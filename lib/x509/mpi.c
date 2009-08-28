@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -211,7 +211,7 @@ get_mpis (int pk_algorithm, ASN1_TYPE asn, const char *root,
 {
   int result;
   char name[256];
-  gnutls_datum tmp = { NULL, 0 };
+  gnutls_datum_t tmp = { NULL, 0 };
 
   /* Read the algorithm's parameters
    */

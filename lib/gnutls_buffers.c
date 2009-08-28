@@ -651,7 +651,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
    */
   if (iptr == NULL)
     {
-      gnutls_datum bdata;
+      gnutls_datum_t bdata;
       /* checking is handled above */
       _gnutls_buffer_get_datum (&session->internals.record_send_buffer, &bdata, session->internals.record_send_buffer.length);
 
@@ -843,7 +843,7 @@ _gnutls_handshake_io_send_int (gnutls_session_t session,
   if (session->internals.handshake_send_buffer.length > 0 && ptr == NULL
       && n == 0)
     {
-      gnutls_datum bdata;
+      gnutls_datum_t bdata;
 
       /* resuming previously interrupted write
        */

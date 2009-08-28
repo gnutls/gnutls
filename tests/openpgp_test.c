@@ -41,7 +41,7 @@ get_pktime (long timestamp)
 }
 
 int
-get_pubkey (gnutls_datum * pk, const gnutls_datum * kr, unsigned long kid)
+get_pubkey (gnutls_datum_t * pk, const gnutls_datum_t * kr, unsigned long kid)
 {
   unsigned char buf[4];
 
@@ -57,7 +57,7 @@ int
 main (int argc, char **argv)
 {
   gnutls_certificate_credentials ctx;
-  gnutls_datum dat, xml, pk;
+  gnutls_datum_t dat, xml, pk;
   gnutls_openpgp_name uid;
   gnutls_privkey *pkey;
   gnutls_cert *cert;

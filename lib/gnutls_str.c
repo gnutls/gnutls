@@ -212,12 +212,12 @@ _gnutls_string_append_str (gnutls_string * dest, const char *src)
   return _gnutls_string_append_data (dest, src, strlen(src));
 }
 
-/* returns data from a string in a constant buffer. 
+/* returns data from a string in a constant buffer.
  * The data will NOT be valid if buffer is released or
  * data are appended in the buffer.
  */
 void
-_gnutls_string_get_datum (gnutls_string * str, gnutls_datum *data,
+_gnutls_string_get_datum (gnutls_string * str, gnutls_datum_t *data,
 			    size_t req_size)
 {
 
@@ -232,32 +232,31 @@ _gnutls_string_get_datum (gnutls_string * str, gnutls_datum *data,
 
   data->data = str->data;
   data->size = req_size;
-  
+
   str->data += req_size;
   str->length -= req_size;
 
-  /* if string becomes empty start from begining */  
+  /* if string becomes empty start from begining */
   if (str->length == 0) {
       str->data = str->allocd;
   }
-  
+
   return;
-  
 }
 
-/* returns data from a string in a constant buffer. 
+/* returns data from a string in a constant buffer.
  */
 void
 _gnutls_string_get_data (gnutls_string * str, void *data,
-			    size_t *req_size)
+			 size_t *req_size)
 {
-gnutls_datum tdata;
+  gnutls_datum_t tdata;
 
   _gnutls_string_get_datum( str, &tdata, *req_size);
 
   *req_size = tdata.size;
   memcpy( data, tdata.data, tdata.size);
-  
+
   return;
 }
 

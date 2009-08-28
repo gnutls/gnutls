@@ -1,5 +1,5 @@
 /* pubkey.c - Public key API
- * Copyright (C) 2002, 2003, 2007, 2008 Free Software Foundation, Inc.
+ * Copyright (C) 2002, 2003, 2007, 2008, 2009 Free Software Foundation, Inc.
  *
  * Author: Timo Schulz
  *
@@ -72,13 +72,13 @@ sig_to_datum (gnutls_datum_t * r_sig, cdk_pkt_signature_t sig)
 cdk_error_t
 cdk_pk_verify (cdk_pubkey_t pk, cdk_pkt_signature_t sig, const byte * md)
 {
-  gnutls_datum s_sig;
+  gnutls_datum_t s_sig;
   byte *encmd = NULL;
   size_t enclen;
   cdk_error_t rc;
   int ret, algo;
   unsigned int i;
-  gnutls_datum data;
+  gnutls_datum_t data;
   gnutls_pk_params_st params;
 
   if (!pk || !sig || !md)

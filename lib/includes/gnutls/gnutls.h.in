@@ -771,7 +771,7 @@ extern "C" {
   (gnutls_certificate_credentials_t res, const char *pkcs12file,
    gnutls_x509_crt_fmt_t type, const char *password);
   int gnutls_certificate_set_x509_simple_pkcs12_mem
-  (gnutls_certificate_credentials_t res, const gnutls_datum *p12blob,
+  (gnutls_certificate_credentials_t res, const gnutls_datum_t *p12blob,
    gnutls_x509_crt_fmt_t type, const char *password);
 
 /* New functions to allow setting already parsed X.509 stuff.

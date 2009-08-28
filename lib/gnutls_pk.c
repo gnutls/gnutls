@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -53,7 +53,7 @@ _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
   size_t k, psize;
   size_t mod_bits;
   gnutls_pk_params_st pk_params;
-  gnutls_datum to_encrypt, encrypted;
+  gnutls_datum_t to_encrypt, encrypted;
 
   for (i = 0; i < params_len; i++)
     pk_params.params[i] = params[i];

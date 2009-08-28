@@ -525,7 +525,7 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
 {
   unsigned char *extensions = NULL;
   size_t extensions_size = 0;
-  gnutls_datum der;
+  gnutls_datum_t der;
   ASN1_TYPE c2;
   int result;
 

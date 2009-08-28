@@ -1939,7 +1939,7 @@ int
  **/
 int
   gnutls_certificate_set_x509_simple_pkcs12_mem
-  (gnutls_certificate_credentials_t res, const gnutls_datum *p12blob,
+  (gnutls_certificate_credentials_t res, const gnutls_datum_t *p12blob,
    gnutls_x509_crt_fmt_t type, const char *password)
 {
   gnutls_pkcs12_t p12;

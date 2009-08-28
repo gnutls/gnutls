@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -126,7 +126,7 @@ check_schema (const char *oid)
  * an ASN.1 INTEGER of the x value.
  */
 inline static int
-_encode_privkey (gnutls_x509_privkey pkey, gnutls_datum * raw)
+_encode_privkey (gnutls_x509_privkey pkey, gnutls_datum_t * raw)
 {
   size_t size = 0;
   opaque *data = NULL;
@@ -216,8 +216,8 @@ encode_to_private_key_info (gnutls_x509_privkey_t pkey,
   int result, len;
   opaque null = 0;
   const char *oid;
-  gnutls_datum algo_params = { NULL, 0 };
-  gnutls_datum algo_privkey = { NULL, 0 };
+  gnutls_datum_t algo_params = { NULL, 0 };
+  gnutls_datum_t algo_privkey = { NULL, 0 };
 
   if (pkey->pk_algorithm != GNUTLS_PK_RSA
       && pkey->pk_algorithm != GNUTLS_PK_DSA)
@@ -856,7 +856,7 @@ static int
 _decode_pkcs8_rsa_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey pkey)
 {
   int ret;
-  gnutls_datum tmp;
+  gnutls_datum_t tmp;
 
   ret = _gnutls_x509_read_value (pkcs8_asn, "privateKey", &tmp, 0);
   if (ret < 0)
@@ -886,7 +886,7 @@ static int
 _decode_pkcs8_dsa_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey pkey)
 {
   int ret;
-  gnutls_datum tmp;
+  gnutls_datum_t tmp;
 
   ret = _gnutls_x509_read_value (pkcs8_asn, "privateKey", &tmp, 0);
   if (ret < 0)

@@ -88,7 +88,7 @@ client (struct params_res *params)
   /* variables used in session resuming
    */
   int t;
-  gnutls_datum session_data;
+  gnutls_datum_t session_data;
 
   gnutls_global_init ();
 

@@ -320,7 +320,7 @@ gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt,
       opaque *extensions;
       size_t extensions_size;
       unsigned int critical;
-      gnutls_datum ext;
+      gnutls_datum_t ext;
 
       oid_size = sizeof (oid);
       result = gnutls_x509_crq_get_extension_info (crq, i, oid,

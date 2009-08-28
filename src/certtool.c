@@ -127,8 +127,8 @@ raw_to_string (const unsigned char *raw, size_t raw_size)
 }
 
 static void
-print_dsa_pkey (gnutls_datum * x, gnutls_datum * y, gnutls_datum * p,
-		gnutls_datum * q, gnutls_datum * g)
+print_dsa_pkey (gnutls_datum_t * x, gnutls_datum_t * y, gnutls_datum_t * p,
+		gnutls_datum_t * q, gnutls_datum_t * g)
 {
   fprintf (outfile, "private key:");
   print_hex_datum (x);
@@ -143,8 +143,8 @@ print_dsa_pkey (gnutls_datum * x, gnutls_datum * y, gnutls_datum * p,
 }
 
 static void
-print_rsa_pkey (gnutls_datum * m, gnutls_datum * e, gnutls_datum * d,
-		gnutls_datum * p, gnutls_datum * q, gnutls_datum * u)
+print_rsa_pkey (gnutls_datum_t * m, gnutls_datum_t * e, gnutls_datum_t * d,
+		gnutls_datum_t * p, gnutls_datum_t * q, gnutls_datum_t * u)
 {
   fprintf (outfile, "modulus:");
   print_hex_datum (m);

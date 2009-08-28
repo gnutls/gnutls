@@ -742,7 +742,7 @@ _gnutls_x509_export_int_named (ASN1_TYPE asn1_data, const char *name,
   else
     {				/* PEM */
       opaque *out;
-      gnutls_datum tmp;
+      gnutls_datum_t tmp;
 
       result = _gnutls_x509_der_encode (asn1_data, name, &tmp, 0);
       if (result < 0)

@@ -140,7 +140,7 @@ doit (void)
   gnutls_digest_algorithm_t hash_algo;
   unsigned char _signature[128];
   size_t _signature_size = sizeof (_signature);
-  gnutls_datum signature;
+  gnutls_datum_t signature;
   int ret;
   size_t i;
 

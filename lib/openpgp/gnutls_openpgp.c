@@ -618,7 +618,7 @@ gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t c,
 					    size_t dlen,
 					    gnutls_openpgp_crt_fmt_t format)
 {
-  gnutls_datum ddata;
+  gnutls_datum_t ddata;
   int rc;
 
   ddata.data = (void *) data;

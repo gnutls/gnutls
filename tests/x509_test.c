@@ -118,7 +118,7 @@ _verify_x509_mem (const char *cert, int cert_size,
   const char *ptr;
   int ret;
   unsigned int output;
-  gnutls_datum tmp;
+  gnutls_datum_t tmp;
   gnutls_x509_crt *x509_cert_list = NULL;
   gnutls_x509_crt x509_ca;
   gnutls_x509_crl *x509_crl_list = NULL;
