@@ -109,7 +109,7 @@ const gnutls_datum_t key = { key_pem, sizeof (key_pem) };
 #define EXPECT_RDN0 "GnuTLS test CA"
 
 static int
-cert_callback (gnutls_session session,
+cert_callback (gnutls_session_t session,
 	       const gnutls_datum_t * req_ca_rdn, int nreqs,
 	       const gnutls_pk_algorithm * sign_algos,
 	       int sign_algos_length, gnutls_retr_st * st)
