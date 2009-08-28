@@ -1,4 +1,4 @@
-# unistd_h.m4 serial 19
+# unistd_h.m4 serial 21
 dnl Copyright (C) 2006-2009 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -35,6 +35,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   GNULIB_CHOWN=0;            AC_SUBST([GNULIB_CHOWN])
   GNULIB_CLOSE=0;            AC_SUBST([GNULIB_CLOSE])
   GNULIB_DUP2=0;             AC_SUBST([GNULIB_DUP2])
+  GNULIB_DUP3=0;             AC_SUBST([GNULIB_DUP3])
   GNULIB_ENVIRON=0;          AC_SUBST([GNULIB_ENVIRON])
   GNULIB_EUIDACCESS=0;       AC_SUBST([GNULIB_EUIDACCESS])
   GNULIB_FCHDIR=0;           AC_SUBST([GNULIB_FCHDIR])
@@ -50,6 +51,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   GNULIB_LCHOWN=0;           AC_SUBST([GNULIB_LCHOWN])
   GNULIB_LINK=0;             AC_SUBST([GNULIB_LINK])
   GNULIB_LSEEK=0;            AC_SUBST([GNULIB_LSEEK])
+  GNULIB_PIPE2=0;            AC_SUBST([GNULIB_PIPE2])
   GNULIB_READLINK=0;         AC_SUBST([GNULIB_READLINK])
   GNULIB_SLEEP=0;            AC_SUBST([GNULIB_SLEEP])
   GNULIB_UNISTD_H_GETOPT=0;  AC_SUBST([GNULIB_UNISTD_H_GETOPT])
@@ -57,6 +59,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   GNULIB_WRITE=0;            AC_SUBST([GNULIB_WRITE])
   dnl Assume proper GNU behavior unless another module says otherwise.
   HAVE_DUP2=1;            AC_SUBST([HAVE_DUP2])
+  HAVE_DUP3=1;            AC_SUBST([HAVE_DUP3])
   HAVE_EUIDACCESS=1;      AC_SUBST([HAVE_EUIDACCESS])
   HAVE_FSYNC=1;           AC_SUBST([HAVE_FSYNC])
   HAVE_FTRUNCATE=1;       AC_SUBST([HAVE_FTRUNCATE])
@@ -66,6 +69,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   HAVE_GETPAGESIZE=1;     AC_SUBST([HAVE_GETPAGESIZE])
   HAVE_GETUSERSHELL=1;    AC_SUBST([HAVE_GETUSERSHELL])
   HAVE_LINK=1;            AC_SUBST([HAVE_LINK])
+  HAVE_PIPE2=1;           AC_SUBST([HAVE_PIPE2])
   HAVE_READLINK=1;        AC_SUBST([HAVE_READLINK])
   HAVE_SLEEP=1;           AC_SUBST([HAVE_SLEEP])
   HAVE_DECL_ENVIRON=1;    AC_SUBST([HAVE_DECL_ENVIRON])

@@ -178,6 +178,28 @@ extern int dup2 (int oldfd, int newfd);
 #endif
 
 
+#if @GNULIB_DUP3@
+/* Copy the file descriptor OLDFD into file descriptor NEWFD, with the
+   specified flags.
+   The flags are a bitmask, possibly including O_CLOEXEC (defined in <fcntl.h>)
+   and O_TEXT, O_BINARY (defined in "binary-io.h").
+   Close NEWFD first if it is open.
+   Return newfd if successful, otherwise -1 and errno set.
+   See the Linux man page at
+   <http://www.kernel.org/doc/man-pages/online/pages/man2/dup3.2.html>.  */
+# if @HAVE_DUP3@
+#  define dup3 rpl_dup3
+# endif
+extern int dup3 (int oldfd, int newfd, int flags);
+#elif defined GNULIB_POSIXCHECK
+# undef dup3
+# define dup3(o,n,f) \
+    (GL_LINK_WARNING ("dup3 is unportable - " \
+                      "use gnulib module dup3 for portability"), \
+     dup3 (o, n, f))
+#endif
+
+
 #if @GNULIB_ENVIRON@
 # if !@HAVE_DECL_ENVIRON@
 /* Set of environment variables and values.  An array of strings of the form
@@ -328,7 +350,8 @@ extern int getdomainname(char *name, size_t len);
 
 #if @GNULIB_GETDTABLESIZE@
 # if !@HAVE_GETDTABLESIZE@
-/* Return the maximum number of file descriptors in the current process.  */
+/* Return the maximum number of file descriptors in the current process.
+   In POSIX, this is same as sysconf (_SC_OPEN_MAX).  */
 extern int getdtablesize (void);
 # endif
 #elif defined GNULIB_POSIXCHECK
@@ -528,6 +551,28 @@ extern int link (const char *path1, const char *path2);
     (GL_LINK_WARNING ("lseek does not fail with ESPIPE on pipes on some " \
                       "systems - use gnulib module lseek for portability"), \
      lseek (f, o, w))
+#endif
+
+
+#if @GNULIB_PIPE2@
+/* Create a pipe, applying the given flags when opening the read-end of the
+   pipe and the write-end of the pipe.
+   The flags are a bitmask, possibly including O_CLOEXEC (defined in <fcntl.h>)
+   and O_TEXT, O_BINARY (defined in "binary-io.h").
+   Store the read-end as fd[0] and the write-end as fd[1].
+   Return 0 upon success, or -1 with errno set upon failure.
+   See also the Linux man page at
+   <http://www.kernel.org/doc/man-pages/online/pages/man2/pipe2.2.html>.  */
+# if @HAVE_PIPE2@
+#  define pipe2 rpl_pipe2
+# endif
+extern int pipe2 (int fd[2], int flags);
+#elif defined GNULIB_POSIXCHECK
+# undef pipe2
+# define pipe2(f,o) \
+    (GL_LINK_WARNING ("pipe2 is unportable - " \
+                      "use gnulib module pipe2 for portability"), \
+     pipe2 (f, o))
 #endif
 
 
