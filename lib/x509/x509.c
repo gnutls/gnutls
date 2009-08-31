@@ -1012,6 +1012,7 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
 	  if (len > strlen (XMPP_OID) && strcmp (oid, XMPP_OID) == 0)
 	    {
 	      ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+	      size_t orig_name_size = *name_size;
 
 	      result = asn1_create_element
 		(_gnutls_get_pkix (), "PKIX1.XmppAddr", &c2);
@@ -1029,15 +1030,27 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
 		  return _gnutls_asn2err (result);
 		}
 
+	      len = *name_size;
 	      result = asn1_read_value (c2, "", name, &len);
-	      *name_size = len;
 	      if (result != ASN1_SUCCESS)
 		{
 		  gnutls_assert ();
 		  asn1_delete_structure (&c2);
+		  *name_size = len + 1;
 		  return _gnutls_asn2err (result);
 		}
 	      asn1_delete_structure (&c2);
+
+	      if (len + 1 > orig_name_size)
+		{
+		  gnutls_assert ();
+		  *name_size = len + 1;
+		  return GNUTLS_E_SHORT_MEMORY_BUFFER;
+		}
+
+	      *name_size = len;
+	      /* null terminate it */
+	      ((char *) name)[*name_size] = 0;
 	    }
 	}
     }
