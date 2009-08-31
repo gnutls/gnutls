@@ -1353,10 +1353,9 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, opaque * data,
     {
       /* read supported hashes */
       int hash_num;
-      DECR_LEN (dsize, 1);
-
-      hash_num = p[0] & 0xFF;
-      p++;
+      DECR_LEN (dsize, 2);
+      hash_num = _gnutls_read_uint16 (p);
+      p += 2;
 
       DECR_LEN (dsize, hash_num);
       p += hash_num;
