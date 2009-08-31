@@ -1787,6 +1787,8 @@ struct gnutls_sign_entry
   gnutls_sign_algorithm_t id;
   gnutls_pk_algorithm_t pk;
   gnutls_mac_algorithm_t mac;
+  /* See RFC 5246 HashAlgorithm and SignatureAlgorithm
+     for values to use in aid struct. */
   sign_algorithm_st aid;
 };
 typedef struct gnutls_sign_entry gnutls_sign_entry;
