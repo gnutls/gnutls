@@ -12,6 +12,10 @@ Contributed by Daiki Ueno.
 The patch to resolve the X.509 CN/SAN issue accidentally broken
 OpenPGP hostname comparison.
 
+** libgnutls: When printing X.509 certificates, handle XMPP SANs better.
+Reported by Howard Chu <hyc@symas.com> in
+<https://savannah.gnu.org/support/?106975>.
+
 ** Fix use of deprecated types internally.
 Use of deprecated types in GnuTLS from now on will lead to a compile
 error, to prevent this from happening again.
