@@ -785,7 +785,7 @@ _gnutls_P_hash (gnutls_mac_algorithm_t algorithm,
 
   digest_hd_st td2;
   int i, times, how, blocksize, A_size;
-  opaque final[20], Atmp[MAX_SEED_SIZE];
+  opaque final[MAX_HASH_SIZE], Atmp[MAX_SEED_SIZE];
   int output_bytes, result;
 
   if (seed_size > MAX_SEED_SIZE || total_bytes <= 0)
@@ -906,7 +906,7 @@ _gnutls_PRF (gnutls_session_t session,
   if (_gnutls_version_has_selectable_prf(ver))
     {
       result =
-	_gnutls_P_hash (GNUTLS_MAC_SHA1, secret, secret_size,
+	_gnutls_P_hash (GNUTLS_MAC_SHA256, secret, secret_size,
 			s_seed, s_seed_size, total_bytes, ret);
       if (result < 0)
 	{

@@ -236,7 +236,7 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret)
   else
     {
       _gnutls_hash_deinit (&td_sha, concat);
-      len = 20;
+      len = _gnutls_hash_get_algo_len (td_sha.algorithm);
     }
 
   if (type == GNUTLS_SERVER)
@@ -2170,6 +2170,8 @@ _gnutls_abort_handshake (gnutls_session_t session, int ret)
 inline static int
 _gnutls_handshake_hash_init (gnutls_session_t session)
 {
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  gnutls_digest_algorithm_t hash_algo = GNUTLS_MAC_SHA1;
 
   if (session->internals.handshake_mac_handle_init == 0)
     {
@@ -2183,9 +2185,15 @@ _gnutls_handshake_hash_init (gnutls_session_t session)
 	  return ret;
 	}
 
+      /* The algorithm to compute hash over handshake messages must be
+	 same as the one used as the basis for PRF.  By now we use
+	 SHA256. */
+      if (_gnutls_version_has_selectable_prf (ver))
+       hash_algo = GNUTLS_MAC_SHA256;
+
       ret =
 	_gnutls_hash_init (&session->internals.handshake_mac_handle_sha,
-			   GNUTLS_MAC_SHA1);
+			   hash_algo);
       if (ret < 0)
 	{
 	  gnutls_assert ();
