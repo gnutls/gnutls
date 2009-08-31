@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.9.4 (unreleased)
 
+** libgnutls: Client-side TLS 1.2 now works.
+Contributed by Daiki Ueno.
+
 ** libgnutls: Make OpenPGP hostname checking work again.
 The patch to resolve the X.509 CN/SAN issue accidentally broken
 OpenPGP hostname comparison.

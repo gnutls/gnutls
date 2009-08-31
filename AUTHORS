@@ -7,7 +7,7 @@ The copyright holder for GnuTLS is Free Software Foundation, Inc., 51
 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 Simon Josefsson <simon@josefsson.org>
-Current maintainer.
+Current maintainer; draft TLS 1.2 support.
 
 Nikos Mavrogiannopoulos <nmav@gnutls.org>
 Original author and maintainer of GnuTLS.
@@ -52,7 +52,8 @@ David Marín Carreño <davefx@gmail.com>
 Added gnutls_x509_crq_get_key_id.
 
 Daiki Ueno <ueno@unixuser.org>
-Added TLS Session Ticket (RFC 5077) support.
+Added TLS Session Ticket (RFC 5077) support,
+finished client-side TLS 1.2 support.
 
 Jonathan Bastien-Filiatrault <joe@x2a.org>
 Fix TLS-version checks.
