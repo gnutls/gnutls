@@ -1787,29 +1787,32 @@ struct gnutls_sign_entry
   gnutls_sign_algorithm_t id;
   gnutls_pk_algorithm_t pk;
   gnutls_mac_algorithm_t mac;
+  sign_algorithm_st aid;
 };
 typedef struct gnutls_sign_entry gnutls_sign_entry;
 
+#define TLS_SIGN_AID_UNKNOWN {255, 255}
+
 static const gnutls_sign_entry sign_algorithms[] = {
   {"RSA-SHA", SIG_RSA_SHA1_OID, GNUTLS_SIGN_RSA_SHA1, GNUTLS_PK_RSA,
-   GNUTLS_MAC_SHA1},
+   GNUTLS_MAC_SHA1, {2, 1}},
   {"RSA-SHA256", SIG_RSA_SHA256_OID, GNUTLS_SIGN_RSA_SHA256, GNUTLS_PK_RSA,
-   GNUTLS_MAC_SHA256},
+   GNUTLS_MAC_SHA256, {4, 1}},
   {"RSA-SHA384", SIG_RSA_SHA384_OID, GNUTLS_SIGN_RSA_SHA384, GNUTLS_PK_RSA,
-   GNUTLS_MAC_SHA384},
+   GNUTLS_MAC_SHA384, {5, 1}},
   {"RSA-SHA512", SIG_RSA_SHA512_OID, GNUTLS_SIGN_RSA_SHA512, GNUTLS_PK_RSA,
-   GNUTLS_MAC_SHA512},
+   GNUTLS_MAC_SHA512, {6, 1}},
   {"RSA-RMD160", SIG_RSA_RMD160_OID, GNUTLS_SIGN_RSA_RMD160, GNUTLS_PK_RSA,
-   GNUTLS_MAC_RMD160},
+   GNUTLS_MAC_RMD160, TLS_SIGN_AID_UNKNOWN},
   {"DSA-SHA", SIG_DSA_SHA1_OID, GNUTLS_SIGN_DSA_SHA1, GNUTLS_PK_DSA,
-   GNUTLS_MAC_SHA1},
+   GNUTLS_MAC_SHA1, {2, 2}},
   {"RSA-MD5", SIG_RSA_MD5_OID, GNUTLS_SIGN_RSA_MD5, GNUTLS_PK_RSA,
-   GNUTLS_MAC_MD5},
+   GNUTLS_MAC_MD5, {1, 1}},
   {"RSA-MD2", SIG_RSA_MD2_OID, GNUTLS_SIGN_RSA_MD2, GNUTLS_PK_RSA,
-   GNUTLS_MAC_MD2},
-  {"GOST R 34.10-2001", SIG_GOST_R3410_2001_OID, 0, 0, 0},
-  {"GOST R 34.10-94", SIG_GOST_R3410_94_OID, 0, 0, 0},
-  {0, 0, 0, 0, 0}
+   GNUTLS_MAC_MD2, TLS_SIGN_AID_UNKNOWN},
+  {"GOST R 34.10-2001", SIG_GOST_R3410_2001_OID, 0, 0, 0, TLS_SIGN_AID_UNKNOWN},
+  {"GOST R 34.10-94", SIG_GOST_R3410_94_OID, 0, 0, 0, TLS_SIGN_AID_UNKNOWN},
+  {0, 0, 0, 0, 0, TLS_SIGN_AID_UNKNOWN}
 };
 
 /* Keep the contents of this struct the same as the previous one. */
@@ -1957,6 +1960,52 @@ _gnutls_x509_sign_to_oid (gnutls_pk_algorithm_t pk,
   GNUTLS_SIGN_ALG_LOOP (ret = p->oid);
   return ret;
 }
+
+gnutls_mac_algorithm_t
+_gnutls_sign_get_mac_algorithm (gnutls_sign_algorithm_t sign)
+{
+  gnutls_mac_algorithm_t ret = GNUTLS_MAC_UNKNOWN;
+
+  GNUTLS_SIGN_ALG_LOOP (ret = p->mac);
+
+  return ret;
+}
+
+gnutls_pk_algorithm_t
+_gnutls_sign_get_pk_algorithm (gnutls_sign_algorithm_t sign)
+{
+  gnutls_pk_algorithm_t ret = GNUTLS_PK_UNKNOWN;
+
+  GNUTLS_SIGN_ALG_LOOP (ret = p->pk);
+
+  return ret;
+}
+
+gnutls_sign_algorithm_t
+_gnutls_tls_aid_to_sign (sign_algorithm_st aid)
+{
+  gnutls_sign_algorithm_t ret = GNUTLS_SIGN_UNKNOWN;
+
+  GNUTLS_SIGN_LOOP ( if (p->aid.hash_algorithm == aid.hash_algorithm
+			 && p->aid.sign_algorithm == aid.sign_algorithm)
+		       {
+			 ret = p->id;
+			 break;
+		       } );
+
+  return ret;
+}
+
+sign_algorithm_st
+_gnutls_sign_to_tls_aid (gnutls_sign_algorithm_t sign)
+{
+  sign_algorithm_st ret = TLS_SIGN_AID_UNKNOWN;
+
+  GNUTLS_SIGN_ALG_LOOP (ret = p->aid);
+
+  return ret;
+}
+
 
 
 /* pk algorithms;

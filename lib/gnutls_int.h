@@ -273,6 +273,12 @@ typedef struct
   uint8_t suite[2];
 } cipher_suite_st;
 
+typedef struct
+{
+  uint8_t hash_algorithm;
+  uint8_t sign_algorithm;
+} sign_algorithm_st;
+
 /* This structure holds parameters got from TLS extension
  * mechanism. (some extensions may hold parameters in auth_info_t
  * structures also - see SRP).
