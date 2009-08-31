@@ -42,7 +42,8 @@ int _gnutls_verify_sig_hdata (gnutls_session_t session,
 int _gnutls_verify_sig_params (gnutls_session_t session,
 			       gnutls_cert * cert,
 			       const gnutls_datum_t * params,
-			       gnutls_datum_t * signature);
+			       gnutls_datum_t * signature,
+			       gnutls_sign_algorithm_t algo);
 
 int _gnutls_sign (gnutls_pk_algorithm_t algo,
 		  bigint_t * params, int params_size,

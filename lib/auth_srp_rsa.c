@@ -191,7 +191,8 @@ proc_srp_cert_server_kx (gnutls_session_t session, opaque * data,
       return ret;
     }
 
-  ret = _gnutls_verify_sig_params (session, &peer_cert, &vparams, &signature);
+  ret = _gnutls_verify_sig_params (session, &peer_cert, &vparams, &signature,
+				   GNUTLS_SIGN_UNKNOWN);
 
   _gnutls_gcert_deinit (&peer_cert);
   if (ret < 0)

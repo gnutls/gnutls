@@ -180,11 +180,14 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
 		    size_t _data_size)
 {
   int sigsize;
+  opaque *sigdata;
   gnutls_datum_t vparams, signature;
   int ret;
   cert_auth_info_t info = _gnutls_get_auth_info (session);
   ssize_t data_size = _data_size;
   gnutls_cert peer_cert;
+  gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
   if (info == NULL || info->ncerts == 0)
     {
@@ -205,11 +208,28 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
   vparams.size = ret;
   vparams.data = data;
 
+  sigdata = &data[vparams.size];
+  if (_gnutls_version_has_selectable_sighash (ver))
+    {
+      sign_algorithm_st aid;
+
+      DECR_LEN(data_size, 1);
+      aid.hash_algorithm = *sigdata++;
+      DECR_LEN(data_size, 1);
+      aid.sign_algorithm = *sigdata++;
+      sign_algo = _gnutls_tls_aid_to_sign (aid);
+      if (sign_algo == GNUTLS_SIGN_UNKNOWN)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+	}
+    }
   DECR_LEN (data_size, 2);
-  sigsize = _gnutls_read_uint16 (&data[vparams.size]);
+  sigsize = _gnutls_read_uint16 (sigdata);
+  sigdata += 2;
 
   DECR_LEN (data_size, sigsize);
-  signature.data = &data[vparams.size + 2];
+  signature.data = sigdata;
   signature.size = sigsize;
 
   if ((ret =
@@ -221,7 +241,8 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
       return ret;
     }
 
-  ret = _gnutls_verify_sig_params (session, &peer_cert, &vparams, &signature);
+  ret = _gnutls_verify_sig_params (session, &peer_cert, &vparams, &signature,
+				   sign_algo);
 
   _gnutls_gcert_deinit (&peer_cert);
   if (ret < 0)
