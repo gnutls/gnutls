@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.9.4 (unreleased)
 
+** libgnutls: Make OpenPGP hostname checking work again.
+The patch to resolve the X.509 CN/SAN issue accidentally broken
+OpenPGP hostname comparison.
+
 ** Fix use of deprecated types internally.
 Use of deprecated types in GnuTLS from now on will lead to a compile
 error, to prevent this from happening again.
