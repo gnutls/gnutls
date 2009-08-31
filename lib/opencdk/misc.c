@@ -109,7 +109,7 @@ cdk_strlist_add (cdk_strlist_t * list, const char *string)
  * cdk_strlist_next:
  * @root: the opaque string list.
  * @r_str: optional argument to store the string data.
- * 
+ *
  * Return the next string list node from @root. The optional
  * argument @r_str return the data of the current (!) node.
  **/
@@ -118,7 +118,10 @@ cdk_strlist_next (cdk_strlist_t root, const char **r_str)
 {
   cdk_strlist_t node;
 
-  if (root && r_str)
+  if (!root)
+    return NULL;
+
+  if (r_str)
     *r_str = root->d;
   for (node = root->next; node; node = node->next)
     return node;
