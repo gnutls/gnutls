@@ -9,6 +9,10 @@ See the end for copying conditions.
 The patch to resolve the X.509 CN/SAN issue accidentally broken
 OpenPGP hostname comparison.
 
+** libgnutls: When printing X.509 certificates, handle XMPP SANs better.
+Reported by Howard Chu <hyc@symas.com> in
+<https://savannah.gnu.org/support/?106975>.
+
 ** API and ABI modifications:
 No changes since last version.
 
