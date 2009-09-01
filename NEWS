@@ -7,7 +7,9 @@ See the end for copying conditions.
 
 ** libgnutls: Client-side TLS 1.2 and SHA-256 ciphersuites now works.
 The new supported ciphersuites are AES-128/256 in CBC mode with
-ANON-DH/RSA/DHE-DSS/DHE-RSA.  Contributed by Daiki Ueno.
+ANON-DH/RSA/DHE-DSS/DHE-RSA.  Contributed by Daiki Ueno.  Further,
+SHA-256 is now the preferred default MAC (however it is only used with
+TLS 1.2).
 
 ** libgnutls: Make OpenPGP hostname checking work again.
 The patch to resolve the X.509 CN/SAN issue accidentally broken
