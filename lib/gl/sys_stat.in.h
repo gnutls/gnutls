@@ -302,6 +302,10 @@ extern int rpl_lstat (const char *name, struct stat *buf);
    lstat (p, b))
 #endif
 
+#if @REPLACE_FCHDIR@
+# define fstat rpl_fstat
+extern int fstat (int fd, struct stat *buf);
+#endif
 
 #if @REPLACE_MKDIR@
 # undef mkdir

@@ -248,11 +248,11 @@ extern int fchdir (int /*fd*/);
 #  define dup rpl_dup
 extern int dup (int);
 
-#  if @REPLACE_DUP2@
-#   undef dup2
-#  endif
-#  define dup2 rpl_dup2_fchdir
-extern int dup2 (int, int);
+/* Gnulib internal hooks needed to maintain the fchdir metadata.  */
+extern int _gl_register_fd (int fd, const char *filename);
+extern void _gl_unregister_fd (int fd);
+extern int _gl_register_dup (int oldfd, int newfd);
+extern const char *_gl_directory_name (int fd);
 
 # endif
 #elif defined GNULIB_POSIXCHECK
@@ -618,12 +618,6 @@ extern unsigned int sleep (unsigned int n);
 # undef write
 # define write rpl_write
 extern ssize_t write (int fd, const void *buf, size_t count);
-#endif
-
-
-#ifdef FCHDIR_REPLACEMENT
-/* gnulib internal function.  */
-extern void _gl_unregister_fd (int fd);
 #endif
 
 

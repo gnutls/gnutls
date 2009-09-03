@@ -91,7 +91,7 @@ BUILT_SOURCES += $(ARPA_INET_H)
 # We need the following in order to create <arpa/inet.h> when the system
 # doesn't have one.
 arpa/inet.h: arpa_inet.in.h
-	$(AM_V_at)@MKDIR_P@ arpa
+	$(AM_V_at)$(MKDIR_P) arpa
 	$(AM_V_GEN)rm -f $@-t $@ && \
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
 	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
@@ -418,7 +418,7 @@ BUILT_SOURCES += $(NETINET_IN_H)
 # We need the following in order to create <netinet/in.h> when the system
 # doesn't have one.
 netinet/in.h: netinet_in.in.h
-	$(AM_V_at)@MKDIR_P@ netinet
+	$(AM_V_at)$(MKDIR_P) netinet
 	$(AM_V_GEN)rm -f $@-t $@ && \
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
 	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
@@ -917,7 +917,7 @@ BUILT_SOURCES += $(SYS_SELECT_H)
 # We need the following in order to create <sys/select.h> when the system
 # doesn't have one that works with the given compiler.
 sys/select.h: sys_select.in.h
-	$(AM_V_at)@MKDIR_P@ sys
+	$(AM_V_at)$(MKDIR_P) sys
 	$(AM_V_GEN)rm -f $@-t $@ && \
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
 	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
@@ -945,7 +945,7 @@ BUILT_SOURCES += $(SYS_SOCKET_H)
 # We need the following in order to create <sys/socket.h> when the system
 # doesn't have one that works with the given compiler.
 sys/socket.h: sys_socket.in.h
-	$(AM_V_at)@MKDIR_P@ sys
+	$(AM_V_at)$(MKDIR_P) sys
 	$(AM_V_GEN)rm -f $@-t $@ && \
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
 	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
@@ -991,7 +991,7 @@ BUILT_SOURCES += $(SYS_STAT_H)
 # We need the following in order to create <sys/stat.h> when the system
 # has one that is incomplete.
 sys/stat.h: sys_stat.in.h
-	$(AM_V_at)@MKDIR_P@ sys
+	$(AM_V_at)$(MKDIR_P) sys
 	$(AM_V_GEN)rm -f $@-t $@ && \
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
 	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
@@ -1003,6 +1003,7 @@ sys/stat.h: sys_stat.in.h
 	      -e 's|@''HAVE_LSTAT''@|$(HAVE_LSTAT)|g' \
 	      -e 's|@''REPLACE_LSTAT''@|$(REPLACE_LSTAT)|g' \
 	      -e 's|@''REPLACE_MKDIR''@|$(REPLACE_MKDIR)|g' \
+	      -e 's|@''REPLACE_FCHDIR''@|$(REPLACE_FCHDIR)|g' \
 	      -e '/definition of GL_LINK_WARNING/r $(LINK_WARNING_H)' \
 	      < $(srcdir)/sys_stat.in.h; \
 	} > $@-t && \
@@ -1021,7 +1022,7 @@ BUILT_SOURCES += $(SYS_TIME_H)
 # We need the following in order to create <sys/time.h> when the system
 # doesn't have one that works with the given compiler.
 sys/time.h: sys_time.in.h
-	$(AM_V_at)@MKDIR_P@ sys
+	$(AM_V_at)$(MKDIR_P) sys
 	$(AM_V_GEN)rm -f $@-t $@ && \
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
 	  sed -e 's/@''HAVE_SYS_TIME_H''@/$(HAVE_SYS_TIME_H)/g' \
