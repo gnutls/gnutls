@@ -27,7 +27,9 @@
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
-#include <gnutls/openpgp.h>
+#ifdef ENABLE_OPENPGP
+# include <gnutls/openpgp.h>
+#endif
 
 #include "utils.h"
 
@@ -635,6 +637,7 @@ char pem10[] =
   "/yfcgJk0Zr3jMVTVtj/O1AijUihhXr0=\n"
   "-----END CERTIFICATE-----\n";
 
+#ifdef ENABLE_OPENPGP
 /* Check basic OpenPGP comparison too.
    <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3812>. */
 char pem11[] =
@@ -667,12 +670,15 @@ char pem11[] =
   "Z/V2Me1st/9pqPfZAJ4+9YBnyjCq/0vosIoZabi+s92m7g==\n"
   "=NkXV\n"
   "-----END PGP PUBLIC KEY BLOCK-----\n";
+#endif
 
 void
 doit (void)
 {
   gnutls_x509_crt_t x509;
+#ifdef ENABLE_OPENPGP
   gnutls_openpgp_crt_t pgp;
+#endif
   gnutls_datum_t data;
   int ret;
 
@@ -684,9 +690,11 @@ doit (void)
   if (ret < 0)
     fail ("gnutls_x509_crt_init: %d\n", ret);
 
+#ifdef ENABLE_OPENPGP
   ret = gnutls_openpgp_crt_init (&pgp);
   if (ret < 0)
     fail ("gnutls_openpgp_crt_init: %d\n", ret);
+#endif
 
   success ("Testing pem1...\n");
   data.data = pem1;
@@ -930,6 +938,7 @@ doit (void)
   else
     success ("Hostname correctly does not match (%d)\n", ret);
 
+#ifdef ENABLE_OPENPGP
   success ("Testing pem11...\n");
   data.data = pem11;
   data.size = strlen (pem11);
@@ -944,8 +953,9 @@ doit (void)
   else
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
-  gnutls_x509_crt_deinit (x509);
   gnutls_openpgp_crt_deinit (pgp);
+#endif
+  gnutls_x509_crt_deinit (x509);
 
   gnutls_global_deinit ();
 }
