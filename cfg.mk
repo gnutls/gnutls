@@ -117,4 +117,5 @@ web:
 
 upload-web:
 	cd $(htmldir) && \
-		cvs commit -m "Update." manual/ reference/ doxygen/ devel/
+		cvs commit -m "Update." manual/ reference/ \
+			doxygen/ devel/ cyclo/
