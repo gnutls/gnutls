@@ -1,3 +1,325 @@
+2009-09-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.9.4.
+
+2009-09-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/hostname-check.c: Build when OpenPGP is disabled.
+
+2009-09-03  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Fix!
+
+2009-09-03  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Typo.
+
+2009-09-03  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Ugly hack for autobuilder.
+
+2009-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_priority.c: Use SHA256 as MAC by default.
+
+2009-09-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-09-01  Daiki Ueno <ueno@unixuser.org>
+
+	* lib/gnutls_algorithms.c: Add SHA-2 cipher suites.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-09-01  Daiki Ueno <ueno@unixuser.org>
+
+	* lib/debug.c: Print NewSessionTicket handshake.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-31  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-08-31  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Handle XMPP SANs properly.  Reported by Howard
+	Chu <hyc@symas.com> in <https://savannah.gnu.org/support/?106975>.
+
+2009-08-31  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_dhe.c: Need another header.
+
+2009-08-31  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS, NEWS: Add.
+
+2009-08-31  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_algorithms.c: Add comment explaining where magic values
+	come from.
+
+2009-08-31  Daiki Ueno <ueno@unixuser.org>
+
+	* lib/auth_cert.c: Fix parsing Certificate Request for TLS 1.2.  Fix the logic to skip supported_signature_algorithms in Certificate
+	Request.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-31  Daiki Ueno <ueno@unixuser.org>
+
+	* lib/gnutls_handshake.c, lib/gnutls_pk.c, lib/gnutls_state.c: Use
+	SHA256 for PRF if TLS 1.2.  Use SHA256 for the basis of PRF, and for the hash over handshake
+	messages.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-31  Daiki Ueno <ueno@unixuser.org>
+
+	* lib/auth_dhe.c, lib/auth_rsa_export.c, lib/auth_srp_rsa.c,
+	lib/gnutls_sig.c, lib/gnutls_sig.h: Respect TLS signature algorithm
+	in server KX.  Verify signature of DH parameters in Server Key Exchange with the
+	embedded signature algorithm.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-31  Daiki Ueno <ueno@unixuser.org>
+
+	* lib/gnutls_algorithms.c, lib/gnutls_algorithms.h,
+	lib/gnutls_int.h: Add functions for TLS signature algorithm.  Add functions to convert TLS signature algorithm from/to constants
+	defined by GnuTLS.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-31  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-08-31  Simon Josefsson <simon@josefsson.org>
+
+	* maint.mk: Update gnulib files.
+
+2009-08-31  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2009-08-25  Fabian Keil <fk@fabiankeil.de>
+
+	* src/serv.c: Remove dead store in listen_socket().  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-25  Fabian Keil <fk@fabiankeil.de>
+
+	* lib/gnutls_buffers.c: Remove dead store in
+	_gnutls_io_write_buffered().  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-24  Fabian Keil <fk@fabiankeil.de>
+
+	* lib/x509/x509.c: Remove dead store in
+	gnutls_x509_crt_list_import().  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-24  Fabian Keil <fk@fabiankeil.de>
+
+	* lib/auth_srp_passwd.c: Remove dead store in pwd_put_values().  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-24  Fabian Keil <fk@fabiankeil.de>
+
+	* src/certtool.c: Remove dead store in pkcs12_info().  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-25  Fabian Keil <fk@fabiankeil.de>
+
+	* lib/auth_cert.c: Remove write-only variable info in
+	_gnutls_proc_cert_cert_req().  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-25  Fabian Keil <fk@fabiankeil.de>
+
+	* lib/auth_rsa_export.c: Remove write-only variable info in
+	gen_rsa_export_server_kx().  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-25  Fabian Keil <fk@fabiankeil.de>
+
+	* src/cfg/shared.c: Remove write-only variable sep_ar_idx in
+	split_multi_arg().  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-24  Fabian Keil <fk@fabiankeil.de>
+
+	* lib/x509/pkcs12.c: Remove write-only variable tmp_size in
+	_pkcs12_decode_safe_content().  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-29  Fabian Keil <fk@fabiankeil.de>
+
+	* THANKS: Remove duplicates. Two exact ones and a pretty close one.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-25  Fabian Keil <fk@fabiankeil.de>
+
+	* lib/auth_srp_passwd.c: Mark what looks like a bug in in
+	_gnutls_srp_pwd_read_entry() Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-24  Fabian Keil <fk@fabiankeil.de>
+
+	* src/crypt.c: In main(), rename salt to salt_size and don't bother
+	reading info.salt which we don't use anyway.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-31  Simon Josefsson <simon@josefsson.org>
+
+	* lib/opencdk/misc.c: (cdk_strlist_next): Handle NULL root value better.  Based on report
+	by Fabian Keil <fk@fabiankeil.de>.
+
+2009-08-24  Fabian Keil <fk@fabiankeil.de>
+
+	* lib/x509/output.c: In print_extensions(), declare the *_idx
+	variables as int instead of size_t.  While it shouldn't make a difference, it makes more sense to me.
+	It's also consistent with (at least) print_crl().  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-24  Fabian Keil <fk@fabiankeil.de>
+
+	* lib/x509/output.c: In print_extensions(), initialize *_idx
+	variables once before entering the for loop instead of each run.  Otherwise checking them is pointless as they always will be zero.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-24  Fabian Keil <fk@fabiankeil.de>
+
+	* lib/x509/output.c: In print_crq(), initialize challenge and
+	extensions once before entering the for loop instead of each run.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-24  Fabian Keil <fk@fabiankeil.de>
+
+	* lib/x509/output.c: In print_crl(), initialize aki_idx and crl_nr
+	once before entering the for loop instead of each run.  Otherwise the "error: more than one AKI extension\n" and "error:
+	more than one CRL number\n" checks want work.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* tests/x509dn.c: Likewise.
+
+2009-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* tests/x509dn.c: Don't use deprecated type.
+
+2009-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Overwrite gettext's size_max.m4 to make sure we use one
+	that works.
+
+2009-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-comp.m4, gl/m4/stdlib_h.m4,
+	gl/m4/sys_socket_h.m4, gl/m4/unistd_h.m4, gl/progname.c,
+	gl/stdlib.in.h, gl/sys_socket.in.h, gl/tests/Makefile.am,
+	gl/unistd.in.h, gl/vasnprintf.c, lib/gl/Makefile.am,
+	lib/gl/m4/stdlib_h.m4, lib/gl/m4/sys_socket_h.m4,
+	lib/gl/m4/unistd_h.m4, lib/gl/stdlib.in.h, lib/gl/sys_socket.in.h,
+	lib/gl/tests/test-func.c, lib/gl/unistd.in.h, lib/gl/vasnprintf.c,
+	libextra/gl/override/lib/md5.c.diff: Update gnulib files.
+
+2009-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, lib/configure.ac, lib/gnutls_handshake.c,
+	lib/gnutls_handshake.h, lib/gnutls_str.h, lib/opencdk/Makefile.am,
+	lib/x509/privkey_pkcs8.c, libextra/configure.ac: Fix use of
+	deprecated types, for now and the future.
+
+2009-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crq.c: Fix gnutls_datum usage.
+
+2009-08-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_buffers.c, lib/gnutls_pk.c, lib/gnutls_str.c,
+	lib/gnutls_x509.c, lib/includes/gnutls/gnutls.h.in,
+	lib/opencdk/pubkey.c, lib/openpgp/gnutls_openpgp.c,
+	lib/x509/common.c, lib/x509/extensions.c, lib/x509/mpi.c,
+	lib/x509/privkey_pkcs8.c, lib/x509/x509_write.c, src/certtool.c,
+	tests/openpgp_test.c, tests/resume.c, tests/x509_test.c,
+	tests/x509dn.c, tests/x509sign-verify.c: Fix deprecated usage of
+	gnutls_datum.
+
+2009-08-27  Dan Fandrich <dan@coneharvesters.com>
+
+	* lib/opencdk/new-packet.c, lib/opencdk/packet.h,
+	lib/opencdk/pubkey.c, lib/opencdk/read-packet.c,
+	lib/opencdk/stream.c, lib/opencdk/stream.h, lib/opencdk/verify.c,
+	lib/x509/crq.c: Fix compiler warning bugs for OpenWatcom.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-25  Daiki Ueno <ueno@unixuser.org>
+
+	* tests/resume.c: Fix double-free Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-24  Simon Josefsson <simon@josefsson.org>
+
+	* .gitattributes: Disable whitespace for file that need it.
+
+2009-08-20  Simon Josefsson <simon@josefsson.org>
+
+	* tests/hostname-check.c: Add check of OpenPGP cert too.
+
+2009-08-20  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2009-08-20  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gl/override/lib/md5.c.diff: Work around whitespace commit
+	hook.
+
+2009-08-20  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/stdio_h.m4, gl/select.c, gl/stdio.in.h,
+	lib/gl/Makefile.am, lib/gl/m4/stdio_h.m4, lib/gl/stdio.in.h,
+	maint.mk: Update gnulib files.
+
+2009-08-20  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/gl/gnulib.mk, libextra/gl/m4/gnulib-cache.m4,
+	libextra/gl/md5.c, libextra/gl/override/lib/md5.c.diff: Reduce stack
+	usage and remove code.
+
+2009-08-20  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_int.h: Remove unused constant.
+
+2009-08-20  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c: Reduce stack usage.
+
+2009-08-20  Simon Josefsson <simon@josefsson.org>
+
+	* lib/openpgp/pgp.c: Fix OpenPGP hostname comparison.
+
+2009-08-20  Simon Josefsson <simon@josefsson.org>
+
+	* lib/openpgp/output.c, lib/openpgp/pgp.c: Reduce stack usage.
+
+2009-08-20  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c: Reduce stack usage.
+
+2009-08-20  Simon Josefsson <simon@josefsson.org>
+
+	* .x-sc_m4_quote_check, lib/gnutls_sig.c,
+	lib/opencdk/write-packet.c: Fix syntax-check nits.
+
+2009-08-20  Daiki Ueno <ueno@unixuser.org>
+
+	* lib/libgnutls.map, lib/opencdk/keydb.c, tests/dn2.c, tests/mpi.c,
+	tests/resume.c: Fix memleaks.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Fix references.
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Also commit devel/ web pages.
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Fix ChangeLog.
+
+2009-08-19  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-08-19  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.9.3.
@@ -18,7 +340,7 @@
 
 	* lib/auth_cert.c, lib/gnutls_algorithms.c,
 	lib/gnutls_algorithms.h, lib/gnutls_cipher.c,
-	lib/gnutls_handshake.c, lib/gnutls_sig.c, lib/gnutls_state.c:
+	lib/gnutls_handshake.c, lib/gnutls_sig.c, lib/gnutls_state.c: 
 	Replace explicit version checks with feature checks Signed-off-by: Simon Josefsson <simon@josefsson.org>
 
 2009-08-19  Simon Josefsson <simon@josefsson.org>
