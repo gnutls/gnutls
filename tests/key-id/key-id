@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2007, 2008 Free Software Foundation
+# Copyright (C) 2007, 2008, 2009 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -38,7 +38,10 @@ echo > tmpl
 $CERTTOOL $PARAMS --load-ca-certificate $srcdir/ca-weird-keyid.pem \
     --outfile user-weird-keyid.pem 2> /dev/null
 
-if ! $CERTTOOL -i < user-weird-keyid.pem | grep '7a2c7a6097460603cbfb28e8e219df18deeb4e0d'; then
+if $CERTTOOL -i < user-weird-keyid.pem \
+    | grep -q '7a2c7a6097460603cbfb28e8e219df18deeb4e0d'; then
+    :
+else
     echo "Could not find CA SKI in user certificate."
     exit 1;
 fi
