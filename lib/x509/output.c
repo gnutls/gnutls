@@ -212,6 +212,10 @@ print_ski (gnutls_string * str, gnutls_x509_crt_t cert)
 #define TYPE_CRT 2
 #define TYPE_CRQ 3
 
+#define TYPE_CRT_SAN TYPE_CRT
+#define TYPE_CRQ_SAN TYPE_CRQ
+#define TYPE_CRT_IAN 4
+
 typedef union
 {
   gnutls_x509_crt_t crt;
@@ -510,27 +514,31 @@ print_basic (gnutls_string * str, const char *prefix, int type,
 
 
 static void
-print_san (gnutls_string * str, const char *prefix, int type,
-	   cert_type_t cert)
+print_altname (gnutls_string * str, const char *prefix, int altname_type,
+	       cert_type_t cert)
 {
-  unsigned int san_idx;
+  unsigned int altname_idx;
   char str_ip[64];
   char *p;
 
-  for (san_idx = 0;; san_idx++)
+  for (altname_idx = 0;; altname_idx++)
     {
       char *buffer = NULL;
       size_t size = 0;
       int err;
 
-      if (type == TYPE_CRT)
+      if (altname_type == TYPE_CRT_SAN)
 	err =
-	  gnutls_x509_crt_get_subject_alt_name (cert.crt, san_idx, buffer,
+	  gnutls_x509_crt_get_subject_alt_name (cert.crt, altname_idx, buffer,
 						&size, NULL);
-      else if (type == TYPE_CRQ)
+      else if (altname_type == TYPE_CRQ_SAN)
 	err =
-	  gnutls_x509_crq_get_subject_alt_name (cert.crq, san_idx, buffer,
+	  gnutls_x509_crq_get_subject_alt_name (cert.crq, altname_idx, buffer,
 						&size, NULL, NULL);
+      else if (altname_type == TYPE_CRT_IAN)
+	err =
+	  gnutls_x509_crt_get_issuer_alt_name (cert.crt, altname_idx, buffer,
+					       &size, NULL);
       else
 	return;
 
@@ -538,7 +546,7 @@ print_san (gnutls_string * str, const char *prefix, int type,
 	break;
       if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
 	{
-	  addf (str, "error: get_subject_alt_name: %s\n",
+	  addf (str, "error: get_subject/issuer_alt_name: %s\n",
 		gnutls_strerror (err));
 	  return;
 	}
@@ -551,19 +559,23 @@ print_san (gnutls_string * str, const char *prefix, int type,
 	  return;
 	}
 
-      if (type == TYPE_CRT)
+      if (altname_type == TYPE_CRT_SAN)
 	err =
-	  gnutls_x509_crt_get_subject_alt_name (cert.crt, san_idx, buffer,
+	  gnutls_x509_crt_get_subject_alt_name (cert.crt, altname_idx, buffer,
 						&size, NULL);
-      else if (type == TYPE_CRQ)
+      else if (altname_type == TYPE_CRQ_SAN)
 	err =
-	  gnutls_x509_crq_get_subject_alt_name (cert.crq, san_idx, buffer,
+	  gnutls_x509_crq_get_subject_alt_name (cert.crq, altname_idx, buffer,
 						&size, NULL, NULL);
+      else if (altname_type == TYPE_CRT_IAN)
+	err = 
+	  gnutls_x509_crt_get_issuer_alt_name (cert.crt, altname_idx, buffer,
+						&size, NULL);
 
       if (err < 0)
 	{
 	  gnutls_free (buffer);
-	  addf (str, "error: get_subject_alt_name2: %s\n",
+	  addf (str, "error: get_subject/issuer_alt_name2: %s\n",
 		gnutls_strerror (err));
 	  return;
 	}
@@ -573,7 +585,7 @@ print_san (gnutls_string * str, const char *prefix, int type,
 	   || err == GNUTLS_SAN_URI) &&
 	  strlen (buffer) != size)
 	{
-	  adds (str, _("warning: SAN contains an embedded NUL, "
+	  adds (str, _("warning: altname contains an embedded NUL, "
 		       "replacing with '!'\n"));
 	  while (strlen (buffer) < size)
 	    buffer[strlen (buffer)] = '!';
@@ -611,17 +623,20 @@ print_san (gnutls_string * str, const char *prefix, int type,
 	    size_t oidsize;
 
 	    oidsize = 0;
-	    if (type == TYPE_CRT)
+	    if (altname_type == TYPE_CRT_SAN)
 	      err = gnutls_x509_crt_get_subject_alt_othername_oid
-		(cert.crt, san_idx, oid, &oidsize);
-	    else if (type == TYPE_CRQ)
+		(cert.crt, altname_idx, oid, &oidsize);
+	    else if (altname_type == TYPE_CRQ_SAN)
 	      err = gnutls_x509_crq_get_subject_alt_othername_oid
-		(cert.crq, san_idx, oid, &oidsize);
+		(cert.crq, altname_idx, oid, &oidsize);
+	    else if (altname_type == TYPE_CRT_IAN)
+	      err = gnutls_x509_crt_get_issuer_alt_othername_oid
+		(cert.crt, altname_idx, oid, &oidsize);
 
 	    if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
 	      {
 		gnutls_free (buffer);
-		addf (str, "error: get_subject_alt_othername_oid: %s\n",
+		addf (str, "error: get_subject/issuer_alt_othername_oid: %s\n",
 		      gnutls_strerror (err));
 		return;
 	      }
@@ -635,12 +650,16 @@ print_san (gnutls_string * str, const char *prefix, int type,
 		return;
 	      }
 
-	    if (type == TYPE_CRT)
+	    if (altname_type == TYPE_CRT_SAN)
 	      err = gnutls_x509_crt_get_subject_alt_othername_oid
-		(cert.crt, san_idx, oid, &oidsize);
-	    else if (type == TYPE_CRQ)
+		(cert.crt, altname_idx, oid, &oidsize);
+	    else if (altname_type == TYPE_CRQ_SAN)
 	      err = gnutls_x509_crq_get_subject_alt_othername_oid
-		(cert.crq, san_idx, oid, &oidsize);
+		(cert.crq, altname_idx, oid, &oidsize);
+	    else if (altname_type == TYPE_CRT_IAN)
+	      err = gnutls_x509_crt_get_issuer_alt_othername_oid
+		(cert.crt, altname_idx, oid, &oidsize);
+
 	    if (err < 0)
 	      {
 		gnutls_free (buffer);
@@ -654,7 +673,7 @@ print_san (gnutls_string * str, const char *prefix, int type,
 	      {
 		if (strlen (buffer) != size)
 		  {
-		    adds (str, _("warning: SAN contains an embedded NUL, "
+		    adds (str, _("warning: altname contains an embedded NUL, "
 				 "replacing with '!'\n"));
 		    while (strlen (buffer) < size)
 		      buffer[strlen (buffer)] = '!';
@@ -678,7 +697,7 @@ print_san (gnutls_string * str, const char *prefix, int type,
 	  break;
 
 	default:
-	  addf (str, "error: unknown SAN\n");
+	  addf (str, "error: unknown altname\n");
 	  break;
 	}
 
@@ -686,12 +705,14 @@ print_san (gnutls_string * str, const char *prefix, int type,
     }
 }
 
+
 static void
 print_extensions (gnutls_string * str, const char *prefix, int type,
 		  cert_type_t cert)
 {
   int i, err;
   int san_idx = 0;
+  int ian_idx = 0;
   int proxy_idx = 0;
   int basic_idx = 0;
   int keyusage_idx = 0;
@@ -824,9 +845,24 @@ print_extensions (gnutls_string * str, const char *prefix, int type,
 	  addf (str, _("%s\t\tSubject Alternative Name (%s):\n"), prefix,
 		critical ? _("critical") : _("not critical"));
 
-	  print_san (str, prefix, type, cert);
+	  print_altname (str, prefix, type, cert);
 
 	  san_idx++;
+	}
+      else if (strcmp (oid, "2.5.29.18") == 0)
+	{
+	  if (ian_idx)
+	    {
+	      addf (str, "error: more than one Issuer AltName extension\n");
+	      continue;
+	    }
+
+	  addf (str, _("%s\t\tIssuer Alternative Name (%s):\n"), prefix,
+		critical ? _("critical") : _("not critical"));
+
+	  print_altname (str, prefix, TYPE_CRT_IAN, cert);
+
+	  ian_idx++;
 	}
       else if (strcmp (oid, "2.5.29.31") == 0)
 	{
