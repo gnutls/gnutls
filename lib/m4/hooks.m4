@@ -176,7 +176,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   # Allow disabling Camellia
   AC_ARG_ENABLE(camellia,
     AS_HELP_STRING([--disable-camellia], [disable Camellia cipher]),
-    enable_camellia=$enableval, enable_camellia=no)
+    enable_camellia=$enableval, enable_camellia=yes)
   AC_MSG_CHECKING([whether to disable Camellia cipher])
   if test "$enable_camellia" != "no"; then
    AC_MSG_RESULT([no])
