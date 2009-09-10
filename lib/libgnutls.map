@@ -562,9 +562,6 @@ GNUTLS_2_8
     gnutls_x509_crq_set_key_purpose_oid;
     gnutls_x509_crq_set_key_usage;
     gnutls_x509_crq_set_subject_alt_name;
-    gnutls_x509_crt_get_issuer_alt_name2;
-    gnutls_x509_crt_get_issuer_alt_name;
-    gnutls_x509_crt_get_issuer_alt_othername_oid;
     gnutls_x509_crt_get_verify_algorithm;
     gnutls_x509_crt_set_crq_extensions;
     gnutls_x509_crt_verify_hash;
@@ -579,6 +576,9 @@ GNUTLS_2_10
     gnutls_session_ticket_key_generate;
     gnutls_session_ticket_enable_client;
     gnutls_session_ticket_enable_server;
+    gnutls_x509_crt_get_issuer_alt_name2;
+    gnutls_x509_crt_get_issuer_alt_name;
+    gnutls_x509_crt_get_issuer_alt_othername_oid;
 } GNUTLS_2_8;
 
 GNUTLS_PRIVATE {
