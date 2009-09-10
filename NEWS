@@ -5,8 +5,16 @@ See the end for copying conditions.
 
 * Version 2.9.5 (unreleased)
 
+** libgnutls: Add new functions to extract X.509 Issuer Alternative Names.
+The new functions are gnutls_x509_crt_get_issuer_alt_name2,
+gnutls_x509_crt_get_issuer_alt_name, and
+gnutls_x509_crt_get_issuer_alt_othername_oid.  Contributed by Brad
+Hards <bradh@frogmouth.net>.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_crt_get_issuer_alt_name2: ADDED.
+gnutls_x509_crt_get_issuer_alt_name: ADDED.
+gnutls_x509_crt_get_issuer_alt_othername_oid: ADDED.
 
 * Version 2.9.4 (released 2009-09-03)
 
