@@ -1,3 +1,76 @@
+2009-09-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.9.5.
+
+2009-09-10  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac: Bump version.
+
+2009-09-10  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/stdio_h.m4, gl/m4/string_h.m4,
+	gl/m4/sys_stat_h.m4, gl/m4/unistd_h.m4, gl/stdio.in.h,
+	gl/string.in.h, gl/sys_stat.in.h, gl/unistd.in.h,
+	lib/gl/Makefile.am, lib/gl/m4/stdio_h.m4, lib/gl/m4/string_h.m4,
+	lib/gl/m4/sys_stat_h.m4, lib/gl/m4/unistd_h.m4, lib/gl/stdio.in.h,
+	lib/gl/string.in.h, lib/gl/sys_stat.in.h, lib/gl/unistd.in.h,
+	maint.mk: Update gnulib files.
+
+2009-09-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-09-10  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS: Add.
+
+2009-09-10  Simon Josefsson <simon@josefsson.org>
+
+	* lib/m4/hooks.m4: Bump library version for new APIs.
+
+2009-09-10  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/output.c, lib/x509/x509.c: Indent.
+
+2009-09-10  Simon Josefsson <simon@josefsson.org>
+
+	* lib/libgnutls.map: Move the new ABIs to the GNUTLS_2_10 section.
+
+2009-09-09  Brad Hards <bradh@frogmouth.net>
+
+	* doc/manpages/Makefile.am, lib/includes/gnutls/x509.h,
+	lib/libgnutls.map, lib/x509/output.c, lib/x509/x509.c,
+	tests/Makefile.am, tests/x509_altname.c: Add X509 Issuer Altname
+	functions Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-09-07  Simon Josefsson <simon@josefsson.org>
+
+	* tests/key-id/key-id: Don't use ! to negate exit status.  Reported
+	by "Tom G. Christensen" <tgc@jupiterrise.com> in
+
+	<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3861>.
+
+2009-09-03  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/close.c, gl/inet_ntop.c, gl/inet_pton.c,
+	gl/m4/sys_stat_h.m4, gl/sys_stat.in.h, gl/tests/Makefile.am,
+	gl/unistd.in.h, lib/gl/Makefile.am, lib/gl/m4/sys_stat_h.m4,
+	lib/gl/sys_stat.in.h, lib/gl/unistd.in.h, maint.mk: Update gnulib
+	files.
+
+2009-09-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/configure.ac, lib/m4/hooks.m4, libextra/configure.ac: 
+	Bump versions.
+
+2009-09-03  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Commit cyclo/ dir too.
+
+2009-09-03  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-09-03  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.9.4.
