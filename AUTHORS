@@ -58,6 +58,9 @@ finished client-side TLS 1.2 support.
 Jonathan Bastien-Filiatrault <joe@x2a.org>
 Fix TLS-version checks.
 
+Brad Hards <bradh@frogmouth.net>
+Add X.509 Issuer Alternative Name functions.
+
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 URL: http://josefsson.org/key.txt (always latest version)
 Comment: This 0xB565716F key is used to sign releases of GnuTLS.
