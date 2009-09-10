@@ -214,8 +214,8 @@ gnutls_x509_crt_import (gnutls_x509_crt_t cert,
   if (cert->cert)
     {
       /* Any earlier asn1_der_decoding will modify the ASN.1
-	 structure, so we need to replace it with a fresh
-	 structure. */
+         structure, so we need to replace it with a fresh
+         structure. */
       asn1_delete_structure (&cert->cert);
 
       result = asn1_create_element (_gnutls_get_pkix (),
@@ -1110,10 +1110,10 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
 }
 
 static int
-get_alt_name(gnutls_x509_crt_t cert, const char *extension_id,
-             unsigned int seq, void *ret,
-	     size_t * ret_size, unsigned int *ret_type,
-	     unsigned int *critical, int othername_oid)
+get_alt_name (gnutls_x509_crt_t cert, const char *extension_id,
+	      unsigned int seq, void *ret,
+	      size_t * ret_size, unsigned int *ret_type,
+	      unsigned int *critical, int othername_oid)
 {
   int result;
   gnutls_datum_t dnsname;
@@ -1144,14 +1144,12 @@ get_alt_name(gnutls_x509_crt_t cert, const char *extension_id,
       return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
     }
 
-  if (strcmp("2.5.29.17", extension_id) == 0) 
-    {
-      result = asn1_create_element(_gnutls_get_pkix (), "PKIX1.SubjectAltName", &c2);
-    }
-  else if (strcmp("2.5.29.18", extension_id) == 0)
-    {
-      result = asn1_create_element(_gnutls_get_pkix (), "PKIX1.IssuerAltName", &c2);
-    }
+  if (strcmp ("2.5.29.17", extension_id) == 0)
+    result = asn1_create_element (_gnutls_get_pkix (),
+				  "PKIX1.SubjectAltName", &c2);
+  else if (strcmp ("2.5.29.18", extension_id) == 0)
+    result = asn1_create_element (_gnutls_get_pkix (),
+				  "PKIX1.IssuerAltName", &c2);
   else
     {
       gnutls_assert ();
@@ -1231,7 +1229,8 @@ gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
 				      size_t * ret_size,
 				      unsigned int *critical)
 {
-  return get_alt_name (cert, "2.5.29.17", seq, ret, ret_size, NULL, critical, 0);
+  return get_alt_name (cert, "2.5.29.17", seq, ret, ret_size, NULL, critical,
+		       0);
 }
 
 /**
@@ -1269,11 +1268,12 @@ gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
   **/
 int
 gnutls_x509_crt_get_issuer_alt_name (gnutls_x509_crt_t cert,
-				      unsigned int seq, void *ret,
-				      size_t * ret_size,
-				      unsigned int *critical)
+				     unsigned int seq, void *ret,
+				     size_t * ret_size,
+				     unsigned int *critical)
 {
-  return get_alt_name (cert, "2.5.29.18", seq, ret, ret_size, NULL, critical, 0);
+  return get_alt_name (cert, "2.5.29.18", seq, ret, ret_size, NULL, critical,
+		       0);
 }
 
 /**
@@ -1307,7 +1307,8 @@ gnutls_x509_crt_get_subject_alt_name2 (gnutls_x509_crt_t cert,
 				       unsigned int *ret_type,
 				       unsigned int *critical)
 {
-  return get_alt_name (cert, "2.5.29.17", seq, ret, ret_size, ret_type, critical, 0);
+  return get_alt_name (cert, "2.5.29.17", seq, ret, ret_size, ret_type,
+		       critical, 0);
 }
 
 /**
@@ -1336,12 +1337,13 @@ gnutls_x509_crt_get_subject_alt_name2 (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_issuer_alt_name2 (gnutls_x509_crt_t cert,
-				       unsigned int seq, void *ret,
-				       size_t * ret_size,
-				       unsigned int *ret_type,
-				       unsigned int *critical)
+				      unsigned int seq, void *ret,
+				      size_t * ret_size,
+				      unsigned int *ret_type,
+				      unsigned int *critical)
 {
-  return get_alt_name (cert, "2.5.29.18", seq, ret, ret_size, ret_type, critical, 0);
+  return get_alt_name (cert, "2.5.29.18", seq, ret, ret_size, ret_type,
+		       critical, 0);
 }
 
 /**
@@ -1406,8 +1408,8 @@ gnutls_x509_crt_get_subject_alt_othername_oid (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_issuer_alt_othername_oid (gnutls_x509_crt_t cert,
-					       unsigned int seq,
-					       void *ret, size_t * ret_size)
+					      unsigned int seq,
+					      void *ret, size_t * ret_size)
 {
   return get_alt_name (cert, "2.5.29.18", seq, ret, ret_size, NULL, NULL, 1);
 }
@@ -2477,7 +2479,7 @@ gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
 int
 gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
 				      const gnutls_datum_t * signature,
-				      gnutls_digest_algorithm_t *hash)
+				      gnutls_digest_algorithm_t * hash)
 {
   if (crt == NULL)
     {

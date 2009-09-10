@@ -363,8 +363,7 @@ print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
 
       if ((err == GNUTLS_SAN_DNSNAME
 	   || err == GNUTLS_SAN_RFC822NAME
-	   || err == GNUTLS_SAN_URI) &&
-	  strlen (buffer) != size)
+	   || err == GNUTLS_SAN_URI) && strlen (buffer) != size)
 	{
 	  adds (str, _("warning: distributionPoint contains an embedded NUL, "
 		       "replacing with '!'\n"));
@@ -568,9 +567,8 @@ print_altname (gnutls_string * str, const char *prefix, int altname_type,
 	  gnutls_x509_crq_get_subject_alt_name (cert.crq, altname_idx, buffer,
 						&size, NULL, NULL);
       else if (altname_type == TYPE_CRT_IAN)
-	err = 
-	  gnutls_x509_crt_get_issuer_alt_name (cert.crt, altname_idx, buffer,
-						&size, NULL);
+	err = gnutls_x509_crt_get_issuer_alt_name (cert.crt, altname_idx,
+						   buffer, &size, NULL);
 
       if (err < 0)
 	{
@@ -582,8 +580,7 @@ print_altname (gnutls_string * str, const char *prefix, int altname_type,
 
       if ((err == GNUTLS_SAN_DNSNAME
 	   || err == GNUTLS_SAN_RFC822NAME
-	   || err == GNUTLS_SAN_URI) &&
-	  strlen (buffer) != size)
+	   || err == GNUTLS_SAN_URI) && strlen (buffer) != size)
 	{
 	  adds (str, _("warning: altname contains an embedded NUL, "
 		       "replacing with '!'\n"));
@@ -598,7 +595,8 @@ print_altname (gnutls_string * str, const char *prefix, int altname_type,
 	  break;
 
 	case GNUTLS_SAN_RFC822NAME:
-	  addf (str, "%s\t\t\tRFC822name: %.*s\n", prefix, (int) size, buffer);
+	  addf (str, "%s\t\t\tRFC822name: %.*s\n", prefix, (int) size,
+		buffer);
 	  break;
 
 	case GNUTLS_SAN_URI:
@@ -636,7 +634,8 @@ print_altname (gnutls_string * str, const char *prefix, int altname_type,
 	    if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
 	      {
 		gnutls_free (buffer);
-		addf (str, "error: get_subject/issuer_alt_othername_oid: %s\n",
+		addf (str,
+		      "error: get_subject/issuer_alt_othername_oid: %s\n",
 		      gnutls_strerror (err));
 		return;
 	      }
@@ -704,7 +703,6 @@ print_altname (gnutls_string * str, const char *prefix, int altname_type,
       gnutls_free (buffer);
     }
 }
-
 
 static void
 print_extensions (gnutls_string * str, const char *prefix, int type,
@@ -1075,8 +1073,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	  {
 	    err = gnutls_x509_crt_get_dn (cert, dn, &dn_size);
 	    if (err < 0)
-	      addf (str, "error: get_dn: %s\n",
-		    gnutls_strerror (err));
+	      addf (str, "error: get_dn: %s\n", gnutls_strerror (err));
 	    else
 	      addf (str, _("\tSubject: %s\n"), dn);
 	    gnutls_free (dn);
@@ -1297,8 +1294,7 @@ print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
 	  {
 	    err = gnutls_x509_crt_get_dn (cert, dn, &dn_size);
 	    if (err < 0)
-	      addf (str, "unknown subject (%s), ",
-		    gnutls_strerror (err));
+	      addf (str, "unknown subject (%s), ", gnutls_strerror (err));
 	    else
 	      addf (str, "subject `%s', ", dn);
 	    gnutls_free (dn);
@@ -1325,8 +1321,7 @@ print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
 	  {
 	    err = gnutls_x509_crt_get_issuer_dn (cert, dn, &dn_size);
 	    if (err < 0)
-	      addf (str, "unknown issuer (%s), ",
-		    gnutls_strerror (err));
+	      addf (str, "unknown issuer (%s), ", gnutls_strerror (err));
 	    else
 	      addf (str, "issuer `%s', ", dn);
 	    gnutls_free (dn);
@@ -1350,8 +1345,7 @@ print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
 
     err = gnutls_x509_crt_get_signature_algorithm (cert);
     if (err < 0)
-      addf (str, "unknown signature algorithm (%s), ",
-	    gnutls_strerror (err));
+      addf (str, "unknown signature algorithm (%s), ", gnutls_strerror (err));
     else
       {
 	const char *name = gnutls_sign_algorithm_get_name (err);
@@ -1869,8 +1863,7 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
 	  {
 	    err = gnutls_x509_crq_get_dn (cert, dn, &dn_size);
 	    if (err < 0)
-	      addf (str, "error: get_dn: %s\n",
-		    gnutls_strerror (err));
+	      addf (str, "error: get_dn: %s\n", gnutls_strerror (err));
 	    else
 	      addf (str, _("\tSubject: %s\n"), dn);
 	    gnutls_free (dn);
