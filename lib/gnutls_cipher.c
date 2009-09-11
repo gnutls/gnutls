@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008 Free Software Foundation
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -571,7 +571,10 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
    * 1.0 protocol.
    */
   if (pad_failed != 0)
-    return pad_failed;
+    {
+      gnutls_assert ();
+      return pad_failed;
+    }
 
   /* HMAC was not the same. 
    */
