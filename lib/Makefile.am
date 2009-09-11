@@ -141,7 +141,7 @@ endif
 # C++ library
 
 if ENABLE_CXX
-libgnutlsxx_la_CPPFLAGS = -I$(top_srcdir)/includes -I../includes
+libgnutlsxx_la_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_builddir)/includes
 
 AM_CXXFLAGS = -I$(top_srcdir)/includes/
 
