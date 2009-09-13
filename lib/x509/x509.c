@@ -1265,6 +1265,9 @@ gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
   *   the required size.  If the certificate does not have an
   *   Alternative name with the specified sequence number then
   *   %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
+  *
+  * Since: 2.10.0
+  *
   **/
 int
 gnutls_x509_crt_get_issuer_alt_name (gnutls_x509_crt_t cert,
@@ -1334,6 +1337,9 @@ gnutls_x509_crt_get_subject_alt_name2 (gnutls_x509_crt_t cert,
  *   the required size.  If the certificate does not have an
  *   Alternative name with the specified sequence number then
  *   %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
+ *
+ * Since: 2.10.0
+ *
  **/
 int
 gnutls_x509_crt_get_issuer_alt_name2 (gnutls_x509_crt_t cert,
@@ -1405,6 +1411,9 @@ gnutls_x509_crt_get_subject_alt_othername_oid (gnutls_x509_crt_t cert,
  * certificate does not have an Alternative name with the specified
  * sequence number and with the otherName type then
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
+ *
+ * Since: 2.10.0
+ *
  **/
 int
 gnutls_x509_crt_get_issuer_alt_othername_oid (gnutls_x509_crt_t cert,
