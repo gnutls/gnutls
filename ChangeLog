@@ -1,3 +1,51 @@
+2009-09-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.8.4.
+
+2009-09-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/m4/hooks.m4: Enable Camellia by default.
+
+2009-08-31  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-08-31  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Handle XMPP SANs properly.  Reported by Howard
+	Chu <hyc@symas.com> in <https://savannah.gnu.org/support/?106975>.
+
+2009-08-27  Dan Fandrich <dan@coneharvesters.com>
+
+	* lib/opencdk/new-packet.c, lib/opencdk/packet.h,
+	lib/opencdk/pubkey.c, lib/opencdk/read-packet.c,
+	lib/opencdk/stream.c, lib/opencdk/stream.h, lib/opencdk/verify.c,
+	lib/x509/crq.c: Fix compiler warning bugs for OpenWatcom.  Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-08-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-08-20  Simon Josefsson <simon@josefsson.org>
+
+	* lib/openpgp/pgp.c: Fix OpenPGP hostname comparison.
+
+2009-08-18  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-08-17  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/size_max.m4, lib/gl/m4/size_max.m4: Pull in SIZE_MAX fix
+	from gnulib, to fix IRIX build.  Reported by "Tom G. Christensen" <tgc@jupiterrise.com> in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3782>.
+
+2009-08-13  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-08-13  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.8.3.
