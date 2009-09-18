@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.8.4 (unreleased)
 
+** libgnutls: Enable Camellia ciphers by default.
+
 ** libgnutls: Make OpenPGP hostname checking work again.
 The patch to resolve the X.509 CN/SAN issue accidentally broken
 OpenPGP hostname comparison.
