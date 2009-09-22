@@ -1,3 +1,53 @@
+2009-09-22  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.9.6.
+
+2009-09-22  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/getdelim.m4, gl/m4/stdio_h.m4,
+	gl/m4/stdlib_h.m4, gl/m4/sys_stat_h.m4, gl/m4/unistd_h.m4,
+	gl/stdio.in.h, gl/stdlib.in.h, gl/sys_stat.in.h, gl/unistd.in.h,
+	lib/gl/Makefile.am, lib/gl/m4/stdio_h.m4, lib/gl/m4/stdlib_h.m4,
+	lib/gl/m4/sys_stat_h.m4, lib/gl/m4/unistd_h.m4, lib/gl/stdio.in.h,
+	lib/gl/stdlib.in.h, lib/gl/sys_stat.in.h, lib/gl/unistd.in.h,
+	maint.mk: Update gnulib files.
+
+2009-09-13  Brad Hards <bradh@frogmouth.net>
+
+	* lib/x509/x509.c: Add forgotten documentation bits for issuer
+	altname Signed-off-by: Simon Josefsson <simon@josefsson.org>
+
+2009-09-11  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/gendocs.sh, gl/m4/getaddrinfo.m4, gl/m4/getline.m4,
+	gl/m4/readline.m4, gl/m4/select.m4, gl/m4/sockets.m4,
+	gl/m4/socklen.m4, gl/m4/sockpfaf.m4, lib/gl/m4/sockets.m4,
+	lib/gl/m4/socklen.m4, lib/gl/m4/sockpfaf.m4, lib/gl/m4/time_r.m4: 
+	Update gnulib files.
+
+2009-09-11  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_cipher.c: Add debug message.  Tiny patch from Miroslav
+	Kratochvil <exa.exa@gmail.com> in
+	<http://thread.gmane.org/gmane.network.gnutls.general/1758>.
+
+2009-09-11  Daiki Ueno <ueno@unixuser.org>
+
+	* lib/Makefile.am: Fix out-of-tree build.  Fix out-of-tree build; gnutls.h is generated in the build tree.
+
+2009-09-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/m4/hooks.m4: Enable Camellia by default.
+
+2009-09-10  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-09-10  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-09-10  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.9.5.
