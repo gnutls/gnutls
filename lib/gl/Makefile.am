@@ -422,6 +422,7 @@ stdio.h: stdio.in.h
 	      -e 's|@''GNULIB_PUTC''@|$(GNULIB_PUTC)|g' \
 	      -e 's|@''GNULIB_PUTCHAR''@|$(GNULIB_PUTCHAR)|g' \
 	      -e 's|@''GNULIB_PUTS''@|$(GNULIB_PUTS)|g' \
+	      -e 's|@''GNULIB_REMOVE''@|$(GNULIB_REMOVE)|g' \
 	      -e 's|@''GNULIB_RENAME''@|$(GNULIB_RENAME)|g' \
 	      -e 's|@''GNULIB_SNPRINTF''@|$(GNULIB_SNPRINTF)|g' \
 	      -e 's|@''GNULIB_SPRINTF_POSIX''@|$(GNULIB_SPRINTF_POSIX)|g' \
@@ -459,6 +460,7 @@ stdio.h: stdio.in.h
 	      -e 's|@''REPLACE_PERROR''@|$(REPLACE_PERROR)|g' \
 	      -e 's|@''REPLACE_POPEN''@|$(REPLACE_POPEN)|g' \
 	      -e 's|@''REPLACE_PRINTF''@|$(REPLACE_PRINTF)|g' \
+	      -e 's|@''REPLACE_REMOVE''@|$(REPLACE_REMOVE)|g' \
 	      -e 's|@''REPLACE_RENAME''@|$(REPLACE_RENAME)|g' \
 	      -e 's|@''REPLACE_SNPRINTF''@|$(REPLACE_SNPRINTF)|g' \
 	      -e 's|@''REPLACE_SPRINTF''@|$(REPLACE_SPRINTF)|g' \
@@ -493,18 +495,19 @@ stdlib.h: stdlib.in.h
 	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
 	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''NEXT_STDLIB_H''@|$(NEXT_STDLIB_H)|g' \
-	      -e 's|@''HAVE_RANDOM_H''@|$(HAVE_RANDOM_H)|g' \
-	      -e 's|@''GNULIB_MALLOC_POSIX''@|$(GNULIB_MALLOC_POSIX)|g' \
-	      -e 's|@''GNULIB_REALLOC_POSIX''@|$(GNULIB_REALLOC_POSIX)|g' \
-	      -e 's|@''GNULIB_CALLOC_POSIX''@|$(GNULIB_CALLOC_POSIX)|g' \
 	      -e 's|@''GNULIB_ATOLL''@|$(GNULIB_ATOLL)|g' \
+	      -e 's|@''GNULIB_CALLOC_POSIX''@|$(GNULIB_CALLOC_POSIX)|g' \
+	      -e 's|@''GNULIB_CANONICALIZE_FILE_NAME''@|$(GNULIB_CANONICALIZE_FILE_NAME)|g' \
 	      -e 's|@''GNULIB_GETLOADAVG''@|$(GNULIB_GETLOADAVG)|g' \
 	      -e 's|@''GNULIB_GETSUBOPT''@|$(GNULIB_GETSUBOPT)|g' \
+	      -e 's|@''GNULIB_MALLOC_POSIX''@|$(GNULIB_MALLOC_POSIX)|g' \
 	      -e 's|@''GNULIB_MKDTEMP''@|$(GNULIB_MKDTEMP)|g' \
 	      -e 's|@''GNULIB_MKOSTEMP''@|$(GNULIB_MKOSTEMP)|g' \
 	      -e 's|@''GNULIB_MKSTEMP''@|$(GNULIB_MKSTEMP)|g' \
 	      -e 's|@''GNULIB_PUTENV''@|$(GNULIB_PUTENV)|g' \
 	      -e 's|@''GNULIB_RANDOM_R''@|$(GNULIB_RANDOM_R)|g' \
+	      -e 's|@''GNULIB_REALLOC_POSIX''@|$(GNULIB_REALLOC_POSIX)|g' \
+	      -e 's|@''GNULIB_REALPATH''@|$(GNULIB_REALPATH)|g' \
 	      -e 's|@''GNULIB_RPMATCH''@|$(GNULIB_RPMATCH)|g' \
 	      -e 's|@''GNULIB_SETENV''@|$(GNULIB_SETENV)|g' \
 	      -e 's|@''GNULIB_STRTOD''@|$(GNULIB_STRTOD)|g' \
@@ -513,12 +516,16 @@ stdlib.h: stdlib.in.h
 	      -e 's|@''GNULIB_UNSETENV''@|$(GNULIB_UNSETENV)|g' \
 	      -e 's|@''HAVE_ATOLL''@|$(HAVE_ATOLL)|g' \
 	      -e 's|@''HAVE_CALLOC_POSIX''@|$(HAVE_CALLOC_POSIX)|g' \
+	      -e 's|@''HAVE_CANONICALIZE_FILE_NAME''@|$(HAVE_CANONICALIZE_FILE_NAME)|g' \
+	      -e 's|@''HAVE_DECL_GETLOADAVG''@|$(HAVE_DECL_GETLOADAVG)|g' \
 	      -e 's|@''HAVE_GETSUBOPT''@|$(HAVE_GETSUBOPT)|g' \
 	      -e 's|@''HAVE_MALLOC_POSIX''@|$(HAVE_MALLOC_POSIX)|g' \
 	      -e 's|@''HAVE_MKDTEMP''@|$(HAVE_MKDTEMP)|g' \
 	      -e 's|@''HAVE_MKOSTEMP''@|$(HAVE_MKOSTEMP)|g' \
-	      -e 's|@''HAVE_REALLOC_POSIX''@|$(HAVE_REALLOC_POSIX)|g' \
+	      -e 's|@''HAVE_RANDOM_H''@|$(HAVE_RANDOM_H)|g' \
 	      -e 's|@''HAVE_RANDOM_R''@|$(HAVE_RANDOM_R)|g' \
+	      -e 's|@''HAVE_REALLOC_POSIX''@|$(HAVE_REALLOC_POSIX)|g' \
+	      -e 's|@''HAVE_REALPATH''@|$(HAVE_REALPATH)|g' \
 	      -e 's|@''HAVE_RPMATCH''@|$(HAVE_RPMATCH)|g' \
 	      -e 's|@''HAVE_SETENV''@|$(HAVE_SETENV)|g' \
 	      -e 's|@''HAVE_STRTOD''@|$(HAVE_STRTOD)|g' \
@@ -527,9 +534,10 @@ stdlib.h: stdlib.in.h
 	      -e 's|@''HAVE_STRUCT_RANDOM_DATA''@|$(HAVE_STRUCT_RANDOM_DATA)|g' \
 	      -e 's|@''HAVE_SYS_LOADAVG_H''@|$(HAVE_SYS_LOADAVG_H)|g' \
 	      -e 's|@''HAVE_UNSETENV''@|$(HAVE_UNSETENV)|g' \
-	      -e 's|@''HAVE_DECL_GETLOADAVG''@|$(HAVE_DECL_GETLOADAVG)|g' \
+	      -e 's|@''REPLACE_CANONICALIZE_FILE_NAME''@|$(REPLACE_CANONICALIZE_FILE_NAME)|g' \
 	      -e 's|@''REPLACE_MKSTEMP''@|$(REPLACE_MKSTEMP)|g' \
 	      -e 's|@''REPLACE_PUTENV''@|$(REPLACE_PUTENV)|g' \
+	      -e 's|@''REPLACE_REALPATH''@|$(REPLACE_REALPATH)|g' \
 	      -e 's|@''REPLACE_STRTOD''@|$(REPLACE_STRTOD)|g' \
 	      -e 's|@''VOID_UNSETENV''@|$(VOID_UNSETENV)|g' \
 	      -e '/definition of GL_LINK_WARNING/r $(LINK_WARNING_H)' \
@@ -732,6 +740,7 @@ sys/stat.h: sys_stat.in.h
 	      -e 's|@''GNULIB_MKDIRAT''@|$(GNULIB_MKDIRAT)|g' \
 	      -e 's|@''GNULIB_MKFIFOAT''@|$(GNULIB_MKFIFOAT)|g' \
 	      -e 's|@''GNULIB_MKNODAT''@|$(GNULIB_MKNODAT)|g' \
+	      -e 's|@''GNULIB_STAT''@|$(GNULIB_STAT)|g' \
 	      -e 's|@''HAVE_FCHMODAT''@|$(HAVE_FCHMODAT)|g' \
 	      -e 's|@''HAVE_FSTATAT''@|$(HAVE_FSTATAT)|g' \
 	      -e 's|@''HAVE_LCHMOD''@|$(HAVE_LCHMOD)|g' \
@@ -739,10 +748,11 @@ sys/stat.h: sys_stat.in.h
 	      -e 's|@''HAVE_MKDIRAT''@|$(HAVE_MKDIRAT)|g' \
 	      -e 's|@''HAVE_MKFIFOAT''@|$(HAVE_MKFIFOAT)|g' \
 	      -e 's|@''HAVE_MKNODAT''@|$(HAVE_MKNODAT)|g' \
-	      -e 's|@''REPLACE_FCHDIR''@|$(REPLACE_FCHDIR)|g' \
+	      -e 's|@''REPLACE_FSTAT''@|$(REPLACE_FSTAT)|g' \
 	      -e 's|@''REPLACE_FSTATAT''@|$(REPLACE_FSTATAT)|g' \
 	      -e 's|@''REPLACE_LSTAT''@|$(REPLACE_LSTAT)|g' \
 	      -e 's|@''REPLACE_MKDIR''@|$(REPLACE_MKDIR)|g' \
+	      -e 's|@''REPLACE_STAT''@|$(REPLACE_STAT)|g' \
 	      -e '/definition of GL_LINK_WARNING/r $(LINK_WARNING_H)' \
 	      < $(srcdir)/sys_stat.in.h; \
 	} > $@-t && \
@@ -828,10 +838,12 @@ unistd.h: unistd.in.h
 	      -e 's|@''GNULIB_PIPE2''@|$(GNULIB_PIPE2)|g' \
 	      -e 's|@''GNULIB_READLINK''@|$(GNULIB_READLINK)|g' \
 	      -e 's|@''GNULIB_READLINKAT''@|$(GNULIB_READLINKAT)|g' \
+	      -e 's|@''GNULIB_RMDIR''@|$(GNULIB_RMDIR)|g' \
 	      -e 's|@''GNULIB_SLEEP''@|$(GNULIB_SLEEP)|g' \
 	      -e 's|@''GNULIB_SYMLINKAT''@|$(GNULIB_SYMLINKAT)|g' \
 	      -e 's|@''GNULIB_UNISTD_H_GETOPT''@|$(GNULIB_UNISTD_H_GETOPT)|g' \
 	      -e 's|@''GNULIB_UNISTD_H_SIGPIPE''@|$(GNULIB_UNISTD_H_SIGPIPE)|g' \
+	      -e 's|@''GNULIB_UNLINK''@|$(GNULIB_UNLINK)|g' \
 	      -e 's|@''GNULIB_UNLINKAT''@|$(GNULIB_UNLINKAT)|g' \
 	      -e 's|@''GNULIB_WRITE''@|$(GNULIB_WRITE)|g' \
 	      -e 's|@''HAVE_DUP2''@|$(HAVE_DUP2)|g' \
@@ -859,6 +871,7 @@ unistd.h: unistd.in.h
 	      -e 's|@''HAVE_SYS_PARAM_H''@|$(HAVE_SYS_PARAM_H)|g' \
 	      -e 's|@''REPLACE_CHOWN''@|$(REPLACE_CHOWN)|g' \
 	      -e 's|@''REPLACE_CLOSE''@|$(REPLACE_CLOSE)|g' \
+	      -e 's|@''REPLACE_DUP''@|$(REPLACE_DUP)|g' \
 	      -e 's|@''REPLACE_DUP2''@|$(REPLACE_DUP2)|g' \
 	      -e 's|@''REPLACE_FCHDIR''@|$(REPLACE_FCHDIR)|g' \
 	      -e 's|@''REPLACE_FCHOWNAT''@|$(REPLACE_FCHOWNAT)|g' \
@@ -867,6 +880,9 @@ unistd.h: unistd.in.h
 	      -e 's|@''REPLACE_LCHOWN''@|$(REPLACE_LCHOWN)|g' \
 	      -e 's|@''REPLACE_LINK''@|$(REPLACE_LINK)|g' \
 	      -e 's|@''REPLACE_LSEEK''@|$(REPLACE_LSEEK)|g' \
+	      -e 's|@''REPLACE_RMDIR''@|$(REPLACE_RMDIR)|g' \
+	      -e 's|@''REPLACE_UNLINK''@|$(REPLACE_UNLINK)|g' \
+	      -e 's|@''REPLACE_UNLINKAT''@|$(REPLACE_UNLINKAT)|g' \
 	      -e 's|@''REPLACE_WRITE''@|$(REPLACE_WRITE)|g' \
 	      -e 's|@''UNISTD_H_HAVE_WINSOCK2_H''@|$(UNISTD_H_HAVE_WINSOCK2_H)|g' \
 	      -e 's|@''UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS''@|$(UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS)|g' \

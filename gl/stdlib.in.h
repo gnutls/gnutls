@@ -87,36 +87,19 @@ struct random_data
 extern "C" {
 #endif
 
-
-#if @GNULIB_MALLOC_POSIX@
-# if !@HAVE_MALLOC_POSIX@
-#  undef malloc
-#  define malloc rpl_malloc
-extern void * malloc (size_t size);
+#if @GNULIB_ATOLL@
+# if !@HAVE_ATOLL@
+/* Parse a signed decimal integer.
+   Returns the value of the integer.  Errors are not detected.  */
+extern long long atoll (const char *string);
 # endif
 #elif defined GNULIB_POSIXCHECK
-# undef malloc
-# define malloc(s) \
-    (GL_LINK_WARNING ("malloc is not POSIX compliant everywhere - " \
-                      "use gnulib module malloc-posix for portability"), \
-     malloc (s))
+# undef atoll
+# define atoll(s) \
+    (GL_LINK_WARNING ("atoll is unportable - " \
+                      "use gnulib module atoll for portability"), \
+     atoll (s))
 #endif
-
-
-#if @GNULIB_REALLOC_POSIX@
-# if !@HAVE_REALLOC_POSIX@
-#  undef realloc
-#  define realloc rpl_realloc
-extern void * realloc (void *ptr, size_t size);
-# endif
-#elif defined GNULIB_POSIXCHECK
-# undef realloc
-# define realloc(p,s) \
-    (GL_LINK_WARNING ("realloc is not POSIX compliant everywhere - " \
-                      "use gnulib module realloc-posix for portability"), \
-     realloc (p, s))
-#endif
-
 
 #if @GNULIB_CALLOC_POSIX@
 # if !@HAVE_CALLOC_POSIX@
@@ -132,21 +115,20 @@ extern void * calloc (size_t nmemb, size_t size);
      calloc (n, s))
 #endif
 
-
-#if @GNULIB_ATOLL@
-# if !@HAVE_ATOLL@
-/* Parse a signed decimal integer.
-   Returns the value of the integer.  Errors are not detected.  */
-extern long long atoll (const char *string);
+#if @GNULIB_CANONICALIZE_FILE_NAME@
+# if @REPLACE_CANONICALIZE_FILE_NAME@
+#  define canonicalize_file_name rpl_canonicalize_file_name
+# endif
+# if !@HAVE_CANONICALIZE_FILE_NAME@ || @REPLACE_CANONICALIZE_FILE_NAME@
+extern char *canonicalize_file_name (const char *name);
 # endif
 #elif defined GNULIB_POSIXCHECK
-# undef atoll
-# define atoll(s) \
-    (GL_LINK_WARNING ("atoll is unportable - " \
-                      "use gnulib module atoll for portability"), \
-     atoll (s))
+# undef canonicalize_file_name
+# define canonicalize_file_name(n)                        \
+    (GL_LINK_WARNING ("canonicalize_file_name is unportable - " \
+                      "use gnulib module canonicalize-lgpl for portability"), \
+     canonicalize_file_name (n))
 #endif
-
 
 #if @GNULIB_GETLOADAVG@
 # if !@HAVE_DECL_GETLOADAVG@
@@ -163,7 +145,6 @@ extern int getloadavg (double loadavg[], int nelem);
                       "use gnulib module getloadavg for portability"), \
      getloadavg (l, n))
 #endif
-
 
 #if @GNULIB_GETSUBOPT@
 /* Assuming *OPTIONP is a comma separated list of elements of the form
@@ -188,6 +169,19 @@ extern int getsubopt (char **optionp, char *const *tokens, char **valuep);
      getsubopt (o, t, v))
 #endif
 
+#if @GNULIB_MALLOC_POSIX@
+# if !@HAVE_MALLOC_POSIX@
+#  undef malloc
+#  define malloc rpl_malloc
+extern void * malloc (size_t size);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef malloc
+# define malloc(s) \
+    (GL_LINK_WARNING ("malloc is not POSIX compliant everywhere - " \
+                      "use gnulib module malloc-posix for portability"), \
+     malloc (s))
+#endif
 
 #if @GNULIB_MKDTEMP@
 # if !@HAVE_MKDTEMP@
@@ -205,7 +199,6 @@ extern char * mkdtemp (char * /*template*/);
                       "use gnulib module mkdtemp for portability"), \
      mkdtemp (t))
 #endif
-
 
 #if @GNULIB_MKOSTEMP@
 # if !@HAVE_MKOSTEMP@
@@ -230,7 +223,6 @@ extern int mkostemp (char * /*template*/, int /*flags*/);
                       "use gnulib module mkostemp for portability"), \
      mkostemp (t, f))
 #endif
-
 
 #if @GNULIB_MKSTEMP@
 # if @REPLACE_MKSTEMP@
@@ -257,7 +249,6 @@ extern int mkstemp (char * /*template*/);
      mkstemp (t))
 #endif
 
-
 #if @GNULIB_PUTENV@
 # if @REPLACE_PUTENV@
 #  undef putenv
@@ -265,7 +256,6 @@ extern int mkstemp (char * /*template*/);
 extern int putenv (char *string);
 # endif
 #endif
-
 
 #if @GNULIB_RANDOM_R@
 # if !@HAVE_RANDOM_R@
@@ -303,6 +293,34 @@ int random_r (struct random_data *buf, int32_t *result);
      setstate_r (a,r))
 #endif
 
+#if @GNULIB_REALLOC_POSIX@
+# if !@HAVE_REALLOC_POSIX@
+#  undef realloc
+#  define realloc rpl_realloc
+extern void * realloc (void *ptr, size_t size);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef realloc
+# define realloc(p,s) \
+    (GL_LINK_WARNING ("realloc is not POSIX compliant everywhere - " \
+                      "use gnulib module realloc-posix for portability"), \
+     realloc (p, s))
+#endif
+
+#if @GNULIB_REALPATH@
+# if @REPLACE_REALPATH@
+#  define realpath rpl_realpath
+# endif
+# if !@HAVE_REALPATH@ || @REPLACE_REALPATH@
+extern char *realpath (const char *name, char *resolved);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef realpath
+# define realpath(n,r)                        \
+    (GL_LINK_WARNING ("realpath is unportable - use gnulib module " \
+                      "canonicalize or canonicalize-lgpl for portability"), \
+     realpath (n, r))
+#endif
 
 #if @GNULIB_RPMATCH@
 # if !@HAVE_RPMATCH@
@@ -318,7 +336,6 @@ extern int rpmatch (const char *response);
      rpmatch (r))
 #endif
 
-
 #if @GNULIB_SETENV@
 # if !@HAVE_SETENV@
 /* Set NAME to VALUE in the environment.
@@ -326,21 +343,6 @@ extern int rpmatch (const char *response);
 extern int setenv (const char *name, const char *value, int replace);
 # endif
 #endif
-
-
-#if @GNULIB_UNSETENV@
-# if @HAVE_UNSETENV@
-#  if @VOID_UNSETENV@
-/* On some systems, unsetenv() returns void.
-   This is the case for MacOS X 10.3, FreeBSD 4.8, NetBSD 1.6, OpenBSD 3.4.  */
-#   define unsetenv(name) ((unsetenv)(name), 0)
-#  endif
-# else
-/* Remove the variable NAME from the environment.  */
-extern int unsetenv (const char *name);
-# endif
-#endif
-
 
 #if @GNULIB_STRTOD@
 # if @REPLACE_STRTOD@
@@ -357,7 +359,6 @@ extern double strtod (const char *str, char **endp);
                       "use gnulib module strtod for portability"), \
      strtod (s, e))
 #endif
-
 
 #if @GNULIB_STRTOLL@
 # if !@HAVE_STRTOLL@
@@ -379,7 +380,6 @@ extern long long strtoll (const char *string, char **endptr, int base);
      strtoll (s, e, b))
 #endif
 
-
 #if @GNULIB_STRTOULL@
 # if !@HAVE_STRTOULL@
 /* Parse an unsigned integer whose textual representation starts at STRING.
@@ -400,6 +400,18 @@ extern unsigned long long strtoull (const char *string, char **endptr, int base)
      strtoull (s, e, b))
 #endif
 
+#if @GNULIB_UNSETENV@
+# if @HAVE_UNSETENV@
+#  if @VOID_UNSETENV@
+/* On some systems, unsetenv() returns void.
+   This is the case for MacOS X 10.3, FreeBSD 4.8, NetBSD 1.6, OpenBSD 3.4.  */
+#   define unsetenv(name) ((unsetenv)(name), 0)
+#  endif
+# else
+/* Remove the variable NAME from the environment.  */
+extern int unsetenv (const char *name);
+# endif
+#endif
 
 #ifdef __cplusplus
 }

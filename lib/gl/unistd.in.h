@@ -164,8 +164,27 @@ extern int fchownat (int fd, char const *file, uid_t owner, gid_t group, int fla
 #endif
 
 
+#if @GNULIB_UNLINK@
+# if @REPLACE_UNLINK@
+#  undef unlink
+#  define unlink rpl_unlink
+extern int unlink (char const *file);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef unlink
+# define unlink(n)                         \
+    (GL_LINK_WARNING ("unlink is not portable - " \
+                      "use gnulib module unlink for portability"), \
+     unlink (n))
+#endif
+
+
 #if @GNULIB_UNLINKAT@
-# if !@HAVE_UNLINKAT@
+# if @REPLACE_UNLINKAT@
+#  undef unlinkat
+#  define unlinkat rpl_unlinkat
+# endif
+# if !@HAVE_UNLINKAT@ || @REPLACE_UNLINKAT@
 extern int unlinkat (int fd, char const *file, int flag);
 # endif
 #elif defined GNULIB_POSIXCHECK
@@ -231,6 +250,10 @@ extern int close (int);
      close (f))
 #endif
 
+#if @REPLACE_DUP@
+# define dup rpl_dup
+extern int dup (int);
+#endif
 
 #if @GNULIB_DUP2@
 # if @REPLACE_DUP2@
@@ -312,16 +335,12 @@ extern int euidaccess (const char *filename, int mode);
 
 #if @GNULIB_FCHDIR@
 # if @REPLACE_FCHDIR@
-
 /* Change the process' current working directory to the directory on which
    the given file descriptor is open.
    Return 0 if successful, otherwise -1 and errno set.
    See the POSIX:2001 specification
    <http://www.opengroup.org/susv3xsh/fchdir.html>.  */
 extern int fchdir (int /*fd*/);
-
-#  define dup rpl_dup
-extern int dup (int);
 
 /* Gnulib internal hooks needed to maintain the fchdir metadata.  */
 extern int _gl_register_fd (int fd, const char *filename);
@@ -669,6 +688,21 @@ extern int readlink (const char *file, char *buf, size_t bufsize);
     (GL_LINK_WARNING ("readlink is unportable - " \
                       "use gnulib module readlink for portability"), \
      readlink (f, b, s))
+#endif
+
+
+#if @GNULIB_RMDIR@
+# if @REPLACE_RMDIR@
+#  define rmdir rpl_rmdir
+/* Remove the directory DIR.  */
+extern int rmdir (char const *name);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef rmdir
+# define rmdir(n) \
+    (GL_LINK_WARNING ("rmdir is unportable - " \
+                      "use gnulib module rmdir for portability"), \
+     rmdir (n))
 #endif
 
 
