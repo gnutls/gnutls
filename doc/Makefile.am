@@ -156,7 +156,9 @@ if HAVE_GUILE
 # Guile documentation extraction from C code.
 #
 
-GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/guile/modules
+GUILE_FOR_BUILD =				\
+  GUILE_AUTO_COMPILE=0				\
+  $(GUILE) -L $(top_srcdir)/guile/modules
 
 SNARF_CPPFLAGS = -I$(top_srcdir) -I$(top_builddir)			\
 	 -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes	\

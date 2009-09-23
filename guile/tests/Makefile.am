@@ -1,5 +1,5 @@
 #  GNUTLS -- Guile bindings for GnuTLS.
-#  Copyright (C) 2007, 2008  Free Software Foundation
+#  Copyright (C) 2007, 2008, 2009  Free Software Foundation, Inc.
 #
 #  GNUTLS is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,9 @@ if ENABLE_SRP
 TESTS += srp-base64.scm
 endif
 
-TESTS_ENVIRONMENT = $(top_builddir)/guile/pre-inst-guile -L $(srcdir)
+TESTS_ENVIRONMENT =					\
+  GUILE_AUTO_COMPILE=0					\
+  $(top_builddir)/guile/pre-inst-guile -L $(srcdir)
 
 
 EXTRA_DIST = $(TESTS) openpgp-pub.asc openpgp-sec.asc	\

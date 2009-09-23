@@ -1,5 +1,5 @@
 #  GNUTLS -- Guile bindings for GnuTLS.
-#  Copyright (C) 2007, 2008  Free Software Foundation
+#  Copyright (C) 2007, 2008, 2009  Free Software Foundation, Inc.
 #
 #  GNUTLS is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -15,7 +15,8 @@
 #  License along with GNUTLS; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-GUILE_FOR_BUILD = $(GUILE) -L $(top_srcdir)/guile/modules
+GUILE_FOR_BUILD =						\
+  GUILE_AUTO_COMPILE=0 $(GUILE) -L $(top_srcdir)/guile/modules
 
 noinst_HEADERS = errors.h utils.h
 
