@@ -307,10 +307,10 @@ gnutls_server_name_get (gnutls_session_t session, void *data,
  * This should be used by clients that connect to servers that do
  * virtual hosting.
  *
- * The value of @name depends on the @ind type. In case of
- * GNUTLS_NAME_DNS, an ASCII or UTF-8 null terminated string, without
- * the trailing dot, is expected.  IPv4 or IPv6 addresses are not
- * permitted.
+ * The value of @name depends on the @type type.  In case of
+ * %GNUTLS_NAME_DNS, an ASCII zero-terminated domain name string,
+ * without the trailing dot, is expected.  IPv4 or IPv6 addresses are
+ * not permitted.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
  *   otherwise an error code is returned.
