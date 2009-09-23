@@ -167,7 +167,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_id, "openpgp-certificate-id",
   if (c_id == NULL)
     scm_gnutls_error (GNUTLS_E_MEMORY_ERROR, FUNC_NAME);
 
-  err = gnutls_openpgp_crt_get_id (c_key, c_id);
+  err = gnutls_openpgp_crt_get_key_id (c_key, c_id);
   if (EXPECT_FALSE (err))
     scm_gnutls_error (err, FUNC_NAME);
 
@@ -199,7 +199,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_id_x, "openpgp-certificate-id!",
       scm_misc_error (FUNC_NAME, "ID vector too small: ~A", scm_list_1 (id));
     }
 
-  err = gnutls_openpgp_crt_get_id (c_key, (unsigned char *) c_id);
+  err = gnutls_openpgp_crt_get_key_id (c_key, (unsigned char *) c_id);
   scm_gnutls_release_array (&c_id_handle);
 
   if (EXPECT_FALSE (err))
