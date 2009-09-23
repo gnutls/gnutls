@@ -1,5 +1,5 @@
 /* GNUTLS-EXTRA --- Guile bindings for GNUTLS-EXTRA.
-   Copyright (C) 2007  Free Software Foundation
+   Copyright (C) 2007, 2009  Free Software Foundation, Inc.
 
    GNUTLS-EXTRA is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@
 
 /* Written by Ludovic Courtès <ludo@chbouib.org>.  */
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
 #include <stdio.h>
 #include <gnutls/gnutls.h>
