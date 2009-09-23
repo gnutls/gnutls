@@ -18,6 +18,7 @@
 /* Written by Ludovic Courtès <ludo@gnu.org>.  */
 
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <libguile.h>
@@ -783,7 +784,7 @@ do_fill_port (void *data)
   else
     scm_gnutls_error (result, "fill_session_record_port_input");
 
-  return ((void *) chr);
+  return ((void *) (uintptr_t) chr);
 }
 
 /* Fill in the input buffer of PORT.  */
@@ -809,11 +810,11 @@ fill_session_record_port_input (SCM port)
       if (SCM_GNUTLS_SESSION_TRANSPORT_IS_FD (c_session))
 	/* SESSION's underlying transport is a raw file descriptor, so we
 	   must leave "Guile mode" to allow the GC to run.  */
-	chr = (int) scm_without_guile (do_fill_port, &c_args);
+	chr = (intptr_t) scm_without_guile (do_fill_port, &c_args);
       else
 	/* SESSION's underlying transport is a port, so don't leave "Guile
 	   mode".  */
-	chr = (int) do_fill_port (&c_args);
+	chr = (intptr_t) do_fill_port (&c_args);
     }
   else
     chr = (int) *c_port->read_pos;
@@ -935,7 +936,7 @@ SCM_DEFINE (scm_gnutls_set_session_transport_fd_x,
   c_session = scm_to_gnutls_session (session, 1, FUNC_NAME);
   c_fd = (int) scm_to_uint (fd);
 
-  gnutls_transport_set_ptr (c_session, (gnutls_transport_ptr_t) c_fd);
+  gnutls_transport_set_ptr (c_session, (gnutls_transport_ptr_t) (intptr_t) c_fd);
 
   SCM_GNUTLS_SET_SESSION_TRANSPORT_IS_FD (c_session, 1);
 
