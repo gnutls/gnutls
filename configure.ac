@@ -145,6 +145,15 @@ if test "$opt_guile_bindings" = "yes"; then
                           gnu89_inline=yes, gnu89_inline=no)
         AC_MSG_RESULT($gnu89_inline)
         CFLAGS="$_gcc_cflags_save"
+
+	# Optional Guile functions.
+	save_CFLAGS="$CFLAGS"
+	save_LIBS="$LIBS"
+	CFLAGS="$CFLAGS $GUILE_CFLAGS"
+	LIBS="$LIBS $GUILE_LDFLAGS"
+	AC_CHECK_FUNCS([scm_gc_malloc_pointerless])
+	CFLAGS="$save_CFLAGS"
+	LIBS="$save_LIBS"
       else
         AC_MSG_RESULT([no])
         AC_MSG_WARN([A sufficiently recent GNU Guile not found.  Guile bindings not built.])

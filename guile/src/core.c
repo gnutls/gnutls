@@ -720,6 +720,9 @@ static scm_t_bits session_record_port_type;
 static const char session_record_port_gc_hint[] =
   "gnutls-session-record-port";
 
+
+#if SCM_MAJOR_VERSION == 1 && SCM_MINOR_VERSION <= 8
+
 /* Mark the session associated with PORT.  */
 static SCM
 mark_session_record_port (SCM port)
@@ -755,8 +758,10 @@ free_session_record_port (SCM port)
 
   return 0;
 }
-
 #undef FUNC_NAME
+
+#endif /* SCM_MAJOR_VERSION == 1 && SCM_MINOR_VERSION <= 8 */
+
 
 /* Data passed to `do_fill_port ()'.  */
 typedef struct
@@ -865,7 +870,12 @@ make_session_record_port (SCM session)
 
   c_port_buf =
     (unsigned char *)
-    scm_gc_malloc (SCM_GNUTLS_SESSION_RECORD_PORT_BUFFER_SIZE,
+#ifdef HAVE_SCM_GC_MALLOC_POINTERLESS
+    scm_gc_malloc_pointerless
+#else
+    scm_gc_malloc
+#endif
+                  (SCM_GNUTLS_SESSION_RECORD_PORT_BUFFER_SIZE,
 		   session_record_port_gc_hint);
 
   /* Create a new port.  */
@@ -921,8 +931,14 @@ scm_init_gnutls_session_record_port_type (void)
     scm_make_port_type ("gnutls-session-port",
 			fill_session_record_port_input,
 			write_to_session_record_port);
+
+  /* Guile >= 1.9.3 doesn't need a custom mark procedure, and doesn't need a
+     finalizer (since memory associated with the port is automatically
+     reclaimed.)  */
+#if SCM_MAJOR_VERSION == 1 && SCM_MINOR_VERSION <= 8
   scm_set_port_mark (session_record_port_type, mark_session_record_port);
   scm_set_port_free (session_record_port_type, free_session_record_port);
+#endif
 }
 
 
