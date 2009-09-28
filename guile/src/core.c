@@ -60,7 +60,7 @@ const char scm_gnutls_array_error_message[] =
    marked by the session mark procedure.  */
 
 #define SCM_GNUTLS_MAKE_SESSION_DATA()		\
-  scm_cons (SCM_BOOL_F, SCM_BOOL_F);
+  scm_cons (SCM_BOOL_F, SCM_BOOL_F)
 #define SCM_GNUTLS_SET_SESSION_DATA(c_session, data)			\
   gnutls_session_set_ptr (c_session, (void *) SCM_UNPACK (data))
 #define SCM_GNUTLS_SESSION_DATA(c_session)			\
@@ -70,7 +70,7 @@ const char scm_gnutls_array_error_message[] =
   SCM_SETCAR (SCM_GNUTLS_SESSION_DATA (c_session),			\
 	      scm_from_bool (c_is_fd))
 #define SCM_GNUTLS_SET_SESSION_RECORD_PORT(c_session, port)	\
-  SCM_SETCDR (SCM_GNUTLS_SESSION_DATA (c_session), port);
+  SCM_SETCDR (SCM_GNUTLS_SESSION_DATA (c_session), port)
 
 #define SCM_GNUTLS_SESSION_TRANSPORT_IS_FD(c_session)		\
   scm_to_bool (SCM_CAR (SCM_GNUTLS_SESSION_DATA (c_session)))
