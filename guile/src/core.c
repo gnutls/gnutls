@@ -2786,6 +2786,12 @@ scm_init_gnutls (void)
 {
 #include "core.x"
 
+  /* Use Guile's allocation routines, which will run the GC if need be.  */
+  gnutls_malloc = scm_malloc;
+  gnutls_realloc = scm_realloc;
+  gnutls_secure_malloc = scm_malloc;
+  gnutls_free = free;
+
   (void) gnutls_global_init ();
 
   scm_gnutls_define_enums ();
@@ -2794,6 +2800,3 @@ scm_init_gnutls (void)
 
   scm_init_gnutls_session_record_port_type ();
 }
-
-/* arch-tag: 58420abe-0769-4684-b522-da7f32f4474c
- */
