@@ -208,7 +208,7 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
 }
 
 static const int protocol_priority[] = {
-  /* GNUTLS_TLS1_2, -- not finalized yet! */
+  GNUTLS_TLS1_2,
   GNUTLS_TLS1_1,
   GNUTLS_TLS1_0,
   GNUTLS_SSL3,
