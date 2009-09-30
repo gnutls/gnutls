@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1523,7 +1523,7 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
     size += cred->x509_rdn_sequence.size;
 
   if (_gnutls_version_has_selectable_sighash(ver))
-    /* Need at least one byte to announce the number of supported hash
+    /* Need two bytes to announce the number of supported hash
        functions (see below).  */
     size += 2;
 
