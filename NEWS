@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** libgnutls: TLS 1.2 server mode fixes.
 Now interoperates against Opera.  Contributed by Daiki Ueno.
 
+** guile: Compatibility with guile 2.x.
+By Ludovic Courtes <ludovic.courtes@laas.fr>.
+
 ** API and ABI modifications:
 No changes since last version.
 
