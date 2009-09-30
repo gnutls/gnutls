@@ -41,7 +41,9 @@
 /* mingw, BeOS, Haiku declare environ in <stdlib.h>, not in <unistd.h>.  */
 #include <stdlib.h>
 
-#if @GNULIB_WRITE@ && @REPLACE_WRITE@ && @GNULIB_UNISTD_H_SIGPIPE@
+#if ((@GNULIB_WRITE@ && @REPLACE_WRITE@ && @GNULIB_UNISTD_H_SIGPIPE@)   \
+     || (@GNULIB_READLINK@ && (!@HAVE_READLINK@ || @REPLACE_READLINK@)) \
+     || (@GNULIB_READLINKAT@ && !@HAVE_READLINKAT@))
 /* Get ssize_t.  */
 # include <sys/types.h>
 #endif
@@ -579,6 +581,21 @@ extern int link (const char *path1, const char *path2);
      link (path1, path2))
 #endif
 
+#if @GNULIB_LINKAT@
+/* Create a new hard link for an existing file, relative to two
+   directories.  FLAG controls whether symlinks are followed.
+   Return 0 if successful, otherwise -1 and errno set.  */
+# if !@HAVE_LINKAT@
+extern int linkat (int fd1, const char *path1, int fd2, const char *path2,
+		   int flag);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef linkat
+# define link(f1,path1,f2,path2,f)		\
+    (GL_LINK_WARNING ("linkat is unportable - " \
+                      "use gnulib module linkat for portability"), \
+     linkat (f1, path1, f2, path2,f))
+#endif
 
 #if @GNULIB_LSEEK@
 # if @REPLACE_LSEEK@
@@ -621,13 +638,16 @@ extern int pipe2 (int fd[2], int flags);
 
 
 #if @GNULIB_READLINK@
+# if @REPLACE_READLINK@
+#  define readlink rpl_readlink
+# endif
 /* Read the contents of the symbolic link FILE and place the first BUFSIZE
    bytes of it into BUF.  Return the number of bytes placed into BUF if
    successful, otherwise -1 and errno set.
    See the POSIX:2001 specification
    <http://www.opengroup.org/susv3xsh/readlink.html>.  */
-# if !@HAVE_READLINK@
-extern int readlink (const char *file, char *buf, size_t bufsize);
+# if !@HAVE_READLINK@ || @REPLACE_READLINK@
+extern ssize_t readlink (const char *file, char *buf, size_t bufsize);
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef readlink
@@ -680,6 +700,23 @@ extern unsigned int sleep (unsigned int n);
     (GL_LINK_WARNING ("sleep is unportable - " \
                       "use gnulib module sleep for portability"), \
      sleep (n))
+#endif
+
+
+#if @GNULIB_SYMLINK@
+# if @REPLACE_SYMLINK@
+#  undef symlink
+#  define symlink rpl_symlink
+# endif
+# if !@HAVE_SYMLINK@ || @REPLACE_SYMLINK@
+int symlink (char const *contents, char const *file);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef symlink
+# define symlink(c,n)			     \
+    (GL_LINK_WARNING ("symlink is not portable - " \
+                      "use gnulib module symlink for portability"), \
+     symlink (c, n))
 #endif
 
 

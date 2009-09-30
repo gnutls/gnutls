@@ -102,6 +102,14 @@ EXTRA_DIST += intprops.h
 
 ## end   gnulib module intprops
 
+## begin gnulib module link-warning
+
+LINK_WARNING_H=$(top_srcdir)/build-aux/link-warning.h
+
+EXTRA_DIST += $(top_srcdir)/build-aux/link-warning.h
+
+## end   gnulib module link-warning
+
 ## begin gnulib module memchr-tests
 
 TESTS += test-memchr

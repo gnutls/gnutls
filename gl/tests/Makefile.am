@@ -151,6 +151,14 @@ EXTRA_libtests_a_SOURCES += ioctl.c
 
 ## end   gnulib module ioctl
 
+## begin gnulib module link-warning
+
+LINK_WARNING_H=$(top_srcdir)/build-aux/link-warning.h
+
+EXTRA_DIST += $(top_srcdir)/build-aux/link-warning.h
+
+## end   gnulib module link-warning
+
 ## begin gnulib module lseek-tests
 
 TESTS += test-lseek.sh
