@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.9.7 (unreleased)
 
+** libgnutls: TLS 1.2 server mode fixes.
+Now interoperates against Opera.  Contributed by Daiki Ueno.
+
 ** API and ABI modifications:
 No changes since last version.
 
