@@ -1525,7 +1525,7 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
   if (_gnutls_version_has_selectable_sighash(ver))
     /* Need at least one byte to announce the number of supported hash
        functions (see below).  */
-    size += 1;
+    size += 2;
 
   (*data) = gnutls_malloc (size);
   pdata = (*data);
@@ -1545,8 +1545,8 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
   if (_gnutls_version_has_selectable_sighash(ver))
     {
       /* Supported hashes (nothing for now -- FIXME). */
-      *pdata = 0;
-      pdata++;
+      _gnutls_write_uint16 (0, pdata);
+      pdata += 2;
     }
 
   if (session->security_parameters.cert_type == GNUTLS_CRT_X509 &&

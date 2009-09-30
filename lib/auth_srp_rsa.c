@@ -87,6 +87,7 @@ gen_srp_cert_server_kx (gnutls_session_t session, opaque ** data)
   gnutls_cert *apr_cert_list;
   gnutls_privkey *apr_pkey;
   int apr_cert_list_length;
+  gnutls_sign_algorithm_t sign_algo;
 
   ret = _gnutls_gen_srp_server_kx (session, data);
 
@@ -116,7 +117,8 @@ gen_srp_cert_server_kx (gnutls_session_t session, opaque ** data)
 
   if ((ret =
        _gnutls_tls_sign_params (session, &apr_cert_list[0],
-				apr_pkey, &ddata, &signature)) < 0)
+				apr_pkey, &ddata, &signature,
+				&sign_algo)) < 0)
     {
       gnutls_assert ();
       gnutls_free (*data);

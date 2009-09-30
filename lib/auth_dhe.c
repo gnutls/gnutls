@@ -91,6 +91,8 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
   gnutls_datum_t signature, ddata;
   gnutls_certificate_credentials_t cred;
   gnutls_dh_params_t dh_params;
+  gnutls_sign_algorithm_t sign_algo;
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
   cred = (gnutls_certificate_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -147,7 +149,8 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
     {
       if ((ret =
 	   _gnutls_tls_sign_params (session, &apr_cert_list[0],
-				    apr_pkey, &ddata, &signature)) < 0)
+				    apr_pkey, &ddata, &signature,
+				    &sign_algo)) < 0)
 	{
 	  gnutls_assert ();
 	  gnutls_free (*data);
@@ -160,12 +163,28 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
       return data_size;		/* do not put a signature - ILLEGAL! */
     }
 
-  *data = gnutls_realloc_fast (*data, data_size + signature.size + 2);
+  *data = gnutls_realloc_fast (*data, data_size + signature.size + 4);
   if (*data == NULL)
     {
       _gnutls_free_datum (&signature);
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  if (_gnutls_version_has_selectable_sighash (ver))
+    {
+      sign_algorithm_st aid;
+
+      if (sign_algo == GNUTLS_SIGN_UNKNOWN)
+	{
+	  _gnutls_free_datum (&signature);
+	  gnutls_assert ();
+	  return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+	}
+
+      aid = _gnutls_sign_to_tls_aid (sign_algo);
+      (*data)[data_size++] = aid.hash_algorithm;
+      (*data)[data_size++] = aid.sign_algorithm;
     }
 
   _gnutls_write_datum16 (&(*data)[data_size], signature);

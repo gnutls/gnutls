@@ -203,7 +203,8 @@ _gnutls_tls_sign_hdata (gnutls_session_t session,
 int
 _gnutls_tls_sign_params (gnutls_session_t session, gnutls_cert * cert,
 			 gnutls_privkey * pkey, gnutls_datum_t * params,
-			 gnutls_datum_t * signature)
+			 gnutls_datum_t * signature,
+			 gnutls_sign_algorithm_t * sign_algo)
 {
   gnutls_datum_t dconcat;
   int ret;
@@ -211,6 +212,19 @@ _gnutls_tls_sign_params (gnutls_session_t session, gnutls_cert * cert,
   opaque concat[MAX_SIG_SIZE];
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
   gnutls_mac_algorithm_t mac_algo = GNUTLS_MAC_SHA1;
+  gnutls_sign_algorithm_t _sign_algo = GNUTLS_SIGN_UNKNOWN;
+
+  if (_gnutls_version_has_selectable_prf (ver))
+    {
+      _sign_algo = _gnutls_x509_pk_to_sign (cert->subject_pk_algorithm,
+					    mac_algo);
+      if (_sign_algo == GNUTLS_SIGN_UNKNOWN)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+	}
+    }
+  *sign_algo = _sign_algo;
 
   ret = _gnutls_hash_init (&td_sha, mac_algo);
   if (ret < 0)

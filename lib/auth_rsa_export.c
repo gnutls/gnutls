@@ -77,6 +77,7 @@ gen_rsa_export_server_kx (gnutls_session_t session, opaque ** data)
   int apr_cert_list_length;
   gnutls_datum_t signature, ddata;
   gnutls_certificate_credentials_t cred;
+  gnutls_sign_algorithm_t sign_algo;
 
   cred = (gnutls_certificate_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -154,7 +155,8 @@ gen_rsa_export_server_kx (gnutls_session_t session, opaque ** data)
     {
       if ((ret =
 	   _gnutls_tls_sign_params (session, &apr_cert_list[0],
-				    apr_pkey, &ddata, &signature)) < 0)
+				    apr_pkey, &ddata, &signature,
+				    &sign_algo)) < 0)
 	{
 	  gnutls_assert ();
 	  gnutls_free (*data);
