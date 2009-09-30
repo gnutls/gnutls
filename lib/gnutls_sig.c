@@ -127,7 +127,7 @@ _gnutls_tls_sign_hdata (gnutls_session_t session,
 {
   gnutls_datum_t dconcat;
   int ret;
-  opaque concat[36];
+  opaque concat[MAX_SIG_SIZE];
   digest_hd_st td_md5;
   digest_hd_st td_sha;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
@@ -458,7 +458,7 @@ _gnutls_verify_sig_hdata (gnutls_session_t session, gnutls_cert * cert,
 			  gnutls_datum_t * signature)
 {
   int ret;
-  opaque concat[36];
+  opaque concat[MAX_SIG_SIZE];
   digest_hd_st td_md5;
   digest_hd_st td_sha;
   gnutls_datum_t dconcat;
