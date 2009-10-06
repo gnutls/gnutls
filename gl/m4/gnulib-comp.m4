@@ -126,6 +126,7 @@ AC_SUBST([LTALLOCA])
   gl_STRING_MODULE_INDICATOR([perror])
   gl_PMCCABE2HTML
   AC_CHECK_DECLS([program_invocation_name], [], [], [#include <errno.h>])
+  AC_CHECK_DECLS([program_invocation_short_name], [], [], [#include <errno.h>])
   gl_FUNC_READ_FILE
   gl_FUNC_READLINE
   gl_FUNC_REALLOC_POSIX
