@@ -1,3 +1,125 @@
+2009-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.9.7.
+
+2009-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-comp.m4, gl/m4/stdio_h.m4,
+	gl/m4/unistd_h.m4, gl/progname.c, gl/stdio.in.h, gl/unistd.in.h,
+	lib/gl/Makefile.am, lib/gl/m4/stdio_h.m4, lib/gl/m4/unistd_h.m4,
+	lib/gl/stdio.in.h, lib/gl/unistd.in.h, maint.mk: Update gnulib
+	files.
+
+2009-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/libgnutlsxx.map: Fix symbol export rules.  Tiny patch by Boyan Kasarov <bkasarov@gmail.com>.
+
+2009-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutlsxx.cpp: Include config.h.  Tiny patch from Boyan Kasarov <bkasarov@gmail.com>.
+
+2009-10-01  Daiki Ueno <ueno@unixuser.org>
+
+	* lib/gnutls_sig.c: Reserve enough room for hash buffers.  This fixes x509self self-test.
+
+2009-09-30  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/sys_stat_h.m4, gl/m4/unistd_h.m4,
+	gl/tests/Makefile.am, gl/unistd.in.h, lib/gl/Makefile.am,
+	lib/gl/m4/sys_stat_h.m4, lib/gl/m4/unistd_h.m4,
+	lib/gl/tests/Makefile.am, lib/gl/unistd.in.h: Update gnulib files.
+
+2009-09-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-09-30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_priority.c: Attempt to negotiate TLS 1.2 by default.
+
+2009-09-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-09-30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_cert.c: Fix comment.
+
+2009-09-30  Daiki Ueno <ueno@unixuser.org>
+
+	* lib/auth_cert.c, lib/auth_dhe.c, lib/auth_rsa_export.c,
+	lib/auth_srp_rsa.c, lib/gnutls_sig.c, lib/gnutls_sig.h: Fix
+	server-side TLS 1.2 support.
+
+2009-09-30  Daiki Ueno <ueno@unixuser.org>
+
+	* lib/gnutls_sig.c: Calculate DER-encoded DigestInfo on-the-fly
+	rather than hard code it.
+
+2009-09-28  Ludovic Courtès <ludo@gnu.org>
+
+	* configure.ac, guile/src/core.c: guile: Adjust for Guile 1.9.3+.  * guile/src/core.c (mark_session_record_port,
+	  free_session_record_port): Conditionalize on `SCM_MAJOR_VERSION == 1
+	  && SCM_MINOR_VERSION <= 8'.  (scm_init_gnutls_session_record_port_type): Adjust accordingly.    (make_session_record_port): Use `scm_gc_malloc_pointerless ()'
+	  when available.
+
+2009-09-28  Ludovic Courtès <ludo@gnu.org>
+
+	* guile/src/core.c: guile: Syntactic nitpicking.  * guile/src/core.c (SCM_GNUTLS_MAKE_SESSION_DATA,   SCM_GNUTLS_SET_SESSION_RECORD_PORT): Remove extraneous semicolon.
+
+2009-09-28  Ludovic Courtès <ludo@gnu.org>
+
+	* guile/src/core.c: guile: Use Guile's malloc routines.  * guile/src/core.c (scm_init_gnutls): Use Guile's malloc routines.
+
+2009-09-23  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_server_name.c: Clarify gnutls_server_name_set usage.  Reported by Daniel Black <daniel@cacert.org> in
+
+	<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3878>.
+
+2009-09-23  Ludovic Courtès <ludo@gnu.org>
+
+	* guile/src/core.c: Fix integer/pointer cast warnings in the Guile
+	bindings on x86_64.  * guile/src/core.c (do_fill_port, fill_session_record_port_input,   scm_gnutls_set_session_transport_fd_x): Make sure pointer/integer
+	  casts use integers of the right size.
+
+2009-09-23  Ludovic Courtès <ludo@gnu.org>
+
+	* guile/src/extra.c: Update Guile bindings to the current OpenPGP
+	API.  * guile/src/extra.c (scm_gnutls_openpgp_certificate_id,   scm_gnutls_openpgp_certificate_id_x): Use   the newer `gnutls_openpgp_crt_get_key_id ()'.
+
+2009-09-23  Ludovic Courtès <ludo@gnu.org>
+
+	* doc/Makefile.am, guile/src/Makefile.am, guile/tests/Makefile.am: 
+	Turn off auto-compilation when using Guile 1.9+.  * guile/src/Makefile.am (GUILE_FOR_BUILD): Turn off auto-compilation   with Guile 1.9+.  * guile/tests/Makefile.am (TESTS_ENVIRONMENT): Likewise.  * doc/Makefile.am (GUILE_FOR_BUILD): Likewise.
+
+2009-09-23  Ludovic Courtès <ludo@gnu.org>
+
+	* guile/src/core.c, guile/src/errors.c, guile/src/extra.c,
+	guile/src/utils.c, guile/src/utils.h: Fix inclusion of <config.h> in
+	Guile bindings.  * guile/src/core.c, guile/src/errors.c, guile/src/extra.c,   guile/src/utils.c: Include <config.h> first, as suggested by Simon   Josefsson.  * guile/src/utils.h: Don't include <config.h>.
+
+2009-09-22  Simon Josefsson <simon@josefsson.org>
+
+	* gl/unistd.in.h, lib/gl/unistd.in.h: Update gnulib files.
+
+2009-09-22  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-09-22  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/gendocs.sh: Chmod.
+
+2009-09-22  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-09-22  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.9.6.
