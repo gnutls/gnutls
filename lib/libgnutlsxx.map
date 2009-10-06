@@ -24,7 +24,11 @@ GNUTLS_1_6
 {
   global:
     extern "C++" {
-      gnutls*;
+      gnutls::*;
   };
+
+  # export typeinfo names and structures
+  _ZTI*;
+
   local: *;
 };
