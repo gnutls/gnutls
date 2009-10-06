@@ -3,7 +3,7 @@ Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Simon Josefsson
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
-* Version 2.9.7 (unreleased)
+* Version 2.9.7 (released 2009-10-06)
 
 ** libgnutls: TLS 1.2 server mode fixes.
 Now interoperates against Opera.  Contributed by Daiki Ueno.
