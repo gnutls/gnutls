@@ -426,6 +426,13 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   memcpy (&session->internals.priorities, priority,
 	  sizeof (struct gnutls_priority_st));
 
+  /* set the current version to the first in the chain.
+   * This will be overridden later.
+   */
+  if (session->internals.priorities.protocol.algorithms > 0)
+    _gnutls_set_current_version (session, session->internals.
+				 priorities.protocol.priority[0]);
+
   return 0;
 }
 
