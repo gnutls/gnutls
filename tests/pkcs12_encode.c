@@ -136,13 +136,12 @@ main (void)
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "bag_set_key_id: %d", ret);
 
-      ret = gnutls_pkcs12_bag_encrypt (bag, "password",
+      ret = gnutls_pkcs12_bag_encrypt (bag, "pass",
 				       i == 0 ? GNUTLS_PKCS8_USE_PKCS12_3DES
 				       : GNUTLS_PKCS_USE_PKCS12_RC2_40);
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "bag_encrypt: %d", ret);
 
-      /* Set PKCS#12 structure. */
       ret = gnutls_pkcs12_set_bag (pkcs12, bag);
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "set_bag: %d", ret);
@@ -150,7 +149,8 @@ main (void)
       gnutls_pkcs12_bag_deinit (bag);
     }
 
-  ret = gnutls_pkcs12_generate_mac (pkcs12, "mac pass");
+  /* MAC the structure, export and print. */
+  ret = gnutls_pkcs12_generate_mac (pkcs12, "pass");
   if (ret < 0)
     error (EXIT_FAILURE, 0, "generate_mac: %d", ret);
 
