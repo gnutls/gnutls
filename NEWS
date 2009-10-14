@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version 2.8.5 (unreleased)
 
+** libgnutls: Fix PKCS#12 encoding.
+The error you would get was "The OID is not supported.".  Problem
+introduced for the v2.8.x branch in 2.7.6.
+
+** guile: Compatibility with guile 2.x.
+By Ludovic Courtes <ludovic.courtes@laas.fr>.
+
 ** API and ABI modifications:
 No changes since last version.
 
