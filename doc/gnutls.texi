@@ -2914,6 +2914,17 @@ $ certtool --load-certificate cert.pem --load-privkey key.pem \
   --to-p12 --outder --outfile key.p12
 @end example
 
+Some tools (reportedly web browsers) have problems with that file
+because it does not contain the CA certificate for the certificate.
+To work around that problem in the tool, you can use the
+@samp{--load-ca-certificate} parameter as follows:
+
+@example
+$ certtool --load-ca-certificate ca.pem \
+  --load-certificate cert.pem --load-privkey key.pem \
+  --to-p12 --outder --outfile key.p12
+@end example
+
 @item
 Proxy certificate can be used to delegate your credential to a
 temporary, typically short-lived, certificate.  To create one from the
@@ -3362,7 +3373,7 @@ applications, you will need to convert them into a PKCS#12 structure.
 This also encrypts the security sensitive key with a password.
 
 @example
-certtool --to-p12 --load-privkey x509-client-key.pem --load-certificate x509-client.pem --outder --outfile x509-client.p12
+certtool --to-p12 --load-ca-certificate x509-ca.pem --load-privkey x509-client-key.pem --load-certificate x509-client.pem --outder --outfile x509-client.p12
 @end example
 
 For icing, we'll create a proxy certificate for the client too.
