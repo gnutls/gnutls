@@ -476,6 +476,8 @@ pkcs-9-challengePassword        ::= CHOICE {
       printableString       PrintableString,
       utf8String            UTF8String }
 
+pkcs-9-at-localKeyId OBJECT IDENTIFIER ::= {iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) 9 21}
+
 pkcs-9-localKeyId ::= OCTET STRING
 
 pkcs-9-at-friendlyName             OBJECT IDENTIFIER ::= {iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) 9 20}
