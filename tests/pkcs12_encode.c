@@ -118,7 +118,8 @@ main (void)
 
       indx = ret;
 
-      ret = gnutls_pkcs12_bag_set_friendly_name (bag, indx, "friendly name");
+      ret = gnutls_pkcs12_bag_set_friendly_name (bag, indx,
+						 i == 0 ? "client" : "ca");
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "set_friendly_name: %d", ret);
 
