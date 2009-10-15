@@ -190,6 +190,7 @@ AC_SUBST([LTALLOCA])
   AC_PROG_MKDIR_P
   gl_HEADER_SYS_TIME_H
   AC_PROG_MKDIR_P
+  gl_HEADER_TIME_H
   gl_UNISTD_H
   gl_FUNC_VASNPRINTF
   gl_VERSION_ETC
@@ -252,7 +253,7 @@ AC_SUBST([LTALLOCA])
   gt_TYPE_WINT_T
   gl_SYS_IOCTL_H
   AC_PROG_MKDIR_P
-  AC_CHECK_FUNCS([shutdown])
+  AC_CHECK_FUNCS_ONCE([shutdown])
   abs_aux_dir=`cd "$ac_aux_dir"; pwd`
   AC_SUBST([abs_aux_dir])
   m4_ifval(gltests_LIBSOURCES_LIST, [
@@ -432,6 +433,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/sys_socket.in.h
   lib/sys_stat.in.h
   lib/sys_time.in.h
+  lib/time.in.h
   lib/unistd.in.h
   lib/vasnprintf.c
   lib/vasnprintf.h
@@ -505,6 +507,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
   m4/sys_time_h.m4
+  m4/time_h.m4
   m4/ungetc.m4
   m4/unistd_h.m4
   m4/vasnprintf.m4
@@ -552,6 +555,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-sys_socket.c
   tests/test-sys_stat.c
   tests/test-sys_time.c
+  tests/test-time.c
   tests/test-unistd.c
   tests/test-vasnprintf.c
   tests/test-vc-list-files-cvs.sh

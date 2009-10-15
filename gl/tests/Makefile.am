@@ -369,6 +369,15 @@ EXTRA_DIST += test-sys_time.c
 
 ## end   gnulib module sys_time-tests
 
+## begin gnulib module time-tests
+
+TESTS += test-time
+check_PROGRAMS += test-time
+
+EXTRA_DIST += test-time.c
+
+## end   gnulib module time-tests
+
 ## begin gnulib module unistd-tests
 
 TESTS += test-unistd

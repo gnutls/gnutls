@@ -143,7 +143,7 @@ AC_DEFUN([lgl_INIT],
   gl_FUNC_UNGETC_WORKS
   gt_TYPE_WCHAR_T
   gt_TYPE_WINT_T
-  AC_CHECK_FUNCS([shutdown])
+  AC_CHECK_FUNCS_ONCE([shutdown])
   m4_ifval(lgltests_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([lgltests_LIBSOURCES_DIR])[ ||
       for gl_file in ]lgltests_LIBSOURCES_LIST[ ; do

@@ -1,5 +1,5 @@
 /* Test of <sys/stat.h> substitute.
-   Copyright (C) 2007-2008 Free Software Foundation, Inc.
+   Copyright (C) 2007-2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -253,8 +253,33 @@ verify (!S_ISWHT (S_IFLNK));
 verify (!S_ISWHT (S_IFSOCK));
 #endif
 
+/* POSIX 2008 requires traditional encoding of permission constants.  */
+verify (S_IRWXU == 00700);
+verify (S_IRUSR == 00400);
+verify (S_IWUSR == 00200);
+verify (S_IXUSR == 00100);
+verify (S_IRWXG == 00070);
+verify (S_IRGRP == 00040);
+verify (S_IWGRP == 00020);
+verify (S_IXGRP == 00010);
+verify (S_IRWXO == 00007);
+verify (S_IROTH == 00004);
+verify (S_IWOTH == 00002);
+verify (S_IXOTH == 00001);
+verify (S_ISUID == 04000);
+verify (S_ISGID == 02000);
+verify (S_ISVTX == 01000);
+
+#if ((0 <= UTIME_NOW && UTIME_NOW < 1000000000)           \
+     || (0 <= UTIME_OMIT && UTIME_OMIT < 1000000000)      \
+     || UTIME_NOW == UTIME_OMIT)
+invalid UTIME macros
+#endif
+
 /* Check the existence of some types.  */
 nlink_t t1;
+
+struct timespec t2;
 
 int
 main ()

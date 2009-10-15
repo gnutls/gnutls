@@ -38,6 +38,9 @@
 /* Get nlink_t.  */
 #include <sys/types.h>
 
+/* Get struct timespec.  */
+#include <time.h>
+
 /* The include_next requires a split double-inclusion guard.  */
 #@INCLUDE_NEXT@ @NEXT_SYS_STAT_H@
 
@@ -278,6 +281,12 @@
 # define S_IRWXUGO (S_IRWXU | S_IRWXG | S_IRWXO)
 #endif
 
+/* Macros for futimens and utimensat.  */
+#ifndef UTIME_NOW
+# define UTIME_NOW (-1)
+# define UTIME_OMIT (-2)
+#endif
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -346,6 +355,23 @@ extern int fstatat (int fd, char const *name, struct stat *st, int flags);
     (GL_LINK_WARNING ("fstatat is not portable - " \
                       "use gnulib module openat for portability"), \
      fstatat (d, n, s, f))
+#endif
+
+
+#if @GNULIB_FUTIMENS@
+# if @REPLACE_FUTIMENS@
+#  undef futimens
+#  define futimens rpl_futimens
+# endif
+# if !@HAVE_FUTIMENS@ || @REPLACE_FUTIMENS@
+extern int futimens (int fd, struct timespec const times[2]);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef futimens
+# define futimens(f,t)                         \
+    (GL_LINK_WARNING ("futimens is not portable - " \
+                      "use gnulib module futimens for portability"), \
+     futimens (f, t))
 #endif
 
 

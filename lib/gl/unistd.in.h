@@ -49,7 +49,7 @@
 #endif
 
 /* Get getopt(), optarg, optind, opterr, optopt.  */
-#if @GNULIB_UNISTD_H_GETOPT@
+#if @GNULIB_UNISTD_H_GETOPT@ && !defined _GL_SYSTEM_GETOPT
 # include <getopt.h>
 #endif
 
@@ -239,7 +239,7 @@ extern char **environ;
 
 #if @GNULIB_EUIDACCESS@
 # if !@HAVE_EUIDACCESS@
-/* Like access(), except that is uses the effective user id and group id of
+/* Like access(), except that it uses the effective user id and group id of
    the current process.  */
 extern int euidaccess (const char *filename, int mode);
 # endif
