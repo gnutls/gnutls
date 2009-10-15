@@ -24,11 +24,18 @@ GNUTLS_1_6
 {
   global:
     extern "C++" {
-      gnutls::*;
-  };
+      # To specify a class we also need to specify its typeinfo,
+      # typeinfo name and vtable objects.
+      # For example for class gnutls::psk_client_credentials,
+      # we need to declare this 4 lines:
+      #
+      # gnutls::psk_client_credentials::*;
+      # "typeinfo for gnutls::psk_client_credentials";
+      # "typeinfo name for gnutls::psk_client_credentials";
+      # "vtable for gnutls::psk_client_credentials";
 
-  # export typeinfo names and structures
-  _ZTI*;
+      *gnutls::*;
+  };
 
   local: *;
 };
