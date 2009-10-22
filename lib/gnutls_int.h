@@ -200,6 +200,12 @@ typedef enum content_type_t
 #define GNUTLS_PK_ANY (gnutls_pk_algorithm_t)-1
 #define GNUTLS_PK_NONE (gnutls_pk_algorithm_t)-2
 
+typedef enum
+{
+  HANDSHAKE_MAC_TYPE_10=1,
+  HANDSHAKE_MAC_TYPE_12
+} handshake_mac_type_t;
+
 /* Store & Retrieve functions defines: 
  */
 
@@ -212,7 +218,6 @@ typedef struct auth_cred_st
   void *credentials;
   struct auth_cred_st *next;
 } auth_cred_st;
-
 
 struct gnutls_key_st
 {
@@ -361,6 +366,7 @@ typedef struct
   gnutls_cipher_algorithm_t write_bulk_cipher_algorithm;
   gnutls_mac_algorithm_t write_mac_algorithm;
   gnutls_compression_method_t write_compression_algorithm;
+  handshake_mac_type_t handshake_mac_handle_type; /* one of HANDSHAKE_TYPE_10 and HANDSHAKE_TYPE_12 */
 
   /* this is the ciphersuite we are going to use 
    * moved here from internals in order to be restored
@@ -468,14 +474,25 @@ typedef struct
   gnutls_handshake_description_t recv_type;
 } handshake_header_buffer_st;
 
+
 typedef struct
 {
   gnutls_buffer application_data_buffer;	/* holds data to be delivered to application layer */
   gnutls_buffer handshake_hash_buffer;	/* used to keep the last received handshake 
 					 * message */
-  digest_hd_st handshake_mac_handle_sha;	/* hash of the handshake messages */
-  digest_hd_st handshake_mac_handle_md5;	/* hash of the handshake messages */
-  int handshake_mac_handle_init; /* 1 when the previous two were initialized */
+  union
+    {
+      struct 
+        {
+          digest_hd_st sha;	/* hash of the handshake messages */
+          digest_hd_st md5;	/* hash of the handshake messages */
+        } tls10;
+      struct
+        {
+          digest_hd_st mac;	/* hash of the handshake messages for TLS 1.2+ */
+        } tls12;
+    } handshake_mac_handle;
+  int handshake_mac_handle_init; /* 1 when the previous union and type were initialized */
 
   gnutls_buffer handshake_data_buffer;	/* this is a buffer that holds the current handshake message */
   gnutls_buffer ia_data_buffer;	/* holds inner application data (TLS/IA) */

@@ -418,6 +418,10 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
   return length;
 }
 
+#define DEINIT_MAC(td, ver, algo) \
+          if (algo != GNUTLS_MAC_NULL) \
+            mac_deinit (&td, NULL, ver);
+
 /* Deciphers the ciphertext packet, and puts the result to compress_data, of compress_size.
  * Returns the actual compressed packet size.
  */
@@ -473,6 +477,9 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 				   ciphertext.size)) < 0)
 	{
 	  gnutls_assert ();
+	  DEINIT_MAC(td, ver, session->security_parameters.write_mac_algorithm);
+
+
 	  return ret;
 	}
 
@@ -483,6 +490,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
       if ((ciphertext.size < blocksize) || (ciphertext.size % blocksize != 0))
 	{
 	  gnutls_assert ();
+	  DEINIT_MAC(td, ver, session->security_parameters.write_mac_algorithm);
 	  return GNUTLS_E_DECRYPTION_FAILED;
 	}
 
@@ -492,6 +500,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 				   ciphertext.size)) < 0)
 	{
 	  gnutls_assert ();
+	  DEINIT_MAC(td, ver, session->security_parameters.write_mac_algorithm);
 	  return ret;
 	}
 
@@ -505,6 +514,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 	  if (ciphertext.size == 0)
 	    {
 	      gnutls_assert ();
+              DEINIT_MAC(td, ver, session->security_parameters.write_mac_algorithm);
 	      return GNUTLS_E_DECRYPTION_FAILED;
 	    }
 	}
@@ -537,6 +547,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
       break;
     default:
       gnutls_assert ();
+      DEINIT_MAC(td, ver, session->security_parameters.write_mac_algorithm);
       return GNUTLS_E_INTERNAL_ERROR;
     }
 

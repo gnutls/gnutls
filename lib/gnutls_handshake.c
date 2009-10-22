@@ -63,17 +63,31 @@
 #define TRUE 1
 #define FALSE 0
 
-int _gnutls_server_select_comp_method (gnutls_session_t session,
+static int _gnutls_handshake_hash_init (gnutls_session_t session);
+static int _gnutls_server_select_comp_method (gnutls_session_t session,
 				       opaque * data, int datalen);
+static int
+_gnutls_handshake_hash_add_recvd (gnutls_session_t session,
+				  gnutls_handshake_description_t recv_type,
+				  opaque * header, uint16_t header_size,
+				  opaque * dataptr, uint32_t datalen);
 
 
 /* Clears the handshake hash buffers and handles.
  */
-static void
+void
 _gnutls_handshake_hash_buffers_clear (gnutls_session_t session)
 {
-  _gnutls_hash_deinit (&session->internals.handshake_mac_handle_md5, NULL);
-  _gnutls_hash_deinit (&session->internals.handshake_mac_handle_sha, NULL);
+  if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_10) 
+    {
+      _gnutls_hash_deinit (&session->internals.handshake_mac_handle.tls10.md5, NULL);
+      _gnutls_hash_deinit (&session->internals.handshake_mac_handle.tls10.sha, NULL);
+    }
+  else if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_12)
+    {
+      _gnutls_hash_deinit (&session->internals.handshake_mac_handle.tls12.mac, NULL);
+    }
+  session->security_parameters.handshake_mac_handle_type = 0;
   session->internals.handshake_mac_handle_init = 0;
   _gnutls_handshake_buffer_clear (session);
 }
@@ -150,22 +164,32 @@ _gnutls_ssl3_finished (gnutls_session_t session, int type, opaque * ret)
   const char *mesg;
   int rc;
 
-  rc =
-    _gnutls_hash_copy (&td_md5, &session->internals.handshake_mac_handle_md5);
-  if (rc < 0)
+  if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_10) 
     {
-      gnutls_assert ();
-      return rc;
+      rc =
+        _gnutls_hash_copy (&td_md5, &session->internals.handshake_mac_handle.tls10.md5);
+      if (rc < 0)
+        {
+          gnutls_assert ();
+          return rc;
+        }
+
+      rc =
+        _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle.tls10.sha);
+      if (rc < 0)
+        {
+          gnutls_assert ();
+          _gnutls_hash_deinit (&td_md5, NULL);
+          return rc;
+        }
+
+    }
+  else
+    {
+      gnutls_assert();
+      return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  rc =
-    _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle_sha);
-  if (rc < 0)
-    {
-      gnutls_assert ();
-      _gnutls_hash_deinit (&td_md5, NULL);
-      return rc;
-    }
 
   if (type == GNUTLS_SERVER)
     {
@@ -198,7 +222,7 @@ static int
 _gnutls_finished (gnutls_session_t session, int type, void *ret)
 {
   const int siz = TLS_MSG_LEN;
-  opaque concat[36];
+  opaque concat[MAX_HASH_SIZE+16/*MD5*/];
   size_t len;
   const char *mesg;
   digest_hd_st td_md5;
@@ -206,38 +230,44 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret)
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
   int rc;
 
-  if (!_gnutls_version_has_selectable_prf(ver))
+  if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_10) 
     {
       rc =
 	_gnutls_hash_copy (&td_md5,
-			   &session->internals.handshake_mac_handle_md5);
+			   &session->internals.handshake_mac_handle.tls10.md5);
       if (rc < 0)
 	{
 	  gnutls_assert ();
 	  return rc;
 	}
+
+      rc =
+        _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle.tls10.sha);
+      if (rc < 0)
+        {
+          gnutls_assert ();
+          _gnutls_hash_deinit (&td_md5, NULL);
+          return rc;
+        }
+
+        _gnutls_hash_deinit (&td_md5, concat);
+        _gnutls_hash_deinit (&td_sha, &concat[16]);
+        len = 20 + 16;
+    }
+  else if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_12) 
+    {
+      rc =
+        _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle.tls12.mac);
+      if (rc < 0)
+        {
+          gnutls_assert ();
+          return rc;
+        }
+
+        _gnutls_hash_deinit (&td_sha, concat);
+        len = _gnutls_hash_get_algo_len (td_sha.algorithm);
     }
 
-  rc =
-    _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle_sha);
-  if (rc < 0)
-    {
-      gnutls_assert ();
-      _gnutls_hash_deinit (&td_md5, NULL);
-      return rc;
-    }
-
-  if (!_gnutls_version_has_selectable_prf(ver))
-    {
-      _gnutls_hash_deinit (&td_md5, concat);
-      _gnutls_hash_deinit (&td_sha, &concat[16]);
-      len = 20 + 16;
-    }
-  else
-    {
-      _gnutls_hash_deinit (&td_sha, concat);
-      len = _gnutls_hash_get_algo_len (td_sha.algorithm);
-    }
 
   if (type == GNUTLS_SERVER)
     {
@@ -534,8 +564,15 @@ _gnutls_handshake_hash_pending (gnutls_session_t session)
 
   if (siz > 0)
     {
-      _gnutls_hash (&session->internals.handshake_mac_handle_sha, data, siz);
-      _gnutls_hash (&session->internals.handshake_mac_handle_md5, data, siz);
+      if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_10) 
+        {
+          _gnutls_hash (&session->internals.handshake_mac_handle.tls10.sha, data, siz);
+          _gnutls_hash (&session->internals.handshake_mac_handle.tls10.md5, data, siz);
+        } 
+      else if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_12)
+        {
+          _gnutls_hash (&session->internals.handshake_mac_handle.tls12.mac, data, siz);
+        }
     }
 
   _gnutls_handshake_buffer_empty (session);
@@ -836,7 +873,7 @@ finish:
 
 /* This selects the best supported compression method from the ones provided 
  */
-int
+static int
 _gnutls_server_select_comp_method (gnutls_session_t session,
 				   opaque * data, int datalen)
 {
@@ -915,6 +952,18 @@ _gnutls_handshake_hash_add_sent (gnutls_session_t session,
 {
   int ret;
 
+  if (session->security_parameters.entity == GNUTLS_CLIENT && type == GNUTLS_HANDSHAKE_CLIENT_HELLO)
+    {
+      /* do not hash immediatelly since the hash has not yet been initialized */
+      if ((ret =
+	   _gnutls_handshake_buffer_put (session, dataptr, datalen)) < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
+      return 0;
+    }
+
   if ((ret = _gnutls_handshake_hash_pending (session)) < 0)
     {
       gnutls_assert ();
@@ -923,10 +972,18 @@ _gnutls_handshake_hash_add_sent (gnutls_session_t session,
 
   if (type != GNUTLS_HANDSHAKE_HELLO_REQUEST)
     {
-      _gnutls_hash (&session->internals.handshake_mac_handle_sha, dataptr,
+      if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_10) 
+        {
+          _gnutls_hash (&session->internals.handshake_mac_handle.tls10.sha, dataptr,
 		    datalen);
-      _gnutls_hash (&session->internals.handshake_mac_handle_md5, dataptr,
+          _gnutls_hash (&session->internals.handshake_mac_handle.tls10.md5, dataptr,
 		    datalen);
+        }
+      else if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_12) 
+        { 
+          _gnutls_hash (&session->internals.handshake_mac_handle.tls12.mac, dataptr,
+		    datalen);
+        }
     }
 
   return 0;
@@ -1165,11 +1222,14 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
   /* The idea here is to hash the previous message we received,
    * and add the one we just received into the handshake_hash_buffer.
    */
-
-  if ((ret = _gnutls_handshake_hash_pending (session)) < 0)
+  if ((session->security_parameters.entity == GNUTLS_SERVER || recv_type != GNUTLS_HANDSHAKE_SERVER_HELLO) && 
+      (session->security_parameters.entity == GNUTLS_CLIENT || recv_type != GNUTLS_HANDSHAKE_CLIENT_HELLO))
     {
-      gnutls_assert ();
-      return ret;
+      if ((ret = _gnutls_handshake_hash_pending (session)) < 0)
+        {
+          gnutls_assert ();
+          return ret;
+        }
     }
 
   /* here we buffer the handshake messages - needed at Finished message */
@@ -1292,11 +1352,23 @@ _gnutls_recv_handshake (gnutls_session_t session, uint8_t ** data,
     case GNUTLS_HANDSHAKE_CLIENT_HELLO:
     case GNUTLS_HANDSHAKE_SERVER_HELLO:
       ret = _gnutls_recv_hello (session, dataptr, length32);
+      
       /* dataptr is freed because the caller does not
        * need it */
       gnutls_free (dataptr);
       if (data != NULL)
 	*data = NULL;
+      
+      if (ret < 0)
+        break;
+
+      /* initialize the hashes for both - (client will know server's version
+       * and server as well at this point) */
+      if ((ret = _gnutls_handshake_hash_init (session)) < 0) {
+        gnutls_assert();
+        return ret;
+      }
+
       break;
     case GNUTLS_HANDSHAKE_SERVER_HELLO_DONE:
       if (length32 == 0)
@@ -2167,38 +2239,60 @@ _gnutls_abort_handshake (gnutls_session_t session, int ret)
 /* This function initialized the handshake hash session.
  * required for finished messages.
  */
-inline static int
+static int
 _gnutls_handshake_hash_init (gnutls_session_t session)
 {
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
-  gnutls_digest_algorithm_t hash_algo = GNUTLS_MAC_SHA1;
 
   if (session->internals.handshake_mac_handle_init == 0)
     {
-      int ret =
-	_gnutls_hash_init (&session->internals.handshake_mac_handle_md5,
+      int ret;
+
+      /* set the hash type for handshake message hashing */
+      if (_gnutls_version_has_selectable_prf (ver))
+        session->security_parameters.handshake_mac_handle_type = HANDSHAKE_MAC_TYPE_12;
+      else
+        session->security_parameters.handshake_mac_handle_type = HANDSHAKE_MAC_TYPE_10;
+
+
+      if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_10) 
+        {
+          ret =
+  	    _gnutls_hash_init (&session->internals.handshake_mac_handle.tls10.md5,
 			   GNUTLS_MAC_MD5);
 
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+          if (ret < 0)
+  	    {
+	      gnutls_assert ();
+	      return ret;
+	    }
 
-      /* The algorithm to compute hash over handshake messages must be
-	 same as the one used as the basis for PRF.  By now we use
-	 SHA256. */
-      if (_gnutls_version_has_selectable_prf (ver))
-       hash_algo = GNUTLS_MAC_SHA256;
+          ret =
+            _gnutls_hash_init (&session->internals.handshake_mac_handle.tls10.sha,
+			   GNUTLS_MAC_SHA1);
+          if (ret < 0)
+	    {
+	      gnutls_assert ();
+	      _gnutls_hash_deinit (&session->internals.handshake_mac_handle.tls10.md5, NULL);
+	      return GNUTLS_E_MEMORY_ERROR;
+	    }
+        }
+      else if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_12)
+        {
+        /* The algorithm to compute hash over handshake messages must be
+  	   same as the one used as the basis for PRF.  By now we use
+	   SHA256. */
+          gnutls_digest_algorithm_t hash_algo = GNUTLS_MAC_SHA256;
 
-      ret =
-	_gnutls_hash_init (&session->internals.handshake_mac_handle_sha,
+          ret =
+           _gnutls_hash_init (&session->internals.handshake_mac_handle.tls12.mac,
 			   hash_algo);
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+           if (ret < 0)
+	     {
+	       gnutls_assert ();
+	       return GNUTLS_E_MEMORY_ERROR;
+  	     }
+        }
 
       session->internals.handshake_mac_handle_init = 1;
     }
@@ -2300,12 +2394,6 @@ gnutls_handshake (gnutls_session_t session)
 {
   int ret;
 
-  if ((ret = _gnutls_handshake_hash_init (session)) < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
       ret = _gnutls_handshake_client (session);
@@ -2343,9 +2431,9 @@ gnutls_handshake (gnutls_session_t session)
   return 0;
 }
 
-#define IMED_RET( str, ret) do { \
+#define IMED_RET( str, ret, check_fatal) do { \
 	if (ret < 0) { \
-		if (gnutls_error_is_fatal(ret)==0) return ret; \
+		if (check_fatal != 0 && gnutls_error_is_fatal(ret)==0) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \
 		_gnutls_handshake_hash_buffers_clear(session); \
@@ -2383,7 +2471,7 @@ _gnutls_handshake_client (gnutls_session_t session)
     case STATE1:
       ret = _gnutls_send_hello (session, AGAIN (STATE1));
       STATE = STATE1;
-      IMED_RET ("send hello", ret);
+      IMED_RET ("send hello", ret, 0);
 
     case STATE2:
       /* receive the server hello */
@@ -2392,14 +2480,14 @@ _gnutls_handshake_client (gnutls_session_t session)
 				GNUTLS_HANDSHAKE_SERVER_HELLO,
 				MANDATORY_PACKET);
       STATE = STATE2;
-      IMED_RET ("recv hello", ret);
+      IMED_RET ("recv hello", ret, 1);
 
     case STATE70:
       if (session->security_parameters.extensions.do_recv_supplemental)
 	{
 	  ret = _gnutls_recv_supplemental (session);
 	  STATE = STATE70;
-	  IMED_RET ("recv supplemental", ret);
+	  IMED_RET ("recv supplemental", ret, 1);
 	}
 
     case STATE3:
@@ -2407,14 +2495,14 @@ _gnutls_handshake_client (gnutls_session_t session)
       if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 	ret = _gnutls_recv_server_certificate (session);
       STATE = STATE3;
-      IMED_RET ("recv server certificate", ret);
+      IMED_RET ("recv server certificate", ret, 1);
 
     case STATE4:
       /* receive the server key exchange */
       if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 	ret = _gnutls_recv_server_kx_message (session);
       STATE = STATE4;
-      IMED_RET ("recv server kx message", ret);
+      IMED_RET ("recv server kx message", ret, 1);
 
     case STATE5:
       /* receive the server certificate request - if any 
@@ -2423,7 +2511,7 @@ _gnutls_handshake_client (gnutls_session_t session)
       if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 	ret = _gnutls_recv_server_certificate_request (session);
       STATE = STATE5;
-      IMED_RET ("recv server certificate request message", ret);
+      IMED_RET ("recv server certificate request message", ret, 1);
 
     case STATE6:
       /* receive the server hello done */
@@ -2433,14 +2521,14 @@ _gnutls_handshake_client (gnutls_session_t session)
 				  GNUTLS_HANDSHAKE_SERVER_HELLO_DONE,
 				  MANDATORY_PACKET);
       STATE = STATE6;
-      IMED_RET ("recv server hello done", ret);
+      IMED_RET ("recv server hello done", ret, 1);
 
     case STATE71:
       if (session->security_parameters.extensions.do_send_supplemental)
 	{
 	  ret = _gnutls_send_supplemental (session, AGAIN (STATE71));
 	  STATE = STATE71;
-	  IMED_RET ("send supplemental", ret);
+	  IMED_RET ("send supplemental", ret, 0);
 	}
 
     case STATE7:
@@ -2449,13 +2537,13 @@ _gnutls_handshake_client (gnutls_session_t session)
       if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 	ret = _gnutls_send_client_certificate (session, AGAIN (STATE7));
       STATE = STATE7;
-      IMED_RET ("send client certificate", ret);
+      IMED_RET ("send client certificate", ret, 0);
 
     case STATE8:
       if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 	ret = _gnutls_send_client_kx_message (session, AGAIN (STATE8));
       STATE = STATE8;
-      IMED_RET ("send client kx", ret);
+      IMED_RET ("send client kx", ret, 0);
 
     case STATE9:
       /* send client certificate verify */
@@ -2463,7 +2551,7 @@ _gnutls_handshake_client (gnutls_session_t session)
 	ret =
 	  _gnutls_send_client_certificate_verify (session, AGAIN (STATE9));
       STATE = STATE9;
-      IMED_RET ("send client certificate verify", ret);
+      IMED_RET ("send client certificate verify", ret, 0);
 
       STATE = STATE0;
     default:
@@ -2612,19 +2700,19 @@ _gnutls_handshake_server (gnutls_session_t session)
 				GNUTLS_HANDSHAKE_CLIENT_HELLO,
 				MANDATORY_PACKET);
       STATE = STATE1;
-      IMED_RET ("recv hello", ret);
+      IMED_RET ("recv hello", ret, 1);
 
     case STATE2:
       ret = _gnutls_send_hello (session, AGAIN (STATE2));
       STATE = STATE2;
-      IMED_RET ("send hello", ret);
+      IMED_RET ("send hello", ret, 0);
 
     case STATE70:
       if (session->security_parameters.extensions.do_send_supplemental)
 	{
 	  ret = _gnutls_send_supplemental (session, AGAIN (STATE70));
 	  STATE = STATE70;
-	  IMED_RET ("send supplemental data", ret);
+	  IMED_RET ("send supplemental data", ret, 0);
 	}
 
       /* SEND CERTIFICATE + KEYEXCHANGE + CERTIFICATE_REQUEST */
@@ -2634,14 +2722,14 @@ _gnutls_handshake_server (gnutls_session_t session)
       if (session->internals.resumed == RESUME_FALSE)
 	ret = _gnutls_send_server_certificate (session, AGAIN (STATE3));
       STATE = STATE3;
-      IMED_RET ("send server certificate", ret);
+      IMED_RET ("send server certificate", ret, 0);
 
     case STATE4:
       /* send server key exchange (A) */
       if (session->internals.resumed == RESUME_FALSE)
 	ret = _gnutls_send_server_kx_message (session, AGAIN (STATE4));
       STATE = STATE4;
-      IMED_RET ("send server kx", ret);
+      IMED_RET ("send server kx", ret, 0);
 
     case STATE5:
       /* Send certificate request - if requested to */
@@ -2649,7 +2737,7 @@ _gnutls_handshake_server (gnutls_session_t session)
 	ret =
 	  _gnutls_send_server_certificate_request (session, AGAIN (STATE5));
       STATE = STATE5;
-      IMED_RET ("send server cert request", ret);
+      IMED_RET ("send server cert request", ret, 0);
 
     case STATE6:
       /* send the server hello done */
@@ -2659,14 +2747,14 @@ _gnutls_handshake_server (gnutls_session_t session)
 					GNUTLS_HANDSHAKE_SERVER_HELLO_DONE,
 					AGAIN (STATE6));
       STATE = STATE6;
-      IMED_RET ("send server hello done", ret);
+      IMED_RET ("send server hello done", ret, 0);
 
     case STATE71:
       if (session->security_parameters.extensions.do_recv_supplemental)
 	{
 	  ret = _gnutls_recv_supplemental (session);
 	  STATE = STATE71;
-	  IMED_RET ("recv client supplemental", ret);
+	  IMED_RET ("recv client supplemental", ret, 1);
 	}
 
       /* RECV CERTIFICATE + KEYEXCHANGE + CERTIFICATE_VERIFY */
@@ -2675,21 +2763,21 @@ _gnutls_handshake_server (gnutls_session_t session)
       if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 	ret = _gnutls_recv_client_certificate (session);
       STATE = STATE7;
-      IMED_RET ("recv client certificate", ret);
+      IMED_RET ("recv client certificate", ret, 1);
 
     case STATE8:
       /* receive the client key exchange message */
       if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 	ret = _gnutls_recv_client_kx_message (session);
       STATE = STATE8;
-      IMED_RET ("recv client kx", ret);
+      IMED_RET ("recv client kx", ret, 1);
 
     case STATE9:
       /* receive the client certificate verify message */
       if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */
 	ret = _gnutls_recv_client_certificate_verify_message (session);
       STATE = STATE9;
-      IMED_RET ("recv client certificate verify", ret);
+      IMED_RET ("recv client certificate verify", ret, 1);
 
       STATE = STATE0;		/* finished thus clear session */
     default:
@@ -2713,7 +2801,7 @@ _gnutls_handshake_common (gnutls_session_t session)
       /* if we are a client resuming - or we are a server not resuming */
 
       ret = _gnutls_recv_handshake_final (session, TRUE);
-      IMED_RET ("recv handshake final", ret);
+      IMED_RET ("recv handshake final", ret, 1);
 
 #ifdef ENABLE_SESSION_TICKET
       switch (STATE)
@@ -2724,7 +2812,7 @@ _gnutls_handshake_common (gnutls_session_t session)
 	    {
 	      ret = _gnutls_send_new_session_ticket (session, AGAIN(STATE40));
 	      STATE = STATE40;
-	      IMED_RET ("send handshake new session ticket", ret);
+	      IMED_RET ("send handshake new session ticket", ret, 0);
 	    }
 	  STATE = STATE0;
 	default:
@@ -2733,13 +2821,13 @@ _gnutls_handshake_common (gnutls_session_t session)
 #endif
 
       ret = _gnutls_send_handshake_final (session, FALSE);
-      IMED_RET ("send handshake final", ret);
+      IMED_RET ("send handshake final", ret, 0);
     }
   else
     {				/* if we are a client not resuming - or we are a server resuming */
 
       ret = _gnutls_send_handshake_final (session, TRUE);
-      IMED_RET ("send handshake final 2", ret);
+      IMED_RET ("send handshake final 2", ret, 0);
 
 #ifdef ENABLE_SESSION_TICKET
       switch (STATE)
@@ -2750,7 +2838,7 @@ _gnutls_handshake_common (gnutls_session_t session)
 	    {
 	      ret = _gnutls_recv_new_session_ticket (session);
 	      STATE = STATE41;
-	      IMED_RET ("recv handshake new session ticket", ret);
+	      IMED_RET ("recv handshake new session ticket", ret, 1);
 	    }
 	  STATE = STATE0;
 	default:
@@ -2759,7 +2847,7 @@ _gnutls_handshake_common (gnutls_session_t session)
 #endif
 
       ret = _gnutls_recv_handshake_final (session, FALSE);
-      IMED_RET ("recv handshake final 2", ret);
+      IMED_RET ("recv handshake final 2", ret, 1);
     }
 
   if (session->security_parameters.entity == GNUTLS_SERVER)

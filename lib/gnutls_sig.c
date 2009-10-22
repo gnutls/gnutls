@@ -132,8 +132,17 @@ _gnutls_tls_sign_hdata (gnutls_session_t session,
   digest_hd_st td_sha;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
+  /* FIXME: This is not compliant to TLS 1.2. We should use an algorithm from the
+   * SignatureAndHashAlgorithm field of Certificate Request.
+   */
+  if (session->security_parameters.handshake_mac_handle_type != HANDSHAKE_MAC_TYPE_10)
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+    }
+  
   ret =
-    _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle_sha);
+    _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle.tls10.sha);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -161,7 +170,7 @@ _gnutls_tls_sign_hdata (gnutls_session_t session,
     case GNUTLS_PK_RSA:
       ret =
 	_gnutls_hash_copy (&td_md5,
-			   &session->internals.handshake_mac_handle_md5);
+			   &session->internals.handshake_mac_handle.tls10.md5);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -464,8 +473,14 @@ _gnutls_verify_sig_hdata (gnutls_session_t session, gnutls_cert * cert,
   gnutls_datum_t dconcat;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
+  if (session->security_parameters.handshake_mac_handle_type != HANDSHAKE_MAC_TYPE_10)
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+    }
+
   ret =
-    _gnutls_hash_copy (&td_md5, &session->internals.handshake_mac_handle_md5);
+    _gnutls_hash_copy (&td_md5, &session->internals.handshake_mac_handle.tls10.md5);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -473,7 +488,7 @@ _gnutls_verify_sig_hdata (gnutls_session_t session, gnutls_cert * cert,
     }
 
   ret =
-    _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle_sha);
+    _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle.tls10.sha);
   if (ret < 0)
     {
       gnutls_assert ();
