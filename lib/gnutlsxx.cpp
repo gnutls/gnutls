@@ -987,8 +987,10 @@ psk_server_credentials::psk_server_credentials ():credentials
     ret = gnutls_rsa_params_cpy (dst->params, src.params);
 
     if (ret < 0)
-      delete dst;
-    throw (ret);
+      {
+	delete dst;
+	throw (ret);
+      }
 
     return *dst;
   }
