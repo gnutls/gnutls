@@ -350,12 +350,17 @@ int _gnutls_pkcs7_decrypt_data (const gnutls_datum_t * data,
 
 typedef enum schema_id
   {
-    PBES2,			/* the stuff in PKCS #5 */
+    PBES2_GENERIC, /* when the algorithm is unknown, temporal use when reading only */
+    PBES2_3DES,			/* the stuff in PKCS #5 */
+    PBES2_AES_128,
+    PBES2_AES_192,
+    PBES2_AES_256,
     PKCS12_3DES_SHA1,		/* the stuff in PKCS #12 */
     PKCS12_ARCFOUR_SHA1,
     PKCS12_RC2_40_SHA1
   } schema_id;
 
+int _gnutls_pkcs_flags_to_schema(unsigned int flags);
 int _gnutls_pkcs7_encrypt_data (schema_id schema,
 				const gnutls_datum_t * data,
 				const char *password, gnutls_datum_t * enc);

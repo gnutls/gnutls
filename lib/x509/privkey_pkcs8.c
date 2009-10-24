@@ -42,6 +42,9 @@
 #define PBES2_OID "1.2.840.113549.1.5.13"
 #define PBKDF2_OID "1.2.840.113549.1.5.12"
 #define DES_EDE3_CBC_OID "1.2.840.113549.3.7"
+#define AES_128_CBC_OID "2.16.840.1.101.3.4.1.2"
+#define AES_192_CBC_OID "2.16.840.1.101.3.4.1.22"
+#define AES_256_CBC_OID "2.16.840.1.101.3.4.1.42"
 #define DES_CBC_OID "1.3.14.3.2.7"
 
 /* oid_pbeWithSHAAnd3_KeyTripleDES_CBC */
@@ -60,7 +63,7 @@ struct pbkdf2_params
 struct pbe_enc_params
 {
   gnutls_cipher_algorithm_t cipher;
-  opaque iv[8];
+  opaque iv[MAX_CIPHER_BLOCK_SIZE];
   int iv_size;
 };
 
@@ -105,7 +108,7 @@ check_schema (const char *oid)
 {
 
   if (strcmp (oid, PBES2_OID) == 0)
-    return PBES2;
+    return PBES2_GENERIC; /* ok */
 
   if (strcmp (oid, PKCS12_PBE_3DES_SHA1_OID) == 0)
     return PKCS12_3DES_SHA1;
@@ -388,7 +391,10 @@ encode_to_pkcs8_key (schema_id schema, const gnutls_datum_t * der_key,
    */
   switch (schema)
     {
-    case PBES2:
+    case PBES2_3DES:
+    case PBES2_AES_128:
+    case PBES2_AES_192:
+    case PBES2_AES_256:
       result =
 	asn1_write_value (pkcs8_asn, "encryptionAlgorithm.algorithm",
 			  PBES2_OID, 1);
@@ -472,6 +478,31 @@ error:
   return result;
 }
 
+int _gnutls_pkcs_flags_to_schema(unsigned int flags)
+{
+int schema;
+
+    if (flags & GNUTLS_PKCS_USE_PKCS12_ARCFOUR)
+      schema = PKCS12_ARCFOUR_SHA1;
+    else if (flags & GNUTLS_PKCS_USE_PKCS12_RC2_40)
+      schema = PKCS12_RC2_40_SHA1;
+    else if (flags & GNUTLS_PKCS_USE_PBES2_3DES)
+      schema = PBES2_3DES;
+    else if (flags & GNUTLS_PKCS_USE_PBES2_AES_128)
+      schema = PBES2_AES_128;
+    else if (flags & GNUTLS_PKCS_USE_PBES2_AES_192)
+      schema = PBES2_AES_192;
+    else if (flags & GNUTLS_PKCS_USE_PBES2_AES_256)
+      schema = PBES2_AES_256;
+    else {
+      gnutls_assert();
+      _gnutls_x509_log
+	("Selecting default encryption PKCS12_3DES_SHA1 (flags: %u).\n", flags);
+      schema = PKCS12_3DES_SHA1;
+    }
+
+    return schema;
+}
 
 /**
   * gnutls_x509_privkey_export_pkcs8 - This function will export the private key to PKCS8 format
@@ -532,15 +563,7 @@ gnutls_x509_privkey_export_pkcs8 (gnutls_x509_privkey_t key,
       return ret;
     }
 
-  if (flags & GNUTLS_PKCS_USE_PKCS12_3DES)
-    schema = PKCS12_3DES_SHA1;
-  else if (flags & GNUTLS_PKCS_USE_PKCS12_ARCFOUR)
-    schema = PKCS12_ARCFOUR_SHA1;
-  else if (flags & GNUTLS_PKCS_USE_PKCS12_RC2_40)
-    schema = PKCS12_RC2_40_SHA1;
-  else
-    schema = PBES2;
-
+  schema = _gnutls_pkcs_flags_to_schema(flags);
 
   if ((flags & GNUTLS_PKCS_PLAIN) || password == NULL)
     {
@@ -576,12 +599,34 @@ gnutls_x509_privkey_export_pkcs8 (gnutls_x509_privkey_t key,
   return ret;
 }
 
+static int cipher_to_schema(int cipher)
+{
+  switch(cipher) 
+    {
+      case GNUTLS_CIPHER_AES_128_CBC:
+        return PBES2_AES_128;
+        break;
+      case GNUTLS_CIPHER_AES_192_CBC:
+        return PBES2_AES_192;
+        break;
+      case GNUTLS_CIPHER_AES_256_CBC:
+        return PBES2_AES_256;
+        break;
+      case GNUTLS_CIPHER_3DES_CBC:
+        return PBES2_3DES;
+        break;
+      default:
+        return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
+        break;
+    }
+}
+
 
 /* Read the parameters cipher, IV, salt etc using the given
  * schema ID.
  */
 static int
-read_pkcs_schema_params (schema_id schema, const char *password,
+read_pkcs_schema_params (schema_id *schema, const char *password,
 			 const opaque * data, int data_size,
 			 struct pbkdf2_params *kdf_params,
 			 struct pbe_enc_params *enc_params)
@@ -590,10 +635,10 @@ read_pkcs_schema_params (schema_id schema, const char *password,
   int result;
   gnutls_datum_t tmp;
 
-  switch (schema)
+  switch (*schema)
     {
 
-    case PBES2:
+    case PBES2_GENERIC:
 
       /* Now check the key derivation and the encryption
        * functions.
@@ -638,24 +683,32 @@ read_pkcs_schema_params (schema_id schema, const char *password,
 	}
 
       asn1_delete_structure (&pbes2_asn);
+      
+      result = cipher_to_schema(enc_params->cipher);
+      if (result < 0)
+        {
+          gnutls_assert();
+          goto error;
+        }
+      
+      *schema = result;
       return 0;
-      break;
 
     case PKCS12_3DES_SHA1:
     case PKCS12_ARCFOUR_SHA1:
     case PKCS12_RC2_40_SHA1:
 
-      if ((schema) == PKCS12_3DES_SHA1)
+      if ((*schema) == PKCS12_3DES_SHA1)
 	{
 	  enc_params->cipher = GNUTLS_CIPHER_3DES_CBC;
 	  enc_params->iv_size = 8;
 	}
-      else if ((schema) == PKCS12_ARCFOUR_SHA1)
+      else if ((*schema) == PKCS12_ARCFOUR_SHA1)
 	{
 	  enc_params->cipher = GNUTLS_CIPHER_ARCFOUR_128;
 	  enc_params->iv_size = 0;
 	}
-      else if ((schema) == PKCS12_RC2_40_SHA1)
+      else if ((*schema) == PKCS12_RC2_40_SHA1)
 	{
 	  enc_params->cipher = GNUTLS_CIPHER_RC2_40_CBC;
 	  enc_params->iv_size = 8;
@@ -707,8 +760,9 @@ read_pkcs_schema_params (schema_id schema, const char *password,
       asn1_delete_structure (&pbes2_asn);
 
       return 0;
-      break;
-
+      
+      default:
+        gnutls_assert();
     }				/* switch */
 
   return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
@@ -790,7 +844,7 @@ decode_pkcs8_key (const gnutls_datum_t * raw_key,
   params_len = params_end - params_start + 1;
 
   result =
-    read_pkcs_schema_params (schema, password,
+    read_pkcs_schema_params (&schema, password,
 			     &raw_key->data[params_start],
 			     params_len, &kdf_params, &enc_params);
 
@@ -1346,16 +1400,61 @@ oid2cipher (const char *oid, gnutls_cipher_algorithm_t * algo)
       *algo = GNUTLS_CIPHER_3DES_CBC;
       return 0;
     }
-
+  else
   if (strcmp (oid, DES_CBC_OID) == 0)
     {
       *algo = GNUTLS_CIPHER_DES_CBC;
+      return 0;
+    }
+  else
+  if (strcmp (oid, AES_128_CBC_OID) == 0)
+    {
+      *algo = GNUTLS_CIPHER_AES_128_CBC;
+      return 0;
+    }
+  else
+  if (strcmp (oid, AES_192_CBC_OID) == 0)
+    {
+      *algo = GNUTLS_CIPHER_AES_192_CBC;
+      return 0;
+    }
+  else
+  if (strcmp (oid, AES_256_CBC_OID) == 0)
+    {
+      *algo = GNUTLS_CIPHER_AES_256_CBC;
       return 0;
     }
 
   _gnutls_x509_log ("PKCS #8 encryption OID '%s' is unsupported.\n", oid);
   return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 }
+
+static const char* cipher_to_pkcs_params(int cipher, const char** oid)
+{
+  switch(cipher) 
+    {
+      case GNUTLS_CIPHER_AES_128_CBC:
+        if (oid) *oid = AES_128_CBC_OID;
+        return "PKIX1.pkcs-5-aes128-CBC-params";
+        break;
+      case GNUTLS_CIPHER_AES_192_CBC:
+        if (oid) *oid = AES_192_CBC_OID;
+        return "PKIX1.pkcs-5-aes192-CBC-params";
+        break;
+      case GNUTLS_CIPHER_AES_256_CBC:
+        if (oid) *oid = AES_256_CBC_OID;
+        return "PKIX1.pkcs-5-aes256-CBC-params";
+        break;
+      case GNUTLS_CIPHER_3DES_CBC:
+        if (oid) *oid = DES_EDE3_CBC_OID;
+        return "PKIX1.pkcs-5-des-EDE3-CBC-params";
+        break;
+      default:
+        return NULL;
+        break;
+    }
+}
+
 
 
 static int
@@ -1367,6 +1466,7 @@ read_pbe_enc_params (ASN1_TYPE pbes2_asn,
   int params_len, len, result;
   ASN1_TYPE pbe_asn = ASN1_TYPE_EMPTY;
   char oid[64];
+  const char* eparams;
 
   memset (params, 0, sizeof (params));
 
@@ -1401,9 +1501,16 @@ read_pbe_enc_params (ASN1_TYPE pbes2_asn,
 
   /* Now check the encryption parameters.
    */
+  eparams = cipher_to_pkcs_params( params->cipher, NULL);
+  if (eparams == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
   if ((result =
        asn1_create_element (_gnutls_get_pkix (),
-			    "PKIX1.pkcs-5-des-EDE3-CBC-params",
+			    eparams,
 			    &pbe_asn)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -1493,31 +1600,35 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
 
   /* generate the key
    */
-  if (schema == PBES2)
+  switch(schema)
     {
-      result = _gnutls_pbkdf2_sha1 (password, strlen (password),
+      case PBES2_3DES:
+      case PBES2_AES_128:
+      case PBES2_AES_192:
+      case PBES2_AES_256:
+
+        result = _gnutls_pbkdf2_sha1 (password, strlen (password),
 				    kdf_params->salt, kdf_params->salt_size,
 				    kdf_params->iter_count, key, key_size);
 
-      if (result < 0)
-	{
-	  gnutls_assert ();
-	  goto error;
-	}
-    }
-  else
-    {
-      result =
-	_gnutls_pkcs12_string_to_key (1 /*KEY*/, kdf_params->salt,
-				      kdf_params->salt_size,
+        if (result < 0)
+ 	  {
+	    gnutls_assert ();
+	    goto error;
+	  }
+        break;
+      default:
+        result =
+  	  _gnutls_pkcs12_string_to_key (1 /*KEY*/, kdf_params->salt,
+	 			      kdf_params->salt_size,
 				      kdf_params->iter_count, password,
 				      key_size, key);
 
-      if (result < 0)
-	{
-	  gnutls_assert ();
-	  goto error;
-	}
+        if (result < 0)
+	  {
+	    gnutls_assert ();
+	    goto error;
+	  }
     }
 
   /* do the decryption.
@@ -1675,30 +1786,39 @@ error:
 
 }
 
+
 static int
 write_pbe_enc_params (ASN1_TYPE pbes2_asn,
 		      const struct pbe_enc_params *params)
 {
   int result;
   ASN1_TYPE pbe_asn = ASN1_TYPE_EMPTY;
+  const char* oid, *eparams;
 
   /* Write the encryption algorithm
    */
+  eparams = cipher_to_pkcs_params(params->cipher, &oid);
+  if (eparams == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
   result =
     asn1_write_value (pbes2_asn, "encryptionScheme.algorithm",
-		      DES_EDE3_CBC_OID, 1);
+		      oid, 1);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
       goto error;
     }
-  _gnutls_hard_log ("encryptionScheme.algorithm: %s\n", DES_EDE3_CBC_OID);
+  _gnutls_hard_log ("encryptionScheme.algorithm: %s\n", oid);
 
   /* Now check the encryption parameters.
    */
   if ((result =
        asn1_create_element (_gnutls_get_pkix (),
-			    "PKIX1.pkcs-5-des-EDE3-CBC-params",
+			    eparams,
 			    &pbe_asn)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -1747,17 +1867,6 @@ generate_key (schema_id schema,
   opaque rnd[2];
   int ret;
 
-  /* We should use the flags here to use different
-   * encryption algorithms etc. 
-   */
-
-  if (schema == PKCS12_ARCFOUR_SHA1)
-    enc_params->cipher = GNUTLS_CIPHER_ARCFOUR_128;
-  else if (schema == PKCS12_3DES_SHA1)
-    enc_params->cipher = GNUTLS_CIPHER_3DES_CBC;
-  else if (schema == PKCS12_RC2_40_SHA1)
-    enc_params->cipher = GNUTLS_CIPHER_RC2_40_CBC;
-
   ret = _gnutls_rnd (GNUTLS_RND_RANDOM, rnd, 2);
   if (ret < 0)
     {
@@ -1766,12 +1875,40 @@ generate_key (schema_id schema,
     }
 
   /* generate salt */
+  kdf_params->salt_size =
+    MIN (sizeof (kdf_params->salt), (unsigned) (10 + (rnd[1] % 10)));
 
-  if (schema == PBES2)
-    kdf_params->salt_size =
-      MIN (sizeof (kdf_params->salt), (unsigned) (10 + (rnd[1] % 10)));
-  else
-    kdf_params->salt_size = 8;
+  switch(schema)
+    {
+      case PBES2_3DES:
+        enc_params->cipher = GNUTLS_CIPHER_3DES_CBC;
+        break;
+      case PBES2_AES_128:
+        enc_params->cipher = GNUTLS_CIPHER_AES_128_CBC;
+        break;
+      case PBES2_AES_192:
+        enc_params->cipher = GNUTLS_CIPHER_AES_192_CBC;
+        break;
+      case PBES2_AES_256:
+        enc_params->cipher = GNUTLS_CIPHER_AES_256_CBC;
+        break;
+      /* non PBES2 algorithms */
+      case PKCS12_ARCFOUR_SHA1:
+        enc_params->cipher = GNUTLS_CIPHER_ARCFOUR_128;
+        kdf_params->salt_size = 8;
+        break;
+      case PKCS12_3DES_SHA1:
+        enc_params->cipher = GNUTLS_CIPHER_3DES_CBC;
+        kdf_params->salt_size = 8;
+        break;
+      case PKCS12_RC2_40_SHA1:
+        enc_params->cipher = GNUTLS_CIPHER_RC2_40_CBC;
+        kdf_params->salt_size = 8;
+        break;
+      default:
+        gnutls_assert();
+        return GNUTLS_E_INVALID_REQUEST;
+    }
 
   ret = _gnutls_rnd (GNUTLS_RND_RANDOM, kdf_params->salt,
 		     kdf_params->salt_size);
@@ -1786,7 +1923,6 @@ generate_key (schema_id schema,
     gnutls_cipher_get_key_size (enc_params->cipher);
 
   enc_params->iv_size = _gnutls_cipher_get_iv_size (enc_params->cipher);
-
   key->data = gnutls_secure_malloc (key->size);
   if (key->data == NULL)
     {
@@ -1797,59 +1933,63 @@ generate_key (schema_id schema,
   /* now generate the key. 
    */
 
-  if (schema == PBES2)
+  switch(schema)
     {
+      case PBES2_3DES:
+      case PBES2_AES_128:
+      case PBES2_AES_192:
+      case PBES2_AES_256:
 
-      ret = _gnutls_pbkdf2_sha1 (password, strlen (password),
+        ret = _gnutls_pbkdf2_sha1 (password, strlen (password),
 				 kdf_params->salt, kdf_params->salt_size,
 				 kdf_params->iter_count,
 				 key->data, kdf_params->key_size);
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        if (ret < 0)
+	  {
+	    gnutls_assert ();
+	    return ret;
+	  }
 
-      if (enc_params->iv_size)
-	{
-	  ret = _gnutls_rnd (GNUTLS_RND_NONCE,
+        if (enc_params->iv_size)
+	  {
+	    ret = _gnutls_rnd (GNUTLS_RND_NONCE,
 			     enc_params->iv, enc_params->iv_size);
-	  if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      return ret;
-	    }
-	}
-    }
-  else
-    {				/* PKCS12 schemas */
-      ret =
-	_gnutls_pkcs12_string_to_key (1 /*KEY*/, kdf_params->salt,
+	    if (ret < 0)
+	      {
+	        gnutls_assert ();
+	        return ret;
+	      }
+	  }
+	  break;
+	  
+       default:
+        ret =
+  	  _gnutls_pkcs12_string_to_key (1 /*KEY*/, kdf_params->salt,
 				      kdf_params->salt_size,
 				      kdf_params->iter_count, password,
 				      kdf_params->key_size, key->data);
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        if (ret < 0)
+	  {
+	    gnutls_assert ();
+	    return ret;
+	  }
 
-      /* Now generate the IV
-       */
-      if (enc_params->iv_size)
-	{
-	  ret =
-	    _gnutls_pkcs12_string_to_key (2 /*IV*/, kdf_params->salt,
+        /* Now generate the IV
+         */
+        if (enc_params->iv_size)
+  	  {
+	    ret =
+	      _gnutls_pkcs12_string_to_key (2 /*IV*/, kdf_params->salt,
 					  kdf_params->salt_size,
 					  kdf_params->iter_count, password,
 					  enc_params->iv_size,
 					  enc_params->iv);
-	  if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      return ret;
-	    }
-	}
+	    if (ret < 0)
+	      {
+	        gnutls_assert ();
+	        return ret;
+	      }
+          }
     }
 
 
@@ -1869,70 +2009,74 @@ write_schema_params (schema_id schema, ASN1_TYPE pkcs8_asn,
   int result;
   ASN1_TYPE pbes2_asn = ASN1_TYPE_EMPTY;
 
-  if (schema == PBES2)
+  switch(schema)
     {
-      if ((result =
+      case PBES2_3DES:
+      case PBES2_AES_128:
+      case PBES2_AES_192:
+      case PBES2_AES_256:
+        if ((result =
 	   asn1_create_element (_gnutls_get_pkix (),
 				"PKIX1.pkcs-5-PBES2-params",
 				&pbes2_asn)) != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  return _gnutls_asn2err (result);
-	}
+ 	  {
+	    gnutls_assert ();
+	    return _gnutls_asn2err (result);
+	  }
 
-      result = write_pbkdf2_params (pbes2_asn, kdf_params);
-      if (result < 0)
-	{
-	  gnutls_assert ();
-	  goto error;
-	}
+        result = write_pbkdf2_params (pbes2_asn, kdf_params);
+        if (result < 0)
+  	  {
+	    gnutls_assert ();
+	    goto error;
+	  }
 
-      result = write_pbe_enc_params (pbes2_asn, enc_params);
-      if (result < 0)
-	{
-	  gnutls_assert ();
-	  goto error;
-	}
+        result = write_pbe_enc_params (pbes2_asn, enc_params);
+        if (result < 0)
+  	  {
+	    gnutls_assert ();
+	    goto error;
+	  }
 
-      result = _gnutls_x509_der_encode_and_copy (pbes2_asn, "",
+        result = _gnutls_x509_der_encode_and_copy (pbes2_asn, "",
 						 pkcs8_asn, where, 0);
-      if (result < 0)
-	{
-	  gnutls_assert ();
-	  goto error;
-	}
+        if (result < 0)
+	  {
+	    gnutls_assert ();
+	    goto error;
+	  }
 
-      asn1_delete_structure (&pbes2_asn);
-    }
-  else
-    {				/* PKCS12 schemas */
+        asn1_delete_structure (&pbes2_asn);
+        break;
+      
+      default:
 
-      if ((result =
+        if ((result =
 	   asn1_create_element (_gnutls_get_pkix (),
 				"PKIX1.pkcs-12-PbeParams",
 				&pbes2_asn)) != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  result = _gnutls_asn2err (result);
-	  goto error;
-	}
+  	  {
+	    gnutls_assert ();
+	    result = _gnutls_asn2err (result);
+	    goto error;
+	  }
 
-      result = write_pkcs12_kdf_params (pbes2_asn, kdf_params);
-      if (result < 0)
-	{
-	  gnutls_assert ();
-	  goto error;
-	}
+        result = write_pkcs12_kdf_params (pbes2_asn, kdf_params);
+        if (result < 0)
+  	  {
+	    gnutls_assert ();
+	    goto error;
+	  }
 
-      result = _gnutls_x509_der_encode_and_copy (pbes2_asn, "",
+        result = _gnutls_x509_der_encode_and_copy (pbes2_asn, "",
 						 pkcs8_asn, where, 0);
-      if (result < 0)
-	{
-	  gnutls_assert ();
-	  goto error;
-	}
+        if (result < 0)
+  	  {
+	    gnutls_assert ();
+	    goto error;
+	  }
 
-      asn1_delete_structure (&pbes2_asn);
+        asn1_delete_structure (&pbes2_asn);
 
     }
 
@@ -2086,7 +2230,7 @@ _gnutls_pkcs7_decrypt_data (const gnutls_datum_t * data,
   params_len = params_end - params_start + 1;
 
   result =
-    read_pkcs_schema_params (schema, password,
+    read_pkcs_schema_params (&schema, password,
 			     &data->data[params_start],
 			     params_len, &kdf_params, &enc_params);
   if (result < ASN1_SUCCESS)
@@ -2152,7 +2296,10 @@ _gnutls_pkcs7_encrypt_data (schema_id schema,
    */
   switch (schema)
     {
-    case PBES2:
+    case PBES2_3DES:
+    case PBES2_AES_128:
+    case PBES2_AES_192:
+    case PBES2_AES_256:
       result =
 	asn1_write_value (pkcs7_asn,
 			  "encryptedContentInfo.contentEncryptionAlgorithm.algorithm",

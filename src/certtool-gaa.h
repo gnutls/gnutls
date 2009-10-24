@@ -8,8 +8,10 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 125 "certtool.gaa"
+#line 128 "certtool.gaa"
 	int debug;
+#line 124 "certtool.gaa"
+	char *pkcs_cipher;
 #line 121 "certtool.gaa"
 	char *template;
 #line 118 "certtool.gaa"

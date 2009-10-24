@@ -47,6 +47,12 @@ wrap_gcry_cipher_init (gnutls_cipher_algorithm_t algo, void **ctx)
 			  GCRY_CIPHER_MODE_CBC, 0);
       break;
 
+    case GNUTLS_CIPHER_AES_192_CBC:
+      err =
+	gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_AES192,
+			  GCRY_CIPHER_MODE_CBC, 0);
+      break;
+
     case GNUTLS_CIPHER_AES_256_CBC:
       err =
 	gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_AES256,

@@ -511,6 +511,9 @@ pkcs-8-EncryptedData ::= OCTET STRING
 -- PKCS #5 stuff
 
 pkcs-5-des-EDE3-CBC-params ::= OCTET STRING (SIZE(8))
+pkcs-5-aes128-CBC-params ::= OCTET STRING (SIZE(16))
+pkcs-5-aes192-CBC-params ::= OCTET STRING (SIZE(16))
+pkcs-5-aes256-CBC-params ::= OCTET STRING (SIZE(16))
 
 pkcs-5-PBES2-params ::= SEQUENCE {
   keyDerivationFunc AlgorithmIdentifier,

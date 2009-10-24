@@ -740,14 +740,7 @@ gnutls_pkcs12_bag_encrypt (gnutls_pkcs12_bag_t bag, const char *pass,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  if (flags & GNUTLS_PKCS_USE_PKCS12_ARCFOUR)
-    id = PKCS12_ARCFOUR_SHA1;
-  else if (flags & GNUTLS_PKCS_USE_PKCS12_RC2_40)
-    id = PKCS12_RC2_40_SHA1;
-  else if (flags & GNUTLS_PKCS_USE_PBES2_3DES)
-    id = PBES2;
-  else
-    id = PKCS12_3DES_SHA1;
+  id = _gnutls_pkcs_flags_to_schema(flags);
 
   /* Now encrypt them.
    */

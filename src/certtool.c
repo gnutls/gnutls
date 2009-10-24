@@ -2416,6 +2416,28 @@ verify_crl (void)
   fprintf (outfile, "\n");
 }
 
+static int cipher_to_flags(const char* cipher)
+{
+int flags;
+
+  if (strcasecmp(cipher, "3des")==0) {
+    flags = GNUTLS_PKCS_USE_PBES2_3DES;
+  } else if (strcasecmp(cipher, "aes-128")==0) {
+    flags = GNUTLS_PKCS_USE_PBES2_AES_128;
+  } else if (strcasecmp(cipher, "aes-192")==0) {
+    flags = GNUTLS_PKCS_USE_PBES2_AES_192;
+  } else if (strcasecmp(cipher, "aes-256")==0) {
+    flags = GNUTLS_PKCS_USE_PBES2_AES_256;
+  } else if (strcasecmp(cipher, "rc2-40")==0) {
+    flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
+  } else {
+    error(EXIT_FAILURE, 0, "Unknown cipher %s\n", cipher);
+  }
+
+  return flags;
+
+}
+
 void
 generate_pkcs8 (void)
 {
@@ -2437,7 +2459,7 @@ generate_pkcs8 (void)
   if (info.export)
     flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
   else
-    flags = GNUTLS_PKCS_USE_PKCS12_3DES;
+    flags = cipher_to_flags(info.pkcs_cipher);
 
   if (password == NULL || password[0] == 0)
     {
@@ -2530,7 +2552,7 @@ generate_pkcs12 (void)
       if (info.export)
 	flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
       else
-	flags = GNUTLS_PKCS8_USE_PKCS12_3DES;
+        flags = cipher_to_flags(info.pkcs_cipher);
 
       result = gnutls_pkcs12_bag_encrypt (bag, pass, flags);
       if (result < 0)
@@ -2552,7 +2574,7 @@ generate_pkcs12 (void)
       if (info.export)
 	flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
       else
-	flags = GNUTLS_PKCS_USE_PKCS12_3DES;
+        flags = cipher_to_flags(info.pkcs_cipher);
 
       size = sizeof (buffer);
       result =
