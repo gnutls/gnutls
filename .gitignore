@@ -1,3 +1,4 @@
+gl/
 *.la
 *.lo
 *.o
@@ -121,3 +122,8 @@ tests/x509dn
 tests/x509self
 tests/x509sign-verify
 tests/x509signself
+tests/mini-hfail.c
+tests/nul-in-x509-names
+tests/pkcs12_encode
+tests/x509_altname
+lib/build-aux
