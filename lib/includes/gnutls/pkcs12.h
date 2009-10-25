@@ -68,6 +68,10 @@ extern "C"
     GNUTLS_BAG_PKCS8_KEY,
     GNUTLS_BAG_CERTIFICATE,
     GNUTLS_BAG_CRL,
+    GNUTLS_BAG_SECRET, /* secret data. Underspecified in pkcs-12, gnutls extension. We use
+                        * the PKCS-9 random nonce ID (1.2.840.113549.1.9.25.3) to store randomly
+                        * generated keys.
+                        */
     GNUTLS_BAG_ENCRYPTED = 10,
     GNUTLS_BAG_UNKNOWN = 20
   } gnutls_pkcs12_bag_type_t;

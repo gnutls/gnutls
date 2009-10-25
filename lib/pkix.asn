@@ -591,6 +591,11 @@ pkcs-12-CRLBag ::= SEQUENCE {
   crlValue  [0] EXPLICIT ANY DEFINED BY crlId
 }
 
+pkcs-12-SecretBag ::= SEQUENCE {
+  secretTypeId     OBJECT IDENTIFIER,
+  secretValue  [0] EXPLICIT ANY DEFINED BY secretTypeId
+}
+
 -- x509CRL BAG-TYPE ::= {OCTET STRING IDENTIFIED BY {pkcs-9-crlTypes 1}}
 -- DER-encoded X.509 CRL stored in OCTET STRING
 

@@ -328,6 +328,7 @@ typedef struct gnutls_pkcs12_bag_int
 #define BAG_PKCS8_ENCRYPTED_KEY "1.2.840.113549.1.12.10.1.2"
 #define BAG_CERTIFICATE "1.2.840.113549.1.12.10.1.3"
 #define BAG_CRL "1.2.840.113549.1.12.10.1.4"
+#define BAG_SECRET "1.2.840.113549.1.12.10.1.5"
 
 /* PKCS #7
  */

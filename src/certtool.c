@@ -2646,6 +2646,8 @@ BAGTYPE (gnutls_pkcs12_bag_type_t x)
       return "Encrypted";
     case GNUTLS_BAG_CRL:
       return "CRL";
+    case GNUTLS_BAG_SECRET:
+      return "Secret";
     default:
       return "Unknown";
     }

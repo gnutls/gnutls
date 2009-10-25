@@ -301,6 +301,8 @@ oid2bag (const char *oid)
     return GNUTLS_BAG_CERTIFICATE;
   if (strcmp (oid, BAG_CRL) == 0)
     return GNUTLS_BAG_CRL;
+  if (strcmp (oid, BAG_SECRET) == 0)
+    return GNUTLS_BAG_SECRET;
 
   return GNUTLS_BAG_UNKNOWN;
 }
@@ -318,6 +320,8 @@ bag_to_oid (int bag)
       return BAG_CERTIFICATE;
     case GNUTLS_BAG_CRL:
       return BAG_CRL;
+    case GNUTLS_BAG_SECRET:
+      return BAG_SECRET;
     }
   return NULL;
 }
@@ -423,7 +427,7 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
 	  goto cleanup;
 	}
 
-      if (bag_type == GNUTLS_BAG_CERTIFICATE || bag_type == GNUTLS_BAG_CRL)
+      if (bag_type == GNUTLS_BAG_CERTIFICATE || bag_type == GNUTLS_BAG_CRL || bag_type == GNUTLS_BAG_SECRET)
 	{
 	  gnutls_datum_t tmp = bag->element[i].data;
 
@@ -1276,6 +1280,7 @@ _pkcs12_encode_safe_contents (gnutls_pkcs12_bag_t bag, ASN1_TYPE * contents,
        */
 
       if (bag->element[i].type == GNUTLS_BAG_CERTIFICATE ||
+	  bag->element[i].type == GNUTLS_BAG_SECRET ||
 	  bag->element[i].type == GNUTLS_BAG_CRL)
 	{
 	  gnutls_datum_t tmp;
