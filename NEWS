@@ -5,6 +5,12 @@ See the end for copying conditions.
 
 * Version 2.9.8 (unreleased)
 
+** libgnutls: Added support for AES-128,AES-192 and AES-256 in PKCS #8
+encryption. This affects also PKCS #12 encoded files.
+
+*** certtool: Added the --pkcs-cipher option to explicitely specify
+the encryption algorithm to use.
+
 ** libgnutls: Fix PKCS#12 encoding.
 The error you would get was "The OID is not supported.".  Problem
 introduced for the v2.8.x branch in 2.7.6.

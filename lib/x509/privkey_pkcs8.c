@@ -362,6 +362,112 @@ error:
 
 }
 
+static const char* cipher_to_pkcs_params(int cipher, const char** oid)
+{
+  switch(cipher) 
+    {
+      case GNUTLS_CIPHER_AES_128_CBC:
+        if (oid) *oid = AES_128_CBC_OID;
+        return "PKIX1.pkcs-5-aes128-CBC-params";
+        break;
+      case GNUTLS_CIPHER_AES_192_CBC:
+        if (oid) *oid = AES_192_CBC_OID;
+        return "PKIX1.pkcs-5-aes192-CBC-params";
+        break;
+      case GNUTLS_CIPHER_AES_256_CBC:
+        if (oid) *oid = AES_256_CBC_OID;
+        return "PKIX1.pkcs-5-aes256-CBC-params";
+        break;
+      case GNUTLS_CIPHER_3DES_CBC:
+        if (oid) *oid = DES_EDE3_CBC_OID;
+        return "PKIX1.pkcs-5-des-EDE3-CBC-params";
+        break;
+      default:
+        return NULL;
+        break;
+    }
+}
+
+static int cipher_to_schema(int cipher)
+{
+  switch(cipher) 
+    {
+      case GNUTLS_CIPHER_AES_128_CBC:
+        return PBES2_AES_128;
+        break;
+      case GNUTLS_CIPHER_AES_192_CBC:
+        return PBES2_AES_192;
+        break;
+      case GNUTLS_CIPHER_AES_256_CBC:
+        return PBES2_AES_256;
+        break;
+      case GNUTLS_CIPHER_3DES_CBC:
+        return PBES2_3DES;
+        break;
+      default:
+        return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
+        break;
+    }
+}
+
+
+int _gnutls_pkcs_flags_to_schema(unsigned int flags)
+{
+int schema;
+
+    if (flags & GNUTLS_PKCS_USE_PKCS12_ARCFOUR)
+      schema = PKCS12_ARCFOUR_SHA1;
+    else if (flags & GNUTLS_PKCS_USE_PKCS12_RC2_40)
+      schema = PKCS12_RC2_40_SHA1;
+    else if (flags & GNUTLS_PKCS_USE_PBES2_3DES)
+      schema = PBES2_3DES;
+    else if (flags & GNUTLS_PKCS_USE_PBES2_AES_128)
+      schema = PBES2_AES_128;
+    else if (flags & GNUTLS_PKCS_USE_PBES2_AES_192)
+      schema = PBES2_AES_192;
+    else if (flags & GNUTLS_PKCS_USE_PBES2_AES_256)
+      schema = PBES2_AES_256;
+    else {
+      gnutls_assert();
+      _gnutls_x509_log
+	("Selecting default encryption PKCS12_3DES_SHA1 (flags: %u).\n", flags);
+      schema = PKCS12_3DES_SHA1;
+    }
+
+    return schema;
+}
+
+/* returns the OID corresponding to given schema
+ */
+static int schema_to_oid(schema_id schema, const char** str_oid)
+{
+int result = 0;
+
+  switch (schema)
+    {
+    case PBES2_3DES:
+    case PBES2_AES_128:
+    case PBES2_AES_192:
+    case PBES2_AES_256:
+      *str_oid = PBES2_OID;
+      break;
+    case PKCS12_3DES_SHA1:
+      *str_oid = PKCS12_PBE_3DES_SHA1_OID;
+      break;
+    case PKCS12_ARCFOUR_SHA1:
+      *str_oid = PKCS12_PBE_ARCFOUR_SHA1_OID;
+      break;
+    case PKCS12_RC2_40_SHA1:
+      *str_oid = PKCS12_PBE_RC2_40_SHA1_OID;
+      break;
+    default:
+      gnutls_assert();
+      result = GNUTLS_E_INTERNAL_ERROR;
+    }
+    
+    return result;
+}
+
 /* Converts a PKCS #8 private key info to
  * a PKCS #8 EncryptedPrivateKeyInfo.
  */
@@ -375,6 +481,7 @@ encode_to_pkcs8_key (schema_id schema, const gnutls_datum_t * der_key,
   ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
   struct pbkdf2_params kdf_params;
   struct pbe_enc_params enc_params;
+  const char* str_oid;
 
 
   if ((result =
@@ -389,33 +496,16 @@ encode_to_pkcs8_key (schema_id schema, const gnutls_datum_t * der_key,
 
   /* Write the encryption schema OID
    */
-  switch (schema)
+  result = schema_to_oid(schema, &str_oid);
+  if (result < 0)
     {
-    case PBES2_3DES:
-    case PBES2_AES_128:
-    case PBES2_AES_192:
-    case PBES2_AES_256:
-      result =
-	asn1_write_value (pkcs8_asn, "encryptionAlgorithm.algorithm",
-			  PBES2_OID, 1);
-      break;
-    case PKCS12_3DES_SHA1:
-      result =
-	asn1_write_value (pkcs8_asn, "encryptionAlgorithm.algorithm",
-			  PKCS12_PBE_3DES_SHA1_OID, 1);
-      break;
-    case PKCS12_ARCFOUR_SHA1:
-      result =
-	asn1_write_value (pkcs8_asn, "encryptionAlgorithm.algorithm",
-			  PKCS12_PBE_ARCFOUR_SHA1_OID, 1);
-      break;
-    case PKCS12_RC2_40_SHA1:
-      result =
-	asn1_write_value (pkcs8_asn, "encryptionAlgorithm.algorithm",
-			  PKCS12_PBE_RC2_40_SHA1_OID, 1);
-      break;
-
+      gnutls_assert();
+      return result;
     }
+
+  result =
+    asn1_write_value (pkcs8_asn, "encryptionAlgorithm.algorithm",
+			  str_oid, 1);
 
   if (result != ASN1_SUCCESS)
     {
@@ -478,31 +568,6 @@ error:
   return result;
 }
 
-int _gnutls_pkcs_flags_to_schema(unsigned int flags)
-{
-int schema;
-
-    if (flags & GNUTLS_PKCS_USE_PKCS12_ARCFOUR)
-      schema = PKCS12_ARCFOUR_SHA1;
-    else if (flags & GNUTLS_PKCS_USE_PKCS12_RC2_40)
-      schema = PKCS12_RC2_40_SHA1;
-    else if (flags & GNUTLS_PKCS_USE_PBES2_3DES)
-      schema = PBES2_3DES;
-    else if (flags & GNUTLS_PKCS_USE_PBES2_AES_128)
-      schema = PBES2_AES_128;
-    else if (flags & GNUTLS_PKCS_USE_PBES2_AES_192)
-      schema = PBES2_AES_192;
-    else if (flags & GNUTLS_PKCS_USE_PBES2_AES_256)
-      schema = PBES2_AES_256;
-    else {
-      gnutls_assert();
-      _gnutls_x509_log
-	("Selecting default encryption PKCS12_3DES_SHA1 (flags: %u).\n", flags);
-      schema = PKCS12_3DES_SHA1;
-    }
-
-    return schema;
-}
 
 /**
   * gnutls_x509_privkey_export_pkcs8 - This function will export the private key to PKCS8 format
@@ -597,28 +662,6 @@ gnutls_x509_privkey_export_pkcs8 (gnutls_x509_privkey_t key,
     }
 
   return ret;
-}
-
-static int cipher_to_schema(int cipher)
-{
-  switch(cipher) 
-    {
-      case GNUTLS_CIPHER_AES_128_CBC:
-        return PBES2_AES_128;
-        break;
-      case GNUTLS_CIPHER_AES_192_CBC:
-        return PBES2_AES_192;
-        break;
-      case GNUTLS_CIPHER_AES_256_CBC:
-        return PBES2_AES_256;
-        break;
-      case GNUTLS_CIPHER_3DES_CBC:
-        return PBES2_3DES;
-        break;
-      default:
-        return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
-        break;
-    }
 }
 
 
@@ -1427,32 +1470,6 @@ oid2cipher (const char *oid, gnutls_cipher_algorithm_t * algo)
 
   _gnutls_x509_log ("PKCS #8 encryption OID '%s' is unsupported.\n", oid);
   return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
-}
-
-static const char* cipher_to_pkcs_params(int cipher, const char** oid)
-{
-  switch(cipher) 
-    {
-      case GNUTLS_CIPHER_AES_128_CBC:
-        if (oid) *oid = AES_128_CBC_OID;
-        return "PKIX1.pkcs-5-aes128-CBC-params";
-        break;
-      case GNUTLS_CIPHER_AES_192_CBC:
-        if (oid) *oid = AES_192_CBC_OID;
-        return "PKIX1.pkcs-5-aes192-CBC-params";
-        break;
-      case GNUTLS_CIPHER_AES_256_CBC:
-        if (oid) *oid = AES_256_CBC_OID;
-        return "PKIX1.pkcs-5-aes256-CBC-params";
-        break;
-      case GNUTLS_CIPHER_3DES_CBC:
-        if (oid) *oid = DES_EDE3_CBC_OID;
-        return "PKIX1.pkcs-5-des-EDE3-CBC-params";
-        break;
-      default:
-        return NULL;
-        break;
-    }
 }
 
 
@@ -2280,7 +2297,7 @@ _gnutls_pkcs7_encrypt_data (schema_id schema,
   ASN1_TYPE pkcs7_asn = ASN1_TYPE_EMPTY;
   struct pbkdf2_params kdf_params;
   struct pbe_enc_params enc_params;
-
+  const char* str_oid;
 
   if ((result =
        asn1_create_element (_gnutls_get_pkix (),
@@ -2294,37 +2311,17 @@ _gnutls_pkcs7_encrypt_data (schema_id schema,
 
   /* Write the encryption schema OID
    */
-  switch (schema)
+  result = schema_to_oid(schema, &str_oid);
+  if (result < 0)
     {
-    case PBES2_3DES:
-    case PBES2_AES_128:
-    case PBES2_AES_192:
-    case PBES2_AES_256:
-      result =
-	asn1_write_value (pkcs7_asn,
-			  "encryptedContentInfo.contentEncryptionAlgorithm.algorithm",
-			  PBES2_OID, 1);
-      break;
-    case PKCS12_3DES_SHA1:
-      result =
-	asn1_write_value (pkcs7_asn,
-			  "encryptedContentInfo.contentEncryptionAlgorithm.algorithm",
-			  PKCS12_PBE_3DES_SHA1_OID, 1);
-      break;
-    case PKCS12_ARCFOUR_SHA1:
-      result =
-	asn1_write_value (pkcs7_asn,
-			  "encryptedContentInfo.contentEncryptionAlgorithm.algorithm",
-			  PKCS12_PBE_ARCFOUR_SHA1_OID, 1);
-      break;
-    case PKCS12_RC2_40_SHA1:
-      result =
-	asn1_write_value (pkcs7_asn,
-			  "encryptedContentInfo.contentEncryptionAlgorithm.algorithm",
-			  PKCS12_PBE_RC2_40_SHA1_OID, 1);
-      break;
-
+      gnutls_assert();
+      return result;
     }
+
+  result =
+     asn1_write_value (pkcs7_asn,
+		  "encryptedContentInfo.contentEncryptionAlgorithm.algorithm",
+		  str_oid, 1);
 
   if (result != ASN1_SUCCESS)
     {
