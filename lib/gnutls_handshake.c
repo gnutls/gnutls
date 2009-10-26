@@ -1797,7 +1797,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
   int datalen = 0, ret = 0;
   opaque rnd[GNUTLS_RANDOM_SIZE];
   gnutls_protocol_t hver;
-  opaque extdata[MAX_EXT_DATA_LENGTH];
+  opaque *extdata = NULL;
   int rehandshake = 0;
 
   opaque *SessionID =
@@ -1827,6 +1827,17 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
 
+      extdatalen = MAX_EXT_DATA_LENGTH
+	+ session->internals.resumed_security_parameters.extensions.
+	session_ticket_len;
+      extdata = gnutls_malloc (extdatalen);
+      if (extdata == NULL)
+	{
+	  gnutls_assert ();
+	  gnutls_free (data);
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+
       /* if we are resuming a session then we set the
        * version number to the previously established.
        */
@@ -1846,6 +1857,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 	{
 	  gnutls_assert ();
 	  gnutls_free (data);
+	  gnutls_free (extdata);
 	  return GNUTLS_E_INTERNAL_ERROR;
 	}
 
@@ -1901,85 +1913,89 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 
       /* Copy the ciphersuites.
        */
-      extdatalen =
-	_gnutls_copy_ciphersuites (session, extdata, sizeof (extdata));
-      if (extdatalen > 0)
+      ret = _gnutls_copy_ciphersuites (session, extdata, extdatalen);
+      if (ret > 0)
 	{
-	  datalen += extdatalen;
+	  datalen += ret;
 	  data = gnutls_realloc_fast (data, datalen);
 	  if (data == NULL)
 	    {
 	      gnutls_assert ();
+	      gnutls_free (extdata);
 	      return GNUTLS_E_MEMORY_ERROR;
 	    }
 
-	  memcpy (&data[pos], extdata, extdatalen);
-	  pos += extdatalen;
+	  memcpy (&data[pos], extdata, ret);
+	  pos += ret;
 
 	}
       else
 	{
-	  if (extdatalen == 0)
-	    extdatalen = GNUTLS_E_INTERNAL_ERROR;
+	  if (ret == 0)
+	    ret = GNUTLS_E_INTERNAL_ERROR;
 	  gnutls_free (data);
+	  gnutls_free (extdata);
 	  gnutls_assert ();
-	  return extdatalen;
+	  return ret;
 	}
 
 
       /* Copy the compression methods.
        */
-      extdatalen =
-	_gnutls_copy_comp_methods (session, extdata, sizeof (extdata));
-      if (extdatalen > 0)
+      ret = _gnutls_copy_comp_methods (session, extdata, extdatalen);
+      if (ret > 0)
 	{
-	  datalen += extdatalen;
+	  datalen += ret;
 	  data = gnutls_realloc_fast (data, datalen);
 	  if (data == NULL)
 	    {
 	      gnutls_assert ();
+	      gnutls_free (extdata);
 	      return GNUTLS_E_MEMORY_ERROR;
 	    }
 
-	  memcpy (&data[pos], extdata, extdatalen);
-	  pos += extdatalen;
+	  memcpy (&data[pos], extdata, ret);
+	  pos += ret;
 
 	}
       else
 	{
-	  if (extdatalen == 0)
-	    extdatalen = GNUTLS_E_INTERNAL_ERROR;
+	  if (ret == 0)
+	    ret = GNUTLS_E_INTERNAL_ERROR;
 	  gnutls_free (data);
+	  gnutls_free (extdata);
 	  gnutls_assert ();
-	  return extdatalen;
+	  return ret;
 	}
 
       /* Generate and copy TLS extensions.
        */
       if (_gnutls_version_has_extensions(hver))
 	{
-	  extdatalen =
-	    _gnutls_gen_extensions (session, extdata, sizeof (extdata));
+	  ret = _gnutls_gen_extensions (session, extdata, extdatalen);
 
-	  if (extdatalen > 0)
+	  if (ret > 0)
 	    {
-	      datalen += extdatalen;
+	      datalen += ret;
 	      data = gnutls_realloc_fast (data, datalen);
 	      if (data == NULL)
 		{
 		  gnutls_assert ();
+		  gnutls_free (extdata);
 		  return GNUTLS_E_MEMORY_ERROR;
 		}
 
-	      memcpy (&data[pos], extdata, extdatalen);
+	      memcpy (&data[pos], extdata, ret);
 	    }
-	  else if (extdatalen < 0)
+	  else if (ret < 0)
 	    {
 	      gnutls_assert ();
 	      gnutls_free (data);
-	      return extdatalen;
+	      gnutls_free (extdata);
+	      return ret;
 	    }
 	}
+      gnutls_free (extdata);
     }
 
   ret =
