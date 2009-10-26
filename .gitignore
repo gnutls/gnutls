@@ -1,4 +1,3 @@
-gl/
 *.la
 *.lo
 *.o
@@ -56,6 +55,7 @@ doc/reference/gnutls-overrides.txt
 doc/reference/gnutls-sections.txt
 doc/stamp-vti
 doc/version.texi
+gl/
 lib/build-aux/
 lib/gnutls-api.texi
 lib/gnutls.pc
@@ -104,12 +104,14 @@ tests/mini-eagain
 tests/moredn
 tests/mpi
 tests/netconf-psk
+tests/nul-in-x509-names
 tests/openpgp-keyring
 tests/openpgpself
 tests/openssl
 tests/parse_ca
 tests/pgps2kgnu
 tests/pkcs12-decode/pkcs12_s2k
+tests/pkcs12_encode
 tests/pkcs12_s2k
 tests/pkcs12_s2k_pem
 tests/pskself
@@ -118,12 +120,8 @@ tests/set_pkcs12_cred
 tests/setcredcrash
 tests/simple
 tests/tlsia
+tests/x509_altname
 tests/x509dn
 tests/x509self
 tests/x509sign-verify
 tests/x509signself
-tests/mini-hfail.c
-tests/nul-in-x509-names
-tests/pkcs12_encode
-tests/x509_altname
-lib/build-aux
