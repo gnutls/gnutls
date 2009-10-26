@@ -78,21 +78,26 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
 void
 _gnutls_handshake_hash_buffers_clear (gnutls_session_t session)
 {
-  if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_10) 
+  if (session->security_parameters.
+      handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_10)
     {
-      _gnutls_hash_deinit (&session->internals.handshake_mac_handle.tls10.md5, NULL);
-      _gnutls_hash_deinit (&session->internals.handshake_mac_handle.tls10.sha, NULL);
+      _gnutls_hash_deinit (&session->internals.
+			   handshake_mac_handle.tls10.md5, NULL);
+      _gnutls_hash_deinit (&session->internals.
+			   handshake_mac_handle.tls10.sha, NULL);
     }
-  else if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_12)
+  else if (session->security_parameters.
+	   handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_12)
     {
-      _gnutls_hash_deinit (&session->internals.handshake_mac_handle.tls12.mac, NULL);
+      _gnutls_hash_deinit (&session->internals.
+			   handshake_mac_handle.tls12.mac, NULL);
     }
   session->security_parameters.handshake_mac_handle_type = 0;
   session->internals.handshake_mac_handle_init = 0;
   _gnutls_handshake_buffer_clear (session);
 }
 
-/* this will copy the required values for resuming to 
+/* this will copy the required values for resuming to
  * internals, and to security_parameters.
  * this will keep as less data to security_parameters.
  */
@@ -150,7 +155,7 @@ _gnutls_set_client_random (gnutls_session_t session, uint8_t * rnd)
 	  GNUTLS_RANDOM_SIZE);
 }
 
-/* Calculate The SSL3 Finished message 
+/* Calculate The SSL3 Finished message
  */
 #define SSL3_CLIENT_MSG "CLNT"
 #define SSL3_SERVER_MSG "SRVR"
@@ -164,32 +169,31 @@ _gnutls_ssl3_finished (gnutls_session_t session, int type, opaque * ret)
   const char *mesg;
   int rc;
 
-  if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_10) 
+  if (session->security_parameters.
+      handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_10)
     {
-      rc =
-        _gnutls_hash_copy (&td_md5, &session->internals.handshake_mac_handle.tls10.md5);
+      rc = _gnutls_hash_copy (&td_md5, &session->internals.
+			      handshake_mac_handle.tls10.md5);
       if (rc < 0)
-        {
-          gnutls_assert ();
-          return rc;
-        }
+	{
+	  gnutls_assert ();
+	  return rc;
+	}
 
-      rc =
-        _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle.tls10.sha);
+      rc = _gnutls_hash_copy (&td_sha, &session->internals.
+			      handshake_mac_handle.tls10.sha);
       if (rc < 0)
-        {
-          gnutls_assert ();
-          _gnutls_hash_deinit (&td_md5, NULL);
-          return rc;
-        }
-
+	{
+	  gnutls_assert ();
+	  _gnutls_hash_deinit (&td_md5, NULL);
+	  return rc;
+	}
     }
   else
     {
       gnutls_assert();
       return GNUTLS_E_INTERNAL_ERROR;
     }
-
 
   if (type == GNUTLS_SERVER)
     {
@@ -213,7 +217,7 @@ _gnutls_ssl3_finished (gnutls_session_t session, int type, opaque * ret)
   return 0;
 }
 
-/* Hash the handshake messages as required by TLS 1.0 
+/* Hash the handshake messages as required by TLS 1.0
  */
 #define SERVER_MSG "server finished"
 #define CLIENT_MSG "client finished"
@@ -223,51 +227,50 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret)
 {
   const int siz = TLS_MSG_LEN;
   opaque concat[MAX_HASH_SIZE+16/*MD5*/];
-  size_t len;
+  size_t len = 20 + 16;
   const char *mesg;
   digest_hd_st td_md5;
   digest_hd_st td_sha;
-  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
   int rc;
 
-  if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_10) 
+  if (session->security_parameters.
+      handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_10)
     {
       rc =
-	_gnutls_hash_copy (&td_md5,
-			   &session->internals.handshake_mac_handle.tls10.md5);
+	_gnutls_hash_copy (&td_md5, &session->internals.
+			   handshake_mac_handle.tls10.md5);
       if (rc < 0)
 	{
 	  gnutls_assert ();
 	  return rc;
 	}
 
-      rc =
-        _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle.tls10.sha);
+      rc = _gnutls_hash_copy (&td_sha, &session->internals.
+			      handshake_mac_handle.tls10.sha);
       if (rc < 0)
-        {
-          gnutls_assert ();
-          _gnutls_hash_deinit (&td_md5, NULL);
-          return rc;
-        }
+	{
+	  gnutls_assert ();
+	  _gnutls_hash_deinit (&td_md5, NULL);
+	  return rc;
+	}
 
-        _gnutls_hash_deinit (&td_md5, concat);
-        _gnutls_hash_deinit (&td_sha, &concat[16]);
-        len = 20 + 16;
+      _gnutls_hash_deinit (&td_md5, concat);
+      _gnutls_hash_deinit (&td_sha, &concat[16]);
     }
-  else if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_12) 
+  else if (session->security_parameters.
+	   handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_12)
     {
-      rc =
-        _gnutls_hash_copy (&td_sha, &session->internals.handshake_mac_handle.tls12.mac);
+      rc = _gnutls_hash_copy (&td_sha, &session->internals.
+			      handshake_mac_handle.tls12.mac);
       if (rc < 0)
-        {
-          gnutls_assert ();
-          return rc;
-        }
+	{
+	  gnutls_assert ();
+	  return rc;
+	}
 
-        _gnutls_hash_deinit (&td_sha, concat);
-        len = _gnutls_hash_get_algo_len (td_sha.algorithm);
+      _gnutls_hash_deinit (&td_sha, concat);
+      len = _gnutls_hash_get_algo_len (td_sha.algorithm);
     }
-
 
   if (type == GNUTLS_SERVER)
     {

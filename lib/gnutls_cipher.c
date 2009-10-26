@@ -217,7 +217,7 @@ mac_init (digest_hd_st * td, gnutls_mac_algorithm_t mac, opaque * secret,
   return ret;
 }
 
-inline static void
+static void
 mac_deinit (digest_hd_st * td, opaque * res, int ver)
 {
   if (ver == GNUTLS_SSL3)
