@@ -12,6 +12,8 @@ introduced for the v2.8.x branch in 2.7.6.
 ** guile: Compatibility with guile 2.x.
 By Ludovic Courtes <ludovic.courtes@laas.fr>.
 
+** tests: Fix expired cert in chainverify self-test.
+
 ** API and ABI modifications:
 No changes since last version.
 
