@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.9.8 (unreleased)
 
+** libgnutls: In server side when resuming a session do not overwrite the 
+initial session data with the resumed session data.
+
 ** libgnutls: Added support for AES-128,AES-192 and AES-256 in PKCS #8
 encryption. This affects also PKCS #12 encoded files.
 
