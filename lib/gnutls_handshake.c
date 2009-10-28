@@ -2686,6 +2686,13 @@ _gnutls_handshake_common (gnutls_session_t session)
 
       ret = _gnutls_send_handshake_final (session, FALSE);
       IMED_RET ("send handshake final", ret);
+
+      /* only store if we are not resuming */
+      if (session->security_parameters.entity == GNUTLS_SERVER)
+        {
+          /* in order to support session resuming */
+          _gnutls_server_register_current_session (session);
+        }
     }
   else
     {				/* if we are a client not resuming - or we are a server resuming */
@@ -2695,12 +2702,6 @@ _gnutls_handshake_common (gnutls_session_t session)
 
       ret = _gnutls_recv_handshake_final (session, FALSE);
       IMED_RET ("recv handshake final 2", ret);
-    }
-
-  if (session->security_parameters.entity == GNUTLS_SERVER)
-    {
-      /* in order to support session resuming */
-      _gnutls_server_register_current_session (session);
     }
 
   /* clear handshake buffer */
