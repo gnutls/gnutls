@@ -38,11 +38,6 @@
 #define GNUTLS_MIN_LIBGCRYPT_VERSION "1.2.4"
 #define GNUTLS_MIN_LIBTASN1_VERSION "0.3.4"
 
-/* Remove this when we require libtasn1 v1.6 or later. */
-#ifndef ASN1_VERSION
-# define ASN1_VERSION LIBTASN1_VERSION
-#endif
-
 /* created by asn1c */
 extern const ASN1_ARRAY_TYPE gnutls_asn1_tab[];
 extern const ASN1_ARRAY_TYPE pkix_asn1_tab[];
