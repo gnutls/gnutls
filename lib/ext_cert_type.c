@@ -89,7 +89,7 @@ _gnutls_cert_type_recv_params (gnutls_session_t session,
 	  uint8_t len;
 
 	  len = data[0];
-	  DECR_LEN (data_size, len);
+	  DECR_LEN (data_size, len+1);
 
 	  for (i = 0; i < len; i++)
 	    {
