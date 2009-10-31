@@ -201,7 +201,6 @@ mac_init (digest_hd_st * td, gnutls_mac_algorithm_t mac, opaque * secret,
 
   if (mac == GNUTLS_MAC_NULL)
     {
-      gnutls_assert ();
       return GNUTLS_E_HASH_FAILED;
     }
 
