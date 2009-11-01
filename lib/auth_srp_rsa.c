@@ -116,7 +116,7 @@ gen_srp_cert_server_kx (gnutls_session_t session, opaque ** data)
     }
 
   if ((ret =
-       _gnutls_tls_sign_params (session, &apr_cert_list[0],
+       _gnutls_handshake_sign_data (session, &apr_cert_list[0],
 				apr_pkey, &ddata, &signature,
 				&sign_algo)) < 0)
     {
@@ -193,7 +193,7 @@ proc_srp_cert_server_kx (gnutls_session_t session, opaque * data,
       return ret;
     }
 
-  ret = _gnutls_verify_sig_params (session, &peer_cert, &vparams, &signature,
+  ret = _gnutls_handshake_verify_data (session, &peer_cert, &vparams, &signature,
 				   GNUTLS_SIGN_UNKNOWN);
 
   _gnutls_gcert_deinit (&peer_cert);

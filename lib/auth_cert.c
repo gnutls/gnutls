@@ -1438,7 +1438,7 @@ _gnutls_gen_cert_client_cert_vrfy (gnutls_session_t session, opaque ** data)
   if (apr_cert_list_length > 0)
     {
       if ((ret =
-	   _gnutls_tls_sign_hdata (session,
+	   _gnutls_handshake_sign_cert_vrfy (session,
 				   &apr_cert_list[0],
 				   apr_pkey, &signature)) < 0)
 	{
@@ -1545,7 +1545,7 @@ _gnutls_proc_cert_client_cert_vrfy (gnutls_session_t session,
       return ret;
     }
 
-  if ((ret = _gnutls_verify_sig_hdata (session, &peer_cert, &sig, sign_algo)) < 0)
+  if ((ret = _gnutls_handshake_verify_cert_vrfy (session, &peer_cert, &sig, sign_algo)) < 0)
     {
       gnutls_assert ();
       _gnutls_gcert_deinit (&peer_cert);

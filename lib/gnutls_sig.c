@@ -125,7 +125,7 @@ _gnutls_rsa_encode_sig (gnutls_mac_algorithm_t algo,
  * Used in DHE_* ciphersuites.
  */
 int
-_gnutls_tls_sign_params (gnutls_session_t session, gnutls_cert * cert,
+_gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
 			 gnutls_privkey * pkey, gnutls_datum_t * params,
 			 gnutls_datum_t * signature,
 			 gnutls_sign_algorithm_t * sign_algo)
@@ -379,7 +379,7 @@ _gnutls_verify_sig (gnutls_cert * cert,
  * Used in DHE_* ciphersuites.
  */
 int
-_gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
+_gnutls_handshake_verify_data (gnutls_session_t session, gnutls_cert * cert,
 			   const gnutls_datum_t * params,
 			   gnutls_datum_t * signature,
 			   gnutls_sign_algorithm_t algo)
@@ -470,9 +470,9 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
 /* Client certificate verify calculations
  */
 
-/* this is _gnutls_verify_sig_hdata for TLS 1.2
+/* this is _gnutls_handshake_verify_cert_vrfy for TLS 1.2
  */
-static int _gnutls_tls12_verify_sig_hdata (gnutls_session_t session, gnutls_cert * cert,
+static int _gnutls_handshake_verify_cert_vrfy12 (gnutls_session_t session, gnutls_cert * cert,
 			  gnutls_datum_t * signature, gnutls_sign_algorithm_t sign_algo)
 {
   int ret;
@@ -527,7 +527,7 @@ static int _gnutls_tls12_verify_sig_hdata (gnutls_session_t session, gnutls_cert
  * verify message). 
  */
 int
-_gnutls_verify_sig_hdata (gnutls_session_t session, gnutls_cert * cert,
+_gnutls_handshake_verify_cert_vrfy (gnutls_session_t session, gnutls_cert * cert,
 			  gnutls_datum_t * signature, gnutls_sign_algorithm_t sign_algo)
 {
   int ret;
@@ -539,7 +539,7 @@ _gnutls_verify_sig_hdata (gnutls_session_t session, gnutls_cert * cert,
 
   if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_12)
     {
-      return _gnutls_tls12_verify_sig_hdata(session, cert, signature, sign_algo);
+      return _gnutls_handshake_verify_cert_vrfy12(session, cert, signature, sign_algo);
     }
   else if (session->security_parameters.handshake_mac_handle_type != HANDSHAKE_MAC_TYPE_10)
     {
@@ -600,9 +600,9 @@ _gnutls_verify_sig_hdata (gnutls_session_t session, gnutls_cert * cert,
 
 }
 
-/* the same as _gnutls_tls_sign_hdata except that it is made for TLS 1.2
+/* the same as _gnutls_handshake_sign_cert_vrfy except that it is made for TLS 1.2
  */
-static int _gnutls_tls12_sign_hdata (gnutls_session_t session,
+static int _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
 			gnutls_cert * cert, gnutls_privkey * pkey,
 			gnutls_datum_t * signature)
 {
@@ -677,7 +677,7 @@ static int _gnutls_tls12_sign_hdata (gnutls_session_t session,
  * For TLS1.2 returns the signature algorithm used on success, or a negative value;
  */
 int
-_gnutls_tls_sign_hdata (gnutls_session_t session,
+_gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
 			gnutls_cert * cert, gnutls_privkey * pkey,
 			gnutls_datum_t * signature)
 {
@@ -690,7 +690,7 @@ _gnutls_tls_sign_hdata (gnutls_session_t session,
 
   if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_12)
     {
-      return _gnutls_tls12_sign_hdata(session, cert, pkey, signature);
+      return _gnutls_handshake_sign_cert_vrfy12(session, cert, pkey, signature);
     }
   else if (session->security_parameters.handshake_mac_handle_type != HANDSHAKE_MAC_TYPE_10)
     {
