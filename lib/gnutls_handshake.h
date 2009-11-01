@@ -53,6 +53,8 @@ int _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
 int _gnutls_negotiate_version( gnutls_session_t session, gnutls_protocol_t adv_version);
 int _gnutls_user_hello_func( gnutls_session, gnutls_protocol_t adv_version);
 
+void _gnutls_handshake_hash_buffers_clear (gnutls_session_t session);
+
 #define STATE session->internals.handshake_state
 /* This returns true if we have got there
  * before (and not finished due to an interrupt).

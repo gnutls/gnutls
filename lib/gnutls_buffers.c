@@ -1068,8 +1068,7 @@ _gnutls_handshake_buffer_put (gnutls_session_t session, opaque * data,
       return GNUTLS_E_HANDSHAKE_TOO_LARGE;
     }
 
-  _gnutls_buffers_log ("BUF[HSK]: Inserted %d bytes of Data\n", length);
-
+  _gnutls_buffers_log ("BUF[HSK]: Inserted %d bytes of Data\n", (int)length);
   if (_gnutls_buffer_append (&session->internals.handshake_hash_buffer,
 			     data, length) < 0)
     {
@@ -1085,24 +1084,6 @@ _gnutls_handshake_buffer_get_size (gnutls_session_t session)
 {
 
   return session->internals.handshake_hash_buffer.length;
-}
-
-/* this function does not touch the buffer
- * and returns data from it (peek mode!)
- */
-int
-_gnutls_handshake_buffer_peek (gnutls_session_t session, opaque * data,
-			       size_t length)
-{
-  if (length > session->internals.handshake_hash_buffer.length)
-    {
-      length = session->internals.handshake_hash_buffer.length;
-    }
-
-  _gnutls_buffers_log ("BUF[HSK]: Peeked %d bytes of Data\n", length);
-
-  memcpy (data, session->internals.handshake_hash_buffer.data, length);
-  return length;
 }
 
 /* this function does not touch the buffer
@@ -1142,7 +1123,6 @@ _gnutls_handshake_buffer_clear (gnutls_session_t session)
 {
 
   _gnutls_buffers_log ("BUF[HSK]: Cleared Data from buffer\n");
-
   _gnutls_buffer_clear (&session->internals.handshake_hash_buffer);
 
   return 0;

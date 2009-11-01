@@ -52,6 +52,7 @@ typedef struct
   gnutls_mac_algorithm_t algorithm;
   const void *key;
   int keysize;
+  int active;
 } digest_hd_st;
 
 int _gnutls_hmac_init (digest_hd_st*, gnutls_mac_algorithm_t algorithm,
