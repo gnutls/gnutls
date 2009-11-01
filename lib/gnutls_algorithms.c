@@ -2021,12 +2021,12 @@ _gnutls_sign_get_pk_algorithm (gnutls_sign_algorithm_t sign)
 }
 
 gnutls_sign_algorithm_t
-_gnutls_tls_aid_to_sign (sign_algorithm_st aid)
+_gnutls_tls_aid_to_sign (const sign_algorithm_st *aid)
 {
   gnutls_sign_algorithm_t ret = GNUTLS_SIGN_UNKNOWN;
 
-  GNUTLS_SIGN_LOOP ( if (p->aid.hash_algorithm == aid.hash_algorithm
-			 && p->aid.sign_algorithm == aid.sign_algorithm)
+  GNUTLS_SIGN_LOOP ( if (p->aid.hash_algorithm == aid->hash_algorithm
+			 && p->aid.sign_algorithm == aid->sign_algorithm)
 		       {
 			 ret = p->id;
 			 break;

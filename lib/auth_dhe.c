@@ -237,11 +237,11 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
       aid.hash_algorithm = *sigdata++;
       DECR_LEN(data_size, 1);
       aid.sign_algorithm = *sigdata++;
-      sign_algo = _gnutls_tls_aid_to_sign (aid);
+      sign_algo = _gnutls_tls_aid_to_sign (&aid);
       if (sign_algo == GNUTLS_SIGN_UNKNOWN)
 	{
 	  gnutls_assert ();
-	  return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+	  return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
 	}
     }
   DECR_LEN (data_size, 2);

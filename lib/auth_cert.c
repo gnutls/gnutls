@@ -43,7 +43,6 @@
 #include <gnutls_state.h>
 #include <gnutls_pk.h>
 #include <gnutls_x509.h>
-#include <ext_signature.h>
 #include "debug.h"
 
 #ifdef ENABLE_OPENPGP
@@ -1470,9 +1469,11 @@ _gnutls_gen_cert_client_cert_vrfy (gnutls_session_t session, opaque ** data)
   p = *data;
   if (_gnutls_version_has_selectable_sighash(ver))
     {
+      sign_algorithm_st aid;
       /* error checking is not needed here since we have used those algorithms */
-      p[0] = _gnutls_sign_algorithm_hash2num(_gnutls_sign_get_hash_algorithm(sign_algo));
-      p[1] = _gnutls_sign_algorithm_pk2num(_gnutls_sign_get_pk_algorithm(sign_algo));
+      aid = _gnutls_sign_to_tls_aid(sign_algo);
+      p[0] = aid.hash_algorithm;
+      p[1] = aid.sign_algorithm;
       p+=2;
     }
 
@@ -1509,8 +1510,13 @@ _gnutls_proc_cert_client_cert_vrfy (gnutls_session_t session,
 
   if (_gnutls_version_has_selectable_sighash(ver))
     {
+    sign_algorithm_st aid;
+
       DECR_LEN (dsize, 2);
-      sign_algo = _gnutls_sign_algorithm_num2sig (pdata[0], pdata[1]);
+      aid.hash_algorithm = pdata[0];
+      aid.sign_algorithm = pdata[1];
+      
+      sign_algo = _gnutls_tls_aid_to_sign(&aid);
       if (sign_algo == GNUTLS_PK_UNKNOWN)
         {
           gnutls_assert();

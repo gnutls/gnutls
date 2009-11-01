@@ -282,7 +282,7 @@ typedef struct
 typedef struct
 {
   uint8_t hash_algorithm;
-  uint8_t sign_algorithm;
+  uint8_t sign_algorithm; /* pk algorithm actually */
 } sign_algorithm_st;
 
 /* This structure holds parameters got from TLS extension

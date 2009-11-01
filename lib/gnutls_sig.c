@@ -643,7 +643,7 @@ static int _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
         }
     }
   
-  _gnutls_x509_log("sign hash data: picked %s with %s\n", gnutls_sign_algorithm_get_name(sign_algo), gnutls_mac_get_name(hash_algo));
+  _gnutls_x509_log("sign handshake cert vrfy: picked %s with %s\n", gnutls_sign_algorithm_get_name(sign_algo), gnutls_mac_get_name(hash_algo));
 
   ret =
     _gnutls_hash_copy (&td, handshake_td);

@@ -34,78 +34,6 @@
 #include <gnutls_num.h>
 #include <gnutls_algorithms.h>
 
-int _gnutls_sign_algorithm_pk2num (gnutls_pk_algorithm_t pk)
-{
-  switch (pk)
-    {
-    case GNUTLS_PK_RSA:
-      return 1;
-    case GNUTLS_PK_DSA:
-      return 2;
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-}
-
-int _gnutls_sign_algorithm_hash2num (gnutls_digest_algorithm_t hash)
-{
-  switch (hash)
-    {
-    case GNUTLS_DIG_MD5:
-      return 1;
-    case GNUTLS_DIG_SHA1:
-      return 2;
-    case GNUTLS_DIG_SHA224:
-      return 3;
-    case GNUTLS_DIG_SHA256:
-      return 4;
-    case GNUTLS_DIG_SHA384:
-      return 5;
-    case GNUTLS_DIG_SHA512:
-      return 6;
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-}
-
-gnutls_sign_algorithm_t
-_gnutls_sign_algorithm_num2sig (int hash, int sig)
-{
-  if (sig == 1)                 /* rsa */
-    {
-      switch (hash)
-        {
-        case 2:                /* sha1 */
-          return GNUTLS_SIGN_RSA_SHA1;
-        case 3:
-          return GNUTLS_SIGN_RSA_SHA224;
-        case 4:
-          return GNUTLS_SIGN_RSA_SHA256;
-        case 5:
-          return GNUTLS_SIGN_RSA_SHA384;
-        case 6:
-          return GNUTLS_SIGN_RSA_SHA512;
-        default:
-          return GNUTLS_SIGN_UNKNOWN;
-        }
-    }
-
-  if (sig == 2)                 /* DSA */
-    {
-      switch (hash)
-        {
-        case 2:                /* sha1 */
-          return GNUTLS_SIGN_DSA_SHA1;
-        default:
-          return GNUTLS_SIGN_UNKNOWN;
-        }
-    }
-
-  return GNUTLS_SIGN_UNKNOWN;
-}
-
 /* generates a SignatureAndHashAlgorithm structure with length as prefix
  * by using the setup priorities.
  */
@@ -113,7 +41,8 @@ int _gnutls_sign_algorithm_write_params(gnutls_session_t session, opaque *data, 
 {
 opaque* p = data;
 int len, i ,j;
-int ret, hash, pk;
+int ret;
+sign_algorithm_st aid;
 
           len = session->internals.priorities.sign_algo.algorithms * 2;
           if (max_data_size < len + 2)
@@ -127,40 +56,10 @@ int ret, hash, pk;
 
           for (i = j = 0; i < len; i += 2, j++)
             {
-              hash =
-                _gnutls_sign_get_hash_algorithm (session->
-                                                 internals.priorities.
-                                                 sign_algo.priority[j]);
-              if (hash == GNUTLS_DIG_UNKNOWN)
-                {
-                  gnutls_assert ();
-                  return GNUTLS_E_INTERNAL_ERROR;
-                }
-              pk =
-                _gnutls_sign_get_pk_algorithm (session->internals.priorities.
-                                               sign_algo.priority[j]);
-              if (pk == GNUTLS_PK_UNKNOWN)
-                {
-                  gnutls_assert ();
-                  return GNUTLS_E_INTERNAL_ERROR;
-                }
-              ret = _gnutls_sign_algorithm_hash2num (hash);
-              if (ret < 0)
-                {
-                  gnutls_assert ();
-                  return ret;
-                }
-              *p = ret;
+              aid = _gnutls_sign_to_tls_aid(session->internals.priorities.sign_algo.priority[j]);
+              *p = aid.hash_algorithm;
               p++;
-
-              ret = _gnutls_sign_algorithm_pk2num (pk);
-              if (ret < 0)
-                {
-                  gnutls_assert ();
-                  return ret;
-                }
-
-              *p = ret;
+              *p = aid.sign_algorithm;
               p++;
 
             }
@@ -180,7 +79,12 @@ _gnutls_sign_algorithm_parse_data (gnutls_session_t session, const opaque * data
 
   for (i = 0; i < data_size; i += 2)
     {
-      sig = _gnutls_sign_algorithm_num2sig (data[i], data[i + 1]);
+      sign_algorithm_st aid;
+
+      aid.hash_algorithm = data[i];
+      aid.sign_algorithm = data[i+1];
+
+      sig = _gnutls_tls_aid_to_sign(&aid);
       if (sig != GNUTLS_SIGN_UNKNOWN)
         {
           session->security_parameters.extensions.sign_algorithms[session->
@@ -260,7 +164,6 @@ _gnutls_signature_algorithm_send_params (gnutls_session_t session,
   if (session->security_parameters.entity == GNUTLS_CLIENT
       && _gnutls_version_has_selectable_sighash (ver))
     {
-
       if (session->internals.priorities.sign_algo.algorithms > 0)
         {
           ret = _gnutls_sign_algorithm_write_params(session, data, data_size);
@@ -269,6 +172,7 @@ _gnutls_signature_algorithm_send_params (gnutls_session_t session,
               gnutls_assert();
               return ret;
             }
+          return ret;
         }
     }
 
