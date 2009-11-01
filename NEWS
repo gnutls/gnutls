@@ -9,7 +9,11 @@ See the end for copying conditions.
 by Tang Tong.
 
 ** libgnutls: addition of support for TLS 1.2 signature algorithms
-extension and certificate verify field.
+extension and certificate verify field. This requires changes for
+TLS 1.2 servers and clients that use callbacks for certificate retrieval.
+They are now required to check with gnutls_session_sign_algorithm_get_requested()
+whether the certificate they send complies with the peer's preferences in
+signature algorithms.
 
 ** libgnutls: In server side when resuming a session do not overwrite the 
 initial session data with the resumed session data.
