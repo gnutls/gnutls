@@ -226,6 +226,8 @@ static const gnutls_error_entry error_algorithms[] = {
 
   ERROR_ENTRY (N_("The OpenPGP fingerprint is not supported."),
 	       GNUTLS_E_OPENPGP_FINGERPRINT_UNSUPPORTED, 1),
+  ERROR_ENTRY (N_("The signature algorithm is not supported."),
+	       GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM, 1),
   ERROR_ENTRY (N_("The certificate has unsupported attributes."),
 	       GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE, 1),
   ERROR_ENTRY (N_("The OID is not supported."), GNUTLS_E_X509_UNSUPPORTED_OID,

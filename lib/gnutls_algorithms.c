@@ -1833,7 +1833,7 @@ typedef struct gnutls_sign_entry gnutls_sign_entry;
 #define TLS_SIGN_AID_UNKNOWN {255, 255}
 
 static const gnutls_sign_entry sign_algorithms[] = {
-  {"RSA-SHA", SIG_RSA_SHA1_OID, GNUTLS_SIGN_RSA_SHA1, GNUTLS_PK_RSA,
+  {"RSA-SHA1", SIG_RSA_SHA1_OID, GNUTLS_SIGN_RSA_SHA1, GNUTLS_PK_RSA,
    GNUTLS_MAC_SHA1, {2, 1}},
   {"RSA-SHA256", SIG_RSA_SHA256_OID, GNUTLS_SIGN_RSA_SHA256, GNUTLS_PK_RSA,
    GNUTLS_MAC_SHA256, {4, 1}},
@@ -1843,7 +1843,7 @@ static const gnutls_sign_entry sign_algorithms[] = {
    GNUTLS_MAC_SHA512, {6, 1}},
   {"RSA-RMD160", SIG_RSA_RMD160_OID, GNUTLS_SIGN_RSA_RMD160, GNUTLS_PK_RSA,
    GNUTLS_MAC_RMD160, TLS_SIGN_AID_UNKNOWN},
-  {"DSA-SHA", SIG_DSA_SHA1_OID, GNUTLS_SIGN_DSA_SHA1, GNUTLS_PK_DSA,
+  {"DSA-SHA1", SIG_DSA_SHA1_OID, GNUTLS_SIGN_DSA_SHA1, GNUTLS_PK_DSA,
    GNUTLS_MAC_SHA1, {2, 2}},
   {"RSA-MD5", SIG_RSA_MD5_OID, GNUTLS_SIGN_RSA_MD5, GNUTLS_PK_RSA,
    GNUTLS_MAC_MD5, {1, 1}},
@@ -2001,9 +2001,9 @@ _gnutls_x509_sign_to_oid (gnutls_pk_algorithm_t pk,
 }
 
 gnutls_mac_algorithm_t
-_gnutls_sign_get_mac_algorithm (gnutls_sign_algorithm_t sign)
+_gnutls_sign_get_hash_algorithm (gnutls_sign_algorithm_t sign)
 {
-  gnutls_mac_algorithm_t ret = GNUTLS_MAC_UNKNOWN;
+  gnutls_mac_algorithm_t ret = GNUTLS_DIG_UNKNOWN;
 
   GNUTLS_SIGN_ALG_LOOP (ret = p->mac);
 

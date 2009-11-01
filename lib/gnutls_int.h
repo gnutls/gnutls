@@ -175,6 +175,7 @@ typedef enum extensions_t
   GNUTLS_EXTENSION_OPAQUE_PRF_INPUT = ENABLE_OPRFI,
 #endif
   GNUTLS_EXTENSION_SRP = 12,
+  GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS = 13,
   GNUTLS_EXTENSION_SESSION_TICKET = 35,
   GNUTLS_EXTENSION_INNER_APPLICATION = 37703
 } extensions_t;
@@ -297,6 +298,7 @@ typedef struct
 } server_name_st;
 
 #define MAX_SERVER_NAME_EXTENSIONS 3
+#define MAX_SIGNATURE_ALGORITHMS 16
 
 struct gnutls_session_ticket_key_st {
   opaque key_name[SESSION_TICKET_KEY_NAME_SIZE];
@@ -311,6 +313,10 @@ typedef struct
   unsigned server_names_size;
 
   opaque srp_username[MAX_SRP_USERNAME + 1];
+
+  /* TLS 1.2 signature algorithms */
+  gnutls_sign_algorithm_t sign_algorithms[MAX_SIGNATURE_ALGORITHMS];
+  uint16_t sign_algorithms_size;
 
   /* TLS/IA data. */
   int gnutls_ia_enable, gnutls_ia_peer_enable;
@@ -437,6 +443,7 @@ struct gnutls_priority_st
   priority_st compression;
   priority_st protocol;
   priority_st cert_type;
+  priority_st sign_algo;
 
   /* to disable record padding */
   int no_padding;
@@ -489,7 +496,8 @@ typedef struct
         } tls10;
       struct
         {
-          digest_hd_st mac;	/* hash of the handshake messages for TLS 1.2+ */
+          digest_hd_st sha1;	/* hash of the handshake messages for TLS 1.2+ */
+          digest_hd_st sha256;	/* hash of the handshake messages for TLS 1.2+ */
         } tls12;
     } handshake_mac_handle;
   int handshake_mac_handle_init; /* 1 when the previous union and type were initialized */

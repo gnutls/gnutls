@@ -36,6 +36,7 @@
 #include <ext_oprfi.h>
 #include <ext_srp.h>
 #include <ext_session_ticket.h>
+#include <ext_signature.h>
 #include <gnutls_num.h>
 
 typedef struct
@@ -348,6 +349,14 @@ _gnutls_ext_init (void)
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
 #endif
+
+  ret = gnutls_ext_register (GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
+			      "SIGNATURE_ALGORITHMS",
+			      GNUTLS_EXT_TLS,
+			      _gnutls_signature_algorithm_recv_params,
+			      _gnutls_signature_algorithm_send_params);
+  if (ret != GNUTLS_E_SUCCESS)
+    return ret;
 
   return GNUTLS_E_SUCCESS;
 }

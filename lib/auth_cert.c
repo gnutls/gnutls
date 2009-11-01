@@ -43,6 +43,7 @@
 #include <gnutls_state.h>
 #include <gnutls_pk.h>
 #include <gnutls_x509.h>
+#include <ext_signature.h>
 #include "debug.h"
 
 #ifdef ENABLE_OPENPGP
@@ -112,6 +113,8 @@ _gnutls_copy_certificate_auth_info (cert_auth_info_t info,
   info->ncerts = ncerts;
 
   info->cert_type = cert[0].cert_type;
+  info->sign_algo = cert[0].sign_algo;
+
 #ifdef ENABLE_OPENPGP
   if (cert[0].cert_type == GNUTLS_CRT_OPENPGP)
     {
@@ -1023,6 +1026,14 @@ _gnutls_proc_x509_server_certificate (gnutls_session_t session,
 	  gnutls_assert ();
 	  goto cleanup;
 	}
+      
+      /* check if signature algorithm is supported */
+      ret = _gnutls_session_sign_algo_supported(session, peer_certificate_list[j].sign_algo, 0);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
 
       p += len;
     }
@@ -1356,8 +1367,15 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, opaque * data,
       DECR_LEN (dsize, 2);
       hash_num = _gnutls_read_uint16 (p);
       p += 2;
-
       DECR_LEN (dsize, hash_num);
+
+      ret = _gnutls_sign_algo_parse_data( session, p, hash_num);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          return ret;
+        }
+
       p += hash_num;
     }
 
@@ -1401,6 +1419,10 @@ _gnutls_gen_cert_client_cert_vrfy (gnutls_session_t session, opaque ** data)
   gnutls_privkey *apr_pkey;
   int apr_cert_list_length, size;
   gnutls_datum_t signature;
+  int total_data;
+  opaque* p;
+  gnutls_sign_algorithm_t sign_algo;
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
   *data = NULL;
 
@@ -1423,26 +1445,46 @@ _gnutls_gen_cert_client_cert_vrfy (gnutls_session_t session, opaque ** data)
 	  gnutls_assert ();
 	  return ret;
 	}
+	sign_algo = ret;
     }
   else
     {
       return 0;
     }
 
-  *data = gnutls_malloc (signature.size + 2);
+  total_data = signature.size + 2;
+
+  /* add hash and signature algorithms */
+  if (_gnutls_version_has_selectable_sighash(ver))
+    {
+      total_data+=2;
+    }
+
+  *data = gnutls_malloc (total_data);
   if (*data == NULL)
     {
       _gnutls_free_datum (&signature);
       return GNUTLS_E_MEMORY_ERROR;
     }
-  size = signature.size;
-  _gnutls_write_uint16 (size, *data);
 
-  memcpy (&(*data)[2], signature.data, size);
+  p = *data;
+  if (_gnutls_version_has_selectable_sighash(ver))
+    {
+      /* error checking is not needed here since we have used those algorithms */
+      p[0] = _gnutls_sign_algo_hash2num(_gnutls_sign_get_hash_algorithm(sign_algo));
+      p[1] = _gnutls_sign_algo_pk2num(_gnutls_sign_get_pk_algorithm(sign_algo));
+      p+=2;
+    }
+
+  size = signature.size;
+  _gnutls_write_uint16 (size, p);
+
+  p+=2;
+  memcpy (p, signature.data, size);
 
   _gnutls_free_datum (&signature);
 
-  return size + 2;
+  return total_data;
 }
 
 int
@@ -1455,12 +1497,26 @@ _gnutls_proc_cert_client_cert_vrfy (gnutls_session_t session,
   gnutls_datum_t sig;
   cert_auth_info_t info = _gnutls_get_auth_info (session);
   gnutls_cert peer_cert;
+  gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
   if (info == NULL || info->ncerts == 0)
     {
       gnutls_assert ();
       /* we need this in order to get peer's certificate */
       return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+  if (_gnutls_version_has_selectable_sighash(ver))
+    {
+      DECR_LEN (dsize, 2);
+      sign_algo = _gnutls_sign_algo_num2sig (pdata[0], pdata[1]);
+      if (sign_algo == GNUTLS_PK_UNKNOWN)
+        {
+          gnutls_assert();
+          return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
+        }
+      pdata+=2;
     }
 
   DECR_LEN (dsize, 2);
@@ -1482,7 +1538,7 @@ _gnutls_proc_cert_client_cert_vrfy (gnutls_session_t session,
       return ret;
     }
 
-  if ((ret = _gnutls_verify_sig_hdata (session, &peer_cert, &sig)) < 0)
+  if ((ret = _gnutls_verify_sig_hdata (session, &peer_cert, &sig, sign_algo)) < 0)
     {
       gnutls_assert ();
       _gnutls_gcert_deinit (&peer_cert);
@@ -1498,9 +1554,10 @@ int
 _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
 {
   gnutls_certificate_credentials_t cred;
-  int size;
+  int size, ret;
   opaque *pdata;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  const int signalgosize = 2+MAX_SIGNATURE_ALGORITHMS*2;
 
   /* Now we need to generate the RDN sequence. This is
    * already in the CERTIFICATE_CRED structure, to improve
@@ -1525,7 +1582,7 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
   if (_gnutls_version_has_selectable_sighash(ver))
     /* Need two bytes to announce the number of supported hash
        functions (see below).  */
-    size += 2;
+    size += signalgosize;
 
   (*data) = gnutls_malloc (size);
   pdata = (*data);
@@ -1544,9 +1601,16 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
 
   if (_gnutls_version_has_selectable_sighash(ver))
     {
-      /* Supported hashes (nothing for now -- FIXME). */
-      _gnutls_write_uint16 (0, pdata);
-      pdata += 2;
+      ret = _gnutls_sign_algo_write_params(session, pdata, signalgosize);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          return ret;
+        }
+      
+      /* recalculate size */
+      size=size-signalgosize+ret;
+      pdata += ret;
     }
 
   if (session->security_parameters.cert_type == GNUTLS_CRT_X509 &&
@@ -1842,10 +1906,10 @@ _gnutls_server_select_cert (gnutls_session_t session,
       if (requested_algo == GNUTLS_PK_ANY ||
 	  requested_algo == cred->cert_list[i][0].subject_pk_algorithm)
 	{
-	  /* if cert type matches 
+	  /* if cert type and signature algorithm matches 
 	   */
 	  if (session->security_parameters.cert_type ==
-	      cred->cert_list[i][0].cert_type)
+	      cred->cert_list[i][0].cert_type && _gnutls_session_sign_algo_requested(session, cred->cert_list[i][0].sign_algo) == 0)
 	    {
 	      idx = i;
 	      break;

@@ -90,7 +90,9 @@ _gnutls_handshake_hash_buffers_clear (gnutls_session_t session)
 	   handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_12)
     {
       _gnutls_hash_deinit (&session->internals.
-			   handshake_mac_handle.tls12.mac, NULL);
+			   handshake_mac_handle.tls12.sha256, NULL);
+      _gnutls_hash_deinit (&session->internals.
+			   handshake_mac_handle.tls12.sha1, NULL);
     }
   session->security_parameters.handshake_mac_handle_type = 0;
   session->internals.handshake_mac_handle_init = 0;
@@ -261,7 +263,7 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret)
 	   handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_12)
     {
       rc = _gnutls_hash_copy (&td_sha, &session->internals.
-			      handshake_mac_handle.tls12.mac);
+			      handshake_mac_handle.tls12.sha256);
       if (rc < 0)
 	{
 	  gnutls_assert ();
@@ -574,7 +576,8 @@ _gnutls_handshake_hash_pending (gnutls_session_t session)
         } 
       else if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_12)
         {
-          _gnutls_hash (&session->internals.handshake_mac_handle.tls12.mac, data, siz);
+          _gnutls_hash (&session->internals.handshake_mac_handle.tls12.sha256, data, siz);
+          _gnutls_hash (&session->internals.handshake_mac_handle.tls12.sha1, data, siz);
         }
     }
 
@@ -984,7 +987,9 @@ _gnutls_handshake_hash_add_sent (gnutls_session_t session,
         }
       else if (session->security_parameters.handshake_mac_handle_type == HANDSHAKE_MAC_TYPE_12) 
         { 
-          _gnutls_hash (&session->internals.handshake_mac_handle.tls12.mac, dataptr,
+          _gnutls_hash (&session->internals.handshake_mac_handle.tls12.sha256, dataptr,
+		    datalen);
+          _gnutls_hash (&session->internals.handshake_mac_handle.tls12.sha1, dataptr,
 		    datalen);
         }
     }
@@ -2301,14 +2306,22 @@ _gnutls_handshake_hash_init (gnutls_session_t session)
         /* The algorithm to compute hash over handshake messages must be
   	   same as the one used as the basis for PRF.  By now we use
 	   SHA256. */
-          gnutls_digest_algorithm_t hash_algo = GNUTLS_MAC_SHA256;
-
           ret =
-           _gnutls_hash_init (&session->internals.handshake_mac_handle.tls12.mac,
-			   hash_algo);
+           _gnutls_hash_init (&session->internals.handshake_mac_handle.tls12.sha256,
+			   GNUTLS_DIG_SHA256);
            if (ret < 0)
 	     {
 	       gnutls_assert ();
+	       return GNUTLS_E_MEMORY_ERROR;
+  	     }
+
+          ret =
+           _gnutls_hash_init (&session->internals.handshake_mac_handle.tls12.sha1,
+			   GNUTLS_DIG_SHA1);
+           if (ret < 0)
+	     {
+	       gnutls_assert ();
+	       _gnutls_hash_deinit(&session->internals.handshake_mac_handle.tls12.sha256, NULL);
 	       return GNUTLS_E_MEMORY_ERROR;
   	     }
         }
