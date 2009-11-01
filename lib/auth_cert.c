@@ -1028,7 +1028,7 @@ _gnutls_proc_x509_server_certificate (gnutls_session_t session,
 	}
       
       /* check if signature algorithm is supported */
-      ret = _gnutls_session_sign_algo_supported(session, peer_certificate_list[j].sign_algo, 0);
+      ret = _gnutls_session_sign_algo_enabled(session, peer_certificate_list[j].sign_algo);
       if (ret < 0)
         {
           gnutls_assert();
@@ -1369,7 +1369,7 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, opaque * data,
       p += 2;
       DECR_LEN (dsize, hash_num);
 
-      ret = _gnutls_sign_algo_parse_data( session, p, hash_num);
+      ret = _gnutls_sign_algorithm_parse_data( session, p, hash_num);
       if (ret < 0)
         {
           gnutls_assert();
@@ -1471,8 +1471,8 @@ _gnutls_gen_cert_client_cert_vrfy (gnutls_session_t session, opaque ** data)
   if (_gnutls_version_has_selectable_sighash(ver))
     {
       /* error checking is not needed here since we have used those algorithms */
-      p[0] = _gnutls_sign_algo_hash2num(_gnutls_sign_get_hash_algorithm(sign_algo));
-      p[1] = _gnutls_sign_algo_pk2num(_gnutls_sign_get_pk_algorithm(sign_algo));
+      p[0] = _gnutls_sign_algorithm_hash2num(_gnutls_sign_get_hash_algorithm(sign_algo));
+      p[1] = _gnutls_sign_algorithm_pk2num(_gnutls_sign_get_pk_algorithm(sign_algo));
       p+=2;
     }
 
@@ -1510,13 +1510,20 @@ _gnutls_proc_cert_client_cert_vrfy (gnutls_session_t session,
   if (_gnutls_version_has_selectable_sighash(ver))
     {
       DECR_LEN (dsize, 2);
-      sign_algo = _gnutls_sign_algo_num2sig (pdata[0], pdata[1]);
+      sign_algo = _gnutls_sign_algorithm_num2sig (pdata[0], pdata[1]);
       if (sign_algo == GNUTLS_PK_UNKNOWN)
         {
           gnutls_assert();
           return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
         }
       pdata+=2;
+    }
+
+  ret = _gnutls_session_sign_algo_enabled (session, sign_algo);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
     }
 
   DECR_LEN (dsize, 2);
@@ -1601,7 +1608,7 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
 
   if (_gnutls_version_has_selectable_sighash(ver))
     {
-      ret = _gnutls_sign_algo_write_params(session, pdata, signalgosize);
+      ret = _gnutls_sign_algorithm_write_params(session, pdata, signalgosize);
       if (ret < 0)
         {
           gnutls_assert();

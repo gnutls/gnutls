@@ -392,7 +392,7 @@ _gnutls_verify_sig_params (gnutls_session_t session, gnutls_cert * cert,
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
   gnutls_digest_algorithm_t hash_algo = GNUTLS_DIG_SHA1;
 
-  ret = _gnutls_session_sign_algo_supported(session, algo, 0);
+  ret = _gnutls_session_sign_algo_enabled(session, algo);
   if (ret < 0)
     {
       gnutls_assert();

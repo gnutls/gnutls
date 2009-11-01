@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.9.8 (unreleased)
 
+** libgnutls: addition of support for TLS 1.2 signature algorithms
+extension and certificate verify field.
+
 ** libgnutls: In server side when resuming a session do not overwrite the 
 initial session data with the resumed session data.
 

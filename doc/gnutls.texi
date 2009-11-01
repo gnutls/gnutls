@@ -1314,6 +1314,11 @@ callback can be set using the functions:
 
 @end itemize
 
+Clients and servers that will select certificates using callback
+functions should select a certificate according the peer's signature
+algorithm preferences. To get those preferences use
+@ref{gnutls_session_sign_algorithm_get_requested}.
+
 Certificate verification is possible by loading the trusted
 authorities into the credentials structure by using
 @ref{gnutls_certificate_set_x509_trust_file} or

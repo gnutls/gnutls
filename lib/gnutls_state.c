@@ -189,60 +189,6 @@ _gnutls_session_cert_type_supported (gnutls_session_t session,
   return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 }
 
-/* Check if the given signature algorithm is supported.
- * This means that it is enabled by the priority functions,
- * and in case of a server a matching certificate exists.
- */
-int
-_gnutls_session_sign_algo_supported (gnutls_session_t session,
-				     gnutls_sign_algorithm_t sig, int check_certs)
-{
-  unsigned i;
-  unsigned cert_found = 0;
-  gnutls_certificate_credentials_t cred;
-
-  if (check_certs != 0 && session->security_parameters.entity == GNUTLS_SERVER)
-    {
-      cred = (gnutls_certificate_credentials_t)
-	_gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
-
-      if (cred == NULL)
-	return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
-
-      if (cred->server_get_cert_callback == NULL)
-	{
-	  for (i = 0; i < cred->ncerts; i++)
-	    {
-	      if (cred->cert_list[i][0].sign_algo == sig)
-		{
-		  cert_found = 1;
-		  break;
-		}
-	    }
-
-	  if (cert_found == 0)
-	    /* no certificate is of that type.
-	     */
-	    return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
-	}
-    }
-
-  if (session->internals.priorities.sign_algo.algorithms == 0) /* none set, allow all */
-    {
-      gnutls_assert();
-      return 0;
-    }
-
-  for (i = 0; i < session->internals.priorities.sign_algo.algorithms; i++)
-    {
-      if (session->internals.priorities.sign_algo.priority[i] == sig)
-	{
-	  return 0;		/* ok */
-	}
-    }
-
-  return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
-}
 
 /* this function deinitializes all the internal parameters stored
  * in a session struct.

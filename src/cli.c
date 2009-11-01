@@ -365,10 +365,46 @@ cert_callback (gnutls_session_t session,
 
   st->type = gnutls_certificate_type_get (session);
 
+
   st->ncerts = 0;
 
   if (st->type == GNUTLS_CRT_X509)
     {
+      gnutls_sign_algorithm_t cert_algo, req_algo;
+      int i, match = 0;
+      
+      ret = gnutls_x509_crt_get_signature_algorithm(x509_crt[0]);
+      if (ret < 0)
+        {
+          /* error reading signature algorithm */
+          return -1;
+        }
+      cert_algo = ret;
+    
+      i=0;
+      do {
+        ret = gnutls_session_sign_algorithm_get_requested(session, i, &req_algo);
+        if (ret >= 0 && cert_algo == req_algo)
+          {
+            match = 1;
+            break;
+          }
+          
+         /* server has not requested anything specific */
+        if (i==0 && ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+          {
+            match = 1;
+            break;
+          }
+        i++;
+      } while(ret >= 0);
+      
+      if (match == 0)
+        {
+          printf("- Could not find a suitable certificate to send to server\n");
+          return -1;
+        }
+
       if (x509_crt != NULL && x509_key != NULL)
 	{
 	  st->ncerts = x509_crt_size;

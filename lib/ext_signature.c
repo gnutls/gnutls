@@ -34,7 +34,7 @@
 #include <gnutls_num.h>
 #include <gnutls_algorithms.h>
 
-int _gnutls_sign_algo_pk2num (gnutls_pk_algorithm_t pk)
+int _gnutls_sign_algorithm_pk2num (gnutls_pk_algorithm_t pk)
 {
   switch (pk)
     {
@@ -48,7 +48,7 @@ int _gnutls_sign_algo_pk2num (gnutls_pk_algorithm_t pk)
     }
 }
 
-int _gnutls_sign_algo_hash2num (gnutls_digest_algorithm_t hash)
+int _gnutls_sign_algorithm_hash2num (gnutls_digest_algorithm_t hash)
 {
   switch (hash)
     {
@@ -71,7 +71,7 @@ int _gnutls_sign_algo_hash2num (gnutls_digest_algorithm_t hash)
 }
 
 gnutls_sign_algorithm_t
-_gnutls_sign_algo_num2sig (int hash, int sig)
+_gnutls_sign_algorithm_num2sig (int hash, int sig)
 {
   if (sig == 1)                 /* rsa */
     {
@@ -109,7 +109,7 @@ _gnutls_sign_algo_num2sig (int hash, int sig)
 /* generates a SignatureAndHashAlgorithm structure with length as prefix
  * by using the setup priorities.
  */
-int _gnutls_sign_algo_write_params(gnutls_session_t session, opaque *data, size_t max_data_size)
+int _gnutls_sign_algorithm_write_params(gnutls_session_t session, opaque *data, size_t max_data_size)
 {
 opaque* p = data;
 int len, i ,j;
@@ -144,7 +144,7 @@ int ret, hash, pk;
                   gnutls_assert ();
                   return GNUTLS_E_INTERNAL_ERROR;
                 }
-              ret = _gnutls_sign_algo_hash2num (hash);
+              ret = _gnutls_sign_algorithm_hash2num (hash);
               if (ret < 0)
                 {
                   gnutls_assert ();
@@ -153,7 +153,7 @@ int ret, hash, pk;
               *p = ret;
               p++;
 
-              ret = _gnutls_sign_algo_pk2num (pk);
+              ret = _gnutls_sign_algorithm_pk2num (pk);
               if (ret < 0)
                 {
                   gnutls_assert ();
@@ -171,7 +171,7 @@ int ret, hash, pk;
  * session->security_parameters.extensions. 
  */
 int
-_gnutls_sign_algo_parse_data (gnutls_session_t session, const opaque * data,
+_gnutls_sign_algorithm_parse_data (gnutls_session_t session, const opaque * data,
                               size_t data_size)
 {
   int sig, i;
@@ -180,7 +180,7 @@ _gnutls_sign_algo_parse_data (gnutls_session_t session, const opaque * data,
 
   for (i = 0; i < data_size; i += 2)
     {
-      sig = _gnutls_sign_algo_num2sig (data[i], data[i + 1]);
+      sig = _gnutls_sign_algorithm_num2sig (data[i], data[i + 1]);
       if (sig != GNUTLS_SIGN_UNKNOWN)
         {
           session->security_parameters.extensions.sign_algorithms[session->
@@ -210,6 +210,7 @@ _gnutls_signature_algorithm_recv_params (gnutls_session_t session,
                                          size_t _data_size)
 {
   ssize_t data_size = _data_size;
+  int ret;
 
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
@@ -230,8 +231,12 @@ _gnutls_signature_algorithm_recv_params (gnutls_session_t session,
           len = _gnutls_read_uint16 (data);
           DECR_LEN (data_size, len);
 
-          _gnutls_sign_algo_parse_data (session, data + 2, len);
-
+          ret = _gnutls_sign_algorithm_parse_data (session, data + 2, len);
+          if (ret < 0)
+            {
+              gnutls_assert();
+              return ret;
+            }
         }
     }
 
@@ -254,7 +259,7 @@ _gnutls_signature_algorithm_send_params (gnutls_session_t session,
 
       if (session->internals.priorities.sign_algo.algorithms > 0)
         {
-          ret = _gnutls_sign_algo_write_params(session, data, data_size);
+          ret = _gnutls_sign_algorithm_write_params(session, data, data_size);
           if (ret < 0)
             {
               gnutls_assert();
@@ -329,4 +334,69 @@ _gnutls_session_sign_algo_requested (gnutls_session_t session,
     }
 
   return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
+}
+
+/* Check if the given signature algorithm is supported.
+ * This means that it is enabled by the priority functions,
+ * and in case of a server a matching certificate exists.
+ */
+int
+_gnutls_session_sign_algo_enabled (gnutls_session_t session,
+				     gnutls_sign_algorithm_t sig)
+{
+  unsigned i;
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+
+  if (!_gnutls_version_has_selectable_sighash (ver) || session->security_parameters.extensions.sign_algorithms_size == 0)       /* none set, allow all */
+    {
+      return 0;
+    }
+
+  for (i = 0; i < session->internals.priorities.sign_algo.algorithms; i++)
+    {
+      if (session->internals.priorities.sign_algo.priority[i] == sig)
+	{
+	  return 0;		/* ok */
+	}
+    }
+
+  return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
+}
+
+/**
+  * gnutls_session_sign_algorithm_get - Returns the signature algorithms requested by peer
+  * @session: is a #gnutls_session_t structure.
+  * @indx: is an index of the signature algorithm to return
+  * @algo: the returned certificate type will be stored there
+  *
+  * Returns the signature algorithm specified by index that was requested
+  * by the peer. If the specified index has no data available 
+  * this function returns %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
+  * If the negotiated TLS version does not support signature algorithms
+  * then %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned even
+  * for the first index.
+  *
+  * This function is usefull in the certificate callback functions
+  * to assist in selecting the correct certificate.
+  *
+  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+  *   an error code is returned.
+  **/
+int gnutls_session_sign_algorithm_get_requested (gnutls_session_t session,
+                    int indx, gnutls_sign_algorithm_t *algo)
+{
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+
+  if (!_gnutls_version_has_selectable_sighash (ver) || session->security_parameters.extensions.sign_algorithms_size == 0)
+    {
+      return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+
+  if (indx < session->security_parameters.extensions.sign_algorithms_size)
+    {
+      *algo = session->security_parameters.extensions.sign_algorithms[indx];
+      return 0;
+    }
+  else
+      return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 }

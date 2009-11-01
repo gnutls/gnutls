@@ -242,3 +242,4 @@ _gnutls_cert_type2num (int cert_type)
     }
 
 }
+

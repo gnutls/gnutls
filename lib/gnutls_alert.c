@@ -199,6 +199,7 @@ gnutls_error_to_alert (int err, int *level)
     case GNUTLS_E_INSUFFICIENT_CREDENTIALS:
     case GNUTLS_E_NO_CIPHER_SUITES:
     case GNUTLS_E_NO_COMPRESSION_ALGORITHMS:
+    case GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM:
       ret = GNUTLS_A_HANDSHAKE_FAILURE;
       _level = GNUTLS_AL_FATAL;
       break;

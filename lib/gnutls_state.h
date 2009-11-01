@@ -41,8 +41,6 @@ void _gnutls_session_cert_type_set (gnutls_session_t session,
 
 int _gnutls_session_cert_type_supported (gnutls_session_t,
 					 gnutls_certificate_type_t);
-int _gnutls_session_sign_algo_supported (gnutls_session_t session,
-                                     gnutls_sign_algorithm_t sig, int check_certs);
 int _gnutls_dh_set_secret_bits (gnutls_session_t session, unsigned bits);
 
 int _gnutls_dh_set_peer_public (gnutls_session_t session, bigint_t public);
