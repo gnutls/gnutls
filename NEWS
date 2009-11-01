@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.9.8 (unreleased)
 
+** libgnutls: Fix for memory leaks on interrupted handshake. Reported
+by Tang Tong.
+
 ** libgnutls: addition of support for TLS 1.2 signature algorithms
 extension and certificate verify field.
 
