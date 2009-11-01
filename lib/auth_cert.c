@@ -1921,8 +1921,12 @@ _gnutls_server_select_cert (gnutls_session_t session,
 	{
 	  /* if cert type and signature algorithm matches 
 	   */
-	  if (session->security_parameters.cert_type ==
-	      cred->cert_list[i][0].cert_type && _gnutls_session_sign_algo_requested(session, cred->cert_list[i][0].sign_algo) == 0)
+	  if (session->security_parameters.cert_type == cred->cert_list[i][0].cert_type && 
+	      (cred->cert_list[i][0].cert_type == GNUTLS_CRT_OPENPGP || /* FIXME: make this a check for
+                                                                         * certificate type capabilities
+                                                                         */
+	       !_gnutls_version_has_selectable_sighash (gnutls_protocol_get_version (session)) || 
+	       _gnutls_session_sign_algo_requested(session, cred->cert_list[i][0].sign_algo) == 0))
 	    {
 	      idx = i;
 	      break;
