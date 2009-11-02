@@ -5,30 +5,36 @@ See the end for copying conditions.
 
 * Version 2.9.8 (unreleased)
 
-** libgnutls: Fix for memory leaks on interrupted handshake. Reported
-by Tang Tong.
+** libgnutls: Fix for memory leaks on interrupted handshake.
+Reported by Tang Tong.
 
-** libgnutls: addition of support for TLS 1.2 signature algorithms
-extension and certificate verify field. This requires changes for
-TLS 1.2 servers and clients that use callbacks for certificate retrieval.
-They are now required to check with gnutls_session_sign_algorithm_get_requested()
-whether the certificate they send complies with the peer's preferences in
+** libgnutls: Addition of support for TLS 1.2 signature algorithms
+** extension and certificate verify field.
+This requires changes for TLS 1.2 servers and clients that use
+callbacks for certificate retrieval.  They are now required to check
+with gnutls_session_sign_algorithm_get_requested() whether the
+certificate they send complies with the peer's preferences in
 signature algorithms.
 
 ** libgnutls: In server side when resuming a session do not overwrite the 
-initial session data with the resumed session data.
+** initial session data with the resumed session data.
 
-** libgnutls: Added support for AES-128,AES-192 and AES-256 in PKCS #8
-encryption. This affects also PKCS #12 encoded files.
-
-*** certtool: Added the --pkcs-cipher option to explicitely specify
-the encryption algorithm to use.
+** libgnutls: Added support for AES-128, AES-192 and AES-256 in PKCS #8
+** encryption.
+This affects also PKCS #12 encoded files.
 
 ** libgnutls: Fix PKCS#12 encoding.
 The error you would get was "The OID is not supported.".  Problem
 introduced for the v2.8.x branch in 2.7.6.
 
+** certtool: Added the --pkcs-cipher option.
+To explicitely specify the encryption algorithm to use.
+
 ** tests: Added "pkcs12_encode" self-test to check PKCS#12 functions.
+
+** tests: Fix time bomb in chainverify self-test.
+Reported by Andreas Metzler <ametzler@downhill.at.eu.org> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3925>.
 
 ** tests: Fix expired cert in chainverify self-test.
 
