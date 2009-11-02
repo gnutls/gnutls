@@ -77,7 +77,6 @@ _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
 	  gnutls_assert ();
 	  return GNUTLS_E_HASH_FAILED;
 	}
-      dig->active = 1;
       return 0;
     }
 
@@ -90,7 +89,6 @@ _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
       return result;
     }
 
-  dig->active = 1;
   return 0;
 }
 
@@ -121,10 +119,10 @@ _gnutls_hash_copy (digest_hd_st * dst, digest_hd_st * src)
 {
   int result;
 
-  memset(dst, 0, sizeof(*dst));
   dst->algorithm = src->algorithm;
+  dst->key = NULL;		/* it's a hash anyway */
+  dst->keysize = 0;
   dst->registered = src->registered;
-  dst->active = 1;
 
   if (src->registered)
     {
@@ -167,14 +165,7 @@ _gnutls_hash_output (digest_hd_st * handle, void *digest)
 void
 _gnutls_hash_deinit (digest_hd_st * handle, void *digest)
 {
-  if (handle->active != 1) {
-    return;
-  }
-
-  if (digest != NULL)
-    _gnutls_hash_output (handle, digest);
-
-  handle->active = 0;
+  _gnutls_hash_output (handle, digest);
 
   if (handle->registered && handle->hd.rh.ctx != NULL)
     {
@@ -278,7 +269,6 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
 	  return GNUTLS_E_HASH_FAILED;
 	}
 
-      dig->active = 1;
       return 0;
     }
 
@@ -293,7 +283,6 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
 
   _gnutls_mac_ops.setkey (dig->hd.gc, key, keylen);
 
-  dig->active = 1;
   return 0;
 }
 
@@ -334,14 +323,8 @@ _gnutls_hmac_output (digest_hd_st * handle, void *digest)
 void
 _gnutls_hmac_deinit (digest_hd_st * handle, void *digest)
 {
-  if (handle->active != 1) {
-    return;
-  }
+  _gnutls_hmac_output (handle, digest);
 
-  if (digest)
-    _gnutls_hmac_output (handle, digest);
-
-  handle->active = 0;
   if (handle->registered && handle->hd.rh.ctx != NULL)
     {
       handle->hd.rh.cc->deinit (handle->hd.rh.ctx);
@@ -415,7 +398,6 @@ _gnutls_mac_deinit_ssl3 (digest_hd_st * handle, void *digest)
   if (padsize == 0)
     {
       gnutls_assert ();
-      _gnutls_hash_deinit (handle, NULL);
       return;
     }
 
@@ -425,7 +407,6 @@ _gnutls_mac_deinit_ssl3 (digest_hd_st * handle, void *digest)
   if (rc < 0)
     {
       gnutls_assert ();
-      _gnutls_hash_deinit (handle, NULL);
       return;
     }
 

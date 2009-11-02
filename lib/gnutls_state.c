@@ -201,8 +201,6 @@ deinit_internal_params (gnutls_session_t session)
   if (session->internals.params.free_rsa_params)
     gnutls_rsa_params_deinit (session->internals.params.rsa_params);
 
-  _gnutls_handshake_hash_buffers_clear(session);
-
   memset (&session->internals.params, 0, sizeof (session->internals.params));
 }
 
@@ -210,8 +208,8 @@ deinit_internal_params (gnutls_session_t session)
  * structure within the session, which depend on the current handshake.
  * This is used to allow further handshakes.
  */
-static void
-_gnutls_handshake_internal_state_init (gnutls_session_t session)
+void
+_gnutls_handshake_internal_state_clear (gnutls_session_t session)
 {
   session->internals.extensions_sent_size = 0;
 
@@ -233,13 +231,6 @@ _gnutls_handshake_internal_state_init (gnutls_session_t session)
   session->internals.last_handshake_out = -1;
 
   session->internals.resumable = RESUME_TRUE;
-}
-
-void
-_gnutls_handshake_internal_state_clear (gnutls_session_t session)
-{
-  _gnutls_handshake_internal_state_init(session);
-
   _gnutls_free_datum (&session->internals.recv_buffer);
 
   deinit_internal_params (session);
@@ -345,7 +336,7 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
    * as NULL or 0. This is why calloc is used.
    */
 
-  _gnutls_handshake_internal_state_init (*session);
+  _gnutls_handshake_internal_state_clear (*session);
 
   return 0;
 }
