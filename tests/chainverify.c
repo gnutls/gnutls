@@ -32,6 +32,21 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
+/* GnuTLS internally calls time() to find out the current time when
+   verifying certificates.  To avoid a time bomb, we hard code the
+   current time.  This should work fine on systems where the library
+   call to time is resolved at run-time.  */
+time_t
+time (time_t *t)
+{
+  time_t then = 1256803113;
+
+  if (t)
+    *t = then;
+
+  return then;
+}
+
 /* *INDENT-OFF* */
 
 /* Triggers incorrect verification success on older versions */
