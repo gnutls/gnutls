@@ -30,7 +30,7 @@ LDADD = libexamples.la				\
 	../../lib/libgnutls.la			\
 	../../libextra/libgnutls-extra.la	\
 	../../gl/libgnu.la			\
-	$(LIBSOCKET)
+	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB)
 
 CXX_LDADD = $(LDADD) \
 	../../lib/libgnutlsxx.la

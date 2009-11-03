@@ -44,7 +44,7 @@ LDADD = ../lib/libgnutls.la \
 	../gl/libgnu.la \
 	libutils.la \
 	$(LTLIBGCRYPT)	\
-	$(LIBSOCKET)
+	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB)
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../lib/minitasn1
