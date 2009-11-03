@@ -94,7 +94,7 @@ libcmd_certtool_la_SOURCES = certtool.gaa certtool-gaa.h	\
 	certtool-gaa.c certtool-cfg.h certtool-cfg.c
 libcmd_certtool_la_LIBADD = ../gl/libgnu.la $(LTLIBREADLINE)
 libcmd_certtool_la_LIBADD += ../lib/libgnutls.la ../libextra/libgnutls-extra.la
-libcmd_certtool_la_LIBADD += ../gl/libgnu.la
+libcmd_certtool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
 
 psk-gaa.c: $(srcdir)/psk.gaa
 	-$(GAA) $< -o psk-gaa.c -i psk-gaa.h
