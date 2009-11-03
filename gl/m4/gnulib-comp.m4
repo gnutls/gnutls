@@ -124,7 +124,6 @@ AC_SUBST([LTALLOCA])
   AC_PROG_MKDIR_P
   gl_FUNC_PERROR
   gl_STRING_MODULE_INDICATOR([perror])
-  gl_PMCCABE2HTML
   AC_CHECK_DECLS([program_invocation_name], [], [], [#include <errno.h>])
   AC_CHECK_DECLS([program_invocation_short_name], [], [], [#include <errno.h>])
   gl_FUNC_READ_FILE
@@ -481,7 +480,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/netdb_h.m4
   m4/netinet_in_h.m4
   m4/perror.m4
-  m4/pmccabe2html.m4
   m4/printf.m4
   m4/read-file.m4
   m4/readline.m4
