@@ -1830,19 +1830,13 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
   gnutls_protocol_t hver;
   opaque *extdata = NULL;
   int rehandshake = 0;
-
-  opaque *SessionID =
-    session->internals.resumed_security_parameters.session_id;
   uint8_t session_id_len =
     session->internals.resumed_security_parameters.session_id_size;
 
+  /* note that rehandshake is different than resuming
+   */
   if (session->security_parameters.session_id_size)
     rehandshake = 1;
-
-  if (SessionID == NULL)
-    session_id_len = 0;
-  else if (session_id_len == 0)
-    SessionID = NULL;
 
   if (again == 0)
     {
@@ -1873,15 +1867,16 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       /* if we are resuming a session then we set the
        * version number to the previously established.
        */
-      if (SessionID == NULL)
+      if (session_id_len == 0)
 	{
-	  if (rehandshake)	/* already negotiated version thus version_max == negotiated version */
-	    hver = session->security_parameters.version;
-	  else
-	    hver = _gnutls_version_max (session);
+          if (rehandshake) /* already negotiated version thus version_max == negotiated version */
+            hver = session->security_parameters.version;
+          else /* new handshake. just get the max */
+            hver = _gnutls_version_max (session);
 	}
       else
-	{			/* we are resuming a session */
+	{
+	  /* we are resuming a session */
 	  hver = session->internals.resumed_security_parameters.version;
 	}
 
@@ -1938,7 +1933,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 
       if (session_id_len > 0)
 	{
-	  memcpy (&data[pos], SessionID, session_id_len);
+	  memcpy (&data[pos], session->internals.resumed_security_parameters.session_id, session_id_len);
 	  pos += session_id_len;
 	}
 
@@ -2047,12 +2042,8 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
   int pos = 0;
   int datalen, ret = 0;
   uint8_t comp;
-  opaque *SessionID = session->security_parameters.session_id;
   uint8_t session_id_len = session->security_parameters.session_id_size;
   opaque buf[2 * TLS_MAX_SESSION_ID_SIZE + 1];
-
-  if (SessionID == NULL)
-    session_id_len = 0;
 
   datalen = 0;
 
@@ -2117,12 +2108,12 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
       data[pos++] = session_id_len;
       if (session_id_len > 0)
 	{
-	  memcpy (&data[pos], SessionID, session_id_len);
+	  memcpy (&data[pos], session->security_parameters.session_id, session_id_len);
 	}
       pos += session_id_len;
 
       _gnutls_handshake_log ("HSK[%p]: SessionID: %s\n", session,
-			     _gnutls_bin2hex (SessionID, session_id_len,
+			     _gnutls_bin2hex (session->security_parameters.session_id, session_id_len,
 					      buf, sizeof (buf)));
 
       memcpy (&data[pos],
