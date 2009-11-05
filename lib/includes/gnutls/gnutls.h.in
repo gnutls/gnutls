@@ -403,8 +403,9 @@ extern "C" {
   gnutls_compression_get (gnutls_session_t session);
   gnutls_certificate_type_t
   gnutls_certificate_type_get (gnutls_session_t session);
-  int gnutls_session_sign_algorithm_get_requested (gnutls_session_t session,
-                    int indx, gnutls_sign_algorithm_t *algo);
+  int gnutls_sign_algorithm_get_requested (gnutls_session_t session,
+					   size_t indx,
+					   gnutls_sign_algorithm_t *algo);
 
   size_t gnutls_cipher_get_key_size (gnutls_cipher_algorithm_t algorithm);
   size_t gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm);

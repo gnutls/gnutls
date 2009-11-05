@@ -12,16 +12,18 @@ Reported by Tang Tong.
 ** extension and certificate verify field.
 This requires changes for TLS 1.2 servers and clients that use
 callbacks for certificate retrieval.  They are now required to check
-with gnutls_session_sign_algorithm_get_requested() whether the
-certificate they send complies with the peer's preferences in
-signature algorithms.
+with gnutls_sign_algorithm_get_requested() whether the certificate
+they send complies with the peer's preferences in signature
+algorithms.
 
 ** libgnutls: In server side when resuming a session do not overwrite the 
 ** initial session data with the resumed session data.
 
 ** libgnutls: Added support for AES-128, AES-192 and AES-256 in PKCS #8
 ** encryption.
-This affects also PKCS #12 encoded files.
+This affects also PKCS #12 encoded files.  This adds the following new
+enums: GNUTLS_CIPHER_AES_192_CBC, GNUTLS_PKCS_USE_PBES2_AES_128,
+GNUTLS_PKCS_USE_PBES2_AES_192, GNUTLS_PKCS_USE_PBES2_AES_256.
 
 ** libgnutls: Fix PKCS#12 encoding.
 The error you would get was "The OID is not supported.".  Problem
@@ -42,7 +44,13 @@ Reported by Andreas Metzler <ametzler@downhill.at.eu.org> in
 Thanks to Clytie Siddall.
 
 ** API and ABI modifications:
-No changes since last version.
+GNUTLS_CIPHER_AES_192_CBC: ADDED to gnutls/gnutls.h.
+GNUTLS_PKCS_USE_PBES2_AES_128: ADDED to gnutls/x509.h.
+GNUTLS_PKCS_USE_PBES2_AES_192: ADDED to gnutls/x509.h.
+GNUTLS_PKCS_USE_PBES2_AES_256: ADDED to gnutls/x509.h.
+GNUTLS_BAG_SECRET: ADDED to gnutls/pkcs12.h.
+GNUTLS_DIG_UNKNOWN: ADDED to gnutls/gnutls.h.
+gnutls_sign_algorithm_get_requested: ADDED.
 
 * Version 2.9.7 (released 2009-10-06)
 

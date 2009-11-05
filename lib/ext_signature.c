@@ -284,7 +284,7 @@ _gnutls_session_sign_algo_enabled (gnutls_session_t session,
 }
 
 /**
- * gnutls_session_sign_algorithm_get - get signature algorithms requested by peer
+ * gnutls_sign_algorithm_get - get signature algorithms requested by peer
  * @session: is a #gnutls_session_t structure.
  * @indx: is an index of the signature algorithm to return
  * @algo: the returned certificate type will be stored there
@@ -305,9 +305,9 @@ _gnutls_session_sign_algo_enabled (gnutls_session_t session,
  * Since: 2.10.0
  **/
 int
-gnutls_session_sign_algorithm_get_requested (gnutls_session_t session,
-					     size_t indx,
-					     gnutls_sign_algorithm_t * algo)
+gnutls_sign_algorithm_get_requested (gnutls_session_t session,
+				     size_t indx,
+				     gnutls_sign_algorithm_t * algo)
 {
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
