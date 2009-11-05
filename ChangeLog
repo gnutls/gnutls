@@ -1,3 +1,418 @@
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.9.8.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gl/tests/test-func.c: Update gnulib files.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/gnulib-comp.m4, gl/m4/inet_ntop.m4, gl/m4/inet_pton.m4,
+	gl/tests/Makefile.am, gl/tests/test-inet_ntop.c,
+	gl/tests/test-inet_pton.c, gl/tests/test-sys_socket.c,
+	lib/gl/tests/test-func.c, lib/gl/tests/test-sys_socket.c,
+	libextra/gl/md5.c: Update gnulib files.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* lib/m4/hooks.m4: Make sure libgcrypt's dependency on libgpg-error
+	is known.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Fix API name change.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Fix API name change.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-cert-select.c, doc/examples/ex-client-psk.c,
+	doc/examples/ex-pkcs12.c, doc/examples/ex-serv-anon.c,
+	doc/examples/ex-serv-export.c, doc/examples/ex-serv-pgp.c,
+	doc/examples/ex-serv-psk.c, doc/examples/ex-serv-srp.c,
+	doc/examples/ex-serv1.c, guile/src/core.c, lib/auth_cert.c,
+	lib/auth_dhe.c, lib/auth_rsa_export.c, lib/auth_srp.c,
+	lib/auth_srp_passwd.c, lib/auth_srp_rsa.c, lib/ext_cert_type.c,
+	lib/ext_server_name.c, lib/ext_session_ticket.c,
+	lib/ext_signature.c, lib/gnutls_algorithms.c, lib/gnutls_buffers.c,
+	lib/gnutls_cert.c, lib/gnutls_cipher.c, lib/gnutls_errors.c,
+	lib/gnutls_extensions.c, lib/gnutls_handshake.c,
+	lib/gnutls_hash_int.c, lib/gnutls_mpi.c, lib/gnutls_priority.c,
+	lib/gnutls_psk.c, lib/gnutls_record.c, lib/gnutls_session_pack.c,
+	lib/gnutls_sig.c, lib/gnutls_state.c, lib/gnutls_str.c,
+	lib/gnutls_supplemental.c, lib/gnutls_ui.c, lib/gnutls_x509.c,
+	lib/minitasn1/decoding.c, lib/opencdk/armor.c, lib/opencdk/keydb.c,
+	lib/opencdk/literal.c, lib/opencdk/misc.c,
+	lib/opencdk/new-packet.c, lib/opencdk/read-packet.c,
+	lib/opencdk/sig-check.c, lib/opencdk/stream.c,
+	lib/opencdk/verify.c, lib/openpgp/gnutls_openpgp.c,
+	lib/openpgp/output.c, lib/openpgp/pgp.c, lib/x509/crq.c,
+	lib/x509/dn.c, lib/x509/pkcs12.c, lib/x509/pkcs12_bag.c,
+	lib/x509/privkey_pkcs8.c, lib/x509/verify.c, lib/x509/x509_write.c,
+	libextra/gl/md5.c, libextra/gnutls_openssl.c, src/certtool-cfg.c,
+	src/cli.c, src/common.c, src/crypt.c, src/psk.c, src/serv.c,
+	tests/anonself.c, tests/chainverify.c, tests/crq_apis.c,
+	tests/cve-2008-4989.c, tests/cve-2009-1415.c, tests/dhepskself.c,
+	tests/dn2.c, tests/finished.c, tests/hostname-check.c,
+	tests/mini-eagain.c, tests/mini.c, tests/nul-in-x509-names.c,
+	tests/openpgpself.c, tests/oprfi.c, tests/pkcs12_encode.c,
+	tests/pkcs12_s2k.c, tests/pkcs12_s2k_pem.c, tests/pskself.c,
+	tests/resume.c, tests/tlsia.c, tests/x509_altname.c,
+	tests/x509dn.c, tests/x509self.c, tests/x509sign-verify.c,
+	tests/x509signself.c: Indent code.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/ex-cert-select.c, src/cli.c: Fix API name change.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/manpages/Makefile.am, lib/ext_signature.c,
+	lib/includes/gnutls/gnutls.h.in, lib/libgnutls.map: Fix NEWS blurb.
+	Shorten new API name.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_signature.c: Doc fix, add Since tag.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_signature.c: Indent code.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/inet_ntop.m4, gl/m4/inet_pton.m4: Fix compile error.  Tiny patch by Brad Hards <bradh@frogmouth.net> in
+
+	<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3943>.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_signature.c: Fix compile errors.  Tiny patch from Brad Hards <bradh@frogmouth.net> in
+
+	<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3942>.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* lib/auth_cert.c: Fix compile errors.  Tiny patch from Brad Hards <bradh@frogmouth.net> in
+
+	<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3941>.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/stdlib_h.m4, gl/stdlib.in.h,
+	gl/tests/test-getaddrinfo.c, lib/gl/Makefile.am,
+	lib/gl/m4/stdlib_h.m4, lib/gl/stdlib.in.h: Update gnulib files.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* lib/po/vi.po.in: Sync with TP.
+
+2009-11-03  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/Makefile.am, src/Makefile.am, tests/Makefile.am: Use
+	INET_NTOP_LIB and INET_PTON_LIB.
+
+2009-11-03  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/pmccabe2html, build-aux/useless-if-before-free,
+	gl/m4/fseeko.m4, gl/m4/gnulib-comp.m4, gl/m4/inet_ntop.m4,
+	gl/m4/inet_pton.m4, gl/m4/pmccabe2html.m4, gl/m4/ungetc.m4,
+	gl/sockets.c, gl/stdio.in.h, gl/sys_stat.in.h,
+	gl/tests/test-arpa_inet.c, gl/tests/test-getaddrinfo.c,
+	gl/tests/test-getdelim.c, gl/tests/test-getline.c,
+	gl/tests/test-gettimeofday.c, gl/tests/test-memchr.c,
+	gl/tests/test-netinet_in.c, gl/tests/test-select-stdin.c,
+	gl/tests/test-select.c, gl/tests/test-sockets.c,
+	gl/tests/test-stddef.c, gl/tests/test-stdint.c,
+	gl/tests/test-stdio.c, gl/tests/test-stdlib.c,
+	gl/tests/test-strerror.c, gl/tests/test-string.c,
+	gl/tests/test-sys_select.c, gl/tests/test-sys_socket.c,
+	gl/tests/test-sys_stat.c, gl/tests/test-sys_time.c,
+	gl/tests/test-time.c, gl/tests/test-unistd.c,
+	gl/tests/test-version-etc.c, gl/tests/test-wchar.c,
+	lib/gl/m4/fseeko.m4, lib/gl/m4/ungetc.m4, lib/gl/sockets.c,
+	lib/gl/stdio.in.h, lib/gl/sys_stat.in.h,
+	lib/gl/tests/test-memchr.c, lib/gl/tests/test-sockets.c,
+	lib/gl/tests/test-stddef.c, lib/gl/tests/test-stdint.c,
+	lib/gl/tests/test-stdio.c, lib/gl/tests/test-stdlib.c,
+	lib/gl/tests/test-string.c, lib/gl/tests/test-strverscmp.c,
+	lib/gl/tests/test-sys_socket.c, lib/gl/tests/test-sys_stat.c,
+	lib/gl/tests/test-time.c, lib/gl/tests/test-unistd.c,
+	lib/gl/tests/test-wchar.c, libextra/gl/md5.c, maint.mk: Update
+	gnulib files.
+
+2009-11-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-11-02  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chainverify.c: Fix time bomb in chainverify self-test.  Reported by Andreas Metzler <ametzler@downhill.at.eu.org> in
+
+	<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3925>.
+
+2009-11-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: Documented change for certificate retrieval callbacks.
+
+2009-11-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/cli.c: do not use gnutls_x509_crt_get_signature_algorithm() on
+	null certificates.
+
+2009-11-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/auth_cert.c: Do not check signature algorithms for certificate
+	selection when using openpgp certificates.
+
+2009-11-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/manpages/gnutls-cli.1: Avoid code duplication by using all the
+	functions defined in gnutls_algorithms to map from TLS 1.2 signature
+	algorithm numbers to gnutls signature algorithms.  Added minimal documentation for SIGN-* in gnutls-cli priority
+	strings.  Corrected bug in signature algorithm extension generation.
+
+2009-11-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/auth_cert.c, lib/auth_dhe.c, lib/ext_signature.c,
+	lib/ext_signature.h, lib/gnutls_algorithms.c,
+	lib/gnutls_algorithms.h, lib/gnutls_int.h, lib/gnutls_sig.c: Avoid
+	code duplication by using all the functions defined in
+	gnutls_algorithms to map from TLS 1.2 signature algorithm numbers to
+	gnutls signature algorithms.  Added minimal documentation for SIGN-* in gnutls-cli priority
+	strings.  Corrected bug in signature algorithm extension generation.
+
+2009-11-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/auth_cert.c, lib/auth_dhe.c, lib/auth_rsa_export.c,
+	lib/auth_srp_rsa.c, lib/gnutls_sig.c, lib/gnutls_sig.h: Rationalized
+	function names for signature generation and verification during
+	handshake.  _gnutls_tls_sign_hdata ->
+	_gnutls_handshake_sign_cert_vrfy _gnutls_verify_sig_hdata ->
+	_gnutls_handshake_verify_cert_vrfy _gnutls_tls_sign_params ->
+	_gnutls_handshake_sign_data _gnutls_verify_sig_params ->
+	_gnutls_handshake_verify_data
+
+2009-11-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/ext_signature.c: Do not output error if a server replies with
+	a SignatureAlgorithms extension.
+
+2009-11-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/dn2.c, tests/pathlen/ca-no-pathlen.pem: RSA_SHA -> RSA_SHA1
+
+2009-11-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: Documented memory leak fix.
+
+2009-11-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, doc/examples/ex-cert-select.c, doc/gnutls.texi,
+	lib/auth_cert.c, lib/ext_cert_type.c, lib/ext_cert_type.h,
+	lib/ext_signature.c, lib/ext_signature.h, lib/gnutls_alert.c,
+	lib/gnutls_sig.c, lib/gnutls_state.c, lib/gnutls_state.h,
+	lib/includes/gnutls/gnutls.h.in, lib/libgnutls.map, src/cli.c: Final
+	touch on signature algorithms in TLS 1.2 support. Added function
+	gnutls_session_sign_algorithm_get_requested() for callbacks to be
+	able to verify they return a correct certificate as well as
+	documentation for its usage.
+
+2009-11-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/Makefile.am, lib/auth_cert.c, lib/auth_cert.h,
+	lib/ext_signature.c, lib/ext_signature.h, lib/gnutls_algorithms.c,
+	lib/gnutls_algorithms.h, lib/gnutls_cert.c, lib/gnutls_cert.h,
+	lib/gnutls_errors.c, lib/gnutls_extensions.c,
+	lib/gnutls_handshake.c, lib/gnutls_int.h, lib/gnutls_priority.c,
+	lib/gnutls_sig.c, lib/gnutls_sig.h, lib/gnutls_state.c,
+	lib/gnutls_state.h, lib/gnutls_x509.c,
+	lib/includes/gnutls/gnutls.h.in, lib/openpgp/gnutls_openpgp.c: 
+	Improved TLS 1.2 support. Added support for the SignatureAlgorithm
+	extension as well for the SignatureAlgorithm in certificate request.  Limitation for TLS 1.2 clients:  Only SHA1 or SHA256 are supported for generating signatures in
+	certificate verify message. That is to avoid storing all handshake
+	messages in memory. To be reconsidered in the future.
+
+2009-11-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_global.c: fixes in order to compile with -Werror
+
+2009-10-31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/ext_cert_type.c, lib/gnutls_cipher.c: remove unnessesary
+	warning.
+
+2009-10-31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/ext_cert_type.c: correctly check extension size.
+
+2009-10-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_handshake.c: When resuming a session do not
+	overwrite the initial session data with resumed session data.
+	Discovered on discussion at help-gnutls with Sebastien Decugis.
+
+2009-10-26  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_cipher.c, lib/gnutls_handshake.c, src/certtool.c: Fix
+	code style so it compiles with gcc 4.4 with warnings.
+
+2009-10-26  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/sys_stat_h.m4, gl/sys_stat.in.h,
+	lib/gl/Makefile.am, lib/gl/m4/sys_stat_h.m4, lib/gl/sys_stat.in.h: 
+	Update gnulib files.
+
+2009-10-26  Simon Josefsson <simon@josefsson.org>
+
+	* .gitignore: Drop unknown mini-hfail.
+
+2009-10-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-10-25  Daiki Ueno <ueno@unixuser.org>
+
+	* lib/gnutls_handshake.c: Enable ClientHello to carry arbitrary
+	length extension data.
+
+2009-10-25  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/includes/gnutls/pkcs12.h, lib/pkix.asn, lib/pkix_asn1_tab.c,
+	lib/x509/pkcs12.c, lib/x509/pkcs12_bag.c, lib/x509/x509_int.h,
+	src/certtool.c: Added GNUTLS_BAG_SECRET that adds support for
+	storing a randomly generated key into a PKCS-12 structure. This is a
+	gnutls extension, since PKCS-12 does not specify what should be in
+	the secret bag. What we do is store the key as OCTET string and
+	specify an OID of the PKCS-9 random nonce.
+
+2009-10-25  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/x509/privkey_pkcs8.c: Corrected warnings in picky
+	compilers and rearanged code.
+
+2009-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/manpages/certtool.1, lib/cipher-libgcrypt.c,
+	lib/gnutls_algorithms.c, lib/includes/gnutls/gnutls.h.in,
+	lib/includes/gnutls/x509.h, lib/pkix.asn, lib/pkix_asn1_tab.c,
+	lib/x509/pkcs12_bag.c, lib/x509/privkey_pkcs8.c,
+	lib/x509/x509_int.h, src/certtool-gaa.c, src/certtool-gaa.h,
+	src/certtool.c, src/certtool.gaa: Added support for the AES family
+	of ciphers in the PKCS8 and 12 encryption options.
+
+2009-10-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitignore: Do not print auto-generated files.
+
+2009-10-23  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Add.
+
+2009-10-23  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutlsxx.cpp: Fix forgotten braces.  Reported by Jason Pettiss <jpettiss@yahoo.com>.
+
+2009-10-23  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutlsxx.cpp: Indent code.
+
+2009-10-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_buffers.c, lib/gnutls_buffers.h, lib/gnutls_cipher.c,
+	lib/gnutls_handshake.c, lib/gnutls_handshake.h,
+	lib/gnutls_hash_int.c, lib/gnutls_hash_int.h, lib/gnutls_int.h,
+	lib/gnutls_sig.c, lib/gnutls_state.c: 1. Fix for memory leaks on interrupted handshake.  2. Fixes issue where a TLS 1.2 client will wrongly calculate hashes
+	if the server will select a different than 1.2 protocol.  3. In TLS 1.2 when a certificate request is sent, support is not
+	complete. In that case abort the handshake. By checking TLS 1.2 it
+	seems that the algorithms to be used for the signature in the
+	certificate verify message are negotiated not at the client/server
+	hello messages but rather selected by the server at the certificate
+	request. This might not look as bad, but since in this message we
+	have to sign all previous handshake messages, it forces us to keep
+	all the handshake messages into a buffer until this point... I don't
+	know who proposed this change to the TLS WG, but it seems it wasn't
+	really thought of.
+
+2009-10-20  Simon Josefsson <simon@josefsson.org>
+
+	* tests/chainverify.c: Fix expired cert.
+
+2009-10-16  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: Make sure we use libgcrypt correctly.
+
+2009-10-15  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/time_h.m4: Update gnulib files.
+
+2009-10-15  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-comp.m4, gl/m4/sys_stat_h.m4,
+	gl/sys_stat.in.h, gl/tests/Makefile.am, gl/tests/test-sys_stat.c,
+	gl/tests/test-time.c, gl/time.in.h, gl/unistd.in.h,
+	lib/gl/Makefile.am, lib/gl/m4/gnulib-comp.m4,
+	lib/gl/m4/sys_stat_h.m4, lib/gl/sys_stat.in.h,
+	lib/gl/tests/test-sys_stat.c, lib/gl/unistd.in.h: Update gnulib
+	files.
+
+2009-10-15  Simon Josefsson <simon@josefsson.org>
+
+	* lib/libgnutlsxx.map: Export C++ symbol visibility.  Tiny patch from Boyan Kasarov <bkasarov@gmail.com>.
+
+2009-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/pkix_asn1_tab.c: Regenerate.
+
+2009-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs12_encode.c: Fix MAC password.
+
+2009-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs12_encode.c: Use better friendly names.
+
+2009-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/pkcs12_encode.c: Add self test to test
+	PKCS#12 functions.
+
+2009-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/pkix.asn: Work around 'Cannot find OID: 1.2.840.113549.1.9.21'
+	PKCS#12 problem.  Reported by Michael Welsh Duggan <mwd@cert.org> in
+	<http://permalink.gmane.org/gmane.network.gnutls.general/1786>.
+
+2009-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Mention that sometimes CA certs needs to be
+	included in PKCS#12 files.  Reported by Ivars Suba <Ivars.Suba@bank.lv>.
+
+2009-10-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_priority.c: After setting priorities using new API,
+	update current TLS version.
+
+2009-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-10-06  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-10-06  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.9.7.
