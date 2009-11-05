@@ -38,6 +38,9 @@ Reported by Andreas Metzler <ametzler@downhill.at.eu.org> in
 
 ** tests: Fix expired cert in chainverify self-test.
 
+** i18n: Vietnamese translation updated.
+Thanks to Clytie Siddall.
+
 ** API and ABI modifications:
 No changes since last version.
 
