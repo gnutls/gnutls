@@ -284,28 +284,29 @@ _gnutls_session_sign_algo_enabled (gnutls_session_t session,
 }
 
 /**
-  * gnutls_session_sign_algorithm_get - get signature algorithms requested by peer
-  * @session: is a #gnutls_session_t structure.
-  * @indx: is an index of the signature algorithm to return
-  * @algo: the returned certificate type will be stored there
-  *
-  * Returns the signature algorithm specified by index that was
-  * requested by the peer. If the specified index has no data
-  * available this function returns
-  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.  If the negotiated TLS
-  * version does not support signature algorithms then
-  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned even for
-  * the first index.
-  *
-  * This function is usefull in the certificate callback functions
-  * to assist in selecting the correct certificate.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
-  *   an error code is returned.
-  **/
+ * gnutls_session_sign_algorithm_get - get signature algorithms requested by peer
+ * @session: is a #gnutls_session_t structure.
+ * @indx: is an index of the signature algorithm to return
+ * @algo: the returned certificate type will be stored there
+ *
+ * Returns the signature algorithm specified by index that was
+ * requested by the peer. If the specified index has no data available
+ * this function returns %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.  If
+ * the negotiated TLS version does not support signature algorithms
+ * then %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned even
+ * for the first index.  The first index is 0.
+ *
+ * This function is usefull in the certificate callback functions
+ * to assist in selecting the correct certificate.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ *
+ * Since: 2.10.0
+ **/
 int
 gnutls_session_sign_algorithm_get_requested (gnutls_session_t session,
-					     int indx,
+					     size_t indx,
 					     gnutls_sign_algorithm_t * algo)
 {
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
