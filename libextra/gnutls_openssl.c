@@ -887,9 +887,10 @@ X509_get_issuer_name (const X509 * cert)
 char *
 X509_NAME_oneline (gnutls_x509_dn * name, char *buf, int len)
 {
-  memset (buf, 0, len);
+  /* XXX openssl allocates buffer if buf == NULL */
   if (!buf)
     return NULL;
+  memset (buf, 0, len);
 
   snprintf (buf, len - 1,
 	    "C=%s, ST=%s, L=%s, O=%s, OU=%s, CN=%s/Email=%s",

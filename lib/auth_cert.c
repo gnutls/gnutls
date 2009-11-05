@@ -1895,7 +1895,7 @@ _gnutls_server_select_cert (gnutls_session_t session,
 			    gnutls_pk_algorithm_t requested_algo)
 {
   unsigned i;
-  int idx, ret;
+  int idx;
   gnutls_certificate_credentials_t cred;
 
   cred = (gnutls_certificate_credentials_t)
@@ -1914,7 +1914,6 @@ _gnutls_server_select_cert (gnutls_session_t session,
 
   /* Otherwise... */
 
-  ret = 0;
   idx = -1;			/* default is use no certificate */
 
 
@@ -1949,7 +1948,7 @@ _gnutls_server_select_cert (gnutls_session_t session,
   /* store the certificate pointer for future use, in the handshake.
    * (This will allow not calling this callback again.)
    */
-  if (idx >= 0 && ret == 0)
+  if (idx >= 0)
     {
       _gnutls_selected_certs_set (session,
 				  &cred->cert_list[idx][0],
@@ -1958,9 +1957,9 @@ _gnutls_server_select_cert (gnutls_session_t session,
     }
   else
     /* Certificate does not support REQUESTED_ALGO.  */
-    ret = GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+    return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
 
-  return ret;
+  return 0;
 }
 
 /* Frees the rsa_info_st structure.

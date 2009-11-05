@@ -500,7 +500,10 @@ peer_print_info (gnutls_session_t session, int *ret_length,
 
   http_buffer = malloc (len);
   if (http_buffer == NULL)
-    return NULL;
+    {
+      free(crtinfo);
+      return NULL;
+    }
 
   strcpy (http_buffer, HTTP_BEGIN);
 
@@ -617,6 +620,7 @@ peer_print_info (gnutls_session_t session, int *ret_length,
       strcat (http_buffer, "<hr><PRE>");
       strcat (http_buffer, crtinfo);
       strcat (http_buffer, "\n</PRE>\n");
+      free(crtinfo);
     }
 
   strcat (http_buffer, "<hr><P>Your HTTP header was:<PRE>");

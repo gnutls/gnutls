@@ -72,7 +72,7 @@ cfg_get_context(options)
 	for (i = 0; i < CFG_N_PROPS; i++) {
 		con->prop[i] = PLATON_FUNC(strdyn_create_ar)(cfg_default_properties[i]);
 		if (con->prop[i] == NULL) {
-			/* TODO: possible freeing on failure */
+			cfg_free_context(con);
 			return NULL;
 		}
 	}
