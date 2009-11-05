@@ -316,15 +316,19 @@ PLATON_FUNC(strdyn_explode_str)(str, sep)
 
 		s_size = strstr(s, sep) - s;
 
-		if ((ar[i] = (char*) malloc((s_size + 1) * sizeof(char))) == NULL)
+		if ((ar[i] = (char*) malloc((s_size + 1) * sizeof(char))) == NULL) {
+			PLATON_FUNC(strdyn_free)(ar);
 			return NULL;
+		}
 
 		strncpy(ar[i], s, s_size);
 		ar[i][s_size] = '\0';
 	}
 
-	if ((ar[ar_size] = strdup(s)) == NULL)
+	if ((ar[ar_size] = strdup(s)) == NULL) {
+		PLATON_FUNC(strdyn_free)(ar);
 		return NULL;
+	}
 
 	ar[ar_size + 1] = NULL;
 

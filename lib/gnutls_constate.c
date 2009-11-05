@@ -431,7 +431,7 @@ _gnutls_connection_state_init (gnutls_session_t session)
 
 /* Setup the master secret 
  */
-  if ((ret = _gnutls_generate_master (session, 0), 0) < 0)
+  if ((ret = _gnutls_generate_master (session, 0)) < 0)
     {
       gnutls_assert ();
       return ret;

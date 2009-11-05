@@ -2175,7 +2175,6 @@ _verify_x509_mem (const void *cert, int cert_size)
   /* Verify using internal algorithm too. */
   {
     int verify_status;
-    int comma;
 
     ret = gnutls_x509_crt_list_verify (x509_cert_list, x509_ncerts,
 				       &x509_cert_list[x509_ncerts - 1], 1,
@@ -2192,28 +2191,22 @@ _verify_x509_mem (const void *cert, int cert_size)
     if (verify_status & GNUTLS_CERT_INVALID)
       {
 	fprintf (outfile, "Not verified");
-	comma = 1;
       }
     else
       {
 	fprintf (outfile, "Verified");
-	comma = 1;
       }
 
     if (verify_status & GNUTLS_CERT_SIGNER_NOT_CA)
       {
-	if (comma)
-	  fprintf (outfile, ", ");
+	fprintf (outfile, ", ");
 	fprintf (outfile, "Issuer is not a CA");
-	comma = 1;
       }
 
     if (verify_status & GNUTLS_CERT_INSECURE_ALGORITHM)
       {
-	if (comma)
-	  fprintf (outfile, ", ");
+	fprintf (outfile, ", ");
 	fprintf (outfile, "Insecure algorithm");
-	comma = 1;
       }
 
     fprintf (outfile, ".\n");
