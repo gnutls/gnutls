@@ -289,7 +289,7 @@ gnutls_dh_get_secret_bits (gnutls_session_t session)
 }
 
 static int
-mpi_buf2bits (gnutls_datum_t *mpi_buf)
+mpi_buf2bits (gnutls_datum_t * mpi_buf)
 {
   bigint_t mpi;
   int rc;

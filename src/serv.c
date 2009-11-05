@@ -1169,10 +1169,10 @@ main (int argc, char **argv)
 		    ctt = ctime (&tt);
 		    ctt[strlen (ctt) - 1] = 0;
 
-		    printf("\n* Accepted connection from %s on %s\n",
-			   human_addr ((struct sockaddr *)
-				       &client_address, calen, topbuf,
-				       sizeof (topbuf)), ctt);
+		    printf ("\n* Accepted connection from %s on %s\n",
+			    human_addr ((struct sockaddr *)
+					&client_address, calen, topbuf,
+					sizeof (topbuf)), ctt);
 		  }
 	      }
 	  }
@@ -1476,7 +1476,7 @@ gaa_parser (int argc, char **argv)
   parse_comp (info.comp, info.ncomp, comp_priority);
 }
 
-extern void serv_version(void);
+extern void serv_version (void);
 
 void
 serv_version (void)

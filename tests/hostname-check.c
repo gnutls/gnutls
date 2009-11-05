@@ -549,8 +549,7 @@ char pem9[] =
   "A1UdDgQWBBRMuQqb+h00437ey9IHFf6h2stokTALBgkqhkiG9w0BAQUDgYEAoh/S\n"
   "kF/JHG+SHcULrLAXI8VnRpRvD2J9Zkwo/7cQc2CuDqJHgoO7iQ3xFl75WzVLzu5e\n"
   "0K21i8w3s6xNG1jCTxx/xqw9JRhnN/AnEZssILZ4JCGmd0TnGuX2v0WEMoFnr42W\n"
-  "Jvc5MWtjxRWd4KCaHpYSy62Fy6fUhqzY9emkKyA=\n"
-  "-----END CERTIFICATE-----\n";
+  "Jvc5MWtjxRWd4KCaHpYSy62Fy6fUhqzY9emkKyA=\n" "-----END CERTIFICATE-----\n";
 
 /* Certificate with SAN and CN that match iff you truncate the SAN to
    the embedded NUL.
@@ -634,8 +633,7 @@ char pem10[] =
   "ODUiNAMP1F2rHHIVsdmJVhAS+30NGBKpCjjck89p/3WGnuNr65JsVRbVZYvXnF5L\n"
   "gsiSbIvmGKL4jGWqtusj7cuZ2/yLjh16Ocn1e39Ye+0BbDxA7OOpX8Q9y4EXA20t\n"
   "170AX8R58vurxg6iAYuhQnPelik+v9fZUafUmAd/8PTNAKHhrGwFrKuTG7BcLBOt\n"
-  "/yfcgJk0Zr3jMVTVtj/O1AijUihhXr0=\n"
-  "-----END CERTIFICATE-----\n";
+  "/yfcgJk0Zr3jMVTVtj/O1AijUihhXr0=\n" "-----END CERTIFICATE-----\n";
 
 #ifdef ENABLE_OPENPGP
 /* Check basic OpenPGP comparison too.
@@ -668,8 +666,7 @@ char pem11[] =
   "03G+ynCHf5pBAXHhfCNhA0lMv5h3eJECNElcCh0sYGmo19jOzbnlRSGKRqrflOtO\n"
   "YwhQXK9y/ohJBBgRAgAJBQJFyJ51AhsMAAoJEK5frT5dHRTYDDgAn2bLaS5n3Xy8\n"
   "Z/V2Me1st/9pqPfZAJ4+9YBnyjCq/0vosIoZabi+s92m7g==\n"
-  "=NkXV\n"
-  "-----END PGP PUBLIC KEY BLOCK-----\n";
+  "=NkXV\n" "-----END PGP PUBLIC KEY BLOCK-----\n";
 #endif
 
 void

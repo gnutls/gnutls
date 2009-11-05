@@ -61,10 +61,10 @@ static char pem[] =
   "96B6WWBo9mzgwSM1d8LDhrarZ7uQhm+kBAMyEXhmDnCPWhvExvxJzjEmOlxjThyP\n"
   "2yvIgfLyDfplRe+jUbsY7YNe08eEyoLRq1jwPuRWTaEx2gA7C6pq45747/HkJrtF\n"
   "ya3ULM/AJv6Nj6pobxzQ5rEkUGEwKavu7GMjLrSMnHrbVCiQrn1v6c7B9nSPA31L\n"
-  "/do1TDFI0vSl5+M=\n"
-  "-----END CERTIFICATE-----\n";
+  "/do1TDFI0vSl5+M=\n" "-----END CERTIFICATE-----\n";
 
-static const char *info = "subject `1.3.6.1.4.1.311.60.2.1.3=#13024445,1.3.6.1.4.1.311.60.2.1.1=#14084d75656e6368656e,2.5.4.15=#131256312e302c20436c6175736520352e286229,serialNumber=HRB 144261,C=DE,2.5.4.17=#14053830383037,ST=Bavaria,L=Muenchen,STREET=Frankfurter Ring 129,O=GMX GmbH,CN=www.gmx.de', issuer `C=US,O=VeriSign\\, Inc.,OU=VeriSign Trust Network,OU=Terms of use at https://www.verisign.com/rpa (c)06,CN=VeriSign Class 3 Extended Validation SSL SGC CA', RSA key 1024 bits, signed using RSA-SHA1, activated `2008-11-13 00:00:00 UTC', expires `2009-11-13 23:59:59 UTC', SHA-1 fingerprint `7ece297c45d5b17685224b4e929a30e91a9553cb'";
+static const char *info =
+  "subject `1.3.6.1.4.1.311.60.2.1.3=#13024445,1.3.6.1.4.1.311.60.2.1.1=#14084d75656e6368656e,2.5.4.15=#131256312e302c20436c6175736520352e286229,serialNumber=HRB 144261,C=DE,2.5.4.17=#14053830383037,ST=Bavaria,L=Muenchen,STREET=Frankfurter Ring 129,O=GMX GmbH,CN=www.gmx.de', issuer `C=US,O=VeriSign\\, Inc.,OU=VeriSign Trust Network,OU=Terms of use at https://www.verisign.com/rpa (c)06,CN=VeriSign Class 3 Extended Validation SSL SGC CA', RSA key 1024 bits, signed using RSA-SHA1, activated `2008-11-13 00:00:00 UTC', expires `2009-11-13 23:59:59 UTC', SHA-1 fingerprint `7ece297c45d5b17685224b4e929a30e91a9553cb'";
 
 void
 doit (void)
@@ -94,9 +94,7 @@ doit (void)
     success ("comparison ok\n");
   else
     fail ("comparison fail (%d/%d)\nexpect: %s\n   got: %.*s\n",
-	  out.size, strlen (info),
-	  info,
-	  out.size, out.data);
+	  out.size, strlen (info), info, out.size, out.data);
 
   gnutls_x509_crt_deinit (cert);
   gnutls_global_deinit ();

@@ -128,15 +128,15 @@ _gnutls_string_append_data (gnutls_string * dest, const void *data,
 
   if (dest->max_length >= tot_len)
     {
-      size_t unused = MEMSUB(dest->data, dest->allocd);
-      
-      if (dest->max_length - unused <= tot_len)
-        {
-          if (dest->length && dest->data)
-            memmove(dest->allocd, dest->data, dest->length);
+      size_t unused = MEMSUB (dest->data, dest->allocd);
 
-          dest->data = dest->allocd;
-        }
+      if (dest->max_length - unused <= tot_len)
+	{
+	  if (dest->length && dest->data)
+	    memmove (dest->allocd, dest->data, dest->length);
+
+	  dest->data = dest->allocd;
+	}
       memmove (&dest->data[dest->length], data, data_size);
       dest->length = tot_len;
 
@@ -144,7 +144,7 @@ _gnutls_string_append_data (gnutls_string * dest, const void *data,
     }
   else
     {
-      size_t unused = MEMSUB(dest->data, dest->allocd);
+      size_t unused = MEMSUB (dest->data, dest->allocd);
       size_t new_len =
 	MAX (data_size, MIN_CHUNK) + MAX (dest->max_length, MIN_CHUNK);
 
@@ -158,7 +158,7 @@ _gnutls_string_append_data (gnutls_string * dest, const void *data,
       dest->data = dest->allocd + unused;
 
       if (dest->length && dest->data)
-        memmove(dest->allocd, dest->data, dest->length);
+	memmove (dest->allocd, dest->data, dest->length);
       dest->data = dest->allocd;
 
       memcpy (&dest->data[dest->length], data, data_size);
@@ -173,19 +173,19 @@ _gnutls_string_resize (gnutls_string * dest, size_t new_size)
 {
   if (dest->max_length >= new_size)
     {
-      size_t unused = MEMSUB(dest->data, dest->allocd);
+      size_t unused = MEMSUB (dest->data, dest->allocd);
       if (dest->max_length - unused <= new_size)
-        {
-          if (dest->length && dest->data)
-            memmove(dest->allocd, dest->data, dest->length);
-          dest->data = dest->allocd;
-        }
+	{
+	  if (dest->length && dest->data)
+	    memmove (dest->allocd, dest->data, dest->length);
+	  dest->data = dest->allocd;
+	}
 
       return 0;
     }
   else
     {
-      size_t unused = MEMSUB(dest->data, dest->allocd);
+      size_t unused = MEMSUB (dest->data, dest->allocd);
       size_t alloc_len =
 	MAX (new_size, MIN_CHUNK) + MAX (dest->max_length, MIN_CHUNK);
 
@@ -199,7 +199,7 @@ _gnutls_string_resize (gnutls_string * dest, size_t new_size)
       dest->data = dest->allocd + unused;
 
       if (dest->length && dest->data)
-        memmove(dest->allocd, dest->data, dest->length);
+	memmove (dest->allocd, dest->data, dest->length);
       dest->data = dest->allocd;
 
       return 0;
@@ -209,7 +209,7 @@ _gnutls_string_resize (gnutls_string * dest, size_t new_size)
 int
 _gnutls_string_append_str (gnutls_string * dest, const char *src)
 {
-  return _gnutls_string_append_data (dest, src, strlen(src));
+  return _gnutls_string_append_data (dest, src, strlen (src));
 }
 
 /* returns data from a string in a constant buffer.
@@ -217,18 +217,19 @@ _gnutls_string_append_str (gnutls_string * dest, const char *src)
  * data are appended in the buffer.
  */
 void
-_gnutls_string_get_datum (gnutls_string * str, gnutls_datum_t *data,
-			    size_t req_size)
+_gnutls_string_get_datum (gnutls_string * str, gnutls_datum_t * data,
+			  size_t req_size)
 {
 
-  if (str->length == 0) {
+  if (str->length == 0)
+    {
       data->data = NULL;
       data->size = 0;
       return;
-  }
+    }
 
   if (req_size > str->length)
-      req_size = str->length;
+    req_size = str->length;
 
   data->data = str->data;
   data->size = req_size;
@@ -237,9 +238,10 @@ _gnutls_string_get_datum (gnutls_string * str, gnutls_datum_t *data,
   str->length -= req_size;
 
   /* if string becomes empty start from begining */
-  if (str->length == 0) {
+  if (str->length == 0)
+    {
       str->data = str->allocd;
-  }
+    }
 
   return;
 }
@@ -247,15 +249,14 @@ _gnutls_string_get_datum (gnutls_string * str, gnutls_datum_t *data,
 /* returns data from a string in a constant buffer.
  */
 void
-_gnutls_string_get_data (gnutls_string * str, void *data,
-			 size_t *req_size)
+_gnutls_string_get_data (gnutls_string * str, void *data, size_t * req_size)
 {
   gnutls_datum_t tdata;
 
-  _gnutls_string_get_datum( str, &tdata, *req_size);
+  _gnutls_string_get_datum (str, &tdata, *req_size);
 
   *req_size = tdata.size;
-  memcpy( data, tdata.data, tdata.size);
+  memcpy (data, tdata.data, tdata.size);
 
   return;
 }
@@ -368,8 +369,7 @@ _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
  */
 int
 _gnutls_hostname_compare (const char *certname,
-			  size_t certnamesize,
-			  const char *hostname)
+			  size_t certnamesize, const char *hostname)
 {
   /* find the first different character */
   for (; *certname && *hostname && toupper (*certname) == toupper (*hostname);

@@ -52,7 +52,7 @@ _decode_pkcs12_auth_safe (ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
   gnutls_datum_t auth_safe = { NULL, 0 };
   int len, result;
   char error_str[ASN1_MAX_ERROR_DESCRIPTION_SIZE];
-  
+
   len = sizeof (oid) - 1;
   result = asn1_read_value (pkcs12, "authSafe.contentType", oid, &len);
   if (result != ASN1_SUCCESS)
@@ -95,7 +95,7 @@ _decode_pkcs12_auth_safe (ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      _gnutls_x509_log("DER error: %s\n", error_str);
+      _gnutls_x509_log ("DER error: %s\n", error_str);
       result = _gnutls_asn2err (result);
       goto cleanup;
     }
@@ -233,11 +233,12 @@ gnutls_pkcs12_import (gnutls_pkcs12_t pkcs12,
       need_free = 1;
     }
 
-  result = asn1_der_decoding (&pkcs12->pkcs12, _data.data, _data.size, error_str);
+  result =
+    asn1_der_decoding (&pkcs12->pkcs12, _data.data, _data.size, error_str);
   if (result != ASN1_SUCCESS)
     {
       result = _gnutls_asn2err (result);
-      _gnutls_x509_log("DER error: %s\n", error_str);
+      _gnutls_x509_log ("DER error: %s\n", error_str);
       gnutls_assert ();
       goto cleanup;
     }
@@ -427,7 +428,8 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
 	  goto cleanup;
 	}
 
-      if (bag_type == GNUTLS_BAG_CERTIFICATE || bag_type == GNUTLS_BAG_CRL || bag_type == GNUTLS_BAG_SECRET)
+      if (bag_type == GNUTLS_BAG_CERTIFICATE || bag_type == GNUTLS_BAG_CRL
+	  || bag_type == GNUTLS_BAG_SECRET)
 	{
 	  gnutls_datum_t tmp = bag->element[i].data;
 

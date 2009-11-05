@@ -42,7 +42,8 @@
 
 #define MAC_SIZE 32
 
-struct ticket {
+struct ticket
+{
   opaque key_name[KEY_NAME_SIZE];
   opaque IV[IV_SIZE];
   opaque *encrypted_state;
@@ -51,7 +52,8 @@ struct ticket {
 };
 
 static int
-digest_ticket (const gnutls_datum_t *key, struct ticket *ticket, opaque *digest)
+digest_ticket (const gnutls_datum_t * key, struct ticket *ticket,
+	       opaque * digest)
 {
   digest_hd_st digest_hd;
   uint16_t length16;
@@ -85,8 +87,8 @@ decrypt_ticket (gnutls_session_t session, struct ticket *ticket)
   int ret;
 
   /* Check the integrity of ticket using HMAC-SHA-256. */
-  mac_secret.data = session->security_parameters.extensions.
-    session_ticket_key->mac_secret;
+  mac_secret.data =
+    session->security_parameters.extensions.session_ticket_key->mac_secret;
   mac_secret.size = MAC_SECRET_SIZE;
   ret = digest_ticket (&mac_secret, ticket, final);
   if (ret < 0)
@@ -102,12 +104,12 @@ decrypt_ticket (gnutls_session_t session, struct ticket *ticket)
     }
 
   /* Decrypt encrypted_state using 128-bit AES in CBC mode. */
-  key.data = session->security_parameters.extensions.
-    session_ticket_key->key;
+  key.data = session->security_parameters.extensions.session_ticket_key->key;
   key.size = KEY_SIZE;
   IV.data = ticket->IV;
   IV.size = IV_SIZE;
-  ret = _gnutls_cipher_init (&cipher_hd, GNUTLS_CIPHER_AES_128_CBC, &key, &IV);
+  ret =
+    _gnutls_cipher_init (&cipher_hd, GNUTLS_CIPHER_AES_128_CBC, &key, &IV);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -161,7 +163,8 @@ encrypt_ticket (gnutls_session_t session, struct ticket *ticket)
       return ret;
     }
   blocksize = _gnutls_cipher_get_block_size (GNUTLS_CIPHER_AES_128_CBC);
-  encrypted_state.size = ((state.size + blocksize - 1) / blocksize) * blocksize;
+  encrypted_state.size =
+    ((state.size + blocksize - 1) / blocksize) * blocksize;
   encrypted_state.data = gnutls_malloc (encrypted_state.size);
   if (!encrypted_state.data)
     {
@@ -178,7 +181,8 @@ encrypt_ticket (gnutls_session_t session, struct ticket *ticket)
   key.size = KEY_SIZE;
   IV.data = session->security_parameters.extensions.session_ticket_IV;
   IV.size = IV_SIZE;
-  ret = _gnutls_cipher_init (&cipher_hd, GNUTLS_CIPHER_AES_128_CBC, &key, &IV);
+  ret =
+    _gnutls_cipher_init (&cipher_hd, GNUTLS_CIPHER_AES_128_CBC, &key, &IV);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -199,14 +203,13 @@ encrypt_ticket (gnutls_session_t session, struct ticket *ticket)
   /* Fill the ticket structure to compute MAC. */
   memcpy (ticket->key_name,
 	  session->security_parameters.extensions.
-	  session_ticket_key->key_name,
-	  KEY_NAME_SIZE);
+	  session_ticket_key->key_name, KEY_NAME_SIZE);
   memcpy (ticket->IV, IV.data, IV.size);
   ticket->encrypted_state_len = encrypted_state.size;
   ticket->encrypted_state = encrypted_state.data;
 
-  mac_secret.data = session->security_parameters.extensions.
-    session_ticket_key->mac_secret;
+  mac_secret.data =
+    session->security_parameters.extensions.session_ticket_key->mac_secret;
   mac_secret.size = MAC_SECRET_SIZE;
   ret = digest_ticket (&mac_secret, ticket, ticket->mac);
   if (ret < 0)
@@ -246,11 +249,10 @@ _gnutls_session_ticket_recv_params (gnutls_session_t session,
       data += KEY_NAME_SIZE;
 
       /* If the key name of the ticket does not match the one that we
-	 hold, issue a new ticket. */
+         hold, issue a new ticket. */
       if (memcmp (ticket.key_name,
 		  session->security_parameters.extensions.
-		  session_ticket_key->key_name,
-		  KEY_NAME_SIZE))
+		  session_ticket_key->key_name, KEY_NAME_SIZE))
 	{
 	  session->internals.session_ticket_renew = 1;
 	  return 0;
@@ -360,11 +362,11 @@ _gnutls_session_ticket_send_params (gnutls_session_t session,
  * Since: 2.10.0
  **/
 int
-gnutls_session_ticket_key_generate (gnutls_datum_t *key)
+gnutls_session_ticket_key_generate (gnutls_datum_t * key)
 {
   int ret;
 
-  key->size = sizeof(struct gnutls_session_ticket_key_st);
+  key->size = sizeof (struct gnutls_session_ticket_key_st);
   key->data = gnutls_malloc (key->size);
   if (!key->data)
     {
@@ -424,12 +426,12 @@ gnutls_session_ticket_enable_client (gnutls_session_t session)
  **/
 int
 gnutls_session_ticket_enable_server (gnutls_session_t session,
-				     const gnutls_datum_t *key)
+				     const gnutls_datum_t * key)
 {
   int ret;
 
   if (!session || !key
-      || key->size != sizeof(struct gnutls_session_ticket_key_st))
+      || key->size != sizeof (struct gnutls_session_ticket_key_st))
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -445,7 +447,7 @@ gnutls_session_ticket_enable_server (gnutls_session_t session,
     }
 
   session->security_parameters.extensions.session_ticket_key =
-    (struct gnutls_session_ticket_key_st *)key->data;
+    (struct gnutls_session_ticket_key_st *) key->data;
   session->internals.session_ticket_enable = 1;
   return 0;
 }
@@ -489,9 +491,9 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
   if (again == 0)
     {
       /* XXX: Temporarily set write algorithms to be used.
-	 _gnutls_write_connection_state_init() does this job, but it also
-	 triggers encryption, while NewSessionTicket should not be
-	 encrypted in the record layer. */
+         _gnutls_write_connection_state_init() does this job, but it also
+         triggers encryption, while NewSessionTicket should not be
+         encrypted in the record layer. */
       SAVE_WRITE_SECURITY_PARAMETERS;
       ret = _gnutls_set_write_cipher (session,
 				      _gnutls_cipher_suite_get_cipher_algo
@@ -532,7 +534,7 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
 
       p = data;
       /* FIXME: ticket lifetime is fixed to 10 days, which should be
-	 customizable. */
+         customizable. */
       _gnutls_write_uint32 (864000, p);
       p += 4;
 
@@ -620,7 +622,7 @@ _gnutls_recv_new_session_ticket (gnutls_session_t session)
     }
   return 0;
 
- error:
+error:
   gnutls_free (data);
   return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
 }

@@ -308,7 +308,7 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 
   if (buf)
     {
-      _gnutls_string_get_data( &out_str, buf, sizeof_buf);
+      _gnutls_string_get_data (&out_str, buf, sizeof_buf);
       buf[*sizeof_buf] = 0;
     }
   else
@@ -997,7 +997,7 @@ gnutls_x509_dn_import (gnutls_x509_dn_t dn, const gnutls_datum_t * data)
   int result;
   char err[ASN1_MAX_ERROR_DESCRIPTION_SIZE];
 
-  result = asn1_der_decoding ((ASN1_TYPE *) &dn,
+  result = asn1_der_decoding ((ASN1_TYPE *) & dn,
 			      data->data, data->size, err);
   if (result != ASN1_SUCCESS)
     {
@@ -1022,7 +1022,7 @@ gnutls_x509_dn_import (gnutls_x509_dn_t dn, const gnutls_datum_t * data)
 void
 gnutls_x509_dn_deinit (gnutls_x509_dn_t dn)
 {
-  asn1_delete_structure ((ASN1_TYPE *) &dn);
+  asn1_delete_structure ((ASN1_TYPE *) & dn);
 }
 
 /**

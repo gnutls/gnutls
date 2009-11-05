@@ -202,7 +202,7 @@ deinit_internal_params (gnutls_session_t session)
   if (session->internals.params.free_rsa_params)
     gnutls_rsa_params_deinit (session->internals.params.rsa_params);
 
-  _gnutls_handshake_hash_buffers_clear(session);
+  _gnutls_handshake_hash_buffers_clear (session);
 
   memset (&session->internals.params, 0, sizeof (session->internals.params));
 }
@@ -239,7 +239,7 @@ _gnutls_handshake_internal_state_init (gnutls_session_t session)
 void
 _gnutls_handshake_internal_state_clear (gnutls_session_t session)
 {
-  _gnutls_handshake_internal_state_init(session);
+  _gnutls_handshake_internal_state_init (session);
 
   _gnutls_free_datum (&session->internals.recv_buffer);
 
@@ -913,7 +913,7 @@ _gnutls_PRF (gnutls_session_t session,
   memcpy (s_seed, label, label_size);
   memcpy (&s_seed[label_size], seed, seed_size);
 
-  if (_gnutls_version_has_selectable_prf(ver))
+  if (_gnutls_version_has_selectable_prf (ver))
     {
       result =
 	_gnutls_P_hash (GNUTLS_MAC_SHA256, secret, secret_size,
@@ -1339,7 +1339,8 @@ _gnutls_rsa_pms_set_version (gnutls_session_t session,
  **/
 void
 gnutls_handshake_set_post_client_hello_function (gnutls_session_t session,
-						 gnutls_handshake_post_client_hello_func func)
+						 gnutls_handshake_post_client_hello_func
+						 func)
 {
   session->internals.user_hello_func = func;
 }
@@ -1361,4 +1362,3 @@ gnutls_session_enable_compatibility_mode (gnutls_session_t session)
 {
   gnutls_record_disable_padding (session);
 }
-

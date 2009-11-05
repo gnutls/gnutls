@@ -121,7 +121,7 @@ _gnutls_hash_copy (digest_hd_st * dst, digest_hd_st * src)
 {
   int result;
 
-  memset(dst, 0, sizeof(*dst));
+  memset (dst, 0, sizeof (*dst));
   dst->algorithm = src->algorithm;
   dst->registered = src->registered;
   dst->active = 1;
@@ -167,9 +167,10 @@ _gnutls_hash_output (digest_hd_st * handle, void *digest)
 void
 _gnutls_hash_deinit (digest_hd_st * handle, void *digest)
 {
-  if (handle->active != 1) {
-    return;
-  }
+  if (handle->active != 1)
+    {
+      return;
+    }
 
   if (digest != NULL)
     _gnutls_hash_output (handle, digest);
@@ -334,9 +335,10 @@ _gnutls_hmac_output (digest_hd_st * handle, void *digest)
 void
 _gnutls_hmac_deinit (digest_hd_st * handle, void *digest)
 {
-  if (handle->active != 1) {
-    return;
-  }
+  if (handle->active != 1)
+    {
+      return;
+    }
 
   if (digest)
     _gnutls_hmac_output (handle, digest);

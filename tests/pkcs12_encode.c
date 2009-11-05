@@ -45,8 +45,7 @@ static char client_pem[] =
   "+62SbuYGpFYsouHAUyfI8pUwCwYJKoZIhvcNAQEFA4GBALujmBJVZnvaTXr9cFRJ\n"
   "jpfc/3X7sLUsMvumcDE01ls/cG5mIatmiyEU9qI3jbgUf82z23ON/acwJf875D3/\n"
   "U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
-  "dc8Siq5JojruiMizAf0pA7in\n"
-  "-----END CERTIFICATE-----\n";
+  "dc8Siq5JojruiMizAf0pA7in\n" "-----END CERTIFICATE-----\n";
 const gnutls_datum_t client_dat = { client_pem, sizeof (client_pem) };
 
 static char ca_pem[] =
@@ -61,8 +60,7 @@ static char ca_pem[] =
   "Viyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAiaIRqGfp1jPpNeVhABK60SU0KIAy\n"
   "njuu7kHq5peUgYn8Jd9zNzExBOEp1VOipGsf6G66oQAhDFp2o8zkz7ZH71zR4HEW\n"
   "KoX6n5Emn6DvcEH/9pAhnGxNHJAoS7czTKv/JDZJhkqHxyrE1fuLsg5Qv25DTw7+\n"
-  "PfqUpIhz5Bbm7J4=\n"
-  "-----END CERTIFICATE-----\n";
+  "PfqUpIhz5Bbm7J4=\n" "-----END CERTIFICATE-----\n";
 const gnutls_datum_t ca_dat = { ca_pem, sizeof (ca_pem) };
 
 int

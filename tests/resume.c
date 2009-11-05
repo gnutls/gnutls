@@ -58,16 +58,15 @@ struct params_res
   int expect_resume;
 };
 
-struct params_res resume_tests[] =
-  {
-    {"try to resume from db", 50, 0, 0, 1},
+struct params_res resume_tests[] = {
+  {"try to resume from db", 50, 0, 0, 1},
 #ifdef ENABLE_SESSION_TICKET
-    {"try to resume from session ticket", 0, 1, 1, 1},
-    {"try to resume from session ticket (server only)", 0, 1, 0, 0},
-    {"try to resume from session ticket (client only)", 0, 0, 1, 0},
+  {"try to resume from session ticket", 0, 1, 1, 1},
+  {"try to resume from session ticket (server only)", 0, 1, 0, 0},
+  {"try to resume from session ticket (client only)", 0, 0, 1, 0},
 #endif
-    {NULL, -1}
-  };
+  {NULL, -1}
+};
 
 /* A very basic TLS client, with anonymous authentication.
  */
@@ -256,7 +255,7 @@ static gnutls_dh_params_t dh_params;
 static int
 generate_dh_params (void)
 {
-  const gnutls_datum_t p3 = { (char*) pkcs3, strlen (pkcs3) };
+  const gnutls_datum_t p3 = { (char *) pkcs3, strlen (pkcs3) };
   /* Generate Diffie-Hellman parameters - for use with DHE
    * kx algorithms. These should be discarded and regenerated
    * once a day, once a week or once a month. Depending on the
@@ -294,7 +293,8 @@ global_start (void)
   sa_serv.sin_addr.s_addr = INADDR_ANY;
   sa_serv.sin_port = htons (PORT);	/* Server Port number */
 
-  setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *) &optval, sizeof (int));
+  setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *) &optval,
+	      sizeof (int));
 
   err = bind (listen_sd, (SA *) & sa_serv, sizeof (sa_serv));
   if (err == -1)

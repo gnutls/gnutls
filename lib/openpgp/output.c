@@ -520,7 +520,8 @@ gnutls_openpgp_crt_print (gnutls_openpgp_crt_t cert,
     print_oneline (&str, cert);
   else
     {
-      _gnutls_string_append_str (&str, _("OpenPGP Certificate Information:\n"));
+      _gnutls_string_append_str (&str,
+				 _("OpenPGP Certificate Information:\n"));
       print_cert (&str, cert);
     }
 

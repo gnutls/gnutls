@@ -65,8 +65,7 @@ static char pem1_cert[] =
   "+62SbuYGpFYsouHAUyfI8pUwCwYJKoZIhvcNAQEFA4GBALujmBJVZnvaTXr9cFRJ\n"
   "jpfc/3X7sLUsMvumcDE01ls/cG5mIatmiyEU9qI3jbgUf82z23ON/acwJf875D3/\n"
   "U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
-  "dc8Siq5JojruiMizAf0pA7in\n"
-  "-----END CERTIFICATE-----\n";
+  "dc8Siq5JojruiMizAf0pA7in\n" "-----END CERTIFICATE-----\n";
 
 static char pem1_key[] =
   "-----BEGIN RSA PRIVATE KEY-----\n"
@@ -105,8 +104,7 @@ static char pem2_cert[] =
   "HPutkm7mBqRWLKLhwFMnyPKVMAsGCSqGSIb3DQEBBQOBgQBCsrnfD1xzh8/Eih1f\n"
   "x+M0lPoX1Re5L2ElHI6DJpHYOBPwf9glwxnet2+avzgUQDUFwUSxOhodpyeaACXD\n"
   "o0gGVpcH8sOBTQ+aTdM37hGkPxoXjtIkR/LgG5nP2H2JRd5TkW8l13JdM4MJFB4W\n"
-  "QcDzQ8REwidsfh9uKAluk1c/KQ==\n"
-  "-----END CERTIFICATE-----\n";
+  "QcDzQ8REwidsfh9uKAluk1c/KQ==\n" "-----END CERTIFICATE-----\n";
 
 static char pem2_key[] =
   "-----BEGIN DSA PRIVATE KEY-----\n"
@@ -119,17 +117,18 @@ static char pem2_key[] =
   "jsY+OpcCgYAPiodX8tHC3KzfS4sPi7op9+ED5FX6spgH1v0SsYC89bq0UNR/oA5D\n"
   "55/JeBFf5eQMLGtqpDXcvVTlYDaaMdGKWW5rHLq9LrrrfIfv2sjdoeukg+aLrfr6\n"
   "jlvXN8gyPpbCPvRD2n2RAg+3vPjvj/dBAF6W3w8IltzqsukGgq/SLwIUS5/r/2ya\n"
-  "AoNBXjeBjgCGMei2m8E=\n"
-  "-----END DSA PRIVATE KEY-----\n";
+  "AoNBXjeBjgCGMei2m8E=\n" "-----END DSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t cert_dat[] = {
-  { pem1_cert, sizeof (pem1_cert) },
-  { pem2_cert, sizeof (pem2_cert) }
+  {pem1_cert, sizeof (pem1_cert)}
+  ,
+  {pem2_cert, sizeof (pem2_cert)}
 };
 
 const gnutls_datum_t key_dat[] = {
-  { pem1_key, sizeof (pem1_key) },
-  { pem2_key, sizeof (pem2_key) }
+  {pem1_key, sizeof (pem1_key)}
+  ,
+  {pem2_key, sizeof (pem2_key)}
 };
 
 void
@@ -154,7 +153,8 @@ doit (void)
       if (ret < 0)
 	fail ("gnutls_x509_privkey_init\n");
 
-      ret = gnutls_x509_privkey_import (key, &key_dat[i], GNUTLS_X509_FMT_PEM);
+      ret =
+	gnutls_x509_privkey_import (key, &key_dat[i], GNUTLS_X509_FMT_PEM);
       if (ret < 0)
 	fail ("gnutls_x509_privkey_import\n");
 
@@ -174,7 +174,8 @@ doit (void)
       signature.data = _signature;
       signature.size = _signature_size;
 
-      ret = gnutls_x509_crt_get_verify_algorithm (crt, &signature, &hash_algo);
+      ret =
+	gnutls_x509_crt_get_verify_algorithm (crt, &signature, &hash_algo);
       if (ret < 0 || hash_algo != GNUTLS_DIG_SHA1)
 	fail ("gnutls_x509_crt_get_verify_algorithm\n");
 

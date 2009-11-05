@@ -56,7 +56,8 @@ static unsigned char key_pem[] =
   "-----END RSA PRIVATE KEY-----\n";
 const gnutls_datum_t key = { key_pem, sizeof (key_pem) };
 
-void doit (void)
+void
+doit (void)
 {
   gnutls_x509_privkey_t pkey;
   gnutls_x509_crt_t crt;
@@ -169,7 +170,8 @@ void doit (void)
     fail ("gnutls_x509_crq_get_key_purpose_oid %d\n", ret);
 
   s = 0;
-  ret = gnutls_x509_crq_set_key_purpose_oid (crq, GNUTLS_KP_TLS_WWW_SERVER, 0);
+  ret =
+    gnutls_x509_crq_set_key_purpose_oid (crq, GNUTLS_KP_TLS_WWW_SERVER, 0);
   if (ret != 0)
     fail ("gnutls_x509_crq_set_key_purpose_oid %d\n", ret);
 
@@ -179,7 +181,8 @@ void doit (void)
     fail ("gnutls_x509_crq_get_key_purpose_oid %d\n", ret);
 
   s = 0;
-  ret = gnutls_x509_crq_set_key_purpose_oid (crq, GNUTLS_KP_TLS_WWW_CLIENT, 1);
+  ret =
+    gnutls_x509_crq_set_key_purpose_oid (crq, GNUTLS_KP_TLS_WWW_CLIENT, 1);
   if (ret != 0)
     fail ("gnutls_x509_crq_set_key_purpose_oid2 %d\n", ret);
 

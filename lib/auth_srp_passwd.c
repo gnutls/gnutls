@@ -346,8 +346,8 @@ _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
 	      /* Keep the last index in memory, so we can retrieve fake parameters (g,n)
 	       * when the user does not exist.
 	       */
-              /* XXX: last_idx will not be read as both if block branches return. */
-              last_idx = idx;
+	      /* XXX: last_idx will not be read as both if block branches return. */
+	      last_idx = idx;
 	      if (pwd_read_conf (cred->password_conf_file, entry, idx) == 0)
 		{
 		  return 0;

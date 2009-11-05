@@ -1056,7 +1056,7 @@ cdk_stream_write (cdk_stream_t s, const void *buf, size_t count)
 	  memcpy (s->cache.buf, old, s->cache.size);
 	  cdk_free (old);
 	  _cdk_log_debug ("stream: enlarge cache to %d octets\n",
-			  (int)s->cache.alloced);
+			  (int) s->cache.alloced);
 	}
       memcpy (s->cache.buf + s->cache.size, buf, count);
       s->cache.size += count;
@@ -1575,7 +1575,8 @@ _cdk_stream_set_blockmode (cdk_stream_t s, size_t nbytes)
 {
   assert (s);
 
-  _cdk_log_debug ("stream: activate block mode with blocksize %d\n", (int)nbytes);
+  _cdk_log_debug ("stream: activate block mode with blocksize %d\n",
+		  (int) nbytes);
   s->blkmode = nbytes;
   return 0;
 }

@@ -167,15 +167,15 @@ client (void)
   print_info (session);
 
   ret = gnutls_record_send (session, MSG, strlen (MSG));
-  
-  if (ret == strlen(MSG))
+
+  if (ret == strlen (MSG))
     {
       success ("client: sent record.\n");
     }
-  else 
+  else
     {
       fail ("client: failed to send record.\n");
-      gnutls_perror(ret);
+      gnutls_perror (ret);
       goto end;
     }
 
@@ -187,16 +187,16 @@ client (void)
     {
       success ("client: doing handshake!\n");
       ret = gnutls_handshake (session);
-      if (ret == 0) 
-        {
-          success ("client: handshake complete, reading again.\n");
-          ret = gnutls_record_recv (session, buffer, MAX_BUF);
-        }
+      if (ret == 0)
+	{
+	  success ("client: handshake complete, reading again.\n");
+	  ret = gnutls_record_recv (session, buffer, MAX_BUF);
+	}
       else
-        {
-          fail ("client: handshake failed.\n");
-        }
-  }
+	{
+	  fail ("client: handshake failed.\n");
+	}
+    }
 
   if (ret == 0)
     {
@@ -256,8 +256,8 @@ initialize_tls_session (void)
 
   /* request client certificate if any.
      Moved to later on to be able to test re-handshakes.
-  gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
-  */
+     gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
+   */
 
   gnutls_dh_set_prime_bits (session, DH_BITS);
 
@@ -269,7 +269,7 @@ static gnutls_dh_params_t dh_params;
 static int
 generate_dh_params (void)
 {
-  const gnutls_datum_t p3 = { (char*) pkcs3, strlen (pkcs3) };
+  const gnutls_datum_t p3 = { (char *) pkcs3, strlen (pkcs3) };
   /* Generate Diffie-Hellman parameters - for use with DHE
    * kx algorithms. These should be discarded and regenerated
    * once a day, once a week or once a month. Depending on the
@@ -349,7 +349,8 @@ server_start (void)
   sa_serv.sin_addr.s_addr = INADDR_ANY;
   sa_serv.sin_port = htons (PORT);	/* Server Port number */
 
-  setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *) &optval, sizeof (int));
+  setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *) &optval,
+	      sizeof (int));
 
   err = bind (listen_sd, (SA *) & sa_serv, sizeof (sa_serv));
   if (err == -1)
@@ -438,27 +439,28 @@ server (void)
 	}
       else if (ret > 0)
 	{
-          gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
+	  gnutls_certificate_server_set_request (session,
+						 GNUTLS_CERT_REQUEST);
 
-          success ("server: got data, forcing rehandshake.\n");
+	  success ("server: got data, forcing rehandshake.\n");
 
-          ret = gnutls_rehandshake(session);
-          if (ret < 0) 
-            {
-              fail ("server: rehandshake failed\n");
-              gnutls_perror(ret);
-              break;
-            }
-          
-          ret = gnutls_handshake(session);
-          if (ret < 0) 
-            {
-              fail ("server: (re)handshake failed\n");
-              gnutls_perror(ret);
-              break;
-            }
-            
-          success ("server: rehandshake complete.\n");
+	  ret = gnutls_rehandshake (session);
+	  if (ret < 0)
+	    {
+	      fail ("server: rehandshake failed\n");
+	      gnutls_perror (ret);
+	      break;
+	    }
+
+	  ret = gnutls_handshake (session);
+	  if (ret < 0)
+	    {
+	      fail ("server: (re)handshake failed\n");
+	      gnutls_perror (ret);
+	      break;
+	    }
+
+	  success ("server: rehandshake complete.\n");
 
 	  /* echo data back to the client
 	   */

@@ -274,7 +274,8 @@ calc_enc_length (gnutls_session_t session, int data_size,
       *pad = (uint8_t) (blocksize - (length % blocksize)) + rnd;
 
       length += *pad;
-      if (_gnutls_version_has_explicit_iv(session->security_parameters.version))
+      if (_gnutls_version_has_explicit_iv
+	  (session->security_parameters.version))
 	length += blocksize;	/* for the IV */
 
       break;
@@ -343,7 +344,7 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
 				write_sequence_number), 8);
 
       _gnutls_hmac (&td, &type, 1);
-      if (_gnutls_version_has_variable_padding(ver))
+      if (_gnutls_version_has_variable_padding (ver))
 	{			/* TLS 1.0 or higher */
 	  _gnutls_hmac (&td, &major, 1);
 	  _gnutls_hmac (&td, &minor, 1);
@@ -375,7 +376,7 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
 
   data_ptr = cipher_data;
   if (block_algo == CIPHER_BLOCK &&
-      _gnutls_version_has_explicit_iv(session->security_parameters.version))
+      _gnutls_version_has_explicit_iv (session->security_parameters.version))
     {
       /* copy the random IV.
        */
@@ -476,7 +477,8 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 				   ciphertext.size)) < 0)
 	{
 	  gnutls_assert ();
-	  DEINIT_MAC(td, ver, session->security_parameters.write_mac_algorithm);
+	  DEINIT_MAC (td, ver,
+		      session->security_parameters.write_mac_algorithm);
 
 
 	  return ret;
@@ -489,7 +491,8 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
       if ((ciphertext.size < blocksize) || (ciphertext.size % blocksize != 0))
 	{
 	  gnutls_assert ();
-	  DEINIT_MAC(td, ver, session->security_parameters.write_mac_algorithm);
+	  DEINIT_MAC (td, ver,
+		      session->security_parameters.write_mac_algorithm);
 	  return GNUTLS_E_DECRYPTION_FAILED;
 	}
 
@@ -499,13 +502,15 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 				   ciphertext.size)) < 0)
 	{
 	  gnutls_assert ();
-	  DEINIT_MAC(td, ver, session->security_parameters.write_mac_algorithm);
+	  DEINIT_MAC (td, ver,
+		      session->security_parameters.write_mac_algorithm);
 	  return ret;
 	}
 
       /* ignore the IV in TLS 1.1.
        */
-      if (_gnutls_version_has_explicit_iv(session->security_parameters.version))
+      if (_gnutls_version_has_explicit_iv
+	  (session->security_parameters.version))
 	{
 	  ciphertext.size -= blocksize;
 	  ciphertext.data += blocksize;
@@ -513,7 +518,8 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 	  if (ciphertext.size == 0)
 	    {
 	      gnutls_assert ();
-              DEINIT_MAC(td, ver, session->security_parameters.write_mac_algorithm);
+	      DEINIT_MAC (td, ver,
+			  session->security_parameters.write_mac_algorithm);
 	      return GNUTLS_E_DECRYPTION_FAILED;
 	    }
 	}
@@ -536,7 +542,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 
       /* Check the pading bytes (TLS 1.x)
        */
-      if (_gnutls_version_has_variable_padding(ver) && pad_failed == 0)
+      if (_gnutls_version_has_variable_padding (ver) && pad_failed == 0)
 	for (i = 2; i < pad; i++)
 	  {
 	    if (ciphertext.data[ciphertext.size - i] !=
@@ -546,7 +552,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
       break;
     default:
       gnutls_assert ();
-      DEINIT_MAC(td, ver, session->security_parameters.write_mac_algorithm);
+      DEINIT_MAC (td, ver, session->security_parameters.write_mac_algorithm);
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
@@ -564,7 +570,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 				read_sequence_number), 8);
 
       _gnutls_hmac (&td, &type, 1);
-      if (_gnutls_version_has_variable_padding(ver))
+      if (_gnutls_version_has_variable_padding (ver))
 	{			/* TLS 1.x */
 	  _gnutls_hmac (&td, &major, 1);
 	  _gnutls_hmac (&td, &minor, 1);

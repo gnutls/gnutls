@@ -758,6 +758,7 @@ free_session_record_port (SCM port)
 
   return 0;
 }
+
 #undef FUNC_NAME
 
 #endif /* SCM_MAJOR_VERSION == 1 && SCM_MINOR_VERSION <= 8 */
@@ -868,15 +869,13 @@ make_session_record_port (SCM session)
   unsigned char *c_port_buf;
   const unsigned long mode_bits = SCM_OPN | SCM_RDNG | SCM_WRTNG;
 
-  c_port_buf =
-    (unsigned char *)
+  c_port_buf = (unsigned char *)
 #ifdef HAVE_SCM_GC_MALLOC_POINTERLESS
     scm_gc_malloc_pointerless
 #else
     scm_gc_malloc
 #endif
-                  (SCM_GNUTLS_SESSION_RECORD_PORT_BUFFER_SIZE,
-		   session_record_port_gc_hint);
+    (SCM_GNUTLS_SESSION_RECORD_PORT_BUFFER_SIZE, session_record_port_gc_hint);
 
   /* Create a new port.  */
   port = scm_new_port_table_entry (session_record_port_type);
@@ -956,7 +955,8 @@ SCM_DEFINE (scm_gnutls_set_session_transport_fd_x,
   c_session = scm_to_gnutls_session (session, 1, FUNC_NAME);
   c_fd = (int) scm_to_uint (fd);
 
-  gnutls_transport_set_ptr (c_session, (gnutls_transport_ptr_t) (intptr_t) c_fd);
+  gnutls_transport_set_ptr (c_session,
+			    (gnutls_transport_ptr_t) (intptr_t) c_fd);
 
   SCM_GNUTLS_SET_SESSION_TRANSPORT_IS_FD (c_session, 1);
 

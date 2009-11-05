@@ -419,9 +419,9 @@ main (int argc, char **argv)
     }
 
   if (info.passwd == NULL)
-    info.passwd = (char*) KPASSWD;
+    info.passwd = (char *) KPASSWD;
   if (info.passwd_conf == NULL)
-    info.passwd_conf = (char*) KPASSWD_CONF;
+    info.passwd_conf = (char *) KPASSWD_CONF;
 
   if (info.username == NULL)
     {
@@ -710,7 +710,7 @@ read_conf_values (gnutls_datum_t * g, gnutls_datum_t * n, char *str)
   return index;
 }
 
-extern void srptool_version(void);
+extern void srptool_version (void);
 
 void
 srptool_version (void)

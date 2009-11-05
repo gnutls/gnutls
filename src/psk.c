@@ -92,7 +92,7 @@ main (int argc, char **argv)
     }
 
   if (info.passwd == NULL)
-    info.passwd = (char*) KPASSWD;
+    info.passwd = (char *) KPASSWD;
 
   if (info.username == NULL)
     {

@@ -459,8 +459,8 @@ gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t res,
  * Since: 2.4.0
  **/
 int
-gnutls_certificate_set_openpgp_key_file2 (gnutls_certificate_credentials_t res,
-					  const char *certfile,
+gnutls_certificate_set_openpgp_key_file2 (gnutls_certificate_credentials_t
+					  res, const char *certfile,
 					  const char *keyfile,
 					  const char *subkey_id,
 					  gnutls_openpgp_crt_fmt_t format)
@@ -566,8 +566,8 @@ gnutls_openpgp_count_key_names (const gnutls_datum_t * cert)
  *   negative error value.
  **/
 int
-gnutls_certificate_set_openpgp_keyring_file (gnutls_certificate_credentials_t c,
-					     const char *file,
+gnutls_certificate_set_openpgp_keyring_file (gnutls_certificate_credentials_t
+					     c, const char *file,
 					     gnutls_openpgp_crt_fmt_t format)
 {
   gnutls_datum_t ring;
@@ -613,8 +613,8 @@ gnutls_certificate_set_openpgp_keyring_file (gnutls_certificate_credentials_t c,
  *   negative error value.
  **/
 int
-gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t c,
-					    const opaque * data,
+gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t
+					    c, const opaque * data,
 					    size_t dlen,
 					    gnutls_openpgp_crt_fmt_t format)
 {
@@ -800,7 +800,7 @@ _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert, gnutls_openpgp_crt_t cert)
 
   memset (gcert, 0, sizeof (gnutls_cert));
   gcert->cert_type = GNUTLS_CRT_OPENPGP;
-  gcert->sign_algo = GNUTLS_SIGN_UNKNOWN; /* N/A here */
+  gcert->sign_algo = GNUTLS_SIGN_UNKNOWN;	/* N/A here */
 
   gcert->version = gnutls_openpgp_crt_get_version (cert);
   gcert->params_size = MAX_PUBLIC_PARAMS_SIZE;

@@ -791,9 +791,7 @@ gnutls_x509_crq_set_key (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
   result = _gnutls_x509_encode_and_copy_PKI_params
     (crq->crq,
      "certificationRequestInfo.subjectPKInfo",
-     key->pk_algorithm,
-     key->params,
-     key->params_size);
+     key->pk_algorithm, key->params, key->params_size);
 
   if (result < 0)
     {
@@ -923,9 +921,7 @@ gnutls_x509_crq_set_key_rsa_raw (gnutls_x509_crq_t crq,
   result = _gnutls_x509_encode_and_copy_PKI_params
     (crq->crq,
      "certificationRequestInfo.subjectPKInfo",
-     GNUTLS_PK_RSA,
-     temp_params,
-     RSA_PUBLIC_PARAMS);
+     GNUTLS_PK_RSA, temp_params, RSA_PUBLIC_PARAMS);
 
   if (result < 0)
     {
@@ -977,8 +973,7 @@ gnutls_x509_crq_set_challenge_password (gnutls_x509_crq_t crq,
 
   result = _gnutls_x509_encode_and_write_attribute
     ("1.2.840.113549.1.9.7", crq->crq,
-     "certificationRequestInfo.attributes.?LAST",
-     pass, strlen (pass), 1);
+     "certificationRequestInfo.attributes.?LAST", pass, strlen (pass), 1);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1400,7 +1395,7 @@ gnutls_x509_crq_get_extension_info (gnutls_x509_crq_t crq, int indx,
 
   result = 0;
 
- out:
+out:
   gnutls_free (extensions);
   return result;
 }
@@ -1652,8 +1647,7 @@ get_subject_alt_name (gnutls_x509_crq_t crq,
   /* Extract extension.
    */
   result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.17", 0,
-						 NULL, &dns_size,
-						 critical);
+						 NULL, &dns_size, critical);
   if (result < 0)
     {
       gnutls_assert ();
@@ -2093,8 +2087,7 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t crq,
   /* Extract extension.
    */
   result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.37", 0,
-						 NULL, &prev_size,
-						 critical);
+						 NULL, &prev_size, critical);
   prev.size = prev_size;
 
   if (result < 0)
@@ -2193,8 +2186,7 @@ gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t crq,
   /* Read existing extension, if there is one.
    */
   result = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.37", 0,
-						 NULL, &prev_size,
-						 &critical);
+						 NULL, &prev_size, &critical);
   prev.size = prev_size;
 
   switch (result)
@@ -2418,8 +2410,9 @@ gnutls_x509_crq_get_key_id (gnutls_x509_crq_t crq, unsigned int flags,
     }
 
   pubkey.size = 0;
-  result = asn1_der_coding (crq->crq, "certificationRequestInfo.subjectPKInfo",
-			    NULL, &pubkey.size, NULL);
+  result =
+    asn1_der_coding (crq->crq, "certificationRequestInfo.subjectPKInfo", NULL,
+		     &pubkey.size, NULL);
   if (result != ASN1_MEM_ERROR)
     {
       gnutls_assert ();
@@ -2433,8 +2426,9 @@ gnutls_x509_crq_get_key_id (gnutls_x509_crq_t crq, unsigned int flags,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  result = asn1_der_coding (crq->crq, "certificationRequestInfo.subjectPKInfo",
-			    pubkey.data, &pubkey.size, NULL);
+  result =
+    asn1_der_coding (crq->crq, "certificationRequestInfo.subjectPKInfo",
+		     pubkey.data, &pubkey.size, NULL);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();

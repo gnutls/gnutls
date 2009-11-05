@@ -200,11 +200,11 @@ _gnutls_openpgp_export (cdk_kbnode_t node,
       *output_data_size = calc_size;
 
       if (rc)
-        {
-          rc = _gnutls_map_cdk_rc (rc);
-          gnutls_assert ();
-          return rc;
-        }
+	{
+	  rc = _gnutls_map_cdk_rc (rc);
+	  gnutls_assert ();
+	  return rc;
+	}
     }
 
   return 0;
@@ -363,7 +363,7 @@ gnutls_openpgp_crt_get_name (gnutls_openpgp_crt_t key,
   if (buf)
     {
       memcpy (buf, uid->name, uid->len);
-      buf[uid->len] = '\0';		/* make sure it's a string */
+      buf[uid->len] = '\0';	/* make sure it's a string */
     }
   *sizeof_buf = uid->len + 1;
 

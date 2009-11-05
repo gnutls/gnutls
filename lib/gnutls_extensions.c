@@ -342,19 +342,19 @@ _gnutls_ext_init (void)
 
 #ifdef ENABLE_SESSION_TICKET
   ret = gnutls_ext_register (GNUTLS_EXTENSION_SESSION_TICKET,
-			      "SESSION_TICKET",
-			      GNUTLS_EXT_TLS,
-			      _gnutls_session_ticket_recv_params,
-			      _gnutls_session_ticket_send_params);
+			     "SESSION_TICKET",
+			     GNUTLS_EXT_TLS,
+			     _gnutls_session_ticket_recv_params,
+			     _gnutls_session_ticket_send_params);
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
 #endif
 
   ret = gnutls_ext_register (GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
-			      "SIGNATURE_ALGORITHMS",
-			      GNUTLS_EXT_TLS,
-			      _gnutls_signature_algorithm_recv_params,
-			      _gnutls_signature_algorithm_send_params);
+			     "SIGNATURE_ALGORITHMS",
+			     GNUTLS_EXT_TLS,
+			     _gnutls_signature_algorithm_recv_params,
+			     _gnutls_signature_algorithm_send_params);
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
 

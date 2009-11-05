@@ -152,8 +152,7 @@ print_x509_info (gnutls_session_t session, const char *hostname, int insecure)
     }
   else if (hostname_ok == 2)
     {
-      printf ("- The hostname in the certificate matches '%s'.\n",
-	      hostname);
+      printf ("- The hostname in the certificate matches '%s'.\n", hostname);
     }
 }
 
@@ -188,7 +187,8 @@ print_openpgp_info (gnutls_session_t session, const char *hostname,
       if (verbose)
 	ret = gnutls_openpgp_crt_print (crt, GNUTLS_CRT_PRINT_FULL, &cinfo);
       else
-	ret = gnutls_openpgp_crt_print (crt, GNUTLS_CRT_PRINT_ONELINE, &cinfo);
+	ret =
+	  gnutls_openpgp_crt_print (crt, GNUTLS_CRT_PRINT_ONELINE, &cinfo);
       if (ret == 0)
 	{
 	  printf (" - %s\n", cinfo.data);
@@ -235,8 +235,7 @@ print_openpgp_info (gnutls_session_t session, const char *hostname,
     }
   else if (hostname_ok == 2)
     {
-      printf ("- The hostname in the certificate matches '%s'.\n",
-	      hostname);
+      printf ("- The hostname in the certificate matches '%s'.\n", hostname);
     }
 }
 
@@ -273,7 +272,8 @@ print_cert_vrfy (gnutls_session_t session)
       if (status & GNUTLS_CERT_INSECURE_ALGORITHM)
 	printf ("- Peer's certificate chain uses insecure algorithm\n");
       if (status & GNUTLS_CERT_NOT_ACTIVATED)
-	printf ("- Peer's certificate chain uses not yet valid certificate\n");
+	printf
+	  ("- Peer's certificate chain uses not yet valid certificate\n");
       if (status & GNUTLS_CERT_EXPIRED)
 	printf ("- Peer's certificate chain uses expired certificate\n");
       if (status & GNUTLS_CERT_INVALID)

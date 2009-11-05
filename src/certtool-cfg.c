@@ -72,7 +72,7 @@ typedef struct _cfg_ctx
   int code_sign_key;
   int ocsp_sign_key;
   int time_stamping_key;
-  char** key_purpose_oids;
+  char **key_purpose_oids;
   int crl_next_update;
   int crl_number;
   int crq_extensions;
@@ -198,7 +198,8 @@ read_crt_set (gnutls_x509_crt_t crt, const char *input_str, const char *oid)
   int ret;
 
   fputs (input_str, stderr);
-  if (fgets (input, sizeof (input), stdin)==NULL) return;
+  if (fgets (input, sizeof (input), stdin) == NULL)
+    return;
 
   if (strlen (input) == 1)	/* only newline */
     return;
@@ -219,7 +220,8 @@ read_crq_set (gnutls_x509_crq_t crq, const char *input_str, const char *oid)
   int ret;
 
   fputs (input_str, stderr);
-  if (fgets (input, sizeof (input), stdin)==NULL) return;
+  if (fgets (input, sizeof (input), stdin) == NULL)
+    return;
 
   if (strlen (input) == 1)	/* only newline */
     return;
@@ -302,7 +304,8 @@ read_yesno (const char *input_str)
   char input[128];
 
   fputs (input_str, stderr);
-  if (fgets (input, sizeof (input), stdin)==NULL) return 0;
+  if (fgets (input, sizeof (input), stdin) == NULL)
+    return 0;
 
   if (strlen (input) == 1)	/* only newline */
     return 0;
@@ -597,13 +600,16 @@ get_key_purpose_set (gnutls_x509_crt_t crt)
     {
       if (!cfg.key_purpose_oids)
 	return;
-      for (i = 0; cfg.key_purpose_oids[i] != NULL; i ++)
+      for (i = 0; cfg.key_purpose_oids[i] != NULL; i++)
 	{
-	  ret = gnutls_x509_crt_set_key_purpose_oid (crt, cfg.key_purpose_oids[i], 0);
+	  ret =
+	    gnutls_x509_crt_set_key_purpose_oid (crt, cfg.key_purpose_oids[i],
+						 0);
 
 	  if (ret < 0)
 	    {
-	      fprintf (stderr, "set_key_purpose_oid (%s): %s\n",  cfg.key_purpose_oids[i], gnutls_strerror (ret));
+	      fprintf (stderr, "set_key_purpose_oid (%s): %s\n",
+		       cfg.key_purpose_oids[i], gnutls_strerror (ret));
 	      exit (1);
 	    }
 	}
@@ -986,7 +992,8 @@ get_dns_name_set (int type, void *crt)
 
       do
 	{
-	  p = read_str ("Enter a dnsName of the subject of the certificate: ");
+	  p =
+	    read_str ("Enter a dnsName of the subject of the certificate: ");
 	  if (!p)
 	    return;
 

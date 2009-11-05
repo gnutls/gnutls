@@ -182,90 +182,90 @@ _pkcs12_decode_crt_bag (gnutls_pkcs12_bag_type_t type,
   int ret;
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 
-  switch(type)
+  switch (type)
     {
-      case GNUTLS_BAG_CERTIFICATE:
-        if ((ret = asn1_create_element (_gnutls_get_pkix (),
+    case GNUTLS_BAG_CERTIFICATE:
+      if ((ret = asn1_create_element (_gnutls_get_pkix (),
 				      "PKIX1.pkcs-12-CertBag",
 				      &c2)) != ASN1_SUCCESS)
-	  {
-	    gnutls_assert ();
-	    ret = _gnutls_asn2err (ret);
-	    goto cleanup;
-	  }
+	{
+	  gnutls_assert ();
+	  ret = _gnutls_asn2err (ret);
+	  goto cleanup;
+	}
 
-        ret = asn1_der_decoding (&c2, in->data, in->size, NULL);
-        if (ret != ASN1_SUCCESS)
-  	  {
-	    gnutls_assert ();
-	    ret = _gnutls_asn2err (ret);
-	    goto cleanup;
-	  }
+      ret = asn1_der_decoding (&c2, in->data, in->size, NULL);
+      if (ret != ASN1_SUCCESS)
+	{
+	  gnutls_assert ();
+	  ret = _gnutls_asn2err (ret);
+	  goto cleanup;
+	}
 
-        ret = _gnutls_x509_read_value (c2, "certValue", out, 1);
-        if (ret < 0)
-	  {
-	    gnutls_assert ();
-	    goto cleanup;
-	  }
-        break;
+      ret = _gnutls_x509_read_value (c2, "certValue", out, 1);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  goto cleanup;
+	}
+      break;
 
-      case GNUTLS_BAG_CRL:
-        if ((ret = asn1_create_element (_gnutls_get_pkix (),
+    case GNUTLS_BAG_CRL:
+      if ((ret = asn1_create_element (_gnutls_get_pkix (),
 				      "PKIX1.pkcs-12-CRLBag",
 				      &c2)) != ASN1_SUCCESS)
-	  {
-	    gnutls_assert ();
-  	    ret = _gnutls_asn2err (ret);
-	    goto cleanup;
-	  }
+	{
+	  gnutls_assert ();
+	  ret = _gnutls_asn2err (ret);
+	  goto cleanup;
+	}
 
-        ret = asn1_der_decoding (&c2, in->data, in->size, NULL);
-        if (ret != ASN1_SUCCESS)
-	  {
-	    gnutls_assert ();
-	    ret = _gnutls_asn2err (ret);
-	    goto cleanup;
-	  }
+      ret = asn1_der_decoding (&c2, in->data, in->size, NULL);
+      if (ret != ASN1_SUCCESS)
+	{
+	  gnutls_assert ();
+	  ret = _gnutls_asn2err (ret);
+	  goto cleanup;
+	}
 
-        ret = _gnutls_x509_read_value (c2, "crlValue", out, 1);
-        if (ret < 0)
-	  {
-	    gnutls_assert ();
-	    goto cleanup;
-	  }
-        break;
+      ret = _gnutls_x509_read_value (c2, "crlValue", out, 1);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  goto cleanup;
+	}
+      break;
 
-      case GNUTLS_BAG_SECRET:
-        if ((ret = asn1_create_element (_gnutls_get_pkix (),
+    case GNUTLS_BAG_SECRET:
+      if ((ret = asn1_create_element (_gnutls_get_pkix (),
 				      "PKIX1.pkcs-12-SecretBag",
 				      &c2)) != ASN1_SUCCESS)
-	  {
-	    gnutls_assert ();
-	    ret = _gnutls_asn2err (ret);
-	    goto cleanup;
-	  }
+	{
+	  gnutls_assert ();
+	  ret = _gnutls_asn2err (ret);
+	  goto cleanup;
+	}
 
-        ret = asn1_der_decoding (&c2, in->data, in->size, NULL);
-        if (ret != ASN1_SUCCESS)
-	  {
-	    gnutls_assert ();
-	    ret = _gnutls_asn2err (ret);
-	    goto cleanup;
-	  }
+      ret = asn1_der_decoding (&c2, in->data, in->size, NULL);
+      if (ret != ASN1_SUCCESS)
+	{
+	  gnutls_assert ();
+	  ret = _gnutls_asn2err (ret);
+	  goto cleanup;
+	}
 
-        ret = _gnutls_x509_read_value (c2, "secretValue", out, 1);
-        if (ret < 0)
-	  {
-	    gnutls_assert ();
-	    goto cleanup;
-	  }
-        break;
-      
-      default:
-        gnutls_assert();
-        asn1_delete_structure (&c2);
-        return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+      ret = _gnutls_x509_read_value (c2, "secretValue", out, 1);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  goto cleanup;
+	}
+      break;
+
+    default:
+      gnutls_assert ();
+      asn1_delete_structure (&c2);
+      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
     }
 
   asn1_delete_structure (&c2);
@@ -287,90 +287,90 @@ _pkcs12_encode_crt_bag (gnutls_pkcs12_bag_type_t type,
   int ret;
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
 
-  switch(type)
+  switch (type)
     {
-      case GNUTLS_BAG_CERTIFICATE:
-        if ((ret = asn1_create_element (_gnutls_get_pkix (),
+    case GNUTLS_BAG_CERTIFICATE:
+      if ((ret = asn1_create_element (_gnutls_get_pkix (),
 				      "PKIX1.pkcs-12-CertBag",
 				      &c2)) != ASN1_SUCCESS)
-	  {
-	    gnutls_assert ();
-  	    ret = _gnutls_asn2err (ret);
-	    goto cleanup;
-	  }
+	{
+	  gnutls_assert ();
+	  ret = _gnutls_asn2err (ret);
+	  goto cleanup;
+	}
 
-        ret = asn1_write_value (c2, "certId", X509_CERT_OID, 1);
-        if (ret != ASN1_SUCCESS)
-	  {
-	    gnutls_assert ();
-	    ret = _gnutls_asn2err (ret);
-	    goto cleanup;
-	  }
+      ret = asn1_write_value (c2, "certId", X509_CERT_OID, 1);
+      if (ret != ASN1_SUCCESS)
+	{
+	  gnutls_assert ();
+	  ret = _gnutls_asn2err (ret);
+	  goto cleanup;
+	}
 
-        ret = _gnutls_x509_write_value (c2, "certValue", raw, 1);
-        if (ret < 0)
-  	  {
-	    gnutls_assert ();
-	    goto cleanup;
-	  }
-        break;
-      
-      case GNUTLS_BAG_CRL:
-        if ((ret = asn1_create_element (_gnutls_get_pkix (),
+      ret = _gnutls_x509_write_value (c2, "certValue", raw, 1);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  goto cleanup;
+	}
+      break;
+
+    case GNUTLS_BAG_CRL:
+      if ((ret = asn1_create_element (_gnutls_get_pkix (),
 				      "PKIX1.pkcs-12-CRLBag",
 				      &c2)) != ASN1_SUCCESS)
-	  {
-	    gnutls_assert ();
-	    ret = _gnutls_asn2err (ret);
-	    goto cleanup;
-	  }
+	{
+	  gnutls_assert ();
+	  ret = _gnutls_asn2err (ret);
+	  goto cleanup;
+	}
 
-        ret = asn1_write_value (c2, "crlId", X509_CRL_OID, 1);
-        if (ret != ASN1_SUCCESS)
-	  {
-	    gnutls_assert ();
-	    ret = _gnutls_asn2err (ret);
-	    goto cleanup;
-	  }
+      ret = asn1_write_value (c2, "crlId", X509_CRL_OID, 1);
+      if (ret != ASN1_SUCCESS)
+	{
+	  gnutls_assert ();
+	  ret = _gnutls_asn2err (ret);
+	  goto cleanup;
+	}
 
-        ret = _gnutls_x509_write_value (c2, "crlValue", raw, 1);
-        if (ret < 0)
-  	  {
-	    gnutls_assert ();
-	    goto cleanup;
-	  }
-        break;
+      ret = _gnutls_x509_write_value (c2, "crlValue", raw, 1);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  goto cleanup;
+	}
+      break;
 
-      case GNUTLS_BAG_SECRET:
-        if ((ret = asn1_create_element (_gnutls_get_pkix (),
+    case GNUTLS_BAG_SECRET:
+      if ((ret = asn1_create_element (_gnutls_get_pkix (),
 				      "PKIX1.pkcs-12-SecretBag",
 				      &c2)) != ASN1_SUCCESS)
-	  {
-	    gnutls_assert ();
-	    ret = _gnutls_asn2err (ret);
-	    goto cleanup;
-	  }
+	{
+	  gnutls_assert ();
+	  ret = _gnutls_asn2err (ret);
+	  goto cleanup;
+	}
 
-        ret = asn1_write_value (c2, "secretTypeId", RANDOM_NONCE_OID, 1);
-        if (ret != ASN1_SUCCESS)
-	  {
-	    gnutls_assert ();
-	    ret = _gnutls_asn2err (ret);
-	    goto cleanup;
-	  }
+      ret = asn1_write_value (c2, "secretTypeId", RANDOM_NONCE_OID, 1);
+      if (ret != ASN1_SUCCESS)
+	{
+	  gnutls_assert ();
+	  ret = _gnutls_asn2err (ret);
+	  goto cleanup;
+	}
 
-        ret = _gnutls_x509_write_value (c2, "secretValue", raw, 1);
-        if (ret < 0)
-  	  {
-	    gnutls_assert ();
-	    goto cleanup;
-	  }
-        break;
-      
-      default:
-        gnutls_assert();
-        asn1_delete_structure (&c2);
-        return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+      ret = _gnutls_x509_write_value (c2, "secretValue", raw, 1);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  goto cleanup;
+	}
+      break;
+
+    default:
+      gnutls_assert ();
+      asn1_delete_structure (&c2);
+      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
     }
 
   ret = _gnutls_x509_der_encode (c2, "", out, 0);
@@ -805,7 +805,7 @@ gnutls_pkcs12_bag_encrypt (gnutls_pkcs12_bag_t bag, const char *pass,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  id = _gnutls_pkcs_flags_to_schema(flags);
+  id = _gnutls_pkcs_flags_to_schema (flags);
 
   /* Now encrypt them.
    */

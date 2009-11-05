@@ -54,8 +54,7 @@ static char badguy_nul_cn_data[] =
   "8/pc7vh7C8Y5tQQzXq64Xg5mzKjAag3sYMHF2TnqvRuPHH0WOLHoyDcBqkuZ3+QP\n"
   "EL5h7prPzScFRgBg2Gp0CDI8i5ABagczDGyQ2+r7ahcadrtzFCfhpH7V3TCxXfIO\n"
   "qtSy1Uz2T5EqB/Q3wc9IGcX+fpKWqN9QajGSo7EU/kHMSWKYTerFugUtScMicu9B\n"
-  "CQ==\n"
-  "-----END CERTIFICATE-----\n";
+  "CQ==\n" "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t badguy_nul_cn = {
   badguy_nul_cn_data, sizeof (badguy_nul_cn_data)
@@ -120,11 +119,11 @@ main (void)
   ret = gnutls_x509_crt_check_hostname (crt, "www.bank.com");
   if (ret == 0)
     {
-      puts("gnutls_x509_crt_check_hostname OK (NUL-IN-CN)");
+      puts ("gnutls_x509_crt_check_hostname OK (NUL-IN-CN)");
     }
   else
     {
-      puts("gnutls_x509_crt_check_hostname BROKEN (NUL-IN-CN)");
+      puts ("gnutls_x509_crt_check_hostname BROKEN (NUL-IN-CN)");
       exit_code = 1;
     }
 
@@ -138,11 +137,11 @@ main (void)
   ret = gnutls_x509_crt_check_hostname (crt, "www.bank.com");
   if (ret == 0)
     {
-      puts("gnutls_x509_crt_check_hostname OK (NUL-IN-SAN)");
+      puts ("gnutls_x509_crt_check_hostname OK (NUL-IN-SAN)");
     }
   else
     {
-      puts("gnutls_x509_crt_check_hostname BROKEN (NUL-IN-SAN)");
+      puts ("gnutls_x509_crt_check_hostname BROKEN (NUL-IN-SAN)");
       exit_code = 1;
     }
 

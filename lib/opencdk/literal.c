@@ -121,7 +121,7 @@ literal_decode (void *data, FILE * in, FILE * out)
   while (!feof (in))
     {
       _cdk_log_debug ("literal_decode: part on %d size %lu\n",
-		      (int)pfx->blkmode.on, pfx->blkmode.size);
+		      (int) pfx->blkmode.on, pfx->blkmode.size);
       if (pfx->blkmode.on)
 	bufsize = pfx->blkmode.size;
       else
@@ -200,7 +200,7 @@ literal_encode (void *data, FILE * in, FILE * out)
   filelen = strlen (pfx->filename);
   cdk_pkt_new (&pkt);
   pt = pkt->pkt.literal = cdk_calloc (1, sizeof *pt + filelen);
-  pt->name = (char*) pt + sizeof(*pt);
+  pt->name = (char *) pt + sizeof (*pt);
   if (!pt)
     {
       cdk_pkt_release (pkt);

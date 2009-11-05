@@ -56,7 +56,7 @@ client_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
   unsigned char rnd;
   gcry_create_nonce (&rnd, 1);
 
-  if (handshake == 0 && rnd % 2 == 0) 
+  if (handshake == 0 && rnd % 2 == 0)
     {
       gnutls_transport_set_global_errno (EAGAIN);
       return -1;
@@ -105,7 +105,7 @@ server_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
   unsigned char rnd;
 
   gcry_create_nonce (&rnd, 1);
-  if (handshake == 0 && rnd % 2 == 0) 
+  if (handshake == 0 && rnd % 2 == 0)
     {
       gnutls_transport_set_global_errno (EAGAIN);
       return -1;
@@ -134,7 +134,7 @@ server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 
   //success ("server_push len %d has %d\n", len, to_client_len);
   gcry_create_nonce (&rnd, 1);
-  if (handshake == 0 && rnd % 2 == 0) 
+  if (handshake == 0 && rnd % 2 == 0)
     {
       gnutls_transport_set_global_errno (EAGAIN);
       return -1;
@@ -164,7 +164,7 @@ doit (void)
 {
   /* Server stuff. */
   gnutls_anon_server_credentials_t s_anoncred;
-  const gnutls_datum_t p3 = { (char*) pkcs3, strlen (pkcs3) };
+  const gnutls_datum_t p3 = { (char *) pkcs3, strlen (pkcs3) };
   static gnutls_dh_params_t dh_params;
   gnutls_session_t server;
   int sret = GNUTLS_E_AGAIN;
@@ -230,46 +230,48 @@ doit (void)
   ns = gnutls_record_send (client, MSG, strlen (MSG));
   //success ("client: sent %d\n", ns);
 
-  do 
+  do
     {
       //success("transferred: %d\n", transferred);
 
       ret = gnutls_record_recv (server, buffer, MAX_BUF);
       if (ret == 0)
-        fail ("server: didn't receive any data\n");
-      else if (ret < 0) 
-        {
-          if (ret != GNUTLS_E_AGAIN) {
-            fail ("server: error: %s\n", gnutls_strerror (ret));
-            break;
-          }
-        } 
+	fail ("server: didn't receive any data\n");
+      else if (ret < 0)
+	{
+	  if (ret != GNUTLS_E_AGAIN)
+	    {
+	      fail ("server: error: %s\n", gnutls_strerror (ret));
+	      break;
+	    }
+	}
       else
-        {
-          transferred+=ret;
-          fputs ("*", stdout);
-        }
+	{
+	  transferred += ret;
+	  fputs ("*", stdout);
+	}
 
-    ns = gnutls_record_send (server, MSG, strlen (MSG));
-    //success ("server: sent %d\n", ns);
+      ns = gnutls_record_send (server, MSG, strlen (MSG));
+      //success ("server: sent %d\n", ns);
 
-    ret = gnutls_record_recv (client, buffer, MAX_BUF);
-    if (ret == 0)
-      {
-        fail ("client: Peer has closed the TLS connection\n");
-      }
-    else if (ret < 0)
-      {
-        if (ret != GNUTLS_E_AGAIN) {
-          fail ("client: Error: %s\n", gnutls_strerror (ret));
-          break;
-        }
-      }
-    else
-      {
-        transferred+=ret;
-        fputs (".", stdout);
-      }
+      ret = gnutls_record_recv (client, buffer, MAX_BUF);
+      if (ret == 0)
+	{
+	  fail ("client: Peer has closed the TLS connection\n");
+	}
+      else if (ret < 0)
+	{
+	  if (ret != GNUTLS_E_AGAIN)
+	    {
+	      fail ("client: Error: %s\n", gnutls_strerror (ret));
+	      break;
+	    }
+	}
+      else
+	{
+	  transferred += ret;
+	  fputs (".", stdout);
+	}
     }
   while (transferred < 7000);
   fputs ("\n", stdout);

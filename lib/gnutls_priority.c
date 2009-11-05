@@ -452,8 +452,9 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
    * This will be overridden later.
    */
   if (session->internals.priorities.protocol.algorithms > 0)
-    _gnutls_set_current_version (session, session->internals.
-				 priorities.protocol.priority[0]);
+    _gnutls_set_current_version (session,
+				 session->internals.priorities.
+				 protocol.priority[0]);
 
   return 0;
 }
@@ -548,8 +549,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  **/
 int
 gnutls_priority_init (gnutls_priority_t * priority_cache,
-		      const char *priorities,
-		      const char **err_pos)
+		      const char *priorities, const char **err_pos)
 {
   char *broken_list[MAX_ELEMENTS];
   int broken_list_size, i, j;
@@ -599,14 +599,16 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 			 cipher_priority_performance);
 	  _set_priority (&(*priority_cache)->kx, kx_priority_performance);
 	  _set_priority (&(*priority_cache)->mac, mac_priority_performance);
-          _set_priority (&(*priority_cache)->sign_algo, sign_priority_default);
+	  _set_priority (&(*priority_cache)->sign_algo,
+			 sign_priority_default);
 	}
       else if (strcasecmp (broken_list[i], "NORMAL") == 0)
 	{
 	  _set_priority (&(*priority_cache)->cipher, cipher_priority_normal);
 	  _set_priority (&(*priority_cache)->kx, kx_priority_secure);
 	  _set_priority (&(*priority_cache)->mac, mac_priority_secure);
-          _set_priority (&(*priority_cache)->sign_algo, sign_priority_default);
+	  _set_priority (&(*priority_cache)->sign_algo,
+			 sign_priority_default);
 	}
       else if (strcasecmp (broken_list[i], "SECURE256") == 0
 	       || strcasecmp (broken_list[i], "SECURE") == 0)
@@ -615,7 +617,8 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 			 cipher_priority_secure256);
 	  _set_priority (&(*priority_cache)->kx, kx_priority_secure);
 	  _set_priority (&(*priority_cache)->mac, mac_priority_secure);
-          _set_priority (&(*priority_cache)->sign_algo, sign_priority_secure256);
+	  _set_priority (&(*priority_cache)->sign_algo,
+			 sign_priority_secure256);
 	}
       else if (strcasecmp (broken_list[i], "SECURE128") == 0)
 	{
@@ -623,14 +626,16 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 			 cipher_priority_secure128);
 	  _set_priority (&(*priority_cache)->kx, kx_priority_secure);
 	  _set_priority (&(*priority_cache)->mac, mac_priority_secure);
-          _set_priority (&(*priority_cache)->sign_algo, sign_priority_secure128);
+	  _set_priority (&(*priority_cache)->sign_algo,
+			 sign_priority_secure128);
 	}
       else if (strcasecmp (broken_list[i], "EXPORT") == 0)
 	{
 	  _set_priority (&(*priority_cache)->cipher, cipher_priority_export);
 	  _set_priority (&(*priority_cache)->kx, kx_priority_export);
 	  _set_priority (&(*priority_cache)->mac, mac_priority_secure);
-          _set_priority (&(*priority_cache)->sign_algo, sign_priority_default);
+	  _set_priority (&(*priority_cache)->sign_algo,
+			 sign_priority_default);
 	}			/* now check if the element is something like -ALGO */
       else if (broken_list[i][0] == '!' || broken_list[i][0] == '+'
 	       || broken_list[i][0] == '-')
@@ -655,8 +660,8 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 		   gnutls_protocol_get_id (&broken_list[i][6])) !=
 		  GNUTLS_VERSION_UNKNOWN)
 		fn (&(*priority_cache)->protocol, algo);
-              else
-                goto error;
+	      else
+		goto error;
 	    }			/* now check if the element is something like -ALGO */
 	  else if (strncasecmp (&broken_list[i][1], "COMP-", 5) == 0)
 	    {
@@ -664,8 +669,8 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 		   gnutls_compression_get_id (&broken_list[i][6])) !=
 		  GNUTLS_COMP_UNKNOWN)
 		fn (&(*priority_cache)->compression, algo);
-              else
-                goto error;
+	      else
+		goto error;
 	    }			/* now check if the element is something like -ALGO */
 	  else if (strncasecmp (&broken_list[i][1], "CTYPE-", 6) == 0)
 	    {
@@ -673,8 +678,8 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 		   gnutls_certificate_type_get_id (&broken_list[i][7])) !=
 		  GNUTLS_CRT_UNKNOWN)
 		fn (&(*priority_cache)->cert_type, algo);
-              else
-                goto error;
+	      else
+		goto error;
 	    }			/* now check if the element is something like -ALGO */
 	  else if (strncasecmp (&broken_list[i][1], "SIGN-", 5) == 0)
 	    {
@@ -682,8 +687,8 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 		   gnutls_sign_get_id (&broken_list[i][6])) !=
 		  GNUTLS_SIGN_UNKNOWN)
 		fn (&(*priority_cache)->sign_algo, algo);
-              else
-                goto error;
+	      else
+		goto error;
 	    }			/* now check if the element is something like -ALGO */
 	  else
 	    goto error;
@@ -694,11 +699,11 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	    (*priority_cache)->no_padding = 1;
 	  else if (strcasecmp (&broken_list[i][1],
 			       "VERIFY_ALLOW_SIGN_RSA_MD5") == 0)
-            {
-  	      prio_add (&(*priority_cache)->sign_algo, GNUTLS_SIGN_RSA_MD5);
+	    {
+	      prio_add (&(*priority_cache)->sign_algo, GNUTLS_SIGN_RSA_MD5);
 	      (*priority_cache)->additional_verify_flags |=
-	        GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5;
-            }
+		GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5;
+	    }
 	  else if (strcasecmp (&broken_list[i][1],
 			       "SSL3_RECORD_VERSION") == 0)
 	    (*priority_cache)->ssl3_record_version = 1;
@@ -760,8 +765,7 @@ gnutls_priority_deinit (gnutls_priority_t priority_cache)
  **/
 int
 gnutls_priority_set_direct (gnutls_session_t session,
-			    const char *priorities,
-			    const char **err_pos)
+			    const char *priorities, const char **err_pos)
 {
   gnutls_priority_t prio;
   int ret;

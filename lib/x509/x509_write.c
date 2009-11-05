@@ -556,8 +556,8 @@ gnutls_x509_crt_set_key_usage (gnutls_x509_crt_t crt, unsigned int usage)
  **/
 int
 gnutls_x509_crt_set_subject_alternative_name (gnutls_x509_crt_t crt,
-					      gnutls_x509_subject_alt_name_t type,
-					      const char *data_string)
+					      gnutls_x509_subject_alt_name_t
+					      type, const char *data_string)
 {
   if (crt == NULL)
     {
@@ -1189,8 +1189,7 @@ gnutls_x509_crt_set_authority_key_id (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_set_key_purpose_oid (gnutls_x509_crt_t cert,
-				     const void *oid,
-				     unsigned int critical)
+				     const void *oid, unsigned int critical)
 {
   int result;
   gnutls_datum_t old_id, der_data;

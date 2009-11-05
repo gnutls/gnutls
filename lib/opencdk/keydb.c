@@ -663,7 +663,8 @@ keydb_cache_add (cdk_keydb_search_t dbs, off_t offset)
   k->next = dbs->cache;
   dbs->cache = k;
   dbs->ncache++;
-  _cdk_log_debug ("cache: add entry off=%d type=%d\n", (int)offset, (int)dbs->type);
+  _cdk_log_debug ("cache: add entry off=%d type=%d\n", (int) offset,
+		  (int) dbs->type);
   return 0;
 }
 

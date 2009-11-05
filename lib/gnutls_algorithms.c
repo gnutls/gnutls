@@ -1238,14 +1238,15 @@ _gnutls_version_has_selectable_sighash (gnutls_protocol_t version)
 int
 _gnutls_version_has_extensions (gnutls_protocol_t version)
 {
-  switch(version) {
-  case GNUTLS_TLS1_0:
-  case GNUTLS_TLS1_1:
-  case GNUTLS_TLS1_2:
-    return 1;
-  default:
-    return 0;
-  }
+  switch (version)
+    {
+    case GNUTLS_TLS1_0:
+    case GNUTLS_TLS1_1:
+    case GNUTLS_TLS1_2:
+      return 1;
+    default:
+      return 0;
+    }
 }
 
 /* This function determines if the version specified has explicit IVs
@@ -1253,27 +1254,30 @@ _gnutls_version_has_extensions (gnutls_protocol_t version)
 int
 _gnutls_version_has_explicit_iv (gnutls_protocol_t version)
 {
-  switch(version) {
-  case GNUTLS_TLS1_1:
-  case GNUTLS_TLS1_2:
-    return 1;
-  default:
-    return 0;
-  }
+  switch (version)
+    {
+    case GNUTLS_TLS1_1:
+    case GNUTLS_TLS1_2:
+      return 1;
+    default:
+      return 0;
+    }
 }
 
 /* This function determines if the version specified can have
    non-minimal padding. */
-int _gnutls_version_has_variable_padding (gnutls_protocol_t version)
+int
+_gnutls_version_has_variable_padding (gnutls_protocol_t version)
 {
-  switch(version) {
-  case GNUTLS_TLS1_0:
-  case GNUTLS_TLS1_1:
-  case GNUTLS_TLS1_2:
-    return 1;
-  default:
-    return 0;
-  }
+  switch (version)
+    {
+    case GNUTLS_TLS1_0:
+    case GNUTLS_TLS1_1:
+    case GNUTLS_TLS1_2:
+      return 1;
+    default:
+      return 0;
+    }
 }
 
 /* Type to KX mappings */
@@ -1849,7 +1853,8 @@ static const gnutls_sign_entry sign_algorithms[] = {
    GNUTLS_MAC_MD5, {1, 1}},
   {"RSA-MD2", SIG_RSA_MD2_OID, GNUTLS_SIGN_RSA_MD2, GNUTLS_PK_RSA,
    GNUTLS_MAC_MD2, TLS_SIGN_AID_UNKNOWN},
-  {"GOST R 34.10-2001", SIG_GOST_R3410_2001_OID, 0, 0, 0, TLS_SIGN_AID_UNKNOWN},
+  {"GOST R 34.10-2001", SIG_GOST_R3410_2001_OID, 0, 0, 0,
+   TLS_SIGN_AID_UNKNOWN},
   {"GOST R 34.10-94", SIG_GOST_R3410_94_OID, 0, 0, 0, TLS_SIGN_AID_UNKNOWN},
   {0, 0, 0, 0, 0, TLS_SIGN_AID_UNKNOWN}
 };
@@ -2021,16 +2026,15 @@ _gnutls_sign_get_pk_algorithm (gnutls_sign_algorithm_t sign)
 }
 
 gnutls_sign_algorithm_t
-_gnutls_tls_aid_to_sign (const sign_algorithm_st *aid)
+_gnutls_tls_aid_to_sign (const sign_algorithm_st * aid)
 {
   gnutls_sign_algorithm_t ret = GNUTLS_SIGN_UNKNOWN;
 
-  GNUTLS_SIGN_LOOP ( if (p->aid.hash_algorithm == aid->hash_algorithm
-			 && p->aid.sign_algorithm == aid->sign_algorithm)
-		       {
-			 ret = p->id;
-			 break;
-		       } );
+  GNUTLS_SIGN_LOOP (if (p->aid.hash_algorithm == aid->hash_algorithm
+			&& p->aid.sign_algorithm == aid->sign_algorithm)
+		    {
+		    ret = p->id; break;}
+  );
 
   return ret;
 }

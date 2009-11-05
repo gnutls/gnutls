@@ -134,19 +134,19 @@ _gnutls_record_buffer_put (content_type_t type,
     case GNUTLS_APPLICATION_DATA:
       buf = &session->internals.application_data_buffer;
       _gnutls_buffers_log ("BUF[REC]: Inserted %d bytes of Data(%d)\n",
-			   (int)length, (int)type);
+			   (int) length, (int) type);
       break;
 
     case GNUTLS_HANDSHAKE:
       buf = &session->internals.handshake_data_buffer;
       _gnutls_buffers_log ("BUF[HSK]: Inserted %d bytes of Data(%d)\n",
-			   (int)length, (int)type);
+			   (int) length, (int) type);
       break;
 
     case GNUTLS_INNER_APPLICATION:
       buf = &session->internals.ia_data_buffer;
       _gnutls_buffers_log ("BUF[IA]: Inserted %d bytes of Data(%d)\n",
-			   (int)length, (int)type);
+			   (int) length, (int) type);
       break;
 
     default:
@@ -215,22 +215,25 @@ _gnutls_record_buffer_get (content_type_t type,
   switch (type)
     {
     case GNUTLS_APPLICATION_DATA:
-      _gnutls_buffer_get_data( &session->internals.application_data_buffer, data, &length);
+      _gnutls_buffer_get_data (&session->internals.application_data_buffer,
+			       data, &length);
       _gnutls_buffers_log ("BUFFER[REC][AD]: Read %d bytes of Data(%d)\n",
-			   (int)length, (int)type);
+			   (int) length, (int) type);
       break;
 
     case GNUTLS_HANDSHAKE:
-      _gnutls_buffer_get_data( &session->internals.handshake_data_buffer, data, &length);
+      _gnutls_buffer_get_data (&session->internals.handshake_data_buffer,
+			       data, &length);
       _gnutls_buffers_log ("BUF[REC][HD]: Read %d bytes of Data(%d)\n",
-			   (int)length, (int)type);
+			   (int) length, (int) type);
       break;
 
     case GNUTLS_INNER_APPLICATION:
 
-      _gnutls_buffer_get_data( &session->internals.ia_data_buffer, data, &length);
+      _gnutls_buffer_get_data (&session->internals.ia_data_buffer, data,
+			       &length);
       _gnutls_buffers_log ("BUF[REC][IA]: Read %d bytes of Data(%d)\n",
-			   (int)length, (int)type);
+			   (int) length, (int) type);
       break;
 
     default:
@@ -303,7 +306,7 @@ _gnutls_read (gnutls_session_t session, void *iptr,
 	    : errno;
 
 	  _gnutls_read_log ("READ: %d returned from %p, errno=%d gerrno=%d\n",
-			    (int)i, fd, errno, session->internals.errnum);
+			    (int) i, fd, errno, session->internals.errnum);
 
 	  if (err == EAGAIN || err == EINTR)
 	    {
@@ -311,7 +314,7 @@ _gnutls_read (gnutls_session_t session, void *iptr,
 		{
 
 		  _gnutls_read_log ("READ: returning %d bytes from %p\n",
-				    (int)(sizeOfPtr - left), fd);
+				    (int) (sizeOfPtr - left), fd);
 
 		  goto finish;
 		}
@@ -330,7 +333,7 @@ _gnutls_read (gnutls_session_t session, void *iptr,
       else
 	{
 
-	  _gnutls_read_log ("READ: Got %d bytes from %p\n", (int)i, fd);
+	  _gnutls_read_log ("READ: Got %d bytes from %p\n", (int) i, fd);
 
 	  if (i == 0)
 	    break;		/* EOF */
@@ -349,7 +352,7 @@ finish:
 
 
       _gnutls_read_log ("READ: read %d bytes from %p\n",
-			(int)(sizeOfPtr - left), fd);
+			(int) (sizeOfPtr - left), fd);
 
       for (x = 0; x < ((sizeOfPtr - left) / 16) + 1; x++)
 	{
@@ -508,12 +511,13 @@ _gnutls_io_read_buffered (gnutls_session_t session, opaque ** iptr,
 
   /* Allocate the data required to store the new packet.
    */
-  ret = _gnutls_buffer_resize( &session->internals.record_recv_buffer, 
-      recvdata + session->internals.record_recv_buffer.length); 
+  ret = _gnutls_buffer_resize (&session->internals.record_recv_buffer,
+			       recvdata +
+			       session->internals.record_recv_buffer.length);
 
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
 
@@ -542,8 +546,8 @@ _gnutls_io_read_buffered (gnutls_session_t session, opaque ** iptr,
     {
       _gnutls_read_log
 	("RB: Have %d bytes into buffer. Adding %d bytes.\n",
-	 (int)session->internals.record_recv_buffer.length, (int)ret);
-      _gnutls_read_log ("RB: Requested %d bytes\n", (int)sizeOfPtr);
+	 (int) session->internals.record_recv_buffer.length, (int) ret);
+      _gnutls_read_log ("RB: Requested %d bytes\n", (int) sizeOfPtr);
       session->internals.record_recv_buffer.length += ret;
     }
 
@@ -565,10 +569,12 @@ _gnutls_io_read_buffered (gnutls_session_t session, opaque ** iptr,
 
       if (ret2 > 0)
 	{
-	  _gnutls_read_log ("RB-PEEK: Read %d bytes in PEEK MODE.\n", (int)ret2);
+	  _gnutls_read_log ("RB-PEEK: Read %d bytes in PEEK MODE.\n",
+			    (int) ret2);
 	  _gnutls_read_log
 	    ("RB-PEEK: Have %d bytes into buffer. Adding %d bytes.\nRB: Requested %d bytes\n",
-	     (int)session->internals.record_recv_buffer.length, (int)ret2, (int)sizeOfPtr);
+	     (int) session->internals.record_recv_buffer.length, (int) ret2,
+	     (int) sizeOfPtr);
 	  session->internals.have_peeked_data = 1;
 	  session->internals.record_recv_buffer.length += ret2;
 
@@ -653,16 +659,18 @@ _gnutls_io_write_buffered (gnutls_session_t session,
     {
       gnutls_datum_t bdata;
       /* checking is handled above */
-      _gnutls_buffer_get_datum (&session->internals.record_send_buffer, &bdata, session->internals.record_send_buffer.length);
+      _gnutls_buffer_get_datum (&session->internals.record_send_buffer,
+				&bdata,
+				session->internals.record_send_buffer.length);
 
       ptr = bdata.data;
       n = bdata.size;
 
       _gnutls_write_log
-	("WRITE: Restoring old write. (%d bytes to send)\n", (int)n);
+	("WRITE: Restoring old write. (%d bytes to send)\n", (int) n);
     }
 
-  _gnutls_write_log ("WRITE: Will write %d bytes to %p.\n", (int)n, fd);
+  _gnutls_write_log ("WRITE: Will write %d bytes to %p.\n", (int) n, fd);
 
   left = n;
   while (left > 0)
@@ -718,7 +726,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 
 	      _gnutls_write_log
 		("WRITE: Interrupted. Stored %d bytes to buffer. Already sent %d bytes.\n",
-		 (int)left, (int)(n - left));
+		 (int) left, (int) (n - left));
 
 	      if (err == EAGAIN)
 		return GNUTLS_E_AGAIN;
@@ -741,7 +749,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 
 	  _gnutls_write_log
 	    ("WRITE: wrote %d bytes to %p. Left %d bytes. Total %d bytes.\n",
-	     (int)i, fd, (int)left, (int)n);
+	     (int) i, fd, (int) left, (int) n);
 	  for (x = 0; x < (unsigned) ((i) / 16) + 1; x++)
 	    {
 	      line[0] = 0;
@@ -790,8 +798,8 @@ _gnutls_io_write_flush (gnutls_session_t session)
     return 0;			/* done */
 
   ret = _gnutls_io_write_buffered (session, NULL, 0);
-  _gnutls_write_log ("WRITE FLUSH: %d [buffer: %d]\n", (int)ret,
-		     (int)session->internals.record_send_buffer.length);
+  _gnutls_write_log ("WRITE FLUSH: %d [buffer: %d]\n", (int) ret,
+		     (int) session->internals.record_send_buffer.length);
 
   return ret;
 }
@@ -811,7 +819,7 @@ _gnutls_handshake_io_write_flush (gnutls_session_t session)
       return ret;
     }
 
-  _gnutls_write_log ("HANDSHAKE_FLUSH: written[1] %d bytes\n", (int)ret);
+  _gnutls_write_log ("HANDSHAKE_FLUSH: written[1] %d bytes\n", (int) ret);
 
   if (session->internals.handshake_send_buffer.length == 0)
     {
@@ -849,7 +857,10 @@ _gnutls_handshake_io_send_int (gnutls_session_t session,
       gnutls_assert ();
 
       /* checking is handled above */
-      _gnutls_buffer_get_datum (&session->internals.handshake_send_buffer, &bdata, session->internals.handshake_send_buffer.length);
+      _gnutls_buffer_get_datum (&session->internals.handshake_send_buffer,
+				&bdata,
+				session->internals.
+				handshake_send_buffer.length);
 
       ptr = bdata.data;
       n = bdata.size;
@@ -984,22 +995,24 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
   if (session->internals.handshake_recv_buffer.length > 0)
     {
       size_t tmp;
-      
+
       /* if we have already received some data */
       if (sizeOfPtr <= session->internals.handshake_recv_buffer.length)
 	{
 	  /* if requested less data then return it.
 	   */
 	  gnutls_assert ();
-	  
+
 	  tmp = sizeOfPtr;
-	  _gnutls_string_get_data( &session->internals.handshake_recv_buffer, iptr, &tmp);
+	  _gnutls_string_get_data (&session->internals.handshake_recv_buffer,
+				   iptr, &tmp);
 	  return tmp;
 	}
       gnutls_assert ();
 
-      tmp = sizeOfPtr; 
-      _gnutls_string_get_data( &session->internals.handshake_recv_buffer, iptr, &tmp);
+      tmp = sizeOfPtr;
+      _gnutls_string_get_data (&session->internals.handshake_recv_buffer,
+			       iptr, &tmp);
       left -= tmp;
 
       htype = session->internals.handshake_recv_buffer_htype;
@@ -1017,8 +1030,9 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
 	    {
 	      gnutls_assert ();
 
-	      _gnutls_buffer_append (&session->internals.handshake_recv_buffer, iptr,
-		      dsize);
+	      _gnutls_buffer_append (&session->
+				     internals.handshake_recv_buffer, iptr,
+				     dsize);
 
 	      session->internals.handshake_recv_buffer_htype = htype;
 	      session->internals.handshake_recv_buffer_type = type;
@@ -1063,7 +1077,7 @@ _gnutls_handshake_buffer_put (gnutls_session_t session, opaque * data,
       return GNUTLS_E_HANDSHAKE_TOO_LARGE;
     }
 
-  _gnutls_buffers_log ("BUF[HSK]: Inserted %d bytes of Data\n", (int)length);
+  _gnutls_buffers_log ("BUF[HSK]: Inserted %d bytes of Data\n", (int) length);
   if (_gnutls_buffer_append (&session->internals.handshake_hash_buffer,
 			     data, length) < 0)
     {
@@ -1091,7 +1105,8 @@ _gnutls_handshake_buffer_get_ptr (gnutls_session_t session,
   if (length != NULL)
     *length = session->internals.handshake_hash_buffer.length;
 
-  _gnutls_buffers_log ("BUF[HSK]: Peeked %d bytes of Data\n", (int)session->internals.handshake_hash_buffer.length);
+  _gnutls_buffers_log ("BUF[HSK]: Peeked %d bytes of Data\n",
+		       (int) session->internals.handshake_hash_buffer.length);
 
   if (data_ptr != NULL)
     *data_ptr = session->internals.handshake_hash_buffer.data;
