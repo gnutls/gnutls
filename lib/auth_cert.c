@@ -35,6 +35,7 @@
 #include "gnutls_num.h"
 #include "libtasn1.h"
 #include "gnutls_datum.h"
+#include "ext_signature.h"
 #include <gnutls_pk.h>
 #include <gnutls_algorithms.h>
 #include <gnutls_global.h>
