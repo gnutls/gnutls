@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2004, 2005, 2009 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -41,7 +41,6 @@ int _gnutls_sign_algorithm_write_params(gnutls_session_t session, opaque *data, 
 {
 opaque* p = data;
 int len, i ,j;
-int ret;
 sign_algorithm_st aid;
 
           len = session->internals.priorities.sign_algo.algorithms * 2;
