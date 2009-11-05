@@ -237,6 +237,8 @@ AC_SUBST([LTALLOCA])
   gl_source_base='gl/tests'
   gl_FUNC_UNGETC_WORKS
   gl_FUNC_GETTIMEOFDAY
+  AC_C_BIGENDIAN
+  AC_C_BIGENDIAN
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
     dnl Even if the 'socket' module is not used here, another part of the
@@ -527,6 +529,8 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-getdelim.c
   tests/test-getline.c
   tests/test-gettimeofday.c
+  tests/test-inet_ntop.c
+  tests/test-inet_pton.c
   tests/test-lseek.c
   tests/test-lseek.sh
   tests/test-memchr.c

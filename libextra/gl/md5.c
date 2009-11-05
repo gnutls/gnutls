@@ -63,7 +63,7 @@
 
 /* This array contains the bytes used to pad the buffer to the next
    64-byte boundary.  (RFC 1321, 3.1: Step 1)  */
-static const unsigned char fillbuf[64] = { 0x80, 0 /* , 0, 0, ...  */  };
+static const unsigned char fillbuf[64] = { 0x80, 0 /* , 0, 0, ...  */ };
 
 
 /* Initialize structure containing state of computation.
@@ -129,13 +129,13 @@ md5_finish_ctx (struct md5_ctx *ctx, void *resbuf)
   return md5_read_ctx (ctx, resbuf);
 }
 
-#if 0				/* Not needed by GnuTLS, and it has a large stack frame. */
+#if 0 /* Not needed by GnuTLS, and it has a large stack frame. */
 
 /* Compute MD5 message digest for bytes read from STREAM.  The
    resulting message digest number will be written into the 16 bytes
    beginning at RESBLOCK.  */
 int
-md5_stream (FILE * stream, void *resblock)
+md5_stream (FILE *stream, void *resblock)
 {
   struct md5_ctx ctx;
   size_t sum;

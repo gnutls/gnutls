@@ -142,6 +142,24 @@ EXTRA_DIST += test-gettimeofday.c
 
 ## end   gnulib module gettimeofday-tests
 
+## begin gnulib module inet_ntop-tests
+
+TESTS += test-inet_ntop
+check_PROGRAMS += test-inet_ntop
+test_inet_ntop_LDADD = $(LDADD) @INET_NTOP_LIB@
+EXTRA_DIST += test-inet_ntop.c
+
+## end   gnulib module inet_ntop-tests
+
+## begin gnulib module inet_pton-tests
+
+TESTS += test-inet_pton
+check_PROGRAMS += test-inet_pton
+test_inet_pton_LDADD = $(LDADD) @INET_PTON_LIB@
+EXTRA_DIST += test-inet_pton.c
+
+## end   gnulib module inet_pton-tests
+
 ## begin gnulib module ioctl
 
 
