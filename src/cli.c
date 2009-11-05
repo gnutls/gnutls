@@ -385,7 +385,7 @@ cert_callback (gnutls_session_t session,
     
           i=0;
           do {
-            ret = gnutls_session_sign_algorithm_get_requested(session, i, &req_algo);
+            ret = gnutls_sign_algorithm_get_requested(session, i, &req_algo);
             if (ret >= 0 && cert_algo == req_algo)
               {
                 match = 1;
