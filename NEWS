@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.9.9 (unreleased)
 
+** libgnutls: Cleanups and several bug fixes found by Tomas Mraz.
+
 ** API and ABI modifications:
 No changes since last version.
 
