@@ -40,7 +40,8 @@ noinst_LTLIBRARIES =
 
 gnutls_serv_SOURCES = list.h serv.c common.h common.c certtool-common.h
 gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
-gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la $(LIBSOCKET) $(GETADDRINFO_LIB)
+gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la
+gnutls_serv_LDADD += $(LTLIBGCRYPT) $(LIBSOCKET) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-serv.la
 libcmd_serv_la_CFLAGS =
 libcmd_serv_la_SOURCES = serv.gaa serv-gaa.h serv-gaa.c
@@ -61,7 +62,8 @@ libcmd_psk_la_SOURCES = psk.gaa psk-gaa.h psk-gaa.c
 
 gnutls_cli_SOURCES = cli.c common.h common.c
 gnutls_cli_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
-gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la $(LIBSOCKET) $(GETADDRINFO_LIB)
+gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la
+gnutls_cli_LDADD += $(LTLIBGCRYPT) $(LIBSOCKET) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-cli.la
 libcmd_cli_la_CFLAGS =
 libcmd_cli_la_SOURCES = cli.gaa cli-gaa.h cli-gaa.c
@@ -74,9 +76,9 @@ libcmd_cli_debug_la_CFLAGS =
 libcmd_cli_debug_la_SOURCES = tls_test.gaa tls_test-gaa.h tls_test-gaa.c
 
 certtool_SOURCES = certtool.c prime.c
-certtool_LDADD = libcmd-certtool.la
-certtool_LDADD += ../lib/libgnutls.la ../libextra/libgnutls-extra.la
-certtool_LDADD += ../gl/libgnu.la
+certtool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
+certtool_LDADD += libcmd-certtool.la ../gl/libgnu.la
+certtool_LDADD += $(LTLIBGCRYPT)
 if HAVE_LIBCFG
 certtool_LDADD += -lcfg+
 else
