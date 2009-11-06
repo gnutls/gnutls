@@ -849,6 +849,9 @@ main (int argc, char **argv)
   set_program_name (argv[0]);
 
 #ifdef gcry_fips_mode_active
+  /* Libgcrypt manual says that gcry_version_check must be called
+     before calling gcry_fips_mode_active. */
+  gcry_check_version (NULL);
   if (gcry_fips_mode_active ())
     {
       ret = gnutls_register_md5_handler ();
