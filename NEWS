@@ -8,6 +8,10 @@ See the end for copying conditions.
 ** libgnutls: Cleanups and several bug fixes found by Steve Grubb and 
 Tomas Mraz.
 
+** Fix --disable-valgrind-tests.
+Reported by Ingmar Vanhassel in
+<https://savannah.gnu.org/support/?107029>.
+
 ** API and ABI modifications:
 No changes since last version.
 
