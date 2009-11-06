@@ -5,7 +5,12 @@ See the end for copying conditions.
 
 * Version 2.8.6 (unreleased)
 
-** libgnutls: Cleanups and several bug fixes found by Steve Grubb and Tomas Mraz.
+** libgnutls: Cleanups and several bug fixes.
+Found by Steve Grubb and Tomas Mraz.
+
+** Fix --disable-valgrind-tests.
+Reported by Ingmar Vanhassel in
+<https://savannah.gnu.org/support/?107029>.
 
 ** API and ABI modifications:
 No changes since last version.
