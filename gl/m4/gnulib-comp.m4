@@ -124,6 +124,7 @@ AC_SUBST([LTALLOCA])
   AC_PROG_MKDIR_P
   gl_FUNC_PERROR
   gl_STRING_MODULE_INDICATOR([perror])
+  AC_PATH_PROG([PMCCABE], [pmccabe], [false])
   AC_CHECK_DECLS([program_invocation_name], [], [], [#include <errno.h>])
   AC_CHECK_DECLS([program_invocation_short_name], [], [], [#include <errno.h>])
   gl_FUNC_READ_FILE
