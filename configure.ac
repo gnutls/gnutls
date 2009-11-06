@@ -296,7 +296,7 @@ AC_MSG_NOTICE([summary of build options:
   Compiler:         ${CC}
   Warning flags:    errors: ${WERROR_CFLAGS} warnings: ${WARN_CFLAGS}
   Library types:    Shared=${enable_shared}, Static=${enable_static}
-  Valgrind:         ${VALGRIND}
+  Valgrind:         $opt_valgrind_tests ${VALGRIND}
   Guile wrappers:   $opt_guile_bindings
   C++ library:      $use_cxx
   OpenSSL library:  $enable_openssl
