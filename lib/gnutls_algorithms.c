@@ -1057,12 +1057,6 @@ _gnutls_version_priority (gnutls_session_t session, gnutls_protocol_t version)
 {				/* actually returns the priority */
   unsigned int i;
 
-  if (session->internals.priorities.protocol.priority == NULL)
-    {
-      gnutls_assert ();
-      return -1;
-    }
-
   for (i = 0; i < session->internals.priorities.protocol.algorithms; i++)
     {
       if (session->internals.priorities.protocol.priority[i] == version)
@@ -1076,16 +1070,11 @@ _gnutls_version_lowest (gnutls_session_t session)
 {				/* returns the lowest version supported */
   unsigned int i, min = 0xff;
 
-  if (session->internals.priorities.protocol.priority == NULL)
+  for (i = 0; i < session->internals.priorities.protocol.algorithms; i++)
     {
-      return GNUTLS_VERSION_UNKNOWN;
+      if (session->internals.priorities.protocol.priority[i] < min)
+        min = session->internals.priorities.protocol.priority[i];
     }
-  else
-    for (i = 0; i < session->internals.priorities.protocol.algorithms; i++)
-      {
-	if (session->internals.priorities.protocol.priority[i] < min)
-	  min = session->internals.priorities.protocol.priority[i];
-      }
 
   if (min == 0xff)
     return GNUTLS_VERSION_UNKNOWN;	/* unknown version */
@@ -1098,16 +1087,11 @@ _gnutls_version_max (gnutls_session_t session)
 {				/* returns the maximum version supported */
   unsigned int i, max = 0x00;
 
-  if (session->internals.priorities.protocol.priority == NULL)
+  for (i = 0; i < session->internals.priorities.protocol.algorithms; i++)
     {
-      return GNUTLS_VERSION_UNKNOWN;
+      if (session->internals.priorities.protocol.priority[i] > max)
+        max = session->internals.priorities.protocol.priority[i];
     }
-  else
-    for (i = 0; i < session->internals.priorities.protocol.algorithms; i++)
-      {
-	if (session->internals.priorities.protocol.priority[i] > max)
-	  max = session->internals.priorities.protocol.priority[i];
-      }
 
   if (max == 0x00)
     return GNUTLS_VERSION_UNKNOWN;	/* unknown version */
