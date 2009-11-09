@@ -18,23 +18,21 @@
  */
 
 #include <config.h>
+
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
+#include <gnutls/x509.h>
+#include <gnutls/openpgp.h>
+#include <gnutls/pkcs12.h>
+
 #include <gcrypt.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <gnutls/x509.h>
-#include <gnutls/openpgp.h>
 #include <time.h>
-#include "certtool-gaa.h"
-#include "certtool-common.h"
-#include <gnutls/pkcs12.h>
 #include <unistd.h>
-#include <certtool-cfg.h>
-#include <gcrypt.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -45,6 +43,10 @@
 #include <read-file.h>
 #include <progname.h>
 #include <version-etc.h>
+
+#include <certtool-cfg.h>
+#include "certtool-gaa.h"
+#include "certtool-common.h"
 
 static void print_crl_info (gnutls_x509_crl_t crl, FILE * out);
 int generate_prime (int bits, int how);
