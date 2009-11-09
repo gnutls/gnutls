@@ -5,8 +5,8 @@ See the end for copying conditions.
 
 * Version 2.9.9 (unreleased)
 
-** libgnutls: Cleanups and several bug fixes found by Steve Grubb and 
-Tomas Mraz.
+** libgnutls: Cleanups and several bug fixes.
+Found by Steve Grubb and Tomas Mraz.
 
 ** Fix --disable-valgrind-tests.
 Reported by Ingmar Vanhassel in
