@@ -1,3 +1,92 @@
+2009-11-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.9.9.
+
+2009-11-09  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/pmccabe2html, gl/Makefile.am, gl/getpagesize.c,
+	gl/m4/getpagesize.m4, gl/m4/gnulib-comp.m4, gl/tests/test-fseeko.c,
+	lib/gl/Makefile.am, lib/gl/getpagesize.c, lib/gl/m4/getpagesize.m4,
+	lib/gl/m4/gnulib-comp.m4, lib/gl/tests/test-fseeko.c: Update gnulib
+	files.
+
+2009-11-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-11-09  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c: Cleanup header inclusion.
+
+2009-11-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2009-11-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_algorithms.c: More dead code removed. Based on
+	suggestions by Steve Grubb and Tomaz Mraz
+
+2009-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, m4/valgrind.m4: Fix --disable-valgrind-tests.
+
+2009-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* gl/tests/Makefile.am: Update gnulib files.
+
+2009-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/getaddrinfo.m4, gl/m4/gnulib-comp.m4, maint.mk: Update
+	gnulib files.
+
+2009-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am: Link to libgcrypt explicitly when libgcrypt
+	functions are used.
+
+2009-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/certtool.c, src/serv.c: Fix libgcrypt usage.
+
+2009-11-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_handshake.c: Simplified code which was based on older
+	version of internal structures.  Based on observations by Steve
+	Grubb and Tomas Mraz.
+
+2009-11-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: Corrected bug fix author.
+
+2009-11-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: Documented previous commit.
+
+2009-11-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/auth_cert.c, lib/gnutls_constate.c, lib/gnutls_sig.c,
+	libextra/gnutls_openssl.c, src/certtool.c, src/cfg/cfg+.c,
+	src/cfg/platon/str/strdyn.c, src/serv.c: Cleanups and several bug
+	fixes found by Tomas Mraz.  "I've patched the following problems in the code found by review of
+	gnutls-2.8.5 code done by Steve Grubb.  See the patch attached.  The gnutls_constate.c bug might be potentially serious so I've
+	decided to mail it to you directly, not to the public mailing list.  The auth_cert.c change is just cleanup of the code.  In gnutls_openssl.c I've just fixed the potential crasher, correct
+	fix would require using asprintf or precomputed length of the buffer
+	to allocate a memory.  The certtool.c change is again just a cleanup."
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-11-05  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.9.8.
