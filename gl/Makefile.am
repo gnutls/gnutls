@@ -263,15 +263,6 @@ EXTRA_libgnu_la_SOURCES += getline.c
 
 ## end   gnulib module getline
 
-## begin gnulib module getpagesize
-
-
-EXTRA_DIST += getpagesize.c
-
-EXTRA_libgnu_la_SOURCES += getpagesize.c
-
-## end   gnulib module getpagesize
-
 ## begin gnulib module getpass-gnu
 
 

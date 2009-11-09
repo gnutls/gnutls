@@ -88,8 +88,6 @@ AC_SUBST([LTALLOCA])
   gl_STDIO_MODULE_INDICATOR([getdelim])
   gl_FUNC_GETLINE
   gl_STDIO_MODULE_INDICATOR([getline])
-  gl_FUNC_GETPAGESIZE
-  gl_UNISTD_MODULE_INDICATOR([getpagesize])
   gl_FUNC_GETPASS_GNU
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
@@ -385,7 +383,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/getaddrinfo.c
   lib/getdelim.c
   lib/getline.c
-  lib/getpagesize.c
   lib/getpass.c
   lib/getpass.h
   lib/gettext.h
@@ -459,7 +456,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getaddrinfo.m4
   m4/getdelim.m4
   m4/getline.m4
-  m4/getpagesize.m4
   m4/getpass.m4
   m4/gettimeofday.m4
   m4/gnulib-common.m4

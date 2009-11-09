@@ -49,8 +49,6 @@ AC_DEFUN([lgl_INIT],
   gl_FUNC_FSEEKO
   gl_STDIO_MODULE_INDICATOR([fseeko])
   gl_FUNC
-  gl_FUNC_GETPAGESIZE
-  gl_UNISTD_MODULE_INDICATOR([getpagesize])
   dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
   AM_GNU_GETTEXT_VERSION([0.17])
   AC_SUBST([LIBINTL])
@@ -250,7 +248,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/float+.h
   lib/float.in.h
   lib/fseeko.c
-  lib/getpagesize.c
   lib/gettext.h
   lib/lseek.c
   lib/memchr.c
@@ -303,7 +300,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/float_h.m4
   m4/fseeko.m4
   m4/func.m4
-  m4/getpagesize.m4
   m4/gettext.m4
   m4/glibc2.m4
   m4/glibc21.m4
