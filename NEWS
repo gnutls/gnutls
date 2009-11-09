@@ -8,6 +8,8 @@ See the end for copying conditions.
 ** libgnutls: Cleanups and several bug fixes.
 Found by Steve Grubb and Tomas Mraz.
 
+** Link libgcrypt explicitly to certtool, gnutls-cli, gnutls-serv.
+
 ** Fix --disable-valgrind-tests.
 Reported by Ingmar Vanhassel in
 <https://savannah.gnu.org/support/?107029>.
