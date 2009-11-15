@@ -96,6 +96,17 @@ guile> (use-modules (gnutls))
 guile>
 @end example
 
+To check that you got the intended GnuTLS library version, you may
+print the version number of the loaded library as follows:
+
+@example
+$ guile
+guile> (use-modules (gnutls))
+guile> (gnutls-version)
+"@value{VERSION}"
+guile> 
+@end example
+
 
 @c *********************************************************************
 @node Guile API Conventions
