@@ -27,7 +27,7 @@ CERTTOOL=${CERTTOOL:-../src/certtool$EXEEXT}
 
 if cat<<EOF \
     | $CERTTOOL --certificate-info \
-    | grep -q 'Issuer: O=RFC 2253 escape test,OU=Plus \\+ Comma \\,'
+    | grep 'Issuer: O=RFC 2253 escape test,OU=Plus \\+ Comma \\,' > /dev/null
 -----BEGIN CERTIFICATE-----
 MIICETCCAXygAwIBAgIESnlIMTALBgkqhkiG9w0BAQUwODEdMBsGA1UEChMUUkZD
 IDIyNTMgZXNjYXBlIHRlc3QxFzAVBgNVBAsTDlBsdXMgKyBDb21tYSAsMB4XDTA5
