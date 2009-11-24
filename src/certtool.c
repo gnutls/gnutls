@@ -1408,16 +1408,19 @@ print_crq_info (gnutls_x509_crq_t crq, FILE * out)
   int ret;
   size_t size;
 
-  ret = gnutls_x509_crq_print (crq, GNUTLS_CRT_PRINT_FULL, &cinfo);
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "crq_print: %s", gnutls_strerror (ret));
+  if (info.outcert_format == GNUTLS_X509_FMT_PEM) 
+    {
+      ret = gnutls_x509_crq_print (crq, GNUTLS_CRT_PRINT_FULL, &cinfo);
+      if (ret < 0)
+        error (EXIT_FAILURE, 0, "crq_print: %s", gnutls_strerror (ret));
 
-  fprintf (out, "%s\n", cinfo.data);
+      fprintf (out, "%s\n", cinfo.data);
 
-  gnutls_free (cinfo.data);
+      gnutls_free (cinfo.data);
+    }
 
   size = sizeof (buffer);
-  ret = gnutls_x509_crq_export (crq, GNUTLS_X509_FMT_PEM, buffer, &size);
+  ret = gnutls_x509_crq_export (crq, info.outcert_format, buffer, &size);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crq_export: %s", gnutls_strerror (ret));
 
@@ -1880,92 +1883,94 @@ generate_request (void)
 	error (EXIT_FAILURE, 0, "set_pass: %s", gnutls_strerror (ret));
     }
 
-  ca_status = get_ca_status ();
-  if (ca_status)
-    path_len = get_path_len ();
-  else
-    path_len = -1;
+  if (info.crq_extensions != 0)
+    {
+      ca_status = get_ca_status ();
+      if (ca_status)
+        path_len = get_path_len ();
+      else
+        path_len = -1;
 
-  ret = gnutls_x509_crq_set_basic_constraints (crq, ca_status, path_len);
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "set_basic_constraints: %s",
+      ret = gnutls_x509_crq_set_basic_constraints (crq, ca_status, path_len);
+      if (ret < 0)
+        error (EXIT_FAILURE, 0, "set_basic_constraints: %s",
 	   gnutls_strerror (ret));
 
 
-  ret = get_sign_status (1);
-  if (ret)
-    usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
-
-  ret = get_encrypt_status (1);
-  if (ret)
-    usage |= GNUTLS_KEY_KEY_ENCIPHERMENT;
-  else
-    usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
-
-  if (ca_status)
-    {
-      ret = get_cert_sign_status ();
+      ret = get_sign_status (1);
       if (ret)
-	usage |= GNUTLS_KEY_KEY_CERT_SIGN;
+        usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
 
-      ret = get_crl_sign_status ();
+      ret = get_encrypt_status (1);
       if (ret)
-	usage |= GNUTLS_KEY_CRL_SIGN;
+        usage |= GNUTLS_KEY_KEY_ENCIPHERMENT;
+      else
+        usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
 
-      ret = get_code_sign_status ();
-      if (ret)
-	{
-	  ret =
-	    gnutls_x509_crq_set_key_purpose_oid (crq,
+      if (ca_status)
+        {
+          ret = get_cert_sign_status ();
+          if (ret)
+            usage |= GNUTLS_KEY_KEY_CERT_SIGN;
+
+          ret = get_crl_sign_status ();
+          if (ret)
+            usage |= GNUTLS_KEY_CRL_SIGN;
+
+          ret = get_code_sign_status ();
+          if (ret)
+            {
+    	      ret =
+    	        gnutls_x509_crq_set_key_purpose_oid (crq,
 						 GNUTLS_KP_CODE_SIGNING, 0);
-	  if (ret < 0)
-	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
-	}
+              if (ret < 0)
+                error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
+            }
 
-      ret = get_ocsp_sign_status ();
-      if (ret)
-	{
-	  ret =
-	    gnutls_x509_crq_set_key_purpose_oid (crq,
+          ret = get_ocsp_sign_status ();
+          if (ret)
+            {
+              ret =
+                gnutls_x509_crq_set_key_purpose_oid (crq,
 						 GNUTLS_KP_OCSP_SIGNING, 0);
-	  if (ret < 0)
-	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
-	}
+              if (ret < 0)
+                error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
+            }
 
-      ret = get_time_stamp_status ();
-      if (ret)
-	{
-	  ret =
-	    gnutls_x509_crq_set_key_purpose_oid (crq,
+          ret = get_time_stamp_status ();
+          if (ret)
+            {
+                ret =
+                  gnutls_x509_crq_set_key_purpose_oid (crq,
 						 GNUTLS_KP_TIME_STAMPING, 0);
-	  if (ret < 0)
-	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
-	}
+                if (ret < 0)
+                  error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
+            }
 
-    }
+        }
 
-  ret = gnutls_x509_crq_set_key_usage (crq, usage);
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "key_usage: %s", gnutls_strerror (ret));
+      ret = gnutls_x509_crq_set_key_usage (crq, usage);
+      if (ret < 0)
+        error (EXIT_FAILURE, 0, "key_usage: %s", gnutls_strerror (ret));
 
-  ret = get_tls_client_status ();
-  if (ret != 0)
-    {
-      ret = gnutls_x509_crq_set_key_purpose_oid (crq,
+      ret = get_tls_client_status ();
+      if (ret != 0)
+        {
+          ret = gnutls_x509_crq_set_key_purpose_oid (crq,
 						 GNUTLS_KP_TLS_WWW_CLIENT, 0);
-      if (ret < 0)
-	error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
-    }
+          if (ret < 0)
+	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
+        }
 
-  ret = get_tls_server_status ();
-  if (ret != 0)
-    {
-      ret = gnutls_x509_crq_set_key_purpose_oid (crq,
+      ret = get_tls_server_status ();
+      if (ret != 0)
+        {
+          ret = gnutls_x509_crq_set_key_purpose_oid (crq,
 						 GNUTLS_KP_TLS_WWW_SERVER, 0);
-      if (ret < 0)
-	error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
-    }
-
+          if (ret < 0)
+            error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
+        }
+  }
   ret = gnutls_x509_crq_set_key (crq, key);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "set_key: %s", gnutls_strerror (ret));
