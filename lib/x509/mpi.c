@@ -380,14 +380,14 @@ _gnutls_x509_write_rsa_params (bigint_t * params, int params_size,
       return _gnutls_asn2err (result);
     }
 
-  result = _gnutls_x509_write_int (spk, "modulus", params[0], 0);
+  result = _gnutls_x509_write_int (spk, "modulus", params[0], 1);
   if (result < 0)
     {
       gnutls_assert ();
       goto cleanup;
     }
 
-  result = _gnutls_x509_write_int (spk, "publicExponent", params[1], 0);
+  result = _gnutls_x509_write_int (spk, "publicExponent", params[1], 1);
   if (result < 0)
     {
       gnutls_assert ();
@@ -448,36 +448,15 @@ _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
   _gnutls_str_cpy (name, sizeof (name), dst_name);
   _gnutls_str_cat (name, sizeof (name), ".parameters");
 
-  if (pk_algorithm == GNUTLS_PK_DSA)
+  result = asn1_write_value (dst, name, NULL, 0);
+
+  if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND)
     {
-      result = _gnutls_x509_write_dsa_params (params, params_size, &der);
-      if (result < 0)
-	{
-	  gnutls_assert ();
-	  return result;
-	}
-
-      result = asn1_write_value (dst, name, der.data, der.size);
-      _gnutls_free_datum (&der);
-
-      if (result != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  return _gnutls_asn2err (result);
-	}
-    }
-  else
-    {				/* RSA */
-      result = asn1_write_value (dst, name, NULL, 0);
-
-      if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND)
-	{
-	  /* Here we ignore the element not found error, since this
-	   * may have been disabled before.
-	   */
-	  gnutls_assert ();
-	  return _gnutls_asn2err (result);
-	}
+      /* Here we ignore the element not found error, since this
+       * may have been disabled before.
+       */
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
     }
 
   return 0;
@@ -514,21 +493,21 @@ _gnutls_x509_write_dsa_params (bigint_t * params, int params_size,
       return _gnutls_asn2err (result);
     }
 
-  result = _gnutls_x509_write_int (spk, "p", params[0], 0);
+  result = _gnutls_x509_write_int (spk, "p", params[0], 1);
   if (result < 0)
     {
       gnutls_assert ();
       goto cleanup;
     }
 
-  result = _gnutls_x509_write_int (spk, "q", params[1], 0);
+  result = _gnutls_x509_write_int (spk, "q", params[1], 1);
   if (result < 0)
     {
       gnutls_assert ();
       goto cleanup;
     }
 
-  result = _gnutls_x509_write_int (spk, "g", params[2], 0);
+  result = _gnutls_x509_write_int (spk, "g", params[2], 1);
   if (result < 0)
     {
       gnutls_assert ();
@@ -580,7 +559,7 @@ _gnutls_x509_write_dsa_public_key (bigint_t * params, int params_size,
       return _gnutls_asn2err (result);
     }
 
-  result = _gnutls_x509_write_int (spk, "", params[3], 0);
+  result = _gnutls_x509_write_int (spk, "", params[3], 1);
   if (result < 0)
     {
       gnutls_assert ();
