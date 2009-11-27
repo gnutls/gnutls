@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.9.10 (unreleased)
 
+** certtool: Allow exporting of Certificate requests on DER format.
+
+** certtool: New option --no-crq-extensions to avoid extensions in CSRs.
+
 ** API and ABI modifications:
 No changes since last version.
 
