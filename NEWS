@@ -5,6 +5,14 @@ See the end for copying conditions.
 
 * Version 2.9.10 (unreleased)
 
+** certtool: Corrected two issues that affected certificate request generation.
+(1) Null padding is added on integers (found thanks to Wilankar Trupti),
+(2) In optional SignatureAlgorithm parameters field for DSA keys the DSA
+parameters were added. Those were rejected by Verisign. Gnutls no longer adds 
+those parameters there since other implementations don't do either and having 
+them does not seem to offer anything (anyway you need the signer's certificate
+to verify thus public key will be available). Found thanks to Boyan Kasarov.
+
 ** certtool: Allow exporting of Certificate requests on DER format.
 
 ** certtool: New option --no-crq-extensions to avoid extensions in CSRs.
