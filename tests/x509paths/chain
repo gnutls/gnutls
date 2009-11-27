@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2004, 2005, 2007 Free Software Foundation
+# Copyright (C) 2004, 2005, 2007, 2009 Free Software Foundation
 #
 # Author: Simon Josefsson
 #
@@ -40,14 +40,14 @@ while test -d X509tests/test$i; do
     if test $rc != 0; then
 	echo "Chain $i FATAL failure."
     else
-	if echo "$SUCCESS" | grep -q " $i "; then
-	    if grep 'Verification output:' out | grep -q -v 'Verification output: Verified\.$'; then
+	if echo "$SUCCESS" | grep " $i " > /dev/null; then
+	    if grep 'Verification output:' out | grep -v 'Verification output: Verified\.$' > /dev/null; then
 		echo "Chain $i verification failure UNEXPECTED."
 	    else
 		echo "Chain $i verification success as expected."
 	    fi
-	elif echo "$FAILURE" | grep -q " $i "; then
-	    if grep 'Verification output:' out | grep -q -v 'Verification output: Verified\.$'; then
+	elif echo "$FAILURE" | grep " $i "; then
+	    if grep 'Verification output:' out | grep -v 'Verification output: Verified\.$' > /dev/null; then
 		echo "Chain $i verification failure as expected."
 	    else
 		echo "Chain $i verification success UNEXPECTED. "

@@ -591,7 +591,7 @@ update-makefile:
 	MANS=""; \
 	SRPMANS=""; \
 	for i in $$FUNCS; do \
-		if echo $$i | grep -q _srp_; then \
+		if echo $$i | grep gnutls_srp_ > /dev/null; then \
 			SRPMANS="$$SRPMANS\nSRPMANS += $$i.3"; \
 		else \
 			MANS="$$MANS\nAPIMANS += $$i.3"; \

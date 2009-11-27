@@ -39,7 +39,7 @@ $CERTTOOL $PARAMS --load-ca-certificate $srcdir/ca-weird-keyid.pem \
     --outfile user-weird-keyid.pem 2> /dev/null
 
 if $CERTTOOL -i < user-weird-keyid.pem \
-    | grep -q '7a2c7a6097460603cbfb28e8e219df18deeb4e0d'; then
+    | grep '7a2c7a6097460603cbfb28e8e219df18deeb4e0d' > /dev/null; then
     :
 else
     echo "Could not find CA SKI in user certificate."
