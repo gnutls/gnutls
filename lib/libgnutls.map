@@ -580,6 +580,11 @@ GNUTLS_2_10
     gnutls_x509_crt_get_issuer_alt_name;
     gnutls_x509_crt_get_issuer_alt_othername_oid;
     gnutls_sign_algorithm_get_requested;
+    gnutls_cipher_init;
+    gnutls_cipher_encrypt;
+    gnutls_cipher_decrypt;
+    gnutls_cipher_deinit;
+
 } GNUTLS_2_8;
 
 GNUTLS_PRIVATE {

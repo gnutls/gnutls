@@ -30,6 +30,7 @@
 #include <gcrypt.h>
 
 #include <gnutls_extensions.h>	/* for _gnutls_ext_init */
+#include <gnutls_cryptodev.h>
 
 #include "sockets.h"
 #include "gettext.h"
@@ -246,6 +247,8 @@ gnutls_global_init (void)
       gnutls_assert ();
       goto out;
     }
+    
+  _gnutls_cryptodev_init();
 
 out:
   return result;
@@ -271,6 +274,7 @@ gnutls_global_deinit (void)
       asn1_delete_structure (&_gnutls_gnutls_asn);
       asn1_delete_structure (&_gnutls_pkix1_asn);
       _gnutls_crypto_deregister ();
+      _gnutls_cryptodev_deinit();
     }
   _gnutls_init--;
 }

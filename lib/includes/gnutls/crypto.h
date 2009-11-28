@@ -25,29 +25,23 @@
 #ifndef GNUTLS_CRYPTO_H
 # define GNUTLS_CRYPTO_H
 
-# define GNUTLS_CRYPTO_API_VERSION 0x01
+typedef struct cipher_hd_st* gnutls_cipher_hd_t;
 
-typedef struct
-{
-  int (*init) (void **ctx);
-  int (*setkey) (void *ctx, const void *key, size_t keysize);
-  int (*setiv) (void *ctx, const void *iv, size_t ivsize);
-  int (*encrypt) (void *ctx, const void *plain, size_t plainsize,
-		  void *encr, size_t encrsize);
-  int (*decrypt) (void *ctx, const void *encr, size_t encrsize,
-		  void *plain, size_t plainsize);
-  void (*deinit) (void *ctx);
-} gnutls_crypto_single_cipher_st;
+int gnutls_cipher_init (gnutls_cipher_hd_t*, gnutls_cipher_algorithm_t cipher,
+				 const gnutls_datum_t * key,
+				 const gnutls_datum_t * iv);
+int gnutls_cipher_encrypt (const gnutls_cipher_hd_t handle, void *text, int textlen);
+int gnutls_cipher_decrypt (const gnutls_cipher_hd_t handle, void *ciphertext,
+			    int ciphertextlen);
+void gnutls_cipher_deinit (gnutls_cipher_hd_t handle);
 
-typedef struct
-{
-  int (*init) (void **ctx);
-  int (*setkey) (void *ctx, const void *key, size_t keysize);
-  int (*hash) (void *ctx, const void *text, size_t textsize);
-  int (*copy) (void **dst_ctx, void *src_ctx);
-  int (*output) (void *src_ctx, void *digest, size_t digestsize);
-  void (*deinit) (void *ctx);
-} gnutls_crypto_single_mac_st;
+
+/* register ciphers */
+
+#define GNUTLS_CRYPTO_API_VERSION 0x02
+
+#define gnutls_crypto_single_cipher_st gnutls_crypto_cipher_st
+#define gnutls_crypto_single_mac_st gnutls_crypto_mac_st
 
 typedef struct
 {
@@ -256,13 +250,13 @@ typedef struct gnutls_crypto_pk
 
 int gnutls_crypto_single_cipher_register2 (gnutls_cipher_algorithm_t algorithm,
 					   int priority, int version,
-					   gnutls_crypto_single_cipher_st *s);
+					   const gnutls_crypto_single_cipher_st *s);
 int gnutls_crypto_single_mac_register2 (gnutls_mac_algorithm_t algorithm,
 					int priority, int version,
-					gnutls_crypto_single_mac_st * s);
+					const gnutls_crypto_single_mac_st * s);
 int gnutls_crypto_single_digest_register2 (gnutls_digest_algorithm_t algorithm,
 					   int priority, int version,
-					   gnutls_crypto_single_digest_st *s);
+					   const gnutls_crypto_single_digest_st *s);
 
 # define gnutls_crypto_cipher_register(prio, st)			\
   gnutls_crypto_cipher_register2 (prio, GNUTLS_CRYPTO_API_VERSION, st)
@@ -272,11 +266,11 @@ int gnutls_crypto_single_digest_register2 (gnutls_digest_algorithm_t algorithm,
   gnutls_crypto_digest_register2 (prio, GNUTLS_CRYPTO_API_VERSION, st)
 
 int gnutls_crypto_cipher_register2 (int priority, int version,
-				    gnutls_crypto_cipher_st * s);
+				    const gnutls_crypto_cipher_st * s);
 int gnutls_crypto_mac_register2 (int priority, int version,
-				 gnutls_crypto_mac_st * s);
+				 const gnutls_crypto_mac_st * s);
 int gnutls_crypto_digest_register2 (int priority, int version,
-				    gnutls_crypto_digest_st * s);
+				    const gnutls_crypto_digest_st * s);
 
 # define gnutls_crypto_rnd_register(prio, st)				\
   gnutls_crypto_rnd_register2 (prio, GNUTLS_CRYPTO_API_VERSION, st)
@@ -286,10 +280,10 @@ int gnutls_crypto_digest_register2 (int priority, int version,
   gnutls_crypto_bigint_register2 (prio, GNUTLS_CRYPTO_API_VERSION, st)
 
 int gnutls_crypto_rnd_register2 (int priority, int version,
-				 gnutls_crypto_rnd_st * s);
+				 const gnutls_crypto_rnd_st * s);
 int gnutls_crypto_pk_register2 (int priority, int version,
-				gnutls_crypto_pk_st * s);
+				const gnutls_crypto_pk_st * s);
 int gnutls_crypto_bigint_register2 (int priority, int version,
-				    gnutls_crypto_bigint_st * s);
+				    const gnutls_crypto_bigint_st * s);
 
 #endif

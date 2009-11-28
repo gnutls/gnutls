@@ -72,7 +72,7 @@ _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
     {
       dig->registered = 1;
       dig->hd.rh.cc = cc;
-      if (cc->init (&dig->hd.rh.ctx) < 0)
+      if (cc->init (algorithm, &dig->hd.rh.ctx) < 0)
 	{
 	  gnutls_assert ();
 	  return GNUTLS_E_HASH_FAILED;
@@ -266,7 +266,7 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
       dig->registered = 1;
 
       dig->hd.rh.cc = cc;
-      if (cc->init (&dig->hd.rh.ctx) < 0)
+      if (cc->init (algorithm, &dig->hd.rh.ctx) < 0)
 	{
 	  gnutls_assert ();
 	  return GNUTLS_E_HASH_FAILED;

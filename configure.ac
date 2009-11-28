@@ -187,6 +187,21 @@ LIBS=$SAVED_LIBS
 AC_MSG_CHECKING([whether to use the included libcfg])
 AC_MSG_RESULT($libcfg_enabled)
 
+# For cryptodev
+enable_cryptodev=no
+AC_MSG_CHECKING([whether to add cryptodev support])
+AC_ARG_ENABLE(cryptodev,
+	AS_HELP_STRING([--enable-cryptodev], [enable cryptodev support]),
+enable_cryptodev=yes)
+AC_MSG_RESULT($enable_cryptodev)
+
+if test "$enable_cryptodev" = "yes"; then
+AC_CHECK_MEMBER(struct crypt_opv.iovec, 
+[AC_DEFINE([ENABLE_CRYPTODEV_IOVEC], 1, [Enable cryptodev iovec support])],,[[#include <crypto/cryptodev.h>]])
+AC_DEFINE([ENABLE_CRYPTODEV], 1, [Enable cryptodev support])
+fi
+
+
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
@@ -303,4 +318,5 @@ AC_MSG_NOTICE([summary of build options:
   Guile wrappers:   $opt_guile_bindings
   C++ library:      $use_cxx
   OpenSSL library:  $enable_openssl
+  /dev/crypto:      $enable_cryptodev
 ])

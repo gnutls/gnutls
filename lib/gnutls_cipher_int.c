@@ -49,7 +49,7 @@ _gnutls_cipher_init (cipher_hd_st * handle, gnutls_cipher_algorithm_t cipher,
     {
       handle->registered = 1;
       handle->hd.rh.cc = cc;
-      SR (cc->init (&handle->hd.rh.ctx), cc_cleanup);
+      SR (cc->init (cipher, &handle->hd.rh.ctx), cc_cleanup);
       SR (cc->setkey (handle->hd.rh.ctx, key->data, key->size), cc_cleanup);
       if (iv->data && iv->size && cc->setiv)
 	SR (cc->setiv (handle->hd.rh.ctx, iv->data, iv->size), cc_cleanup);

@@ -261,6 +261,12 @@ static const gnutls_error_entry error_algorithms[] = {
 		  "check gnutls_handshake_set_max_packet_length()."),
 	       GNUTLS_E_HANDSHAKE_TOO_LARGE, 1),
 
+  ERROR_ENTRY (N_("Error opening /dev/crypto"),
+	       GNUTLS_E_CRYPTODEV_DEVICE_ERROR, 1),
+
+  ERROR_ENTRY (N_("Error interfacing with /dev/crypto"),
+	       GNUTLS_E_CRYPTODEV_IOCTL_ERROR, 1),
+
   {NULL, NULL, 0, 0}
 };
 

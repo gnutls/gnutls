@@ -81,6 +81,7 @@ src/printlist
 src/psktool
 src/req
 src/srptool
+src/benchmark
 stamp-h1
 tests/anonself
 tests/certder
