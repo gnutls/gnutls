@@ -26,10 +26,11 @@
 #include <gnutls_int.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
-#include <crypto/cryptodev.h>
 #include <gnutls/crypto.h>
 
 #ifdef ENABLE_CRYPTODEV
+
+#include <crypto/cryptodev.h>
 
 #ifndef CRYPTO_CIPHER_MAX_KEY_LEN
 # define CRYPTO_CIPHER_MAX_KEY_LEN 64
