@@ -36,6 +36,7 @@
 # define CRYPTO_CIPHER_MAX_KEY_LEN 64
 #endif
 
+
 static int cryptodev_fd = -1;
 
 struct cryptodev_ctx {
@@ -152,7 +153,7 @@ struct cryptodev_ctx* ctx = _ctx;
 	gnutls_free(ctx);
 }
 
-const static gnutls_crypto_single_cipher_st cipher_struct = {
+const static gnutls_crypto_cipher_st cipher_struct = {
 	.init = cryptodev_cipher_init,
 	.setkey = cryptodev_setkey,
 	.setiv = cryptodev_setiv,
@@ -252,5 +253,4 @@ void _gnutls_cryptodev_deinit()
 {
 	return;
 }
-
 #endif /* ENABLE_CRYPTODEV */
