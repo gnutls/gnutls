@@ -2213,7 +2213,7 @@ rsadsa_get_key_id (gnutls_x509_crt_t crt, int pk,
   int params_size = MAX_PUBLIC_PARAMS_SIZE;
   int i, result = 0;
   gnutls_datum_t der = { NULL, 0 };
-  digest_hd_st hd;
+  hash_hd_st hd;
 
   result = _gnutls_x509_crt_get_mpis (crt, params, &params_size);
   if (result < 0)
@@ -2243,7 +2243,7 @@ rsadsa_get_key_id (gnutls_x509_crt_t crt, int pk,
   else
     return GNUTLS_E_INTERNAL_ERROR;
 
-  result = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1);
+  result = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1, NULL, 0);
   if (result < 0)
     {
       gnutls_assert ();
@@ -2496,7 +2496,7 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  return _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) hash,
+  return _gnutls_x509_verify_algorithm ((gnutls_digest_algorithm_t *) hash,
 					signature, crt);
 }
 

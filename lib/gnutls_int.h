@@ -133,7 +133,7 @@ typedef struct
 #define DECR_LENGTH_RET(len, x, RET) do { len-=x; if (len<0) {gnutls_assert(); return RET;} } while (0)
 #define DECR_LENGTH_COM(len, x, COM) do { len-=x; if (len<0) {gnutls_assert(); COM;} } while (0)
 
-#define HASH2MAC(x) ((gnutls_mac_algorithm_t)x)
+#define HASH2MAC(x) ((gnutls_digest_algorithm_t)x)
 
 #define GNUTLS_POINTER_TO_INT(_) ((int) GNUTLS_POINTER_TO_INT_CAST (_))
 #define GNUTLS_INT_TO_POINTER(_) ((void*) GNUTLS_POINTER_TO_INT_CAST (_))
@@ -366,11 +366,11 @@ typedef struct
    * null cipher and we don't
    */
   gnutls_cipher_algorithm_t read_bulk_cipher_algorithm;
-  gnutls_mac_algorithm_t read_mac_algorithm;
+  gnutls_digest_algorithm_t read_mac_algorithm;
   gnutls_compression_method_t read_compression_algorithm;
 
   gnutls_cipher_algorithm_t write_bulk_cipher_algorithm;
-  gnutls_mac_algorithm_t write_mac_algorithm;
+  gnutls_digest_algorithm_t write_mac_algorithm;
   gnutls_compression_method_t write_compression_algorithm;
   handshake_mac_type_t handshake_mac_handle_type; /* one of HANDSHAKE_TYPE_10 and HANDSHAKE_TYPE_12 */
 
@@ -491,13 +491,13 @@ typedef struct
     {
       struct 
         {
-          digest_hd_st sha;	/* hash of the handshake messages */
-          digest_hd_st md5;	/* hash of the handshake messages */
+          hash_hd_st sha;	/* hash of the handshake messages */
+          hash_hd_st md5;	/* hash of the handshake messages */
         } tls10;
       struct
         {
-          digest_hd_st sha1;	/* hash of the handshake messages for TLS 1.2+ */
-          digest_hd_st sha256;	/* hash of the handshake messages for TLS 1.2+ */
+          hash_hd_st sha1;	/* hash of the handshake messages for TLS 1.2+ */
+          hash_hd_st sha256;	/* hash of the handshake messages for TLS 1.2+ */
         } tls12;
     } handshake_mac_handle;
   int handshake_mac_handle_init; /* 1 when the previous union and type were initialized */

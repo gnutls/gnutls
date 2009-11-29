@@ -170,7 +170,7 @@ static cdk_error_t
 file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
 {
   cdk_stream_t inp = NULL, out = NULL, tmp = NULL;
-  digest_hd_st md;
+  hash_hd_st md;
   char buf[512], chk[512];
   const char *s;
   int i, is_signed = 0, nbytes;
@@ -241,7 +241,7 @@ file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
   if (!digest_algo)
     digest_algo = GNUTLS_DIG_MD5;
 
-  err = _gnutls_hash_init (&md, digest_algo);
+  err = _gnutls_hash_init (&md, digest_algo, NULL, 0);
   if (err < 0)
     {
       rc = map_gnutls_error (err);

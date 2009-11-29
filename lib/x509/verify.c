@@ -553,7 +553,7 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
  */
 static int
 decode_ber_digest_info (const gnutls_datum_t * info,
-			gnutls_mac_algorithm_t * hash,
+			gnutls_digest_algorithm_t * hash,
 			opaque * digest, int *digest_size)
 {
   ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
@@ -635,11 +635,11 @@ _pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
 		       const gnutls_datum_t * signature, bigint_t * params,
 		       int params_len)
 {
-  gnutls_mac_algorithm_t hash = GNUTLS_MAC_UNKNOWN;
+  gnutls_digest_algorithm_t hash = GNUTLS_MAC_UNKNOWN;
   int ret;
   opaque digest[MAX_HASH_SIZE], md[MAX_HASH_SIZE], *cmp;
   int digest_size;
-  digest_hd_st hd;
+  hash_hd_st hd;
   gnutls_datum_t decrypted;
 
   ret =
@@ -682,7 +682,7 @@ _pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
 	  return GNUTLS_E_INVALID_REQUEST;
 	}
 
-      ret = _gnutls_hash_init (&hd, hash);
+      ret = _gnutls_hash_init (&hd, hash, NULL, 0);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -715,7 +715,7 @@ dsa_verify_sig (const gnutls_datum_t * text,
   int ret;
   opaque _digest[MAX_HASH_SIZE];
   gnutls_datum_t digest;
-  digest_hd_st hd;
+  hash_hd_st hd;
 
   if (hash && hash->data && hash->size == 20)
     {
@@ -723,7 +723,7 @@ dsa_verify_sig (const gnutls_datum_t * text,
     }
   else
     {
-      ret = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1);
+      ret = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1, NULL, 0);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -785,7 +785,7 @@ verify_sig (const gnutls_datum_t * tbs,
 }
 
 int
-_gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
+_gnutls_x509_verify_algorithm (gnutls_digest_algorithm_t * hash,
 			       const gnutls_datum_t * signature,
 			       const gnutls_x509_crt_t issuer)
 {

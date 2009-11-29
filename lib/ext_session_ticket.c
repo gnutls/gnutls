@@ -55,24 +55,24 @@ static int
 digest_ticket (const gnutls_datum_t * key, struct ticket *ticket,
 	       opaque * digest)
 {
-  digest_hd_st digest_hd;
+  hash_hd_st digest_hd;
   uint16_t length16;
   int ret;
 
-  ret = _gnutls_hmac_init (&digest_hd, GNUTLS_MAC_SHA256, key->data,
+  ret = _gnutls_hash_init (&digest_hd, GNUTLS_MAC_SHA256, key->data,
 			   key->size);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
-  _gnutls_hmac (&digest_hd, ticket->key_name, KEY_NAME_SIZE);
-  _gnutls_hmac (&digest_hd, ticket->IV, IV_SIZE);
+  _gnutls_hash (&digest_hd, ticket->key_name, KEY_NAME_SIZE);
+  _gnutls_hash (&digest_hd, ticket->IV, IV_SIZE);
   length16 = _gnutls_conv_uint16 (ticket->encrypted_state_len);
-  _gnutls_hmac (&digest_hd, &length16, 2);
-  _gnutls_hmac (&digest_hd, ticket->encrypted_state,
+  _gnutls_hash (&digest_hd, &length16, 2);
+  _gnutls_hash (&digest_hd, ticket->encrypted_state,
 		ticket->encrypted_state_len);
-  _gnutls_hmac_deinit (&digest_hd, digest);
+  _gnutls_hash_deinit (&digest_hd, digest);
 
   return 0;
 }
@@ -461,7 +461,7 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
   struct ticket ticket;
   uint16_t ticket_len;
   gnutls_cipher_algorithm_t write_bulk_cipher_algorithm;
-  gnutls_mac_algorithm_t write_mac_algorithm;
+  gnutls_digest_algorithm_t write_mac_algorithm;
   gnutls_compression_method_t write_compression_algorithm;
 
 #define SAVE_WRITE_SECURITY_PARAMETERS					\

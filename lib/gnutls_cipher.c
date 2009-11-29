@@ -194,7 +194,7 @@ _gnutls_decrypt (gnutls_session_t session, opaque * ciphertext,
 }
 
 inline static int
-mac_init (digest_hd_st * td, gnutls_mac_algorithm_t mac, opaque * secret,
+mac_init (hash_hd_st * td, gnutls_digest_algorithm_t mac, opaque * secret,
 	  int secret_size, int ver)
 {
   int ret = 0;
@@ -210,14 +210,14 @@ mac_init (digest_hd_st * td, gnutls_mac_algorithm_t mac, opaque * secret,
     }
   else
     {				/* TLS 1.x */
-      ret = _gnutls_hmac_init (td, mac, secret, secret_size);
+      ret = _gnutls_hash_init (td, mac, secret, secret_size);
     }
 
   return ret;
 }
 
 static void
-mac_deinit (digest_hd_st * td, opaque * res, int ver)
+mac_deinit (hash_hd_st * td, opaque * res, int ver)
 {
   if (ver == GNUTLS_SSL3)
     {				/* SSL 3.0 */
@@ -225,7 +225,7 @@ mac_deinit (digest_hd_st * td, opaque * res, int ver)
     }
   else
     {
-      _gnutls_hmac_deinit (td, res);
+      _gnutls_hash_deinit (td, res);
     }
 }
 
@@ -302,7 +302,7 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
   uint16_t c_length;
   uint8_t pad;
   int length, ret;
-  digest_hd_st td;
+  hash_hd_st td;
   uint8_t type = _type;
   uint8_t major, minor;
   int hash_size =
@@ -339,18 +339,18 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
 
   if (session->security_parameters.write_mac_algorithm != GNUTLS_MAC_NULL)
     {				/* actually when the algorithm in not the NULL one */
-      _gnutls_hmac (&td,
+      _gnutls_hash (&td,
 		    UINT64DATA (session->connection_state.
 				write_sequence_number), 8);
 
-      _gnutls_hmac (&td, &type, 1);
+      _gnutls_hash (&td, &type, 1);
       if (_gnutls_version_has_variable_padding (ver))
 	{			/* TLS 1.0 or higher */
-	  _gnutls_hmac (&td, &major, 1);
-	  _gnutls_hmac (&td, &minor, 1);
+	  _gnutls_hash (&td, &major, 1);
+	  _gnutls_hash (&td, &minor, 1);
 	}
-      _gnutls_hmac (&td, &c_length, 2);
-      _gnutls_hmac (&td, compressed.data, compressed.size);
+      _gnutls_hash (&td, &c_length, 2);
+      _gnutls_hash (&td, compressed.data, compressed.size);
       mac_deinit (&td, MAC, ver);
     }
 
@@ -435,7 +435,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
   uint16_t c_length;
   uint8_t pad;
   int length;
-  digest_hd_st td;
+  hash_hd_st td;
   uint16_t blocksize;
   int ret, i, pad_failed = 0;
   uint8_t major, minor;
@@ -565,20 +565,20 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
    */
   if (session->security_parameters.read_mac_algorithm != GNUTLS_MAC_NULL)
     {
-      _gnutls_hmac (&td,
+      _gnutls_hash (&td,
 		    UINT64DATA (session->connection_state.
 				read_sequence_number), 8);
 
-      _gnutls_hmac (&td, &type, 1);
+      _gnutls_hash (&td, &type, 1);
       if (_gnutls_version_has_variable_padding (ver))
 	{			/* TLS 1.x */
-	  _gnutls_hmac (&td, &major, 1);
-	  _gnutls_hmac (&td, &minor, 1);
+	  _gnutls_hash (&td, &major, 1);
+	  _gnutls_hash (&td, &minor, 1);
 	}
-      _gnutls_hmac (&td, &c_length, 2);
+      _gnutls_hash (&td, &c_length, 2);
 
       if (length > 0)
-	_gnutls_hmac (&td, ciphertext.data, length);
+	_gnutls_hash (&td, ciphertext.data, length);
 
       mac_deinit (&td, MAC, ver);
     }

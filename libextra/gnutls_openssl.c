@@ -1009,10 +1009,10 @@ RAND_egd_bytes (const char *path, int bytes)
 void
 MD5_Init (MD5_CTX * ctx)
 {
-  ctx->handle = gnutls_malloc (sizeof (digest_hd_st));
+  ctx->handle = gnutls_malloc (sizeof (hash_hd_st));
   if (!ctx->handle)
     abort ();
-  _gnutls_hash_init (ctx->handle, GNUTLS_DIG_MD5);
+  _gnutls_hash_init (ctx->handle, GNUTLS_DIG_MD5, NULL, 0);
 }
 
 void
@@ -1034,7 +1034,7 @@ MD5 (const unsigned char *buf, unsigned long len, unsigned char *md)
   if (!md)
     return NULL;
 
-  _gnutls_hash_fast (GNUTLS_DIG_MD5, buf, len, md);
+  _gnutls_hash_fast (GNUTLS_DIG_MD5, buf, len, NULL, 0, md);
 
   return md;
 }
@@ -1042,10 +1042,10 @@ MD5 (const unsigned char *buf, unsigned long len, unsigned char *md)
 void
 RIPEMD160_Init (RIPEMD160_CTX * ctx)
 {
-  ctx->handle = gnutls_malloc (sizeof (digest_hd_st));
+  ctx->handle = gnutls_malloc (sizeof (hash_hd_st));
   if (!ctx->handle)
     abort ();
-  _gnutls_hash_init (ctx->handle, GNUTLS_DIG_RMD160);
+  _gnutls_hash_init (ctx->handle, GNUTLS_DIG_RMD160, NULL, 0);
 }
 
 void
@@ -1067,7 +1067,7 @@ RIPEMD160 (const unsigned char *buf, unsigned long len, unsigned char *md)
   if (!md)
     return NULL;
 
-  _gnutls_hash_fast (GNUTLS_DIG_RMD160, buf, len, md);
+  _gnutls_hash_fast (GNUTLS_DIG_RMD160, buf, len, NULL, 0, md);
 
   return md;
 }

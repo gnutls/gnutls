@@ -127,35 +127,34 @@ extern "C" {
 
   typedef enum
   {
-    GNUTLS_MAC_UNKNOWN = 0,
-    GNUTLS_MAC_NULL = 1,
-    GNUTLS_MAC_MD5,
-    GNUTLS_MAC_SHA1,
-    GNUTLS_MAC_RMD160,
-    GNUTLS_MAC_MD2,
-    GNUTLS_MAC_SHA256,
-    GNUTLS_MAC_SHA384,
-    GNUTLS_MAC_SHA512
+    GNUTLS_DIG_UNKNOWN = 0,
+    GNUTLS_DIG_NULL = 1,
+    GNUTLS_DIG_MD5,
+    GNUTLS_DIG_SHA1,
+    GNUTLS_DIG_RMD160,
+    GNUTLS_DIG_MD2,
+    GNUTLS_DIG_SHA256,
+    GNUTLS_DIG_SHA384,
+    GNUTLS_DIG_SHA512,
+    GNUTLS_DIG_SHA224, /* unsupported in TLS */
     /* If you add anything here, make sure you align with
        gnutls_digest_algorithm_t, in particular SHA-224. */
-  } gnutls_mac_algorithm_t;
-
-  /* The enumerations here should have the same value with
-     gnutls_mac_algorithm_t.
-   */
-  typedef enum
-  {
-    GNUTLS_DIG_UNKNOWN = GNUTLS_MAC_UNKNOWN,
-    GNUTLS_DIG_NULL = GNUTLS_MAC_NULL,
-    GNUTLS_DIG_MD5 = GNUTLS_MAC_MD5,
-    GNUTLS_DIG_SHA1 = GNUTLS_MAC_SHA1,
-    GNUTLS_DIG_RMD160 = GNUTLS_MAC_RMD160,
-    GNUTLS_DIG_MD2 = GNUTLS_MAC_MD2,
-    GNUTLS_DIG_SHA256 = GNUTLS_MAC_SHA256,
-    GNUTLS_DIG_SHA384 = GNUTLS_MAC_SHA384,
-    GNUTLS_DIG_SHA512 = GNUTLS_MAC_SHA512,
-    GNUTLS_DIG_SHA224
   } gnutls_digest_algorithm_t;
+
+  /* These are compatibility definitions.
+   */
+#define gnutls_mac_algorithm_t gnutls_digest_algorithm_t
+
+#define GNUTLS_MAC_UNKNOWN GNUTLS_DIG_UNKNOWN
+#define GNUTLS_MAC_NULL GNUTLS_DIG_NULL
+#define GNUTLS_MAC_MD5 GNUTLS_DIG_MD5
+#define GNUTLS_MAC_SHA1 GNUTLS_DIG_SHA1
+#define GNUTLS_MAC_RMD160 GNUTLS_DIG_RMD160
+#define GNUTLS_MAC_MD2 GNUTLS_DIG_MD2
+#define GNUTLS_MAC_SHA256 GNUTLS_DIG_SHA256
+#define GNUTLS_MAC_SHA384 GNUTLS_DIG_SHA384
+#define GNUTLS_MAC_SHA512 GNUTLS_DIG_SHA512
+#define GNUTLS_MAC_SHA224 GNUTLS_DIG_SHA224
 
   /* exported for other gnutls headers. This is the maximum number of
    * algorithms (ciphers, kx or macs).
@@ -937,7 +936,7 @@ extern "C" {
 /* fingerprint 
  * Actually this function returns the hash of the given data.
  */
-  int gnutls_fingerprint (gnutls_digest_algorithm_t algo,
+  int gnutls_fingerprint (gnutls_mac_algorithm_t algo,
 			  const gnutls_datum_t * data, void *result,
 			  size_t * result_size);
 

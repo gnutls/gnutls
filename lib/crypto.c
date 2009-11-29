@@ -35,7 +35,7 @@ typedef struct algo_list
 {
   int algorithm;
   int priority;
-  void *alg_data;
+  const void *alg_data;
   struct algo_list *next;
 } algo_list;
 
@@ -44,7 +44,7 @@ typedef struct algo_list
 #define digest_list algo_list
 
 static int
-_algo_register (algo_list * al, int algorithm, int priority, void *s)
+_algo_register (algo_list * al, int algorithm, int priority, const void *s)
 {
   algo_list *cl;
   algo_list *last_cl = al;
@@ -92,7 +92,7 @@ _algo_register (algo_list * al, int algorithm, int priority, void *s)
 
 }
 
-static void *
+static const void *
 _get_algo (algo_list * al, int algo)
 {
   cipher_list *cl;
@@ -166,7 +166,7 @@ _gnutls_crypto_deregister (void)
 int
 gnutls_crypto_single_cipher_register2 (gnutls_cipher_algorithm_t algorithm,
 				       int priority, int version,
-				       const gnutls_crypto_single_cipher_st * s)
+				       const gnutls_crypto_cipher_st * s)
 {
   if (version != GNUTLS_CRYPTO_API_VERSION)
     {
@@ -177,7 +177,7 @@ gnutls_crypto_single_cipher_register2 (gnutls_cipher_algorithm_t algorithm,
   return _algo_register (&glob_cl, algorithm, priority, s);
 }
 
-gnutls_crypto_single_cipher_st *
+const gnutls_crypto_cipher_st *
 _gnutls_get_crypto_cipher (gnutls_cipher_algorithm_t algo)
 {
   return _get_algo (&glob_cl, algo);
@@ -225,7 +225,7 @@ gnutls_crypto_rnd_register2 (int priority, int version,
 }
 
 /**
- * gnutls_crypto_single_mac_register2 - register a MAC algorithm
+ * gnutls_crypto_single_digest_register2 - register a MAC algorithm
  * @algorithm: is the gnutls algorithm identifier
  * @priority: is the priority of the algorithm
  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
@@ -239,16 +239,16 @@ gnutls_crypto_rnd_register2 (int priority, int version,
  * This function should be called before gnutls_global_init().
  *
  * For simplicity you can use the convenience
- * gnutls_crypto_single_mac_register() macro.
+ * gnutls_crypto_single_digest_register() macro.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
  *
  * Since: 2.6.0
  **/
 int
-gnutls_crypto_single_mac_register2 (gnutls_mac_algorithm_t algorithm,
+gnutls_crypto_single_digest_register2 (gnutls_digest_algorithm_t algorithm,
 				    int priority, int version,
-				    const gnutls_crypto_single_mac_st * s)
+				    const gnutls_crypto_digest_st * s)
 {
   if (version != GNUTLS_CRYPTO_API_VERSION)
     {
@@ -259,52 +259,10 @@ gnutls_crypto_single_mac_register2 (gnutls_mac_algorithm_t algorithm,
   return _algo_register (&glob_ml, algorithm, priority, s);
 }
 
-gnutls_crypto_single_mac_st *
-_gnutls_get_crypto_mac (gnutls_mac_algorithm_t algo)
+const gnutls_crypto_digest_st *
+_gnutls_get_crypto_mac (gnutls_digest_algorithm_t algo)
 {
   return _get_algo (&glob_ml, algo);
-}
-
-/**
- * gnutls_crypto_single_digest_register2 - register a digest algorithm
- * @algorithm: is the gnutls algorithm identifier
- * @priority: is the priority of the algorithm
- * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
- * @s: is a structure holding new algorithms's data
- *
- * This function will register a digest (hash) algorithm to be used by
- * gnutls.  Any algorithm registered will override the included
- * algorithms and by convention kernel implemented algorithms have
- * priority of 90.  The algorithm with the lowest priority will be
- * used by gnutls.
- *
- * This function should be called before gnutls_global_init().
- *
- * For simplicity you can use the convenience
- * gnutls_crypto_single_digest_register() macro.
- *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
- *
- * Since: 2.6.0
- **/
-int
-gnutls_crypto_single_digest_register2 (gnutls_digest_algorithm_t algorithm,
-				       int priority, int version,
-				       const gnutls_crypto_single_digest_st * s)
-{
-  if (version != GNUTLS_CRYPTO_API_VERSION)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-    }
-
-  return _algo_register (&glob_dl, algorithm, priority, s);
-}
-
-gnutls_crypto_single_digest_st *
-_gnutls_get_crypto_digest (gnutls_digest_algorithm_t algo)
-{
-  return _get_algo (&glob_dl, algo);
 }
 
 /**
@@ -459,7 +417,7 @@ gnutls_crypto_cipher_register2 (int priority, int version,
  **/
 int
 gnutls_crypto_mac_register2 (int priority, int version,
-			     const gnutls_crypto_mac_st * s)
+			     const gnutls_crypto_digest_st * s)
 {
   if (version != GNUTLS_CRYPTO_API_VERSION)
     {
@@ -477,43 +435,3 @@ gnutls_crypto_mac_register2 (int priority, int version,
   return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
 }
 
-/**
- * gnutls_crypto_digest_register2 - register a digest interface
- * @priority: is the priority of the digest interface
- * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
- * @s: is a structure holding new interface's data
- *
- * This function will register a digest interface to be used by
- * gnutls. Any interface registered will override the included engine
- * and by convention kernel implemented interfaces should have
- * priority of 90. The interface with the lowest priority will be used
- * by gnutls.
- *
- * This function should be called before gnutls_global_init().
- *
- * For simplicity you can use the convenience
- * gnutls_crypto_digest_register() macro.
- *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
- *
- * Since: 2.6.0
- **/
-int
-gnutls_crypto_digest_register2 (int priority, int version,
-				const gnutls_crypto_digest_st * s)
-{
-  if (version != GNUTLS_CRYPTO_API_VERSION)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-    }
-
-  if (crypto_digest_prio > priority)
-    {
-      memcpy (&_gnutls_digest_ops, s, sizeof (*s));
-      crypto_digest_prio = priority;
-      return 0;
-    }
-
-  return GNUTLS_E_CRYPTO_ALREADY_REGISTERED;
-}

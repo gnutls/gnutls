@@ -345,7 +345,7 @@ _gnutls_set_read_keys (gnutls_session_t session)
   int IV_size;
   int key_size, export_flag;
   gnutls_cipher_algorithm_t algo;
-  gnutls_mac_algorithm_t mac_algo;
+  gnutls_digest_algorithm_t mac_algo;
 
   mac_algo = session->security_parameters.read_mac_algorithm;
   algo = session->security_parameters.read_bulk_cipher_algorithm;
@@ -366,7 +366,7 @@ _gnutls_set_write_keys (gnutls_session_t session)
   int IV_size;
   int key_size, export_flag;
   gnutls_cipher_algorithm_t algo;
-  gnutls_mac_algorithm_t mac_algo;
+  gnutls_digest_algorithm_t mac_algo;
 
   mac_algo = session->security_parameters.write_mac_algorithm;
   algo = session->security_parameters.write_bulk_cipher_algorithm;
@@ -934,7 +934,7 @@ _gnutls_set_kx (gnutls_session_t session, gnutls_kx_algorithm_t algo)
 
 /* Sets the specified mac algorithm into pending session */
 int
-_gnutls_set_read_mac (gnutls_session_t session, gnutls_mac_algorithm_t algo)
+_gnutls_set_read_mac (gnutls_session_t session, gnutls_digest_algorithm_t algo)
 {
 
   if (_gnutls_mac_is_ok (algo) == 0)
@@ -958,7 +958,7 @@ _gnutls_set_read_mac (gnutls_session_t session, gnutls_mac_algorithm_t algo)
 }
 
 int
-_gnutls_set_write_mac (gnutls_session_t session, gnutls_mac_algorithm_t algo)
+_gnutls_set_write_mac (gnutls_session_t session, gnutls_digest_algorithm_t algo)
 {
 
   if (_gnutls_mac_is_ok (algo) == 0)

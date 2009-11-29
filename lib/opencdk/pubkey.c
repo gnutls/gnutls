@@ -421,7 +421,7 @@ _cdk_sk_get_csum (cdk_pkt_seckey_t sk)
 cdk_error_t
 cdk_pk_get_fingerprint (cdk_pubkey_t pk, byte * fpr)
 {
-  digest_hd_st hd;
+  hash_hd_st hd;
   int md_algo;
   int dlen = 0;
   int err;
@@ -434,7 +434,7 @@ cdk_pk_get_fingerprint (cdk_pubkey_t pk, byte * fpr)
   else
     md_algo = GNUTLS_DIG_SHA1;
   dlen = _gnutls_hash_get_algo_len (md_algo);
-  err = _gnutls_hash_init (&hd, md_algo);
+  err = _gnutls_hash_init (&hd, md_algo, NULL, 0);
   if (err < 0)
     return map_gnutls_error (err);
   _cdk_hash_pubkey (pk, &hd, 1);

@@ -28,11 +28,11 @@ int _gnutls_write_connection_state_init (gnutls_session_t session);
 int _gnutls_set_write_cipher (gnutls_session_t session,
 			      gnutls_cipher_algorithm_t algo);
 int _gnutls_set_write_mac (gnutls_session_t session,
-			   gnutls_mac_algorithm_t algo);
+			   gnutls_digest_algorithm_t algo);
 int _gnutls_set_read_cipher (gnutls_session_t session,
 			     gnutls_cipher_algorithm_t algo);
 int _gnutls_set_read_mac (gnutls_session_t session,
-			  gnutls_mac_algorithm_t algo);
+			  gnutls_digest_algorithm_t algo);
 int _gnutls_set_read_compression (gnutls_session_t session,
 				  gnutls_compression_method_t algo);
 int _gnutls_set_write_compression (gnutls_session_t session,

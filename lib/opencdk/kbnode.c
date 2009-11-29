@@ -578,7 +578,7 @@ cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte * buf, size_t * r_nbytes)
  * is extracted from it.
  **/
 cdk_error_t
-cdk_kbnode_hash (cdk_kbnode_t node, digest_hd_st * md, int is_v4,
+cdk_kbnode_hash (cdk_kbnode_t node, hash_hd_st * md, int is_v4,
 		 cdk_packet_type_t pkttype, int flags)
 {
   cdk_packet_t pkt;

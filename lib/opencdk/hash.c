@@ -49,7 +49,7 @@ hash_encode (void *data, FILE * in, FILE * out)
 
   if (!mfx->md_initialized)
     {
-      err = _gnutls_hash_init (&mfx->md, mfx->digest_algo);
+      err = _gnutls_hash_init (&mfx->md, mfx->digest_algo, NULL, 0);
       if (err < 0)
 	{
 	  gnutls_assert ();

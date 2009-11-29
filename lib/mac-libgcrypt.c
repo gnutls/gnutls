@@ -31,7 +31,7 @@
 #include <gcrypt.h>
 
 static int
-wrap_gcry_mac_init (gnutls_mac_algorithm_t algo, void **ctx)
+wrap_gcry_mac_init (gnutls_digest_algorithm_t algo, void **ctx)
 {
   int err;
   unsigned int flags = GCRY_MD_FLAG_HMAC;
@@ -97,7 +97,7 @@ wrap_gcry_md_close (void *hd)
 }
 
 static int
-wrap_gcry_hash_init (gnutls_mac_algorithm_t algo, void **ctx)
+wrap_gcry_hash_init (gnutls_digest_algorithm_t algo, void **ctx)
 {
   int err;
   unsigned int flags = 0;
@@ -161,7 +161,7 @@ wrap_gcry_mac_output (void *src_ctx, void *digest, size_t digestsize)
 
 int crypto_mac_prio = INT_MAX;
 
-gnutls_crypto_mac_st _gnutls_mac_ops = {
+gnutls_crypto_digest_st _gnutls_mac_ops = {
   .init = wrap_gcry_mac_init,
   .setkey = wrap_gcry_md_setkey,
   .hash = wrap_gcry_md_write,
@@ -170,13 +170,3 @@ gnutls_crypto_mac_st _gnutls_mac_ops = {
   .deinit = wrap_gcry_md_close,
 };
 
-int crypto_digest_prio = INT_MAX;
-
-gnutls_crypto_digest_st _gnutls_digest_ops = {
-  .init = wrap_gcry_hash_init,
-  .setkey = NULL,
-  .hash = wrap_gcry_md_write,
-  .copy = wrap_gcry_md_copy,
-  .output = wrap_gcry_mac_output,
-  .deinit = wrap_gcry_md_close,
-};

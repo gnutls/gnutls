@@ -27,48 +27,6 @@
 #include <md5.h>
 #include <hmac.h>
 
-static int
-md5init (void **ctx)
-{
-  *ctx = gnutls_malloc (sizeof (struct md5_ctx));
-  if (!*ctx)
-    return GNUTLS_E_MEMORY_ERROR;
-  md5_init_ctx (*ctx);
-  return 0;
-}
-
-static int
-md5hash (void *ctx, const void *text, size_t textsize)
-{
-  md5_process_bytes (text, textsize, ctx);
-  return 0;
-}
-
-static int
-md5copy (void **dst_ctx, void *src_ctx)
-{
-  *dst_ctx = gnutls_malloc (sizeof (struct md5_ctx));
-  if (!*dst_ctx)
-    return GNUTLS_E_MEMORY_ERROR;
-  memcpy (*dst_ctx, src_ctx, sizeof (struct md5_ctx));
-  return 0;
-}
-
-static int
-md5output (void *src_ctx, void *digest, size_t digestsize)
-{
-  char out[MD5_DIGEST_SIZE];
-  md5_finish_ctx (src_ctx, out);
-  memcpy (digest, out, digestsize);
-  return 0;
-}
-
-static void
-md5deinit (void *ctx)
-{
-  gnutls_free (ctx);
-}
-
 struct hmacctx
 {
   char *data;
@@ -78,7 +36,7 @@ struct hmacctx
 };
 
 static int
-hmacmd5init (void **ctx)
+hmacmd5init (gnutls_digest_algorithm_t ign, void **ctx)
 {
   struct hmacctx *p;
 
@@ -138,7 +96,7 @@ hmacmd5copy (void **dst_ctx, void *src_ctx)
   struct hmacctx *p = src_ctx;
   struct hmacctx *q;
 
-  q = gnutls_malloc (sizeof (struct hmacctx));
+  q = gnutls_calloc (1, sizeof (struct hmacctx));
   if (!q)
     return -1;
 
@@ -151,15 +109,18 @@ hmacmd5copy (void **dst_ctx, void *src_ctx)
   memcpy (q->data, p->data, p->datasize);
   q->datasize = p->datasize;
 
-  q->key = gnutls_malloc (p->keysize);
-  if (!q->key)
+  if (p->key) 
     {
-      gnutls_free (q);
-      gnutls_free (q->data);
-      return -1;
+      q->key = gnutls_malloc (p->keysize);
+      if (!q->key)
+        {
+          gnutls_free (q);
+          gnutls_free (q->data);
+          return -1;
+        }
+      memcpy (q->key, p->key, p->keysize);
+      q->keysize = p->keysize;
     }
-  memcpy (q->key, p->key, p->keysize);
-  q->keysize = p->keysize;
 
   *dst_ctx = q;
 
@@ -195,16 +156,7 @@ hmacmd5deinit (void *ctx)
   gnutls_free (p);
 }
 
-static gnutls_crypto_single_digest_st dig = {
-  md5init,
-  NULL,
-  md5hash,
-  md5copy,
-  md5output,
-  md5deinit
-};
-
-static gnutls_crypto_single_mac_st mac = {
+static gnutls_crypto_digest_st mac = {
   hmacmd5init,
   hmacmd5setkey,
   hmacmd5hash,
@@ -230,11 +182,7 @@ gnutls_register_md5_handler (void)
 {
   int ret;
 
-  ret = gnutls_crypto_single_digest_register (GNUTLS_DIG_MD5, INT_MAX, &dig);
-  if (ret)
-    return ret;
-
-  ret = gnutls_crypto_single_mac_register (GNUTLS_MAC_MD5, INT_MAX, &mac);
+  ret = gnutls_crypto_single_digest_register (GNUTLS_DIG_MD5, INT_MAX, &mac);
   if (ret)
     return ret;
 
