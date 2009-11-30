@@ -730,7 +730,9 @@ gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t res,
   * This function sets a certificate/private key pair in the
   * gnutls_certificate_credentials_t structure.  This function may be
   * called more than once (in case multiple keys/certificates exist
-  * for the server).
+  * for the server).  For clients that wants to send more than its own
+  * end entity certificate (e.g., also an intermediate CA cert) then
+  * put the certificate chain in @cert_list.
   *
   * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
   *
@@ -744,7 +746,7 @@ gnutls_certificate_set_x509_key (gnutls_certificate_credentials_t res,
 {
   int ret, i;
 
-  /* this should be first 
+  /* this should be first
    */
 
   res->pkey =
@@ -817,8 +819,10 @@ gnutls_certificate_set_x509_key (gnutls_certificate_credentials_t res,
  *
  * This function sets a certificate/private key pair in the
  * gnutls_certificate_credentials_t structure.  This function may be
- * called more than once (in case multiple keys/certificates exist
- * for the server).
+ * called more than once (in case multiple keys/certificates exist for
+ * the server).  For clients that wants to send more than its own end
+ * entity certificate (e.g., also an intermediate CA cert) then put
+ * the certificate chain in @certfile.
  *
  * Currently only PKCS-1 encoded RSA and DSA private keys are accepted by
  * this function.
@@ -833,7 +837,7 @@ gnutls_certificate_set_x509_key_file (gnutls_certificate_credentials_t res,
 {
   int ret;
 
-  /* this should be first 
+  /* this should be first
    */
   if ((ret = read_key_file (res, keyfile, type)) < 0)
     return ret;
