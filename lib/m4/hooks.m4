@@ -228,6 +228,20 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   fi
   AM_CONDITIONAL(ENABLE_SESSION_TICKET, test "$ac_enable_session_ticket" != "no")
 
+  # For cryptodev
+  enable_cryptodev=no
+  AC_MSG_CHECKING([whether to add cryptodev support])
+  AC_ARG_ENABLE(cryptodev,
+ 	AS_HELP_STRING([--enable-cryptodev], [enable cryptodev support]),
+  enable_cryptodev=yes)
+  AC_MSG_RESULT($enable_cryptodev)
+
+  if test "$enable_cryptodev" = "yes"; then
+    AC_CHECK_MEMBER(struct crypt_opv.iovec, 
+    [AC_DEFINE([ENABLE_CRYPTODEV_IOVEC], 1, [Enable cryptodev iovec support])],,[[#include <crypto/cryptodev.h>]])
+    AC_DEFINE([ENABLE_CRYPTODEV], 1, [Enable cryptodev support])
+  fi
+
   # For storing integers in pointers without warnings
   # http://developer.gnome.org/doc/API/2.0/glib/glib-Type-Conversion-Macros.html#desc
   AC_CHECK_SIZEOF(void *)
