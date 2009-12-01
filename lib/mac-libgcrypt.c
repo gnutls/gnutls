@@ -97,50 +97,6 @@ wrap_gcry_md_close (void *hd)
 }
 
 static int
-wrap_gcry_hash_init (gnutls_digest_algorithm_t algo, void **ctx)
-{
-  int err;
-  unsigned int flags = 0;
-
-  switch (algo)
-    {
-    case GNUTLS_DIG_MD5:
-      err = gcry_md_open ((gcry_md_hd_t *) ctx, GCRY_MD_MD5, flags);
-      break;
-    case GNUTLS_DIG_SHA1:
-      err = gcry_md_open ((gcry_md_hd_t *) ctx, GCRY_MD_SHA1, flags);
-      break;
-    case GNUTLS_DIG_RMD160:
-      err = gcry_md_open ((gcry_md_hd_t *) ctx, GCRY_MD_RMD160, flags);
-      break;
-    case GNUTLS_DIG_MD2:
-      err = gcry_md_open ((gcry_md_hd_t *) ctx, GCRY_MD_MD2, flags);
-      break;
-    case GNUTLS_DIG_SHA256:
-      err = gcry_md_open ((gcry_md_hd_t *) ctx, GCRY_MD_SHA256, flags);
-      break;
-    case GNUTLS_DIG_SHA224:
-      err = gcry_md_open ((gcry_md_hd_t *) ctx, GCRY_MD_SHA224, flags);
-      break;
-    case GNUTLS_DIG_SHA384:
-      err = gcry_md_open ((gcry_md_hd_t *) ctx, GCRY_MD_SHA384, flags);
-      break;
-    case GNUTLS_DIG_SHA512:
-      err = gcry_md_open ((gcry_md_hd_t *) ctx, GCRY_MD_SHA512, flags);
-      break;
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  if (err == 0)
-    return 0;
-
-  gnutls_assert ();
-  return GNUTLS_E_ENCRYPTION_FAILED;
-}
-
-static int
 wrap_gcry_mac_output (void *src_ctx, void *digest, size_t digestsize)
 {
   opaque *_digest = gcry_md_read (src_ctx, 0);

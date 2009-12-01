@@ -420,7 +420,6 @@ _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
 			       gnutls_digest_algorithm_t dig,
 			       bigint_t * params, int params_size)
 {
-  gnutls_datum_t der;
   int result;
   char name[128];
   const char *pk;

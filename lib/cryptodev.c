@@ -27,6 +27,7 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <gnutls/crypto.h>
+#include <gnutls_cryptodev.h>
 
 #ifdef ENABLE_CRYPTODEV
 
@@ -47,7 +48,7 @@ struct cryptodev_ctx {
 	int cfd;
 };
 
-const static int gnutls_cipher_map[] = {
+static const int gnutls_cipher_map[] = {
 	[GNUTLS_CIPHER_AES_128_CBC] = CRYPTO_AES_CBC,
 	[GNUTLS_CIPHER_AES_192_CBC] = CRYPTO_AES_CBC,
 	[GNUTLS_CIPHER_AES_256_CBC] = CRYPTO_AES_CBC,
@@ -153,7 +154,7 @@ struct cryptodev_ctx* ctx = _ctx;
 	gnutls_free(ctx);
 }
 
-const static gnutls_crypto_cipher_st cipher_struct = {
+static const gnutls_crypto_cipher_st cipher_struct = {
 	.init = cryptodev_cipher_init,
 	.setkey = cryptodev_setkey,
 	.setiv = cryptodev_setiv,
@@ -182,7 +183,6 @@ static const struct cipher_map cipher_map[] = {
 static int register_crypto(int cfd)
 {
 	struct session_op sess;
-	struct crypt_op cryp;
 	char fake_key[CRYPTO_CIPHER_MAX_KEY_LEN];
 	int i=0, ret;
 	
@@ -208,7 +208,7 @@ static int register_crypto(int cfd)
 	return 0;
 }
 
-int _gnutls_cryptodev_init()
+int _gnutls_cryptodev_init(void)
 {
 	int cfd = -1, ret;
 

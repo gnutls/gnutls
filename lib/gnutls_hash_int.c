@@ -149,7 +149,7 @@ _gnutls_hash_init (hash_hd_st * dig, gnutls_digest_algorithm_t algorithm,
 }
 
 int
-_gnutls_hash (const hash_hd_st * handle, const void *text, size_t textlen)
+_gnutls_hash (hash_hd_st * handle, const void *text, size_t textlen)
 {
   if (textlen > 0)
     {
@@ -208,8 +208,7 @@ _gnutls_hash_copy (hash_hd_st * dst, hash_hd_st * src)
   return 0;
 }
 
-void
-_gnutls_hash_reset (hash_hd_st * handle)
+void _gnutls_hash_reset (hash_hd_st * handle)
 {
   if (handle->registered && handle->hd.rh.ctx != NULL)
     {
