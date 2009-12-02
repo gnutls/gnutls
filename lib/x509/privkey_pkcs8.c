@@ -1681,7 +1681,7 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
 
   decrypted_data->data = data;
 
-  if (_gnutls_cipher_get_block_size (enc_params->cipher) != 1)
+  if (gnutls_cipher_get_block_size (enc_params->cipher) != 1)
     decrypted_data->size = data_size - data[data_size - 1];
   else
     decrypted_data->size = data_size;
@@ -2119,7 +2119,7 @@ encrypt_data (const gnutls_datum_t * plain,
   int ch_init = 0;
   opaque pad, pad_size;
 
-  pad_size = _gnutls_cipher_get_block_size (enc_params->cipher);
+  pad_size = gnutls_cipher_get_block_size (enc_params->cipher);
 
   if (pad_size == 1)		/* stream */
     pad_size = 0;

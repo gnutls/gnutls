@@ -310,7 +310,7 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
 			       write_mac_algorithm);
   gnutls_protocol_t ver;
   int blocksize =
-    _gnutls_cipher_get_block_size (session->security_parameters.
+    gnutls_cipher_get_block_size (session->security_parameters.
 				   write_bulk_cipher_algorithm);
   cipher_type_t block_algo =
     _gnutls_cipher_is_block (session->security_parameters.
@@ -449,7 +449,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
   major = _gnutls_version_get_major (ver);
 
   blocksize =
-    _gnutls_cipher_get_block_size (session->security_parameters.
+    gnutls_cipher_get_block_size (session->security_parameters.
 				   read_bulk_cipher_algorithm);
 
   /* initialize MAC 

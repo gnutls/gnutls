@@ -34,6 +34,7 @@ int gnutls_cipher_encrypt (const gnutls_cipher_hd_t handle, void *text, int text
 int gnutls_cipher_decrypt (const gnutls_cipher_hd_t handle, void *ciphertext,
 			    int ciphertextlen);
 void gnutls_cipher_deinit (gnutls_cipher_hd_t handle);
+int gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm);
 
 /* HMAC */
 typedef struct hash_hd_st* gnutls_hash_hd_t;
@@ -263,12 +264,12 @@ int gnutls_crypto_single_digest_register2 (gnutls_mac_algorithm_t algorithm,
 
 # define gnutls_crypto_cipher_register(prio, st)			\
   gnutls_crypto_cipher_register2 (prio, GNUTLS_CRYPTO_API_VERSION, st)
-# define gnutls_crypto_mac_register(prio, st)				\
-  gnutls_crypto_mac_register2 (prio, GNUTLS_CRYPTO_API_VERSION, st)
+# define gnutls_crypto_digest_register(prio, st)				\
+  gnutls_crypto_digest_register2 (prio, GNUTLS_CRYPTO_API_VERSION, st)
 
 int gnutls_crypto_cipher_register2 (int priority, int version,
 				    const gnutls_crypto_cipher_st * s);
-int gnutls_crypto_mac_register2 (int priority, int version,
+int gnutls_crypto_digest_register2 (int priority, int version,
 				 const gnutls_crypto_digest_st * s);
 
 # define gnutls_crypto_rnd_register(prio, st)				\

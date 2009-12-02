@@ -162,7 +162,7 @@ encrypt_ticket (gnutls_session_t session, struct ticket *ticket)
       gnutls_assert ();
       return ret;
     }
-  blocksize = _gnutls_cipher_get_block_size (GNUTLS_CIPHER_AES_128_CBC);
+  blocksize = gnutls_cipher_get_block_size (GNUTLS_CIPHER_AES_128_CBC);
   encrypted_state.size =
     ((state.size + blocksize - 1) / blocksize) * blocksize;
   encrypted_state.data = gnutls_malloc (encrypted_state.size);

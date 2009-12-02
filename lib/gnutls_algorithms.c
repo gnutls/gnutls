@@ -806,7 +806,7 @@ _gnutls_mac_is_ok (gnutls_digest_algorithm_t algorithm)
 
 /* CIPHER functions */
 int
-_gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm)
+gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm)
 {
   size_t ret = 0;
   GNUTLS_ALG_LOOP (ret = p->blocksize);

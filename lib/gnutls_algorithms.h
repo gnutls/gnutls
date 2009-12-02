@@ -70,7 +70,7 @@ cipher_suite_st _gnutls_cipher_suite_get_suite_name (cipher_suite_st *
 						     algorithm);
 
 /* Functions for ciphers. */
-int _gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm);
+int gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_is_block (gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_is_ok (gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_get_iv_size (gnutls_cipher_algorithm_t algorithm);

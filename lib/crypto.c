@@ -395,7 +395,7 @@ gnutls_crypto_cipher_register2 (int priority, int version,
 }
 
 /**
- * gnutls_crypto_mac_register2 - register a mac interface
+ * gnutls_crypto_digest_register2 - register a mac interface
  * @priority: is the priority of the mac interface
  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
  * @s: is a structure holding new interface's data
@@ -409,14 +409,14 @@ gnutls_crypto_cipher_register2 (int priority, int version,
  * This function should be called before gnutls_global_init().
  *
  * For simplicity you can use the convenience
- * gnutls_crypto_mac_register() macro.
+ * gnutls_crypto_digest_register() macro.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
  *
  * Since: 2.6.0
  **/
 int
-gnutls_crypto_mac_register2 (int priority, int version,
+gnutls_crypto_digest_register2 (int priority, int version,
 			     const gnutls_crypto_digest_st * s)
 {
   if (version != GNUTLS_CRYPTO_API_VERSION)

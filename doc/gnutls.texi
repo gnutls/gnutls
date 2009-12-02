@@ -4033,8 +4033,11 @@ is summarized in the following diagram.
 @section Cryptographic Backend
 Several new systems provide hardware assisted cryptographic algorithm
 implementations that offer implementations some orders of magnitude
-faster than the software. For this reason in current releases of
-GnuTLS it is possible to override parts of the crypto backend or the
+faster than the software. For this reason GnuTLS supports by default
+the /dev/crypto device usually found in FreeBSD and OpenBSD system, to
+take advantage of installed hardware. 
+
+In addition it is possible to override parts of the crypto backend or the
 whole. It is possible to override them both at runtime and compile
 time, however here we will discuss the runtime possibility. The API
 available for this functionality is in @code{gnutls/crypto.h} header
@@ -4050,11 +4053,8 @@ following functions can be used to register those algorithms.
 @item @ref{gnutls_crypto_single_cipher_register2}
 To register a cipher algorithm.
 
-@item @ref{gnutls_crypto_single_mac_register2}
-To register a MAC algorithm.
-
 @ref{gnutls_crypto_single_digest_register2}
-To register a digest (hash) algorithm.
+To register a hash (digest) or MAC algorithm.
 
 @end itemize
 
@@ -4070,9 +4070,6 @@ them. For this reason the following functions are provided.
 
 @item @ref{gnutls_crypto_cipher_register2}
 To override the cryptographic algorithms backend.
-
-@item @ref{gnutls_crypto_mac_register2}
-To override the MAC algorithms backend.
 
 @item @ref{gnutls_crypto_digest_register2}
 To override the digest algorithms backend.

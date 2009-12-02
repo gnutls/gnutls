@@ -28,27 +28,45 @@
 
 static unsigned char data[64*1024];
 
-void cipher_bench(int size)
+void cipher_bench(int algo, int size)
 {
 int ret, i;
 gnutls_cipher_hd_t ctx;
-gnutls_datum_t key = { "\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01", 16 };
-gnutls_datum_t iv = { "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff", 16 };
+void* _key,*_iv;
+gnutls_datum_t key, iv;
 struct timespec start, stop;
 double secs;
 long data_size = 0;
 double dd;
+int blocksize = gnutls_cipher_get_block_size(algo);
+int keysize = gnutls_cipher_get_key_size(algo);
 
+  _key = malloc(keysize);
+  if (_key == NULL)
+    return;
+  memset(_key, 0xf0, keysize);
+
+  _iv = malloc(blocksize);
+  if (_iv == NULL)
+    return;
+  memset(_iv, 0xf0, blocksize);
+
+  iv.data = _iv;
+  iv.size = blocksize;
+  
+  key.data = _key;
+  key.size = keysize;
+  
   gnutls_global_init();
   
-  printf("Checking AES (%dkb payload)... ", size);
+  printf("Checking %s (%dkb payload)... ", gnutls_cipher_get_name(algo), size);
   fflush(stdout);
   clock_gettime(CLOCK_MONOTONIC, &start);
 
-  ret = gnutls_cipher_init( &ctx, GNUTLS_CIPHER_AES_128_CBC, &key, &iv);
+  ret = gnutls_cipher_init( &ctx, algo, &key, &iv);
   if (ret < 0) {
     fprintf(stderr, "error: %s\n", gnutls_strerror(ret));
-    return;
+    goto leave;
   }
   
   for (i=0;i<7*1024;i++) {
@@ -63,17 +81,29 @@ double dd;
   secs = (stop.tv_sec*1000+stop.tv_nsec/(1000*1000)-(start.tv_sec*1000+start.tv_nsec/(1000*1000)));
   secs /= 1000;
   dd = (((double)data_size/(double)secs))/1000;
-  printf("Transferred %u kb in %.2f secs: ", data_size/1000, secs);
+  printf("Transferred %ld kb in %.2f secs: ", data_size/1000, secs);
   printf("%.2f kbyte/sec\n", dd);
+  
+leave:
+  free(_key);
+  free(_iv);
 
 }
 
 
 int main()
 {
-  cipher_bench(8);
-  cipher_bench(16);
-  cipher_bench(32);
+  cipher_bench(GNUTLS_CIPHER_3DES_CBC, 4);
+  cipher_bench(GNUTLS_CIPHER_3DES_CBC, 8);
+  cipher_bench(GNUTLS_CIPHER_3DES_CBC, 16);
+
+  cipher_bench(GNUTLS_CIPHER_AES_128_CBC, 4);
+  cipher_bench(GNUTLS_CIPHER_AES_128_CBC, 8);
+  cipher_bench(GNUTLS_CIPHER_AES_128_CBC, 16);
+
+  cipher_bench(GNUTLS_CIPHER_ARCFOUR, 4);
+  cipher_bench(GNUTLS_CIPHER_ARCFOUR, 8);
+  cipher_bench(GNUTLS_CIPHER_ARCFOUR, 16);
  
   return 0; 
 }

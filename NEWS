@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.9.10 (unreleased)
 
+** libgnutls: Added cryptodev support (/dev/crypto). Tested with
+http://www.logix.cz/michal/devel/cryptodev/. Added benchmark utility 
+for AES. Exported API to access encryption and hash algorithms.
+
 ** certtool: Corrected two issues that affected certificate request generation.
 (1) Null padding is added on integers (found thanks to Wilankar Trupti),
 (2) In optional SignatureAlgorithm parameters field for DSA keys the DSA
@@ -18,7 +22,18 @@ to verify thus public key will be available). Found thanks to Boyan Kasarov.
 ** certtool: New option --no-crq-extensions to avoid extensions in CSRs.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_cipher_get_block_size: Added
+gnutls_cipher_init: Added
+gnutls_cipher_encrypt: Added
+gnutls_cipher_decrypt: Added
+gnutls_cipher_deinit: Added
+gnutls_hash_init: Added
+gnutls_hash_get_algo_len: Added
+gnutls_hash: Added
+gnutls_hash_fast: Added
+gnutls_hash_deinit: Added
+gnutls_hash_output: Added
+gnutls_hash_reset: Added
 
 * Version 2.9.9 (released 2009-11-09)
 
