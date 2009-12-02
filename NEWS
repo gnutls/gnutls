@@ -16,6 +16,8 @@ parameters were added. Those were rejected by Verisign. Gnutls no longer adds
 those parameters there since other implementations don't do either and having 
 them does not seem to offer anything (anyway you need the signer's certificate
 to verify thus public key will be available). Found thanks to Boyan Kasarov.
+This however has the side-effect that public key IDs shown by certtool are
+now different than previous gnutls releases.
 
 ** certtool: Allow exporting of Certificate requests on DER format.
 
