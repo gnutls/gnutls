@@ -287,6 +287,26 @@ calc_enc_length (gnutls_session_t session, int data_size,
   return length;
 }
 
+#define PREAMBLE_SIZE 16
+static inline int make_preamble(opaque* uint64_data, opaque type, uint16_t c_length, opaque ver, opaque* preamble)
+{
+  opaque minor = _gnutls_version_get_minor (ver);
+  opaque major = _gnutls_version_get_major (ver);
+  opaque *p = preamble;
+  
+  memcpy(p, uint64_data, 8);
+  p+=8;
+  *p=type; p++;
+  if (_gnutls_version_has_variable_padding (ver))
+    {			/* TLS 1.0 or higher */
+      *p = major; p++;
+      *p = minor; p++;
+    }
+  memcpy(p, &c_length, 2);
+  p+=2;
+  return p-preamble;
+}
+
 /* This is the actual encryption 
  * Encrypts the given compressed datum, and puts the result to cipher_data,
  * which has cipher_size size.
@@ -302,13 +322,12 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
   uint16_t c_length;
   uint8_t pad;
   int length, ret;
-  hash_hd_st td;
   uint8_t type = _type;
-  uint8_t major, minor;
+  opaque preamble[PREAMBLE_SIZE];
+  int preamble_size;
   int hash_size =
     _gnutls_hash_get_algo_len (session->security_parameters.
 			       write_mac_algorithm);
-  gnutls_protocol_t ver;
   int blocksize =
     gnutls_cipher_get_block_size (session->security_parameters.
 				   write_bulk_cipher_algorithm);
@@ -316,40 +335,28 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
     _gnutls_cipher_is_block (session->security_parameters.
 			     write_bulk_cipher_algorithm);
   opaque *data_ptr;
-
-
-  ver = gnutls_protocol_get_version (session);
-  minor = _gnutls_version_get_minor (ver);
-  major = _gnutls_version_get_major (ver);
+  int ver = gnutls_protocol_get_version (session);
 
 
   /* Initialize MAC */
-  ret = mac_init (&td, session->security_parameters.write_mac_algorithm,
-		  session->connection_state.write_mac_secret.data,
-		  session->connection_state.write_mac_secret.size, ver);
-
-  if (ret < 0
-      && session->security_parameters.write_mac_algorithm != GNUTLS_MAC_NULL)
-    {
-      gnutls_assert ();
-      return ret;
-    }
 
   c_length = _gnutls_conv_uint16 (compressed.size);
 
   if (session->security_parameters.write_mac_algorithm != GNUTLS_MAC_NULL)
     {				/* actually when the algorithm in not the NULL one */
-      _gnutls_hash (&td,
-		    UINT64DATA (session->connection_state.
-				write_sequence_number), 8);
+      hash_hd_st td;
 
-      _gnutls_hash (&td, &type, 1);
-      if (_gnutls_version_has_variable_padding (ver))
-	{			/* TLS 1.0 or higher */
-	  _gnutls_hash (&td, &major, 1);
-	  _gnutls_hash (&td, &minor, 1);
-	}
-      _gnutls_hash (&td, &c_length, 2);
+      ret = mac_init (&td, session->security_parameters.write_mac_algorithm,
+		  session->connection_state.write_mac_secret.data,
+		  session->connection_state.write_mac_secret.size, ver);
+
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          return ret;
+        }
+      preamble_size = make_preamble( UINT64DATA (session->connection_state.write_sequence_number), type, c_length, ver, preamble);
+      _gnutls_hash (&td, preamble, preamble_size);
       _gnutls_hash (&td, compressed.data, compressed.size);
       mac_deinit (&td, MAC, ver);
     }
@@ -418,10 +425,6 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
   return length;
 }
 
-#define DEINIT_MAC(td, ver, algo) \
-          if (algo != GNUTLS_MAC_NULL) \
-            mac_deinit (&td, NULL, ver);
-
 /* Deciphers the ciphertext packet, and puts the result to compress_data, of compress_size.
  * Returns the actual compressed packet size.
  */
@@ -435,35 +438,19 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
   uint16_t c_length;
   uint8_t pad;
   int length;
-  hash_hd_st td;
   uint16_t blocksize;
   int ret, i, pad_failed = 0;
-  uint8_t major, minor;
-  gnutls_protocol_t ver;
+  opaque preamble[PREAMBLE_SIZE];
+  int preamble_size;
+  int ver = gnutls_protocol_get_version (session);
   int hash_size =
     _gnutls_hash_get_algo_len (session->security_parameters.
 			       read_mac_algorithm);
-
-  ver = gnutls_protocol_get_version (session);
-  minor = _gnutls_version_get_minor (ver);
-  major = _gnutls_version_get_major (ver);
 
   blocksize =
     gnutls_cipher_get_block_size (session->security_parameters.
 				   read_bulk_cipher_algorithm);
 
-  /* initialize MAC 
-   */
-  ret = mac_init (&td, session->security_parameters.read_mac_algorithm,
-		  session->connection_state.read_mac_secret.data,
-		  session->connection_state.read_mac_secret.size, ver);
-
-  if (ret < 0
-      && session->security_parameters.read_mac_algorithm != GNUTLS_MAC_NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
 
   /* actual decryption (inplace)
    */
@@ -477,10 +464,6 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 				   ciphertext.size)) < 0)
 	{
 	  gnutls_assert ();
-	  DEINIT_MAC (td, ver,
-		      session->security_parameters.write_mac_algorithm);
-
-
 	  return ret;
 	}
 
@@ -491,8 +474,6 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
       if ((ciphertext.size < blocksize) || (ciphertext.size % blocksize != 0))
 	{
 	  gnutls_assert ();
-	  DEINIT_MAC (td, ver,
-		      session->security_parameters.write_mac_algorithm);
 	  return GNUTLS_E_DECRYPTION_FAILED;
 	}
 
@@ -502,8 +483,6 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 				   ciphertext.size)) < 0)
 	{
 	  gnutls_assert ();
-	  DEINIT_MAC (td, ver,
-		      session->security_parameters.write_mac_algorithm);
 	  return ret;
 	}
 
@@ -518,8 +497,6 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 	  if (ciphertext.size == 0)
 	    {
 	      gnutls_assert ();
-	      DEINIT_MAC (td, ver,
-			  session->security_parameters.write_mac_algorithm);
 	      return GNUTLS_E_DECRYPTION_FAILED;
 	    }
 	}
@@ -552,7 +529,6 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
       break;
     default:
       gnutls_assert ();
-      DEINIT_MAC (td, ver, session->security_parameters.write_mac_algorithm);
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
@@ -565,18 +541,20 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
    */
   if (session->security_parameters.read_mac_algorithm != GNUTLS_MAC_NULL)
     {
-      _gnutls_hash (&td,
-		    UINT64DATA (session->connection_state.
-				read_sequence_number), 8);
+      hash_hd_st td;
 
-      _gnutls_hash (&td, &type, 1);
-      if (_gnutls_version_has_variable_padding (ver))
-	{			/* TLS 1.x */
-	  _gnutls_hash (&td, &major, 1);
-	  _gnutls_hash (&td, &minor, 1);
-	}
-      _gnutls_hash (&td, &c_length, 2);
+      ret = mac_init (&td, session->security_parameters.read_mac_algorithm,
+		  session->connection_state.read_mac_secret.data,
+		  session->connection_state.read_mac_secret.size, ver);
 
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
+
+      preamble_size = make_preamble( UINT64DATA (session->connection_state.read_sequence_number), type, c_length, ver, preamble);
+      _gnutls_hash (&td, preamble, preamble_size);
       if (length > 0)
 	_gnutls_hash (&td, ciphertext.data, length);
 
