@@ -31,6 +31,9 @@
 #include <random.h>
 #include <gnutls_cipher_int.h>
 
+int gnutls_crypto_single_mac_register2 (int priority, ...);
+int gnutls_crypto_mac_register2 (int priority, ...);
+
 int
 gnutls_crypto_single_mac_register2 (int priority, ...)
 {
