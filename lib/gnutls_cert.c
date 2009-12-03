@@ -874,7 +874,14 @@ _gnutls_x509_crt_to_gcert (gnutls_cert * gcert,
 
   if (flags & CERT_ONLY_EXTENSIONS || flags == 0)
     {
-      gnutls_x509_crt_get_key_usage (cert, &gcert->key_usage, NULL);
+      ret = gnutls_x509_crt_get_key_usage (cert, &gcert->key_usage, NULL);
+      if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+	gcert->key_usage = 0;
+      else if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
       gcert->version = gnutls_x509_crt_get_version (cert);
     }
   gcert->subject_pk_algorithm = gnutls_x509_crt_get_pk_algorithm (cert, NULL);
