@@ -1834,14 +1834,14 @@ previous one, and will verify the peer's certificate in a TLS session.
 
 @table @code
 
-@item CERT_INVALID:
+@item GNUTLS_CERT_INVALID:
 The certificate is not signed by one of the known authorities, or
 the signature is invalid.
 
-@item CERT_REVOKED:
+@item GNUTLS_CERT_REVOKED:
 The certificate has been revoked by its CA.
 
-@item CERT_SIGNER_NOT_FOUND:
+@item GNUTLS_CERT_SIGNER_NOT_FOUND:
 The certificate's issuer is not known. This is the case when the
 issuer is not in the trusted certificates list.
 
