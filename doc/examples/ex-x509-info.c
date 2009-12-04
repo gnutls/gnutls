@@ -39,13 +39,14 @@ void
 print_x509_certificate_info (gnutls_session_t session)
 {
   char serial[40];
-  char dn[128];
+  char dn[256];
   size_t size;
   unsigned int algo, bits;
   time_t expiration_time, activation_time;
   const gnutls_datum_t *cert_list;
   unsigned int cert_list_size = 0;
   gnutls_x509_crt_t cert;
+  gnutls_datum_t cinfo;
 
   /* This function only works for X.509 certificates.
    */
@@ -58,6 +59,7 @@ print_x509_certificate_info (gnutls_session_t session)
 
   if (cert_list_size > 0)
     {
+      int ret;
 
       /* we only print information about the first certificate.
        */
@@ -66,6 +68,19 @@ print_x509_certificate_info (gnutls_session_t session)
       gnutls_x509_crt_import (cert, &cert_list[0], GNUTLS_X509_FMT_DER);
 
       printf ("Certificate info:\n");
+
+      /* This is the preferred way of printing short information about
+	 a certificate. */
+
+      ret = gnutls_x509_crt_print (cert, GNUTLS_CRT_PRINT_ONELINE, &cinfo);
+      if (ret == 0)
+	{
+	  printf ("\t%s\n", cinfo.data);
+	  gnutls_free (cinfo.data);
+	}
+
+      /* If you want to extract fields manually for some other reason,
+	 below are popular example calls. */
 
       expiration_time = gnutls_x509_crt_get_expiration_time (cert);
       activation_time = gnutls_x509_crt_get_activation_time (cert);
@@ -87,7 +102,7 @@ print_x509_certificate_info (gnutls_session_t session)
       printf ("Certificate public key: %s",
 	      gnutls_pk_algorithm_get_name (algo));
 
-      /* Print the version of the X.509 
+      /* Print the version of the X.509
        * certificate.
        */
       printf ("\tCertificate version: #%d\n",
