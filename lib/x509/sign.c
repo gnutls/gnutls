@@ -52,7 +52,7 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
   int result;
   const char *algo;
 
-  algo = _gnutls_x509_mac_to_oid ((gnutls_digest_algorithm_t) hash);
+  algo = _gnutls_x509_mac_to_oid ((gnutls_mac_algorithm_t) hash);
   if (algo == NULL)
     {
       gnutls_assert ();
@@ -133,10 +133,10 @@ pkcs1_rsa_sign (gnutls_digest_algorithm_t hash, const gnutls_datum_t * text,
 {
   int ret;
   opaque _digest[MAX_HASH_SIZE];
-  hash_hd_st hd;
+  digest_hd_st hd;
   gnutls_datum_t digest, info;
 
-  ret = _gnutls_hash_init (&hd, HASH2MAC (hash), NULL, 0);
+  ret = _gnutls_hash_init (&hd, HASH2MAC (hash));
   if (ret < 0)
     {
       gnutls_assert ();
@@ -177,10 +177,10 @@ dsa_sign (const gnutls_datum_t * text,
 {
   int ret;
   opaque _digest[MAX_HASH_SIZE];
-  hash_hd_st hd;
+  digest_hd_st hd;
   gnutls_datum_t digest;
 
-  ret = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1, NULL, 0);
+  ret = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1);
   if (ret < 0)
     {
       gnutls_assert ();

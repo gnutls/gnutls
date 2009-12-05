@@ -871,7 +871,7 @@ gnutls_pkcs12_generate_mac (gnutls_pkcs12_t pkcs12, const char *pass)
   opaque salt[8], key[20];
   int result;
   const int iter = 1;
-  hash_hd_st td1;
+  digest_hd_st td1;
   gnutls_datum_t tmp = { NULL, 0 };
   opaque sha_mac[20];
 
@@ -937,17 +937,17 @@ gnutls_pkcs12_generate_mac (gnutls_pkcs12_t pkcs12, const char *pass)
 
   /* MAC the data
    */
-  result = _gnutls_hash_init (&td1, GNUTLS_MAC_SHA1, key, sizeof (key));
+  result = _gnutls_hmac_init (&td1, GNUTLS_MAC_SHA1, key, sizeof (key));
   if (result < 0)
     {
       gnutls_assert ();
       goto cleanup;
     }
 
-  _gnutls_hash (&td1, tmp.data, tmp.size);
+  _gnutls_hmac (&td1, tmp.data, tmp.size);
   _gnutls_free_datum (&tmp);
 
-  _gnutls_hash_deinit (&td1, sha_mac);
+  _gnutls_hmac_deinit (&td1, sha_mac);
 
 
   result =
@@ -1005,7 +1005,7 @@ gnutls_pkcs12_verify_mac (gnutls_pkcs12_t pkcs12, const char *pass)
   int result;
   unsigned int iter;
   int len;
-  hash_hd_st td1;
+  digest_hd_st td1;
   gnutls_datum_t tmp = { NULL, 0 }, salt =
   {
   NULL, 0};
@@ -1063,17 +1063,17 @@ gnutls_pkcs12_verify_mac (gnutls_pkcs12_t pkcs12, const char *pass)
 
   /* MAC the data
    */
-  result = _gnutls_hash_init (&td1, GNUTLS_MAC_SHA1, key, sizeof (key));
+  result = _gnutls_hmac_init (&td1, GNUTLS_MAC_SHA1, key, sizeof (key));
   if (result < 0)
     {
       gnutls_assert ();
       goto cleanup;
     }
 
-  _gnutls_hash (&td1, tmp.data, tmp.size);
+  _gnutls_hmac (&td1, tmp.data, tmp.size);
   _gnutls_free_datum (&tmp);
 
-  _gnutls_hash_deinit (&td1, sha_mac);
+  _gnutls_hmac_deinit (&td1, sha_mac);
 
   len = sizeof (sha_mac_orig);
   result =

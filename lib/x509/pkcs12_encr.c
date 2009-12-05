@@ -60,7 +60,7 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
 {
   int rc;
   unsigned int i, j;
-  hash_hd_st md;
+  digest_hd_st md;
   bigint_t num_b1 = NULL, num_ij = NULL;
   bigint_t mpi512 = NULL;
   unsigned int pwlen;
@@ -121,7 +121,7 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
 
   for (;;)
     {
-      rc = _gnutls_hash_init (&md, GNUTLS_MAC_SHA1, NULL, 0);
+      rc = _gnutls_hash_init (&md, GNUTLS_MAC_SHA1);
       if (rc < 0)
 	{
 	  gnutls_assert ();
@@ -136,7 +136,7 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
       _gnutls_hash_deinit (&md, hash);
       for (i = 1; i < iter; i++)
 	{
-	  rc = _gnutls_hash_init (&md, GNUTLS_MAC_SHA1, NULL, 0);
+	  rc = _gnutls_hash_init (&md, GNUTLS_MAC_SHA1);
 	  if (rc < 0)
 	    {
 	      gnutls_assert ();

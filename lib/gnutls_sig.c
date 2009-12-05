@@ -57,7 +57,7 @@ _gnutls_tls_sign (gnutls_session_t session,
  * See RFC 5246 DigitallySigned for the actual format.
  */
 static int
-_gnutls_rsa_encode_sig (gnutls_digest_algorithm_t algo,
+_gnutls_rsa_encode_sig (gnutls_mac_algorithm_t algo,
 			const gnutls_datum_t * hash,
 			gnutls_datum_t * signature)
 {
@@ -132,7 +132,7 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
 {
   gnutls_datum_t dconcat;
   int ret;
-  hash_hd_st td_sha;
+  digest_hd_st td_sha;
   opaque concat[MAX_SIG_SIZE];
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
   gnutls_digest_algorithm_t hash_algo;
@@ -146,7 +146,7 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
 
-  ret = _gnutls_hash_init (&td_sha, hash_algo, NULL, 0);
+  ret = _gnutls_hash_init (&td_sha, hash_algo);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -164,9 +164,9 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
     case GNUTLS_PK_RSA:
       if (!_gnutls_version_has_selectable_prf (ver))
 	{
-	  hash_hd_st td_md5;
+	  digest_hd_st td_md5;
 
-	  ret = _gnutls_hash_init (&td_md5, GNUTLS_MAC_MD5, NULL, 0);
+	  ret = _gnutls_hash_init (&td_md5, GNUTLS_MAC_MD5);
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
@@ -386,8 +386,8 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_cert * cert,
 {
   gnutls_datum_t dconcat;
   int ret;
-  hash_hd_st td_md5;
-  hash_hd_st td_sha;
+  digest_hd_st td_md5;
+  digest_hd_st td_sha;
   opaque concat[MAX_SIG_SIZE];
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
   gnutls_digest_algorithm_t hash_algo = GNUTLS_DIG_SHA1;
@@ -401,7 +401,7 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_cert * cert,
 
   if (!_gnutls_version_has_selectable_prf (ver))
     {
-      ret = _gnutls_hash_init (&td_md5, GNUTLS_MAC_MD5, NULL, 0);
+      ret = _gnutls_hash_init (&td_md5, GNUTLS_MAC_MD5);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -418,7 +418,7 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_cert * cert,
   if (algo != GNUTLS_SIGN_UNKNOWN)
     hash_algo = _gnutls_sign_get_hash_algorithm (algo);
 
-  ret = _gnutls_hash_init (&td_sha, hash_algo, NULL, 0);
+  ret = _gnutls_hash_init (&td_sha, hash_algo);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -481,11 +481,11 @@ _gnutls_handshake_verify_cert_vrfy12 (gnutls_session_t session,
 {
   int ret;
   opaque concat[MAX_SIG_SIZE];
-  hash_hd_st td;
+  digest_hd_st td;
   gnutls_datum_t dconcat;
   gnutls_sign_algorithm_t _sign_algo;
   gnutls_digest_algorithm_t hash_algo;
-  hash_hd_st *handshake_td;
+  digest_hd_st *handshake_td;
 
   handshake_td = &session->internals.handshake_mac_handle.tls12.sha1;
   hash_algo = handshake_td->algorithm;
@@ -541,8 +541,8 @@ _gnutls_handshake_verify_cert_vrfy (gnutls_session_t session,
 {
   int ret;
   opaque concat[MAX_SIG_SIZE];
-  hash_hd_st td_md5;
-  hash_hd_st td_sha;
+  digest_hd_st td_md5;
+  digest_hd_st td_sha;
   gnutls_datum_t dconcat;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
@@ -626,10 +626,10 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
   gnutls_datum_t dconcat;
   int ret;
   opaque concat[MAX_SIG_SIZE];
-  hash_hd_st td;
+  digest_hd_st td;
   gnutls_sign_algorithm_t sign_algo;
   gnutls_digest_algorithm_t hash_algo;
-  hash_hd_st *handshake_td;
+  digest_hd_st *handshake_td;
 
   handshake_td = &session->internals.handshake_mac_handle.tls12.sha1;
   hash_algo = handshake_td->algorithm;
@@ -707,8 +707,8 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
   gnutls_datum_t dconcat;
   int ret;
   opaque concat[MAX_SIG_SIZE];
-  hash_hd_st td_md5;
-  hash_hd_st td_sha;
+  digest_hd_st td_md5;
+  digest_hd_st td_sha;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
   if (session->security_parameters.handshake_mac_handle_type ==

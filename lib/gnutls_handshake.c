@@ -166,8 +166,8 @@ static int
 _gnutls_ssl3_finished (gnutls_session_t session, int type, opaque * ret)
 {
   const int siz = SSL_MSG_LEN;
-  hash_hd_st td_md5;
-  hash_hd_st td_sha;
+  digest_hd_st td_md5;
+  digest_hd_st td_sha;
   const char *mesg;
   int rc;
 
@@ -235,8 +235,8 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret)
   opaque concat[MAX_HASH_SIZE + 16 /*MD5 */ ];
   size_t len = 20 + 16;
   const char *mesg;
-  hash_hd_st td_md5;
-  hash_hd_st td_sha;
+  digest_hd_st td_md5;
+  digest_hd_st td_sha;
   int rc;
 
   if (session->security_parameters.handshake_mac_handle_type ==
@@ -2301,7 +2301,7 @@ _gnutls_handshake_hash_init (gnutls_session_t session)
 	{
 	  ret =
 	    _gnutls_hash_init (&session->internals.handshake_mac_handle.
-			       tls10.md5, GNUTLS_MAC_MD5, NULL, 0);
+			       tls10.md5, GNUTLS_MAC_MD5);
 
 	  if (ret < 0)
 	    {
@@ -2311,7 +2311,7 @@ _gnutls_handshake_hash_init (gnutls_session_t session)
 
 	  ret =
 	    _gnutls_hash_init (&session->internals.handshake_mac_handle.
-			       tls10.sha, GNUTLS_MAC_SHA1, NULL, 0);
+			       tls10.sha, GNUTLS_MAC_SHA1);
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
@@ -2328,7 +2328,7 @@ _gnutls_handshake_hash_init (gnutls_session_t session)
 	     SHA256. */
 	  ret =
 	    _gnutls_hash_init (&session->internals.handshake_mac_handle.
-			       tls12.sha256, GNUTLS_DIG_SHA256, NULL, 0);
+			       tls12.sha256, GNUTLS_DIG_SHA256);
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();
@@ -2337,7 +2337,7 @@ _gnutls_handshake_hash_init (gnutls_session_t session)
 
 	  ret =
 	    _gnutls_hash_init (&session->internals.handshake_mac_handle.
-			       tls12.sha1, GNUTLS_DIG_SHA1, NULL, 0);
+			       tls12.sha1, GNUTLS_DIG_SHA1);
 	  if (ret < 0)
 	    {
 	      gnutls_assert ();

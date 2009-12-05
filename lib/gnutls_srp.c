@@ -166,7 +166,7 @@ _gnutls_calc_srp_u (bigint_t A, bigint_t B, bigint_t n)
   size_t b_size, a_size;
   opaque *holder, hd[MAX_HASH_SIZE];
   size_t holder_size, hash_size, n_size;
-  hash_hd_st td;
+  digest_hd_st td;
   int ret;
   bigint_t res;
 
@@ -191,7 +191,7 @@ _gnutls_calc_srp_u (bigint_t A, bigint_t B, bigint_t n)
   _gnutls_mpi_print (A, &holder[n_size - a_size], &a_size);
   _gnutls_mpi_print (B, &holder[n_size + n_size - b_size], &b_size);
 
-  ret = _gnutls_hash_init (&td, GNUTLS_MAC_SHA1, NULL, 0);
+  ret = _gnutls_hash_init (&td, GNUTLS_MAC_SHA1);
   if (ret < 0)
     {
       gnutls_free (holder);
@@ -289,13 +289,13 @@ _gnutls_calc_srp_sha (const char *username, const char *password,
 		      opaque * salt, int salt_size, size_t * size,
 		      void *digest)
 {
-  hash_hd_st td;
+  digest_hd_st td;
   opaque res[MAX_HASH_SIZE];
   int ret;
 
   *size = 20;
 
-  ret = _gnutls_hash_init (&td, GNUTLS_MAC_SHA1, NULL, 0);
+  ret = _gnutls_hash_init (&td, GNUTLS_MAC_SHA1);
   if (ret < 0)
     {
       return GNUTLS_E_MEMORY_ERROR;
@@ -306,7 +306,7 @@ _gnutls_calc_srp_sha (const char *username, const char *password,
 
   _gnutls_hash_deinit (&td, res);
 
-  ret = _gnutls_hash_init (&td, GNUTLS_MAC_SHA1, NULL, 0);
+  ret = _gnutls_hash_init (&td, GNUTLS_MAC_SHA1);
   if (ret < 0)
     {
       return GNUTLS_E_MEMORY_ERROR;

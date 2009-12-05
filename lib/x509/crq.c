@@ -2293,7 +2293,7 @@ rsadsa_crq_get_key_id (gnutls_x509_crq_t crq, int pk,
   int params_size = MAX_PUBLIC_PARAMS_SIZE;
   int i, result = 0;
   gnutls_datum_t der = { NULL, 0 };
-  hash_hd_st hd;
+  digest_hd_st hd;
 
   result = _gnutls_x509_crq_get_mpis (crq, params, &params_size);
   if (result < 0)
@@ -2323,7 +2323,7 @@ rsadsa_crq_get_key_id (gnutls_x509_crq_t crq, int pk,
   else
     return GNUTLS_E_INTERNAL_ERROR;
 
-  result = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1, NULL, 0);
+  result = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1);
   if (result < 0)
     {
       gnutls_assert ();

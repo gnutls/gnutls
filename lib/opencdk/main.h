@@ -108,7 +108,7 @@ FILE *_cdk_tmpfile (void);
 cdk_error_t _cdk_proc_packets (cdk_ctx_t hd, cdk_stream_t inp,
 			       cdk_stream_t data,
 			       const char *output, cdk_stream_t outstream,
-			       hash_hd_st*md);
+			       digest_hd_st*md);
 cdk_error_t _cdk_pkt_write2 (cdk_stream_t out, int pkttype, void *pktctx);
 
 /*-- pubkey.c --*/
@@ -125,10 +125,10 @@ void _cdk_pkt_detach_free (cdk_packet_t pkt, int *r_pkttype, void **ctx);
 
 /*-- sig-check.c --*/
 cdk_error_t _cdk_sig_check (cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig,
-			    hash_hd_st*digest, int * r_expired);
-cdk_error_t _cdk_hash_sig_data (cdk_pkt_signature_t sig, hash_hd_st*hd);
-cdk_error_t _cdk_hash_userid (cdk_pkt_userid_t uid, int sig_version, hash_hd_st*md);
-cdk_error_t _cdk_hash_pubkey (cdk_pkt_pubkey_t pk, hash_hd_st *md, 
+			    digest_hd_st*digest, int * r_expired);
+cdk_error_t _cdk_hash_sig_data (cdk_pkt_signature_t sig, digest_hd_st*hd);
+cdk_error_t _cdk_hash_userid (cdk_pkt_userid_t uid, int sig_version, digest_hd_st*md);
+cdk_error_t _cdk_hash_pubkey (cdk_pkt_pubkey_t pk, digest_hd_st *md, 
 			      int use_fpr);
 cdk_error_t _cdk_pk_check_sig (cdk_keydb_hd_t hd,
 			       cdk_kbnode_t knode, 
@@ -159,7 +159,7 @@ int _cdk_sig_hash_for (cdk_pkt_pubkey_t pk);
 void _cdk_trim_string (char * s, int canon);
 cdk_error_t _cdk_sig_create (cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig);
 cdk_error_t _cdk_sig_complete (cdk_pkt_signature_t sig, cdk_pkt_seckey_t sk,
-			       hash_hd_st *hd);
+			       digest_hd_st *hd);
 
 /*-- stream.c --*/
 void _cdk_stream_set_compress_algo (cdk_stream_t s, int algo);   

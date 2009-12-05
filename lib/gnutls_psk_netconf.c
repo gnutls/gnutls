@@ -54,7 +54,7 @@ gnutls_psk_netconf_derive_key (const char *password,
   const char netconf_key_pad[] = "Key Pad for Netconf";
   size_t sha1len = _gnutls_hash_get_algo_len (GNUTLS_DIG_SHA1);
   size_t hintlen = strlen (psk_identity_hint);
-  hash_hd_st dig;
+  digest_hd_st dig;
   char *inner;
   size_t innerlen;
   int rc;
@@ -65,7 +65,7 @@ gnutls_psk_netconf_derive_key (const char *password,
    *
    */
 
-  rc = _gnutls_hash_init (&dig, GNUTLS_DIG_SHA1, NULL, 0);
+  rc = _gnutls_hash_init (&dig, GNUTLS_DIG_SHA1);
   if (rc < 0)
     {
       gnutls_assert ();
@@ -107,7 +107,7 @@ gnutls_psk_netconf_derive_key (const char *password,
 
   memcpy (inner + sha1len, psk_identity_hint, hintlen);
 
-  rc = _gnutls_hash_init (&dig, GNUTLS_DIG_SHA1, NULL, 0);
+  rc = _gnutls_hash_init (&dig, GNUTLS_DIG_SHA1);
   if (rc < 0)
     {
       gnutls_assert ();

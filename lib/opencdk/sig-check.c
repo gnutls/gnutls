@@ -36,7 +36,7 @@
 /* Hash all multi precision integers of the key PK with the given
    message digest context MD. */
 static int
-hash_mpibuf (cdk_pubkey_t pk, hash_hd_st * md, int usefpr)
+hash_mpibuf (cdk_pubkey_t pk, digest_hd_st * md, int usefpr)
 {
   byte buf[MAX_MPI_BYTES];	/* FIXME: do not use hardcoded length. */
   size_t nbytes;
@@ -66,7 +66,7 @@ hash_mpibuf (cdk_pubkey_t pk, hash_hd_st * md, int usefpr)
    MD. The @usefpr param is only valid for version 3 keys because of
    the different way to calculate the fingerprint. */
 cdk_error_t
-_cdk_hash_pubkey (cdk_pubkey_t pk, hash_hd_st * md, int usefpr)
+_cdk_hash_pubkey (cdk_pubkey_t pk, digest_hd_st * md, int usefpr)
 {
   byte buf[12];
   size_t i, n, npkey;
@@ -113,7 +113,7 @@ _cdk_hash_pubkey (cdk_pubkey_t pk, hash_hd_st * md, int usefpr)
 /* Hash the user ID @uid with the given message digest @md.
    Use openpgp mode if @is_v4 is 1. */
 cdk_error_t
-_cdk_hash_userid (cdk_pkt_userid_t uid, int is_v4, hash_hd_st * md)
+_cdk_hash_userid (cdk_pkt_userid_t uid, int is_v4, digest_hd_st * md)
 {
   const byte *data;
   byte buf[5];
@@ -144,7 +144,7 @@ _cdk_hash_userid (cdk_pkt_userid_t uid, int is_v4, hash_hd_st * md)
 /* Hash all parts of the signature which are needed to derive
    the correct message digest to verify the sig. */
 cdk_error_t
-_cdk_hash_sig_data (cdk_pkt_signature_t sig, hash_hd_st * md)
+_cdk_hash_sig_data (cdk_pkt_signature_t sig, digest_hd_st * md)
 {
   byte buf[4];
   byte tmp;
@@ -227,7 +227,7 @@ cache_sig_result (cdk_pkt_signature_t sig, int res)
    Use the digest handle @digest. */
 cdk_error_t
 _cdk_sig_check (cdk_pubkey_t pk, cdk_pkt_signature_t sig,
-		hash_hd_st * digest, int *r_expired)
+		digest_hd_st * digest, int *r_expired)
 {
   cdk_error_t rc;
   byte md[MAX_DIGEST_LEN];
@@ -272,7 +272,7 @@ _cdk_pk_check_sig (cdk_keydb_hd_t keydb,
 		   cdk_kbnode_t knode, cdk_kbnode_t snode, int *is_selfsig,
 		   char **ret_uid)
 {
-  hash_hd_st md;
+  digest_hd_st md;
   int err;
   cdk_pubkey_t pk;
   cdk_pkt_signature_t sig;
@@ -297,7 +297,7 @@ _cdk_pk_check_sig (cdk_keydb_hd_t keydb,
   pk = knode->pkt->pkt.public_key;
   sig = snode->pkt->pkt.signature;
 
-  err = _gnutls_hash_init (&md, sig->digest_algo, NULL, 0);
+  err = _gnutls_hash_init (&md, sig->digest_algo);
   if (err < 0)
     {
       gnutls_assert ();

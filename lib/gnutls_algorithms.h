@@ -46,9 +46,9 @@ int _gnutls_version_has_explicit_iv (gnutls_protocol_t version);
 int _gnutls_version_has_variable_padding (gnutls_protocol_t version);
 
 /* Functions for MACs. */
-int _gnutls_mac_is_ok (gnutls_digest_algorithm_t algorithm);
-gnutls_digest_algorithm_t _gnutls_x509_oid2mac_algorithm (const char *oid);
-const char *_gnutls_x509_mac_to_oid (gnutls_digest_algorithm_t mac);
+int _gnutls_mac_is_ok (gnutls_mac_algorithm_t algorithm);
+gnutls_mac_algorithm_t _gnutls_x509_oid2mac_algorithm (const char *oid);
+const char *_gnutls_x509_mac_to_oid (gnutls_mac_algorithm_t mac);
 
 /* Functions for cipher suites. */
 int _gnutls_supported_ciphersuites (gnutls_session_t session,
@@ -61,7 +61,7 @@ gnutls_cipher_algorithm_t _gnutls_cipher_suite_get_cipher_algo (const
 								* algorithm);
 gnutls_kx_algorithm_t _gnutls_cipher_suite_get_kx_algo (const cipher_suite_st
 							* algorithm);
-gnutls_digest_algorithm_t _gnutls_cipher_suite_get_mac_algo (const
+gnutls_mac_algorithm_t _gnutls_cipher_suite_get_mac_algo (const
 							  cipher_suite_st *
 							  algorithm);
 gnutls_protocol_t _gnutls_cipher_suite_get_version (const cipher_suite_st *
@@ -101,17 +101,17 @@ enum encipher_type _gnutls_kx_encipher_type (gnutls_kx_algorithm_t algorithm);
 /* Functions for sign algorithms. */
 gnutls_sign_algorithm_t _gnutls_x509_oid2sign_algorithm (const char *oid);
 gnutls_sign_algorithm_t _gnutls_x509_pk_to_sign (gnutls_pk_algorithm_t pk,
-						 gnutls_digest_algorithm_t mac);
+						 gnutls_mac_algorithm_t mac);
 gnutls_pk_algorithm_t _gnutls_x509_sign_to_pk (gnutls_sign_algorithm_t sign);
 const char *_gnutls_x509_sign_to_oid (gnutls_pk_algorithm_t,
-				      gnutls_digest_algorithm_t mac);
+				      gnutls_mac_algorithm_t mac);
 gnutls_sign_algorithm_t _gnutls_tls_aid_to_sign (const sign_algorithm_st* aid);
 sign_algorithm_st _gnutls_sign_to_tls_aid (gnutls_sign_algorithm_t sign);
-gnutls_digest_algorithm_t _gnutls_sign_get_hash_algorithm (gnutls_sign_algorithm_t);
+gnutls_mac_algorithm_t _gnutls_sign_get_hash_algorithm (gnutls_sign_algorithm_t);
 gnutls_pk_algorithm_t _gnutls_sign_get_pk_algorithm (gnutls_sign_algorithm_t);
 
 int _gnutls_mac_priority (gnutls_session_t session,
-			  gnutls_digest_algorithm_t algorithm);
+			  gnutls_mac_algorithm_t algorithm);
 int _gnutls_cipher_priority (gnutls_session_t session,
 			     gnutls_cipher_algorithm_t algorithm);
 int _gnutls_kx_priority (gnutls_session_t session,

@@ -40,7 +40,7 @@ _gnutls_cipher_init (cipher_hd_st * handle, gnutls_cipher_algorithm_t cipher,
 		     const gnutls_datum_t * key, const gnutls_datum_t * iv)
 {
   int ret = GNUTLS_E_INTERNAL_ERROR;
-  const gnutls_crypto_cipher_st *cc = NULL;
+  gnutls_crypto_single_cipher_st *cc = NULL;
 
   /* check if a cipher has been registered
    */

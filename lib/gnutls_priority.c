@@ -111,7 +111,7 @@ gnutls_kx_set_priority (gnutls_session_t session, const int *list)
 /**
   * gnutls_mac_set_priority - Sets the priority on the mac algorithms supported by gnutls.
   * @session: is a #gnutls_session_t structure.
-  * @list: is a 0 terminated list of gnutls_digest_algorithm_t elements.
+  * @list: is a 0 terminated list of gnutls_mac_algorithm_t elements.
   *
   * Sets the priority on the mac algorithms supported by gnutls.
   * Priority is higher for elements specified before others.

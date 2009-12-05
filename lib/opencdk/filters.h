@@ -32,7 +32,7 @@ enum {
 
 typedef struct {
   cipher_hd_st hd;
-  hash_hd_st mdc;
+  digest_hd_st mdc;
   int mdc_method;
   u32 datalen;
   struct {
@@ -45,7 +45,7 @@ typedef struct {
 
 typedef struct {
   int digest_algo;
-  hash_hd_st md;
+  digest_hd_st md;
   int md_initialized;
 } md_filter_t;
 
@@ -61,7 +61,7 @@ typedef struct {
   cdk_lit_format_t mode;
   char *orig_filename; /* This original name of the input file. */
   char *filename;
-  hash_hd_st md;
+  digest_hd_st md;
   int md_initialized;
   struct {
     size_t on;

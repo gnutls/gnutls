@@ -222,7 +222,7 @@ struct gnutls_hash_entry
 {
   const char *name;
   const char *oid;
-  gnutls_digest_algorithm_t id;
+  gnutls_mac_algorithm_t id;
   size_t key_size;		/* in case of mac */
 };
 typedef struct gnutls_hash_entry gnutls_hash_entry;
@@ -240,7 +240,7 @@ static const gnutls_hash_entry hash_algorithms[] = {
 };
 
 /* Keep the contents of this struct the same as the previous one. */
-static const gnutls_digest_algorithm_t supported_macs[] = {
+static const gnutls_mac_algorithm_t supported_macs[] = {
   GNUTLS_MAC_SHA1,
   GNUTLS_MAC_MD5,
   GNUTLS_MAC_SHA256,
@@ -346,7 +346,7 @@ typedef struct
   cipher_suite_st id;
   gnutls_cipher_algorithm_t block_algorithm;
   gnutls_kx_algorithm_t kx_algorithm;
-  gnutls_digest_algorithm_t mac_algorithm;
+  gnutls_mac_algorithm_t mac_algorithm;
   gnutls_protocol_t version;	/* this cipher suite is supported
 				 * from 'version' and above;
 				 */
@@ -677,7 +677,7 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
 
 int
 _gnutls_mac_priority (gnutls_session_t session,
-		      gnutls_digest_algorithm_t algorithm)
+		      gnutls_mac_algorithm_t algorithm)
 {				/* actually returns the priority */
   unsigned int i;
   for (i = 0; i < session->internals.priorities.mac.algorithms; i++)
@@ -692,13 +692,13 @@ _gnutls_mac_priority (gnutls_session_t session,
  * gnutls_mac_get_name - Returns a string with the name of the specified mac algorithm
  * @algorithm: is a MAC algorithm
  *
- * Convert a #gnutls_digest_algorithm_t value to a string.
+ * Convert a #gnutls_mac_algorithm_t value to a string.
  *
  * Returns: a string that contains the name of the specified MAC
  *   algorithm, or %NULL.
  **/
 const char *
-gnutls_mac_get_name (gnutls_digest_algorithm_t algorithm)
+gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm)
 {
   const char *ret = NULL;
 
@@ -712,16 +712,16 @@ gnutls_mac_get_name (gnutls_digest_algorithm_t algorithm)
  * gnutls_mac_get_id - Returns the gnutls id of the specified in string algorithm
  * @name: is a MAC algorithm name
  *
- * Convert a string to a #gnutls_digest_algorithm_t value.  The names are
+ * Convert a string to a #gnutls_mac_algorithm_t value.  The names are
  * compared in a case insensitive way.
  *
- * Returns: a #gnutls_digest_algorithm_t id of the specified MAC
+ * Returns: a #gnutls_mac_algorithm_t id of the specified MAC
  *   algorithm string, or %GNUTLS_MAC_UNKNOWN on failures.
  **/
-gnutls_digest_algorithm_t
+gnutls_mac_algorithm_t
 gnutls_mac_get_id (const char *name)
 {
-  gnutls_digest_algorithm_t ret = GNUTLS_MAC_UNKNOWN;
+  gnutls_mac_algorithm_t ret = GNUTLS_MAC_UNKNOWN;
 
   GNUTLS_HASH_LOOP (if (strcasecmp (p->name, name) == 0) ret = p->id);
 
@@ -738,7 +738,7 @@ gnutls_mac_get_id (const char *name)
  *   given MAC algorithm is invalid.
  **/
 size_t
-gnutls_mac_get_key_size (gnutls_digest_algorithm_t algorithm)
+gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm)
 {
   size_t ret = 0;
 
@@ -756,17 +756,17 @@ gnutls_mac_get_key_size (gnutls_digest_algorithm_t algorithm)
  * example, MD2 is not supported as a cipher suite, but is supported
  * for other purposes (e.g., X.509 signature verification or similar).
  *
- * Returns: Return a zero-terminated list of #gnutls_digest_algorithm_t
+ * Returns: Return a zero-terminated list of #gnutls_mac_algorithm_t
  *   integers indicating the available MACs.
  **/
-const gnutls_digest_algorithm_t *
+const gnutls_mac_algorithm_t *
 gnutls_mac_list (void)
 {
   return supported_macs;
 }
 
 const char *
-_gnutls_x509_mac_to_oid (gnutls_digest_algorithm_t algorithm)
+_gnutls_x509_mac_to_oid (gnutls_mac_algorithm_t algorithm)
 {
   const char *ret = NULL;
 
@@ -776,10 +776,10 @@ _gnutls_x509_mac_to_oid (gnutls_digest_algorithm_t algorithm)
   return ret;
 }
 
-gnutls_digest_algorithm_t
+gnutls_mac_algorithm_t
 _gnutls_x509_oid2mac_algorithm (const char *oid)
 {
-  gnutls_digest_algorithm_t ret = 0;
+  gnutls_mac_algorithm_t ret = 0;
 
   GNUTLS_HASH_LOOP (if (p->oid && strcmp (oid, p->oid) == 0)
 		    {
@@ -793,7 +793,7 @@ _gnutls_x509_oid2mac_algorithm (const char *oid)
 
 
 int
-_gnutls_mac_is_ok (gnutls_digest_algorithm_t algorithm)
+_gnutls_mac_is_ok (gnutls_mac_algorithm_t algorithm)
 {
   ssize_t ret = -1;
   GNUTLS_HASH_ALG_LOOP (ret = p->id);
@@ -1327,7 +1327,7 @@ _gnutls_cipher_suite_get_kx_algo (const cipher_suite_st * suite)
 
 }
 
-gnutls_digest_algorithm_t
+gnutls_mac_algorithm_t
 _gnutls_cipher_suite_get_mac_algo (const cipher_suite_st * suite)
 {				/* In bytes */
   int ret = 0;
@@ -1362,7 +1362,7 @@ _gnutls_cipher_suite_get_name (cipher_suite_st * suite)
 const char *
 gnutls_cipher_suite_get_name (gnutls_kx_algorithm_t kx_algorithm,
 			      gnutls_cipher_algorithm_t cipher_algorithm,
-			      gnutls_digest_algorithm_t mac_algorithm)
+			      gnutls_mac_algorithm_t mac_algorithm)
 {
   const char *ret = NULL;
 
@@ -1398,7 +1398,7 @@ gnutls_cipher_suite_info (size_t idx,
 			  char *cs_id,
 			  gnutls_kx_algorithm_t * kx,
 			  gnutls_cipher_algorithm_t * cipher,
-			  gnutls_digest_algorithm_t * mac,
+			  gnutls_mac_algorithm_t * mac,
 			  gnutls_protocol_t * version)
 {
   if (idx >= CIPHER_SUITES_COUNT)
@@ -1529,9 +1529,9 @@ _gnutls_compare_algo (gnutls_session_t session, const void *i_A1,
     _gnutls_cipher_suite_get_cipher_algo ((const cipher_suite_st *) i_A1);
   gnutls_cipher_algorithm_t cA2 =
     _gnutls_cipher_suite_get_cipher_algo ((const cipher_suite_st *) i_A2);
-  gnutls_digest_algorithm_t mA1 =
+  gnutls_mac_algorithm_t mA1 =
     _gnutls_cipher_suite_get_mac_algo ((const cipher_suite_st *) i_A1);
-  gnutls_digest_algorithm_t mA2 =
+  gnutls_mac_algorithm_t mA2 =
     _gnutls_cipher_suite_get_mac_algo ((const cipher_suite_st *) i_A2);
 
   int p1 = (_gnutls_kx_priority (session, kA1) + 1) * 64;
@@ -1811,7 +1811,7 @@ struct gnutls_sign_entry
   const char *oid;
   gnutls_sign_algorithm_t id;
   gnutls_pk_algorithm_t pk;
-  gnutls_digest_algorithm_t mac;
+  gnutls_mac_algorithm_t mac;
   /* See RFC 5246 HashAlgorithm and SignatureAlgorithm
      for values to use in aid struct. */
   sign_algorithm_st aid;
@@ -1960,7 +1960,7 @@ _gnutls_x509_oid2sign_algorithm (const char *oid)
 }
 
 gnutls_sign_algorithm_t
-_gnutls_x509_pk_to_sign (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t mac)
+_gnutls_x509_pk_to_sign (gnutls_pk_algorithm_t pk, gnutls_mac_algorithm_t mac)
 {
   gnutls_sign_algorithm_t ret = 0;
 
@@ -1976,7 +1976,7 @@ _gnutls_x509_pk_to_sign (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t mac
 
 const char *
 _gnutls_x509_sign_to_oid (gnutls_pk_algorithm_t pk,
-			  gnutls_digest_algorithm_t mac)
+			  gnutls_mac_algorithm_t mac)
 {
   gnutls_sign_algorithm_t sign;
   const char *ret = NULL;
@@ -1989,10 +1989,10 @@ _gnutls_x509_sign_to_oid (gnutls_pk_algorithm_t pk,
   return ret;
 }
 
-gnutls_digest_algorithm_t
+gnutls_mac_algorithm_t
 _gnutls_sign_get_hash_algorithm (gnutls_sign_algorithm_t sign)
 {
-  gnutls_digest_algorithm_t ret = GNUTLS_DIG_UNKNOWN;
+  gnutls_mac_algorithm_t ret = GNUTLS_DIG_UNKNOWN;
 
   GNUTLS_SIGN_ALG_LOOP (ret = p->mac);
 
