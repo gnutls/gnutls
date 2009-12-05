@@ -37,12 +37,33 @@ void gnutls_cipher_deinit (gnutls_cipher_hd_t handle);
 int gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm);
 
 
+typedef struct hash_hd_st* gnutls_hash_hd_t;
+typedef struct hmac_hd_st* gnutls_hmac_hd_t;
+
+int gnutls_hmac_init (gnutls_hmac_hd_t * dig, gnutls_digest_algorithm_t algorithm,
+		   const void *key, int keylen);
+int gnutls_hmac (gnutls_hmac_hd_t handle, const void *text, size_t textlen);
+void gnutls_hmac_output (gnutls_hmac_hd_t handle, void *digest);
+void gnutls_hmac_deinit (gnutls_hmac_hd_t handle, void *digest);
+int gnutls_hmac_get_len( gnutls_mac_algorithm_t algorithm);
+int gnutls_hmac_fast( gnutls_mac_algorithm_t algorithm, const void* key, int keylen, 
+	const void* text, size_t textlen, void* digest);
+
+int gnutls_hash_init (gnutls_hash_hd_t * dig, gnutls_digest_algorithm_t algorithm);
+int gnutls_hash (gnutls_hash_hd_t handle, const void *text, size_t textlen);
+void gnutls_hash_output (gnutls_hash_hd_t handle, void *digest);
+void gnutls_hash_deinit (gnutls_hash_hd_t handle, void *digest);
+int gnutls_hash_get_len( gnutls_digest_algorithm_t algorithm);
+int gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,
+                   const void *text, size_t textlen, void *digest);
+
 /* register ciphers */
 
 #define GNUTLS_CRYPTO_API_VERSION 0x02
 
 #define gnutls_crypto_single_cipher_st gnutls_crypto_cipher_st
 #define gnutls_crypto_single_mac_st gnutls_crypto_mac_st
+#define gnutls_crypto_single_digest_st gnutls_crypto_digest_st
 
 typedef struct
 {
@@ -67,7 +88,6 @@ typedef struct
 } gnutls_crypto_mac_st;
 
 /* the same... setkey should be null */
-typedef gnutls_crypto_single_mac_st gnutls_crypto_single_digest_st;
 typedef gnutls_crypto_mac_st gnutls_crypto_digest_st;
 
 typedef enum gnutls_rnd_level

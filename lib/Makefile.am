@@ -81,7 +81,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	auth_dh_common.c gnutls_helper.c gnutls_supplemental.c		\
 	crypto.c random.c pk-libgcrypt.c mpi-libgcrypt.c cryptodev.c	\
 	rnd-libgcrypt.c cipher-libgcrypt.c mac-libgcrypt.c ext_signature.c \
-	crypto-api.c compat.c
+	crypto-api.c
 
 if ENABLE_OPRFI
 COBJECTS += $(OPRFI_COBJECTS)

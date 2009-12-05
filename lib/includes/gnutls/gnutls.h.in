@@ -135,9 +135,10 @@ extern "C" {
     GNUTLS_MAC_MD2,
     GNUTLS_MAC_SHA256,
     GNUTLS_MAC_SHA384,
-    GNUTLS_MAC_SHA512
+    GNUTLS_MAC_SHA512,
+    GNUTLS_MAC_SHA224, /* unused as MAC */
     /* If you add anything here, make sure you align with
-       gnutls_digest_algorithm_t, in particular SHA-224. */
+       gnutls_digest_algorithm_t. */
   } gnutls_mac_algorithm_t;
 
   /* The enumerations here should have the same value with

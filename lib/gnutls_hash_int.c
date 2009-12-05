@@ -61,7 +61,7 @@ int
 _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
 {
   int result;
-  gnutls_crypto_single_digest_st *cc = NULL;
+  const gnutls_crypto_digest_st *cc = NULL;
 
   dig->algorithm = algorithm;
 
@@ -103,7 +103,7 @@ _gnutls_hash_get_algo_len (gnutls_digest_algorithm_t algorithm)
 }
 
 int
-_gnutls_hash (const digest_hd_st * handle, const void *text, size_t textlen)
+_gnutls_hash (digest_hd_st * handle, const void *text, size_t textlen)
 {
   if (textlen > 0)
     {
@@ -252,7 +252,7 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
 		   const void *key, int keylen)
 {
   int result;
-  gnutls_crypto_single_mac_st *cc = NULL;
+  const gnutls_crypto_mac_st *cc = NULL;
 
   dig->algorithm = algorithm;
   dig->key = key;
@@ -299,7 +299,7 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
 }
 
 int
-_gnutls_hmac (const digest_hd_st * handle, const void *text, size_t textlen)
+_gnutls_hmac (digest_hd_st * handle, const void *text, size_t textlen)
 {
   if (textlen > 0)
     {

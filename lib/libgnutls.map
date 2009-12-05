@@ -586,12 +586,17 @@ GNUTLS_2_10
     gnutls_cipher_deinit;
     gnutls_cipher_get_block_size;
     gnutls_hash_init;
-    gnutls_hash_get_algo_len;
+    gnutls_hash_get_len;
     gnutls_hash;
     gnutls_hash_fast;
     gnutls_hash_deinit;
     gnutls_hash_output;
-    gnutls_hash_reset;
+    gnutls_hmac_init;
+    gnutls_hmac_get_len;
+    gnutls_hmac;
+    gnutls_hmac_fast;
+    gnutls_hmac_deinit;
+    gnutls_hmac_output;
 } GNUTLS_2_8;
 
 GNUTLS_PRIVATE {

@@ -28,7 +28,7 @@
 #include <hmac.h>
 
 static int
-md5init (void **ctx)
+md5init (gnutls_mac_algorithm_t mac, void **ctx)
 {
   *ctx = gnutls_malloc (sizeof (struct md5_ctx));
   if (!*ctx)
@@ -78,7 +78,7 @@ struct hmacctx
 };
 
 static int
-hmacmd5init (void **ctx)
+hmacmd5init (gnutls_mac_algorithm_t mac, void **ctx)
 {
   struct hmacctx *p;
 
@@ -195,7 +195,7 @@ hmacmd5deinit (void *ctx)
   gnutls_free (p);
 }
 
-static gnutls_crypto_single_digest_st dig = {
+static gnutls_crypto_digest_st dig = {
   md5init,
   NULL,
   md5hash,
@@ -204,7 +204,7 @@ static gnutls_crypto_single_digest_st dig = {
   md5deinit
 };
 
-static gnutls_crypto_single_mac_st mac = {
+static gnutls_crypto_mac_st mac = {
   hmacmd5init,
   hmacmd5setkey,
   hmacmd5hash,

@@ -193,7 +193,7 @@ _gnutls_decrypt (gnutls_session_t session, opaque * ciphertext,
   return ret;
 }
 
-inline static int
+static inline int
 mac_init (digest_hd_st * td, gnutls_mac_algorithm_t mac, opaque * secret,
 	  int secret_size, int ver)
 {
@@ -216,7 +216,20 @@ mac_init (digest_hd_st * td, gnutls_mac_algorithm_t mac, opaque * secret,
   return ret;
 }
 
-static void
+static inline void
+mac_hash (digest_hd_st * td, void * data, int data_size, int ver)
+{
+  if (ver == GNUTLS_SSL3)
+    {				/* SSL 3.0 */
+      _gnutls_hash (td, data, data_size);
+    }
+  else
+    {
+      _gnutls_hmac (td, data, data_size);
+    }
+}
+
+static inline void
 mac_deinit (digest_hd_st * td, opaque * res, int ver)
 {
   if (ver == GNUTLS_SSL3)
@@ -356,8 +369,8 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
           return ret;
         }
       preamble_size = make_preamble( UINT64DATA (session->connection_state.write_sequence_number), type, c_length, ver, preamble);
-      _gnutls_hash (&td, preamble, preamble_size);
-      _gnutls_hash (&td, compressed.data, compressed.size);
+      mac_hash (&td, preamble, preamble_size, ver);
+      mac_hash (&td, compressed.data, compressed.size, ver);
       mac_deinit (&td, MAC, ver);
     }
 
@@ -554,9 +567,9 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
         }
 
       preamble_size = make_preamble( UINT64DATA (session->connection_state.read_sequence_number), type, c_length, ver, preamble);
-      _gnutls_hash (&td, preamble, preamble_size);
+      mac_hash (&td, preamble, preamble_size, ver);
       if (length > 0)
-	_gnutls_hmac (&td, ciphertext.data, length);
+	mac_hash (&td, ciphertext.data, length, ver);
 
       mac_deinit (&td, MAC, ver);
     }

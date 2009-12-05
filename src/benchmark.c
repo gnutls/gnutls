@@ -28,7 +28,9 @@
 
 static unsigned char data[64*1024];
 
-void cipher_bench(int algo, int size)
+#define TOTAL_ITER 8*1024
+
+static void cipher_bench(int algo, int size)
 {
 int ret, i;
 gnutls_cipher_hd_t ctx;
@@ -69,7 +71,7 @@ int keysize = gnutls_cipher_get_key_size(algo);
     goto leave;
   }
   
-  for (i=0;i<7*1024;i++) {
+  for (i=0;i<TOTAL_ITER;i++) {
     gnutls_cipher_encrypt(ctx, data, size*1024);
     data_size+= size*1024;
   }
@@ -81,7 +83,7 @@ int keysize = gnutls_cipher_get_key_size(algo);
   secs = (stop.tv_sec*1000+stop.tv_nsec/(1000*1000)-(start.tv_sec*1000+start.tv_nsec/(1000*1000)));
   secs /= 1000;
   dd = (((double)data_size/(double)secs))/1000;
-  printf("Transferred %ld kb in %.2f secs: ", data_size/1000, secs);
+  printf("Encrypted %ld kb in %.2f secs: ", data_size/1000, secs);
   printf("%.2f kbyte/sec\n", dd);
   
 leave:
@@ -90,9 +92,55 @@ leave:
 
 }
 
-
-int main()
+static void mac_bench(int algo, int size)
 {
+int i;
+void* _key;
+struct timespec start, stop;
+double secs;
+long data_size = 0;
+double dd;
+int blocksize = gnutls_hmac_get_len(algo);
+
+  _key = malloc(blocksize);
+  if (_key == NULL)
+    return;
+  memset(_key, 0xf0, blocksize);
+
+  gnutls_global_init();
+  
+  printf("Checking %s (%dkb payload)... ", gnutls_mac_get_name(algo), size);
+  fflush(stdout);
+  clock_gettime(CLOCK_MONOTONIC, &start);
+
+  for (i=0;i<TOTAL_ITER;i++) {
+    gnutls_hmac_fast(algo, _key, blocksize, data, size*1024, _key);
+    data_size+= size*1024;
+  }
+  
+  clock_gettime(CLOCK_MONOTONIC, &stop);
+
+  secs = (stop.tv_sec*1000+stop.tv_nsec/(1000*1000)-(start.tv_sec*1000+start.tv_nsec/(1000*1000)));
+  secs /= 1000;
+  dd = (((double)data_size/(double)secs))/1000;
+  printf("Hashed %ld kb in %.2f secs: ", data_size/1000, secs);
+  printf("%.2f kbyte/sec\n", dd);
+  
+  free(_key);
+
+}
+
+
+int main(void)
+{
+  mac_bench(GNUTLS_MAC_SHA1, 4);
+  mac_bench(GNUTLS_MAC_SHA1, 8);
+  mac_bench(GNUTLS_MAC_SHA1, 16);
+
+  mac_bench(GNUTLS_MAC_SHA256, 4);
+  mac_bench(GNUTLS_MAC_SHA256, 8);
+  mac_bench(GNUTLS_MAC_SHA256, 16);
+
   cipher_bench(GNUTLS_CIPHER_3DES_CBC, 4);
   cipher_bench(GNUTLS_CIPHER_3DES_CBC, 8);
   cipher_bench(GNUTLS_CIPHER_3DES_CBC, 16);
@@ -104,6 +152,7 @@ int main()
   cipher_bench(GNUTLS_CIPHER_ARCFOUR, 4);
   cipher_bench(GNUTLS_CIPHER_ARCFOUR, 8);
   cipher_bench(GNUTLS_CIPHER_ARCFOUR, 16);
+
  
   return 0; 
 }

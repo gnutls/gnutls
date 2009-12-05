@@ -35,7 +35,7 @@ typedef struct algo_list
 {
   int algorithm;
   int priority;
-  void *alg_data;
+  const void *alg_data;
   struct algo_list *next;
 } algo_list;
 
@@ -44,7 +44,7 @@ typedef struct algo_list
 #define digest_list algo_list
 
 static int
-_algo_register (algo_list * al, int algorithm, int priority, void *s)
+_algo_register (algo_list * al, int algorithm, int priority, const void *s)
 {
   algo_list *cl;
   algo_list *last_cl = al;
@@ -92,7 +92,7 @@ _algo_register (algo_list * al, int algorithm, int priority, void *s)
 
 }
 
-static void *
+static const void *
 _get_algo (algo_list * al, int algo)
 {
   cipher_list *cl;
@@ -166,7 +166,7 @@ _gnutls_crypto_deregister (void)
 int
 gnutls_crypto_single_cipher_register2 (gnutls_cipher_algorithm_t algorithm,
 				       int priority, int version,
-				       const gnutls_crypto_single_cipher_st * s)
+				       const gnutls_crypto_cipher_st * s)
 {
   if (version != GNUTLS_CRYPTO_API_VERSION)
     {
@@ -177,7 +177,7 @@ gnutls_crypto_single_cipher_register2 (gnutls_cipher_algorithm_t algorithm,
   return _algo_register (&glob_cl, algorithm, priority, s);
 }
 
-gnutls_crypto_single_cipher_st *
+const gnutls_crypto_cipher_st *
 _gnutls_get_crypto_cipher (gnutls_cipher_algorithm_t algo)
 {
   return _get_algo (&glob_cl, algo);
@@ -248,7 +248,7 @@ gnutls_crypto_rnd_register2 (int priority, int version,
 int
 gnutls_crypto_single_mac_register2 (gnutls_mac_algorithm_t algorithm,
 				    int priority, int version,
-				    const gnutls_crypto_single_mac_st * s)
+				    const gnutls_crypto_mac_st * s)
 {
   if (version != GNUTLS_CRYPTO_API_VERSION)
     {
@@ -259,7 +259,7 @@ gnutls_crypto_single_mac_register2 (gnutls_mac_algorithm_t algorithm,
   return _algo_register (&glob_ml, algorithm, priority, s);
 }
 
-gnutls_crypto_single_mac_st *
+const gnutls_crypto_mac_st *
 _gnutls_get_crypto_mac (gnutls_mac_algorithm_t algo)
 {
   return _get_algo (&glob_ml, algo);
@@ -290,7 +290,7 @@ _gnutls_get_crypto_mac (gnutls_mac_algorithm_t algo)
 int
 gnutls_crypto_single_digest_register2 (gnutls_digest_algorithm_t algorithm,
 				       int priority, int version,
-				       const gnutls_crypto_single_digest_st * s)
+				       const gnutls_crypto_digest_st * s)
 {
   if (version != GNUTLS_CRYPTO_API_VERSION)
     {
@@ -301,7 +301,7 @@ gnutls_crypto_single_digest_register2 (gnutls_digest_algorithm_t algorithm,
   return _algo_register (&glob_dl, algorithm, priority, s);
 }
 
-gnutls_crypto_single_digest_st *
+const gnutls_crypto_digest_st *
 _gnutls_get_crypto_digest (gnutls_digest_algorithm_t algo)
 {
   return _get_algo (&glob_dl, algo);
