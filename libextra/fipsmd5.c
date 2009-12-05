@@ -196,21 +196,20 @@ hmacmd5deinit (void *ctx)
 }
 
 static gnutls_crypto_digest_st dig = {
-  md5init,
-  NULL,
-  md5hash,
-  md5copy,
-  md5output,
-  md5deinit
+  .init = md5init,
+  .hash = md5hash,
+  .copy = md5copy,
+  .output = md5output,
+  .deinit = md5deinit
 };
 
 static gnutls_crypto_mac_st mac = {
-  hmacmd5init,
-  hmacmd5setkey,
-  hmacmd5hash,
-  hmacmd5copy,
-  hmacmd5output,
-  hmacmd5deinit
+  .init = hmacmd5init,
+  .setkey = hmacmd5setkey,
+  .hash = hmacmd5hash,
+  .copy = hmacmd5copy,
+  .output = hmacmd5output,
+  .deinit = hmacmd5deinit
 };
 
 /**
