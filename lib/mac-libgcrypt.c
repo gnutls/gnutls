@@ -31,12 +31,10 @@
 #include <gcrypt.h>
 
 static int
-wrap_gcry_mac_init (gnutls_digest_algorithm_t algo, void **ctx, const void* key, size_t keylen)
+wrap_gcry_mac_init (gnutls_digest_algorithm_t algo, void **ctx)
 {
   int err;
-  unsigned int flags = 0;
-  
-  if (key) flags = GCRY_MD_FLAG_HMAC;
+  unsigned int flags = GCRY_MD_FLAG_HMAC;
 
   switch (algo)
     {
@@ -66,14 +64,17 @@ wrap_gcry_mac_init (gnutls_digest_algorithm_t algo, void **ctx, const void* key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  if (key)
-    gcry_md_setkey ((gcry_md_hd_t) *ctx, key, keylen);
-
   if (err == 0)
     return 0;
 
   gnutls_assert ();
   return GNUTLS_E_ENCRYPTION_FAILED;
+}
+
+static int
+wrap_gcry_md_setkey (void *ctx, const void *key, size_t keylen)
+{
+  return gcry_md_setkey ((gcry_md_hd_t) ctx, key, keylen);
 }
 
 static int
@@ -118,6 +119,7 @@ int crypto_mac_prio = INT_MAX;
 
 gnutls_crypto_digest_st _gnutls_mac_ops = {
   .init = wrap_gcry_mac_init,
+  .setkey = wrap_gcry_md_setkey,
   .hash = wrap_gcry_md_write,
   .copy = wrap_gcry_md_copy,
   .output = wrap_gcry_mac_output,

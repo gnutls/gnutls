@@ -70,7 +70,8 @@ typedef struct
 
 typedef struct
 {
-  int (*init) (gnutls_mac_algorithm_t, void **ctx, const void* key, size_t keysize);
+  int (*init) (gnutls_mac_algorithm_t, void **ctx);
+  int (*setkey) (void *ctx, const void *key, size_t keysize);
   int (*hash) (void *ctx, const void *text, size_t textsize);
   int (*copy) (void **dst_ctx, void *src_ctx);
   int (*output) (void *src_ctx, void *digest, size_t digestsize);

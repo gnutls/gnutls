@@ -42,22 +42,6 @@ doit (void)
   gnutls_global_init ();
 
   err =
-    _gnutls_hash_fast (GNUTLS_MAC_MD5, NULL, 0, "testtest", 8, digest);
-  if (err < 0)
-    fail ("_gnutls_hash_fast(MD5) failed: %d\n", err);
-  else
-    {
-      if (memcmp (digest, "\x05\xa6\x71\xc6\x6a\xef\xea\x12\x4c\xc0\x8b\x76\xea\x6d\x30\xbb", 16) == 0)
-	success ("HASH: _gnutls_hash_fast(MD5) OK\n");
-      else
-	{
-	  hexprint (digest, 16);
-	  fail ("HASH: _gnutls_hash_fast(MD5) failure\n");
-	}
-    }
-
-
-  err =
     _gnutls_hash_fast (GNUTLS_MAC_MD5, "keykeykey", 9, "abcdefgh", 8, digest);
   if (err < 0)
     fail ("_gnutls_hash_fast(MD5) failed: %d\n", err);

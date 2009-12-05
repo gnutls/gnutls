@@ -110,10 +110,20 @@ _gnutls_hash_init (hash_hd_st * dig, gnutls_digest_algorithm_t algorithm,
       dig->registered = 1;
 
       dig->hd.rh.cc = cc;
-      if (cc->init (algorithm, &dig->hd.rh.ctx, key, keylen) < 0)
+      if (cc->init (algorithm, &dig->hd.rh.ctx) < 0)
 	{
 	  gnutls_assert ();
 	  return GNUTLS_E_HASH_FAILED;
+	}
+
+      if (key)
+	{
+	  if (cc->setkey == NULL || cc->setkey (dig->hd.rh.ctx, key, keylen) < 0)
+	    {
+	      gnutls_assert ();
+  	      cc->deinit (dig->hd.rh.ctx);
+	      return GNUTLS_E_HASH_FAILED;
+            }
 	}
 
       dig->active = 1;
@@ -122,11 +132,16 @@ _gnutls_hash_init (hash_hd_st * dig, gnutls_digest_algorithm_t algorithm,
 
   dig->registered = 0;
 
-  result = _gnutls_mac_ops.init (algorithm, &dig->hd.gc, key, keylen);
+  result = _gnutls_mac_ops.init (algorithm, &dig->hd.gc);
   if (result < 0)
     {
       gnutls_assert ();
       return result;
+    }
+
+  if (key) 
+    {
+      _gnutls_mac_ops.setkey (dig->hd.gc, key, keylen);
     }
 
   dig->active = 1;

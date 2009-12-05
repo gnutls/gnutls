@@ -1034,7 +1034,7 @@ MD5 (const unsigned char *buf, unsigned long len, unsigned char *md)
   if (!md)
     return NULL;
 
-  _gnutls_hash_fast (GNUTLS_DIG_MD5, NULL, 0, buf, len, md);
+  _gnutls_hash_fast (GNUTLS_DIG_MD5, buf, len, NULL, 0, md);
 
   return md;
 }
@@ -1067,7 +1067,7 @@ RIPEMD160 (const unsigned char *buf, unsigned long len, unsigned char *md)
   if (!md)
     return NULL;
 
-  _gnutls_hash_fast (GNUTLS_DIG_RMD160, NULL, 0, buf, len, md);
+  _gnutls_hash_fast (GNUTLS_DIG_RMD160, buf, len, NULL, 0, md);
 
   return md;
 }
