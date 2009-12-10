@@ -453,6 +453,7 @@ gnutls_session_ticket_enable_server (gnutls_session_t session,
 int
 _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
 {
+  mbuffer_st *bufel = NULL;
   uint8_t *data = NULL, *p;
   int data_size = 0;
   int ret;
@@ -522,14 +523,15 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
       ticket_len = KEY_NAME_SIZE + IV_SIZE + 2 + ticket.encrypted_state_len
 	+ MAC_SIZE;
 
-      data = gnutls_malloc (4 + 2 + ticket_len);
-      if (!data)
+      bufel = _gnutls_handshake_alloc (4 + 2 + ticket_len);
+      if (!bufel)
 	{
 	  gnutls_assert ();
 	  gnutls_free (ticket.encrypted_state);
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
 
+      data = bufel->msg.data + bufel->mark;
       p = data;
       /* FIXME: ticket lifetime is fixed to 10 days, which should be
          customizable. */
@@ -556,11 +558,11 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
       p += MAC_SIZE;
 
       data_size = p - data;
+      data = _gnutls_handshake_realloc(data, data_size);
     }
 
-  ret = _gnutls_send_handshake (session, data_size ? data : NULL, data_size,
+  ret = _gnutls_send_handshake (session, data_size ? bufel : NULL,
 				GNUTLS_HANDSHAKE_NEW_SESSION_TICKET);
-  gnutls_free (data);
 
   return ret;
 }
