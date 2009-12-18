@@ -37,6 +37,10 @@
 # define CRYPTO_CIPHER_MAX_KEY_LEN 64
 #endif
 
+#ifndef EALG_MAX_BLOCK_LEN
+# define EALG_MAX_BLOCK_LEN 16
+#endif
+
 
 static int cryptodev_fd = -1;
 
