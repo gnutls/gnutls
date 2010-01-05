@@ -1565,7 +1565,7 @@ gnutls_openpgp_crt_get_preferred_key_id (gnutls_openpgp_crt_t key,
 }
 
 /**
- * gnutls_openpgp_crt_set_preferred_key_id - Sets the prefered keyID
+ * gnutls_openpgp_crt_set_preferred_key_id - Sets the preferred keyID
  * @key: the structure that contains the OpenPGP public key.
  * @keyid: the selected keyid
  *

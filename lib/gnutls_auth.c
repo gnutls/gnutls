@@ -273,7 +273,7 @@ out:
   * _gnutls_get_auth_info - Returns a pointer to authentication information.
   * @session: is a #gnutls_session_t structure.
   *
-  * This function must be called after a succesful gnutls_handshake().
+  * This function must be called after a successful gnutls_handshake().
   * Returns a pointer to authentication information. That information
   * is data obtained by the handshake protocol, the key exchange algorithm,
   * and the TLS extensions messages.

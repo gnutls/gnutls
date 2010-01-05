@@ -40,7 +40,7 @@
   * successful handshake.
   *
   * Resuming sessions is really useful and speedups connections after
-  * a succesful one.
+  * a successful one.
   *
   * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
   *   an error code is returned.
@@ -95,7 +95,7 @@ error:
  * gnutls_free().
  *
  * Resuming sessions is really useful and speedups connections after
- * a succesful one.
+ * a successful one.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.

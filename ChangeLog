@@ -9799,7 +9799,7 @@
 	* configure.in: Bump version so we are higher than gnutls 2.2.x but
 	remain compatible.  This will avoid shared library name conflicts
 	with 2.2.x, and also that any 2.3.x libraries will always be
-	prefered over 2.2.x.
+	preferred over 2.2.x.
 
 2008-01-19  Simon Josefsson <simon@josefsson.org>
 

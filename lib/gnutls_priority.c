@@ -480,7 +480,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  * compression NULL; for certificate types X.509, OpenPGP.
  *
  * For key exchange algorithms when in NORMAL or SECURE levels the
- * perfect forward secrecy algorithms take precendence of the other
+ * perfect forward secrecy algorithms take precedence of the other
  * protocols.  In all cases all the supported key exchange algorithms
  * are enabled (except for the RSA-EXPORT which is only enabled in
  * EXPORT level).
