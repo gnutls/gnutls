@@ -331,6 +331,8 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
 		   params_size);
 }
 
+#ifdef ENABLE_PKI
+
 /* Extracts DSA and RSA parameters from a certificate.
  */
 int
@@ -347,6 +349,8 @@ _gnutls_x509_crq_get_mpis (gnutls_x509_crq_t cert,
 		   "certificationRequestInfo.subjectPKInfo", params,
 		   params_size);
 }
+
+#endif
 
 /*
  * some x509 certificate functions that relate to MPI parameter
