@@ -1240,14 +1240,24 @@ main (int argc, char **argv)
 		  }
 		else if (r <= 0)
 		  {
-		    j->http_state = HTTP_STATE_CLOSING;
-		    if (r < 0 && r != GNUTLS_E_UNEXPECTED_PACKET_LENGTH)
+  	            if (r == GNUTLS_E_REHANDSHAKE) 
 		      {
-			check_alert (j->tls_session, r);
-			fprintf (stderr, "Error while receiving data\n");
-			GERR (r);
-		      }
-
+		        do 
+		          {
+		            r = gnutls_handshake (j->tls_session);
+                          } 
+                        while (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN);
+                      }
+                    else
+                      { 
+ 		        j->http_state = HTTP_STATE_CLOSING;
+		        if (r < 0 && r != GNUTLS_E_UNEXPECTED_PACKET_LENGTH)
+		          {
+			    check_alert (j->tls_session, r);
+			    fprintf (stderr, "Error while receiving data\n");
+			    GERR (r);
+		          }
+                        }
 		  }
 		else
 		  {

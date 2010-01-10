@@ -533,6 +533,9 @@ extern "C" {
 			      void *data, size_t * data_length,
 			      unsigned int *type, unsigned int indx);
 
+  /* Safe renegotiation */
+  void gnutls_safe_renegotiation_set (gnutls_session_t session, int value);
+
   /* Opaque PRF Input
    * http://tools.ietf.org/id/draft-rescorla-tls-opaque-prf-input-00.txt
    */
@@ -1382,6 +1385,7 @@ extern "C" {
 #define GNUTLS_E_IA_VERIFY_FAILED -104
 #define GNUTLS_E_UNKNOWN_ALGORITHM -105
 #define GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM -106
+#define GNUTLS_E_SAFE_RENEGOTIATION_FAILED -107
 
 #define GNUTLS_E_BASE64_ENCODING_ERROR -201
 #define GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY -202	/* obsolete */

@@ -36,6 +36,7 @@
 #include <ext_oprfi.h>
 #include <ext_srp.h>
 #include <ext_session_ticket.h>
+#include <ext_safe_renegotiation.h>
 #include <ext_signature.h>
 #include <gnutls_num.h>
 
@@ -317,6 +318,14 @@ _gnutls_ext_init (void)
 			     GNUTLS_EXT_APPLICATION,
 			     _gnutls_server_name_recv_params,
 			     _gnutls_server_name_send_params);
+  if (ret != GNUTLS_E_SUCCESS)
+    return ret;
+
+  ret = gnutls_ext_register (GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
+			     "SAFE_RENEGOTIATION",
+			     GNUTLS_EXT_TLS,
+			     _gnutls_safe_renegotiation_recv_params,
+			     _gnutls_safe_renegotiation_send_params);
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
 

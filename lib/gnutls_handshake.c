@@ -384,6 +384,26 @@ _gnutls_user_hello_func (gnutls_session_t session,
   return 0;
 }
 
+/* traverses the list of ciphersuites to find the
+ * SCSV (Secure Renegotiation indicator) ciphersuite.
+ */
+static int check_for_scsv(opaque* data, size_t datalen)
+{
+int j;
+  /* check for Safe renegotiation ciphersuite 
+   * FIXME: apply correct values here.
+   */
+  for (j = 0; j < datalen; j += 2)
+    {
+	  if (data[j] == 0xFF && data[j+1] == 0xFF)
+	    {
+		  return 1;
+		}
+	}
+	
+  return 0;
+}
+
 /* Read a client hello packet. 
  * A client hello must be a known version client hello
  * or version 2.0 client hello (only for compatibility
@@ -452,6 +472,7 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
     {				/* resumed! */
       resume_copy_required_values (session);
       session->internals.resumed = RESUME_TRUE;
+      
       return _gnutls_user_hello_func (session, adv_version);
     }
   else
@@ -472,6 +493,14 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
   DECR_LEN (len, suite_size);
   suite_ptr = &data[pos];
   pos += suite_size;
+
+
+  if (session->security_parameters.extensions.initial_negotiation_completed != 0 \
+	&& check_for_scsv(suite_ptr, suite_size) != 0)
+    {
+      gnutls_assert();
+      return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
+    }
 
   /* Point to the compression methods
    */
@@ -636,7 +665,7 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 	  data_size = 36;
 	}
       else
-	{			/* TLS 1.0 */
+	{ /* TLS 1.0 */
 	  ret = _gnutls_finished (session,
 				  session->security_parameters.entity, data);
 	  data_size = 12;
@@ -652,6 +681,21 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 	session->internals.finished_func (session, data, data_size);
     }
 
+  /* Save data for safe_renegotiation. 
+   */
+  if (session->security_parameters.entity == GNUTLS_CLIENT)
+    {
+      memcpy (session->security_parameters.extensions.current_verify_data,
+	      data, data_size);
+    }
+  else
+    {
+      memcpy (&session->security_parameters.extensions.current_verify_data[data_size],
+	      data, data_size);
+    }
+  session->security_parameters.extensions.current_verify_data_len = 
+	      data_size*2;
+
   ret =
     _gnutls_send_handshake (session, data_size ? data : NULL, data_size,
 			    GNUTLS_HANDSHAKE_FINISHED);
@@ -665,7 +709,7 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 static int
 _gnutls_recv_finished (gnutls_session_t session)
 {
-  uint8_t data[36], *vrfy;
+  uint8_t data[MAX_VERIFY_DATA_SIZE], *vrfy;
   int data_size;
   int ret;
   int vrfysize;
@@ -726,6 +770,21 @@ _gnutls_recv_finished (gnutls_session_t session)
     }
   gnutls_free (vrfy);
 
+  /* For safe renegotiation */
+  if (session->security_parameters.entity == GNUTLS_CLIENT)
+    {
+      memcpy (&session->security_parameters.extensions.current_verify_data[data_size],
+          data, data_size);
+    }
+  else /* server */
+    {
+      memcpy (session->security_parameters.extensions.current_verify_data,
+          data, data_size);
+    }
+  session->security_parameters.extensions.current_verify_data_len = data_size*2;
+
+  session->security_parameters.extensions.initial_negotiation_completed = 1;
+
   return ret;
 }
 
@@ -765,7 +824,6 @@ _gnutls_server_find_pk_algos_in_ciphersuites (const opaque *
   return algo;
 }
 
-
 /* This selects the best supported ciphersuite from the given ones. Then
  * it adds the suite to the session and performs some checks.
  */
@@ -784,7 +842,7 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
 
   x = _gnutls_supported_ciphersuites (session, &ciphers);
   if (x < 0)
-    {				/* the case x==0 is handled within the function. */
+    { /* the case x==0 is handled within the function. */
       gnutls_assert ();
       return x;
     }
@@ -830,23 +888,28 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
 
   retval = GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 
+  if (check_for_scsv(data, datalen) != 0)
+    {
+      session->security_parameters.extensions.safe_renegotiation_received = 1;
+    }
+
   for (j = 0; j < datalen; j += 2)
     {
-      for (i = 0; i < x; i++)
-	{
-	  if (memcmp (ciphers[i].suite, &data[j], 2) == 0)
-	    {
-	      memcpy (&cs.suite, &data[j], 2);
+	  for (i = 0; i < x; i++)
+		{
+		  if (memcmp (ciphers[i].suite, &data[j], 2) == 0)
+			{
+			  memcpy (&cs.suite, &data[j], 2);
 
-	      _gnutls_handshake_log
-		("HSK[%p]: Selected cipher suite: %s\n", session,
-		 _gnutls_cipher_suite_get_name (&cs));
-	      memcpy (session->security_parameters.current_cipher_suite.suite,
-		      ciphers[i].suite, 2);
-	      retval = 0;
-	      goto finish;
-	    }
-	}
+			  _gnutls_handshake_log
+			("HSK[%p]: Selected cipher suite: %s\n", session,
+			 _gnutls_cipher_suite_get_name (&cs));
+			  memcpy (session->security_parameters.current_cipher_suite.suite,
+				  ciphers[i].suite, 2);
+			  retval = 0;
+			  goto finish;
+			}
+		}
     }
 
 finish:
@@ -2169,6 +2232,8 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 {
   int ret;
 
+  session->security_parameters.extensions.safe_renegotiation_received = 0;
+
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
       ret = _gnutls_read_server_hello (session, data, datalen);
@@ -2179,13 +2244,53 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	}
     }
   else
-    {				/* Server side reading a client hello */
+    { /* Server side reading a client hello */
 
       ret = _gnutls_read_client_hello (session, data, datalen);
       if (ret < 0)
 	{
 	  gnutls_assert ();
 	  return ret;
+	}
+    }
+
+  if (!session->security_parameters.extensions.disable_safe_renegotiation)
+    {
+      if (session->security_parameters.extensions.safe_renegotiation_received)
+        {
+          if ((session->security_parameters.extensions.current_verify_data_len !=
+               session->security_parameters.extensions.previous_verify_data_len) ||
+              (memcmp (session->security_parameters.extensions.current_verify_data,
+                       session->security_parameters.extensions.previous_verify_data,
+                       session->security_parameters.extensions.current_verify_data_len)))
+            {
+	      gnutls_assert();
+              return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
+            }
+	  else
+            {
+              _gnutls_debug_log ("Safe renegotiation succeeded.\n");
+            }
+	}
+      else
+        {
+          if (session->security_parameters.extensions.initial_negotiation_completed)
+            {
+              if (session->internals.priorities.unsafe_renegotiation)
+                {
+                  _gnutls_handshake_log ("Allowing unsafe renegotiation!\n");
+                }
+              else
+                {
+				  gnutls_assert();
+                  _gnutls_handshake_log ("Denying unsafe renegotiation.\n");
+                  return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
+                }
+            }
+	  else
+            {
+              _gnutls_handshake_log ("Allowing unsafe initial negotiation.\n");
+	    }
 	}
     }
 

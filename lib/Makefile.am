@@ -81,7 +81,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	auth_dh_common.c gnutls_helper.c gnutls_supplemental.c		\
 	crypto.c random.c pk-libgcrypt.c mpi-libgcrypt.c cryptodev.c	\
 	rnd-libgcrypt.c cipher-libgcrypt.c mac-libgcrypt.c ext_signature.c \
-	crypto-api.c
+	crypto-api.c ext_safe_renegotiation.c
 
 if ENABLE_OPRFI
 COBJECTS += $(OPRFI_COBJECTS)
@@ -101,7 +101,8 @@ HFILES = debug.h gnutls_compress.h gnutls_cipher.h gnutls_buffers.h	\
 	ext_srp.h gnutls_srp.h auth_srp.h auth_srp_passwd.h		\
 	gnutls_helper.h auth_psk.h auth_psk_passwd.h			\
 	gnutls_supplemental.h ext_oprfi.h crypto.h random.h		\
-	ext_session_ticket.h ext_signature.h gnutls_cryptodev.h
+	ext_session_ticket.h ext_signature.h gnutls_cryptodev.h		\
+	ext_safe_renegotiation.h
 
 # Separate so we can create the documentation
 

@@ -177,7 +177,8 @@ typedef enum extensions_t
   GNUTLS_EXTENSION_SRP = 12,
   GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS = 13,
   GNUTLS_EXTENSION_SESSION_TICKET = 35,
-  GNUTLS_EXTENSION_INNER_APPLICATION = 37703
+  GNUTLS_EXTENSION_INNER_APPLICATION = 37703,
+  GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 0xff01,
 } extensions_t;
 
 typedef enum
@@ -306,6 +307,8 @@ struct gnutls_session_ticket_key_st {
   opaque mac_secret[SESSION_TICKET_MAC_SECRET_SIZE];
 };
 
+#define MAX_VERIFY_DATA_SIZE 36 /* in SSL 3.0, 12 in TLS 1.0 */
+
 typedef struct
 {
   server_name_st server_names[MAX_SERVER_NAME_EXTENSIONS];
@@ -333,6 +336,16 @@ typedef struct
   opaque *oprfi_server;
   uint16_t oprfi_server_len;
 
+  /* Safe renegotiation. */
+  int disable_safe_renegotiation:1;
+  int safe_renegotiation_received:1;
+  int initial_negotiation_completed:1;
+  uint8_t current_verify_data[2*MAX_VERIFY_DATA_SIZE];
+  size_t current_verify_data_len;
+  uint8_t previous_verify_data[2*MAX_VERIFY_DATA_SIZE];
+  size_t previous_verify_data_len;
+
+  /* Session Ticket */
   opaque *session_ticket;
   uint16_t session_ticket_len;
   struct gnutls_session_ticket_key_st *session_ticket_key;
@@ -446,7 +459,8 @@ struct gnutls_priority_st
   priority_st sign_algo;
 
   /* to disable record padding */
-  int no_padding;
+  int no_padding:1;
+  int unsafe_renegotiation:1;
   int ssl3_record_version;
   int additional_verify_flags;
 };

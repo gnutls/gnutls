@@ -522,6 +522,8 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  *
  * "%COMPAT" will enable compatibility features for a server.
  *
+ * "%UNSAFE_RENEGOTIATION" will allow unsafe renegotiation.
+ *
  * "%SSL3_RECORD_VERSION" will use SSL3.0 record version in client hello.
  *
  * "%VERIFY_ALLOW_SIGN_RSA_MD5" will allow RSA-MD5 signatures in
@@ -711,6 +713,9 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 			       "VERIFY_ALLOW_X509_V1_CA_CRT") == 0)
 	    (*priority_cache)->additional_verify_flags |=
 	      GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT;
+	  else if (strcasecmp (&broken_list[i][1],
+			       "UNSAFE_RENEGOTIATION") == 0)
+	    (*priority_cache)->unsafe_renegotiation = 1;
 	  else
 	    goto error;
 	}
