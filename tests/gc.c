@@ -42,36 +42,36 @@ doit (void)
   gnutls_global_init ();
 
   err =
-    _gnutls_hash_fast (GNUTLS_MAC_MD5, "keykeykey", 9, "abcdefgh", 8, digest);
+    _gnutls_hmac_fast (GNUTLS_MAC_MD5, "keykeykey", 9, "abcdefgh", 8, digest);
   if (err < 0)
-    fail ("_gnutls_hash_fast(MD5) failed: %d\n", err);
+    fail ("_gnutls_hmac_fast(MD5) failed: %d\n", err);
   else
     {
       if (memcmp (digest, "\x3c\xb0\x9d\x83\x28\x01\xef\xc0"
 		  "\x7b\xb3\xaf\x42\x69\xe5\x93\x9a", 16) == 0)
-	success ("_gnutls_hash_fast(MD5) OK\n");
+	success ("_gnutls_hmac_fast(MD5) OK\n");
       else
 	{
 	  hexprint (digest, 16);
-	  fail ("_gnutls_hash_fast(MD5) failure\n");
+	  fail ("_gnutls_hmac_fast(MD5) failure\n");
 	}
     }
 
   err =
-    _gnutls_hash_fast (GNUTLS_MAC_SHA1, "keykeykey", 9, "abcdefgh", 8,
+    _gnutls_hmac_fast (GNUTLS_MAC_SHA1, "keykeykey", 9, "abcdefgh", 8,
 		       digest);
   if (err < 0)
-    fail ("_gnutls_hash_fast(SHA1) failed: %d\n", err);
+    fail ("_gnutls_hmac_fast(SHA1) failed: %d\n", err);
   else
     {
       if (memcmp (digest, "\x58\x93\x7a\x58\xfe\xea\x82\xf8"
 		  "\x0e\x64\x62\x01\x40\x2b\x2c\xed\x5d\x54\xc1\xfa",
 		  20) == 0)
-	success ("_gnutls_hash_fast(SHA1) OK\n");
+	success ("_gnutls_hmac_fast(SHA1) OK\n");
       else
 	{
 	  hexprint (digest, 20);
-	  fail ("_gnutls_hash_fast(SHA1) failure\n");
+	  fail ("_gnutls_hmac_fast(SHA1) failure\n");
 	}
     }
 
