@@ -324,7 +324,7 @@ _gnutls_ext_init (void)
 
   ret = gnutls_ext_register (GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 			     "SAFE_RENEGOTIATION",
-			     GNUTLS_EXT_TLS,
+			     GNUTLS_EXT_RESUMED,
 			     _gnutls_safe_renegotiation_recv_params,
 			     _gnutls_safe_renegotiation_send_params);
   if (ret != GNUTLS_E_SUCCESS)

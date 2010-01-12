@@ -450,6 +450,33 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
 
   if (ret == 0)
     {				/* resumed! */
+      /* Parse only the safe renegotiation extension
+       * We don't want to parse any other extensions since
+       * we don't want new extension values to overwrite the
+       * resumed ones.
+       */
+       
+      /* move forward to extensions */
+      DECR_LEN (len, 2);
+      suite_size = _gnutls_read_uint16 (&data[pos]);
+      pos += 2;
+
+      DECR_LEN (len, suite_size);
+      pos += suite_size;
+      
+      DECR_LEN (len, 1);
+      comp_size = data[pos++];	/* z is the number of compression methods */
+      DECR_LEN (len, comp_size);
+      pos += comp_size;
+
+      ret = _gnutls_parse_extensions (session, GNUTLS_EXT_RESUMED,
+				  &data[pos], len);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          return ret;
+        }
+
       resume_copy_required_values (session);
       session->internals.resumed = RESUME_TRUE;
       
@@ -504,9 +531,16 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
       return ret;
     }
 
+  ret = _gnutls_parse_extensions (session, GNUTLS_EXT_RESUMED,
+				  &data[pos], len);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
   ret = _gnutls_parse_extensions (session, GNUTLS_EXT_TLS,
 				  &data[pos], len);
-  /* len is the rest of the parsed length */
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1718,9 +1752,21 @@ _gnutls_read_server_hello (gnutls_session_t session,
    */
   if (_gnutls_client_check_if_resuming
       (session, &data[pos], session_id_len) == 0)
-    return 0;
-  pos += session_id_len;
+    {
+      pos += session_id_len + 2 + 1;
+      DECR_LEN (len, 2+1);
 
+      ret = _gnutls_parse_extensions (session, GNUTLS_EXT_RESUMED,
+				  &data[pos], len);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          return ret;
+        }
+      return 0;
+    }
+
+  pos += session_id_len;
 
   /* Check if the given cipher suite is supported and copy
    * it to the session.
@@ -1752,7 +1798,6 @@ _gnutls_read_server_hello (gnutls_session_t session,
    */
   ret = _gnutls_parse_extensions (session, GNUTLS_EXT_ANY,
 				  &data[pos], len);
-  /* len is the rest of the parsed length */
   if (ret < 0)
     {
       gnutls_assert ();

@@ -511,7 +511,8 @@ extern "C" {
     {
       GNUTLS_EXT_ANY,
       GNUTLS_EXT_APPLICATION,
-      GNUTLS_EXT_TLS
+      GNUTLS_EXT_TLS,
+      GNUTLS_EXT_RESUMED, /* parse even if resuming */
     } gnutls_ext_parse_type_t;
 
   int gnutls_ext_register (int type,

@@ -58,6 +58,8 @@ struct params_res
   int expect_resume;
 };
 
+pid_t child;
+
 struct params_res resume_tests[] = {
   {"try to resume from db", 50, 0, 0, 1},
 #ifdef ENABLE_SESSION_TICKET
@@ -75,6 +77,12 @@ struct params_res resume_tests[] = {
 #define MSG "Hello TLS"
 
 static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "%s |<%d>| %s", child ? "server" : "client", level, str);
+}
+
+static void
 client (struct params_res *params)
 {
   int ret, sd, ii;
@@ -89,6 +97,11 @@ client (struct params_res *params)
   int t;
   gnutls_datum_t session_data;
 
+  if (debug)
+    {
+      gnutls_global_set_log_function (tls_log_func);
+      gnutls_global_set_log_level (4);
+    }
   gnutls_global_init ();
 
   gnutls_anon_allocate_client_credentials (&anoncred);
@@ -336,8 +349,13 @@ server (struct params_res *params)
 
   /* this must be called once in the program, it is mostly for the server.
    */
-  gnutls_global_init ();
+  if (debug)
+    {
+      gnutls_global_set_log_function (tls_log_func);
+      gnutls_global_set_log_level (4);
+    }
 
+  gnutls_global_init ();
   gnutls_anon_allocate_server_credentials (&anoncred);
 
   success ("Launched, generating DH parameters...\n");
@@ -430,7 +448,6 @@ server (struct params_res *params)
 void
 doit (void)
 {
-  pid_t child;
   int i;
 
   for (i = 0; resume_tests[i].desc; i++)
