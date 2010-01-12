@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.8.6 (unreleased)
 
+** libgnutls: When checking openpgp self signature also check the signatures of all subkeys.                                                                                                             
+Ilari Liusvaara noticed and reported the issue and provided test vectors as well.
+
 ** libgnutls: Cleanups and several bug fixes.
 Found by Steve Grubb and Tomas Mraz.
 
