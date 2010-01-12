@@ -1,0 +1,24 @@
+#!/bin/bash
+
+srcdir="${srcdir:-.}"
+CERTTOOL="${certtool:-../../src/certtool} -q"
+unset RETCODE
+
+fail() {
+   echo "Failure: $1" >&2
+   RETCODE=${RETCODE:-${2:-1}}
+}
+
+echo "Checking OpenPGP certificate self verification"
+
+( $CERTTOOL --pgp-certificate-info <$srcdir/selfsigs/alice.pub | grep -e "^Self Signature verification: ok" ) >/dev/null ||
+  fail "Self sig Verification should have succeeded!"
+
+( $CERTTOOL --pgp-certificate-info <$srcdir/selfsigs/alice-mallory-badsig18.pub | grep -e "^Self Signature verification: failed" ) >/dev/null ||
+  fail "Self sig Verification should have failed!"
+( $CERTTOOL --pgp-certificate-info <$srcdir/selfsigs/alice-mallory-irrelevantsig.pub | grep -e "^Self Signature verification: failed" ) >/dev/null ||
+  fail "Self sig Verification should have failed!"
+( $CERTTOOL --pgp-certificate-info <$srcdir/selfsigs/alice-mallory-nosig18.pub | grep -e "^Self Signature verification: failed" ) >/dev/null ||
+  fail "Self sig Verification should have failed!"
+
+exit ${RETCODE:-0}

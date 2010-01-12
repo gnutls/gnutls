@@ -21,13 +21,15 @@ if ENABLE_OPENPGP
 
 EXTRA_DIST = ca-public.gpg srv-public-all-signed.gpg srv-secret.gpg	\
 	ca-secret.gpg srv-public.gpg srv-public-127.0.0.1-signed.gpg	\
-	srv-public-localhost-signed.gpg
+	srv-public-localhost-signed.gpg selfsigs/alice-mallory-badsig18.pub \
+	selfsigs/alice-mallory-irrelevantsig.pub selfsigs/alice-mallory-nosig18.pub \
+	selfsigs/alice.pub
 
 # The selftest is disabled until we can make it work under Wine and
 # under Debian buildds (problem with 127.0.0.2?).  Just extra-dist it
 # for now.
-EXTRA_DIST += testcerts
-#dist_check_SCRIPTS = testcerts
-#TESTS = testcerts
+EXTRA_DIST += testcerts testselfsigs
+dist_check_SCRIPTS = testselfsigs #testcerts
+TESTS = testselfsigs #testcerts
 
 endif

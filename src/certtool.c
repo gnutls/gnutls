@@ -1094,6 +1094,7 @@ pgp_certificate_info (void)
   size_t size;
   int ret;
   gnutls_datum_t pem, out_data;
+  unsigned int verify_status;
 
   pem.data = fread_file (infile, &size);
   pem.size = size;
@@ -1120,6 +1121,22 @@ pgp_certificate_info (void)
 	}
     }
 
+
+  ret = gnutls_openpgp_crt_verify_self(crt, 0, &verify_status);
+  if (ret < 0) 
+    {
+      error (EXIT_FAILURE, 0, "verify signature error: %s", gnutls_strerror (ret));
+    }
+
+  if (verify_status & GNUTLS_CERT_INVALID)
+    {
+      fprintf (outfile, "Self Signature verification: failed\n\n");
+    }
+  else
+    {
+      fprintf (outfile, "Self Signature verification: ok (%x)\n\n", verify_status);
+    }
+
   size = sizeof (buffer);
   ret = gnutls_openpgp_crt_export (crt, info.outcert_format, buffer, &size);
   if (ret < 0)
@@ -1129,7 +1146,6 @@ pgp_certificate_info (void)
     }
 
   fprintf (outfile, "%s\n", buffer);
-
   gnutls_openpgp_crt_deinit (crt);
 }
 

@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.9.10 (unreleased)
 
+** libgnutls: When checking self signature also check the signatures of all subkeys.                                                                                                             
+Ilari Liusvaara noticed and reported the issue and provided test vectors as well.
+
 ** libgnutls: Added cryptodev support (/dev/crypto). Tested with
 http://www.logix.cz/michal/devel/cryptodev/. Added benchmark utility 
 for AES. Exported API to access encryption and hash algorithms.
@@ -18,6 +21,7 @@ them does not seem to offer anything (anyway you need the signer's certificate
 to verify thus public key will be available). Found thanks to Boyan Kasarov.
 This however has the side-effect that public key IDs shown by certtool are
 now different than previous gnutls releases.
+(3) the option --pgp-certificate-info will verify self signatures
 
 ** certtool: Allow exporting of Certificate requests on DER format.
 

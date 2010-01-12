@@ -288,7 +288,8 @@ _cdk_pk_check_sig (cdk_keydb_hd_t keydb,
 
   if (is_selfsig)
     *is_selfsig = 0;
-  if (knode->pkt->pkttype != CDK_PKT_PUBLIC_KEY ||
+  if ((knode->pkt->pkttype != CDK_PKT_PUBLIC_KEY &&
+      knode->pkt->pkttype != CDK_PKT_PUBLIC_SUBKEY) ||
       snode->pkt->pkttype != CDK_PKT_SIGNATURE)
     {
       gnutls_assert ();
@@ -591,45 +592,56 @@ cdk_pk_check_self_sig (cdk_kbnode_t key, int *r_status)
   cdk_error_t rc;
   u32 keyid[2], sigid[2];
   int is_selfsig, sig_ok;
+  cdk_kbnode_t p, ctx = NULL;
+  cdk_packet_t pkt;
 
   if (!key || !r_status)
     return CDK_Inv_Value;
 
-  node = cdk_kbnode_find (key, CDK_PKT_PUBLIC_KEY);
-  if (!node)
-    return CDK_Error_No_Key;
-  /* FIXME: we should set expire/revoke here also but callers
-     expect CDK_KEY_VALID=0 if the key is okay. */
   cdk_pk_get_keyid (key->pkt->pkt.public_key, keyid);
-  sig_ok = 0;
-  for (node = key; node; node = node->next)
+
+  while ((p = cdk_kbnode_walk (key, &ctx, 0)))
     {
-      if (node->pkt->pkttype != CDK_PKT_SIGNATURE)
-	continue;
-      sig = node->pkt->pkt.signature;
-      if (!IS_UID_SIG (sig))
-	continue;
-      cdk_sig_get_keyid (sig, sigid);
-      if (sigid[0] != keyid[0] || sigid[1] != keyid[1])
-	continue;
-      /* FIXME: Now we check all self signatures. */
-      rc = _cdk_pk_check_sig (NULL, key, node, &is_selfsig, NULL);
-      if (rc)
-	{
-	  *r_status = CDK_KEY_INVALID;
-	  return rc;
-	}
-      else			/* For each valid self sig we increase this counter. */
-	sig_ok++;
+      pkt = cdk_kbnode_get_packet (p);
+      if (pkt->pkttype != CDK_PKT_PUBLIC_SUBKEY && pkt->pkttype != CDK_PKT_PUBLIC_KEY)
+        continue;
+
+      /* FIXME: we should set expire/revoke here also but callers
+         expect CDK_KEY_VALID=0 if the key is okay. */
+      sig_ok = 0;
+      for (node = p; node; node = node->next)
+        {
+          if (node->pkt->pkttype != CDK_PKT_SIGNATURE)
+  	    continue;
+          sig = node->pkt->pkt.signature;
+
+          cdk_sig_get_keyid (sig, sigid);
+          if (sigid[0] != keyid[0] || sigid[1] != keyid[1])
+	    continue;
+          /* FIXME: Now we check all self signatures. */
+          rc = _cdk_pk_check_sig (NULL, p, node, &is_selfsig, NULL);
+          if (rc)
+	    {
+  	      *r_status = CDK_KEY_INVALID;
+	      return rc;
+  	    }
+          else			/* For each valid self sig we increase this counter. */
+	    sig_ok++;
+        }
+
+      /* A key without a self signature is not valid. At least one
+       * signature for the given key has to be found.
+       */
+      if (!sig_ok)
+        {
+          *r_status = CDK_KEY_INVALID;
+          return CDK_General_Error;
+        }
+
     }
 
-  /* A key without a self signature is not valid. */
-  if (!sig_ok)
-    {
-      *r_status = CDK_KEY_INVALID;
-      return CDK_General_Error;
-    }
-  /* No flags indicate a valid key. */
-  *r_status = CDK_KEY_VALID;
-  return 0;
+    /* No flags indicate a valid key. */
+    *r_status = CDK_KEY_VALID;
+
+    return 0;
 }
