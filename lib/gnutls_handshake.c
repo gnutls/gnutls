@@ -2430,6 +2430,15 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	    {
 	      gnutls_assert();
 	      _gnutls_handshake_log ("Denying unsafe renegotiation.\n");
+	      ret = gnutls_alert_send (session, GNUTLS_AL_WARNING,
+				   GNUTLS_A_NO_RENEGOTIATION);
+
+  	      if (ret < 0)
+	        {
+	          gnutls_assert ();
+	          return ret;
+	        }
+
 	      return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
 	    }
 	}
