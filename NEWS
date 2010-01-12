@@ -5,7 +5,7 @@ See the end for copying conditions.
 
 * Version 2.9.10 (unreleased)
 
-** libgnutls: When checking self signature also check the signatures of all subkeys.                                                                                                             
+** libgnutls: When checking openpgp self signature also check the signatures of all subkeys.                                                                                                             
 Ilari Liusvaara noticed and reported the issue and provided test vectors as well.
 
 ** libgnutls: Added cryptodev support (/dev/crypto). Tested with
