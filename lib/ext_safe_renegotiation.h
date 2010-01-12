@@ -26,4 +26,3 @@ int _gnutls_safe_renegotiation_recv_params (gnutls_session_t state,
 		const opaque * data, size_t data_size);
 int _gnutls_safe_renegotiation_send_params (gnutls_session_t state, 
 		opaque * data, size_t);
-void gnutls_safe_renegotiation_set (gnutls_session_t session, int value);

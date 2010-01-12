@@ -24,89 +24,96 @@
 
 #include <gnutls_int.h>
 #include <ext_safe_renegotiation.h>
-#include "gnutls_errors.h"
+#include <gnutls_errors.h>
 
-/* Each peer processes the extension in the same way - by moving the "current"
- * value to "previous" and setting new "current" values.
- */
 int
 _gnutls_safe_renegotiation_recv_params (gnutls_session_t session, 
 		const opaque * data, size_t _data_size)
 {
+  tls_ext_st *ext = &session->security_parameters.extensions;
+
+  int len = data[0];
   ssize_t data_size = _data_size;
-  uint8_t len;
 
-  DECR_LEN (data_size, 1);
-  len = data[0];
-  DECR_LEN (data_size, len);
-  
-  if (len >= MAX_VERIFY_DATA_SIZE)
-    {
-      gnutls_assert();
-      return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-    }
+  DECR_LEN (data_size, len+1 /* count the first byte and payload */);
 
-  memcpy (session->security_parameters.extensions.previous_verify_data,
-	  session->security_parameters.extensions.current_verify_data,
-	  session->security_parameters.extensions.current_verify_data_len);
+  int conservative_len = len;
+  if (len > sizeof (ext->ri_extension_data))
+    conservative_len = sizeof (ext->ri_extension_data);
 
-  session->security_parameters.extensions.previous_verify_data_len =
-	  session->security_parameters.extensions.current_verify_data_len;
+  memcpy (ext->ri_extension_data, &data[1], conservative_len);
+  ext->ri_extension_data_len = conservative_len;
 
-  memcpy (session->security_parameters.extensions.current_verify_data,
-	  &data[1], len);
-
-  if (session->security_parameters.entity == GNUTLS_SERVER)
-    len *= 2;
-
-  session->security_parameters.extensions.current_verify_data_len = len;
-
-  session->security_parameters.extensions.safe_renegotiation_received = 1;
-  
+  /* "safe renegotiation received" means on *this* handshake; "connection using
+   * safe renegotiation" means that the initial hello received on the connection
+   * indicatd safe renegotiation. 
+   */
+  ext->safe_renegotiation_received = 1;
+  ext->connection_using_safe_renegotiation = 1;
 
   return 0;
 }
 
-/* As a client, this sends the verify information that was saved during the
- * previous finished message. As a server, echo back whatever we just received.
- */
 int
 _gnutls_safe_renegotiation_send_params (gnutls_session_t session, 
-		opaque * data, size_t data_size)
+		opaque * data, size_t _data_size)
 {
-  uint8_t len = 0; /* return 0 if we're not sending this ext */
+  /* The format of this extension is a one-byte length of verify data followed
+   * by the verify data itself. Note that the length byte does not include
+   * itself; IOW, empty verify data is represented as a length of 0. That means
+   * the minimum extension is one byte: 0x00.
+   */
 
-  if(session->security_parameters.extensions.safe_renegotiation_received ||
+  ssize_t data_size = _data_size;
+  tls_ext_st *ext = &session->security_parameters.extensions;
+
+  /* Always offer the extension if we're a client */
+  if (ext->connection_using_safe_renegotiation ||
      session->security_parameters.entity == GNUTLS_CLIENT)
     {
-      if (!session->security_parameters.extensions.disable_safe_renegotiation)
-        {
-          len = session->security_parameters.extensions.current_verify_data_len;
+      DECR_LEN (data_size, 1);
+      data[0] = ext->client_verify_data_len;
 
-	  /* client only sends its verification data */
-	  if (session->security_parameters.entity == GNUTLS_CLIENT)
-	    {
-              len /= 2;
-            }
+      DECR_LEN (data_size, ext->client_verify_data_len);
 
-          if (data_size < len + 1) /* save room for the length byte */
-            {
-              gnutls_assert ();
-              return GNUTLS_E_SHORT_MEMORY_BUFFER;
-            }
+      memcpy(&data[1], 
+	     ext->client_verify_data, 
+	     ext->client_verify_data_len);
 
-          data[0] = len++; /* return total length = len + length byte */
-          memcpy (&data[1], 
-	          session->security_parameters.extensions.current_verify_data,
-	          session->security_parameters.extensions.current_verify_data_len);
-        }
+      if (session->security_parameters.entity == GNUTLS_SERVER)
+	{
+	  data[0] += ext->server_verify_data_len;
+
+	  DECR_LEN (data_size, ext->server_verify_data_len);
+
+	  memcpy(&data[1 + ext->client_verify_data_len],
+		 ext->server_verify_data,
+		 ext->server_verify_data_len);
+	}
     }
 
-  return len;
+  return 1 + data[0]; /* don't forget the length byte */
 }
 
 /**
-  * gnutls_safe_renegotiation_set - Used to enable and disable safe renegotiation
+  * gnutls_safe_negotiation_set_initial - Used to enable and disable initial safe renegotiation
+  * @session: is a #gnutls_session_t structure.
+  * @value: 0 to disable and 1 to enable
+  *
+  * Used to enable and disable initial safe renegotiation for the current
+  * session. By default it is allowed for a client to not advertise safe
+  * renegotiation capability but there might be cases where signalling
+  * a client of its insecurity by rejecting session might be beneficial.
+  * This option has meaning only in server side.
+  **/
+void
+gnutls_safe_negotiation_set_initial (gnutls_session_t session, int value)
+{
+  session->internals.priorities.initial_safe_renegotiation = value;
+}
+
+/**
+  * gnutls_safe_negotiation_set - Used to enable and disable safe renegotiation
   * @session: is a #gnutls_session_t structure.
   * @value: 0 to disable and 1 to enable
   *
@@ -115,9 +122,7 @@ _gnutls_safe_renegotiation_send_params (gnutls_session_t session,
   * default (enable) is sufficient, but there might be servers that
   * cannot handle or correctly handle the extension.
   **/
-void
-gnutls_safe_renegotiation_set (gnutls_session_t session, int value)
+void gnutls_safe_renegotiation_set (gnutls_session_t session, int value)
 {
-	session->security_parameters.extensions.disable_safe_renegotiation = 1-value;
+	session->internals.priorities.unsafe_renegotiation = 1-value;
 }
-

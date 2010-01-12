@@ -178,7 +178,7 @@ typedef enum extensions_t
   GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS = 13,
   GNUTLS_EXTENSION_SESSION_TICKET = 35,
   GNUTLS_EXTENSION_INNER_APPLICATION = 37703,
-  GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 0xff01,
+  GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281, /* aka: 0xff01 */
 } extensions_t;
 
 typedef enum
@@ -336,20 +336,23 @@ typedef struct
   opaque *oprfi_server;
   uint16_t oprfi_server_len;
 
-  /* Safe renegotiation. */
-  int disable_safe_renegotiation:1;
-  int safe_renegotiation_received:1;
-  int initial_negotiation_completed:1;
-  uint8_t current_verify_data[2*MAX_VERIFY_DATA_SIZE];
-  size_t current_verify_data_len;
-  uint8_t previous_verify_data[2*MAX_VERIFY_DATA_SIZE];
-  size_t previous_verify_data_len;
-
   /* Session Ticket */
   opaque *session_ticket;
   uint16_t session_ticket_len;
   struct gnutls_session_ticket_key_st *session_ticket_key;
   opaque session_ticket_IV[SESSION_TICKET_IV_SIZE];
+
+  /* Safe renegotiation. */
+  int connection_using_safe_renegotiation:1;
+  int safe_renegotiation_received:1;
+  int initial_negotiation_completed:1;
+  uint8_t client_verify_data[MAX_VERIFY_DATA_SIZE]; 
+  size_t client_verify_data_len;
+  uint8_t server_verify_data[MAX_VERIFY_DATA_SIZE];
+  size_t server_verify_data_len;
+  uint8_t ri_extension_data[MAX_VERIFY_DATA_SIZE*2]; /* max signal is 72 bytes in s->c sslv3 */
+  size_t ri_extension_data_len;
+
 } tls_ext_st;
 
 /* auth_info_t structures now MAY contain malloced 
@@ -461,6 +464,7 @@ struct gnutls_priority_st
   /* to disable record padding */
   int no_padding:1;
   int unsafe_renegotiation:1;
+  int initial_safe_renegotiation:1;
   int ssl3_record_version;
   int additional_verify_flags;
 };

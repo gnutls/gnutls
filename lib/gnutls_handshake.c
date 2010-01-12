@@ -384,26 +384,6 @@ _gnutls_user_hello_func (gnutls_session_t session,
   return 0;
 }
 
-/* traverses the list of ciphersuites to find the
- * SCSV (Secure Renegotiation indicator) ciphersuite.
- */
-static int check_for_scsv(opaque* data, size_t datalen)
-{
-int j;
-  /* check for Safe renegotiation ciphersuite 
-   * FIXME: apply correct values here.
-   */
-  for (j = 0; j < datalen; j += 2)
-    {
-	  if (data[j] == 0xFF && data[j+1] == 0xFF)
-	    {
-		  return 1;
-		}
-	}
-	
-  return 0;
-}
-
 /* Read a client hello packet. 
  * A client hello must be a known version client hello
  * or version 2.0 client hello (only for compatibility
@@ -494,14 +474,6 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
   suite_ptr = &data[pos];
   pos += suite_size;
 
-
-  if (session->security_parameters.extensions.initial_negotiation_completed != 0 \
-	&& check_for_scsv(suite_ptr, suite_size) != 0)
-    {
-      gnutls_assert();
-      return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
-    }
-
   /* Point to the compression methods
    */
   DECR_LEN (len, 1);
@@ -512,17 +484,17 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
   pos += comp_size;
 
   /* Parse the extensions (if any)
+   *
+   * Unconditionally try to parse extensions; safe renegotiation uses them in
+   * sslv3 and higher, even though sslv3 doesn't officially support them.
    */
-  if (_gnutls_version_has_extensions (neg_version))
+  ret = _gnutls_parse_extensions (session, GNUTLS_EXT_APPLICATION,
+				  &data[pos], len);
+  /* len is the rest of the parsed length */
+  if (ret < 0)
     {
-      ret = _gnutls_parse_extensions (session, GNUTLS_EXT_APPLICATION,
-				      &data[pos], len);
-      /* len is the rest of the parsed length */
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+      gnutls_assert ();
+      return ret;
     }
 
   ret = _gnutls_user_hello_func (session, adv_version);
@@ -532,36 +504,33 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
       return ret;
     }
 
-  if (_gnutls_version_has_extensions (neg_version))
+  ret = _gnutls_parse_extensions (session, GNUTLS_EXT_TLS,
+				  &data[pos], len);
+  /* len is the rest of the parsed length */
+  if (ret < 0)
     {
-      ret = _gnutls_parse_extensions (session, GNUTLS_EXT_TLS,
-				      &data[pos], len);
-      /* len is the rest of the parsed length */
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+      gnutls_assert ();
+      return ret;
+    }
 
-      /* resumed by session_ticket extension */
-      if (session->internals.resumed == RESUME_TRUE)
-	{
-	  /* to indicate the client that the current session is resumed */
-	  memcpy (session->internals.resumed_security_parameters.session_id,
-		  session_id, session_id_len);
-	  session->internals.resumed_security_parameters.session_id_size =
-	    session_id_len;
+  /* resumed by session_ticket extension */
+  if (session->internals.resumed == RESUME_TRUE)
+    {
+      /* to indicate the client that the current session is resumed */
+      memcpy (session->internals.resumed_security_parameters.session_id,
+	      session_id, session_id_len);
+      session->internals.resumed_security_parameters.session_id_size =
+              session_id_len;
 
-	  session->internals.
-	    resumed_security_parameters.max_record_recv_size =
-	    session->security_parameters.max_record_recv_size;
-	  session->internals.
-	    resumed_security_parameters.max_record_send_size =
-	    session->security_parameters.max_record_send_size;
+      session->internals.
+	resumed_security_parameters.max_record_recv_size =
+	session->security_parameters.max_record_recv_size;
+      session->internals.
+	resumed_security_parameters.max_record_send_size =
+	session->security_parameters.max_record_send_size;
 
-	  resume_copy_required_values (session);
-	  return 0;
-	}
+      resume_copy_required_values (session);
+	return 0;
     }
 
   /* select an appropriate cipher suite
@@ -640,7 +609,7 @@ _gnutls_handshake_hash_pending (gnutls_session_t session)
 static int
 _gnutls_send_finished (gnutls_session_t session, int again)
 {
-  uint8_t data[36];
+  uint8_t data[MAX_VERIFY_DATA_SIZE];
   int ret;
   int data_size = 0;
 
@@ -665,7 +634,7 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 	  data_size = 36;
 	}
       else
-	{ /* TLS 1.0 */
+	{ /* TLS 1.0+ */
 	  ret = _gnutls_finished (session,
 				  session->security_parameters.entity, data);
 	  data_size = 12;
@@ -681,20 +650,30 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 	session->internals.finished_func (session, data, data_size);
     }
 
-  /* Save data for safe_renegotiation. 
+  /* Save data for safe renegotiation. 
    */
+  if (data_size > MAX_VERIFY_DATA_SIZE) 
+    {
+      gnutls_assert ();
+      return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+    }
+
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
-      memcpy (session->security_parameters.extensions.current_verify_data,
+      session->security_parameters.extensions.client_verify_data_len = 
+	      data_size;
+
+      memcpy (session->security_parameters.extensions.client_verify_data,
 	      data, data_size);
     }
   else
     {
-      memcpy (&session->security_parameters.extensions.current_verify_data[data_size],
+      session->security_parameters.extensions.server_verify_data_len = 
+	      data_size;
+
+      memcpy (session->security_parameters.extensions.server_verify_data,
 	      data, data_size);
     }
-  session->security_parameters.extensions.current_verify_data_len = 
-	      data_size*2;
 
   ret =
     _gnutls_send_handshake (session, data_size ? data : NULL, data_size,
@@ -770,20 +749,27 @@ _gnutls_recv_finished (gnutls_session_t session)
     }
   gnutls_free (vrfy);
 
-  /* For safe renegotiation */
+  /* Save peer's verify data for safe renegotiation */
+  if (data_size > MAX_VERIFY_DATA_SIZE)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+    }
+
+  tls_ext_st *ext = &session->security_parameters.extensions;
+
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
-      memcpy (&session->security_parameters.extensions.current_verify_data[data_size],
-          data, data_size);
+      memcpy (ext->server_verify_data, data, data_size);
+      ext->server_verify_data_len = data_size;
     }
-  else /* server */
+  else
     {
-      memcpy (session->security_parameters.extensions.current_verify_data,
-          data, data_size);
+      memcpy (ext->client_verify_data, data, data_size);
+      ext->client_verify_data_len = data_size;
     }
-  session->security_parameters.extensions.current_verify_data_len = data_size*2;
 
-  session->security_parameters.extensions.initial_negotiation_completed = 1;
+  ext->initial_negotiation_completed = 1;
 
   return ret;
 }
@@ -838,6 +824,25 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
 					 * supported by the peer.
 					 */
 
+  /* First, check for safe renegotiation SCSV.
+   */
+  {
+    int offset;
+
+    for(offset = 0; offset < datalen; offset += 2)
+      {
+	/* TLS_RENEGO_PROTECTION_REQUEST = { 0x00, 0xff } */
+        if (data[offset]   == GNUTLS_RENEGO_PROTECTION_REQUEST_MAJOR &&
+            data[offset+1] == GNUTLS_RENEGO_PROTECTION_REQUEST_MINOR)
+          {
+	    _gnutls_handshake_log ("HSK[%p]: Received safe renegotiation CS\n", session);
+            session->security_parameters.extensions.safe_renegotiation_received = 1;
+            session->security_parameters.extensions.connection_using_safe_renegotiation = 1;
+	    break;
+          }
+      }
+  }
+
   pk_algo = _gnutls_server_find_pk_algos_in_ciphersuites (data, datalen);
 
   x = _gnutls_supported_ciphersuites (session, &ciphers);
@@ -887,11 +892,6 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
   memset (session->security_parameters.current_cipher_suite.suite, '\0', 2);
 
   retval = GNUTLS_E_UNKNOWN_CIPHER_SUITE;
-
-  if (check_for_scsv(data, datalen) != 0)
-    {
-      session->security_parameters.extensions.safe_renegotiation_received = 1;
-    }
 
   for (j = 0; j < datalen; j += 2)
     {
@@ -1128,7 +1128,7 @@ _gnutls_send_handshake (gnutls_session_t session, void *i_data,
   if (i_datasize > 0)
     memcpy (&data[pos], i_data, i_datasize);
 
-  _gnutls_handshake_log ("HSK[%p]: %s was send [%ld bytes]\n",
+  _gnutls_handshake_log ("HSK[%p]: %s was sent [%ld bytes]\n",
 			 session, _gnutls_handshake2str (type),
 			 (long) datasize);
 
@@ -1750,27 +1750,27 @@ _gnutls_read_server_hello (gnutls_session_t session,
 
   /* Parse extensions.
    */
-  if (_gnutls_version_has_extensions (version))
+  ret = _gnutls_parse_extensions (session, GNUTLS_EXT_ANY,
+				  &data[pos], len);
+  /* len is the rest of the parsed length */
+  if (ret < 0)
     {
-      ret = _gnutls_parse_extensions (session, GNUTLS_EXT_ANY,
-				      &data[pos], len);
-      /* len is the rest of the parsed length */
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+      gnutls_assert ();
+      return ret;
     }
+
   return ret;
 }
 
 
 /* This function copies the appropriate ciphersuites to a locally allocated buffer
- * Needed in client hello messages. Returns the new data length.
+ * Needed in client hello messages. Returns the new data length. If add_scsv is
+ * true, add the special safe renegotiation CS.
  */
 static int
 _gnutls_copy_ciphersuites (gnutls_session_t session,
-			   opaque * ret_data, size_t ret_data_size)
+			   opaque * ret_data, size_t ret_data_size,
+			   int add_scsv)
 {
   int ret, i;
   cipher_suite_st *cipher_suites;
@@ -1806,6 +1806,9 @@ _gnutls_copy_ciphersuites (gnutls_session_t session,
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
+  if (add_scsv)
+    ++ret;
+
   cipher_num = ret;
 
   cipher_num *= sizeof (uint16_t);	/* in order to get bytes */
@@ -1823,11 +1826,21 @@ _gnutls_copy_ciphersuites (gnutls_session_t session,
   _gnutls_write_uint16 (cipher_num, ret_data);
   pos += 2;
 
-  for (i = 0; i < (cipher_num / 2); i++)
+  uint16_t loop_max = add_scsv ? cipher_num - 2 : cipher_num;
+
+  for (i = 0; i < (loop_max / 2); i++)
     {
       memcpy (&ret_data[pos], cipher_suites[i].suite, 2);
       pos += 2;
     }
+
+  if (add_scsv)
+    {
+      /* Safe renegotiation signalling CS value is { 0x00, 0xff } */
+      ret_data[pos++] = 0x00;
+      ret_data[pos++] = 0xff;
+    }
+
   gnutls_free (cipher_suites);
 
   return datalen;
@@ -2002,8 +2015,20 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 
 
       /* Copy the ciphersuites.
+       *
+       * If using SSLv3 Send TLS_RENEGO_PROTECTION_REQUEST SCSV for MITM
+       * prevention on initial negotiation (but not renegotiation; that's
+       * handled with the RI extension below).
        */
-      ret = _gnutls_copy_ciphersuites (session, extdata, extdatalen);
+      if(!session->security_parameters.extensions.initial_negotiation_completed &&
+	 session->security_parameters.entity == GNUTLS_CLIENT)
+        {
+	  ret = _gnutls_copy_ciphersuites (session, extdata, extdatalen, TRUE);
+	  _gnutls_extension_list_add (session, GNUTLS_EXTENSION_SAFE_RENEGOTIATION);
+	}
+      else
+	ret = _gnutls_copy_ciphersuites (session, extdata, extdatalen, FALSE);
+
       if (ret > 0)
 	{
 	  datalen += ret;
@@ -2084,6 +2109,53 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 	      gnutls_free (extdata);
 	      return ret;
 	    }
+	}
+      else if(session->security_parameters.extensions.initial_negotiation_completed)
+        {
+	  /* For SSLv3 only, we will (only) to send the RI extension; we must
+	   * send it every time we renegotiate. We don't want to send anything
+	   * else, out of concern for interoperability.
+	   *
+	   * If this is an initial negotiation, we already sent SCSV above.
+	   */
+          
+	  opaque buf[256]; /* opaque renegotiated_connection<0..255> */
+	  ret = _gnutls_safe_renegotiation_send_params (session, buf, sizeof(buf));
+
+	  if (ret < 0)
+	    {
+	      gnutls_assert ();
+	      gnutls_free (data);
+	      gnutls_free (extdata);
+	      return ret;
+	    }
+
+	  datalen += ret + 6; /* extlen(2) + type(2) + len(2) + ret */
+
+	  data = gnutls_realloc_fast (data, datalen);
+	  if (data == NULL)
+	    {
+	      gnutls_assert ();
+	      gnutls_free (extdata);
+	      return GNUTLS_E_MEMORY_ERROR;
+	    }
+
+	  /* total extensions length (one extension, with type(2) + len(2)) */
+	  _gnutls_write_uint16 (4 + ret, &data[pos]);
+	  pos += 2;
+
+	  /* TLS RI extension type is 0xff01 */
+	  data[pos++] = 0xff;
+	  data[pos++] = 0x01;
+
+	  _gnutls_write_uint16 (ret, &data[pos]);
+	  pos += 2;
+
+	  memcpy(&data[pos], buf, ret);
+	  pos += ret;
+
+	  _gnutls_debug_log ("EXT[%p]: Sending extension safe renegotiation (SSLv3)\n",
+			         session);
 	}
       gnutls_free (extdata);
     }
@@ -2210,6 +2282,8 @@ _gnutls_send_hello (gnutls_session_t session, int again)
 {
   int ret;
 
+  session->security_parameters.extensions.safe_renegotiation_received = 0;
+
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
       ret = _gnutls_send_client_hello (session, again);
@@ -2232,8 +2306,6 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 {
   int ret;
 
-  session->security_parameters.extensions.safe_renegotiation_received = 0;
-
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
       ret = _gnutls_read_server_hello (session, data, datalen);
@@ -2253,43 +2325,80 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	  return ret;
 	}
     }
+  	    
+  /* Safe renegotiation */
+  tls_ext_st *ext = &session->security_parameters.extensions;
 
-  if (!session->security_parameters.extensions.disable_safe_renegotiation)
+  if (ext->safe_renegotiation_received)
     {
-      if (session->security_parameters.extensions.safe_renegotiation_received)
+      if ((ext->ri_extension_data_len < ext->client_verify_data_len) ||
+	  (memcmp (ext->ri_extension_data,
+		   ext->client_verify_data,
+		   ext->client_verify_data_len)))
+	{
+	  gnutls_assert();
+	  _gnutls_handshake_log ("Safe renegotiation failed (1)\n");
+	  return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
+	}
+      if (session->security_parameters.entity == GNUTLS_CLIENT)
         {
-          if ((session->security_parameters.extensions.current_verify_data_len !=
-               session->security_parameters.extensions.previous_verify_data_len) ||
-              (memcmp (session->security_parameters.extensions.current_verify_data,
-                       session->security_parameters.extensions.previous_verify_data,
-                       session->security_parameters.extensions.current_verify_data_len)))
-            {
+	  if ((ext->ri_extension_data_len !=
+	       ext->client_verify_data_len + ext->server_verify_data_len) ||
+	       memcmp (ext->ri_extension_data + ext->client_verify_data_len,
+		       ext->server_verify_data, ext->server_verify_data_len))
+	    {
 	      gnutls_assert();
-              return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
-            }
+	      _gnutls_handshake_log ("Safe renegotiation failed (2)\n");
+	      return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
+	    }
+	}
+      else /* Make sure there are 0 extra bytes */
+	{
+	  if (ext->ri_extension_data_len != ext->client_verify_data_len)
+	    {
+	      gnutls_assert();
+	      _gnutls_handshake_log ("Safe renegotiation failed (3)\n");
+	      return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
+	    }
+	}
+
+      _gnutls_handshake_log ("Safe renegotiation succeeded.\n");
+    }
+  else /* safe renegotiation not received... */
+    {
+      if (ext->connection_using_safe_renegotiation)
+	{
+	  gnutls_assert();
+	  _gnutls_handshake_log ("Peer previously asked for safe renegotiation!\n");
+	  return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
+	}
+
+      /* Clients can't tell if it's an initial negotiation */
+      if (ext->initial_negotiation_completed ||
+	  session->security_parameters.entity == GNUTLS_CLIENT)
+	{
+	  if (session->internals.priorities.unsafe_renegotiation != 0)
+	    {
+	      _gnutls_handshake_log ("Allowing unsafe renegotiation!\n");
+	    }
 	  else
-            {
-              _gnutls_debug_log ("Safe renegotiation succeeded.\n");
-            }
+	    {
+	      gnutls_assert();
+	      _gnutls_handshake_log ("Denying unsafe renegotiation.\n");
+	      return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
+	    }
 	}
       else
-        {
-          if (session->security_parameters.extensions.initial_negotiation_completed)
-            {
-              if (session->internals.priorities.unsafe_renegotiation)
-                {
-                  _gnutls_handshake_log ("Allowing unsafe renegotiation!\n");
-                }
-              else
-                {
-				  gnutls_assert();
-                  _gnutls_handshake_log ("Denying unsafe renegotiation.\n");
-                  return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
-                }
-            }
+	{
+	  if (session->internals.priorities.initial_safe_renegotiation==0)
+	    {
+	      _gnutls_handshake_log ("Allowing unsafe initial negotiation!\n");
+	    }
 	  else
-            {
-              _gnutls_handshake_log ("Allowing unsafe initial negotiation.\n");
+	    {
+	      gnutls_assert();
+	      _gnutls_handshake_log ("Denying unsafe initial negotiation.\n");
+	      return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
 	    }
 	}
     }

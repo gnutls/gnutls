@@ -38,6 +38,7 @@
 #include <ext_session_ticket.h>
 #include <ext_safe_renegotiation.h>
 #include <ext_signature.h>
+#include <ext_safe_renegotiation.h>
 #include <gnutls_num.h>
 
 typedef struct
@@ -184,7 +185,7 @@ _gnutls_parse_extensions (gnutls_session_t session,
  * This list is used to check whether the (later) received
  * extensions are the ones we requested.
  */
-static void
+void
 _gnutls_extension_list_add (gnutls_session_t session, uint16_t type)
 {
 

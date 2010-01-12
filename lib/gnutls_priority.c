@@ -524,6 +524,8 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  *
  * "%UNSAFE_RENEGOTIATION" will allow unsafe renegotiation.
  *
+ * "%INITIAL_SAFE_RENEGOTIATION" will force initial safe negotiation even if renegotiation wasn't requested.
+ *
  * "%SSL3_RECORD_VERSION" will use SSL3.0 record version in client hello.
  *
  * "%VERIFY_ALLOW_SIGN_RSA_MD5" will allow RSA-MD5 signatures in
@@ -716,6 +718,9 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	  else if (strcasecmp (&broken_list[i][1],
 			       "UNSAFE_RENEGOTIATION") == 0)
 	    (*priority_cache)->unsafe_renegotiation = 1;
+	  else if (strcasecmp (&broken_list[i][1],
+			       "INITIAL_SAFE_RENEGOTIATION") == 0)
+	    (*priority_cache)->initial_safe_renegotiation = 1;
 	  else
 	    goto error;
 	}

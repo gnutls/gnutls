@@ -470,6 +470,10 @@ typedef struct
 #define GNUTLS_DHE_RSA_AES_128_CBC_SHA256 { 0x00, 0x67 }
 #define GNUTLS_DHE_RSA_AES_256_CBC_SHA256 { 0x00, 0x6B }
 
+/* Safe renegotiation */
+
+#define GNUTLS_RENEGO_PROTECTION_REQUEST { GNUTLS_RENEGO_PROTECTION_REQUEST_MAJOR, GNUTLS_RENEGO_PROTECTION_REQUEST_MINOR }
+
 #define CIPHER_SUITES_COUNT sizeof(cs_algorithms)/sizeof(gnutls_cipher_suite_entry)-1
 
 static const gnutls_cipher_suite_entry cs_algorithms[] = {
@@ -661,6 +665,9 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_RSA_AES_256_CBC_SHA256,
 			     GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_RSA,
 			     GNUTLS_MAC_SHA256, GNUTLS_TLS1_2),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_RENEGO_PROTECTION_REQUEST,
+			     GNUTLS_CIPHER_UNKNOWN, GNUTLS_KX_UNKNOWN,
+			     GNUTLS_MAC_UNKNOWN, GNUTLS_SSL3),
   {0, {{0, 0}}, 0, 0, 0, 0}
 };
 

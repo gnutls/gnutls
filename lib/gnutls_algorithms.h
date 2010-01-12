@@ -27,6 +27,9 @@
 
 #include "gnutls_auth.h"
 
+#define GNUTLS_RENEGO_PROTECTION_REQUEST_MAJOR 0x00
+#define GNUTLS_RENEGO_PROTECTION_REQUEST_MINOR 0xFF
+
 /* Functions for version handling. */
 gnutls_protocol_t _gnutls_version_lowest (gnutls_session_t session);
 gnutls_protocol_t _gnutls_version_max (gnutls_session_t session);
