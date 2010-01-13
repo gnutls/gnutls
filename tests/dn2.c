@@ -94,7 +94,7 @@ doit (void)
     success ("comparison ok\n");
   else
     fail ("comparison fail (%d/%d)\nexpect: %s\n   got: %.*s\n",
-	  out.size, strlen (info), info, out.size, out.data);
+	  out.size, (int)strlen (info), info, out.size, out.data);
 
   gnutls_x509_crt_deinit (cert);
   gnutls_global_deinit ();

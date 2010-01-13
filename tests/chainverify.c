@@ -833,7 +833,7 @@ main (int argc, char *argv[])
 					 &verify_status);
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "gnutls_x509_crt_list_verify[%d,%d]: %s",
-	       i, j, gnutls_strerror (ret));
+	       (int)i, (int)j, gnutls_strerror (ret));
 
       if (verify_status != chains[i].expected_verify_result)
 	{

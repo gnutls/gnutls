@@ -284,7 +284,7 @@ main (void)
 					      keys[i].password, 0);
       if (ret != keys[i].expected_result)
 	{
-	  printf ("fail[%d]: %d: %s\n", i, ret, gnutls_strerror (ret));
+	  printf ("fail[%d]: %d: %s\n", (int)i, ret, gnutls_strerror (ret));
 	  return 1;
 	}
 

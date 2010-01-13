@@ -59,7 +59,7 @@ client_avp (gnutls_session_t session, void *ptr,
 
   if (last)
     printf ("client: received %d bytes AVP: `%.*s'\n",
-	    lastlen, (int) lastlen, last);
+	    (int)lastlen, (int) lastlen, last);
   else
     printf ("client: new application phase\n");
 
@@ -93,7 +93,7 @@ client_avp (gnutls_session_t session, void *ptr,
     return -1;
   *newlen = strlen (*new);
 
-  printf ("client: sending %d bytes AVP: `%s'\n", *newlen, *new);
+  printf ("client: sending %d bytes AVP: `%s'\n", (int)*newlen, *new);
 
   gnutls_ia_permute_inner_secret (session, 3, "foo");
 
@@ -291,7 +291,7 @@ server_avp (gnutls_session_t session, void *ptr,
 
   if (last)
     printf ("server: received %d bytes AVP: `%.*s'\n",
-	    lastlen, (int) lastlen, last);
+	    (int)lastlen, (int) lastlen, last);
 
   gnutls_ia_permute_inner_secret (session, 3, "foo");
 
@@ -355,7 +355,7 @@ server_avp (gnutls_session_t session, void *ptr,
     return -1;
   *newlen = strlen (*new);
 
-  printf ("server: sending %d bytes AVP: `%s'\n", *newlen, *new);
+  printf ("server: sending %d bytes AVP: `%s'\n", (int)*newlen, *new);
 
   return 0;
 }

@@ -49,7 +49,7 @@ size_t to_client_len;
 static ssize_t
 client_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
 {
-  success ("client_pull len %d has %d\n", len, to_client_len);
+  success ("client_pull len %d has %d\n", (int)len, (int)to_client_len);
 
   if (to_client_len < len)
     {
@@ -71,7 +71,7 @@ client_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
   size_t newlen = to_server_len + len;
   char *tmp;
 
-  success ("client_push len %d has %d\n", len, to_server_len);
+  success ("client_push len %d has %d\n", (int)len, (int)to_server_len);
   hexprint (data, len);
 
   tmp = realloc (to_server, newlen);
@@ -91,7 +91,7 @@ client_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 static ssize_t
 server_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
 {
-  success ("server_pull len %d has %d\n", len, to_server_len);
+  success ("server_pull len %d has %d\n", (int)len, (int)to_server_len);
 
   if (to_server_len < len)
     {
@@ -113,7 +113,7 @@ server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
   size_t newlen = to_client_len + len;
   char *tmp;
 
-  success ("server_push len %d has %d\n", len, to_client_len);
+  success ("server_push len %d has %d\n", (int)len, (int)to_client_len);
 
   hexprint (data, len);
 
@@ -135,7 +135,7 @@ static void
 client_finished_callback (gnutls_session_t session,
 			  const void *finished, size_t len)
 {
-  success ("client finished (length %d)\n", len);
+  success ("client finished (length %d)\n", (int)len);
   hexprint (finished, len);
 }
 
@@ -143,7 +143,7 @@ static void
 server_finished_callback (gnutls_session_t session,
 			  const void *finished, size_t len)
 {
-  success ("server finished (length %d)\n", len);
+  success ("server finished (length %d)\n", (int)len);
   hexprint (finished, len);
 }
 
@@ -220,7 +220,7 @@ doit (void)
   success ("Handshake established\n");
 
   ns = gnutls_record_send (client, MSG, strlen (MSG));
-  success ("client: sent %d\n", ns);
+  success ("client: sent %d\n", (int)ns);
 
   ret = gnutls_record_recv (server, buffer, MAX_BUF);
   if (ret == 0)
@@ -236,7 +236,7 @@ doit (void)
     }
 
   ns = gnutls_record_send (server, MSG, strlen (MSG));
-  success ("server: sent %d\n", ns);
+  success ("server: sent %d\n", (int)ns);
 
   ret = gnutls_record_recv (client, buffer, MAX_BUF);
   if (ret == 0)

@@ -159,7 +159,7 @@ doit (void)
       else
 	{
 	  fail ("Key_id lengths differ incorrectly: %d - %d\n",
-		crq_key_id_len, pkey_key_id_len);
+		(int)crq_key_id_len, (int)pkey_key_id_len);
 	}
 
 
