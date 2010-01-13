@@ -380,6 +380,19 @@ _gnutls_set_write_keys (gnutls_session_t session)
 			   export_flag);
 }
 
+#define CPY_EXTENSIONS \
+	memcpy(dst->extensions.server_names, src->extensions.server_names, sizeof(src->extensions.server_names)); \
+	dst->extensions.server_names_size = src->extensions.server_names_size; \
+	memcpy(dst->extensions.srp_username, src->extensions.srp_username, sizeof(src->extensions.srp_username)); \
+	memcpy(dst->extensions.sign_algorithms, src->extensions.sign_algorithms, sizeof(src->extensions.sign_algorithms)); \
+	dst->extensions.sign_algorithms_size = src->extensions.sign_algorithms_size; \
+	dst->extensions.gnutls_ia_enable = src->extensions.gnutls_ia_enable; \
+	dst->extensions.gnutls_ia_peer_enable = src->extensions.gnutls_ia_peer_enable; \
+	dst->extensions.gnutls_ia_allowskip = src->extensions.gnutls_ia_allowskip; \
+	dst->extensions.gnutls_ia_peer_allowskip = src->extensions.gnutls_ia_peer_allowskip; \
+	dst->extensions.do_recv_supplemental = src->extensions.do_recv_supplemental; \
+	dst->extensions.do_send_supplemental = src->extensions.do_send_supplemental
+
 #define CPY_COMMON dst->entity = src->entity; \
 	dst->kx_algorithm = src->kx_algorithm; \
 	memcpy( &dst->current_cipher_suite, &src->current_cipher_suite, sizeof(cipher_suite_st)); \
@@ -393,8 +406,8 @@ _gnutls_set_write_keys (gnutls_session_t session)
 	dst->max_record_recv_size = src->max_record_recv_size; \
 	dst->max_record_send_size = src->max_record_send_size; \
 	dst->version = src->version; \
-	memcpy( &dst->extensions, &src->extensions, sizeof(tls_ext_st)); \
-	memcpy( &dst->inner_secret, &src->inner_secret, GNUTLS_MASTER_SIZE);
+	CPY_EXTENSIONS; \
+	memcpy( &dst->inner_secret, &src->inner_secret, GNUTLS_MASTER_SIZE)
 
 static void
 _gnutls_cpy_read_security_parameters (security_parameters_st *
@@ -486,12 +499,9 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
     }
   else
     {				/* RESUME_TRUE */
-      opaque *session_ticket =
-	session->security_parameters.extensions.session_ticket;
       _gnutls_cpy_read_security_parameters (&session->security_parameters,
 					    &session->internals.
 					    resumed_security_parameters);
-      session->security_parameters.extensions.session_ticket = session_ticket;
     }
 
 
@@ -671,12 +681,9 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
     }
   else
     {				/* RESUME_TRUE */
-      opaque *session_ticket =
-	session->security_parameters.extensions.session_ticket;
       _gnutls_cpy_write_security_parameters (&session->security_parameters,
 					     &session->internals.
 					     resumed_security_parameters);
-      session->security_parameters.extensions.session_ticket = session_ticket;
     }
 
   rc = _gnutls_set_write_keys (session);

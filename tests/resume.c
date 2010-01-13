@@ -100,7 +100,7 @@ client (struct params_res *params)
   if (debug)
     {
       gnutls_global_set_log_function (tls_log_func);
-      gnutls_global_set_log_level (4);
+      gnutls_global_set_log_level (2);
     }
   gnutls_global_init ();
 
@@ -178,7 +178,7 @@ client (struct params_res *params)
 	      if (params->expect_resume)
 		fail ("*** Previous session was NOT resumed\n");
 	      else
-		success ("*** Previous session was NOT resumed\n");
+		success ("*** Previous session was NOT resumed (expected)\n");
 	    }
 	}
 
@@ -352,7 +352,7 @@ server (struct params_res *params)
   if (debug)
     {
       gnutls_global_set_log_function (tls_log_func);
-      gnutls_global_set_log_level (4);
+      gnutls_global_set_log_level (2);
     }
 
   gnutls_global_init ();

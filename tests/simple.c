@@ -50,7 +50,7 @@ doit (void)
 
     for (i = 0; algs[i]; i++)
       {
-	printf ("pk_list[%d] = %d = %s = %d\n", i, algs[i],
+	printf ("pk_list[%d] = %d = %s = %d\n", (int)i, algs[i],
 		gnutls_pk_algorithm_get_name (algs[i]),
 		gnutls_pk_get_id (gnutls_pk_algorithm_get_name (algs[i])));
 	if (gnutls_pk_get_id (gnutls_pk_algorithm_get_name (algs[i]))
@@ -76,7 +76,7 @@ doit (void)
 
     for (i = 0; algs[i]; i++)
       {
-	printf ("sign_list[%d] = %d = %s = %d\n", i, algs[i],
+	printf ("sign_list[%d] = %d = %s = %d\n", (int)i, algs[i],
 		gnutls_sign_algorithm_get_name (algs[i]),
 		gnutls_sign_get_id (gnutls_sign_algorithm_get_name
 				    (algs[i])));

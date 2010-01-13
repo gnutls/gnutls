@@ -309,6 +309,9 @@ struct gnutls_session_ticket_key_st {
 
 #define MAX_VERIFY_DATA_SIZE 36 /* in SSL 3.0, 12 in TLS 1.0 */
 
+/* If you want the extension data to be kept across resuming sessions
+ * then modify CPY_EXTENSIONS in gnutls_constate.c
+ */
 typedef struct
 {
   server_name_st server_names[MAX_SERVER_NAME_EXTENSIONS];
@@ -328,6 +331,9 @@ typedef struct
   /* Used by extensions that enable supplemental data. */
   int do_recv_supplemental, do_send_supplemental;
 
+  /*** Those below do not get copied when resuming session 
+   ***/
+
   /* Opaque PRF input. */
   gnutls_oprfi_callback_func oprfi_cb;
   void *oprfi_userdata;
@@ -343,15 +349,14 @@ typedef struct
   opaque session_ticket_IV[SESSION_TICKET_IV_SIZE];
 
   /* Safe renegotiation. */
-  int connection_using_safe_renegotiation:1;
-  int safe_renegotiation_received:1;
-  int initial_negotiation_completed:1;
   uint8_t client_verify_data[MAX_VERIFY_DATA_SIZE]; 
   size_t client_verify_data_len;
   uint8_t server_verify_data[MAX_VERIFY_DATA_SIZE];
   size_t server_verify_data_len;
   uint8_t ri_extension_data[MAX_VERIFY_DATA_SIZE*2]; /* max signal is 72 bytes in s->c sslv3 */
   size_t ri_extension_data_len;
+
+  int connection_using_safe_renegotiation:1;
 
 } tls_ext_st;
 
@@ -366,7 +371,7 @@ typedef struct
  */
 
 /* if you add anything in Security_Parameters struct, then
- * also modify CPY_COMMON in gnutls_constate.c
+ * also modify CPY_COMMON in gnutls_constate.c. 
  */
 
 /* Note that the security parameters structure is set up after the
@@ -411,6 +416,7 @@ typedef struct
   /* holds the negotiated certificate type */
   gnutls_certificate_type_t cert_type;
   gnutls_protocol_t version;	/* moved here */
+
   /* For TLS/IA.  XXX: Move to IA credential? */
   opaque inner_secret[GNUTLS_MASTER_SIZE];
 } security_parameters_st;
@@ -739,6 +745,9 @@ typedef struct
   uint16_t srp_prime_bits;
 
   int session_ticket_enable, session_ticket_renew;
+
+  int safe_renegotiation_received:1;
+  int initial_negotiation_completed:1;
 
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */
