@@ -141,6 +141,23 @@ resume_copy_required_values (gnutls_session_t session)
 	  sizeof (session->security_parameters.session_id));
   session->security_parameters.session_id_size =
     session->internals.resumed_security_parameters.session_id_size;
+
+  /* safe renegotiation */
+  tls_ext_st *newext = &session->security_parameters.extensions;
+  tls_ext_st *resext = &session->internals.resumed_security_parameters.extensions;
+
+  newext->connection_using_safe_renegotiation = 
+	  resext->connection_using_safe_renegotiation;
+
+  newext->initial_negotiation_completed = TRUE;
+
+  newext->client_verify_data_len = resext->client_verify_data_len;
+  memcpy (newext->client_verify_data, resext->client_verify_data, 
+	  resext->client_verify_data_len);
+
+  newext->server_verify_data_len = resext->server_verify_data_len;
+  memcpy (newext->server_verify_data, resext->server_verify_data, 
+	  resext->server_verify_data_len);
 }
 
 void
@@ -1677,6 +1694,23 @@ _gnutls_client_check_if_resuming (gnutls_session_t session,
 	      session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
       session->internals.resumed = RESUME_TRUE;	/* we are resuming */
 
+      /* safe renegotiation after resumption */
+      tls_ext_st *newext = &session->security_parameters.extensions;
+      tls_ext_st *resext = &session->internals.resumed_security_parameters.extensions;
+
+      newext->connection_using_safe_renegotiation = 
+	resext->connection_using_safe_renegotiation;
+
+      newext->initial_negotiation_completed = TRUE;
+
+      newext->client_verify_data_len = resext->client_verify_data_len;
+      memcpy (newext->client_verify_data, resext->client_verify_data, 
+	      resext->client_verify_data_len);
+
+      newext->server_verify_data_len = resext->server_verify_data_len;
+      memcpy (newext->server_verify_data, resext->server_verify_data, 
+	      resext->server_verify_data_len);
+
       return 0;
     }
   else
@@ -2066,7 +2100,8 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
        * handled with the RI extension below).
        */
       if(!session->security_parameters.extensions.initial_negotiation_completed &&
-	 session->security_parameters.entity == GNUTLS_CLIENT)
+	 session->security_parameters.entity == GNUTLS_CLIENT &&
+	 gnutls_protocol_get_version (session) == GNUTLS_SSL3)
         {
 	  ret = _gnutls_copy_ciphersuites (session, extdata, extdatalen, TRUE);
 	  _gnutls_extension_list_add (session, GNUTLS_EXTENSION_SAFE_RENEGOTIATION);
