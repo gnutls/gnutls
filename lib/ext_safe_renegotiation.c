@@ -31,24 +31,25 @@ _gnutls_safe_renegotiation_recv_params (gnutls_session_t session,
 		const opaque * data, size_t _data_size)
 {
   tls_ext_st *ext = &session->security_parameters.extensions;
-
   int len = data[0];
   ssize_t data_size = _data_size;
 
   DECR_LEN (data_size, len+1 /* count the first byte and payload */);
 
-  int conservative_len = len;
   if (len > sizeof (ext->ri_extension_data))
-    conservative_len = sizeof (ext->ri_extension_data);
+    {
+      gnutls_assert();
+      return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
+    }
 
-  memcpy (ext->ri_extension_data, &data[1], conservative_len);
-  ext->ri_extension_data_len = conservative_len;
+  memcpy (ext->ri_extension_data, &data[1], len);
+  ext->ri_extension_data_len = len;
 
   /* "safe renegotiation received" means on *this* handshake; "connection using
    * safe renegotiation" means that the initial hello received on the connection
-   * indicatd safe renegotiation. 
+   * indicated safe renegotiation. 
    */
-  ext->safe_renegotiation_received = 1;
+  session->internals.safe_renegotiation_received = 1;
   ext->connection_using_safe_renegotiation = 1;
 
   return 0;
@@ -66,6 +67,8 @@ _gnutls_safe_renegotiation_send_params (gnutls_session_t session,
 
   ssize_t data_size = _data_size;
   tls_ext_st *ext = &session->security_parameters.extensions;
+
+  data[0] = 0;
 
   /* Always offer the extension if we're a client */
   if (ext->connection_using_safe_renegotiation ||
