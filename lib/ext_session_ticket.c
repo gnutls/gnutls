@@ -87,7 +87,7 @@ decrypt_ticket (gnutls_session_t session, struct ticket *ticket)
   int ret;
 
   /* Check the integrity of ticket using HMAC-SHA-256. */
-  mac_secret.data =
+  mac_secret.data = (void*)
     session->security_parameters.extensions.session_ticket_key->mac_secret;
   mac_secret.size = MAC_SECRET_SIZE;
   ret = digest_ticket (&mac_secret, ticket, final);
@@ -104,7 +104,7 @@ decrypt_ticket (gnutls_session_t session, struct ticket *ticket)
     }
 
   /* Decrypt encrypted_state using 128-bit AES in CBC mode. */
-  key.data = session->security_parameters.extensions.session_ticket_key->key;
+  key.data = (void*)session->security_parameters.extensions.session_ticket_key->key;
   key.size = KEY_SIZE;
   IV.data = ticket->IV;
   IV.size = IV_SIZE;
@@ -177,7 +177,7 @@ encrypt_ticket (gnutls_session_t session, struct ticket *ticket)
   _gnutls_free_datum (&state);
 
   /* Encrypt state using 128-bit AES in CBC mode. */
-  key.data = session->security_parameters.extensions.session_ticket_key->key;
+  key.data = (void*)session->security_parameters.extensions.session_ticket_key->key;
   key.size = KEY_SIZE;
   IV.data = session->security_parameters.extensions.session_ticket_IV;
   IV.size = IV_SIZE;
@@ -209,7 +209,7 @@ encrypt_ticket (gnutls_session_t session, struct ticket *ticket)
   ticket->encrypted_state = encrypted_state.data;
 
   mac_secret.data =
-    session->security_parameters.extensions.session_ticket_key->mac_secret;
+    (void*)session->security_parameters.extensions.session_ticket_key->mac_secret;
   mac_secret.size = MAC_SECRET_SIZE;
   ret = digest_ticket (&mac_secret, ticket, ticket->mac);
   if (ret < 0)

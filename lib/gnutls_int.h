@@ -331,21 +331,22 @@ typedef struct
   /* Used by extensions that enable supplemental data. */
   int do_recv_supplemental, do_send_supplemental;
 
+  opaque *session_ticket;
+  uint16_t session_ticket_len;
+
   /*** Those below do not get copied when resuming session 
    ***/
 
   /* Opaque PRF input. */
   gnutls_oprfi_callback_func oprfi_cb;
-  void *oprfi_userdata;
+  const void *oprfi_userdata;
   opaque *oprfi_client;
   uint16_t oprfi_client_len;
   opaque *oprfi_server;
   uint16_t oprfi_server_len;
 
   /* Session Ticket */
-  opaque *session_ticket;
-  uint16_t session_ticket_len;
-  struct gnutls_session_ticket_key_st *session_ticket_key;
+  const struct gnutls_session_ticket_key_st *session_ticket_key;
   opaque session_ticket_IV[SESSION_TICKET_IV_SIZE];
 
   /* Safe renegotiation. */

@@ -381,17 +381,8 @@ _gnutls_set_write_keys (gnutls_session_t session)
 }
 
 #define CPY_EXTENSIONS \
-	memcpy(dst->extensions.server_names, src->extensions.server_names, sizeof(src->extensions.server_names)); \
-	dst->extensions.server_names_size = src->extensions.server_names_size; \
-	memcpy(dst->extensions.srp_username, src->extensions.srp_username, sizeof(src->extensions.srp_username)); \
-	memcpy(dst->extensions.sign_algorithms, src->extensions.sign_algorithms, sizeof(src->extensions.sign_algorithms)); \
-	dst->extensions.sign_algorithms_size = src->extensions.sign_algorithms_size; \
-	dst->extensions.gnutls_ia_enable = src->extensions.gnutls_ia_enable; \
-	dst->extensions.gnutls_ia_peer_enable = src->extensions.gnutls_ia_peer_enable; \
-	dst->extensions.gnutls_ia_allowskip = src->extensions.gnutls_ia_allowskip; \
-	dst->extensions.gnutls_ia_peer_allowskip = src->extensions.gnutls_ia_peer_allowskip; \
-	dst->extensions.do_recv_supplemental = src->extensions.do_recv_supplemental; \
-	dst->extensions.do_send_supplemental = src->extensions.do_send_supplemental
+	memcpy(&dst->extensions.server_names, &src->extensions, sizeof(src->extensions)); \
+	memset(&src->extensions, 0, sizeof(src->extensions)) /* avoid duplicate free's */
 
 #define CPY_COMMON dst->entity = src->entity; \
 	dst->kx_algorithm = src->kx_algorithm; \
@@ -406,7 +397,6 @@ _gnutls_set_write_keys (gnutls_session_t session)
 	dst->max_record_recv_size = src->max_record_recv_size; \
 	dst->max_record_send_size = src->max_record_send_size; \
 	dst->version = src->version; \
-	CPY_EXTENSIONS; \
 	memcpy( &dst->inner_secret, &src->inner_secret, GNUTLS_MASTER_SIZE)
 
 static void
@@ -425,6 +415,7 @@ _gnutls_cpy_write_security_parameters (security_parameters_st *
 				       dst, security_parameters_st * src)
 {
   CPY_COMMON;
+  CPY_EXTENSIONS; /* only do once */
 
   dst->write_bulk_cipher_algorithm = src->write_bulk_cipher_algorithm;
   dst->write_mac_algorithm = src->write_mac_algorithm;

@@ -1133,6 +1133,7 @@ unpack_security_parameters (gnutls_session_t session,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
+  memset(&session->internals.resumed_security_parameters, 0, sizeof(session->internals.resumed_security_parameters));
   session->internals.resumed_security_parameters.entity =
     packed_session->data[pos++];
   session->internals.resumed_security_parameters.kx_algorithm =
