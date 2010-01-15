@@ -381,6 +381,9 @@ _gnutls_set_write_keys (gnutls_session_t session)
 }
 
 #define CPY_EXTENSIONS \
+        gnutls_free(dst->extensions.session_ticket); \
+        gnutls_free(dst->extensions.oprfi_client); \
+        gnutls_free(dst->extensions.oprfi_server); \
 	memcpy(&dst->extensions.server_names, &src->extensions, sizeof(src->extensions)); \
 	memset(&src->extensions, 0, sizeof(src->extensions)) /* avoid duplicate free's */
 

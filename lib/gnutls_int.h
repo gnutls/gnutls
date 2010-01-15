@@ -338,16 +338,10 @@ typedef struct
    ***/
 
   /* Opaque PRF input. */
-  gnutls_oprfi_callback_func oprfi_cb;
-  const void *oprfi_userdata;
   opaque *oprfi_client;
   uint16_t oprfi_client_len;
   opaque *oprfi_server;
   uint16_t oprfi_server_len;
-
-  /* Session Ticket */
-  const struct gnutls_session_ticket_key_st *session_ticket_key;
-  opaque session_ticket_IV[SESSION_TICKET_IV_SIZE];
 
   /* Safe renegotiation. */
   uint8_t client_verify_data[MAX_VERIFY_DATA_SIZE]; 
@@ -749,6 +743,14 @@ typedef struct
 
   int safe_renegotiation_received:1;
   int initial_negotiation_completed:1;
+
+  /* Oprfi */
+  gnutls_oprfi_callback_func oprfi_cb;
+  const void *oprfi_userdata;
+
+  /* Session Ticket */
+  struct gnutls_session_ticket_key_st *session_ticket_key;
+  opaque session_ticket_IV[SESSION_TICKET_IV_SIZE];
 
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */

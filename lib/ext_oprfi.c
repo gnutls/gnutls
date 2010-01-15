@@ -40,7 +40,7 @@ oprfi_recv_server (gnutls_session_t session,
   uint16_t len;
   int ret;
 
-  if (!session->security_parameters.extensions.oprfi_cb)
+  if (!session->internals.oprfi_cb)
     {
       gnutls_assert ();
       return 0;
@@ -152,7 +152,7 @@ oprfi_send_server (gnutls_session_t session, opaque * data, size_t _data_size)
   size_t len;
 
   if (!session->security_parameters.extensions.oprfi_client ||
-      !session->security_parameters.extensions.oprfi_cb)
+      !session->internals.oprfi_cb)
     return 0;
 
   /* Allocate buffer for outgoing data. */
@@ -167,8 +167,8 @@ oprfi_send_server (gnutls_session_t session, opaque * data, size_t _data_size)
     }
 
   /* Get outgoing data. */
-  ret = session->security_parameters.extensions.oprfi_cb
-    (session, session->security_parameters.extensions.oprfi_userdata,
+  ret = session->internals.oprfi_cb
+    (session, session->internals.oprfi_userdata,
      session->security_parameters.extensions.oprfi_client_len,
      session->security_parameters.extensions.oprfi_client,
      session->security_parameters.extensions.oprfi_server);
@@ -249,6 +249,6 @@ void
 gnutls_oprfi_enable_server (gnutls_session_t session,
 			    gnutls_oprfi_callback_func cb, void *userdata)
 {
-  session->security_parameters.extensions.oprfi_cb = cb;
-  session->security_parameters.extensions.oprfi_userdata = userdata;
+  session->internals.oprfi_cb = cb;
+  session->internals.oprfi_userdata = userdata;
 }

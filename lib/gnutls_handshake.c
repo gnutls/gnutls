@@ -470,7 +470,7 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
   pos += session_id_len;
 
   if (ret == 0)
-    {				/* resumed! */
+    { /* resumed using default TLS resumption! */
       /* Parse only the safe renegotiation extension
        * We don't want to parse any other extensions since
        * we don't want new extension values to overwrite the
@@ -585,7 +585,8 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
 	session->security_parameters.max_record_send_size;
 
       resume_copy_required_values (session);
-	return 0;
+
+      return _gnutls_user_hello_func (session, adv_version);
     }
 
   /* select an appropriate cipher suite
