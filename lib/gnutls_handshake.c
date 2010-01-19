@@ -152,16 +152,6 @@ resume_copy_required_values (gnutls_session_t session)
 
   newext->connection_using_safe_renegotiation = 
 	  resext->connection_using_safe_renegotiation;
-
-  session->internals.initial_negotiation_completed = TRUE;
-
-  newext->client_verify_data_len = resext->client_verify_data_len;
-  memcpy (newext->client_verify_data, resext->client_verify_data, 
-	  resext->client_verify_data_len);
-
-  newext->server_verify_data_len = resext->server_verify_data_len;
-  memcpy (newext->server_verify_data, resext->server_verify_data, 
-	  resext->server_verify_data_len);
 }
 
 void
@@ -1708,16 +1698,6 @@ _gnutls_client_check_if_resuming (gnutls_session_t session,
 
       newext->connection_using_safe_renegotiation = 
 	resext->connection_using_safe_renegotiation;
-
-      session->internals.initial_negotiation_completed = TRUE;
-
-      newext->client_verify_data_len = resext->client_verify_data_len;
-      memcpy (newext->client_verify_data, resext->client_verify_data, 
-	      resext->client_verify_data_len);
-
-      newext->server_verify_data_len = resext->server_verify_data_len;
-      memcpy (newext->server_verify_data, resext->server_verify_data, 
-	      resext->server_verify_data_len);
 
       return 0;
     }
