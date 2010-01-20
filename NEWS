@@ -36,7 +36,8 @@ Reported by Ingmar Vanhassel in
 
 ** examples: Use the new APIs for printing X.509 certificate information.
 
-** Fix build failure on Solaris.
+** Fix build failure on Solaris related to libgpg-error.
+Thanks to Dagobert Michelsen <dam@opencsw.org>.
 
 ** API and ABI modifications:
 No changes since last version.
