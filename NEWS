@@ -9,6 +9,10 @@ See the end for copying conditions.
 VeriSign rejected CSRs with this padding.  Reported by Wilankar Trupti
 <trupti.wilankar@hp.com> and Boyan Kasarov <bkasarov@gmail.com>.
 
+Note: As a side effect of this change, the "public key identifier"
+value computed for a certificate using this version of GnuTLS will be
+different from values computed using earlier versions of GnuTLS.
+
 ** libgnutls: For CSRs on DSA keys, don't add DSA parameters to the
 ** optional SignatureAlgorithm parameter field.
 VeriSign rejected these CSRs.  They are stricly speaking not needed
