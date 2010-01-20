@@ -7,13 +7,14 @@ See the end for copying conditions.
 
 ** libgnutls: For CSRs, don't null pad integers for RSA/DSA value.
 VeriSign rejected CSRs with this padding.  Reported by Wilankar Trupti
-<trupti.wilankar@hp.com>.
+<trupti.wilankar@hp.com> and Boyan Kasarov <bkasarov@gmail.com>.
 
 ** libgnutls: For CSRs on DSA keys, don't add DSA parameters to the
 ** optional SignatureAlgorithm parameter field.
 VeriSign rejected these CSRs.  They are stricly speaking not needed
 since you need the signer's certificate to verify the certificate
-signature anyway.
+signature anyway.  Reported by Wilankar Trupti
+<trupti.wilankar@hp.com> and Boyan Kasarov <bkasarov@gmail.com>.
 
 ** libgnutls: When checking openpgp self signature also check the signatures
 ** of all subkeys.
