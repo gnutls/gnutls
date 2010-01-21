@@ -2422,9 +2422,7 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	  return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
 	}
 
-      /* Clients can't tell if it's an initial negotiation */
-      if (session->internals.initial_negotiation_completed ||
-	  session->security_parameters.entity == GNUTLS_CLIENT)
+      if (session->internals.initial_negotiation_completed != 0)
 	{
 	  if (session->internals.priorities.unsafe_renegotiation != 0)
 	    {
