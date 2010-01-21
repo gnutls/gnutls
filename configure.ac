@@ -282,6 +282,7 @@ AC_CONFIG_FILES([
   tests/Makefile
   tests/key-id/Makefile
   tests/openpgp-certs/Makefile
+  tests/safe-renegotiation/Makefile
   tests/pathlen/Makefile
   tests/pkcs1-padding/Makefile
   tests/pkcs12-decode/Makefile
