@@ -826,17 +826,6 @@ after_handshake:
 	      continue;
 	    }
 
-          if (strstr(buffer, "**REHANDSHAKE**") != NULL) {
-  	    fprintf (stderr, "*** Starting TLS rehandshake\n");
-	    ret = do_handshake (&hd);
-	    if (ret < 0)
-	      {
-	        fprintf (stderr, "*** Rehandshake has failed\n");
-	        user_term = 1;
-	        retval = 1;
-	        break;
-	      }
-          }
 	  if (crlf != 0)
 	    {
 	      char *b = strchr (buffer, '\n');

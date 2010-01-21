@@ -790,6 +790,18 @@ get_response (gnutls_session_t session, char *request,
     }
   else
     {
+      fprintf(stderr, "received: %s\n", request);
+      if (request[0] == request[1] && request[0] == '*')
+        {
+          if (strncmp(request, "**REHANDSHAKE**", sizeof("**REHANDSHAKE**")-1)==0)
+            {
+              fprintf(stderr, "*** Sending rehandshake request\n");
+              gnutls_rehandshake(session);
+            }
+          *response = NULL;
+          *response_length = 0;
+          return;
+        }
       *response = strdup (request);
       *response_length = ((*response) ? strlen (*response) : 0);
     }
@@ -1242,6 +1254,7 @@ main (int argc, char **argv)
 		  {
   	            if (r == GNUTLS_E_REHANDSHAKE) 
 		      {
+		        fprintf(stderr, "*** Received hello message\n");
 		        do 
 		          {
 		            r = gnutls_handshake (j->tls_session);
@@ -1337,7 +1350,7 @@ main (int argc, char **argv)
 		  }
 	      }
 
-	    if (j->handshake_ok == 1)
+	    if (j->handshake_ok == 1 && j->http_response != NULL)
 	      {
 		/* FIXME if j->http_response == NULL? */
 		r = gnutls_record_send (j->tls_session,
@@ -1389,6 +1402,12 @@ main (int argc, char **argv)
 		      }
 		  }
 	      }
+            else
+              {
+		j->request_length = 0;
+		j->http_request[0] = 0;
+                j->http_state = HTTP_STATE_REQUEST;
+              }
 	  }
       }
       lloopend (listener_list, j);
