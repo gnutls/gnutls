@@ -75,9 +75,15 @@ _gnutls_safe_renegotiation_send_params (gnutls_session_t session,
    * itself; IOW, empty verify data is represented as a length of 0. That means
    * the minimum extension is one byte: 0x00.
    */
-
   ssize_t data_size = _data_size;
   tls_ext_st *ext = &session->security_parameters.extensions;
+
+
+  if (session->internals.priorities.disable_safe_renegotiation != 0)
+    {
+      gnutls_assert();
+      return 0;
+    }
 
   data[0] = 0;
 
@@ -107,6 +113,8 @@ _gnutls_safe_renegotiation_send_params (gnutls_session_t session,
 		 ext->server_verify_data_len);
 	}
     }
+  else
+    return 0;
 
   return 1 + data[0]; /* don't forget the length byte */
 }

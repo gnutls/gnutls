@@ -464,6 +464,7 @@ struct gnutls_priority_st
   int no_padding:1;
   int unsafe_renegotiation:1;
   int initial_safe_renegotiation:1;
+  int disable_safe_renegotiation:1;
   int ssl3_record_version;
   int additional_verify_flags;
 };

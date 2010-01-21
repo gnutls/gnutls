@@ -2374,6 +2374,12 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	  return ret;
 	}
     }
+
+  if (session->internals.priorities.disable_safe_renegotiation != 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
   	    
   /* Safe renegotiation */
   ext = &session->security_parameters.extensions;

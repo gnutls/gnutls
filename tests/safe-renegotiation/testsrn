@@ -1,0 +1,76 @@
+#!/bin/bash
+
+srcdir="${srcdir:-.}"
+SERV="${SERV:-../../src/gnutls-serv} -q"
+CLI="${CLI:-../../src/gnutls-cli}"
+PORT="${PORT:-5558}"
+unset RETCODE
+
+fail() {
+   echo "Failure: $1" >&2
+   RETCODE=${RETCODE:-${2:-1}}
+}
+
+echo "Checking Safe renegotiation"
+
+$SERV -p $PORT --echo --priority NORMAL:+ANON-DH --dhparams params.dh >/dev/null 2>&1 & 
+
+# give the server a chance to initialize
+sleep 2
+
+$CLI -p $PORT localhost --rehandshake --priority NORMAL:+ANON-DH </dev/null >/dev/null 2>&1 || \
+  fail "1. Safe rehandshake should have succeeded!"
+
+$CLI -p $PORT localhost --rehandshake --priority NORMAL:+ANON-DH:%UNSAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
+  fail "2. Unsafe rehandshake should have succeeded!"
+
+$CLI -p $PORT localhost --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
+  fail "3. Unsafe negotiation should have succeeded!"
+
+$CLI -p $PORT localhost --rehandshake --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 && \
+  fail "4. Unsafe renegotiation should have failed!"
+
+kill %1
+wait
+
+$SERV -p $PORT --echo --priority NORMAL:+ANON-DH:%INITIAL_SAFE_RENEGOTIATION --dhparams params.dh >/dev/null 2>&1 &
+
+# give the server a chance to initialize
+sleep 2
+
+$CLI -p $PORT localhost --rehandshake --priority NORMAL:+ANON-DH </dev/null >/dev/null 2>&1 || \
+  fail "5. Safe rehandshake should have succeeded!"
+
+$CLI -p $PORT localhost --rehandshake --priority NORMAL:+ANON-DH:%UNSAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
+  fail "6. Unsafe rehandshake should have succeeded!"
+
+$CLI -p $PORT localhost --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 && \
+  fail "7. Unsafe negotiation should have failed!"
+
+$CLI -p $PORT localhost --rehandshake --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 && \
+  fail "8. Unsafe renegotiation should have failed!"
+
+kill %1
+wait
+
+$SERV -p $PORT --echo --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION --dhparams params.dh >/dev/null 2>&1 &
+
+# give the server a chance to initialize
+sleep 2
+
+$CLI -p $PORT localhost --rehandshake --priority NORMAL:+ANON-DH </dev/null >/dev/null 2>&1 && \
+  fail "9. Safe rehandshake should have failed!"
+
+$CLI -p $PORT localhost --rehandshake --priority NORMAL:+ANON-DH:%UNSAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
+  fail "10. Unsafe rehandshake should have succeeded!"
+
+$CLI -p $PORT localhost --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
+  fail "11. Unsafe negotiation should have succeeded!"
+
+$CLI -p $PORT localhost --rehandshake --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
+  fail "12. Unsafe renegotiation should have succeeded!"
+
+kill %1
+wait
+
+exit ${RETCODE:-0}
