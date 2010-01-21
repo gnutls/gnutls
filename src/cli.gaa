@@ -17,6 +17,9 @@ option (d, debug) INT "integer" { $debug = $1 } "Enable debugging"
 #int resume;
 option (r, resume) { $resume = 1 } "Connect, establish a session. Connect again and resume this session."
 
+#int rehandshake;
+option (e, rehandshake) { $rehandshake = 1 } "Connect, establish a session and rehandshake immediately."
+
 #int noticket;
 option (noticket) { $noticket = 1 } "Doen't accept session tickets."
 
@@ -133,4 +136,4 @@ init { $resume=0; $noticket=0; $port="443"; $rest_args=NULL; $ciphers=NULL;
 	$srp_username=NULL; $srp_passwd=NULL; $fmtder = 0; $starttls =0; 
 	$debug = 0; $print_cert = 0; $verbose = 0; $psk_key = NULL; 
 	$psk_username = NULL; $priorities = NULL;
-	$opaque_prf_input = NULL; $pgp_subkey = NULL; }
+	$opaque_prf_input = NULL; $pgp_subkey = NULL; $rehandshake = 0; }

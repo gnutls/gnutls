@@ -8,82 +8,84 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 124 "cli.gaa"
+#line 127 "cli.gaa"
 	char *rest_args;
-#line 116 "cli.gaa"
+#line 119 "cli.gaa"
 	int insecure;
-#line 113 "cli.gaa"
+#line 116 "cli.gaa"
 	char *port;
-#line 110 "cli.gaa"
+#line 113 "cli.gaa"
 	char *opaque_prf_input;
-#line 107 "cli.gaa"
+#line 110 "cli.gaa"
 	char *psk_key;
-#line 104 "cli.gaa"
+#line 107 "cli.gaa"
 	char *psk_username;
-#line 101 "cli.gaa"
+#line 104 "cli.gaa"
 	char *srp_passwd;
-#line 98 "cli.gaa"
+#line 101 "cli.gaa"
 	char *srp_username;
-#line 95 "cli.gaa"
+#line 98 "cli.gaa"
 	char *x509_certfile;
-#line 92 "cli.gaa"
+#line 95 "cli.gaa"
 	char *x509_keyfile;
-#line 89 "cli.gaa"
+#line 92 "cli.gaa"
 	char *pgp_subkey;
-#line 86 "cli.gaa"
+#line 89 "cli.gaa"
 	char *pgp_certfile;
-#line 83 "cli.gaa"
+#line 86 "cli.gaa"
 	char *pgp_keyring;
-#line 80 "cli.gaa"
+#line 83 "cli.gaa"
 	char *pgp_keyfile;
-#line 77 "cli.gaa"
+#line 80 "cli.gaa"
 	char *x509_crlfile;
-#line 74 "cli.gaa"
+#line 77 "cli.gaa"
 	char *x509_cafile;
-#line 71 "cli.gaa"
+#line 74 "cli.gaa"
 	char *priorities;
-#line 68 "cli.gaa"
+#line 71 "cli.gaa"
 	char **ctype;
-#line 67 "cli.gaa"
+#line 70 "cli.gaa"
 	int nctype;
-#line 64 "cli.gaa"
+#line 67 "cli.gaa"
 	char **kx;
-#line 63 "cli.gaa"
+#line 66 "cli.gaa"
 	int nkx;
-#line 60 "cli.gaa"
+#line 63 "cli.gaa"
 	char **macs;
-#line 59 "cli.gaa"
+#line 62 "cli.gaa"
 	int nmacs;
-#line 56 "cli.gaa"
+#line 59 "cli.gaa"
 	char **comp;
-#line 55 "cli.gaa"
+#line 58 "cli.gaa"
 	int ncomp;
-#line 52 "cli.gaa"
+#line 55 "cli.gaa"
 	char **proto;
-#line 51 "cli.gaa"
+#line 54 "cli.gaa"
 	int nproto;
-#line 48 "cli.gaa"
+#line 51 "cli.gaa"
 	char **ciphers;
-#line 47 "cli.gaa"
+#line 50 "cli.gaa"
 	int nciphers;
-#line 44 "cli.gaa"
+#line 47 "cli.gaa"
 	int verbose;
-#line 41 "cli.gaa"
+#line 44 "cli.gaa"
 	int record_size;
-#line 38 "cli.gaa"
+#line 41 "cli.gaa"
 	int print_cert;
-#line 35 "cli.gaa"
+#line 38 "cli.gaa"
 	int disable_extensions;
-#line 32 "cli.gaa"
+#line 35 "cli.gaa"
 	int fingerprint;
-#line 29 "cli.gaa"
+#line 32 "cli.gaa"
 	int fmtder;
-#line 26 "cli.gaa"
+#line 29 "cli.gaa"
 	int crlf;
-#line 23 "cli.gaa"
+#line 26 "cli.gaa"
 	int starttls;
-#line 20 "cli.gaa"
+#line 23 "cli.gaa"
 	int noticket;
+#line 20 "cli.gaa"
+	int rehandshake;
 #line 17 "cli.gaa"
 	int resume;
 #line 14 "cli.gaa"

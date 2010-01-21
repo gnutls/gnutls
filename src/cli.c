@@ -53,7 +53,7 @@
 #define MAX_BUF 4096
 
 /* global stuff here */
-int resume, starttls, insecure;
+int resume, starttls, insecure, rehandshake;
 const char *hostname = NULL;
 char *service;
 int record_max_size;
@@ -725,6 +725,23 @@ after_handshake:
      programs to search for when gnutls-cli has reached this point. */
   printf ("\n- Simple Client Mode:\n\n");
 
+  if (rehandshake)
+    {
+      ret = do_handshake (&hd);
+
+      if (ret < 0)
+	{
+	  fprintf (stderr, "*** ReHandshake has failed\n");
+	  gnutls_perror (ret);
+	  gnutls_deinit (hd.session);
+	  return 1;
+	}
+      else
+	{
+	  printf ("- ReHandshake was completed\n");
+	}
+    }
+
 #ifndef _WIN32
   signal (SIGALRM, &starttls_alarm);
 #endif
@@ -889,6 +906,7 @@ gaa_parser (int argc, char **argv)
   print_cert = info.print_cert;
   starttls = info.starttls;
   resume = info.resume;
+  rehandshake = info.rehandshake;
   insecure = info.insecure;
   service = info.port;
   record_max_size = info.record_size;
