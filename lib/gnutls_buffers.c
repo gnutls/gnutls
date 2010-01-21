@@ -318,7 +318,6 @@ _gnutls_read (gnutls_session_t session, void *iptr,
 
 		  goto finish;
 		}
-	      gnutls_assert ();
 
 	      if (err == EAGAIN)
 		return GNUTLS_E_AGAIN;
@@ -1037,8 +1036,6 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
 	      session->internals.handshake_recv_buffer_htype = htype;
 	      session->internals.handshake_recv_buffer_type = type;
 	    }
-
-	  gnutls_assert ();
 
 	  return i;
 	}
