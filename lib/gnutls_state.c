@@ -227,7 +227,6 @@ _gnutls_handshake_internal_state_init (gnutls_session_t session)
   session->internals.adv_version_minor = 0;
   session->internals.direction = 0;
   session->internals.safe_renegotiation_received = 0;
-  session->internals.initial_negotiation_completed = 0;
 
   /* use out of band data for the last
    * handshake messages received.

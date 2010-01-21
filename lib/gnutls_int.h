@@ -351,8 +351,6 @@ typedef struct
   uint8_t ri_extension_data[MAX_VERIFY_DATA_SIZE*2]; /* max signal is 72 bytes in s->c sslv3 */
   size_t ri_extension_data_len;
 
-  int connection_using_safe_renegotiation:1;
-
 } tls_ext_st;
 
 /* auth_info_t structures now MAY contain malloced 
@@ -743,6 +741,7 @@ typedef struct
 
   int safe_renegotiation_received:1;
   int initial_negotiation_completed:1;
+  int connection_using_safe_renegotiation:1;
 
   /* Oprfi */
   gnutls_oprfi_callback_func oprfi_cb;

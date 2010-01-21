@@ -107,9 +107,6 @@ _gnutls_handshake_hash_buffers_clear (gnutls_session_t session)
 static void
 resume_copy_required_values (gnutls_session_t session)
 {
-  tls_ext_st *newext;
-  tls_ext_st *resext;
-
   /* get the new random values */
   memcpy (session->internals.resumed_security_parameters.server_random,
 	  session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
@@ -146,12 +143,6 @@ resume_copy_required_values (gnutls_session_t session)
   session->security_parameters.session_id_size =
     session->internals.resumed_security_parameters.session_id_size;
 
-  /* safe renegotiation */
-  newext = &session->security_parameters.extensions;
-  resext = &session->internals.resumed_security_parameters.extensions;
-
-  newext->connection_using_safe_renegotiation = 
-	  resext->connection_using_safe_renegotiation;
 }
 
 void
@@ -884,7 +875,7 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
           {
 	    _gnutls_handshake_log ("HSK[%p]: Received safe renegotiation CS\n", session);
             session->internals.safe_renegotiation_received = 1;
-            session->security_parameters.extensions.connection_using_safe_renegotiation = 1;
+            session->internals.connection_using_safe_renegotiation = 1;
 	    break;
           }
       }
@@ -1668,8 +1659,6 @@ _gnutls_client_check_if_resuming (gnutls_session_t session,
 				  opaque * session_id, int session_id_len)
 {
   opaque buf[2 * TLS_MAX_SESSION_ID_SIZE + 1];
-  tls_ext_st *newext;
-  tls_ext_st *resext;
 
   _gnutls_handshake_log ("HSK[%p]: SessionID length: %d\n", session,
 			 session_id_len);
@@ -1690,13 +1679,6 @@ _gnutls_client_check_if_resuming (gnutls_session_t session,
       memcpy (session->internals.resumed_security_parameters.client_random,
 	      session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
       session->internals.resumed = RESUME_TRUE;	/* we are resuming */
-
-      /* safe renegotiation after resumption */
-      newext = &session->security_parameters.extensions;
-      resext = &session->internals.resumed_security_parameters.extensions;
-
-      newext->connection_using_safe_renegotiation = 
-	resext->connection_using_safe_renegotiation;
 
       return 0;
     }
@@ -2433,7 +2415,7 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
     }
   else /* safe renegotiation not received... */
     {
-      if (ext->connection_using_safe_renegotiation)
+      if (session->internals.connection_using_safe_renegotiation)
 	{
 	  gnutls_assert();
 	  _gnutls_handshake_log ("Peer previously asked for safe renegotiation!\n");

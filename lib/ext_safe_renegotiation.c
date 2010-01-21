@@ -50,7 +50,7 @@ _gnutls_safe_renegotiation_recv_params (gnutls_session_t session,
    * indicated safe renegotiation. 
    */
   session->internals.safe_renegotiation_received = 1;
-  ext->connection_using_safe_renegotiation = 1;
+  session->internals.connection_using_safe_renegotiation = 1;
 
   return 0;
 }
@@ -71,7 +71,7 @@ _gnutls_safe_renegotiation_send_params (gnutls_session_t session,
   data[0] = 0;
 
   /* Always offer the extension if we're a client */
-  if (ext->connection_using_safe_renegotiation ||
+  if (session->internals.connection_using_safe_renegotiation ||
      session->security_parameters.entity == GNUTLS_CLIENT)
     {
       DECR_LEN (data_size, 1);
