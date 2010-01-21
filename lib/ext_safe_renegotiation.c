@@ -36,13 +36,24 @@ _gnutls_safe_renegotiation_recv_params (gnutls_session_t session,
 
   DECR_LEN (data_size, len+1 /* count the first byte and payload */);
 
+  /* It is not legal to receive this extension on a renegotiation and
+   * not receive it on the initial negotiation.
+   */
+  if (session->internals.initial_negotiation_completed != 0 &&
+    session->internals.connection_using_safe_renegotiation == 0)
+    {
+      gnutls_assert();
+      return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
+    }
+
   if (len > sizeof (ext->ri_extension_data))
     {
       gnutls_assert();
       return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
     }
 
-  memcpy (ext->ri_extension_data, &data[1], len);
+  if (len > 0)
+    memcpy (ext->ri_extension_data, &data[1], len);
   ext->ri_extension_data_len = len;
 
   /* "safe renegotiation received" means on *this* handshake; "connection using
@@ -79,7 +90,8 @@ _gnutls_safe_renegotiation_send_params (gnutls_session_t session,
 
       DECR_LEN (data_size, ext->client_verify_data_len);
 
-      memcpy(&data[1], 
+      if (ext->client_verify_data_len > 0)
+        memcpy(&data[1], 
 	     ext->client_verify_data, 
 	     ext->client_verify_data_len);
 
@@ -89,7 +101,8 @@ _gnutls_safe_renegotiation_send_params (gnutls_session_t session,
 
 	  DECR_LEN (data_size, ext->server_verify_data_len);
 
-	  memcpy(&data[1 + ext->client_verify_data_len],
+	  if (ext->server_verify_data_len > 0)
+  	    memcpy(&data[1 + ext->client_verify_data_len],
 		 ext->server_verify_data,
 		 ext->server_verify_data_len);
 	}
