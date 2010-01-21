@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2004, 2005, 2008 Free Software Foundation
+ * Copyright (C) 2009, 2010 Free Software Foundation
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -51,7 +51,7 @@ _gnutls_cipher_init (cipher_hd_st * handle, gnutls_cipher_algorithm_t cipher,
       handle->hd.rh.cc = cc;
       SR (cc->init (cipher, &handle->hd.rh.ctx), cc_cleanup);
       SR (cc->setkey (handle->hd.rh.ctx, key->data, key->size), cc_cleanup);
-      if (iv->data && iv->size && cc->setiv)
+      if (iv && iv->data && iv->size && cc->setiv)
 	SR (cc->setiv (handle->hd.rh.ctx, iv->data, iv->size), cc_cleanup);
       return 0;
     }
@@ -75,7 +75,7 @@ _gnutls_cipher_init (cipher_hd_st * handle, gnutls_cipher_algorithm_t cipher,
       return ret;
     }
 
-  if (iv->data != NULL && iv->size > 0)
+  if (iv && iv->data != NULL && iv->size > 0)
     _gnutls_cipher_ops.setiv (handle->hd.gc, iv->data, iv->size);
 
   return 0;
