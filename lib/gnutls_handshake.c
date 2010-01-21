@@ -1257,7 +1257,6 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
 
       if (ret < 0)
 	{
-	  gnutls_assert ();
 	  return ret;
 	}
 
@@ -2519,6 +2518,13 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
   * If this function succeeds (returns 0), you must call the
   * gnutls_handshake() function in order to negotiate the new
   * parameters.
+  *
+  * Since TLS is full duplex some application data might have been
+  * sent during peer's processing of this message. In that case
+  * one should call gnutls_record_recv() until GNUTLS_E_REHANDSHAKE
+  * is returned to clear any pending data. Care must be taken if
+  * rehandshake is mandatory to terminate if it does not start after
+  * some threshold.
   *
   * If the client does not wish to renegotiate parameters he will
   * should with an alert message, thus the return code will be
