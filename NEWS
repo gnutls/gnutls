@@ -5,6 +5,14 @@ See the end for copying conditions.
 
 * Version 2.9.10 (unreleased)
 
+** libgnutls: Added Steve Dispensa's patch for safe renegotiation
+(draft-ietf-tls-renegotiation) that solves the issue discussed in:
+http://www.ietf.org/mail-archive/web/tls/current/msg03928.html
+and http://www.ietf.org/mail-archive/web/tls/current/msg03948.html
+Note however that the TLS client implemented here will reject
+any connections to unsafe servers unless the priority string
+%UNSAFE_RENEGOTIATION is specified.
+
 ** libgnutls: When checking openpgp self signature also check the signatures of all subkeys.                                                                                                             
 Ilari Liusvaara noticed and reported the issue and provided test vectors as well.
 
@@ -45,6 +53,8 @@ gnutls_hmac: Added
 gnutls_hmac_fast: Added
 gnutls_hmac_deinit: Added
 gnutls_hmac_output: Added
+gnutls_safe_negotiation_set_initial: Added
+gnutls_safe_renegotiation_set: Added
 
 * Version 2.9.9 (released 2009-11-09)
 
