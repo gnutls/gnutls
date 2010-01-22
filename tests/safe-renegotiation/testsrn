@@ -58,11 +58,11 @@ $SERV -p $PORT --echo --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION --d
 # give the server a chance to initialize
 sleep 2
 
-$CLI -p $PORT localhost --rehandshake --priority NORMAL:+ANON-DH </dev/null >/dev/null 2>&1 && \
-  fail "9. Safe rehandshake should have failed!"
+$CLI -p $PORT localhost --priority NORMAL:+ANON-DH </dev/null >/dev/null 2>&1 && \
+  fail "9. Initial connection should have failed!"
 
-$CLI -p $PORT localhost --rehandshake --priority NORMAL:+ANON-DH:%UNSAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
-  fail "10. Unsafe rehandshake should have succeeded!"
+$CLI -p $PORT localhost --priority NORMAL:+ANON-DH:%UNSAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
+  fail "10. Unsafe connection should have succeeded!"
 
 $CLI -p $PORT localhost --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
   fail "11. Unsafe negotiation should have succeeded!"
