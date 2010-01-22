@@ -55,6 +55,9 @@ gnutls_hmac_deinit: Added
 gnutls_hmac_output: Added
 gnutls_safe_negotiation_set_initial: Added
 gnutls_safe_renegotiation_set: Added
+%UNSAFE_RENEGOTIATION: Added to priority strings
+%INITIAL_SAFE_RENEGOTIATION: Added to priority strings
+%DISABLE_SAFE_RENEGOTIATION: Added to priority strings (do not use)
 
 * Version 2.9.9 (released 2009-11-09)
 
