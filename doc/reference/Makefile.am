@@ -106,7 +106,7 @@ IGNORE_HFILES=debug.h gnutls_compress.h gnutls_cipher.h			\
 									\
 	alloca.h byteswap.h c-ctype.h errno.h float.h netdb.h stdint.h	\
 	stdio.h stdlib.h string.h strings.h sys_socket.h sys_stat.h	\
-	time.h unistd.h wchar.h						\
+	time.h unistd.h wchar.h	stat.h socket.h				\
 									\
 	hmac.h  md5.h  memxor.h
 
