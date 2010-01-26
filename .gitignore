@@ -55,7 +55,6 @@ doc/reference/gnutls-overrides.txt
 doc/reference/gnutls-sections.txt
 doc/stamp-vti
 doc/version.texi
-gl/
 lib/build-aux/
 lib/gnutls-api.texi
 lib/gnutls.pc
