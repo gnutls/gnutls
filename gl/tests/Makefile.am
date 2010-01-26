@@ -411,6 +411,14 @@ EXTRA_DIST += test-unistd.c
 
 ## end   gnulib module unistd-tests
 
+## begin gnulib module update-copyright-tests
+
+TESTS += test-update-copyright.sh
+TESTS_ENVIRONMENT += PATH='$(abs_aux_dir)'$(PATH_SEPARATOR)"$$PATH"
+EXTRA_DIST += test-update-copyright.sh
+
+## end   gnulib module update-copyright-tests
+
 ## begin gnulib module vasnprintf-tests
 
 TESTS += test-vasnprintf
