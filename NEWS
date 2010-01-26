@@ -1,6 +1,6 @@
 GNU TLS NEWS -- History of user-visible changes.                -*- outline -*-
-Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Simon Josefsson
-Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
+Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
+              2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 See the end for copying conditions.
 
 * Version 2.9.10 (unreleased)
@@ -36,22 +36,22 @@ now different than previous gnutls releases.
 ** certtool: New option --no-crq-extensions to avoid extensions in CSRs.
 
 ** API and ABI modifications:
-gnutls_cipher_get_block_size: Added
-gnutls_cipher_init: Added
-gnutls_cipher_encrypt: Added
 gnutls_cipher_decrypt: Added
 gnutls_cipher_deinit: Added
-gnutls_hash_init: Added
-gnutls_hash_get_len: Added
+gnutls_cipher_encrypt: Added
+gnutls_cipher_get_block_size: Added
+gnutls_cipher_init: Added
 gnutls_hash: Added
-gnutls_hash_fast: Added
 gnutls_hash_deinit: Added
+gnutls_hash_fast: Added
+gnutls_hash_get_len: Added
+gnutls_hash_init: Added
 gnutls_hash_output: Added
-gnutls_hmac_init: Added
-gnutls_hmac_get_len: Added
 gnutls_hmac: Added
-gnutls_hmac_fast: Added
 gnutls_hmac_deinit: Added
+gnutls_hmac_fast: Added
+gnutls_hmac_get_len: Added
+gnutls_hmac_init: Added
 gnutls_hmac_output: Added
 gnutls_safe_negotiation_set_initial: Added
 gnutls_safe_renegotiation_set: Added
