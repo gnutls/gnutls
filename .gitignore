@@ -67,7 +67,6 @@ libextra/*-api.texi
 libextra/build-aux/
 libextra/gnutls-extra.pc
 libtool
-m4/
 po
 src/algorithms.texi
 src/certtool
