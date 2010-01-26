@@ -1,6 +1,6 @@
---- gl/gettext.h.orig	2008-11-17 17:12:20.000000000 +0100
-+++ gl/gettext.h	2008-11-17 17:12:29.000000000 +0100
-@@ -162,109 +162,4 @@
+--- gl/gettext.h.orig	2010-01-26 15:37:52.000000000 +0100
++++ gl/gettext.h	2010-01-26 15:37:59.000000000 +0100
+@@ -172,109 +172,4 @@
      return translation;
  }
  
@@ -32,8 +32,8 @@
 -#endif
 -static const char *
 -dcpgettext_expr (const char *domain,
--		 const char *msgctxt, const char *msgid,
--		 int category)
+-                 const char *msgctxt, const char *msgid,
+-                 int category)
 -{
 -  size_t msgctxt_len = strlen (msgctxt) + 1;
 -  size_t msgid_len = strlen (msgid) + 1;
@@ -55,10 +55,10 @@
 -      translation = dcgettext (domain, msg_ctxt_id, category);
 -#if !_LIBGETTEXT_HAVE_VARIABLE_SIZE_ARRAYS
 -      if (msg_ctxt_id != buf)
--	free (msg_ctxt_id);
+-        free (msg_ctxt_id);
 -#endif
 -      if (translation != msg_ctxt_id)
--	return translation;
+-        return translation;
 -    }
 -  return msgid;
 -}
@@ -77,9 +77,9 @@
 -#endif
 -static const char *
 -dcnpgettext_expr (const char *domain,
--		  const char *msgctxt, const char *msgid,
--		  const char *msgid_plural, unsigned long int n,
--		  int category)
+-                  const char *msgctxt, const char *msgid,
+-                  const char *msgid_plural, unsigned long int n,
+-                  int category)
 -{
 -  size_t msgctxt_len = strlen (msgctxt) + 1;
 -  size_t msgid_len = strlen (msgid) + 1;
@@ -101,10 +101,10 @@
 -      translation = dcngettext (domain, msg_ctxt_id, msgid_plural, n, category);
 -#if !_LIBGETTEXT_HAVE_VARIABLE_SIZE_ARRAYS
 -      if (msg_ctxt_id != buf)
--	free (msg_ctxt_id);
+-        free (msg_ctxt_id);
 -#endif
 -      if (!(translation == msg_ctxt_id || translation == msgid_plural))
--	return translation;
+-        return translation;
 -    }
 -  return (n == 1 ? msgid : msgid_plural);
 -}

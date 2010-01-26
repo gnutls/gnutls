@@ -1,5 +1,5 @@
 # getaddrinfo.m4 serial 22
-dnl Copyright (C) 2004-2009 Free Software Foundation, Inc.
+dnl Copyright (C) 2004-2010 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -39,7 +39,7 @@ AC_DEFUN([gl_GETADDRINFO],
       [gl_cv_func_getaddrinfo=no])])
   if test $gl_cv_func_getaddrinfo = no; then
     AC_CACHE_CHECK([for getaddrinfo in ws2tcpip.h and -lws2_32],
-		   gl_cv_w32_getaddrinfo, [
+                   gl_cv_w32_getaddrinfo, [
       gl_cv_w32_getaddrinfo=no
       am_save_LIBS="$LIBS"
       LIBS="$LIBS -lws2_32"

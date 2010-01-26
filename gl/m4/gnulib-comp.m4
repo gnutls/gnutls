@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2009 Free Software Foundation, Inc.
+# Copyright (C) 2002-2010 Free Software Foundation, Inc.
 #
 # This file is free software, distributed under the terms of the GNU
 # General Public License.  As a special exception to the GNU General
@@ -54,7 +54,7 @@ AC_DEFUN([gl_INIT],
   fi
   gl_SYS_SOCKET_MODULE_INDICATOR([accept])
 changequote(,)dnl
-LTALLOCA=`echo "$ALLOCA" | sed 's/\.[^.]* /.lo /g;s/\.[^.]*$/.lo/'`
+LTALLOCA=`echo "$ALLOCA" | sed -e 's/\.[^.]* /.lo /g;s/\.[^.]*$/.lo/'`
 changequote([, ])dnl
 AC_SUBST([LTALLOCA])
   gl_FUNC_ALLOCA
@@ -113,6 +113,8 @@ AC_SUBST([LTALLOCA])
   gl_SYS_SOCKET_MODULE_INDICATOR([listen])
   gl_FUNC_LSEEK
   gl_UNISTD_MODULE_INDICATOR([lseek])
+  AC_CONFIG_COMMANDS_PRE([m4_ifdef([AH_HEADER],
+    [AC_SUBST([CONFIG_INCLUDE], m4_defn([AH_HEADER]))])])
   gl_FUNC_MEMCHR
   gl_STRING_MODULE_INDICATOR([memchr])
   gl_MINMAX
@@ -217,7 +219,7 @@ AC_SUBST([LTALLOCA])
     if test -n "$gl_LIBOBJS"; then
       # Remove the extension.
       sed_drop_objext='s/\.o$//;s/\.obj$//'
-      for i in `for i in $gl_LIBOBJS; do echo "$i"; done | sed "$sed_drop_objext" | sort | uniq`; do
+      for i in `for i in $gl_LIBOBJS; do echo "$i"; done | sed -e "$sed_drop_objext" | sort | uniq`; do
         gl_libobjs="$gl_libobjs $i.$ac_objext"
         gl_ltlibobjs="$gl_ltlibobjs $i.lo"
       done
@@ -278,7 +280,7 @@ AC_SUBST([LTALLOCA])
     if test -n "$gltests_LIBOBJS"; then
       # Remove the extension.
       sed_drop_objext='s/\.o$//;s/\.obj$//'
-      for i in `for i in $gltests_LIBOBJS; do echo "$i"; done | sed "$sed_drop_objext" | sort | uniq`; do
+      for i in `for i in $gltests_LIBOBJS; do echo "$i"; done | sed -e "$sed_drop_objext" | sort | uniq`; do
         gltests_libobjs="$gltests_libobjs $i.$ac_objext"
         gltests_ltlibobjs="$gltests_ltlibobjs $i.lo"
       done
@@ -347,14 +349,15 @@ AC_DEFUN([gltests_LIBSOURCES], [
 # This macro records the list of files which have been installed by
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([gl_FILE_LIST], [
+  build-aux/arg-nonnull.h
   build-aux/config.rpath
   build-aux/gendocs.sh
   build-aux/gnupload
-  build-aux/link-warning.h
   build-aux/pmccabe.css
   build-aux/pmccabe2html
   build-aux/useless-if-before-free
   build-aux/vc-list-files
+  build-aux/warn-on-use.h
   doc/fdl-1.3.texi
   doc/gendocs_template
   doc/gpl-3.0.texi
@@ -509,11 +512,14 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/unistd_h.m4
   m4/vasnprintf.m4
   m4/version-etc.m4
+  m4/warn-on-use.m4
   m4/warnings.m4
   m4/wchar.m4
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
+  tests/macros.h
+  tests/signature.h
   tests/test-alignof.c
   tests/test-alloca-opt.c
   tests/test-arpa_inet.c
@@ -550,6 +556,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-stdlib.c
   tests/test-strerror.c
   tests/test-string.c
+  tests/test-sys_ioctl.c
   tests/test-sys_select.c
   tests/test-sys_socket.c
   tests/test-sys_stat.c

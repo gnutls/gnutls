@@ -1,5 +1,5 @@
-# unistd_h.m4 serial 34
-dnl Copyright (C) 2006-2009 Free Software Foundation, Inc.
+# unistd_h.m4 serial 39
+dnl Copyright (C) 2006-2010 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -11,6 +11,7 @@ AC_DEFUN([gl_UNISTD_H],
   dnl Use AC_REQUIRE here, so that the default behavior below is expanded
   dnl once only, before all statements that occur in other macros.
   AC_REQUIRE([gl_UNISTD_H_DEFAULTS])
+  AC_REQUIRE([AC_C_INLINE])
 
   gl_CHECK_NEXT_HEADERS([unistd.h])
 
@@ -21,6 +22,24 @@ AC_DEFUN([gl_UNISTD_H],
     HAVE_UNISTD_H=0
   fi
   AC_SUBST([HAVE_UNISTD_H])
+
+  dnl Check for declarations of anything we want to poison if the
+  dnl corresponding gnulib module is not in use.
+  gl_WARN_ON_USE_PREPARE([[#include <unistd.h>
+/* Some systems declare various items in the wrong headers.  */
+#ifndef __GLIBC__
+# include <fcntl.h>
+# include <stdio.h>
+# include <stdlib.h>
+# if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+#  include <io.h>
+# endif
+#endif
+    ]], [chown dup2 dup3 environ euidaccess faccessat fchdir fchownat
+    fsync ftruncate getcwd getdomainname getdtablesize getgroups
+    gethostname getlogin getlogin_r getpagesize getusershell setusershell
+    endusershell lchown link linkat lseek pipe2 pread readlink readlinkat
+    rmdir sleep symlink symlinkat unlink unlinkat usleep])
 ])
 
 AC_DEFUN([gl_UNISTD_MODULE_INDICATOR],
@@ -48,6 +67,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   GNULIB_GETDTABLESIZE=0;    AC_SUBST([GNULIB_GETDTABLESIZE])
   GNULIB_GETGROUPS=0;        AC_SUBST([GNULIB_GETGROUPS])
   GNULIB_GETHOSTNAME=0;      AC_SUBST([GNULIB_GETHOSTNAME])
+  GNULIB_GETLOGIN=0;         AC_SUBST([GNULIB_GETLOGIN])
   GNULIB_GETLOGIN_R=0;       AC_SUBST([GNULIB_GETLOGIN_R])
   GNULIB_GETPAGESIZE=0;      AC_SUBST([GNULIB_GETPAGESIZE])
   GNULIB_GETUSERSHELL=0;     AC_SUBST([GNULIB_GETUSERSHELL])
@@ -56,6 +76,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   GNULIB_LINKAT=0;           AC_SUBST([GNULIB_LINKAT])
   GNULIB_LSEEK=0;            AC_SUBST([GNULIB_LSEEK])
   GNULIB_PIPE2=0;            AC_SUBST([GNULIB_PIPE2])
+  GNULIB_PREAD=0;            AC_SUBST([GNULIB_PREAD])
   GNULIB_READLINK=0;         AC_SUBST([GNULIB_READLINK])
   GNULIB_READLINKAT=0;       AC_SUBST([GNULIB_READLINKAT])
   GNULIB_RMDIR=0;            AC_SUBST([GNULIB_RMDIR])
@@ -66,6 +87,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   GNULIB_UNISTD_H_SIGPIPE=0; AC_SUBST([GNULIB_UNISTD_H_SIGPIPE])
   GNULIB_UNLINK=0;           AC_SUBST([GNULIB_UNLINK])
   GNULIB_UNLINKAT=0;         AC_SUBST([GNULIB_UNLINKAT])
+  GNULIB_USLEEP=0;           AC_SUBST([GNULIB_USLEEP])
   GNULIB_WRITE=0;            AC_SUBST([GNULIB_WRITE])
   dnl Assume proper GNU behavior unless another module says otherwise.
   HAVE_CHOWN=1;           AC_SUBST([HAVE_CHOWN])
@@ -80,12 +102,14 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   HAVE_GETDTABLESIZE=1;   AC_SUBST([HAVE_GETDTABLESIZE])
   HAVE_GETGROUPS=1;       AC_SUBST([HAVE_GETGROUPS])
   HAVE_GETHOSTNAME=1;     AC_SUBST([HAVE_GETHOSTNAME])
+  HAVE_GETLOGIN=1;        AC_SUBST([HAVE_GETLOGIN])
   HAVE_GETPAGESIZE=1;     AC_SUBST([HAVE_GETPAGESIZE])
   HAVE_GETUSERSHELL=1;    AC_SUBST([HAVE_GETUSERSHELL])
   HAVE_LCHOWN=1;          AC_SUBST([HAVE_LCHOWN])
   HAVE_LINK=1;            AC_SUBST([HAVE_LINK])
   HAVE_LINKAT=1;          AC_SUBST([HAVE_LINKAT])
   HAVE_PIPE2=1;           AC_SUBST([HAVE_PIPE2])
+  HAVE_PREAD=1;           AC_SUBST([HAVE_PREAD])
   HAVE_READLINK=1;        AC_SUBST([HAVE_READLINK])
   HAVE_READLINKAT=1;      AC_SUBST([HAVE_READLINKAT])
   HAVE_SLEEP=1;           AC_SUBST([HAVE_SLEEP])
@@ -96,6 +120,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   HAVE_OS_H=0;            AC_SUBST([HAVE_OS_H])
   HAVE_SYS_PARAM_H=0;     AC_SUBST([HAVE_SYS_PARAM_H])
   HAVE_UNLINKAT=1;        AC_SUBST([HAVE_UNLINKAT])
+  HAVE_USLEEP=1;          AC_SUBST([HAVE_USLEEP])
   REPLACE_CHOWN=0;        AC_SUBST([REPLACE_CHOWN])
   REPLACE_CLOSE=0;        AC_SUBST([REPLACE_CLOSE])
   REPLACE_DUP=0;          AC_SUBST([REPLACE_DUP])
@@ -109,11 +134,14 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   REPLACE_LINK=0;         AC_SUBST([REPLACE_LINK])
   REPLACE_LINKAT=0;       AC_SUBST([REPLACE_LINKAT])
   REPLACE_LSEEK=0;        AC_SUBST([REPLACE_LSEEK])
+  REPLACE_PREAD=0;        AC_SUBST([REPLACE_PREAD])
   REPLACE_READLINK=0;     AC_SUBST([REPLACE_READLINK])
   REPLACE_RMDIR=0;        AC_SUBST([REPLACE_RMDIR])
+  REPLACE_SLEEP=0;        AC_SUBST([REPLACE_SLEEP])
   REPLACE_SYMLINK=0;      AC_SUBST([REPLACE_SYMLINK])
   REPLACE_UNLINK=0;       AC_SUBST([REPLACE_UNLINK])
   REPLACE_UNLINKAT=0;     AC_SUBST([REPLACE_UNLINKAT])
+  REPLACE_USLEEP=0;       AC_SUBST([REPLACE_USLEEP])
   REPLACE_WRITE=0;        AC_SUBST([REPLACE_WRITE])
   UNISTD_H_HAVE_WINSOCK2_H=0; AC_SUBST([UNISTD_H_HAVE_WINSOCK2_H])
   UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS=0;

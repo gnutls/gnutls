@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2009 Free Software Foundation, Inc.
+# Copyright (C) 2002-2010 Free Software Foundation, Inc.
 #
 # This file is free software, distributed under the terms of the GNU
 # General Public License.  As a special exception to the GNU General
@@ -121,7 +121,7 @@ AC_DEFUN([lgl_INIT],
     if test -n "$lgl_LIBOBJS"; then
       # Remove the extension.
       sed_drop_objext='s/\.o$//;s/\.obj$//'
-      for i in `for i in $lgl_LIBOBJS; do echo "$i"; done | sed "$sed_drop_objext" | sort | uniq`; do
+      for i in `for i in $lgl_LIBOBJS; do echo "$i"; done | sed -e "$sed_drop_objext" | sort | uniq`; do
         lgl_libobjs="$lgl_libobjs $i.$ac_objext"
         lgl_ltlibobjs="$lgl_ltlibobjs $i.lo"
       done
@@ -164,7 +164,7 @@ AC_DEFUN([lgl_INIT],
     if test -n "$lgltests_LIBOBJS"; then
       # Remove the extension.
       sed_drop_objext='s/\.o$//;s/\.obj$//'
-      for i in `for i in $lgltests_LIBOBJS; do echo "$i"; done | sed "$sed_drop_objext" | sort | uniq`; do
+      for i in `for i in $lgltests_LIBOBJS; do echo "$i"; done | sed -e "$sed_drop_objext" | sort | uniq`; do
         lgltests_libobjs="$lgltests_libobjs $i.$ac_objext"
         lgltests_ltlibobjs="$lgltests_ltlibobjs $i.lo"
       done
@@ -233,8 +233,9 @@ AC_DEFUN([lgltests_LIBSOURCES], [
 # This macro records the list of files which have been installed by
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([lgl_FILE_LIST], [
+  build-aux/arg-nonnull.h
   build-aux/config.rpath
-  build-aux/link-warning.h
+  build-aux/warn-on-use.h
   lib/alignof.h
   lib/alloca.in.h
   lib/asnprintf.c
@@ -364,10 +365,13 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/vasprintf.m4
   m4/visibility.m4
   m4/vsnprintf.m4
+  m4/warn-on-use.m4
   m4/wchar.m4
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
+  tests/macros.h
+  tests/signature.h
   tests/test-alloca-opt.c
   tests/test-byteswap.c
   tests/test-c-ctype.c

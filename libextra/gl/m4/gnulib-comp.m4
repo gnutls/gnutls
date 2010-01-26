@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2009 Free Software Foundation, Inc.
+# Copyright (C) 2002-2010 Free Software Foundation, Inc.
 #
 # This file is free software, distributed under the terms of the GNU
 # General Public License.  As a special exception to the GNU General
@@ -68,7 +68,7 @@ AC_DEFUN([xgl_INIT],
     if test -n "$xgl_LIBOBJS"; then
       # Remove the extension.
       sed_drop_objext='s/\.o$//;s/\.obj$//'
-      for i in `for i in $xgl_LIBOBJS; do echo "$i"; done | sed "$sed_drop_objext" | sort | uniq`; do
+      for i in `for i in $xgl_LIBOBJS; do echo "$i"; done | sed -e "$sed_drop_objext" | sort | uniq`; do
         xgl_libobjs="$xgl_libobjs $i.$ac_objext"
         xgl_ltlibobjs="$xgl_ltlibobjs $i.lo"
       done
@@ -107,7 +107,7 @@ AC_DEFUN([xgl_INIT],
     if test -n "$xgltests_LIBOBJS"; then
       # Remove the extension.
       sed_drop_objext='s/\.o$//;s/\.obj$//'
-      for i in `for i in $xgltests_LIBOBJS; do echo "$i"; done | sed "$sed_drop_objext" | sort | uniq`; do
+      for i in `for i in $xgltests_LIBOBJS; do echo "$i"; done | sed -e "$sed_drop_objext" | sort | uniq`; do
         xgltests_libobjs="$xgltests_libobjs $i.$ac_objext"
         xgltests_ltlibobjs="$xgltests_ltlibobjs $i.lo"
       done

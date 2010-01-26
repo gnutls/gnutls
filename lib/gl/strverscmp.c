@@ -1,5 +1,6 @@
 /* Compare strings while treating digits characters numerically.
-   Copyright (C) 1997, 2000, 2002, 2004, 2006 Free Software Foundation, Inc.
+   Copyright (C) 1997, 2000, 2002, 2004, 2006, 2009-2010 Free Software
+   Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Jean-François Bignolles <bignolle@ecoledoc.ibp.fr>, 1997.
 
@@ -117,8 +118,8 @@ __strverscmp (const char *s1, const char *s2)
 
     case LEN:
       while (ISDIGIT (*p1++))
-	if (!ISDIGIT (*p2++))
-	  return 1;
+        if (!ISDIGIT (*p2++))
+          return 1;
 
       return ISDIGIT (*p2) ? -1 : diff;
 

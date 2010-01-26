@@ -1,5 +1,5 @@
-# sys_ioctl_h.m4 serial 3
-dnl Copyright (C) 2008-2009 Free Software Foundation, Inc.
+# sys_ioctl_h.m4 serial 5
+dnl Copyright (C) 2008-2010 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -27,24 +27,28 @@ AC_DEFUN([gl_SYS_IOCTL_H],
          [gl_cv_decl_ioctl_in_sys_ioctl_h=yes],
          [gl_cv_decl_ioctl_in_sys_ioctl_h=no])
       ])
-    if test $gl_cv_decl_ioctl_in_sys_ioctl_h != yes; then
-      SYS_IOCTL_H='sys/ioctl.h'
-    fi
   else
     HAVE_SYS_IOCTL_H=0
-    SYS_IOCTL_H='sys/ioctl.h'
   fi
   AC_SUBST([HAVE_SYS_IOCTL_H])
-  dnl Execute this unconditionally, because SYS_IOCTL_H may be set by other
-  dnl modules, after this code is executed.
+  dnl <sys/ioctl.h> is always overridden, because of GNULIB_POSIXCHECK.
   gl_CHECK_NEXT_HEADERS([sys/ioctl.h])
+
+  dnl Check for declarations of anything we want to poison if the
+  dnl corresponding gnulib module is not in use.
+  gl_WARN_ON_USE_PREPARE([[#include <sys/ioctl.h>
+/* Some platforms declare ioctl in the wrong header.  */
+#ifndef __GLIBC__
+# include <unistd.h>
+#endif
+    ]], [ioctl])
 ])
 
 dnl Unconditionally enables the replacement of <sys/ioctl.h>.
 AC_DEFUN([gl_REPLACE_SYS_IOCTL_H],
 [
-  AC_REQUIRE([gl_SYS_IOCTL_H_DEFAULTS])
-  SYS_IOCTL_H='sys/ioctl.h'
+  dnl This is a no-op, because <sys/ioctl.h> is always overridden.
+  :
 ])
 
 AC_DEFUN([gl_SYS_IOCTL_MODULE_INDICATOR],
@@ -61,5 +65,4 @@ AC_DEFUN([gl_SYS_IOCTL_H_DEFAULTS],
   SYS_IOCTL_H_HAVE_WINSOCK2_H=0; AC_SUBST([SYS_IOCTL_H_HAVE_WINSOCK2_H])
   SYS_IOCTL_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS=0;
                         AC_SUBST([SYS_IOCTL_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS])
-  SYS_IOCTL_H='';                AC_SUBST([SYS_IOCTL_H])
 ])

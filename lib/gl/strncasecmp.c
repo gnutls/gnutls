@@ -1,5 +1,5 @@
 /* strncasecmp.c -- case insensitive string comparator
-   Copyright (C) 1998-1999, 2005-2007 Free Software Foundation, Inc.
+   Copyright (C) 1998-1999, 2005-2007, 2009-2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -46,7 +46,7 @@ strncasecmp (const char *s1, const char *s2, size_t n)
       c2 = TOLOWER (*p2);
 
       if (--n == 0 || c1 == '\0')
-	break;
+        break;
 
       ++p1;
       ++p2;

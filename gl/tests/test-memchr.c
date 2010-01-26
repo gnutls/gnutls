@@ -19,22 +19,13 @@
 
 #include <string.h>
 
-#include <stdio.h>
+#include "signature.h"
+SIGNATURE_CHECK (memchr, void *, (void const *, int, size_t));
+
 #include <stdlib.h>
 
 #include "zerosize-ptr.h"
-
-#define ASSERT(expr) \
-  do									     \
-    {									     \
-      if (!(expr))							     \
-	{								     \
-	  fprintf (stderr, "%s:%d: assertion failed\n", __FILE__, __LINE__); \
-	  fflush (stderr);						     \
-	  abort ();							     \
-	}								     \
-    }									     \
-  while (0)
+#include "macros.h"
 
 /* Calculating void * + int is not portable, so this wrapper converts
    to char * to make the tests easier to write.  */
@@ -76,7 +67,7 @@ main (void)
     size_t repeat = 10000;
     for (; repeat > 0; repeat--)
       {
-	ASSERT (MEMCHR (input, 'c', n) == input + 2);
+        ASSERT (MEMCHR (input, 'c', n) == input + 2);
       }
   }
 
@@ -85,12 +76,12 @@ main (void)
     int i, j;
     for (i = 0; i < 32; i++)
       {
-	for (j = 0; j < 256; j++)
-	  input[i + j] = j;
-	for (j = 0; j < 256; j++)
-	  {
-	    ASSERT (MEMCHR (input + i, j, 256) == input + i + j);
-	  }
+        for (j = 0; j < 256; j++)
+          input[i + j] = j;
+        for (j = 0; j < 256; j++)
+          {
+            ASSERT (MEMCHR (input + i, j, 256) == input + i + j);
+          }
       }
   }
 
@@ -102,23 +93,23 @@ main (void)
 
     if (page_boundary != NULL)
       {
-	for (n = 1; n <= 500; n++)
-	  {
-	    char *mem = page_boundary - n;
-	    memset (mem, 'X', n);
-	    ASSERT (MEMCHR (mem, 'U', n) == NULL);
+        for (n = 1; n <= 500; n++)
+          {
+            char *mem = page_boundary - n;
+            memset (mem, 'X', n);
+            ASSERT (MEMCHR (mem, 'U', n) == NULL);
 
-	    {
-	      size_t i;
+            {
+              size_t i;
 
-	      for (i = 0; i < n; i++)
-		{
-		  mem[i] = 'U';
-		  ASSERT (MEMCHR (mem, 'U', 4000) == mem + i);
-		  mem[i] = 'X';
-		}
-	    }
-	  }
+              for (i = 0; i < n; i++)
+                {
+                  mem[i] = 'U';
+                  ASSERT (MEMCHR (mem, 'U', 4000) == mem + i);
+                  mem[i] = 'X';
+                }
+            }
+          }
       }
   }
 

@@ -1,5 +1,5 @@
 /* Substitute for and wrapper around <unistd.h>.
-   Copyright (C) 2003-2009 Free Software Foundation, Inc.
+   Copyright (C) 2003-2010 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -33,23 +33,43 @@
 #include <stddef.h>
 
 /* mingw doesn't define the SEEK_* or *_FILENO macros in <unistd.h>.  */
-#if !(defined SEEK_CUR && defined SEEK_END && defined SEEK_SET)
+/* Cygwin 1.7.1 declares symlinkat in <stdio.h>, not in <unistd.h>.  */
+/* But avoid namespace pollution on glibc systems.  */
+#if (!(defined SEEK_CUR && defined SEEK_END && defined SEEK_SET) \
+     || (@GNULIB_SYMLINKAT@ || defined GNULIB_POSIXCHECK)) \
+    && ! defined __GLIBC__
 # include <stdio.h>
+#endif
+
+/* Cygwin 1.7.1 declares unlinkat in <fcntl.h>, not in <unistd.h>.  */
+/* But avoid namespace pollution on glibc systems.  */
+#if (@GNULIB_UNLINKAT@ || defined GNULIB_POSIXCHECK) && ! defined __GLIBC__
+# include <fcntl.h>
 #endif
 
 /* mingw fails to declare _exit in <unistd.h>.  */
 /* mingw, BeOS, Haiku declare environ in <stdlib.h>, not in <unistd.h>.  */
-#include <stdlib.h>
+/* Solaris declares getcwd not only in <unistd.h> but also in <stdlib.h>.  */
+/* But avoid namespace pollution on glibc systems.  */
+#ifndef __GLIBC__
+# include <stdlib.h>
+#endif
 
-#if ((@GNULIB_WRITE@ && @REPLACE_WRITE@ && @GNULIB_UNISTD_H_SIGPIPE@)   \
-     || (@GNULIB_READLINK@ && (!@HAVE_READLINK@ || @REPLACE_READLINK@)) \
-     || (@GNULIB_READLINKAT@ && !@HAVE_READLINKAT@))
+/* mingw declares getcwd in <io.h>, not in <unistd.h>.  */
+#if ((@GNULIB_GETCWD@ || defined GNULIB_POSIXCHECK) \
+     && ((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__))
+# include <io.h>
+#endif
+
+#if (@GNULIB_WRITE@ || @GNULIB_READLINK@ || @GNULIB_READLINKAT@ \
+     || @GNULIB_PREAD@ || defined GNULIB_POSIXCHECK)
 /* Get ssize_t.  */
 # include <sys/types.h>
 #endif
 
-/* Get getopt(), optarg, optind, opterr, optopt.  */
-#if @GNULIB_UNISTD_H_GETOPT@ && !defined _GL_SYSTEM_GETOPT
+/* Get getopt(), optarg, optind, opterr, optopt.
+   But avoid namespace pollution on glibc systems.  */
+#if @GNULIB_UNISTD_H_GETOPT@ && !defined __GLIBC__ && !defined _GL_SYSTEM_GETOPT
 # include <getopt.h>
 #endif
 
@@ -59,42 +79,44 @@
 #  include <winsock2.h>
 #  if !defined _GL_SYS_SOCKET_H
 #   undef socket
-#   define socket		socket_used_without_including_sys_socket_h
+#   define socket               socket_used_without_including_sys_socket_h
 #   undef connect
-#   define connect		connect_used_without_including_sys_socket_h
+#   define connect              connect_used_without_including_sys_socket_h
 #   undef accept
-#   define accept		accept_used_without_including_sys_socket_h
+#   define accept               accept_used_without_including_sys_socket_h
 #   undef bind
-#   define bind			bind_used_without_including_sys_socket_h
+#   define bind                 bind_used_without_including_sys_socket_h
 #   undef getpeername
-#   define getpeername		getpeername_used_without_including_sys_socket_h
+#   define getpeername          getpeername_used_without_including_sys_socket_h
 #   undef getsockname
-#   define getsockname		getsockname_used_without_including_sys_socket_h
+#   define getsockname          getsockname_used_without_including_sys_socket_h
 #   undef getsockopt
-#   define getsockopt		getsockopt_used_without_including_sys_socket_h
+#   define getsockopt           getsockopt_used_without_including_sys_socket_h
 #   undef listen
-#   define listen		listen_used_without_including_sys_socket_h
+#   define listen               listen_used_without_including_sys_socket_h
 #   undef recv
-#   define recv			recv_used_without_including_sys_socket_h
+#   define recv                 recv_used_without_including_sys_socket_h
 #   undef send
-#   define send			send_used_without_including_sys_socket_h
+#   define send                 send_used_without_including_sys_socket_h
 #   undef recvfrom
-#   define recvfrom		recvfrom_used_without_including_sys_socket_h
+#   define recvfrom             recvfrom_used_without_including_sys_socket_h
 #   undef sendto
-#   define sendto		sendto_used_without_including_sys_socket_h
+#   define sendto               sendto_used_without_including_sys_socket_h
 #   undef setsockopt
-#   define setsockopt		setsockopt_used_without_including_sys_socket_h
+#   define setsockopt           setsockopt_used_without_including_sys_socket_h
 #   undef shutdown
-#   define shutdown		shutdown_used_without_including_sys_socket_h
+#   define shutdown             shutdown_used_without_including_sys_socket_h
 #  endif
 #  if !defined _GL_SYS_SELECT_H
 #   undef select
-#   define select		select_used_without_including_sys_select_h
+#   define select               select_used_without_including_sys_select_h
 #  endif
 # endif
 #endif
 
-/* The definition of GL_LINK_WARNING is copied here.  */
+/* The definition of _GL_ARG_NONNULL is copied here.  */
+
+/* The definition of _GL_WARN_ON_USE is copied here.  */
 
 
 /* OS/2 EMX lacks these macros.  */
@@ -135,15 +157,16 @@ extern "C" {
    Return 0 if successful, otherwise -1 and errno set.
    See the POSIX:2001 specification
    <http://www.opengroup.org/susv3xsh/chown.html>.  */
-extern int chown (const char *file, uid_t uid, gid_t gid);
+extern int chown (const char *file, uid_t uid, gid_t gid)
+     _GL_ARG_NONNULL ((1));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef chown
-# define chown(f,u,g) \
-    (GL_LINK_WARNING ("chown fails to follow symlinks on some systems and " \
-                      "doesn't treat a uid or gid of -1 on some systems - " \
-                      "use gnulib module chown for portability"), \
-     chown (f, u, g))
+# if HAVE_RAW_DECL_CHOWN
+_GL_WARN_ON_USE (chown, "chown fails to follow symlinks on some systems and "
+                 "doesn't treat a uid or gid of -1 on some systems - "
+                 "use gnulib module chown for portability");
+# endif
 #endif
 
 
@@ -159,10 +182,9 @@ extern int close (int);
 # define close close_used_without_requesting_gnulib_module_close
 #elif defined GNULIB_POSIXCHECK
 # undef close
-# define close(f) \
-    (GL_LINK_WARNING ("close does not portably work on sockets - " \
-                      "use gnulib module close for portability"), \
-     close (f))
+/* Assume close is always declared.  */
+_GL_WARN_ON_USE (close, "close does not portably work on sockets - "
+                 "use gnulib module close for portability");
 #endif
 
 
@@ -186,10 +208,10 @@ extern int dup2 (int oldfd, int newfd);
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef dup2
-# define dup2(o,n) \
-    (GL_LINK_WARNING ("dup2 is unportable - " \
-                      "use gnulib module dup2 for portability"), \
-     dup2 (o, n))
+# if HAVE_RAW_DECL_DUP2
+_GL_WARN_ON_USE (dup2, "dup2 is unportable - "
+                 "use gnulib module dup2 for portability");
+# endif
 #endif
 
 
@@ -208,10 +230,10 @@ extern int dup2 (int oldfd, int newfd);
 extern int dup3 (int oldfd, int newfd, int flags);
 #elif defined GNULIB_POSIXCHECK
 # undef dup3
-# define dup3(o,n,f) \
-    (GL_LINK_WARNING ("dup3 is unportable - " \
-                      "use gnulib module dup3 for portability"), \
-     dup3 (o, n, f))
+# if HAVE_RAW_DECL_DUP3
+_GL_WARN_ON_USE (dup3, "dup3 is unportable - "
+                 "use gnulib module dup3 for portability");
+# endif
 #endif
 
 
@@ -227,11 +249,17 @@ extern char **environ;
 #  endif
 # endif
 #elif defined GNULIB_POSIXCHECK
-# undef environ
-# define environ \
-    (GL_LINK_WARNING ("environ is unportable - " \
-                      "use gnulib module environ for portability"), \
-     environ)
+# if HAVE_RAW_DECL_ENVIRON
+static inline char ***
+rpl_environ (void)
+{
+  return &environ;
+}
+_GL_WARN_ON_USE (rpl_environ, "environ is unportable - "
+                 "use gnulib module environ for portability");
+#  undef environ
+#  define environ (*rpl_environ ())
+# endif
 #endif
 
 
@@ -239,27 +267,28 @@ extern char **environ;
 # if !@HAVE_EUIDACCESS@
 /* Like access(), except that it uses the effective user id and group id of
    the current process.  */
-extern int euidaccess (const char *filename, int mode);
+extern int euidaccess (const char *filename, int mode) _GL_ARG_NONNULL ((1));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef euidaccess
-# define euidaccess(f,m) \
-    (GL_LINK_WARNING ("euidaccess is unportable - " \
-                      "use gnulib module euidaccess for portability"), \
-     euidaccess (f, m))
+# if HAVE_RAW_DECL_EUIDACCESS
+_GL_WARN_ON_USE (euidaccess, "euidaccess is unportable - "
+                 "use gnulib module euidaccess for portability");
+# endif
 #endif
 
 
 #if @GNULIB_FACCESSAT@
 # if !@HAVE_FACCESSAT@
-int faccessat (int fd, char const *file, int mode, int flag);
+extern int faccessat (int fd, char const *file, int mode, int flag)
+     _GL_ARG_NONNULL ((2));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef faccessat
-# define faccessat(d,n,m,f)			    \
-    (GL_LINK_WARNING ("faccessat is not portable - " \
-                      "use gnulib module faccessat for portability"), \
-     faccessat (d, n, m, f))
+# if HAVE_RAW_DECL_FACCESSAT
+_GL_WARN_ON_USE (faccessat, "faccessat is not portable - "
+                 "use gnulib module faccessat for portability");
+# endif
 #endif
 
 
@@ -273,7 +302,8 @@ int faccessat (int fd, char const *file, int mode, int flag);
 extern int fchdir (int /*fd*/);
 
 /* Gnulib internal hooks needed to maintain the fchdir metadata.  */
-extern int _gl_register_fd (int fd, const char *filename);
+extern int _gl_register_fd (int fd, const char *filename)
+     _GL_ARG_NONNULL ((2));
 extern void _gl_unregister_fd (int fd);
 extern int _gl_register_dup (int oldfd, int newfd);
 extern const char *_gl_directory_name (int fd);
@@ -281,10 +311,10 @@ extern const char *_gl_directory_name (int fd);
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef fchdir
-# define fchdir(f) \
-    (GL_LINK_WARNING ("fchdir is unportable - " \
-                      "use gnulib module fchdir for portability"), \
-     fchdir (f))
+# if HAVE_RAW_DECL_FCHDIR
+_GL_WARN_ON_USE (fchdir, "fchdir is unportable - "
+                 "use gnulib module fchdir for portability");
+# endif
 #endif
 
 
@@ -294,14 +324,15 @@ extern const char *_gl_directory_name (int fd);
 #  define fchownat rpl_fchownat
 # endif
 # if !@HAVE_FCHOWNAT@ || @REPLACE_FCHOWNAT@
-extern int fchownat (int fd, char const *file, uid_t owner, gid_t group, int flag);
+extern int fchownat (int fd, char const *file, uid_t owner, gid_t group, int flag)
+     _GL_ARG_NONNULL ((2));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef fchownat
-# define fchownat(d,n,o,g,f)			    \
-    (GL_LINK_WARNING ("fchownat is not portable - " \
-                      "use gnulib module openat for portability"), \
-     fchownat (d, n, o, g, f))
+# if HAVE_RAW_DECL_FCHOWNAT
+_GL_WARN_ON_USE (fchownat, "fchownat is not portable - "
+                 "use gnulib module openat for portability");
+# endif
 #endif
 
 
@@ -315,10 +346,10 @@ extern int fsync (int fd);
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef fsync
-# define fsync(fd) \
-    (GL_LINK_WARNING ("fsync is unportable - " \
-                      "use gnulib module fsync for portability"), \
-     fsync (fd))
+# if HAVE_RAW_DECL_FSYNC
+_GL_WARN_ON_USE (fsync, "fsync is unportable - "
+                 "use gnulib module fsync for portability");
+# endif
 #endif
 
 
@@ -332,17 +363,14 @@ extern int ftruncate (int fd, off_t length);
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef ftruncate
-# define ftruncate(f,l) \
-    (GL_LINK_WARNING ("ftruncate is unportable - " \
-                      "use gnulib module ftruncate for portability"), \
-     ftruncate (f, l))
+# if HAVE_RAW_DECL_FTRUNCATE
+_GL_WARN_ON_USE (ftruncate, "ftruncate is unportable - "
+                 "use gnulib module ftruncate for portability");
+# endif
 #endif
 
 
 #if @GNULIB_GETCWD@
-/* Include the headers that might declare getcwd so that they will not
-   cause confusion if included after this file.  */
-# include <stdlib.h>
 # if @REPLACE_GETCWD@
 /* Get the name of the current working directory, and put it in SIZE bytes
    of BUF.
@@ -359,10 +387,10 @@ extern char * getcwd (char *buf, size_t size);
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef getcwd
-# define getcwd(b,s) \
-    (GL_LINK_WARNING ("getcwd is unportable - " \
-                      "use gnulib module getcwd for portability"), \
-     getcwd (b, s))
+# if HAVE_RAW_DECL_GETCWD
+_GL_WARN_ON_USE (getcwd, "getcwd is unportable - "
+                 "use gnulib module getcwd for portability");
+# endif
 #endif
 
 
@@ -378,14 +406,14 @@ extern char * getcwd (char *buf, size_t size);
    If the NIS domain name is longer than LEN, set errno = EINVAL and return -1.
    Return 0 if successful, otherwise set errno and return -1.  */
 # if !@HAVE_GETDOMAINNAME@
-extern int getdomainname(char *name, size_t len);
+extern int getdomainname(char *name, size_t len) _GL_ARG_NONNULL ((1));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef getdomainname
-# define getdomainname(n,l) \
-    (GL_LINK_WARNING ("getdomainname is unportable - " \
-                      "use gnulib module getdomainname for portability"), \
-     getdomainname (n, l))
+# if HAVE_RAW_DECL_GETDOMAINNAME
+_GL_WARN_ON_USE (getdomainname, "getdomainname is unportable - "
+                 "use gnulib module getdomainname for portability");
+# endif
 #endif
 
 
@@ -397,10 +425,10 @@ extern int getdtablesize (void);
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef getdtablesize
-# define getdtablesize() \
-    (GL_LINK_WARNING ("getdtablesize is unportable - " \
-                      "use gnulib module getdtablesize for portability"), \
-     getdtablesize ())
+# if HAVE_RAW_DECL_GETDTABLESIZE
+_GL_WARN_ON_USE (getdtablesize, "getdtablesize is unportable - "
+                 "use gnulib module getdtablesize for portability");
+# endif
 #endif
 
 
@@ -419,10 +447,10 @@ int getgroups (int n, gid_t *groups);
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef getgroups
-# define getgroups(n,g)                                                 \
-    (GL_LINK_WARNING ("getgroups is unportable - "                      \
-                      "use gnulib module getgroups for portability"),   \
-     getgroups (n, g))
+# if HAVE_RAW_DECL_GETGROUPS
+_GL_WARN_ON_USE (getgroups, "getgroups is unportable - "
+                 "use gnulib module getgroups for portability");
+# endif
 #endif
 
 
@@ -439,17 +467,40 @@ int getgroups (int n, gid_t *groups);
 #  define gethostname rpl_gethostname
 # endif
 # if @UNISTD_H_HAVE_WINSOCK2_H@ || !@HAVE_GETHOSTNAME@
-extern int gethostname(char *name, size_t len);
+extern int gethostname(char *name, size_t len) _GL_ARG_NONNULL ((1));
 # endif
 #elif @UNISTD_H_HAVE_WINSOCK2_H@
 # undef gethostname
 # define gethostname gethostname_used_without_requesting_gnulib_module_gethostname
 #elif defined GNULIB_POSIXCHECK
 # undef gethostname
-# define gethostname(n,l) \
-    (GL_LINK_WARNING ("gethostname is unportable - " \
-                      "use gnulib module gethostname for portability"), \
-     gethostname (n, l))
+# if HAVE_RAW_DECL_GETHOSTNAME
+_GL_WARN_ON_USE (gethostname, "gethostname is unportable - "
+                 "use gnulib module gethostname for portability");
+# endif
+#endif
+
+
+#if @GNULIB_GETLOGIN@
+/* Returns the user's login name, or NULL if it cannot be found.  Upon error,
+   returns NULL with errno set.
+
+   See <http://www.opengroup.org/susv3xsh/getlogin.html>.
+
+   Most programs don't need to use this function, because the information is
+   available through environment variables:
+     ${LOGNAME-$USER}        on Unix platforms,
+     $USERNAME               on native Windows platforms.
+ */
+# if !@HAVE_GETLOGIN@
+extern char *getlogin (void);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef getlogin
+# if HAVE_RAW_DECL_GETLOGIN
+_GL_WARN_ON_USE (getlogin, "getlogin is unportable - "
+                 "use gnulib module getlogin for portability");
+# endif
 #endif
 
 
@@ -462,16 +513,21 @@ extern int gethostname(char *name, size_t len);
    provided (this case is hopefully rare but is left open by the POSIX spec).
 
    See <http://www.opengroup.org/susv3xsh/getlogin.html>.
+
+   Most programs don't need to use this function, because the information is
+   available through environment variables:
+     ${LOGNAME-$USER}        on Unix platforms,
+     $USERNAME               on native Windows platforms.
  */
 # if !@HAVE_DECL_GETLOGIN_R@
-extern int getlogin_r (char *name, size_t size);
+extern int getlogin_r (char *name, size_t size) _GL_ARG_NONNULL ((1));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef getlogin_r
-# define getlogin_r(n,s) \
-    (GL_LINK_WARNING ("getlogin_r is unportable - " \
-                      "use gnulib module getlogin_r for portability"), \
-     getlogin_r (n, s))
+# if HAVE_RAW_DECL_GETLOGIN_R
+_GL_WARN_ON_USE (getlogin_r, "getlogin_r is unportable - "
+                 "use gnulib module getlogin_r for portability");
+# endif
 #endif
 
 
@@ -526,10 +582,10 @@ extern int getpagesize (void);
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef getpagesize
-# define getpagesize() \
-    (GL_LINK_WARNING ("getpagesize is unportable - " \
-                      "use gnulib module getpagesize for portability"), \
-     getpagesize ())
+# if HAVE_RAW_DECL_GETPAGESIZE
+_GL_WARN_ON_USE (getpagesize, "getpagesize is unportable - "
+                 "use gnulib module getpagesize for portability");
+# endif
 #endif
 
 
@@ -546,20 +602,20 @@ extern void endusershell (void);
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef getusershell
-# define getusershell() \
-    (GL_LINK_WARNING ("getusershell is unportable - " \
-                      "use gnulib module getusershell for portability"), \
-     getusershell ())
+# if HAVE_RAW_DECL_GETUSERSHELL
+_GL_WARN_ON_USE (getusershell, "getusershell is unportable - "
+                 "use gnulib module getusershell for portability");
+# endif
 # undef setusershell
-# define setusershell() \
-    (GL_LINK_WARNING ("setusershell is unportable - " \
-                      "use gnulib module getusershell for portability"), \
-     setusershell ())
+# if HAVE_RAW_DECL_SETUSERSHELL
+_GL_WARN_ON_USE (setusershell, "setusershell is unportable - "
+                 "use gnulib module getusershell for portability");
+# endif
 # undef endusershell
-# define endusershell() \
-    (GL_LINK_WARNING ("endusershell is unportable - " \
-                      "use gnulib module getusershell for portability"), \
-     endusershell ())
+# if HAVE_RAW_DECL_ENDUSERSHELL
+_GL_WARN_ON_USE (endusershell, "endusershell is unportable - "
+                 "use gnulib module getusershell for portability");
+# endif
 #endif
 
 
@@ -574,14 +630,15 @@ extern void endusershell (void);
    Return 0 if successful, otherwise -1 and errno set.
    See the POSIX:2001 specification
    <http://www.opengroup.org/susv3xsh/lchown.html>.  */
-extern int lchown (char const *file, uid_t owner, gid_t group);
+extern int lchown (char const *file, uid_t owner, gid_t group)
+     _GL_ARG_NONNULL ((1));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef lchown
-# define lchown(f,u,g) \
-    (GL_LINK_WARNING ("lchown is unportable to pre-POSIX.1-2001 " \
-                      "systems - use gnulib module lchown for portability"), \
-     lchown (f, u, g))
+# if HAVE_RAW_DECL_LCHOWN
+_GL_WARN_ON_USE (lchown, "lchown is unportable to pre-POSIX.1-2001 systems - "
+                 "use gnulib module lchown for portability");
+# endif
 #endif
 
 
@@ -594,14 +651,15 @@ extern int lchown (char const *file, uid_t owner, gid_t group);
    See POSIX:2001 specification
    <http://www.opengroup.org/susv3xsh/link.html>.  */
 # if !@HAVE_LINK@ || @REPLACE_LINK@
-extern int link (const char *path1, const char *path2);
+extern int link (const char *path1, const char *path2)
+     _GL_ARG_NONNULL ((1, 2));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef link
-# define link(path1,path2) \
-    (GL_LINK_WARNING ("link is unportable - " \
-                      "use gnulib module link for portability"), \
-     link (path1, path2))
+# if HAVE_RAW_DECL_LINK
+_GL_WARN_ON_USE (link, "link is unportable - "
+                 "use gnulib module link for portability");
+# endif
 #endif
 
 #if @GNULIB_LINKAT@
@@ -614,14 +672,15 @@ extern int link (const char *path1, const char *path2);
    Return 0 if successful, otherwise -1 and errno set.  */
 # if !@HAVE_LINKAT@ || @REPLACE_LINKAT@
 extern int linkat (int fd1, const char *path1, int fd2, const char *path2,
-		   int flag);
+                   int flag)
+     _GL_ARG_NONNULL ((2, 4));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef linkat
-# define link(f1,path1,f2,path2,f)		\
-    (GL_LINK_WARNING ("linkat is unportable - " \
-                      "use gnulib module linkat for portability"), \
-     linkat (f1, path1, f2, path2,f))
+# if HAVE_RAW_DECL_LINKAT
+_GL_WARN_ON_USE (linkat, "linkat is unportable - "
+                 "use gnulib module linkat for portability");
+# endif
 #endif
 
 #if @GNULIB_LSEEK@
@@ -635,10 +694,10 @@ extern int linkat (int fd1, const char *path1, int fd2, const char *path2,
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef lseek
-# define lseek(f,o,w) \
-    (GL_LINK_WARNING ("lseek does not fail with ESPIPE on pipes on some " \
-                      "systems - use gnulib module lseek for portability"), \
-     lseek (f, o, w))
+# if HAVE_RAW_DECL_LSEEK
+_GL_WARN_ON_USE (lseek, "lseek does not fail with ESPIPE on pipes on some "
+                 "systems - use gnulib module lseek for portability");
+# endif
 #endif
 
 
@@ -654,13 +713,34 @@ extern int linkat (int fd1, const char *path1, int fd2, const char *path2,
 # if @HAVE_PIPE2@
 #  define pipe2 rpl_pipe2
 # endif
-extern int pipe2 (int fd[2], int flags);
+extern int pipe2 (int fd[2], int flags) _GL_ARG_NONNULL ((1));
 #elif defined GNULIB_POSIXCHECK
 # undef pipe2
-# define pipe2(f,o) \
-    (GL_LINK_WARNING ("pipe2 is unportable - " \
-                      "use gnulib module pipe2 for portability"), \
-     pipe2 (f, o))
+# if HAVE_RAW_DECL_PIPE2
+_GL_WARN_ON_USE (pipe2, "pipe2 is unportable - "
+                 "use gnulib module pipe2 for portability");
+# endif
+#endif
+
+
+#if @GNULIB_PREAD@
+# if @REPLACE_PREAD@
+#  define pread rpl_pread
+# endif
+/* Read at most BUFSIZE bytes from FD into BUF, starting at OFFSET.
+   Return the number of bytes placed into BUF if successful, otherwise
+   set errno and return -1.  0 indicates EOF.  See the POSIX:2001
+   specification <http://www.opengroup.org/susv3xsh/pread.html>.  */
+# if !@HAVE_PREAD@ || @REPLACE_PREAD@
+  extern ssize_t pread (int fd, void *buf, size_t bufsize, off_t offset)
+       _GL_ARG_NONNULL ((2));
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef pread
+# if HAVE_RAW_DECL_PREAD
+_GL_WARN_ON_USE (pread, "pread is unportable - "
+                 "use gnulib module pread for portability");
+# endif
 #endif
 
 
@@ -674,27 +754,29 @@ extern int pipe2 (int fd[2], int flags);
    See the POSIX:2001 specification
    <http://www.opengroup.org/susv3xsh/readlink.html>.  */
 # if !@HAVE_READLINK@ || @REPLACE_READLINK@
-extern ssize_t readlink (const char *file, char *buf, size_t bufsize);
+extern ssize_t readlink (const char *file, char *buf, size_t bufsize)
+     _GL_ARG_NONNULL ((1, 2));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef readlink
-# define readlink(f,b,s) \
-    (GL_LINK_WARNING ("readlink is unportable - " \
-                      "use gnulib module readlink for portability"), \
-     readlink (f, b, s))
+# if HAVE_RAW_DECL_READLINK
+_GL_WARN_ON_USE (readlink, "readlink is unportable - "
+                 "use gnulib module readlink for portability");
+# endif
 #endif
 
 
 #if @GNULIB_READLINKAT@
 # if !@HAVE_READLINKAT@
-ssize_t readlinkat (int fd, char const *file, char *buf, size_t len);
+extern ssize_t readlinkat (int fd, char const *file, char *buf, size_t len)
+     _GL_ARG_NONNULL ((2, 3));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef readlinkat
-# define readlinkat(d,n,b,l)			     \
-    (GL_LINK_WARNING ("readlinkat is not portable - " \
-                      "use gnulib module symlinkat for portability"), \
-     readlinkat (d, n, b, l))
+# if HAVE_RAW_DECL_READLINKAT
+_GL_WARN_ON_USE (readlinkat, "readlinkat is not portable - "
+                 "use gnulib module symlinkat for portability");
+# endif
 #endif
 
 
@@ -702,31 +784,35 @@ ssize_t readlinkat (int fd, char const *file, char *buf, size_t len);
 # if @REPLACE_RMDIR@
 #  define rmdir rpl_rmdir
 /* Remove the directory DIR.  */
-extern int rmdir (char const *name);
+extern int rmdir (char const *name) _GL_ARG_NONNULL ((1));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef rmdir
-# define rmdir(n) \
-    (GL_LINK_WARNING ("rmdir is unportable - " \
-                      "use gnulib module rmdir for portability"), \
-     rmdir (n))
+# if HAVE_RAW_DECL_RMDIR
+_GL_WARN_ON_USE (rmdir, "rmdir is unportable - "
+                 "use gnulib module rmdir for portability");
+# endif
 #endif
 
 
 #if @GNULIB_SLEEP@
+# if @REPLACE_SLEEP@
+#  undef sleep
+#  define sleep rpl_sleep
+# endif
 /* Pause the execution of the current thread for N seconds.
    Returns the number of seconds left to sleep.
    See the POSIX:2001 specification
    <http://www.opengroup.org/susv3xsh/sleep.html>.  */
-# if !@HAVE_SLEEP@
+# if !@HAVE_SLEEP@ || @REPLACE_SLEEP@
 extern unsigned int sleep (unsigned int n);
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef sleep
-# define sleep(n) \
-    (GL_LINK_WARNING ("sleep is unportable - " \
-                      "use gnulib module sleep for portability"), \
-     sleep (n))
+# if HAVE_RAW_DECL_SLEEP
+_GL_WARN_ON_USE (sleep, "sleep is unportable - "
+                 "use gnulib module sleep for portability");
+# endif
 #endif
 
 
@@ -736,27 +822,29 @@ extern unsigned int sleep (unsigned int n);
 #  define symlink rpl_symlink
 # endif
 # if !@HAVE_SYMLINK@ || @REPLACE_SYMLINK@
-int symlink (char const *contents, char const *file);
+extern int symlink (char const *contents, char const *file)
+     _GL_ARG_NONNULL ((1, 2));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef symlink
-# define symlink(c,n)			     \
-    (GL_LINK_WARNING ("symlink is not portable - " \
-                      "use gnulib module symlink for portability"), \
-     symlink (c, n))
+# if HAVE_RAW_DECL_SYMLINK
+_GL_WARN_ON_USE (symlink, "symlink is not portable - "
+                 "use gnulib module symlink for portability");
+# endif
 #endif
 
 
 #if @GNULIB_SYMLINKAT@
 # if !@HAVE_SYMLINKAT@
-int symlinkat (char const *contents, int fd, char const *file);
+extern int symlinkat (char const *contents, int fd, char const *file)
+     _GL_ARG_NONNULL ((1, 3));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef symlinkat
-# define symlinkat(c,d,n)			     \
-    (GL_LINK_WARNING ("symlinkat is not portable - " \
-                      "use gnulib module symlinkat for portability"), \
-     symlinkat (c, d, n))
+# if HAVE_RAW_DECL_SYMLINKAT
+_GL_WARN_ON_USE (symlinkat, "symlinkat is not portable - "
+                 "use gnulib module symlinkat for portability");
+# endif
 #endif
 
 
@@ -764,14 +852,14 @@ int symlinkat (char const *contents, int fd, char const *file);
 # if @REPLACE_UNLINK@
 #  undef unlink
 #  define unlink rpl_unlink
-extern int unlink (char const *file);
+extern int unlink (char const *file) _GL_ARG_NONNULL ((1));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef unlink
-# define unlink(n)                         \
-    (GL_LINK_WARNING ("unlink is not portable - " \
-                      "use gnulib module unlink for portability"), \
-     unlink (n))
+# if HAVE_RAW_DECL_UNLINK
+_GL_WARN_ON_USE (unlink, "unlink is not portable - "
+                 "use gnulib module unlink for portability");
+# endif
 #endif
 
 
@@ -781,14 +869,35 @@ extern int unlink (char const *file);
 #  define unlinkat rpl_unlinkat
 # endif
 # if !@HAVE_UNLINKAT@ || @REPLACE_UNLINKAT@
-extern int unlinkat (int fd, char const *file, int flag);
+extern int unlinkat (int fd, char const *file, int flag) _GL_ARG_NONNULL ((2));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef unlinkat
-# define unlinkat(d,n,f)                         \
-    (GL_LINK_WARNING ("unlinkat is not portable - " \
-                      "use gnulib module openat for portability"), \
-     unlinkat (d, n, f))
+# if HAVE_RAW_DECL_UNLINKAT
+_GL_WARN_ON_USE (unlinkat, "unlinkat is not portable - "
+                 "use gnulib module openat for portability");
+# endif
+#endif
+
+
+#if @GNULIB_USLEEP@
+# if @REPLACE_USLEEP@
+#  undef usleep
+#  define usleep rpl_usleep
+# endif
+# if !@HAVE_USLEEP@ || @REPLACE_USLEEP@
+/* Pause the execution of the current thread for N microseconds.
+   Returns 0 on completion, or -1 on range error.
+   See the POSIX:2001 specification
+   <http://www.opengroup.org/susv3xsh/sleep.html>.  */
+extern int usleep (useconds_t n);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef usleep
+# if HAVE_RAW_DECL_USLEEP
+_GL_WARN_ON_USE (usleep, "usleep is unportable - "
+                 "use gnulib module usleep for portability");
+# endif
 #endif
 
 
@@ -798,7 +907,8 @@ extern int unlinkat (int fd, char const *file, int flag);
    <http://www.opengroup.org/susv3xsh/write.html>.  */
 # undef write
 # define write rpl_write
-extern ssize_t write (int fd, const void *buf, size_t count);
+extern ssize_t write (int fd, const void *buf, size_t count)
+     _GL_ARG_NONNULL ((2));
 #endif
 
 

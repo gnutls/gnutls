@@ -1,5 +1,5 @@
 /* Test of select() substitute.
-   Copyright (C) 2008-2009 Free Software Foundation, Inc.
+   Copyright (C) 2008-2010 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,6 +19,24 @@
 #include <config.h>
 
 #include <sys/select.h>
+
+#include "signature.h"
+SIGNATURE_CHECK (select, int, (int, fd_set *, fd_set *, fd_set *,
+                               struct timeval *));
+/* The following may be macros without underlying functions, so only
+   check signature if they are not macros.  */
+#ifndef FD_CLR
+SIGNATURE_CHECK (FD_CLR, void, (int, fd_set *));
+#endif
+#ifndef FD_ISSET
+SIGNATURE_CHECK (FD_ISSET, void, (int, fd_set *));
+#endif
+#ifndef FD_SET
+SIGNATURE_CHECK (FD_SET, int, (int, fd_set *));
+#endif
+#ifndef FD_ZERO
+SIGNATURE_CHECK (FD_ZERO, void, (fd_set *));
+#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -51,7 +69,7 @@ enum { SEL_IN = 1, SEL_OUT = 2, SEL_EXC = 4 };
 #define SO_REUSEPORT    SO_REUSEADDR
 #endif
 
-#define TEST_PORT	12345
+#define TEST_PORT       12345
 
 
 /* Minimal testing infrastructure.  */

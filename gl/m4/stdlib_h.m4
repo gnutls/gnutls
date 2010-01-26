@@ -1,5 +1,5 @@
-# stdlib_h.m4 serial 21
-dnl Copyright (C) 2007-2009 Free Software Foundation, Inc.
+# stdlib_h.m4 serial 22
+dnl Copyright (C) 2007-2010 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -22,6 +22,20 @@ AC_DEFUN([gl_STDLIB_H],
       # include <random.h>
       #endif
     ]])
+
+  dnl Check for declarations of anything we want to poison if the
+  dnl corresponding gnulib module is not in use, and which is not
+  dnl guaranteed by C89.
+  gl_WARN_ON_USE_PREPARE([[#include <stdlib.h>
+#if HAVE_SYS_LOADAVG_H
+# include <sys/loadavg.h>
+#endif
+#if HAVE_RANDOM_H
+# include <random.h>
+#endif
+    ]], [atoll canonicalize_file_name getloadavg getsubopt mkdtemp
+    mkostemp mkostemps mkstemp mkstemps random_r initstat_r srandom_r
+    setstate_r realpath rpmatch setenv strtod strtoll strtoull unsetenv])
 ])
 
 AC_DEFUN([gl_STDLIB_MODULE_INDICATOR],
@@ -80,6 +94,7 @@ AC_DEFUN([gl_STDLIB_H_DEFAULTS],
   REPLACE_MKSTEMP=0;         AC_SUBST([REPLACE_MKSTEMP])
   REPLACE_PUTENV=0;          AC_SUBST([REPLACE_PUTENV])
   REPLACE_REALPATH=0;        AC_SUBST([REPLACE_REALPATH])
+  REPLACE_SETENV=0;          AC_SUBST([REPLACE_SETENV])
   REPLACE_STRTOD=0;          AC_SUBST([REPLACE_STRTOD])
-  VOID_UNSETENV=0;           AC_SUBST([VOID_UNSETENV])
+  REPLACE_UNSETENV=0;        AC_SUBST([REPLACE_UNSETENV])
 ])

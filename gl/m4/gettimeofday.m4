@@ -1,6 +1,6 @@
 # serial 12
 
-# Copyright (C) 2001-2003, 2005, 2007, 2009 Free Software Foundation, Inc.
+# Copyright (C) 2001-2003, 2005, 2007, 2009-2010 Free Software Foundation, Inc.
 # This file is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -17,16 +17,16 @@ AC_DEFUN([gl_FUNC_GETTIMEOFDAY],
     [gl_cv_func_gettimeofday_posix_signature],
     [AC_COMPILE_IFELSE(
        [AC_LANG_PROGRAM(
-	  [[#include <sys/time.h>
-	    struct timeval c;
-	  ]],
-	  [[
-	    int (*f) (struct timeval *restrict, void *restrict) = gettimeofday;
-	    int x = f (&c, 0);
-	    return !(x | c.tv_sec | c.tv_usec);
-	  ]])],
-	[gl_cv_func_gettimeofday_posix_signature=yes],
-	[gl_cv_func_gettimeofday_posix_signature=no])])
+          [[#include <sys/time.h>
+            struct timeval c;
+          ]],
+          [[
+            int (*f) (struct timeval *restrict, void *restrict) = gettimeofday;
+            int x = f (&c, 0);
+            return !(x | c.tv_sec | c.tv_usec);
+          ]])],
+        [gl_cv_func_gettimeofday_posix_signature=yes],
+        [gl_cv_func_gettimeofday_posix_signature=no])])
 
   gl_FUNC_GETTIMEOFDAY_CLOBBER
 
@@ -56,21 +56,21 @@ AC_DEFUN([gl_FUNC_GETTIMEOFDAY_CLOBBER],
   [gl_cv_func_gettimeofday_clobber],
   [AC_RUN_IFELSE(
      [AC_LANG_PROGRAM(
-	[[#include <string.h>
-	  #include <sys/time.h>
-	  #include <time.h>
-	  #include <stdlib.h>
-	]],
-	[[
-	  time_t t = 0;
-	  struct tm *lt;
-	  struct tm saved_lt;
-	  struct timeval tv;
-	  lt = localtime (&t);
-	  saved_lt = *lt;
-	  gettimeofday (&tv, NULL);
-	  return memcmp (lt, &saved_lt, sizeof (struct tm)) != 0;
-	]])],
+        [[#include <string.h>
+          #include <sys/time.h>
+          #include <time.h>
+          #include <stdlib.h>
+        ]],
+        [[
+          time_t t = 0;
+          struct tm *lt;
+          struct tm saved_lt;
+          struct timeval tv;
+          lt = localtime (&t);
+          saved_lt = *lt;
+          gettimeofday (&tv, NULL);
+          return memcmp (lt, &saved_lt, sizeof (struct tm)) != 0;
+        ]])],
      [gl_cv_func_gettimeofday_clobber=no],
      [gl_cv_func_gettimeofday_clobber=yes],
      dnl When crosscompiling, assume it is broken.

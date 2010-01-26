@@ -1,6 +1,6 @@
 #! /bin/sh
 # Test suite for version-etc.
-# Copyright (C) 2009 Free Software Foundation, Inc.
+# Copyright (C) 2009, 2010 Free Software Foundation, Inc.
 # This file is part of the GNUlib Library.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -33,7 +33,8 @@ EOT
 
 ./test-version-etc${EXEEXT} --version |
  sed '1s/test-version-etc (.*) .*/test-version-etc (PROJECT) VERSION/
-      2s/Copyright (C) [0-9]\{4,4\}/COPYRIGHT/' |
+      /^Packaged by/d
+      2,3 s/Copyright (C) [0-9]\{4,4\}/COPYRIGHT/' |
  tr -d '\015' |
  diff -c $TMP - || ERR=1
 

@@ -1,5 +1,5 @@
-# sys_stat_h.m4 serial 21   -*- Autoconf -*-
-dnl Copyright (C) 2006-2009 Free Software Foundation, Inc.
+# sys_stat_h.m4 serial 22   -*- Autoconf -*-
+dnl Copyright (C) 2006-2010 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -27,6 +27,11 @@ AC_DEFUN([gl_HEADER_SYS_STAT_H],
     [#include <sys/types.h>
      #include <sys/stat.h>])
 
+  dnl Check for declarations of anything we want to poison if the
+  dnl corresponding gnulib module is not in use.
+  gl_WARN_ON_USE_PREPARE([[#include <sys/stat.h>
+    ]], [fchmodat fstatat futimens lchmod lstat mkdirat mkfifo mkfifoat
+    mknod mknodat stat utimensat])
 ]) # gl_HEADER_SYS_STAT_H
 
 AC_DEFUN([gl_SYS_STAT_MODULE_INDICATOR],

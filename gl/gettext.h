@@ -1,5 +1,6 @@
 /* Convenience header for conditional use of GNU <libintl.h>.
-   Copyright (C) 1995-1998, 2000-2002, 2004-2006, 2009 Free Software Foundation, Inc.
+   Copyright (C) 1995-1998, 2000-2002, 2004-2006, 2009-2010 Free Software
+   Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -140,8 +141,8 @@ inline
 #endif
 static const char *
 pgettext_aux (const char *domain,
-	      const char *msg_ctxt_id, const char *msgid,
-	      int category)
+              const char *msg_ctxt_id, const char *msgid,
+              int category)
 {
   const char *translation = dcgettext (domain, msg_ctxt_id, category);
   if (translation == msg_ctxt_id)
@@ -159,9 +160,9 @@ inline
 #endif
 static const char *
 npgettext_aux (const char *domain,
-	       const char *msg_ctxt_id, const char *msgid,
-	       const char *msgid_plural, unsigned long int n,
-	       int category)
+               const char *msg_ctxt_id, const char *msgid,
+               const char *msgid_plural, unsigned long int n,
+               int category)
 {
   const char *translation =
     dcngettext (domain, msg_ctxt_id, msgid_plural, n, category);
