@@ -42,6 +42,9 @@ Reported by and tiny patch from Vitaly Mayatskikh
 
 ** minitasn1: Upgraded to libtasn1 version 2.4.
 
+** i18n: Added Czech translation.
+Thanks to Petr Pisar.
+
 ** API and ABI modifications:
 gnutls_cipher_decrypt: Added
 gnutls_cipher_deinit: Added
