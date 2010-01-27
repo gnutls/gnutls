@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Free Software Foundation
+ * Copyright (C) 2009 Free Software Foundation, Inc.
  *
  * This file is part of GNUTLS.
  *

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Free Software Foundation
+ * Copyright (C) 2007 Free Software Foundation, Inc.
  * Author: Ludovic Courtès, Timo Schulz
  *
  * This file is part of GNUTLS.

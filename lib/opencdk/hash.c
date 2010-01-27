@@ -1,5 +1,5 @@
 /* hash.c - Hash filters
- * Copyright (C) 2002, 2003, 2007, 2008 Free Software Foundation
+ * Copyright (C) 2002, 2003, 2007, 2008 Free Software Foundation, Inc.
  *
  * Author: Timo Schulz
  *

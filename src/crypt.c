@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Simon Josefsson
  * Copyright (C) 2001,2003 Nikos Mavrogiannopoulos
- * Copyright (C) 2004 Free Software Foundation
+ * Copyright (C) 2004 Free Software Foundation, Inc.
  *
  * This file is part of GNUTLS.
  *

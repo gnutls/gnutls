@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2008 Free Software Foundation
+ * Copyright (C) 2006, 2008 Free Software Foundation, Inc.
  *
  * Author: Simon Josefsson
  *
