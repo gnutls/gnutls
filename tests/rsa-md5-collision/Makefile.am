@@ -22,7 +22,7 @@
 EXTRA_DIST = MD5CollisionCA.cer \
 	TargetCollidingCertificate1.cer \
 	TargetCollidingCertificate2.cer \
-	README mbox
+	README
 
 dist_check_SCRIPTS = rsa-md5-collision
 
