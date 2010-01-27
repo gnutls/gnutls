@@ -1,7 +1,7 @@
 ;;; Help produce Guile wrappers for GnuTLS types.
 ;;;
 ;;; GNUTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007  Free Software Foundation, Inc.
+;;; Copyright (C) 2007, 2010 Free Software Foundation, Inc.
 ;;;
 ;;; GNUTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public

@@ -1,5 +1,6 @@
 /* literal.c - Literal packet filters
- * Copyright (C) 2002, 2003, 2008, 2009 Free Software Foundation, Inc.
+ * Copyright (C) 2002, 2003, 2008, 2009, 2010 Free Software Foundation,
+ * Inc.
  *
  * Author: Timo Schulz
  *

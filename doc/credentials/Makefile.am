@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2007 Free Software Foundation, Inc.
+# Copyright (C) 2007, 2010 Free Software Foundation, Inc.
 #
 # Author: Simon Josefsson
 #
