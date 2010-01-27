@@ -1,7 +1,6 @@
 /*
- * Copyright (C) 2004, 2006, 2007, 2008, 2009, 2010 Free Software
- * Foundation, Inc.
- * Copyright (C) 2002  Fabio Fiorina
+ * Copyright (C) 2002, 2004, 2006, 2007, 2008, 2009, 2010 Free
+ * Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -671,7 +670,7 @@ _asn1_expand_identifier (ASN1_TYPE * node, ASN1_TYPE root)
   * Creates a structure of type @source_name.  Example using
   *  "pkix.asn":
   *
-  * rc = asn1_create_structure(cert_def, "PKIX1.Certificate",
+  * rc = asn1_create_element(cert_def, "PKIX1.Certificate",
   * certptr);
   *
   * Returns:

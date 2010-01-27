@@ -1,6 +1,6 @@
 /*
- *      Copyright (C) 2004, 2006, 2008, 2009 Free Software Foundation, Inc.
- *      Copyright (C) 2002 Fabio Fiorina
+ * Copyright (C) 2002, 2004, 2006, 2008, 2009, 2010 Free Software
+ * Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -288,20 +288,18 @@ _asn1_get_objectid_der (const unsigned char *der, int der_len, int *ret_len,
   leading = 1;
   for (k = 1; k < len; k++)
     {
-
+      
 
       /* X.690 mandates that the leading byte must never be 0x80
        */
-      if (leading != 0 && der[len_len + k] == 0x80)
-	return ASN1_DER_ERROR;
+      if (leading != 0 && der[len_len + k] == 0x80) return ASN1_DER_ERROR;
       leading = 0;
 
       /* check for wrap around */
       val = val << 7;
       val |= der[len_len + k] & 0x7F;
 
-      if (val < prev_val)
-	return ASN1_DER_ERROR;
+      if (val < prev_val) return ASN1_DER_ERROR;
 
       prev_val = val;
 
@@ -315,7 +313,7 @@ _asn1_get_objectid_der (const unsigned char *der, int der_len, int *ret_len,
 	}
     }
   *ret_len = len + len_len;
-
+  
   return ASN1_SUCCESS;
 }
 
@@ -808,8 +806,8 @@ _asn1_get_indefinite_length_string (const unsigned char *der, int *len)
   *   error occurred.
   *
   * Fill the structure *ELEMENT with values of a DER encoding
-  * string. The sructure must just be created with function
-  * 'create_stucture'.  If an error occurs during the decoding
+  * string. The structure must just be created with function
+  * 'asn1_create_element'.  If an error occurs during the decoding
   * procedure, the *ELEMENT is deleted and set equal to
   * %ASN1_TYPE_EMPTY.
   *
@@ -1056,9 +1054,8 @@ asn1_der_decoding (ASN1_TYPE * element, const void *ider, int len,
 	      move = RIGHT;
 	      break;
 	    case TYPE_OBJECT_ID:
-	      result =
-		_asn1_get_objectid_der (der + counter, len - counter, &len2,
-					temp, sizeof (temp));
+	      result = _asn1_get_objectid_der (der + counter, len - counter, &len2,
+				      temp, sizeof (temp));
 	      if (result != ASN1_SUCCESS)
 		{
 		  asn1_delete_structure (element);
@@ -1367,8 +1364,8 @@ asn1_der_decoding (ASN1_TYPE * element, const void *ider, int len,
   *   error occurred.
   *
   * Fill the element named ELEMENTNAME with values of a DER encoding
-  * string.  The sructure must just be created with function
-  * 'create_stucture'.  The DER vector must contain the encoding
+  * string.  The structure must just be created with function
+  * 'asn1_create_element'.  The DER vector must contain the encoding
   * string of the whole STRUCTURE.  If an error occurs during the
   * decoding procedure, the *STRUCTURE is deleted and set equal to
   * %ASN1_TYPE_EMPTY.
@@ -1673,13 +1670,12 @@ asn1_der_decoding_element (ASN1_TYPE * structure, const char *elementName,
 	    case TYPE_OBJECT_ID:
 	      if (state == FOUND)
 		{
-		  result =
-		    _asn1_get_objectid_der (der + counter, len - counter,
-					    &len2, temp, sizeof (temp));
-		  if (result != ASN1_SUCCESS)
-		    {
-		      return result;
-		    }
+		  result = _asn1_get_objectid_der (der + counter, len - counter, &len2,
+					  temp, sizeof (temp));
+                  if (result != ASN1_SUCCESS)
+                  {
+		    return result;
+                  }
 
 		  tlen = strlen (temp);
 

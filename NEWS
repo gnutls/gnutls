@@ -40,6 +40,8 @@ Reported by and tiny patch from Vitaly Mayatskikh
 <v.mayatskih@gmail.com> in
 <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/4096>.
 
+** minitasn1: Upgraded to libtasn1 version 2.4.
+
 ** API and ABI modifications:
 gnutls_cipher_decrypt: Added
 gnutls_cipher_deinit: Added
