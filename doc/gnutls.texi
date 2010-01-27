@@ -17,7 +17,7 @@
 This manual is last updated @value{UPDATED} for version
 @value{VERSION} of GNU TLS.
 
-Copyright @copyright{} 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+Copyright @copyright{} 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 
 @quotation
 Permission is granted to copy, distribute and/or modify this document
@@ -2353,14 +2353,14 @@ source is configured.  To solve this problem, the library uses the
 external package @command{pkg-config} that knows the path to the
 include file and other configuration options.  The options that need
 to be added to the compiler invocation at compile time are output by
-the @option{--cflags} option to @command{pkg-config libgnutls}.  The
+the @option{--cflags} option to @command{pkg-config gnutls}.  The
 following example shows how it can be used at the command line:
 
 @example
-gcc -c foo.c `pkg-config libgnutls --cflags`
+gcc -c foo.c `pkg-config gnutls --cflags`
 @end example
 
-Adding the output of @samp{pkg-config libgnutls --cflags} to the
+Adding the output of @samp{pkg-config gnutls --cflags} to the
 compilers command line will ensure that the compiler can find the
 @file{gnutls/gnutls.h} header file.
 
@@ -2368,21 +2368,21 @@ A similar problem occurs when linking the program with the library.
 Again, the compiler has to find the library files.  For this to work,
 the path to the library files has to be added to the library search
 path (via the @option{-L} option).  For this, the option
-@option{--libs} to @command{pkg-config libgnutls} can be used.  For
+@option{--libs} to @command{pkg-config gnutls} can be used.  For
 convenience, this option also outputs all other options that are
 required to link the program with the libarary (for instance, the
 @samp{-ltasn1} option).  The example shows how to link @file{foo.o}
 with the library to a program @command{foo}.
 
 @example
-gcc -o foo foo.o `pkg-config libgnutls --libs`
+gcc -o foo foo.o `pkg-config gnutls --libs`
 @end example
 
 Of course you can also combine both examples to a single command by
 specifying both options to @command{pkg-config}:
 
 @example
-gcc -o foo foo.c `pkg-config libgnutls --cflags --libs`
+gcc -o foo foo.c `pkg-config gnutls --cflags --libs`
 @end example
 
 @node Multi-threaded applications
