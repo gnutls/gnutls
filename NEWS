@@ -35,6 +35,11 @@ now different than previous gnutls releases.
 
 ** certtool: New option --no-crq-extensions to avoid extensions in CSRs.
 
+** gnutls-cli: Handle reading binary data from server.
+Reported by and tiny patch from Vitaly Mayatskikh
+<v.mayatskih@gmail.com> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/4096>.
+
 ** API and ABI modifications:
 gnutls_cipher_decrypt: Added
 gnutls_cipher_deinit: Added

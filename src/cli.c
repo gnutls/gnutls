@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
  * Copyright (C) 2000,2001,2002,2003 Nikos Mavrogiannopoulos
  *
  * This file is part of GNUTLS.
@@ -606,6 +606,7 @@ main (int argc, char **argv)
   struct timeval tv;
   int user_term = 0, retval = 0;
   socket_st hd;
+  ssize_t bytes;
 
   set_program_name (argv[0]);
 
@@ -817,7 +818,7 @@ after_handshake:
 
       if (FD_ISSET (fileno (stdin), &rset))
 	{
-	  if (fgets (buffer, MAX_BUF, stdin) == NULL)
+	  if ((bytes = read (fileno(stdin), buffer, MAX_BUF - 1)) < 0)
 	    {
 	      if (hd.secure == 0)
 		{
@@ -847,10 +848,13 @@ after_handshake:
 	    {
 	      char *b = strchr (buffer, '\n');
 	      if (b != NULL)
-		strcpy (b, "\r\n");
+		{
+		  strcpy (b, "\r\n");
+		  bytes++;
+		}
 	    }
 
-	  ret = socket_send (&hd, buffer, strlen (buffer));
+	  ret = socket_send (&hd, buffer, bytes);
 
 	  if (ret > 0)
 	    {
