@@ -1,0 +1,198 @@
+To: help-gnutls@gnu.org, gnutls-devel@gnu.org, info-gnu@gnu.org
+Subject: GnuTLS 2.8.5
+<#part sign=pgpmime>
+
+We are proud to announce a new stable GnuTLS release: Version 2.8.5.
+
+GnuTLS is a modern C library that implements the standard network
+security protocol Transport Layer Security (TLS), for use by network
+applications.  GnuTLS is developed for GNU/Linux, but works on many
+Unix-like systems and comes with a binary installer for Windows.
+
+The GnuTLS library is distributed under the terms of the GNU Lesser
+General Public License version 2.1 (or later).  The "extra" GnuTLS
+library (which contains TLS/IA support, LZO compression and Libgcrypt
+FIPS-mode handler), the OpenSSL compatibility library, the self tests
+and the command line tools are all distributed under the GNU General
+Public License version 3.0 (or later).  The manual is distributed
+under the GNU Free Documentation License version 1.3 (or later).
+
+The project page of the library is available at:
+  http://www.gnu.org/software/gnutls/
+
+What's New
+==========
+
+** libgnutls: In server side when resuming a session do not overwrite the 
+** initial session data with the resumed session data.
+
+** libgnutls: Fix PKCS#12 encoding.
+The error you would get was "The OID is not supported.".  Problem
+introduced for the v2.8.x branch in 2.7.6.
+
+** guile: Compatibility with guile 2.x.
+By Ludovic Courtes <ludovic.courtes@laas.fr>.
+
+** tests: Fix expired cert in chainverify self-test.
+
+** tests: Fix time bomb in chainverify self-test.
+Reported by Andreas Metzler <ametzler@downhill.at.eu.org> in
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3925>.
+
+** API and ABI modifications:
+No changes since last version.
+
+Getting the Software
+====================
+
+GnuTLS may be downloaded from one of the mirror sites or direct from
+<ftp://ftp.gnu.org/gnu/gnutls/>.  The list of mirrors can be found at
+<http://www.gnu.org/software/gnutls/download.html>.
+
+Here are the BZIP2 compressed sources (6.0MB):
+
+  ftp://ftp.gnu.org/gnu/gnutls/gnutls-2.8.5.tar.bz2
+  http://ftp.gnu.org/gnu/gnutls/gnutls-2.8.5.tar.bz2
+
+Here are OpenPGP detached signatures signed using key 0xB565716F:
+
+  ftp://ftp.gnu.org/gnu/gnutls/gnutls-2.8.5.tar.bz2.sig
+  http://ftp.gnu.org/gnu/gnutls/gnutls-2.8.5.tar.bz2.sig
+
+Note, that we don't distribute gzip compressed tarballs.
+
+In order to check that the version of GnuTLS which you are going to
+install is an original and unmodified one, you should verify the OpenPGP
+signature.  You can use the command
+
+     gpg --verify gnutls-2.8.5.tar.bz2.sig
+
+This checks whether the signature file matches the source file.  You
+should see a message indicating that the signature is good and made by
+that signing key.  Make sure that you have the right key, either by
+checking the fingerprint of that key with other sources or by checking
+that the key has been signed by a trustworthy other key.  The signing
+key can be identified with the following information:
+
+pub   1280R/B565716F 2002-05-05 [expires: 2010-04-21]
+      Key fingerprint = 0424 D4EE 81A0 E3D1 19C6  F835 EDA2 1E94 B565 716F
+uid                  Simon Josefsson <simon@josefsson.org>
+uid                  Simon Josefsson <jas@extundo.com>
+sub   1280R/4D5D40AE 2002-05-05 [expires: 2010-04-21]
+
+The key is available from:
+  http://josefsson.org/key.txt
+  dns:b565716f.josefsson.org?TYPE=CERT
+
+Alternatively, after successfully verifying the OpenPGP signature of
+this announcement, you could verify that the files match the following
+checksum values.  The values are for SHA-1 and SHA-224 respectively:
+
+5121c52efd4718ad3d8b641d28343b0c6abaa571  gnutls-2.8.5.tar.bz2
+9d6f1906e380cc7366e2427493c33b72a137e438cdc9080fba3d84f6  gnutls-2.8.5.tar.bz2
+
+Documentation
+=============
+
+The manual is available online at:
+
+  http://www.gnu.org/software/gnutls/documentation.html
+
+In particular the following formats are available:
+
+ HTML: http://www.gnu.org/software/gnutls/manual/html_node/index.html
+ PDF: http://www.gnu.org/software/gnutls/manual/gnutls.pdf
+
+For developers there is a GnuTLS API reference manual formatted using
+the GTK-DOC tools:
+
+  http://www.gnu.org/software/gnutls/reference/gnutls-gnutls.html
+
+For developers interested in improving code quality, we publish
+Cyclomatic code complexity charts that help you find code that may need
+review and improvements:
+
+  http://www.gnu.org/software/gnutls/cyclo/
+
+Also useful are code coverage charts which indicate parts of the source
+code that needs to be tested better by the included self-tests:
+
+  http://www.gnu.org/software/gnutls/coverage/
+
+Community
+=========
+
+If you need help to use GnuTLS, or want to help others, you are invited
+to join our help-gnutls mailing list, see:
+
+  http://lists.gnu.org/mailman/listinfo/help-gnutls
+
+If you wish to participate in the development of GnuTLS, you are invited
+to join our gnutls-dev mailing list, see:
+
+  http://lists.gnu.org/mailman/listinfo/gnutls-devel
+
+Windows installer
+=================
+
+GnuTLS has been ported to the Windows operating system, and a binary
+installer is available.  The installer contains DLLs for application
+development, manuals, examples, and source code.  The installer includes
+libgpg-error v1.7, libgcrypt v1.4.4, libtasn1 v2.3, and GnuTLS v2.8.5.
+
+For more information about GnuTLS for Windows:
+  http://josefsson.org/gnutls4win/
+
+The Windows binary installer and PGP signature:
+  http://josefsson.org/gnutls4win/gnutls-2.8.5.exe (15MB)
+  http://josefsson.org/gnutls4win/gnutls-2.8.5.exe.sig
+
+The checksum values for SHA-1 and SHA-224 are:
+
+5dadd78a630f30d3b4b3a34261068e74cba28d80  gnutls-2.8.5.exe
+53af38a54ff2f971d9eecfb44f4ab39cc6dbad371ad6425d312eaccd  gnutls-2.8.5.exe
+
+A ZIP archive containing the Windows binaries:
+  http://josefsson.org/gnutls4win/gnutls-2.8.5.zip (5.3MB)
+  http://josefsson.org/gnutls4win/gnutls-2.8.5.zip.sig
+
+The checksum values for SHA-1 and SHA-224 are:
+
+b41c0ac3088620bf78996d719b335317cb90405a  gnutls-2.8.5.zip
+73ca7da90ebac569948114735d6899a08431ebbe15be3d619bec05a3  gnutls-2.8.5.zip
+
+A Debian mingw32 package is also available:
+  http://josefsson.org/gnutls4win/mingw32-gnutls_2.8.5-1_all.deb (4.8MB)
+
+The checksum values for SHA-1 and SHA-224 are:
+
+4ecb2e7617d8722d090ec96138ce595647c06a82  mingw32-gnutls_2.8.5-1_all.deb
+cbdd418aea622dfaf9876f563ebc1e192ec0ab90bca8748277501e76  mingw32-gnutls_2.8.5-1_all.deb
+
+Internationalization
+====================
+
+The GnuTLS library messages have been translated into Czech, Dutch,
+French, German, Malay, Polish, Swedish, and Vietnamese.  We welcome the
+addition of more translations.
+
+Support
+=======
+
+Improving GnuTLS is costly, but you can help!  We are looking for
+organizations that find GnuTLS useful and wish to contribute back.  You
+can contribute by reporting bugs, improve the software, or donate money
+or equipment.
+
+Commercial support contracts for GnuTLS are available, and they help
+finance continued maintenance.  Simon Josefsson Datakonsult AB, a
+Stockholm based privately held company, is currently funding GnuTLS
+maintenance.  We are always looking for interesting development
+projects.  See http://josefsson.org/ for more details.
+
+The GnuTLS service directory is available at:
+
+  http://www.gnu.org/software/gnutls/commercial.html
+
+Happy Hacking,
+Simon
