@@ -754,6 +754,7 @@ error:
 /* Format: 
  *      1 byte the credentials type
  *      4 bytes the size of the whole structure
+ *
  *      4 bytes the size of the PSK username (x)
  *      x bytes the PSK username
  *      2 bytes the size of secret key in bits
@@ -776,9 +777,10 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
     {
       username_size = strlen (info->username) + 1;	/* include the terminating null */
       hint_size = strlen (info->hint) + 1;	/* include the terminating null */
-      pack_size = username_size + hint_size +
-	2 + 4 * 3 + info->dh.prime.size + info->dh.generator.size +
-	info->dh.public_key.size;
+
+      pack_size = 1 + 4 + 4 + username_size + 4 + hint_size +
+        + 2 + 4 + info->dh.prime.size + 4 + info->dh.generator.size +
+	4 + info->dh.public_key.size;
     }
   else
     pack_size = 0;
@@ -805,7 +807,6 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
 
   _gnutls_write_uint32 (pack_size, &packed_session->data[pos]);
   pos += 4;
-
 
   if (pack_size > 0)
     {
