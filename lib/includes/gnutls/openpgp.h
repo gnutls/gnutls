@@ -40,10 +40,18 @@ extern "C"
 /* Openpgp certificate stuff
  */
 
+/**
+ * gnutls_openpgp_crt_fmt_t:
+ * @GNUTLS_OPENPGP_FMT_RAW: OpenPGP certificate in raw format.
+ * @GNUTLS_OPENPGP_FMT_BASE64: OpenPGP certificate in base64 format.
+ *
+ * Enumeration of different OpenPGP key formats.
+ */
   typedef enum gnutls_openpgp_crt_fmt
-  { GNUTLS_OPENPGP_FMT_RAW,
-    GNUTLS_OPENPGP_FMT_BASE64
-  } gnutls_openpgp_crt_fmt_t;
+    {
+      GNUTLS_OPENPGP_FMT_RAW,
+      GNUTLS_OPENPGP_FMT_BASE64
+    } gnutls_openpgp_crt_fmt_t;
 
   typedef unsigned char gnutls_openpgp_keyid_t[8];
 
