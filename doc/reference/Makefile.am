@@ -95,6 +95,9 @@ IGNORE_HFILES += alignof.h alloca.h alloca.in.h arg-nonnull.h		\
 	time.h time.in.h unistd.h unistd.in.h w32sock.h warn-on-use.h	\
 	vasnprintf.h wchar.h wchar.in.h xsize.h
 
+# cd lib/gl/sys/ && echo *.h
+IGNORE_HFILES += socket.h stat.h
+
 # cd lib/minitasn1/ && echo *.h
 IGNORE_HFILES += element.h gstr.h int.h parser_aux.h structure.h
 
