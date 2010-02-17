@@ -126,17 +126,16 @@ cleanup:
 }
 
 /**
-  * gnutls_pkcs12_init - This function initializes a gnutls_pkcs12_t structure
-  * @pkcs12: The structure to be initialized
-  *
-  * This function will initialize a PKCS12 structure. PKCS12 structures
-  * usually contain lists of X.509 Certificates and X.509 Certificate
-  * revocation lists.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_pkcs12_init - This function initializes a gnutls_pkcs12_t structure
+ * @pkcs12: The structure to be initialized
+ *
+ * This function will initialize a PKCS12 structure. PKCS12 structures
+ * usually contain lists of X.509 Certificates and X.509 Certificate
+ * revocation lists.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs12_init (gnutls_pkcs12_t * pkcs12)
 {
@@ -159,12 +158,11 @@ gnutls_pkcs12_init (gnutls_pkcs12_t * pkcs12)
 }
 
 /**
-  * gnutls_pkcs12_deinit - This function deinitializes memory used by a gnutls_pkcs12_t structure
-  * @pkcs12: The structure to be initialized
-  *
-  * This function will deinitialize a PKCS12 structure. 
-  *
-  **/
+ * gnutls_pkcs12_deinit - This function deinitializes memory used by a gnutls_pkcs12_t structure
+ * @pkcs12: The structure to be initialized
+ *
+ * This function will deinitialize a PKCS12 structure.
+ **/
 void
 gnutls_pkcs12_deinit (gnutls_pkcs12_t pkcs12)
 {
@@ -178,21 +176,20 @@ gnutls_pkcs12_deinit (gnutls_pkcs12_t pkcs12)
 }
 
 /**
-  * gnutls_pkcs12_import - This function will import a DER or PEM encoded PKCS12 structure
-  * @pkcs12: The structure to store the parsed PKCS12.
-  * @data: The DER or PEM encoded PKCS12.
-  * @format: One of DER or PEM
-  * @flags: an ORed sequence of gnutls_privkey_pkcs8_flags
-  *
-  * This function will convert the given DER or PEM encoded PKCS12
-  * to the native gnutls_pkcs12_t format. The output will be stored in 'pkcs12'.
-  *
-  * If the PKCS12 is PEM encoded it should have a header of "PKCS12".
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_pkcs12_import - This function will import a DER or PEM encoded PKCS12 structure
+ * @pkcs12: The structure to store the parsed PKCS12.
+ * @data: The DER or PEM encoded PKCS12.
+ * @format: One of DER or PEM
+ * @flags: an ORed sequence of gnutls_privkey_pkcs8_flags
+ *
+ * This function will convert the given DER or PEM encoded PKCS12
+ * to the native gnutls_pkcs12_t format. The output will be stored in 'pkcs12'.
+ *
+ * If the PKCS12 is PEM encoded it should have a header of "PKCS12".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs12_import (gnutls_pkcs12_t pkcs12,
 		      const gnutls_datum_t * data,
@@ -257,26 +254,25 @@ cleanup:
 
 
 /**
-  * gnutls_pkcs12_export - This function will export the pkcs12 structure
-  * @pkcs12: Holds the pkcs12 structure
-  * @format: the format of output params. One of PEM or DER.
-  * @output_data: will contain a structure PEM or DER encoded
-  * @output_data_size: holds the size of output_data (and will be
-  *   replaced by the actual size of parameters)
-  *
-  * This function will export the pkcs12 structure to DER or PEM format.
-  *
-  * If the buffer provided is not long enough to hold the output, then
-  * *output_data_size will be updated and GNUTLS_E_SHORT_MEMORY_BUFFER
-  * will be returned.
-  *
-  * If the structure is PEM encoded, it will have a header
-  * of "BEGIN PKCS12".
-  *
-  * Return value: In case of failure a negative value will be
-  *   returned, and 0 on success.
-  *
-  **/
+ * gnutls_pkcs12_export - This function will export the pkcs12 structure
+ * @pkcs12: Holds the pkcs12 structure
+ * @format: the format of output params. One of PEM or DER.
+ * @output_data: will contain a structure PEM or DER encoded
+ * @output_data_size: holds the size of output_data (and will be
+ *   replaced by the actual size of parameters)
+ *
+ * This function will export the pkcs12 structure to DER or PEM format.
+ *
+ * If the buffer provided is not long enough to hold the output, then
+ * *output_data_size will be updated and GNUTLS_E_SHORT_MEMORY_BUFFER
+ * will be returned.
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN PKCS12".
+ *
+ * Return value: In case of failure a negative value will be
+ *   returned, and 0 on success.
+ **/
 int
 gnutls_pkcs12_export (gnutls_pkcs12_t pkcs12,
 		      gnutls_x509_crt_fmt_t format, void *output_data,
@@ -576,19 +572,19 @@ cleanup:
 
 
 /**
-  * gnutls_pkcs12_get_bag - This function returns a Bag from a PKCS12 structure
-  * @pkcs12: should contain a gnutls_pkcs12_t structure
-  * @indx: contains the index of the bag to extract
-  * @bag: An initialized bag, where the contents of the bag will be copied
-  *
-  * This function will return a Bag from the PKCS12 structure.
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  * After the last Bag has been read GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
-  * will be returned.
-  *
-  **/
+ * gnutls_pkcs12_get_bag - This function returns a Bag from a PKCS12 structure
+ * @pkcs12: should contain a gnutls_pkcs12_t structure
+ * @indx: contains the index of the bag to extract
+ * @bag: An initialized bag, where the contents of the bag will be copied
+ *
+ * This function will return a Bag from the PKCS12 structure.
+ *
+ * After the last Bag has been read
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs12_get_bag (gnutls_pkcs12_t pkcs12,
 		       int indx, gnutls_pkcs12_bag_t bag)
@@ -725,15 +721,15 @@ cleanup:
 }
 
 /**
-  * gnutls_pkcs12_set_bag - This function inserts a Bag into a PKCS12 structure
-  * @pkcs12: should contain a gnutls_pkcs12_t structure
-  * @bag: An initialized bag
-  *
-  * This function will insert a Bag into the PKCS12 structure.
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_pkcs12_set_bag - This function inserts a Bag into a PKCS12 structure
+ * @pkcs12: should contain a gnutls_pkcs12_t structure
+ * @bag: An initialized bag
+ *
+ * This function will insert a Bag into the PKCS12 structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs12_set_bag (gnutls_pkcs12_t pkcs12, gnutls_pkcs12_bag_t bag)
 {
@@ -857,15 +853,15 @@ cleanup:
 }
 
 /**
-  * gnutls_pkcs12_generate_mac - This function generates the MAC of the PKCS12 structure
-  * @pkcs12: should contain a gnutls_pkcs12_t structure
-  * @pass: The password for the MAC
-  *
-  * This function will generate a MAC for the PKCS12 structure.
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_pkcs12_generate_mac - This function generates the MAC of the PKCS12 structure
+ * @pkcs12: should contain a gnutls_pkcs12_t structure
+ * @pass: The password for the MAC
+ *
+ * This function will generate a MAC for the PKCS12 structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs12_generate_mac (gnutls_pkcs12_t pkcs12, const char *pass)
 {
@@ -990,15 +986,15 @@ cleanup:
 }
 
 /**
-  * gnutls_pkcs12_verify_mac - This function verifies the MAC of the PKCS12 structure
-  * @pkcs12: should contain a gnutls_pkcs12_t structure
-  * @pass: The password for the MAC
-  *
-  * This function will verify the MAC for the PKCS12 structure.
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_pkcs12_verify_mac - This function verifies the MAC of the PKCS12 structure
+ * @pkcs12: should contain a gnutls_pkcs12_t structure
+ * @pass: The password for the MAC
+ *
+ * This function will verify the MAC for the PKCS12 structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs12_verify_mac (gnutls_pkcs12_t pkcs12, const char *pass)
 {

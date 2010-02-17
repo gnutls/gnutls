@@ -39,12 +39,12 @@
 #include "debug.h"
 
 /**
-  * gnutls_psk_free_client_credentials - Used to free an allocated gnutls_psk_client_credentials_t structure
-  * @sc: is a #gnutls_psk_client_credentials_t structure.
-  *
-  * This structure is complex enough to manipulate directly thus this
-  * helper function is provided in order to free (deallocate) it.
-  **/
+ * gnutls_psk_free_client_credentials - Used to free an allocated gnutls_psk_client_credentials_t structure
+ * @sc: is a #gnutls_psk_client_credentials_t structure.
+ *
+ * This structure is complex enough to manipulate directly thus this
+ * helper function is provided in order to free (deallocate) it.
+ **/
 void
 gnutls_psk_free_client_credentials (gnutls_psk_client_credentials_t sc)
 {
@@ -54,14 +54,14 @@ gnutls_psk_free_client_credentials (gnutls_psk_client_credentials_t sc)
 }
 
 /**
-  * gnutls_psk_allocate_client_credentials - Used to allocate an gnutls_psk_server_credentials_t structure
-  * @sc: is a pointer to a #gnutls_psk_server_credentials_t structure.
-  *
-  * This structure is complex enough to manipulate directly thus this
-  * helper function is provided in order to allocate it.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_psk_allocate_client_credentials - Used to allocate an gnutls_psk_server_credentials_t structure
+ * @sc: is a pointer to a #gnutls_psk_server_credentials_t structure.
+ *
+ * This structure is complex enough to manipulate directly thus this
+ * helper function is provided in order to allocate it.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
 gnutls_psk_allocate_client_credentials (gnutls_psk_client_credentials_t * sc)
 {
@@ -74,22 +74,22 @@ gnutls_psk_allocate_client_credentials (gnutls_psk_client_credentials_t * sc)
 }
 
 /**
-  * gnutls_psk_set_client_credentials - Used to set the username/password, in a gnutls_psk_client_credentials_t structure
-  * @res: is a #gnutls_psk_client_credentials_t structure.
-  * @username: is the user's zero-terminated userid
-  * @key: is the user's key
-  * @format: indicate the format of the key, either
-  *   %GNUTLS_PSK_KEY_RAW or %GNUTLS_PSK_KEY_HEX.
-  *
-  * This function sets the username and password, in a
-  * gnutls_psk_client_credentials_t structure.  Those will be used in
-  * PSK authentication.  @username should be an ASCII string or UTF-8
-  * strings prepared using the "SASLprep" profile of "stringprep".
-  * The key can be either in raw byte format or in Hex format (without
-  * the 0x prefix).
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_psk_set_client_credentials - Used to set the username/password, in a gnutls_psk_client_credentials_t structure
+ * @res: is a #gnutls_psk_client_credentials_t structure.
+ * @username: is the user's zero-terminated userid
+ * @key: is the user's key
+ * @format: indicate the format of the key, either
+ *   %GNUTLS_PSK_KEY_RAW or %GNUTLS_PSK_KEY_HEX.
+ *
+ * This function sets the username and password, in a
+ * gnutls_psk_client_credentials_t structure.  Those will be used in
+ * PSK authentication.  @username should be an ASCII string or UTF-8
+ * strings prepared using the "SASLprep" profile of "stringprep".  The
+ * key can be either in raw byte format or in Hex format (without the
+ * 0x prefix).
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
 gnutls_psk_set_client_credentials (gnutls_psk_client_credentials_t res,
 				   const char *username,
@@ -364,19 +364,19 @@ gnutls_psk_client_get_hint (gnutls_session_t session)
 }
 
 /**
-  * gnutls_hex_decode - decode hex encoded data
-  * @hex_data: contain the encoded data
-  * @result: the place where decoded data will be copied
-  * @result_size: holds the size of the result
-  *
-  * This function will decode the given encoded data, using the hex encoding
-  * used by PSK password files.
-  *
-  * Note that hex_data should be null terminated.
-  *
-  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
-  *   long enough, or 0 on success.
-  **/
+ * gnutls_hex_decode - decode hex encoded data
+ * @hex_data: contain the encoded data
+ * @result: the place where decoded data will be copied
+ * @result_size: holds the size of the result
+ *
+ * This function will decode the given encoded data, using the hex
+ * encoding used by PSK password files.
+ *
+ * Note that hex_data should be null terminated.
+ *
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
+ *   long enough, or 0 on success.
+ **/
 int
 gnutls_hex_decode (const gnutls_datum_t * hex_data, char *result,
 		   size_t * result_size)
@@ -393,17 +393,17 @@ gnutls_hex_decode (const gnutls_datum_t * hex_data, char *result,
 }
 
 /**
-  * gnutls_hex_encode - convert raw data to hex encoded
-  * @data: contain the raw data
-  * @result: the place where hex data will be copied
-  * @result_size: holds the size of the result
-  *
-  * This function will convert the given data to printable data, using
-  * the hex encoding, as used in the PSK password files.
-  *
-  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
-  * long enough, or 0 on success.
-  **/
+ * gnutls_hex_encode - convert raw data to hex encoded
+ * @data: contain the raw data
+ * @result: the place where hex data will be copied
+ * @result_size: holds the size of the result
+ *
+ * This function will convert the given data to printable data, using
+ * the hex encoding, as used in the PSK password files.
+ *
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
+ * long enough, or 0 on success.
+ **/
 int
 gnutls_hex_encode (const gnutls_datum_t * data, char *result,
 		   size_t * result_size)
@@ -423,14 +423,14 @@ gnutls_hex_encode (const gnutls_datum_t * data, char *result,
 }
 
 /**
-  * gnutls_psk_set_server_dh_params - set the DH parameters for a server to use
-  * @res: is a gnutls_psk_server_credentials_t structure
-  * @dh_params: is a structure that holds Diffie-Hellman parameters.
-  *
-  * This function will set the Diffie-Hellman parameters for an
-  * anonymous server to use. These parameters will be used in
-  * Diffie-Hellman exchange with PSK cipher suites.
-  **/
+ * gnutls_psk_set_server_dh_params - set the DH parameters for a server to use
+ * @res: is a gnutls_psk_server_credentials_t structure
+ * @dh_params: is a structure that holds Diffie-Hellman parameters.
+ *
+ * This function will set the Diffie-Hellman parameters for an
+ * anonymous server to use. These parameters will be used in
+ * Diffie-Hellman exchange with PSK cipher suites.
+ **/
 void
 gnutls_psk_set_server_dh_params (gnutls_psk_server_credentials_t res,
 				 gnutls_dh_params_t dh_params)

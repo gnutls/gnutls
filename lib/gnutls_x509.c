@@ -83,15 +83,14 @@ check_bits (gnutls_x509_crt_t crt, unsigned int max_bits)
 	gnutls_free( peer_certificate_list)
 
 /*-
-  * _gnutls_x509_cert_verify_peers - return the peer's certificate status
-  * @session: is a gnutls session
-  *
-  * This function will try to verify the peer's certificate and return its status (TRUSTED, REVOKED etc.). 
-  * The return value (status) should be one of the gnutls_certificate_status_t enumerated elements.
-  * However you must also check the peer's name in order to check if the verified certificate belongs to the 
-  * actual peer. Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
-  *
-  -*/
+ * _gnutls_x509_cert_verify_peers - return the peer's certificate status
+ * @session: is a gnutls session
+ *
+ * This function will try to verify the peer's certificate and return its status (TRUSTED, REVOKED etc.).
+ * The return value (status) should be one of the gnutls_certificate_status_t enumerated elements.
+ * However you must also check the peer's name in order to check if the verified certificate belongs to the
+ * actual peer. Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
+ -*/
 int
 _gnutls_x509_cert_verify_peers (gnutls_session_t session,
 				unsigned int *status)
@@ -722,23 +721,23 @@ gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t res,
 }
 
 /**
-  * gnutls_certificate_set_x509_key - Used to set keys in a gnutls_certificate_credentials_t structure
-  * @res: is a #gnutls_certificate_credentials_t structure.
-  * @cert_list: contains a certificate list (path) for the specified private key
-  * @cert_list_size: holds the size of the certificate list
-  * @key: is a gnutls_x509_privkey_t key
-  *
-  * This function sets a certificate/private key pair in the
-  * gnutls_certificate_credentials_t structure.  This function may be
-  * called more than once (in case multiple keys/certificates exist
-  * for the server).  For clients that wants to send more than its own
-  * end entity certificate (e.g., also an intermediate CA cert) then
-  * put the certificate chain in @cert_list.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  *
-  * Since: 2.4.0
-  **/
+ * gnutls_certificate_set_x509_key - Used to set keys in a gnutls_certificate_credentials_t structure
+ * @res: is a #gnutls_certificate_credentials_t structure.
+ * @cert_list: contains a certificate list (path) for the specified private key
+ * @cert_list_size: holds the size of the certificate list
+ * @key: is a gnutls_x509_privkey_t key
+ *
+ * This function sets a certificate/private key pair in the
+ * gnutls_certificate_credentials_t structure.  This function may be
+ * called more than once (in case multiple keys/certificates exist for
+ * the server).  For clients that wants to send more than its own end
+ * entity certificate (e.g., also an intermediate CA cert) then put
+ * the certificate chain in @cert_list.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 2.4.0
+ **/
 int
 gnutls_certificate_set_x509_key (gnutls_certificate_credentials_t res,
 				 gnutls_x509_crt_t * cert_list,
@@ -1113,24 +1112,24 @@ parse_der_ca_mem (gnutls_x509_crt_t ** cert_list, unsigned *ncerts,
 }
 
 /**
-  * gnutls_certificate_set_x509_trust_mem - Used to add trusted CAs in a gnutls_certificate_credentials_t structure
-  * @res: is a #gnutls_certificate_credentials_t structure.
-  * @ca: is a list of trusted CAs or a DER certificate
-  * @type: is DER or PEM
-  *
-  * This function adds the trusted CAs in order to verify client or
-  * server certificates. In case of a client this is not required to
-  * be called if the certificates are not verified using
-  * gnutls_certificate_verify_peers2().  This function may be called
-  * multiple times.
-  *
-  * In case of a server the CAs set here will be sent to the client if
-  * a certificate request is sent. This can be disabled using
-  * gnutls_certificate_send_x509_rdn_sequence().
-  *
-  * Returns: the number of certificates processed or a negative value
-  * on error.
-  **/
+ * gnutls_certificate_set_x509_trust_mem - Used to add trusted CAs in a gnutls_certificate_credentials_t structure
+ * @res: is a #gnutls_certificate_credentials_t structure.
+ * @ca: is a list of trusted CAs or a DER certificate
+ * @type: is DER or PEM
+ *
+ * This function adds the trusted CAs in order to verify client or
+ * server certificates. In case of a client this is not required to be
+ * called if the certificates are not verified using
+ * gnutls_certificate_verify_peers2().  This function may be called
+ * multiple times.
+ *
+ * In case of a server the CAs set here will be sent to the client if
+ * a certificate request is sent. This can be disabled using
+ * gnutls_certificate_send_x509_rdn_sequence().
+ *
+ * Returns: the number of certificates processed or a negative value
+ * on error.
+ **/
 int
 gnutls_certificate_set_x509_trust_mem (gnutls_certificate_credentials_t res,
 				       const gnutls_datum_t * ca,
@@ -1152,25 +1151,25 @@ gnutls_certificate_set_x509_trust_mem (gnutls_certificate_credentials_t res,
 }
 
 /**
-  * gnutls_certificate_set_x509_trust - Used to add trusted CAs in a gnutls_certificate_credentials_t structure
-  * @res: is a #gnutls_certificate_credentials_t structure.
-  * @ca_list: is a list of trusted CAs
-  * @ca_list_size: holds the size of the CA list
-  *
-  * This function adds the trusted CAs in order to verify client
-  * or server certificates. In case of a client this is not required
-  * to be called if the certificates are not verified using
-  * gnutls_certificate_verify_peers2().
-  * This function may be called multiple times.
-  *
-  * In case of a server the CAs set here will be sent to the client if
-  * a certificate request is sent. This can be disabled using
-  * gnutls_certificate_send_x509_rdn_sequence().
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  *
-  * Since: 2.4.0
-  **/
+ * gnutls_certificate_set_x509_trust - Used to add trusted CAs in a gnutls_certificate_credentials_t structure
+ * @res: is a #gnutls_certificate_credentials_t structure.
+ * @ca_list: is a list of trusted CAs
+ * @ca_list_size: holds the size of the CA list
+ *
+ * This function adds the trusted CAs in order to verify client
+ * or server certificates. In case of a client this is not required
+ * to be called if the certificates are not verified using
+ * gnutls_certificate_verify_peers2().
+ * This function may be called multiple times.
+ *
+ * In case of a server the CAs set here will be sent to the client if
+ * a certificate request is sent. This can be disabled using
+ * gnutls_certificate_send_x509_rdn_sequence().
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 2.4.0
+ **/
 int
 gnutls_certificate_set_x509_trust (gnutls_certificate_credentials_t res,
 				   gnutls_x509_crt_t * ca_list,
@@ -1215,24 +1214,24 @@ gnutls_certificate_set_x509_trust (gnutls_certificate_credentials_t res,
 }
 
 /**
-  * gnutls_certificate_set_x509_trust_file - Used to add trusted CAs in a gnutls_certificate_credentials_t structure
-  * @res: is a #gnutls_certificate_credentials_t structure.
-  * @cafile: is a file containing the list of trusted CAs (DER or PEM list)
-  * @type: is PEM or DER
-  *
-  * This function adds the trusted CAs in order to verify client or
-  * server certificates. In case of a client this is not required to
-  * be called if the certificates are not verified using
-  * gnutls_certificate_verify_peers2().  This function may be called
-  * multiple times.
-  *
-  * In case of a server the names of the CAs set here will be sent to
-  * the client if a certificate request is sent. This can be disabled
-  * using gnutls_certificate_send_x509_rdn_sequence().
-  *
-  * Returns: number of certificates processed, or a negative value on
-  * error.
-  **/
+ * gnutls_certificate_set_x509_trust_file - Used to add trusted CAs in a gnutls_certificate_credentials_t structure
+ * @res: is a #gnutls_certificate_credentials_t structure.
+ * @cafile: is a file containing the list of trusted CAs (DER or PEM list)
+ * @type: is PEM or DER
+ *
+ * This function adds the trusted CAs in order to verify client or
+ * server certificates. In case of a client this is not required to
+ * be called if the certificates are not verified using
+ * gnutls_certificate_verify_peers2().  This function may be called
+ * multiple times.
+ *
+ * In case of a server the names of the CAs set here will be sent to
+ * the client if a certificate request is sent. This can be disabled
+ * using gnutls_certificate_send_x509_rdn_sequence().
+ *
+ * Returns: number of certificates processed, or a negative value on
+ * error.
+ **/
 int
 gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t res,
 					const char *cafile,
@@ -1435,19 +1434,19 @@ read_crl_mem (gnutls_certificate_credentials_t res, const void *crl,
 }
 
 /**
-  * gnutls_certificate_set_x509_crl_mem - Used to add CRLs in a gnutls_certificate_credentials_t structure
-  * @res: is a #gnutls_certificate_credentials_t structure.
-  * @CRL: is a list of trusted CRLs. They should have been verified before.
-  * @type: is DER or PEM
-  *
-  * This function adds the trusted CRLs in order to verify client or
-  * server certificates.  In case of a client this is not required to
-  * be called if the certificates are not verified using
-  * gnutls_certificate_verify_peers2().  This function may be called
-  * multiple times.
-  *
-  * Returns: number of CRLs processed, or a negative value on error.
-  **/
+ * gnutls_certificate_set_x509_crl_mem - Used to add CRLs in a gnutls_certificate_credentials_t structure
+ * @res: is a #gnutls_certificate_credentials_t structure.
+ * @CRL: is a list of trusted CRLs. They should have been verified before.
+ * @type: is DER or PEM
+ *
+ * This function adds the trusted CRLs in order to verify client or
+ * server certificates.  In case of a client this is not required to
+ * be called if the certificates are not verified using
+ * gnutls_certificate_verify_peers2().  This function may be called
+ * multiple times.
+ *
+ * Returns: number of CRLs processed, or a negative value on error.
+ **/
 int
 gnutls_certificate_set_x509_crl_mem (gnutls_certificate_credentials_t res,
 				     const gnutls_datum_t * CRL,
@@ -1462,21 +1461,21 @@ gnutls_certificate_set_x509_crl_mem (gnutls_certificate_credentials_t res,
 }
 
 /**
-  * gnutls_certificate_set_x509_crl - Used to add CRLs in a gnutls_certificate_credentials_t structure
-  * @res: is a #gnutls_certificate_credentials_t structure.
-  * @crl_list: is a list of trusted CRLs. They should have been verified before.
-  * @crl_list_size: holds the size of the crl_list
-  *
-  * This function adds the trusted CRLs in order to verify client or
-  * server certificates.  In case of a client this is not required to
-  * be called if the certificates are not verified using
-  * gnutls_certificate_verify_peers2().  This function may be called
-  * multiple times.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  *
-  * Since: 2.4.0
-  **/
+ * gnutls_certificate_set_x509_crl - Used to add CRLs in a gnutls_certificate_credentials_t structure
+ * @res: is a #gnutls_certificate_credentials_t structure.
+ * @crl_list: is a list of trusted CRLs. They should have been verified before.
+ * @crl_list_size: holds the size of the crl_list
+ *
+ * This function adds the trusted CRLs in order to verify client or
+ * server certificates.  In case of a client this is not required to
+ * be called if the certificates are not verified using
+ * gnutls_certificate_verify_peers2().  This function may be called
+ * multiple times.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 2.4.0
+ **/
 int
 gnutls_certificate_set_x509_crl (gnutls_certificate_credentials_t res,
 				 gnutls_x509_crl_t * crl_list,
@@ -1517,19 +1516,19 @@ gnutls_certificate_set_x509_crl (gnutls_certificate_credentials_t res,
 }
 
 /**
-  * gnutls_certificate_set_x509_crl_file - Used to add CRLs in a gnutls_certificate_credentials_t structure
-  * @res: is a #gnutls_certificate_credentials_t structure.
-  * @crlfile: is a file containing the list of verified CRLs (DER or PEM list)
-  * @type: is PEM or DER
-  *
-  * This function adds the trusted CRLs in order to verify client or server
-  * certificates.  In case of a client this is not required
-  * to be called if the certificates are not verified using
-  * gnutls_certificate_verify_peers2().
-  * This function may be called multiple times.
-  *
-  * Returns: number of CRLs processed or a negative value on error.
-  **/
+ * gnutls_certificate_set_x509_crl_file - Used to add CRLs in a gnutls_certificate_credentials_t structure
+ * @res: is a #gnutls_certificate_credentials_t structure.
+ * @crlfile: is a file containing the list of verified CRLs (DER or PEM list)
+ * @type: is PEM or DER
+ *
+ * This function adds the trusted CRLs in order to verify client or server
+ * certificates.  In case of a client this is not required
+ * to be called if the certificates are not verified using
+ * gnutls_certificate_verify_peers2().
+ * This function may be called multiple times.
+ *
+ * Returns: number of CRLs processed or a negative value on error.
+ **/
 int
 gnutls_certificate_set_x509_crl_file (gnutls_certificate_credentials_t res,
 				      const char *crlfile,
@@ -2045,13 +2044,12 @@ done:
 
 
 /**
-  * gnutls_certificate_free_crls - Used to free all the CRLs from a gnutls_certificate_credentials_t structure
-  * @sc: is a #gnutls_certificate_credentials_t structure.
-  *
-  * This function will delete all the CRLs associated
-  * with the given credentials.
-  *
-  **/
+ * gnutls_certificate_free_crls - Used to free all the CRLs from a gnutls_certificate_credentials_t structure
+ * @sc: is a #gnutls_certificate_credentials_t structure.
+ *
+ * This function will delete all the CRLs associated
+ * with the given credentials.
+ **/
 void
 gnutls_certificate_free_crls (gnutls_certificate_credentials_t sc)
 {

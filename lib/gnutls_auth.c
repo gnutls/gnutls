@@ -39,12 +39,11 @@
  */
 
 /**
-  * gnutls_credentials_clear - Clears all the credentials previously set
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Clears all the credentials previously set in this session.
-  *
-  **/
+ * gnutls_credentials_clear - Clears all the credentials previously set
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Clears all the credentials previously set in this session.
+ **/
 void
 gnutls_credentials_clear (gnutls_session_t session)
 {
@@ -156,20 +155,20 @@ gnutls_credentials_set (gnutls_session_t session,
 }
 
 /**
-  * gnutls_auth_get_type - Returns the type of credentials for the current authentication schema.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Returns type of credentials for the current authentication schema.
-  * The returned information is to be used to distinguish the function used
-  * to access authentication data.
-  *
-  * Eg. for CERTIFICATE ciphersuites (key exchange algorithms:
-  * %GNUTLS_KX_RSA, %GNUTLS_KX_DHE_RSA), the same function are to be
-  * used to access the authentication data.
-  *
-  * Returns: The type of credentials for the current authentication
-  *   schema, a #gnutls_credentials_type_t type.
-  **/
+ * gnutls_auth_get_type - Returns the type of credentials for the current authentication schema.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Returns type of credentials for the current authentication schema.
+ * The returned information is to be used to distinguish the function used
+ * to access authentication data.
+ *
+ * Eg. for CERTIFICATE ciphersuites (key exchange algorithms:
+ * %GNUTLS_KX_RSA, %GNUTLS_KX_DHE_RSA), the same function are to be
+ * used to access the authentication data.
+ *
+ * Returns: The type of credentials for the current authentication
+ *   schema, a #gnutls_credentials_type_t type.
+ **/
 gnutls_credentials_type_t
 gnutls_auth_get_type (gnutls_session_t session)
 {
@@ -185,16 +184,16 @@ gnutls_auth_get_type (gnutls_session_t session)
 }
 
 /**
-  * gnutls_auth_server_get_type - Returns the type of credentials for the server authentication schema.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Returns the type of credentials that were used for server authentication.
-  * The returned information is to be used to distinguish the function used
-  * to access authentication data.
-  *
-  * Returns: The type of credentials for the server authentication
-  *   schema, a #gnutls_credentials_type_t type.
-  **/
+ * gnutls_auth_server_get_type - Returns the type of credentials for the server authentication schema.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Returns the type of credentials that were used for server authentication.
+ * The returned information is to be used to distinguish the function used
+ * to access authentication data.
+ *
+ * Returns: The type of credentials for the server authentication
+ *   schema, a #gnutls_credentials_type_t type.
+ **/
 gnutls_credentials_type_t
 gnutls_auth_server_get_type (gnutls_session_t session)
 {
@@ -205,16 +204,16 @@ gnutls_auth_server_get_type (gnutls_session_t session)
 }
 
 /**
-  * gnutls_auth_client_get_type - Returns the type of credentials for the client authentication schema.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Returns the type of credentials that were used for client authentication.
-  * The returned information is to be used to distinguish the function used
-  * to access authentication data.
-  *
-  * Returns: The type of credentials for the client authentication
-  *   schema, a #gnutls_credentials_type_t type.
-  **/
+ * gnutls_auth_client_get_type - Returns the type of credentials for the client authentication schema.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Returns the type of credentials that were used for client authentication.
+ * The returned information is to be used to distinguish the function used
+ * to access authentication data.
+ *
+ * Returns: The type of credentials for the client authentication
+ *   schema, a #gnutls_credentials_type_t type.
+ **/
 gnutls_credentials_type_t
 gnutls_auth_client_get_type (gnutls_session_t session)
 {
@@ -271,18 +270,18 @@ out:
 }
 
 /*-
-  * _gnutls_get_auth_info - Returns a pointer to authentication information.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * This function must be called after a successful gnutls_handshake().
-  * Returns a pointer to authentication information. That information
-  * is data obtained by the handshake protocol, the key exchange algorithm,
-  * and the TLS extensions messages.
-  *
-  * In case of GNUTLS_CRD_ANON returns a type of &anon_(server/client)_auth_info_t;
-  * In case of GNUTLS_CRD_CERTIFICATE returns a type of &cert_auth_info_t;
-  * In case of GNUTLS_CRD_SRP returns a type of &srp_(server/client)_auth_info_t;
-  -*/
+ * _gnutls_get_auth_info - Returns a pointer to authentication information.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function must be called after a successful gnutls_handshake().
+ * Returns a pointer to authentication information. That information
+ * is data obtained by the handshake protocol, the key exchange algorithm,
+ * and the TLS extensions messages.
+ *
+ * In case of GNUTLS_CRD_ANON returns a type of &anon_(server/client)_auth_info_t;
+ * In case of GNUTLS_CRD_CERTIFICATE returns a type of &cert_auth_info_t;
+ * In case of GNUTLS_CRD_SRP returns a type of &srp_(server/client)_auth_info_t;
+ -*/
 void *
 _gnutls_get_auth_info (gnutls_session_t session)
 {
@@ -290,13 +289,13 @@ _gnutls_get_auth_info (gnutls_session_t session)
 }
 
 /*-
-  * _gnutls_free_auth_info - Frees the auth info structure
-  * @session: is a #gnutls_session_t structure.
-  *
-  * This function frees the auth info structure and sets it to
-  * null. It must be called since some structures contain malloced
-  * elements.
-  -*/
+ * _gnutls_free_auth_info - Frees the auth info structure
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function frees the auth info structure and sets it to
+ * null. It must be called since some structures contain malloced
+ * elements.
+ -*/
 void
 _gnutls_free_auth_info (gnutls_session_t session)
 {

@@ -37,17 +37,16 @@
 #include "x509_int.h"
 
 /**
-  * gnutls_pkcs12_bag_init - This function initializes a gnutls_pkcs12_bag_t  structure
-  * @bag: The structure to be initialized
-  *
-  * This function will initialize a PKCS12 bag structure. PKCS12 Bags
-  * usually contain private keys, lists of X.509 Certificates and X.509 Certificate
-  * revocation lists.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_pkcs12_bag_init - This function initializes a gnutls_pkcs12_bag_t  structure
+ * @bag: The structure to be initialized
+ *
+ * This function will initialize a PKCS12 bag structure. PKCS12 Bags
+ * usually contain private keys, lists of X.509 Certificates and X.509
+ * Certificate revocation lists.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs12_bag_init (gnutls_pkcs12_bag_t * bag)
 {
@@ -78,12 +77,11 @@ _pkcs12_bag_free_data (gnutls_pkcs12_bag_t bag)
 
 
 /**
-  * gnutls_pkcs12_bag_deinit - This function deinitializes memory used by a gnutls_pkcs12_t structure
-  * @bag: The structure to be initialized
-  *
-  * This function will deinitialize a PKCS12 Bag structure. 
-  *
-  **/
+ * gnutls_pkcs12_bag_deinit - This function deinitializes memory used by a gnutls_pkcs12_t structure
+ * @bag: The structure to be initialized
+ *
+ * This function will deinitialize a PKCS12 Bag structure.
+ **/
 void
 gnutls_pkcs12_bag_deinit (gnutls_pkcs12_bag_t bag)
 {
@@ -140,19 +138,18 @@ gnutls_pkcs12_bag_get_count (gnutls_pkcs12_bag_t bag)
 }
 
 /**
-  * gnutls_pkcs12_bag_get_data - This function returns the bag's data
-  * @bag: The bag
-  * @indx: The element of the bag to get the data from
-  * @data: where the bag's data will be. Should be treated as constant.
-  *
-  * This function will return the bag's data. The data is a constant
-  * that is stored into the bag. Should not be accessed after the bag
-  * is deleted.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_pkcs12_bag_get_data - This function returns the bag's data
+ * @bag: The bag
+ * @indx: The element of the bag to get the data from
+ * @data: where the bag's data will be. Should be treated as constant.
+ *
+ * This function will return the bag's data. The data is a constant
+ * that is stored into the bag.  Should not be accessed after the bag
+ * is deleted.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs12_bag_get_data (gnutls_pkcs12_bag_t bag, int indx,
 			    gnutls_datum_t * data)
@@ -533,19 +530,19 @@ gnutls_pkcs12_bag_set_crl (gnutls_pkcs12_bag_t bag, gnutls_x509_crl_t crl)
 }
 
 /**
-  * gnutls_pkcs12_bag_set_key_id - This function sets a key ID into the bag element
-  * @bag: The bag
-  * @indx: The bag's element to add the id
-  * @id: the ID
-  *
-  * This function will add the given key ID, to the specified, by the index, bag
-  * element. The key ID will be encoded as a 'Local key identifier' bag attribute,
-  * which is usually used to distinguish the local private key and the certificate pair.
-  * 
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value. or a negative value on error.
-  *
-  **/
+ * gnutls_pkcs12_bag_set_key_id - This function sets a key ID into the bag element
+ * @bag: The bag
+ * @indx: The bag's element to add the id
+ * @id: the ID
+ *
+ * This function will add the given key ID, to the specified, by the
+ * index, bag element. The key ID will be encoded as a 'Local key
+ * identifier' bag attribute, which is usually used to distinguish
+ * the local private key and the certificate pair.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value. or a negative value on error.
+ **/
 int
 gnutls_pkcs12_bag_set_key_id (gnutls_pkcs12_bag_t bag, int indx,
 			      const gnutls_datum_t * id)
@@ -578,18 +575,18 @@ gnutls_pkcs12_bag_set_key_id (gnutls_pkcs12_bag_t bag, int indx,
 }
 
 /**
-  * gnutls_pkcs12_bag_get_key_id - This function gets the key ID from the bag element
-  * @bag: The bag
-  * @indx: The bag's element to add the id
-  * @id: where the ID will be copied (to be treated as const)
-  *
-  * This function will return the key ID, of the specified bag element.
-  * The key ID is usually used to distinguish the local private key and the certificate pair.
-  * 
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value. or a negative value on error.
-  *
-  **/
+ * gnutls_pkcs12_bag_get_key_id - This function gets the key ID from the bag element
+ * @bag: The bag
+ * @indx: The bag's element to add the id
+ * @id: where the ID will be copied (to be treated as const)
+ *
+ * This function will return the key ID, of the specified bag element.
+ * The key ID is usually used to distinguish the local private key and
+ * the certificate pair.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value. or a negative value on error.
+ **/
 int
 gnutls_pkcs12_bag_get_key_id (gnutls_pkcs12_bag_t bag, int indx,
 			      gnutls_datum_t * id)
@@ -613,18 +610,18 @@ gnutls_pkcs12_bag_get_key_id (gnutls_pkcs12_bag_t bag, int indx,
 }
 
 /**
-  * gnutls_pkcs12_bag_get_friendly_name - This function returns the friendly name of the bag element
-  * @bag: The bag
-  * @indx: The bag's element to add the id
-  * @name: will hold a pointer to the name (to be treated as const)
-  *
-  * This function will return the friendly name, of the specified bag element.
-  * The key ID is usually used to distinguish the local private key and the certificate pair.
-  * 
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value. or a negative value on error.
-  *
-  **/
+ * gnutls_pkcs12_bag_get_friendly_name - This function returns the friendly name of the bag element
+ * @bag: The bag
+ * @indx: The bag's element to add the id
+ * @name: will hold a pointer to the name (to be treated as const)
+ *
+ * This function will return the friendly name, of the specified bag
+ * element.  The key ID is usually used to distinguish the local
+ * private key and the certificate pair.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value. or a negative value on error.
+ **/
 int
 gnutls_pkcs12_bag_get_friendly_name (gnutls_pkcs12_bag_t bag, int indx,
 				     char **name)
@@ -648,19 +645,19 @@ gnutls_pkcs12_bag_get_friendly_name (gnutls_pkcs12_bag_t bag, int indx,
 
 
 /**
-  * gnutls_pkcs12_bag_set_friendly_name - This function sets a friendly name into the bag element
-  * @bag: The bag
-  * @indx: The bag's element to add the id
-  * @name: the name
-  *
-  * This function will add the given key friendly name, to the specified, by the index, bag
-  * element. The name will be encoded as a 'Friendly name' bag attribute,
-  * which is usually used to set a user name to the local private key and the certificate pair.
-  * 
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value. or a negative value on error.
-  *
-  **/
+ * gnutls_pkcs12_bag_set_friendly_name - This function sets a friendly name into the bag element
+ * @bag: The bag
+ * @indx: The bag's element to add the id
+ * @name: the name
+ *
+ * This function will add the given key friendly name, to the
+ * specified, by the index, bag element. The name will be encoded as
+ * a 'Friendly name' bag attribute, which is usually used to set a
+ * user name to the local private key and the certificate pair.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value. or a negative value on error.
+ **/
 int
 gnutls_pkcs12_bag_set_friendly_name (gnutls_pkcs12_bag_t bag, int indx,
 				     const char *name)

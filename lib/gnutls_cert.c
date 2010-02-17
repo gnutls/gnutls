@@ -46,14 +46,14 @@
 #endif
 
 /**
-  * gnutls_certificate_free_keys - Used to free all the keys from a gnutls_certificate_credentials_t structure
-  * @sc: is a #gnutls_certificate_credentials_t structure.
-  *
-  * This function will delete all the keys and the certificates associated
-  * with the given credentials. This function must not be called when a
-  * TLS negotiation that uses the credentials is in progress.
-  *
-  **/
+ * gnutls_certificate_free_keys - Used to free all the keys from a gnutls_certificate_credentials_t structure
+ * @sc: is a #gnutls_certificate_credentials_t structure.
+ *
+ * This function will delete all the keys and the certificates associated
+ * with the given credentials. This function must not be called when a
+ * TLS negotiation that uses the credentials is in progress.
+ *
+ **/
 void
 gnutls_certificate_free_keys (gnutls_certificate_credentials_t sc)
 {
@@ -87,15 +87,14 @@ gnutls_certificate_free_keys (gnutls_certificate_credentials_t sc)
 }
 
 /**
-  * gnutls_certificate_free_cas - Used to free all the CAs from a gnutls_certificate_credentials_t structure
-  * @sc: is a #gnutls_certificate_credentials_t structure.
-  *
-  * This function will delete all the CAs associated
-  * with the given credentials. Servers that do not use
-  * gnutls_certificate_verify_peers2() may call this to
-  * save some memory.
-  *
-  **/
+ * gnutls_certificate_free_cas - Used to free all the CAs from a gnutls_certificate_credentials_t structure
+ * @sc: is a #gnutls_certificate_credentials_t structure.
+ *
+ * This function will delete all the CAs associated with the given
+ * credentials. Servers that do not use
+ * gnutls_certificate_verify_peers2() may call this to save some
+ * memory.
+ **/
 void
 gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc)
 {
@@ -114,16 +113,16 @@ gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc)
 }
 
 /**
-  * gnutls_certificate_get_x509_cas - Used to export all the CAs from a gnutls_certificate_credentials_t structure
-  * @sc: is a #gnutls_certificate_credentials_t structure.
-  * @x509_ca_list: will point to the CA list. Should be treated as constant
-  * @ncas: the number of CAs
-  *
-  * This function will export all the CAs associated
-  * with the given credentials. 
-  *
-  * Since: 2.4.0
-  **/
+ * gnutls_certificate_get_x509_cas - Used to export all the CAs from a gnutls_certificate_credentials_t structure
+ * @sc: is a #gnutls_certificate_credentials_t structure.
+ * @x509_ca_list: will point to the CA list. Should be treated as constant
+ * @ncas: the number of CAs
+ *
+ * This function will export all the CAs associated with the given
+ * credentials.
+ *
+ * Since: 2.4.0
+ **/
 void
 gnutls_certificate_get_x509_cas (gnutls_certificate_credentials_t sc,
 				 gnutls_x509_crt_t ** x509_ca_list,
@@ -134,16 +133,16 @@ gnutls_certificate_get_x509_cas (gnutls_certificate_credentials_t sc,
 }
 
 /**
-  * gnutls_certificate_get_x509_crls - Used to export all the CRLs from a gnutls_certificate_credentials_t structure
-  * @sc: is a #gnutls_certificate_credentials_t structure.
-  * @x509_crl_list: the exported CRL list. Should be treated as constant
-  * @ncrls: the number of exported CRLs
-  *
-  * This function will export all the CRLs associated with the given
-  * credentials.
-  *
-  * Since: 2.4.0
-  **/
+ * gnutls_certificate_get_x509_crls - Used to export all the CRLs from a gnutls_certificate_credentials_t structure
+ * @sc: is a #gnutls_certificate_credentials_t structure.
+ * @x509_crl_list: the exported CRL list. Should be treated as constant
+ * @ncrls: the number of exported CRLs
+ *
+ * This function will export all the CRLs associated with the given
+ * credentials.
+ *
+ * Since: 2.4.0
+ **/
 void
 gnutls_certificate_get_x509_crls (gnutls_certificate_credentials_t sc,
 				  gnutls_x509_crl_t ** x509_crl_list,
@@ -175,17 +174,16 @@ gnutls_certificate_get_openpgp_keyring (gnutls_certificate_credentials_t sc,
 #endif
 
 /**
-  * gnutls_certificate_free_ca_names - Used to free all the CA names from a gnutls_certificate_credentials_t structure
-  * @sc: is a #gnutls_certificate_credentials_t structure.
-  *
-  * This function will delete all the CA name in the
-  * given credentials. Clients may call this to save some memory
-  * since in client side the CA names are not used.
-  *
-  * CA names are used by servers to advertize the CAs they
-  * support to clients.
-  *
-  **/
+ * gnutls_certificate_free_ca_names - Used to free all the CA names from a gnutls_certificate_credentials_t structure
+ * @sc: is a #gnutls_certificate_credentials_t structure.
+ *
+ * This function will delete all the CA name in the given
+ * credentials. Clients may call this to save some memory since in
+ * client side the CA names are not used.
+ *
+ * CA names are used by servers to advertize the CAs they support to
+ * clients.
+ **/
 void
 gnutls_certificate_free_ca_names (gnutls_certificate_credentials_t sc)
 {
@@ -193,14 +191,13 @@ gnutls_certificate_free_ca_names (gnutls_certificate_credentials_t sc)
 }
 
 /*-
-  * _gnutls_certificate_get_rsa_params - Returns the RSA parameters pointer
-  * @rsa_params: holds the RSA parameters or NULL.
-  * @func: function to retrieve the parameters or NULL.
-  * @session: The session.
-  *
-  * This function will return the rsa parameters pointer.
-  *
-  -*/
+ * _gnutls_certificate_get_rsa_params - Returns the RSA parameters pointer
+ * @rsa_params: holds the RSA parameters or NULL.
+ * @func: function to retrieve the parameters or NULL.
+ * @session: The session.
+ *
+ * This function will return the rsa parameters pointer.
+ -*/
 gnutls_rsa_params_t
 _gnutls_certificate_get_rsa_params (gnutls_rsa_params_t rsa_params,
 				    gnutls_params_function * func,
@@ -233,16 +230,16 @@ _gnutls_certificate_get_rsa_params (gnutls_rsa_params_t rsa_params,
 
 
 /**
-  * gnutls_certificate_free_credentials - Used to free an allocated gnutls_certificate_credentials_t structure
-  * @sc: is a #gnutls_certificate_credentials_t structure.
-  *
-  * This structure is complex enough to manipulate directly thus
-  * this helper function is provided in order to free (deallocate) it.
-  *
-  * This function does not free any temporary parameters associated
-  * with this structure (ie RSA and DH parameters are not freed by
-  * this function).
-  **/
+ * gnutls_certificate_free_credentials - Used to free an allocated gnutls_certificate_credentials_t structure
+ * @sc: is a #gnutls_certificate_credentials_t structure.
+ *
+ * This structure is complex enough to manipulate directly thus this
+ * helper function is provided in order to free (deallocate) it.
+ *
+ * This function does not free any temporary parameters associated
+ * with this structure (ie RSA and DH parameters are not freed by this
+ * function).
+ **/
 void
 gnutls_certificate_free_credentials (gnutls_certificate_credentials_t sc)
 {
@@ -262,14 +259,14 @@ gnutls_certificate_free_credentials (gnutls_certificate_credentials_t sc)
 
 
 /**
-  * gnutls_certificate_allocate_credentials - Used to allocate a gnutls_certificate_credentials_t structure
-  * @res: is a pointer to a #gnutls_certificate_credentials_t structure.
-  *
-  * This structure is complex enough to manipulate directly thus this
-  * helper function is provided in order to allocate it.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_certificate_allocate_credentials - Used to allocate a gnutls_certificate_credentials_t structure
+ * @res: is a pointer to a #gnutls_certificate_credentials_t structure.
+ *
+ * This structure is complex enough to manipulate directly thus this
+ * helper function is provided in order to allocate it.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
 gnutls_certificate_allocate_credentials (gnutls_certificate_credentials_t *
 					 res)
@@ -346,17 +343,16 @@ _gnutls_selected_cert_supported_kx (gnutls_session_t session,
 
 
 /**
-  * gnutls_certificate_server_set_request - Used to set whether to request a client certificate
-  * @session: is a #gnutls_session_t structure.
-  * @req: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE
-  *
-  * This function specifies if we (in case of a server) are going
-  * to send a certificate request message to the client. If @req
-  * is GNUTLS_CERT_REQUIRE then the server will return an error if
-  * the peer does not provide a certificate. If you do not
-  * call this function then the client will not be asked to
-  * send a certificate.
-  **/
+ * gnutls_certificate_server_set_request - Used to set whether to request a client certificate
+ * @session: is a #gnutls_session_t structure.
+ * @req: is one of GNUTLS_CERT_REQUEST, GNUTLS_CERT_REQUIRE
+ *
+ * This function specifies if we (in case of a server) are going to
+ * send a certificate request message to the client. If @req is
+ * GNUTLS_CERT_REQUIRE then the server will return an error if the
+ * peer does not provide a certificate. If you do not call this
+ * function then the client will not be asked to send a certificate.
+ **/
 void
 gnutls_certificate_server_set_request (gnutls_session_t session,
 				       gnutls_certificate_request_t req)
@@ -365,35 +361,36 @@ gnutls_certificate_server_set_request (gnutls_session_t session,
 }
 
 /**
-  * gnutls_certificate_client_set_retrieve_function - Used to set a callback to retrieve the certificate
-  * @cred: is a #gnutls_certificate_credentials_t structure.
-  * @func: is the callback function
-  *
-  * This function sets a callback to be called in order to retrieve the certificate
-  * to be used in the handshake.
-  * The callback's function prototype is:
-  * int (*callback)(gnutls_session_t, const gnutls_datum_t* req_ca_dn, int nreqs, 
-  * const gnutls_pk_algorithm_t* pk_algos, int pk_algos_length, gnutls_retr_st* st);
-  *
-  * @req_ca_cert is only used in X.509 certificates. 
-  * Contains a list with the CA names that the server considers trusted. 
-  * Normally we should send a certificate that is signed
-  * by one of these CAs. These names are DER encoded. To get a more
-  * meaningful value use the function gnutls_x509_rdn_get().
-  *
-  * @pk_algos contains a list with server's acceptable signature algorithms.
-  * The certificate returned should support the server's given algorithms.
-  *
-  * @st should contain the certificates and private keys.
-  *
-  * If the callback function is provided then gnutls will call it, in the
-  * handshake, after the certificate request message has been received.
-  *
-  * The callback function should set the certificate list to be sent, and
-  * return 0 on success. If no certificate was selected then the number of certificates
-  * should be set to zero. The value (-1) indicates error and the handshake
-  * will be terminated.
-  **/
+ * gnutls_certificate_client_set_retrieve_function - Used to set a callback to retrieve the certificate
+ * @cred: is a #gnutls_certificate_credentials_t structure.
+ * @func: is the callback function
+ *
+ * This function sets a callback to be called in order to retrieve the
+ * certificate to be used in the handshake.
+ *
+ * The callback's function prototype is:
+ * int (*callback)(gnutls_session_t, const gnutls_datum_t* req_ca_dn, int nreqs,
+ * const gnutls_pk_algorithm_t* pk_algos, int pk_algos_length, gnutls_retr_st* st);
+ *
+ * @req_ca_cert is only used in X.509 certificates.
+ * Contains a list with the CA names that the server considers trusted.
+ * Normally we should send a certificate that is signed
+ * by one of these CAs. These names are DER encoded. To get a more
+ * meaningful value use the function gnutls_x509_rdn_get().
+ *
+ * @pk_algos contains a list with server's acceptable signature algorithms.
+ * The certificate returned should support the server's given algorithms.
+ *
+ * @st should contain the certificates and private keys.
+ *
+ * If the callback function is provided then gnutls will call it, in the
+ * handshake, after the certificate request message has been received.
+ *
+ * The callback function should set the certificate list to be sent,
+ * and return 0 on success. If no certificate was selected then the
+ * number of certificates should be set to zero. The value (-1)
+ * indicates error and the handshake will be terminated.
+ **/
 void gnutls_certificate_client_set_retrieve_function
   (gnutls_certificate_credentials_t cred,
    gnutls_certificate_client_retrieve_function * func)
@@ -402,24 +399,25 @@ void gnutls_certificate_client_set_retrieve_function
 }
 
 /**
-  * gnutls_certificate_server_set_retrieve_function - Used to set a callback to retrieve the certificate
-  * @cred: is a #gnutls_certificate_credentials_t structure.
-  * @func: is the callback function
-  *
-  * This function sets a callback to be called in order to retrieve the certificate
-  * to be used in the handshake.
-  * The callback's function prototype is:
-  * int (*callback)(gnutls_session_t, gnutls_retr_st* st);
-  *
-  * @st should contain the certificates and private keys.
-  *
-  * If the callback function is provided then gnutls will call it, in the
-  * handshake, after the certificate request message has been received.
-  *
-  * The callback function should set the certificate list to be sent, and
-  * return 0 on success.  The value (-1) indicates error and the handshake
-  * will be terminated.
-  **/
+ * gnutls_certificate_server_set_retrieve_function - Used to set a callback to retrieve the certificate
+ * @cred: is a #gnutls_certificate_credentials_t structure.
+ * @func: is the callback function
+ *
+ * This function sets a callback to be called in order to retrieve the
+ * certificate to be used in the handshake.
+ *
+ * The callback's function prototype is:
+ * int (*callback)(gnutls_session_t, gnutls_retr_st* st);
+ *
+ * @st should contain the certificates and private keys.
+ *
+ * If the callback function is provided then gnutls will call it, in the
+ * handshake, after the certificate request message has been received.
+ *
+ * The callback function should set the certificate list to be sent, and
+ * return 0 on success.  The value (-1) indicates error and the handshake
+ * will be terminated.
+ **/
 void gnutls_certificate_server_set_retrieve_function
   (gnutls_certificate_credentials_t cred,
    gnutls_certificate_server_retrieve_function * func)
@@ -497,13 +495,12 @@ _gnutls_x509_get_raw_crt_expiration_time (const gnutls_datum_t * cert)
 
 #ifdef ENABLE_OPENPGP
 /*-
-  * _gnutls_openpgp_crt_verify_peers - return the peer's certificate status
-  * @session: is a gnutls session
-  *
-  * This function will try to verify the peer's certificate and return its status (TRUSTED, INVALID etc.). 
-  * Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
-  *
-  -*/
+ * _gnutls_openpgp_crt_verify_peers - return the peer's certificate status
+ * @session: is a gnutls session
+ *
+ * This function will try to verify the peer's certificate and return its status (TRUSTED, INVALID etc.).
+ * Returns a negative error code in case of an error, or GNUTLS_E_NO_CERTIFICATE_FOUND if no certificate was sent.
+ -*/
 static int
 _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
 				  unsigned int *status)
@@ -560,31 +557,31 @@ _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
 #endif
 
 /**
-  * gnutls_certificate_verify_peers2 - return the peer's certificate verification status
-  * @session: is a gnutls session
-  * @status: is the output of the verification
-  *
-  * This function will try to verify the peer's certificate and return
-  * its status (trusted, invalid etc.).  The value of @status should
-  * be one or more of the gnutls_certificate_status_t enumerated
-  * elements bitwise or'd. To avoid denial of service attacks some
-  * default upper limits regarding the certificate key size and chain
-  * size are set. To override them use
-  * gnutls_certificate_set_verify_limits().
-  *
-  * Note that you must also check the peer's name in order to check if
-  * the verified certificate belongs to the actual peer.
-  *
-  * This function uses gnutls_x509_crt_list_verify() with the CAs in
-  * the credentials as trusted CAs.
-  *
-  * Note that some commonly used X.509 Certificate Authorities are
-  * still using Version 1 certificates.  If you want to accept them,
-  * you need to call gnutls_certificate_set_verify_flags() with, e.g.,
-  * %GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT parameter.
-  *
-  * Returns: a negative error code on error and zero on success.
-  **/
+ * gnutls_certificate_verify_peers2 - return the peer's certificate verification status
+ * @session: is a gnutls session
+ * @status: is the output of the verification
+ *
+ * This function will try to verify the peer's certificate and return
+ * its status (trusted, invalid etc.).  The value of @status should
+ * be one or more of the gnutls_certificate_status_t enumerated
+ * elements bitwise or'd. To avoid denial of service attacks some
+ * default upper limits regarding the certificate key size and chain
+ * size are set. To override them use
+ * gnutls_certificate_set_verify_limits().
+ *
+ * Note that you must also check the peer's name in order to check if
+ * the verified certificate belongs to the actual peer.
+ *
+ * This function uses gnutls_x509_crt_list_verify() with the CAs in
+ * the credentials as trusted CAs.
+ *
+ * Note that some commonly used X.509 Certificate Authorities are
+ * still using Version 1 certificates.  If you want to accept them,
+ * you need to call gnutls_certificate_set_verify_flags() with, e.g.,
+ * %GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT parameter.
+ *
+ * Returns: a negative error code on error and zero on success.
+ **/
 int
 gnutls_certificate_verify_peers2 (gnutls_session_t session,
 				  unsigned int *status)
@@ -616,21 +613,21 @@ gnutls_certificate_verify_peers2 (gnutls_session_t session,
 }
 
 /**
-  * gnutls_certificate_verify_peers - return the peer's certificate verification status
-  * @session: is a gnutls session
-  *
-  * This function will try to verify the peer's certificate and return
-  * its status (trusted, invalid etc.).  However you must also check
-  * the peer's name in order to check if the verified certificate
-  * belongs to the actual peer.
-  *
-  * This function uses gnutls_x509_crt_list_verify().
-  *
-  * Returns: one or more of the #gnutls_certificate_status_t
-  * enumerated elements bitwise or'd, or a negative value on error.
-  *
-  * Deprecated: Use gnutls_certificate_verify_peers2() instead.
-  **/
+ * gnutls_certificate_verify_peers - return the peer's certificate verification status
+ * @session: is a gnutls session
+ *
+ * This function will try to verify the peer's certificate and return
+ * its status (trusted, invalid etc.).  However you must also check
+ * the peer's name in order to check if the verified certificate
+ * belongs to the actual peer.
+ *
+ * This function uses gnutls_x509_crt_list_verify().
+ *
+ * Returns: one or more of the #gnutls_certificate_status_t
+ * enumerated elements bitwise or'd, or a negative value on error.
+ *
+ * Deprecated: Use gnutls_certificate_verify_peers2() instead.
+ **/
 int
 gnutls_certificate_verify_peers (gnutls_session_t session)
 {
@@ -649,15 +646,15 @@ gnutls_certificate_verify_peers (gnutls_session_t session)
 }
 
 /**
-  * gnutls_certificate_expiration_time_peers - return the peer's certificate expiration time
-  * @session: is a gnutls session
-  *
-  * This function will return the peer's certificate expiration time.
-  *
-  * Returns: (time_t)-1 on error.
-  *
-  * Deprecated: gnutls_certificate_verify_peers2() now verifies expiration times.
-  **/
+ * gnutls_certificate_expiration_time_peers - return the peer's certificate expiration time
+ * @session: is a gnutls session
+ *
+ * This function will return the peer's certificate expiration time.
+ *
+ * Returns: (time_t)-1 on error.
+ *
+ * Deprecated: gnutls_certificate_verify_peers2() now verifies expiration times.
+ **/
 time_t
 gnutls_certificate_expiration_time_peers (gnutls_session_t session)
 {
@@ -695,16 +692,16 @@ gnutls_certificate_expiration_time_peers (gnutls_session_t session)
 }
 
 /**
-  * gnutls_certificate_activation_time_peers - return the peer's certificate activation time
-  * @session: is a gnutls session
-  *
-  * This function will return the peer's certificate activation time.
-  * This is the creation time for openpgp keys.
-  *
-  * Returns: (time_t)-1 on error.
-  *
-  * Deprecated: gnutls_certificate_verify_peers2() now verifies activation times.
-  **/
+ * gnutls_certificate_activation_time_peers - return the peer's certificate activation time
+ * @session: is a gnutls session
+ *
+ * This function will return the peer's certificate activation time.
+ * This is the creation time for openpgp keys.
+ *
+ * Returns: (time_t)-1 on error.
+ *
+ * Deprecated: gnutls_certificate_verify_peers2() now verifies activation times.
+ **/
 time_t
 gnutls_certificate_activation_time_peers (gnutls_session_t session)
 {

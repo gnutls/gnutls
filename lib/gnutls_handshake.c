@@ -2495,35 +2495,34 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
  */
 
 /**
-  * gnutls_rehandshake - renegotiate security parameters
-  * @session: is a #gnutls_session_t structure.
-  *
-  * This function will renegotiate security parameters with the
-  * client.  This should only be called in case of a server.
-  *
-  * This message informs the peer that we want to renegotiate
-  * parameters (perform a handshake).
-  *
-  * If this function succeeds (returns 0), you must call the
-  * gnutls_handshake() function in order to negotiate the new
-  * parameters.
-  *
-  * Since TLS is full duplex some application data might have been
-  * sent during peer's processing of this message. In that case
-  * one should call gnutls_record_recv() until GNUTLS_E_REHANDSHAKE
-  * is returned to clear any pending data. Care must be taken if
-  * rehandshake is mandatory to terminate if it does not start after
-  * some threshold.
-  *
-  * If the client does not wish to renegotiate parameters he will
-  * should with an alert message, thus the return code will be
-  * %GNUTLS_E_WARNING_ALERT_RECEIVED and the alert will be
-  * %GNUTLS_A_NO_RENEGOTIATION.  A client may also choose to ignore
-  * this message.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
-  *
-  **/
+ * gnutls_rehandshake - renegotiate security parameters
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function will renegotiate security parameters with the
+ * client.  This should only be called in case of a server.
+ *
+ * This message informs the peer that we want to renegotiate
+ * parameters (perform a handshake).
+ *
+ * If this function succeeds (returns 0), you must call the
+ * gnutls_handshake() function in order to negotiate the new
+ * parameters.
+ *
+ * Since TLS is full duplex some application data might have been
+ * sent during peer's processing of this message. In that case
+ * one should call gnutls_record_recv() until GNUTLS_E_REHANDSHAKE
+ * is returned to clear any pending data. Care must be taken if
+ * rehandshake is mandatory to terminate if it does not start after
+ * some threshold.
+ *
+ * If the client does not wish to renegotiate parameters he will
+ * should with an alert message, thus the return code will be
+ * %GNUTLS_E_WARNING_ALERT_RECEIVED and the alert will be
+ * %GNUTLS_A_NO_RENEGOTIATION.  A client may also choose to ignore
+ * this message.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ **/
 int
 gnutls_rehandshake (gnutls_session_t session)
 {
@@ -2700,34 +2699,33 @@ _gnutls_recv_supplemental (gnutls_session_t session)
 }
 
 /**
-  * gnutls_handshake - This is the main function in the handshake protocol.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * This function does the handshake of the TLS/SSL protocol, and
-  * initializes the TLS connection.
-  *
-  * This function will fail if any problem is encountered, and will
-  * return a negative error code. In case of a client, if the client
-  * has asked to resume a session, but the server couldn't, then a
-  * full handshake will be performed.
-  *
-  * The non-fatal errors such as %GNUTLS_E_AGAIN and
-  * %GNUTLS_E_INTERRUPTED interrupt the handshake procedure, which
-  * should be later be resumed.  Call this function again, until it
-  * returns 0; cf.  gnutls_record_get_direction() and
-  * gnutls_error_is_fatal().
-  *
-  * If this function is called by a server after a rehandshake request
-  * then %GNUTLS_E_GOT_APPLICATION_DATA or
-  * %GNUTLS_E_WARNING_ALERT_RECEIVED may be returned.  Note that these
-  * are non fatal errors, only in the specific case of a rehandshake.
-  * Their meaning is that the client rejected the rehandshake request or
-  * in the case of %GNUTLS_E_GOT_APPLICATION_DATA it might also mean that
-  * some data were pending.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
-  *
-  **/
+ * gnutls_handshake - This is the main function in the handshake protocol.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function does the handshake of the TLS/SSL protocol, and
+ * initializes the TLS connection.
+ *
+ * This function will fail if any problem is encountered, and will
+ * return a negative error code. In case of a client, if the client
+ * has asked to resume a session, but the server couldn't, then a
+ * full handshake will be performed.
+ *
+ * The non-fatal errors such as %GNUTLS_E_AGAIN and
+ * %GNUTLS_E_INTERRUPTED interrupt the handshake procedure, which
+ * should be later be resumed.  Call this function again, until it
+ * returns 0; cf.  gnutls_record_get_direction() and
+ * gnutls_error_is_fatal().
+ *
+ * If this function is called by a server after a rehandshake request
+ * then %GNUTLS_E_GOT_APPLICATION_DATA or
+ * %GNUTLS_E_WARNING_ALERT_RECEIVED may be returned.  Note that these
+ * are non fatal errors, only in the specific case of a rehandshake.
+ * Their meaning is that the client rejected the rehandshake request or
+ * in the case of %GNUTLS_E_GOT_APPLICATION_DATA it might also mean that
+ * some data were pending.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ **/
 int
 gnutls_handshake (gnutls_session_t session)
 {
@@ -3020,11 +3018,10 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
   return 0;
 }
 
- /*
-  * _gnutls_handshake_server 
-  * This function does the server stuff of the handshake protocol.
-  */
-
+/*
+ * _gnutls_handshake_server
+ * This function does the server stuff of the handshake protocol.
+ */
 int
 _gnutls_handshake_server (gnutls_session_t session)
 {
@@ -3529,19 +3526,19 @@ _gnutls_get_adv_version (gnutls_session_t session)
 }
 
 /**
-  * gnutls_handshake_get_last_in - Returns the last handshake message received.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * This function is only useful to check where the last performed
-  * handshake failed.  If the previous handshake succeed or was not
-  * performed at all then no meaningful value will be returned.
-  *
-  * Check %gnutls_handshake_description_t in gnutls.h for the
-  * available handshake descriptions.
-  *
-  * Returns: the last handshake message type received, a
-  * %gnutls_handshake_description_t.
-  **/
+ * gnutls_handshake_get_last_in - Returns the last handshake message received.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function is only useful to check where the last performed
+ * handshake failed.  If the previous handshake succeed or was not
+ * performed at all then no meaningful value will be returned.
+ *
+ * Check %gnutls_handshake_description_t in gnutls.h for the
+ * available handshake descriptions.
+ *
+ * Returns: the last handshake message type received, a
+ * %gnutls_handshake_description_t.
+ **/
 gnutls_handshake_description_t
 gnutls_handshake_get_last_in (gnutls_session_t session)
 {
@@ -3549,19 +3546,19 @@ gnutls_handshake_get_last_in (gnutls_session_t session)
 }
 
 /**
-  * gnutls_handshake_get_last_out - Returns the last handshake message sent.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * This function is only useful to check where the last performed
-  * handshake failed.  If the previous handshake succeed or was not
-  * performed at all then no meaningful value will be returned.
-  *
-  * Check %gnutls_handshake_description_t in gnutls.h for the
-  * available handshake descriptions.
-  *
-  * Returns: the last handshake message type sent, a
-  * %gnutls_handshake_description_t.
-  **/
+ * gnutls_handshake_get_last_out - Returns the last handshake message sent.
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function is only useful to check where the last performed
+ * handshake failed.  If the previous handshake succeed or was not
+ * performed at all then no meaningful value will be returned.
+ *
+ * Check %gnutls_handshake_description_t in gnutls.h for the
+ * available handshake descriptions.
+ *
+ * Returns: the last handshake message type sent, a
+ * %gnutls_handshake_description_t.
+ **/
 gnutls_handshake_description_t
 gnutls_handshake_get_last_out (gnutls_session_t session)
 {

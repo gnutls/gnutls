@@ -251,19 +251,19 @@ _gnutls_handshake_internal_state_clear (gnutls_session_t session)
 
 #define MIN_DH_BITS 727
 /**
-  * gnutls_init - initialize the session to null (null encryption etc...).
-  * @con_end: indicate if this session is to be used for server or client.
-  * @session: is a pointer to a #gnutls_session_t structure.
-  *
-  * This function initializes the current session to null. Every
-  * session must be initialized before use, so internal structures can
-  * be allocated.  This function allocates structures which can only
-  * be free'd by calling gnutls_deinit().  Returns zero on success.
-  *
-  * @con_end can be one of %GNUTLS_CLIENT and %GNUTLS_SERVER.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_init - initialize the session to null (null encryption etc...).
+ * @con_end: indicate if this session is to be used for server or client.
+ * @session: is a pointer to a #gnutls_session_t structure.
+ *
+ * This function initializes the current session to null. Every
+ * session must be initialized before use, so internal structures can
+ * be allocated.  This function allocates structures which can only
+ * be free'd by calling gnutls_deinit().  Returns zero on success.
+ *
+ * @con_end can be one of %GNUTLS_CLIENT and %GNUTLS_SERVER.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
 gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
 {
@@ -363,13 +363,13 @@ _gnutls_session_is_resumable (gnutls_session_t session)
 
 
 /**
-  * gnutls_deinit - clear all buffers associated with a session
-  * @session: is a #gnutls_session_t structure.
-  *
-  * This function clears all buffers associated with the @session.
-  * This function will also remove session data from the session
-  * database if the session was terminated abnormally.
-  **/
+ * gnutls_deinit - clear all buffers associated with a session
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function clears all buffers associated with the @session.
+ * This function will also remove session data from the session
+ * database if the session was terminated abnormally.
+ **/
 void
 gnutls_deinit (gnutls_session_t session)
 {
@@ -675,15 +675,15 @@ _gnutls_dh_set_group (gnutls_session_t session, bigint_t gen, bigint_t prime)
 
 #ifdef ENABLE_OPENPGP
 /**
-  * gnutls_openpgp_send_cert - order gnutls to send the openpgp fingerprint instead of the key
-  * @session: is a pointer to a #gnutls_session_t structure.
-  * @status: is one of GNUTLS_OPENPGP_CERT, or GNUTLS_OPENPGP_CERT_FINGERPRINT
-  *
-  * This function will order gnutls to send the key fingerprint
-  * instead of the key in the initial handshake procedure. This should
-  * be used with care and only when there is indication or knowledge
-  * that the server can obtain the client's key.
-  **/
+ * gnutls_openpgp_send_cert - order gnutls to send the openpgp fingerprint instead of the key
+ * @session: is a pointer to a #gnutls_session_t structure.
+ * @status: is one of GNUTLS_OPENPGP_CERT, or GNUTLS_OPENPGP_CERT_FINGERPRINT
+ *
+ * This function will order gnutls to send the key fingerprint
+ * instead of the key in the initial handshake procedure. This should
+ * be used with care and only when there is indication or knowledge
+ * that the server can obtain the client's key.
+ **/
 void
 gnutls_openpgp_send_cert (gnutls_session_t session,
 			  gnutls_openpgp_crt_status_t status)
@@ -693,19 +693,19 @@ gnutls_openpgp_send_cert (gnutls_session_t session,
 #endif
 
 /**
-  * gnutls_certificate_send_x509_rdn_sequence - order gnutls to send or not the x.509 rdn sequence
-  * @session: is a pointer to a #gnutls_session_t structure.
-  * @status: is 0 or 1
-  *
-  * If status is non zero, this function will order gnutls not to send
-  * the rdnSequence in the certificate request message. That is the
-  * server will not advertize it's trusted CAs to the peer. If status
-  * is zero then the default behaviour will take effect, which is to
-  * advertize the server's trusted CAs.
-  *
-  * This function has no effect in clients, and in authentication
-  * methods other than certificate with X.509 certificates.
-  **/
+ * gnutls_certificate_send_x509_rdn_sequence - order gnutls to send or not the x.509 rdn sequence
+ * @session: is a pointer to a #gnutls_session_t structure.
+ * @status: is 0 or 1
+ *
+ * If status is non zero, this function will order gnutls not to send
+ * the rdnSequence in the certificate request message. That is the
+ * server will not advertize it's trusted CAs to the peer. If status
+ * is zero then the default behaviour will take effect, which is to
+ * advertize the server's trusted CAs.
+ *
+ * This function has no effect in clients, and in authentication
+ * methods other than certificate with X.509 certificates.
+ **/
 void
 gnutls_certificate_send_x509_rdn_sequence (gnutls_session_t session,
 					   int status)
@@ -722,16 +722,15 @@ _gnutls_openpgp_send_fingerprint (gnutls_session_t session)
 #endif
 
 /*-
-  * _gnutls_record_set_default_version - Used to set the default version for the first record packet
-  * @session: is a #gnutls_session_t structure.
-  * @major: is a tls major version
-  * @minor: is a tls minor version
-  *
-  * This function sets the default version that we will use in the first
-  * record packet (client hello). This function is only useful to people
-  * that know TLS internals and want to debug other implementations.
-  *
-  -*/
+ * _gnutls_record_set_default_version - Used to set the default version for the first record packet
+ * @session: is a #gnutls_session_t structure.
+ * @major: is a tls major version
+ * @minor: is a tls minor version
+ *
+ * This function sets the default version that we will use in the first
+ * record packet (client hello). This function is only useful to people
+ * that know TLS internals and want to debug other implementations.
+ -*/
 void
 _gnutls_record_set_default_version (gnutls_session_t session,
 				    unsigned char major, unsigned char minor)
@@ -741,21 +740,21 @@ _gnutls_record_set_default_version (gnutls_session_t session,
 }
 
 /**
-  * gnutls_handshake_set_private_extensions - Used to enable the private cipher suites
-  * @session: is a #gnutls_session_t structure.
-  * @allow: is an integer (0 or 1)
-  *
-  * This function will enable or disable the use of private cipher
-  * suites (the ones that start with 0xFF).  By default or if @allow
-  * is 0 then these cipher suites will not be advertized nor used.
-  *
-  * Unless this function is called with the option to allow (1), then
-  * no compression algorithms, like LZO.  That is because these
-  * algorithms are not yet defined in any RFC or even internet draft.
-  *
-  * Enabling the private ciphersuites when talking to other than
-  * gnutls servers and clients may cause interoperability problems.
-  **/
+ * gnutls_handshake_set_private_extensions - Used to enable the private cipher suites
+ * @session: is a #gnutls_session_t structure.
+ * @allow: is an integer (0 or 1)
+ *
+ * This function will enable or disable the use of private cipher
+ * suites (the ones that start with 0xFF).  By default or if @allow
+ * is 0 then these cipher suites will not be advertized nor used.
+ *
+ * Unless this function is called with the option to allow (1), then
+ * no compression algorithms, like LZO.  That is because these
+ * algorithms are not yet defined in any RFC or even internet draft.
+ *
+ * Enabling the private ciphersuites when talking to other than
+ * gnutls servers and clients may cause interoperability problems.
+ **/
 void
 gnutls_handshake_set_private_extensions (gnutls_session_t session, int allow)
 {
@@ -1201,12 +1200,11 @@ gnutls_session_is_resumed (gnutls_session_t session)
 }
 
 /*-
-  * _gnutls_session_is_export - Used to check whether this session is of export grade
-  * @session: is a #gnutls_session_t structure.
-  *
-  * This function will return non zero if this session is of export grade.
-  *
-  -*/
+ * _gnutls_session_is_export - Used to check whether this session is of export grade
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function will return non zero if this session is of export grade.
+ -*/
 int
 _gnutls_session_is_export (gnutls_session_t session)
 {
@@ -1228,7 +1226,6 @@ _gnutls_session_is_export (gnutls_session_t session)
  *
  * This function will return non zero if this session uses a PSK key
  * exchange algorithm.
- *
  -*/
 int
 _gnutls_session_is_psk (gnutls_session_t session)
@@ -1300,16 +1297,15 @@ gnutls_record_get_direction (gnutls_session_t session)
 }
 
 /*-
-  * _gnutls_rsa_pms_set_version - Sets a version to be used at the RSA PMS
-  * @session: is a #gnutls_session_t structure.
-  * @major: is the major version to use
-  * @minor: is the minor version to use
-  *
-  * This function will set the given version number to be used at the
-  * RSA PMS secret. This is only useful to clients, which want to
-  * test server's capabilities.
-  *
-  -*/
+ * _gnutls_rsa_pms_set_version - Sets a version to be used at the RSA PMS
+ * @session: is a #gnutls_session_t structure.
+ * @major: is the major version to use
+ * @minor: is the minor version to use
+ *
+ * This function will set the given version number to be used at the
+ * RSA PMS secret. This is only useful to clients, which want to
+ * test server's capabilities.
+ -*/
 void
 _gnutls_rsa_pms_set_version (gnutls_session_t session,
 			     unsigned char major, unsigned char minor)

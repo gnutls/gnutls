@@ -925,37 +925,37 @@ _gnutls_x509_privkey_verify_signature (const gnutls_datum_t * tbs,
 }
 
 /**
-  * gnutls_x509_crt_list_verify - This function verifies the given certificate list
-  * @cert_list: is the certificate list to be verified
-  * @cert_list_length: holds the number of certificate in cert_list
-  * @CA_list: is the CA list which will be used in verification
-  * @CA_list_length: holds the number of CA certificate in CA_list
-  * @CRL_list: holds a list of CRLs.
-  * @CRL_list_length: the length of CRL list.
-  * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
-  * @verify: will hold the certificate verification output.
-  *
-  * This function will try to verify the given certificate list and return its status.
-  * If no flags are specified (0), this function will use the 
-  * basicConstraints (2.5.29.19) PKIX extension. This means that only a certificate 
-  * authority is allowed to sign a certificate.
-  *
-  * You must also check the peer's name in order to check if the verified 
-  * certificate belongs to the actual peer. 
-  *
-  * The certificate verification output will be put in @verify and will be
-  * one or more of the gnutls_certificate_status_t enumerated elements bitwise or'd.
-  * For a more detailed verification status use gnutls_x509_crt_verify() per list
-  * element.
-  *
-  * GNUTLS_CERT_INVALID: the certificate chain is not valid.
-  *
-  * GNUTLS_CERT_REVOKED: a certificate in the chain has been revoked.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_x509_crt_list_verify - This function verifies the given certificate list
+ * @cert_list: is the certificate list to be verified
+ * @cert_list_length: holds the number of certificate in cert_list
+ * @CA_list: is the CA list which will be used in verification
+ * @CA_list_length: holds the number of CA certificate in CA_list
+ * @CRL_list: holds a list of CRLs.
+ * @CRL_list_length: the length of CRL list.
+ * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
+ * @verify: will hold the certificate verification output.
+ *
+ * This function will try to verify the given certificate list and
+ * return its status.  If no flags are specified (0), this function
+ * will use the basicConstraints (2.5.29.19) PKIX extension. This
+ * means that only a certificate authority is allowed to sign a
+ * certificate.
+ *
+ * You must also check the peer's name in order to check if the verified
+ * certificate belongs to the actual peer.
+ *
+ * The certificate verification output will be put in @verify and will
+ * be one or more of the gnutls_certificate_status_t enumerated
+ * elements bitwise or'd.  For a more detailed verification status use
+ * gnutls_x509_crt_verify() per list element.
+ *
+ * GNUTLS_CERT_INVALID: the certificate chain is not valid.
+ *
+ * GNUTLS_CERT_REVOKED: a certificate in the chain has been revoked.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_crt_list_verify (const gnutls_x509_crt_t * cert_list,
 			     int cert_list_length,
@@ -979,20 +979,20 @@ gnutls_x509_crt_list_verify (const gnutls_x509_crt_t * cert_list,
 }
 
 /**
-  * gnutls_x509_crt_verify - This function verifies the given certificate against a given trusted one
-  * @cert: is the certificate to be verified
-  * @CA_list: is one certificate that is considered to be trusted one
-  * @CA_list_length: holds the number of CA certificate in CA_list
-  * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
-  * @verify: will hold the certificate verification output.
-  *
-  * This function will try to verify the given certificate and return its status. 
-  * The verification output in this functions cannot be GNUTLS_CERT_NOT_VALID.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_x509_crt_verify - This function verifies the given certificate against a given trusted one
+ * @cert: is the certificate to be verified
+ * @CA_list: is one certificate that is considered to be trusted one
+ * @CA_list_length: holds the number of CA certificate in CA_list
+ * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
+ * @verify: will hold the certificate verification output.
+ *
+ * This function will try to verify the given certificate and return
+ * its status.  The verification output in this functions cannot be
+ * GNUTLS_CERT_NOT_VALID.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_crt_verify (gnutls_x509_crt_t cert,
 			const gnutls_x509_crt_t * CA_list,

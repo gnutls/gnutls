@@ -120,16 +120,16 @@ _gnutls_safe_renegotiation_send_params (gnutls_session_t session,
 }
 
 /**
-  * gnutls_safe_negotiation_set_initial - Used to enable and disable initial safe renegotiation
-  * @session: is a #gnutls_session_t structure.
-  * @value: 0 to disable and 1 to enable
-  *
-  * Used to enable and disable initial safe renegotiation for the current
-  * session. By default it is allowed for a client to not advertise safe
-  * renegotiation capability but there might be cases where signalling
-  * a client of its insecurity by rejecting session might be beneficial.
-  * This option has meaning only in server side.
-  **/
+ * gnutls_safe_negotiation_set_initial - Used to enable and disable initial safe renegotiation
+ * @session: is a #gnutls_session_t structure.
+ * @value: 0 to disable and 1 to enable
+ *
+ * Used to enable and disable initial safe renegotiation for the current
+ * session. By default it is allowed for a client to not advertise safe
+ * renegotiation capability but there might be cases where signalling
+ * a client of its insecurity by rejecting session might be beneficial.
+ * This option has meaning only in server side.
+ **/
 void
 gnutls_safe_negotiation_set_initial (gnutls_session_t session, int value)
 {
@@ -137,16 +137,17 @@ gnutls_safe_negotiation_set_initial (gnutls_session_t session, int value)
 }
 
 /**
-  * gnutls_safe_negotiation_set - Used to enable and disable safe renegotiation
-  * @session: is a #gnutls_session_t structure.
-  * @value: 0 to disable and 1 to enable
-  *
-  * Used to enable and disable safe renegotiation for the current
-  * session. Normally you shouldn't cope with this function since the
-  * default (enable) is sufficient, but there might be servers that
-  * cannot handle or correctly handle the extension.
-  **/
-void gnutls_safe_renegotiation_set (gnutls_session_t session, int value)
+ * gnutls_safe_negotiation_set - Used to enable and disable safe renegotiation
+ * @session: is a #gnutls_session_t structure.
+ * @value: 0 to disable and 1 to enable
+ *
+ * Used to enable and disable safe renegotiation for the current
+ * session. Normally you shouldn't cope with this function since the
+ * default (enable) is sufficient, but there might be servers that
+ * cannot handle or correctly handle the extension.
+ **/
+void
+gnutls_safe_renegotiation_set (gnutls_session_t session, int value)
 {
-	session->internals.priorities.unsafe_renegotiation = 1-value;
+  session->internals.priorities.unsafe_renegotiation = 1-value;
 }

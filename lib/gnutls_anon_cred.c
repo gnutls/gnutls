@@ -35,12 +35,12 @@
 #include "gnutls_mpi.h"
 
 /**
-  * gnutls_anon_free_server_credentials - Used to free an allocated gnutls_anon_server_credentials_t structure
-  * @sc: is a #gnutls_anon_server_credentials_t structure.
-  *
-  * This structure is complex enough to manipulate directly thus this
-  * helper function is provided in order to free (deallocate) it.
-  **/
+ * gnutls_anon_free_server_credentials - Used to free an allocated gnutls_anon_server_credentials_t structure
+ * @sc: is a #gnutls_anon_server_credentials_t structure.
+ *
+ * This structure is complex enough to manipulate directly thus this
+ * helper function is provided in order to free (deallocate) it.
+ **/
 void
 gnutls_anon_free_server_credentials (gnutls_anon_server_credentials_t sc)
 {
@@ -49,14 +49,14 @@ gnutls_anon_free_server_credentials (gnutls_anon_server_credentials_t sc)
 }
 
 /**
-  * gnutls_anon_allocate_server_credentials - Used to allocate an gnutls_anon_server_credentials_t structure
-  * @sc: is a pointer to a #gnutls_anon_server_credentials_t structure.
-  *
-  * This structure is complex enough to manipulate directly thus this
-  * helper function is provided in order to allocate it.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_anon_allocate_server_credentials - Used to allocate an gnutls_anon_server_credentials_t structure
+ * @sc: is a pointer to a #gnutls_anon_server_credentials_t structure.
+ *
+ * This structure is complex enough to manipulate directly thus this
+ * helper function is provided in order to allocate it.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
 gnutls_anon_allocate_server_credentials (gnutls_anon_server_credentials_t *
 					 sc)
@@ -69,12 +69,12 @@ gnutls_anon_allocate_server_credentials (gnutls_anon_server_credentials_t *
 
 
 /**
-  * gnutls_anon_free_client_credentials - Used to free an allocated gnutls_anon_client_credentials_t structure
-  * @sc: is a #gnutls_anon_client_credentials_t structure.
-  *
-  * This structure is complex enough to manipulate directly thus this
-  * helper function is provided in order to free (deallocate) it.
-  **/
+ * gnutls_anon_free_client_credentials - Used to free an allocated gnutls_anon_client_credentials_t structure
+ * @sc: is a #gnutls_anon_client_credentials_t structure.
+ *
+ * This structure is complex enough to manipulate directly thus this
+ * helper function is provided in order to free (deallocate) it.
+ **/
 void
 gnutls_anon_free_client_credentials (gnutls_anon_client_credentials_t sc)
 {
@@ -105,14 +105,14 @@ gnutls_anon_allocate_client_credentials (gnutls_anon_client_credentials_t *
 }
 
 /**
-  * gnutls_anon_set_server_dh_params - set the DH parameters for a server to use
-  * @res: is a gnutls_anon_server_credentials_t structure
-  * @dh_params: is a structure that holds Diffie-Hellman parameters.
-  *
-  * This function will set the Diffie-Hellman parameters for an
-  * anonymous server to use.  These parameters will be used in
-  * Anonymous Diffie-Hellman cipher suites.
-  **/
+ * gnutls_anon_set_server_dh_params - set the DH parameters for a server to use
+ * @res: is a gnutls_anon_server_credentials_t structure
+ * @dh_params: is a structure that holds Diffie-Hellman parameters.
+ *
+ * This function will set the Diffie-Hellman parameters for an
+ * anonymous server to use.  These parameters will be used in
+ * Anonymous Diffie-Hellman cipher suites.
+ **/
 void
 gnutls_anon_set_server_dh_params (gnutls_anon_server_credentials_t res,
 				  gnutls_dh_params_t dh_params)
@@ -121,14 +121,14 @@ gnutls_anon_set_server_dh_params (gnutls_anon_server_credentials_t res,
 }
 
 /**
-  * gnutls_anon_set_server_params_function - set the DH parameters callback
-  * @res: is a gnutls_certificate_credentials_t structure
-  * @func: is the function to be called
-  *
-  * This function will set a callback in order for the server to get
-  * the Diffie-Hellman parameters for anonymous authentication.  The
-  * callback should return zero on success.
-  **/
+ * gnutls_anon_set_server_params_function - set the DH parameters callback
+ * @res: is a gnutls_certificate_credentials_t structure
+ * @func: is the function to be called
+ *
+ * This function will set a callback in order for the server to get
+ * the Diffie-Hellman parameters for anonymous authentication.  The
+ * callback should return zero on success.
+ **/
 void
 gnutls_anon_set_server_params_function (gnutls_anon_server_credentials_t res,
 					gnutls_params_function * func)

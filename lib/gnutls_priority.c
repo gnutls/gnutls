@@ -37,19 +37,18 @@ break_comma_list (char *etag,
 		  char sep);
 
 /**
-  * gnutls_cipher_set_priority - Sets the priority on the ciphers supported by gnutls.
-  * @session: is a #gnutls_session_t structure.
-  * @list: is a 0 terminated list of gnutls_cipher_algorithm_t elements.
-  *
-  * Sets the priority on the ciphers supported by gnutls.
-  * Priority is higher for elements specified before others.
-  * After specifying the ciphers you want, you must append a 0.
-  * Note that the priority is set on the client. The server does
-  * not use the algorithm's priority except for disabling
-  * algorithms that were not specified.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_cipher_set_priority - Sets the priority on the ciphers supported by gnutls.
+ * @session: is a #gnutls_session_t structure.
+ * @list: is a 0 terminated list of gnutls_cipher_algorithm_t elements.
+ *
+ * Sets the priority on the ciphers supported by gnutls.  Priority is
+ * higher for elements specified before others.  After specifying the
+ * ciphers you want, you must append a 0.  Note that the priority is
+ * set on the client. The server does not use the algorithm's
+ * priority except for disabling algorithms that were not specified.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
 gnutls_cipher_set_priority (gnutls_session_t session, const int *list)
 {
@@ -90,19 +89,19 @@ _set_priority (priority_st * st, const int *list)
 }
 
 /**
-  * gnutls_kx_set_priority - Sets the priority on the key exchange algorithms supported by gnutls.
-  * @session: is a #gnutls_session_t structure.
-  * @list: is a 0 terminated list of gnutls_kx_algorithm_t elements.
-  *
-  * Sets the priority on the key exchange algorithms supported by gnutls.
-  * Priority is higher for elements specified before others.
-  * After specifying the algorithms you want, you must append a 0.
-  * Note that the priority is set on the client. The server does
-  * not use the algorithm's priority except for disabling
-  * algorithms that were not specified.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_kx_set_priority - Sets the priority on the key exchange algorithms supported by gnutls.
+ * @session: is a #gnutls_session_t structure.
+ * @list: is a 0 terminated list of gnutls_kx_algorithm_t elements.
+ *
+ * Sets the priority on the key exchange algorithms supported by
+ * gnutls.  Priority is higher for elements specified before others.
+ * After specifying the algorithms you want, you must append a 0.
+ * Note that the priority is set on the client. The server does not
+ * use the algorithm's priority except for disabling algorithms that
+ * were not specified.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
 gnutls_kx_set_priority (gnutls_session_t session, const int *list)
 {
@@ -110,19 +109,19 @@ gnutls_kx_set_priority (gnutls_session_t session, const int *list)
 }
 
 /**
-  * gnutls_mac_set_priority - Sets the priority on the mac algorithms supported by gnutls.
-  * @session: is a #gnutls_session_t structure.
-  * @list: is a 0 terminated list of gnutls_mac_algorithm_t elements.
-  *
-  * Sets the priority on the mac algorithms supported by gnutls.
-  * Priority is higher for elements specified before others.
-  * After specifying the algorithms you want, you must append a 0.
-  * Note that the priority is set on the client. The server does
-  * not use the algorithm's priority except for disabling
-  * algorithms that were not specified.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_mac_set_priority - Sets the priority on the mac algorithms supported by gnutls.
+ * @session: is a #gnutls_session_t structure.
+ * @list: is a 0 terminated list of gnutls_mac_algorithm_t elements.
+ *
+ * Sets the priority on the mac algorithms supported by gnutls.
+ * Priority is higher for elements specified before others.  After
+ * specifying the algorithms you want, you must append a 0.  Note
+ * that the priority is set on the client. The server does not use
+ * the algorithm's priority except for disabling algorithms that were
+ * not specified.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
 gnutls_mac_set_priority (gnutls_session_t session, const int *list)
 {
@@ -130,23 +129,23 @@ gnutls_mac_set_priority (gnutls_session_t session, const int *list)
 }
 
 /**
-  * gnutls_compression_set_priority - Sets the priority on the compression algorithms supported by gnutls.
-  * @session: is a #gnutls_session_t structure.
-  * @list: is a 0 terminated list of gnutls_compression_method_t elements.
-  *
-  * Sets the priority on the compression algorithms supported by gnutls.
-  * Priority is higher for elements specified before others.
-  * After specifying the algorithms you want, you must append a 0.
-  * Note that the priority is set on the client. The server does
-  * not use the algorithm's priority except for disabling
-  * algorithms that were not specified.
-  *
-  * TLS 1.0 does not define any compression algorithms except
-  * NULL. Other compression algorithms are to be considered
-  * as gnutls extensions.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_compression_set_priority - Sets the priority on the compression algorithms supported by gnutls.
+ * @session: is a #gnutls_session_t structure.
+ * @list: is a 0 terminated list of gnutls_compression_method_t elements.
+ *
+ * Sets the priority on the compression algorithms supported by
+ * gnutls.  Priority is higher for elements specified before others.
+ * After specifying the algorithms you want, you must append a 0.
+ * Note that the priority is set on the client. The server does not
+ * use the algorithm's priority except for disabling algorithms that
+ * were not specified.
+ *
+ * TLS 1.0 does not define any compression algorithms except
+ * NULL. Other compression algorithms are to be considered as gnutls
+ * extensions.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
 gnutls_compression_set_priority (gnutls_session_t session, const int *list)
 {
@@ -154,16 +153,16 @@ gnutls_compression_set_priority (gnutls_session_t session, const int *list)
 }
 
 /**
-  * gnutls_protocol_set_priority - Sets the priority on the protocol versions supported by gnutls.
-  * @session: is a #gnutls_session_t structure.
-  * @list: is a 0 terminated list of gnutls_protocol_t elements.
-  *
-  * Sets the priority on the protocol versions supported by gnutls.
-  * This function actually enables or disables protocols. Newer protocol
-  * versions always have highest priority.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_protocol_set_priority - Sets the priority on the protocol versions supported by gnutls.
+ * @session: is a #gnutls_session_t structure.
+ * @list: is a 0 terminated list of gnutls_protocol_t elements.
+ *
+ * Sets the priority on the protocol versions supported by gnutls.
+ * This function actually enables or disables protocols. Newer protocol
+ * versions always have highest priority.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
 gnutls_protocol_set_priority (gnutls_session_t session, const int *list)
 {
@@ -181,19 +180,19 @@ gnutls_protocol_set_priority (gnutls_session_t session, const int *list)
 }
 
 /**
-  * gnutls_certificate_type_set_priority - Sets the priority on the certificate types supported by gnutls.
-  * @session: is a #gnutls_session_t structure.
-  * @list: is a 0 terminated list of gnutls_certificate_type_t elements.
-  *
-  * Sets the priority on the certificate types supported by gnutls.
-  * Priority is higher for elements specified before others.
-  * After specifying the types you want, you must append a 0.
-  * Note that the certificate type priority is set on the client. 
-  * The server does not use the cert type priority except for disabling
-  * types that were not specified.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
+ * gnutls_certificate_type_set_priority - Sets the priority on the certificate types supported by gnutls.
+ * @session: is a #gnutls_session_t structure.
+ * @list: is a 0 terminated list of gnutls_certificate_type_t elements.
+ *
+ * Sets the priority on the certificate types supported by gnutls.
+ * Priority is higher for elements specified before others.
+ * After specifying the types you want, you must append a 0.
+ * Note that the certificate type priority is set on the client.
+ * The server does not use the cert type priority except for disabling
+ * types that were not specified.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ **/
 int
 gnutls_certificate_type_set_priority (gnutls_session_t session,
 				      const int *list)

@@ -112,14 +112,13 @@ gnutls_calc_dh_key (bigint_t f, bigint_t x, bigint_t prime)
 }
 
 /*-
-  * _gnutls_get_dh_params - Returns the DH parameters pointer
-  * @dh_params: is an DH parameters structure, or NULL.
-  * @func: is a callback function to receive the parameters or NULL.
-  * @session: a gnutls session.
-  *
-  * This function will return the dh parameters pointer.
-  *
-  -*/
+ * _gnutls_get_dh_params - Returns the DH parameters pointer
+ * @dh_params: is an DH parameters structure, or NULL.
+ * @func: is a callback function to receive the parameters or NULL.
+ * @session: a gnutls session.
+ *
+ * This function will return the dh parameters pointer.
+ -*/
 gnutls_dh_params_t
 _gnutls_get_dh_params (gnutls_dh_params_t dh_params,
 		       gnutls_params_function * func,

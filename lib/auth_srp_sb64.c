@@ -311,22 +311,22 @@ _gnutls_sbase64_decode (uint8_t * data, size_t idata_size, uint8_t ** result)
 }
 
 /**
-  * gnutls_srp_base64_encode - Encode raw data using SRP-Base64
-  * @data: contain the raw data
-  * @result: the place where base64 data will be copied
-  * @result_size: holds the size of the result
-  *
-  * This function will convert the given data to printable data, using
-  * the base64 encoding, as used in the libsrp.  This is the encoding
-  * used in SRP password files.  If the provided buffer is not long
-  * enough GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
-  *
-  * Warning!  This base64 encoding is not the "standard" encoding, so
-  * do not use it for non-SRP purposes.
-  *
-  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
-  * long enough, or 0 on success.
-  **/
+ * gnutls_srp_base64_encode - Encode raw data using SRP-Base64
+ * @data: contain the raw data
+ * @result: the place where base64 data will be copied
+ * @result_size: holds the size of the result
+ *
+ * This function will convert the given data to printable data, using
+ * the base64 encoding, as used in the libsrp.  This is the encoding
+ * used in SRP password files.  If the provided buffer is not long
+ * enough GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
+ *
+ * Warning!  This base64 encoding is not the "standard" encoding, so
+ * do not use it for non-SRP purposes.
+ *
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
+ * long enough, or 0 on success.
+ **/
 int
 gnutls_srp_base64_encode (const gnutls_datum_t * data, char *result,
 			  size_t * result_size)
@@ -355,22 +355,22 @@ gnutls_srp_base64_encode (const gnutls_datum_t * data, char *result,
 }
 
 /**
-  * gnutls_srp_base64_encode_alloc - encode raw data using SRP-Base64
-  * @data: contains the raw data
-  * @result: will hold the newly allocated encoded data
-  *
-  * This function will convert the given data to printable data, using
-  * the base64 encoding.  This is the encoding used in SRP password
-  * files.  This function will allocate the required memory to hold
-  * the encoded data.
-  *
-  * You should use gnutls_free() to free the returned data.
-  *
-  * Warning!  This base64 encoding is not the "standard" encoding, so
-  * do not use it for non-SRP purposes.
-  *
-  * Returns: 0 on success, or an error code.
-  **/
+ * gnutls_srp_base64_encode_alloc - encode raw data using SRP-Base64
+ * @data: contains the raw data
+ * @result: will hold the newly allocated encoded data
+ *
+ * This function will convert the given data to printable data, using
+ * the base64 encoding.  This is the encoding used in SRP password
+ * files.  This function will allocate the required memory to hold
+ * the encoded data.
+ *
+ * You should use gnutls_free() to free the returned data.
+ *
+ * Warning!  This base64 encoding is not the "standard" encoding, so
+ * do not use it for non-SRP purposes.
+ *
+ * Returns: 0 on success, or an error code.
+ **/
 int
 gnutls_srp_base64_encode_alloc (const gnutls_datum_t * data,
 				gnutls_datum_t * result)
@@ -397,22 +397,22 @@ gnutls_srp_base64_encode_alloc (const gnutls_datum_t * data,
 }
 
 /**
-  * gnutls_srp_base64_decode - decode SRP-base64 encoded data
-  * @b64_data: contain the encoded data
-  * @result: the place where decoded data will be copied
-  * @result_size: holds the size of the result
-  *
-  * This function will decode the given encoded data, using the base64
-  * encoding found in libsrp.
-  *
-  * Note that b64_data should be null terminated.
-  *
-  * Warning!  This base64 encoding is not the "standard" encoding, so
-  * do not use it for non-SRP purposes.
-  *
-  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
-  * long enough, or 0 on success.
-  **/
+ * gnutls_srp_base64_decode - decode SRP-base64 encoded data
+ * @b64_data: contain the encoded data
+ * @result: the place where decoded data will be copied
+ * @result_size: holds the size of the result
+ *
+ * This function will decode the given encoded data, using the base64
+ * encoding found in libsrp.
+ *
+ * Note that @b64_data should be null terminated.
+ *
+ * Warning!  This base64 encoding is not the "standard" encoding, so
+ * do not use it for non-SRP purposes.
+ *
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the buffer given is not
+ * long enough, or 0 on success.
+ **/
 int
 gnutls_srp_base64_decode (const gnutls_datum_t * b64_data, char *result,
 			  size_t * result_size)
@@ -441,21 +441,21 @@ gnutls_srp_base64_decode (const gnutls_datum_t * b64_data, char *result,
 }
 
 /**
-  * gnutls_srp_base64_decode_alloc - decode SRP-base64 encoded data
-  * @b64_data: contains the encoded data
-  * @result: the place where decoded data lie
-  *
-  * This function will decode the given encoded data. The decoded data
-  * will be allocated, and stored into result.  It will decode using
-  * the base64 algorithm as used in libsrp.
-  *
-  * You should use gnutls_free() to free the returned data.
-  *
-  * Warning!  This base64 encoding is not the "standard" encoding, so
-  * do not use it for non-SRP purposes.
-  *
-  * Returns: 0 on success, or an error code.
-  **/
+ * gnutls_srp_base64_decode_alloc - decode SRP-base64 encoded data
+ * @b64_data: contains the encoded data
+ * @result: the place where decoded data lie
+ *
+ * This function will decode the given encoded data. The decoded data
+ * will be allocated, and stored into result.  It will decode using
+ * the base64 algorithm as used in libsrp.
+ *
+ * You should use gnutls_free() to free the returned data.
+ *
+ * Warning!  This base64 encoding is not the "standard" encoding, so
+ * do not use it for non-SRP purposes.
+ *
+ * Returns: 0 on success, or an error code.
+ **/
 int
 gnutls_srp_base64_decode_alloc (const gnutls_datum_t * b64_data,
 				gnutls_datum_t * result)

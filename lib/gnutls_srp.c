@@ -391,13 +391,12 @@ freeall:
 }
 
 /**
-  * gnutls_srp_free_client_credentials - Used to free an allocated gnutls_srp_client_credentials_t structure
-  * @sc: is a #gnutls_srp_client_credentials_t structure.
-  *
-  * This structure is complex enough to manipulate directly thus
-  * this helper function is provided in order to free (deallocate) it.
-  *
-  **/
+ * gnutls_srp_free_client_credentials - Used to free an allocated gnutls_srp_client_credentials_t structure
+ * @sc: is a #gnutls_srp_client_credentials_t structure.
+ *
+ * This structure is complex enough to manipulate directly thus
+ * this helper function is provided in order to free (deallocate) it.
+ **/
 void
 gnutls_srp_free_client_credentials (gnutls_srp_client_credentials_t sc)
 {
@@ -407,15 +406,15 @@ gnutls_srp_free_client_credentials (gnutls_srp_client_credentials_t sc)
 }
 
 /**
-  * gnutls_srp_allocate_client_credentials - Used to allocate an gnutls_srp_server_credentials_t structure
-  * @sc: is a pointer to a #gnutls_srp_server_credentials_t structure.
-  *
-  * This structure is complex enough to manipulate directly thus
-  * this helper function is provided in order to allocate it.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
-  *   error code.
-  **/
+ * gnutls_srp_allocate_client_credentials - Used to allocate an gnutls_srp_server_credentials_t structure
+ * @sc: is a pointer to a #gnutls_srp_server_credentials_t structure.
+ *
+ * This structure is complex enough to manipulate directly thus
+ * this helper function is provided in order to allocate it.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
+ *   error code.
+ **/
 int
 gnutls_srp_allocate_client_credentials (gnutls_srp_client_credentials_t * sc)
 {
@@ -428,20 +427,20 @@ gnutls_srp_allocate_client_credentials (gnutls_srp_client_credentials_t * sc)
 }
 
 /**
-  * gnutls_srp_set_client_credentials - Used to set the username/password, in a gnutls_srp_client_credentials_t structure
-  * @res: is a #gnutls_srp_client_credentials_t structure.
-  * @username: is the user's userid
-  * @password: is the user's password
-  *
-  * This function sets the username and password, in a
-  * #gnutls_srp_client_credentials_t structure.  Those will be used in
-  * SRP authentication.  @username and @password should be ASCII
-  * strings or UTF-8 strings prepared using the "SASLprep" profile of
-  * "stringprep".
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
-  *   error code.
-  **/
+ * gnutls_srp_set_client_credentials - Used to set the username/password, in a gnutls_srp_client_credentials_t structure
+ * @res: is a #gnutls_srp_client_credentials_t structure.
+ * @username: is the user's userid
+ * @password: is the user's password
+ *
+ * This function sets the username and password, in a
+ * #gnutls_srp_client_credentials_t structure.  Those will be used in
+ * SRP authentication.  @username and @password should be ASCII
+ * strings or UTF-8 strings prepared using the "SASLprep" profile of
+ * "stringprep".
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
+ *   error code.
+ **/
 int
 gnutls_srp_set_client_credentials (gnutls_srp_client_credentials_t res,
 				   const char *username, const char *password)
@@ -468,13 +467,12 @@ gnutls_srp_set_client_credentials (gnutls_srp_client_credentials_t res,
 }
 
 /**
-  * gnutls_srp_free_server_credentials - Used to free an allocated gnutls_srp_server_credentials_t structure
-  * @sc: is a #gnutls_srp_server_credentials_t structure.
-  *
-  * This structure is complex enough to manipulate directly thus
-  * this helper function is provided in order to free (deallocate) it.
-  *
-  **/
+ * gnutls_srp_free_server_credentials - Used to free an allocated gnutls_srp_server_credentials_t structure
+ * @sc: is a #gnutls_srp_server_credentials_t structure.
+ *
+ * This structure is complex enough to manipulate directly thus
+ * this helper function is provided in order to free (deallocate) it.
+ **/
 void
 gnutls_srp_free_server_credentials (gnutls_srp_server_credentials_t sc)
 {
@@ -485,15 +483,15 @@ gnutls_srp_free_server_credentials (gnutls_srp_server_credentials_t sc)
 }
 
 /**
-  * gnutls_srp_allocate_server_credentials - Used to allocate an gnutls_srp_server_credentials_t structure
-  * @sc: is a pointer to a #gnutls_srp_server_credentials_t structure.
-  *
-  * This structure is complex enough to manipulate directly thus this
-  * helper function is provided in order to allocate it.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
-  *   error code.
-  **/
+ * gnutls_srp_allocate_server_credentials - Used to allocate an gnutls_srp_server_credentials_t structure
+ * @sc: is a pointer to a #gnutls_srp_server_credentials_t structure.
+ *
+ * This structure is complex enough to manipulate directly thus this
+ * helper function is provided in order to allocate it.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
+ *   error code.
+ **/
 int
 gnutls_srp_allocate_server_credentials (gnutls_srp_server_credentials_t * sc)
 {
@@ -506,19 +504,19 @@ gnutls_srp_allocate_server_credentials (gnutls_srp_server_credentials_t * sc)
 }
 
 /**
-  * gnutls_srp_set_server_credentials_file - Used to set the password files, in a gnutls_srp_server_credentials_t structure
-  * @res: is a #gnutls_srp_server_credentials_t structure.
-  * @password_file: is the SRP password file (tpasswd)
-  * @password_conf_file: is the SRP password conf file (tpasswd.conf)
-  *
-  * This function sets the password files, in a
-  * #gnutls_srp_server_credentials_t structure.  Those password files
-  * hold usernames and verifiers and will be used for SRP
-  * authentication.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
-  *   error code.
-  **/
+ * gnutls_srp_set_server_credentials_file - Used to set the password files, in a gnutls_srp_server_credentials_t structure
+ * @res: is a #gnutls_srp_server_credentials_t structure.
+ * @password_file: is the SRP password file (tpasswd)
+ * @password_conf_file: is the SRP password conf file (tpasswd.conf)
+ *
+ * This function sets the password files, in a
+ * #gnutls_srp_server_credentials_t structure.  Those password files
+ * hold usernames and verifiers and will be used for SRP
+ * authentication.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
+ *   error code.
+ **/
 int
 gnutls_srp_set_server_credentials_file (gnutls_srp_server_credentials_t res,
 					const char *password_file,
@@ -565,34 +563,34 @@ gnutls_srp_set_server_credentials_file (gnutls_srp_server_credentials_t res,
 
 
 /**
-  * gnutls_srp_set_server_credentials_function - Used to set a callback to retrieve the user's SRP credentials
-  * @cred: is a #gnutls_srp_server_credentials_t structure.
-  * @func: is the callback function
-  *
-  * This function can be used to set a callback to retrieve the user's SRP credentials.
-  * The callback's function form is:
-  * int (*callback)(gnutls_session_t, const char* username,
-  *  gnutls_datum_t* salt, gnutls_datum_t *verifier, gnutls_datum_t* g,
-  *  gnutls_datum_t* n);
-  *
-  * @username contains the actual username. 
-  * The @salt, @verifier, @generator and @prime must be filled
-  * in using the gnutls_malloc(). For convenience @prime and @generator 
-  * may also be one of the static parameters defined in extra.h.
-  *
-  * In case the callback returned a negative number then gnutls will
-  * assume that the username does not exist.
-  *
-  * In order to prevent attackers from guessing valid usernames,
-  * if a user does not exist, g and n values should be filled in
-  * using a random user's parameters. In that case the callback must
-  * return the special value (1).
-  *
-  * The callback function will only be called once per handshake.
-  * The callback function should return 0 on success, while
-  * -1 indicates an error.
-  *
-  **/
+ * gnutls_srp_set_server_credentials_function - Used to set a callback to retrieve the user's SRP credentials
+ * @cred: is a #gnutls_srp_server_credentials_t structure.
+ * @func: is the callback function
+ *
+ * This function can be used to set a callback to retrieve the user's
+ * SRP credentials.  The callback's function form is:
+ *
+ * int (*callback)(gnutls_session_t, const char* username,
+ *  gnutls_datum_t* salt, gnutls_datum_t *verifier, gnutls_datum_t* g,
+ *  gnutls_datum_t* n);
+ *
+ * @username contains the actual username.
+ * The @salt, @verifier, @generator and @prime must be filled
+ * in using the gnutls_malloc(). For convenience @prime and @generator
+ * may also be one of the static parameters defined in extra.h.
+ *
+ * In case the callback returned a negative number then gnutls will
+ * assume that the username does not exist.
+ *
+ * In order to prevent attackers from guessing valid usernames,
+ * if a user does not exist, g and n values should be filled in
+ * using a random user's parameters. In that case the callback must
+ * return the special value (1).
+ *
+ * The callback function will only be called once per handshake.
+ * The callback function should return 0 on success, while
+ * -1 indicates an error.
+ **/
 void
 gnutls_srp_set_server_credentials_function (gnutls_srp_server_credentials_t
 					    cred,
@@ -603,31 +601,30 @@ gnutls_srp_set_server_credentials_function (gnutls_srp_server_credentials_t
 }
 
 /**
-  * gnutls_srp_set_client_credentials_function - Used to set a callback to retrieve the username and password
-  * @cred: is a #gnutls_srp_server_credentials_t structure.
-  * @func: is the callback function
-  *
-  * This function can be used to set a callback to retrieve the username and
-  * password for client SRP authentication.
-  *
-  * The callback's function form is:
-  *
-  * int (*callback)(gnutls_session_t, char** username, char**password);
-  *
-  * The @username and @password must be allocated using
-  * gnutls_malloc().  @username and @password should be ASCII strings
-  * or UTF-8 strings prepared using the "SASLprep" profile of
-  * "stringprep".
-  *
-  * The callback function will be called once per handshake before the
-  * initial hello message is sent.
-  *
-  * The callback should not return a negative error code the second
-  * time called, since the handshake procedure will be aborted.
-  *
-  * The callback function should return 0 on success.
-  * -1 indicates an error.
-  **/
+ * gnutls_srp_set_client_credentials_function - Used to set a callback to retrieve the username and password
+ * @cred: is a #gnutls_srp_server_credentials_t structure.
+ * @func: is the callback function
+ *
+ * This function can be used to set a callback to retrieve the
+ * username and password for client SRP authentication.  The
+ * callback's function form is:
+ *
+ * int (*callback)(gnutls_session_t, char** username, char**password);
+ *
+ * The @username and @password must be allocated using
+ * gnutls_malloc().  @username and @password should be ASCII strings
+ * or UTF-8 strings prepared using the "SASLprep" profile of
+ * "stringprep".
+ *
+ * The callback function will be called once per handshake before the
+ * initial hello message is sent.
+ *
+ * The callback should not return a negative error code the second
+ * time called, since the handshake procedure will be aborted.
+ *
+ * The callback function should return 0 on success.
+ * -1 indicates an error.
+ **/
 void
 gnutls_srp_set_client_credentials_function (gnutls_srp_client_credentials_t
 					    cred,
@@ -639,15 +636,15 @@ gnutls_srp_set_client_credentials_function (gnutls_srp_client_credentials_t
 
 
 /**
-  * gnutls_srp_server_get_username - return the username of the peer
-  * @session: is a gnutls session
-  *
-  * This function will return the username of the peer.  This should
-  * only be called in case of SRP authentication and in case of a
-  * server.  Returns NULL in case of an error.
-  *
-  * Returns: SRP username of the peer, or NULL in case of error.
-  **/
+ * gnutls_srp_server_get_username - return the username of the peer
+ * @session: is a gnutls session
+ *
+ * This function will return the username of the peer.  This should
+ * only be called in case of SRP authentication and in case of a
+ * server.  Returns NULL in case of an error.
+ *
+ * Returns: SRP username of the peer, or NULL in case of error.
+ **/
 const char *
 gnutls_srp_server_get_username (gnutls_session_t session)
 {
@@ -662,26 +659,26 @@ gnutls_srp_server_get_username (gnutls_session_t session)
 }
 
 /**
-  * gnutls_srp_verifier - Used to calculate an SRP verifier
-  * @username: is the user's name
-  * @password: is the user's password
-  * @salt: should be some randomly generated bytes
-  * @generator: is the generator of the group
-  * @prime: is the group's prime
-  * @res: where the verifier will be stored.
-  *
-  * This function will create an SRP verifier, as specified in
-  * RFC2945.  The @prime and @generator should be one of the static
-  * parameters defined in gnutls/extra.h or may be generated using the
-  * libgcrypt functions gcry_prime_generate() and
-  * gcry_prime_group_generator().
-  *
-  * The verifier will be allocated with @malloc and will be stored in
-  * @res using binary format.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
-  *   error code.
-  **/
+ * gnutls_srp_verifier - Used to calculate an SRP verifier
+ * @username: is the user's name
+ * @password: is the user's password
+ * @salt: should be some randomly generated bytes
+ * @generator: is the generator of the group
+ * @prime: is the group's prime
+ * @res: where the verifier will be stored.
+ *
+ * This function will create an SRP verifier, as specified in
+ * RFC2945.  The @prime and @generator should be one of the static
+ * parameters defined in gnutls/extra.h or may be generated using the
+ * libgcrypt functions gcry_prime_generate() and
+ * gcry_prime_group_generator().
+ *
+ * The verifier will be allocated with @malloc and will be stored in
+ * @res using binary format.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
+ *   error code.
+ **/
 int
 gnutls_srp_verifier (const char *username, const char *password,
 		     const gnutls_datum_t * salt,

@@ -1564,18 +1564,18 @@ gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
 }
 
 /**
-  * gnutls_x509_privkey_verify_data - Verify the signed data using private key
-  * @key: Holds the key
-  * @flags: should be 0 for now
-  * @data: holds the data to be signed
-  * @signature: contains the signature
-  *
-  * This function will verify the given signed data, using the
-  * parameters in the private key.
-  *
-  * Returns: In case of a verification failure 0 is returned, and 1 on
-  * success.
-  **/
+ * gnutls_x509_privkey_verify_data - Verify the signed data using private key
+ * @key: Holds the key
+ * @flags: should be 0 for now
+ * @data: holds the data to be signed
+ * @signature: contains the signature
+ *
+ * This function will verify the given signed data, using the
+ * parameters in the private key.
+ *
+ * Returns: In case of a verification failure 0 is returned, and 1 on
+ *   success.
+ **/
 int
 gnutls_x509_privkey_verify_data (gnutls_x509_privkey_t key,
 				 unsigned int flags,

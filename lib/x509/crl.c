@@ -533,16 +533,15 @@ gnutls_x509_crl_get_crt_serial (gnutls_x509_crl_t crl, int indx,
 }
 
 /*-
-  * _gnutls_x509_crl_get_raw_issuer_dn - This function returns the issuer's DN DER encoded
-  * @crl: should contain a gnutls_x509_crl_t structure
-  * @dn: will hold the starting point of the DN
-  *
-  * This function will return a pointer to the DER encoded DN structure and
-  * the length.
-  *
-  * Returns a negative value on error, and zero on success.
-  *
-  -*/
+ * _gnutls_x509_crl_get_raw_issuer_dn - This function returns the issuer's DN DER encoded
+ * @crl: should contain a gnutls_x509_crl_t structure
+ * @dn: will hold the starting point of the DN
+ *
+ * This function will return a pointer to the DER encoded DN structure and
+ * the length.
+ *
+ * Returns a negative value on error, and zero on success.
+ -*/
 int
 _gnutls_x509_crl_get_raw_issuer_dn (gnutls_x509_crl_t crl,
 				    gnutls_datum_t * dn)
@@ -646,16 +645,15 @@ gnutls_x509_crl_export (gnutls_x509_crl_t crl,
 }
 
 /*-
-  * _gnutls_x509_crl_cpy - This function copies a gnutls_x509_crl_t structure
-  * @dest: The structure where to copy
-  * @src: The structure to be copied
-  *
-  * This function will copy an X.509 certificate structure. 
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  -*/
+ * _gnutls_x509_crl_cpy - This function copies a gnutls_x509_crl_t structure
+ * @dest: The structure where to copy
+ * @src: The structure to be copied
+ *
+ * This function will copy an X.509 certificate structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ -*/
 int
 _gnutls_x509_crl_cpy (gnutls_x509_crl_t dest, gnutls_x509_crl_t src)
 {

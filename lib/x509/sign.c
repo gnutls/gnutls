@@ -295,18 +295,17 @@ _gnutls_x509_sign_tbs (ASN1_TYPE cert, const char *tbs_name,
 }
 
 /*-
-  * _gnutls_x509_pkix_sign - This function will sign a CRL or a certificate with a key
-  * @src: should contain an ASN1_TYPE
-  * @issuer: is the certificate of the certificate issuer
-  * @issuer_key: holds the issuer's private key
-  *
-  * This function will sign a CRL or a certificate with the issuer's private key, and
-  * will copy the issuer's information into the CRL or certificate.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  -*/
+ * _gnutls_x509_pkix_sign - This function will sign a CRL or a certificate with a key
+ * @src: should contain an ASN1_TYPE
+ * @issuer: is the certificate of the certificate issuer
+ * @issuer_key: holds the issuer's private key
+ *
+ * This function will sign a CRL or a certificate with the issuer's private key, and
+ * will copy the issuer's information into the CRL or certificate.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ -*/
 int
 _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
 			gnutls_digest_algorithm_t dig,

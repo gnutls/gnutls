@@ -618,17 +618,17 @@ cleanup:
 }
 
 /**
-  * gnutls_pkcs7_set_crt - add a parsed certificate in a PKCS7 certificate set
-  * @pkcs7: should contain a #gnutls_pkcs7_t structure
-  * @crt: the certificate to be copied.
-  *
-  * This function will add a parsed certificate to the PKCS7 or
-  * RFC2630 certificate set.  This is a wrapper function over
-  * gnutls_pkcs7_set_crt_raw() .
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  **/
+ * gnutls_pkcs7_set_crt - add a parsed certificate in a PKCS7 certificate set
+ * @pkcs7: should contain a #gnutls_pkcs7_t structure
+ * @crt: the certificate to be copied.
+ *
+ * This function will add a parsed certificate to the PKCS7 or
+ * RFC2630 certificate set.  This is a wrapper function over
+ * gnutls_pkcs7_set_crt_raw() .
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_pkcs7_set_crt (gnutls_pkcs7_t pkcs7, gnutls_x509_crt_t crt)
 {

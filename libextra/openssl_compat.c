@@ -36,15 +36,15 @@
 #include <openssl_compat.h>
 
 /*-
-  * gnutls_x509_extract_dn - This function parses an RDN sequence
-  * @idn: should contain a DER encoded RDN sequence
-  * @rdn: a pointer to a structure to hold the name
-  *
-  * This function will return the name of the given RDN sequence.
-  * The name will be returned as a gnutls_x509_dn structure.
-  * Returns a negative error code in case of an error.
-  *
-  -*/
+ * gnutls_x509_extract_dn - This function parses an RDN sequence
+ * @idn: should contain a DER encoded RDN sequence
+ * @rdn: a pointer to a structure to hold the name
+ *
+ * This function will return the name of the given RDN sequence.
+ * The name will be returned as a gnutls_x509_dn structure.
+ * Returns a negative error code in case of an error.
+ *
+ -*/
 int
 gnutls_x509_extract_dn (const gnutls_datum_t * idn, gnutls_x509_dn * rdn)
 {
@@ -105,16 +105,15 @@ gnutls_x509_extract_dn (const gnutls_datum_t * idn, gnutls_x509_dn * rdn)
 }
 
 /*-
-  * gnutls_x509_extract_certificate_dn - This function returns the certificate's distinguished name
-  * @cert: should contain an X.509 DER encoded certificate
-  * @ret: a pointer to a structure to hold the peer's name
-  *
-  * This function will return the name of the certificate holder. The name is gnutls_x509_dn structure and 
-  * is a obtained by the peer's certificate. If the certificate send by the
-  * peer is invalid, or in any other failure this function returns error.
-  * Returns a negative error code in case of an error.
-  *
-  -*/
+ * gnutls_x509_extract_certificate_dn - This function returns the certificate's distinguished name
+ * @cert: should contain an X.509 DER encoded certificate
+ * @ret: a pointer to a structure to hold the peer's name
+ *
+ * This function will return the name of the certificate holder. The name is gnutls_x509_dn structure and
+ * is a obtained by the peer's certificate. If the certificate send by the
+ * peer is invalid, or in any other failure this function returns error.
+ * Returns a negative error code in case of an error.
+ -*/
 int
 gnutls_x509_extract_certificate_dn (const gnutls_datum_t * cert,
 				    gnutls_x509_dn * ret)
@@ -170,16 +169,15 @@ gnutls_x509_extract_certificate_dn (const gnutls_datum_t * cert,
 }
 
 /*-
-  * gnutls_x509_extract_certificate_issuer_dn - This function returns the certificate's issuer distinguished name
-  * @cert: should contain an X.509 DER encoded certificate
-  * @ret: a pointer to a structure to hold the issuer's name
-  *
-  * This function will return the name of the issuer stated in the certificate. The name is a gnutls_x509_dn structure and 
-  * is a obtained by the peer's certificate. If the certificate send by the
-  * peer is invalid, or in any other failure this function returns error.
-  * Returns a negative error code in case of an error.
-  *
-  -*/
+ * gnutls_x509_extract_certificate_issuer_dn - This function returns the certificate's issuer distinguished name
+ * @cert: should contain an X.509 DER encoded certificate
+ * @ret: a pointer to a structure to hold the issuer's name
+ *
+ * This function will return the name of the issuer stated in the certificate. The name is a gnutls_x509_dn structure and
+ * is a obtained by the peer's certificate. If the certificate send by the
+ * peer is invalid, or in any other failure this function returns error.
+ * Returns a negative error code in case of an error.
+ -*/
 int
 gnutls_x509_extract_certificate_issuer_dn (const gnutls_datum_t * cert,
 					   gnutls_x509_dn * ret)
@@ -242,26 +240,25 @@ gnutls_x509_extract_certificate_issuer_dn (const gnutls_datum_t * cert,
 
 
 /*-
-  * gnutls_x509_extract_certificate_subject_alt_name - This function returns the certificate's alternative name, if any
-  * @cert: should contain an X.509 DER encoded certificate
-  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
-  * @ret: is the place where the alternative name will be copied to
-  * @ret_size: holds the size of ret.
-  *
-  * This function will return the alternative names, contained in the
-  * given certificate.
-  * 
-  * This is specified in X509v3 Certificate Extensions. 
-  * GNUTLS will return the Alternative name, or a negative
-  * error code.
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if ret_size is not enough to hold the alternative 
-  * name, or the type of alternative name if everything was ok. The type is 
-  * one of the enumerated GNUTLS_X509_SUBJECT_ALT_NAME.
-  *
-  * If the certificate does not have an Alternative name with the specified 
-  * sequence number then returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-  *
-  -*/
+ * gnutls_x509_extract_certificate_subject_alt_name - This function returns the certificate's alternative name, if any
+ * @cert: should contain an X.509 DER encoded certificate
+ * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
+ * @ret: is the place where the alternative name will be copied to
+ * @ret_size: holds the size of ret.
+ *
+ * This function will return the alternative names, contained in the
+ * given certificate.
+ *
+ * This is specified in X509v3 Certificate Extensions.
+ * GNUTLS will return the Alternative name, or a negative
+ * error code.
+ * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if ret_size is not enough to hold the alternative
+ * name, or the type of alternative name if everything was ok. The type is
+ * one of the enumerated GNUTLS_X509_SUBJECT_ALT_NAME.
+ *
+ * If the certificate does not have an Alternative name with the specified
+ * sequence number then returns GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+ -*/
 int
 gnutls_x509_extract_certificate_subject_alt_name (const gnutls_datum_t *
 						  cert, int seq,
@@ -292,19 +289,18 @@ gnutls_x509_extract_certificate_subject_alt_name (const gnutls_datum_t *
 }
 
 /*-
-  * gnutls_x509_extract_certificate_ca_status - This function returns the certificate CA status
-  * @cert: should contain an X.509 DER encoded certificate
-  *
-  * This function will return certificates CA status, by reading the 
-  * basicConstraints X.509 extension. If the certificate is a CA a positive
-  * value will be returned, or zero if the certificate does not have
-  * CA flag set. 
-  *
-  * A negative value may be returned in case of parsing error.
-  * If the certificate does not contain the basicConstraints extension
-  * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
-  *
-  -*/
+ * gnutls_x509_extract_certificate_ca_status - This function returns the certificate CA status
+ * @cert: should contain an X.509 DER encoded certificate
+ *
+ * This function will return certificates CA status, by reading the
+ * basicConstraints X.509 extension. If the certificate is a CA a positive
+ * value will be returned, or zero if the certificate does not have
+ * CA flag set.
+ *
+ * A negative value may be returned in case of parsing error.
+ * If the certificate does not contain the basicConstraints extension
+ * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ -*/
 int
 gnutls_x509_extract_certificate_ca_status (const gnutls_datum_t * cert)
 {
@@ -330,14 +326,13 @@ gnutls_x509_extract_certificate_ca_status (const gnutls_datum_t * cert)
 }
 
 /*-
-  * gnutls_x509_extract_certificate_activation_time - This function returns the peer's certificate activation time
-  * @cert: should contain an X.509 DER encoded certificate
-  *
-  * This function will return the certificate's activation time in UNIX time 
-  * (ie seconds since 00:00:00 UTC January 1, 1970).
-  * Returns a (time_t) -1 in case of an error.
-  *
-  -*/
+ * gnutls_x509_extract_certificate_activation_time - This function returns the peer's certificate activation time
+ * @cert: should contain an X.509 DER encoded certificate
+ *
+ * This function will return the certificate's activation time in UNIX time
+ * (ie seconds since 00:00:00 UTC January 1, 1970).
+ * Returns a (time_t) -1 in case of an error.
+ -*/
 time_t
 gnutls_x509_extract_certificate_activation_time (const gnutls_datum_t * cert)
 {
@@ -363,14 +358,13 @@ gnutls_x509_extract_certificate_activation_time (const gnutls_datum_t * cert)
 }
 
 /*-
-  * gnutls_x509_extract_certificate_expiration_time - This function returns the certificate's expiration time
-  * @cert: should contain an X.509 DER encoded certificate
-  *
-  * This function will return the certificate's expiration time in UNIX time 
-  * (ie seconds since 00:00:00 UTC January 1, 1970).
-  * Returns a (time_t) -1 in case of an error.
-  *
-  -*/
+ * gnutls_x509_extract_certificate_expiration_time - This function returns the certificate's expiration time
+ * @cert: should contain an X.509 DER encoded certificate
+ *
+ * This function will return the certificate's expiration time in UNIX time
+ * (ie seconds since 00:00:00 UTC January 1, 1970).
+ * Returns a (time_t) -1 in case of an error.
+ -*/
 time_t
 gnutls_x509_extract_certificate_expiration_time (const gnutls_datum_t * cert)
 {
@@ -396,13 +390,12 @@ gnutls_x509_extract_certificate_expiration_time (const gnutls_datum_t * cert)
 }
 
 /*-
-  * gnutls_x509_extract_certificate_version - This function returns the certificate's version
-  * @cert: is an X.509 DER encoded certificate
-  *
-  * This function will return the X.509 certificate's version (1, 2, 3). This is obtained by the X509 Certificate
-  * Version field. Returns a negative value in case of an error.
-  *
-  -*/
+ * gnutls_x509_extract_certificate_version - This function returns the certificate's version
+ * @cert: is an X.509 DER encoded certificate
+ *
+ * This function will return the X.509 certificate's version (1, 2, 3). This is obtained by the X509 Certificate
+ * Version field. Returns a negative value in case of an error.
+ -*/
 int
 gnutls_x509_extract_certificate_version (const gnutls_datum_t * cert)
 {
@@ -429,19 +422,19 @@ gnutls_x509_extract_certificate_version (const gnutls_datum_t * cert)
 }
 
 /*-
-  * gnutls_x509_extract_certificate_serial - This function returns the certificate's serial number
-  * @cert: is an X.509 DER encoded certificate
-  * @result: The place where the serial number will be copied
-  * @result_size: Holds the size of the result field.
-  *
-  * This function will return the X.509 certificate's serial number. 
-  * This is obtained by the X509 Certificate serialNumber
-  * field. Serial is not always a 32 or 64bit number. Some CAs use
-  * large serial numbers, thus it may be wise to handle it as something
-  * opaque. 
-  * Returns a negative value in case of an error.
-  *
-  -*/
+ * gnutls_x509_extract_certificate_serial - This function returns the certificate's serial number
+ * @cert: is an X.509 DER encoded certificate
+ * @result: The place where the serial number will be copied
+ * @result_size: Holds the size of the result field.
+ *
+ * This function will return the X.509 certificate's serial number.
+ * This is obtained by the X509 Certificate serialNumber
+ * field. Serial is not always a 32 or 64bit number. Some CAs use
+ * large serial numbers, thus it may be wise to handle it as something
+ * opaque.
+ *
+ * Returns a negative value in case of an error.
+ -*/
 int
 gnutls_x509_extract_certificate_serial (const gnutls_datum_t * cert,
 					char *result, int *result_size)
@@ -471,22 +464,21 @@ gnutls_x509_extract_certificate_serial (const gnutls_datum_t * cert,
 
 
 /*-
-  * gnutls_x509_extract_certificate_pk_algorithm - This function returns the certificate's PublicKey algorithm
-  * @cert: is a DER encoded X.509 certificate
-  * @bits: if bits is non null it will hold the size of the parameters' in bits
-  *
-  * This function will return the public key algorithm of an X.509 
-  * certificate.
-  *
-  * If bits is non null, it should have enough size to hold the parameters
-  * size in bits. For RSA the bits returned is the modulus. 
-  * For DSA the bits returned are of the public
-  * exponent.
-  *
-  * Returns a member of the gnutls_pk_algorithm_t enumeration on success,
-  * or a negative value on error.
-  *
-  -*/
+ * gnutls_x509_extract_certificate_pk_algorithm - This function returns the certificate's PublicKey algorithm
+ * @cert: is a DER encoded X.509 certificate
+ * @bits: if bits is non null it will hold the size of the parameters' in bits
+ *
+ * This function will return the public key algorithm of an X.509
+ * certificate.
+ *
+ * If bits is non null, it should have enough size to hold the parameters
+ * size in bits. For RSA the bits returned is the modulus.
+ * For DSA the bits returned are of the public
+ * exponent.
+ *
+ * Returns a member of the gnutls_pk_algorithm_t enumeration on success,
+ * or a negative value on error.
+ -*/
 int
 gnutls_x509_extract_certificate_pk_algorithm (const gnutls_datum_t *
 					      cert, int *bits)
@@ -514,19 +506,19 @@ gnutls_x509_extract_certificate_pk_algorithm (const gnutls_datum_t *
 
 
 /*-
-  * gnutls_x509_extract_certificate_dn_string - This function returns the certificate's distinguished name
-  * @cert: should contain an X.509 DER encoded certificate
-  * @buf: a pointer to a structure to hold the peer's name
-  * @sizeof_buf: holds the size of 'buf'
-  * @issuer: if non zero, then extract the name of the issuer, instead of the holder
-  *
-  * This function will copy the name of the certificate holder in the provided buffer. The name 
-  * will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253.
-  *
-  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not long enough,
-  * and 0 on success.
-  *
-  -*/
+ * gnutls_x509_extract_certificate_dn_string - This function returns the certificate's distinguished name
+ * @cert: should contain an X.509 DER encoded certificate
+ * @buf: a pointer to a structure to hold the peer's name
+ * @sizeof_buf: holds the size of 'buf'
+ * @issuer: if non zero, then extract the name of the issuer, instead of the holder
+ *
+ * This function will copy the name of the certificate holder in the
+ * provided buffer. The name will be in the form
+ * "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253.
+ *
+ * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
+ * long enough, and 0 on success.
+ -*/
 int
 gnutls_x509_extract_certificate_dn_string (char *buf,
 					   unsigned int sizeof_buf,
@@ -560,38 +552,39 @@ gnutls_x509_extract_certificate_dn_string (char *buf,
 }
 
 /*-
-  * gnutls_x509_verify_certificate - This function verifies given certificate list
-  * @cert_list: is the certificate list to be verified
-  * @cert_list_length: holds the number of certificate in cert_list
-  * @CA_list: is the CA list which will be used in verification
-  * @CA_list_length: holds the number of CA certificate in CA_list
-  * @CRL_list: not used
-  * @CRL_list_length: not used
-  *
-  * This function will try to verify the given certificate list and return its status (TRUSTED, EXPIRED etc.). 
-  * The return value (status) should be one or more of the gnutls_certificate_status_t 
-  * enumerated elements bitwise or'd. Note that expiration and activation dates are not checked 
-  * by this function, you should check them using the appropriate functions.
-  *
-  * This function understands the basicConstraints (2.5.29.19) PKIX extension.
-  * This means that only a certificate authority can sign a certificate.
-  *
-  * However you must also check the peer's name in order to check if the verified certificate belongs to the 
-  * actual peer. 
-  *
-  * The return value (status) should be one or more of the gnutls_certificate_status_t 
-  * enumerated elements bitwise or'd.
-  *
-  * GNUTLS_CERT_INVALID: the peer's certificate is not valid.
-  *
-  * GNUTLS_CERT_REVOKED: the certificate has been revoked.
-  *
-  * A negative error code is returned in case of an error.
-  * GNUTLS_E_NO_CERTIFICATE_FOUND is returned to indicate that
-  * no certificate was sent by the peer.
-  *  
-  *
-  -*/
+ * gnutls_x509_verify_certificate - This function verifies given certificate list
+ * @cert_list: is the certificate list to be verified
+ * @cert_list_length: holds the number of certificate in cert_list
+ * @CA_list: is the CA list which will be used in verification
+ * @CA_list_length: holds the number of CA certificate in CA_list
+ * @CRL_list: not used
+ * @CRL_list_length: not used
+ *
+ * This function will try to verify the given certificate list and
+ * return its status (TRUSTED, EXPIRED etc.).  The return value
+ * (status) should be one or more of the gnutls_certificate_status_t
+ * enumerated elements bitwise or'd. Note that expiration and
+ * activation dates are not checked by this function, you should
+ * check them using the appropriate functions.
+ *
+ * This function understands the basicConstraints (2.5.29.19) PKIX
+ * extension.  This means that only a certificate authority can sign
+ * a certificate.
+ *
+ * However you must also check the peer's name in order to check if
+ * the verified certificate belongs to the actual peer.
+ *
+ * The return value (status) should be one or more of the
+ * gnutls_certificate_status_t enumerated elements bitwise or'd.
+ *
+ * GNUTLS_CERT_INVALID: the peer's certificate is not valid.
+ *
+ * GNUTLS_CERT_REVOKED: the certificate has been revoked.
+ *
+ * A negative error code is returned in case of an error.
+ * GNUTLS_E_NO_CERTIFICATE_FOUND is returned to indicate that
+ * no certificate was sent by the peer.
+ -*/
 int
 gnutls_x509_verify_certificate (const gnutls_datum_t * cert_list,
 				int cert_list_length,
@@ -759,16 +752,15 @@ cleanup:
 }
 
 /*-
-  * gnutls_x509_extract_key_pk_algorithm - This function returns the keys's PublicKey algorithm
-  * @cert: is a DER encoded private key
-  *
-  * This function will return the public key algorithm of a DER encoded private
-  * key.
-  *
-  * Returns a member of the gnutls_pk_algorithm_t enumeration on success,
-  * or GNUTLS_E_UNKNOWN_PK_ALGORITHM on error.
-  *
-  -*/
+ * gnutls_x509_extract_key_pk_algorithm - This function returns the keys's PublicKey algorithm
+ * @cert: is a DER encoded private key
+ *
+ * This function will return the public key algorithm of a DER encoded private
+ * key.
+ *
+ * Returns a member of the gnutls_pk_algorithm_t enumeration on success,
+ * or GNUTLS_E_UNKNOWN_PK_ALGORITHM on error.
+ -*/
 int
 gnutls_x509_extract_key_pk_algorithm (const gnutls_datum_t * key)
 {
@@ -798,20 +790,19 @@ gnutls_x509_extract_key_pk_algorithm (const gnutls_datum_t * key)
 #ifdef ENABLE_PKI
 
 /*-
-  * gnutls_x509_pkcs7_extract_certificate - This function returns a certificate in a PKCS7 certificate set
-  * @pkcs7_struct: should contain a PKCS7 DER formatted structure
-  * @indx: contains the index of the certificate to extract
-  * @certificate: the contents of the certificate will be copied there
-  * @certificate_size: should hold the size of the certificate
-  *
-  * This function will return a certificate of the PKCS7 or RFC2630 certificate set.
-  * Returns 0 on success. If the provided buffer is not long enough,
-  * then GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
-  *
-  * After the last certificate has been read GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
-  * will be returned.
-  *
-  -*/
+ * gnutls_x509_pkcs7_extract_certificate - This function returns a certificate in a PKCS7 certificate set
+ * @pkcs7_struct: should contain a PKCS7 DER formatted structure
+ * @indx: contains the index of the certificate to extract
+ * @certificate: the contents of the certificate will be copied there
+ * @certificate_size: should hold the size of the certificate
+ *
+ * This function will return a certificate of the PKCS7 or RFC2630
+ * certificate set.  Returns 0 on success. If the provided buffer is
+ * not long enough, then GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
+ *
+ * After the last certificate has been read
+ * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ -*/
 int
 gnutls_x509_pkcs7_extract_certificate (const gnutls_datum_t *
 				       pkcs7_struct, int indx,

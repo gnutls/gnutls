@@ -35,21 +35,21 @@
 #include <gnutls_datum.h>
 
 /**
-  * gnutls_db_set_retrieve_function - Set the function that will be used to get data
-  * @session: is a #gnutls_session_t structure.
-  * @retr_func: is the function.
-  *
-  * Sets the function that will be used to retrieve data from the
-  * resumed sessions database.  This function must return a
-  * gnutls_datum_t containing the data on success, or a gnutls_datum_t
-  * containing null and 0 on failure.
-  *
-  * The datum's data must be allocated using the function
-  * gnutls_malloc().
-  *
-  * The first argument to retr_func() will be null unless
-  * gnutls_db_set_ptr() has been called.
-  **/
+ * gnutls_db_set_retrieve_function - Set the function that will be used to get data
+ * @session: is a #gnutls_session_t structure.
+ * @retr_func: is the function.
+ *
+ * Sets the function that will be used to retrieve data from the
+ * resumed sessions database.  This function must return a
+ * gnutls_datum_t containing the data on success, or a gnutls_datum_t
+ * containing null and 0 on failure.
+ *
+ * The datum's data must be allocated using the function
+ * gnutls_malloc().
+ *
+ * The first argument to retr_func() will be null unless
+ * gnutls_db_set_ptr() has been called.
+ **/
 void
 gnutls_db_set_retrieve_function (gnutls_session_t session,
 				 gnutls_db_retr_func retr_func)
@@ -58,16 +58,16 @@ gnutls_db_set_retrieve_function (gnutls_session_t session,
 }
 
 /**
-  * gnutls_db_set_remove_function - Set the function that will be used to remove data
-  * @session: is a #gnutls_session_t structure.
-  * @rem_func: is the function.
-  *
-  * Sets the function that will be used to remove data from the
-  * resumed sessions database. This function must return 0 on success.
-  *
-  * The first argument to rem_func() will be null unless
-  * gnutls_db_set_ptr() has been called.
-  **/
+ * gnutls_db_set_remove_function - Set the function that will be used to remove data
+ * @session: is a #gnutls_session_t structure.
+ * @rem_func: is the function.
+ *
+ * Sets the function that will be used to remove data from the
+ * resumed sessions database. This function must return 0 on success.
+ *
+ * The first argument to rem_func() will be null unless
+ * gnutls_db_set_ptr() has been called.
+ **/
 void
 gnutls_db_set_remove_function (gnutls_session_t session,
 			       gnutls_db_remove_func rem_func)
@@ -76,16 +76,16 @@ gnutls_db_set_remove_function (gnutls_session_t session,
 }
 
 /**
-  * gnutls_db_set_store_function - Set the function that will be used to put data
-  * @session: is a #gnutls_session_t structure.
-  * @store_func: is the function
-  *
-  * Sets the function that will be used to store data from the resumed
-  * sessions database. This function must remove 0 on success.
-  *
-  * The first argument to store_func() will be null unless
-  * gnutls_db_set_ptr() has been called.
-  **/
+ * gnutls_db_set_store_function - Set the function that will be used to put data
+ * @session: is a #gnutls_session_t structure.
+ * @store_func: is the function
+ *
+ * Sets the function that will be used to store data from the resumed
+ * sessions database. This function must remove 0 on success.
+ *
+ * The first argument to store_func() will be null unless
+ * gnutls_db_set_ptr() has been called.
+ **/
 void
 gnutls_db_set_store_function (gnutls_session_t session,
 			      gnutls_db_store_func store_func)
@@ -94,14 +94,13 @@ gnutls_db_set_store_function (gnutls_session_t session,
 }
 
 /**
-  * gnutls_db_set_ptr - Set a pointer to be sent to db functions
-  * @session: is a #gnutls_session_t structure.
-  * @ptr: is the pointer
-  *
-  * Sets the pointer that will be provided to db store, retrieve and
-  * delete functions, as the first argument.
-  *
-  **/
+ * gnutls_db_set_ptr - Set a pointer to be sent to db functions
+ * @session: is a #gnutls_session_t structure.
+ * @ptr: is the pointer
+ *
+ * Sets the pointer that will be provided to db store, retrieve and
+ * delete functions, as the first argument.
+ **/
 void
 gnutls_db_set_ptr (gnutls_session_t session, void *ptr)
 {
@@ -109,14 +108,14 @@ gnutls_db_set_ptr (gnutls_session_t session, void *ptr)
 }
 
 /**
-  * gnutls_db_get_ptr - Returns the pointer which is sent to db functions
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Get db function pointer.
-  *
-  * Returns: the pointer that will be sent to db store, retrieve and
-  *   delete functions, as the first argument.
-  **/
+ * gnutls_db_get_ptr - Returns the pointer which is sent to db functions
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Get db function pointer.
+ *
+ * Returns: the pointer that will be sent to db store, retrieve and
+ *   delete functions, as the first argument.
+ **/
 void *
 gnutls_db_get_ptr (gnutls_session_t session)
 {

@@ -105,29 +105,30 @@ _gnutls_strdup (const char *str)
  */
 
 /**
-  * gnutls_malloc - Allocates and returns data
-  *
-  * This function will allocate 's' bytes data, and
-  * return a pointer to memory. This function is supposed
-  * to be used by callbacks.
-  *
-  * The allocation function used is the one set by gnutls_global_set_mem_functions().
-  *
-  **/
+ * gnutls_malloc - Allocates and returns data
+ *
+ * This function will allocate 's' bytes data, and
+ * return a pointer to memory. This function is supposed
+ * to be used by callbacks.
+ *
+ * The allocation function used is the one set by
+ * gnutls_global_set_mem_functions().
+ **/
 void *
 gnutls_malloc (size_t s)
 {
 }
 
 /**
-  * gnutls_free - Returns a free() like function
-  * @d: pointer to memory
-  *
-  * This function will free data pointed by ptr.
-  *
-  * The deallocation function used is the one set by gnutls_global_set_mem_functions().
-  *
-  **/
+ * gnutls_free - Returns a free() like function
+ * @d: pointer to memory
+ *
+ * This function will free data pointed by ptr.
+ *
+ * The deallocation function used is the one set by
+ * gnutls_global_set_mem_functions().
+ *
+ **/
 void
 gnutls_free (void *ptr)
 {

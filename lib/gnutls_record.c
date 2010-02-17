@@ -67,17 +67,17 @@ _gnutls_set_current_version (gnutls_session_t session,
 }
 
 /**
-  * gnutls_transport_set_lowat - Used to set the lowat value in order for select to check for pending data.
-  * @session: is a #gnutls_session_t structure.
-  * @num: is the low water value.
-  *
-  * Used to set the lowat value in order for select to check if there
-  * are pending data to socket buffer. Used only if you have changed
-  * the default low water value (default is 1).  Normally you will not
-  * need that function.  This function is only useful if using
-  * berkeley style sockets.  Otherwise it must be called and set lowat
-  * to zero.
-  **/
+ * gnutls_transport_set_lowat - Used to set the lowat value in order for select to check for pending data.
+ * @session: is a #gnutls_session_t structure.
+ * @num: is the low water value.
+ *
+ * Used to set the lowat value in order for select to check if there
+ * are pending data to socket buffer. Used only if you have changed
+ * the default low water value (default is 1).  Normally you will not
+ * need that function.  This function is only useful if using
+ * berkeley style sockets.  Otherwise it must be called and set lowat
+ * to zero.
+ **/
 void
 gnutls_transport_set_lowat (gnutls_session_t session, int num)
 {
@@ -85,17 +85,17 @@ gnutls_transport_set_lowat (gnutls_session_t session, int num)
 }
 
 /**
-  * gnutls_record_disable_padding - Used to disabled padding in TLS 1.0 and above
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Used to disabled padding in TLS 1.0 and above.  Normally you do
-  * not need to use this function, but there are buggy clients that
-  * complain if a server pads the encrypted data.  This of course will
-  * disable protection against statistical attacks on the data.
-  *
-  * Normally only servers that require maximum compatibility with everything
-  * out there, need to call this function.
-  **/
+ * gnutls_record_disable_padding - Used to disabled padding in TLS 1.0 and above
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Used to disabled padding in TLS 1.0 and above.  Normally you do not
+ * need to use this function, but there are buggy clients that
+ * complain if a server pads the encrypted data.  This of course will
+ * disable protection against statistical attacks on the data.
+ *
+ * Normally only servers that require maximum compatibility with everything
+ * out there, need to call this function.
+ **/
 void
 gnutls_record_disable_padding (gnutls_session_t session)
 {
@@ -103,14 +103,14 @@ gnutls_record_disable_padding (gnutls_session_t session)
 }
 
 /**
-  * gnutls_transport_set_ptr - Used to set first argument of the transport functions
-  * @session: is a #gnutls_session_t structure.
-  * @ptr: is the value.
-  *
-  * Used to set the first argument of the transport function (like
-  * PUSH and PULL).  In berkeley style sockets this function will set
-  * the connection handle.
-  **/
+ * gnutls_transport_set_ptr - Used to set first argument of the transport functions
+ * @session: is a #gnutls_session_t structure.
+ * @ptr: is the value.
+ *
+ * Used to set the first argument of the transport function (like PUSH
+ * and PULL).  In berkeley style sockets this function will set the
+ * connection handle.
+ **/
 void
 gnutls_transport_set_ptr (gnutls_session_t session,
 			  gnutls_transport_ptr_t ptr)
@@ -119,18 +119,17 @@ gnutls_transport_set_ptr (gnutls_session_t session,
   session->internals.transport_send_ptr = ptr;
 }
 
-
 /**
-  * gnutls_transport_set_ptr2 - Used to set first argument of the transport functions
-  * @session: is a #gnutls_session_t structure.
-  * @recv_ptr: is the value for the pull function
-  * @send_ptr: is the value for the push function
-  *
-  * Used to set the first argument of the transport function (like
-  * PUSH and PULL). In berkeley style sockets this function will set
-  * the connection handle.  With this function you can use two
-  * different pointers for receiving and sending.
-  **/
+ * gnutls_transport_set_ptr2 - Used to set first argument of the transport functions
+ * @session: is a #gnutls_session_t structure.
+ * @recv_ptr: is the value for the pull function
+ * @send_ptr: is the value for the push function
+ *
+ * Used to set the first argument of the transport function (like PUSH
+ * and PULL). In berkeley style sockets this function will set the
+ * connection handle.  With this function you can use two different
+ * pointers for receiving and sending.
+ **/
 void
 gnutls_transport_set_ptr2 (gnutls_session_t session,
 			   gnutls_transport_ptr_t recv_ptr,
@@ -141,15 +140,15 @@ gnutls_transport_set_ptr2 (gnutls_session_t session,
 }
 
 /**
-  * gnutls_transport_get_ptr - Used to return the first argument of the transport functions
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Used to get the first argument of the transport function (like
-  * PUSH and PULL).  This must have been set using
-  * gnutls_transport_set_ptr().
-  *
-  * Returns: first argument of the transport function.
-  **/
+ * gnutls_transport_get_ptr - Used to return the first argument of the transport functions
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Used to get the first argument of the transport function (like
+ * PUSH and PULL).  This must have been set using
+ * gnutls_transport_set_ptr().
+ *
+ * Returns: first argument of the transport function.
+ **/
 gnutls_transport_ptr_t
 gnutls_transport_get_ptr (gnutls_session_t session)
 {
@@ -157,15 +156,15 @@ gnutls_transport_get_ptr (gnutls_session_t session)
 }
 
 /**
-  * gnutls_transport_get_ptr2 - Used to return the first argument of the transport functions
-  * @session: is a #gnutls_session_t structure.
-  * @recv_ptr: will hold the value for the pull function
-  * @send_ptr: will hold the value for the push function
-  *
-  * Used to get the arguments of the transport functions (like PUSH
-  * and PULL).  These should have been set using
-  * gnutls_transport_set_ptr2().
-  **/
+ * gnutls_transport_get_ptr2 - Used to return the first argument of the transport functions
+ * @session: is a #gnutls_session_t structure.
+ * @recv_ptr: will hold the value for the pull function
+ * @send_ptr: will hold the value for the push function
+ *
+ * Used to get the arguments of the transport functions (like PUSH
+ * and PULL).  These should have been set using
+ * gnutls_transport_set_ptr2().
+ **/
 void
 gnutls_transport_get_ptr2 (gnutls_session_t session,
 			   gnutls_transport_ptr_t * recv_ptr,
@@ -177,38 +176,38 @@ gnutls_transport_get_ptr2 (gnutls_session_t session,
 }
 
 /**
-  * gnutls_bye - terminate the current TLS/SSL connection.
-  * @session: is a #gnutls_session_t structure.
-  * @how: is an integer
-  *
-  * Terminates the current TLS/SSL connection. The connection should
-  * have been initiated using gnutls_handshake().  @how should be one
-  * of %GNUTLS_SHUT_RDWR, %GNUTLS_SHUT_WR.
-  *
-  * In case of %GNUTLS_SHUT_RDWR then the TLS connection gets
-  * terminated and further receives and sends will be disallowed.  If
-  * the return value is zero you may continue using the connection.
-  * %GNUTLS_SHUT_RDWR actually sends an alert containing a close
-  * request and waits for the peer to reply with the same message.
-  *
-  * In case of %GNUTLS_SHUT_WR then the TLS connection gets terminated
-  * and further sends will be disallowed. In order to reuse the
-  * connection you should wait for an EOF from the peer.
-  * %GNUTLS_SHUT_WR sends an alert containing a close request.
-  *
-  * Note that not all implementations will properly terminate a TLS
-  * connection.  Some of them, usually for performance reasons, will
-  * terminate only the underlying transport layer, thus causing a
-  * transmission error to the peer.  This error cannot be
-  * distinguished from a malicious party prematurely terminating the
-  * session, thus this behavior is not recommended.
-  *
-  * This function may also return %GNUTLS_E_AGAIN or
-  * %GNUTLS_E_INTERRUPTED; cf.  gnutls_record_get_direction().
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code, see
-  *   function documentation for entire semantics.
-  **/
+ * gnutls_bye - terminate the current TLS/SSL connection.
+ * @session: is a #gnutls_session_t structure.
+ * @how: is an integer
+ *
+ * Terminates the current TLS/SSL connection. The connection should
+ * have been initiated using gnutls_handshake().  @how should be one
+ * of %GNUTLS_SHUT_RDWR, %GNUTLS_SHUT_WR.
+ *
+ * In case of %GNUTLS_SHUT_RDWR then the TLS connection gets
+ * terminated and further receives and sends will be disallowed.  If
+ * the return value is zero you may continue using the connection.
+ * %GNUTLS_SHUT_RDWR actually sends an alert containing a close
+ * request and waits for the peer to reply with the same message.
+ *
+ * In case of %GNUTLS_SHUT_WR then the TLS connection gets terminated
+ * and further sends will be disallowed. In order to reuse the
+ * connection you should wait for an EOF from the peer.
+ * %GNUTLS_SHUT_WR sends an alert containing a close request.
+ *
+ * Note that not all implementations will properly terminate a TLS
+ * connection.  Some of them, usually for performance reasons, will
+ * terminate only the underlying transport layer, thus causing a
+ * transmission error to the peer.  This error cannot be
+ * distinguished from a malicious party prematurely terminating the
+ * session, thus this behavior is not recommended.
+ *
+ * This function may also return %GNUTLS_E_AGAIN or
+ * %GNUTLS_E_INTERRUPTED; cf.  gnutls_record_get_direction().
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code, see
+ *   function documentation for entire semantics.
+ **/
 int
 gnutls_bye (gnutls_session_t session, gnutls_close_request_t how)
 {
@@ -1109,32 +1108,32 @@ begin:
 
 
 /**
-  * gnutls_record_send - sends to the peer the specified data
-  * @session: is a #gnutls_session_t structure.
-  * @data: contains the data to send
-  * @sizeofdata: is the length of the data
-  *
-  * This function has the similar semantics with send().  The only
-  * difference is that it accepts a GnuTLS session, and uses different
-  * error codes.
-  *
-  * Note that if the send buffer is full, send() will block this
-  * function.  See the send() documentation for full information.  You
-  * can replace the default push function by using
-  * gnutls_transport_set_ptr2() with a call to send() with a
-  * MSG_DONTWAIT flag if blocking is a problem.
-  *
-  * If the EINTR is returned by the internal push function (the
-  * default is send()} then %GNUTLS_E_INTERRUPTED will be returned. If
-  * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN is returned, you must
-  * call this function again, with the same parameters; alternatively
-  * you could provide a %NULL pointer for data, and 0 for
-  * size. cf. gnutls_record_get_direction().
-  *
-  * Returns: the number of bytes sent, or a negative error code.  The
-  * number of bytes sent might be less than @sizeofdata.  The maximum
-  * number of bytes this function can send in a single call depends on
-  * the negotiated maximum record size.
+ * gnutls_record_send - sends to the peer the specified data
+ * @session: is a #gnutls_session_t structure.
+ * @data: contains the data to send
+ * @sizeofdata: is the length of the data
+ *
+ * This function has the similar semantics with send().  The only
+ * difference is that it accepts a GnuTLS session, and uses different
+ * error codes.
+ *
+ * Note that if the send buffer is full, send() will block this
+ * function.  See the send() documentation for full information.  You
+ * can replace the default push function by using
+ * gnutls_transport_set_ptr2() with a call to send() with a
+ * MSG_DONTWAIT flag if blocking is a problem.
+ *
+ * If the EINTR is returned by the internal push function (the
+ * default is send()} then %GNUTLS_E_INTERRUPTED will be returned. If
+ * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN is returned, you must
+ * call this function again, with the same parameters; alternatively
+ * you could provide a %NULL pointer for data, and 0 for
+ * size. cf. gnutls_record_get_direction().
+ *
+ * Returns: the number of bytes sent, or a negative error code.  The
+ *   number of bytes sent might be less than @sizeofdata.  The maximum
+ *   number of bytes this function can send in a single call depends
+ *   on the negotiated maximum record size.
   **/
 ssize_t
 gnutls_record_send (gnutls_session_t session, const void *data,
@@ -1145,35 +1144,35 @@ gnutls_record_send (gnutls_session_t session, const void *data,
 }
 
 /**
-  * gnutls_record_recv - reads data from the TLS record protocol
-  * @session: is a #gnutls_session_t structure.
-  * @data: the buffer that the data will be read into
-  * @sizeofdata: the number of requested bytes
-  *
-  * This function has the similar semantics with recv().  The only
-  * difference is that it accepts a GnuTLS session, and uses different
-  * error codes.
-  *
-  * In the special case that a server requests a renegotiation, the
-  * client may receive an error code of %GNUTLS_E_REHANDSHAKE.  This
-  * message may be simply ignored, replied with an alert
-  * %GNUTLS_A_NO_RENEGOTIATION, or replied with a new handshake,
-  * depending on the client's will.
-  *
-  * If %EINTR is returned by the internal push function (the default
-  * is recv()) then %GNUTLS_E_INTERRUPTED will be returned.  If
-  * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN is returned, you must
-  * call this function again to get the data.  See also
-  * gnutls_record_get_direction().
-  *
-  * A server may also receive %GNUTLS_E_REHANDSHAKE when a client has
-  * initiated a handshake. In that case the server can only initiate a
-  * handshake or terminate the connection.
-  *
-  * Returns: the number of bytes received and zero on EOF.  A negative
-  * error code is returned in case of an error.  The number of bytes
-  * received might be less than @sizeofdata.
-  **/
+ * gnutls_record_recv - reads data from the TLS record protocol
+ * @session: is a #gnutls_session_t structure.
+ * @data: the buffer that the data will be read into
+ * @sizeofdata: the number of requested bytes
+ *
+ * This function has the similar semantics with recv().  The only
+ * difference is that it accepts a GnuTLS session, and uses different
+ * error codes.
+ *
+ * In the special case that a server requests a renegotiation, the
+ * client may receive an error code of %GNUTLS_E_REHANDSHAKE.  This
+ * message may be simply ignored, replied with an alert
+ * %GNUTLS_A_NO_RENEGOTIATION, or replied with a new handshake,
+ * depending on the client's will.
+ *
+ * If %EINTR is returned by the internal push function (the default
+ * is recv()) then %GNUTLS_E_INTERRUPTED will be returned.  If
+ * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN is returned, you must
+ * call this function again to get the data.  See also
+ * gnutls_record_get_direction().
+ *
+ * A server may also receive %GNUTLS_E_REHANDSHAKE when a client has
+ * initiated a handshake. In that case the server can only initiate a
+ * handshake or terminate the connection.
+ *
+ * Returns: the number of bytes received and zero on EOF.  A negative
+ *   error code is returned in case of an error.  The number of bytes
+ *   received might be less than @sizeofdata.
+ **/
 ssize_t
 gnutls_record_recv (gnutls_session_t session, void *data, size_t sizeofdata)
 {
@@ -1182,14 +1181,14 @@ gnutls_record_recv (gnutls_session_t session, void *data, size_t sizeofdata)
 }
 
 /**
-  * gnutls_record_get_max_size - returns the maximum record size
-  * @session: is a #gnutls_session_t structure.
-  *
-  * Get the record size.  The maximum record size is negotiated by the
-  * client after the first handshake message.
-  *
-  * Returns: The maximum record packet size in this connection.
-  **/
+ * gnutls_record_get_max_size - returns the maximum record size
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Get the record size.  The maximum record size is negotiated by the
+ * client after the first handshake message.
+ *
+ * Returns: The maximum record packet size in this connection.
+ **/
 size_t
 gnutls_record_get_max_size (gnutls_session_t session)
 {

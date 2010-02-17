@@ -580,35 +580,34 @@ error:
 
 
 /**
-  * gnutls_x509_privkey_export_pkcs8 - This function will export the private key to PKCS8 format
-  * @key: Holds the key
-  * @format: the format of output params. One of PEM or DER.
-  * @password: the password that will be used to encrypt the key. 
-  * @flags: an ORed sequence of gnutls_pkcs_encrypt_flags_t
-  * @output_data: will contain a private key PEM or DER encoded
-  * @output_data_size: holds the size of output_data (and will be
-  *   replaced by the actual size of parameters)
-  *
-  * This function will export the private key to a PKCS8 structure.
-  * Both RSA and DSA keys can be exported. For DSA keys we use
-  * PKCS #11 definitions. If the flags do not specify the encryption 
-  * cipher, then the default 3DES (PBES2) will be used.
-  *
-  * The @password can be either ASCII or UTF-8 in the default PBES2
-  * encryption schemas, or ASCII for the PKCS12 schemas.
-  *
-  * If the buffer provided is not long enough to hold the output, then
-  * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
-  * be returned.
-  *
-  * If the structure is PEM encoded, it will have a header
-  * of "BEGIN ENCRYPTED PRIVATE KEY" or "BEGIN PRIVATE KEY" if
-  * encryption is not used.
-  *
-  * Return value: In case of failure a negative value will be
-  *   returned, and 0 on success.
-  *
-  **/
+ * gnutls_x509_privkey_export_pkcs8 - This function will export the private key to PKCS8 format
+ * @key: Holds the key
+ * @format: the format of output params. One of PEM or DER.
+ * @password: the password that will be used to encrypt the key.
+ * @flags: an ORed sequence of gnutls_pkcs_encrypt_flags_t
+ * @output_data: will contain a private key PEM or DER encoded
+ * @output_data_size: holds the size of output_data (and will be
+ *   replaced by the actual size of parameters)
+ *
+ * This function will export the private key to a PKCS8 structure.
+ * Both RSA and DSA keys can be exported. For DSA keys we use
+ * PKCS #11 definitions. If the flags do not specify the encryption
+ * cipher, then the default 3DES (PBES2) will be used.
+ *
+ * The @password can be either ASCII or UTF-8 in the default PBES2
+ * encryption schemas, or ASCII for the PKCS12 schemas.
+ *
+ * If the buffer provided is not long enough to hold the output, then
+ * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
+ * be returned.
+ *
+ * If the structure is PEM encoded, it will have a header
+ * of "BEGIN ENCRYPTED PRIVATE KEY" or "BEGIN PRIVATE KEY" if
+ * encryption is not used.
+ *
+ * Return value: In case of failure a negative value will be
+ *   returned, and 0 on success.
+ **/
 int
 gnutls_x509_privkey_export_pkcs8 (gnutls_x509_privkey_t key,
 				  gnutls_x509_crt_fmt_t format,
@@ -1136,31 +1135,31 @@ error:
 
 }
 
-
 /**
-  * gnutls_x509_privkey_import_pkcs8 - This function will import a DER or PEM PKCS8 encoded key
-  * @key: The structure to store the parsed key
-  * @data: The DER or PEM encoded key.
-  * @format: One of DER or PEM
-  * @password: the password to decrypt the key (if it is encrypted).
-  * @flags: 0 if encrypted or GNUTLS_PKCS_PLAIN if not encrypted.
-  *
-  * This function will convert the given DER or PEM encoded PKCS8 2.0 encrypted key
-  * to the native gnutls_x509_privkey_t format. The output will be stored in @key.
-  * Both RSA and DSA keys can be imported, and flags can only be used to indicate
-  * an unencrypted key.
-  *
-  * The @password can be either ASCII or UTF-8 in the default PBES2
-  * encryption schemas, or ASCII for the PKCS12 schemas.
-  *
-  * If the Certificate is PEM encoded it should have a header of "ENCRYPTED PRIVATE KEY",
-  * or "PRIVATE KEY". You only need to specify the flags if the key is DER encoded, since
-  * in that case the encryption status cannot be auto-detected.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_x509_privkey_import_pkcs8 - This function will import a DER or PEM PKCS8 encoded key
+ * @key: The structure to store the parsed key
+ * @data: The DER or PEM encoded key.
+ * @format: One of DER or PEM
+ * @password: the password to decrypt the key (if it is encrypted).
+ * @flags: 0 if encrypted or GNUTLS_PKCS_PLAIN if not encrypted.
+ *
+ * This function will convert the given DER or PEM encoded PKCS8 2.0
+ * encrypted key to the native gnutls_x509_privkey_t format. The
+ * output will be stored in @key.  Both RSA and DSA keys can be
+ * imported, and flags can only be used to indicate an unencrypted
+ * key.
+ *
+ * The @password can be either ASCII or UTF-8 in the default PBES2
+ * encryption schemas, or ASCII for the PKCS12 schemas.
+ *
+ * If the Certificate is PEM encoded it should have a header of
+ * "ENCRYPTED PRIVATE KEY", or "PRIVATE KEY". You only need to
+ * specify the flags if the key is DER encoded, since in that case
+ * the encryption status cannot be auto-detected.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_privkey_import_pkcs8 (gnutls_x509_privkey_t key,
 				  const gnutls_datum_t * data,

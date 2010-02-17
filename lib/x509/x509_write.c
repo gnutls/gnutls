@@ -207,18 +207,18 @@ gnutls_x509_crt_set_version (gnutls_x509_crt_t crt, unsigned int version)
 }
 
 /**
-  * gnutls_x509_crt_set_key - This function will associate the Certificate with a key
-  * @crt: a certificate of type #gnutls_x509_crt_t
-  * @key: holds a private key
-  *
-  * This function will set the public parameters from the given
-  * private key to the certificate. Only RSA keys are currently
-  * supported.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_x509_crt_set_key - This function will associate the Certificate with a key
+ * @crt: a certificate of type #gnutls_x509_crt_t
+ * @key: holds a private key
+ *
+ * This function will set the public parameters from the given
+ * private key to the certificate. Only RSA keys are currently
+ * supported.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ *
+ **/
 int
 gnutls_x509_crt_set_key (gnutls_x509_crt_t crt, gnutls_x509_privkey_t key)
 {

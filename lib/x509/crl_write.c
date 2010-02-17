@@ -42,18 +42,17 @@
 static void disable_optional_stuff (gnutls_x509_crl_t crl);
 
 /**
-  * gnutls_x509_crl_set_version - This function will set the CRL version
-  * @crl: should contain a gnutls_x509_crl_t structure
-  * @version: holds the version number. For CRLv1 crls must be 1.
-  *
-  * This function will set the version of the CRL. This
-  * must be one for CRL version 1, and so on. The CRLs generated
-  * by gnutls should have a version number of 2.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_x509_crl_set_version - This function will set the CRL version
+ * @crl: should contain a gnutls_x509_crl_t structure
+ * @version: holds the version number. For CRLv1 crls must be 1.
+ *
+ * This function will set the version of the CRL. This
+ * must be one for CRL version 1, and so on. The CRLs generated
+ * by gnutls should have a version number of 2.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_crl_set_version (gnutls_x509_crl_t crl, unsigned int version)
 {
@@ -80,23 +79,22 @@ gnutls_x509_crl_set_version (gnutls_x509_crl_t crl, unsigned int version)
 }
 
 /**
-  * gnutls_x509_crl_sign2 - This function will sign a CRL with a key
-  * @crl: should contain a gnutls_x509_crl_t structure
-  * @issuer: is the certificate of the certificate issuer
-  * @issuer_key: holds the issuer's private key
-  * @dig: The message digest to use. GNUTLS_DIG_SHA1 is the safe choice unless you know what you're doing.
-  * @flags: must be 0
-  *
-  * This function will sign the CRL with the issuer's private key, and
-  * will copy the issuer's information into the CRL.
-  *
-  * This must be the last step in a certificate CRL since all
-  * the previously set parameters are now signed.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_x509_crl_sign2 - This function will sign a CRL with a key
+ * @crl: should contain a gnutls_x509_crl_t structure
+ * @issuer: is the certificate of the certificate issuer
+ * @issuer_key: holds the issuer's private key
+ * @dig: The message digest to use. GNUTLS_DIG_SHA1 is the safe choice unless you know what you're doing.
+ * @flags: must be 0
+ *
+ * This function will sign the CRL with the issuer's private key, and
+ * will copy the issuer's information into the CRL.
+ *
+ * This must be the last step in a certificate CRL since all
+ * the previously set parameters are now signed.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_crl_sign2 (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
 		       gnutls_x509_privkey_t issuer_key,
@@ -126,18 +124,17 @@ gnutls_x509_crl_sign2 (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
 }
 
 /**
-  * gnutls_x509_crl_sign - This function will sign a CRL with a key
-  * @crl: should contain a gnutls_x509_crl_t structure
-  * @issuer: is the certificate of the certificate issuer
-  * @issuer_key: holds the issuer's private key
-  *
-  * This function is the same a gnutls_x509_crl_sign2() with no flags, and
-  * SHA1 as the hash algorithm.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_x509_crl_sign - This function will sign a CRL with a key
+ * @crl: should contain a gnutls_x509_crl_t structure
+ * @issuer: is the certificate of the certificate issuer
+ * @issuer_key: holds the issuer's private key
+ *
+ * This function is the same a gnutls_x509_crl_sign2() with no flags, and
+ * SHA1 as the hash algorithm.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_crl_sign (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
 		      gnutls_x509_privkey_t issuer_key)
@@ -146,16 +143,15 @@ gnutls_x509_crl_sign (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
 }
 
 /**
-  * gnutls_x509_crl_set_this_update - This function will set the CRL's issuing time
-  * @crl: should contain a gnutls_x509_crl_t structure
-  * @act_time: The actual time
-  *
-  * This function will set the time this CRL was issued.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_x509_crl_set_this_update - This function will set the CRL's issuing time
+ * @crl: should contain a gnutls_x509_crl_t structure
+ * @act_time: The actual time
+ *
+ * This function will set the time this CRL was issued.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_crl_set_this_update (gnutls_x509_crl_t crl, time_t act_time)
 {
@@ -169,16 +165,15 @@ gnutls_x509_crl_set_this_update (gnutls_x509_crl_t crl, time_t act_time)
 }
 
 /**
-  * gnutls_x509_crl_set_next_update - This function will set the CRL next update time
-  * @crl: should contain a gnutls_x509_crl_t structure
-  * @exp_time: The actual time
-  *
-  * This function will set the time this CRL will be updated.
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_x509_crl_set_next_update - This function will set the CRL next update time
+ * @crl: should contain a gnutls_x509_crl_t structure
+ * @exp_time: The actual time
+ *
+ * This function will set the time this CRL will be updated.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_crl_set_next_update (gnutls_x509_crl_t crl, time_t exp_time)
 {
@@ -191,18 +186,17 @@ gnutls_x509_crl_set_next_update (gnutls_x509_crl_t crl, time_t exp_time)
 }
 
 /**
-  * gnutls_x509_crl_set_crt_serial - This function will set a revoked certificate's serial number
-  * @crl: should contain a gnutls_x509_crl_t structure
-  * @serial: The revoked certificate's serial number
-  * @serial_size: Holds the size of the serial field.
-  * @revocation_time: The time this certificate was revoked
-  *
-  * This function will set a revoked certificate's serial number to the CRL. 
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_x509_crl_set_crt_serial - This function will set a revoked certificate's serial number
+ * @crl: should contain a gnutls_x509_crl_t structure
+ * @serial: The revoked certificate's serial number
+ * @serial_size: Holds the size of the serial field.
+ * @revocation_time: The time this certificate was revoked
+ *
+ * This function will set a revoked certificate's serial number to the CRL.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_crl_set_crt_serial (gnutls_x509_crl_t crl,
 				const void *serial, size_t serial_size,
@@ -258,17 +252,16 @@ gnutls_x509_crl_set_crt_serial (gnutls_x509_crl_t crl,
 }
 
 /**
-  * gnutls_x509_crl_set_crt - This function will set a revoked certificate's serial number
-  * @crl: should contain a gnutls_x509_crl_t structure
-  * @crt: a certificate of type #gnutls_x509_crt_t with the revoked certificate
-  * @revocation_time: The time this certificate was revoked
-  *
-  * This function will set a revoked certificate's serial number to the CRL. 
-  *
-  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
-  *   negative error value.
-  *
-  **/
+ * gnutls_x509_crl_set_crt - This function will set a revoked certificate's serial number
+ * @crl: should contain a gnutls_x509_crl_t structure
+ * @crt: a certificate of type #gnutls_x509_crt_t with the revoked certificate
+ * @revocation_time: The time this certificate was revoked
+ *
+ * This function will set a revoked certificate's serial number to the CRL.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int
 gnutls_x509_crl_set_crt (gnutls_x509_crl_t crl, gnutls_x509_crt_t crt,
 			 time_t revocation_time)
