@@ -240,6 +240,7 @@ APIMANS += gnutls_record_get_direction.3
 APIMANS += gnutls_handshake_set_post_client_hello_function.3
 APIMANS += gnutls_session_enable_compatibility_mode.3
 APIMANS += gnutls_hex2bin.3
+APIMANS += gnutls_supplemental_get_name.3
 APIMANS += gnutls_dh_set_prime_bits.3
 APIMANS += gnutls_dh_get_group.3
 APIMANS += gnutls_dh_get_pubkey.3
