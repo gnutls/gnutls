@@ -26,6 +26,11 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libextra/includes				\
 	-I$(top_srcdir)/gl -I$(top_builddir)/gl
 
+# Gnulib warns and suggests use of fseeko instead of fseek, which is
+# used in ex-cert-select.c, but certificate files will not be > 4 GB,
+# so we just silence the warning instead of fixing the code here.
+AM_CPPFLAGS += -D_GL_NO_LARGE_FILES
+
 AM_LDFLAGS = -no-install
 LDADD = libexamples.la				\
 	../../lib/libgnutls.la			\
