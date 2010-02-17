@@ -295,7 +295,6 @@ gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t res,
 						  NULL, format);
 }
 
-
 /**
  * gnutls_certificate_set_openpgp_key_file:
  * @res: the destination context to save the data.
@@ -438,7 +437,6 @@ gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t res,
   return ret;
 }
 
-
 /**
  * gnutls_certificate_set_openpgp_key_file2:
  * @res: the destination context to save the data.
@@ -550,7 +548,6 @@ gnutls_openpgp_count_key_names (const gnutls_datum_t * cert)
   cdk_kbnode_release (knode);
   return nuids;
 }
-
 
 /**
  * gnutls_certificate_set_openpgp_keyring_file:
@@ -911,7 +908,6 @@ _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert, gnutls_openpgp_crt_t cert)
 
 }
 
-
 /**
  * gnutls_openpgp_privkey_sign_hash:
  * @key: Holds the key
@@ -919,8 +915,8 @@ _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert, gnutls_openpgp_crt_t cert)
  * @signature: will contain newly allocated signature
  *
  * This function will sign the given hash using the private key.  You
- * should use gnutls_openpgp_privkey_set_subkey() before calling this
- * function to set the subkey to use.
+ * should use gnutls_openpgp_privkey_set_preferred_key_id() before
+ * calling this function to set the subkey to use.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
