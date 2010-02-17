@@ -661,8 +661,7 @@ gnutls_ia_handshake (gnutls_session_t session)
  *
  * Adding this credential to a session will enable TLS/IA, and will
  * require an Application Phase after the TLS handshake (if the server
- * support TLS/IA).  Use gnutls_ia_require_inner_phase() to toggle the
- * TLS/IA mode.
+ * support TLS/IA).  Use gnutls_ia_enable() to toggle the TLS/IA mode.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
@@ -771,8 +770,7 @@ gnutls_ia_get_client_avp_ptr (gnutls_ia_client_credentials_t cred)
  *
  * Adding this credential to a session will enable TLS/IA, and will
  * require an Application Phase after the TLS handshake (if the client
- * support TLS/IA).  Use gnutls_ia_require_inner_phase() to toggle the
- * TLS/IA mode.
+ * support TLS/IA).  Use gnutls_ia_enable() to toggle the TLS/IA mode.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
