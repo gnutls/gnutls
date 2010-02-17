@@ -93,21 +93,33 @@ typedef struct
 /* the same... setkey should be null */
 typedef gnutls_crypto_mac_st gnutls_crypto_digest_st;
 
+/**
+ * gnutls_rnd_level_t:
+ * @GNUTLS_RND_NONCE: Non-predictable random number.  Fatal in parts
+ *   of session if broken, i.e., vulnerable to statistical analysis.
+ * @GNUTLS_RND_RANDOM: Pseudo-random cryptographic random number.
+ *   Fatal in session if broken.
+ * @GNUTLS_RND_KEY: Fatal in many sessions if broken.
+ *
+ * Enumeration of random quality levels.
+ */
 typedef enum gnutls_rnd_level
-{
-  /* fatal in parts of session if broken, i.e., vulnerable to
-     statistical analysis */
-  GNUTLS_RND_NONCE = 0,
-  /* fatal in session if broken */
-  GNUTLS_RND_RANDOM = 1,
-  /* fatal in many sessions if broken */
-  GNUTLS_RND_KEY = 2
-} gnutls_rnd_level_t;
+  {
+    GNUTLS_RND_NONCE = 0,
+    GNUTLS_RND_RANDOM = 1,
+    GNUTLS_RND_KEY = 2
+  } gnutls_rnd_level_t;
 
+/**
+ * gnutls_pk_flag_t:
+ * @GNUTLS_PK_FLAG_NONE: No flag.
+ *
+ * Enumeration of public-key flag.
+ */
 typedef enum
-{
-  GNUTLS_PK_FLAG_NONE = 0
-} gnutls_pk_flag_t;
+  {
+    GNUTLS_PK_FLAG_NONE = 0
+  } gnutls_pk_flag_t;
 
 typedef struct gnutls_crypto_rnd
 {
@@ -118,6 +130,15 @@ typedef struct gnutls_crypto_rnd
 
 typedef void *bigint_t;
 
+/**
+ * gnutls_bigint_format_t:
+ * @GNUTLS_MPI_FORMAT_USG: Raw unsigned integer format.
+ * @GNUTLS_MPI_FORMAT_STD: Raw signed integer format, always a leading
+ *   zero when positive.
+ * @GNUTLS_MPI_FORMAT_PGP: The pgp integer format.
+ *
+ * Enumeration of different bignum integer encoding formats.
+ */
 typedef enum
 {
   /* raw unsigned integer format */
@@ -223,11 +244,18 @@ void gnutls_pk_params_init (gnutls_pk_params_st * p);
  *  [4] is x (private key only)
  */
 
+/**
+ * gnutls_direction_t:
+ * @GNUTLS_IMPORT: Import direction.
+ * @GNUTLS_EXPORT: Export direction.
+ *
+ * Enumeration of different directions.
+ */
 typedef enum
-{
-  GNUTLS_IMPORT,
-  GNUTLS_EXPORT
-} gnutls_direction_t;
+  {
+    GNUTLS_IMPORT = 0,
+    GNUTLS_EXPORT = 1
+  } gnutls_direction_t;
 
 /* Public key algorithms */
 typedef struct gnutls_crypto_pk
