@@ -164,23 +164,47 @@ extern "C" {
    */
 #define GNUTLS_MAX_ALGORITHM_NUM 16
 
-#define GNUTLS_COMP_ZLIB GNUTLS_COMP_DEFLATE
+  /**
+   * gnutls_compression_method_t:
+   * @GNUTLS_COMP_UNKNOWN: Unknown compression method.
+   * @GNUTLS_COMP_NULL: The NULL compression method (uncompressed).
+   * @GNUTLS_COMP_DEFLATE: The deflate/zlib compression method.
+   * @GNUTLS_COMP_ZLIB: Same as %GNUTLS_COMP_DEFLATE.
+   * @GNUTLS_COMP_LZO: The non-standard LZO compression method.
+   *
+   * Different TLS compression methods.
+   */
   typedef enum
   {
     GNUTLS_COMP_UNKNOWN = 0,
     GNUTLS_COMP_NULL = 1,
-    GNUTLS_COMP_DEFLATE,
-    GNUTLS_COMP_LZO		/* only available if gnutls-extra has
+    GNUTLS_COMP_DEFLATE = 2,
+    GNUTLS_COMP_ZLIB = GNUTLS_COMP_DEFLATE,
+    GNUTLS_COMP_LZO = 3		/* only available if gnutls-extra has
 				   been initialized
 				 */
   } gnutls_compression_method_t;
 
+  /**
+   * gnutls_connection_end_t:
+   * @GNUTLS_SERVER: Connection end is a server.
+   * @GNUTLS_CLIENT: Connection end is a client.
+   *
+   * Different TLS connection end types.
+   */
   typedef enum
   {
     GNUTLS_SERVER = 1,
     GNUTLS_CLIENT
   } gnutls_connection_end_t;
 
+  /**
+   * gnutls_alert_level_t:
+   * @GNUTLS_AL_WARNING: TLS alert of warning severity.
+   * @GNUTLS_AL_FATAL: TLS alert of fatal severity.
+   *
+   * Different TLS alert severities.
+   */
   typedef enum
   {
     GNUTLS_AL_WARNING = 1,
@@ -269,26 +293,52 @@ extern "C" {
     GNUTLS_CERT_REQUIRE
   } gnutls_certificate_request_t;
 
+  /**
+   * gnutls_openpgp_crt_status_t:
+   * @GNUTLS_OPENPGP_CERT: Send entire certificate.
+   * @GNUTLS_OPENPGP_CERT_FINGERPRINT: Send only certificate fingerprint.
+   *
+   * Ways to send OpenPGP certificate.
+   */
   typedef enum
-  { GNUTLS_OPENPGP_CERT,
-    GNUTLS_OPENPGP_CERT_FINGERPRINT
-  } gnutls_openpgp_crt_status_t;
+    {
+      GNUTLS_OPENPGP_CERT,
+      GNUTLS_OPENPGP_CERT_FINGERPRINT
+    } gnutls_openpgp_crt_status_t;
 
+  /**
+   * gnutls_close_request_t:
+   * @GNUTLS_SHUT_RDWR: Disallow further receives/sends.
+   * @GNUTLS_SHUT_WR: Disallow further sends.
+   *
+   * How TLS session should be terminated.  See gnutls_bye().
+   */
   typedef enum
-  {
-    GNUTLS_SHUT_RDWR = 0,
-    GNUTLS_SHUT_WR = 1
-  } gnutls_close_request_t;
+    {
+      GNUTLS_SHUT_RDWR = 0,
+      GNUTLS_SHUT_WR = 1
+    } gnutls_close_request_t;
 
-#define GNUTLS_TLS1 GNUTLS_TLS1_0
+  /**
+   * gnutls_protocol_t:
+   * @GNUTLS_SSL3: SSL version 3.0.
+   * @GNUTLS_TLS1_0: TLS version 1.0.
+   * @GNUTLS_TLS1: Same as %GNUTLS_TLS1_0.
+   * @GNUTLS_TLS1_1: TLS version 1.1.
+   * @GNUTLS_TLS1_2: TLS version 1.2.
+   * @GNUTLS_VERSION_UNKNOWN: Unknown SSL/TLS version.
+   *
+   * Enumeration of different SSL/TLS protocol versions.
+   */
   typedef enum
-  {
-    GNUTLS_SSL3 = 1,
-    GNUTLS_TLS1_0,
-    GNUTLS_TLS1_1,
-    GNUTLS_TLS1_2,
-    GNUTLS_VERSION_UNKNOWN = 0xff
-  } gnutls_protocol_t;
+    {
+      GNUTLS_SSL3 = 1,
+      GNUTLS_TLS1_0 = 2,
+      GNUTLS_TLS1 = GNUTLS_TLS1_0,
+      GNUTLS_TLS1_1 = 3,
+      GNUTLS_TLS1_2 = 4,
+      GNUTLS_VERSION_UNKNOWN = 0xff
+    } gnutls_protocol_t;
 
   typedef enum
   {
