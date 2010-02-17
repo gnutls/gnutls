@@ -47,7 +47,7 @@
  * The datum's data must be allocated using the function
  * gnutls_malloc().
  *
- * The first argument to retr_func() will be null unless
+ * The first argument to @retr_func will be null unless
  * gnutls_db_set_ptr() has been called.
  **/
 void
@@ -65,7 +65,7 @@ gnutls_db_set_retrieve_function (gnutls_session_t session,
  * Sets the function that will be used to remove data from the
  * resumed sessions database. This function must return 0 on success.
  *
- * The first argument to rem_func() will be null unless
+ * The first argument to @rem_func will be null unless
  * gnutls_db_set_ptr() has been called.
  **/
 void
