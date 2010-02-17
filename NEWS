@@ -47,6 +47,8 @@ Reported by and tiny patch from Vitaly Mayatskikh
 Thanks to Petr Pisar, Erwin Poeze, Nicolas Provost, Jakub Bogusz,
 Daniel Nylander, Tao Wei, and Aron Xu.
 
+** doc: The GTK-DOC manual is significantly improved.
+
 ** API and ABI modifications:
 gnutls_cipher_decrypt: Added
 gnutls_cipher_deinit: Added
