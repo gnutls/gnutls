@@ -284,7 +284,7 @@ _gnutls_session_sign_algo_enabled (gnutls_session_t session,
 }
 
 /**
- * gnutls_sign_algorithm_get:
+ * gnutls_sign_algorithm_get_requested:
  * @session: is a #gnutls_session_t structure.
  * @indx: is an index of the signature algorithm to return
  * @algo: the returned certificate type will be stored there

@@ -137,7 +137,7 @@ gnutls_safe_negotiation_set_initial (gnutls_session_t session, int value)
 }
 
 /**
- * gnutls_safe_negotiation_set:
+ * gnutls_safe_renegotiation_set:
  * @session: is a #gnutls_session_t structure.
  * @value: 0 to disable and 1 to enable
  *

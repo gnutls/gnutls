@@ -66,6 +66,16 @@ gnutls_supplemental_entry _gnutls_supplemental[] = {
   {0, 0, 0, 0}
 };
 
+/**
+ * gnutls_supplemental_get_name:
+ * @type: is a supplemental data format type
+ *
+ * Convert a #gnutls_supplemental_data_format_type_t value to a
+ * string.
+ *
+ * Returns: a string that contains the name of the specified
+ *   supplemental data format type, or %NULL for unknown types.
+ **/
 const char *
 gnutls_supplemental_get_name (gnutls_supplemental_data_format_type_t type)
 {

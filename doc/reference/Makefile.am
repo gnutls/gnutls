@@ -99,7 +99,7 @@ IGNORE_HFILES += alignof.h alloca.h alloca.in.h arg-nonnull.h		\
 IGNORE_HFILES += socket.h stat.h
 
 # cd lib/minitasn1/ && echo *.h
-IGNORE_HFILES += element.h gstr.h int.h parser_aux.h structure.h
+IGNORE_HFILES += element.h gstr.h int.h libtasn1.h parser_aux.h structure.h
 
 # cd lib/opencdk/ && echo *.h
 IGNORE_HFILES += context.h filters.h keydb.h main.h opencdk.h packet.h	\
