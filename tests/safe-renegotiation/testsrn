@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Copyright (C) 2010 Free Software Foundation, Inc.
 #
@@ -21,8 +21,8 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir="${srcdir:-.}"
-SERV="${SERV:-../../src/gnutls-serv} -q"
-CLI="${CLI:-../../src/gnutls-cli}"
+SERV="${SERV:-../../src/gnutls-serv$EXEEXT} -q"
+CLI="${CLI:-../../src/gnutls-cli$EXEEXT}"
 PORT="${PORT:-5558}"
 unset RETCODE
 
@@ -33,7 +33,8 @@ fail() {
 
 echo "Checking Safe renegotiation"
 
-$SERV -p $PORT --echo --priority NORMAL:+ANON-DH --dhparams params.dh >/dev/null 2>&1 & 
+$SERV -p $PORT --echo --priority NORMAL:+ANON-DH --dhparams params.dh >/dev/null 2>&1 &
+pid=$!
 
 # give the server a chance to initialize
 sleep 2
@@ -50,10 +51,11 @@ $CLI -p $PORT localhost --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION <
 $CLI -p $PORT localhost --rehandshake --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 && \
   fail "4. Unsafe renegotiation should have failed!"
 
-kill %1
+kill $pid
 wait
 
 $SERV -p $PORT --echo --priority NORMAL:+ANON-DH:%INITIAL_SAFE_RENEGOTIATION --dhparams params.dh >/dev/null 2>&1 &
+pid=$!
 
 # give the server a chance to initialize
 sleep 2
@@ -70,10 +72,11 @@ $CLI -p $PORT localhost --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION <
 $CLI -p $PORT localhost --rehandshake --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 && \
   fail "8. Unsafe renegotiation should have failed!"
 
-kill %1
+kill $pid
 wait
 
 $SERV -p $PORT --echo --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION --dhparams params.dh >/dev/null 2>&1 &
+pid=$!
 
 # give the server a chance to initialize
 sleep 2
@@ -90,7 +93,7 @@ $CLI -p $PORT localhost --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION <
 $CLI -p $PORT localhost --rehandshake --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
   fail "12. Unsafe renegotiation should have succeeded!"
 
-kill %1
+kill $pid
 wait
 
 exit ${RETCODE:-0}
