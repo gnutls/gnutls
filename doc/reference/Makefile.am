@@ -64,51 +64,59 @@ EXTRA_HFILES=
 
 # Header files to ignore when scanning. Use base file name, no paths
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
-IGNORE_HFILES=debug.h gnutls_compress.h gnutls_cipher.h			\
-	gnutls_buffers.h gnutls_errors.h gnutls_int.h			\
-	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h		\
-	gnutls_dh.h gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h	\
-	gnutls_db.h gnutls_priority.h gnutls_auth.h auth_anon.h		\
-	gnutls_extensions.h gnutls_random.h x509_b64.h			\
-	gnutls_v2_compat.h gnutls_errors_int.h gnutls_datum.h		\
-	auth_cert.h gnutls_mpi.h gnutls_pk.h gnutls_record.h		\
-	gnutls_cert.h gnutls_constate.h gnutls_global.h strfile.h	\
-	gnutls_sig.h gnutls_mem.h gnutls_ui.h io_debug.h		\
-	ext_max_record.h gnutls_session_pack.h gnutls_alert.h		\
-	gnutls_str.h gnutls_state.h gnutls_x509.h ext_cert_type.h	\
-	gnutls_rsa_export.h ext_server_name.h auth_dh_common.h		\
-	ext_srp.h gnutls_srp.h auth_srp.h auth_srp_passwd.h auth_psk.h	\
-	auth_psk_passwd.h memmem.h gnutls_helper.h			\
-	ext_inner_application.h						\
-									\
-	der.h errors.h gstr.h parser_aux.h element.h errors_int.h	\
-	int.h structure.h						\
-									\
-	common.h compat.h pbkdf2-sha1.h					\
-									\
-	openssl_compat.h						\
-									\
-	cipher.h context.h filters.h main.h md.h packet.h		\
-	stream.h types.h						\
-									\
-	gnutls_openpgp.h gnutlsxx.h gnutls_extra_hooks.h		\
-	gnutls_supplemental.h						\
-	opencdk.h							\
-									\
-	config.h							\
-									\
-	alloca.in.h byteswap.in.h c-ctype.h errno.in.h float+.h		\
+IGNORE_HFILES=compat.h
+
+# cd lib/ && echo *.h
+IGNORE_HFILES += auth_anon.h auth_cert.h auth_dh_common.h auth_psk.h	\
+	auth_psk_passwd.h auth_srp.h auth_srp_passwd.h config.h		\
+	crypto.h debug.h ext_cert_type.h ext_max_record.h ext_oprfi.h	\
+	ext_safe_renegotiation.h ext_server_name.h			\
+	ext_session_ticket.h ext_signature.h ext_srp.h			\
+	gnutls_algorithms.h gnutls_auth.h gnutls_buffers.h		\
+	gnutls_cert.h gnutls_cipher.h gnutls_cipher_int.h		\
+	gnutls_compress.h gnutls_constate.h gnutls_cryptodev.h		\
+	gnutls_datum.h gnutls_db.h gnutls_dh.h gnutls_errors.h		\
+	gnutls_extensions.h gnutls_global.h gnutls_handshake.h		\
+	gnutls_hash_int.h gnutls_helper.h gnutls_int.h gnutls_kx.h	\
+	gnutls_mem.h gnutls_mpi.h gnutls_num.h gnutls_pk.h		\
+	gnutls_record.h gnutls_rsa_export.h gnutls_session_pack.h	\
+	gnutls_sig.h gnutls_srp.h gnutls_state.h gnutls_str.h		\
+	gnutls_supplemental.h gnutls_v2_compat.h gnutls_x509.h		\
+	random.h x509_b64.h
+
+# cd lib/gl/ && echo *.h
+IGNORE_HFILES += alignof.h alloca.h alloca.in.h arg-nonnull.h		\
+	byteswap.in.h c-ctype.h close-hook.h errno.in.h float+.h	\
 	float.in.h gettext.h minmax.h netdb.in.h printf-args.h		\
 	printf-parse.h read-file.h size_max.h sockets.h stdbool.in.h	\
-	stdint.in.h stdio-impl.h stdio.in.h stdlib.in.h string.in.h	\
+	stddef.in.h stdint.in.h stdio.h stdio-impl.h stdio.in.h		\
+	stdlib.h stdlib.in.h string.h string.in.h strings.h		\
 	strings.in.h str-two-way.h sys_socket.in.h sys_stat.in.h	\
-	time.in.h unistd.in.h vasnprintf.h wchar.in.h xsize.h		\
-									\
-	alloca.h byteswap.h c-ctype.h errno.h float.h netdb.h stdint.h	\
-	stdio.h stdlib.h string.h strings.h sys_socket.h sys_stat.h	\
-	time.h unistd.h wchar.h	stat.h socket.h				\
-									\
-	hmac.h  md5.h  memxor.h
+	time.h time.in.h unistd.h unistd.in.h w32sock.h warn-on-use.h	\
+	vasnprintf.h wchar.h wchar.in.h xsize.h
+
+# cd lib/minitasn1/ && echo *.h
+IGNORE_HFILES += element.h gstr.h int.h parser_aux.h structure.h
+
+# cd lib/opencdk/ && echo *.h
+IGNORE_HFILES += context.h filters.h keydb.h main.h opencdk.h packet.h	\
+	stream.h types.h
+
+# cd lib/openpgp/ && echo *.h
+IGNORE_HFILES += gnutls_openpgp.h openpgp_int.h
+
+# cd lib/x509/ && echo *.h
+IGNORE_HFILES += common.h pbkdf2-sha1.h x509_int.h
+
+# cd lib/gl/tests/ && echo *.h
+IGNORE_HFILES += arg-nonnull.h intprops.h macros.h signature.h	\
+	warn-on-use.h verify.h zerosize-ptr.h
+
+# cd libextra/ && echo *.h
+IGNORE_HFILES += config.h ext_inner_application.h openssl_compat.h
+
+# cd libextra/gl/ && echo *.h
+IGNORE_HFILES += hmac.h md5.h memxor.h
 
 # Images to copy into HTML directory.
 # e.g. HTML_IMAGES=$(top_srcdir)/gtk/stock-icons/stock_about_24.png
