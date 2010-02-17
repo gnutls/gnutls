@@ -982,7 +982,7 @@ gnutls_x509_crl_get_extension_info (gnutls_x509_crl_t crl, int indx,
  * buffer.
  *
  * Use gnutls_x509_crl_get_extension_info() to extract the OID and
- * critical flag.  Use gnutls_x509_crl_get_extension_by_oid() instead,
+ * critical flag.  Use gnutls_x509_crl_get_extension_info() instead,
  * if you want to get data indexed by the extension OID rather than
  * sequence.
  *
