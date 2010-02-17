@@ -112,8 +112,7 @@ typedef enum
 typedef struct gnutls_crypto_rnd
 {
   int (*init) (void **ctx);
-  int (*rnd) (void *ctx, int /* gnutls_rnd_level_t */ level,
-	      void *data, size_t datasize);
+  int (*rnd) (void *ctx, int level, void *data, size_t datasize);
   void (*deinit) (void *ctx);
 } gnutls_crypto_rnd_st;
 
