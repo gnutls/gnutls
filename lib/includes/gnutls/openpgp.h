@@ -278,7 +278,7 @@ extern "C"
 
 
 /**
- * gnutls_openpgp_recv_key_func - Callback prototype to get OpenPGP keys
+ * gnutls_openpgp_recv_key_func:
  * @session: a TLS session
  * @keyfpr: key fingerprint
  * @keyfpr_length: length of key fingerprint
