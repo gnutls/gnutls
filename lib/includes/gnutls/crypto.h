@@ -144,38 +144,38 @@ typedef struct gnutls_crypto_bigint
   /* as bigint_cmp */
   int (*bigint_cmp_ui) (const bigint_t m1, unsigned long m2);
   /* ret = a % b */
-    bigint_t (*bigint_mod) (const bigint_t a, const bigint_t b);
+  bigint_t (*bigint_mod) (const bigint_t a, const bigint_t b);
   /* a = b -> ret == a */
-    bigint_t (*bigint_set) (bigint_t a, const bigint_t b);
+  bigint_t (*bigint_set) (bigint_t a, const bigint_t b);
   /* a = b -> ret == a */
-    bigint_t (*bigint_set_ui) (bigint_t a, unsigned long b);
+  bigint_t (*bigint_set_ui) (bigint_t a, unsigned long b);
   unsigned int (*bigint_get_nbits) (const bigint_t a);
   /* w = b ^ e mod m */
-    bigint_t (*bigint_powm) (bigint_t w, const bigint_t b,
-			     const bigint_t e, const bigint_t m);
+  bigint_t (*bigint_powm) (bigint_t w, const bigint_t b,
+			   const bigint_t e, const bigint_t m);
   /* w = a + b mod m */
-    bigint_t (*bigint_addm) (bigint_t w, const bigint_t a,
-			     const bigint_t b, const bigint_t m);
+  bigint_t (*bigint_addm) (bigint_t w, const bigint_t a,
+			   const bigint_t b, const bigint_t m);
   /* w = a - b mod m */
-    bigint_t (*bigint_subm) (bigint_t w, const bigint_t a, const bigint_t b,
-			     const bigint_t m);
+  bigint_t (*bigint_subm) (bigint_t w, const bigint_t a, const bigint_t b,
+			   const bigint_t m);
   /* w = a * b mod m */
-    bigint_t (*bigint_mulm) (bigint_t w, const bigint_t a, const bigint_t b,
-			     const bigint_t m);
+  bigint_t (*bigint_mulm) (bigint_t w, const bigint_t a, const bigint_t b,
+			   const bigint_t m);
   /* w = a + b */ bigint_t (*bigint_add) (bigint_t w, const bigint_t a,
 					  const bigint_t b);
   /* w = a - b */ bigint_t (*bigint_sub) (bigint_t w, const bigint_t a,
 					  const bigint_t b);
   /* w = a * b */
-    bigint_t (*bigint_mul) (bigint_t w, const bigint_t a, const bigint_t b);
+  bigint_t (*bigint_mul) (bigint_t w, const bigint_t a, const bigint_t b);
   /* w = a + b */
-    bigint_t (*bigint_add_ui) (bigint_t w, const bigint_t a, unsigned long b);
+  bigint_t (*bigint_add_ui) (bigint_t w, const bigint_t a, unsigned long b);
   /* w = a - b */
-    bigint_t (*bigint_sub_ui) (bigint_t w, const bigint_t a, unsigned long b);
+  bigint_t (*bigint_sub_ui) (bigint_t w, const bigint_t a, unsigned long b);
   /* w = a * b */
-    bigint_t (*bigint_mul_ui) (bigint_t w, const bigint_t a, unsigned long b);
+  bigint_t (*bigint_mul_ui) (bigint_t w, const bigint_t a, unsigned long b);
   /* q = a / b */
-    bigint_t (*bigint_div) (bigint_t q, const bigint_t a, const bigint_t b);
+  bigint_t (*bigint_div) (bigint_t q, const bigint_t a, const bigint_t b);
   /* 0 if prime */
   int (*bigint_prime_check) (const bigint_t pp);
   int (*bigint_generate_group) (gnutls_group_st * gg, unsigned int bits);
@@ -185,8 +185,8 @@ typedef struct gnutls_crypto_bigint
    * GNUTLS_E_SHORT_MEMORY_BUFFER if buf_size is not sufficient to
    * store this integer, and updates the buf_size;
    */
-    bigint_t (*bigint_scan) (const void *buf, size_t buf_size,
-			     gnutls_bigint_format_t format);
+  bigint_t (*bigint_scan) (const void *buf, size_t buf_size,
+			   gnutls_bigint_format_t format);
   int (*bigint_print) (const bigint_t a, void *buf, size_t * buf_size,
 		       gnutls_bigint_format_t format);
 } gnutls_crypto_bigint_st;
@@ -236,19 +236,19 @@ typedef struct gnutls_crypto_pk
    * parameters, depending on the operation */
   int (*encrypt) (gnutls_pk_algorithm_t, gnutls_datum_t * ciphertext,
 		  const gnutls_datum_t * plaintext,
-		  const gnutls_pk_params_st * /* public */ );
+		  const gnutls_pk_params_st *public);
   int (*decrypt) (gnutls_pk_algorithm_t, gnutls_datum_t * plaintext,
 		  const gnutls_datum_t * ciphertext,
-		  const gnutls_pk_params_st * /* private */ );
+		  const gnutls_pk_params_st *private);
 
   int (*sign) (gnutls_pk_algorithm_t, gnutls_datum_t * signature,
 	       const gnutls_datum_t * data,
-	       const gnutls_pk_params_st * /* private */ );
+	       const gnutls_pk_params_st *private);
   int (*verify) (gnutls_pk_algorithm_t, const gnutls_datum_t * data,
 		 const gnutls_datum_t * signature,
-		 const gnutls_pk_params_st * /* public */ );
+		 const gnutls_pk_params_st *public);
 
-  int (*generate) (gnutls_pk_algorithm_t, unsigned int level /*bits */ ,
+  int (*generate) (gnutls_pk_algorithm_t, unsigned int nbits,
 		   gnutls_pk_params_st *);
   /* this function should convert params to ones suitable
    * for the above functions
