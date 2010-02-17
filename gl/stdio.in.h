@@ -340,7 +340,11 @@ extern size_t fwrite (const void *ptr, size_t s, size_t n, FILE *stream)
 #endif
 
 #if @GNULIB_GETDELIM@
-# if !@HAVE_DECL_GETDELIM@
+# if @REPLACE_GETDELIM@
+#  undef getdelim
+#  define getdelim rpl_getdelim
+# endif
+# if !@HAVE_DECL_GETDELIM@ || @REPLACE_GETDELIM@
 /* Read input, up to (and including) the next occurrence of DELIMITER, from
    STREAM, store it in *LINEPTR (and NUL-terminate it).
    *LINEPTR is a pointer returned from malloc (or NULL), pointing to *LINESIZE
@@ -382,7 +386,7 @@ _GL_WARN_ON_USE (getline, "getline is unportable - "
 # endif
 #endif
 
-#if @GNULIB_OBSTACK_PRINTF@
+#if @GNULIB_OBSTACK_PRINTF@ || @GNULIB_OBSTACK_PRINTF_POSIX@
 # if @REPLACE_OBSTACK_PRINTF@
 #  define obstack_printf rpl_osbtack_printf
 #  define obstack_vprintf rpl_obstack_vprintf
