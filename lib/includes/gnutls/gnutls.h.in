@@ -92,32 +92,32 @@ extern "C" {
    * Enumeration of different symmetric encryption algorithms.
    */
   typedef enum gnutls_cipher_algorithm
-  {
-    GNUTLS_CIPHER_UNKNOWN = 0,
-    GNUTLS_CIPHER_NULL = 1,
-    GNUTLS_CIPHER_ARCFOUR_128 = 2,
-    GNUTLS_CIPHER_3DES_CBC = 3,
-    GNUTLS_CIPHER_AES_128_CBC = 4,
-    GNUTLS_CIPHER_AES_256_CBC = 5,
-    GNUTLS_CIPHER_ARCFOUR_40 = 6,
-    GNUTLS_CIPHER_CAMELLIA_128_CBC = 7,
-    GNUTLS_CIPHER_CAMELLIA_256_CBC = 8,
-    GNUTLS_CIPHER_RC2_40_CBC = 90,
-    GNUTLS_CIPHER_DES_CBC = 91,
-    GNUTLS_CIPHER_AES_192_CBC = 92,
+    {
+      GNUTLS_CIPHER_UNKNOWN = 0,
+      GNUTLS_CIPHER_NULL = 1,
+      GNUTLS_CIPHER_ARCFOUR_128 = 2,
+      GNUTLS_CIPHER_3DES_CBC = 3,
+      GNUTLS_CIPHER_AES_128_CBC = 4,
+      GNUTLS_CIPHER_AES_256_CBC = 5,
+      GNUTLS_CIPHER_ARCFOUR_40 = 6,
+      GNUTLS_CIPHER_CAMELLIA_128_CBC = 7,
+      GNUTLS_CIPHER_CAMELLIA_256_CBC = 8,
+      GNUTLS_CIPHER_RC2_40_CBC = 90,
+      GNUTLS_CIPHER_DES_CBC = 91,
+      GNUTLS_CIPHER_AES_192_CBC = 92,
 
-    /* used only for PGP internals. Ignored in TLS/SSL 
-     */
-    GNUTLS_CIPHER_IDEA_PGP_CFB = 200,
-    GNUTLS_CIPHER_3DES_PGP_CFB = 201,
-    GNUTLS_CIPHER_CAST5_PGP_CFB = 202,
-    GNUTLS_CIPHER_BLOWFISH_PGP_CFB = 203,
-    GNUTLS_CIPHER_SAFER_SK128_PGP_CFB = 204,
-    GNUTLS_CIPHER_AES128_PGP_CFB = 205,
-    GNUTLS_CIPHER_AES192_PGP_CFB = 206,
-    GNUTLS_CIPHER_AES256_PGP_CFB = 207,
-    GNUTLS_CIPHER_TWOFISH_PGP_CFB = 208
-  } gnutls_cipher_algorithm_t;
+      /* used only for PGP internals. Ignored in TLS/SSL
+       */
+      GNUTLS_CIPHER_IDEA_PGP_CFB = 200,
+      GNUTLS_CIPHER_3DES_PGP_CFB = 201,
+      GNUTLS_CIPHER_CAST5_PGP_CFB = 202,
+      GNUTLS_CIPHER_BLOWFISH_PGP_CFB = 203,
+      GNUTLS_CIPHER_SAFER_SK128_PGP_CFB = 204,
+      GNUTLS_CIPHER_AES128_PGP_CFB = 205,
+      GNUTLS_CIPHER_AES192_PGP_CFB = 206,
+      GNUTLS_CIPHER_AES256_PGP_CFB = 207,
+      GNUTLS_CIPHER_TWOFISH_PGP_CFB = 208
+    } gnutls_cipher_algorithm_t;
 
   /**
    * gnutls_kx_algorithm_t:
@@ -136,19 +136,19 @@ extern "C" {
    * Enumeration of different key exchange algorithms.
    */
   typedef enum
-  {
-    GNUTLS_KX_UNKNOWN = 0,
-    GNUTLS_KX_RSA = 1,
-    GNUTLS_KX_DHE_DSS = 2,
-    GNUTLS_KX_DHE_RSA = 3,
-    GNUTLS_KX_ANON_DH = 4,
-    GNUTLS_KX_SRP = 5,
-    GNUTLS_KX_RSA_EXPORT = 6,
-    GNUTLS_KX_SRP_RSA = 7,
-    GNUTLS_KX_SRP_DSS = 8,
-    GNUTLS_KX_PSK = 9,
-    GNUTLS_KX_DHE_PSK = 10
-  } gnutls_kx_algorithm_t;
+    {
+      GNUTLS_KX_UNKNOWN = 0,
+      GNUTLS_KX_RSA = 1,
+      GNUTLS_KX_DHE_DSS = 2,
+      GNUTLS_KX_DHE_RSA = 3,
+      GNUTLS_KX_ANON_DH = 4,
+      GNUTLS_KX_SRP = 5,
+      GNUTLS_KX_RSA_EXPORT = 6,
+      GNUTLS_KX_SRP_RSA = 7,
+      GNUTLS_KX_SRP_DSS = 8,
+      GNUTLS_KX_PSK = 9,
+      GNUTLS_KX_DHE_PSK = 10
+    } gnutls_kx_algorithm_t;
 
   /**
    * gnutls_params_type_t:
@@ -202,20 +202,20 @@ extern "C" {
    * algorithms.
    */
   typedef enum
-  {
-    GNUTLS_MAC_UNKNOWN = 0,
-    GNUTLS_MAC_NULL = 1,
-    GNUTLS_MAC_MD5 = 2,
-    GNUTLS_MAC_SHA1 = 3,
-    GNUTLS_MAC_RMD160 = 4,
-    GNUTLS_MAC_MD2 = 5,
-    GNUTLS_MAC_SHA256 = 6,
-    GNUTLS_MAC_SHA384 = 7,
-    GNUTLS_MAC_SHA512 = 8,
-    GNUTLS_MAC_SHA224 = 9
-    /* If you add anything here, make sure you align with
-       gnutls_digest_algorithm_t. */
-  } gnutls_mac_algorithm_t;
+    {
+      GNUTLS_MAC_UNKNOWN = 0,
+      GNUTLS_MAC_NULL = 1,
+      GNUTLS_MAC_MD5 = 2,
+      GNUTLS_MAC_SHA1 = 3,
+      GNUTLS_MAC_RMD160 = 4,
+      GNUTLS_MAC_MD2 = 5,
+      GNUTLS_MAC_SHA256 = 6,
+      GNUTLS_MAC_SHA384 = 7,
+      GNUTLS_MAC_SHA512 = 8,
+      GNUTLS_MAC_SHA224 = 9
+      /* If you add anything here, make sure you align with
+	 gnutls_digest_algorithm_t. */
+    } gnutls_mac_algorithm_t;
 
   /**
    * gnutls_digest_algorithm_t:
@@ -233,20 +233,20 @@ extern "C" {
    * Enumeration of different digest (hash) algorithms.
    */
   typedef enum
-  {
-    GNUTLS_DIG_UNKNOWN = GNUTLS_MAC_UNKNOWN,
-    GNUTLS_DIG_NULL = GNUTLS_MAC_NULL,
-    GNUTLS_DIG_MD5 = GNUTLS_MAC_MD5,
-    GNUTLS_DIG_SHA1 = GNUTLS_MAC_SHA1,
-    GNUTLS_DIG_RMD160 = GNUTLS_MAC_RMD160,
-    GNUTLS_DIG_MD2 = GNUTLS_MAC_MD2,
-    GNUTLS_DIG_SHA256 = GNUTLS_MAC_SHA256,
-    GNUTLS_DIG_SHA384 = GNUTLS_MAC_SHA384,
-    GNUTLS_DIG_SHA512 = GNUTLS_MAC_SHA512,
-    GNUTLS_DIG_SHA224 = GNUTLS_MAC_SHA224,
-    /* If you add anything here, make sure you align with
-       gnutls_mac_algorithm_t. */
-  } gnutls_digest_algorithm_t;
+    {
+      GNUTLS_DIG_UNKNOWN = GNUTLS_MAC_UNKNOWN,
+      GNUTLS_DIG_NULL = GNUTLS_MAC_NULL,
+      GNUTLS_DIG_MD5 = GNUTLS_MAC_MD5,
+      GNUTLS_DIG_SHA1 = GNUTLS_MAC_SHA1,
+      GNUTLS_DIG_RMD160 = GNUTLS_MAC_RMD160,
+      GNUTLS_DIG_MD2 = GNUTLS_MAC_MD2,
+      GNUTLS_DIG_SHA256 = GNUTLS_MAC_SHA256,
+      GNUTLS_DIG_SHA384 = GNUTLS_MAC_SHA384,
+      GNUTLS_DIG_SHA512 = GNUTLS_MAC_SHA512,
+      GNUTLS_DIG_SHA224 = GNUTLS_MAC_SHA224,
+      /* If you add anything here, make sure you align with
+	 gnutls_mac_algorithm_t. */
+    } gnutls_digest_algorithm_t;
 
   /* exported for other gnutls headers. This is the maximum number of
    * algorithms (ciphers, kx or macs).
@@ -264,15 +264,15 @@ extern "C" {
    * Enumeration of different TLS compression methods.
    */
   typedef enum
-  {
-    GNUTLS_COMP_UNKNOWN = 0,
-    GNUTLS_COMP_NULL = 1,
-    GNUTLS_COMP_DEFLATE = 2,
-    GNUTLS_COMP_ZLIB = GNUTLS_COMP_DEFLATE,
-    GNUTLS_COMP_LZO = 3		/* only available if gnutls-extra has
-				   been initialized
-				 */
-  } gnutls_compression_method_t;
+    {
+      GNUTLS_COMP_UNKNOWN = 0,
+      GNUTLS_COMP_NULL = 1,
+      GNUTLS_COMP_DEFLATE = 2,
+      GNUTLS_COMP_ZLIB = GNUTLS_COMP_DEFLATE,
+      GNUTLS_COMP_LZO = 3		/* only available if gnutls-extra has
+					   been initialized
+					*/
+    } gnutls_compression_method_t;
 
   /**
    * gnutls_connection_end_t:
@@ -282,10 +282,10 @@ extern "C" {
    * Enumeration of different TLS connection end types.
    */
   typedef enum
-  {
-    GNUTLS_SERVER = 1,
-    GNUTLS_CLIENT
-  } gnutls_connection_end_t;
+    {
+      GNUTLS_SERVER = 1,
+      GNUTLS_CLIENT
+    } gnutls_connection_end_t;
 
   /**
    * gnutls_alert_level_t:
@@ -295,85 +295,147 @@ extern "C" {
    * Enumeration of different TLS alert severities.
    */
   typedef enum
-  {
-    GNUTLS_AL_WARNING = 1,
-    GNUTLS_AL_FATAL
-  } gnutls_alert_level_t;
+    {
+      GNUTLS_AL_WARNING = 1,
+      GNUTLS_AL_FATAL
+    } gnutls_alert_level_t;
 
+  /**
+   * gnutls_alert_description_t:
+   * @GNUTLS_A_CLOSE_NOTIFY: Close notify.
+   * @GNUTLS_A_UNEXPECTED_MESSAGE: Unexpected message.
+   * @GNUTLS_A_BAD_RECORD_MAC: Bad record MAC.
+   * @GNUTLS_A_DECRYPTION_FAILED: Decryption failed.
+   * @GNUTLS_A_RECORD_OVERFLOW: Record overflow.
+   * @GNUTLS_A_DECOMPRESSION_FAILURE: Decompression failed.
+   * @GNUTLS_A_HANDSHAKE_FAILURE: Handshake failed.
+   * @GNUTLS_A_BAD_CERTIFICATE: Certificate is bad.
+   * @GNUTLS_A_UNSUPPORTED_CERTIFICATE: Certificate is not supported.
+   * @GNUTLS_A_CERTIFICATE_REVOKED: Certificate was revoked.
+   * @GNUTLS_A_CERTIFICATE_EXPIRED: Certificate is expired.
+   * @GNUTLS_A_CERTIFICATE_UNKNOWN: Unknown certificate.
+   * @GNUTLS_A_ILLEGAL_PARAMETER: Illegal parameter.
+   * @GNUTLS_A_UNKNOWN_CA: CA is unknown.
+   * @GNUTLS_A_ACCESS_DENIED: Access was denied.
+   * @GNUTLS_A_DECODE_ERROR: Decode error.
+   * @GNUTLS_A_DECRYPT_ERROR: Decrypt error.
+   * @GNUTLS_A_EXPORT_RESTRICTION: Export restriction.
+   * @GNUTLS_A_PROTOCOL_VERSION: Error in protocol version.
+   * @GNUTLS_A_INSUFFICIENT_SECURITY: Insufficient security.
+   * @GNUTLS_A_USER_CANCELED: User canceled.
+   * @GNUTLS_A_INTERNAL_ERROR: Internal error.
+   * @GNUTLS_A_NO_RENEGOTIATION: No renegotiation is allowed.
+   * @GNUTLS_A_CERTIFICATE_UNOBTAINABLE: Could not retrieve the
+   *   specified certificate.
+   * @GNUTLS_A_UNSUPPORTED_EXTENSION: An unsupported extension was
+   *   sent.
+   * @GNUTLS_A_UNRECOGNIZED_NAME: The server name sent was not
+   *   recognized.
+   * @GNUTLS_A_UNKNOWN_PSK_IDENTITY: The SRP/PSK username is missing
+   *   or not known.
+   * @GNUTLS_A_INNER_APPLICATION_FAILURE: Inner application
+   *   negotiation failed.
+   * @GNUTLS_A_INNER_APPLICATION_VERIFICATION: Inner application
+   *   verification failed.
+   *
+   * Enumeration of different TLS alerts.
+   */
   typedef enum
-  {
-    GNUTLS_A_CLOSE_NOTIFY,
-    GNUTLS_A_UNEXPECTED_MESSAGE = 10,
-    GNUTLS_A_BAD_RECORD_MAC = 20,
-    GNUTLS_A_DECRYPTION_FAILED,
-    GNUTLS_A_RECORD_OVERFLOW,
-    GNUTLS_A_DECOMPRESSION_FAILURE = 30,
-    GNUTLS_A_HANDSHAKE_FAILURE = 40,
-    GNUTLS_A_SSL3_NO_CERTIFICATE = 41,
-    GNUTLS_A_BAD_CERTIFICATE = 42,
-    GNUTLS_A_UNSUPPORTED_CERTIFICATE,
-    GNUTLS_A_CERTIFICATE_REVOKED,
-    GNUTLS_A_CERTIFICATE_EXPIRED,
-    GNUTLS_A_CERTIFICATE_UNKNOWN,
-    GNUTLS_A_ILLEGAL_PARAMETER,
-    GNUTLS_A_UNKNOWN_CA,
-    GNUTLS_A_ACCESS_DENIED,
-    GNUTLS_A_DECODE_ERROR = 50,
-    GNUTLS_A_DECRYPT_ERROR,
-    GNUTLS_A_EXPORT_RESTRICTION = 60,
-    GNUTLS_A_PROTOCOL_VERSION = 70,
-    GNUTLS_A_INSUFFICIENT_SECURITY,
-    GNUTLS_A_INTERNAL_ERROR = 80,
-    GNUTLS_A_USER_CANCELED = 90,
-    GNUTLS_A_NO_RENEGOTIATION = 100,
-    GNUTLS_A_UNSUPPORTED_EXTENSION = 110,
-    GNUTLS_A_CERTIFICATE_UNOBTAINABLE = 111,
-    GNUTLS_A_UNRECOGNIZED_NAME = 112,
-    GNUTLS_A_UNKNOWN_PSK_IDENTITY = 115,
-    GNUTLS_A_INNER_APPLICATION_FAILURE = 208,
-    GNUTLS_A_INNER_APPLICATION_VERIFICATION = 209
-  } gnutls_alert_description_t;
+    {
+      GNUTLS_A_CLOSE_NOTIFY,
+      GNUTLS_A_UNEXPECTED_MESSAGE = 10,
+      GNUTLS_A_BAD_RECORD_MAC = 20,
+      GNUTLS_A_DECRYPTION_FAILED,
+      GNUTLS_A_RECORD_OVERFLOW,
+      GNUTLS_A_DECOMPRESSION_FAILURE = 30,
+      GNUTLS_A_HANDSHAKE_FAILURE = 40,
+      GNUTLS_A_SSL3_NO_CERTIFICATE = 41,
+      GNUTLS_A_BAD_CERTIFICATE = 42,
+      GNUTLS_A_UNSUPPORTED_CERTIFICATE,
+      GNUTLS_A_CERTIFICATE_REVOKED,
+      GNUTLS_A_CERTIFICATE_EXPIRED,
+      GNUTLS_A_CERTIFICATE_UNKNOWN,
+      GNUTLS_A_ILLEGAL_PARAMETER,
+      GNUTLS_A_UNKNOWN_CA,
+      GNUTLS_A_ACCESS_DENIED,
+      GNUTLS_A_DECODE_ERROR = 50,
+      GNUTLS_A_DECRYPT_ERROR,
+      GNUTLS_A_EXPORT_RESTRICTION = 60,
+      GNUTLS_A_PROTOCOL_VERSION = 70,
+      GNUTLS_A_INSUFFICIENT_SECURITY,
+      GNUTLS_A_INTERNAL_ERROR = 80,
+      GNUTLS_A_USER_CANCELED = 90,
+      GNUTLS_A_NO_RENEGOTIATION = 100,
+      GNUTLS_A_UNSUPPORTED_EXTENSION = 110,
+      GNUTLS_A_CERTIFICATE_UNOBTAINABLE = 111,
+      GNUTLS_A_UNRECOGNIZED_NAME = 112,
+      GNUTLS_A_UNKNOWN_PSK_IDENTITY = 115,
+      GNUTLS_A_INNER_APPLICATION_FAILURE = 208,
+      GNUTLS_A_INNER_APPLICATION_VERIFICATION = 209
+    } gnutls_alert_description_t;
 
+  /**
+   * gnutls_handshake_description_t:
+   * @GNUTLS_HANDSHAKE_HELLO_REQUEST: Hello request.
+   * @GNUTLS_HANDSHAKE_CLIENT_HELLO: Client hello.
+   * @GNUTLS_HANDSHAKE_SERVER_HELLO: Server hello.
+   * @GNUTLS_HANDSHAKE_NEW_SESSION_TICKET: New session ticket.
+   * @GNUTLS_HANDSHAKE_CERTIFICATE_PKT: Certificate packet.
+   * @GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE: Server key exchange.
+   * @GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST: Certificate request.
+   * @GNUTLS_HANDSHAKE_SERVER_HELLO_DONE: Server hello done.
+   * @GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY: Certificate verify.
+   * @GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE: Client key exchange.
+   * @GNUTLS_HANDSHAKE_FINISHED: Finished.
+   * @GNUTLS_HANDSHAKE_SUPPLEMENTAL: Supplemental.
+   *
+   * Enumeration of different TLS handshake packets.
+   */
   typedef enum
-  { GNUTLS_HANDSHAKE_HELLO_REQUEST = 0,
-    GNUTLS_HANDSHAKE_CLIENT_HELLO = 1,
-    GNUTLS_HANDSHAKE_SERVER_HELLO = 2,
-    GNUTLS_HANDSHAKE_NEW_SESSION_TICKET = 4,
-    GNUTLS_HANDSHAKE_CERTIFICATE_PKT = 11,
-    GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE = 12,
-    GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST = 13,
-    GNUTLS_HANDSHAKE_SERVER_HELLO_DONE = 14,
-    GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY = 15,
-    GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE = 16,
-    GNUTLS_HANDSHAKE_FINISHED = 20,
-    GNUTLS_HANDSHAKE_SUPPLEMENTAL = 23
-  } gnutls_handshake_description_t;
+    {
+      GNUTLS_HANDSHAKE_HELLO_REQUEST = 0,
+      GNUTLS_HANDSHAKE_CLIENT_HELLO = 1,
+      GNUTLS_HANDSHAKE_SERVER_HELLO = 2,
+      GNUTLS_HANDSHAKE_NEW_SESSION_TICKET = 4,
+      GNUTLS_HANDSHAKE_CERTIFICATE_PKT = 11,
+      GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE = 12,
+      GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST = 13,
+      GNUTLS_HANDSHAKE_SERVER_HELLO_DONE = 14,
+      GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY = 15,
+      GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE = 16,
+      GNUTLS_HANDSHAKE_FINISHED = 20,
+      GNUTLS_HANDSHAKE_SUPPLEMENTAL = 23
+    } gnutls_handshake_description_t;
 
-/* Note that the status bits have different meanings
- * in openpgp keys and x.509 certificate verification.
- */
+  /**
+   * gnutls_handshake_description_t:
+   * @GNUTLS_CERT_INVALID: Will be set if the certificate was not
+   *   verified.
+   * @GNUTLS_CERT_REVOKED: Certificate revoked.  In X.509 this will be
+   *   set only if CRLs are checked.
+   * @GNUTLS_CERT_SIGNER_NOT_FOUND: Certificate not verified.  Signer
+   *   not found.
+   * @GNUTLS_CERT_SIGNER_NOT_CA: Certificate not verified.  Signer
+   *   not a CA certificate.
+   * @GNUTLS_CERT_INSECURE_ALGORITHM: Certificate not verified,
+   *   insecure algorithm.
+   * @GNUTLS_CERT_NOT_ACTIVATED: Certificate not yet activated.
+   * @GNUTLS_CERT_EXPIRED: Certificate expired.
+   *
+   * Enumeration of certificate status codes.  Note that the status
+   * bits have different meanings in OpenPGP keys and X.509
+   * certificate verification.
+   */
   typedef enum
-  {
-    GNUTLS_CERT_INVALID = 2,	/* will be set if the certificate
-				 * was not verified.
-				 */
-    GNUTLS_CERT_REVOKED = 32,	/* in X.509 this will be set only if CRLs are checked
-				 */
-
-    /* Those are extra information about the verification
-     * process. Will be set only if the certificate was 
-     * not verified.
-     */
-    GNUTLS_CERT_SIGNER_NOT_FOUND = 64,
-    GNUTLS_CERT_SIGNER_NOT_CA = 128,
-    GNUTLS_CERT_INSECURE_ALGORITHM = 256,
-
-    /* Time verification.
-     */
-    GNUTLS_CERT_NOT_ACTIVATED = 512,
-    GNUTLS_CERT_EXPIRED = 1024
-
-  } gnutls_certificate_status_t;
+    {
+      GNUTLS_CERT_INVALID = 2,
+      GNUTLS_CERT_REVOKED = 32,
+      GNUTLS_CERT_SIGNER_NOT_FOUND = 64,
+      GNUTLS_CERT_SIGNER_NOT_CA = 128,
+      GNUTLS_CERT_INSECURE_ALGORITHM = 256,
+      GNUTLS_CERT_NOT_ACTIVATED = 512,
+      GNUTLS_CERT_EXPIRED = 1024
+    } gnutls_certificate_status_t;
 
   /**
    * gnutls_certificate_request_t:
@@ -384,11 +446,11 @@ extern "C" {
    * Enumeration of certificate request types.
    */
   typedef enum
-  {
-    GNUTLS_CERT_IGNORE = 0,
-    GNUTLS_CERT_REQUEST = 1,
-    GNUTLS_CERT_REQUIRE = 2
-  } gnutls_certificate_request_t;
+    {
+      GNUTLS_CERT_IGNORE = 0,
+      GNUTLS_CERT_REQUEST = 1,
+      GNUTLS_CERT_REQUIRE = 2
+    } gnutls_certificate_request_t;
 
   /**
    * gnutls_openpgp_crt_status_t:
