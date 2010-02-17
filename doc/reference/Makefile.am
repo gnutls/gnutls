@@ -64,7 +64,7 @@ EXTRA_HFILES=
 
 # Header files to ignore when scanning. Use base file name, no paths
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
-IGNORE_HFILES=compat.h
+IGNORE_HFILES=compat.h gnutlsxx.h
 
 # cd lib/ && echo *.h | sed 's/crypto.h//'
 IGNORE_HFILES += auth_anon.h auth_cert.h auth_dh_common.h auth_psk.h	\
