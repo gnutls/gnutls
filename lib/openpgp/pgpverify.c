@@ -33,7 +33,7 @@
 #include <gnutls_num.h>
 
 /**
- * gnutls_openpgp_crt_verify_ring - Verify all signatures in the key
+ * gnutls_openpgp_crt_verify_ring:
  * @key: the structure that holds the key.
  * @keyring: holds the keyring to check against
  * @flags: unused (should be 0)
@@ -117,7 +117,7 @@ gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
 
 
 /**
- * gnutls_openpgp_crt_verify_self - Verify the self signature on the key
+ * gnutls_openpgp_crt_verify_self:
  * @key: the structure that holds the key.
  * @flags: unused (should be 0)
  * @verify: will hold the key verification output.

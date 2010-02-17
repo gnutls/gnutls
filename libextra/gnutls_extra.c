@@ -87,7 +87,7 @@ _gnutls_add_lzo_comp (void)
 static int _gnutls_init_extra = 0;
 
 /**
- * gnutls_global_init_extra - initializes the global state of gnutls-extra
+ * gnutls_global_init_extra:
  *
  * This function initializes the global state of gnutls-extra library
  * to defaults.
@@ -150,7 +150,7 @@ gnutls_global_init_extra (void)
 }
 
 /**
- * gnutls_extra_check_version - checks the libgnutls-extra version
+ * gnutls_extra_check_version:
  * @req_version: version string to compare with, or %NULL.
  *
  * Check GnuTLS Extra Library version.

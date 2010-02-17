@@ -41,7 +41,7 @@
 #include <libtasn1.h>
 
 /**
- * gnutls_x509_crq_init - initializes a #gnutls_x509_crq_t structure
+ * gnutls_x509_crq_init:
  * @crq: The structure to be initialized
  *
  * This function will initialize a PKCS#10 certificate request
@@ -73,7 +73,7 @@ gnutls_x509_crq_init (gnutls_x509_crq_t * crq)
 }
 
 /**
- * gnutls_x509_crq_deinit - deinitializes a #gnutls_x509_crq_t structure
+ * gnutls_x509_crq_deinit:
  * @crq: The structure to be initialized
  *
  * This function will deinitialize a PKCS#10 certificate request
@@ -95,7 +95,7 @@ gnutls_x509_crq_deinit (gnutls_x509_crq_t crq)
 #define PEM_CRQ2 "CERTIFICATE REQUEST"
 
 /**
- * gnutls_x509_crq_import - import a DER or PEM encoded Certificate request
+ * gnutls_x509_crq_import:
  * @crq: The structure to store the parsed certificate request.
  * @data: The DER or PEM encoded certificate.
  * @format: One of DER or PEM
@@ -173,7 +173,7 @@ cleanup:
 
 
 /**
- * gnutls_x509_crq_get_dn - get certificate request subject's distinguished name
+ * gnutls_x509_crq_get_dn:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @buf: a pointer to a structure to hold the name (may be %NULL)
  * @sizeof_buf: initially holds the size of @buf
@@ -203,7 +203,7 @@ gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf, size_t * sizeof_buf)
 }
 
 /**
- * gnutls_x509_crq_get_dn_by_oid - get certificate request subject's distinguished name
+ * gnutls_x509_crq_get_dn_by_oid:
  * @crq: should contain a gnutls_x509_crq_t structure
  * @oid: holds an Object Identified in null terminated string
  * @indx: In case multiple same OIDs exist in the RDN, this specifies
@@ -245,7 +245,7 @@ gnutls_x509_crq_get_dn_by_oid (gnutls_x509_crq_t crq, const char *oid,
 }
 
 /**
- * gnutls_x509_crq_get_dn_oid - This function returns the Certificate request subject's distinguished name OIDs
+ * gnutls_x509_crq_get_dn_oid:
  * @crq: should contain a gnutls_x509_crq_t structure
  * @indx: Specifies which DN OID to send. Use zero to get the first one.
  * @oid: a pointer to a structure to hold the name (may be %NULL)
@@ -409,7 +409,7 @@ cleanup:
 }
 
 /**
- * gnutls_x509_crq_get_challenge_password - get challenge password
+ * gnutls_x509_crq_get_challenge_password:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @pass: will hold a zero-terminated password string
  * @sizeof_pass: Initially holds the size of @pass.
@@ -593,7 +593,7 @@ set_attribute (ASN1_TYPE asn, const char *root,
 }
 
 /**
- * gnutls_x509_crq_set_attribute_by_oid - set attribute in the request
+ * gnutls_x509_crq_set_attribute_by_oid:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @oid: holds an Object Identified in zero-terminated string
  * @buf: a pointer to a structure that holds the attribute data
@@ -627,7 +627,7 @@ gnutls_x509_crq_set_attribute_by_oid (gnutls_x509_crq_t crq,
 }
 
 /**
- * gnutls_x509_crq_get_attribute_by_oid - get an attribute in the request
+ * gnutls_x509_crq_get_attribute_by_oid:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @oid: holds an Object Identified in zero-terminated string
  * @indx: In case multiple same OIDs exist in the attribute list, this
@@ -658,7 +658,7 @@ gnutls_x509_crq_get_attribute_by_oid (gnutls_x509_crq_t crq,
 }
 
 /**
- * gnutls_x509_crq_set_dn_by_oid - set the certificate request subject's distinguished name
+ * gnutls_x509_crq_set_dn_by_oid:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @oid: holds an Object Identifier in a zero-terminated string
  * @raw_flag: must be 0, or 1 if the data are DER encoded
@@ -694,7 +694,7 @@ gnutls_x509_crq_set_dn_by_oid (gnutls_x509_crq_t crq, const char *oid,
 }
 
 /**
- * gnutls_x509_crq_set_version - set the Certificate request version
+ * gnutls_x509_crq_set_version:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @version: holds the version number, for v1 Requests must be 1
  *
@@ -731,7 +731,7 @@ gnutls_x509_crq_set_version (gnutls_x509_crq_t crq, unsigned int version)
 }
 
 /**
- * gnutls_x509_crq_get_version - get certificate request's version number
+ * gnutls_x509_crq_get_version:
  * @crq: should contain a #gnutls_x509_crq_t structure
  *
  * This function will return the version of the specified Certificate
@@ -768,7 +768,7 @@ gnutls_x509_crq_get_version (gnutls_x509_crq_t crq)
 }
 
 /**
- * gnutls_x509_crq_set_key - associate the certificate request with a key
+ * gnutls_x509_crq_set_key:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @key: holds a private key
  *
@@ -804,7 +804,7 @@ gnutls_x509_crq_set_key (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
 }
 
 /**
- * gnutls_x509_crq_get_key_rsa_raw - export the RSA public key
+ * gnutls_x509_crq_get_key_rsa_raw:
  * @crq: Holds the certificate
  * @m: will hold the modulus
  * @e: will hold the public exponent
@@ -873,7 +873,7 @@ cleanup:
 }
 
 /**
- * gnutls_x509_crq_set_key_rsa_raw - associate Certificate request with a key
+ * gnutls_x509_crq_set_key_rsa_raw:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @m: holds the modulus
  * @e: holds the public exponent
@@ -940,7 +940,7 @@ error:
 }
 
 /**
- * gnutls_x509_crq_set_challenge_password - set a challenge password
+ * gnutls_x509_crq_set_challenge_password:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @pass: holds a zero-terminated password
  *
@@ -985,7 +985,7 @@ gnutls_x509_crq_set_challenge_password (gnutls_x509_crq_t crq,
 }
 
 /**
- * gnutls_x509_crq_sign2 - Sign a Certificate request with a key
+ * gnutls_x509_crq_sign2:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @key: holds a private key
  * @dig: The message digest to use, i.e., %GNUTLS_DIG_SHA1
@@ -1070,7 +1070,7 @@ gnutls_x509_crq_sign2 (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key,
 }
 
 /**
- * gnutls_x509_crq_sign - sign a Certificate request with a key
+ * gnutls_x509_crq_sign:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @key: holds a private key
  *
@@ -1087,7 +1087,7 @@ gnutls_x509_crq_sign (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
 }
 
 /**
- * gnutls_x509_crq_export - Export the generated certificate request
+ * gnutls_x509_crq_export:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @format: the format of output params. One of PEM or DER.
  * @output_data: will contain a certificate request PEM or DER encoded
@@ -1123,7 +1123,7 @@ gnutls_x509_crq_export (gnutls_x509_crq_t crq,
 }
 
 /**
- * gnutls_x509_crq_get_pk_algorithm - get certificate request public key algorithm
+ * gnutls_x509_crq_get_pk_algorithm:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @bits: if bits is non-%NULL it will hold the size of the parameters' in bits
  *
@@ -1159,7 +1159,7 @@ gnutls_x509_crq_get_pk_algorithm (gnutls_x509_crq_t crq, unsigned int *bits)
 }
 
 /**
- * gnutls_x509_crq_get_attribute_info - Get attribute id
+ * gnutls_x509_crq_get_attribute_info:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @indx: Specifies which attribute OID to send. Use zero to get the first one.
  * @oid: a pointer to a structure to hold the OID
@@ -1216,7 +1216,7 @@ gnutls_x509_crq_get_attribute_info (gnutls_x509_crq_t crq, int indx,
 }
 
 /**
- * gnutls_x509_crq_get_attribute_data - Get the specified attribute data
+ * gnutls_x509_crq_get_attribute_data:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @indx: Specifies which attribute OID to send. Use zero to get the first one.
  * @data: a pointer to a structure to hold the data (may be null)
@@ -1270,7 +1270,7 @@ gnutls_x509_crq_get_attribute_data (gnutls_x509_crq_t crq, int indx,
 }
 
 /**
- * gnutls_x509_crq_get_extension_info - Get extension id and criticality
+ * gnutls_x509_crq_get_extension_info:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @indx: Specifies which extension OID to send. Use zero to get the first one.
  * @oid: a pointer to a structure to hold the OID
@@ -1402,7 +1402,7 @@ out:
 }
 
 /**
- * gnutls_x509_crq_get_extension_data - Get the specified extension data
+ * gnutls_x509_crq_get_extension_data:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @indx: Specifies which extension OID to send. Use zero to get the first one.
  * @data: a pointer to a structure to hold the data (may be null)
@@ -1504,7 +1504,7 @@ gnutls_x509_crq_get_extension_data (gnutls_x509_crq_t crq, int indx,
 }
 
 /**
- * gnutls_x509_crq_get_key_usage - return the certificate's key usage
+ * gnutls_x509_crq_get_key_usage:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @key_usage: where the key usage bits will be stored
  * @critical: will be non zero if the extension is marked as critical
@@ -1562,7 +1562,7 @@ gnutls_x509_crq_get_key_usage (gnutls_x509_crq_t crq,
 }
 
 /**
- * gnutls_x509_crq_get_basic_constraints - get certificate's basic constraints
+ * gnutls_x509_crq_get_basic_constraints:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @critical: will be non zero if the extension is marked as critical
  * @ca: pointer to output integer indicating CA status, may be NULL,
@@ -1705,7 +1705,7 @@ get_subject_alt_name (gnutls_x509_crq_t crq,
 }
 
 /**
- * gnutls_x509_crq_get_subject_alt_name - Get certificate's alternative name
+ * gnutls_x509_crq_get_subject_alt_name:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @seq: specifies the sequence number of the alt name, 0 for the
  *   first one, 1 for the second etc.
@@ -1744,7 +1744,7 @@ gnutls_x509_crq_get_subject_alt_name (gnutls_x509_crq_t crq,
 }
 
 /**
- * gnutls_x509_crq_get_subject_alt_othername_oid - Get SAN otherName OID
+ * gnutls_x509_crq_get_subject_alt_othername_oid:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
  * @ret: is the place where the otherName OID will be copied to
@@ -1780,7 +1780,7 @@ gnutls_x509_crq_get_subject_alt_othername_oid (gnutls_x509_crq_t crq,
 }
 
 /**
- * gnutls_x509_crq_get_extension_by_oid - get the specified extension
+ * gnutls_x509_crq_get_extension_by_oid:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @oid: holds an Object Identified in null terminated string
  * @indx: In case multiple same OIDs exist in the extensions, this
@@ -1839,7 +1839,7 @@ gnutls_x509_crq_get_extension_by_oid (gnutls_x509_crq_t crq,
 }
 
 /**
- * gnutls_x509_crq_set_subject_alt_name - Set the subject Alternative Name
+ * gnutls_x509_crq_set_subject_alt_name:
  * @crq: a certificate request of type #gnutls_x509_crq_t
  * @nt: is one of the #gnutls_x509_subject_alt_name_t enumerations
  * @data: The data to be set
@@ -1954,7 +1954,7 @@ finish:
 }
 
 /**
- * gnutls_x509_crq_set_basic_constraints - Set the basicConstraints extension
+ * gnutls_x509_crq_set_basic_constraints:
  * @crq: a certificate request of type #gnutls_x509_crq_t
  * @ca: true(1) or false(0) depending on the Certificate authority status.
  * @pathLenConstraint: non-negative values indicate maximum length of path,
@@ -2005,7 +2005,7 @@ gnutls_x509_crq_set_basic_constraints (gnutls_x509_crq_t crq,
 }
 
 /**
- * gnutls_x509_crq_set_key_usage - Set the keyUsage extension
+ * gnutls_x509_crq_set_key_usage:
  * @crq: a certificate request of type #gnutls_x509_crq_t
  * @usage: an ORed sequence of the GNUTLS_KEY_* elements.
  *
@@ -2051,7 +2051,7 @@ gnutls_x509_crq_set_key_usage (gnutls_x509_crq_t crq, unsigned int usage)
 }
 
 /**
- * gnutls_x509_crq_get_key_purpose_oid - get Certificate's key purpose OIDs
+ * gnutls_x509_crq_get_key_purpose_oid:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @indx: This specifies which OID to return, use zero to get the first one
  * @oid: a pointer to a buffer to hold the OID (may be %NULL)
@@ -2159,7 +2159,7 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t crq,
 }
 
 /**
- * gnutls_x509_crq_set_key_purpose_oid - Sets the Certificate's key purpose OIDs
+ * gnutls_x509_crq_set_key_purpose_oid:
  * @crq: a certificate of type #gnutls_x509_crq_t
  * @oid: a pointer to a zero-terminated string that holds the OID
  * @critical: Whether this extension will be critical or not
@@ -2352,7 +2352,7 @@ cleanup:
 }
 
 /**
- * gnutls_x509_crq_get_key_id - Return unique ID of public key's parameters
+ * gnutls_x509_crq_get_key_id:
  * @crq: a certificate of type #gnutls_x509_crq_t
  * @flags: should be 0 for now
  * @output_data: will contain the key ID

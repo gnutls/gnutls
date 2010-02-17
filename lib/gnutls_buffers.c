@@ -184,7 +184,7 @@ _gnutls_record_buffer_get_size (content_type_t type, gnutls_session_t session)
 }
 
 /**
- * gnutls_record_check_pending - checks if there are any data to receive in gnutls buffers.
+ * gnutls_record_check_pending:
  * @session: is a #gnutls_session_t structure.
  *
  * This function checks if there are any data to receive in the gnutls

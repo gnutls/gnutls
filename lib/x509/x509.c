@@ -36,7 +36,7 @@
 #include <libtasn1.h>
 
 /**
- * gnutls_x509_crt_init - This function initializes a gnutls_x509_crt_t structure
+ * gnutls_x509_crt_init:
  * @cert: The structure to be initialized
  *
  * This function will initialize an X.509 certificate structure.
@@ -127,7 +127,7 @@ _gnutls_x509_crt_cpy (gnutls_x509_crt_t dest, gnutls_x509_crt_t src)
 }
 
 /**
- * gnutls_x509_crt_deinit - This function deinitializes memory used by a gnutls_x509_crt_t structure
+ * gnutls_x509_crt_deinit:
  * @cert: The structure to be initialized
  *
  * This function will deinitialize a CRL structure.
@@ -145,7 +145,7 @@ gnutls_x509_crt_deinit (gnutls_x509_crt_t cert)
 }
 
 /**
- * gnutls_x509_crt_import - This function will import a DER or PEM encoded Certificate
+ * gnutls_x509_crt_import:
  * @cert: The structure to store the parsed certificate.
  * @data: The DER or PEM encoded certificate.
  * @format: One of DER or PEM
@@ -250,7 +250,7 @@ cleanup:
 
 
 /**
- * gnutls_x509_crt_get_issuer_dn - This function returns the Certificate's issuer distinguished name
+ * gnutls_x509_crt_get_issuer_dn:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @buf: a pointer to a structure to hold the name (may be null)
  * @sizeof_buf: initially holds the size of @buf
@@ -282,7 +282,7 @@ gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert, char *buf,
 }
 
 /**
- * gnutls_x509_crt_get_issuer_dn_by_oid - This function returns the Certificate's issuer distinguished name
+ * gnutls_x509_crt_get_issuer_dn_by_oid:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @oid: holds an Object Identified in null terminated string
  * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
@@ -325,7 +325,7 @@ gnutls_x509_crt_get_issuer_dn_by_oid (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_issuer_dn_oid - This function returns the Certificate's issuer distinguished name OIDs
+ * gnutls_x509_crt_get_issuer_dn_oid:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @indx: This specifies which OID to return. Use zero to get the first one.
  * @oid: a pointer to a buffer to hold the OID (may be null)
@@ -356,7 +356,7 @@ gnutls_x509_crt_get_issuer_dn_oid (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_dn - This function returns the Certificate's distinguished name
+ * gnutls_x509_crt_get_dn:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @buf: a pointer to a structure to hold the name (may be null)
  * @sizeof_buf: initially holds the size of @buf
@@ -388,7 +388,7 @@ gnutls_x509_crt_get_dn (gnutls_x509_crt_t cert, char *buf,
 }
 
 /**
- * gnutls_x509_crt_get_dn_by_oid - This function returns the Certificate's distinguished name
+ * gnutls_x509_crt_get_dn_by_oid:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @oid: holds an Object Identified in null terminated string
  * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
@@ -430,7 +430,7 @@ gnutls_x509_crt_get_dn_by_oid (gnutls_x509_crt_t cert, const char *oid,
 }
 
 /**
- * gnutls_x509_crt_get_dn_oid - This function returns the Certificate's subject distinguished name OIDs
+ * gnutls_x509_crt_get_dn_oid:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @indx: This specifies which OID to return. Use zero to get the first one.
  * @oid: a pointer to a buffer to hold the OID (may be null)
@@ -461,7 +461,7 @@ gnutls_x509_crt_get_dn_oid (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_signature_algorithm - This function returns the Certificate's signature algorithm
+ * gnutls_x509_crt_get_signature_algorithm:
  * @cert: should contain a #gnutls_x509_crt_t structure
  *
  * This function will return a value of the #gnutls_sign_algorithm_t
@@ -503,7 +503,7 @@ gnutls_x509_crt_get_signature_algorithm (gnutls_x509_crt_t cert)
 }
 
 /**
- * gnutls_x509_crt_get_signature - Returns the Certificate's signature
+ * gnutls_x509_crt_get_signature:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @sig: a pointer where the signature part will be copied (may be null).
  * @sizeof_sig: initially holds the size of @sig
@@ -559,7 +559,7 @@ gnutls_x509_crt_get_signature (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_version - return the Certificate's version number
+ * gnutls_x509_crt_get_version:
  * @cert: should contain a #gnutls_x509_crt_t structure
  *
  * This function will return the version of the specified Certificate.
@@ -594,7 +594,7 @@ gnutls_x509_crt_get_version (gnutls_x509_crt_t cert)
 }
 
 /**
- * gnutls_x509_crt_get_activation_time - returns the Certificate's activation time
+ * gnutls_x509_crt_get_activation_time:
  * @cert: should contain a #gnutls_x509_crt_t structure
  *
  * This function will return the time this Certificate was or will be
@@ -616,7 +616,7 @@ gnutls_x509_crt_get_activation_time (gnutls_x509_crt_t cert)
 }
 
 /**
- * gnutls_x509_crt_get_expiration_time - returns the Certificate's expiration time
+ * gnutls_x509_crt_get_expiration_time:
  * @cert: should contain a #gnutls_x509_crt_t structure
  *
  * This function will return the time this Certificate was or will be
@@ -638,7 +638,7 @@ gnutls_x509_crt_get_expiration_time (gnutls_x509_crt_t cert)
 }
 
 /**
- * gnutls_x509_crt_get_serial - This function returns the certificate's serial number
+ * gnutls_x509_crt_get_serial:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @result: The place where the serial number will be copied
  * @result_size: Holds the size of the result field.
@@ -678,7 +678,7 @@ gnutls_x509_crt_get_serial (gnutls_x509_crt_t cert, void *result,
 }
 
 /**
- * gnutls_x509_crt_get_subject_key_id - This function returns the certificate's key identifier
+ * gnutls_x509_crt_get_subject_key_id:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @ret: The place where the identifier will be copied
  * @ret_size: Holds the size of the result field.
@@ -765,7 +765,7 @@ gnutls_x509_crt_get_subject_key_id (gnutls_x509_crt_t cert, void *ret,
 }
 
 /**
- * gnutls_x509_crt_get_authority_key_id - This function returns the certificate authority's identifier
+ * gnutls_x509_crt_get_authority_key_id:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @ret: The place where the identifier will be copied
  * @ret_size: Holds the size of the result field.
@@ -854,7 +854,7 @@ gnutls_x509_crt_get_authority_key_id (gnutls_x509_crt_t cert, void *ret,
 }
 
 /**
- * gnutls_x509_crt_get_pk_algorithm - return the certificate's PublicKey algorithm
+ * gnutls_x509_crt_get_pk_algorithm:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @bits: if bits is non null it will hold the size of the parameters' in bits
  *
@@ -1178,7 +1178,7 @@ get_alt_name (gnutls_x509_crt_t cert, const char *extension_id,
 }
 
 /**
- * gnutls_x509_crt_get_subject_alt_name - Get certificate's alternative name, if any
+ * gnutls_x509_crt_get_subject_alt_name:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
  * @ret: is the place where the alternative name will be copied to
@@ -1221,7 +1221,7 @@ gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_issuer_alt_name - Get certificate's issuer alternative name, if any
+ * gnutls_x509_crt_get_issuer_alt_name:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
  * @ret: is the place where the alternative name will be copied to
@@ -1266,7 +1266,7 @@ gnutls_x509_crt_get_issuer_alt_name (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_subject_alt_name2 - Get certificate's alternative name, if any
+ * gnutls_x509_crt_get_subject_alt_name2:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
  * @ret: is the place where the alternative name will be copied to
@@ -1301,7 +1301,7 @@ gnutls_x509_crt_get_subject_alt_name2 (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_issuer_alt_name2 - Get certificate issuer's alternative name, if any
+ * gnutls_x509_crt_get_issuer_alt_name2:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
  * @ret: is the place where the alternative name will be copied to
@@ -1339,7 +1339,7 @@ gnutls_x509_crt_get_issuer_alt_name2 (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_subject_alt_othername_oid - Get SAN otherName OID
+ * gnutls_x509_crt_get_subject_alt_othername_oid:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
  * @ret: is the place where the otherName OID will be copied to
@@ -1373,7 +1373,7 @@ gnutls_x509_crt_get_subject_alt_othername_oid (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_issuer_alt_othername_oid - Get Issuer AltName otherName OID
+ * gnutls_x509_crt_get_issuer_alt_othername_oid:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
  * @ret: is the place where the otherName OID will be copied to
@@ -1410,7 +1410,7 @@ gnutls_x509_crt_get_issuer_alt_othername_oid (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_basic_constraints - This function returns the certificate basic constraints
+ * gnutls_x509_crt_get_basic_constraints:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @critical: will be non zero if the extension is marked as critical
  * @ca: pointer to output integer indicating CA status, may be NULL,
@@ -1476,7 +1476,7 @@ gnutls_x509_crt_get_basic_constraints (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_ca_status - This function returns the certificate CA status
+ * gnutls_x509_crt_get_ca_status:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @critical: will be non zero if the extension is marked as critical
  *
@@ -1501,7 +1501,7 @@ gnutls_x509_crt_get_ca_status (gnutls_x509_crt_t cert, unsigned int *critical)
 }
 
 /**
- * gnutls_x509_crt_get_key_usage - return the certificate's key usage
+ * gnutls_x509_crt_get_key_usage:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @key_usage: where the key usage bits will be stored
  * @critical: will be non zero if the extension is marked as critical
@@ -1563,7 +1563,7 @@ gnutls_x509_crt_get_key_usage (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_proxy - This function returns the proxy certificate info
+ * gnutls_x509_crt_get_proxy:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @critical: will be non zero if the extension is marked as critical
  * @pathlen: pointer to output integer indicating path length (may be
@@ -1625,7 +1625,7 @@ gnutls_x509_crt_get_proxy (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_extension_by_oid - This function returns the specified extension
+ * gnutls_x509_crt_get_extension_by_oid:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @oid: holds an Object Identified in null terminated string
  * @indx: In case multiple same OIDs exist in the extensions, this specifies which to send. Use zero to get the first one.
@@ -1690,7 +1690,7 @@ gnutls_x509_crt_get_extension_by_oid (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_extension_oid - get the specified extension OID
+ * gnutls_x509_crt_get_extension_oid:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @indx: Specifies which extension OID to send. Use zero to get the first one.
  * @oid: a pointer to a structure to hold the OID (may be null)
@@ -1727,7 +1727,7 @@ gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
 }
 
 /**
- * gnutls_x509_crt_get_extension_info - Get extension id and criticality
+ * gnutls_x509_crt_get_extension_info:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @indx: Specifies which extension OID to send. Use zero to get the first one.
  * @oid: a pointer to a structure to hold the OID
@@ -1803,7 +1803,7 @@ gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
 }
 
 /**
- * gnutls_x509_crt_get_extension_data - Get the specified extension data
+ * gnutls_x509_crt_get_extension_data:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @indx: Specifies which extension OID to send. Use zero to get the first one.
  * @data: a pointer to a structure to hold the data (may be null)
@@ -1914,7 +1914,7 @@ cleanup:
 }
 
 /**
- * gnutls_x509_crt_get_raw_issuer_dn - This function returns the issuer's DN DER encoded
+ * gnutls_x509_crt_get_raw_issuer_dn:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @start: will hold the starting point of the DN
  *
@@ -1933,7 +1933,7 @@ gnutls_x509_crt_get_raw_issuer_dn (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_raw_dn - This function returns the subject's DN DER encoded
+ * gnutls_x509_crt_get_raw_dn:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @start: will hold the starting point of the DN
  *
@@ -1960,7 +1960,7 @@ get_dn (gnutls_x509_crt_t cert, const char *whom, gnutls_x509_dn_t * dn)
 }
 
 /**
- * gnutls_x509_crt_get_subject: get opaque subject DN pointer
+ * gnutls_x509_crt_get_subject:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @dn: output variable with pointer to opaque DN.
  *
@@ -1980,7 +1980,7 @@ gnutls_x509_crt_get_subject (gnutls_x509_crt_t cert, gnutls_x509_dn_t * dn)
 }
 
 /**
- * gnutls_x509_crt_get_issuer: get opaque issuer DN pointer
+ * gnutls_x509_crt_get_issuer:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @dn: output variable with pointer to opaque DN
  *
@@ -2097,7 +2097,7 @@ gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn,
 }
 
 /**
- * gnutls_x509_crt_get_fingerprint - This function returns the Certificate's fingerprint
+ * gnutls_x509_crt_get_fingerprint:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @algo: is a digest algorithm
  * @buf: a pointer to a structure to hold the fingerprint (may be null)
@@ -2156,7 +2156,7 @@ gnutls_x509_crt_get_fingerprint (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_export - This function will export the certificate
+ * gnutls_x509_crt_export:
  * @cert: Holds the certificate
  * @format: the format of output params. One of PEM or DER.
  * @output_data: will contain a certificate PEM or DER encoded
@@ -2257,7 +2257,7 @@ cleanup:
 }
 
 /**
- * gnutls_x509_crt_get_key_id - Return unique ID of public key's parameters
+ * gnutls_x509_crt_get_key_id:
  * @crt: Holds the certificate
  * @flags: should be 0 for now
  * @output_data: will contain the key ID
@@ -2351,7 +2351,7 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
 #ifdef ENABLE_PKI
 
 /**
- * gnutls_x509_crt_check_revocation - This function checks if the given certificate is revoked
+ * gnutls_x509_crt_check_revocation:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @crl_list: should contain a list of gnutls_x509_crl_t structures
  * @crl_list_length: the length of the crl_list
@@ -2458,7 +2458,7 @@ gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_verify_algorithm - get hash algorithm used to verify signature.
+ * gnutls_x509_crt_get_verify_algorithm:
  * @crt: Holds the certificate
  * @signature: contains the signature
  * @hash: The result of the call with the hash algorithm used for signature
@@ -2487,7 +2487,7 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
 }
 
 /**
- * gnutls_x509_crt_verify_data - verify the given signed data.
+ * gnutls_x509_crt_verify_data:
  * @crt: Holds the certificate
  * @flags: should be 0 for now
  * @data: holds the data to be signed
@@ -2523,7 +2523,7 @@ gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
 }
 
 /**
- * gnutls_x509_crt_verify_hash - verify the given signed digest
+ * gnutls_x509_crt_verify_hash:
  * @crt: Holds the certificate
  * @flags: should be 0 for now
  * @hash: holds the hash digest to be verified
@@ -2559,7 +2559,7 @@ gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,
 }
 
 /**
- * gnutls_x509_crt_get_crl_dist_points - This function returns the CRL distribution points
+ * gnutls_x509_crt_get_crl_dist_points:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @seq: specifies the sequence number of the distribution point (0 for the first one, 1 for the second etc.)
  * @ret: is the place where the distribution point will be copied to
@@ -2694,7 +2694,7 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_key_purpose_oid - This function returns the Certificate's key purpose OIDs
+ * gnutls_x509_crt_get_key_purpose_oid:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @indx: This specifies which OID to return. Use zero to get the first one.
  * @oid: a pointer to a buffer to hold the OID (may be null)
@@ -2792,7 +2792,7 @@ gnutls_x509_crt_get_key_purpose_oid (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_get_pk_rsa_raw - This function will export the RSA public key
+ * gnutls_x509_crt_get_pk_rsa_raw:
  * @crt: Holds the certificate
  * @m: will hold the modulus
  * @e: will hold the public exponent
@@ -2858,7 +2858,7 @@ cleanup:
 }
 
 /**
- * gnutls_x509_crt_get_pk_dsa_raw - This function will export the DSA public key
+ * gnutls_x509_crt_get_pk_dsa_raw:
  * @crt: Holds the certificate
  * @p: will hold the p
  * @q: will hold the q
@@ -2956,7 +2956,7 @@ cleanup:
 #endif
 
 /**
- * gnutls_x509_crt_list_import - This function will import a PEM encoded certificate list
+ * gnutls_x509_crt_list_import:
  * @certs: The structures to store the parsed certificate. Must not be initialized.
  * @cert_max: Initially must hold the maximum number of certs. It will be updated with the number of certs available.
  * @data: The PEM encoded certificate.

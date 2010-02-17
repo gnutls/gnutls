@@ -2495,7 +2495,7 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
  */
 
 /**
- * gnutls_rehandshake - renegotiate security parameters
+ * gnutls_rehandshake:
  * @session: is a #gnutls_session_t structure.
  *
  * This function will renegotiate security parameters with the
@@ -2699,7 +2699,7 @@ _gnutls_recv_supplemental (gnutls_session_t session)
 }
 
 /**
- * gnutls_handshake - This is the main function in the handshake protocol.
+ * gnutls_handshake:
  * @session: is a #gnutls_session_t structure.
  *
  * This function does the handshake of the TLS/SSL protocol, and
@@ -3492,7 +3492,7 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
 }
 
 /**
- * gnutls_handshake_set_max_packet_length - set the maximum size of the handshake
+ * gnutls_handshake_set_max_packet_length:
  * @session: is a #gnutls_session_t structure.
  * @max: is the maximum number.
  *
@@ -3526,7 +3526,7 @@ _gnutls_get_adv_version (gnutls_session_t session)
 }
 
 /**
- * gnutls_handshake_get_last_in - Returns the last handshake message received.
+ * gnutls_handshake_get_last_in:
  * @session: is a #gnutls_session_t structure.
  *
  * This function is only useful to check where the last performed
@@ -3546,7 +3546,7 @@ gnutls_handshake_get_last_in (gnutls_session_t session)
 }
 
 /**
- * gnutls_handshake_get_last_out - Returns the last handshake message sent.
+ * gnutls_handshake_get_last_out:
  * @session: is a #gnutls_session_t structure.
  *
  * This function is only useful to check where the last performed

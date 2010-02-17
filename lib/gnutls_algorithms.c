@@ -697,7 +697,7 @@ _gnutls_mac_priority (gnutls_session_t session,
 }
 
 /**
- * gnutls_mac_get_name - Returns a string with the name of the specified mac algorithm
+ * gnutls_mac_get_name:
  * @algorithm: is a MAC algorithm
  *
  * Convert a #gnutls_mac_algorithm_t value to a string.
@@ -717,7 +717,7 @@ gnutls_mac_get_name (gnutls_mac_algorithm_t algorithm)
 }
 
 /**
- * gnutls_mac_get_id - Returns the gnutls id of the specified in string algorithm
+ * gnutls_mac_get_id:
  * @name: is a MAC algorithm name
  *
  * Convert a string to a #gnutls_mac_algorithm_t value.  The names are
@@ -737,7 +737,7 @@ gnutls_mac_get_id (const char *name)
 }
 
 /**
- * gnutls_mac_get_key_size - Returns the length of the MAC's key size
+ * gnutls_mac_get_key_size:
  * @algorithm: is an encryption algorithm
  *
  * Get size of MAC key.
@@ -757,7 +757,7 @@ gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm)
 }
 
 /**
- * gnutls_mac_list - Get a list of supported MAC algorithms
+ * gnutls_mac_list:
  *
  * Get a list of hash algorithms for use as MACs.  Note that not
  * necessarily all MACs are supported in TLS cipher suites.  For
@@ -848,7 +848,7 @@ _gnutls_cipher_is_block (gnutls_cipher_algorithm_t algorithm)
 }
 
 /**
- * gnutls_cipher_get_key_size - Returns the length of the cipher's key size
+ * gnutls_cipher_get_key_size:
  * @algorithm: is an encryption algorithm
  *
  * Get key size for cipher.
@@ -884,7 +884,7 @@ _gnutls_cipher_get_export_flag (gnutls_cipher_algorithm_t algorithm)
 }
 
 /**
- * gnutls_cipher_get_name - Returns a string with the name of the specified cipher algorithm
+ * gnutls_cipher_get_name:
  * @algorithm: is an encryption algorithm
  *
  * Convert a #gnutls_cipher_algorithm_t type to a string.
@@ -904,7 +904,7 @@ gnutls_cipher_get_name (gnutls_cipher_algorithm_t algorithm)
 }
 
 /**
- * gnutls_cipher_get_id - Returns the gnutls id of the specified in string algorithm
+ * gnutls_cipher_get_id:
  * @name: is a MAC algorithm name
  *
  * The names are compared in a case insensitive way.
@@ -923,7 +923,7 @@ gnutls_cipher_get_id (const char *name)
 }
 
 /**
- * gnutls_cipher_list - Get a list of supported ciphers
+ * gnutls_cipher_list:
  *
  * Get a list of supported cipher algorithms.  Note that not
  * necessarily all ciphers are supported as TLS cipher suites.  For
@@ -977,7 +977,7 @@ _gnutls_kx_priority (gnutls_session_t session,
 }
 
 /**
- * gnutls_kx_get_name - Returns a string with the name of the specified key exchange algorithm
+ * gnutls_kx_get_name:
  * @algorithm: is a key exchange algorithm
  *
  * Convert a #gnutls_kx_algorithm_t value to a string.
@@ -997,7 +997,7 @@ gnutls_kx_get_name (gnutls_kx_algorithm_t algorithm)
 }
 
 /**
- * gnutls_kx_get_id - Returns the gnutls id of the specified in string algorithm
+ * gnutls_kx_get_id:
  * @name: is a KX name
  *
  * Convert a string to a #gnutls_kx_algorithm_t value.  The names are
@@ -1017,7 +1017,7 @@ gnutls_kx_get_id (const char *name)
 }
 
 /**
- * gnutls_kx_list - Get a list of supported key exchange methods
+ * gnutls_kx_list:
  *
  * Get a list of supported key exchange algorithms.
  *
@@ -1109,7 +1109,7 @@ _gnutls_version_max (gnutls_session_t session)
 
 
 /**
- * gnutls_protocol_get_name - Returns a string with the name of the specified SSL/TLS version
+ * gnutls_protocol_get_name:
  * @version: is a (gnutls) version number
  *
  * Convert a #gnutls_protocol_t value to a string.
@@ -1128,7 +1128,7 @@ gnutls_protocol_get_name (gnutls_protocol_t version)
 }
 
 /**
- * gnutls_protocol_get_id - Returns the gnutls id of the specified in string protocol
+ * gnutls_protocol_get_id:
  * @name: is a protocol name
  *
  * The names are compared in a case insensitive way.
@@ -1147,7 +1147,7 @@ gnutls_protocol_get_id (const char *name)
 }
 
 /**
- * gnutls_protocol_list - Get a list of supported protocols
+ * gnutls_protocol_list:
  *
  * Get a list of supported protocols, e.g. SSL 3.0, TLS 1.0 etc.
  *
@@ -1356,7 +1356,7 @@ _gnutls_cipher_suite_get_name (cipher_suite_st * suite)
 }
 
 /**
- * gnutls_cipher_suite_get_name - get name of the specified cipher suite
+ * gnutls_cipher_suite_get_name:
  * @kx_algorithm: is a Key exchange algorithm
  * @cipher_algorithm: is a cipher algorithm
  * @mac_algorithm: is a MAC algorithm
@@ -1722,7 +1722,7 @@ _gnutls_supported_ciphersuites (gnutls_session_t session,
 }
 
 /**
- * gnutls_certificate_type_get_name - Returns a string with the name of the specified certificate type
+ * gnutls_certificate_type_get_name:
  * @type: is a certificate type
  *
  * Convert a #gnutls_certificate_type_t type to a string.
@@ -1744,7 +1744,7 @@ gnutls_certificate_type_get_name (gnutls_certificate_type_t type)
 }
 
 /**
- * gnutls_certificate_type_get_id - Returns the gnutls id of the specified in string type
+ * gnutls_certificate_type_get_id:
  * @name: is a certificate type name
  *
  * The names are compared in a case insensitive way.
@@ -1772,7 +1772,7 @@ static const gnutls_certificate_type_t supported_certificate_types[] = {
 };
 
 /**
- * gnutls_certificate_type_list - Get a list of supported certificate types
+ * gnutls_certificate_type_list:
  *
  * Get a list of certificate types.  Note that to be able to use
  * OpenPGP certificates, you must link to libgnutls-extra and call
@@ -1874,7 +1874,7 @@ static const gnutls_sign_algorithm_t supported_sign[] = {
   GNUTLS_SIGN_LOOP( if(p->id && p->id == sign) { a; break; } )
 
 /**
- * gnutls_sign_algorithm_get_name - Returns a string with the name of the specified sign algorithm
+ * gnutls_sign_algorithm_get_name:
  * @sign: is a sign algorithm
  *
  * Convert a #gnutls_sign_algorithm_t value to a string.
@@ -1894,7 +1894,7 @@ gnutls_sign_algorithm_get_name (gnutls_sign_algorithm_t sign)
 }
 
 /**
- * gnutls_sign_list - Get a list of supported public key signature algorithms
+ * gnutls_sign_list:
  *
  * Get a list of supported public key signature algorithms.
  *
@@ -1909,7 +1909,7 @@ gnutls_sign_list (void)
 }
 
 /**
- * gnutls_sign_get_id - Returns the gnutls id of the specified in signature algorithm
+ * gnutls_sign_get_id:
  * @name: is a MAC algorithm name
  *
  * The names are compared in a case insensitive way.
@@ -1929,7 +1929,7 @@ gnutls_sign_get_id (const char *name)
 }
 
 /**
- * gnutls_sign_get_name - Get name string for a #gnutls_sign_algorithm_t
+ * gnutls_sign_get_name:
  * @algorithm: is a public key signature algorithm
  *
  * Convert a #gnutls_sign_algorithm_t value to a string.
@@ -2062,7 +2062,7 @@ static const gnutls_pk_entry pk_algorithms[] = {
 };
 
 /**
- * gnutls_pk_algorithm_get_name - Get string with name of public key algorithm
+ * gnutls_pk_algorithm_get_name:
  * @algorithm: is a pk algorithm
  *
  * Convert a #gnutls_pk_algorithm_t value to a string.
@@ -2087,7 +2087,7 @@ gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm)
 }
 
 /**
- * gnutls_pk_list - Get a list of supported public key algorithms
+ * gnutls_pk_list:
  *
  * Get a list of supported public key algorithms.
  *
@@ -2109,7 +2109,7 @@ gnutls_pk_list (void)
 }
 
 /**
- * gnutls_pk_get_id - Get #gnutls_pk_algorithm_t from a string
+ * gnutls_pk_get_id:
  * @name: is a string containing a public key algorithm name.
  *
  * Convert a string to a #gnutls_pk_algorithm_t value.  The names are
@@ -2133,7 +2133,7 @@ gnutls_pk_get_id (const char *name)
 }
 
 /**
- * gnutls_pk_get_name - Get name string with #gnutls_pk_algorithm_t algorithm
+ * gnutls_pk_get_name:
  * @algorithm: is a public key algorithm
  *
  * Convert a #gnutls_pk_algorithm_t value to a string.

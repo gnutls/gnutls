@@ -306,7 +306,7 @@ _gnutls_bin2hex (const void *_old, size_t oldlen,
 }
 
 /**
- * gnutls_hex2bin - convert hex string into binary buffer.
+ * gnutls_hex2bin:
  * @hex_data: string with data in hex format
  * @hex_size: size of hex data
  * @bin_data: output array with binary data

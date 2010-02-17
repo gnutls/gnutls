@@ -35,7 +35,7 @@
 #include <gnutls_num.h>
 
 /**
- * gnutls_openpgp_crt_init - initialize a #gnutls_openpgp_crt_t structure
+ * gnutls_openpgp_crt_init:
  * @key: The structure to be initialized
  *
  * This function will initialize an OpenPGP key structure.
@@ -53,7 +53,7 @@ gnutls_openpgp_crt_init (gnutls_openpgp_crt_t * key)
 }
 
 /**
- * gnutls_openpgp_crt_deinit - deinitialize memory used by a #gnutls_openpgp_crt_t structure
+ * gnutls_openpgp_crt_deinit:
  * @key: The structure to be initialized
  *
  * This function will deinitialize a key structure.
@@ -74,7 +74,7 @@ gnutls_openpgp_crt_deinit (gnutls_openpgp_crt_t key)
 }
 
 /**
- * gnutls_openpgp_crt_import - import a RAW or BASE64 encoded key
+ * gnutls_openpgp_crt_import:
  * @key: The structure to store the parsed key.
  * @data: The RAW or BASE64 encoded key.
  * @format: One of gnutls_openpgp_crt_fmt_t elements.
@@ -213,7 +213,7 @@ _gnutls_openpgp_export (cdk_kbnode_t node,
 }
 
 /**
- * gnutls_openpgp_crt_export - export a RAW or BASE64 encoded key
+ * gnutls_openpgp_crt_export:
  * @key: Holds the key.
  * @format: One of gnutls_openpgp_crt_fmt_t elements.
  * @output_data: will contain the key base64 encoded or raw
@@ -236,7 +236,7 @@ gnutls_openpgp_crt_export (gnutls_openpgp_crt_t key,
 }
 
 /**
- * gnutls_openpgp_crt_get_fingerprint - Gets the fingerprint
+ * gnutls_openpgp_crt_get_fingerprint:
  * @key: the raw data that contains the OpenPGP public key.
  * @fpr: the buffer to save the fingerprint, must hold at least 20 bytes.
  * @fprlen: the integer to save the length of the fingerprint.
@@ -303,7 +303,7 @@ _gnutls_openpgp_count_key_names (gnutls_openpgp_crt_t key)
 
 
 /**
- * gnutls_openpgp_crt_get_name - Extracts the userID
+ * gnutls_openpgp_crt_get_name:
  * @key: the structure that contains the OpenPGP public key.
  * @idx: the index of the ID to extract
  * @buf: a pointer to a structure to hold the name, may be %NULL
@@ -375,7 +375,7 @@ gnutls_openpgp_crt_get_name (gnutls_openpgp_crt_t key,
 }
 
 /**
- * gnutls_openpgp_crt_get_pk_algorithm - return the key's PublicKey algorithm
+ * gnutls_openpgp_crt_get_pk_algorithm:
  * @key: is an OpenPGP key
  * @bits: if bits is non null it will hold the size of the parameters' in bits
  *
@@ -416,7 +416,7 @@ gnutls_openpgp_crt_get_pk_algorithm (gnutls_openpgp_crt_t key,
 
 
 /**
- * gnutls_openpgp_crt_get_version - Extracts the version of the key.
+ * gnutls_openpgp_crt_get_version:
  * @key: the structure that contains the OpenPGP public key.
  *
  * Extract the version of the OpenPGP key.
@@ -443,7 +443,7 @@ gnutls_openpgp_crt_get_version (gnutls_openpgp_crt_t key)
 
 
 /**
- * gnutls_openpgp_crt_get_creation_time - Extract the timestamp
+ * gnutls_openpgp_crt_get_creation_time:
  * @key: the structure that contains the OpenPGP public key.
  *
  * Get key creation time.
@@ -470,7 +470,7 @@ gnutls_openpgp_crt_get_creation_time (gnutls_openpgp_crt_t key)
 
 
 /**
- * gnutls_openpgp_crt_get_expiration_time - Extract the expire date
+ * gnutls_openpgp_crt_get_expiration_time:
  * @key: the structure that contains the OpenPGP public key.
  *
  * Get key expiration time.  A value of '0' means that the key doesn't
@@ -497,7 +497,7 @@ gnutls_openpgp_crt_get_expiration_time (gnutls_openpgp_crt_t key)
 }
 
 /**
- * gnutls_openpgp_crt_get_key_id - Gets the keyID
+ * gnutls_openpgp_crt_get_key_id:
  * @key: the structure that contains the OpenPGP public key.
  * @keyid: the buffer to save the keyid.
  *
@@ -532,7 +532,7 @@ gnutls_openpgp_crt_get_key_id (gnutls_openpgp_crt_t key,
 }
 
 /**
- * gnutls_openpgp_crt_get_revoked_status - Gets the revoked status of the key
+ * gnutls_openpgp_crt_get_revoked_status:
  * @key: the structure that contains the OpenPGP public key.
  *
  * Get revocation status of key.
@@ -563,7 +563,7 @@ gnutls_openpgp_crt_get_revoked_status (gnutls_openpgp_crt_t key)
 }
 
 /**
- * gnutls_openpgp_crt_check_hostname - compare hostname with the key's hostname
+ * gnutls_openpgp_crt_check_hostname:
  * @key: should contain a #gnutls_openpgp_crt_t structure
  * @hostname: A null terminated string that contains a DNS name
  *
@@ -623,7 +623,7 @@ _gnutls_get_pgp_key_usage (unsigned int cdk_usage)
 }
 
 /**
- * gnutls_openpgp_crt_get_key_usage - This function returns the key's usage
+ * gnutls_openpgp_crt_get_key_usage:
  * @key: should contain a gnutls_openpgp_crt_t structure
  * @key_usage: where the key usage bits will be stored
  *
@@ -655,7 +655,7 @@ gnutls_openpgp_crt_get_key_usage (gnutls_openpgp_crt_t key,
 }
 
 /**
- * gnutls_openpgp_crt_get_subkey_count - return the number of subkeys
+ * gnutls_openpgp_crt_get_subkey_count:
  * @key: is an OpenPGP key
  *
  * This function will return the number of subkeys present in the
@@ -799,7 +799,7 @@ _gnutls_openpgp_find_subkey_idx (cdk_kbnode_t knode, uint32_t keyid[2],
 }
 
 /**
- * gnutls_openpgp_crt_get_subkey_revoked_status - Gets the revoked status of the key
+ * gnutls_openpgp_crt_get_subkey_revoked_status:
  * @key: the structure that contains the OpenPGP public key.
  * @idx: is the subkey index
  *
@@ -832,7 +832,7 @@ gnutls_openpgp_crt_get_subkey_revoked_status (gnutls_openpgp_crt_t key,
 }
 
 /**
- * gnutls_openpgp_crt_get_subkey_pk_algorithm - return the subkey's PublicKey algorithm
+ * gnutls_openpgp_crt_get_subkey_pk_algorithm:
  * @key: is an OpenPGP key
  * @idx: is the subkey index
  * @bits: if bits is non null it will hold the size of the parameters' in bits
@@ -877,7 +877,7 @@ gnutls_openpgp_crt_get_subkey_pk_algorithm (gnutls_openpgp_crt_t key,
 }
 
 /**
- * gnutls_openpgp_crt_get_subkey_creation_time - Extract the timestamp
+ * gnutls_openpgp_crt_get_subkey_creation_time:
  * @key: the structure that contains the OpenPGP public key.
  * @idx: the subkey index
  *
@@ -908,7 +908,7 @@ gnutls_openpgp_crt_get_subkey_creation_time (gnutls_openpgp_crt_t key,
 
 
 /**
- * gnutls_openpgp_crt_get_subkey_expiration_time - Extract the expire date
+ * gnutls_openpgp_crt_get_subkey_expiration_time:
  * @key: the structure that contains the OpenPGP public key.
  * @idx: the subkey index
  *
@@ -939,7 +939,7 @@ gnutls_openpgp_crt_get_subkey_expiration_time (gnutls_openpgp_crt_t key,
 }
 
 /**
- * gnutls_openpgp_crt_get_subkey_id - Gets the keyID
+ * gnutls_openpgp_crt_get_subkey_id:
  * @key: the structure that contains the OpenPGP public key.
  * @idx: the subkey index
  * @keyid: the buffer to save the keyid.
@@ -974,7 +974,7 @@ gnutls_openpgp_crt_get_subkey_id (gnutls_openpgp_crt_t key,
 }
 
 /**
- * gnutls_openpgp_crt_get_subkey_fingerprint - Gets the fingerprint of a subkey
+ * gnutls_openpgp_crt_get_subkey_fingerprint:
  * @key: the raw data that contains the OpenPGP public key.
  * @idx: the subkey index
  * @fpr: the buffer to save the fingerprint, must hold at least 20 bytes.
@@ -1019,7 +1019,7 @@ gnutls_openpgp_crt_get_subkey_fingerprint (gnutls_openpgp_crt_t key,
 }
 
 /**
- * gnutls_openpgp_crt_get_subkey_idx - Returns the subkey's index
+ * gnutls_openpgp_crt_get_subkey_idx:
  * @key: the structure that contains the OpenPGP public key.
  * @keyid: the keyid.
  *
@@ -1054,7 +1054,7 @@ gnutls_openpgp_crt_get_subkey_idx (gnutls_openpgp_crt_t key,
 }
 
 /**
- * gnutls_openpgp_crt_get_subkey_usage - returns the key's usage
+ * gnutls_openpgp_crt_get_subkey_usage:
  * @key: should contain a gnutls_openpgp_crt_t structure
  * @idx: the subkey index
  * @key_usage: where the key usage bits will be stored
@@ -1404,7 +1404,7 @@ cleanup:
 
 
 /**
- * gnutls_openpgp_crt_get_pk_rsa_raw - export the RSA public key
+ * gnutls_openpgp_crt_get_pk_rsa_raw:
  * @crt: Holds the certificate
  * @m: will hold the modulus
  * @e: will hold the public exponent
@@ -1435,7 +1435,7 @@ gnutls_openpgp_crt_get_pk_rsa_raw (gnutls_openpgp_crt_t crt,
 }
 
 /**
- * gnutls_openpgp_crt_get_pk_dsa_raw - export the DSA public key
+ * gnutls_openpgp_crt_get_pk_dsa_raw:
  * @crt: Holds the certificate
  * @p: will hold the p
  * @q: will hold the q
@@ -1469,7 +1469,7 @@ gnutls_openpgp_crt_get_pk_dsa_raw (gnutls_openpgp_crt_t crt,
 }
 
 /**
- * gnutls_openpgp_crt_get_subkey_pk_rsa_raw - export the RSA public key
+ * gnutls_openpgp_crt_get_subkey_pk_rsa_raw:
  * @crt: Holds the certificate
  * @idx: Is the subkey index
  * @m: will hold the modulus
@@ -1503,7 +1503,7 @@ gnutls_openpgp_crt_get_subkey_pk_rsa_raw (gnutls_openpgp_crt_t crt,
 }
 
 /**
- * gnutls_openpgp_crt_get_subkey_pk_dsa_raw - export the DSA public key
+ * gnutls_openpgp_crt_get_subkey_pk_dsa_raw:
  * @crt: Holds the certificate
  * @idx: Is the subkey index
  * @p: will hold the p
@@ -1541,7 +1541,7 @@ gnutls_openpgp_crt_get_subkey_pk_dsa_raw (gnutls_openpgp_crt_t crt,
 }
 
 /**
- * gnutls_openpgp_crt_get_preferred_key_id - Gets the preferred keyID
+ * gnutls_openpgp_crt_get_preferred_key_id:
  * @key: the structure that contains the OpenPGP public key.
  * @keyid: the struct to save the keyid.
  *
@@ -1566,7 +1566,7 @@ gnutls_openpgp_crt_get_preferred_key_id (gnutls_openpgp_crt_t key,
 }
 
 /**
- * gnutls_openpgp_crt_set_preferred_key_id - Sets the preferred keyID
+ * gnutls_openpgp_crt_set_preferred_key_id:
  * @key: the structure that contains the OpenPGP public key.
  * @keyid: the selected keyid
  *
@@ -1604,7 +1604,7 @@ gnutls_openpgp_crt_set_preferred_key_id (gnutls_openpgp_crt_t key,
 }
 
 /**
- * gnutls_openpgp_crt_get_auth_subkey - Gets the keyID of an authentication subkey
+ * gnutls_openpgp_crt_get_auth_subkey:
  * @crt: the structure that contains the OpenPGP public key.
  * @keyid: the struct to save the keyid.
  * @flag: Non zero indicates that a valid subkey is always returned.

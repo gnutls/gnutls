@@ -39,7 +39,7 @@
  */
 
 /**
- * gnutls_credentials_clear - Clears all the credentials previously set
+ * gnutls_credentials_clear:
  * @session: is a #gnutls_session_t structure.
  *
  * Clears all the credentials previously set in this session.
@@ -66,7 +66,7 @@ gnutls_credentials_clear (gnutls_session_t session)
  * { algorithm, credentials, pointer to next }
  */
 /**
- * gnutls_credentials_set - Sets the needed credentials for the specified authentication algorithm.
+ * gnutls_credentials_set:
  * @session: is a #gnutls_session_t structure.
  * @type: is the type of the credentials
  * @cred: is a pointer to a structure.
@@ -155,7 +155,7 @@ gnutls_credentials_set (gnutls_session_t session,
 }
 
 /**
- * gnutls_auth_get_type - Returns the type of credentials for the current authentication schema.
+ * gnutls_auth_get_type:
  * @session: is a #gnutls_session_t structure.
  *
  * Returns type of credentials for the current authentication schema.
@@ -184,7 +184,7 @@ gnutls_auth_get_type (gnutls_session_t session)
 }
 
 /**
- * gnutls_auth_server_get_type - Returns the type of credentials for the server authentication schema.
+ * gnutls_auth_server_get_type:
  * @session: is a #gnutls_session_t structure.
  *
  * Returns the type of credentials that were used for server authentication.
@@ -204,7 +204,7 @@ gnutls_auth_server_get_type (gnutls_session_t session)
 }
 
 /**
- * gnutls_auth_client_get_type - Returns the type of credentials for the client authentication schema.
+ * gnutls_auth_client_get_type:
  * @session: is a #gnutls_session_t structure.
  *
  * Returns the type of credentials that were used for client authentication.

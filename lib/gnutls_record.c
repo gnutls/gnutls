@@ -46,7 +46,7 @@
 #include <gnutls_dh.h>
 
 /**
- * gnutls_protocol_get_version - Returns the version of the currently used protocol
+ * gnutls_protocol_get_version:
  * @session: is a #gnutls_session_t structure.
  *
  * Get TLS version, a #gnutls_protocol_t value.
@@ -67,7 +67,7 @@ _gnutls_set_current_version (gnutls_session_t session,
 }
 
 /**
- * gnutls_transport_set_lowat - Used to set the lowat value in order for select to check for pending data.
+ * gnutls_transport_set_lowat:
  * @session: is a #gnutls_session_t structure.
  * @num: is the low water value.
  *
@@ -85,7 +85,7 @@ gnutls_transport_set_lowat (gnutls_session_t session, int num)
 }
 
 /**
- * gnutls_record_disable_padding - Used to disabled padding in TLS 1.0 and above
+ * gnutls_record_disable_padding:
  * @session: is a #gnutls_session_t structure.
  *
  * Used to disabled padding in TLS 1.0 and above.  Normally you do not
@@ -103,7 +103,7 @@ gnutls_record_disable_padding (gnutls_session_t session)
 }
 
 /**
- * gnutls_transport_set_ptr - Used to set first argument of the transport functions
+ * gnutls_transport_set_ptr:
  * @session: is a #gnutls_session_t structure.
  * @ptr: is the value.
  *
@@ -120,7 +120,7 @@ gnutls_transport_set_ptr (gnutls_session_t session,
 }
 
 /**
- * gnutls_transport_set_ptr2 - Used to set first argument of the transport functions
+ * gnutls_transport_set_ptr2:
  * @session: is a #gnutls_session_t structure.
  * @recv_ptr: is the value for the pull function
  * @send_ptr: is the value for the push function
@@ -140,7 +140,7 @@ gnutls_transport_set_ptr2 (gnutls_session_t session,
 }
 
 /**
- * gnutls_transport_get_ptr - Used to return the first argument of the transport functions
+ * gnutls_transport_get_ptr:
  * @session: is a #gnutls_session_t structure.
  *
  * Used to get the first argument of the transport function (like
@@ -156,7 +156,7 @@ gnutls_transport_get_ptr (gnutls_session_t session)
 }
 
 /**
- * gnutls_transport_get_ptr2 - Used to return the first argument of the transport functions
+ * gnutls_transport_get_ptr2:
  * @session: is a #gnutls_session_t structure.
  * @recv_ptr: will hold the value for the pull function
  * @send_ptr: will hold the value for the push function
@@ -176,7 +176,7 @@ gnutls_transport_get_ptr2 (gnutls_session_t session,
 }
 
 /**
- * gnutls_bye - terminate the current TLS/SSL connection.
+ * gnutls_bye:
  * @session: is a #gnutls_session_t structure.
  * @how: is an integer
  *
@@ -1108,7 +1108,7 @@ begin:
 
 
 /**
- * gnutls_record_send - sends to the peer the specified data
+ * gnutls_record_send:
  * @session: is a #gnutls_session_t structure.
  * @data: contains the data to send
  * @sizeofdata: is the length of the data
@@ -1144,7 +1144,7 @@ gnutls_record_send (gnutls_session_t session, const void *data,
 }
 
 /**
- * gnutls_record_recv - reads data from the TLS record protocol
+ * gnutls_record_recv:
  * @session: is a #gnutls_session_t structure.
  * @data: the buffer that the data will be read into
  * @sizeofdata: the number of requested bytes
@@ -1181,7 +1181,7 @@ gnutls_record_recv (gnutls_session_t session, void *data, size_t sizeofdata)
 }
 
 /**
- * gnutls_record_get_max_size - returns the maximum record size
+ * gnutls_record_get_max_size:
  * @session: is a #gnutls_session_t structure.
  *
  * Get the record size.  The maximum record size is negotiated by the
@@ -1200,7 +1200,7 @@ gnutls_record_get_max_size (gnutls_session_t session)
 
 
 /**
- * gnutls_record_set_max_size - sets the maximum record size
+ * gnutls_record_set_max_size:
  * @session: is a #gnutls_session_t structure.
  * @size: is the new size
  *

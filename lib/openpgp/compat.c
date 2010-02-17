@@ -32,7 +32,7 @@
 #include <openpgp_int.h>
 
 /*-
- * gnutls_openpgp_verify_key - Verify all signatures on the key
+ * gnutls_openpgp_verify_key:
  * @cert_list: the structure that holds the certificates.
  * @cert_list_lenght: the items in the cert_list.
  * @status: the output of the verification function
@@ -108,7 +108,7 @@ leave:
 }
 
 /*-
- * gnutls_openpgp_fingerprint - Gets the fingerprint
+ * gnutls_openpgp_fingerprint:
  * @cert: the raw data that contains the OpenPGP public key.
  * @fpr: the buffer to save the fingerprint.
  * @fprlen: the integer to save the length of the fingerprint.
@@ -149,7 +149,7 @@ _gnutls_openpgp_fingerprint (const gnutls_datum_t * cert,
 }
 
 /*-
- * gnutls_openpgp_get_raw_key_creation_time - Extract the timestamp
+ * gnutls_openpgp_get_raw_key_creation_time:
  * @cert: the raw data that contains the OpenPGP public key.
  *
  * Returns the timestamp when the OpenPGP key was created.
@@ -184,7 +184,7 @@ _gnutls_openpgp_get_raw_key_creation_time (const gnutls_datum_t * cert)
 
 
 /*-
- * gnutls_openpgp_get_raw_key_expiration_time - Extract the expire date
+ * gnutls_openpgp_get_raw_key_expiration_time:
  * @cert: the raw data that contains the OpenPGP public key.
  *
  * Returns the time when the OpenPGP key expires. A value of '0' means

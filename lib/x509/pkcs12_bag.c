@@ -37,7 +37,7 @@
 #include "x509_int.h"
 
 /**
- * gnutls_pkcs12_bag_init - This function initializes a gnutls_pkcs12_bag_t  structure
+ * gnutls_pkcs12_bag_init:
  * @bag: The structure to be initialized
  *
  * This function will initialize a PKCS12 bag structure. PKCS12 Bags
@@ -77,7 +77,7 @@ _pkcs12_bag_free_data (gnutls_pkcs12_bag_t bag)
 
 
 /**
- * gnutls_pkcs12_bag_deinit - This function deinitializes memory used by a gnutls_pkcs12_t structure
+ * gnutls_pkcs12_bag_deinit:
  * @bag: The structure to be initialized
  *
  * This function will deinitialize a PKCS12 Bag structure.
@@ -94,7 +94,7 @@ gnutls_pkcs12_bag_deinit (gnutls_pkcs12_bag_t bag)
 }
 
 /**
- * gnutls_pkcs12_bag_get_type - This function returns the bag's type
+ * gnutls_pkcs12_bag_get_type:
  * @bag: The bag
  * @indx: The element of the bag to get the type
  *
@@ -117,7 +117,7 @@ gnutls_pkcs12_bag_get_type (gnutls_pkcs12_bag_t bag, int indx)
 }
 
 /**
- * gnutls_pkcs12_bag_get_count - This function returns the bag's elements count
+ * gnutls_pkcs12_bag_get_count:
  * @bag: The bag
  *
  * This function will return the number of the elements withing the bag.
@@ -138,7 +138,7 @@ gnutls_pkcs12_bag_get_count (gnutls_pkcs12_bag_t bag)
 }
 
 /**
- * gnutls_pkcs12_bag_get_data - This function returns the bag's data
+ * gnutls_pkcs12_bag_get_data:
  * @bag: The bag
  * @indx: The element of the bag to get the data from
  * @data: where the bag's data will be. Should be treated as constant.
@@ -392,7 +392,7 @@ cleanup:
 
 
 /**
- * gnutls_pkcs12_bag_set_data - This function inserts data into the bag
+ * gnutls_pkcs12_bag_set_data:
  * @bag: The bag
  * @type: The data's type
  * @data: the data to be copied.
@@ -455,7 +455,7 @@ gnutls_pkcs12_bag_set_data (gnutls_pkcs12_bag_t bag,
 }
 
 /**
- * gnutls_pkcs12_bag_set_crt - This function inserts a certificate into the bag
+ * gnutls_pkcs12_bag_set_crt:
  * @bag: The bag
  * @crt: the certificate to be copied.
  *
@@ -492,7 +492,7 @@ gnutls_pkcs12_bag_set_crt (gnutls_pkcs12_bag_t bag, gnutls_x509_crt_t crt)
 }
 
 /**
- * gnutls_pkcs12_bag_set_crl - insert the CRL into the bag
+ * gnutls_pkcs12_bag_set_crl:
  * @bag: The bag
  * @crl: the CRL to be copied.
  *
@@ -530,7 +530,7 @@ gnutls_pkcs12_bag_set_crl (gnutls_pkcs12_bag_t bag, gnutls_x509_crl_t crl)
 }
 
 /**
- * gnutls_pkcs12_bag_set_key_id - This function sets a key ID into the bag element
+ * gnutls_pkcs12_bag_set_key_id:
  * @bag: The bag
  * @indx: The bag's element to add the id
  * @id: the ID
@@ -575,7 +575,7 @@ gnutls_pkcs12_bag_set_key_id (gnutls_pkcs12_bag_t bag, int indx,
 }
 
 /**
- * gnutls_pkcs12_bag_get_key_id - This function gets the key ID from the bag element
+ * gnutls_pkcs12_bag_get_key_id:
  * @bag: The bag
  * @indx: The bag's element to add the id
  * @id: where the ID will be copied (to be treated as const)
@@ -610,7 +610,7 @@ gnutls_pkcs12_bag_get_key_id (gnutls_pkcs12_bag_t bag, int indx,
 }
 
 /**
- * gnutls_pkcs12_bag_get_friendly_name - This function returns the friendly name of the bag element
+ * gnutls_pkcs12_bag_get_friendly_name:
  * @bag: The bag
  * @indx: The bag's element to add the id
  * @name: will hold a pointer to the name (to be treated as const)
@@ -645,7 +645,7 @@ gnutls_pkcs12_bag_get_friendly_name (gnutls_pkcs12_bag_t bag, int indx,
 
 
 /**
- * gnutls_pkcs12_bag_set_friendly_name - This function sets a friendly name into the bag element
+ * gnutls_pkcs12_bag_set_friendly_name:
  * @bag: The bag
  * @indx: The bag's element to add the id
  * @name: the name
@@ -687,7 +687,7 @@ gnutls_pkcs12_bag_set_friendly_name (gnutls_pkcs12_bag_t bag, int indx,
 
 
 /**
- * gnutls_pkcs12_bag_decrypt - This function will decrypt an encrypted bag
+ * gnutls_pkcs12_bag_decrypt:
  * @bag: The bag
  * @pass: The password used for encryption, must be ASCII.
  *
@@ -743,7 +743,7 @@ gnutls_pkcs12_bag_decrypt (gnutls_pkcs12_bag_t bag, const char *pass)
 }
 
 /**
- * gnutls_pkcs12_bag_encrypt - This function will encrypt a bag
+ * gnutls_pkcs12_bag_encrypt:
  * @bag: The bag
  * @pass: The password used for encryption, must be ASCII
  * @flags: should be one of #gnutls_pkcs_encrypt_flags_t elements bitwise or'd

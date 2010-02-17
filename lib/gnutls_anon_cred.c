@@ -35,7 +35,7 @@
 #include "gnutls_mpi.h"
 
 /**
- * gnutls_anon_free_server_credentials - Used to free an allocated gnutls_anon_server_credentials_t structure
+ * gnutls_anon_free_server_credentials:
  * @sc: is a #gnutls_anon_server_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
@@ -49,7 +49,7 @@ gnutls_anon_free_server_credentials (gnutls_anon_server_credentials_t sc)
 }
 
 /**
- * gnutls_anon_allocate_server_credentials - Used to allocate an gnutls_anon_server_credentials_t structure
+ * gnutls_anon_allocate_server_credentials:
  * @sc: is a pointer to a #gnutls_anon_server_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
@@ -69,7 +69,7 @@ gnutls_anon_allocate_server_credentials (gnutls_anon_server_credentials_t *
 
 
 /**
- * gnutls_anon_free_client_credentials - Used to free an allocated gnutls_anon_client_credentials_t structure
+ * gnutls_anon_free_client_credentials:
  * @sc: is a #gnutls_anon_client_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
@@ -84,7 +84,7 @@ static struct gnutls_anon_client_credentials_st anon_dummy_struct;
 static const gnutls_anon_client_credentials_t anon_dummy = &anon_dummy_struct;
 
 /**
- * gnutls_anon_allocate_client_credentials - Used to allocate a credentials structure
+ * gnutls_anon_allocate_client_credentials:
  * @sc: is a pointer to a #gnutls_anon_client_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus
@@ -105,7 +105,7 @@ gnutls_anon_allocate_client_credentials (gnutls_anon_client_credentials_t *
 }
 
 /**
- * gnutls_anon_set_server_dh_params - set the DH parameters for a server to use
+ * gnutls_anon_set_server_dh_params:
  * @res: is a gnutls_anon_server_credentials_t structure
  * @dh_params: is a structure that holds Diffie-Hellman parameters.
  *
@@ -121,7 +121,7 @@ gnutls_anon_set_server_dh_params (gnutls_anon_server_credentials_t res,
 }
 
 /**
- * gnutls_anon_set_server_params_function - set the DH parameters callback
+ * gnutls_anon_set_server_params_function:
  * @res: is a gnutls_certificate_credentials_t structure
  * @func: is the function to be called
  *

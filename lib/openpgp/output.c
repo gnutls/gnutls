@@ -493,7 +493,7 @@ print_oneline (gnutls_string * str, gnutls_openpgp_crt_t cert)
 }
 
 /**
- * gnutls_openpgp_crt_print - Pretty print OpenPGP certificates
+ * gnutls_openpgp_crt_print:
  * @cert: The structure to be printed
  * @format: Indicate the format to use
  * @out: Newly allocated datum with zero terminated string.

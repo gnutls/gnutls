@@ -945,7 +945,7 @@ _gnutls_x509_set_dn_oid (ASN1_TYPE asn1_struct,
 }
 
 /**
- * gnutls_x509_dn_init: initialize an opaque DN object
+ * gnutls_x509_dn_init:
  * @dn: the object to be initialized
  *
  * This function initializes a #gnutls_x509_dn_t structure.
@@ -978,7 +978,7 @@ gnutls_x509_dn_init (gnutls_x509_dn_t * dn)
 }
 
 /**
- * gnutls_x509_dn_import: get opaque DN object from DER RDN sequence
+ * gnutls_x509_dn_import:
  * @dn: the structure that will hold the imported DN
  * @data: should contain a DER encoded RDN sequence
  *
@@ -1012,7 +1012,7 @@ gnutls_x509_dn_import (gnutls_x509_dn_t dn, const gnutls_datum_t * data)
 }
 
 /**
- * gnutls_x509_dn_deinit: deallocate a DN object
+ * gnutls_x509_dn_deinit:
  * @dn: a DN opaque object pointer.
  *
  * This function deallocates the DN object as returned by
@@ -1027,7 +1027,7 @@ gnutls_x509_dn_deinit (gnutls_x509_dn_t dn)
 }
 
 /**
- * gnutls_x509_rdn_get - parse an RDN sequence and returns a string
+ * gnutls_x509_rdn_get:
  * @idn: should contain a DER encoded RDN sequence
  * @buf: a pointer to a structure to hold the peer's name
  * @sizeof_buf: holds the size of @buf
@@ -1083,7 +1083,7 @@ gnutls_x509_rdn_get (const gnutls_datum_t * idn,
 }
 
 /**
- * gnutls_x509_rdn_get_by_oid - parse an RDN sequence and returns a string
+ * gnutls_x509_rdn_get_by_oid:
  * @idn: should contain a DER encoded RDN sequence
  * @oid: an Object Identifier
  * @indx: In case multiple same OIDs exist in the RDN indicates which
@@ -1141,7 +1141,7 @@ gnutls_x509_rdn_get_by_oid (const gnutls_datum_t * idn, const char *oid,
 }
 
 /**
- * gnutls_x509_rdn_get_oid - parse an RDN sequence and returns an OID.
+ * gnutls_x509_rdn_get_oid:
  * @idn: should contain a DER encoded RDN sequence
  * @indx: Indicates which OID to return. Use 0 for the first one.
  * @buf: a pointer to a structure to hold the peer's name OID
@@ -1220,7 +1220,7 @@ _gnutls_x509_compare_raw_dn (const gnutls_datum_t * dn1,
 }
 
 /**
- * gnutls_x509_dn_export - This function will export the DN
+ * gnutls_x509_dn_export:
  * @dn: Holds the opaque DN object
  * @format: the format of output params. One of PEM or DER.
  * @output_data: will contain a DN PEM or DER encoded

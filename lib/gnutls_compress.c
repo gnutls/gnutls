@@ -121,7 +121,7 @@ static const gnutls_compression_method_t supported_compressions[] = {
 /* Compression Functions */
 
 /**
- * gnutls_compression_get_name - Returns a string with the name of the specified compression algorithm
+ * gnutls_compression_get_name:
  * @algorithm: is a Compression algorithm
  *
  * Convert a #gnutls_compression_method_t value to a string.
@@ -141,7 +141,7 @@ gnutls_compression_get_name (gnutls_compression_method_t algorithm)
 }
 
 /**
- * gnutls_compression_get_id - Returns the gnutls id of the specified in string algorithm
+ * gnutls_compression_get_id:
  * @name: is a compression method name
  *
  * The names are compared in a case insensitive way.
@@ -163,7 +163,7 @@ gnutls_compression_get_id (const char *name)
 }
 
 /**
- * gnutls_compression_list - Get a list of supported compression methods
+ * gnutls_compression_list:
  *
  * Get a list of compression methods.  Note that to be able to use LZO
  * compression, you must link to libgnutls-extra and call

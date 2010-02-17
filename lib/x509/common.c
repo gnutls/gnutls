@@ -106,7 +106,7 @@ _gnutls_x509_oid_data_printable (const char *oid)
 }
 
 /**
- * gnutls_x509_dn_oid_known - return true if the given OID is known
+ * gnutls_x509_dn_oid_known:
  * @oid: holds an Object Identifier in a null terminated string
  *
  * This function will inform about known DN OIDs. This is useful since

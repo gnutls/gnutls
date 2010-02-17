@@ -31,7 +31,7 @@
 #include <crypto.h>
 
 /**
- * gnutls_cipher_init - initializes a crypto context
+ * gnutls_cipher_init:
  * @handle: is a #gnutls_cipher_hd_t structure.
  * @cipher: the encryption algorithm to use
  * @key: The key to be used for encryption
@@ -45,8 +45,10 @@
  * Returns: Zero or a negative value on error.
  **/
 int
-gnutls_cipher_init (gnutls_cipher_hd_t * handle, gnutls_cipher_algorithm_t cipher,
-		     const gnutls_datum_t * key, const gnutls_datum_t * iv)
+gnutls_cipher_init (gnutls_cipher_hd_t * handle,
+		    gnutls_cipher_algorithm_t cipher,
+		    const gnutls_datum_t * key,
+		    const gnutls_datum_t * iv)
 {
   *handle = gnutls_malloc(sizeof(cipher_hd_st));
   if (*handle == NULL) {
@@ -58,7 +60,7 @@ gnutls_cipher_init (gnutls_cipher_hd_t * handle, gnutls_cipher_algorithm_t ciphe
 }
 
 /**
- * gnutls_cipher_encrypt - encrypts the given data
+ * gnutls_cipher_encrypt:
  * @handle: is a #gnutls_cipher_hd_t structure.
  * @text: the data to encrypt
  * @textlen: The length of data to encrypt
@@ -74,10 +76,10 @@ int gnutls_cipher_encrypt (gnutls_cipher_hd_t handle, void *text, int textlen)
 }
 
 /**
- * gnutls_cipher_decrypt - decrypts the given data
+ * gnutls_cipher_decrypt:
  * @handle: is a #gnutls_cipher_hd_t structure.
- * @text: the data to encrypt
- * @textlen: The length of data to encrypt
+ * @ciphertext: the data to encrypt
+ * @ciphertextlen: The length of data to encrypt
  *
  * This function will decrypt the given data using the algorithm
  * specified by the context.
@@ -88,17 +90,16 @@ int
 gnutls_cipher_decrypt (gnutls_cipher_hd_t handle, void *ciphertext,
 			int ciphertextlen)
 {
-  return _gnutls_cipher_decrypt((cipher_hd_st*)handle, ciphertext, ciphertextlen);
+  return _gnutls_cipher_decrypt((cipher_hd_st*)handle, ciphertext,
+				ciphertextlen);
 }
 
 /**
- * gnutls_cipher_deinit - deinitializes resources by a context
+ * gnutls_cipher_deinit:
  * @handle: is a #gnutls_cipher_hd_t structure.
  *
- * This function will deinitialize all resources occupied by
- * the given encryption context.
- *
- * Returns: This function has no return value.
+ * This function will deinitialize all resources occupied by the given
+ * encryption context.
  **/
 void
 gnutls_cipher_deinit (gnutls_cipher_hd_t handle)
@@ -110,8 +111,8 @@ gnutls_cipher_deinit (gnutls_cipher_hd_t handle)
 /* HMAC */
 
 /**
- * gnutls_hmac_init - initializes an HMAC context
- * @handle: is a #gnutls_hmac_hd_t structure.
+ * gnutls_hmac_init:
+ * @dig: is a #gnutls_hmac_hd_t structure.
  * @algorithm: the HMAC algorithm to use
  * @key: The key to be used for encryption
  * @keylen: The length of the key
@@ -124,20 +125,21 @@ gnutls_cipher_deinit (gnutls_cipher_hd_t handle)
  * Returns: Zero or a negative value on error.
  **/
 int
-gnutls_hmac_init (gnutls_hmac_hd_t * dig, gnutls_digest_algorithm_t algorithm,
-		   const void *key, int keylen)
+gnutls_hmac_init (gnutls_hmac_hd_t * dig,
+		  gnutls_digest_algorithm_t algorithm,
+		  const void *key, int keylen)
 {
   *dig = gnutls_malloc(sizeof(digest_hd_st));
   if (*dig == NULL) {
     gnutls_assert();
     return GNUTLS_E_MEMORY_ERROR;
   }
-  
+
   return _gnutls_hmac_init(((digest_hd_st*)*dig), algorithm, key, keylen);
 }
 
 /**
- * gnutls_hmac - hashes the given data
+ * gnutls_hmac:
  * @handle: is a #gnutls_cipher_hd_t structure.
  * @text: the data to hash
  * @textlen: The length of data to hash
@@ -153,13 +155,11 @@ int gnutls_hmac (gnutls_hmac_hd_t handle, const void *text, size_t textlen)
 }
 
 /**
- * gnutls_hmac_output - Outputs the current MAC value
+ * gnutls_hmac_output:
  * @handle: is a #gnutls_hmac_hd_t structure.
  * @digest: is the output value of the MAC
  *
  * This function will output the current MAC value.
- *
- * Returns: This function has no return value.
  **/
 void
 gnutls_hmac_output (gnutls_hmac_hd_t handle, void *digest)
@@ -168,14 +168,12 @@ gnutls_hmac_output (gnutls_hmac_hd_t handle, void *digest)
 }
 
 /**
- * gnutls_hmac_deinit - deinitializes resources by a context
+ * gnutls_hmac_deinit:
  * @handle: is a #gnutls_hmac_hd_t structure.
  * @digest: is the output value of the MAC
  *
  * This function will deinitialize all resources occupied by
  * the given hmac context.
- *
- * Returns: This function has no return value.
  **/
 void gnutls_hmac_deinit (gnutls_hmac_hd_t handle, void *digest)
 {
@@ -183,7 +181,7 @@ void gnutls_hmac_deinit (gnutls_hmac_hd_t handle, void *digest)
 }
 
 /**
- * gnutls_hmac_get_len - returns the length of the output data
+ * gnutls_hmac_get_len:
  * @algorithm: the hmac algorithm to use
  *
  * This function will return the length of the output data
@@ -198,7 +196,7 @@ int gnutls_hmac_get_len( gnutls_mac_algorithm_t algorithm)
 }
 
 /**
- * gnutls_hmac_fast - hashes data
+ * gnutls_hmac_fast:
  * @algorithm: the hash algorithm to use
  * @key: the key to use
  * @keylen: The length of the key
@@ -221,11 +219,9 @@ int gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm,
 /* HASH */
 
 /**
- * gnutls_hash_init - initializes an hash context
- * @handle: is a #gnutls_hash_hd_t structure.
+ * gnutls_hash_init:
+ * @dig: is a #gnutls_hash_hd_t structure.
  * @algorithm: the hash algorithm to use
- * @key: The key to be used for encryption
- * @keylen: The length of the key
  *
  * This function will initialize an context that can be used to
  * produce a Message Digest of data.  This will effectively use the
@@ -247,7 +243,7 @@ int gnutls_hash_init (gnutls_hash_hd_t * dig,
 }
 
 /**
- * gnutls_hash - hashes the given data
+ * gnutls_hash:
  * @handle: is a #gnutls_cipher_hd_t structure.
  * @text: the data to hash
  * @textlen: The length of data to hash
@@ -263,13 +259,11 @@ int gnutls_hash (gnutls_hash_hd_t handle, const void *text, size_t textlen)
 }
 
 /**
- * gnutls_hash_output - Outputs the current hash value
+ * gnutls_hash_output:
  * @handle: is a #gnutls_hash_hd_t structure.
  * @digest: is the output value of the hash
  *
  * This function will output the current hash value.
- *
- * Returns: This function has no return value.
  **/
 void gnutls_hash_output (gnutls_hash_hd_t handle, void *digest)
 {
@@ -277,14 +271,12 @@ void gnutls_hash_output (gnutls_hash_hd_t handle, void *digest)
 }
 
 /**
- * gnutls_hash_deinit - deinitializes resources by a context
+ * gnutls_hash_deinit:
  * @handle: is a #gnutls_hash_hd_t structure.
  * @digest: is the output value of the hash
  *
  * This function will deinitialize all resources occupied by
  * the given hash context.
- *
- * Returns: This function has no return value.
  **/
 void
 gnutls_hash_deinit (gnutls_hash_hd_t handle, void *digest)
@@ -293,7 +285,7 @@ gnutls_hash_deinit (gnutls_hash_hd_t handle, void *digest)
 }
 
 /**
- * gnutls_hash_get_len - returns the length of the output data
+ * gnutls_hash_get_len:
  * @algorithm: the hash algorithm to use
  *
  * This function will return the length of the output data
@@ -308,7 +300,7 @@ int gnutls_hash_get_len( gnutls_digest_algorithm_t algorithm)
 }
 
 /**
- * gnutls_hash_fast - initializes an hash context
+ * gnutls_hash_fast:
  * @algorithm: the hash algorithm to use
  * @text: the data to hash
  * @textlen: The length of data to hash

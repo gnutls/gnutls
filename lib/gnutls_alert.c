@@ -78,7 +78,7 @@ static const gnutls_alert_entry sup_alerts[] = {
 };
 
 /**
- * gnutls_alert_get_name - Returns a string describing the alert number given
+ * gnutls_alert_get_name:
  * @alert: is an alert number #gnutls_session_t structure.
  *
  * This function will return a string that describes the given alert
@@ -99,7 +99,7 @@ gnutls_alert_get_name (gnutls_alert_description_t alert)
 }
 
 /**
- * gnutls_alert_send - send an alert message to the peer
+ * gnutls_alert_send:
  * @session: is a #gnutls_session_t structure.
  * @level: is the level of the alert
  * @desc: is the alert description
@@ -140,7 +140,7 @@ gnutls_alert_send (gnutls_session_t session, gnutls_alert_level_t level,
 }
 
 /**
- * gnutls_error_to_alert - return an alert code based on the given error code
+ * gnutls_error_to_alert:
  * @err: is a negative integer
  * @level: the alert level will be stored there
  *
@@ -258,7 +258,7 @@ gnutls_error_to_alert (int err, int *level)
 }
 
 /**
- * gnutls_alert_send_appropriate - send alert to peer depending on error code
+ * gnutls_alert_send_appropriate:
  * @session: is a #gnutls_session_t structure.
  * @err: is an integer
  *
@@ -291,7 +291,7 @@ gnutls_alert_send_appropriate (gnutls_session_t session, int err)
 }
 
 /**
- * gnutls_alert_get - Returns the last alert number received.
+ * gnutls_alert_get:
  * @session: is a #gnutls_session_t structure.
  *
  * This function will return the last alert number received.  This

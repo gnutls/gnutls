@@ -36,7 +36,7 @@
 #include <gnutls_cert.h>
 
 /**
- * gnutls_openpgp_privkey_init - initializes a #gnutls_openpgp_privkey_t structure
+ * gnutls_openpgp_privkey_init:
  * @key: The structure to be initialized
  *
  * This function will initialize an OpenPGP key structure.
@@ -54,7 +54,7 @@ gnutls_openpgp_privkey_init (gnutls_openpgp_privkey_t * key)
 }
 
 /**
- * gnutls_openpgp_privkey_deinit - deinitializes memory used by a #gnutls_openpgp_privkey_t structure
+ * gnutls_openpgp_privkey_deinit:
  * @key: The structure to be initialized
  *
  * This function will deinitialize a key structure.
@@ -75,7 +75,7 @@ gnutls_openpgp_privkey_deinit (gnutls_openpgp_privkey_t key)
 }
 
 /**
- * gnutls_openpgp_privkey_import - import a RAW or BASE64 encoded key
+ * gnutls_openpgp_privkey_import:
  * @key: The structure to store the parsed key.
  * @data: The RAW or BASE64 encoded key.
  * @format: One of #gnutls_openpgp_crt_fmt_t elements.
@@ -159,7 +159,7 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
 }
 
 /**
- * gnutls_openpgp_privkey_export - export a RAW or BASE64 encoded key
+ * gnutls_openpgp_privkey_export:
  * @key: Holds the key.
  * @format: One of gnutls_openpgp_crt_fmt_t elements.
  * @password: the password that will be used to encrypt the key. (unused for now)
@@ -189,7 +189,7 @@ gnutls_openpgp_privkey_export (gnutls_openpgp_privkey_t key,
 
 
 /**
- * gnutls_openpgp_privkey_get_pk_algorithm - return the key's PublicKey algorithm
+ * gnutls_openpgp_privkey_get_pk_algorithm:
  * @key: is an OpenPGP key
  * @bits: if bits is non null it will hold the size of the parameters' in bits
  *
@@ -249,7 +249,7 @@ _gnutls_openpgp_get_algo (int cdk_algo)
 }
 
 /**
- * gnutls_openpgp_privkey_get_revoked_ status - Get the revoked status of the key
+ * gnutls_openpgp_privkey_get_revoked_status:
  * @key: the structure that contains the OpenPGP private key.
  *
  * Get revocation status of key.
@@ -280,7 +280,7 @@ gnutls_openpgp_privkey_get_revoked_status (gnutls_openpgp_privkey_t key)
 }
 
 /**
- * gnutls_openpgp_privkey_get_fingerprint - Gets the fingerprint
+ * gnutls_openpgp_privkey_get_fingerprint:
  * @key: the raw data that contains the OpenPGP secret key.
  * @fpr: the buffer to save the fingerprint, must hold at least 20 bytes.
  * @fprlen: the integer to save the length of the fingerprint.
@@ -326,7 +326,7 @@ gnutls_openpgp_privkey_get_fingerprint (gnutls_openpgp_privkey_t key,
 }
 
 /**
- * gnutls_openpgp_privkey_get_key_id - Gets the keyID
+ * gnutls_openpgp_privkey_get_key_id:
  * @key: the structure that contains the OpenPGP secret key.
  * @keyid: the buffer to save the keyid.
  *
@@ -362,7 +362,7 @@ gnutls_openpgp_privkey_get_key_id (gnutls_openpgp_privkey_t key,
 
 
 /**
- * gnutls_openpgp_privkey_get_subkey_count - return the number of subkeys
+ * gnutls_openpgp_privkey_get_subkey_count:
  * @key: is an OpenPGP key
  *
  * This function will return the number of subkeys present in the
@@ -418,7 +418,7 @@ _get_secret_subkey (gnutls_openpgp_privkey_t key, unsigned int indx)
 }
 
 /**
- * gnutls_openpgp_privkey_get_subkey_revoked_ status - Get the revoked status of the key
+ * gnutls_openpgp_privkey_get_subkey_revoked_status:
  * @key: the structure that contains the OpenPGP private key.
  * @idx: is the subkey index
  *
@@ -451,7 +451,7 @@ gnutls_openpgp_privkey_get_subkey_revoked_status (gnutls_openpgp_privkey_t
 }
 
 /**
- * gnutls_openpgp_privkey_get_subkey_pk_algorithm - return the subkey's PublicKey algorithm
+ * gnutls_openpgp_privkey_get_subkey_pk_algorithm:
  * @key: is an OpenPGP key
  * @idx: is the subkey index
  * @bits: if bits is non null it will hold the size of the parameters' in bits
@@ -502,7 +502,7 @@ gnutls_openpgp_privkey_get_subkey_pk_algorithm (gnutls_openpgp_privkey_t key,
 }
 
 /**
- * gnutls_openpgp_privkey_get_subkey_idx - Returns the subkey's index
+ * gnutls_openpgp_privkey_get_subkey_idx:
  * @key: the structure that contains the OpenPGP private key.
  * @keyid: the keyid.
  *
@@ -537,7 +537,7 @@ gnutls_openpgp_privkey_get_subkey_idx (gnutls_openpgp_privkey_t key,
 }
 
 /**
- * gnutls_openpgp_privkey_get_subkey_creation_time - Extract the timestamp
+ * gnutls_openpgp_privkey_get_subkey_creation_time:
  * @key: the structure that contains the OpenPGP private key.
  * @idx: the subkey index
  *
@@ -567,7 +567,7 @@ gnutls_openpgp_privkey_get_subkey_creation_time (gnutls_openpgp_privkey_t key,
 }
 
 /**
- * gnutls_openpgp_privkey_get_subkey_expiration_time - Extract the expire date
+ * gnutls_openpgp_privkey_get_subkey_expiration_time:
  * @key: the structure that contains the OpenPGP private key.
  * @idx: the subkey index
  *
@@ -598,7 +598,7 @@ gnutls_openpgp_privkey_get_subkey_expiration_time (gnutls_openpgp_privkey_t
 }
 
 /**
- * gnutls_openpgp_privkey_get_subkey_id - Gets the keyID
+ * gnutls_openpgp_privkey_get_subkey_id:
  * @key: the structure that contains the OpenPGP secret key.
  * @idx: the subkey index
  * @keyid: the buffer to save the keyid.
@@ -635,7 +635,7 @@ gnutls_openpgp_privkey_get_subkey_id (gnutls_openpgp_privkey_t key,
 }
 
 /**
- * gnutls_openpgp_privkey_get_subkey_fingerprint - Gets the fingerprint of a subkey
+ * gnutls_openpgp_privkey_get_subkey_fingerprint:
  * @key: the raw data that contains the OpenPGP secret key.
  * @idx: the subkey index
  * @fpr: the buffer to save the fingerprint, must hold at least 20 bytes.
@@ -966,7 +966,7 @@ cleanup:
 
 
 /**
- * gnutls_openpgp_privkey_export_rsa_raw - This function will export the RSA private key
+ * gnutls_openpgp_privkey_export_rsa_raw:
  * @pkey: Holds the certificate
  * @m: will hold the modulus
  * @e: will hold the public exponent
@@ -1003,7 +1003,7 @@ gnutls_openpgp_privkey_export_rsa_raw (gnutls_openpgp_privkey_t pkey,
 }
 
 /**
- * gnutls_openpgp_privkey_export_dsa_raw - This function will export the DSA private key
+ * gnutls_openpgp_privkey_export_dsa_raw:
  * @pkey: Holds the certificate
  * @p: will hold the p
  * @q: will hold the q
@@ -1039,7 +1039,7 @@ gnutls_openpgp_privkey_export_dsa_raw (gnutls_openpgp_privkey_t pkey,
 }
 
 /**
- * gnutls_openpgp_privkey_export_subkey_rsa_raw - export the RSA private key
+ * gnutls_openpgp_privkey_export_subkey_rsa_raw:
  * @pkey: Holds the certificate
  * @idx: Is the subkey index
  * @m: will hold the modulus
@@ -1081,7 +1081,7 @@ gnutls_openpgp_privkey_export_subkey_rsa_raw (gnutls_openpgp_privkey_t pkey,
 }
 
 /**
- * gnutls_openpgp_privkey_export_subkey_dsa_raw - export the DSA private key
+ * gnutls_openpgp_privkey_export_subkey_dsa_raw:
  * @pkey: Holds the certificate
  * @idx: Is the subkey index
  * @p: will hold the p
@@ -1121,7 +1121,7 @@ gnutls_openpgp_privkey_export_subkey_dsa_raw (gnutls_openpgp_privkey_t pkey,
 }
 
 /**
- * gnutls_openpgp_privkey_get_preferred_key_id - Gets the preferred keyID
+ * gnutls_openpgp_privkey_get_preferred_key_id:
  * @key: the structure that contains the OpenPGP public key.
  * @keyid: the struct to save the keyid.
  *
@@ -1146,7 +1146,7 @@ gnutls_openpgp_privkey_get_preferred_key_id (gnutls_openpgp_privkey_t key,
 }
 
 /**
- * gnutls_openpgp_privkey_set_preferred_key_id - Set the preferred keyID
+ * gnutls_openpgp_privkey_set_preferred_key_id:
  * @key: the structure that contains the OpenPGP public key.
  * @keyid: the selected keyid
  *

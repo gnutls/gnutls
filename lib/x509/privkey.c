@@ -38,7 +38,7 @@
 static int _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params);
 
 /**
- * gnutls_x509_privkey_init - initialize a #gnutls_privkey_t structure
+ * gnutls_x509_privkey_init:
  * @key: The structure to be initialized
  *
  * This function will initialize an private key structure.
@@ -62,7 +62,7 @@ gnutls_x509_privkey_init (gnutls_x509_privkey_t * key)
 }
 
 /**
- * gnutls_x509_privkey_deinit - deinitializes a #gnutls_x509_privkey_t structure
+ * gnutls_x509_privkey_deinit:
  * @key: The structure to be initialized
  *
  * This function will deinitialize a private key structure.
@@ -85,7 +85,7 @@ gnutls_x509_privkey_deinit (gnutls_x509_privkey_t key)
 }
 
 /**
- * gnutls_x509_privkey_cpy - copy a private key
+ * gnutls_x509_privkey_cpy:
  * @dst: The destination key, which should be initialized.
  * @src: The source key
  *
@@ -314,7 +314,7 @@ error:
 #define PEM_KEY_RSA "RSA PRIVATE KEY"
 
 /**
- * gnutls_x509_privkey_import - import a DER or PEM encoded key
+ * gnutls_x509_privkey_import:
  * @key: The structure to store the parsed key
  * @data: The DER or PEM encoded certificate.
  * @format: One of DER or PEM
@@ -439,7 +439,7 @@ cleanup:
 		_gnutls_mpi_release(&key->params[i])
 
 /**
- * gnutls_x509_privkey_import_rsa_raw - import a raw RSA key
+ * gnutls_x509_privkey_import_rsa_raw:
  * @key: The structure to store the parsed key
  * @m: holds the modulus
  * @e: holds the public exponent
@@ -540,7 +540,7 @@ gnutls_x509_privkey_import_rsa_raw (gnutls_x509_privkey_t key,
 }
 
 /**
- * gnutls_x509_privkey_import_dsa_raw - import a raw DSA key
+ * gnutls_x509_privkey_import_dsa_raw:
  * @key: The structure to store the parsed key
  * @p: holds the p
  * @q: holds the q
@@ -632,7 +632,7 @@ gnutls_x509_privkey_import_dsa_raw (gnutls_x509_privkey_t key,
 
 
 /**
- * gnutls_x509_privkey_get_pk_algorithm - returns the key's PublicKey algorithm
+ * gnutls_x509_privkey_get_pk_algorithm:
  * @key: should contain a #gnutls_x509_privkey_t structure
  *
  * This function will return the public key algorithm of a private
@@ -654,7 +654,7 @@ gnutls_x509_privkey_get_pk_algorithm (gnutls_x509_privkey_t key)
 }
 
 /**
- * gnutls_x509_privkey_export - export the private key
+ * gnutls_x509_privkey_export:
  * @key: Holds the key
  * @format: the format of output params. One of PEM or DER.
  * @output_data: will contain a private key PEM or DER encoded
@@ -728,7 +728,7 @@ gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
 }
 
 /**
- * gnutls_x509_privkey_export_rsa_raw - export the RSA private key
+ * gnutls_x509_privkey_export_rsa_raw:
  * @key: a structure that holds the rsa parameters
  * @m: will hold the modulus
  * @e: will hold the public exponent
@@ -839,7 +839,7 @@ error:
 }
 
 /**
- * gnutls_x509_privkey_export_dsa_raw - export the DSA private key
+ * gnutls_x509_privkey_export_dsa_raw:
  * @key: a structure that holds the DSA parameters
  * @p: will hold the p
  * @q: will hold the q
@@ -1288,7 +1288,7 @@ cleanup:
 
 
 /**
- * gnutls_x509_privkey_generate - generate a private key
+ * gnutls_x509_privkey_generate:
  * @key: should contain a #gnutls_x509_privkey_t structure
  * @algo: is one of RSA or DSA.
  * @bits: the size of the modulus
@@ -1377,7 +1377,7 @@ cleanup:
 }
 
 /**
- * gnutls_x509_privkey_get_key_id - Return unique ID of the key's parameters
+ * gnutls_x509_privkey_get_key_id:
  * @key: Holds the key
  * @flags: should be 0 for now
  * @output_data: will contain the key ID
@@ -1466,7 +1466,7 @@ cleanup:
 #ifdef ENABLE_PKI
 
 /**
- * gnutls_x509_privkey_sign_data - sign data using the private key
+ * gnutls_x509_privkey_sign_data:
  * @key: Holds the key
  * @digest: should be MD5 or SHA1
  * @flags: should be 0 for now
@@ -1526,7 +1526,7 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
 }
 
 /**
- * gnutls_x509_privkey_sign_hash - sign hash using the private key
+ * gnutls_x509_privkey_sign_hash:
  * @key: Holds the key
  * @hash: holds the data to be signed
  * @signature: will contain newly allocated signature
@@ -1564,7 +1564,7 @@ gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
 }
 
 /**
- * gnutls_x509_privkey_verify_data - Verify the signed data using private key
+ * gnutls_x509_privkey_verify_data:
  * @key: Holds the key
  * @flags: should be 0 for now
  * @data: holds the data to be signed
@@ -1601,7 +1601,7 @@ gnutls_x509_privkey_verify_data (gnutls_x509_privkey_t key,
 }
 
 /**
- * gnutls_x509_privkey_fix - recalculate some parameters of the key.
+ * gnutls_x509_privkey_fix:
  * @key: Holds the key
  *
  * This function will recalculate the secondary parameters in a key.

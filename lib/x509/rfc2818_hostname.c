@@ -29,7 +29,7 @@
 #include <gnutls_errors.h>
 
 /**
- * gnutls_x509_crt_check_hostname - compares the hostname with certificate's hostname
+ * gnutls_x509_crt_check_hostname:
  * @cert: should contain an gnutls_x509_crt_t structure
  * @hostname: A null terminated string that contains a DNS name
  *

@@ -1437,7 +1437,7 @@ print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
 }
 
 /**
- * gnutls_x509_crt_print - Pretty print X.509 certificates
+ * gnutls_x509_crt_print:
  * @cert: The structure to be printed
  * @format: Indicate the format to use
  * @out: Newly allocated datum with zero terminated string.
@@ -1798,7 +1798,7 @@ print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
 }
 
 /**
- * gnutls_x509_crl_print - Pretty print X.509 certificate revocation list
+ * gnutls_x509_crl_print:
  * @crl: The structure to be printed
  * @format: Indicate the format to use
  * @out: Newly allocated datum with zero terminated string.
@@ -2110,7 +2110,7 @@ print_crq_other (gnutls_string * str, gnutls_x509_crq_t crq)
 }
 
 /**
- * gnutls_x509_crq_print - Pretty print PKCS 10 certificate request
+ * gnutls_x509_crq_print:
  * @crq: The structure to be printed
  * @format: Indicate the format to use
  * @out: Newly allocated datum with zero terminated string.

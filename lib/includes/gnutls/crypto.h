@@ -27,12 +27,15 @@
 
 typedef struct cipher_hd_st* gnutls_cipher_hd_t;
 
-int gnutls_cipher_init (gnutls_cipher_hd_t*, gnutls_cipher_algorithm_t cipher,
-				 const gnutls_datum_t * key,
-				 const gnutls_datum_t * iv);
-int gnutls_cipher_encrypt (const gnutls_cipher_hd_t handle, void *text, int textlen);
-int gnutls_cipher_decrypt (const gnutls_cipher_hd_t handle, void *ciphertext,
-			    int ciphertextlen);
+int gnutls_cipher_init (gnutls_cipher_hd_t *handle,
+			gnutls_cipher_algorithm_t cipher,
+			const gnutls_datum_t * key,
+			const gnutls_datum_t * iv);
+int gnutls_cipher_encrypt (const gnutls_cipher_hd_t handle,
+			   void *text, int textlen);
+int gnutls_cipher_decrypt (const gnutls_cipher_hd_t handle,
+			   void *ciphertext,
+			   int ciphertextlen);
 void gnutls_cipher_deinit (gnutls_cipher_hd_t handle);
 int gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm);
 

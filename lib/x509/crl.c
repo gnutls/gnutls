@@ -36,7 +36,7 @@
 #include <x509_int.h>
 
 /**
- * gnutls_x509_crl_init - initializes a #gnutls_x509_crl_t structure
+ * gnutls_x509_crl_init:
  * @crl: The structure to be initialized
  *
  * This function will initialize a CRL structure. CRL stands for
@@ -70,7 +70,7 @@ gnutls_x509_crl_init (gnutls_x509_crl_t * crl)
 }
 
 /**
- * gnutls_x509_crl_deinit - deinitializes a #gnutls_x509_crl_t structure
+ * gnutls_x509_crl_deinit:
  * @crl: The structure to be initialized
  *
  * This function will deinitialize a CRL structure.
@@ -88,7 +88,7 @@ gnutls_x509_crl_deinit (gnutls_x509_crl_t crl)
 }
 
 /**
- * gnutls_x509_crl_import - import a DER or PEM encoded CRL
+ * gnutls_x509_crl_import:
  * @crl: The structure to store the parsed CRL.
  * @data: The DER or PEM encoded CRL.
  * @format: One of DER or PEM
@@ -162,7 +162,7 @@ cleanup:
 
 
 /**
- * gnutls_x509_crl_get_issuer_dn - returns the CRL's issuer distinguished name
+ * gnutls_x509_crl_get_issuer_dn:
  * @crl: should contain a gnutls_x509_crl_t structure
  * @buf: a pointer to a structure to hold the peer's name (may be null)
  * @sizeof_buf: initially holds the size of @buf
@@ -195,7 +195,7 @@ gnutls_x509_crl_get_issuer_dn (const gnutls_x509_crl_t crl, char *buf,
 }
 
 /**
- * gnutls_x509_crl_get_issuer_dn_by_oid - return the CRL's issuer distinguished name
+ * gnutls_x509_crl_get_issuer_dn_by_oid:
  * @crl: should contain a gnutls_x509_crl_t structure
  * @oid: holds an Object Identified in null terminated string
  * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
@@ -238,7 +238,7 @@ gnutls_x509_crl_get_issuer_dn_by_oid (gnutls_x509_crl_t crl,
 }
 
 /**
- * gnutls_x509_crl_get_dn_oid - returns the Certificate request issuer's distinguished name OIDs
+ * gnutls_x509_crl_get_dn_oid:
  * @crl: should contain a gnutls_x509_crl_t structure
  * @indx: Specifies which DN OID to send. Use zero to get the first one.
  * @oid: a pointer to a structure to hold the name (may be null)
@@ -270,7 +270,7 @@ gnutls_x509_crl_get_dn_oid (gnutls_x509_crl_t crl,
 
 
 /**
- * gnutls_x509_crl_get_signature_algorithm - returns the CRL's signature algorithm
+ * gnutls_x509_crl_get_signature_algorithm:
  * @crl: should contain a #gnutls_x509_crl_t structure
  *
  * This function will return a value of the #gnutls_sign_algorithm_t
@@ -313,7 +313,7 @@ gnutls_x509_crl_get_signature_algorithm (gnutls_x509_crl_t crl)
 }
 
 /**
- * gnutls_x509_crl_get_signature - Returns the CRL's signature
+ * gnutls_x509_crl_get_signature:
  * @crl: should contain a gnutls_x509_crl_t structure
  * @sig: a pointer where the signature part will be copied (may be null).
  * @sizeof_sig: initially holds the size of @sig
@@ -370,7 +370,7 @@ gnutls_x509_crl_get_signature (gnutls_x509_crl_t crl,
 }
 
 /**
- * gnutls_x509_crl_get_version - returns the CRL's version number
+ * gnutls_x509_crl_get_version:
  * @crl: should contain a #gnutls_x509_crl_t structure
  *
  * This function will return the version of the specified CRL.
@@ -402,7 +402,7 @@ gnutls_x509_crl_get_version (gnutls_x509_crl_t crl)
 }
 
 /**
- * gnutls_x509_crl_get_this_update - return the CRL's thisUpdate time
+ * gnutls_x509_crl_get_this_update:
  * @crl: should contain a #gnutls_x509_crl_t structure
  *
  * This function will return the time this CRL was issued.
@@ -422,7 +422,7 @@ gnutls_x509_crl_get_this_update (gnutls_x509_crl_t crl)
 }
 
 /**
- * gnutls_x509_crl_get_next_update - return the CRL's nextUpdate time
+ * gnutls_x509_crl_get_next_update:
  * @crl: should contain a #gnutls_x509_crl_t structure
  *
  * This function will return the time the next CRL will be issued.
@@ -444,7 +444,7 @@ gnutls_x509_crl_get_next_update (gnutls_x509_crl_t crl)
 }
 
 /**
- * gnutls_x509_crl_get_crt_count - get number of revoked certificates in a CRL
+ * gnutls_x509_crl_get_crt_count:
  * @crl: should contain a #gnutls_x509_crl_t structure
  *
  * This function will return the number of revoked certificates in the
@@ -478,7 +478,7 @@ gnutls_x509_crl_get_crt_count (gnutls_x509_crl_t crl)
 }
 
 /**
- * gnutls_x509_crl_get_crt_serial - get the serial number of a revoked certificate
+ * gnutls_x509_crl_get_crt_serial:
  * @crl: should contain a #gnutls_x509_crl_t structure
  * @indx: the index of the certificate to extract (starting from 0)
  * @serial: where the serial number will be copied
@@ -611,7 +611,7 @@ cleanup:
 }
 
 /**
- * gnutls_x509_crl_export - export the CRL
+ * gnutls_x509_crl_export:
  * @crl: Holds the revocation list
  * @format: the format of output params. One of PEM or DER.
  * @output_data: will contain a private key PEM or DER encoded
@@ -701,7 +701,7 @@ _gnutls_x509_crl_cpy (gnutls_x509_crl_t dest, gnutls_x509_crl_t src)
 }
 
 /**
- * gnutls_x509_crl_get_authority_key_id - get the CRL authority's identifier
+ * gnutls_x509_crl_get_authority_key_id:
  * @crl: should contain a #gnutls_x509_crl_t structure
  * @ret: The place where the identifier will be copied
  * @ret_size: Holds the size of the result field.
@@ -792,7 +792,7 @@ gnutls_x509_crl_get_authority_key_id (gnutls_x509_crl_t crl, void *ret,
 }
 
 /**
- * gnutls_x509_crl_get_number - get the CRL number (extension)
+ * gnutls_x509_crl_get_number:
  * @crl: should contain a #gnutls_x509_crl_t structure
  * @ret: The place where the number will be copied
  * @ret_size: Holds the size of the result field.
@@ -853,7 +853,7 @@ gnutls_x509_crl_get_number (gnutls_x509_crl_t crl, void *ret,
 }
 
 /**
- * gnutls_x509_crl_get_extension_oid - get the specified extension OID
+ * gnutls_x509_crl_get_extension_oid:
  * @crl: should contain a #gnutls_x509_crl_t structure
  * @indx: Specifies which extension OID to send, use zero to get the first one.
  * @oid: a pointer to a structure to hold the OID (may be null)
@@ -893,7 +893,7 @@ gnutls_x509_crl_get_extension_oid (gnutls_x509_crl_t crl, int indx,
 }
 
 /**
- * gnutls_x509_crl_get_extension_info - Get extension id and criticality
+ * gnutls_x509_crl_get_extension_info:
  * @crl: should contain a #gnutls_x509_crl_t structure
  * @indx: Specifies which extension OID to send, use zero to get the first one.
  * @oid: a pointer to a structure to hold the OID
@@ -971,7 +971,7 @@ gnutls_x509_crl_get_extension_info (gnutls_x509_crl_t crl, int indx,
 }
 
 /**
- * gnutls_x509_crl_get_extension_data - Get the specified extension data
+ * gnutls_x509_crl_get_extension_data:
  * @crl: should contain a #gnutls_x509_crl_t structure
  * @indx: Specifies which extension OID to send. Use zero to get the first one.
  * @data: a pointer to a structure to hold the data (may be null)

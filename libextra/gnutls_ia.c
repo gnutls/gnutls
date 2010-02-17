@@ -371,7 +371,7 @@ gnutls_ia_verify_endphase (gnutls_session_t session, const char *checksum)
 }
 
 /**
- * gnutls_ia_send: Send peer the specified TLS/IA data.
+ * gnutls_ia_send:
  * @session: is a #gnutls_session_t structure.
  * @data: contains the data to send
  * @sizeofdata: is the length of the data
@@ -410,7 +410,7 @@ gnutls_ia_send (gnutls_session_t session, const char *data, size_t sizeofdata)
 }
 
 /**
- * gnutls_ia_recv - read data from the TLS/IA protocol
+ * gnutls_ia_recv:
  * @session: is a #gnutls_session_t structure.
  * @data: the buffer that the data will be read into, must hold >= 12 bytes.
  * @sizeofdata: the number of requested bytes, must be >= 12.
@@ -653,7 +653,7 @@ gnutls_ia_handshake (gnutls_session_t session)
 }
 
 /**
- * gnutls_ia_allocate_client_credentials - Used to allocate an gnutls_ia_server_credentials_t structure
+ * gnutls_ia_allocate_client_credentials:
  * @sc: is a pointer to a #gnutls_ia_server_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
@@ -679,7 +679,7 @@ gnutls_ia_allocate_client_credentials (gnutls_ia_client_credentials_t * sc)
 }
 
 /**
- * gnutls_ia_free_client_credentials - Used to free an allocated #gnutls_ia_client_credentials_t structure
+ * gnutls_ia_free_client_credentials:
  * @sc: is a #gnutls_ia_client_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
@@ -693,7 +693,7 @@ gnutls_ia_free_client_credentials (gnutls_ia_client_credentials_t sc)
 }
 
 /**
- * gnutls_ia_set_client_avp_function - Used to set a AVP callback
+ * gnutls_ia_set_client_avp_function:
  * @cred: is a #gnutls_ia_client_credentials_t structure.
  * @avp_func: is the callback function
  *
@@ -734,7 +734,7 @@ gnutls_ia_set_client_avp_function (gnutls_ia_client_credentials_t cred,
 }
 
 /**
- * gnutls_ia_set_client_avp_ptr - Sets a pointer to be sent to TLS/IA callback
+ * gnutls_ia_set_client_avp_ptr:
  * @cred: is a #gnutls_ia_client_credentials_t structure.
  * @ptr: is the pointer
  *
@@ -748,7 +748,7 @@ gnutls_ia_set_client_avp_ptr (gnutls_ia_client_credentials_t cred, void *ptr)
 }
 
 /**
- * gnutls_ia_get_client_avp_ptr - Returns the pointer which is sent to TLS/IA callback
+ * gnutls_ia_get_client_avp_ptr:
  * @cred: is a #gnutls_ia_client_credentials_t structure.
  *
  * Returns the pointer that will be provided to the TLS/IA callback
@@ -763,7 +763,7 @@ gnutls_ia_get_client_avp_ptr (gnutls_ia_client_credentials_t cred)
 }
 
 /**
- * gnutls_ia_allocate_server_credentials - Used to allocate an gnutls_ia_server_credentials_t structure
+ * gnutls_ia_allocate_server_credentials:
  * @sc: is a pointer to a #gnutls_ia_server_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
@@ -789,7 +789,7 @@ gnutls_ia_allocate_server_credentials (gnutls_ia_server_credentials_t * sc)
 }
 
 /**
- * gnutls_ia_free_server_credentials - Used to free an allocated #gnutls_ia_server_credentials_t structure
+ * gnutls_ia_free_server_credentials:
  * @sc: is a #gnutls_ia_server_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
@@ -803,7 +803,7 @@ gnutls_ia_free_server_credentials (gnutls_ia_server_credentials_t sc)
 }
 
 /**
- * gnutls_ia_set_server_credentials_function - Used to set a AVP callback
+ * gnutls_ia_set_server_credentials_function:
  * @cred: is a #gnutls_ia_server_credentials_t structure.
  * @func: is the callback function
  *
@@ -851,7 +851,7 @@ gnutls_ia_set_server_avp_function (gnutls_ia_server_credentials_t cred,
 }
 
 /**
- * gnutls_ia_set_server_avp_ptr - Sets a pointer to be sent to TLS/IA callback
+ * gnutls_ia_set_server_avp_ptr:
  * @cred: is a #gnutls_ia_client_credentials_t structure.
  * @ptr: is the pointer
  *
@@ -865,7 +865,7 @@ gnutls_ia_set_server_avp_ptr (gnutls_ia_server_credentials_t cred, void *ptr)
 }
 
 /**
- * gnutls_ia_get_server_avp_ptr - Returns the pointer which is sent to TLS/IA callback
+ * gnutls_ia_get_server_avp_ptr:
  * @cred: is a #gnutls_ia_client_credentials_t structure.
  *
  * Returns the pointer that will be provided to the TLS/IA callback
@@ -880,7 +880,7 @@ gnutls_ia_get_server_avp_ptr (gnutls_ia_server_credentials_t cred)
 }
 
 /**
- * gnutls_ia_enable - Indicate willingness for TLS/IA application phases
+ * gnutls_ia_enable:
  * @session: is a #gnutls_session_t structure.
  * @allow_skip_on_resume: non-zero if local party allows to skip the
  *			  TLS/IA application phases for a resumed session.

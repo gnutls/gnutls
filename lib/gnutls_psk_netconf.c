@@ -32,7 +32,7 @@
 
 
 /**
- * gnutls_psk_netconf_derive_key - derive PSK Netconf key from password
+ * gnutls_psk_netconf_derive_key:
  * @password: zero terminated string containing password.
  * @psk_identity: zero terminated string with PSK identity.
  * @psk_identity_hint: zero terminated string with PSK identity hint.

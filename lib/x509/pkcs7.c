@@ -139,7 +139,7 @@ cleanup:
 }
 
 /**
- * gnutls_pkcs7_init - initialize a #gnutls_pkcs7_t structure
+ * gnutls_pkcs7_init:
  * @pkcs7: The structure to be initialized
  *
  * This function will initialize a PKCS7 structure. PKCS7 structures
@@ -171,7 +171,7 @@ gnutls_pkcs7_init (gnutls_pkcs7_t * pkcs7)
 }
 
 /**
- * gnutls_pkcs7_deinit - deinitializes a #gnutls_pkcs7_t structure
+ * gnutls_pkcs7_deinit:
  * @pkcs7: The structure to be initialized
  *
  * This function will deinitialize a PKCS7 structure.
@@ -189,7 +189,7 @@ gnutls_pkcs7_deinit (gnutls_pkcs7_t pkcs7)
 }
 
 /**
- * gnutls_pkcs7_import - import a DER or PEM encoded PKCS7
+ * gnutls_pkcs7_import:
  * @pkcs7: The structure to store the parsed PKCS7.
  * @data: The DER or PEM encoded PKCS7.
  * @format: One of DER or PEM
@@ -260,7 +260,7 @@ cleanup:
 }
 
 /**
- * gnutls_pkcs7_get_crt_raw - get a certificate from a PKCS7 certificate set
+ * gnutls_pkcs7_get_crt_raw:
  * @pkcs7: should contain a gnutls_pkcs7_t structure
  * @indx: contains the index of the certificate to extract
  * @certificate: the contents of the certificate will be copied
@@ -369,7 +369,7 @@ cleanup:
 }
 
 /**
- * gnutls_pkcs7_get_crt_count - return the number of certificates in a PKCS7 certificate set
+ * gnutls_pkcs7_get_crt_count:
  * @pkcs7: should contain a #gnutls_pkcs7_t structure
  *
  * This function will return the number of certifcates in the PKCS7
@@ -413,7 +413,7 @@ gnutls_pkcs7_get_crt_count (gnutls_pkcs7_t pkcs7)
 }
 
 /**
- * gnutls_pkcs7_export - export the pkcs7 structure
+ * gnutls_pkcs7_export:
  * @pkcs7: Holds the pkcs7 structure
  * @format: the format of output params. One of PEM or DER.
  * @output_data: will contain a structure PEM or DER encoded
@@ -524,7 +524,7 @@ cleanup:
 }
 
 /**
- * gnutls_pkcs7_set_crt_raw - add a certificate in a PKCS7 certificate set
+ * gnutls_pkcs7_set_crt_raw:
  * @pkcs7: should contain a #gnutls_pkcs7_t structure
  * @crt: the DER encoded certificate to be added
  *
@@ -618,7 +618,7 @@ cleanup:
 }
 
 /**
- * gnutls_pkcs7_set_crt - add a parsed certificate in a PKCS7 certificate set
+ * gnutls_pkcs7_set_crt:
  * @pkcs7: should contain a #gnutls_pkcs7_t structure
  * @crt: the certificate to be copied.
  *
@@ -660,7 +660,7 @@ gnutls_pkcs7_set_crt (gnutls_pkcs7_t pkcs7, gnutls_x509_crt_t crt)
 
 
 /**
- * gnutls_pkcs7_delete_crt - deletes a certificate from a PKCS7 certificate set
+ * gnutls_pkcs7_delete_crt:
  * @pkcs7: should contain a gnutls_pkcs7_t structure
  * @indx: the index of the certificate to delete
  *
@@ -726,7 +726,7 @@ cleanup:
  */
 
 /**
- * gnutls_pkcs7_get_crl_raw - returns a crl in a PKCS7 crl set
+ * gnutls_pkcs7_get_crl_raw:
  * @pkcs7: should contain a #gnutls_pkcs7_t structure
  * @indx: contains the index of the crl to extract
  * @crl: the contents of the crl will be copied there (may be null)
@@ -803,7 +803,7 @@ cleanup:
 }
 
 /**
- * gnutls_pkcs7_get_crl_count - returns the number of CRLs in a PKCS7 crl set
+ * gnutls_pkcs7_get_crl_count:
  * @pkcs7: should contain a gnutls_pkcs7_t structure
  *
  * This function will return the number of certifcates in the PKCS7
@@ -847,7 +847,7 @@ gnutls_pkcs7_get_crl_count (gnutls_pkcs7_t pkcs7)
 }
 
 /**
- * gnutls_pkcs7_set_crl_raw - add a crl in a PKCS7 crl set
+ * gnutls_pkcs7_set_crl_raw:
  * @pkcs7: should contain a #gnutls_pkcs7_t structure
  * @crl: the DER encoded crl to be added
  *
@@ -930,7 +930,7 @@ cleanup:
 }
 
 /**
- * gnutls_pkcs7_set_crl - add a parsed crl in a PKCS7 crl set
+ * gnutls_pkcs7_set_crl:
  * @pkcs7: should contain a #gnutls_pkcs7_t structure
  * @crl: the DER encoded crl to be added
  *
@@ -970,7 +970,7 @@ gnutls_pkcs7_set_crl (gnutls_pkcs7_t pkcs7, gnutls_x509_crl_t crl)
 }
 
 /**
- * gnutls_pkcs7_delete_crl - deletes a CRL from a PKCS7 crl set
+ * gnutls_pkcs7_delete_crl:
  * @pkcs7: should contain a #gnutls_pkcs7_t structure
  * @indx: the index of the crl to delete
  *

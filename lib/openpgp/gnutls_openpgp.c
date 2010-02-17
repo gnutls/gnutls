@@ -116,7 +116,7 @@ _gnutls_openpgp_raw_crt_to_gcert (gnutls_cert * gcert,
 }
 
 /**
- * gnutls_certificate_set_openpgp_key - Used to set keys in a gnutls_certificate_credentials_t structure
+ * gnutls_certificate_set_openpgp_key:
  * @res: is a #gnutls_certificate_credentials_t structure.
  * @key: contains an openpgp public key
  * @pkey: is an openpgp private key
@@ -199,7 +199,7 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
 }
 
 /*-
- * gnutls_openpgp_get_key - Retrieve a key from the keyring.
+ * gnutls_openpgp_get_key:
  * @key: the destination context to save the key.
  * @keyring: the datum struct that contains all keyring information.
  * @attr: The attribute (keyid, fingerprint, ...).
@@ -273,7 +273,7 @@ leave:
 }
 
 /**
- * gnutls_certificate_set_openpgp_key_mem - Used to set OpenPGP keys
+ * gnutls_certificate_set_openpgp_key_mem:
  * @res: the destination context to save the data.
  * @cert: the datum that contains the public key.
  * @key: the datum that contains the secret key.
@@ -297,7 +297,7 @@ gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t res,
 
 
 /**
- * gnutls_certificate_set_openpgp_key_file - Used to set OpenPGP keys
+ * gnutls_certificate_set_openpgp_key_file:
  * @res: the destination context to save the data.
  * @certfile: the file that contains the public key.
  * @keyfile: the file that contains the secret key.
@@ -342,7 +342,7 @@ get_keyid (gnutls_openpgp_keyid_t keyid, const char *str)
 }
 
 /**
- * gnutls_certificate_set_openpgp_key_mem2 - Used to set OpenPGP keys
+ * gnutls_certificate_set_openpgp_key_mem2:
  * @res: the destination context to save the data.
  * @cert: the datum that contains the public key.
  * @key: the datum that contains the secret key.
@@ -440,7 +440,7 @@ gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t res,
 
 
 /**
- * gnutls_certificate_set_openpgp_key_file2 - Used to set OpenPGP keys
+ * gnutls_certificate_set_openpgp_key_file2:
  * @res: the destination context to save the data.
  * @certfile: the file that contains the public key.
  * @keyfile: the file that contains the secret key.
@@ -553,7 +553,7 @@ gnutls_openpgp_count_key_names (const gnutls_datum_t * cert)
 
 
 /**
- * gnutls_certificate_set_openpgp_keyring_file - Sets a keyring file for OpenPGP
+ * gnutls_certificate_set_openpgp_keyring_file:
  * @c: A certificate credentials structure
  * @file: filename of the keyring.
  * @format: format of keyring.
@@ -599,7 +599,7 @@ gnutls_certificate_set_openpgp_keyring_file (gnutls_certificate_credentials_t
 }
 
 /**
- * gnutls_certificate_set_openpgp_keyring_mem - Add keyring data for OpenPGP
+ * gnutls_certificate_set_openpgp_keyring_mem:
  * @c: A certificate credentials structure
  * @data: buffer with keyring data.
  * @dlen: length of data buffer.
@@ -706,7 +706,7 @@ error:
 }
 
 /**
- * gnutls_openpgp_set_recv_key_function - Used to set a key retrieval callback for PGP keys
+ * gnutls_openpgp_set_recv_key_function:
  * @session: a TLS session
  * @func: the callback
  *
@@ -913,7 +913,7 @@ _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert, gnutls_openpgp_crt_t cert)
 
 
 /**
- * gnutls_openpgp_privkey_sign_hash - sign the given data using the private key params
+ * gnutls_openpgp_privkey_sign_hash:
  * @key: Holds the key
  * @hash: holds the data to be signed
  * @signature: will contain newly allocated signature

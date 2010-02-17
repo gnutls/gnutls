@@ -311,7 +311,7 @@ _gnutls_sbase64_decode (uint8_t * data, size_t idata_size, uint8_t ** result)
 }
 
 /**
- * gnutls_srp_base64_encode - Encode raw data using SRP-Base64
+ * gnutls_srp_base64_encode:
  * @data: contain the raw data
  * @result: the place where base64 data will be copied
  * @result_size: holds the size of the result
@@ -355,7 +355,7 @@ gnutls_srp_base64_encode (const gnutls_datum_t * data, char *result,
 }
 
 /**
- * gnutls_srp_base64_encode_alloc - encode raw data using SRP-Base64
+ * gnutls_srp_base64_encode_alloc:
  * @data: contains the raw data
  * @result: will hold the newly allocated encoded data
  *
@@ -397,7 +397,7 @@ gnutls_srp_base64_encode_alloc (const gnutls_datum_t * data,
 }
 
 /**
- * gnutls_srp_base64_decode - decode SRP-base64 encoded data
+ * gnutls_srp_base64_decode:
  * @b64_data: contain the encoded data
  * @result: the place where decoded data will be copied
  * @result_size: holds the size of the result
@@ -441,7 +441,7 @@ gnutls_srp_base64_decode (const gnutls_datum_t * b64_data, char *result,
 }
 
 /**
- * gnutls_srp_base64_decode_alloc - decode SRP-base64 encoded data
+ * gnutls_srp_base64_decode_alloc:
  * @b64_data: contains the encoded data
  * @result: the place where decoded data lie
  *

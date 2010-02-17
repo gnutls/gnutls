@@ -126,7 +126,7 @@ cleanup:
 }
 
 /**
- * gnutls_pkcs12_init - This function initializes a gnutls_pkcs12_t structure
+ * gnutls_pkcs12_init:
  * @pkcs12: The structure to be initialized
  *
  * This function will initialize a PKCS12 structure. PKCS12 structures
@@ -158,7 +158,7 @@ gnutls_pkcs12_init (gnutls_pkcs12_t * pkcs12)
 }
 
 /**
- * gnutls_pkcs12_deinit - This function deinitializes memory used by a gnutls_pkcs12_t structure
+ * gnutls_pkcs12_deinit:
  * @pkcs12: The structure to be initialized
  *
  * This function will deinitialize a PKCS12 structure.
@@ -176,7 +176,7 @@ gnutls_pkcs12_deinit (gnutls_pkcs12_t pkcs12)
 }
 
 /**
- * gnutls_pkcs12_import - This function will import a DER or PEM encoded PKCS12 structure
+ * gnutls_pkcs12_import:
  * @pkcs12: The structure to store the parsed PKCS12.
  * @data: The DER or PEM encoded PKCS12.
  * @format: One of DER or PEM
@@ -254,7 +254,7 @@ cleanup:
 
 
 /**
- * gnutls_pkcs12_export - This function will export the pkcs12 structure
+ * gnutls_pkcs12_export:
  * @pkcs12: Holds the pkcs12 structure
  * @format: the format of output params. One of PEM or DER.
  * @output_data: will contain a structure PEM or DER encoded
@@ -572,7 +572,7 @@ cleanup:
 
 
 /**
- * gnutls_pkcs12_get_bag - This function returns a Bag from a PKCS12 structure
+ * gnutls_pkcs12_get_bag:
  * @pkcs12: should contain a gnutls_pkcs12_t structure
  * @indx: contains the index of the bag to extract
  * @bag: An initialized bag, where the contents of the bag will be copied
@@ -721,7 +721,7 @@ cleanup:
 }
 
 /**
- * gnutls_pkcs12_set_bag - This function inserts a Bag into a PKCS12 structure
+ * gnutls_pkcs12_set_bag:
  * @pkcs12: should contain a gnutls_pkcs12_t structure
  * @bag: An initialized bag
  *
@@ -853,7 +853,7 @@ cleanup:
 }
 
 /**
- * gnutls_pkcs12_generate_mac - This function generates the MAC of the PKCS12 structure
+ * gnutls_pkcs12_generate_mac:
  * @pkcs12: should contain a gnutls_pkcs12_t structure
  * @pass: The password for the MAC
  *
@@ -986,7 +986,7 @@ cleanup:
 }
 
 /**
- * gnutls_pkcs12_verify_mac - This function verifies the MAC of the PKCS12 structure
+ * gnutls_pkcs12_verify_mac:
  * @pkcs12: should contain a gnutls_pkcs12_t structure
  * @pass: The password for the MAC
  *

@@ -437,14 +437,15 @@ cdk_stream_tmp_set_mode (cdk_stream_t s, int val)
 
 
 /**
- * cdk_stream_close: Close a stream and flush all buffers.
+ * cdk_stream_close:
  * @s: The STREAM object.
  *
- * This function work different for read or write streams. When the
- * stream is for reading, the filtering is already done and we can
- * simply close the file and all buffers.
- * But for the case it's a write stream, we need to apply all registered
- * filters now. The file is closed in the filter function and not here.
+ * Close a stream and flush all buffers.  This function work different
+ * for read or write streams. When the stream is for reading, the
+ * filtering is already done and we can simply close the file and all
+ * buffers.  But for the case it's a write stream, we need to apply
+ * all registered filters now. The file is closed in the filter
+ * function and not here.
  **/
 cdk_error_t
 cdk_stream_close (cdk_stream_t s)
@@ -517,10 +518,11 @@ cdk_stream_close (cdk_stream_t s)
 
 
 /**
- * cdk_stream_eof: Return if the associated file handle was set to EOF.
+ * cdk_stream_eof:
  * @s: The STREAM object.
  *
- * This function will only work with read streams.
+ *  Return if the associated file handle was set to EOF.  This
+ *  function will only work with read streams.
  **/
 int
 cdk_stream_eof (cdk_stream_t s)
@@ -557,11 +559,12 @@ _cdk_stream_get_errno (cdk_stream_t s)
 
 
 /**
- * cdk_stream_get_length: Return the length of the associated file handle.
+ * cdk_stream_get_length:
  * @s: The STREAM object.
  *
- * This function should work for both read and write streams. For write
- * streams an additional flush is used to write possible pending data.
+ * Return the length of the associated file handle.  This function
+ * should work for both read and write streams. For write streams an
+ * additional flush is used to write possible pending data.
  **/
 off_t
 cdk_stream_get_length (cdk_stream_t s)

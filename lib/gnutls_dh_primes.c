@@ -54,7 +54,7 @@ _gnutls_dh_params_to_mpi (gnutls_dh_params_t dh_primes)
  * generated one.
  */
 /**
- * gnutls_dh_params_import_raw - import DH parameters
+ * gnutls_dh_params_import_raw:
  * @dh_params: Is a structure that will hold the prime numbers
  * @prime: holds the new prime
  * @generator: holds the new generator
@@ -99,7 +99,7 @@ gnutls_dh_params_import_raw (gnutls_dh_params_t dh_params,
 }
 
 /**
- * gnutls_dh_params_init - initialize the DH parameters
+ * gnutls_dh_params_init:
  * @dh_params: Is a structure that will hold the prime numbers
  *
  * This function will initialize the DH parameters structure.
@@ -123,7 +123,7 @@ gnutls_dh_params_init (gnutls_dh_params_t * dh_params)
 }
 
 /**
- * gnutls_dh_params_deinit - deinitialize the DH parameters
+ * gnutls_dh_params_deinit:
  * @dh_params: Is a structure that holds the prime numbers
  *
  * This function will deinitialize the DH parameters structure.
@@ -142,7 +142,7 @@ gnutls_dh_params_deinit (gnutls_dh_params_t dh_params)
 }
 
 /**
- * gnutls_dh_params_cpy - copy a DH parameters structure
+ * gnutls_dh_params_cpy:
  * @dst: Is the destination structure, which should be initialized.
  * @src: Is the source structure
  *
@@ -169,7 +169,7 @@ gnutls_dh_params_cpy (gnutls_dh_params_t dst, gnutls_dh_params_t src)
 
 
 /**
- * gnutls_dh_params_generate2 - generate new DH parameters
+ * gnutls_dh_params_generate2:
  * @params: Is the structure that the DH parameters will be stored
  * @bits: is the prime's number of bits
  *
@@ -206,7 +206,7 @@ gnutls_dh_params_generate2 (gnutls_dh_params_t params, unsigned int bits)
 }
 
 /**
- * gnutls_dh_params_import_pkcs3 - import DH params from a pkcs3 structure
+ * gnutls_dh_params_import_pkcs3:
  * @params: A structure where the parameters will be copied to
  * @pkcs3_params: should contain a PKCS3 DHParams structure PEM or DER encoded
  * @format: the format of params. PEM or DER.
@@ -315,7 +315,7 @@ gnutls_dh_params_import_pkcs3 (gnutls_dh_params_t params,
 }
 
 /**
- * gnutls_dh_params_export_pkcs3 - export DH params to a pkcs3 structure
+ * gnutls_dh_params_export_pkcs3:
  * @params: Holds the DH parameters
  * @format: the format of output params. One of PEM or DER.
  * @params_data: will contain a PKCS3 DHParams structure PEM or DER encoded
@@ -491,7 +491,7 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
 }
 
 /**
- * gnutls_dh_params_export_raw - export the raw DH parameters
+ * gnutls_dh_params_export_raw:
  * @params: Holds the DH parameters
  * @prime: will hold the new prime
  * @generator: will hold the new generator

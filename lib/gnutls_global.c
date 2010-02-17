@@ -51,7 +51,7 @@ gnutls_log_func _gnutls_log_func;
 int _gnutls_log_level = 0;	/* default log level */
 
 /**
- * gnutls_global_set_log_function - set the logging function
+ * gnutls_global_set_log_function:
  * @log_func: it's a log function
  *
  * This is the function where you set the logging function gnutls is
@@ -69,7 +69,7 @@ gnutls_global_set_log_function (gnutls_log_func log_func)
 }
 
 /**
- * gnutls_global_set_log_level - set the logging level
+ * gnutls_global_set_log_level:
  * @level: it's an integer from 0 to 9.
  *
  * This is the function that allows you to set the log level.  The
@@ -86,7 +86,7 @@ gnutls_global_set_log_level (int level)
 }
 
 /**
- * gnutls_global_set_mem_functions - set the memory allocation functions
+ * gnutls_global_set_mem_functions:
  * @alloc_func: it's the default memory allocation function. Like malloc().
  * @secure_alloc_func: This is the memory allocation function that will be used for sensitive data.
  * @is_secure_func: a function that returns 0 if the memory given is not secure. May be NULL.
@@ -138,7 +138,7 @@ gnutls_global_set_mem_functions (gnutls_alloc_function alloc_func,
 static int _gnutls_init = 0;
 
 /**
- * gnutls_global_init - initialize the global data to defaults.
+ * gnutls_global_init:
  *
  * This function initializes the global data to defaults.  Every
  * gnutls application has a global data which holds common parameters
@@ -256,7 +256,7 @@ out:
 }
 
 /**
- * gnutls_global_deinit - deinitialize the global data
+ * gnutls_global_deinit:
  *
  * This function deinitializes the global data, that were initialized
  * using gnutls_global_init().
@@ -285,7 +285,7 @@ gnutls_global_deinit (void)
  */
 
 /**
- * gnutls_transport_set_pull_function - set a read like function
+ * gnutls_transport_set_pull_function:
  * @pull_func: a callback function similar to read()
  * @session: gnutls session
  *
@@ -304,7 +304,7 @@ gnutls_transport_set_pull_function (gnutls_session_t session,
 }
 
 /**
- * gnutls_transport_set_push_function - set the function to send data
+ * gnutls_transport_set_push_function:
  * @push_func: a callback function similar to write()
  * @session: gnutls session
  *
@@ -325,7 +325,7 @@ gnutls_transport_set_push_function (gnutls_session_t session,
 }
 
 /**
- * gnutls_check_version - checks the libgnutls version
+ * gnutls_check_version:
  * @req_version: version string to compare with, or %NULL.
  *
  * Check GnuTLS Library version.

@@ -37,7 +37,7 @@ break_comma_list (char *etag,
 		  char sep);
 
 /**
- * gnutls_cipher_set_priority - Sets the priority on the ciphers supported by gnutls.
+ * gnutls_cipher_set_priority:
  * @session: is a #gnutls_session_t structure.
  * @list: is a 0 terminated list of gnutls_cipher_algorithm_t elements.
  *
@@ -89,7 +89,7 @@ _set_priority (priority_st * st, const int *list)
 }
 
 /**
- * gnutls_kx_set_priority - Sets the priority on the key exchange algorithms supported by gnutls.
+ * gnutls_kx_set_priority:
  * @session: is a #gnutls_session_t structure.
  * @list: is a 0 terminated list of gnutls_kx_algorithm_t elements.
  *
@@ -109,7 +109,7 @@ gnutls_kx_set_priority (gnutls_session_t session, const int *list)
 }
 
 /**
- * gnutls_mac_set_priority - Sets the priority on the mac algorithms supported by gnutls.
+ * gnutls_mac_set_priority:
  * @session: is a #gnutls_session_t structure.
  * @list: is a 0 terminated list of gnutls_mac_algorithm_t elements.
  *
@@ -129,7 +129,7 @@ gnutls_mac_set_priority (gnutls_session_t session, const int *list)
 }
 
 /**
- * gnutls_compression_set_priority - Sets the priority on the compression algorithms supported by gnutls.
+ * gnutls_compression_set_priority:
  * @session: is a #gnutls_session_t structure.
  * @list: is a 0 terminated list of gnutls_compression_method_t elements.
  *
@@ -153,7 +153,7 @@ gnutls_compression_set_priority (gnutls_session_t session, const int *list)
 }
 
 /**
- * gnutls_protocol_set_priority - Sets the priority on the protocol versions supported by gnutls.
+ * gnutls_protocol_set_priority:
  * @session: is a #gnutls_session_t structure.
  * @list: is a 0 terminated list of gnutls_protocol_t elements.
  *
@@ -180,7 +180,7 @@ gnutls_protocol_set_priority (gnutls_session_t session, const int *list)
 }
 
 /**
- * gnutls_certificate_type_set_priority - Sets the priority on the certificate types supported by gnutls.
+ * gnutls_certificate_type_set_priority:
  * @session: is a #gnutls_session_t structure.
  * @list: is a 0 terminated list of gnutls_certificate_type_t elements.
  *
@@ -427,7 +427,7 @@ prio_add (priority_st * priority_list, unsigned int algo)
 
 
 /**
- * gnutls_priority_set - Sets priorities for the cipher suites supported by gnutls.
+ * gnutls_priority_set:
  * @session: is a #gnutls_session_t structure.
  * @priority: is a #gnutls_priority_t structure.
  *
@@ -463,7 +463,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
 #define MAX_ELEMENTS 48
 
 /**
- * gnutls_priority_init - Sets priorities for the cipher suites supported by gnutls.
+ * gnutls_priority_init:
  * @priority_cache: is a #gnutls_prioritity_t structure.
  * @priorities: is a string describing priorities
  * @err_pos: In case of an error this will have the position in the string the error occured
@@ -753,7 +753,7 @@ error:
 }
 
 /**
- * gnutls_priority_deinit - deinitialize the priorities cache
+ * gnutls_priority_deinit:
  * @priority_cache: is a #gnutls_prioritity_t structure.
  *
  * Deinitializes the priority cache.
@@ -766,7 +766,7 @@ gnutls_priority_deinit (gnutls_priority_t priority_cache)
 
 
 /**
- * gnutls_priority_set_direct - Sets priorities for the cipher suites supported by gnutls.
+ * gnutls_priority_set_direct:
  * @session: is a #gnutls_session_t structure.
  * @priorities: is a string describing priorities
  * @err_pos: In case of an error this will have the position in the string the error occured
@@ -840,7 +840,7 @@ break_comma_list (char *etag,
 }
 
 /**
- * gnutls_set_default_priority - Sets some default priority on the cipher suites supported by gnutls.
+ * gnutls_set_default_priority:
  * @session: is a #gnutls_session_t structure.
  *
  * Sets some default priority on the ciphers, key exchange methods,
@@ -865,7 +865,7 @@ gnutls_set_default_priority (gnutls_session_t session)
 }
 
 /**
- * gnutls_set_default_export_priority - Sets some default priority on the cipher suites supported by gnutls.
+ * gnutls_set_default_export_priority:
  * @session: is a #gnutls_session_t structure.
  *
  * Sets some default priority on the ciphers, key exchange methods, macs

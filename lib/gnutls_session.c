@@ -29,7 +29,7 @@
 #include <gnutls_datum.h>
 
 /**
- * gnutls_session_get_data - Returns all session parameters.
+ * gnutls_session_get_data:
  * @session: is a #gnutls_session_t structure.
  * @session_data: is a pointer to space to hold the session.
  * @session_data_size: is the session_data's size, or it will be set by the function.
@@ -84,7 +84,7 @@ error:
 }
 
 /**
- * gnutls_session_get_data2 - Returns all session parameters.
+ * gnutls_session_get_data2:
  * @session: is a #gnutls_session_t structure.
  * @data: is a pointer to a datum that will hold the session.
  *
@@ -127,7 +127,7 @@ gnutls_session_get_data2 (gnutls_session_t session, gnutls_datum_t * data)
 
 
 /**
- * gnutls_session_get_id - Returns session id.
+ * gnutls_session_get_id:
  * @session: is a #gnutls_session_t structure.
  * @session_id: is a pointer to space to hold the session id.
  * @session_id_size: is the session id's size, or it will be set by the function.
@@ -170,7 +170,7 @@ gnutls_session_get_id (gnutls_session_t session,
 }
 
 /**
- * gnutls_session_set_data - Sets all session parameters
+ * gnutls_session_set_data:
  * @session: is a #gnutls_session_t structure.
  * @session_data: is a pointer to space to hold the session.
  * @session_data_size: is the session's size

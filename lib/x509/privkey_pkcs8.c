@@ -580,7 +580,7 @@ error:
 
 
 /**
- * gnutls_x509_privkey_export_pkcs8 - This function will export the private key to PKCS8 format
+ * gnutls_x509_privkey_export_pkcs8:
  * @key: Holds the key
  * @format: the format of output params. One of PEM or DER.
  * @password: the password that will be used to encrypt the key.
@@ -1136,7 +1136,7 @@ error:
 }
 
 /**
- * gnutls_x509_privkey_import_pkcs8 - This function will import a DER or PEM PKCS8 encoded key
+ * gnutls_x509_privkey_import_pkcs8:
  * @key: The structure to store the parsed key
  * @data: The DER or PEM encoded key.
  * @format: One of DER or PEM

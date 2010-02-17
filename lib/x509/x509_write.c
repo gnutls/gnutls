@@ -42,7 +42,7 @@
 static void disable_optional_stuff (gnutls_x509_crt_t cert);
 
 /**
- * gnutls_x509_crt_set_dn_by_oid - Set the Certificate request subject's distinguished name
+ * gnutls_x509_crt_set_dn_by_oid:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @oid: holds an Object Identifier in a null terminated string
  * @raw_flag: must be 0, or 1 if the data are DER encoded
@@ -77,7 +77,7 @@ gnutls_x509_crt_set_dn_by_oid (gnutls_x509_crt_t crt, const char *oid,
 }
 
 /**
- * gnutls_x509_crt_set_issuer_dn_by_oid - Set the Certificate request issuer's distinguished name
+ * gnutls_x509_crt_set_issuer_dn_by_oid:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @oid: holds an Object Identifier in a null terminated string
  * @raw_flag: must be 0, or 1 if the data are DER encoded
@@ -118,7 +118,7 @@ gnutls_x509_crt_set_issuer_dn_by_oid (gnutls_x509_crt_t crt,
 }
 
 /**
- * gnutls_x509_crt_set_proxy_dn - Set Proxy Certificate subject's distinguished name 
+ * gnutls_x509_crt_set_proxy_dn:
  * @crt: a gnutls_x509_crt_t structure with the new proxy cert
  * @eecrt: the end entity certificate that will be issuing the proxy
  * @raw_flag: must be 0, or 1 if the CN is DER encoded
@@ -165,7 +165,7 @@ gnutls_x509_crt_set_proxy_dn (gnutls_x509_crt_t crt, gnutls_x509_crt_t eecrt,
 }
 
 /**
- * gnutls_x509_crt_set_version - Set the Certificate request version
+ * gnutls_x509_crt_set_version:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @version: holds the version number. For X.509v1 certificates must be 1.
  *
@@ -207,7 +207,7 @@ gnutls_x509_crt_set_version (gnutls_x509_crt_t crt, unsigned int version)
 }
 
 /**
- * gnutls_x509_crt_set_key - This function will associate the Certificate with a key
+ * gnutls_x509_crt_set_key:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @key: holds a private key
  *
@@ -246,7 +246,7 @@ gnutls_x509_crt_set_key (gnutls_x509_crt_t crt, gnutls_x509_privkey_t key)
 }
 
 /**
- * gnutls_x509_crt_set_crq - Associate the Certificate with a request
+ * gnutls_x509_crt_set_crq:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @crq: holds a certificate request
  *
@@ -289,7 +289,7 @@ gnutls_x509_crt_set_crq (gnutls_x509_crt_t crt, gnutls_x509_crq_t crq)
 }
 
 /**
- * gnutls_x509_crt_set_crq_extensions - Associate the Certificate with a request
+ * gnutls_x509_crt_set_crq_extensions:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @crq: holds a certificate request
  *
@@ -379,7 +379,7 @@ gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt,
 }
 
 /**
- * gnutls_x509_crt_set_extension_by_oid - Set an arbitrary extension
+ * gnutls_x509_crt_set_extension_by_oid:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @oid: holds an Object Identified in null terminated string
  * @buf: a pointer to a DER encoded data
@@ -425,7 +425,7 @@ gnutls_x509_crt_set_extension_by_oid (gnutls_x509_crt_t crt,
 }
 
 /**
- * gnutls_x509_crt_set_basic_constraints - Set the basicConstraints extension
+ * gnutls_x509_crt_set_basic_constraints:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @ca: true(1) or false(0). Depending on the Certificate authority status.
  * @pathLenConstraint: non-negative values indicate maximum length of path,
@@ -476,7 +476,7 @@ gnutls_x509_crt_set_basic_constraints (gnutls_x509_crt_t crt,
 }
 
 /**
- * gnutls_x509_crt_set_ca_status - Set the basicConstraints extension
+ * gnutls_x509_crt_set_ca_status:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @ca: true(1) or false(0). Depending on the Certificate authority status.
  *
@@ -494,7 +494,7 @@ gnutls_x509_crt_set_ca_status (gnutls_x509_crt_t crt, unsigned int ca)
 }
 
 /**
- * gnutls_x509_crt_set_key_usage - Set the keyUsage extension
+ * gnutls_x509_crt_set_key_usage:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @usage: an ORed sequence of the GNUTLS_KEY_* elements.
  *
@@ -540,7 +540,7 @@ gnutls_x509_crt_set_key_usage (gnutls_x509_crt_t crt, unsigned int usage)
 }
 
 /**
- * gnutls_x509_crt_set_subject_alternative_name - Set the subject Alternative Name
+ * gnutls_x509_crt_set_subject_alternative_name:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @type: is one of the gnutls_x509_subject_alt_name_t enumerations
  * @data_string: The data to be set, a zero terminated string
@@ -580,7 +580,7 @@ gnutls_x509_crt_set_subject_alternative_name (gnutls_x509_crt_t crt,
 }
 
 /**
- * gnutls_x509_crt_set_subject_alt_name - Set the subject Alternative Name
+ * gnutls_x509_crt_set_subject_alt_name:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @type: is one of the gnutls_x509_subject_alt_name_t enumerations
  * @data: The data to be set
@@ -672,7 +672,7 @@ finish:
 }
 
 /**
- * gnutls_x509_crt_set_proxy - Set the proxyCertInfo extension
+ * gnutls_x509_crt_set_proxy:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @pathLenConstraint: non-negative values indicate maximum length of path,
  *   and negative values indicate that the pathLenConstraints field should
@@ -730,7 +730,7 @@ gnutls_x509_crt_set_proxy (gnutls_x509_crt_t crt,
 }
 
 /**
- * gnutls_x509_crt_sign2 - Sign a certificate with a key
+ * gnutls_x509_crt_sign2:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @issuer: is the certificate of the certificate issuer
  * @issuer_key: holds the issuer's private key
@@ -775,7 +775,7 @@ gnutls_x509_crt_sign2 (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
 }
 
 /**
- * gnutls_x509_crt_sign - Sign a certificate with a key
+ * gnutls_x509_crt_sign:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @issuer: is the certificate of the certificate issuer
  * @issuer_key: holds the issuer's private key
@@ -794,7 +794,7 @@ gnutls_x509_crt_sign (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
 }
 
 /**
- * gnutls_x509_crt_set_activation_time - Set the Certificate's activation time
+ * gnutls_x509_crt_set_activation_time:
  * @cert: a certificate of type #gnutls_x509_crt_t
  * @act_time: The actual time
  *
@@ -819,7 +819,7 @@ gnutls_x509_crt_set_activation_time (gnutls_x509_crt_t cert, time_t act_time)
 }
 
 /**
- * gnutls_x509_crt_set_expiration_time - Set the Certificate's expiration time
+ * gnutls_x509_crt_set_expiration_time:
  * @cert: a certificate of type #gnutls_x509_crt_t
  * @exp_time: The actual time
  *
@@ -841,7 +841,7 @@ gnutls_x509_crt_set_expiration_time (gnutls_x509_crt_t cert, time_t exp_time)
 }
 
 /**
- * gnutls_x509_crt_set_serial - Set the certificate's serial number
+ * gnutls_x509_crt_set_serial:
  * @cert: a certificate of type #gnutls_x509_crt_t
  * @serial: The serial number
  * @serial_size: Holds the size of the serial field.
@@ -900,7 +900,7 @@ disable_optional_stuff (gnutls_x509_crt_t cert)
 }
 
 /**
- * gnutls_x509_crt_set_crl_dist_points - Set the CRL dist points
+ * gnutls_x509_crt_set_crl_dist_points:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @type: is one of the gnutls_x509_subject_alt_name_t enumerations
  * @data_string: The data to be set
@@ -923,7 +923,7 @@ gnutls_x509_crt_set_crl_dist_points (gnutls_x509_crt_t crt,
 }
 
 /**
- * gnutls_x509_crt_set_crl_dist_points2 - Set the CRL dist points
+ * gnutls_x509_crt_set_crl_dist_points2:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @type: is one of the gnutls_x509_subject_alt_name_t enumerations
  * @data: The data to be set
@@ -996,7 +996,7 @@ gnutls_x509_crt_set_crl_dist_points2 (gnutls_x509_crt_t crt,
 }
 
 /**
- * gnutls_x509_crt_cpy_crl_dist_points - Copy the CRL dist points
+ * gnutls_x509_crt_cpy_crl_dist_points:
  * @dst: a certificate of type #gnutls_x509_crt_t
  * @src: the certificate where the dist points will be copied from
  *
@@ -1048,7 +1048,7 @@ gnutls_x509_crt_cpy_crl_dist_points (gnutls_x509_crt_t dst,
 }
 
 /**
- * gnutls_x509_crt_set_subject_key_id - Set the certificate's subject key id
+ * gnutls_x509_crt_set_subject_key_id:
  * @cert: a certificate of type #gnutls_x509_crt_t
  * @id: The key ID
  * @id_size: Holds the size of the serial field.
@@ -1111,7 +1111,7 @@ gnutls_x509_crt_set_subject_key_id (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_set_authority_key_id - Set the certificate authority's key id
+ * gnutls_x509_crt_set_authority_key_id:
  * @cert: a certificate of type #gnutls_x509_crt_t
  * @id: The key ID
  * @id_size: Holds the size of the serial field.
@@ -1174,7 +1174,7 @@ gnutls_x509_crt_set_authority_key_id (gnutls_x509_crt_t cert,
 }
 
 /**
- * gnutls_x509_crt_set_key_purpose_oid - Sets the Certificate's key purpose OIDs
+ * gnutls_x509_crt_set_key_purpose_oid:
  * @cert: a certificate of type #gnutls_x509_crt_t
  * @oid: a pointer to a null terminated string that holds the OID
  * @critical: Whether this extension will be critical or not

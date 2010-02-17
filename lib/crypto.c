@@ -142,7 +142,7 @@ _gnutls_crypto_deregister (void)
 }
 
 /**
- * gnutls_crypto_single_cipher_register2 - register a cipher algorithm
+ * gnutls_crypto_single_cipher_register2:
  * @algorithm: is the gnutls algorithm identifier
  * @priority: is the priority of the algorithm
  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
@@ -184,7 +184,7 @@ _gnutls_get_crypto_cipher (gnutls_cipher_algorithm_t algo)
 }
 
 /**
- * gnutls_crypto_rnd_register2 - register a random generator
+ * gnutls_crypto_rnd_register2:
  * @priority: is the priority of the generator
  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
  * @s: is a structure holding new generator's data
@@ -225,7 +225,7 @@ gnutls_crypto_rnd_register2 (int priority, int version,
 }
 
 /**
- * gnutls_crypto_single_mac_register2 - register a MAC algorithm
+ * gnutls_crypto_single_mac_register2:
  * @algorithm: is the gnutls algorithm identifier
  * @priority: is the priority of the algorithm
  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
@@ -266,7 +266,7 @@ _gnutls_get_crypto_mac (gnutls_mac_algorithm_t algo)
 }
 
 /**
- * gnutls_crypto_single_digest_register2 - register a digest algorithm
+ * gnutls_crypto_single_digest_register2:
  * @algorithm: is the gnutls algorithm identifier
  * @priority: is the priority of the algorithm
  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
@@ -308,7 +308,7 @@ _gnutls_get_crypto_digest (gnutls_digest_algorithm_t algo)
 }
 
 /**
- * gnutls_crypto_bigint_register2 - register a bigint interface
+ * gnutls_crypto_bigint_register2:
  * @priority: is the priority of the interface
  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
  * @s: is a structure holding new interface's data
@@ -352,7 +352,7 @@ gnutls_crypto_bigint_register2 (int priority, int version,
 }
 
 /**
- * gnutls_crypto_pk_register2 - register a public key interface
+ * gnutls_crypto_pk_register2:
  * @priority: is the priority of the interface
  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
  * @s: is a structure holding new interface's data
@@ -396,7 +396,7 @@ gnutls_crypto_pk_register2 (int priority, int version,
 }
 
 /**
- * gnutls_crypto_cipher_register2 - register a cipher interface
+ * gnutls_crypto_cipher_register2:
  * @priority: is the priority of the cipher interface
  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
  * @s: is a structure holding new interface's data
@@ -437,7 +437,7 @@ gnutls_crypto_cipher_register2 (int priority, int version,
 }
 
 /**
- * gnutls_crypto_mac_register2 - register a mac interface
+ * gnutls_crypto_mac_register2:
  * @priority: is the priority of the mac interface
  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
  * @s: is a structure holding new interface's data
@@ -478,7 +478,7 @@ gnutls_crypto_mac_register2 (int priority, int version,
 }
 
 /**
- * gnutls_crypto_digest_register2 - register a digest interface
+ * gnutls_crypto_digest_register2:
  * @priority: is the priority of the digest interface
  * @version: should be set to %GNUTLS_CRYPTO_API_VERSION
  * @s: is a structure holding new interface's data

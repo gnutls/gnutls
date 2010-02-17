@@ -105,7 +105,7 @@ _gnutls_strdup (const char *str)
  */
 
 /**
- * gnutls_malloc - Allocates and returns data
+ * gnutls_malloc:
  *
  * This function will allocate 's' bytes data, and
  * return a pointer to memory. This function is supposed
@@ -120,7 +120,7 @@ gnutls_malloc (size_t s)
 }
 
 /**
- * gnutls_free - Returns a free() like function
+ * gnutls_free:
  * @d: pointer to memory
  *
  * This function will free data pointed by ptr.

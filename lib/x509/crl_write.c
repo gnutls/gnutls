@@ -42,7 +42,7 @@
 static void disable_optional_stuff (gnutls_x509_crl_t crl);
 
 /**
- * gnutls_x509_crl_set_version - This function will set the CRL version
+ * gnutls_x509_crl_set_version:
  * @crl: should contain a gnutls_x509_crl_t structure
  * @version: holds the version number. For CRLv1 crls must be 1.
  *
@@ -79,7 +79,7 @@ gnutls_x509_crl_set_version (gnutls_x509_crl_t crl, unsigned int version)
 }
 
 /**
- * gnutls_x509_crl_sign2 - This function will sign a CRL with a key
+ * gnutls_x509_crl_sign2:
  * @crl: should contain a gnutls_x509_crl_t structure
  * @issuer: is the certificate of the certificate issuer
  * @issuer_key: holds the issuer's private key
@@ -124,7 +124,7 @@ gnutls_x509_crl_sign2 (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
 }
 
 /**
- * gnutls_x509_crl_sign - This function will sign a CRL with a key
+ * gnutls_x509_crl_sign:
  * @crl: should contain a gnutls_x509_crl_t structure
  * @issuer: is the certificate of the certificate issuer
  * @issuer_key: holds the issuer's private key
@@ -143,7 +143,7 @@ gnutls_x509_crl_sign (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
 }
 
 /**
- * gnutls_x509_crl_set_this_update - This function will set the CRL's issuing time
+ * gnutls_x509_crl_set_this_update:
  * @crl: should contain a gnutls_x509_crl_t structure
  * @act_time: The actual time
  *
@@ -165,7 +165,7 @@ gnutls_x509_crl_set_this_update (gnutls_x509_crl_t crl, time_t act_time)
 }
 
 /**
- * gnutls_x509_crl_set_next_update - This function will set the CRL next update time
+ * gnutls_x509_crl_set_next_update:
  * @crl: should contain a gnutls_x509_crl_t structure
  * @exp_time: The actual time
  *
@@ -186,7 +186,7 @@ gnutls_x509_crl_set_next_update (gnutls_x509_crl_t crl, time_t exp_time)
 }
 
 /**
- * gnutls_x509_crl_set_crt_serial - This function will set a revoked certificate's serial number
+ * gnutls_x509_crl_set_crt_serial:
  * @crl: should contain a gnutls_x509_crl_t structure
  * @serial: The revoked certificate's serial number
  * @serial_size: Holds the size of the serial field.
@@ -252,7 +252,7 @@ gnutls_x509_crl_set_crt_serial (gnutls_x509_crl_t crl,
 }
 
 /**
- * gnutls_x509_crl_set_crt - This function will set a revoked certificate's serial number
+ * gnutls_x509_crl_set_crt:
  * @crl: should contain a gnutls_x509_crl_t structure
  * @crt: a certificate of type #gnutls_x509_crt_t with the revoked certificate
  * @revocation_time: The time this certificate was revoked
@@ -313,7 +313,7 @@ disable_optional_stuff (gnutls_x509_crl_t crl)
 }
 
 /**
- * gnutls_x509_crl_set_authority_key_id - Set the CRL's authority key id
+ * gnutls_x509_crl_set_authority_key_id:
  * @crl: a CRL of type #gnutls_x509_crl_t
  * @id: The key ID
  * @id_size: Holds the size of the serial field.
@@ -378,7 +378,7 @@ gnutls_x509_crl_set_authority_key_id (gnutls_x509_crl_t crl,
 }
 
 /**
- * gnutls_x509_crl_set_number - Set the CRL's number extension
+ * gnutls_x509_crl_set_number:
  * @crl: a CRL of type #gnutls_x509_crl_t
  * @nr: The CRL number
  * @nr_size: Holds the size of the nr field.

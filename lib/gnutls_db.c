@@ -35,7 +35,7 @@
 #include <gnutls_datum.h>
 
 /**
- * gnutls_db_set_retrieve_function - Set the function that will be used to get data
+ * gnutls_db_set_retrieve_function:
  * @session: is a #gnutls_session_t structure.
  * @retr_func: is the function.
  *
@@ -58,7 +58,7 @@ gnutls_db_set_retrieve_function (gnutls_session_t session,
 }
 
 /**
- * gnutls_db_set_remove_function - Set the function that will be used to remove data
+ * gnutls_db_set_remove_function:
  * @session: is a #gnutls_session_t structure.
  * @rem_func: is the function.
  *
@@ -76,7 +76,7 @@ gnutls_db_set_remove_function (gnutls_session_t session,
 }
 
 /**
- * gnutls_db_set_store_function - Set the function that will be used to put data
+ * gnutls_db_set_store_function:
  * @session: is a #gnutls_session_t structure.
  * @store_func: is the function
  *
@@ -94,7 +94,7 @@ gnutls_db_set_store_function (gnutls_session_t session,
 }
 
 /**
- * gnutls_db_set_ptr - Set a pointer to be sent to db functions
+ * gnutls_db_set_ptr:
  * @session: is a #gnutls_session_t structure.
  * @ptr: is the pointer
  *
@@ -108,7 +108,7 @@ gnutls_db_set_ptr (gnutls_session_t session, void *ptr)
 }
 
 /**
- * gnutls_db_get_ptr - Returns the pointer which is sent to db functions
+ * gnutls_db_get_ptr:
  * @session: is a #gnutls_session_t structure.
  *
  * Get db function pointer.
@@ -123,7 +123,7 @@ gnutls_db_get_ptr (gnutls_session_t session)
 }
 
 /**
- * gnutls_db_set_cache_expiration - Set the expiration time for resumed sessions.
+ * gnutls_db_set_cache_expiration:
  * @session: is a #gnutls_session_t structure.
  * @seconds: is the number of seconds.
  *
@@ -137,7 +137,7 @@ gnutls_db_set_cache_expiration (gnutls_session_t session, int seconds)
 }
 
 /**
- * gnutls_db_check_entry - check if the given db entry has expired
+ * gnutls_db_check_entry:
  * @session: is a #gnutls_session_t structure.
  * @session_entry: is the session data (not key)
  *
@@ -362,7 +362,7 @@ _gnutls_remove_session (gnutls_session_t session, gnutls_datum_t session_id)
 }
 
 /**
- * gnutls_db_remove_session - remove the current session data from the database
+ * gnutls_db_remove_session:
  * @session: is a #gnutls_session_t structure.
  *
  * This function will remove the current session data from the

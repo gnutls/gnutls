@@ -36,7 +36,7 @@
 #include <openssl_compat.h>
 
 /*-
- * gnutls_x509_extract_dn - This function parses an RDN sequence
+ * gnutls_x509_extract_dn:
  * @idn: should contain a DER encoded RDN sequence
  * @rdn: a pointer to a structure to hold the name
  *
@@ -105,7 +105,7 @@ gnutls_x509_extract_dn (const gnutls_datum_t * idn, gnutls_x509_dn * rdn)
 }
 
 /*-
- * gnutls_x509_extract_certificate_dn - This function returns the certificate's distinguished name
+ * gnutls_x509_extract_certificate_dn:
  * @cert: should contain an X.509 DER encoded certificate
  * @ret: a pointer to a structure to hold the peer's name
  *
@@ -169,7 +169,7 @@ gnutls_x509_extract_certificate_dn (const gnutls_datum_t * cert,
 }
 
 /*-
- * gnutls_x509_extract_certificate_issuer_dn - This function returns the certificate's issuer distinguished name
+ * gnutls_x509_extract_certificate_issuer_dn:
  * @cert: should contain an X.509 DER encoded certificate
  * @ret: a pointer to a structure to hold the issuer's name
  *
@@ -240,7 +240,7 @@ gnutls_x509_extract_certificate_issuer_dn (const gnutls_datum_t * cert,
 
 
 /*-
- * gnutls_x509_extract_certificate_subject_alt_name - This function returns the certificate's alternative name, if any
+ * gnutls_x509_extract_certificate_subject_alt_name:
  * @cert: should contain an X.509 DER encoded certificate
  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
  * @ret: is the place where the alternative name will be copied to
@@ -289,7 +289,7 @@ gnutls_x509_extract_certificate_subject_alt_name (const gnutls_datum_t *
 }
 
 /*-
- * gnutls_x509_extract_certificate_ca_status - This function returns the certificate CA status
+ * gnutls_x509_extract_certificate_ca_status:
  * @cert: should contain an X.509 DER encoded certificate
  *
  * This function will return certificates CA status, by reading the
@@ -326,7 +326,7 @@ gnutls_x509_extract_certificate_ca_status (const gnutls_datum_t * cert)
 }
 
 /*-
- * gnutls_x509_extract_certificate_activation_time - This function returns the peer's certificate activation time
+ * gnutls_x509_extract_certificate_activation_time:
  * @cert: should contain an X.509 DER encoded certificate
  *
  * This function will return the certificate's activation time in UNIX time
@@ -358,7 +358,7 @@ gnutls_x509_extract_certificate_activation_time (const gnutls_datum_t * cert)
 }
 
 /*-
- * gnutls_x509_extract_certificate_expiration_time - This function returns the certificate's expiration time
+ * gnutls_x509_extract_certificate_expiration_time:
  * @cert: should contain an X.509 DER encoded certificate
  *
  * This function will return the certificate's expiration time in UNIX time
@@ -390,7 +390,7 @@ gnutls_x509_extract_certificate_expiration_time (const gnutls_datum_t * cert)
 }
 
 /*-
- * gnutls_x509_extract_certificate_version - This function returns the certificate's version
+ * gnutls_x509_extract_certificate_version:
  * @cert: is an X.509 DER encoded certificate
  *
  * This function will return the X.509 certificate's version (1, 2, 3). This is obtained by the X509 Certificate
@@ -422,7 +422,7 @@ gnutls_x509_extract_certificate_version (const gnutls_datum_t * cert)
 }
 
 /*-
- * gnutls_x509_extract_certificate_serial - This function returns the certificate's serial number
+ * gnutls_x509_extract_certificate_serial:
  * @cert: is an X.509 DER encoded certificate
  * @result: The place where the serial number will be copied
  * @result_size: Holds the size of the result field.
@@ -464,7 +464,7 @@ gnutls_x509_extract_certificate_serial (const gnutls_datum_t * cert,
 
 
 /*-
- * gnutls_x509_extract_certificate_pk_algorithm - This function returns the certificate's PublicKey algorithm
+ * gnutls_x509_extract_certificate_pk_algorithm:
  * @cert: is a DER encoded X.509 certificate
  * @bits: if bits is non null it will hold the size of the parameters' in bits
  *
@@ -506,7 +506,7 @@ gnutls_x509_extract_certificate_pk_algorithm (const gnutls_datum_t *
 
 
 /*-
- * gnutls_x509_extract_certificate_dn_string - This function returns the certificate's distinguished name
+ * gnutls_x509_extract_certificate_dn_string:
  * @cert: should contain an X.509 DER encoded certificate
  * @buf: a pointer to a structure to hold the peer's name
  * @sizeof_buf: holds the size of 'buf'
@@ -552,7 +552,7 @@ gnutls_x509_extract_certificate_dn_string (char *buf,
 }
 
 /*-
- * gnutls_x509_verify_certificate - This function verifies given certificate list
+ * gnutls_x509_verify_certificate:
  * @cert_list: is the certificate list to be verified
  * @cert_list_length: holds the number of certificate in cert_list
  * @CA_list: is the CA list which will be used in verification
@@ -752,7 +752,7 @@ cleanup:
 }
 
 /*-
- * gnutls_x509_extract_key_pk_algorithm - This function returns the keys's PublicKey algorithm
+ * gnutls_x509_extract_key_pk_algorithm:
  * @cert: is a DER encoded private key
  *
  * This function will return the public key algorithm of a DER encoded private
@@ -790,7 +790,7 @@ gnutls_x509_extract_key_pk_algorithm (const gnutls_datum_t * key)
 #ifdef ENABLE_PKI
 
 /*-
- * gnutls_x509_pkcs7_extract_certificate - This function returns a certificate in a PKCS7 certificate set
+ * gnutls_x509_pkcs7_extract_certificate:
  * @pkcs7_struct: should contain a PKCS7 DER formatted structure
  * @indx: contains the index of the certificate to extract
  * @certificate: the contents of the certificate will be copied there

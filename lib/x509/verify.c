@@ -381,7 +381,7 @@ cleanup:
 }
 
 /**
- * gnutls_x509_crt_check_issuer - check if certificate has given issuer
+ * gnutls_x509_crt_check_issuer:
  * @cert: is the certificate to be checked
  * @issuer: is the certificate of a possible issuer
  *
@@ -925,7 +925,7 @@ _gnutls_x509_privkey_verify_signature (const gnutls_datum_t * tbs,
 }
 
 /**
- * gnutls_x509_crt_list_verify - This function verifies the given certificate list
+ * gnutls_x509_crt_list_verify:
  * @cert_list: is the certificate list to be verified
  * @cert_list_length: holds the number of certificate in cert_list
  * @CA_list: is the CA list which will be used in verification
@@ -979,7 +979,7 @@ gnutls_x509_crt_list_verify (const gnutls_x509_crt_t * cert_list,
 }
 
 /**
- * gnutls_x509_crt_verify - This function verifies the given certificate against a given trusted one
+ * gnutls_x509_crt_verify:
  * @cert: is the certificate to be verified
  * @CA_list: is one certificate that is considered to be trusted one
  * @CA_list_length: holds the number of CA certificate in CA_list
@@ -1019,7 +1019,7 @@ gnutls_x509_crt_verify (gnutls_x509_crt_t cert,
 #ifdef ENABLE_PKI
 
 /**
- * gnutls_x509_crl_check_issuer - checks if CRL has given issuer
+ * gnutls_x509_crl_check_issuer:
  * @crl: is the CRL to be checked
  * @issuer: is the certificate of a possible issuer
  *
@@ -1038,7 +1038,7 @@ gnutls_x509_crl_check_issuer (gnutls_x509_crl_t cert,
 }
 
 /**
- * gnutls_x509_crl_verify - This function verifies the given crl against a given trusted one
+ * gnutls_x509_crl_verify:
  * @crl: is the crl to be verified
  * @CA_list: is a certificate list that is considered to be trusted one
  * @CA_list_length: holds the number of CA certificates in CA_list

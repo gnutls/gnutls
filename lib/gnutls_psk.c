@@ -39,7 +39,7 @@
 #include "debug.h"
 
 /**
- * gnutls_psk_free_client_credentials - Used to free an allocated gnutls_psk_client_credentials_t structure
+ * gnutls_psk_free_client_credentials:
  * @sc: is a #gnutls_psk_client_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
@@ -54,7 +54,7 @@ gnutls_psk_free_client_credentials (gnutls_psk_client_credentials_t sc)
 }
 
 /**
- * gnutls_psk_allocate_client_credentials - Used to allocate an gnutls_psk_server_credentials_t structure
+ * gnutls_psk_allocate_client_credentials:
  * @sc: is a pointer to a #gnutls_psk_server_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
@@ -74,7 +74,7 @@ gnutls_psk_allocate_client_credentials (gnutls_psk_client_credentials_t * sc)
 }
 
 /**
- * gnutls_psk_set_client_credentials - Used to set the username/password, in a gnutls_psk_client_credentials_t structure
+ * gnutls_psk_set_client_credentials:
  * @res: is a #gnutls_psk_client_credentials_t structure.
  * @username: is the user's zero-terminated userid
  * @key: is the user's key
@@ -148,7 +148,7 @@ error:
 }
 
 /**
- * gnutls_psk_free_server_credentials - Used to free an allocated gnutls_psk_server_credentials_t structure
+ * gnutls_psk_free_server_credentials:
  * @sc: is a #gnutls_psk_server_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
@@ -162,7 +162,7 @@ gnutls_psk_free_server_credentials (gnutls_psk_server_credentials_t sc)
 }
 
 /**
- * gnutls_psk_allocate_server_credentials - Used to allocate an gnutls_psk_server_credentials_t structure
+ * gnutls_psk_allocate_server_credentials:
  * @sc: is a pointer to a #gnutls_psk_server_credentials_t structure.
  *
  * This structure is complex enough to manipulate directly thus this
@@ -183,7 +183,7 @@ gnutls_psk_allocate_server_credentials (gnutls_psk_server_credentials_t * sc)
 
 
 /**
- * gnutls_psk_set_server_credentials_file - Used to set the password files, in a gnutls_psk_server_credentials_t structure
+ * gnutls_psk_set_server_credentials_file:
  * @res: is a #gnutls_psk_server_credentials_t structure.
  * @password_file: is the PSK password file (passwd.psk)
  *
@@ -222,7 +222,7 @@ gnutls_psk_set_server_credentials_file (gnutls_psk_server_credentials_t
 }
 
 /**
- * gnutls_psk_set_server_credentials_hint - Set a identity hint, in a %gnutls_psk_server_credentials_t structure
+ * gnutls_psk_set_server_credentials_hint:
  * @res: is a #gnutls_psk_server_credentials_t structure.
  * @hint: is the PSK identity hint string
  *
@@ -250,7 +250,7 @@ gnutls_psk_set_server_credentials_hint (gnutls_psk_server_credentials_t res,
 }
 
 /**
- * gnutls_psk_set_server_credentials_function - Used to set a callback to retrieve the user's PSK credentials
+ * gnutls_psk_set_server_credentials_function:
  * @cred: is a #gnutls_psk_server_credentials_t structure.
  * @func: is the callback function
  *
@@ -279,7 +279,7 @@ gnutls_psk_set_server_credentials_function (gnutls_psk_server_credentials_t
 }
 
 /**
- * gnutls_psk_set_client_credentials_function - Used to set a callback to retrieve the username and key
+ * gnutls_psk_set_client_credentials_function:
  * @cred: is a #gnutls_psk_server_credentials_t structure.
  * @func: is the callback function
  *
@@ -309,7 +309,7 @@ gnutls_psk_set_client_credentials_function (gnutls_psk_client_credentials_t
 
 
 /**
- * gnutls_psk_server_get_username - return the username of the peer
+ * gnutls_psk_server_get_username:
  * @session: is a gnutls session
  *
  * This should only be called in case of PSK authentication and in
@@ -335,7 +335,7 @@ gnutls_psk_server_get_username (gnutls_session_t session)
 }
 
 /**
- * gnutls_psk_client_get_hint - return the PSK identity hint of the peer
+ * gnutls_psk_client_get_hint:
  * @session: is a gnutls session
  *
  * The PSK identity hint may give the client help in deciding which
@@ -364,7 +364,7 @@ gnutls_psk_client_get_hint (gnutls_session_t session)
 }
 
 /**
- * gnutls_hex_decode - decode hex encoded data
+ * gnutls_hex_decode:
  * @hex_data: contain the encoded data
  * @result: the place where decoded data will be copied
  * @result_size: holds the size of the result
@@ -393,7 +393,7 @@ gnutls_hex_decode (const gnutls_datum_t * hex_data, char *result,
 }
 
 /**
- * gnutls_hex_encode - convert raw data to hex encoded
+ * gnutls_hex_encode:
  * @data: contain the raw data
  * @result: the place where hex data will be copied
  * @result_size: holds the size of the result
@@ -423,7 +423,7 @@ gnutls_hex_encode (const gnutls_datum_t * data, char *result,
 }
 
 /**
- * gnutls_psk_set_server_dh_params - set the DH parameters for a server to use
+ * gnutls_psk_set_server_dh_params:
  * @res: is a gnutls_psk_server_credentials_t structure
  * @dh_params: is a structure that holds Diffie-Hellman parameters.
  *
@@ -439,7 +439,7 @@ gnutls_psk_set_server_dh_params (gnutls_psk_server_credentials_t res,
 }
 
 /**
- * gnutls_psk_set_server_params_function - set the DH parameters callback
+ * gnutls_psk_set_server_params_function:
  * @res: is a #gnutls_certificate_credentials_t structure
  * @func: is the function to be called
  *

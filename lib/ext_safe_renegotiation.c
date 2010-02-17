@@ -120,7 +120,7 @@ _gnutls_safe_renegotiation_send_params (gnutls_session_t session,
 }
 
 /**
- * gnutls_safe_negotiation_set_initial - Used to enable and disable initial safe renegotiation
+ * gnutls_safe_negotiation_set_initial:
  * @session: is a #gnutls_session_t structure.
  * @value: 0 to disable and 1 to enable
  *
@@ -137,7 +137,7 @@ gnutls_safe_negotiation_set_initial (gnutls_session_t session, int value)
 }
 
 /**
- * gnutls_safe_negotiation_set - Used to enable and disable safe renegotiation
+ * gnutls_safe_negotiation_set:
  * @session: is a #gnutls_session_t structure.
  * @value: 0 to disable and 1 to enable
  *

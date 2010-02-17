@@ -383,7 +383,7 @@ _gnutls_ext_deinit (void)
 }
 
 /**
- * gnutls_ext_register - Register a handler for a TLS extension
+ * gnutls_ext_register:
  * @type: the 16-bit integer referring to the extension type
  * @name: human printable name of the extension used for debugging
  * @parse_type: either #GNUTLS_EXT_TLS or %GNUTLS_EXT_APPLICATION.

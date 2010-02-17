@@ -38,7 +38,7 @@
  */
 
 /**
- * gnutls_openpgp_keyring_init - initializes a #gnutls_openpgp_keyring_t structure
+ * gnutls_openpgp_keyring_init:
  * @keyring: The structure to be initialized
  *
  * This function will initialize an keyring structure.
@@ -57,7 +57,7 @@ gnutls_openpgp_keyring_init (gnutls_openpgp_keyring_t * keyring)
 
 
 /**
- * gnutls_openpgp_keyring_deinit - deinitializes memory used by a #gnutls_openpgp_keyring_t structure
+ * gnutls_openpgp_keyring_deinit:
  * @keyring: The structure to be initialized
  *
  * This function will deinitialize a keyring structure.
@@ -78,7 +78,7 @@ gnutls_openpgp_keyring_deinit (gnutls_openpgp_keyring_t keyring)
 }
 
 /**
- * gnutls_openpgp_keyring_check_id - Check if a key id exists in the keyring
+ * gnutls_openpgp_keyring_check_id:
  * @ring: holds the keyring to check against
  * @keyid: will hold the keyid to check for.
  * @flags: unused (should be 0)
@@ -110,7 +110,7 @@ gnutls_openpgp_keyring_check_id (gnutls_openpgp_keyring_t ring,
 }
 
 /**
- * gnutls_openpgp_keyring_import - Import a raw- or Base64-encoded keyring
+ * gnutls_openpgp_keyring_import:
  * @keyring: The structure to store the parsed key.
  * @data: The RAW or BASE64 encoded keyring.
  * @format: One of #gnutls_openpgp_keyring_fmt elements.
@@ -210,7 +210,7 @@ error:
   cdk_kbnode_find_packet (node, CDK_PKT_PUBLIC_KEY)!=NULL
 
 /**
- * gnutls_openpgp_keyring_get_crt_count - return the number of certificates
+ * gnutls_openpgp_keyring_get_crt_count:
  * @ring: is an OpenPGP key ring
  *
  * This function will return the number of OpenPGP certificates
@@ -256,7 +256,7 @@ gnutls_openpgp_keyring_get_crt_count (gnutls_openpgp_keyring_t ring)
 }
 
 /**
- * gnutls_openpgp_keyring_get_crt - export an openpgp certificate from a keyring
+ * gnutls_openpgp_keyring_get_crt:
  * @ring: Holds the keyring.
  * @idx: the index of the certificate to export
  * @cert: An uninitialized #gnutls_openpgp_crt_t structure
