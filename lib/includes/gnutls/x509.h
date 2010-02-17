@@ -83,14 +83,19 @@ extern "C"
 
 /* Certificate handling functions.
  */
+
+/**
+ * gnutls_certificate_import_flags:
+ * @GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED: Fail if the
+ *   certificates in the buffer are more than the space allocated for
+ *   certificates. The error code will be %GNUTLS_E_SHORT_MEMORY_BUFFER.
+ *
+ * Enumeration of different certificate import flags.
+ */
   typedef enum gnutls_certificate_import_flags
-  {
-    /* Fail if the certificates in the buffer are more than the space
-     * allocated for certificates. The error code will be
-     * GNUTLS_E_SHORT_MEMORY_BUFFER.
-     */
-    GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED = 1
-  } gnutls_certificate_import_flags;
+    {
+      GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED = 1
+    } gnutls_certificate_import_flags;
 
   int gnutls_x509_crt_init (gnutls_x509_crt_t * cert);
   void gnutls_x509_crt_deinit (gnutls_x509_crt_t cert);
@@ -489,46 +494,45 @@ extern "C"
 
 /* X.509 Certificate verification functions.
  */
+
+/**
+ * gnutls_certificate_verify_flags:
+ * @GNUTLS_VERIFY_DISABLE_CA_SIGN: If set a signer does not have to be
+ *   a certificate authority. This flag should normaly be disabled,
+ *   unless you know what this means.
+ * @GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT: Allow only trusted CA
+ *   certificates that have version 1.  This is safer than
+ *   %GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT, and should be used
+ *   instead. That way only signers in your trusted list will be
+ *   allowed to have certificates of version 1.
+ * @GNUTLS_VERIFY_DO_NOT_ALLOW_SAME: If a certificate is not signed by
+ *   anyone trusted but exists in the trusted CA list do not treat it
+ *   as trusted.
+ * @GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT: Allow CA certificates that
+ *   have version 1 (both root and intermediate). This might be
+ *   dangerous since those haven't the basicConstraints
+ *   extension. Must be used in combination with
+ *   %GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT.
+ * @GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2: Allow certificates to be signed
+ *   using the broken MD2 algorithm.
+ * @GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5: Allow certificates to be signed
+ *   using the broken MD5 algorithm.
+ * @GNUTLS_VERIFY_DISABLE_TIME_CHECKS: Disable checking of activation
+ *   and expiration validity periods of certificate chains. Don't set
+ *   this unless you understand the security implications.
+ *
+ * Enumeration of different certificate verify flags.
+ */
   typedef enum gnutls_certificate_verify_flags
-  {
-    /* If set a signer does not have to be a certificate authority. This
-     * flag should normaly be disabled, unless you know what this means.
-     */
-    GNUTLS_VERIFY_DISABLE_CA_SIGN = 1,
-
-    /* Allow only trusted CA certificates that have version 1.  This is
-     * safer than GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT, and should be
-     * used instead. That way only signers in your trusted list will be
-     * allowed to have certificates of version 1.
-     */
-    GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT = 2,
-
-    /* If a certificate is not signed by anyone trusted but exists in
-     * the trusted CA list do not treat it as trusted.
-     */
-    GNUTLS_VERIFY_DO_NOT_ALLOW_SAME = 4,
-
-    /* Allow CA certificates that have version 1 (both root and
-     * intermediate). This might be dangerous since those haven't the
-     * basicConstraints extension. Must be used in combination with
-     * GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT.
-     */
-    GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT = 8,
-
-    /* Allow certificates to be signed using the broken MD2 algorithm.
-     */
-    GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 = 16,
-
-    /* Allow certificates to be signed using the broken MD5 algorithm.
-     */
-    GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5 = 32,
-
-    /* Disable checking of activation and expiration validity
-     * periods of certificate chains. Don't set this unless you
-     * understand the security implications.
-     */
-    GNUTLS_VERIFY_DISABLE_TIME_CHECKS = 64
-  } gnutls_certificate_verify_flags;
+    {
+      GNUTLS_VERIFY_DISABLE_CA_SIGN = 1,
+      GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT = 2,
+      GNUTLS_VERIFY_DO_NOT_ALLOW_SAME = 4,
+      GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT = 8,
+      GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 = 16,
+      GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5 = 32,
+      GNUTLS_VERIFY_DISABLE_TIME_CHECKS = 64
+    } gnutls_certificate_verify_flags;
 
   int gnutls_x509_crt_check_issuer (gnutls_x509_crt_t cert,
 				    gnutls_x509_crt_t issuer);
@@ -571,24 +575,39 @@ extern "C"
 
 /* Flags for the gnutls_x509_privkey_export_pkcs8() function.
  */
-  typedef enum gnutls_pkcs_encrypt_flags_t
-  {
-    GNUTLS_PKCS_PLAIN = 1,	/* if set the private key will not
-				 * be encrypted.
-				 */
-    GNUTLS_PKCS_USE_PKCS12_3DES = 2,
-    GNUTLS_PKCS_USE_PKCS12_ARCFOUR = 4,
-    GNUTLS_PKCS_USE_PKCS12_RC2_40 = 8,
-    GNUTLS_PKCS_USE_PBES2_3DES = 16,
-    GNUTLS_PKCS_USE_PBES2_AES_128 = 32,
-    GNUTLS_PKCS_USE_PBES2_AES_192 = 64,
-    GNUTLS_PKCS_USE_PBES2_AES_256 = 128,
-  } gnutls_pkcs_encrypt_flags_t;
 
-#define GNUTLS_PKCS8_PLAIN GNUTLS_PKCS_PLAIN
-#define GNUTLS_PKCS8_USE_PKCS12_3DES GNUTLS_PKCS_USE_PKCS12_3DES
-#define GNUTLS_PKCS8_USE_PKCS12_ARCFOUR GNUTLS_PKCS_USE_PKCS12_ARCFOUR
-#define GNUTLS_PKCS8_USE_PKCS12_RC2_40 GNUTLS_PKCS_USE_PKCS12_RC2_40
+/**
+ * gnutls_pkcs_encrypt_flags_t:
+ * @GNUTLS_PKCS_PLAIN: Unencrypted private key.
+ * @GNUTLS_PKCS8_PLAIN: Same as %GNUTLS_PKCS_PLAIN.
+ * @GNUTLS_PKCS_USE_PKCS12_3DES: PKCS-12 3DES.
+ * @GNUTLS_PKCS8_USE_PKCS12_3DES: Same as %GNUTLS_PKCS_USE_PKCS12_3DES.
+ * @GNUTLS_PKCS_USE_PKCS12_ARCFOUR: PKCS-12 ARCFOUR.
+ * @GNUTLS_PKCS8_USE_PKCS12_ARCFOUR: Same as %GNUTLS_PKCS_USE_PKCS12_ARCFOUR.
+ * @GNUTLS_PKCS_USE_PKCS12_RC2_40: PKCS-12 RC2-40.
+ * @GNUTLS_PKCS8_USE_PKCS12_RC2_40: Same as %GNUTLS_PKCS_USE_PKCS12_RC2_40.
+ * @GNUTLS_PKCS_USE_PBES2_3DES: PBES2 3DES.
+ * @GNUTLS_PKCS_USE_PBES2_AES_128: PBES2 AES-128.
+ * @GNUTLS_PKCS_USE_PBES2_AES_192: PBES2 AES-192.
+ * @GNUTLS_PKCS_USE_PBES2_AES_256: PBES2 AES-256.
+ *
+ * Enumeration of different PKCS encryption flags.
+ */
+  typedef enum gnutls_pkcs_encrypt_flags_t
+    {
+      GNUTLS_PKCS_PLAIN = 1,
+      GNUTLS_PKCS8_PLAIN = GNUTLS_PKCS_PLAIN,
+      GNUTLS_PKCS_USE_PKCS12_3DES = 2,
+      GNUTLS_PKCS8_USE_PKCS12_3DES = GNUTLS_PKCS_USE_PKCS12_3DES,
+      GNUTLS_PKCS_USE_PKCS12_ARCFOUR = 4,
+      GNUTLS_PKCS8_USE_PKCS12_ARCFOUR = GNUTLS_PKCS_USE_PKCS12_ARCFOUR,
+      GNUTLS_PKCS_USE_PKCS12_RC2_40 = 8,
+      GNUTLS_PKCS8_USE_PKCS12_RC2_40 = GNUTLS_PKCS_USE_PKCS12_RC2_40,
+      GNUTLS_PKCS_USE_PBES2_3DES = 16,
+      GNUTLS_PKCS_USE_PBES2_AES_128 = 32,
+      GNUTLS_PKCS_USE_PBES2_AES_192 = 64,
+      GNUTLS_PKCS_USE_PBES2_AES_256 = 128,
+    } gnutls_pkcs_encrypt_flags_t;
 
   int gnutls_x509_privkey_init (gnutls_x509_privkey_t * key);
   void gnutls_x509_privkey_deinit (gnutls_x509_privkey_t key);
