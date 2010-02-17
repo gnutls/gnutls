@@ -309,6 +309,7 @@ extern "C" {
    * @GNUTLS_A_RECORD_OVERFLOW: Record overflow.
    * @GNUTLS_A_DECOMPRESSION_FAILURE: Decompression failed.
    * @GNUTLS_A_HANDSHAKE_FAILURE: Handshake failed.
+   * @GNUTLS_A_SSL3_NO_CERTIFICATE: No certificate.
    * @GNUTLS_A_BAD_CERTIFICATE: Certificate is bad.
    * @GNUTLS_A_UNSUPPORTED_CERTIFICATE: Certificate is not supported.
    * @GNUTLS_A_CERTIFICATE_REVOKED: Certificate was revoked.
@@ -408,7 +409,7 @@ extern "C" {
     } gnutls_handshake_description_t;
 
   /**
-   * gnutls_handshake_description_t:
+   * gnutls_certificate_status_t:
    * @GNUTLS_CERT_INVALID: Will be set if the certificate was not
    *   verified.
    * @GNUTLS_CERT_REVOKED: Certificate revoked.  In X.509 this will be
