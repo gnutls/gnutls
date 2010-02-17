@@ -42,12 +42,20 @@ extern "C"
   /* TLS/IA stuff
    */
 
+  /**
+   * gnutls_ia_apptype_t:
+   * @GNUTLS_IA_APPLICATION_PAYLOAD: TLS/IA application payload.
+   * @GNUTLS_IA_INTERMEDIATE_PHASE_FINISHED: TLS/IA intermediate phase finished.
+   * @GNUTLS_IA_FINAL_PHASE_FINISHED: TLS/IA final phase finished.
+   *
+   * Enumeration of different certificate encoding formats.
+   */
   typedef enum
-  {
-    GNUTLS_IA_APPLICATION_PAYLOAD = 0,
-    GNUTLS_IA_INTERMEDIATE_PHASE_FINISHED = 1,
-    GNUTLS_IA_FINAL_PHASE_FINISHED = 2
-  } gnutls_ia_apptype_t;
+    {
+      GNUTLS_IA_APPLICATION_PAYLOAD = 0,
+      GNUTLS_IA_INTERMEDIATE_PHASE_FINISHED = 1,
+      GNUTLS_IA_FINAL_PHASE_FINISHED = 2
+    } gnutls_ia_apptype_t;
 
   /* TLS/IA credential
    */
