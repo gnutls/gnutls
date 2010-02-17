@@ -289,8 +289,8 @@ extern "C" {
 
   /**
    * gnutls_alert_level_t:
-   * @GNUTLS_AL_WARNING: TLS alert of warning severity.
-   * @GNUTLS_AL_FATAL: TLS alert of fatal severity.
+   * @GNUTLS_AL_WARNING: Alert of warning severity.
+   * @GNUTLS_AL_FATAL: Alert of fatal severity.
    *
    * Enumeration of different TLS alert severities.
    */
