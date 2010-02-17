@@ -697,17 +697,25 @@ extern "C" {
   typedef int (*gnutls_ext_send_func) (gnutls_session_t session,
 				       unsigned char *data, size_t len);
 
-  /* This flag indicates for an extension whether
-   * it is useful to application level or TLS level only.
-   * This is (only) used to parse the application level extensions
-   * before the user_hello callback is called.
+  /**
+   * gnutls_ext_parse_type_t:
+   * @GNUTLS_EXT_ANY: Any extension type.
+   * @GNUTLS_EXT_APPLICATION: Application extension.
+   * @GNUTLS_EXT_TLS: TLS-internal extension.
+   * @GNUTLS_EXT_RESUMED: Extension parsed even if resuming.
+   *
+   * Enumeration of different TLS extension types.  This flag
+   * indicates for an extension whether it is useful to application
+   * level or TLS level only.  This is (only) used to parse the
+   * application level extensions before the "client_hello" callback
+   * is called.
    */
   typedef enum
     {
-      GNUTLS_EXT_ANY,
-      GNUTLS_EXT_APPLICATION,
-      GNUTLS_EXT_TLS,
-      GNUTLS_EXT_RESUMED, /* parse even if resuming */
+      GNUTLS_EXT_ANY = 0,
+      GNUTLS_EXT_APPLICATION = 1,
+      GNUTLS_EXT_TLS = 2,
+      GNUTLS_EXT_RESUMED = 3
     } gnutls_ext_parse_type_t;
 
   int gnutls_ext_register (int type,
