@@ -1139,7 +1139,7 @@ parse_version_string (const char *s, int *major, int *minor, int *micro)
 }
 
 /**
- * asn1_check_version - check for library version
+ * asn1_check_version:
  * @req_version: Required version number, or NULL.
  *
  * Check that the version of the library is at minimum the

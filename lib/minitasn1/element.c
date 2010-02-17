@@ -163,116 +163,115 @@ _asn1_append_sequence_set (ASN1_TYPE node)
 
 
 /**
-  * asn1_write_value - Set the value of one element inside a structure.
-  * @node_root: pointer to a structure
-  * @name: the name of the element inside the structure that you want to set.
-  * @ivalue: vector used to specify the value to set. If len is >0,
-  *   VALUE must be a two's complement form integer.  if len=0 *VALUE
-  *   must be a null terminated string with an integer value.
-  * @len: number of bytes of *value to use to set the value:
-  *   value[0]..value[len-1] or 0 if value is a null terminated string
-  *
-  * Set the value of one element inside a structure.
-  *
-  * If an element is OPTIONAL and you want to delete it, you must use
-  * the value=NULL and len=0.  Using "pkix.asn":
-  *
-  * result=asn1_write_value(cert, "tbsCertificate.issuerUniqueID",
-  * NULL, 0);
-  *
-  * Description for each type:
-  *
-  * INTEGER: VALUE must contain a two's complement form integer.
-  *
-  *            value[0]=0xFF ,               len=1 -> integer=-1.
-  *            value[0]=0xFF value[1]=0xFF , len=2 -> integer=-1.
-  *            value[0]=0x01 ,               len=1 -> integer= 1.
-  *            value[0]=0x00 value[1]=0x01 , len=2 -> integer= 1.
-  *            value="123"                 , len=0 -> integer= 123.
-  *
-  * ENUMERATED: As INTEGER (but only with not negative numbers).
-  *
-  * BOOLEAN: VALUE must be the null terminated string "TRUE" or
-  *   "FALSE" and LEN != 0.
-  *
-  *            value="TRUE" , len=1 -> boolean=TRUE.
-  *            value="FALSE" , len=1 -> boolean=FALSE.
-  *
-  * OBJECT IDENTIFIER: VALUE must be a null terminated string with
-  *   each number separated by a dot (e.g. "1.2.3.543.1").  LEN != 0.
-  *
-  *            value="1 2 840 10040 4 3" , len=1 -> OID=dsa-with-sha.
-  *
-  * UTCTime: VALUE must be a null terminated string in one of these
-  *   formats: "YYMMDDhhmmssZ", "YYMMDDhhmmssZ",
-  *   "YYMMDDhhmmss+hh'mm'", "YYMMDDhhmmss-hh'mm'",
-  *   "YYMMDDhhmm+hh'mm'", or "YYMMDDhhmm-hh'mm'".  LEN != 0.
-  *
-  *            value="9801011200Z" , len=1 -> time=Jannuary 1st, 1998
-  *            at 12h 00m Greenwich Mean Time
-  *
-  * GeneralizedTime: VALUE must be in one of this format:
-  *   "YYYYMMDDhhmmss.sZ", "YYYYMMDDhhmmss.sZ",
-  *   "YYYYMMDDhhmmss.s+hh'mm'", "YYYYMMDDhhmmss.s-hh'mm'",
-  *   "YYYYMMDDhhmm+hh'mm'", or "YYYYMMDDhhmm-hh'mm'" where ss.s
-  *   indicates the seconds with any precision like "10.1" or "01.02".
-  *   LEN != 0
-  *
-  *            value="2001010112001.12-0700" , len=1 -> time=Jannuary
-  *            1st, 2001 at 12h 00m 01.12s Pacific Daylight Time
-  *
-  * OCTET STRING: VALUE contains the octet string and LEN is the
-  *   number of octets.
-  *
-  *            value="$\backslash$x01$\backslash$x02$\backslash$x03" ,
-  *            len=3 -> three bytes octet string
-  *
-  * GeneralString: VALUE contains the generalstring and LEN is the
-  *   number of octets.
-  *
-  *            value="$\backslash$x01$\backslash$x02$\backslash$x03" ,
-  *            len=3 -> three bytes generalstring
-  *
-  * BIT STRING: VALUE contains the bit string organized by bytes and
-  *   LEN is the number of bits.
-  *
-  *   value="$\backslash$xCF" , len=6 -> bit string="110011" (six
-  *   bits)
-  *
-  * CHOICE: if NAME indicates a choice type, VALUE must specify one of
-  *   the alternatives with a null terminated string. LEN != 0. Using
-  *   "pkix.asn"\:
-  *
-  *           result=asn1_write_value(cert,
-  *           "certificate1.tbsCertificate.subject", "rdnSequence",
-  *           1);
-  *
-  * ANY: VALUE indicates the der encoding of a structure.  LEN != 0.
-  *
-  * SEQUENCE OF: VALUE must be the null terminated string "NEW" and
-  *   LEN != 0. With this instruction another element is appended in
-  *   the sequence. The name of this element will be "?1" if it's the
-  *   first one, "?2" for the second and so on.
-  *
-  *   Using "pkix.asn"\:
-  *
-  *   result=asn1_write_value(cert,
-  *   "certificate1.tbsCertificate.subject.rdnSequence", "NEW", 1);
-  *
-  * SET OF: the same as SEQUENCE OF.  Using "pkix.asn":
-  *
-  *           result=asn1_write_value(cert,
-  *           "tbsCertificate.subject.rdnSequence.?LAST", "NEW", 1);
-  *
-  * Returns:
-  *
-  *   ASN1_SUCCESS: Set value OK.
-  *
-  *   ASN1_ELEMENT_NOT_FOUND: NAME is not a valid element.
-  *
-  *   ASN1_VALUE_NOT_VALID: VALUE has a wrong format.
-  *
-  **/
+ * asn1_write_value:
+ * @node_root: pointer to a structure
+ * @name: the name of the element inside the structure that you want to set.
+ * @ivalue: vector used to specify the value to set. If len is >0,
+ *   VALUE must be a two's complement form integer.  if len=0 *VALUE
+ *   must be a null terminated string with an integer value.
+ * @len: number of bytes of *value to use to set the value:
+ *   value[0]..value[len-1] or 0 if value is a null terminated string
+ *
+ * Set the value of one element inside a structure.
+ *
+ * If an element is OPTIONAL and you want to delete it, you must use
+ * the value=NULL and len=0.  Using "pkix.asn":
+ *
+ * result=asn1_write_value(cert, "tbsCertificate.issuerUniqueID",
+ * NULL, 0);
+ *
+ * Description for each type:
+ *
+ * INTEGER: VALUE must contain a two's complement form integer.
+ *
+ *            value[0]=0xFF ,               len=1 -> integer=-1.
+ *            value[0]=0xFF value[1]=0xFF , len=2 -> integer=-1.
+ *            value[0]=0x01 ,               len=1 -> integer= 1.
+ *            value[0]=0x00 value[1]=0x01 , len=2 -> integer= 1.
+ *            value="123"                 , len=0 -> integer= 123.
+ *
+ * ENUMERATED: As INTEGER (but only with not negative numbers).
+ *
+ * BOOLEAN: VALUE must be the null terminated string "TRUE" or
+ *   "FALSE" and LEN != 0.
+ *
+ *            value="TRUE" , len=1 -> boolean=TRUE.
+ *            value="FALSE" , len=1 -> boolean=FALSE.
+ *
+ * OBJECT IDENTIFIER: VALUE must be a null terminated string with
+ *   each number separated by a dot (e.g. "1.2.3.543.1").  LEN != 0.
+ *
+ *            value="1 2 840 10040 4 3" , len=1 -> OID=dsa-with-sha.
+ *
+ * UTCTime: VALUE must be a null terminated string in one of these
+ *   formats: "YYMMDDhhmmssZ", "YYMMDDhhmmssZ",
+ *   "YYMMDDhhmmss+hh'mm'", "YYMMDDhhmmss-hh'mm'",
+ *   "YYMMDDhhmm+hh'mm'", or "YYMMDDhhmm-hh'mm'".  LEN != 0.
+ *
+ *            value="9801011200Z" , len=1 -> time=Jannuary 1st, 1998
+ *            at 12h 00m Greenwich Mean Time
+ *
+ * GeneralizedTime: VALUE must be in one of this format:
+ *   "YYYYMMDDhhmmss.sZ", "YYYYMMDDhhmmss.sZ",
+ *   "YYYYMMDDhhmmss.s+hh'mm'", "YYYYMMDDhhmmss.s-hh'mm'",
+ *   "YYYYMMDDhhmm+hh'mm'", or "YYYYMMDDhhmm-hh'mm'" where ss.s
+ *   indicates the seconds with any precision like "10.1" or "01.02".
+ *   LEN != 0
+ *
+ *            value="2001010112001.12-0700" , len=1 -> time=Jannuary
+ *            1st, 2001 at 12h 00m 01.12s Pacific Daylight Time
+ *
+ * OCTET STRING: VALUE contains the octet string and LEN is the
+ *   number of octets.
+ *
+ *            value="$\backslash$x01$\backslash$x02$\backslash$x03" ,
+ *            len=3 -> three bytes octet string
+ *
+ * GeneralString: VALUE contains the generalstring and LEN is the
+ *   number of octets.
+ *
+ *            value="$\backslash$x01$\backslash$x02$\backslash$x03" ,
+ *            len=3 -> three bytes generalstring
+ *
+ * BIT STRING: VALUE contains the bit string organized by bytes and
+ *   LEN is the number of bits.
+ *
+ *   value="$\backslash$xCF" , len=6 -> bit string="110011" (six
+ *   bits)
+ *
+ * CHOICE: if NAME indicates a choice type, VALUE must specify one of
+ *   the alternatives with a null terminated string. LEN != 0. Using
+ *   "pkix.asn"\:
+ *
+ *           result=asn1_write_value(cert,
+ *           "certificate1.tbsCertificate.subject", "rdnSequence",
+ *           1);
+ *
+ * ANY: VALUE indicates the der encoding of a structure.  LEN != 0.
+ *
+ * SEQUENCE OF: VALUE must be the null terminated string "NEW" and
+ *   LEN != 0. With this instruction another element is appended in
+ *   the sequence. The name of this element will be "?1" if it's the
+ *   first one, "?2" for the second and so on.
+ *
+ *   Using "pkix.asn"\:
+ *
+ *   result=asn1_write_value(cert,
+ *   "certificate1.tbsCertificate.subject.rdnSequence", "NEW", 1);
+ *
+ * SET OF: the same as SEQUENCE OF.  Using "pkix.asn":
+ *
+ *           result=asn1_write_value(cert,
+ *           "tbsCertificate.subject.rdnSequence.?LAST", "NEW", 1);
+ *
+ * Returns:
+ *
+ *   %ASN1_SUCCESS: Set value OK.
+ *
+ *   %ASN1_ELEMENT_NOT_FOUND: NAME is not a valid element.
+ *
+ *   %ASN1_VALUE_NOT_VALID: VALUE has a wrong format.
+ **/
 asn1_retCode
 asn1_write_value (ASN1_TYPE node_root, const char *name,
 		  const void *ivalue, int len)
@@ -645,71 +644,70 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
 	}
 
 /**
-  * asn1_read_value - Returns the value of one element inside a structure
-  * @root: pointer to a structure.
-  * @name: the name of the element inside a structure that you want to read.
-  * @ivalue: vector that will contain the element's content, must be a
-  *   pointer to memory cells already allocated.
-  * @len: number of bytes of *value: value[0]..value[len-1]. Initialy
-  *   holds the sizeof value.
-  *
-  * Returns the value of one element inside a structure.
-  *
-  * If an element is OPTIONAL and the function "read_value" returns
-  * %ASN1_ELEMENT_NOT_FOUND, it means that this element wasn't present
-  * in the der encoding that created the structure.  The first element
-  * of a SEQUENCE_OF or SET_OF is named "?1". The second one "?2" and
-  * so on.
-  *
-  * INTEGER: VALUE will contain a two's complement form integer.
-  *
-  *            integer=-1  -> value[0]=0xFF , len=1.
-  *            integer=1   -> value[0]=0x01 , len=1.
-  *
-  * ENUMERATED: As INTEGER (but only with not negative numbers).
-  *
-  * BOOLEAN: VALUE will be the null terminated string "TRUE" or
-  *   "FALSE" and LEN=5 or LEN=6.
-  *
-  * OBJECT IDENTIFIER: VALUE will be a null terminated string with
-  *   each number separated by a dot (i.e. "1.2.3.543.1").
-  *
-  *                      LEN = strlen(VALUE)+1
-  *
-  * UTCTime: VALUE will be a null terminated string in one of these
-  *   formats: "YYMMDDhhmmss+hh'mm'" or "YYMMDDhhmmss-hh'mm'".
-  *   LEN=strlen(VALUE)+1.
-  *
-  * GeneralizedTime: VALUE will be a null terminated string in the
-  *   same format used to set the value.
-  *
-  * OCTET STRING: VALUE will contain the octet string and LEN will be
-  *   the number of octets.
-  *
-  * GeneralString: VALUE will contain the generalstring and LEN will
-  *   be the number of octets.
-  *
-  * BIT STRING: VALUE will contain the bit string organized by bytes
-  *   and LEN will be the number of bits.
-  *
-  * CHOICE: If NAME indicates a choice type, VALUE will specify the
-  *   alternative selected.
-  *
-  * ANY: If NAME indicates an any type, VALUE will indicate the DER
-  *   encoding of the structure actually used.
-  *
-  * Returns:
-  *
-  *   ASN1_SUCCESS: Set value OK.
-  *
-  *   ASN1_ELEMENT_NOT_FOUND: NAME is not a valid element.
-  *
-  *   ASN1_VALUE_NOT_FOUND: There isn't any value for the element selected.
-  *
-  *   ASN1_MEM_ERROR: The value vector isn't big enough to store the result.
-  *   In this case LEN will contain the number of bytes needed.
-  *
-  **/
+ * asn1_read_value:
+ * @root: pointer to a structure.
+ * @name: the name of the element inside a structure that you want to read.
+ * @ivalue: vector that will contain the element's content, must be a
+ *   pointer to memory cells already allocated.
+ * @len: number of bytes of *value: value[0]..value[len-1]. Initialy
+ *   holds the sizeof value.
+ *
+ * Returns the value of one element inside a structure.
+ *
+ * If an element is OPTIONAL and the function "read_value" returns
+ * %ASN1_ELEMENT_NOT_FOUND, it means that this element wasn't present
+ * in the der encoding that created the structure.  The first element
+ * of a SEQUENCE_OF or SET_OF is named "?1". The second one "?2" and
+ * so on.
+ *
+ * INTEGER: VALUE will contain a two's complement form integer.
+ *
+ *            integer=-1  -> value[0]=0xFF , len=1.
+ *            integer=1   -> value[0]=0x01 , len=1.
+ *
+ * ENUMERATED: As INTEGER (but only with not negative numbers).
+ *
+ * BOOLEAN: VALUE will be the null terminated string "TRUE" or
+ *   "FALSE" and LEN=5 or LEN=6.
+ *
+ * OBJECT IDENTIFIER: VALUE will be a null terminated string with
+ *   each number separated by a dot (i.e. "1.2.3.543.1").
+ *
+ *                      LEN = strlen(VALUE)+1
+ *
+ * UTCTime: VALUE will be a null terminated string in one of these
+ *   formats: "YYMMDDhhmmss+hh'mm'" or "YYMMDDhhmmss-hh'mm'".
+ *   LEN=strlen(VALUE)+1.
+ *
+ * GeneralizedTime: VALUE will be a null terminated string in the
+ *   same format used to set the value.
+ *
+ * OCTET STRING: VALUE will contain the octet string and LEN will be
+ *   the number of octets.
+ *
+ * GeneralString: VALUE will contain the generalstring and LEN will
+ *   be the number of octets.
+ *
+ * BIT STRING: VALUE will contain the bit string organized by bytes
+ *   and LEN will be the number of bits.
+ *
+ * CHOICE: If NAME indicates a choice type, VALUE will specify the
+ *   alternative selected.
+ *
+ * ANY: If NAME indicates an any type, VALUE will indicate the DER
+ *   encoding of the structure actually used.
+ *
+ * Returns:
+ *
+ *   %ASN1_SUCCESS: Set value OK.
+ *
+ *   %ASN1_ELEMENT_NOT_FOUND: NAME is not a valid element.
+ *
+ *   %ASN1_VALUE_NOT_FOUND: There isn't any value for the element selected.
+ *
+ *   %ASN1_MEM_ERROR: The value vector isn't big enough to store the result.
+ *   In this case LEN will contain the number of bytes needed.
+ **/
 asn1_retCode
 asn1_read_value (ASN1_TYPE root, const char *name, void *ivalue, int *len)
 {
@@ -874,24 +872,23 @@ asn1_read_value (ASN1_TYPE root, const char *name, void *ivalue, int *len)
 
 
 /**
-  * asn1_read_tag - Returns the TAG of one element inside a structure
-  * @root: pointer to a structure
-  * @name: the name of the element inside a structure.
-  * @tagValue:  variable that will contain the TAG value.
-  * @classValue: variable that will specify the TAG type.
-  *
-  * Returns the TAG and the CLASS of one element inside a structure.
-  * CLASS can have one of these constants: %ASN1_CLASS_APPLICATION,
-  * %ASN1_CLASS_UNIVERSAL, %ASN1_CLASS_PRIVATE or
-  * %ASN1_CLASS_CONTEXT_SPECIFIC.
-  *
-  * Returns:
-  *
-  *   ASN1_SUCCESS: Set value OK.
-  *
-  *   ASN1_ELEMENT_NOT_FOUND: NAME is not a valid element.
-  *
-  **/
+ * asn1_read_tag:
+ * @root: pointer to a structure
+ * @name: the name of the element inside a structure.
+ * @tagValue:  variable that will contain the TAG value.
+ * @classValue: variable that will specify the TAG type.
+ *
+ * Returns the TAG and the CLASS of one element inside a structure.
+ * CLASS can have one of these constants: %ASN1_CLASS_APPLICATION,
+ * %ASN1_CLASS_UNIVERSAL, %ASN1_CLASS_PRIVATE or
+ * %ASN1_CLASS_CONTEXT_SPECIFIC.
+ *
+ * Returns:
+ *
+ *   %ASN1_SUCCESS: Set value OK.
+ *
+ *   %ASN1_ELEMENT_NOT_FOUND: NAME is not a valid element.
+ **/
 asn1_retCode
 asn1_read_tag (ASN1_TYPE root, const char *name, int *tagValue,
 	       int *classValue)

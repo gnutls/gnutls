@@ -159,26 +159,26 @@ _asn1_create_static_structure (ASN1_TYPE pointer, char *output_file_name,
 
 
 /**
-  * asn1_array2tree - Creates the structures needed to manage the ASN1 definitions.
-  * @array: specify the array that contains ASN.1 declarations
-  * @definitions: return the pointer to the structure created by
-  *   *ARRAY ASN.1 declarations
-  * @errorDescription: return the error description.
-  *
-  * Creates the structures needed to manage the ASN.1 definitions.
-  * @array is a vector created by asn1_parser2array().
-  *
-  * Returns:
-  *
-  * ASN1_SUCCESS: Structure created correctly.
-  *
-  * ASN1_ELEMENT_NOT_EMPTY: *@definitions not ASN1_TYPE_EMPTY.
-  *
-  * ASN1_IDENTIFIER_NOT_FOUND: In the file there is an identifier that
-  *   is not defined (see @errorDescription for more information).
-  *
-  * ASN1_ARRAY_ERROR: The array pointed by @array is wrong.
-  **/
+ * asn1_array2tree:
+ * @array: specify the array that contains ASN.1 declarations
+ * @definitions: return the pointer to the structure created by
+ *   *ARRAY ASN.1 declarations
+ * @errorDescription: return the error description.
+ *
+ * Creates the structures needed to manage the ASN.1 definitions.
+ * @array is a vector created by asn1_parser2array().
+ *
+ * Returns:
+ *
+ * %ASN1_SUCCESS: Structure created correctly.
+ *
+ * %ASN1_ELEMENT_NOT_EMPTY: *@definitions not ASN1_TYPE_EMPTY.
+ *
+ * %ASN1_IDENTIFIER_NOT_FOUND: In the file there is an identifier that
+ *   is not defined (see @errorDescription for more information).
+ *
+ * %ASN1_ARRAY_ERROR: The array pointed by @array is wrong.
+ **/
 asn1_retCode
 asn1_array2tree (const ASN1_ARRAY_TYPE * array, ASN1_TYPE * definitions,
 		 char *errorDescription)
@@ -278,19 +278,18 @@ asn1_array2tree (const ASN1_ARRAY_TYPE * array, ASN1_TYPE * definitions,
 }
 
 /**
-  * asn1_delete_structure - Deletes the structure pointed by *ROOT.
-  * @structure: pointer to the structure that you want to delete.
-  *
-  * Deletes the structure *@structure.  At the end, *@structure is set
-  * to ASN1_TYPE_EMPTY.
-  *
-  * Returns:
-  *
-  * ASN1_SUCCESS: Everything OK.
-  *
-  * ASN1_ELEMENT_NOT_FOUND: *@structure was ASN1_TYPE_EMPTY.
-  *
-  **/
+ * asn1_delete_structure:
+ * @structure: pointer to the structure that you want to delete.
+ *
+ * Deletes the structure *@structure.  At the end, *@structure is set
+ * to ASN1_TYPE_EMPTY.
+ *
+ * Returns:
+ *
+ * %ASN1_SUCCESS: Everything OK.
+ *
+ * %ASN1_ELEMENT_NOT_FOUND: *@structure was ASN1_TYPE_EMPTY.
+ **/
 asn1_retCode
 asn1_delete_structure (ASN1_TYPE * structure)
 {
@@ -345,20 +344,19 @@ asn1_delete_structure (ASN1_TYPE * structure)
 
 
 /**
-  * asn1_delete_element - Deletes the element of a structure.
-  * @structure: pointer to the structure that contains the element you
-  *   want to delete.
-  * @element_name: element's name you want to delete.
-  *
-  * Deletes the element named *@element_name inside *@structure.
-  *
-  * Returns:
-  *
-  * ASN1_SUCCESS: Everything OK.
-  *
-  * ASN1_ELEMENT_NOT_FOUND: The name element was not found.
-  *
-  **/
+ * asn1_delete_element:
+ * @structure: pointer to the structure that contains the element you
+ *   want to delete.
+ * @element_name: element's name you want to delete.
+ *
+ * Deletes the element named *@element_name inside *@structure.
+ *
+ * Returns:
+ *
+ * %ASN1_SUCCESS: Everything OK.
+ *
+ * %ASN1_ELEMENT_NOT_FOUND: The name element was not found.
+ **/
 asn1_retCode
 asn1_delete_element (ASN1_TYPE structure, const char *element_name)
 {
@@ -661,24 +659,23 @@ _asn1_expand_identifier (ASN1_TYPE * node, ASN1_TYPE root)
 
 
 /**
-  * asn1_create_element - Creates a structure of type SOURCE_NAME.
-  * @definitions: pointer to the structure returned by "parser_asn1" function
-  * @source_name: the name of the type of the new structure (must be
-  *   inside p_structure).
-  * @element: pointer to the structure created.
-  *
-  * Creates a structure of type @source_name.  Example using
-  *  "pkix.asn":
-  *
-  * rc = asn1_create_element(cert_def, "PKIX1.Certificate",
-  * certptr);
-  *
-  * Returns:
-  *
-  * ASN1_SUCCESS: Creation OK.
-  *
-  * ASN1_ELEMENT_NOT_FOUND: SOURCE_NAME isn't known
-  **/
+ * asn1_create_element:
+ * @definitions: pointer to the structure returned by "parser_asn1" function
+ * @source_name: the name of the type of the new structure (must be
+ *   inside p_structure).
+ * @element: pointer to the structure created.
+ *
+ * Creates a structure of type @source_name.  Example using
+ *  "pkix.asn":
+ *
+ * rc = asn1_create_element(cert_def, "PKIX1.Certificate", certptr);
+ *
+ * Returns:
+ *
+ * %ASN1_SUCCESS: Creation OK.
+ *
+ * %ASN1_ELEMENT_NOT_FOUND: SOURCE_NAME isn't known
+ **/
 asn1_retCode
 asn1_create_element (ASN1_TYPE definitions, const char *source_name,
 		     ASN1_TYPE * element)
@@ -703,17 +700,17 @@ asn1_create_element (ASN1_TYPE definitions, const char *source_name,
 
 
 /**
-  * asn1_print_structure - Prints on the standard output the structure's tree
-  * @out: pointer to the output file (e.g. stdout).
-  * @structure: pointer to the structure that you want to visit.
-  * @name: an element of the structure
-  * @mode: specify how much of the structure to print, can be
-  *   %ASN1_PRINT_NAME, %ASN1_PRINT_NAME_TYPE,
-  *   %ASN1_PRINT_NAME_TYPE_VALUE, or %ASN1_PRINT_ALL.
-  *
-  * Prints on the @out file descriptor the structure's tree starting
-  * from the @name element inside the structure @structure.
-  **/
+ * asn1_print_structure:
+ * @out: pointer to the output file (e.g. stdout).
+ * @structure: pointer to the structure that you want to visit.
+ * @name: an element of the structure
+ * @mode: specify how much of the structure to print, can be
+ *   %ASN1_PRINT_NAME, %ASN1_PRINT_NAME_TYPE,
+ *   %ASN1_PRINT_NAME_TYPE_VALUE, or %ASN1_PRINT_ALL.
+ *
+ * Prints on the @out file descriptor the structure's tree starting
+ * from the @name element inside the structure @structure.
+ **/
 void
 asn1_print_structure (FILE * out, ASN1_TYPE structure, const char *name,
 		      int mode)
@@ -1067,23 +1064,22 @@ asn1_print_structure (FILE * out, ASN1_TYPE structure, const char *name,
 
 
 /**
-  * asn1_number_of_elements - Counts the number of elements of a structure.
-  * @element: pointer to the root of an ASN1 structure.
-  * @name: the name of a sub-structure of ROOT.
-  * @num: pointer to an integer where the result will be stored
-  *
-  * Counts the number of elements of a sub-structure called NAME with
-  * names equal to "?1","?2", ...
-  *
-  * Returns:
-  *
-  *  ASN1_SUCCESS: Creation OK.
-  *
-  *  ASN1_ELEMENT_NOT_FOUND: NAME isn't known.
-  *
-  *  ASN1_GENERIC_ERROR: Pointer num equal to NULL.
-  *
-  **/
+ * asn1_number_of_elements:
+ * @element: pointer to the root of an ASN1 structure.
+ * @name: the name of a sub-structure of ROOT.
+ * @num: pointer to an integer where the result will be stored
+ *
+ * Counts the number of elements of a sub-structure called NAME with
+ * names equal to "?1","?2", ...
+ *
+ * Returns:
+ *
+ *  %ASN1_SUCCESS: Creation OK.
+ *
+ *  %ASN1_ELEMENT_NOT_FOUND: NAME isn't known.
+ *
+ *  %ASN1_GENERIC_ERROR: Pointer num equal to NULL.
+ **/
 asn1_retCode
 asn1_number_of_elements (ASN1_TYPE element, const char *name, int *num)
 {
@@ -1112,17 +1108,16 @@ asn1_number_of_elements (ASN1_TYPE element, const char *name, int *num)
 
 
 /**
-  * asn1_find_structure_from_oid - Locate structure defined by a specific OID.
-  * @definitions: ASN1 definitions
-  * @oidValue: value of the OID to search (e.g. "1.2.3.4").
-  *
-  * Search the structure that is defined just after an OID definition.
-  *
-  * Returns: NULL when OIDVALUE not found, otherwise the pointer to a
-  *   constant string that contains the element name defined just
-  *   after the OID.
-  *
-  **/
+ * asn1_find_structure_from_oid:
+ * @definitions: ASN1 definitions
+ * @oidValue: value of the OID to search (e.g. "1.2.3.4").
+ *
+ * Search the structure that is defined just after an OID definition.
+ *
+ * Returns: %NULL when @oidValue not found, otherwise the pointer to a
+ *   constant string that contains the element name defined just after
+ *   the OID.
+ **/
 const char *
 asn1_find_structure_from_oid (ASN1_TYPE definitions, const char *oidValue)
 {
@@ -1176,7 +1171,7 @@ asn1_find_structure_from_oid (ASN1_TYPE definitions, const char *oidValue)
  *
  * Create a deep copy of a ASN1_TYPE variable.
  *
- * Return value: Return ASN1_SUCCESS on success.
+ * Return value: Return %ASN1_SUCCESS on success.
  **/
 asn1_retCode
 asn1_copy_node (ASN1_TYPE dst, const char *dst_name,
