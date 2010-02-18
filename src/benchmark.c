@@ -28,6 +28,7 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
 #include <time.h>
+#include "timespec.h" /* gnulib gettime */
 
 static unsigned char data[64 * 1024];
 
@@ -68,7 +69,7 @@ cipher_bench (int algo, int size)
   printf ("Checking %s (%dkb payload)... ", gnutls_cipher_get_name (algo),
 	  size);
   fflush (stdout);
-  clock_gettime (CLOCK_MONOTONIC, &start);
+  gettime (&start);
 
   ret = gnutls_cipher_init (&ctx, algo, &key, &iv);
   if (ret < 0)
@@ -85,11 +86,10 @@ cipher_bench (int algo, int size)
 
   gnutls_cipher_deinit (ctx);
 
-  clock_gettime (CLOCK_MONOTONIC, &stop);
+  gettime (&stop);
 
-  secs =
-    (stop.tv_sec * 1000 + stop.tv_nsec / (1000 * 1000) -
-     (start.tv_sec * 1000 + start.tv_nsec / (1000 * 1000)));
+  secs = (stop.tv_sec * 1000 + stop.tv_nsec / (1000 * 1000) -
+	  (start.tv_sec * 1000 + start.tv_nsec / (1000 * 1000)));
   secs /= 1000;
   dd = (((double) data_size / (double) secs)) / 1000;
   printf ("Encrypted %ld kb in %.2f secs: ", data_size / 1000, secs);
@@ -121,7 +121,7 @@ mac_bench (int algo, int size)
 
   printf ("Checking %s (%dkb payload)... ", gnutls_mac_get_name (algo), size);
   fflush (stdout);
-  clock_gettime (CLOCK_MONOTONIC, &start);
+  gettime (&start);
 
   for (i = 0; i < TOTAL_ITER; i++)
     {
@@ -129,7 +129,7 @@ mac_bench (int algo, int size)
       data_size += size * 1024;
     }
 
-  clock_gettime (CLOCK_MONOTONIC, &stop);
+  gettime (&stop);
 
   secs =
     (stop.tv_sec * 1000 + stop.tv_nsec / (1000 * 1000) -
@@ -140,7 +140,6 @@ mac_bench (int algo, int size)
   printf ("%.2f kbyte/sec\n", dd);
 
   free (_key);
-
 }
 
 int
