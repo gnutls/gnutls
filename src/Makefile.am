@@ -63,7 +63,7 @@ libcmd_psk_la_CFLAGS =
 libcmd_psk_la_SOURCES = psk.gaa psk-gaa.h psk-gaa.c
 
 benchmark_SOURCES = benchmark.c
-benchmark_LDADD = ../lib/libgnutls.la ../gl/libgnu.la -lrt
+benchmark_LDADD = ../lib/libgnutls.la ../gl/libgnu.la $(LIB_CLOCK_GETTIME)
 
 gnutls_cli_SOURCES = cli.c common.h common.c
 gnutls_cli_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
