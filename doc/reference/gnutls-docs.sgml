@@ -6,7 +6,7 @@
     <title>GNU TLS API Reference Manual</title>
   </bookinfo>
 
-  <chapter>
+  <chapter id="intro">
     <title>GNU TLS API Reference Manual</title>
 
     <para>
@@ -30,22 +30,22 @@
     <xi:include href="xml/openssl.xml"/>
   </chapter>
 
-  <index>
-    <title>Index</title>
+  <index id="api-index-full">
+    <title>Index of all symbols</title>
   </index>
-  <index role="deprecated">
+  <index role="deprecated" id="api-index-deprecated">
     <title>Index of deprecated symbols</title>
   </index>
-  <index role="2.4.0">
+  <index role="2.4.0" id="api-index-2-4-0">
     <title>Index of new symbols in 2.4.0</title>
   </index>
-  <index role="2.6.0">
+  <index role="2.6.0" id="api-index-2-6-0">
     <title>Index of new symbols in 2.6.0</title>
   </index>
-  <index role="2.8.0">
+  <index role="2.8.0" id="api-index-2-8-0">
     <title>Index of new symbols in 2.8.0</title>
   </index>
-  <index role="2.10.0">
+  <index role="2.10.0" id="api-index-2-10-0">
     <title>Index of new symbols in 2.10.0</title>
   </index>
 </book>
