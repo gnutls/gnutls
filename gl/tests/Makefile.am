@@ -148,15 +148,6 @@ EXTRA_DIST += test-getline.c signature.h macros.h
 
 ## end   gnulib module getline-tests
 
-## begin gnulib module gettimeofday
-
-
-EXTRA_DIST += gettimeofday.c
-
-EXTRA_libtests_a_SOURCES += gettimeofday.c
-
-## end   gnulib module gettimeofday
-
 ## begin gnulib module gettimeofday-tests
 
 TESTS += test-gettimeofday

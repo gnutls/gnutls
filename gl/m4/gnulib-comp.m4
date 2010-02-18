@@ -65,6 +65,7 @@ AC_SUBST([LTALLOCA])
     AC_LIBOBJ([bind])
   fi
   gl_SYS_SOCKET_MODULE_INDICATOR([bind])
+  gl_CLOCK_TIME
   gl_FUNC_CLOSE
   gl_UNISTD_MODULE_INDICATOR([close])
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
@@ -91,6 +92,9 @@ AC_SUBST([LTALLOCA])
   gl_FUNC_GETPASS_GNU
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
+  gl_GETTIME
+  gl_FUNC_GETTIMEOFDAY
+  gl_SYS_TIME_MODULE_INDICATOR([gettimeofday])
   # Autoconf 2.61a.99 and earlier don't support linking a file only
   # in VPATH builds.  But since GNUmakefile is for maintainer use
   # only, it does not matter if we skip the link with older autoconf.
@@ -191,6 +195,7 @@ AC_SUBST([LTALLOCA])
   gl_HEADER_SYS_TIME_H
   AC_PROG_MKDIR_P
   gl_HEADER_TIME_H
+  gl_TIMESPEC
   gl_UNISTD_H
   gl_FUNC_VASNPRINTF
   gl_VERSION_ETC
@@ -237,8 +242,6 @@ AC_SUBST([LTALLOCA])
   gl_COMMON
   gl_source_base='gl/tests'
   gl_FUNC_UNGETC_WORKS
-  gl_FUNC_GETTIMEOFDAY
-  gl_SYS_TIME_MODULE_INDICATOR([gettimeofday])
   AC_C_BIGENDIAN
   AC_C_BIGENDIAN
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
@@ -393,6 +396,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/getpass.c
   lib/getpass.h
   lib/gettext.h
+  lib/gettime.c
+  lib/gettimeofday.c
   lib/inet_ntop.c
   lib/inet_pton.c
   lib/intprops.h
@@ -440,6 +445,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/sys_stat.in.h
   lib/sys_time.in.h
   lib/time.in.h
+  lib/timespec.h
   lib/unistd.in.h
   lib/vasnprintf.c
   lib/vasnprintf.h
@@ -453,6 +459,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/alloca.m4
   m4/arpa_inet_h.m4
   m4/autobuild.m4
+  m4/clock_time.m4
   m4/close.m4
   m4/errno_h.m4
   m4/error.m4
@@ -464,6 +471,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/getdelim.m4
   m4/getline.m4
   m4/getpass.m4
+  m4/gettime.m4
   m4/gettimeofday.m4
   m4/gnulib-common.m4
   m4/hostent.m4
@@ -512,6 +520,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/sys_stat_h.m4
   m4/sys_time_h.m4
   m4/time_h.m4
+  m4/timespec.m4
   m4/ungetc.m4
   m4/unistd_h.m4
   m4/vasnprintf.m4
@@ -576,7 +585,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-wchar.c
   tests/zerosize-ptr.h
   tests=lib/dummy.c
-  tests=lib/gettimeofday.c
   tests=lib/ioctl.c
   tests=lib/sys_ioctl.in.h
   tests=lib/verify.h
