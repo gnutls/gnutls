@@ -41,6 +41,7 @@
 /* public key algorithm's OIDs
  */
 #define PK_PKIX1_RSA_OID "1.2.840.113549.1.1.1"
+#define PK_X509_RSA_OID "2.5.8.1.1"
 #define PK_DSA_OID "1.2.840.10040.4.1"
 #define PK_GOST_R3410_94_OID "1.2.643.2.2.20"
 #define PK_GOST_R3410_2001_OID "1.2.643.2.2.19"

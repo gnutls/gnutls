@@ -1284,10 +1284,14 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
     }
 
   algo = _gnutls_x509_oid2pk_algorithm (oid);
+  if (algo == GNUTLS_PK_UNKNOWN)
+    {
+      _gnutls_x509_log
+	("%s: unknown public key algorithm: %s\n", __func__, oid);
+    }
 
   if (bits == NULL)
     {
-      gnutls_free (str);
       return algo;
     }
 
@@ -1363,9 +1367,6 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
 	_gnutls_mpi_release (&params[3]);
       }
       break;
-    default:
-      _gnutls_x509_log
-	("_gnutls_x509_get_pk_algorithm: unhandled algorithm %d\n", algo);
     }
 
   gnutls_free (str);

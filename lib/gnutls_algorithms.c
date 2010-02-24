@@ -2174,10 +2174,13 @@ struct gnutls_pk_entry
 typedef struct gnutls_pk_entry gnutls_pk_entry;
 
 static const gnutls_pk_entry pk_algorithms[] = {
+  /* having duplicate entries is ok, as long as the one
+   * we want to return OID from is first */
   {"RSA", PK_PKIX1_RSA_OID, GNUTLS_PK_RSA},
+  {"RSA (X.509)", PK_X509_RSA_OID, GNUTLS_PK_RSA},
   {"DSA", PK_DSA_OID, GNUTLS_PK_DSA},
-  {"GOST R 34.10-2001", PK_GOST_R3410_2001_OID, 0},
-  {"GOST R 34.10-94", PK_GOST_R3410_94_OID, 0},
+  {"GOST R 34.10-2001", PK_GOST_R3410_2001_OID, GNUTLS_PK_UNKNOWN},
+  {"GOST R 34.10-94", PK_GOST_R3410_94_OID, GNUTLS_PK_UNKNOWN},
   {0, 0, 0}
 };
 
