@@ -1035,6 +1035,11 @@ do_handshake (socket_st * socket)
       socket->secure = 1;
 
     }
+  else
+    {
+      gnutls_alert_send_appropriate(socket->session, ret);
+      shutdown (socket->fd, SHUT_RDWR);
+    }
   return ret;
 }
 
