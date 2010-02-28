@@ -63,6 +63,10 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   AC_MSG_CHECKING([whether to use the included minitasn1])
   AC_MSG_RESULT($included_libtasn1)
   AM_CONDITIONAL(ENABLE_MINITASN1, test "$included_libtasn1" = "yes")
+  if test "$included_libtasn1" = "no"; then
+    GNUTLS_REQUIRES_PRIVATE="Requires.private: libtasn1"
+    AC_SUBST(GNUTLS_REQUIRES_PRIVATE)
+  fi
 
   AC_ARG_WITH(lzo,
     AS_HELP_STRING([--with-lzo], [use experimental LZO compression]),
