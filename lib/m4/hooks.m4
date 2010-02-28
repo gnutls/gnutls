@@ -65,7 +65,6 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   AM_CONDITIONAL(ENABLE_MINITASN1, test "$included_libtasn1" = "yes")
   if test "$included_libtasn1" = "no"; then
     GNUTLS_REQUIRES_PRIVATE="Requires.private: libtasn1"
-    AC_SUBST(GNUTLS_REQUIRES_PRIVATE)
   fi
 
   AC_ARG_WITH(lzo,
