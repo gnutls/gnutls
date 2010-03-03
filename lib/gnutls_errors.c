@@ -223,9 +223,13 @@ static const gnutls_error_entry error_algorithms[] = {
 	       GNUTLS_E_OPENPGP_SUBKEY_ERROR, 1),
   ERROR_ENTRY (N_("Safe renegotiation failed."),
 	       GNUTLS_E_SAFE_RENEGOTIATION_FAILED, 1),
+  ERROR_ENTRY (N_("Unsafe renegotiation denied."),
+	       GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED, 1),
 
   ERROR_ENTRY (N_("The SRP username supplied is illegal."),
 	       GNUTLS_E_ILLEGAL_SRP_USERNAME, 1),
+  ERROR_ENTRY (N_("The SRP username supplied is unknown."),
+	       GNUTLS_E_UNKNOWN_SRP_USERNAME, 1),
 
   ERROR_ENTRY (N_("The OpenPGP fingerprint is not supported."),
 	       GNUTLS_E_OPENPGP_FINGERPRINT_UNSUPPORTED, 1),

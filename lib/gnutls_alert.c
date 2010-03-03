@@ -181,6 +181,10 @@ gnutls_error_to_alert (int err, int *level)
       ret = GNUTLS_A_ILLEGAL_PARAMETER;
       _level = GNUTLS_AL_FATAL;
       break;
+    case GNUTLS_E_UNKNOWN_SRP_USERNAME:
+      ret = GNUTLS_A_UNKNOWN_PSK_IDENTITY;
+      _level = GNUTLS_AL_FATAL;
+      break;
     case GNUTLS_E_ASN1_ELEMENT_NOT_FOUND:
     case GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND:
     case GNUTLS_E_ASN1_DER_ERROR:
@@ -215,6 +219,7 @@ gnutls_error_to_alert (int err, int *level)
       _level = GNUTLS_AL_FATAL;
       break;
     case GNUTLS_E_REHANDSHAKE:
+    case GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED:
       ret = GNUTLS_A_NO_RENEGOTIATION;
       _level = GNUTLS_AL_WARNING;
       break;

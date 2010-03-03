@@ -2248,15 +2248,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 	   * alert and abort.
 	   */
 	  gnutls_assert ();
-	  ret = gnutls_alert_send (session, GNUTLS_AL_FATAL,
-				   GNUTLS_A_UNKNOWN_PSK_IDENTITY);
-	  if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      return ret;
-	    }
-
-	  return GNUTLS_E_ILLEGAL_SRP_USERNAME;
+	  return GNUTLS_E_UNKNOWN_SRP_USERNAME;
 	}
     }
 #endif
@@ -2435,22 +2427,16 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	{
 	  if (session->internals.priorities.unsafe_renegotiation != 0)
 	    {
-	      _gnutls_handshake_log ("Allowing unsafe renegotiation!\n");
+	      _gnutls_handshake_log ("Allowing unsafe (re)negotiation!\n");
 	    }
 	  else
 	    {
 	      gnutls_assert();
-	      _gnutls_handshake_log ("Denying unsafe renegotiation.\n");
-	      ret = gnutls_alert_send (session, GNUTLS_AL_WARNING,
-				   GNUTLS_A_NO_RENEGOTIATION);
-
-  	      if (ret < 0)
-	        {
-	          gnutls_assert ();
-	          return ret;
-	        }
-
-	      return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
+	      _gnutls_handshake_log ("Denying unsafe (re)negotiation.\n");
+	      if (session->security_parameters.entity == GNUTLS_SERVER)
+	        return GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED; /* send no renegotiation alert */
+              else
+ 	        return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
 	    }
 	}
       else
