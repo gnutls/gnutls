@@ -1222,7 +1222,7 @@ main (int argc, char **argv)
 			ret =
 			  gnutls_alert_send_appropriate (j->tls_session, r);
 		      }
-		    while (ret == GNUTLS_E_AGAIN);
+		    while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 		    j->http_state = HTTP_STATE_CLOSING;
 		  }
 		else if (r == 0)
@@ -1261,6 +1261,18 @@ main (int argc, char **argv)
 		            r = gnutls_handshake (j->tls_session);
                           } 
                         while (r == GNUTLS_E_INTERRUPTED || r == GNUTLS_E_AGAIN);
+                        if (r < 0) 
+                          {
+
+  		            do
+		              {
+			        ret = gnutls_alert_send_appropriate (j->tls_session, r);
+		              }
+		            while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
+                            GERR (r);
+ 		            j->http_state = HTTP_STATE_CLOSING;
+                          }
                       }
                     else
                       { 
