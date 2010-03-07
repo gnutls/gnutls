@@ -440,10 +440,10 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
    * one of the certs we trust and all the certs after that i.e. if
    * cert chain is A signed-by B signed-by C signed-by D (signed-by
    * self-signed E but already removed above), and we trust B, remove
-   * B, C and D.  We must leave the first cert on chain. */
-  if (clist_size > 1 && !(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_SAME))
+   * B, C and D. */
+  if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_SAME))
     {
-      for (i = 1; i < clist_size; i++)
+      for (i = 0; i < clist_size; i++)
 	{
 	  int j;
 
@@ -459,6 +459,11 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
 	  /* clist_size may have been changed which gets out of loop */
 	}
     }
+
+  if (clist_size == 0)
+    /* The certificate is already present in the trusted certificate list.
+     * Nothing to verify. */
+    return status;
 
   /* Verify the last certificate in the certificate path
    * against the trusted CA certificate list.
