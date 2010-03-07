@@ -53,15 +53,38 @@ static int _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
 				int tcas_size, unsigned int flags,
 				unsigned int *output);
 
-/* Checks if two certs are identical.  Return 0 onn match. */
+/* Checks if two certs are identical.  Return 0 on match. */
 static int
 check_if_same_cert (gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2)
 {
   gnutls_datum_t cert1bin = { NULL, 0 }, cert2bin =
-  {
-  NULL, 0};
+  {NULL, 0};
   int result;
+  opaque serial1[128], serial2[128];
+  size_t serial1_size, serial2_size;
 
+  serial1_size = sizeof (serial1);
+  result = gnutls_x509_crt_get_serial (cert1, serial1, &serial1_size);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      goto cmp;
+    }
+
+  serial2_size = sizeof (serial2);
+  result = gnutls_x509_crt_get_serial (cert2, serial2, &serial2_size);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      goto cmp;
+    }
+
+  if (serial2_size != serial1_size || memcmp(serial1, serial2, serial1_size) != 0)
+    {
+      return 1;
+    }
+
+cmp:
   result = _gnutls_x509_der_encode (cert1->cert, "", &cert1bin, 0);
   if (result < 0)
     {
