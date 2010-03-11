@@ -80,6 +80,9 @@ typedef struct
 } TLS_TEST;
 
 static const TLS_TEST tls_tests[] = {
+  {"for Safe renegotiation support", test_safe_renegotiation, "yes", "no", "dunno"},
+  {"for Safe renegotiation support (SCSV)", test_safe_renegotiation_scsv, "yes", "no", "dunno"},
+  {"for TLS 1.2 support", test_tls1_2, "yes", "no", "dunno"},
   {"for TLS 1.1 support", test_tls1_1, "yes", "no", "dunno"},
   {"fallback from TLS 1.1 to", test_tls1_1_fallback, "TLS 1.0", "failed",
    "SSL 3.0"},
@@ -140,14 +143,8 @@ static const TLS_TEST tls_tests[] = {
   {"for ZLIB compression support (TLS extension)", test_zlib, "yes",
    "no", "dunno"},
 #endif
-  {"for LZO compression support (GnuTLS extension)", test_lzo, "yes",
-   "no", "dunno"},
   {"for max record size (TLS extension)", test_max_record_size, "yes",
    "no", "dunno"},
-#ifdef ENABLE_SRP
-  {"for SRP authentication support (TLS extension)", test_srp, "yes",
-   "no", "dunno"},
-#endif
   {"for OpenPGP authentication support (TLS extension)", test_openpgp1,
    "yes", "no", "dunno"},
   {NULL, NULL, NULL, NULL, NULL}
@@ -234,7 +231,7 @@ main (int argc, char **argv)
 
       /* if neither of SSL3 and TLSv1 are supported, exit
        */
-      if (i > 3 && tls1_1_ok == 0 && tls1_ok == 0 && ssl3_ok == 0)
+      if (i > 6 && tls1_1_ok == 0 && tls1_ok == 0 && ssl3_ok == 0)
 	{
 	  fprintf (stderr,
 		   "\nServer does not support any of SSL 3.0, TLS 1.0 and TLS 1.1\n");
