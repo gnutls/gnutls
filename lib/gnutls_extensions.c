@@ -210,7 +210,7 @@ _gnutls_extension_list_add (gnutls_session_t session, uint16_t type)
 
 int
 _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
-			size_t data_size)
+			size_t data_size, gnutls_ext_parse_type_t parse_type)
 {
   int size;
   uint16_t pos = 0;
@@ -241,6 +241,9 @@ _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
 
       if (p->send_func == NULL)
 	continue;
+	
+      if (parse_type != GNUTLS_EXT_ANY && p->parse_type != parse_type)
+        continue;
 
       size = p->send_func (session, sdata, sdata_size);
       if (size > 0 || size == GNUTLS_E_INT_RET_0)
@@ -327,7 +330,7 @@ _gnutls_ext_init (void)
 
   ret = gnutls_ext_register (GNUTLS_EXTENSION_SAFE_RENEGOTIATION,
 			     "SAFE_RENEGOTIATION",
-			     GNUTLS_EXT_RESUMED,
+			     GNUTLS_EXT_MANDATORY,
 			     _gnutls_safe_renegotiation_recv_params,
 			     _gnutls_safe_renegotiation_send_params);
   if (ret != GNUTLS_E_SUCCESS)

@@ -39,6 +39,9 @@ pid=$!
 # give the server a chance to initialize
 sleep 2
 
+$CLI -p $PORT localhost --rehandshake --priority NONE:+AES-128-CBC:+MD5:+SHA1:+VERS-SSL3.0:+ANON-DH:+COMP-NULL </dev/null >/dev/null 2>&1 || \
+  fail "0. Renegotiation should have succeeded!"
+
 $CLI -p $PORT localhost --rehandshake --priority NORMAL:+ANON-DH </dev/null >/dev/null 2>&1 || \
   fail "1. Safe rehandshake should have succeeded!"
 
@@ -50,6 +53,7 @@ $CLI -p $PORT localhost --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION <
 
 $CLI -p $PORT localhost --rehandshake --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 && \
   fail "4. Unsafe renegotiation should have failed!"
+
 
 kill $pid
 wait

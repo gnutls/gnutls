@@ -472,7 +472,7 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
       DECR_LEN (len, comp_size);
       pos += comp_size;
 
-      ret = _gnutls_parse_extensions (session, GNUTLS_EXT_RESUMED,
+      ret = _gnutls_parse_extensions (session, GNUTLS_EXT_MANDATORY,
 				  &data[pos], len);
       if (ret < 0)
         {
@@ -534,7 +534,7 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
       return ret;
     }
 
-  ret = _gnutls_parse_extensions (session, GNUTLS_EXT_RESUMED,
+  ret = _gnutls_parse_extensions (session, GNUTLS_EXT_MANDATORY,
 				  &data[pos], len);
   if (ret < 0)
     {
@@ -1759,7 +1759,7 @@ _gnutls_read_server_hello (gnutls_session_t session,
       pos += session_id_len + 2 + 1;
       DECR_LEN (len, 2+1);
 
-      ret = _gnutls_parse_extensions (session, GNUTLS_EXT_RESUMED,
+      ret = _gnutls_parse_extensions (session, GNUTLS_EXT_MANDATORY,
 				  &data[pos], len);
       if (ret < 0)
         {
@@ -1947,7 +1947,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 {
   opaque *data = NULL;
   int extdatalen;
-  int pos = 0;
+  int pos = 0, type;
   int datalen = 0, ret = 0;
   opaque rnd[GNUTLS_RANDOM_SIZE];
   gnutls_protocol_t hver;
@@ -2134,79 +2134,38 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       /* Generate and copy TLS extensions.
        */
       if (_gnutls_version_has_extensions (hver))
-	{
-	  ret = _gnutls_gen_extensions (session, extdata, extdatalen);
-
-	  if (ret > 0)
-	    {
-	      datalen += ret;
-	      data = gnutls_realloc_fast (data, datalen);
-	      if (data == NULL)
-		{
-		  gnutls_assert ();
-		  gnutls_free (extdata);
-		  return GNUTLS_E_MEMORY_ERROR;
-		}
-
-	      memcpy (&data[pos], extdata, ret);
-	    }
-	  else if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      gnutls_free (data);
-	      gnutls_free (extdata);
-	      return ret;
-	    }
-	}
-      else if(session->internals.initial_negotiation_completed != 0)
+	  type = GNUTLS_EXT_ANY;
+      else
         {
-	  opaque buf[256]; /* opaque renegotiated_connection<0..255> */
+	  if(session->internals.initial_negotiation_completed != 0)
+	    type = GNUTLS_EXT_MANDATORY;
+          else
+            type = GNUTLS_EXT_NONE;
+        }
+        
+      ret = _gnutls_gen_extensions (session, extdata, extdatalen, type);
 
-	  /* For SSLv3 only, we will (only) to send the RI extension; we must
-	   * send it every time we renegotiate. We don't want to send anything
-	   * else, out of concern for interoperability.
-	   *
-	   * If this is an initial negotiation, we already sent SCSV above.
-	   */
-          
-	  ret = _gnutls_safe_renegotiation_send_params (session, buf, sizeof(buf));
-
-	  if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      gnutls_free (data);
-	      gnutls_free (extdata);
-	      return ret;
-	    }
-
-	  datalen += ret + 6; /* extlen(2) + type(2) + len(2) + ret */
-
-	  data = gnutls_realloc_fast (data, datalen);
-	  if (data == NULL)
-	    {
+      if (ret > 0)
+        {
+          datalen += ret;
+          data = gnutls_realloc_fast (data, datalen);
+          if (data == NULL)
+ 	    {
 	      gnutls_assert ();
 	      gnutls_free (extdata);
 	      return GNUTLS_E_MEMORY_ERROR;
 	    }
 
-	  /* total extensions length (one extension, with type(2) + len(2)) */
-	  _gnutls_write_uint16 (4 + ret, &data[pos]);
-	  pos += 2;
+          memcpy (&data[pos], extdata, ret);
+        }
+      else if (ret < 0)
+        {
+          gnutls_assert ();
+          gnutls_free (data);
+          gnutls_free (extdata);
+          return ret;
+	 }
 
-	  /* TLS RI extension type is 0xff01 */
-	  data[pos++] = 0xff;
-	  data[pos++] = 0x01;
-
-	  _gnutls_write_uint16 (ret, &data[pos]);
-	  pos += 2;
-
-	  memcpy(&data[pos], buf, ret);
-	  pos += ret;
-
-	  _gnutls_debug_log ("EXT[%p]: Sending extension safe renegotiation (SSLv3)\n",
-			         session);
-	}
-      gnutls_free (extdata);
     }
 
   ret =
@@ -2257,7 +2216,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
     {
       datalen = 2 + session_id_len + 1 + GNUTLS_RANDOM_SIZE + 3;
       extdatalen =
-	_gnutls_gen_extensions (session, extdata, sizeof (extdata));
+	_gnutls_gen_extensions (session, extdata, sizeof (extdata), GNUTLS_EXT_ANY);
 
       if (extdatalen < 0)
 	{
