@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.9.10 (unreleased)
 
+** libgnutls: Time verification extended to trusted certificate list,
+unless GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS flag is specified.
+
 ** libgnutls: Added Steve Dispensa's patch for safe renegotiation (RFC 5746)
 Solves the issue discussed in:
 <http://www.ietf.org/mail-archive/web/tls/current/msg03928.html> and
