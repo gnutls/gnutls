@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Copyright (C) 2010 Free Software Foundation, Inc.
 #
@@ -20,8 +20,11 @@
 # along with GNUTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+set -e
+
 srcdir="${srcdir:-.}"
-CERTTOOL="${certtool:-../../src/certtool} -q"
+CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
+
 unset RETCODE
 
 fail() {
@@ -31,14 +34,20 @@ fail() {
 
 echo "Checking OpenPGP certificate self verification"
 
-( $CERTTOOL --pgp-certificate-info <$srcdir/selfsigs/alice.pub | grep -e "^Self Signature verification: ok" ) >/dev/null ||
-  fail "Self sig Verification should have succeeded!"
+($CERTTOOL --pgp-certificate-info < $srcdir/selfsigs/alice.pub \
+    | grep "^Self Signature verification: ok" > /dev/null) || \
+    fail "Self sig Verification should have succeeded!"
 
-( $CERTTOOL --pgp-certificate-info <$srcdir/selfsigs/alice-mallory-badsig18.pub | grep -e "^Self Signature verification: failed" ) >/dev/null ||
-  fail "Self sig Verification should have failed!"
-( $CERTTOOL --pgp-certificate-info <$srcdir/selfsigs/alice-mallory-irrelevantsig.pub | grep -e "^Self Signature verification: failed" ) >/dev/null ||
-  fail "Self sig Verification should have failed!"
-( $CERTTOOL --pgp-certificate-info <$srcdir/selfsigs/alice-mallory-nosig18.pub | grep -e "^Self Signature verification: failed" ) >/dev/null ||
-  fail "Self sig Verification should have failed!"
+($CERTTOOL --pgp-certificate-info < $srcdir/selfsigs/alice-mallory-badsig18.pub \
+    | grep "^Self Signature verification: failed" > /dev/null) || \
+    fail "Self sig Verification should have failed!"
+
+($CERTTOOL --pgp-certificate-info < $srcdir/selfsigs/alice-mallory-irrelevantsig.pub \
+    | grep "^Self Signature verification: failed" >/dev/null) || \
+    fail "Self sig Verification should have failed!"
+
+($CERTTOOL --pgp-certificate-info < $srcdir/selfsigs/alice-mallory-nosig18.pub \
+    | grep "^Self Signature verification: failed" >/dev/null) || \
+    fail "Self sig Verification should have failed!"
 
 exit ${RETCODE:-0}
