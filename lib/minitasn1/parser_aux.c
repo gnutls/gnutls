@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2004, 2006, 2007, 2008, 2009 Free Software Foundation
- * Copyright (C) 2000,2001 Fabio Fiorina
+ * Copyright (C) 2000, 2001, 2004, 2006, 2007, 2008, 2009, 2010 Free
+ * Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -1139,7 +1139,7 @@ parse_version_string (const char *s, int *major, int *minor, int *micro)
 }
 
 /**
- * asn1_check_version - check for library version
+ * asn1_check_version:
  * @req_version: Required version number, or NULL.
  *
  * Check that the version of the library is at minimum the
