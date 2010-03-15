@@ -1,3 +1,156 @@
+2010-03-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.8.6.
+
+2010-03-15  Simon Josefsson <simon@josefsson.org>
+
+	* tests/openpgp-certs/Makefile.am, tests/openpgp-certs/testselfsigs: 
+	Backport tests/openpgp-certs fixes.
+
+2009-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* gl/tests/Makefile.am: Update gnulib files.
+
+2010-03-15  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/getaddrinfo.m4, gl/m4/inet_ntop.m4, gl/m4/inet_pton.m4: 
+	Backport fix for inet_ntop/inet_pton link problem.
+
+2010-03-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2010-03-15  Simon Josefsson <simon@josefsson.org>
+
+	* lib/po/LINGUAS, lib/po/cs.po.in, lib/po/fr.po.in,
+	lib/po/nl.po.in, lib/po/pl.po.in, lib/po/sv.po.in, lib/po/vi.po.in,
+	lib/po/zh_CN.po.in: Sync with TP.
+
+2009-11-03  Simon Josefsson <simon@josefsson.org>
+
+	* doc/examples/Makefile.am, src/Makefile.am, tests/Makefile.am: Use
+	INET_NTOP_LIB and INET_PTON_LIB.
+
+2010-01-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2010-01-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* lib/m4/hooks.m4: Make sure libgcrypt's dependency on libgpg-error
+	is known.
+
+2010-01-20  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pathlen/ca-no-pathlen.pem,
+	tests/pathlen/no-ca-or-pathlen.pem: Fix public key identifier
+	change.
+
+2010-01-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add note about public key id difference.
+
+2010-01-20  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/mpi.c: Fix warning.
+
+2010-01-20  Simon Josefsson <simon@josefsson.org>
+
+	* THANKS: Fix copyright.  Add.
+
+2010-01-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Improve.
+
+2010-01-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2010-01-20  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix copyright.  Add two NEWS blurbs.
+
+2010-01-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/opencdk/sig-check.c, src/certtool.c,
+	tests/openpgp-certs/Makefile.am, tests/openpgp-certs/testselfsigs: 
+	When checking self signature also check the signatures of all
+	subkeys.  Ilari Liusvaara noticed and reported the issue and
+	provided test vectors as well.  certtool --pgp-certificate-info will check self signatures.  Added self tests for self-sigs.
+
+2010-01-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : commit fd29562630a701fadbfbf316ce323a248a3ccd43 Author: Simon
+	Josefsson <simon@josefsson.org> Date:   Fri Dec 4 13:36:58 2009
+	+0100
+
+2009-11-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/mpi.c: Corrected two issues that affected certificate
+	request generation.  1. Null padding is added on integers (found thanks to Wilankar
+	Trupti <trupti.wilankar@hp.com>) 2. In optional SignatureAlgorithm parameters field for DSA keys the
+	DSA parameters were added. Those were rejected by verisign. Gnutls
+	no longer adds those parameters there since other implementations
+	don't do either and having them does not seem to offer anything
+	(anyway you need the signer's certificate to verify thus public key
+	will be available).
+
+2009-11-09  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* src/Makefile.am: Link to libgcrypt explicitly when libgcrypt
+	functions are used.
+
+2009-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2009-11-06  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, m4/valgrind.m4: Fix --disable-valgrind-tests.
+
+2009-11-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: Corrected bug fix author.
+
+2009-11-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: Documented previous fix.
+
+2009-11-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/auth_cert.c, lib/gnutls_constate.c, lib/gnutls_sig.c,
+	libextra/gnutls_openssl.c, src/certtool.c, src/cfg/cfg+.c,
+	src/cfg/platon/str/strdyn.c, src/serv.c: Cleanups and several bug
+	fixes found by Tomas Mraz.  "I've patched the following problems in the code found by review of
+	gnutls-2.8.5 code done by Steve Grubb.  See the patch attached.  The gnutls_constate.c bug might be potentially serious so I've
+	decided to mail it to you directly, not to the public mailing list.  The auth_cert.c change is just cleanup of the code.  In gnutls_openssl.c I've just fixed the potential crasher, correct
+	fix would require using asprintf or precomputed length of the buffer
+	to allocate a memory.  The certtool.c change is again just a cleanup."
+
+2009-11-05  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gl/tests/test-func.c: Back port Solaris work around for
+	__func__ bug.  Reported by Dagobert Michelsen <dam@opencsw.org> in
+
+	<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3947>.
+
+2009-11-02  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, libextra/configure.ac: Bump
+	versions.
+
+2009-11-02  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2009-11-02  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.8.5.
