@@ -904,8 +904,12 @@ begin:
        _gnutls_io_read_buffered (session, &headers, header_size,
 				 -1)) != header_size)
     {
+  _gnutls_handshake_log ("XXX[]: ret: %d %s\n", ret, gnutls_strerror(ret));
+
       if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
 	return ret;
+
+  _gnutls_handshake_log ("XXX2[]: ret: %d %s\n", ret, gnutls_strerror(ret));
 
       session_invalidate (session);
       if (type == GNUTLS_ALERT)

@@ -522,7 +522,11 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  *
  * "%COMPAT" will enable compatibility features for a server.
  *
- * "%UNSAFE_RENEGOTIATION" will allow unsafe renegotiation.
+ * "%UNSAFE_RENEGOTIATION" will allow unsafe renegotiation (this is now
+ * the default, but will change once more servers support the safe renegotiation
+ * TLS fix).
+ *
+ * "%SAFE_RENEGOTIATION" will allow safe renegotiation only.
  *
  * "%INITIAL_SAFE_RENEGOTIATION" will force initial safe negotiation even if 
  * renegotiation wasn't requested. Only valid for server side.
@@ -571,6 +575,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
+  (*priority_cache)->unsafe_renegotiation = 1;
 
   if (priorities == NULL)
     priorities = "NORMAL";
@@ -722,6 +727,9 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	  else if (strcasecmp (&broken_list[i][1],
 			       "UNSAFE_RENEGOTIATION") == 0)
 	    (*priority_cache)->unsafe_renegotiation = 1;
+	  else if (strcasecmp (&broken_list[i][1],
+			       "SAFE_RENEGOTIATION") == 0)
+	    (*priority_cache)->unsafe_renegotiation = 0;
 	  else if (strcasecmp (&broken_list[i][1],
 			       "INITIAL_SAFE_RENEGOTIATION") == 0)
 	    (*priority_cache)->initial_safe_renegotiation = 1;

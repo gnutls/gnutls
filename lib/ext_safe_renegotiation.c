@@ -151,3 +151,16 @@ gnutls_safe_renegotiation_set (gnutls_session_t session, int value)
 {
   session->internals.priorities.unsafe_renegotiation = 1-value;
 }
+
+/**
+ * gnutls_safe_renegotiation_status:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Can be used to check whether safe renegotiation is being used
+ * in the current session. Returns 0 when not and non zero when
+ * used.
+ **/
+int gnutls_safe_renegotiation_status (gnutls_session_t session)
+{
+  return session->internals.connection_using_safe_renegotiation;
+}
