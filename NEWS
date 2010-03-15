@@ -39,6 +39,9 @@ Reported by Ingmar Vanhassel in
 ** Fix build failures on Solaris.
 Thanks to Dagobert Michelsen <dam@opencsw.org>.
 
+** i18n: Updated Czech, Dutch, French, Polish, Swedish and Vietnamese
+** translations.  Added Simplified Chinese translation.
+
 ** API and ABI modifications:
 No changes since last version.
 
