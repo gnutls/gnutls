@@ -3,6 +3,11 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010 Free Software Foundation
 See the end for copying conditions.
 
+* Version 2.8.7 (unreleased)
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 2.8.6 (released 2010-03-15)
 
 ** libgnutls: For CSRs, don't null pad integers for RSA/DSA value.

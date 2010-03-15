@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
 #    Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos, Simon Josefsson
@@ -22,7 +22,7 @@ dnl Process this file with autoconf to produce a configure script.
 # 02110-1301, USA.
 
 AC_PREREQ(2.61)
-AC_INIT([libgnutls-extra], [2.8.6], [bug-gnutls@gnu.org])
+AC_INIT([libgnutls-extra], [2.8.7], [bug-gnutls@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
