@@ -46,7 +46,7 @@ Reported by and tiny patch from Vitaly Mayatskikh
 <v.mayatskih@gmail.com> in
 <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/4096>.
 
-** minitasn1: Upgraded to libtasn1 version 2.4.
+** minitasn1: Upgraded to libtasn1 version 2.5.
 
 ** i18n: Updated Czech, Dutch, French, Polish, Swedish translation.
 ** Added Simplified Chinese translation.
