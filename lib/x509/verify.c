@@ -1035,8 +1035,7 @@ gnutls_x509_crt_list_verify (const gnutls_x509_crt_t * cert_list,
  * @verify: will hold the certificate verification output.
  *
  * This function will try to verify the given certificate and return
- * its status.  The verification output in this functions cannot be
- * GNUTLS_CERT_NOT_VALID.
+ * its status.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
@@ -1047,18 +1046,12 @@ gnutls_x509_crt_verify (gnutls_x509_crt_t cert,
 			int CA_list_length, unsigned int flags,
 			unsigned int *verify)
 {
-  int ret;
   /* Verify certificate 
    */
-  ret =
-    _gnutls_verify_certificate2 (cert, CA_list, CA_list_length, flags,
-				 verify, NULL);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
+  *verify =
+    _gnutls_x509_verify_certificate (&cert, 1,
+				     CA_list, CA_list_length, NULL,
+				     0, flags);
   return 0;
 }
 

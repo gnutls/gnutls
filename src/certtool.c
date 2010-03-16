@@ -2006,7 +2006,7 @@ generate_request (void)
 static void print_verification_res (gnutls_x509_crt_t crt,
 				    gnutls_x509_crt_t issuer,
 				    gnutls_x509_crl_t * crl_list,
-				    int crl_list_size);
+				    int crl_list_size, unsigned int flags);
 
 #define CERT_SEP "-----BEGIN CERT"
 #define CRL_SEP "-----BEGIN X509 CRL"
@@ -2150,7 +2150,7 @@ _verify_x509_mem (const void *cert, int cert_size)
 	  fprintf (outfile, "\tVerification output: ");
 	  print_verification_res (x509_cert_list[i - 2],
 				  x509_cert_list[i - 1], x509_crl_list,
-				  x509_ncrls);
+				  x509_ncrls, GNUTLS_VERIFY_DO_NOT_ALLOW_SAME);
 	  fprintf (outfile, ".\n\n");
 
 	}
@@ -2196,7 +2196,9 @@ _verify_x509_mem (const void *cert, int cert_size)
   fprintf (outfile, "\tVerification output: ");
   print_verification_res (x509_cert_list[x509_ncerts - 1],
 			  x509_cert_list[x509_ncerts - 1], x509_crl_list,
-			  x509_ncrls);
+			  /* we add GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT since it is
+			   * self signed. */
+			  x509_ncrls, GNUTLS_VERIFY_DO_NOT_ALLOW_SAME|GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
 
   fprintf (outfile, ".\n\n");
 
@@ -2208,7 +2210,7 @@ _verify_x509_mem (const void *cert, int cert_size)
 				       &x509_cert_list[x509_ncerts - 1], 1,
 				       x509_crl_list,
 				       x509_ncrls,
-				       GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT,
+				       GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT|GNUTLS_VERIFY_DO_NOT_ALLOW_SAME,
 				       &verify_status);
     if (ret < 0)
       error (EXIT_FAILURE, 0, "gnutls_x509_crt_list_verify: %s",
@@ -2258,14 +2260,13 @@ _verify_x509_mem (const void *cert, int cert_size)
 static void
 print_verification_res (gnutls_x509_crt_t crt,
 			gnutls_x509_crt_t issuer,
-			gnutls_x509_crl_t * crl_list, int crl_list_size)
+			gnutls_x509_crl_t * crl_list, int crl_list_size, unsigned int flags)
 {
   unsigned int output;
   int comma = 0;
   int ret;
-  time_t now = time (0);
 
-  ret = gnutls_x509_crt_verify (crt, &issuer, 1, 0, &output);
+  ret = gnutls_x509_crt_verify (crt, &issuer, 1, flags , &output);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "verification error: %s", gnutls_strerror (ret));
 
@@ -2296,23 +2297,20 @@ print_verification_res (gnutls_x509_crt_t crt,
       comma = 1;
     }
 
-  /* Check expiration dates.
-   */
-
-  if (gnutls_x509_crt_get_activation_time (crt) > now)
+  if (output & GNUTLS_CERT_NOT_ACTIVATED)
     {
       if (comma)
 	fprintf (outfile, ", ");
-      comma = 1;
       fprintf (outfile, "Not activated");
+      comma = 1;
     }
 
-  if (gnutls_x509_crt_get_expiration_time (crt) < now)
+  if (output & GNUTLS_CERT_EXPIRED)
     {
       if (comma)
 	fprintf (outfile, ", ");
-      comma = 1;
       fprintf (outfile, "Expired");
+      comma = 1;
     }
 
   ret = gnutls_x509_crt_check_revocation (crt, crl_list, crl_list_size);
