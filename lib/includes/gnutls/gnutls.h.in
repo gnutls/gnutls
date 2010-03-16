@@ -813,6 +813,8 @@ extern "C" {
 
   void gnutls_safe_renegotiation_set (gnutls_session_t session, int value);
 
+  int gnutls_safe_renegotiation_status (gnutls_session_t session);
+
   /* Opaque PRF Input
    * http://tools.ietf.org/id/draft-rescorla-tls-opaque-prf-input-00.txt
    */
