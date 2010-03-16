@@ -458,6 +458,9 @@ _gnutls_x509_time2gtime (const char *ttime, int year)
   if (sizeof (time_t) <= 4 && etime.tm_year >= 2038)
     return (time_t) 2145914603;	/* 2037-12-31 23:23:23 */
 
+  if (etime.tm_year < 1970)
+    return (time_t) 0;
+
   xx[2] = 0;
 
 /* get the month
