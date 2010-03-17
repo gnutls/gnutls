@@ -529,7 +529,8 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  * "%SAFE_RENEGOTIATION" will allow safe renegotiation only.
  *
  * "%INITIAL_SAFE_RENEGOTIATION" will force initial safe negotiation even if 
- * renegotiation wasn't requested. Only valid for server side.
+ * renegotiation wasn't requested. Only valid for server side and implies
+ * "%SAFE_RENEGOTIATION".
  *
  * "%DISABLE_SAFE_RENEGOTIATION" will disable safe renegotiation completely. Do not use
  * unless you know what you are doing. Testing purposes only.
@@ -732,7 +733,10 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	    (*priority_cache)->unsafe_renegotiation = 0;
 	  else if (strcasecmp (&broken_list[i][1],
 			       "INITIAL_SAFE_RENEGOTIATION") == 0)
-	    (*priority_cache)->initial_safe_renegotiation = 1;
+            {
+	      (*priority_cache)->unsafe_renegotiation = 0;
+	      (*priority_cache)->initial_safe_renegotiation = 1;
+            }
 	  else if (strcasecmp (&broken_list[i][1],
 			       "DISABLE_SAFE_RENEGOTIATION") == 0)
 	    (*priority_cache)->disable_safe_renegotiation = 1;
