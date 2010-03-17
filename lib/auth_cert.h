@@ -93,6 +93,7 @@ typedef struct gnutls_certificate_credentials_st
 
   gnutls_certificate_client_retrieve_function *client_get_cert_callback;
   gnutls_certificate_server_retrieve_function *server_get_cert_callback;
+  gnutls_certificate_verify_function *verify_callback;
 } certificate_credentials_st;
 
 typedef struct rsa_info_st

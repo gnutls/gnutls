@@ -318,7 +318,24 @@ load_keys (void)
 
 }
 
+static int cert_verify_callback( gnutls_session_t session)
+{
+int rc;
+unsigned int status;
 
+  if (!x509_cafile && !pgp_keyring)
+    return 0;
+
+  rc = gnutls_certificate_verify_peers2 (session, &status);
+  if (rc != 0 || status != 0)
+    {
+      printf ("*** Verifying server certificate failed...\n");
+      if (!insecure)
+        return -1;
+    }
+
+  return 0;
+}
 
 /* This callback should be associated with a session by calling
  * gnutls_certificate_client_set_retrieve_function( session, cert_callback),
@@ -493,6 +510,7 @@ init_tls_session (const char *hostname)
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
 
   gnutls_certificate_client_set_retrieve_function (xcred, cert_callback);
+  gnutls_certificate_set_verify_function (xcred, cert_verify_callback);
 
   /* send the fingerprint */
 #ifdef ENABLE_OPENPGP
@@ -1018,19 +1036,6 @@ do_handshake (socket_st * socket)
       /* print some information */
       print_info (socket->session, socket->hostname, info.insecure);
 
-      if ((x509_cafile || pgp_keyring) && !insecure)
-	{
-	  int rc;
-	  unsigned int status;
-
-	  /* abort if verification fail  */
-	  rc = gnutls_certificate_verify_peers2 (socket->session, &status);
-	  if (rc != 0 || status != 0)
-	    {
-	      printf ("*** Verifying server certificate failed...\n");
-	      exit (1);
-	    }
-	}
 
       socket->secure = 1;
 

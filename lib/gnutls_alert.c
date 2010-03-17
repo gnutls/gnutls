@@ -196,6 +196,7 @@ gnutls_error_to_alert (int err, int *level)
     case GNUTLS_E_ASN1_TYPE_ANY_ERROR:
     case GNUTLS_E_ASN1_SYNTAX_ERROR:
     case GNUTLS_E_ASN1_DER_OVERFLOW:
+    case GNUTLS_E_CERTIFICATE_ERROR:
       ret = GNUTLS_A_BAD_CERTIFICATE;
       _level = GNUTLS_AL_FATAL;
       break;

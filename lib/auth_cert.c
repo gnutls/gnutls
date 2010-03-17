@@ -1251,7 +1251,7 @@ _gnutls_proc_openpgp_server_certificate (gnutls_session_t session,
       gnutls_assert ();
       goto cleanup;
     }
-
+    
   ret = 0;
 
 cleanup:
@@ -1268,19 +1268,39 @@ int
 _gnutls_proc_cert_server_certificate (gnutls_session_t session,
 				      opaque * data, size_t data_size)
 {
+int ret;
+gnutls_certificate_credentials_t cred;
+
+    cred = (gnutls_certificate_credentials_t) _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
+    if (cred == NULL)
+      {
+        gnutls_assert();
+        return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+      }
+
   switch (session->security_parameters.cert_type)
     {
 #ifdef ENABLE_OPENPGP
     case GNUTLS_CRT_OPENPGP:
-      return _gnutls_proc_openpgp_server_certificate (session,
+      ret = _gnutls_proc_openpgp_server_certificate (session,
 						      data, data_size);
+      break;
 #endif
     case GNUTLS_CRT_X509:
-      return _gnutls_proc_x509_server_certificate (session, data, data_size);
+      ret = _gnutls_proc_x509_server_certificate (session, data, data_size);
+      break;
     default:
       gnutls_assert ();
       return GNUTLS_E_INTERNAL_ERROR;
     }
+
+  if (ret == 0 && cred->verify_callback != NULL)
+    {
+      ret = cred->verify_callback (session);
+      if (ret != 0) ret = GNUTLS_E_CERTIFICATE_ERROR;
+    }
+
+  return ret;
 }
 
 #define MAX_SIGN_ALGOS 2

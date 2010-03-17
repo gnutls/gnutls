@@ -1453,6 +1453,8 @@ extern "C" {
   typedef int gnutls_certificate_server_retrieve_function (gnutls_session_t,
 							   gnutls_retr_st *);
 
+  typedef int gnutls_certificate_verify_function( gnutls_session_t);
+
 
   /* Functions that allow auth_info_t structures handling
    */
@@ -1506,6 +1508,9 @@ extern "C" {
   void gnutls_certificate_server_set_retrieve_function
     (gnutls_certificate_credentials_t cred,
      gnutls_certificate_server_retrieve_function * func);
+
+  void gnutls_certificate_set_verify_function(
+    gnutls_certificate_credentials_t cred, gnutls_certificate_verify_function * func);
 
   void
   gnutls_certificate_server_set_request (gnutls_session_t session,

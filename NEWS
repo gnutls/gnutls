@@ -27,6 +27,10 @@ Tested with http://www.logix.cz/michal/devel/cryptodev/.  Added
 benchmark utility for AES.  Exported API to access encryption and hash
 algorithms.
 
+** libgnutls: Added gnutls_certificate_set_verify_function() to allow
+verification of certificate upon receipt rather than waiting until the
+end of the handshake.
+
 ** certtool: Corrected two issues that affected certificate request generation.
 (1) Null padding is added on integers (found thanks to Wilankar Trupti),
 (2) In optional SignatureAlgorithm parameters field for DSA keys the DSA
@@ -57,6 +61,7 @@ Daniel Nylander, Tao Wei, and Aron Xu.
 ** doc: The GTK-DOC manual is significantly improved.
 
 ** API and ABI modifications:
+gnutls_certificate_set_verify_function: Added
 gnutls_safe_renegotiation_status: Added
 gnutls_cipher_decrypt: Added
 gnutls_cipher_deinit: Added

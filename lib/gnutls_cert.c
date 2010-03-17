@@ -425,6 +425,34 @@ void gnutls_certificate_server_set_retrieve_function
   cred->server_get_cert_callback = func;
 }
 
+/**
+ * gnutls_certificate_set_verify_function:
+ * @cred: is a #gnutls_certificate_credentials_t structure.
+ * @func: is the callback function
+ *
+ * This function sets a callback to be called when peer's certificate
+ * has been received in order to verify it on receipt rather than
+ * doing after the handshake is completed.
+ *
+ * The callback's function prototype is:
+ * int (*callback)(gnutls_session_t);
+ *
+ * If the callback function is provided then gnutls will call it, in the
+ * handshake, just after the certificate message has been received.
+ * To verify or obtain the certificate the gnutls_certificate_verify_peers2(),
+ * gnutls_certificate_type_get(), gnutls_certificate_get_peers() functions
+ * can be used.
+ *
+ * The callback function should return 0 for the handshake to continue
+ * or non-zero to terminate.
+ **/
+void gnutls_certificate_set_verify_function
+  (gnutls_certificate_credentials_t cred,
+   gnutls_certificate_verify_function * func)
+{
+  cred->verify_callback = func;
+}
+
 /*-
  * _gnutls_x509_extract_certificate_activation_time - return the peer's certificate activation time
  * @cert: should contain an X.509 DER encoded certificate
