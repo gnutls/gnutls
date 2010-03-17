@@ -43,6 +43,11 @@ verify_certificate (gnutls_session_t session, const char *hostname)
   if (status & GNUTLS_CERT_REVOKED)
     printf ("The certificate has been revoked.\n");
 
+  if (status & GNUTLS_CERT_EXPIRED)
+    printf ("The certificate has expired\n");
+
+  if (status & GNUTLS_CERT_NOT_ACTIVATED)
+    printf ("The certificate is not yet activated\n");
 
   /* Up to here the process is the same for X.509 certificates and
    * OpenPGP keys. From now on X.509 certificates are assumed. This can
@@ -73,19 +78,6 @@ verify_certificate (gnutls_session_t session, const char *hostname)
       return;
     }
 
-  /* Beware here we do not check for errors.
-   */
-  if (gnutls_x509_crt_get_expiration_time (cert) < time (0))
-    {
-      printf ("The certificate has expired\n");
-      return;
-    }
-
-  if (gnutls_x509_crt_get_activation_time (cert) > time (0))
-    {
-      printf ("The certificate is not yet activated\n");
-      return;
-    }
 
   if (!gnutls_x509_crt_check_hostname (cert, hostname))
     {

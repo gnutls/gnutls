@@ -103,7 +103,6 @@ verify_cert2 (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
 {
   unsigned int output;
   int ret;
-  time_t now = time (0);
   size_t name_size;
   char name[64];
 
@@ -139,20 +138,15 @@ verify_cert2 (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
 	fprintf (stderr, ": no issuer was found");
       if (output & GNUTLS_CERT_SIGNER_NOT_CA)
 	fprintf (stderr, ": issuer is not a CA");
+      if (output & GNUTLS_CERT_NOT_ACTIVATED)
+        fprintf (stderr, ": not yet activated\n");
+      if (output & GNUTLS_CERT_EXPIRED)
+        fprintf (stderr, ": expired\n");
 
       fprintf (stderr, "\n");
     }
   else
     fprintf (stderr, "Trusted\n");
-
-
-  /* Now check the expiration dates.
-   */
-  if (gnutls_x509_crt_get_activation_time (crt) > now)
-    fprintf (stderr, "Not yet activated\n");
-
-  if (gnutls_x509_crt_get_expiration_time (crt) < now)
-    fprintf (stderr, "Expired\n");
 
   /* Check if the certificate is revoked.
    */
@@ -174,7 +168,6 @@ verify_last_cert (gnutls_x509_crt_t crt,
 {
   unsigned int output;
   int ret;
-  time_t now = time (0);
   size_t name_size;
   char name[64];
 
@@ -202,20 +195,15 @@ verify_last_cert (gnutls_x509_crt_t crt,
 
       if (output & GNUTLS_CERT_SIGNER_NOT_CA)
 	fprintf (stderr, ": Issuer is not a CA\n");
-      else
-	fprintf (stderr, "\n");
+      if (output & GNUTLS_CERT_NOT_ACTIVATED)
+        fprintf (stderr, ": Not yet activated\n");
+      if (output & GNUTLS_CERT_EXPIRED)
+        fprintf (stderr, ": Expired\n");
+      fprintf (stderr, "\n");
     }
   else
     fprintf (stderr, "Trusted\n");
 
-
-  /* Now check the expiration dates.
-   */
-  if (gnutls_x509_crt_get_activation_time (crt) > now)
-    fprintf (stderr, "Not yet activated\n");
-
-  if (gnutls_x509_crt_get_expiration_time (crt) < now)
-    fprintf (stderr, "Expired\n");
 
   /* Check if the certificate is revoked.
    */
