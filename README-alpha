@@ -25,6 +25,7 @@ We require several tools to build the software, including:
 - Guile <http://www.gnu.org/software/guile/>
 - Gaa <http://gaa.sf.net> (optional)
 - libtasn1 <http://josefsson.org/libtasn1/> (optional)
+- datefudge <packages.debian.org/datefudge> (optional)
 
 The required software is typically distributed with your operating
 system, and the instructions for installing them differ.  Here are
@@ -35,6 +36,7 @@ sudo apt-get install git-core autoconf automake libtool gettext cvs
 sudo apt-get install texinfo texlive texlive-generic-recommended texlive-extra-utils
 sudo apt-get install help2man gtk-doc-tools valgrind
 sudo apt-get install libgcrypt-dev guile-1.8-dev libtasn1-3-dev
+sudo apt-get install datefudge
 
 To download the version controlled sources:
 
