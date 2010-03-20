@@ -107,7 +107,7 @@ gnutls-api.texi: $(srcdir)/../lib/*.c
 	done
 	$(srcdir)/scripts/sort2.pl < $@-tmp > $@-tmp2
 	rm -f $@-tmp
-	mv $@-tmp2 $@
+	mv -f $@-tmp2 $@
 
 x509-api.texi: $(srcdir)/../lib/x509/*.c
 	echo "" > $@-tmp
@@ -118,7 +118,7 @@ x509-api.texi: $(srcdir)/../lib/x509/*.c
 	done
 	$(srcdir)/scripts/sort2.pl < $@-tmp > $@-tmp2
 	rm -f $@-tmp
-	mv $@-tmp2 $@
+	mv -f $@-tmp2 $@
 
 pgp-api.texi: $(srcdir)/../lib/openpgp/*.c
 	echo "" > $@-tmp
@@ -129,7 +129,7 @@ pgp-api.texi: $(srcdir)/../lib/openpgp/*.c
 	done
 	$(srcdir)/scripts/sort2.pl < $@-tmp > $@-tmp2
 	rm -f $@-tmp
-	mv $@-tmp2 $@
+	mv -f $@-tmp2 $@
 
 extra-api.texi: $(srcdir)/../libextra/gnutls_extra.c
 	echo "" > $@-tmp
@@ -140,7 +140,7 @@ extra-api.texi: $(srcdir)/../libextra/gnutls_extra.c
 	done
 	$(srcdir)/scripts/sort2.pl < $@-tmp > $@-tmp2
 	rm -f $@-tmp
-	mv $@-tmp2 $@
+	mv -f $@-tmp2 $@
 
 ia-api.texi: $(srcdir)/../libextra/gnutls_ia.c
 	echo "" > $@-tmp
@@ -151,7 +151,7 @@ ia-api.texi: $(srcdir)/../libextra/gnutls_ia.c
 	done
 	$(srcdir)/scripts/sort2.pl < $@-tmp > $@-tmp2
 	rm -f $@-tmp
-	mv $@-tmp2 $@
+	mv -f $@-tmp2 $@
 
 # Generated texinfos.
 
@@ -171,12 +171,12 @@ printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 error_codes.texi: $(top_srcdir)/lib/gnutls_errors.c $(srcdir)/errcodes.c
 	make $(builddir)/errcodes
 	$(builddir)/errcodes > $@-tmp
-	mv $@-tmp $@
+	mv -f $@-tmp $@
 
 algorithms.texi: $(srcdir)/printlist.c
 	make $(builddir)/printlist
 	$(builddir)/printlist > $@-tmp
-	mv $@-tmp $@
+	mv -f $@-tmp $@
 
 # Guile texinfos.
 
