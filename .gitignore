@@ -427,3 +427,11 @@ tests/x509dn
 tests/x509self
 tests/x509sign-verify
 tests/x509signself
+tests/x509paths/
+m4/
+lib/gnutls-api.texi
+lib/openpgp/pgp-api.texi
+lib/x509/x509-api.texi
+libextra/gnutls-extra-api.texi
+libextra/ia-api.texi
+doc/gnutls-extra-api.texi
