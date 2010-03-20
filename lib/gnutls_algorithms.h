@@ -68,8 +68,8 @@ gnutls_kx_algorithm_t _gnutls_cipher_suite_get_kx_algo (const cipher_suite_st
 gnutls_mac_algorithm_t _gnutls_cipher_suite_get_mac_algo (const
 							  cipher_suite_st *
 							  algorithm);
-gnutls_protocol_t _gnutls_cipher_suite_get_version (const cipher_suite_st *
-						    algorithm);
+gnutls_protocol_t _gnutls_cipher_suite_is_version_supported (const cipher_suite_st *
+						    algorithm, gnutls_protocol_t);
 cipher_suite_st _gnutls_cipher_suite_get_suite_name (cipher_suite_st *
 						     algorithm);
 

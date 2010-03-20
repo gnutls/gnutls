@@ -497,8 +497,10 @@ extern "C" {
       GNUTLS_TLS1 = GNUTLS_TLS1_0,
       GNUTLS_TLS1_1 = 3,
       GNUTLS_TLS1_2 = 4,
+      GNUTLS_TLS_END_VERSION,
       GNUTLS_VERSION_UNKNOWN = 0xff
     } gnutls_protocol_t;
+#define GNUTLS_TLS_MAX_VERSION (GNUTLS_TLS_END_VERSION-1)
 
   /**
    * gnutls_certificate_type_t:

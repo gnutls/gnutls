@@ -13,7 +13,7 @@ helpnode "GNU TLS test server\nUsage: gnutls-serv [options]\n\n"
 option (d, debug) INT "integer" { $debug = $1 } "Enable debugging" 
 
 #int generate;
-option (g, generate) { $generate = 1 } "Generate Diffie-Hellman Parameters."
+option (g, generate) { $generate = 1 } "Generate Diffie-Hellman and RSA-EXPORT Parameters."
 
 #int port;
 option (p, port) INT "integer" { $port = $1 } "The port to connect to."
