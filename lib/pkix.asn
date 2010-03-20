@@ -234,6 +234,9 @@ X520postalAddress ::= PostalAddress
 
 PostalAddress ::= SEQUENCE OF DirectoryString
 
+id-at-postalCode     AttributeType   ::=     {id-at 17}
+X520postalCode ::= DirectoryString
+
  -- Legacy attributes
 
 emailAddress AttributeType      ::= { iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) 9 1 }
