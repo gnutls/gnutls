@@ -80,7 +80,8 @@ print_dn (gnutls_x509_dn_t dn)
 	  }
 	if (ret < 0)
 	  fail ("get_rdn_ava %d\n", ret);
-	printf ("dn[%d][%d] OID=%.*s\n\tDATA=%.*s\n", i, j,
+	if (debug)
+  	  printf ("dn[%d][%d] OID=%.*s\n\tDATA=%.*s\n", i, j,
 		ava.oid.size, ava.oid.data, ava.value.size, ava.value.data);
       }
 }
@@ -109,17 +110,23 @@ doit (void)
   if (ret < 0)
     fail ("get_issuer %d\n", ret);
 
-  printf ("Issuer:\n");
-  print_dn (xdn);
+  if (debug)
+    {
+      printf ("Issuer:\n");
+      print_dn (xdn);
+    }
 
   ret = gnutls_x509_crt_get_subject (cert, &xdn);
   if (ret < 0)
     fail ("get_subject %d\n", ret);
 
-  printf ("Subject:\n");
-  print_dn (xdn);
+  if (debug)
+    {
+      printf ("Subject:\n");
+      print_dn (xdn);
+    }
 
-  success ("done\n");
+  if (debug) success ("done\n");
 
   gnutls_x509_crt_deinit (cert);
   gnutls_global_deinit ();

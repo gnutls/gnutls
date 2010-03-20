@@ -32,6 +32,8 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
+#include "utils.h"
+
 /* GnuTLS internally calls time() to find out the current time when
    verifying certificates.  To avoid a time bomb, we hard code the
    current time.  This should work fine on systems where the library
@@ -754,8 +756,7 @@ tls_log_func (int level, const char *str)
   fprintf (stderr, "|<%d>| %s", level, str);
 }
 
-int
-main (int argc, char *argv[])
+void doit (void)
 {
   int exit_val = 0;
   size_t i;
@@ -764,12 +765,13 @@ main (int argc, char *argv[])
   ret = gnutls_global_init ();
   if (ret != 0)
     {
-      printf ("%d: %s\n", ret, gnutls_strerror (ret));
-      return EXIT_FAILURE;
+      fail ("%d: %s\n", ret, gnutls_strerror (ret));
+      exit(EXIT_FAILURE);
     }
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (4711);
+  if (debug)
+    gnutls_global_set_log_level (4711);
 
   for (i = 0; chains[i].chain; i++)
     {
@@ -779,11 +781,11 @@ main (int argc, char *argv[])
       gnutls_datum_t tmp;
       size_t j;
 
-      printf ("Chain '%s' (%d)...\n", chains[i].name, (int) i);
+      if (debug) printf ("Chain '%s' (%d)...\n", chains[i].name, (int) i);
 
       for (j = 0; chains[i].chain[j]; j++)
 	{
-	  printf ("\tAdding certificate %d...", (int) j);
+	  if (debug) printf ("\tAdding certificate %d...", (int) j);
 
 	  ret = gnutls_x509_crt_init (&certs[j]);
 	  if (ret < 0)
@@ -794,17 +796,17 @@ main (int argc, char *argv[])
 	  tmp.size = strlen (chains[i].chain[j]);
 
 	  ret = gnutls_x509_crt_import (certs[j], &tmp, GNUTLS_X509_FMT_PEM);
-	  printf ("done\n");
+	  if (debug) printf ("done\n");
 	  if (ret < 0)
 	    error (EXIT_FAILURE, 0, "gnutls_x509_crt_import[%d,%d]: %s",
 		   (int) i, (int) j, gnutls_strerror (ret));
 
 	  gnutls_x509_crt_print (certs[j], GNUTLS_CRT_PRINT_ONELINE, &tmp);
-	  printf ("\tCertificate %d: %.*s\n", (int) j, tmp.size, tmp.data);
+	  if (debug) printf ("\tCertificate %d: %.*s\n", (int) j, tmp.size, tmp.data);
 	  gnutls_free (tmp.data);
 	}
 
-      printf ("\tAdding CA certificate...");
+      if (debug) printf ("\tAdding CA certificate...");
 
       ret = gnutls_x509_crt_init (&ca);
       if (ret < 0)
@@ -819,13 +821,13 @@ main (int argc, char *argv[])
 	error (EXIT_FAILURE, 0, "gnutls_x509_crt_import: %s",
 	       gnutls_strerror (ret));
 
-      printf ("done\n");
+      if (debug) printf ("done\n");
 
       gnutls_x509_crt_print (ca, GNUTLS_CRT_PRINT_ONELINE, &tmp);
-      printf ("\tCA Certificate: %.*s\n", tmp.size, tmp.data);
+      if (debug) printf ("\tCA Certificate: %.*s\n", tmp.size, tmp.data);
       gnutls_free (tmp.data);
 
-      printf ("\tVerifying...");
+      if (debug) printf ("\tVerifying...");
 
       ret = gnutls_x509_crt_list_verify (certs, j,
 					 &ca, 1, NULL, 0,
@@ -837,29 +839,25 @@ main (int argc, char *argv[])
 
       if (verify_status != chains[i].expected_verify_result)
 	{
-	  error (0, 0, "verify_status: %d expected: %d",
+	  fail("verify_status: %d expected: %d",
 		 verify_status, chains[i].expected_verify_result);
-	  exit_val = 1;
-	  if (argc > 1)
-	    {
-	      printf ("Exiting early with status...%d\n", exit_val);
-	      return exit_val;
-	    }
+	  
+	  if (debug) exit(1);
 	}
-      else
+      else if (debug)
 	printf ("done\n");
-      printf ("\tCleanup...");
+      if (debug) printf ("\tCleanup...");
 
       gnutls_x509_crt_deinit (ca);
       for (j = 0; chains[i].chain[j]; j++)
 	gnutls_x509_crt_deinit (certs[j]);
 
-      printf ("done\n");
+      if (debug) printf ("done\n");
     }
 
   gnutls_global_deinit ();
 
-  printf ("Exit status...%d\n", exit_val);
+  if (debug) printf ("Exit status...%d\n", exit_val);
 
-  return exit_val;
+  exit(exit_val);
 }

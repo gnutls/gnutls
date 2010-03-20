@@ -28,6 +28,8 @@
 #include <gnutls/x509.h>
 #include <gnutls/pkcs12.h>
 
+#include "utils.h"
+
 #include <error.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,8 +65,7 @@ static char ca_pem[] =
   "PfqUpIhz5Bbm7J4=\n" "-----END CERTIFICATE-----\n";
 const gnutls_datum_t ca_dat = { ca_pem, sizeof (ca_pem) };
 
-int
-main (void)
+void doit(void)
 {
   gnutls_pkcs12_t pkcs12;
   gnutls_x509_crt_t client;
@@ -157,7 +158,7 @@ main (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "pkcs12_export: %d", ret);
 
-  fwrite (outbuf, size, 1, stdout);
+  if (debug) fwrite (outbuf, size, 1, stdout);
 
   /* Cleanup. */
   gnutls_pkcs12_deinit (pkcs12);
@@ -165,5 +166,4 @@ main (void)
   gnutls_x509_crt_deinit (ca);
   gnutls_global_deinit ();
 
-  return 0;
 }

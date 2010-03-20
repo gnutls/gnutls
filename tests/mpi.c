@@ -48,7 +48,8 @@ doit (void)
   gnutls_global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (99);
+  if (debug)
+    gnutls_global_set_log_level (99);
 
   n1 = _gnutls_mpi_new (1000);
   if (n1 == NULL)

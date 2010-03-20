@@ -693,7 +693,7 @@ doit (void)
     fail ("gnutls_openpgp_crt_init: %d\n", ret);
 #endif
 
-  success ("Testing pem1...\n");
+  if (debug) success ("Testing pem1...\n");
   data.data = pem1;
   data.size = strlen (pem1);
 
@@ -704,10 +704,8 @@ doit (void)
   ret = gnutls_x509_crt_check_hostname (x509, "foo");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
-  else
-    success ("Hostname correctly does not match (%d)\n", ret);
 
-  success ("Testing pem2...\n");
+  if (debug) success ("Testing pem2...\n");
   data.data = pem2;
   data.size = strlen (pem2);
 
@@ -718,22 +716,16 @@ doit (void)
   ret = gnutls_x509_crt_check_hostname (x509, "foo");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
-  else
-    success ("Hostname correctly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "www.example.org");
-  if (ret)
-    success ("Hostname correctly matches (%d)\n", ret);
-  else
+  if (!ret)
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "*.example.org");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
-  else
-    success ("Hostname correctly does not match (%d)\n", ret);
 
-  success ("Testing pem3...\n");
+  if (debug) success ("Testing pem3...\n");
   data.data = pem3;
   data.size = strlen (pem3);
 
@@ -744,22 +736,16 @@ doit (void)
   ret = gnutls_x509_crt_check_hostname (x509, "foo");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
-  else
-    success ("Hostname correctly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "www.example.org");
-  if (ret)
-    success ("Hostname correctly matches (%d)\n", ret);
-  else
+  if (!ret)
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "*.example.org");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
-  else
-    success ("Hostname correctly does not match (%d)\n", ret);
 
-  success ("Testing pem4...\n");
+  if (debug) success ("Testing pem4...\n");
   data.data = pem4;
   data.size = strlen (pem4);
 
@@ -770,28 +756,20 @@ doit (void)
   ret = gnutls_x509_crt_check_hostname (x509, "foo");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
-  else
-    success ("Hostname correctly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "www.example.org");
-  if (ret)
-    success ("Hostname correctly matches (%d)\n", ret);
-  else
+  if (!ret)
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foo.example.org");
-  if (ret)
-    success ("Hostname correctly matches (%d)\n", ret);
-  else
+  if (!ret)
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foo.example.com");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
-  else
-    success ("Hostname correctly does not match (%d)\n", ret);
 
-  success ("Testing pem5...\n");
+  if (debug) success ("Testing pem5...\n");
   data.data = pem5;
   data.size = strlen (pem5);
 
@@ -802,22 +780,16 @@ doit (void)
   ret = gnutls_x509_crt_check_hostname (x509, "foo");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
-  else
-    success ("Hostname correctly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "1.2.3.4");
-  if (ret)
-    success ("Hostname correctly matches (%d)\n", ret);
-  else
+  if (!ret)
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "www.example.org");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
-  else
-    success ("Hostname correctly does not match (%d)\n", ret);
 
-  success ("Testing pem6...\n");
+  if (debug) success ("Testing pem6...\n");
   data.data = pem6;
   data.size = strlen (pem6);
 
@@ -828,16 +800,12 @@ doit (void)
   ret = gnutls_x509_crt_check_hostname (x509, "foo.example.org");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
-  else
-    success ("Hostname correctly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "bar.foo.example.org");
-  if (ret)
-    success ("Hostname correctly matches (%d)\n", ret);
-  else
+  if (!ret)
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
-  success ("Testing pem7...\n");
+  if (debug) success ("Testing pem7...\n");
   data.data = pem7;
   data.size = strlen (pem7);
 
@@ -848,28 +816,20 @@ doit (void)
   ret = gnutls_x509_crt_check_hostname (x509, "foo.bar.example.org");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
-  else
-    success ("Hostname correctly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foobar.bar.example.org");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
-  else
-    success ("Hostname correctly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foobar.example.org");
-  if (ret)
-    success ("Hostname correctly matches (%d)\n", ret);
-  else
+  if (!ret)
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foobazbar.example.org");
-  if (ret)
-    success ("Hostname correctly matches (%d)\n", ret);
-  else
+  if (!ret)
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
-  success ("Testing pem8...\n");
+  if (debug) success ("Testing pem8...\n");
   data.data = pem8;
   data.size = strlen (pem8);
 
@@ -878,30 +838,22 @@ doit (void)
     fail ("gnutls_x509_crt_import: %d\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "www.example.org");
-  if (ret)
-    success ("Hostname correctly matches (%d)\n", ret);
-  else
+  if (!ret)
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "www.example.");
-  if (ret)
-    success ("Hostname correctly matches (%d)\n", ret);
-  else
+  if (!ret)
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "www.example.com");
-  if (ret)
-    success ("Hostname correctly matches (%d)\n", ret);
-  else
+  if (!ret)
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "www.example.foo.com");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
-  else
-    success ("Hostname correctly does not match (%d)\n", ret);
 
-  success ("Testing pem9...\n");
+  if (debug) success ("Testing pem9...\n");
   data.data = pem9;
   data.size = strlen (pem9);
 
@@ -912,16 +864,12 @@ doit (void)
   ret = gnutls_x509_crt_check_hostname (x509, "foo.example.org");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
-  else
-    success ("Hostname correctly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "bar.example.org");
-  if (ret)
-    success ("Hostname correctly matches (%d)\n", ret);
-  else
+  if (!ret)
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
-  success ("Testing pem10...\n");
+  if (debug) success ("Testing pem10...\n");
   data.data = pem10;
   data.size = strlen (pem10);
 
@@ -932,11 +880,9 @@ doit (void)
   ret = gnutls_x509_crt_check_hostname (x509, "localhost");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
-  else
-    success ("Hostname correctly does not match (%d)\n", ret);
 
 #ifdef ENABLE_OPENPGP
-  success ("Testing pem11...\n");
+  if (debug) success ("Testing pem11...\n");
   data.data = pem11;
   data.size = strlen (pem11);
 
@@ -945,9 +891,7 @@ doit (void)
     fail ("gnutls_openpgp_crt_import: %d\n", ret);
 
   ret = gnutls_openpgp_crt_check_hostname (pgp, "test.gnutls.org");
-  if (ret)
-    success ("Hostname correctly matches (%d)\n", ret);
-  else
+  if (!ret)
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
   gnutls_openpgp_crt_deinit (pgp);

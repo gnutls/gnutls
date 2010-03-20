@@ -76,5 +76,5 @@ doit (void)
 
   gnutls_global_deinit ();
 
-  success ("import ok\n");
+  if (debug) success ("import ok\n");
 }

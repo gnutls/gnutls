@@ -94,7 +94,7 @@ client (void)
     }
   else
     {
-      success ("client: Handshake was completed\n");
+      if (debug) success ("client: Handshake was completed\n");
     }
 
   gnutls_record_send (session, MSG, strlen (MSG));
@@ -102,7 +102,7 @@ client (void)
   ret = gnutls_record_recv (session, buffer, MAX_BUF);
   if (ret == 0)
     {
-      success ("client: Peer has closed the TLS connection\n");
+      if (debug) success ("client: Peer has closed the TLS connection\n");
       goto end;
     }
   else if (ret < 0)
@@ -166,7 +166,7 @@ initialize_tls_session (void)
 static int
 pskfunc (gnutls_session_t session, const char *username, gnutls_datum_t * key)
 {
-  printf ("psk: username %s\n", username);
+  if (debug) printf ("psk: username %s\n", username);
   key->data = gnutls_malloc (4);
   key->data[0] = 0xDE;
   key->data[1] = 0xAD;
@@ -189,7 +189,7 @@ int optval = 1;
 static void
 server_start (void)
 {
-  success ("Launched...\n");
+  if (debug) success ("Launched...\n");
 
   /* Socket operations
    */
@@ -225,7 +225,7 @@ server_start (void)
       return;
     }
 
-  success ("server: ready. Listening to port '%d'.\n", PORT);
+  if (debug) success ("server: ready. Listening to port '%d'.\n", PORT);
 }
 
 static void
@@ -244,7 +244,7 @@ server (void)
 
   sd = accept (listen_sd, (SA *) & sa_cli, &client_len);
 
-  success ("server: connection from %s, port %d\n",
+  if (debug) success ("server: connection from %s, port %d\n",
 	   inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
 		      sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
@@ -257,7 +257,7 @@ server (void)
       fail ("server: Handshake has failed (%s)\n\n", gnutls_strerror (ret));
       return;
     }
-  success ("server: Handshake was completed\n");
+  if (debug) success ("server: Handshake was completed\n");
 
   /* see the Getting peer's information example */
   /* print_info(session); */
@@ -270,7 +270,7 @@ server (void)
 
       if (ret == 0)
 	{
-	  success ("server: Peer has closed the GNUTLS connection\n");
+	  if (debug) success ("server: Peer has closed the GNUTLS connection\n");
 	  break;
 	}
       else if (ret < 0)
@@ -298,7 +298,7 @@ server (void)
 
   gnutls_global_deinit ();
 
-  success ("server: finished\n");
+  if (debug) success ("server: finished\n");
 }
 
 void

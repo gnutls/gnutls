@@ -31,7 +31,7 @@ echo cn = "SHA 512 CA" >> template
 $CERTTOOL --generate-self-signed --template template \
     --load-privkey $srcdir/key-ca.pem \
     --outfile new-ca.pem \
-    --hash sha512
+    --hash sha512 >/dev/null 2>&1
 
 echo ca > template
 echo cn = "SHA 384 sub-CA" >> template
@@ -41,7 +41,7 @@ $CERTTOOL --generate-certificate --template template \
     --load-ca-certificate new-ca.pem \
     --load-privkey $srcdir/key-subca.pem \
     --outfile new-subca.pem \
-    --hash sha384
+    --hash sha384 >/dev/null 2>&1
 
 echo ca > template
 echo cn = "SHA 256 sub-sub-CA" >> template
@@ -51,7 +51,7 @@ $CERTTOOL --generate-certificate --template template \
     --load-ca-certificate new-subca.pem \
     --load-privkey $srcdir/key-subsubca.pem \
     --outfile new-subsubca.pem \
-    --hash sha256
+    --hash sha256 >/dev/null 2>&1
 
 echo ca > template
 echo cn = "End-user" >> template
@@ -60,17 +60,15 @@ $CERTTOOL --generate-certificate --template template \
     --load-ca-privkey $srcdir/key-subsubca.pem \
     --load-ca-certificate new-subsubca.pem \
     --load-privkey $srcdir/key-user.pem \
-    --outfile new-user.pem
+    --outfile new-user.pem >/dev/null 2>&1
 
 
 num=`cat new-user.pem new-subsubca.pem new-subca.pem new-ca.pem | $CERTTOOL --verify-chain | tee verify | grep -c Verified`
-cat verify
+#cat verify
 
 if test "$num" != "5"; then
     echo Verification failure
     exit 1
-else
-    echo Test OK
 fi
 
 rm -f verify new-user.pem new-subsubca.pem new-subca.pem new-ca.pem template

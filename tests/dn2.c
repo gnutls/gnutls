@@ -90,9 +90,7 @@ doit (void)
   if (ret < 0)
     fail ("x509_crt_print %d\n", ret);
 
-  if (out.size == strlen (info) && strcmp (out.data, info) == 0)
-    success ("comparison ok\n");
-  else
+  if (out.size != strlen (info) || strcmp (out.data, info) != 0)
     fail ("comparison fail (%d/%d)\nexpect: %s\n   got: %.*s\n",
 	  out.size, (int)strlen (info), info, out.size, out.data);
 
@@ -100,5 +98,5 @@ doit (void)
   gnutls_global_deinit ();
   gnutls_free (out.data);
 
-  success ("done\n");
+  if (debug) success ("done\n");
 }

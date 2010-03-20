@@ -325,7 +325,7 @@ doit (void)
   if (ret != GNUTLS_E_ASN1_DER_ERROR)
     fail ("crt3_import %d\n", ret);
 
-  success ("done\n");
+  if (debug) success ("done\n");
 
   gnutls_x509_crt_deinit (cert);
 

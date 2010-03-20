@@ -76,7 +76,8 @@ doit (void)
     fail ("gnutls_global_init\n");
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (4711);
+  if (debug)
+    gnutls_global_set_log_level (4711);
 
   ret = gnutls_x509_crq_init (&crq);
   if (ret != 0)
@@ -189,7 +190,7 @@ doit (void)
   ret = gnutls_x509_crq_print (crq, GNUTLS_CRT_PRINT_FULL, &out);
   if (ret != 0)
     fail ("gnutls_x509_crq_print\n");
-  printf ("crq: %.*s\n", out.size, out.data);
+  if (debug) printf ("crq: %.*s\n", out.size, out.data);
   gnutls_free (out.data);
 
   ret = gnutls_x509_crt_set_version (crt, 3);
@@ -203,7 +204,7 @@ doit (void)
   ret = gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_FULL, &out);
   if (ret != 0)
     fail ("gnutls_x509_crt_print\n");
-  printf ("crt: %.*s\n", out.size, out.data);
+  if (debug) printf ("crt: %.*s\n", out.size, out.data);
   gnutls_free (out.data);
 
   gnutls_x509_crq_deinit (crq);

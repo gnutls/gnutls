@@ -32,12 +32,13 @@
 void
 doit (void)
 {
-  printf ("GnuTLS header version %s.\n", GNUTLS_VERSION);
-  printf ("GnuTLS library version %s.\n", gnutls_check_version (NULL));
+  if (debug) 
+    {
+      printf ("GnuTLS header version %s.\n", GNUTLS_VERSION);
+      printf ("GnuTLS library version %s.\n", gnutls_check_version (NULL));
+    }
 
-  if (gnutls_check_version (GNUTLS_VERSION))
-    success ("gnutls_check_version OK\n");
-  else
+  if (!gnutls_check_version (GNUTLS_VERSION))
     fail ("gnutls_check_version ERROR\n");
 
   {
@@ -51,7 +52,7 @@ doit (void)
 
     for (i = 0; algs[i]; i++)
       {
-	printf ("pk_list[%d] = %d = %s = %d\n", (int)i, algs[i],
+	if (debug) printf ("pk_list[%d] = %d = %s = %d\n", (int)i, algs[i],
 		gnutls_pk_algorithm_get_name (algs[i]),
 		gnutls_pk_get_id (gnutls_pk_algorithm_get_name (algs[i])));
 	if (gnutls_pk_get_id (gnutls_pk_algorithm_get_name (algs[i]))
@@ -63,7 +64,7 @@ doit (void)
     if (pk != GNUTLS_PK_UNKNOWN)
       fail ("gnutls_pk unknown test failed (%d)\n", pk);
 
-    success ("gnutls_pk_list ok\n");
+    if (debug) success ("gnutls_pk_list ok\n");
   }
 
   {
@@ -77,7 +78,8 @@ doit (void)
 
     for (i = 0; algs[i]; i++)
       {
-	printf ("sign_list[%d] = %d = %s = %d\n", (int)i, algs[i],
+	if (debug)
+	  printf ("sign_list[%d] = %d = %s = %d\n", (int)i, algs[i],
 		gnutls_sign_algorithm_get_name (algs[i]),
 		gnutls_sign_get_id (gnutls_sign_algorithm_get_name
 				    (algs[i])));
@@ -90,6 +92,6 @@ doit (void)
     if (pk != GNUTLS_PK_UNKNOWN)
       fail ("gnutls_sign unknown test failed (%d)\n", pk);
 
-    success ("gnutls_sign_list ok\n");
+    if (debug) success ("gnutls_sign_list ok\n");
   }
 }

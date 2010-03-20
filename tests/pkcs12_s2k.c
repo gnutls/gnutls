@@ -117,7 +117,8 @@ doit (void)
   gnutls_global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (99);
+  if (debug)
+    gnutls_global_set_log_level (99);
 
   x = 0;
   for (i = 1; i < 4; i++)
@@ -135,12 +136,13 @@ doit (void)
 				       tmp, sizeof (tmp)), values[x]) != 0)
 	    fail ("_gnutls_pkcs12_string_to_key failed[1]\n");
 
-	  printf ("ij: %d.%d: %s\n", i, j,
+	  if (debug)
+	    printf ("ij: %d.%d: %s\n", i, j,
 		  _gnutls_bin2hex (key, sizeof (key), tmp, sizeof (tmp)));
 	  x++;
 	}
     }
-  printf ("\n");
+  if (debug) printf ("\n");
 
   for (i = 0; i < sizeof (tv) / sizeof (tv[0]); i++)
     {
@@ -155,12 +157,13 @@ doit (void)
 		  tv[i].key, tv[i].keylen) != 0)
 	fail ("_gnutls_pkcs12_string_to_key failed[3]\n");
 
-      printf ("tv[%d]: %s\n", i,
+      if (debug)
+        printf ("tv[%d]: %s\n", i,
 	      _gnutls_bin2hex (key, tv[i].keylen, tmp, sizeof (tmp)));
     }
-  printf ("\n");
+  if (debug) printf ("\n");
 
   gnutls_global_deinit ();
 
-  success ("_gnutls_pkcs12_string_to_key ok\n");
+  if (debug) success ("_gnutls_pkcs12_string_to_key ok\n");
 }

@@ -47,7 +47,8 @@ size_t to_client_len;
 static ssize_t
 client_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
 {
-  success ("client_pull len %d has %d\n", (int)len, (int)to_client_len);
+  if (debug)
+    success ("client_pull len %d has %d\n", (int)len, (int)to_client_len);
 
   if (to_client_len < len)
     {
@@ -69,8 +70,11 @@ client_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
   size_t newlen = to_server_len + len;
   char *tmp;
 
-  success ("client_push len %d has %d\n", (int)len, (int)to_server_len);
-  hexprint (data, len);
+  if (debug)
+    {
+      success ("client_push len %d has %d\n", (int)len, (int)to_server_len);
+      hexprint (data, len);
+    }
 
   tmp = realloc (to_server, newlen);
   if (!tmp)
@@ -89,7 +93,8 @@ client_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 static ssize_t
 server_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
 {
-  success ("server_pull len %d has %d\n", (int)len, (int)to_server_len);
+  if (debug)
+    success ("server_pull len %d has %d\n", (int)len, (int)to_server_len);
 
   if (to_server_len < len)
     {
@@ -111,9 +116,11 @@ server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
   size_t newlen = to_client_len + len;
   char *tmp;
 
-  success ("server_push len %d has %d\n", (int)len, (int)to_client_len);
-
-  hexprint (data, len);
+  if (debug)
+    {
+      success ("server_push len %d has %d\n", (int)len, (int)to_client_len);
+      hexprint (data, len);
+    }
 
   tmp = realloc (to_client, newlen);
   if (!tmp)
@@ -183,24 +190,25 @@ doit (void)
     {
       if (cret == GNUTLS_E_AGAIN)
 	{
-	  success ("loop invoking client:\n");
+	  if (debug)
+	    success ("loop invoking client:\n");
 	  cret = gnutls_handshake (client);
-	  success ("client %d: %s\n", cret, gnutls_strerror (cret));
+	  if (debug) success ("client %d: %s\n", cret, gnutls_strerror (cret));
 	}
 
       if (sret == GNUTLS_E_AGAIN)
 	{
-	  success ("loop invoking server:\n");
+	  if (debug) success ("loop invoking server:\n");
 	  sret = gnutls_handshake (server);
-	  success ("server %d: %s\n", sret, gnutls_strerror (sret));
+	  if (debug) success ("server %d: %s\n", sret, gnutls_strerror (sret));
 	}
     }
   while (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN);
 
-  success ("Handshake established\n");
+  if (debug) success ("Handshake established\n");
 
   ns = gnutls_record_send (client, MSG, strlen (MSG));
-  success ("client: sent %d\n", (int)ns);
+  if (debug) success ("client: sent %d\n", (int)ns);
 
   ret = gnutls_record_recv (server, buffer, MAX_BUF);
   if (ret == 0)
@@ -209,14 +217,17 @@ doit (void)
     fail ("server: error: %s\n", gnutls_strerror (ret));
   else
     {
-      printf ("server: received %d: ", ret);
-      for (n = 0; n < ret; n++)
-	fputc (buffer[n], stdout);
-      fputs ("\n", stdout);
+      if (debug)
+        {
+          printf ("server: received %d: ", ret);
+          for (n = 0; n < ret; n++)
+  	    fputc (buffer[n], stdout);
+          fputs ("\n", stdout);
+        }
     }
 
   ns = gnutls_record_send (server, MSG, strlen (MSG));
-  success ("server: sent %d\n", (int)ns);
+  if (debug) success ("server: sent %d\n", (int)ns);
 
   ret = gnutls_record_recv (client, buffer, MAX_BUF);
   if (ret == 0)
@@ -229,10 +240,13 @@ doit (void)
     }
   else
     {
-      printf ("client: received %d: ", ret);
-      for (n = 0; n < ret; n++)
-	fputc (buffer[n], stdout);
-      fputs ("\n", stdout);
+      if (debug)
+        {
+          printf ("client: received %d: ", ret);
+          for (n = 0; n < ret; n++)
+	    fputc (buffer[n], stdout);
+          fputs ("\n", stdout);
+        }
     }
 
   gnutls_bye (client, GNUTLS_SHUT_RDWR);

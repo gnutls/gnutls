@@ -153,7 +153,7 @@ client (struct params_res *params)
 	}
       else
 	{
-	  success ("client: Handshake was completed\n");
+	  if (debug) success ("client: Handshake was completed\n");
 	}
 
       if (t == 0)
@@ -170,7 +170,9 @@ client (struct params_res *params)
 	  if (gnutls_session_is_resumed (session) != 0)
 	    {
 	      if (params->expect_resume)
-		success ("- Previous session was resumed\n");
+	        {
+		  if (debug) success ("- Previous session was resumed\n");
+                }
 	      else
 		fail ("- Previous session was resumed\n");
 	    }
@@ -179,7 +181,9 @@ client (struct params_res *params)
 	      if (params->expect_resume)
 		fail ("*** Previous session was NOT resumed\n");
 	      else
-		success ("*** Previous session was NOT resumed (expected)\n");
+	        {
+		  if (debug) success ("*** Previous session was NOT resumed (expected)\n");
+                }
 	    }
 	}
 
@@ -188,7 +192,7 @@ client (struct params_res *params)
       ret = gnutls_record_recv (session, buffer, MAX_BUF);
       if (ret == 0)
 	{
-	  success ("client: Peer has closed the TLS connection\n");
+	  if (debug) success ("client: Peer has closed the TLS connection\n");
 	  goto end;
 	}
       else if (ret < 0)
@@ -326,13 +330,13 @@ global_start (void)
       return;
     }
 
-  success ("server: ready. Listening to port '%d'.\n", PORT);
+  if (debug) success ("server: ready. Listening to port '%d'.\n", PORT);
 }
 
 static void
 global_stop (void)
 {
-  success ("global stop\n");
+  if (debug) success ("global stop\n");
 
   gnutls_anon_free_server_credentials (anoncred);
 
@@ -359,7 +363,7 @@ server (struct params_res *params)
   gnutls_global_init ();
   gnutls_anon_allocate_server_credentials (&anoncred);
 
-  success ("Launched, generating DH parameters...\n");
+  if (debug) success ("Launched, generating DH parameters...\n");
 
   generate_dh_params ();
 
@@ -382,7 +386,7 @@ server (struct params_res *params)
 
       sd = accept (listen_sd, (SA *) & sa_cli, &client_len);
 
-      success ("server: connection from %s, port %d\n",
+      if (debug) success ("server: connection from %s, port %d\n",
 	       inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
 			  sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
@@ -396,7 +400,7 @@ server (struct params_res *params)
 		gnutls_strerror (ret));
 	  return;
 	}
-      success ("server: Handshake was completed\n");
+      if (debug) success ("server: Handshake was completed\n");
 
       /* see the Getting peer's information example */
       /* print_info(session); */
@@ -409,7 +413,7 @@ server (struct params_res *params)
 
 	  if (ret == 0)
 	    {
-	      success ("server: Peer has closed the GNUTLS connection\n");
+	      if (debug) success ("server: Peer has closed the GNUTLS connection\n");
 	      break;
 	    }
 	  else if (ret < 0)
@@ -443,7 +447,7 @@ server (struct params_res *params)
   gnutls_free (session_ticket_key.data);
   session_ticket_key.data = NULL;
 
-  success ("server: finished\n");
+  if (debug) success ("server: finished\n");
 }
 
 void
@@ -453,7 +457,7 @@ doit (void)
 
   for (i = 0; resume_tests[i].desc; i++)
     {
-      printf ("%s\n", resume_tests[i].desc);
+      if (debug) printf ("%s\n", resume_tests[i].desc);
 
       global_start ();
       if (error_count)
@@ -523,7 +527,7 @@ wrap_db_deinit (void)
 static int
 wrap_db_store (void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 {
-  success ("resume db storing... (%d-%d)\n", key.size, data.size);
+  if (debug) success ("resume db storing... (%d-%d)\n", key.size, data.size);
 
   if (debug)
     {
@@ -572,7 +576,7 @@ wrap_db_fetch (void *dbf, gnutls_datum_t key)
   gnutls_datum_t res = { NULL, 0 };
   int i;
 
-  success ("resume db fetch... (%d)\n", key.size);
+  if (debug) success ("resume db fetch... (%d)\n", key.size);
   if (debug)
     {
       unsigned int i;
@@ -594,7 +598,7 @@ wrap_db_fetch (void *dbf, gnutls_datum_t key)
       if (key.size == cache_db[i].session_id_size &&
 	  memcmp (key.data, cache_db[i].session_id, key.size) == 0)
 	{
-	  success ("resume db fetch... return info\n");
+	  if (debug) success ("resume db fetch... return info\n");
 
 	  res.size = cache_db[i].session_data_size;
 

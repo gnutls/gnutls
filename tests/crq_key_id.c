@@ -62,7 +62,8 @@ doit (void)
   gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (4711);
+  if (debug)
+    gnutls_global_set_log_level (4711);
 
   for (algorithm = GNUTLS_PK_RSA; algorithm <= GNUTLS_PK_DSA; algorithm++)
     {
@@ -81,7 +82,7 @@ doit (void)
 	{
 	  fail ("gnutls_x509_privkey_generate (rsa): %d\n", ret);
 	}
-      else
+      else if (debug)
 	{
 	  success ("Key[%s] generation ok: %d\n",
 		   gnutls_pk_algorithm_get_name (algorithm), ret);
@@ -149,7 +150,7 @@ doit (void)
 	  ret = memcmp (crq_key_id, pkey_key_id, crq_key_id_len);
 	  if (ret == 0)
 	    {
-	      success ("Key ids are identical. OK.\n");
+	      if (debug) success ("Key ids are identical. OK.\n");
 	    }
 	  else
 	    {

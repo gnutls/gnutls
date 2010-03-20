@@ -199,7 +199,8 @@ doit (void)
     fail ("init %d\n", ret);
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (2);
+  if (debug)
+    gnutls_global_set_log_level (2);
 
   ret = gnutls_global_init_extra ();
   if (ret < 0)
@@ -228,7 +229,7 @@ doit (void)
   if (ret != 0)
     fail ("keyring-check-id second key %d\n", ret);
 
-  success ("done\n");
+  if (debug) success ("done\n");
 
   gnutls_openpgp_keyring_deinit (keyring);
   gnutls_global_deinit ();

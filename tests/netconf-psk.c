@@ -51,11 +51,14 @@ doit (void)
   gnutls_global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (2);
+  if (debug)
+    gnutls_global_set_log_level (2);
 
   if (gnutls_psk_netconf_derive_key ("password", "psk_identity",
 				     "psk_identity_hint", &key) == 0)
-    success ("success: gnutls_psk_netconf_derive_key\n");
+    {
+      if (debug) success ("success: gnutls_psk_netconf_derive_key\n");
+    }
   else
     fail ("gnutls_psk_netconf_derive_key failure\n");
 
@@ -63,7 +66,9 @@ doit (void)
     hexprint (key.data, key.size);
 
   if (key.size == 20 && memcmp (key.data, known, 20) == 0)
-    success ("success: match.\n");
+    {
+      if (debug) success ("success: match.\n");
+    }
   else
     fail ("FAIL: key differ.\n");
 

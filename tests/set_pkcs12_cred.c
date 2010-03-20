@@ -51,7 +51,7 @@ doit (void)
   if (!password)
     password = "foobar";
 
-  success ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
+  if (debug) success ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
 	   file, password);
   ret = gnutls_certificate_set_x509_simple_pkcs12_file (x509cred,
 							file,
@@ -60,7 +60,7 @@ doit (void)
   if (ret < 0)
     fail ("x509_pkcs12 failed %d: %s\n", ret, gnutls_strerror (ret));
 
-  success ("Read file OK\n");
+  if (debug) success ("Read file OK\n");
 
   gnutls_certificate_free_credentials (x509cred);
 
@@ -79,7 +79,7 @@ doit (void)
   if (!password)
     password = "";
 
-  success ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
+  if (debug) success ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
 	   file, password);
   ret = gnutls_certificate_set_x509_simple_pkcs12_file (x509cred,
 							file,
@@ -88,7 +88,7 @@ doit (void)
   if (ret < 0)
     fail ("x509_pkcs12 failed %d: %s\n", ret, gnutls_strerror (ret));
 
-  success ("Read file OK\n");
+  if (debug) success ("Read file OK\n");
 
   gnutls_certificate_free_credentials (x509cred);
 

@@ -49,7 +49,9 @@ doit (void)
     {
       if (memcmp (digest, "\x3c\xb0\x9d\x83\x28\x01\xef\xc0"
 		  "\x7b\xb3\xaf\x42\x69\xe5\x93\x9a", 16) == 0)
-	success ("_gnutls_hmac_fast(MD5) OK\n");
+        {
+	  if (debug) success ("_gnutls_hmac_fast(MD5) OK\n");
+        }
       else
 	{
 	  hexprint (digest, 16);
@@ -67,7 +69,9 @@ doit (void)
       if (memcmp (digest, "\x58\x93\x7a\x58\xfe\xea\x82\xf8"
 		  "\x0e\x64\x62\x01\x40\x2b\x2c\xed\x5d\x54\xc1\xfa",
 		  20) == 0)
-	success ("_gnutls_hmac_fast(SHA1) OK\n");
+        {
+	  if (debug) success ("_gnutls_hmac_fast(SHA1) OK\n");
+        }
       else
 	{
 	  hexprint (digest, 20);
@@ -82,7 +86,9 @@ doit (void)
     {
       if (memcmp (digest, "\x09\xb7\x85\x57\xdd\xf6\x07\x15"
 		  "\x1c\x52\x34\xde\xba\x5c\xdc\x59", 16) == 0)
-	success ("_gnutls_pkcs5_pbkdf2_sha1() OK\n");
+	{
+	  if (debug) success ("_gnutls_pkcs5_pbkdf2_sha1() OK\n");
+        }
       else
 	{
 	  hexprint (digest, 16);

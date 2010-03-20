@@ -53,6 +53,6 @@ doit (void)
       hexprint (md, sizeof (md));
       fail ("MD5 failure\n");
     }
-  else
+  else if (debug)
     success ("MD5 OK\n");
 }

@@ -227,6 +227,7 @@ if test "$gl_gcc_warnings" = yes; then
   nw="$nw -Wformat-nonliteral"      # Incompatible with gettext _()
   nw="$nw -Wunsafe-loop-optimizations"
   nw="$nw -Wstrict-overflow"
+  nw="$nw -Wmissing-noreturn"
 
   gl_MANYWARN_ALL_GCC([ws])
   gl_MANYWARN_COMPLEMENT(ws, [$ws], [$nw])

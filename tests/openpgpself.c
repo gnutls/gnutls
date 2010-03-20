@@ -113,13 +113,14 @@ client (void)
   gnutls_global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (2);
+  if (debug)
+    gnutls_global_set_log_level (2);
 
   gnutls_certificate_allocate_credentials (&xcred);
 
   /* sets the trusted cas file
    */
-  success ("Setting key files...\n");
+  if (debug) success ("Setting key files...\n");
 
   ret = gnutls_certificate_set_openpgp_key_mem (xcred, &cert, &key,
 						GNUTLS_OPENPGP_FMT_BASE64);
@@ -141,7 +142,7 @@ client (void)
 
   /* connect to the peer
    */
-  success ("Connecting...\n");
+  if (debug) success ("Connecting...\n");
   sd = tcp_connect ();
 
   gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
@@ -156,23 +157,23 @@ client (void)
       gnutls_perror (ret);
       goto end;
     }
-  else
+  else if (debug) 
     {
       success ("client: Handshake was completed\n");
     }
 
-  success ("client: TLS version is: %s\n",
+  if (debug) success ("client: TLS version is: %s\n",
 	   gnutls_protocol_get_name (gnutls_protocol_get_version (session)));
 
   /* see the Getting peer's information example */
-  print_info (session);
+  if (debug) print_info (session);
 
   gnutls_record_send (session, MSG, strlen (MSG));
 
   ret = gnutls_record_recv (session, buffer, MAX_BUF);
   if (ret == 0)
     {
-      success ("client: Peer has closed the TLS connection\n");
+      if (debug) success ("client: Peer has closed the TLS connection\n");
       goto end;
     }
   else if (ret < 0)
@@ -181,12 +182,15 @@ client (void)
       goto end;
     }
 
-  printf ("- Received %d bytes: ", ret);
-  for (ii = 0; ii < ret; ii++)
+  if (debug)
     {
-      fputc (buffer[ii], stdout);
+        printf ("- Received %d bytes: ", ret);
+        for (ii = 0; ii < ret; ii++)
+          {
+            fputc (buffer[ii], stdout);
+          }
+        fputs ("\n", stdout);
     }
-  fputs ("\n", stdout);
 
   gnutls_bye (session, GNUTLS_SHUT_RDWR);
 
@@ -372,7 +376,7 @@ server_start (void)
       return;
     }
 
-  success ("server: ready. Listening to port '%d'.\n", PORT);
+  if (debug) success ("server: ready. Listening to port '%d'.\n", PORT);
 }
 
 static void
@@ -396,7 +400,7 @@ server (void)
       fail ("Could not set server key files...\n");
     }
 
-  success ("Launched, setting DH parameters...\n");
+  if (debug) success ("Launched, setting DH parameters...\n");
 
   generate_dh_params ();
 
@@ -408,7 +412,7 @@ server (void)
 
   sd = accept (listen_sd, (SA *) & sa_cli, &client_len);
 
-  success ("server: connection from %s, port %d\n",
+  if (debug) success ("server: connection from %s, port %d\n",
 	   inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
 		      sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
@@ -421,13 +425,13 @@ server (void)
       fail ("server: Handshake has failed (%s)\n\n", gnutls_strerror (ret));
       return;
     }
-  success ("server: Handshake was completed\n");
+  if (debug) success ("server: Handshake was completed\n");
 
-  success ("server: TLS version is: %s\n",
+  if (debug) success ("server: TLS version is: %s\n",
 	   gnutls_protocol_get_name (gnutls_protocol_get_version (session)));
 
   /* see the Getting peer's information example */
-  print_info (session);
+  if (debug) print_info (session);
 
   i = 0;
   for (;;)
@@ -437,7 +441,7 @@ server (void)
 
       if (ret == 0)
 	{
-	  success ("server: Peer has closed the GNUTLS connection\n");
+	  if (debug) success ("server: Peer has closed the GNUTLS connection\n");
 	  break;
 	}
       else if (ret < 0)
@@ -467,7 +471,7 @@ server (void)
 
   gnutls_global_deinit ();
 
-  success ("server: finished\n");
+  if (debug) success ("server: finished\n");
 }
 
 
