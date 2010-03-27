@@ -847,7 +847,7 @@ _gnutls_x509_crt_to_gcert (gnutls_cert * gcert,
 
   if (!(flags & CERT_NO_COPY))
     {
-#define SMALL_DER 512
+#define SMALL_DER 1536
       opaque *der;
       size_t der_size = SMALL_DER;
 
