@@ -23,6 +23,7 @@ AC_DEFUN([sj_VALGRIND],
 
   if test -n "$VALGRIND" && $VALGRIND true > /dev/null 2>&1; then
     opt_valgrind_tests=yes
+    VALGRIND="$VALGRIND -q"
   else
     opt_valgrind_tests=no
     VALGRIND=
