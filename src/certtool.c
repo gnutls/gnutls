@@ -1904,90 +1904,86 @@ generate_request (void)
     {
       ca_status = get_ca_status ();
       if (ca_status)
-        path_len = get_path_len ();
+	path_len = get_path_len ();
       else
-        path_len = -1;
+	path_len = -1;
 
       ret = gnutls_x509_crq_set_basic_constraints (crq, ca_status, path_len);
       if (ret < 0)
-        error (EXIT_FAILURE, 0, "set_basic_constraints: %s",
-	   gnutls_strerror (ret));
-
+	error (EXIT_FAILURE, 0, "set_basic_constraints: %s",
+	       gnutls_strerror (ret));
 
       ret = get_sign_status (1);
       if (ret)
-        usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
+	usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
 
       ret = get_encrypt_status (1);
       if (ret)
-        usage |= GNUTLS_KEY_KEY_ENCIPHERMENT;
+	usage |= GNUTLS_KEY_KEY_ENCIPHERMENT;
       else
-        usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
+	usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
 
       if (ca_status)
-        {
-          ret = get_cert_sign_status ();
-          if (ret)
-            usage |= GNUTLS_KEY_KEY_CERT_SIGN;
+	{
+	  ret = get_cert_sign_status ();
+	  if (ret)
+	    usage |= GNUTLS_KEY_KEY_CERT_SIGN;
 
-          ret = get_crl_sign_status ();
-          if (ret)
-            usage |= GNUTLS_KEY_CRL_SIGN;
+	  ret = get_crl_sign_status ();
+	  if (ret)
+	    usage |= GNUTLS_KEY_CRL_SIGN;
 
-          ret = get_code_sign_status ();
-          if (ret)
-            {
-    	      ret =
-    	        gnutls_x509_crq_set_key_purpose_oid (crq,
-						 GNUTLS_KP_CODE_SIGNING, 0);
-              if (ret < 0)
-                error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
-            }
+	  ret = get_code_sign_status ();
+	  if (ret)
+	    {
+	      ret = gnutls_x509_crq_set_key_purpose_oid
+		(crq, GNUTLS_KP_CODE_SIGNING, 0);
+	      if (ret < 0)
+		error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
+	    }
 
-          ret = get_ocsp_sign_status ();
-          if (ret)
-            {
-              ret =
-                gnutls_x509_crq_set_key_purpose_oid (crq,
-						 GNUTLS_KP_OCSP_SIGNING, 0);
-              if (ret < 0)
-                error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
-            }
+	  ret = get_ocsp_sign_status ();
+	  if (ret)
+	    {
+	      ret = gnutls_x509_crq_set_key_purpose_oid
+		(crq, GNUTLS_KP_OCSP_SIGNING, 0);
+	      if (ret < 0)
+		error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
+	    }
 
-          ret = get_time_stamp_status ();
-          if (ret)
-            {
-                ret =
-                  gnutls_x509_crq_set_key_purpose_oid (crq,
-						 GNUTLS_KP_TIME_STAMPING, 0);
-                if (ret < 0)
-                  error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
-            }
-
-        }
+	  ret = get_time_stamp_status ();
+	  if (ret)
+	    {
+	      ret = gnutls_x509_crq_set_key_purpose_oid
+		(crq, GNUTLS_KP_TIME_STAMPING, 0);
+	      if (ret < 0)
+		error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
+	    }
+	}
 
       ret = gnutls_x509_crq_set_key_usage (crq, usage);
       if (ret < 0)
-        error (EXIT_FAILURE, 0, "key_usage: %s", gnutls_strerror (ret));
+	error (EXIT_FAILURE, 0, "key_usage: %s", gnutls_strerror (ret));
 
       ret = get_tls_client_status ();
       if (ret != 0)
-        {
-          ret = gnutls_x509_crq_set_key_purpose_oid (crq,
-						 GNUTLS_KP_TLS_WWW_CLIENT, 0);
-          if (ret < 0)
+	{
+	  ret = gnutls_x509_crq_set_key_purpose_oid
+	    (crq, GNUTLS_KP_TLS_WWW_CLIENT, 0);
+	  if (ret < 0)
 	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
-        }
+	}
 
       ret = get_tls_server_status ();
       if (ret != 0)
-        {
-          ret = gnutls_x509_crq_set_key_purpose_oid (crq,
-						 GNUTLS_KP_TLS_WWW_SERVER, 0);
-          if (ret < 0)
-            error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
-        }
+	{
+	  ret = gnutls_x509_crq_set_key_purpose_oid
+	    (crq, GNUTLS_KP_TLS_WWW_SERVER, 0);
+	  if (ret < 0)
+	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
+	}
   }
+
   ret = gnutls_x509_crq_set_key (crq, key);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "set_key: %s", gnutls_strerror (ret));

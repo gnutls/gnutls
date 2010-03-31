@@ -218,12 +218,12 @@ doit (void)
   else
     {
       if (debug)
-        {
-          printf ("server: received %d: ", ret);
-          for (n = 0; n < ret; n++)
-  	    fputc (buffer[n], stdout);
-          fputs ("\n", stdout);
-        }
+	{
+	  printf ("server: received %d: ", ret);
+	  for (n = 0; n < ret; n++)
+	    fputc (buffer[n], stdout);
+	  fputs ("\n", stdout);
+	}
     }
 
   ns = gnutls_record_send (server, MSG, strlen (MSG));

@@ -231,7 +231,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   # For cryptodev
   AC_MSG_CHECKING([whether to add cryptodev support])
   AC_ARG_ENABLE(cryptodev,
- 	AS_HELP_STRING([--enable-cryptodev], [enable cryptodev support]),
+    AS_HELP_STRING([--enable-cryptodev], [enable cryptodev support]),
   enable_cryptodev=yes,enable_cryptodev=no)
   AC_MSG_RESULT($enable_cryptodev)
 

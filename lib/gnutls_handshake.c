@@ -2136,35 +2136,35 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       if (_gnutls_version_has_extensions (hver))
 	  type = GNUTLS_EXT_ANY;
       else
-        {
+	{
 	  if(session->internals.initial_negotiation_completed != 0)
 	    type = GNUTLS_EXT_MANDATORY;
-          else
-            type = GNUTLS_EXT_NONE;
-        }
-        
+	  else
+	    type = GNUTLS_EXT_NONE;
+	}
+
       ret = _gnutls_gen_extensions (session, extdata, extdatalen, type);
 
       if (ret > 0)
-        {
-          datalen += ret;
-          data = gnutls_realloc_fast (data, datalen);
-          if (data == NULL)
- 	    {
+	{
+	  datalen += ret;
+	  data = gnutls_realloc_fast (data, datalen);
+	  if (data == NULL)
+	    {
 	      gnutls_assert ();
 	      gnutls_free (extdata);
 	      return GNUTLS_E_MEMORY_ERROR;
 	    }
 
-          memcpy (&data[pos], extdata, ret);
-        }
+	  memcpy (&data[pos], extdata, ret);
+	}
       else if (ret < 0)
-        {
-          gnutls_assert ();
-          gnutls_free (data);
-          gnutls_free (extdata);
-          return ret;
-	 }
+	{
+	  gnutls_assert ();
+	  gnutls_free (data);
+	  gnutls_free (extdata);
+	  return ret;
+	}
 
     }
 
@@ -2332,7 +2332,7 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
       gnutls_assert();
       return ret;
     }
-  	    
+
   /* Safe renegotiation */
   ext = &session->security_parameters.extensions;
 
@@ -2347,12 +2347,14 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	  _gnutls_handshake_log ("Safe renegotiation failed [1]\n");
 	  return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
 	}
+
       if (session->security_parameters.entity == GNUTLS_CLIENT)
-        {
+	{
 	  if ((ext->ri_extension_data_len !=
 	       ext->client_verify_data_len + ext->server_verify_data_len) ||
-	       memcmp (ext->ri_extension_data + ext->client_verify_data_len,
-		       ext->server_verify_data, ext->server_verify_data_len) != 0)
+	      memcmp (ext->ri_extension_data + ext->client_verify_data_len,
+		      ext->server_verify_data,
+		      ext->server_verify_data_len) != 0)
 	    {
 	      gnutls_assert();
 	      _gnutls_handshake_log ("Safe renegotiation failed [2]\n");
@@ -2393,9 +2395,10 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	      gnutls_assert();
 	      _gnutls_handshake_log ("Denying unsafe (re)negotiation.\n");
 	      if (session->security_parameters.entity == GNUTLS_SERVER)
-	        return GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED; /* send no renegotiation alert */
-              else
- 	        return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
+		/* send no renegotiation alert */
+		return GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED;
+	      else
+		return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
 	    }
 	}
       else

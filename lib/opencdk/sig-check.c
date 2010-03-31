@@ -551,7 +551,7 @@ cdk_pk_check_sigs (cdk_kbnode_t key, cdk_keydb_hd_t keydb, int *r_status)
 	{
 	  /* add every uid in the uid list. Only consider valid:
 	   * - verification was ok
-	   * - not a selfsig 
+	   * - not a selfsig
 	   */
 	  rc =
 	    uid_list_add_sig (&uid_list, uid_name,
@@ -581,7 +581,7 @@ exit:
  * cdk_pk_check_self_sig:
  * @key: the key node
  * @r_status: output the status of the key.
- * 
+ *
  * A convenient function to make sure the key is valid.
  * Valid means the self signature is ok.
  **/
@@ -604,41 +604,41 @@ cdk_pk_check_self_sig (cdk_kbnode_t key, int *r_status)
   while ((p = cdk_kbnode_walk (key, &ctx, 0)))
     {
       pkt = cdk_kbnode_get_packet (p);
-      if (pkt->pkttype != CDK_PKT_PUBLIC_SUBKEY && pkt->pkttype != CDK_PKT_PUBLIC_KEY)
-        continue;
+      if (pkt->pkttype != CDK_PKT_PUBLIC_SUBKEY
+	  && pkt->pkttype != CDK_PKT_PUBLIC_KEY)
+	continue;
 
       /* FIXME: we should set expire/revoke here also but callers
          expect CDK_KEY_VALID=0 if the key is okay. */
       sig_ok = 0;
       for (node = p; node; node = node->next)
-        {
-          if (node->pkt->pkttype != CDK_PKT_SIGNATURE)
-  	    continue;
-          sig = node->pkt->pkt.signature;
-
-          cdk_sig_get_keyid (sig, sigid);
-          if (sigid[0] != keyid[0] || sigid[1] != keyid[1])
+	{
+	  if (node->pkt->pkttype != CDK_PKT_SIGNATURE)
 	    continue;
-          /* FIXME: Now we check all self signatures. */
-          rc = _cdk_pk_check_sig (NULL, p, node, &is_selfsig, NULL);
-          if (rc)
+	  sig = node->pkt->pkt.signature;
+
+	  cdk_sig_get_keyid (sig, sigid);
+	  if (sigid[0] != keyid[0] || sigid[1] != keyid[1])
+	    continue;
+	  /* FIXME: Now we check all self signatures. */
+	  rc = _cdk_pk_check_sig (NULL, p, node, &is_selfsig, NULL);
+	  if (rc)
 	    {
-  	      *r_status = CDK_KEY_INVALID;
+	      *r_status = CDK_KEY_INVALID;
 	      return rc;
-  	    }
-          else			/* For each valid self sig we increase this counter. */
+	    }
+	  else /* For each valid self sig we increase this counter. */
 	    sig_ok++;
-        }
+	}
 
       /* A key without a self signature is not valid. At least one
        * signature for the given key has to be found.
        */
       if (!sig_ok)
-        {
-          *r_status = CDK_KEY_INVALID;
-          return CDK_General_Error;
-        }
-
+	{
+	  *r_status = CDK_KEY_INVALID;
+	  return CDK_General_Error;
+	}
     }
 
     /* No flags indicate a valid key. */

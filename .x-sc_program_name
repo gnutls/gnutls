@@ -1,5 +1,4 @@
 ^doc/
-^gl/
-^lib/gl/
 ^src/cfg/
+^src/benchmark
 ^tests/

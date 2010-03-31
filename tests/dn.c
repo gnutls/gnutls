@@ -81,8 +81,8 @@ print_dn (gnutls_x509_dn_t dn)
 	if (ret < 0)
 	  fail ("get_rdn_ava %d\n", ret);
 	if (debug)
-  	  printf ("dn[%d][%d] OID=%.*s\n\tDATA=%.*s\n", i, j,
-		ava.oid.size, ava.oid.data, ava.value.size, ava.value.data);
+	  printf ("dn[%d][%d] OID=%.*s\n\tDATA=%.*s\n", i, j,
+		  ava.oid.size, ava.oid.data, ava.value.size, ava.value.data);
       }
 }
 

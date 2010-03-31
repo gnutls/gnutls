@@ -97,9 +97,8 @@ _gnutls_safe_renegotiation_send_params (gnutls_session_t session,
       DECR_LEN (data_size, ext->client_verify_data_len);
 
       if (ext->client_verify_data_len > 0)
-        memcpy(&data[1], 
-	     ext->client_verify_data, 
-	     ext->client_verify_data_len);
+	memcpy(&data[1], ext->client_verify_data,
+	       ext->client_verify_data_len);
 
       if (session->security_parameters.entity == GNUTLS_SERVER)
 	{
@@ -108,7 +107,7 @@ _gnutls_safe_renegotiation_send_params (gnutls_session_t session,
 	  DECR_LEN (data_size, ext->server_verify_data_len);
 
 	  if (ext->server_verify_data_len > 0)
-  	    memcpy(&data[1 + ext->client_verify_data_len],
+	    memcpy(&data[1 + ext->client_verify_data_len],
 		 ext->server_verify_data,
 		 ext->server_verify_data_len);
 	}
