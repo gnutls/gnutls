@@ -57,9 +57,9 @@ Reported by and tiny patch from Vitaly Mayatskikh
 ** minitasn1: Upgraded to libtasn1 version 2.5.
 
 ** i18n: Updated Czech, Dutch, French, Polish, Swedish translation.
-** Added Simplified Chinese translation.
+** Added Italian and Simplified Chinese translation.
 Thanks to Petr Pisar, Erwin Poeze, Nicolas Provost, Jakub Bogusz,
-Daniel Nylander, Tao Wei, and Aron Xu.
+Daniel Nylander, Sergio Zanchetta, Tao Wei, and Aron Xu.
 
 ** doc: The GTK-DOC manual is significantly improved.
 
