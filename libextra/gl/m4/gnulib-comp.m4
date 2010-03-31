@@ -25,7 +25,14 @@ AC_DEFUN([xgl_EARLY],
   m4_pattern_allow([^gl_LIBOBJS$])dnl a variable
   m4_pattern_allow([^gl_LTLIBOBJS$])dnl a variable
   AC_REQUIRE([AC_PROG_RANLIB])
+  # Code from module crypto/hmac-md5:
+  # Code from module crypto/md5:
+  # Code from module extensions:
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
+  # Code from module havelib:
+  # Code from module lib-msvc-compat:
+  # Code from module lib-symbol-versions:
+  # Code from module memxor:
 ])
 
 # This macro should be invoked from ./configure.ac, in the section
@@ -41,11 +48,19 @@ AC_DEFUN([xgl_INIT],
   m4_pushdef([xgl_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='gl'
+  # Code from module crypto/hmac-md5:
   gl_HMAC_MD5
+  # Code from module crypto/md5:
   gl_MD5
+  # Code from module extensions:
+  # Code from module havelib:
+  # Code from module lib-msvc-compat:
   gl_LD_OUTPUT_DEF
+  # Code from module lib-symbol-versions:
   gl_LD_VERSION_SCRIPT
+  # Code from module memxor:
   gl_MEMXOR
+  # End of code from modules
   m4_ifval(xgl_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([xgl_LIBSOURCES_DIR])[ ||
       for gl_file in ]xgl_LIBSOURCES_LIST[ ; do
@@ -85,6 +100,13 @@ AC_DEFUN([xgl_INIT],
   m4_pushdef([xgltests_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='gl/tests'
+changequote(,)dnl
+  xgltests_WITNESS=IN_`echo "${PACKAGE-$PACKAGE_TARNAME}" | LC_ALL=C tr abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ | LC_ALL=C sed -e 's/[^A-Z0-9_]/_/g'`_GNULIB_TESTS
+changequote([, ])dnl
+  AC_SUBST([xgltests_WITNESS])
+  gl_module_indicator_condition=$xgltests_WITNESS
+  m4_pushdef([gl_MODULE_INDICATOR_CONDITION], [$gl_module_indicator_condition])
+  m4_popdef([gl_MODULE_INDICATOR_CONDITION])
   m4_ifval(xgltests_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([xgltests_LIBSOURCES_DIR])[ ||
       for gl_file in ]xgltests_LIBSOURCES_LIST[ ; do

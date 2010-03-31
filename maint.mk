@@ -292,7 +292,7 @@ sc_prohibit_HAVE_MBRTOWC:
 # To use this "command" macro, you must first define two shell variables:
 # h: the header, enclosed in <> or ""
 # re: a regular expression that matches IFF something provided by $h is used.
-define _header_without_use
+define _sc_header_without_use
   dummy=; : so we do not need a semicolon before each use;		\
   h_esc=`echo "$$h"|sed 's/\./\\\\./g'`;				\
   if $(VC_LIST_EXCEPT) | grep -l '\.c$$' > /dev/null; then		\
@@ -307,44 +307,44 @@ endef
 
 # Prohibit the inclusion of assert.h without an actual use of assert.
 sc_prohibit_assert_without_use:
-	@h='<assert.h>' re='\<assert *\(' $(_header_without_use)
+	@h='<assert.h>' re='\<assert *\(' $(_sc_header_without_use)
 
 # Prohibit the inclusion of close-stream.h without an actual use.
 sc_prohibit_close_stream_without_use:
-	@h='"close-stream.h"' re='\<close_stream *\(' $(_header_without_use)
+	@h='"close-stream.h"' re='\<close_stream *\(' $(_sc_header_without_use)
 
 # Prohibit the inclusion of getopt.h without an actual use.
 sc_prohibit_getopt_without_use:
-	@h='<getopt.h>' re='\<getopt(_long)? *\(' $(_header_without_use)
+	@h='<getopt.h>' re='\<getopt(_long)? *\(' $(_sc_header_without_use)
 
 # Don't include quotearg.h unless you use one of its functions.
 sc_prohibit_quotearg_without_use:
-	@h='"quotearg.h"' re='\<quotearg(_[^ ]+)? *\(' $(_header_without_use)
+	@h='"quotearg.h"' re='\<quotearg(_[^ ]+)? *\(' $(_sc_header_without_use)
 
 # Don't include quote.h unless you use one of its functions.
 sc_prohibit_quote_without_use:
-	@h='"quote.h"' re='\<quote(_n)? *\(' $(_header_without_use)
+	@h='"quote.h"' re='\<quote(_n)? *\(' $(_sc_header_without_use)
 
 # Don't include this header unless you use one of its functions.
 sc_prohibit_long_options_without_use:
 	@h='"long-options.h"' re='\<parse_long_options *\(' \
-	  $(_header_without_use)
+	  $(_sc_header_without_use)
 
 # Don't include this header unless you use one of its functions.
 sc_prohibit_inttostr_without_use:
 	@h='"inttostr.h"' re='\<(off|[iu]max|uint)tostr *\(' \
-	  $(_header_without_use)
+	  $(_sc_header_without_use)
 
 # Don't include this header unless you use one of its functions.
 sc_prohibit_ignore_value_without_use:
 	@h='"ignore-value.h"' re='\<ignore_(value|ptr) *\(' \
-	  $(_header_without_use)
+	  $(_sc_header_without_use)
 
 # Don't include this header unless you use one of its functions.
 sc_prohibit_error_without_use:
 	@h='"error.h"' \
 	re='\<error(_at_line|_print_progname|_one_per_line|_message_count)? *\('\
-	  $(_header_without_use)
+	  $(_sc_header_without_use)
 
 # Don't include xalloc.h unless you use one of its functions.
 # Consider these symbols:
@@ -367,7 +367,7 @@ _xa2 = X([CZ]|N?M)ALLOC
 sc_prohibit_xalloc_without_use:
 	@h='"xalloc.h"' \
 	re='\<($(_xa1)|$(_xa2)) *\('\
-	  $(_header_without_use)
+	  $(_sc_header_without_use)
 
 # Extract function names:
 # perl -lne '/^(?:extern )?(?:void|char) \*?(\w+) \(/ and print $1' lib/hash.h
@@ -378,42 +378,43 @@ _hash_struct = (struct )?\<[Hh]ash_(table|tuning)\>
 sc_prohibit_hash_without_use:
 	@h='"hash.h"' \
 	re='$(_hash_fn)|$(_hash_struct)'\
-	  $(_header_without_use)
+	  $(_sc_header_without_use)
 
 sc_prohibit_hash_pjw_without_use:
 	@h='"hash-pjw.h"' \
 	re='\<hash_pjw *\(' \
-	  $(_header_without_use)
+	  $(_sc_header_without_use)
 
 sc_prohibit_safe_read_without_use:
 	@h='"safe-read.h"' re='(\<SAFE_READ_ERROR\>|\<safe_read *\()' \
-	  $(_header_without_use)
+	  $(_sc_header_without_use)
 
 sc_prohibit_argmatch_without_use:
 	@h='"argmatch.h"' \
 	re='(\<(ARRAY_CARDINALITY|X?ARGMATCH(|_TO_ARGUMENT|_VERIFY))\>|\<argmatch(_exit_fn|_(in)?valid) *\()' \
-	  $(_header_without_use)
+	  $(_sc_header_without_use)
 
 sc_prohibit_canonicalize_without_use:
 	@h='"canonicalize.h"' \
 	re='CAN_(EXISTING|ALL_BUT_LAST|MISSING)|canonicalize_(mode_t|filename_mode)' \
-	  $(_header_without_use)
+	  $(_sc_header_without_use)
 
 sc_prohibit_root_dev_ino_without_use:
 	@h='"root-dev-ino.h"' \
 	re='(\<ROOT_DEV_INO_(CHECK|WARN)\>|\<get_root_dev_ino *\()' \
-	  $(_header_without_use)
+	  $(_sc_header_without_use)
 
 sc_prohibit_openat_without_use:
 	@h='"openat.h"' \
 	re='\<(openat_(permissive|needs_fchdir|(save|restore)_fail)|l?(stat|ch(own|mod))at|(euid)?accessat)\>' \
-	  $(_header_without_use)
+	  $(_sc_header_without_use)
 
 # Prohibit the inclusion of c-ctype.h without an actual use.
 ctype_re = isalnum|isalpha|isascii|isblank|iscntrl|isdigit|isgraph|islower\
 |isprint|ispunct|isspace|isupper|isxdigit|tolower|toupper
 sc_prohibit_c_ctype_without_use:
-	@h='[<"]c-ctype.h[">]' re='\<c_($(ctype_re)) *\(' $(_header_without_use)
+	@h='[<"]c-ctype.h[">]' re='\<c_($(ctype_re)) *\(' \
+	  $(_sc_header_without_use)
 
 _empty =
 _sp = $(_empty) $(_empty)
@@ -450,7 +451,20 @@ _sig_syms_re = $(subst $(_sp),|,$(strip $(_sig_names) $(_sig_types_and_consts)))
 sc_prohibit_signal_without_use:
 	@h='<signal.h>'							\
 	re='\<($(_sig_function_re)) *\(|\<($(_sig_syms_re))\>'		\
-	  $(_header_without_use)
+	  $(_sc_header_without_use)
+
+# Get the list of symbol names with this:
+# perl -lne '/^# *define (\w+)\(/ and print $1' lib/intprops.h|grep -v '^s'|fmt
+_intprops_names =							\
+  TYPE_IS_INTEGER TYPE_TWOS_COMPLEMENT TYPE_ONES_COMPLEMENT		\
+  TYPE_SIGNED_MAGNITUDE TYPE_SIGNED TYPE_MINIMUM TYPE_MAXIMUM		\
+  INT_STRLEN_BOUND INT_BUFSIZE_BOUND
+_intprops_syms_re = $(subst $(_sp),|,$(strip $(_intprops_names)))
+# Prohibit the inclusion of intprops.h without an actual use.
+sc_prohibit_intprops_without_use:
+	@h='"intprops.h"'						\
+	re='\<($(_intprops_syms_re)) *\('				\
+	  $(_sc_header_without_use)
 
 sc_obsolete_symbols:
 	@re='\<(HAVE''_FCNTL_H|O''_NDELAY)\>'				\
@@ -548,6 +562,16 @@ sc_GFDL_version:
 	@re='$(_GFDL_regexp)' msg='GFDL vN, N!=3'			\
 	  $(_prohibit_regexp)
 
+# Don't use Texinfo @acronym{} as it is not a good idea.
+sc_texinfo_acronym:
+	@if $(VC_LIST_EXCEPT) | grep -lE '\.texi$$' >/dev/null; then	\
+		grep -nE '@acronym{'					\
+			$$($(VC_LIST_EXCEPT) | grep -E '\.texi$$') &&	\
+	  { echo '$(ME): found use of Texinfo @acronym{}' 1>&2;		\
+	    exit 1; } || :;						\
+	else :;								\
+	fi
+
 cvs_keywords = \
   Author|Date|Header|Id|Name|Locker|Log|RCSfile|Revision|Source|State
 
@@ -568,6 +592,14 @@ sc_prohibit_stat_st_blocks:
 sc_prohibit_S_IS_definition:
 	@re='^ *# *define  *S_IS'					\
 	msg='do not define S_IS* macros; include <sys/stat.h>'		\
+	  $(_prohibit_regexp)
+
+_ptm1 = use "test C1 && test C2", not "test C1 -''a C2"
+_ptm2 = use "test C1 || test C2", not "test C1 -''o C2"
+# Using test's -a and -o operators is not portable.
+sc_prohibit_test_minus_ao:
+	@re='\<test .+ -[ao] '						\
+	msg='$(_ptm1); $(_ptm2)'						\
 	  $(_prohibit_regexp)
 
 # Each program that uses proper_name_utf8 must link with one of the
@@ -746,8 +778,9 @@ sc_copyright_check:
 # tests many undefined macros, and so we can't enable that option.
 # So at least preclude common boolean strings as macro values.
 sc_Wundef_boolean:
-	@grep -Ei '^#define.*(yes|no|true|false)$$' '$(CONFIG_INCLUDE)' && \
-	  { echo 'Use 0 or 1 for macro values' 1>&2; exit 1; } || :
+	@test -e '$(CONFIG_INCLUDE)' &&                                 \
+	   grep -Ei '^#define.*(yes|no|true|false)$$' '$(CONFIG_INCLUDE)' && \
+	     { echo 'Use 0 or 1 for macro values' 1>&2; exit 1; } || :
 
 sc_vulnerable_makefile_CVE-2009-4029:
 	@files=$$(find $(srcdir) -name Makefile.in);			\

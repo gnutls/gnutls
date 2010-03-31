@@ -1,4 +1,4 @@
-# gnulib-common.m4 serial 12
+# gnulib-common.m4 serial 18
 dnl Copyright (C) 2007-2010 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -37,12 +37,63 @@ AC_DEFUN([gl_COMMON_BODY], [
 ])
 ])
 
+# gl_MODULE_INDICATOR_CONDITION
+# expands to a C preprocessor expression that evaluates to 1 or 0, depending
+# whether a gnulib module that has been requested shall be considered present
+# or not.
+AC_DEFUN([gl_MODULE_INDICATOR_CONDITION], [1])
+
+# gl_MODULE_INDICATOR_SET_VARIABLE([modulename])
+# sets the shell variable that indicates the presence of the given module to
+# a C preprocessor expression that will evaluate to 1.
+AC_DEFUN([gl_MODULE_INDICATOR_SET_VARIABLE],
+[
+  GNULIB_[]m4_translit([[$1]],
+    [abcdefghijklmnopqrstuvwxyz./-],
+    [ABCDEFGHIJKLMNOPQRSTUVWXYZ___])=gl_MODULE_INDICATOR_CONDITION
+])
+
 # gl_MODULE_INDICATOR([modulename])
-# defines a C macro indicating the presence of the given module.
+# defines a C macro indicating the presence of the given module
+# in a location where it can be used.
+#                                             |  Value  |   Value   |
+#                                             | in lib/ | in tests/ |
+# --------------------------------------------+---------+-----------+
+# Module present among main modules:          |    1    |     1     |
+# --------------------------------------------+---------+-----------+
+# Module present among tests-related modules: |    0    |     1     |
+# --------------------------------------------+---------+-----------+
+# Module not present at all:                  |    0    |     0     |
+# --------------------------------------------+---------+-----------+
 AC_DEFUN([gl_MODULE_INDICATOR],
 [
-  AC_DEFINE([GNULIB_]translit([$1],[abcdefghijklmnopqrstuvwxyz./-],[ABCDEFGHIJKLMNOPQRSTUVWXYZ___]), [1],
-    [Define to 1 when using the gnulib module ]$1[.])
+  AC_DEFINE_UNQUOTED([GNULIB_]m4_translit([[$1]],
+      [abcdefghijklmnopqrstuvwxyz./-],
+      [ABCDEFGHIJKLMNOPQRSTUVWXYZ___]),
+    [gl_MODULE_INDICATOR_CONDITION],
+    [Define to a C preprocessor expression that evaluates to 1 or 0,
+     depending whether the gnulib module $1 shall be considered present.])
+])
+
+# gl_MODULE_INDICATOR_FOR_TESTS([modulename])
+# defines a C macro indicating the presence of the given module
+# in lib or tests. This is useful to determine whether the module
+# should be tested.
+#                                             |  Value  |   Value   |
+#                                             | in lib/ | in tests/ |
+# --------------------------------------------+---------+-----------+
+# Module present among main modules:          |    1    |     1     |
+# --------------------------------------------+---------+-----------+
+# Module present among tests-related modules: |    1    |     1     |
+# --------------------------------------------+---------+-----------+
+# Module not present at all:                  |    0    |     0     |
+# --------------------------------------------+---------+-----------+
+AC_DEFUN([gl_MODULE_INDICATOR_FOR_TESTS],
+[
+  AC_DEFINE([GNULIB_TEST_]m4_translit([[$1]],
+      [abcdefghijklmnopqrstuvwxyz./-],
+      [ABCDEFGHIJKLMNOPQRSTUVWXYZ___]), [1],
+    [Define to 1 when the gnulib module $1 should be tested.])
 ])
 
 # m4_foreach_w
@@ -61,9 +112,16 @@ m4_ifndef([AS_VAR_IF],
 [AS_IF([test x"AS_VAR_GET([$1])" = x""$2], [$3], [$4])])])
 
 # AC_PROG_MKDIR_P
-# is a backport of autoconf-2.60's AC_PROG_MKDIR_P.
-# Remove this macro when we can assume autoconf >= 2.60.
-m4_ifdef([AC_PROG_MKDIR_P], [], [
+# is a backport of autoconf-2.60's AC_PROG_MKDIR_P, with a fix
+# for interoperability with automake-1.9.6 from autoconf-2.62.
+# Remove this macro when we can assume autoconf >= 2.62 or
+# autoconf >= 2.60 && automake >= 1.10.
+m4_ifdef([AC_PROG_MKDIR_P], [
+  dnl For automake-1.9.6 && autoconf < 2.62: Ensure MKDIR_P is AC_SUBSTed.
+  m4_define([AC_PROG_MKDIR_P],
+    m4_defn([AC_PROG_MKDIR_P])[
+    AC_SUBST([MKDIR_P])])], [
+  dnl For autoconf < 2.60: Backport of AC_PROG_MKDIR_P.
   AC_DEFUN_ONCE([AC_PROG_MKDIR_P],
     [AC_REQUIRE([AM_PROG_MKDIR_P])dnl defined by automake
      MKDIR_P='$(mkdir_p)'
