@@ -58,6 +58,7 @@ doc/examples/libexamples.la
 doc/extra-api.texi
 doc/extra.c.texi
 doc/gnutls-api.texi
+doc/gnutls-extra-api.texi
 doc/gnutls.info
 doc/gnutls.info-1
 doc/gnutls.info-2
@@ -230,6 +231,7 @@ lib/gl/time.h
 lib/gl/unistd.h
 lib/gl/warn-on-use.h
 lib/gl/wchar.h
+lib/gnutls-api.texi
 lib/gnutls.pc
 lib/includes/Makefile
 lib/includes/Makefile.in
@@ -279,6 +281,7 @@ lib/opencdk/libminiopencdk.la
 lib/openpgp/Makefile
 lib/openpgp/Makefile.in
 lib/openpgp/libgnutls_openpgp.la
+lib/openpgp/pgp-api.texi
 lib/po/*.gmo
 lib/po/*.po
 lib/po/Makefile
@@ -302,6 +305,7 @@ lib/stamp-h1
 lib/x509/Makefile
 lib/x509/Makefile.in
 lib/x509/libgnutls_x509.la
+lib/x509/x509-api.texi
 libextra/INSTALL
 libextra/Makefile
 libextra/Makefile.in
@@ -321,7 +325,9 @@ libextra/configure
 libextra/gl/Makefile
 libextra/gl/Makefile.in
 libextra/gl/libxgnu.la
+libextra/gnutls-extra-api.texi
 libextra/gnutls-extra.pc
+libextra/ia-api.texi
 libextra/includes/Makefile
 libextra/includes/Makefile.in
 libextra/libgnutls-extra.la
@@ -424,14 +430,7 @@ tests/userid/Makefile
 tests/userid/Makefile.in
 tests/x509_altname
 tests/x509dn
+tests/x509paths/
 tests/x509self
 tests/x509sign-verify
 tests/x509signself
-tests/x509paths/
-m4/
-lib/gnutls-api.texi
-lib/openpgp/pgp-api.texi
-lib/x509/x509-api.texi
-libextra/gnutls-extra-api.texi
-libextra/ia-api.texi
-doc/gnutls-extra-api.texi
