@@ -566,7 +566,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 {
   char *broken_list[MAX_ELEMENTS];
   int broken_list_size, i, j;
-  char *darg;
+  char *darg = NULL;
   int algo;
   rmadd_func *fn;
 
@@ -585,8 +585,9 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
   if (darg == NULL)
     {
       gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
+      goto error;
     }
+
 
   break_comma_list (darg, broken_list, &broken_list_size, MAX_ELEMENTS, ':');
   /* This is our default set of protocol version, certificate types and
@@ -759,6 +760,7 @@ error:
 	}
     }
   gnutls_free (darg);
+  gnutls_free(*priority_cache);
 
   return GNUTLS_E_INVALID_REQUEST;
 
