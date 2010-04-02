@@ -472,7 +472,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  * compression methods. This is to avoid using the
  * gnutls_*_priority() functions.
  *
- * The #priorities option allows you to specify a semi-colon
+ * The #priorities option allows you to specify a colon
  * separated list of the cipher priorities to enable.
  *
  * Unless the first keyword is "NONE" the defaults (in preference
