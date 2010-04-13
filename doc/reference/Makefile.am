@@ -112,8 +112,8 @@ IGNORE_HFILES += gnutls_openpgp.h openpgp_int.h
 IGNORE_HFILES += common.h pbkdf2-sha1.h x509_int.h
 
 # cd lib/gl/tests/ && echo *.h
-IGNORE_HFILES += arg-nonnull.h intprops.h macros.h signature.h	\
-	warn-on-use.h verify.h zerosize-ptr.h
+IGNORE_HFILES += arg-nonnull.h c++defs.h intprops.h macros.h		\
+	signature.h warn-on-use.h verify.h zerosize-ptr.h
 
 # cd libextra/ && echo *.h
 IGNORE_HFILES += config.h ext_inner_application.h openssl_compat.h
