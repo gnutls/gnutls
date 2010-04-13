@@ -87,6 +87,11 @@ _GL_FUNCDECL_RPL (nanosleep, int,
 _GL_CXXALIAS_RPL (nanosleep, int,
                   (struct timespec const *__rqtp, struct timespec *__rmtp));
 #  else
+#   if ! @HAVE_NANOSLEEP@
+_GL_FUNCDECL_SYS (nanosleep, int,
+                  (struct timespec const *__rqtp, struct timespec *__rmtp)
+                  _GL_ARG_NONNULL ((1)));
+#   endif
 _GL_CXXALIAS_SYS (nanosleep, int,
                   (struct timespec const *__rqtp, struct timespec *__rmtp));
 #  endif
@@ -122,6 +127,11 @@ _GL_FUNCDECL_RPL (localtime_r, struct tm *, (time_t const *restrict __timer,
 _GL_CXXALIAS_RPL (localtime_r, struct tm *, (time_t const *restrict __timer,
                                              struct tm *restrict __result));
 #  else
+#   if ! @HAVE_LOCALTIME_R@
+_GL_FUNCDECL_SYS (localtime_r, struct tm *, (time_t const *restrict __timer,
+                                             struct tm *restrict __result)
+                                            _GL_ARG_NONNULL ((1, 2)));
+#   endif
 _GL_CXXALIAS_SYS (localtime_r, struct tm *, (time_t const *restrict __timer,
                                              struct tm *restrict __result));
 #  endif
@@ -137,6 +147,11 @@ _GL_FUNCDECL_RPL (gmtime_r, struct tm *, (time_t const *restrict __timer,
 _GL_CXXALIAS_RPL (gmtime_r, struct tm *, (time_t const *restrict __timer,
                                           struct tm *restrict __result));
 #  else
+#   if ! @HAVE_LOCALTIME_R@
+_GL_FUNCDECL_SYS (gmtime_r, struct tm *, (time_t const *restrict __timer,
+                                          struct tm *restrict __result)
+                                         _GL_ARG_NONNULL ((1, 2)));
+#   endif
 _GL_CXXALIAS_SYS (gmtime_r, struct tm *, (time_t const *restrict __timer,
                                           struct tm *restrict __result));
 #  endif
@@ -147,23 +162,15 @@ _GL_CXXALIASWARN (gmtime_r);
    the resulting broken-down time into TM.  See
    <http://www.opengroup.org/susv3xsh/strptime.html>.  */
 # if @GNULIB_STRPTIME@
-#  if @REPLACE_STRPTIME@
-#   if !(defined __cplusplus && defined GNULIB_NAMESPACE)
-#    undef strptime
-#    define strptime rpl_strptime
-#   endif
-_GL_FUNCDECL_RPL (strptime, char *, (char const *restrict __buf,
+#  if ! @HAVE_STRPTIME@
+_GL_FUNCDECL_SYS (strptime, char *, (char const *restrict __buf,
                                      char const *restrict __format,
                                      struct tm *restrict __tm)
                                     _GL_ARG_NONNULL ((1, 2, 3)));
-_GL_CXXALIAS_RPL (strptime, char *, (char const *restrict __buf,
-                                     char const *restrict __format,
-                                     struct tm *restrict __tm));
-#  else
+#  endif
 _GL_CXXALIAS_SYS (strptime, char *, (char const *restrict __buf,
                                      char const *restrict __format,
                                      struct tm *restrict __tm));
-#  endif
 _GL_CXXALIASWARN (strptime);
 # endif
 
@@ -177,6 +184,9 @@ _GL_CXXALIASWARN (strptime);
 _GL_FUNCDECL_RPL (timegm, time_t, (struct tm *__tm) _GL_ARG_NONNULL ((1)));
 _GL_CXXALIAS_RPL (timegm, time_t, (struct tm *__tm));
 #  else
+#   if ! @HAVE_TIMEGM@
+_GL_FUNCDECL_SYS (timegm, time_t, (struct tm *__tm) _GL_ARG_NONNULL ((1)));
+#   endif
 _GL_CXXALIAS_SYS (timegm, time_t, (struct tm *__tm));
 #  endif
 _GL_CXXALIASWARN (timegm);

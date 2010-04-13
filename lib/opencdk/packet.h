@@ -46,4 +46,3 @@ cdk_error_t _cdk_copy_signature( cdk_pkt_signature_t* dst, cdk_pkt_signature_t s
 cdk_error_t _cdk_pubkey_compare( cdk_pkt_pubkey_t a, cdk_pkt_pubkey_t b );
 
 #endif /* CDK_PACKET_H */
-

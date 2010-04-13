@@ -78,4 +78,3 @@
 ;;; mode: scheme
 ;;; coding: latin-1
 ;;; End:
-

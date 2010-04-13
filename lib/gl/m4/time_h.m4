@@ -64,7 +64,7 @@ AC_DEFUN([gl_CHECK_TYPE_STRUCT_TIMESPEC],
 AC_DEFUN([gl_TIME_MODULE_INDICATOR],
 [
   dnl Use AC_REQUIRE here, so that the default settings are expanded once only.
-  AC_REQUIRE([gl_HEADER_STRING_H_DEFAULTS])
+  AC_REQUIRE([gl_HEADER_TIME_H_DEFAULTS])
   gl_MODULE_INDICATOR_SET_VARIABLE([$1])
   dnl Define it also as a C macro, for the benefit of the unit tests.
   gl_MODULE_INDICATOR_FOR_TESTS([$1])
@@ -77,12 +77,16 @@ AC_DEFUN([gl_HEADER_TIME_H_DEFAULTS],
   GNULIB_STRPTIME=0;                     AC_SUBST([GNULIB_STRPTIME])
   GNULIB_TIMEGM=0;                       AC_SUBST([GNULIB_TIMEGM])
   GNULIB_TIME_R=0;                       AC_SUBST([GNULIB_TIME_R])
+  dnl Assume proper GNU behavior unless another module says otherwise.
+  HAVE_LOCALTIME_R=1;                    AC_SUBST([HAVE_LOCALTIME_R])
+  HAVE_NANOSLEEP=1;                      AC_SUBST([HAVE_NANOSLEEP])
+  HAVE_STRPTIME=1;                       AC_SUBST([HAVE_STRPTIME])
+  HAVE_TIMEGM=1;                         AC_SUBST([HAVE_TIMEGM])
   dnl If another module says to replace or to not replace, do that.
   dnl Otherwise, replace only if someone compiles with -DGNULIB_PORTCHECK;
   dnl this lets maintainers check for portability.
   REPLACE_LOCALTIME_R=GNULIB_PORTCHECK;  AC_SUBST([REPLACE_LOCALTIME_R])
   REPLACE_MKTIME=GNULIB_PORTCHECK;       AC_SUBST([REPLACE_MKTIME])
   REPLACE_NANOSLEEP=GNULIB_PORTCHECK;    AC_SUBST([REPLACE_NANOSLEEP])
-  REPLACE_STRPTIME=GNULIB_PORTCHECK;     AC_SUBST([REPLACE_STRPTIME])
   REPLACE_TIMEGM=GNULIB_PORTCHECK;       AC_SUBST([REPLACE_TIMEGM])
 ])

@@ -66,6 +66,11 @@ _GL_FUNCDECL_RPL (memchr, void *, (void const *__s, int __c, size_t __n)
                                   _GL_ARG_NONNULL ((1)));
 _GL_CXXALIAS_RPL (memchr, void *, (void const *__s, int __c, size_t __n));
 # else
+#  if ! @HAVE_MEMCHR@
+_GL_FUNCDECL_SYS (memchr, void *, (void const *__s, int __c, size_t __n)
+                                  __attribute__ ((__pure__))
+                                  _GL_ARG_NONNULL ((1)));
+#  endif
   /* On some systems, this function is defined as an overloaded function:
        extern "C" { const void * std::memchr (const void *, int, size_t); }
        extern "C++" { void * std::memchr (void *, int, size_t); }  */
@@ -222,7 +227,7 @@ _GL_WARN_ON_USE (stpcpy, "stpcpy is unportable - "
 /* Copy no more than N bytes of SRC to DST, returning a pointer past the
    last non-NUL byte written into DST.  */
 #if @GNULIB_STPNCPY@
-# if ! @HAVE_STPNCPY@
+# if @REPLACE_STPNCPY@
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
 #   define stpncpy rpl_stpncpy
 #  endif
@@ -234,6 +239,12 @@ _GL_CXXALIAS_RPL (stpncpy, char *,
                   (char *restrict __dst, char const *restrict __src,
                    size_t __n));
 # else
+#  if ! @HAVE_STPNCPY@
+_GL_FUNCDECL_SYS (stpncpy, char *,
+                  (char *restrict __dst, char const *restrict __src,
+                   size_t __n)
+                  _GL_ARG_NONNULL ((1, 2)));
+#  endif
 _GL_CXXALIAS_SYS (stpncpy, char *,
                   (char *restrict __dst, char const *restrict __src,
                    size_t __n));
@@ -309,6 +320,28 @@ _GL_WARN_ON_USE (strdup, "strdup is unportable - "
 # endif
 #endif
 
+/* Append no more than N characters from SRC onto DEST.  */
+#if @GNULIB_STRNCAT@
+# if @REPLACE_STRNCAT@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef strncat
+#   define strncat rpl_strncat
+#  endif
+_GL_FUNCDECL_RPL (strncat, char *, (char *dest, const char *src, size_t n)
+                                   _GL_ARG_NONNULL ((1, 2)));
+_GL_CXXALIAS_RPL (strncat, char *, (char *dest, const char *src, size_t n));
+# else
+_GL_CXXALIAS_SYS (strncat, char *, (char *dest, const char *src, size_t n));
+# endif
+_GL_CXXALIASWARN (strncat);
+#elif defined GNULIB_POSIXCHECK
+# undef strncat
+# if HAVE_RAW_DECL_STRNCAT
+_GL_WARN_ON_USE (strncat, "strncat is unportable - "
+                 "use gnulib module strncat for portability");
+# endif
+#endif
+
 /* Return a newly allocated copy of at most N bytes of STRING.  */
 #if @GNULIB_STRNDUP@
 # if @REPLACE_STRNDUP@
@@ -339,12 +372,23 @@ _GL_WARN_ON_USE (strndup, "strndup is unportable - "
    MAXLEN bytes.  If no '\0' terminator is found in that many bytes,
    return MAXLEN.  */
 #if @GNULIB_STRNLEN@
-# if ! @HAVE_DECL_STRNLEN@
+# if @REPLACE_STRNLEN@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef strnlen
+#   define strnlen rpl_strnlen
+#  endif
+_GL_FUNCDECL_RPL (strnlen, size_t, (char const *__string, size_t __maxlen)
+                                   __attribute__ ((__pure__))
+                                   _GL_ARG_NONNULL ((1)));
+_GL_CXXALIAS_RPL (strnlen, size_t, (char const *__string, size_t __maxlen));
+# else
+#  if ! @HAVE_DECL_STRNLEN@
 _GL_FUNCDECL_SYS (strnlen, size_t, (char const *__string, size_t __maxlen)
                                    __attribute__ ((__pure__))
                                    _GL_ARG_NONNULL ((1)));
-# endif
+#  endif
 _GL_CXXALIAS_SYS (strnlen, size_t, (char const *__string, size_t __maxlen));
+# endif
 _GL_CXXALIASWARN (strnlen);
 #elif defined GNULIB_POSIXCHECK
 # undef strnlen

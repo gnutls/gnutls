@@ -49,4 +49,3 @@ struct cdk_keydb_hd_s
     size_t new_keys; /* amount of new keys that were imported. */
   } stats;
 };
-

@@ -40,4 +40,3 @@ option (h, help) { gaa_help(); exit(0); } "shows this help text"
 init { $username=NULL; $passwd=NULL; $salt=0;
        $create_conf=NULL; $passwd_conf=NULL; $verify = 0; 
        $index = 1; }
-
