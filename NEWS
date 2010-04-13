@@ -64,30 +64,31 @@ Daniel Nylander, Sergio Zanchetta, Tao Wei, and Aron Xu.
 ** doc: The GTK-DOC manual is significantly improved.
 
 ** API and ABI modifications:
-gnutls_certificate_set_verify_function: Added
-gnutls_safe_renegotiation_status: Added
-gnutls_cipher_decrypt: Added
-gnutls_cipher_deinit: Added
-gnutls_cipher_encrypt: Added
-gnutls_cipher_get_block_size: Added
-gnutls_cipher_init: Added
-gnutls_hash: Added
-gnutls_hash_deinit: Added
-gnutls_hash_fast: Added
-gnutls_hash_get_len: Added
-gnutls_hash_init: Added
-gnutls_hash_output: Added
-gnutls_hmac: Added
-gnutls_hmac_deinit: Added
-gnutls_hmac_fast: Added
-gnutls_hmac_get_len: Added
-gnutls_hmac_init: Added
-gnutls_hmac_output: Added
-gnutls_safe_negotiation_set_initial: Added
-gnutls_safe_renegotiation_set: Added
+gnutls_certificate_set_verify_function: ADDED.
+gnutls_safe_renegotiation_status: ADDED.
+gnutls_cipher_decrypt: ADDED.
+gnutls_cipher_deinit: ADDED.
+gnutls_cipher_encrypt: ADDED.
+gnutls_cipher_get_block_size: ADDED.
+gnutls_cipher_init: ADDED.
+gnutls_hash: ADDED.
+gnutls_hash_deinit: ADDED.
+gnutls_hash_fast: ADDED.
+gnutls_hash_get_len: ADDED.
+gnutls_hash_init: ADDED.
+gnutls_hash_output: ADDED.
+gnutls_hmac: ADDED.
+gnutls_hmac_deinit: ADDED.
+gnutls_hmac_fast: ADDED.
+gnutls_hmac_get_len: ADDED.
+gnutls_hmac_init: ADDED.
+gnutls_hmac_output: ADDED.
+gnutls_safe_negotiation_set_initial: ADDED.
+gnutls_safe_renegotiation_set: ADDED.
 %UNSAFE_RENEGOTIATION: Added to priority strings
 %INITIAL_SAFE_RENEGOTIATION: Added to priority strings
 %DISABLE_SAFE_RENEGOTIATION: Added to priority strings (do not use)
+GNUTLS_VERSION_MAX: Added.
 
 * Version 2.9.9 (released 2009-11-09)
 
