@@ -32,9 +32,9 @@ int gnutls_cipher_init (gnutls_cipher_hd_t * handle,
 			const gnutls_datum_t * key,
 			const gnutls_datum_t * iv);
 int gnutls_cipher_encrypt (const gnutls_cipher_hd_t handle,
-			   void *text, int textlen);
+			   void *text, size_t textlen);
 int gnutls_cipher_decrypt (const gnutls_cipher_hd_t handle,
-			   void *ciphertext, int ciphertextlen);
+			   void *ciphertext, size_t ciphertextlen);
 void gnutls_cipher_deinit (gnutls_cipher_hd_t handle);
 int gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm);
 
@@ -44,13 +44,13 @@ typedef struct hmac_hd_st *gnutls_hmac_hd_t;
 
 int gnutls_hmac_init (gnutls_hmac_hd_t * dig,
 		      gnutls_digest_algorithm_t algorithm, const void *key,
-		      int keylen);
+		      size_t keylen);
 int gnutls_hmac (gnutls_hmac_hd_t handle, const void *text, size_t textlen);
 void gnutls_hmac_output (gnutls_hmac_hd_t handle, void *digest);
 void gnutls_hmac_deinit (gnutls_hmac_hd_t handle, void *digest);
 int gnutls_hmac_get_len (gnutls_mac_algorithm_t algorithm);
 int gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
-		      int keylen, const void *text, size_t textlen,
+		      size_t keylen, const void *text, size_t textlen,
 		      void *digest);
 
 int gnutls_hash_init (gnutls_hash_hd_t * dig,

@@ -74,8 +74,7 @@ gnutls_cipher_init (gnutls_cipher_hd_t * handle,
  *
  * Since: 2.10.0
  **/
-int
-gnutls_cipher_encrypt (gnutls_cipher_hd_t handle, void *text, int textlen)
+int gnutls_cipher_encrypt (gnutls_cipher_hd_t handle, void *text, size_t textlen)
 {
   return _gnutls_cipher_encrypt ((cipher_hd_st *) handle, text, textlen);
 }
@@ -95,7 +94,7 @@ gnutls_cipher_encrypt (gnutls_cipher_hd_t handle, void *text, int textlen)
  **/
 int
 gnutls_cipher_decrypt (gnutls_cipher_hd_t handle, void *ciphertext,
-		       int ciphertextlen)
+		       size_t ciphertextlen)
 {
   return _gnutls_cipher_decrypt ((cipher_hd_st *) handle, ciphertext,
 				 ciphertextlen);
@@ -138,7 +137,7 @@ gnutls_cipher_deinit (gnutls_cipher_hd_t handle)
 int
 gnutls_hmac_init (gnutls_hmac_hd_t * dig,
 		  gnutls_digest_algorithm_t algorithm,
-		  const void *key, int keylen)
+		  const void *key, size_t keylen)
 {
   *dig = gnutls_malloc (sizeof (digest_hd_st));
   if (*dig == NULL)
@@ -235,7 +234,7 @@ gnutls_hmac_get_len (gnutls_mac_algorithm_t algorithm)
  **/
 int
 gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm,
-		  const void *key, int keylen,
+		  const void *key, size_t keylen,
 		  const void *text, size_t textlen, void *digest)
 {
   return _gnutls_hmac_fast (algorithm, key, keylen, text, textlen, digest);
