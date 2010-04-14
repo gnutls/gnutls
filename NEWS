@@ -47,6 +47,9 @@ constants are GNUTLS_MAC_SHA224 and GNUTLS_DIG_SHA224.
 verification of certificate upon receipt rather than waiting until the
 end of the handshake.
 
+** libgnutls: Don't send alerts during handshake.
+Instead new error code GNUTLS_E_UNKNOWN_SRP_USERNAME is added.
+
 ** certtool: Corrected two issues that affected certificate request generation.
 (1) Null padding is added on integers (found thanks to Wilankar Trupti),
 (2) In optional SignatureAlgorithm parameters field for DSA keys the DSA
@@ -77,6 +80,20 @@ Daniel Nylander, Sergio Zanchetta, Tao Wei, and Aron Xu.
 ** doc: The GTK-DOC manual is significantly improved.
 
 ** API and ABI modifications:
+%DISABLE_SAFE_RENEGOTIATION: Added to priority strings (do not use).
+%INITIAL_SAFE_RENEGOTIATION: Added to priority strings.
+%UNSAFE_RENEGOTIATION: Added to priority strings.
+GNUTLS_DIG_SHA224: ADDED.
+GNUTLS_E_CRYPTODEV_DEVICE_ERROR: ADDED.
+GNUTLS_E_CRYPTODEV_IOCTL_ERROR: ADDED.
+GNUTLS_E_SAFE_RENEGOTIATION_FAILED: ADDED.
+GNUTLS_E_UNKNOWN_SRP_USERNAME: ADDED.
+GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED: ADDED.
+GNUTLS_MAC_SHA224: ADDED.
+GNUTLS_OID_X520_NAME: ADDED.
+GNUTLS_OID_X520_POSTALCODE: ADDED.
+GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS: ADDED.
+GNUTLS_VERSION_MAX: ADDED.
 gnutls_certificate_set_verify_function: ADDED.
 gnutls_cipher_decrypt: ADDED.
 gnutls_cipher_deinit: ADDED.
@@ -98,12 +115,6 @@ gnutls_hmac_output: ADDED.
 gnutls_safe_negotiation_set_initial: ADDED.
 gnutls_safe_renegotiation_set: ADDED.
 gnutls_safe_renegotiation_status: ADDED.
-%UNSAFE_RENEGOTIATION: Added to priority strings
-%INITIAL_SAFE_RENEGOTIATION: Added to priority strings
-%DISABLE_SAFE_RENEGOTIATION: Added to priority strings (do not use)
-GNUTLS_VERSION_MAX: ADDED.
-GNUTLS_MAC_SHA224: ADDED.
-GNUTLS_DIG_SHA224: ADDED.
 
 * Version 2.9.9 (released 2009-11-09)
 
