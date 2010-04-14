@@ -20,4 +20,4 @@
 EXTRA_DIST = params.dh
 
 dist_check_SCRIPTS = testsrn
-TESTS = testsrn
+#TESTS = testsrn
