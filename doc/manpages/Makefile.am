@@ -73,6 +73,7 @@ APIMANS += gnutls_mac_get_name.3
 APIMANS += gnutls_mac_get_id.3
 APIMANS += gnutls_mac_get_key_size.3
 APIMANS += gnutls_mac_list.3
+APIMANS += gnutls_cipher_get_block_size.3
 APIMANS += gnutls_cipher_get_key_size.3
 APIMANS += gnutls_cipher_get_name.3
 APIMANS += gnutls_cipher_get_id.3
