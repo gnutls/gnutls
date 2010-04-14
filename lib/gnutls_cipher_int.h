@@ -31,25 +31,29 @@
 extern int crypto_cipher_prio;
 extern gnutls_crypto_cipher_st _gnutls_cipher_ops;
 
-typedef struct {
-  const gnutls_crypto_single_cipher_st* cc;
-  void* ctx;
+typedef struct
+{
+  const gnutls_crypto_single_cipher_st *cc;
+  void *ctx;
 } reg_hd;
 
-typedef struct {
-	int registered; /* true or false(0) */
-	union {
-		void* gc; /* when not registered */
-		reg_hd rh; /* when registered */
-	} hd;
+typedef struct
+{
+  int registered;		/* true or false(0) */
+  union
+  {
+    void *gc;			/* when not registered */
+    reg_hd rh;			/* when registered */
+  } hd;
 } cipher_hd_st;
 
-int _gnutls_cipher_init (cipher_hd_st*, gnutls_cipher_algorithm_t cipher,
-				 const gnutls_datum_t * key,
-				 const gnutls_datum_t * iv);
-int _gnutls_cipher_encrypt (const cipher_hd_st *handle, void *text, int textlen);
-int _gnutls_cipher_decrypt (const cipher_hd_st *handle, void *ciphertext,
+int _gnutls_cipher_init (cipher_hd_st *, gnutls_cipher_algorithm_t cipher,
+			 const gnutls_datum_t * key,
+			 const gnutls_datum_t * iv);
+int _gnutls_cipher_encrypt (const cipher_hd_st * handle, void *text,
+			    int textlen);
+int _gnutls_cipher_decrypt (const cipher_hd_st * handle, void *ciphertext,
 			    int ciphertextlen);
-void _gnutls_cipher_deinit (cipher_hd_st* handle);
+void _gnutls_cipher_deinit (cipher_hd_st * handle);
 
 #endif /* GNUTLS_CIPHER_INT */

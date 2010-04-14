@@ -42,14 +42,15 @@
 #endif
 
 int _gnutls_asn2err (int asn_err);
-void _gnutls_log (int, const char *fmt, ...)
+void
+_gnutls_log (int, const char *fmt, ...)
 #ifdef __GNUC__
-__attribute__ ((format (printf, 2, 3)));
+  __attribute__ ((format (printf, 2, 3)));
 #else
-;
+ ;
 #endif
 
-void _gnutls_mpi_log (const char *prefix, bigint_t a);
+     void _gnutls_mpi_log (const char *prefix, bigint_t a);
 
 #ifdef C99_MACROS
 #define LEVEL(l, ...) if (_gnutls_log_level >= l || _gnutls_log_level > 9) \
@@ -78,7 +79,7 @@ void _gnutls_mpi_log (const char *prefix, bigint_t a);
 # define _gnutls_write_log _gnutls_null_log
 # define _gnutls_x509_log _gnutls_null_log
 
-void _gnutls_null_log (void *, ...);
+     void _gnutls_null_log (void *, ...);
 
 #endif /* C99_MACROS */
 

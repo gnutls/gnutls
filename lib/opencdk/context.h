@@ -27,20 +27,23 @@
 
 #include "types.h"
 
-struct cdk_listkey_s {
+struct cdk_listkey_s
+{
   unsigned init:1;
   cdk_stream_t inp;
   cdk_keydb_hd_t db;
   int type;
-  union {
+  union
+  {
     char *patt;
-    cdk_strlist_t fpatt;  
+    cdk_strlist_t fpatt;
   } u;
-  cdk_strlist_t t;   
+  cdk_strlist_t t;
 };
 
 
-struct cdk_s2k_s {
+struct cdk_s2k_s
+{
   int mode;
   byte hash_algo;
   byte salt[8];
@@ -48,18 +51,22 @@ struct cdk_s2k_s {
 };
 
 
-struct cdk_ctx_s {
+struct cdk_ctx_s
+{
   int cipher_algo;
   int digest_algo;
-  struct {
+  struct
+  {
     int algo;
     int level;
   } compress;
-  struct {
+  struct
+  {
     int mode;
     int digest_algo;
   } _s2k;
-  struct {
+  struct
+  {
     unsigned blockmode:1;
     unsigned armor:1;
     unsigned textmode:1;
@@ -68,61 +75,71 @@ struct cdk_ctx_s {
     unsigned overwrite;
     unsigned force_digest:1;
   } opt;
-  struct {
+  struct
+  {
     cdk_verify_result_t verify;
   } result;
-  struct {
+  struct
+  {
     cdk_pkt_seckey_t sk;
     unsigned on:1;
   } cache;
-  struct {
+  struct
+  {
     cdk_keydb_hd_t sec;
     cdk_keydb_hd_t pub;
     unsigned int close_db:1;
   } db;
   char *(*passphrase_cb) (void *opaque, const char *prompt);
-  void * passphrase_cb_value;
+  void *passphrase_cb_value;
 };
 
-struct cdk_prefitem_s {
+struct cdk_prefitem_s
+{
   byte type;
   byte value;
 };
 
-struct cdk_desig_revoker_s {
-  struct cdk_desig_revoker_s * next;
+struct cdk_desig_revoker_s
+{
+  struct cdk_desig_revoker_s *next;
   byte r_class;
   byte algid;
   byte fpr[KEY_FPR_LEN];
 };
 
-struct cdk_subpkt_s {
-  struct cdk_subpkt_s * next;
+struct cdk_subpkt_s
+{
+  struct cdk_subpkt_s *next;
   u32 size;
   byte type;
-  byte *d;  
+  byte *d;
 };
 
-struct cdk_keylist_s {
-  struct cdk_keylist_s * next;
-  union {
+struct cdk_keylist_s
+{
+  struct cdk_keylist_s *next;
+  union
+  {
     cdk_pkt_pubkey_t pk;
     cdk_pkt_seckey_t sk;
   } key;
   int version;
-  int type;  
+  int type;
 };
 
-struct cdk_dek_s {
+struct cdk_dek_s
+{
   int algo;
   int keylen;
   int use_mdc;
-  byte key[32]; /* 256-bit */
+  byte key[32];			/* 256-bit */
 };
 
-struct cdk_strlist_s {
-  struct cdk_strlist_s * next;
-  char *d; 
+struct cdk_strlist_s
+{
+  struct cdk_strlist_s *next;
+  char *d;
 };
 
 #endif /* CDK_CONTEXT_H */

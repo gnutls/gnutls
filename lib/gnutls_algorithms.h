@@ -68,8 +68,10 @@ gnutls_kx_algorithm_t _gnutls_cipher_suite_get_kx_algo (const cipher_suite_st
 gnutls_mac_algorithm_t _gnutls_cipher_suite_get_mac_algo (const
 							  cipher_suite_st *
 							  algorithm);
-gnutls_protocol_t _gnutls_cipher_suite_is_version_supported (const cipher_suite_st *
-						    algorithm, gnutls_protocol_t);
+gnutls_protocol_t _gnutls_cipher_suite_is_version_supported (const
+							     cipher_suite_st *
+							     algorithm,
+							     gnutls_protocol_t);
 cipher_suite_st _gnutls_cipher_suite_get_suite_name (cipher_suite_st *
 						     algorithm);
 
@@ -109,9 +111,11 @@ gnutls_sign_algorithm_t _gnutls_x509_pk_to_sign (gnutls_pk_algorithm_t pk,
 gnutls_pk_algorithm_t _gnutls_x509_sign_to_pk (gnutls_sign_algorithm_t sign);
 const char *_gnutls_x509_sign_to_oid (gnutls_pk_algorithm_t,
 				      gnutls_mac_algorithm_t mac);
-gnutls_sign_algorithm_t _gnutls_tls_aid_to_sign (const sign_algorithm_st* aid);
+gnutls_sign_algorithm_t _gnutls_tls_aid_to_sign (const sign_algorithm_st *
+						 aid);
 sign_algorithm_st _gnutls_sign_to_tls_aid (gnutls_sign_algorithm_t sign);
-gnutls_mac_algorithm_t _gnutls_sign_get_hash_algorithm (gnutls_sign_algorithm_t);
+gnutls_mac_algorithm_t
+_gnutls_sign_get_hash_algorithm (gnutls_sign_algorithm_t);
 gnutls_pk_algorithm_t _gnutls_sign_get_pk_algorithm (gnutls_sign_algorithm_t);
 
 int _gnutls_mac_priority (gnutls_session_t session,

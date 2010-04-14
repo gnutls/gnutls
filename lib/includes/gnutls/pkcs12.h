@@ -81,18 +81,17 @@ extern "C"
     GNUTLS_BAG_PKCS8_KEY = 2,
     GNUTLS_BAG_CERTIFICATE = 3,
     GNUTLS_BAG_CRL = 4,
-    GNUTLS_BAG_SECRET = 5, /* Secret data. Underspecified in pkcs-12,
-			    * gnutls extension. We use the PKCS-9
-			    * random nonce ID 1.2.840.113549.1.9.25.3
-			    * to store randomly generated keys.
-			    */
+    GNUTLS_BAG_SECRET = 5,	/* Secret data. Underspecified in pkcs-12,
+				 * gnutls extension. We use the PKCS-9
+				 * random nonce ID 1.2.840.113549.1.9.25.3
+				 * to store randomly generated keys.
+				 */
     GNUTLS_BAG_ENCRYPTED = 10,
     GNUTLS_BAG_UNKNOWN = 20
   } gnutls_pkcs12_bag_type_t;
 
-  gnutls_pkcs12_bag_type_t
-  gnutls_pkcs12_bag_get_type (gnutls_pkcs12_bag_t bag,
-			      int indx);
+    gnutls_pkcs12_bag_type_t
+    gnutls_pkcs12_bag_get_type (gnutls_pkcs12_bag_t bag, int indx);
   int gnutls_pkcs12_bag_get_data (gnutls_pkcs12_bag_t bag, int indx,
 				  gnutls_datum_t * data);
   int gnutls_pkcs12_bag_set_data (gnutls_pkcs12_bag_t bag,

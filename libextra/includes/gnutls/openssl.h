@@ -169,8 +169,9 @@ extern "C"
 
 #define rbio gnutls_state
 
-  typedef struct {
-    void* handle;
+  typedef struct
+  {
+    void *handle;
   } MD_CTX;
 
   struct rsa_st;

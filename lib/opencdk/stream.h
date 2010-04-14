@@ -28,27 +28,30 @@
 /* The default buffer size for the stream. */
 #define STREAM_BUFSIZE 8192
 
-enum {
-    fDUMMY   = 0,
-    fARMOR   = 1,
-    fCIPHER  = 2,
-    fLITERAL = 3,
-    fCOMPRESS= 4,
-    fHASH    = 5,
-    fTEXT    = 6
+enum
+{
+  fDUMMY = 0,
+  fARMOR = 1,
+  fCIPHER = 2,
+  fLITERAL = 3,
+  fCOMPRESS = 4,
+  fHASH = 5,
+  fTEXT = 6
 };
 
 /* Type definition for the filter function. */
-typedef cdk_error_t (*filter_fnct_t) (void * opaque, int ctl, FILE * in, FILE * out);
+typedef cdk_error_t (*filter_fnct_t) (void *opaque, int ctl, FILE * in,
+				      FILE * out);
 
 /* The stream filter context structure. */
-struct stream_filter_s 
+struct stream_filter_s
 {
   struct stream_filter_s *next;
   filter_fnct_t fnct;
   void *opaque;
   FILE *tmp;
-  union {
+  union
+  {
     armor_filter_t afx;
     cipher_filter_t cfx;
     literal_filter_t pfx;
@@ -56,7 +59,8 @@ struct stream_filter_s
     text_filter_t tfx;
     md_filter_t mfx;
   } u;
-  struct {
+  struct
+  {
     unsigned enabled:1;
     unsigned rdonly:1;
     unsigned error:1;
@@ -67,12 +71,14 @@ struct stream_filter_s
 
 
 /* The stream context structure. */
-struct cdk_stream_s {
+struct cdk_stream_s
+{
   struct stream_filter_s *filters;
   int fmode;
   int error;
   size_t blkmode;
-  struct {
+  struct
+  {
     unsigned filtrated:1;
     unsigned eof:1;
     unsigned write:1;
@@ -81,7 +87,8 @@ struct cdk_stream_s {
     unsigned no_filter:1;
     unsigned compressed:3;
   } flags;
-  struct {
+  struct
+  {
     unsigned char *buf;
     unsigned on:1;
     size_t size;

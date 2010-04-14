@@ -22,8 +22,10 @@
 
 #include "utils.h"
 
-SCM_API void scm_gnutls_error (int, const char *) NO_RETURN;
-SCM_API void scm_init_gnutls_error (void);
+SCM_API void
+scm_gnutls_error (int, const char *)
+  NO_RETURN;
+     SCM_API void scm_init_gnutls_error (void);
 
 #endif
 

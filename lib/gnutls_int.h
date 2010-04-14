@@ -179,7 +179,7 @@ typedef enum extensions_t
   GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS = 13,
   GNUTLS_EXTENSION_SESSION_TICKET = 35,
   GNUTLS_EXTENSION_INNER_APPLICATION = 37703,
-  GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281, /* aka: 0xff01 */
+  GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281,	/* aka: 0xff01 */
 } extensions_t;
 
 typedef enum
@@ -205,7 +205,7 @@ typedef enum content_type_t
 
 typedef enum
 {
-  HANDSHAKE_MAC_TYPE_10=1,
+  HANDSHAKE_MAC_TYPE_10 = 1,
   HANDSHAKE_MAC_TYPE_12
 } handshake_mac_type_t;
 
@@ -284,7 +284,7 @@ typedef struct
 typedef struct
 {
   uint8_t hash_algorithm;
-  uint8_t sign_algorithm; /* pk algorithm actually */
+  uint8_t sign_algorithm;	/* pk algorithm actually */
 } sign_algorithm_st;
 
 /* This structure holds parameters got from TLS extension
@@ -302,13 +302,14 @@ typedef struct
 #define MAX_SERVER_NAME_EXTENSIONS 3
 #define MAX_SIGNATURE_ALGORITHMS 16
 
-struct gnutls_session_ticket_key_st {
+struct gnutls_session_ticket_key_st
+{
   opaque key_name[SESSION_TICKET_KEY_NAME_SIZE];
   opaque key[SESSION_TICKET_KEY_SIZE];
   opaque mac_secret[SESSION_TICKET_MAC_SECRET_SIZE];
 };
 
-#define MAX_VERIFY_DATA_SIZE 36 /* in SSL 3.0, 12 in TLS 1.0 */
+#define MAX_VERIFY_DATA_SIZE 36	/* in SSL 3.0, 12 in TLS 1.0 */
 
 /* If you want the extension data to be kept across resuming sessions
  * then modify CPY_EXTENSIONS in gnutls_constate.c
@@ -345,11 +346,11 @@ typedef struct
   uint16_t oprfi_server_len;
 
   /* Safe renegotiation. */
-  uint8_t client_verify_data[MAX_VERIFY_DATA_SIZE]; 
+  uint8_t client_verify_data[MAX_VERIFY_DATA_SIZE];
   size_t client_verify_data_len;
   uint8_t server_verify_data[MAX_VERIFY_DATA_SIZE];
   size_t server_verify_data_len;
-  uint8_t ri_extension_data[MAX_VERIFY_DATA_SIZE*2]; /* max signal is 72 bytes in s->c sslv3 */
+  uint8_t ri_extension_data[MAX_VERIFY_DATA_SIZE * 2];	/* max signal is 72 bytes in s->c sslv3 */
   size_t ri_extension_data_len;
 
 } tls_ext_st;
@@ -387,7 +388,7 @@ typedef struct
   gnutls_cipher_algorithm_t write_bulk_cipher_algorithm;
   gnutls_mac_algorithm_t write_mac_algorithm;
   gnutls_compression_method_t write_compression_algorithm;
-  handshake_mac_type_t handshake_mac_handle_type; /* one of HANDSHAKE_TYPE_10 and HANDSHAKE_TYPE_12 */
+  handshake_mac_type_t handshake_mac_handle_type;	/* one of HANDSHAKE_TYPE_10 and HANDSHAKE_TYPE_12 */
 
   /* this is the ciphersuite we are going to use 
    * moved here from internals in order to be restored
@@ -507,19 +508,19 @@ typedef struct
   gnutls_buffer handshake_hash_buffer;	/* used to keep the last received handshake 
 					 * message */
   union
+  {
+    struct
     {
-      struct 
-        {
-          digest_hd_st sha;	/* hash of the handshake messages */
-          digest_hd_st md5;	/* hash of the handshake messages */
-        } tls10;
-      struct
-        {
-          digest_hd_st sha1;	/* hash of the handshake messages for TLS 1.2+ */
-          digest_hd_st sha256;	/* hash of the handshake messages for TLS 1.2+ */
-        } tls12;
-    } handshake_mac_handle;
-  int handshake_mac_handle_init; /* 1 when the previous union and type were initialized */
+      digest_hd_st sha;		/* hash of the handshake messages */
+      digest_hd_st md5;		/* hash of the handshake messages */
+    } tls10;
+    struct
+    {
+      digest_hd_st sha1;	/* hash of the handshake messages for TLS 1.2+ */
+      digest_hd_st sha256;	/* hash of the handshake messages for TLS 1.2+ */
+    } tls12;
+  } handshake_mac_handle;
+  int handshake_mac_handle_init;	/* 1 when the previous union and type were initialized */
 
   gnutls_buffer handshake_data_buffer;	/* this is a buffer that holds the current handshake message */
   gnutls_buffer ia_data_buffer;	/* holds inner application data (TLS/IA) */
@@ -557,7 +558,7 @@ typedef struct
 
   /* sockets internals */
   int lowat;
-  
+
   /* These buffers are used in the handshake
    * protocol only. freed using _gnutls_handshake_io_buffer_clear();
    */
@@ -637,7 +638,7 @@ typedef struct
   gnutls_db_retr_func db_retrieve_func;
   gnutls_db_remove_func db_remove_func;
   void *db_ptr;
-  
+
   /* post client hello callback (server side only)
    */
   gnutls_handshake_post_client_hello_func user_hello_func;

@@ -95,9 +95,9 @@ extern "C"
  * Enumeration of different certificate import flags.
  */
   typedef enum gnutls_certificate_import_flags
-    {
-      GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED = 1
-    } gnutls_certificate_import_flags;
+  {
+    GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED = 1
+  } gnutls_certificate_import_flags;
 
   int gnutls_x509_crt_init (gnutls_x509_crt_t * cert);
   void gnutls_x509_crt_deinit (gnutls_x509_crt_t cert);
@@ -166,13 +166,13 @@ extern "C"
 					   unsigned int *reason_flags,
 					   unsigned int *critical);
   int gnutls_x509_crt_set_crl_dist_points2 (gnutls_x509_crt_t crt,
-					    gnutls_x509_subject_alt_name_t type,
-					    const void *data,
+					    gnutls_x509_subject_alt_name_t
+					    type, const void *data,
 					    unsigned int data_size,
 					    unsigned int reason_flags);
   int gnutls_x509_crt_set_crl_dist_points (gnutls_x509_crt_t crt,
-					   gnutls_x509_subject_alt_name_t type,
-					   const void *data_string,
+					   gnutls_x509_subject_alt_name_t
+					   type, const void *data_string,
 					   unsigned int reason_flags);
   int gnutls_x509_crt_cpy_crl_dist_points (gnutls_x509_crt_t dst,
 					   gnutls_x509_crt_t src);
@@ -207,19 +207,19 @@ extern "C"
 						     size_t * ret_size);
 
   int gnutls_x509_crt_get_issuer_alt_name (gnutls_x509_crt_t cert,
+					   unsigned int seq, void *ret,
+					   size_t * ret_size,
+					   unsigned int *critical);
+  int gnutls_x509_crt_get_issuer_alt_name2 (gnutls_x509_crt_t cert,
 					    unsigned int seq, void *ret,
 					    size_t * ret_size,
+					    unsigned int *ret_type,
 					    unsigned int *critical);
-  int gnutls_x509_crt_get_issuer_alt_name2 (gnutls_x509_crt_t cert,
-					     unsigned int seq, void *ret,
-					     size_t * ret_size,
-					     unsigned int *ret_type,
-					     unsigned int *critical);
 
   int gnutls_x509_crt_get_issuer_alt_othername_oid (gnutls_x509_crt_t cert,
-						     unsigned int seq,
-						     void *ret,
-						     size_t * ret_size);
+						    unsigned int seq,
+						    void *ret,
+						    size_t * ret_size);
 
   int gnutls_x509_crt_get_ca_status (gnutls_x509_crt_t cert,
 				     unsigned int *critical);
@@ -287,18 +287,17 @@ extern "C"
 					     unsigned int ca,
 					     int pathLenConstraint);
   int gnutls_x509_crt_set_subject_alternative_name (gnutls_x509_crt_t crt,
-						    gnutls_x509_subject_alt_name_t type,
+						    gnutls_x509_subject_alt_name_t
+						    type,
 						    const char *data_string);
   int gnutls_x509_crt_set_subject_alt_name (gnutls_x509_crt_t crt,
-					    gnutls_x509_subject_alt_name_t type,
-					    const void *data,
+					    gnutls_x509_subject_alt_name_t
+					    type, const void *data,
 					    unsigned int data_size,
 					    unsigned int flags);
-  int gnutls_x509_crt_sign (gnutls_x509_crt_t crt,
-			    gnutls_x509_crt_t issuer,
+  int gnutls_x509_crt_sign (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
 			    gnutls_x509_privkey_t issuer_key);
-  int gnutls_x509_crt_sign2 (gnutls_x509_crt_t crt,
-			     gnutls_x509_crt_t issuer,
+  int gnutls_x509_crt_sign2 (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
 			     gnutls_x509_privkey_t issuer_key,
 			     gnutls_digest_algorithm_t dig,
 			     unsigned int flags);
@@ -528,16 +527,16 @@ extern "C"
  * Enumeration of different certificate verify flags.
  */
   typedef enum gnutls_certificate_verify_flags
-    {
-      GNUTLS_VERIFY_DISABLE_CA_SIGN = 1,
-      GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT = 2,
-      GNUTLS_VERIFY_DO_NOT_ALLOW_SAME = 4,
-      GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT = 8,
-      GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 = 16,
-      GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5 = 32,
-      GNUTLS_VERIFY_DISABLE_TIME_CHECKS = 64,
-      GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS = 128,
-    } gnutls_certificate_verify_flags;
+  {
+    GNUTLS_VERIFY_DISABLE_CA_SIGN = 1,
+    GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT = 2,
+    GNUTLS_VERIFY_DO_NOT_ALLOW_SAME = 4,
+    GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT = 8,
+    GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 = 16,
+    GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5 = 32,
+    GNUTLS_VERIFY_DISABLE_TIME_CHECKS = 64,
+    GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS = 128,
+  } gnutls_certificate_verify_flags;
 
   int gnutls_x509_crt_check_issuer (gnutls_x509_crt_t cert,
 				    gnutls_x509_crt_t issuer);
@@ -599,20 +598,20 @@ extern "C"
  * Enumeration of different PKCS encryption flags.
  */
   typedef enum gnutls_pkcs_encrypt_flags_t
-    {
-      GNUTLS_PKCS_PLAIN = 1,
-      GNUTLS_PKCS8_PLAIN = GNUTLS_PKCS_PLAIN,
-      GNUTLS_PKCS_USE_PKCS12_3DES = 2,
-      GNUTLS_PKCS8_USE_PKCS12_3DES = GNUTLS_PKCS_USE_PKCS12_3DES,
-      GNUTLS_PKCS_USE_PKCS12_ARCFOUR = 4,
-      GNUTLS_PKCS8_USE_PKCS12_ARCFOUR = GNUTLS_PKCS_USE_PKCS12_ARCFOUR,
-      GNUTLS_PKCS_USE_PKCS12_RC2_40 = 8,
-      GNUTLS_PKCS8_USE_PKCS12_RC2_40 = GNUTLS_PKCS_USE_PKCS12_RC2_40,
-      GNUTLS_PKCS_USE_PBES2_3DES = 16,
-      GNUTLS_PKCS_USE_PBES2_AES_128 = 32,
-      GNUTLS_PKCS_USE_PBES2_AES_192 = 64,
-      GNUTLS_PKCS_USE_PBES2_AES_256 = 128,
-    } gnutls_pkcs_encrypt_flags_t;
+  {
+    GNUTLS_PKCS_PLAIN = 1,
+    GNUTLS_PKCS8_PLAIN = GNUTLS_PKCS_PLAIN,
+    GNUTLS_PKCS_USE_PKCS12_3DES = 2,
+    GNUTLS_PKCS8_USE_PKCS12_3DES = GNUTLS_PKCS_USE_PKCS12_3DES,
+    GNUTLS_PKCS_USE_PKCS12_ARCFOUR = 4,
+    GNUTLS_PKCS8_USE_PKCS12_ARCFOUR = GNUTLS_PKCS_USE_PKCS12_ARCFOUR,
+    GNUTLS_PKCS_USE_PKCS12_RC2_40 = 8,
+    GNUTLS_PKCS8_USE_PKCS12_RC2_40 = GNUTLS_PKCS_USE_PKCS12_RC2_40,
+    GNUTLS_PKCS_USE_PBES2_3DES = 16,
+    GNUTLS_PKCS_USE_PBES2_AES_128 = 32,
+    GNUTLS_PKCS_USE_PBES2_AES_192 = 64,
+    GNUTLS_PKCS_USE_PBES2_AES_256 = 128,
+  } gnutls_pkcs_encrypt_flags_t;
 
   int gnutls_x509_privkey_init (gnutls_x509_privkey_t * key);
   void gnutls_x509_privkey_deinit (gnutls_x509_privkey_t key);
@@ -697,8 +696,9 @@ extern "C"
 				   const gnutls_datum_t * hash,
 				   const gnutls_datum_t * signature);
 
-  int gnutls_x509_crt_get_verify_algorithm(gnutls_x509_crt_t crt, 
-      const gnutls_datum_t * signature, gnutls_digest_algorithm_t *hash);
+  int gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
+					    const gnutls_datum_t * signature,
+					    gnutls_digest_algorithm_t * hash);
 
   int gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
 				     const gnutls_datum_t * hash,

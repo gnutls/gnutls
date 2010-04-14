@@ -159,8 +159,8 @@ gnutls_rsa_params_t _gnutls_certificate_get_rsa_params (gnutls_rsa_params_t
 							gnutls_session_t);
 
 int _gnutls_get_auth_info_gcert (gnutls_cert * gcert,
-			       gnutls_certificate_type_t type,
-			       cert_auth_info_t info,
-			       int flags /* OR of ConvFlags */ );
+				 gnutls_certificate_type_t type,
+				 cert_auth_info_t info,
+				 int flags /* OR of ConvFlags */ );
 
 #endif

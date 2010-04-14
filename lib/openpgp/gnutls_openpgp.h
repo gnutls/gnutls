@@ -25,7 +25,8 @@ int gnutls_openpgp_get_key (gnutls_datum_t * key,
 
 /* internal */
 int _gnutls_openpgp_raw_crt_to_gcert (gnutls_cert * cert,
-				      const gnutls_datum_t * raw, const gnutls_openpgp_keyid_t);
+				      const gnutls_datum_t * raw,
+				      const gnutls_openpgp_keyid_t);
 
 int
 _gnutls_openpgp_raw_privkey_to_gkey (gnutls_privkey * pkey,

@@ -35,10 +35,10 @@ void _gnutls_str_cat (char *dest, size_t dest_tot_size, const char *src);
 
 typedef struct
 {
-  opaque *allocd; /* pointer to allocated data */
-  opaque *data; /* API: pointer to data to copy from */
+  opaque *allocd;		/* pointer to allocated data */
+  opaque *data;			/* API: pointer to data to copy from */
   size_t max_length;
-  size_t length; /* API: current length */
+  size_t length;		/* API: current length */
   gnutls_realloc_function realloc_func;
   gnutls_alloc_function alloc_func;
   gnutls_free_function free_func;
@@ -53,8 +53,9 @@ int _gnutls_string_append_str (gnutls_string *, const char *str);
 int _gnutls_string_append_data (gnutls_string *, const void *data,
 				size_t data_size);
 
-void _gnutls_string_get_data( gnutls_string *, void*, size_t *size);
-void _gnutls_string_get_datum( gnutls_string *, gnutls_datum_t *, size_t max_size);
+void _gnutls_string_get_data (gnutls_string *, void *, size_t * size);
+void _gnutls_string_get_datum (gnutls_string *, gnutls_datum_t *,
+			       size_t max_size);
 
 #ifndef __attribute__
 /* This feature is available in gcc versions 2.5 and later.  */
@@ -80,7 +81,8 @@ char *_gnutls_bin2hex (const void *old, size_t oldlen, char *buffer,
 int _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 		     size_t * bin_size);
 
-int _gnutls_hostname_compare (const char *certname, size_t certnamesize, const char *hostname);
+int _gnutls_hostname_compare (const char *certname, size_t certnamesize,
+			      const char *hostname);
 #define MAX_CN 256
 
 #endif

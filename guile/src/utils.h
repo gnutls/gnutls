@@ -21,8 +21,8 @@
 /* Common utilities.  */
 
 #include <libguile.h>
-
 
+
 /* Compiler twiddling.  */
 
 #ifdef __GNUC__
@@ -35,8 +35,8 @@
 
 #define EXPECT_TRUE(_expr)  EXPECT ((_expr), 1)
 #define EXPECT_FALSE(_expr) EXPECT ((_expr), 0)
-
 
+
 /* Arrays as byte vectors.  */
 
 extern const char scm_gnutls_array_error_message[];
@@ -44,8 +44,8 @@ extern const char scm_gnutls_array_error_message[];
 /* Initialize C_HANDLE and C_LEN and return the contiguous C array
    corresponding to ARRAY.  */
 static inline const char *
-scm_gnutls_get_array (SCM array, scm_t_array_handle *c_handle, size_t *c_len,
-		      const char *func_name)
+scm_gnutls_get_array (SCM array, scm_t_array_handle * c_handle,
+		      size_t * c_len, const char *func_name)
 {
   const char *c_array = NULL;
   const scm_t_array_dim *c_dims;
@@ -74,9 +74,8 @@ scm_gnutls_get_array (SCM array, scm_t_array_handle *c_handle, size_t *c_len,
 /* Initialize C_HANDLE and C_LEN and return the contiguous C array
    corresponding to ARRAY.  The returned array can be written to.  */
 static inline char *
-scm_gnutls_get_writable_array (SCM array, scm_t_array_handle *c_handle,
-			       size_t *c_len,
-			       const char *func_name)
+scm_gnutls_get_writable_array (SCM array, scm_t_array_handle * c_handle,
+			       size_t * c_len, const char *func_name)
 {
   char *c_array = NULL;
   const scm_t_array_dim *c_dims;
@@ -96,16 +95,17 @@ scm_gnutls_get_writable_array (SCM array, scm_t_array_handle *c_handle,
       c_elem_size = scm_array_handle_uniform_element_size (c_handle);
       *c_len = c_elem_size * (c_dims->ubnd - c_dims->lbnd + 1);
 
-      c_array = (char *) scm_array_handle_uniform_writable_elements (c_handle);
+      c_array =
+	(char *) scm_array_handle_uniform_writable_elements (c_handle);
     }
 
   return (c_array);
 }
 
 #define scm_gnutls_release_array  scm_array_handle_release
-
-
 
+
+
 /* Type conversion.  */
 
 /* Return a list corresponding to the key usage values ORed in C_USAGE.  */

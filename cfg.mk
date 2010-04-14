@@ -23,7 +23,7 @@ WFLAGS ?= --enable-gcc-warnings
 ADDFLAGS ?=
 CFGFLAGS ?= --enable-gtk-doc $(ADDFLAGS) $(WFLAGS)
 
-INDENT_SOURCES = `find . -name \*.c|grep -v -e ^./lib/gl -e ^./gl -e ^./src/cfg -e -gaa.c -e asn1_tab.c`
+INDENT_SOURCES = `find . -name \*.[ch] -o -name gnutls.h.in | grep -v -e ^./build-aux/ -e ^./lib/minitasn1/ -e ^./lib/build-aux/ -e ^./lib/gl/ -e ^./gl/ -e ^./libextra/gl/ -e ^./src/cfg/ -e -gaa.[ch] -e asn1_tab.c`
 
 ifeq ($(.DEFAULT_GOAL),abort-due-to-no-makefile)
 .DEFAULT_GOAL := bootstrap

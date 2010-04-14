@@ -27,19 +27,19 @@
 
 #ifndef HAVE_BYTE_TYPEDEF
 # undef byte
-  typedef unsigned char byte;
+typedef unsigned char byte;
 # define HAVE_BYTE_TYPEDEF
 #endif
 
 #ifndef HAVE_U16_TYPEDEF
 # undef u16
-  typedef unsigned short u16;
+typedef unsigned short u16;
 # define HAVE_U16_TYPEDEF
 #endif
 
 #ifndef HAVE_U32_TYPEDEF
 # undef u32
-  typedef unsigned int u32;
+typedef unsigned int u32;
 # define HAVE_U32_TYPEDEF
 #endif
 

@@ -25,7 +25,8 @@
 #ifdef ENABLE_SESSION_TICKET
 
 int _gnutls_session_ticket_recv_params (gnutls_session_t session,
-					const opaque * data, size_t data_size);
+					const opaque * data,
+					size_t data_size);
 int _gnutls_session_ticket_send_params (gnutls_session_t session,
 					opaque * data, size_t data_size);
 

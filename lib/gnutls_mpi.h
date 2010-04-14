@@ -33,11 +33,12 @@
 extern int crypto_bigint_prio;
 extern gnutls_crypto_bigint_st _gnutls_mpi_ops;
 
-bigint_t _gnutls_mpi_randomize( bigint_t, unsigned int bits, gnutls_rnd_level_t level);
+bigint_t _gnutls_mpi_randomize (bigint_t, unsigned int bits,
+				gnutls_rnd_level_t level);
 
 #define _gnutls_mpi_new(x) _gnutls_mpi_ops.bigint_new(x)
 #define _gnutls_mpi_cmp(x,y) _gnutls_mpi_ops.bigint_cmp(x,y)
-#define _gnutls_mpi_cmp_ui(x,y) _gnutls_mpi_ops.bigint_cmp_ui(x,y) 
+#define _gnutls_mpi_cmp_ui(x,y) _gnutls_mpi_ops.bigint_cmp_ui(x,y)
 #define _gnutls_mpi_mod(x,y) _gnutls_mpi_ops.bigint_mod(x,y)
 #define _gnutls_mpi_set(x,y) _gnutls_mpi_ops.bigint_set(x,y)
 #define _gnutls_mpi_set_ui(x,y) _gnutls_mpi_ops.bigint_set_ui(x,y)
@@ -62,13 +63,16 @@ bigint_t _gnutls_mpi_randomize( bigint_t, unsigned int bits, gnutls_rnd_level_t 
 
 void _gnutls_mpi_release (bigint_t * x);
 
-int _gnutls_mpi_scan (bigint_t * ret_mpi, const void * buffer, size_t nbytes);
-int _gnutls_mpi_scan_nz (bigint_t * ret_mpi, const void * buffer, size_t nbytes);
-int _gnutls_mpi_scan_pgp (bigint_t * ret_mpi, const void * buffer, size_t nbytes);
+int _gnutls_mpi_scan (bigint_t * ret_mpi, const void *buffer, size_t nbytes);
+int _gnutls_mpi_scan_nz (bigint_t * ret_mpi, const void *buffer,
+			 size_t nbytes);
+int _gnutls_mpi_scan_pgp (bigint_t * ret_mpi, const void *buffer,
+			  size_t nbytes);
 
-int _gnutls_mpi_dprint_lz ( const bigint_t a, gnutls_datum_t * dest);
-int _gnutls_mpi_dprint ( const bigint_t a, gnutls_datum_t * dest);
-int _gnutls_mpi_dprint_size (const bigint_t a, gnutls_datum_t * dest, size_t size);
+int _gnutls_mpi_dprint_lz (const bigint_t a, gnutls_datum_t * dest);
+int _gnutls_mpi_dprint (const bigint_t a, gnutls_datum_t * dest);
+int _gnutls_mpi_dprint_size (const bigint_t a, gnutls_datum_t * dest,
+			     size_t size);
 
 #define _gnutls_mpi_generate_group( gg, bits) _gnutls_mpi_ops.bigint_generate_group( gg, bits)
 
