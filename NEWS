@@ -27,8 +27,16 @@ vectors as well.
 
 ** libgnutls: Added cryptodev support (/dev/crypto).
 Tested with http://www.logix.cz/michal/devel/cryptodev/.  Added
-benchmark utility for AES.  Exported API to access encryption and hash
-algorithms.
+benchmark utility for AES.
+
+** libgnutls: Exported API to access encryption and hash algorithms.
+The new API functions are gnutls_cipher_decrypt, gnutls_cipher_deinit,
+gnutls_cipher_encrypt, gnutls_cipher_get_block_size,
+gnutls_cipher_init, gnutls_hash, gnutls_hash_deinit, gnutls_hash_fast,
+gnutls_hash_get_len, gnutls_hash_init, gnutls_hash_output,
+gnutls_hmac, gnutls_hmac_deinit, gnutls_hmac_fast,
+gnutls_hmac_get_len, gnutls_hmac_init, gnutls_hmac_output.  New API
+constants are GNUTLS_MAC_SHA224 and GNUTLS_DIG_SHA224.
 
 ** libgnutls: Added gnutls_certificate_set_verify_function() to allow
 verification of certificate upon receipt rather than waiting until the
@@ -88,7 +96,9 @@ gnutls_safe_renegotiation_status: ADDED.
 %UNSAFE_RENEGOTIATION: Added to priority strings
 %INITIAL_SAFE_RENEGOTIATION: Added to priority strings
 %DISABLE_SAFE_RENEGOTIATION: Added to priority strings (do not use)
-GNUTLS_VERSION_MAX: Added.
+GNUTLS_VERSION_MAX: ADDED.
+GNUTLS_MAC_SHA224: ADDED.
+GNUTLS_DIG_SHA224: ADDED.
 
 * Version 2.9.9 (released 2009-11-09)
 
