@@ -42,7 +42,9 @@
 /* Get ssize_t. */
 #ifndef HAVE_SSIZE_T
 # define HAVE_SSIZE_T
-@ DEFINE_SSIZE_T @
+/* *INDENT-OFF* */
+@DEFINE_SSIZE_T@
+/* *INDENT-ON* */
 #endif
 /* Get time_t. */
 #include <time.h>
