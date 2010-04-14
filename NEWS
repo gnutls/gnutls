@@ -5,11 +5,13 @@ See the end for copying conditions.
 
 * Version 2.9.10 (unreleased)
 
-** libgnutls: Time verification extended to trusted certificate list,
-unless GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS flag is specified.
+** libgnutls: Time verification extended to trusted certificate list.
+Unless new constant GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS flag is
+specified.
 
 ** certtool: Display postalCode and Name X.509 DN attributes correctly.
-Based on patch by Pavan Konjarla.
+Based on patch by Pavan Konjarla.  Adds new constant
+GNUTLS_OID_X520_POSTALCODE and GNUTLS_OID_X520_NAME.
 
 ** libgnutls: Added Steve Dispensa's patch for safe renegotiation (RFC 5746)
 Solves the issue discussed in:
@@ -18,7 +20,9 @@ Solves the issue discussed in:
 Note that to allow connecting to unpatched servers the full protection
 is only enabled if the priority string %SAFE_RENEGOTIATION is
 specified. You can check whether protection is in place by querying
-gnutls_safe_renegotiation_status().
+gnutls_safe_renegotiation_status().  New error codes
+GNUTLS_E_SAFE_RENEGOTIATION_FAILED and
+GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED added.
 
 ** libgnutls: When checking openpgp self signature also check the signatures
 ** of all subkeys.
@@ -27,7 +31,8 @@ vectors as well.
 
 ** libgnutls: Added cryptodev support (/dev/crypto).
 Tested with http://www.logix.cz/michal/devel/cryptodev/.  Added
-benchmark utility for AES.
+benchmark utility for AES.  Adds new error codes
+GNUTLS_E_CRYPTODEV_IOCTL_ERROR and GNUTLS_E_CRYPTODEV_DEVICE_ERROR.
 
 ** libgnutls: Exported API to access encryption and hash algorithms.
 The new API functions are gnutls_cipher_decrypt, gnutls_cipher_deinit,
