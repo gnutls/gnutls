@@ -225,7 +225,8 @@ doit (void)
     }
   while (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN);
   handshake = 0;
-  if (debug) success ("Handshake established\n");
+  if (debug)
+    success ("Handshake established\n");
 
   ns = gnutls_record_send (client, MSG, strlen (MSG));
   //success ("client: sent %d\n", ns);
@@ -248,7 +249,8 @@ doit (void)
       else
 	{
 	  transferred += ret;
-	  if (debug) fputs ("*", stdout);
+	  if (debug)
+	    fputs ("*", stdout);
 	}
 
       ns = gnutls_record_send (server, MSG, strlen (MSG));
@@ -270,11 +272,13 @@ doit (void)
       else
 	{
 	  transferred += ret;
-	  if (debug) fputs (".", stdout);
+	  if (debug)
+	    fputs (".", stdout);
 	}
     }
   while (transferred < 7000);
-  if (debug) fputs ("\n", stdout);
+  if (debug)
+    fputs ("\n", stdout);
 
   gnutls_bye (client, GNUTLS_SHUT_RDWR);
   gnutls_bye (server, GNUTLS_SHUT_RDWR);

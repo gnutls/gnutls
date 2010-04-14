@@ -30,7 +30,7 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
-#include "utils.h" 
+#include "utils.h"
 
 /* Thanks to Tomas Hoger <thoger@redhat.com> for generating the two
    certs that trigger this bug. */
@@ -90,7 +90,8 @@ const gnutls_datum_t badguy_nul_san = {
   badguy_nul_san_data, sizeof (badguy_nul_san_data)
 };
 
-void doit(void)
+void
+doit (void)
 {
   gnutls_x509_crt_t crt;
   int ret;
@@ -99,48 +100,50 @@ void doit(void)
   if (ret < 0)
     {
       fail ("gnutls_global_init");
-      exit(1);
+      exit (1);
     }
 
   ret = gnutls_x509_crt_init (&crt);
   if (ret != 0)
     {
-      fail("gnutls_x509_crt_init");
-      exit(1);
+      fail ("gnutls_x509_crt_init");
+      exit (1);
     }
 
   ret = gnutls_x509_crt_import (crt, &badguy_nul_cn, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
     {
-      fail("gnutls_x509_crt_import");
-      exit(1);
+      fail ("gnutls_x509_crt_import");
+      exit (1);
     }
 
   ret = gnutls_x509_crt_check_hostname (crt, "www.bank.com");
   if (ret == 0)
     {
-      if (debug) success("gnutls_x509_crt_check_hostname OK (NUL-IN-CN)");
+      if (debug)
+	success ("gnutls_x509_crt_check_hostname OK (NUL-IN-CN)");
     }
   else
     {
-      fail("gnutls_x509_crt_check_hostname BROKEN (NUL-IN-CN)");
+      fail ("gnutls_x509_crt_check_hostname BROKEN (NUL-IN-CN)");
     }
 
   ret = gnutls_x509_crt_import (crt, &badguy_nul_san, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
     {
       fail ("gnutls_x509_crt_import");
-      exit(1);
+      exit (1);
     }
 
   ret = gnutls_x509_crt_check_hostname (crt, "www.bank.com");
   if (ret == 0)
     {
-      if  (debug) success("gnutls_x509_crt_check_hostname OK (NUL-IN-SAN)");
+      if (debug)
+	success ("gnutls_x509_crt_check_hostname OK (NUL-IN-SAN)");
     }
   else
     {
-      fail("gnutls_x509_crt_check_hostname BROKEN (NUL-IN-SAN)");
+      fail ("gnutls_x509_crt_check_hostname BROKEN (NUL-IN-SAN)");
     }
 
   gnutls_x509_crt_deinit (crt);

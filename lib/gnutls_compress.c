@@ -269,8 +269,8 @@ _gnutls_supported_compression_methods (gnutls_session_t session,
   for (i = j = 0; i < SUPPORTED_COMPRESSION_METHODS; i++)
     {
       int tmp =
-	_gnutls_compression_get_num (session->internals.priorities.
-				     compression.priority[i]);
+	_gnutls_compression_get_num (session->internals.
+				     priorities.compression.priority[i]);
 
       /* remove private compression algorithms, if requested.
        */

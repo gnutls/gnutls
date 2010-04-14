@@ -318,10 +318,11 @@ load_keys (void)
 
 }
 
-static int cert_verify_callback( gnutls_session_t session)
+static int
+cert_verify_callback (gnutls_session_t session)
 {
-int rc;
-unsigned int status;
+  int rc;
+  unsigned int status;
 
   if (!x509_cafile && !pgp_keyring)
     return 0;
@@ -331,7 +332,7 @@ unsigned int status;
     {
       printf ("*** Verifying server certificate failed...\n");
       if (!insecure)
-        return -1;
+	return -1;
     }
 
   return 0;
@@ -836,7 +837,7 @@ after_handshake:
 
       if (FD_ISSET (fileno (stdin), &rset))
 	{
-	  if ((bytes = read (fileno(stdin), buffer, MAX_BUF - 1)) < 0)
+	  if ((bytes = read (fileno (stdin), buffer, MAX_BUF - 1)) < 0)
 	    {
 	      if (hd.secure == 0)
 		{
@@ -1042,7 +1043,7 @@ do_handshake (socket_st * socket)
     }
   else
     {
-      gnutls_alert_send_appropriate(socket->session, ret);
+      gnutls_alert_send_appropriate (socket->session, ret);
       shutdown (socket->fd, SHUT_RDWR);
     }
   return ret;

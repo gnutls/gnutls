@@ -61,10 +61,10 @@ client_avp (gnutls_session_t session, void *ptr,
   if (debug)
     {
       if (last)
-        printf ("client: received %d bytes AVP: `%.*s'\n",
-	    (int)lastlen, (int) lastlen, last);
+	printf ("client: received %d bytes AVP: `%.*s'\n",
+		(int) lastlen, (int) lastlen, last);
       else
-        printf ("client: new application phase\n");
+	printf ("client: new application phase\n");
     }
 
   switch (iter)
@@ -97,7 +97,8 @@ client_avp (gnutls_session_t session, void *ptr,
     return -1;
   *newlen = strlen (*new);
 
-  if (debug) printf ("client: sending %d bytes AVP: `%s'\n", (int)*newlen, *new);
+  if (debug)
+    printf ("client: sending %d bytes AVP: `%s'\n", (int) *newlen, *new);
 
   gnutls_ia_permute_inner_secret (session, 3, "foo");
 
@@ -159,7 +160,8 @@ client (void)
     }
   else
     {
-      if (debug) success ("client: Handshake was completed\n");
+      if (debug)
+	success ("client: Handshake was completed\n");
     }
 
   /*
@@ -173,7 +175,8 @@ client (void)
     fail ("client: No TLS/IA negotiation\n");
   else
     {
-      if (debug) success ("client: TLS/IA handshake\n");
+      if (debug)
+	success ("client: TLS/IA handshake\n");
 
       ret = gnutls_ia_handshake (session);
 
@@ -185,7 +188,8 @@ client (void)
 	}
       else
 	{
-	  if (debug) success ("client: TLS/IA Handshake was completed\n");
+	  if (debug)
+	    success ("client: TLS/IA Handshake was completed\n");
 	}
     }
 
@@ -194,7 +198,8 @@ client (void)
   ret = gnutls_record_recv (session, buffer, MAX_BUF);
   if (ret == 0)
     {
-      if (debug) success ("client: Peer has closed the TLS connection\n");
+      if (debug)
+	success ("client: Peer has closed the TLS connection\n");
       goto end;
     }
   else if (ret < 0)
@@ -295,7 +300,7 @@ server_avp (gnutls_session_t session, void *ptr,
 
   if (last && debug)
     printf ("server: received %d bytes AVP: `%.*s'\n",
-	    (int)lastlen, (int) lastlen, last);
+	    (int) lastlen, (int) lastlen, last);
 
   gnutls_ia_permute_inner_secret (session, 3, "foo");
 
@@ -344,13 +349,15 @@ server_avp (gnutls_session_t session, void *ptr,
 
   if (strcmp (p, "1") == 0)
     {
-      if (debug) success ("server: Sending IntermediatePhaseFinished...\n");
+      if (debug)
+	success ("server: Sending IntermediatePhaseFinished...\n");
       return 1;
     }
 
   if (strcmp (p, "2") == 0)
     {
-      if (debug) success ("server: Sending FinalPhaseFinished...\n");
+      if (debug)
+	success ("server: Sending FinalPhaseFinished...\n");
       return 2;
     }
 
@@ -359,7 +366,8 @@ server_avp (gnutls_session_t session, void *ptr,
     return -1;
   *newlen = strlen (*new);
 
-  if (debug) printf ("server: sending %d bytes AVP: `%s'\n", (int)*newlen, *new);
+  if (debug)
+    printf ("server: sending %d bytes AVP: `%s'\n", (int) *newlen, *new);
 
   return 0;
 }
@@ -401,7 +409,8 @@ server_start (void)
       return;
     }
 
-  if (debug) success ("server: ready. Listening to port '%d'\n", PORT);
+  if (debug)
+    success ("server: ready. Listening to port '%d'\n", PORT);
 }
 
 static void
@@ -419,7 +428,8 @@ server (void)
   gnutls_anon_allocate_server_credentials (&anoncred);
   gnutls_ia_allocate_server_credentials (&iacred);
 
-  if (debug) success ("Launched, generating DH parameters...\n");
+  if (debug)
+    success ("Launched, generating DH parameters...\n");
 
   generate_dh_params ();
 
@@ -431,9 +441,10 @@ server (void)
 
   sd = accept (listen_sd, (SA *) & sa_cli, &client_len);
 
-  if (debug) success ("server: connection from %s, port %d\n",
-	   inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
-		      sizeof (topbuf)), ntohs (sa_cli.sin_port));
+  if (debug)
+    success ("server: connection from %s, port %d\n",
+	     inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
+			sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
   gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
 
@@ -449,13 +460,15 @@ server (void)
       fail ("server: Handshake has failed (%s)\n\n", gnutls_strerror (ret));
       return;
     }
-  if (debug) success ("server: Handshake was completed\n");
+  if (debug)
+    success ("server: Handshake was completed\n");
 
   if (!gnutls_ia_handshake_p (session))
     fail ("server: No TLS/IA negotiation\n");
   else
     {
-      if (debug) success ("server: TLS/IA handshake\n");
+      if (debug)
+	success ("server: TLS/IA handshake\n");
 
       ret = gnutls_ia_handshake (session);
 
@@ -467,7 +480,8 @@ server (void)
 	}
       else
 	{
-	  if (debug) success ("server: TLS/IA Handshake was completed\n");
+	  if (debug)
+	    success ("server: TLS/IA Handshake was completed\n");
 	}
     }
 
@@ -482,7 +496,8 @@ server (void)
 
       if (ret == 0)
 	{
-	  if (debug) success ("server: Peer has closed the GNUTLS connection\n");
+	  if (debug)
+	    success ("server: Peer has closed the GNUTLS connection\n");
 	  break;
 	}
       else if (ret < 0)
@@ -524,7 +539,8 @@ server (void)
 
   gnutls_global_deinit ();
 
-  if (debug) success ("server: finished\n");
+  if (debug)
+    success ("server: finished\n");
 }
 
 void

@@ -169,8 +169,8 @@ _gnutls_get_private_rsa_params (gnutls_session_t session,
     }
 
   bits =
-    _gnutls_mpi_get_nbits (session->internals.selected_cert_list[0].
-			   params[0]);
+    _gnutls_mpi_get_nbits (session->internals.
+			   selected_cert_list[0].params[0]);
 
   if (_gnutls_cipher_suite_get_kx_algo
       (&session->security_parameters.current_cipher_suite)

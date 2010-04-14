@@ -127,13 +127,13 @@ doit (void)
   s = 0;
   ret = gnutls_x509_crq_get_challenge_password (crq, NULL, &s);
   if (ret != 0 || s != 3)
-    fail ("gnutls_x509_crq_get_challenge_password2 %d/%d\n", ret, (int)s);
+    fail ("gnutls_x509_crq_get_challenge_password2 %d/%d\n", ret, (int) s);
 
   s = 10;
   ret = gnutls_x509_crq_get_challenge_password (crq, smallbuf, &s);
   if (ret != 0 || s != 3 || strcmp (smallbuf, "foo") != 0)
     fail ("gnutls_x509_crq_get_challenge_password3 %d/%d/%s\n",
-	  ret,(int) s, smallbuf);
+	  ret, (int) s, smallbuf);
 
   s = 0;
   ret = gnutls_x509_crq_get_extension_info (crq, 0, NULL, &s, NULL);
@@ -190,7 +190,8 @@ doit (void)
   ret = gnutls_x509_crq_print (crq, GNUTLS_CRT_PRINT_FULL, &out);
   if (ret != 0)
     fail ("gnutls_x509_crq_print\n");
-  if (debug) printf ("crq: %.*s\n", out.size, out.data);
+  if (debug)
+    printf ("crq: %.*s\n", out.size, out.data);
   gnutls_free (out.data);
 
   ret = gnutls_x509_crt_set_version (crt, 3);
@@ -204,7 +205,8 @@ doit (void)
   ret = gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_FULL, &out);
   if (ret != 0)
     fail ("gnutls_x509_crt_print\n");
-  if (debug) printf ("crt: %.*s\n", out.size, out.data);
+  if (debug)
+    printf ("crt: %.*s\n", out.size, out.data);
   gnutls_free (out.data);
 
   gnutls_x509_crq_deinit (crq);

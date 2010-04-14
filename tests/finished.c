@@ -49,7 +49,8 @@ size_t to_client_len;
 static ssize_t
 client_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
 {
-  if (debug) success ("client_pull len %d has %d\n", (int)len, (int)to_client_len);
+  if (debug)
+    success ("client_pull len %d has %d\n", (int) len, (int) to_client_len);
 
   if (to_client_len < len)
     {
@@ -71,9 +72,9 @@ client_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
   size_t newlen = to_server_len + len;
   char *tmp;
 
-  if (debug) 
+  if (debug)
     {
-      success ("client_push len %d has %d\n", (int)len, (int)to_server_len);
+      success ("client_push len %d has %d\n", (int) len, (int) to_server_len);
       hexprint (data, len);
     }
 
@@ -94,7 +95,8 @@ client_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 static ssize_t
 server_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
 {
-  if (debug) success ("server_pull len %d has %d\n", (int)len, (int)to_server_len);
+  if (debug)
+    success ("server_pull len %d has %d\n", (int) len, (int) to_server_len);
 
   if (to_server_len < len)
     {
@@ -116,9 +118,9 @@ server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
   size_t newlen = to_client_len + len;
   char *tmp;
 
-  if (debug) 
+  if (debug)
     {
-      success ("server_push len %d has %d\n", (int)len, (int)to_client_len);
+      success ("server_push len %d has %d\n", (int) len, (int) to_client_len);
       hexprint (data, len);
     }
 
@@ -140,9 +142,9 @@ static void
 client_finished_callback (gnutls_session_t session,
 			  const void *finished, size_t len)
 {
-  if (debug) 
+  if (debug)
     {
-      success ("client finished (length %d)\n", (int)len);
+      success ("client finished (length %d)\n", (int) len);
       hexprint (finished, len);
     }
 }
@@ -151,9 +153,9 @@ static void
 server_finished_callback (gnutls_session_t session,
 			  const void *finished, size_t len)
 {
-  if (debug) 
+  if (debug)
     {
-      success ("server finished (length %d)\n", (int)len);
+      success ("server finished (length %d)\n", (int) len);
       hexprint (finished, len);
     }
 }
@@ -214,24 +216,30 @@ doit (void)
     {
       if (cret == GNUTLS_E_AGAIN)
 	{
-	  if (debug) success ("loop invoking client:\n");
+	  if (debug)
+	    success ("loop invoking client:\n");
 	  cret = gnutls_handshake (client);
-	  if (debug) success ("client %d: %s\n", cret, gnutls_strerror (cret));
+	  if (debug)
+	    success ("client %d: %s\n", cret, gnutls_strerror (cret));
 	}
 
       if (sret == GNUTLS_E_AGAIN)
 	{
-	  if (debug) success ("loop invoking server:\n");
+	  if (debug)
+	    success ("loop invoking server:\n");
 	  sret = gnutls_handshake (server);
-	  if (debug) success ("server %d: %s\n", sret, gnutls_strerror (sret));
+	  if (debug)
+	    success ("server %d: %s\n", sret, gnutls_strerror (sret));
 	}
     }
   while (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN);
 
-  if (debug) success ("Handshake established\n");
+  if (debug)
+    success ("Handshake established\n");
 
   ns = gnutls_record_send (client, MSG, strlen (MSG));
-  if (debug) success ("client: sent %d\n", (int)ns);
+  if (debug)
+    success ("client: sent %d\n", (int) ns);
 
   ret = gnutls_record_recv (server, buffer, MAX_BUF);
   if (ret == 0)
@@ -247,7 +255,8 @@ doit (void)
     }
 
   ns = gnutls_record_send (server, MSG, strlen (MSG));
-  if (debug) success ("server: sent %d\n", (int)ns);
+  if (debug)
+    success ("server: sent %d\n", (int) ns);
 
   ret = gnutls_record_recv (client, buffer, MAX_BUF);
   if (ret == 0)

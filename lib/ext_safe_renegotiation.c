@@ -28,13 +28,14 @@
 
 int
 _gnutls_safe_renegotiation_recv_params (gnutls_session_t session,
-					const opaque * data, size_t _data_size)
+					const opaque * data,
+					size_t _data_size)
 {
   tls_ext_st *ext = &session->security_parameters.extensions;
   int len = data[0];
   ssize_t data_size = _data_size;
 
-  DECR_LEN (data_size, len+1 /* count the first byte and payload */);
+  DECR_LEN (data_size, len + 1 /* count the first byte and payload */ );
 
   /* It is not legal to receive this extension on a renegotiation and
    * not receive it on the initial negotiation.
@@ -42,13 +43,13 @@ _gnutls_safe_renegotiation_recv_params (gnutls_session_t session,
   if (session->internals.initial_negotiation_completed != 0 &&
       session->internals.connection_using_safe_renegotiation == 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
     }
 
   if (len > sizeof (ext->ri_extension_data))
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
     }
 
@@ -80,7 +81,7 @@ _gnutls_safe_renegotiation_send_params (gnutls_session_t session,
 
   if (session->internals.priorities.disable_safe_renegotiation != 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return 0;
     }
 
@@ -96,8 +97,8 @@ _gnutls_safe_renegotiation_send_params (gnutls_session_t session,
       DECR_LEN (data_size, ext->client_verify_data_len);
 
       if (ext->client_verify_data_len > 0)
-	memcpy(&data[1], ext->client_verify_data,
-	       ext->client_verify_data_len);
+	memcpy (&data[1], ext->client_verify_data,
+		ext->client_verify_data_len);
 
       if (session->security_parameters.entity == GNUTLS_SERVER)
 	{
@@ -106,15 +107,14 @@ _gnutls_safe_renegotiation_send_params (gnutls_session_t session,
 	  DECR_LEN (data_size, ext->server_verify_data_len);
 
 	  if (ext->server_verify_data_len > 0)
-	    memcpy(&data[1 + ext->client_verify_data_len],
-		   ext->server_verify_data,
-		   ext->server_verify_data_len);
+	    memcpy (&data[1 + ext->client_verify_data_len],
+		    ext->server_verify_data, ext->server_verify_data_len);
 	}
     }
   else
     return 0;
 
-  return 1 + data[0]; /* don't forget the length byte */
+  return 1 + data[0];		/* don't forget the length byte */
 }
 
 /**
@@ -151,7 +151,7 @@ gnutls_safe_negotiation_set_initial (gnutls_session_t session, int value)
 void
 gnutls_safe_renegotiation_set (gnutls_session_t session, int value)
 {
-  session->internals.priorities.unsafe_renegotiation = 1-value;
+  session->internals.priorities.unsafe_renegotiation = 1 - value;
 }
 
 /**

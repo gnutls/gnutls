@@ -288,18 +288,20 @@ _asn1_get_objectid_der (const unsigned char *der, int der_len, int *ret_len,
   leading = 1;
   for (k = 1; k < len; k++)
     {
-      
+
 
       /* X.690 mandates that the leading byte must never be 0x80
        */
-      if (leading != 0 && der[len_len + k] == 0x80) return ASN1_DER_ERROR;
+      if (leading != 0 && der[len_len + k] == 0x80)
+	return ASN1_DER_ERROR;
       leading = 0;
 
       /* check for wrap around */
       val = val << 7;
       val |= der[len_len + k] & 0x7F;
 
-      if (val < prev_val) return ASN1_DER_ERROR;
+      if (val < prev_val)
+	return ASN1_DER_ERROR;
 
       prev_val = val;
 
@@ -313,7 +315,7 @@ _asn1_get_objectid_der (const unsigned char *der, int der_len, int *ret_len,
 	}
     }
   *ret_len = len + len_len;
-  
+
   return ASN1_SUCCESS;
 }
 
@@ -1053,8 +1055,9 @@ asn1_der_decoding (ASN1_TYPE * element, const void *ider, int len,
 	      move = RIGHT;
 	      break;
 	    case TYPE_OBJECT_ID:
-	      result = _asn1_get_objectid_der (der + counter, len - counter, &len2,
-				      temp, sizeof (temp));
+	      result =
+		_asn1_get_objectid_der (der + counter, len - counter, &len2,
+					temp, sizeof (temp));
 	      if (result != ASN1_SUCCESS)
 		{
 		  asn1_delete_structure (element);
@@ -1668,12 +1671,13 @@ asn1_der_decoding_element (ASN1_TYPE * structure, const char *elementName,
 	    case TYPE_OBJECT_ID:
 	      if (state == FOUND)
 		{
-		  result = _asn1_get_objectid_der (der + counter, len - counter, &len2,
-					  temp, sizeof (temp));
-                  if (result != ASN1_SUCCESS)
-                  {
-		    return result;
-                  }
+		  result =
+		    _asn1_get_objectid_der (der + counter, len - counter,
+					    &len2, temp, sizeof (temp));
+		  if (result != ASN1_SUCCESS)
+		    {
+		      return result;
+		    }
 
 		  tlen = strlen (temp);
 

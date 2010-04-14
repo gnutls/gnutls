@@ -126,11 +126,13 @@ static int wrap_db_delete (void *dbf, gnutls_datum_t key);
 #define HTTP_STATE_RESPONSE	2
 #define HTTP_STATE_CLOSING	3
 
-LIST_TYPE_DECLARE (listener_item, char *http_request;
-		   char *http_response; int request_length;
-		   int response_length; int response_written;
-		   int http_state; int listen_socket;
-		   int fd; gnutls_session_t tls_session; int handshake_ok;);
+LIST_TYPE_DECLARE (listener_item, char *http_request; char *http_response;
+		   int request_length; int response_length;
+		   int response_written; int http_state;
+		   int listen_socket; int fd;
+		   gnutls_session_t tls_session;
+		   int handshake_ok;
+  );
 
 static const char *
 safe_strerror (int value)
@@ -502,7 +504,7 @@ peer_print_info (gnutls_session_t session, int *ret_length,
   http_buffer = malloc (len);
   if (http_buffer == NULL)
     {
-      free(crtinfo);
+      free (crtinfo);
       return NULL;
     }
 
@@ -621,7 +623,7 @@ peer_print_info (gnutls_session_t session, int *ret_length,
       strcat (http_buffer, "<hr><PRE>");
       strcat (http_buffer, crtinfo);
       strcat (http_buffer, "\n</PRE>\n");
-      free(crtinfo);
+      free (crtinfo);
     }
 
   strcat (http_buffer, "<hr><P>Your HTTP header was:<PRE>");
@@ -791,18 +793,20 @@ get_response (gnutls_session_t session, char *request,
     }
   else
     {
-      fprintf(stderr, "received: %s\n", request);
+      fprintf (stderr, "received: %s\n", request);
       if (request[0] == request[1] && request[0] == '*')
-        {
-          if (strncmp(request, "**REHANDSHAKE**", sizeof("**REHANDSHAKE**")-1)==0)
-            {
-              fprintf(stderr, "*** Sending rehandshake request\n");
-              gnutls_rehandshake(session);
-            }
-          *response = NULL;
-          *response_length = 0;
-          return;
-        }
+	{
+	  if (strncmp
+	      (request, "**REHANDSHAKE**",
+	       sizeof ("**REHANDSHAKE**") - 1) == 0)
+	    {
+	      fprintf (stderr, "*** Sending rehandshake request\n");
+	      gnutls_rehandshake (session);
+	    }
+	  *response = NULL;
+	  *response_length = 0;
+	  return;
+	}
       *response = strdup (request);
       *response_length = ((*response) ? strlen (*response) : 0);
     }
@@ -1222,7 +1226,8 @@ main (int argc, char **argv)
 			ret =
 			  gnutls_alert_send_appropriate (j->tls_session, r);
 		      }
-		    while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+		    while (ret == GNUTLS_E_AGAIN
+			   || ret == GNUTLS_E_INTERRUPTED);
 		    j->http_state = HTTP_STATE_CLOSING;
 		  }
 		else if (r == 0)
@@ -1255,7 +1260,7 @@ main (int argc, char **argv)
 		  {
 		    if (r == GNUTLS_E_REHANDSHAKE)
 		      {
-			fprintf(stderr, "*** Received hello message\n");
+			fprintf (stderr, "*** Received hello message\n");
 			do
 			  {
 			    r = gnutls_handshake (j->tls_session);
@@ -1418,12 +1423,12 @@ main (int argc, char **argv)
 		      }
 		  }
 	      }
-            else
-              {
+	    else
+	      {
 		j->request_length = 0;
 		j->http_request[0] = 0;
-                j->http_state = HTTP_STATE_REQUEST;
-              }
+		j->http_state = HTTP_STATE_REQUEST;
+	      }
 	  }
       }
       lloopend (listener_list, j);

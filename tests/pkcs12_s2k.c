@@ -138,11 +138,12 @@ doit (void)
 
 	  if (debug)
 	    printf ("ij: %d.%d: %s\n", i, j,
-		  _gnutls_bin2hex (key, sizeof (key), tmp, sizeof (tmp)));
+		    _gnutls_bin2hex (key, sizeof (key), tmp, sizeof (tmp)));
 	  x++;
 	}
     }
-  if (debug) printf ("\n");
+  if (debug)
+    printf ("\n");
 
   for (i = 0; i < sizeof (tv) / sizeof (tv[0]); i++)
     {
@@ -158,12 +159,14 @@ doit (void)
 	fail ("_gnutls_pkcs12_string_to_key failed[3]\n");
 
       if (debug)
-        printf ("tv[%d]: %s\n", i,
-	      _gnutls_bin2hex (key, tv[i].keylen, tmp, sizeof (tmp)));
+	printf ("tv[%d]: %s\n", i,
+		_gnutls_bin2hex (key, tv[i].keylen, tmp, sizeof (tmp)));
     }
-  if (debug) printf ("\n");
+  if (debug)
+    printf ("\n");
 
   gnutls_global_deinit ();
 
-  if (debug) success ("_gnutls_pkcs12_string_to_key ok\n");
+  if (debug)
+    success ("_gnutls_pkcs12_string_to_key ok\n");
 }

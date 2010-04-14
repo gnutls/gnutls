@@ -282,8 +282,8 @@ pack_certificate_auth_info (gnutls_session_t session,
    */
   packed_session->data =
     gnutls_malloc (packed_session->size + MAX_SEC_PARAMS + 2 +
-		   session->security_parameters.
-		   extensions.session_ticket_len);
+		   session->security_parameters.extensions.
+		   session_ticket_len);
 
   if (packed_session->data == NULL)
     {
@@ -517,8 +517,8 @@ pack_srp_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
    */
   packed_session->data =
     gnutls_malloc (packed_session->size + MAX_SEC_PARAMS + 2 +
-		   session->security_parameters.
-		   extensions.session_ticket_len);
+		   session->security_parameters.extensions.
+		   session_ticket_len);
 
   if (packed_session->data == NULL)
     {
@@ -624,8 +624,8 @@ pack_anon_auth_info (gnutls_session_t session,
    */
   packed_session->data =
     gnutls_malloc (packed_session->size + MAX_SEC_PARAMS + 2 +
-		   session->security_parameters.
-		   extensions.session_ticket_len);
+		   session->security_parameters.extensions.
+		   session_ticket_len);
 
   if (packed_session->data == NULL)
     {
@@ -779,7 +779,7 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
       hint_size = strlen (info->hint) + 1;	/* include the terminating null */
 
       pack_size = 1 + 4 + 4 + username_size + 4 + hint_size +
-        + 2 + 4 + info->dh.prime.size + 4 + info->dh.generator.size +
+	+2 + 4 + info->dh.prime.size + 4 + info->dh.generator.size +
 	4 + info->dh.public_key.size;
     }
   else
@@ -791,8 +791,8 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_datum_t * packed_session)
    */
   packed_session->data =
     gnutls_malloc (packed_session->size + MAX_SEC_PARAMS + 2 +
-		   session->security_parameters.
-		   extensions.session_ticket_len);
+		   session->security_parameters.extensions.
+		   session_ticket_len);
 
   if (packed_session->data == NULL)
     {
@@ -1067,8 +1067,9 @@ pack_security_parameters (gnutls_session_t session,
 	  session->security_parameters.extensions.srp_username, len);
   pos += len;
 
-  _gnutls_write_uint16 (session->security_parameters.extensions.
-			server_names_size, &packed_session->data[pos]);
+  _gnutls_write_uint16 (session->security_parameters.
+			extensions.server_names_size,
+			&packed_session->data[pos]);
   pos += 2;
 
   for (i = 0; i < session->security_parameters.extensions.server_names_size;
@@ -1076,21 +1077,22 @@ pack_security_parameters (gnutls_session_t session,
     {
       packed_session->data[pos++] =
 	session->security_parameters.extensions.server_names[i].type;
-      _gnutls_write_uint16 (session->security_parameters.extensions.
-			    server_names[i].name_length,
+      _gnutls_write_uint16 (session->security_parameters.
+			    extensions.server_names[i].name_length,
 			    &packed_session->data[pos]);
       pos += 2;
 
       memcpy (&packed_session->data[pos],
 	      session->security_parameters.extensions.server_names[i].name,
-	      session->security_parameters.extensions.server_names[i].
-	      name_length);
+	      session->security_parameters.extensions.
+	      server_names[i].name_length);
       pos +=
 	session->security_parameters.extensions.server_names[i].name_length;
     }
 
-  _gnutls_write_uint16 (session->security_parameters.extensions.
-			session_ticket_len, &packed_session->data[pos]);
+  _gnutls_write_uint16 (session->security_parameters.
+			extensions.session_ticket_len,
+			&packed_session->data[pos]);
   pos += 2;
   memcpy (&packed_session->data[pos],
 	  session->security_parameters.extensions.session_ticket,
@@ -1135,7 +1137,8 @@ unpack_security_parameters (gnutls_session_t session,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  memset(&session->internals.resumed_security_parameters, 0, sizeof(session->internals.resumed_security_parameters));
+  memset (&session->internals.resumed_security_parameters, 0,
+	  sizeof (session->internals.resumed_security_parameters));
   session->internals.resumed_security_parameters.entity =
     packed_session->data[pos++];
   session->internals.resumed_security_parameters.kx_algorithm =
@@ -1152,10 +1155,10 @@ unpack_security_parameters (gnutls_session_t session,
     packed_session->data[pos++];
   session->internals.resumed_security_parameters.write_compression_algorithm =
     packed_session->data[pos++];
-  session->internals.resumed_security_parameters.current_cipher_suite.
-    suite[0] = packed_session->data[pos++];
-  session->internals.resumed_security_parameters.current_cipher_suite.
-    suite[1] = packed_session->data[pos++];
+  session->internals.resumed_security_parameters.
+    current_cipher_suite.suite[0] = packed_session->data[pos++];
+  session->internals.resumed_security_parameters.
+    current_cipher_suite.suite[1] = packed_session->data[pos++];
 
   session->internals.resumed_security_parameters.cert_type =
     packed_session->data[pos++];
@@ -1204,46 +1207,48 @@ unpack_security_parameters (gnutls_session_t session,
 
   /* SRP */
   len = packed_session->data[pos++];	/* srp username length */
-  memcpy (session->internals.resumed_security_parameters.extensions.
-	  srp_username, &packed_session->data[pos], len);
-  session->internals.resumed_security_parameters.extensions.
-    srp_username[len] = 0;
+  memcpy (session->internals.resumed_security_parameters.
+	  extensions.srp_username, &packed_session->data[pos], len);
+  session->internals.resumed_security_parameters.
+    extensions.srp_username[len] = 0;
   pos += len;
 
-  session->internals.resumed_security_parameters.extensions.
-    server_names_size = _gnutls_read_uint16 (&packed_session->data[pos]);
+  session->internals.resumed_security_parameters.
+    extensions.server_names_size =
+    _gnutls_read_uint16 (&packed_session->data[pos]);
   pos += 2;
   for (i = 0;
        i <
-       session->internals.resumed_security_parameters.extensions.
-       server_names_size; i++)
+       session->internals.resumed_security_parameters.
+       extensions.server_names_size; i++)
     {
-      session->internals.resumed_security_parameters.extensions.
-	server_names[i].type = packed_session->data[pos++];
-      session->internals.resumed_security_parameters.extensions.
-	server_names[i].name_length =
+      session->internals.resumed_security_parameters.
+	extensions.server_names[i].type = packed_session->data[pos++];
+      session->internals.resumed_security_parameters.
+	extensions.server_names[i].name_length =
 	_gnutls_read_uint16 (&packed_session->data[pos]);
       pos += 2;
 
-      memcpy (session->internals.resumed_security_parameters.extensions.
-	      server_names[i].name, &packed_session->data[pos],
-	      session->internals.resumed_security_parameters.extensions.
-	      server_names[i].name_length);
+      memcpy (session->internals.resumed_security_parameters.
+	      extensions.server_names[i].name, &packed_session->data[pos],
+	      session->internals.resumed_security_parameters.
+	      extensions.server_names[i].name_length);
       pos +=
-	session->internals.resumed_security_parameters.extensions.
-	server_names[i].name_length;
+	session->internals.resumed_security_parameters.
+	extensions.server_names[i].name_length;
     }
 
-  session->internals.resumed_security_parameters.extensions.
-    session_ticket_len = _gnutls_read_uint16 (&packed_session->data[pos]);
+  session->internals.resumed_security_parameters.
+    extensions.session_ticket_len =
+    _gnutls_read_uint16 (&packed_session->data[pos]);
   pos += 2;
   session->internals.resumed_security_parameters.extensions.session_ticket =
-    gnutls_malloc (session->internals.resumed_security_parameters.extensions.
-		   session_ticket_len);
-  memcpy (session->internals.resumed_security_parameters.extensions.
-	  session_ticket, &packed_session->data[pos],
-	  session->internals.resumed_security_parameters.extensions.
-	  session_ticket_len);
+    gnutls_malloc (session->internals.resumed_security_parameters.
+		   extensions.session_ticket_len);
+  memcpy (session->internals.resumed_security_parameters.
+	  extensions.session_ticket, &packed_session->data[pos],
+	  session->internals.resumed_security_parameters.
+	  extensions.session_ticket_len);
 
   return 0;
 }

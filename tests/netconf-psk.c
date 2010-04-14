@@ -57,7 +57,8 @@ doit (void)
   if (gnutls_psk_netconf_derive_key ("password", "psk_identity",
 				     "psk_identity_hint", &key) == 0)
     {
-      if (debug) success ("success: gnutls_psk_netconf_derive_key\n");
+      if (debug)
+	success ("success: gnutls_psk_netconf_derive_key\n");
     }
   else
     fail ("gnutls_psk_netconf_derive_key failure\n");
@@ -67,7 +68,8 @@ doit (void)
 
   if (key.size == 20 && memcmp (key.data, known, 20) == 0)
     {
-      if (debug) success ("success: match.\n");
+      if (debug)
+	success ("success: match.\n");
     }
   else
     fail ("FAIL: key differ.\n");

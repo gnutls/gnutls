@@ -453,8 +453,8 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
    */
   if (session->internals.priorities.protocol.algorithms > 0)
     _gnutls_set_current_version (session,
-				 session->internals.priorities.
-				 protocol.priority[0]);
+				 session->internals.priorities.protocol.
+				 priority[0]);
 
   return 0;
 }
@@ -728,15 +728,14 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	  else if (strcasecmp (&broken_list[i][1],
 			       "UNSAFE_RENEGOTIATION") == 0)
 	    (*priority_cache)->unsafe_renegotiation = 1;
-	  else if (strcasecmp (&broken_list[i][1],
-			       "SAFE_RENEGOTIATION") == 0)
+	  else if (strcasecmp (&broken_list[i][1], "SAFE_RENEGOTIATION") == 0)
 	    (*priority_cache)->unsafe_renegotiation = 0;
 	  else if (strcasecmp (&broken_list[i][1],
 			       "INITIAL_SAFE_RENEGOTIATION") == 0)
-            {
+	    {
 	      (*priority_cache)->unsafe_renegotiation = 0;
 	      (*priority_cache)->initial_safe_renegotiation = 1;
-            }
+	    }
 	  else if (strcasecmp (&broken_list[i][1],
 			       "DISABLE_SAFE_RENEGOTIATION") == 0)
 	    (*priority_cache)->disable_safe_renegotiation = 1;

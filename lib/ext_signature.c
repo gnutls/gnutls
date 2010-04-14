@@ -59,8 +59,8 @@ _gnutls_sign_algorithm_write_params (gnutls_session_t session, opaque * data,
   for (i = j = 0; i < len; i += 2, j++)
     {
       aid =
-	_gnutls_sign_to_tls_aid (session->internals.priorities.sign_algo.
-				 priority[j]);
+	_gnutls_sign_to_tls_aid (session->internals.priorities.
+				 sign_algo.priority[j]);
       *p = aid.hash_algorithm;
       p++;
       *p = aid.sign_algorithm;
@@ -91,9 +91,10 @@ _gnutls_sign_algorithm_parse_data (gnutls_session_t session,
       sig = _gnutls_tls_aid_to_sign (&aid);
       if (sig != GNUTLS_SIGN_UNKNOWN)
 	{
-	  session->security_parameters.extensions.
-	    sign_algorithms[session->security_parameters.extensions.
-			    sign_algorithms_size++] = sig;
+	  session->security_parameters.extensions.sign_algorithms[session->
+								  security_parameters.
+								  extensions.sign_algorithms_size++]
+	    = sig;
 	  if (session->security_parameters.extensions.sign_algorithms_size ==
 	      MAX_SIGNATURE_ALGORITHMS)
 	    break;
@@ -213,9 +214,8 @@ _gnutls_session_get_sign_algo (gnutls_session_t session,
 	  (session->security_parameters.extensions.sign_algorithms[i]) == pk)
 	{
 	  *hash =
-	    _gnutls_sign_get_hash_algorithm (session->
-					     security_parameters.extensions.
-					     sign_algorithms[i]);
+	    _gnutls_sign_get_hash_algorithm (session->security_parameters.
+					     extensions.sign_algorithms[i]);
 	  return session->security_parameters.extensions.sign_algorithms[i];
 	}
     }

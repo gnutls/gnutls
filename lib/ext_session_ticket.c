@@ -87,7 +87,7 @@ decrypt_ticket (gnutls_session_t session, struct ticket *ticket)
   int ret;
 
   /* Check the integrity of ticket using HMAC-SHA-256. */
-  mac_secret.data = (void*)
+  mac_secret.data = (void *)
     session->internals.session_ticket_key->mac_secret;
   mac_secret.size = MAC_SECRET_SIZE;
   ret = digest_ticket (&mac_secret, ticket, final);
@@ -104,7 +104,7 @@ decrypt_ticket (gnutls_session_t session, struct ticket *ticket)
     }
 
   /* Decrypt encrypted_state using 128-bit AES in CBC mode. */
-  key.data = (void*)session->internals.session_ticket_key->key;
+  key.data = (void *) session->internals.session_ticket_key->key;
   key.size = KEY_SIZE;
   IV.data = ticket->IV;
   IV.size = IV_SIZE;
@@ -177,7 +177,7 @@ encrypt_ticket (gnutls_session_t session, struct ticket *ticket)
   _gnutls_free_datum (&state);
 
   /* Encrypt state using 128-bit AES in CBC mode. */
-  key.data = (void*)session->internals.session_ticket_key->key;
+  key.data = (void *) session->internals.session_ticket_key->key;
   key.size = KEY_SIZE;
   IV.data = session->internals.session_ticket_IV;
   IV.size = IV_SIZE;
@@ -202,13 +202,13 @@ encrypt_ticket (gnutls_session_t session, struct ticket *ticket)
 
   /* Fill the ticket structure to compute MAC. */
   memcpy (ticket->key_name,
-         session->internals.session_ticket_key->key_name, KEY_NAME_SIZE);
+	  session->internals.session_ticket_key->key_name, KEY_NAME_SIZE);
   memcpy (ticket->IV, IV.data, IV.size);
   ticket->encrypted_state_len = encrypted_state.size;
   ticket->encrypted_state = encrypted_state.data;
 
   mac_secret.data =
-    (void*)session->internals.session_ticket_key->mac_secret;
+    (void *) session->internals.session_ticket_key->mac_secret;
   mac_secret.size = MAC_SECRET_SIZE;
   ret = digest_ticket (&mac_secret, ticket, ticket->mac);
   if (ret < 0)
@@ -250,7 +250,8 @@ _gnutls_session_ticket_recv_params (gnutls_session_t session,
       /* If the key name of the ticket does not match the one that we
          hold, issue a new ticket. */
       if (memcmp (ticket.key_name,
-		  session->internals.session_ticket_key->key_name, KEY_NAME_SIZE))
+		  session->internals.session_ticket_key->key_name,
+		  KEY_NAME_SIZE))
 	{
 	  session->internals.session_ticket_renew = 1;
 	  return 0;
@@ -322,21 +323,21 @@ _gnutls_session_ticket_send_params (gnutls_session_t session,
     }
   else
     {
-      if (session->internals.resumed_security_parameters.extensions.
-	  session_ticket_len > 0)
+      if (session->internals.resumed_security_parameters.
+	  extensions.session_ticket_len > 0)
 	{
 	  DECR_LENGTH_RET (data_size,
-			   session->internals.resumed_security_parameters.
-			   extensions.session_ticket_len,
-			   GNUTLS_E_SHORT_MEMORY_BUFFER);
+			   session->internals.
+			   resumed_security_parameters.extensions.
+			   session_ticket_len, GNUTLS_E_SHORT_MEMORY_BUFFER);
 	  memcpy (data,
-		  session->internals.resumed_security_parameters.extensions.
-		  session_ticket,
-		  session->internals.resumed_security_parameters.extensions.
-		  session_ticket_len);
+		  session->internals.resumed_security_parameters.
+		  extensions.session_ticket,
+		  session->internals.resumed_security_parameters.
+		  extensions.session_ticket_len);
 
-	  return session->internals.resumed_security_parameters.
-	    extensions.session_ticket_len;
+	  return session->internals.resumed_security_parameters.extensions.
+	    session_ticket_len;
 	}
       else
 	{
@@ -436,8 +437,7 @@ gnutls_session_ticket_enable_server (gnutls_session_t session,
     }
 
   ret = _gnutls_rnd (GNUTLS_RND_RANDOM,
-		     session->internals.
-		     session_ticket_IV, IV_SIZE);
+		     session->internals.session_ticket_IV, IV_SIZE);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -495,19 +495,19 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
       SAVE_WRITE_SECURITY_PARAMETERS;
       ret = _gnutls_set_write_cipher (session,
 				      _gnutls_cipher_suite_get_cipher_algo
-				      (&session->security_parameters.
-				       current_cipher_suite));
+				      (&session->
+				       security_parameters.current_cipher_suite));
       if (ret < 0)
 	return ret;
       ret = _gnutls_set_write_mac (session,
 				   _gnutls_cipher_suite_get_mac_algo
-				   (&session->security_parameters.
-				    current_cipher_suite));
+				   (&session->
+				    security_parameters.current_cipher_suite));
       if (ret < 0)
 	return ret;
       ret = _gnutls_set_write_compression (session,
-					   session->internals.
-					   compression_method);
+					   session->
+					   internals.compression_method);
       if (ret < 0)
 	return ret;
 
@@ -609,8 +609,8 @@ _gnutls_recv_new_session_ticket (gnutls_session_t session)
 
   /* Discard the current session ID.  (RFC5077 3.4) */
   ret = _gnutls_generate_session_id (session->security_parameters.session_id,
-				     &session->security_parameters.
-				     session_id_size);
+				     &session->
+				     security_parameters.session_id_size);
   if (ret < 0)
     {
       gnutls_assert ();

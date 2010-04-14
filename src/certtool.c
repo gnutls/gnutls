@@ -1123,10 +1123,11 @@ pgp_certificate_info (void)
     }
 
 
-  ret = gnutls_openpgp_crt_verify_self(crt, 0, &verify_status);
-  if (ret < 0) 
+  ret = gnutls_openpgp_crt_verify_self (crt, 0, &verify_status);
+  if (ret < 0)
     {
-      error (EXIT_FAILURE, 0, "verify signature error: %s", gnutls_strerror (ret));
+      error (EXIT_FAILURE, 0, "verify signature error: %s",
+	     gnutls_strerror (ret));
     }
 
   if (verify_status & GNUTLS_CERT_INVALID)
@@ -1135,7 +1136,8 @@ pgp_certificate_info (void)
     }
   else
     {
-      fprintf (outfile, "Self Signature verification: ok (%x)\n\n", verify_status);
+      fprintf (outfile, "Self Signature verification: ok (%x)\n\n",
+	       verify_status);
     }
 
   size = sizeof (buffer);
@@ -1425,11 +1427,11 @@ print_crq_info (gnutls_x509_crq_t crq, FILE * out)
   int ret;
   size_t size;
 
-  if (info.outcert_format == GNUTLS_X509_FMT_PEM) 
+  if (info.outcert_format == GNUTLS_X509_FMT_PEM)
     {
       ret = gnutls_x509_crq_print (crq, GNUTLS_CRT_PRINT_FULL, &cinfo);
       if (ret < 0)
-        error (EXIT_FAILURE, 0, "crq_print: %s", gnutls_strerror (ret));
+	error (EXIT_FAILURE, 0, "crq_print: %s", gnutls_strerror (ret));
 
       fprintf (out, "%s\n", cinfo.data);
 
@@ -1982,7 +1984,7 @@ generate_request (void)
 	  if (ret < 0)
 	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
 	}
-  }
+    }
 
   ret = gnutls_x509_crq_set_key (crq, key);
   if (ret < 0)
@@ -2146,7 +2148,8 @@ _verify_x509_mem (const void *cert, int cert_size)
 	  fprintf (outfile, "\tVerification output: ");
 	  print_verification_res (x509_cert_list[i - 2],
 				  x509_cert_list[i - 1], x509_crl_list,
-				  x509_ncrls, GNUTLS_VERIFY_DO_NOT_ALLOW_SAME);
+				  x509_ncrls,
+				  GNUTLS_VERIFY_DO_NOT_ALLOW_SAME);
 	  fprintf (outfile, ".\n\n");
 
 	}
@@ -2194,7 +2197,9 @@ _verify_x509_mem (const void *cert, int cert_size)
 			  x509_cert_list[x509_ncerts - 1], x509_crl_list,
 			  /* we add GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT since it is
 			   * self signed. */
-			  x509_ncrls, GNUTLS_VERIFY_DO_NOT_ALLOW_SAME|GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
+			  x509_ncrls,
+			  GNUTLS_VERIFY_DO_NOT_ALLOW_SAME |
+			  GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
 
   fprintf (outfile, ".\n\n");
 
@@ -2206,7 +2211,8 @@ _verify_x509_mem (const void *cert, int cert_size)
 				       &x509_cert_list[x509_ncerts - 1], 1,
 				       x509_crl_list,
 				       x509_ncrls,
-				       GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT|GNUTLS_VERIFY_DO_NOT_ALLOW_SAME,
+				       GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT |
+				       GNUTLS_VERIFY_DO_NOT_ALLOW_SAME,
 				       &verify_status);
     if (ret < 0)
       error (EXIT_FAILURE, 0, "gnutls_x509_crt_list_verify: %s",
@@ -2256,13 +2262,14 @@ _verify_x509_mem (const void *cert, int cert_size)
 static void
 print_verification_res (gnutls_x509_crt_t crt,
 			gnutls_x509_crt_t issuer,
-			gnutls_x509_crl_t * crl_list, int crl_list_size, unsigned int flags)
+			gnutls_x509_crl_t * crl_list, int crl_list_size,
+			unsigned int flags)
 {
   unsigned int output;
   int comma = 0;
   int ret;
 
-  ret = gnutls_x509_crt_verify (crt, &issuer, 1, flags , &output);
+  ret = gnutls_x509_crt_verify (crt, &issuer, 1, flags, &output);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "verification error: %s", gnutls_strerror (ret));
 

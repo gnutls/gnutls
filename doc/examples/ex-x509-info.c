@@ -70,7 +70,7 @@ print_x509_certificate_info (gnutls_session_t session)
       printf ("Certificate info:\n");
 
       /* This is the preferred way of printing short information about
-	 a certificate. */
+         a certificate. */
 
       ret = gnutls_x509_crt_print (cert, GNUTLS_CRT_PRINT_ONELINE, &cinfo);
       if (ret == 0)
@@ -80,7 +80,7 @@ print_x509_certificate_info (gnutls_session_t session)
 	}
 
       /* If you want to extract fields manually for some other reason,
-	 below are popular example calls. */
+         below are popular example calls. */
 
       expiration_time = gnutls_x509_crt_get_expiration_time (cert);
       activation_time = gnutls_x509_crt_get_activation_time (cert);

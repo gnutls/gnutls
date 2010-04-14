@@ -196,9 +196,8 @@ _gnutls_extension_list_add (gnutls_session_t session, uint16_t type)
     {
       if (session->internals.extensions_sent_size < MAX_EXT_TYPES)
 	{
-	  session->internals.extensions_sent[session->
-					     internals.extensions_sent_size] =
-	    type;
+	  session->internals.extensions_sent[session->internals.
+					     extensions_sent_size] = type;
 	  session->internals.extensions_sent_size++;
 	}
       else
@@ -241,9 +240,9 @@ _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
 
       if (p->send_func == NULL)
 	continue;
-	
+
       if (parse_type != GNUTLS_EXT_ANY && p->parse_type != parse_type)
-        continue;
+	continue;
 
       size = p->send_func (session, sdata, sdata_size);
       if (size > 0 || size == GNUTLS_E_INT_RET_0)

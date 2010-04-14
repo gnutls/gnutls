@@ -229,7 +229,8 @@ doit (void)
   if (ret != 0)
     fail ("keyring-check-id second key %d\n", ret);
 
-  if (debug) success ("done\n");
+  if (debug)
+    success ("done\n");
 
   gnutls_openpgp_keyring_deinit (keyring);
   gnutls_global_deinit ();

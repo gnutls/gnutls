@@ -122,7 +122,8 @@ doit (void)
       fail ("unexpected number of alt names: %i\n", alt_name_count);
     }
 
-  if (debug) success ("done\n");
+  if (debug)
+    success ("done\n");
 
   gnutls_x509_crt_deinit (cert);
   gnutls_global_deinit ();

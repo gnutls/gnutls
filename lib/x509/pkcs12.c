@@ -1140,10 +1140,12 @@ write_attributes (gnutls_pkcs12_bag_t bag, int elem,
 
       result =
 	_gnutls_x509_encode_and_write_attribute (KEY_ID_OID, c2, root,
-						 bag->element[elem].
-						 local_key_id.data,
-						 bag->element[elem].
-						 local_key_id.size, 1);
+						 bag->
+						 element[elem].local_key_id.
+						 data,
+						 bag->
+						 element[elem].local_key_id.
+						 size, 1);
       if (result < 0)
 	{
 	  gnutls_assert ();

@@ -290,7 +290,7 @@ _cdk_pk_check_sig (cdk_keydb_hd_t keydb,
   if (is_selfsig)
     *is_selfsig = 0;
   if ((knode->pkt->pkttype != CDK_PKT_PUBLIC_KEY &&
-      knode->pkt->pkttype != CDK_PKT_PUBLIC_SUBKEY) ||
+       knode->pkt->pkttype != CDK_PKT_PUBLIC_SUBKEY) ||
       snode->pkt->pkttype != CDK_PKT_SIGNATURE)
     {
       gnutls_assert ();
@@ -627,7 +627,7 @@ cdk_pk_check_self_sig (cdk_kbnode_t key, int *r_status)
 	      *r_status = CDK_KEY_INVALID;
 	      return rc;
 	    }
-	  else /* For each valid self sig we increase this counter. */
+	  else			/* For each valid self sig we increase this counter. */
 	    sig_ok++;
 	}
 
@@ -641,8 +641,8 @@ cdk_pk_check_self_sig (cdk_kbnode_t key, int *r_status)
 	}
     }
 
-    /* No flags indicate a valid key. */
-    *r_status = CDK_KEY_VALID;
+  /* No flags indicate a valid key. */
+  *r_status = CDK_KEY_VALID;
 
-    return 0;
+  return 0;
 }

@@ -42,7 +42,8 @@
 static int _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
 					const gnutls_x509_crt_t * trusted_cas,
 					int tcas_size, unsigned int flags,
-					unsigned int *output, gnutls_x509_crt_t* issuer);
+					unsigned int *output,
+					gnutls_x509_crt_t * issuer);
 
 static int is_crl_issuer (gnutls_x509_crl_t crl,
 			  gnutls_x509_crt_t issuer_cert);
@@ -267,7 +268,8 @@ static int
 _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
 			     const gnutls_x509_crt_t * trusted_cas,
 			     int tcas_size, unsigned int flags,
-			     unsigned int *output, gnutls_x509_crt_t *_issuer)
+			     unsigned int *output,
+			     gnutls_x509_crt_t * _issuer)
 {
   gnutls_datum_t cert_signed_data = { NULL, 0 };
   gnutls_datum_t cert_signature = { NULL, 0 };
@@ -298,7 +300,8 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
       return 0;
     }
 
-  if (_issuer != NULL) *_issuer = issuer;
+  if (_issuer != NULL)
+    *_issuer = issuer;
 
   issuer_version = gnutls_x509_crt_get_version (issuer);
   if (issuer_version < 0)
@@ -401,10 +404,11 @@ gnutls_x509_crt_check_issuer (gnutls_x509_crt_t cert,
   return is_issuer (cert, issuer);
 }
 
-static unsigned int check_time(gnutls_x509_crt_t crt, time_t now)
+static unsigned int
+check_time (gnutls_x509_crt_t crt, time_t now)
 {
-int status = 0;
-time_t t;
+  int status = 0;
+  time_t t;
 
   t = gnutls_x509_crt_get_activation_time (crt);
   if (t == (time_t) - 1 || now < t)
@@ -421,7 +425,7 @@ time_t t;
       status |= GNUTLS_CERT_INVALID;
       return status;
     }
-  
+
   return 0;
 }
 
@@ -482,13 +486,14 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
 		  /* explicity time check for trusted CA that we remove from
 		   * list. GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS
 		   */
-		  if (!(flags&GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS) && !(flags&GNUTLS_VERIFY_DISABLE_TIME_CHECKS))
+		  if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS)
+		      && !(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS))
 		    {
-		      status |= check_time(trusted_cas[j], now);
+		      status |= check_time (trusted_cas[j], now);
 		      if (status != 0)
-		        {
-		          return status;
-                        }
+			{
+			  return status;
+			}
 		    }
 		  clist_size = i;
 		  break;
@@ -510,7 +515,8 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
    * in self signed etc certificates.
    */
   ret = _gnutls_verify_certificate2 (certificate_list[clist_size - 1],
-				     trusted_cas, tcas_size, flags, &output, &issuer);
+				     trusted_cas, tcas_size, flags, &output,
+				     &issuer);
   if (ret == 0)
     {
       /* if the last certificate in the certificate
@@ -545,24 +551,24 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
   if (!(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS))
     {
       /* check the time of the issuer first */
-      if (!(flags&GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS))
-        {
-          if (issuer == NULL)
-            {
-              gnutls_assert();
-              return GNUTLS_E_INTERNAL_ERROR;
-            }
+      if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS))
+	{
+	  if (issuer == NULL)
+	    {
+	      gnutls_assert ();
+	      return GNUTLS_E_INTERNAL_ERROR;
+	    }
 
-          status |= check_time(issuer, now);
-          if (status != 0)
-            {
-              return status;
-            }
-        }
+	  status |= check_time (issuer, now);
+	  if (status != 0)
+	    {
+	      return status;
+	    }
+	}
 
       for (i = 0; i < clist_size; i++)
 	{
-	  status |= check_time(certificate_list[i], now);
+	  status |= check_time (certificate_list[i], now);
 	  if (status != 0)
 	    {
 	      return status;
@@ -1050,8 +1056,7 @@ gnutls_x509_crt_verify (gnutls_x509_crt_t cert,
    */
   *verify =
     _gnutls_x509_verify_certificate (&cert, 1,
-				     CA_list, CA_list_length, NULL,
-				     0, flags);
+				     CA_list, CA_list_length, NULL, 0, flags);
   return 0;
 }
 

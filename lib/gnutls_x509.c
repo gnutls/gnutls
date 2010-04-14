@@ -184,9 +184,9 @@ _gnutls_x509_cert_verify_peers (gnutls_session_t session,
 				     peer_certificate_list_size,
 				     cred->x509_ca_list, cred->x509_ncas,
 				     cred->x509_crl_list, cred->x509_ncrls,
-				     cred->verify_flags | session->
-				     internals.priorities.
-				     additional_verify_flags, status);
+				     cred->verify_flags | session->internals.
+				     priorities.additional_verify_flags,
+				     status);
 
   CLEAR_CERTS;
 
@@ -226,8 +226,8 @@ _gnutls_check_key_cert_match (gnutls_certificate_credentials_t res)
 					       1].params_size, &kid);
 
 
-      _gnutls_x509_write_rsa_params (res->cert_list[res->ncerts - 1][0].
-				     params,
+      _gnutls_x509_write_rsa_params (res->
+				     cert_list[res->ncerts - 1][0].params,
 				     res->cert_list[res->ncerts -
 						    1][0].params_size, &cid);
     }
@@ -238,8 +238,8 @@ _gnutls_check_key_cert_match (gnutls_certificate_credentials_t res)
 				     res->pkey[res->ncerts -
 					       1].params_size, &kid);
 
-      _gnutls_x509_write_dsa_params (res->cert_list[res->ncerts - 1][0].
-				     params,
+      _gnutls_x509_write_dsa_params (res->
+				     cert_list[res->ncerts - 1][0].params,
 				     res->cert_list[res->ncerts -
 						    1][0].params_size, &cid);
     }

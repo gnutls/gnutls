@@ -446,8 +446,8 @@ gnutls_deinit (gnutls_session_t session)
     }
 
   gnutls_free (session->security_parameters.extensions.session_ticket);
-  gnutls_free (session->internals.resumed_security_parameters.extensions.
-	       session_ticket);
+  gnutls_free (session->internals.resumed_security_parameters.
+	       extensions.session_ticket);
 
   memset (session, 0, sizeof (struct gnutls_session_int));
   gnutls_free (session);
@@ -1185,8 +1185,8 @@ gnutls_session_is_resumed (gnutls_session_t session)
 	  session->security_parameters.session_id_size ==
 	  session->internals.resumed_security_parameters.session_id_size
 	  && memcmp (session->security_parameters.session_id,
-		     session->internals.resumed_security_parameters.
-		     session_id,
+		     session->internals.
+		     resumed_security_parameters.session_id,
 		     session->security_parameters.session_id_size) == 0)
 	return 1;
     }
@@ -1211,8 +1211,8 @@ _gnutls_session_is_export (gnutls_session_t session)
   gnutls_cipher_algorithm_t cipher;
 
   cipher =
-    _gnutls_cipher_suite_get_cipher_algo (&session->security_parameters.
-					  current_cipher_suite);
+    _gnutls_cipher_suite_get_cipher_algo (&session->
+					  security_parameters.current_cipher_suite);
 
   if (_gnutls_cipher_get_export_flag (cipher) != 0)
     return 1;
@@ -1233,8 +1233,8 @@ _gnutls_session_is_psk (gnutls_session_t session)
   gnutls_kx_algorithm_t kx;
 
   kx =
-    _gnutls_cipher_suite_get_kx_algo (&session->security_parameters.
-				      current_cipher_suite);
+    _gnutls_cipher_suite_get_kx_algo (&session->
+				      security_parameters.current_cipher_suite);
   if (kx == GNUTLS_KX_PSK || kx == GNUTLS_KX_DHE_PSK)
     return 1;
 

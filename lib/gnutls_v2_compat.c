@@ -179,9 +179,9 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
    */
   if (_gnutls_get_kx_cred
       (session,
-       _gnutls_cipher_suite_get_kx_algo (&session->security_parameters.
-					 current_cipher_suite), &err) == NULL
-      && err != 0)
+       _gnutls_cipher_suite_get_kx_algo (&session->
+					 security_parameters.current_cipher_suite),
+       &err) == NULL && err != 0)
     {
       gnutls_assert ();
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -193,8 +193,8 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
    */
   session->internals.auth_struct =
     _gnutls_kx_auth_struct (_gnutls_cipher_suite_get_kx_algo
-			    (&session->security_parameters.
-			     current_cipher_suite));
+			    (&session->
+			     security_parameters.current_cipher_suite));
   if (session->internals.auth_struct == NULL)
     {
 
@@ -247,8 +247,8 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
   else
     {
       _gnutls_generate_session_id (session->security_parameters.session_id,
-				   &session->security_parameters.
-				   session_id_size);
+				   &session->
+				   security_parameters.session_id_size);
       session->internals.resumed = RESUME_FALSE;
     }
 

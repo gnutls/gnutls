@@ -326,11 +326,11 @@ _gnutls_verify_sig (gnutls_cert * cert,
   /* If the certificate supports signing continue.
    */
   if (cert->key_usage != 0)
-      if (!(cert->key_usage & KEY_DIGITAL_SIGNATURE))
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_KEY_USAGE_VIOLATION;
-	}
+    if (!(cert->key_usage & KEY_DIGITAL_SIGNATURE))
+      {
+	gnutls_assert ();
+	return GNUTLS_E_KEY_USAGE_VIOLATION;
+      }
 
   if (pk_algo == GNUTLS_PK_UNKNOWN)
     pk_algo = cert->subject_pk_algorithm;
@@ -589,11 +589,13 @@ _gnutls_handshake_verify_cert_vrfy (gnutls_session_t session,
 	}
 
       _gnutls_mac_deinit_ssl3_handshake (&td_md5, concat,
-					 session->security_parameters.
-					 master_secret, GNUTLS_MASTER_SIZE);
+					 session->
+					 security_parameters.master_secret,
+					 GNUTLS_MASTER_SIZE);
       _gnutls_mac_deinit_ssl3_handshake (&td_sha, &concat[16],
-					 session->security_parameters.
-					 master_secret, GNUTLS_MASTER_SIZE);
+					 session->
+					 security_parameters.master_secret,
+					 GNUTLS_MASTER_SIZE);
     }
   else
     {
@@ -660,8 +662,8 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
 	  _gnutls_x509_log
 	    ("Server did not allow either '%s' or '%s' for signing\n",
 	     gnutls_mac_get_name (hash_algo),
-	     gnutls_mac_get_name (session->internals.
-				  handshake_mac_handle.tls12.sha1.algorithm));
+	     gnutls_mac_get_name (session->internals.handshake_mac_handle.
+				  tls12.sha1.algorithm));
 	  return ret;
 	}
     }
@@ -744,8 +746,9 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
 	}
 
       _gnutls_mac_deinit_ssl3_handshake (&td_sha, &concat[16],
-					 session->security_parameters.
-					 master_secret, GNUTLS_MASTER_SIZE);
+					 session->
+					 security_parameters.master_secret,
+					 GNUTLS_MASTER_SIZE);
     }
   else
     _gnutls_hash_deinit (&td_sha, &concat[16]);
@@ -755,8 +758,8 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
     case GNUTLS_PK_RSA:
       ret =
 	_gnutls_hash_copy (&td_md5,
-			   &session->internals.handshake_mac_handle.
-			   tls10.md5);
+			   &session->internals.handshake_mac_handle.tls10.
+			   md5);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -765,8 +768,9 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
 
       if (ver == GNUTLS_SSL3)
 	_gnutls_mac_deinit_ssl3_handshake (&td_md5, concat,
-					   session->security_parameters.
-					   master_secret, GNUTLS_MASTER_SIZE);
+					   session->
+					   security_parameters.master_secret,
+					   GNUTLS_MASTER_SIZE);
       else
 	_gnutls_hash_deinit (&td_md5, concat);
 

@@ -371,8 +371,8 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
   _gnutls_record_log
     ("REC[%p]: Sending Packet[%d] %s(%d) with length: %d\n", session,
-     (int) _gnutls_uint64touint32 (&session->connection_state.
-				   write_sequence_number),
+     (int) _gnutls_uint64touint32 (&session->
+				   connection_state.write_sequence_number),
      _gnutls_packet2str (type), type, (int) sizeofdata);
 
   if (sizeofdata > MAX_RECORD_SEND_SIZE)
@@ -904,12 +904,14 @@ begin:
        _gnutls_io_read_buffered (session, &headers, header_size,
 				 -1)) != header_size)
     {
-  _gnutls_handshake_log ("XXX[]: ret: %d %s\n", ret, gnutls_strerror(ret));
+      _gnutls_handshake_log ("XXX[]: ret: %d %s\n", ret,
+			     gnutls_strerror (ret));
 
       if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
 	return ret;
 
-  _gnutls_handshake_log ("XXX2[]: ret: %d %s\n", ret, gnutls_strerror(ret));
+      _gnutls_handshake_log ("XXX2[]: ret: %d %s\n", ret,
+			     gnutls_strerror (ret));
 
       session_invalidate (session);
       if (type == GNUTLS_ALERT)
@@ -951,14 +953,13 @@ begin:
 
   _gnutls_record_log
     ("REC[%p]: Expected Packet[%d] %s(%d) with length: %d\n", session,
-     (int) _gnutls_uint64touint32 (&session->connection_state.
-				   read_sequence_number),
+     (int) _gnutls_uint64touint32 (&session->
+				   connection_state.read_sequence_number),
      _gnutls_packet2str (type), type, (int) sizeofdata);
   _gnutls_record_log ("REC[%p]: Received Packet[%d] %s(%d) with length: %d\n",
 		      session,
-		      (int)
-		      _gnutls_uint64touint32 (&session->connection_state.
-					      read_sequence_number),
+		      (int) _gnutls_uint64touint32 (&session->
+						    connection_state.read_sequence_number),
 		      _gnutls_packet2str (recv_type), recv_type, length);
 
   if (length > MAX_RECV_SIZE)
@@ -1037,8 +1038,8 @@ begin:
 
   _gnutls_record_log
     ("REC[%p]: Decrypted Packet[%d] %s(%d) with length: %d\n", session,
-     (int) _gnutls_uint64touint32 (&session->connection_state.
-				   read_sequence_number),
+     (int) _gnutls_uint64touint32 (&session->
+				   connection_state.read_sequence_number),
      _gnutls_packet2str (recv_type), recv_type, decrypted_length);
 
 /* increase sequence number 

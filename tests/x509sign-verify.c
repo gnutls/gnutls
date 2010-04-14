@@ -148,7 +148,8 @@ doit (void)
 
   for (i = 0; i < sizeof (key_dat) / sizeof (key_dat[0]); i++)
     {
-      if (debug) success ("loop %d\n", (int)i);
+      if (debug)
+	success ("loop %d\n", (int) i);
 
       ret = gnutls_x509_privkey_init (&key);
       if (ret < 0)

@@ -150,7 +150,8 @@ doit (void)
 	  ret = memcmp (crq_key_id, pkey_key_id, crq_key_id_len);
 	  if (ret == 0)
 	    {
-	      if (debug) success ("Key ids are identical. OK.\n");
+	      if (debug)
+		success ("Key ids are identical. OK.\n");
 	    }
 	  else
 	    {
@@ -160,7 +161,7 @@ doit (void)
       else
 	{
 	  fail ("Key_id lengths differ incorrectly: %d - %d\n",
-		(int)crq_key_id_len, (int)pkey_key_id_len);
+		(int) crq_key_id_len, (int) pkey_key_id_len);
 	}
 
 

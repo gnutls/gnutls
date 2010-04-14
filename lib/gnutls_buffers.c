@@ -859,8 +859,8 @@ _gnutls_handshake_io_send_int (gnutls_session_t session,
       /* checking is handled above */
       _gnutls_buffer_get_datum (&session->internals.handshake_send_buffer,
 				&bdata,
-				session->internals.
-				handshake_send_buffer.length);
+				session->internals.handshake_send_buffer.
+				length);
 
       ptr = bdata.data;
       n = bdata.size;
@@ -933,9 +933,9 @@ _gnutls_handshake_io_send_int (gnutls_session_t session,
 	      gnutls_assert ();
 
 	      retval =
-		_gnutls_buffer_append (&session->internals.
-				       handshake_send_buffer, &ptr[n - left],
-				       left);
+		_gnutls_buffer_append (&session->
+				       internals.handshake_send_buffer,
+				       &ptr[n - left], left);
 	      if (retval < 0)
 		{
 		  gnutls_assert ();
@@ -1030,9 +1030,8 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
 	    {
 	      gnutls_assert ();
 
-	      _gnutls_buffer_append (&session->
-				     internals.handshake_recv_buffer, iptr,
-				     dsize);
+	      _gnutls_buffer_append (&session->internals.
+				     handshake_recv_buffer, iptr, dsize);
 
 	      session->internals.handshake_recv_buffer_htype = htype;
 	      session->internals.handshake_recv_buffer_type = type;

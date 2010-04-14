@@ -80,8 +80,10 @@ typedef struct
 } TLS_TEST;
 
 static const TLS_TEST tls_tests[] = {
-  {"for Safe renegotiation support", test_safe_renegotiation, "yes", "no", "dunno"},
-  {"for Safe renegotiation support (SCSV)", test_safe_renegotiation_scsv, "yes", "no", "dunno"},
+  {"for Safe renegotiation support", test_safe_renegotiation, "yes", "no",
+   "dunno"},
+  {"for Safe renegotiation support (SCSV)", test_safe_renegotiation_scsv,
+   "yes", "no", "dunno"},
   {"for TLS 1.2 support", test_tls1_2, "yes", "no", "dunno"},
   {"for TLS 1.1 support", test_tls1_1, "yes", "no", "dunno"},
   {"fallback from TLS 1.1 to", test_tls1_1_fallback, "TLS 1.0", "failed",

@@ -449,9 +449,9 @@ void gnutls_certificate_server_set_retrieve_function
  * Since: 2.10.0
  **/
 void
-gnutls_certificate_set_verify_function
-(gnutls_certificate_credentials_t cred,
- gnutls_certificate_verify_function * func)
+  gnutls_certificate_set_verify_function
+  (gnutls_certificate_credentials_t cred,
+   gnutls_certificate_verify_function * func)
 {
   cred->verify_callback = func;
 }
@@ -788,9 +788,8 @@ _gnutls_get_auth_info_gcert (gnutls_cert * gcert,
     case GNUTLS_CRT_OPENPGP:
       return _gnutls_openpgp_raw_crt_to_gcert (gcert,
 					       &info->raw_certificate_list[0],
-					       info->
-					       use_subkey ? info->subkey_id :
-					       NULL);
+					       info->use_subkey ? info->
+					       subkey_id : NULL);
 #endif
     default:
       gnutls_assert ();

@@ -48,5 +48,6 @@ doit (void)
 
   gnutls_global_deinit ();
 
-  if (debug) success ("init-deinit round-trip success\n");
+  if (debug)
+    success ("init-deinit round-trip success\n");
 }

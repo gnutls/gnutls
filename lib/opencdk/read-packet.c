@@ -361,8 +361,7 @@ read_secret_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_seckey_t sk)
 	sk->protect.ivlen = 0;
       else
 	{
-	  sk->protect.ivlen =
-	    gnutls_cipher_get_block_size (sk->protect.algo);
+	  sk->protect.ivlen = gnutls_cipher_get_block_size (sk->protect.algo);
 	  if (!sk->protect.ivlen)
 	    return CDK_Inv_Packet;
 	  rc = stream_read (inp, sk->protect.iv, sk->protect.ivlen, &nread);

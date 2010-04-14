@@ -65,7 +65,8 @@ static char ca_pem[] =
   "PfqUpIhz5Bbm7J4=\n" "-----END CERTIFICATE-----\n";
 const gnutls_datum_t ca_dat = { ca_pem, sizeof (ca_pem) };
 
-void doit(void)
+void
+doit (void)
 {
   gnutls_pkcs12_t pkcs12;
   gnutls_x509_crt_t client;
@@ -158,7 +159,8 @@ void doit(void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "pkcs12_export: %d", ret);
 
-  if (debug) fwrite (outbuf, size, 1, stdout);
+  if (debug)
+    fwrite (outbuf, size, 1, stdout);
 
   /* Cleanup. */
   gnutls_pkcs12_deinit (pkcs12);

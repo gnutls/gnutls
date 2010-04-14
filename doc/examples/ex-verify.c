@@ -139,9 +139,9 @@ verify_cert2 (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
       if (output & GNUTLS_CERT_SIGNER_NOT_CA)
 	fprintf (stderr, ": issuer is not a CA");
       if (output & GNUTLS_CERT_NOT_ACTIVATED)
-        fprintf (stderr, ": not yet activated\n");
+	fprintf (stderr, ": not yet activated\n");
       if (output & GNUTLS_CERT_EXPIRED)
-        fprintf (stderr, ": expired\n");
+	fprintf (stderr, ": expired\n");
 
       fprintf (stderr, "\n");
     }
@@ -196,9 +196,9 @@ verify_last_cert (gnutls_x509_crt_t crt,
       if (output & GNUTLS_CERT_SIGNER_NOT_CA)
 	fprintf (stderr, ": Issuer is not a CA\n");
       if (output & GNUTLS_CERT_NOT_ACTIVATED)
-        fprintf (stderr, ": Not yet activated\n");
+	fprintf (stderr, ": Not yet activated\n");
       if (output & GNUTLS_CERT_EXPIRED)
-        fprintf (stderr, ": Expired\n");
+	fprintf (stderr, ": Expired\n");
       fprintf (stderr, "\n");
     }
   else
