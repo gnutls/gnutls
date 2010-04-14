@@ -65,7 +65,6 @@ Daniel Nylander, Sergio Zanchetta, Tao Wei, and Aron Xu.
 
 ** API and ABI modifications:
 gnutls_certificate_set_verify_function: ADDED.
-gnutls_safe_renegotiation_status: ADDED.
 gnutls_cipher_decrypt: ADDED.
 gnutls_cipher_deinit: ADDED.
 gnutls_cipher_encrypt: ADDED.
@@ -85,6 +84,7 @@ gnutls_hmac_init: ADDED.
 gnutls_hmac_output: ADDED.
 gnutls_safe_negotiation_set_initial: ADDED.
 gnutls_safe_renegotiation_set: ADDED.
+gnutls_safe_renegotiation_status: ADDED.
 %UNSAFE_RENEGOTIATION: Added to priority strings
 %INITIAL_SAFE_RENEGOTIATION: Added to priority strings
 %DISABLE_SAFE_RENEGOTIATION: Added to priority strings (do not use)

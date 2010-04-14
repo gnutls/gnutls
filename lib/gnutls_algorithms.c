@@ -814,6 +814,17 @@ _gnutls_mac_is_ok (gnutls_mac_algorithm_t algorithm)
 }
 
 /* CIPHER functions */
+
+/**
+ * gnutls_cipher_get_block_size:
+ * @algorithm: is an encryption algorithm
+ *
+ * Get block size for encryption algorithm.
+ *
+ * Returns: block size for encryption algorithm.
+ *
+ * Since: 2.10.0
+ **/
 int
 gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm)
 {

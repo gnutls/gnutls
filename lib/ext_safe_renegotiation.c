@@ -122,11 +122,13 @@ _gnutls_safe_renegotiation_send_params (gnutls_session_t session,
  * @session: is a #gnutls_session_t structure.
  * @value: 0 to disable and 1 to enable
  *
- * Used to enable and disable initial safe renegotiation for the current
- * session. By default it is allowed for a client to not advertise safe
- * renegotiation capability but there might be cases where signalling
- * a client of its insecurity by rejecting session might be beneficial.
- * This option has meaning only in server side.
+ * Used to enable and disable initial safe renegotiation for the
+ * current session. By default it is allowed for a client to not
+ * advertise safe renegotiation capability but there might be cases
+ * where signalling a client of its insecurity by rejecting session
+ * might be beneficial.  This option has meaning only in server side.
+ *
+ * Since: 2.10.0
  **/
 void
 gnutls_safe_negotiation_set_initial (gnutls_session_t session, int value)
@@ -143,6 +145,8 @@ gnutls_safe_negotiation_set_initial (gnutls_session_t session, int value)
  * session. Normally you shouldn't cope with this function since the
  * default (enable) is sufficient, but there might be servers that
  * cannot handle or correctly handle the extension.
+ *
+ * Since: 2.10.0
  **/
 void
 gnutls_safe_renegotiation_set (gnutls_session_t session, int value)
@@ -159,6 +163,8 @@ gnutls_safe_renegotiation_set (gnutls_session_t session, int value)
  *
  * Returns: 0 when safe renegotiation is not used and non zero when
  *   safe renegotiation is used.
+ *
+ * Since: 2.10.0
  **/
 int
 gnutls_safe_renegotiation_status (gnutls_session_t session)

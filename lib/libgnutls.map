@@ -599,6 +599,9 @@ GNUTLS_2_10
     gnutls_hmac_deinit;
     gnutls_hmac_output;
     gnutls_certificate_set_verify_function;
+    gnutls_safe_negotiation_set_initial;
+    gnutls_safe_renegotiation_set;
+    gnutls_safe_renegotiation_status;
 } GNUTLS_2_8;
 
 GNUTLS_PRIVATE {

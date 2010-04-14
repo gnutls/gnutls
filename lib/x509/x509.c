@@ -1399,7 +1399,6 @@ gnutls_x509_crt_get_subject_alt_othername_oid (gnutls_x509_crt_t cert,
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
  *
  * Since: 2.10.0
- *
  **/
 int
 gnutls_x509_crt_get_issuer_alt_othername_oid (gnutls_x509_crt_t cert,

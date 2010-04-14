@@ -445,10 +445,13 @@ void gnutls_certificate_server_set_retrieve_function
  *
  * The callback function should return 0 for the handshake to continue
  * or non-zero to terminate.
+ *
+ * Since: 2.10.0
  **/
-void gnutls_certificate_set_verify_function
-  (gnutls_certificate_credentials_t cred,
-   gnutls_certificate_verify_function * func)
+void
+gnutls_certificate_set_verify_function
+(gnutls_certificate_credentials_t cred,
+ gnutls_certificate_verify_function * func)
 {
   cred->verify_callback = func;
 }
