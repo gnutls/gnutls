@@ -1,0 +1,10 @@
+--- maint.mk.orig	2010-04-15 09:42:17.000000000 +0200
++++ maint.mk	2010-04-15 09:42:32.000000000 +0200
+@@ -1099,6 +1099,7 @@
+ .PHONY: indent
+ indent:
+ 	indent $(INDENT_SOURCES)
++	indent $(INDENT_SOURCES) # Ident is not idempotent!
+ 
+ # If you want to set UPDATE_COPYRIGHT_* environment variables,
+ # put the assignments in this variable.
