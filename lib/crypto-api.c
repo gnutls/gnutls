@@ -74,7 +74,8 @@ gnutls_cipher_init (gnutls_cipher_hd_t * handle,
  *
  * Since: 2.10.0
  **/
-int gnutls_cipher_encrypt (gnutls_cipher_hd_t handle, void *text, size_t textlen)
+int
+gnutls_cipher_encrypt (gnutls_cipher_hd_t handle, void *text, size_t textlen)
 {
   return _gnutls_cipher_encrypt ((cipher_hd_st *) handle, text, textlen);
 }

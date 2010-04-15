@@ -760,7 +760,7 @@ error:
 	}
     }
   gnutls_free (darg);
-  gnutls_free(*priority_cache);
+  gnutls_free (*priority_cache);
 
   return GNUTLS_E_INVALID_REQUEST;
 
