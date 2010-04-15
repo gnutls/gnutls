@@ -565,7 +565,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 		      const char *priorities, const char **err_pos)
 {
   char *broken_list[MAX_ELEMENTS];
-  int broken_list_size, i, j;
+  int broken_list_size = 0, i = 0, j;
   char *darg = NULL;
   int algo;
   rmadd_func *fn;
@@ -587,7 +587,6 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
       gnutls_assert ();
       goto error;
     }
-
 
   break_comma_list (darg, broken_list, &broken_list_size, MAX_ELEMENTS, ':');
   /* This is our default set of protocol version, certificate types and
