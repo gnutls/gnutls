@@ -475,35 +475,7 @@ changequote([, ])dnl
   gl_FUNC_UNGETC_WORKS
   AC_C_BIGENDIAN
   AC_C_BIGENDIAN
-  AC_REQUIRE([gl_SYS_IOCTL_H_DEFAULTS])
-  AC_REQUIRE([gl_HEADER_SYS_SOCKET])
-  if test "$ac_cv_header_winsock2_h" = yes; then
-    dnl Even if the 'socket' module is not used here, another part of the
-    dnl application may use it and pass file descriptors that refer to
-    dnl sockets to the ioctl() function. So enable the support for sockets.
-    AC_LIBOBJ([ioctl])
-    gl_REPLACE_SYS_IOCTL_H
-  else
-    AC_CHECK_FUNCS([ioctl])
-    dnl On glibc systems, the second parameter is 'unsigned long int request',
-    dnl not 'int request'. We cannot simply cast the function pointer, but
-    dnl instead need a wrapper.
-    AC_CACHE_CHECK([for ioctl with POSIX signature],
-      [gl_cv_func_ioctl_posix_signature],
-      [AC_COMPILE_IFELSE(
-         [AC_LANG_PROGRAM(
-            [[#include <sys/ioctl.h>]],
-            [[extern int ioctl (int, int, ...);]])
-         ],
-         [gl_cv_func_ioctl_posix_signature=yes],
-         [gl_cv_func_ioctl_posix_signature=no])
-      ])
-    if test $gl_cv_func_ioctl_posix_signature != yes; then
-      REPLACE_IOCTL=1
-      AC_LIBOBJ([ioctl])
-      gl_REPLACE_SYS_IOCTL_H
-    fi
-  fi
+  gl_FUNC_IOCTL
   gl_SYS_IOCTL_MODULE_INDICATOR([ioctl])
   AC_CHECK_HEADERS_ONCE([unistd.h sys/wait.h])
   gt_TYPE_WCHAR_T
@@ -733,6 +705,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/inet_pton.m4
   m4/intmax_t.m4
   m4/inttypes_h.m4
+  m4/ioctl.m4
   m4/lib-ld.m4
   m4/lib-link.m4
   m4/lib-prefix.m4
