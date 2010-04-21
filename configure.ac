@@ -66,7 +66,6 @@ LIBGNUTLS_HOOKS
 LIBGNUTLS_EXTRA_HOOKS
 
 AC_HEADER_STDC
-AC_CHECK_FUNCS(fork,,)
 AC_DEFINE([HAVE_STRINGS_H], 1, [Hard-code for src/cfg/.])
 AC_DEFINE([HAVE_FLOAT_H], 1, [Hard-code for src/cfg/.])
 AC_DEFINE([HAVE_LIMITS_H], 1, [Hard-code for src/cfg/.])
@@ -75,6 +74,7 @@ AC_DEFINE([HAVE_CTYPE_H], 1, [Hard-code for src/cfg/.])
 AC_DEFINE([HAVE_ERRNO_H], 1, [Hard-code for src/cfg/.])
 
 # No fork on MinGW, disable some self-tests until we fix them.
+AC_CHECK_FUNCS(fork,,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
 sj_VALGRIND
