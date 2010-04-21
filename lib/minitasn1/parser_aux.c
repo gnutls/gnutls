@@ -83,12 +83,12 @@ _asn1_add_node (unsigned int type)
  * @pointer: NODE_ASN element pointer.
  * @name: null terminated string with the element's name to find.
  *
- * Searches for an element called NAME starting from POINTER.  The
+ * Searches for an element called @name starting from @pointer.  The
  * name is composed by differents identifiers separated by dots.  When
- * *POINTER has a name, the first identifier must be the name of
- * *POINTER, otherwise it must be the name of one child of *POINTER.
+ * *@pointer has a name, the first identifier must be the name of
+ * *@pointer, otherwise it must be the name of one child of *@pointer.
  *
- * Return value: the searching result. NULL if not found.
+ * Returns: the search result, or %NULL if not found.
  **/
 ASN1_TYPE
 asn1_find_node (ASN1_TYPE pointer, const char *name)
@@ -160,7 +160,7 @@ asn1_find_node (ASN1_TYPE pointer, const char *name)
 
       p = p->down;
 
-      /* The identifier "?LAST" indicates the last element 
+      /* The identifier "?LAST" indicates the last element
          in the right chain. */
       if (!strcmp (n, "?LAST"))
 	{
@@ -1094,91 +1094,4 @@ _asn1_set_default_tag (ASN1_TYPE node)
     }
 
   return ASN1_SUCCESS;
-}
-
-
-
-static const char *
-parse_version_number (const char *s, int *number)
-{
-  int val = 0;
-
-  if (*s == '0' && isdigit (s[1]))
-    return NULL;		/* leading zeros are not allowed */
-  for (; isdigit (*s); s++)
-    {
-      val *= 10;
-      val += *s - '0';
-    }
-  *number = val;
-  return val < 0 ? NULL : s;
-}
-
-/* The parse version functions were copied from libgcrypt.
- */
-static const char *
-parse_version_string (const char *s, int *major, int *minor, int *micro)
-{
-  s = parse_version_number (s, major);
-  if (!s || *s != '.')
-    return NULL;
-  s++;
-  s = parse_version_number (s, minor);
-  if (!s)
-    return NULL;
-  if (*s != '.')
-    {
-      *micro = 0;
-      return s;
-    }
-  s++;
-  s = parse_version_number (s, micro);
-  if (!s)
-    return NULL;
-  return s;			/* patchlevel */
-}
-
-/**
- * asn1_check_version:
- * @req_version: Required version number, or NULL.
- *
- * Check that the version of the library is at minimum the
- * requested one and return the version string; return %NULL if the
- * condition is not satisfied.  If a %NULL is passed to this function,
- * no check is done, but the version string is simply returned.
- *
- * See %ASN1_VERSION for a suitable @req_version string.
- *
- * Return value: Version string of run-time library, or %NULL if the
- *   run-time library does not meet the required version number.
- */
-const char *
-asn1_check_version (const char *req_version)
-{
-  const char *ver = ASN1_VERSION;
-  int my_major, my_minor, my_micro;
-  int rq_major, rq_minor, rq_micro;
-  const char *my_plvl, *rq_plvl;
-
-  if (!req_version)
-    return ver;
-
-  my_plvl = parse_version_string (ver, &my_major, &my_minor, &my_micro);
-  if (!my_plvl)
-    return NULL;		/* very strange our own version is bogus */
-  rq_plvl = parse_version_string (req_version, &rq_major, &rq_minor,
-				  &rq_micro);
-  if (!rq_plvl)
-    return NULL;		/* req version string is invalid */
-
-  if (my_major > rq_major
-      || (my_major == rq_major && my_minor > rq_minor)
-      || (my_major == rq_major && my_minor == rq_minor
-	  && my_micro > rq_micro)
-      || (my_major == rq_major && my_minor == rq_minor
-	  && my_micro == rq_micro && strcmp (my_plvl, rq_plvl) >= 0))
-    {
-      return ver;
-    }
-  return NULL;
 }
