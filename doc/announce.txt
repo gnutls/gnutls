@@ -53,7 +53,7 @@ Ilari Liusvaara noticed and reported the issue and provided test
 vectors as well.
 
 ** libgnutls: Added cryptodev support (/dev/crypto).
-Tested with http://www.logix.cz/michal/devel/cryptodev/.  Added
+Tested with http://home.gna.org/cryptodev-linux/.  Added
 benchmark utility for AES.  Adds new error codes
 GNUTLS_E_CRYPTODEV_IOCTL_ERROR and GNUTLS_E_CRYPTODEV_DEVICE_ERROR.
 
