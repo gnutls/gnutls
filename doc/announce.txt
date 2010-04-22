@@ -353,11 +353,11 @@ checking the fingerprint of that key with other sources or by checking
 that the key has been signed by a trustworthy other key.  The signing
 key can be identified with the following information:
 
-pub   1280R/B565716F 2002-05-05 [expires: 2010-04-21]
+pub   1280R/B565716F 2002-05-05 [expires: 2011-03-30]
       Key fingerprint = 0424 D4EE 81A0 E3D1 19C6  F835 EDA2 1E94 B565 716F
-uid                  Simon Josefsson <simon@josefsson.org>
 uid                  Simon Josefsson <jas@extundo.com>
-sub   1280R/4D5D40AE 2002-05-05 [expires: 2010-04-21]
+uid                  Simon Josefsson <simon@josefsson.org>
+sub   1280R/4D5D40AE 2002-05-05 [expires: 2011-03-30]
 
 The key is available from:
   http://josefsson.org/key.txt
