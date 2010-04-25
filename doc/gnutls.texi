@@ -4021,6 +4021,15 @@ You can implement the API function in the @code{ext_foobar.c} file, or
 if that file ends up becoming rather larger, add a
 @code{gnutls_foobar.c} file.
 
+To make the API available in the shared library you need to add the
+symbol in @code{lib/libgnutls.map} or
+@code{libextra/libgnutls-extra.map} as appropriate, so that the symbol
+is exported properly.
+
+When writing GTK-DOC style documentation for your new APIs, don't
+forget to add @code{Since:} tags to indicate the GnuTLS version the
+API was introduced in.
+
 @end enumerate
 
 @section Certificate Handling
