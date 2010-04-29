@@ -40,6 +40,7 @@ doc/errcodes
 doc/error_codes.texi
 doc/examples/Makefile
 doc/examples/Makefile.in
+doc/examples/ex-cert-select
 doc/examples/ex-client-psk
 doc/examples/ex-client-resume
 doc/examples/ex-client-srp
@@ -103,7 +104,9 @@ gl/Makefile.in
 gl/alloca.h
 gl/arg-nonnull.h
 gl/arpa/
+gl/c++defs.h
 gl/libgnu.la
+gl/netdb.h
 gl/stdio.h
 gl/stdlib.h
 gl/string.h
@@ -111,6 +114,7 @@ gl/sys/
 gl/tests/Makefile
 gl/tests/Makefile.in
 gl/tests/arg-nonnull.h
+gl/tests/c++defs.h
 gl/tests/libtests.a
 gl/tests/sys/
 gl/tests/test-alignof
@@ -189,7 +193,9 @@ lib/gl/Makefile
 lib/gl/Makefile.in
 lib/gl/alloca.h
 lib/gl/arg-nonnull.h
+lib/gl/c++defs.h
 lib/gl/liblgnu.la
+lib/gl/netdb.h
 lib/gl/stdio.h
 lib/gl/stdlib.h
 lib/gl/string.h
@@ -198,6 +204,7 @@ lib/gl/sys/
 lib/gl/tests/Makefile
 lib/gl/tests/Makefile.in
 lib/gl/tests/arg-nonnull.h
+lib/gl/tests/c++defs.h
 lib/gl/tests/libtests.a
 lib/gl/tests/test-alloca-opt
 lib/gl/tests/test-byteswap
