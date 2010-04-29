@@ -2352,7 +2352,8 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 		   ext->client_verify_data, ext->client_verify_data_len)))
 	{
 	  gnutls_assert ();
-	  _gnutls_handshake_log ("Safe renegotiation failed [1]\n");
+	  _gnutls_handshake_log ("HSK[%p]: Safe renegotiation failed [1]\n",
+				 session);
 	  return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
 	}
 
@@ -2365,7 +2366,8 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 		      ext->server_verify_data_len) != 0)
 	    {
 	      gnutls_assert ();
-	      _gnutls_handshake_log ("Safe renegotiation failed [2]\n");
+	      _gnutls_handshake_log
+		("HSK[%p]: Safe renegotiation failed [2]\n", session);
 	      return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
 	    }
 	}
@@ -2374,12 +2376,14 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	  if (ext->ri_extension_data_len != ext->client_verify_data_len)
 	    {
 	      gnutls_assert ();
-	      _gnutls_handshake_log ("Safe renegotiation failed [3]\n");
+	      _gnutls_handshake_log
+		("HSK[%p]: Safe renegotiation failed [3]\n", session);
 	      return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
 	    }
 	}
 
-      _gnutls_handshake_log ("Safe renegotiation succeeded.\n");
+      _gnutls_handshake_log ("HSK[%p]: Safe renegotiation succeeded\n",
+			     session);
     }
   else				/* safe renegotiation not received... */
     {
@@ -2387,7 +2391,8 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	{
 	  gnutls_assert ();
 	  _gnutls_handshake_log
-	    ("Peer previously asked for safe renegotiation!\n");
+	    ("HSK[%p]: Peer previously asked for safe renegotiation\n",
+	     session);
 	  return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
 	}
 
@@ -2397,12 +2402,14 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	{
 	  if (session->internals.priorities.unsafe_renegotiation != 0)
 	    {
-	      _gnutls_handshake_log ("Allowing unsafe (re)negotiation!\n");
+	      _gnutls_handshake_log
+		("HSK[%p]: Allowing unsafe (re)negotiation\n", session);
 	    }
 	  else
 	    {
 	      gnutls_assert ();
-	      _gnutls_handshake_log ("Denying unsafe (re)negotiation.\n");
+	      _gnutls_handshake_log
+		("HSK[%p]: Denying unsafe (re)negotiation\n", sesion);
 	      if (session->security_parameters.entity == GNUTLS_SERVER)
 		/* send no renegotiation alert */
 		return GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED;
@@ -2415,12 +2422,13 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	  if (session->internals.priorities.initial_safe_renegotiation == 0)
 	    {
 	      _gnutls_handshake_log
-		("Allowing unsafe initial negotiation!\n");
+		("HSK[%p]: Allowing unsafe initial negotiation\n", session);
 	    }
 	  else
 	    {
 	      gnutls_assert ();
-	      _gnutls_handshake_log ("Denying unsafe initial negotiation.\n");
+	      _gnutls_handshake_log
+		("HSK[%p]: Denying unsafe initial negotiation\n", session);
 	      return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
 	    }
 	}
