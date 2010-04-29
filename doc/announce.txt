@@ -254,10 +254,73 @@ Forwarded by Martin von Gagern <Martin.vGagern@gmx.net> from
 
 ** Doc fixes for CRQ functions.
 
-TLS Safe Renegotiation Support
-==============================
+TLS Renegotiation Attack
+========================
 
-TBA
+This releases supports the new extension that hardens TLS
+renegotiation, prompted by the recent discovery of a security flaw in
+the protocol.  We quote the manual which contains a discussion of the
+problem and how the solution is implemented in GnuTLS:
+
+Some application protocols and implementations uses the TLS
+renegotiation feature in a manner that enables attackers to insert
+content of his choice in the beginning of a TLS session.
+
+The simplest example is HTTP.  For HTTP one attack works by having the
+attacker simulate a client and connect to a server, with server-only
+authentication, and send some data intended to cause harm.  When the
+proper client attempts to contact the server, the attacker hijacks that
+connection and uses the TLS renegotiation feature with the server and
+splices in the client connection to the already established connection
+between the client and server.  The attacker will not be able to read
+the data exchanged between the client and the server.  However, some
+server implementations will (incorrectly) assume that the data sent by
+the attacker was sent by the now authenticated client.  The result is a
+prefix plain-text injection attack.
+
+While fixing these application protocols and implementations would be
+one natural reaction, an extension to TLS has been designed that
+cryptographically binds together any renegotiated handshakes with the
+initial negotiation.  When the extension is used, the attack is
+detected and the session can be terminated.  The extension is
+specified in [RFC5746].
+
+GnuTLS supports the safe renegotiation extension.  By default, GnuTLS
+clients will attempt to negotiate the safe renegotiation extension when
+talking to servers.  Also by default, GnuTLS servers will accept the
+extension when presented by clients.  However, by default GnuTLS client
+and servers will not refuse renegotiation attempts when the extension
+has not been negotiated, as this would break backwards compatibility
+and cause too much operational problems.  We will likely reconsider
+these defaults in the future.
+
+To modify the default behaviour, we have introduced three new priority
+strings.  The priority strings can be used by applications
+(gnutls_priority_set) and end users (e.g., `--priority' parameter to
+`gnutls-cli' and `gnutls-serv').
+
+The `%UNSAFE_RENEGOTIATION' priority string requests what is today the
+default behaviour, i.e., that handshakes without the safe renegotiation
+extension is permitted.  To make more use of the extension, you may
+provide the `%SAFE_RENEGOTIATION' priority string.  In this mode,
+clients will require that the server supports the extension for the
+initial handshake, and servers will require that the client supports
+the extension for renegotiated handshakes.  If you want to make a
+server refuse even initial handshakes without the safe renegotiation
+extension, use the `%INITIAL_SAFE_RENEGOTIATION' priority string.  It
+is possible to disable use of the extension completely by using the
+`%DISABLE_SAFE_RENEGOTIATION' priority string however this is
+recommended against except for debugging.
+
+For applications we have introduced three new APIs related to safe
+renegotiation.  The gnutls_safe_renegotiation_status function is used
+to check if the extension has been negotiated on a session, and can be
+used both by clients and servers.  The gnutls_safe_renegotiation_set
+function allows applications to request that the extension should be
+disabled (or re-enabled) in handshakes for the session.  The
+gnutls_safe_negotiation_set_initial function is only relevant for
+servers, and is used to enforce that clients support the extension
+even on the initial handshake.
 
 API/ABI changes in GnuTLS 2.10
 ==============================
