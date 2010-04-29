@@ -2409,7 +2409,7 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	    {
 	      gnutls_assert ();
 	      _gnutls_handshake_log
-		("HSK[%p]: Denying unsafe (re)negotiation\n", sesion);
+		("HSK[%p]: Denying unsafe (re)negotiation\n", session);
 	      if (session->security_parameters.entity == GNUTLS_SERVER)
 		/* send no renegotiation alert */
 		return GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED;
