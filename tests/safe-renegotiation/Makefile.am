@@ -25,7 +25,7 @@ AM_CPPFLAGS = \
 AM_LDFLAGS = -no-install
 LDADD = ../../lib/libgnutls.la $(LTLIBGCRYPT) $(LIBSOCKET)
 
-ctests = srn1
+ctests = srn1 srn2
 
 check_PROGRAMS = $(ctests)
 TESTS = $(ctests)
