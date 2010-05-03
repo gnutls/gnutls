@@ -22,9 +22,9 @@
 
 /* Code based on ../mini-x509.c.
  *
- * This tests that a %INITIAL_SAFE_RENEGOTIATION server will reject
- * handshakes against clients that do not support the extension.  This
- * is sort of the inverse of what srn3.c is testing.
+ * This tests that a %SAFE_RENEGOTIATION client will reject handshakes
+ * against servers that do not support the extension.  This is sort of
+ * the inverse of what srn1.c is testing.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -184,7 +184,7 @@ main (int argc, char *argv[])
 				       GNUTLS_X509_FMT_PEM);
   gnutls_init (&server, GNUTLS_SERVER);
   gnutls_credentials_set (server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
-  gnutls_priority_set_direct (server, "NORMAL:%INITIAL_SAFE_RENEGOTIATION",
+  gnutls_priority_set_direct (server, "NORMAL:%DISABLE_SAFE_RENEGOTIATION",
 			      NULL);
   gnutls_transport_set_push_function (server, server_push);
   gnutls_transport_set_pull_function (server, server_pull);
@@ -193,7 +193,7 @@ main (int argc, char *argv[])
   gnutls_certificate_allocate_credentials (&clientx509cred);
   gnutls_init (&client, GNUTLS_CLIENT);
   gnutls_credentials_set (client, GNUTLS_CRD_CERTIFICATE, clientx509cred);
-  gnutls_priority_set_direct (client, "NORMAL:%DISABLE_SAFE_RENEGOTIATION",
+  gnutls_priority_set_direct (client, "NORMAL:%SAFE_RENEGOTIATION",
 			      NULL);
   gnutls_transport_set_push_function (client, client_push);
   gnutls_transport_set_pull_function (client, client_pull);
@@ -237,7 +237,7 @@ main (int argc, char *argv[])
   while ((cret == GNUTLS_E_AGAIN || cret == GNUTLS_E_SUCCESS)
 	 && (sret == GNUTLS_E_AGAIN || sret == GNUTLS_E_SUCCESS));
 
-  if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_SAFE_RENEGOTIATION_FAILED)
+  if (cret != GNUTLS_E_SAFE_RENEGOTIATION_FAILED && sret != GNUTLS_E_SUCCESS)
     exit_code = EXIT_FAILURE;
 
   gnutls_bye (client, GNUTLS_SHUT_RDWR);
