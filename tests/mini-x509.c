@@ -191,6 +191,10 @@ main (int argc, char *argv[])
 
   do
     {
+      static int max_iter = 0;
+      if (max_iter++ > 10)
+	abort ();
+
       if (cret == GNUTLS_E_AGAIN)
 	{
 	  cret = gnutls_handshake (client);
