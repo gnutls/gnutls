@@ -491,7 +491,6 @@ size_t l;
     ret = 0;
    
 cleanup:
-    
     return ret;
 
 }
@@ -571,7 +570,6 @@ int pkcs11_info_to_url(const struct pkcs11_url_info* info, char** url)
         }
         init = 1;
     }
-
 
     if (info->manufacturer[0]) {
         ret = append(&str, info->manufacturer, "manufacturer", init);

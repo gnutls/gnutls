@@ -90,10 +90,6 @@ if test x$ac_pakchois != xno; then
    AC_MSG_ERROR(
 *** 
 *** Pakchois was not found. This is required for PKCS11 support.)
- fi
-else
- AC_MSG_RESULT(no)
-fi
 AM_CONDITIONAL(ENABLE_PAKCHOIS, test "$ac_cv_libpakchois" = "yes")
 
 lgl_INIT
