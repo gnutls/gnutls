@@ -22,10 +22,13 @@ enum
   ACTION_PGP_INFO,
   ACTION_PGP_PRIVKEY_INFO,
   ACTION_RING_INFO,
-  ACTION_REQUEST
+  ACTION_REQUEST,
+  ACTION_PKCS11_LIST,
 };
 
 #define TYPE_CRT 1
 #define TYPE_CRQ 2
 
 void certtool_version (void);
+void pkcs11_list( const char* url);
+

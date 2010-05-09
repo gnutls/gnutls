@@ -84,6 +84,10 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	rnd-libgcrypt.c cipher-libgcrypt.c mac-libgcrypt.c ext_signature.c \
 	crypto-api.c ext_safe_renegotiation.c gnutls_mbuffers.c
 
+if ENABLE_PKCS11
+COBJECTS += pkcs11.c
+endif
+
 if ENABLE_OPRFI
 COBJECTS += $(OPRFI_COBJECTS)
 endif
@@ -132,6 +136,10 @@ if ENABLE_MINITASN1
 libgnutls_la_LIBADD += minitasn1/libminitasn1.la
 else
 libgnutls_la_LDFLAGS += $(LTLIBTASN1)
+endif
+
+if ENABLE_PKCS11
+libgnutls_la_LDFLAGS += $(LTLIBPAKCHOIS)
 endif
 
 if HAVE_LD_OUTPUT_DEF

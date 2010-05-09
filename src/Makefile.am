@@ -80,7 +80,7 @@ noinst_LTLIBRARIES += libcmd-cli-debug.la
 libcmd_cli_debug_la_CFLAGS =
 libcmd_cli_debug_la_SOURCES = tls_test.gaa tls_test-gaa.h tls_test-gaa.c
 
-certtool_SOURCES = certtool.c prime.c
+certtool_SOURCES = certtool.c prime.c pkcs11.c
 certtool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
 certtool_LDADD += libcmd-certtool.la ../gl/libgnu.la
 certtool_LDADD += $(LTLIBGCRYPT)

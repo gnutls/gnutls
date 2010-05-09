@@ -416,7 +416,7 @@ gnutls_hex_encode (const gnutls_datum_t * data, char *result,
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
-  _gnutls_bin2hex (data->data, data->size, result, *result_size);
+  _gnutls_bin2hex (data->data, data->size, result, *result_size, NULL);
   *result_size = res;
 
   return 0;

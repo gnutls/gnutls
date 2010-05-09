@@ -116,7 +116,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 
   _gnutls_hard_log ("INT: KEY BLOCK[%d]: %s\n", block_size,
 		    _gnutls_bin2hex (key_block, block_size, buf,
-				     sizeof (buf)));
+				     sizeof (buf), NULL));
 
   _gnutls_free_datum (&session->cipher_specs.server_write_mac_secret);
   _gnutls_free_datum (&session->cipher_specs.client_write_mac_secret);
@@ -242,7 +242,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 			client_write_key_size,
 			_gnutls_bin2hex (client_write_key,
 					 client_write_key_size, buf,
-					 sizeof (buf)));
+					 sizeof (buf), NULL));
 
       if (_gnutls_sset_datum
 	  (&session->cipher_specs.server_write_key,
@@ -256,7 +256,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 			server_write_key_size,
 			_gnutls_bin2hex (server_write_key,
 					 server_write_key_size, buf,
-					 sizeof (buf)));
+					 sizeof (buf), NULL));
 
     }
 

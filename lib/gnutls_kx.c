@@ -95,15 +95,15 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
 
   _gnutls_hard_log ("INT: PREMASTER SECRET[%d]: %s\n", PREMASTER.size,
 		    _gnutls_bin2hex (PREMASTER.data, PREMASTER.size, buf,
-				     sizeof (buf)));
+				     sizeof (buf), NULL));
   _gnutls_hard_log ("INT: CLIENT RANDOM[%d]: %s\n", 32,
 		    _gnutls_bin2hex (session->
 				     security_parameters.client_random, 32,
-				     buf, sizeof (buf)));
+				     buf, sizeof (buf), NULL));
   _gnutls_hard_log ("INT: SERVER RANDOM[%d]: %s\n", 32,
 		    _gnutls_bin2hex (session->
 				     security_parameters.server_random, 32,
-				     buf, sizeof (buf)));
+				     buf, sizeof (buf), NULL));
 
   if (gnutls_protocol_get_version (session) == GNUTLS_SSL3)
     {
@@ -147,7 +147,7 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
 					 session->
 					 security_parameters.extensions.
 					 oprfi_client_len, buf,
-					 sizeof (buf)));
+					 sizeof (buf), NULL));
       _gnutls_hard_log ("INT: SERVER OPRFI[%d]: %s\n",
 			session->security_parameters.extensions.
 			oprfi_server_len,
@@ -157,7 +157,7 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
 					 session->
 					 security_parameters.extensions.
 					 oprfi_server_len, buf,
-					 sizeof (buf)));
+					 sizeof (buf), NULL));
 
       memcpy (rnd, session->security_parameters.client_random,
 	      GNUTLS_RANDOM_SIZE);
@@ -209,7 +209,7 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
   _gnutls_hard_log ("INT: MASTER SECRET: %s\n",
 		    _gnutls_bin2hex (session->
 				     security_parameters.master_secret,
-				     GNUTLS_MASTER_SIZE, buf, sizeof (buf)));
+				     GNUTLS_MASTER_SIZE, buf, sizeof (buf), NULL));
 
   return ret;
 }

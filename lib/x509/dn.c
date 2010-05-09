@@ -281,7 +281,7 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 	      gnutls_assert ();
 	      _gnutls_x509_log
 		("Found OID: '%s' with value '%s'\n",
-		 oid, _gnutls_bin2hex (value2, len, escaped, sizeof_escaped));
+		 oid, _gnutls_bin2hex (value2, len, escaped, sizeof_escaped, NULL));
 	      goto cleanup;
 	    }
 	  STR_APPEND (str_escape (string, escaped, sizeof_escaped));

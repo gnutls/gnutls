@@ -247,7 +247,7 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
   _gnutls_write_uint16 (n_b, data_b);
 
   _gnutls_hard_log ("INT: SRP B[%d]: %s\n", (int) n_b,
-		    _gnutls_bin2hex (&data_b[2], n_b, buf, sizeof (buf)));
+		    _gnutls_bin2hex (&data_b[2], n_b, buf, sizeof (buf), NULL));
 
   _gnutls_srp_entry_free (pwd_entry);
 
@@ -366,7 +366,7 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
     }
 
   _gnutls_hard_log ("INT: SRP A[%d]: %s\n", (int) n_a,
-		    _gnutls_bin2hex (&data_a[2], n_a, buf, sizeof (buf)));
+		    _gnutls_bin2hex (&data_a[2], n_a, buf, sizeof (buf), NULL));
 
   _gnutls_mpi_release (&A);
 

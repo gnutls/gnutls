@@ -342,7 +342,7 @@ _gnutls_x509_data2hex (const opaque * data, size_t data_size,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  res = _gnutls_bin2hex (data, data_size, escaped, sizeof (escaped));
+  res = _gnutls_bin2hex (data, data_size, escaped, sizeof (escaped), NULL);
   if (!res)
     {
       gnutls_assert ();

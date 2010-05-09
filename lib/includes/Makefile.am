@@ -22,7 +22,7 @@
 # MA 02110-1301, USA
 
 nobase_include_HEADERS = gnutls/x509.h gnutls/pkcs12.h gnutls/compat.h	\
-	gnutls/openpgp.h gnutls/crypto.h
+	gnutls/openpgp.h gnutls/crypto.h gnutls/pkcs11.h
 
 if ENABLE_CXX
 nobase_include_HEADERS += gnutls/gnutlsxx.h

@@ -283,6 +283,101 @@ _gnutls_string_append_printf (gnutls_string * dest, const char *fmt, ...)
   return len;
 }
 
+static int _gnutls_string_insert_data(gnutls_string * dest, int pos, const void* str, size_t str_size)
+{
+        size_t orig_length = dest->length;
+        int ret;
+
+        ret = _gnutls_string_resize(dest, dest->length+str_size); /* resize to make space */
+        if (ret < 0)
+                return ret;
+
+        memmove(&dest->data[pos+str_size], &dest->data[pos], orig_length-pos);
+
+        memcpy(&dest->data[pos], str, str_size);
+        dest->length += str_size;
+
+        return 0;
+}
+
+static void _gnutls_string_delete_data(gnutls_string * dest, int pos, size_t str_size)
+{
+        memmove(&dest->data[pos], &dest->data[pos+str_size], dest->length-pos-str_size);
+
+        dest->length -= str_size;
+
+        return;
+}
+
+
+int _gnutls_string_escape(gnutls_string * dest, const char *const invalid_chars)
+{
+        static const char *x = "0123456789ABCDEF";
+        int rv = -1;
+        char t[5];
+        int pos = 0;
+
+        /*_PKCS11H_ASSERT (target!=NULL); Not required*/
+
+        while (pos < dest->length) {
+
+                if (dest->data[pos] == '\\' || strchr(invalid_chars, dest->data[pos])
+                    || !isgraph(dest->data[pos])) {
+
+                        t[0] = '%';
+                        t[1] = x[(dest->data[pos] & 0xf0) >> 4];
+                        t[2] = x[(dest->data[pos] & 0x0f) >> 0];
+
+                        _gnutls_string_delete_data(dest, pos, 1);
+
+                        if (_gnutls_string_insert_data(dest, pos, t, 3) < 0) {
+                                        rv = -1;
+                                        goto cleanup;
+                        }
+
+                }
+                pos++;
+        }
+
+        rv = 0;
+
+    cleanup:
+
+        return rv;
+}
+
+int _gnutls_string_unescape(gnutls_string * dest)
+{
+        int rv = -1;
+        int pos = 0;
+
+        /*_PKCS11H_ASSERT (target!=NULL); Not required*/
+
+        while (pos < dest->length) {
+                if (dest->data[pos] == '%') {
+                        char b[3];
+                        unsigned u;
+                        char x;
+                        b[0] = dest->data[pos+1];
+                        b[1] = dest->data[pos+2];
+                        b[2] = '\x0';
+
+                        sscanf(b, "%08x", &u);
+                        x = u & 0xff;
+                        _gnutls_string_delete_data(dest, pos, 3);
+                        _gnutls_string_insert_data(dest, pos, &x, 1);
+                }
+                pos++;
+        }
+
+        rv = 0;
+
+    cleanup:
+
+        return rv;
+}
+
+
 /* Converts the given string (old) to hex. A buffer must be provided
  * to hold the new hex string. The new string will be null terminated.
  * If the buffer does not have enough space to hold the string, a
@@ -290,14 +385,27 @@ _gnutls_string_append_printf (gnutls_string * dest, const char *fmt, ...)
  */
 char *
 _gnutls_bin2hex (const void *_old, size_t oldlen,
-		 char *buffer, size_t buffer_size)
+		 char *buffer, size_t buffer_size, const char *separator)
 {
   unsigned int i, j;
   const opaque *old = _old;
+  int init = 0;
+  int step = 2;
+  const char empty[] = "";
+  
+  if (separator != NULL && separator[0] != 0)
+    step = 3;
+  else
+    separator = empty;
 
-  for (i = j = 0; i < oldlen && j + 2 < buffer_size; j += 2)
+  i = j = 0;
+  sprintf (&buffer[j], "%.2x", old[i]);
+  j+=2;
+  i++;
+
+  for (; i < oldlen && j + step < buffer_size; j += step)
     {
-      sprintf (&buffer[j], "%.2x", old[i]);
+      sprintf (&buffer[j], "%s%.2x", separator, old[i]);
       i++;
     }
   buffer[j] = '\0';
@@ -344,11 +452,16 @@ _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
-  for (i = j = 0; j < hex_size; i += 2, j++)
+  for (i = j = 0; j < hex_size; j++)
     {
+    
+      if (!isxdigit(hex_data[i])) /* skip non-hex such as the ':' in 00:FF */
+        continue;
+
       hex2_data[0] = hex_data[i];
       hex2_data[1] = hex_data[i + 1];
       hex2_data[2] = 0;
+      i+=2;
       val = strtoul ((char *) hex2_data, NULL, 16);
       if (val == ULONG_MAX)
 	{

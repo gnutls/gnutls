@@ -487,7 +487,7 @@ _gnutls_mpi_log (const char *prefix, bigint_t a)
       return;
     }
 
-  _gnutls_bin2hex (binbuf, binlen, hexbuf, hexlen);
+  _gnutls_bin2hex (binbuf, binlen, hexbuf, hexlen, NULL);
 
   _gnutls_hard_log ("MPI: length: %d\n\t%s%s\n", (int) binlen, prefix,
 		    hexbuf);

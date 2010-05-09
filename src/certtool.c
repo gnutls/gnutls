@@ -25,6 +25,7 @@
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
 #include <gnutls/pkcs12.h>
+#include <gnutls/pkcs11.h>
 
 #include <gcrypt.h>
 
@@ -941,6 +942,25 @@ gaa_parser (int argc, char **argv)
 
   if ((ret = gnutls_global_init ()) < 0)
     error (EXIT_FAILURE, 0, "global_init: %s", gnutls_strerror (ret));
+    
+  if (info.pkcs11_provider != NULL)
+    {
+      ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
+      if (ret < 0)
+        fprintf (stderr, "pkcs11_init: %s", gnutls_strerror (ret));
+      else {
+        ret = gnutls_pkcs11_add_provider(info.pkcs11_provider, NULL);
+        if (ret < 0)
+          error (EXIT_FAILURE, 0, "pkcs11_add_provider: %s", gnutls_strerror (ret));
+      }
+    }
+  else
+    {
+      ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
+      if (ret < 0)
+        fprintf (stderr, "pkcs11_init: %s", gnutls_strerror (ret));
+    }
+      
 
   if ((ret = gnutls_global_init_extra ()) < 0)
     error (EXIT_FAILURE, 0, "global_init_extra: %s", gnutls_strerror (ret));
@@ -1007,6 +1027,9 @@ gaa_parser (int argc, char **argv)
     case ACTION_GENERATE_PKCS8:
       generate_pkcs8 ();
       break;
+    case ACTION_PKCS11_LIST:
+      pkcs11_list(info.pkcs11_url);
+      break;
 #ifdef ENABLE_OPENPGP
     case ACTION_PGP_INFO:
       pgp_certificate_info ();
@@ -1026,6 +1049,9 @@ gaa_parser (int argc, char **argv)
       exit (0);
     }
   fclose (outfile);
+  
+  gnutls_pkcs11_deinit();
+  gnutls_global_deinit();
 }
 
 #define MAX_CRTS 500

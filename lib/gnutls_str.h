@@ -57,6 +57,9 @@ void _gnutls_string_get_data (gnutls_string *, void *, size_t * size);
 void _gnutls_string_get_datum (gnutls_string *, gnutls_datum_t *,
 			       size_t max_size);
 
+int _gnutls_string_escape(gnutls_string * dest, const char *const invalid_chars);
+int _gnutls_string_unescape(gnutls_string * dest);
+
 #ifndef __attribute__
 /* This feature is available in gcc versions 2.5 and later.  */
 # if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
@@ -77,7 +80,7 @@ typedef gnutls_string gnutls_buffer;
 #define _gnutls_buffer_resize _gnutls_string_resize
 
 char *_gnutls_bin2hex (const void *old, size_t oldlen, char *buffer,
-		       size_t buffer_size);
+		       size_t buffer_size, const char* separator);
 int _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 		     size_t * bin_size);
 

@@ -1662,7 +1662,7 @@ _gnutls_client_check_if_resuming (gnutls_session_t session,
 			 session_id_len);
   _gnutls_handshake_log ("HSK[%p]: SessionID: %s\n", session,
 			 _gnutls_bin2hex (session_id, session_id_len, buf,
-					  sizeof (buf)));
+					  sizeof (buf), NULL));
 
   if (session_id_len > 0 &&
       session->internals.resumed_security_parameters.session_id_size ==
@@ -2249,7 +2249,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
       _gnutls_handshake_log ("HSK[%p]: SessionID: %s\n", session,
 			     _gnutls_bin2hex (session->security_parameters.
 					      session_id, session_id_len, buf,
-					      sizeof (buf)));
+					      sizeof (buf), NULL));
 
       memcpy (&data[pos],
 	      session->security_parameters.current_cipher_suite.suite, 2);
@@ -2757,7 +2757,7 @@ _gnutls_handshake_client (gnutls_session_t session)
 					    internals.resumed_security_parameters.session_id,
 					    session->
 					    internals.resumed_security_parameters.session_id_size,
-					    buf, sizeof (buf)));
+					    buf, sizeof (buf), NULL));
 #endif
 
   switch (STATE)
