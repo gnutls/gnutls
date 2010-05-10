@@ -348,6 +348,7 @@ void pkcs11_export(FILE* outfile, const char* url)
 gnutls_pkcs11_crt_t crt;
 gnutls_x509_crt_t xcrt;
 int ret;
+size_t size;
 
 	pkcs11_common();
 
@@ -378,10 +379,86 @@ int ret;
 		exit(1);
 	}
 
-	print_certificate_info(xcrt, outfile, 1);
+	size = buffer_size;
+	ret = gnutls_x509_crt_export (xcrt, GNUTLS_X509_FMT_PEM, buffer, &size);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+	fwrite (buffer, 1, size, outfile);
+	fputs("\n\n", outfile);
 
 	gnutls_x509_crt_deinit(xcrt);
 	gnutls_pkcs11_crt_deinit(crt);
+
+	return;
+
+
+
+}
+
+void pkcs11_token_list(FILE* outfile)
+{
+int ret;
+int i;
+char *url;
+char buf[128];
+size_t size;
+
+	pkcs11_common();
+
+	for (i=0;;i++) {
+		ret = gnutls_pkcs11_token_get_url(i, &url);
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			break;
+
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fprintf(outfile, "Token %d:\n\tURL: %s\n", i, url);
+
+		size = sizeof(buf);
+		ret = gnutls_pkcs11_token_get_info(url, GNUTLS_PKCS11_TOKEN_LABEL, buf, &size);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fprintf(outfile, "\tLabel: %s\n", buf);
+
+		size = sizeof(buf);
+		ret = gnutls_pkcs11_token_get_info(url, GNUTLS_PKCS11_TOKEN_MANUFACTURER, buf, &size);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fprintf(outfile, "\tManufacturer: %s\n", buf);
+
+		size = sizeof(buf);
+		ret = gnutls_pkcs11_token_get_info(url, GNUTLS_PKCS11_TOKEN_MODEL, buf, &size);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fprintf(outfile, "\tModel: %s\n", buf);
+
+		size = sizeof(buf);
+		ret = gnutls_pkcs11_token_get_info(url, GNUTLS_PKCS11_TOKEN_SERIAL, buf, &size);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fprintf(outfile, "\tSerial: %s\n", buf);
+		fprintf(outfile, "\n\n");
+
+		gnutls_free(url);
+
+	}
 
 	return;
 

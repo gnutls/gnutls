@@ -1368,7 +1368,7 @@ print_hex_datum (gnutls_datum_t * dat)
 }
 
 
-void
+static void
 print_certificate_info (gnutls_x509_crt_t crt, FILE * out, unsigned int all)
 {
   gnutls_datum_t cinfo;
