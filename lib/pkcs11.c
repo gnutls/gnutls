@@ -31,6 +31,8 @@
 #define ID_SIZE 128
 #define LABEL_SIZE 128
 
+/* XXX: try to eliminate this */
+#define MAX_CERT_SIZE 8*1024
 
 struct gnutls_pkcs11_provider_s {
     pakchois_module_t *module;
@@ -67,7 +69,7 @@ struct crt_find_data_st {
     gnutls_pkcs11_crt_t *p_list;
     unsigned int* n_list;
     unsigned int current;
-    pkcs11_crt_attributes flags;
+    gnutls_pkcs11_crt_attr_t flags;
     struct pkcs11_url_info info;
 };
 
@@ -78,6 +80,10 @@ struct token_info {
     struct gnutls_pkcs11_provider_s* prov;
 };
 
+/* thus function is called for every token in the traverse_tokens
+ * function. Once everything is traversed it is called with NULL tinfo.
+ * It should return 0 if found what it was looking for.
+ */
 typedef int (*find_func_t)(pakchois_session_t *pks, struct token_info* tinfo, void* input);
 
 static struct gnutls_pkcs11_provider_s providers[MAX_PROVIDERS];
@@ -130,6 +136,52 @@ fail:
     return GNUTLS_E_PKCS11_LOAD_ERROR;
 
 }
+
+/* returns strings of the PKCS#11 certificate structure.
+ * Returns null terminated strings but output_size contains
+ * the size of the actual data only.
+ */
+int gnutls_pkcs11_crt_get_info(gnutls_pkcs11_crt_t crt, gnutls_pkcs11_cert_info_t itype,
+    void* output, size_t* output_size)
+{
+    const char* str;
+    size_t len;
+
+    switch(itype) {
+        case GNUTLS_PKCS11_CRT_ID_HEX:
+            str = crt->info.id;
+            break;
+        case GNUTLS_PKCS11_CRT_LABEL:
+            str = crt->info.label;
+            break;
+        case GNUTLS_PKCS11_CRT_TOKEN_LABEL:
+            str = crt->info.token;
+            break;
+        case GNUTLS_PKCS11_CRT_TOKEN_SERIAL:
+            str = crt->info.serial;
+            break;
+        case GNUTLS_PKCS11_CRT_TOKEN_MANUFACTURER:
+            str = crt->info.manufacturer;
+            break;
+        case GNUTLS_PKCS11_CRT_TOKEN_MODEL:
+            str = crt->info.model;
+            break;
+    }
+
+    len = strlen(str);
+
+    if (len+1>*output_size) {
+        *output_size = len+1;
+        return GNUTLS_E_SHORT_MEMORY_BUFFER;
+    }
+
+    strcpy(output, str);
+
+    *output_size = len;
+
+    return 0;
+}
+
 
 int gnutls_pkcs11_init(unsigned int flags, const char* configfile)
 {
@@ -423,12 +475,16 @@ static int pkcs11_info_to_url(const struct pkcs11_url_info* info, char** url)
         init = 1;
     }
 
-    ret = _gnutls_string_append_printf(&str, ";id=%s", info->id);
-    if (ret < 0) {
-        gnutls_assert();
-        return ret;
+    if (info->id[0] != 0) {
+        ret = _gnutls_string_append_printf(&str, ";id=%s", info->id);
+        if (ret < 0) {
+            gnutls_assert();
+            return ret;
+        }
     }
     
+    _gnutls_string_append_data(&str, "", 1);
+
     *url = str.data;
     
     return 0;
@@ -509,11 +565,12 @@ static int traverse_tokens (find_func_t find_func, void* input)
             
             if (ret == 0) {
                 found = 1;
-                break;
+                goto finish;
             }
         }
     }
 
+finish:
     /* final call */
 
     if (found == 0) {
@@ -579,7 +636,7 @@ static int find_cert_url(pakchois_session_t *pks, struct token_info *info, void*
     ck_object_handle_t obj;
     unsigned long count;
     int found = 0, ret;
-    unsigned char value[8192], subject[8192];
+    unsigned char value[MAX_CERT_SIZE];
     char certid_tmp[ID_SIZE];
     char label_tmp[LABEL_SIZE];
     
@@ -653,13 +710,6 @@ static int find_cert_url(pakchois_session_t *pks, struct token_info *info, void*
         a[2].value_len = sizeof(label_tmp);
 
         if (pakchois_get_attribute_value(pks, obj, a, 3) == CKR_OK) {
-char buf[512];
-char buf2[512];
-fprintf(stderr, "val: %d, certid: %d\n", a[1].value_len, find_data->certid_raw_size);
-fprintf(stderr, "fcertid: %s, gcertid: %s\n",    _gnutls_bin2hex (a[1].value, a[1].value_len, buf,
-                                     sizeof (buf), NULL), _gnutls_bin2hex (a[1].value, a[1].value_len, buf2,
-                                     sizeof (buf2), NULL));
-
             if (a[1].value_len == find_data->certid_raw_size && 
                 memcmp(certid_tmp, find_data->certid_raw, find_data->certid_raw_size)==0) {
                 gnutls_datum_t id = { a[1].value, a[1].value_len };
@@ -715,7 +765,7 @@ int gnutls_pkcs11_crt_import_url (gnutls_pkcs11_crt_t cert, const char * url)
         gnutls_assert();
         return ret;
     }
-fprintf(stderr, "hex2bin: %d, %d\n", ret, find_data.certid_raw_size);
+
     ret = traverse_tokens(find_cert_url, &find_data);
     if (ret < 0) {
         gnutls_assert();
@@ -724,6 +774,104 @@ fprintf(stderr, "hex2bin: %d, %d\n", ret, find_data.certid_raw_size);
     
     return 0;
 }
+
+struct token_num {
+    struct pkcs11_url_info info;
+    unsigned int seq; /* which one we are looking for */
+    unsigned int current; /* which one are we now */
+};
+
+static int find_token_num(pakchois_session_t *pks, struct token_info *tinfo, void* input)
+{
+    struct token_num* find_data = input;
+
+    if (tinfo == NULL) { /* we don't support multiple calls */
+        gnutls_assert();
+        return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+
+    if (find_data->current == find_data->seq) {
+        strcpy(find_data->info.manufacturer, tinfo->tinfo.manufacturer_id);
+        strcpy(find_data->info.token, tinfo->tinfo.label);
+        strcpy(find_data->info.model, tinfo->tinfo.model);
+        strcpy(find_data->info.serial, tinfo->tinfo.serial_number);
+
+        return 0;
+    }
+
+    find_data->current++;
+    /* search the token for the id */
+
+
+    return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE; /* non zero is enough */
+}
+
+int gnutls_pkcs11_token_get_url (unsigned int seq, char** url)
+{
+    int ret;
+    struct token_num tn;
+
+    memset(&tn, 0, sizeof(tn));
+    tn.seq = seq;
+
+    ret = traverse_tokens(find_token_num, &tn);
+    if (ret < 0) {
+        gnutls_assert();
+        return ret;
+    }
+
+    ret = pkcs11_info_to_url(&tn.info, url);
+    if (ret < 0) {
+        gnutls_assert();
+        return ret;
+    }
+
+    return 0;
+
+}
+
+int gnutls_pkcs11_token_get_info(const char* url, gnutls_pkcs11_token_info_t ttype, void* output, size_t *output_size)
+{
+    const char* str;
+    size_t len;
+    struct pkcs11_url_info info;
+    int ret;
+
+    ret = pkcs11_url_to_info(url, &info);
+    if (ret < 0) {
+        gnutls_assert();
+        return ret;
+    }
+
+    switch(ttype) {
+        case GNUTLS_PKCS11_TOKEN_LABEL:
+            str = info.token;
+            break;
+        case GNUTLS_PKCS11_TOKEN_SERIAL:
+            str = info.serial;
+            break;
+        case GNUTLS_PKCS11_TOKEN_MANUFACTURER:
+            str = info.manufacturer;
+            break;
+        case GNUTLS_PKCS11_TOKEN_MODEL:
+            str = info.model;
+            break;
+    }
+
+    len = strlen(str);
+
+    if (len+1>*output_size) {
+        *output_size = len+1;
+        return GNUTLS_E_SHORT_MEMORY_BUFFER;
+    }
+
+    strcpy(output, str);
+
+    *output_size = len;
+
+    return 0;
+}
+
 
 int gnutls_pkcs11_crt_export_url (gnutls_pkcs11_crt_t cert, char ** url)
 {
@@ -935,7 +1083,7 @@ static int find_crts(pakchois_session_t *pks, struct token_info *info, void* inp
     ck_rv_t rv;
     ck_object_handle_t obj;
     unsigned long count;
-    unsigned char value[8192], subject[8192];
+    unsigned char value[MAX_CERT_SIZE];
     char certid_tmp[ID_SIZE];
     char label_tmp[LABEL_SIZE];
     int ret, i;
@@ -1095,7 +1243,7 @@ fail:
     return ret;
 }
 
-int gnutls_pkcs11_crt_list_import (gnutls_pkcs11_crt_t * p_list, unsigned int *n_list, const char* url, pkcs11_crt_attributes flags)
+int gnutls_pkcs11_crt_list_import_url (gnutls_pkcs11_crt_t * p_list, unsigned int *n_list, const char* url, gnutls_pkcs11_crt_attr_t flags)
 {
     int ret;
     struct crt_find_data_st find_data;
@@ -1124,6 +1272,39 @@ int gnutls_pkcs11_crt_list_import (gnutls_pkcs11_crt_t * p_list, unsigned int *n
     
     return 0;
 }
+
+int gnutls_x509_crt_import_pkcs11_url( gnutls_x509_crt_t crt, const char* url)
+{
+    gnutls_pkcs11_crt_t pcrt;
+    int ret;
+
+    ret = gnutls_pkcs11_crt_init ( &pcrt);
+    if (ret < 0) {
+        gnutls_assert();
+        return ret;
+    }
+
+    ret = gnutls_pkcs11_crt_import_url (pcrt, url);
+    if (ret < 0) {
+        gnutls_assert();
+        goto cleanup;
+    }
+
+    ret = gnutls_x509_crt_import(crt, &pcrt->raw, GNUTLS_X509_FMT_DER);
+    if (ret < 0) {
+        gnutls_assert();
+        goto cleanup;
+    }
+
+    ret = 0;
+cleanup:
+
+    gnutls_pkcs11_crt_deinit(pcrt);
+
+    return ret;
+}
+
+
 
 int gnutls_x509_crt_import_pkcs11( gnutls_x509_crt_t crt, gnutls_pkcs11_crt_t pkcs11_crt)
 {

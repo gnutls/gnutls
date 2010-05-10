@@ -167,11 +167,32 @@ void gnutls_pkcs11_crt_deinit ( gnutls_pkcs11_crt_t certificate);
 int gnutls_pkcs11_crt_list_deinit (gnutls_pkcs11_crt_t * certificates, const unsigned int ncertificates);
 
 typedef enum {
-	GNUTLS_PKCS11_CRT_ATTR_ALL,
+	GNUTLS_PKCS11_CRT_ID_HEX=1,
+	GNUTLS_PKCS11_CRT_LABEL,
+	GNUTLS_PKCS11_CRT_TOKEN_LABEL,
+	GNUTLS_PKCS11_CRT_TOKEN_SERIAL,
+	GNUTLS_PKCS11_CRT_TOKEN_MANUFACTURER,
+	GNUTLS_PKCS11_CRT_TOKEN_MODEL,
+} gnutls_pkcs11_cert_info_t;
+
+int gnutls_pkcs11_crt_get_info(gnutls_pkcs11_crt_t crt, gnutls_pkcs11_cert_info_t itype, void* output, size_t* output_size);
+
+typedef enum {
+	GNUTLS_PKCS11_CRT_ATTR_ALL=1,
 	GNUTLS_PKCS11_CRT_ATTR_TRUSTED, /* marked as trusted */
 	GNUTLS_PKCS11_CRT_ATTR_WITH_PK, /* with corresponding private key */
-} pkcs11_crt_attributes;
+} gnutls_pkcs11_crt_attr_t;
 
+/* token info */
+typedef enum {
+	GNUTLS_PKCS11_TOKEN_LABEL,
+	GNUTLS_PKCS11_TOKEN_SERIAL,
+	GNUTLS_PKCS11_TOKEN_MANUFACTURER,
+	GNUTLS_PKCS11_TOKEN_MODEL,
+} gnutls_pkcs11_token_info_t;
+
+int gnutls_pkcs11_token_get_url (unsigned int seq, char** url);
+int gnutls_pkcs11_token_get_info(const char* url, gnutls_pkcs11_token_info_t, void* output, size_t *output_size);
 /**
  * @brief Enumerate available certificates.
  * @param p_list	Location to store the list.
@@ -181,9 +202,10 @@ typedef enum {
  * @return gnutls status.
  * @note the p_list is should not be initialized.
  */
-int gnutls_pkcs11_crt_list_import (gnutls_pkcs11_crt_t * p_list, unsigned int *const n_list, const char* url, pkcs11_crt_attributes flags);
+int gnutls_pkcs11_crt_list_import_url (gnutls_pkcs11_crt_t * p_list, unsigned int *const n_list, const char* url, gnutls_pkcs11_crt_attr_t flags);
 
 int gnutls_x509_crt_import_pkcs11( gnutls_x509_crt_t crt, gnutls_pkcs11_crt_t pkcs11_crt);
+int gnutls_x509_crt_import_pkcs11_url( gnutls_x509_crt_t crt, const char* url);
 
 /**
  * @brief Return the type of the certificate

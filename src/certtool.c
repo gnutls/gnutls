@@ -75,6 +75,7 @@ static void gaa_parser (int argc, char **argv);
 void generate_self_signed (void);
 void generate_request (void);
 gnutls_x509_crt_t *load_cert_list (int mand, size_t * size);
+static void print_certificate_info (gnutls_x509_crt_t crt, FILE * out, unsigned int all);
 
 static void print_hex_datum (gnutls_datum_t * dat);
 
@@ -1026,7 +1027,10 @@ gaa_parser (int argc, char **argv)
       generate_pkcs8 ();
       break;
     case ACTION_PKCS11_LIST:
-      pkcs11_list(info.pkcs11_url, info.pkcs11_type);
+      pkcs11_list(outfile, info.pkcs11_url, info.pkcs11_type);
+      break;
+    case ACTION_PKCS11_TOKENS:
+      pkcs11_token_list(outfile);
       break;
     case ACTION_PKCS11_EXPORT_URL:
       pkcs11_export(outfile, info.pkcs11_url);
@@ -1371,7 +1375,7 @@ print_hex_datum (gnutls_datum_t * dat)
 }
 
 
-void
+static void
 print_certificate_info (gnutls_x509_crt_t crt, FILE * out, unsigned int all)
 {
   gnutls_datum_t cinfo;

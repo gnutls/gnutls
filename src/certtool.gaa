@@ -138,6 +138,7 @@ option (pkcs11-export-url) STR "URL" { $action = ACTION_PKCS11_EXPORT_URL; $pkcs
 option (pkcs11-list) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS11_TYPE_PK; } "List objects specified by a PKCS#11 URL"
 option (pkcs11-list-trusted) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS11_TYPE_TRUSTED; } "List objects marked as trusted, specified by a PKCS#11 URL"
 option (pkcs11-list-all) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS11_TYPE_ALL; } "List all objects specified by a PKCS#11 URL"
+option (pkcs11-list-tokens) { $action = ACTION_PKCS11_TOKENS; } "List all available tokens"
 
 #int debug;
 option (d, debug) INT "LEVEL" { $debug = $1 } "specify the debug level. Default is 1."

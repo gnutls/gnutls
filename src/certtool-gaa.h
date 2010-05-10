@@ -8,7 +8,7 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 142 "certtool.gaa"
+#line 143 "certtool.gaa"
 	int debug;
 #line 137 "certtool.gaa"
 	int pkcs11_type;

@@ -41,9 +41,10 @@ static void pkcs11_common(void)
 
 /* lists certificates from a token
  */
-void pkcs11_list( const char* url, int type)
+void pkcs11_list( FILE* outfile, const char* url, int type)
 {
 gnutls_pkcs11_crt_t *crt_list;
+gnutls_x509_crt_t xcrt;
 unsigned int crt_list_size = 0;
 int ret;
 char* output;
@@ -54,7 +55,7 @@ int i, flags;
 	if (url == NULL)
 		url = "pkcs11:";
 
-	ret = gnutls_pkcs11_crt_list_import( NULL, &crt_list_size, url, GNUTLS_PKCS11_CRT_ATTR_ALL);
+	ret = gnutls_pkcs11_crt_list_import_url( NULL, &crt_list_size, url, GNUTLS_PKCS11_CRT_ATTR_ALL);
 	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
 		fprintf(stderr, "Error in crt_list_import (1): %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -79,15 +80,69 @@ int i, flags;
 		flags = GNUTLS_PKCS11_CRT_ATTR_ALL;
 	}
 
-	ret = gnutls_pkcs11_crt_list_import( crt_list, &crt_list_size, url, flags);
+	ret = gnutls_pkcs11_crt_list_import_url( crt_list, &crt_list_size, url, flags);
 	if (ret < 0) {
 		fprintf(stderr, "Error in crt_list_import: %s\n", gnutls_strerror(ret));
 		exit(1);
 	}
 	
 	for (i=0;i<crt_list_size;i++) {
-		gnutls_pkcs11_crt_export_url(crt_list[i], &output);
-		fprintf(stderr, "cert[%d]: %s\n\n", i, output);
+		char buf[128];
+		size_t size;
+
+
+		ret = gnutls_pkcs11_crt_export_url(crt_list[i], &output);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fprintf(outfile, "Certificate %d:\n\tURL: %s\n", i, output);
+
+		size = sizeof(buf);
+		ret = gnutls_pkcs11_crt_get_info( crt_list[i], GNUTLS_PKCS11_CRT_LABEL, buf, &size);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+		fprintf(outfile, "\tLabel: %s\n", buf);
+
+		size = sizeof(buf);
+		ret = gnutls_pkcs11_crt_get_info( crt_list[i], GNUTLS_PKCS11_CRT_ID_HEX, buf, &size);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+		fprintf(outfile, "\tID: %s\n\n", buf);
+
+
+		ret = gnutls_x509_crt_init(&xcrt);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		ret = gnutls_x509_crt_import_pkcs11(xcrt, crt_list[i]);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+#if 0
+		size = buffer_size;
+		ret = gnutls_x509_crt_export (xcrt, GNUTLS_X509_FMT_PEM, buffer, &size);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fwrite (buffer, 1, size, outfile);
+		fputs("\n\n", outfile);
+#endif
+
+		gnutls_x509_crt_deinit(xcrt);
+
+
 	}
 	
 	return;
@@ -98,6 +153,7 @@ void pkcs11_export(FILE* outfile, const char* url)
 gnutls_pkcs11_crt_t crt;
 gnutls_x509_crt_t xcrt;
 int ret;
+size_t size;
 
 	pkcs11_common();
 
@@ -128,10 +184,86 @@ int ret;
 		exit(1);
 	}
 
-	print_certificate_info(xcrt, outfile, 1);
+	size = buffer_size;
+	ret = gnutls_x509_crt_export (xcrt, GNUTLS_X509_FMT_PEM, buffer, &size);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+	fwrite (buffer, 1, size, outfile);
+	fputs("\n\n", outfile);
 
 	gnutls_x509_crt_deinit(xcrt);
 	gnutls_pkcs11_crt_deinit(crt);
+
+	return;
+
+
+
+}
+
+void pkcs11_token_list(FILE* outfile)
+{
+int ret;
+int i;
+char *url;
+char buf[128];
+size_t size;
+
+	pkcs11_common();
+
+	for (i=0;;i++) {
+		ret = gnutls_pkcs11_token_get_url(i, &url);
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+			break;
+
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fprintf(outfile, "Token %d:\n\tURL: %s\n", i, url);
+
+		size = sizeof(buf);
+		ret = gnutls_pkcs11_token_get_info(url, GNUTLS_PKCS11_TOKEN_LABEL, buf, &size);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fprintf(outfile, "\tLabel: %s\n", buf);
+
+		size = sizeof(buf);
+		ret = gnutls_pkcs11_token_get_info(url, GNUTLS_PKCS11_TOKEN_MANUFACTURER, buf, &size);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fprintf(outfile, "\tManufacturer: %s\n", buf);
+
+		size = sizeof(buf);
+		ret = gnutls_pkcs11_token_get_info(url, GNUTLS_PKCS11_TOKEN_MODEL, buf, &size);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fprintf(outfile, "\tModel: %s\n", buf);
+
+		size = sizeof(buf);
+		ret = gnutls_pkcs11_token_get_info(url, GNUTLS_PKCS11_TOKEN_SERIAL, buf, &size);
+		if (ret < 0) {
+			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+			exit(1);
+		}
+
+		fprintf(outfile, "\tSerial: %s\n", buf);
+		fprintf(outfile, "\n\n");
+
+		gnutls_free(url);
+
+	}
 
 	return;
 

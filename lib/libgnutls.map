@@ -614,10 +614,14 @@ GNUTLS_2_11
         gnutls_pkcs11_crt_export_url;
         gnutls_pkcs11_crt_deinit;
         gnutls_pkcs11_crt_list_deinit;
-        gnutls_pkcs11_crt_list_import;
+        gnutls_pkcs11_crt_list_import_url;
         gnutls_x509_crt_import_pkcs11;
         gnutls_pkcs11_crt_get_type;
         gnutls_x509_crt_list_import_pkcs11;
+	gnutls_x509_crt_import_pkcs11_url;
+	gnutls_pkcs11_crt_get_info;
+	gnutls_pkcs11_token_get_info;
+	gnutls_pkcs11_token_get_url;
 } GNUTLS_2_10;
 
 GNUTLS_PRIVATE {
