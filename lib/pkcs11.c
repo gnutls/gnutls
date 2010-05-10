@@ -60,7 +60,6 @@ struct crt_find_data_st {
     struct pkcs11_url_info info;
 };
 
-
 static struct gnutls_pkcs11_provider_s providers[MAX_PROVIDERS];
 static int active_providers = 0;
 
@@ -486,6 +485,9 @@ size_t l;
             gnutls_assert();
             goto cleanup;
         }
+
+        memcpy(info->id, p1, l);
+        info->id[l] = 0;
     }
     
     ret = 0;
@@ -570,6 +572,7 @@ int pkcs11_info_to_url(const struct pkcs11_url_info* info, char** url)
         }
         init = 1;
     }
+
 
     if (info->manufacturer[0]) {
         ret = append(&str, info->manufacturer, "manufacturer", init);
@@ -1453,6 +1456,185 @@ static int find_privkeys(pakchois_session_t *pks, struct token_info* info, struc
     char certid_tmp[PKCS11_ID_SIZE];
 
     class = CKO_PRIVATE_KEY;
+
+    /* Find an object with private key class and a certificate ID
+     * which matches the certificate. */
+    /* FIXME: also match the cert subject. */
+    a[0].type = CKA_CLASS;
+    a[0].value = &class;
+    a[0].value_len = sizeof class;
+
+    rv = pakchois_find_objects_init(pks, a, 1);
+    if (rv != CKR_OK) {
+        gnutls_assert();
+        return GNUTLS_E_PKCS11_ERROR;
+    }
+
+    list->key_ids_size = 0;
+    while (pakchois_find_objects(pks, &obj, 1, &count) == CKR_OK
+           && count == 1) {
+        list->key_ids_size++;
+    }
+
+    pakchois_find_objects_final(pks);
+
+    if (list->key_ids_size == 0) {
+        gnutls_assert();
+        return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+
+    list->key_ids = gnutls_malloc(sizeof(gnutls_string)*list->key_ids_size);
+    if (list->key_ids == NULL) {
+        gnutls_assert();
+        return GNUTLS_E_MEMORY_ERROR;
+    }
+
+    /* actual search */
+    a[0].type = CKA_CLASS;
+    a[0].value = &class;
+    a[0].value_len = sizeof class;
+
+    rv = pakchois_find_objects_init(pks, a, 1);
+    if (rv != CKR_OK) {
+        gnutls_assert();
+        return GNUTLS_E_PKCS11_ERROR;
+    }
+
+    current = 0;
+    while (pakchois_find_objects(pks, &obj, 1, &count) == CKR_OK
+           && count == 1) {
+
+        a[0].type = CKA_ID;
+        a[0].value = certid_tmp;
+        a[0].value_len = sizeof(certid_tmp);
+
+        _gnutls_string_init(&list->key_ids[current], gnutls_malloc, gnutls_realloc, gnutls_free);
+
+        if (pakchois_get_attribute_value(pks, obj, a, 1) == CKR_OK) {
+            _gnutls_string_append_data(&list->key_ids[current], a[0].value, a[0].value_len);
+            current++;
+        }
+
+        if (current > list->key_ids_size)
+            break;
+    }
+
+    pakchois_find_objects_final(pks);
+
+    list->key_ids_size = current-1;
+
+    return 0;
+}
+
+struct pkey_list {
+    gnutls_string *key_ids;
+    size_t key_ids_size;
+};
+
+static int pk11_login(pakchois_session_t *pks, struct token_info *info)
+{
+    struct ck_token_info tinfo;
+    int attempt = 0;
+    ck_rv_t rv;
+
+    if (pakchois_get_token_info(info->prov->module, info->sid, &info->tinfo) != CKR_OK) {
+        gnutls_assert();
+        _gnutls_debug_log( "pk11: GetTokenInfo failed\n");
+        return GNUTLS_E_PKCS11_ERROR;
+    }
+
+    /* force login on HW tokens. Some tokens will not list private keys
+     * if login has not been performed.
+     */
+    if (!(info->sinfo.flags & CKF_HW_SLOT) && (tinfo.flags & CKF_LOGIN_REQUIRED) == 0) {
+        gnutls_assert();
+        _gnutls_debug_log( "pk11: No login required.\n");
+        return 0;
+    }
+
+    /* For a token with a "protected" (out-of-band) authentication
+     * path, calling login with a NULL username is all that is
+     * required. */
+    if (tinfo.flags & CKF_PROTECTED_AUTHENTICATION_PATH) {
+        if (pakchois_login(pks, CKU_USER, NULL, 0) == CKR_OK) {
+            return 0;
+        }
+        else {
+            gnutls_assert();
+            _gnutls_debug_log( "pk11: Protected login failed.\n");
+            return GNUTLS_E_PKCS11_ERROR;
+        }
+    }
+
+    /* Otherwise, PIN entry is necessary for login, so fail if there's
+     * no callback. */
+    if (!pin_func) {
+        gnutls_assert();
+        _gnutls_debug_log("pk11: No pin callback but login required.\n");
+        return GNUTLS_E_PKCS11_ERROR;
+    }
+
+    terminate_string(info->sinfo.slot_description, sizeof info->sinfo.slot_description);
+
+    do {
+        char pin[GNUTLS_PKCS11_MAX_PIN_LEN];
+        unsigned int flags = 0;
+
+        /* If login has been attempted once already, check the token
+         * status again, the flags might change. */
+        if (attempt) {
+            if (pakchois_get_token_info(info->prov->module, info->sid,
+                                        &info->tinfo) != CKR_OK) {
+                gnutls_assert();
+                _gnutls_debug_log( "pk11: GetTokenInfo failed\n");
+                return GNUTLS_E_PKCS11_ERROR;
+            }
+        }
+
+        if (info->tinfo.flags & CKF_USER_PIN_COUNT_LOW)
+            flags |= GNUTLS_PKCS11_PIN_COUNT_LOW;
+        if (info->tinfo.flags & CKF_USER_PIN_FINAL_TRY)
+            flags |= GNUTLS_PKCS11_PIN_FINAL_TRY;
+
+        terminate_string(info->tinfo.label, sizeof info->tinfo.label);
+
+        if (pin_func(pin_data, attempt++,
+                         (char *)info->sinfo.slot_description,
+                         (char *)info->tinfo.label, flags, pin, sizeof(pin))) {
+            gnutls_assert();
+            return GNUTLS_E_PKCS11_PIN_ERROR;
+        }
+
+        rv = pakchois_login(pks, CKU_USER, (unsigned char *)pin, strlen(pin));
+
+        /* Try to scrub the pin off the stack.  Clever compilers will
+         * probably optimize this away, oh well. */
+        memset(pin, 0, sizeof pin);
+    } while (rv == CKR_PIN_INCORRECT);
+
+    _gnutls_debug_log("pk11: Login result = %lu\n", rv);
+
+    return (rv == CKR_OK || rv == CKR_USER_ALREADY_LOGGED_IN) ? 0 : GNUTLS_E_PKCS11_ERROR;
+}
+
+
+static int find_privkeys(pakchois_session_t *pks, struct token_info* info, struct pkey_list *list)
+{
+    struct ck_attribute a[3];
+    ck_object_class_t class;
+    ck_rv_t rv;
+    ck_object_handle_t obj;
+    unsigned long count, current;
+    char certid_tmp[ID_SIZE];
+    int ret;
+
+    class = CKO_PRIVATE_KEY;
+
+    ret = pk11_login(pks, info);
+    if (ret < 0) {
+        gnutls_assert();
+        return ret;
+    }
 
     /* Find an object with private key class and a certificate ID
      * which matches the certificate. */

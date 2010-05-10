@@ -342,3 +342,49 @@ size_t size;
 	return;
 
 }
+
+void pkcs11_export(FILE* outfile, const char* url)
+{
+gnutls_pkcs11_crt_t crt;
+gnutls_x509_crt_t xcrt;
+int ret;
+
+	pkcs11_common();
+
+	if (url == NULL)
+		url = "pkcs11:";
+
+	ret = gnutls_pkcs11_crt_init(&crt);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_pkcs11_crt_import_url( crt, url);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_x509_crt_init(&xcrt);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+
+	ret = gnutls_x509_crt_import_pkcs11(xcrt, crt);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+
+	print_certificate_info(xcrt, outfile, 1);
+
+	gnutls_x509_crt_deinit(xcrt);
+	gnutls_pkcs11_crt_deinit(crt);
+
+	return;
+
+
+
+}
