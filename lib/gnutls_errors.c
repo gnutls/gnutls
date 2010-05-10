@@ -274,6 +274,17 @@ static const gnutls_error_entry error_algorithms[] = {
   ERROR_ENTRY (N_("Error interfacing with /dev/crypto"),
 	       GNUTLS_E_CRYPTODEV_IOCTL_ERROR, 1),
 
+  ERROR_ENTRY (N_("PKCS #11 error."),
+	       GNUTLS_E_PKCS11_ERROR, 1),
+  ERROR_ENTRY (N_("PKCS #11 initialization error."),
+	       GNUTLS_E_PKCS11_LOAD_ERROR, 1),
+  ERROR_ENTRY (N_("Error in parsing."),
+	       GNUTLS_E_PARSING_ERROR, 1),
+  ERROR_ENTRY (N_("PKCS #11 error in PIN."),
+	       GNUTLS_E_PKCS11_PIN_ERROR, 1),
+  ERROR_ENTRY (N_("PKCS #11 error"),
+	       GNUTLS_E_PKCS11_ERROR, 1),
+
   {NULL, NULL, 0, 0}
 };
 

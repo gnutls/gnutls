@@ -18,13 +18,6 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
-/**
- * @brief PKCS#11 error
- */
-#define GNUTLS_E_PKCS11_ERROR (GNUTLS_E_APPLICATION_ERROR_MIN+529)
-#define GNUTLS_E_PKCS11_LOAD_ERROR 1821
-#define GNUTLS_E_PARSING_ERROR 1822
-#define GNUTLS_E_PKCS11_PIN_ERROR 1823
 
 #define GNUTLS_PKCS11_MAX_PIN_LEN 32
 
@@ -121,7 +114,7 @@ void gnutls_pkcs11_deinit (void);
  * @param data		Data to use when calling callback.
  * @return gnutls status.
  */
-void gnutls_pkcs11_set_pin_function (const gnutls_pkcs11_pin_callback_t callback, void * const data);
+void gnutls_pkcs11_set_pin_function (gnutls_pkcs11_pin_callback_t callback, void * const data);
 
 /**
  * @brief Add PKCS#11 provider.

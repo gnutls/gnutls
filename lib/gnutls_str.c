@@ -442,34 +442,34 @@ _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
   opaque hex2_data[3];
   unsigned long val;
 
-  /* FIXME: we don't handle whitespace.
-   */
-  hex_size /= 2;
+  hex2_data[2] = 0;
 
-  if (*bin_size < (size_t) hex_size)
+  for (i = j = 0; i < hex_size;)
     {
-      gnutls_assert ();
-      return GNUTLS_E_SHORT_MEMORY_BUFFER;
-    }
+        if (!isxdigit(hex_data[i])) /* skip non-hex such as the ':' in 00:FF */
+          {
+            i++;
+            continue;
+          }
 
-  for (i = j = 0; j < hex_size; j++)
-    {
-    
-      if (!isxdigit(hex_data[i])) /* skip non-hex such as the ':' in 00:FF */
-        continue;
+        if (j > *bin_size) {
+            gnutls_assert();
+            return GNUTLS_E_SHORT_MEMORY_BUFFER;
+        }
 
-      hex2_data[0] = hex_data[i];
-      hex2_data[1] = hex_data[i + 1];
-      hex2_data[2] = 0;
-      i+=2;
-      val = strtoul ((char *) hex2_data, NULL, 16);
-      if (val == ULONG_MAX)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_SRP_PWD_PARSING_ERROR;
-	}
-      bin_data[j] = val;
+        hex2_data[0] = hex_data[i];
+        hex2_data[1] = hex_data[i + 1];
+        i+=2;
+
+        val = strtoul ((char *) hex2_data, NULL, 16);
+        if (val == ULONG_MAX) {
+            gnutls_assert ();
+            return GNUTLS_E_PARSING_ERROR;
+        }
+        bin_data[j] = val;
+        j++;
     }
+  *bin_size = j;
 
   return 0;
 }

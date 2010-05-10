@@ -71,8 +71,6 @@ void certificate_info (void);
 void pgp_certificate_info (void);
 void crl_info (void);
 void privkey_info (void);
-static void print_certificate_info (gnutls_x509_crt_t crt, FILE * out,
-				    unsigned int);
 static void gaa_parser (int argc, char **argv);
 void generate_self_signed (void);
 void generate_request (void);
@@ -1028,7 +1026,10 @@ gaa_parser (int argc, char **argv)
       generate_pkcs8 ();
       break;
     case ACTION_PKCS11_LIST:
-      pkcs11_list(info.pkcs11_url);
+      pkcs11_list(info.pkcs11_url, info.pkcs11_type);
+      break;
+    case ACTION_PKCS11_EXPORT_URL:
+      pkcs11_export(outfile, info.pkcs11_url);
       break;
 #ifdef ENABLE_OPENPGP
     case ACTION_PGP_INFO:
@@ -1370,7 +1371,7 @@ print_hex_datum (gnutls_datum_t * dat)
 }
 
 
-static void
+void
 print_certificate_info (gnutls_x509_crt_t crt, FILE * out, unsigned int all)
 {
   gnutls_datum_t cinfo;

@@ -1,3 +1,6 @@
+#include <gnutls/x509.h>
+#include <stdio.h>
+
 enum
 {
   ACTION_SELF_SIGNED,
@@ -24,11 +27,18 @@ enum
   ACTION_RING_INFO,
   ACTION_REQUEST,
   ACTION_PKCS11_LIST,
+  ACTION_PKCS11_EXPORT_URL,
 };
 
 #define TYPE_CRT 1
 #define TYPE_CRQ 2
 
 void certtool_version (void);
-void pkcs11_list( const char* url);
+void pkcs11_list( const char* url, int type);
+void pkcs11_export(FILE* outfile, const char *pkcs11_url);
+void print_certificate_info (gnutls_x509_crt_t crt, FILE * out,
+				    unsigned int);
 
+#define PKCS11_TYPE_ALL 1
+#define PKCS11_TYPE_TRUSTED 2
+#define PKCS11_TYPE_PK 3

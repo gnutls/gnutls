@@ -89,13 +89,6 @@ option (to-p12) { $action = ACTION_TO_PKCS12; } "Generate a PKCS #12 structure."
 
 option (to-p8) { $action = ACTION_GENERATE_PKCS8; } "Generate a PKCS #8 key structure."
 
-#char* pkcs11_provider;
-option (pkcs11-provider) STR "Library" { $pkcs11_provider = $1 } "Specify the pkcs11 provider library"
-
-#char* pkcs11_url;
-option (pkcs11-url) STR "URL" { $pkcs11_url = $1 } "Specify a pkcs11 URL"
-
-option (pkcs11-list) { $action = ACTION_PKCS11_LIST } "List objects specified by a PKCS#11 URL"
 
 #int pkcs8;
 option (8, pkcs8) { $pkcs8=1 } "Use PKCS #8 format for private keys."
@@ -135,6 +128,16 @@ option (template) STR "FILE" { $template = $1 } "Template file to use for non in
 #char *pkcs_cipher;
 option (pkcs-cipher) STR "CIPHER" { $pkcs_cipher = $1 } "Cipher to use for pkcs operations (3des,aes-128,aes-192,aes-256,rc2-40)."
 
+#char* pkcs11_provider;
+option (pkcs11-provider) STR "Library" { $pkcs11_provider = $1 } "Specify the pkcs11 provider library"
+
+#char* pkcs11_url;
+option (pkcs11-export-url) STR "URL" { $action = ACTION_PKCS11_EXPORT_URL; $pkcs11_url = $1; } "Export data specified a pkcs11 URL"
+
+#int pkcs11_type;
+option (pkcs11-list) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS11_TYPE_PK; } "List objects specified by a PKCS#11 URL"
+option (pkcs11-list-trusted) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS11_TYPE_TRUSTED; } "List objects marked as trusted, specified by a PKCS#11 URL"
+option (pkcs11-list-all) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS11_TYPE_ALL; } "List all objects specified by a PKCS#11 URL"
 
 #int debug;
 option (d, debug) INT "LEVEL" { $debug = $1 } "specify the debug level. Default is 1."
@@ -148,4 +151,4 @@ init { $bits = 2048; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL;
 	$incert_format = 0; $outcert_format = 0; $action=-1; $pass = NULL; $v1_cert = 0;
 	$export = 0; $template = NULL; $hash=NULL; $fix_key = 0; $quick_random=1; 
 	$privkey_op = 0; $pkcs_cipher = "3des"; $crq_extensions=1; $pkcs11_provider= NULL;
-	$pkcs11_url = NULL; }
+	$pkcs11_url = NULL; $pkcs11_type = PKCS11_TYPE_PK; }
