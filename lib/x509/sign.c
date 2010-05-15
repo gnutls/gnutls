@@ -168,7 +168,6 @@ pk_dsa_hash (const gnutls_datum_t * text, gnutls_datum_t * hash)
   int ret;
   digest_hd_st hd;
   gnutls_datum_t digest;
-  opaque _digest[MAX_HASH_SIZE];
   gnutls_digest_algorithm_t hash = _gnutls_dsa_q_to_hash(params[1]);
 
   hash->size = _gnutls_hash_get_algo_len(hash);
@@ -180,7 +179,6 @@ pk_dsa_hash (const gnutls_datum_t * text, gnutls_datum_t * hash)
     }
 
   ret = _gnutls_hash_init (&hd, hash);
-
   if (ret < 0)
     {
       gnutls_assert ();

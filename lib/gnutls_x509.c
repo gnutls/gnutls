@@ -46,7 +46,6 @@
 #include "x509/x509_int.h"
 #include "read-file.h"
 
-
 /*
  * some x509 certificate parsing functions.
  */

@@ -69,6 +69,7 @@ typedef int (*gnutls_pkcs11_pin_callback_t)(void *userdata, int attempt,
 struct gnutls_pkcs11_obj_st;
 typedef struct gnutls_pkcs11_obj_st* gnutls_pkcs11_obj_t;
 
+
 #define GNUTLS_PKCS11_FLAG_MANUAL 0 /* Manual loading of libraries */
 #define GNUTLS_PKCS11_FLAG_AUTO 1 /* Automatically load libraries by reading /etc/gnutls/pkcs11.conf */
 
