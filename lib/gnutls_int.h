@@ -672,7 +672,7 @@ typedef struct
    */
   gnutls_cert *selected_cert_list;
   int selected_cert_list_length;
-  gnutls_privkey *selected_key;
+  struct gnutls_privkey_st *selected_key;
   int selected_need_free;
 
   /* holds the extensions we sent to the peer

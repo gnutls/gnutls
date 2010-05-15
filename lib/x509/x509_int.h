@@ -134,10 +134,6 @@ int _gnutls_x509_crl_get_raw_issuer_dn (gnutls_x509_crl_t crl,
 					gnutls_datum_t * dn);
 
 /* sign.c */
-int _gnutls_x509_sign (const gnutls_datum_t * tbs,
-		       gnutls_digest_algorithm_t hash,
-		       gnutls_x509_privkey_t signer,
-		       gnutls_datum_t * signature);
 int _gnutls_x509_sign_tbs (ASN1_TYPE cert, const char *tbs_name,
 			   gnutls_digest_algorithm_t hash,
 			   gnutls_x509_privkey_t signer,

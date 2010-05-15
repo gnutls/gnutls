@@ -158,7 +158,7 @@ _gnutls_session_cert_type_supported (gnutls_session_t session,
       if (cred == NULL)
 	return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 
-      if (cred->server_get_cert_callback == NULL)
+      if (cred->server_get_cert_callback == NULL && cred->get_cert_callback == NULL)
 	{
 	  for (i = 0; i < cred->ncerts; i++)
 	    {

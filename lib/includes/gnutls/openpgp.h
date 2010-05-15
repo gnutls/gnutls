@@ -165,6 +165,10 @@ extern "C"
 				     gnutls_openpgp_crt_fmt_t format,
 				     const char *password,
 				     unsigned int flags);
+
+  int gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
+            unsigned int flags, const gnutls_datum_t * ciphertext,
+				  gnutls_datum_t * plaintext);
   int gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
 					const gnutls_datum_t * hash,
 					gnutls_datum_t * signature);

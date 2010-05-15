@@ -34,6 +34,7 @@
 #include <x509_b64.h>
 #include <x509_int.h>
 #include <gnutls_pk.h>
+#include <sign.h>
 
 static int _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params);
 
@@ -90,7 +91,7 @@ gnutls_x509_privkey_deinit (gnutls_x509_privkey_t key)
  * @src: The source key
  *
  * This function will copy a private key from source to destination
- * key.
+ * key. Destination has to be initialized.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
@@ -1463,12 +1464,118 @@ cleanup:
   return result;
 }
 
-#ifdef ENABLE_PKI
 
+/**
+ * gnutls_x509_privkey_sign_data2:
+ * @signer: Holds the key
+ * @digest: should be MD5 or SHA1
+ * @flags: should be 0 for now
+ * @data: holds the data to be signed
+ * @signature: will contain the signature allocate with gnutls_malloc()
+ *
+ * This function will sign the given data using a signature algorithm
+ * supported by the private key. Signature algorithms are always used
+ * together with a hash functions.  Different hash functions may be
+ * used for the RSA algorithm, but only SHA-1 for the DSA keys.
+ *
+ * If the buffer provided is not long enough to hold the output, then
+ * *@signature_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will
+ * be returned.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_privkey_sign_data2 (gnutls_x509_privkey_t signer,
+			       gnutls_digest_algorithm_t hash,
+			       unsigned int flags,
+			       const gnutls_datum_t * data,
+			       gnutls_datum_t * signature)
+{
+  int ret;
+  gnutls_datum_t digest;
+  
+  switch (signer->pk_algorithm)
+    {
+    case GNUTLS_PK_RSA:
+      ret =
+	pk_pkcs1_rsa_hash (hash, data, &digest);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
+      break;
+    case GNUTLS_PK_DSA:
+      ret = pk_dsa_hash (data,  &digest);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
+
+      break;
+    default:
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
+    }
+    
+  ret = gnutls_x509_privkey_sign_hash(signer, &digest, signature);
+  _gnutls_free_datum (&digest);
+		     
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  return 0;
+
+}
+
+/**
+ * gnutls_x509_privkey_sign_hash:
+ * @key: Holds the key
+ * @hash: holds the data to be signed
+ * @signature: will contain newly allocated signature
+ *
+ * This function will sign the given hash using the private key. Do not
+ * use this function directly unless you know what it is. Typical signing
+ * requires the data to be hashed and stored in special formats 
+ * (e.g. BER Digest-Info for RSA).
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
+			       const gnutls_datum_t * hash,
+			       gnutls_datum_t * signature)
+{
+  int result;
+
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  result = _gnutls_soft_sign (key->pk_algorithm, key->params,
+			 key->params_size, hash, signature);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  return 0;
+}
+
+#ifdef ENABLE_PKI
 /**
  * gnutls_x509_privkey_sign_data:
  * @key: Holds the key
- * @digest: should be MD5 or SHAx. May be ignored.
+ * @digest: should be MD5 or SHA1
  * @flags: should be 0 for now
  * @data: holds the data to be signed
  * @signature: will contain the signature
@@ -1503,7 +1610,7 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  result = _gnutls_x509_sign (data, digest, key, &sig);
+  result = gnutls_x509_privkey_sign_data2(key, digest, flags, data, &sig);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1525,43 +1632,6 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
   return 0;
 }
 
-/**
- * gnutls_x509_privkey_sign_hash:
- * @key: Holds the key
- * @hash: holds the data to be signed
- * @signature: will contain newly allocated signature
- *
- * This function will sign the given hash using the private key. Do not
- * use this function directly unless you know what it is. Typical signing
- * requires the data to be hashed and stored in special formats 
- * (e.g. BER Digest-Info for RSA).
- *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value.
- **/
-int
-gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
-			       const gnutls_datum_t * hash,
-			       gnutls_datum_t * signature)
-{
-  int result;
-
-  if (key == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  result = _gnutls_sign (key->pk_algorithm, key->params,
-			 key->params_size, hash, signature);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      return result;
-    }
-
-  return 0;
-}
 
 /**
  * gnutls_x509_privkey_verify_data:

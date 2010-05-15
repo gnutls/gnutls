@@ -7,6 +7,7 @@
 
 #include <auth_cert.h>
 #include <opencdk.h>
+#include <gnutls/privkey.h>
 
 /* OpenCDK compatible */
 typedef enum
@@ -29,7 +30,7 @@ int _gnutls_openpgp_raw_crt_to_gcert (gnutls_cert * cert,
 				      const gnutls_openpgp_keyid_t);
 
 int
-_gnutls_openpgp_raw_privkey_to_gkey (gnutls_privkey * pkey,
+_gnutls_openpgp_raw_privkey_to_gkey (gnutls_privkey_t * pkey,
 				     const gnutls_datum_t * raw_key);
 
 int

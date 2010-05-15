@@ -82,10 +82,10 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	auth_dh_common.c gnutls_helper.c gnutls_supplemental.c		\
 	crypto.c random.c pk-libgcrypt.c mpi-libgcrypt.c cryptodev.c	\
 	rnd-libgcrypt.c cipher-libgcrypt.c mac-libgcrypt.c ext_signature.c \
-	crypto-api.c ext_safe_renegotiation.c gnutls_mbuffers.c
+	crypto-api.c ext_safe_renegotiation.c gnutls_mbuffers.c gnutls_privkey.c
 
 if ENABLE_PKCS11
-COBJECTS += pkcs11.c
+COBJECTS += pkcs11.c pkcs11_privkey.c
 endif
 
 if ENABLE_OPRFI

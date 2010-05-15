@@ -68,9 +68,8 @@ typedef int (*gnutls_pkcs11_pin_callback_t)(void *userdata, int attempt,
  * @brief PKCS#11 certificate reference.
  */
 struct gnutls_pkcs11_crt_st;
-
-
 typedef struct gnutls_pkcs11_crt_st* gnutls_pkcs11_crt_t;
+
 
 
 #define GNUTLS_PKCS11_FLAG_MANUAL 0 /* Manual loading of libraries */
@@ -106,7 +105,7 @@ void gnutls_pkcs11_deinit (void);
  * @param data		Data to use when calling callback.
  * @return gnutls status.
  */
-//int gnutls_pkcs11_set_token_function (const gnutls_pkcs11_token_callback_t callback, void * const data);
+void gnutls_pkcs11_set_token_function(gnutls_pkcs11_token_callback_t fn, void *userdata);
 
 /**
  * @brief Set PIN prompt callback.
@@ -173,6 +172,7 @@ typedef enum {
 	GNUTLS_PKCS11_CRT_TOKEN_SERIAL,
 	GNUTLS_PKCS11_CRT_TOKEN_MANUFACTURER,
 	GNUTLS_PKCS11_CRT_TOKEN_MODEL,
+	GNUTLS_PKCS11_CRT_ID,
 } gnutls_pkcs11_cert_info_t;
 
 int gnutls_pkcs11_crt_get_info(gnutls_pkcs11_crt_t crt, gnutls_pkcs11_cert_info_t itype, void* output, size_t* output_size);
@@ -220,24 +220,27 @@ int gnutls_x509_crt_list_import_pkcs11 (gnutls_x509_crt_t * certs,
                                    unsigned int flags);
 
 
-/* XXX: private key functions...*/
+/* private key functions...*/
+int gnutls_pkcs11_privkey_init (gnutls_pkcs11_privkey_t * key);
+void gnutls_pkcs11_privkey_deinit (gnutls_pkcs11_privkey_t key);
+int gnutls_pkcs11_privkey_get_pk_algorithm (gnutls_pkcs11_privkey_t key, unsigned int* bits);
+int gnutls_pkcs11_privkey_get_info(gnutls_pkcs11_privkey_t crt, gnutls_pkcs11_cert_info_t itype, void* output, size_t* output_size);
+int gnutls_pkcs11_privkey_import_url (gnutls_pkcs11_privkey_t key,
+				  const char* url);
 
-/**
- * @brief Setup session to be used with gnutls-pkcs11.
- * @param session	Session to setup.
- * @param certificate	Certificate to use in this session.
- * @return gnutls status.
- * @see gnutls_pkcs11_cleanup_session()
- * @note Resources must be released using @ref gnutls_pkcs11_cleanup_session().
- */
-//int gnutls_pkcs11_setup_session (gnutls_session session, gnutls_pkcs11_crt_t certificate);
-
-/**
- * @brief Cleanup session.
- * @param session	Session to cleanup.
- * @return gnutls status.
- */
-//int gnutls_pkcs11_cleanup_session (gnutls_session session);
+int
+gnutls_pkcs11_privkey_sign_data(gnutls_pkcs11_privkey_t signer,
+				gnutls_digest_algorithm_t hash,
+				unsigned int flags,
+				const gnutls_datum_t * data,
+				gnutls_datum_t * signature);
+int gnutls_pkcs11_privkey_sign_hash (gnutls_pkcs11_privkey_t key,
+				 const gnutls_datum_t * hash,
+				 gnutls_datum_t * signature);
+int
+gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
+				unsigned int flags, const gnutls_datum_t * ciphertext,
+				gnutls_datum_t * plaintext);
 
 /** @} */
 

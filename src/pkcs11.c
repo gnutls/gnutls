@@ -15,6 +15,7 @@ static int pin_callback(void* user, int attempt, const char *slot_descr,
 	const char *token_label, unsigned int flags, char* pin, size_t pin_max)
 {
 const char* password;
+int len;
 
 	printf("PIN required for token '%s' in slot '%s'\n", token_label, slot_descr);
 	if (flags & GNUTLS_PKCS11_PIN_FINAL_TRY)
@@ -27,8 +28,11 @@ const char* password;
 		fprintf(stderr, "No password given\n");
 		exit(1);
 	}
-	memcpy(pin, password, MIN(pin_max,strlen(password)));
 
+	len = MIN(pin_max,strlen(password));
+	memcpy(pin, password, len);
+	pin[len] = 0;
+	
 	return 0;
 }
 

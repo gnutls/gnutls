@@ -45,8 +45,6 @@ int _gnutls_openpgp_export (cdk_kbnode_t node,
 
 int _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert,
 				  gnutls_openpgp_crt_t cert);
-int _gnutls_openpgp_privkey_to_gkey (gnutls_privkey * dest,
-				     gnutls_openpgp_privkey_t src);
 
 cdk_packet_t _gnutls_get_valid_subkey (cdk_kbnode_t knode, int key_type);
 

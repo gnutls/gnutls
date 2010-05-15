@@ -82,28 +82,6 @@ typedef struct gnutls_cert
 #endif
 } gnutls_cert;
 
-typedef struct gnutls_privkey_int
-{
-  /* the size of params depends on the public
-   * key algorithm
-   * RSA: [0] is modulus
-   *      [1] is public exponent
-   *      [2] is private exponent
-   *      [3] is prime1 (p)
-   *      [4] is prime2 (q)
-   *      [5] is coefficient (u == inverse of p mod q)
-   * DSA: [0] is p
-   *      [1] is q
-   *      [2] is g
-   *      [3] is y (public key)
-   *      [4] is x (private key)
-   */
-  bigint_t params[MAX_PRIV_PARAMS_SIZE];
-  int params_size;		/* holds the number of params */
-
-  gnutls_pk_algorithm_t pk_algorithm;
-} gnutls_privkey;
-
 /* because gnutls_session_t is not defined when this file is included */
 struct gnutls_session_int;
 
@@ -120,7 +98,6 @@ int _gnutls_x509_raw_cert_to_gcert (gnutls_cert * gcert,
 int _gnutls_x509_crt_to_gcert (gnutls_cert * gcert, gnutls_x509_crt_t cert,
 			       unsigned int flags);
 
-void _gnutls_gkey_deinit (gnutls_privkey * key);
 void _gnutls_gcert_deinit (gnutls_cert * cert);
 
 int _gnutls_selected_cert_supported_kx (struct gnutls_session_int *session,

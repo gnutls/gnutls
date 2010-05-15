@@ -1,7 +1,7 @@
 /* Typedefs for more compatibility with older GnuTLS. */
 
-#ifndef GNUTLS_COMPAT_H
-# define GNUTLS_COMPAT_H
+#ifndef _GNUTLS_COMPAT_H
+# define _GNUTLS_COMPAT_H
 
 #define gnutls_cipher_algorithm gnutls_cipher_algorithm_t
 #define gnutls_kx_algorithm gnutls_kx_algorithm_t
@@ -98,4 +98,44 @@
 #define LIBGNUTLS_VERSION_NUMBER GNUTLS_VERSION_NUMBER
 #define LIBGNUTLS_EXTRA_VERSION GNUTLS_VERSION
 
-#endif /* GNUTLS_COMPAT_H */
+  typedef struct gnutls_retr_st
+  {
+    gnutls_certificate_type_t type;
+    union
+    {
+      gnutls_x509_crt_t *x509;
+      gnutls_openpgp_crt_t pgp;
+    } cert;
+    unsigned int ncerts;	/* one for pgp keys */
+
+    union
+    {
+      gnutls_x509_privkey_t x509;
+      gnutls_openpgp_privkey_t pgp;
+    } key;
+
+    unsigned int deinit_all;	/* if non zero all keys will be deinited */
+  } gnutls_retr_st;
+
+typedef int gnutls_certificate_client_retrieve_function (gnutls_session_t,
+							   const
+							   gnutls_datum_t *
+							   req_ca_rdn,
+							   int nreqs,
+							   const
+							   gnutls_pk_algorithm_t
+							   * pk_algos,
+							   int
+							   pk_algos_length,
+							   gnutls_retr_st *);
+typedef int gnutls_certificate_server_retrieve_function (gnutls_session_t,
+							   gnutls_retr_st *);
+
+void gnutls_certificate_client_set_retrieve_function
+    (gnutls_certificate_credentials_t cred,
+     gnutls_certificate_client_retrieve_function * func);
+void gnutls_certificate_server_set_retrieve_function
+    (gnutls_certificate_credentials_t cred,
+     gnutls_certificate_server_retrieve_function * func);
+
+#endif /* _GNUTLS_COMPAT_H */

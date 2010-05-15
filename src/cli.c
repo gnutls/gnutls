@@ -37,6 +37,7 @@
 #include <gnutls/extra.h>
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
+#include <gnutls/pkcs11.h>
 #include <gcrypt.h>
 
 /* Gnulib portability files. */
@@ -144,6 +145,8 @@ static unsigned int x509_crt_size;
 static gnutls_x509_crt_t x509_crt[MAX_CRT];
 static gnutls_x509_privkey_t x509_key = NULL;
 
+static gnutls_pkcs11_privkey_t pkcs11_key = NULL;
+
 static gnutls_openpgp_crt_t pgp_crt = NULL;
 static gnutls_openpgp_privkey_t pgp_key = NULL;
 
@@ -179,58 +182,86 @@ load_keys (void)
 
   if (x509_certfile != NULL && x509_keyfile != NULL)
     {
-      data = load_file (x509_certfile);
-      if (data.data == NULL)
+      if (strncmp (x509_certfile, "pkcs11:", 7) == 0)
 	{
-	  fprintf (stderr, "*** Error loading cert file.\n");
-	  exit (1);
-	}
+	  crt_num = 1;
+	  gnutls_x509_crt_init (&x509_crt[0]);
 
-      crt_num = MAX_CRT;
-      ret =
-	gnutls_x509_crt_list_import (x509_crt, &crt_num, &data,
-				     GNUTLS_X509_FMT_PEM,
-				     GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
-      if (ret < 0)
+	  ret =
+	    gnutls_x509_crt_import_pkcs11_url (x509_crt[0], x509_certfile);
+	  if (ret < 0)
+	    {
+	      fprintf (stderr, "*** Error loading cert file.\n");
+	      exit (1);
+	    }
+	  x509_crt_size = 1;
+	}
+      else
 	{
-	  if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
-	    {
-	      fprintf (stderr,
-		       "*** Error loading cert file: Too many certs %d\n",
-		       crt_num);
 
-	    }
-	  else
+	  data = load_file (x509_certfile);
+	  if (data.data == NULL)
 	    {
-	      fprintf (stderr,
-		       "*** Error loading cert file: %s\n",
-		       gnutls_strerror (ret));
+	      fprintf (stderr, "*** Error loading cert file.\n");
+	      exit (1);
 	    }
-	  exit (1);
+
+	  crt_num = MAX_CRT;
+	  ret =
+	    gnutls_x509_crt_list_import (x509_crt, &crt_num, &data,
+					 GNUTLS_X509_FMT_PEM,
+					 GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+	  if (ret < 0)
+	    {
+	      if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
+		{
+		  fprintf (stderr,
+			   "*** Error loading cert file: Too many certs %d\n",
+			   crt_num);
+
+		}
+	      else
+		{
+		  fprintf (stderr,
+			   "*** Error loading cert file: %s\n",
+			   gnutls_strerror (ret));
+		}
+	      exit (1);
+	    }
+	  x509_crt_size = ret;
 	}
-      x509_crt_size = ret;
       fprintf (stderr, "Processed %d client certificates...\n", ret);
 
       unload_file (data);
 
-      data = load_file (x509_keyfile);
-      if (data.data == NULL)
+      if (strncmp (x509_keyfile, "pkcs11:", 7) == 0)
 	{
-	  fprintf (stderr, "*** Error loading key file.\n");
-	  exit (1);
+	  gnutls_pkcs11_privkey_init (&pkcs11_key);
+
+	  ret = gnutls_pkcs11_privkey_import_url (pkcs11_key, x509_keyfile);
 	}
-
-      gnutls_x509_privkey_init (&x509_key);
-
-      ret = gnutls_x509_privkey_import (x509_key, &data, GNUTLS_X509_FMT_PEM);
-      if (ret < 0)
+      else
 	{
-	  fprintf (stderr, "*** Error loading key file: %s\n",
-		   gnutls_strerror (ret));
-	  exit (1);
-	}
+	  data = load_file (x509_keyfile);
+	  if (data.data == NULL)
+	    {
+	      fprintf (stderr, "*** Error loading key file.\n");
+	      exit (1);
+	    }
 
-      unload_file (data);
+	  gnutls_x509_privkey_init (&x509_key);
+
+	  ret =
+	    gnutls_x509_privkey_import (x509_key, &data, GNUTLS_X509_FMT_PEM);
+	  if (ret < 0)
+	    {
+	      fprintf (stderr, "*** Error loading key file: %s\n",
+		       gnutls_strerror (ret));
+	      exit (1);
+	    }
+
+	  unload_file (data);
+	}
 
       fprintf (stderr, "Processed %d client X.509 certificates...\n",
 	       x509_crt_size);
@@ -259,27 +290,38 @@ load_keys (void)
 
       unload_file (data);
 
-      data = load_file (pgp_keyfile);
-      if (data.data == NULL)
+      if (strncmp (pgp_keyfile, "pkcs11:", 7) == 0)
 	{
-	  fprintf (stderr, "*** Error loading PGP key file.\n");
-	  exit (1);
+	  gnutls_pkcs11_privkey_init (&pkcs11_key);
+
+	  ret = gnutls_pkcs11_privkey_import_url (pkcs11_key, pgp_keyfile);
 	}
-
-      gnutls_openpgp_privkey_init (&pgp_key);
-
-      ret =
-	gnutls_openpgp_privkey_import (pgp_key, &data,
-				       GNUTLS_OPENPGP_FMT_BASE64, NULL, 0);
-      if (ret < 0)
+      else
 	{
-	  fprintf (stderr,
-		   "*** Error loading PGP key file: %s\n",
-		   gnutls_strerror (ret));
-	  exit (1);
-	}
 
-      unload_file (data);
+	  data = load_file (pgp_keyfile);
+	  if (data.data == NULL)
+	    {
+	      fprintf (stderr, "*** Error loading PGP key file.\n");
+	      exit (1);
+	    }
+
+	  gnutls_openpgp_privkey_init (&pgp_key);
+
+	  ret =
+	    gnutls_openpgp_privkey_import (pgp_key, &data,
+					   GNUTLS_OPENPGP_FMT_BASE64, NULL,
+					   0);
+	  if (ret < 0)
+	    {
+	      fprintf (stderr,
+		       "*** Error loading PGP key file: %s\n",
+		       gnutls_strerror (ret));
+	      exit (1);
+	    }
+
+	  unload_file (data);
+	}
 
       if (info.pgp_subkey != NULL)
 	{
@@ -347,7 +389,7 @@ static int
 cert_callback (gnutls_session_t session,
 	       const gnutls_datum_t * req_ca_rdn, int nreqs,
 	       const gnutls_pk_algorithm_t * sign_algos,
-	       int sign_algos_length, gnutls_retr_st * st)
+	       int sign_algos_length, gnutls_retr2_st * st)
 {
   char issuer_dn[256];
   int i, ret;
@@ -355,7 +397,6 @@ cert_callback (gnutls_session_t session,
 
   if (verbose)
     {
-
       /* Print the server's trusted CAs
        */
       if (nreqs > 0)
@@ -381,12 +422,11 @@ cert_callback (gnutls_session_t session,
    * supported by the server.
    */
 
-  st->type = gnutls_certificate_type_get (session);
-
+  st->cert_type = gnutls_certificate_type_get (session);
 
   st->ncerts = 0;
 
-  if (st->type == GNUTLS_CRT_X509)
+  if (st->cert_type == GNUTLS_CRT_X509)
     {
       gnutls_sign_algorithm_t cert_algo, req_algo;
       int i, match = 0;
@@ -430,26 +470,56 @@ cert_callback (gnutls_session_t session,
 	    }
 	}
 
-      if (x509_crt != NULL && x509_key != NULL)
+      if (x509_key != NULL)
+	{
+	  st->key.x509 = x509_key;
+	  st->key_type = GNUTLS_PRIVKEY_X509;
+	}
+      else if (pkcs11_key != NULL)
+	{
+	  st->key.pkcs11 = pkcs11_key;
+	  st->key_type = GNUTLS_PRIVKEY_PKCS11;
+	}
+      else
+	{
+	  printf ("- Could not find a suitable key to send to server\n");
+	  return -1;
+	}
+
+      if (x509_crt != NULL)
 	{
 	  st->ncerts = x509_crt_size;
 
 	  st->cert.x509 = x509_crt;
-	  st->key.x509 = x509_key;
 
 	  st->deinit_all = 0;
 
 	  return 0;
 	}
     }
-  else if (st->type == GNUTLS_CRT_OPENPGP)
+  else if (st->cert_type == GNUTLS_CRT_OPENPGP)
     {
-      if (pgp_key != NULL && pgp_crt != NULL)
+      if (pgp_key != NULL)
+	{
+	  st->key.pgp = pgp_key;
+	  st->key_type = GNUTLS_PRIVKEY_OPENPGP;
+	}
+      else if (pkcs11_key != NULL)
+	{
+	  st->key.pkcs11 = pkcs11_key;
+	  st->key_type = GNUTLS_PRIVKEY_PKCS11;
+	}
+      else
+	{
+	  printf ("- Could not find a suitable key to send to server\n");
+	  return -1;
+	}
+
+      if (pgp_crt != NULL)
 	{
 	  st->ncerts = 1;
 
 	  st->cert.pgp = pgp_crt;
-	  st->key.pgp = pgp_key;
 
 	  st->deinit_all = 0;
 
@@ -510,7 +580,7 @@ init_tls_session (const char *hostname)
     gnutls_credentials_set (session, GNUTLS_CRD_PSK, psk_cred);
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-  gnutls_certificate_client_set_retrieve_function (xcred, cert_callback);
+  gnutls_certificate_set_retrieve_function (xcred, cert_callback);
   gnutls_certificate_set_verify_function (xcred, cert_verify_callback);
 
   /* send the fingerprint */
@@ -656,6 +726,7 @@ main (int argc, char **argv)
       exit (1);
     }
 
+  pkcs11_common ();
   gaa_parser (argc, argv);
   if (hostname == NULL)
     {

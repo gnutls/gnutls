@@ -30,6 +30,8 @@
 # include "auth_dh_common.h"
 # include "x509/x509_int.h"
 # include "openpgp/openpgp_int.h"
+# include <gnutls/privkey.h>
+# include <gnutls/compat.h>
 
 /* This structure may be complex, but it's the only way to
  * support a server that has multiple certificates
@@ -57,7 +59,7 @@ typedef struct gnutls_certificate_credentials_st
 				 * This is the same with the number of pkeys.
 				 */
 
-  gnutls_privkey *pkey;
+  gnutls_privkey_t *pkey;
   /* private keys. It contains ncerts private
    * keys. pkey[i] corresponds to certificate in
    * cert_list[i][0].
@@ -91,9 +93,11 @@ typedef struct gnutls_certificate_credentials_st
    */
   gnutls_datum_t x509_rdn_sequence;
 
-  gnutls_certificate_client_retrieve_function *client_get_cert_callback;
-  gnutls_certificate_server_retrieve_function *server_get_cert_callback;
+  gnutls_certificate_client_retrieve_function *client_get_cert_callback; /* deprecated */
+  gnutls_certificate_server_retrieve_function *server_get_cert_callback; /* deprecated */
   gnutls_certificate_verify_function *verify_callback;
+
+  gnutls_certificate_retrieve_function *get_cert_callback;
 } certificate_credentials_st;
 
 typedef struct rsa_info_st
@@ -141,14 +145,14 @@ int _gnutls_proc_cert_server_certificate (gnutls_session_t, opaque *, size_t);
 int _gnutls_get_selected_cert (gnutls_session_t session,
 			       gnutls_cert ** apr_cert_list,
 			       int *apr_cert_list_length,
-			       gnutls_privkey ** apr_pkey);
+			       gnutls_privkey_t * apr_pkey);
 
 int _gnutls_server_select_cert (struct gnutls_session_int *,
 				gnutls_pk_algorithm_t);
 void _gnutls_selected_certs_deinit (gnutls_session_t session);
 void _gnutls_selected_certs_set (gnutls_session_t session,
 				 gnutls_cert * certs, int ncerts,
-				 gnutls_privkey * key, int need_free);
+				 gnutls_privkey_t key, int need_free);
 
 #define _gnutls_proc_cert_client_certificate _gnutls_proc_cert_server_certificate
 

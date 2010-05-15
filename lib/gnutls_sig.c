@@ -43,7 +43,7 @@
 
 static int
 _gnutls_tls_sign (gnutls_session_t session,
-		  gnutls_cert * cert, gnutls_privkey * pkey,
+		  gnutls_cert * cert, gnutls_privkey_t pkey,
 		  const gnutls_datum_t * hash_concat,
 		  gnutls_datum_t * signature);
 
@@ -127,7 +127,7 @@ _gnutls_rsa_encode_sig (gnutls_mac_algorithm_t algo,
  */
 int
 _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
-			     gnutls_privkey * pkey, gnutls_datum_t * params,
+			     gnutls_privkey_t pkey, gnutls_datum_t * params,
 			     gnutls_datum_t * signature,
 			     gnutls_sign_algorithm_t * sign_algo)
 {
@@ -232,7 +232,7 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
  * given data. The output will be allocated and be put in signature.
  */
 int
-_gnutls_sign (gnutls_pk_algorithm_t algo, bigint_t * params,
+_gnutls_soft_sign (gnutls_pk_algorithm_t algo, bigint_t * params,
 	      int params_size, const gnutls_datum_t * data,
 	      gnutls_datum_t * signature)
 {
@@ -273,7 +273,7 @@ _gnutls_sign (gnutls_pk_algorithm_t algo, bigint_t * params,
  */
 static int
 _gnutls_tls_sign (gnutls_session_t session,
-		  gnutls_cert * cert, gnutls_privkey * pkey,
+		  gnutls_cert * cert, gnutls_privkey_t pkey,
 		  const gnutls_datum_t * hash_concat,
 		  gnutls_datum_t * signature)
 {
@@ -291,7 +291,7 @@ _gnutls_tls_sign (gnutls_session_t session,
 	  }
 
       /* External signing. */
-      if (!pkey || pkey->params_size == 0)
+      if (!pkey)
 	{
 	  if (!session->internals.sign_func)
 	    return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
@@ -302,8 +302,7 @@ _gnutls_tls_sign (gnutls_session_t session,
 	}
     }
 
-  return _gnutls_sign (pkey->pk_algorithm, pkey->params,
-		       pkey->params_size, hash_concat, signature);
+  return gnutls_privkey_sign_hash(pkey, hash_concat, signature);
 }
 
 static int
@@ -623,7 +622,7 @@ _gnutls_handshake_verify_cert_vrfy (gnutls_session_t session,
  */
 static int
 _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
-				    gnutls_cert * cert, gnutls_privkey * pkey,
+				    gnutls_cert * cert, gnutls_privkey_t pkey,
 				    gnutls_datum_t * signature)
 {
   gnutls_datum_t dconcat;
@@ -705,7 +704,7 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
  */
 int
 _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
-				  gnutls_cert * cert, gnutls_privkey * pkey,
+				  gnutls_cert * cert, gnutls_privkey_t pkey,
 				  gnutls_datum_t * signature)
 {
   gnutls_datum_t dconcat;

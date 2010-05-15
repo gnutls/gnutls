@@ -44,7 +44,7 @@
 #include <gnutls_mpi.h>
 
 int _gnutls_gen_rsa_client_kx (gnutls_session_t, opaque **);
-int _gnutls_proc_rsa_client_kx (gnutls_session_t, opaque *, size_t);
+static int proc_rsa_client_kx (gnutls_session_t, opaque *, size_t);
 
 const mod_auth_st rsa_auth_struct = {
   "RSA",
@@ -58,7 +58,7 @@ const mod_auth_st rsa_auth_struct = {
   _gnutls_proc_cert_server_certificate,
   _gnutls_proc_cert_client_certificate,
   NULL,				/* proc server kx */
-  _gnutls_proc_rsa_client_kx,	/* proc client kx */
+  proc_rsa_client_kx,	/* proc client kx */
   _gnutls_proc_cert_client_cert_vrfy,	/* proc client cert vrfy */
   _gnutls_proc_cert_cert_req	/* proc server cert request */
 };
@@ -144,76 +144,13 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
   return 0;
 }
 
-/* This function reads the RSA parameters from the private key
- */
 static int
-_gnutls_get_private_rsa_params (gnutls_session_t session,
-				bigint_t ** params, int *params_size)
-{
-  int bits;
-  gnutls_certificate_credentials_t cred;
-  gnutls_rsa_params_t rsa_params;
-
-  cred = (gnutls_certificate_credentials_t)
-    _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
-  if (cred == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-    }
-
-  if (session->internals.selected_cert_list == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-    }
-
-  bits =
-    _gnutls_mpi_get_nbits (session->internals.
-			   selected_cert_list[0].params[0]);
-
-  if (_gnutls_cipher_suite_get_kx_algo
-      (&session->security_parameters.current_cipher_suite)
-      == GNUTLS_KX_RSA_EXPORT && bits > 512)
-    {
-
-      rsa_params =
-	_gnutls_certificate_get_rsa_params (cred->rsa_params,
-					    cred->params_func, session);
-      /* EXPORT case: */
-      if (rsa_params == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_NO_TEMPORARY_RSA_PARAMS;
-	}
-
-      /* In the export case, we do use temporary RSA params
-       * of 512 bits size. The params in the certificate are
-       * used to sign this temporary stuff.
-       */
-      *params_size = RSA_PRIVATE_PARAMS;
-      *params = rsa_params->params;
-
-      return 0;
-    }
-
-  /* non export cipher suites. */
-
-  *params_size = session->internals.selected_key->params_size;
-  *params = session->internals.selected_key->params;
-
-  return 0;
-}
-
-int
-_gnutls_proc_rsa_client_kx (gnutls_session_t session, opaque * data,
+proc_rsa_client_kx (gnutls_session_t session, opaque * data,
 			    size_t _data_size)
 {
   gnutls_datum_t plaintext;
   gnutls_datum_t ciphertext;
   int ret, dsize;
-  bigint_t *params;
-  int params_len;
   int randomize_key = 0;
   ssize_t data_size = _data_size;
 
@@ -240,14 +177,7 @@ _gnutls_proc_rsa_client_kx (gnutls_session_t session, opaque * data,
       ciphertext.size = dsize;
     }
 
-  ret = _gnutls_get_private_rsa_params (session, &params, &params_len);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  ret = _gnutls_pkcs1_rsa_decrypt (&plaintext, &ciphertext, params, params_len, 2);	/* btype==2 */
+  ret = gnutls_privkey_decrypt_data (session->internals.selected_key, 0, &ciphertext, &plaintext);
 
   if (ret < 0 || plaintext.size != GNUTLS_MASTER_SIZE)
     {

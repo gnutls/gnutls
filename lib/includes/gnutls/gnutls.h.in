@@ -48,7 +48,6 @@
 #endif
 /* Get time_t. */
 #include <time.h>
-#include <gnutls/compat.h>
 #ifdef __cplusplus
 extern "C"
 {
@@ -1428,40 +1427,36 @@ extern "C"
   struct gnutls_openpgp_privkey_int;
   typedef struct gnutls_openpgp_privkey_int *gnutls_openpgp_privkey_t;
 
-  typedef struct gnutls_retr_st
+  struct gnutls_pkcs11_privkey_st;
+  typedef struct gnutls_pkcs11_privkey_st* gnutls_pkcs11_privkey_t;
+
+  typedef enum {
+        GNUTLS_PRIVKEY_X509, /* gnutls_x509_privkey_t */
+	GNUTLS_PRIVKEY_OPENPGP, /* gnutls_openpgp_privkey_t */
+	GNUTLS_PRIVKEY_PKCS11, /* gnutls_pkcs11_privkey_t */
+  } gnutls_privkey_type_t;
+
+  typedef struct gnutls_retr2_st
   {
-    gnutls_certificate_type_t type;
-    union cert
+    gnutls_certificate_type_t cert_type;
+    gnutls_privkey_type_t key_type;
+    
+    union
     {
       gnutls_x509_crt_t *x509;
       gnutls_openpgp_crt_t pgp;
     } cert;
     unsigned int ncerts;	/* one for pgp keys */
 
-    union key
+    union
     {
       gnutls_x509_privkey_t x509;
       gnutls_openpgp_privkey_t pgp;
+      gnutls_pkcs11_privkey_t pkcs11;
     } key;
 
     unsigned int deinit_all;	/* if non zero all keys will be deinited */
-  } gnutls_retr_st;
-
-  typedef int gnutls_certificate_client_retrieve_function (gnutls_session_t,
-							   const
-							   gnutls_datum_t *
-							   req_ca_rdn,
-							   int nreqs,
-							   const
-							   gnutls_pk_algorithm_t
-							   * pk_algos,
-							   int
-							   pk_algos_length,
-							   gnutls_retr_st *);
-  typedef int gnutls_certificate_server_retrieve_function (gnutls_session_t,
-							   gnutls_retr_st *);
-
-  typedef int gnutls_certificate_verify_function (gnutls_session_t);
+  } gnutls_retr2_st;
 
 
   /* Functions that allow auth_info_t structures handling
@@ -1508,13 +1503,25 @@ extern "C"
 
   /* These are set on the credentials structure.
    */
-  void gnutls_certificate_client_set_retrieve_function
-    (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_client_retrieve_function * func);
-  void gnutls_certificate_server_set_retrieve_function
-    (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_server_retrieve_function * func);
 
+  typedef int gnutls_certificate_retrieve_function (gnutls_session_t,
+							   const
+							   gnutls_datum_t *
+							   req_ca_rdn,
+							   int nreqs,
+							   const
+							   gnutls_pk_algorithm_t
+							   * pk_algos,
+							   int
+							   pk_algos_length,
+							   gnutls_retr2_st *);
+
+
+  void gnutls_certificate_set_retrieve_function
+    (gnutls_certificate_credentials_t cred,
+     gnutls_certificate_retrieve_function * func);
+
+  typedef int gnutls_certificate_verify_function (gnutls_session_t);
   void
     gnutls_certificate_set_verify_function (gnutls_certificate_credentials_t
 					    cred,
@@ -1744,5 +1751,7 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+
+#include <gnutls/compat.h>
 
 #endif				/* GNUTLS_H */

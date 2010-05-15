@@ -684,6 +684,11 @@ extern "C"
 				     const gnutls_datum_t * data,
 				     void *signature,
 				     size_t * signature_size);
+  int gnutls_x509_privkey_sign_data2 (gnutls_x509_privkey_t key,
+				     gnutls_digest_algorithm_t digest,
+				     unsigned int flags,
+				     const gnutls_datum_t * data,
+				     gnutls_datum_t *signature);
   int gnutls_x509_privkey_verify_data (gnutls_x509_privkey_t key,
 				       unsigned int flags,
 				       const gnutls_datum_t * data,

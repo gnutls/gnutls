@@ -29,6 +29,7 @@
 #include <gnutls_dh.h>
 #include <random.h>
 #include <gcrypt.h>
+#include <gnutls/pkcs11.h>
 
 #include <gnutls_extensions.h>	/* for _gnutls_ext_init */
 #include <gnutls_cryptodev.h>
@@ -249,6 +250,8 @@ gnutls_global_init (void)
       goto out;
     }
 
+  gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
+  
   _gnutls_cryptodev_init ();
 
 out:
@@ -276,6 +279,7 @@ gnutls_global_deinit (void)
       asn1_delete_structure (&_gnutls_pkix1_asn);
       _gnutls_crypto_deregister ();
       _gnutls_cryptodev_deinit ();
+      gnutls_pkcs11_deinit();
     }
   _gnutls_init--;
 }

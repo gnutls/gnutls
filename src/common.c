@@ -36,8 +36,10 @@
 #include <gnutls/openpgp.h>
 #include <time.h>
 #include <common.h>
+#include <gnutls/pkcs11.h>
 
 #define SU(x) (x!=NULL?x:"Unknown")
+#define MIN(x,y) ((x)<(y))?(x):(y)
 
 int print_cert;
 extern int verbose;
@@ -857,4 +859,36 @@ service_to_port (const char *service)
     }
 
   return ntohs (server_port->s_port);
+}
+
+static int pin_callback(void* user, int attempt, const char *slot_descr,
+	const char *token_label, unsigned int flags, char* pin, size_t pin_max)
+{
+const char* password;
+int len;
+
+	printf("PIN required for token '%s' in slot '%s'\n", token_label, slot_descr);
+	if (flags & GNUTLS_PKCS11_PIN_FINAL_TRY)
+		printf("*** This is the final try before locking!\n");
+	if (flags & GNUTLS_PKCS11_PIN_COUNT_LOW)
+		printf("*** Only few tries left before locking!\n");
+	
+	password = getpass("Enter pin: ");
+	if (password==NULL || password[0] == 0) {
+		fprintf(stderr, "No password given\n");
+		exit(1);
+	}
+	
+	len = MIN(pin_max,strlen(password));
+	memcpy(pin, password, len);
+	pin[len] = 0;
+	
+	return 0;
+}
+
+void pkcs11_common(void)
+{
+
+	gnutls_pkcs11_set_pin_function (pin_callback, NULL);
+
 }

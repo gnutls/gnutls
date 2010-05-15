@@ -87,7 +87,7 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
   const bigint_t *mpis;
   int ret = 0, data_size;
   gnutls_cert *apr_cert_list;
-  gnutls_privkey *apr_pkey;
+  gnutls_privkey_t apr_pkey;
   int apr_cert_list_length;
   gnutls_datum_t signature, ddata;
   gnutls_certificate_credentials_t cred;

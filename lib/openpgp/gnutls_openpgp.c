@@ -142,16 +142,24 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
 
   res->pkey = gnutls_realloc_fast (res->pkey,
 				   (res->ncerts + 1) *
-				   sizeof (gnutls_privkey));
+				   sizeof (gnutls_privkey_t));
   if (res->pkey == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  ret = _gnutls_openpgp_privkey_to_gkey (&res->pkey[res->ncerts], pkey);
+  ret = gnutls_privkey_init(&res->pkey[res->ncerts]);
+  if (ret < 0) 
+    {
+      gnutls_assert();
+      return ret;
+    }
+
+  ret = gnutls_privkey_import_openpgp (res->pkey[res->ncerts], pkey, 0);
   if (ret < 0)
     {
+      gnutls_privkey_deinit(res->pkey[res->ncerts]);
       gnutls_assert ();
       return ret;
     }
@@ -163,6 +171,7 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
   if (res->cert_list == NULL)
     {
       gnutls_assert ();
+      /* memory leak here? */
       return GNUTLS_E_MEMORY_ERROR;
     }
 
@@ -720,73 +729,6 @@ gnutls_openpgp_set_recv_key_function (gnutls_session_t session,
 }
 
 
-/* Copies a gnutls_openpgp_privkey_t to a gnutls_privkey structure. */
-int
-_gnutls_openpgp_privkey_to_gkey (gnutls_privkey * dest,
-				 gnutls_openpgp_privkey_t src)
-{
-  int ret = 0;
-  gnutls_openpgp_keyid_t keyid;
-  char err_buf[33];
-
-  if (dest == NULL || src == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_CERTIFICATE_ERROR;
-    }
-
-  dest->params_size = MAX_PRIV_PARAMS_SIZE;
-
-  ret = gnutls_openpgp_privkey_get_preferred_key_id (src, keyid);
-
-  if (ret == 0)
-    {
-      int idx;
-      uint32_t kid32[2];
-
-      _gnutls_debug_log
-	("Importing Openpgp key and using openpgp sub key: %s\n",
-	 _gnutls_bin2hex (keyid, sizeof (keyid), err_buf, sizeof (err_buf), NULL));
-
-      KEYID_IMPORT (kid32, keyid);
-
-      idx = gnutls_openpgp_privkey_get_subkey_idx (src, keyid);
-      if (idx < 0)
-	{
-	  gnutls_assert ();
-	  return idx;
-	}
-
-      dest->pk_algorithm =
-	gnutls_openpgp_privkey_get_subkey_pk_algorithm (src, idx, NULL);
-
-      ret =
-	_gnutls_openpgp_privkey_get_mpis (src, kid32, dest->params,
-					  &dest->params_size);
-    }
-  else
-    {
-      _gnutls_debug_log
-	("Importing Openpgp key and using main openpgp key.\n");
-
-      dest->pk_algorithm =
-	gnutls_openpgp_privkey_get_pk_algorithm (src, NULL);
-      ret =
-	_gnutls_openpgp_privkey_get_mpis (src, NULL, dest->params,
-					  &dest->params_size);
-    }
-
-
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  return 0;
-
-}
-
 /* Converts a parsed gnutls_openpgp_crt_t to a gnutls_cert structure.
  */
 int
@@ -961,7 +903,81 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
 
   pk_algorithm = gnutls_openpgp_privkey_get_pk_algorithm (key, NULL);
 
-  result = _gnutls_sign (pk_algorithm, params, params_size, hash, signature);
+  result = _gnutls_soft_sign (pk_algorithm, params, params_size, hash, signature);
+
+  for (i = 0; i < params_size; i++)
+    _gnutls_mpi_release (&params[i]);
+
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  return 0;
+}
+
+/**
+ * gnutls_openpgp_privkey_decrypt_data:
+ * @key: Holds the key
+ * @flags: zero for now
+ * @ciphertext: holds the data to be decrypted
+ * @plaintext: will contain newly allocated plaintext
+ *
+ * This function will sign the given hash using the private key.  You
+ * should use gnutls_openpgp_privkey_set_preferred_key_id() before
+ * calling this function to set the subkey to use.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
+      unsigned int flags, const gnutls_datum_t * ciphertext,
+				  gnutls_datum_t * plaintext)
+{
+  int result, i;
+  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
+  int params_size = MAX_PUBLIC_PARAMS_SIZE;
+  int pk_algorithm;
+  gnutls_openpgp_keyid_t keyid;
+
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+  
+  result = gnutls_openpgp_privkey_get_preferred_key_id (key, keyid);
+  if (result == 0)
+    {
+      uint32_t kid[2];
+
+      KEYID_IMPORT (kid, keyid);
+      result = _gnutls_openpgp_privkey_get_mpis (key, kid,
+						 params, &params_size);
+    }
+  else
+    {
+      result = _gnutls_openpgp_privkey_get_mpis (key, NULL,
+						 params, &params_size);
+    }
+
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  pk_algorithm = gnutls_openpgp_privkey_get_pk_algorithm (key, NULL);
+
+  if (pk_algorithm != GNUTLS_PK_RSA)
+    {
+      gnutls_assert();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  result = _gnutls_pkcs1_rsa_decrypt (plaintext, ciphertext, params, params_size, 2);
 
   for (i = 0; i < params_size; i++)
     _gnutls_mpi_release (&params[i]);

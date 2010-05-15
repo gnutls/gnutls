@@ -24,6 +24,7 @@
  */
 
 #include <libtasn1.h>
+#include <gnutls/privkey.h>
 
 int _gnutls_x509_cert_verify_peers (gnutls_session_t session,
 				    unsigned int *status);
@@ -39,8 +40,6 @@ int _gnutls_x509_cert_verify_peers (gnutls_session_t session,
 int _gnutls_check_key_usage (const gnutls_cert * cert,
 			     gnutls_kx_algorithm_t alg);
 
-int _gnutls_x509_raw_privkey_to_gkey (gnutls_privkey * privkey,
+int _gnutls_x509_raw_privkey_to_gkey (gnutls_privkey_t * privkey,
 				      const gnutls_datum_t * raw_key,
 				      gnutls_x509_crt_fmt_t type);
-int _gnutls_x509_privkey_to_gkey (gnutls_privkey * privkey,
-				  gnutls_x509_privkey_t);

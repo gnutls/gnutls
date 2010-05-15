@@ -372,8 +372,6 @@ int _gnutls_string_unescape(gnutls_string * dest)
 
         rv = 0;
 
-    cleanup:
-
         return rv;
 }
 
@@ -389,7 +387,6 @@ _gnutls_bin2hex (const void *_old, size_t oldlen,
 {
   unsigned int i, j;
   const opaque *old = _old;
-  int init = 0;
   int step = 2;
   const char empty[] = "";
   

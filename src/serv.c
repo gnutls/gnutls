@@ -916,6 +916,7 @@ main (int argc, char **argv)
       exit (1);
     }
 
+  pkcs11_common();
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (debug);
 
