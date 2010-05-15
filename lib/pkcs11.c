@@ -4,12 +4,9 @@
  * 
  * Author: Nikos Mavrogiannopoulos
  *
-<<<<<<< HEAD:lib/pkcs11.c
  * Inspired and some parts based on neon PKCS #11 support by Joe Orton.
  * More ideas came from the pkcs11-helper library.
  *
-=======
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
@@ -46,7 +43,6 @@ struct gnutls_pkcs11_provider_s {
     ck_slot_id_t *slots;
 };
 
-<<<<<<< HEAD:lib/pkcs11.c
 struct url_find_data_st {
     gnutls_pkcs11_obj_t crt;
 };
@@ -54,16 +50,6 @@ struct url_find_data_st {
 struct flags_find_data_st {
     struct pkcs11_url_info info;
     unsigned int slot_flags;
-=======
-struct gnutls_pkcs11_crt_st {
-    gnutls_datum_t raw;
-    gnutls_certificate_type_t type;
-    struct pkcs11_url_info info;
-};
-
-struct url_find_data_st {
-    gnutls_pkcs11_crt_t crt;
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
 };
 
 struct crt_find_data_st {
@@ -74,10 +60,6 @@ struct crt_find_data_st {
     struct pkcs11_url_info info;
 };
 
-<<<<<<< HEAD:lib/pkcs11.c
-=======
-
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
 static struct gnutls_pkcs11_provider_s providers[MAX_PROVIDERS];
 static int active_providers = 0;
 
@@ -87,7 +69,6 @@ static void* pin_data;
 gnutls_pkcs11_token_callback_t token_func;
 void* token_data;
 
-<<<<<<< HEAD:lib/pkcs11.c
 /* Fake scan */
 void pkcs11_rescan_slots(void)
 {
@@ -108,8 +89,6 @@ unsigned long slots;
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  **/
-=======
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
 int gnutls_pkcs11_add_provider (const char * name, const char * params)
 {
 
@@ -180,22 +159,14 @@ int gnutls_pkcs11_obj_get_info(gnutls_pkcs11_obj_t crt, gnutls_pkcs11_obj_info_t
     return pkcs11_get_info(&crt->info, itype, output, output_size);
 }
 
-<<<<<<< HEAD:lib/pkcs11.c
 int pkcs11_get_info(struct pkcs11_url_info *info, gnutls_pkcs11_obj_info_t itype,
-=======
-int pkcs11_get_info(struct pkcs11_url_info *info, gnutls_pkcs11_cert_info_t itype,
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
     void* output, size_t* output_size)
 {
     const char* str = NULL;
     size_t len;
 
     switch(itype) {
-<<<<<<< HEAD:lib/pkcs11.c
         case GNUTLS_PKCS11_OBJ_ID:
-=======
-        case GNUTLS_PKCS11_CRT_ID:
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
             if (*output_size < info->certid_raw_size) {
                 *output_size = info->certid_raw_size;
                 return GNUTLS_E_SHORT_MEMORY_BUFFER;
@@ -204,7 +175,6 @@ int pkcs11_get_info(struct pkcs11_url_info *info, gnutls_pkcs11_cert_info_t ityp
             *output_size = info->certid_raw_size;
             
             return 0;
-<<<<<<< HEAD:lib/pkcs11.c
         case GNUTLS_PKCS11_OBJ_ID_HEX:
             str = info->id;
             break;
@@ -221,24 +191,6 @@ int pkcs11_get_info(struct pkcs11_url_info *info, gnutls_pkcs11_cert_info_t ityp
             str = info->manufacturer;
             break;
         case GNUTLS_PKCS11_OBJ_TOKEN_MODEL:
-=======
-        case GNUTLS_PKCS11_CRT_ID_HEX:
-            str = info->id;
-            break;
-        case GNUTLS_PKCS11_CRT_LABEL:
-            str = info->label;
-            break;
-        case GNUTLS_PKCS11_CRT_TOKEN_LABEL:
-            str = info->token;
-            break;
-        case GNUTLS_PKCS11_CRT_TOKEN_SERIAL:
-            str = info->serial;
-            break;
-        case GNUTLS_PKCS11_CRT_TOKEN_MANUFACTURER:
-            str = info->manufacturer;
-            break;
-        case GNUTLS_PKCS11_CRT_TOKEN_MODEL:
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
             str = info->model;
             break;
         default:
@@ -262,7 +214,6 @@ int pkcs11_get_info(struct pkcs11_url_info *info, gnutls_pkcs11_cert_info_t ityp
 
 static int init = 0;
 
-<<<<<<< HEAD:lib/pkcs11.c
 
 /**
  * gnutls_pkcs11_init:
@@ -280,8 +231,6 @@ static int init = 0;
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  **/
-=======
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
 int gnutls_pkcs11_init(unsigned int flags, const char* configfile)
 {
     int ret;
@@ -378,7 +327,6 @@ void gnutls_pkcs11_set_pin_function(gnutls_pkcs11_pin_callback_t fn,
     pin_data = userdata;
 }
 
-<<<<<<< HEAD:lib/pkcs11.c
 /**
  * gnutls_pkcs11_set_token_function:
  * @fn: The PIN callback
@@ -390,8 +338,6 @@ void gnutls_pkcs11_set_pin_function(gnutls_pkcs11_pin_callback_t fn,
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  **/
-=======
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
 void gnutls_pkcs11_set_token_function(gnutls_pkcs11_token_callback_t fn,
                                 void *userdata)
 {
@@ -539,12 +485,9 @@ size_t l;
             gnutls_assert();
             goto cleanup;
         }
-<<<<<<< HEAD:lib/pkcs11.c
 
         memcpy(info->id, p1, l);
         info->id[l] = 0;
-=======
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
     }
     
     ret = 0;
@@ -688,11 +631,8 @@ cleanup:
  **/
 int gnutls_pkcs11_obj_init(gnutls_pkcs11_obj_t * crt)
 {
-<<<<<<< HEAD:lib/pkcs11.c
     *crt = gnutls_calloc(1, sizeof(struct gnutls_pkcs11_obj_st));
-=======
-    *crt = gnutls_calloc(1, sizeof(struct gnutls_pkcs11_crt_st));
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
+
     if (*crt == NULL) {
         gnutls_assert();
         return GNUTLS_E_MEMORY_ERROR;
@@ -1150,18 +1090,11 @@ static int find_obj_url(pakchois_session_t *pks, struct token_info *info, void* 
         return GNUTLS_E_MEMORY_ERROR;
     }
     
-<<<<<<< HEAD:lib/pkcs11.c
     /* Find objects with given class and type */
-=======
-    /* Find objects with cert class and X.509 cert type. */
-    class = CKO_CERTIFICATE;
-    type = CKC_X_509;
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
 
     a[0].type = CKA_CLASS;
     a[0].value = &class;
     a[0].value_len = sizeof class;
-<<<<<<< HEAD:lib/pkcs11.c
 
     a[1].type = CKA_ID;
     a[1].value = find_data->crt->info.certid_raw;
@@ -1177,17 +1110,6 @@ static int find_obj_url(pakchois_session_t *pks, struct token_info *info, void* 
     }
 
     rv = pakchois_find_objects_init(pks, a, a_vals);
-=======
-    a[1].type = CKA_CERTIFICATE_TYPE;
-    a[1].value = &type;
-    a[1].value_len = sizeof type;
-    a[2].type = CKA_ID;
-    a[2].value = find_data->crt->info.certid_raw;
-    a[2].value_len = find_data->crt->info.certid_raw_size;
-
-
-    rv = pakchois_find_objects_init(pks, a, 3);
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
     if (rv != CKR_OK) {
         gnutls_assert();
         _gnutls_debug_log("pk11: FindObjectsInit failed.\n");
@@ -1210,7 +1132,6 @@ static int find_obj_url(pakchois_session_t *pks, struct token_info *info, void* 
             gnutls_datum_t data = { a[0].value, a[0].value_len };
             gnutls_datum_t label = { a[1].value, a[1].value_len };
             
-<<<<<<< HEAD:lib/pkcs11.c
             if (class == CKO_PUBLIC_KEY) {
                 ret = pkcs11_obj_import_pubkey(pks, obj, find_data->crt, &id, &label, &info->tinfo);
             } else {
@@ -1220,13 +1141,6 @@ static int find_obj_url(pakchois_session_t *pks, struct token_info *info, void* 
                 gnutls_assert();
                 goto cleanup;
             }
-=======
-            ret = pkcs11_crt_import(find_data->crt, &data, &id, &label, &info->tinfo);
-            if (ret < 0) {
-                gnutls_assert();
-                goto cleanup;
-            }
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
 
             found = 1;
             break;
@@ -1277,11 +1191,7 @@ int gnutls_pkcs11_obj_import_url (gnutls_pkcs11_obj_t cert, const char * url)
         return ret;
     }
 
-<<<<<<< HEAD:lib/pkcs11.c
     ret = _pkcs11_traverse_tokens(find_obj_url, &find_data, 0);
-=======
-    ret = _pkcs11_traverse_tokens(find_cert_url, &find_data, 0);
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
     if (ret < 0) {
         gnutls_assert();
         return ret;
@@ -1882,14 +1792,6 @@ static int find_objs(pakchois_session_t *pks, struct token_info *info, void* inp
         gnutls_assert();
         return GNUTLS_E_MEMORY_ERROR;
     }
-<<<<<<< HEAD:lib/pkcs11.c
-=======
-
-    /* Find objects with cert class and X.509 cert type. */
-    class = CKO_CERTIFICATE;
-    type = CKC_X_509;
-    trusted = 1;
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
 
     /* Find objects with cert class and X.509 cert type. */
     
@@ -1947,26 +1849,9 @@ static int find_objs(pakchois_session_t *pks, struct token_info *info, void* inp
            && count == 1) {
         gnutls_datum_t label, id, value;
 
-<<<<<<< HEAD:lib/pkcs11.c
         a[0].type = CKA_LABEL;
         a[0].value = label_tmp;
         a[0].value_len = sizeof label_tmp;
-=======
-        a[0].type = CKA_VALUE;
-        a[0].value = cert_data;
-        a[0].value_len = MAX_CERT_SIZE;
-        a[1].type = CKA_ID;
-        a[1].value = certid_tmp;
-        a[1].value_len = sizeof(certid_tmp);
-        a[2].type = CKA_LABEL;
-        a[2].value = label_tmp;
-        a[2].value_len = sizeof label_tmp;
-
-        if (pakchois_get_attribute_value(pks, obj, a, 3) == CKR_OK) {
-            gnutls_datum_t data = { a[0].value, a[0].value_len };
-            gnutls_datum_t id = { a[1].value, a[1].value_len };
-            gnutls_datum_t label = { a[2].value, a[2].value_len };
->>>>>>> Added gnutls_pkcs11_privkey_t and gnutls_privkey_t types. Those are:lib/pkcs11.c
 
         if (pakchois_get_attribute_value(pks, obj, a, 1) == CKR_OK) {
             label.data = a[0].value;
