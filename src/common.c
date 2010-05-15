@@ -886,9 +886,25 @@ int len;
 	return 0;
 }
 
+static int token_callback(void* user, const char* label, const unsigned retry)
+{
+char buf[32];
+char *p;
+
+	if (retry > 0) {
+		fprintf(stderr, "Could not find token %s\n", label);
+		return -1;
+	}
+	printf("Please insert token '%s' in slot and press enter\n", label);
+	p = fgets(buf, sizeof(buf), stdin);
+
+	return 0;
+}
+
 void pkcs11_common(void)
 {
 
 	gnutls_pkcs11_set_pin_function (pin_callback, NULL);
+	gnutls_pkcs11_set_token_function(token_callback, NULL);
 
 }

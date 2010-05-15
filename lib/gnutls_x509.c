@@ -515,7 +515,6 @@ static int read_key_url (gnutls_certificate_credentials_t res, const char* url)
   /* allocate space for the pkey list
    */
   
-fprintf(stderr, "%s:%d\n", __func__, __LINE__);
   ret = gnutls_pkcs11_privkey_init(&key1);
   if (ret < 0)
     {
@@ -571,7 +570,6 @@ int ret;
 gnutls_x509_crt_t crt;
 gnutls_cert * ccert;
 
-fprintf(stderr, "%s:%d\n", __func__, __LINE__);
   ccert = gnutls_malloc(sizeof(*ccert));
   if (ccert == NULL)
     {

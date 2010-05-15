@@ -609,6 +609,7 @@ GNUTLS_2_11
         gnutls_pkcs11_init;
         gnutls_pkcs11_deinit;
         gnutls_pkcs11_set_pin_function;
+	gnutls_pkcs11_set_token_function;
         gnutls_pkcs11_add_provider;
         gnutls_pkcs11_crt_init;
         gnutls_pkcs11_crt_import_url;

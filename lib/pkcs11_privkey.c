@@ -60,7 +60,6 @@ int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
 void gnutls_pkcs11_privkey_deinit(gnutls_pkcs11_privkey_t key)
 {
 	if (key->pks) {
-fprintf(stderr, "xxx: close session %p at %d\n", key->pks, __LINE__);
 		pakchois_close_session(key->pks);
         }
 	gnutls_free(key);
@@ -84,9 +83,16 @@ int gnutls_pkcs11_privkey_get_info(gnutls_pkcs11_privkey_t pkey,
 	int retries = 0; find_data.privkey = key; retry:
 
 
-
+/* the rescan_slots() here is a dummy but if not
+ * called my card fails to work when removed and inserted.
+ * May have to do with the pkcs11 library I use.
+ */
 #define RETRY_CHECK(rv, label) { \
-		if (token_func && rv == CKR_SESSION_HANDLE_INVALID) { \
+		if (token_func && (rv == CKR_SESSION_HANDLE_INVALID||rv==CKR_DEVICE_REMOVED)) { \
+			pkcs11_rescan_slots(); \
+			pakchois_close_session(key->pks); \
+			pkcs11_rescan_slots(); \
+			key->pks = NULL; \
 			ret = token_func(token_data, label, retries++); \
 			if (ret == 0) { \
 				_pkcs11_traverse_tokens(find_privkey_url, &find_data, 1); \
@@ -166,7 +172,7 @@ int gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 
 	RETRY_BLOCK_START(key);
 
-	if (key->privkey == CK_INVALID_HANDLE) {
+	if (key->privkey == CK_INVALID_HANDLE || key->pks == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_PKCS11_ERROR;
 	}
@@ -201,6 +207,7 @@ int gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 			   signature->data, &siglen);
 	if (rv != CKR_OK) {
 		gnutls_free(signature->data);
+		RETRY_CHECK(rv, key->info.label);
 		gnutls_assert();
 		return GNUTLS_E_PK_SIGN_FAILED;
 	}

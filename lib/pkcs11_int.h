@@ -45,5 +45,7 @@ int pkcs11_login(pakchois_session_t *pks, struct token_info *info);
 extern gnutls_pkcs11_token_callback_t token_func;
 extern void* token_data;
 
+void pkcs11_rescan_slots(void);
+
 
 #endif

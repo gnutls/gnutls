@@ -68,6 +68,14 @@ static void* pin_data;
 gnutls_pkcs11_token_callback_t token_func;
 void* token_data;
 
+/* Fake scan */
+void pkcs11_rescan_slots(void)
+{
+unsigned long slots;
+
+    pakchois_get_slot_list(providers[active_providers-1].module, 0, NULL, &slots);
+}
+
 int gnutls_pkcs11_add_provider (const char * name, const char * params)
 {
 
