@@ -3,6 +3,20 @@
 #ifndef _GNUTLS_COMPAT_H
 # define _GNUTLS_COMPAT_H
 
+#ifdef __GNUC__
+
+#define _GNUTLS_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+
+#if _GNUTLS_GCC_VERSION >= 30100
+#define _GNUTLS_GCC_ATTR_DEPRECATED __attribute__ ((__deprecated__))
+#endif
+
+#endif /* __GNUC__ */
+
+#ifndef _GNUTLS_GCC_ATTR_DEPRECATED
+#define _GNUTLS_GCC_ATTR_DEPRECATED
+#endif
+
 #define gnutls_cipher_algorithm gnutls_cipher_algorithm_t
 #define gnutls_kx_algorithm gnutls_kx_algorithm_t
 #define gnutls_paramsype gnutls_paramsype_t
@@ -133,9 +147,22 @@ typedef int gnutls_certificate_server_retrieve_function (gnutls_session_t,
 
 void gnutls_certificate_client_set_retrieve_function
     (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_client_retrieve_function * func);
+     gnutls_certificate_client_retrieve_function * func) _GNUTLS_GCC_ATTR_DEPRECATED;
 void gnutls_certificate_server_set_retrieve_function
     (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_server_retrieve_function * func);
+     gnutls_certificate_server_retrieve_function * func) _GNUTLS_GCC_ATTR_DEPRECATED;
+
+  /* External signing callback.  Experimental. */
+  typedef int (*gnutls_sign_func) (gnutls_session_t session,
+				   void *userdata,
+				   gnutls_certificate_type_t cert_type,
+				   const gnutls_datum_t * cert,
+				   const gnutls_datum_t * hash,
+				   gnutls_datum_t * signature);
+
+  void gnutls_sign_callback_set (gnutls_session_t session,
+				 gnutls_sign_func sign_func, void *userdata) _GNUTLS_GCC_ATTR_DEPRECATED;
+    gnutls_sign_func
+    gnutls_sign_callback_get (gnutls_session_t session, void **userdata);
 
 #endif /* _GNUTLS_COMPAT_H */
