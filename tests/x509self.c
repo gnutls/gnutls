@@ -55,6 +55,7 @@ tls_log_func (int level, const char *str)
 /* A very basic TLS client, with anonymous authentication.
  */
 
+
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 
