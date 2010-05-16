@@ -1364,7 +1364,7 @@ socket_bye (socket_st * socket)
   if (socket->secure)
     {
       do
-	ret = gnutls_bye (socket->session, GNUTLS_SHUT_RDWR);
+	ret = gnutls_bye (socket->session, GNUTLS_SHUT_WR);
       while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
       if (ret < 0)
 	fprintf (stderr, "*** gnutls_bye() error: %s\n",
