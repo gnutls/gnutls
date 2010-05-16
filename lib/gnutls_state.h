@@ -30,6 +30,9 @@
 
 void _gnutls_session_cert_type_set (gnutls_session_t session,
 				    gnutls_certificate_type_t);
+void
+_gnutls_record_set_default_version (gnutls_session_t session,
+				    unsigned char major, unsigned char minor);
 
 #include <gnutls_auth.h>
 

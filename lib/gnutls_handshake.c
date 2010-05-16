@@ -2015,14 +2015,9 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
        * (RSA uses it).
        */
       _gnutls_set_adv_version (session, hver);
+      _gnutls_set_current_version (session, hver);
 
       if (session->internals.priorities.ssl3_record_version)
-	{
-	  /* Honor the SSL3_RECORD_VERSION option
-	   */
-	  _gnutls_set_current_version (session, GNUTLS_SSL3);
-	}
-      else
 	{
 	  /* Some old implementations do not interoperate if we send a
 	   * different version in the record layer.
@@ -2032,7 +2027,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 	   * handshake packet and ignore the one in the packet's record 
 	   * header.
 	   */
-	  _gnutls_set_current_version (session, hver);
+	  _gnutls_record_set_default_version (session, 3, 0);
 	}
 
       /* In order to know when this session was initiated.

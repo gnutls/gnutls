@@ -49,9 +49,6 @@
 /* These should really be static, but src/tests.c calls them.  Make
    them public functions?  */
 void
-_gnutls_record_set_default_version (gnutls_session_t session,
-				    unsigned char major, unsigned char minor);
-void
 _gnutls_rsa_pms_set_version (gnutls_session_t session,
 			     unsigned char major, unsigned char minor);
 
