@@ -137,66 +137,51 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
 				    gnutls_openpgp_privkey_t pkey)
 {
   int ret;
-
+  gnutls_privkey_t privkey;
+  gnutls_cert *ccert;
   /* this should be first */
 
-  res->pkey = gnutls_realloc_fast (res->pkey,
-				   (res->ncerts + 1) *
-				   sizeof (gnutls_privkey_t));
-  if (res->pkey == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  ret = gnutls_privkey_init(&res->pkey[res->ncerts]);
+  ret = gnutls_privkey_init(&privkey);
   if (ret < 0) 
     {
       gnutls_assert();
       return ret;
     }
 
-  ret = gnutls_privkey_import_openpgp (res->pkey[res->ncerts], pkey, 0);
+  ret = gnutls_privkey_import_openpgp (privkey, pkey, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
   if (ret < 0)
     {
-      gnutls_privkey_deinit(res->pkey[res->ncerts]);
+      gnutls_privkey_deinit(privkey);
       gnutls_assert ();
       return ret;
     }
 
-  res->cert_list = gnutls_realloc_fast (res->cert_list,
-					(1 +
-					 res->ncerts) *
-					sizeof (gnutls_cert *));
-  if (res->cert_list == NULL)
+
+  ccert = gnutls_calloc (1, sizeof (gnutls_cert));
+  if (ccert == NULL)
     {
       gnutls_assert ();
-      /* memory leak here? */
+      gnutls_privkey_deinit(privkey);
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  res->cert_list_length = gnutls_realloc_fast (res->cert_list_length,
-					       (1 +
-						res->ncerts) * sizeof (int));
-  if (res->cert_list_length == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  res->cert_list[res->ncerts] = gnutls_calloc (1, sizeof (gnutls_cert));
-  if (res->cert_list[res->ncerts] == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  res->cert_list_length[res->ncerts] = 1;
-
-  ret = _gnutls_openpgp_crt_to_gcert (res->cert_list[res->ncerts], crt);
+  ret = _gnutls_openpgp_crt_to_gcert (ccert, crt);
   if (ret < 0)
     {
       gnutls_assert ();
+      gnutls_free(ccert);
+      gnutls_privkey_deinit(privkey);
+      return ret;
+    }
+
+  ret = certificate_credentials_append_pkey(res, privkey);
+  if (ret >=0) ret = certificate_credential_append_crt_list(res, ccert, 1);
+
+  if (ret < 0)
+    {
+      gnutls_assert();
+      gnutls_free(ccert);
+      gnutls_privkey_deinit(privkey);
       return ret;
     }
 
@@ -440,7 +425,6 @@ gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t res,
 
   ret = gnutls_certificate_set_openpgp_key (res, crt, pkey);
 
-  gnutls_openpgp_privkey_deinit (pkey);
   gnutls_openpgp_crt_deinit (crt);
 
   return ret;
@@ -869,8 +853,8 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
 				  gnutls_datum_t * signature)
 {
   int result, i;
-  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
-  int params_size = MAX_PUBLIC_PARAMS_SIZE;
+  bigint_t params[MAX_PRIV_PARAMS_SIZE];
+  int params_size = MAX_PRIV_PARAMS_SIZE;
   int pk_algorithm;
   gnutls_openpgp_keyid_t keyid;
 

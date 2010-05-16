@@ -167,4 +167,7 @@ int _gnutls_get_auth_info_gcert (gnutls_cert * gcert,
 				 cert_auth_info_t info,
 				 int flags /* OR of ConvFlags */ );
 
+int certificate_credential_append_crt_list( gnutls_certificate_credentials_t res, gnutls_cert *crt, int nr);
+int certificate_credentials_append_pkey( gnutls_certificate_credentials_t res, gnutls_privkey_t pkey);
+
 #endif

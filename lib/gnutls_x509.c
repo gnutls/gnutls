@@ -46,8 +46,6 @@
 #include "x509/x509_int.h"
 #include "read-file.h"
 
-static int append_crt_list( gnutls_certificate_credentials_t res, gnutls_cert *crt, int nr);
-static int append_pkey( gnutls_certificate_credentials_t res, gnutls_privkey_t pkey);
 
 /*
  * some x509 certificate parsing functions.
@@ -272,7 +270,7 @@ parse_der_cert_mem (gnutls_certificate_credentials_t res,
       return ret;
     }
   
-  ret = append_crt_list(res, ccert, 1);
+  ret = certificate_credential_append_crt_list(res, ccert, 1);
   if (ret < 0)
     {
       gnutls_assert();
@@ -372,7 +370,7 @@ parse_pem_cert_mem (gnutls_certificate_credentials_t res,
     }
   while (ptr != NULL);
 
-  ret = append_crt_list(res, certs, count);
+  ret = certificate_credential_append_crt_list(res, certs, count);
   if (ret < 0)
     {
       gnutls_assert();
@@ -485,7 +483,7 @@ read_key_mem (gnutls_certificate_credentials_t res,
 	  return ret;
 	}
 
-      ret = append_pkey(res, privkey);
+      ret = certificate_credentials_append_pkey(res, privkey);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -543,7 +541,7 @@ static int read_key_url (gnutls_certificate_credentials_t res, const char* url)
       goto cleanup;
     }
     
-  ret = append_pkey(res, pkey);
+  ret = certificate_credentials_append_pkey(res, pkey);
   if (ret < 0)
     {
       gnutls_assert();
@@ -604,7 +602,7 @@ gnutls_cert * ccert;
       return ret;
     }
   
-  ret = append_crt_list(res, ccert, 1);
+  ret = certificate_credential_append_crt_list(res, ccert, 1);
   if (ret < 0)
     {
       gnutls_assert();
@@ -734,7 +732,7 @@ gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t res,
   return 0;
 }
 
-static int append_crt_list( gnutls_certificate_credentials_t res, gnutls_cert *crt, int nr)
+int certificate_credential_append_crt_list( gnutls_certificate_credentials_t res, gnutls_cert *crt, int nr)
 {
   res->cert_list = gnutls_realloc_fast (res->cert_list,
 					(1 +
@@ -762,7 +760,7 @@ static int append_crt_list( gnutls_certificate_credentials_t res, gnutls_cert *c
 
 }
 
-static int append_pkey( gnutls_certificate_credentials_t res, gnutls_privkey_t pkey)
+int certificate_credentials_append_pkey( gnutls_certificate_credentials_t res, gnutls_privkey_t pkey)
 {
   res->pkey = gnutls_realloc_fast (res->pkey,
 					(1 + res->ncerts) *
@@ -824,7 +822,7 @@ gnutls_certificate_set_x509_key (gnutls_certificate_credentials_t res,
       return ret;
     }
   
-  ret = append_pkey(res, pkey);
+  ret = certificate_credentials_append_pkey(res, pkey);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -849,7 +847,7 @@ gnutls_certificate_set_x509_key (gnutls_certificate_credentials_t res,
 	}
     }
     
-  ret = append_crt_list(res, pcerts, cert_list_size);
+  ret = certificate_credential_append_crt_list(res, pcerts, cert_list_size);
   if (ret < 0) 
     {
       gnutls_assert();
