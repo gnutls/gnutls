@@ -4,6 +4,9 @@
  * 
  * Author: Nikos Mavrogiannopoulos
  *
+ * Inspired and some parts based on neon PKCS #11 support by Joe Orton.
+ * More ideas came from the pkcs11-helper library.
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
  * License as published by the Free Software Foundation; either
@@ -1384,28 +1387,4 @@ cleanup:
     
     return ret;
 }
-
-
-/* To do list for PKCS#11 support:
-
-   - propagate error strings back to ne_session; use new 
-   pakchois_error() for pakchois API 0.2
-   - add API to specify a particular slot number to use for clicert
-   - add API to specify a particular cert ID for clicert
-   - find a certificate which has an issuer matching the 
-     CA dnames given by GnuTLS
-   - make sure subject name matches between pubkey and privkey
-   - check error handling & fail gracefully if the token is 
-   ejected mid-session
-   - add API to enumerate/search provided certs and allow 
-     direct choice? (or just punt)
-   - the session<->provider interface requires that 
-   one clicert is used for all sessions.  remove this limitation
-   - add API to import all CA certs as trusted
-   (CKA_CERTIFICATE_CATEGORY seems to be unused unfortunately; 
-    just add all X509 certs with CKA_TRUSTED set to true))
-   - make DSA work
-
-*/
-
 
