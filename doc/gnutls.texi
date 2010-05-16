@@ -2617,6 +2617,14 @@ certificate selection callback.
 
 @verbatiminclude examples/ex-cert-select.c
 
+@subsection Using a Callback to Select a @acronym{PKCS} #11 Certificate
+
+This example will demonstrate how to load keys and certificates
+from a @acronym{PKCS} #11 module, which is typically used
+for keys and certificates stored in smart cards.
+
+@verbatiminclude examples/ex-cert-select-pkcs11.c
+
 @node Client with Resume capability example
 @subsection Client with Resume Capability Example
 @anchor{ex:resume-client}
