@@ -48,11 +48,33 @@ struct gnutls_privkey_st {
 	unsigned int flags;
 };
 
-int gnutls_privkey_get_type (gnutls_privkey_t key)
+/**
+ * gnutls_privkey_get_type:
+ * @key: should contain a #gnutls_privkey_t structure
+ *
+ * This function will return the type of the private key. This is
+ * actually the type of the subsystem used to set this private key.
+ *
+ * Returns: a member of the #gnutls_privkey_type_t enumeration on
+ *   success, or a negative value on error.
+ **/
+gnutls_privkey_type_t gnutls_privkey_get_type (gnutls_privkey_t key)
 {
 	return key->type;
 }
 
+/**
+ * gnutls_privkey_get_pk_algorithm:
+ * @key: should contain a #gnutls_privkey_t structure
+ * @bits: If set will return the number of bits of the parameters (may be NULL)
+ *
+ * This function will return the public key algorithm of a private
+ * key and if possible will return a number of bits that indicates
+ * the security parameter of the key.
+ *
+ * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
+ *   success, or a negative value on error.
+ **/
 int gnutls_privkey_get_pk_algorithm (gnutls_privkey_t key, unsigned int* bits)
 {
 	switch(key->type) {
@@ -71,6 +93,15 @@ int gnutls_privkey_get_pk_algorithm (gnutls_privkey_t key, unsigned int* bits)
 
 }
 
+/**
+ * gnutls_privkey_init:
+ * @key: The structure to be initialized
+ *
+ * This function will initialize an private key structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_privkey_init(gnutls_privkey_t * key)
 {
 	*key = gnutls_calloc(1, sizeof(struct gnutls_privkey_st));
@@ -82,6 +113,12 @@ int gnutls_privkey_init(gnutls_privkey_t * key)
 	return 0;
 }
 
+/**
+ * gnutls_privkey_deinit:
+ * @key: The structure to be deinitialized
+ *
+ * This function will deinitialize a private key structure.
+ **/
 void gnutls_privkey_deinit(gnutls_privkey_t key)
 {
 	if (key->flags & GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE)
@@ -96,6 +133,18 @@ void gnutls_privkey_deinit(gnutls_privkey_t key)
 	gnutls_free(key);
 }
 
+/**
+ * gnutls_privkey_import_pkcs11:
+ * @pkey: The private key
+ * @key: The private key to be imported
+ * @flags: should be zero
+ *
+ * This function will import the given private key to the abstract
+ * #gnutls_privkey_t structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_privkey_import_pkcs11 (gnutls_privkey_t pkey, gnutls_pkcs11_privkey_t key, unsigned int flags)
 {
 	pkey->key.pkcs11 = key;
@@ -106,6 +155,18 @@ int gnutls_privkey_import_pkcs11 (gnutls_privkey_t pkey, gnutls_pkcs11_privkey_t
 	return 0;
 }
 
+/**
+ * gnutls_privkey_import_x509:
+ * @pkey: The private key
+ * @key: The private key to be imported
+ * @flags: should be zero
+ *
+ * This function will import the given private key to the abstract
+ * #gnutls_privkey_t structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_privkey_import_x509 (gnutls_privkey_t pkey, gnutls_x509_privkey_t key, unsigned int flags)
 {
         pkey->key.x509 = key;
@@ -116,6 +177,18 @@ int gnutls_privkey_import_x509 (gnutls_privkey_t pkey, gnutls_x509_privkey_t key
 	return 0;
 }
 
+/**
+ * gnutls_privkey_import_openpgp:
+ * @pkey: The private key
+ * @key: The private key to be imported
+ * @flags: should be zero
+ *
+ * This function will import the given private key to the abstract
+ * #gnutls_privkey_t structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_privkey_import_openpgp (gnutls_privkey_t pkey, gnutls_openpgp_privkey_t key, unsigned int flags)
 {
 	pkey->key.openpgp = key;
@@ -138,10 +211,6 @@ int gnutls_privkey_import_openpgp (gnutls_privkey_t pkey, gnutls_openpgp_privkey
  * supported by the private key. Signature algorithms are always used
  * together with a hash functions.  Different hash functions may be
  * used for the RSA algorithm, but only SHA-1 for the DSA keys.
- *
- * If the buffer provided is not long enough to hold the output, then
- * *@signature_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will
- * be returned.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  * negative error value.
@@ -188,9 +257,21 @@ gnutls_privkey_sign_data(gnutls_privkey_t signer,
 	return 0;
 }
 
+/**
+ * gnutls_privkey_sign_hash:
+ * @key: Holds the key
+ * @data: holds the data to be signed
+ * @signature: will contain the signature allocate with gnutls_malloc()
+ *
+ * This function will sign the given data using a signature algorithm
+ * supported by the private key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * negative error value.
+ **/
 int gnutls_privkey_sign_hash (gnutls_privkey_t key,
-				 const gnutls_datum_t * hash,
-				 gnutls_datum_t * signature)
+			const gnutls_datum_t * hash,
+			gnutls_datum_t * signature)
 {
 	switch(key->type) {
 		case GNUTLS_PRIVKEY_OPENPGP:
@@ -205,6 +286,19 @@ int gnutls_privkey_sign_hash (gnutls_privkey_t key,
 	}
 }
 
+/**
+ * gnutls_privkey_decrypt_data:
+ * @key: Holds the key
+ * @flags: zero for now
+ * @ciphertext: holds the data to be decrypted
+ * @plaintext: will contain the decrypted data, allocated with gnutls_malloc()
+ *
+ * This function will decrypt the given data using the algorithm
+ * supported by the private key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * negative error value.
+ **/
 int gnutls_privkey_decrypt_data(gnutls_privkey_t key,
 				unsigned int flags,
 				const gnutls_datum_t * ciphertext,

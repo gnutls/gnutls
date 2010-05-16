@@ -79,6 +79,18 @@ unsigned long slots;
     pakchois_get_slot_list(providers[active_providers-1].module, 0, NULL, &slots);
 }
 
+/**
+ * gnutls_pkcs11_add_provider:
+ * @name: The filename of the module
+ * @params: should be NULL
+ *
+ * This function will load and add a PKCS 11 module to the module
+ * list used in gnutls. After this function is called the module will
+ * be used for PKCS 11 operations.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_pkcs11_add_provider (const char * name, const char * params)
 {
 
@@ -124,10 +136,21 @@ fail:
 
 }
 
-/* returns strings of the PKCS#11 certificate structure.
- * Returns null terminated strings but output_size contains
+
+/**
+ * gnutls_pkcs11_crt_get_info:
+ * @crt: should contain a #gnutls_pkcs11_crt_t structure
+ * @itype: Denotes the type of information requested
+ * @output: where output will be stored
+ * @output_size: contains the maximum size of the output and will be overwritten with actual
+ *
+ * This function will return information about the PKCS 11 certificatesuch
+ * as the label, id as well as token information where the key is stored. When
+ * output is text it returns null terminated string although %output_size contains
  * the size of the actual data only.
- */
+ *
+ * Returns: zero on success or a negative value on error.
+ **/
 int gnutls_pkcs11_crt_get_info(gnutls_pkcs11_crt_t crt, gnutls_pkcs11_cert_info_t itype,
     void* output, size_t* output_size)
 {
@@ -189,6 +212,20 @@ int pkcs11_get_info(struct pkcs11_url_info *info, gnutls_pkcs11_cert_info_t ityp
 
 static int init = 0;
 
+
+/**
+ * gnutls_pkcs11_init:
+ * @flags: GNUTLS_PKCS11_FLAG_MANUAL or GNUTLS_PKCS11_FLAG_AUTO
+ * @configfile: either NULL or the location of a configuration file
+ *
+ * This function will initialize the PKCS 11 subsystem in gnutls. It will
+ * read a configuration file if %GNUTLS_PKCS11_FLAG_AUTO is used or allow
+ * you to independently load PKCS 11 modules using gnutls_pkcs11_add_provider()
+ * if %GNUTLS_PKCS11_FLAG_MANUAL is specified.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_pkcs11_init(unsigned int flags, const char* configfile)
 {
     int ret;
@@ -242,6 +279,12 @@ int gnutls_pkcs11_init(unsigned int flags, const char* configfile)
     return 0;
 }
 
+/**
+ * gnutls_pkcs11_deinit:
+ *
+ * This function will deinitialize the PKCS 11 subsystem in gnutls.
+ *
+ **/
 void gnutls_pkcs11_deinit (void)
 {
     int i;
@@ -261,6 +304,17 @@ void gnutls_pkcs11_deinit (void)
     active_providers = 0;
 }
 
+/**
+ * gnutls_pkcs11_set_pin_function:
+ * @fn: The PIN callback
+ * @userdata: data to be supplied to callback
+ *
+ * This function will set a callback function to be used when a PIN
+ * is required for PKCS 11 operations.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 void gnutls_pkcs11_set_pin_function(gnutls_pkcs11_pin_callback_t fn,
                                 void *userdata)
 {
@@ -268,6 +322,17 @@ void gnutls_pkcs11_set_pin_function(gnutls_pkcs11_pin_callback_t fn,
     pin_data = userdata;
 }
 
+/**
+ * gnutls_pkcs11_set_token_function:
+ * @fn: The PIN callback
+ * @userdata: data to be supplied to callback
+ *
+ * This function will set a callback function to be used when a token
+ * needs to be inserted to continue PKCS 11 operations.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 void gnutls_pkcs11_set_token_function(gnutls_pkcs11_token_callback_t fn,
                                 void *userdata)
 {
@@ -454,7 +519,7 @@ cleanup:
 }
 
 
-static int pkcs11_info_to_url(const struct pkcs11_url_info* info, char** url)
+int pkcs11_info_to_url(const struct pkcs11_url_info* info, char** url)
 {
     gnutls_string str;
     int init = 0;
@@ -529,6 +594,15 @@ cleanup:
     return ret;
 }
 
+/**
+ * gnutls_pkcs11_crt_init:
+ * @crt: The structure to be initialized
+ *
+ * This function will initialize a pkcs11 certificate structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_pkcs11_crt_init(gnutls_pkcs11_crt_t * crt)
 {
     *crt = gnutls_calloc(1, sizeof(struct gnutls_pkcs11_crt_st));
@@ -540,6 +614,12 @@ int gnutls_pkcs11_crt_init(gnutls_pkcs11_crt_t * crt)
     return 0;
 }
 
+/**
+ * gnutls_pkcs11_crt_deinit:
+ * @key: The structure to be initialized
+ *
+ * This function will deinitialize a certificate structure.
+ **/
 void gnutls_pkcs11_crt_deinit(gnutls_pkcs11_crt_t crt)
 {
     free(crt);
@@ -788,6 +868,19 @@ cleanup:
     return ret;
 }
 
+/**
+ * gnutls_pkcs11_privkey_import_url:
+ * @cert: The structure to store the parsed certificate
+ * @url: a PKCS 11 url identifying the key
+ *
+ * This function will "import" a PKCS 11 URL identifying a certificate
+ * key to the #gnutls_pkcs11_crt_t structure. This does not involve any
+ * parsing (such as X.509 or OpenPGP) since the #gnutls_pkcs11_crt_t is
+ * format agnostic. Only data are transferred.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_pkcs11_crt_import_url (gnutls_pkcs11_crt_t cert, const char * url)
 {
     int ret;
@@ -842,6 +935,18 @@ static int find_token_num(pakchois_session_t *pks, struct token_info *tinfo, voi
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE; /* non zero is enough */
 }
 
+/**
+ * gnutls_pkcs11_token_get_url:
+ * @seq: sequence number starting from 0
+ * @url: will contain an allocated url
+ *
+ * This function will return the URL for each token available
+ * in system. The url has to be released using gnutls_free()
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ * if the sequence number exceeds the available tokens, otherwise a negative error value.
+ **/
+
 int gnutls_pkcs11_token_get_url (unsigned int seq, char** url)
 {
     int ret;
@@ -865,7 +970,18 @@ int gnutls_pkcs11_token_get_url (unsigned int seq, char** url)
     return 0;
 
 }
-
+/**
+ * gnutls_pkcs11_token_get_info:
+ * @url: should contain a PKCS 11 URL
+ * @itype: Denotes the type of information requested
+ * @output: where output will be stored
+ * @output_size: contains the maximum size of the output and will be overwritten with actual
+ *
+ * This function will return information about the PKCS 11 private key such
+ * as the label, id as well as token information where the key is stored.
+ *
+ * Returns: zero on success or a negative value on error.
+ **/
 int gnutls_pkcs11_token_get_info(const char* url, gnutls_pkcs11_token_info_t ttype, void* output, size_t *output_size)
 {
     const char* str;
@@ -911,7 +1027,16 @@ int gnutls_pkcs11_token_get_info(const char* url, gnutls_pkcs11_token_info_t tty
     return 0;
 }
 
-
+/**
+ * gnutls_pkcs11_crt_export_url:
+ * @crt: Holds the PKCS 11 certificate
+ * @url: will contain an allocated url
+ *
+ * This function will export a URL identifying the given certificate.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_pkcs11_crt_export_url (gnutls_pkcs11_crt_t cert, char ** url)
 {
 int ret;
@@ -925,6 +1050,15 @@ int ret;
     return 0;
 }
 
+/**
+ * gnutls_pkcs11_crt_get_type:
+ * @certificate: Holds the PKCS 11 certificate
+ *
+ * This function will return the type of the certificate being
+ * stored in the structure.
+ *
+ * Returns: The type of the certificate.
+ **/
 gnutls_certificate_type_t gnutls_pkcs11_crt_get_type (gnutls_pkcs11_crt_t certificate)
 {
     return certificate->type;
@@ -1289,6 +1423,19 @@ fail:
     return ret;
 }
 
+/**
+ * gnutls_pkcs11_crt_list_import_url:
+ * @p_list: An uninitialized certificate list (may be NULL)
+ * @n_list: initially should hold the maximum size of the list. Will contain the actual size.
+ * @url: A PKCS 11 url identifying a set of certificates
+ * @flags: Attributes of type #gnutls_pkcs11_crt_attr_t that can be used to limit output
+ *
+ * This function will initialize and set value to a certificate list
+ * specified by a PKCS 11 URL.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_pkcs11_crt_list_import_url (gnutls_pkcs11_crt_t * p_list, unsigned int *n_list, const char* url, gnutls_pkcs11_crt_attr_t flags)
 {
     int ret;
@@ -1319,6 +1466,18 @@ int gnutls_pkcs11_crt_list_import_url (gnutls_pkcs11_crt_t * p_list, unsigned in
     return 0;
 }
 
+/**
+ * gnutls_x509_crt_import_pkcs11_url:
+ * @crt: A certificate of type #gnutls_x509_crt_t
+ * @url: A PKCS 11 url
+ *
+ * This function will import a PKCS 11 certificate directly from a token
+ * without involving the #gnutls_pkcs11_crt_t structure. This function will
+ * fail if the certificate stored is not of X.509 type.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_x509_crt_import_pkcs11_url( gnutls_x509_crt_t crt, const char* url)
 {
     gnutls_pkcs11_crt_t pcrt;
@@ -1351,7 +1510,17 @@ cleanup:
 }
 
 
-
+/**
+ * gnutls_x509_crt_import_pkcs11:
+ * @crt: A certificate of type #gnutls_x509_crt_t
+ * @pkcs11_crt: A PKCS 11 certificate
+ *
+ * This function will import a PKCS 11 certificate to a #gnutls_x509_crt_t
+ * structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_x509_crt_import_pkcs11( gnutls_x509_crt_t crt, gnutls_pkcs11_crt_t pkcs11_crt)
 {
     return gnutls_x509_crt_import(crt, &pkcs11_crt->raw, GNUTLS_X509_FMT_DER);

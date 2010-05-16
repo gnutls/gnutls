@@ -241,6 +241,7 @@ int
 gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 				unsigned int flags, const gnutls_datum_t * ciphertext,
 				gnutls_datum_t * plaintext);
+int gnutls_pkcs11_privkey_export_url (gnutls_pkcs11_privkey_t key, char ** url);
 
 /** @} */
 

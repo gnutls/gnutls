@@ -45,6 +45,15 @@ struct privkey_find_data_st {
 static int find_privkey_url(pakchois_session_t * pks,
 			    struct token_info *info, void *input);
 
+/**
+ * gnutls_pkcs11_privkey_init:
+ * @key: The structure to be initialized
+ *
+ * This function will initialize an private key structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
 {
 	*key = gnutls_calloc(1, sizeof(struct gnutls_pkcs11_privkey_st));
@@ -57,6 +66,12 @@ int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
 	return 0;
 }
 
+/**
+ * gnutls_pkcs11_privkey_deinit:
+ * @key: The structure to be initialized
+ *
+ * This function will deinitialize a private key structure.
+ **/
 void gnutls_pkcs11_privkey_deinit(gnutls_pkcs11_privkey_t key)
 {
 	if (key->pks) {
@@ -65,6 +80,16 @@ void gnutls_pkcs11_privkey_deinit(gnutls_pkcs11_privkey_t key)
 	gnutls_free(key);
 }
 
+/**
+ * gnutls_pkcs11_privkey_get_pk_algorithm:
+ * @key: should contain a #gnutls_pkcs11_privkey_t structure
+ *
+ * This function will return the public key algorithm of a private
+ * key.
+ *
+ * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
+ *   success, or a negative value on error.
+ **/
 int gnutls_pkcs11_privkey_get_pk_algorithm(gnutls_pkcs11_privkey_t key, unsigned int *bits)
 {
         if (bits)
@@ -72,6 +97,20 @@ int gnutls_pkcs11_privkey_get_pk_algorithm(gnutls_pkcs11_privkey_t key, unsigned
 	return key->pk_algorithm;
 }
 
+/**
+ * gnutls_pkcs11_privkey_get_info:
+ * @key: should contain a #gnutls_pkcs11_privkey_t structure
+ * @itype: Denotes the type of information requested
+ * @output: where output will be stored
+ * @output_size: contains the maximum size of the output and will be overwritten with actual
+ *
+ * This function will return information about the PKCS 11 private key such
+ * as the label, id as well as token information where the key is stored. When
+ * output is text it returns null terminated string although #output_size contains
+ * the size of the actual data only.
+ *
+ * Returns: zero on success or a negative value on error.
+ **/
 int gnutls_pkcs11_privkey_get_info(gnutls_pkcs11_privkey_t pkey,
 				   gnutls_pkcs11_cert_info_t itype,
 				   void *output, size_t * output_size)
@@ -160,7 +199,19 @@ gnutls_pkcs11_privkey_sign_data(gnutls_pkcs11_privkey_t signer,
 
 }
 
-
+/**
+ * gnutls_pkcs11_privkey_sign_hash:
+ * @key: Holds the key
+ * @hash: holds the data to be signed (should be output of a hash)
+ * @signature: will contain the signature allocated with gnutls_malloc()
+ *
+ * This function will sign the given data using a signature algorithm
+ * supported by the private key. It is assumed that the given data
+ * are the output of a hash function.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 				    const gnutls_datum_t * hash,
 				    gnutls_datum_t * signature)
@@ -338,6 +389,19 @@ static int find_privkey_url(pakchois_session_t * pks,
 	return ret;
 }
 
+/**
+ * gnutls_pkcs11_privkey_import_url:
+ * @pkey: The structure to store the parsed key
+ * @url: a PKCS 11 url identifying the key
+ *
+ * This function will "import" a PKCS 11 URL identifying a private
+ * key to the #gnutls_pkcs11_privkey_t structure. In reality since
+ * in most cases keys cannot be exported, the private key structure
+ * is being associated with the available operations on the token.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 				     const char *url)
 {
@@ -434,4 +498,27 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	plaintext->size = siglen;
 
 	return 0;
+}
+
+/**
+ * gnutls_pkcs11_privkey_export_url:
+ * @key: Holds the PKCS 11 key
+ * @url: will contain an allocated url
+ *
+ * This function will export a URL identifying the given key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int gnutls_pkcs11_privkey_export_url (gnutls_pkcs11_privkey_t key, char ** url)
+{
+int ret;
+
+    ret = pkcs11_info_to_url(&key->info, url);
+    if (ret < 0) {
+        gnutls_assert();
+        return ret;
+    }
+
+    return 0;
 }

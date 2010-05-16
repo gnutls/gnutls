@@ -13,7 +13,7 @@ typedef struct gnutls_privkey_st* gnutls_privkey_t;
 int gnutls_privkey_init (gnutls_privkey_t * key);
 void gnutls_privkey_deinit (gnutls_privkey_t key);
 int gnutls_privkey_get_pk_algorithm (gnutls_privkey_t key, unsigned int* bits);
-int gnutls_privkey_get_type (gnutls_privkey_t key);
+gnutls_privkey_type_t gnutls_privkey_get_type (gnutls_privkey_t key);
 
 #define GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE 1
 int gnutls_privkey_import_pkcs11 (gnutls_privkey_t pkey, gnutls_pkcs11_privkey_t key, unsigned int flags);

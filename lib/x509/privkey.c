@@ -64,7 +64,7 @@ gnutls_x509_privkey_init (gnutls_x509_privkey_t * key)
 
 /**
  * gnutls_x509_privkey_deinit:
- * @key: The structure to be initialized
+ * @key: The structure to be deinitialized
  *
  * This function will deinitialize a private key structure.
  **/

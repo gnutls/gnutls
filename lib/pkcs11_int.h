@@ -46,6 +46,6 @@ extern gnutls_pkcs11_token_callback_t token_func;
 extern void* token_data;
 
 void pkcs11_rescan_slots(void);
-
+int pkcs11_info_to_url(const struct pkcs11_url_info* info, char** url);
 
 #endif

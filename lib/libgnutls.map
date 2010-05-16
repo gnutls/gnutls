@@ -643,6 +643,7 @@ GNUTLS_2_11
 	gnutls_privkey_sign_data;
 	gnutls_privkey_sign_hash;
 	gnutls_privkey_decrypt_data;
+	gnutls_pkcs11_privkey_export_url;
 
 } GNUTLS_2_10;
 
