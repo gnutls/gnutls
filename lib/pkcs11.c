@@ -223,6 +223,9 @@ static int init = 0;
  * you to independently load PKCS 11 modules using gnutls_pkcs11_add_provider()
  * if %GNUTLS_PKCS11_FLAG_MANUAL is specified.
  *
+ * Normally you don't need to call this function since it is being called
+ * by gnutls_global_init(). Otherwise you must call it before it.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  **/
