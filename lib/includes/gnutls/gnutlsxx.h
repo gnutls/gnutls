@@ -310,6 +310,9 @@ namespace gnutls
 				 gnutls_x509_crt_fmt_t type,
 				 const char *password);
 
+    void set_retrieve_function (gnutls_certificate_retrieve_function *
+				func);
+
   protected:
       gnutls_certificate_credentials_t cred;
   };
@@ -317,16 +320,12 @@ namespace gnutls
   class certificate_server_credentials:public certificate_credentials
   {
   public:
-    void set_retrieve_function (gnutls_certificate_server_retrieve_function *
-				func);
     void set_params_function (gnutls_params_function * func);
   };
 
   class certificate_client_credentials:public certificate_credentials
   {
   public:
-    void set_retrieve_function (gnutls_certificate_client_retrieve_function *
-				func);
   };
 
 

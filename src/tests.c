@@ -975,7 +975,7 @@ static int
 cert_callback (gnutls_session_t session,
 	       const gnutls_datum_t * req_ca_rdn, int nreqs,
 	       const gnutls_pk_algorithm_t * sign_algos,
-	       int sign_algos_length, gnutls_retr_st * st)
+	       int sign_algos_length, gnutls_retr2_st * st)
 {
   char issuer_dn[256];
   int i, ret;
@@ -1025,10 +1025,10 @@ test_server_cas (gnutls_session_t session)
   _gnutls_priority_set_direct (session, prio_str);
 
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
-  gnutls_certificate_client_set_retrieve_function (xcred, cert_callback);
+  gnutls_certificate_set_retrieve_function (xcred, cert_callback);
 
   ret = do_handshake (session);
-  gnutls_certificate_client_set_retrieve_function (xcred, NULL);
+  gnutls_certificate_set_retrieve_function (xcred, NULL);
 
   if (ret == TEST_FAILED)
     return ret;

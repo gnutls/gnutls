@@ -716,16 +716,10 @@ namespace gnutls
     RETWRAP (gnutls_certificate_set_x509_crl (cred, crl_list, crl_list_size));
   }
 
-  void certificate_server_credentials::
-    set_retrieve_function (gnutls_certificate_server_retrieve_function * func)
+  void certificate_credentials::
+    set_retrieve_function (gnutls_certificate_retrieve_function * func)
   {
-    gnutls_certificate_server_set_retrieve_function (cred, func);
-  }
-
-  void certificate_client_credentials::
-    set_retrieve_function (gnutls_certificate_client_retrieve_function * func)
-  {
-    gnutls_certificate_client_set_retrieve_function (cred, func);
+    gnutls_certificate_set_retrieve_function (cred, func);
   }
 
 // SRP
