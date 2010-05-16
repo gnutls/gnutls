@@ -2169,3 +2169,4 @@ const char* gnutls_pkcs11_type_get_name (gnutls_pkcs11_obj_type_t type)
             return "Unknown";
     }
 }
+
