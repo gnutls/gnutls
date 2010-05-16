@@ -73,7 +73,7 @@ openpgp_keyring_LDADD = $(LDADD) ../libextra/libgnutls-extra.la
 endif
 
 if HAVE_FORK
-ctests += x509self x509signself x509dn anonself pskself dhepskself	\
+ctests += x509self x509dn anonself pskself dhepskself	\
 	tlsia resume netconf-psk setcredcrash
 
 if ENABLE_OPENPGP

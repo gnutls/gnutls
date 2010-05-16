@@ -113,7 +113,7 @@ static int
 cert_callback (gnutls_session_t session,
 	       const gnutls_datum_t * req_ca_rdn, int nreqs,
 	       const gnutls_pk_algorithm_t * sign_algos,
-	       int sign_algos_length, gnutls_retr_st * st)
+	       int sign_algos_length, gnutls_retr2_st * st)
 {
   int result;
   gnutls_x509_dn_t dn;
@@ -197,7 +197,7 @@ client (void)
    */
   gnutls_certificate_set_x509_trust_mem (xcred, &ca, GNUTLS_X509_FMT_PEM);
 
-  gnutls_certificate_client_set_retrieve_function (xcred, cert_callback);
+  gnutls_certificate_set_retrieve_function (xcred, cert_callback);
 
   /* Initialize TLS session
    */

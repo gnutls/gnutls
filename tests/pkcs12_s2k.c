@@ -133,12 +133,12 @@ doit (void)
 	    fail ("_gnutls_pkcs12_string_to_key failed[0]: %d\n", rc);
 
 	  if (strcmp (_gnutls_bin2hex (key, sizeof (key),
-				       tmp, sizeof (tmp)), values[x]) != 0)
+				       tmp, sizeof (tmp), NULL), values[x]) != 0)
 	    fail ("_gnutls_pkcs12_string_to_key failed[1]\n");
 
 	  if (debug)
 	    printf ("ij: %d.%d: %s\n", i, j,
-		    _gnutls_bin2hex (key, sizeof (key), tmp, sizeof (tmp)));
+		    _gnutls_bin2hex (key, sizeof (key), tmp, sizeof (tmp), NULL));
 	  x++;
 	}
     }
@@ -154,13 +154,13 @@ doit (void)
 	fail ("_gnutls_pkcs12_string_to_key failed[2]: %d\n", rc);
 
       if (memcmp (_gnutls_bin2hex (key, tv[i].keylen,
-				   tmp, sizeof (tmp)),
+				   tmp, sizeof (tmp), NULL),
 		  tv[i].key, tv[i].keylen) != 0)
 	fail ("_gnutls_pkcs12_string_to_key failed[3]\n");
 
       if (debug)
 	printf ("tv[%d]: %s\n", i,
-		_gnutls_bin2hex (key, tv[i].keylen, tmp, sizeof (tmp)));
+		_gnutls_bin2hex (key, tv[i].keylen, tmp, sizeof (tmp), NULL));
     }
   if (debug)
     printf ("\n");
