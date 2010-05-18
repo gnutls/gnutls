@@ -29,7 +29,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_datum.h>
 #include <pkcs11_int.h>
-#include <gnutls/privkey.h>
+#include <gnutls/abstract.h>
 #include <sign.h>
 #include <gnutls_pk.h>
 #include <x509_int.h>

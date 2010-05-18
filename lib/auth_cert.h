@@ -30,7 +30,7 @@
 # include "auth_dh_common.h"
 # include "x509/x509_int.h"
 # include "openpgp/openpgp_int.h"
-# include <gnutls/privkey.h>
+# include <gnutls/abstract.h>
 # include <gnutls/compat.h>
 
 /* This structure may be complex, but it's the only way to

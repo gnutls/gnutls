@@ -24,7 +24,7 @@
  */
 
 #include <libtasn1.h>
-#include <gnutls/privkey.h>
+#include <gnutls/abstract.h>
 
 int _gnutls_x509_cert_verify_peers (gnutls_session_t session,
 				    unsigned int *status);

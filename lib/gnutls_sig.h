@@ -26,7 +26,7 @@
 #ifndef GNUTLS_SIG_H
 # define GNUTLS_SIG_H
 
-#include <gnutls/privkey.h>
+#include <gnutls/abstract.h>
 
 int _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
 				      gnutls_cert * cert,

@@ -7,7 +7,7 @@
 
 #include <auth_cert.h>
 #include <opencdk.h>
-#include <gnutls/privkey.h>
+#include <gnutls/abstract.h>
 
 /* OpenCDK compatible */
 typedef enum

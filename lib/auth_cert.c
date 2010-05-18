@@ -45,7 +45,7 @@
 #include <gnutls_state.h>
 #include <gnutls_pk.h>
 #include <gnutls_x509.h>
-#include <gnutls/privkey.h>
+#include <gnutls/abstract.h>
 #include "debug.h"
 
 #ifdef ENABLE_OPENPGP
