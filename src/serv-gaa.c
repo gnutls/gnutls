@@ -135,14 +135,14 @@ void gaa_help(void)
 	__gaa_helpsingle(0, "echo", "", "Act as an Echo Server.");
 	__gaa_helpsingle(0, "dhparams", "FILE ", "DH params file to use.");
 	__gaa_helpsingle(0, "x509fmtder", "", "Use DER format for certificates");
-	__gaa_helpsingle(0, "x509cafile", "FILE ", "Certificate file to use.");
+	__gaa_helpsingle(0, "x509cafile", "FILE ", "Certificate file or PKCS #11 URL to use.");
 	__gaa_helpsingle(0, "x509crlfile", "FILE ", "CRL file to use.");
 	__gaa_helpsingle(0, "pgpkeyring", "FILE ", "PGP Key ring file to use.");
 	__gaa_helpsingle(0, "pgpkeyfile", "FILE ", "PGP Key file to use.");
 	__gaa_helpsingle(0, "pgpcertfile", "FILE ", "PGP Public Key (certificate) file to use.");
 	__gaa_helpsingle(0, "pgpsubkey", "HEX|auto ", "PGP subkey to use.");
-	__gaa_helpsingle(0, "x509keyfile", "FILE ", "X.509 key file to use.");
-	__gaa_helpsingle(0, "x509certfile", "FILE ", "X.509 Certificate file to use.");
+	__gaa_helpsingle(0, "x509keyfile", "FILE ", "X.509 key file or PKCS #11 URL to use.");
+	__gaa_helpsingle(0, "x509certfile", "FILE ", "X.509 Certificate file or PKCS #11 URL to use.");
 	__gaa_helpsingle(0, "x509dsakeyfile", "FILE ", "Alternative X.509 key file to use.");
 	__gaa_helpsingle(0, "x509dsacertfile", "FILE ", "Alternative X.509 certificate file to use.");
 	__gaa_helpsingle('r', "require-cert", "", "Require a valid certificate.");

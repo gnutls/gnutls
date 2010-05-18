@@ -38,7 +38,7 @@ option (dhparams) STR "FILE" { $dh_params_file = $1 } "DH params file to use."
 option (x509fmtder) { $fmtder = 1 } "Use DER format for certificates"
 
 #char *x509_cafile;
-option (x509cafile) STR "FILE" { $x509_cafile = $1 } "Certificate file to use."
+option (x509cafile) STR "FILE" { $x509_cafile = $1 } "Certificate file or PKCS #11 URL to use."
 
 #char *x509_crlfile;
 option (x509crlfile) STR "FILE" { $x509_crlfile = $1 } "CRL file to use."
@@ -56,10 +56,10 @@ option (pgpcertfile) STR "FILE" { $pgp_certfile = $1 } "PGP Public Key (certific
 option (pgpsubkey) STR "HEX|auto" { $pgp_subkey = $1 } "PGP subkey to use."
 
 #char *x509_keyfile;
-option (x509keyfile) STR "FILE" { $x509_keyfile = $1 } "X.509 key file to use."
+option (x509keyfile) STR "FILE" { $x509_keyfile = $1 } "X.509 key file or PKCS #11 URL to use."
 
 #char *x509_certfile;
-option (x509certfile) STR "FILE" { $x509_certfile = $1 } "X.509 Certificate file to use."
+option (x509certfile) STR "FILE" { $x509_certfile = $1 } "X.509 Certificate file or PKCS #11 URL to use."
 
 #char *x509_dsakeyfile;
 option (x509dsakeyfile) STR "FILE" { $x509_dsakeyfile = $1 } "Alternative X.509 key file to use."

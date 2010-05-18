@@ -146,14 +146,14 @@ void gaa_help(void)
 	__gaa_helpsingle(0, "kx", "kx1 kx2... ", "Key exchange methods to enable.");
 	__gaa_helpsingle(0, "ctypes", "certType1 certType2... ", "Certificate types to enable.");
 	__gaa_helpsingle(0, "priority", "PRIORITY STRING ", "Priorities string.");
-	__gaa_helpsingle(0, "x509cafile", "FILE ", "Certificate file to use.");
+	__gaa_helpsingle(0, "x509cafile", "FILE ", "Certificate file or PKCS #11 URL to use.");
 	__gaa_helpsingle(0, "x509crlfile", "FILE ", "CRL file to use.");
 	__gaa_helpsingle(0, "pgpkeyfile", "FILE ", "PGP Key file to use.");
 	__gaa_helpsingle(0, "pgpkeyring", "FILE ", "PGP Key ring file to use.");
 	__gaa_helpsingle(0, "pgpcertfile", "FILE ", "PGP Public Key (certificate) file to use.");
 	__gaa_helpsingle(0, "pgpsubkey", "HEX|auto ", "PGP subkey to use.");
-	__gaa_helpsingle(0, "x509keyfile", "FILE ", "X.509 key file to use.");
-	__gaa_helpsingle(0, "x509certfile", "FILE ", "X.509 Certificate file to use.");
+	__gaa_helpsingle(0, "x509keyfile", "FILE ", "X.509 key file or PKCS #11 URL to use.");
+	__gaa_helpsingle(0, "x509certfile", "FILE ", "X.509 Certificate file or PKCS #11 URL to use.");
 	__gaa_helpsingle(0, "srpusername", "NAME ", "SRP username to use.");
 	__gaa_helpsingle(0, "srppasswd", "PASSWD ", "SRP password to use.");
 	__gaa_helpsingle(0, "pskusername", "NAME ", "PSK username to use.");
