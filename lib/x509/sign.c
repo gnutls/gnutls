@@ -170,6 +170,7 @@ pk_dsa_hash (const gnutls_datum_t * text, gnutls_datum_t * hash)
   gnutls_datum_t digest;
   gnutls_digest_algorithm_t hash = _gnutls_dsa_q_to_hash(params[1]);
 
+
   hash->size = _gnutls_hash_get_algo_len(hash);
   hash->data = gnutls_malloc( hash->size);
   if (hash->data == NULL)
