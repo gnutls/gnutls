@@ -538,10 +538,12 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  * "%COMPAT" will enable compatibility features for a server.
  *
  * "%UNSAFE_RENEGOTIATION" will allow unsafe renegotiation (this is now
- * the default, but will change once more servers support the safe renegotiation
+ * the default for clients, but will change once more servers support the safe renegotiation
  * TLS fix).
  *
- * "%SAFE_RENEGOTIATION" will allow safe renegotiation only.
+ * "%SAFE_RENEGOTIATION" will allow safe renegotiation only (this is the
+ * default for servers - that will reject clients trying to perform an
+ * unsafe renegotiation).
  *
  * "%INITIAL_SAFE_RENEGOTIATION" will force initial safe negotiation even if 
  * renegotiation wasn't requested. Only valid for server side and implies
