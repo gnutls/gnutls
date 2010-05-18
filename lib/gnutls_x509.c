@@ -569,6 +569,7 @@ gnutls_x509_crt_t * xcrt_list = NULL;
 gnutls_pkcs11_obj_t *pcrt_list=NULL;
 unsigned int pcrt_list_size = 0;
 
+
 	ret = gnutls_pkcs11_obj_list_import_url( NULL, &pcrt_list_size, url, GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED);
 	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
 		gnutls_assert();
