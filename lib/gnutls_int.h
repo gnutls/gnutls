@@ -467,6 +467,7 @@ struct gnutls_priority_st
   int unsafe_renegotiation:1;
   int initial_safe_renegotiation:1;
   int disable_safe_renegotiation:1;
+  int safe_renegotiation_set:1; /* whether the priority string set any renegotiation parameters */
   int ssl3_record_version;
   int additional_verify_flags;
 };

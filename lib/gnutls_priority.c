@@ -448,6 +448,21 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   memcpy (&session->internals.priorities, priority,
 	  sizeof (struct gnutls_priority_st));
 
+  /* Hack. Because we want to differentiate the behavior of server
+   * and client with regards to safe renegotiation. If a server didn't
+   * have either SAFE_RENEGOTIATION or UNSAFE_RENEGOTIATION set the
+   * safe renegotiation will be the default. This (as well as the
+   * safe_renegotiation_set flag) has to be removed once safe 
+   * renegotiation is default in both server and client side.
+   */
+  if (session->security_parameters.entity == GNUTLS_SERVER)
+    {
+      if (session->internals.priorities.safe_renegotiation_set == 0)
+        {
+          session->internals.priorities.unsafe_renegotiation = 0;
+        }
+    }
+
   /* set the current version to the first in the chain.
    * This will be overridden later.
    */
@@ -576,6 +591,10 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
+  
+  /* for now unsafe renegotiation is default on everyone. To be removed
+   * when we make it the default.
+   */
   (*priority_cache)->unsafe_renegotiation = 1;
 
   if (priorities == NULL)
@@ -727,18 +746,28 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	      GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT;
 	  else if (strcasecmp (&broken_list[i][1],
 			       "UNSAFE_RENEGOTIATION") == 0)
-	    (*priority_cache)->unsafe_renegotiation = 1;
+            {
+	      (*priority_cache)->unsafe_renegotiation = 1;
+	      (*priority_cache)->safe_renegotiation_set = 1;
+            }
 	  else if (strcasecmp (&broken_list[i][1], "SAFE_RENEGOTIATION") == 0)
-	    (*priority_cache)->unsafe_renegotiation = 0;
+	    {
+	      (*priority_cache)->unsafe_renegotiation = 0;
+	      (*priority_cache)->safe_renegotiation_set = 1;
+            }
 	  else if (strcasecmp (&broken_list[i][1],
 			       "INITIAL_SAFE_RENEGOTIATION") == 0)
 	    {
 	      (*priority_cache)->unsafe_renegotiation = 0;
 	      (*priority_cache)->initial_safe_renegotiation = 1;
+	      (*priority_cache)->safe_renegotiation_set = 1;
 	    }
 	  else if (strcasecmp (&broken_list[i][1],
 			       "DISABLE_SAFE_RENEGOTIATION") == 0)
-	    (*priority_cache)->disable_safe_renegotiation = 1;
+            {
+	      (*priority_cache)->disable_safe_renegotiation = 1;
+	      (*priority_cache)->safe_renegotiation_set = 1;
+            }
 	  else
 	    goto error;
 	}
