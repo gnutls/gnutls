@@ -27,6 +27,7 @@
 # define X509_H
 
 #include <gnutls/x509.h>
+#include <gnutls/abstract.h>
 
 #include <libtasn1.h>
 
@@ -134,14 +135,12 @@ int _gnutls_x509_crl_get_raw_issuer_dn (gnutls_x509_crl_t crl,
 					gnutls_datum_t * dn);
 
 /* sign.c */
-int _gnutls_x509_sign_tbs (ASN1_TYPE cert, const char *tbs_name,
-			   gnutls_digest_algorithm_t hash,
-			   gnutls_x509_privkey_t signer,
-			   gnutls_datum_t * signature);
+int _gnutls_x509_get_tbs (ASN1_TYPE cert, const char *tbs_name,
+			   gnutls_datum_t * tbs);
 int _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
 			    gnutls_digest_algorithm_t,
 			    gnutls_x509_crt_t issuer,
-			    gnutls_x509_privkey_t issuer_key);
+			    gnutls_privkey_t issuer_key);
 
 /* dn.c */
 #define OID_X520_COUNTRY_NAME		"2.5.4.6"
@@ -303,8 +302,7 @@ int _gnutls_x509_write_uint32 (ASN1_TYPE node, const char *value,
 
 int _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
 				   gnutls_pk_algorithm_t pk_algorithm,
-				   gnutls_digest_algorithm_t,
-				   bigint_t * params, int params_size);
+				   gnutls_digest_algorithm_t);
 /* pkcs12.h */
 #include <gnutls/pkcs12.h>
 

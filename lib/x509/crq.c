@@ -1010,7 +1010,7 @@ gnutls_x509_crq_sign2 (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key,
 		       gnutls_digest_algorithm_t dig, unsigned int flags)
 {
   int result;
-  gnutls_datum_t signature;
+  gnutls_privkey_t privkey;
 
   if (crq == NULL)
     {
@@ -1018,55 +1018,33 @@ gnutls_x509_crq_sign2 (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  /* Make sure version field is set. */
-  if (gnutls_x509_crq_get_version (crq) == GNUTLS_E_ASN1_VALUE_NOT_FOUND)
-    {
-      result = gnutls_x509_crq_set_version (crq, 1);
-      if (result < 0)
-	{
-	  gnutls_assert ();
-	  return result;
-	}
-    }
-
-  /* Step 1. Self sign the request.
-   */
-  result =
-    _gnutls_x509_sign_tbs (crq->crq, "certificationRequestInfo",
-			   dig, key, &signature);
-
+  result = gnutls_privkey_init(&privkey);
   if (result < 0)
     {
       gnutls_assert ();
       return result;
     }
 
-  /* Step 2. write the signature (bits)
-   */
-  result =
-    asn1_write_value (crq->crq, "signature", signature.data,
-		      signature.size * 8);
-
-  _gnutls_free_datum (&signature);
-
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      return _gnutls_asn2err (result);
-    }
-
-  /* Step 3. Write the signatureAlgorithm field.
-   */
-  result = _gnutls_x509_write_sig_params (crq->crq, "signatureAlgorithm",
-					  key->pk_algorithm, dig, key->params,
-					  key->params_size);
+  result = gnutls_privkey_import_x509(privkey, key, 0);
   if (result < 0)
     {
       gnutls_assert ();
-      return result;
+      goto fail;
     }
 
-  return 0;
+  result = gnutls_x509_crq_privkey_sign (crq, privkey, dig, flags);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      goto fail;
+    }
+
+  result = 0;
+
+fail:
+  gnutls_privkey_deinit(privkey);
+
+  return result;
 }
 
 /**
@@ -2444,6 +2422,101 @@ gnutls_x509_crq_get_key_id (gnutls_x509_crq_t crq, unsigned int flags,
 
   return result;
 }
+
+/**
+ * gnutls_x509_crq_privkey_sign:
+ * @crq: should contain a #gnutls_x509_crq_t structure
+ * @key: holds a private key
+ * @dig: The message digest to use, i.e., %GNUTLS_DIG_SHA1
+ * @flags: must be 0
+ *
+ * This function will sign the certificate request with a private key.
+ * This must be the same key as the one used in
+ * gnutls_x509_crt_set_key() since a certificate request is self
+ * signed.
+ *
+ * This must be the last step in a certificate request generation
+ * since all the previously set parameters are now signed.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ *   %GNUTLS_E_ASN1_VALUE_NOT_FOUND is returned if you didn't set all
+ *   information in the certificate request (e.g., the version using
+ *   gnutls_x509_crq_set_version()).
+ *
+ **/
+int
+gnutls_x509_crq_privkey_sign (gnutls_x509_crq_t crq, gnutls_privkey_t key,
+		       gnutls_digest_algorithm_t dig, unsigned int flags)
+{
+  int result;
+  gnutls_datum_t signature;
+  gnutls_datum_t tbs;
+
+  if (crq == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  /* Make sure version field is set. */
+  if (gnutls_x509_crq_get_version (crq) == GNUTLS_E_ASN1_VALUE_NOT_FOUND)
+    {
+      result = gnutls_x509_crq_set_version (crq, 1);
+      if (result < 0)
+	{
+	  gnutls_assert ();
+	  return result;
+	}
+    }
+
+  /* Step 1. Self sign the request.
+   */
+  result =
+    _gnutls_x509_get_tbs (crq->crq, "certificationRequestInfo",
+			   &tbs);
+
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  result = gnutls_privkey_sign_data (key, dig, 0, &tbs, &signature);
+  gnutls_free(tbs.data);
+
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  /* Step 2. write the signature (bits)
+   */
+  result =
+    asn1_write_value (crq->crq, "signature", signature.data,
+		      signature.size * 8);
+
+  _gnutls_free_datum (&signature);
+
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  /* Step 3. Write the signatureAlgorithm field.
+   */
+  result = _gnutls_x509_write_sig_params (crq->crq, "signatureAlgorithm",
+					  gnutls_privkey_get_pk_algorithm(key, NULL), dig);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  return 0;
+}
+
 
 
 #endif /* ENABLE_PKI */

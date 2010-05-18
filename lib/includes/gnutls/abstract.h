@@ -34,4 +34,20 @@ int gnutls_privkey_decrypt_data(gnutls_privkey_t signer,
 				const gnutls_datum_t * ciphertext,
 				gnutls_datum_t * plaintext);
 
+int gnutls_x509_crt_privkey_sign (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
+			     gnutls_privkey_t issuer_key,
+			     gnutls_digest_algorithm_t dig,
+			     unsigned int flags);
+
+int gnutls_x509_crl_privkey_sign (gnutls_x509_crl_t crl,
+			     gnutls_x509_crt_t issuer,
+			     gnutls_privkey_t issuer_key,
+			     gnutls_digest_algorithm_t dig,
+			     unsigned int flags);
+
+int gnutls_x509_crq_privkey_sign (gnutls_x509_crq_t crq,
+			     gnutls_privkey_t key,
+			     gnutls_digest_algorithm_t dig,
+			     unsigned int flags);
+
 #endif

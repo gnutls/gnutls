@@ -101,6 +101,7 @@ gnutls_x509_crl_sign2 (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
 		       gnutls_digest_algorithm_t dig, unsigned int flags)
 {
   int result;
+  gnutls_privkey_t privkey;
 
   if (crl == NULL || issuer == NULL)
     {
@@ -108,19 +109,33 @@ gnutls_x509_crl_sign2 (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  /* disable all the unneeded OPTIONAL fields.
-   */
-  disable_optional_stuff (crl);
-
-  result = _gnutls_x509_pkix_sign (crl->crl, "tbsCertList",
-				   dig, issuer, issuer_key);
+  result = gnutls_privkey_init(&privkey);
   if (result < 0)
     {
       gnutls_assert ();
       return result;
     }
 
-  return 0;
+  result = gnutls_privkey_import_x509(privkey, issuer_key, 0);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      goto fail;
+    }
+
+  result = gnutls_x509_crl_privkey_sign (crl, issuer, privkey, dig, flags);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      goto fail;
+    }
+
+  result = 0;
+
+fail:
+  gnutls_privkey_deinit(privkey);
+
+  return result;
 }
 
 /**
@@ -437,6 +452,51 @@ gnutls_x509_crl_set_number (gnutls_x509_crl_t crl,
     }
 
   crl->use_extensions = 1;
+
+  return 0;
+}
+
+/**
+ * gnutls_x509_crl_privkey_sign:
+ * @crl: should contain a gnutls_x509_crl_t structure
+ * @issuer: is the certificate of the certificate issuer
+ * @issuer_key: holds the issuer's private key
+ * @dig: The message digest to use. GNUTLS_DIG_SHA1 is the safe choice unless you know what you're doing.
+ * @flags: must be 0
+ *
+ * This function will sign the CRL with the issuer's private key, and
+ * will copy the issuer's information into the CRL.
+ *
+ * This must be the last step in a certificate CRL since all
+ * the previously set parameters are now signed.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_crl_privkey_sign (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
+		       gnutls_privkey_t issuer_key,
+		       gnutls_digest_algorithm_t dig, unsigned int flags)
+{
+  int result;
+
+  if (crl == NULL || issuer == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  /* disable all the unneeded OPTIONAL fields.
+   */
+  disable_optional_stuff (crl);
+
+  result = _gnutls_x509_pkix_sign (crl->crl, "tbsCertList",
+				   dig, issuer, issuer_key);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
 
   return 0;
 }

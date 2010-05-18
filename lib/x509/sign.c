@@ -42,6 +42,7 @@
 #include <x509_int.h>
 #include <common.h>
 #include <sign.h>
+#include <gnutls/abstract.h>
 
 /* Writes the digest information and the digest in a DER encoded
  * structure. The digest info is allocated and stored into the info structure.
@@ -199,15 +200,12 @@ pk_dsa_hash (const gnutls_datum_t * text, gnutls_datum_t * hash)
  * of the TBS and sign it on the fly.
  */
 int
-_gnutls_x509_sign_tbs (ASN1_TYPE cert, const char *tbs_name,
-		       gnutls_digest_algorithm_t hash,
-		       gnutls_x509_privkey_t signer,
-		       gnutls_datum_t * signature)
+_gnutls_x509_get_tbs (ASN1_TYPE cert, const char *tbs_name,
+		       gnutls_datum_t * tbs)
 {
   int result;
   opaque *buf;
   int buf_size;
-  gnutls_datum_t tbs;
 
   buf_size = 0;
   asn1_der_coding (cert, tbs_name, NULL, &buf_size, NULL);
@@ -228,13 +226,10 @@ _gnutls_x509_sign_tbs (ASN1_TYPE cert, const char *tbs_name,
       return _gnutls_asn2err (result);
     }
 
-  tbs.data = buf;
-  tbs.size = buf_size;
+  tbs->data = buf;
+  tbs->size = buf_size;
 
-  result = gnutls_x509_privkey_sign_data2 (signer, hash, 0, &tbs, signature);
-  gnutls_free (buf);
-
-  return result;
+  return 0;
 }
 
 /*-
@@ -253,10 +248,11 @@ int
 _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
 			gnutls_digest_algorithm_t dig,
 			gnutls_x509_crt_t issuer,
-			gnutls_x509_privkey_t issuer_key)
+			gnutls_privkey_t issuer_key)
 {
   int result;
   gnutls_datum_t signature;
+  gnutls_datum_t tbs;
   char name[128];
 
   /* Step 1. Copy the issuer's name into the certificate.
@@ -277,9 +273,7 @@ _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
   _gnutls_str_cat (name, sizeof (name), ".signature");
 
   result = _gnutls_x509_write_sig_params (src, name,
-					  issuer_key->pk_algorithm, dig,
-					  issuer_key->params,
-					  issuer_key->params_size);
+					  gnutls_privkey_get_pk_algorithm(issuer_key, NULL), dig);
   if (result < 0)
     {
       gnutls_assert ();
@@ -288,7 +282,16 @@ _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
 
   /* Step 2. Sign the certificate.
    */
-  result = _gnutls_x509_sign_tbs (src, src_name, dig, issuer_key, &signature);
+  result = _gnutls_x509_get_tbs (src, src_name, &tbs);
+
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  result = gnutls_privkey_sign_data (issuer_key, dig, 0, &tbs, &signature);
+  gnutls_free(tbs.data);
 
   if (result < 0)
     {
@@ -314,9 +317,7 @@ _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
    */
 
   result = _gnutls_x509_write_sig_params (src, "signatureAlgorithm",
-					  issuer_key->pk_algorithm, dig,
-					  issuer_key->params,
-					  issuer_key->params_size);
+					  gnutls_privkey_get_pk_algorithm(issuer_key, NULL), dig);
   if (result < 0)
     {
       gnutls_assert ();
