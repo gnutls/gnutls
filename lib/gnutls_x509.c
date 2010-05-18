@@ -562,6 +562,68 @@ cleanup:
 
 /* Reads a private key from a token.
  */
+static int read_cas_url (gnutls_certificate_credentials_t res, const char* url)
+{
+int ret;
+gnutls_x509_crt_t * xcrt_list = NULL;
+gnutls_pkcs11_crt_t *pcrt_list=NULL;
+unsigned int pcrt_list_size = 0;
+
+	ret = gnutls_pkcs11_crt_list_import_url( NULL, &pcrt_list_size, url, GNUTLS_PKCS11_CRT_ATTR_TRUSTED);
+	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+		gnutls_assert();
+		return ret;
+	}
+                                                        
+	if (pcrt_list_size == 0) {
+		gnutls_assert();
+		return 0;
+	}
+	
+	pcrt_list = gnutls_malloc(sizeof(*pcrt_list)*pcrt_list_size);
+	if (pcrt_list == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_MEMORY_ERROR;
+	}
+	
+	ret = gnutls_pkcs11_crt_list_import_url( pcrt_list, &pcrt_list_size, url, GNUTLS_PKCS11_CRT_ATTR_TRUSTED);
+	if (ret < 0) {
+		gnutls_assert();
+		goto cleanup;
+	}
+
+	xcrt_list = gnutls_malloc(sizeof(*xcrt_list)*pcrt_list_size);
+	if (xcrt_list == NULL) {
+		gnutls_assert();
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
+	
+	ret = gnutls_x509_crt_list_import_pkcs11(xcrt_list, pcrt_list_size, pcrt_list, 0);
+	if (xcrt_list == NULL) {
+		gnutls_assert();
+		ret = GNUTLS_E_MEMORY_ERROR;
+		goto cleanup;
+	}
+
+	res->x509_ca_list = xcrt_list;
+	res->x509_ncas = pcrt_list_size;
+	
+	gnutls_free(pcrt_list);
+	
+	return pcrt_list_size;
+
+cleanup:
+	gnutls_free(xcrt_list);
+	gnutls_free(pcrt_list);
+
+	return ret;
+
+}
+
+
+/* Reads a private key from a token.
+ */
 static int read_cert_url (gnutls_certificate_credentials_t res, const char* url)
 {
 int ret;
@@ -882,6 +944,9 @@ gnutls_certificate_set_x509_key (gnutls_certificate_credentials_t res,
  *
  * Currently only PKCS-1 encoded RSA and DSA private keys are accepted by
  * this function.
+ *
+ * This function can also accept PKCS #11 URLs. In that case it
+ * will import the private key and certificate indicated by the urls.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
@@ -1285,6 +1350,9 @@ gnutls_certificate_set_x509_trust (gnutls_certificate_credentials_t res,
  * the client if a certificate request is sent. This can be disabled
  * using gnutls_certificate_send_x509_rdn_sequence().
  *
+ * This function can also accept PKCS #11 URLs. In that case it
+ * will import all certificates that are marked as trusted.
+ *
  * Returns: number of certificates processed, or a negative value on
  * error.
  **/
@@ -1295,8 +1363,13 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t res,
 {
   int ret, ret2;
   size_t size;
-  char *data = read_binary_file (cafile, &size);
+  char* data;
+  
+  if (strncmp(cafile, "pkcs11:", 7)==0) {
+    return read_cas_url(res, cafile);
+  }
 
+  data = read_binary_file (cafile, &size);
   if (data == NULL)
     {
       gnutls_assert ();

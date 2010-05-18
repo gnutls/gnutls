@@ -94,7 +94,7 @@ if test x$ac_pakchois != xno; then
 else
  AC_MSG_RESULT(no)
 fi
-AM_CONDITIONAL(ENABLE_PKCS11, test "$ac_cv_libpakchois" = "yes")
+AM_CONDITIONAL(ENABLE_PAKCHOIS, test "$ac_cv_libpakchois" = "yes")
 
 lgl_INIT
 

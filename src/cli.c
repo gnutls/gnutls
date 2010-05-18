@@ -582,6 +582,7 @@ init_tls_session (const char *hostname)
 
   gnutls_certificate_set_retrieve_function (xcred, cert_callback);
   gnutls_certificate_set_verify_function (xcred, cert_verify_callback);
+  gnutls_certificate_set_verify_flags(xcred, GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
 
   /* send the fingerprint */
 #ifdef ENABLE_OPENPGP
