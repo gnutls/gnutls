@@ -99,6 +99,12 @@ if ENABLE_PKCS11
 COBJECTS += pkcs11.c pkcs11_privkey.c
 endif
 
+if ENABLE_NETTLE
+SUBDIRS += nettle
+else
+SUBDIRS += gcrypt
+endif
+
 if ENABLE_OPRFI
 COBJECTS += $(OPRFI_COBJECTS)
 endif
