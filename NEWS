@@ -5,8 +5,15 @@ See the end for copying conditions.
 
 * Version 2.9.11 (unreleased)
 
+** Removed two APIs related to safe renegotiation.
+Use priority strings instead.  The APIs were
+gnutls_safe_negotiation_set_initial and gnutls_safe_renegotiation_set.
+(Remember that we don't promise ABI stability during development
+series, so this doesn't cause an shared library ABI increment.)
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_safe_negotiation_set_initial: REMOVED.
+gnutls_safe_renegotiation_set: REMOVED.
 
 * Version 2.9.10 (released 2010-04-22)
 

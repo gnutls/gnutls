@@ -312,8 +312,8 @@ main (int argc, char *argv[])
     }
 
   /* Check that this API does not affect anything after first
-     handshake. */
-  gnutls_safe_negotiation_set_initial (server, 0);
+     handshake.
+  gnutls_safe_negotiation_set_initial (server, 0); */
 
   sret = gnutls_rehandshake (server);
   if (debug_level > 0)
@@ -371,8 +371,8 @@ main (int argc, char *argv[])
   if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_SUCCESS)
     exit_code = 1;
 
-  /* Check that disabling the extension will break rehandshakes. */
-  gnutls_safe_renegotiation_set (client, 0);
+  /* Check that disabling the extension will break rehandshakes.
+     gnutls_safe_renegotiation_set (client, 0); */
 
   sret = gnutls_rehandshake (server);
   if (debug_level > 0)

@@ -1289,16 +1289,10 @@ priority string.  It is possible to disable use of the extension
 completely by using the @code{%DISABLE_SAFE_RENEGOTIATION} priority
 string however this is recommended against except for debugging.
 
-For applications we have introduced three new APIs related to safe
+For applications we have introduced a new API related to safe
 renegotiation.  The @ref{gnutls_safe_renegotiation_status} function is
 used to check if the extension has been negotiated on a session, and
-can be used both by clients and servers.  The
-@ref{gnutls_safe_renegotiation_set} function allows applications to
-request that the extension should be disabled (or re-enabled) in
-handshakes for the session.  The
-@ref{gnutls_safe_negotiation_set_initial} function is only relevant
-for servers, and is used to enforce that clients support the extension
-even on the initial handshake.
+can be used both by clients and servers.
 
 @node Authentication methods
 @chapter Authentication Methods

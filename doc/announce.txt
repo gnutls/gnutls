@@ -312,15 +312,10 @@ is possible to disable use of the extension completely by using the
 `%DISABLE_SAFE_RENEGOTIATION' priority string however this is
 recommended against except for debugging.
 
-For applications we have introduced three new APIs related to safe
+For applications we have introduced a new API related to safe
 renegotiation.  The gnutls_safe_renegotiation_status function is used
 to check if the extension has been negotiated on a session, and can be
-used both by clients and servers.  The gnutls_safe_renegotiation_set
-function allows applications to request that the extension should be
-disabled (or re-enabled) in handshakes for the session.  The
-gnutls_safe_negotiation_set_initial function is only relevant for
-servers, and is used to enforce that clients support the extension
-even on the initial handshake.
+used both by clients and servers.
 
 API/ABI changes in GnuTLS 2.10
 ==============================
@@ -349,8 +344,6 @@ gnutls_hmac_fast: ADDED.
 gnutls_hmac_get_len: ADDED.
 gnutls_hmac_init: ADDED.
 gnutls_hmac_output: ADDED.
-gnutls_safe_negotiation_set_initial: ADDED.
-gnutls_safe_renegotiation_set: ADDED.
 gnutls_safe_renegotiation_status: ADDED.
 gnutls_sign_algorithm_get_requested: ADDED.
 

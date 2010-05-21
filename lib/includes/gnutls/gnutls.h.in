@@ -812,11 +812,6 @@ extern "C"
 			      unsigned int *type, unsigned int indx);
 
   /* Safe renegotiation */
-  void gnutls_safe_negotiation_set_initial (gnutls_session_t session,
-					    int value);
-
-  void gnutls_safe_renegotiation_set (gnutls_session_t session, int value);
-
   int gnutls_safe_renegotiation_status (gnutls_session_t session);
 
   /* Opaque PRF Input
