@@ -48,6 +48,7 @@ _gnutls_srp_gx (opaque * text, size_t textsize, opaque ** result,
 {
   bigint_t x, e;
   size_t result_size;
+  int ret;
 
   if (_gnutls_mpi_scan_nz (&x, text, textsize))
     {
@@ -67,19 +68,25 @@ _gnutls_srp_gx (opaque * text, size_t textsize, opaque ** result,
   _gnutls_mpi_powm (e, g, x, prime);
   _gnutls_mpi_release (&x);
 
-  _gnutls_mpi_print (e, NULL, &result_size);
-  if (result != NULL)
+  ret = _gnutls_mpi_print (e, NULL, &result_size);
+  if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
       *result = galloc_func (result_size);
       if ((*result) == NULL)
 	return GNUTLS_E_MEMORY_ERROR;
 
       _gnutls_mpi_print (e, *result, &result_size);
+      ret = result_size;
+    }
+  else
+    {
+      gnutls_assert();
+      ret = GNUTLS_E_MPI_PRINT_FAILED;
     }
 
   _gnutls_mpi_release (&e);
 
-  return result_size;
+  return ret;
 
 }
 

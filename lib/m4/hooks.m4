@@ -34,7 +34,30 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   DLL_VERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
   AC_SUBST(DLL_VERSION)
 
-  AC_LIB_HAVE_LINKFLAGS([gcrypt], [gpg-error], [#include <gcrypt.h>],
+  cryptolib="nettle (unsupported)"
+  AC_ARG_WITH(nettle,
+    AS_HELP_STRING([--with-nettle], [use libnettle 2.x as crypto library]),
+      nettle=$withval,
+      nettle=no)
+    if test "$nettle" = "yes"; then
+    AC_LIB_HAVE_LINKFLAGS([nettle],, [#include <nettle/aes.h>],
+                          [aes_set_key (0, 0, 0)])
+    if test "$ac_cv_libnettle" != yes; then
+      nettle=yes
+      AC_MSG_WARN([[
+  *** 
+  *** Libnettle was not found. 
+  ]])
+    fi
+  fi
+
+  AC_MSG_CHECKING([whether to use nettle])
+  AC_MSG_RESULT($nettle)
+  AM_CONDITIONAL(ENABLE_NETTLE, test "$nettle" = "yes")
+
+  if test "$nettle" != "yes";then
+  	cryptolib=libgcrypt
+	AC_LIB_HAVE_LINKFLAGS([gcrypt], [gpg-error], [#include <gcrypt.h>],
     [enum gcry_cipher_algos i = GCRY_CIPHER_CAMELLIA128])
   if test "$ac_cv_libgcrypt" != yes; then
     AC_MSG_ERROR([[
@@ -43,6 +66,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
 *** ftp://ftp.gnupg.org/gcrypt/libgcrypt/
 ***
     ]])
+  fi
   fi
 
   AC_ARG_WITH(included-libtasn1,
@@ -174,9 +198,14 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   AM_CONDITIONAL(ENABLE_ANON, test "$ac_enable_anon" != "no")
   
   # Allow disabling Camellia
+  if test "$nettle" != "yes";then
   AC_ARG_ENABLE(camellia,
     AS_HELP_STRING([--disable-camellia], [disable Camellia cipher]),
     enable_camellia=$enableval, enable_camellia=yes)
+  else
+    enable_camellia=no
+  fi
+
   AC_MSG_CHECKING([whether to disable Camellia cipher])
   if test "$enable_camellia" != "no"; then
    AC_MSG_RESULT([no])

@@ -848,7 +848,7 @@ doit (void)
 
       if (verify_status != chains[i].expected_verify_result)
 	{
-	  fail ("verify_status: %d expected: %d",
+	  fail ("verify_status: %d expected: %d\n",
 		verify_status, chains[i].expected_verify_result);
 
 	  if (debug)

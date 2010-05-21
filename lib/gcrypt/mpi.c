@@ -68,6 +68,7 @@ wrap_gcry_mpi_print (const bigint_t a, void *buffer, size_t * nbytes,
 		     gnutls_bigint_format_t format)
 {
   int ret;
+  size_t init_bytes = *nbytes;
 
   format = _format_conv (format);
 
@@ -75,8 +76,12 @@ wrap_gcry_mpi_print (const bigint_t a, void *buffer, size_t * nbytes,
     return GNUTLS_E_INVALID_REQUEST;
 
   ret = gcry_mpi_print (format, buffer, *nbytes, nbytes, a);
-  if (!ret)
+  if (!ret) {
+    if (buffer==NULL || init_bytes < *nbytes) {
+      return GNUTLS_E_SHORT_MEMORY_BUFFER;
+    }
     return 0;
+  }
 
   return GNUTLS_E_MPI_PRINT_FAILED;
 }

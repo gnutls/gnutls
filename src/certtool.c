@@ -172,9 +172,6 @@ generate_private_key_int (void)
   if (info.dsa)
     {
       key_type = GNUTLS_PK_DSA;
-      /* FIXME: Remove me once we depend on 1.3.x */
-      if (info.bits > 1024 && gcry_check_version ("1.3.1") == NULL)
-	info.bits = 1024;
     }
   else
     key_type = GNUTLS_PK_RSA;
@@ -921,19 +918,6 @@ gaa_parser (int argc, char **argv)
       template_parse (info.template);
     }
 
-#ifdef gcry_fips_mode_active
-  /* Libgcrypt manual says that gcry_version_check must be called
-     before calling gcry_fips_mode_active. */
-  gcry_check_version (NULL);
-  if (gcry_fips_mode_active ())
-    {
-      ret = gnutls_register_md5_handler ();
-      if (ret)
-	fprintf (stderr, "gnutls_register_md5_handler: %s\n",
-		 gnutls_strerror (ret));
-    }
-#endif
-
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (info.debug);
   if (info.debug > 1)
@@ -963,9 +947,6 @@ gaa_parser (int argc, char **argv)
 
   if ((ret = gnutls_global_init_extra ()) < 0)
     error (EXIT_FAILURE, 0, "global_init_extra: %s", gnutls_strerror (ret));
-
-  if (info.quick_random != 0)
-    gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
 
   switch (info.action)
     {

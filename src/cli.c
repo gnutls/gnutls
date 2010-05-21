@@ -38,7 +38,6 @@
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
 #include <gnutls/pkcs11.h>
-#include <gcrypt.h>
 
 /* Gnulib portability files. */
 #include <progname.h>
@@ -700,21 +699,6 @@ main (int argc, char **argv)
 
   set_program_name (argv[0]);
 
-  gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
-
-#ifdef gcry_fips_mode_active
-  /* Libgcrypt manual says that gcry_version_check must be called
-     before calling gcry_fips_mode_active. */
-  gcry_check_version (NULL);
-  if (gcry_fips_mode_active ())
-    {
-      ret = gnutls_register_md5_handler ();
-      if (ret)
-	fprintf (stderr, "gnutls_register_md5_handler: %s\n",
-		 gnutls_strerror (ret));
-    }
-#endif
-
   if ((ret = gnutls_global_init ()) < 0)
     {
       fprintf (stderr, "global_init: %s\n", gnutls_strerror (ret));
@@ -957,9 +941,6 @@ after_handshake:
 
 	}
     }
-
-  if (info.debug)
-    gcry_control (GCRYCTL_DUMP_RANDOM_STATS);
 
   if (user_term != 0)
     socket_bye (&hd);

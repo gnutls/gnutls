@@ -343,7 +343,7 @@ _gnutls_x509_write_int (ASN1_TYPE node, const char *value, bigint_t mpi,
   else
     result = _gnutls_mpi_print (mpi, NULL, &s_len);
 
-  if (result != 0)
+  if (result != GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
       gnutls_assert ();
       return result;

@@ -74,7 +74,7 @@ AC_DEFINE([HAVE_CTYPE_H], 1, [Hard-code for src/cfg/.])
 AC_DEFINE([HAVE_ERRNO_H], 1, [Hard-code for src/cfg/.])
 
 # No fork on MinGW, disable some self-tests until we fix them.
-AC_CHECK_FUNCS(fork,,)
+AC_CHECK_FUNCS(fork getrusage,,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
 AC_CHECK_TYPES(uint,,, [
@@ -305,4 +305,5 @@ AC_MSG_NOTICE([summary of build options:
   C++ library:      $use_cxx
   OpenSSL library:  $enable_openssl
   /dev/crypto:      $enable_cryptodev
+  Crypto library:   $cryptolib
 ])

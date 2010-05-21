@@ -196,7 +196,7 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  if (_gnutls_mpi_print (B, NULL, &n_b) != 0)
+  if (_gnutls_mpi_print (B, NULL, &n_b) != GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_PRINT_FAILED;
@@ -344,7 +344,7 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
       return ret;
     }
 
-  if (_gnutls_mpi_print (A, NULL, &n_a) != 0)
+  if (_gnutls_mpi_print (A, NULL, &n_a) != GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
       gnutls_assert ();
       return GNUTLS_E_MPI_PRINT_FAILED;

@@ -28,7 +28,9 @@
 #include <libtasn1.h>
 #include <gnutls_dh.h>
 #include <random.h>
+#ifndef HAVE_LIBNETTLE
 #include <gcrypt.h>
+#endif
 #include <gnutls/pkcs11.h>
 
 #include <gnutls_extensions.h>	/* for _gnutls_ext_init */
@@ -184,6 +186,7 @@ gnutls_global_init (void)
 
   bindtextdomain (PACKAGE, LOCALEDIR);
 
+#ifndef HAVE_LIBNETTLE
   /* Initialize libgcrypt if it hasn't already been initialized. */
   if (gcry_control (GCRYCTL_ANY_INITIALIZATION_P) == 0)
     {
@@ -205,7 +208,7 @@ gnutls_global_init (void)
 
       gcry_control (GCRYCTL_INITIALIZATION_FINISHED, NULL, 0);
     }
-
+#endif
   /* initialize ASN.1 parser
    * This should not deal with files in the final
    * version.

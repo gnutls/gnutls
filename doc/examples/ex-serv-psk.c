@@ -14,7 +14,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
-#include <gcrypt.h>		/* for gcry_control */
 
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
@@ -100,10 +99,6 @@ main (void)
   gnutls_session_t session;
   char buffer[MAX_BUF + 1];
   int optval = 1;
-
-  /* to disallow usage of the blocking /dev/random 
-   */
-  gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
 
   /* this must be called once in the program
    */

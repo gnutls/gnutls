@@ -34,7 +34,6 @@
 #include <sys/types.h>
 #include <string.h>
 #include <gnutls/gnutls.h>
-#include <gcrypt.h>
 #include <gnutls/extra.h>
 #include <gnutls/openpgp.h>
 #include <sys/time.h>
@@ -865,19 +864,6 @@ main (int argc, char **argv)
 
   set_program_name (argv[0]);
 
-#ifdef gcry_fips_mode_active
-  /* Libgcrypt manual says that gcry_version_check must be called
-     before calling gcry_fips_mode_active. */
-  gcry_check_version (NULL);
-  if (gcry_fips_mode_active ())
-    {
-      ret = gnutls_register_md5_handler ();
-      if (ret)
-	fprintf (stderr, "gnutls_register_md5_handler: %s\n",
-		 gnutls_strerror (ret));
-    }
-#endif
-
 #ifndef _WIN32
   signal (SIGPIPE, SIG_IGN);
   signal (SIGHUP, SIG_IGN);
@@ -901,8 +887,6 @@ main (int argc, char **argv)
     {
       strcpy (name, "Echo Server");
     }
-
-  gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
 
   if ((ret = gnutls_global_init ()) < 0)
     {

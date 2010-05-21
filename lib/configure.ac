@@ -87,9 +87,9 @@ if test x$ac_pakchois != xno; then
  AC_MSG_RESULT(yes)
  AC_LIB_HAVE_LINKFLAGS(pakchois,, [#include <pakchois/pakchois.h>], [pakchois_module_load(0,0);])
  if test "$ac_cv_libpakchois" != yes; then
-   AC_MSG_WARN(
+   AC_MSG_ERROR(
 *** 
-*** Pakchois was not found. You will not be able to use PKCS11 support.)
+*** Pakchois was not found. This is required for PKCS11 support.)
  fi
 else
  AC_MSG_RESULT(no)
@@ -124,5 +124,7 @@ AC_CONFIG_FILES([
   openpgp/Makefile
   po/Makefile.in
   x509/Makefile
+  gcrypt/Makefile
+  nettle/Makefile
 ])
 AC_OUTPUT
