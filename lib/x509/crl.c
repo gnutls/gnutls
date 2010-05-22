@@ -621,7 +621,7 @@ cleanup:
  * This function will export the revocation list to DER or PEM format.
  *
  * If the buffer provided is not long enough to hold the output, then
- * ¤GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+ * %GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
  *
  * If the structure is PEM encoded, it will have a header
  * of "BEGIN X509 CRL".
