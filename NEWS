@@ -11,6 +11,8 @@ gnutls_safe_negotiation_set_initial and gnutls_safe_renegotiation_set.
 (Remember that we don't promise ABI stability during development
 series, so this doesn't cause an shared library ABI increment.)
 
+** Terms 'GNUTLS' and 'GNU TLS' were changed to 'GnuTLS' for consistency.
+
 ** API and ABI modifications:
 gnutls_safe_negotiation_set_initial: REMOVED.
 gnutls_safe_renegotiation_set: REMOVED.
