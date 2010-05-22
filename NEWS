@@ -99,6 +99,7 @@ gnutls_pubkey_import_rsa_raw: ADDED
 gnutls_x509_crt_set_pubkey: ADDED
 gnutls_x509_crq_set_pubkey: ADDED
 
+
 * Version 2.9.10 (released 2010-04-22)
 
 ** libgnutls: Time verification extended to trusted certificate list.
