@@ -45,14 +45,11 @@ struct gnutls_pkcs11_provider_s {
 
 struct url_find_data_st {
     gnutls_pkcs11_obj_t crt;
-<<<<<<< HEAD:lib/pkcs11.c
 };
 
 struct flags_find_data_st {
     struct pkcs11_url_info info;
     unsigned int slot_flags;
-=======
->>>>>>> Added gnutls_pubkey_t abstract type to handle public keys. It can currently:lib/pkcs11.c
 };
 
 struct flags_find_data_st {
@@ -640,10 +637,7 @@ cleanup:
 int gnutls_pkcs11_obj_init(gnutls_pkcs11_obj_t * crt)
 {
     *crt = gnutls_calloc(1, sizeof(struct gnutls_pkcs11_obj_st));
-<<<<<<< HEAD:lib/pkcs11.c
 
-=======
->>>>>>> Added gnutls_pubkey_t abstract type to handle public keys. It can currently:lib/pkcs11.c
     if (*crt == NULL) {
         gnutls_assert();
         return GNUTLS_E_MEMORY_ERROR;
@@ -831,8 +825,6 @@ static int pkcs11_obj_import(unsigned int class, gnutls_pkcs11_obj_t crt, const 
             crt->type = GNUTLS_PKCS11_OBJ_UNKNOWN;
     }
     
-<<<<<<< HEAD:lib/pkcs11.c
-=======
     switch(class) {
         case CKO_CERTIFICATE:
             crt->type = GNUTLS_PKCS11_OBJ_X509_CRT;
@@ -1163,15 +1155,11 @@ static int find_obj_url(pakchois_session_t *pks, struct token_info *info, void* 
             gnutls_datum_t data = { a[0].value, a[0].value_len };
             gnutls_datum_t label = { a[1].value, a[1].value_len };
             
-<<<<<<< HEAD:lib/pkcs11.c
             if (class == CKO_PUBLIC_KEY) {
                 ret = pkcs11_obj_import_pubkey(pks, obj, find_data->crt, &id, &label, &info->tinfo);
             } else {
                 ret = pkcs11_obj_import(class, find_data->crt, &data, &id, &label, &info->tinfo);
             }
-=======
-            ret = pkcs11_obj_import(CKO_CERTIFICATE, find_data->crt, &data, &id, &label, &info->tinfo);
->>>>>>> Added gnutls_pubkey_t abstract type to handle public keys. It can currently:lib/pkcs11.c
             if (ret < 0) {
                 gnutls_assert();
                 goto cleanup;
@@ -1392,7 +1380,6 @@ int ret;
  * Returns: The type of the certificate.
  **/
 gnutls_pkcs11_obj_type_t gnutls_pkcs11_obj_get_type (gnutls_pkcs11_obj_t obj)
-<<<<<<< HEAD:lib/pkcs11.c
 {
     return obj->type;
 }
@@ -1564,10 +1551,6 @@ static int find_privkeys(pakchois_session_t *pks, struct token_info* info, struc
     list->key_ids_size = current-1;
 
     return 0;
-=======
-{
-    return obj->type;
->>>>>>> Added gnutls_pubkey_t abstract type to handle public keys. It can currently:lib/pkcs11.c
 }
 
 struct pkey_list {
@@ -1667,7 +1650,6 @@ static int find_privkeys(pakchois_session_t *pks, struct token_info* info, struc
     ck_object_handle_t obj;
     unsigned long count, current;
     char certid_tmp[PKCS11_ID_SIZE];
-    int ret;
 
     class = CKO_PRIVATE_KEY;
 
@@ -1914,21 +1896,12 @@ static int find_objs(pakchois_session_t *pks, struct token_info *info, void* inp
             value.data = NULL;
             value.size = 0;
         }        
-<<<<<<< HEAD:lib/pkcs11.c
 
         if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_ALL) {
             a[0].type = CKA_CLASS;
             a[0].value = &class;
             a[0].value_len = sizeof class;
 
-=======
-
-        if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_ALL) {
-            a[0].type = CKA_CLASS;
-            a[0].value = &class;
-            a[0].value_len = sizeof class;
-
->>>>>>> Added gnutls_pubkey_t abstract type to handle public keys. It can currently:lib/pkcs11.c
             pakchois_get_attribute_value(pks, obj, a, 1);
         }
 
@@ -1948,15 +1921,12 @@ static int find_objs(pakchois_session_t *pks, struct token_info *info, void* inp
                 goto fail;
             }
 
-<<<<<<< HEAD:lib/pkcs11.c
            if (class == CKO_PUBLIC_KEY) {
                 ret = pkcs11_obj_import_pubkey(pks, obj, find_data->p_list[find_data->current], &id, &label, &info->tinfo);
             } else {
                 ret = pkcs11_obj_import(class, find_data->p_list[find_data->current], &value, &id, &label, &info->tinfo);
             }
-=======
-            ret = pkcs11_obj_import(class, find_data->p_list[find_data->current], &value, &id, &label, &info->tinfo);
->>>>>>> Added gnutls_pubkey_t abstract type to handle public keys. It can currently:lib/pkcs11.c
+
             if (ret < 0) {
                 gnutls_assert();
                 goto fail;
