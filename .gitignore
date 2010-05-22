@@ -1,3 +1,4 @@
+ABOUT-NLS
 *.lo
 *.o
 *~
@@ -56,6 +57,8 @@ doc/examples/ex-serv-psk
 doc/examples/ex-serv-srp
 doc/examples/ex-serv1
 doc/examples/libexamples.la
+lib/gcrypt/libcrypto.la
+lib/nettle/libcrypto.la
 doc/extra-api.texi
 doc/extra.c.texi
 doc/gnutls-api.texi
@@ -389,6 +392,11 @@ tests/pkcs8-decode/Makefile
 tests/pkcs8-decode/Makefile.in
 tests/pskself
 tests/resume
+tests/mini-x509
+tests/mini-x509-rehandshake
+tests/safe-renegotiation/srn1
+tests/safe-renegotiation/srn2
+tests/safe-renegotiation/srn3
 tests/rsa-md5-collision/Makefile
 tests/rsa-md5-collision/Makefile.in
 tests/safe-renegotiation/Makefile
