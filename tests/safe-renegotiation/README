@@ -1,0 +1,9 @@
+Testing safe renegotiation is relatively complex, here is a summary of
+what we test and what how we believe it should work.
+
+srn0.c:
+
+ This tests that the safe renegotiation extension is negotiated
+ properly by default on initial connections and on rehandshaked
+ connections.  Consequently, it also verifies that rehandshaked
+ connections work with the extension enabled.

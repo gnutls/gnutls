@@ -25,13 +25,13 @@ AM_CPPFLAGS = \
 AM_LDFLAGS = -no-install
 LDADD = ../../lib/libgnutls.la $(LTLIBGCRYPT) $(LIBSOCKET)
 
-ctests = srn1 srn2 srn3
+ctests = srn0 srn1 srn2 srn3
 
 check_PROGRAMS = $(ctests)
 TESTS = $(ctests)
 TESTS_ENVIRONMENT = $(VALGRIND)
 
-EXTRA_DIST = params.dh
+EXTRA_DIST = README params.dh
 
 dist_check_SCRIPTS = testsrn
 #TESTS = testsrn
