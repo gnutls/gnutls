@@ -409,7 +409,7 @@ gnutls_pubkey_get_key_id(gnutls_pubkey_t key, unsigned int flags,
 
 /**
  * gnutls_pubkey_get_pk_rsa_raw:
- * @crt: Holds the certificate
+ * @key: Holds the certificate
  * @m: will hold the modulus
  * @e: will hold the public exponent
  *
@@ -453,7 +453,7 @@ gnutls_pubkey_get_pk_rsa_raw(gnutls_pubkey_t key,
 
 /**
  * gnutls_pubkey_get_pk_dsa_raw:
- * @crt: Holds the certificate
+ * @key: Holds the public key
  * @p: will hold the p
  * @q: will hold the q
  * @g: will hold the g
@@ -611,6 +611,17 @@ int gnutls_pubkey_import(gnutls_pubkey_t key,
 	return result;
 }
 
+/**
+ * gnutls_x509_crt_set_pubkey:
+ * @crt: should contain a #gnutls_x509_crt_t structure
+ * @key: holds a public key
+ *
+ * This function will set the public parameters from the given public
+ * key to the request.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_x509_crt_set_pubkey(gnutls_x509_crt_t crt, gnutls_pubkey_t key)
 {
 	int result;
@@ -637,6 +648,17 @@ int gnutls_x509_crt_set_pubkey(gnutls_x509_crt_t crt, gnutls_pubkey_t key)
 	return 0;
 }
 
+/**
+ * gnutls_x509_crq_set_pubkey:
+ * @crq: should contain a #gnutls_x509_crq_t structure
+ * @key: holds a public key
+ *
+ * This function will set the public parameters from the given public
+ * key to the request.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_x509_crq_set_pubkey(gnutls_x509_crq_t crq, gnutls_pubkey_t key)
 {
 	int result;
@@ -816,5 +838,67 @@ gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key,
 	key->pk_algorithm = GNUTLS_PK_DSA;
 
 	return 0;
+
+}
+
+/**
+ * gnutls_pubkey_verify_hash:
+ * @key: Holds the certificate
+ * @flags: should be 0 for now
+ * @hash: holds the hash digest to be verified
+ * @signature: contains the signature
+ *
+ * This function will verify the given signed digest, using the
+ * parameters from the certificate.
+ *
+ * Returns: In case of a verification failure 0 is returned, and 1 on
+ * success.
+ **/
+int
+gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
+			     const gnutls_datum_t * hash,
+			     const gnutls_datum_t * signature)
+{
+  int ret;
+
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+   ret =
+    pubkey_verify_sig (NULL, hash, signature, key->pk_algorithm,
+		key->params, key->params_size);
+
+  return ret;
+}
+
+/**
+ * gnutls_pubkey_get_verify_algorithm:
+ * @key: Holds the certificate
+ * @signature: contains the signature
+ * @hash: The result of the call with the hash algorithm used for signature
+ *
+ * This function will read the certifcate and the signed data to
+ * determine the hash algorithm used to generate the signature.
+ *
+ * Returns: the 0 if the hash algorithm is found. A negative value is
+ * returned on error.
+ **/
+int
+gnutls_pubkey_get_verify_algorithm (gnutls_pubkey_t key,
+				      const gnutls_datum_t * signature,
+				      gnutls_digest_algorithm_t * hash)
+{
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  return _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) hash,
+			signature, key->pk_algorithm, key->params,
+			key->params_size);
 
 }

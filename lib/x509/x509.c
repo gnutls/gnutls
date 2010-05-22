@@ -2499,14 +2499,37 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
 				      const gnutls_datum_t * signature,
 				      gnutls_digest_algorithm_t * hash)
 {
+  bigint_t issuer_params[MAX_PUBLIC_PARAMS_SIZE];
+  int issuer_params_size;
+  int ret, i;
+
   if (crt == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  return _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) hash,
-					signature, crt);
+  issuer_params_size = MAX_PUBLIC_PARAMS_SIZE;
+  ret =
+	_gnutls_x509_crt_get_mpis (crt, issuer_params,
+				   &issuer_params_size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  ret = _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) hash,
+			signature, gnutls_x509_crt_get_pk_algorithm (crt, NULL),
+			issuer_params, issuer_params_size);
+
+  /* release allocated mpis */
+  for (i = 0; i < issuer_params_size; i++)
+    {
+      _gnutls_mpi_release (&issuer_params[i]);
+    }
+
+  return ret;
 }
 
 /**
@@ -2518,6 +2541,9 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
  *
  * This function will verify the given signed data, using the
  * parameters from the certificate.
+ *
+ * Note: Use gnutls_x509_crt_verify_hash() instead. This function
+ * does not do the implied hashing of the data.
  *
  * Returns: In case of a verification failure 0 is returned, and 1 on
  * success.

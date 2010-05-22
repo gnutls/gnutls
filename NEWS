@@ -88,6 +88,8 @@ gnutls_pubkey_get_pk_dsa_raw: ADDED
 gnutls_pubkey_export: ADDED
 gnutls_pubkey_get_key_id: ADDED
 gnutls_pubkey_get_key_usage: ADDED
+gnutls_pubkey_verify_hash: ADDED
+gnutls_pubkey_get_verify_algorithm: ADDED
 gnutls_pkcs11_type_get_name: ADDED
 gnutls_pubkey_import_pkcs11_url: ADDED
 gnutls_pubkey_import: ADDED

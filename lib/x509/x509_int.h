@@ -180,9 +180,13 @@ int _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
 /* verify.c */
 int gnutls_x509_crt_is_issuer (gnutls_x509_crt_t cert,
 			       gnutls_x509_crt_t issuer);
-int _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
-				   const gnutls_datum_t * signature,
-				   const gnutls_x509_crt_t crt);
+
+int
+_gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
+			       const gnutls_datum_t * signature,
+			       gnutls_pk_algorithm pk,
+			       bigint_t* issuer_params, unsigned int issuer_params_size);
+
 int _gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
 				   const gnutls_datum_t * hash,
 				   const gnutls_datum_t * signature,

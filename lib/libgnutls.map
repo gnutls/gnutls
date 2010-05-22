@@ -663,6 +663,8 @@ GNUTLS_2_11
 	gnutls_pubkey_import_dsa_raw;
 	gnutls_pubkey_import_rsa_raw;
 	gnutls_pubkey_import_pkcs11_url;
+	gnutls_pubkey_get_verify_algorithm;
+	gnutls_pubkey_verify_hash;
 	gnutls_pkcs11_obj_export;
 	gnutls_pubkey_import;
 	gnutls_x509_crt_set_pubkey;

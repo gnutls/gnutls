@@ -823,8 +823,8 @@ dsa_verify_sig (const gnutls_datum_t * text,
 /* Verifies the signature data, and returns 0 if not verified,
  * or 1 otherwise.
  */
-static int
-verify_sig (const gnutls_datum_t * tbs,
+int
+pubkey_verify_sig (const gnutls_datum_t * tbs,
 	    const gnutls_datum_t * hash,
 	    const gnutls_datum_t * signature,
 	    gnutls_pk_algorithm_t pk, bigint_t * issuer_params,
@@ -878,26 +878,15 @@ gnutls_digest_algorithm_t _gnutls_dsa_q_to_hash(bigint_t q)
 int
 _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
 			       const gnutls_datum_t * signature,
-			       const gnutls_x509_crt_t issuer)
+			       gnutls_pk_algorithm pk,
+			       bigint_t* issuer_params, unsigned int issuer_params_size)
 {
-  bigint_t issuer_params[MAX_PUBLIC_PARAMS_SIZE];
   opaque digest[MAX_HASH_SIZE];
   gnutls_datum_t decrypted;
-  int issuer_params_size;
   int digest_size;
-  int ret, i;
+  int ret;
 
-  issuer_params_size = MAX_PUBLIC_PARAMS_SIZE;
-  ret =
-    _gnutls_x509_crt_get_mpis (issuer, issuer_params,
-				   &issuer_params_size);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  switch (gnutls_x509_crt_get_pk_algorithm (issuer, NULL))
+  switch(pk)
     {
     case GNUTLS_PK_DSA:
       
@@ -908,7 +897,6 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
       break;
 
     case GNUTLS_PK_RSA:
-
       ret =
 	_gnutls_pkcs1_rsa_decrypt (&decrypted, signature,
 				   issuer_params, issuer_params_size, 1);
@@ -984,7 +972,7 @@ _gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
     }
 
   ret =
-    verify_sig (tbs, hash, signature,
+    pubkey_verify_sig (tbs, hash, signature,
 		gnutls_x509_crt_get_pk_algorithm (issuer, NULL),
 		issuer_params, issuer_params_size);
   if (ret < 0)
@@ -1015,7 +1003,7 @@ _gnutls_x509_privkey_verify_signature (const gnutls_datum_t * tbs,
 {
   int ret;
 
-  ret = verify_sig (tbs, NULL, signature, issuer->pk_algorithm,
+  ret = pubkey_verify_sig (tbs, NULL, signature, issuer->pk_algorithm,
 		    issuer->params, issuer->params_size);
   if (ret < 0)
     {
