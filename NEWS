@@ -4523,7 +4523,7 @@ LIBGNUTLS_VERSION_NUMBER: New CPP symbols, indicating the GnuTLS
   No changes since last version.
 
 * Version 1.2.7 (2005-09-09)
-- The GNUTLS and GNUTLS-EXTRA libraries are now built with versioned symbols.
+- The GnuTLS and GnuTLS-extra libraries are now built with versioned symbols.
 - Certtool now complains when reading out-of-range X.509 serial
   numbers, suggested by Fran <e_agf@yahoo.es>.
 - Certtool now uses the readline library (when available) when reading

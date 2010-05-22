@@ -141,7 +141,7 @@ main (void)
 
 	  if (ret == 0)
 	    {
-	      printf ("\n- Peer has closed the GNUTLS connection\n");
+	      printf ("\n- Peer has closed the GnuTLS connection\n");
 	      break;
 	    }
 	  else if (ret < 0)

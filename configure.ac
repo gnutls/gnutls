@@ -4,7 +4,7 @@ dnl Process this file with autoconf to produce a configure script.
 #
 # Author: Nikos Mavrogiannopoulos, Simon Josefsson
 #
-# This file is part of GNUTLS.
+# This file is part of GnuTLS.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

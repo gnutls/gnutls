@@ -88,7 +88,7 @@ main (void)
     {
       if (ret == 0)
 	{
-	  printf ("- Peer has closed the GNUTLS connection\n");
+	  printf ("- Peer has closed the GnuTLS connection\n");
 	  goto end;
 	}
       else

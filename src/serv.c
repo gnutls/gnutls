@@ -4,14 +4,14 @@
  * Copyright (C) 2001,2002 Paul Sheer
  * Portions Copyright (C) 2002,2003 Nikos Mavrogiannopoulos
  *
- * This file is part of GNUTLS.
+ * This file is part of GnuTLS.
  *
- * GNUTLS is free software: you can redistribute it and/or modify
+ * GnuTLS is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * GNUTLS is distributed in the hope that it will be useful,
+ * GnuTLS is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -20,7 +20,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* This server is heavily modified for GNUTLS by Nikos Mavrogiannopoulos
+/* This server is heavily modified for GnuTLS by Nikos Mavrogiannopoulos
  * (which means it is quite unreadable)
  */
 
@@ -103,7 +103,7 @@ gnutls_datum_t session_ticket_key;
 		"\n" \
 		"<HTML><BODY>\n" \
 		"<CENTER><H1>This is <a href=\"http://www.gnu.org/software/gnutls\">" \
-		"GNUTLS</a></H1></CENTER>\n\n"
+		"GnuTLS</a></H1></CENTER>\n\n"
 
 /* These are global */
 gnutls_srp_server_credentials_t srp_cred = NULL;
