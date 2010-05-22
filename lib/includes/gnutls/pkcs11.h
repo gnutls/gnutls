@@ -138,6 +138,9 @@ int gnutls_pkcs11_obj_import_url (gnutls_pkcs11_obj_t, const char * url);
 int gnutls_pkcs11_obj_export_url (gnutls_pkcs11_obj_t, char** url);
 void gnutls_pkcs11_obj_deinit ( gnutls_pkcs11_obj_t);
 
+int gnutls_pkcs11_obj_export(gnutls_pkcs11_obj_t obj,
+		     void *output_data, size_t * output_data_size);
+
 /**
  * @brief Release array of certificate references.
  * @param certificates	Array to free.

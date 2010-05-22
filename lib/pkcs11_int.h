@@ -33,6 +33,11 @@ struct gnutls_pkcs11_obj_st {
     gnutls_datum_t raw;
     gnutls_pkcs11_obj_type_t type;
     struct pkcs11_url_info info;
+
+    /* only when pubkey */
+    gnutls_datum_t pubkey[MAX_PUBLIC_PARAMS_SIZE];
+    gnutls_pk_algorithm pk_algorithm;
+    unsigned int key_usage;
 };
 
 /* thus function is called for every token in the traverse_tokens

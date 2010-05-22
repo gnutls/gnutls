@@ -632,6 +632,8 @@ GNUTLS_2_11
 	gnutls_pkcs11_privkey_sign_data;
 	gnutls_pkcs11_privkey_sign_hash;
 	gnutls_pkcs11_privkey_decrypt_data;
+	gnutls_pkcs11_obj_export;
+	gnutls_pkcs11_type_get_name;
 
 	gnutls_privkey_init;
 	gnutls_privkey_deinit;
@@ -657,9 +659,11 @@ GNUTLS_2_11
 	gnutls_pubkey_export;
 	gnutls_pubkey_get_key_id;
 	gnutls_pubkey_get_key_usage;
-	gnutls_pkcs11_type_get_name;
-
+	gnutls_pubkey_import_pkcs11;
+	gnutls_pubkey_import_dsa_raw;
+	gnutls_pubkey_import_rsa_raw;
 	gnutls_pubkey_import_pkcs11_url;
+	gnutls_pkcs11_obj_export;
 	gnutls_pubkey_import;
 	gnutls_x509_crt_set_pubkey;
 	gnutls_x509_crq_set_pubkey;

@@ -17,6 +17,7 @@ void gnutls_pubkey_deinit (gnutls_pubkey_t key);
 int gnutls_pubkey_get_pk_algorithm (gnutls_pubkey_t key, unsigned int* bits);
 
 int gnutls_pubkey_import_x509(gnutls_pubkey_t pkey, gnutls_x509_crt_t crt, unsigned int flags);
+int gnutls_pubkey_import_pkcs11(gnutls_pubkey_t pkey, gnutls_pkcs11_obj_t crt, unsigned int flags);
 int gnutls_pubkey_import_openpgp(gnutls_pubkey_t pkey,
 				 gnutls_openpgp_crt_t crt,
 				 gnutls_openpgp_keyid_t keyid,
@@ -45,7 +46,14 @@ int gnutls_pubkey_import (gnutls_pubkey_t key,
 
 
 int gnutls_pubkey_import_pkcs11_url( gnutls_pubkey_t key, const char* url);
-
+int gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
+				    const gnutls_datum_t * p,
+				    const gnutls_datum_t * q,
+				    const gnutls_datum_t * g,
+				    const gnutls_datum_t * y);
+int gnutls_pubkey_import_rsa_raw (gnutls_pubkey_t pubkey,
+			      const gnutls_datum_t * m,
+			      const gnutls_datum_t * e);
 
 int gnutls_x509_crt_set_pubkey (gnutls_x509_crt_t crt,
 			       gnutls_pubkey_t key);
