@@ -3,24 +3,93 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 2.9.11 (unreleased)
+* Version 2.11.0 (unreleased)
 
-** libgnutls: Removed two APIs related to safe renegotiation.
-Use priority strings instead.  The APIs were
-gnutls_safe_negotiation_set_initial and gnutls_safe_renegotiation_set.
-(Remember that we don't promise ABI stability during development
-series, so this doesn't cause an shared library ABI increment.)
+** libgnutls: Added PKCS #11 support and an API to access objects in
+gnutls/pkcs11.h. Currently certificates and public keys can be
+imported from tokens, and operations can be performed on private keys.
 
-** tests: More self testing of safe renegotiation extension.
-See tests/safe-renegotiation/README for more information.
+** libgnutls: Added abstract gnutls_privkey_t and gnutls_pubkey_t
 
-** doc: a PDF version of the API reference manual (GTK-DOC) is now built.
+** libgnutls: Added initial support for the nettle library (unsupported)
 
-** doc: Terms 'GNUTLS' and 'GNU TLS' were changed to 'GnuTLS' for consistency.
+** libgnutls: Corrected issue on the %SSL3_RECORD_VERSION priority string. It now
+    works even when resuming a session.
+
+** libgnutls: Added gnutls_certificate_set_retrieve_function() to replace the
+similar gnutls_certificate_set_server_retrieve_function() and
+gnutls_certificate_set_client_retrieve_function(). In addition it support
+PKCS #11 private keys.
+
+** certtool: Added new options: --pkcs11-list-tokens, --pkcs11-list-all
+--pkcs11-list-all-certs, --pkcs11-list-trusted, --pkcs11-list-certs
+
+** gnutls-cli/gnutls-serv: --x509cafile, --x509certfile and --x509keyfile
+can now accept a PKCS #11 URL in addition to a file. This will allow for
+example to use the Gnome-keyring trusted certificate list to verify
+connections using a url such as:
+pkcs11:token=Root%20CA%20Certificates;serial=1%3AROOTS%3ADEFAULT;model=1%2E0;manufacturer=Gnome%20Keyring
 
 ** API and ABI modifications:
-gnutls_safe_negotiation_set_initial: REMOVED.
-gnutls_safe_renegotiation_set: REMOVED.
+gnutls_certificate_set_server_retrieve_function: DEPRECATED
+gnutls_certificate_set_client_retrieve_function: DEPRECATED
+gnutls_sign_callback_set: DEPRECATED
+gnutls_certificate_set_retrieve_function: ADDED
+gnutls_pkcs11_init: ADDED
+gnutls_pkcs11_deinit: ADDED
+gnutls_pkcs11_set_pin_function: ADDED
+gnutls_pkcs11_set_token_function: ADDED
+gnutls_pkcs11_add_provider: ADDED
+gnutls_pkcs11_obj_init: ADDED
+gnutls_pkcs11_obj_import_url: ADDED
+gnutls_pkcs11_obj_export_url: ADDED
+gnutls_pkcs11_obj_deinit: ADDED
+gnutls_pkcs11_obj_list_deinit: ADDED
+gnutls_pkcs11_obj_list_import_url: ADDED
+gnutls_x509_crt_import_pkcs11: ADDED
+gnutls_pkcs11_obj_get_type: ADDED
+gnutls_x509_crt_list_import_pkcs11: ADDED
+gnutls_x509_crt_import_pkcs11_url: ADDED
+gnutls_pkcs11_obj_get_info: ADDED
+gnutls_pkcs11_token_get_info: ADDED
+gnutls_pkcs11_token_get_url: ADDED
+gnutls_pkcs11_privkey_init: ADDED
+gnutls_pkcs11_privkey_deinit: ADDED
+gnutls_pkcs11_privkey_get_pk_algorithm: ADDED
+gnutls_pkcs11_privkey_get_info: ADDED
+gnutls_pkcs11_privkey_import_url: ADDED
+gnutls_pkcs11_privkey_sign_data: ADDED
+gnutls_pkcs11_privkey_sign_hash: ADDED
+gnutls_pkcs11_privkey_decrypt_data: ADDED
+gnutls_privkey_init: ADDED
+gnutls_privkey_deinit: ADDED
+gnutls_privkey_get_pk_algorithm: ADDED
+gnutls_privkey_get_type: ADDED
+gnutls_privkey_import_pkcs11: ADDED
+gnutls_privkey_import_x509: ADDED
+gnutls_privkey_import_openpgp: ADDED
+gnutls_privkey_sign_data: ADDED
+gnutls_privkey_sign_hash: ADDED
+gnutls_privkey_decrypt_data: ADDED
+gnutls_pkcs11_privkey_export_url: ADDED
+gnutls_x509_crq_privkey_sign: ADDED
+gnutls_x509_crl_privkey_sign: ADDED
+gnutls_x509_crt_privkey_sign: ADDED
+gnutls_pubkey_init: ADDED
+gnutls_pubkey_deinit: ADDED
+gnutls_pubkey_get_pk_algorithm: ADDED
+gnutls_pubkey_import_x509: ADDED
+gnutls_pubkey_import_openpgp: ADDED
+gnutls_pubkey_get_pk_rsa_raw: ADDED
+gnutls_pubkey_get_pk_dsa_raw: ADDED
+gnutls_pubkey_export: ADDED
+gnutls_pubkey_get_key_id: ADDED
+gnutls_pubkey_get_key_usage: ADDED
+gnutls_pkcs11_type_get_name: ADDED
+gnutls_pubkey_import_pkcs11_url: ADDED
+gnutls_pubkey_import: ADDED
+gnutls_x509_crt_set_pubkey: ADDED
+gnutls_x509_crq_set_pubkey: ADDED
 
 * Version 2.9.10 (released 2010-04-22)
 

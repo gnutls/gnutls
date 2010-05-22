@@ -179,7 +179,7 @@ void gaa_help(void)
 	__gaa_helpsingle(0, "pkcs-cipher", "CIPHER ", "Cipher to use for pkcs operations (3des,aes-128,aes-192,aes-256,rc2-40).");
 	__gaa_helpsingle(0, "pkcs11-provider", "Library ", "Specify the pkcs11 provider library");
 	__gaa_helpsingle(0, "pkcs11-export-url", "URL ", "Export data specified a pkcs11 URL");
-	__gaa_helpsingle(0, "pkcs11-list-certs", "", "List certificates specified by a PKCS#11 URL");
+	__gaa_helpsingle(0, "pkcs11-list-certs", "", "List certificates that have a private key specified by a PKCS#11 URL");
 	__gaa_helpsingle(0, "pkcs11-list-trusted", "", "List certificates marked as trusted, specified by a PKCS#11 URL");
 	__gaa_helpsingle(0, "pkcs11-list-all-certs", "", "List all certificates specified by a PKCS#11 URL");
 	__gaa_helpsingle(0, "pkcs11-list-all", "", "List all objects specified by a PKCS#11 URL");
