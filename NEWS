@@ -5,15 +5,18 @@ See the end for copying conditions.
 
 * Version 2.9.11 (unreleased)
 
-** Removed two APIs related to safe renegotiation.
+** libgnutls: Removed two APIs related to safe renegotiation.
 Use priority strings instead.  The APIs were
 gnutls_safe_negotiation_set_initial and gnutls_safe_renegotiation_set.
 (Remember that we don't promise ABI stability during development
 series, so this doesn't cause an shared library ABI increment.)
 
+** tests: More self testing of safe renegotiation extension.
+See tests/safe-renegotiation/README for more information.
+
 ** doc: a PDF version of the API reference manual (GTK-DOC) is now built.
 
-** Terms 'GNUTLS' and 'GNU TLS' were changed to 'GnuTLS' for consistency.
+** doc: Terms 'GNUTLS' and 'GNU TLS' were changed to 'GnuTLS' for consistency.
 
 ** API and ABI modifications:
 gnutls_safe_negotiation_set_initial: REMOVED.
