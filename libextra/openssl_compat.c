@@ -249,9 +249,6 @@ gnutls_x509_extract_certificate_issuer_dn (const gnutls_datum_t * cert,
  * This function will return the alternative names, contained in the
  * given certificate.
  *
- * This is specified in X509v3 Certificate Extensions.
- * GNUTLS will return the Alternative name, or a negative
- * error code.
  * Returns GNUTLS_E_SHORT_MEMORY_BUFFER if ret_size is not enough to hold the alternative
  * name, or the type of alternative name if everything was ok. The type is
  * one of the enumerated GNUTLS_X509_SUBJECT_ALT_NAME.

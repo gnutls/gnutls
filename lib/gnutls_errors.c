@@ -326,7 +326,7 @@ gnutls_error_is_fatal (int error)
 void
 gnutls_perror (int error)
 {
-  fprintf (stderr, "GNUTLS ERROR: %s\n", gnutls_strerror (error));
+  fprintf (stderr, "GnuTLS error: %s\n", gnutls_strerror (error));
 }
 
 
