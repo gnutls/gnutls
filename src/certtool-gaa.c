@@ -1335,7 +1335,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
 	gaaval->incert_format = 0; gaaval->outcert_format = 0; gaaval->action=-1; gaaval->pass = NULL; gaaval->v1_cert = 0;
 	gaaval->export = 0; gaaval->template = NULL; gaaval->hash=NULL; gaaval->fix_key = 0; gaaval->quick_random=1; 
 	gaaval->privkey_op = 0; gaaval->pkcs_cipher = "3des"; gaaval->crq_extensions=1; gaaval->pkcs11_provider= NULL;
-	gaaval->pkcs11_url = NULL; gaaval->pkcs11_type = PKCS11_TYPE_PK; ;};
+	gaaval->pkcs11_url = NULL; gaaval->pkcs11_type = PKCS11_TYPE_PK; gaaval->pubkey=NULL; ;};
 
     }
     inited = 1;

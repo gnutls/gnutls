@@ -59,4 +59,5 @@ extern void* token_data;
 void pkcs11_rescan_slots(void);
 int pkcs11_info_to_url(const struct pkcs11_url_info* info, char** url);
 
+
 #endif

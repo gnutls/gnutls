@@ -355,13 +355,13 @@ size_t size;
 	if (url == NULL)
 		url = "pkcs11:";
 
-	ret = gnutls_pkcs11_crt_init(&crt);
+	ret = gnutls_pkcs11_obj_init(&crt);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret = gnutls_pkcs11_crt_import_url( crt, url);
+	ret = gnutls_pkcs11_obj_import_url( crt, url);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
 		exit(1);
@@ -389,7 +389,7 @@ size_t size;
 	fputs("\n\n", outfile);
 
 	gnutls_x509_crt_deinit(xcrt);
-	gnutls_pkcs11_crt_deinit(crt);
+	gnutls_pkcs11_obj_deinit(crt);
 
 	return;
 
