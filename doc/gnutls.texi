@@ -3843,6 +3843,7 @@ happens inside the black box.
 * TLS Handshake Protocol::
 * TLS Authentication Methods::
 * TLS Extension Handling::
+* Certificate Handling::
 * Cryptographic Backend::
 @end menu
 
@@ -4097,6 +4098,7 @@ API was introduced in.
 
 @end enumerate
 
+@node Certificate Handling
 @section Certificate Handling
 What is provided by the certificate handling functions
 is summarized in the following diagram.
