@@ -53,6 +53,11 @@ struct url_find_data_st {
     gnutls_pkcs11_crt_t crt;
 };
 
+struct flags_find_data_st {
+    struct pkcs11_url_info info;
+    unsigned int slot_flags;
+};
+
 struct crt_find_data_st {
     gnutls_pkcs11_crt_t *p_list;
     unsigned int* n_list;
@@ -973,6 +978,7 @@ int gnutls_pkcs11_token_get_url (unsigned int seq, char** url)
     return 0;
 
 }
+
 /**
  * gnutls_pkcs11_token_get_info:
  * @url: should contain a PKCS 11 URL
@@ -980,7 +986,7 @@ int gnutls_pkcs11_token_get_url (unsigned int seq, char** url)
  * @output: where output will be stored
  * @output_size: contains the maximum size of the output and will be overwritten with actual
  *
- * This function will return information about the PKCS 11 private key such
+ * This function will return information about the PKCS 11 token such
  * as the label, id as well as token information where the key is stored.
  *
  * Returns: zero on success or a negative value on error.
@@ -1086,7 +1092,6 @@ int pkcs11_login(pakchois_session_t *pks, struct token_info *info)
     /* force login on HW tokens. Some tokens will not list private keys
      * if login has not been performed.
      */
-//    if (!(info->sinfo.flags & CKF_HW_SLOT) && (info->tinfo.flags & CKF_LOGIN_REQUIRED) == 0) {
     if ((info->tinfo.flags & CKF_LOGIN_REQUIRED) == 0) {
         gnutls_assert();
         _gnutls_debug_log( "pk11: No login required.\n");
@@ -1156,7 +1161,6 @@ int pkcs11_login(pakchois_session_t *pks, struct token_info *info)
 
     return (rv == CKR_OK || rv == CKR_USER_ALREADY_LOGGED_IN) ? 0 : GNUTLS_E_PKCS11_ERROR;
 }
-
 
 static int find_privkeys(pakchois_session_t *pks, struct token_info* info, struct pkey_list *list)
 {
@@ -1559,4 +1563,80 @@ cleanup:
     
     return ret;
 }
+
+static int find_flags(pakchois_session_t *pks, struct token_info *info, void* input)
+{
+    struct flags_find_data_st* find_data = input;
+
+    if (info == NULL) { /* we don't support multiple calls */
+        gnutls_assert();
+        return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+
+    /* do not bother reading the token if basic fields do not match
+     */
+    if (find_data->info.manufacturer[0] != 0) {
+        if (strcmp(find_data->info.manufacturer, info->tinfo.manufacturer_id) != 0)
+            return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+
+    if (find_data->info.token[0] != 0) {
+        if (strcmp(find_data->info.token, info->tinfo.label) != 0)
+            return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+
+    if (find_data->info.model[0] != 0) {
+        if (strcmp(find_data->info.model, info->tinfo.model) != 0)
+            return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+
+    if (find_data->info.serial[0] != 0) {
+        if (strcmp(find_data->info.serial, info->tinfo.serial_number) != 0)
+            return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+
+    /* found token! */
+
+    find_data->slot_flags = info->sinfo.flags;
+
+    return 0;
+}
+
+/**
+ * gnutls_pkcs11_token_get_flags:
+ * @url: should contain a PKCS 11 URL
+ * @flags: The output flags
+ *
+ * This function will return information about the PKCS 11 token flags.
+ *
+ * Returns: zero on success or a negative value on error.
+ **/
+int gnutls_pkcs11_token_get_flags(const char* url, unsigned int *flags)
+{
+    const char* str;
+    size_t len;
+
+    struct flags_find_data_st find_data;
+    int ret;
+
+    ret = pkcs11_url_to_info(url, &find_data.info);
+    if (ret < 0) {
+        gnutls_assert();
+        return ret;
+    }
+
+    ret = _pkcs11_traverse_tokens(find_flags, &find_data, 0);
+    if (ret < 0) {
+        gnutls_assert();
+        return ret;
+    }
+
+    *flags = 0;
+    if (find_data.slot_flags & CKF_HW_SLOT)
+        *flags |= GNUTLS_PKCS11_TOKEN_HW;
+
+    return 0;
+
+}
+
 

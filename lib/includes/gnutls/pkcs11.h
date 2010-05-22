@@ -193,6 +193,10 @@ typedef enum {
 
 int gnutls_pkcs11_token_get_url (unsigned int seq, char** url);
 int gnutls_pkcs11_token_get_info(const char* url, gnutls_pkcs11_token_info_t, void* output, size_t *output_size);
+
+#define GNUTLS_PKCS11_TOKEN_HW 1
+int gnutls_pkcs11_token_get_flags(const char* url, unsigned int *flags);
+
 /**
  * @brief Enumerate available certificates.
  * @param p_list	Location to store the list.
