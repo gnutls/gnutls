@@ -1185,11 +1185,8 @@ get_alt_name (gnutls_x509_crt_t cert, const char *extension_id,
  * @ret_size: holds the size of ret.
  * @critical: will be non zero if the extension is marked as critical (may be null)
  *
- * This function will return the alternative names, contained in the
- * given certificate.
- *
- * This is specified in X509v3 Certificate Extensions.  GNUTLS will
- * return the Alternative name (2.5.29.17), or a negative error code.
+ * This function retrieves the Alternative Name (2.5.29.17), contained
+ * in the given certificate in the X509v3 Certificate Extensions.
  *
  * When the SAN type is otherName, it will extract the data in the
  * otherName's value field, and %GNUTLS_SAN_OTHERNAME is returned.
@@ -1228,11 +1225,9 @@ gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
  * @ret_size: holds the size of ret.
  * @critical: will be non zero if the extension is marked as critical (may be null)
  *
- * This function will return the issuer alternative names, contained in the
- * given certificate.
- *
- * This is specified in X509v3 Certificate Extensions.  GNUTLS will
- * return the Isssuer Alternative name (2.5.29.18), or a negative error code.
+ * This function retrieves the Issuer Alternative Name (2.5.29.18),
+ * contained in the given certificate in the X509v3 Certificate
+ * Extensions.
  *
  * When the SAN type is otherName, it will extract the data in the
  * otherName's value field, and %GNUTLS_SAN_OTHERNAME is returned.
@@ -2566,8 +2561,9 @@ gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,
  * @reason_flags: Revocation reasons flags.
  * @critical: will be non zero if the extension is marked as critical (may be null)
  *
- * This function will return the CRL distribution points (2.5.29.31),
- * contained in the given certificate.
+ * This function retrieves the CRL distribution points (2.5.29.31),
+ * contained in the given certificate in the X509v3 Certificate
+ * Extensions.
  *
  * @reason_flags should be an ORed sequence of
  * %GNUTLS_CRL_REASON_UNUSED, %GNUTLS_CRL_REASON_KEY_COMPROMISE,
@@ -2578,10 +2574,6 @@ gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,
  * %GNUTLS_CRL_REASON_CERTIFICATE_HOLD,
  * %GNUTLS_CRL_REASON_PRIVILEGE_WITHDRAWN,
  * %GNUTLS_CRL_REASON_AA_COMPROMISE, or zero for all possible reasons.
- *
- * This is specified in X509v3 Certificate Extensions. GNUTLS will
- * return the distribution point type, or a negative error code on
- * error.
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER and updates &@ret_size if
  *   &@ret_size is not enough to hold the distribution point, or the
