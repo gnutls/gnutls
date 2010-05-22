@@ -24,7 +24,8 @@
  *
  * This tests that clients with support for safe renegotiation is able
  * to handshake properly against a server with no support for safe
- * renegotiation, but that the client will not perform a rehandshake.
+ * renegotiation, but that the client will not be able to complete a
+ * rehandshake.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -245,8 +246,6 @@ main (int argc, char *argv[])
       tls_log_func (0, "Server thinks it is using safe renegotiation!\n");
       exit_code = EXIT_FAILURE;
     }
-
-  abort ();
 
   sret = gnutls_rehandshake (server);
   if (debug_level > 0)
