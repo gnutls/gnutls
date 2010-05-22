@@ -20,22 +20,13 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA
 
-GNUTLS_1_6
+GNUTLS_2_10
 {
   global:
     extern "C++" {
-      # To specify a class we also need to specify its typeinfo,
-      # typeinfo name and vtable objects.
-      # For example for class gnutls::psk_client_credentials,
-      # we need to declare this 4 lines:
-      #
-      # gnutls::psk_client_credentials::*;
-      # "typeinfo for gnutls::psk_client_credentials";
-      # "typeinfo name for gnutls::psk_client_credentials";
-      # "vtable for gnutls::psk_client_credentials";
+      # Allow all symbols for C++. It has its own way to keep
+      # symbol namespaces.
 
-      *gnutls::*;
+      *;
   };
-
-  local: *;
 };
