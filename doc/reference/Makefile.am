@@ -18,11 +18,11 @@ DOC_MODULE=$(PACKAGE)
 # The top-level SGML file. You can change this if you want to.
 DOC_MAIN_SGML_FILE=$(DOC_MODULE)-docs.sgml
 
-# The directory containing the source code. Relative to $(srcdir).
-# gtk-doc will search all .c & .h files beneath here for inline comments
-# documenting the functions and macros.
-# e.g. DOC_SOURCE_DIR=../../../gtk
-DOC_SOURCE_DIR=../../lib --source-dir=../../libextra
+# Directories containing the source code, relative to $(srcdir).
+# gtk-doc will search all .c and .h files beneath these paths
+# for inline comments documenting functions and macros.
+# e.g. DOC_SOURCE_DIR=../../../gtk ../../../gdk
+DOC_SOURCE_DIR=../../lib ../../libextra
 
 # Extra options to pass to gtkdoc-scangobj. Not normally needed.
 SCANGOBJ_OPTIONS=
@@ -50,7 +50,9 @@ FIXXREF_OPTIONS=
 # Used for dependencies. The docs will be rebuilt if any of these change.
 # e.g. HFILE_GLOB=$(top_srcdir)/gtk/*.h
 # e.g. CFILE_GLOB=$(top_srcdir)/gtk/*.c
-HFILE_GLOB=$(top_srcdir)/lib/includes/gnutls/*.h $(top_builddir)/lib/includes/gnutls/*.h $(top_srcdir)/libextra/includes/gnutls/*.h
+HFILE_GLOB=$(top_srcdir)/lib/includes/gnutls/*.h \
+	$(top_builddir)/lib/includes/gnutls/*.h \
+	$(top_srcdir)/libextra/includes/gnutls/*.h
 CFILE_GLOB=$(top_srcdir)/lib/*.c \
 	$(top_srcdir)/lib/x509/*.c \
 	$(top_srcdir)/lib/openpgp/*.c \
@@ -156,6 +158,6 @@ EXTRA_DIST +=
 
 # Comment this out if you want your docs-status tested during 'make check'
 if ENABLE_GTK_DOC
-#TESTS_ENVIRONMENT = cd $(srcsrc)
+#TESTS_ENVIRONMENT = cd $(srcsrc) &&
 #TESTS = $(GTKDOC_CHECK)
 endif

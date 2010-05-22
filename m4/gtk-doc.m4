@@ -48,7 +48,7 @@ AC_DEFUN([GTK_DOC_CHECK],
                      [build documentation in pdf format [[default=no]]]),,
       [enable_gtk_doc_pdf=no])
 
-  if test -n "$GTKDOC_MKPDF"; then
+  if test -z "$GTKDOC_MKPDF"; then
     enable_gtk_doc_pdf=no
   fi
 
