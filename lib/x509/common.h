@@ -131,4 +131,12 @@ int _gnutls_x509_get_signature (ASN1_TYPE src, const char *src_name,
 
 gnutls_digest_algorithm_t _gnutls_dsa_q_to_hash(bigint_t q);
 
+int _gnutls_get_asn_mpis (ASN1_TYPE asn, const char *root,
+          bigint_t * params, int *params_size);
+
+int _gnutls_get_key_id (gnutls_pk_algorithm_t pk, bigint_t* params, int params_size,
+                   unsigned char *output_data, size_t * output_data_size);
+
+void _asnstr_append_name(char* name, size_t name_size, const char* part1, const char* part2);
+
 #endif

@@ -26,6 +26,7 @@
 #include <gnutls/openpgp.h>
 #include <gnutls/pkcs12.h>
 #include <gnutls/pkcs11.h>
+#include <gnutls/abstract.h>
 
 #include <gcrypt.h>
 
@@ -60,6 +61,7 @@ void generate_pkcs12 (void);
 void generate_pkcs8 (void);
 void verify_chain (void);
 void verify_crl (void);
+void pubkey_info (void);
 void pgp_privkey_info (void);
 void pgp_ring_info (void);
 gnutls_x509_privkey_t load_private_key (int mand);
@@ -67,6 +69,7 @@ gnutls_x509_crq_t load_request (void);
 gnutls_x509_privkey_t load_ca_private_key (void);
 gnutls_x509_crt_t load_ca_cert (void);
 gnutls_x509_crt_t load_cert (int mand);
+gnutls_pubkey_t load_pubkey (int mand);
 void certificate_info (void);
 void pgp_certificate_info (void);
 void crl_info (void);
@@ -133,8 +136,11 @@ static void
 print_dsa_pkey (gnutls_datum_t * x, gnutls_datum_t * y, gnutls_datum_t * p,
 		gnutls_datum_t * q, gnutls_datum_t * g)
 {
-  fprintf (outfile, "private key:");
-  print_hex_datum (x);
+  if (x) 
+    {
+      fprintf (outfile, "private key:");
+      print_hex_datum (x);
+    }
   fprintf (outfile, "public key:");
   print_hex_datum (y);
   fprintf (outfile, "p:");
@@ -153,14 +159,17 @@ print_rsa_pkey (gnutls_datum_t * m, gnutls_datum_t * e, gnutls_datum_t * d,
   print_hex_datum (m);
   fprintf (outfile, "public exponent:");
   print_hex_datum (e);
-  fprintf (outfile, "private exponent:");
-  print_hex_datum (d);
-  fprintf (outfile, "prime1:");
-  print_hex_datum (p);
-  fprintf (outfile, "prime2:");
-  print_hex_datum (q);
-  fprintf (outfile, "coefficient:");
-  print_hex_datum (u);
+  if (d) 
+    {
+      fprintf (outfile, "private exponent:");
+      print_hex_datum (d);
+      fprintf (outfile, "prime1:");
+      print_hex_datum (p);
+      fprintf (outfile, "prime2:");
+      print_hex_datum (q);
+      fprintf (outfile, "coefficient:");
+      print_hex_datum (u);
+    }
 }
 
 static gnutls_x509_privkey_t
@@ -971,6 +980,9 @@ gaa_parser (int argc, char **argv)
     case ACTION_PRIVKEY_INFO:
       privkey_info ();
       break;
+    case ACTION_PUBKEY_INFO:
+      pubkey_info ();
+      break;
     case ACTION_UPDATE_CERTIFICATE:
       update_signed_certificate ();
       break;
@@ -1608,6 +1620,51 @@ privkey_info (void)
   fprintf (outfile, "\n%s\n", buffer);
 
   gnutls_x509_privkey_deinit (key);
+}
+
+/* Load a public key.
+ * @mand should be non zero if it is required to read a public key.
+ */
+gnutls_pubkey_t
+load_pubkey (int mand)
+{
+  gnutls_pubkey_t key;
+  int ret;
+  gnutls_datum_t dat;
+  size_t size;
+
+  if (!info.pubkey && !mand)
+    return NULL;
+
+  if (info.pubkey == NULL)
+    error (EXIT_FAILURE, 0, "missing --load-pubkey");
+
+  ret = gnutls_pubkey_init (&key);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
+
+  dat.data = read_binary_file (info.pubkey, &size);
+  dat.size = size;
+
+  if (!dat.data)
+    error (EXIT_FAILURE, errno, "reading --load-pubkey: %s", info.pubkey);
+
+  ret = gnutls_pubkey_import (key, &dat, info.incert_format);
+
+  free (dat.data);
+
+  if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
+    {
+      error (EXIT_FAILURE, 0,
+	     "import error: could not find a valid PEM header; "
+	     "check if your key has the PUBLIC KEY header");
+    }
+
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "importing --load-pubkey: %s: %s",
+	   info.pubkey, gnutls_strerror (ret));
+
+  return key;
 }
 
 
@@ -2977,4 +3034,142 @@ certtool_version (void)
     p = PACKAGE_STRING;
   version_etc (stdout, program_name, p, gnutls_check_version (NULL),
 	       "Nikos Mavrogiannopoulos", "Simon Josefsson", (char *) NULL);
+}
+
+static void print_key_usage(FILE* outfile, unsigned int usage)
+{
+  if (usage & GNUTLS_KEY_DIGITAL_SIGNATURE) {
+    fprintf(outfile, "\tDigital signature.\n");
+  }
+
+  if (usage & GNUTLS_KEY_NON_REPUDIATION) {
+    fprintf(outfile, "\tNon repudiation.\n");
+  }
+
+  if (usage & GNUTLS_KEY_KEY_ENCIPHERMENT) {
+    fprintf(outfile, "\tKey encipherment.\n");
+  }
+
+  if (usage & GNUTLS_KEY_DATA_ENCIPHERMENT) {
+    fprintf(outfile, "\tData encipherment.\n");
+  }
+
+  if (usage & GNUTLS_KEY_KEY_AGREEMENT) {
+    fprintf(outfile, "\tKey agreement.\n");
+  }
+
+  if (usage & GNUTLS_KEY_KEY_CERT_SIGN) {
+    fprintf(outfile, "\tCertificate signing.\n");
+  }
+
+  if (usage & GNUTLS_KEY_NON_REPUDIATION) {
+    fprintf(outfile, "\tCRL signing.\n");  
+  }
+
+  if (usage & GNUTLS_KEY_ENCIPHER_ONLY) {
+    fprintf(outfile, "\tKey encipher only.\n");
+  }
+
+  if (usage & GNUTLS_KEY_DECIPHER_ONLY) {
+    fprintf(outfile, "\tKey decipher only.\n");
+  }
+}
+
+void pubkey_info (void)
+{
+  gnutls_x509_crt_t crt;
+  gnutls_pubkey_t pubkey;
+  unsigned int bits, usage;
+  int ret;
+  size_t size;
+  const char* cprint;
+
+  ret = gnutls_pubkey_init(&pubkey);
+  if (ret < 0) {
+    error (EXIT_FAILURE, 0, "pubkey_init: %s", gnutls_strerror (ret));
+  }
+
+  crt = load_cert(0);
+  
+  if (crt != NULL) {
+    ret = gnutls_pubkey_import_x509(pubkey, crt, 0);
+    if (ret < 0) {
+      error (EXIT_FAILURE, 0, "pubkey_import_x509: %s", gnutls_strerror (ret));
+    }
+  } else {
+    pubkey = load_pubkey(1);
+  }
+
+  fprintf (outfile, "Public Key Info:\n\n");
+  ret = gnutls_pubkey_get_pk_algorithm (pubkey, &bits);
+  fprintf (outfile, "Public Key Algorithm: ");
+
+  cprint = gnutls_pk_algorithm_get_name (ret);
+  fprintf (outfile, "%s (%u bits)\n", cprint ? cprint : "Unknown", bits);
+
+
+  /* Print the raw public and private keys
+   */
+  if (ret == GNUTLS_PK_RSA)
+    {
+      gnutls_datum_t m, e;
+
+      ret = gnutls_pubkey_get_pk_rsa_raw (pubkey, &m, &e);
+      if (ret < 0)
+	fprintf (stderr, "Error in key RSA data export: %s\n",
+		 gnutls_strerror (ret));
+      else
+	{
+	  print_rsa_pkey (&m, &e, NULL, NULL, NULL, NULL);
+	  gnutls_free (m.data);
+	  gnutls_free (e.data);
+	}
+    }
+  else if (ret == GNUTLS_PK_DSA)
+    {
+      gnutls_datum_t p, q, g, y;
+
+      ret = gnutls_pubkey_get_pk_dsa_raw (pubkey, &p, &q, &g, &y);
+      if (ret < 0)
+	fprintf (stderr, "Error in key DSA data export: %s\n",
+		 gnutls_strerror (ret));
+      else
+	{
+	  print_dsa_pkey (NULL, &y, &p, &q, &g);
+	  gnutls_free (y.data);
+	  gnutls_free (p.data);
+	  gnutls_free (q.data);
+	  gnutls_free (g.data);
+	}
+    }
+
+  ret = gnutls_pubkey_get_key_usage (pubkey, &usage);
+  if (ret < 0) {
+    error (EXIT_FAILURE, 0, "pubkey_get_key_usage: %s", gnutls_strerror (ret));
+  }
+  
+  fprintf (outfile, "Public Key Usage:\n");
+  print_key_usage(outfile, usage);
+
+  fprintf (outfile, "\n");
+
+  size = sizeof (buffer);
+  if ((ret = gnutls_pubkey_get_key_id (pubkey, 0, buffer, &size)) < 0)
+    {
+      fprintf (stderr, "Error in key id calculation: %s\n",
+	       gnutls_strerror (ret));
+    }
+  else
+    {
+      fprintf (outfile, "Public Key ID: %s\n", raw_to_string (buffer, size));
+    }
+
+  size = sizeof (buffer);
+  ret = gnutls_pubkey_export (pubkey, GNUTLS_X509_FMT_PEM, buffer, &size);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "export error: %s", gnutls_strerror (ret));
+
+  fprintf (outfile, "\n%s\n", buffer);
+
+  gnutls_pubkey_deinit (pubkey);
 }

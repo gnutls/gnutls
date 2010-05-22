@@ -8,54 +8,56 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 143 "certtool.gaa"
+#line 149 "certtool.gaa"
 	int debug;
-#line 137 "certtool.gaa"
+#line 142 "certtool.gaa"
 	int pkcs11_type;
-#line 134 "certtool.gaa"
+#line 139 "certtool.gaa"
 	char* pkcs11_url;
-#line 131 "certtool.gaa"
+#line 136 "certtool.gaa"
 	char* pkcs11_provider;
-#line 128 "certtool.gaa"
+#line 133 "certtool.gaa"
 	char *pkcs_cipher;
-#line 125 "certtool.gaa"
+#line 130 "certtool.gaa"
 	char *template;
-#line 122 "certtool.gaa"
+#line 127 "certtool.gaa"
 	char *infile;
-#line 119 "certtool.gaa"
+#line 124 "certtool.gaa"
 	char *outfile;
-#line 116 "certtool.gaa"
+#line 121 "certtool.gaa"
 	int quick_random;
-#line 113 "certtool.gaa"
+#line 118 "certtool.gaa"
 	int bits;
-#line 109 "certtool.gaa"
+#line 114 "certtool.gaa"
 	int outcert_format;
-#line 105 "certtool.gaa"
+#line 110 "certtool.gaa"
 	int incert_format;
-#line 102 "certtool.gaa"
+#line 107 "certtool.gaa"
 	int export;
-#line 99 "certtool.gaa"
+#line 104 "certtool.gaa"
 	char *hash;
-#line 96 "certtool.gaa"
+#line 101 "certtool.gaa"
 	int dsa;
-#line 93 "certtool.gaa"
+#line 98 "certtool.gaa"
 	int pkcs8;
-#line 85 "certtool.gaa"
+#line 90 "certtool.gaa"
 	int v1_cert;
-#line 82 "certtool.gaa"
+#line 87 "certtool.gaa"
 	int fix_key;
-#line 67 "certtool.gaa"
+#line 70 "certtool.gaa"
 	int crq_extensions;
-#line 54 "certtool.gaa"
+#line 57 "certtool.gaa"
 	char *pass;
-#line 51 "certtool.gaa"
+#line 54 "certtool.gaa"
 	char *ca;
-#line 48 "certtool.gaa"
+#line 51 "certtool.gaa"
 	char *ca_privkey;
-#line 45 "certtool.gaa"
+#line 48 "certtool.gaa"
 	char *cert;
-#line 42 "certtool.gaa"
+#line 45 "certtool.gaa"
 	char *request;
+#line 42 "certtool.gaa"
+	char *pubkey;
 #line 39 "certtool.gaa"
 	char *privkey;
 #line 17 "certtool.gaa"

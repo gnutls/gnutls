@@ -39,6 +39,9 @@ option (get-dh-params) { $action=ACTION_GET_DH; } "Get the included PKCS #3 enco
 #char *privkey;
 option (load-privkey) STR "FILE" { $privkey = $1 } "Private key file to use."
 
+#char *pubkey;
+option (load-pubkey) STR "FILE" { $pubkey = $1 } "Private key file to use."
+
 #char *request;
 option (load-request) STR "FILE" { $request = $1 } "Certificate request file to use."
 
@@ -78,6 +81,8 @@ option (smime-to-p7) { $action = ACTION_SMIME_TO_P7; } "Convert S/MIME to PKCS #
 option (k, key-info) { $privkey_op=1; $action = ACTION_PRIVKEY_INFO; } "Print information on a private key."
 
 option (pgp-key-info) { $privkey_op=1; $action = ACTION_PGP_PRIVKEY_INFO; } "Print information on a OpenPGP private key."
+
+option (pubkey-info) { $action = ACTION_PUBKEY_INFO; } "Print information on a public key."
 
 #int fix_key;
 option (fix-key) { $privkey_op=1; $fix_key = 1; } "Regenerate the parameters in a private key."
@@ -135,8 +140,9 @@ option (pkcs11-provider) STR "Library" { $pkcs11_provider = $1 } "Specify the pk
 option (pkcs11-export-url) STR "URL" { $action = ACTION_PKCS11_EXPORT_URL; $pkcs11_url = $1; } "Export data specified a pkcs11 URL"
 
 #int pkcs11_type;
-option (pkcs11-list) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS11_TYPE_PK; } "List objects specified by a PKCS#11 URL"
-option (pkcs11-list-trusted) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS11_TYPE_TRUSTED; } "List objects marked as trusted, specified by a PKCS#11 URL"
+option (pkcs11-list-certs) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS11_TYPE_PK; } "List certificates specified by a PKCS#11 URL"
+option (pkcs11-list-trusted) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS11_TYPE_TRUSTED; } "List certificates marked as trusted, specified by a PKCS#11 URL"
+option (pkcs11-list-all-certs) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS11_TYPE_CRT_ALL; } "List all certificates specified by a PKCS#11 URL"
 option (pkcs11-list-all) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS11_TYPE_ALL; } "List all objects specified by a PKCS#11 URL"
 option (pkcs11-list-tokens) { $action = ACTION_PKCS11_TOKENS; } "List all available tokens"
 
@@ -152,4 +158,4 @@ init { $bits = 2048; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL;
 	$incert_format = 0; $outcert_format = 0; $action=-1; $pass = NULL; $v1_cert = 0;
 	$export = 0; $template = NULL; $hash=NULL; $fix_key = 0; $quick_random=1; 
 	$privkey_op = 0; $pkcs_cipher = "3des"; $crq_extensions=1; $pkcs11_provider= NULL;
-	$pkcs11_url = NULL; $pkcs11_type = PKCS11_TYPE_PK; }
+	$pkcs11_url = NULL; $pkcs11_type = PKCS11_TYPE_PK; $pubkey=NULL; }

@@ -1,11 +1,60 @@
-#ifndef __GNUTLS_PRIVKEY_H
-#define __GNUTLS_PRIVKEY_H
+#ifndef __GNUTLS_ABSTRACT_H
+#define __GNUTLS_ABSTRACT_H
 
 #include <stdarg.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include <gnutls/pkcs11.h>
 #include <gnutls/openpgp.h>
+
+/* Public key operations */
+
+struct gnutls_pubkey_st;
+typedef struct gnutls_pubkey_st* gnutls_pubkey_t;
+
+int gnutls_pubkey_init (gnutls_pubkey_t * key);
+void gnutls_pubkey_deinit (gnutls_pubkey_t key);
+int gnutls_pubkey_get_pk_algorithm (gnutls_pubkey_t key, unsigned int* bits);
+
+int gnutls_pubkey_import_x509(gnutls_pubkey_t pkey, gnutls_x509_crt_t crt, unsigned int flags);
+int gnutls_pubkey_import_openpgp(gnutls_pubkey_t pkey,
+				 gnutls_openpgp_crt_t crt,
+				 gnutls_openpgp_keyid_t keyid,
+				 unsigned int flags);
+
+int gnutls_pubkey_get_pk_rsa_raw (gnutls_pubkey_t crt,
+				gnutls_datum_t * m, gnutls_datum_t * e);
+int gnutls_pubkey_get_pk_dsa_raw (gnutls_pubkey_t crt,
+				gnutls_datum_t * p, gnutls_datum_t * q,
+				gnutls_datum_t * g, gnutls_datum_t * y);
+
+int gnutls_pubkey_export (gnutls_pubkey_t key,
+			      gnutls_x509_crt_fmt_t format,
+			      void *output_data, size_t * output_data_size);
+
+int gnutls_pubkey_get_key_id (gnutls_pubkey_t key, unsigned int flags,
+			    unsigned char *output_data,
+			    size_t * output_data_size);
+
+int gnutls_pubkey_get_key_usage(gnutls_pubkey_t key, unsigned int *usage);
+int gnutls_pubkey_set_key_usage (gnutls_pubkey_t key, unsigned int usage);
+
+int gnutls_pubkey_import (gnutls_pubkey_t key,
+			      const gnutls_datum_t * data,
+			      gnutls_x509_crt_fmt_t format);
+
+
+int gnutls_pubkey_import_pkcs11_url( gnutls_pubkey_t key, const char* url);
+
+
+int gnutls_x509_crt_set_pubkey (gnutls_x509_crt_t crt,
+			       gnutls_pubkey_t key);
+
+int gnutls_x509_crq_set_pubkey (gnutls_x509_crq_t crq,
+			       gnutls_pubkey_t key);
+
+
+/* Private key operations */
 
 struct gnutls_privkey_st;
 typedef struct gnutls_privkey_st* gnutls_privkey_t;
@@ -14,6 +63,7 @@ int gnutls_privkey_init (gnutls_privkey_t * key);
 void gnutls_privkey_deinit (gnutls_privkey_t key);
 int gnutls_privkey_get_pk_algorithm (gnutls_privkey_t key, unsigned int* bits);
 gnutls_privkey_type_t gnutls_privkey_get_type (gnutls_privkey_t key);
+
 
 #define GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE 1
 int gnutls_privkey_import_pkcs11 (gnutls_privkey_t pkey, gnutls_pkcs11_privkey_t key, unsigned int flags);

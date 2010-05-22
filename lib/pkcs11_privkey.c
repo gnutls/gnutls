@@ -112,7 +112,7 @@ int gnutls_pkcs11_privkey_get_pk_algorithm(gnutls_pkcs11_privkey_t key, unsigned
  * Returns: zero on success or a negative value on error.
  **/
 int gnutls_pkcs11_privkey_get_info(gnutls_pkcs11_privkey_t pkey,
-				   gnutls_pkcs11_cert_info_t itype,
+				   gnutls_pkcs11_obj_info_t itype,
 				   void *output, size_t * output_size)
 {
 	return pkcs11_get_info(&pkey->info, itype, output, output_size);

@@ -1138,6 +1138,18 @@ cleanup:
   return result;
 }
 
+void _asnstr_append_name(char* name, size_t name_size, const char* part1, const char* part2)
+{
+  if (part1[0] != 0) 
+    {
+	  _gnutls_str_cpy (name, name_size, part1);
+	  _gnutls_str_cat (name, name_size, part2);
+    }
+  else
+	  _gnutls_str_cpy (name, name_size, part2+1 /* remove initial dot */);
+}
+
+
 /* Encodes and copies the private key parameters into a
  * subjectPublicKeyInfo structure.
  *
@@ -1163,8 +1175,8 @@ _gnutls_x509_encode_and_copy_PKI_params (ASN1_TYPE dst,
 
   /* write the OID
    */
-  _gnutls_str_cpy (name, sizeof (name), dst_name);
-  _gnutls_str_cat (name, sizeof (name), ".algorithm.algorithm");
+  _asnstr_append_name(name, sizeof(name), dst_name, ".algorithm.algorithm");
+
   result = asn1_write_value (dst, name, pk, 1);
   if (result != ASN1_SUCCESS)
     {
@@ -1176,8 +1188,8 @@ _gnutls_x509_encode_and_copy_PKI_params (ASN1_TYPE dst,
     {
       /* disable parameters, which are not used in RSA.
        */
-      _gnutls_str_cpy (name, sizeof (name), dst_name);
-      _gnutls_str_cat (name, sizeof (name), ".algorithm.parameters");
+	  _asnstr_append_name(name, sizeof(name), dst_name, ".algorithm.parameters");
+
       result = asn1_write_value (dst, name, NULL, 0);
       if (result != ASN1_SUCCESS)
 	{
@@ -1194,8 +1206,7 @@ _gnutls_x509_encode_and_copy_PKI_params (ASN1_TYPE dst,
 
       /* Write the DER parameters. (in bits)
        */
-      _gnutls_str_cpy (name, sizeof (name), dst_name);
-      _gnutls_str_cat (name, sizeof (name), ".subjectPublicKey");
+	  _asnstr_append_name(name, sizeof(name), dst_name, ".subjectPublicKey");
       result = asn1_write_value (dst, name, der.data, der.size * 8);
 
       _gnutls_free_datum (&der);
@@ -1218,8 +1229,7 @@ _gnutls_x509_encode_and_copy_PKI_params (ASN1_TYPE dst,
 
       /* Write the DER parameters.
        */
-      _gnutls_str_cpy (name, sizeof (name), dst_name);
-      _gnutls_str_cat (name, sizeof (name), ".algorithm.parameters");
+	  _asnstr_append_name(name, sizeof(name), dst_name, ".algorithm.parameters");
       result = asn1_write_value (dst, name, der.data, der.size);
 
       _gnutls_free_datum (&der);
@@ -1237,8 +1247,7 @@ _gnutls_x509_encode_and_copy_PKI_params (ASN1_TYPE dst,
 	  return result;
 	}
 
-      _gnutls_str_cpy (name, sizeof (name), dst_name);
-      _gnutls_str_cat (name, sizeof (name), ".subjectPublicKey");
+	  _asnstr_append_name(name, sizeof(name), dst_name, ".subjectPublicKey");
       result = asn1_write_value (dst, name, der.data, der.size * 8);
 
       _gnutls_free_datum (&der);
@@ -1271,9 +1280,8 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
   bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
   char name[128];
 
-  _gnutls_str_cpy (name, sizeof (name), src_name);
-  _gnutls_str_cat (name, sizeof (name), ".algorithm.algorithm");
 
+  _asnstr_append_name(name, sizeof(name), src_name, ".algorithm.algorithm");
   len = sizeof (oid);
   result = asn1_read_value (src, name, oid, &len);
 
@@ -1297,8 +1305,7 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
 
   /* Now read the parameters' bits 
    */
-  _gnutls_str_cpy (name, sizeof (name), src_name);
-  _gnutls_str_cat (name, sizeof (name), ".subjectPublicKey");
+  _asnstr_append_name(name, sizeof(name), src_name, ".subjectPublicKey");
 
   len = 0;
   result = asn1_read_value (src, name, NULL, &len);
@@ -1323,8 +1330,7 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  _gnutls_str_cpy (name, sizeof (name), src_name);
-  _gnutls_str_cat (name, sizeof (name), ".subjectPublicKey");
+  _asnstr_append_name(name, sizeof(name), src_name, ".subjectPublicKey");
 
   result = asn1_read_value (src, name, str, &len);
 

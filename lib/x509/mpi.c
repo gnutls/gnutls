@@ -206,23 +206,32 @@ _gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, bigint_t * params)
 
 /* Extracts DSA and RSA parameters from a certificate.
  */
-static int
-get_mpis (int pk_algorithm, ASN1_TYPE asn, const char *root,
+int
+_gnutls_get_asn_mpis (ASN1_TYPE asn, const char *root,
 	  bigint_t * params, int *params_size)
 {
   int result;
   char name[256];
   gnutls_datum_t tmp = { NULL, 0 };
+  gnutls_pk_algorithm pk_algorithm;
+
+  result = _gnutls_x509_get_pk_algorithm(asn, root, NULL);
+  if (result < 0)
+    {
+      gnutls_assert();
+      return result;
+    }
+  
+  pk_algorithm = result;
 
   /* Read the algorithm's parameters
    */
-  snprintf (name, sizeof (name), "%s.subjectPublicKey", root);
+  _asnstr_append_name(name, sizeof(name), root, ".subjectPublicKey");
   result = _gnutls_x509_read_value (asn, name, &tmp, 2);
 
   if (result < 0)
     {
       gnutls_assert ();
-      fprintf (stderr, "name: %s\n", name);
       return result;
     }
 
@@ -275,7 +284,7 @@ get_mpis (int pk_algorithm, ASN1_TYPE asn, const char *root,
        */
       _gnutls_free_datum (&tmp);
 
-      snprintf (name, sizeof (name), "%s.algorithm.parameters", root);
+      _asnstr_append_name(name, sizeof(name), root, ".algorithm.parameters");
       result = _gnutls_x509_read_value (asn, name, &tmp, 0);
 
       /* FIXME: If the parameters are not included in the certificate
@@ -321,13 +330,9 @@ int
 _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
 			   bigint_t * params, int *params_size)
 {
-  int pk_algorithm;
-
   /* Read the algorithm's OID
    */
-  pk_algorithm = gnutls_x509_crt_get_pk_algorithm (cert, NULL);
-
-  return get_mpis (pk_algorithm, cert->cert,
+  return _gnutls_get_asn_mpis (cert->cert,
 		   "tbsCertificate.subjectPublicKeyInfo", params,
 		   params_size);
 }
@@ -340,13 +345,9 @@ int
 _gnutls_x509_crq_get_mpis (gnutls_x509_crq_t cert,
 			   bigint_t * params, int *params_size)
 {
-  int pk_algorithm;
-
   /* Read the algorithm's OID
    */
-  pk_algorithm = gnutls_x509_crq_get_pk_algorithm (cert, NULL);
-
-  return get_mpis (pk_algorithm, cert->crq,
+  return _gnutls_get_asn_mpis (cert->crq,
 		   "certificationRequestInfo.subjectPKInfo", params,
 		   params_size);
 }

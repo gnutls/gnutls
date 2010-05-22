@@ -566,10 +566,10 @@ static int read_cas_url (gnutls_certificate_credentials_t res, const char* url)
 {
 int ret;
 gnutls_x509_crt_t * xcrt_list = NULL;
-gnutls_pkcs11_crt_t *pcrt_list=NULL;
+gnutls_pkcs11_obj_t *pcrt_list=NULL;
 unsigned int pcrt_list_size = 0;
 
-	ret = gnutls_pkcs11_crt_list_import_url( NULL, &pcrt_list_size, url, GNUTLS_PKCS11_CRT_ATTR_TRUSTED);
+	ret = gnutls_pkcs11_obj_list_import_url( NULL, &pcrt_list_size, url, GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED);
 	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
 		gnutls_assert();
 		return ret;
@@ -586,7 +586,7 @@ unsigned int pcrt_list_size = 0;
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	
-	ret = gnutls_pkcs11_crt_list_import_url( pcrt_list, &pcrt_list_size, url, GNUTLS_PKCS11_CRT_ATTR_TRUSTED);
+	ret = gnutls_pkcs11_obj_list_import_url( pcrt_list, &pcrt_list_size, url, GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

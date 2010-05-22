@@ -2184,22 +2184,19 @@ gnutls_x509_crt_export (gnutls_x509_crt_t cert,
 				  output_data, output_data_size);
 }
 
-
-static int
-rsadsa_get_key_id (gnutls_x509_crt_t crt, int pk,
+int
+_gnutls_get_key_id (gnutls_pk_algorithm_t pk, bigint_t* params, int params_size,
 		   unsigned char *output_data, size_t * output_data_size)
 {
-  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
-  int params_size = MAX_PUBLIC_PARAMS_SIZE;
   int i, result = 0;
   gnutls_datum_t der = { NULL, 0 };
   digest_hd_st hd;
 
-  result = _gnutls_x509_crt_get_mpis (crt, params, &params_size);
-  if (result < 0)
+  if (output_data==NULL || *output_data_size < 0)
     {
-      gnutls_assert ();
-      return result;
+      gnutls_assert();
+      *output_data_size = 20;
+      return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
   if (pk == GNUTLS_PK_RSA)
@@ -2240,6 +2237,37 @@ rsadsa_get_key_id (gnutls_x509_crt_t crt, int pk,
 cleanup:
 
   _gnutls_free_datum (&der);
+  return result;
+}
+
+
+static int
+rsadsa_get_key_id (gnutls_x509_crt_t crt, int pk,
+		   unsigned char *output_data, size_t * output_data_size)
+{
+  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
+  int params_size = MAX_PUBLIC_PARAMS_SIZE;
+  int i, result = 0;
+  gnutls_datum_t der = { NULL, 0 };
+  digest_hd_st hd;
+
+  result = _gnutls_x509_crt_get_mpis (crt, params, &params_size);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  result = _gnutls_get_key_id(pk, params, params_size, output_data, output_data_size);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  result = 0;
+
+cleanup:
 
   /* release all allocated MPIs
    */
@@ -2308,6 +2336,9 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
       return rsadsa_get_key_id (crt, pk, output_data, output_data_size);
     }
 
+  /* FIXME: what does this code do here? Isn't identical to the code
+   * in rsadsa_get_key_id?
+   */
   pubkey.size = 0;
   result = asn1_der_coding (crt->cert, "tbsCertificate.subjectPublicKeyInfo",
 			    NULL, &pubkey.size, NULL);

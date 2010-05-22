@@ -67,8 +67,8 @@ typedef int (*gnutls_pkcs11_pin_callback_t)(void *userdata, int attempt,
 /**
  * @brief PKCS#11 certificate reference.
  */
-struct gnutls_pkcs11_crt_st;
-typedef struct gnutls_pkcs11_crt_st* gnutls_pkcs11_crt_t;
+struct gnutls_pkcs11_obj_st;
+typedef struct gnutls_pkcs11_obj_st* gnutls_pkcs11_obj_t;
 
 
 
@@ -132,30 +132,11 @@ int gnutls_pkcs11_add_provider (const char * name, const char * params);
  * @param certificate	Certificate reference to free.
  * @return gnutls stauts.
  */
-int gnutls_pkcs11_crt_init ( gnutls_pkcs11_crt_t *certificate);
+int gnutls_pkcs11_obj_init ( gnutls_pkcs11_obj_t *certificate);
 
-/**
- * @brief Deserialize a certificate reference.
- * @param serialized	Serialized certificate.
- * @param p_certificate	Certificate reference.
- * @return gnutls status.
- */
-int gnutls_pkcs11_crt_import_url (gnutls_pkcs11_crt_t p_certificate, const char * url);
-
-/**
- * @brief Serialize a certificate reference.
- * @param certificate	Certificate reference to serialize.
- * @param serialized	Serialize result (string). Use gnutls_free() to free it.
- * @return gnutls status.
- */
-int gnutls_pkcs11_crt_export_url (gnutls_pkcs11_crt_t certificate, char** url);
-
-/**
- * @brief Free certificate reference.
- * @param certificate	Certificate reference to free.
- * @return gnutls stauts.
- */
-void gnutls_pkcs11_crt_deinit ( gnutls_pkcs11_crt_t certificate);
+int gnutls_pkcs11_obj_import_url (gnutls_pkcs11_obj_t, const char * url);
+int gnutls_pkcs11_obj_export_url (gnutls_pkcs11_obj_t, char** url);
+void gnutls_pkcs11_obj_deinit ( gnutls_pkcs11_obj_t);
 
 /**
  * @brief Release array of certificate references.
@@ -163,25 +144,27 @@ void gnutls_pkcs11_crt_deinit ( gnutls_pkcs11_crt_t certificate);
  * @param ncertificates	Array size.
  * @return gnutls status.
  */
-int gnutls_pkcs11_crt_list_deinit (gnutls_pkcs11_crt_t * certificates, const unsigned int ncertificates);
+int gnutls_pkcs11_obj_list_deinit (gnutls_pkcs11_obj_t * , const unsigned int nobjs);
 
 typedef enum {
-	GNUTLS_PKCS11_CRT_ID_HEX=1,
-	GNUTLS_PKCS11_CRT_LABEL,
-	GNUTLS_PKCS11_CRT_TOKEN_LABEL,
-	GNUTLS_PKCS11_CRT_TOKEN_SERIAL,
-	GNUTLS_PKCS11_CRT_TOKEN_MANUFACTURER,
-	GNUTLS_PKCS11_CRT_TOKEN_MODEL,
-	GNUTLS_PKCS11_CRT_ID,
-} gnutls_pkcs11_cert_info_t;
+	GNUTLS_PKCS11_OBJ_ID_HEX=1,
+	GNUTLS_PKCS11_OBJ_LABEL,
+	GNUTLS_PKCS11_OBJ_TOKEN_LABEL,
+	GNUTLS_PKCS11_OBJ_TOKEN_SERIAL,
+	GNUTLS_PKCS11_OBJ_TOKEN_MANUFACTURER,
+	GNUTLS_PKCS11_OBJ_TOKEN_MODEL,
+	GNUTLS_PKCS11_OBJ_ID,
+} gnutls_pkcs11_obj_info_t;
 
-int gnutls_pkcs11_crt_get_info(gnutls_pkcs11_crt_t crt, gnutls_pkcs11_cert_info_t itype, void* output, size_t* output_size);
+int gnutls_pkcs11_obj_get_info(gnutls_pkcs11_obj_t crt, gnutls_pkcs11_obj_info_t itype, void* output, size_t* output_size);
 
 typedef enum {
-	GNUTLS_PKCS11_CRT_ATTR_ALL=1,
-	GNUTLS_PKCS11_CRT_ATTR_TRUSTED, /* marked as trusted */
-	GNUTLS_PKCS11_CRT_ATTR_WITH_PK, /* with corresponding private key */
-} gnutls_pkcs11_crt_attr_t;
+	GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL=1, /* all certificates */
+	GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED, /* certificates marked as trusted */
+	GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY, /* certificates with corresponding private key */
+	GNUTLS_PKCS11_OBJ_ATTR_PUBKEY, /* public keys */
+	GNUTLS_PKCS11_OBJ_ATTR_ALL, /* everything! */
+} gnutls_pkcs11_obj_attr_t;
 
 /* token info */
 typedef enum {
@@ -191,36 +174,32 @@ typedef enum {
 	GNUTLS_PKCS11_TOKEN_MODEL,
 } gnutls_pkcs11_token_info_t;
 
+typedef enum {
+	GNUTLS_PKCS11_OBJ_UNKNOWN,
+	GNUTLS_PKCS11_OBJ_X509_CRT,
+	GNUTLS_PKCS11_OBJ_PUBKEY,
+	GNUTLS_PKCS11_OBJ_PRIVKEY,
+	GNUTLS_PKCS11_OBJ_SECRET_KEY,
+	GNUTLS_PKCS11_OBJ_DATA,
+} gnutls_pkcs11_obj_type_t;
+
 int gnutls_pkcs11_token_get_url (unsigned int seq, char** url);
 int gnutls_pkcs11_token_get_info(const char* url, gnutls_pkcs11_token_info_t, void* output, size_t *output_size);
 
 #define GNUTLS_PKCS11_TOKEN_HW 1
 int gnutls_pkcs11_token_get_flags(const char* url, unsigned int *flags);
 
-/**
- * @brief Enumerate available certificates.
- * @param p_list	Location to store the list.
- * @param n_list	Location to store end list length.
- * @param url		Enumerate only certificates found in token(s) pointed by url
- * @param attributes Only export certificates that match this attribute
- * @return gnutls status.
- * @note the p_list is should not be initialized.
- */
-int gnutls_pkcs11_crt_list_import_url (gnutls_pkcs11_crt_t * p_list, unsigned int *const n_list, const char* url, gnutls_pkcs11_crt_attr_t flags);
+int gnutls_pkcs11_obj_list_import_url (gnutls_pkcs11_obj_t * p_list, unsigned int *const n_list, const char* url, gnutls_pkcs11_obj_attr_t flags);
 
-int gnutls_x509_crt_import_pkcs11( gnutls_x509_crt_t crt, gnutls_pkcs11_crt_t pkcs11_crt);
+int gnutls_x509_crt_import_pkcs11( gnutls_x509_crt_t crt, gnutls_pkcs11_obj_t pkcs11_crt);
 int gnutls_x509_crt_import_pkcs11_url( gnutls_x509_crt_t crt, const char* url);
 
-/**
- * @brief Return the type of the certificate
- * @param certificate	Certificate reference.
- * @return gnutls status.
- */
-gnutls_certificate_type_t gnutls_pkcs11_crt_get_type (gnutls_pkcs11_crt_t certificate);
+gnutls_pkcs11_obj_type_t gnutls_pkcs11_obj_get_type (gnutls_pkcs11_obj_t certificate);
+const char* gnutls_pkcs11_type_get_name (gnutls_pkcs11_obj_type_t);
 
 int gnutls_x509_crt_list_import_pkcs11 (gnutls_x509_crt_t * certs,
                                    unsigned int cert_max,
-                                   gnutls_pkcs11_crt_t * const pkcs11_certs,
+                                   gnutls_pkcs11_obj_t * const pkcs11_certs,
                                    unsigned int flags);
 
 
@@ -228,7 +207,7 @@ int gnutls_x509_crt_list_import_pkcs11 (gnutls_x509_crt_t * certs,
 int gnutls_pkcs11_privkey_init (gnutls_pkcs11_privkey_t * key);
 void gnutls_pkcs11_privkey_deinit (gnutls_pkcs11_privkey_t key);
 int gnutls_pkcs11_privkey_get_pk_algorithm (gnutls_pkcs11_privkey_t key, unsigned int* bits);
-int gnutls_pkcs11_privkey_get_info(gnutls_pkcs11_privkey_t crt, gnutls_pkcs11_cert_info_t itype, void* output, size_t* output_size);
+int gnutls_pkcs11_privkey_get_info(gnutls_pkcs11_privkey_t crt, gnutls_pkcs11_obj_info_t itype, void* output, size_t* output_size);
 int gnutls_pkcs11_privkey_import_url (gnutls_pkcs11_privkey_t key,
 				  const char* url);
 

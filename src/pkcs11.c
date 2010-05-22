@@ -47,7 +47,7 @@ static void pkcs11_common(void)
  */
 void pkcs11_list( FILE* outfile, const char* url, int type)
 {
-gnutls_pkcs11_crt_t *crt_list;
+gnutls_pkcs11_obj_t *crt_list;
 gnutls_x509_crt_t xcrt;
 unsigned int crt_list_size = 0;
 int ret;
@@ -59,52 +59,66 @@ int i, flags;
 	if (url == NULL)
 		url = "pkcs11:";
 
-	ret = gnutls_pkcs11_crt_list_import_url( NULL, &crt_list_size, url, GNUTLS_PKCS11_CRT_ATTR_ALL);
-	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
-		fprintf(stderr, "Error in crt_list_import (1): %s\n", gnutls_strerror(ret));
-		exit(1);
+	if (type == PKCS11_TYPE_TRUSTED) {
+		flags = GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED;
+	} else if (type == PKCS11_TYPE_PK) {
+		flags = GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY;
+	} else if (type == PKCS11_TYPE_CRT_ALL) {
+		flags = GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL;
+	} else {
+		flags = GNUTLS_PKCS11_OBJ_ATTR_ALL;
 	}
-	
-	if (crt_list_size == 0) {
-		fprintf(stderr, "No matching certificates found\n");
-		exit(0);
-	}
-	
+		
+	/* give some initial value to avoid asking for the pkcs11 pin twice.
+	 */
+	crt_list_size = 128;
 	crt_list = malloc(sizeof(*crt_list)*crt_list_size);
 	if (crt_list == NULL) {
 		fprintf(stderr, "Memory error\n");
 		exit(1);
 	}
 
-	if (type == PKCS11_TYPE_TRUSTED) {
-		flags = GNUTLS_PKCS11_CRT_ATTR_TRUSTED;
-	} else if (type == PKCS11_TYPE_PK) {
-		flags = GNUTLS_PKCS11_CRT_ATTR_WITH_PK;
-	} else {
-		flags = GNUTLS_PKCS11_CRT_ATTR_ALL;
-	}
-
-	ret = gnutls_pkcs11_crt_list_import_url( crt_list, &crt_list_size, url, flags);
-	if (ret < 0) {
-		fprintf(stderr, "Error in crt_list_import: %s\n", gnutls_strerror(ret));
+	ret = gnutls_pkcs11_obj_list_import_url( crt_list, &crt_list_size, url, flags);
+	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
+		fprintf(stderr, "Error in crt_list_import (1): %s\n", gnutls_strerror(ret));
 		exit(1);
+	}
+	
+	if (crt_list_size == 0) {
+		fprintf(stderr, "No matching objects found\n");
+		exit(0);
+	}
+	
+	if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER) {
+		crt_list = realloc(crt_list, sizeof(*crt_list)*crt_list_size);
+		if (crt_list == NULL) {
+			fprintf(stderr, "Memory error\n");
+			exit(1);
+		}
+
+		ret = gnutls_pkcs11_obj_list_import_url( crt_list, &crt_list_size, url, flags);
+		if (ret < 0) {
+			fprintf(stderr, "Error in crt_list_import: %s\n", gnutls_strerror(ret));
+			exit(1);
+		}
 	}
 	
 	for (i=0;i<crt_list_size;i++) {
 		char buf[128];
 		size_t size;
-
-
-		ret = gnutls_pkcs11_crt_export_url(crt_list[i], &output);
+		
+		ret = gnutls_pkcs11_obj_export_url(crt_list[i], &output);
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
 			exit(1);
 		}
 
-		fprintf(outfile, "Certificate %d:\n\tURL: %s\n", i, output);
+		fprintf(outfile, "Object %d:\n\tURL: %s\n", i, output);
 
+		fprintf(outfile, "\tType: %s\n", gnutls_pkcs11_type_get_name(gnutls_pkcs11_obj_get_type( crt_list[i])));
+		
 		size = sizeof(buf);
-		ret = gnutls_pkcs11_crt_get_info( crt_list[i], GNUTLS_PKCS11_CRT_LABEL, buf, &size);
+		ret = gnutls_pkcs11_obj_get_info( crt_list[i], GNUTLS_PKCS11_OBJ_LABEL, buf, &size);
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
 			exit(1);
@@ -112,13 +126,17 @@ int i, flags;
 		fprintf(outfile, "\tLabel: %s\n", buf);
 
 		size = sizeof(buf);
-		ret = gnutls_pkcs11_crt_get_info( crt_list[i], GNUTLS_PKCS11_CRT_ID_HEX, buf, &size);
+		ret = gnutls_pkcs11_obj_get_info( crt_list[i], GNUTLS_PKCS11_OBJ_ID_HEX, buf, &size);
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
 			exit(1);
 		}
 		fprintf(outfile, "\tID: %s\n\n", buf);
+		
+		
 
+		if (flags == GNUTLS_PKCS11_OBJ_ATTR_ALL)
+			continue;
 
 		ret = gnutls_x509_crt_init(&xcrt);
 		if (ret < 0) {
@@ -154,7 +172,7 @@ int i, flags;
 
 void pkcs11_export(FILE* outfile, const char* url)
 {
-gnutls_pkcs11_crt_t crt;
+gnutls_pkcs11_obj_t crt;
 gnutls_x509_crt_t xcrt;
 int ret;
 size_t size;
@@ -164,13 +182,13 @@ size_t size;
 	if (url == NULL)
 		url = "pkcs11:";
 
-	ret = gnutls_pkcs11_crt_init(&crt);
+	ret = gnutls_pkcs11_obj_init(&crt);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
 		exit(1);
 	}
 
-	ret = gnutls_pkcs11_crt_import_url( crt, url);
+	ret = gnutls_pkcs11_obj_import_url( crt, url);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
 		exit(1);
@@ -198,7 +216,7 @@ size_t size;
 	fputs("\n\n", outfile);
 
 	gnutls_x509_crt_deinit(xcrt);
-	gnutls_pkcs11_crt_deinit(crt);
+	gnutls_pkcs11_obj_deinit(crt);
 
 	return;
 

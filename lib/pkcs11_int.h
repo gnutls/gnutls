@@ -29,6 +29,12 @@ struct pkcs11_url_info
     size_t certid_raw_size;
 };
 
+struct gnutls_pkcs11_obj_st {
+    gnutls_datum_t raw;
+    gnutls_pkcs11_obj_type_t type;
+    struct pkcs11_url_info info;
+};
+
 /* thus function is called for every token in the traverse_tokens
  * function. Once everything is traversed it is called with NULL tinfo.
  * It should return 0 if found what it was looking for.
@@ -38,7 +44,7 @@ typedef int (*find_func_t)(pakchois_session_t *pks, struct token_info* tinfo, vo
 int _pkcs11_traverse_tokens (find_func_t find_func, void* input, int leave_session);
 int pkcs11_url_to_info(const char* url, struct pkcs11_url_info* info);
 
-int pkcs11_get_info(struct pkcs11_url_info *info, gnutls_pkcs11_cert_info_t itype, 
+int pkcs11_get_info(struct pkcs11_url_info *info, gnutls_pkcs11_obj_info_t itype, 
     void* output, size_t* output_size);
 int pkcs11_login(pakchois_session_t *pks, struct token_info *info);
 
@@ -47,5 +53,6 @@ extern void* token_data;
 
 void pkcs11_rescan_slots(void);
 int pkcs11_info_to_url(const struct pkcs11_url_info* info, char** url);
+
 
 #endif
