@@ -9,7 +9,7 @@ void cli_version(void);
 
 #}
 
-helpnode "GNU TLS test client\nUsage:  gnutls-cli [options] hostname\n\n"
+helpnode "GnuTLS test client\nUsage:  gnutls-cli [options] hostname\n\n"
 
 #int debug;
 option (d, debug) INT "integer" { $debug = $1 } "Enable debugging" 

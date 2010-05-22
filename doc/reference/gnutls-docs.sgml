@@ -3,16 +3,15 @@
                "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
 <book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
   <bookinfo>
-    <title>GNU TLS API Reference Manual</title>
+    <title>GnuTLS API Reference Manual</title>
   </bookinfo>
 
   <chapter id="intro">
-    <title>GNU TLS API Reference Manual</title>
+    <title>GnuTLS API Reference Manual</title>
 
     <para>
-      This is the GNU TLS library, a implementation of the TLS
-      (Transport Layer Security) and SSL (Secure Sockets Layer) for
-      the GNU project.
+      GnuTLS is a implementation of the TLS (Transport Layer Security)
+      and SSL (Secure Sockets Layer) protocols for the GNU project.
     </para>
 
     <para>

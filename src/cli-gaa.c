@@ -126,7 +126,7 @@ static void __gaa_helpsingle(char short_name, char *name,
 
 void gaa_help(void)
 {
-	printf("GNU TLS test client\nUsage:  gnutls-cli [options] hostname\n\n\n");
+	printf("GnuTLS test client\nUsage:  gnutls-cli [options] hostname\n\n\n");
 	__gaa_helpsingle('d', "debug", "integer ", "Enable debugging");
 	__gaa_helpsingle('r', "resume", "", "Connect, establish a session. Connect again and resume this session.");
 	__gaa_helpsingle('e', "rehandshake", "", "Connect, establish a session and rehandshake immediately.");

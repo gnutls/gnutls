@@ -128,7 +128,7 @@ static void __gaa_helpsingle(char short_name, char *name,
 
 void gaa_help(void)
 {
-	printf("GNU TLS debug client\nUsage: gnutls-cli-debug [options] hostname\n\n\n");
+	printf("GnuTLS debug client\nUsage: gnutls-cli-debug [options] hostname\n\n\n");
 	__gaa_helpsingle('p', "port", "integer ", "The port to connect to.");
 	__gaa_helpsingle('d', "debug", "integer ", "Enable debugging");
 	__gaa_helpsingle('V', "verbose", "", "More verbose output");

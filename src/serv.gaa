@@ -7,7 +7,7 @@ void serv_version(void);
 
 #}
 
-helpnode "GNU TLS test server\nUsage: gnutls-serv [options]\n\n"
+helpnode "GnuTLS test server\nUsage: gnutls-serv [options]\n\n"
 
 #int debug;
 option (d, debug) INT "integer" { $debug = $1 } "Enable debugging" 

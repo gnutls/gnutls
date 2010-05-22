@@ -1,4 +1,4 @@
-GNU TLS NEWS -- History of user-visible changes.                -*- outline -*-
+GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 See the end for copying conditions.
@@ -1041,7 +1041,7 @@ No changes since last version.
 
 ** libgnutls: Fix X.509 certificate chain validation error. [GNUTLS-SA-2008-3]
 The flaw makes it possible for man in the middle attackers (i.e.,
-active attackers) to assume any name and trick GNU TLS clients into
+active attackers) to assume any name and trick GnuTLS clients into
 trusting that name.  Thanks for report and analysis from Martin von
 Gagern <Martin.vGagern@gmx.net>.  [CVE-2008-4989]
 
@@ -1316,7 +1316,7 @@ No changes since last version.
 
 ** libgnutls: Fix X.509 certificate chain validation error. [GNUTLS-SA-2008-3]
 The flaw makes it possible for man in the middle attackers (i.e.,
-active attackers) to assume any name and trick GNU TLS clients into
+active attackers) to assume any name and trick GnuTLS clients into
 trusting that name.  Thanks for report and analysis from Martin von
 Gagern <Martin.vGagern@gmx.net>.  [CVE-2008-4989]
 
@@ -1733,7 +1733,7 @@ certificate.  Reported by Michael Meskes <meskes@debian.org> in
 
 ** libgnutls: Fix X.509 certificate chain validation error. [GNUTLS-SA-2008-3]
 The flaw makes it possible for man in the middle attackers (i.e.,
-active attackers) to assume any name and trick GNU TLS clients into
+active attackers) to assume any name and trick GnuTLS clients into
 trusting that name.  Thanks for report and analysis from Martin von
 Gagern <Martin.vGagern@gmx.net>.  [CVE-2008-4989]
 

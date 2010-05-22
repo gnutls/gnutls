@@ -37,12 +37,6 @@ _gnutls_safe_renegotiation_recv_params (gnutls_session_t session,
 
   DECR_LEN (data_size, len + 1 /* count the first byte and payload */ );
 
-  if (session->internals.priorities.disable_safe_renegotiation != 0)
-    {
-      gnutls_assert ();
-      return 0;
-    }
-
   /* It is not legal to receive this extension on a renegotiation and
    * not receive it on the initial negotiation.
    */

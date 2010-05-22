@@ -124,7 +124,7 @@ static void __gaa_helpsingle(char short_name, char *name,
 
 void gaa_help(void)
 {
-	printf("GNU TLS test server\nUsage: gnutls-serv [options]\n\n\n");
+	printf("GnuTLS test server\nUsage: gnutls-serv [options]\n\n\n");
 	__gaa_helpsingle('d', "debug", "integer ", "Enable debugging");
 	__gaa_helpsingle('g', "generate", "", "Generate Diffie-Hellman and RSA-EXPORT Parameters.");
 	__gaa_helpsingle('p', "port", "integer ", "The port to connect to.");

@@ -2,7 +2,7 @@
 @comment %**start of header
 @setfilename gnutls.info
 @include version.texi
-@settitle GNU TLS @value{VERSION}
+@settitle GnuTLS @value{VERSION}
 
 @c don't indent the paragraphs.
 @paragraphindent 0
@@ -15,7 +15,7 @@
 @finalout
 @copying
 This manual is last updated @value{UPDATED} for version
-@value{VERSION} of GNU TLS.
+@value{VERSION} of GnuTLS.
 
 Copyright @copyright{} 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 
@@ -37,15 +37,15 @@ Documentation License''.
 @dircategory System Administration
 @direntry
 * certtool: (gnutls)Invoking certtool.	Manipulate certificates and keys.
-* gnutls-serv: (gnutls)Invoking gnutls-serv.	GNU TLS test server.
-* gnutls-cli: (gnutls)Invoking gnutls-cli.	GNU TLS test client.
-* gnutls-cli-debug: (gnutls)Invoking gnutls-cli-debug.	GNU TLS debug client.
+* gnutls-serv: (gnutls)Invoking gnutls-serv.	GnuTLS test server.
+* gnutls-cli: (gnutls)Invoking gnutls-cli.	GnuTLS test client.
+* gnutls-cli-debug: (gnutls)Invoking gnutls-cli-debug.	GnuTLS debug client.
 * psktool: (gnutls)Invoking psktool.	Simple TLS-Pre-Shared-Keys manager.
 * srptool: (gnutls)Invoking srptool.	Simple SRP password tool.
 @end direntry
 
 @titlepage
-@title GNU TLS
+@title GnuTLS
 @subtitle Transport Layer Security Library for the GNU system
 @subtitle for version @value{VERSION}, @value{UPDATED}
 @sp 7
@@ -65,7 +65,7 @@ Documentation License''.
 
 @ifnottex
 @node Top
-@top GNU TLS
+@top GnuTLS
 
 @insertcopying
 @end ifnottex
@@ -3153,7 +3153,7 @@ computer.  It sets up a TLS connection and forwards data from the
 standard input to the secured socket and vice versa.
 
 @verbatim
-GNU TLS test client
+GnuTLS test client
 Usage:  gnutls-cli [options] hostname
 
      -d, --debug integer      Enable debugging
@@ -3325,7 +3325,7 @@ Checking for OpenPGP authentication support (TLS extension)... no
 Simple server program that listens to incoming TLS connections.
 
 @verbatim
-GNU TLS test server
+GnuTLS test server
 Usage: gnutls-serv [options]
 
      -d, --debug integer      Enable debugging

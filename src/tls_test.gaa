@@ -11,7 +11,7 @@ void tls_test_version(void);
 
 #}
 
-helpnode "GNU TLS debug client\nUsage: gnutls-cli-debug [options] hostname\n\n"
+helpnode "GnuTLS debug client\nUsage: gnutls-cli-debug [options] hostname\n\n"
 
 #int pp;
 option (p, port) INT "integer" { $pp = $1 } "The port to connect to."
