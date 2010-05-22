@@ -864,7 +864,8 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
 
   /* First, check for safe renegotiation SCSV.
    */
-  {
+  if (session->internals.priorities.disable_safe_renegotiation == 0)
+    {
     int offset;
 
     for (offset = 0; offset < datalen; offset += 2)
