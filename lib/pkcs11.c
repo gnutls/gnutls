@@ -52,6 +52,11 @@ struct flags_find_data_st {
     unsigned int slot_flags;
 };
 
+struct flags_find_data_st {
+    struct pkcs11_url_info info;
+    unsigned int slot_flags;
+};
+
 struct crt_find_data_st {
     gnutls_pkcs11_obj_t *p_list;
     unsigned int* n_list;
@@ -1549,7 +1554,6 @@ int pkcs11_login(pakchois_session_t *pks, struct token_info *info)
     /* force login on HW tokens. Some tokens will not list private keys
      * if login has not been performed.
      */
-//    if (!(info->sinfo.flags & CKF_HW_SLOT) && (info->tinfo.flags & CKF_LOGIN_REQUIRED) == 0) {
     if ((info->tinfo.flags & CKF_LOGIN_REQUIRED) == 0) {
         gnutls_assert();
         _gnutls_debug_log( "pk11: No login required.\n");
@@ -1619,7 +1623,6 @@ int pkcs11_login(pakchois_session_t *pks, struct token_info *info)
 
     return (rv == CKR_OK || rv == CKR_USER_ALREADY_LOGGED_IN) ? 0 : GNUTLS_E_PKCS11_ERROR;
 }
-
 
 static int find_privkeys(pakchois_session_t *pks, struct token_info* info, struct pkey_list *list)
 {
