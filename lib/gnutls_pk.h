@@ -77,4 +77,6 @@ int
 _gnutls_decode_ber_rs (const gnutls_datum_t * sig_value, bigint_t * r,
 		       bigint_t * s);
 
+int _gnutls_calc_rsa_exp(bigint_t* params, unsigned int params_size);
+
 #endif /* GNUTLS_PK_H */

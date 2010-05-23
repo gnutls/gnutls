@@ -741,21 +741,13 @@ _rsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
 	  goto cleanup;
 	}
 
-  /* [6] = d % p-1, [7] = d % q-1 */
-  _gnutls_mpi_sub_ui(tmp, resarr[3]/*p*/, 1);
-  resarr[6] = _gnutls_mpi_mod(resarr[2]/*d*/, tmp);
-
-  _gnutls_mpi_sub_ui(tmp, resarr[4]/*q*/, 1);
-  resarr[7] = _gnutls_mpi_mod(resarr[2]/*d*/, tmp);
-
-  _gnutls_mpi_release(&tmp);
-  
-  if (resarr[6] == NULL || resarr[7] == NULL)
+  ret =  _gnutls_calc_rsa_exp(resarr, 2 + *resarr_len);
+  if (ret < 0)
     {
-	  gnutls_assert();
-	  ret= GNUTLS_E_MEMORY_ERROR;
-	  goto cleanup;
-	}
+      gnutls_assert();
+      ret= GNUTLS_E_MEMORY_ERROR;
+      goto cleanup;
+    }
 
   (*resarr_len)+=2;
 

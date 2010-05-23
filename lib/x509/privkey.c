@@ -588,32 +588,18 @@ gnutls_x509_privkey_import_rsa_raw2 (gnutls_x509_privkey_t key,
           return GNUTLS_E_MPI_SCAN_FAILED;
         }
     } 
-  else  /* calculate e1 and e2 */
+  else
     {
-      bigint_t tmp = _gnutls_mpi_alloc_like(key->params[0]);
-      if (tmp == NULL)
-        {
-          gnutls_assert ();
-          FREE_RSA_PRIVATE_PARAMS;
-          return GNUTLS_E_MEMORY_ERROR;
-        }
-
-        /* [6] = d % p-1, [7] = d % q-1 */
-        _gnutls_mpi_sub_ui(tmp, key->params[3], 1);
-        key->params[6] = _gnutls_mpi_mod(key->params[2]/*d*/, tmp);
-
-        _gnutls_mpi_sub_ui(tmp, key->params[4], 1);
-        key->params[7] = _gnutls_mpi_mod(key->params[2]/*d*/, tmp);
-		
-		_gnutls_mpi_release(&tmp);
-
-      if (key->params[7] == NULL || key->params[6] == NULL)
-        {
-          gnutls_assert ();
-          FREE_RSA_PRIVATE_PARAMS;
-          return GNUTLS_E_MEMORY_ERROR;
-        }
+        /* calculate exp1 and exp2 */
+        ret = _gnutls_calc_rsa_exp(key->params, key->params_size);
+        if (ret < 0)
+          {
+            gnutls_assert();
+            FREE_RSA_PRIVATE_PARAMS;
+            return ret;
+          }
     }
+
     
 
   if (!key->crippled)

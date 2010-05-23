@@ -708,7 +708,7 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
   switch (pk_algorithm)
     {
     case GNUTLS_PK_RSA:
-      local_params = RSA_PRIVATE_PARAMS;
+      local_params = RSA_PRIVATE_PARAMS-2;
       break;
     case GNUTLS_PK_DSA:
       local_params = DSA_PRIVATE_PARAMS;
@@ -726,7 +726,6 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
 
   *params_size = local_params;
 
-
   for (i = 0; i < local_params; i++)
     {
       result = _gnutls_read_pgp_mpi (pkt, 1, i, &params[i]);
@@ -736,6 +735,19 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
 	  goto error;
 	}
     }
+
+    if (pk_algorithm==GNUTLS_PK_RSA)
+      {
+        /* on RSA we need to calculate exp1 and exp2 */
+        result = _gnutls_calc_rsa_exp(params, RSA_PRIVATE_PARAMS);
+        if (result < 0)
+          {
+            gnutls_assert();
+            i = *params_size;
+            goto error;
+          }
+        *params_size = RSA_PRIVATE_PARAMS;
+      }
 
   return 0;
 
