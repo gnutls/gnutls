@@ -629,6 +629,12 @@ _rsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
   gcry_sexp_t parms, key, list;
   bigint_t tmp;
 
+  if (*resarr_len < RSA_PRIVATE_PARAMS)
+    {
+      gnutls_assert();
+      return GNUTLS_E_INTERNAL_ERROR;
+    }
+
   ret = gcry_sexp_build (&parms, NULL, "(genkey(rsa(nbits %d)))", bits);
   if (ret != 0)
     {
@@ -736,10 +742,10 @@ _rsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
 	}
 
   /* [6] = d % p-1, [7] = d % q-1 */
-  _gnutls_mpi_sub_ui(tmp, resarr[3], 1);
+  _gnutls_mpi_sub_ui(tmp, resarr[3]/*p*/, 1);
   resarr[6] = _gnutls_mpi_mod(resarr[2]/*d*/, tmp);
 
-  _gnutls_mpi_sub_ui(tmp, resarr[4], 1);
+  _gnutls_mpi_sub_ui(tmp, resarr[4]/*q*/, 1);
   resarr[7] = _gnutls_mpi_mod(resarr[2]/*d*/, tmp);
 
   _gnutls_mpi_release(&tmp);
