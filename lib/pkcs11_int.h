@@ -46,7 +46,7 @@ struct gnutls_pkcs11_obj_st {
  */
 typedef int (*find_func_t)(pakchois_session_t *pks, struct token_info* tinfo, void* input);
 
-int _pkcs11_traverse_tokens (find_func_t find_func, void* input, int leave_session);
+
 int pkcs11_url_to_info(const char* url, struct pkcs11_url_info* info);
 
 int pkcs11_get_info(struct pkcs11_url_info *info, gnutls_pkcs11_obj_info_t itype, 
@@ -59,5 +59,12 @@ extern void* token_data;
 void pkcs11_rescan_slots(void);
 int pkcs11_info_to_url(const struct pkcs11_url_info* info, char** url);
 
+#define SESSION_WRITE 1
+#define SESSION_LOGIN 2
+int pkcs11_open_session (pakchois_session_t** _pks, struct pkcs11_url_info *info, unsigned int flags);
+int _pkcs11_traverse_tokens (find_func_t find_func, void* input, int leave_session, unsigned int flags);
+ck_object_class_t pkcs11_strtype_to_class(const char* type);
+
+int pkcs11_token_matches_info( struct pkcs11_url_info* info, struct ck_token_info* tinfo);
 
 #endif

@@ -625,8 +625,9 @@ static int
 _rsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
 {
 
-  int ret;
+  int ret, i;
   gcry_sexp_t parms, key, list;
+  bigint_t tmp;
 
   ret = gcry_sexp_build (&parms, NULL, "(genkey(rsa(nbits %d)))", bits);
   if (ret != 0)
@@ -722,9 +723,43 @@ _rsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
   _gnutls_mpi_log ("q: ", resarr[4]);
   _gnutls_mpi_log ("u: ", resarr[5]);
 
+  /* generate e1 and e2 */
+
   *resarr_len = 6;
+	
+  tmp = _gnutls_mpi_alloc_like(resarr[0]);
+  if (tmp == NULL)
+	{
+	  gnutls_assert ();
+	  ret = GNUTLS_E_MEMORY_ERROR;
+	  goto cleanup;
+	}
+
+  /* [6] = d % p-1, [7] = d % q-1 */
+  _gnutls_mpi_sub_ui(tmp, resarr[3], 1);
+  resarr[6] = _gnutls_mpi_mod(resarr[2]/*d*/, tmp);
+
+  _gnutls_mpi_sub_ui(tmp, resarr[4], 1);
+  resarr[7] = _gnutls_mpi_mod(resarr[2]/*d*/, tmp);
+
+  _gnutls_mpi_release(&tmp);
+  
+  if (resarr[6] == NULL || resarr[7] == NULL)
+    {
+	  gnutls_assert();
+	  ret= GNUTLS_E_MEMORY_ERROR;
+	  goto cleanup;
+	}
+
+  (*resarr_len)+=2;
 
   return 0;
+
+cleanup:
+  for (i=0;i<*resarr_len;i++)
+	_gnutls_mpi_release(&resarr[i]);
+
+  return ret;
 }
 
 

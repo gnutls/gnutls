@@ -134,7 +134,7 @@ int gnutls_pkcs11_privkey_get_info(gnutls_pkcs11_privkey_t pkey,
 			key->pks = NULL; \
 			ret = token_func(token_data, label, retries++); \
 			if (ret == 0) { \
-				_pkcs11_traverse_tokens(find_privkey_url, &find_data, 1); \
+				_pkcs11_traverse_tokens(find_privkey_url, &find_data, 1, 0); \
 				goto retry; \
 			} \
 		} \
@@ -287,36 +287,13 @@ static int find_privkey_url(pakchois_session_t * pks,
 
 	/* do not bother reading the token if basic fields do not match
 	 */
-	if (find_data->privkey->info.manufacturer[0] != 0) {
-		if (strcmp
-		    (find_data->privkey->info.manufacturer,
-		     info->tinfo.manufacturer_id) != 0)
-			return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    if (pkcs11_token_matches_info( &find_data->privkey->info, &info->tinfo) < 0) {
+		gnutls_assert();
+		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
-
-	if (find_data->privkey->info.token[0] != 0) {
-		if (strcmp
-		    (find_data->privkey->info.token,
-		     info->tinfo.label) != 0)
-			return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	}
-
-	if (find_data->privkey->info.model[0] != 0) {
-		if (strcmp
-		    (find_data->privkey->info.model,
-		     info->tinfo.model) != 0)
-			return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	}
-
-	if (find_data->privkey->info.serial[0] != 0) {
-		if (strcmp
-		    (find_data->privkey->info.serial,
-		     info->tinfo.serial_number) != 0)
-			return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	}
-
+	
 	if (find_data->privkey->info.type[0] != 0) {
-		if (strcmp(find_data->privkey->info.type, "cert") != 0) {
+		if (strcmp(find_data->privkey->info.type, "private") != 0) {
 			gnutls_assert();
 			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
 		}
@@ -422,7 +399,7 @@ int gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	ret = _pkcs11_traverse_tokens(find_privkey_url, &find_data, 1);
+	ret = _pkcs11_traverse_tokens(find_privkey_url, &find_data, 1, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

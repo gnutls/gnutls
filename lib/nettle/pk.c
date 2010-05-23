@@ -72,17 +72,8 @@ mpz_t q_1;
 	memcpy(&priv->q, pk_params->params[4], sizeof(mpz_t));
 	memcpy(&priv->c, pk_params->params[5], sizeof(mpz_t));
 
-	/* FIXME: possibly move it to fixup to avoid those calculations here */	
-	
-	/* b = d % q-1 */
-	mpz_init(q_1);
-	mpz_sub_ui(q_1, priv->q, 1);
-	
-	mpz_fdiv_r(priv->b, priv->d, q_1);
-
-	/* a = d % p-1 */
-	mpz_sub_ui(q_1, priv->p, 1);
-	mpz_fdiv_r(priv->a, priv->d, q_1);
+	memcpy(&priv->a, pk_params->params[6], sizeof(mpz_t));
+	memcpy(&priv->b, pk_params->params[7], sizeof(mpz_t));
 }
 
 static int
@@ -425,7 +416,8 @@ int ret, i;
 		_gnutls_mpi_set(params->params[3], priv.p);
 		_gnutls_mpi_set(params->params[4], priv.q);
 		_gnutls_mpi_set(params->params[5], priv.c);
-
+		_gnutls_mpi_set(params->params[6], priv.a);
+		_gnutls_mpi_set(params->params[7], priv.b);
 		rsa_private_key_clear(&priv);
 		rsa_public_key_clear(&pub);
 		

@@ -44,6 +44,28 @@ static void pkcs11_common(void)
 
 }
 
+void pkcs11_delete(FILE* outfile, const char* url, int batch)
+{
+int ret;
+	if (!batch) {
+		pkcs11_list(outfile, url, PKCS11_TYPE_ALL);
+		ret = read_yesno("Are you sure you want to delete those objects? (Y/N): ");
+		if (ret == 0) {
+			exit(1);
+		}
+	}
+	
+	ret = gnutls_pkcs11_delete_url(url);
+	if (ret < 0) {
+		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+	
+	fprintf(outfile, "\n%d objects deleted\n", ret);
+	
+	return;
+}
+                                                                                                                                                
 /* lists certificates from a token
  */
 void pkcs11_list( FILE* outfile, const char* url, int type)
@@ -340,6 +362,15 @@ size_t size;
 	}
 
 	return;
+}
+
+void pkcs11_write(FILE* outfile, const char* url, const char* label, int trusted)
+{
+gnutls_x509_crt_t xcrt;
+gnutls_x509_privkey_t xkey;
+int ret;
+unsigned int flags = 0;
+unsigned int key_usage;
 
 }
 
@@ -512,6 +543,10 @@ size_t size;
 
 	return;
 
+	if (xkey == NULL && xcrt == NULL) {
+		fprintf(stderr, "You must use --load-privkey or --load-certificate to load the file to be copied\n");
+		exit (1);
+	}
 
-
+	return;
 }

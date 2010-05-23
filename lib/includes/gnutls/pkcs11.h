@@ -139,6 +139,14 @@ void gnutls_pkcs11_obj_deinit ( gnutls_pkcs11_obj_t);
 int gnutls_pkcs11_obj_export(gnutls_pkcs11_obj_t obj,
 		     void *output_data, size_t * output_data_size);
 
+#define GNUTLS_PKCS11_OBJ_FLAG_TRUSTED 1 /* object marked as trusted */
+
+int gnutls_pkcs11_copy_x509_crt(const char* token_url, gnutls_x509_crt_t crt, 
+	const char* label, unsigned int flags /* GNUTLS_PKCS11_OBJ_FLAG_* */);
+int gnutls_pkcs11_copy_x509_privkey(const char* token_url, 
+	gnutls_x509_privkey_t crt, const char* label, unsigned int key_usage /*GNUTLS_KEY_* */);
+int gnutls_pkcs11_delete_url(const char* object_url);
+
 /**
  * @brief Release array of certificate references.
  * @param certificates	Array to free.
@@ -212,8 +220,7 @@ int gnutls_pkcs11_privkey_get_info(gnutls_pkcs11_privkey_t crt, gnutls_pkcs11_ob
 int gnutls_pkcs11_privkey_import_url (gnutls_pkcs11_privkey_t key,
 				  const char* url);
 
-int
-gnutls_pkcs11_privkey_sign_data(gnutls_pkcs11_privkey_t signer,
+int gnutls_pkcs11_privkey_sign_data(gnutls_pkcs11_privkey_t signer,
 				gnutls_digest_algorithm_t hash,
 				unsigned int flags,
 				const gnutls_datum_t * data,

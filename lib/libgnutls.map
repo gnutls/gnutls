@@ -669,6 +669,9 @@ GNUTLS_2_11
 	gnutls_pubkey_import;
 	gnutls_x509_crt_set_pubkey;
 	gnutls_x509_crq_set_pubkey;
+	gnutls_pkcs11_copy_x509_crt;
+	gnutls_pkcs11_copy_x509_privkey;
+	gnutls_pkcs11_delete_url;
 } GNUTLS_2_10;
 
 GNUTLS_PRIVATE {

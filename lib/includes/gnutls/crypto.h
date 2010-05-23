@@ -214,7 +214,7 @@ typedef struct gnutls_crypto_bigint
 		       gnutls_bigint_format_t format);
 } gnutls_crypto_bigint_st;
 
-#define GNUTLS_MAX_PK_PARAMS 6
+#define GNUTLS_MAX_PK_PARAMS 16
 
 typedef struct
 {
@@ -234,9 +234,11 @@ void gnutls_pk_params_init (gnutls_pk_params_st * p);
  *  [3] is prime1 (p) (private key only)
  *  [4] is prime2 (q) (private key only)
  *  [5] is coefficient (u == inverse of p mod q) (private key only)
+ *  [6] e1 == d mod (p-1)
+ *  [7] e2 == d mod (q-1)
  *
- *  note that other packages use inverse of q mod p,
- *  so we need to perform conversions using fixup_params().
+ *  note that for libgcrypt that does not use the inverse of q mod p,
+ *  we need to perform conversions using fixup_params().
  *
  * DSA:
  *  [0] is p

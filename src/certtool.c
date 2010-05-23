@@ -64,12 +64,6 @@ void verify_crl (void);
 void pubkey_info (void);
 void pgp_privkey_info (void);
 void pgp_ring_info (void);
-gnutls_x509_privkey_t load_private_key (int mand);
-gnutls_x509_crq_t load_request (void);
-gnutls_x509_privkey_t load_ca_private_key (void);
-gnutls_x509_crt_t load_ca_cert (void);
-gnutls_x509_crt_t load_cert (int mand);
-gnutls_pubkey_t load_pubkey (int mand);
 void certificate_info (void);
 void pgp_certificate_info (void);
 void crl_info (void);
@@ -1027,6 +1021,12 @@ gaa_parser (int argc, char **argv)
       break;
     case ACTION_PKCS11_EXPORT_URL:
       pkcs11_export(outfile, info.pkcs11_url);
+      break;
+    case ACTION_PKCS11_WRITE_URL:
+      pkcs11_write(outfile, info.pkcs11_url, info.pkcs11_label, info.pkcs11_trusted);
+      break;
+    case ACTION_PKCS11_DELETE_URL:
+      pkcs11_delete(outfile, info.pkcs11_url, batch);
       break;
 #ifdef ENABLE_OPENPGP
     case ACTION_PGP_INFO:

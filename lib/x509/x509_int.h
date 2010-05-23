@@ -72,12 +72,12 @@ typedef struct gnutls_pkcs7_int
   ASN1_TYPE pkcs7;
 } gnutls_pkcs7_int;
 
-#define MAX_PRIV_PARAMS_SIZE GNUTLS_MAX_PK_PARAMS	/* ok for RSA and DSA */
+#define MAX_PRIV_PARAMS_SIZE GNUTLS_MAX_PK_PARAMS /* ok for RSA and DSA */
 
 /* parameters should not be larger than this limit */
 #define DSA_PRIVATE_PARAMS 5
 #define DSA_PUBLIC_PARAMS 4
-#define RSA_PRIVATE_PARAMS 6
+#define RSA_PRIVATE_PARAMS 8
 #define RSA_PUBLIC_PARAMS 2
 
 #if MAX_PRIV_PARAMS_SIZE - RSA_PRIVATE_PARAMS < 0
@@ -103,7 +103,9 @@ typedef struct gnutls_x509_privkey_int
    *      [4] is prime2 (q)
    *      [5] is coefficient (u == inverse of p mod q)
    *          note that other packages used inverse of q mod p,
-   *          so we need to perform conversions.
+   *          so we need to perform conversions (for libgcrypt only)
+   *	  [6] e1 == d mod (p-1)
+   *	  [7] e2 == d mod (q-1)
    * DSA: [0] is p
    *      [1] is q
    *      [2] is g

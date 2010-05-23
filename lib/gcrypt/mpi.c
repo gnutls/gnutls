@@ -78,6 +78,7 @@ wrap_gcry_mpi_print (const bigint_t a, void *buffer, size_t * nbytes,
   ret = gcry_mpi_print (format, buffer, *nbytes, nbytes, a);
   if (!ret) {
     if (buffer==NULL || init_bytes < *nbytes) {
+      (*nbytes)++;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
     return 0;
