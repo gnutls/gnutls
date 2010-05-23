@@ -1077,20 +1077,18 @@ static int
 _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
 {
   int result, i;
-  size_t size[8], total;
-  opaque *m_data, *pube_data, *prie_data;
-  opaque *p1_data, *p2_data, *u_data, *exp1_data, *exp2_data;
-  opaque *all_data = NULL, *p;
   opaque null = '\0';
   gnutls_pk_params_st pk_params;
+  gnutls_datum_t m, e, d, p, q, u, exp1, exp2;
 
-  /* Read all the sizes */
-  total = 0;
-  for (i = 0; i < RSA_PRIVATE_PARAMS; i++)
-    {
-      _gnutls_mpi_print_lz (params[i], NULL, &size[i]);
-      total += size[i];
-    }
+  memset(&m, 0, sizeof(m));
+  memset(&p, 0, sizeof(e));
+  memset(&q, 0, sizeof(d));
+  memset(&p, 0, sizeof(p));
+  memset(&q, 0, sizeof(q));
+  memset(&u, 0, sizeof(u));
+  memset(&exp1, 0, sizeof(exp1));
+  memset(&exp2, 0, sizeof(exp2));
 
   result = _gnutls_pk_params_copy (&pk_params, params, RSA_PRIVATE_PARAMS);
   if (result < 0)
@@ -1106,49 +1104,63 @@ _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
       goto cleanup;
     }
 
-  /* Encoding phase.
-   * allocate data enough to hold everything
-   */
-  all_data = gnutls_secure_malloc (total);
-  if (all_data == NULL)
+  /* retrieve as data */
+
+  result = _gnutls_mpi_dprint_lz( pk_params.params[0], &m);
+  if (result < 0)
     {
-      gnutls_assert ();
-      result = GNUTLS_E_MEMORY_ERROR;
+      gnutls_assert();
       goto cleanup;
     }
 
-  p = all_data;
-  m_data = p;
-  p += size[0];
-  
-  pube_data = p;
-  p += size[1];
-  
-  prie_data = p;
-  p += size[2];
-  
-  p1_data = p;
-  p += size[3];
-  
-  p2_data = p;
-  p += size[4];
-  
-  u_data = p;
-  p += size[5];
-  
-  exp1_data = p;
-  p += size[6];
-  
-  exp2_data = p;
+  result = _gnutls_mpi_dprint_lz( pk_params.params[1], &e);
+  if (result < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
 
-  _gnutls_mpi_print_lz (pk_params.params[0], m_data, &size[0]);
-  _gnutls_mpi_print_lz (pk_params.params[1], pube_data, &size[1]);
-  _gnutls_mpi_print_lz (pk_params.params[2], prie_data, &size[2]);
-  _gnutls_mpi_print_lz (pk_params.params[3], p1_data, &size[3]);
-  _gnutls_mpi_print_lz (pk_params.params[4], p2_data, &size[4]);
-  _gnutls_mpi_print_lz (pk_params.params[5], u_data, &size[5]);
-  _gnutls_mpi_print_lz (pk_params.params[6], exp1_data, &size[6]);
-  _gnutls_mpi_print_lz (pk_params.params[7], exp2_data, &size[7]);
+  result = _gnutls_mpi_dprint_lz( pk_params.params[2], &d);
+  if (result < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  result = _gnutls_mpi_dprint_lz( pk_params.params[3], &p);
+  if (result < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  result = _gnutls_mpi_dprint_lz( pk_params.params[4], &q);
+  if (result < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  result = _gnutls_mpi_dprint_lz( pk_params.params[5], &u);
+  if (result < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  result = _gnutls_mpi_dprint_lz( pk_params.params[6], &exp1);
+  if (result < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  result = _gnutls_mpi_dprint_lz( pk_params.params[7], &exp2);
+  if (result < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
 
   /* Ok. Now we have the data. Create the asn1 structures
    */
@@ -1172,7 +1184,7 @@ _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
   /* Write PRIME 
    */
   if ((result = asn1_write_value (*c2, "modulus",
-				  m_data, size[0])) != ASN1_SUCCESS)
+				  m.data, m.size)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       result = _gnutls_asn2err (result);
@@ -1180,7 +1192,7 @@ _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
     }
 
   if ((result = asn1_write_value (*c2, "publicExponent",
-				  pube_data, size[1])) != ASN1_SUCCESS)
+				  e.data, e.size)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       result = _gnutls_asn2err (result);
@@ -1188,7 +1200,7 @@ _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
     }
 
   if ((result = asn1_write_value (*c2, "privateExponent",
-				  prie_data, size[2])) != ASN1_SUCCESS)
+				  d.data, d.size)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       result = _gnutls_asn2err (result);
@@ -1196,7 +1208,7 @@ _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
     }
 
   if ((result = asn1_write_value (*c2, "prime1",
-				  p1_data, size[3])) != ASN1_SUCCESS)
+				  p.data, p.size)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       result = _gnutls_asn2err (result);
@@ -1204,7 +1216,7 @@ _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
     }
 
   if ((result = asn1_write_value (*c2, "prime2",
-				  p2_data, size[4])) != ASN1_SUCCESS)
+				  q.data, q.size)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       result = _gnutls_asn2err (result);
@@ -1212,7 +1224,7 @@ _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
     }
 
   if ((result = asn1_write_value (*c2, "coefficient",
-				  u_data, size[5])) != ASN1_SUCCESS)
+				  u.data, u.size)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       result = _gnutls_asn2err (result);
@@ -1221,7 +1233,7 @@ _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
     }
 
   if ((result = asn1_write_value (*c2, "exponent1",
-				  exp1_data, size[6])) != ASN1_SUCCESS)
+				  exp1.data, exp1.size)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       result = _gnutls_asn2err (result);
@@ -1229,15 +1241,12 @@ _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
     }
 
   if ((result = asn1_write_value (*c2, "exponent2",
-				  exp2_data, size[7])) != ASN1_SUCCESS)
+				  exp2.data, exp2.size)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       result = _gnutls_asn2err (result);
       goto cleanup;
     }
-
-  gnutls_pk_params_release (&pk_params);
-  gnutls_free (all_data);
 
   if ((result = asn1_write_value (*c2, "otherPrimeInfos",
 				  NULL, 0)) != ASN1_SUCCESS)
@@ -1254,12 +1263,22 @@ _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
       goto cleanup;
     }
 
-  return 0;
+  result = 0;
 
 cleanup:
+  if (result != 0)
+    asn1_delete_structure (c2);
+
   gnutls_pk_params_release (&pk_params);
-  asn1_delete_structure (c2);
-  gnutls_free (all_data);
+
+  _gnutls_free_datum(&m);
+  _gnutls_free_datum(&d);
+  _gnutls_free_datum(&e);
+  _gnutls_free_datum(&p);
+  _gnutls_free_datum(&q);
+  _gnutls_free_datum(&u);
+  _gnutls_free_datum(&exp1);
+  _gnutls_free_datum(&exp2);
 
   return result;
 }

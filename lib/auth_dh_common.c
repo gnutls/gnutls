@@ -367,6 +367,8 @@ _gnutls_dh_common_print_server_kx (gnutls_session_t session,
    * have been pessimist and might have returned initially
    * more data */
   ret = n_g + n_p + n_X + 6;
+  if (psk != 0)
+    ret += 2;
 
   return ret;
 }

@@ -355,10 +355,11 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
     }
 
   p_data = &all_data[0];
-  g_data = &all_data[p_size];
-
   _gnutls_mpi_print_lz (params->params[0], p_data, &p_size);
+
+  g_data = &all_data[p_size];
   _gnutls_mpi_print_lz (params->params[1], g_data, &g_size);
+
 
   /* Ok. Now we have the data. Create the asn1 structures
    */
