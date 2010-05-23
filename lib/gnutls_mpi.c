@@ -256,8 +256,6 @@ _gnutls_mpi_dprint_size (const bigint_t a, gnutls_datum_t * dest, size_t size)
   if (buf == NULL)
     return GNUTLS_E_MEMORY_ERROR;
 
-  dest->size = MAX (size, bytes);
-
   if (bytes <= size)
     {
       size_t diff = size - bytes;

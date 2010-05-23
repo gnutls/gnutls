@@ -78,7 +78,12 @@ wrap_gcry_mpi_print (const bigint_t a, void *buffer, size_t * nbytes,
   ret = gcry_mpi_print (format, buffer, *nbytes, nbytes, a);
   if (!ret) {
     if (buffer==NULL || init_bytes < *nbytes) {
-      (*nbytes)++;
+
+      /* in STD format we may want to include
+        * an extra byte for zero. Sometimes the gcry_
+        * function doesn't add it.
+        */
+      if (format == GNUTLS_MPI_FORMAT_STD) (*nbytes)++;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
     return 0;

@@ -95,7 +95,7 @@ _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
     {
       ret = _gnutls_mpi_dprint (session->key->KEY, &session->key->key);
     }
-  else				/* In DHE_PSK the key is set differently */
+  else	/* In DHE_PSK the key is set differently */
     {
       gnutls_datum_t tmp_dh_key;
       ret = _gnutls_mpi_dprint (session->key->KEY, &tmp_dh_key);
@@ -176,7 +176,7 @@ _gnutls_gen_dh_common_client_kx (gnutls_session_t session, opaque ** data)
     {
       ret = _gnutls_mpi_dprint (session->key->KEY, &session->key->key);
     }
-  else				/* In DHE_PSK the key is set differently */
+  else	/* In DHE_PSK the key is set differently */
     {
       gnutls_datum_t tmp_dh_key;
       ret = _gnutls_mpi_dprint (session->key->KEY, &tmp_dh_key);
@@ -363,7 +363,10 @@ _gnutls_dh_common_print_server_kx (gnutls_session_t session,
 
   _gnutls_write_uint16 (n_X, &pdata[pos]);
 
-  ret = data_size;
+  /* do not use data_size. _gnutls_mpi_print() might
+   * have been pessimist and might have returned initially
+   * more data */
+  ret = n_g + n_p + n_X + 6;
 
   return ret;
 }
