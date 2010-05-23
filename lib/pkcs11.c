@@ -2140,8 +2140,20 @@ int gnutls_x509_crt_import_pkcs11( gnutls_x509_crt_t crt, gnutls_pkcs11_obj_t pk
     return gnutls_x509_crt_import(crt, &pkcs11_crt->raw, GNUTLS_X509_FMT_DER);
 }
 
+/**
+ * gnutls_x509_crt_list_import_pkcs11:
+ * @cert: A list of certificates of type #gnutls_x509_crt_t
+ * @cert_max: The maximum size of the list
+ * @objs: A list of PKCS 11 objects
+ *
+ * This function will import a PKCS 11 certificate list to a list of 
+ * #gnutls_x509_crt_t structure. These must not be initialized.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
 int gnutls_x509_crt_list_import_pkcs11 (gnutls_x509_crt_t * certs,
-    unsigned int cert_max, gnutls_pkcs11_obj_t * const pkcs11_certs,
+    unsigned int cert_max, gnutls_pkcs11_obj_t * const objs,
     unsigned int flags)
 {
     int i, j;
@@ -2154,7 +2166,7 @@ int gnutls_x509_crt_list_import_pkcs11 (gnutls_x509_crt_t * certs,
             goto cleanup;
         }
         
-        ret = gnutls_x509_crt_import_pkcs11( certs[i], pkcs11_certs[i]);
+        ret = gnutls_x509_crt_import_pkcs11( certs[i], objs[i]);
         if (ret < 0) {
             gnutls_assert();
             goto cleanup;

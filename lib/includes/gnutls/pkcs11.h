@@ -147,14 +147,6 @@ int gnutls_pkcs11_copy_x509_privkey(const char* token_url,
 	gnutls_x509_privkey_t crt, const char* label, unsigned int key_usage /*GNUTLS_KEY_* */);
 int gnutls_pkcs11_delete_url(const char* object_url);
 
-/**
- * @brief Release array of certificate references.
- * @param certificates	Array to free.
- * @param ncertificates	Array size.
- * @return gnutls status.
- */
-int gnutls_pkcs11_obj_list_deinit (gnutls_pkcs11_obj_t * , const unsigned int nobjs);
-
 typedef enum {
 	GNUTLS_PKCS11_OBJ_ID_HEX=1,
 	GNUTLS_PKCS11_OBJ_LABEL,

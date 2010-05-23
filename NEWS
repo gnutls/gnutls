@@ -21,8 +21,12 @@ similar gnutls_certificate_set_server_retrieve_function() and
 gnutls_certificate_set_client_retrieve_function(). In addition it support
 PKCS #11 private keys.
 
+** libgnutls: Added  gnutls_pkcs11_copy_x509_crt(), gnutls_pkcs11_copy_x509_privkey(),
+and gnutls_pkcs11_delete_url() to allow copying and deleting data in tokens.
+
 ** certtool: Added new options: --pkcs11-list-tokens, --pkcs11-list-all
---pkcs11-list-all-certs, --pkcs11-list-trusted, --pkcs11-list-certs
+--pkcs11-list-all-certs, --pkcs11-list-trusted, --pkcs11-list-certs,
+--pkcs11-delete-url, --pkcs11-write
 
 ** gnutls-cli/gnutls-serv: --x509cafile, --x509certfile and --x509keyfile
 can now accept a PKCS #11 URL in addition to a file. This will allow for
@@ -45,7 +49,6 @@ gnutls_pkcs11_obj_init: ADDED
 gnutls_pkcs11_obj_import_url: ADDED
 gnutls_pkcs11_obj_export_url: ADDED
 gnutls_pkcs11_obj_deinit: ADDED
-gnutls_pkcs11_obj_list_deinit: ADDED
 gnutls_pkcs11_obj_export: ADDED
 gnutls_pkcs11_obj_list_import_url: ADDED
 gnutls_pkcs11_obj_export: ADDED
@@ -98,6 +101,9 @@ gnutls_pubkey_import_dsa_raw: ADDED
 gnutls_pubkey_import_rsa_raw: ADDED
 gnutls_x509_crt_set_pubkey: ADDED
 gnutls_x509_crq_set_pubkey: ADDED
+gnutls_pkcs11_copy_x509_crt: ADDED
+gnutls_pkcs11_copy_x509_privkey: ADDED
+gnutls_pkcs11_delete_url: ADDED
 
 
 * Version 2.9.10 (released 2010-04-22)
