@@ -33,13 +33,10 @@
 
 struct gnutls_pkcs11_privkey_st {
 	pakchois_session_t *pks;
-	ck_object_handle_t privkey;
+	ck_object_handle_t obj;
 	gnutls_pk_algorithm_t pk_algorithm;
+	unsigned int flags;
 	struct pkcs11_url_info info;
-};
-
-struct privkey_find_data_st {
-	gnutls_pkcs11_privkey_t privkey;
 };
 
 static int find_privkey_url(pakchois_session_t * pks,
@@ -61,7 +58,7 @@ int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	(*key)->privkey = CK_INVALID_HANDLE;
+	(*key)->obj = CK_INVALID_HANDLE;
 	
 	return 0;
 }
@@ -76,7 +73,7 @@ void gnutls_pkcs11_privkey_deinit(gnutls_pkcs11_privkey_t key)
 {
 	if (key->pks) {
 		pakchois_close_session(key->pks);
-        }
+    }
 	gnutls_free(key);
 }
 
@@ -118,23 +115,23 @@ int gnutls_pkcs11_privkey_get_info(gnutls_pkcs11_privkey_t pkey,
 	return pkcs11_get_info(&pkey->info, itype, output, output_size);
 }
 
-#define RETRY_BLOCK_START(key) struct privkey_find_data_st find_data; \
-	int retries = 0; find_data.privkey = key; retry:
+#define RETRY_BLOCK_START int retries = 0; retry:
 
 
 /* the rescan_slots() here is a dummy but if not
  * called my card fails to work when removed and inserted.
  * May have to do with the pkcs11 library I use.
  */
-#define RETRY_CHECK(rv, label) { \
+#define RETRY_CHECK(rv, key) { \
 		if (token_func && (rv == CKR_SESSION_HANDLE_INVALID||rv==CKR_DEVICE_REMOVED)) { \
 			pkcs11_rescan_slots(); \
 			pakchois_close_session(key->pks); \
 			pkcs11_rescan_slots(); \
 			key->pks = NULL; \
-			ret = token_func(token_data, label, retries++); \
+			key->obj = CK_INVALID_HANDLE; \
+			ret = token_func(token_data, key->info.label, retries++); \
 			if (ret == 0) { \
-				_pkcs11_traverse_tokens(find_privkey_url, &find_data, 1, 0); \
+				pkcs11_find_object (&key->pks, &key->obj, &key->info, SESSION_LOGIN); \
 				goto retry; \
 			} \
 		} \
@@ -221,9 +218,9 @@ int gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	struct ck_mechanism mech;
 	unsigned long siglen;
 
-	RETRY_BLOCK_START(key);
+	RETRY_BLOCK_START;
 
-	if (key->privkey == CK_INVALID_HANDLE || key->pks == NULL) {
+	if (key->obj == CK_INVALID_HANDLE || key->pks == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_PKCS11_ERROR;
 	}
@@ -235,9 +232,9 @@ int gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 
 	/* Initialize signing operation; using the private key discovered
 	 * earlier. */
-	rv = pakchois_sign_init(key->pks, &mech, key->privkey);
+	rv = pakchois_sign_init(key->pks, &mech, key->obj);
 	if (rv != CKR_OK) {
-		RETRY_CHECK(rv, key->info.label);
+		RETRY_CHECK(rv, key);
 		gnutls_assert();
 		return GNUTLS_E_PK_SIGN_FAILED;
 	}
@@ -246,7 +243,7 @@ int gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	rv = pakchois_sign(key->pks, hash->data, hash->size, NULL,
 			   &siglen);
 	if (rv != CKR_OK) {
-		RETRY_CHECK(rv, key->info.label);
+		RETRY_CHECK(rv, key);
 		gnutls_assert();
 		return GNUTLS_E_PK_SIGN_FAILED;
 	}
@@ -258,7 +255,7 @@ int gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 			   signature->data, &siglen);
 	if (rv != CKR_OK) {
 		gnutls_free(signature->data);
-		RETRY_CHECK(rv, key->info.label);
+		RETRY_CHECK(rv, key);
 		gnutls_assert();
 		return GNUTLS_E_PK_SIGN_FAILED;
 	}
@@ -268,108 +265,12 @@ int gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	return 0;
 }
 
-static int find_privkey_url(pakchois_session_t * pks,
-			    struct token_info *info, void *input)
-{
-	struct privkey_find_data_st *find_data = input;
-	struct ck_attribute a[4];
-	ck_object_class_t class;
-	ck_rv_t rv;
-	ck_object_handle_t obj;
-	unsigned long count;
-	int found = 0, ret;
-	ck_key_type_t keytype;
-
-	if (info == NULL) {	/* we don't support multiple calls */
-		gnutls_assert();
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	}
-
-	/* do not bother reading the token if basic fields do not match
-	 */
-    if (pkcs11_token_matches_info( &find_data->privkey->info, &info->tinfo) < 0) {
-		gnutls_assert();
-		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	}
-	
-	if (find_data->privkey->info.type[0] != 0) {
-		if (strcmp(find_data->privkey->info.type, "private") != 0) {
-			gnutls_assert();
-			return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-		}
-	}
-
-	/* search the token for the id */
-        ret = pkcs11_login(pks, info);
-        if (ret < 0) {
-            gnutls_assert();
-            return ret;
-        }
-        
-	/* Find objects with cert class and X.509 cert type. */
-	class = CKO_PRIVATE_KEY;
-
-	a[0].type = CKA_CLASS;
-	a[0].value = &class;
-	a[0].value_len = sizeof class;
-
-	a[1].type = CKA_ID;
-	a[1].value = find_data->privkey->info.certid_raw;
-	a[1].value_len = find_data->privkey->info.certid_raw_size;
-
-
-	rv = pakchois_find_objects_init(pks, a, 2);
-	if (rv != CKR_OK) {
-		gnutls_assert();
-		_gnutls_debug_log("pk11: FindObjectsInit failed.\n");
-		ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-		goto cleanup;
-	}
-
-	while (pakchois_find_objects(pks, &obj, 1, &count) == CKR_OK
-	       && count == 1) {
-
-		a[0].type = CKA_KEY_TYPE;
-		a[0].value = &keytype;
-		a[0].value_len = sizeof keytype;
-
-		if (pakchois_get_attribute_value(pks, obj, a, 1) == CKR_OK) {
-			if (keytype == CKK_RSA)
-				find_data->privkey->pk_algorithm = GNUTLS_PK_RSA;
-			else if (keytype == CKK_DSA)
-				find_data->privkey->pk_algorithm = GNUTLS_PK_DSA;
-			else {
-				gnutls_assert();
-				ret =
-				    GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
-				goto cleanup;
-			}
-			find_data->privkey->pks = pks;
-			find_data->privkey->privkey = obj;
-			found = 1;
-		} else {
-			_gnutls_debug_log
-			    ("pk11: Skipped cert, missing attrs.\n");
-		}
-	}
-
-	if (found == 0) {
-		gnutls_assert();
-		ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-	} else {
-		ret = 0;
-	}
-
-      cleanup:
-	pakchois_find_objects_final(pks);
-
-	return ret;
-}
 
 /**
  * gnutls_pkcs11_privkey_import_url:
  * @pkey: The structure to store the parsed key
  * @url: a PKCS 11 url identifying the key
+ * @flags: sequence of GNUTLS_PKCS_PRIVKEY_*
  *
  * This function will "import" a PKCS 11 URL identifying a private
  * key to the #gnutls_pkcs11_privkey_t structure. In reality since
@@ -380,13 +281,9 @@ static int find_privkey_url(pakchois_session_t * pks,
  *   negative error value.
  **/
 int gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
-				     const char *url)
+				     const char *url, unsigned int flags)
 {
 	int ret;
-	struct privkey_find_data_st find_data;
-
-	/* fill in the find data structure */
-	find_data.privkey = pkey;
 
 	ret = pkcs11_url_to_info(url, &pkey->info);
 	if (ret < 0) {
@@ -399,11 +296,12 @@ int gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	ret = _pkcs11_traverse_tokens(find_privkey_url, &find_data, 1, 0);
+	ret = pkcs11_find_object (&pkey->pks, &pkey->obj, &pkey->info, SESSION_LOGIN);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
 	}
+	pkey->flags = flags;
 
 	return 0;
 }
@@ -431,9 +329,9 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	struct ck_mechanism mech;
 	unsigned long siglen;
 
-	RETRY_BLOCK_START(key);
+	RETRY_BLOCK_START;
 
-	if (key->privkey == CK_INVALID_HANDLE) {
+	if (key->obj == CK_INVALID_HANDLE) {
 		gnutls_assert();
 		return GNUTLS_E_PKCS11_ERROR;
 	}
@@ -445,9 +343,9 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 
 	/* Initialize signing operation; using the private key discovered
 	 * earlier. */
-	rv = pakchois_decrypt_init(key->pks, &mech, key->privkey);
+	rv = pakchois_decrypt_init(key->pks, &mech, key->obj);
 	if (rv != CKR_OK) {
-		RETRY_CHECK(rv, key->info.label);
+		RETRY_CHECK(rv, key);
 		gnutls_assert();
 		return GNUTLS_E_PK_DECRYPTION_FAILED;
 	}
@@ -456,7 +354,7 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	rv = pakchois_decrypt(key->pks, ciphertext->data, ciphertext->size, NULL,
 			   &siglen);
 	if (rv != CKR_OK) {
-		RETRY_CHECK(rv, key->info.label);
+		RETRY_CHECK(rv, key);
 		gnutls_assert();
 		return GNUTLS_E_PK_DECRYPTION_FAILED;
 	}

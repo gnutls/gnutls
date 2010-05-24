@@ -520,7 +520,7 @@ static int read_key_url (gnutls_certificate_credentials_t res, const char* url)
       return ret;
     }
     
-  ret = gnutls_pkcs11_privkey_import_url(key1, url);
+  ret = gnutls_pkcs11_privkey_import_url(key1, url, 0);
   if (ret < 0)
     {
       gnutls_assert();

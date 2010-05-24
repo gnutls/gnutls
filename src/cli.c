@@ -237,7 +237,7 @@ load_keys (void)
 	{
 	  gnutls_pkcs11_privkey_init (&pkcs11_key);
 
-	  ret = gnutls_pkcs11_privkey_import_url (pkcs11_key, x509_keyfile);
+	  ret = gnutls_pkcs11_privkey_import_url (pkcs11_key, x509_keyfile, 0);
 	}
       else
 	{
@@ -293,7 +293,7 @@ load_keys (void)
 	{
 	  gnutls_pkcs11_privkey_init (&pkcs11_key);
 
-	  ret = gnutls_pkcs11_privkey_import_url (pkcs11_key, pgp_keyfile);
+	  ret = gnutls_pkcs11_privkey_import_url (pkcs11_key, pgp_keyfile, 0);
 	}
       else
 	{

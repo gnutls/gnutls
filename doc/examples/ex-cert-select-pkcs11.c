@@ -58,7 +58,7 @@ load_keys (void)
 
   gnutls_pkcs11_privkey_init (&key);
 
-  ret = gnutls_pkcs11_privkey_import_url (key, KEY_URL);
+  ret = gnutls_pkcs11_privkey_import_url (key, KEY_URL, 0);
   if (ret < 0)
     {
       fprintf (stderr, "*** Error loading key file: %s\n",

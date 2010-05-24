@@ -209,8 +209,9 @@ int gnutls_pkcs11_privkey_init (gnutls_pkcs11_privkey_t * key);
 void gnutls_pkcs11_privkey_deinit (gnutls_pkcs11_privkey_t key);
 int gnutls_pkcs11_privkey_get_pk_algorithm (gnutls_pkcs11_privkey_t key, unsigned int* bits);
 int gnutls_pkcs11_privkey_get_info(gnutls_pkcs11_privkey_t crt, gnutls_pkcs11_obj_info_t itype, void* output, size_t* output_size);
+
 int gnutls_pkcs11_privkey_import_url (gnutls_pkcs11_privkey_t key,
-				  const char* url);
+				  const char* url, unsigned int flags);
 
 int gnutls_pkcs11_privkey_sign_data(gnutls_pkcs11_privkey_t signer,
 				gnutls_digest_algorithm_t hash,

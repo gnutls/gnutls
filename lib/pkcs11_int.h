@@ -62,9 +62,13 @@ int pkcs11_info_to_url(const struct pkcs11_url_info* info, char** url);
 #define SESSION_WRITE 1
 #define SESSION_LOGIN 2
 int pkcs11_open_session (pakchois_session_t** _pks, struct pkcs11_url_info *info, unsigned int flags);
-int _pkcs11_traverse_tokens (find_func_t find_func, void* input, int leave_session, unsigned int flags);
+int _pkcs11_traverse_tokens (find_func_t find_func, void* input, unsigned int flags);
 ck_object_class_t pkcs11_strtype_to_class(const char* type);
 
 int pkcs11_token_matches_info( struct pkcs11_url_info* info, struct ck_token_info* tinfo);
+
+/* flags are SESSION_* */
+int pkcs11_find_object (pakchois_session_t** _pks, ck_object_handle_t* _obj,
+    struct pkcs11_url_info *info, unsigned int flags);
 
 #endif

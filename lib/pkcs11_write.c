@@ -499,7 +499,7 @@ int gnutls_pkcs11_delete_url(const char* object_url)
         return ret;
     }
 
-    ret = _pkcs11_traverse_tokens(delete_obj_url, &find_data, 0, SESSION_WRITE);
+    ret = _pkcs11_traverse_tokens(delete_obj_url, &find_data, SESSION_WRITE);
     if (ret < 0) {
         gnutls_assert();
         return ret;
