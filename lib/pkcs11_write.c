@@ -100,8 +100,9 @@ int gnutls_pkcs11_copy_x509_crt(const char* token_url, gnutls_x509_crt_t crt,
 		goto cleanup;
 	}
 	
-	
-	a[0].type = CKA_CLASS;
+    /* FIXME: copy key usage flags */
+
+    a[0].type = CKA_CLASS;
     a[0].value = &class;
     a[0].value_len = sizeof(class);
     a[1].type = CKA_ID;
@@ -206,18 +207,20 @@ int gnutls_pkcs11_copy_x509_privkey(const char* token_url,
 		return ret;
 	}
 
+    /* FIXME: copy key usage flags */
+
     a[0].type = CKA_CLASS;
     a[0].value = &class;
     a[0].value_len = sizeof(class);
     a[1].type = CKA_ID;
     a[1].value = id;
     a[1].value_len = id_size;
-	a[2].type = CKA_KEY_TYPE;
-	a[2].value = &type;
-	a[2].value_len = sizeof(type);
-	a[3].type = CKA_SENSITIVE;
-	a[3].value = &tval;
-	a[3].value_len = sizeof(tval);
+    a[2].type = CKA_KEY_TYPE;
+    a[2].value = &type;
+    a[2].value_len = sizeof(type);
+    a[3].type = CKA_SENSITIVE;
+    a[3].value = &tval;
+    a[3].value_len = sizeof(tval);
     
     a_val = 4;
 
