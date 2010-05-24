@@ -231,8 +231,6 @@ static ck_rv_t load_provider(struct provider **provider, const char *name,
         goto fail_locked;
     }
 
-fprintf(stderr, "found name: %s\n", cname);
-
     prov = find_provider(cname);
     if (prov) {
         prov->refcount++;
