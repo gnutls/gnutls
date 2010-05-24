@@ -5,7 +5,6 @@ in order to avoid having people working on the same thing.
 Current list:
 + Support PKCS#8 AES and DES-MD5 (tests/enc3pkcs8.pem) encrypted keys.
 * Implement Datagram-TLS (DTLS).
-* Correct TLS 1.2 support.
 * Cleanup pkix.asn and remove unused (by the certificate api) structures.
   That way memory used will be reduced.
 * Improve or rewrite libtasn1 to make it easier to maintain.
@@ -24,8 +23,6 @@ Current list:
 - Clean up name space of helper functions in library (memmem,
    firstElement, bit_mask, ...) for platforms that libtool's
    -export-symbols-regex doesn't work.
-- Allow sending V2 Hello messages. It seems that some (old) broken 
-  implementations require that.
 - Add Kerberos ciphersuites
 - Certificate chain validation improvements:
   - Implement "correct" DN comparison (instead of memcmp).
@@ -40,7 +37,6 @@ Current list:
   - Check path length constraints.
   - Check keyCertSign key usages.
   - Reject extensions in v1 certificates.
-- Support for cryptodev (and thus hardware accelerators)
 - Exhaustive test suite, using NIST's PKI Test vectors,
   see http://csrc.nist.gov/pki/testing/x509paths_old.html
   and http://csrc.nist.gov/pki/testing/x509paths.html
