@@ -2021,7 +2021,7 @@ _gnutls_x509_oid2sign_algorithm (const char *oid)
 {
   gnutls_sign_algorithm_t ret = 0;
 
-  GNUTLS_SIGN_LOOP (if (strcmp (oid, p->oid) == 0)
+  GNUTLS_SIGN_LOOP (if (p->oid && strcmp (oid, p->oid) == 0)
 		    {
 		    ret = p->id; break;}
   );
@@ -2241,7 +2241,7 @@ _gnutls_x509_oid2pk_algorithm (const char *oid)
   const gnutls_pk_entry *p;
 
   for (p = pk_algorithms; p->name != NULL; p++)
-    if (strcmp (p->oid, oid) == 0)
+    if (p->oid && strcmp (p->oid, oid) == 0)
       {
 	ret = p->id;
 	break;
