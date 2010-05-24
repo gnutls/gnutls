@@ -6,8 +6,9 @@
 @menu
 * The X.509 trust model::
 * The OpenPGP trust model::
-* Digital signatures::
 * PKCS #11 tokens::
+* Abstract data types::
+* Digital signatures::
 @end menu
 
 @node The X.509 trust model
@@ -317,123 +318,6 @@ MD5.  These algorithms have been broken and should not be trusted.
 
 @end table
 
-@node Digital signatures
-@section Digital Signatures
-@cindex Digital signatures
-
-In this section we will provide some information about digital
-signatures, how they work, and give the rationale for disabling some
-of the algorithms used.
-
-Digital signatures work by using somebody's secret key to sign some
-arbitrary data.  Then anybody else could use the public key of that
-person to verify the signature.  Since the data may be arbitrary it is
-not suitable input to a cryptographic digital signature algorithm. For
-this reason and also for performance cryptographic hash algorithms are
-used to preprocess the input to the signature algorithm. This works as
-long as it is difficult enough to generate two different messages with
-the same hash algorithm output. In that case the same signature could
-be used as a proof for both messages. Nobody wants to sign an innocent
-message of donating 1 @euro{} to Greenpeace and find out that he
-donated 1.000.000 @euro{} to Bad Inc.
-
-For a hash algorithm to be called cryptographic the following three
-requirements must hold:
-
-@enumerate
-@item Preimage resistance.
-That means the algorithm must be one way and given the output of the
-hash function @math{H(x)}, it is impossible to calculate @math{x}.
-
-@item 2nd preimage resistance.
-That means that given a pair @math{x,y} with @math{y=H(x)} it is
-impossible to calculate an @math{x'} such that @math{y=H(x')}.
-
-@item Collision resistance.
-That means that it is impossible to calculate random @math{x} and
-@math{x'} such @math{H(x')=H(x)}.
-@end enumerate
-
-The last two requirements in the list are the most important in
-digital signatures. These protect against somebody who would like to
-generate two messages with the same hash output. When an algorithm is
-considered broken usually it means that the Collision resistance of
-the algorithm is less than brute force. Using the birthday paradox the
-brute force attack takes
-@iftex
-@math{2^{(\rm{hash\ size}) / 2}}
-@end iftex
-@ifnottex
-@math{2^{((hash size) / 2)}}
-@end ifnottex
-operations. Today colliding certificates using the MD5 hash algorithm
-have been generated as shown in @xcite{WEGER}.
-
-There has been cryptographic results for the SHA-1 hash algorithms as
-well, although they are not yet critical.  Before 2004, MD5 had a
-presumed collision strength of @math{2^{64}}, but it has been showed
-to have a collision strength well under @math{2^{50}}.  As of November
-2005, it is believed that SHA-1's collision strength is around
-@math{2^{63}}.  We consider this sufficiently hard so that we still
-support SHA-1.  We anticipate that SHA-256/386/512 will be used in
-publicly-distributed certificates in the future.  When @math{2^{63}}
-can be considered too weak compared to the computer power available
-sometime in the future, SHA-1 will be disabled as well.  The collision
-attacks on SHA-1 may also get better, given the new interest in tools
-for creating them.
-
-@subsection Trading Security for Interoperability
-
-If you connect to a server and use GnuTLS' functions to verify the
-certificate chain, and get a @ref{GNUTLS_CERT_INSECURE_ALGORITHM}
-validation error (@pxref{Verifying X.509 certificate paths}), it means
-that somewhere in the certificate chain there is a certificate signed
-using @code{RSA-MD2} or @code{RSA-MD5}.  These two digital signature
-algorithms are considered broken, so GnuTLS fail when attempting to
-verify the certificate.  In some situations, it may be useful to be
-able to verify the certificate chain anyway, assuming an attacker did
-not utilize the fact that these signatures algorithms are broken.
-This section will give help on how to achieve that.
-
-First, it is important to know that you do not have to enable any of
-the flags discussed here to be able to use trusted root CA
-certificates signed using @code{RSA-MD2} or @code{RSA-MD5}.  The only
-attack today is that it is possible to generate certificates with
-colliding signatures (collision resistance); you cannot generate a
-certificate that has the same signature as an already existing
-signature (2nd preimage resistance).
-
-If you are using @ref{gnutls_certificate_verify_peers2} to verify the
-certificate chain, you can call
-@ref{gnutls_certificate_set_verify_flags} with the
-@code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2} or
-@code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5} flag, as in:
-
-@example
-  gnutls_certificate_set_verify_flags (x509cred,
-                                       GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5);
-@end example
-
-This will tell the verifier algorithm to enable @code{RSA-MD5} when
-verifying the certificates.
-
-If you are using @ref{gnutls_x509_crt_verify} or
-@ref{gnutls_x509_crt_list_verify}, you can pass the
-@code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5} parameter directly in the
-@code{flags} parameter.
-
-If you are using these flags, it may also be a good idea to warn the
-user when verification failure occur for this reason.  The simplest is
-to not use the flags by default, and only fall back to using them
-after warning the user.  If you wish to inspect the certificate chain
-yourself, you can use @ref{gnutls_certificate_get_peers} to extract
-the raw server's certificate chain, then use
-@ref{gnutls_x509_crt_import} to parse each of the certificates, and
-then use @ref{gnutls_x509_crt_get_signature_algorithm} to find out the
-signing algorithm used for each certificate.  If any of the
-intermediary certificates are using @code{GNUTLS_SIGN_RSA_MD2} or
-@code{GNUTLS_SIGN_RSA_MD5}, you could present a warning.
-
 
 @node PKCS #11 tokens
 @section @acronym{PKCS #11} tokens
@@ -563,29 +447,29 @@ unsigned int obj_list_size = 0;
 gnutls_datum_t cinfo;
 int i;
 
-	crt_list_size = 0;
-	ret = gnutls_pkcs11_obj_list_import_url( crt_list, NULL, url, \
+	obj_list_size = 0;
+	ret = gnutls_pkcs11_obj_list_import_url( obj_list, NULL, url, \
 				GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY);
 	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
 		exit(1);
 
-	crt_list = malloc(sizeof(*crt_list)*crt_list_size);
-	if (crt_list == NULL)
+	obj_list = malloc(sizeof(*obj_list)*obj_list_size);
+	if (obj_list == NULL)
 		exit(1);
 
-	ret = gnutls_pkcs11_obj_list_import_url( crt_list, &crt_list_size, url, flags);
+	ret = gnutls_pkcs11_obj_list_import_url( obj_list, &obj_list_size, url, flags);
 	if (ret < 0)
 		exit(1);
 
-	/* now all certificates are in crt_list */
+	/* now all certificates are in obj_list */
 
-	for (i=0;i<crt_list_size;i++) {
+	for (i=0;i<obj_list_size;i++) {
 
 		ret = gnutls_x509_crt_init(&xcrt);
 		if (ret < 0)
 			exit(1);
 		
-		ret = gnutls_x509_crt_import_pkcs11(xcrt, crt_list[i]);
+		ret = gnutls_x509_crt_import_pkcs11(xcrt, obj_list[i]);
 		if (ret < 0)
 			exit(1);
 		
@@ -619,8 +503,173 @@ to a token. This can be achieved with the following functions
 
 @subsection Using a @acronym{PKCS #11} token with TLS
 
-This example will demonstrate how to load keys and certificates
-from a @acronym{PKCS} #11 token, and use it with a TLS connection.
+It is possible to use a @acronym{PKCS #11} token to a TLS
+session, as shown in @ref{ex:pkcs11-client}. In addition
+the following functions can be used to load PKCS #11 key and
+certificates.
 
-@verbatiminclude examples/ex-cert-select-pkcs11.c
+@itemize
+
+@item @ref{gnutls_certificate_set_x509_trust_file}: If given a PKCS #11 URL will load the trusted certificates from it.
+
+@item @ref{gnutls_certificate_set_x509_key_file}: Will also load PKCS #11 URLs for keys and certificates.
+
+@end itemize
+
+
+@node Abstract data types
+@section Abstract data types
+@anchor{sec:abstract}
+@cindex Abstract types
+
+Since there are many forms of a public or private keys supported by @acronym{GnuTLS} such as
+@acronym{X.509}, @acronym{OpenPGP}, or @acronym{PKCS #11} it is desirable to allow common operations
+on them. For these reasons the abstract @code{gnutls_privkey_t} and @code{gnutls_pubkey_t} were
+introduced in @code{gnutls/abstract.h} header. Those types are initialized using a specific type of key and then can be used to
+perform operations in an abstract way. For example in order for someone to sign an X.509 certificate
+with a key that resides in a smart he has to follow the steps below:
+
+@verbatim
+#inlude <gnutls/abstract.h>
+#inlude <gnutls/pkcs11.h>
+
+void sign_cert( gnutls_x509_crt_t to_be_signed)
+{
+gnutls_pkcs11_privkey_t ca_key;
+gnutls_x509_crt_t ca_cert;
+gnutls_privkey_t abs_key;
+
+	/* load the PKCS 11 key and certificates */
+	gnutls_pkcs11_privkey_init(&ca_key);
+	gnutls_pkcs11_privkey_import_url(ca_key, key_url);
+
+	gnutls_x509_crt_init(&ca_cert);
+	gnutls_x509_crt_import_pkcs11_url(&ca_cert, cert_url);
+
+	/* initialize the abstract key */
+	gnutls_privkey_init(&abs_key);
+	gnutls_privkey_import_pkcs11(abs_key, ca_key);
+
+	/* sign the certificate to be signed */
+	gnutls_x509_crt_privkey_sign(to_be_signed, ca_cert, ca_key, GNUTLS_DIG_SHA1, 0);
+}
+@end verbatim
+
+
+@node Digital signatures
+@section Digital Signatures
+@cindex Digital signatures
+
+In this section we will provide some information about digital
+signatures, how they work, and give the rationale for disabling some
+of the algorithms used.
+
+Digital signatures work by using somebody's secret key to sign some
+arbitrary data.  Then anybody else could use the public key of that
+person to verify the signature.  Since the data may be arbitrary it is
+not suitable input to a cryptographic digital signature algorithm. For
+this reason and also for performance cryptographic hash algorithms are
+used to preprocess the input to the signature algorithm. This works as
+long as it is difficult enough to generate two different messages with
+the same hash algorithm output. In that case the same signature could
+be used as a proof for both messages. Nobody wants to sign an innocent
+message of donating 1 @euro{} to Greenpeace and find out that he
+donated 1.000.000 @euro{} to Bad Inc.
+
+For a hash algorithm to be called cryptographic the following three
+requirements must hold:
+
+@enumerate
+@item Preimage resistance.
+That means the algorithm must be one way and given the output of the
+hash function @math{H(x)}, it is impossible to calculate @math{x}.
+
+@item 2nd preimage resistance.
+That means that given a pair @math{x,y} with @math{y=H(x)} it is
+impossible to calculate an @math{x'} such that @math{y=H(x')}.
+
+@item Collision resistance.
+That means that it is impossible to calculate random @math{x} and
+@math{x'} such @math{H(x')=H(x)}.
+@end enumerate
+
+The last two requirements in the list are the most important in
+digital signatures. These protect against somebody who would like to
+generate two messages with the same hash output. When an algorithm is
+considered broken usually it means that the Collision resistance of
+the algorithm is less than brute force. Using the birthday paradox the
+brute force attack takes
+@iftex
+@math{2^{(\rm{hash\ size}) / 2}}
+@end iftex
+@ifnottex
+@math{2^{((hash size) / 2)}}
+@end ifnottex
+operations. Today colliding certificates using the MD5 hash algorithm
+have been generated as shown in @xcite{WEGER}.
+
+There has been cryptographic results for the SHA-1 hash algorithms as
+well, although they are not yet critical.  Before 2004, MD5 had a
+presumed collision strength of @math{2^{64}}, but it has been showed
+to have a collision strength well under @math{2^{50}}.  As of November
+2005, it is believed that SHA-1's collision strength is around
+@math{2^{63}}.  We consider this sufficiently hard so that we still
+support SHA-1.  We anticipate that SHA-256/386/512 will be used in
+publicly-distributed certificates in the future.  When @math{2^{63}}
+can be considered too weak compared to the computer power available
+sometime in the future, SHA-1 will be disabled as well.  The collision
+attacks on SHA-1 may also get better, given the new interest in tools
+for creating them.
+
+@subsection Trading Security for Interoperability
+
+If you connect to a server and use GnuTLS' functions to verify the
+certificate chain, and get a @ref{GNUTLS_CERT_INSECURE_ALGORITHM}
+validation error (@pxref{Verifying X.509 certificate paths}), it means
+that somewhere in the certificate chain there is a certificate signed
+using @code{RSA-MD2} or @code{RSA-MD5}.  These two digital signature
+algorithms are considered broken, so GnuTLS fail when attempting to
+verify the certificate.  In some situations, it may be useful to be
+able to verify the certificate chain anyway, assuming an attacker did
+not utilize the fact that these signatures algorithms are broken.
+This section will give help on how to achieve that.
+
+First, it is important to know that you do not have to enable any of
+the flags discussed here to be able to use trusted root CA
+certificates signed using @code{RSA-MD2} or @code{RSA-MD5}.  The only
+attack today is that it is possible to generate certificates with
+colliding signatures (collision resistance); you cannot generate a
+certificate that has the same signature as an already existing
+signature (2nd preimage resistance).
+
+If you are using @ref{gnutls_certificate_verify_peers2} to verify the
+certificate chain, you can call
+@ref{gnutls_certificate_set_verify_flags} with the
+@code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2} or
+@code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5} flag, as in:
+
+@example
+  gnutls_certificate_set_verify_flags (x509cred,
+                                       GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5);
+@end example
+
+This will tell the verifier algorithm to enable @code{RSA-MD5} when
+verifying the certificates.
+
+If you are using @ref{gnutls_x509_crt_verify} or
+@ref{gnutls_x509_crt_list_verify}, you can pass the
+@code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5} parameter directly in the
+@code{flags} parameter.
+
+If you are using these flags, it may also be a good idea to warn the
+user when verification failure occur for this reason.  The simplest is
+to not use the flags by default, and only fall back to using them
+after warning the user.  If you wish to inspect the certificate chain
+yourself, you can use @ref{gnutls_certificate_get_peers} to extract
+the raw server's certificate chain, then use
+@ref{gnutls_x509_crt_import} to parse each of the certificates, and
+then use @ref{gnutls_x509_crt_get_signature_algorithm} to find out the
+signing algorithm used for each certificate.  If any of the
+intermediary certificates are using @code{GNUTLS_SIGN_RSA_MD2} or
+@code{GNUTLS_SIGN_RSA_MD5}, you could present a warning.
 
