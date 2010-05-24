@@ -92,6 +92,35 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   AC_MSG_RESULT($included_libtasn1)
   AM_CONDITIONAL(ENABLE_MINITASN1, test "$included_libtasn1" = "yes")
 
+  AC_ARG_WITH(included-pakchois,
+    AS_HELP_STRING([--with-included-pakchois], [use the included pakchois]),
+      included_pakchois=$withval,
+      included_pakchois=no)
+  if test "$included_pakchois" = "no"; then
+    AC_LIB_HAVE_LINKFLAGS(pakchois,, [#include <pakchois/pakchois.h>],
+                          [pakchois_module_load(0,0);])
+    if test "$ac_cv_pakchois" != yes; then
+      included_pakchois=yes
+      AC_MSG_WARN([[
+  *** 
+  *** Pakchois was not found. Will use the included one.
+  ]])
+    fi
+  fi
+  AC_MSG_CHECKING([whether to use the included pakchois])
+  AC_MSG_RESULT($included_pakchois)
+  AM_CONDITIONAL(ENABLE_LOCAL_PAKCHOIS, test "$included_pakchois" = "yes")
+  if test "$included_pakchois" = "yes";then
+	AC_CHECK_LIB(pthread, pthread_mutex_lock,,
+	   [AC_MSG_ERROR([could not find pthread_mutex_lock])])
+	AC_CHECK_LIB(dl, dlopen,,
+	   [AC_MSG_ERROR([could not find dlopen])])
+
+	module_path="${libdir}:${libdir}/pkcs11"
+
+	CPPFLAGS="$CPPFLAGS -DPAKCHOIS_MODPATH=\\\"${module_path}\\\""
+  fi
+
   AC_ARG_WITH(lzo,
     AS_HELP_STRING([--with-lzo], [use experimental LZO compression]),
                    use_lzo=$withval, use_lzo=no)

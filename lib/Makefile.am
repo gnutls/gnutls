@@ -88,6 +88,7 @@ if ENABLE_PKCS11
 COBJECTS += pkcs11.c pkcs11_privkey.c
 endif
 
+
 if ENABLE_NETTLE
 SUBDIRS += nettle
 else
@@ -125,6 +126,11 @@ HFILES = debug.h gnutls_compress.h gnutls_cipher.h gnutls_buffers.h	\
 	ext_session_ticket.h ext_signature.h gnutls_cryptodev.h		\
 	ext_safe_renegotiation.h
 
+if ENABLE_LOCAL_PAKCHOIS
+COBJECTS+=pakchois/pakchois.c pakchois/errors.c
+HFILES+=pakchois/pakchois.h pakchois/pakchois11.h
+endif
+
 # Separate so we can create the documentation
 
 libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
@@ -154,9 +160,7 @@ else
 libgnutls_la_LDFLAGS += $(LTLIBTASN1)
 endif
 
-if ENABLE_PAKCHOIS
 libgnutls_la_LDFLAGS += $(LTLIBPAKCHOIS)
-endif
 
 if ENABLE_NETTLE
 libgnutls_la_LDFLAGS += $(LTLIBNETTLE) -lgmp -lpthread -lhogweed

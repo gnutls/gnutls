@@ -79,19 +79,6 @@ else
  AC_MSG_RESULT(no)
 fi
 
-AC_ARG_WITH(pakchois, AS_HELP_STRING([--without-pakchois],
-                                 [disable pakchois PKCS11 support]),
-            ac_pakchois=$withval, ac_pakchois=yes)
-AC_MSG_CHECKING([whether to include pakchois PKCS11 support])
-if test x$ac_pakchois != xno; then
- AC_MSG_RESULT(yes)
- AC_LIB_HAVE_LINKFLAGS(pakchois,, [#include <pakchois/pakchois.h>], [pakchois_module_load(0,0);])
- if test "$ac_cv_libpakchois" != yes; then
-   AC_MSG_ERROR(
-*** 
-*** Pakchois was not found. This is required for PKCS11 support.)
-AM_CONDITIONAL(ENABLE_PAKCHOIS, test "$ac_cv_libpakchois" = "yes")
-
 lgl_INIT
 
 LIBGNUTLS_LIBS="-L${libdir} -lgnutls $LIBS"
