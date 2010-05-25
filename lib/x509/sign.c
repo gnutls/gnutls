@@ -180,8 +180,9 @@ dsa_sign (const gnutls_datum_t * text,
   opaque _digest[MAX_HASH_SIZE];
   digest_hd_st hd;
   gnutls_datum_t digest;
+  gnutls_digest_algorithm_t hash = _gnutls_dsa_q_to_hash(params[1]);
 
-  ret = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1);
+  ret = _gnutls_hash_init (&hd, hash);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -192,7 +193,7 @@ dsa_sign (const gnutls_datum_t * text,
   _gnutls_hash_deinit (&hd, _digest);
 
   digest.data = _digest;
-  digest.size = 20;
+  digest.size = _gnutls_hash_get_algo_len(hash);
 
   if ((ret =
        _gnutls_sign (GNUTLS_PK_DSA, params, params_len, &digest,

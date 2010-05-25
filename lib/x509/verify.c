@@ -839,6 +839,19 @@ verify_sig (const gnutls_datum_t * tbs,
     }
 }
 
+gnutls_digest_algorithm_t _gnutls_dsa_q_to_hash(bigint_t q)
+{
+  int bits = _gnutls_mpi_get_nbits(q);
+
+  if (bits <= 160) {
+    return GNUTLS_DIG_SHA1;
+  } else if (bits <= 224) {
+    return GNUTLS_DIG_SHA224;
+  } else {
+    return GNUTLS_DIG_SHA256;
+  }
+}
+
 int
 _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
 			       const gnutls_datum_t * signature,
@@ -851,38 +864,37 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
   int digest_size;
   int ret, i;
 
+  issuer_params_size = MAX_PUBLIC_PARAMS_SIZE;
+  ret =
+    _gnutls_x509_crt_get_mpis (issuer, issuer_params,
+				   &issuer_params_size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
   switch (gnutls_x509_crt_get_pk_algorithm (issuer, NULL))
     {
     case GNUTLS_PK_DSA:
+      
       if (hash)
-	*hash = GNUTLS_MAC_SHA1;
-      return 0;
+	*hash = _gnutls_dsa_q_to_hash(issuer_params[1]);
+
+      ret = 0;
+      break;
 
     case GNUTLS_PK_RSA:
-      issuer_params_size = MAX_PUBLIC_PARAMS_SIZE;
-      ret =
-	_gnutls_x509_crt_get_mpis (issuer, issuer_params,
-				   &issuer_params_size);
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
 
       ret =
 	_gnutls_pkcs1_rsa_decrypt (&decrypted, signature,
 				   issuer_params, issuer_params_size, 1);
 
-      /* release allocated mpis */
-      for (i = 0; i < issuer_params_size; i++)
-	{
-	  _gnutls_mpi_release (&issuer_params[i]);
-	}
 
       if (ret < 0)
 	{
 	  gnutls_assert ();
-	  return ret;
+	  goto cleanup;
 	}
 
       digest_size = sizeof (digest);
@@ -892,22 +904,34 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
 	{
 	  gnutls_assert ();
 	  _gnutls_free_datum (&decrypted);
-	  return ret;
+	  goto cleanup;
 	}
 
       _gnutls_free_datum (&decrypted);
       if (digest_size != _gnutls_hash_get_algo_len (*hash))
 	{
 	  gnutls_assert ();
-	  return GNUTLS_E_ASN1_GENERIC_ERROR;
+	  ret = GNUTLS_E_ASN1_GENERIC_ERROR;
+	  goto cleanup;
 	}
 
-      return 0;
+      ret = 0;
+      break;
 
     default:
       gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
+      ret = GNUTLS_E_INTERNAL_ERROR;
     }
+
+cleanup:
+    /* release allocated mpis */
+  for (i = 0; i < issuer_params_size; i++)
+    {
+      _gnutls_mpi_release (&issuer_params[i]);
+    }
+
+  return ret;
+
 }
 
 /* verifies if the certificate is properly signed.

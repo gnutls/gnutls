@@ -1468,7 +1468,7 @@ cleanup:
 /**
  * gnutls_x509_privkey_sign_data:
  * @key: Holds the key
- * @digest: should be MD5 or SHA1
+ * @digest: should be MD5 or SHAx. May be ignored.
  * @flags: should be 0 for now
  * @data: holds the data to be signed
  * @signature: will contain the signature
