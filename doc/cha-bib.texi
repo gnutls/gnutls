@@ -94,6 +94,10 @@ January 2008, available from @url{http://www.ietf.org/rfc/rfc5077}.
 RSA Laboratories, "PKCS 12 v1.0: Personal Information Exchange
 Syntax", June 1999, Available from @url{http://www.rsa.com}.
 
+@item @anchor{PKCS11}[PKCS11]
+RSA Laboratories, "PKCS #11 Base Functionality v2.30: Cryptoki – Draft 4",
+July 2009, Available from @url{http://www.rsa.com}.
+
 @item @anchor{RESCORLA}[RESCORLA]
 Eric Rescorla, "SSL and TLS: Designing and Building Secure Systems",
 2001

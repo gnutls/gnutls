@@ -325,7 +325,7 @@ MD5.  These algorithms have been broken and should not be trusted.
 @cindex @acronym{PKCS #11} tokens
 
 @subsection Introduction
-This section copes with the @acronym{PKCS #11} support in @acronym{GnuTLS}.
+This section copes with the @acronym{PKCS #11} @xcite{PKCS11} support in @acronym{GnuTLS}.
 @acronym{PKCS #11} is plugin API allowing applications to access cryptographic
 operations on a token, as well as to objects residing on the token. A token can 
 be a real hardware token such as a smart card, or it can be a software component
@@ -544,7 +544,7 @@ gnutls_pkcs11_privkey_t ca_key;
 gnutls_x509_crt_t ca_cert;
 gnutls_privkey_t abs_key;
 
-	/* load the PKCS 11 key and certificates */
+	/* load the PKCS #11 key and certificates */
 	gnutls_pkcs11_privkey_init(&ca_key);
 	gnutls_pkcs11_privkey_import_url(ca_key, key_url);
 
