@@ -25,8 +25,10 @@
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
 #define CAFILE "ca.pem"
-#define CERT_URL "pkcs11:manufacturer=EnterSafe;object=Certificate;id=db:5b:3e:b5:72:33:92:99:18:ed:bb:eb:74:68:31:bd:b2:23:67:26"
-#define KEY_URL "pkcs11:manufacturer=EnterSafe;object=Certificate;id=db:5b:3e:b5:72:33:92:99:18:ed:bb:eb:74:68:31:bd:b2:23:67:26"
+#define CERT_URL "pkcs11:manufacturer=EnterSafe;object=Certificate" \
+  ";id=db:5b:3e:b5:72:33:92:99:18:ed:bb:eb:74:68:31:bd:b2:23:67:26"
+#define KEY_URL "pkcs11:manufacturer=EnterSafe;object=Certificate" \
+  ";id=db:5b:3e:b5:72:33:92:99:18:ed:bb:eb:74:68:31:bd:b2:23:67:26"
 
 extern int tcp_connect (void);
 extern void tcp_close (int sd);
