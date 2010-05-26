@@ -335,6 +335,11 @@ certificates and public/private key pairs can be used with @acronym{GnuTLS}. It'
 main advantage is that it allows operations on private key objects such as decryption
 and signing without accessing the key itself.
 
+Moreover it can be used to allow all applications in the same operating system to access
+shared cryptographic keys and certificates in a uniform way, as in the following picture.
+
+@image{pkcs11-vision}
+
 @subsection Initialization
 To allow all the  @acronym{GnuTLS} applications to access @acronym{PKCS #11} tokens
 it is adviceable to use @code{/etc/gnutls/pkcs11.conf}. This file has the following
