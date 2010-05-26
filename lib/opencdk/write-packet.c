@@ -268,7 +268,7 @@ write_pubkey_enc (cdk_stream_t out, cdk_pkt_pubkey_enc_t pke, int old_ctb)
     return CDK_Inv_Algo;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("write_pubkey_enc:\n");
+    _gnutls_write_log ("write_pubkey_enc:\n");
 
   nenc = cdk_pk_get_nenc (pke->pubkey_algo);
   size = 10 + calc_mpisize (pke->mpi, nenc);
@@ -298,7 +298,7 @@ write_mdc (cdk_stream_t out, cdk_pkt_mdc_t mdc)
   assert (out);
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("write_mdc:\n");
+    _gnutls_write_log ("write_mdc:\n");
 
   /* This packet requires a fixed header encoding */
   rc = stream_putc (out, 0xD3);	/* packet ID and 1 byte length */
@@ -374,7 +374,7 @@ write_signature (cdk_stream_t out, cdk_pkt_signature_t sig, int old_ctb)
     return CDK_Inv_Packet;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("write_signature:\n");
+    _gnutls_write_log ("write_signature:\n");
 
   nsig = cdk_pk_get_nsig (sig->pubkey_algo);
   if (!nsig)
@@ -438,7 +438,7 @@ write_public_key (cdk_stream_t out, cdk_pkt_pubkey_t pk,
     return CDK_Inv_Packet;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("write_public_key: subkey=%d\n", is_subkey);
+    _gnutls_write_log ("write_public_key: subkey=%d\n", is_subkey);
 
   pkttype = is_subkey ? CDK_PKT_PUBLIC_SUBKEY : CDK_PKT_PUBLIC_KEY;
   npkey = cdk_pk_get_npkey (pk->pubkey_algo);
@@ -515,7 +515,7 @@ write_secret_key (cdk_stream_t out, cdk_pkt_seckey_t sk,
     return CDK_Inv_Packet;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("write_secret_key:\n");
+    _gnutls_write_log ("write_secret_key:\n");
 
   npkey = cdk_pk_get_npkey (pk->pubkey_algo);
   nskey = cdk_pk_get_nskey (pk->pubkey_algo);
@@ -629,7 +629,7 @@ write_compressed (cdk_stream_t out, cdk_pkt_compressed_t cd)
   assert (cd);
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("packet: write_compressed\n");
+    _gnutls_write_log ("packet: write_compressed\n");
 
   /* Use an old (RFC1991) header for this packet. */
   rc = pkt_write_head (out, 1, 0, CDK_PKT_COMPRESSED);
@@ -655,7 +655,7 @@ write_literal (cdk_stream_t out, cdk_pkt_literal_t pt, int old_ctb)
     return CDK_Inv_Packet;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("write_literal:\n");
+    _gnutls_write_log ("write_literal:\n");
 
   size = 6 + pt->namelen + pt->len;
   rc = pkt_write_head (out, old_ctb, size, CDK_PKT_LITERAL);
@@ -700,7 +700,7 @@ write_onepass_sig (cdk_stream_t out, cdk_pkt_onepass_sig_t sig)
     return CDK_Inv_Packet;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("write_onepass_sig:\n");
+    _gnutls_write_log ("write_onepass_sig:\n");
 
   rc = pkt_write_head (out, 0, 13, CDK_PKT_ONEPASS_SIG);
   if (!rc)
@@ -773,7 +773,7 @@ cdk_pkt_write (cdk_stream_t out, cdk_packet_t pkt)
   if (!out || !pkt)
     return CDK_Inv_Value;
 
-  _cdk_log_debug ("write packet pkttype=%d\n", pkt->pkttype);
+  _gnutls_write_log ("write packet pkttype=%d\n", pkt->pkttype);
   switch (pkt->pkttype)
     {
     case CDK_PKT_LITERAL:
@@ -816,7 +816,7 @@ cdk_pkt_write (cdk_stream_t out, cdk_packet_t pkt)
     }
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("write_packet rc=%d pkttype=%d\n", rc, pkt->pkttype);
+    _gnutls_write_log ("write_packet rc=%d pkttype=%d\n", rc, pkt->pkttype);
   return rc;
 }
 

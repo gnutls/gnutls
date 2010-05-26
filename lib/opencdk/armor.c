@@ -283,7 +283,7 @@ compress_get_algo (cdk_stream_t inp, int *r_zipalgo)
 	  pkttype = *plain & 0x40 ? (*plain & 0x3f) : ((*plain >> 2) & 0xf);
 	  if (pkttype == CDK_PKT_COMPRESSED && r_zipalgo)
 	    {
-	      _cdk_log_debug ("armor compressed (algo=%d)\n", *(plain + 1));
+	      _gnutls_buffers_log ("armor compressed (algo=%d)\n", *(plain + 1));
 	      *r_zipalgo = *(plain + 1);
 	    }
 	  break;
@@ -380,7 +380,7 @@ armor_encode (void *data, FILE * in, FILE * out)
       return CDK_Inv_Value;
     }
 
-  _cdk_log_debug ("armor filter: encode\n");
+  _gnutls_buffers_log ("armor filter: encode\n");
 
   memset (crcbuf, 0, sizeof (crcbuf));
 
@@ -499,7 +499,7 @@ armor_decode (void *data, FILE * in, FILE * out)
       return CDK_Inv_Value;
     }
 
-  _cdk_log_debug ("armor filter: decode\n");
+  _gnutls_buffers_log ("armor filter: decode\n");
 
   fseek (in, 0, SEEK_SET);
   /* Search the begin of the message */
@@ -596,7 +596,7 @@ armor_decode (void *data, FILE * in, FILE * out)
   afx->crc_okay = (afx->crc == crc2) ? 1 : 0;
   if (!afx->crc_okay && !rc)
     {
-      _cdk_log_debug ("file crc=%08X afx_crc=%08X\n", (unsigned int) crc2,
+      _gnutls_buffers_log ("file crc=%08X afx_crc=%08X\n", (unsigned int) crc2,
 		      (unsigned int) afx->crc);
       rc = CDK_Armor_CRC_Error;
     }
@@ -724,7 +724,7 @@ _cdk_filter_armor (void *data, int ctl, FILE * in, FILE * out)
       armor_filter_t *afx = data;
       if (afx)
 	{
-	  _cdk_log_debug ("free armor filter\n");
+	  _gnutls_buffers_log ("free armor filter\n");
 	  afx->idx = afx->idx2 = 0;
 	  afx->crc = afx->crc_okay = 0;
 	  return 0;

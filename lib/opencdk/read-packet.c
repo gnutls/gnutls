@@ -129,14 +129,14 @@ read_mpi (cdk_stream_t inp, bigint_t * ret_m, int secure)
 
   if (nbits > MAX_MPI_BITS || nbits == 0)
     {
-      _cdk_log_debug ("read_mpi: too large %d bits\n", (int) nbits);
+      _gnutls_write_log ("read_mpi: too large %d bits\n", (int) nbits);
       return CDK_MPI_Error;	/* Sanity check */
     }
 
   rc = stream_read (inp, buf + 2, nread, &nread);
   if (!rc && nread != ((nbits + 7) / 8))
     {
-      _cdk_log_debug ("read_mpi: too short %d < %d\n", (int) nread,
+      _gnutls_write_log ("read_mpi: too short %d < %d\n", (int) nread,
 		      (int) ((nbits + 7) / 8));
       return CDK_MPI_Error;
     }
@@ -198,7 +198,7 @@ read_pubkey_enc (cdk_stream_t inp, size_t pktlen, cdk_pkt_pubkey_enc_t pke)
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_pubkey_enc: %d octets\n", (int) pktlen);
+    _gnutls_write_log ("read_pubkey_enc: %d octets\n", (int) pktlen);
 
   if (pktlen < 12)
     return CDK_Inv_Packet;
@@ -235,7 +235,7 @@ read_mdc (cdk_stream_t inp, cdk_pkt_mdc_t mdc)
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_mdc:\n");
+    _gnutls_write_log ("read_mdc:\n");
 
   rc = stream_read (inp, mdc->hash, DIM (mdc->hash), &n);
   if (rc)
@@ -252,7 +252,7 @@ read_compressed (cdk_stream_t inp, size_t pktlen, cdk_pkt_compressed_t c)
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_compressed: %d octets\n", (int) pktlen);
+    _gnutls_write_log ("read_compressed: %d octets\n", (int) pktlen);
 
   c->algorithm = cdk_stream_getc (inp);
   if (c->algorithm > 3)
@@ -279,7 +279,7 @@ read_public_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_pubkey_t pk)
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_public_key: %d octets\n", (int) pktlen);
+    _gnutls_write_log ("read_public_key: %d octets\n", (int) pktlen);
 
   pk->is_invalid = 1;		/* default to detect missing self signatures */
   pk->is_revoked = 0;
@@ -301,7 +301,7 @@ read_public_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_pubkey_t pk)
   if (!npkey)
     {
       gnutls_assert ();
-      _cdk_log_debug ("invalid public key algorithm %d\n", pk->pubkey_algo);
+      _gnutls_write_log ("invalid public key algorithm %d\n", pk->pubkey_algo);
       return CDK_Inv_Algo;
     }
   for (i = 0; i < npkey; i++)
@@ -337,7 +337,7 @@ read_secret_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_seckey_t sk)
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_secret_key: %d octets\n", (int) pktlen);
+    _gnutls_write_log ("read_secret_key: %d octets\n", (int) pktlen);
 
   p1 = cdk_stream_tell (inp);
   rc = read_public_key (inp, pktlen, sk->pk);
@@ -484,7 +484,7 @@ read_attribute (cdk_stream_t inp, size_t pktlen, cdk_pkt_userid_t attr)
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_attribute: %d octets\n", (int) pktlen);
+    _gnutls_write_log ("read_attribute: %d octets\n", (int) pktlen);
 
   strcpy (attr->name, "[attribute]");
   attr->len = strlen (attr->name);
@@ -553,7 +553,7 @@ read_user_id (cdk_stream_t inp, size_t pktlen, cdk_pkt_userid_t user_id)
     return CDK_Inv_Packet;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_user_id: %lu octets\n", pktlen);
+    _gnutls_write_log ("read_user_id: %lu octets\n", pktlen);
 
   user_id->len = pktlen;
   rc = stream_read (inp, user_id->name, pktlen, &nread);
@@ -578,7 +578,7 @@ read_subpkt (cdk_stream_t inp, cdk_subpkt_t * r_ctx, size_t * r_nbytes)
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_subpkt:\n");
+    _gnutls_write_log ("read_subpkt:\n");
 
   n = 0;
   *r_nbytes = 0;
@@ -608,7 +608,7 @@ read_subpkt (cdk_stream_t inp, cdk_subpkt_t * r_ctx, size_t * r_nbytes)
   node->size = size;
   node->type = cdk_stream_getc (inp);
   if (DEBUG_PKT)
-    _cdk_log_debug (" %d octets %d type\n", node->size, node->type);
+    _gnutls_write_log (" %d octets %d type\n", node->size, node->type);
   n++;
   node->size--;
   rc = stream_read (inp, node->d, node->size, &nread);
@@ -631,7 +631,7 @@ read_onepass_sig (cdk_stream_t inp, size_t pktlen, cdk_pkt_onepass_sig_t sig)
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_onepass_sig: %d octets\n", (int) pktlen);
+    _gnutls_write_log ("read_onepass_sig: %d octets\n", (int) pktlen);
 
   if (pktlen != 13)
     return CDK_Inv_Packet;
@@ -730,7 +730,7 @@ read_signature (cdk_stream_t inp, size_t pktlen, cdk_pkt_signature_t sig)
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_signature: %d octets\n", (int) pktlen);
+    _gnutls_write_log ("read_signature: %d octets\n", (int) pktlen);
 
   if (pktlen < 16)
     return CDK_Inv_Packet;
@@ -822,7 +822,7 @@ read_literal (cdk_stream_t inp, size_t pktlen,
     return CDK_Inv_Value;
 
   if (DEBUG_PKT)
-    _cdk_log_debug ("read_literal: %d octets\n", (int) pktlen);
+    _gnutls_write_log ("read_literal: %d octets\n", (int) pktlen);
 
   pt->mode = cdk_stream_getc (inp);
   if (pt->mode != 0x62 && pt->mode != 0x74 && pt->mode != 0x75)

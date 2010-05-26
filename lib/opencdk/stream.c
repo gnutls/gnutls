@@ -84,7 +84,7 @@ _cdk_stream_open_mode (const char *file, const char *mode,
       return CDK_Inv_Value;
     }
 
-  _cdk_log_debug ("open stream `%s'\n", file);
+  _gnutls_read_log ("open stream `%s'\n", file);
   *ret_s = NULL;
   s = cdk_calloc (1, sizeof *s);
   if (!s)
@@ -107,7 +107,7 @@ _cdk_stream_open_mode (const char *file, const char *mode,
       gnutls_assert ();
       return CDK_File_Error;
     }
-  _cdk_log_debug ("open stream fd=%d\n", fileno (s->fp));
+  _gnutls_read_log ("open stream fd=%d\n", fileno (s->fp));
   s->flags.write = 0;
   *ret_s = s;
   return 0;
@@ -177,7 +177,7 @@ cdk_stream_new (const char *file, cdk_stream_t * ret_s)
       return CDK_Inv_Value;
     }
 
-  _cdk_log_debug ("new stream `%s'\n", file ? file : "[temp]");
+  _gnutls_read_log ("new stream `%s'\n", file ? file : "[temp]");
   *ret_s = NULL;
   s = cdk_calloc (1, sizeof *s);
   if (!s)
@@ -206,7 +206,7 @@ cdk_stream_new (const char *file, cdk_stream_t * ret_s)
       gnutls_assert ();
       return CDK_File_Error;
     }
-  _cdk_log_debug ("new stream fd=%d\n", fileno (s->fp));
+  _gnutls_read_log ("new stream fd=%d\n", fileno (s->fp));
   *ret_s = s;
   return 0;
 }
@@ -231,7 +231,7 @@ cdk_stream_create (const char *file, cdk_stream_t * ret_s)
       return CDK_Inv_Value;
     }
 
-  _cdk_log_debug ("create stream `%s'\n", file);
+  _gnutls_read_log ("create stream `%s'\n", file);
   *ret_s = NULL;
   s = cdk_calloc (1, sizeof *s);
   if (!s)
@@ -256,7 +256,7 @@ cdk_stream_create (const char *file, cdk_stream_t * ret_s)
       gnutls_assert ();
       return CDK_File_Error;
     }
-  _cdk_log_debug ("stream create fd=%d\n", fileno (s->fp));
+  _gnutls_read_log ("stream create fd=%d\n", fileno (s->fp));
   *ret_s = s;
   return 0;
 }
@@ -325,7 +325,7 @@ _cdk_stream_fpopen (FILE * fp, unsigned write_mode, cdk_stream_t * ret_out)
       return CDK_Out_Of_Core;
     }
 
-  _cdk_log_debug ("stream ref fd=%d\n", fileno (fp));
+  _gnutls_read_log ("stream ref fd=%d\n", fileno (fp));
   s->fp = fp;
   s->fp_ref = 1;
   s->flags.filtrated = 1;
@@ -459,7 +459,7 @@ cdk_stream_close (cdk_stream_t s)
       return CDK_Inv_Value;
     }
 
-  _cdk_log_debug ("close stream ref=%d `%s'\n",
+  _gnutls_read_log ("close stream ref=%d `%s'\n",
 		  s->fp_ref, s->fname ? s->fname : "[temp]");
 
   /* In the user callback mode, we call the release cb if possible
@@ -483,7 +483,7 @@ cdk_stream_close (cdk_stream_t s)
     {
       int err;
 
-      _cdk_log_debug ("close stream fd=%d\n", fileno (s->fp));
+      _gnutls_read_log ("close stream fd=%d\n", fileno (s->fp));
       err = fclose (s->fp);
       s->fp = NULL;
       if (err)
@@ -756,7 +756,7 @@ stream_fp_replace (cdk_stream_t s, FILE ** tmp)
 
   assert (s);
 
-  _cdk_log_debug ("replace stream fd=%d with fd=%d\n",
+  _gnutls_read_log ("replace stream fd=%d with fd=%d\n",
 		  fileno (s->fp), fileno (*tmp));
   rc = fclose (s->fp);
   if (rc)
@@ -792,7 +792,7 @@ stream_filter_write (cdk_stream_t s)
       if (!f->flags.enabled)
 	continue;
       /* if there is no next filter, create the final output file */
-      _cdk_log_debug ("filter [write]: last filter=%d fname=%s\n",
+      _gnutls_read_log ("filter [write]: last filter=%d fname=%s\n",
 		      f->next ? 1 : 0, s->fname);
       if (!f->next && s->fname)
 	f->tmp = fopen (s->fname, "w+b");
@@ -813,14 +813,14 @@ stream_filter_write (cdk_stream_t s)
 	    break;
 	}
       rc = f->fnct (f->opaque, f->ctl, s->fp, f->tmp);
-      _cdk_log_debug ("filter [write]: type=%d rc=%d\n", f->type, rc);
+      _gnutls_read_log ("filter [write]: type=%d rc=%d\n", f->type, rc);
       if (!rc)
 	rc = stream_fp_replace (s, &f->tmp);
       if (!rc)
 	rc = cdk_stream_seek (s, 0);
       if (rc)
 	{
-	  _cdk_log_debug ("filter [close]: fd=%d\n", fileno (f->tmp));
+	  _gnutls_read_log ("filter [close]: fd=%d\n", fileno (f->tmp));
 	  fclose (f->tmp);
 	  break;
 	}
@@ -851,7 +851,7 @@ stream_filter_read (cdk_stream_t s)
 	continue;
       if (f->flags.error)
 	{
-	  _cdk_log_debug ("filter %s [read]: has the error flag; skipped\n",
+	  _gnutls_read_log ("filter %s [read]: has the error flag; skipped\n",
 			  s->fname ? s->fname : "[temp]");
 	  continue;
 	}
@@ -863,7 +863,7 @@ stream_filter_read (cdk_stream_t s)
 	  break;
 	}
       rc = f->fnct (f->opaque, f->ctl, s->fp, f->tmp);
-      _cdk_log_debug ("filter %s [read]: type=%d rc=%d\n",
+      _gnutls_read_log ("filter %s [read]: type=%d rc=%d\n",
 		      s->fname ? s->fname : "[temp]", f->type, rc);
       if (rc)
 	{
@@ -1059,7 +1059,7 @@ cdk_stream_write (cdk_stream_t s, const void *buf, size_t count)
 	  s->cache.alloced += (count + STREAM_BUFSIZE);
 	  memcpy (s->cache.buf, old, s->cache.size);
 	  cdk_free (old);
-	  _cdk_log_debug ("stream: enlarge cache to %d octets\n",
+	  _gnutls_read_log ("stream: enlarge cache to %d octets\n",
 			  (int) s->cache.alloced);
 	}
       memcpy (s->cache.buf + s->cache.size, buf, count);
@@ -1197,7 +1197,7 @@ cdk_stream_set_literal_flag (cdk_stream_t s, cdk_lit_format_t mode,
   struct stream_filter_s *f;
   const char *orig_fname;
 
-  _cdk_log_debug ("stream: enable literal mode.\n");
+  _gnutls_read_log ("stream: enable literal mode.\n");
 
   if (!s)
     {
@@ -1349,7 +1349,7 @@ cdk_stream_enable_cache (cdk_stream_t s, int val)
     {
       s->cache.buf = cdk_calloc (1, STREAM_BUFSIZE);
       s->cache.alloced = STREAM_BUFSIZE;
-      _cdk_log_debug ("stream: allocate cache of %d octets\n",
+      _gnutls_read_log ("stream: allocate cache of %d octets\n",
 		      STREAM_BUFSIZE);
     }
   return 0;
@@ -1455,7 +1455,7 @@ cdk_stream_mmap_part (cdk_stream_t s, off_t off, size_t len,
   /* Memory mapping is not supported on custom I/O objects. */
   if (s->cbs_hd)
     {
-      _cdk_log_debug ("cdk_stream_mmap_part: not supported on callbacks\n");
+      _gnutls_read_log ("cdk_stream_mmap_part: not supported on callbacks\n");
       gnutls_assert ();
       return CDK_Inv_Mode;
     }
@@ -1477,7 +1477,7 @@ cdk_stream_mmap_part (cdk_stream_t s, off_t off, size_t len,
     len = cdk_stream_get_length (s);
   if (!len)
     {
-      _cdk_log_debug ("cdk_stream_mmap_part: invalid file size %lu\n", len);
+      _gnutls_read_log ("cdk_stream_mmap_part: invalid file size %lu\n", len);
       gnutls_assert ();
       return s->error;
     }
@@ -1579,7 +1579,7 @@ _cdk_stream_set_blockmode (cdk_stream_t s, size_t nbytes)
 {
   assert (s);
 
-  _cdk_log_debug ("stream: activate block mode with blocksize %d\n",
+  _gnutls_read_log ("stream: activate block mode with blocksize %d\n",
 		  (int) nbytes);
   s->blkmode = nbytes;
   return 0;
