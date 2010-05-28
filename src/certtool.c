@@ -166,6 +166,33 @@ print_rsa_pkey (gnutls_datum_t * m, gnutls_datum_t * e, gnutls_datum_t * d,
     }
 }
 
+static gnutls_sec_param_t str_to_sec_param(const char* str)
+{
+  if (strcasecmp(str, "low")==0)
+    {
+      return GNUTLS_SEC_PARAM_LOW;
+    }
+  else if (strcasecmp(str, "normal")==0)
+    {
+      return GNUTLS_SEC_PARAM_NORMAL;
+    }
+  else if (strcasecmp(str, "high")==0)
+    {
+      return GNUTLS_SEC_PARAM_HIGH;
+    }
+  else if (strcasecmp(str, "ultra")==0)
+    {
+      return GNUTLS_SEC_PARAM_ULTRA;
+    }
+  else
+    {
+      fprintf(stderr, "Unknown security parameter string: %s\n", str);
+      exit(1);
+    }
+
+}
+
+
 static gnutls_x509_privkey_t
 generate_private_key_int (void)
 {
@@ -182,6 +209,19 @@ generate_private_key_int (void)
   ret = gnutls_x509_privkey_init (&key);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
+
+  if (info.bits != 0)
+    {
+      fprintf(stderr, "** Note: Please use the --sec-param instead of --bits\n");
+    }
+  else
+    {
+      if (info.sec_param)
+        {
+          info.bits = gnutls_sec_param_to_pk_bits(key_type, str_to_sec_param(info.sec_param));
+        }
+      else info.bits = gnutls_sec_param_to_pk_bits(key_type, GNUTLS_SEC_PARAM_NORMAL);
+    }
 
   fprintf (stderr, "Generating a %d bit %s private key...\n", info.bits,
 	   gnutls_pk_algorithm_get_name (key_type));

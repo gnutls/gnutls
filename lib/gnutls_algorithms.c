@@ -2326,3 +2326,118 @@ _gnutls_x509_pk_to_oid (gnutls_pk_algorithm_t algorithm)
   return ret;
 }
 
+/**
+ * gnutls_sec_param_to_pk_bits:
+ * @algo: is a public key algorithm
+ * @param: is a security parameter
+ *
+ * When generating private and public key pairs a difficult question
+ * is which size of "bits" the modulus will be in RSA and the group size
+ * in DSA. The easy answer is 1024, which is also wrong. This function
+ * will convert a human understandable security parameter to an
+ * appropriate size for the specific algorithm.
+ *
+ * Returns: The number of bits, or zero.
+ *
+ **/
+unsigned int gnutls_sec_param_to_pk_bits (gnutls_pk_algorithm_t algo,
+                                      gnutls_sec_param_t param)
+{
+
+  switch(algo)
+    {
+      case GNUTLS_PK_RSA:
+      case GNUTLS_PK_DSA:
+        switch(param)
+          {
+            case GNUTLS_SEC_PARAM_LOW:
+              return 1024;
+            case GNUTLS_SEC_PARAM_HIGH:
+              return 3072;
+            case GNUTLS_SEC_PARAM_ULTRA:
+              return 7680;
+            case GNUTLS_SEC_PARAM_NORMAL:
+            default:
+              return 2048;
+          }
+        default:
+          gnutls_assert();
+          return 0;
+    }
+
+}
+
+/**
+ * gnutls_sec_param_get_name:
+ * @param: is a security parameter
+ *
+ * Convert a #gnutls_sec_param_t value to a string.
+ *
+ * Returns: a pointer to a string that contains the name of the
+ *   specified public key algorithm, or %NULL.
+ *
+ **/
+const char *
+gnutls_sec_param_get_name (gnutls_sec_param_t param)
+{
+  const char *p;
+
+  switch (param)
+    {
+    case GNUTLS_SEC_PARAM_WEAK:
+      p = "Weak";
+      break;
+
+    case GNUTLS_SEC_PARAM_LOW:
+      p = "Low";
+      break;
+
+    case GNUTLS_SEC_PARAM_NORMAL:
+      p = "Normal";
+      break;
+
+    case GNUTLS_SEC_PARAM_HIGH:
+      p = "High";
+      break;
+
+    case GNUTLS_SEC_PARAM_ULTRA:
+      p = "Ultra";
+      break;
+
+    default:
+      p = "Unknown";
+      break;
+    }
+
+  return p;
+}
+
+/**
+ * gnutls_pk_bits_to_sec_param:
+ * @algo: is a public key algorithm
+ * @bits: is the number of bits
+ *
+ * This is the inverse of gnutls_sec_param_to_pk_bits(). Given an algorithm
+ * and the number of bits, it will return the security parameter. This is
+ * a rough indication.
+ *
+ * Returns: The security parameter.
+ *
+ **/
+gnutls_sec_param_t gnutls_pk_bits_to_sec_param (gnutls_pk_algorithm_t algo,
+                                      unsigned int bits)
+{
+
+  /* currently we ignore algo */
+  if (bits >= 7680)
+    return GNUTLS_SEC_PARAM_ULTRA;
+  else if (bits >= 3072)
+    return GNUTLS_SEC_PARAM_HIGH;
+  else if (bits >= 2048)
+    return GNUTLS_SEC_PARAM_NORMAL;
+  else if (bits >= 1024)
+    return GNUTLS_SEC_PARAM_LOW;
+  else
+    return GNUTLS_SEC_PARAM_WEAK;
+
+}

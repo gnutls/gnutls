@@ -117,6 +117,9 @@ option (outraw) { $outcert_format=1 } "Use RAW/DER format for output certificate
 #int bits;
 option (bits) INT "BITS" { $bits = $1 } "specify the number of bits for key generation."
 
+#char* sec_param;
+option (sec-param) STR "PARAM" { $sec_param = $1 } "specify the security level [low|normal|high|ultra]."
+
 #int quick_random;
 option (disable-quick-random) { $quick_random = 0; } "Use /dev/random for key generationg, thus increasing the quality of randomness used."
 
@@ -160,10 +163,10 @@ option (h, help) { gaa_help(); exit(0); } "shows this help text"
 
 option (v, version) { certtool_version(); exit(0); } "shows the program's version"
 
-init { $bits = 2048; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL; 
+init { $bits = 0; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL;
 	$debug=1; $request = NULL; $infile = NULL; $outfile = NULL; $cert = NULL; 
 	$incert_format = 0; $outcert_format = 0; $action=-1; $pass = NULL; $v1_cert = 0;
 	$export = 0; $template = NULL; $hash=NULL; $fix_key = 0; $quick_random=1; 
 	$privkey_op = 0; $pkcs_cipher = "3des"; $crq_extensions=1; $pkcs11_provider= NULL;
 	$pkcs11_url = NULL; $pkcs11_type = PKCS11_TYPE_PK; $pubkey=NULL; $pkcs11_label = NULL; 
-	$pkcs11_trusted=0; }
+	$pkcs11_trusted=0; $sec_param = NULL; }

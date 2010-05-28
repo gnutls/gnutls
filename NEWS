@@ -26,6 +26,9 @@ PKCS #11 private keys.
 ** libgnutls: Added  gnutls_pkcs11_copy_x509_crt(), gnutls_pkcs11_copy_x509_privkey(),
 and gnutls_pkcs11_delete_url() to allow copying and deleting data in tokens.
 
+** libgnutls: Added gnutls_sec_param_to_pk_bits() et al. to allow select bit
+sizes for private keys using a human understandable scale.
+
 ** certtool: Added new options: --pkcs11-list-tokens, --pkcs11-list-all
 --pkcs11-list-all-certs, --pkcs11-list-trusted, --pkcs11-list-certs,
 --pkcs11-delete-url, --pkcs11-write
@@ -40,6 +43,9 @@ pkcs11:token=Root%20CA%20Certificates;serial=1%3AROOTS%3ADEFAULT;model=1%2E0;man
 gnutls_certificate_set_server_retrieve_function: DEPRECATED
 gnutls_certificate_set_client_retrieve_function: DEPRECATED
 gnutls_sign_callback_set: DEPRECATED
+gnutls_sec_param_to_pk_bits: ADDED
+gnutls_pk_bits_to_sec_param: ADDED
+gnutls_sec_param_get_name: ADDED
 gnutls_pkcs11_type_get_name: ADDED
 gnutls_certificate_set_retrieve_function: ADDED
 gnutls_pkcs11_init: ADDED

@@ -1096,6 +1096,8 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 	  name = _("unknown");
 
 	addf (str, _("\tSubject Public Key Algorithm: %s\n"), name);
+	addf (str, _("\tCertificate Security Level: %s\n"), gnutls_sec_param_get_name(gnutls_pk_bits_to_sec_param(err, bits)));
+
 #ifdef ENABLE_PKI
 	switch (err)
 	  {

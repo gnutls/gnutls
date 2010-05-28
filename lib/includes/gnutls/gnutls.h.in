@@ -602,6 +602,28 @@ extern "C"
 
   const char *gnutls_sign_algorithm_get_name (gnutls_sign_algorithm_t sign);
 
+  /**
+   * gnutls_sec_param_t:
+   * @GNUTLS_SEC_PARAM_UNKNOWN: Cannot be known
+   * @GNUTLS_SEC_PARAM_WEAK: 50 or less bits of security
+   * @GNUTLS_SEC_PARAM_LOW: 80 bits of security
+   * @GNUTLS_SEC_PARAM_NORMAL: 112 bits of security
+   * @GNUTLS_SEC_PARAM_HIGH: 128 bits of security
+   * @GNUTLS_SEC_PARAM_ULTRA: 192 bits of security
+   *
+   * Enumeration of security parameters for passive attacks
+   */
+  typedef enum
+  {
+    GNUTLS_SEC_PARAM_UNKNOWN,
+    GNUTLS_SEC_PARAM_WEAK,
+    GNUTLS_SEC_PARAM_LOW,
+    GNUTLS_SEC_PARAM_NORMAL,
+    GNUTLS_SEC_PARAM_HIGH,
+    GNUTLS_SEC_PARAM_ULTRA,
+  } gnutls_sec_param_t;
+
+
 /* If you want to change this, then also change the define in
  * gnutls_int.h, and recompile.
  */
@@ -659,6 +681,12 @@ extern "C"
 			 gnutls_alert_description_t desc);
   int gnutls_alert_send_appropriate (gnutls_session_t session, int err);
   const char *gnutls_alert_get_name (gnutls_alert_description_t alert);
+
+  gnutls_sec_param_t gnutls_pk_bits_to_sec_param (gnutls_pk_algorithm_t algo,
+                                      unsigned int bits);
+  const char * gnutls_sec_param_get_name (gnutls_sec_param_t param);
+  unsigned int gnutls_sec_param_to_pk_bits (gnutls_pk_algorithm_t algo,
+                                      gnutls_sec_param_t param);
 
 /* get information on the current session */
   gnutls_cipher_algorithm_t gnutls_cipher_get (gnutls_session_t session);

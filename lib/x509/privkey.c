@@ -1402,6 +1402,8 @@ cleanup:
  * This function will generate a random private key. Note that this
  * function must be called on an empty private key.
  *
+ * Do not set the number of bits directly, use gnutls_sec_param_to_pk_bits().
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  **/

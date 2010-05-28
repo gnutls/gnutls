@@ -237,6 +237,8 @@ print_key_info (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
 	name = _("unknown");
 
       addf (str, _("\tPublic Key Algorithm: %s\n"), name);
+      addf (str, _("\tKey Security Level: %s\n"), gnutls_sec_param_get_name(gnutls_pk_bits_to_sec_param(err, bits)));
+
       switch (err)
 	{
 	case GNUTLS_PK_RSA:
