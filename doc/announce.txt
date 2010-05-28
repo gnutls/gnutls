@@ -1,5 +1,5 @@
 To: help-gnutls@gnu.org, gnutls-devel@gnu.org, info-gnu@gnu.org
-Subject: GnuTLS 2.10.0
+Subject: GnuTLS 2.10.0 released
 <#part sign=pgpmime>
 We are proud to announce a new stable GnuTLS release: Version 2.10.0.
 
