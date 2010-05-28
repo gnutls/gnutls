@@ -153,11 +153,13 @@ AC_DEFUN([gl_EARLY],
   # Code from module update-copyright:
   # Code from module update-copyright-tests:
   # Code from module useless-if-before-free:
+  # Code from module valgrind-tests:
   # Code from module vasnprintf:
   # Code from module vasnprintf-tests:
   # Code from module vc-list-files:
   # Code from module vc-list-files-tests:
   # Code from module verify:
+  # Code from module verify-tests:
   # Code from module version-etc:
   # Code from module version-etc-fsf:
   # Code from module version-etc-tests:
@@ -413,6 +415,8 @@ AC_SUBST([LTALLOCA])
   gl_UNISTD_H
   # Code from module update-copyright:
   # Code from module useless-if-before-free:
+  # Code from module valgrind-tests:
+  gl_VALGRIND_TESTS
   # Code from module vasnprintf:
   gl_FUNC_VASNPRINTF
   # Code from module vc-list-files:
@@ -485,6 +489,7 @@ changequote([, ])dnl
   AC_CHECK_FUNCS_ONCE([shutdown])
   abs_aux_dir=`cd "$ac_aux_dir"; pwd`
   AC_SUBST([abs_aux_dir])
+  gl_VALGRIND_TESTS
   abs_aux_dir=`cd "$ac_aux_dir"; pwd`
   AC_SUBST([abs_aux_dir])
   m4_popdef([gl_MODULE_INDICATOR_CONDITION])
@@ -683,6 +688,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/00gnulib.m4
   m4/alloca.m4
   m4/arpa_inet_h.m4
+  m4/asm-underscore.m4
   m4/autobuild.m4
   m4/clock_time.m4
   m4/close.m4
@@ -749,6 +755,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/timespec.m4
   m4/ungetc.m4
   m4/unistd_h.m4
+  m4/valgrind-tests.m4
   m4/vasnprintf.m4
   m4/version-etc.m4
   m4/warn-on-use.m4
@@ -757,6 +764,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
+  tests/init.sh
   tests/macros.h
   tests/signature.h
   tests/test-alignof.c
@@ -806,6 +814,8 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-vasnprintf.c
   tests/test-vc-list-files-cvs.sh
   tests/test-vc-list-files-git.sh
+  tests/test-verify.c
+  tests/test-verify.sh
   tests/test-version-etc.c
   tests/test-version-etc.sh
   tests/test-wchar.c

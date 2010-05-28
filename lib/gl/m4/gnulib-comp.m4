@@ -100,6 +100,7 @@ AC_DEFUN([lgl_EARLY],
   # Code from module vasprintf:
   # Code from module vasprintf-tests:
   # Code from module verify:
+  # Code from module verify-tests:
   # Code from module vsnprintf:
   # Code from module vsnprintf-tests:
   # Code from module warn-on-use:
@@ -143,7 +144,7 @@ AC_DEFUN([lgl_INIT],
   gl_FUNC
   # Code from module gettext:
   dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
-  AM_GNU_GETTEXT_VERSION([0.17])
+  AM_GNU_GETTEXT_VERSION([0.18])
   # Code from module gettext-h:
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
@@ -434,10 +435,12 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/xsize.h
   m4/00gnulib.m4
   m4/alloca.m4
+  m4/asm-underscore.m4
   m4/byteswap.m4
   m4/codeset.m4
   m4/errno_h.m4
   m4/extensions.m4
+  m4/fcntl-o.m4
   m4/float_h.m4
   m4/fseeko.m4
   m4/func.m4
@@ -510,6 +513,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
+  tests/init.sh
   tests/macros.h
   tests/signature.h
   tests/test-alloca-opt.c
@@ -539,6 +543,8 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-unistd.c
   tests/test-vasnprintf.c
   tests/test-vasprintf.c
+  tests/test-verify.c
+  tests/test-verify.sh
   tests/test-vsnprintf.c
   tests/test-wchar.c
   tests/zerosize-ptr.h

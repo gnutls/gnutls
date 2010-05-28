@@ -451,7 +451,7 @@ EXTRA_DIST += test-vasnprintf.c macros.h
 TESTS += test-vc-list-files-git.sh
 TESTS += test-vc-list-files-cvs.sh
 TESTS_ENVIRONMENT += PATH='$(abs_aux_dir)'$(PATH_SEPARATOR)"$$PATH"
-EXTRA_DIST += test-vc-list-files-git.sh test-vc-list-files-cvs.sh
+EXTRA_DIST += test-vc-list-files-git.sh test-vc-list-files-cvs.sh init.sh
 
 ## end   gnulib module vc-list-files-tests
 
@@ -460,6 +460,15 @@ EXTRA_DIST += test-vc-list-files-git.sh test-vc-list-files-cvs.sh
 libtests_a_SOURCES += verify.h
 
 ## end   gnulib module verify
+
+## begin gnulib module verify-tests
+
+TESTS_ENVIRONMENT += MAKE='$(MAKE)'
+TESTS += test-verify test-verify.sh
+check_PROGRAMS += test-verify
+EXTRA_DIST += test-verify.c test-verify.sh init.sh
+
+## end   gnulib module verify-tests
 
 ## begin gnulib module version-etc-tests
 

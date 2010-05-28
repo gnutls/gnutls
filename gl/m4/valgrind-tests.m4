@@ -1,4 +1,4 @@
-# valgrind.m4 serial 3
+# valgrind-tests.m4 serial 1
 dnl Copyright (C) 2008, 2009, 2010 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -6,10 +6,10 @@ dnl with or without modifications, as long as this notice is preserved.
 
 dnl From Simon Josefsson
 
-# sj_VALGRIND()
-# -------------
+# gl_VALGRIND_TESTS()
+# -------------------
 # Check if valgrind is available, and set VALGRIND to it if available.
-AC_DEFUN([sj_VALGRIND],
+AC_DEFUN([gl_VALGRIND_TESTS],
 [
   AC_ARG_ENABLE(valgrind-tests,
     AS_HELP_STRING([--enable-valgrind-tests],

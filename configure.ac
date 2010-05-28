@@ -77,8 +77,6 @@ AC_DEFINE([HAVE_ERRNO_H], 1, [Hard-code for src/cfg/.])
 AC_CHECK_FUNCS(fork,,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
-sj_VALGRIND
-
 AC_CHECK_TYPES(uint,,, [
 # include <sys/types.h>
 ])
