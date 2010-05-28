@@ -1262,32 +1262,38 @@ initial negotiation.  When the extension is used, the attack is
 detected and the session can be terminated.  The extension is
 specified in @xcite{RFC5746}.
 
-GnuTLS supports the safe renegotiation extension.  By default, GnuTLS
-clients will attempt to negotiate the safe renegotiation extension
-when talking to servers.  Also by default, GnuTLS servers will accept
-the extension when presented by clients.  However, by default GnuTLS
-client and servers will not refuse renegotiation attempts when the
-extension has not been negotiated, as this would break backwards
-compatibility and cause too much operational problems.  We will likely
-reconsider these defaults in the future.
+GnuTLS supports the safe renegotiation extension.  The default
+behavior is as follows.  Clients will attempt to negotiate the safe
+renegotiation extension when talking to servers.  Servers will accept
+the extension when presented by clients.  Clients and servers will
+permit an initial handshake to complete even when the other side does
+not support the safe renegotiation extension.  Clients and servers
+will refuse renegotiation attempts when the extension has not been
+negotiated.
 
-To modify the default behaviour, we have introduced four new priority
+Note that permitting clients to connect to servers even when the safe
+renegotiation extension is not negotiated open up for some attacks.
+Changing this default behaviour would prevent interoperability against
+the majority of deployed servers out there.  We will reconsider this
+default behaviour in the future when more servers have been upgraded.
+Note that it is easy to configure clients to always require the safe
+renegotiation extension from servers (see below on the
+%SAFE_RENEGOTIATION priority string).
+
+To modify the default behaviour, we have introduced some new priority
 strings.  The priority strings can be used by applications
 (@pxref{gnutls_priority_set}) and end users (e.g., @code{--priority}
 parameter to @code{gnutls-cli} and @code{gnutls-serv}).
 
-The @code{%UNSAFE_RENEGOTIATION} priority string requests what is
-today the default behaviour, i.e., that handshakes without the safe
-renegotiation extension is permitted.  To make more use of the
-extension, you may provide the @code{%SAFE_RENEGOTIATION} priority
-string.  In this mode, clients will require that the server supports
-the extension for the initial handshake, and servers will require that
-the client supports the extension for renegotiated handshakes.  If you
-want to make a server refuse even initial handshakes without the safe
-renegotiation extension, use the @code{%INITIAL_SAFE_RENEGOTIATION}
-priority string.  It is possible to disable use of the extension
-completely by using the @code{%DISABLE_SAFE_RENEGOTIATION} priority
-string however this is recommended against except for debugging.
+The @code{%UNSAFE_RENEGOTIATION} priority string permits
+(re-)handshakes even when the safe renegotiation extension was not
+negotiated.  The @code{%SAFE_RENEGOTIATION} priority string makes
+client and servers require the extension for every handshake.
+
+It is possible to disable use of the extension completely, in both
+clients and servers, by using the @code{%DISABLE_SAFE_RENEGOTIATION}
+priority string however we strongly recommend you to only do this for
+debugging and test purposes.
 
 For applications we have introduced a new API related to safe
 renegotiation.  The @ref{gnutls_safe_renegotiation_status} function is
