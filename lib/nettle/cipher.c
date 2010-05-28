@@ -49,9 +49,33 @@ static void stream_encrypt (void* ctx, nettle_crypt_func func, unsigned block_si
 	func(ctx, length, dst, src);
 }
 
+struct aes_bidi_ctx
+{
+	struct aes_ctx encrypt;
+	struct aes_ctx decrypt;
+};
+
+void aes_bidi_setkey (struct aes_bidi_ctx* ctx, unsigned length, const uint8_t *key)
+{
+	aes_set_encrypt_key (&ctx->encrypt, length, key);
+	aes_set_decrypt_key (&ctx->decrypt, length, key);
+}
+
+void aes_bidi_encrypt(struct aes_bidi_ctx *ctx,
+	   unsigned length, uint8_t *dst, const uint8_t *src)
+{
+	aes_encrypt(&ctx->encrypt, length, dst, src);
+}
+
+void aes_bidi_decrypt(struct aes_bidi_ctx *ctx,
+	   unsigned length, uint8_t *dst, const uint8_t *src)
+{
+	aes_decrypt(&ctx->decrypt, length, dst, src);
+}
+
 struct nettle_cipher_ctx {
     union {
-		struct aes_ctx aes;
+		struct aes_bidi_ctx aes;
 		struct arcfour_ctx arcfour;
 		struct arctwo_ctx arctwo;
 		struct des3_ctx des3;
@@ -65,7 +89,6 @@ struct nettle_cipher_ctx {
     nettle_crypt_func* i_decrypt;
     encrypt_func encrypt;
     decrypt_func decrypt;
-    setkey_func setkey;
 };
 
 
@@ -89,9 +112,8 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
     case GNUTLS_CIPHER_AES_256_CBC:
 		ctx->encrypt = cbc_encrypt;
 		ctx->decrypt = cbc_decrypt;
-		ctx->i_encrypt = (nettle_crypt_func*)aes_encrypt;
-		ctx->i_decrypt = (nettle_crypt_func*)aes_decrypt;
-		ctx->setkey = (setkey_func)aes_set_key;
+		ctx->i_encrypt = (nettle_crypt_func*)aes_bidi_encrypt;
+		ctx->i_decrypt = (nettle_crypt_func*)aes_bidi_decrypt;
 		ctx->ctx_ptr = &ctx->ctx.aes;
 		ctx->block_size = AES_BLOCK_SIZE;
 		break;
@@ -100,7 +122,6 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
 		ctx->decrypt = cbc_decrypt;
 		ctx->i_encrypt = (nettle_crypt_func*)des3_encrypt;
 		ctx->i_decrypt = (nettle_crypt_func*)des3_decrypt;
-		ctx->setkey = (setkey_func)des3_set_key2;
 		ctx->ctx_ptr = &ctx->ctx.des3;
 		ctx->block_size = DES3_BLOCK_SIZE;
 		break;
@@ -109,7 +130,6 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
 		ctx->decrypt = cbc_decrypt;
 		ctx->i_encrypt = (nettle_crypt_func*)des_encrypt;
 		ctx->i_decrypt = (nettle_crypt_func*)des_decrypt;
-		ctx->setkey = (setkey_func)des_set_key2;
 		ctx->ctx_ptr = &ctx->ctx.des;
 		ctx->block_size = DES_BLOCK_SIZE;
 		break;
@@ -119,7 +139,6 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
 		ctx->decrypt = stream_encrypt;
 		ctx->i_encrypt = (nettle_crypt_func*)arcfour_crypt;
 		ctx->i_decrypt = (nettle_crypt_func*)arcfour_crypt;
-		ctx->setkey = (setkey_func)arcfour_set_key;
 		ctx->ctx_ptr = &ctx->ctx.arcfour;
 		ctx->block_size = 1;
 		break;
@@ -128,7 +147,6 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
 		ctx->decrypt = cbc_decrypt;
 		ctx->i_encrypt = (nettle_crypt_func*)arctwo_encrypt;
 		ctx->i_decrypt = (nettle_crypt_func*)arctwo_decrypt;
-		ctx->setkey = (setkey_func)arctwo_set_key;
 		ctx->ctx_ptr = &ctx->ctx.arctwo;
 		ctx->block_size = ARCTWO_BLOCK_SIZE;
 		break;
@@ -147,8 +165,55 @@ static int
 wrap_nettle_cipher_setkey (void *_ctx, const void *key, size_t keysize)
 {
 	struct nettle_cipher_ctx* ctx = _ctx;
+	opaque des_key[DES3_KEY_SIZE];
 	
-	ctx->setkey(ctx->ctx_ptr, keysize, key);
+    switch (ctx->algo) {
+    case GNUTLS_CIPHER_AES_128_CBC:
+    case GNUTLS_CIPHER_AES_192_CBC:
+    case GNUTLS_CIPHER_AES_256_CBC:
+		aes_bidi_setkey(ctx->ctx_ptr, keysize, key);
+		break;
+    case GNUTLS_CIPHER_3DES_CBC:
+		/* why do we have to deal with parity *@$(*$# */
+		if (keysize != DES3_KEY_SIZE)
+		  {
+		    gnutls_assert();
+		    return GNUTLS_E_INTERNAL_ERROR;
+                  }
+
+		des_fix_parity(keysize, des_key, key);
+
+		/* this fails on weak keys */
+		if (des3_set_key(ctx->ctx_ptr, des_key)!=1) {
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+		break;
+    case GNUTLS_CIPHER_DES_CBC:
+		if (keysize != DES_KEY_SIZE)
+		  {
+		    gnutls_assert();
+		    return GNUTLS_E_INTERNAL_ERROR;
+                  }
+
+		des_fix_parity(keysize, des_key, key);
+
+		if (des_set_key(ctx->ctx_ptr, des_key)!=1) {
+			gnutls_assert();
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+		break;
+    case GNUTLS_CIPHER_ARCFOUR_128:
+    case GNUTLS_CIPHER_ARCFOUR_40:
+		arcfour_set_key(ctx->ctx_ptr, keysize, key);
+		break;
+    case GNUTLS_CIPHER_RC2_40_CBC:
+		arctwo_set_key(ctx->ctx_ptr, keysize, key);
+		break;
+    default:
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
 	
 	return 0;
 }
