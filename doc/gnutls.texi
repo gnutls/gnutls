@@ -1280,6 +1280,7 @@ Note that it is easy to configure clients to always require the safe
 renegotiation extension from servers (see below on the
 %SAFE_RENEGOTIATION priority string).
 
+
 To modify the default behaviour, we have introduced some new priority
 strings.  The priority strings can be used by applications
 (@pxref{gnutls_priority_set}) and end users (e.g., @code{--priority}
@@ -1288,7 +1289,15 @@ parameter to @code{gnutls-cli} and @code{gnutls-serv}).
 The @code{%UNSAFE_RENEGOTIATION} priority string permits
 (re-)handshakes even when the safe renegotiation extension was not
 negotiated.  The @code{%SAFE_RENEGOTIATION} priority string makes
-client and servers require the extension for every handshake.
+client require the extension for every handshake and servers will refuse
+renegotiation without it.
+
+To enforce your clients to upgrade to a version that supports safe
+renegotiation the %INITIAL_SAFE_RENEGOTIATION priority string should be used
+at server side. This will deny any connections unless the client supports
+the extension. This however will prevent all clients that do not support
+the extension from connecting to server, even if they do not use
+renegotiation.
 
 It is possible to disable use of the extension completely, in both
 clients and servers, by using the @code{%DISABLE_SAFE_RENEGOTIATION}
