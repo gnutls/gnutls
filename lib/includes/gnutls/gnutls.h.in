@@ -569,6 +569,8 @@ extern "C"
    * @GNUTLS_SIGN_RSA_SHA1: Digital signature algorithm RSA with SHA-1
    * @GNUTLS_SIGN_RSA_SHA: Same as %GNUTLS_SIGN_RSA_SHA1.
    * @GNUTLS_SIGN_DSA_SHA1: Digital signature algorithm DSA with SHA-1
+   * @GNUTLS_SIGN_DSA_SHA224: Digital signature algorithm DSA with SHA-224
+   * @GNUTLS_SIGN_DSA_SHA256: Digital signature algorithm DSA with SHA-256
    * @GNUTLS_SIGN_DSA_SHA: Same as %GNUTLS_SIGN_DSA_SHA1.
    * @GNUTLS_SIGN_RSA_MD5: Digital signature algorithm RSA with MD5.
    * @GNUTLS_SIGN_RSA_MD2: Digital signature algorithm RSA with MD2.
@@ -593,7 +595,9 @@ extern "C"
     GNUTLS_SIGN_RSA_SHA256 = 6,
     GNUTLS_SIGN_RSA_SHA384 = 7,
     GNUTLS_SIGN_RSA_SHA512 = 8,
-    GNUTLS_SIGN_RSA_SHA224 = 9
+    GNUTLS_SIGN_RSA_SHA224 = 9,
+    GNUTLS_SIGN_DSA_SHA224 = 10,
+    GNUTLS_SIGN_DSA_SHA256 = 11,
   } gnutls_sign_algorithm_t;
 
   const char *gnutls_sign_algorithm_get_name (gnutls_sign_algorithm_t sign);

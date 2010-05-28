@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.11.0 (unreleased)
 
+** libgnutls: Added support for DSA-SHA256 and DSA-SHA224
+
 ** libgnutls: Added PKCS #11 support and an API to access objects in
 gnutls/pkcs11.h. Currently certificates and public keys can be
 imported from tokens, and operations can be performed on private keys.

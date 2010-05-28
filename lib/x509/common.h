@@ -49,6 +49,10 @@
 /* signature OIDs
  */
 #define SIG_DSA_SHA1_OID "1.2.840.10040.4.3"
+/* those two from draft-ietf-pkix-sha2-dsa-ecdsa-06 */
+#define SIG_DSA_SHA224_OID "2.16.840.1.101.3.4.3.1"
+#define SIG_DSA_SHA256_OID "2.16.840.1.101.3.4.3.2"
+
 #define SIG_RSA_MD5_OID "1.2.840.113549.1.1.4"
 #define SIG_RSA_MD2_OID "1.2.840.113549.1.1.2"
 #define SIG_RSA_SHA1_OID "1.2.840.113549.1.1.5"
