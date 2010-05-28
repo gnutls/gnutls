@@ -55,19 +55,19 @@ struct aes_bidi_ctx
 	struct aes_ctx decrypt;
 };
 
-void aes_bidi_setkey (struct aes_bidi_ctx* ctx, unsigned length, const uint8_t *key)
+static void aes_bidi_setkey (struct aes_bidi_ctx* ctx, unsigned length, const uint8_t *key)
 {
 	aes_set_encrypt_key (&ctx->encrypt, length, key);
 	aes_set_decrypt_key (&ctx->decrypt, length, key);
 }
 
-void aes_bidi_encrypt(struct aes_bidi_ctx *ctx,
+static void aes_bidi_encrypt(struct aes_bidi_ctx *ctx,
 	   unsigned length, uint8_t *dst, const uint8_t *src)
 {
 	aes_encrypt(&ctx->encrypt, length, dst, src);
 }
 
-void aes_bidi_decrypt(struct aes_bidi_ctx *ctx,
+static void aes_bidi_decrypt(struct aes_bidi_ctx *ctx,
 	   unsigned length, uint8_t *dst, const uint8_t *src)
 {
 	aes_decrypt(&ctx->decrypt, length, dst, src);
@@ -75,7 +75,7 @@ void aes_bidi_decrypt(struct aes_bidi_ctx *ctx,
 
 struct nettle_cipher_ctx {
     union {
-		struct aes_bidi_ctx aes;
+		struct aes_bidi_ctx aes_bidi;
 		struct arcfour_ctx arcfour;
 		struct arctwo_ctx arctwo;
 		struct des3_ctx des3;
@@ -98,7 +98,7 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
 {
 	struct nettle_cipher_ctx* ctx;
 
-    ctx = gnutls_calloc(1, sizeof(struct nettle_cipher_ctx));
+    ctx = gnutls_calloc(1, sizeof(*ctx));
     if (ctx == NULL) {
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
@@ -114,7 +114,7 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
 		ctx->decrypt = cbc_decrypt;
 		ctx->i_encrypt = (nettle_crypt_func*)aes_bidi_encrypt;
 		ctx->i_decrypt = (nettle_crypt_func*)aes_bidi_decrypt;
-		ctx->ctx_ptr = &ctx->ctx.aes;
+		ctx->ctx_ptr = &ctx->ctx.aes_bidi;
 		ctx->block_size = AES_BLOCK_SIZE;
 		break;
     case GNUTLS_CIPHER_3DES_CBC:
@@ -171,15 +171,14 @@ wrap_nettle_cipher_setkey (void *_ctx, const void *key, size_t keysize)
     case GNUTLS_CIPHER_AES_128_CBC:
     case GNUTLS_CIPHER_AES_192_CBC:
     case GNUTLS_CIPHER_AES_256_CBC:
-		aes_bidi_setkey(ctx->ctx_ptr, keysize, key);
+		aes_bidi_setkey(&ctx->ctx_ptr, keysize, key);
 		break;
     case GNUTLS_CIPHER_3DES_CBC:
 		/* why do we have to deal with parity *@$(*$# */
-		if (keysize != DES3_KEY_SIZE)
-		  {
+		if (keysize != DES3_KEY_SIZE) {
 		    gnutls_assert();
 		    return GNUTLS_E_INTERNAL_ERROR;
-                  }
+		}
 
 		des_fix_parity(keysize, des_key, key);
 
