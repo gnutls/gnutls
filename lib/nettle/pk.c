@@ -92,9 +92,9 @@ _wrap_nettle_pk_encrypt(gnutls_pk_algorithm_t algo,
 			return GNUTLS_E_MPI_SCAN_FAILED;
 		}
 
-		mpz_powm(p, p, TOMPZ(pk_params->params[1]), TOMPZ(pk_params->params[0]));
+		mpz_powm(p, p, TOMPZ(pk_params->params[1])/*e*/, TOMPZ(pk_params->params[0]/*m*/));
 
-		ret = _gnutls_mpi_dprint(p, ciphertext);
+		ret = _gnutls_mpi_dprint_size(p, ciphertext, plaintext->size);
 		_gnutls_mpi_release(&p);
 
 		if (ret < 0) {
