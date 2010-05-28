@@ -107,6 +107,9 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   ]])
     fi
   fi
+  #not other option for now. The released pakchois cannot open an arbitrary PKCS11 module,
+  #and the author is reluctant to add such feature.
+  included_pakchois=yes
   AC_MSG_CHECKING([whether to use the included pakchois])
   AC_MSG_RESULT($included_pakchois)
   AM_CONDITIONAL(ENABLE_LOCAL_PAKCHOIS, test "$included_pakchois" = "yes")
