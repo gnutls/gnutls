@@ -1304,6 +1304,17 @@ clients and servers, by using the @code{%DISABLE_SAFE_RENEGOTIATION}
 priority string however we strongly recommend you to only do this for
 debugging and test purposes.
 
+The default values if the flags above are not specified are:
+@table @code
+
+@item Server:
+%SAFE_RENEGOTIATION
+
+@item Client:
+%UNSAFE_RENEGOTIATION
+
+@end table
+
 For applications we have introduced a new API related to safe
 renegotiation.  The @ref{gnutls_safe_renegotiation_status} function is
 used to check if the extension has been negotiated on a session, and
