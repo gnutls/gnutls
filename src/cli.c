@@ -430,7 +430,7 @@ cert_callback (gnutls_session_t session,
       gnutls_sign_algorithm_t cert_algo, req_algo;
       int i, match = 0;
 
-      if (x509_crt[0] != NULL)
+      if (x509_crt_size > 0)
 	{
 	  ret = gnutls_x509_crt_get_signature_algorithm (x509_crt[0]);
 	  if (ret < 0)
@@ -467,26 +467,23 @@ cert_callback (gnutls_session_t session,
 		("- Could not find a suitable certificate to send to server\n");
 	      return -1;
 	    }
-	}
 
-      if (x509_key != NULL)
-	{
-	  st->key.x509 = x509_key;
-	  st->key_type = GNUTLS_PRIVKEY_X509;
-	}
-      else if (pkcs11_key != NULL)
-	{
-	  st->key.pkcs11 = pkcs11_key;
-	  st->key_type = GNUTLS_PRIVKEY_PKCS11;
-	}
-      else
-	{
-	  printf ("- Could not find a suitable key to send to server\n");
-	  return -1;
-	}
+          if (x509_key != NULL)
+            {
+	      st->key.x509 = x509_key;
+	      st->key_type = GNUTLS_PRIVKEY_X509;
+            }
+          else if (pkcs11_key != NULL)
+            {
+              st->key.pkcs11 = pkcs11_key;
+              st->key_type = GNUTLS_PRIVKEY_PKCS11;
+            }
+          else
+            {
+              printf ("- Could not find a suitable key to send to server\n");
+              return -1;
+            }
 
-      if (x509_crt != NULL)
-	{
 	  st->ncerts = x509_crt_size;
 
 	  st->cert.x509 = x509_crt;
@@ -495,27 +492,29 @@ cert_callback (gnutls_session_t session,
 
 	  return 0;
 	}
+
     }
   else if (st->cert_type == GNUTLS_CRT_OPENPGP)
     {
-      if (pgp_key != NULL)
-	{
-	  st->key.pgp = pgp_key;
-	  st->key_type = GNUTLS_PRIVKEY_OPENPGP;
-	}
-      else if (pkcs11_key != NULL)
-	{
-	  st->key.pkcs11 = pkcs11_key;
-	  st->key_type = GNUTLS_PRIVKEY_PKCS11;
-	}
-      else
-	{
-	  printf ("- Could not find a suitable key to send to server\n");
-	  return -1;
-	}
-
       if (pgp_crt != NULL)
 	{
+
+          if (pgp_key != NULL)
+            {
+              st->key.pgp = pgp_key;
+              st->key_type = GNUTLS_PRIVKEY_OPENPGP;
+            }
+          else if (pkcs11_key != NULL)
+            {
+              st->key.pkcs11 = pkcs11_key;
+              st->key_type = GNUTLS_PRIVKEY_PKCS11;
+            }
+          else
+            {
+              printf ("- Could not find a suitable key to send to server\n");
+              return -1;
+            }
+
 	  st->ncerts = 1;
 
 	  st->cert.pgp = pgp_crt;
