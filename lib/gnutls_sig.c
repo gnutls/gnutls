@@ -203,13 +203,14 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
     case GNUTLS_PK_DSA:
       _gnutls_hash_deinit (&td_sha, concat);
 
-      if (hash_algo != GNUTLS_DIG_SHA1)
+      if (hash_algo != GNUTLS_DIG_SHA1 && hash_algo != GNUTLS_DIG_SHA224 && \
+        hash_algo != hash_algo != GNUTLS_DIG_SHA256)
 	{
 	  gnutls_assert ();
 	  return GNUTLS_E_INTERNAL_ERROR;
 	}
       dconcat.data = concat;
-      dconcat.size = 20;
+      dconcat.size = _gnutls_hash_get_algo_len (hash_algo);
       break;
 
     default:
