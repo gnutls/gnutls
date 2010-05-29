@@ -675,6 +675,7 @@ GNUTLS_2_11
 	gnutls_sec_param_to_pk_bits;
 	gnutls_sec_param_get_name;
 	gnutls_pk_bits_to_sec_param;
+	gnutls_rnd;
 } GNUTLS_2_10;
 
 GNUTLS_PRIVATE {
@@ -703,7 +704,7 @@ GNUTLS_PRIVATE {
     _gnutls_hash;
 
     # Internal symbols needed by psktool:
-    _gnutls_rnd;
+
     # Internal symbols needed by gnutls-cli-debug:
     _gnutls_rsa_pms_set_version;
     _gnutls_record_set_default_version;

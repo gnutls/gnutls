@@ -152,7 +152,7 @@ main (int argc, char **argv)
 
       printf ("Generating a random key for user '%s'\n", info.username);
 
-      ret = _gnutls_rnd (GNUTLS_RND_RANDOM, (char *) key, info.key_size);
+      ret = gnutls_rnd (GNUTLS_RND_RANDOM, (char *) key, info.key_size);
       if (ret < 0)
 	{
 	  fprintf (stderr, "Not enough randomness\n");

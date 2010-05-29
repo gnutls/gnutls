@@ -29,8 +29,7 @@
 #include <string.h>
 #include <errno.h>
 #include <gnutls/gnutls.h>
-
-#include <gcrypt.h>
+#include <gnutls/crypto.h>
 
 #include "utils.h"
 
@@ -54,7 +53,7 @@ client_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
 {
 //  success ("client_pull len %d has %d\n", len, to_client_len);
   unsigned char rnd;
-  gcry_create_nonce (&rnd, 1);
+  gnutls_rnd(GNUTLS_RND_NONCE, &rnd, 1);
 
   if (handshake == 0 && rnd % 2 == 0)
     {
@@ -104,7 +103,7 @@ server_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
   //success ("server_pull len %d has %d\n", len, to_server_len);
   unsigned char rnd;
 
-  gcry_create_nonce (&rnd, 1);
+  gnutls_rnd (GNUTLS_RND_NONCE, &rnd, 1);
   if (handshake == 0 && rnd % 2 == 0)
     {
       gnutls_transport_set_global_errno (EAGAIN);
@@ -133,7 +132,7 @@ server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
   size_t newlen = to_client_len + len;
 
   //success ("server_push len %d has %d\n", len, to_client_len);
-  gcry_create_nonce (&rnd, 1);
+  gnutls_rnd (GNUTLS_RND_NONCE, &rnd, 1);
   if (handshake == 0 && rnd % 2 == 0)
     {
       gnutls_transport_set_global_errno (EAGAIN);

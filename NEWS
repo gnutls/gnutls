@@ -43,6 +43,7 @@ pkcs11:token=Root%20CA%20Certificates;serial=1%3AROOTS%3ADEFAULT;model=1%2E0;man
 gnutls_certificate_set_server_retrieve_function: DEPRECATED
 gnutls_certificate_set_client_retrieve_function: DEPRECATED
 gnutls_sign_callback_set: DEPRECATED
+gnutls_rnd: ADDED
 gnutls_sec_param_to_pk_bits: ADDED
 gnutls_pk_bits_to_sec_param: ADDED
 gnutls_sec_param_get_name: ADDED

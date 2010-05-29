@@ -112,6 +112,9 @@ typedef enum gnutls_rnd_level
   GNUTLS_RND_KEY = 2
 } gnutls_rnd_level_t;
 
+int gnutls_rnd (gnutls_rnd_level_t level, void *data, size_t len);
+
+
 /**
  * gnutls_pk_flag_t:
  * @GNUTLS_PK_FLAG_NONE: No flag.

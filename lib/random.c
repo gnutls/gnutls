@@ -57,8 +57,20 @@ _gnutls_rnd_deinit (void)
   return;
 }
 
-int
-_gnutls_rnd (int level, void *data, size_t len)
+/**
+ * gnutls_rnd:
+ * @level: a security level
+ * @data: place to store random bytes
+ * @len: The requested size
+ *
+ * This function will generate random data and store it
+ * to output buffer.
+ *
+ * Returns: Zero or a negative value on error.
+ *
+ **/
+
+int gnutls_rnd (gnutls_rnd_level_t level, void *data, size_t len)
 {
   if (len > 0)
     {

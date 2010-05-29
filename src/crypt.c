@@ -477,7 +477,7 @@ _srp_crypt (const char *username, const char *passwd, int salt_size,
 
   /* generate the salt
    */
-  if (_gnutls_rnd (GNUTLS_RND_NONCE, salt, salt_size) < 0)
+  if (gnutls_rnd (GNUTLS_RND_NONCE, salt, salt_size) < 0)
     {
       fprintf (stderr, "Could not create nonce\n");
       return NULL;

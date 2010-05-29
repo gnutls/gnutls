@@ -30,7 +30,8 @@
 extern int crypto_rnd_prio;
 extern gnutls_crypto_rnd_st _gnutls_rnd_ops;
 
-int _gnutls_rnd (int level, void *data, size_t len);
+int _gnutls_rnd (gnutls_rnd_level_t level, void *data, size_t len);
+#define _gnutls_rnd gnutls_rnd
 void _gnutls_rnd_deinit (void);
 int _gnutls_rnd_init (void);
 
