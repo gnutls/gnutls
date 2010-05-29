@@ -65,6 +65,12 @@ static char ca_pem[] =
   "PfqUpIhz5Bbm7J4=\n" "-----END CERTIFICATE-----\n";
 const gnutls_datum_t ca_dat = { ca_pem, sizeof (ca_pem) };
 
+static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "|<%d>| %s", level, str);
+}
+
 void
 doit (void)
 {
@@ -82,6 +88,11 @@ doit (void)
   ret = gnutls_global_init ();
   if (ret < 0)
     error (EXIT_FAILURE, 0, "gnutls_global_init %d", ret);
+
+  gnutls_global_init ();
+  gnutls_global_set_log_function (tls_log_func);
+  if (debug)
+    gnutls_global_set_log_level (4711);
 
   /* Read certs. */
   ret = gnutls_x509_crt_init (&client);
@@ -140,7 +151,7 @@ doit (void)
 				       i == 0 ? GNUTLS_PKCS8_USE_PKCS12_3DES
 				       : GNUTLS_PKCS_USE_PKCS12_RC2_40);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "bag_encrypt: %d", ret);
+	error (EXIT_FAILURE, 0, "bag_encrypt: %d: %s", ret, i==0?"3DES":"RC2-40");
 
       ret = gnutls_pkcs12_set_bag (pkcs12, bag);
       if (ret < 0)
