@@ -338,6 +338,7 @@ static int wrap_nettle_prime_check(bigint_t pp)
 /* generate a prime of the form p=2qw+1
  * The algorithm is simple but probably it has to be modified to gcrypt's
  * since it is really really slow. Nature did not want 2qw+1 to be prime.
+ * The generator will be the generator of a subgroup of order q-1.
  */
 inline static int gen_group (mpz_t *prime, mpz_t* generator, unsigned int nbits)
 {
@@ -442,7 +443,7 @@ inline static int gen_group (mpz_t *prime, mpz_t* generator, unsigned int nbits)
 	
 	/* c = r^((p-1)/q), r == random
 	 * c = r^(2w)
-	 * if c!=1 c is the generator for the group of the prime
+	 * if c!=1 c is the generator for the subgroup of order q-1
 	 * 
 	 * (here we reuse q as r)
 	 */
