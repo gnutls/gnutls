@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
+#include <certtool-common.h>
 
 /* Generates Diffie-Hellman parameters (a prime and a generator
  * of the group). Exports them in PKCS #3 format. Used by certtool.
@@ -35,22 +36,19 @@
 
 extern FILE *outfile;
 extern FILE *infile;
-extern unsigned char buffer[];
-extern const int buffer_size;
 
 static int cparams = 0;
-
-int generate_prime (int bits, int how);
 
 /* If how is zero then the included parameters are used.
  */
 int
-generate_prime (int bits, int how)
+generate_prime (int how)
 {
   unsigned int i;
   int ret;
   gnutls_dh_params_t dh_params;
   gnutls_datum_t p, g;
+  int bits = get_bits(GNUTLS_PK_DSA);
 
   gnutls_dh_params_init (&dh_params);
 

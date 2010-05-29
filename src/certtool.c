@@ -52,7 +52,6 @@
 #include "certtool-common.h"
 
 static void print_crl_info (gnutls_x509_crl_t crl, FILE * out);
-int generate_prime (int bits, int how);
 void pkcs7_info (void);
 void crq_info (void);
 void smime_to_pkcs7 (void);
@@ -192,12 +191,33 @@ static gnutls_sec_param_t str_to_sec_param(const char* str)
 
 }
 
+int get_bits(gnutls_pk_algorithm_t key_type)
+{
+int bits;
+
+  if (info.bits != 0)
+    {
+      fprintf(stderr, "** Note: Please use the --sec-param instead of --bits\n");
+      bits = info.bits;
+    }
+  else
+    {
+      if (info.sec_param)
+        {
+          bits = gnutls_sec_param_to_pk_bits(key_type, str_to_sec_param(info.sec_param));
+        }
+      else bits = gnutls_sec_param_to_pk_bits(key_type, GNUTLS_SEC_PARAM_NORMAL);
+    }
+
+  return bits;
+}
+
 
 static gnutls_x509_privkey_t
 generate_private_key_int (void)
 {
   gnutls_x509_privkey_t key;
-  int ret, key_type;
+  int ret, key_type, bits;
 
   if (info.dsa)
     {
@@ -210,18 +230,7 @@ generate_private_key_int (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
 
-  if (info.bits != 0)
-    {
-      fprintf(stderr, "** Note: Please use the --sec-param instead of --bits\n");
-    }
-  else
-    {
-      if (info.sec_param)
-        {
-          info.bits = gnutls_sec_param_to_pk_bits(key_type, str_to_sec_param(info.sec_param));
-        }
-      else info.bits = gnutls_sec_param_to_pk_bits(key_type, GNUTLS_SEC_PARAM_NORMAL);
-    }
+  bits = get_bits(key_type);
 
   fprintf (stderr, "Generating a %d bit %s private key...\n", info.bits,
 	   gnutls_pk_algorithm_get_name (key_type));
@@ -1027,10 +1036,10 @@ gaa_parser (int argc, char **argv)
       pkcs12_info ();
       break;
     case ACTION_GENERATE_DH:
-      generate_prime (info.bits, 1);
+      generate_prime (1);
       break;
     case ACTION_GET_DH:
-      generate_prime (info.bits, 0);
+      generate_prime (0);
       break;
     case ACTION_CRL_INFO:
       crl_info ();

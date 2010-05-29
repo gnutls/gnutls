@@ -61,3 +61,10 @@ gnutls_x509_privkey_t load_ca_private_key (void);
 gnutls_x509_crt_t load_ca_cert (void);
 gnutls_x509_crt_t load_cert (int mand);
 gnutls_pubkey_t load_pubkey (int mand);
+
+/* returns the bits specified in cmd */
+int get_bits(gnutls_pk_algorithm_t);
+
+/* prime.c */
+int generate_prime (int how);
+
