@@ -25,3 +25,4 @@
 
 const char *_gnutls_packet2str (content_type_t packet);
 const char *_gnutls_handshake2str (gnutls_handshake_description_t handshake);
+void _gnutls_dump_mpi(const char* prefix, bigint_t a);
