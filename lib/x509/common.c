@@ -46,6 +46,7 @@ struct oid2string
 
 /* This list contains all the OIDs that may be
  * contained in a rdnSequence and are printable.
+ * This must also be defined in pkix.asn.
  */
 static const struct oid2string _oid2str[] = {
   /* PKIX
@@ -75,9 +76,16 @@ static const struct oid2string _oid2str[] = {
   {"2.5.4.46", "dnQualifier", 0, 1},
   {"2.5.4.17", "postalCode", 1, 1},
   {"2.5.4.41", "Name", 1, 1},
+  {"2.5.4.15", "businessCategory", 1, 1},
 
   {"0.9.2342.19200300.100.1.25", "DC", 0, 1},
   {"0.9.2342.19200300.100.1.1", "UID", 1, 1},
+
+  /* Extended validation
+   */
+  {"1.3.6.1.4.1.311.60.2.1.1", "jurisdictionOfIncorporationLocalityName", 1, 1},
+  {"1.3.6.1.4.1.311.60.2.1.2", "jurisdictionOfIncorporationStateOrProvinceName", 1, 1},
+  {"1.3.6.1.4.1.311.60.2.1.3", "jurisdictionOfIncorporationCountryName", 0, 1},
 
   /* PKCS #9
    */

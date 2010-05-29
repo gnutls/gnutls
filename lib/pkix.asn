@@ -190,6 +190,7 @@ X520CommonName  ::=      DirectoryString
 id-at-localityName      AttributeType   ::=     {id-at 7}
 X520LocalityName ::= DirectoryString
 
+
 id-at-stateOrProvinceName       AttributeType   ::=     {id-at 8}
 X520StateOrProvinceName         ::= DirectoryString
 
@@ -205,6 +206,9 @@ X520Title ::=   DirectoryString
 id-at-description     AttributeType   ::=     {id-at 13}
 X520Description ::=   DirectoryString
 
+id-at-businessCategory AttributeType ::=     {id-at 15}
+businessCategory ::= DirectoryString
+
 id-at-dnQualifier       AttributeType   ::=     {id-at 46}
 X520dnQualifier ::=     PrintableString
 
@@ -219,6 +223,15 @@ X520telephoneNumber ::=     PrintableString
 
 id-at-facsimileTelephoneNumber       AttributeType   ::=     {id-at 23}
 X520facsimileTelephoneNumber ::=     PrintableString
+
+id-at-jurisdictionOfIncorporationLocalityName      AttributeType   ::=     {1 3 6 1 4 1 311 60 2 1 1}
+EV_jurisdictionOfIncorporationLocalityName ::= X520LocalityName
+
+id-at-jurisdictionOfIncorporationStateOrProvinceName      AttributeType   ::=     {1 3 6 1 4 1 311 60 2 1 2}
+EV_jurisdictionOfIncorporationStateOrProvinceName ::= X520StateOrProvinceName
+
+id-at-jurisdictionOfIncorporationCountryName      AttributeType   ::=     {1 3 6 1 4 1 311 60 2 1 3}
+EV_jurisdictionOfIncorporationCountryName ::= X520countryName
 
 id-at-pseudonym         AttributeType   ::=     {id-at 65}
 X520pseudonym ::=       DirectoryString
@@ -666,5 +679,6 @@ ProxyPolicy ::= SEQUENCE {
 id-on-xmppAddr  OBJECT IDENTIFIER ::= { id-pkix 8 5 }
 
 XmppAddr ::= UTF8String
+
 
 END
