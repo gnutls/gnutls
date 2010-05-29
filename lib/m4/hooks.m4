@@ -45,7 +45,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
       nettle=no)
     if test "$nettle" = "yes"; then
     AC_LIB_HAVE_LINKFLAGS([nettle],, [#include <nettle/aes.h>],
-                          [aes_set_key (0, 0, 0)])
+                          [aes_set_encrypt_key (0, 0, 0)])
     if test "$ac_cv_libnettle" != yes; then
       nettle=yes
       AC_MSG_WARN([[

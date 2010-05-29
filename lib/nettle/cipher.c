@@ -171,7 +171,7 @@ wrap_nettle_cipher_setkey (void *_ctx, const void *key, size_t keysize)
     case GNUTLS_CIPHER_AES_128_CBC:
     case GNUTLS_CIPHER_AES_192_CBC:
     case GNUTLS_CIPHER_AES_256_CBC:
-		aes_bidi_setkey(&ctx->ctx_ptr, keysize, key);
+		aes_bidi_setkey(ctx->ctx_ptr, keysize, key);
 		break;
     case GNUTLS_CIPHER_3DES_CBC:
 		/* why do we have to deal with parity *@$(*$# */
