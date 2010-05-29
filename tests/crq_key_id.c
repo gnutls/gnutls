@@ -59,8 +59,6 @@ doit (void)
   if (ret < 0)
     fail ("gnutls_global_init: %d\n", ret);
 
-  gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
-
   gnutls_global_set_log_function (tls_log_func);
   if (debug)
     gnutls_global_set_log_level (4711);

@@ -266,7 +266,6 @@ main (void)
   int ret;
 
   gnutls_global_init ();
-  gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
 
   for (i = 0; i < sizeof (keys) / sizeof (keys[0]); i++)
     {
