@@ -121,7 +121,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
 
 	module_path="${libdir}:${libdir}/pkcs11"
 
-	CPPFLAGS="$CPPFLAGS -DPAKCHOIS_MODPATH=\\\"${module_path}\\\""
+	CPPFLAGS="$CPPFLAGS -DPAKCHOIS_MODPATH=\"\""
   fi
 
   AC_ARG_WITH(lzo,
