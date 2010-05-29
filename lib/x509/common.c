@@ -94,6 +94,12 @@ static const struct oid2string _oid2str[] = {
 
   /* friendly name */
   {"1.2.840.113549.1.9.20", NULL, 0, 1, "PKIX1.BMPString"},
+  /* local key id */
+  {"1.2.840.113549.1.9.21", NULL, 0, 1, "PKIX1.pkcs-9-localKeyId"},
+
+  /* rfc3920 section 5.1.1 */
+  {"1.3.6.1.5.5.7.8.5", "XmppAddr", 0, 1, "PKIX1.UTF8String"},
+
   {NULL, NULL, 0, 0, ""}
 };
 

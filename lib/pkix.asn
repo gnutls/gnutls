@@ -413,12 +413,7 @@ pkcs-9-challengePassword        ::= CHOICE {
       printableString       PrintableString,
       utf8String            UTF8String }
 
-pkcs-9-at-localKeyId OBJECT IDENTIFIER ::= {iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) 9 21}
-
 pkcs-9-localKeyId ::= OCTET STRING
-
-pkcs-9-at-friendlyName             OBJECT IDENTIFIER ::= {iso(1) member-body(2) us(840) rsadsi(113549) pkcs(1) 9 20}
-pkcs-9-friendlyName ::= BMPString      (SIZE (1..255))
 
 -- PKCS #8 stuff
 
@@ -567,12 +562,5 @@ ProxyCertInfo ::= SEQUENCE {
 ProxyPolicy ::= SEQUENCE {
   policyLanguage   OBJECT IDENTIFIER,
   policy           OCTET STRING OPTIONAL }
-
--- rfc3920 section 5.1.1
-
-id-on-xmppAddr  OBJECT IDENTIFIER ::= { id-pkix 8 5 }
-
-XmppAddr ::= UTF8String
-
 
 END
