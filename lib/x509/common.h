@@ -74,6 +74,8 @@ int _gnutls_x509_oid_data2string (const char *OID, void *value,
 int _gnutls_x509_data2hex (const opaque * data, size_t data_size,
 			   opaque * out, size_t * sizeof_out);
 
+const char * _gnutls_x509_oid2asn_string (const char *oid);
+
 const char *_gnutls_x509_oid2ldap_string (const char *OID);
 
 int _gnutls_x509_oid_data_choice (const char *OID);

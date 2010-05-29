@@ -655,7 +655,7 @@ _gnutls_x509_encode_and_write_attribute (const char *given_oid,
 
   /* Find how to encode the data.
    */
-  val_name = asn1_find_structure_from_oid (_gnutls_get_pkix (), given_oid);
+  val_name = _gnutls_x509_oid2asn_string(given_oid);
   if (val_name == NULL)
     {
       gnutls_assert ();
@@ -663,10 +663,7 @@ _gnutls_x509_encode_and_write_attribute (const char *given_oid,
       return GNUTLS_E_X509_UNSUPPORTED_OID;
     }
 
-  _gnutls_str_cpy (tmp, sizeof (tmp), "PKIX1.");
-  _gnutls_str_cat (tmp, sizeof (tmp), val_name);
-
-  result = asn1_create_element (_gnutls_get_pkix (), tmp, &c2);
+  result = asn1_create_element (_gnutls_get_pkix (), val_name, &c2);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();

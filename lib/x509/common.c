@@ -42,59 +42,59 @@ struct oid2string
   const char *ldap_desc;
   int choice;			/* of type DirectoryString */
   int printable;
+  const char* asn_desc; /* description in the pkix file */
 };
 
 /* This list contains all the OIDs that may be
  * contained in a rdnSequence and are printable.
- * This must also be defined in pkix.asn.
  */
 static const struct oid2string _oid2str[] = {
   /* PKIX
    */
-  {"1.3.6.1.5.5.7.9.1", "dateOfBirth", 0, 1},
-  {"1.3.6.1.5.5.7.9.2", "placeOfBirth", 0, 1},
-  {"1.3.6.1.5.5.7.9.3", "gender", 0, 1},
-  {"1.3.6.1.5.5.7.9.4", "countryOfCitizenship", 0, 1},
-  {"1.3.6.1.5.5.7.9.5", "countryOfResidence", 0, 1},
+  {"1.3.6.1.5.5.7.9.1", "dateOfBirth", 0, 1, "PKIX1.GeneralizedTime"},
+  {"1.3.6.1.5.5.7.9.2", "placeOfBirth", 0, 1, "PKIX1.DirectoryString"},
+  {"1.3.6.1.5.5.7.9.3", "gender", 0, 1, "PKIX1.PrintableString"},
+  {"1.3.6.1.5.5.7.9.4", "countryOfCitizenship", 0, 1, "PKIX1.PrintableString"},
+  {"1.3.6.1.5.5.7.9.5", "countryOfResidence", 0, 1, "PKIX1.PrintableString"},
 
-  {"2.5.4.6", "C", 0, 1},
-  {"2.5.4.9", "STREET", 1, 1},
-  {"2.5.4.12", "T", 1, 1},
-  {"2.5.4.10", "O", 1, 1},
-  {"2.5.4.11", "OU", 1, 1},
-  {"2.5.4.3", "CN", 1, 1},
-  {"2.5.4.7", "L", 1, 1},
-  {"2.5.4.8", "ST", 1, 1},
+  {"2.5.4.6", "C", 0, 1, "PKIX1.PrintableString"},
+  {"2.5.4.9", "STREET", 1, 1, "PKIX1.DirectoryString"},
+  {"2.5.4.12", "T", 1, 1, "PKIX1.DirectoryString"},
+  {"2.5.4.10", "O", 1, 1, "PKIX1.DirectoryString"},
+  {"2.5.4.11", "OU", 1, 1, "PKIX1.DirectoryString"},
+  {"2.5.4.3", "CN", 1, 1, "PKIX1.DirectoryString"},
+  {"2.5.4.7", "L", 1, 1, "PKIX1.DirectoryString"},
+  {"2.5.4.8", "ST", 1, 1, "PKIX1.DirectoryString"},
 
-  {"2.5.4.5", "serialNumber", 0, 1},
-  {"2.5.4.20", "telephoneNumber", 0, 1},
-  {"2.5.4.4", "surName", 1, 1},
-  {"2.5.4.43", "initials", 1, 1},
-  {"2.5.4.44", "generationQualifier", 1, 1},
-  {"2.5.4.42", "givenName", 1, 1},
-  {"2.5.4.65", "pseudonym", 1, 1},
-  {"2.5.4.46", "dnQualifier", 0, 1},
-  {"2.5.4.17", "postalCode", 1, 1},
-  {"2.5.4.41", "Name", 1, 1},
-  {"2.5.4.15", "businessCategory", 1, 1},
+  {"2.5.4.5", "serialNumber", 0, 1, "PKIX1.PrintableString"},
+  {"2.5.4.20", "telephoneNumber", 0, 1, "PKIX1.PrintableString"},
+  {"2.5.4.4", "surName", 1, 1, "PKIX1.DirectoryString"},
+  {"2.5.4.43", "initials", 1, 1, "PKIX1.DirectoryString"},
+  {"2.5.4.44", "generationQualifier", 1, 1, "PKIX1.DirectoryString"},
+  {"2.5.4.42", "givenName", 1, 1, "PKIX1.DirectoryString"},
+  {"2.5.4.65", "pseudonym", 1, 1, "PKIX1.DirectoryString"},
+  {"2.5.4.46", "dnQualifier", 0, 1, "PKIX1.PrintableString"},
+  {"2.5.4.17", "postalCode", 1, 1, "PKIX1.DirectoryString"},
+  {"2.5.4.41", "Name", 1, 1, "PKIX1.DirectoryString"},
+  {"2.5.4.15", "businessCategory", 1, 1, "PKIX1.DirectoryString"},
 
-  {"0.9.2342.19200300.100.1.25", "DC", 0, 1},
-  {"0.9.2342.19200300.100.1.1", "UID", 1, 1},
+  {"0.9.2342.19200300.100.1.25", "DC", 0, 1, "PKIX1.IA5String"},
+  {"0.9.2342.19200300.100.1.1", "UID", 1, 1, "PKIX1.DirectoryString"},
 
   /* Extended validation
    */
-  {"1.3.6.1.4.1.311.60.2.1.1", "jurisdictionOfIncorporationLocalityName", 1, 1},
-  {"1.3.6.1.4.1.311.60.2.1.2", "jurisdictionOfIncorporationStateOrProvinceName", 1, 1},
-  {"1.3.6.1.4.1.311.60.2.1.3", "jurisdictionOfIncorporationCountryName", 0, 1},
+  {"1.3.6.1.4.1.311.60.2.1.1", "jurisdictionOfIncorporationLocalityName", 1, 1, "PKIX1.DirectoryString"},
+  {"1.3.6.1.4.1.311.60.2.1.2", "jurisdictionOfIncorporationStateOrProvinceName", 1, 1, "PKIX1.DirectoryString"},
+  {"1.3.6.1.4.1.311.60.2.1.3", "jurisdictionOfIncorporationCountryName", 0, 1, "PKIX1.PrintableString"},
 
   /* PKCS #9
    */
-  {"1.2.840.113549.1.9.1", "EMAIL", 0, 1},
-  {"1.2.840.113549.1.9.7", NULL, 1, 1},
+  {"1.2.840.113549.1.9.1", "EMAIL", 0, 1, "PKIX1.IA5String"},
+  {"1.2.840.113549.1.9.7", NULL, 1, 1, "PKIX1.pkcs-9-challengePassword"},
 
   /* friendly name */
-  {"1.2.840.113549.1.9.20", NULL, 0, 1},
-  {NULL, NULL, 0, 0}
+  {"1.2.840.113549.1.9.20", NULL, 0, 1, "PKIX1.BMPString"},
+  {NULL, NULL, 0, 0, ""}
 };
 
 /* Returns 1 if the data defined by the OID are printable.
@@ -180,6 +180,23 @@ _gnutls_x509_oid2ldap_string (const char *oid)
   return NULL;
 }
 
+const char *
+_gnutls_x509_oid2asn_string (const char *oid)
+{
+  int i = 0;
+
+  do
+    {
+      if (strcmp (_oid2str[i].oid, oid) == 0)
+	return _oid2str[i].asn_desc;
+      i++;
+    }
+  while (_oid2str[i].oid != NULL);
+
+  return NULL;
+}
+
+
 /* This function will convert an attribute value, specified by the OID,
  * to a string. The result will be a null terminated string.
  *
@@ -208,7 +225,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  ANAME = asn1_find_structure_from_oid (_gnutls_get_pkix (), oid);
+  ANAME = _gnutls_x509_oid2asn_string(oid);
   CHOICE = _gnutls_x509_oid_data_choice (oid);
 
   if (ANAME == NULL)
@@ -217,11 +234,8 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  _gnutls_str_cpy (str, sizeof (str), "PKIX1.");
-  _gnutls_str_cat (str, sizeof (str), ANAME);
-
   if ((result =
-       asn1_create_element (_gnutls_get_pkix (), str,
+       asn1_create_element (_gnutls_get_pkix (), ANAME,
 			    &tmpasn)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
