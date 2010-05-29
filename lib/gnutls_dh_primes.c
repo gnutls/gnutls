@@ -50,9 +50,6 @@ _gnutls_dh_params_to_mpi (gnutls_dh_params_t dh_primes)
 }
 
 
-/* Replaces the prime in the static DH parameters, with a randomly
- * generated one.
- */
 /**
  * gnutls_dh_params_import_raw:
  * @dh_params: Is a structure that will hold the prime numbers
@@ -178,7 +175,8 @@ gnutls_dh_params_cpy (gnutls_dh_params_t dst, gnutls_dh_params_t src)
  * gnutls_malloc() and will be stored in the appropriate datum.
  * This function is normally slow.
  *
- * Note that the bits value should be one of 768, 1024, 2048, 3072 or 4096.
+ * Do not set the number of bits directly, use gnutls_sec_param_to_pk_bits() to
+ * get bits for %GNUTLS_PK_DSA.
  * Also note that the DH parameters are only useful to servers.
  * Since clients use the parameters sent by the server, it's of
  * no use to call this in client side.
