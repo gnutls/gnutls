@@ -146,7 +146,8 @@ print_dsa_pkey (gnutls_datum_t * x, gnutls_datum_t * y, gnutls_datum_t * p,
 
 static void
 print_rsa_pkey (gnutls_datum_t * m, gnutls_datum_t * e, gnutls_datum_t * d,
-		gnutls_datum_t * p, gnutls_datum_t * q, gnutls_datum_t * u)
+		gnutls_datum_t * p, gnutls_datum_t * q, gnutls_datum_t * u,
+		gnutls_datum_t * exp1, gnutls_datum_t *exp2)
 {
   fprintf (outfile, "modulus:");
   print_hex_datum (m);
@@ -162,6 +163,13 @@ print_rsa_pkey (gnutls_datum_t * m, gnutls_datum_t * e, gnutls_datum_t * d,
       print_hex_datum (q);
       fprintf (outfile, "coefficient:");
       print_hex_datum (u);
+      if (exp1 && exp2)
+        {
+          fprintf (outfile, "exp1:");
+          print_hex_datum (exp1);
+          fprintf (outfile, "exp2:");
+          print_hex_datum (exp2);
+        }
     }
 }
 
@@ -1293,7 +1301,7 @@ pgp_privkey_info (void)
 	    fprintf (stderr, "Error in key RSA data export: %s\n",
 		     gnutls_strerror (ret));
 	  else
-	    print_rsa_pkey (&m, &e, &d, &p, &q, &u);
+	    print_rsa_pkey (&m, &e, &d, &p, &q, &u, NULL, NULL);
 
 	}
       else if (ret == GNUTLS_PK_DSA)
@@ -1605,21 +1613,23 @@ privkey_info (void)
    */
   if (ret == GNUTLS_PK_RSA)
     {
-      gnutls_datum_t m, e, d, p, q, u;
+      gnutls_datum_t m, e, d, p, q, u, exp1, exp2;
 
-      ret = gnutls_x509_privkey_export_rsa_raw (key, &m, &e, &d, &p, &q, &u);
+      ret = gnutls_x509_privkey_export_rsa_raw2 (key, &m, &e, &d, &p, &q, &u, &exp1, &exp2);
       if (ret < 0)
 	fprintf (stderr, "Error in key RSA data export: %s\n",
 		 gnutls_strerror (ret));
       else
 	{
-	  print_rsa_pkey (&m, &e, &d, &p, &q, &u);
+	  print_rsa_pkey (&m, &e, &d, &p, &q, &u, &exp1, &exp2);
 	  gnutls_free (m.data);
 	  gnutls_free (e.data);
 	  gnutls_free (d.data);
 	  gnutls_free (p.data);
 	  gnutls_free (q.data);
 	  gnutls_free (u.data);
+	  gnutls_free (exp1.data);
+	  gnutls_free (exp2.data);
 	}
     }
   else if (ret == GNUTLS_PK_DSA)
@@ -3169,7 +3179,7 @@ void pubkey_info (void)
 		 gnutls_strerror (ret));
       else
 	{
-	  print_rsa_pkey (&m, &e, NULL, NULL, NULL, NULL);
+	  print_rsa_pkey (&m, &e, NULL, NULL, NULL, NULL, NULL, NULL);
 	  gnutls_free (m.data);
 	  gnutls_free (e.data);
 	}

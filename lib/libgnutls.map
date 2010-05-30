@@ -671,6 +671,7 @@ GNUTLS_2_11
 	gnutls_pkcs11_copy_x509_crt;
 	gnutls_pkcs11_copy_x509_privkey;
 	gnutls_pkcs11_delete_url;
+	gnutls_x509_privkey_export_rsa_raw2;
 
 	gnutls_sec_param_to_pk_bits;
 	gnutls_sec_param_get_name;
