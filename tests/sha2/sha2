@@ -20,7 +20,7 @@
 # along with GnuTLS; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-set -e
+#set -e
 
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
@@ -28,40 +28,59 @@ CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 echo ca > template
 echo cn = "SHA 512 CA" >> template
 
-$CERTTOOL --generate-self-signed --template template \
+$CERTTOOL -d 2 --generate-self-signed --template template \
     --load-privkey $srcdir/key-ca.pem \
     --outfile new-ca.pem \
-    --hash sha512 >/dev/null 2>&1
+    --hash sha512 >out 2>&1
+
+if [ $? != 0 ];then
+	cat out
+	exit 1
+fi
 
 echo ca > template
 echo cn = "SHA 384 sub-CA" >> template
 
-$CERTTOOL --generate-certificate --template template \
+$CERTTOOL -d 2 --generate-certificate --template template \
     --load-ca-privkey $srcdir/key-ca.pem \
     --load-ca-certificate new-ca.pem \
     --load-privkey $srcdir/key-subca.pem \
     --outfile new-subca.pem \
-    --hash sha384 >/dev/null 2>&1
+    --hash sha384 >out 2>&1
+
+if [ $? != 0 ];then
+	cat out
+	exit 1
+fi
 
 echo ca > template
 echo cn = "SHA 256 sub-sub-CA" >> template
 
-$CERTTOOL --generate-certificate --template template \
+$CERTTOOL -d 2 --generate-certificate --template template \
     --load-ca-privkey $srcdir/key-subca.pem \
     --load-ca-certificate new-subca.pem \
     --load-privkey $srcdir/key-subsubca.pem \
     --outfile new-subsubca.pem \
-    --hash sha256 >/dev/null 2>&1
+    --hash sha256 >out 2>&1
+
+if [ $? != 0 ];then
+	cat out
+	exit 1
+fi
 
 echo ca > template
 echo cn = "End-user" >> template
 
-$CERTTOOL --generate-certificate --template template \
+$CERTTOOL -d 2 --generate-certificate --template template \
     --load-ca-privkey $srcdir/key-subsubca.pem \
     --load-ca-certificate new-subsubca.pem \
     --load-privkey $srcdir/key-user.pem \
-    --outfile new-user.pem >/dev/null 2>&1
+    --outfile new-user.pem >out 2>&1
 
+if [ $? != 0 ];then
+	cat out
+	exit 1
+fi
 
 num=`cat new-user.pem new-subsubca.pem new-subca.pem new-ca.pem | $CERTTOOL --verify-chain | tee verify | grep -c Verified`
 #cat verify
