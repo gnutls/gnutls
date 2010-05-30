@@ -30,9 +30,10 @@ for p12 in 'client.p12 foobar' noclient.p12 unclient.p12 pkcs12_2certs.p12; do
     file=$1
     passwd=$2
     $CERTTOOL --p12-info --inder --password "$passwd" \
-		--infile $srcdir/$file | tee out
+		--infile $srcdir/$file > out 2>&1
     rc=$?
     if test $rc != 0; then
+	cat out
 	echo "NEON PKCS12 FATAL $p12"
 	ret=1
     else
