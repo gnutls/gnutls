@@ -30,6 +30,9 @@
 #include <random.h>
 #ifndef HAVE_LIBNETTLE
 #include <gcrypt.h>
+
+#define GNUTLS_MIN_LIBGCRYPT_VERSION "1.2.4"
+
 #endif
 #include <gnutls/pkcs11.h>
 
@@ -40,7 +43,6 @@
 #include "gettext.h"
 
 /* Minimum library versions we accept. */
-#define GNUTLS_MIN_LIBGCRYPT_VERSION "1.2.4"
 #define GNUTLS_MIN_LIBTASN1_VERSION "0.3.4"
 
 /* created by asn1c */
