@@ -875,6 +875,10 @@ gnutls_digest_algorithm_t _gnutls_dsa_q_to_hash(bigint_t q)
   }
 }
 
+/* This will return the appropriate hash to verify the given signature.
+ * If signature is NULL it will return an (or the) appropriate hash for
+ * the given parameters.
+ */
 int
 _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
 			       const gnutls_datum_t * signature,
@@ -896,6 +900,9 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
       ret = 0;
       break;
     case GNUTLS_PK_RSA:
+      if (signature == NULL) /* return a sensible algorithm */
+        return GNUTLS_DIG_SHA256;
+
       ret =
 	_gnutls_pkcs1_rsa_decrypt (&decrypted, signature,
 				   issuer_params, issuer_params_size, 1);

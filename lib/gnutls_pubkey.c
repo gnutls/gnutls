@@ -184,6 +184,40 @@ int gnutls_pubkey_import_x509(gnutls_pubkey_t key, gnutls_x509_crt_t crt,
 }
 
 /**
+ * gnutls_pubkey_get_preferred_hash_algorithm:
+ * @key: Holds the certificate
+ * @hash: The result of the call with the hash algorithm used for signature
+ *
+ * This function will read the certifcate and return the appropriate digest
+ * algorithm to use for signing with this certificate. Some certificates (i.e.
+ * DSA might not be able to sign without the preferred algorithm).
+ *
+ * Returns: the 0 if the hash algorithm is found. A negative value is
+ * returned on error.
+ *
+ * Since: 2.11.0
+ **/
+int
+gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
+				      gnutls_digest_algorithm_t * hash)
+{
+  int ret;
+
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  ret = _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) hash,
+			NULL, key->pk_algorithm,
+			key->params, key->params_size);
+
+  return ret;
+}
+
+
+/**
  * gnutls_pubkey_import_pkcs11:
  * @key: The public key
  * @obj: The parameters to be imported

@@ -75,11 +75,10 @@ static void print_certificate_info (gnutls_x509_crt_t crt, FILE * out, unsigned 
 
 static void print_hex_datum (gnutls_datum_t * dat);
 
-
 static gaainfo info;
 FILE *outfile;
 FILE *infile;
-gnutls_digest_algorithm_t dig = GNUTLS_DIG_SHA1;
+gnutls_digest_algorithm_t default_dig;
 
 /* non interactive operation if set
  */
@@ -698,8 +697,27 @@ generate_crl (gnutls_x509_crt_t ca_crt)
   return crl;
 }
 
-void
-generate_self_signed (void)
+static gnutls_digest_algorithm_t get_dig(gnutls_x509_crt crt)
+{
+gnutls_digest_algorithm_t dig;
+int result;
+
+  if (default_dig != GNUTLS_DIG_UNKNOWN)
+    dig = default_dig;
+  else
+    {
+      result = gnutls_x509_crt_get_preferred_hash_algorithm(crt, &dig);
+      if (result < 0)
+        {
+	    error (EXIT_FAILURE, 0, "crl_preferred_hash_algorithm: %s",
+	       gnutls_strerror (result));
+        }
+    }
+
+  return dig;
+}
+
+void generate_self_signed (void)
 {
   gnutls_x509_crt_t crt;
   gnutls_x509_privkey_t key;
@@ -729,7 +747,7 @@ generate_self_signed (void)
 
   fprintf (stderr, "\n\nSigning certificate...\n");
 
-  result = gnutls_x509_crt_sign2 (crt, crt, key, dig, 0);
+  result = gnutls_x509_crt_sign2 (crt, crt, key, get_dig(crt), 0);
   if (result < 0)
     error (EXIT_FAILURE, 0, "crt_sign: %s", gnutls_strerror (result));
 
@@ -771,7 +789,7 @@ generate_signed_certificate (void)
 
   fprintf (stderr, "\n\nSigning certificate...\n");
 
-  result = gnutls_x509_crt_sign2 (crt, ca_crt, ca_key, dig, 0);
+  result = gnutls_x509_crt_sign2 (crt, ca_crt, ca_key, get_dig(ca_crt), 0);
   if (result < 0)
     error (EXIT_FAILURE, 0, "crt_sign: %s", gnutls_strerror (result));
 
@@ -805,7 +823,7 @@ generate_proxy_certificate (void)
 
   fprintf (stderr, "\n\nSigning certificate...\n");
 
-  result = gnutls_x509_crt_sign2 (crt, eecrt, eekey, dig, 0);
+  result = gnutls_x509_crt_sign2 (crt, eecrt, eekey, get_dig(eecrt), 0);
   if (result < 0)
     error (EXIT_FAILURE, 0, "crt_sign: %s", gnutls_strerror (result));
 
@@ -874,7 +892,7 @@ update_signed_certificate (void)
 
   fprintf (stderr, "\n\nSigning certificate...\n");
 
-  result = gnutls_x509_crt_sign2 (crt, ca_crt, ca_key, dig, 0);
+  result = gnutls_x509_crt_sign2 (crt, ca_crt, ca_key, get_dig(ca_crt), 0);
   if (result < 0)
     error (EXIT_FAILURE, 0, "crt_sign: %s", gnutls_strerror (result));
 
@@ -949,24 +967,30 @@ gaa_parser (int argc, char **argv)
   else
     info.outcert_format = GNUTLS_X509_FMT_PEM;
 
+  default_dig = GNUTLS_DIG_UNKNOWN;
   if (info.hash != NULL)
     {
+      fprintf(stderr, "Warning: It is suggested that you do not use this parameter unless you know what you are doing. "
+      "It is not always possible to set specific algorithms, for example DSA keys are unable to use any algorithm and "
+      "thus using the defaults is highly recommended!\n");
+      sleep(2);
+
       if (strcasecmp (info.hash, "md5") == 0)
 	{
 	  fprintf (stderr,
 		   "Warning: MD5 is broken, and should not be used any more for digital signatures.\n");
-	  dig = GNUTLS_DIG_MD5;
+	  default_dig = GNUTLS_DIG_MD5;
 	}
       else if (strcasecmp (info.hash, "sha1") == 0)
-	dig = GNUTLS_DIG_SHA1;
+	default_dig = GNUTLS_DIG_SHA1;
       else if (strcasecmp (info.hash, "sha256") == 0)
-	dig = GNUTLS_DIG_SHA256;
+	default_dig = GNUTLS_DIG_SHA256;
       else if (strcasecmp (info.hash, "sha384") == 0)
-	dig = GNUTLS_DIG_SHA384;
+	default_dig = GNUTLS_DIG_SHA384;
       else if (strcasecmp (info.hash, "sha512") == 0)
-	dig = GNUTLS_DIG_SHA512;
+	default_dig = GNUTLS_DIG_SHA512;
       else if (strcasecmp (info.hash, "rmd160") == 0)
-	dig = GNUTLS_DIG_RMD160;
+	default_dig = GNUTLS_DIG_RMD160;
       else
 	error (EXIT_FAILURE, 0, "invalid hash: %s", info.hash);
     }

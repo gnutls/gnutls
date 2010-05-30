@@ -139,6 +139,8 @@ extern "C"
 				  unsigned int flags,
 				  unsigned char *output_data,
 				  size_t * output_data_size);
+  int gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
+				      gnutls_digest_algorithm_t * hash);
 
   int gnutls_x509_crt_set_authority_key_id (gnutls_x509_crt_t cert,
 					    const void *id, size_t id_size);
