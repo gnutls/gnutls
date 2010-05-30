@@ -395,7 +395,7 @@ server (void)
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)
-    gnutls_global_set_log_level (4711);
+    gnutls_global_set_log_level (2);
 
   gnutls_certificate_allocate_credentials (&pgp_cred);
 
