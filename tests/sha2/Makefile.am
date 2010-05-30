@@ -19,10 +19,11 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = key-ca.pem key-subca.pem key-subsubca.pem key-user.pem
+EXTRA_DIST = key-ca.pem key-subca.pem key-subsubca.pem key-user.pem key-dsa.pem \
+	key-ca-dsa.pem
 
-dist_check_SCRIPTS = sha2
+dist_check_SCRIPTS = sha2 sha2-dsa
 
-TESTS = sha2
+TESTS = sha2 sha2-dsa
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)
