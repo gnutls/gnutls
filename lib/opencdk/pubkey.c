@@ -437,7 +437,10 @@ cdk_pk_get_fingerprint (cdk_pubkey_t pk, byte * fpr)
   dlen = _gnutls_hash_get_algo_len (md_algo);
   err = _gnutls_hash_init (&hd, md_algo);
   if (err < 0)
-    return map_gnutls_error (err);
+    {
+      gnutls_assert();
+      return map_gnutls_error (err);
+    }
   _cdk_hash_pubkey (pk, &hd, 1);
   _gnutls_hash_deinit (&hd, fpr);
   if (dlen == 16)

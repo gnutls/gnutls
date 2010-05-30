@@ -365,6 +365,7 @@ gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t res,
   gnutls_openpgp_privkey_t pkey;
   gnutls_openpgp_crt_t crt;
   int ret;
+  gnutls_openpgp_keyid_t keyid;
 
   ret = gnutls_openpgp_privkey_init (&pkey);
   if (ret < 0)
@@ -400,27 +401,28 @@ gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t res,
 
   if (subkey_id != NULL)
     {
-      gnutls_openpgp_keyid_t keyid;
-
       if (strcasecmp (subkey_id, "auto") == 0)
-	ret = gnutls_openpgp_crt_get_auth_subkey (crt, keyid, 1);
+        ret = gnutls_openpgp_crt_get_auth_subkey (crt, keyid, 1);
       else
-	ret = get_keyid (keyid, subkey_id);
-
-      if (ret >= 0)
-	{
-	  ret = gnutls_openpgp_crt_set_preferred_key_id (crt, keyid);
-	  if (ret >= 0)
-	    ret = gnutls_openpgp_privkey_set_preferred_key_id (pkey, keyid);
-	}
+        ret = get_keyid (keyid, subkey_id);
 
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  gnutls_openpgp_privkey_deinit (pkey);
-	  gnutls_openpgp_crt_deinit (crt);
-	  return ret;
-	}
+        gnutls_assert();
+
+      if (ret >= 0)
+        {
+          ret = gnutls_openpgp_crt_set_preferred_key_id (crt, keyid);
+          if (ret >= 0)
+            ret = gnutls_openpgp_privkey_set_preferred_key_id (pkey, keyid);
+        }
+
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          gnutls_openpgp_privkey_deinit (pkey);
+          gnutls_openpgp_crt_deinit (crt);
+          return ret;
+        }
     }
 
   ret = gnutls_certificate_set_openpgp_key (res, crt, pkey);
@@ -868,13 +870,18 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
   if (result == 0)
     {
       uint32_t kid[2];
+      int idx;
 
       KEYID_IMPORT (kid, keyid);
+
+      idx = gnutls_openpgp_privkey_get_subkey_idx(key, keyid);
+      pk_algorithm = gnutls_openpgp_privkey_get_subkey_pk_algorithm (key, idx, NULL);
       result = _gnutls_openpgp_privkey_get_mpis (key, kid,
 						 params, &params_size);
     }
   else
     {
+      pk_algorithm = gnutls_openpgp_privkey_get_pk_algorithm (key, NULL);
       result = _gnutls_openpgp_privkey_get_mpis (key, NULL,
 						 params, &params_size);
     }
@@ -885,7 +892,6 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
       return result;
     }
 
-  pk_algorithm = gnutls_openpgp_privkey_get_pk_algorithm (key, NULL);
 
   result = _gnutls_soft_sign (pk_algorithm, params, params_size, hash, signature);
 

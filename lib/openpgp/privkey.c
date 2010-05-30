@@ -688,8 +688,11 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
 				  bigint_t * params, int *params_size)
 {
   int result, i;
-  int pk_algorithm, local_params;
+  int pk_algorithm;
+  gnutls_pk_params_st pk_params;
   cdk_packet_t pkt;
+
+  memset(&pk_params, 0, sizeof(pk_params));
 
   if (keyid == NULL)
     pkt = cdk_kbnode_find_packet (pkey->knode, CDK_PKT_SECRET_KEY);
@@ -708,27 +711,21 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
   switch (pk_algorithm)
     {
     case GNUTLS_PK_RSA:
-      local_params = RSA_PRIVATE_PARAMS-2;
+      /* openpgp does not hold all parameters as in PKCS #1
+       */
+      pk_params.params_nr = RSA_PRIVATE_PARAMS-2;
       break;
     case GNUTLS_PK_DSA:
-      local_params = DSA_PRIVATE_PARAMS;
+      pk_params.params_nr = DSA_PRIVATE_PARAMS;
       break;
     default:
       gnutls_assert ();
       return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
     }
 
-  if (*params_size < local_params)
+  for (i = 0; i < pk_params.params_nr; i++)
     {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  *params_size = local_params;
-
-  for (i = 0; i < local_params; i++)
-    {
-      result = _gnutls_read_pgp_mpi (pkt, 1, i, &params[i]);
+      result = _gnutls_read_pgp_mpi (pkt, 1, i, &pk_params.params[i]);
       if (result < 0)
 	{
 	  gnutls_assert ();
@@ -736,18 +733,25 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
 	}
     }
 
-    if (pk_algorithm==GNUTLS_PK_RSA)
-      {
-        /* on RSA we need to calculate exp1 and exp2 */
-        result = _gnutls_calc_rsa_exp(params, RSA_PRIVATE_PARAMS);
-        if (result < 0)
-          {
-            gnutls_assert();
-            i = *params_size;
-            goto error;
-          }
-        *params_size = RSA_PRIVATE_PARAMS;
-      }
+    /* fixup will generate exp1 and exp2 that are not
+     * available here.
+     */
+  result = _gnutls_pk_fixup (pk_algorithm, GNUTLS_IMPORT, &pk_params);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      goto error;
+    }
+
+  if (*params_size < pk_params.params_nr)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+  *params_size = pk_params.params_nr;
+  for(i=0;i<pk_params.params_nr;i++)
+    params[i] = pk_params.params[i];
 
   return 0;
 
@@ -755,7 +759,7 @@ error:
   {
     int j;
     for (j = 0; j < i; j++)
-      _gnutls_mpi_release (&params[j]);
+      _gnutls_mpi_release (&pk_params.params[j]);
   }
 
   return result;

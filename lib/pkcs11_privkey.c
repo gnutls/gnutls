@@ -39,9 +39,6 @@ struct gnutls_pkcs11_privkey_st {
 	struct pkcs11_url_info info;
 };
 
-static int find_privkey_url(pakchois_session_t * pks,
-			    struct token_info *info, void *input);
-
 /**
  * gnutls_pkcs11_privkey_init:
  * @key: The structure to be initialized

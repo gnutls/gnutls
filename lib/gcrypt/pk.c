@@ -807,10 +807,9 @@ wrap_gcry_pk_fixup (gnutls_pk_algorithm_t algo,
   if (algo != GNUTLS_PK_RSA)
     return 0;
 
-  if (params->params[5])
-    _gnutls_mpi_release (&params->params[5]);
-  params->params[5] =
-    _gnutls_mpi_new (_gnutls_mpi_get_nbits (params->params[0]));
+  if (params->params[5]==NULL)
+    params->params[5] =
+      _gnutls_mpi_new (_gnutls_mpi_get_nbits (params->params[0]));
 
   if (params->params[5] == NULL)
     {
@@ -818,10 +817,25 @@ wrap_gcry_pk_fixup (gnutls_pk_algorithm_t algo,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
+  ret = 1;
   if (direction == GNUTLS_IMPORT)
-    ret =
-      gcry_mpi_invm (params->params[5], params->params[3], params->params[4]);
-  else
+    {
+	  /* calculate exp1 [6] and exp2 [7] */
+      _gnutls_mpi_release(&pk_params.params[6]);
+      _gnutls_mpi_release(&pk_params.params[7]);
+	  result = _gnutls_calc_rsa_exp(pk_params.params, RSA_PRIVATE_PARAMS);
+	  if (result < 0)
+	    {
+		  gnutls_assert();
+		  return result;
+	    }
+
+      ret =
+        gcry_mpi_invm (params->params[5], params->params[3], params->params[4]);
+
+	  params->params_nr = RSA_PRIVATE_PARAMS;
+	}
+  else if (direction == GNUTLS_EXPORT)
     ret =
       gcry_mpi_invm (params->params[5], params->params[4], params->params[3]);
   if (ret == 0)

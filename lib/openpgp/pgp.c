@@ -773,6 +773,8 @@ _gnutls_openpgp_find_subkey_idx (cdk_kbnode_t knode, uint32_t keyid[2],
   int i = 0;
   uint32_t local_keyid[2];
 
+  _gnutls_hard_log("Looking keyid: %x.%x\n", keyid[0], keyid[1]);
+
   ctx = NULL;
   while ((p = cdk_kbnode_walk (knode, &ctx, 0)))
     {
@@ -786,6 +788,7 @@ _gnutls_openpgp_find_subkey_idx (cdk_kbnode_t knode, uint32_t keyid[2],
 	  else
 	    cdk_pk_get_keyid (pkt->pkt.secret_key->pk, local_keyid);
 
+          _gnutls_hard_log("Found keyid: %x.%x\n", local_keyid[0], local_keyid[1]);
 	  if (local_keyid[0] == keyid[0] && local_keyid[1] == keyid[1])
 	    {
 	      return i;

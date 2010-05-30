@@ -33,7 +33,6 @@
 #include "main.h"
 #include "packet.h"
 
-
 /* Hash all multi precision integers of the key PK with the given
    message digest context MD. */
 static int
@@ -52,8 +51,13 @@ hash_mpibuf (cdk_pubkey_t pk, digest_hd_st * md, int usefpr)
     {
       nbytes = MAX_MPI_BYTES;
       err = _gnutls_mpi_print_pgp (pk->mpi[i], buf, &nbytes);
+
       if (err < 0)
-	return map_gnutls_error (err);
+        {
+          gnutls_assert();
+	  return map_gnutls_error (err);
+        }
+
       if (!usefpr || pk->version == 4)
 	_gnutls_hash (md, buf, nbytes);
       else			/* without the prefix. */

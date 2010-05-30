@@ -245,6 +245,7 @@ file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
   err = _gnutls_hash_init (&md, digest_algo);
   if (err < 0)
     {
+      gnutls_assert();
       rc = map_gnutls_error (err);
       goto leave;
     }

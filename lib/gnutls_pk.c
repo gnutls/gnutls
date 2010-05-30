@@ -612,10 +612,9 @@ gnutls_pk_params_release (gnutls_pk_params_st * p)
 
 int _gnutls_calc_rsa_exp(bigint_t* params, unsigned int params_size)
 {
-int ret;
 bigint_t tmp = _gnutls_mpi_alloc_like(params[0]);
 
- if (params_size < RSA_PRIVATE_PARAMS)
+ if (params_size < RSA_PRIVATE_PARAMS-2)
    {
      gnutls_assert();
      return GNUTLS_E_INTERNAL_ERROR;

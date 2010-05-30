@@ -515,12 +515,17 @@ gnutls_x509_privkey_import_rsa_raw2 (gnutls_x509_privkey_t key,
 {
   int i = 0, ret;
   size_t siz = 0;
+  gnutls_pk_params_st pk_params;
+
+  memset(&pk_params, 0, sizeof(pk_params));
 
   if (key == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
+
+  key->params_size = 0;
 
   siz = m->size;
   if (_gnutls_mpi_scan_nz (&key->params[0], m->data, siz))
@@ -529,6 +534,7 @@ gnutls_x509_privkey_import_rsa_raw2 (gnutls_x509_privkey_t key,
       FREE_RSA_PRIVATE_PARAMS;
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
+  key->params_size++;
 
   siz = e->size;
   if (_gnutls_mpi_scan_nz (&key->params[1], e->data, siz))
@@ -537,6 +543,7 @@ gnutls_x509_privkey_import_rsa_raw2 (gnutls_x509_privkey_t key,
       FREE_RSA_PRIVATE_PARAMS;
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
+  key->params_size++;
 
   siz = d->size;
   if (_gnutls_mpi_scan_nz (&key->params[2], d->data, siz))
@@ -545,6 +552,7 @@ gnutls_x509_privkey_import_rsa_raw2 (gnutls_x509_privkey_t key,
       FREE_RSA_PRIVATE_PARAMS;
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
+  key->params_size++;
 
   siz = p->size;
   if (_gnutls_mpi_scan_nz (&key->params[3], p->data, siz))
@@ -553,6 +561,7 @@ gnutls_x509_privkey_import_rsa_raw2 (gnutls_x509_privkey_t key,
       FREE_RSA_PRIVATE_PARAMS;
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
+  key->params_size++;
 
   siz = q->size;
   if (_gnutls_mpi_scan_nz (&key->params[4], q->data, siz))
@@ -561,6 +570,7 @@ gnutls_x509_privkey_import_rsa_raw2 (gnutls_x509_privkey_t key,
       FREE_RSA_PRIVATE_PARAMS;
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
+  key->params_size++;
 
   siz = u->size;
   if (_gnutls_mpi_scan_nz (&key->params[5], u->data, siz))
@@ -569,6 +579,7 @@ gnutls_x509_privkey_import_rsa_raw2 (gnutls_x509_privkey_t key,
       FREE_RSA_PRIVATE_PARAMS;
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
+  key->params_size++;
 
   if (e1 && e2)
     {
@@ -579,6 +590,7 @@ gnutls_x509_privkey_import_rsa_raw2 (gnutls_x509_privkey_t key,
           FREE_RSA_PRIVATE_PARAMS;
           return GNUTLS_E_MPI_SCAN_FAILED;
         }
+      key->params_size++;
 
       siz = e2->size;
       if (_gnutls_mpi_scan_nz (&key->params[7], e2->data, siz))
@@ -587,20 +599,29 @@ gnutls_x509_privkey_import_rsa_raw2 (gnutls_x509_privkey_t key,
           FREE_RSA_PRIVATE_PARAMS;
           return GNUTLS_E_MPI_SCAN_FAILED;
         }
+       key->params_size++;
     } 
-  else
+
+  for(i=0;i<key->params_size;i++)
     {
-        /* calculate exp1 and exp2 */
-        ret = _gnutls_calc_rsa_exp(key->params, key->params_size);
-        if (ret < 0)
-          {
-            gnutls_assert();
-            FREE_RSA_PRIVATE_PARAMS;
-            return ret;
-          }
+      pk_params.params[i] = key->params[i];
     }
 
-    
+  pk_params.params_nr = key->params_size;
+
+  ret = _gnutls_pk_fixup (GNUTLS_PK_RSA, GNUTLS_IMPORT, &pk_params);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      FREE_RSA_PRIVATE_PARAMS;
+      return ret;
+    }
+
+  for(i=0;i<pk_params.params_nr;i++)
+    {
+      key->params[i] = pk_params.params[i];
+    }
+  key->params_size = pk_params.params_nr;
 
   if (!key->crippled)
     {
@@ -864,6 +885,8 @@ gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
   int ret;
   gnutls_pk_params_st pk_params;
 
+  memset (&pk_params, 0, sizeof (pk_params));
+
   if (key == NULL)
     {
       gnutls_assert ();
@@ -1062,10 +1085,12 @@ gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
 static int
 _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
 {
-  int result, i;
+  int result;
   opaque null = '\0';
   gnutls_pk_params_st pk_params;
   gnutls_datum_t m, e, d, p, q, u, exp1, exp2;
+
+  memset (&pk_params, 0, sizeof (pk_params));
 
   memset(&m, 0, sizeof(m));
   memset(&p, 0, sizeof(e));

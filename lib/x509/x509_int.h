@@ -103,7 +103,10 @@ typedef struct gnutls_x509_privkey_int
    *      [4] is prime2 (q)
    *      [5] is coefficient (u == inverse of p mod q)
    *          note that other packages used inverse of q mod p,
-   *          so we need to perform conversions (for libgcrypt only)
+   *          so we need to perform conversions on import/export
+   *          using fixup.
+   *      The following two are also not always available thus fixup
+   *      will generate them.
    *	  [6] e1 == d mod (p-1)
    *	  [7] e2 == d mod (q-1)
    * DSA: [0] is p
