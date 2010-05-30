@@ -163,17 +163,21 @@ pk_pkcs1_rsa_hash (gnutls_digest_algorithm_t hash, const gnutls_datum_t * text, 
 }
 
 int
-pk_dsa_hash (const gnutls_datum_t * text, gnutls_datum_t * hash)
+pk_dsa_hash (gnutls_digest_algorithm_t hash, const gnutls_datum_t * text, gnutls_datum_t * digest)
 {
   int ret;
   digest_hd_st hd;
-  gnutls_datum_t digest;
-  gnutls_digest_algorithm_t hash = _gnutls_dsa_q_to_hash(params[1]);
 
+  if (hash != GNUTLS_DIG_SHA1 && hash != GNUTLS_DIG_SHA224 &&
+    hash != GNUTLS_DIG_SHA256)
+    {
+      gnutls_assert();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
 
-  hash->size = _gnutls_hash_get_algo_len(hash);
-  hash->data = gnutls_malloc( hash->size);
-  if (hash->data == NULL)
+  digest->size = _gnutls_hash_get_algo_len(hash);
+  digest->data = gnutls_malloc( digest->size);
+  if (digest->data == NULL)
     {
       gnutls_assert();
       return GNUTLS_E_MEMORY_ERROR;
@@ -188,12 +192,12 @@ pk_dsa_hash (const gnutls_datum_t * text, gnutls_datum_t * hash)
 
   _gnutls_hash (&hd, text->data, text->size);
 
-  _gnutls_hash_deinit (&hd, hash->data);
+  _gnutls_hash_deinit (&hd, digest->data);
 
   return 0;
 
 fail:
-  gnutls_free(hash->data);
+  gnutls_free(digest->data);
 
   return ret;
 }

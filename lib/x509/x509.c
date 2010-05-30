@@ -2542,9 +2542,6 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
  * This function will verify the given signed data, using the
  * parameters from the certificate.
  *
- * Note: Use gnutls_x509_crt_verify_hash() instead. This function
- * does not do the implied hashing of the data.
- *
  * Returns: In case of a verification failure 0 is returned, and 1 on
  * success.
  **/

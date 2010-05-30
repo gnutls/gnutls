@@ -1649,7 +1649,8 @@ gnutls_x509_privkey_sign_data2 (gnutls_x509_privkey_t signer,
 	}
       break;
     case GNUTLS_PK_DSA:
-      ret = pk_dsa_hash (data,  &digest);
+      /* override hash for DSA */
+      ret = pk_dsa_hash (_gnutls_dsa_q_to_hash(signer->params[1]), data,  &digest);
       if (ret < 0)
 	{
 	  gnutls_assert ();

@@ -202,7 +202,7 @@ int gnutls_privkey_import_openpgp (gnutls_privkey_t pkey, gnutls_openpgp_privkey
 /**
  * gnutls_privkey_sign_data:
  * @signer: Holds the key
- * @digest: should be MD5 or SHA1
+ * @digest: should be a digest algorithm
  * @flags: should be 0 for now
  * @data: holds the data to be signed
  * @signature: will contain the signature allocate with gnutls_malloc()
@@ -234,7 +234,7 @@ gnutls_privkey_sign_data(gnutls_privkey_t signer,
 		}
 		break;
 	case GNUTLS_PK_DSA:
-		ret = pk_dsa_hash(data, &digest);
+		ret = pk_dsa_hash(hash, data, &digest);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;

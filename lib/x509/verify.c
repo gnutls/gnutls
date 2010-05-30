@@ -934,11 +934,6 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
     }
 
 cleanup:
-    /* release allocated mpis */
-  for (i = 0; i < issuer_params_size; i++)
-    {
-      _gnutls_mpi_release (&issuer_params[i]);
-    }
 
   return ret;
 

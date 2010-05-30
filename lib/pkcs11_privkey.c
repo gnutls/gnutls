@@ -169,7 +169,7 @@ gnutls_pkcs11_privkey_sign_data(gnutls_pkcs11_privkey_t signer,
 		}
 		break;
 	case GNUTLS_PK_DSA:
-		ret = pk_dsa_hash(data, &digest);
+		ret = pk_dsa_hash(hash, data, &digest);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;

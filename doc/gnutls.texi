@@ -102,6 +102,8 @@ Documentation License''.
 
 @include cha-tls-app.texi
 
+@include cha-gtls-app.texi
+
 @include cha-programs.texi
 
 @include cha-functions.texi

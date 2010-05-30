@@ -800,7 +800,7 @@ wrap_gcry_pk_fixup (gnutls_pk_algorithm_t algo,
 		    gnutls_direction_t direction,
 		    gnutls_pk_params_st * params)
 {
-  int ret;
+  int ret, result;
 
   /* only for RSA we invert the coefficient --pgp type */
 
@@ -821,9 +821,9 @@ wrap_gcry_pk_fixup (gnutls_pk_algorithm_t algo,
   if (direction == GNUTLS_IMPORT)
     {
 	  /* calculate exp1 [6] and exp2 [7] */
-      _gnutls_mpi_release(&pk_params.params[6]);
-      _gnutls_mpi_release(&pk_params.params[7]);
-	  result = _gnutls_calc_rsa_exp(pk_params.params, RSA_PRIVATE_PARAMS);
+      _gnutls_mpi_release(&params->params[6]);
+      _gnutls_mpi_release(&params->params[7]);
+	  result = _gnutls_calc_rsa_exp(params->params, RSA_PRIVATE_PARAMS);
 	  if (result < 0)
 	    {
 		  gnutls_assert();
