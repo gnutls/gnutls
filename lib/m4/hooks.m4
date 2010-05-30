@@ -119,9 +119,6 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
 	AC_CHECK_LIB(dl, dlopen,,
 	   [AC_MSG_ERROR([could not find dlopen])])
 
-	module_path="${libdir}:${libdir}/pkcs11"
-
-	CPPFLAGS="$CPPFLAGS -DPAKCHOIS_MODPATH=\"\""
   fi
 
   AC_ARG_WITH(lzo,

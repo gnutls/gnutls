@@ -85,7 +85,7 @@ struct slot {
 
 #define DIR_DELIMITER '/'
 
-char* pkcs11ize(const char* name)
+static char* pkcs11ize(const char* name)
 {
     int len;
     char* oname;
@@ -150,7 +150,13 @@ static const char *suffix_prefixes[][2] = {
 
 static void *find_pkcs11_module(const char *name, CK_C_GetFunctionList *gfl)
 {
-    char module_path[] = PAKCHOIS_MODPATH;
+
+    char module_path[] =
+#ifdef PAKCHOIS_MODPATH
+    PAKCHOIS_MODPATH;
+#else
+    "";
+#endif
     char *next = module_path;
     void *h;
 
