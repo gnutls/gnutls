@@ -436,6 +436,7 @@ _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
   if (pk == NULL)
     {
       gnutls_assert ();
+      _gnutls_debug_log("Cannot find OID for sign algorithm pk: %d dig: %d\n", (int)pk_algorithm, (int)dig);
       return GNUTLS_E_INVALID_REQUEST;
     }
 
