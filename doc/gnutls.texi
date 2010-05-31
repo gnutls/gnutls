@@ -1293,11 +1293,11 @@ client require the extension for every handshake and servers will refuse
 renegotiation without it.
 
 To enforce your clients to upgrade to a version that supports safe
-renegotiation the %INITIAL_SAFE_RENEGOTIATION priority string should be used
-at server side. This will deny any connections unless the client supports
-the extension. This however will prevent all clients that do not support
-the extension from connecting to server, even if they do not use
-renegotiation.
+renegotiation the %INITIAL_SAFE_RENEGOTIATION priority string should
+be used at server side.  This will deny any (re-)handshakes unless the
+client supports the extension.  This however will prevent all clients
+that do not support the extension from connecting to server, even if
+they do not use renegotiation.
 
 It is possible to disable use of the extension completely, in both
 clients and servers, by using the @code{%DISABLE_SAFE_RENEGOTIATION}
