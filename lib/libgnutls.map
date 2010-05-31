@@ -679,6 +679,7 @@ GNUTLS_2_11
 	gnutls_sec_param_get_name;
 	gnutls_pk_bits_to_sec_param;
 	gnutls_rnd;
+	gnutls_x509_crq_get_preferred_hash_algorithm;
 } GNUTLS_2_10;
 
 GNUTLS_PRIVATE {

@@ -22,6 +22,7 @@ main (void)
   gnutls_x509_privkey_t key;
   unsigned char buffer[10 * 1024];
   size_t buffer_size = sizeof (buffer);
+  unsigned int bits;
 
   gnutls_global_init ();
 
@@ -32,9 +33,10 @@ main (void)
 
   gnutls_x509_privkey_init (&key);
 
-  /* Generate a 1024 bit RSA private key.
+  /* Generate an RSA key of moderate security.
    */
-  gnutls_x509_privkey_generate (key, GNUTLS_PK_RSA, 1024, 0);
+  bits = gnutls_sec_param_to_pk_bits( GNUTLS_PK_RSA, GNUTLS_SEC_PARAM_NORMAL);
+  gnutls_x509_privkey_generate (key, GNUTLS_PK_RSA, bits, 0);
 
   /* Add stuff to the distinguished name
    */

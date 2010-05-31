@@ -741,6 +741,9 @@ extern "C"
   int gnutls_x509_crq_import (gnutls_x509_crq_t crq,
 			      const gnutls_datum_t * data,
 			      gnutls_x509_crt_fmt_t format);
+  int gnutls_x509_crq_get_preferred_hash_algorithm (gnutls_x509_crq_t crq,
+				      gnutls_digest_algorithm_t * hash);
+
   int gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf,
 			      size_t * sizeof_buf);
   int gnutls_x509_crq_get_dn_oid (gnutls_x509_crq_t crq, int indx,

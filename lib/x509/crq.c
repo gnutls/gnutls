@@ -999,6 +999,10 @@ gnutls_x509_crq_set_challenge_password (gnutls_x509_crq_t crq,
  * This must be the last step in a certificate request generation
  * since all the previously set parameters are now signed.
  *
+ * Use gnutls_x509_crq_get_preferred_hash_algorithm() to obtain
+ * the digest algorithm to use with the specified public key
+ * algorithm.
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
  *   %GNUTLS_E_ASN1_VALUE_NOT_FOUND is returned if you didn't set all
  *   information in the certificate request (e.g., the version using
@@ -1061,7 +1065,16 @@ fail:
 int
 gnutls_x509_crq_sign (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
 {
-  return gnutls_x509_crq_sign2 (crq, key, GNUTLS_DIG_SHA1, 0);
+gnutls_digest_algorithm_t dig;
+int ret = gnutls_x509_crq_get_preferred_hash_algorithm (crq, &dig);
+
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+
+  return gnutls_x509_crq_sign2 (crq, key, dig, 0);
 }
 
 /**
@@ -2263,6 +2276,56 @@ gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t crq,
 
   return 0;
 }
+
+/**
+ * gnutls_x509_crq_get_preferred_hash_algorithm:
+ * @crq: Holds the certificate
+ * @hash: The result of the call with the hash algorithm used for signature
+ *
+ * This function will read the certifcate and return the appropriate digest
+ * algorithm to use for signing with this certificate. Some certificates (i.e.
+ * DSA might not be able to sign without the preferred algorithm).
+ *
+ * Returns: the 0 if the hash algorithm is found. A negative value is
+ * returned on error.
+ *
+ * Since: 2.11.0
+ **/
+int
+gnutls_x509_crq_get_preferred_hash_algorithm (gnutls_x509_crq_t crq,
+				      gnutls_digest_algorithm_t * hash)
+{
+  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
+  int params_size;
+  int ret, i;
+
+  if (crt == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  params_size = MAX_PUBLIC_PARAMS_SIZE;
+  ret = _gnutls_x509_crq_get_mpis (crq, params, &params_size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  ret = _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) hash,
+			NULL, gnutls_x509_crq_get_pk_algorithm (crq, NULL),
+			params, params_size);
+
+  /* release allocated mpis */
+  for (i = 0; i < params_size; i++)
+    {
+      _gnutls_mpi_release (&params[i]);
+    }
+
+  return ret;
+}
+
 
 static int
 rsadsa_crq_get_key_id (gnutls_x509_crq_t crq, int pk,
