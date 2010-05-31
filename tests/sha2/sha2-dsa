@@ -60,6 +60,6 @@ if [ $? != 0 ];then
 	exit 1
 fi
 
-rm -f verify new-user.pem new-ca-dsa.pem template
+rm -f verify new-user.pem new-dsa-ca.pem template
 
 exit 0
