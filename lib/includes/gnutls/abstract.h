@@ -24,7 +24,7 @@ int gnutls_pubkey_import_openpgp(gnutls_pubkey_t pkey,
 				 unsigned int flags);
 
 int gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
-				      gnutls_digest_algorithm_t * hash);
+			      gnutls_digest_algorithm_t * hash, unsigned int *mand);
 
 int gnutls_pubkey_get_pk_rsa_raw (gnutls_pubkey_t crt,
 				gnutls_datum_t * m, gnutls_datum_t * e);

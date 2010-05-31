@@ -1066,7 +1066,7 @@ int
 gnutls_x509_crq_sign (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
 {
 gnutls_digest_algorithm_t dig;
-int ret = gnutls_x509_crq_get_preferred_hash_algorithm (crq, &dig);
+int ret = gnutls_x509_crq_get_preferred_hash_algorithm (crq, &dig, NULL);
 
   if (ret < 0)
     {
@@ -2281,6 +2281,7 @@ gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t crq,
  * gnutls_x509_crq_get_preferred_hash_algorithm:
  * @crq: Holds the certificate
  * @hash: The result of the call with the hash algorithm used for signature
+ * @mand: If non zero it means that the algorithm MUST use this hash. May be NULL.
  *
  * This function will read the certifcate and return the appropriate digest
  * algorithm to use for signing with this certificate. Some certificates (i.e.
@@ -2293,13 +2294,13 @@ gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t crq,
  **/
 int
 gnutls_x509_crq_get_preferred_hash_algorithm (gnutls_x509_crq_t crq,
-				      gnutls_digest_algorithm_t * hash)
+				      gnutls_digest_algorithm_t * hash, unsigned int *mand)
 {
   bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
   int params_size;
   int ret, i;
 
-  if (crt == NULL)
+  if (crq == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -2313,9 +2314,8 @@ gnutls_x509_crq_get_preferred_hash_algorithm (gnutls_x509_crq_t crq,
       return ret;
     }
 
-  ret = _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) hash,
-			NULL, gnutls_x509_crq_get_pk_algorithm (crq, NULL),
-			params, params_size);
+  ret = _gnutls_pk_get_hash_algorithm(gnutls_x509_crq_get_pk_algorithm (crq, NULL),
+    params, params_size, hash, mand);
 
   /* release allocated mpis */
   for (i = 0; i < params_size; i++)

@@ -2533,10 +2533,13 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
   return ret;
 }
 
+
+
 /**
  * gnutls_x509_crt_get_preferred_hash_algorithm:
  * @crt: Holds the certificate
  * @hash: The result of the call with the hash algorithm used for signature
+ * @mand: If non zero it means that the algorithm MUST use this hash. May be NULL.
  *
  * This function will read the certifcate and return the appropriate digest
  * algorithm to use for signing with this certificate. Some certificates (i.e.
@@ -2549,7 +2552,7 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
  **/
 int
 gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
-				      gnutls_digest_algorithm_t * hash)
+				      gnutls_digest_algorithm_t * hash, unsigned int *mand)
 {
   bigint_t issuer_params[MAX_PUBLIC_PARAMS_SIZE];
   int issuer_params_size;
@@ -2571,9 +2574,8 @@ gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
       return ret;
     }
 
-  ret = _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) hash,
-			NULL, gnutls_x509_crt_get_pk_algorithm (crt, NULL),
-			issuer_params, issuer_params_size);
+  ret = _gnutls_pk_get_hash_algorithm(gnutls_x509_crt_get_pk_algorithm (crt, NULL),
+    issuer_params, issuer_params_size, hash, mand);
 
   /* release allocated mpis */
   for (i = 0; i < issuer_params_size; i++)

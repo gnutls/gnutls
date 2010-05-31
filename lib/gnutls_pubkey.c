@@ -187,6 +187,7 @@ int gnutls_pubkey_import_x509(gnutls_pubkey_t key, gnutls_x509_crt_t crt,
  * gnutls_pubkey_get_preferred_hash_algorithm:
  * @key: Holds the certificate
  * @hash: The result of the call with the hash algorithm used for signature
+ * @mand: If non zero it means that the algorithm MUST use this hash. May be NULL.
  *
  * This function will read the certifcate and return the appropriate digest
  * algorithm to use for signing with this certificate. Some certificates (i.e.
@@ -199,7 +200,7 @@ int gnutls_pubkey_import_x509(gnutls_pubkey_t key, gnutls_x509_crt_t crt,
  **/
 int
 gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
-				      gnutls_digest_algorithm_t * hash)
+			      gnutls_digest_algorithm_t * hash, unsigned int *mand)
 {
   int ret;
 
@@ -209,9 +210,8 @@ gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) hash,
-			NULL, key->pk_algorithm,
-			key->params, key->params_size);
+  ret = _gnutls_pk_get_hash_algorithm(key->pk_algorithm,
+    key->params, key->params_size, hash, mand);
 
   return ret;
 }

@@ -701,18 +701,18 @@ static gnutls_digest_algorithm_t get_dig(gnutls_x509_crt crt)
 {
 gnutls_digest_algorithm_t dig;
 int result;
+unsigned int mand;
 
-  if (default_dig != GNUTLS_DIG_UNKNOWN)
-    dig = default_dig;
-  else
+  result = gnutls_x509_crt_get_preferred_hash_algorithm(crt, &dig, &mand);
+  if (result < 0)
     {
-      result = gnutls_x509_crt_get_preferred_hash_algorithm(crt, &dig);
-      if (result < 0)
-        {
 	    error (EXIT_FAILURE, 0, "crl_preferred_hash_algorithm: %s",
 	       gnutls_strerror (result));
-        }
     }
+
+  /* if algorithm allows alternatives */
+  if (mand == 0 && default_dig != GNUTLS_DIG_UNKNOWN)
+    dig = default_dig;
 
   return dig;
 }
@@ -970,11 +970,6 @@ gaa_parser (int argc, char **argv)
   default_dig = GNUTLS_DIG_UNKNOWN;
   if (info.hash != NULL)
     {
-      fprintf(stderr, "Warning: It is suggested that you do not use this parameter unless you know what you are doing. "
-      "It is not always possible to set specific algorithms, for example DSA keys are unable to use any algorithm and "
-      "thus using the defaults is highly recommended!\n");
-      sleep(2);
-
       if (strcasecmp (info.hash, "md5") == 0)
 	{
 	  fprintf (stderr,

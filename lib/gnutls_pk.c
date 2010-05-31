@@ -644,3 +644,18 @@ bigint_t tmp = _gnutls_mpi_alloc_like(params[0]);
   return 0;
 }
 
+int _gnutls_pk_get_hash_algorithm(gnutls_pk_algorithm_t pk, bigint_t* params, int params_size,
+  gnutls_digest_algorithm_t *dig, unsigned int *mand)
+{
+  if (mand)
+    {
+      if (pk == GNUTLS_PK_DSA)
+        *mand = 1;
+      else
+        *mand = 0;
+    }
+
+  return _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) dig,
+			NULL, pk, params, params_size);
+
+}
