@@ -34,6 +34,19 @@ doc/credentials/srp/Makefile
 doc/credentials/srp/Makefile.in
 doc/credentials/x509/Makefile
 doc/credentials/x509/Makefile.in
+doc/gnutls.pdf
+doc/gnutls.toc
+doc/gnutls.cp
+doc/gnutls.cps
+doc/gnutls.fn
+doc/gnutls.fns
+doc/gnutls.ky
+doc/gnutls.log
+doc/gnutls.pg
+doc/gnutls.tp
+doc/gnutls.vr
+doc/gnutls.vrs
+doc/gnutls.aux
 doc/cyclo/Makefile
 doc/cyclo/Makefile.in
 doc/doxygen/Doxyfile
@@ -345,6 +358,7 @@ src/psktool
 src/srptool
 stamp-h1
 tests/Makefile
+tests/*/out
 tests/Makefile.in
 tests/anonself
 tests/certder
@@ -415,6 +429,7 @@ tests/x509paths/
 tests/x509self
 tests/x509sign-verify
 tests/x509signself
+tests/safe-renegotiation/srn*
 m4/
 po/
 lib/m4
