@@ -184,7 +184,7 @@ main (int argc, char *argv[])
 				       GNUTLS_X509_FMT_PEM);
   gnutls_init (&server, GNUTLS_SERVER);
   gnutls_credentials_set (server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
-  gnutls_priority_set_direct (server, "NORMAL:%INITIAL_SAFE_RENEGOTIATION",
+  gnutls_priority_set_direct (server, "NORMAL:%SAFE_RENEGOTIATION",
 			      NULL);
   gnutls_transport_set_push_function (server, server_push);
   gnutls_transport_set_pull_function (server, server_pull);

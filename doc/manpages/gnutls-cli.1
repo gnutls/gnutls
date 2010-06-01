@@ -78,9 +78,14 @@ Special keywords:
 "%SSL3_RECORD_VERSION" force SSL3.0 record version in the first client
 hello. This is to avoid buggy servers from terminating connection.
 .IP
-"%UNSAFE_RENEGOTIATION" will enable unsafe renegotiation (default)
+"%UNSAFE_RENEGOTIATION" Permits (re-)handshakes even unsafe ones.
 .IP
-"%SAFE_RENEGOTIATION" will enable safe renegotiation.
+"%PARTIAL_RENEGOTIATION" Prevents renegotiation with clients and servers not
+supporting the safe renegotiation extension. (default)
+.IP
+"%SAFE_RENEGOTIATION" will enable safe renegotiation. This is the most
+secure and recommended option for clients. However this will prevent from
+connecting to legacy servers.
 .IP
 To avoid collisions in order to specify a compression algorithm in
 this string you have to prefix it with "COMP-", protocol versions

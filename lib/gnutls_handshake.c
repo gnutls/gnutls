@@ -864,7 +864,7 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
 
   /* First, check for safe renegotiation SCSV.
    */
-  if (session->internals.priorities.disable_safe_renegotiation == 0)
+  if (session->internals.priorities.sr != SR_DISABLED)
     {
     int offset;
 
@@ -2337,7 +2337,7 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	}
     }
 
-  if (session->internals.priorities.disable_safe_renegotiation != 0)
+  if (session->internals.priorities.sr == SR_DISABLED)
     {
       gnutls_assert ();
       return ret;
@@ -2386,7 +2386,7 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
       _gnutls_handshake_log ("HSK[%p]: Safe renegotiation succeeded\n",
 			     session);
     }
-  else				/* safe renegotiation not received... */
+  else	/* safe renegotiation not received... */
     {
       if (session->internals.connection_using_safe_renegotiation)
 	{
@@ -2398,10 +2398,10 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	}
 
       /* Clients can't tell if it's an initial negotiation */
-      if (session->internals.initial_negotiation_completed ||
-	  session->security_parameters.entity == GNUTLS_CLIENT)
+      if (session->internals.initial_negotiation_completed)
 	{
-	  if (session->internals.priorities.unsafe_renegotiation != 0)
+
+          if (session->internals.priorities.sr < SR_PARTIAL)
 	    {
 	      _gnutls_handshake_log
 		("HSK[%p]: Allowing unsafe (re)negotiation\n", session);
@@ -2411,16 +2411,12 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	      gnutls_assert ();
 	      _gnutls_handshake_log
 		("HSK[%p]: Denying unsafe (re)negotiation\n", session);
-	      if (session->security_parameters.entity == GNUTLS_SERVER)
-		/* send no renegotiation alert */
-		return GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED;
-	      else
-		return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
+              return GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED;
 	    }
 	}
       else
 	{
-	  if (session->internals.priorities.initial_safe_renegotiation == 0)
+	  if (session->internals.priorities.sr < SR_SAFE)
 	    {
 	      _gnutls_handshake_log
 		("HSK[%p]: Allowing unsafe initial negotiation\n", session);

@@ -451,6 +451,13 @@ typedef struct
   unsigned int algorithms;
 } priority_st;
 
+typedef enum {
+  SR_DISABLED,
+  SR_UNSAFE,
+  SR_PARTIAL,
+  SR_SAFE,
+} safe_renegotiation_t;
+
 /* For the external api */
 struct gnutls_priority_st
 {
@@ -464,10 +471,7 @@ struct gnutls_priority_st
 
   /* to disable record padding */
   int no_padding:1;
-  int unsafe_renegotiation:1;
-  int initial_safe_renegotiation:1;
-  int disable_safe_renegotiation:1;
-  int safe_renegotiation_set:1; /* whether the priority string set any renegotiation parameters */
+  safe_renegotiation_t sr;
   int ssl3_record_version;
   int additional_verify_flags;
 };

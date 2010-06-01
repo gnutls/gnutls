@@ -299,16 +299,15 @@ strings.  The priority strings can be used by applications
 (gnutls_priority_set) and end users (e.g., `--priority' parameter to
 `gnutls-cli' and `gnutls-serv').
 
-The `%UNSAFE_RENEGOTIATION' priority string requests what is today the
+The `%PARTIAL_RENEGOTIATION' priority string requests what is today the
 default behaviour, i.e., that handshakes without the safe renegotiation
 extension is permitted.  To make more use of the extension, you may
 provide the `%SAFE_RENEGOTIATION' priority string.  In this mode,
-clients will require that the server supports the extension for the
-initial handshake, and servers will require that the client supports
-the extension for renegotiated handshakes.  If you want to make a
-server refuse even initial handshakes without the safe renegotiation
-extension, use the `%INITIAL_SAFE_RENEGOTIATION' priority string.  It
-is possible to disable use of the extension completely by using the
+clients and servers will require that the peer supports the extension for 
+the initial handshakes.  To allow unsafe rengotiation the 
+`%UNSAFE_RENEGOTIATION' priority string is available. This will send
+the extension if supported by peer but will never mandate it.
+It is possible to disable use of the extension completely by using the
 `%DISABLE_SAFE_RENEGOTIATION' priority string however this is
 recommended against except for debugging.
 

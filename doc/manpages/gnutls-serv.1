@@ -75,12 +75,14 @@ Special keywords:
 .IP
 "%COMPAT" will enable compatibility features for a server.
 .IP
-"%UNSAFE_RENEGOTIATION" will enable unsafe renegotiation (default).
+"%UNSAFE_RENEGOTIATION" Permits (re-)handshakes even unsafe ones.
 .IP
-"%SAFE_RENEGOTIATION" will enable safe renegotiation.
+"%PARTIAL_RENEGOTIATION" Prevents renegotiation with clients and servers not
+supporting the safe renegotiation extension. (default)
 .IP
-"%INITIAL_SAFE_RENEGOTIATION" will force initial safe negotiation even if
-renegotiation wasn't requested.
+"%SAFE_RENEGOTIATION" will enable safe renegotiation. This is the most
+secure and recommended option for clients. However this will prevent from
+connecting to legacy servers.
 .IP
 To avoid collisions in order to specify a compression algorithm in
 this string you have to prefix it with "COMP-", protocol versions
