@@ -33,7 +33,7 @@ fail() {
 
 echo "Checking Safe renegotiation"
 
-$SERV -p $PORT --echo --priority NORMAL:+ANON-DH:%SAFE_RENEGOTIATION --dhparams $srcdir/params.dh >/dev/null 2>&1 &
+$SERV -p $PORT --echo --priority NORMAL:+ANON-DH:%PARTIAL_RENEGOTIATION --dhparams $srcdir/params.dh >/dev/null 2>&1 &
 pid=$!
 
 # give the server a chance to initialize
@@ -58,7 +58,7 @@ $CLI -p $PORT 127.0.0.1 --rehandshake --priority NORMAL:+ANON-DH:%DISABLE_SAFE_R
 kill $pid
 wait
 
-$SERV -p $PORT --echo --priority NORMAL:+ANON-DH:%INITIAL_SAFE_RENEGOTIATION --dhparams $srcdir/params.dh >/dev/null 2>&1 &
+$SERV -p $PORT --echo --priority NORMAL:+ANON-DH:%SAFE_RENEGOTIATION --dhparams $srcdir/params.dh >/dev/null 2>&1 &
 pid=$!
 
 # give the server a chance to initialize

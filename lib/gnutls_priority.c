@@ -448,21 +448,6 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
   memcpy (&session->internals.priorities, priority,
 	  sizeof (struct gnutls_priority_st));
 
-  /* Hack. Because we want to differentiate the behavior of server
-   * and client with regards to safe renegotiation. If a server didn't
-   * have either SAFE_RENEGOTIATION or UNSAFE_RENEGOTIATION set the
-   * safe renegotiation will be the default. This (as well as the
-   * safe_renegotiation_set flag) has to be removed once safe 
-   * renegotiation is default in both server and client side.
-   */
-  if (session->security_parameters.entity == GNUTLS_SERVER)
-    {
-      if (session->internals.priorities.safe_renegotiation_set == 0)
-        {
-          session->internals.priorities.unsafe_renegotiation = 0;
-        }
-    }
-
   /* set the current version to the first in the chain.
    * This will be overridden later.
    */
@@ -537,20 +522,20 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  *
  * "%COMPAT" will enable compatibility features for a server.
  *
+ * "%DISABLE_SAFE_RENEGOTIATION" will disable safe renegotiation completely. Do not use
+ * unless you know what you are doing. Testing purposes only.
+ *
  * "%UNSAFE_RENEGOTIATION" will allow unsafe renegotiation (this is now
  * the default for clients, but will change once more servers support the safe renegotiation
  * TLS fix).
  *
- * "%SAFE_RENEGOTIATION" will allow safe renegotiation only (this is the
- * default for servers - that will reject clients trying to perform an
- * unsafe renegotiation).
+ * "%PARTIAL_SAFE_RENEGOTIATION" In server side it will enable safe renegotiation
+ * and will protect all clients from known attacks, but will not prevent insecure clients
+ * from connecting. In client side it will disallow from renegotiating with an insecure server
+ * but will not prevent connecting to one (this leaves the client vulnerable to attacks).
  *
- * "%INITIAL_SAFE_RENEGOTIATION" will force initial safe negotiation even if 
- * renegotiation wasn't requested. Only valid for server side and implies
- * "%SAFE_RENEGOTIATION".
- *
- * "%DISABLE_SAFE_RENEGOTIATION" will disable safe renegotiation completely. Do not use
- * unless you know what you are doing. Testing purposes only.
+ * "%SAFE_RENEGOTIATION" will enforce safe renegotiation. Clients and Servers will refuse
+ * to talk to an insecure peer.
  *
  * "%SSL3_RECORD_VERSION" will use SSL3.0 record version in client hello.
  *
@@ -597,7 +582,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
   /* for now unsafe renegotiation is default on everyone. To be removed
    * when we make it the default.
    */
-  (*priority_cache)->unsafe_renegotiation = 1;
+  (*priority_cache)->sr = SR_PARTIAL;
 
   if (priorities == NULL)
     priorities = "NORMAL";
@@ -749,26 +734,21 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	  else if (strcasecmp (&broken_list[i][1],
 			       "UNSAFE_RENEGOTIATION") == 0)
             {
-	      (*priority_cache)->unsafe_renegotiation = 1;
-	      (*priority_cache)->safe_renegotiation_set = 1;
+	      (*priority_cache)->sr = SR_UNSAFE;
             }
 	  else if (strcasecmp (&broken_list[i][1], "SAFE_RENEGOTIATION") == 0)
 	    {
-	      (*priority_cache)->unsafe_renegotiation = 0;
-	      (*priority_cache)->safe_renegotiation_set = 1;
+	      (*priority_cache)->sr = SR_SAFE;
             }
 	  else if (strcasecmp (&broken_list[i][1],
-			       "INITIAL_SAFE_RENEGOTIATION") == 0)
+			       "PARTIAL_RENEGOTIATION") == 0)
 	    {
-	      (*priority_cache)->unsafe_renegotiation = 0;
-	      (*priority_cache)->initial_safe_renegotiation = 1;
-	      (*priority_cache)->safe_renegotiation_set = 1;
+	      (*priority_cache)->sr = SR_PARTIAL;
 	    }
 	  else if (strcasecmp (&broken_list[i][1],
 			       "DISABLE_SAFE_RENEGOTIATION") == 0)
             {
-	      (*priority_cache)->disable_safe_renegotiation = 1;
-	      (*priority_cache)->safe_renegotiation_set = 1;
+	      (*priority_cache)->sr = SR_DISABLED;
             }
 	  else
 	    goto error;

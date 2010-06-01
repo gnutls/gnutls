@@ -1280,7 +1280,6 @@ Note that it is easy to configure clients to always require the safe
 renegotiation extension from servers (see below on the
 %SAFE_RENEGOTIATION priority string).
 
-
 To modify the default behaviour, we have introduced some new priority
 strings.  The priority strings can be used by applications
 (@pxref{gnutls_priority_set}) and end users (e.g., @code{--priority}
@@ -1288,16 +1287,15 @@ parameter to @code{gnutls-cli} and @code{gnutls-serv}).
 
 The @code{%UNSAFE_RENEGOTIATION} priority string permits
 (re-)handshakes even when the safe renegotiation extension was not
-negotiated.  The @code{%SAFE_RENEGOTIATION} priority string makes
-client require the extension for every handshake and servers will refuse
-renegotiation without it.
-
-To enforce your clients to upgrade to a version that supports safe
-renegotiation the %INITIAL_SAFE_RENEGOTIATION priority string should
-be used at server side.  This will deny any (re-)handshakes unless the
-client supports the extension.  This however will prevent all clients
-that do not support the extension from connecting to server, even if
-they do not use renegotiation.
+negotiated. The default behavior is @code{%PARTIAL_RENEGOTIATION} that will
+prevent renegotiation with clients and servers not supporting the
+extension. This is secure for servers but leaves clients vulnerable
+to some attacks, but this is a tradeoff between security and compatibility
+with old servers. The @code{%SAFE_RENEGOTIATION} priority string makes
+clients and servers require the extension for every handshake. The latter
+is the most secure option for clients, at the cost of not being able
+to connect to legacy servers. Servers will also deny clients that
+do not support the extension from connecting.
 
 It is possible to disable use of the extension completely, in both
 clients and servers, by using the @code{%DISABLE_SAFE_RENEGOTIATION}
@@ -1308,10 +1306,10 @@ The default values if the flags above are not specified are:
 @table @code
 
 @item Server:
-%SAFE_RENEGOTIATION
+%PARTIAL_RENEGOTIATION
 
 @item Client:
-%UNSAFE_RENEGOTIATION
+%PARTIAL_RENEGOTIATION
 
 @end table
 
