@@ -209,6 +209,8 @@ gnutls_global_init (void)
       gcry_control (GCRYCTL_DISABLE_SECMEM, NULL, 0);
 
       gcry_control (GCRYCTL_INITIALIZATION_FINISHED, NULL, 0);
+      
+      gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
     }
 #endif
   /* initialize ASN.1 parser
