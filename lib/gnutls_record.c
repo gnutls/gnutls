@@ -409,7 +409,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
       cipher_size =
 	_gnutls_encrypt (session, headers, RECORD_HEADER_SIZE, data,
-			 data2send_size, bufel->msg.data, cipher_size, type,
+			 data2send_size, _mbuffer_get_udata_ptr(bufel), cipher_size, type,
 			 (session->internals.priorities.no_padding ==
 			  0) ? 1 : 0);
       if (cipher_size <= 0)
@@ -434,7 +434,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 	  return GNUTLS_E_RECORD_LIMIT_REACHED;
 	}
 
-      bufel->msg.size = cipher_size;
+      _mbuffer_set_udata_size(bufel, cipher_size);
       ret = _gnutls_io_write_buffered (session, bufel);
     }
 

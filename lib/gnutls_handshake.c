@@ -674,7 +674,7 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 
   if (again == 0)
     {
-      bufel = _gnutls_handshake_alloc (36);
+      bufel = _gnutls_handshake_alloc (MAX_VERIFY_DATA_SIZE);
       if (bufel == NULL)
 	{
 	  gnutls_assert ();
@@ -1156,8 +1156,8 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st *bufel,
     }
 
   /* first run */
-  data = bufel->msg.data;
-  datasize = bufel->msg.size;
+  data = _mbuffer_get_uhead_ptr(bufel);
+  datasize = _mbuffer_get_udata_size(bufel) + _mbuffer_get_uhead_size(bufel);
 
   data[pos++] = (uint8_t) type;
   _gnutls_write_uint24 (bufel->msg.size - bufel->mark, &data[pos]);

@@ -27,12 +27,69 @@
 
 #include "gnutls_int.h"
 
-void _gnutls_mbuffer_init (mbuffer_head_st *buf);
-void _gnutls_mbuffer_clear (mbuffer_head_st *buf);
-void _gnutls_mbuffer_enqueue (mbuffer_head_st *buf, mbuffer_st *bufel);
-void _gnutls_mbuffer_get_head (mbuffer_head_st *buf, gnutls_datum_t *msg);
-int  _gnutls_mbuffer_remove_bytes (mbuffer_head_st *buf, size_t bytes);
-mbuffer_st* _gnutls_mbuffer_alloc (size_t payload_size);
-mbuffer_st* _gnutls_mbuffer_realloc (mbuffer_st *bufel, size_t payload_size);
+void _mbuffer_init (mbuffer_head_st *buf);
+void _mbuffer_clear (mbuffer_head_st *buf);
+void _mbuffer_enqueue (mbuffer_head_st *buf, mbuffer_st *bufel);
+void _mbuffer_get_head (mbuffer_head_st *buf, gnutls_datum_t *msg);
+int  _mbuffer_remove_bytes (mbuffer_head_st *buf, size_t bytes);
+mbuffer_st* _mbuffer_alloc (size_t payload_size);
+
+/* This is dangerous since it will replace bufel with a new
+ * one.
+ */
+mbuffer_st* _mbuffer_append_data (mbuffer_st *bufel, void* newdata, size_t newdata_size);
+
+
+/* For "user" use. One can have buffer data and header.
+ */
+
+inline static void _mbuffer_set_udata(mbuffer_st *bufel, void* data, size_t data_size)
+{
+  memcpy(bufel->msg.data + bufel->user_mark, data, data_size);
+}
+
+inline static void* _mbuffer_get_uhead_ptr(mbuffer_st *bufel)
+{
+  return bufel->msg.data;
+}
+
+inline static void* _mbuffer_get_udata_ptr(mbuffer_st *bufel)
+{
+  return bufel->msg.data + bufel->user_mark;
+}
+
+inline static void _mbuffer_set_udata_size(mbuffer_st *bufel, size_t size)
+{
+  bufel->msg.size = size + bufel->user_mark;
+}
+
+inline static size_t _mbuffer_get_udata_size(mbuffer_st *bufel)
+{
+  return bufel->msg.size - bufel->user_mark;
+}
+
+inline static size_t _mbuffer_get_uhead_size(mbuffer_st *bufel)
+{
+  return bufel->user_mark;
+}
+
+inline static void _mbuffer_set_uhead_size(mbuffer_st *bufel, size_t size)
+{
+  bufel->user_mark = size;
+}
+
+
+
+inline static mbuffer_st* _gnutls_handshake_alloc(size_t size)
+{
+  mbuffer_st *ret = _mbuffer_alloc (HANDSHAKE_HEADER_SIZE + size);
+
+  if (!ret)
+    return NULL;
+
+  _mbuffer_set_uhead_size(ret, HANDSHAKE_HEADER_SIZE);
+
+  return ret;
+}
 
 #endif
