@@ -900,8 +900,11 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
       ret = 0;
       break;
     case GNUTLS_PK_RSA:
-      if (signature == NULL) /* return a sensible algorithm */
-        return GNUTLS_DIG_SHA256;
+      if (signature == NULL) {/* return a sensible algorithm */
+        if (hash)
+          *hash = GNUTLS_DIG_SHA256;
+        return 0;
+      }
 
       ret =
 	_gnutls_pkcs1_rsa_decrypt (&decrypted, signature,
