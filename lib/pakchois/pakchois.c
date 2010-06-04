@@ -370,14 +370,13 @@ static void provider_unref(struct provider *prov)
 
 void pakchois_module_destroy(pakchois_module_t *mod)
 {
-    provider_unref(mod->provider);
-
     while (mod->slots) {
         struct slot *slot = mod->slots;
         pakchois_close_all_sessions(mod, slot->id);
         mod->slots = slot->next;
         free(slot);
     }
+    provider_unref(mod->provider);
 
     free(mod);
 }
