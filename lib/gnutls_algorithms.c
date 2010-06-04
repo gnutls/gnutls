@@ -1279,7 +1279,6 @@ _gnutls_version_has_selectable_prf (gnutls_protocol_t version)
   return version == GNUTLS_TLS1_2;
 }
 
-
 /* This function determines if the version specified has selectable
    signature/hash functions for certificate authentification. */
 int
@@ -1288,25 +1287,11 @@ _gnutls_version_has_selectable_sighash (gnutls_protocol_t version)
   return version == GNUTLS_TLS1_2;
 }
 
-/* This function determines if the version specified has selectable
-   signature/hash functions for certificate authentification. */
-int
-_gnutls_version_has_selectable_sighash (gnutls_protocol_t version)
-{
-  switch(version) {
-  case GNUTLS_TLS1_2:
-    return 1;
-  default:
-    return 0;
-  }
-}
-
 /* This function determines if the version specified has support for
    TLS extensions. */
 int
 _gnutls_version_has_extensions (gnutls_protocol_t version)
 {
-<<<<<<< HEAD:lib/gnutls_algorithms.c
   switch (version)
     {
     case GNUTLS_TLS1_0:
@@ -1347,44 +1332,6 @@ _gnutls_version_has_variable_padding (gnutls_protocol_t version)
     default:
       return 0;
     }
-=======
-  switch(version) {
-  case GNUTLS_TLS1_0:
-  case GNUTLS_TLS1_1:
-  case GNUTLS_TLS1_2:
-    return 1;
-  default:
-    return 0;
-  }
->>>>>>> Do not rely on version ordering; use switch..case instead.:lib/gnutls_algorithms.c
-}
-
-/* This function determines if the version specified has explicit IVs
-   (for CBC attack prevention). */
-int
-_gnutls_version_has_explicit_iv (gnutls_protocol_t version)
-{
-  switch(version) {
-  case GNUTLS_TLS1_1:
-  case GNUTLS_TLS1_2:
-    return 1;
-  default:
-    return 0;
-  }
-}
-
-/* This function determines if the version specified can have
-   non-minimal padding. */
-int _gnutls_version_has_variable_padding (gnutls_protocol_t version)
-{
-  switch(version) {
-  case GNUTLS_TLS1_0:
-  case GNUTLS_TLS1_1:
-  case GNUTLS_TLS1_2:
-    return 1;
-  default:
-    return 0;
-  }
 }
 
 /* Type to KX mappings */
@@ -2399,7 +2346,7 @@ gnutls_sec_param_get_name (gnutls_sec_param_t param)
     case GNUTLS_SEC_PARAM_HIGH:
       p = "High";
       break;
-
+  
     case GNUTLS_SEC_PARAM_ULTRA:
       p = "Ultra";
       break;
@@ -2437,7 +2384,7 @@ gnutls_sec_param_t gnutls_pk_bits_to_sec_param (gnutls_pk_algorithm_t algo,
     return GNUTLS_SEC_PARAM_NORMAL;
   else if (bits >= 1024)
     return GNUTLS_SEC_PARAM_LOW;
-  else
+  else 
     return GNUTLS_SEC_PARAM_WEAK;
 
 }

@@ -48,7 +48,7 @@ int _gnutls_handshake_buffer_get_ptr (gnutls_session_t session,
 				      opaque ** data_ptr, size_t * length);
 
 #define _gnutls_handshake_io_buffer_clear( session) \
-        _gnutls_mbuffer_clear( &session->internals.handshake_send_buffer); \
+        _mbuffer_clear( &session->internals.handshake_send_buffer); \
         _gnutls_buffer_clear( &session->internals.handshake_recv_buffer);
 
 ssize_t _gnutls_handshake_io_recv_int (gnutls_session_t, content_type_t,

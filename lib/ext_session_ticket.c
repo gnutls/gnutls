@@ -32,6 +32,7 @@
 #include <gnutls_session_pack.h>
 #include <random.h>
 #include <ext_session_ticket.h>
+#include <gnutls_mbuffers.h>
 
 #ifdef ENABLE_SESSION_TICKET
 
@@ -500,6 +501,7 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
 				       security_parameters.current_cipher_suite));
       if (ret < 0)
 	return ret;
+
       ret = _gnutls_set_write_mac (session,
 				   _gnutls_cipher_suite_get_mac_algo
 				   (&session->
@@ -531,7 +533,7 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
 
-      data = bufel->msg.data + bufel->mark;
+      data = _mbuffer_get_udata_ptr(bufel);
       p = data;
       /* FIXME: ticket lifetime is fixed to 10 days, which should be
          customizable. */
@@ -558,7 +560,6 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
       p += MAC_SIZE;
 
       data_size = p - data;
-      data = _gnutls_handshake_realloc(data, data_size);
     }
 
   ret = _gnutls_send_handshake (session, data_size ? bufel : NULL,

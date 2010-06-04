@@ -261,7 +261,6 @@ _gnutls_read (gnutls_session_t session, void *iptr,
   size_t left;
   ssize_t i = 0;
   char *ptr = iptr;
-  unsigned j, x, sum = 0;
   gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
 
   session->internals.direction = 0;
@@ -352,7 +351,6 @@ finish:
       _gnutls_read_log ("READ: read %d bytes from %p\n",
 			(int) (sizeOfPtr - left), fd);
 
-      dump_bytes (ptr, sizeOfPtr - left, 0);
     }
 
   return (sizeOfPtr - left);
@@ -670,7 +668,7 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 {
   mbuffer_head_st * const send_buffer = &session->internals.record_send_buffer;
 
-  _gnutls_mbuffer_enqueue (send_buffer, bufel);
+  _mbuffer_enqueue (send_buffer, bufel);
 
   _gnutls_write_log
     ("WRITE: enqueued %d bytes for %p. Total %d bytes.\n",
@@ -695,16 +693,15 @@ _gnutls_io_write_flush (gnutls_session_t session)
   _gnutls_write_log ("WRITE FLUSH: %d bytes in buffer.\n",
 		     (int)send_buffer->byte_length);
 
-  for (_gnutls_mbuffer_get_head (send_buffer, &msg);
+  for (_mbuffer_get_head (send_buffer, &msg);
        msg.data != NULL && msg.size > 0;
-       _gnutls_mbuffer_get_head (send_buffer, &msg))
+       _mbuffer_get_head (send_buffer, &msg))
     {
       ret = _gnutls_write (session, msg.data, msg.size);
 
       if (ret >= 0)
 	{
-	  dump_bytes (msg.data, msg.size, 1);
-	  _gnutls_mbuffer_remove_bytes (send_buffer, ret);
+	  _mbuffer_remove_bytes (send_buffer, ret);
 
 	  _gnutls_write_log ("WRITE: wrote %d bytes, %d bytes left.\n",
 			     ret, (int)send_buffer->byte_length);
@@ -747,9 +744,9 @@ _gnutls_handshake_io_write_flush (gnutls_session_t session)
   _gnutls_write_log ("HWRITE FLUSH: %d bytes in buffer.\n",
 		     (int)send_buffer->byte_length);
 
-  for (_gnutls_mbuffer_get_head (send_buffer, &msg);
+  for (_mbuffer_get_head (send_buffer, &msg);
        msg.data != NULL && msg.size > 0;
-       _gnutls_mbuffer_get_head (send_buffer, &msg))
+       _mbuffer_get_head (send_buffer, &msg))
     {
       ret = _gnutls_send_int (session, GNUTLS_HANDSHAKE,
 			      session->internals.handshake_send_buffer_htype,
@@ -757,8 +754,7 @@ _gnutls_handshake_io_write_flush (gnutls_session_t session)
 
       if (ret >= 0)
 	{
-	  dump_bytes (msg.data, msg.size, 1);
-	  _gnutls_mbuffer_remove_bytes (send_buffer, ret);
+	  _mbuffer_remove_bytes (send_buffer, ret);
 
 	  _gnutls_write_log ("HWRITE: wrote %d bytes, %d bytes left.\n",
 			     ret, (int)send_buffer->byte_length);
@@ -797,7 +793,7 @@ _gnutls_handshake_io_send_int (gnutls_session_t session,
 {
   mbuffer_head_st * const send_buffer = &session->internals.handshake_send_buffer;
 
-  _gnutls_mbuffer_enqueue (send_buffer, bufel);
+  _mbuffer_enqueue (send_buffer, bufel);
   session->internals.handshake_send_buffer_htype = htype;
 
   _gnutls_write_log

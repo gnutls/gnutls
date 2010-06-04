@@ -38,6 +38,7 @@
 #include <gnutls_state.h>
 #include <gnutls_datum.h>
 #include <gnutls_rsa_export.h>
+#include <gnutls_mbuffers.h>
 
 /* This is a temporary function to be used before the generate_*
    internal API is changed to use mbuffers. For now we don't avoid the
@@ -64,7 +65,7 @@ send_handshake (gnutls_session_t session, opaque *data, size_t size,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  memcpy(bufel->msg.data + bufel->mark, data, size);
+  _mbuffer_set_udata(bufel, data, size);
 
   return _gnutls_send_handshake(session, bufel, type);
 }

@@ -28,7 +28,7 @@
 /* Here be mbuffers */
 
 void
-_gnutls_mbuffer_init (mbuffer_head_st *buf)
+_mbuffer_init (mbuffer_head_st *buf)
 {
   buf->head = NULL;
   buf->tail = &buf->head;
@@ -38,7 +38,7 @@ _gnutls_mbuffer_init (mbuffer_head_st *buf)
 }
 
 void
-_gnutls_mbuffer_clear (mbuffer_head_st *buf)
+_mbuffer_clear (mbuffer_head_st *buf)
 {
   mbuffer_st *bufel, *next;
 
@@ -48,11 +48,11 @@ _gnutls_mbuffer_clear (mbuffer_head_st *buf)
       gnutls_free(bufel);
     }
 
-  _gnutls_mbuffer_init (buf);
+  _mbuffer_init (buf);
 }
 
 void
-_gnutls_mbuffer_enqueue (mbuffer_head_st *buf, mbuffer_st *bufel)
+_mbuffer_enqueue (mbuffer_head_st *buf, mbuffer_st *bufel)
 {
   bufel->next = NULL;
 
@@ -64,7 +64,7 @@ _gnutls_mbuffer_enqueue (mbuffer_head_st *buf, mbuffer_st *bufel)
 }
 
 void
-_gnutls_mbuffer_get_head (mbuffer_head_st *buf, gnutls_datum_t *msg)
+_mbuffer_get_head (mbuffer_head_st *buf, gnutls_datum_t *msg)
 {
   mbuffer_st *bufel;
 
@@ -101,7 +101,7 @@ remove_front (mbuffer_head_st *buf)
 }
 
 int
-_gnutls_mbuffer_remove_bytes (mbuffer_head_st *buf, size_t bytes)
+_mbuffer_remove_bytes (mbuffer_head_st *buf, size_t bytes)
 {
   size_t left = bytes;
   mbuffer_st *bufel, *next;
@@ -130,7 +130,7 @@ _gnutls_mbuffer_remove_bytes (mbuffer_head_st *buf, size_t bytes)
 }
 
 mbuffer_st *
-_gnutls_mbuffer_alloc (size_t payload_size)
+_mbuffer_alloc (size_t payload_size)
 {
   mbuffer_st * st;
 
@@ -145,25 +145,24 @@ _gnutls_mbuffer_alloc (size_t payload_size)
   st->msg.data = (opaque*)st + sizeof (mbuffer_st);
   st->msg.size = payload_size;
   st->mark = 0;
+  st->user_mark = 0;
   st->next = NULL;
 
   return st;
 }
 
 mbuffer_st*
-_gnutls_mbuffer_realloc (mbuffer_st *bufel, size_t payload_size)
+_mbuffer_append_data (mbuffer_st *bufel, void* newdata, size_t newdata_size)
 {
-  mbuffer_st *ret;
-
-  ret = gnutls_realloc_fast (bufel, payload_size+sizeof (mbuffer_st));
-  if (ret == NULL)
+  bufel = gnutls_realloc_fast (bufel, bufel->msg.size+newdata_size+sizeof (mbuffer_st));
+  if (bufel == NULL)
     {
       gnutls_assert ();
       return NULL;
     }
+  bufel->msg.data = (opaque*)bufel + sizeof (mbuffer_st);
+  memcpy(&bufel->msg.data[bufel->msg.size], newdata, newdata_size);
+  bufel->msg.size += newdata_size;
 
-  ret->msg.size = payload_size;
-  ret->msg.data = (opaque*)ret + sizeof (mbuffer_st);
-
-  return ret;
+  return bufel;
 }

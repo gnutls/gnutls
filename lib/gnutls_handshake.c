@@ -76,26 +76,6 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
 				  opaque * dataptr, uint32_t datalen);
 
 
-mbuffer_st*
-_gnutls_handshake_alloc(size_t size)
-{
-  mbuffer_st *ret = _gnutls_mbuffer_alloc (HANDSHAKE_HEADER_SIZE + size);
-
-  if (!ret)
-    return NULL;
-
-  ret->mark = HANDSHAKE_HEADER_SIZE;
-
-  return ret;
-}
-
-mbuffer_st*
-_gnutls_handshake_realloc(mbuffer_st *bufel, size_t size)
-{
-  mbuffer_st *ret = _gnutls_mbuffer_realloc (bufel, HANDSHAKE_HEADER_SIZE + size);
-
-  return ret;
-}
 
 /* Clears the handshake hash buffers and handles.
  */
@@ -671,6 +651,7 @@ _gnutls_send_finished (gnutls_session_t session, int again)
   mbuffer_st *bufel;
   opaque *data;
   int ret;
+  size_t vdata_size = 0;
 
   if (again == 0)
     {
@@ -680,7 +661,7 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 	  gnutls_assert ();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
-      data = bufel->msg.data + bufel->mark;
+      data = _mbuffer_get_udata_ptr(bufel);
 
       /* This is needed in order to hash all the required
        * messages.
@@ -696,12 +677,13 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 	  ret =
 	    _gnutls_ssl3_finished (session,
 				   session->security_parameters.entity, data);
+          _mbuffer_set_udata_size(bufel, 36);
 	}
       else
 	{			/* TLS 1.0+ */
 	  ret = _gnutls_finished (session,
 				  session->security_parameters.entity, data);
-	  bufel->msg.size = 12 + bufel->mark;
+          _mbuffer_set_udata_size(bufel, 12);
 	}
 
       if (ret < 0)
@@ -709,9 +691,33 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 	  gnutls_assert ();
 	  return ret;
 	}
+	
+      vdata_size = _mbuffer_get_udata_size(bufel);
 
       if (session->internals.finished_func)
-	session->internals.finished_func (session, data, bufel->msg.size - bufel->mark);
+	session->internals.finished_func (session, data, vdata_size);
+
+      /* Save data for safe renegotiation. 
+       */
+      if (vdata_size > MAX_VERIFY_DATA_SIZE)
+       {
+         gnutls_assert ();
+         return GNUTLS_E_INTERNAL_ERROR;
+       }
+
+       if (session->security_parameters.entity == GNUTLS_CLIENT)
+         {
+           session->security_parameters.extensions.client_verify_data_len =
+	    vdata_size;
+
+           memcpy (session->security_parameters.extensions.client_verify_data, data, vdata_size);
+         }
+       else
+         {
+           session->security_parameters.extensions.server_verify_data_len = vdata_size;
+           memcpy (session->security_parameters.extensions.server_verify_data,
+	      data, vdata_size);
+         }
 
       ret = _gnutls_send_handshake (session, bufel, GNUTLS_HANDSHAKE_FINISHED);
     }
@@ -1160,10 +1166,8 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st *bufel,
   datasize = _mbuffer_get_udata_size(bufel) + _mbuffer_get_uhead_size(bufel);
 
   data[pos++] = (uint8_t) type;
-  _gnutls_write_uint24 (bufel->msg.size - bufel->mark, &data[pos]);
+  _gnutls_write_uint24 ( _mbuffer_get_udata_size(bufel), &data[pos]);
   pos += 3;
-
-  bufel->mark = 0;
 
   _gnutls_handshake_log ("HSK[%p]: %s was sent [%ld bytes]\n",
 			 session, _gnutls_handshake2str (type),
@@ -1971,17 +1975,16 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 	  gnutls_assert ();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
-      data = bufel->msg.data + bufel->mark;
-
+      data = _mbuffer_get_udata_ptr(bufel);
       extdatalen = MAX_EXT_DATA_LENGTH
 	+
 	session->internals.resumed_security_parameters.
 	extensions.session_ticket_len;
+
       extdata = gnutls_malloc (extdatalen);
       if (extdata == NULL)
 	{
 	  gnutls_assert ();
-	  gnutls_free (data);
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
 
@@ -2005,6 +2008,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 	{
 	  gnutls_assert ();
 	  gnutls_free (bufel);
+	  gnutls_free(extdata);
 	  return GNUTLS_E_INTERNAL_ERROR;
 	}
 
@@ -2065,25 +2069,30 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 	  session->security_parameters.entity == GNUTLS_CLIENT &&
 	  gnutls_protocol_get_version (session) == GNUTLS_SSL3)
 	{
-	  datalen += extdatalen;
-	  bufel = _gnutls_handshake_realloc (bufel, datalen);
+	  ret =
+	    _gnutls_copy_ciphersuites (session, extdata, extdatalen, TRUE);
+	  _gnutls_extension_list_add (session,
+				      GNUTLS_EXTENSION_SAFE_RENEGOTIATION);
+	}
+      else
+	ret = _gnutls_copy_ciphersuites (session, extdata, extdatalen, FALSE);
+
+      if (ret > 0)
+	{
+	  bufel = _mbuffer_append_data (bufel, extdata, ret);
 	  if (bufel == NULL)
 	    {
 	      gnutls_assert ();
 	      gnutls_free (extdata);
 	      return GNUTLS_E_MEMORY_ERROR;
 	    }
-	  data = bufel->msg.data + bufel->mark;
-
-	  memcpy (&data[pos], extdata, ret);
-	  pos += ret;
-
 	}
       else
 	{
 	  if (extdatalen == 0)
 	    extdatalen = GNUTLS_E_INTERNAL_ERROR;
 	  gnutls_free (bufel);
+	  gnutls_free(extdata);
 	  gnutls_assert ();
 	  return ret;
 	}
@@ -2094,28 +2103,23 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       ret = _gnutls_copy_comp_methods (session, extdata, extdatalen);
       if (ret > 0)
 	{
-	  datalen += extdatalen;
-	  bufel = _gnutls_handshake_realloc (bufel, datalen);
+	  bufel = _mbuffer_append_data (bufel, extdata, ret);
 	  if (bufel == NULL)
 	    {
 	      gnutls_assert ();
 	      gnutls_free (extdata);
 	      return GNUTLS_E_MEMORY_ERROR;
 	    }
-	  data = bufel->msg.data + bufel->mark;
-
-	  memcpy (&data[pos], extdata, extdatalen);
-	  pos += extdatalen;
 	}
       else
 	{
 	  if (extdatalen == 0)
 	    extdatalen = GNUTLS_E_INTERNAL_ERROR;
 	  gnutls_free (bufel);
+	  gnutls_free(extdata);
 	  gnutls_assert ();
 	  return ret;
 	}
-
 
       /* Generate and copy TLS extensions.
        */
@@ -2129,37 +2133,28 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 	    type = GNUTLS_EXT_NONE;
 	}
 
-	  if (extdatalen > 0)
-	    {
-	      datalen += extdatalen;
-	      bufel = _gnutls_handshake_realloc (bufel, datalen);
-	      if (bufel == NULL)
-		{
-		  gnutls_assert ();
-		  return GNUTLS_E_MEMORY_ERROR;
-		}
-	      data = bufel->msg.data + bufel->mark;
+      ret = _gnutls_gen_extensions (session, extdata, extdatalen, type);
 
-	      memcpy (&data[pos], extdata, extdatalen);
-	    }
-	  else if (extdatalen < 0)
+      if (ret > 0)
+	{
+	  bufel = _mbuffer_append_data (bufel, extdata, ret);
+	  if (bufel == NULL)
 	    {
 	      gnutls_assert ();
-	      gnutls_free (bufel);
-	      return extdatalen;
+	      gnutls_free (extdata);
+	      return GNUTLS_E_MEMORY_ERROR;
 	    }
-
-	  memcpy (&data[pos], extdata, ret);
-	}
+        }
       else if (ret < 0)
-	{
-	  gnutls_assert ();
-	  gnutls_free (data);
-	  gnutls_free (extdata);
-	  return ret;
-	}
-
+        {
+          gnutls_assert ();
+          gnutls_free (bufel);
+	  gnutls_free(extdata);
+          return ret;
+        }
     }
+
+  gnutls_free(extdata);
 
   ret = _gnutls_send_handshake (session, bufel, GNUTLS_HANDSHAKE_CLIENT_HELLO);
 
@@ -2222,7 +2217,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 	  gnutls_assert ();
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
-      data = bufel->msg.data + bufel->mark;
+      data = _mbuffer_get_udata_ptr(bufel);
 
       data[pos++] =
 	_gnutls_version_get_major (session->security_parameters.version);
@@ -2612,7 +2607,7 @@ _gnutls_send_supplemental (gnutls_session_t session, int again)
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
 
-      memcpy(bufel->msg.data + bufel->mark, buf.data, buf.length);
+      _mbuffer_set_udata(bufel, buf.data, buf.length);
       _gnutls_buffer_clear (&buf);
 
       ret = _gnutls_send_handshake (session, bufel,
@@ -2653,34 +2648,33 @@ _gnutls_recv_supplemental (gnutls_session_t session)
 }
 
 /**
-  * gnutls_handshake - This is the main function in the handshake protocol.
-  * @session: is a #gnutls_session_t structure.
-  *
-  * This function does the handshake of the TLS/SSL protocol, and
-  * initializes the TLS connection.
-  *
-  * This function will fail if any problem is encountered, and will
-  * return a negative error code. In case of a client, if the client
-  * has asked to resume a session, but the server couldn't, then a
-  * full handshake will be performed.
-  *
-  * The non-fatal errors such as %GNUTLS_E_AGAIN and
-  * %GNUTLS_E_INTERRUPTED interrupt the handshake procedure, which
-  * should be later be resumed.  Call this function again, until it
-  * returns 0; cf.  gnutls_record_get_direction() and
-  * gnutls_error_is_fatal().
-  *
-  * If this function is called by a server after a rehandshake request
-  * then %GNUTLS_E_GOT_APPLICATION_DATA or
-  * %GNUTLS_E_WARNING_ALERT_RECEIVED may be returned.  Note that these
-  * are non fatal errors, only in the specific case of a rehandshake.
-  * Their meaning is that the client rejected the rehandshake request or
-  * in the case of %GNUTLS_E_GOT_APPLICATION_DATA it might also mean that
-  * some data were pending.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
-  *
-  **/
+ * gnutls_handshake:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function does the handshake of the TLS/SSL protocol, and
+ * initializes the TLS connection.
+ *
+ * This function will fail if any problem is encountered, and will
+ * return a negative error code. In case of a client, if the client
+ * has asked to resume a session, but the server couldn't, then a
+ * full handshake will be performed.
+ *
+ * The non-fatal errors such as %GNUTLS_E_AGAIN and
+ * %GNUTLS_E_INTERRUPTED interrupt the handshake procedure, which
+ * should be later be resumed.  Call this function again, until it
+ * returns 0; cf.  gnutls_record_get_direction() and
+ * gnutls_error_is_fatal().
+ *
+ * If this function is called by a server after a rehandshake request
+ * then %GNUTLS_E_GOT_APPLICATION_DATA or
+ * %GNUTLS_E_WARNING_ALERT_RECEIVED may be returned.  Note that these
+ * are non fatal errors, only in the specific case of a rehandshake.
+ * Their meaning is that the client rejected the rehandshake request or
+ * in the case of %GNUTLS_E_GOT_APPLICATION_DATA it might also mean that
+ * some data were pending.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ **/
 int
 gnutls_handshake (gnutls_session_t session)
 {

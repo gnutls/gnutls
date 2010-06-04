@@ -295,10 +295,10 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
   _gnutls_buffer_init (&(*session)->internals.handshake_hash_buffer);
   _gnutls_buffer_init (&(*session)->internals.ia_data_buffer);
 
-  _gnutls_mbuffer_init (&(*session)->internals.record_send_buffer);
+  _mbuffer_init (&(*session)->internals.record_send_buffer);
   _gnutls_buffer_init (&(*session)->internals.record_recv_buffer);
 
-  _gnutls_mbuffer_init (&(*session)->internals.handshake_send_buffer);
+  _mbuffer_init (&(*session)->internals.handshake_send_buffer);
   _gnutls_buffer_init (&(*session)->internals.handshake_recv_buffer);
 
   (*session)->key = gnutls_calloc (1, sizeof (struct gnutls_key_st));
@@ -394,7 +394,7 @@ gnutls_deinit (gnutls_session_t session)
   _gnutls_buffer_clear (&session->internals.handshake_data_buffer);
   _gnutls_buffer_clear (&session->internals.application_data_buffer);
   _gnutls_buffer_clear (&session->internals.record_recv_buffer);
-  _gnutls_mbuffer_clear (&session->internals.record_send_buffer);
+  _mbuffer_clear (&session->internals.record_send_buffer);
 
   gnutls_credentials_clear (session);
   _gnutls_selected_certs_deinit (session);
@@ -916,7 +916,6 @@ _gnutls_PRF (gnutls_session_t session,
 
   memcpy (s_seed, label, label_size);
   memcpy (&s_seed[label_size], seed, seed_size);
-
 
   if (_gnutls_version_has_selectable_prf (ver))
     {

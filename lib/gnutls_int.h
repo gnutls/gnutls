@@ -203,12 +203,6 @@ typedef enum content_type_t
 #define GNUTLS_PK_ANY (gnutls_pk_algorithm_t)-1
 #define GNUTLS_PK_NONE (gnutls_pk_algorithm_t)-2
 
-typedef enum
-{
-  HANDSHAKE_MAC_TYPE_10 = 1,
-  HANDSHAKE_MAC_TYPE_12
-} handshake_mac_type_t;
-
 /* Message buffers (mbuffers) structures */
 
 typedef struct mbuffer_st
@@ -220,6 +214,7 @@ typedef struct mbuffer_st
      message. Mark should only be non-zero when this buffer is the
      head of the queue. */
   size_t mark;
+  unsigned int user_mark; /* only used during fill in */
 } mbuffer_st;
 
 typedef struct mbuffer_head_st
@@ -230,6 +225,12 @@ typedef struct mbuffer_head_st
   unsigned int length;
   size_t byte_length;
 } mbuffer_head_st;
+
+typedef enum
+{
+  HANDSHAKE_MAC_TYPE_10 = 1,
+  HANDSHAKE_MAC_TYPE_12
+} handshake_mac_type_t;
 
 /* Store & Retrieve functions defines: 
  */

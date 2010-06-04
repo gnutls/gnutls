@@ -400,7 +400,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
       /* now proceed to packet encryption
        */
       cipher_size = data2send_size + MAX_RECORD_OVERHEAD;
-      bufel = _gnutls_mbuffer_alloc (cipher_size);
+      bufel = _mbuffer_alloc (cipher_size);
       if (bufel == NULL)
 	{
 	  gnutls_assert ();
@@ -465,7 +465,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 		      (int)
 		      _gnutls_uint64touint32
 		      (&session->connection_state.write_sequence_number),
-		      _gnutls_packet2str (type), type, cipher_size);
+		      _gnutls_packet2str (type), type, (int)cipher_size);
 
   return retval;
 }

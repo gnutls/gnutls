@@ -67,7 +67,7 @@ OPRFI_COBJECTS = ext_oprfi.c
 SESSION_TICKET_COBJECTS = ext_session_ticket.c
 
 COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
-	gnutls_buffers.c gnutls_handshake.c gnutls_num.c		\
+	gnutls_mbuffers.c gnutls_buffers.c gnutls_handshake.c gnutls_num.c \
 	gnutls_errors.c gnutls_algorithms.c gnutls_dh.c gnutls_kx.c	\
 	gnutls_priority.c gnutls_hash_int.c gnutls_cipher_int.c		\
 	gnutls_session.c gnutls_db.c x509_b64.c auth_anon.c		\
@@ -80,9 +80,10 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_str.c gnutls_state.c gnutls_x509.c ext_cert_type.c	\
 	gnutls_rsa_export.c auth_rsa_export.c ext_server_name.c		\
 	auth_dh_common.c gnutls_helper.c gnutls_supplemental.c		\
-	crypto.c random.c cryptodev.c ext_signature.c crypto-api.c \
-	ext_safe_renegotiation.c gnutls_mbuffers.c gnutls_privkey.c pkcs11.c \
-	pkcs11_privkey.c gnutls_pubkey.c pkcs11_write.c
+	crypto.c random.c  ext_signature.c cryptodev.c \
+	crypto-api.c ext_safe_renegotiation.c gnutls_privkey.c \
+	pkcs11.c pkcs11_privkey.c gnutls_pubkey.c pkcs11_write.c
+
 
 if ENABLE_NETTLE
 SUBDIRS += nettle
