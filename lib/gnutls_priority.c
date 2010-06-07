@@ -468,12 +468,12 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  * @priorities: is a string describing priorities
  * @err_pos: In case of an error this will have the position in the string the error occured
  *
- * Sets priorities for the ciphers, key exchange methods, macs and
- * compression methods. This is to avoid using the
- * gnutls_*_priority() functions.
+ * Sets priorities for the ciphers, key exchange methods, MACs and
+ * compression methods.  This provides a more flexible interface
+ * compared to the gnutls_*_priority functions.
  *
- * The #priorities option allows you to specify a colon
- * separated list of the cipher priorities to enable.
+ * The @priorities parameter allows you to specify a colon separated
+ * list of the cipher priorities to enable.
  *
  * Unless the first keyword is "NONE" the defaults (in preference
  * order) are for TLS protocols TLS1.1, TLS1.0, SSL3.0; for
@@ -485,9 +485,9 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  * are enabled (except for the RSA-EXPORT which is only enabled in
  * EXPORT level).
  *
- * Note that although one can select very long key sizes (such as 256 bits)
- * for symmetric algorithms, to actually increase security the public key
- * algorithms have to use longer key sizes as well.
+ * Note that although one can select very long key sizes (such as 256
+ * bits) for symmetric algorithms, to actually increase security the
+ * public key algorithms have to use longer key sizes as well.
  *
  * For all the current available algorithms and protocols use
  * "gnutls-cli -l" to get a listing.
@@ -499,7 +499,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  * limited to 128 bit ciphers and sorted by terms of speed
  * performance.
  *
- * "NORMAL" means all "secure" ciphersuites. The 256-bit ciphers are
+ * "NORMAL" means all "secure" ciphersuites.  The 256-bit ciphers are
  * included as a fallback only.  The ciphers are sorted by security
  * margin.
  *
@@ -522,33 +522,37 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  *
  * "%COMPAT" will enable compatibility features for a server.
  *
- * "%DISABLE_SAFE_RENEGOTIATION" will disable safe renegotiation completely. Do not use
- * unless you know what you are doing. Testing purposes only.
+ * "%DISABLE_SAFE_RENEGOTIATION" will disable safe renegotiation
+ * completely. Do not use unless you know what you are doing. Testing
+ * purposes only.
  *
- * "%UNSAFE_RENEGOTIATION" will allow unsafe renegotiation (this is now
- * the default for clients, but will change once more servers support the safe renegotiation
- * TLS fix).
+ * "%UNSAFE_RENEGOTIATION" will allow unsafe renegotiation (this is
+ * now the default for clients, but will change once more servers
+ * support the safe renegotiation TLS fix).
  *
- * "%PARTIAL_SAFE_RENEGOTIATION" In server side it will enable safe renegotiation
- * and will protect all clients from known attacks, but will not prevent insecure clients
- * from connecting. In client side it will disallow from renegotiating with an insecure server
- * but will not prevent connecting to one (this leaves the client vulnerable to attacks).
+ * "%PARTIAL_SAFE_RENEGOTIATION" In server side it will enable safe
+ * renegotiation and will protect all clients from known attacks, but
+ * will not prevent insecure clients from connecting. In client side
+ * it will disallow from renegotiating with an insecure server but
+ * will not prevent connecting to one (this leaves the client
+ * vulnerable to attacks).
  *
- * "%SAFE_RENEGOTIATION" will enforce safe renegotiation. Clients and Servers will refuse
- * to talk to an insecure peer.
+ * "%SAFE_RENEGOTIATION" will enforce safe renegotiation. Clients and
+ * Servers will refuse to talk to an insecure peer.
  *
- * "%SSL3_RECORD_VERSION" will use SSL3.0 record version in client hello.
+ * "%SSL3_RECORD_VERSION" will use SSL3.0 record version in client
+ * hello.
  *
  * "%VERIFY_ALLOW_SIGN_RSA_MD5" will allow RSA-MD5 signatures in
  * certificate chains.
  *
  * "%VERIFY_ALLOW_X509_V1_CA_CRT" will allow V1 CAs in chains.
  *
- * Namespace concern:
+ * Namespace:
  * To avoid collisions in order to specify a compression algorithm in
  * this string you have to prefix it with "COMP-", protocol versions
- * with "VERS-", signature algorithms with "SIGN-" and certificate types with "CTYPE-". All other
- * algorithms don't need a prefix.
+ * with "VERS-", signature algorithms with "SIGN-" and certificate
+ * types with "CTYPE-".  Other algorithms don't need a prefix.
  *
  * Examples:
  * "NORMAL:!AES-128-CBC" means normal ciphers except for AES-128.
@@ -560,7 +564,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  * "%COMPAT".
  *
  * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
- * %GNUTLS_E_SUCCESS on success, or an error code.
+ *   %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
 gnutls_priority_init (gnutls_priority_t * priority_cache,
