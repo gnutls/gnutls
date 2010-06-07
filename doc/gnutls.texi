@@ -1278,7 +1278,7 @@ the majority of deployed servers out there.  We will reconsider this
 default behaviour in the future when more servers have been upgraded.
 Note that it is easy to configure clients to always require the safe
 renegotiation extension from servers (see below on the
-$code{%SAFE_RENEGOTIATION} priority string).
+@code{%SAFE_RENEGOTIATION} priority string).
 
 To modify the default behaviour, we have introduced some new priority
 strings.  The priority strings can be used by applications
