@@ -1,3 +1,540 @@
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.9.11.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* doc/announce.txt: Update.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Fix typo.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Editorial doc fixes.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_priority.c: Doc fix.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_priority.c: Doc fix.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_safe_renegotiation.c, lib/gnutls_handshake.c,
+	lib/gnutls_int.h, lib/gnutls_priority.c, lib/gnutls_state.c: Expand
+	sr acronym for easy grepping.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_handshake.c, lib/gnutls_int.h, lib/gnutls_priority.c,
+	lib/x509/common.h, lib/x509/sign.c, lib/x509/verify.c,
+	tests/mini-x509-rehandshake.c, tests/safe-renegotiation/srn0.c,
+	tests/safe-renegotiation/srn1.c, tests/safe-renegotiation/srn2.c,
+	tests/safe-renegotiation/srn3.c, tests/safe-renegotiation/srn5.c,
+	tests/safe-renegotiation/srn6.c, tests/safe-renegotiation/srn7.c: 
+	Indent code.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* gl/override/top/maint.mk.diff, maint.mk: Drop unnecessary gnulib
+	patch.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/README: Improve safe renegotiation
+	README.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/Makefile.am,
+	tests/safe-renegotiation/README, tests/safe-renegotiation/srn7.c: 
+	Add new self test srn7.c.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/Makefile.am,
+	tests/safe-renegotiation/README, tests/safe-renegotiation/srn6.c: 
+	Add new self test srn6.c
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/README, tests/safe-renegotiation/srn5.c: 
+	Rewrite self test srn5.c.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/README, tests/safe-renegotiation/srn4.c: 
+	Rewrite srn4.c self test.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/README, tests/safe-renegotiation/srn3.c: 
+	Review srn3.c self test.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/README, tests/safe-renegotiation/srn2.c: 
+	Rewrite srn2.c self-test.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/srn1.c: Also check initial state.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/srn0.c: Also check initial state.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/README, tests/safe-renegotiation/srn1.c: 
+	Rewrite srn1.c self test.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/po/nl.po.in: Sync with TP.
+
+2010-06-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/announce.txt, doc/gnutls.texi, doc/manpages/gnutls-cli.1,
+	doc/manpages/gnutls-serv.1, lib/ext_safe_renegotiation.c,
+	lib/gnutls_handshake.c, lib/gnutls_int.h, lib/gnutls_priority.c,
+	lib/gnutls_state.c, tests/safe-renegotiation/srn1.c,
+	tests/safe-renegotiation/srn5.c, tests/safe-renegotiation/testsrn: 
+	Splitted safe renegotiation capabilities to %SAFE_RENEGOTIATION: will enable safe renegotiation. This is the
+	most secure and recommended option for clients. However this will
+	prevent from connecting to legacy servers.  %PARTIAL_RENEGOTIATION: Prevents renegotiation with clients and
+	servers not supporting the safe renegotiation extension. (this is
+	the default) %UNSAFE_RENEGOTIATION: Permits (re-)handshakes even unsafe ones.
+
+2010-05-31  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Minor fix.
+
+2010-05-31  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile, maint.mk: Update gnulib files.
+
+2010-05-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/gnutls.texi: Documented the defaults.
+
+2010-05-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/gnutls.texi: Added INITIAL_SAFE_RENEGOTIATION and other small
+	updates.
+
+2010-05-28  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Update.
+
+2010-05-28  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/README: Add.
+
+2010-05-28  Simon Josefsson <simon@josefsson.org>
+
+	* .x-sc_prohibit_strings_without_use, build-aux/c++defs.h,
+	build-aux/gendocs.sh, build-aux/gnupload, build-aux/vc-list-files,
+	configure.ac, doc/gendocs_template, gl/Makefile.am, gl/error.c,
+	gl/m4/asm-underscore.m4, gl/m4/gnulib-cache.m4,
+	gl/m4/gnulib-common.m4, gl/m4/gnulib-comp.m4, gl/m4/netdb_h.m4,
+	gl/m4/stdio_h.m4, gl/m4/unistd_h.m4, gl/m4/valgrind-tests.m4,
+	gl/netdb.in.h, gl/stdio-write.c, gl/stdio.in.h,
+	gl/tests/Makefile.am, gl/tests/init.sh, gl/tests/test-lseek.sh,
+	gl/tests/test-vc-list-files-cvs.sh,
+	gl/tests/test-vc-list-files-git.sh, gl/tests/test-verify.c,
+	gl/tests/test-verify.sh, gl/tests/verify.h, gl/unistd.in.h,
+	gl/vasnprintf.c, gl/wchar.in.h, gtk-doc.make,
+	lib/build-aux/c++defs.h, lib/gl/Makefile.am,
+	lib/gl/m4/asm-underscore.m4, lib/gl/m4/fcntl-o.m4,
+	lib/gl/m4/gettext.m4, lib/gl/m4/gnulib-common.m4,
+	lib/gl/m4/gnulib-comp.m4, lib/gl/m4/iconv.m4, lib/gl/m4/intl.m4,
+	lib/gl/m4/netdb_h.m4, lib/gl/m4/po.m4, lib/gl/m4/stdio_h.m4,
+	lib/gl/m4/unistd_h.m4, lib/gl/netdb.in.h, lib/gl/stdio-write.c,
+	lib/gl/stdio.in.h, lib/gl/tests/Makefile.am, lib/gl/tests/init.sh,
+	lib/gl/tests/test-vasprintf.c, lib/gl/tests/test-verify.c,
+	lib/gl/tests/test-verify.sh, lib/gl/tests/verify.h,
+	lib/gl/unistd.in.h, lib/gl/vasnprintf.c, lib/gl/wchar.in.h,
+	libextra/gl/m4/gnulib-common.m4, m4/valgrind.m4, maint.mk: Update
+	gnulib files, use valgrind-tests module, fix syntax-check problems.
+
+2010-05-28  Simon Josefsson <simon@josefsson.org>
+
+	* doc/announce.txt: Doc fix.
+
+2010-05-25  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/common.h, lib/x509/privkey.c, lib/x509/sign.c,
+	lib/x509/verify.c: Use correct hashing algorithms for DSA with q
+	over 160 bits.
+
+2010-05-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_algorithms.c: Better checks in loops.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/crl.c: Doc fix.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am, gtk-doc.make, m4/gtk-doc.m4: Support
+	GTK-DOC PDF file.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Also build PDF manual.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Fix node/section usage.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/srn5.c: Fix self test.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_handshake.c: Readd lost fix from Nikos.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/ext_safe_renegotiation.c: Readd lost fix from Nikos.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_errors.c, libextra/includes/gnutls/openssl.h,
+	libextra/openssl_compat.c: Doc fixes.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/x509.c: Doc fix.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* Makefile.am, NEWS, README, cfg.mk, configure.ac, doc/Makefile.am,
+	doc/credentials/Makefile.am, doc/cyclo/Makefile.am, doc/errcodes.c,
+	doc/examples/Makefile.am, doc/examples/ex-client-srp.c,
+	doc/examples/ex-serv-anon.c, doc/examples/ex-serv-pgp.c,
+	doc/examples/ex-serv-psk.c, doc/examples/ex-serv-srp.c,
+	doc/examples/ex-serv1.c, doc/gnutls.texi, doc/manpages/Makefile.am,
+	doc/printlist.c, guile/Makefile.am, guile/modules/Makefile.am,
+	guile/modules/gnutls.scm, guile/modules/gnutls/build/enums.scm,
+	guile/modules/gnutls/build/priorities.scm,
+	guile/modules/gnutls/build/smobs.scm,
+	guile/modules/gnutls/build/utils.scm,
+	guile/modules/gnutls/extra.scm, guile/src/Makefile.am,
+	guile/src/core.c, guile/src/errors.c, guile/src/errors.h,
+	guile/src/extra.c, guile/src/make-enum-header.scm,
+	guile/src/make-enum-map.scm, guile/src/make-session-priorities.scm,
+	guile/src/make-smob-header.scm, guile/src/make-smob-types.scm,
+	guile/src/utils.c, guile/src/utils.h, guile/tests/Makefile.am,
+	guile/tests/anonymous-auth.scm, guile/tests/errors.scm,
+	guile/tests/openpgp-auth.scm, guile/tests/openpgp-keyring.scm,
+	guile/tests/openpgp-keys.scm, guile/tests/pkcs-import-export.scm,
+	guile/tests/session-record-port.scm, guile/tests/srp-base64.scm,
+	guile/tests/x509-auth.scm, guile/tests/x509-certificates.scm,
+	lib/Makefile.am, lib/auth_anon.c, lib/auth_anon.h, lib/auth_cert.c,
+	lib/auth_cert.h, lib/auth_dh_common.c, lib/auth_dh_common.h,
+	lib/auth_dhe.c, lib/auth_dhe_psk.c, lib/auth_psk.c, lib/auth_psk.h,
+	lib/auth_psk_passwd.c, lib/auth_psk_passwd.h, lib/auth_rsa.c,
+	lib/auth_rsa_export.c, lib/auth_srp.c, lib/auth_srp.h,
+	lib/auth_srp_passwd.c, lib/auth_srp_passwd.h, lib/auth_srp_rsa.c,
+	lib/auth_srp_sb64.c, lib/cipher-libgcrypt.c, lib/configure.ac,
+	lib/crypto-api.c, lib/crypto.c, lib/crypto.h, lib/cryptodev.c,
+	lib/debug.c, lib/debug.h, lib/ext_cert_type.c, lib/ext_cert_type.h,
+	lib/ext_max_record.c, lib/ext_max_record.h, lib/ext_oprfi.c,
+	lib/ext_oprfi.h, lib/ext_safe_renegotiation.c,
+	lib/ext_safe_renegotiation.h, lib/ext_server_name.c,
+	lib/ext_server_name.h, lib/ext_session_ticket.c,
+	lib/ext_session_ticket.h, lib/ext_signature.c, lib/ext_signature.h,
+	lib/ext_srp.c, lib/ext_srp.h, lib/gnutls_alert.c,
+	lib/gnutls_algorithms.c, lib/gnutls_algorithms.h,
+	lib/gnutls_anon_cred.c, lib/gnutls_auth.c, lib/gnutls_auth.h,
+	lib/gnutls_buffers.c, lib/gnutls_buffers.h, lib/gnutls_cert.c,
+	lib/gnutls_cert.h, lib/gnutls_cipher.c, lib/gnutls_cipher.h,
+	lib/gnutls_cipher_int.c, lib/gnutls_cipher_int.h,
+	lib/gnutls_compress.c, lib/gnutls_compress.h,
+	lib/gnutls_constate.c, lib/gnutls_constate.h, lib/gnutls_datum.c,
+	lib/gnutls_datum.h, lib/gnutls_db.c, lib/gnutls_db.h,
+	lib/gnutls_dh.c, lib/gnutls_dh.h, lib/gnutls_dh_primes.c,
+	lib/gnutls_errors.c, lib/gnutls_errors.h, lib/gnutls_extensions.c,
+	lib/gnutls_extensions.h, lib/gnutls_global.c, lib/gnutls_global.h,
+	lib/gnutls_handshake.c, lib/gnutls_handshake.h,
+	lib/gnutls_hash_int.c, lib/gnutls_hash_int.h, lib/gnutls_helper.c,
+	lib/gnutls_int.h, lib/gnutls_kx.c, lib/gnutls_kx.h,
+	lib/gnutls_mem.c, lib/gnutls_mem.h, lib/gnutls_mpi.c,
+	lib/gnutls_mpi.h, lib/gnutls_num.c, lib/gnutls_num.h,
+	lib/gnutls_pk.c, lib/gnutls_pk.h, lib/gnutls_priority.c,
+	lib/gnutls_psk.c, lib/gnutls_psk_netconf.c, lib/gnutls_record.c,
+	lib/gnutls_record.h, lib/gnutls_rsa_export.c,
+	lib/gnutls_rsa_export.h, lib/gnutls_session.c,
+	lib/gnutls_session_pack.c, lib/gnutls_session_pack.h,
+	lib/gnutls_sig.c, lib/gnutls_sig.h, lib/gnutls_srp.c,
+	lib/gnutls_srp.h, lib/gnutls_state.c, lib/gnutls_state.h,
+	lib/gnutls_str.c, lib/gnutls_str.h, lib/gnutls_supplemental.c,
+	lib/gnutls_supplemental.h, lib/gnutls_ui.c, lib/gnutls_v2_compat.c,
+	lib/gnutls_v2_compat.h, lib/gnutls_x509.c, lib/gnutls_x509.h,
+	lib/includes/Makefile.am, lib/includes/gnutls/crypto.h,
+	lib/includes/gnutls/gnutls.h.in, lib/includes/gnutls/openpgp.h,
+	lib/includes/gnutls/pkcs12.h, lib/includes/gnutls/x509.h,
+	lib/libgnutls.map, lib/libgnutlsxx.map, lib/m4/hooks.m4,
+	lib/mac-libgcrypt.c, lib/minitasn1/Makefile.am,
+	lib/mpi-libgcrypt.c, lib/opencdk/Makefile.am,
+	lib/openpgp/Makefile.am, lib/openpgp/compat.c,
+	lib/openpgp/extras.c, lib/openpgp/gnutls_openpgp.c,
+	lib/openpgp/output.c, lib/openpgp/pgp.c, lib/openpgp/pgpverify.c,
+	lib/openpgp/privkey.c, lib/pk-libgcrypt.c, lib/random.c,
+	lib/random.h, lib/rnd-libgcrypt.c, lib/x509/Makefile.am,
+	lib/x509/common.c, lib/x509/common.h, lib/x509/crl.c,
+	lib/x509/crl_write.c, lib/x509/crq.c, lib/x509/dn.c,
+	lib/x509/extensions.c, lib/x509/mpi.c, lib/x509/output.c,
+	lib/x509/pkcs12.c, lib/x509/pkcs12_bag.c, lib/x509/pkcs12_encr.c,
+	lib/x509/pkcs7.c, lib/x509/privkey.c, lib/x509/privkey_pkcs8.c,
+	lib/x509/rfc2818_hostname.c, lib/x509/sign.c, lib/x509/verify.c,
+	lib/x509/x509.c, lib/x509/x509_int.h, lib/x509/x509_write.c,
+	lib/x509_b64.c, lib/x509_b64.h, libextra/Makefile.am,
+	libextra/configure.ac, libextra/ext_inner_application.c,
+	libextra/ext_inner_application.h, libextra/fipsmd5.c,
+	libextra/gl/Makefile.am, libextra/gnutls_extra.c,
+	libextra/gnutls_ia.c, libextra/gnutls_openssl.c,
+	libextra/includes/Makefile.am, libextra/includes/gnutls/extra.h,
+	libextra/includes/gnutls/openssl.h, libextra/libgnutls-extra.map,
+	libextra/m4/hooks.m4, libextra/openssl_compat.c,
+	libextra/openssl_compat.h, src/Makefile.am, src/benchmark.c,
+	src/certtool-cfg.c, src/certtool.c, src/cli.c, src/common.c,
+	src/crypt.c, src/list.h, src/prime.c, src/psk.c, src/serv.c,
+	src/tests.c, src/tls_test.c, tests/Makefile.am, tests/anonself.c,
+	tests/certder.c, tests/certificate_set_x509_crl.c,
+	tests/chainverify.c, tests/crq_apis.c, tests/crq_key_id.c,
+	tests/crypto_rng.c, tests/cve-2008-4989.c, tests/cve-2009-1415.c,
+	tests/cve-2009-1416.c, tests/dhepskself.c, tests/dn.c, tests/dn2.c,
+	tests/finished.c, tests/gc.c, tests/hostname-check.c,
+	tests/init_roundtrip.c, tests/key-id/Makefile.am,
+	tests/key-id/key-id, tests/mini-eagain.c,
+	tests/mini-x509-rehandshake.c, tests/mini-x509.c, tests/mini.c,
+	tests/moredn.c, tests/mpi.c, tests/netconf-psk.c,
+	tests/nist-pkits/pkits, tests/nist-pkits/pkits_crl,
+	tests/nist-pkits/pkits_crt, tests/nist-pkits/pkits_pkcs12,
+	tests/nist-pkits/pkits_smime, tests/nul-in-x509-names.c,
+	tests/openpgp-certs/Makefile.am, tests/openpgp-certs/testcerts,
+	tests/openpgp-certs/testselfsigs, tests/openpgp-keyring.c,
+	tests/openpgpself.c, tests/openssl.c, tests/oprfi.c,
+	tests/parse_ca.c, tests/pathlen/Makefile.am, tests/pathlen/pathlen,
+	tests/pgps2kgnu.c, tests/pkcs1-padding/Makefile.am,
+	tests/pkcs1-padding/pkcs1-pad, tests/pkcs12-decode/Makefile.am,
+	tests/pkcs12-decode/pkcs12, tests/pkcs12_encode.c,
+	tests/pkcs12_s2k.c, tests/pkcs12_s2k_pem.c,
+	tests/pkcs8-decode/Makefile.am, tests/pkcs8-decode/pkcs8,
+	tests/pskself.c, tests/resume.c, tests/rfc2253-escape-test,
+	tests/rsa-md5-collision/Makefile.am,
+	tests/rsa-md5-collision/rsa-md5-collision,
+	tests/safe-renegotiation/Makefile.am,
+	tests/safe-renegotiation/srn0.c, tests/safe-renegotiation/srn1.c,
+	tests/safe-renegotiation/srn2.c, tests/safe-renegotiation/srn3.c,
+	tests/safe-renegotiation/srn4.c, tests/safe-renegotiation/srn5.c,
+	tests/safe-renegotiation/testsrn, tests/set_pkcs12_cred.c,
+	tests/setcredcrash.c, tests/sha2/Makefile.am, tests/sha2/sha2,
+	tests/simple.c, tests/tlsia.c, tests/userid/Makefile.am,
+	tests/userid/userid, tests/utils.c, tests/utils.h,
+	tests/x509_altname.c, tests/x509dn.c, tests/x509paths/chain,
+	tests/x509self.c, tests/x509sign-verify.c, tests/x509signself.c: 
+	Change GNUTLS into GnuTLS.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS, ChangeLog.1, NEWS, README, README-alpha, THANKS,
+	doc/gnutls.texi, doc/manpages/gnutls-cli-debug.1,
+	doc/manpages/gnutls-cli.1, doc/manpages/gnutls-serv.1,
+	doc/manpages/srptool.1, doc/reference/gnutls-docs.sgml,
+	lib/ext_safe_renegotiation.c, lib/gnutls_handshake.c,
+	src/cli-gaa.c, src/cli.gaa, src/serv-gaa.c, src/serv.gaa,
+	src/tls_test-gaa.c, src/tls_test.gaa: Change GNU TLS into GnuTLS.
+
+2010-05-22  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/ext_safe_renegotiation.c, lib/gnutls_handshake.c: Ignore
+	parsing of ciphersuite or extensions when safe renegotiation is
+	disabled.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/Makefile.am,
+	tests/safe-renegotiation/srn5.c: Add test of self renegotiation
+	APIs.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/Makefile.am,
+	tests/safe-renegotiation/README, tests/safe-renegotiation/srn4.c: 
+	Add more rengotiation self tests.
+
+2010-05-22  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/Makefile.am,
+	tests/safe-renegotiation/README, tests/safe-renegotiation/srn0.c: 
+	Add more safe renegotiation self test.
+
+2010-05-21  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/announce.txt, doc/gnutls.texi,
+	doc/manpages/Makefile.am, lib/ext_safe_renegotiation.c,
+	lib/includes/gnutls/gnutls.h.in, lib/libgnutls.map,
+	tests/safe-renegotiation/srn2.c: Remove
+	gnutls_safe_negotiation_set_initial and
+	gnutls_safe_renegotiation_set.
+
+2010-05-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_priority.c: Documented behavioral change.
+
+2010-05-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_int.h, lib/gnutls_priority.c: Because we want to
+	differentiate the behavior of server and client with regards to safe
+	renegotiation. If a server didn't have either SAFE_RENEGOTIATION or
+	UNSAFE_RENEGOTIATION set the safe renegotiation will be the default.
+	This (as well as the safe_renegotiation_set flag) has to be removed
+	once safe renegotiation is default in both server and client side.
+
+2010-05-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_state.c: Emulate old gnutls behavior regarding safe
+	renegotiation if the priority_* functions are not called.
+
+2010-05-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/includes/gnutls/x509.h: Corrected typo. Reported by Clint
+	Adams.
+
+2010-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/Makefile.am,
+	tests/safe-renegotiation/srn1.c, tests/safe-renegotiation/srn3.c: 
+	tests: Add srn3 to test inverse of what srn1 is testing.
+
+2010-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/Makefile.am,
+	tests/safe-renegotiation/srn2.c: tests: Add another safe
+	renegotiation self tests.
+
+2010-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/srn1.c: Also test
+	gnutls_safe_renegotiation_status API.
+
+2010-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/Makefile.am,
+	tests/safe-renegotiation/srn1.c: tests: Add first self-test of safe
+	renegotiation extension.
+
+2010-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/mini-x509-rehandshake.c: tests: Add small
+	X.509 rehandshake test.
+
+2010-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/mini-x509.c: Protect against infloops.
+
+2010-05-03  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/mini-x509.c: tests: Add mini-x509
+	self-test.
+
+2010-04-30  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Improve text, based on suggestions from Tomas
+	Hoger <thoger@redhat.com>.
+
+2010-04-29  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_handshake.c: Fix typo.
+
+2010-04-29  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_handshake.c: Improve renegotiation debug messages.
+
+2010-04-29  Simon Josefsson <simon@josefsson.org>
+
+	* doc/announce.txt: Add.
+
+2010-04-29  Simon Josefsson <simon@josefsson.org>
+
+	* .gitignore: Add.
+
+2010-04-29  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Add section on safe renegotiation.
+
+2010-04-29  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_record.c: Remove debug code.
+
+2010-04-25  Simon Josefsson <simon@josefsson.org>
+
+	* doc/gnutls.texi: Mention shared library map file and GTK-DOC
+	guidelines.
+
+2010-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* doc/announce.txt: Update URL.
+
+2010-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* AUTHORS: Update my OpenPGP key.
+
+2010-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* doc/announce.txt: Update my key.
+
+2010-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* doc/announcement-template.txt: Remove.
+
+2010-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* doc/ANNOUNCE, doc/announce.txt: Prepare 2.10.0 release notes.
+
+2010-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add 2.8.x NEWS entries.
+
+2010-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/configure.ac: Also bump libgnutls-extra version.
+
+2010-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4: Bump
+	versions.
+
+2010-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/gendocs.sh: Chmod +x.
+
+2010-04-22  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2010-04-22  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.9.10.
@@ -20958,12 +21495,7 @@
 
 2005-11-07  Simon Josefsson <simon@josefsson.org>
 
-	* NEWS: Version 1.2.9.
-
-2005-11-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
-
-	* corrected bug in pkcs 12 ID key setting. Found and reported by Fran
-	<e_agf@yahoo.es>.
+	* Version 1.2.9.
 
 	-----
 
