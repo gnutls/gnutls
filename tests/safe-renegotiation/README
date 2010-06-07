@@ -1,49 +1,93 @@
 Testing safe renegotiation is relatively complex, here is a summary of
 what we test and what how we believe it should work.
 
-srn0.c:
+	Client setting
+			Server setting
+					Initial handshake outcome
+							Rehandshake outcome
+srn0.c
 
  This tests that the safe renegotiation extension is negotiated
  properly by default on initial connections and on rehandshaked
  connections.  Consequently, it also verifies that rehandshaked
  connections work with the extension enabled.
 
-srn1.c:
+	NORMAL
+			NORMAL
+					OK
+							OK
+
+srn1.c
 
  This tests that clients without support for safe renegotiation is
  able to handshake against servers with support, but not able to
  rehandshake (server will refuse rehandshake).
 
-srn2.c:
+	NORMAL:%DISABLE_SAFE_RENEGOTIATION
+			NORMAL
+					OK
+							Server refuses
+
+srn2.c
 
  This tests that clients with support for safe renegotiation is able
  to handshake against servers without support, but not able to
  rehandshake (client will refuse rehandshake).
 
-srn3.c:
+	NORMAL
+			NORMAL:%DISABLE_SAFE_RENEGOTIATION
+					OK
+							Client refuses
+
+srn3.c
 
  This tests that a %SAFE_RENEGOTIATION client will reject handshakes
  against servers that do not support the extension (server uses
  %DISABLE_SAFE_RENEGOTIATION).
 
-srn4.c:
+	NORMAL:%SAFE_RENEGOTIATION
+			NORMAL:%DISABLE_SAFE_RENEGOTIATION
+					Client refuses
+							N/A
+
+srn4.c
 
  This tests that a %SAFE_RENEGOTIATION server will reject handshakes
  against clients that do not support the extension.
 
-srn5.c:
+	NORMAL:%DISABLE_SAFE_RENEGOTIATION
+			NORMAL:%SAFE_RENEGOTIATION
+					Server refuses
+							N/A
+
+srn5.c
 
  This tests that a client with a permissive policy
  (%UNSAFE_RENEGOTIATION) is able to handshake and rehandshake with a
  server with no support for the extension.
 
-srn6.c:
+	NORMAL:%DISABLE_SAFE_RENEGOTIATION
+			NORMAL:%UNSAFE_RENEGOTIATION
+					OK
+							OK
+
+srn6.c
 
  This tests that a server with a permissive policy
  (%UNSAFE_RENEGOTIATION) is able to handshake and rehandshake with a
  client with no support for the extension.
 
-srn7.c:
+	NORMAL:%UNSAFE_RENEGOTIATION
+			NORMAL:%DISABLE_SAFE_RENEGOTIATION
+					OK
+							OK
+
+srn7.c
 
  This tests that clients and servers in %SAFE_RENEGOTIATION mode are
  able to handshake and rehandshake.
+
+	NORMAL:%SAFE_RENEGOTIATION
+			NORMAL:%SAFE_RENEGOTIATION
+					OK
+							OK
