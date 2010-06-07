@@ -23,8 +23,8 @@
 /* Code based on ../mini-x509.c.
  *
  * This tests that a %SAFE_RENEGOTIATION client will reject handshakes
- * against servers that do not support the extension.  This is sort of
- * the inverse of what srn1.c is testing.
+ * against servers that do not support the extension (server uses
+ * %DISABLE_SAFE_RENEGOTIATION).
  */
 
 #ifdef HAVE_CONFIG_H

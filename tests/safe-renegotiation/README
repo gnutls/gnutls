@@ -20,6 +20,12 @@ srn2.c:
  to handshake against servers without support, but not able to
  rehandshake (client will refuse rehandshake).
 
+srn3.c:
+
+ This tests that a %SAFE_RENEGOTIATION client will reject handshakes
+ against servers that do not support the extension (server uses
+ %DISABLE_SAFE_RENEGOTIATION).
+
 srn4.c:
 
  This tests that clients without support for safe renegotiation is
