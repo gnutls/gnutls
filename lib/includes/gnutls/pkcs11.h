@@ -1,18 +1,6 @@
 #ifndef __GNUTLS_PKCS11_H
 #define __GNUTLS_PKCS11_H
 
-/**
- * @addtogroup gnutls_pkcs11 GnuTLS PKCS#11 interface.
- *
- * @{
- */
-
-/**
- * @file gnutls-pkcs11.h
- * @brief gnutls-pkcs11 interface.
- * @author Alon Bar-Lev <alon.barlev@gmail.com>
- * @see @ref gnutls_pkcs11
- */
 
 #include <stdarg.h>
 #include <gnutls/gnutls.h>
@@ -20,12 +8,12 @@
 
 #define GNUTLS_PKCS11_MAX_PIN_LEN 32
 
-/**
- * @brief Token prompt callback.
- * @param global_data	Callback data.
- * @param label		Token label.
- * @param retry		Retry counter.
- * @return none zero on success.
+/* Token callback function. The callback will be used to
+ * ask the user to re-enter the token with given null terminated
+ * label. Callback should return zero if token has been inserted
+ * by user and a negative error code otherwise. It might be called
+ * multiple times if the token is not detected and the retry counter
+ * will be increased.
  */
 typedef int (*gnutls_pkcs11_token_callback_t)(
 	void * const global_data,
@@ -63,9 +51,6 @@ typedef int (*gnutls_pkcs11_pin_callback_t)(void *userdata, int attempt,
                                     unsigned int flags,
                                     char *pin, size_t pin_max);
 
-/**
- * @brief PKCS#11 certificate reference.
- */
 struct gnutls_pkcs11_obj_st;
 typedef struct gnutls_pkcs11_obj_st* gnutls_pkcs11_obj_t;
 
@@ -78,58 +63,11 @@ typedef struct gnutls_pkcs11_obj_st* gnutls_pkcs11_obj_t;
  * load = /lib/yyy-pkcs11.so
  */
 
-/**
- * @brief Initialize gnutls-pkcs11.
- * @param params	Misc values to use.
- * @return gnutls status.
- * @note gnutls-pkcs11 must be uninitialize.
- * @see gnutls_pkcs11_deinit()
- * @todo params is not implemented yet.
- *
- * params is in the format of:
- * name=value;name=value;
- */
 int gnutls_pkcs11_init (unsigned int flags, const char* configfile);
-
-/**
- * @brief Deinitialize gnutls-pkcs11.
- * @return gnutls status.
- */
 void gnutls_pkcs11_deinit (void);
-
-/**
- * @brief Set token prompt callback.
- * @param callback	Callback to use.
- * @param data		Data to use when calling callback.
- * @return gnutls status.
- */
 void gnutls_pkcs11_set_token_function(gnutls_pkcs11_token_callback_t fn, void *userdata);
-
-/**
- * @brief Set PIN prompt callback.
- * @param callback	Callback to use.
- * @param data		Data to use when calling callback.
- * @return gnutls status.
- */
 void gnutls_pkcs11_set_pin_function (gnutls_pkcs11_pin_callback_t callback, void * data);
-
-/**
- * @brief Add PKCS#11 provider.
- * @param name		Library to load.
- * @param params	Misc provider parameters.
- * @return gnutls status.
- * @todo params is not implemented yet.
- *
- * params is in the format of:
- * name=value;name=value; 
- */
 int gnutls_pkcs11_add_provider (const char * name, const char * params);
-
-/**
- * @brief Free certificate reference.
- * @param certificate	Certificate reference to free.
- * @return gnutls stauts.
- */
 int gnutls_pkcs11_obj_init ( gnutls_pkcs11_obj_t *certificate);
 
 int gnutls_pkcs11_obj_import_url (gnutls_pkcs11_obj_t, const char * url);
