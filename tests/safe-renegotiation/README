@@ -28,9 +28,8 @@ srn3.c:
 
 srn4.c:
 
- This tests that clients without support for safe renegotiation is
- able to handshake properly against a default GnuTLS server, but
- that rehandshake will be refused by the server.
+ This tests that a %SAFE_RENEGOTIATION server will reject handshakes
+ against clients that do not support the extension.
 
 srn5.c:
  This tests that clients with support for safe renegotiation is able
