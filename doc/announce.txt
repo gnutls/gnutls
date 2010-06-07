@@ -23,18 +23,10 @@ What's New
 ==========
 
 Version 2.10.0 is the first stable release on the 2.10.x branch and is
-the result of 11 months of work on the experimental 2.9.x branch.  The
-GnuTLS 2.10.x branch replaces the GnuTLS 2.8.x branch as the supported
-stable branch, although we will continue to support GnuTLS 2.8.x for
-some time.
-
-** libgnutls: Time verification extended to trusted certificate list.
-Unless new constant GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS flag is
-specified.
-
-** certtool: Display postalCode and Name X.509 DN attributes correctly.
-Based on patch by Pavan Konjarla.  Adds new constant
-GNUTLS_OID_X520_POSTALCODE and GNUTLS_OID_X520_NAME.
+the result of over 12 months of work on the experimental 2.9.x branch.
+The GnuTLS 2.10.x branch replaces the GnuTLS 2.8.x branch as the
+supported stable branch, although we will continue to support GnuTLS
+2.8.x for some time.
 
 ** libgnutls: Added Steve Dispensa's patch for safe renegotiation (RFC 5746)
 Solves the issue discussed in:
@@ -46,6 +38,14 @@ specified. You can check whether protection is in place by querying
 gnutls_safe_renegotiation_status().  New error codes
 GNUTLS_E_SAFE_RENEGOTIATION_FAILED and
 GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED added.
+
+** libgnutls: Time verification extended to trusted certificate list.
+Unless new constant GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS flag is
+specified.
+
+** certtool: Display postalCode and Name X.509 DN attributes correctly.
+Based on patch by Pavan Konjarla.  Adds new constant
+GNUTLS_OID_X520_POSTALCODE and GNUTLS_OID_X520_NAME.
 
 ** libgnutls: When checking openpgp self signature also check the signatures
 ** of all subkeys.
@@ -96,6 +96,10 @@ Reported by and tiny patch from Vitaly Mayatskikh
 ** minitasn1: Upgraded to libtasn1 version 2.6.
 
 ** doc: The GTK-DOC manual is significantly improved.
+
+** doc: a PDF version of the API reference manual (GTK-DOC) is now built.
+
+** doc: Terms 'GNUTLS' and 'GNU TLS' were changed to 'GnuTLS' for consistency.
 
 ** libgnutls: Cleanups and several bug fixes.
 Found by Steve Grubb and Tomas Mraz.
@@ -257,64 +261,131 @@ Forwarded by Martin von Gagern <Martin.vGagern@gmx.net> from
 TLS Renegotiation Attack
 ========================
 
-This releases supports the new extension that hardens TLS
-renegotiation, prompted by the recent discovery of a security flaw in
-the protocol.  We quote the manual which contains a discussion of the
-problem and how the solution is implemented in GnuTLS:
-
 Some application protocols and implementations uses the TLS
 renegotiation feature in a manner that enables attackers to insert
 content of his choice in the beginning of a TLS session.
 
-The simplest example is HTTP.  For HTTP one attack works by having the
-attacker simulate a client and connect to a server, with server-only
-authentication, and send some data intended to cause harm.  When the
-proper client attempts to contact the server, the attacker hijacks that
-connection and uses the TLS renegotiation feature with the server and
-splices in the client connection to the already established connection
-between the client and server.  The attacker will not be able to read
-the data exchanged between the client and the server.  However, some
-server implementations will (incorrectly) assume that the data sent by
-the attacker was sent by the now authenticated client.  The result is a
-prefix plain-text injection attack.
+One easy to understand vulnerability is HTTPS when servers request
+client certificates optionally for certain parts of a web site.  The
+attack works by having the attacker simulate a client and connect to a
+server, with server-only authentication, and send some data intended to
+cause harm.  When the proper client attempts to contact the server, the
+attacker hijacks that connection and uses the TLS renegotiation feature
+with the server and splices in the client connection to the already
+established connection between the attacker and server.  The attacker
+will not be able to read the data exchanged between the client and the
+server.  However, the server will (incorrectly) assume that the data
+sent by the attacker was sent by the now authenticated client.  The
+result is a prefix plain-text injection attack.
+
+The above is just one example.  Other vulnerabilities exists that do
+not rely on the TLS renegotiation to change the client's authenticated
+status (either TLS or application layer).
 
 While fixing these application protocols and implementations would be
 one natural reaction, an extension to TLS has been designed that
 cryptographically binds together any renegotiated handshakes with the
 initial negotiation.  When the extension is used, the attack is
-detected and the session can be terminated.  The extension is
-specified in [RFC5746].
+detected and the session can be terminated.  The extension is specified
+in RFC5746.
 
-GnuTLS supports the safe renegotiation extension.  By default, GnuTLS
-clients will attempt to negotiate the safe renegotiation extension when
-talking to servers.  Also by default, GnuTLS servers will accept the
-extension when presented by clients.  However, by default GnuTLS client
-and servers will not refuse renegotiation attempts when the extension
-has not been negotiated, as this would break backwards compatibility
-and cause too much operational problems.  We will likely reconsider
-these defaults in the future.
+GnuTLS supports the safe renegotiation extension.  The default behavior
+is as follows.  Clients will attempt to negotiate the safe
+renegotiation extension when talking to servers.  Servers will accept
+the extension when presented by clients.  Clients and servers will
+permit an initial handshake to complete even when the other side does
+not support the safe renegotiation extension.  Clients and servers will
+refuse renegotiation attempts when the extension has not been
+negotiated.
 
-To modify the default behaviour, we have introduced three new priority
-strings.  The priority strings can be used by applications
-(gnutls_priority_set) and end users (e.g., `--priority' parameter to
+Note that permitting clients to connect to servers even when the safe
+renegotiation extension is not negotiated open up for some attacks.
+Changing this default behaviour would prevent interoperability against
+the majority of deployed servers out there.  We will reconsider this
+default behaviour in the future when more servers have been upgraded.
+Note that it is easy to configure clients to always require the safe
+renegotiation extension from servers (see below on the
+`%SAFE_RENEGOTIATION' priority string).
+
+To modify the default behaviour, we have introduced some new priority
+strings.  The priority strings can be used by applications (see
+gnutls_priority_set) and end users (e.g., `--priority' parameter to
 `gnutls-cli' and `gnutls-serv').
 
-The `%PARTIAL_RENEGOTIATION' priority string requests what is today the
-default behaviour, i.e., that handshakes without the safe renegotiation
-extension is permitted.  To make more use of the extension, you may
-provide the `%SAFE_RENEGOTIATION' priority string.  In this mode,
-clients and servers will require that the peer supports the extension for 
-the initial handshakes.  To allow unsafe rengotiation the 
-`%UNSAFE_RENEGOTIATION' priority string is available. This will send
-the extension if supported by peer but will never mandate it.
-It is possible to disable use of the extension completely by using the
-`%DISABLE_SAFE_RENEGOTIATION' priority string however this is
-recommended against except for debugging.
+The `%UNSAFE_RENEGOTIATION' priority string permits (re-)handshakes
+even when the safe renegotiation extension was not negotiated.  The
+default behavior is `%PARTIAL_RENEGOTIATION' that will prevent
+renegotiation with clients and servers not supporting the extension.
+This is secure for servers but leaves clients vulnerable to some
+attacks, but this is a tradeoff between security and compatibility with
+old servers.  The `%SAFE_RENEGOTIATION' priority string makes clients
+and servers require the extension for every handshake.  The latter is
+the most secure option for clients, at the cost of not being able to
+connect to legacy servers.  Servers will also deny clients that do not
+support the extension from connecting.
+
+It is possible to disable use of the extension completely, in both
+clients and servers, by using the `%DISABLE_SAFE_RENEGOTIATION'
+priority string however we strongly recommend you to only do this for
+debugging and test purposes.
+
+The default values if the flags above are not specified are:
+`Server:'
+     %PARTIAL_RENEGOTIATION
+
+`Client:'
+     %PARTIAL_RENEGOTIATION
 
 For applications we have introduced a new API related to safe
 renegotiation.  The gnutls_safe_renegotiation_status function is used
 to check if the extension has been negotiated on a session, and can be
 used both by clients and servers.
+
+Call to application authors
+===========================
+
+Please use the priority string interface, and make it possible for
+users to supply a priority string!
+
+Several parts of GnuTLS, including the new safe renegotiation
+behaviour, can be configured through priority strings.  However, if
+the application do not publish this interface to users, it will not be
+possible to configure GnuTLS the way a user wants.
+
+The new defaults for GnuTLS with regard to the safe renegotiation bug
+is to be insecure by default.  This is something we reluctantly and
+after carefuly consideration decided to do, for interoperability
+reasons.  We'd like to close this security gap as soon as possible,
+hopefully even for the GnuTLS 2.12.x branch.
+
+For this transition to be as smooth as possible, users of GnuTLS
+applications needs to be able to provide a priority string when a TLS
+session is initialized.  Preferrably it should be possible to do on a
+domain name or IP basis, to only modify the defaults for a particular
+server and not generally.
+
+Once the GnuTLS defaults have changed to be secure by default, users
+may want to be able to provide a %PARTIAL_RENEGOTIATION or even an
+%UNSAFE_RENEGOTIATION priority string, to be able to talk with certain
+clients or servers.  This will not be possible unless you, as
+application author, export this ability to your users.
+
+Technically, you would replace a call like this:
+
+   gnutls_set_default_priority (session)
+
+with a call like this:
+
+   gnutls_priority_set_direct (session, string, NULL);
+
+where 'string' is a character string read from your configuration
+files, and the default should be 'NORMAL'.  It is fine for string to
+be NULL if you didn't read any configuration from the user, then
+'NORMAL' will be used.
+
+For more information see:
+
+http://www.gnu.org/software/gnutls/manual/html_node/Core-functions.html#gnutls_005fpriority_005finit
 
 API/ABI changes in GnuTLS 2.10
 ==============================
