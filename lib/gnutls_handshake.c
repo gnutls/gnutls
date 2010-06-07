@@ -864,7 +864,7 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
 
   /* First, check for safe renegotiation SCSV.
    */
-  if (session->internals.priorities.sr != SR_DISABLED)
+  if (session->internals.priorities.safe_renegotiation != SR_DISABLED)
     {
       int offset;
 
@@ -2337,7 +2337,7 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	}
     }
 
-  if (session->internals.priorities.sr == SR_DISABLED)
+  if (session->internals.priorities.safe_renegotiation == SR_DISABLED)
     {
       gnutls_assert ();
       return ret;
@@ -2401,7 +2401,7 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
       if (session->internals.initial_negotiation_completed)
 	{
 
-	  if (session->internals.priorities.sr < SR_PARTIAL)
+	  if (session->internals.priorities.safe_renegotiation < SR_PARTIAL)
 	    {
 	      _gnutls_handshake_log
 		("HSK[%p]: Allowing unsafe (re)negotiation\n", session);
@@ -2416,7 +2416,7 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	}
       else
 	{
-	  if (session->internals.priorities.sr < SR_SAFE)
+	  if (session->internals.priorities.safe_renegotiation < SR_SAFE)
 	    {
 	      _gnutls_handshake_log
 		("HSK[%p]: Allowing unsafe initial negotiation\n", session);

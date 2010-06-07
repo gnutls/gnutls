@@ -37,7 +37,7 @@ _gnutls_safe_renegotiation_recv_params (gnutls_session_t session,
 
   DECR_LEN (data_size, len + 1 /* count the first byte and payload */ );
 
-  if (session->internals.priorities.sr == SR_DISABLED)
+  if (session->internals.priorities.safe_renegotiation == SR_DISABLED)
     {
       gnutls_assert ();
       return 0;
@@ -85,7 +85,7 @@ _gnutls_safe_renegotiation_send_params (gnutls_session_t session,
   ssize_t data_size = _data_size;
   tls_ext_st *ext = &session->security_parameters.extensions;
 
-  if (session->internals.priorities.sr == SR_DISABLED)
+  if (session->internals.priorities.safe_renegotiation == SR_DISABLED)
     {
       gnutls_assert ();
       return 0;

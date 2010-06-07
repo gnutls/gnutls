@@ -353,7 +353,7 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
   /* emulate old gnutls behavior for old applications that do not use the priority_*
    * functions.
    */
-  (*session)->internals.priorities.sr = SR_PARTIAL;
+  (*session)->internals.priorities.safe_renegotiation = SR_PARTIAL;
 
   return 0;
 }
