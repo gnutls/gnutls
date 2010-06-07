@@ -14,6 +14,12 @@ srn1.c:
  able to handshake against servers with support, but not able to
  rehandshake (server will refuse rehandshake).
 
+srn2.c:
+
+ This tests that clients with support for safe renegotiation is able
+ to handshake against servers without support, but not able to
+ rehandshake (client will refuse rehandshake).
+
 srn4.c:
 
  This tests that clients without support for safe renegotiation is

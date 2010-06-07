@@ -20,9 +20,11 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
  */
 
-/* Code based on ../mini-x509-rehandshake.c.
+/* Code based on ./srn1.c.
  *
- * Check that new APIs are behaving properly.
+ * This tests that clients with support for safe renegotiation is able
+ * to handshake against servers without support, but not able to
+ * rehandshake (client will refuse rehandshake).
  */
 
 #ifdef HAVE_CONFIG_H
@@ -182,7 +184,8 @@ main (int argc, char *argv[])
 				       GNUTLS_X509_FMT_PEM);
   gnutls_init (&server, GNUTLS_SERVER);
   gnutls_credentials_set (server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
-  gnutls_priority_set_direct (server, "NORMAL", NULL);
+  gnutls_priority_set_direct (server, "NORMAL:%DISABLE_SAFE_RENEGOTIATION",
+			      NULL);
   gnutls_transport_set_push_function (server, server_push);
   gnutls_transport_set_pull_function (server, server_pull);
 
@@ -239,12 +242,11 @@ main (int argc, char *argv[])
   if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_SUCCESS)
     exit_code = EXIT_FAILURE;
 
-  /* Check that both sessions use the extension. */
-  if (!gnutls_safe_renegotiation_status (server)
-      || !gnutls_safe_renegotiation_status (client))
+  if (gnutls_safe_renegotiation_status (client) ||
+      gnutls_safe_renegotiation_status (server))
     {
-      puts ("Client or server not using safe renegotiation extension?");
-      abort ();
+      tls_log_func (0, "Session using safe renegotiation but shouldn't?!\n");
+      exit_code = EXIT_FAILURE;
     }
 
   sret = gnutls_rehandshake (server);
@@ -293,6 +295,9 @@ main (int argc, char *argv[])
 	      tls_log_func (0, "\n");
 	    }
 	}
+
+      if (cret == GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED)
+	break;
     }
   while (
 	 /* Not done: */
@@ -300,135 +305,15 @@ main (int argc, char *argv[])
 	 /* No error: */
 	 && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
 
-  if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_SUCCESS)
+  if (cret != GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED && sret != GNUTLS_E_SUCCESS)
     exit_code = 1;
 
-  /* Check that session still use the extension. */
-  if (!gnutls_safe_renegotiation_status (server)
-      || !gnutls_safe_renegotiation_status (client))
+  if (gnutls_safe_renegotiation_status (client) ||
+      gnutls_safe_renegotiation_status (server))
     {
-      puts ("Client or server not using safe renegotiation extension?");
-      abort ();
+      tls_log_func (0, "Rehandshaked worked and uses safe reneg?!\n");
+      exit_code = EXIT_FAILURE;
     }
-
-  /* Check that this API does not affect anything after first
-     handshake.
-  gnutls_safe_negotiation_set_initial (server, 0); */
-
-  sret = gnutls_rehandshake (server);
-  if (debug_level > 0)
-    {
-      tls_log_func (0, "gnutls_rehandshake (server)...\n");
-      tls_log_func (0, gnutls_strerror (sret));
-      tls_log_func (0, "\n");
-    }
-
-  {
-    ssize_t n;
-    char b[1];
-    n = gnutls_record_recv (client, b, 1);
-    if (n != GNUTLS_E_REHANDSHAKE)
-      abort ();
-  }
-
-  cret = GNUTLS_E_AGAIN;
-  sret = GNUTLS_E_AGAIN;
-
-  do
-    {
-      static int max_iter = 0;
-      if (max_iter++ > 10)
-	abort ();
-
-      if (cret == GNUTLS_E_AGAIN)
-	{
-	  cret = gnutls_handshake (client);
-	  if (debug_level > 0)
-	    {
-	      tls_log_func (0, "second gnutls_handshake (client)...\n");
-	      tls_log_func (0, gnutls_strerror (cret));
-	      tls_log_func (0, "\n");
-	    }
-	}
-
-      if (sret == GNUTLS_E_AGAIN)
-	{
-	  sret = gnutls_handshake (server);
-	  if (debug_level > 0)
-	    {
-	      tls_log_func (0, "second gnutls_handshake (server)...\n");
-	      tls_log_func (0, gnutls_strerror (sret));
-	      tls_log_func (0, "\n");
-	    }
-	}
-    }
-  while (
-	 /* Not done: */
-	 !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
-	 /* No error: */
-	 && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
-
-  if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_SUCCESS)
-    exit_code = 1;
-
-  /* Check that disabling the extension will break rehandshakes.
-     gnutls_safe_renegotiation_set (client, 0); */
-
-  sret = gnutls_rehandshake (server);
-  if (debug_level > 0)
-    {
-      tls_log_func (0, "gnutls_rehandshake (server)...\n");
-      tls_log_func (0, gnutls_strerror (sret));
-      tls_log_func (0, "\n");
-    }
-
-  {
-    ssize_t n;
-    char b[1];
-    n = gnutls_record_recv (client, b, 1);
-    if (n != GNUTLS_E_REHANDSHAKE)
-      abort ();
-  }
-
-  cret = GNUTLS_E_AGAIN;
-  sret = GNUTLS_E_AGAIN;
-
-  do
-    {
-      static int max_iter = 0;
-      if (max_iter++ > 10)
-	abort ();
-
-      if (cret == GNUTLS_E_AGAIN)
-	{
-	  cret = gnutls_handshake (client);
-	  if (debug_level > 0)
-	    {
-	      tls_log_func (0, "second gnutls_handshake (client)...\n");
-	      tls_log_func (0, gnutls_strerror (cret));
-	      tls_log_func (0, "\n");
-	    }
-	}
-
-      if (sret == GNUTLS_E_AGAIN)
-	{
-	  sret = gnutls_handshake (server);
-	  if (debug_level > 0)
-	    {
-	      tls_log_func (0, "second gnutls_handshake (server)...\n");
-	      tls_log_func (0, gnutls_strerror (sret));
-	      tls_log_func (0, "\n");
-	    }
-	}
-    }
-  while (
-	 /* Not done: */
-	 !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
-	 /* No error: */
-	 && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
-
-  if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_SUCCESS)
-    exit_code = 1;
 
   gnutls_bye (client, GNUTLS_SHUT_RDWR);
   gnutls_bye (server, GNUTLS_SHUT_RDWR);
