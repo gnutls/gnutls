@@ -578,7 +578,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
-  
+
   /* for now unsafe renegotiation is default on everyone. To be removed
    * when we make it the default.
    */
@@ -733,13 +733,13 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	      GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT;
 	  else if (strcasecmp (&broken_list[i][1],
 			       "UNSAFE_RENEGOTIATION") == 0)
-            {
+	    {
 	      (*priority_cache)->sr = SR_UNSAFE;
-            }
+	    }
 	  else if (strcasecmp (&broken_list[i][1], "SAFE_RENEGOTIATION") == 0)
 	    {
 	      (*priority_cache)->sr = SR_SAFE;
-            }
+	    }
 	  else if (strcasecmp (&broken_list[i][1],
 			       "PARTIAL_RENEGOTIATION") == 0)
 	    {
@@ -747,9 +747,9 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	    }
 	  else if (strcasecmp (&broken_list[i][1],
 			       "DISABLE_SAFE_RENEGOTIATION") == 0)
-            {
+	    {
 	      (*priority_cache)->sr = SR_DISABLED;
-            }
+	    }
 	  else
 	    goto error;
 	}

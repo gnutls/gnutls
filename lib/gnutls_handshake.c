@@ -866,22 +866,22 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
    */
   if (session->internals.priorities.sr != SR_DISABLED)
     {
-    int offset;
+      int offset;
 
-    for (offset = 0; offset < datalen; offset += 2)
-      {
-	/* TLS_RENEGO_PROTECTION_REQUEST = { 0x00, 0xff } */
-	if (data[offset] == GNUTLS_RENEGO_PROTECTION_REQUEST_MAJOR &&
-	    data[offset + 1] == GNUTLS_RENEGO_PROTECTION_REQUEST_MINOR)
-	  {
-	    _gnutls_handshake_log
-	      ("HSK[%p]: Received safe renegotiation CS\n", session);
-	    session->internals.safe_renegotiation_received = 1;
-	    session->internals.connection_using_safe_renegotiation = 1;
-	    break;
-	  }
-      }
-  }
+      for (offset = 0; offset < datalen; offset += 2)
+	{
+	  /* TLS_RENEGO_PROTECTION_REQUEST = { 0x00, 0xff } */
+	  if (data[offset] == GNUTLS_RENEGO_PROTECTION_REQUEST_MAJOR &&
+	      data[offset + 1] == GNUTLS_RENEGO_PROTECTION_REQUEST_MINOR)
+	    {
+	      _gnutls_handshake_log
+		("HSK[%p]: Received safe renegotiation CS\n", session);
+	      session->internals.safe_renegotiation_received = 1;
+	      session->internals.connection_using_safe_renegotiation = 1;
+	      break;
+	    }
+	}
+    }
 
   pk_algo = _gnutls_server_find_pk_algos_in_ciphersuites (data, datalen);
 
@@ -2386,7 +2386,7 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
       _gnutls_handshake_log ("HSK[%p]: Safe renegotiation succeeded\n",
 			     session);
     }
-  else	/* safe renegotiation not received... */
+  else				/* safe renegotiation not received... */
     {
       if (session->internals.connection_using_safe_renegotiation)
 	{
@@ -2401,7 +2401,7 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
       if (session->internals.initial_negotiation_completed)
 	{
 
-          if (session->internals.priorities.sr < SR_PARTIAL)
+	  if (session->internals.priorities.sr < SR_PARTIAL)
 	    {
 	      _gnutls_handshake_log
 		("HSK[%p]: Allowing unsafe (re)negotiation\n", session);
@@ -2411,7 +2411,7 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	      gnutls_assert ();
 	      _gnutls_handshake_log
 		("HSK[%p]: Denying unsafe (re)negotiation\n", session);
-              return GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED;
+	      return GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED;
 	    }
 	}
       else

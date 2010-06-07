@@ -839,17 +839,23 @@ verify_sig (const gnutls_datum_t * tbs,
     }
 }
 
-gnutls_digest_algorithm_t _gnutls_dsa_q_to_hash(bigint_t q)
+gnutls_digest_algorithm_t
+_gnutls_dsa_q_to_hash (bigint_t q)
 {
-  int bits = _gnutls_mpi_get_nbits(q);
+  int bits = _gnutls_mpi_get_nbits (q);
 
-  if (bits <= 160) {
-    return GNUTLS_DIG_SHA1;
-  } else if (bits <= 224) {
-    return GNUTLS_DIG_SHA224;
-  } else {
-    return GNUTLS_DIG_SHA256;
-  }
+  if (bits <= 160)
+    {
+      return GNUTLS_DIG_SHA1;
+    }
+  else if (bits <= 224)
+    {
+      return GNUTLS_DIG_SHA224;
+    }
+  else
+    {
+      return GNUTLS_DIG_SHA256;
+    }
 }
 
 int
@@ -866,8 +872,7 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
 
   issuer_params_size = MAX_PUBLIC_PARAMS_SIZE;
   ret =
-    _gnutls_x509_crt_get_mpis (issuer, issuer_params,
-				   &issuer_params_size);
+    _gnutls_x509_crt_get_mpis (issuer, issuer_params, &issuer_params_size);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -877,9 +882,9 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
   switch (gnutls_x509_crt_get_pk_algorithm (issuer, NULL))
     {
     case GNUTLS_PK_DSA:
-      
+
       if (hash)
-	*hash = _gnutls_dsa_q_to_hash(issuer_params[1]);
+	*hash = _gnutls_dsa_q_to_hash (issuer_params[1]);
 
       ret = 0;
       break;
@@ -924,7 +929,7 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
     }
 
 cleanup:
-    /* release allocated mpis */
+  /* release allocated mpis */
   for (i = 0; i < issuer_params_size; i++)
     {
       _gnutls_mpi_release (&issuer_params[i]);

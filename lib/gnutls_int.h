@@ -451,7 +451,8 @@ typedef struct
   unsigned int algorithms;
 } priority_st;
 
-typedef enum {
+typedef enum
+{
   SR_DISABLED,
   SR_UNSAFE,
   SR_PARTIAL,

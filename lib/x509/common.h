@@ -128,6 +128,6 @@ int _gnutls_x509_get_signed_data (ASN1_TYPE src, const char *src_name,
 int _gnutls_x509_get_signature (ASN1_TYPE src, const char *src_name,
 				gnutls_datum_t * signature);
 
-gnutls_digest_algorithm_t _gnutls_dsa_q_to_hash(bigint_t q);
+gnutls_digest_algorithm_t _gnutls_dsa_q_to_hash (bigint_t q);
 
 #endif

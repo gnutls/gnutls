@@ -193,8 +193,7 @@ main (int argc, char *argv[])
   gnutls_certificate_allocate_credentials (&clientx509cred);
   gnutls_init (&client, GNUTLS_CLIENT);
   gnutls_credentials_set (client, GNUTLS_CRD_CERTIFICATE, clientx509cred);
-  gnutls_priority_set_direct (client, "NORMAL:%SAFE_RENEGOTIATION",
-			      NULL);
+  gnutls_priority_set_direct (client, "NORMAL:%SAFE_RENEGOTIATION", NULL);
   gnutls_transport_set_push_function (client, client_push);
   gnutls_transport_set_pull_function (client, client_pull);
 

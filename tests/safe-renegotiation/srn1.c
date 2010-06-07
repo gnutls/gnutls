@@ -300,12 +300,13 @@ main (int argc, char *argv[])
 	break;
     }
   while (
-	 /* Not done: */
-	 !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
-	 /* No error: */
-	 && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
+	  /* Not done: */
+	  !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
+	  /* No error: */
+	  && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
 
-  if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED)
+  if (cret != GNUTLS_E_SUCCESS
+      && sret != GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED)
     exit_code = 1;
 
   if (gnutls_safe_renegotiation_status (client) ||
