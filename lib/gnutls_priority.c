@@ -520,20 +520,26 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  *
  * "%COMPAT" will enable compatibility features for a server.
  *
- * "%DISABLE_SAFE_RENEGOTIATION" will disable safe renegotiation completely. Do not use
- * unless you know what you are doing. Testing purposes only.
+ * "%DISABLE_SAFE_RENEGOTIATION" will disable safe renegotiation
+ * completely.  Do not use unless you know what you are doing.
+ * Testing purposes only.
  *
- * "%UNSAFE_RENEGOTIATION" will allow unsafe renegotiation (this is now
- * the default for clients, but will change once more servers support the safe renegotiation
- * TLS fix).
+ * "%UNSAFE_RENEGOTIATION" will allow handshakes and rehandshakes
+ * without the safe renegotiation extension.  Note that for clients
+ * this mode is insecure (you may be under attack), and for servers it
+ * will allow insecure clients to connect (which could be fooled by an
+ * attacker).  Do not use unless you know what you are doing and want
+ * maximum compatibility.
  *
- * "%PARTIAL_SAFE_RENEGOTIATION" In server side it will enable safe renegotiation
- * and will protect all clients from known attacks, but will not prevent insecure clients
- * from connecting. In client side it will disallow from renegotiating with an insecure server
- * but will not prevent connecting to one (this leaves the client vulnerable to attacks).
+ * "%PARTIAL_RENEGOTIATION" will allow initial handshakes to proceed,
+ * but not rehandshakes.  This leaves the client vulnerable to attack,
+ * and servers will be compatible with non-upgraded clients for
+ * initial handshakes.  This is currently the default for clients and
+ * servers, for compatibility reasons.
  *
- * "%SAFE_RENEGOTIATION" will enforce safe renegotiation. Clients and Servers will refuse
- * to talk to an insecure peer.
+ * "%SAFE_RENEGOTIATION" will enforce safe renegotiation.  Clients and
+ * servers will refuse to talk to an insecure peer.  Currently this
+ * causes operability problems, but is required for full protection.
  *
  * "%SSL3_RECORD_VERSION" will use SSL3.0 record version in client hello.
  *
