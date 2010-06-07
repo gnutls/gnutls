@@ -36,3 +36,9 @@ srn5.c:
  This tests that a client with a permissive policy
  (%UNSAFE_RENEGOTIATION) is able to handshake and rehandshake with a
  server with no support for the extension.
+
+srn6.c:
+
+ This tests that a server with a permissive policy
+ (%UNSAFE_RENEGOTIATION) is able to handshake and rehandshake with a
+ client with no support for the extension.
