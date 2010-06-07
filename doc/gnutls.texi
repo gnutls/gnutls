@@ -1278,7 +1278,7 @@ the majority of deployed servers out there.  We will reconsider this
 default behaviour in the future when more servers have been upgraded.
 Note that it is easy to configure clients to always require the safe
 renegotiation extension from servers (see below on the
-%SAFE_RENEGOTIATION priority string).
+$code{%SAFE_RENEGOTIATION} priority string).
 
 To modify the default behaviour, we have introduced some new priority
 strings.  The priority strings can be used by applications
@@ -1287,15 +1287,16 @@ parameter to @code{gnutls-cli} and @code{gnutls-serv}).
 
 The @code{%UNSAFE_RENEGOTIATION} priority string permits
 (re-)handshakes even when the safe renegotiation extension was not
-negotiated. The default behavior is @code{%PARTIAL_RENEGOTIATION} that will
-prevent renegotiation with clients and servers not supporting the
-extension. This is secure for servers but leaves clients vulnerable
-to some attacks, but this is a tradeoff between security and compatibility
-with old servers. The @code{%SAFE_RENEGOTIATION} priority string makes
-clients and servers require the extension for every handshake. The latter
-is the most secure option for clients, at the cost of not being able
-to connect to legacy servers. Servers will also deny clients that
-do not support the extension from connecting.
+negotiated.  The default behavior is @code{%PARTIAL_RENEGOTIATION}
+that will prevent renegotiation with clients and servers not
+supporting the extension.  This is secure for servers but leaves
+clients vulnerable to some attacks, but this is a tradeoff between
+security and compatibility with old servers.  The
+@code{%SAFE_RENEGOTIATION} priority string makes clients and servers
+require the extension for every handshake.  The latter is the most
+secure option for clients, at the cost of not being able to connect to
+legacy servers.  Servers will also deny clients that do not support
+the extension from connecting.
 
 It is possible to disable use of the extension completely, in both
 clients and servers, by using the @code{%DISABLE_SAFE_RENEGOTIATION}
