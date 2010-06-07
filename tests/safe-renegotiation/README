@@ -32,7 +32,7 @@ srn4.c:
  against clients that do not support the extension.
 
 srn5.c:
- This tests that clients with support for safe renegotiation is able
- to handshake properly against a server with no support for safe
- renegotiation, but that the client will not be able to complete a
- rehandshake.
+
+ This tests that a client with a permissive policy
+ (%UNSAFE_RENEGOTIATION) is able to handshake and rehandshake with a
+ server with no support for the extension.
