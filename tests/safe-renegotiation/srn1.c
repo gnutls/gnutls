@@ -197,6 +197,14 @@ main (int argc, char *argv[])
   gnutls_transport_set_push_function (client, client_push);
   gnutls_transport_set_pull_function (client, client_pull);
 
+  /* Check that initially no session use the extension. */
+  if (gnutls_safe_renegotiation_status (server)
+      || gnutls_safe_renegotiation_status (client))
+    {
+      puts ("Client or server using extension before handshake?");
+      abort ();
+    }
+
   do
     {
       static int max_iter = 0;
