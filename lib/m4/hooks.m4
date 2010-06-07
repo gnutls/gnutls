@@ -28,7 +28,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   # Interfaces removed:                           AGE=0
   AC_SUBST(LT_CURRENT, 42)
   AC_SUBST(LT_REVISION, 6)
-  AC_SUBST(LT_AGE, 16)
+  AC_SUBST(LT_AGE, 17)
 
   # Used when creating the Windows libgnutls-XX.def files.
   DLL_VERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
