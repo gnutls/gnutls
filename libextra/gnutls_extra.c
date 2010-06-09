@@ -26,6 +26,11 @@
 #include <gnutls_extensions.h>
 #include <gnutls_algorithms.h>
 #include <ext_inner_application.h>
+
+#ifndef HAVE_LIBNETTLE
+# include <gcrypt.h>
+#endif
+
 #ifdef USE_LZO
 # ifdef USE_MINILZO
 #  include "minilzo/minilzo.h"
@@ -144,6 +149,22 @@ gnutls_global_init_extra (void)
       gnutls_assert ();
       return ret;
     }
+#endif
+
+
+#ifndef HAVE_LIBNETTLE
+# ifdef gcry_fips_mode_active
+  /* Libgcrypt manual says that gcry_version_check must be called
+     before calling gcry_fips_mode_active. */
+  gcry_check_version (NULL);
+  if (gcry_fips_mode_active ())
+    {
+      ret = gnutls_register_md5_handler ();
+      if (ret)
+       fprintf (stderr, "gnutls_register_md5_handler: %s\n",
+                gnutls_strerror (ret));
+    }
+# endif
 #endif
 
   return 0;
