@@ -67,12 +67,25 @@ typedef struct pakchois_session_s pakchois_session_t;
  * underlying PKCS#11 provider will be loaded only once. */
 ck_rv_t pakchois_module_load(pakchois_module_t **module, const char *name);
 
+/* Load a PKCS#11 module by absolute file name (for example "/lib/opensc-pkcs.so" 
+ * Returns CKR_OK on success.  Any module of given name may be safely loaded 
+ * multiple times within an application; the underlying PKCS#11 provider will 
+ * be loaded only once. */
+ck_rv_t pakchois_module_load_abs(pakchois_module_t **module, const char *name);
+
 /* Load an NSS "softokn" which violates the PKCS#11 standard in
  * initialization, with given name (e.g. "softokn3").  The directory
  * in which the NSS database resides must be specified; the other
  * arguments may be NULL to use defaults. Returns CKR_OK on
  * success. */
 ck_rv_t pakchois_module_nssload(pakchois_module_t **module, 
+                                const char *name,
+                                const char *directory,
+                                const char *cert_prefix,
+                                const char *key_prefix,
+                                const char *secmod_db);
+
+ck_rv_t pakchois_module_nssload_abs(pakchois_module_t **module, 
                                 const char *name,
                                 const char *directory,
                                 const char *cert_prefix,

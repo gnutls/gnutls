@@ -98,7 +98,7 @@ int gnutls_pkcs11_add_provider (const char * name, const char * params)
     }
 
     active_providers++;
-    if (pakchois_module_load(&providers[active_providers-1].module, name) != CKR_OK) {
+    if (pakchois_module_load_abs(&providers[active_providers-1].module, name) != CKR_OK) {
         gnutls_assert();
         _gnutls_debug_log("p11: Cannot load provider %s\n", name);
         active_providers--;

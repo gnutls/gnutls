@@ -44,9 +44,18 @@
 #include <string.h>
 #include <pthread.h>
 #include <assert.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+#ifdef HAVE_WORDEXP
+# include <wordexp.h>
+#endif
 #include "pakchois.h"
 
 struct provider {
+    dev_t dev;
+    ino_t ino;
     char *name;
     void *handle;
     pthread_mutex_t mutex;
@@ -91,12 +100,12 @@ static char* pkcs11ize(const char* name)
     char* oname;
     char *base;
     char *suffix;
-    
+
     oname = strdup(name);
     if (oname == NULL) {
-        return NULL;
+	    return NULL;
     }
-    
+
     /* basename has too many ifs to use */
     base = strrchr(oname, DIR_DELIMITER);
     if (base == NULL) {
@@ -115,13 +124,13 @@ static char* pkcs11ize(const char* name)
     /* check and remove for -p11 or -pkcs11 */
 	suffix = base;
     while((suffix=strchr(suffix, '-')) != NULL) {
-		if (strncasecmp(suffix, "-p11", 4)==0 || 
-			strncasecmp(suffix, "-pkcs11", 7)==0) {
-			suffix[0] = 0;
-			break;
-		}
-		suffix++;
+	if (strncasecmp(suffix, "-p11", 4)==0 || 
+		strncasecmp(suffix, "-pkcs11", 7)==0) {
+		suffix[0] = 0;
+		break;
 	}
+	suffix++;
+    }
     
     len = strlen(base);
 
@@ -148,28 +157,19 @@ static const char *suffix_prefixes[][2] = {
 #define CALLS5(n, a, b, c, d, e) CALLS(n, (sess->id, a, b, c, d, e))
 #define CALLS7(n, a, b, c, d, e, f, g) CALLS(n, (sess->id, a, b, c, d, e, f, g))
 
-static void *find_pkcs11_module(const char *name, CK_C_GetFunctionList *gfl)
-{
-
-    char module_path[] =
-#ifdef PAKCHOIS_MODPATH
-    PAKCHOIS_MODPATH;
-#else
-    "";
+#ifndef PAKCHOIS_MODPATH
+# define PAKCHOIS_MODPATH "/lib:/usr/lib"
 #endif
-    char *next = module_path;
-    void *h;
 
-    /* try the plain name first */
-    h = dlopen(name, RTLD_LOCAL|RTLD_NOW);
-    if (h != NULL) {
-         *gfl = dlsym(h, "C_GetFunctionList");
-         if (*gfl) {
-              return h;
-         }
-         dlclose(h);
-    }
-    
+/* Returns an allocated name of the real module as well
+ * as it's inode and device numbers.
+ */
+static char *find_pkcs11_module_name(const char *hint, dev_t* dev, ino_t* ino)
+{
+    char module_path[] = PAKCHOIS_MODPATH;
+    char *next = module_path;
+    struct stat st;
+
     while (next) {
         char *dir = next, *sep = strchr(next, ':');
         unsigned i;
@@ -181,34 +181,69 @@ static void *find_pkcs11_module(const char *name, CK_C_GetFunctionList *gfl)
         else {
             next = NULL;
         }
-
         
         for (i = 0; suffix_prefixes[i][0]; i++) {
             char path[PATH_MAX];
             
             snprintf(path, sizeof path, "%s/%s%s%s", dir,
-                     suffix_prefixes[i][0], name, suffix_prefixes[i][1]);
+                     suffix_prefixes[i][0], hint, suffix_prefixes[i][1]);
 
-            h = dlopen(path, RTLD_LOCAL|RTLD_NOW);
-            if (h != NULL) {
-                *gfl = dlsym(h, "C_GetFunctionList");
-                if (*gfl) {
-                    return h;
-                }
-                dlclose(h);
-            }
+			if (stat(path, &st) < 0) continue;
+
+			*dev = st.st_dev;
+			*ino = st.st_ino;
+
+			return strdup(path);
         }
     }
 
     return NULL;
 }            
 
-static struct provider *find_provider(const char *name)
+/* Expands the given filename and returns an allocated
+ * string, if the expanded file exists. In that case
+ * dev and ino are filled in as well.
+ */
+static char* find_real_module_name(const char* name, dev_t *dev, ino_t* ino)
+{
+char* exname = NULL;
+struct stat st;
+#ifdef HAVE_WORDEXP
+int len;
+wordexp_t we;
+
+	len = wordexp(name, &we, 0);
+	if (len == 0) { /* success */
+		if (we.we_wordc > 0) { /* we care about the 1st */
+			exname = strdup(we.we_wordv[0]);
+		}
+		wordfree(&we);
+	}
+#endif
+
+	if (exname == NULL)
+		exname = strdup(name);
+
+	/* find file information */
+	if (exname != NULL) {
+		if (stat(exname, &st) >= 0) {
+			*dev = st.st_dev;
+			*ino = st.st_ino;
+		} else {
+			free(exname);
+			return NULL;
+		}
+	}
+
+	return exname;
+}
+
+static struct provider *find_provider(dev_t dev, ino_t ino)
 {
     struct provider *p;
 
     for (p = provider_list; p; p = p->next) {
-        if (strcmp(name, p->name) == 0) {
+        if (dev == p->dev && ino == p->ino) {
             return p;
         }
     }
@@ -216,59 +251,49 @@ static struct provider *find_provider(const char *name)
     return NULL;    
 }
 
-static ck_rv_t load_provider(struct provider **provider, const char *name, 
-                             void *reserved)
+/* The provider list must be locked when calling it
+ */
+static ck_rv_t load_pkcs11_module( struct provider **provider, 
+    const char* name, dev_t dev, ino_t ino, void* reserved)
 {
-    CK_C_GetFunctionList gfl;
-    struct provider *prov;
-    struct ck_function_list *fns;
-    struct ck_c_initialize_args args;
-    void *h;
-    ck_rv_t rv;
-    char *cname = NULL;
+struct provider * prov;
+CK_C_GetFunctionList gfl;
+struct ck_c_initialize_args args;
+struct ck_function_list *fns;
+void *h;
+ck_rv_t rv;
 
-    if (pthread_mutex_lock(&provider_mutex) != 0) {
-        return CKR_CANT_LOCK;
+    /* try the plain name first */
+    h = dlopen(name, RTLD_LOCAL|RTLD_NOW);
+    if (h == NULL) {
+    	return CKR_GENERAL_ERROR;
     }
 
-    cname = pkcs11ize(name);
-    if (cname == NULL) {
-        rv = CKR_HOST_MEMORY;
-        goto fail_locked;
-    }
-
-    prov = find_provider(cname);
-    if (prov) {
-        prov->refcount++;
-        *provider = prov;
-        free(cname);
-        pthread_mutex_unlock(&provider_mutex);
-        return CKR_OK;
-    }
-
-    h = find_pkcs11_module(name, &gfl);
-    if (!h) {
+    gfl = dlsym(h, "C_GetFunctionList");
+    if (!gfl) {
         rv = CKR_GENERAL_ERROR;
-        goto fail_ndup;
+	goto fail_dso;    
     }
-    
-    rv = gfl(&fns);
-    if (rv != CKR_OK) {
-        goto fail_dso;
-    }
-    
-    *provider = prov = malloc(sizeof *prov);
+
+    prov = malloc(sizeof *prov);
     if (prov == NULL) {
         rv = CKR_HOST_MEMORY;
-        goto fail_dso;
+	goto fail_dso;
     }
-    
+
     if (pthread_mutex_init(&prov->mutex, NULL)) {
-        rv = CKR_GENERAL_ERROR;
+        rv = CKR_CANT_LOCK;
         goto fail_ctx;
     }
 
-    prov->name = cname;
+    rv = gfl(&fns);
+    if (rv != CKR_OK) {
+	goto fail_ctx;
+    }
+
+    prov->dev = dev;
+    prov->ino = ino;
+    prov->name = pkcs11ize(name);
     prov->handle = h;
     prov->fns = fns;
     prov->refcount = 1;
@@ -290,23 +315,68 @@ static ck_rv_t load_provider(struct provider **provider, const char *name,
     }
     provider_list = prov;
 
-    pthread_mutex_unlock(&provider_mutex);
-    
+    *provider = prov;
     return CKR_OK;
-fail_ctx:        
+	
+fail_ctx:
     free(prov);
 fail_dso:
     dlclose(h);
+
+    return rv;
+}
+
+/* Will load a provider using the given name. If real_name is zero
+ * name is used as a hint to find library otherwise it is used as
+ * absolute name.
+ */
+static ck_rv_t load_provider(struct provider **provider, const char *name, 
+                             void *reserved, int real_name)
+{
+    ck_rv_t rv;
+    char* cname = NULL;
+    dev_t dev;
+    ino_t ino;
+
+    if (pthread_mutex_lock(&provider_mutex) != 0) {
+        return CKR_CANT_LOCK;
+    }
+
+	if (real_name) {
+		cname = find_real_module_name(name, &dev, &ino);
+	} else {
+		cname = find_pkcs11_module_name(name, &dev, &ino);
+	}
+
+	if (cname == NULL) {
+		rv = CKR_ARGUMENTS_BAD;
+		goto fail_locked;
+	}
+
+    *provider = find_provider(dev, ino);
+    if (*provider) {
+        (*provider)->refcount++;
+        free(cname);
+        pthread_mutex_unlock(&provider_mutex);
+        return CKR_OK;
+    }
+
+    rv = load_pkcs11_module(provider, cname, dev, ino, reserved);
+    if (rv != CKR_OK) {
+	goto fail_ndup;
+    }
+
+    rv = CKR_OK;
+
 fail_ndup:
     free(cname);
 fail_locked:
     pthread_mutex_unlock(&provider_mutex);
-    *provider = NULL;
     return rv;
 }    
 
 static ck_rv_t load_module(pakchois_module_t **module, const char *name, 
-                           void *reserved)
+                           void *reserved, unsigned int real_name)
 {
     ck_rv_t rv;
     pakchois_module_t *pm = malloc(sizeof *pm);
@@ -315,7 +385,7 @@ static ck_rv_t load_module(pakchois_module_t **module, const char *name,
         return CKR_HOST_MEMORY;
     }
 
-    rv = load_provider(&pm->provider, name, reserved);
+    rv = load_provider(&pm->provider, name, reserved, real_name);
     if (rv) {
         return rv;
     }
@@ -328,7 +398,12 @@ static ck_rv_t load_module(pakchois_module_t **module, const char *name,
 
 ck_rv_t pakchois_module_load(pakchois_module_t **module, const char *name)
 {
-    return load_module(module, name, NULL);
+    return load_module(module, name, NULL, 0);
+}
+
+ck_rv_t pakchois_module_load_abs(pakchois_module_t **module, const char *name)
+{
+    return load_module(module, name, NULL, 1);
 }
 
 ck_rv_t pakchois_module_nssload(pakchois_module_t **module, 
@@ -346,7 +421,25 @@ ck_rv_t pakchois_module_nssload(pakchois_module_t **module,
              key_prefix ? key_prefix : "", 
              secmod_db ? secmod_db : "secmod.db");
 
-    return load_module(module, name, buf);
+    return load_module(module, name, buf, 0);
+}
+
+ck_rv_t pakchois_module_nssload_abs(pakchois_module_t **module, 
+                                const char *name,
+                                const char *directory,
+                                const char *cert_prefix,
+                                const char *key_prefix,
+                                const char *secmod_db)
+{
+    char buf[256];
+
+    snprintf(buf, sizeof buf, 
+             "configdir='%s' certPrefix='%s' keyPrefix='%s' secmod='%s'",
+             directory, cert_prefix ? cert_prefix : "",
+             key_prefix ? key_prefix : "", 
+             secmod_db ? secmod_db : "secmod.db");
+
+    return load_module(module, name, buf, 1);
 }
 
 /* Unreference a provider structure and destoy if, if necessary.  Must
@@ -370,13 +463,14 @@ static void provider_unref(struct provider *prov)
 
 void pakchois_module_destroy(pakchois_module_t *mod)
 {
+    provider_unref(mod->provider);
+
     while (mod->slots) {
         struct slot *slot = mod->slots;
         pakchois_close_all_sessions(mod, slot->id);
         mod->slots = slot->next;
         free(slot);
     }
-    provider_unref(mod->provider);
 
     free(mod);
 }
