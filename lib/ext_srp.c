@@ -33,14 +33,37 @@
 #include "gnutls_errors.h"
 #include "gnutls_algorithms.h"
 #include <gnutls_num.h>
+#include <gnutls_extensions.h>
 
-int
+static int _gnutls_srp_unpack(gnutls_buffer_st* ps, extension_priv_data_t* _priv);
+static int _gnutls_srp_pack(extension_priv_data_t epriv, gnutls_buffer_st* ps);
+static void _gnutls_srp_deinit_data(extension_priv_data_t epriv);
+static int _gnutls_srp_recv_params (gnutls_session_t state, const opaque * data,
+			     size_t data_size);
+static int _gnutls_srp_send_params (gnutls_session_t state, opaque * data, size_t);
+
+extension_entry_st ext_mod_srp = {
+    .name = "SRP",
+    .type = GNUTLS_EXTENSION_SRP,
+    .parse_type = GNUTLS_EXT_TLS,
+
+    .recv_func = _gnutls_srp_recv_params,
+    .send_func = _gnutls_srp_send_params,
+    .pack_func = _gnutls_srp_pack,
+    .unpack_func = _gnutls_srp_unpack,
+    .deinit_func = _gnutls_srp_deinit_data
+};
+
+
+static int
 _gnutls_srp_recv_params (gnutls_session_t session, const opaque * data,
 			 size_t _data_size)
 {
   uint8_t len;
   ssize_t data_size = _data_size;
-
+  extension_priv_data_t epriv;
+  srp_ext_st * priv;
+  
   if (session->security_parameters.entity == GNUTLS_SERVER)
     {
       if (data_size > 0)
@@ -53,10 +76,24 @@ _gnutls_srp_recv_params (gnutls_session_t session, const opaque * data,
 	      gnutls_assert ();
 	      return GNUTLS_E_ILLEGAL_SRP_USERNAME;
 	    }
-	  memcpy (session->security_parameters.extensions.srp_username,
-		  &data[1], len);
-	  /* null terminated */
-	  session->security_parameters.extensions.srp_username[len] = 0;
+	
+	  priv = gnutls_calloc(1, sizeof(*priv));
+	  if (priv == NULL)
+	    {
+	      gnutls_assert();
+	      return GNUTLS_E_MEMORY_ERROR;
+	    }
+
+	  priv->username = gnutls_malloc(len+1);
+	  if (priv->username)
+	    {
+	      memcpy (priv->username, &data[1], len);
+	      /* null terminated */
+	      priv->username[len] = 0;
+	    }
+
+	  epriv.ptr = priv;
+	  _gnutls_ext_set_session_data(session, GNUTLS_EXTENSION_SRP, epriv);
 	}
     }
   return 0;
@@ -65,11 +102,13 @@ _gnutls_srp_recv_params (gnutls_session_t session, const opaque * data,
 /* returns data_size or a negative number on failure
  * data is allocated locally
  */
-int
+static int
 _gnutls_srp_send_params (gnutls_session_t session, opaque * data,
 			 size_t data_size)
 {
   unsigned len;
+  extension_priv_data_t epriv;
+  srp_ext_st * priv;
 
   if (_gnutls_kx_priority (session, GNUTLS_KX_SRP) < 0 &&
       _gnutls_kx_priority (session, GNUTLS_KX_SRP_DSS) < 0 &&
@@ -126,8 +165,18 @@ _gnutls_srp_send_params (gnutls_session_t session, opaque * data,
 	      return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	    }
 
-	  session->internals.srp_username = username;
-	  session->internals.srp_password = password;
+	  priv = gnutls_malloc(sizeof(*priv));
+	  if (priv == NULL)
+	    {
+	      gnutls_assert();
+	      return GNUTLS_E_MEMORY_ERROR;
+	    }
+
+	  priv->username = username;
+	  priv->password = password;
+
+	  epriv.ptr = priv;
+	  _gnutls_ext_set_session_data(session, GNUTLS_EXTENSION_SRP, epriv);
 
 	  data[0] = (uint8_t) len;
 	  memcpy (&data[1], username, len);
@@ -136,5 +185,64 @@ _gnutls_srp_send_params (gnutls_session_t session, opaque * data,
     }
   return 0;
 }
+
+static void _gnutls_srp_deinit_data(extension_priv_data_t epriv)
+{
+    srp_ext_st * priv = epriv.ptr;
+
+    gnutls_free(priv->username);
+    gnutls_free(priv->password);
+    gnutls_free(priv);
+}
+
+static int _gnutls_srp_pack(extension_priv_data_t epriv, gnutls_buffer_st* ps)
+{
+srp_ext_st* priv = epriv.ptr;
+int ret;
+int password_len = 0, username_len = 0;
+
+  if (priv->username)
+    username_len = strlen(priv->username);
+
+  if (priv->password)
+    password_len = strlen(priv->password);
+
+  BUFFER_APPEND_PFX(ps, priv->username, username_len);
+  BUFFER_APPEND_PFX(ps, priv->password, password_len);
+
+  return 0;
+}
+
+static int _gnutls_srp_unpack(gnutls_buffer_st* ps, extension_priv_data_t* _priv)
+{
+srp_ext_st* priv;
+int ret;
+extension_priv_data_t epriv;
+gnutls_datum username = { NULL, 0 }, password = {NULL, 0};
+
+  priv = gnutls_calloc(1, sizeof(*priv));
+  if (priv == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  BUFFER_POP_DATUM(ps, &username);
+  BUFFER_POP_DATUM(ps, &password);
+  
+  priv->username = username.data;
+  priv->password = password.data;
+  
+  epriv.ptr = priv;
+  *_priv = epriv;
+  
+  return 0;
+
+error:
+  _gnutls_free_datum(&username);
+  _gnutls_free_datum(&password);
+  return ret;
+}
+
 
 #endif /* ENABLE_SRP */

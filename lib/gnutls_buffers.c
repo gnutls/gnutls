@@ -218,14 +218,14 @@ _gnutls_record_buffer_get (content_type_t type,
   switch (type)
     {
     case GNUTLS_APPLICATION_DATA:
-      _gnutls_buffer_get_data (&session->internals.application_data_buffer,
+      _gnutls_buffer_pop_data (&session->internals.application_data_buffer,
 			       data, &length);
       _gnutls_buffers_log ("BUFFER[REC][AD]: Read %d bytes of Data(%d)\n",
 			   (int) length, (int) type);
       break;
 
     case GNUTLS_HANDSHAKE:
-      _gnutls_buffer_get_data (&session->internals.handshake_data_buffer,
+      _gnutls_buffer_pop_data (&session->internals.handshake_data_buffer,
 			       data, &length);
       _gnutls_buffers_log ("BUF[REC][HD]: Read %d bytes of Data(%d)\n",
 			   (int) length, (int) type);
@@ -233,7 +233,7 @@ _gnutls_record_buffer_get (content_type_t type,
 
     case GNUTLS_INNER_APPLICATION:
 
-      _gnutls_buffer_get_data (&session->internals.ia_data_buffer, data,
+      _gnutls_buffer_pop_data (&session->internals.ia_data_buffer, data,
 			       &length);
       _gnutls_buffers_log ("BUF[REC][IA]: Read %d bytes of Data(%d)\n",
 			   (int) length, (int) type);
@@ -839,14 +839,14 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
 	  gnutls_assert ();
 
 	  tmp = sizeOfPtr;
-	  _gnutls_buffer_get_data (&session->internals.handshake_recv_buffer,
+	  _gnutls_buffer_pop_data (&session->internals.handshake_recv_buffer,
 				   iptr, &tmp);
 	  return tmp;
 	}
       gnutls_assert ();
 
       tmp = sizeOfPtr;
-      _gnutls_buffer_get_data (&session->internals.handshake_recv_buffer,
+      _gnutls_buffer_pop_data (&session->internals.handshake_recv_buffer,
 			       iptr, &tmp);
       left -= tmp;
 

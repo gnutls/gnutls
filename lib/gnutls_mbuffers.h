@@ -37,7 +37,7 @@ mbuffer_st* _mbuffer_alloc (size_t payload_size);
 /* This is dangerous since it will replace bufel with a new
  * one.
  */
-mbuffer_st* _mbuffer_append_data (mbuffer_st *bufel, void* newdata, size_t newdata_size);
+mbuffer_st* _mbuffer_push_data (mbuffer_st *bufel, void* newdata, size_t newdata_size);
 
 
 /* For "user" use. One can have buffer data and header.

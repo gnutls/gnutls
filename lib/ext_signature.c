@@ -35,6 +35,33 @@
 #include <gnutls_num.h>
 #include <gnutls_algorithms.h>
 
+static int _gnutls_signature_algorithm_recv_params (gnutls_session_t session,
+					     const opaque * data,
+					     size_t data_size);
+static int _gnutls_signature_algorithm_send_params (gnutls_session_t session,
+					     opaque * data, size_t);
+static void signature_algorithms_deinit_data(extension_priv_data_t priv);
+static int signature_algorithms_pack(extension_priv_data_t epriv, gnutls_buffer_st* ps);
+static int signature_algorithms_unpack(gnutls_buffer_st* ps, extension_priv_data_t* _priv);
+
+extension_entry_st ext_mod_sig = {
+    .name = "SIGNATURE ALGORITHMS",
+    .type = GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
+    .parse_type = GNUTLS_EXT_TLS,
+
+    .recv_func = _gnutls_signature_algorithm_recv_params,
+    .send_func = _gnutls_signature_algorithm_send_params,
+    .pack_func = signature_algorithms_pack,
+    .unpack_func = signature_algorithms_unpack,
+    .deinit_func = signature_algorithms_deinit_data,
+};
+
+typedef struct {
+  /* TLS 1.2 signature algorithms */
+  gnutls_sign_algorithm_t sign_algorithms[MAX_SIGNATURE_ALGORITHMS];
+  uint16_t sign_algorithms_size;
+} sig_ext_st;
+
 /* generates a SignatureAndHashAlgorithm structure with length as prefix
  * by using the setup priorities.
  */
@@ -70,6 +97,7 @@ _gnutls_sign_algorithm_write_params (gnutls_session_t session, opaque * data,
   return len + 2;
 }
 
+
 /* Parses the Signature Algorithm structure and stores data into
  * session->security_parameters.extensions.
  */
@@ -78,8 +106,15 @@ _gnutls_sign_algorithm_parse_data (gnutls_session_t session,
 				   const opaque * data, size_t data_size)
 {
   int sig, i;
+  sig_ext_st * priv;
+  extension_priv_data_t epriv;
 
-  session->security_parameters.extensions.sign_algorithms_size = 0;
+  priv = gnutls_calloc(1, sizeof(*priv));
+  if (priv == NULL)
+    {
+	gnutls_assert();
+	return GNUTLS_E_MEMORY_ERROR;
+    }
 
   for (i = 0; i < data_size; i += 2)
     {
@@ -91,15 +126,15 @@ _gnutls_sign_algorithm_parse_data (gnutls_session_t session,
       sig = _gnutls_tls_aid_to_sign (&aid);
       if (sig != GNUTLS_SIGN_UNKNOWN)
 	{
-	  session->security_parameters.extensions.sign_algorithms[session->
-								  security_parameters.
-								  extensions.sign_algorithms_size++]
+	  priv->sign_algorithms[priv->sign_algorithms_size++]
 	    = sig;
-	  if (session->security_parameters.extensions.sign_algorithms_size ==
-	      MAX_SIGNATURE_ALGORITHMS)
+	  if (priv->sign_algorithms_size == MAX_SIGNATURE_ALGORITHMS)
 	    break;
 	}
     }
+
+  epriv.ptr = priv;    
+  _gnutls_ext_set_session_data(session, GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS, epriv);
 
   return 0;
 }
@@ -113,7 +148,7 @@ _gnutls_sign_algorithm_parse_data (gnutls_session_t session,
  * then it is an error;
  */
 
-int
+static int
 _gnutls_signature_algorithm_recv_params (gnutls_session_t session,
 					 const opaque * data,
 					 size_t _data_size)
@@ -139,7 +174,6 @@ _gnutls_signature_algorithm_recv_params (gnutls_session_t session,
 	{
 	  uint16_t len;
 
-
 	  DECR_LEN (data_size, 2);
 	  len = _gnutls_read_uint16 (data);
 	  DECR_LEN (data_size, len);
@@ -158,7 +192,7 @@ _gnutls_signature_algorithm_recv_params (gnutls_session_t session,
 
 /* returns data_size or a negative number on failure
  */
-int
+static int
 _gnutls_signature_algorithm_send_params (gnutls_session_t session,
 					 opaque * data, size_t data_size)
 {
@@ -196,11 +230,22 @@ _gnutls_session_get_sign_algo (gnutls_session_t session,
 			       gnutls_digest_algorithm_t * hash)
 {
   unsigned i;
+  int ret;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  sig_ext_st * priv;
+  extension_priv_data_t epriv;
 
+  ret = _gnutls_ext_get_session_data(session, GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
+    &epriv);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+  priv = epriv.ptr;
 
   if (!_gnutls_version_has_selectable_sighash (ver)
-      || session->security_parameters.extensions.sign_algorithms_size == 0)
+      || priv->sign_algorithms_size == 0)
     /* none set, allow all */
     {
       *hash = GNUTLS_DIG_SHA1;
@@ -208,15 +253,14 @@ _gnutls_session_get_sign_algo (gnutls_session_t session,
     }
 
   for (i = 0;
-       i < session->security_parameters.extensions.sign_algorithms_size; i++)
+       i < priv->sign_algorithms_size; i++)
     {
       if (_gnutls_sign_get_pk_algorithm
-	  (session->security_parameters.extensions.sign_algorithms[i]) == pk)
+	  (priv->sign_algorithms[i]) == pk)
 	{
 	  *hash =
-	    _gnutls_sign_get_hash_algorithm (session->security_parameters.
-					     extensions.sign_algorithms[i]);
-	  return session->security_parameters.extensions.sign_algorithms[i];
+	    _gnutls_sign_get_hash_algorithm (priv->sign_algorithms[i]);
+	  return priv->sign_algorithms[i];
 	}
     }
 
@@ -233,19 +277,31 @@ _gnutls_session_sign_algo_requested (gnutls_session_t session,
 				     gnutls_sign_algorithm_t sig)
 {
   unsigned i;
+  int ret;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  sig_ext_st * priv;
+  extension_priv_data_t epriv;
+
+  ret = _gnutls_ext_get_session_data(session, GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
+    &epriv);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+  priv = epriv.ptr;
 
   if (!_gnutls_version_has_selectable_sighash (ver)
-      || session->security_parameters.extensions.sign_algorithms_size == 0)
+      || priv->sign_algorithms_size == 0)
     /* none set, allow all */
     {
       return 0;
     }
 
   for (i = 0;
-       i < session->security_parameters.extensions.sign_algorithms_size; i++)
+       i < priv->sign_algorithms_size; i++)
     {
-      if (session->security_parameters.extensions.sign_algorithms[i] == sig)
+      if (priv->sign_algorithms[i] == sig)
 	{
 	  return 0;		/* ok */
 	}
@@ -263,10 +319,22 @@ _gnutls_session_sign_algo_enabled (gnutls_session_t session,
 				   gnutls_sign_algorithm_t sig)
 {
   unsigned i;
+  int ret;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  sig_ext_st * priv;
+  extension_priv_data_t epriv;
+
+  ret = _gnutls_ext_get_session_data(session, GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
+    &epriv);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return 0;
+    }
+  priv = epriv.ptr;
 
   if (!_gnutls_version_has_selectable_sighash (ver)
-      || session->security_parameters.extensions.sign_algorithms_size == 0)
+      || priv->sign_algorithms_size == 0)
     /* none set, allow all */
     {
       return 0;
@@ -282,6 +350,55 @@ _gnutls_session_sign_algo_enabled (gnutls_session_t session,
 
   return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
 }
+
+static void signature_algorithms_deinit_data(extension_priv_data_t priv)
+{
+    gnutls_free(priv.ptr);
+}
+
+static int signature_algorithms_pack(extension_priv_data_t epriv, gnutls_buffer_st* ps)
+{
+sig_ext_st* priv = epriv.ptr;
+int ret, i;
+
+  BUFFER_APPEND_NUM(ps, priv->sign_algorithms_size);
+  for (i = 0; i < priv->sign_algorithms_size;i++)
+    {
+      BUFFER_APPEND_NUM(ps, priv->sign_algorithms[i]);
+    }
+  return 0;
+}
+
+static int signature_algorithms_unpack(gnutls_buffer_st* ps, extension_priv_data_t* _priv)
+{
+sig_ext_st* priv;
+int i, ret;
+extension_priv_data_t epriv;
+
+  priv = gnutls_calloc(1, sizeof(*priv));
+  if (priv == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  BUFFER_POP_NUM(ps, priv->sign_algorithms_size);
+  for (i = 0; i < priv->sign_algorithms_size;i++)
+    {
+      BUFFER_POP_NUM(ps, priv->sign_algorithms[i]);
+    }
+
+  epriv.ptr = priv;
+  *_priv = epriv;
+  
+  return 0;
+
+error:
+  gnutls_free(priv);
+  return ret;
+}
+
+
 
 /**
  * gnutls_sign_algorithm_get_requested:
@@ -310,16 +427,28 @@ gnutls_sign_algorithm_get_requested (gnutls_session_t session,
 				     gnutls_sign_algorithm_t * algo)
 {
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
+  sig_ext_st * priv;
+  extension_priv_data_t epriv;
+  int ret;
+
+  ret = _gnutls_ext_get_session_data(session, GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
+    &epriv);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+  priv = epriv.ptr;
 
   if (!_gnutls_version_has_selectable_sighash (ver)
-      || session->security_parameters.extensions.sign_algorithms_size == 0)
+      || priv->sign_algorithms_size == 0)
     {
       return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
     }
 
-  if (indx < session->security_parameters.extensions.sign_algorithms_size)
+  if (indx < priv->sign_algorithms_size)
     {
-      *algo = session->security_parameters.extensions.sign_algorithms[indx];
+      *algo = priv->sign_algorithms[indx];
       return 0;
     }
   else

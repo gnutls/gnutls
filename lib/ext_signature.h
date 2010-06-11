@@ -25,11 +25,13 @@
 
 /* signature algorithms extension
  */
-int _gnutls_signature_algorithm_recv_params (gnutls_session_t session,
-					     const opaque * data,
-					     size_t data_size);
-int _gnutls_signature_algorithm_send_params (gnutls_session_t session,
-					     opaque * data, size_t);
+#ifndef EXT_SIGNATURE_H
+# define EXT_SIGNATURE_H
+
+#include <gnutls_extensions.h>
+
+extern extension_entry_st ext_mod_sig;
+
 int _gnutls_session_sign_algo_requested (gnutls_session_t session,
 					 gnutls_sign_algorithm_t sig);
 gnutls_sign_algorithm_t _gnutls_session_get_sign_algo (gnutls_session_t
@@ -44,3 +46,5 @@ int _gnutls_sign_algorithm_write_params (gnutls_session_t session,
 					 opaque * data, size_t max_data_size);
 int _gnutls_session_sign_algo_enabled (gnutls_session_t session,
 				       gnutls_sign_algorithm_t sig);
+
+#endif

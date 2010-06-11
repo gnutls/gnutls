@@ -152,7 +152,7 @@ _mbuffer_alloc (size_t payload_size)
 }
 
 mbuffer_st*
-_mbuffer_append_data (mbuffer_st *bufel, void* newdata, size_t newdata_size)
+_mbuffer_push_data (mbuffer_st *bufel, void* newdata, size_t newdata_size)
 {
   bufel = gnutls_realloc_fast (bufel, bufel->msg.size+newdata_size+sizeof (mbuffer_st));
   if (bufel == NULL)

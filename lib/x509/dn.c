@@ -309,7 +309,7 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 
   if (buf)
     {
-      _gnutls_buffer_get_data (&out_str, buf, sizeof_buf);
+      _gnutls_buffer_pop_data (&out_str, buf, sizeof_buf);
       buf[*sizeof_buf] = 0;
     }
   else

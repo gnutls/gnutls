@@ -27,6 +27,7 @@
 # define GNUTLS_STR_H
 
 #include <gnutls_int.h>
+#include <gnutls_datum.h>
 
 void _gnutls_str_cpy (char *dest, size_t dest_tot_size, const char *src);
 void _gnutls_mem_cpy (char *dest, size_t dest_tot_size, const char *src,
@@ -49,9 +50,22 @@ int _gnutls_buffer_append_str (gnutls_buffer_st *, const char *str);
 int _gnutls_buffer_append_data (gnutls_buffer_st *, const void *data,
 				size_t data_size);
 
-void _gnutls_buffer_get_data (gnutls_buffer_st *, void *, size_t * size);
-void _gnutls_buffer_get_datum (gnutls_buffer_st *, gnutls_datum_t *,
+#include <gnutls_num.h>
+
+int _gnutls_buffer_append_prefix (gnutls_buffer_st * buf, size_t data_size);
+
+int _gnutls_buffer_append_data_prefix (gnutls_buffer_st * buf, 
+    const void *data, size_t data_size);
+void _gnutls_buffer_pop_data (gnutls_buffer_st *, void *, size_t * size);
+void _gnutls_buffer_pop_datum (gnutls_buffer_st *, gnutls_datum_t *,
 			       size_t max_size);
+
+int _gnutls_buffer_pop_prefix (gnutls_buffer_st * buf, size_t *data_size, int check);
+
+int _gnutls_buffer_pop_data_prefix (gnutls_buffer_st * buf, void * data, size_t * data_size);
+
+int _gnutls_buffer_pop_datum_prefix (gnutls_buffer_st * buf, gnutls_datum_t* data);
+int _gnutls_buffer_to_datum (gnutls_buffer_st * str, gnutls_datum_t * data);
 
 int _gnutls_buffer_escape(gnutls_buffer_st * dest, const char *const invalid_chars);
 int _gnutls_buffer_unescape(gnutls_buffer_st * dest);
@@ -74,5 +88,61 @@ int _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 int _gnutls_hostname_compare (const char *certname, size_t certnamesize,
 			      const char *hostname);
 #define MAX_CN 256
+
+#define BUFFER_APPEND(b, x, s) { \
+        ret = _gnutls_buffer_append_data(b, x, s); \
+        if (ret < 0) { \
+            gnutls_assert(); \
+            return ret; \
+        } \
+    }
+
+#define BUFFER_APPEND_PFX(b, x, s) { \
+        ret = _gnutls_buffer_append_data_prefix(b, x, s); \
+        if (ret < 0) { \
+            gnutls_assert(); \
+            return ret; \
+        } \
+    }
+
+#define BUFFER_APPEND_NUM(b, s) { \
+        ret = _gnutls_buffer_append_prefix(b, s); \
+        if (ret < 0) { \
+            gnutls_assert(); \
+            return ret; \
+        } \
+    }
+
+
+#define BUFFER_POP(b, x, s) { \
+        size_t is = s; \
+        _gnutls_buffer_pop_data(b, x, &is); \
+        if (is != s) { \
+            ret = GNUTLS_E_PARSING_ERROR; \
+            gnutls_assert(); \
+            goto error; \
+        } \
+    }
+
+#define BUFFER_POP_DATUM(b, o) { \
+        gnutls_datum_t d; \
+        ret = _gnutls_buffer_pop_datum_prefix(b, &d); \
+        if (ret >= 0) \
+            ret = _gnutls_set_datum (o, d.data, d.size); \
+        if (ret < 0) { \
+            gnutls_assert(); \
+            goto error; \
+        } \
+    }
+
+#define BUFFER_POP_NUM(b, o) { \
+        size_t s; \
+        ret = _gnutls_buffer_pop_prefix(b, &s, 0); \
+        if (ret < 0) { \
+            gnutls_assert(); \
+            goto error; \
+        } \
+        o = s; \
+    }
 
 #endif

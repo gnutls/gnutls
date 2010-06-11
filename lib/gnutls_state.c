@@ -45,6 +45,7 @@
 #include <auth_psk.h>
 #include <gnutls_algorithms.h>
 #include <gnutls_rsa_export.h>
+#include <gnutls_extensions.h>
 
 /* These should really be static, but src/tests.c calls them.  Make
    them public functions?  */
@@ -216,7 +217,6 @@ _gnutls_handshake_internal_state_init (gnutls_session_t session)
   session->internals.extensions_sent_size = 0;
 
   /* by default no selected certificate */
-  session->internals.proposed_record_size = DEFAULT_MAX_RECORD_SIZE;
   session->internals.adv_version_major = 0;
   session->internals.adv_version_minor = 0;
   session->internals.v2_hello = 0;
@@ -225,7 +225,6 @@ _gnutls_handshake_internal_state_init (gnutls_session_t session)
   session->internals.adv_version_minor = 0;
   session->internals.adv_version_minor = 0;
   session->internals.direction = 0;
-  session->internals.safe_renegotiation_received = 0;
 
   /* use out of band data for the last
    * handshake messages received.
@@ -385,6 +384,7 @@ gnutls_deinit (gnutls_session_t session)
 
   _gnutls_handshake_internal_state_clear (session);
   _gnutls_handshake_io_buffer_clear (session);
+  _gnutls_ext_free_session_data (session);
 
   _gnutls_free_datum (&session->connection_state.read_mac_secret);
   _gnutls_free_datum (&session->connection_state.write_mac_secret);
@@ -438,19 +438,6 @@ gnutls_deinit (gnutls_session_t session)
 
       session->key = NULL;
     }
-
-  gnutls_free (session->internals.srp_username);
-
-  if (session->internals.srp_password)
-    {
-      memset (session->internals.srp_password, 0,
-	      strlen (session->internals.srp_password));
-      gnutls_free (session->internals.srp_password);
-    }
-
-  gnutls_free (session->security_parameters.extensions.session_ticket);
-  gnutls_free (session->internals.resumed_security_parameters.
-	       extensions.session_ticket);
 
   memset (session, 0, sizeof (struct gnutls_session_int));
   gnutls_free (session);

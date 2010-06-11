@@ -375,7 +375,7 @@ static int unescape_string (char* output, const char* input, size_t* size, char 
         return ret;
     }
 
-    _gnutls_buffer_get_data(&str, output, size);
+    _gnutls_buffer_pop_data(&str, output, size);
 
     _gnutls_buffer_clear(&str);
 

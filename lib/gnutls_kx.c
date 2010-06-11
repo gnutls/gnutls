@@ -39,6 +39,7 @@
 #include <gnutls_datum.h>
 #include <gnutls_rsa_export.h>
 #include <gnutls_mbuffers.h>
+#include "../libextra/ext_inner_application.h" /* isn't this too much? */
 
 /* This is a temporary function to be used before the generate_*
    internal API is changed to use mbuffers. For now we don't avoid the
@@ -123,64 +124,6 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
 				      security_parameters.master_secret);
 
     }
-  else if (session->security_parameters.extensions.oprfi_client_len > 0 &&
-	   session->security_parameters.extensions.oprfi_server_len > 0)
-    {
-      opaque *rnd;
-      size_t rndlen = 2 * GNUTLS_RANDOM_SIZE;
-
-      rndlen += session->security_parameters.extensions.oprfi_client_len;
-      rndlen += session->security_parameters.extensions.oprfi_server_len;
-
-      rnd = gnutls_malloc (rndlen + 1);
-      if (!rnd)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
-
-      _gnutls_hard_log ("INT: CLIENT OPRFI[%d]: %s\n",
-			session->security_parameters.extensions.
-			oprfi_server_len,
-			_gnutls_bin2hex (session->
-					 security_parameters.extensions.
-					 oprfi_client,
-					 session->
-					 security_parameters.extensions.
-					 oprfi_client_len, buf,
-					 sizeof (buf), NULL));
-      _gnutls_hard_log ("INT: SERVER OPRFI[%d]: %s\n",
-			session->security_parameters.extensions.
-			oprfi_server_len,
-			_gnutls_bin2hex (session->
-					 security_parameters.extensions.
-					 oprfi_server,
-					 session->
-					 security_parameters.extensions.
-					 oprfi_server_len, buf,
-					 sizeof (buf), NULL));
-
-      memcpy (rnd, session->security_parameters.client_random,
-	      GNUTLS_RANDOM_SIZE);
-      memcpy (rnd + GNUTLS_RANDOM_SIZE,
-	      session->security_parameters.extensions.oprfi_client,
-	      session->security_parameters.extensions.oprfi_client_len);
-      memcpy (rnd + GNUTLS_RANDOM_SIZE +
-	      session->security_parameters.extensions.oprfi_client_len,
-	      session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
-      memcpy (rnd + GNUTLS_RANDOM_SIZE +
-	      session->security_parameters.extensions.oprfi_client_len +
-	      GNUTLS_RANDOM_SIZE,
-	      session->security_parameters.extensions.oprfi_server,
-	      session->security_parameters.extensions.oprfi_server_len);
-
-      ret = _gnutls_PRF (session, PREMASTER.data, PREMASTER.size,
-			 MASTER_SECRET, strlen (MASTER_SECRET),
-			 rnd, rndlen, GNUTLS_MASTER_SIZE,
-			 session->security_parameters.master_secret);
-
-      gnutls_free (rnd);
-    }
   else
     {
       opaque rnd[2 * GNUTLS_RANDOM_SIZE + 1];
@@ -198,8 +141,7 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
     }
 
   /* TLS/IA inner secret is derived from the master secret. */
-  memcpy (session->security_parameters.inner_secret,
-	  session->security_parameters.master_secret, GNUTLS_MASTER_SIZE);
+  _gnutls_ia_derive_inner_secret(session);
 
   if (!keep_premaster)
     _gnutls_free_datum (&PREMASTER);

@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.11.0 (unreleased)
 
+** libgnutls: Internal API for extensions augmented to allow
+safe storing and loading of data on resumption. OPRFI extension
+was removed.
+
 ** libgnutls: Added support for DSA-SHA256 and DSA-SHA224
 
 ** libgnutls: Added PKCS #11 support and an API to access objects in

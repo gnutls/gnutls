@@ -36,6 +36,7 @@
 #include "auth_srp.h"
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
+#include <ext_srp.h>
 
 const mod_auth_st srp_auth_struct = {
   "SRP",
@@ -142,6 +143,16 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
   size_t n_b, tmp_size;
   char buf[64];
   uint8_t *data_b;
+  extension_priv_data_t epriv;
+  srp_ext_st * priv;
+
+  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_SRP, &epriv);
+  if (ret < 0) /* peer didn't send a username */
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNKNOWN_SRP_USERNAME;
+    }
+  priv = epriv.ptr;
 
   if ((ret =
        _gnutls_auth_info_set (session, GNUTLS_CRD_SRP,
@@ -154,8 +165,7 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
   info = _gnutls_get_auth_info (session);
   username = info->username;
 
-  _gnutls_str_cpy (username, MAX_SRP_USERNAME,
-		   session->security_parameters.extensions.srp_username);
+  _gnutls_str_cpy (username, MAX_SRP_USERNAME, priv->username);
 
   ret = _gnutls_srp_pwd_read_entry (session, username, &pwd_entry);
 
@@ -264,7 +274,16 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
   char *username, *password;
   char buf[64];
   gnutls_srp_client_credentials_t cred;
+  extension_priv_data_t epriv;
+  srp_ext_st * priv;
 
+  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_SRP, &epriv);
+  if (ret < 0) /* peer didn't send a username */
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNKNOWN_SRP_USERNAME;
+    }
+  priv = epriv.ptr;
 
   cred = (gnutls_srp_client_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_SRP, NULL);
@@ -275,15 +294,16 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  if (session->internals.srp_username == NULL)
+  if (priv->username == NULL)
     {
       username = cred->username;
       password = cred->password;
     }
   else
     {
-      username = session->internals.srp_username;
-      password = session->internals.srp_password;
+
+      username = priv->username;
+      password = priv->password;
     }
 
   if (username == NULL || password == NULL)
@@ -716,6 +736,16 @@ _gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
   char *username, *password;
   ssize_t data_size = _data_size;
   gnutls_srp_client_credentials_t cred;
+  extension_priv_data_t epriv;
+  srp_ext_st * priv;
+
+  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_SRP, &epriv);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNKNOWN_SRP_USERNAME;
+    }
+  priv = epriv.ptr;
 
   cred = (gnutls_srp_client_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_SRP, NULL);
@@ -726,15 +756,15 @@ _gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  if (session->internals.srp_username == NULL)
+  if (priv->username == NULL)
     {
       username = cred->username;
       password = cred->password;
     }
   else
     {
-      username = session->internals.srp_username;
-      password = session->internals.srp_password;
+      username = priv->username;
+      password = priv->password;
     }
 
   if (username == NULL || password == NULL)

@@ -697,27 +697,12 @@ _gnutls_send_finished (gnutls_session_t session, int again)
       if (session->internals.finished_func)
 	session->internals.finished_func (session, data, vdata_size);
 
-      /* Save data for safe renegotiation. 
-       */
-      if (vdata_size > MAX_VERIFY_DATA_SIZE)
-       {
-         gnutls_assert ();
-         return GNUTLS_E_INTERNAL_ERROR;
-       }
-
-       if (session->security_parameters.entity == GNUTLS_CLIENT)
-         {
-           session->security_parameters.extensions.client_verify_data_len =
-	    vdata_size;
-
-           memcpy (session->security_parameters.extensions.client_verify_data, data, vdata_size);
-         }
-       else
-         {
-           session->security_parameters.extensions.server_verify_data_len = vdata_size;
-           memcpy (session->security_parameters.extensions.server_verify_data,
-	      data, vdata_size);
-         }
+      ret = _gnutls_ext_sr_finished( session, data, vdata_size, 0);
+      if (ret < 0)
+        {
+	  gnutls_assert();
+	  return ret;
+	}
 
       ret = _gnutls_send_handshake (session, bufel, GNUTLS_HANDSHAKE_FINISHED);
     }
@@ -739,7 +724,6 @@ _gnutls_recv_finished (gnutls_session_t session)
   int data_size;
   int ret;
   int vrfysize;
-  tls_ext_st *ext;
 
   ret =
     _gnutls_recv_handshake (session, &vrfy, &vrfysize,
@@ -797,24 +781,11 @@ _gnutls_recv_finished (gnutls_session_t session)
     }
   gnutls_free (vrfy);
 
-  /* Save peer's verify data for safe renegotiation */
-  if (data_size > MAX_VERIFY_DATA_SIZE)
+  ret = _gnutls_ext_sr_finished( session, data, data_size, 1);
+  if (ret < 0)
     {
-      gnutls_assert ();
-      return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-    }
-
-  ext = &session->security_parameters.extensions;
-
-  if (session->security_parameters.entity == GNUTLS_CLIENT)
-    {
-      memcpy (ext->server_verify_data, data, data_size);
-      ext->server_verify_data_len = data_size;
-    }
-  else
-    {
-      memcpy (ext->client_verify_data, data, data_size);
-      ext->client_verify_data_len = data_size;
+      gnutls_assert();
+      return ret;
     }
 
   session->internals.initial_negotiation_completed = 1;
@@ -886,8 +857,12 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
 	  {
 	    _gnutls_handshake_log
 	      ("HSK[%p]: Received safe renegotiation CS\n", session);
-	    session->internals.safe_renegotiation_received = 1;
-	    session->internals.connection_using_safe_renegotiation = 1;
+	    retval = _gnutls_ext_sr_recv_cs(session);
+	    if (retval < 0)
+	      {
+		gnutls_assert();
+		return retval;
+	      }
 	    break;
 	  }
       }
@@ -1938,7 +1913,7 @@ _gnutls_copy_comp_methods (gnutls_session_t session,
 /* This should be sufficient by now. It should hold all the extensions
  * plus the headers in a hello message.
  */
-#define MAX_EXT_DATA_LENGTH 1024
+#define MAX_EXT_DATA_LENGTH 4096
 
 /* This function sends the client hello handshake message.
  */
@@ -1976,10 +1951,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
       data = _mbuffer_get_udata_ptr(bufel);
-      extdatalen = MAX_EXT_DATA_LENGTH
-	+
-	session->internals.resumed_security_parameters.
-	extensions.session_ticket_len;
+      extdatalen = MAX_EXT_DATA_LENGTH;
 
       extdata = gnutls_malloc (extdatalen);
       if (extdata == NULL)
@@ -2079,7 +2051,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 
       if (ret > 0)
 	{
-	  bufel = _mbuffer_append_data (bufel, extdata, ret);
+	  bufel = _mbuffer_push_data (bufel, extdata, ret);
 	  if (bufel == NULL)
 	    {
 	      gnutls_assert ();
@@ -2103,7 +2075,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       ret = _gnutls_copy_comp_methods (session, extdata, extdatalen);
       if (ret > 0)
 	{
-	  bufel = _mbuffer_append_data (bufel, extdata, ret);
+	  bufel = _mbuffer_push_data (bufel, extdata, ret);
 	  if (bufel == NULL)
 	    {
 	      gnutls_assert ();
@@ -2137,7 +2109,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 
       if (ret > 0)
 	{
-	  bufel = _mbuffer_append_data (bufel, extdata, ret);
+	  bufel = _mbuffer_push_data (bufel, extdata, ret);
 	  if (bufel == NULL)
 	    {
 	      gnutls_assert ();
@@ -2175,28 +2147,6 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
   opaque buf[2 * TLS_MAX_SESSION_ID_SIZE + 1];
 
   datalen = 0;
-
-#ifdef ENABLE_SRP
-  if (IS_SRP_KX
-      (_gnutls_cipher_suite_get_kx_algo
-       (&session->security_parameters.current_cipher_suite)))
-    {
-      /* While resuming we cannot check the username extension since it is
-       * not available at this point. It will be copied on connection
-       * state activation.
-       */
-      if (session->internals.resumed == RESUME_FALSE &&
-	  session->security_parameters.extensions.srp_username[0] == 0)
-	{
-	  /* The peer didn't send a valid SRP extension with the
-	   * SRP username. The draft requires that we send a fatal
-	   * alert and abort.
-	   */
-	  gnutls_assert ();
-	  return GNUTLS_E_UNKNOWN_SRP_USERNAME;
-	}
-    }
-#endif
 
   if (again == 0)
     {
@@ -2269,8 +2219,6 @@ _gnutls_send_hello (gnutls_session_t session, int again)
 {
   int ret;
 
-  session->internals.safe_renegotiation_received = 0;
-
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
       ret = _gnutls_send_client_hello (session, again);
@@ -2292,7 +2240,6 @@ int
 _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 {
   int ret;
-  tls_ext_st *ext;
 
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
@@ -2314,101 +2261,14 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	}
     }
 
-  if (session->internals.priorities.sr == SR_DISABLED)
+  ret = _gnutls_ext_sr_verify(session);
+  if (ret < 0)
     {
-      gnutls_assert ();
-      return ret;
+	gnutls_assert();
+	return ret;
     }
 
-  /* Safe renegotiation */
-  ext = &session->security_parameters.extensions;
-
-  if (session->internals.safe_renegotiation_received)
-    {
-      if ((ext->ri_extension_data_len < ext->client_verify_data_len) ||
-	  (memcmp (ext->ri_extension_data,
-		   ext->client_verify_data, ext->client_verify_data_len)))
-	{
-	  gnutls_assert ();
-	  _gnutls_handshake_log ("HSK[%p]: Safe renegotiation failed [1]\n",
-				 session);
-	  return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
-	}
-
-      if (session->security_parameters.entity == GNUTLS_CLIENT)
-	{
-	  if ((ext->ri_extension_data_len !=
-	       ext->client_verify_data_len + ext->server_verify_data_len) ||
-	      memcmp (ext->ri_extension_data + ext->client_verify_data_len,
-		      ext->server_verify_data,
-		      ext->server_verify_data_len) != 0)
-	    {
-	      gnutls_assert ();
-	      _gnutls_handshake_log
-		("HSK[%p]: Safe renegotiation failed [2]\n", session);
-	      return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
-	    }
-	}
-      else			/* Make sure there are 0 extra bytes */
-	{
-	  if (ext->ri_extension_data_len != ext->client_verify_data_len)
-	    {
-	      gnutls_assert ();
-	      _gnutls_handshake_log
-		("HSK[%p]: Safe renegotiation failed [3]\n", session);
-	      return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
-	    }
-	}
-
-      _gnutls_handshake_log ("HSK[%p]: Safe renegotiation succeeded\n",
-			     session);
-    }
-  else	/* safe renegotiation not received... */
-    {
-      if (session->internals.connection_using_safe_renegotiation)
-	{
-	  gnutls_assert ();
-	  _gnutls_handshake_log
-	    ("HSK[%p]: Peer previously asked for safe renegotiation\n",
-	     session);
-	  return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
-	}
-
-      /* Clients can't tell if it's an initial negotiation */
-      if (session->internals.initial_negotiation_completed)
-	{
-
-          if (session->internals.priorities.sr < SR_PARTIAL)
-	    {
-	      _gnutls_handshake_log
-		("HSK[%p]: Allowing unsafe (re)negotiation\n", session);
-	    }
-	  else
-	    {
-	      gnutls_assert ();
-	      _gnutls_handshake_log
-		("HSK[%p]: Denying unsafe (re)negotiation\n", session);
-              return GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED;
-	    }
-	}
-      else
-	{
-	  if (session->internals.priorities.sr < SR_SAFE)
-	    {
-	      _gnutls_handshake_log
-		("HSK[%p]: Allowing unsafe initial negotiation\n", session);
-	    }
-	  else
-	    {
-	      gnutls_assert ();
-	      _gnutls_handshake_log
-		("HSK[%p]: Denying unsafe initial negotiation\n", session);
-	      return GNUTLS_E_SAFE_RENEGOTIATION_FAILED;
-	    }
-	}
-    }
-
-  return ret;
+  return 0;
 }
 
 /* The packets in gnutls_handshake (it's more broad than original TLS handshake)
@@ -2767,7 +2627,7 @@ _gnutls_handshake_client (gnutls_session_t session)
       IMED_RET ("recv hello", ret, 1);
 
     case STATE70:
-      if (session->security_parameters.extensions.do_recv_supplemental)
+      if (session->security_parameters.do_recv_supplemental)
 	{
 	  ret = _gnutls_recv_supplemental (session);
 	  STATE = STATE70;
@@ -2808,7 +2668,7 @@ _gnutls_handshake_client (gnutls_session_t session)
       IMED_RET ("recv server hello done", ret, 1);
 
     case STATE71:
-      if (session->security_parameters.extensions.do_send_supplemental)
+      if (session->security_parameters.do_send_supplemental)
 	{
 	  ret = _gnutls_send_supplemental (session, AGAIN (STATE71));
 	  STATE = STATE71;
@@ -2867,7 +2727,6 @@ _gnutls_send_handshake_final (gnutls_session_t session, int init)
 	  gnutls_assert ();
 	  return ret;
 	}
-
       /* Initialize the connection session (start encryption) - in case of client 
        */
       if (init == TRUE)
@@ -2991,7 +2850,7 @@ _gnutls_handshake_server (gnutls_session_t session)
       IMED_RET ("send hello", ret, 0);
 
     case STATE70:
-      if (session->security_parameters.extensions.do_send_supplemental)
+      if (session->security_parameters.do_send_supplemental)
 	{
 	  ret = _gnutls_send_supplemental (session, AGAIN (STATE70));
 	  STATE = STATE70;
@@ -3033,7 +2892,7 @@ _gnutls_handshake_server (gnutls_session_t session)
       IMED_RET ("send server hello done", ret, 0);
 
     case STATE71:
-      if (session->security_parameters.extensions.do_recv_supplemental)
+      if (session->security_parameters.do_recv_supplemental)
 	{
 	  ret = _gnutls_recv_supplemental (session);
 	  STATE = STATE71;
@@ -3091,13 +2950,9 @@ _gnutls_handshake_common (gnutls_session_t session)
 	{
 	case STATE0:
 	case STATE40:
-	  if (session->internals.session_ticket_renew)
-	    {
-	      ret =
-		_gnutls_send_new_session_ticket (session, AGAIN (STATE40));
-	      STATE = STATE40;
-	      IMED_RET ("send handshake new session ticket", ret, 0);
-	    }
+          ret = _gnutls_send_new_session_ticket (session, AGAIN (STATE40));
+          STATE = STATE40;
+          IMED_RET ("send handshake new session ticket", ret, 0);
 	  STATE = STATE0;
 	default:
 	  break;
@@ -3125,12 +2980,9 @@ _gnutls_handshake_common (gnutls_session_t session)
 	{
 	case STATE0:
 	case STATE41:
-	  if (session->internals.session_ticket_renew)
-	    {
-	      ret = _gnutls_recv_new_session_ticket (session);
-	      STATE = STATE41;
-	      IMED_RET ("recv handshake new session ticket", ret, 1);
-	    }
+          ret = _gnutls_recv_new_session_ticket (session);
+	  STATE = STATE41;
+	  IMED_RET ("recv handshake new session ticket", ret, 1);
 	  STATE = STATE0;
 	default:
 	  break;

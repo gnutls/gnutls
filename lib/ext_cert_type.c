@@ -34,8 +34,27 @@
 #include <gnutls_state.h>
 #include <gnutls_num.h>
 
+/* Maps record size to numbers according to the
+ * extensions draft.
+ */
 inline static int _gnutls_num2cert_type (int num);
 inline static int _gnutls_cert_type2num (int record_size);
+static int _gnutls_cert_type_recv_params (gnutls_session_t session,
+				   const opaque * data, size_t data_size);
+static int _gnutls_cert_type_send_params (gnutls_session_t session, opaque * data,
+				   size_t);
+
+extension_entry_st ext_mod_cert_type = {
+    .name = "CERT TYPE",
+    .type = GNUTLS_EXTENSION_CERT_TYPE,
+    .parse_type = GNUTLS_EXT_TLS,
+
+    .recv_func = _gnutls_cert_type_recv_params,
+    .send_func = _gnutls_cert_type_send_params,
+    .pack_func = NULL,
+    .unpack_func = NULL,
+    .deinit_func = NULL
+};
 
 /* 
  * In case of a server: if a CERT_TYPE extension type is received then it stores
@@ -46,7 +65,7 @@ inline static int _gnutls_cert_type2num (int record_size);
  *
  */
 
-int
+static int
 _gnutls_cert_type_recv_params (gnutls_session_t session,
 			       const opaque * data, size_t _data_size)
 {
@@ -142,7 +161,7 @@ _gnutls_cert_type_recv_params (gnutls_session_t session,
 
 /* returns data_size or a negative number on failure
  */
-int
+static int
 _gnutls_cert_type_send_params (gnutls_session_t session, opaque * data,
 			       size_t data_size)
 {

@@ -112,7 +112,7 @@ _gnutls_buffer_clear (gnutls_buffer_st * str)
   str->length = 0;
 }
 
-#define MIN_CHUNK 256
+#define MIN_CHUNK 1024
 
 int
 _gnutls_buffer_append_data (gnutls_buffer_st * dest, const void *data,
@@ -211,7 +211,7 @@ _gnutls_buffer_append_str (gnutls_buffer_st * dest, const char *src)
  * data are appended in the buffer.
  */
 void
-_gnutls_buffer_get_datum (gnutls_buffer_st * str, gnutls_datum_t * data,
+_gnutls_buffer_pop_datum (gnutls_buffer_st * str, gnutls_datum_t * data,
 			  size_t req_size)
 {
 
@@ -240,14 +240,48 @@ _gnutls_buffer_get_datum (gnutls_buffer_st * str, gnutls_datum_t * data,
   return;
 }
 
+/* converts the buffer to a datum if possible. After this call the buffer
+ * is at an usable state and might not be used or deinitialized */
+int
+_gnutls_buffer_to_datum (gnutls_buffer_st * str, gnutls_datum_t * data)
+{
+
+  if (str->length == 0)
+    {
+      data->data = NULL;
+      data->size = 0;
+      return 0;
+    }
+
+  if (str->allocd != str->data)
+    {
+      data->data = gnutls_malloc(str->length);
+      if (data->data == NULL)
+        {
+          gnutls_assert();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
+      memcpy(data->data, str->data, str->length);
+      data->size = str->length;
+      _gnutls_buffer_clear(str);
+    }
+  else
+    {
+      data->data = str->data;
+      data->size = str->length;
+    }
+
+  return 0;
+}
+
 /* returns data from a string in a constant buffer.
  */
 void
-_gnutls_buffer_get_data (gnutls_buffer_st * str, void *data, size_t * req_size)
+_gnutls_buffer_pop_data (gnutls_buffer_st * str, void *data, size_t * req_size)
 {
   gnutls_datum_t tdata;
 
-  _gnutls_buffer_get_datum (str, &tdata, *req_size);
+  _gnutls_buffer_pop_datum (str, &tdata, *req_size);
 
   *req_size = tdata.size;
   memcpy (data, tdata.data, tdata.size);
@@ -509,3 +543,90 @@ _gnutls_hostname_compare (const char *certname,
 
   return 0;
 }
+
+int _gnutls_buffer_append_prefix (gnutls_buffer_st * buf, size_t data_size)
+{
+    opaque ss[4];
+    _gnutls_write_uint32(data_size, ss);
+    return _gnutls_buffer_append_data(buf, ss, 4);
+}
+
+/* Reads an uint32 number from the buffer. If check is non zero it will also check whether
+ * the number read, is less than the data in the buffer
+ */
+int _gnutls_buffer_pop_prefix (gnutls_buffer_st * buf, size_t *data_size, int check)
+{
+    size_t size;
+    
+    if (buf->length < 4) {
+	gnutls_assert();
+	return GNUTLS_E_PARSING_ERROR;
+    }
+    
+    size = _gnutls_read_uint32(buf->data);
+    if (check && size > buf->length-4) {
+	gnutls_assert();
+	return GNUTLS_E_PARSING_ERROR;
+    }
+    
+    buf->data+=4;
+    buf->length-=4;
+    
+    *data_size = size;
+    
+    return 0;
+}
+
+int _gnutls_buffer_pop_datum_prefix (gnutls_buffer_st * buf, gnutls_datum_t* data)
+{
+    size_t size;
+    int ret;
+    
+    ret = _gnutls_buffer_pop_prefix(buf, &size, 1);
+    if (ret < 0) {
+	gnutls_assert();
+	return ret;
+    }
+
+    if (size > 0) {
+	size_t osize = size;
+	_gnutls_buffer_pop_datum(buf, data, size);
+	if (osize != data->size) {
+	    gnutls_assert();
+	    return GNUTLS_E_PARSING_ERROR;
+	}
+    } else {
+	data->size = 0;
+	data->data = NULL;
+    }
+    
+    return 0;
+}
+
+int _gnutls_buffer_append_data_prefix (gnutls_buffer_st * buf, const void *data,
+				size_t data_size)
+{
+    _gnutls_buffer_append_prefix(buf, data_size);
+    if (data_size > 0)
+      return _gnutls_buffer_append_data(buf, data, data_size);
+    
+    return 0;
+}
+
+int _gnutls_buffer_pop_data_prefix (gnutls_buffer_st * buf, void * data, size_t * data_size)
+{
+    size_t size;
+    int ret;
+    
+    ret = _gnutls_buffer_pop_prefix(buf, &size, 1);
+    if (ret < 0) {
+	gnutls_assert();
+	return ret;
+    }
+
+    if (size > 0)
+	_gnutls_buffer_pop_data(buf, data, data_size);
+    
+    return 0;
+}
+

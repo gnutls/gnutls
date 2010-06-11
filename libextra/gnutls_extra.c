@@ -126,11 +126,7 @@ gnutls_global_init_extra (void)
   if (_gnutls_init_extra != 1)
     return 0;
 
-  ret = gnutls_ext_register (GNUTLS_EXTENSION_INNER_APPLICATION,
-			     "INNER_APPLICATION",
-			     GNUTLS_EXT_TLS,
-			     _gnutls_inner_application_recv_params,
-			     _gnutls_inner_application_send_params);
+  ret = _gnutls_ext_register (&ext_mod_ia);
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
 

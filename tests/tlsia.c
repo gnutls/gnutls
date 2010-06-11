@@ -51,6 +51,12 @@
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 
+static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "<%d>| %s", level, str);
+}
+
 static int
 client_avp (gnutls_session_t session, void *ptr,
 	    const char *last, size_t lastlen, char **new, size_t * newlen)
@@ -117,6 +123,10 @@ client (void)
   const int kx_prio[] = { GNUTLS_KX_ANON_DH, 0 };
 
   ret = gnutls_global_init ();
+  gnutls_global_set_log_function (tls_log_func);
+  if (debug)
+    gnutls_global_set_log_level (2);
+
   if (ret)
     fail ("global_init: %d\n", ret);
   ret = gnutls_global_init_extra ();
@@ -424,6 +434,10 @@ server (void)
   ret = gnutls_global_init_extra ();
   if (ret)
     fail ("global_init_extra: %d\n", ret);
+
+  gnutls_global_set_log_function (tls_log_func);
+  if (debug)
+    gnutls_global_set_log_level (2);
 
   gnutls_anon_allocate_server_credentials (&anoncred);
   gnutls_ia_allocate_server_credentials (&iacred);

@@ -165,4 +165,10 @@ void gnutls_certificate_server_set_retrieve_function
     gnutls_sign_func
     gnutls_sign_callback_get (gnutls_session_t session, void **userdata);
 
+  int gnutls_ext_register (int type,
+			   const char *name,
+			   gnutls_ext_parse_type_t parse_type,
+			   gnutls_ext_recv_func recv_func,
+			   gnutls_ext_send_func send_func) _GNUTLS_GCC_ATTR_DEPRECATED;
+
 #endif /* _GNUTLS_COMPAT_H */

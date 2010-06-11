@@ -273,7 +273,7 @@ gnutls_bye (gnutls_session_t session, gnutls_close_request_t how)
 inline static void
 session_invalidate (gnutls_session_t session)
 {
-  session->internals.valid_connection = VALID_FALSE;
+  session->internals.invalid_connection = 1;
 }
 
 
@@ -288,7 +288,7 @@ session_unresumable (gnutls_session_t session)
 inline static int
 session_is_valid (gnutls_session_t session)
 {
-  if (session->internals.valid_connection == VALID_FALSE)
+  if (session->internals.invalid_connection != 0)
     return GNUTLS_E_INVALID_SESSION;
 
   return 0;
@@ -1173,64 +1173,3 @@ gnutls_record_recv (gnutls_session_t session, void *data, size_t sizeofdata)
 			   sizeofdata);
 }
 
-/**
- * gnutls_record_get_max_size:
- * @session: is a #gnutls_session_t structure.
- *
- * Get the record size.  The maximum record size is negotiated by the
- * client after the first handshake message.
- *
- * Returns: The maximum record packet size in this connection.
- **/
-size_t
-gnutls_record_get_max_size (gnutls_session_t session)
-{
-  /* Recv will hold the negotiated max record size
-   * always.
-   */
-  return session->security_parameters.max_record_recv_size;
-}
-
-
-/**
- * gnutls_record_set_max_size:
- * @session: is a #gnutls_session_t structure.
- * @size: is the new size
- *
- * This function sets the maximum record packet size in this
- * connection.  This property can only be set to clients.  The server
- * may choose not to accept the requested size.
- *
- * Acceptable values are 512(=2^9), 1024(=2^10), 2048(=2^11) and
- * 4096(=2^12).  The requested record size does get in effect
- * immediately only while sending data. The receive part will take
- * effect after a successful handshake.
- *
- * This function uses a TLS extension called 'max record size'.  Not
- * all TLS implementations use or even understand this extension.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
- **/
-ssize_t
-gnutls_record_set_max_size (gnutls_session_t session, size_t size)
-{
-  ssize_t new_size;
-
-  if (session->security_parameters.entity == GNUTLS_SERVER)
-    return GNUTLS_E_INVALID_REQUEST;
-
-  new_size = _gnutls_mre_record2num (size);
-
-  if (new_size < 0)
-    {
-      gnutls_assert ();
-      return new_size;
-    }
-
-  session->security_parameters.max_record_send_size = size;
-
-  session->internals.proposed_record_size = size;
-
-  return 0;
-}

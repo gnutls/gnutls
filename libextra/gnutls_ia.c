@@ -26,6 +26,7 @@
 #include "gnutls_num.h"
 #include "gnutls_state.h"
 #include <gnutls/extra.h>
+#include <ext_inner_application.h>
 
 #define CHECKSUM_SIZE 12
 
@@ -171,6 +172,16 @@ _gnutls_ia_prf (gnutls_session_t session,
   int ret;
   opaque *seed;
   size_t seedsize = 2 * GNUTLS_RANDOM_SIZE + extra_size;
+  extension_priv_data_t epriv;
+  ia_ext_st *priv;
+
+  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_INNER_APPLICATION, &epriv);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+  priv = epriv.ptr;
 
   seed = gnutls_malloc (seedsize);
   if (!seed)
@@ -185,7 +196,7 @@ _gnutls_ia_prf (gnutls_session_t session,
 	  session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
   memcpy (seed + 2 * GNUTLS_RANDOM_SIZE, extra, extra_size);
 
-  ret = _gnutls_PRF (session, session->security_parameters.inner_secret,
+  ret = _gnutls_PRF (session, priv->inner_secret,
 		     GNUTLS_MASTER_SIZE,
 		     label, label_size, seed, seedsize, outsize, out);
 
@@ -213,13 +224,25 @@ gnutls_ia_permute_inner_secret (gnutls_session_t session,
 				size_t session_keys_size,
 				const char *session_keys)
 {
+  extension_priv_data_t epriv;
+  ia_ext_st *priv;
+  int ret;
+
+  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_INNER_APPLICATION, &epriv);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+  priv = epriv.ptr;
+
   return _gnutls_ia_prf (session,
 			 sizeof (inner_permutation_label) - 1,
 			 inner_permutation_label,
 			 session_keys_size,
 			 session_keys,
 			 GNUTLS_RANDOM_SIZE,
-			 session->security_parameters.inner_secret);
+			 priv->inner_secret);
 }
 
 /**
@@ -261,8 +284,19 @@ gnutls_ia_generate_challenge (gnutls_session_t session,
 void
 gnutls_ia_extract_inner_secret (gnutls_session_t session, char *buffer)
 {
-  memcpy (buffer, session->security_parameters.inner_secret,
-	  GNUTLS_MASTER_SIZE);
+  extension_priv_data_t epriv;
+  ia_ext_st *priv;
+  int ret;
+
+  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_INNER_APPLICATION, &epriv);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return;
+    }
+  priv = epriv.ptr;
+
+  memcpy (buffer, priv->inner_secret, GNUTLS_MASTER_SIZE);
 }
 
 /**
@@ -290,8 +324,18 @@ gnutls_ia_endphase_send (gnutls_session_t session, int final_p)
     sizeof (server_finished_label);
   ssize_t len;
   int ret;
+  extension_priv_data_t epriv;
+  ia_ext_st *priv;
 
-  ret = _gnutls_PRF (session, session->security_parameters.inner_secret,
+  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_INNER_APPLICATION, &epriv);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+  priv = epriv.ptr;
+
+  ret = _gnutls_PRF (session, priv->inner_secret,
 		     GNUTLS_MASTER_SIZE, label, size_of_label - 1,
 		     /* XXX specification unclear on seed. */
 		     "", 0, CHECKSUM_SIZE, local_checksum);
@@ -343,8 +387,18 @@ gnutls_ia_verify_endphase (gnutls_session_t session, const char *checksum)
   int size_of_label = client ? sizeof (server_finished_label) :
     sizeof (client_finished_label);
   int ret;
+  extension_priv_data_t epriv;
+  ia_ext_st *priv;
 
-  ret = _gnutls_PRF (session, session->security_parameters.inner_secret,
+  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_INNER_APPLICATION, &epriv);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+  priv = epriv.ptr;
+
+  ret = _gnutls_PRF (session, priv->inner_secret,
 		     GNUTLS_MASTER_SIZE,
 		     label, size_of_label - 1,
 		     "", 0, CHECKSUM_SIZE, local_checksum);
@@ -610,22 +664,32 @@ _gnutls_ia_server_handshake (gnutls_session_t session)
 int
 gnutls_ia_handshake_p (gnutls_session_t session)
 {
-  tls_ext_st *ext = &session->security_parameters.extensions;
+  extension_priv_data_t epriv;
+  ia_ext_st * priv;
+  int ret;
+
+  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_SERVER_NAME, &epriv);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+  priv = epriv.ptr;
 
   /* Either local side or peer doesn't do TLS/IA: don't do IA */
 
-  if (!ext->gnutls_ia_enable || !ext->gnutls_ia_peer_enable)
+  if (!(priv->flags & IA_ENABLE) || !(priv->flags & IA_PEER_ENABLE))
     return 0;
 
   /* Not resuming or we don't allow skipping on resumption locally: do IA */
 
-  if (!ext->gnutls_ia_allowskip || !gnutls_session_is_resumed (session))
+  if (!(priv->flags & IA_ALLOW_SKIP) || !gnutls_session_is_resumed (session))
     return 1;
 
   /* If we're resuming and we and the peer both allow skipping on resumption: 
    * don't do IA */
 
-  return !ext->gnutls_ia_peer_allowskip;
+  return !(priv->flags & IA_PEER_ALLOW_SKIP);
 }
 
 
@@ -902,10 +966,24 @@ gnutls_ia_get_server_avp_ptr (gnutls_ia_server_credentials_t cred)
  * calling gnutls_ia_handshake() or one of the lower level gnutls_ia_*
  * functions.
  **/
-void
-gnutls_ia_enable (gnutls_session_t session, int allow_skip_on_resume)
+void gnutls_ia_enable (gnutls_session_t session, int allow_skip_on_resume)
 {
-  session->security_parameters.extensions.gnutls_ia_enable = 1;
-  session->security_parameters.extensions.gnutls_ia_allowskip =
-    allow_skip_on_resume;
+  extension_priv_data_t epriv;
+  ia_ext_st * priv;
+
+  priv = gnutls_calloc(1, sizeof(*priv));
+  if (priv == NULL)
+    {
+      gnutls_assert();
+      return;
+    }
+
+  epriv.ptr = priv;
+
+  priv->flags |= IA_ENABLE;
+  if (allow_skip_on_resume)
+    priv->flags |= IA_ALLOW_SKIP;
+
+  _gnutls_ext_set_session_data(session, GNUTLS_EXTENSION_INNER_APPLICATION, epriv);
+
 }

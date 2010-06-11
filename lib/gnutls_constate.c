@@ -35,6 +35,7 @@
 #include <gnutls_num.h>
 #include <gnutls_datum.h>
 #include <gnutls_state.h>
+#include <gnutls_extensions.h>
 
 static const char keyexp[] = "key expansion";
 static const int keyexp_length = sizeof (keyexp) - 1;
@@ -381,13 +382,6 @@ _gnutls_set_write_keys (gnutls_session_t session)
 			   export_flag);
 }
 
-#define CPY_EXTENSIONS \
-        gnutls_free(dst->extensions.session_ticket); \
-        gnutls_free(dst->extensions.oprfi_client); \
-        gnutls_free(dst->extensions.oprfi_server); \
-	memcpy(&dst->extensions.server_names, &src->extensions, sizeof(src->extensions)); \
-	memset(&src->extensions, 0, sizeof(src->extensions))	/* avoid duplicate free's */
-
 #define CPY_COMMON dst->entity = src->entity; \
 	dst->kx_algorithm = src->kx_algorithm; \
 	memcpy( &dst->current_cipher_suite, &src->current_cipher_suite, sizeof(cipher_suite_st)); \
@@ -400,8 +394,7 @@ _gnutls_set_write_keys (gnutls_session_t session)
 	dst->timestamp = src->timestamp; \
 	dst->max_record_recv_size = src->max_record_recv_size; \
 	dst->max_record_send_size = src->max_record_send_size; \
-	dst->version = src->version; \
-	memcpy( &dst->inner_secret, &src->inner_secret, GNUTLS_MASTER_SIZE)
+	dst->version = src->version
 
 static void
 _gnutls_cpy_read_security_parameters (security_parameters_st *
@@ -419,7 +412,6 @@ _gnutls_cpy_write_security_parameters (security_parameters_st *
 				       dst, security_parameters_st * src)
 {
   CPY_COMMON;
-  CPY_EXTENSIONS;		/* only do once */
 
   dst->write_bulk_cipher_algorithm = src->write_bulk_cipher_algorithm;
   dst->write_mac_algorithm = src->write_mac_algorithm;
@@ -493,7 +485,7 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
 	return rc;
     }
   else
-    {				/* RESUME_TRUE */
+    { /* RESUME_TRUE */
       _gnutls_cpy_read_security_parameters (&session->security_parameters,
 					    &session->
 					    internals.resumed_security_parameters);
@@ -681,6 +673,7 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
       _gnutls_cpy_write_security_parameters (&session->security_parameters,
 					     &session->
 					     internals.resumed_security_parameters);
+      _gnutls_ext_restore_resumed_session(session);
     }
 
   rc = _gnutls_set_write_keys (session);

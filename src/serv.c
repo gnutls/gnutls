@@ -333,29 +333,6 @@ static int comp_priority[PRI_MAX];
 static int mac_priority[PRI_MAX];
 static int cert_type_priority[PRI_MAX];
 
-#if ENABLE_OPRFI
-int
-oprfi_callback (gnutls_session_t session,
-		void *userdata,
-		size_t oprfi_len,
-		const unsigned char *in_oprfi, unsigned char *out_oprfi)
-{
-  size_t ourlen = strlen (info.opaque_prf_input);
-  size_t i;
-
-  printf ("- Received Opaque PRF data of %d bytes\n", oprfi_len);
-  printf ("  data: ");
-  for (i = 0; i < oprfi_len; i++)
-    printf ("%02x", in_oprfi[i]);
-  printf ("\n");
-
-  memset (out_oprfi, 0, oprfi_len);
-  strncpy (out_oprfi, info.opaque_prf_input, oprfi_len);
-
-  return 0;
-}
-#endif
-
 static gnutls_session_t
 initialize_session (void)
 {
@@ -419,11 +396,6 @@ initialize_session (void)
       else
 	gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
     }
-
-#ifdef ENABLE_OPRFI
-  if (info.opaque_prf_input)
-    gnutls_oprfi_enable_server (session, oprfi_callback, NULL);
-#endif
 
   return session;
 }

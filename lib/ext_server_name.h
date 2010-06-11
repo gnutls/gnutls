@@ -22,8 +22,26 @@
  * USA
  *
  */
+#ifndef EXT_SERVER_NAME_H
+#define EXT_SERVER_NAME_H
 
-int _gnutls_server_name_recv_params (gnutls_session_t session,
-				     const opaque * data, size_t data_size);
-int _gnutls_server_name_send_params (gnutls_session_t session,
-				     opaque * data, size_t);
+#include <gnutls_extensions.h>
+
+typedef struct
+{
+  opaque name[MAX_SERVER_NAME_SIZE];
+  unsigned name_length;
+  gnutls_server_name_type_t type;
+} server_name_st;
+
+#define MAX_SERVER_NAME_EXTENSIONS 3
+
+typedef struct {
+  server_name_st server_names[MAX_SERVER_NAME_EXTENSIONS];
+  /* limit server_name extensions */
+  unsigned server_names_size;
+} server_name_ext_st;
+
+extern extension_entry_st ext_mod_server_name;
+
+#endif

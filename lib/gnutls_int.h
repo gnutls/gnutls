@@ -95,7 +95,7 @@ typedef struct
 
 /* we can receive up to MAX_EXT_TYPES extensions.
  */
-#define MAX_EXT_TYPES 64
+#define MAX_EXT_TYPES 32
 
 /* The initial size of the receive
  * buffer size. This will grow if larger
@@ -172,9 +172,6 @@ typedef enum extensions_t
 { GNUTLS_EXTENSION_SERVER_NAME = 0,
   GNUTLS_EXTENSION_MAX_RECORD_SIZE = 1,
   GNUTLS_EXTENSION_CERT_TYPE = 9,
-#ifdef ENABLE_OPRFI
-  GNUTLS_EXTENSION_OPAQUE_PRF_INPUT = ENABLE_OPRFI,
-#endif
   GNUTLS_EXTENSION_SRP = 12,
   GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS = 13,
   GNUTLS_EXTENSION_SESSION_TICKET = 35,
@@ -185,12 +182,8 @@ typedef enum extensions_t
 typedef enum
 { CIPHER_STREAM, CIPHER_BLOCK } cipher_type_t;
 
-typedef enum valid_session_t
-{ VALID_TRUE, VALID_FALSE } valid_session_t;
-typedef enum resumable_session_t
-{ RESUME_TRUE,
-  RESUME_FALSE
-} resumable_session_t;
+#define RESUME_TRUE 0
+#define RESUME_FALSE -1
 
 /* Record Protocol */
 typedef enum content_type_t
@@ -315,68 +308,9 @@ typedef struct
  * structures also - see SRP).
  */
 
-typedef struct
-{
-  opaque name[MAX_SERVER_NAME_SIZE];
-  unsigned name_length;
-  gnutls_server_name_type_t type;
-} server_name_st;
-
-#define MAX_SERVER_NAME_EXTENSIONS 3
 #define MAX_SIGNATURE_ALGORITHMS 16
 
-struct gnutls_session_ticket_key_st
-{
-  opaque key_name[SESSION_TICKET_KEY_NAME_SIZE];
-  opaque key[SESSION_TICKET_KEY_SIZE];
-  opaque mac_secret[SESSION_TICKET_MAC_SECRET_SIZE];
-};
-
 #define MAX_VERIFY_DATA_SIZE 36	/* in SSL 3.0, 12 in TLS 1.0 */
-
-/* If you want the extension data to be kept across resuming sessions
- * then modify CPY_EXTENSIONS in gnutls_constate.c
- */
-typedef struct
-{
-  server_name_st server_names[MAX_SERVER_NAME_EXTENSIONS];
-  /* limit server_name extensions */
-  unsigned server_names_size;
-
-  opaque srp_username[MAX_SRP_USERNAME + 1];
-
-  /* TLS 1.2 signature algorithms */
-  gnutls_sign_algorithm_t sign_algorithms[MAX_SIGNATURE_ALGORITHMS];
-  uint16_t sign_algorithms_size;
-
-  /* TLS/IA data. */
-  int gnutls_ia_enable, gnutls_ia_peer_enable;
-  int gnutls_ia_allowskip, gnutls_ia_peer_allowskip;
-
-  /* Used by extensions that enable supplemental data. */
-  int do_recv_supplemental, do_send_supplemental;
-
-  opaque *session_ticket;
-  uint16_t session_ticket_len;
-
-  /*** Those below do not get copied when resuming session 
-   ***/
-
-  /* Opaque PRF input. */
-  opaque *oprfi_client;
-  uint16_t oprfi_client_len;
-  opaque *oprfi_server;
-  uint16_t oprfi_server_len;
-
-  /* Safe renegotiation. */
-  uint8_t client_verify_data[MAX_VERIFY_DATA_SIZE];
-  size_t client_verify_data_len;
-  uint8_t server_verify_data[MAX_VERIFY_DATA_SIZE];
-  size_t server_verify_data_len;
-  uint8_t ri_extension_data[MAX_VERIFY_DATA_SIZE * 2];	/* max signal is 72 bytes in s->c sslv3 */
-  size_t ri_extension_data_len;
-
-} tls_ext_st;
 
 /* auth_info_t structures now MAY contain malloced 
  * elements.
@@ -424,7 +358,6 @@ typedef struct
   opaque session_id[TLS_MAX_SESSION_ID_SIZE];
   uint8_t session_id_size;
   time_t timestamp;
-  tls_ext_st extensions;
 
   /* The send size is the one requested by the programmer.
    * The recv size is the one negotiated with the peer.
@@ -435,8 +368,14 @@ typedef struct
   gnutls_certificate_type_t cert_type;
   gnutls_protocol_t version;	/* moved here */
 
-  /* For TLS/IA.  XXX: Move to IA credential? */
-  opaque inner_secret[GNUTLS_MASTER_SIZE];
+  /* FIXME: The following are not saved in the session storage
+   * for session resumption.
+   */
+
+  /* Used by extensions that enable supplemental data: Which ones
+   * do that? Do they belong in security parameters?
+   */
+  int do_recv_supplemental, do_send_supplemental;
 } security_parameters_st;
 
 /* This structure holds the generated keys
@@ -529,6 +468,11 @@ typedef struct
   gnutls_handshake_description_t recv_type;
 } handshake_header_buffer_st;
 
+typedef union 
+{
+  void* ptr;
+  uint32_t num;
+} extension_priv_data_t;
 
 typedef struct
 {
@@ -552,7 +496,7 @@ typedef struct
 
   gnutls_buffer_st handshake_data_buffer;	/* this is a buffer that holds the current handshake message */
   gnutls_buffer_st ia_data_buffer;	/* holds inner application data (TLS/IA) */
-  resumable_session_t resumable;	/* TRUE or FALSE - if we can resume that session */
+  int resumable:1;	/* TRUE or FALSE - if we can resume that session */
   handshake_state_t handshake_state;	/* holds
 					 * a number which indicates where
 					 * the handshake procedure has been
@@ -560,12 +504,12 @@ typedef struct
 					 * no interruption has happened.
 					 */
 
-  valid_session_t valid_connection;	/* true or FALSE - if this session is valid */
+  int invalid_connection:1;	/* true or FALSE - if this session is valid */
 
-  int may_not_read;		/* if it's 0 then we can read/write, otherwise it's forbiden to read/write
+  int may_not_read:1;		/* if it's 0 then we can read/write, otherwise it's forbiden to read/write
 				 */
-  int may_not_write;
-  int read_eof;			/* non-zero if we have received a closure alert. */
+  int may_not_write:1;
+  int read_eof:1;			/* non-zero if we have received a closure alert. */
 
   int last_alert;		/* last alert received */
 
@@ -581,7 +525,7 @@ typedef struct
   struct gnutls_priority_st priorities;
 
   /* resumed session */
-  resumable_session_t resumed;	/* RESUME_TRUE or FALSE - if we are resuming a session */
+  int resumed:1;	/* RESUME_TRUE or FALSE - if we are resuming a session */
   security_parameters_st resumed_security_parameters;
 
   /* sockets internals */
@@ -607,7 +551,7 @@ typedef struct
 
   /* 0 if no peeked data was kept, 1 otherwise.
    */
-  int have_peeked_data;
+  int have_peeked_data:1;
 
   int expire_time;		/* after expire_time seconds this session will expire */
   struct mod_auth_st_int *auth_struct;	/* used in handshake packets and KX algorithms */
@@ -662,11 +606,6 @@ typedef struct
    */
   gnutls_handshake_post_client_hello_func user_hello_func;
 
-  /* Holds the record size requested by the
-   * user.
-   */
-  uint16_t proposed_record_size;
-
   /* holds the selected certificate and key.
    * use _gnutls_selected_certs_deinit() and _gnutls_selected_certs_set()
    * to change them.
@@ -674,7 +613,7 @@ typedef struct
   gnutls_cert *selected_cert_list;
   int selected_cert_list_length;
   struct gnutls_privkey_st *selected_key;
-  int selected_need_free;
+  int selected_need_free:1;
 
   /* holds the extensions we sent to the peer
    * (in case of a client)
@@ -690,8 +629,6 @@ typedef struct
   /* This holds the default version that our first
    * record packet will have. */
   opaque default_record_version[2];
-
-  int cbc_protection_hack;
 
   void *user_ptr;
 
@@ -720,9 +657,6 @@ typedef struct
    * server checks that version. (** only used in gnutls-cli-debug)
    */
   opaque rsa_pms_version[2];
-
-  char *srp_username;
-  char *srp_password;
 
   /* Here we cache the DH or RSA parameters got from the
    * credentials structure, or from a callback. That is to
@@ -759,19 +693,19 @@ typedef struct
    */
   uint16_t srp_prime_bits;
 
-  int session_ticket_enable, session_ticket_renew;
-
-  int safe_renegotiation_received:1;
   int initial_negotiation_completed:1;
-  int connection_using_safe_renegotiation:1;
 
-  /* Oprfi */
-  gnutls_oprfi_callback_func oprfi_cb;
-  const void *oprfi_userdata;
+  struct {
+      uint16_t type;
+      extension_priv_data_t priv;
+      int set:1;
+  } extension_int_data[MAX_EXT_TYPES];
 
-  /* Session Ticket */
-  struct gnutls_session_ticket_key_st *session_ticket_key;
-  opaque session_ticket_IV[SESSION_TICKET_IV_SIZE];
+  struct {
+      uint16_t type;
+      extension_priv_data_t priv;
+      int set:1;
+  } resumed_extension_int_data[MAX_EXT_TYPES];
 
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */

@@ -10,7 +10,6 @@
 * Server examples::
 * Miscellaneous examples::
 * Compatibility with the OpenSSL library::
-* Opaque PRF Input TLS Extension::
 * Keying Material Exporters::
 @end menu
 
@@ -453,20 +452,6 @@ Current limitations imposed by the compatibility layer include:
 @item Error handling is not thread safe.
 
 @end itemize
-
-@node Opaque PRF Input TLS Extension
-@section Opaque PRF Input TLS Extension
-@cindex Opaque PRF Input
-
-GnuTLS supports the Opaque PRF Input TLS extension
-(@code{draft-rescorla-tls-opaque-prf-input-00.txt}).  The API consists
-of one API for use in the client, @ref{gnutls_oprfi_enable_client},
-and one API for use in the server, @ref{gnutls_oprfi_enable_server}.
-You must invoke both functions before calling @ref{gnutls_handshake}.
-The server utilizes a callback function into the application.  The
-callback can look at the random string provided by the client, and
-also set the server string.  The string lengths must be equal
-according to the protocol.
 
 @node Keying Material Exporters
 @section Keying Material Exporters

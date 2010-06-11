@@ -21,8 +21,40 @@
  *
  */
 
-int _gnutls_inner_application_recv_params (gnutls_session_t session,
-					   const opaque * data,
-					   size_t data_size);
-int _gnutls_inner_application_send_params (gnutls_session_t session,
-					   opaque * data, size_t);
+#ifndef EXT_IA_H
+#define EXT_IA_H
+
+#include <gnutls_extensions.h>
+
+#define IA_PEER_ENABLE (1 << 1)
+#define IA_PEER_ALLOW_SKIP (1 << 2)
+#define IA_ENABLE (1 << 3)
+#define IA_ALLOW_SKIP (1 << 4)
+
+extension_entry_st ext_mod_ia;
+
+typedef struct {
+  unsigned int flags;
+  /* For TLS/IA.  XXX: Move to IA credential? */
+  opaque inner_secret[GNUTLS_MASTER_SIZE];
+} ia_ext_st;
+
+inline static void _gnutls_ia_derive_inner_secret(gnutls_session_t session)
+{
+extension_priv_data_t epriv;
+ia_ext_st *priv;
+int ret;
+  
+  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_INNER_APPLICATION, &epriv);
+  if (ret < 0)
+    {
+      return ;
+    }
+  priv = epriv.ptr;
+  
+  memcpy (priv->inner_secret,
+	  session->security_parameters.master_secret, GNUTLS_MASTER_SIZE);
+
+}
+
+#endif

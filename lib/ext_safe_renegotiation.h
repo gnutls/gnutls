@@ -25,10 +25,26 @@
 #ifndef EXT_SAFE_RENEGOTIATION_H
 # define EXT_SAFE_RENEGOTIATION_H
 
-int _gnutls_safe_renegotiation_recv_params (gnutls_session_t state,
-					    const opaque * data,
-					    size_t data_size);
-int _gnutls_safe_renegotiation_send_params (gnutls_session_t state,
-					    opaque * data, size_t);
+#include <gnutls_extensions.h>
+
+typedef struct {
+  uint8_t client_verify_data[MAX_VERIFY_DATA_SIZE];
+  size_t client_verify_data_len;
+  uint8_t server_verify_data[MAX_VERIFY_DATA_SIZE];
+  size_t server_verify_data_len;
+  uint8_t ri_extension_data[MAX_VERIFY_DATA_SIZE * 2];  /* max signal is 72 bytes in s->c sslv3 */
+  size_t ri_extension_data_len;
+
+  int safe_renegotiation_received:1;
+  int initial_negotiation_completed:1;
+  int connection_using_safe_renegotiation:1;
+} sr_ext_st;
+
+extern extension_entry_st ext_mod_sr;
+
+int _gnutls_ext_sr_finished( gnutls_session_t session, void* vdata, 
+    size_t vdata_size, int dir);
+int _gnutls_ext_sr_recv_cs(gnutls_session_t session);
+int _gnutls_ext_sr_verify(gnutls_session_t session);
 
 #endif /* EXT_SAFE_RENEGOTIATION_H */

@@ -817,11 +817,6 @@ extern "C"
     GNUTLS_EXT_NONE = 4,
   } gnutls_ext_parse_type_t;
 
-  int gnutls_ext_register (int type,
-			   const char *name,
-			   gnutls_ext_parse_type_t parse_type,
-			   gnutls_ext_recv_func recv_func,
-			   gnutls_ext_send_func send_func);
 
   /**
    * gnutls_server_name_type_t:

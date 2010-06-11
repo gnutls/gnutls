@@ -601,14 +601,8 @@ init_tls_session (const char *hostname)
 	}
     }
 
-#ifdef ENABLE_OPRFI
-  if (info.opaque_prf_input)
-    gnutls_oprfi_enable_client (session, strlen (info.opaque_prf_input),
-				info.opaque_prf_input);
-#endif
-
 #ifdef ENABLE_SESSION_TICKET
-  if (!info.noticket)
+  if (disable_extensions ==0 && !info.noticket)
     gnutls_session_ticket_enable_client (session);
 #endif
 
@@ -774,6 +768,7 @@ main (int argc, char **argv)
 				   &session_data_size);
 
 	  gnutls_session_get_id (hd.session, NULL, &session_id_size);
+
 	  session_id = malloc (session_id_size);
 	  gnutls_session_get_id (hd.session, session_id, &session_id_size);
 

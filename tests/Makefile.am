@@ -83,10 +83,6 @@ endif
 tlsia_LDADD = ../libextra/libgnutls-extra.la $(LDADD) $(LTLIBREADLINE)
 endif
 
-if ENABLE_OPRFI
-ctests +=  oprfi
-endif
-
 check_PROGRAMS = $(ctests)
 dist_check_SCRIPTS = rfc2253-escape-test
 

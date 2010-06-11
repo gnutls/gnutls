@@ -22,15 +22,17 @@
  *
  */
 
-#ifdef ENABLE_SESSION_TICKET
+#ifndef EXT_SESSION_TICKET_H
+# define EXT_SESSION_TICKET_H
 
-int _gnutls_session_ticket_recv_params (gnutls_session_t session,
-					const opaque * data,
-					size_t data_size);
-int _gnutls_session_ticket_send_params (gnutls_session_t session,
-					opaque * data, size_t data_size);
+# ifdef ENABLE_SESSION_TICKET
+
+#include <gnutls_extensions.h>
+
+extern extension_entry_st ext_mod_session_ticket;
 
 int _gnutls_send_new_session_ticket (gnutls_session_t session, int again);
 int _gnutls_recv_new_session_ticket (gnutls_session_t session);
 
+# endif
 #endif
