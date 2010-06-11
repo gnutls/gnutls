@@ -93,26 +93,19 @@ _gnutls_mem_cpy (char *dest, size_t dest_tot_size, const char *src,
 }
 
 void
-_gnutls_string_init (gnutls_string * str,
-		     gnutls_alloc_function alloc_func,
-		     gnutls_realloc_function realloc_func,
-		     gnutls_free_function free_func)
+_gnutls_buffer_init (gnutls_buffer_st * str)
 {
   str->data = str->allocd = NULL;
   str->max_length = 0;
   str->length = 0;
-
-  str->alloc_func = alloc_func;
-  str->free_func = free_func;
-  str->realloc_func = realloc_func;
 }
 
 void
-_gnutls_string_clear (gnutls_string * str)
+_gnutls_buffer_clear (gnutls_buffer_st * str)
 {
   if (str == NULL || str->allocd == NULL)
     return;
-  str->free_func (str->allocd);
+  gnutls_free (str->allocd);
 
   str->data = str->allocd = NULL;
   str->max_length = 0;
@@ -122,7 +115,7 @@ _gnutls_string_clear (gnutls_string * str)
 #define MIN_CHUNK 256
 
 int
-_gnutls_string_append_data (gnutls_string * dest, const void *data,
+_gnutls_buffer_append_data (gnutls_buffer_st * dest, const void *data,
 			    size_t data_size)
 {
   size_t tot_len = data_size + dest->length;
@@ -149,7 +142,7 @@ _gnutls_string_append_data (gnutls_string * dest, const void *data,
       size_t new_len =
 	MAX (data_size, MIN_CHUNK) + MAX (dest->max_length, MIN_CHUNK);
 
-      dest->allocd = dest->realloc_func (dest->allocd, new_len);
+      dest->allocd = gnutls_realloc (dest->allocd, new_len);
       if (dest->allocd == NULL)
 	{
 	  gnutls_assert ();
@@ -170,7 +163,7 @@ _gnutls_string_append_data (gnutls_string * dest, const void *data,
 }
 
 int
-_gnutls_string_resize (gnutls_string * dest, size_t new_size)
+_gnutls_buffer_resize (gnutls_buffer_st * dest, size_t new_size)
 {
   if (dest->max_length >= new_size)
     {
@@ -190,7 +183,7 @@ _gnutls_string_resize (gnutls_string * dest, size_t new_size)
       size_t alloc_len =
 	MAX (new_size, MIN_CHUNK) + MAX (dest->max_length, MIN_CHUNK);
 
-      dest->allocd = dest->realloc_func (dest->allocd, alloc_len);
+      dest->allocd = gnutls_realloc (dest->allocd, alloc_len);
       if (dest->allocd == NULL)
 	{
 	  gnutls_assert ();
@@ -208,9 +201,9 @@ _gnutls_string_resize (gnutls_string * dest, size_t new_size)
 }
 
 int
-_gnutls_string_append_str (gnutls_string * dest, const char *src)
+_gnutls_buffer_append_str (gnutls_buffer_st * dest, const char *src)
 {
-  return _gnutls_string_append_data (dest, src, strlen (src));
+  return _gnutls_buffer_append_data (dest, src, strlen (src));
 }
 
 /* returns data from a string in a constant buffer.
@@ -218,7 +211,7 @@ _gnutls_string_append_str (gnutls_string * dest, const char *src)
  * data are appended in the buffer.
  */
 void
-_gnutls_string_get_datum (gnutls_string * str, gnutls_datum_t * data,
+_gnutls_buffer_get_datum (gnutls_buffer_st * str, gnutls_datum_t * data,
 			  size_t req_size)
 {
 
@@ -250,11 +243,11 @@ _gnutls_string_get_datum (gnutls_string * str, gnutls_datum_t * data,
 /* returns data from a string in a constant buffer.
  */
 void
-_gnutls_string_get_data (gnutls_string * str, void *data, size_t * req_size)
+_gnutls_buffer_get_data (gnutls_buffer_st * str, void *data, size_t * req_size)
 {
   gnutls_datum_t tdata;
 
-  _gnutls_string_get_datum (str, &tdata, *req_size);
+  _gnutls_buffer_get_datum (str, &tdata, *req_size);
 
   *req_size = tdata.size;
   memcpy (data, tdata.data, tdata.size);
@@ -263,7 +256,7 @@ _gnutls_string_get_data (gnutls_string * str, void *data, size_t * req_size)
 }
 
 int
-_gnutls_string_append_printf (gnutls_string * dest, const char *fmt, ...)
+_gnutls_buffer_append_printf (gnutls_buffer_st * dest, const char *fmt, ...)
 {
   va_list args;
   int len;
@@ -276,19 +269,19 @@ _gnutls_string_append_printf (gnutls_string * dest, const char *fmt, ...)
   if (len < 0 || !str)
     return -1;
 
-  len = _gnutls_string_append_str (dest, str);
+  len = _gnutls_buffer_append_str (dest, str);
 
   free (str);
 
   return len;
 }
 
-static int _gnutls_string_insert_data(gnutls_string * dest, int pos, const void* str, size_t str_size)
+static int _gnutls_buffer_insert_data(gnutls_buffer_st * dest, int pos, const void* str, size_t str_size)
 {
         size_t orig_length = dest->length;
         int ret;
 
-        ret = _gnutls_string_resize(dest, dest->length+str_size); /* resize to make space */
+        ret = _gnutls_buffer_resize(dest, dest->length+str_size); /* resize to make space */
         if (ret < 0)
                 return ret;
 
@@ -300,7 +293,7 @@ static int _gnutls_string_insert_data(gnutls_string * dest, int pos, const void*
         return 0;
 }
 
-static void _gnutls_string_delete_data(gnutls_string * dest, int pos, size_t str_size)
+static void _gnutls_buffer_delete_data(gnutls_buffer_st * dest, int pos, size_t str_size)
 {
         memmove(&dest->data[pos], &dest->data[pos+str_size], dest->length-pos-str_size);
 
@@ -310,7 +303,7 @@ static void _gnutls_string_delete_data(gnutls_string * dest, int pos, size_t str
 }
 
 
-int _gnutls_string_escape(gnutls_string * dest, const char *const invalid_chars)
+int _gnutls_buffer_escape(gnutls_buffer_st * dest, const char *const invalid_chars)
 {
         static const char *x = "0123456789ABCDEF";
         int rv = -1;
@@ -328,9 +321,9 @@ int _gnutls_string_escape(gnutls_string * dest, const char *const invalid_chars)
                         t[1] = x[(dest->data[pos] & 0xf0) >> 4];
                         t[2] = x[(dest->data[pos] & 0x0f) >> 0];
 
-                        _gnutls_string_delete_data(dest, pos, 1);
+                        _gnutls_buffer_delete_data(dest, pos, 1);
 
-                        if (_gnutls_string_insert_data(dest, pos, t, 3) < 0) {
+                        if (_gnutls_buffer_insert_data(dest, pos, t, 3) < 0) {
                                         rv = -1;
                                         goto cleanup;
                         }
@@ -346,7 +339,7 @@ int _gnutls_string_escape(gnutls_string * dest, const char *const invalid_chars)
         return rv;
 }
 
-int _gnutls_string_unescape(gnutls_string * dest)
+int _gnutls_buffer_unescape(gnutls_buffer_st * dest)
 {
         int rv = -1;
         int pos = 0;
@@ -364,8 +357,8 @@ int _gnutls_string_unescape(gnutls_string * dest)
 
                         sscanf(b, "%08x", &u);
                         x = u & 0xff;
-                        _gnutls_string_delete_data(dest, pos, 3);
-                        _gnutls_string_insert_data(dest, pos, &x, 1);
+                        _gnutls_buffer_delete_data(dest, pos, 3);
+                        _gnutls_buffer_insert_data(dest, pos, &x, 1);
                 }
                 pos++;
         }

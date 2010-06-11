@@ -52,7 +52,7 @@
 
 typedef int (*supp_recv_func) (gnutls_session_t session,
 			       const opaque * data, size_t data_size);
-typedef int (*supp_send_func) (gnutls_session_t session, gnutls_buffer * buf);
+typedef int (*supp_send_func) (gnutls_session_t session, gnutls_buffer_st * buf);
 
 typedef struct
 {
@@ -101,13 +101,13 @@ get_supp_func_recv (gnutls_supplemental_data_format_type_t type)
 }
 
 int
-_gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer * buf)
+_gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer_st * buf)
 {
   gnutls_supplemental_entry *p;
   int ret;
 
   /* Make room for 3 byte length field. */
-  ret = _gnutls_buffer_append (buf, "\0\0\0", 3);
+  ret = _gnutls_buffer_append_data (buf, "\0\0\0", 3);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -120,7 +120,7 @@ _gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer * buf)
       size_t sizepos = buf->length;
 
       /* Make room for supplement type and length byte length field. */
-      ret = _gnutls_buffer_append (buf, "\0\0\0\0", 4);
+      ret = _gnutls_buffer_append_data (buf, "\0\0\0\0", 4);
       if (ret < 0)
 	{
 	  gnutls_assert ();

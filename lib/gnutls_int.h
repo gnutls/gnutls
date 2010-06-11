@@ -532,8 +532,8 @@ typedef struct
 
 typedef struct
 {
-  gnutls_buffer application_data_buffer;	/* holds data to be delivered to application layer */
-  gnutls_buffer handshake_hash_buffer;	/* used to keep the last received handshake 
+  gnutls_buffer_st application_data_buffer;	/* holds data to be delivered to application layer */
+  gnutls_buffer_st handshake_hash_buffer;	/* used to keep the last received handshake 
 					 * message */
   union
   {
@@ -550,8 +550,8 @@ typedef struct
   } handshake_mac_handle;
   int handshake_mac_handle_init;	/* 1 when the previous union and type were initialized */
 
-  gnutls_buffer handshake_data_buffer;	/* this is a buffer that holds the current handshake message */
-  gnutls_buffer ia_data_buffer;	/* holds inner application data (TLS/IA) */
+  gnutls_buffer_st handshake_data_buffer;	/* this is a buffer that holds the current handshake message */
+  gnutls_buffer_st ia_data_buffer;	/* holds inner application data (TLS/IA) */
   resumable_session_t resumable;	/* TRUE or FALSE - if we can resume that session */
   handshake_state_t handshake_state;	/* holds
 					 * a number which indicates where
@@ -594,12 +594,12 @@ typedef struct
   gnutls_handshake_description_t handshake_send_buffer_htype;
   content_type_t handshake_recv_buffer_type;
   gnutls_handshake_description_t handshake_recv_buffer_htype;
-  gnutls_buffer handshake_recv_buffer;
+  gnutls_buffer_st handshake_recv_buffer;
 
   /* this buffer holds a record packet -mostly used for
    * non blocking IO.
    */
-  gnutls_buffer record_recv_buffer;
+  gnutls_buffer_st record_recv_buffer;
   mbuffer_head_st record_send_buffer;	/* holds cached data
 					 * for the gnutls_io_write_buffered()
 					 * function.

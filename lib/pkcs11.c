@@ -343,12 +343,12 @@ void gnutls_pkcs11_set_token_function(gnutls_pkcs11_token_callback_t fn,
 
 static int unescape_string (char* output, const char* input, size_t* size, char terminator)
 {
-    gnutls_string str;
+    gnutls_buffer_st str;
     int ret = 0;
     char* p;
     int len;
     
-    _gnutls_string_init(&str, gnutls_malloc, gnutls_realloc, gnutls_free);
+    _gnutls_buffer_init(&str);
     
     /* find terminator */
     p = strchr(input, terminator);
@@ -357,27 +357,27 @@ static int unescape_string (char* output, const char* input, size_t* size, char 
     else
         len = strlen(input);
 
-    ret = _gnutls_string_append_data(&str, input, len);
+    ret = _gnutls_buffer_append_data(&str, input, len);
     if (ret < 0) {
         gnutls_assert();
         return ret;
     }
 
-    ret = _gnutls_string_unescape(&str);
+    ret = _gnutls_buffer_unescape(&str);
     if (ret < 0) {
         gnutls_assert();
         return ret;
     }
 
-    ret = _gnutls_string_append_data(&str, "", 1);
+    ret = _gnutls_buffer_append_data(&str, "", 1);
     if (ret < 0) {
         gnutls_assert();
         return ret;
     }
 
-    _gnutls_string_get_data(&str, output, size);
+    _gnutls_buffer_get_data(&str, output, size);
 
-    _gnutls_string_clear(&str);
+    _gnutls_buffer_clear(&str);
 
     return ret;
 }
@@ -493,29 +493,29 @@ cleanup:
 
 #define INVALID_CHARS       "\\/\"'%&#@!?$* <>{}[]()`|:;,.+-"
 
-static int append(gnutls_string* dest, const char* tname, const char* p11name, int init)
+static int append(gnutls_buffer_st* dest, const char* tname, const char* p11name, int init)
 {
-        gnutls_string tmpstr;
+        gnutls_buffer_st tmpstr;
         int ret;
 
-        _gnutls_string_init(&tmpstr, gnutls_malloc, gnutls_realloc, gnutls_free);
-        if ((ret=_gnutls_string_append_str(&tmpstr, tname))<0) {
+        _gnutls_buffer_init(&tmpstr);
+        if ((ret=_gnutls_buffer_append_str(&tmpstr, tname))<0) {
                 gnutls_assert();
                 goto cleanup;
         }
 
-        ret = _gnutls_string_escape(&tmpstr, INVALID_CHARS);
+        ret = _gnutls_buffer_escape(&tmpstr, INVALID_CHARS);
         if (ret < 0) {
                 gnutls_assert();
                 goto cleanup;
         }
 
-        if ((ret=_gnutls_string_append_data(&tmpstr, "", 1)) < 0) {
+        if ((ret=_gnutls_buffer_append_data(&tmpstr, "", 1)) < 0) {
                 gnutls_assert();
                 goto cleanup;
         }
 
-        if ((ret=_gnutls_string_append_printf(dest, "%s%s=%s", (init!=0)?";":"", p11name, tmpstr.data)) < 0) {
+        if ((ret=_gnutls_buffer_append_printf(dest, "%s%s=%s", (init!=0)?";":"", p11name, tmpstr.data)) < 0) {
                 gnutls_assert();
                 goto cleanup;
         }
@@ -523,7 +523,7 @@ static int append(gnutls_string* dest, const char* tname, const char* p11name, i
         ret = 0;
 
 cleanup:
-        _gnutls_string_clear(&tmpstr);
+        _gnutls_buffer_clear(&tmpstr);
 
         return ret;
 
@@ -532,13 +532,13 @@ cleanup:
 
 int pkcs11_info_to_url(const struct pkcs11_url_info* info, char** url)
 {
-    gnutls_string str;
+    gnutls_buffer_st str;
     int init = 0;
     int ret;
     
-    _gnutls_string_init (&str, gnutls_malloc, gnutls_realloc, gnutls_free);
+    _gnutls_buffer_init (&str);
 
-    _gnutls_string_append_str(&str, "pkcs11:");
+    _gnutls_buffer_append_str(&str, "pkcs11:");
 
     if (info->token[0]) {
         ret = append(&str, info->token, "token", init);
@@ -596,21 +596,21 @@ int pkcs11_info_to_url(const struct pkcs11_url_info* info, char** url)
     }
 
     if (info->id[0] != 0) {
-        ret = _gnutls_string_append_printf(&str, ";id=%s", info->id);
+        ret = _gnutls_buffer_append_printf(&str, ";id=%s", info->id);
         if (ret < 0) {
             gnutls_assert();
             return ret;
         }
     }
     
-    _gnutls_string_append_data(&str, "", 1);
+    _gnutls_buffer_append_data(&str, "", 1);
 
     *url = str.data;
     
     return 0;
 
 cleanup:
-    _gnutls_string_clear(&str);
+    _gnutls_buffer_clear(&str);
     return ret;
 }
 
@@ -1474,7 +1474,7 @@ gnutls_pkcs11_obj_type_t gnutls_pkcs11_obj_get_type (gnutls_pkcs11_obj_t obj)
 }
 
 struct pkey_list {
-    gnutls_string *key_ids;
+    gnutls_buffer_st *key_ids;
     size_t key_ids_size;
 };
 
@@ -1599,7 +1599,7 @@ static int find_privkeys(pakchois_session_t *pks, struct token_info* info, struc
         return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
     }
 
-    list->key_ids = gnutls_malloc(sizeof(gnutls_string)*list->key_ids_size);
+    list->key_ids = gnutls_malloc(sizeof(gnutls_buffer_st)*list->key_ids_size);
     if (list->key_ids == NULL) {
         gnutls_assert();
         return GNUTLS_E_MEMORY_ERROR;
@@ -1624,10 +1624,10 @@ static int find_privkeys(pakchois_session_t *pks, struct token_info* info, struc
         a[0].value = certid_tmp;
         a[0].value_len = sizeof(certid_tmp);
 
-        _gnutls_string_init(&list->key_ids[current], gnutls_malloc, gnutls_realloc, gnutls_free);
+        _gnutls_buffer_init(&list->key_ids[current]);
 
         if (pakchois_get_attribute_value(pks, obj, a, 1) == CKR_OK) {
-            _gnutls_string_append_data(&list->key_ids[current], a[0].value, a[0].value_len);
+            _gnutls_buffer_append_data(&list->key_ids[current], a[0].value, a[0].value_len);
             current++;
         }
 
@@ -1889,7 +1889,7 @@ fail:
     pakchois_find_objects_final(pks);
     if (plist.key_ids != NULL) {
         for (i=0;i<plist.key_ids_size;i++) {
-            _gnutls_string_clear(&plist.key_ids[i]);
+            _gnutls_buffer_clear(&plist.key_ids[i]);
         }
         gnutls_free( plist.key_ids);
     }

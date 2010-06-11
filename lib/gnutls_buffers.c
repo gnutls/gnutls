@@ -127,7 +127,7 @@ _gnutls_record_buffer_put (content_type_t type,
 			   gnutls_session_t session, opaque * data,
 			   size_t length)
 {
-  gnutls_buffer *buf;
+  gnutls_buffer_st *buf;
 
   if (length == 0)
     return 0;
@@ -157,7 +157,7 @@ _gnutls_record_buffer_put (content_type_t type,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  if (_gnutls_buffer_append (buf, data, length) < 0)
+  if (_gnutls_buffer_append_data (buf, data, length) < 0)
     {
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
@@ -839,14 +839,14 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
 	  gnutls_assert ();
 
 	  tmp = sizeOfPtr;
-	  _gnutls_string_get_data (&session->internals.handshake_recv_buffer,
+	  _gnutls_buffer_get_data (&session->internals.handshake_recv_buffer,
 				   iptr, &tmp);
 	  return tmp;
 	}
       gnutls_assert ();
 
       tmp = sizeOfPtr;
-      _gnutls_string_get_data (&session->internals.handshake_recv_buffer,
+      _gnutls_buffer_get_data (&session->internals.handshake_recv_buffer,
 			       iptr, &tmp);
       left -= tmp;
 
@@ -865,7 +865,7 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
 	    {
 	      gnutls_assert ();
 
-	      _gnutls_buffer_append (&session->internals.
+	      _gnutls_buffer_append_data (&session->internals.
 				     handshake_recv_buffer, iptr, dsize);
 
 	      session->internals.handshake_recv_buffer_htype = htype;
@@ -910,7 +910,7 @@ _gnutls_handshake_buffer_put (gnutls_session_t session, opaque * data,
     }
 
   _gnutls_buffers_log ("BUF[HSK]: Inserted %d bytes of Data\n", (int) length);
-  if (_gnutls_buffer_append (&session->internals.handshake_hash_buffer,
+  if (_gnutls_buffer_append_data (&session->internals.handshake_hash_buffer,
 			     data, length) < 0)
     {
       gnutls_assert ();

@@ -39,26 +39,22 @@ typedef struct
   opaque *data;			/* API: pointer to data to copy from */
   size_t max_length;
   size_t length;		/* API: current length */
-  gnutls_realloc_function realloc_func;
-  gnutls_alloc_function alloc_func;
-  gnutls_free_function free_func;
-} gnutls_string;
+} gnutls_buffer_st;
 
-void _gnutls_string_init (gnutls_string *, gnutls_alloc_function,
-			  gnutls_realloc_function, gnutls_free_function);
-void _gnutls_string_clear (gnutls_string *);
-int _gnutls_string_resize (gnutls_string *, size_t new_size);
+void _gnutls_buffer_init (gnutls_buffer_st *);
+void _gnutls_buffer_clear (gnutls_buffer_st *);
+int _gnutls_buffer_resize (gnutls_buffer_st *, size_t new_size);
 
-int _gnutls_string_append_str (gnutls_string *, const char *str);
-int _gnutls_string_append_data (gnutls_string *, const void *data,
+int _gnutls_buffer_append_str (gnutls_buffer_st *, const char *str);
+int _gnutls_buffer_append_data (gnutls_buffer_st *, const void *data,
 				size_t data_size);
 
-void _gnutls_string_get_data (gnutls_string *, void *, size_t * size);
-void _gnutls_string_get_datum (gnutls_string *, gnutls_datum_t *,
+void _gnutls_buffer_get_data (gnutls_buffer_st *, void *, size_t * size);
+void _gnutls_buffer_get_datum (gnutls_buffer_st *, gnutls_datum_t *,
 			       size_t max_size);
 
-int _gnutls_string_escape(gnutls_string * dest, const char *const invalid_chars);
-int _gnutls_string_unescape(gnutls_string * dest);
+int _gnutls_buffer_escape(gnutls_buffer_st * dest, const char *const invalid_chars);
+int _gnutls_buffer_unescape(gnutls_buffer_st * dest);
 
 #ifndef __attribute__
 /* This feature is available in gcc versions 2.5 and later.  */
@@ -67,17 +63,8 @@ int _gnutls_string_unescape(gnutls_string * dest);
 # endif
 #endif
 
-int _gnutls_string_append_printf (gnutls_string * dest, const char *fmt, ...)
+int _gnutls_buffer_append_printf (gnutls_buffer_st * dest, const char *fmt, ...)
   __attribute__ ((format (printf, 2, 3)));
-
-typedef gnutls_string gnutls_buffer;
-
-#define _gnutls_buffer_init(buf) _gnutls_string_init(buf, gnutls_malloc, gnutls_realloc, gnutls_free);
-#define _gnutls_buffer_clear _gnutls_string_clear
-#define _gnutls_buffer_append _gnutls_string_append_data
-#define _gnutls_buffer_get_datum _gnutls_string_get_datum
-#define _gnutls_buffer_get_data _gnutls_string_get_data
-#define _gnutls_buffer_resize _gnutls_string_resize
 
 char *_gnutls_bin2hex (const void *old, size_t oldlen, char *buffer,
 		       size_t buffer_size, const char* separator);

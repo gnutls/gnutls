@@ -26,4 +26,4 @@
 
 int _gnutls_parse_supplemental (gnutls_session_t session,
 				const uint8_t * data, int data_size);
-int _gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer * buf);
+int _gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer_st * buf);

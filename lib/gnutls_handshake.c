@@ -2590,7 +2590,7 @@ _gnutls_send_supplemental (gnutls_session_t session, int again)
     ret = _gnutls_send_handshake (session, NULL, GNUTLS_HANDSHAKE_SUPPLEMENTAL);
   else
     {
-      gnutls_buffer buf;
+      gnutls_buffer_st buf;
       _gnutls_buffer_init (&buf);
 
       ret = _gnutls_gen_supplemental (session, &buf);

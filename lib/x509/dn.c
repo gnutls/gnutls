@@ -91,7 +91,7 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 		       const char *asn1_rdn_name, char *buf,
 		       size_t * sizeof_buf)
 {
-  gnutls_string out_str;
+  gnutls_buffer_st out_str;
   int k2, k1, result;
   char tmpbuffer1[ASN1_MAX_NAME_SIZE];
   char tmpbuffer2[ASN1_MAX_NAME_SIZE];
@@ -115,7 +115,7 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
   else
     *sizeof_buf = 0;
 
-  _gnutls_string_init (&out_str, gnutls_malloc, gnutls_realloc, gnutls_free);
+  _gnutls_buffer_init (&out_str);
 
   k1 = 0;
   do
@@ -214,7 +214,7 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 	      result = _gnutls_asn2err (result);
 	      goto cleanup;
 	    }
-#define STR_APPEND(y) if ((result=_gnutls_string_append_str( &out_str, y)) < 0) { \
+#define STR_APPEND(y) if ((result=_gnutls_buffer_append_str( &out_str, y)) < 0) { \
 	gnutls_assert(); \
 	goto cleanup; \
 }
@@ -309,7 +309,7 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
 
   if (buf)
     {
-      _gnutls_string_get_data (&out_str, buf, sizeof_buf);
+      _gnutls_buffer_get_data (&out_str, buf, sizeof_buf);
       buf[*sizeof_buf] = 0;
     }
   else
@@ -321,7 +321,7 @@ cleanup:
   gnutls_free (value2);
   gnutls_free (string);
   gnutls_free (escaped);
-  _gnutls_string_clear (&out_str);
+  _gnutls_buffer_clear (&out_str);
   return result;
 }
 

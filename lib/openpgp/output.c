@@ -33,11 +33,11 @@
 #include "gettext.h"
 #define _(String) dgettext (PACKAGE, String)
 
-#define addf _gnutls_string_append_printf
-#define adds _gnutls_string_append_str
+#define addf _gnutls_buffer_append_printf
+#define adds _gnutls_buffer_append_str
 
 static void
-hexdump (gnutls_string * str, const char *data, size_t len, const char *spc)
+hexdump (gnutls_buffer_st * str, const char *data, size_t len, const char *spc)
 {
   size_t j;
 
@@ -61,7 +61,7 @@ hexdump (gnutls_string * str, const char *data, size_t len, const char *spc)
 }
 
 static void
-hexprint (gnutls_string * str, const char *data, size_t len)
+hexprint (gnutls_buffer_st * str, const char *data, size_t len)
 {
   size_t j;
 
@@ -75,7 +75,7 @@ hexprint (gnutls_string * str, const char *data, size_t len)
 }
 
 static void
-print_key_usage (gnutls_string * str, gnutls_openpgp_crt_t cert,
+print_key_usage (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert,
 		 unsigned int idx)
 {
   unsigned int key_usage;
@@ -110,7 +110,7 @@ print_key_usage (gnutls_string * str, gnutls_openpgp_crt_t cert,
  * otherwise the subkey.
  */
 static void
-print_key_id (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
+print_key_id (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert, int idx)
 {
   gnutls_openpgp_keyid_t id;
   int err;
@@ -134,7 +134,7 @@ print_key_id (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
  * otherwise the subkey.
  */
 static void
-print_key_fingerprint (gnutls_string * str, gnutls_openpgp_crt_t cert)
+print_key_fingerprint (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
 {
   char fpr[128];
   size_t fpr_size = sizeof (fpr);
@@ -152,7 +152,7 @@ print_key_fingerprint (gnutls_string * str, gnutls_openpgp_crt_t cert)
 }
 
 static void
-print_key_revoked (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
+print_key_revoked (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert, int idx)
 {
   int err;
 
@@ -168,7 +168,7 @@ print_key_revoked (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
 }
 
 static void
-print_key_times (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
+print_key_times (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert, int idx)
 {
   time_t tim;
 
@@ -218,7 +218,7 @@ print_key_times (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
 }
 
 static void
-print_key_info (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
+print_key_info (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert, int idx)
 {
   int err;
   unsigned int bits;
@@ -307,7 +307,7 @@ print_key_info (gnutls_string * str, gnutls_openpgp_crt_t cert, int idx)
 }
 
 static void
-print_cert (gnutls_string * str, gnutls_openpgp_crt_t cert)
+print_cert (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
 {
   int i, subkeys;
   int err;
@@ -388,7 +388,7 @@ print_cert (gnutls_string * str, gnutls_openpgp_crt_t cert)
 }
 
 static void
-print_oneline (gnutls_string * str, gnutls_openpgp_crt_t cert)
+print_oneline (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
 {
   int err, i;
 
@@ -514,20 +514,20 @@ gnutls_openpgp_crt_print (gnutls_openpgp_crt_t cert,
 			  gnutls_certificate_print_formats_t format,
 			  gnutls_datum_t * out)
 {
-  gnutls_string str;
+  gnutls_buffer_st str;
 
-  _gnutls_string_init (&str, gnutls_malloc, gnutls_realloc, gnutls_free);
+  _gnutls_buffer_init (&str);
 
   if (format == GNUTLS_CRT_PRINT_ONELINE)
     print_oneline (&str, cert);
   else
     {
-      _gnutls_string_append_str (&str,
+      _gnutls_buffer_append_str (&str,
 				 _("OpenPGP Certificate Information:\n"));
       print_cert (&str, cert);
     }
 
-  _gnutls_string_append_data (&str, "\0", 1);
+  _gnutls_buffer_append_data (&str, "\0", 1);
 
   out->data = str.data;
   out->size = strlen (str.data);

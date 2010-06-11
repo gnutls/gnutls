@@ -37,13 +37,13 @@
 #include "gettext.h"
 #define _(String) dgettext (PACKAGE, String)
 
-#define addf _gnutls_string_append_printf
-#define adds _gnutls_string_append_str
+#define addf _gnutls_buffer_append_printf
+#define adds _gnutls_buffer_append_str
 
 #define ERROR_STR (char*) "(error)"
 
 static void
-hexdump (gnutls_string * str, const char *data, size_t len, const char *spc)
+hexdump (gnutls_buffer_st * str, const char *data, size_t len, const char *spc)
 {
   size_t j;
 
@@ -67,7 +67,7 @@ hexdump (gnutls_string * str, const char *data, size_t len, const char *spc)
 }
 
 static void
-hexprint (gnutls_string * str, const char *data, size_t len)
+hexprint (gnutls_buffer_st * str, const char *data, size_t len)
 {
   size_t j;
 
@@ -82,7 +82,7 @@ hexprint (gnutls_string * str, const char *data, size_t len)
 
 
 static void
-asciiprint (gnutls_string * str, const char *data, size_t len)
+asciiprint (gnutls_buffer_st * str, const char *data, size_t len)
 {
   size_t j;
 
@@ -135,7 +135,7 @@ ip_to_string (void *_ip, int ip_size, char *string, int string_size)
 }
 
 static void
-print_proxy (gnutls_string * str, gnutls_x509_crt_t cert)
+print_proxy (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
   int pathlen;
   char *policyLanguage;
@@ -172,7 +172,7 @@ print_proxy (gnutls_string * str, gnutls_x509_crt_t cert)
 }
 
 static void
-print_ski (gnutls_string * str, gnutls_x509_crt_t cert)
+print_ski (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
   char *buffer = NULL;
   size_t size = 0;
@@ -224,7 +224,7 @@ typedef union
 } cert_type_t;
 
 static void
-print_aki (gnutls_string * str, int type, cert_type_t cert)
+print_aki (gnutls_buffer_st * str, int type, cert_type_t cert)
 {
   char *buffer = NULL;
   size_t size = 0;
@@ -278,7 +278,7 @@ print_aki (gnutls_string * str, int type, cert_type_t cert)
 }
 
 static void
-print_key_usage (gnutls_string * str, const char *prefix, int type,
+print_key_usage (gnutls_buffer_st * str, const char *prefix, int type,
 		 cert_type_t cert)
 {
   unsigned int key_usage;
@@ -320,7 +320,7 @@ print_key_usage (gnutls_string * str, const char *prefix, int type,
 #ifdef ENABLE_PKI
 
 static void
-print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
+print_crldist (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
   char *buffer = NULL;
   size_t size;
@@ -405,7 +405,7 @@ print_crldist (gnutls_string * str, gnutls_x509_crt_t cert)
 }
 
 static void
-print_key_purpose (gnutls_string * str, const char *prefix, int type,
+print_key_purpose (gnutls_buffer_st * str, const char *prefix, int type,
 		   cert_type_t cert)
 {
   int indx;
@@ -481,7 +481,7 @@ print_key_purpose (gnutls_string * str, const char *prefix, int type,
 #endif
 
 static void
-print_basic (gnutls_string * str, const char *prefix, int type,
+print_basic (gnutls_buffer_st * str, const char *prefix, int type,
 	     cert_type_t cert)
 {
   int pathlen;
@@ -513,7 +513,7 @@ print_basic (gnutls_string * str, const char *prefix, int type,
 
 
 static void
-print_altname (gnutls_string * str, const char *prefix, int altname_type,
+print_altname (gnutls_buffer_st * str, const char *prefix, int altname_type,
 	       cert_type_t cert)
 {
   unsigned int altname_idx;
@@ -705,7 +705,7 @@ print_altname (gnutls_string * str, const char *prefix, int altname_type,
 }
 
 static void
-print_extensions (gnutls_string * str, const char *prefix, int type,
+print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
 		  cert_type_t cert)
 {
   int i, err;
@@ -962,7 +962,7 @@ print_extensions (gnutls_string * str, const char *prefix, int type,
 }
 
 static void
-print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
+print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
 {
   /* Version. */
   {
@@ -1222,7 +1222,7 @@ print_cert (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 }
 
 static void
-print_fingerprint (gnutls_string * str, gnutls_x509_crt_t cert,
+print_fingerprint (gnutls_buffer_st * str, gnutls_x509_crt_t cert,
 		   gnutls_digest_algorithm_t algo)
 {
   int err;
@@ -1245,7 +1245,7 @@ print_fingerprint (gnutls_string * str, gnutls_x509_crt_t cert,
 }
 
 static void
-print_keyid (gnutls_string * str, gnutls_x509_crt_t cert)
+print_keyid (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
   int err;
   char buffer[20];
@@ -1264,7 +1264,7 @@ print_keyid (gnutls_string * str, gnutls_x509_crt_t cert)
 }
 
 static void
-print_other (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
+print_other (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
 {
   if (!notsigned)
     {
@@ -1275,7 +1275,7 @@ print_other (gnutls_string * str, gnutls_x509_crt_t cert, int notsigned)
 }
 
 static void
-print_oneline (gnutls_string * str, gnutls_x509_crt_t cert)
+print_oneline (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
   /* Subject. */
   {
@@ -1462,32 +1462,32 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
 		       gnutls_certificate_print_formats_t format,
 		       gnutls_datum_t * out)
 {
-  gnutls_string str;
+  gnutls_buffer_st str;
 
   if (format == GNUTLS_CRT_PRINT_FULL
       || format == GNUTLS_CRT_PRINT_UNSIGNED_FULL)
     {
-      _gnutls_string_init (&str, gnutls_malloc, gnutls_realloc, gnutls_free);
+      _gnutls_buffer_init (&str);
 
-      _gnutls_string_append_str (&str, _("X.509 Certificate Information:\n"));
+      _gnutls_buffer_append_str (&str, _("X.509 Certificate Information:\n"));
 
       print_cert (&str, cert, format == GNUTLS_CRT_PRINT_UNSIGNED_FULL);
 
-      _gnutls_string_append_str (&str, _("Other Information:\n"));
+      _gnutls_buffer_append_str (&str, _("Other Information:\n"));
 
       print_other (&str, cert, format == GNUTLS_CRT_PRINT_UNSIGNED_FULL);
 
-      _gnutls_string_append_data (&str, "\0", 1);
+      _gnutls_buffer_append_data (&str, "\0", 1);
       out->data = str.data;
       out->size = strlen (str.data);
     }
   else if (format == GNUTLS_CRT_PRINT_ONELINE)
     {
-      _gnutls_string_init (&str, gnutls_malloc, gnutls_realloc, gnutls_free);
+      _gnutls_buffer_init (&str);
 
       print_oneline (&str, cert);
 
-      _gnutls_string_append_data (&str, "\0", 1);
+      _gnutls_buffer_append_data (&str, "\0", 1);
       out->data = str.data;
       out->size = strlen (str.data);
     }
@@ -1503,7 +1503,7 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
 #ifdef ENABLE_PKI
 
 static void
-print_crl (gnutls_string * str, gnutls_x509_crl_t crl, int notsigned)
+print_crl (gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 {
   /* Version. */
   {
@@ -1818,16 +1818,16 @@ gnutls_x509_crl_print (gnutls_x509_crl_t crl,
 		       gnutls_certificate_print_formats_t format,
 		       gnutls_datum_t * out)
 {
-  gnutls_string str;
+  gnutls_buffer_st str;
 
-  _gnutls_string_init (&str, gnutls_malloc, gnutls_realloc, gnutls_free);
+  _gnutls_buffer_init (&str);
 
-  _gnutls_string_append_str
+  _gnutls_buffer_append_str
     (&str, _("X.509 Certificate Revocation List Information:\n"));
 
   print_crl (&str, crl, format == GNUTLS_CRT_PRINT_UNSIGNED_FULL);
 
-  _gnutls_string_append_data (&str, "\0", 1);
+  _gnutls_buffer_append_data (&str, "\0", 1);
   out->data = str.data;
   out->size = strlen (str.data);
 
@@ -1835,7 +1835,7 @@ gnutls_x509_crl_print (gnutls_x509_crl_t crl,
 }
 
 static void
-print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
+print_crq (gnutls_buffer_st * str, gnutls_x509_crq_t cert)
 {
   /* Version. */
   {
@@ -2075,7 +2075,7 @@ print_crq (gnutls_string * str, gnutls_x509_crq_t cert)
 }
 
 static void
-print_crq_other (gnutls_string * str, gnutls_x509_crq_t crq)
+print_crq_other (gnutls_buffer_st * str, gnutls_x509_crq_t crq)
 {
   int err;
   size_t size = 0;
@@ -2132,20 +2132,20 @@ gnutls_x509_crq_print (gnutls_x509_crq_t crq,
 		       gnutls_certificate_print_formats_t format,
 		       gnutls_datum_t * out)
 {
-  gnutls_string str;
+  gnutls_buffer_st str;
 
-  _gnutls_string_init (&str, gnutls_malloc, gnutls_realloc, gnutls_free);
+  _gnutls_buffer_init (&str);
 
-  _gnutls_string_append_str
+  _gnutls_buffer_append_str
     (&str, _("PKCS #10 Certificate Request Information:\n"));
 
   print_crq (&str, crq);
 
-  _gnutls_string_append_str (&str, _("Other Information:\n"));
+  _gnutls_buffer_append_str (&str, _("Other Information:\n"));
 
   print_crq_other (&str, crq);
 
-  _gnutls_string_append_data (&str, "\0", 1);
+  _gnutls_buffer_append_data (&str, "\0", 1);
   out->data = str.data;
   out->size = strlen (str.data);
 
