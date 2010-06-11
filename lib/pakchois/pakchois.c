@@ -62,6 +62,7 @@ struct provider {
     const struct ck_function_list *fns;
     unsigned int refcount;
     struct provider *next, **prevref;
+    void* reserved;
 };
 
 struct pakchois_module_s {
@@ -297,6 +298,7 @@ ck_rv_t rv;
     prov->handle = h;
     prov->fns = fns;
     prov->refcount = 1;
+    prov->reserved = reserved;
 
     /* Require OS locking, the only sane option. */
     memset(&args, 0, sizeof args);
@@ -375,15 +377,45 @@ fail_locked:
     return rv;
 }    
 
+static void providers_reinit(void)
+{
+    struct ck_c_initialize_args args;
+    ck_rv_t rv;
+    struct provider * p;
+
+    assert(pthread_mutex_lock(&provider_mutex) == 0);
+
+    memset(&args, 0, sizeof args);
+    args.flags = CKF_OS_LOCKING_OK;
+
+    for (p = provider_list; p; p = p->next) {
+        args.reserved = p->reserved;
+        rv = p->fns->C_Initialize(&args);
+        assert(rv == CKR_OK); /* what can we do? */
+    }
+
+    pthread_mutex_unlock(&provider_mutex);
+}
+
 static ck_rv_t load_module(pakchois_module_t **module, const char *name, 
                            void *reserved, unsigned int real_name)
 {
     ck_rv_t rv;
     pakchois_module_t *pm = malloc(sizeof *pm);
+    static int forkinit = 0;
 
     if (!pm) {
         return CKR_HOST_MEMORY;
     }
+    
+    assert(pthread_mutex_lock(&provider_mutex) == 0);
+
+    if (forkinit == 0) {
+	pthread_atfork(NULL, NULL, providers_reinit);
+	forkinit++;
+    }
+
+    pthread_mutex_unlock(&provider_mutex);
 
     rv = load_provider(&pm->provider, name, reserved, real_name);
     if (rv) {
