@@ -2431,7 +2431,7 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 	}
     }
 
-  return ret;
+  return 0;
 }
 
 /* The packets in gnutls_handshake (it's more broad than original TLS handshake)
