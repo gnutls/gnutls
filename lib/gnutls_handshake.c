@@ -1913,7 +1913,7 @@ _gnutls_copy_comp_methods (gnutls_session_t session,
 /* This should be sufficient by now. It should hold all the extensions
  * plus the headers in a hello message.
  */
-#define MAX_EXT_DATA_LENGTH 4096
+#define MAX_EXT_DATA_LENGTH 65535
 
 /* This function sends the client hello handshake message.
  */
@@ -2138,7 +2138,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 {
   mbuffer_st *bufel = NULL;
   opaque *data = NULL;
-  opaque extdata[MAX_EXT_DATA_LENGTH];
+  opaque *extdata = NULL;
   int extdatalen;
   int pos = 0;
   int datalen, ret = 0;
@@ -2150,22 +2150,32 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 
   if (again == 0)
     {
+    
+      extdata = gnutls_malloc(MAX_EXT_DATA_LENGTH);
+      if (extdata == NULL)
+        {
+          gnutls_assert();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
+
       datalen = 2 + session_id_len + 1 + GNUTLS_RANDOM_SIZE + 3;
-      extdatalen =
-	_gnutls_gen_extensions (session, extdata, sizeof (extdata),
+      ret =
+	_gnutls_gen_extensions (session, extdata, MAX_EXT_DATA_LENGTH,
 				GNUTLS_EXT_ANY);
 
-      if (extdatalen < 0)
+      if (ret < 0)
 	{
 	  gnutls_assert ();
-	  return extdatalen;
+	  goto fail;
 	}
+      extdatalen = ret;
 
       bufel = _gnutls_handshake_alloc (datalen + extdatalen);
       if (bufel == NULL)
 	{
 	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
+	  ret = GNUTLS_E_MEMORY_ERROR;
+	  goto fail;
 	}
       data = _mbuffer_get_udata_ptr(bufel);
 
@@ -2211,6 +2221,8 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 
   ret = _gnutls_send_handshake (session, bufel, GNUTLS_HANDSHAKE_SERVER_HELLO);
 
+fail:
+  gnutls_free(extdata);
   return ret;
 }
 
