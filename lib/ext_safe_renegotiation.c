@@ -32,8 +32,6 @@ static int _gnutls_sr_recv_params (gnutls_session_t state,
 					    size_t data_size);
 static int _gnutls_sr_send_params (gnutls_session_t state,
 					    opaque * data, size_t);
-static int _gnutls_sr_pack(extension_priv_data_t epriv, gnutls_buffer_st* ps);
-static int _gnutls_sr_unpack(gnutls_buffer_st* ps, extension_priv_data_t* _priv);
 static void _gnutls_sr_deinit_data(extension_priv_data_t priv);
 
 extension_entry_st ext_mod_sr = {
@@ -392,53 +390,6 @@ static void _gnutls_sr_deinit_data(extension_priv_data_t priv)
 {
     gnutls_free(priv.ptr);
 }
-
-#if 0
-
-static int _gnutls_sr_pack(extension_priv_data_t epriv, gnutls_buffer_st* ps)
-{
-sr_ext_st* priv = epriv.ptr;
-int ret;
-
-  BUFFER_APPEND_PFX(ps, priv->client_verify_data, priv->client_verify_data_len);
-  BUFFER_APPEND_PFX(ps, priv->server_verify_data, priv->server_verify_data_len);
-  BUFFER_APPEND_PFX(ps, priv->ri_extension_data, priv->ri_extension_data_len);
-  
-  return 0;
-}
-
-static int _gnutls_sr_unpack(gnutls_buffer_st* ps, extension_priv_data_t* _priv)
-{
-sr_ext_st* priv;
-int ret;
-extension_priv_data_t epriv;
-
-  priv = gnutls_calloc(1, sizeof(*priv));
-  if (priv == NULL)
-    {
-      gnutls_assert();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  BUFFER_POP_NUM(ps, priv->client_verify_data_len);
-  BUFFER_POP(ps, priv->client_verify_data, priv->client_verify_data_len);
-
-  BUFFER_POP_NUM(ps, priv->server_verify_data_len);
-  BUFFER_POP(ps, priv->server_verify_data, priv->server_verify_data_len);
-
-  BUFFER_POP_NUM(ps, priv->ri_extension_data_len);
-  BUFFER_POP(ps, priv->ri_extension_data, priv->ri_extension_data_len);
-  
-  epriv.ptr = priv;
-  *_priv = epriv;
-  
-  ret = 0;
-
-error:
-  return ret;
-}
-
-#endif
 
 /**
  * gnutls_safe_renegotiation_status:
