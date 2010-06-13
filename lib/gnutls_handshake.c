@@ -2340,7 +2340,7 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
   if (session->internals.priorities.safe_renegotiation == SR_DISABLED)
     {
       gnutls_assert ();
-      return ret;
+      return 0;
     }
 
   /* Safe renegotiation */
