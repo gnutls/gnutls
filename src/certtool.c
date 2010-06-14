@@ -204,7 +204,13 @@ int bits;
 
   if (info.bits != 0)
     {
-      fprintf(stderr, "** Note: Please use the --sec-param instead of --bits\n");
+      static int warned = 0;
+      
+      if (warned == 0) 
+        {
+          warned = 1;
+          fprintf(stderr, "** Note: Please use the --sec-param instead of --bits\n");
+        }
       bits = info.bits;
     }
   else
