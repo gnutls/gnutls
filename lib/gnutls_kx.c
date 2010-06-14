@@ -59,7 +59,7 @@ send_handshake (gnutls_session_t session, opaque *data, size_t size,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  bufel = _gnutls_handshake_alloc(size);
+  bufel = _gnutls_handshake_alloc(size, size);
   if (bufel == NULL)
     {
       gnutls_assert ();

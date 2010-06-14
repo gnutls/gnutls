@@ -655,7 +655,7 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 
   if (again == 0)
     {
-      bufel = _gnutls_handshake_alloc (MAX_VERIFY_DATA_SIZE);
+      bufel = _gnutls_handshake_alloc (MAX_VERIFY_DATA_SIZE, MAX_VERIFY_DATA_SIZE);
       if (bufel == NULL)
 	{
 	  gnutls_assert ();
@@ -1046,7 +1046,7 @@ _gnutls_send_empty_handshake (gnutls_session_t session,
 
   if (again == 0)
     {
-      bufel = _gnutls_handshake_alloc (0);
+      bufel = _gnutls_handshake_alloc (0, 0);
       if (bufel == NULL)
 	{
 	  gnutls_assert ();
@@ -1913,7 +1913,7 @@ _gnutls_copy_comp_methods (gnutls_session_t session,
 /* This should be sufficient by now. It should hold all the extensions
  * plus the headers in a hello message.
  */
-#define MAX_EXT_DATA_LENGTH 65535
+#define MAX_EXT_DATA_LENGTH 32*1024
 
 /* This function sends the client hello handshake message.
  */
@@ -1944,7 +1944,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       /* 2 for version, (4 for unix time + 28 for random bytes==GNUTLS_RANDOM_SIZE) 
        */
 
-      bufel = _gnutls_handshake_alloc (datalen);
+      bufel = _gnutls_handshake_alloc (datalen, datalen+MAX_EXT_DATA_LENGTH);
       if (bufel == NULL)
 	{
 	  gnutls_assert ();
@@ -2051,12 +2051,12 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 
       if (ret > 0)
 	{
-	  bufel = _mbuffer_push_data (bufel, extdata, ret);
-	  if (bufel == NULL)
+	  ret = _mbuffer_append_data (bufel, extdata, ret);
+	  if (ret < 0)
 	    {
 	      gnutls_assert ();
 	      gnutls_free (extdata);
-	      return GNUTLS_E_MEMORY_ERROR;
+	      return ret;
 	    }
 	}
       else
@@ -2075,12 +2075,12 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       ret = _gnutls_copy_comp_methods (session, extdata, extdatalen);
       if (ret > 0)
 	{
-	  bufel = _mbuffer_push_data (bufel, extdata, ret);
-	  if (bufel == NULL)
+	  ret = _mbuffer_append_data (bufel, extdata, ret);
+	  if (ret < 0)
 	    {
 	      gnutls_assert ();
 	      gnutls_free (extdata);
-	      return GNUTLS_E_MEMORY_ERROR;
+	      return ret;
 	    }
 	}
       else
@@ -2109,12 +2109,12 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 
       if (ret > 0)
 	{
-	  bufel = _mbuffer_push_data (bufel, extdata, ret);
-	  if (bufel == NULL)
+	  ret = _mbuffer_append_data (bufel, extdata, ret);
+	  if (ret < 0)
 	    {
 	      gnutls_assert ();
 	      gnutls_free (extdata);
-	      return GNUTLS_E_MEMORY_ERROR;
+	      return ret;
 	    }
         }
       else if (ret < 0)
@@ -2170,7 +2170,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 	}
       extdatalen = ret;
 
-      bufel = _gnutls_handshake_alloc (datalen + extdatalen);
+      bufel = _gnutls_handshake_alloc (datalen + extdatalen, datalen + extdatalen);
       if (bufel == NULL)
 	{
 	  gnutls_assert ();
@@ -2472,7 +2472,7 @@ _gnutls_send_supplemental (gnutls_session_t session, int again)
 	  return ret;
 	}
 
-      bufel = _gnutls_handshake_alloc(buf.length);
+      bufel = _gnutls_handshake_alloc(buf.length, buf.length);
       if (bufel == NULL)
 	{
 	  gnutls_assert ();

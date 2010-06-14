@@ -207,6 +207,7 @@ typedef struct mbuffer_st
      head of the queue. */
   size_t mark;
   unsigned int user_mark; /* only used during fill in */
+  size_t maximum_size;
 } mbuffer_st;
 
 typedef struct mbuffer_head_st

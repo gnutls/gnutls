@@ -130,11 +130,11 @@ _mbuffer_remove_bytes (mbuffer_head_st *buf, size_t bytes)
 }
 
 mbuffer_st *
-_mbuffer_alloc (size_t payload_size)
+_mbuffer_alloc (size_t payload_size, size_t maximum_size)
 {
   mbuffer_st * st;
 
-  st = gnutls_malloc (payload_size+sizeof (mbuffer_st));
+  st = gnutls_malloc (maximum_size+sizeof (mbuffer_st));
   if (st == NULL)
     {
       gnutls_assert ();
@@ -147,22 +147,24 @@ _mbuffer_alloc (size_t payload_size)
   st->mark = 0;
   st->user_mark = 0;
   st->next = NULL;
+  st->maximum_size = maximum_size;
 
   return st;
 }
 
-mbuffer_st*
-_mbuffer_push_data (mbuffer_st *bufel, void* newdata, size_t newdata_size)
+int
+_mbuffer_append_data (mbuffer_st *bufel, void* newdata, size_t newdata_size)
 {
-  bufel = gnutls_realloc_fast (bufel, bufel->msg.size+newdata_size+sizeof (mbuffer_st));
-  if (bufel == NULL)
+  if (sizeof(mbuffer_st)+bufel->msg.size+newdata_size < bufel->maximum_size)
     {
-      gnutls_assert ();
-      return NULL;
+      memcpy(&bufel->msg.data[bufel->msg.size], newdata, newdata_size);
+      bufel->msg.size+=newdata_size;
     }
-  bufel->msg.data = (opaque*)bufel + sizeof (mbuffer_st);
-  memcpy(&bufel->msg.data[bufel->msg.size], newdata, newdata_size);
-  bufel->msg.size += newdata_size;
+  else
+    {
+      gnutls_assert();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
 
-  return bufel;
+  return 0;
 }

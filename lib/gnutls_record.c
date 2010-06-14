@@ -400,7 +400,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
       /* now proceed to packet encryption
        */
       cipher_size = data2send_size + MAX_RECORD_OVERHEAD;
-      bufel = _mbuffer_alloc (cipher_size);
+      bufel = _mbuffer_alloc (cipher_size, cipher_size);
       if (bufel == NULL)
 	{
 	  gnutls_assert ();

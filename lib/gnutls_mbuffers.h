@@ -32,12 +32,12 @@ void _mbuffer_clear (mbuffer_head_st *buf);
 void _mbuffer_enqueue (mbuffer_head_st *buf, mbuffer_st *bufel);
 void _mbuffer_get_head (mbuffer_head_st *buf, gnutls_datum_t *msg);
 int  _mbuffer_remove_bytes (mbuffer_head_st *buf, size_t bytes);
-mbuffer_st* _mbuffer_alloc (size_t payload_size);
+mbuffer_st* _mbuffer_alloc (size_t payload_size, size_t maximum_size);
 
 /* This is dangerous since it will replace bufel with a new
  * one.
  */
-mbuffer_st* _mbuffer_push_data (mbuffer_st *bufel, void* newdata, size_t newdata_size);
+int _mbuffer_append_data (mbuffer_st *bufel, void* newdata, size_t newdata_size);
 
 
 /* For "user" use. One can have buffer data and header.
@@ -80,9 +80,9 @@ inline static void _mbuffer_set_uhead_size(mbuffer_st *bufel, size_t size)
 
 
 
-inline static mbuffer_st* _gnutls_handshake_alloc(size_t size)
+inline static mbuffer_st* _gnutls_handshake_alloc(size_t size, size_t maximum)
 {
-  mbuffer_st *ret = _mbuffer_alloc (HANDSHAKE_HEADER_SIZE + size);
+  mbuffer_st *ret = _mbuffer_alloc (HANDSHAKE_HEADER_SIZE + size, HANDSHAKE_HEADER_SIZE+maximum);
 
   if (!ret)
     return NULL;
