@@ -39,11 +39,25 @@ if [ $? != 0 ];then
 fi
 
 echo ca > template
-echo cn = "End-user" >> template
+echo cn = "SHA 224 Mid CA" >> template
 
 $CERTTOOL -d 2 --generate-certificate --template template \
     --load-ca-privkey $srcdir/key-ca-dsa.pem \
     --load-ca-certificate new-ca-dsa.pem \
+    --load-privkey $srcdir/key-subca-dsa.pem \
+    --outfile new-subca-dsa.pem \
+    --hash sha224 >out 2>&1
+
+if [ $? != 0 ];then
+	cat out
+	exit 1
+fi
+
+echo cn = "End-user" > template
+
+$CERTTOOL -d 2 --generate-certificate --template template \
+    --load-ca-privkey $srcdir/key-subca-dsa.pem \
+    --load-ca-certificate new-subca-dsa.pem \
     --load-privkey $srcdir/key-dsa.pem \
     --outfile new-user.pem >out 2>&1
 
@@ -52,7 +66,7 @@ if [ $? != 0 ];then
 	exit 1
 fi
 
-cat new-user.pem new-ca-dsa.pem > out
+cat new-user.pem new-subca-dsa.pem new-ca-dsa.pem > out
 $CERTTOOL --verify-chain <out > verify
 
 if [ $? != 0 ];then
@@ -60,6 +74,6 @@ if [ $? != 0 ];then
 	exit 1
 fi
 
-rm -f verify new-user.pem new-dsa-ca.pem template
+rm -f verify new-user.pem new-ca-dsa.pem new-subca-dsa.pem template out
 
 exit 0

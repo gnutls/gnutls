@@ -986,6 +986,8 @@ gaa_parser (int argc, char **argv)
 	default_dig = GNUTLS_DIG_SHA1;
       else if (strcasecmp (info.hash, "sha256") == 0)
 	default_dig = GNUTLS_DIG_SHA256;
+      else if (strcasecmp (info.hash, "sha224") == 0)
+	default_dig = GNUTLS_DIG_SHA224;
       else if (strcasecmp (info.hash, "sha384") == 0)
 	default_dig = GNUTLS_DIG_SHA384;
       else if (strcasecmp (info.hash, "sha512") == 0)

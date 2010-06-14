@@ -68,8 +68,7 @@ if [ $? != 0 ];then
 	exit 1
 fi
 
-echo ca > template
-echo cn = "End-user" >> template
+echo cn = "End-user" > template
 
 $CERTTOOL -d 2 --generate-certificate --template template \
     --load-ca-privkey $srcdir/key-subsubca.pem \
