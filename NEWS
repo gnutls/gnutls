@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.9.12 (unreleased)
 
+** gnutls-cli: Make --starttls work again.
+Problem introduced in patch to use read() instead of fgets() committed
+on 2010-01-27.
+
 ** API and ABI modifications:
 No changes since last version.
 
