@@ -887,7 +887,7 @@ after_handshake:
 
       if (FD_ISSET (fileno (stdin), &rset))
 	{
-	  if ((bytes = read (fileno (stdin), buffer, MAX_BUF - 1)) < 0)
+	  if ((bytes = read (fileno (stdin), buffer, MAX_BUF - 1)) <= 0)
 	    {
 	      if (hd.secure == 0)
 		{
