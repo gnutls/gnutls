@@ -144,7 +144,7 @@ AC_DEFUN([lgl_INIT],
   gl_FUNC
   # Code from module gettext:
   dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
-  AM_GNU_GETTEXT_VERSION([0.18])
+  AM_GNU_GETTEXT_VERSION([0.18.1])
   # Code from module gettext-h:
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
