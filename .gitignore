@@ -82,11 +82,14 @@ doc/reference/gnutls-unused.txt
 doc/reference/gnutls.args
 doc/reference/gnutls.hierarchy
 doc/reference/gnutls.interfaces
+doc/reference/gnutls.pdf
 doc/reference/gnutls.prerequisites
 doc/reference/gnutls.signals
 doc/reference/html-build.stamp
 doc/reference/html.stamp
 doc/reference/html/
+doc/reference/pdf-build.stamp
+doc/reference/pdf.stamp
 doc/reference/scan-build.stamp
 doc/reference/sgml-build.stamp
 doc/reference/sgml.stamp
