@@ -1,3 +1,63 @@
+2010-06-17  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.9.12.
+
+2010-06-17  Simon Josefsson <simon@josefsson.org>
+
+	* gl/m4/sockpfaf.m4, lib/gl/m4/sockpfaf.m4: Update gnulib files.
+
+2010-06-17  Simon Josefsson <simon@josefsson.org>
+
+	* .gitignore: Add.
+
+2010-06-15  Simon Josefsson <simon@josefsson.org>
+
+	* gl/Makefile.am, gl/m4/lib-link.m4, gl/m4/printf.m4,
+	gl/m4/stdint.m4, gl/m4/time_h.m4, gl/select.c, gl/strerror.c,
+	gl/tests/init.sh, gl/tests/test-sys_socket.c,
+	gl/tests/test-verify.c, gl/time.in.h, lib/gl/Makefile.am,
+	lib/gl/m4/gnulib-comp.m4, lib/gl/m4/iconv.m4,
+	lib/gl/m4/lib-link.m4, lib/gl/m4/printf.m4, lib/gl/m4/stdint.m4,
+	lib/gl/m4/time_h.m4, lib/gl/tests/init.sh,
+	lib/gl/tests/test-sys_socket.c, lib/gl/tests/test-verify.c,
+	lib/gl/time.in.h, libextra/gl/m4/lib-link.m4, maint.mk: Update
+	gnulib files.
+
+2010-06-15  Simon Josefsson <simon@josefsson.org>
+
+	* lib/m4/hooks.m4: Fix shared library version.
+
+2010-06-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2010-06-15  Simon Josefsson <simon@josefsson.org>
+
+	* src/cli.c: gnutls-cli: Make --starttls work again.  Problem introduced in patch to use read() instead of fgets()
+	committed on 2010-01-27.
+
+2010-06-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_handshake.c: more return value fixes.
+
+2010-06-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_handshake.c: Corrected return value when safe
+	renegotiation is disabled.
+
+2010-06-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/tests.c: corrected tests.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2010-06-07  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.9.11.
