@@ -32,8 +32,6 @@
 #include <sign.h>
 
 struct gnutls_pkcs11_privkey_st {
-	pakchois_session_t *pks;
-	ck_object_handle_t obj;
 	gnutls_pk_algorithm_t pk_algorithm;
 	unsigned int flags;
 	struct pkcs11_url_info info;
@@ -55,7 +53,6 @@ int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	(*key)->obj = CK_INVALID_HANDLE;
 	
 	return 0;
 }
@@ -68,9 +65,6 @@ int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
  **/
 void gnutls_pkcs11_privkey_deinit(gnutls_pkcs11_privkey_t key)
 {
-	if (key->pks) {
-		pakchois_close_session(key->pks);
-    }
 	gnutls_free(key);
 }
 
@@ -112,27 +106,6 @@ int gnutls_pkcs11_privkey_get_info(gnutls_pkcs11_privkey_t pkey,
 	return pkcs11_get_info(&pkey->info, itype, output, output_size);
 }
 
-#define RETRY_BLOCK_START int retries = 0; retry:
-
-
-/* the rescan_slots() here is a dummy but if not
- * called my card fails to work when removed and inserted.
- * May have to do with the pkcs11 library I use.
- */
-#define RETRY_CHECK(rv, key) { \
-		if (token_func && (rv == CKR_SESSION_HANDLE_INVALID||rv==CKR_DEVICE_REMOVED)) { \
-			pkcs11_rescan_slots(); \
-			pakchois_close_session(key->pks); \
-			pkcs11_rescan_slots(); \
-			key->pks = NULL; \
-			key->obj = CK_INVALID_HANDLE; \
-			ret = token_func(token_data, key->info.label, retries++); \
-			if (ret == 0) { \
-				pkcs11_find_object (&key->pks, &key->obj, &key->info, SESSION_LOGIN); \
-				goto retry; \
-			} \
-		} \
-	}
 
 /**
  * gnutls_pkcs11_privkey_sign_data:
@@ -193,6 +166,18 @@ gnutls_pkcs11_privkey_sign_data(gnutls_pkcs11_privkey_t signer,
 
 }
 
+#define FIND_OBJECT(pks, obj) \
+	do { \
+		int retries = 0; \
+		ret = pkcs11_find_object (&pks, &obj, &key->info, SESSION_LOGIN); \
+		if (ret < 0) { \
+			rv = token_func(token_data, key->info.label, retries++); \
+			if (rv == 0) continue; \
+			gnutls_assert(); \
+			return ret; \
+		} \
+	} while (ret < 0); 
+
 /**
  * gnutls_pkcs11_privkey_sign_hash:
  * @key: Holds the key
@@ -214,13 +199,10 @@ int gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	int ret;
 	struct ck_mechanism mech;
 	unsigned long siglen;
+	pakchois_session_t *pks;
+	ck_object_handle_t obj;
 
-	RETRY_BLOCK_START;
-
-	if (key->obj == CK_INVALID_HANDLE || key->pks == NULL) {
-		gnutls_assert();
-		return GNUTLS_E_PKCS11_ERROR;
-	}
+	FIND_OBJECT(pks, obj);
 
 	mech.mechanism =
 	    key->pk_algorithm == GNUTLS_PK_DSA ? CKM_DSA : CKM_RSA_PKCS;
@@ -229,37 +211,42 @@ int gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 
 	/* Initialize signing operation; using the private key discovered
 	 * earlier. */
-	rv = pakchois_sign_init(key->pks, &mech, key->obj);
+	rv = pakchois_sign_init(pks, &mech, obj);
 	if (rv != CKR_OK) {
-		RETRY_CHECK(rv, key);
 		gnutls_assert();
-		return GNUTLS_E_PK_SIGN_FAILED;
+		ret = GNUTLS_E_PK_SIGN_FAILED;
+		goto cleanup;
 	}
 
 	/* Work out how long the signature must be: */
-	rv = pakchois_sign(key->pks, hash->data, hash->size, NULL,
+	rv = pakchois_sign(pks, hash->data, hash->size, NULL,
 			   &siglen);
 	if (rv != CKR_OK) {
-		RETRY_CHECK(rv, key);
 		gnutls_assert();
-		return GNUTLS_E_PK_SIGN_FAILED;
+		ret = GNUTLS_E_PK_SIGN_FAILED;
+		goto cleanup;
 	}
 
 	signature->data = gnutls_malloc(siglen);
 	signature->size = siglen;
 
-	rv = pakchois_sign(key->pks, hash->data, hash->size,
+	rv = pakchois_sign(pks, hash->data, hash->size,
 			   signature->data, &siglen);
 	if (rv != CKR_OK) {
 		gnutls_free(signature->data);
-		RETRY_CHECK(rv, key);
 		gnutls_assert();
-		return GNUTLS_E_PK_SIGN_FAILED;
+		ret = GNUTLS_E_PK_SIGN_FAILED;
+		goto cleanup;
 	}
 
 	signature->size = siglen;
 
-	return 0;
+	ret = 0;
+
+cleanup:
+	pakchois_close_session(pks);
+
+	return ret;
 }
 
 
@@ -293,11 +280,6 @@ int gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
 
-	ret = pkcs11_find_object (&pkey->pks, &pkey->obj, &pkey->info, SESSION_LOGIN);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
 	pkey->flags = flags;
 
 	return 0;
@@ -325,14 +307,11 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	int ret;
 	struct ck_mechanism mech;
 	unsigned long siglen;
+	pakchois_session_t *pks;
+	ck_object_handle_t obj;
 
-	RETRY_BLOCK_START;
-
-	if (key->obj == CK_INVALID_HANDLE) {
-		gnutls_assert();
-		return GNUTLS_E_PKCS11_ERROR;
-	}
-
+	FIND_OBJECT(pks, obj);
+	
 	mech.mechanism =
 	    key->pk_algorithm == GNUTLS_PK_DSA ? CKM_DSA : CKM_RSA_PKCS;
 	mech.parameter = NULL;
@@ -340,36 +319,42 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 
 	/* Initialize signing operation; using the private key discovered
 	 * earlier. */
-	rv = pakchois_decrypt_init(key->pks, &mech, key->obj);
+	rv = pakchois_decrypt_init(pks, &mech, obj);
 	if (rv != CKR_OK) {
-		RETRY_CHECK(rv, key);
 		gnutls_assert();
-		return GNUTLS_E_PK_DECRYPTION_FAILED;
+		ret = GNUTLS_E_PK_DECRYPTION_FAILED;
+		goto cleanup;
 	}
 
 	/* Work out how long the plaintext must be: */
-	rv = pakchois_decrypt(key->pks, ciphertext->data, ciphertext->size, NULL,
+	rv = pakchois_decrypt(pks, ciphertext->data, ciphertext->size, NULL,
 			   &siglen);
 	if (rv != CKR_OK) {
-		RETRY_CHECK(rv, key);
 		gnutls_assert();
-		return GNUTLS_E_PK_DECRYPTION_FAILED;
+		ret = GNUTLS_E_PK_DECRYPTION_FAILED;
+		goto cleanup;
 	}
 
 	plaintext->data = gnutls_malloc(siglen);
 	plaintext->size = siglen;
 
-	rv = pakchois_decrypt(key->pks, ciphertext->data, ciphertext->size,
+	rv = pakchois_decrypt(pks, ciphertext->data, ciphertext->size,
 			   plaintext->data, &siglen);
 	if (rv != CKR_OK) {
 		gnutls_free(plaintext->data);
 		gnutls_assert();
-		return GNUTLS_E_PK_DECRYPTION_FAILED;
+		ret = GNUTLS_E_PK_DECRYPTION_FAILED;
+		goto cleanup;
 	}
 
 	plaintext->size = siglen;
 
-	return 0;
+	ret = 0;
+
+cleanup:
+	pakchois_close_session(pks);
+
+	return ret;
 }
 
 /**
