@@ -35,6 +35,7 @@ struct gnutls_pkcs11_privkey_st {
 	gnutls_pk_algorithm_t pk_algorithm;
 	unsigned int flags;
 	struct pkcs11_url_info info;
+	token_creds_st creds;
 };
 
 /**
@@ -166,10 +167,11 @@ gnutls_pkcs11_privkey_sign_data(gnutls_pkcs11_privkey_t signer,
 
 }
 
-#define FIND_OBJECT(pks, obj) \
+#define FIND_OBJECT(pks, obj, key) \
 	do { \
 		int retries = 0; \
-		ret = pkcs11_find_object (&pks, &obj, &key->info, SESSION_LOGIN); \
+		ret = pkcs11_find_object (&pks, &obj, &key->info, &key->creds, \
+			SESSION_LOGIN); \
 		if (ret < 0) { \
 			rv = token_func(token_data, key->info.label, retries++); \
 			if (rv == 0) continue; \
@@ -202,7 +204,7 @@ int gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	pakchois_session_t *pks;
 	ck_object_handle_t obj;
 
-	FIND_OBJECT(pks, obj);
+	FIND_OBJECT(pks, obj, key);
 
 	mech.mechanism =
 	    key->pk_algorithm == GNUTLS_PK_DSA ? CKM_DSA : CKM_RSA_PKCS;
@@ -275,12 +277,17 @@ int gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 		return ret;
 	}
 
+	pkey->flags = flags;
+
+	if (pkey->info.type[0] != 0 && strcmp(pkey->info.type, "private") != 0) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
+
 	if (pkey->info.id[0] == 0) {
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}
-
-	pkey->flags = flags;
 
 	return 0;
 }
@@ -310,7 +317,7 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	pakchois_session_t *pks;
 	ck_object_handle_t obj;
 
-	FIND_OBJECT(pks, obj);
+	FIND_OBJECT(pks, obj, key);
 	
 	mech.mechanism =
 	    key->pk_algorithm == GNUTLS_PK_DSA ? CKM_DSA : CKM_RSA_PKCS;

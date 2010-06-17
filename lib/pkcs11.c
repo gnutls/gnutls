@@ -313,6 +313,28 @@ void gnutls_pkcs11_deinit (void)
  * This function will set a callback function to be used when a PIN
  * is required for PKCS 11 operations.
  *
+ * Callback for PKCS#11 PIN entry.  The callback provides the PIN code
+ * to unlock the token with label 'token_label' in the slot described
+ * by 'slot_descr'.
+ *
+ * The PIN code, as a NUL-terminated ASCII string, should be copied
+ * into the 'pin' buffer (of maximum size pin_max), and
+ * return 0 to indicate success. Alternatively, the callback may
+ * return a negative gnutls error code to indicate failure and cancel 
+ * PIN entry (in which case, the contents of the 'pin' parameter are ignored).
+ * 
+ * The special error code GNUTLS_E_PKCS11_PIN_SAVE can be returned to
+ * tell the caller to save the pin for future use with this token. This will
+ * only work if the token is being used with a single &gnutls_pkcs11_privkey_t
+ * structure and thread safety is not an issue.
+ *
+ * When a PIN is required, the callback will be invoked repeatedly
+ * (and indefinitely) until either the returned PIN code is correct,
+ * the callback returns failure, or the token refuses login (e.g. when
+ * the token is locked due to too many incorrect PINs!).  For the
+ * first such invocation, the 'attempt' counter will have value zero;
+ * it will increase by one for each subsequent attempt.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  **/
@@ -704,7 +726,7 @@ static void terminate_string(unsigned char *str, size_t len)
 }
 
 int pkcs11_find_object (pakchois_session_t** _pks, ck_object_handle_t* _obj,
-    struct pkcs11_url_info *info, unsigned int flags)
+    struct pkcs11_url_info *info, token_creds_st* creds, unsigned int flags)
 {
 int ret;
 pakchois_session_t *pks;
@@ -721,7 +743,7 @@ ck_rv_t rv;
         return GNUTLS_E_INVALID_REQUEST;
     }
 
-    ret = pkcs11_open_session (&pks, info, flags);
+    ret = pkcs11_open_session (&pks, info, creds, flags);
     if (ret < 0) {
         gnutls_assert();
         return ret;
@@ -763,7 +785,8 @@ fail:
     return ret;
 }
 
-int pkcs11_open_session (pakchois_session_t** _pks, struct pkcs11_url_info *info, unsigned int flags)
+int pkcs11_open_session (pakchois_session_t** _pks, struct pkcs11_url_info *info, 
+    token_creds_st* creds, unsigned int flags)
 {
     ck_rv_t rv;
     int x, z, ret;
@@ -800,7 +823,7 @@ int pkcs11_open_session (pakchois_session_t** _pks, struct pkcs11_url_info *info
             }
 
             if (flags&SESSION_LOGIN) {
-                ret = pkcs11_login(pks, &tinfo);
+                ret = pkcs11_login(pks, &tinfo, creds);
                 if (ret < 0) {
                     gnutls_assert();
                     pakchois_close_session(pks);
@@ -1478,10 +1501,11 @@ struct pkey_list {
     size_t key_ids_size;
 };
 
-int pkcs11_login(pakchois_session_t *pks, struct token_info *info)
+int pkcs11_login(pakchois_session_t *pks, struct token_info *info, token_creds_st* creds)
 {
-    int attempt = 0;
+    int attempt = 0, ret;
     ck_rv_t rv;
+    int pin_len;
 
     if (pakchois_get_token_info(info->prov->module, info->sid, &info->tinfo) != CKR_OK) {
         gnutls_assert();
@@ -1489,9 +1513,6 @@ int pkcs11_login(pakchois_session_t *pks, struct token_info *info)
         return GNUTLS_E_PKCS11_ERROR;
     }
 
-    /* force login on HW tokens. Some tokens will not list private keys
-     * if login has not been performed.
-     */
     if ((info->tinfo.flags & CKF_LOGIN_REQUIRED) == 0) {
         gnutls_assert();
         _gnutls_debug_log( "pk11: No login required.\n");
@@ -1514,7 +1535,7 @@ int pkcs11_login(pakchois_session_t *pks, struct token_info *info)
 
     /* Otherwise, PIN entry is necessary for login, so fail if there's
      * no callback. */
-    if (!pin_func) {
+    if (!pin_func && !creds) {
         gnutls_assert();
         _gnutls_debug_log("pk11: No pin callback but login required.\n");
         return GNUTLS_E_PKCS11_ERROR;
@@ -1537,21 +1558,35 @@ int pkcs11_login(pakchois_session_t *pks, struct token_info *info)
             }
         }
 
-        if (info->tinfo.flags & CKF_USER_PIN_COUNT_LOW)
-            flags |= GNUTLS_PKCS11_PIN_COUNT_LOW;
-        if (info->tinfo.flags & CKF_USER_PIN_FINAL_TRY)
-            flags |= GNUTLS_PKCS11_PIN_FINAL_TRY;
+        if (creds != NULL && creds->pin_size > 0 && 
+            !(info->tinfo.flags & CKF_USER_PIN_FINAL_TRY)) {
 
-        terminate_string(info->tinfo.label, sizeof info->tinfo.label);
+            memcpy(pin, creds->pin, creds->pin_size);
+            pin_len = creds->pin_size;
+        } else {
+            if (info->tinfo.flags & CKF_USER_PIN_COUNT_LOW)
+                flags |= GNUTLS_PKCS11_PIN_COUNT_LOW;
+            if (info->tinfo.flags & CKF_USER_PIN_FINAL_TRY)
+                flags |= GNUTLS_PKCS11_PIN_FINAL_TRY;
 
-        if (pin_func(pin_data, attempt++,
-                         (char *)info->sinfo.slot_description,
-                         (char *)info->tinfo.label, flags, pin, sizeof(pin))) {
-            gnutls_assert();
-            return GNUTLS_E_PKCS11_PIN_ERROR;
+            terminate_string(info->tinfo.label, sizeof info->tinfo.label);
+
+            ret = pin_func(pin_data, attempt++,
+                             (char *)info->sinfo.slot_description,
+                             (char *)info->tinfo.label, flags, pin, sizeof(pin));
+            if (ret < 0 && ret != GNUTLS_E_PKCS11_PIN_SAVE) {
+                gnutls_assert();
+                return GNUTLS_E_PKCS11_PIN_ERROR;
+            }
+            pin_len = strlen(pin);
+            
+            if (ret == GNUTLS_E_PKCS11_PIN_SAVE && creds) {
+                memcpy(creds->pin, pin, pin_len);
+                creds->pin_size = pin_len;
+            }
         }
 
-        rv = pakchois_login(pks, CKU_USER, (unsigned char *)pin, strlen(pin));
+        rv = pakchois_login(pks, CKU_USER, (unsigned char *)pin, pin_len);
         /* Try to scrub the pin off the stack.  Clever compilers will
          * probably optimize this away, oh well. */
         memset(pin, 0, sizeof pin);
@@ -1697,7 +1732,7 @@ static int find_objs(pakchois_session_t *pks, struct token_info *info, void* inp
     memset(&plist, 0, sizeof(plist));
 
     if (find_data->flags==GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY) {
-        ret = pkcs11_login(pks, info);
+        ret = pkcs11_login(pks, info, NULL);
         if (ret < 0) {
             gnutls_assert();
             return ret;
@@ -1714,7 +1749,7 @@ static int find_objs(pakchois_session_t *pks, struct token_info *info, void* inp
             return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
         }
     } else if (find_data->flags==GNUTLS_PKCS11_OBJ_ATTR_ALL) {
-        ret = pkcs11_login(pks, info);
+        ret = pkcs11_login(pks, info, NULL);
         if (ret < 0) {
             gnutls_assert();
             return ret;

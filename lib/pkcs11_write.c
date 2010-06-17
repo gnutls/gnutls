@@ -64,7 +64,7 @@ int gnutls_pkcs11_copy_x509_crt(const char* token_url, gnutls_x509_crt_t crt,
 		return ret;
 	}
 	
-	ret = pkcs11_open_session (&pks, &info, SESSION_WRITE|SESSION_LOGIN);
+	ret = pkcs11_open_session (&pks, &info, NULL, SESSION_WRITE|SESSION_LOGIN);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -201,7 +201,7 @@ int gnutls_pkcs11_copy_x509_privkey(const char* token_url,
 		goto cleanup;
 	}
 
-	ret = pkcs11_open_session (&pks, &info, SESSION_WRITE|SESSION_LOGIN);
+	ret = pkcs11_open_session (&pks, &info, NULL, SESSION_WRITE|SESSION_LOGIN);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -405,7 +405,7 @@ static int delete_obj_url(pakchois_session_t *pks, struct token_info *info, void
         }
     }
 
-	ret = pkcs11_login(pks, info);
+	ret = pkcs11_login(pks, info, NULL);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

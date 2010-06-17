@@ -883,7 +883,7 @@ int len;
 	memcpy(pin, password, len);
 	pin[len] = 0;
 	
-	return 0;
+	return GNUTLS_E_PKCS11_PIN_SAVE; /* 0 to not save it */
 }
 
 static int token_callback(void* user, const char* label, const unsigned retry)

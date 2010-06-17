@@ -238,6 +238,11 @@ load_keys (void)
 	  gnutls_pkcs11_privkey_init (&pkcs11_key);
 
 	  ret = gnutls_pkcs11_privkey_import_url (pkcs11_key, x509_keyfile, 0);
+	  if (ret < 0) 
+	    {
+	      fprintf(stderr, "*** Error loading url: %s\n", gnutls_strerror(ret));
+	      exit(1);
+            }
 	}
       else
 	{
@@ -294,6 +299,11 @@ load_keys (void)
 	  gnutls_pkcs11_privkey_init (&pkcs11_key);
 
 	  ret = gnutls_pkcs11_privkey_import_url (pkcs11_key, pgp_keyfile, 0);
+	  if (ret < 0) 
+	    {
+	      fprintf(stderr, "*** Error loading url: %s\n", gnutls_strerror(ret));
+	      exit(1);
+            }
 	}
       else
 	{

@@ -25,31 +25,9 @@ typedef int (*gnutls_pkcs11_token_callback_t)(
 #define GNUTLS_PKCS11_PIN_FINAL_TRY 1
 #define GNUTLS_PKCS11_PIN_COUNT_LOW 2
 
-/* Callback for PKCS#11 PIN entry.  The callback provides the PIN code
- * to unlock the token with label 'token_label' in the slot described
- * by 'slot_descr'.
- *
- * The PIN code, as a NUL-terminated ASCII string, should be copied
- * into the 'pin' buffer (of fixed length NE_SSL_P11PINLEN), and
- * return 0 to indicate success. Alternatively, the callback may
- * return -1 to indicate failure and cancel PIN entry (in which case,
- * the contents of the 'pin' parameter are ignored).
- *
- * When a PIN is required, the callback will be invoked repeatedly
- * (and indefinitely) until either the returned PIN code is correct,
- * the callback returns failure, or the token refuses login (e.g. when
- * the token is locked due to too many incorrect PINs!).  For the
- * first such invocation, the 'attempt' counter will have value zero;
- * it will increase by one for each subsequent attempt.
- *
- * The NE_SSL_P11PIN_COUNT_LOW and/or NE_SSL_P11PIN_FINAL_TRY hints
- * may be set in the 'flags' argument, if these hints are made
- * available by the token; not all tokens expose these hints. */
 typedef int (*gnutls_pkcs11_pin_callback_t)(void *userdata, int attempt,
-                                    const char *slot_descr,
-                                    const char *token_label,
-                                    unsigned int flags,
-                                    char *pin, size_t pin_max);
+		const char *slot_descr, const char *token_label,
+		unsigned int flags, char *pin, size_t pin_max);
 
 struct gnutls_pkcs11_obj_st;
 typedef struct gnutls_pkcs11_obj_st* gnutls_pkcs11_obj_t;
