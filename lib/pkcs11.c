@@ -5,7 +5,7 @@
  * Author: Nikos Mavrogiannopoulos
  *
  * Inspired and some parts based on neon PKCS #11 support by Joe Orton.
- * More ideas came from the pkcs11-helper library.
+ * More ideas came from the pkcs11-helper library by Alon Bar-Lev.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -68,6 +68,91 @@ static void* pin_data;
 
 gnutls_pkcs11_token_callback_t token_func;
 void* token_data;
+
+int pkcs11_rv_to_err(ck_rv_t rv)
+{
+    switch(rv) {
+        case CKR_OK:
+            return 0;
+        case CKR_HOST_MEMORY:
+            return GNUTLS_E_MEMORY_ERROR;
+        case CKR_SLOT_ID_INVALID:
+            return GNUTLS_E_PKCS11_SLOT_ERROR;
+        case CKR_ARGUMENTS_BAD:
+        case CKR_MECHANISM_PARAM_INVALID:
+            return GNUTLS_E_INVALID_REQUEST;
+        case CKR_NEED_TO_CREATE_THREADS:
+        case CKR_CANT_LOCK:
+        case CKR_FUNCTION_NOT_PARALLEL:
+        case CKR_MUTEX_BAD:
+        case CKR_MUTEX_NOT_LOCKED:
+            return GNUTLS_E_PKCS11_LOCKING_ERROR;
+        case CKR_ATTRIBUTE_READ_ONLY:
+        case CKR_ATTRIBUTE_SENSITIVE:
+        case CKR_ATTRIBUTE_TYPE_INVALID:
+        case CKR_ATTRIBUTE_VALUE_INVALID:
+            return GNUTLS_E_PKCS11_ATTRIBUTE_ERROR;
+        case CKR_DEVICE_ERROR:
+        case CKR_DEVICE_MEMORY:
+        case CKR_DEVICE_REMOVED:
+            return GNUTLS_E_PKCS11_DEVICE_ERROR;
+        case CKR_DATA_INVALID:
+        case CKR_DATA_LEN_RANGE:
+        case CKR_ENCRYPTED_DATA_INVALID:
+        case CKR_ENCRYPTED_DATA_LEN_RANGE:
+        case CKR_OBJECT_HANDLE_INVALID:
+            return GNUTLS_E_PKCS11_DATA_ERROR;
+        case CKR_FUNCTION_NOT_SUPPORTED:
+        case CKR_MECHANISM_INVALID:
+            return GNUTLS_E_PKCS11_UNSUPPORTED_FEATURE_ERROR;
+        case CKR_KEY_HANDLE_INVALID:
+        case CKR_KEY_SIZE_RANGE:
+        case CKR_KEY_TYPE_INCONSISTENT:
+        case CKR_KEY_NOT_NEEDED:
+        case CKR_KEY_CHANGED:
+        case CKR_KEY_NEEDED:
+        case CKR_KEY_INDIGESTIBLE:
+        case CKR_KEY_FUNCTION_NOT_PERMITTED:
+        case CKR_KEY_NOT_WRAPPABLE:
+        case CKR_KEY_UNEXTRACTABLE:
+            return GNUTLS_E_PKCS11_KEY_ERROR;
+        case CKR_PIN_INCORRECT:
+        case CKR_PIN_INVALID:
+        case CKR_PIN_LEN_RANGE:
+            return GNUTLS_E_PKCS11_PIN_ERROR;
+        case CKR_PIN_EXPIRED:
+            return GNUTLS_E_PKCS11_PIN_EXPIRED;
+        case CKR_PIN_LOCKED:
+            return GNUTLS_E_PKCS11_PIN_LOCKED;
+        case CKR_SESSION_CLOSED:
+        case CKR_SESSION_COUNT:
+        case CKR_SESSION_HANDLE_INVALID:
+        case CKR_SESSION_PARALLEL_NOT_SUPPORTED:
+        case CKR_SESSION_READ_ONLY:
+        case CKR_SESSION_EXISTS:
+        case CKR_SESSION_READ_ONLY_EXISTS:
+        case CKR_SESSION_READ_WRITE_SO_EXISTS:
+            return GNUTLS_E_PKCS11_SESSION_ERROR;
+        case CKR_SIGNATURE_INVALID:
+        case CKR_SIGNATURE_LEN_RANGE:
+            return GNUTLS_E_PKCS11_SIGNATURE_ERROR;
+        case CKR_TOKEN_NOT_PRESENT:
+        case CKR_TOKEN_NOT_RECOGNIZED:
+        case CKR_TOKEN_WRITE_PROTECTED:
+            return GNUTLS_E_PKCS11_TOKEN_ERROR;
+        case CKR_USER_ALREADY_LOGGED_IN:
+        case CKR_USER_NOT_LOGGED_IN:
+        case CKR_USER_PIN_NOT_INITIALIZED:
+        case CKR_USER_TYPE_INVALID:
+        case CKR_USER_ANOTHER_ALREADY_LOGGED_IN:
+        case CKR_USER_TOO_MANY_TYPES:
+            return GNUTLS_E_PKCS11_USER_ERROR;
+        case CKR_BUFFER_TOO_SMALL:
+            return GNUTLS_E_SHORT_MEMORY_BUFFER;
+        default:
+            return GNUTLS_E_PKCS11_ERROR;
+    }
+}
 
 /* Fake scan */
 void pkcs11_rescan_slots(void)
@@ -765,7 +850,7 @@ ck_rv_t rv;
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		_gnutls_debug_log("pk11: FindObjectsInit failed.\n");
-		ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+		ret = pkcs11_rv_to_err(rv);
 		goto fail;
 	}
 
@@ -1248,7 +1333,7 @@ static int find_obj_url(pakchois_session_t *pks, struct token_info *info, void* 
     if (rv != CKR_OK) {
         gnutls_assert();
         _gnutls_debug_log("pk11: FindObjectsInit failed.\n");
-        ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+        ret = pkcs11_rv_to_err(rv);
         goto cleanup;
     }
 
@@ -1594,7 +1679,7 @@ int pkcs11_login(pakchois_session_t *pks, struct token_info *info, token_creds_s
 
     _gnutls_debug_log("pk11: Login result = %lu\n", rv);
 
-    return (rv == CKR_OK || rv == CKR_USER_ALREADY_LOGGED_IN) ? 0 : GNUTLS_E_PKCS11_ERROR;
+    return (rv == CKR_OK || rv == CKR_USER_ALREADY_LOGGED_IN) ? 0 : pkcs11_rv_to_err(rv);
 }
 
 static int find_privkeys(pakchois_session_t *pks, struct token_info* info, struct pkey_list *list)
@@ -1618,7 +1703,7 @@ static int find_privkeys(pakchois_session_t *pks, struct token_info* info, struc
     rv = pakchois_find_objects_init(pks, a, 1);
     if (rv != CKR_OK) {
         gnutls_assert();
-        return GNUTLS_E_PKCS11_ERROR;
+        return pkcs11_rv_to_err(rv);
     }
 
     list->key_ids_size = 0;
@@ -1648,7 +1733,7 @@ static int find_privkeys(pakchois_session_t *pks, struct token_info* info, struc
     rv = pakchois_find_objects_init(pks, a, 1);
     if (rv != CKR_OK) {
         gnutls_assert();
-        return GNUTLS_E_PKCS11_ERROR;
+        return pkcs11_rv_to_err(rv);
     }
 
     current = 0;
@@ -1833,7 +1918,7 @@ static int find_objs(pakchois_session_t *pks, struct token_info *info, void* inp
     if (rv != CKR_OK) {
         gnutls_assert();
         _gnutls_debug_log("pk11: FindObjectsInit failed.\n");
-        return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+        return pkcs11_rv_to_err(rv);
     }
 
     while (pakchois_find_objects(pks, &obj, 1, &count) == CKR_OK

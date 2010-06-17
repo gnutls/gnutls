@@ -170,11 +170,12 @@ gnutls_pkcs11_privkey_sign_data(gnutls_pkcs11_privkey_t signer,
 #define FIND_OBJECT(pks, obj, key) \
 	do { \
 		int retries = 0; \
+		int rret; \
 		ret = pkcs11_find_object (&pks, &obj, &key->info, &key->creds, \
 			SESSION_LOGIN); \
 		if (ret < 0) { \
-			rv = token_func(token_data, key->info.label, retries++); \
-			if (rv == 0) continue; \
+			rret = token_func(token_data, key->info.label, retries++); \
+			if (rret == 0) continue; \
 			gnutls_assert(); \
 			return ret; \
 		} \
@@ -216,7 +217,7 @@ int gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	rv = pakchois_sign_init(pks, &mech, obj);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		ret = GNUTLS_E_PK_SIGN_FAILED;
+		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
 
@@ -225,7 +226,7 @@ int gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 			   &siglen);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		ret = GNUTLS_E_PK_SIGN_FAILED;
+		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
 
@@ -237,7 +238,7 @@ int gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	if (rv != CKR_OK) {
 		gnutls_free(signature->data);
 		gnutls_assert();
-		ret = GNUTLS_E_PK_SIGN_FAILED;
+		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
 
@@ -329,7 +330,7 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	rv = pakchois_decrypt_init(pks, &mech, obj);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		ret = GNUTLS_E_PK_DECRYPTION_FAILED;
+		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
 
@@ -338,7 +339,7 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 			   &siglen);
 	if (rv != CKR_OK) {
 		gnutls_assert();
-		ret = GNUTLS_E_PK_DECRYPTION_FAILED;
+		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
 
@@ -350,7 +351,7 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	if (rv != CKR_OK) {
 		gnutls_free(plaintext->data);
 		gnutls_assert();
-		ret = GNUTLS_E_PK_DECRYPTION_FAILED;
+		ret = pkcs11_rv_to_err(rv);
 		goto cleanup;
 	}
 

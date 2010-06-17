@@ -138,7 +138,7 @@ int gnutls_pkcs11_copy_x509_crt(const char* token_url, gnutls_x509_crt_t crt,
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		_gnutls_debug_log("pkcs11: %s\n", pakchois_error(rv));
-		ret = GNUTLS_E_PKCS11_ERROR;
+		ret = pkcs11_rv_to_err(rv);
 		goto  cleanup;
 	}
 	
@@ -321,7 +321,7 @@ int gnutls_pkcs11_copy_x509_privkey(const char* token_url,
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		_gnutls_debug_log("pkcs11: %s\n", pakchois_error(rv));
-		ret = GNUTLS_E_PKCS11_ERROR;
+		ret = pkcs11_rv_to_err(rv);
 		goto  cleanup;
 	}
 
@@ -446,19 +446,18 @@ static int delete_obj_url(pakchois_session_t *pks, struct token_info *info, void
     if (rv != CKR_OK) {
         gnutls_assert();
         _gnutls_debug_log("pk11: FindObjectsInit failed.\n");
-        ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+        ret = pkcs11_rv_to_err(rv);
         goto cleanup;
     }
 
     while (pakchois_find_objects(pks, &obj, 1, &count) == CKR_OK
            && count == 1) {
-		
-		rv = pakchois_destroy_object(pks, obj);
-		if (rv != CKR_OK) {
-            _gnutls_debug_log("pkcs11: Cannot destroy object: %s\n", pakchois_error(rv));
-        } else {
-			find_data->deleted++;
-		}
+	rv = pakchois_destroy_object(pks, obj);
+	if (rv != CKR_OK) {
+	    _gnutls_debug_log("pkcs11: Cannot destroy object: %s\n", pakchois_error(rv));
+	} else {
+	    find_data->deleted++;
+	}
         
         found = 1;
     }

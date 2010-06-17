@@ -51,7 +51,7 @@ struct gnutls_pkcs11_obj_st {
  */
 typedef int (*find_func_t)(pakchois_session_t *pks, struct token_info* tinfo, void* input);
 
-
+int pkcs11_rv_to_err(ck_rv_t rv);
 int pkcs11_url_to_info(const char* url, struct pkcs11_url_info* info);
 
 int pkcs11_get_info(struct pkcs11_url_info *info, gnutls_pkcs11_obj_info_t itype, 
