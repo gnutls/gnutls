@@ -48,6 +48,7 @@ void pkcs11_delete(FILE* outfile, const char *pkcs11_url, int batch);
 #define PKCS11_TYPE_TRUSTED 2
 #define PKCS11_TYPE_PK 3
 #define PKCS11_TYPE_ALL 4
+#define PKCS11_TYPE_PRIVKEY 5
 
 extern unsigned char buffer[];
 extern const int buffer_size;

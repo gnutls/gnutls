@@ -80,6 +80,7 @@ typedef enum {
 	GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED, /* certificates marked as trusted */
 	GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY, /* certificates with corresponding private key */
 	GNUTLS_PKCS11_OBJ_ATTR_PUBKEY, /* public keys */
+	GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY, /* private keys */
 	GNUTLS_PKCS11_OBJ_ATTR_ALL, /* everything! */
 } gnutls_pkcs11_obj_attr_t;
 

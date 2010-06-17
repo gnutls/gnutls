@@ -1833,7 +1833,8 @@ static int find_objs(pakchois_session_t *pks, struct token_info *info, void* inp
             gnutls_assert();
             return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
         }
-    } else if (find_data->flags==GNUTLS_PKCS11_OBJ_ATTR_ALL) {
+    } else if (find_data->flags==GNUTLS_PKCS11_OBJ_ATTR_ALL ||
+        find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY) {
         ret = pkcs11_login(pks, info, NULL);
         if (ret < 0) {
             gnutls_assert();
@@ -1883,6 +1884,13 @@ static int find_objs(pakchois_session_t *pks, struct token_info *info, void* inp
         
     } else if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_PUBKEY) {
         class = CKO_PUBLIC_KEY;
+
+        a[tot_values].type = CKA_CLASS;
+        a[tot_values].value = &class;
+        a[tot_values].value_len = sizeof class;
+        tot_values++;
+    } else if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY) {
+        class = CKO_PRIVATE_KEY;
 
         a[tot_values].type = CKA_CLASS;
         a[tot_values].value = &class;

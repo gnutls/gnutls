@@ -88,6 +88,8 @@ int i, flags;
 		flags = GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY;
 	} else if (type == PKCS11_TYPE_CRT_ALL) {
 		flags = GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL;
+	} else if (type == PKCS11_TYPE_PRIVKEY) {
+		flags = GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY;
 	} else {
 		flags = GNUTLS_PKCS11_OBJ_ATTR_ALL;
 	}
@@ -158,7 +160,7 @@ int i, flags;
 		
 		
 
-		if (flags == GNUTLS_PKCS11_OBJ_ATTR_ALL)
+		if (flags == GNUTLS_PKCS11_OBJ_ATTR_ALL || flags == GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY)
 			continue;
 
 		ret = gnutls_x509_crt_init(&xcrt);
