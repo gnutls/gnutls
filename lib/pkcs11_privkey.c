@@ -174,7 +174,7 @@ gnutls_pkcs11_privkey_sign_data(gnutls_pkcs11_privkey_t signer,
 		ret = pkcs11_find_object (&pks, &obj, &key->info, &key->creds, \
 			SESSION_LOGIN); \
 		if (ret < 0) { \
-			rret = token_func(token_data, key->info.label, retries++); \
+			rret = token_func(token_data, key->info.token, retries++); \
 			if (rret == 0) continue; \
 			gnutls_assert(); \
 			return ret; \
