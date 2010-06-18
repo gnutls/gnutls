@@ -5,6 +5,15 @@ See the end for copying conditions.
 
 * Version 2.11.0 (unreleased)
 
+** libgnutls: Added support for DSA signing/verifying with bit 
+length over 1024.
+
+** libgnutls-extra: When in FIPS mode gnutls_global_init_extra()
+has to be called to register any required md5 handlers.
+
+** libgnutls: Internal buffering code was replaced by simpler
+code contributed by Jonathan Bastien-Filiatrault.
+
 ** libgnutls: Internal API for extensions augmented to allow
 safe storing and loading of data on resumption. OPRFI extension
 was removed.
