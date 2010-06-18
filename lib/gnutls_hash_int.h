@@ -38,24 +38,24 @@ extern gnutls_crypto_mac_st _gnutls_mac_ops;
 extern int crypto_digest_prio;
 extern gnutls_crypto_digest_st _gnutls_digest_ops;
 
-typedef struct
-{
-  const gnutls_crypto_mac_st *cc;
-  void *ctx;
-} digest_reg_hd;
+typedef int (*hash_func)(void* handle, const void* text, size_t size);
+typedef int (*copy_func)(void **dst_ctx, void *src_ctx);
+typedef int (*output_func)(void *src_ctx, void *digest, size_t digestsize);
+typedef void (*deinit_func)(void* handle);
 
 typedef struct
 {
-  int registered;		/* true or false(0) */
-  union
-  {
-    void *gc;			/* when not registered */
-    digest_reg_hd rh;		/* when registered */
-  } hd;
   gnutls_mac_algorithm_t algorithm;
   const void *key;
   int keysize;
   int active;
+  
+  hash_func hash;
+  copy_func copy;
+  output_func output;
+  deinit_func deinit;
+  
+  void * handle;
 } digest_hd_st;
 
 /* basic functions */

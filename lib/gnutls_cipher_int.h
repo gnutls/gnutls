@@ -31,20 +31,16 @@
 extern int crypto_cipher_prio;
 extern gnutls_crypto_cipher_st _gnutls_cipher_ops;
 
-typedef struct
-{
-  const gnutls_crypto_single_cipher_st *cc;
-  void *ctx;
-} reg_hd;
+typedef int (*cipher_encrypt_func)(void* hd, const void* plaintext, size_t, void* ciphertext, size_t);
+typedef int (*cipher_decrypt_func)(void* hd, const void* ciphertext, size_t, void* plaintext, size_t);
+typedef void (*cipher_deinit_func)(void* hd);
 
 typedef struct
 {
-  int registered;		/* true or false(0) */
-  union
-  {
-    void *gc;			/* when not registered */
-    reg_hd rh;			/* when registered */
-  } hd;
+  void* handle;
+  cipher_encrypt_func encrypt;
+  cipher_decrypt_func decrypt;
+  cipher_deinit_func deinit;
 } cipher_hd_st;
 
 int _gnutls_cipher_init (cipher_hd_st *, gnutls_cipher_algorithm_t cipher,
