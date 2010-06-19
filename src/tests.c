@@ -445,7 +445,7 @@ test_aes (gnutls_session_t session)
   int ret;
 
   sprintf (prio_str, INIT_STR
-	   INIT_STR "+AES-128-CBC:" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
+	   "+AES-128-CBC:" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
 	   ":" ALL_KX ":" REST, protocol_str);
   _gnutls_priority_set_direct (session, prio_str);
 
