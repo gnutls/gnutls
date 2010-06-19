@@ -237,6 +237,43 @@ int _gnutls_ext_sr_recv_cs(gnutls_session_t session)
   return 0;    
 }
 
+int _gnutls_ext_sr_send_cs(gnutls_session_t session)
+{
+  int ret, set = 0;
+  sr_ext_st* priv;
+  extension_priv_data_t epriv;
+
+  ret = _gnutls_ext_get_session_data( session, 
+    GNUTLS_EXTENSION_SAFE_RENEGOTIATION, &epriv);
+  if (ret < 0)
+    {
+      set = 1;
+    }
+  else if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+
+  if (set != 0)
+    {
+      priv = gnutls_calloc(1, sizeof(*priv));
+      if (priv == NULL)
+        {
+	      gnutls_assert();
+	      return GNUTLS_E_MEMORY_ERROR;
+	    }
+      epriv.ptr = priv;
+    }
+  else
+    priv = epriv.ptr;
+    
+  if (set != 0)
+    _gnutls_ext_set_session_data( session, GNUTLS_EXTENSION_SAFE_RENEGOTIATION, epriv);
+
+  return 0;    
+}
+
 static int
 _gnutls_sr_recv_params (gnutls_session_t session,
 					const opaque * data,

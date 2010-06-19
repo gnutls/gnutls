@@ -1861,6 +1861,13 @@ _gnutls_copy_ciphersuites (gnutls_session_t session,
       /* Safe renegotiation signalling CS value is { 0x00, 0xff } */
       ret_data[pos++] = 0x00;
       ret_data[pos++] = 0xff;
+      ret = _gnutls_ext_sr_send_cs(session);
+      if (ret < 0) 
+        {
+          gnutls_assert();
+          gnutls_free (cipher_suites);
+          return ret;
+        }
     }
 
   gnutls_free (cipher_suites);

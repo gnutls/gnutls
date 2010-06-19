@@ -46,5 +46,6 @@ int _gnutls_ext_sr_finished( gnutls_session_t session, void* vdata,
     size_t vdata_size, int dir);
 int _gnutls_ext_sr_recv_cs(gnutls_session_t session);
 int _gnutls_ext_sr_verify(gnutls_session_t session);
+int _gnutls_ext_sr_send_cs(gnutls_session_t);
 
 #endif /* EXT_SAFE_RENEGOTIATION_H */

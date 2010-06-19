@@ -237,14 +237,9 @@ _gnutls_session_get_sign_algo (gnutls_session_t session,
 
   ret = _gnutls_ext_get_session_data(session, GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
     &epriv);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      return ret;
-    }
   priv = epriv.ptr;
 
-  if (!_gnutls_version_has_selectable_sighash (ver)
+  if (ret < 0 || !_gnutls_version_has_selectable_sighash (ver)
       || priv->sign_algorithms_size == 0)
     /* none set, allow all */
     {
