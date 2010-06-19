@@ -167,8 +167,7 @@ which is considered weak.
 
 @item AES_CBC
 AES or RIJNDAEL is the block cipher algorithm that replaces the old
-DES algorithm.  Has 128 bits block size and is used in CBC mode. This
-is not officially supported in TLS.
+DES algorithm.  Has 128 bits block size and is used in CBC mode.
 @end table
 
 Supported MAC algorithms:
