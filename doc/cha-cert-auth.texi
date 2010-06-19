@@ -331,7 +331,7 @@ operations on a token, as well as to objects residing on the token. A token can
 be a real hardware token such as a smart card, or it can be a software component
 such as @acronym{Gnome Keyring}. The objects residing on such token can be
 certificates, public keys, private keys or even plain data or  secret keys. Of those
-certificates and public/private key pairs can be used with @acronym{GnuTLS}. It's
+certificates and public/private key pairs can be used with @acronym{GnuTLS}. Its
 main advantage is that it allows operations on private key objects such as decryption
 and signing without accessing the key itself.
 
@@ -351,8 +351,8 @@ load=/usr/lib/gnome-keyring/gnome-keyring-pkcs11.so
 @end verbatim
 
 If you use this file, then there is no need for other initialization in
-@acronym{GnuTLS}, except for the PIN and token functions, to allow retrieving a PIN
-when accessing a protected object, such as a private key, or allowing probing
+@acronym{GnuTLS}, except for the PIN and token functions. Those allow retrieving a PIN
+when accessing a protected object, such as a private key, as well as probe
 the user to insert the token. All the initialization functions are below.
 
 @itemize
@@ -429,55 +429,56 @@ The following example will list all tokens.
 int i;
 char* url;
 
-	gnutls_global_init();
+gnutls_global_init();
 
-	for (i=0;;i++) {
-		ret = gnutls_pkcs11_token_get_url(i, &url);
-		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-			break;
+for (i=0;;i++) {
+	ret = gnutls_pkcs11_token_get_url(i, &url);
+	if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+		break;
 
-		if (ret < 0)
-			exit(1);
+	if (ret < 0)
+		exit(1);
 		
-		fprintf(stdout, "Token[%d]: URL: %s\n", i, url);
-	}
-	gnutls_global_deinit();
+	fprintf(stdout, "Token[%d]: URL: %s\n", i, url);
+	gnutls_free(url);
+}
+gnutls_global_deinit();
 @end verbatim
 
 
-The next one will list all objects in a token:
+The next one will list all certificates in a token, that have a corresponding
+private key:
 @verbatim
 gnutls_pkcs11_obj_t *obj_list;
 unsigned int obj_list_size = 0;
 gnutls_datum_t cinfo;
 int i;
 
-	obj_list_size = 0;
-	ret = gnutls_pkcs11_obj_list_import_url( obj_list, NULL, url, \
-				GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY);
-	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
-		exit(1);
+obj_list_size = 0;
+ret = gnutls_pkcs11_obj_list_import_url( obj_list, NULL, url, \
+			GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY);
+if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
+	exit(1);
 
-	/* no error checking from now on */
-	obj_list = malloc(sizeof(*obj_list)*obj_list_size);
+/* no error checking from now on */
+obj_list = malloc(sizeof(*obj_list)*obj_list_size);
 
-	gnutls_pkcs11_obj_list_import_url( obj_list, &obj_list_size, url, flags);
+gnutls_pkcs11_obj_list_import_url( obj_list, &obj_list_size, url, flags);
 
-	/* now all certificates are in obj_list */
+/* now all certificates are in obj_list */
+for (i=0;i<obj_list_size;i++) {
 
-	for (i=0;i<obj_list_size;i++) {
+	gnutls_x509_crt_init(&xcrt);
 
-		gnutls_x509_crt_init(&xcrt);
+	gnutls_x509_crt_import_pkcs11(xcrt, obj_list[i]);
 		
-		gnutls_x509_crt_import_pkcs11(xcrt, obj_list[i]);
-		
-		gnutls_x509_crt_print (xcrt, GNUTLS_CRT_PRINT_FULL, &cinfo);
+	gnutls_x509_crt_print (xcrt, GNUTLS_CRT_PRINT_FULL, &cinfo);
 
-		fprintf(stdout, "cert[%d]:\n %s\n\n", cinfo.data);
+	fprintf(stdout, "cert[%d]:\n %s\n\n", cinfo.data);
 
-		gnutls_free(cinfo.data);
-		gnutls_x509_crt_deinit(&xcrt);
-	}
+	gnutls_free(cinfo.data);
+	gnutls_x509_crt_deinit(&xcrt);
+}
 @end verbatim
 
 
