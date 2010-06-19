@@ -1648,6 +1648,8 @@ int pkcs11_login(pakchois_session_t *pks, struct token_info *info, token_creds_s
 
             memcpy(pin, creds->pin, creds->pin_size);
             pin_len = creds->pin_size;
+            
+            ret = 0;
         } else {
             if (info->tinfo.flags & CKF_USER_PIN_COUNT_LOW)
                 flags |= GNUTLS_PKCS11_PIN_COUNT_LOW;
@@ -1665,13 +1667,15 @@ int pkcs11_login(pakchois_session_t *pks, struct token_info *info, token_creds_s
             }
             pin_len = strlen(pin);
             
-            if (ret == GNUTLS_E_PKCS11_PIN_SAVE && creds) {
-                memcpy(creds->pin, pin, pin_len);
-                creds->pin_size = pin_len;
-            }
         }
 
         rv = pakchois_login(pks, CKU_USER, (unsigned char *)pin, pin_len);
+
+        if (ret == GNUTLS_E_PKCS11_PIN_SAVE && creds && (rv==CKR_OK||rv==CKR_USER_ALREADY_LOGGED_IN)) {
+                memcpy(creds->pin, pin, pin_len);
+                creds->pin_size = pin_len;
+        }
+
         /* Try to scrub the pin off the stack.  Clever compilers will
          * probably optimize this away, oh well. */
         memset(pin, 0, sizeof pin);
