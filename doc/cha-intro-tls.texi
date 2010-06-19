@@ -595,6 +595,20 @@ table that extends beyond the key sizes given above.
 
 The recommendations are fairly consistent.
 
+When using @acronym{GnuTLS} and 
+bit sizes are required as input it is recommended to use the following
+functions:
+@itemize
+
+@item @ref{gnutls_pk_bits_to_sec_param}
+
+@item @ref{gnutls_sec_param_to_pk_bits}
+
+@end itemize
+Those functions will convert a human understandable security parameter
+of @code{gnutls_sec_param_t} type, to a number of bits suitable for a public 
+key algorithm.
+
 @node On SSL 2 and older protocols
 @section On SSL 2 and Older Protocols
 @cindex SSL 2
