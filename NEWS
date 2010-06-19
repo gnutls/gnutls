@@ -5,6 +5,12 @@ See the end for copying conditions.
 
 * Version 2.11.0 (unreleased)
 
+** libgnutls: Added support for reading DN from EV-certificates.
+New DN values:
+jurisdictionOfIncorporationLocalityName,
+jurisdictionOfIncorporationStateOrProvinceName,
+jurisdictionOfIncorporationCountryName
+
 ** libgnutls: Added support for DSA signing/verifying with bit 
 length over 1024.
 
