@@ -76,7 +76,6 @@ _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
           gnutls_assert ();
           return GNUTLS_E_HASH_FAILED;
         }
-      dig->active = 1;
 
       dig->hash = cc->hash;
       dig->copy = cc->copy;
@@ -98,7 +97,6 @@ _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
   dig->output = _gnutls_digest_ops.output;
   dig->deinit = _gnutls_digest_ops.deinit;
 
-  dig->active = 1;
   return 0;
 }
 
@@ -126,7 +124,6 @@ _gnutls_hash_copy (digest_hd_st * dst, digest_hd_st * src)
 
   memset (dst, 0, sizeof (*dst));
   dst->algorithm = src->algorithm;
-  dst->active = 1;
 
   dst->hash = src->hash;
   dst->copy = src->copy;
@@ -154,7 +151,7 @@ _gnutls_hash_output (digest_hd_st * handle, void *digest)
 void
 _gnutls_hash_deinit (digest_hd_st * handle, void *digest)
 {
-  if (handle->active != 1)
+  if (handle->handle == NULL)
     {
       return;
     }
@@ -162,9 +159,8 @@ _gnutls_hash_deinit (digest_hd_st * handle, void *digest)
   if (digest != NULL)
     _gnutls_hash_output (handle, digest);
 
-  handle->active = 0;
-
   handle->deinit (handle->handle);
+  handle->handle = NULL;
 }
 
 int
@@ -262,7 +258,6 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
       dig->output = cc->output;
       dig->deinit = cc->deinit;
 
-      dig->active = 1;
       return 0;
     }
 
@@ -280,7 +275,6 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
   dig->output = _gnutls_mac_ops.output;
   dig->deinit = _gnutls_mac_ops.deinit;
 
-  dig->active = 1;
   return 0;
 }
 
@@ -310,7 +304,7 @@ _gnutls_hmac_output (digest_hd_st * handle, void *digest)
 void
 _gnutls_hmac_deinit (digest_hd_st * handle, void *digest)
 {
-  if (handle->active != 1)
+  if (handle->handle == NULL)
     {
       return;
     }
@@ -318,8 +312,8 @@ _gnutls_hmac_deinit (digest_hd_st * handle, void *digest)
   if (digest)
     _gnutls_hmac_output (handle, digest);
 
-  handle->active = 0;
   handle->deinit (handle->handle);
+  handle->handle = NULL;
 }
 
 inline static int

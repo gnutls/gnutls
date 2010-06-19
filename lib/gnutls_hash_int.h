@@ -48,7 +48,6 @@ typedef struct
   gnutls_mac_algorithm_t algorithm;
   const void *key;
   int keysize;
-  int active;
   
   hash_func hash;
   copy_func copy;
