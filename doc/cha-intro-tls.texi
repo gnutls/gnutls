@@ -696,21 +696,35 @@ the following parameter: @code{--priority "NORMAL:%COMPAT"}.
 @section Safe Renegotiation
 @cindex renegotiation
 
-Some application protocols and implementations uses the TLS
-renegotiation feature in a manner that enables attackers to insert
+TLS gives the option to two communicating parties to renegotiate
+and update their security parameters. One useful example of this feature
+was for a client to initially connect using anonymous negotiation to a
+server, and the renegotiate using some authenticated ciphersuite. This occured
+to avoid having the client sending its credentials in the clear.
+
+However this renegotiation, as initially designed would not ensure that
+the party one is renegotiating is the same as the one in the initial negotiation.
+For example one server could forward all renegotiation traffic to an other
+server who will see this traffic as an initial negotiation attempt.
+
+This might be seen as a valid design decision, but it seems it was
+not widely known or understood, thus today some application protocols the TLS
+renegotiation feature in a manner that enables a malicious server to insert
 content of his choice in the beginning of a TLS session.
 
-One easy to understand vulnerability is HTTPS when servers request
-client certificates optionally for certain parts of a web site.  The
+The most prominent vulnerability was with HTTPS. There servers request
+a renegotiation to enforce an anonymous user to use a certificate in order
+to access certain parts of a web site.  The
 attack works by having the attacker simulate a client and connect to a
 server, with server-only authentication, and send some data intended
-to cause harm.  When the proper client attempts to contact the server,
-the attacker hijacks that connection and uses the TLS renegotiation
-feature with the server and splices in the client connection to the
-already established connection between the attacker and server.  The
+to cause harm.  The server will then require renegotiation from him
+in order to perform the request. 
+When the proper client attempts to contact the server,
+the attacker hijacks that connection and forwards traffic to
+the initial server that requested renegotiation.  The
 attacker will not be able to read the data exchanged between the
 client and the server.  However, the server will (incorrectly) assume
-that the data sent by the attacker was sent by the now authenticated
+that the initial request sent by the attacker was sent by the now authenticated
 client.  The result is a prefix plain-text injection attack.
 
 The above is just one example.  Other vulnerabilities exists that do
@@ -733,8 +747,8 @@ not support the safe renegotiation extension.  Clients and servers
 will refuse renegotiation attempts when the extension has not been
 negotiated.
 
-Note that permitting clients to connect to servers even when the safe
-renegotiation extension is not negotiated open up for some attacks.
+Note that permitting clients to connect to servers when the safe
+renegotiation extension is not enabled, is open up for attacks.
 Changing this default behaviour would prevent interoperability against
 the majority of deployed servers out there.  We will reconsider this
 default behaviour in the future when more servers have been upgraded.
