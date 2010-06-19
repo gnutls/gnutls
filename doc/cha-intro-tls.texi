@@ -690,7 +690,7 @@ different incoming IP addresses.
 
 To enable the workaround in the @code{gnutls-cli} client or the
 @code{gnutls-serv} server, for testing of other implementations, use
-the following parameter: @code{--priority "%COMPAT"}.
+the following parameter: @code{--priority "NORMAL:%COMPAT"}.
 
 This problem has been discussed on mailing lists and in bug reports.
 This section tries to collect all pieces of information that we know
