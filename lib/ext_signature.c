@@ -296,7 +296,7 @@ _gnutls_session_sign_algo_enabled (gnutls_session_t session,
  * then %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned even
  * for the first index.  The first index is 0.
  *
- * This function is usefull in the certificate callback functions
+ * This function is useful in the certificate callback functions
  * to assist in selecting the correct certificate.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
