@@ -35,6 +35,12 @@ static unsigned char data[64 * 1024];
 #define TOTAL_ITER 8*1024
 
 static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "|<%d>| %s", level, str);
+}
+
+static void
 cipher_bench (int algo, int size)
 {
   int ret, i;
@@ -64,7 +70,6 @@ cipher_bench (int algo, int size)
   key.data = _key;
   key.size = keysize;
 
-  gnutls_global_init ();
 
   printf ("Checking %s (%dkb payload)... ", gnutls_cipher_get_name (algo),
 	  size);
@@ -117,8 +122,6 @@ mac_bench (int algo, int size)
     return;
   memset (_key, 0xf0, blocksize);
 
-  gnutls_global_init ();
-
   printf ("Checking %s (%dkb payload)... ", gnutls_mac_get_name (algo), size);
   fflush (stdout);
   gettime (&start);
@@ -143,8 +146,17 @@ mac_bench (int algo, int size)
 }
 
 int
-main (void)
+main (int argc, char** argv)
 {
+  int debug_level = 0;
+
+  if (argc > 1)
+    debug_level = 2;
+
+  gnutls_global_set_log_function (tls_log_func);
+  gnutls_global_set_log_level (debug_level);
+  gnutls_global_init ();
+
   mac_bench (GNUTLS_MAC_SHA1, 4);
   mac_bench (GNUTLS_MAC_SHA1, 8);
   mac_bench (GNUTLS_MAC_SHA1, 16);
