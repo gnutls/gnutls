@@ -80,26 +80,27 @@ typedef struct
 } TLS_TEST;
 
 static const TLS_TEST tls_tests[] = {
+  {"for SSL 3.0 support", test_ssl3, "yes", "no", "dunno"},
+  {"whether \%COMPAT is required", test_record_padding, "no", "yes", "dunno"},
+  {"for TLS 1.0 support", test_tls1, "yes", "no", "dunno"},
+  {"for TLS 1.1 support", test_tls1_1, "yes", "no", "dunno"},
+  {"fallback from TLS 1.1 to", test_tls1_1_fallback, "TLS 1.0", "failed",
+   "SSL 3.0"},
+  {"for TLS 1.2 support", test_tls1_2, "yes", "no", "dunno"},
+  /* this test will disable TLS 1.0 if the server is
+   * buggy */
+  {"whether we need to disable TLS 1.0", test_tls_disable, "no", "yes",
+   "dunno"},
   {"for Safe renegotiation support", test_safe_renegotiation, "yes", "no",
    "dunno"},
   {"for Safe renegotiation support (SCSV)", test_safe_renegotiation_scsv,
    "yes", "no", "dunno"},
-  {"for TLS 1.2 support", test_tls1_2, "yes", "no", "dunno"},
-  {"for TLS 1.1 support", test_tls1_1, "yes", "no", "dunno"},
-  {"fallback from TLS 1.1 to", test_tls1_1_fallback, "TLS 1.0", "failed",
-   "SSL 3.0"},
-  {"for TLS 1.0 support", test_tls1, "yes", "no", "dunno"},
-  {"for SSL 3.0 support", test_ssl3, "yes", "no", "dunno"},
   {"for HTTPS server name", test_server, "", "failed", "not checked"},
   {"for version rollback bug in RSA PMS", test_rsa_pms, "no", "yes",
    "dunno"},
   {"for version rollback bug in Client Hello", test_version_rollback,
    "no", "yes", "dunno"},
 
-  /* this test will disable TLS 1.0 if the server is
-   * buggy */
-  {"whether we need to disable TLS 1.0", test_tls_disable, "no", "yes",
-   "dunno"},
 
   {"whether the server ignores the RSA PMS version",
    test_rsa_pms_version_check, "yes", "no", "dunno"},

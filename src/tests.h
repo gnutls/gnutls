@@ -4,6 +4,7 @@ typedef enum
 } test_code_t;
 
 test_code_t test_server (gnutls_session_t state);
+test_code_t test_record_padding (gnutls_session_t state);
 test_code_t test_export (gnutls_session_t state);
 test_code_t test_export_info (gnutls_session_t state);
 test_code_t test_hello_extension (gnutls_session_t state);
