@@ -26,6 +26,7 @@
 #include <gnutls_int.h>
 #include <gnutls/crypto.h>
 #include <gnutls_cryptodev.h>
+#include <gnutls_errors.h>
 
 #ifdef ENABLE_CRYPTODEV
 
@@ -167,6 +168,7 @@ cryptodev_deinit (void *_ctx)
 {
   struct cryptodev_ctx *ctx = _ctx;
 
+  ioctl(ctx->cfd, CIOCFSESSION, &ctx->sess);
   close (ctx->cfd);
   gnutls_free (ctx);
 }
@@ -218,6 +220,9 @@ register_crypto (int cfd)
 	  continue;
 	}
 
+      ioctl(cfd, CIOCFSESSION, &sess);
+      
+      _gnutls_debug_log("/dev/crypto: registering: %s\n", gnutls_cipher_get_name(cipher_map[i].gnutls_cipher));
       ret =
 	gnutls_crypto_single_cipher_register (cipher_map[i].gnutls_cipher, 90,
 					      &cipher_struct);
