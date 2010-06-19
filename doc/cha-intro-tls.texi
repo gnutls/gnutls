@@ -692,19 +692,6 @@ To enable the workaround in the @code{gnutls-cli} client or the
 @code{gnutls-serv} server, for testing of other implementations, use
 the following parameter: @code{--priority "NORMAL:%COMPAT"}.
 
-This problem has been discussed on mailing lists and in bug reports.
-This section tries to collect all pieces of information that we know
-about the problem.  If you wish to go back to the old discussions,
-here are some links:
-
-@url{http://bugs.debian.org/390712}
-
-@url{http://bugs.debian.org/402861}
-
-@url{http://bugs.debian.org/438137}
-
-@url{http://thread.gmane.org/gmane.ietf.tls/3079}
-
 @node Safe Renegotiation
 @section Safe Renegotiation
 @cindex renegotiation
