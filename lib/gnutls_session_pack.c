@@ -302,10 +302,9 @@ pack_certificate_auth_info (gnutls_session_t session,
   unsigned int i;
   int cur_size, ret;
   cert_auth_info_t info = _gnutls_get_auth_info (session);
-  void* size_pos;
+  int size_offset;
 
-  size_pos = ps->data + ps->length; 
-
+  size_offset = ps->length;
   BUFFER_APPEND_NUM(ps, 0);
   cur_size = ps->length;
 
@@ -326,7 +325,7 @@ pack_certificate_auth_info (gnutls_session_t session,
     }
 
   /* write the real size */
-  _gnutls_write_uint32(ps->length-cur_size, size_pos);
+  _gnutls_write_uint32(ps->length-cur_size, ps->data+size_offset);
 
   return 0;
 }
@@ -428,7 +427,7 @@ pack_srp_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
 {
   srp_server_auth_info_t info = _gnutls_get_auth_info (session);
   int len, ret;
-  void* size_pos;
+  int size_offset;
   size_t cur_size;
 
   if (info && info->username)
@@ -436,15 +435,14 @@ pack_srp_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
   else
     len = 0;
 
-  size_pos = ps->data + ps->length;
-
+  size_offset = ps->length;
   BUFFER_APPEND_NUM(ps, 0);
   cur_size = ps->length;
 
   BUFFER_APPEND_PFX(ps, info->username, len);
 
   /* write the real size */
-  _gnutls_write_uint32(ps->length-cur_size, size_pos);
+  _gnutls_write_uint32(ps->length-cur_size, ps->data+size_offset);
 
   return 0;
 }
@@ -513,10 +511,9 @@ pack_anon_auth_info (gnutls_session_t session,
 {
   int cur_size, ret;
   anon_auth_info_t info = _gnutls_get_auth_info (session);
-  void* size_pos;
+  int size_offset;
 
-  size_pos = ps->data + ps->length;
-
+  size_offset = ps->length;
   BUFFER_APPEND_NUM(ps, 0);
   cur_size = ps->length;
 
@@ -529,7 +526,7 @@ pack_anon_auth_info (gnutls_session_t session,
     }
 
   /* write the real size */
-  _gnutls_write_uint32(ps->length-cur_size, size_pos);
+  _gnutls_write_uint32(ps->length-cur_size, ps->data+size_offset);
 
   return 0;
 }
@@ -610,7 +607,7 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
   psk_auth_info_t info;
   int username_len;
   int hint_len, ret;
-  void* size_pos;
+  int size_offset;
   size_t cur_size;
 
   info = _gnutls_get_auth_info (session);
@@ -625,8 +622,7 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
   else
     hint_len = 0;
 
-  size_pos = ps->data + ps->length;
-
+  size_offset = ps->length;
   BUFFER_APPEND_NUM(ps, 0);
   cur_size = ps->length;
 
@@ -639,7 +635,7 @@ pack_psk_auth_info (gnutls_session_t session, gnutls_buffer_st * ps)
   BUFFER_APPEND_PFX( ps, info->dh.public_key.data, info->dh.public_key.size);
 
   /* write the real size */
-  _gnutls_write_uint32(ps->length-cur_size, size_pos);
+  _gnutls_write_uint32(ps->length-cur_size, ps->data+size_offset);
 
   return 0;
 }
@@ -742,13 +738,12 @@ pack_security_parameters (gnutls_session_t session,
 {
 
   int ret;
-  void* size_pos;
+  int size_offset;
   size_t cur_size;
 
   /* move after the auth info stuff.
    */
-  size_pos = ps->data + ps->length;
-
+  size_offset = ps->length;
   BUFFER_APPEND_NUM(ps, 0);
   cur_size = ps->length;
 
@@ -776,7 +771,7 @@ pack_security_parameters (gnutls_session_t session,
 
   BUFFER_APPEND_NUM(ps, session->security_parameters.timestamp);
 
-  _gnutls_write_uint32(ps->length-cur_size, size_pos);
+  _gnutls_write_uint32(ps->length-cur_size, ps->data+size_offset);
 
   return 0;
 }

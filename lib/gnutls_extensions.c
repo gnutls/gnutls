@@ -430,7 +430,7 @@ int _gnutls_ext_pack(gnutls_session_t session, gnutls_buffer_st* packed)
 int i, ret;
 extension_priv_data_t data;
 int cur_size;
-void* size_pos;
+int size_offset;
 void* total_exts_pos;
 int exts = 0;
 
@@ -445,8 +445,7 @@ int exts = 0;
         {
 	  BUFFER_APPEND_NUM(packed, extfunc[i].type);
 	  
-	  size_pos = packed->data + packed->length;
-	  
+	  size_offset = packed->length;
 	  BUFFER_APPEND_NUM(packed, 0);
 	  
 	  cur_size = packed->length;
@@ -460,7 +459,7 @@ int exts = 0;
 	  
 	  exts++;
 	  /* write the actual size */
-	  _gnutls_write_uint32(packed->length-cur_size, size_pos);
+	  _gnutls_write_uint32(packed->length-cur_size, packed->data+size_offset);
         }
     }
 
