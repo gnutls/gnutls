@@ -496,34 +496,36 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
    * self-signed E but already removed above), and we trust B, remove
    * B, C and D. */
   if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_SAME))
+    i = 0; /* also replace the first one */
+  else
+    i = 1; /* do not replace the first one */
+    
+  for (; i < clist_size; i++)
     {
-      for (i = 0; i < clist_size; i++)
-	{
-	  int j;
+      int j;
 
-	  for (j = 0; j < tcas_size; j++)
-	    {
-	      if (check_if_same_cert (certificate_list[i],
+      for (j = 0; j < tcas_size; j++)
+        {
+          if (check_if_same_cert (certificate_list[i],
 				      trusted_cas[j]) == 0)
-		{
-		  /* explicity time check for trusted CA that we remove from
-		   * list. GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS
-		   */
-		  if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS)
+	    {
+	      /* explicity time check for trusted CA that we remove from
+	       * list. GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS
+	       */
+	      if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS)
 		      && !(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS))
-		    {
+                {
 		      status |= check_time (trusted_cas[j], now);
 		      if (status != 0)
 			{
 			  return status;
 			}
-		    }
-		  clist_size = i;
-		  break;
 		}
+              clist_size = i;
+	      break;
 	    }
-	  /* clist_size may have been changed which gets out of loop */
-	}
+        }
+        /* clist_size may have been changed which gets out of loop */
     }
 
   if (clist_size == 0)
