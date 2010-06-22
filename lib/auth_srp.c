@@ -165,7 +165,7 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
   info = _gnutls_get_auth_info (session);
   username = info->username;
 
-  _gnutls_str_cpy (username, MAX_SRP_USERNAME, priv->username);
+  _gnutls_str_cpy (username, MAX_USERNAME_SIZE, priv->username);
 
   ret = _gnutls_srp_pwd_read_entry (session, username, &pwd_entry);
 

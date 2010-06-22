@@ -57,9 +57,9 @@ typedef struct gnutls_psk_server_credentials_st
 /* these structures should not use allocated data */
 typedef struct psk_auth_info_st
 {
-  char username[MAX_SRP_USERNAME + 1];
+  char username[MAX_USERNAME_SIZE + 1];
   dh_info_st dh;
-  char hint[MAX_SRP_USERNAME + 1];
+  char hint[MAX_USERNAME_SIZE + 1];
 } *psk_auth_info_t;
 
 

@@ -265,7 +265,7 @@ _gnutls_proc_psk_client_kx (gnutls_session_t session, opaque * data,
    */
   info = _gnutls_get_auth_info (session);
 
-  if (username.size > MAX_SRP_USERNAME)
+  if (username.size > MAX_USERNAME_SIZE)
     {
       gnutls_assert ();
       return GNUTLS_E_ILLEGAL_SRP_USERNAME;
@@ -377,7 +377,7 @@ _gnutls_proc_psk_server_kx (gnutls_session_t session, opaque * data,
    */
   info = _gnutls_get_auth_info (session);
 
-  if (hint.size > MAX_SRP_USERNAME)
+  if (hint.size > MAX_USERNAME_SIZE)
     {
       gnutls_assert ();
       return GNUTLS_E_ILLEGAL_SRP_USERNAME;
