@@ -62,8 +62,6 @@ SRP_COBJECTS = ext_srp.c gnutls_srp.c auth_srp.c auth_srp_passwd.c	\
 PSK_COBJECTS = auth_psk.c auth_psk_passwd.c gnutls_psk.c	\
 	auth_dhe_psk.c gnutls_psk_netconf.c
 
-OPRFI_COBJECTS = ext_oprfi.c
-
 SESSION_TICKET_COBJECTS = ext_session_ticket.c
 
 COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
@@ -91,10 +89,6 @@ else
 SUBDIRS += gcrypt
 endif
 
-if ENABLE_OPRFI
-COBJECTS += $(OPRFI_COBJECTS)
-endif
-
 HFILES = debug.h gnutls_compress.h gnutls_cipher.h gnutls_buffers.h	\
 	gnutls_errors.h gnutls_int.h gnutls_handshake.h gnutls_num.h	\
 	gnutls_algorithms.h gnutls_dh.h gnutls_kx.h gnutls_hash_int.h	\
@@ -108,7 +102,7 @@ HFILES = debug.h gnutls_compress.h gnutls_cipher.h gnutls_buffers.h	\
 	gnutls_rsa_export.h ext_server_name.h auth_dh_common.h		\
 	ext_srp.h gnutls_srp.h auth_srp.h auth_srp_passwd.h		\
 	gnutls_helper.h auth_psk.h auth_psk_passwd.h			\
-	gnutls_supplemental.h ext_oprfi.h crypto.h random.h		\
+	gnutls_supplemental.h crypto.h random.h		\
 	ext_session_ticket.h ext_signature.h gnutls_cryptodev.h		\
 	ext_safe_renegotiation.h
 
