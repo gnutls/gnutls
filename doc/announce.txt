@@ -454,7 +454,7 @@ GnuTLS may be downloaded from one of the mirror sites or direct from
 <ftp://ftp.gnu.org/gnu/gnutls/>.  The list of mirrors can be found at
 <http://www.gnu.org/software/gnutls/download.html>.
 
-Here are the BZIP2 compressed sources (6.0MB):
+Here are the BZIP2 compressed sources (7.2MB):
 
   ftp://ftp.gnu.org/gnu/gnutls/gnutls-2.10.0.tar.bz2
   http://ftp.gnu.org/gnu/gnutls/gnutls-2.10.0.tar.bz2
@@ -493,9 +493,9 @@ Alternatively, after successfully verifying the OpenPGP signature of
 this announcement, you could verify that the files match the following
 checksum values.  The values are for SHA-1 and SHA-224 respectively:
 
-7c102253bb4e817f393b9979a62c647010312eac  gnutls-2.10.0.tar.bz2
+16c94a1262f8ea3c4dd34eec495bd57203bbcd3a  gnutls-2.10.0.tar.bz2
 
-57ee306f261ed331b8386baf854f737fbf24da7b3bcc32331d34176b  gnutls-2.10.0.tar.bz2
+f97d09916dc87315a245991ce005f658915ca3770f4c48006d28c358  gnutls-2.10.0.tar.bz2
 
 Documentation
 =============
@@ -512,7 +512,8 @@ In particular the following formats are available:
 For developers there is a GnuTLS API reference manual formatted using
 the GTK-DOC tools:
 
-  http://www.gnu.org/software/gnutls/reference/gnutls-gnutls.html
+  HTML: http://www.gnu.org/software/gnutls/reference/gnutls-gnutls.html
+  PDF: http://www.gnu.org/software/gnutls/reference/gnutls.pdf
 
 Community
 =========
@@ -532,35 +533,39 @@ Windows installer
 
 GnuTLS has been ported to the Windows operating system, and a binary
 installer is available.  The installer contains DLLs for application
-development, manuals, examples, and source code.  The installer uses
-libgpg-error v1.7, libgcrypt v1.4.5, libtasn1 v2.6, and GnuTLS
-v2.10.0.
+development, manuals, examples, and source code.  The installer
+contains libgpg-error v1.8, libgcrypt v1.4.5, libtasn1 v2.7, and
+GnuTLS v2.10.0.
 
 For more information about GnuTLS for Windows:
   http://josefsson.org/gnutls4win/
 
 The Windows binary installer and PGP signature:
-  http://josefsson.org/gnutls4win/gnutls-2.10.0.exe (15MB)
+  http://josefsson.org/gnutls4win/gnutls-2.10.0.exe (17MB)
   http://josefsson.org/gnutls4win/gnutls-2.10.0.exe.sig
 
 The checksum values for SHA-1 and SHA-224 are:
 
-8a7965168c542edec3259469b6c0e87a9a2b4626  gnutls-2.10.0.exe
+5fb951d9819f45fc53ff368c87aea61391c782f1  gnutls-2.10.0.exe
 
-5f76c907eac768b714dc7187a17f87c0393439cf1ef44ab145aab6e3  gnutls-2.10.0.exe
+ad39fdbdff193c622e72eaf837443d882f7b3876a7c1a911123339cb  gnutls-2.10.0.exe
 
 A ZIP archive containing the Windows binaries:
-  http://josefsson.org/gnutls4win/gnutls-2.10.0.zip (5.3MB)
+  http://josefsson.org/gnutls4win/gnutls-2.10.0.zip (5.5MB)
   http://josefsson.org/gnutls4win/gnutls-2.10.0.zip.sig
 
 A Debian mingw32 package is also available:
-  http://josefsson.org/gnutls4win/mingw32-gnutls_2.7.10-1_all.deb (4.8MB)
+  http://josefsson.org/gnutls4win/mingw32-gnutls_2.7.10-1_all.deb (5.0MB)
 
 The checksum values for SHA-1 and SHA-224 are:
 
-aca9f9f1adba09b952e095039595d4c5d9e67d46  mingw32-gnutls_2.10.0-1_all.deb
+7ffabf34274cfc73c84550aae7efe650df10f77e  gnutls-2.10.0.zip
 
-269020738a9f36135e3f231a94cdb2cabc0edd3658092d76b87c27dc  mingw32-gnutls_2.10.0-1_all.deb
+a657b3c5a07964a46f214bed5d72f731d85ef5829072d15e3c817fca  gnutls-2.10.0.zip
+
+6fd7c6264237f76ba31304d16d2d72a428126267  mingw32-gnutls_2.10.0-1_all.deb
+
+944f8fa4db48efdffd0e03630c86ca275925d5f295fd99614f58ddfd  mingw32-gnutls_2.10.0-1_all.deb
 
 Internationalization
 ====================
