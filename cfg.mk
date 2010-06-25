@@ -106,9 +106,9 @@ prepare:
 upload:
 	git push
 	git push --tags
-	build-aux/gnupload --to alpha.gnu.org:$(PACKAGE) $(distdir).tar.bz2
+	build-aux/gnupload --to ftp.gnu.org:$(PACKAGE) $(distdir).tar.bz2
 	scp $(distdir).tar.bz2 $(distdir).tar.bz2.sig igloo.linux.gr:~ftp/pub/gnutls/devel/
-	ssh igloo.linux.gr 'cd ~ftp/pub/gnutls/devel/ && sha1sum *.tar.bz2 > CHECKSUMS'
+	ssh igloo.linux.gr 'cd ~ftp/pub/gnutls/ && sha1sum *.tar.bz2 > CHECKSUMS'
 	cp $(distdir).tar.bz2 $(distdir).tar.bz2.sig ../releases/$(PACKAGE)/
 
 web:
