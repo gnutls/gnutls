@@ -195,6 +195,35 @@ generate_private_key_int (void)
   return key;
 }
 
+static int
+cipher_to_flags (const char *cipher)
+{
+  if (strcasecmp (cipher, "3des") == 0)
+    {
+      return GNUTLS_PKCS_USE_PBES2_3DES;
+    }
+  else if (strcasecmp (cipher, "aes-128") == 0)
+    {
+      return GNUTLS_PKCS_USE_PBES2_AES_128;
+    }
+  else if (strcasecmp (cipher, "aes-192") == 0)
+    {
+      return GNUTLS_PKCS_USE_PBES2_AES_192;
+    }
+  else if (strcasecmp (cipher, "aes-256") == 0)
+    {
+      return GNUTLS_PKCS_USE_PBES2_AES_256;
+    }
+  else if (strcasecmp (cipher, "rc2-40") == 0)
+    {
+      return GNUTLS_PKCS_USE_PKCS12_RC2_40;
+    }
+
+  error (EXIT_FAILURE, 0, "Unknown cipher %s\n", cipher);
+  return -1;
+}
+
+
 static void
 print_private_key (gnutls_x509_privkey_t key)
 {
@@ -220,7 +249,7 @@ print_private_key (gnutls_x509_privkey_t key)
       if (info.export)
 	flags = GNUTLS_PKCS_USE_PKCS12_RC2_40;
       else
-	flags = GNUTLS_PKCS_USE_PKCS12_3DES;
+	flags = cipher_to_flags (info.pkcs_cipher);
 
       if ((pass = get_confirmed_pass (true)) == NULL || *pass == '\0')
 	flags = GNUTLS_PKCS_PLAIN;
