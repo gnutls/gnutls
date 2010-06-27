@@ -109,7 +109,7 @@ char protocol_str[] = "+VERS-TLS1.0:+VERS-SSL3.0";
 char prio_str[256] = "";
 
 #define ALL_CIPHERS "+3DES-CBC:+ARCFOUR-128:+ARCFOUR-40"
-#define BLOCK_CIPHERS "+3DES-CBC"
+#define BLOCK_CIPHERS "+3DES-CBC:+AES-128-CBC"
 #define ALL_COMP "+COMP-NULL"
 #define ALL_MACS "+SHA1:+MD5"
 #define ALL_CERTTYPES "+CTYPE-X509"
@@ -647,15 +647,17 @@ test_record_padding (gnutls_session_t session)
   _gnutls_priority_set_direct (session, prio_str);
 
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
-
   ret = do_handshake (session);
   if (ret == TEST_SUCCEED)
-    tls1_ok = 1;
+    {
+      tls1_ok = 1;
+    }
   else
-    strcat(rest, ":%COMPAT");
+    {
+      strcat(rest, ":%COMPAT");
+    }
 
   return ret;
-
 }
 
 test_code_t
