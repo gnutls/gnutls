@@ -764,11 +764,12 @@ pack_security_parameters (gnutls_session_t session,
   BUFFER_APPEND(ps, session->security_parameters.master_secret, GNUTLS_MASTER_SIZE);
   BUFFER_APPEND(ps, session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
   BUFFER_APPEND(ps, session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
+
   BUFFER_APPEND_NUM(ps, session->security_parameters.session_id_size);
-  BUFFER_APPEND_NUM(ps, session->security_parameters.max_record_send_size);
-  BUFFER_APPEND_NUM(ps, session->security_parameters.max_record_recv_size);
   BUFFER_APPEND(ps, session->security_parameters.session_id, session->security_parameters.session_id_size);
 
+  BUFFER_APPEND_NUM(ps, session->security_parameters.max_record_send_size);
+  BUFFER_APPEND_NUM(ps, session->security_parameters.max_record_recv_size);
   BUFFER_APPEND_NUM(ps, session->security_parameters.timestamp);
 
   _gnutls_write_uint32(ps->length-cur_size, ps->data+size_offset);
@@ -818,9 +819,9 @@ unpack_security_parameters (gnutls_session_t session,
   BUFFER_POP(ps, &session->internals.resumed_security_parameters.session_id,
 	  session->internals.resumed_security_parameters.session_id_size);
 
-  BUFFER_POP_NUM(ps, session->internals.resumed_security_parameters.timestamp);
   BUFFER_POP_NUM(ps, session->internals.resumed_security_parameters.max_record_send_size);
   BUFFER_POP_NUM(ps, session->internals.resumed_security_parameters.max_record_recv_size);
+  BUFFER_POP_NUM(ps, session->internals.resumed_security_parameters.timestamp);
 
   if (timestamp - session->internals.resumed_security_parameters.timestamp >
       session->internals.expire_time
