@@ -43,4 +43,9 @@ extern ASN1_TYPE _gnutls_gnutls_asn;
 extern gnutls_log_func _gnutls_log_func;
 extern int _gnutls_log_level;
 
+extern mutex_init_func gnutls_mutex_init;
+extern mutex_deinit_func gnutls_mutex_deinit;
+extern mutex_lock_func gnutls_mutex_lock;
+extern mutex_unlock_func gnutls_mutex_unlock;
+
 #endif

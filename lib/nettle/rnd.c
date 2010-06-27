@@ -40,11 +40,10 @@
 
 #define SOURCES 2
 
-static pthread_mutex_t rnd_mutex = PTHREAD_MUTEX_INITIALIZER;
+static void* rnd_mutex;
 
-#define RND_LOCK_INIT
-#define RND_LOCK if (pthread_mutex_lock(&rnd_mutex)!=0) abort()
-#define RND_UNLOCK if (pthread_mutex_unlock(&rnd_mutex)!=0) abort()
+#define RND_LOCK if (gnutls_mutex_lock && gnutls_mutex_lock(&rnd_mutex)!=0) abort()
+#define RND_UNLOCK if (gnutls_mutex_unlock && gnutls_mutex_unlock(&rnd_mutex)!=0) abort()
 
 enum {
 	RANDOM_SOURCE_TRIVIA=0,
@@ -176,15 +175,25 @@ static void wrap_nettle_rnd_deinit(void* ctx)
 
 static int wrap_nettle_rnd_init(void **ctx)
 {
-	RND_LOCK_INIT;
-	
-    yarrow256_init(&yctx, SOURCES, ysources);
+int ret;
+
+	if (gnutls_mutex_init)
+	  {
+	    ret = gnutls_mutex_init(&rnd_mutex);
+	    if (ret < 0)
+	      {
+	        gnutls_assert();
+	        return ret;
+	      }
+	  }
+
+	yarrow256_init(&yctx, SOURCES, ysources);
 	do_device_source(1);
 	do_trivia_source(1);
 
 	yarrow256_slow_reseed(&yctx);
 
-    return 0;
+	return 0;
 }
 
 
@@ -196,7 +205,7 @@ wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 	do_trivia_source( 0);
 	do_device_source( 0);
 
-    yarrow256_random(&yctx, datasize, data);
+	yarrow256_random(&yctx, datasize, data);
 	RND_UNLOCK;
 	return 0;
 }

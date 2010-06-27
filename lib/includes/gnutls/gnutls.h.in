@@ -1122,6 +1122,14 @@ extern "C"
   int gnutls_global_init (void);
   void gnutls_global_deinit (void);
 
+  typedef int (*mutex_init_func)(void** mutex);
+  typedef int (*mutex_lock_func)(void* mutex);
+  typedef int (*mutex_unlock_func)(void* mutex);
+  typedef void (*mutex_deinit_func)(void* mutex);
+  
+  void gnutls_global_set_mutex(mutex_init_func init, mutex_deinit_func, 
+    mutex_lock_func, mutex_unlock_func);
+
   typedef void *(*gnutls_alloc_function) (size_t);
   typedef void *(*gnutls_calloc_function) (size_t, size_t);
   typedef int (*gnutls_is_secure_function) (const void *);
@@ -1739,7 +1747,7 @@ extern "C"
 #define GNUTLS_E_PKCS11_PIN_SAVE -304
 
 #define GNUTLS_E_PKCS11_SLOT_ERROR -305
-#define GNUTLS_E_PKCS11_LOCKING_ERROR -306
+#define GNUTLS_E_LOCKING_ERROR -306
 #define GNUTLS_E_PKCS11_ATTRIBUTE_ERROR -307
 #define GNUTLS_E_PKCS11_DEVICE_ERROR -308
 #define GNUTLS_E_PKCS11_DATA_ERROR -309

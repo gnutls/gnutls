@@ -86,7 +86,7 @@ int pkcs11_rv_to_err(ck_rv_t rv)
         case CKR_FUNCTION_NOT_PARALLEL:
         case CKR_MUTEX_BAD:
         case CKR_MUTEX_NOT_LOCKED:
-            return GNUTLS_E_PKCS11_LOCKING_ERROR;
+            return GNUTLS_E_LOCKING_ERROR;
         case CKR_ATTRIBUTE_READ_ONLY:
         case CKR_ATTRIBUTE_SENSITIVE:
         case CKR_ATTRIBUTE_TYPE_INVALID:

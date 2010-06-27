@@ -126,57 +126,39 @@ gcc -o foo foo.c `pkg-config gnutls --cflags --libs`
 @section Multi-Threaded Applications
 
 Although the @acronym{GnuTLS} library is thread safe by design, some
-parts of Libgcrypt, such as the random generator, are not.
-Applications have to register callback functions to ensure proper
-locking in the sensitive parts of @emph{libgcrypt}.
+parts of the cryptographic backend, such as the random generator, are not.
+Applications can either call @ref{gnutls_global_init} and use the default 
+operating system provided locks (i.e. @code{pthreads} on GNU/Linux), or
+specify manualy the locking system using the function @ref{gnutls_global_set_mutex}
+before calling @ref{gnutls_global_init}. Setting manually mutexes is recommended
+only to applications that have full control of the underlying libraries. If this
+is not the case, the use of the operating system defaults is recommended.
+
 
 There are helper macros to help you properly initialize the libraries.
 Examples are shown below.
 
 @itemize
 
-@item POSIX threads
+@item POSIX threads in GNU/Linux
 @example
 #include <gnutls.h>
-#include <gcrypt.h>
 #include <errno.h>
 #include <pthread.h>
-GCRY_THREAD_OPTION_PTHREAD_IMPL;
 
 int main()
 @{
-   /* The order matters.
-    */
-   gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_pthread);
-   gnutls_global_init();
-@}
-@end example
-
-@item GNU PTH threads
-@example
-#include <gnutls.h>
-#include <gcrypt.h>
-#include <errno.h>
-#include <pth.h>
-GCRY_THREAD_OPTION_PTH_IMPL;
-
-int main()
-@{
-   gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_pth);
    gnutls_global_init();
 @}
 @end example
 
 @item Other thread packages
 @example
-/* The gcry_thread_cbs structure must have been
- * initialized.
- */
-static struct gcry_thread_cbs gcry_threads_other = @{ ... @};
 
 int main()
 @{
-   gcry_control (GCRYCTL_SET_THREAD_CBS, &gcry_threads_other);
+   gnutls_global_mutex_set (mutex_init, mutex_deinit, mutex_lock, mutex_unlock);
+   gnutls_global_init();
 @}
 @end example
 @end itemize

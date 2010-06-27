@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 2.11.0 (unreleased)
 
+** libgnutls: Added gnutls_global_set_mutex() to allow setting
+alternative locking procedures. By default the system available
+locking is used. In *NIX pthreads are used and in windows the
+critical section API.
+
 ** libgnutls: Added support for reading DN from EV-certificates.
 New DN values:
 jurisdictionOfIncorporationLocalityName,
@@ -62,6 +67,7 @@ pkcs11:token=Root%20CA%20Certificates;serial=1%3AROOTS%3ADEFAULT;model=1%2E0;man
 gnutls_certificate_set_server_retrieve_function: DEPRECATED
 gnutls_certificate_set_client_retrieve_function: DEPRECATED
 gnutls_sign_callback_set: DEPRECATED
+gnutls_global_set_mutex: ADDED
 gnutls_pubkey_get_preferred_hash_algorithm: ADDED
 gnutls_x509_crt_get_preferred_hash_algorithm: ADDED
 gnutls_x509_privkey_export_rsa_raw2: ADDED

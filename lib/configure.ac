@@ -82,6 +82,8 @@ fi
 
 lgl_INIT
 
+AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
+
 LIBGNUTLS_LIBS="-L${libdir} -lgnutls $LIBS"
 LIBGNUTLS_CFLAGS="-I${includedir}"
 AC_SUBST(LIBGNUTLS_LIBS)

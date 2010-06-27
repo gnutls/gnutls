@@ -674,6 +674,7 @@ GNUTLS_2_11
 	gnutls_x509_privkey_export_rsa_raw2;
 	gnutls_pubkey_get_preferred_hash_algorithm;
 	gnutls_x509_crt_get_preferred_hash_algorithm;
+	gnutls_global_set_mutex;
 
 	gnutls_sec_param_to_pk_bits;
 	gnutls_sec_param_get_name;
