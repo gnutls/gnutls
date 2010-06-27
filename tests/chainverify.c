@@ -741,7 +741,7 @@ static struct
     0, GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID },
   { "cacertrsamd5 ok", cacertrsamd5, &cacertrsamd5[2],
     GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5, 0 },
-  { "cacertrsamd5 short-cut not ok", cacertrsamd5, &cacertrsamd5[1],
+  { "cacertrsamd5 short-cut not ok", cacertrsamd5, &cacertrsamd5[0],
     GNUTLS_VERIFY_DO_NOT_ALLOW_SAME,
     GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID },
   { "cacertrsamd5 short-cut ok", cacertrsamd5, &cacertrsamd5[1],
@@ -787,7 +787,7 @@ doit (void)
 
       for (j = 0; chains[i].chain[j]; j++)
 	{
-	  if (debug)
+	  if (debug > 2)
 	    printf ("\tAdding certificate %d...", (int) j);
 
 	  ret = gnutls_x509_crt_init (&certs[j]);
@@ -799,7 +799,7 @@ doit (void)
 	  tmp.size = strlen (chains[i].chain[j]);
 
 	  ret = gnutls_x509_crt_import (certs[j], &tmp, GNUTLS_X509_FMT_PEM);
-	  if (debug)
+	  if (debug > 2)
 	    printf ("done\n");
 	  if (ret < 0)
 	    error (EXIT_FAILURE, 0, "gnutls_x509_crt_import[%d,%d]: %s",
@@ -811,7 +811,7 @@ doit (void)
 	  gnutls_free (tmp.data);
 	}
 
-      if (debug)
+      if (debug > 2)
 	printf ("\tAdding CA certificate...");
 
       ret = gnutls_x509_crt_init (&ca);
@@ -827,7 +827,7 @@ doit (void)
 	error (EXIT_FAILURE, 0, "gnutls_x509_crt_import: %s",
 	       gnutls_strerror (ret));
 
-      if (debug)
+      if (debug > 2)
 	printf ("done\n");
 
       gnutls_x509_crt_print (ca, GNUTLS_CRT_PRINT_ONELINE, &tmp);
@@ -848,7 +848,7 @@ doit (void)
 
       if (verify_status != chains[i].expected_verify_result)
 	{
-	  fail ("verify_status: %d expected: %d\n",
+	  fail ("chain[%s]: verify_status: %d expected: %d\n", chains[i].name,
 		verify_status, chains[i].expected_verify_result);
 
 	  if (!debug)
@@ -864,7 +864,7 @@ doit (void)
 	gnutls_x509_crt_deinit (certs[j]);
 
       if (debug)
-	printf ("done\n");
+	printf ("done\n\n\n");
     }
 
   gnutls_global_deinit ();
