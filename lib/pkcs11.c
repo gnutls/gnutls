@@ -1991,12 +1991,6 @@ static int find_objs(pakchois_session_t * pks, struct token_info *info,
 	memset(&plist, 0, sizeof(plist));
 
 	if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY) {
-		ret = pkcs11_login(pks, info, NULL);
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
-		}
-
 		ret = find_privkeys(pks, info, &plist);
 		if (ret < 0) {
 			gnutls_assert();
@@ -2006,13 +2000,6 @@ static int find_objs(pakchois_session_t * pks, struct token_info *info,
 		if (plist.key_ids_size == 0) {
 			gnutls_assert();
 			return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-		}
-	} else if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_ALL ||
-		   find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY) {
-		ret = pkcs11_login(pks, info, NULL);
-		if (ret < 0) {
-			gnutls_assert();
-			return ret;
 		}
 	}
 

@@ -38,13 +38,13 @@
 struct gnutls_privkey_st {
 	gnutls_privkey_type_t type;
 	gnutls_pk_algorithm_t pk_algorithm;
-	
+
 	union {
 		gnutls_x509_privkey_t x509;
 		gnutls_pkcs11_privkey_t pkcs11;
 		gnutls_openpgp_privkey_t openpgp;
 	} key;
-	
+
 	unsigned int flags;
 };
 
@@ -58,7 +58,7 @@ struct gnutls_privkey_st {
  * Returns: a member of the #gnutls_privkey_type_t enumeration on
  *   success, or a negative value on error.
  **/
-gnutls_privkey_type_t gnutls_privkey_get_type (gnutls_privkey_t key)
+gnutls_privkey_type_t gnutls_privkey_get_type(gnutls_privkey_t key)
 {
 	return key->type;
 }
@@ -75,20 +75,27 @@ gnutls_privkey_type_t gnutls_privkey_get_type (gnutls_privkey_t key)
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
  *   success, or a negative value on error.
  **/
-int gnutls_privkey_get_pk_algorithm (gnutls_privkey_t key, unsigned int* bits)
+int gnutls_privkey_get_pk_algorithm(gnutls_privkey_t key,
+				    unsigned int *bits)
 {
-	switch(key->type) {
-		case GNUTLS_PRIVKEY_OPENPGP:
-			return gnutls_openpgp_privkey_get_pk_algorithm(key->key.openpgp, bits);
-		case GNUTLS_PRIVKEY_PKCS11:
-			return gnutls_pkcs11_privkey_get_pk_algorithm(key->key.pkcs11, bits);
-		case GNUTLS_PRIVKEY_X509:
-                        if (bits)
-                                *bits = _gnutls_mpi_get_nbits (key->key.x509->params[0]);
-			return gnutls_x509_privkey_get_pk_algorithm(key->key.x509);
-		default:
-			gnutls_assert();
-			return GNUTLS_E_INVALID_REQUEST;
+	switch (key->type) {
+	case GNUTLS_PRIVKEY_OPENPGP:
+		return gnutls_openpgp_privkey_get_pk_algorithm(key->key.
+							       openpgp,
+							       bits);
+	case GNUTLS_PRIVKEY_PKCS11:
+		return gnutls_pkcs11_privkey_get_pk_algorithm(key->key.
+							      pkcs11,
+							      bits);
+	case GNUTLS_PRIVKEY_X509:
+		if (bits)
+			*bits =
+			    _gnutls_mpi_get_nbits(key->key.x509->
+						  params[0]);
+		return gnutls_x509_privkey_get_pk_algorithm(key->key.x509);
+	default:
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 
 }
@@ -109,7 +116,7 @@ int gnutls_privkey_init(gnutls_privkey_t * key)
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	
+
 	return 0;
 }
 
@@ -122,13 +129,15 @@ int gnutls_privkey_init(gnutls_privkey_t * key)
 void gnutls_privkey_deinit(gnutls_privkey_t key)
 {
 	if (key->flags & GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE)
-		switch(key->type) {
-			case GNUTLS_PRIVKEY_OPENPGP:
-				return gnutls_openpgp_privkey_deinit(key->key.openpgp);
-			case GNUTLS_PRIVKEY_PKCS11:
-				return gnutls_pkcs11_privkey_deinit(key->key.pkcs11);
-			case GNUTLS_PRIVKEY_X509:
-				return gnutls_x509_privkey_deinit(key->key.x509);
+		switch (key->type) {
+		case GNUTLS_PRIVKEY_OPENPGP:
+			return gnutls_openpgp_privkey_deinit(key->key.
+							     openpgp);
+		case GNUTLS_PRIVKEY_PKCS11:
+			return gnutls_pkcs11_privkey_deinit(key->key.
+							    pkcs11);
+		case GNUTLS_PRIVKEY_X509:
+			return gnutls_x509_privkey_deinit(key->key.x509);
 		}
 	gnutls_free(key);
 }
@@ -145,11 +154,14 @@ void gnutls_privkey_deinit(gnutls_privkey_t key)
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  **/
-int gnutls_privkey_import_pkcs11 (gnutls_privkey_t pkey, gnutls_pkcs11_privkey_t key, unsigned int flags)
+int gnutls_privkey_import_pkcs11(gnutls_privkey_t pkey,
+				 gnutls_pkcs11_privkey_t key,
+				 unsigned int flags)
 {
 	pkey->key.pkcs11 = key;
 	pkey->type = GNUTLS_PRIVKEY_PKCS11;
-	pkey->pk_algorithm = gnutls_pkcs11_privkey_get_pk_algorithm(key, NULL);
+	pkey->pk_algorithm =
+	    gnutls_pkcs11_privkey_get_pk_algorithm(key, NULL);
 	pkey->flags = flags;
 
 	return 0;
@@ -167,9 +179,11 @@ int gnutls_privkey_import_pkcs11 (gnutls_privkey_t pkey, gnutls_pkcs11_privkey_t
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  **/
-int gnutls_privkey_import_x509 (gnutls_privkey_t pkey, gnutls_x509_privkey_t key, unsigned int flags)
+int gnutls_privkey_import_x509(gnutls_privkey_t pkey,
+			       gnutls_x509_privkey_t key,
+			       unsigned int flags)
 {
-        pkey->key.x509 = key;
+	pkey->key.x509 = key;
 	pkey->type = GNUTLS_PRIVKEY_X509;
 	pkey->pk_algorithm = gnutls_x509_privkey_get_pk_algorithm(key);
 	pkey->flags = flags;
@@ -189,13 +203,16 @@ int gnutls_privkey_import_x509 (gnutls_privkey_t pkey, gnutls_x509_privkey_t key
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  **/
-int gnutls_privkey_import_openpgp (gnutls_privkey_t pkey, gnutls_openpgp_privkey_t key, unsigned int flags)
+int gnutls_privkey_import_openpgp(gnutls_privkey_t pkey,
+				  gnutls_openpgp_privkey_t key,
+				  unsigned int flags)
 {
 	pkey->key.openpgp = key;
 	pkey->type = GNUTLS_PRIVKEY_OPENPGP;
-	pkey->pk_algorithm = gnutls_openpgp_privkey_get_pk_algorithm(key, NULL);
+	pkey->pk_algorithm =
+	    gnutls_openpgp_privkey_get_pk_algorithm(key, NULL);
 	pkey->flags = flags;
-	
+
 	return 0;
 }
 
@@ -217,10 +234,10 @@ int gnutls_privkey_import_openpgp (gnutls_privkey_t pkey, gnutls_openpgp_privkey
  **/
 int
 gnutls_privkey_sign_data(gnutls_privkey_t signer,
-				gnutls_digest_algorithm_t hash,
-				unsigned int flags,
-				const gnutls_datum_t * data,
-				gnutls_datum_t * signature)
+			 gnutls_digest_algorithm_t hash,
+			 unsigned int flags,
+			 const gnutls_datum_t * data,
+			 gnutls_datum_t * signature)
 {
 	int ret;
 	gnutls_datum_t digest;
@@ -269,20 +286,23 @@ gnutls_privkey_sign_data(gnutls_privkey_t signer,
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  * negative error value.
  **/
-int gnutls_privkey_sign_hash (gnutls_privkey_t key,
-			const gnutls_datum_t * hash,
-			gnutls_datum_t * signature)
+int gnutls_privkey_sign_hash(gnutls_privkey_t key,
+			     const gnutls_datum_t * hash,
+			     gnutls_datum_t * signature)
 {
-	switch(key->type) {
-		case GNUTLS_PRIVKEY_OPENPGP:
-			return gnutls_openpgp_privkey_sign_hash(key->key.openpgp, hash, signature);
-		case GNUTLS_PRIVKEY_PKCS11:
-			return gnutls_pkcs11_privkey_sign_hash(key->key.pkcs11, hash, signature);
-		case GNUTLS_PRIVKEY_X509:
-			return gnutls_x509_privkey_sign_hash(key->key.x509, hash, signature);
-		default:
-			gnutls_assert();
-			return GNUTLS_E_INVALID_REQUEST;
+	switch (key->type) {
+	case GNUTLS_PRIVKEY_OPENPGP:
+		return gnutls_openpgp_privkey_sign_hash(key->key.openpgp,
+							hash, signature);
+	case GNUTLS_PRIVKEY_PKCS11:
+		return gnutls_pkcs11_privkey_sign_hash(key->key.pkcs11,
+						       hash, signature);
+	case GNUTLS_PRIVKEY_X509:
+		return gnutls_x509_privkey_sign_hash(key->key.x509, hash,
+						     signature);
+	default:
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 }
 
@@ -308,17 +328,25 @@ int gnutls_privkey_decrypt_data(gnutls_privkey_t key,
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
-	
-	switch(key->type) {
-		case GNUTLS_PRIVKEY_OPENPGP:
-			return gnutls_openpgp_privkey_decrypt_data(key->key.openpgp, flags, ciphertext, plaintext);
-		case GNUTLS_PRIVKEY_X509:
-			return _gnutls_pkcs1_rsa_decrypt (plaintext, ciphertext, key->key.x509->params, key->key.x509->params_size, 2);
-		case GNUTLS_PRIVKEY_PKCS11:
-			return gnutls_pkcs11_privkey_decrypt_data(key->key.pkcs11, flags, ciphertext, plaintext);
-		default:
-			gnutls_assert();
-			return GNUTLS_E_INVALID_REQUEST;
+
+	switch (key->type) {
+	case GNUTLS_PRIVKEY_OPENPGP:
+		return gnutls_openpgp_privkey_decrypt_data(key->key.
+							   openpgp, flags,
+							   ciphertext,
+							   plaintext);
+	case GNUTLS_PRIVKEY_X509:
+		return _gnutls_pkcs1_rsa_decrypt(plaintext, ciphertext,
+						 key->key.x509->params,
+						 key->key.x509->
+						 params_size, 2);
+	case GNUTLS_PRIVKEY_PKCS11:
+		return gnutls_pkcs11_privkey_decrypt_data(key->key.pkcs11,
+							  flags,
+							  ciphertext,
+							  plaintext);
+	default:
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 }
-

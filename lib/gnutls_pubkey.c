@@ -199,21 +199,22 @@ int gnutls_pubkey_import_x509(gnutls_pubkey_t key, gnutls_x509_crt_t crt,
  * Since: 2.11.0
  **/
 int
-gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
-			      gnutls_digest_algorithm_t * hash, unsigned int *mand)
+gnutls_pubkey_get_preferred_hash_algorithm(gnutls_pubkey_t key,
+					   gnutls_digest_algorithm_t *
+					   hash, unsigned int *mand)
 {
-  int ret;
+	int ret;
 
-  if (key == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
-  ret = _gnutls_pk_get_hash_algorithm(key->pk_algorithm,
-    key->params, key->params_size, hash, mand);
+	ret = _gnutls_pk_get_hash_algorithm(key->pk_algorithm,
+					    key->params, key->params_size,
+					    hash, mand);
 
-  return ret;
+	return ret;
 }
 
 
@@ -749,7 +750,7 @@ int gnutls_pubkey_set_key_usage(gnutls_pubkey_t key, unsigned int usage)
  **/
 
 int gnutls_pubkey_import_pkcs11_url(gnutls_pubkey_t key, const char *url,
-	unsigned int flags)
+				    unsigned int flags)
 {
 	gnutls_pkcs11_obj_t pcrt;
 	int ret;
@@ -903,23 +904,22 @@ gnutls_pubkey_import_dsa_raw(gnutls_pubkey_t key,
  * success.
  **/
 int
-gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
-			     const gnutls_datum_t * hash,
-			     const gnutls_datum_t * signature)
+gnutls_pubkey_verify_hash(gnutls_pubkey_t key, unsigned int flags,
+			  const gnutls_datum_t * hash,
+			  const gnutls_datum_t * signature)
 {
-  int ret;
+	int ret;
 
-  if (key == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
-   ret =
-    pubkey_verify_sig (NULL, hash, signature, key->pk_algorithm,
-		key->params, key->params_size);
+	ret =
+	    pubkey_verify_sig(NULL, hash, signature, key->pk_algorithm,
+			      key->params, key->params_size);
 
-  return ret;
+	return ret;
 }
 
 /**
@@ -935,18 +935,19 @@ gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
  * returned on error.
  **/
 int
-gnutls_pubkey_get_verify_algorithm (gnutls_pubkey_t key,
-				      const gnutls_datum_t * signature,
-				      gnutls_digest_algorithm_t * hash)
+gnutls_pubkey_get_verify_algorithm(gnutls_pubkey_t key,
+				   const gnutls_datum_t * signature,
+				   gnutls_digest_algorithm_t * hash)
 {
-  if (key == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+	if (key == NULL) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
+	}
 
-  return _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) hash,
-			signature, key->pk_algorithm, key->params,
-			key->params_size);
+	return _gnutls_x509_verify_algorithm((gnutls_mac_algorithm_t *)
+					     hash, signature,
+					     key->pk_algorithm,
+					     key->params,
+					     key->params_size);
 
 }

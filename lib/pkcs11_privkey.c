@@ -54,7 +54,7 @@ int gnutls_pkcs11_privkey_init(gnutls_pkcs11_privkey_t * key)
 		gnutls_assert();
 		return GNUTLS_E_MEMORY_ERROR;
 	}
-	
+
 	return 0;
 }
 
@@ -79,10 +79,11 @@ void gnutls_pkcs11_privkey_deinit(gnutls_pkcs11_privkey_t key)
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
  *   success, or a negative value on error.
  **/
-int gnutls_pkcs11_privkey_get_pk_algorithm(gnutls_pkcs11_privkey_t key, unsigned int *bits)
+int gnutls_pkcs11_privkey_get_pk_algorithm(gnutls_pkcs11_privkey_t key,
+					   unsigned int *bits)
 {
-        if (bits)
-          *bits = 0; /* FIXME */
+	if (bits)
+		*bits = 0;	/* FIXME */
 	return key->pk_algorithm;
 }
 
@@ -179,7 +180,7 @@ gnutls_pkcs11_privkey_sign_data(gnutls_pkcs11_privkey_t signer,
 			gnutls_assert(); \
 			return ret; \
 		} \
-	} while (ret < 0); 
+	} while (ret < 0);
 
 /**
  * gnutls_pkcs11_privkey_sign_hash:
@@ -222,8 +223,7 @@ int gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 	}
 
 	/* Work out how long the signature must be: */
-	rv = pakchois_sign(pks, hash->data, hash->size, NULL,
-			   &siglen);
+	rv = pakchois_sign(pks, hash->data, hash->size, NULL, &siglen);
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		ret = pkcs11_rv_to_err(rv);
@@ -246,7 +246,7 @@ int gnutls_pkcs11_privkey_sign_hash(gnutls_pkcs11_privkey_t key,
 
 	ret = 0;
 
-cleanup:
+      cleanup:
 	pakchois_close_session(pks);
 
 	return ret;
@@ -280,7 +280,8 @@ int gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
 
 	pkey->flags = flags;
 
-	if (pkey->info.type[0] != 0 && strcmp(pkey->info.type, "private") != 0) {
+	if (pkey->info.type[0] != 0
+	    && strcmp(pkey->info.type, "private") != 0) {
 		gnutls_assert();
 		return GNUTLS_E_INVALID_REQUEST;
 	}
@@ -308,8 +309,9 @@ int gnutls_pkcs11_privkey_import_url(gnutls_pkcs11_privkey_t pkey,
  **/
 int
 gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
-  unsigned int flags, const gnutls_datum_t * ciphertext,
-				gnutls_datum_t * plaintext)
+				   unsigned int flags,
+				   const gnutls_datum_t * ciphertext,
+				   gnutls_datum_t * plaintext)
 {
 	ck_rv_t rv;
 	int ret;
@@ -319,7 +321,7 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	ck_object_handle_t obj;
 
 	FIND_OBJECT(pks, obj, key);
-	
+
 	mech.mechanism =
 	    key->pk_algorithm == GNUTLS_PK_DSA ? CKM_DSA : CKM_RSA_PKCS;
 	mech.parameter = NULL;
@@ -335,8 +337,8 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	}
 
 	/* Work out how long the plaintext must be: */
-	rv = pakchois_decrypt(pks, ciphertext->data, ciphertext->size, NULL,
-			   &siglen);
+	rv = pakchois_decrypt(pks, ciphertext->data, ciphertext->size,
+			      NULL, &siglen);
 	if (rv != CKR_OK) {
 		gnutls_assert();
 		ret = pkcs11_rv_to_err(rv);
@@ -347,7 +349,7 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 	plaintext->size = siglen;
 
 	rv = pakchois_decrypt(pks, ciphertext->data, ciphertext->size,
-			   plaintext->data, &siglen);
+			      plaintext->data, &siglen);
 	if (rv != CKR_OK) {
 		gnutls_free(plaintext->data);
 		gnutls_assert();
@@ -359,7 +361,7 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 
 	ret = 0;
 
-cleanup:
+      cleanup:
 	pakchois_close_session(pks);
 
 	return ret;
@@ -375,15 +377,16 @@ cleanup:
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  **/
-int gnutls_pkcs11_privkey_export_url (gnutls_pkcs11_privkey_t key, char ** url)
+int gnutls_pkcs11_privkey_export_url(gnutls_pkcs11_privkey_t key,
+				     char **url)
 {
-int ret;
+	int ret;
 
-    ret = pkcs11_info_to_url(&key->info, url);
-    if (ret < 0) {
-        gnutls_assert();
-        return ret;
-    }
+	ret = pkcs11_info_to_url(&key->info, url);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
-    return 0;
+	return 0;
 }
