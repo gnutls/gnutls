@@ -41,8 +41,8 @@ void certtool_version (void);
 void pkcs11_list( FILE*outfile, const char* url, int type, unsigned int login);
 void pkcs11_export(FILE* outfile, const char *pkcs11_url, unsigned int login);
 void pkcs11_token_list(FILE* outfile);
-void pkcs11_write(FILE* outfile, const char *pkcs11_url, const char* label, int trusted);
-void pkcs11_delete(FILE* outfile, const char *pkcs11_url, int batch);
+void pkcs11_write(FILE* outfile, const char *pkcs11_url, const char* label, int trusted, unsigned int login);
+void pkcs11_delete(FILE* outfile, const char *pkcs11_url, int batch, unsigned int login);
 
 #define PKCS11_TYPE_CRT_ALL 1
 #define PKCS11_TYPE_TRUSTED 2

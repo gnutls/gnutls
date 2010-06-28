@@ -1517,7 +1517,7 @@ static int find_obj_url(pakchois_session_t * pks, struct token_info *info,
 	return ret;
 }
 
-inline static unsigned int pkcs11_obj_flags_to_int(unsigned int flags)
+unsigned int pkcs11_obj_flags_to_int(unsigned int flags)
 {
         switch(flags) {
                 case GNUTLS_PKCS11_OBJ_FLAG_LOGIN:

@@ -33,7 +33,7 @@
  * @token_url: A PKCS #11 URL specifying a token
  * @crt: A certificate
  * @label: A name to be used for the stored data
- * @flags: One of GNUTLS_PKCS11_COPY_FLAG_*
+ * @flags: One of GNUTLS_PKCS11_OBJ_FLAG_*
  *
  * This function will copy a certificate into a PKCS #11 token specified by
  * a URL. The certificate can be marked as trusted or not.
@@ -67,7 +67,7 @@ int gnutls_pkcs11_copy_x509_crt(const char *token_url,
 
 	ret =
 	    pkcs11_open_session(&pks, &info, NULL,
-				SESSION_WRITE | SESSION_LOGIN);
+				SESSION_WRITE | pkcs11_obj_flags_to_int(flags));
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -128,7 +128,7 @@ int gnutls_pkcs11_copy_x509_crt(const char *token_url,
 		a_val++;
 	}
 
-	if (flags & GNUTLS_PKCS11_COPY_FLAG_MARK_TRUSTED) {
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED) {
 		a[a_val].type = CKA_TRUSTED;
 		a[a_val].value = &tval;
 		a[a_val].value_len = sizeof(tval);
@@ -162,7 +162,7 @@ int gnutls_pkcs11_copy_x509_crt(const char *token_url,
  * @key: A private key
  * @label: A name to be used for the stored data
  * @key_usage: One of GNUTLS_KEY_*
- * @flags: One of GNUTLS_PKCS11_COPY_* flags
+ * @flags: One of GNUTLS_PKCS11_OBJ_* flags
  *
  * This function will copy a private key into a PKCS #11 token specified by
  * a URL. 
@@ -208,7 +208,7 @@ int gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 
 	ret =
 	    pkcs11_open_session(&pks, &info, NULL,
-				SESSION_WRITE | SESSION_LOGIN);
+				SESSION_WRITE | pkcs11_obj_flags_to_int(flags));
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;
@@ -418,12 +418,6 @@ static int delete_obj_url(pakchois_session_t * pks,
 		}
 	}
 
-	ret = pkcs11_login(pks, info, NULL);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-
 	a_vals = 0;
 
 	/* Find objects with given class and type */
@@ -494,13 +488,14 @@ static int delete_obj_url(pakchois_session_t * pks,
 /**
  * gnutls_pkcs11_delete_url:
  * @object_url: The URL of the object to delete.
+ * @flags: One of GNUTLS_PKCS11_OBJ_* flags
  * 
  * This function will delete objects matching the given URL.
  *
  * Returns: On success, the number of objects deleted is returned, otherwise a
  *   negative error value.
  **/
-int gnutls_pkcs11_delete_url(const char *object_url)
+int gnutls_pkcs11_delete_url(const char *object_url, unsigned int flags)
 {
 	int ret;
 	struct delete_data_st find_data;
@@ -515,7 +510,7 @@ int gnutls_pkcs11_delete_url(const char *object_url)
 
 	ret =
 	    _pkcs11_traverse_tokens(delete_obj_url, &find_data,
-				    SESSION_WRITE);
+				    SESSION_WRITE|pkcs11_obj_flags_to_int(flags));
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

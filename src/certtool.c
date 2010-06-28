@@ -1136,10 +1136,10 @@ gaa_parser (int argc, char **argv)
       pkcs11_export(outfile, info.pkcs11_url, info.pkcs11_login);
       break;
     case ACTION_PKCS11_WRITE_URL:
-      pkcs11_write(outfile, info.pkcs11_url, info.pkcs11_label, info.pkcs11_trusted);
+      pkcs11_write(outfile, info.pkcs11_url, info.pkcs11_label, info.pkcs11_trusted, info.pkcs11_login);
       break;
     case ACTION_PKCS11_DELETE_URL:
-      pkcs11_delete(outfile, info.pkcs11_url, batch);
+      pkcs11_delete(outfile, info.pkcs11_url, batch, info.pkcs11_login);
       break;
 #ifdef ENABLE_OPENPGP
     case ACTION_PGP_INFO:

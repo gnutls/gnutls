@@ -44,18 +44,23 @@ static void pkcs11_common(void)
 
 }
 
-void pkcs11_delete(FILE* outfile, const char* url, int batch)
+void pkcs11_delete(FILE* outfile, const char* url, int batch, unsigned int login)
 {
 int ret;
+unsigned int obj_flags = 0;
+
+	if (login)
+		obj_flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
+
 	if (!batch) {
-		pkcs11_list(outfile, url, PKCS11_TYPE_ALL, 1/*login*/);
+		pkcs11_list(outfile, url, PKCS11_TYPE_ALL, login);
 		ret = read_yesno("Are you sure you want to delete those objects? (Y/N): ");
 		if (ret == 0) {
 			exit(1);
 		}
 	}
 	
-	ret = gnutls_pkcs11_delete_url(url);
+	ret = gnutls_pkcs11_delete_url(url, obj_flags);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
 		exit(1);
@@ -375,13 +380,16 @@ size_t size;
 	return;
 }
 
-void pkcs11_write(FILE* outfile, const char* url, const char* label, int trusted)
+void pkcs11_write(FILE* outfile, const char* url, const char* label, int trusted, unsigned int login)
 {
 gnutls_x509_crt_t xcrt;
 gnutls_x509_privkey_t xkey;
 int ret;
 unsigned int flags = 0;
 unsigned int key_usage;
+
+	if (login)
+		flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
 
 	pkcs11_common();
 
@@ -391,7 +399,7 @@ unsigned int key_usage;
 	xcrt = load_cert(0);
 	if (xcrt != NULL) {
 		if (trusted)
-			flags |= GNUTLS_PKCS11_COPY_FLAG_MARK_TRUSTED;
+			flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED;
 		ret = gnutls_pkcs11_copy_x509_crt(url, xcrt, label, flags);
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));

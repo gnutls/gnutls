@@ -89,4 +89,6 @@ int pkcs11_find_object(pakchois_session_t ** _pks,
 		       struct pkcs11_url_info *info, token_creds_st *,
 		       unsigned int flags);
 
+unsigned int pkcs11_obj_flags_to_int(unsigned int flags);
+
 #endif

@@ -49,6 +49,7 @@ int gnutls_pkcs11_add_provider (const char * name, const char * params);
 int gnutls_pkcs11_obj_init ( gnutls_pkcs11_obj_t *certificate);
 
 #define GNUTLS_PKCS11_OBJ_FLAG_LOGIN 1 /* force login in the token for the operation */
+#define GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED 1 /* object marked as trusted */
 
 int gnutls_pkcs11_obj_import_url (gnutls_pkcs11_obj_t, const char * url,
 	unsigned int flags/* GNUTLS_PKCS11_OBJ_FLAG_* */);
@@ -59,14 +60,13 @@ int gnutls_pkcs11_obj_export(gnutls_pkcs11_obj_t obj,
 		     void *output_data, size_t * output_data_size);
 
 
-#define GNUTLS_PKCS11_COPY_FLAG_MARK_TRUSTED 1 /* object marked as trusted */
-
 int gnutls_pkcs11_copy_x509_crt(const char* token_url, gnutls_x509_crt_t crt, 
-	const char* label, unsigned int flags /* GNUTLS_PKCS11_COPY_FLAG_* */);
+	const char* label, unsigned int flags /* GNUTLS_PKCS11_OBJ_FLAG_* */);
 int gnutls_pkcs11_copy_x509_privkey(const char* token_url, 
 	gnutls_x509_privkey_t crt, const char* label, unsigned int key_usage /*GNUTLS_KEY_* */,
-	unsigned int flags /* GNUTLS_PKCS11_COPY_FLAG_* */);
-int gnutls_pkcs11_delete_url(const char* object_url);
+	unsigned int flags /* GNUTLS_PKCS11_OBJ_FLAG_* */);
+int gnutls_pkcs11_delete_url(const char* object_url, 
+	unsigned int flags/* GNUTLS_PKCS11_OBJ_FLAG_* */);
 
 typedef enum {
 	GNUTLS_PKCS11_OBJ_ID_HEX=1,
