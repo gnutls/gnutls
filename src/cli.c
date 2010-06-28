@@ -187,7 +187,11 @@ load_keys (void)
 	  gnutls_x509_crt_init (&x509_crt[0]);
 
 	  ret =
-	    gnutls_x509_crt_import_pkcs11_url (x509_crt[0], x509_certfile);
+	    gnutls_x509_crt_import_pkcs11_url (x509_crt[0], x509_certfile, 0);
+          
+          if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+  	    ret = gnutls_x509_crt_import_pkcs11_url (x509_crt[0], x509_certfile, GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+
 	  if (ret < 0)
 	    {
 	      fprintf (stderr, "*** Error loading cert file.\n");

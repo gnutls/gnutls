@@ -38,8 +38,8 @@ enum
 #define TYPE_CRQ 2
 
 void certtool_version (void);
-void pkcs11_list( FILE*outfile, const char* url, int type);
-void pkcs11_export(FILE* outfile, const char *pkcs11_url);
+void pkcs11_list( FILE*outfile, const char* url, int type, unsigned int login);
+void pkcs11_export(FILE* outfile, const char *pkcs11_url, unsigned int login);
 void pkcs11_token_list(FILE* outfile);
 void pkcs11_write(FILE* outfile, const char *pkcs11_url, const char* label, int trusted);
 void pkcs11_delete(FILE* outfile, const char *pkcs11_url, int batch);

@@ -33,7 +33,7 @@
  * @token_url: A PKCS #11 URL specifying a token
  * @crt: A certificate
  * @label: A name to be used for the stored data
- * @flags: One of GNUTLS_PKCS11_OBJ_FLAG_*
+ * @flags: One of GNUTLS_PKCS11_COPY_FLAG_*
  *
  * This function will copy a certificate into a PKCS #11 token specified by
  * a URL. The certificate can be marked as trusted or not.
@@ -127,7 +127,7 @@ int gnutls_pkcs11_copy_x509_crt(const char* token_url, gnutls_x509_crt_t crt,
 		a_val++;
 	}
 	
-	if (flags & GNUTLS_PKCS11_OBJ_FLAG_TRUSTED) {
+	if (flags & GNUTLS_PKCS11_COPY_FLAG_MARK_TRUSTED) {
 		a[a_val].type = CKA_TRUSTED;
 		a[a_val].value = &tval;
 		a[a_val].value_len = sizeof(tval);
@@ -161,6 +161,7 @@ cleanup:
  * @key: A private key
  * @label: A name to be used for the stored data
  * @key_usage: One of GNUTLS_KEY_*
+ * @flags: One of GNUTLS_PKCS11_COPY_* flags
  *
  * This function will copy a private key into a PKCS #11 token specified by
  * a URL. 
@@ -169,7 +170,8 @@ cleanup:
  *   negative error value.
  **/
 int gnutls_pkcs11_copy_x509_privkey(const char* token_url, 
-	gnutls_x509_privkey_t key, const char* label, unsigned int key_usage)
+	gnutls_x509_privkey_t key, const char* label, unsigned int key_usage,
+	unsigned int flags)
 {
     int ret;
     pakchois_session_t *pks;

@@ -50,7 +50,13 @@ load_keys (void)
 
   gnutls_x509_crt_init (&crt);
 
-  ret = gnutls_x509_crt_import_pkcs11_url (crt, CERT_URL);
+  ret = gnutls_x509_crt_import_pkcs11_url (crt, CERT_URL, 0);
+
+  /* some tokens require login to read data */
+  if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+    ret = gnutls_x509_crt_import_pkcs11_url (crt, CERT_URL, 
+    GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+
   if (ret < 0)
     {
       fprintf (stderr, "*** Error loading key file: %s\n",

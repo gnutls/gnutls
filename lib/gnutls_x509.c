@@ -569,7 +569,8 @@ gnutls_x509_crt_t * xcrt_list = NULL;
 gnutls_pkcs11_obj_t *pcrt_list=NULL;
 unsigned int pcrt_list_size = 0;
 
-	ret = gnutls_pkcs11_obj_list_import_url( NULL, &pcrt_list_size, url, GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED);
+        /* FIXME: should we use login? */
+	ret = gnutls_pkcs11_obj_list_import_url( NULL, &pcrt_list_size, url, GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED, 0);
 	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
 		gnutls_assert();
 		return ret;
@@ -586,7 +587,7 @@ unsigned int pcrt_list_size = 0;
 		return GNUTLS_E_MEMORY_ERROR;
 	}
 	
-	ret = gnutls_pkcs11_obj_list_import_url( pcrt_list, &pcrt_list_size, url, GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED);
+	ret = gnutls_pkcs11_obj_list_import_url( pcrt_list, &pcrt_list_size, url, GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED, 0);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;
@@ -645,7 +646,10 @@ gnutls_cert * ccert;
       return ret;
     }
   
-  ret = gnutls_x509_crt_import_pkcs11_url(crt, url);
+  ret = gnutls_x509_crt_import_pkcs11_url(crt, url, 0);
+  if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+    ret = gnutls_x509_crt_import_pkcs11_url(crt, url, GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+
   if (ret < 0)
     {
       gnutls_assert();

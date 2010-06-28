@@ -1127,13 +1127,13 @@ gaa_parser (int argc, char **argv)
       generate_pkcs8 ();
       break;
     case ACTION_PKCS11_LIST:
-      pkcs11_list(outfile, info.pkcs11_url, info.pkcs11_type);
+      pkcs11_list(outfile, info.pkcs11_url, info.pkcs11_type, info.pkcs11_login);
       break;
     case ACTION_PKCS11_TOKENS:
       pkcs11_token_list(outfile);
       break;
     case ACTION_PKCS11_EXPORT_URL:
-      pkcs11_export(outfile, info.pkcs11_url);
+      pkcs11_export(outfile, info.pkcs11_url, info.pkcs11_login);
       break;
     case ACTION_PKCS11_WRITE_URL:
       pkcs11_write(outfile, info.pkcs11_url, info.pkcs11_label, info.pkcs11_trusted);

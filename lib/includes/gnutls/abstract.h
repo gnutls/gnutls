@@ -48,7 +48,8 @@ int gnutls_pubkey_import (gnutls_pubkey_t key,
 			      gnutls_x509_crt_fmt_t format);
 
 
-int gnutls_pubkey_import_pkcs11_url( gnutls_pubkey_t key, const char* url);
+int gnutls_pubkey_import_pkcs11_url( gnutls_pubkey_t key, const char* url, 
+	unsigned int flags/* GNUTLS_PKCS11_OBJ_FLAG_* */);
 int gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
 				    const gnutls_datum_t * p,
 				    const gnutls_datum_t * q,

@@ -735,7 +735,21 @@ int gnutls_pubkey_set_key_usage(gnutls_pubkey_t key, unsigned int usage)
 	return 0;
 }
 
-int gnutls_pubkey_import_pkcs11_url(gnutls_pubkey_t key, const char *url)
+/**
+ * gnutls_pubkey_import_pkcs11_url:
+ * @key: A key of type #gnutls_pubkey_t
+ * @url: A PKCS 11 url
+ * @flags: One of GNUTLS_PKCS11_OBJ_* flags
+ *
+ * This function will import a PKCS 11 certificate to a #gnutls_pubkey_t
+ * structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+
+int gnutls_pubkey_import_pkcs11_url(gnutls_pubkey_t key, const char *url,
+	unsigned int flags)
 {
 	gnutls_pkcs11_obj_t pcrt;
 	int ret;
@@ -746,7 +760,7 @@ int gnutls_pubkey_import_pkcs11_url(gnutls_pubkey_t key, const char *url)
 		return ret;
 	}
 
-	ret = gnutls_pkcs11_obj_import_url(pcrt, url);
+	ret = gnutls_pkcs11_obj_import_url(pcrt, url, flags);
 	if (ret < 0) {
 		gnutls_assert();
 		goto cleanup;

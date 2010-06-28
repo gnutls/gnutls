@@ -48,7 +48,7 @@ void pkcs11_delete(FILE* outfile, const char* url, int batch)
 {
 int ret;
 	if (!batch) {
-		pkcs11_list(outfile, url, PKCS11_TYPE_ALL);
+		pkcs11_list(outfile, url, PKCS11_TYPE_ALL, 1/*login*/);
 		ret = read_yesno("Are you sure you want to delete those objects? (Y/N): ");
 		if (ret == 0) {
 			exit(1);
@@ -68,14 +68,18 @@ int ret;
                                                                                                                                                 
 /* lists certificates from a token
  */
-void pkcs11_list( FILE* outfile, const char* url, int type)
+void pkcs11_list( FILE* outfile, const char* url, int type, unsigned int login)
 {
 gnutls_pkcs11_obj_t *crt_list;
 gnutls_x509_crt_t xcrt;
 unsigned int crt_list_size = 0;
 int ret;
 char* output;
-int i, flags;
+int i, attrs;
+unsigned int obj_flags = 0;
+
+	if (login)
+		obj_flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
 
 	pkcs11_common();
 
@@ -83,15 +87,15 @@ int i, flags;
 		url = "pkcs11:";
 
 	if (type == PKCS11_TYPE_TRUSTED) {
-		flags = GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED;
+		attrs = GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED;
 	} else if (type == PKCS11_TYPE_PK) {
-		flags = GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY;
+		attrs = GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY;
 	} else if (type == PKCS11_TYPE_CRT_ALL) {
-		flags = GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL;
+		attrs = GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL;
 	} else if (type == PKCS11_TYPE_PRIVKEY) {
-		flags = GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY;
+		attrs = GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY;
 	} else {
-		flags = GNUTLS_PKCS11_OBJ_ATTR_ALL;
+		attrs = GNUTLS_PKCS11_OBJ_ATTR_ALL;
 	}
 		
 	/* give some initial value to avoid asking for the pkcs11 pin twice.
@@ -103,7 +107,8 @@ int i, flags;
 		exit(1);
 	}
 
-	ret = gnutls_pkcs11_obj_list_import_url( crt_list, &crt_list_size, url, flags);
+	ret = gnutls_pkcs11_obj_list_import_url( crt_list, &crt_list_size, url, 
+		attrs, obj_flags);
 	if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER) {
 		fprintf(stderr, "Error in crt_list_import (1): %s\n", gnutls_strerror(ret));
 		exit(1);
@@ -121,7 +126,7 @@ int i, flags;
 			exit(1);
 		}
 
-		ret = gnutls_pkcs11_obj_list_import_url( crt_list, &crt_list_size, url, flags);
+		ret = gnutls_pkcs11_obj_list_import_url( crt_list, &crt_list_size, url, attrs, obj_flags);
 		if (ret < 0) {
 			fprintf(stderr, "Error in crt_list_import: %s\n", gnutls_strerror(ret));
 			exit(1);
@@ -160,7 +165,7 @@ int i, flags;
 		
 		
 
-		if (flags == GNUTLS_PKCS11_OBJ_ATTR_ALL || flags == GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY)
+		if (attrs == GNUTLS_PKCS11_OBJ_ATTR_ALL || attrs == GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY)
 			continue;
 
 		ret = gnutls_x509_crt_init(&xcrt);
@@ -195,13 +200,17 @@ int i, flags;
 	return;
 }
 
-void pkcs11_export(FILE* outfile, const char* url)
+void pkcs11_export(FILE* outfile, const char* url, unsigned int login)
 {
 gnutls_pkcs11_obj_t crt;
 gnutls_x509_crt_t xcrt;
 gnutls_pubkey_t pubkey;
 int ret;
 size_t size;
+unsigned int obj_flags = 0;
+
+	if (login)
+		obj_flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
 
 	pkcs11_common();
 
@@ -214,7 +223,7 @@ size_t size;
 		exit(1);
 	}
 
-	ret = gnutls_pkcs11_obj_import_url( crt, url);
+	ret = gnutls_pkcs11_obj_import_url( crt, url, obj_flags);
 	if (ret < 0) {
 		fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
 		exit(1);
@@ -382,7 +391,7 @@ unsigned int key_usage;
 	xcrt = load_cert(0);
 	if (xcrt != NULL) {
 		if (trusted)
-			flags |= GNUTLS_PKCS11_OBJ_FLAG_TRUSTED;
+			flags |= GNUTLS_PKCS11_COPY_FLAG_MARK_TRUSTED;
 		ret = gnutls_pkcs11_copy_x509_crt(url, xcrt, label, flags);
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
@@ -394,7 +403,7 @@ unsigned int key_usage;
 
 	xkey = load_private_key(0);
 	if (xkey != NULL) {
-		ret = gnutls_pkcs11_copy_x509_privkey(url, xkey, label, key_usage);
+		ret = gnutls_pkcs11_copy_x509_privkey(url, xkey, label, key_usage, flags);
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
 			exit(1);

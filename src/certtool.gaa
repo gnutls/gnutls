@@ -149,6 +149,9 @@ option (pkcs11-list-all-certs) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS
 option (pkcs11-list-all) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS11_TYPE_ALL; } "List all objects specified by a PKCS#11 URL"
 option (pkcs11-list-tokens) { $action = ACTION_PKCS11_TOKENS; } "List all available tokens"
 
+#int pkcs11_login;
+option (pkcs11-login) { $pkcs11_login = 1; } "Force login to token"
+
 #char* pkcs11_label;
 option (pkcs11-write) STR "URL" { $action = ACTION_PKCS11_WRITE_URL; $pkcs11_url = $1; } "Writes loaded certificates or private keys to a PKCS11 token."
 option (pkcs11-write-label) STR "label" { $pkcs11_label = $1; } "Sets a label for the write operation."
@@ -170,4 +173,4 @@ init { $bits = 0; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL;
 	$export = 0; $template = NULL; $hash=NULL; $fix_key = 0; $quick_random=1; 
 	$privkey_op = 0; $pkcs_cipher = "3des"; $crq_extensions=1; $pkcs11_provider= NULL;
 	$pkcs11_url = NULL; $pkcs11_type = PKCS11_TYPE_PK; $pubkey=NULL; $pkcs11_label = NULL; 
-	$pkcs11_trusted=0; $sec_param = NULL; }
+	$pkcs11_trusted=0; $sec_param = NULL; $pkcs11_login = 0; }
