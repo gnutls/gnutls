@@ -165,7 +165,8 @@ int gnutls_pkcs11_copy_x509_crt(const char *token_url,
  * @flags: One of GNUTLS_PKCS11_OBJ_* flags
  *
  * This function will copy a private key into a PKCS #11 token specified by
- * a URL. 
+ * a URL. It is highly recommended flags to contain %GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE
+ * unless there is a strong reason not to.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
@@ -215,21 +216,31 @@ int gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 	}
 
 	/* FIXME: copy key usage flags */
-
-	a[0].type = CKA_CLASS;
-	a[0].value = &class;
-	a[0].value_len = sizeof(class);
-	a[1].type = CKA_ID;
-	a[1].value = id;
-	a[1].value_len = id_size;
-	a[2].type = CKA_KEY_TYPE;
-	a[2].value = &type;
-	a[2].value_len = sizeof(type);
-	a[3].type = CKA_SENSITIVE;
-	a[3].value = &tval;
-	a[3].value_len = sizeof(tval);
-
-	a_val = 4;
+	a_val = 0;
+	a[a_val].type = CKA_CLASS;
+	a[a_val].value = &class;
+	a[a_val].value_len = sizeof(class);
+	a_val++;
+	
+	a[a_val].type = CKA_ID;
+	a[a_val].value = id;
+	a[a_val].value_len = id_size;
+	a_val++;
+	
+	a[a_val].type = CKA_KEY_TYPE;
+	a[a_val].value = &type;
+	a[a_val].value_len = sizeof(type);
+	a_val++;
+	
+	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE)
+		tval = 1;
+	else
+		tval = 0;
+	
+	a[a_val].type = CKA_SENSITIVE;
+	a[a_val].value = &tval;
+	a[a_val].value_len = sizeof(tval);
+	a_val++;
 
 	pk = gnutls_x509_privkey_get_pk_algorithm(key);
 	switch (pk) {

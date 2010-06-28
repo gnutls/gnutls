@@ -411,7 +411,7 @@ unsigned int key_usage;
 
 	xkey = load_private_key(0);
 	if (xkey != NULL) {
-		ret = gnutls_pkcs11_copy_x509_privkey(url, xkey, label, key_usage, flags);
+		ret = gnutls_pkcs11_copy_x509_privkey(url, xkey, label, key_usage, flags|GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE);
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
 			exit(1);

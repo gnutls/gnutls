@@ -48,8 +48,9 @@ void gnutls_pkcs11_set_pin_function (gnutls_pkcs11_pin_callback_t callback, void
 int gnutls_pkcs11_add_provider (const char * name, const char * params);
 int gnutls_pkcs11_obj_init ( gnutls_pkcs11_obj_t *certificate);
 
-#define GNUTLS_PKCS11_OBJ_FLAG_LOGIN 1 /* force login in the token for the operation */
-#define GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED 1 /* object marked as trusted */
+#define GNUTLS_PKCS11_OBJ_FLAG_LOGIN (1<<0) /* force login in the token for the operation */
+#define GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED (1<<1) /* object marked as trusted */
+#define GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE (1<<2) /* object marked as sensitive (unexportable) */
 
 int gnutls_pkcs11_obj_import_url (gnutls_pkcs11_obj_t, const char * url,
 	unsigned int flags/* GNUTLS_PKCS11_OBJ_FLAG_* */);
