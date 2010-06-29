@@ -80,7 +80,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	auth_dh_common.c gnutls_helper.c gnutls_supplemental.c		\
 	crypto.c random.c  ext_signature.c cryptodev.c \
 	crypto-api.c ext_safe_renegotiation.c gnutls_privkey.c \
-	pkcs11.c pkcs11_privkey.c gnutls_pubkey.c pkcs11_write.c
+	pkcs11.c pkcs11_privkey.c gnutls_pubkey.c pkcs11_write.c locks.c
 
 
 if ENABLE_NETTLE
@@ -104,7 +104,7 @@ HFILES = debug.h gnutls_compress.h gnutls_cipher.h gnutls_buffers.h	\
 	gnutls_helper.h auth_psk.h auth_psk_passwd.h			\
 	gnutls_supplemental.h crypto.h random.h		\
 	ext_session_ticket.h ext_signature.h gnutls_cryptodev.h		\
-	ext_safe_renegotiation.h
+	ext_safe_renegotiation.h locks.h
 
 if ENABLE_LOCAL_PAKCHOIS
 COBJECTS+=pakchois/pakchois.c pakchois/errors.c

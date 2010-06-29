@@ -37,6 +37,7 @@
 
 #include <gnutls_extensions.h>	/* for _gnutls_ext_init */
 #include <gnutls_cryptodev.h>
+#include <locks.h>
 
 #include "sockets.h"
 #include "gettext.h"
@@ -53,139 +54,6 @@ ASN1_TYPE _gnutls_gnutls_asn;
 
 gnutls_log_func _gnutls_log_func;
 int _gnutls_log_level = 0;	/* default log level */
-
-#ifdef _WIN32
-
-# include <windows.h>
-
-/* FIXME: win32 locks are untested */
-static int gnutls_system_mutex_init (void **priv)
-{
-  CRITICAL_SECTION *lock = malloc (sizeof (CRITICAL_SECTION));
-  int ret;
-
-  if (lock==NULL)
-    return GNUTLS_E_MEMORY_ERROR;
-
-  InitializeCriticalSection(lock);
-     
-  *priv = lock;
-  
-  return 0;
-}
-
-static void gnutls_system_mutex_deinit (void *priv)
-{
-  DeleteCriticalSection(priv);
-  free(priv);
-}
-
-static int gnutls_system_mutex_lock (void *priv)
-{
-  EnterCriticalSection(priv);
-  return 0;
-}
-
-static int gnutls_system_mutex_unlock (void *priv)
-{
-  LeaveCriticalSection(priv);
-  return 0;
-}
-
-#else
-
-# ifdef HAVE_LIBPTHREAD
-#  include <pthread.h>
-
-static int gnutls_system_mutex_init (void **priv)
-{
-  pthread_mutex_t *lock = malloc (sizeof (pthread_mutex_t));
-  int ret;
-
-  if (lock==NULL)
-    return GNUTLS_E_MEMORY_ERROR;
-
-   ret = pthread_mutex_init (lock, NULL);
-   if (ret)
-     {
-       free(lock);
-       gnutls_assert();
-       return GNUTLS_E_LOCKING_ERROR;
-     }
-     
-  *priv = lock;
-  
-  return 0;
-}
-
-static void gnutls_system_mutex_deinit (void *priv)
-{
-  pthread_mutex_destroy(priv);
-  free(priv);
-}
-
-static int gnutls_system_mutex_lock (void *priv)
-{
-  if (pthread_mutex_lock(priv))
-    {
-        gnutls_assert();
-        return GNUTLS_E_LOCKING_ERROR;
-    }
-
-  return 0;
-}
-
-static int gnutls_system_mutex_unlock (void *priv)
-{
-  if (pthread_mutex_unlock(priv))
-    {
-        gnutls_assert();
-        return GNUTLS_E_LOCKING_ERROR;
-    }
-
-  return 0;
-}
-
-# else
-
-#define gnutls_system_mutex_init NULL
-#define gnutls_system_mutex_deinit NULL
-#define gnutls_system_mutex_lock NULL
-#define gnutls_mutex_unlock NULL
-
-# endif /* PTHREAD */
-
-#endif
-
-mutex_init_func gnutls_mutex_init = gnutls_system_mutex_init;
-mutex_deinit_func gnutls_mutex_deinit = gnutls_system_mutex_deinit;
-mutex_lock_func gnutls_mutex_lock = gnutls_system_mutex_lock;
-mutex_unlock_func gnutls_mutex_unlock = gnutls_system_mutex_unlock;
-
-/**
- * gnutls_global_set_mutex:
- * @init: mutex initialization function
- * @deinit: mutex deinitialization function
- * @lock: mutex locking function
- * @unlock: mutex unlocking function
- *
- * With this function you are allowed to override the default mutex
- * locks used in some parts of gnutls and dependent libraries. This function
- * should be used if you have complete control of your program and libraries.
- * Do not call this function from a library. Instead only initialize gnutls and
- * the default OS mutex locks will be used.
- * 
- * This function must be called before gnutls_global_init().
- *
- **/
-void gnutls_global_set_mutex(mutex_init_func init, mutex_deinit_func deinit, 
-        mutex_lock_func lock, mutex_unlock_func unlock)
-{
-  gnutls_mutex_init = init;
-  gnutls_mutex_deinit = deinit;
-  gnutls_mutex_lock = lock;
-  gnutls_mutex_unlock = unlock;
-}
 
 /**
  * gnutls_global_set_log_function:
@@ -274,35 +142,6 @@ gnutls_global_set_mem_functions (gnutls_alloc_function alloc_func,
 
 static int _gnutls_init = 0;
 
-#ifndef HAVE_LIBNETTLE
-static struct gcry_thread_cbs gct = {
-  .option = (GCRY_THREAD_OPTION_PTH | (GCRY_THREAD_OPTION_VERSION << 8)),
-  .init = NULL,
-  .select = NULL,
-  .waitpid = NULL,
-  .accept = NULL,
-  .connect = NULL,
-  .sendmsg = NULL,
-  .recvmsg = NULL,
-};
-
-static int wrap_gcry_mutex_lock(void** m)
-{
-  return gnutls_mutex_lock(*m);
-}
-
-static int wrap_gcry_mutex_unlock(void** m)
-{
-  return gnutls_mutex_unlock(*m);
-}
-
-static int wrap_gcry_mutex_deinit(void** m)
-{
-  gnutls_mutex_deinit(*m);
-  return 0;
-}
-
-#endif
 
 /**
  * gnutls_global_init:
@@ -313,10 +152,7 @@ static int wrap_gcry_mutex_deinit(void** m)
  * gnutls_global_deinit() when gnutls usage is no longer needed
  *
  * Note that this function will also initialize libgcrypt, if it has
- * not been initialized before.  Thus if you want to manually
- * initialize libgcrypt you must do it before calling this function.
- * This is useful in cases you want to disable libgcrypt's internal
- * lockings etc.
+ * not been initialized before.  
  *
  * This function increment a global counter, so that
  * gnutls_global_deinit() only releases resources when it has been
@@ -356,15 +192,7 @@ gnutls_global_init (void)
     {
       const char *p;
 
-      if (gnutls_mutex_init != NULL)
-        {
-          gct.mutex_init = gnutls_mutex_init;
-          gct.mutex_destroy = wrap_gcry_mutex_deinit;
-          gct.mutex_lock = wrap_gcry_mutex_lock;
-          gct.mutex_unlock = wrap_gcry_mutex_unlock;
-
-          gcry_control (GCRYCTL_SET_THREAD_CBS, &gct);
-        }
+      _gnutls_gcry_register_mutexes();
 
       p = gcry_check_version (GNUTLS_MIN_LIBGCRYPT_VERSION);
 
