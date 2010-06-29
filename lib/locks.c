@@ -28,12 +28,10 @@
 #include <libtasn1.h>
 #include <gnutls_dh.h>
 #include <random.h>
-#ifndef HAVE_LIBNETTLE
-#include <gcrypt.h>
 
-#endif
+#include <locks.h>
 
-#ifdef _WIN32
+#ifdef HAVE_WIN32_LOCKS
 
 # include <windows.h>
 
@@ -71,10 +69,10 @@ static int gnutls_system_mutex_unlock (void *priv)
   return 0;
 }
 
-#else
+#endif /* WIN32_LOCKS */
 
-# ifdef HAVE_LIBPTHREAD
-#  include <pthread.h>
+#ifdef HAVE_PTHREAD_LOCKS
+# include <pthread.h>
 
 static int gnutls_system_mutex_init (void **priv)
 {
@@ -125,16 +123,31 @@ static int gnutls_system_mutex_unlock (void *priv)
   return 0;
 }
 
-# else
+#endif /* PTHREAD_LOCKS */
 
-#define gnutls_system_mutex_init NULL
-#define gnutls_system_mutex_deinit NULL
-#define gnutls_system_mutex_lock NULL
-#define gnutls_mutex_unlock NULL
+#ifdef HAVE_NO_LOCKS
 
-# endif /* PTHREAD */
+static int gnutls_system_mutex_init (void **priv)
+{
+  return 0;
+}
 
-#endif
+static void gnutls_system_mutex_deinit (void *priv)
+{
+  return;
+}
+
+static int gnutls_system_mutex_lock (void *priv)
+{
+  return 0;
+}
+
+static int gnutls_system_mutex_unlock (void *priv)
+{
+  return 0;
+}
+
+#endif /* NO_LOCKS */
 
 mutex_init_func gnutls_mutex_init = gnutls_system_mutex_init;
 mutex_deinit_func gnutls_mutex_deinit = gnutls_system_mutex_deinit;
