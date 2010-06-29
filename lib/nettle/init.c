@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2009, 2010 Free
- * Software Foundation, Inc.
+ * Copyright (C) 2010 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -23,26 +22,17 @@
  *
  */
 
-#ifndef GNUTLS_GLOBAL_H
-# define GNUTLS_GLOBAL_H
+#include <gnutls_int.h>
+#include <gnutls_errors.h>
+#include <gnutls_num.h>
+#include <gnutls_mpi.h>
+#include <gcrypt.h>
 
-#include <libtasn1.h>
-#include <gnutls/gnutls.h>
-
-int gnutls_is_secure_memory (const void *mem);
-
-extern ASN1_TYPE _gnutls_pkix1_asn;
-extern ASN1_TYPE _gnutls_gnutls_asn;
-
-/* removed const from node_asn* to
- * prevent warnings, since libtasn1 doesn't
- * use the const keywork in its functions.
+/* Functions that refer to the initialization of the libgcrypt library.
  */
-#define _gnutls_get_gnutls_asn() ((ASN1_TYPE) _gnutls_gnutls_asn)
-#define _gnutls_get_pkix() ((ASN1_TYPE) _gnutls_pkix1_asn)
 
-extern gnutls_log_func _gnutls_log_func;
-extern int _gnutls_log_level;
-extern int gnutls_crypto_init(void);
+int gnutls_crypto_init(void)
+{
+   return 0;
+}
 
-#endif

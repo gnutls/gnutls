@@ -31,4 +31,4 @@ AM_CPPFLAGS = \
 
 noinst_LTLIBRARIES = libcrypto.la
 
-libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c
+libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c

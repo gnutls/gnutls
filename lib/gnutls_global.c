@@ -28,11 +28,6 @@
 #include <libtasn1.h>
 #include <gnutls_dh.h>
 #include <random.h>
-#ifndef HAVE_LIBNETTLE
-#include <gcrypt.h>
-#define GNUTLS_MIN_LIBGCRYPT_VERSION "1.2.4"
-
-#endif
 #include <gnutls/pkcs11.h>
 
 #include <gnutls_extensions.h>	/* for _gnutls_ext_init */
@@ -103,7 +98,6 @@ gnutls_global_set_log_level (int level)
  * (malloc(), free()), are used by gnutls, to allocate both sensitive
  * and not sensitive data.  This function is provided to set the
  * memory allocation functions to something other than the defaults
- * (ie the gcrypt allocation functions).
  *
  * This function must be called before gnutls_global_init() is called.
  * This function is not thread safe.
@@ -151,8 +145,8 @@ static int _gnutls_init = 0;
  * shared by gnutls session structures.  You should call
  * gnutls_global_deinit() when gnutls usage is no longer needed
  *
- * Note that this function will also initialize libgcrypt, if it has
- * not been initialized before.  
+ * Note that this function will also initialize the underlying crypto
+ * backend, if it has not been initialized before.  
  *
  * This function increment a global counter, so that
  * gnutls_global_deinit() only releases resources when it has been
@@ -186,33 +180,13 @@ gnutls_global_init (void)
 
   bindtextdomain (PACKAGE, LOCALEDIR);
 
-#ifndef HAVE_LIBNETTLE
-  /* Initialize libgcrypt if it hasn't already been initialized. */
-  if (gcry_control (GCRYCTL_ANY_INITIALIZATION_P) == 0)
+  res = gnutls_crypto_init();
+  if (res != 0) 
     {
-      const char *p;
-
-      _gnutls_gcry_register_mutexes();
-
-      p = gcry_check_version (GNUTLS_MIN_LIBGCRYPT_VERSION);
-
-      if (p == NULL)
-	{
-	  gnutls_assert ();
-	  _gnutls_debug_log ("Checking for libgcrypt failed: %s < %s\n",
-			     gcry_check_version (NULL),
-			     GNUTLS_MIN_LIBGCRYPT_VERSION);
-	  return GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY;
-	}
-
-      /* for gcrypt in order to be able to allocate memory */
-      gcry_control (GCRYCTL_DISABLE_SECMEM, NULL, 0);
-
-      gcry_control (GCRYCTL_INITIALIZATION_FINISHED, NULL, 0);
-      
-      gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
+      gnutls_assert();
+      return GNUTLS_E_CRYPTO_INIT_FAILED;
     }
-#endif
+
   /* initialize ASN.1 parser
    * This should not deal with files in the final
    * version.

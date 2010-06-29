@@ -9,8 +9,4 @@ extern mutex_deinit_func gnutls_mutex_deinit;
 extern mutex_lock_func gnutls_mutex_lock;
 extern mutex_unlock_func gnutls_mutex_unlock;
 
-# ifndef HAVE_LIBNETTLE
-void _gnutls_gcry_register_mutexes(void);
-# endif
-
 #endif

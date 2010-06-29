@@ -35,8 +35,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <fcntl.h>
-
-#include <pthread.h>
+#include <locks.h>
 
 #define SOURCES 2
 
