@@ -57,6 +57,8 @@ gnutls_TEXINFOS += gnutls-pgp.dia gnutls-pgp.eps gnutls-pgp.png		\
 gnutls_TEXINFOS += gnutls-x509.dia gnutls-x509.eps gnutls-x509.png	\
                    gnutls-x509.pdf
 gnutls_TEXINFOS += gnutls-logo.eps gnutls-logo.png gnutls-logo.pdf
+gnutls_TEXINFOS += pkcs11-vision.dia pkcs11-vision.eps	\
+                   pkcs11-vision.png pkcs11-vision.pdf
 
 # Images.  Make sure there are eps + png + pdf of each, plus the source dia.
 gnutls_TEXINFOS += gnutls-certificate-user-use-case.dia	\
@@ -86,7 +88,8 @@ images_DATA = gnutls-certificate-user-use-case.png		\
 	gnutls-layers.png gnutls-mod_auth_st.png gnutls-pgp.png	\
 	gnutls-client-server-use-case.png			\
 	gnutls-handshake-sequence.png gnutls-internals.png	\
-	gnutls-logo.png gnutls-objects.png gnutls-x509.png
+	gnutls-logo.png gnutls-objects.png gnutls-x509.png	\
+	pkcs11-vision.png
 
 AM_MAKEINFOFLAGS = -I $(top_srcdir)/doc
 TEXI2DVI = texi2dvi $(AM_MAKEINFOFLAGS)
