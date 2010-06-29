@@ -221,8 +221,8 @@ typedef struct mbuffer_head_st
 
 typedef enum
 {
-  HANDSHAKE_MAC_TYPE_10 = 1,
-  HANDSHAKE_MAC_TYPE_12
+  HANDSHAKE_MAC_TYPE_10 = 1, /* TLS 1.0 style */ 
+  HANDSHAKE_MAC_TYPE_12 /* TLS 1.2 style */
 } handshake_mac_type_t;
 
 /* Store & Retrieve functions defines: 
