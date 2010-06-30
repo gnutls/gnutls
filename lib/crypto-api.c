@@ -113,7 +113,8 @@ gnutls_cipher_decrypt (gnutls_cipher_hd_t handle, void *ciphertext,
 void
 gnutls_cipher_deinit (gnutls_cipher_hd_t handle)
 {
-  return _gnutls_cipher_deinit ((cipher_hd_st *) handle);
+  _gnutls_cipher_deinit ((cipher_hd_st *) handle);
+  gnutls_free(handle);
 }
 
 
@@ -198,6 +199,7 @@ void
 gnutls_hmac_deinit (gnutls_hmac_hd_t handle, void *digest)
 {
   _gnutls_hmac_deinit ((digest_hd_st *) handle, digest);
+  gnutls_free(handle);
 }
 
 /**
@@ -318,6 +320,7 @@ void
 gnutls_hash_deinit (gnutls_hash_hd_t handle, void *digest)
 {
   _gnutls_hash_deinit ((digest_hd_st *) handle, digest);
+  gnutls_free(handle);
 }
 
 /**
