@@ -22,11 +22,11 @@ typedef int (*gnutls_pkcs11_token_callback_t)(
 );
 
 /* flags */
-#define GNUTLS_PKCS11_PIN_FINAL_TRY 1
-#define GNUTLS_PKCS11_PIN_COUNT_LOW 2
+#define GNUTLS_PKCS11_PIN_FINAL_TRY (1<<0)
+#define GNUTLS_PKCS11_PIN_COUNT_LOW (1<<1)
 
 typedef int (*gnutls_pkcs11_pin_callback_t)(void *userdata, int attempt,
-		const char *slot_descr, const char *token_label,
+		const char *token_url, const char *token_label,
 		unsigned int flags, char *pin, size_t pin_max);
 
 struct gnutls_pkcs11_obj_st;

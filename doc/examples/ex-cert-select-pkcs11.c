@@ -23,6 +23,7 @@
 
 #define MAX_BUF 1024
 #define MSG "GET / HTTP/1.0\r\n\r\n"
+#define MIN(x,y) (((x)<(y))?(x):(y))
 
 #define CAFILE "ca.pem"
 #define CERT_URL "pkcs11:manufacturer=EnterSafe;object=Certificate" \
@@ -76,6 +77,31 @@ load_keys (void)
 
 }
 
+static int pin_callback(void* user, int attempt, const char *token_url,
+	const char *token_label, unsigned int flags, char* pin, size_t pin_max)
+{
+const char* password;
+int len;
+
+	printf("PIN required for token '%s' with URL '%s'\n", token_label, token_url);
+	if (flags & GNUTLS_PKCS11_PIN_FINAL_TRY)
+		printf("*** This is the final try before locking!\n");
+	if (flags & GNUTLS_PKCS11_PIN_COUNT_LOW)
+		printf("*** Only few tries left before locking!\n");
+	
+	password = getpass("Enter pin: ");
+	if (password==NULL || password[0] == 0) {
+		fprintf(stderr, "No password given\n");
+		exit(1);
+	}
+	
+	len = MIN(pin_max,strlen(password));
+	memcpy(pin, password, len);
+	pin[len] = 0;
+	
+	return 0;
+}
+
 int
 main (void)
 {
@@ -88,6 +114,10 @@ main (void)
    */
 
   gnutls_global_init ();
+  /* PKCS11 private key operations might require PIN.
+   * Register a callback.
+   */
+  gnutls_pkcs11_set_pin_function (pin_callback, NULL);
 
   load_keys ();
 

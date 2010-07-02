@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2010 Free Software Foundation, Inc.
+ * Author: Nikos Mavrogiannopoulos
+ *
+ * This file is part of GnuTLS.
+ *
+ * GnuTLS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * GnuTLS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #include <config.h>
 
 #include <gnutls/gnutls.h>
@@ -8,31 +27,47 @@
 #include <stdlib.h>
 #include "certtool-common.h"
 #include "certtool-cfg.h"
+#include <unistd.h>
 #include <string.h>
 
 #define MIN(x,y) ((x)<(y))?(x):(y)
 
-static int pin_callback(void* user, int attempt, const char *slot_descr,
+static int pin_callback(void* user, int attempt, const char *token_url,
 	const char *token_label, unsigned int flags, char* pin, size_t pin_max)
 {
 const char* password;
 int len;
+/* allow caching of PIN */
+static char* cached_url = NULL;
+static char cached_pin[32] = "";
 
-	printf("PIN required for token '%s' in slot '%s'\n", token_label, slot_descr);
+	printf("PIN required for token '%s' with URL '%s'\n", token_label, token_url);
 	if (flags & GNUTLS_PKCS11_PIN_FINAL_TRY)
 		printf("*** This is the final try before locking!\n");
 	if (flags & GNUTLS_PKCS11_PIN_COUNT_LOW)
 		printf("*** Only few tries left before locking!\n");
-
-	password = get_pass();
-	if (password==NULL) {
+	
+	if (flags == 0 && cached_url != NULL) {
+		if (strcmp(cached_url, token_url)==0) {
+			strcpy(pin, cached_pin);
+			return 0;
+		}
+	}
+	
+	password = getpass("Enter pin: ");
+	if (password==NULL || password[0] == 0) {
 		fprintf(stderr, "No password given\n");
 		exit(1);
 	}
-
+	
 	len = MIN(pin_max,strlen(password));
 	memcpy(pin, password, len);
 	pin[len] = 0;
+	
+	/* cache */
+	strcpy(cached_pin, pin);
+	if (cached_url) free(cached_url);
+	cached_url = strdup(token_url);
 	
 	return 0;
 }

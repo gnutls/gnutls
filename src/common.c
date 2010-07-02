@@ -861,17 +861,27 @@ service_to_port (const char *service)
   return ntohs (server_port->s_port);
 }
 
-static int pin_callback(void* user, int attempt, const char *slot_descr,
+static int pin_callback(void* user, int attempt, const char *token_url,
 	const char *token_label, unsigned int flags, char* pin, size_t pin_max)
 {
 const char* password;
 int len;
+/* allow caching of PIN */
+static char* cached_url = NULL;
+static char cached_pin[32] = "";
 
-	printf("PIN required for token '%s' in slot '%s'\n", token_label, slot_descr);
+	printf("PIN required for token '%s' with URL '%s'\n", token_label, token_url);
 	if (flags & GNUTLS_PKCS11_PIN_FINAL_TRY)
 		printf("*** This is the final try before locking!\n");
 	if (flags & GNUTLS_PKCS11_PIN_COUNT_LOW)
 		printf("*** Only few tries left before locking!\n");
+	
+	if (flags == 0 && cached_url != NULL) {
+		if (strcmp(cached_url, token_url)==0) {
+			strcpy(pin, cached_pin);
+			return 0;
+		}
+	}
 	
 	password = getpass("Enter pin: ");
 	if (password==NULL || password[0] == 0) {
@@ -882,6 +892,11 @@ int len;
 	len = MIN(pin_max,strlen(password));
 	memcpy(pin, password, len);
 	pin[len] = 0;
+	
+	/* cache */
+	strcpy(cached_pin, pin);
+	if (cached_url) free(cached_url);
+	cached_url = strdup(token_url);
 	
 	return 0;
 }

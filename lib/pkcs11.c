@@ -418,8 +418,8 @@ void gnutls_pkcs11_deinit(void)
  * is required for PKCS 11 operations.
  *
  * Callback for PKCS#11 PIN entry.  The callback provides the PIN code
- * to unlock the token with label 'token_label' in the slot described
- * by 'slot_descr'.
+ * to unlock the token with label 'token_label', specified by the URL 
+ * 'token_url'.
  *
  * The PIN code, as a NUL-terminated ASCII string, should be copied
  * into the 'pin' buffer (of maximum size pin_max), and
@@ -1733,13 +1733,26 @@ int pkcs11_login(pakchois_session_t * pks, const struct token_info *info)
 {
 	int attempt = 0, ret;
 	ck_rv_t rv;
+	char* token_url;
 	int pin_len;
+	struct pkcs11_url_info uinfo;
 
 
 	if ((info->tinfo.flags & CKF_LOGIN_REQUIRED) == 0) {
 		gnutls_assert();
 		_gnutls_debug_log("pk11: No login required.\n");
 		return 0;
+	}
+	
+	memset(&uinfo, 0, sizeof(uinfo));
+	strcpy(uinfo.manufacturer, info->tinfo.manufacturer_id);
+	strcpy(uinfo.token, info->tinfo.label);
+	strcpy(uinfo.model, info->tinfo.model);
+	strcpy(uinfo.serial, info->tinfo.serial_number);
+	ret = pkcs11_info_to_url(&uinfo, &token_url);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
 	}
 
 	/* For a token with a "protected" (out-of-band) authentication
@@ -1752,7 +1765,8 @@ int pkcs11_login(pakchois_session_t * pks, const struct token_info *info)
 			gnutls_assert();
 			_gnutls_debug_log
 			    ("pk11: Protected login failed.\n");
-			return GNUTLS_E_PKCS11_ERROR;
+			ret = GNUTLS_E_PKCS11_ERROR;
+			goto cleanup;
 		}
 	}
 
@@ -1762,7 +1776,8 @@ int pkcs11_login(pakchois_session_t * pks, const struct token_info *info)
 		gnutls_assert();
 		_gnutls_debug_log
 		    ("pk11: No pin callback but login required.\n");
-		return GNUTLS_E_PKCS11_ERROR;
+		ret = GNUTLS_E_PKCS11_ERROR;
+		goto cleanup;
 	}
 
 	do {
@@ -1779,7 +1794,8 @@ int pkcs11_login(pakchois_session_t * pks, const struct token_info *info)
 				gnutls_assert();
 				_gnutls_debug_log
 				    ("pk11: GetTokenInfo failed\n");
-				return GNUTLS_E_PKCS11_ERROR;
+				ret = GNUTLS_E_PKCS11_ERROR;
+				goto cleanup;
 			}
 		}
 
@@ -1790,12 +1806,13 @@ int pkcs11_login(pakchois_session_t * pks, const struct token_info *info)
 			flags |= GNUTLS_PKCS11_PIN_FINAL_TRY;
 
 		ret = pin_func(pin_data, attempt++,
-			       (char *) info->sinfo.slot_description,
+			       (char *) token_url,
 			       (char *) info->tinfo.label, flags,
 			       pin, sizeof(pin));
 		if (ret < 0) {
 			gnutls_assert();
-			return GNUTLS_E_PKCS11_PIN_ERROR;
+			ret = GNUTLS_E_PKCS11_PIN_ERROR;
+			goto cleanup;
 		}
 		pin_len = strlen(pin);
 
@@ -1809,9 +1826,14 @@ int pkcs11_login(pakchois_session_t * pks, const struct token_info *info)
 
 	_gnutls_debug_log("pk11: Login result = %lu\n", rv);
 
-	return (rv == CKR_OK
+
+	ret = (rv == CKR_OK
 		|| rv ==
 		CKR_USER_ALREADY_LOGGED_IN) ? 0 : pkcs11_rv_to_err(rv);
+
+cleanup:
+	gnutls_free(token_url);
+	return ret;
 }
 
 static int find_privkeys(pakchois_session_t * pks, struct token_info *info,

@@ -18,14 +18,12 @@ struct pkcs11_url_info {
 	/* everything here is null terminated strings */
 	opaque id[PKCS11_ID_SIZE * 3 + 1];	/* hex with delimiters */
 	opaque type[16];	/* cert/key etc. */
-	opaque
-	    manufacturer[sizeof
-			 (((struct ck_token_info *) NULL)->
-			  manufacturer_id) + 1];
+	opaque manufacturer[sizeof
+		(((struct ck_token_info *) NULL)->
+		manufacturer_id) + 1];
 	opaque token[sizeof(((struct ck_token_info *) NULL)->label) + 1];
-	opaque
-	    serial[sizeof(((struct ck_token_info *) NULL)->serial_number) +
-		   1];
+	opaque serial[sizeof(((struct ck_token_info *) NULL)->
+                serial_number) + 1];
 	opaque model[sizeof(((struct ck_token_info *) NULL)->model) + 1];
 	opaque label[PKCS11_LABEL_SIZE + 1];
 
