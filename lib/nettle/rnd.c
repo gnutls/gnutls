@@ -41,8 +41,8 @@
 
 static void* rnd_mutex;
 
-#define RND_LOCK if (gnutls_mutex_lock(&rnd_mutex)!=0) abort()
-#define RND_UNLOCK if (gnutls_mutex_unlock(&rnd_mutex)!=0) abort()
+#define RND_LOCK if (gnutls_mutex_lock(rnd_mutex)!=0) abort()
+#define RND_UNLOCK if (gnutls_mutex_unlock(rnd_mutex)!=0) abort()
 
 enum {
 	RANDOM_SOURCE_TRIVIA=0,
