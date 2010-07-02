@@ -66,7 +66,7 @@ int gnutls_pkcs11_copy_x509_crt(const char *token_url,
 	}
 
 	ret =
-	    pkcs11_open_session(&pks, &info, NULL,
+	    pkcs11_open_session(&pks, &info,
 				SESSION_WRITE | pkcs11_obj_flags_to_int(flags));
 	if (ret < 0) {
 		gnutls_assert();
@@ -208,7 +208,7 @@ int gnutls_pkcs11_copy_x509_privkey(const char *token_url,
 	}
 
 	ret =
-	    pkcs11_open_session(&pks, &info, NULL,
+	    pkcs11_open_session(&pks, &info,
 				SESSION_WRITE | pkcs11_obj_flags_to_int(flags));
 	if (ret < 0) {
 		gnutls_assert();

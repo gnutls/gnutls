@@ -7,11 +7,6 @@
 #define PKCS11_ID_SIZE 128
 #define PKCS11_LABEL_SIZE 128
 
-typedef struct token_creds {
-	char pin[GNUTLS_PKCS11_MAX_PIN_LEN];
-	size_t pin_size;
-} token_creds_st;
-
 struct token_info {
 	struct ck_token_info tinfo;
 	struct ck_slot_info sinfo;
@@ -62,8 +57,7 @@ int pkcs11_url_to_info(const char *url, struct pkcs11_url_info *info);
 int pkcs11_get_info(struct pkcs11_url_info *info,
 		    gnutls_pkcs11_obj_info_t itype, void *output,
 		    size_t * output_size);
-int pkcs11_login(pakchois_session_t * pks, struct token_info *info,
-		 token_creds_st *);
+int pkcs11_login(pakchois_session_t * pks, const struct token_info *info);
 
 extern gnutls_pkcs11_token_callback_t token_func;
 extern void *token_data;
@@ -75,7 +69,7 @@ int pkcs11_info_to_url(const struct pkcs11_url_info *info, char **url);
 #define SESSION_LOGIN 2
 int pkcs11_open_session(pakchois_session_t ** _pks,
 			struct pkcs11_url_info *info,
-			token_creds_st * creds, unsigned int flags);
+			unsigned int flags);
 int _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 			    unsigned int flags);
 ck_object_class_t pkcs11_strtype_to_class(const char *type);
@@ -86,7 +80,7 @@ int pkcs11_token_matches_info(struct pkcs11_url_info *info,
 /* flags are SESSION_* */
 int pkcs11_find_object(pakchois_session_t ** _pks,
 		       ck_object_handle_t * _obj,
-		       struct pkcs11_url_info *info, token_creds_st *,
+		       struct pkcs11_url_info *info, 
 		       unsigned int flags);
 
 unsigned int pkcs11_obj_flags_to_int(unsigned int flags);

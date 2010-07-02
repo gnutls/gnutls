@@ -285,8 +285,6 @@ static const gnutls_error_entry error_algorithms[] = {
   ERROR_ENTRY (N_("PKCS #11 error in PIN."),
 	       GNUTLS_E_PKCS11_PIN_ERROR, 1),
   ERROR_ENTRY (N_("PKCS #11 PIN should be saved."),
-	       GNUTLS_E_PKCS11_PIN_SAVE, 1),
-  ERROR_ENTRY (N_("PKCS #11 error"),
 	       GNUTLS_E_PKCS11_ERROR, 1),
   ERROR_ENTRY (N_("PKCS #11 error in slot"),
 	GNUTLS_E_PKCS11_SLOT_ERROR, 1),

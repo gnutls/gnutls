@@ -35,7 +35,6 @@ struct gnutls_pkcs11_privkey_st {
 	gnutls_pk_algorithm_t pk_algorithm;
 	unsigned int flags;
 	struct pkcs11_url_info info;
-	token_creds_st creds;
 };
 
 /**
@@ -172,7 +171,7 @@ gnutls_pkcs11_privkey_sign_data(gnutls_pkcs11_privkey_t signer,
 	do { \
 		int retries = 0; \
 		int rret; \
-		ret = pkcs11_find_object (&pks, &obj, &key->info, &key->creds, \
+		ret = pkcs11_find_object (&pks, &obj, &key->info, \
 			SESSION_LOGIN); \
 		if (ret < 0) { \
 			rret = token_func(token_data, key->info.token, retries++); \
