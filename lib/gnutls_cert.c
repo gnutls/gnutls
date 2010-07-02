@@ -179,7 +179,10 @@ gnutls_certificate_get_openpgp_keyring (gnutls_certificate_credentials_t sc,
  *
  * This function will delete all the CA name in the given
  * credentials. Clients may call this to save some memory since in
- * client side the CA names are not used.
+ * client side the CA names are not used. Servers might want to use
+ * this function if a large list of trusted CAs is present and
+ * sending the names of it would just consume bandwidth without providing 
+ * information to client.
  *
  * CA names are used by servers to advertize the CAs they support to
  * clients.
