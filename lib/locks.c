@@ -173,6 +173,9 @@ mutex_unlock_func gnutls_mutex_unlock = gnutls_system_mutex_unlock;
 void gnutls_global_set_mutex(mutex_init_func init, mutex_deinit_func deinit, 
         mutex_lock_func lock, mutex_unlock_func unlock)
 {
+  if (init == NULL || deinit == NULL || lock == NULL  || unlock == NULL)
+    return;
+
   gnutls_mutex_init = init;
   gnutls_mutex_deinit = deinit;
   gnutls_mutex_lock = lock;
