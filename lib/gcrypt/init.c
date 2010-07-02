@@ -59,11 +59,6 @@ static int wrap_gcry_mutex_deinit(void** m)
   return 0;
 }
 
-void _gnutls_gcry_register_mutexes(void)
-{
-
-}
-
 int gnutls_crypto_init(void)
 {
   /* Initialize libgcrypt if it hasn't already been initialized. */
