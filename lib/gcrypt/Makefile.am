@@ -29,6 +29,10 @@ AM_CPPFLAGS = \
 	-I$(builddir)/../includes	\
 	-I$(srcdir)/..
 
+if ENABLE_MINITASN1
+AM_CPPFLAGS += -I$(srcdir)/../minitasn1
+endif
+
 noinst_LTLIBRARIES = libcrypto.la
 
 libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c

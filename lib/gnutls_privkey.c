@@ -42,7 +42,9 @@ struct gnutls_privkey_st {
 	union {
 		gnutls_x509_privkey_t x509;
 		gnutls_pkcs11_privkey_t pkcs11;
+#ifdef ENABLE_OPENPGP
 		gnutls_openpgp_privkey_t openpgp;
+#endif
 	} key;
 
 	unsigned int flags;
@@ -79,10 +81,12 @@ int gnutls_privkey_get_pk_algorithm(gnutls_privkey_t key,
 				    unsigned int *bits)
 {
 	switch (key->type) {
+#ifdef ENABLE_OPENPGP
 	case GNUTLS_PRIVKEY_OPENPGP:
 		return gnutls_openpgp_privkey_get_pk_algorithm(key->key.
 							       openpgp,
 							       bits);
+#endif
 	case GNUTLS_PRIVKEY_PKCS11:
 		return gnutls_pkcs11_privkey_get_pk_algorithm(key->key.
 							      pkcs11,
@@ -130,9 +134,11 @@ void gnutls_privkey_deinit(gnutls_privkey_t key)
 {
 	if (key->flags & GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE)
 		switch (key->type) {
+#ifdef ENABLE_OPENPGP
 		case GNUTLS_PRIVKEY_OPENPGP:
 			return gnutls_openpgp_privkey_deinit(key->key.
 							     openpgp);
+#endif
 		case GNUTLS_PRIVKEY_PKCS11:
 			return gnutls_pkcs11_privkey_deinit(key->key.
 							    pkcs11);
@@ -191,6 +197,7 @@ int gnutls_privkey_import_x509(gnutls_privkey_t pkey,
 	return 0;
 }
 
+#ifdef ENABLE_OPENPGP
 /**
  * gnutls_privkey_import_openpgp:
  * @pkey: The private key
@@ -215,6 +222,7 @@ int gnutls_privkey_import_openpgp(gnutls_privkey_t pkey,
 
 	return 0;
 }
+#endif
 
 /**
  * gnutls_privkey_sign_data:
@@ -291,9 +299,11 @@ int gnutls_privkey_sign_hash(gnutls_privkey_t key,
 			     gnutls_datum_t * signature)
 {
 	switch (key->type) {
+#ifdef ENABLE_OPENPGP
 	case GNUTLS_PRIVKEY_OPENPGP:
 		return gnutls_openpgp_privkey_sign_hash(key->key.openpgp,
 							hash, signature);
+#endif
 	case GNUTLS_PRIVKEY_PKCS11:
 		return gnutls_pkcs11_privkey_sign_hash(key->key.pkcs11,
 						       hash, signature);
@@ -330,11 +340,13 @@ int gnutls_privkey_decrypt_data(gnutls_privkey_t key,
 	}
 
 	switch (key->type) {
+#ifdef ENABLE_OPENPGP
 	case GNUTLS_PRIVKEY_OPENPGP:
 		return gnutls_openpgp_privkey_decrypt_data(key->key.
 							   openpgp, flags,
 							   ciphertext,
 							   plaintext);
+#endif
 	case GNUTLS_PRIVKEY_X509:
 		return _gnutls_pkcs1_rsa_decrypt(plaintext, ciphertext,
 						 key->key.x509->params,

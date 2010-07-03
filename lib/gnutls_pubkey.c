@@ -268,6 +268,7 @@ int gnutls_pubkey_import_pkcs11(gnutls_pubkey_t key,
 	return 0;
 }
 
+#ifdef ENABLE_OPENPGP
 /**
  * gnutls_pubkey_import_openpgp:
  * @key: The public key
@@ -329,6 +330,8 @@ int gnutls_pubkey_import_openpgp(gnutls_pubkey_t key,
 
 	return 0;
 }
+
+#endif
 
 /**
  * gnutls_pubkey_export:
