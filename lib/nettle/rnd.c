@@ -107,7 +107,7 @@ static int do_trivia_source(int init)
 
 #define DEVICE_READ_SIZE 16
 #define DEVICE_READ_SIZE_MAX 32
-#define DEVICE_READ_INTERVAL 360
+#define DEVICE_READ_INTERVAL 1200
 static int do_device_source(int init)
 {
     time_t now = time(NULL);
