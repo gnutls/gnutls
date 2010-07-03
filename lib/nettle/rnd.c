@@ -41,8 +41,8 @@
 
 static void* rnd_mutex;
 
-#define RND_LOCK if (gnutls_mutex_lock(rnd_mutex)!=0) abort()
-#define RND_UNLOCK if (gnutls_mutex_unlock(rnd_mutex)!=0) abort()
+#define RND_LOCK if (gnutls_mutex_lock(&rnd_mutex)!=0) abort()
+#define RND_UNLOCK if (gnutls_mutex_unlock(&rnd_mutex)!=0) abort()
 
 enum {
 	RANDOM_SOURCE_TRIVIA=0,
@@ -170,20 +170,20 @@ static void wrap_nettle_rnd_deinit(void* ctx)
 	RND_LOCK;
 	close(device_fd);
 	RND_UNLOCK;
+
+	gnutls_mutex_deinit(&rnd_mutex);
+	rnd_mutex = NULL;
 }
 
 static int wrap_nettle_rnd_init(void **ctx)
 {
 int ret;
 
-	if (gnutls_mutex_init)
+	ret = gnutls_mutex_init(&rnd_mutex);
+	if (ret < 0)
 	  {
-	    ret = gnutls_mutex_init(&rnd_mutex);
-	    if (ret < 0)
-	      {
-	        gnutls_assert();
-	        return ret;
-	      }
+	    gnutls_assert();
+	    return ret;
 	  }
 
 	yarrow256_init(&yctx, SOURCES, ysources);
