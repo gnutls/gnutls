@@ -28,11 +28,17 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
 #include <time.h>
+#include <signal.h>
 #include "timespec.h"		/* gnulib gettime */
 
 static unsigned char data[64 * 1024];
 
-#define TOTAL_ITER 8*1024
+static int must_finish = 0;
+
+static void alarm_handler(int signo)
+{
+        must_finish = 1;
+}
 
 static void
 tls_log_func (int level, const char *str)
@@ -40,19 +46,45 @@ tls_log_func (int level, const char *str)
   fprintf (stderr, "|<%d>| %s", level, str);
 }
 
+static void value2human(int bytes, double time, double* data, double* speed,char* metric)
+{
+        if (bytes > 1000 && bytes < 1000*1000) {
+                *data = ((double)bytes)/1000;
+                *speed = *data/time;
+                strcpy(metric, "Kb");
+                return;
+        } else if (bytes >= 1000*1000 && bytes < 1000*1000*1000) {
+                *data = ((double)bytes)/(1000*1000);
+                *speed = *data/time;
+                strcpy(metric, "Mb");
+                return;
+        } else if (bytes >= 1000*1000*1000) {
+                *data = ((double)bytes)/(1000*1000*1000);
+                *speed = *data/time;
+                strcpy(metric, "Gb");
+                return;
+        } else {
+                *data = (double)bytes;
+                *speed = *data/time;
+                strcpy(metric, "bytes");
+                return;
+        }
+}
+
 static void
 cipher_bench (int algo, int size)
 {
-  int ret, i;
+  int ret;
   gnutls_cipher_hd_t ctx;
   void *_key, *_iv;
   gnutls_datum_t key, iv;
   struct timespec start, stop;
   double secs;
   long data_size = 0;
-  double dd;
+  double dspeed, ddata;
   int blocksize = gnutls_cipher_get_block_size (algo);
   int keysize = gnutls_cipher_get_key_size (algo);
+  char metric[16];
 
   _key = malloc (keysize);
   if (_key == NULL)
@@ -70,10 +102,13 @@ cipher_bench (int algo, int size)
   key.data = _key;
   key.size = keysize;
 
-
   printf ("Checking %s (%dkb payload)... ", gnutls_cipher_get_name (algo),
 	  size);
   fflush (stdout);
+  
+  must_finish = 0;
+  alarm(5);
+  
   gettime (&start);
 
   ret = gnutls_cipher_init (&ctx, algo, &key, &iv);
@@ -83,11 +118,12 @@ cipher_bench (int algo, int size)
       goto leave;
     }
 
-  for (i = 0; i < TOTAL_ITER; i++)
+  do
     {
       gnutls_cipher_encrypt (ctx, data, size * 1024);
       data_size += size * 1024;
     }
+  while(must_finish == 0);
 
   gnutls_cipher_deinit (ctx);
 
@@ -96,9 +132,10 @@ cipher_bench (int algo, int size)
   secs = (stop.tv_sec * 1000 + stop.tv_nsec / (1000 * 1000) -
 	  (start.tv_sec * 1000 + start.tv_nsec / (1000 * 1000)));
   secs /= 1000;
-  dd = (((double) data_size / (double) secs)) / 1000;
-  printf ("Encrypted %ld kb in %.2f secs: ", data_size / 1000, secs);
-  printf ("%.2f kbyte/sec\n", dd);
+  
+  value2human(data_size, secs, &ddata, &dspeed, metric);
+  printf ("Encrypted %.2f %s in %.2f secs: ", ddata, metric, secs);
+  printf ("%.2f %s/sec\n", dspeed, metric);
 
 leave:
   free (_key);
@@ -109,13 +146,13 @@ leave:
 static void
 mac_bench (int algo, int size)
 {
-  int i;
   void *_key;
   struct timespec start, stop;
   double secs;
   long data_size = 0;
-  double dd;
+  double ddata, dspeed;
   int blocksize = gnutls_hmac_get_len (algo);
+  char metric[16];
 
   _key = malloc (blocksize);
   if (_key == NULL)
@@ -124,13 +161,18 @@ mac_bench (int algo, int size)
 
   printf ("Checking %s (%dkb payload)... ", gnutls_mac_get_name (algo), size);
   fflush (stdout);
+
+  must_finish = 0;
+  alarm(5);
+
   gettime (&start);
 
-  for (i = 0; i < TOTAL_ITER; i++)
+  do
     {
       gnutls_hmac_fast (algo, _key, blocksize, data, size * 1024, _key);
       data_size += size * 1024;
     }
+  while(must_finish == 0);
 
   gettime (&stop);
 
@@ -138,9 +180,11 @@ mac_bench (int algo, int size)
     (stop.tv_sec * 1000 + stop.tv_nsec / (1000 * 1000) -
      (start.tv_sec * 1000 + start.tv_nsec / (1000 * 1000)));
   secs /= 1000;
-  dd = (((double) data_size / (double) secs)) / 1000;
-  printf ("Hashed %ld kb in %.2f secs: ", data_size / 1000, secs);
-  printf ("%.2f kbyte/sec\n", dd);
+
+  value2human(data_size, secs, &ddata, &dspeed, metric);
+
+  printf ("Hashed %.2f %s in %.2f secs: ", ddata, metric, secs);
+  printf ("%.2f %s/sec\n", dspeed, metric);
 
   free (_key);
 }
@@ -152,6 +196,8 @@ main (int argc, char** argv)
 
   if (argc > 1)
     debug_level = 2;
+    
+  signal(SIGALRM, alarm_handler);
 
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (debug_level);
