@@ -51,21 +51,23 @@ static int gnutls_system_mutex_init (void **priv)
   return 0;
 }
 
-static void gnutls_system_mutex_deinit (void *priv)
+static int gnutls_system_mutex_deinit (void **priv)
 {
-  DeleteCriticalSection(priv);
-  free(priv);
-}
-
-static int gnutls_system_mutex_lock (void *priv)
-{
-  EnterCriticalSection(priv);
+  DeleteCriticalSection((CRITICAL_SECTION*)*priv);
+  free(*priv);
+  
   return 0;
 }
 
-static int gnutls_system_mutex_unlock (void *priv)
+static int gnutls_system_mutex_lock (void **priv)
 {
-  LeaveCriticalSection(priv);
+  EnterCriticalSection((CRITICAL_SECTION*)*priv);
+  return 0;
+}
+
+static int gnutls_system_mutex_unlock (void **priv)
+{
+  LeaveCriticalSection((CRITICAL_SECTION*)*priv);
   return 0;
 }
 
@@ -101,15 +103,16 @@ static int gnutls_system_mutex_init (void **priv)
   return 0;
 }
 
-static void gnutls_system_mutex_deinit (void *priv)
+static int gnutls_system_mutex_deinit (void **priv)
 {
-  pthread_mutex_destroy(priv);
-  free(priv);
+  pthread_mutex_destroy((pthread_mutex_t*)*priv);
+  free(*priv);
+  return 0;
 }
 
-static int gnutls_system_mutex_lock (void *priv)
+static int gnutls_system_mutex_lock (void **priv)
 {
-  if (pthread_mutex_lock(priv))
+  if (pthread_mutex_lock((pthread_mutex_t*)*priv))
     {
         gnutls_assert();
         return GNUTLS_E_LOCKING_ERROR;
@@ -118,9 +121,9 @@ static int gnutls_system_mutex_lock (void *priv)
   return 0;
 }
 
-static int gnutls_system_mutex_unlock (void *priv)
+static int gnutls_system_mutex_unlock (void **priv)
 {
-  if (pthread_mutex_unlock(priv))
+  if (pthread_mutex_unlock((pthread_mutex_t*)*priv))
     {
         gnutls_assert();
         return GNUTLS_E_LOCKING_ERROR;
@@ -143,17 +146,17 @@ static int gnutls_system_mutex_init (void **priv)
   return 0;
 }
 
-static void gnutls_system_mutex_deinit (void *priv)
-{
-  return;
-}
-
-static int gnutls_system_mutex_lock (void *priv)
+static int gnutls_system_mutex_deinit (void **priv)
 {
   return 0;
 }
 
-static int gnutls_system_mutex_unlock (void *priv)
+static int gnutls_system_mutex_lock (void **priv)
+{
+  return 0;
+}
+
+static int gnutls_system_mutex_unlock (void **priv)
 {
   return 0;
 }

@@ -522,7 +522,8 @@ static void pakchois_destructor(void)
 
 static void pakchois_destructor(void)
 {
-	gnutls_mutex_deinit(&provider_mutex);
+	if (provider_mutex != NULL)
+		gnutls_mutex_deinit(&provider_mutex);
 }
 #else
 #warning need destructor support
