@@ -37,6 +37,7 @@ noinst_LTLIBRARIES = libgnutls_x509.la
 libgnutls_x509_la_SOURCES =	\
 	common.c		\
 	common.h		\
+	sign.h			\
 	crl.c			\
 	crl_write.c		\
 	crq.c			\

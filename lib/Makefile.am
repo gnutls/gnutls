@@ -104,7 +104,7 @@ HFILES = debug.h gnutls_compress.h gnutls_cipher.h gnutls_buffers.h	\
 	gnutls_helper.h auth_psk.h auth_psk_passwd.h			\
 	gnutls_supplemental.h crypto.h random.h		\
 	ext_session_ticket.h ext_signature.h gnutls_cryptodev.h		\
-	ext_safe_renegotiation.h locks.h
+	ext_safe_renegotiation.h locks.h gnutls_mbuffers.h pkcs11_int.h
 
 if ENABLE_LOCAL_PAKCHOIS
 COBJECTS+=pakchois/pakchois.c pakchois/errors.c
