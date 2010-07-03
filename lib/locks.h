@@ -19,4 +19,6 @@ extern mutex_deinit_func gnutls_mutex_deinit;
 extern mutex_lock_func gnutls_mutex_lock;
 extern mutex_unlock_func gnutls_mutex_unlock;
 
+int _gnutls_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));
+
 #endif

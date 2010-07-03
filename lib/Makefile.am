@@ -107,8 +107,8 @@ HFILES = debug.h gnutls_compress.h gnutls_cipher.h gnutls_buffers.h	\
 	ext_safe_renegotiation.h locks.h gnutls_mbuffers.h pkcs11_int.h
 
 if ENABLE_LOCAL_PAKCHOIS
-COBJECTS+=pakchois/pakchois.c pakchois/errors.c
-HFILES+=pakchois/pakchois.h pakchois/pakchois11.h
+COBJECTS+=pakchois/pakchois.c pakchois/errors.c pakchois/dlopen.c
+HFILES+=pakchois/pakchois.h pakchois/pakchois11.h pakchois/dlopen.h
 endif
 
 # Separate so we can create the documentation
