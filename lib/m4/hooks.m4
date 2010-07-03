@@ -115,9 +115,9 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   AM_CONDITIONAL(ENABLE_LOCAL_PAKCHOIS, test "$included_pakchois" = "yes")
   if test "$included_pakchois" = "yes";then
 	AC_CHECK_LIB(pthread, pthread_mutex_lock,,
-	   [AC_MSG_ERROR([could not find pthread_mutex_lock])])
+	   [AC_MSG_WARN([could not find pthread_mutex_lock])])
 	AC_CHECK_LIB(dl, dlopen,,
-	   [AC_MSG_ERROR([could not find dlopen])])
+	   [AC_MSG_WARN([could not find dlopen])])
 
   fi
 
