@@ -102,6 +102,52 @@ gnutls_cipher_decrypt (gnutls_cipher_hd_t handle, void *ciphertext,
 }
 
 /**
+ * gnutls_cipher_encrypt2:
+ * @handle: is a #gnutls_cipher_hd_t structure.
+ * @text: the data to encrypt
+ * @textlen: The length of data to encrypt
+ * @ciphertext: the encrypted data
+ * @ciphertextlen: The available length for encrypted data
+ *
+ * This function will encrypt the given data using the algorithm
+ * specified by the context.
+ *
+ * Returns: Zero or a negative value on error.
+ *
+ * Since: 2.10.0
+ **/
+int
+gnutls_cipher_encrypt2 (gnutls_cipher_hd_t handle, void *text, size_t textlen,
+  void* ciphertext, size_t ciphertextlen)
+{
+  return _gnutls_cipher_encrypt2 ((cipher_hd_st *) handle, text, textlen, 
+    ciphertext, ciphertextlen);
+}
+
+/**
+ * gnutls_cipher_decrypt2:
+ * @handle: is a #gnutls_cipher_hd_t structure.
+ * @ciphertext: the data to encrypt
+ * @ciphertextlen: The length of data to encrypt
+ * @text: the decrypted data
+ * @textlen: The available length for decrypted data
+ *
+ * This function will decrypt the given data using the algorithm
+ * specified by the context.
+ *
+ * Returns: Zero or a negative value on error.
+ *
+ * Since: 2.10.0
+ **/
+int
+gnutls_cipher_decrypt2 (gnutls_cipher_hd_t handle, const void *ciphertext,
+		       size_t ciphertextlen, void* text, size_t textlen)
+{
+  return _gnutls_cipher_decrypt2 ((cipher_hd_st *) handle, ciphertext,
+				 ciphertextlen, text, textlen);
+}
+
+/**
  * gnutls_cipher_deinit:
  * @handle: is a #gnutls_cipher_hd_t structure.
  *

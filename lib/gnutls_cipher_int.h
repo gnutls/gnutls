@@ -50,6 +50,10 @@ int _gnutls_cipher_encrypt (const cipher_hd_st * handle, void *text,
 			    int textlen);
 int _gnutls_cipher_decrypt (const cipher_hd_st * handle, void *ciphertext,
 			    int ciphertextlen);
+int _gnutls_cipher_encrypt2 (const cipher_hd_st * handle, const void *text,
+			    int textlen, void* ciphertext, int ciphertextlen);
+int _gnutls_cipher_decrypt2 (const cipher_hd_st * handle, const void *ciphertext,
+			    int ciphertextlen, void* text, int textlen);
 void _gnutls_cipher_deinit (cipher_hd_st * handle);
 
 #endif /* GNUTLS_CIPHER_INT */

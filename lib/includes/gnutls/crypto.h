@@ -35,6 +35,11 @@ int gnutls_cipher_encrypt (const gnutls_cipher_hd_t handle,
 			   void *text, size_t textlen);
 int gnutls_cipher_decrypt (const gnutls_cipher_hd_t handle,
 			   void *ciphertext, size_t ciphertextlen);
+int gnutls_cipher_decrypt2 (gnutls_cipher_hd_t handle, const void *ciphertext,
+		       size_t ciphertextlen, void* text, size_t textlen);
+int gnutls_cipher_encrypt2 (gnutls_cipher_hd_t handle, void *text, size_t textlen,
+  void* ciphertext, size_t ciphertextlen);
+
 void gnutls_cipher_deinit (gnutls_cipher_hd_t handle);
 int gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm);
 

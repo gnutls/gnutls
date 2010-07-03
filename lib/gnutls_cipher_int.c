@@ -113,6 +113,27 @@ int _gnutls_cipher_decrypt (const cipher_hd_st * handle, void *ciphertext,
   return 0;
 }
 
+int _gnutls_cipher_encrypt2 (const cipher_hd_st * handle, const void *text, int textlen,
+  void* ciphertext, int ciphertextlen)
+{
+  if (handle != NULL && handle->handle != NULL)
+    {
+      return handle->encrypt(handle->handle, text, textlen, ciphertext, ciphertextlen);
+    }
+  return 0;
+}
+
+int _gnutls_cipher_decrypt2 (const cipher_hd_st * handle, const void *ciphertext,
+			int ciphertextlen, void* text, int textlen)
+{
+  if (handle != NULL && handle->handle != NULL)
+    {
+      return handle->decrypt(handle->handle, ciphertext, ciphertextlen, 
+	text, textlen);
+    }
+  return 0;
+}
+
 void _gnutls_cipher_deinit (cipher_hd_st * handle)
 {
   if (handle != NULL && handle->handle != NULL)
