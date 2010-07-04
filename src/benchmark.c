@@ -46,7 +46,7 @@ tls_log_func (int level, const char *str)
   fprintf (stderr, "|<%d>| %s", level, str);
 }
 
-static void value2human(int bytes, double time, double* data, double* speed,char* metric)
+static void value2human(double bytes, double time, double* data, double* speed,char* metric)
 {
         if (bytes > 1000 && bytes < 1000*1000) {
                 *data = ((double)bytes)/1000;
@@ -80,7 +80,7 @@ cipher_bench (int algo, int size)
   gnutls_datum_t key, iv;
   struct timespec start, stop;
   double secs;
-  long data_size = 0;
+  double data_size = 0;
   double dspeed, ddata;
   int blocksize = gnutls_cipher_get_block_size (algo);
   int keysize = gnutls_cipher_get_key_size (algo);
@@ -149,7 +149,7 @@ mac_bench (int algo, int size)
   void *_key;
   struct timespec start, stop;
   double secs;
-  long data_size = 0;
+  double data_size = 0;
   double ddata, dspeed;
   int blocksize = gnutls_hmac_get_len (algo);
   char metric[16];
