@@ -29,17 +29,8 @@
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
 #include <nettle/yarrow.h>
-#include <time.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <fcntl.h>
-#include <locks.h>
 
 #define SOURCES 2
-
-static void* rnd_mutex;
 
 #define RND_LOCK if (gnutls_mutex_lock(&rnd_mutex)!=0) abort()
 #define RND_UNLOCK if (gnutls_mutex_unlock(&rnd_mutex)!=0) abort()
@@ -52,10 +43,99 @@ enum {
 static struct yarrow256_ctx yctx;
 static struct yarrow_source ysources[SOURCES];
 static time_t device_last_read = 0;
-static int device_fd;
-
-static time_t trivia_previous_time = 0;
 static time_t trivia_time_count = 0;
+
+static void* rnd_mutex;
+
+#define DEVICE_READ_SIZE 16
+#define DEVICE_READ_SIZE_MAX 32
+#define DEVICE_READ_INTERVAL 1200
+
+#ifdef _WIN32
+
+# include <windows.h>
+
+static HCRYPTPROV device_fd = NULL;
+
+static int do_trivia_source(int init)
+{
+    struct {
+		FILETIME now;
+		unsigned count;
+    } event;
+
+    unsigned entropy = 0;
+
+    GetSystemTimeAsFileTime(&event.now);
+    event.count = 0;
+
+    if (init) {
+		trivia_time_count = 0;
+    } else {
+		event.count = trivia_time_count++;
+		entropy = 1;
+    }
+
+    return yarrow256_update(&yctx, RANDOM_SOURCE_TRIVIA, entropy,
+			    sizeof(event), (const uint8_t *) &event);
+}
+
+static int do_device_source(int init)
+{
+    time_t now = time(NULL);
+	int read_size = DEVICE_READ_SIZE;
+
+    if (init) {
+		int old;
+
+		if(!CryptAcquireContext(&device_fd, NULL, NULL, PROV_RSA_FULL, CRYPT_SILENT|CRYPT_VERIFYCONTEXT)) {
+			_gnutls_debug_log("error in CryptAcquireContext!\n");
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+		device_last_read = now;
+		read_size = DEVICE_READ_SIZE_MAX; /* initially read more data */
+    }
+
+    if ((device_fd != NULL)
+		&& (init || ((now - device_last_read) > DEVICE_READ_INTERVAL))) {
+
+		/* More than a minute since we last read the device */
+		uint8_t buf[DEVICE_READ_SIZE_MAX];
+
+		if(!CryptGenRandom(device_fd, (DWORD)read_size, buf)) {
+			_gnutls_debug_log("Error in CryptGenRandom: %s\n", GetLastError());
+			return GNUTLS_E_INTERNAL_ERROR;
+		}
+
+		device_last_read = now;
+		return yarrow256_update(&yctx, RANDOM_SOURCE_DEVICE, read_size*8/2 /* we trust the system RNG */,
+					read_size, buf);
+    }
+    return 0;
+}
+
+static void wrap_nettle_rnd_deinit(void* ctx)
+{
+	RND_LOCK;
+	CryptReleaseContext(device_fd, 0);
+	RND_UNLOCK;
+
+	gnutls_mutex_deinit(&rnd_mutex);
+	rnd_mutex = NULL;
+}
+
+#else /* POSIX */
+
+# include <time.h>
+# include <errno.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <sys/time.h>
+# include <fcntl.h>
+# include <locks.h>
+
+static int device_fd;
+static time_t trivia_previous_time = 0;
 
 static int do_trivia_source(int init)
 {
@@ -105,9 +185,6 @@ static int do_trivia_source(int init)
 			    sizeof(event), (const uint8_t *) &event);
 }
 
-#define DEVICE_READ_SIZE 16
-#define DEVICE_READ_SIZE_MAX 32
-#define DEVICE_READ_INTERVAL 1200
 static int do_device_source(int init)
 {
     time_t now = time(NULL);
@@ -119,7 +196,7 @@ static int do_device_source(int init)
 		device_fd = open("/dev/urandom", O_RDONLY);
 		if (device_fd < 0) {
 			_gnutls_debug_log("Cannot open urandom!\n");
-			abort();
+			return GNUTLS_E_FILE_ERROR;
 		}
 
 		old = fcntl(device_fd, F_GETFD);
@@ -152,14 +229,14 @@ static int do_device_source(int init)
 					("Failed to read /dev/urandom: end of file\n");
 				}
 
-				return 0;
+				return GNUTLS_E_INTERNAL_ERROR;
 			}
 
 			done += res;
 		}
 
 		device_last_read = now;
-		return yarrow256_update(&yctx, RANDOM_SOURCE_DEVICE, read_size*8/3 /* be more conservative */,
+		return yarrow256_update(&yctx, RANDOM_SOURCE_DEVICE, read_size*8/2 /* we trust the RNG */,
 					read_size, buf);
     }
     return 0;
@@ -175,6 +252,9 @@ static void wrap_nettle_rnd_deinit(void* ctx)
 	rnd_mutex = NULL;
 }
 
+#endif
+
+
 static int wrap_nettle_rnd_init(void **ctx)
 {
 int ret;
@@ -187,8 +267,18 @@ int ret;
 	  }
 
 	yarrow256_init(&yctx, SOURCES, ysources);
-	do_device_source(1);
-	do_trivia_source(1);
+
+	ret = do_device_source(1);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = do_trivia_source(1);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	yarrow256_slow_reseed(&yctx);
 
@@ -200,9 +290,21 @@ int ret;
 static int
 wrap_nettle_rnd(void *_ctx, int level, void *data, size_t datasize)
 {
+int ret;
+
 	RND_LOCK;
-	do_trivia_source( 0);
-	do_device_source( 0);
+	
+	ret = do_trivia_source( 0);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
+
+	ret = do_device_source( 0);
+	if (ret < 0) {
+		gnutls_assert();
+		return ret;
+	}
 
 	yarrow256_random(&yctx, datasize, data);
 	RND_UNLOCK;
