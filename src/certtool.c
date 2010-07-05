@@ -172,9 +172,10 @@ generate_private_key_int (void)
   if (info.dsa)
     {
       key_type = GNUTLS_PK_DSA;
-      /* FIXME: Remove me once we depend on 1.3.x */
-      if (info.bits > 1024 && gcry_check_version ("1.3.1") == NULL)
-	info.bits = 1024;
+      if (info.bits > 1024)
+        {
+          fprintf(stderr, "It is suggested for compatibility with other implementations to use DSA keys bit length 1024\n");
+        }
     }
   else
     key_type = GNUTLS_PK_RSA;
