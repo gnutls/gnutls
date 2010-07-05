@@ -250,6 +250,10 @@ read_int_with_default (const char *input_str, int def)
 
   printf (input_str, def);
   in = readline ("");
+  if (in == NULL)
+    {
+      return def;
+    }
 
   l = strtol (in, &endptr, 0);
 
