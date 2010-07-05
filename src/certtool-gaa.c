@@ -177,7 +177,7 @@ void gaa_help(void)
 	__gaa_helpsingle(0, "outfile", "FILE ", "Output file.");
 	__gaa_helpsingle(0, "infile", "FILE ", "Input file.");
 	__gaa_helpsingle(0, "template", "FILE ", "Template file to use for non interactive operation.");
-	__gaa_helpsingle(0, "pkcs-cipher", "CIPHER ", "Cipher to use for pkcs operations (3des,aes-128,aes-192,aes-256,rc2-40).");
+	__gaa_helpsingle(0, "pkcs-cipher", "CIPHER ", "Cipher to use for pkcs operations (3des,3des-pkcs12,aes-128,aes-192,aes-256,rc2-40,arcfour).");
 	__gaa_helpsingle(0, "pkcs11-provider", "Library ", "Specify the pkcs11 provider library");
 	__gaa_helpsingle(0, "pkcs11-export-url", "URL ", "Export data specified a pkcs11 URL");
 	__gaa_helpsingle(0, "pkcs11-list-certs", "", "List certificates that have a private key specified by a PKCS#11 URL");
@@ -1459,7 +1459,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
 	gaaval->debug=1; gaaval->request = NULL; gaaval->infile = NULL; gaaval->outfile = NULL; gaaval->cert = NULL; 
 	gaaval->incert_format = 0; gaaval->outcert_format = 0; gaaval->action=-1; gaaval->pass = NULL; gaaval->v1_cert = 0;
 	gaaval->export = 0; gaaval->template = NULL; gaaval->hash=NULL; gaaval->fix_key = 0; gaaval->quick_random=1; 
-	gaaval->privkey_op = 0; gaaval->pkcs_cipher = "3des"; gaaval->crq_extensions=1; gaaval->pkcs11_provider= NULL;
+	gaaval->privkey_op = 0; gaaval->pkcs_cipher = "aes-128"; gaaval->crq_extensions=1; gaaval->pkcs11_provider= NULL;
 	gaaval->pkcs11_url = NULL; gaaval->pkcs11_type = PKCS11_TYPE_PK; gaaval->pubkey=NULL; gaaval->pkcs11_label = NULL; 
 	gaaval->pkcs11_trusted=0; gaaval->sec_param = NULL; gaaval->pkcs11_login = 0; ;};
 

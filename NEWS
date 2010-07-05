@@ -57,6 +57,10 @@ sizes for private keys using a human understandable scale.
 --pkcs11-list-all-certs, --pkcs11-list-trusted, --pkcs11-list-certs,
 --pkcs11-delete-url, --pkcs11-write
 
+certtool: The --pkcs-cipher is taken into account when generating a
+private key. The default cipher used now is aes-128. The old behavior can
+be simulated by specifying "--pkcs-cipher 3des-pkcs12".
+
 ** gnutls-cli/gnutls-serv: --x509cafile, --x509certfile and --x509keyfile
 can now accept a PKCS #11 URL in addition to a file. This will allow for
 example to use the Gnome-keyring trusted certificate list to verify
@@ -141,7 +145,6 @@ gnutls_x509_crq_set_pubkey: ADDED
 gnutls_pkcs11_copy_x509_crt: ADDED
 gnutls_pkcs11_copy_x509_privkey: ADDED
 gnutls_pkcs11_delete_url: ADDED
-
 
 * Version 2.9.10 (released 2010-04-22)
 
