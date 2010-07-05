@@ -205,6 +205,14 @@ cipher_to_flags (const char *cipher)
     {
       return GNUTLS_PKCS_USE_PBES2_3DES;
     }
+  else if (strcasecmp (cipher, "3des-pkcs12") == 0)
+    {
+      return GNUTLS_PKCS_USE_PKCS12_3DES;
+    }
+  else if (strcasecmp (cipher, "arcfour") == 0)
+    {
+      return GNUTLS_PKCS_USE_PKCS12_ARCFOUR;
+    }
   else if (strcasecmp (cipher, "aes-128") == 0)
     {
       return GNUTLS_PKCS_USE_PBES2_AES_128;

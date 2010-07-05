@@ -125,7 +125,7 @@ option (infile) STR "FILE" { $infile = $1 } "Input file."
 option (template) STR "FILE" { $template = $1 } "Template file to use for non interactive operation."
 
 #char *pkcs_cipher;
-option (pkcs-cipher) STR "CIPHER" { $pkcs_cipher = $1 } "Cipher to use for pkcs operations (3des,aes-128,aes-192,aes-256,rc2-40)."
+option (pkcs-cipher) STR "CIPHER" { $pkcs_cipher = $1 } "Cipher to use for pkcs operations (3des,3des-pkcs12,aes-128,aes-192,aes-256,rc2-40,arcfour)."
 
 
 #int debug;
@@ -139,4 +139,4 @@ init { $bits = 2048; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL;
 	$debug=1; $request = NULL; $infile = NULL; $outfile = NULL; $cert = NULL; 
 	$incert_format = 0; $outcert_format = 0; $action=-1; $pass = NULL; $v1_cert = 0;
 	$export = 0; $template = NULL; $hash=NULL; $fix_key = 0; $quick_random=1; 
-	$privkey_op = 0; $pkcs_cipher = "3des"; $crq_extensions=1; }
+	$privkey_op = 0; $pkcs_cipher = "aes-128"; $crq_extensions=1; }
