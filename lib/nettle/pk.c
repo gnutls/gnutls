@@ -454,8 +454,10 @@ int ret, i;
 	
 		rsa_public_key_init(&pub);
 		rsa_private_key_init(&priv);
+		
+		_gnutls_mpi_set_ui(&pub.e, 65537);
 
-		ret = rsa_generate_keypair (&pub, &priv, NULL, rnd_func, NULL, NULL, level, 64);
+		ret = rsa_generate_keypair (&pub, &priv, NULL, rnd_func, NULL, NULL, level, 0);
 		if (ret != 1) {
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;
