@@ -313,7 +313,6 @@ servers, using @acronym{GnuTLS}.
 
 @menu
 * Echo Server with X.509 authentication::
-* Echo Server with X.509 authentication II::
 * Echo Server with OpenPGP authentication::
 * Echo Server with SRP authentication::
 * Echo Server with anonymous authentication::
