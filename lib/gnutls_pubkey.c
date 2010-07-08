@@ -561,7 +561,7 @@ gnutls_pubkey_get_pk_dsa_raw(gnutls_pubkey_t key,
 
 /**
  * gnutls_pubkey_import:
- * @key: The structure to store the parsed certificate. 
+ * @key: The structure to store the parsed public key. 
  * @data: The DER or PEM encoded certificate. 
  * @format: One of DER or PEM 
  * 
