@@ -233,8 +233,8 @@ treat the connection as being a secure one.
 
 @verbatiminclude examples/ex-rfc2818.c
 
-An other example is listed below which provides a more detailed
-verification output.
+Another example is listed below which provides more detailed
+verification output, for applications that need it.
 
 @verbatiminclude examples/ex-verify.c
 
