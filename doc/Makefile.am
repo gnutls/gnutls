@@ -42,7 +42,7 @@ gnutls_TEXINFOS += examples/ex-client1.c examples/ex-client2.c		\
 	examples/ex-cert-select.c examples/ex-client-resume.c		\
 	examples/ex-client-srp.c examples/ex-client-tlsia.c		\
 	examples/ex-rfc2818.c examples/ex-serv1.c			\
-	examples/ex-serv-export.c examples/ex-serv-anon.c		\
+	examples/ex-serv-anon.c		\
 	examples/ex-serv-pgp.c examples/ex-serv-srp.c			\
 	examples/ex-alert.c examples/ex-x509-info.c examples/ex-crq.c	\
 	examples/ex-pkcs12.c

@@ -45,7 +45,7 @@ noinst_PROGRAMS = ex-client2 ex-client-resume
 noinst_PROGRAMS += ex-cert-select
 
 if ENABLE_PKI
-noinst_PROGRAMS += ex-crq ex-serv1 ex-serv-export
+noinst_PROGRAMS += ex-crq ex-serv1
 endif
 
 if ENABLE_CXX

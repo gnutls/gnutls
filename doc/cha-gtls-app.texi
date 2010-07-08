@@ -327,15 +327,6 @@ This example is a very simple echo server which supports
 
 @verbatiminclude examples/ex-serv1.c
 
-@node Echo Server with X.509 authentication II
-@subsection Echo Server with @acronym{X.509} Authentication II
-
-The following example is a server which supports @acronym{X.509}
-authentication.  This server supports the export-grade cipher suites,
-the DHE ciphersuites and session resuming.
-
-@verbatiminclude examples/ex-serv-export.c
-
 @node Echo Server with OpenPGP authentication
 @subsection Echo Server with @acronym{OpenPGP} Authentication
 @cindex @acronym{OpenPGP} Server
