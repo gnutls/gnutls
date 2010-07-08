@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.10.1 (unreleased)
 
+** gnutls-cli: Allow verification using V1 CAs.
+
 ** libgnutls: Correctly deinitialize crypto API functions to prevent
 a memory leak. Reported by Mads Kiilerich.
 
