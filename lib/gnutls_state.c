@@ -46,8 +46,7 @@
 #include <gnutls_algorithms.h>
 #include <gnutls_rsa_export.h>
 #include <gnutls_extensions.h>
-
-#include <errno.h>
+#include <system.h>
 
 /* These should really be static, but src/tests.c calls them.  Make
    them public functions?  */
@@ -248,53 +247,6 @@ _gnutls_handshake_internal_state_clear (gnutls_session_t session)
 
 }
 
-/* wrappers for write() and writev()
- */
-#ifdef _WIN32
-
-static int system_errno(gnutls_transport_ptr)
-{
-  int tmperr = WSAGetLastError ();
-  int ret = 0;
-  switch (tmperr)
-    {
-        case WSAEWOULDBLOCK:
-          ret = EAGAIN;
-          break;
-        case WSAEINTR:
-          ret = EINTR;
-          break;
-        default:
-          ret = EIO;
-          break;
-     }
-   WSASetLastError (tmperr);
-
-  return ret;
-}
-
-static ssize_t system_write(gnutls_transport_ptr ptr, const void* data, size_t data_size)
-{
-  return send( GNUTLS_POINTER_TO_INT(ptr), data, data_size, 0);
-}
-#else /* POSIX */
-static int system_errno(gnutls_transport_ptr ptr)
-{
-  return errno;
-}
-
-static ssize_t system_writev(gnutls_transport_ptr ptr, const giovec_t * iovec, int iovec_cnt)
-{
-  return writev(GNUTLS_POINTER_TO_INT(ptr), (struct iovec*) iovec, iovec_cnt);
-
-}
-#endif
-
-static ssize_t system_read(gnutls_transport_ptr ptr, void* data, size_t data_size)
-{
-  return recv( GNUTLS_POINTER_TO_INT(ptr), data, data_size, 0);
-}
-
 #define MIN_DH_BITS 727
 /**
  * gnutls_init:
@@ -401,10 +353,10 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
    */
   (*session)->internals.priorities.sr = SR_PARTIAL;
 
-#ifdef _WIN32
-  gnutls_transport_set_push_function(*session, system_write);
-#else
+#ifdef HAVE_WRITEV
   gnutls_transport_set_push_function2(*session, system_writev);
+#else
+  gnutls_transport_set_push_function(*session, system_write);
 #endif
   gnutls_transport_set_pull_function(*session, system_read);
   gnutls_transport_set_errno_function(*session, system_errno);

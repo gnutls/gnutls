@@ -46,6 +46,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "../locks.h"
+#include "../system.h"
 #include "dlopen.h"
 
 #ifdef HAVE_WORDEXP

@@ -57,10 +57,6 @@
 
 #include <errno.h>
 
-#ifndef _WIN32
-# include <sys/uio.h>
-#endif
-
 /* We need to disable gnulib's replacement wrappers to get native
    Windows interfaces. */
 #undef recv
