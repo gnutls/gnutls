@@ -63,14 +63,12 @@ _mbuffer_enqueue (mbuffer_head_st *buf, mbuffer_st *bufel)
   buf->tail = &bufel->next;
 }
 
-void
-_mbuffer_get_head (mbuffer_head_st *buf, gnutls_datum_t *msg)
+mbuffer_st* _mbuffer_get_first (mbuffer_head_st *buf, gnutls_datum_t *msg)
 {
-  mbuffer_st *bufel;
+  mbuffer_st *bufel = buf->head;
 
-  if (buf->head)
+  if (bufel)
     {
-      bufel = buf->head;
       msg->data = bufel->msg.data + bufel->mark;
       msg->size = bufel->msg.size - bufel->mark;
     }
@@ -79,6 +77,24 @@ _mbuffer_get_head (mbuffer_head_st *buf, gnutls_datum_t *msg)
       msg->data = NULL;
       msg->size = 0;
     }
+  return bufel;
+}
+
+mbuffer_st* _mbuffer_get_next (mbuffer_st * cur, gnutls_datum_t *msg)
+{
+  mbuffer_st *bufel = cur->next;
+
+  if (bufel)
+    {
+      msg->data = bufel->msg.data + bufel->mark;
+      msg->size = bufel->msg.size - bufel->mark;
+    }
+  else
+    {
+      msg->data = NULL;
+      msg->size = 0;
+    }
+  return bufel;
 }
 
 static inline void

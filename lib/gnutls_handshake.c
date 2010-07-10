@@ -1162,7 +1162,30 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st *bufel,
 
   session->internals.last_handshake_out = type;
 
-  ret = _gnutls_handshake_io_send_int (session, type, bufel);
+  _gnutls_handshake_io_cache_int (session, type, bufel);
+    
+  switch (type) 
+    {
+      case GNUTLS_HANDSHAKE_CERTIFICATE_PKT: /* this one is followed by ServerHelloDone
+                                              * or ClientKeyExchange always.
+                                              */
+      case GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE: /* as above */
+      case GNUTLS_HANDSHAKE_SERVER_HELLO: /* as above */
+      case GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST: /* as above */
+      case GNUTLS_HANDSHAKE_NEW_SESSION_TICKET: /* followed by ChangeCipherSpec */
+
+      /* now for client Certificate, ClientKeyExchange and
+       * CertificateVerify are always followed by ChangeCipherSpec
+       */
+      case GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY:
+      case GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE:
+        ret = 0;
+        break;
+      default:
+        /* send cached messages */
+        ret = _gnutls_handshake_io_write_flush(session);
+        break;
+    }
 
   return ret;
 }
@@ -2307,10 +2330,23 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
  *     CertificateVerify*
  *     [ChangeCipherSpec]
  *     Finished                     -------->
+ *                                                NewSessionTicket
  *                                              [ChangeCipherSpec]
  *                                  <--------             Finished
  *
  * (*): means optional packet.
+ */
+
+/* Handshake when resumming session:
+ *      Client                                                Server
+ *
+ *      ClientHello                   -------->
+ *                                                      ServerHello
+ *                                               [ChangeCipherSpec]
+ *                                   <--------             Finished
+ *     [ChangeCipherSpec]
+ *     Finished                      -------->
+ * 
  */
 
 /**
@@ -2731,6 +2767,7 @@ static int
 _gnutls_send_handshake_final (gnutls_session_t session, int init)
 {
   int ret = 0;
+  int oldstate = STATE;
 
   /* Send the CHANGE CIPHER SPEC PACKET */
 
@@ -2738,8 +2775,18 @@ _gnutls_send_handshake_final (gnutls_session_t session, int init)
     {
     case STATE0:
     case STATE20:
-      ret = _gnutls_send_change_cipher_spec (session, AGAIN (STATE20));
+
       STATE = STATE20;
+
+      ret = _gnutls_handshake_io_write_flush(session);
+      if (ret < 0) 
+        {
+          gnutls_assert();
+          return ret;
+        }
+
+      ret = _gnutls_send_change_cipher_spec (session, AGAIN2 (oldstate, STATE20));
+
       if (ret < 0)
 	{
 	  ERR ("send ChangeCipherSpec", ret);

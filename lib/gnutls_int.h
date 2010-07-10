@@ -586,8 +586,10 @@ typedef struct
 
   /* PUSH & PULL functions.
    */
-  gnutls_pull_func _gnutls_pull_func;
-  gnutls_push_func _gnutls_push_func;
+  gnutls_pull_func pull_func;
+  gnutls_push_func push_func;
+  gnutls_vec_push_func vec_push_func;
+  gnutls_errno_func errno_func;
   /* Holds the first argument of PUSH and PULL
    * functions;
    */

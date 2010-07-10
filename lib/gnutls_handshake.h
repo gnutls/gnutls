@@ -61,4 +61,5 @@ void _gnutls_handshake_hash_buffers_clear (gnutls_session_t session);
 /* This returns true if we have got there
  * before (and not finished due to an interrupt).
  */
-#define AGAIN(target) STATE==target?1:0
+#define AGAIN(target) (STATE==target?1:0)
+#define AGAIN2(state, target) (state==target?1:0)

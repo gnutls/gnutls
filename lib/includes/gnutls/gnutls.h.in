@@ -1209,10 +1209,19 @@ extern "C"
 
 /* Session stuff
  */
+  typedef struct {
+    void  *iov_base;    /* Starting address */
+    size_t iov_len;     /* Number of bytes to transfer */
+  } giovec_t;
+
   typedef ssize_t (*gnutls_pull_func) (gnutls_transport_ptr_t, void *,
 				       size_t);
-  typedef ssize_t (*gnutls_push_func) (gnutls_transport_ptr_t, const void *,
-				       size_t);
+  typedef ssize_t (*gnutls_push_func) (gnutls_transport_ptr_t, const void *, size_t);
+
+  typedef ssize_t (*gnutls_vec_push_func) (gnutls_transport_ptr_t, const giovec_t *iov, int iovcnt);
+
+  typedef int (*gnutls_errno_func) (gnutls_transport_ptr_t);
+
   void gnutls_transport_set_ptr (gnutls_session_t session,
 				 gnutls_transport_ptr_t ptr);
   void gnutls_transport_set_ptr2 (gnutls_session_t session,
@@ -1227,10 +1236,15 @@ extern "C"
   void gnutls_transport_set_lowat (gnutls_session_t session, int num);
 
 
+  void gnutls_transport_set_push_function2 (gnutls_session_t session,
+                                      gnutls_vec_push_func vec_func);
   void gnutls_transport_set_push_function (gnutls_session_t session,
 					   gnutls_push_func push_func);
   void gnutls_transport_set_pull_function (gnutls_session_t session,
 					   gnutls_pull_func pull_func);
+
+  void gnutls_transport_set_errno_function (gnutls_session_t session,
+					   gnutls_errno_func errno_func);
 
   void gnutls_transport_set_errno (gnutls_session_t session, int err);
   void gnutls_transport_set_global_errno (int err);

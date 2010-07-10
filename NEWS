@@ -5,10 +5,17 @@ See the end for copying conditions.
 
 * Version 2.11.0 (unreleased)
 
+** libgnutls: support scattered write using writev(). This takes
+advantage of the new buffering layer and allows queuing of packets
+and flushing them. This is currently used for handshake messages
+only.
+
 ** libgnutls: Added gnutls_global_set_mutex() to allow setting
 alternative locking procedures. By default the system available
 locking is used. In *NIX pthreads are used and in windows the
-critical section API.
+critical section API. This follows a different approach than the
+previous versions that depended on libgcrypt initialization. The
+locks are now set by default in systems that support it.
 
 ** libgnutls: Added support for reading DN from EV-certificates.
 New DN values:
@@ -26,8 +33,9 @@ has to be called to register any required md5 handlers.
 code contributed by Jonathan Bastien-Filiatrault.
 
 ** libgnutls: Internal API for extensions augmented to allow
-safe storing and loading of data on resumption. OPRFI extension
-was removed.
+safe storing and loading of data on resumption. This allows writing
+self-contained extensions (when possible). As a side effect
+the OPRFI extension was removed.
 
 ** libgnutls: Added support for DSA-SHA256 and DSA-SHA224
 

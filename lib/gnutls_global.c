@@ -269,45 +269,6 @@ gnutls_global_deinit (void)
  * historical reasons.
  */
 
-/**
- * gnutls_transport_set_pull_function:
- * @pull_func: a callback function similar to read()
- * @session: gnutls session
- *
- * This is the function where you set a function for gnutls to receive
- * data.  Normally, if you use berkeley style sockets, do not need to
- * use this function since the default (recv(2)) will probably be ok.
- *
- * PULL_FUNC is of the form,
- * ssize_t (*gnutls_pull_func)(gnutls_transport_ptr_t, void*, size_t);
- **/
-void
-gnutls_transport_set_pull_function (gnutls_session_t session,
-				    gnutls_pull_func pull_func)
-{
-  session->internals._gnutls_pull_func = pull_func;
-}
-
-/**
- * gnutls_transport_set_push_function:
- * @push_func: a callback function similar to write()
- * @session: gnutls session
- *
- * This is the function where you set a push function for gnutls to
- * use in order to send data.  If you are going to use berkeley style
- * sockets, you do not need to use this function since the default
- * (send(2)) will probably be ok.  Otherwise you should specify this
- * function for gnutls to be able to send data.
- *
- * PUSH_FUNC is of the form,
- * ssize_t (*gnutls_push_func)(gnutls_transport_ptr_t, const void*, size_t);
- **/
-void
-gnutls_transport_set_push_function (gnutls_session_t session,
-				    gnutls_push_func push_func)
-{
-  session->internals._gnutls_push_func = push_func;
-}
 
 /**
  * gnutls_check_version:

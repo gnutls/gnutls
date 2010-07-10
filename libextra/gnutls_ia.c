@@ -97,7 +97,7 @@ _gnutls_send_inner_application (gnutls_session_t session,
       memcpy (p + 4, data, sizeofdata);
     }
 
-  len = _gnutls_send_int (session, GNUTLS_INNER_APPLICATION, -1, p, plen);
+  len = _gnutls_send_int (session, GNUTLS_INNER_APPLICATION, -1, p, plen, MBUFFER_FLUSH);
 
   if (p)
     gnutls_free (p);

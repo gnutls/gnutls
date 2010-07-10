@@ -335,7 +335,7 @@ copy_record_version (gnutls_session_t session,
 ssize_t
 _gnutls_send_int (gnutls_session_t session, content_type_t type,
 		  gnutls_handshake_description_t htype, const void *_data,
-		  size_t sizeofdata)
+		  size_t sizeofdata, unsigned int mflags)
 {
   mbuffer_st *bufel;
   size_t cipher_size;
@@ -384,7 +384,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
   /* Only encrypt if we don't have data to send 
    * from the previous run. - probably interrupted.
    */
-  if (session->internals.record_send_buffer.byte_length > 0)
+  if (mflags != 0 && session->internals.record_send_buffer.byte_length > 0)
     {
       ret = _gnutls_io_write_flush (session);
       if (ret > 0)
@@ -435,7 +435,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 	}
 
       _mbuffer_set_udata_size(bufel, cipher_size);
-      ret = _gnutls_io_write_buffered (session, bufel);
+      ret = _gnutls_io_write_buffered (session, bufel, mflags);
     }
 
   if (ret != cipher_size)
@@ -481,7 +481,7 @@ _gnutls_send_change_cipher_spec (gnutls_session_t session, int again)
   _gnutls_handshake_log ("REC[%p]: Sent ChangeCipherSpec\n", session);
 
   if (again == 0)
-    return _gnutls_send_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1);
+    return _gnutls_send_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1, data, 1, MBUFFER_FLUSH);
   else
     {
       return _gnutls_io_write_flush (session);
@@ -1133,7 +1133,7 @@ gnutls_record_send (gnutls_session_t session, const void *data,
 		    size_t sizeofdata)
 {
   return _gnutls_send_int (session, GNUTLS_APPLICATION_DATA, -1, data,
-			   sizeofdata);
+			   sizeofdata, MBUFFER_FLUSH);
 }
 
 /**
