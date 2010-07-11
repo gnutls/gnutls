@@ -45,7 +45,9 @@ imported from tokens, and operations can be performed on private keys.
 
 ** libgnutls: Added abstract gnutls_privkey_t and gnutls_pubkey_t
 
-** libgnutls: Added initial support for the nettle library (unsupported)
+** libgnutls: Added initial support for the nettle library. It uses
+the system's random generator for seeding. That is /dev/urandom in Linux, 
+system calls in Win32 and EGD on other systems.
 
 ** libgnutls: Corrected issue on the %SSL3_RECORD_VERSION priority string. It now
     works even when resuming a session.

@@ -47,13 +47,14 @@ static time_t trivia_time_count = 0;
 
 static void* rnd_mutex;
 
-#define DEVICE_READ_SIZE 16
-#define DEVICE_READ_SIZE_MAX 32
 #define DEVICE_READ_INTERVAL 1200
 
 #ifdef _WIN32
 
 # include <windows.h>
+
+# define DEVICE_READ_SIZE 16
+# define DEVICE_READ_SIZE_MAX 32
 
 static HCRYPTPROV device_fd = NULL;
 
@@ -133,6 +134,10 @@ static void wrap_nettle_rnd_deinit(void* ctx)
 # include <sys/time.h>
 # include <fcntl.h>
 # include <locks.h>
+# include "egd.h"
+
+# define DEVICE_READ_SIZE 16
+# define DEVICE_READ_SIZE_MAX 32
 
 static int device_fd;
 static time_t trivia_previous_time = 0;
@@ -185,10 +190,10 @@ static int do_trivia_source(int init)
 			    sizeof(event), (const uint8_t *) &event);
 }
 
-static int do_device_source(int init)
+static int do_device_source_urandom(int init)
 {
     time_t now = time(NULL);
-	int read_size = DEVICE_READ_SIZE;
+    int read_size = DEVICE_READ_SIZE;
 
     if (init) {
 		int old;
@@ -241,6 +246,80 @@ static int do_device_source(int init)
     }
     return 0;
 }
+
+static int do_device_source_egd(int init)
+{
+    time_t now = time(NULL);
+    int read_size = DEVICE_READ_SIZE;
+
+    if (init) {
+		device_fd = _rndegd_connect_socket();
+		if (device_fd < 0) {
+			_gnutls_debug_log("Cannot open egd socket!\n");
+			return GNUTLS_E_FILE_ERROR;
+		}
+
+		device_last_read = now;
+		
+		read_size = DEVICE_READ_SIZE_MAX; /* initially read more data */
+    }
+
+    if ((device_fd > 0)
+		&& (init || ((now - device_last_read) > DEVICE_READ_INTERVAL))) {
+
+		/* More than a minute since we last read the device */
+		uint8_t buf[DEVICE_READ_SIZE_MAX];
+		uint32_t done;
+
+		for (done = 0; done < read_size;) {
+			int res;
+			res = _rndegd_read(&device_fd, buf + done, sizeof(buf) - done);
+			if (res <= 0) {
+				if (res < 0) {
+					_gnutls_debug_log("Failed to read egd.\n");
+				} else {
+					_gnutls_debug_log("Failed to read egd: end of file\n");
+				}
+
+				return GNUTLS_E_INTERNAL_ERROR;
+			}
+			done += res;
+		}
+
+		device_last_read = now;
+		return yarrow256_update(&yctx, RANDOM_SOURCE_DEVICE, read_size*8/2, 
+					read_size, buf);
+    }
+    return 0;
+}
+
+static int do_device_source(int init)
+{
+int ret;
+static int (*do_source)(int init) = NULL;
+/* using static var here is ok since we are
+ * always called with mutexes down 
+ */
+
+    if (init == 1) {
+        do_source = do_device_source_urandom;
+        ret = do_source(init);
+        if (ret < 0) {
+            do_source = do_device_source_egd;
+            ret = do_source(init);
+        }
+        
+        if (ret < 0) {
+            gnutls_assert();
+            return ret;
+        }
+        
+        return ret;
+    } else {
+        return do_source(init);
+    }
+}
+
 
 static void wrap_nettle_rnd_deinit(void* ctx)
 {
