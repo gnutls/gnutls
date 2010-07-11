@@ -18,8 +18,6 @@ ssize_t system_writev(gnutls_transport_ptr ptr, const giovec_t * iovec, int iove
 ssize_t system_read(gnutls_transport_ptr ptr, void* data, size_t data_size);
 ssize_t system_read_peek(gnutls_transport_ptr ptr, void* data, size_t data_size);
 
-#endif
-
 #ifdef _WIN32
 # define HAVE_WIN32_LOCKS
 #else
@@ -31,3 +29,6 @@ ssize_t system_read_peek(gnutls_transport_ptr ptr, void* data, size_t data_size)
 #endif
 
 int _gnutls_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));
+
+#endif /* SYSTEM_H */
+
