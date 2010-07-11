@@ -16,6 +16,7 @@ ssize_t system_write(gnutls_transport_ptr ptr, const void* data, size_t data_siz
 ssize_t system_writev(gnutls_transport_ptr ptr, const giovec_t * iovec, int iovec_cnt);
 #endif
 ssize_t system_read(gnutls_transport_ptr ptr, void* data, size_t data_size);
+ssize_t system_read_peek(gnutls_transport_ptr ptr, void* data, size_t data_size);
 
 #endif
 

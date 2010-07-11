@@ -37,6 +37,11 @@
 # endif
 #endif
 
+/* We need to disable gnulib's replacement wrappers to get native
+   Windows interfaces. */
+#undef recv
+#undef send
+
 /* System specific function wrappers.
  */
 
@@ -87,6 +92,10 @@ ssize_t system_read(gnutls_transport_ptr ptr, void* data, size_t data_size)
   return recv( GNUTLS_POINTER_TO_INT(ptr), data, data_size, 0);
 }
 
+ssize_t system_read_peek(gnutls_transport_ptr ptr, void* data, size_t data_size)
+{
+  return recv( GNUTLS_POINTER_TO_INT(ptr), data, data_size, MSG_PEEK);
+}
 
 /* Thread stuff */
 

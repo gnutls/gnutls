@@ -54,13 +54,9 @@
 #include <gnutls_record.h>
 #include <gnutls_buffers.h>
 #include <gnutls_mbuffers.h>
+#include <system.h>
 
 #include <errno.h>
-
-/* We need to disable gnulib's replacement wrappers to get native
-   Windows interfaces. */
-#undef recv
-#undef send
 
 #ifndef EAGAIN
 # define EAGAIN EWOULDBLOCK
@@ -195,9 +191,11 @@ _gnutls_record_buffer_get_size (content_type_t type, gnutls_session_t session)
  * This function checks if there are any data to receive in the gnutls
  * buffers.
  *
- * Notice that you may also use select() to check for data in a TCP
+ * Note that you could also use select() to check for data in a TCP
  * connection, instead of this function.  GnuTLS leaves some data in
- * the tcp buffer in order for select to work.
+ * the tcp buffer in order for select to work. However the select() 
+ * alternative is not recommended and will be deprecated in later
+ * GnuTLS revisions.
  *
  * Returns: the size of that data or 0.
  **/
@@ -272,7 +270,7 @@ inline static int get_errno(gnutls_session_t session)
  */
 static ssize_t
 _gnutls_read (gnutls_session_t session, void *iptr,
-	      size_t sizeOfPtr, int flags)
+	      size_t sizeOfPtr, gnutls_pull_func pull_func)
 {
   size_t left;
   ssize_t i = 0;
@@ -287,7 +285,7 @@ _gnutls_read (gnutls_session_t session, void *iptr,
 
       reset_errno(session);
 
-      i = session->internals.pull_func (fd, &ptr[sizeOfPtr - left], left);
+      i = pull_func (fd, &ptr[sizeOfPtr - left], left);
 
       if (i < 0)
 	{
@@ -427,7 +425,7 @@ _gnutls_io_clear_peeked_data (gnutls_session_t session)
   sum = 0;
   do
     {				/* we need this to finish now */
-      ret = _gnutls_read (session, peekdata, RCVLOWAT - sum, 0);
+      ret = _gnutls_read (session, peekdata, RCVLOWAT - sum, session->internals.pull_func);
       if (ret > 0)
 	sum += ret;
     }
@@ -485,7 +483,7 @@ _gnutls_io_read_buffered (gnutls_session_t session, opaque ** iptr,
   /* If an external pull function is used, then do not leave
    * any data into the kernel buffer.
    */
-  if (session->internals.pull_func != NULL)
+  if (session->internals.pull_func != system_read)
     {
       recvlowat = 0;
     }
@@ -554,7 +552,7 @@ _gnutls_io_read_buffered (gnutls_session_t session, opaque ** iptr,
    */
   if (recvdata - recvlowat > 0)
     {
-      ret = _gnutls_read (session, &buf[buf_pos], recvdata - recvlowat, 0);
+      ret = _gnutls_read (session, &buf[buf_pos], recvdata - recvlowat, session->internals.pull_func);
 
       /* return immediately if we got an interrupt or eagain
        * error.
@@ -585,7 +583,7 @@ _gnutls_io_read_buffered (gnutls_session_t session, opaque ** iptr,
    */
   if (ret == (recvdata - recvlowat) && recvlowat > 0)
     {
-      ret2 = _gnutls_read (session, &buf[buf_pos], recvlowat, MSG_PEEK);
+      ret2 = _gnutls_read (session, &buf[buf_pos], recvlowat, system_read_peek);
 
       if (ret2 < 0 && gnutls_error_is_fatal (ret2) == 0)
 	{
