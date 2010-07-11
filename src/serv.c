@@ -735,6 +735,24 @@ listen_socket (const char *name, int listen_port)
   return 0;
 }
 
+/* strips \r\n from the end of the string 
+ */
+static void strip (char* data)
+{
+int i;
+int len = strlen(data);
+
+  for (i=0;i<len;i++)
+    {
+      if (data[i] == '\r' && data[i+1] == '\n' && data[i+1] == 0)
+        {
+          data[i] = '\n';
+          data[i+1] = 0;
+          break;
+        }
+    }
+}
+
 static void
 get_response (gnutls_session_t session, char *request,
 	      char **response, int *response_length)
@@ -764,6 +782,7 @@ get_response (gnutls_session_t session, char *request,
     }
   else
     {
+      strip(request);
       fprintf (stderr, "received: %s\n", request);
       if (request[0] == request[1] && request[0] == '*')
 	{
