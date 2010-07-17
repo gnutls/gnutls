@@ -275,7 +275,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 	}
 	case GNUTLS_PK_RSA: {
 		struct rsa_private_key priv;
-		bigint_t hash;
+		bigint_t hash, nc, ri;
 		
 		if (_gnutls_mpi_scan_nz(&hash, vdata->data, vdata->size) != 0) {
 			gnutls_assert();
@@ -285,12 +285,25 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		rsa_private_key_init(&priv);
 		_rsa_params_to_privkey(pk_params, &priv);
 
-		rsa_compute_root(&priv, TOMPZ(hash), TOMPZ(hash));
+		nc = rsa_blind(hash, pk_params->params[1]/*e*/,
+			pk_params->params[0]/*m*/, &ri);
 
-		ret = _gnutls_mpi_dprint(hash, signature);
 		_gnutls_mpi_release(&hash);
 
-		if (ret < 0) {
+		if (nc == NULL) {
+			gnutls_assert();
+			return GNUTLS_E_MEMORY_ERROR;
+		}
+
+		rsa_compute_root(&priv, TOMPZ(nc), TOMPZ(nc));
+
+		rsa_unblind(nc, ri, pk_params->params[0]/*m*/);
+
+		ret = _gnutls_mpi_dprint(nc, signature);
+		_gnutls_mpi_release(&nc);
+		_gnutls_mpi_release(&ri);
+
+        	if (ret < 0) {
 			gnutls_assert();
 			goto cleanup;
 		}
