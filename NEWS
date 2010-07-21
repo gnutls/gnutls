@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.10.1 (unreleased)
 
+** libgnutls: Added support for broken certificates that indicate RSA
+with strange OIDs.
+
 ** gnutls-cli: Allow verification using V1 CAs.
 
 ** libgnutls: Correctly deinitialize crypto API functions to prevent
