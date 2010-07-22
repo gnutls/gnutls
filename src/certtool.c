@@ -60,10 +60,10 @@ void generate_pkcs12 (void);
 void generate_pkcs8 (void);
 void verify_chain (void);
 void verify_crl (void);
-void pubkey_info (void);
+void pubkey_info (gnutls_x509_crt crt);
 void pgp_privkey_info (void);
 void pgp_ring_info (void);
-void certificate_info (void);
+void certificate_info (int);
 void pgp_certificate_info (void);
 void crl_info (void);
 void privkey_info (void);
@@ -1081,7 +1081,10 @@ gaa_parser (int argc, char **argv)
       generate_private_key ();
       break;
     case ACTION_CERT_INFO:
-      certificate_info ();
+      certificate_info (0);
+      break;
+    case ACTION_CERT_PUBKEY:
+      certificate_info (1);
       break;
     case ACTION_GENERATE_REQUEST:
       generate_request ();
@@ -1096,7 +1099,7 @@ gaa_parser (int argc, char **argv)
       privkey_info ();
       break;
     case ACTION_PUBKEY_INFO:
-      pubkey_info ();
+      pubkey_info (NULL);
       break;
     case ACTION_UPDATE_CERTIFICATE:
       update_signed_certificate ();
@@ -1175,7 +1178,7 @@ gaa_parser (int argc, char **argv)
 
 #define MAX_CRTS 500
 void
-certificate_info (void)
+certificate_info (int pubkey)
 {
   gnutls_x509_crt_t crt[MAX_CRTS];
   size_t size;
@@ -1225,7 +1228,10 @@ certificate_info (void)
 				    &size);
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "export error: %s", gnutls_strerror (ret));
+
       fwrite (buffer, 1, size, outfile);
+
+      if (pubkey) pubkey_info(crt[i]);
 
       gnutls_x509_crt_deinit (crt[i]);
     }
@@ -3171,9 +3177,8 @@ static void print_key_usage(FILE* outfile, unsigned int usage)
   }
 }
 
-void pubkey_info (void)
+void pubkey_info (gnutls_x509_crt crt)
 {
-  gnutls_x509_crt_t crt;
   gnutls_pubkey_t pubkey;
   unsigned int bits, usage;
   int ret;
@@ -3185,7 +3190,9 @@ void pubkey_info (void)
     error (EXIT_FAILURE, 0, "pubkey_init: %s", gnutls_strerror (ret));
   }
 
-  crt = load_cert(0);
+  if (crt == NULL) {
+    crt = load_cert(0);
+  }
   
   if (crt != NULL) {
     ret = gnutls_pubkey_import_x509(pubkey, crt, 0);

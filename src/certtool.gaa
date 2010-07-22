@@ -59,6 +59,8 @@ option (password) STR "PASSWORD" { $pass = $1 } "Password to use."
 
 option (i, certificate-info) { $action = ACTION_CERT_INFO; } "Print information on a certificate."
 
+option (certificate-pubkey) { $action = ACTION_CERT_PUBKEY; } "Print certificate public key."
+
 option (pgp-certificate-info) { $action = ACTION_PGP_INFO; } "Print information on a OpenPGP certificate."
 
 option (pgp-ring-info) { $action = ACTION_RING_INFO; } "Print information on a keyring structure."
