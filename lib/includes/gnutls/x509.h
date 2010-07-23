@@ -618,6 +618,7 @@ extern "C"
 
   int gnutls_x509_privkey_init (gnutls_x509_privkey_t * key);
   void gnutls_x509_privkey_deinit (gnutls_x509_privkey_t key);
+  gnutls_sec_param_t gnutls_x509_privkey_sec_param (gnutls_x509_privkey_t key);
   int gnutls_x509_privkey_cpy (gnutls_x509_privkey_t dst,
 			       gnutls_x509_privkey_t src);
   int gnutls_x509_privkey_import (gnutls_x509_privkey_t key,

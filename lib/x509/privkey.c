@@ -830,6 +830,36 @@ gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
 }
 
 /**
+ * gnutls_x509_privkey_sec_param:
+ * @key: a key structure
+ *
+ * This function will return the security parameter appropriate with
+ * this private key.
+ *
+ * Returns: On success, a valid security parameter is returned otherwise
+ * %GNUTLS_SEC_PARAM_UNKNOWN is returned.
+ **/
+gnutls_sec_param_t
+gnutls_x509_privkey_sec_param (gnutls_x509_privkey_t key)
+{
+int ret;
+
+  switch (key->pk_algorithm)
+    {
+      case GNUTLS_PK_RSA:
+        ret = gnutls_pk_bits_to_sec_param (GNUTLS_PK_RSA, _gnutls_mpi_get_nbits(key->params[0]/*m*/));
+        break;
+      case GNUTLS_PK_DSA:
+        ret = gnutls_pk_bits_to_sec_param (GNUTLS_PK_DSA, _gnutls_mpi_get_nbits(key->params[0] /*p*/));
+        break;
+      default:
+        ret = GNUTLS_SEC_PARAM_UNKNOWN;
+    }
+    
+  return ret;
+}
+
+/**
  * gnutls_x509_privkey_export_rsa_raw:
  * @key: a structure that holds the rsa parameters
  * @m: will hold the modulus

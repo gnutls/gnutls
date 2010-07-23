@@ -30,6 +30,32 @@
 #include <x509/common.h>
 
 
+typedef struct
+{
+  const char *name;
+  gnutls_sec_param_t sec_param;
+  int bits;		/* security level */
+  int pk_bits;		/* DH, RSA, SRP */
+  int dsa_bits;		/* bits for DSA. Handled differently since
+			 * choice of key size in DSA is political.
+			 */
+  int subgroup_bits;	/* subgroup bits */
+  int ecc_bits;		/* bits for ECC keys */
+} gnutls_sec_params_entry;
+
+static const gnutls_sec_params_entry sec_params[] = {
+  {"Weak", GNUTLS_SEC_PARAM_WEAK, 64, 816, 1024, 128, 128},
+  {"Low", GNUTLS_SEC_PARAM_LOW, 80, 1248, 1024, 160, 160},
+  {"Normal", GNUTLS_SEC_PARAM_NORMAL, 112, 2432, 2048, 224, 224},
+  {"Weak", GNUTLS_SEC_PARAM_HIGH, 128, 3248, 3072, 256, 256},
+  {"Weak", GNUTLS_SEC_PARAM_ULTRA, 256, 15424, 3072, 512, 512},
+  {NULL, 0, 0, 0, 0, 0}
+};
+
+#define GNUTLS_SEC_PARAM_LOOP(b) \
+	{ const gnutls_sec_params_entry *p; \
+                for(p = sec_params; p->name != NULL; p++) { b ; } }
+
 
 /* Cred type mappings to KX algorithms 
  * FIXME: The mappings are not 1-1. Some KX such as SRP_RSA require
@@ -135,8 +161,7 @@ static const gnutls_protocol_t supported_protocols[] = {
                 for(p = sup_versions; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_VERSION_ALG_LOOP(a) \
-                        GNUTLS_VERSION_LOOP( if(p->id == version) { a; break; })
-
+	GNUTLS_VERSION_LOOP( if(p->id == version) { a; break; })
 
 struct gnutls_cipher_entry
 {
@@ -2293,28 +2318,30 @@ _gnutls_x509_pk_to_oid (gnutls_pk_algorithm_t algorithm)
 unsigned int gnutls_sec_param_to_pk_bits (gnutls_pk_algorithm_t algo,
                                       gnutls_sec_param_t param)
 {
+unsigned int ret = 0;
 
-  switch(algo)
+  /* handle DSA differently */
+  if (algo == GNUTLS_PK_DSA) 
     {
-      case GNUTLS_PK_RSA:
-      case GNUTLS_PK_DSA:
-        switch(param)
-          {
-            case GNUTLS_SEC_PARAM_LOW:
-              return 1248;
-            case GNUTLS_SEC_PARAM_HIGH:
-              return 2432;
-            case GNUTLS_SEC_PARAM_ULTRA:
-              return 3248;
-            case GNUTLS_SEC_PARAM_NORMAL:
-            default:
-              return 2432;
-          }
-        default:
-          gnutls_assert();
-          return 0;
+	GNUTLS_SEC_PARAM_LOOP ( if (p->sec_param == param) { ret = p->dsa_bits; break; });
+	return ret;
     }
 
+  GNUTLS_SEC_PARAM_LOOP ( if (p->sec_param == param) { ret = p->pk_bits; break; });
+
+  return ret;
+}
+
+/* Returns the corresponding size for subgroup bits (q),
+ * given the group bits (p).
+ */
+unsigned int gnutls_pk_bits_to_subgroup_bits (unsigned int pk_bits)
+{
+unsigned int ret = 0;
+
+  GNUTLS_SEC_PARAM_LOOP ( if (p->pk_bits >= pk_bits) { ret = p->subgroup_bits; break; });
+
+  return ret;
 }
 
 /**
@@ -2330,36 +2357,11 @@ unsigned int gnutls_sec_param_to_pk_bits (gnutls_pk_algorithm_t algo,
 const char *
 gnutls_sec_param_get_name (gnutls_sec_param_t param)
 {
-  const char *p;
+const char* ret = "Unknown";
 
-  switch (param)
-    {
-    case GNUTLS_SEC_PARAM_WEAK:
-      p = "Weak";
-      break;
+  GNUTLS_SEC_PARAM_LOOP ( if (p->sec_param == param) { ret = p->name; break; });
 
-    case GNUTLS_SEC_PARAM_LOW:
-      p = "Low";
-      break;
-
-    case GNUTLS_SEC_PARAM_NORMAL:
-      p = "Normal";
-      break;
-
-    case GNUTLS_SEC_PARAM_HIGH:
-      p = "High";
-      break;
-  
-    case GNUTLS_SEC_PARAM_ULTRA:
-      p = "Ultra";
-      break;
-
-    default:
-      p = "Unknown";
-      break;
-    }
-
-  return p;
+  return ret;
 }
 
 /**
@@ -2377,17 +2379,13 @@ gnutls_sec_param_get_name (gnutls_sec_param_t param)
 gnutls_sec_param_t gnutls_pk_bits_to_sec_param (gnutls_pk_algorithm_t algo,
                                       unsigned int bits)
 {
+  gnutls_sec_param_t ret = GNUTLS_SEC_PARAM_WEAK;
 
-  /* currently we ignore algo */
-  if (bits >= 15423)
-    return GNUTLS_SEC_PARAM_ULTRA;
-  else if (bits >= 3247)
-    return GNUTLS_SEC_PARAM_HIGH;
-  else if (bits >= 2431)
-    return GNUTLS_SEC_PARAM_NORMAL;
-  else if (bits >= 1248)
-    return GNUTLS_SEC_PARAM_LOW;
-  else 
-    return GNUTLS_SEC_PARAM_WEAK;
+  GNUTLS_SEC_PARAM_LOOP ( 
+	if (p->pk_bits > bits) 
+	  { break; } 
+	ret = p->sec_param; 
+  );
 
+  return ret;
 }

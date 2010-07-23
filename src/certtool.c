@@ -1350,6 +1350,7 @@ pgp_privkey_info (void)
       fprintf (outfile, "\tPublic Key Algorithm: ");
       cprint = gnutls_pk_algorithm_get_name (ret);
       fprintf (outfile, "%s\n", cprint ? cprint : "Unknown");
+      fprintf (outfile, "\tKey Security Level: %s\n", gnutls_sec_param_get_name(gnutls_openpgp_privkey_sec_param(key)));
 
       /* Print the raw public and private keys
        */
@@ -1678,6 +1679,7 @@ privkey_info (void)
 
   cprint = gnutls_pk_algorithm_get_name (ret);
   fprintf (outfile, "%s\n", cprint ? cprint : "Unknown");
+  fprintf (outfile, "\tKey Security Level: %s\n", gnutls_sec_param_get_name(gnutls_x509_privkey_sec_param(key)));
 
   /* Print the raw public and private keys
    */

@@ -6,13 +6,15 @@ See the end for copying conditions.
 * Version 2.11.1 (unreleased)
 
 ** libgnutls: Updated documentation and gnutls_pk_params_t mappings
-to ECRYPT II recommendations.
+to ECRYPT II recommendations. Mappings were moved to a single location
+and DSA keys are handled differently (since DSA2 allows for 1024,2048
+and 3072 keys only).
 
 ** libgnutls: HMAC-MD5 no longer used by default.
 
 ** API and ABI modifications:
-No changes since last version.
-
+gnutls_openpgp_privkey_sec_param: ADDED
+gnutls_x509_privkey_sec_param: ADDED
 
 * Version 2.11.0 (released 2010-07-22)
 

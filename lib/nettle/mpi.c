@@ -396,14 +396,12 @@ inline static int gen_group (mpz_t *prime, mpz_t* generator, unsigned int nbits)
 	/* security level enforcement. 
 	 * Values for q are selected according to ECRYPT II recommendations.
 	 */
-	if (nbits <= 1248) {
-		q_bytes = 160/8;
-	} else if (nbits <=2432) {
-		q_bytes = 224/8;
-	} else if (nbits <= 3248) {
-		q_bytes = 256/8;
-	} else {
-		q_bytes = 512/8;
+	q_bytes = gnutls_pk_bits_to_subgroup_bits (nbits);
+	q_bytes/=8;
+	
+	if (q_bytes == 0) {
+		gnutls_assert();
+		return GNUTLS_E_INVALID_REQUEST;
 	}
 	
 	if (nbits%8 != 0)

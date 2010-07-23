@@ -160,6 +160,8 @@ extern "C"
     gnutls_pk_algorithm_t
     gnutls_openpgp_privkey_get_pk_algorithm (gnutls_openpgp_privkey_t key,
 					     unsigned int *bits);
+
+  gnutls_sec_param_t gnutls_openpgp_privkey_sec_param (gnutls_openpgp_privkey_t key);
   int gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
 				     const gnutls_datum_t * data,
 				     gnutls_openpgp_crt_fmt_t format,

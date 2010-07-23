@@ -75,6 +75,32 @@ gnutls_openpgp_privkey_deinit (gnutls_openpgp_privkey_t key)
 }
 
 /**
+ * gnutls_openpgp_privkey_sec_param:
+ * @key: a key structure
+ *
+ * This function will return the security parameter appropriate with
+ * this private key.
+ *
+ * Returns: On success, a valid security parameter is returned otherwise
+ * %GNUTLS_SEC_PARAM_UNKNOWN is returned.
+ **/
+gnutls_sec_param_t
+gnutls_openpgp_privkey_sec_param (gnutls_openpgp_privkey_t key)
+{
+gnutls_pk_algorithm_t algo;
+unsigned int bits;
+
+  algo = gnutls_openpgp_privkey_get_pk_algorithm (key, &bits);
+  if (algo == GNUTLS_PK_UNKNOWN) 
+    {
+      gnutls_assert();
+      return GNUTLS_SEC_PARAM_UNKNOWN;
+    }
+
+  return gnutls_pk_bits_to_sec_param (algo, bits);
+}
+
+/**
  * gnutls_openpgp_privkey_import:
  * @key: The structure to store the parsed key.
  * @data: The RAW or BASE64 encoded key.
