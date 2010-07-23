@@ -539,9 +539,14 @@ authentication.
 
 @end multitable
 
-The first column provides an estimation of the year until these
-parameters are considered safe and the rest of the columns list the
-parameters for the various algorithms.
+The first column provides a security parameter in a number of bits. This
+gives an indication of the number of combinations to be tried by an adversary
+to brute force a key. For example to test all possible keys in a 112 bit security parameter
+@math{2^{112}} combinations have to be tried. For today's technology this is infeasible.
+The next two columns correlate the security
+parameter with actual bit sizes of parameters for DH, RSA, SRP and ECC algorithms.
+A mapping to @code{gnutls_sec_param_t} value is given for each security parameter, on
+the next column, and finally a brief description of the level.
 
 Note however that the values suggested here are nothing more than an
 educated guess that is valid today. There are no guarrantees that an
@@ -553,47 +558,11 @@ TLS are selected in a conservative way and such catastrophic
 breakthroughs or failures are believed to be unlikely.
 
 NIST publication SP 800-57 @xcite{NISTSP80057} contains a similar
-table that extends beyond the key sizes given above.
+table.
 
-@multitable @columnfractions .15 .20 .20 .20
-
-@item Bits of security
-@tab Symmetric key algorithms
-@tab RSA key size, DSA, DH and SRP prime size
-@tab ECC key size
-
-@item 80
-@tab 2TDEA
-@tab 1024
-@tab 160-223
-
-@item 112
-@tab 3DES
-@tab 2048
-@tab 224-255
-
-@item 128
-@tab AES-128
-@tab 3072
-@tab 256-383
-
-@item 192
-@tab AES-192
-@tab 7680
-@tab 384-511
-
-@item 256
-@tab AES-256
-@tab 15360
-@tab 512+
-
-@end multitable
-
-The recommendations are fairly consistent.
-
-When using @acronym{GnuTLS} and 
-bit sizes are required as input it is recommended to use the following
-functions:
+When using @acronym{GnuTLS} and a decision on bit sizes for a public
+key algorithm is required, use of the following functions is  
+recommended:
 @itemize
 
 @item @ref{gnutls_pk_bits_to_sec_param}
