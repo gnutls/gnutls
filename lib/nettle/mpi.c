@@ -378,6 +378,9 @@ static int wrap_nettle_prime_check(bigint_t pp)
  * The algorithm is simple but probably it has to be modified to gcrypt's
  * since it is really really slow. Nature did not want 2qw+1 to be prime.
  * The generator will be the generator of a subgroup of order q-1.
+ *
+ * Algorithm based on the algorithm in "A Computational Introduction to Number 
+ * Theory and Algebra" by V. Shoup, sec 11.1 Finding a generator for Z^{*}_p
  */
 inline static int gen_group (mpz_t *prime, mpz_t* generator, unsigned int nbits)
 {
@@ -390,15 +393,15 @@ inline static int gen_group (mpz_t *prime, mpz_t* generator, unsigned int nbits)
 	mpz_init(*prime);
 	mpz_init(*generator);
 
-	/* security level enforcement. "Check Fine-tuned implementation of an
-	 * efficient secure proﬁle matching protocol", p.61, El-gamal key generation.
+	/* security level enforcement. 
+	 * Values for q are selected according to ECRYPT II recommendations.
 	 */
-	if (nbits <= 1024) {
+	if (nbits <= 1248) {
 		q_bytes = 160/8;
-	} else if (nbits <=2644) {
+	} else if (nbits <=2432) {
+		q_bytes = 224/8;
+	} else if (nbits <= 3248) {
 		q_bytes = 256/8;
-	} else if (nbits <= 6897) {
-		q_bytes = 384/8;
 	} else {
 		q_bytes = 512/8;
 	}
