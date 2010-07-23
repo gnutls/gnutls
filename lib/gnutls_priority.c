@@ -361,7 +361,6 @@ static const int sign_priority_secure256[] = {
 };
 
 static const int mac_priority_performance[] = {
-  GNUTLS_MAC_MD5,
   GNUTLS_MAC_SHA1,
   0
 };
@@ -370,7 +369,6 @@ static const int mac_priority_performance[] = {
 static const int mac_priority_secure[] = {
   GNUTLS_MAC_SHA256,
   GNUTLS_MAC_SHA1,
-  GNUTLS_MAC_MD5,
   0
 };
 
