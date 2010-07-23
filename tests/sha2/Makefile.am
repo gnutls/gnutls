@@ -20,7 +20,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 EXTRA_DIST = key-ca.pem key-subca.pem key-subsubca.pem key-user.pem key-dsa.pem \
-	key-ca-dsa.pem
+	key-ca-dsa.pem key-subca-dsa.pem
 
 dist_check_SCRIPTS = sha2 sha2-dsa
 
