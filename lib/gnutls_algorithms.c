@@ -2301,14 +2301,14 @@ unsigned int gnutls_sec_param_to_pk_bits (gnutls_pk_algorithm_t algo,
         switch(param)
           {
             case GNUTLS_SEC_PARAM_LOW:
-              return 1024;
+              return 1248;
             case GNUTLS_SEC_PARAM_HIGH:
-              return 3072;
+              return 2432;
             case GNUTLS_SEC_PARAM_ULTRA:
-              return 7680;
+              return 3248;
             case GNUTLS_SEC_PARAM_NORMAL:
             default:
-              return 2048;
+              return 2432;
           }
         default:
           gnutls_assert();
@@ -2379,13 +2379,13 @@ gnutls_sec_param_t gnutls_pk_bits_to_sec_param (gnutls_pk_algorithm_t algo,
 {
 
   /* currently we ignore algo */
-  if (bits >= 7680)
+  if (bits >= 15423)
     return GNUTLS_SEC_PARAM_ULTRA;
-  else if (bits >= 3072)
+  else if (bits >= 3247)
     return GNUTLS_SEC_PARAM_HIGH;
-  else if (bits >= 2048)
+  else if (bits >= 2431)
     return GNUTLS_SEC_PARAM_NORMAL;
-  else if (bits >= 1024)
+  else if (bits >= 1248)
     return GNUTLS_SEC_PARAM_LOW;
   else 
     return GNUTLS_SEC_PARAM_WEAK;

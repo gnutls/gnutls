@@ -494,52 +494,48 @@ resume functions, @ref{resume}.
 In TLS, since a lot of algorithms are involved, it is not easy to set
 a consistent security level.  For this reason this section will
 present some correspondance between key sizes of symmetric algorithms
-and public key algorithms based on the most conservative values of
-@xcite{SELKEY}.  Those can be used to generate certificates with
+and public key algorithms based on the ``ECRYPT II Yearly Report on Algorithms and Keysizes (2009-2010)''
+in @xcite{ECRYPT}.  Those can be used to generate certificates with
 appropriate key sizes as well as parameters for Diffie-Hellman and SRP
 authentication.
 
-@multitable @columnfractions .15 .20 .20 .20
+@multitable @columnfractions .10 .15 .10 .20 .35
 
-@item Year
-@tab Symmetric key size
-@tab RSA key size, DH and SRP prime size
+@item Security bits
+@tab RSA, DH and SRP parameter size
 @tab ECC key size
+@tab @code{gnutls_sec_param_t}
+@tab Description
 
-@item 1982
-@tab 56
-@tab 417
-@tab 105
+@item 64
+@tab 816
+@tab 128
+@tab @code{WEAK}
+@tab Very short term protection against small organizations
 
-@item 1988
-@tab 61
-@tab 566
-@tab 114
+@item 80
+@tab 1248
+@tab 160
+@tab @code{LOW}
+@tab Very short term protection against agencies
 
-@item 2002
-@tab 72
-@tab 1028
-@tab 139
+@item 112
+@tab 2432
+@tab 224
+@tab @code{NORMAL}
+@tab Medium-term protection
 
-@item 2015
-@tab 82
-@tab 1613
-@tab 173
+@item 128
+@tab 3248
+@tab 256
+@tab @code{HIGH}
+@tab Long term protection
 
-@item 2028
-@tab 92
-@tab 2362
-@tab 210
-
-@item 2040
-@tab 101
-@tab 3214
-@tab 244
-
-@item 2050
-@tab 109
-@tab 4047
-@tab 272
+@item 256
+@tab 15424
+@tab 512
+@tab @code{ULTRA}
+@tab Foreseeable future
 
 @end multitable
 
