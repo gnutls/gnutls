@@ -48,7 +48,7 @@ generate_prime (int how)
   int ret;
   gnutls_dh_params_t dh_params;
   gnutls_datum_t p, g;
-  int bits = get_bits(GNUTLS_PK_DSA);
+  int bits = get_bits(GNUTLS_PK_DH);
 
   gnutls_dh_params_init (&dh_params);
 

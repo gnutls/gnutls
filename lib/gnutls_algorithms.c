@@ -2180,7 +2180,7 @@ gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm)
   const gnutls_pk_entry *p;
 
   for (p = pk_algorithms; p->name != NULL; p++)
-    if (p->id && p->id == algorithm)
+    if (p->id == algorithm)
       {
 	ret = p->name;
 	break;
@@ -2205,6 +2205,10 @@ gnutls_pk_list (void)
   static const gnutls_pk_algorithm_t supported_pks[] = {
     GNUTLS_PK_RSA,
     GNUTLS_PK_DSA,
+    /* GNUTLS_PK_DH is not returned because it is not
+     * a real public key algorithm. I.e. cannot be used
+     * as a public key algorithm of a certificate.
+     */
     0
   };
 
@@ -2227,12 +2231,17 @@ gnutls_pk_list (void)
 gnutls_pk_algorithm_t
 gnutls_pk_get_id (const char *name)
 {
-  if (strcasecmp (name, "RSA") == 0)
-    return GNUTLS_PK_RSA;
-  else if (strcasecmp (name, "DSA") == 0)
-    return GNUTLS_PK_DSA;
+  gnutls_pk_algorithm_t ret = GNUTLS_PK_UNKNOWN;
+  const gnutls_pk_entry *p;
 
-  return GNUTLS_PK_UNKNOWN;
+  for (p = pk_algorithms; p->name != NULL; p++)
+    if (name && strcmp (p->name, name) == 0)
+      {
+	ret = p->id;
+	break;
+      }
+
+  return ret;
 }
 
 /**
@@ -2249,25 +2258,17 @@ gnutls_pk_get_id (const char *name)
 const char *
 gnutls_pk_get_name (gnutls_pk_algorithm_t algorithm)
 {
-  const char *p;
+  const char *ret = "Unknown";
+  const gnutls_pk_entry *p;
 
-  switch (algorithm)
-    {
-    case GNUTLS_PK_RSA:
-      p = "RSA";
-      break;
+  for (p = pk_algorithms; p->name != NULL; p++)
+    if (algorithm == p->id)
+      {
+	ret = p->name;
+	break;
+      }
 
-    case GNUTLS_PK_DSA:
-      p = "DSA";
-      break;
-
-    default:
-    case GNUTLS_PK_UNKNOWN:
-      p = "PK_UNKNOWN";
-      break;
-    }
-
-  return p;
+  return ret;
 }
 
 gnutls_pk_algorithm_t
@@ -2336,7 +2337,7 @@ unsigned int ret = 0;
 /* Returns the corresponding size for subgroup bits (q),
  * given the group bits (p).
  */
-unsigned int gnutls_pk_bits_to_subgroup_bits (unsigned int pk_bits)
+unsigned int _gnutls_pk_bits_to_subgroup_bits (unsigned int pk_bits)
 {
 unsigned int ret = 0;
 

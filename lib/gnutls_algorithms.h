@@ -125,6 +125,6 @@ int _gnutls_cipher_priority (gnutls_session_t session,
 int _gnutls_kx_priority (gnutls_session_t session,
 			 gnutls_kx_algorithm_t algorithm);
 
-unsigned int gnutls_pk_bits_to_subgroup_bits (unsigned int pk_bits);
+unsigned int _gnutls_pk_bits_to_subgroup_bits (unsigned int pk_bits);
 
 #endif

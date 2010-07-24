@@ -396,7 +396,7 @@ inline static int gen_group (mpz_t *prime, mpz_t* generator, unsigned int nbits)
 	/* security level enforcement. 
 	 * Values for q are selected according to ECRYPT II recommendations.
 	 */
-	q_bytes = gnutls_pk_bits_to_subgroup_bits (nbits);
+	q_bytes = _gnutls_pk_bits_to_subgroup_bits (nbits);
 	q_bytes/=8;
 	
 	if (q_bytes == 0) {
