@@ -1653,20 +1653,13 @@ privkey_info (void)
   /* If we failed to import the certificate previously try PKCS #8 */
   if (info.pkcs8 || ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
     {
-      /* first try to import the key without asking any password */
+      if (info.pass)
+        pass = info.pass;
+      else
+        pass = get_pass ();
       ret = gnutls_x509_privkey_import_pkcs8 (key, &pem,
-					      info.incert_format,
-					      NULL, GNUTLS_PKCS_PLAIN);
-      if (ret < 0)
-	{
-	  if (info.pass)
-	    pass = info.pass;
-	  else
-	    pass = get_pass ();
-	  ret = gnutls_x509_privkey_import_pkcs8 (key, &pem,
 						  info.incert_format,
 						  pass, 0);
-	}
     }
   if (ret < 0)
     error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));

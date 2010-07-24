@@ -10,6 +10,10 @@ to ECRYPT II recommendations. Mappings were moved to a single location
 and DSA keys are handled differently (since DSA2 allows for 1024,2048
 and 3072 keys only).
 
+** libgnutls: gnutls_x509_privkey_import() will fallback to
+gnutls_x509_privkey_import_pkcs8() without a password, if it
+is unable to decode the key.
+
 ** libgnutls: HMAC-MD5 no longer used by default.
 
 ** API and ABI modifications:
