@@ -357,7 +357,8 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
       /* Try the first header */
       result =
 	_gnutls_fbase64_decode (PEM_KEY_RSA, data->data, data->size, &out);
-      key->pk_algorithm = GNUTLS_PK_RSA;
+
+      if (result >= 0) key->pk_algorithm = GNUTLS_PK_RSA;
 
       if (result == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
 	{
@@ -365,15 +366,16 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
 	  result =
 	    _gnutls_fbase64_decode (PEM_KEY_DSA, data->data, data->size,
 				    &out);
-	  key->pk_algorithm = GNUTLS_PK_DSA;
-
 	  if (result <= 0)
 	    {
 	      if (result == 0)
 		result = GNUTLS_E_INTERNAL_ERROR;
 	      gnutls_assert ();
-	      return result;
+	      
+	      goto failover;
 	    }
+
+	  key->pk_algorithm = GNUTLS_PK_DSA;
 	}
 
       _data.data = out;
@@ -415,7 +417,7 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
     {
       gnutls_assert ();
       result = GNUTLS_E_ASN1_DER_ERROR;
-      goto cleanup;
+      goto failover;
     }
 
   if (need_free)
@@ -426,10 +428,20 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
 
   return 0;
 
-cleanup:
-  key->pk_algorithm = GNUTLS_PK_UNKNOWN;
+failover:
+  /* Try PKCS #8 */
+#ifdef ENABLE_PKI
+  if (result == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
+    {
+       _gnutls_debug_log("Falling back to PKCS #8 key decoding\n");
+       result = gnutls_x509_privkey_import_pkcs8 (key, data, format,
+                       NULL, GNUTLS_PKCS_PLAIN);
+    }
+#endif
+
   if (need_free)
     _gnutls_free_datum (&_data);
+
   return result;
 }
 

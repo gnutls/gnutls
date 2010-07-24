@@ -10,6 +10,10 @@ with strange OIDs.
 
 ** gnutls-cli: Allow verification using V1 CAs.
 
+** libgnutls: gnutls_x509_privkey_import() will fallback to
+gnutls_x509_privkey_import_pkcs8() without a password, if it
+is unable to decode the key.
+
 ** libgnutls: Correctly deinitialize crypto API functions to prevent
 a memory leak. Reported by Mads Kiilerich.
 
