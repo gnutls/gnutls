@@ -47,8 +47,8 @@ static const gnutls_sec_params_entry sec_params[] = {
   {"Weak", GNUTLS_SEC_PARAM_WEAK, 64, 816, 1024, 128, 128},
   {"Low", GNUTLS_SEC_PARAM_LOW, 80, 1248, 2048, 160, 160},
   {"Normal", GNUTLS_SEC_PARAM_NORMAL, 112, 2432, 3072, 224, 224},
-  {"Weak", GNUTLS_SEC_PARAM_HIGH, 128, 3248, 3072, 256, 256},
-  {"Weak", GNUTLS_SEC_PARAM_ULTRA, 256, 15424, 3072, 512, 512},
+  {"High", GNUTLS_SEC_PARAM_HIGH, 128, 3248, 3072, 256, 256},
+  {"Ultra", GNUTLS_SEC_PARAM_ULTRA, 256, 15424, 3072, 512, 512},
   {NULL, 0, 0, 0, 0, 0}
 };
 
