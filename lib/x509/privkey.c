@@ -376,7 +376,7 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
       result =
 	_gnutls_fbase64_decode (PEM_KEY_RSA, data->data, data->size, &out);
 
-      if (result == 0) key->pk_algorithm = GNUTLS_PK_RSA;
+      if (result >= 0) key->pk_algorithm = GNUTLS_PK_RSA;
 
       if (result == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
 	{
