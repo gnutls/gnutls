@@ -176,6 +176,63 @@ gnutls_pkcs11_copy_x509_crt: ADDED
 gnutls_pkcs11_copy_x509_privkey: ADDED
 gnutls_pkcs11_delete_url: ADDED
 
+* Version 2.10.1 (released 2010-07-25)
+
+** libgnutls: Added support for broken certificates that indicate RSA
+with strange OIDs.
+
+** gnutls-cli: Allow verification using V1 CAs.
+
+** libgnutls: gnutls_x509_privkey_import() will fallback to
+gnutls_x509_privkey_import_pkcs8() without a password, if it
+is unable to decode the key.
+
+** libgnutls: Correctly deinitialize crypto API functions to prevent
+a memory leak.  Reported by Mads Kiilerich.
+
+** certtool: If asked to generate DSA keys of size more than 1024 bits,
+issue a warning, that the output key might not be working everywhere.
+
+** certtool: The --pkcs-cipher is taken into account when generating a
+private key. The default cipher used now is aes-128. The old behavior
+can be simulated by specifying "--pkcs-cipher 3des-pkcs12".
+
+** API and ABI modifications:
+No changes since last version.
+
+* Version 2.10.0 (released 2010-06-25)
+
+** API and ABI modifications:
+No changes since last version.
+
+* Version 2.9.12 (released 2010-06-17)
+
+** gnutls-cli: Make --starttls work again.
+Problem introduced in patch to use read() instead of fgets() committed
+on 2010-01-27.
+
+** API and ABI modifications:
+No changes since last version.
+
+* Version 2.9.11 (released 2010-06-07)
+
+** libgnutls: Removed two APIs related to safe renegotiation.
+Use priority strings instead.  The APIs were
+gnutls_safe_negotiation_set_initial and gnutls_safe_renegotiation_set.
+(Remember that we don't promise ABI stability during development
+series, so this doesn't cause an shared library ABI increment.)
+
+** tests: More self testing of safe renegotiation extension.
+See tests/safe-renegotiation/README for more information.
+
+** doc: a PDF version of the API reference manual (GTK-DOC) is now built.
+
+** doc: Terms 'GNUTLS' and 'GNU TLS' were changed to 'GnuTLS' for consistency.
+
+** API and ABI modifications:
+gnutls_safe_negotiation_set_initial: REMOVED.
+gnutls_safe_renegotiation_set: REMOVED.
+
 * Version 2.9.10 (released 2010-04-22)
 
 ** libgnutls: Time verification extended to trusted certificate list.
