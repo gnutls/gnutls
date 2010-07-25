@@ -1,3 +1,93 @@
+2010-07-25  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Typo.
+
+2010-07-25  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.10.1.
+
+2010-07-25  Simon Josefsson <simon@josefsson.org>
+
+	* configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2010-07-25  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2010-07-25  Simon Josefsson <simon@josefsson.org>
+
+	* lib/x509/common.h: Add OID, from master branch.  To make things
+	build.
+
+2010-07-25  Simon Josefsson <simon@josefsson.org>
+
+	* lib/crypto-api.c, lib/gnutls_algorithms.c, lib/x509/privkey.c,
+	src/certtool.c, src/cli.c: Indent code.
+
+2010-07-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_x509.c, lib/x509/privkey.c, src/certtool.c: 
+	gnutls_x509_privkey_import() will fallback to
+	gnutls_x509_privkey_import_pkcs8() without a password, if it is
+	unable to decode the key.
+
+2010-07-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_algorithms.c: use RSA-SHA1 as an indicator of RSA
+	certificates.
+
+2010-07-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_algorithms.c: Added SIG_RSA_MD5_OID as an
+	indicator of RSA. Some microsoft products were using it. Reported by
+	Mads Kiilerich.
+
+2010-07-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, src/cli.c: gnutls-cli: Allow verification using V1 CAs.
+
+2010-07-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, src/certtool.c: Warn when generating DSA keys of  size more
+	than 1024.
+
+2010-07-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/certtool-cfg.c: Do not crash if input is redirected from
+	/dev/null.
+
+2010-07-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, src/certtool-gaa.c, src/certtool.c, src/certtool.gaa,
+	src/crypt-gaa.c: Changed the default pkcs-cipher to AES-128. Allowed
+	specifying the 3des-pkcs12 cipher with the --pkcs-cipher option.
+
+2010-07-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: documented fix
+
+2010-06-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/crypto-api.c: Correctly deinitialize crypto API handles.
+
+2010-06-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/certtool.c: When generating private key allow usage of
+	--pkcs-cipher flag.
+
+2010-06-25  Simon Josefsson <simon@josefsson.org>
+
+	* doc/announce.txt: Update.
+
+2010-06-25  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Use non-devel locations.
+
+2010-06-25  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2010-06-25  Simon Josefsson <simon@josefsson.org>
 
 	* cfg.mk: Release to non-alpha locations.
