@@ -24,6 +24,9 @@ certtool: The --pkcs-cipher is taken into account when generating a
 private key. The default cipher used now is aes-128. The old behavior can
 be simulated by specifying "--pkcs-cipher 3des-pkcs12".
 
+** API and ABI modifications:
+No changes since last version.
+
 * Version 2.10.0 (released 2010-06-25)
 
 ** API and ABI modifications:
