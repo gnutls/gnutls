@@ -979,8 +979,8 @@ _gnutls_handshake_buffer_clear (gnutls_session_t session)
 
 /**
  * gnutls_transport_set_pull_function:
+ * @session: is a #gnutls_session_t structure.
  * @pull_func: a callback function similar to read()
- * @session: gnutls session
  *
  * This is the function where you set a function for gnutls to receive
  * data.  Normally, if you use berkeley style sockets, do not need to
@@ -998,8 +998,8 @@ gnutls_transport_set_pull_function (gnutls_session_t session,
 
 /**
  * gnutls_transport_set_push_function:
+ * @session: is a #gnutls_session_t structure.
  * @push_func: a callback function similar to write()
- * @session: gnutls session
  *
  * This is the function where you set a push function for gnutls to
  * use in order to send data.  If you are going to use berkeley style
@@ -1019,8 +1019,8 @@ gnutls_transport_set_push_function (gnutls_session_t session,
 }
 
 /**
- * @session: gnutls session
  * gnutls_transport_set_push_function2:
+ * @session: is a #gnutls_session_t structure.
  * @vec_func: a callback function similar to writev()
  *
  * This is the function where you set a push function for gnutls to
@@ -1041,8 +1041,8 @@ gnutls_transport_set_push_function2 (gnutls_session_t session,
 }
 
 /**
- * @session: gnutls session
  * gnutls_transport_set_errno_function:
+ * @session: is a #gnutls_session_t structure.
  * @errno_func: a callback function similar to write()
  *
  * This is the function where you set a function to retrieve errno
