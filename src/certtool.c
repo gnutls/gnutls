@@ -173,9 +173,10 @@ generate_private_key_int (void)
     {
       key_type = GNUTLS_PK_DSA;
       if (info.bits > 1024)
-        {
-          fprintf(stderr, "It is suggested for compatibility with other implementations to use DSA keys bit length 1024\n");
-        }
+	{
+	  fprintf (stderr,
+		   "It is suggested for compatibility with other implementations to use DSA keys bit length 1024\n");
+	}
     }
   else
     key_type = GNUTLS_PK_RSA;
@@ -1540,12 +1541,11 @@ privkey_info (void)
   if (info.pkcs8 || ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
     {
       if (info.pass)
-        pass = info.pass;
+	pass = info.pass;
       else
-        pass = get_pass ();
+	pass = get_pass ();
       ret = gnutls_x509_privkey_import_pkcs8 (key, &pem,
-						  info.incert_format,
-						  pass, 0);
+					      info.incert_format, pass, 0);
     }
   if (ret < 0)
     error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));
