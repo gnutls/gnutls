@@ -44,8 +44,6 @@
 int print_cert;
 extern int verbose;
 
-static char buffer[5 * 1024];
-
 const char str_unknown[] = "(unknown)";
 
 /* Hex encodes the given data.
@@ -115,12 +113,23 @@ print_x509_info (gnutls_session_t session, const char *hostname, int insecure)
 
       if (print_cert)
 	{
-	  size_t size;
-
-	  size = sizeof (buffer);
+	  size_t size = 0;
+	  char *p = NULL;
 
 	  ret = gnutls_x509_crt_export (crt, GNUTLS_X509_FMT_PEM,
-					buffer, &size);
+					p, &size);
+	  if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
+	    {
+	      p = malloc (size);
+	      if (!p)
+		{
+		  fprintf (stderr, "gnutls_malloc\n");
+		  exit (1);
+		}
+
+	      ret = gnutls_x509_crt_export (crt, GNUTLS_X509_FMT_PEM,
+					    p, &size);
+	    }
 	  if (ret < 0)
 	    {
 	      fprintf (stderr, "Encoding error: %s\n", gnutls_strerror (ret));
@@ -128,8 +137,10 @@ print_x509_info (gnutls_session_t session, const char *hostname, int insecure)
 	    }
 
 	  fputs ("\n", stdout);
-	  fputs (buffer, stdout);
+	  fputs (p, stdout);
 	  fputs ("\n", stdout);
+
+	  gnutls_free (p);
 	}
 
       if (j == 0 && hostname != NULL)
@@ -200,19 +211,33 @@ print_openpgp_info (gnutls_session_t session, const char *hostname,
 
       if (print_cert)
 	{
-	  size_t size;
-
-	  size = sizeof (buffer);
+	  size_t size = 0;
+	  char *p = NULL;
 
 	  ret = gnutls_openpgp_crt_export (crt, GNUTLS_OPENPGP_FMT_BASE64,
-					   buffer, &size);
+					   p, &size);
+	  if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
+	    {
+	      p = malloc (size);
+	      if (!p)
+		{
+		  fprintf (stderr, "gnutls_malloc\n");
+		  exit (1);
+		}
+
+	      ret = gnutls_openpgp_crt_export (crt, GNUTLS_OPENPGP_FMT_BASE64,
+					       p, &size);
+	    }
 	  if (ret < 0)
 	    {
 	      fprintf (stderr, "Encoding error: %s\n", gnutls_strerror (ret));
 	      return;
 	    }
-	  fputs (buffer, stdout);
+
+	  fputs (p, stdout);
 	  fputs ("\n", stdout);
+
+	  gnutls_free (p);
 	}
 
       if (hostname != NULL)
