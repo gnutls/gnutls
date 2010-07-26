@@ -236,7 +236,7 @@ static const gnutls_hash_entry hash_algorithms[] = {
   {"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512, 64},
   {"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0},	/* not used as MAC */
   {"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160, 20},
-  {"NULL", NULL, GNUTLS_MAC_NULL, 0},
+  {"MAC-NULL", NULL, GNUTLS_MAC_NULL, 0},
   {0, 0, 0, 0}
 };
 
