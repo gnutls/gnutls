@@ -272,22 +272,31 @@ _gnutls_session_sign_algo_requested (gnutls_session_t session,
 				     gnutls_sign_algorithm_t sig)
 {
   unsigned i;
-  int ret;
+  int ret, hash;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
   sig_ext_st * priv;
   extension_priv_data_t epriv;
+
+  if (!_gnutls_version_has_selectable_sighash (ver))
+    {
+      return 0;
+    }
 
   ret = _gnutls_ext_get_session_data(session, GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS,
     &epriv);
   if (ret < 0)
     {
       gnutls_assert();
-      return ret;
+      /* extension not received allow SHA1 and SHA256 */
+      hash = _gnutls_sign_get_hash_algorithm(sig);
+      if (hash == GNUTLS_DIG_SHA1 || hash == GNUTLS_DIG_SHA256)
+        return 0;
+      else
+        return ret;
     }
   priv = epriv.ptr;
 
-  if (!_gnutls_version_has_selectable_sighash (ver)
-      || priv->sign_algorithms_size == 0)
+  if (priv->sign_algorithms_size == 0)
     /* none set, allow all */
     {
       return 0;
