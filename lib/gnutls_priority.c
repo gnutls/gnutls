@@ -474,7 +474,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  * separated list of the cipher priorities to enable.
  *
  * Unless the first keyword is "NONE" the defaults (in preference
- * order) are for TLS protocols TLS1.1, TLS1.0, SSL3.0; for
+ * order) are for TLS protocols TLS 1.2, TLS1.1, TLS1.0, SSL3.0; for
  * compression NULL; for certificate types X.509, OpenPGP.
  *
  * For key exchange algorithms when in NORMAL or SECURE levels the
@@ -554,7 +554,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  * "EXPORT:!VERS-TLS1.0:+COMP-DEFLATE" means that export ciphers are
  * enabled, TLS 1.0 is disabled, and libz compression enabled.
  *
- * "NONE:+VERS-TLS1.0:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL", "NORMAL",
+ * "NONE:+VERS-TLS1.0:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1", "NORMAL",
  * "%COMPAT".
  *
  * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
