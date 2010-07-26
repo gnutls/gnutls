@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.11.1 (unreleased)
 
+** libgnutls: Added RSA_NULL_SHA1 and SHA256 ciphersuites.
+
 ** libgnutls: Updated documentation and gnutls_pk_params_t mappings
 to ECRYPT II recommendations. Mappings were moved to a single location
 and DSA keys are handled differently (since DSA2 allows for 1024,2048
