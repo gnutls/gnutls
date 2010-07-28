@@ -473,7 +473,9 @@ static int unescape_string(char *output, const char *input, size_t * size,
 	_gnutls_buffer_init(&str);
 
 	/* find terminator */
-	p = strchr(input, terminator);
+	do {
+        	p = strchr(input, terminator);
+        } while(p != NULL && *(p-1) == '\\');
 	if (p != NULL)
 		len = p - input;
 	else
