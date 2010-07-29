@@ -38,7 +38,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   DLL_VERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
   AC_SUBST(DLL_VERSION)
 
-  cryptolib="nettle (unsupported)"
+  cryptolib="nettle"
   AC_ARG_WITH(nettle,
     AS_HELP_STRING([--with-nettle], [use libnettle 2.x as crypto library]),
       nettle=$withval,
@@ -61,6 +61,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
 
   if test "$nettle" != "yes";then
   	cryptolib=libgcrypt
+        AC_DEFINE([HAVE_GCRYPT], 1, [whether the gcrypt library is in use])
 	AC_LIB_HAVE_LINKFLAGS([gcrypt], [gpg-error], [#include <gcrypt.h>],
     [enum gcry_cipher_algos i = GCRY_CIPHER_CAMELLIA128])
   if test "$ac_cv_libgcrypt" != yes; then
