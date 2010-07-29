@@ -27,7 +27,7 @@
 #include <gnutls_algorithms.h>
 #include <ext_inner_application.h>
 
-#ifndef HAVE_LIBNETTLE
+#ifdef HAVE_GCRYPT
 # include <gcrypt.h>
 #endif
 
@@ -148,7 +148,7 @@ gnutls_global_init_extra (void)
 #endif
 
 
-#ifndef HAVE_LIBNETTLE
+#ifdef HAVE_GCRYPT
 # ifdef gcry_fips_mode_active
   /* Libgcrypt manual says that gcry_version_check must be called
      before calling gcry_fips_mode_active. */

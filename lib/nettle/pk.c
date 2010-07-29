@@ -243,7 +243,7 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 		     const gnutls_datum_t * vdata,
 		     const gnutls_pk_params_st * pk_params)
 {
-	int ret;
+	int ret, hash;
 
 	switch (algo) {
 
@@ -259,12 +259,25 @@ _wrap_nettle_pk_sign(gnutls_pk_algorithm_t algo,
 
 		dsa_signature_init(&sig);
 
-		dsa_sign_digest(&pub, &priv, NULL, rnd_func, vdata->data, &sig);
+		hash = _gnutls_dsa_q_to_hash(pub.q);
+		if (vdata->size != _gnutls_hash_get_algo_len(hash)) {
+		    gnutls_assert();
+		    ret = GNUTLS_E_PK_SIGN_FAILED;
+		    goto dsa_fail;
+                }
+
+  		ret = _dsa_sign(&pub, &priv, NULL, rnd_func, vdata->size, vdata->data, &sig);
+  		if (ret == 0) {
+  		    gnutls_assert();
+  		    ret = GNUTLS_E_PK_SIGN_FAILED;
+  		    goto dsa_fail;
+                }
 
 		ret =
 			_gnutls_encode_ber_rs(signature, &sig.r,
 					  &sig.s);
-					  
+
+dsa_fail:					  
 		dsa_signature_clear(&sig);
 
 		if (ret < 0) {
@@ -357,7 +370,7 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		       const gnutls_datum_t * signature,
 		       const gnutls_pk_params_st * pk_params)
 {
-	int ret;
+	int ret, hash;
 	bigint_t tmp[2] = { NULL, NULL };
 
 	switch (algo) {
@@ -375,12 +388,20 @@ _wrap_nettle_pk_verify(gnutls_pk_algorithm_t algo,
 		memcpy(&sig.r, tmp[0], sizeof(sig.r));
 		memcpy(&sig.s, tmp[1], sizeof(sig.s));
 
-		ret = dsa_verify_digest(&pub, vdata->data, &sig);
+		hash = _gnutls_dsa_q_to_hash(pub.q);
+		if (vdata->size != _gnutls_hash_get_algo_len(hash)) {
+		    gnutls_assert();
+		    ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
+		    goto dsa_fail;
+                }
+
+		ret = _dsa_verify(&pub, vdata->size, vdata->data, &sig);
 		if (ret == 0)
 			ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
 		else
 			ret = 0;
 
+dsa_fail:
 		_gnutls_mpi_release(&tmp[0]);
 		_gnutls_mpi_release(&tmp[1]);
 		break;
@@ -423,6 +444,7 @@ wrap_nettle_pk_generate_params(gnutls_pk_algorithm_t algo,
 			       gnutls_pk_params_st * params)
 {
 int ret, i;
+int q_bits;
 
 	switch (algo) {
 
@@ -432,8 +454,15 @@ int ret, i;
 	
 		dsa_public_key_init(&pub);
 		dsa_private_key_init(&priv);
+		
+		/* the best would be to use _gnutls_pk_bits_to_subgroup_bits()
+		 * but we do NIST DSA here */
+		if (level <= 1024)
+		  q_bits = 160;
+		else
+		  q_bits = 256;
 
-		ret = dsa_generate_keypair (&pub, &priv, NULL, rnd_func, NULL, NULL, level);
+		ret = dsa_generate_keypair (&pub, &priv, NULL, rnd_func, NULL, NULL, level, q_bits);
 		if (ret != 1) {
 			gnutls_assert();
 			return GNUTLS_E_INTERNAL_ERROR;

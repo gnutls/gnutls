@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.11.1 (unreleased)
 
+** libgnutls: Depend on nettle 2.1. This makes nettle a fully working
+backend crypto library.
+
 ** libgnutls: Added RSA_NULL_SHA1 and SHA256 ciphersuites.
 
 ** libgnutls: Updated documentation and gnutls_pk_params_t mappings
