@@ -9,6 +9,9 @@ See the end for copying conditions.
 cipher. This prevented the usage of the TLS ciphersuites with NULL
 cipher.
 
+** API and ABI modifications:
+No changes since last version.
+
 * Version 2.10.1 (released 2010-07-25)
 
 ** libgnutls: Added support for broken certificates that indicate RSA
