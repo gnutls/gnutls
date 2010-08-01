@@ -21,14 +21,14 @@ gnutls_x509_privkey_import_pkcs8() without a password, if it
 is unable to decode the key.
 
 ** libgnutls: Correctly deinitialize crypto API functions to prevent
-a memory leak. Reported by Mads Kiilerich.
+a memory leak.  Reported by Mads Kiilerich.
 
-certtool: If asked to generate DSA keys of size more than 1024 bits,
+** certtool: If asked to generate DSA keys of size more than 1024 bits,
 issue a warning, that the output key might not be working everywhere.
 
-certtool: The --pkcs-cipher is taken into account when generating a
-private key. The default cipher used now is aes-128. The old behavior can
-be simulated by specifying "--pkcs-cipher 3des-pkcs12".
+** certtool: The --pkcs-cipher is taken into account when generating a
+private key. The default cipher used now is aes-128. The old behavior
+can be simulated by specifying "--pkcs-cipher 3des-pkcs12".
 
 ** API and ABI modifications:
 No changes since last version.
