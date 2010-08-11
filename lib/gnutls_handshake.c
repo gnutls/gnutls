@@ -2670,7 +2670,7 @@ _gnutls_handshake_client (gnutls_session_t session)
     case STATE1:
       ret = _gnutls_send_hello (session, AGAIN (STATE1));
       STATE = STATE1;
-      IMED_RET ("send hello", ret, 0);
+      IMED_RET ("send hello", ret, 1);
 
     case STATE2:
       /* receive the server hello */
@@ -2750,7 +2750,7 @@ _gnutls_handshake_client (gnutls_session_t session)
 	ret =
 	  _gnutls_send_client_certificate_verify (session, AGAIN (STATE9));
       STATE = STATE9;
-      IMED_RET ("send client certificate verify", ret, 0);
+      IMED_RET ("send client certificate verify", ret, 1);
 
       STATE = STATE0;
     default:
@@ -2915,7 +2915,7 @@ _gnutls_handshake_server (gnutls_session_t session)
     case STATE2:
       ret = _gnutls_send_hello (session, AGAIN (STATE2));
       STATE = STATE2;
-      IMED_RET ("send hello", ret, 0);
+      IMED_RET ("send hello", ret, 1);
 
     case STATE70:
       if (session->security_parameters.do_send_supplemental)
@@ -2957,7 +2957,7 @@ _gnutls_handshake_server (gnutls_session_t session)
 					GNUTLS_HANDSHAKE_SERVER_HELLO_DONE,
 					AGAIN (STATE6));
       STATE = STATE6;
-      IMED_RET ("send server hello done", ret, 0);
+      IMED_RET ("send server hello done", ret, 1);
 
     case STATE71:
       if (session->security_parameters.do_recv_supplemental)
@@ -3028,7 +3028,7 @@ _gnutls_handshake_common (gnutls_session_t session)
 #endif
 
       ret = _gnutls_send_handshake_final (session, FALSE);
-      IMED_RET ("send handshake final", ret, 0);
+      IMED_RET ("send handshake final", ret, 1);
 
       /* only store if we are not resuming */
       if (session->security_parameters.entity == GNUTLS_SERVER)
@@ -3041,7 +3041,7 @@ _gnutls_handshake_common (gnutls_session_t session)
     {				/* if we are a client not resuming - or we are a server resuming */
 
       ret = _gnutls_send_handshake_final (session, TRUE);
-      IMED_RET ("send handshake final 2", ret, 0);
+      IMED_RET ("send handshake final 2", ret, 1);
 
 #ifdef ENABLE_SESSION_TICKET
       switch (STATE)
