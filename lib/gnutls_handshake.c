@@ -2785,7 +2785,9 @@ _gnutls_send_handshake_final (gnutls_session_t session, int init)
           return ret;
         }
 
-      ret = _gnutls_send_change_cipher_spec (session, AGAIN2 (oldstate, STATE20));
+    case STATE21:
+      ret = _gnutls_send_change_cipher_spec (session, AGAIN (STATE21));
+      STATE = STATE21;
 
       if (ret < 0)
 	{
@@ -2812,10 +2814,10 @@ _gnutls_send_handshake_final (gnutls_session_t session, int init)
 	  return ret;
 	}
 
-    case STATE21:
+    case STATE22:
       /* send the finished message */
-      ret = _gnutls_send_finished (session, AGAIN (STATE21));
-      STATE = STATE21;
+      ret = _gnutls_send_finished (session, AGAIN (STATE22));
+      STATE = STATE22;
       if (ret < 0)
 	{
 	  ERR ("send Finished", ret);
