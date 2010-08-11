@@ -548,6 +548,11 @@ typedef struct
 					 * for the gnutls_io_write_buffered()
 					 * function.
 					 */
+  size_t record_send_buffer_user_size;	/* holds the
+					 * size of the user specified data to
+					 * send.
+					 */
+
 
   /* 0 if no peeked data was kept, 1 otherwise.
    */

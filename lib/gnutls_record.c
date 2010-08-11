@@ -392,7 +392,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
       else
 	cipher_size = 0;
 
-      retval = session->internals.record_send_buffer.byte_length;
+      retval = session->internals.record_send_buffer_user_size;
     }
   else
     {
@@ -422,6 +422,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 	}
 
       retval = data2send_size;
+      session->internals.record_send_buffer_user_size = data2send_size;
 
       /* increase sequence number
        */
@@ -459,6 +460,8 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
       gnutls_assert ();
       return ret;
     }
+
+  session->internals.record_send_buffer_user_size = 0;
 
   _gnutls_record_log ("REC[%p]: Sent Packet[%d] %s(%d) with length: %d\n",
 		      session,
