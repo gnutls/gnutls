@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation
+# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -138,7 +138,7 @@ endif
 # C++ library
 
 if ENABLE_CXX
-libgnutlsxx_la_CPPFLAGS = -I$(top_srcdir)/includes -I../includes
+libgnutlsxx_la_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_builddir)/includes
 
 AM_CXXFLAGS = -I$(top_srcdir)/includes/
 
