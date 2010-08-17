@@ -52,16 +52,9 @@ static ssize_t
 client_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
 {
 //  success ("client_pull len %d has %d\n", len, to_client_len);
-  unsigned char rnd;
-  gnutls_rnd(GNUTLS_RND_NONCE, &rnd, 1);
+  static unsigned char rnd = 0;
 
-  if (handshake == 0 && rnd % 2 == 0)
-    {
-      gnutls_transport_set_global_errno (EAGAIN);
-      return -1;
-    }
-
-  if (to_client_len < len)
+  if (rnd++ % 2 == 0 || to_client_len < len)
     {
       gnutls_transport_set_global_errno (EAGAIN);
       return -1;
@@ -80,8 +73,13 @@ client_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
   char *tmp;
   size_t newlen = to_server_len + len;
-//  success ("client_push len %d has %d\n", len, to_server_len);
-//  hexprint (data, len);
+  static unsigned char rnd = 0;
+
+  if (rnd++ % 2 == 0)
+    {
+      gnutls_transport_set_global_errno (EAGAIN);
+      return -1;
+    }
 
   tmp = realloc (to_server, newlen);
   if (!tmp)
@@ -101,16 +99,9 @@ static ssize_t
 server_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
 {
   //success ("server_pull len %d has %d\n", len, to_server_len);
-  unsigned char rnd;
+  static unsigned char rnd = 0;
 
-  gnutls_rnd (GNUTLS_RND_NONCE, &rnd, 1);
-  if (handshake == 0 && rnd % 2 == 0)
-    {
-      gnutls_transport_set_global_errno (EAGAIN);
-      return -1;
-    }
-
-  if (to_server_len < len)
+  if (rnd++ % 2 == 0 || to_server_len < len)
     {
       gnutls_transport_set_global_errno (EAGAIN);
       return -1;
@@ -127,13 +118,11 @@ server_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
 static ssize_t
 server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
-  unsigned char rnd;
   char *tmp;
   size_t newlen = to_client_len + len;
+  static unsigned char rnd = 0;
 
-  //success ("server_push len %d has %d\n", len, to_client_len);
-  gnutls_rnd (GNUTLS_RND_NONCE, &rnd, 1);
-  if (handshake == 0 && rnd % 2 == 0)
+  if (rnd++ % 2 == 0)
     {
       gnutls_transport_set_global_errno (EAGAIN);
       return -1;
@@ -156,7 +145,7 @@ server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 }
 
 #define MAX_BUF 1024
-#define MSG "Hello TLS"
+#define MSG "Hello TLS, and hi and how are you and more data here... and more... and even more and even more more data..."
 
 void
 doit (void)
@@ -175,7 +164,7 @@ doit (void)
   const int kx_prio[] = { GNUTLS_KX_ANON_DH, 0 };
   char buffer[MAX_BUF + 1];
   ssize_t ns;
-  int ret, transferred = 0;
+  int ret, transferred = 0, msglen;
 
   /* General init. */
   gnutls_global_init ();
@@ -223,6 +212,7 @@ doit (void)
 	}
     }
   while (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN);
+
   handshake = 0;
   if (debug)
     success ("Handshake established\n");
@@ -239,6 +229,8 @@ doit (void)
 	fail ("server: didn't receive any data\n");
       else if (ret < 0)
 	{
+//	if (debug)
+//          fputs ("#", stdout);
 	  if (ret != GNUTLS_E_AGAIN)
 	    {
 	      fail ("server: error: %s\n", gnutls_strerror (ret));
@@ -248,12 +240,14 @@ doit (void)
       else
 	{
 	  transferred += ret;
-	  if (debug)
-	    fputs ("*", stdout);
+//	  if (debug)
+//	    fputs ("*", stdout);
 	}
 
-      ns = gnutls_record_send (server, MSG, strlen (MSG));
-      //success ("server: sent %d\n", ns);
+      msglen = strlen(MSG);
+      do {
+        ns = gnutls_record_send (server, MSG, msglen);
+      } while(ns == GNUTLS_E_AGAIN);
 
       ret = gnutls_record_recv (client, buffer, MAX_BUF);
       if (ret == 0)
@@ -262,6 +256,8 @@ doit (void)
 	}
       else if (ret < 0)
 	{
+	  if (debug)
+            fputs ("!", stdout);
 	  if (ret != GNUTLS_E_AGAIN)
 	    {
 	      fail ("client: Error: %s\n", gnutls_strerror (ret));
@@ -270,17 +266,26 @@ doit (void)
 	}
       else
 	{
+	  if (msglen != ret || memcmp(buffer, MSG, msglen) != 0) {
+	      fail ("client: Transmitted data do not match\n");
+          }
+
+          /* echo back */
+          do {
+            ns = gnutls_record_send (client, buffer, msglen);
+          } while(ns == GNUTLS_E_AGAIN);
+
 	  transferred += ret;
 	  if (debug)
 	    fputs (".", stdout);
 	}
     }
-  while (transferred < 7000);
+  while (transferred < 70000);
   if (debug)
     fputs ("\n", stdout);
 
-  gnutls_bye (client, GNUTLS_SHUT_RDWR);
-  gnutls_bye (server, GNUTLS_SHUT_RDWR);
+  gnutls_bye (client, GNUTLS_SHUT_WR);
+  gnutls_bye (server, GNUTLS_SHUT_WR);
 
   gnutls_deinit (client);
   gnutls_deinit (server);
