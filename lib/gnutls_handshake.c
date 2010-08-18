@@ -2767,7 +2767,6 @@ static int
 _gnutls_send_handshake_final (gnutls_session_t session, int init)
 {
   int ret = 0;
-  int oldstate = STATE;
 
   /* Send the CHANGE CIPHER SPEC PACKET */
 
