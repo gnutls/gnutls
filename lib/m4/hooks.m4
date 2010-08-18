@@ -39,40 +39,41 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   AC_SUBST(DLL_VERSION)
 
   cryptolib="nettle"
-  AC_ARG_WITH(nettle,
-    AS_HELP_STRING([--with-nettle], [use libnettle 2.x as crypto library]),
-      nettle=$withval,
-      nettle=no)
-    if test "$nettle" = "yes"; then
-    AC_LIB_HAVE_LINKFLAGS([nettle],, [#include <nettle/aes.h>],
-                          [nettle_aes_invert_key (0, 0)])
-    if test "$ac_cv_libnettle" != yes; then
-      nettle=yes
-      AC_MSG_WARN([[
-  *** 
-  *** Libnettle was not found. 
-  ]])
-    fi
-  fi
 
-  AC_MSG_CHECKING([whether to use nettle])
-  AC_MSG_RESULT($nettle)
-  AM_CONDITIONAL(ENABLE_NETTLE, test "$nettle" = "yes")
-
-  if test "$nettle" != "yes";then
+  AC_ARG_WITH(libgcrypt,
+    AS_HELP_STRING([--with-libgcrypt], [use libgcrypt as crypto library]),
+      libgcrypt=$withval,
+      libgcrypt=no)
+    if test "$libgcrypt" = "yes"; then
   	cryptolib=libgcrypt
         AC_DEFINE([HAVE_GCRYPT], 1, [whether the gcrypt library is in use])
 	AC_LIB_HAVE_LINKFLAGS([gcrypt], [gpg-error], [#include <gcrypt.h>],
     [enum gcry_cipher_algos i = GCRY_CIPHER_CAMELLIA128])
-  if test "$ac_cv_libgcrypt" != yes; then
-    AC_MSG_ERROR([[
+      if test "$ac_cv_libgcrypt" != yes; then
+        AC_MSG_ERROR([[
 ***  
 *** libgcrypt was not found. You may want to get it from
 *** ftp://ftp.gnupg.org/gcrypt/libgcrypt/
 ***
     ]])
-  fi
-  fi
+      fi
+    fi
+
+  AC_MSG_CHECKING([whether to use nettle])
+if test "$cryptolib" = "nettle";then
+  AC_MSG_RESULT(yes)
+    AC_LIB_HAVE_LINKFLAGS([nettle],, [#include <nettle/aes.h>],
+                          [nettle_aes_invert_key (0, 0)])
+    if test "$ac_cv_libnettle" != yes; then
+      AC_MSG_ERROR([[
+  *** 
+  *** Libnettle 2.1 was not found. 
+  ]])
+    fi
+else
+  AC_MSG_RESULT(no)
+fi
+  AM_CONDITIONAL(ENABLE_NETTLE, test "$cryptolib" = "nettle")
 
   AC_ARG_WITH(included-libtasn1,
     AS_HELP_STRING([--with-included-libtasn1], [use the included libtasn1]),

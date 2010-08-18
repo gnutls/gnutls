@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.11.1 (unreleased)
 
+** libgnutls: Nettle is the default crypto back end. Use --with-libgcrypt
+to use the libgcrypt back end.
+
 ** libgnutls: Depend on nettle 2.1. This makes nettle a fully working
 backend crypto library.
 
@@ -37,7 +40,12 @@ alternative locking procedures. By default the system available
 locking is used. In *NIX pthreads are used and in windows the
 critical section API. This follows a different approach than the
 previous versions that depended on libgcrypt initialization. The
-locks are now set by default in systems that support it.
+locks are now set by default in systems that support it. Programs
+that used gcry_control() to set thread locks should insert it into
+a block of
+#if GNUTLS_VERSION_NUMBER <= 0x020b00
+	gcry_control(...)
+#endif
 
 ** libgnutls: Added support for reading DN from EV-certificates.
 New DN values:
