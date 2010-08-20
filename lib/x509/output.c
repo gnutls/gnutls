@@ -705,6 +705,64 @@ print_altname (gnutls_buffer_st * str, const char *prefix, int altname_type,
 }
 
 static void
+guiddump (gnutls_buffer_st * str, const char *data, size_t len, const char *spc)
+{
+  size_t j;
+
+  if (spc)
+    adds (str, spc);
+  addf (str, "{");
+  addf (str, "%.2X", (unsigned char) data[3]);
+  addf (str, "%.2X", (unsigned char) data[2]);
+  addf (str, "%.2X", (unsigned char) data[1]);
+  addf (str, "%.2X", (unsigned char) data[0]);
+  addf (str, "-");
+  addf (str, "%.2X", (unsigned char) data[5]);
+  addf (str, "%.2X", (unsigned char) data[4]);
+  addf (str, "-");
+  addf (str, "%.2X", (unsigned char) data[7]);
+  addf (str, "%.2X", (unsigned char) data[6]);
+  addf (str, "-");
+  addf (str, "%.2X", (unsigned char) data[8]);
+  addf (str, "%.2X", (unsigned char) data[9]);
+  addf (str, "-");
+  for (j = 10; j < 16; j++)
+    {
+      addf (str, "%.2X", (unsigned char) data[j]);
+    }
+  addf (str, "}\n");
+}
+
+static void
+print_unique_ids (gnutls_buffer_st * str, const gnutls_x509_crt_t cert)
+{
+  int result;
+  char buf[256]; /* if its longer, we won't bother to print it */
+  ssize_t buf_size = 256;
+
+  result = gnutls_x509_crt_get_issuer_unique_id (cert, buf, &buf_size);
+  if (result >= 0)
+    {
+      addf (str, ("\t\tIssuer Unique ID:\n"));
+      hexdump (str, buf, buf_size, "\t\t\t");
+      if (buf_size == 16) { /* this could be a GUID */
+	guiddump (str, buf, buf_size, "\t\t\t");
+      }
+    }
+
+  buf_size = 256;
+  result = gnutls_x509_crt_get_subject_unique_id (cert, buf, &buf_size);
+  if (result >= 0)
+    {
+      addf (str, ("\t\tSubject Unique ID:\n"));
+      hexdump (str, buf, buf_size, "\t\t\t");
+      if (buf_size == 16) { /* this could be a GUID */
+	guiddump (str, buf, buf_size, "\t\t\t");
+      }
+    }
+}
+
+static void
 print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
 		  cert_type_t cert)
 {
@@ -1158,6 +1216,8 @@ print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
       }
   }
 
+  print_unique_ids(str, cert);
+  
   /* Extensions. */
   if (gnutls_x509_crt_get_version (cert) >= 3)
     {

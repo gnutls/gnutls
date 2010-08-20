@@ -455,6 +455,7 @@ GNUTLS_1_4
     gnutls_x509_crt_get_issuer_dn;
     gnutls_x509_crt_get_issuer_dn_by_oid;
     gnutls_x509_crt_get_issuer_dn_oid;
+    gnutls_x509_crt_get_issuer_unique_id;
     gnutls_x509_crt_get_key_id;
     gnutls_x509_crt_get_key_purpose_oid;
     gnutls_x509_crt_get_key_usage;
@@ -472,6 +473,7 @@ GNUTLS_1_4
     gnutls_x509_crt_get_subject_alt_name;
     gnutls_x509_crt_get_subject_alt_othername_oid;
     gnutls_x509_crt_get_subject_key_id;
+    gnutls_x509_crt_get_subject_unique_id;
     gnutls_x509_crt_get_version;
     gnutls_x509_crt_import;
     gnutls_x509_crt_init;

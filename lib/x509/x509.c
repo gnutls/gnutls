@@ -3193,3 +3193,77 @@ error:
     gnutls_x509_crt_deinit (certs[j]);
   return ret;
 }
+
+/**
+ * gnutls_x509_crt_get_subject_unique_id:
+ * @crt: Holds the certificate
+ * @buf: user allocated memory buffer, will hold the unique id
+ * @sizeof_buf: size of user allocated memory buffer (on input), will hold
+ * actual size of the unique ID on return.
+ *
+ * This function will extract the subjectUniqueID value (if present) for
+ * the given certificate.
+ *
+ * If the user allocated memory buffer is not large enough to hold the
+ * full subjectUniqueID, then a GNUTLS_E_SHORT_MEMORY_BUFFER error will be
+ * returned, and sizeof_buf will be set to the actual length.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ **/
+int
+gnutls_x509_crt_get_subject_unique_id (gnutls_x509_crt_t crt, char *buf,
+				       size_t * sizeof_buf)
+{
+  int result;
+  gnutls_datum_t datum = { NULL, 0 };
+  
+  result =
+    _gnutls_x509_read_value (crt->cert, "tbsCertificate.subjectUniqueID", &datum, 2);
+    
+  if (datum.size > *sizeof_buf) { /* then we're not going to fit */
+    *sizeof_buf = datum.size;
+    buf[0] = '\0';
+    return GNUTLS_E_SHORT_MEMORY_BUFFER;
+  } else {
+    *sizeof_buf = datum.size;
+    memcpy(buf, datum.data, datum.size);
+    return result;
+  }
+}
+
+/**
+ * gnutls_x509_crt_get_issuer_unique_id:
+ * @crt: Holds the certificate
+ * @buf: user allocated memory buffer, will hold the unique id
+ * @sizeof_buf: size of user allocated memory buffer (on input), will hold
+ * actual size of the unique ID on return.
+ *
+ * This function will extract the issuerUniqueID value (if present) for
+ * the given certificate.
+ *
+ * If the user allocated memory buffer is not large enough to hold the
+ * full subjectUniqueID, then a GNUTLS_E_SHORT_MEMORY_BUFFER error will be
+ * returned, and sizeof_buf will be set to the actual length.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ **/
+int
+gnutls_x509_crt_get_issuer_unique_id (gnutls_x509_crt_t crt, char *buf,
+				       size_t * sizeof_buf)
+{
+  int result;
+  gnutls_datum_t datum = { NULL, 0 };
+  
+  result =
+    _gnutls_x509_read_value (crt->cert, "tbsCertificate.issuerUniqueID", &datum, 2);
+    
+  if (datum.size > *sizeof_buf) { /* then we're not going to fit */
+    *sizeof_buf = datum.size;
+    buf[0] = '\0';
+    return GNUTLS_E_SHORT_MEMORY_BUFFER;
+  } else {
+    *sizeof_buf = datum.size;
+    memcpy(buf, datum.data, datum.size);
+    return result;
+  }
+}

@@ -152,6 +152,12 @@ extern "C"
 					  void *ret, size_t * ret_size,
 					  unsigned int *critical);
 
+  int gnutls_x509_crt_get_subject_unique_id (gnutls_x509_crt_t crt, char *buf,
+					     size_t * sizeof_buf);
+
+  int gnutls_x509_crt_get_issuer_unique_id (gnutls_x509_crt_t crt, char *buf,
+					    size_t * sizeof_buf);
+
 #define GNUTLS_CRL_REASON_UNUSED 128
 #define GNUTLS_CRL_REASON_KEY_COMPROMISE 64
 #define GNUTLS_CRL_REASON_CA_COMPROMISE 32
