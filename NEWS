@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.11.1 (unreleased)
 
+** libgnutls: by default lowat level has been set to zero to avoid unnecessary
+system calls. Applications that depended on it being 1 should explicitly call
+gnutls_transport_set_lowat().
+
 ** libgnutls: Nettle is the default crypto back end. Use --with-libgcrypt
 to use the libgcrypt back end.
 

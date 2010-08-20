@@ -103,7 +103,7 @@ typedef struct
 #define INITIAL_RECV_BUFFER_SIZE 256
 
 /* the default for TCP */
-#define DEFAULT_LOWAT 1
+#define DEFAULT_LOWAT 0
 
 /* expire time for resuming sessions */
 #define DEFAULT_EXPIRE_TIME 3600
