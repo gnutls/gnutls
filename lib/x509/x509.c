@@ -3223,12 +3223,15 @@ gnutls_x509_crt_get_subject_unique_id (gnutls_x509_crt_t crt, char *buf,
   if (datum.size > *sizeof_buf) { /* then we're not going to fit */
     *sizeof_buf = datum.size;
     buf[0] = '\0';
-    return GNUTLS_E_SHORT_MEMORY_BUFFER;
+    result = GNUTLS_E_SHORT_MEMORY_BUFFER;
   } else {
     *sizeof_buf = datum.size;
     memcpy(buf, datum.data, datum.size);
-    return result;
   }
+  
+  _gnutls_free_datum(&datum);
+  
+  return result;
 }
 
 /**
@@ -3260,10 +3263,13 @@ gnutls_x509_crt_get_issuer_unique_id (gnutls_x509_crt_t crt, char *buf,
   if (datum.size > *sizeof_buf) { /* then we're not going to fit */
     *sizeof_buf = datum.size;
     buf[0] = '\0';
-    return GNUTLS_E_SHORT_MEMORY_BUFFER;
+    result = GNUTLS_E_SHORT_MEMORY_BUFFER;
   } else {
     *sizeof_buf = datum.size;
     memcpy(buf, datum.data, datum.size);
-    return result;
   }
+  
+  _gnutls_free_datum(&datum);
+  
+  return result;
 }
