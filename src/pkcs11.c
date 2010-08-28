@@ -89,7 +89,7 @@ unsigned int obj_flags = 0;
 
 	if (!batch) {
 		pkcs11_list(outfile, url, PKCS11_TYPE_ALL, login);
-		ret = read_yesno("Are you sure you want to delete those objects? (Y/N): ");
+		ret = read_yesno("Are you sure you want to delete those objects? (y/N): ");
 		if (ret == 0) {
 			exit(1);
 		}

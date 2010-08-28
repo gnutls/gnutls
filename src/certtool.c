@@ -1513,7 +1513,7 @@ print_certificate_info (gnutls_x509_crt_t crt, FILE * out, unsigned int all)
     }
 
   if (out == stderr && batch == 0)	/* interactive */
-    if (read_yesno ("Is the above information ok? (Y/N): ") == 0)
+    if (read_yesno ("Is the above information ok? (y/N): ") == 0)
       {
 	exit (1);
       }
