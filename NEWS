@@ -9,6 +9,9 @@ See the end for copying conditions.
 cipher. This prevented the usage of the TLS ciphersuites with NULL
 cipher.
 
+** libgnutls: The %COMPAT flag now allows larger records that violate the
+TLS spec.
+
 ** API and ABI modifications:
 No changes since last version.
 
