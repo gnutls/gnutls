@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.11.1 (unreleased)
 
+** libgnutls: The %COMPAT flag now allows larger records that violate the
+TLS spec.
+
 ** libgnutls: by default lowat level has been set to zero to avoid unnecessary
 system calls. Applications that depended on it being 1 should explicitly call
 gnutls_transport_set_lowat().

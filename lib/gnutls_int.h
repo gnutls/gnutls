@@ -433,6 +433,7 @@ struct gnutls_priority_st
 
   /* to disable record padding */
   int no_padding:1;
+  int allow_large_records:1;
   safe_renegotiation_t sr;
   int ssl3_record_version;
   int additional_verify_flags;
