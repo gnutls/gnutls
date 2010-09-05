@@ -1411,7 +1411,11 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
   session->internals.handshake_header_buffer.packet_length = length32;
   session->internals.handshake_header_buffer.recv_type = *recv_type;
 
-  if (*recv_type != type)
+  if (_gnutls_is_dtls (session)
+      && type == GNUTLS_HANDSHAKE_SERVER_HELLO
+      && *recv_type == GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST)
+    return length32;
+  else if (*recv_type != type)
     {
       gnutls_assert ();
       return GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
@@ -2752,7 +2756,10 @@ gnutls_handshake (gnutls_session_t session)
 
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
-      ret = _gnutls_handshake_client (session);
+      do
+	{
+	  ret = _gnutls_handshake_client (session);
+	} while (ret == 1);
     }
   else
     {
@@ -2836,6 +2843,22 @@ _gnutls_handshake_client (gnutls_session_t session)
 
       _gnutls_dtls_transmit(session);
 
+    case STATE11:
+      if (_gnutls_is_dtls (session))
+	{
+	  ret =
+	    _gnutls_recv_handshake (session, NULL, NULL,
+				    GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST,
+				    OPTIONAL_PACKET);
+	  STATE = STATE11;
+	  IMED_RET ("recv hello verify", ret, 1);
+
+	  if (ret == 1)
+	    {
+	      STATE = STATE0;
+	      return 1;
+	    }
+	}
     case STATE2:
       /* receive the server hello */
       ret =
