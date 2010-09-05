@@ -76,6 +76,9 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
                                   opaque * header, uint16_t header_size,
                                   opaque * dataptr, uint32_t datalen);
 
+static int
+_gnutls_recv_hello_verify_request (gnutls_session_t session,
+				   opaque * data, int datalen);
 
 
 /* Clears the handshake hash buffers and handles.
@@ -1587,6 +1590,18 @@ _gnutls_recv_handshake (gnutls_session_t session, uint8_t ** data,
         }
 
       break;
+    case GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST:
+      ret = _gnutls_recv_hello_verify_request (session, dataptr, length32);
+      gnutls_free (dataptr);
+
+      if (ret < 0)
+	break;
+      else
+	/* Signal our caller we have received a verification cookie
+	   and ClientHello needs to be sent again. */
+	ret = 1;
+
+      break;
     case GNUTLS_HANDSHAKE_SERVER_HELLO_DONE:
       if (length32 == 0)
         ret = 0;
@@ -2386,6 +2401,51 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
     {
       gnutls_assert ();
       return ret;
+    }
+
+  return 0;
+}
+
+static int
+_gnutls_recv_hello_verify_request (gnutls_session_t session,
+				   opaque * data, int datalen)
+{
+  ssize_t len = datalen;
+  size_t pos = 0;
+  uint8_t cookie_len;
+
+  if (!_gnutls_is_dtls (session)
+      || session->security_parameters.entity == GNUTLS_SERVER)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_UNEXPECTED_PACKET;
+    }
+
+  /* TODO: determine if we need to do anything with the server version field */
+  DECR_LEN (len, 2);
+  pos += 2;
+
+  DECR_LEN (len, 1);
+  cookie_len = data[pos];
+  pos++;
+
+  if (cookie_len > DTLS_MAX_COOKIE_SIZE)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+    }
+
+  DECR_LEN (len, cookie_len);
+
+  session->internals.dtls.cookie_len = cookie_len;
+  memcpy (session->internals.dtls.cookie, &data[pos], cookie_len);
+
+  pos += cookie_len;
+
+  if (len != 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
     }
 
   return 0;
