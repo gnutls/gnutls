@@ -54,6 +54,7 @@
 #include <gnutls_record.h>
 #include <gnutls_buffers.h>
 #include <gnutls_mbuffers.h>
+#include <gnutls_state.h>
 #include <system.h>
 
 #include <errno.h>
@@ -266,14 +267,72 @@ get_errno (gnutls_session_t session)
 }
 
 
-/* This function is like read. But it does not return -1 on error.
- * It does return gnutls_errno instead.
- *
- * Flags are only used if the default recv() function is being used.
- */
 static ssize_t
-_gnutls_read (gnutls_session_t session, mbuffer_st ** bufel,
-              size_t size, gnutls_pull_func pull_func)
+_gnutls_dgram_read (gnutls_session_t session, mbuffer_st **bufel,
+		    gnutls_pull_func pull_func)
+{
+  ssize_t i;
+  char *ptr = alloca (MAX_RECV_SIZE);
+  gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
+
+  if (!bufel)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+  session->internals.direction = 0;
+
+  reset_errno (session);
+
+  i = pull_func (fd, ptr, MAX_RECV_SIZE);
+
+  if (i < 0)
+    {
+      int err = get_errno (session);
+
+      _gnutls_read_log ("READ: %d returned from %p, errno=%d gerrno=%d\n",
+			(int) i, fd, errno, session->internals.errnum);
+
+      if (err == EAGAIN)
+	return GNUTLS_E_AGAIN;
+      else if (err == EINTR)
+	return GNUTLS_E_INTERRUPTED;
+      else
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_PULL_ERROR;
+	}
+    }
+  else
+    {
+      _gnutls_read_log ("READ: Got %d bytes from %p\n", (int) i, fd);
+      if (i == 0) {
+	/* If we get here, we likely have a stream socket.
+	 * FIXME: this probably breaks DCCP. */
+	gnutls_assert ();
+	return GNUTLS_E_INTERNAL_ERROR;
+      }
+
+      *bufel = _mbuffer_alloc (0, i);
+      if (!*bufel)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+
+      _mbuffer_append_data (*bufel, ptr, i);
+    }
+
+  if (_gnutls_log_level >= 7)
+    _gnutls_read_log ("READ: read %d bytes from %p\n", (int) i, fd);
+
+  return i;
+}
+
+static ssize_t
+_gnutls_stream_read (gnutls_session_t session, mbuffer_st **bufel,
+		     size_t size, gnutls_pull_func pull_func)
 {
   size_t left;
   ssize_t i = 0;
@@ -357,6 +416,21 @@ finish:
 }
 
 
+/* This function is like read. But it does not return -1 on error.
+ * It does return gnutls_errno instead.
+ *
+ * Flags are only used if the default recv() function is being used.
+ */
+static ssize_t
+_gnutls_read (gnutls_session_t session, mbuffer_st **bufel,
+	      size_t size, gnutls_pull_func pull_func)
+{
+  if (_gnutls_is_dtls (session))
+    /* Size is not passed, since a whole datagram will be read. */
+    return _gnutls_dgram_read (session, bufel, pull_func);
+  else
+    return _gnutls_stream_read (session, bufel, size, pull_func);
+}
 
 static ssize_t
 _gnutls_writev_emu (gnutls_session_t session, const giovec_t * giovec,
@@ -518,6 +592,14 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
         }
     }
 
+  if(_gnutls_is_dtls(session)
+     && session->internals.record_recv_buffer.byte_length != 0)
+    {
+      /* Attempt to read across records while using DTLS. */
+      gnutls_assert();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
   /* min is over zero. recvdata is the data we must
    * receive in order to return the requested data.
    */
@@ -578,7 +660,7 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
    * select think, that the socket is ready for reading.
    * MSG_PEEK is only used with berkeley style sockets.
    */
-  if (ret == readsize && recvlowat > 0)
+  if (ret == readsize && recvlowat > 0 && !_gnutls_is_dtls(session))
     {
       ret2 = _gnutls_read (session, &bufel, recvlowat, system_read_peek);
 
@@ -624,7 +706,10 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
       return 0;
     }
 
-  ret = session->internals.record_recv_buffer.byte_length;
+  if(_gnutls_is_dtls(session))
+    ret = MIN(total, session->internals.record_recv_buffer.byte_length);
+  else
+    ret = session->internals.record_recv_buffer.byte_length;
 
   if ((ret > 0) && ((size_t) ret < total))
     {
