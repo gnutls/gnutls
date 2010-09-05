@@ -920,7 +920,8 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
 {
   int decrypted_length;
   opaque version[2];
-  uint64 sequence;
+  uint64 dtls_sequence;
+  uint64 *decrypt_sequence;
   content_type_t recv_type;
   uint16_t length;
   uint8_t *ciphertext;
@@ -1017,7 +1018,7 @@ begin:
 
   if ((ret =
        record_check_headers (session, data_enc.data, type, htype, &recv_type,
-                             version, &sequence, &length, &header_size)) < 0)
+			     version, &dtls_sequence, &length, &header_size)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -1099,11 +1100,14 @@ begin:
       return ret;
     }
 
+  decrypt_sequence =
+    _gnutls_is_dtls(session) ? &dtls_sequence : &record_state->sequence_number;
+
 /* decrypt the data we got. 
  */
   ret =
     _gnutls_decrypt (session, ciphertext, length, tmp.data, tmp.size,
-                     recv_type, record_params);
+		     recv_type, record_params, decrypt_sequence);
   if (ret < 0)
     {
       session_unresumable (session);
