@@ -165,6 +165,8 @@ _gnutls_dtls_transmit (gnutls_session_t session)
 
   _gnutls_dtls_log ("DTLS[%p]: End of flight transmission.\n", session);
 
+  _gnutls_dtls_clear_outgoing_buffer (session);
+
   /* SENDING -> WAITING state transition */
   return 0;
 }
