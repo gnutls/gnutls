@@ -2172,10 +2172,17 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 
       /* Generate random data 
        */
-      _gnutls_tls_create_random (rnd);
-      _gnutls_set_client_random (session, rnd);
+      if (!_gnutls_is_dtls (session)
+	  || session->internals.dtls.hsk_hello_verify_requests == 0)
+	{
+	  _gnutls_tls_create_random (rnd);
+	  _gnutls_set_client_random (session, rnd);
 
-      memcpy (&data[pos], rnd, GNUTLS_RANDOM_SIZE);
+	  memcpy (&data[pos], rnd, GNUTLS_RANDOM_SIZE);
+	}
+      else
+	memcpy (&data[pos], session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
+
       pos += GNUTLS_RANDOM_SIZE;
 
       /* Copy the Session ID 
