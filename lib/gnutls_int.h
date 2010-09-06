@@ -178,6 +178,10 @@ typedef enum transport_t
 /* the maximum size of the DTLS cookie */
 #define DTLS_MAX_COOKIE_SIZE 32
 
+/* The maximum number of HELLO_VERIFY_REQUEST messages the client
+   processes before aborting. */
+#define MAX_HANDSHAKE_HELLO_VERIFY_REQUESTS 5
+
 /* defaults for verification functions
  */
 #define DEFAULT_VERIFY_DEPTH 32
@@ -566,6 +570,8 @@ typedef struct
   /* Head of the next outgoing flight. */
   dtls_hsk_retransmit_buffer *retransmit;
   dtls_hsk_retransmit_buffer **retransmit_end;
+
+  unsigned int hsk_hello_verify_requests;
 } dtls_st;
 
 

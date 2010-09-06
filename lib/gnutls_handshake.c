@@ -2417,10 +2417,20 @@ _gnutls_recv_hello_verify_request (gnutls_session_t session,
   ssize_t len = datalen;
   size_t pos = 0;
   uint8_t cookie_len;
+  unsigned int nb_verifs;
 
   if (!_gnutls_is_dtls (session)
       || session->security_parameters.entity == GNUTLS_SERVER)
     {
+      gnutls_assert ();
+      return GNUTLS_E_UNEXPECTED_PACKET;
+    }
+
+  nb_verifs = ++session->internals.dtls.hsk_hello_verify_requests;
+  if (nb_verifs >= MAX_HANDSHAKE_HELLO_VERIFY_REQUESTS)
+    {
+      /* The server is either buggy, malicious or changing cookie
+	 secrets _way_ too fast. */
       gnutls_assert ();
       return GNUTLS_E_UNEXPECTED_PACKET;
     }
