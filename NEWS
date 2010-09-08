@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.11.1 (unreleased)
 
+** libgnutls: Added support for draft-pechanec-pkcs11uri-02.
+
 ** libgnutls: The %COMPAT flag now allows larger records that violate the
 TLS spec.
 
