@@ -25,7 +25,8 @@
 #ifndef GNUTLS_MBUFFERS_H
 # define GNUTLS_MBUFFERS_H
 
-#include "gnutls_int.h"
+#include <gnutls_int.h>
+#include <gnutls_errors.h>
 
 void _mbuffer_init (mbuffer_head_st *buf);
 void _mbuffer_clear (mbuffer_head_st *buf);
@@ -93,6 +94,20 @@ inline static mbuffer_st* _gnutls_handshake_alloc(size_t size, size_t maximum)
   _mbuffer_set_uhead_size(ret, HANDSHAKE_HEADER_SIZE);
 
   return ret;
+}
+
+/* Free a segment, if the pointer is not NULL
+ *
+ * We take a ** to detect and fix double free bugs (the dangling
+ * pointer case). It also makes sure the pointer has a known value
+ * after freeing.
+ */
+inline static void _mbuffer_xfree(mbuffer_st **bufel)
+{
+  if(*bufel)
+    gnutls_free(*bufel);
+
+  *bufel = NULL;
 }
 
 #endif
