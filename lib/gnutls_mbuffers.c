@@ -272,3 +272,42 @@ _mbuffer_append_data (mbuffer_st *bufel, void* newdata, size_t newdata_size)
 
   return 0;
 }
+
+/* Takes a buffer in multiple chunks and puts all the data in a single
+ * contiguous segment.
+ *
+ * Returns 0 on success or an error code otherwise.
+ *
+ * Cost: O(n)
+ * n: number of segments initially in the buffer
+ */
+int
+_mbuffer_linearize (mbuffer_head_st *buf)
+{
+  mbuffer_st *bufel, *cur;
+  gnutls_datum_t msg;
+  size_t pos=0;
+
+  if (buf->length <= 1)
+    /* Nothing to do */
+    return 0;
+
+  bufel = _mbuffer_alloc (buf->byte_length, buf->byte_length);
+  if (!bufel) {
+    gnutls_assert ();
+    return GNUTLS_E_MEMORY_ERROR;
+  }
+
+  for (cur = _mbuffer_get_first(buf, &msg);
+       msg.data != NULL;
+       cur = _mbuffer_get_next(cur, &msg))
+    {
+      memcpy (&bufel->msg.data[pos], msg.data, cur->msg.size);
+      pos += cur->msg.size;
+    }
+
+  _mbuffer_clear (buf);
+  _mbuffer_enqueue (buf, bufel);
+
+  return 0;
+}

@@ -40,6 +40,7 @@ mbuffer_st* _mbuffer_get_next (mbuffer_st * cur, gnutls_datum_t *msg);
  * one.
  */
 int _mbuffer_append_data (mbuffer_st *bufel, void* newdata, size_t newdata_size);
+int _mbuffer_linearize (mbuffer_head_st *buf);
 
 
 /* For "user" use. One can have buffer data and header.
