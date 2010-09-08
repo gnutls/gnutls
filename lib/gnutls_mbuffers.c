@@ -27,6 +27,32 @@
 
 /* Here be mbuffers */
 
+/* A note on terminology:
+ *
+ * Variables named bufel designate a single buffer segment (mbuffer_st
+ * type). This type is textually referred to as a "segment" or a
+ * "buffer element".
+ *
+ * Variables named buf desigate a chain of buffer segments
+ * (mbuffer_head_st type).  This type is textually referred to as a
+ * "buffer head" or simply as "buffer".
+ *
+ * Design objectives:
+ *
+ * - Make existing code easier to understand.
+ * - Make common operations more efficient by avoiding unnecessary
+ *    copying.
+ * - Provide a common datatype with a well-known interface to move
+ *    data around and through the multiple protocol layers.
+ * - Enable a future implementation of DTLS, which needs the concept
+ *    of record boundaries.
+ */
+
+
+/* Initialize a buffer head.
+ *
+ * Cost: O(1)
+ */
 void
 _mbuffer_init (mbuffer_head_st *buf)
 {
@@ -37,6 +63,11 @@ _mbuffer_init (mbuffer_head_st *buf)
   buf->byte_length = 0;
 }
 
+/* Deallocate all buffer segments and reset the buffer head.
+ *
+ * Cost: O(n)
+ * n: Number of segments currently in the buffer.
+ */
 void
 _mbuffer_clear (mbuffer_head_st *buf)
 {
@@ -51,6 +82,10 @@ _mbuffer_clear (mbuffer_head_st *buf)
   _mbuffer_init (buf);
 }
 
+/* Append a segment to the end of this buffer.
+ *
+ * Cost: O(1)
+ */
 void
 _mbuffer_enqueue (mbuffer_head_st *buf, mbuffer_st *bufel)
 {
@@ -63,6 +98,12 @@ _mbuffer_enqueue (mbuffer_head_st *buf, mbuffer_st *bufel)
   buf->tail = &bufel->next;
 }
 
+/* Get a reference to the first segment of the buffer and its data.
+ *
+ * Used to start iteration or to peek at the data.
+ *
+ * Cost: O(1)
+ */
 mbuffer_st* _mbuffer_get_first (mbuffer_head_st *buf, gnutls_datum_t *msg)
 {
   mbuffer_st *bufel = buf->head;
@@ -80,6 +121,12 @@ mbuffer_st* _mbuffer_get_first (mbuffer_head_st *buf, gnutls_datum_t *msg)
   return bufel;
 }
 
+/* Get a reference to the next segment of the buffer and its data.
+ *
+ * Used to iterate over the buffer segments.
+ *
+ * Cost: O(1)
+ */
 mbuffer_st* _mbuffer_get_next (mbuffer_st * cur, gnutls_datum_t *msg)
 {
   mbuffer_st *bufel = cur->next;
@@ -97,6 +144,13 @@ mbuffer_st* _mbuffer_get_next (mbuffer_st * cur, gnutls_datum_t *msg)
   return bufel;
 }
 
+/* Remove the first segment from the buffer.
+ *
+ * Used to dequeue data from the buffer. Not yet exposed in the
+ * internal interface since it is not yet needed outside of this unit.
+ *
+ * Cost: O(1)
+ */
 static inline void
 remove_front (mbuffer_head_st *buf)
 {
@@ -116,6 +170,15 @@ remove_front (mbuffer_head_st *buf)
     buf->tail = &buf->head;
 }
 
+/* Remove a specified number of bytes from the start of the buffer.
+ *
+ * Useful for uses that treat the buffer as a simple array of bytes.
+ *
+ * Returns 0 on success or an error code otherwise.
+ *
+ * Cost: O(n)
+ * n: Number of segments needed to remove the specified amount of data.
+ */
 int
 _mbuffer_remove_bytes (mbuffer_head_st *buf, size_t bytes)
 {
@@ -145,6 +208,18 @@ _mbuffer_remove_bytes (mbuffer_head_st *buf, size_t bytes)
   return 0;
 }
 
+/* Allocate a buffer segment. The segment is not initially "owned" by
+ * any buffer.
+ *
+ * maximum_size: Amount of data that this segment can contain.
+ * size: Amount of useful data that is contained in this
+ *  buffer. Generally 0, but this is a shortcut when a fixed amount of
+ *  data will immediately be added to this segment.
+ *
+ * Returns the segment or NULL on error.
+ *
+ * Cost: O(1)
+ */
 mbuffer_st *
 _mbuffer_alloc (size_t payload_size, size_t maximum_size)
 {
@@ -168,6 +243,16 @@ _mbuffer_alloc (size_t payload_size, size_t maximum_size)
   return st;
 }
 
+/* Copy data into a segment. The segment must not be part of a buffer
+ * head when using this function.
+ *
+ * Bounds checking is performed by this function.
+ *
+ * Returns 0 on success or an error code otherwise.
+ *
+ * Cost: O(n)
+ * n: number of bytes to copy
+ */
 int
 _mbuffer_append_data (mbuffer_st *bufel, void* newdata, size_t newdata_size)
 {
