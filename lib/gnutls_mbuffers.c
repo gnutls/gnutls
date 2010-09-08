@@ -186,7 +186,10 @@ _mbuffer_remove_bytes (mbuffer_head_st *buf, size_t bytes)
   mbuffer_st *bufel, *next;
 
   if (bytes > buf->byte_length)
-    return -1;
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
 
   for (bufel = buf->head; bufel != NULL && left > 0; bufel = next)
     {
