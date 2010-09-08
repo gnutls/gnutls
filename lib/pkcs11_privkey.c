@@ -369,6 +369,7 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 /**
  * gnutls_pkcs11_privkey_export_url:
  * @key: Holds the PKCS 11 key
+ * @detailed: non zero if a detailed URL is required
  * @url: will contain an allocated url
  *
  * This function will export a URL identifying the given key.
@@ -377,11 +378,11 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
  *   negative error value.
  **/
 int gnutls_pkcs11_privkey_export_url(gnutls_pkcs11_privkey_t key,
-				     char **url)
+	int detailed, char **url)
 {
 	int ret;
 
-	ret = pkcs11_info_to_url(&key->info, url);
+	ret = pkcs11_info_to_url(&key->info, detailed, url);
 	if (ret < 0) {
 		gnutls_assert();
 		return ret;

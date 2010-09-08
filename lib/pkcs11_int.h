@@ -18,6 +18,15 @@ struct pkcs11_url_info {
 	/* everything here is null terminated strings */
 	opaque id[PKCS11_ID_SIZE * 3 + 1];	/* hex with delimiters */
 	opaque type[16];	/* cert/key etc. */
+
+	opaque lib_manufacturer[sizeof
+		(((struct ck_info *) NULL)->
+		manufacturer_id) + 1];
+	opaque lib_desc[sizeof
+		(((struct ck_info *) NULL)->
+		library_description) + 1];
+	opaque lib_version[12];
+
 	opaque manufacturer[sizeof
 		(((struct ck_token_info *) NULL)->
 		manufacturer_id) + 1];
@@ -47,7 +56,7 @@ struct gnutls_pkcs11_obj_st {
  * It should return 0 if found what it was looking for.
  */
 typedef int (*find_func_t) (pakchois_session_t * pks,
-			    struct token_info * tinfo, void *input);
+	    struct token_info * tinfo, struct ck_info*, void *input);
 
 int pkcs11_rv_to_err(ck_rv_t rv);
 int pkcs11_url_to_info(const char *url, struct pkcs11_url_info *info);
@@ -61,7 +70,7 @@ extern gnutls_pkcs11_token_callback_t token_func;
 extern void *token_data;
 
 void pkcs11_rescan_slots(void);
-int pkcs11_info_to_url(const struct pkcs11_url_info *info, char **url);
+int pkcs11_info_to_url(const struct pkcs11_url_info *info, int detailed, char **url);
 
 #define SESSION_WRITE 1
 #define SESSION_LOGIN 2
@@ -73,7 +82,7 @@ int _pkcs11_traverse_tokens(find_func_t find_func, void *input,
 ck_object_class_t pkcs11_strtype_to_class(const char *type);
 
 int pkcs11_token_matches_info(struct pkcs11_url_info *info,
-			      struct ck_token_info *tinfo);
+			      struct ck_token_info *tinfo, struct ck_info *lib_info);
 
 /* flags are SESSION_* */
 int pkcs11_find_object(pakchois_session_t ** _pks,

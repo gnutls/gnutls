@@ -392,7 +392,9 @@ struct delete_data_st {
 };
 
 static int delete_obj_url(pakchois_session_t * pks,
-			  struct token_info *info, void *input)
+			  struct token_info *info, 
+			  struct ck_info * lib_info,
+			  void *input)
 {
 	struct delete_data_st *find_data = input;
 	struct ck_attribute a[4];
@@ -411,7 +413,7 @@ static int delete_obj_url(pakchois_session_t * pks,
 
 	/* do not bother reading the token if basic fields do not match
 	 */
-	if (pkcs11_token_matches_info(&find_data->info, &info->tinfo) < 0) {
+	if (pkcs11_token_matches_info(&find_data->info, &info->tinfo, lib_info) < 0) {
 		gnutls_assert();
 		return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 	}

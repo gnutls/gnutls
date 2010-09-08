@@ -54,7 +54,7 @@ int gnutls_pkcs11_obj_init ( gnutls_pkcs11_obj_t *certificate);
 
 int gnutls_pkcs11_obj_import_url (gnutls_pkcs11_obj_t, const char * url,
 	unsigned int flags/* GNUTLS_PKCS11_OBJ_FLAG_* */);
-int gnutls_pkcs11_obj_export_url (gnutls_pkcs11_obj_t, char** url);
+int gnutls_pkcs11_obj_export_url (gnutls_pkcs11_obj_t, int detailed, char** url);
 void gnutls_pkcs11_obj_deinit ( gnutls_pkcs11_obj_t);
 
 int gnutls_pkcs11_obj_export(gnutls_pkcs11_obj_t obj,
@@ -77,6 +77,10 @@ typedef enum {
 	GNUTLS_PKCS11_OBJ_TOKEN_MANUFACTURER,
 	GNUTLS_PKCS11_OBJ_TOKEN_MODEL,
 	GNUTLS_PKCS11_OBJ_ID,
+	/* the pkcs11 provider library info  */
+	GNUTLS_PKCS11_OBJ_LIBRARY_VERSION,
+	GNUTLS_PKCS11_OBJ_LIBRARY_DESCRIPTION,
+	GNUTLS_PKCS11_OBJ_LIBRARY_MANUFACTURER,
 } gnutls_pkcs11_obj_info_t;
 
 int gnutls_pkcs11_obj_get_info(gnutls_pkcs11_obj_t crt, gnutls_pkcs11_obj_info_t itype, void* output, size_t* output_size);
@@ -107,7 +111,7 @@ typedef enum {
 	GNUTLS_PKCS11_OBJ_DATA,
 } gnutls_pkcs11_obj_type_t;
 
-int gnutls_pkcs11_token_get_url (unsigned int seq, char** url);
+int gnutls_pkcs11_token_get_url (unsigned int seq, int detailed, char** url);
 int gnutls_pkcs11_token_get_info(const char* url, gnutls_pkcs11_token_info_t, void* output, size_t *output_size);
 
 #define GNUTLS_PKCS11_TOKEN_HW 1
@@ -152,7 +156,7 @@ int
 gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
 				unsigned int flags, const gnutls_datum_t * ciphertext,
 				gnutls_datum_t * plaintext);
-int gnutls_pkcs11_privkey_export_url (gnutls_pkcs11_privkey_t key, char ** url);
+int gnutls_pkcs11_privkey_export_url (gnutls_pkcs11_privkey_t key, int detailed, char ** url);
 
 /** @} */
 

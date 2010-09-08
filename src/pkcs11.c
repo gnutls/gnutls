@@ -88,7 +88,7 @@ unsigned int obj_flags = 0;
 		obj_flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
 
 	if (!batch) {
-		pkcs11_list(outfile, url, PKCS11_TYPE_ALL, login);
+		pkcs11_list(outfile, url, PKCS11_TYPE_ALL, login, 1);
 		ret = read_yesno("Are you sure you want to delete those objects? (y/N): ");
 		if (ret == 0) {
 			exit(1);
@@ -108,7 +108,7 @@ unsigned int obj_flags = 0;
                                                                                                                                                 
 /* lists certificates from a token
  */
-void pkcs11_list( FILE* outfile, const char* url, int type, unsigned int login)
+void pkcs11_list( FILE* outfile, const char* url, int type, unsigned int login, unsigned int detailed)
 {
 gnutls_pkcs11_obj_t *crt_list;
 gnutls_x509_crt_t xcrt;
@@ -177,7 +177,7 @@ unsigned int obj_flags = 0;
 		char buf[128];
 		size_t size;
 		
-		ret = gnutls_pkcs11_obj_export_url(crt_list[i], &output);
+		ret = gnutls_pkcs11_obj_export_url(crt_list[i], detailed, &output);
 		if (ret < 0) {
 			fprintf(stderr, "Error in %s:%d: %s\n", __func__, __LINE__, gnutls_strerror(ret));
 			exit(1);
@@ -349,7 +349,7 @@ unsigned int obj_flags = 0;
 
 }
 
-void pkcs11_token_list(FILE* outfile)
+void pkcs11_token_list(FILE* outfile, unsigned int detailed)
 {
 int ret;
 int i;
@@ -360,7 +360,7 @@ size_t size;
 	pkcs11_common();
 
 	for (i=0;;i++) {
-		ret = gnutls_pkcs11_token_get_url(i, &url);
+		ret = gnutls_pkcs11_token_get_url(i, detailed, &url);
 		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
 			break;
 
