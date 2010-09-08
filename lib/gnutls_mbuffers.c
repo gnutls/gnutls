@@ -259,7 +259,7 @@ _mbuffer_alloc (size_t payload_size, size_t maximum_size)
 int
 _mbuffer_append_data (mbuffer_st *bufel, void* newdata, size_t newdata_size)
 {
-  if (sizeof(mbuffer_st)+bufel->msg.size+newdata_size < bufel->maximum_size)
+  if (bufel->msg.size+newdata_size <= bufel->maximum_size)
     {
       memcpy(&bufel->msg.data[bufel->msg.size], newdata, newdata_size);
       bufel->msg.size+=newdata_size;
