@@ -269,23 +269,36 @@ inline static int get_errno(gnutls_session_t session)
  * Flags are only used if the default recv() function is being used.
  */
 static ssize_t
-_gnutls_read (gnutls_session_t session, void *iptr,
-	      size_t sizeOfPtr, gnutls_pull_func pull_func)
+_gnutls_read (gnutls_session_t session, mbuffer_st **bufel,
+	      size_t size, gnutls_pull_func pull_func)
 {
   size_t left;
   ssize_t i = 0;
-  char *ptr = iptr;
+  char *ptr;
   gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
+
+  if (!bufel)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+  *bufel = _mbuffer_alloc (0, size);
+  if (!*bufel)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+  ptr = (*bufel)->msg.data;
 
   session->internals.direction = 0;
 
-  left = sizeOfPtr;
+  left = size;
   while (left > 0)
     {
-
       reset_errno(session);
 
-      i = pull_func (fd, &ptr[sizeOfPtr - left], left);
+      i = pull_func (fd, &ptr[size - left], left);
 
       if (i < 0)
 	{
@@ -296,11 +309,11 @@ _gnutls_read (gnutls_session_t session, void *iptr,
 
 	  if (err == EAGAIN || err == EINTR)
 	    {
-	      if (sizeOfPtr - left > 0)
+	      if (size - left > 0)
 		{
 
 		  _gnutls_read_log ("READ: returning %d bytes from %p\n",
-				    (int) (sizeOfPtr - left), fd);
+				    (int) (size - left), fd);
 
 		  goto finish;
 		}
@@ -325,7 +338,7 @@ _gnutls_read (gnutls_session_t session, void *iptr,
 	}
 
       left -= i;
-
+      (*bufel)->msg.size += i;
     }
 
 finish:
@@ -333,11 +346,11 @@ finish:
   if (_gnutls_log_level >= 7)
     {
       _gnutls_read_log ("READ: read %d bytes from %p\n",
-			(int) (sizeOfPtr - left), fd);
+			(int) (size - left), fd);
 
     }
 
-  return (sizeOfPtr - left);
+  return (size - left);
 }
 
 
@@ -408,31 +421,23 @@ _gnutls_debug_log("errno: %d\n", err);
 int
 _gnutls_io_clear_peeked_data (gnutls_session_t session)
 {
-  char *peekdata;
+  mbuffer_st *peekdata;
   int ret, sum;
 
   if (session->internals.have_peeked_data == 0 || RCVLOWAT == 0)
     return 0;
 
-  peekdata = gnutls_malloc (RCVLOWAT);
-  if (peekdata == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
   /* this was already read by using MSG_PEEK - so it shouldn't fail */
   sum = 0;
   do
     {				/* we need this to finish now */
-      ret = _gnutls_read (session, peekdata, RCVLOWAT - sum, session->internals.pull_func);
+      ret = _gnutls_read (session, &peekdata, RCVLOWAT - sum, session->internals.pull_func);
       if (ret > 0)
 	sum += ret;
+      _mbuffer_xfree (&peekdata);
     }
   while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN
 	 || sum < RCVLOWAT);
-
-  gnutls_free (peekdata);
 
   if (ret < 0)
     {
@@ -460,8 +465,7 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
 {
   ssize_t ret = 0, ret2 = 0;
   size_t min;
-  opaque buf[MAX_RECV_SIZE];
-  mbuffer_st *bufel;
+  mbuffer_st *bufel=NULL;
   size_t recvlowat, recvdata, readsize;
 
   if (total > MAX_RECV_SIZE || total == 0)
@@ -533,13 +537,14 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
    */
   if (readsize > 0)
     {
-      ret = _gnutls_read (session, buf, readsize, session->internals.pull_func);
+      ret = _gnutls_read (session, &bufel, readsize, session->internals.pull_func);
 
       /* return immediately if we got an interrupt or eagain
        * error.
        */
       if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
 	{
+	  _mbuffer_xfree(&bufel);
 	  return ret;
 	}
     }
@@ -553,15 +558,11 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
 	 (int) session->internals.record_recv_buffer.byte_length, (int) ret);
       _gnutls_read_log ("RB: Requested %d bytes\n", (int) total);
 
-      bufel = _mbuffer_alloc (0, ret);
-      if (!bufel)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
-      _mbuffer_append_data (bufel, buf, ret);
       _mbuffer_enqueue (&session->internals.record_recv_buffer, bufel);
     }
+  else
+    _mbuffer_xfree(&bufel);
+
 
   /* This is hack in order for select to work. Just leave recvlowat data,
    * into the kernel buffer (using a read with MSG_PEEK), thus making
@@ -570,10 +571,11 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
    */
   if (ret == readsize && recvlowat > 0)
     {
-      ret2 = _gnutls_read (session, buf, recvlowat, system_read_peek);
+      ret2 = _gnutls_read (session, &bufel, recvlowat, system_read_peek);
 
       if (ret2 < 0 && gnutls_error_is_fatal (ret2) == 0)
 	{
+	  _mbuffer_xfree(&bufel);
 	  return ret2;
 	}
 
@@ -586,15 +588,10 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
 	     (int) session->internals.record_recv_buffer.byte_length, (int) ret2,
 	     (int) total);
 	  session->internals.have_peeked_data = 1;
-	  bufel = _mbuffer_alloc (0, ret2);
-	  if (!bufel)
-	    {
-	      gnutls_assert ();
-	      return GNUTLS_E_INVALID_REQUEST;
-	    }
-	  _mbuffer_append_data (bufel, buf, ret2);
 	  _mbuffer_enqueue (&session->internals.record_recv_buffer, bufel);
 	}
+      else
+	_mbuffer_xfree(&bufel);
     }
 
   if (ret < 0 || ret2 < 0)
