@@ -544,7 +544,7 @@ typedef struct
   /* this buffer holds a record packet -mostly used for
    * non blocking IO.
    */
-  gnutls_buffer_st record_recv_buffer;
+  mbuffer_head_st record_recv_buffer;
   mbuffer_head_st record_send_buffer;	/* holds cached data
 					 * for the gnutls_io_write_buffered()
 					 * function.

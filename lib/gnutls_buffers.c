@@ -445,36 +445,26 @@ _gnutls_io_clear_peeked_data (gnutls_session_t session)
   return 0;
 }
 
-
-void
-_gnutls_io_clear_read_buffer (gnutls_session_t session)
-{
-  session->internals.record_recv_buffer.length = 0;
-}
-
 /* This function is like recv(with MSG_PEEK). But it does not return -1 on error.
  * It does return gnutls_errno instead.
  * This function reads data from the socket and keeps them in a buffer, of up to
  * MAX_RECV_SIZE. 
  *
  * This is not a general purpose function. It returns EXACTLY the data requested,
- * which are stored in a local (in the session) buffer. A pointer (iptr) to this buffer is returned.
+ * which are stored in a local (in the session) buffer.
  *
  */
 ssize_t
-_gnutls_io_read_buffered (gnutls_session_t session, opaque ** iptr,
-			  size_t sizeOfPtr, content_type_t recv_type)
+_gnutls_io_read_buffered (gnutls_session_t session, size_t total,
+			  content_type_t recv_type)
 {
   ssize_t ret = 0, ret2 = 0;
   size_t min;
-  int buf_pos;
-  opaque *buf;
-  int recvlowat;
-  int recvdata;
+  opaque buf[MAX_RECV_SIZE];
+  mbuffer_st *bufel;
+  size_t recvlowat, recvdata, readsize;
 
-  *iptr = session->internals.record_recv_buffer.data;
-
-  if (sizeOfPtr > MAX_RECV_SIZE || sizeOfPtr == 0)
+  if (total > MAX_RECV_SIZE || total == 0)
     {
       gnutls_assert ();		/* internal error */
       return GNUTLS_E_INVALID_REQUEST;
@@ -505,13 +495,13 @@ _gnutls_io_read_buffered (gnutls_session_t session, opaque ** iptr,
   /* calculate the actual size, ie. get the minimum of the
    * buffered data and the requested data.
    */
-  min = MIN (session->internals.record_recv_buffer.length, sizeOfPtr);
+  min = MIN (session->internals.record_recv_buffer.byte_length, total);
   if (min > 0)
     {
       /* if we have enough buffered data
        * then just return them.
        */
-      if (min == sizeOfPtr)
+      if (min == total)
 	{
 	  return min;
 	}
@@ -520,23 +510,18 @@ _gnutls_io_read_buffered (gnutls_session_t session, opaque ** iptr,
   /* min is over zero. recvdata is the data we must
    * receive in order to return the requested data.
    */
-  recvdata = sizeOfPtr - min;
+  recvdata = total - min;
+  readsize = recvdata - recvlowat;
 
   /* Check if the previously read data plus the new data to
    * receive are longer than the maximum receive buffer size.
    */
-  if ((session->internals.record_recv_buffer.length + recvdata) >
+  if ((session->internals.record_recv_buffer.byte_length + recvdata) >
       MAX_RECV_SIZE)
     {
       gnutls_assert ();		/* internal error */
       return GNUTLS_E_INVALID_REQUEST;
     }
-
-  /* Allocate the data required to store the new packet.
-   */
-  ret = _gnutls_buffer_resize (&session->internals.record_recv_buffer,
-			       recvdata +
-			       session->internals.record_recv_buffer.length);
 
   if (ret < 0)
     {
@@ -544,15 +529,11 @@ _gnutls_io_read_buffered (gnutls_session_t session, opaque ** iptr,
       return ret;
     }
 
-  buf_pos = session->internals.record_recv_buffer.length;
-  buf = session->internals.record_recv_buffer.data;
-  *iptr = buf;
-
   /* READ DATA - but leave RCVLOWAT bytes in the kernel buffer.
    */
-  if (recvdata - recvlowat > 0)
+  if (readsize > 0)
     {
-      ret = _gnutls_read (session, &buf[buf_pos], recvdata - recvlowat, session->internals.pull_func);
+      ret = _gnutls_read (session, buf, readsize, session->internals.pull_func);
 
       /* return immediately if we got an interrupt or eagain
        * error.
@@ -569,21 +550,27 @@ _gnutls_io_read_buffered (gnutls_session_t session, opaque ** iptr,
     {
       _gnutls_read_log
 	("RB: Have %d bytes into buffer. Adding %d bytes.\n",
-	 (int) session->internals.record_recv_buffer.length, (int) ret);
-      _gnutls_read_log ("RB: Requested %d bytes\n", (int) sizeOfPtr);
-      session->internals.record_recv_buffer.length += ret;
-    }
+	 (int) session->internals.record_recv_buffer.byte_length, (int) ret);
+      _gnutls_read_log ("RB: Requested %d bytes\n", (int) total);
 
-  buf_pos = session->internals.record_recv_buffer.length;
+      bufel = _mbuffer_alloc (0, ret);
+      if (!bufel)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+      _mbuffer_append_data (bufel, buf, ret);
+      _mbuffer_enqueue (&session->internals.record_recv_buffer, bufel);
+    }
 
   /* This is hack in order for select to work. Just leave recvlowat data,
    * into the kernel buffer (using a read with MSG_PEEK), thus making
    * select think, that the socket is ready for reading.
    * MSG_PEEK is only used with berkeley style sockets.
    */
-  if (ret == (recvdata - recvlowat) && recvlowat > 0)
+  if (ret == readsize && recvlowat > 0)
     {
-      ret2 = _gnutls_read (session, &buf[buf_pos], recvlowat, system_read_peek);
+      ret2 = _gnutls_read (session, buf, recvlowat, system_read_peek);
 
       if (ret2 < 0 && gnutls_error_is_fatal (ret2) == 0)
 	{
@@ -596,11 +583,17 @@ _gnutls_io_read_buffered (gnutls_session_t session, opaque ** iptr,
 			    (int) ret2);
 	  _gnutls_read_log
 	    ("RB-PEEK: Have %d bytes into buffer. Adding %d bytes.\nRB: Requested %d bytes\n",
-	     (int) session->internals.record_recv_buffer.length, (int) ret2,
-	     (int) sizeOfPtr);
+	     (int) session->internals.record_recv_buffer.byte_length, (int) ret2,
+	     (int) total);
 	  session->internals.have_peeked_data = 1;
-	  session->internals.record_recv_buffer.length += ret2;
-
+	  bufel = _mbuffer_alloc (0, ret2);
+	  if (!bufel)
+	    {
+	      gnutls_assert ();
+	      return GNUTLS_E_INVALID_REQUEST;
+	    }
+	  _mbuffer_append_data (bufel, buf, ret2);
+	  _mbuffer_enqueue (&session->internals.record_recv_buffer, bufel);
 	}
     }
 
@@ -625,9 +618,9 @@ _gnutls_io_read_buffered (gnutls_session_t session, opaque ** iptr,
       return 0;
     }
 
-  ret = session->internals.record_recv_buffer.length;
+  ret = session->internals.record_recv_buffer.byte_length;
 
-  if ((ret > 0) && ((size_t) ret < sizeOfPtr))
+  if ((ret > 0) && ((size_t) ret < total))
     {
       /* Short Read */
       gnutls_assert ();

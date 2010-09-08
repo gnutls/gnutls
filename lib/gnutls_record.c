@@ -848,17 +848,15 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
 		  gnutls_handshake_description_t htype, opaque * data,
 		  size_t sizeofdata)
 {
-  gnutls_datum_t tmp;
   int decrypted_length;
   opaque version[2];
-  uint8_t *headers;
   content_type_t recv_type;
   uint16_t length;
   uint8_t *ciphertext;
-  uint8_t *recv_data;
   int ret, ret2;
   uint16_t header_size;
   int empty_packet = 0;
+  gnutls_datum_t data_enc, tmp;
 
   if (type != GNUTLS_ALERT && (sizeofdata == 0 || data == NULL))
     {
@@ -899,7 +897,7 @@ begin:
   header_size = RECORD_HEADER_SIZE;
 
   if ((ret =
-       _gnutls_io_read_buffered (session, &headers, header_size,
+       _gnutls_io_read_buffered (session, header_size,
 				 -1)) != header_size)
     {
       if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
@@ -916,8 +914,16 @@ begin:
       return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
     }
 
+  ret = _mbuffer_linearize (&session->internals.record_recv_buffer);
+  if (ret != 0) {
+    gnutls_assert ();
+    return ret;
+  }
+
+  _mbuffer_get_first (&session->internals.record_recv_buffer, &data_enc);
+
   if ((ret =
-       record_check_headers (session, headers, type, htype, &recv_type,
+       record_check_headers (session, data_enc.data, type, htype, &recv_type,
 			     version, &length, &header_size)) < 0)
     {
       gnutls_assert ();
@@ -969,8 +975,7 @@ begin:
 /* check if we have that data into buffer. 
  */
   if ((ret =
-       _gnutls_io_read_buffered (session, &recv_data,
-				 header_size + length,
+       _gnutls_io_read_buffered (session, header_size + length,
 				 recv_type)) != header_size + length)
     {
       if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
@@ -985,8 +990,14 @@ begin:
 /* ok now we are sure that we can read all the data - so
  * move on !
  */
-  _gnutls_io_clear_read_buffer (session);
-  ciphertext = &recv_data[header_size];
+
+  ret = _mbuffer_linearize (&session->internals.record_recv_buffer);
+  if (ret != 0) {
+    gnutls_assert ();
+    return ret;
+  }
+  _mbuffer_get_first (&session->internals.record_recv_buffer, &data_enc);
+  ciphertext = &data_enc.data[header_size];
 
   ret = get_temp_recv_buffer (session, &tmp);
   if (ret < 0)
@@ -1007,6 +1018,7 @@ begin:
       gnutls_assert ();
       return ret;
     }
+  _mbuffer_remove_bytes (&session->internals.record_recv_buffer, header_size + length);
   decrypted_length = ret;
 
 /* Check if this is a CHANGE_CIPHER_SPEC

@@ -296,7 +296,7 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
   _gnutls_buffer_init (&(*session)->internals.ia_data_buffer);
 
   _mbuffer_init (&(*session)->internals.record_send_buffer);
-  _gnutls_buffer_init (&(*session)->internals.record_recv_buffer);
+  _mbuffer_init (&(*session)->internals.record_recv_buffer);
 
   _mbuffer_init (&(*session)->internals.handshake_send_buffer);
   _gnutls_buffer_init (&(*session)->internals.handshake_recv_buffer);
@@ -304,7 +304,6 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
   (*session)->key = gnutls_calloc (1, sizeof (struct gnutls_key_st));
   if ((*session)->key == NULL)
     {
-    cleanup_session:
       gnutls_free (*session);
       *session = NULL;
       return GNUTLS_E_MEMORY_ERROR;
@@ -318,17 +317,6 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
 
   gnutls_handshake_set_max_packet_length ((*session),
 					  MAX_HANDSHAKE_PACKET_SIZE);
-
-  /* Allocate a minimum size for recv_data
-   * This is allocated in order to avoid small messages, making
-   * the receive procedure slow.
-   */
-  if (_gnutls_buffer_resize (&(*session)->internals.record_recv_buffer,
-			     INITIAL_RECV_BUFFER_SIZE))
-    {
-      gnutls_free ((*session)->key);
-      goto cleanup_session;
-    }
 
   /* set the socket pointers to -1;
    */
@@ -402,7 +390,7 @@ gnutls_deinit (gnutls_session_t session)
   _gnutls_buffer_clear (&session->internals.handshake_hash_buffer);
   _gnutls_buffer_clear (&session->internals.handshake_data_buffer);
   _gnutls_buffer_clear (&session->internals.application_data_buffer);
-  _gnutls_buffer_clear (&session->internals.record_recv_buffer);
+  _mbuffer_clear (&session->internals.record_recv_buffer);
   _mbuffer_clear (&session->internals.record_send_buffer);
 
   gnutls_credentials_clear (session);
