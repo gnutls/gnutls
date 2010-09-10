@@ -378,7 +378,7 @@ gnutls_pkcs11_privkey_decrypt_data(gnutls_pkcs11_privkey_t key,
  *   negative error value.
  **/
 int gnutls_pkcs11_privkey_export_url(gnutls_pkcs11_privkey_t key,
-	int detailed, char **url)
+	gnutls_pkcs11_url_type_t detailed, char **url)
 {
 	int ret;
 

@@ -710,7 +710,7 @@ static int append(gnutls_buffer_st * dest, const char *tname,
 }
 
 
-int pkcs11_info_to_url(const struct pkcs11_url_info *info, int detailed, char **url)
+int pkcs11_info_to_url(const struct pkcs11_url_info *info, gnutls_pkcs11_url_type_t detailed, char **url)
 {
 	gnutls_buffer_st str;
 	int init = 0;
@@ -776,7 +776,7 @@ int pkcs11_info_to_url(const struct pkcs11_url_info *info, int detailed, char **
 		init = 1;
 	}
 
-	if (detailed) {
+	if (detailed > GNUTLS_PKCS11_URL_GENERIC) {
 		if (info->lib_manufacturer[0]) {
 			ret = append(&str, info->lib_manufacturer, "library-manufacturer", init);
 			if (ret < 0) {
@@ -786,17 +786,19 @@ int pkcs11_info_to_url(const struct pkcs11_url_info *info, int detailed, char **
 			init = 1;
 		}
 
-		if (info->lib_version[0]) {
-			ret = append(&str, info->lib_version, "library-version", init);
+		if (info->lib_desc[0]) {
+			ret = append(&str, info->lib_desc, "library-description", init);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
 			}
 			init = 1;
 		}
+	}
 
-		if (info->lib_desc[0]) {
-			ret = append(&str, info->lib_desc, "library-description", init);
+	if (detailed > GNUTLS_PKCS11_URL_LIB) {
+		if (info->lib_version[0]) {
+			ret = append(&str, info->lib_version, "library-version", init);
 			if (ret < 0) {
 				gnutls_assert();
 				goto cleanup;
@@ -1707,7 +1709,7 @@ static int find_token_num(pakchois_session_t * pks,
  * if the sequence number exceeds the available tokens, otherwise a negative error value.
  **/
 
-int gnutls_pkcs11_token_get_url(unsigned int seq, int detailed, char **url)
+int gnutls_pkcs11_token_get_url(unsigned int seq, gnutls_pkcs11_url_type_t detailed, char **url)
 {
 	int ret;
 	struct token_num tn;
@@ -1801,7 +1803,7 @@ int gnutls_pkcs11_token_get_info(const char *url,
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  **/
-int gnutls_pkcs11_obj_export_url(gnutls_pkcs11_obj_t cert, int detailed, char **url)
+int gnutls_pkcs11_obj_export_url(gnutls_pkcs11_obj_t cert, gnutls_pkcs11_url_type_t detailed, char **url)
 {
 	int ret;
 

@@ -88,7 +88,7 @@ unsigned int obj_flags = 0;
 		obj_flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
 
 	if (!batch) {
-		pkcs11_list(outfile, url, PKCS11_TYPE_ALL, login, 1);
+		pkcs11_list(outfile, url, PKCS11_TYPE_ALL, login, GNUTLS_PKCS11_URL_LIB);
 		ret = read_yesno("Are you sure you want to delete those objects? (y/N): ");
 		if (ret == 0) {
 			exit(1);

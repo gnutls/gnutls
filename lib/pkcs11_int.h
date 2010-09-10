@@ -70,7 +70,7 @@ extern gnutls_pkcs11_token_callback_t token_func;
 extern void *token_data;
 
 void pkcs11_rescan_slots(void);
-int pkcs11_info_to_url(const struct pkcs11_url_info *info, int detailed, char **url);
+int pkcs11_info_to_url(const struct pkcs11_url_info *info, gnutls_pkcs11_url_type_t detailed, char **url);
 
 #define SESSION_WRITE 1
 #define SESSION_LOGIN 2
