@@ -414,7 +414,7 @@ cpydata (const uint8_t * data, int data_size, uint8_t ** result)
 
   for (j = i = 0; i < data_size; i++)
     {
-      if (data[i] == '\n' || data[i] == '\r')
+      if (data[i] == '\n' || data[i] == '\r' || data[i] == ' ' || data[i] == '\t')
 	continue;
       (*result)[j] = data[i];
       j++;
@@ -427,15 +427,14 @@ cpydata (const uint8_t * data, int data_size, uint8_t ** result)
  *
  * The result_size is the return value
  */
-#define ENDSTR "-----\n"
-#define ENDSTR2 "-----\r"
+#define ENDSTR "-----"
 int
 _gnutls_fbase64_decode (const char *header, const opaque * data,
 			size_t data_size, uint8_t ** result)
 {
   int ret;
   static const char top[] = "-----BEGIN ";
-  static const char bottom[] = "\n-----END ";
+  static const char bottom[] = "-----END ";
   uint8_t *rdata;
   int rdata_size;
   uint8_t *kdata;
@@ -463,12 +462,9 @@ _gnutls_fbase64_decode (const char *header, const opaque * data,
       return GNUTLS_E_BASE64_DECODING_ERROR;
     }
 
-  kdata = memmem (rdata, data_size, ENDSTR, sizeof (ENDSTR) - 1);
+  kdata = memmem (rdata+1, data_size-1, ENDSTR, sizeof (ENDSTR) - 1);
   /* allow CR as well.
    */
-  if (kdata == NULL)
-    kdata = memmem (rdata, data_size, ENDSTR2, sizeof (ENDSTR2) - 1);
-
   if (kdata == NULL)
     {
       gnutls_assert ();

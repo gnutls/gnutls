@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.10.2 (unreleased)
 
+** libgnutls: Is now more liberal in the PEM decoding. That is spaces and 
+tabs are being skipped.
+
 ** libgnutls: Renamed NULL MAC to MAC-NULL to prevent clash with NULL
 cipher. This prevented the usage of the TLS ciphersuites with NULL
 cipher.
