@@ -55,9 +55,6 @@ Daiki Ueno <ueno@unixuser.org>
 Added TLS Session Ticket (RFC 5077) support,
 finished client-side TLS 1.2 support.
 
-Jonathan Bastien-Filiatrault <joe@x2a.org>
-Fix TLS-version checks.
-
 Brad Hards <bradh@frogmouth.net>
 Add X.509 Issuer Alternative Name functions.
 
@@ -65,9 +62,10 @@ Boyan Kasarov <bkasarov@gmail.com>
 C++ fixes.
 
 Steve Dispensa <dispensa@phonefactor.com>
-TLS safe renegotiation fix.
+Initial TLS safe renegotiation patch.
 
 Jonathan Bastien-Filiatrault <joe@x2a.org>
+Fix TLS-version checks.
 Redesign and implementation of the buffering layer.
 
 -----BEGIN PGP PUBLIC KEY BLOCK-----

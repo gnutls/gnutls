@@ -3,7 +3,17 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 2.11.1 (unreleased)
+* Version 2.11.1 (released 2010-09-14)
+
+** libgnutls: Nettle is the default crypto back end. Use --with-libgcrypt
+to use the libgcrypt back end.
+
+** libgnutls: Depend on nettle 2.1. This makes nettle a fully working
+backend crypto library.
+
+** libgnutls: Added RSA_NULL_SHA1 and SHA256 ciphersuites.
+
+** libgnutls: Several updates in the buffering internal interface.
 
 ** libgnutls: Is now more liberal in the PEM decoding. That is spaces and 
 tabs are being skipped.
@@ -16,14 +26,6 @@ TLS spec.
 ** libgnutls: by default lowat level has been set to zero to avoid unnecessary
 system calls. Applications that depended on it being 1 should explicitly call
 gnutls_transport_set_lowat().
-
-** libgnutls: Nettle is the default crypto back end. Use --with-libgcrypt
-to use the libgcrypt back end.
-
-** libgnutls: Depend on nettle 2.1. This makes nettle a fully working
-backend crypto library.
-
-** libgnutls: Added RSA_NULL_SHA1 and SHA256 ciphersuites.
 
 ** libgnutls: Updated documentation and gnutls_pk_params_t mappings
 to ECRYPT II recommendations. Mappings were moved to a single location
