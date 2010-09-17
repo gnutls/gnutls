@@ -83,4 +83,21 @@ _gnutls_log (int, const char *fmt, ...)
 
 #endif /* C99_MACROS */
 
+/* GCC won't inline this by itself and results in a "fatal warning"
+   otherwise. Making this a macro has been tried, but it interacts
+   badly with the do..while in the expansion. Welcome to the dark
+   side. */
+static inline
+#ifdef __GNUC__
+ __attribute__ ((always_inline))
+#endif
+int
+gnutls_assert_val_int (int val, const char* file, int line)
+{
+  _gnutls_debug_log( "ASSERT: %s:%d\n", file, line);
+  return val;
+}
+
+#define gnutls_assert_val(x) gnutls_assert_val_int(x, __FILE__, __LINE__)
+
 #endif /* GNUTLS_ERRORS_H */
