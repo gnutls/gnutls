@@ -34,6 +34,7 @@
 #include <ext_session_ticket.h>
 #include <gnutls_mbuffers.h>
 #include <gnutls_extensions.h>
+#include <gnutls_constate.h>
 
 #ifdef ENABLE_SESSION_TICKET
 
@@ -579,30 +580,6 @@ gnutls_session_ticket_enable_server (gnutls_session_t session,
   return 0;
 }
 
-#define SAVE_WRITE_SECURITY_PARAMETERS					\
-  do									\
-    {									\
-      write_bulk_cipher_algorithm =					\
-	session->security_parameters.write_bulk_cipher_algorithm;	\
-      write_mac_algorithm =						\
-	session->security_parameters.write_mac_algorithm;		\
-      write_compression_algorithm =					\
-	session->security_parameters.write_compression_algorithm;	\
-    }									\
-  while (0)
-
-#define RESTORE_WRITE_SECURITY_PARAMETERS				\
-  do									\
-    {									\
-      session->security_parameters.write_bulk_cipher_algorithm =	\
-	write_bulk_cipher_algorithm;					\
-      session->security_parameters.write_mac_algorithm =		\
-	write_mac_algorithm;						\
-      session->security_parameters.write_compression_algorithm =	\
-	write_compression_algorithm;					\
-    }									\
-  while (0)
-
 int
 _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
 {
@@ -612,11 +589,9 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
   int ret;
   struct ticket ticket;
   uint16_t ticket_len;
-  gnutls_cipher_algorithm_t write_bulk_cipher_algorithm;
-  gnutls_mac_algorithm_t write_mac_algorithm;
-  gnutls_compression_method_t write_compression_algorithm;
   session_ticket_ext_st* priv=NULL;
   extension_priv_data_t epriv;
+  uint16_t epoch_saved = session->security_parameters.epoch_write;
 
   if (again == 0)
     {
@@ -632,28 +607,17 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
          _gnutls_write_connection_state_init() does this job, but it also
          triggers encryption, while NewSessionTicket should not be
          encrypted in the record layer. */
-      SAVE_WRITE_SECURITY_PARAMETERS;
-      ret = _gnutls_set_write_cipher (session,
-				      _gnutls_cipher_suite_get_cipher_algo
-				      (&session->
-				       security_parameters.current_cipher_suite));
+      ret = _gnutls_epoch_set_keys (session, session->security_parameters.epoch_next);
       if (ret < 0)
-	return ret;
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
 
-      ret = _gnutls_set_write_mac (session,
-				   _gnutls_cipher_suite_get_mac_algo
-				   (&session->
-				    security_parameters.current_cipher_suite));
-      if (ret < 0)
-	return ret;
-      ret = _gnutls_set_write_compression (session,
-					   session->
-					   internals.compression_method);
-      if (ret < 0)
-	return ret;
+      session->security_parameters.epoch_write = session->security_parameters.epoch_next;
 
       ret = encrypt_ticket (session, priv, &ticket);
-      RESTORE_WRITE_SECURITY_PARAMETERS;
+      session->security_parameters.epoch_write = epoch_saved;
       if (ret < 0)
 	{
 	  gnutls_assert ();

@@ -27,10 +27,12 @@
 
 int _gnutls_m_plaintext2compressed (gnutls_session_t session,
 				    gnutls_datum_t * compressed,
-				    const gnutls_datum_t * plaintext);
+				    const gnutls_datum_t * plaintext,
+				    const record_parameters_st *params);
 int _gnutls_m_compressed2plaintext (gnutls_session_t session,
 				    gnutls_datum_t * plain,
-				    const gnutls_datum_t * compressed);
+				    const gnutls_datum_t * compressed,
+				    const record_parameters_st *params);
 
 /* Algorithm handling. */
 int _gnutls_supported_compression_methods (gnutls_session_t session,

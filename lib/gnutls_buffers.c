@@ -753,6 +753,7 @@ _gnutls_handshake_io_write_flush (gnutls_session_t session)
     {
       ret = _gnutls_send_int (session, GNUTLS_HANDSHAKE,
 			      session->internals.handshake_send_buffer_htype,
+			      EPOCH_WRITE_CURRENT,
 			      msg.data, msg.size, 0/* do not flush */);
 
       if (ret >= 0)

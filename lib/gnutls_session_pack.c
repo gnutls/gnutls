@@ -42,6 +42,7 @@
 #include <gnutls_datum.h>
 #include <gnutls_num.h>
 #include <gnutls_extensions.h>
+#include <gnutls_constate.h>
 
 static int pack_certificate_auth_info (gnutls_session_t,
 				       gnutls_buffer_st * packed_session);
@@ -740,6 +741,21 @@ pack_security_parameters (gnutls_session_t session,
   int ret;
   int size_offset;
   size_t cur_size;
+  record_parameters_st *params;
+
+  if ( session->security_parameters.epoch_read
+       != session->security_parameters.epoch_write)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  ret = _gnutls_epoch_get (session, EPOCH_READ_CURRENT, &params);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
 
   /* move after the auth info stuff.
    */
@@ -750,14 +766,9 @@ pack_security_parameters (gnutls_session_t session,
 
   BUFFER_APPEND(ps, &session->security_parameters.entity, 1);
   BUFFER_APPEND(ps, &session->security_parameters.kx_algorithm, 1);
-  BUFFER_APPEND(ps, &session->security_parameters.read_bulk_cipher_algorithm, 1);
-  BUFFER_APPEND(ps, &session->security_parameters.read_mac_algorithm, 1);
-  BUFFER_APPEND(ps, &session->security_parameters.read_compression_algorithm, 1);
-  BUFFER_APPEND(ps, &session->security_parameters.write_bulk_cipher_algorithm, 1);
-  BUFFER_APPEND(ps, &session->security_parameters.write_mac_algorithm, 1);
-  BUFFER_APPEND(ps, &session->security_parameters.write_compression_algorithm, 1);
   BUFFER_APPEND(ps, &session->security_parameters.current_cipher_suite.suite[0], 1);
   BUFFER_APPEND(ps, &session->security_parameters.current_cipher_suite.suite[1], 1);
+  BUFFER_APPEND(ps, &params->compression_algorithm, 1);
   BUFFER_APPEND(ps, &session->security_parameters.cert_type, 1);
   BUFFER_APPEND(ps, &session->security_parameters.version, 1);
 
@@ -795,15 +806,10 @@ unpack_security_parameters (gnutls_session_t session,
 
   BUFFER_POP(ps, &session->internals.resumed_security_parameters.entity, 1);
   BUFFER_POP(ps, &session->internals.resumed_security_parameters.kx_algorithm, 1);
-  BUFFER_POP(ps, &session->internals.resumed_security_parameters.read_bulk_cipher_algorithm, 1);
-  BUFFER_POP(ps, &session->internals.resumed_security_parameters.read_mac_algorithm, 1);
-  BUFFER_POP(ps, &session->internals.resumed_security_parameters.read_compression_algorithm, 1);
-  BUFFER_POP(ps, &session->internals.resumed_security_parameters.write_bulk_cipher_algorithm, 1);
-  BUFFER_POP(ps, &session->internals.resumed_security_parameters.write_mac_algorithm, 1);
-  BUFFER_POP(ps, &session->internals.resumed_security_parameters.write_compression_algorithm, 1);
   BUFFER_POP(ps, &session->internals.resumed_security_parameters.current_cipher_suite.suite[0], 1);
   BUFFER_POP(ps, &session->internals.resumed_security_parameters.
     current_cipher_suite.suite[1], 1);
+  BUFFER_POP(ps, &session->internals.resumed_compression_method, 1);
   BUFFER_POP(ps, &session->internals.resumed_security_parameters.cert_type, 1);
   BUFFER_POP(ps, &session->internals.resumed_security_parameters.version, 1);
 

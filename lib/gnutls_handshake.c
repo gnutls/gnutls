@@ -124,8 +124,11 @@ resume_copy_required_values (gnutls_session_t session)
 	  session->internals.resumed_security_parameters.current_cipher_suite.
 	  suite, 2);
 
-  session->internals.compression_method =
-    session->internals.resumed_security_parameters.read_compression_algorithm;
+  _gnutls_epoch_set_cipher_suite (session, EPOCH_NEXT,
+				  &session->internals.resumed_security_parameters.current_cipher_suite);
+  _gnutls_epoch_set_compression (session, EPOCH_NEXT,
+				 session->internals.resumed_compression_method);
+
   /* or write_compression_algorithm
    * they are the same
    */
@@ -931,6 +934,10 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
 		 _gnutls_cipher_suite_get_name (&cs));
 	      memcpy (session->security_parameters.current_cipher_suite.suite,
 		      ciphers[i].suite, 2);
+	      _gnutls_epoch_set_cipher_suite (session, EPOCH_NEXT,
+					      &session->security_parameters.current_cipher_suite);
+
+
 	      retval = 0;
 	      goto finish;
 	    }
@@ -1012,6 +1019,8 @@ _gnutls_server_select_comp_method (gnutls_session_t session,
 
 	      session->internals.compression_method = method;
 	      gnutls_free (comps);
+
+	      _gnutls_epoch_set_compression (session, EPOCH_NEXT, method);
 
 	      _gnutls_handshake_log
 		("HSK[%p]: Selected Compression Method: %s\n", session,
@@ -1565,6 +1574,7 @@ _gnutls_client_set_ciphersuite (gnutls_session_t session, opaque suite[2])
     }
 
   memcpy (session->security_parameters.current_cipher_suite.suite, suite, 2);
+  _gnutls_epoch_set_cipher_suite (session, EPOCH_NEXT, &session->security_parameters.current_cipher_suite);
 
   _gnutls_handshake_log ("HSK[%p]: Selected cipher suite: %s\n", session,
 			 _gnutls_cipher_suite_get_name
@@ -1645,7 +1655,7 @@ _gnutls_client_set_comp_method (gnutls_session_t session, opaque comp_method)
 
   session->internals.compression_method =
     _gnutls_compression_get_id (comp_method);
-
+  _gnutls_epoch_set_compression (session, EPOCH_NEXT, session->internals.compression_method);
 
   return 0;
 }
@@ -1678,6 +1688,12 @@ _gnutls_client_check_if_resuming (gnutls_session_t session,
 	      session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
       memcpy (session->internals.resumed_security_parameters.client_random,
 	      session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
+
+      _gnutls_epoch_set_cipher_suite
+	(session, EPOCH_NEXT, &session->internals.resumed_security_parameters.current_cipher_suite);
+      _gnutls_epoch_set_compression
+	(session, EPOCH_NEXT, session->internals.resumed_compression_method);
+
       session->internals.resumed = RESUME_TRUE;	/* we are resuming */
 
       return 0;
@@ -2594,6 +2610,20 @@ int
 gnutls_handshake (gnutls_session_t session)
 {
   int ret;
+  record_parameters_st *params;
+
+  ret = _gnutls_epoch_get (session, session->security_parameters.epoch_next,
+			   &params);
+  if (ret < 0)
+    {
+      /* We assume the epoch is not allocated if _gnutls_epoch_get fails. */
+      ret = _gnutls_epoch_alloc (session, session->security_parameters.epoch_next, NULL);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
+    }
 
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
@@ -2628,6 +2658,8 @@ gnutls_handshake (gnutls_session_t session)
 
   _gnutls_handshake_io_buffer_clear (session);
   _gnutls_handshake_internal_state_clear (session);
+
+  session->security_parameters.epoch_next++;
 
   return 0;
 }

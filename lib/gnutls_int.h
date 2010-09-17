@@ -285,6 +285,12 @@ struct gnutls_key_st
 typedef struct gnutls_key_st *gnutls_key_st;
 
 
+struct record_state_st;
+typedef struct record_state_st record_state_st;
+
+struct record_parameters_st;
+typedef struct record_parameters_st record_parameters_st;
+
 /* STATE (cont) */
 
 #include <gnutls_hash_int.h>
@@ -334,18 +340,17 @@ typedef struct
 {
   gnutls_connection_end_t entity;
   gnutls_kx_algorithm_t kx_algorithm;
-  /* we've got separate write/read bulk/macs because
-   * there is a time in handshake where the peer has
-   * null cipher and we don't
-   */
-  gnutls_cipher_algorithm_t read_bulk_cipher_algorithm;
-  gnutls_mac_algorithm_t read_mac_algorithm;
-  gnutls_compression_method_t read_compression_algorithm;
+  handshake_mac_type_t handshake_mac_handle_type;      /* one of HANDSHAKE_TYPE_10 and HANDSHAKE_TYPE_12 */
 
-  gnutls_cipher_algorithm_t write_bulk_cipher_algorithm;
-  gnutls_mac_algorithm_t write_mac_algorithm;
-  gnutls_compression_method_t write_compression_algorithm;
-  handshake_mac_type_t handshake_mac_handle_type;	/* one of HANDSHAKE_TYPE_10 and HANDSHAKE_TYPE_12 */
+  /* The epoch used to read and write */
+  uint16_t epoch_read;
+  uint16_t epoch_write;
+
+  /* The epoch that the next handshake will initialize. */
+  uint16_t epoch_next;
+
+  /* The epoch at index 0 of record_parameters. */
+  uint16_t epoch_min;
 
   /* this is the ciphersuite we are going to use 
    * moved here from internals in order to be restored
@@ -378,34 +383,36 @@ typedef struct
   int do_recv_supplemental, do_send_supplemental;
 } security_parameters_st;
 
-/* This structure holds the generated keys
- */
-typedef struct
+struct record_state_st
 {
-  gnutls_datum_t server_write_mac_secret;
-  gnutls_datum_t client_write_mac_secret;
-  gnutls_datum_t server_write_IV;
-  gnutls_datum_t client_write_IV;
-  gnutls_datum_t server_write_key;
-  gnutls_datum_t client_write_key;
-  int generated_keys;		/* zero if keys have not
-				 * been generated. Non zero
-				 * otherwise.
-				 */
-} cipher_specs_st;
+  gnutls_datum_t mac_secret;
+  gnutls_datum_t IV;
+  gnutls_datum_t key;
+  cipher_hd_st   cipher_state;
+  comp_hd_t      compression_state;
+  uint64         sequence_number;
+};
 
+/* These are used to resolve relative epochs. These values are just
+   outside the 16 bit range to prevent off-by-one errors. An absolute
+   epoch may be referred to by its numeric id in the range
+   0x0000-0xffff. */
+#define EPOCH_READ_CURRENT  70000
+#define EPOCH_WRITE_CURRENT 70001
+#define EPOCH_NEXT          70002
 
-typedef struct
+struct record_parameters_st
 {
-  cipher_hd_st write_cipher_state;
-  cipher_hd_st read_cipher_state;
-  comp_hd_t read_compression_state;
-  comp_hd_t write_compression_state;
-  gnutls_datum_t read_mac_secret;
-  gnutls_datum_t write_mac_secret;
-  uint64 read_sequence_number;
-  uint64 write_sequence_number;
-} conn_stat_st;
+  uint16_t epoch;
+  int initialized;
+
+  gnutls_cipher_algorithm_t   cipher_algorithm;
+  gnutls_mac_algorithm_t      mac_algorithm;
+  gnutls_compression_method_t compression_algorithm;
+
+  record_state_st read;
+  record_state_st write;
+};
 
 typedef struct
 {
@@ -528,6 +535,7 @@ typedef struct
   /* resumed session */
   int resumed:1;	/* RESUME_TRUE or FALSE - if we are resuming a session */
   security_parameters_st resumed_security_parameters;
+  gnutls_compression_method_t resumed_compression_method;
 
   /* sockets internals */
   int lowat;
@@ -719,11 +727,13 @@ typedef struct
    */
 } internals_st;
 
+/* Maximum number of epochs we keep around. */
+#define MAX_EPOCH_INDEX 16
+
 struct gnutls_session_int
 {
   security_parameters_st security_parameters;
-  cipher_specs_st cipher_specs;
-  conn_stat_st connection_state;
+  record_parameters_st *record_parameters[MAX_EPOCH_INDEX];
   internals_st internals;
   gnutls_key_st key;
 };

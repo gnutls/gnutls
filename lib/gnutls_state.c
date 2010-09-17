@@ -40,6 +40,7 @@
 #include <gnutls_buffers.h>
 #include <gnutls_mbuffers.h>
 #include <gnutls_state.h>
+#include <gnutls_constate.h>
 #include <auth_cert.h>
 #include <auth_anon.h>
 #include <auth_psk.h>
@@ -73,7 +74,10 @@ _gnutls_session_cert_type_set (gnutls_session_t session,
 gnutls_cipher_algorithm_t
 gnutls_cipher_get (gnutls_session_t session)
 {
-  return session->security_parameters.read_bulk_cipher_algorithm;
+  record_parameters_st *record_params;
+  _gnutls_epoch_get (session, EPOCH_READ_CURRENT, &record_params);
+
+  return record_params->cipher_algorithm;
 }
 
 /**
@@ -119,7 +123,10 @@ gnutls_kx_get (gnutls_session_t session)
 gnutls_mac_algorithm_t
 gnutls_mac_get (gnutls_session_t session)
 {
-  return session->security_parameters.read_mac_algorithm;
+  record_parameters_st *record_params;
+  _gnutls_epoch_get (session, EPOCH_READ_CURRENT, &record_params);
+
+  return record_params->mac_algorithm;
 }
 
 /**
@@ -134,7 +141,10 @@ gnutls_mac_get (gnutls_session_t session)
 gnutls_compression_method_t
 gnutls_compression_get (gnutls_session_t session)
 {
-  return session->security_parameters.read_compression_algorithm;
+  record_parameters_st *record_params;
+  _gnutls_epoch_get (session, EPOCH_READ_CURRENT, &record_params);
+
+  return record_params->compression_algorithm;
 }
 
 /* Check if the given certificate type is supported.
@@ -265,29 +275,29 @@ _gnutls_handshake_internal_state_clear (gnutls_session_t session)
 int
 gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
 {
+  int ret;
+  record_parameters_st *epoch;
+
   *session = gnutls_calloc (1, sizeof (struct gnutls_session_int));
   if (*session == NULL)
     return GNUTLS_E_MEMORY_ERROR;
+
+  ret = _gnutls_epoch_alloc (*session, 0, &epoch);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  /* Set all NULL algos on epoch 0 */
+  _gnutls_epoch_set_null_algos(*session, epoch);
+
+  (*session)->security_parameters.epoch_next = 1;
 
   (*session)->security_parameters.entity = con_end;
 
   /* the default certificate type for TLS */
   (*session)->security_parameters.cert_type = DEFAULT_CERT_TYPE;
-
-/* Set the defaults for initial handshake */
-  (*session)->security_parameters.read_bulk_cipher_algorithm =
-    (*session)->security_parameters.write_bulk_cipher_algorithm =
-    GNUTLS_CIPHER_NULL;
-
-  (*session)->security_parameters.read_mac_algorithm =
-    (*session)->security_parameters.write_mac_algorithm = GNUTLS_MAC_NULL;
-
-  (*session)->security_parameters.read_compression_algorithm =
-    GNUTLS_COMP_NULL;
-  (*session)->security_parameters.write_compression_algorithm =
-    GNUTLS_COMP_NULL;
-
-  (*session)->internals.enable_private = 0;
 
   /* Initialize buffers */
   _gnutls_buffer_init (&(*session)->internals.application_data_buffer);
@@ -372,6 +382,7 @@ _gnutls_session_is_resumable (gnutls_session_t session)
 void
 gnutls_deinit (gnutls_session_t session)
 {
+  unsigned int i;
 
   if (session == NULL)
     return;
@@ -383,8 +394,12 @@ gnutls_deinit (gnutls_session_t session)
   _gnutls_handshake_io_buffer_clear (session);
   _gnutls_ext_free_session_data (session);
 
-  _gnutls_free_datum (&session->connection_state.read_mac_secret);
-  _gnutls_free_datum (&session->connection_state.write_mac_secret);
+  for(i=0; i < MAX_EPOCH_INDEX; i++)
+    if (session->record_parameters[i] != NULL)
+      {
+	_gnutls_epoch_free (session, session->record_parameters[i]);
+	session->record_parameters[i] = NULL;
+      }
 
   _gnutls_buffer_clear (&session->internals.ia_data_buffer);
   _gnutls_buffer_clear (&session->internals.handshake_hash_buffer);
@@ -395,22 +410,6 @@ gnutls_deinit (gnutls_session_t session)
 
   gnutls_credentials_clear (session);
   _gnutls_selected_certs_deinit (session);
-
-  _gnutls_cipher_deinit (&session->connection_state.read_cipher_state);
-  _gnutls_cipher_deinit (&session->connection_state.write_cipher_state);
-
-  if (session->connection_state.read_compression_state != NULL)
-    _gnutls_comp_deinit (session->connection_state.read_compression_state, 1);
-  if (session->connection_state.write_compression_state != NULL)
-    _gnutls_comp_deinit (session->connection_state.write_compression_state,
-			 0);
-
-  _gnutls_free_datum (&session->cipher_specs.server_write_mac_secret);
-  _gnutls_free_datum (&session->cipher_specs.client_write_mac_secret);
-  _gnutls_free_datum (&session->cipher_specs.server_write_IV);
-  _gnutls_free_datum (&session->cipher_specs.client_write_IV);
-  _gnutls_free_datum (&session->cipher_specs.server_write_key);
-  _gnutls_free_datum (&session->cipher_specs.client_write_key);
 
   if (session->key != NULL)
     {

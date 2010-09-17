@@ -30,6 +30,7 @@
 #include "gnutls_int.h"
 #include "gnutls_compress.h"
 #include "gnutls_errors.h"
+#include "gnutls_constate.h"
 #include <gnutls_algorithms.h>
 #include <gnutls/gnutls.h>
 
@@ -38,13 +39,14 @@
 int
 _gnutls_m_plaintext2compressed (gnutls_session_t session,
 				gnutls_datum_t * compressed,
-				const gnutls_datum_t * plaintext)
+				const gnutls_datum_t * plaintext,
+				const record_parameters_st *params)
 {
   int size;
   opaque *data;
 
   size =
-    _gnutls_compress (session->connection_state.write_compression_state,
+    _gnutls_compress (params->write.compression_state,
 		      plaintext->data, plaintext->size, &data,
 		      MAX_RECORD_SEND_SIZE + EXTRA_COMP_SIZE);
   if (size < 0)
@@ -61,13 +63,14 @@ _gnutls_m_plaintext2compressed (gnutls_session_t session,
 int
 _gnutls_m_compressed2plaintext (gnutls_session_t session,
 				gnutls_datum_t * plain,
-				const gnutls_datum_t * compressed)
+				const gnutls_datum_t * compressed,
+				const record_parameters_st *params)
 {
   int size;
   opaque *data;
 
   size =
-    _gnutls_decompress (session->connection_state.read_compression_state,
+    _gnutls_decompress (params->read.compression_state,
 			compressed->data, compressed->size, &data,
 			MAX_RECORD_RECV_SIZE);
   if (size < 0)

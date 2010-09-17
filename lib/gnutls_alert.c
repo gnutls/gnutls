@@ -133,7 +133,7 @@ gnutls_alert_send (gnutls_session_t session, gnutls_alert_level_t level,
   _gnutls_record_log ("REC: Sending Alert[%d|%d] - %s\n", data[0],
 		      data[1], name);
 
-  if ((ret = _gnutls_send_int (session, GNUTLS_ALERT, -1, data, 2, MBUFFER_FLUSH)) >= 0)
+  if ((ret = _gnutls_send_int (session, GNUTLS_ALERT, -1, EPOCH_WRITE_CURRENT, data, 2, MBUFFER_FLUSH)) >= 0)
     return 0;
   else
     return ret;

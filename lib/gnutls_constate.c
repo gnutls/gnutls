@@ -36,6 +36,7 @@
 #include <gnutls_datum.h>
 #include <gnutls_state.h>
 #include <gnutls_extensions.h>
+#include <gnutls_buffers.h>
 
 static const char keyexp[] = "key expansion";
 static const int keyexp_length = sizeof (keyexp) - 1;
@@ -57,7 +58,7 @@ static const int servwrite_length = sizeof (servwrite) - 1;
  * (session->cipher_specs)
  */
 static int
-_gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
+_gnutls_set_keys (gnutls_session_t session, record_parameters_st *params, int hash_size, int IV_size,
 		  int key_size, int export_flag)
 {
   /* FIXME: This function is too long
@@ -70,15 +71,10 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
   /* avoid using malloc */
   opaque key_block[2 * MAX_HASH_SIZE + 2 * MAX_CIPHER_KEY_SIZE +
 		   2 * MAX_CIPHER_BLOCK_SIZE];
+  record_state_st *client_write, *server_write;
 
-  if (session->cipher_specs.generated_keys != 0)
-    {
-      /* keys have already been generated.
-       * reset generated_keys and exit normally.
-       */
-      session->cipher_specs.generated_keys = 0;
-      return 0;
-    }
+  client_write = session->security_parameters.entity == GNUTLS_CLIENT ? &params->write : &params->read;
+  server_write = session->security_parameters.entity == GNUTLS_SERVER ? &params->write : &params->read;
 
   block_size = 2 * hash_size + 2 * key_size;
   if (export_flag == 0)
@@ -110,42 +106,28 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
     }
 
   if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+    return gnutls_assert_val (ret);
 
   _gnutls_hard_log ("INT: KEY BLOCK[%d]: %s\n", block_size,
 		    _gnutls_bin2hex (key_block, block_size, buf,
 				     sizeof (buf), NULL));
-
-  _gnutls_free_datum (&session->cipher_specs.server_write_mac_secret);
-  _gnutls_free_datum (&session->cipher_specs.client_write_mac_secret);
-  _gnutls_free_datum (&session->cipher_specs.server_write_IV);
-  _gnutls_free_datum (&session->cipher_specs.client_write_IV);
-  _gnutls_free_datum (&session->cipher_specs.server_write_key);
-  _gnutls_free_datum (&session->cipher_specs.client_write_key);
 
   pos = 0;
   if (hash_size > 0)
     {
 
       if (_gnutls_sset_datum
-	  (&session->cipher_specs.client_write_mac_secret,
+	  (&client_write->mac_secret,
 	   &key_block[pos], hash_size) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+	return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
+
       pos += hash_size;
 
       if (_gnutls_sset_datum
-	  (&session->cipher_specs.server_write_mac_secret,
+	  (&server_write->mac_secret,
 	   &key_block[pos], hash_size) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+	return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
+
       pos += hash_size;
     }
 
@@ -197,10 +179,7 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	    }
 
 	  if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      return ret;
-	    }
+	    return gnutls_assert_val (ret);
 
 	  client_write_key_size = EXPORT_FINAL_KEY_SIZE;
 	  pos += key_size;
@@ -223,22 +202,17 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	    }
 
 	  if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      return ret;
-	    }
+	    return gnutls_assert_val (ret);
 
 	  server_write_key_size = EXPORT_FINAL_KEY_SIZE;
 	  pos += key_size;
 	}
 
       if (_gnutls_sset_datum
-	  (&session->cipher_specs.client_write_key,
+	  (&client_write->key,
 	   client_write_key, client_write_key_size) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+	return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
+
       _gnutls_hard_log ("INT: CLIENT WRITE KEY [%d]: %s\n",
 			client_write_key_size,
 			_gnutls_bin2hex (client_write_key,
@@ -246,12 +220,9 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 					 sizeof (buf), NULL));
 
       if (_gnutls_sset_datum
-	  (&session->cipher_specs.server_write_key,
+	  (&server_write->key,
 	   server_write_key, server_write_key_size) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+	return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
       _gnutls_hard_log ("INT: SERVER WRITE KEY [%d]: %s\n",
 			server_write_key_size,
@@ -267,21 +238,17 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
   if (IV_size > 0 && export_flag == 0)
     {
       if (_gnutls_sset_datum
-	  (&session->cipher_specs.client_write_IV, &key_block[pos],
+	  (&client_write->IV, &key_block[pos],
 	   IV_size) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+	return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
+
       pos += IV_size;
 
       if (_gnutls_sset_datum
-	  (&session->cipher_specs.server_write_IV, &key_block[pos],
+	  (&server_write->IV, &key_block[pos],
 	   IV_size) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+	return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
+
       pos += IV_size;
 
     }
@@ -296,10 +263,8 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 				       IV_size, iv_block);
 
 	  if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      return ret;
-	    }
+	    return gnutls_assert_val (ret);
+
 
 	  ret = _gnutls_ssl3_hash_md5 ("", 0, rnd,
 				       GNUTLS_RANDOM_SIZE * 2,
@@ -314,73 +279,176 @@ _gnutls_set_keys (gnutls_session_t session, int hash_size, int IV_size,
 	}
 
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+	return gnutls_assert_val (ret);
 
       if (_gnutls_sset_datum
-	  (&session->cipher_specs.client_write_IV, iv_block, IV_size) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+	  (&client_write->IV, iv_block, IV_size) < 0)
+	return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
       if (_gnutls_sset_datum
-	  (&session->cipher_specs.server_write_IV,
+	  (&server_write->IV,
 	   &iv_block[IV_size], IV_size) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+	return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
     }
-
-  session->cipher_specs.generated_keys = 1;
 
   return 0;
 }
 
 static int
-_gnutls_set_read_keys (gnutls_session_t session)
+_gnutls_init_record_state (record_parameters_st *params, int read,
+			   record_state_st *state)
+{
+  int ret;
+
+  ret = _gnutls_cipher_init (&state->cipher_state,
+			     params->cipher_algorithm,
+			     &state->key, &state->IV);
+  if (ret < 0
+      && params->cipher_algorithm != GNUTLS_CIPHER_NULL)
+    return gnutls_assert_val (ret);
+
+  state->compression_state =
+    _gnutls_comp_init (params->compression_algorithm, read);
+
+  if (state->compression_state == GNUTLS_COMP_FAILED)
+    return gnutls_assert_val (GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM);
+
+  return 0;
+}
+
+int
+_gnutls_epoch_set_cipher_suite (gnutls_session_t session,
+				int epoch_rel,
+				cipher_suite_st *suite)
+{
+  gnutls_cipher_algorithm_t cipher_algo;
+  gnutls_mac_algorithm_t mac_algo;
+  record_parameters_st *params;
+  int ret;
+
+  ret = _gnutls_epoch_get (session, epoch_rel, &params);
+  if (ret < 0)
+    return gnutls_assert_val (ret);
+
+  if (params->initialized
+      || params->cipher_algorithm != GNUTLS_CIPHER_UNKNOWN
+      || params->mac_algorithm != GNUTLS_MAC_UNKNOWN)
+    return gnutls_assert_val (GNUTLS_E_INTERNAL_ERROR);
+
+  cipher_algo =_gnutls_cipher_suite_get_cipher_algo (suite);
+  mac_algo = _gnutls_cipher_suite_get_mac_algo (suite);
+
+  if (_gnutls_cipher_is_ok (cipher_algo) != 0
+      || _gnutls_mac_is_ok (mac_algo) != 0)
+    return gnutls_assert_val (GNUTLS_E_UNWANTED_ALGORITHM);
+
+  params->cipher_algorithm = cipher_algo;
+  params->mac_algorithm = mac_algo;
+
+  return 0;
+}
+
+int
+_gnutls_epoch_set_compression (gnutls_session_t session,
+			       int epoch_rel,
+			       gnutls_compression_method_t comp_algo)
+{
+  record_parameters_st *params;
+  int ret;
+
+  ret = _gnutls_epoch_get (session, epoch_rel, &params);
+  if (ret < 0)
+    return gnutls_assert_val (ret);
+
+  if (params->initialized
+      || params->compression_algorithm != GNUTLS_COMP_UNKNOWN)
+    return gnutls_assert_val (GNUTLS_E_INTERNAL_ERROR);
+
+  if (_gnutls_compression_is_ok (comp_algo) != 0)
+    return gnutls_assert_val (GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM);
+
+  params->compression_algorithm = comp_algo;
+
+  return 0;
+}
+
+void
+_gnutls_epoch_set_null_algos (gnutls_session_t session,
+			      record_parameters_st *params)
+{
+  /* This is only called on startup. We are extra paranoid about this
+     because it may cause unencrypted application data to go out on
+     the wire. */
+  if (params->initialized || params->epoch != 0)
+    {
+      gnutls_assert ();
+      return;
+    }
+
+  params->cipher_algorithm =  GNUTLS_CIPHER_NULL;
+  params->mac_algorithm = GNUTLS_MAC_NULL;
+  params->compression_algorithm =  GNUTLS_COMP_NULL;
+  params->initialized =  1;
+}
+
+int
+_gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
 {
   int hash_size;
   int IV_size;
   int key_size, export_flag;
-  gnutls_cipher_algorithm_t algo;
+  gnutls_cipher_algorithm_t cipher_algo;
   gnutls_mac_algorithm_t mac_algo;
+  gnutls_compression_method_t comp_algo;
+  record_parameters_st *params;
+  int ret;
 
-  mac_algo = session->security_parameters.read_mac_algorithm;
-  algo = session->security_parameters.read_bulk_cipher_algorithm;
+  ret = _gnutls_epoch_get (session, epoch, &params);
+  if (ret < 0)
+    return gnutls_assert_val (ret);
 
+  if (params->initialized)
+    return 0;
+
+  _gnutls_record_log
+    ("REC[%p]: Initializing epoch #%u\n", session, params->epoch);
+
+  cipher_algo = params->cipher_algorithm;
+  mac_algo = params->mac_algorithm;
+  comp_algo = params->compression_algorithm;
+
+  if (_gnutls_cipher_is_ok (cipher_algo) != 0
+      || _gnutls_mac_is_ok (mac_algo) != 0)
+    return gnutls_assert_val (GNUTLS_E_INTERNAL_ERROR);
+
+  if (_gnutls_compression_is_ok (comp_algo) != 0)
+    return gnutls_assert_val (GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM);
+
+  IV_size = _gnutls_cipher_get_iv_size (cipher_algo);
+  key_size = gnutls_cipher_get_key_size (cipher_algo);
+  export_flag = _gnutls_cipher_get_export_flag (cipher_algo);
   hash_size = _gnutls_hash_get_algo_len (mac_algo);
-  IV_size = _gnutls_cipher_get_iv_size (algo);
-  key_size = gnutls_cipher_get_key_size (algo);
-  export_flag = _gnutls_cipher_get_export_flag (algo);
 
-  return _gnutls_set_keys (session, hash_size, IV_size, key_size,
-			   export_flag);
+  ret = _gnutls_set_keys
+    (session, params, hash_size, IV_size, key_size, export_flag);
+  if (ret < 0)
+    return gnutls_assert_val (ret);
+
+  ret = _gnutls_init_record_state (params, 1, &params->read);
+  if (ret < 0)
+      return gnutls_assert_val (ret);
+
+  ret = _gnutls_init_record_state (params, 0, &params->write);
+  if (ret < 0)
+    return gnutls_assert_val (ret);
+
+  _gnutls_record_log
+    ("REC[%p]: Epoch #%u ready\n", session, params->epoch);
+
+  params->initialized = 1;
+  return 0;
 }
 
-static int
-_gnutls_set_write_keys (gnutls_session_t session)
-{
-  int hash_size;
-  int IV_size;
-  int key_size, export_flag;
-  gnutls_cipher_algorithm_t algo;
-  gnutls_mac_algorithm_t mac_algo;
-
-  mac_algo = session->security_parameters.write_mac_algorithm;
-  algo = session->security_parameters.write_bulk_cipher_algorithm;
-
-  hash_size = _gnutls_hash_get_algo_len (mac_algo);
-  IV_size = _gnutls_cipher_get_iv_size (algo);
-  key_size = gnutls_cipher_get_key_size (algo);
-  export_flag = _gnutls_cipher_get_export_flag (algo);
-
-  return _gnutls_set_keys (session, hash_size, IV_size, key_size,
-			   export_flag);
-}
 
 #define CPY_COMMON dst->entity = src->entity; \
 	dst->kx_algorithm = src->kx_algorithm; \
@@ -397,25 +465,12 @@ _gnutls_set_write_keys (gnutls_session_t session)
 	dst->version = src->version
 
 static void
-_gnutls_cpy_read_security_parameters (security_parameters_st *
-				      dst, security_parameters_st * src)
+_gnutls_set_resumed_parameters (gnutls_session_t session)
 {
+  security_parameters_st *src = &session->internals.resumed_security_parameters;
+  security_parameters_st *dst = &session->security_parameters;
+
   CPY_COMMON;
-
-  dst->read_bulk_cipher_algorithm = src->read_bulk_cipher_algorithm;
-  dst->read_mac_algorithm = src->read_mac_algorithm;
-  dst->read_compression_algorithm = src->read_compression_algorithm;
-}
-
-static void
-_gnutls_cpy_write_security_parameters (security_parameters_st *
-				       dst, security_parameters_st * src)
-{
-  CPY_COMMON;
-
-  dst->write_bulk_cipher_algorithm = src->write_bulk_cipher_algorithm;
-  dst->write_mac_algorithm = src->write_mac_algorithm;
-  dst->write_compression_algorithm = src->write_compression_algorithm;
 }
 
 /* Sets the current connection session to conform with the
@@ -432,15 +487,42 @@ _gnutls_connection_state_init (gnutls_session_t session)
 /* Setup the master secret 
  */
   if ((ret = _gnutls_generate_master (session, 0)) < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
+    return gnutls_assert_val (ret);
 
   return 0;
 }
 
+
+
+static int
+_gnutls_check_algos (gnutls_session_t session,
+		     cipher_suite_st *suite, gnutls_compression_method_t comp_algo)
+{
+  gnutls_cipher_algorithm_t cipher_algo;
+  gnutls_mac_algorithm_t mac_algo;
+
+  cipher_algo = _gnutls_cipher_suite_get_cipher_algo (suite);
+  mac_algo = _gnutls_cipher_suite_get_mac_algo (suite);
+
+  if (_gnutls_cipher_is_ok (cipher_algo) != 0)
+    return gnutls_assert_val (GNUTLS_E_INTERNAL_ERROR);
+
+  if (_gnutls_cipher_priority (session, cipher_algo) < 0)
+    return gnutls_assert_val (GNUTLS_E_UNWANTED_ALGORITHM);
+
+
+  if (_gnutls_mac_is_ok (mac_algo) != 0)
+    return gnutls_assert_val (GNUTLS_E_INTERNAL_ERROR);
+
+  if (_gnutls_mac_priority (session, mac_algo) < 0)
+    return gnutls_assert_val (GNUTLS_E_UNWANTED_ALGORITHM);
+
+
+  if (_gnutls_compression_is_ok (comp_algo) != 0)
+    return gnutls_assert_val (GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM);
+
+  return 0;
+}
 
 /* Initializes the read connection session
  * (read encrypted data)
@@ -448,53 +530,33 @@ _gnutls_connection_state_init (gnutls_session_t session)
 int
 _gnutls_read_connection_state_init (gnutls_session_t session)
 {
-  int mac_size;
-  int rc;
+  const uint16_t epoch_next = session->security_parameters.epoch_next;
+  int ret;
 
-  _gnutls_uint64zero (session->connection_state.read_sequence_number);
-
-/* Update internals from CipherSuite selected.
- * If we are resuming just copy the connection session
- */
+  /* Update internals from CipherSuite selected.
+   * If we are resuming just copy the connection session
+   */
   if (session->internals.resumed == RESUME_FALSE)
     {
-      rc = _gnutls_set_read_cipher (session,
-				    _gnutls_cipher_suite_get_cipher_algo
-				    (&session->
-				     security_parameters.current_cipher_suite));
-      if (rc < 0)
-	return rc;
-      rc = _gnutls_set_read_mac (session,
-				 _gnutls_cipher_suite_get_mac_algo
-				 (&session->
-				  security_parameters.current_cipher_suite));
-      if (rc < 0)
-	return rc;
+      ret = _gnutls_check_algos (session,
+				 &session->security_parameters.current_cipher_suite,
+				 session->internals.compression_method);
+      if (ret < 0)
+	return ret;
 
-      rc = _gnutls_set_kx (session,
-			   _gnutls_cipher_suite_get_kx_algo
-			   (&session->
-			    security_parameters.current_cipher_suite));
-      if (rc < 0)
-	return rc;
-
-      rc = _gnutls_set_read_compression (session,
-					 session->
-					 internals.compression_method);
-      if (rc < 0)
-	return rc;
+      ret = _gnutls_set_kx (session,
+			    _gnutls_cipher_suite_get_kx_algo
+			    (&session->
+			     security_parameters.current_cipher_suite));
+      if (ret < 0)
+	return ret;
     }
-  else
-    { /* RESUME_TRUE */
-      _gnutls_cpy_read_security_parameters (&session->security_parameters,
-					    &session->
-					    internals.resumed_security_parameters);
-    }
+  else if (session->security_parameters.entity == GNUTLS_CLIENT)
+    _gnutls_set_resumed_parameters (session);
 
-
-  rc = _gnutls_set_read_keys (session);
-  if (rc < 0)
-    return rc;
+  ret = _gnutls_epoch_set_keys (session, epoch_next);
+  if (ret < 0)
+    return ret;
 
   _gnutls_handshake_log ("HSK[%p]: Cipher Suite: %s\n",
 			 session,
@@ -502,124 +564,8 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
 			 (&session->
 			  security_parameters.current_cipher_suite));
 
-  if (_gnutls_compression_is_ok
-      (session->security_parameters.read_compression_algorithm) != 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
-    }
-
-  if (_gnutls_mac_is_ok
-      (session->security_parameters.read_mac_algorithm) != 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  /* Free all the previous keys/ sessions etc.
-   */
-  if (session->connection_state.read_mac_secret.data != NULL)
-    _gnutls_free_datum (&session->connection_state.read_mac_secret);
-
-  _gnutls_cipher_deinit (&session->connection_state.read_cipher_state);
-
-  if (session->connection_state.read_compression_state != NULL)
-    _gnutls_comp_deinit (session->connection_state.read_compression_state, 1);
-
-
-  mac_size =
-    _gnutls_hash_get_algo_len (session->
-			       security_parameters.read_mac_algorithm);
-
-  _gnutls_handshake_log
-    ("HSK[%p]: Initializing internal [read] cipher sessions\n", session);
-
-  switch (session->security_parameters.entity)
-    {
-    case GNUTLS_SERVER:
-      /* initialize cipher session
-       */
-      rc = _gnutls_cipher_init (&session->connection_state.read_cipher_state,
-				session->security_parameters.
-				read_bulk_cipher_algorithm,
-				&session->cipher_specs.client_write_key,
-				&session->cipher_specs.client_write_IV);
-      if (rc < 0
-	  && session->security_parameters.read_bulk_cipher_algorithm !=
-	  GNUTLS_CIPHER_NULL)
-	{
-	  gnutls_assert ();
-	  return rc;
-	}
-
-      /* copy mac secrets from cipherspecs, to connection
-       * session.
-       */
-      if (mac_size > 0)
-	{
-	  if (_gnutls_sset_datum (&session->connection_state.read_mac_secret,
-				  session->
-				  cipher_specs.client_write_mac_secret.data,
-				  session->
-				  cipher_specs.client_write_mac_secret.size) <
-	      0)
-	    {
-	      gnutls_assert ();
-	      return GNUTLS_E_MEMORY_ERROR;
-	    }
-
-	}
-
-      break;
-
-    case GNUTLS_CLIENT:
-      rc = _gnutls_cipher_init (&session->connection_state.read_cipher_state,
-				session->security_parameters.
-				read_bulk_cipher_algorithm,
-				&session->cipher_specs.server_write_key,
-				&session->cipher_specs.server_write_IV);
-
-      if (rc < 0
-	  && session->security_parameters.read_bulk_cipher_algorithm !=
-	  GNUTLS_CIPHER_NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-
-      /* copy mac secret to connection session
-       */
-      if (mac_size > 0)
-	{
-	  if (_gnutls_sset_datum (&session->connection_state.read_mac_secret,
-				  session->
-				  cipher_specs.server_write_mac_secret.data,
-				  session->
-				  cipher_specs.server_write_mac_secret.size) <
-	      0)
-	    {
-	      gnutls_assert ();
-	      return GNUTLS_E_MEMORY_ERROR;
-	    }
-	}
-
-      break;
-
-    default:			/* this check is useless */
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  session->connection_state.read_compression_state =
-    _gnutls_comp_init (session->
-		       security_parameters.read_compression_algorithm, 1);
-
-  if (session->connection_state.read_compression_state == GNUTLS_COMP_FAILED)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
-    }
+  session->security_parameters.epoch_read = epoch_next;
+  _gnutls_epoch_gc (session);
 
   return 0;
 }
@@ -632,280 +578,49 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
 int
 _gnutls_write_connection_state_init (gnutls_session_t session)
 {
-  int mac_size;
-  int rc;
-
-  _gnutls_uint64zero (session->connection_state.write_sequence_number);
+  const uint16_t epoch_next = session->security_parameters.epoch_next;
+  int ret;
 
 /* Update internals from CipherSuite selected.
  * If we are resuming just copy the connection session
  */
   if (session->internals.resumed == RESUME_FALSE)
     {
-      rc = _gnutls_set_write_cipher (session,
-				     _gnutls_cipher_suite_get_cipher_algo
-				     (&session->
-				      security_parameters.current_cipher_suite));
-      if (rc < 0)
-	return rc;
-      rc = _gnutls_set_write_mac (session,
-				  _gnutls_cipher_suite_get_mac_algo
-				  (&session->
-				   security_parameters.current_cipher_suite));
-      if (rc < 0)
-	return rc;
+      ret = _gnutls_check_algos (session,
+				 &session->security_parameters.current_cipher_suite,
+				 session->internals.compression_method);
+      if (ret < 0)
+	return ret;
 
-      rc = _gnutls_set_kx (session,
-			   _gnutls_cipher_suite_get_kx_algo
-			   (&session->
-			    security_parameters.current_cipher_suite));
-      if (rc < 0)
-	return rc;
-
-      rc = _gnutls_set_write_compression (session,
-					  session->
-					  internals.compression_method);
-      if (rc < 0)
-	return rc;
+      ret = _gnutls_set_kx (session,
+			    _gnutls_cipher_suite_get_kx_algo
+			    (&session->
+			     security_parameters.current_cipher_suite));
+      if (ret < 0)
+	return ret;
     }
-  else
-    {				/* RESUME_TRUE */
-      _gnutls_cpy_write_security_parameters (&session->security_parameters,
-					     &session->
-					     internals.resumed_security_parameters);
-      _gnutls_ext_restore_resumed_session(session);
-    }
+  else if (session->security_parameters.entity == GNUTLS_SERVER)
+    _gnutls_set_resumed_parameters (session);
 
-  rc = _gnutls_set_write_keys (session);
-  if (rc < 0)
-    return rc;
+  ret = _gnutls_epoch_set_keys (session, epoch_next);
+  if (ret < 0)
+    return gnutls_assert_val (ret);
 
   _gnutls_handshake_log ("HSK[%p]: Cipher Suite: %s\n", session,
 			 _gnutls_cipher_suite_get_name
 			 (&session->
 			  security_parameters.current_cipher_suite));
 
-  if (_gnutls_compression_is_ok
-      (session->security_parameters.write_compression_algorithm) != 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
-    }
-
-  if (_gnutls_mac_is_ok
-      (session->security_parameters.write_mac_algorithm) != 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-
-
-  /* Free all the previous keys/ sessions etc.
-   */
-  if (session->connection_state.write_mac_secret.data != NULL)
-    _gnutls_free_datum (&session->connection_state.write_mac_secret);
-
-  _gnutls_cipher_deinit (&session->connection_state.write_cipher_state);
-
-  if (session->connection_state.write_compression_state != NULL)
-    _gnutls_comp_deinit (session->connection_state.write_compression_state,
-			 0);
-
-  mac_size =
-    _gnutls_hash_get_algo_len (session->
-			       security_parameters.write_mac_algorithm);
-
   _gnutls_handshake_log
     ("HSK[%p]: Initializing internal [write] cipher sessions\n", session);
 
-  switch (session->security_parameters.entity)
-    {
-    case GNUTLS_SERVER:
-      /* initialize cipher session
-       */
-      rc = _gnutls_cipher_init (&session->connection_state.write_cipher_state,
-				session->
-				security_parameters.write_bulk_cipher_algorithm,
-				&session->cipher_specs.server_write_key,
-				&session->cipher_specs.server_write_IV);
-
-      if (rc < 0
-	  && session->security_parameters.write_bulk_cipher_algorithm !=
-	  GNUTLS_CIPHER_NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-
-      /* copy mac secrets from cipherspecs, to connection
-       * session.
-       */
-      if (mac_size > 0)
-	{
-	  if (_gnutls_sset_datum (&session->connection_state.write_mac_secret,
-				  session->
-				  cipher_specs.server_write_mac_secret.data,
-				  session->
-				  cipher_specs.server_write_mac_secret.size) <
-	      0)
-	    {
-	      gnutls_assert ();
-	      return GNUTLS_E_MEMORY_ERROR;
-	    }
-
-	}
-
-
-      break;
-
-    case GNUTLS_CLIENT:
-      rc = _gnutls_cipher_init (&session->connection_state.write_cipher_state,
-				session->
-				security_parameters.write_bulk_cipher_algorithm,
-				&session->cipher_specs.client_write_key,
-				&session->cipher_specs.client_write_IV);
-
-      if (rc < 0
-	  && session->security_parameters.write_bulk_cipher_algorithm !=
-	  GNUTLS_CIPHER_NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
-
-      /* copy mac secret to connection session
-       */
-      if (mac_size > 0)
-	{
-	  if (_gnutls_sset_datum (&session->connection_state.write_mac_secret,
-				  session->
-				  cipher_specs.client_write_mac_secret.data,
-				  session->
-				  cipher_specs.client_write_mac_secret.size) <
-	      0)
-	    {
-	      gnutls_assert ();
-	      return GNUTLS_E_MEMORY_ERROR;
-	    }
-	}
-
-      break;
-
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-
-  session->connection_state.write_compression_state =
-    _gnutls_comp_init (session->
-		       security_parameters.write_compression_algorithm, 0);
-
-  if (session->connection_state.write_compression_state == GNUTLS_COMP_FAILED)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
-    }
+  session->security_parameters.epoch_write = epoch_next;
+  _gnutls_epoch_gc (session);
 
   return 0;
 }
 
-/* Sets the specified cipher into the pending session 
- */
-int
-_gnutls_set_read_cipher (gnutls_session_t session,
-			 gnutls_cipher_algorithm_t algo)
-{
-
-  if (_gnutls_cipher_is_ok (algo) == 0)
-    {
-      if (_gnutls_cipher_priority (session, algo) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_UNWANTED_ALGORITHM;
-	}
-
-      session->security_parameters.read_bulk_cipher_algorithm = algo;
-
-    }
-  else
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  return 0;
-
-}
-
-int
-_gnutls_set_write_cipher (gnutls_session_t session,
-			  gnutls_cipher_algorithm_t algo)
-{
-
-  if (_gnutls_cipher_is_ok (algo) == 0)
-    {
-      if (_gnutls_cipher_priority (session, algo) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_UNWANTED_ALGORITHM;
-	}
-
-      session->security_parameters.write_bulk_cipher_algorithm = algo;
-
-    }
-  else
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  return 0;
-
-}
-
-
-/* Sets the specified algorithm into pending compression session 
- */
-int
-_gnutls_set_read_compression (gnutls_session_t session,
-			      gnutls_compression_method_t algo)
-{
-
-  if (_gnutls_compression_is_ok (algo) == 0)
-    {
-      session->security_parameters.read_compression_algorithm = algo;
-    }
-  else
-    {
-      gnutls_assert ();
-      return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
-    }
-  return 0;
-
-}
-
-int
-_gnutls_set_write_compression (gnutls_session_t session,
-			       gnutls_compression_method_t algo)
-{
-
-  if (_gnutls_compression_is_ok (algo) == 0)
-    {
-      session->security_parameters.write_compression_algorithm = algo;
-    }
-  else
-    {
-      gnutls_assert ();
-      return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
-    }
-  return 0;
-
-}
-
-/* Sets the specified kx algorithm into pending session 
+/* Sets the specified kx algorithm into pending session
  */
 int
 _gnutls_set_kx (gnutls_session_t session, gnutls_kx_algorithm_t algo)
@@ -916,66 +631,177 @@ _gnutls_set_kx (gnutls_session_t session, gnutls_kx_algorithm_t algo)
       session->security_parameters.kx_algorithm = algo;
     }
   else
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
+    return gnutls_assert_val (GNUTLS_E_INTERNAL_ERROR);
+
   if (_gnutls_kx_priority (session, algo) < 0)
-    {
-      gnutls_assert ();
-      /* we shouldn't get here */
-      return GNUTLS_E_UNWANTED_ALGORITHM;
-    }
+    return gnutls_assert_val (GNUTLS_E_UNWANTED_ALGORITHM);
 
   return 0;
-
 }
 
-/* Sets the specified mac algorithm into pending session */
-int
-_gnutls_set_read_mac (gnutls_session_t session, gnutls_mac_algorithm_t algo)
+static inline int
+epoch_resolve(gnutls_session_t session,
+	      unsigned int epoch_rel, uint16_t *epoch_out)
 {
-
-  if (_gnutls_mac_is_ok (algo) == 0)
+  switch (epoch_rel)
     {
-      session->security_parameters.read_mac_algorithm = algo;
+    case EPOCH_READ_CURRENT:
+      *epoch_out = session->security_parameters.epoch_read;
+      return 0;
+
+    case EPOCH_WRITE_CURRENT:
+      *epoch_out = session->security_parameters.epoch_write;
+      return 0;
+
+    case EPOCH_NEXT:
+      *epoch_out = session->security_parameters.epoch_next;
+      return 0;
+
+    default:
+      if (epoch_rel > 0xffffu)
+	return gnutls_assert_val (GNUTLS_E_INVALID_REQUEST);
+
+      *epoch_out = epoch_rel;
+      return 0;
     }
-  else
+}
+
+static inline record_parameters_st**
+epoch_get_slot(gnutls_session_t session, uint16_t epoch)
+{
+  uint16_t epoch_index =
+    epoch - session->security_parameters.epoch_min;
+
+  if (epoch_index >= MAX_EPOCH_INDEX)
     {
       gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-  if (_gnutls_mac_priority (session, algo) < 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_UNWANTED_ALGORITHM;
+      return NULL;
     }
 
-
-  return 0;
-
+  /* The slot may still be empty (NULL) */
+  return &session->record_parameters[epoch_index];
 }
 
 int
-_gnutls_set_write_mac (gnutls_session_t session, gnutls_mac_algorithm_t algo)
+_gnutls_epoch_get (gnutls_session_t session, unsigned int epoch_rel,
+		   record_parameters_st **params_out)
 {
+  uint16_t epoch;
+  record_parameters_st **params;
+  int ret;
 
-  if (_gnutls_mac_is_ok (algo) == 0)
-    {
-      session->security_parameters.write_mac_algorithm = algo;
-    }
-  else
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-  if (_gnutls_mac_priority (session, algo) < 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_UNWANTED_ALGORITHM;
-    }
+  ret = epoch_resolve (session, epoch_rel, &epoch);
+  if (ret < 0)
+    return gnutls_assert_val (ret);
 
+  params = epoch_get_slot (session, epoch);
+  if (params == NULL || *params == NULL)
+    return gnutls_assert_val (GNUTLS_E_INVALID_REQUEST);
+
+  *params_out = *params;
 
   return 0;
+}
 
+int
+_gnutls_epoch_alloc(gnutls_session_t session, uint16_t epoch,
+		    record_parameters_st **out)
+{
+  record_parameters_st **slot;
+
+  _gnutls_record_log
+    ("REC[%p]: Allocating epoch #%u\n", session, epoch);
+
+  slot = epoch_get_slot(session, epoch);
+
+  /* If slot out of range or not empty. */
+  if (slot == NULL)
+    return gnutls_assert_val (GNUTLS_E_INVALID_REQUEST);
+
+  if(*slot != NULL)
+    return gnutls_assert_val (GNUTLS_E_INVALID_REQUEST);
+
+  *slot = gnutls_calloc (1, sizeof (record_parameters_st));
+  if (*slot == NULL)
+    return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
+
+  (*slot)->epoch = epoch;
+  (*slot)->cipher_algorithm =  GNUTLS_CIPHER_UNKNOWN;
+  (*slot)->mac_algorithm = GNUTLS_MAC_UNKNOWN;
+  (*slot)->compression_algorithm =  GNUTLS_COMP_UNKNOWN;
+
+  if (out != NULL)
+    *out = *slot;
+
+  return 0;
+}
+
+static inline int
+epoch_alive (gnutls_session_t session, record_parameters_st *params)
+{
+  const security_parameters_st *sp = &session->security_parameters;
+
+  /* DTLS will, in addition, need to check the epoch timeout value. */
+  return (params->epoch == sp->epoch_read
+	  || params->epoch == sp->epoch_write
+	  || params->epoch == sp->epoch_next);
+}
+
+void
+_gnutls_epoch_gc (gnutls_session_t session)
+{
+  int i, j;
+  unsigned int min_index = 0;
+
+  _gnutls_record_log
+    ("REC[%p]: Start of epoch cleanup\n", session);
+
+  /* Free all dead cipher state */
+  for(i=0; i < MAX_EPOCH_INDEX; i++)
+    if (session->record_parameters[i] != NULL
+	&& !epoch_alive (session, session->record_parameters[i]))
+      {
+	_gnutls_epoch_free (session, session->record_parameters[i]);
+	session->record_parameters[i] = NULL;
+      }
+
+  /* Look for contiguous NULLs at the start of the array */
+  for(i=0; i < MAX_EPOCH_INDEX && session->record_parameters[i] == NULL; i++);
+  min_index = i;
+
+  /* Pick up the slack in the epoch window. */
+  for(i=0, j=min_index; j < MAX_EPOCH_INDEX; i++, j++)
+    session->record_parameters[i] = session->record_parameters[j];
+
+  /* Set the new epoch_min */
+  if (session->record_parameters[0] != NULL)
+    session->security_parameters.epoch_min = session->record_parameters[0]->epoch;
+
+  _gnutls_record_log
+    ("REC[%p]: End of epoch cleanup\n", session);
+}
+
+static inline void
+free_record_state (record_state_st *state, int read)
+{
+  _gnutls_free_datum (&state->mac_secret);
+  _gnutls_free_datum (&state->IV);
+  _gnutls_free_datum (&state->key);
+
+  _gnutls_cipher_deinit (&state->cipher_state);
+
+  if (state->compression_state != NULL)
+    _gnutls_comp_deinit (state->compression_state, read);
+}
+
+void
+_gnutls_epoch_free (gnutls_session_t session, record_parameters_st *params)
+{
+  _gnutls_record_log
+    ("REC[%p]: Epoch #%u freed\n", session, params->epoch);
+
+  free_record_state (&params->read, 1);
+  free_record_state (&params->write, 0);
+
+  gnutls_free (params);
 }
