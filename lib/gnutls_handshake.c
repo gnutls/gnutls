@@ -672,8 +672,7 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 
   if (again == 0)
     {
-      bufel =
-        _gnutls_handshake_alloc (MAX_VERIFY_DATA_SIZE, MAX_VERIFY_DATA_SIZE);
+      bufel = _gnutls_handshake_alloc (session, MAX_VERIFY_DATA_SIZE, MAX_VERIFY_DATA_SIZE);
       if (bufel == NULL)
         {
           gnutls_assert ();
@@ -1093,7 +1092,7 @@ _gnutls_send_empty_handshake (gnutls_session_t session,
 
   if (again == 0)
     {
-      bufel = _gnutls_handshake_alloc (0, 0);
+      bufel = _gnutls_handshake_alloc (session, 0, 0);
       if (bufel == NULL)
         {
           gnutls_assert ();
@@ -2049,8 +2048,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       /* 2 for version, (4 for unix time + 28 for random bytes==GNUTLS_RANDOM_SIZE) 
        */
 
-      bufel =
-        _gnutls_handshake_alloc (datalen, datalen + MAX_EXT_DATA_LENGTH);
+      bufel = _gnutls_handshake_alloc (session, datalen, datalen+MAX_EXT_DATA_LENGTH);
       if (bufel == NULL)
         {
           gnutls_assert ();
@@ -2224,8 +2222,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
           goto fail;
         }
 
-      bufel =
-        _gnutls_handshake_alloc (datalen + extdata.length, datalen + extdata.length);
+      bufel = _gnutls_handshake_alloc (session, datalen + extdatalen, datalen + extdatalen);
       if (bufel == NULL)
         {
           gnutls_assert ();
@@ -2541,7 +2538,7 @@ _gnutls_send_supplemental (gnutls_session_t session, int again)
           return ret;
         }
 
-      bufel = _gnutls_handshake_alloc (buf.length, buf.length);
+      bufel = _gnutls_handshake_alloc(session, buf.length, buf.length);
       if (bufel == NULL)
         {
           gnutls_assert ();

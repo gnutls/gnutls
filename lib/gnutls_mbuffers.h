@@ -93,7 +93,7 @@ _mbuffer_set_uhead_size (mbuffer_st * bufel, size_t size)
 
 
 inline static mbuffer_st *
-_gnutls_handshake_alloc (size_t size, size_t maximum)
+_gnutls_handshake_alloc (gnutls_session_t session, size_t size, size_t maximum)
 {
   mbuffer_st *ret = _mbuffer_alloc (HANDSHAKE_HEADER_SIZE + size,
                                     HANDSHAKE_HEADER_SIZE + maximum);

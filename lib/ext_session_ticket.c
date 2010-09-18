@@ -648,8 +648,7 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
       ticket_len = KEY_NAME_SIZE + IV_SIZE + 2 + ticket.encrypted_state_len
         + MAC_SIZE;
 
-      bufel =
-        _gnutls_handshake_alloc (4 + 2 + ticket_len, 4 + 2 + ticket_len);
+      bufel = _gnutls_handshake_alloc (session, 4 + 2 + ticket_len, 4+2+ticket_len);
       if (!bufel)
         {
           gnutls_assert ();
