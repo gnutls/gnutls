@@ -434,3 +434,4 @@ m4/
 po/
 lib/m4
 lgl/
+/tests/openpgp-auth
