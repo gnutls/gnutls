@@ -758,7 +758,6 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
 	  goto error;
 	}
     }
-
     /* fixup will generate exp1 and exp2 that are not
      * available here.
      */
