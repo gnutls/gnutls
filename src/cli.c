@@ -768,6 +768,9 @@ after_handshake:
   signal (SIGALRM, &starttls_alarm);
 #endif
 
+  fflush(stdout);
+  fflush(stderr);
+
   /* do not buffer */
 #if !(defined _WIN32 || defined __WIN32__)
   setbuf (stdin, NULL);
