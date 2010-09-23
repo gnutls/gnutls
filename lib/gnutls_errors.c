@@ -43,7 +43,9 @@ struct gnutls_error_entry
   const char *desc;
   const char *_name;
   int number;
-  int fatal;
+  int fatal; /* whether this error is fatal and the session for handshake 
+              * should be terminated.
+              */
 };
 typedef struct gnutls_error_entry gnutls_error_entry;
 
@@ -92,7 +94,7 @@ static const gnutls_error_entry error_algorithms[] = {
 	       GNUTLS_E_NO_CERTIFICATE_FOUND, 1),
 
   ERROR_ENTRY (N_("There is already a crypto algorithm with lower priority."),
-	       GNUTLS_E_CRYPTO_ALREADY_REGISTERED, 0),
+	       GNUTLS_E_CRYPTO_ALREADY_REGISTERED, 1),
 
   ERROR_ENTRY (N_("No temporary RSA parameters were found."),
 	       GNUTLS_E_NO_TEMPORARY_RSA_PARAMS, 1),
@@ -140,7 +142,7 @@ static const gnutls_error_entry error_algorithms[] = {
   ERROR_ENTRY (N_("Parsing error in password file."),
 	       GNUTLS_E_SRP_PWD_PARSING_ERROR, 1),
   ERROR_ENTRY (N_("The requested data were not available."),
-	       GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE, 0),
+	       GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE, 1),
   ERROR_ENTRY (N_("Error in the pull function."), GNUTLS_E_PULL_ERROR, 1),
   ERROR_ENTRY (N_("Error in the push function."), GNUTLS_E_PUSH_ERROR, 1),
   ERROR_ENTRY (N_
