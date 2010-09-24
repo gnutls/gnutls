@@ -2665,13 +2665,13 @@ gnutls_handshake (gnutls_session_t session)
 }
 
 
-#define IMED_RET( str, ret, check_fatal) do { \
+#define IMED_RET( str, ret, allow_alert) do { \
 	if (ret < 0) { \
 		/* EAGAIN and INTERRUPTED are always non-fatal */ \
 		if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED) \
 			return ret; \
                 /* a warning alert might interrupt handshake */ \
-		if (check_fatal != 0 && ret==GNUTLS_E_WARNING_ALERT_RECEIVED) return ret; \
+		if (allow_alert != 0 && ret==GNUTLS_E_WARNING_ALERT_RECEIVED) return ret; \
 		gnutls_assert(); \
 		ERR( str, ret); \
 		_gnutls_handshake_hash_buffers_clear(session); \
