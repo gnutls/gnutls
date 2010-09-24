@@ -5,15 +5,11 @@ in order to avoid having people working on the same thing.
 Current list:
 + Support PKCS#8 AES and DES-MD5 (tests/enc3pkcs8.pem) encrypted keys.
 * Implement Datagram-TLS (DTLS).
-* Cleanup pkix.asn and remove unused (by the certificate api) structures.
-  That way memory used will be reduced.
-* Improve or rewrite libtasn1 to make it easier to maintain.
+* Implement TLS-PSK with PKCS #11.
 * Verify added CRLs (is it really needed?)
 * Add support for generating empty CRLs
 * Document the format for the supported DN attributes.
 * Audit the code
-- Support OpenSSL encrypted PKCS#1 RSA keys, for compatibility (new
-  applications should use PKCS#8 instead).
 - Allow verifying of certificates on their reception.
 - Add gnutls_certificate_set_openpgp_keyring()
   function, similar to gnutls_certificate_set_openpgp_key().
@@ -71,16 +67,6 @@ Current list:
   TLS.
 - Make gnutls_certificate_get_ours return a zero-terminated array (or
   add a new API that return the size of the array).
-- Debug why www-s.uiuc.edu:443 refuse to negotiate sslv3 when we propose
-  sslv3+tls1.
-- Investigate why failed client authentication results in weird error
-  messages.  See http://permalink.gmane.org/gmane.network.gnutls.general/875
-- Print X.509 DN in the proper order.
-- Debug why connections to smtp.hispeed.ch fails (Debian #429183).
-  Most likely the server is buggy, but it would be useful to document
-  the problem better.
-- The return value of gnutls_dh_get_prime_bits and probably other get*bits
-  functions' are rounded up on byte level. Fix it.
 
 (+) Means high priority 
 (*) Means medium priority
