@@ -158,8 +158,6 @@ wrap_gcry_cipher_close (void *h)
 }
 
 
-int crypto_cipher_prio = INT_MAX;
-
 gnutls_crypto_cipher_st _gnutls_cipher_ops = {
   .init = wrap_gcry_cipher_init,
   .setkey = wrap_gcry_cipher_setkey,

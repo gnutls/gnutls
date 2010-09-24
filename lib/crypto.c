@@ -31,6 +31,11 @@
 #include <random.h>
 #include <gnutls_cipher_int.h>
 
+/* default values for priorities */
+int crypto_mac_prio = INT_MAX;
+int crypto_digest_prio = INT_MAX;
+int crypto_cipher_prio = INT_MAX;
+
 typedef struct algo_list
 {
   int algorithm;

@@ -159,7 +159,6 @@ wrap_gcry_mac_output (void *src_ctx, void *digest, size_t digestsize)
   return GNUTLS_E_HASH_FAILED;
 }
 
-int crypto_mac_prio = INT_MAX;
 
 gnutls_crypto_mac_st _gnutls_mac_ops = {
   .init = wrap_gcry_mac_init,
@@ -169,8 +168,6 @@ gnutls_crypto_mac_st _gnutls_mac_ops = {
   .output = wrap_gcry_mac_output,
   .deinit = wrap_gcry_md_close,
 };
-
-int crypto_digest_prio = INT_MAX;
 
 gnutls_crypto_digest_st _gnutls_digest_ops = {
   .init = wrap_gcry_hash_init,

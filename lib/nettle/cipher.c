@@ -296,9 +296,6 @@ wrap_nettle_cipher_close (void *h)
 	gnutls_free(h);
 }
 
-
-int crypto_cipher_prio = INT_MAX;
-
 gnutls_crypto_cipher_st _gnutls_cipher_ops = {
   .init = wrap_nettle_cipher_init,
   .setkey = wrap_nettle_cipher_setkey,

@@ -314,8 +314,6 @@ wrap_nettle_hmac_output(void *src_ctx, void *digest, size_t digestsize)
 	return 0;
 }
 
-int crypto_mac_prio = INT_MAX;
-
 gnutls_crypto_mac_st _gnutls_mac_ops = {
     .init = wrap_nettle_hmac_init,
     .setkey = wrap_nettle_hmac_setkey,
@@ -324,8 +322,6 @@ gnutls_crypto_mac_st _gnutls_mac_ops = {
     .output = wrap_nettle_hmac_output,
     .deinit = wrap_nettle_md_close,
 };
-
-int crypto_digest_prio = INT_MAX;
 
 gnutls_crypto_digest_st _gnutls_digest_ops = {
     .init = wrap_nettle_hash_init,
