@@ -382,8 +382,11 @@ session_ticket_send_params (gnutls_session_t session,
       ret = _gnutls_ext_get_resumed_session_data( session, GNUTLS_EXTENSION_SESSION_TICKET, &epriv);
       if (ret >= 0)
 	priv = epriv.ptr;
+	
+      if (ret < 0)
+        return GNUTLS_E_INT_RET_0;
 
-      if (ret < 0 || !priv->session_ticket_enable)
+      if (!priv->session_ticket_enable)
 	return 0;
 
       if (priv->session_ticket_len > 0)
