@@ -130,7 +130,7 @@ void gaa_help(void)
 	__gaa_helpsingle('d', "debug", "integer ", "Enable debugging");
 	__gaa_helpsingle('r', "resume", "", "Connect, establish a session. Connect again and resume this session.");
 	__gaa_helpsingle('e', "rehandshake", "", "Connect, establish a session and rehandshake immediately.");
-	__gaa_helpsingle(0, "noticket", "", "Doen't accept session tickets.");
+	__gaa_helpsingle(0, "noticket", "", "Doesn't accept session tickets.");
 	__gaa_helpsingle('s', "starttls", "", "Connect, establish a plain session and start TLS when EOF or a SIGALRM is received.");
 	__gaa_helpsingle(0, "crlf", "", "Send CR LF instead of LF.");
 	__gaa_helpsingle(0, "x509fmtder", "", "Use DER format for certificates to read from.");

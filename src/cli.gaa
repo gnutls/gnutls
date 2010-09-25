@@ -21,7 +21,7 @@ option (r, resume) { $resume = 1 } "Connect, establish a session. Connect again 
 option (e, rehandshake) { $rehandshake = 1 } "Connect, establish a session and rehandshake immediately."
 
 #int noticket;
-option (noticket) { $noticket = 1 } "Doen't accept session tickets."
+option (noticket) { $noticket = 1 } "Doesn't accept session tickets."
 
 #int starttls;
 option (s, starttls) { $starttls = 1 } "Connect, establish a plain session and start TLS when EOF or a SIGALRM is received."
