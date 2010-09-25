@@ -383,9 +383,11 @@ session_ticket_send_params (gnutls_session_t session,
       if (ret >= 0)
 	priv = epriv.ptr;
 	
+      /* no previous data. Just advertize it */
       if (ret < 0)
         return GNUTLS_E_INT_RET_0;
 
+      /* previous data had session tickets disabled. Don't advertize. Ignore. */
       if (!priv->session_ticket_enable)
 	return 0;
 
@@ -395,10 +397,6 @@ session_ticket_send_params (gnutls_session_t session,
 	  memcpy (data, priv->session_ticket, priv->session_ticket_len);
 
 	  return priv->session_ticket_len;
-	}
-      else
-	{
-	  return GNUTLS_E_INT_RET_0;
 	}
     }
   return 0;
