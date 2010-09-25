@@ -53,7 +53,7 @@
 #define MAX_BUF 4096
 
 /* global stuff here */
-int resume, starttls, insecure, rehandshake;
+int resume, starttls, insecure, rehandshake, dtls;
 const char *hostname = NULL;
 char *service;
 int record_max_size;
@@ -551,7 +551,10 @@ init_tls_session (const char *hostname)
 
   gnutls_session_t session;
 
-  gnutls_init (&session, GNUTLS_CLIENT);
+  if (dtls)
+    gnutls_init_dtls (&session, GNUTLS_CLIENT, 0);
+  else
+    gnutls_init (&session, GNUTLS_CLIENT);
 
   if (gnutls_priority_set_direct (session, info.priorities, &err) < 0)
     {
@@ -974,6 +977,7 @@ gaa_parser (int argc, char **argv)
   resume = info.resume;
   rehandshake = info.rehandshake;
   insecure = info.insecure;
+  dtls = info.dtls;
   service = info.port;
   record_max_size = info.record_size;
   fingerprint = info.fingerprint;
@@ -1392,7 +1396,7 @@ socket_open (socket_st * hd, const char *hostname, const char *service)
   printf ("Resolving '%s'...\n", hostname);
   /* get server name */
   memset (&hints, 0, sizeof (hints));
-  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_socktype = dtls ? SOCK_DGRAM : SOCK_STREAM;
   if ((err = getaddrinfo (hostname, service, &hints, &res)))
     {
       fprintf (stderr, "Cannot resolve %s:%s: %s\n", hostname, service,

@@ -26,6 +26,9 @@ option (noticket) { $noticket = 1 } "Doesn't accept session tickets."
 #int starttls;
 option (s, starttls) { $starttls = 1 } "Connect, establish a plain session and start TLS when EOF or a SIGALRM is received."
 
+#int dtls;
+option (u, dtls) { $dtls = 1 } "Use DTLS (datagram TLS)."
+
 #int crlf;
 option (crlf) { $crlf = 1 } "Send CR LF instead of LF."
 
@@ -108,4 +111,4 @@ init { $resume=0; $noticket=0; $port="443"; $rest_args=NULL;
 	$srp_username=NULL; $srp_passwd=NULL; $fmtder = 0; $starttls =0; 
 	$debug = 0; $print_cert = 0; $verbose = 0; $psk_key = NULL; 
 	$psk_username = NULL; $priorities = NULL;
-	$pgp_subkey = NULL; $rehandshake = 0; }
+	$pgp_subkey = NULL; $rehandshake = 0; $dtls = 0; }
