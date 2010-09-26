@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.10.2 (unreleased)
 
+** Use Libtool 2.2.10 to ease MinGW64 builds.
+
 ** libgnutls: Is now more liberal in the PEM decoding.
 That is spaces and tabs are being skipped.
 
