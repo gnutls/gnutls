@@ -5,15 +5,25 @@ See the end for copying conditions.
 
 * Version 2.10.2 (unreleased)
 
-** libgnutls: Is now more liberal in the PEM decoding. That is spaces and 
-tabs are being skipped.
+** libgnutls: Is now more liberal in the PEM decoding.
+That is spaces and tabs are being skipped.
 
-** libgnutls: Renamed NULL MAC to MAC-NULL to prevent clash with NULL
-cipher. This prevented the usage of the TLS ciphersuites with NULL
-cipher.
+** libgnutls: Renamed NULL MAC to MAC-NULL to prevent clash with NULL cipher.
+This prevented the usage of the TLS ciphersuites with NULL cipher.
+See <http://thread.gmane.org/gmane.network.gnutls.general/2093>.
 
 ** libgnutls: The %COMPAT flag now allows larger records that violate the
 TLS spec.
+
+** libgnutls: Fix asynchronous API handling.
+The code was clearing session hash data on EAGAIN.  Problem reported
+by Sjoerd Simons <sjoerd.simons@collabora.co.uk> and Vivek
+Dasmohapatra <vivek@collabora.co.uk>.  See
+<http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/4531>.
+
+** gnutls-cli: Flush stdout/stderr before removing buffering.
+Reported by Knut Anders Hatlen <INVALID.NOREPLY@gnu.org> see
+<http://savannah.gnu.org/support/?107481>.
 
 ** API and ABI modifications:
 No changes since last version.
