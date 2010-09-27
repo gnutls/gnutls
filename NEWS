@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version 2.11.2 (unreleased)
 
+** certtool: Renamed PKCS #11 options to: --p11-provider,
+--p11-export-url, --p11-list-certs, --p11-list-certs,
+--p11-list-privkeys, --p11-list-trusted, --p11-list-all-certs,
+--p11-list-all, --p11-list-tokens, --p11-login, --p11-write,
+--p11-write-label, --p11-write-trusted, --p11-detailed-url,
+--p11-delete-url
+
 ** libgnutls: Corrected bug that caused importing DSA keys as RSA,
 introduced with the new nettle code.
 
