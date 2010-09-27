@@ -24,7 +24,7 @@ Dasmohapatra <vivek@collabora.co.uk>.  See
 <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/4531>.
 
 ** gnutls-cli: Flush stdout/stderr before removing buffering.
-Reported by Knut Anders Hatlen <INVALID.NOREPLY@gnu.org> see
+Reported by Knut Anders Hatlen see
 <http://savannah.gnu.org/support/?107481>.
 
 ** API and ABI modifications:
