@@ -273,8 +273,7 @@ session_ticket_recv_params (gnutls_session_t session,
   ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_SESSION_TICKET, &epriv);
   if (ret < 0)
     {
-      gnutls_assert();
-      return ret;
+      return 0;
     }
   priv = epriv.ptr;
 
