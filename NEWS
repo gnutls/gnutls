@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.11.2 (unreleased)
 
+** libgnutls: Several bug fixes on session resumption
+and session tickets support.
+
 ** libgnutls: Add new extended key usage ipsecIKE.
 
 ** certtool: Renamed PKCS #11 options to: --p11-provider,
