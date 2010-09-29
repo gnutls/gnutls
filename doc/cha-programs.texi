@@ -332,6 +332,9 @@ signing_key
 
 # Whether this key will be used for time stamping.
 #time_stamping_key
+
+# Whether this key will be used for IPsec IKE operations.
+#ipsec_ike_key
 @end example
 
 @node Invoking gnutls-cli

@@ -469,6 +469,8 @@ print_key_purpose (gnutls_buffer_st * str, const char *prefix, int type,
 	addf (str, _("%s\t\t\tTime stamping.\n"), prefix);
       else if (strcmp (buffer, GNUTLS_KP_OCSP_SIGNING) == 0)
 	addf (str, _("%s\t\t\tOCSP signing.\n"), prefix);
+      else if (strcmp (buffer, GNUTLS_KP_IPSEC_IKE) == 0)
+	addf (str, _("%s\t\t\tIpsec IKE.\n"), prefix);
       else if (strcmp (buffer, GNUTLS_KP_ANY) == 0)
 	addf (str, _("%s\t\t\tAny purpose.\n"), prefix);
       else

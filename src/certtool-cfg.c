@@ -76,6 +76,7 @@ typedef struct _cfg_ctx
   int code_sign_key;
   int ocsp_sign_key;
   int time_stamping_key;
+  int ipsec_ike_key;
   char **key_purpose_oids;
   int crl_next_update;
   int crl_number;
@@ -166,6 +167,8 @@ template_parse (const char *template)
      (void *) &cfg.ocsp_sign_key, 0},
     {NULL, '\0', "time_stamping_key", CFG_BOOL,
      (void *) &cfg.time_stamping_key, 0},
+    {NULL, '\0', "ipsec_ike_key", CFG_BOOL,
+     (void *) &cfg.ipsec_ike_key, 0},
     {NULL, '\0', "proxy_policy_language", CFG_STR,
      (void *) &cfg.proxy_policy_language, 0},
     CFG_END_OF_LIST
@@ -1135,6 +1138,21 @@ get_time_stamp_status (void)
       return
 	read_yesno
 	("Will the certificate be used for time stamping? (y/N): ");
+    }
+}
+
+int
+get_ipsec_ike_status (void)
+{
+  if (batch)
+    {
+      return cfg.ipsec_ike_key;
+    }
+  else
+    {
+      return
+	read_yesno
+	("Will the certificate be used for IPsec IKE operations? (y/N): ");
     }
 }
 

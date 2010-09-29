@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.11.2 (unreleased)
 
+** libgnutls: Add new extended key usage ipsecIKE.
+
 ** certtool: Renamed PKCS #11 options to: --p11-provider,
 --p11-export-url, --p11-list-certs, --p11-list-certs,
 --p11-list-privkeys, --p11-list-trusted, --p11-list-all-certs,

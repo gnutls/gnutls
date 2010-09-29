@@ -603,6 +603,18 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 		error (EXIT_FAILURE, 0, "key_kp: %s",
 		       gnutls_strerror (result));
 	    }
+
+	  result = get_ipsec_ike_status ();
+	  if (result)
+	    {
+	      result =
+		gnutls_x509_crt_set_key_purpose_oid (crt,
+						     GNUTLS_KP_IPSEC_IKE,
+						     0);
+	      if (result < 0)
+		error (EXIT_FAILURE, 0, "key_kp: %s",
+		       gnutls_strerror (result));
+	    }
 	}
 
       if (usage != 0)
@@ -2151,6 +2163,15 @@ generate_request (void)
 	    {
 	      ret = gnutls_x509_crq_set_key_purpose_oid
 		(crq, GNUTLS_KP_TIME_STAMPING, 0);
+	      if (ret < 0)
+		error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
+	    }
+
+	  ret = get_ipsec_ike_status ();
+	  if (ret)
+	    {
+	      ret = gnutls_x509_crq_set_key_purpose_oid
+		(crq, GNUTLS_KP_IPSEC_IKE, 0);
 	      if (ret < 0)
 		error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
 	    }
