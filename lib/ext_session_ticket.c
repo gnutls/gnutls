@@ -382,7 +382,7 @@ session_ticket_send_params (gnutls_session_t session,
       ret = _gnutls_ext_get_resumed_session_data( session, GNUTLS_EXTENSION_SESSION_TICKET, &epriv);
       if (ret >= 0)
 	priv = epriv.ptr;
-	
+
       /* no previous data. Just advertize it */
       if (ret < 0)
         return GNUTLS_E_INT_RET_0;
@@ -417,6 +417,7 @@ session_ticket_ext_st* priv = epriv.ptr;
 int ret;
 
   BUFFER_APPEND_PFX(ps, priv->session_ticket, priv->session_ticket_len);
+  BUFFER_APPEND_NUM(ps, priv->session_ticket_enable);
 
   return 0;
 }
@@ -438,11 +439,12 @@ gnutls_datum ticket;
   BUFFER_POP_DATUM(ps, &ticket);
   priv->session_ticket = ticket.data;
   priv->session_ticket_len = ticket.size;
+  BUFFER_POP_NUM(ps, priv->session_ticket_enable);
 
   epriv.ptr = priv;
   *_priv = epriv;
   
-  ret = 0;
+  return 0;
 
 error:
   gnutls_free(priv);
@@ -603,7 +605,7 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
       
       if (!priv->session_ticket_renew)
 	return 0;
-      
+
       /* XXX: Temporarily set write algorithms to be used.
          _gnutls_write_connection_state_init() does this job, but it also
          triggers encryption, while NewSessionTicket should not be
@@ -663,7 +665,6 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
 
       data_size = p - data;
     }
-
   ret = _gnutls_send_handshake (session, data_size ? bufel : NULL,
 				GNUTLS_HANDSHAKE_NEW_SESSION_TICKET);
 
@@ -728,7 +729,6 @@ _gnutls_recv_new_session_ticket (gnutls_session_t session)
   if (ret < 0)
     {
       gnutls_assert ();
-      gnutls_free (data);
       gnutls_free (priv->session_ticket);
       priv->session_ticket = NULL;
       return GNUTLS_E_INTERNAL_ERROR;

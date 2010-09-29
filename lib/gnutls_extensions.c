@@ -434,11 +434,10 @@ int i, ret;
 extension_priv_data_t data;
 int cur_size;
 int size_offset;
-void* total_exts_pos;
+int total_exts_pos;
 int exts = 0;
 
-  total_exts_pos = packed->data + packed->length;
-  
+  total_exts_pos = packed->length;
   BUFFER_APPEND_NUM(packed, 0);
 
   for (i = 0; i < extfunc_size; i++) 
@@ -466,7 +465,7 @@ int exts = 0;
         }
     }
 
-  _gnutls_write_uint32(exts, total_exts_pos);
+  _gnutls_write_uint32(exts, packed->data+total_exts_pos);
 
   return 0;
     
@@ -509,7 +508,7 @@ int i;
 
   for (i=0;i<MAX_EXT_TYPES;i++) 
     {
-      if (session->internals.resumed_extension_int_data[i].type == type)
+      if (session->internals.resumed_extension_int_data[i].type == type || session->internals.resumed_extension_int_data[i].set == 0)
 	{
 	    
 	    if (session->internals.resumed_extension_int_data[i].set != 0)
@@ -532,6 +531,7 @@ int max_exts = 0;
 uint16_t type;
 int size_for_type, cur_pos;
 
+
   BUFFER_POP_NUM(packed, max_exts);
   for (i = 0; i < max_exts; i++) 
     {
@@ -546,14 +546,14 @@ int size_for_type, cur_pos;
 	  gnutls_assert();
 	  return GNUTLS_E_PARSING_ERROR;
 	}
-    
+
       ret = unpack(packed, &data);
       if (ret < 0) 
 	{
 	  gnutls_assert();
 	  return ret;
 	}
-      
+
       /* verify that unpack read the correct bytes */
       cur_pos = cur_pos - packed->length;
       if (cur_pos /* read length */ != size_for_type)
@@ -561,6 +561,7 @@ int size_for_type, cur_pos;
 	  gnutls_assert();
 	  return GNUTLS_E_PARSING_ERROR;
 	}
+
       _gnutls_ext_set_resumed_session_data(session, type, data);
     }
 
