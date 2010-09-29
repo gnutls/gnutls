@@ -109,7 +109,6 @@ client (struct params_res *params)
 
   for (t = 0; t < 2; t++)
     {				/* connect 2 times to the server */
-
       /* connect to the peer
        */
       sd = tcp_connect ();
@@ -218,13 +217,13 @@ client (struct params_res *params)
 
       gnutls_bye (session, GNUTLS_SHUT_RDWR);
 
-    end:
 
       tcp_close (sd);
 
       gnutls_deinit (session);
     }
 
+end:
   gnutls_anon_free_client_credentials (anoncred);
 }
 
