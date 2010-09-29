@@ -7,6 +7,8 @@ See the end for copying conditions.
 
 ** Use Libtool 2.2.10 to ease MinGW64 builds.
 
+** libgnutls: Add new extended key usage ipsecIKE.
+
 ** libgnutls: Is now more liberal in the PEM decoding.
 That is spaces and tabs are being skipped.
 

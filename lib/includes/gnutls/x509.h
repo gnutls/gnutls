@@ -78,6 +78,7 @@ extern "C"
 #define GNUTLS_KP_EMAIL_PROTECTION		"1.3.6.1.5.5.7.3.4"
 #define GNUTLS_KP_TIME_STAMPING			"1.3.6.1.5.5.7.3.8"
 #define GNUTLS_KP_OCSP_SIGNING			"1.3.6.1.5.5.7.3.9"
+#define GNUTLS_KP_IPSEC_IKE			"1.3.6.1.5.5.7.3.17"
 #define GNUTLS_KP_ANY				"2.5.29.37.0"
 
 #define GNUTLS_FSAN_SET 0
