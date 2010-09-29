@@ -614,7 +614,6 @@ _gnutls_recv_new_session_ticket (gnutls_session_t session)
   if (ret < 0)
     {
       gnutls_assert ();
-      gnutls_free (data);
       gnutls_free (session->security_parameters.extensions.session_ticket);
       return GNUTLS_E_INTERNAL_ERROR;
     }
