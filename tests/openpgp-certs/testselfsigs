@@ -25,7 +25,7 @@ set -e
 srcdir="${srcdir:-.}"
 CERTTOOL="${CERTTOOL:-../../src/certtool$EXEEXT}"
 
-unset RETCODE
+unset RETCODE || true
 
 fail() {
    echo "Failure: $1" >&2
