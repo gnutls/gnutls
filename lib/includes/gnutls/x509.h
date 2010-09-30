@@ -537,7 +537,7 @@ extern "C"
     GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 = 16,
     GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5 = 32,
     GNUTLS_VERIFY_DISABLE_TIME_CHECKS = 64,
-    GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS = 128,
+    GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS = 128
   } gnutls_certificate_verify_flags;
 
   int gnutls_x509_crt_check_issuer (gnutls_x509_crt_t cert,
@@ -612,7 +612,7 @@ extern "C"
     GNUTLS_PKCS_USE_PBES2_3DES = 16,
     GNUTLS_PKCS_USE_PBES2_AES_128 = 32,
     GNUTLS_PKCS_USE_PBES2_AES_192 = 64,
-    GNUTLS_PKCS_USE_PBES2_AES_256 = 128,
+    GNUTLS_PKCS_USE_PBES2_AES_256 = 128
   } gnutls_pkcs_encrypt_flags_t;
 
   int gnutls_x509_privkey_init (gnutls_x509_privkey_t * key);
