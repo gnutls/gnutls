@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.10.3 (unreleased)
 
+** libgnutls: Remove trailing comma in enums in gnutls.h and x509.h.
+
 ** API and ABI modifications:
 No changes since last version.
 
