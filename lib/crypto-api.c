@@ -228,7 +228,7 @@ gnutls_hmac (gnutls_hmac_hd_t handle, const void *text, size_t textlen)
 void
 gnutls_hmac_output (gnutls_hmac_hd_t handle, void *digest)
 {
-  return _gnutls_hmac_output ((digest_hd_st *) handle, digest);
+  _gnutls_hmac_output ((digest_hd_st *) handle, digest);
 }
 
 /**
@@ -349,7 +349,7 @@ gnutls_hash (gnutls_hash_hd_t handle, const void *text, size_t textlen)
 void
 gnutls_hash_output (gnutls_hash_hd_t handle, void *digest)
 {
-  return _gnutls_hash_output ((digest_hd_st *) handle, digest);
+  _gnutls_hash_output ((digest_hd_st *) handle, digest);
 }
 
 /**
