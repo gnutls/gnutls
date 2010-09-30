@@ -21,7 +21,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 srcdir=${srcdir:-.}
-CERTTOOL=${CERTTOOL:-../../src/certtool}
+CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 
 ret=0
 for p8 in 'encpkcs8.pem foobar' unencpkcs8.pem 'enc2pkcs8.pem baz'; do

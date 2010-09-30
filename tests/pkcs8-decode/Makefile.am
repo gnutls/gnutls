@@ -24,3 +24,5 @@ EXTRA_DIST = encpkcs8.pem unencpkcs8.pem enc2pkcs8.pem
 dist_check_SCRIPTS = pkcs8
 
 TESTS = pkcs8
+
+TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)
