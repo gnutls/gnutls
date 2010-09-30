@@ -1,3 +1,96 @@
+2010-09-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.10.2.
+
+2010-09-30  Simon Josefsson <simon@josefsson.org>
+
+	* tests/pkcs8-decode/Makefile.am, tests/pkcs8-decode/pkcs8: Make
+	pkcs8-decode test work on Windows.
+
+2010-09-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/ext_session_ticket.c: Avoid double free.
+
+2010-09-29  Micah Anderson <micah@riseup.net>
+
+	* NEWS, doc/certtool.cfg, lib/includes/gnutls/x509.h,
+	lib/x509/output.c, src/certtool-cfg.c, src/certtool-cfg.h,
+	src/certtool.c: Add new extended key usage ipsecIKE According to RFC 4945 § 5.1.3.12 section title
+	"ExtendedKeyUsage"[0] the following extended key usage has been
+	added:  ... this document defines an ExtendedKeyUsage keyPurposeID that MAY
+	   be used to limit a certificate's use:    id-kp-ipsecIKE OBJECT IDENTIFIER ::= { id-kp 17 }    where id-kp is defined in RFC 3280 [5].  If a certificate is
+	   intended to be used with both IKE and other applications, and one
+	   of the other applications requires use of an EKU value, then such
+	   certificates MUST contain either the keyPurposeID id-kp-ipsecIKE or    anyExtendedKeyUsage [5], as well as the keyPurposeID values    associated with the other applications.  Similarly, if a CA
+	   issues multiple otherwise-similar certificates for multiple
+	   applications including IKE, and it is intended that the IKE
+	   certificate NOT be used with another application, the IKE
+	   certificate MAY contain an EKU extension listing a keyPurposeID of
+	   id-kp-ipsecIKE to discourage its use with the other application.
+	   Recall, however, that EKU extensions in certificates meant for use
+	in IKE are NOT RECOMMENDED.     Conforming IKE implementations are not required to support EKU.
+	   If a critical EKU extension appears in a certificate and EKU is
+	   not supported by the implementation, then RFC 3280 requires that the    certificate be rejected.  Implementations that do support EKU
+	   MUST support the following logic for certificate validation:    o  If no EKU extension, continue.     o  If EKU present AND contains either id-kp-ipsecIKE or       anyExtendedKeyUsage, continue.     o  Otherwise, reject cert.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2010-09-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: removed invalid e-mail address
+
+2010-09-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2010-09-26  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2010-09-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_handshake.c: No longer use is_fatal() during handshake.
+	Explicitely treat EAGAIN and INTERRUPTED as non-fatal during
+	handshake. If the check_fatal flag is set then
+	GNUTLS_E_WARNING_ALERT_RECEIVED could interrupt a handshake as well.
+
+2010-09-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/cli.c: fflush stdout and stderr before the call to setbuf.
+	This fixes issue in solaris where lines dissappeared from output.
+	Reported and suggested fix by Knut Anders Hatlen.
+
+2010-09-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/x509_b64.c: Be liberal in the PEM decoding. That is
+	spaces and tabs are being skipped.
+
+2010-09-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_int.h, lib/gnutls_priority.c,
+	lib/gnutls_record.c: When the %COMPAT flag is specified, larger
+	records that would otherwise violate the TLS spec, are accepted.
+
+2010-08-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2010-08-01  Simon Josefsson <simon@josefsson.org>
+
+	* doc/announce.txt: Update for 2.10.1.
+
+2010-08-01  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Fix.
+
+2010-07-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_algorithms.c: renamed NULL MAC to MAC-NULL to
+	prevent clash with NULL cipher.
+
+2010-07-25  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2010-07-25  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Typo.
