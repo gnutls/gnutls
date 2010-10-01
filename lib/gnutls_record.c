@@ -1220,4 +1220,3 @@ gnutls_record_recv (gnutls_session_t session, void *data, size_t sizeofdata)
   return _gnutls_recv_int (session, GNUTLS_APPLICATION_DATA, -1, data,
 			   sizeofdata);
 }
-

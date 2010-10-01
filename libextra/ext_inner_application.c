@@ -253,4 +253,3 @@ error:
   gnutls_free(priv);
   return ret;
 }
-

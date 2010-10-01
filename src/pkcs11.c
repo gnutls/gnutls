@@ -66,7 +66,7 @@ static char cached_pin[32] = "";
 	
 	/* cache */
 	strcpy(cached_pin, pin);
-	if (cached_url) free(cached_url);
+	free(cached_url);
 	cached_url = strdup(token_url);
 	
 	return 0;

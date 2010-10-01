@@ -458,4 +458,3 @@ extension_priv_data_t epriv;
 
   return priv->connection_using_safe_renegotiation;
 }
-

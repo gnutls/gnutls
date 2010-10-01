@@ -238,4 +238,3 @@ mutex_init_func gnutls_mutex_init = gnutls_system_mutex_init;
 mutex_deinit_func gnutls_mutex_deinit = gnutls_system_mutex_deinit;
 mutex_lock_func gnutls_mutex_lock = gnutls_system_mutex_lock;
 mutex_unlock_func gnutls_mutex_unlock = gnutls_system_mutex_unlock;
-

@@ -31,4 +31,3 @@ ssize_t system_read_peek(gnutls_transport_ptr ptr, void* data, size_t data_size)
 int _gnutls_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));
 
 #endif /* SYSTEM_H */
-

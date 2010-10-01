@@ -629,4 +629,3 @@ int _gnutls_buffer_pop_data_prefix (gnutls_buffer_st * buf, void * data, size_t 
     
     return 0;
 }
-

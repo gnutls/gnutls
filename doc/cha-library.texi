@@ -185,4 +185,3 @@ should allocate and free memory using the functions shown below.
 @item @ref{gnutls_free}
 
 @end itemize
-

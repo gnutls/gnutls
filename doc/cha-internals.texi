@@ -333,4 +333,3 @@ must be taken to use the same format.
 @end itemize
 
 If all of them are used then GnuTLS will no longer use libgcrypt.
-

@@ -1,5 +1,5 @@
 /* rndegd.c  -	interface to the EGD
- *	Copyright (C) 1999, 2000, 2002, 2003 Free Software Foundation, Inc.
+ *	Copyright (C) 1999, 2000, 2002, 2003, 2010 Free Software Foundation, Inc.
  *
  * This file is part of Libgcrypt.
  *
@@ -253,4 +253,3 @@ int _rndegd_read (int * fd, void* _output, size_t _length)
 
   return _length; /* success */
 }
-

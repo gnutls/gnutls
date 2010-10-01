@@ -69,4 +69,3 @@ int get_bits(gnutls_pk_algorithm_t);
 
 /* prime.c */
 int generate_prime (int how);
-

@@ -59,4 +59,3 @@ void gnutls_global_set_mutex(mutex_init_func init, mutex_deinit_func deinit,
   gnutls_mutex_lock = lock;
   gnutls_mutex_unlock = unlock;
 }
-

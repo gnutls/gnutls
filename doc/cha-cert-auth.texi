@@ -669,4 +669,3 @@ then use @ref{gnutls_x509_crt_get_signature_algorithm} to find out the
 signing algorithm used for each certificate.  If any of the
 intermediary certificates are using @code{GNUTLS_SIGN_RSA_MD2} or
 @code{GNUTLS_SIGN_RSA_MD5}, you could present a warning.
-
