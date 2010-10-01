@@ -23,7 +23,8 @@ introduced with the new nettle code.
 ** libgnutls: Corrected advertizing issue for session tickets.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_crt_get_subject_unique_id: ADDED.
+gnutls_x509_crt_get_issuer_unique_id: ADDED.
 
 * Version 2.11.1 (released 2010-09-14)
 
