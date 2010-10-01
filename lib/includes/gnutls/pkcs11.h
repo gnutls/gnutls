@@ -53,9 +53,9 @@ int gnutls_pkcs11_obj_init ( gnutls_pkcs11_obj_t *certificate);
 #define GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE (1<<2) /* object marked as sensitive (unexportable) */
 
 typedef enum {
-	GNUTLS_PKCS11_URL_GENERIC, /* URL specifies the object on token level */
-	GNUTLS_PKCS11_URL_LIB, /* URL specifies the object on module level */
-	GNUTLS_PKCS11_URL_LIB_VERSION, /* URL specifies the object on module and version level */
+  GNUTLS_PKCS11_URL_GENERIC, /* URL specifies the object on token level */
+  GNUTLS_PKCS11_URL_LIB, /* URL specifies the object on module level */
+  GNUTLS_PKCS11_URL_LIB_VERSION /* URL specifies the object on module and version level */
 } gnutls_pkcs11_url_type_t;
 
 int gnutls_pkcs11_obj_import_url (gnutls_pkcs11_obj_t, const char * url,
@@ -76,45 +76,45 @@ int gnutls_pkcs11_delete_url(const char* object_url,
 	unsigned int flags/* GNUTLS_PKCS11_OBJ_FLAG_* */);
 
 typedef enum {
-	GNUTLS_PKCS11_OBJ_ID_HEX=1,
-	GNUTLS_PKCS11_OBJ_LABEL,
-	GNUTLS_PKCS11_OBJ_TOKEN_LABEL,
-	GNUTLS_PKCS11_OBJ_TOKEN_SERIAL,
-	GNUTLS_PKCS11_OBJ_TOKEN_MANUFACTURER,
-	GNUTLS_PKCS11_OBJ_TOKEN_MODEL,
-	GNUTLS_PKCS11_OBJ_ID,
-	/* the pkcs11 provider library info  */
-	GNUTLS_PKCS11_OBJ_LIBRARY_VERSION,
-	GNUTLS_PKCS11_OBJ_LIBRARY_DESCRIPTION,
-	GNUTLS_PKCS11_OBJ_LIBRARY_MANUFACTURER,
+  GNUTLS_PKCS11_OBJ_ID_HEX=1,
+  GNUTLS_PKCS11_OBJ_LABEL,
+  GNUTLS_PKCS11_OBJ_TOKEN_LABEL,
+  GNUTLS_PKCS11_OBJ_TOKEN_SERIAL,
+  GNUTLS_PKCS11_OBJ_TOKEN_MANUFACTURER,
+  GNUTLS_PKCS11_OBJ_TOKEN_MODEL,
+  GNUTLS_PKCS11_OBJ_ID,
+  /* the pkcs11 provider library info  */
+  GNUTLS_PKCS11_OBJ_LIBRARY_VERSION,
+  GNUTLS_PKCS11_OBJ_LIBRARY_DESCRIPTION,
+  GNUTLS_PKCS11_OBJ_LIBRARY_MANUFACTURER
 } gnutls_pkcs11_obj_info_t;
 
 int gnutls_pkcs11_obj_get_info(gnutls_pkcs11_obj_t crt, gnutls_pkcs11_obj_info_t itype, void* output, size_t* output_size);
 
 typedef enum {
-	GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL=1, /* all certificates */
-	GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED, /* certificates marked as trusted */
-	GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY, /* certificates with corresponding private key */
-	GNUTLS_PKCS11_OBJ_ATTR_PUBKEY, /* public keys */
-	GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY, /* private keys */
-	GNUTLS_PKCS11_OBJ_ATTR_ALL, /* everything! */
+  GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL=1, /* all certificates */
+  GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED, /* certificates marked as trusted */
+  GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY, /* certificates with corresponding private key */
+  GNUTLS_PKCS11_OBJ_ATTR_PUBKEY, /* public keys */
+  GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY, /* private keys */
+  GNUTLS_PKCS11_OBJ_ATTR_ALL /* everything! */
 } gnutls_pkcs11_obj_attr_t;
 
 /* token info */
 typedef enum {
-	GNUTLS_PKCS11_TOKEN_LABEL,
-	GNUTLS_PKCS11_TOKEN_SERIAL,
-	GNUTLS_PKCS11_TOKEN_MANUFACTURER,
-	GNUTLS_PKCS11_TOKEN_MODEL,
+  GNUTLS_PKCS11_TOKEN_LABEL,
+  GNUTLS_PKCS11_TOKEN_SERIAL,
+  GNUTLS_PKCS11_TOKEN_MANUFACTURER,
+  GNUTLS_PKCS11_TOKEN_MODEL
 } gnutls_pkcs11_token_info_t;
 
 typedef enum {
-	GNUTLS_PKCS11_OBJ_UNKNOWN,
-	GNUTLS_PKCS11_OBJ_X509_CRT,
-	GNUTLS_PKCS11_OBJ_PUBKEY,
-	GNUTLS_PKCS11_OBJ_PRIVKEY,
-	GNUTLS_PKCS11_OBJ_SECRET_KEY,
-	GNUTLS_PKCS11_OBJ_DATA,
+  GNUTLS_PKCS11_OBJ_UNKNOWN,
+  GNUTLS_PKCS11_OBJ_X509_CRT,
+  GNUTLS_PKCS11_OBJ_PUBKEY,
+  GNUTLS_PKCS11_OBJ_PRIVKEY,
+  GNUTLS_PKCS11_OBJ_SECRET_KEY,
+  GNUTLS_PKCS11_OBJ_DATA
 } gnutls_pkcs11_obj_type_t;
 
 int gnutls_pkcs11_token_get_url (unsigned int seq, gnutls_pkcs11_url_type_t detailed, char** url);

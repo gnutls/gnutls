@@ -585,21 +585,21 @@ extern "C"
    * Enumeration of different digital signature algorithms.
    */
   typedef enum
-  {
-    GNUTLS_SIGN_UNKNOWN = 0,
-    GNUTLS_SIGN_RSA_SHA1 = 1,
-    GNUTLS_SIGN_RSA_SHA = GNUTLS_SIGN_RSA_SHA1,
-    GNUTLS_SIGN_DSA_SHA1 = 2,
-    GNUTLS_SIGN_DSA_SHA = GNUTLS_SIGN_DSA_SHA1,
-    GNUTLS_SIGN_RSA_MD5 = 3,
-    GNUTLS_SIGN_RSA_MD2 = 4,
-    GNUTLS_SIGN_RSA_RMD160 = 5,
-    GNUTLS_SIGN_RSA_SHA256 = 6,
-    GNUTLS_SIGN_RSA_SHA384 = 7,
-    GNUTLS_SIGN_RSA_SHA512 = 8,
-    GNUTLS_SIGN_RSA_SHA224 = 9,
-    GNUTLS_SIGN_DSA_SHA224 = 10,
-    GNUTLS_SIGN_DSA_SHA256 = 11,
+    {
+      GNUTLS_SIGN_UNKNOWN = 0,
+      GNUTLS_SIGN_RSA_SHA1 = 1,
+      GNUTLS_SIGN_RSA_SHA = GNUTLS_SIGN_RSA_SHA1,
+      GNUTLS_SIGN_DSA_SHA1 = 2,
+      GNUTLS_SIGN_DSA_SHA = GNUTLS_SIGN_DSA_SHA1,
+      GNUTLS_SIGN_RSA_MD5 = 3,
+      GNUTLS_SIGN_RSA_MD2 = 4,
+      GNUTLS_SIGN_RSA_RMD160 = 5,
+      GNUTLS_SIGN_RSA_SHA256 = 6,
+      GNUTLS_SIGN_RSA_SHA384 = 7,
+      GNUTLS_SIGN_RSA_SHA512 = 8,
+      GNUTLS_SIGN_RSA_SHA224 = 9,
+      GNUTLS_SIGN_DSA_SHA224 = 10,
+      GNUTLS_SIGN_DSA_SHA256 = 11
   } gnutls_sign_algorithm_t;
 
   const char *gnutls_sign_algorithm_get_name (gnutls_sign_algorithm_t sign);
@@ -616,14 +616,14 @@ extern "C"
    * Enumeration of security parameters for passive attacks
    */
   typedef enum
-  {
-    GNUTLS_SEC_PARAM_UNKNOWN,
-    GNUTLS_SEC_PARAM_WEAK,
-    GNUTLS_SEC_PARAM_LOW,
-    GNUTLS_SEC_PARAM_NORMAL,
-    GNUTLS_SEC_PARAM_HIGH,
-    GNUTLS_SEC_PARAM_ULTRA,
-  } gnutls_sec_param_t;
+    {
+      GNUTLS_SEC_PARAM_UNKNOWN,
+      GNUTLS_SEC_PARAM_WEAK,
+      GNUTLS_SEC_PARAM_LOW,
+      GNUTLS_SEC_PARAM_NORMAL,
+      GNUTLS_SEC_PARAM_HIGH,
+      GNUTLS_SEC_PARAM_ULTRA
+    } gnutls_sec_param_t;
 
 
 /* If you want to change this, then also change the define in
@@ -1463,9 +1463,9 @@ extern "C"
   typedef struct gnutls_pkcs11_privkey_st* gnutls_pkcs11_privkey_t;
 
   typedef enum {
-        GNUTLS_PRIVKEY_X509, /* gnutls_x509_privkey_t */
-	GNUTLS_PRIVKEY_OPENPGP, /* gnutls_openpgp_privkey_t */
-	GNUTLS_PRIVKEY_PKCS11, /* gnutls_pkcs11_privkey_t */
+    GNUTLS_PRIVKEY_X509, /* gnutls_x509_privkey_t */
+    GNUTLS_PRIVKEY_OPENPGP, /* gnutls_openpgp_privkey_t */
+    GNUTLS_PRIVKEY_PKCS11 /* gnutls_pkcs11_privkey_t */
   } gnutls_privkey_type_t;
 
   typedef struct gnutls_retr2_st
