@@ -192,3 +192,13 @@ _gnutls_dtls_clear_outgoing_buffer (gnutls_session_t session)
   session->internals.dtls.retransmit_end = &session->internals.dtls.retransmit;
   session->internals.dtls.retransmit = NULL;
 }
+
+void
+_gnutls_dtls_split_sequence (const uint64 *input,
+			     uint16_t *epoch, uint64_t *sequence)
+{
+  *epoch = _gnutls_read_uint16 (UINT64DATA(*input));
+  *sequence = _gnutls_read_uint48 (&UINT64DATA(*input)[2]);
+
+  fprintf(stderr, "%04x:%012lx\n", *epoch, *sequence);
+}

@@ -114,6 +114,20 @@ _gnutls_uint32touint24 (uint32_t num)
 
 }
 
+uint64_t
+_gnutls_uint48touint64 (uint48 num)
+{
+  uint64_t ret=0;
+
+  ((uint8_t *) & ret)[2] = num.i[0];
+  ((uint8_t *) & ret)[3] = num.i[1];
+  ((uint8_t *) & ret)[4] = num.i[2];
+  ((uint8_t *) & ret)[5] = num.i[3];
+  ((uint8_t *) & ret)[6] = num.i[4];
+  ((uint8_t *) & ret)[7] = num.i[5];
+  return ret;
+}
+
 /* data should be at least 3 bytes */
 uint32_t
 _gnutls_read_uint24 (const opaque * data)
@@ -218,6 +232,22 @@ _gnutls_uint64touint32 (const uint64 * num)
   memcpy (&ret, &num->i[4], 4);
 #ifndef WORDS_BIGENDIAN
   ret = bswap_32 (ret);
+#endif
+
+  return ret;
+}
+
+uint64_t
+_gnutls_read_uint48 (const opaque * data)
+{
+  uint64_t ret;
+  uint48 num;
+
+  memcpy(num.i, data, 6);
+
+  ret = _gnutls_uint48touint64 (num);
+#ifndef WORDS_BIGENDIAN
+  ret = bswap_64 (ret);
 #endif
 
   return ret;

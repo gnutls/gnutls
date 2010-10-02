@@ -35,5 +35,6 @@ int _gnutls_dtls_handshake_enqueue(gnutls_session_t session,
 
 int _gnutls_dtls_transmit(gnutls_session_t session);
 void _gnutls_dtls_clear_outgoing_buffer(gnutls_session_t session);
+void _gnutls_dtls_split_sequence(const uint64 *input, uint16_t *epoch, uint64_t *sequence);
 
 #endif

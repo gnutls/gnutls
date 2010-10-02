@@ -32,6 +32,8 @@
 
 uint32_t _gnutls_uint24touint32 (uint24 num);
 uint24 _gnutls_uint32touint24 (uint32_t num);
+uint64_t _gnutls_uint48touint64 (uint48 num);
+uint64_t _gnutls_read_uint48 (const opaque * data);
 uint32_t _gnutls_read_uint32 (const opaque * data);
 uint16_t _gnutls_read_uint16 (const opaque * data);
 uint32_t _gnutls_conv_uint32 (uint32_t data);
