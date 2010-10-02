@@ -259,7 +259,7 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
   size_t size;
   int ret;
   int client;
-  int days, result, ca_status = 0, path_len;
+  int days, result, ca_status = 0, is_ike = 0, path_len;
   int vers;
   unsigned int usage = 0, server;
   gnutls_x509_crq_t crq;	/* request */
@@ -411,16 +411,17 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (result));
 	}
 
+      is_ike = get_ipsec_ike_status ();
       server = get_tls_server_status ();
+      if ((server != 0 && !proxy) || is_ike)
+	{
+	  get_dns_name_set (TYPE_CRT, crt);
+	  get_ip_addr_set (TYPE_CRT, crt);
+	}
+
       if (server != 0)
 	{
 	  result = 0;
-
-	  if (!proxy)
-	    {
-	      get_dns_name_set (TYPE_CRT, crt);
-	      get_ip_addr_set (TYPE_CRT, crt);
-	    }
 
 	  result =
 	    gnutls_x509_crt_set_key_purpose_oid (crt,
@@ -453,6 +454,17 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 	    }
 	  else
 	    usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
+
+	  if (is_ike)
+	    {
+	      result =
+		gnutls_x509_crt_set_key_purpose_oid (crt,
+						     GNUTLS_KP_IPSEC_IKE,
+						     0);
+	      if (result < 0)
+		error (EXIT_FAILURE, 0, "key_kp: %s",
+		       gnutls_strerror (result));
+	    }
 	}
 
 
@@ -505,6 +517,11 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 
       if (usage != 0)
 	{
+	  /* http://tools.ietf.org/html/rfc4945#section-5.1.3.2: if any KU is
+	     set, then either digitalSignature or the nonRepudiation bits in the
+	     KeyUsage extension MUST for all IKE certs */ 
+	  if (is_ike && (get_sign_status (server) != 1))
+	    usage |= GNUTLS_KEY_NON_REPUDIATION;
 	  result = gnutls_x509_crt_set_key_usage (crt, usage);
 	  if (result < 0)
 	    error (EXIT_FAILURE, 0, "key_usage: %s",
