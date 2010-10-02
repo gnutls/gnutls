@@ -932,22 +932,6 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
   record_parameters_st *record_params;
   record_state_st *record_state;
 
-  ret = _gnutls_epoch_get (session, EPOCH_READ_CURRENT, &record_params);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  /* Safeguard against processing data with an incomplete cipher state. */
-  if (!record_params->initialized)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  record_state = &record_params->read;
-
   if (type != GNUTLS_ALERT && (sizeofdata == 0 || data == NULL))
     {
       return GNUTLS_E_INVALID_REQUEST;
@@ -1023,6 +1007,16 @@ begin:
       gnutls_assert ();
       return ret;
     }
+
+  ret = _gnutls_epoch_get (session, EPOCH_READ_CURRENT, &record_params);
+  if (ret < 0)
+    return gnutls_assert_val (ret);
+
+  /* Safeguard against processing data with an incomplete cipher state. */
+  if (!record_params->initialized)
+    return gnutls_assert_val (GNUTLS_E_INVALID_REQUEST);
+
+  record_state = &record_params->read;
 
 /* Here we check if the Type of the received packet is
  * ok. 
