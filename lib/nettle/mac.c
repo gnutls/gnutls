@@ -186,25 +186,6 @@ static int wrap_nettle_hash_copy(void **bhd, void *ahd)
 	return 0;
 }
 
-static int wrap_nettle_hmac_copy(void **bhd, void *ahd)
-{
-	struct nettle_hmac_ctx *ctx = ahd;
-	struct nettle_hmac_ctx *dst_ctx;
-	int ret;
-
-	ret = wrap_nettle_hmac_init(ctx->algo, bhd);
-	if (ret < 0) {
-		gnutls_assert();
-		return ret;
-	}
-	
-	dst_ctx = *bhd;
-
-	memcpy(&dst_ctx->ctx, &ctx->ctx, sizeof(ctx->ctx));
-	
-	return 0;
-}
-
 static void wrap_nettle_md_close(void *hd)
 {
     gnutls_free(hd);
@@ -318,7 +299,6 @@ gnutls_crypto_mac_st _gnutls_mac_ops = {
     .init = wrap_nettle_hmac_init,
     .setkey = wrap_nettle_hmac_setkey,
     .hash = wrap_nettle_hmac_update,
-    .copy = wrap_nettle_hmac_copy,
     .output = wrap_nettle_hmac_output,
     .deinit = wrap_nettle_md_close,
 };

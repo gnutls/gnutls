@@ -254,7 +254,6 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
         }
 
       dig->hash = cc->hash;
-      dig->copy = cc->copy;
       dig->output = cc->output;
       dig->deinit = cc->deinit;
 
@@ -271,7 +270,6 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
   _gnutls_mac_ops.setkey (dig->handle, key, keylen);
 
   dig->hash = _gnutls_mac_ops.hash;
-  dig->copy = _gnutls_mac_ops.copy;
   dig->output = _gnutls_mac_ops.output;
   dig->deinit = _gnutls_mac_ops.deinit;
 

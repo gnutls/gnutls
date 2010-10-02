@@ -164,7 +164,6 @@ gnutls_crypto_mac_st _gnutls_mac_ops = {
   .init = wrap_gcry_mac_init,
   .setkey = wrap_gcry_md_setkey,
   .hash = wrap_gcry_md_write,
-  .copy = wrap_gcry_md_copy,
   .output = wrap_gcry_mac_output,
   .deinit = wrap_gcry_md_close,
 };

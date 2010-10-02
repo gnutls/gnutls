@@ -69,7 +69,7 @@ int gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,
 
 /* register ciphers */
 
-#define GNUTLS_CRYPTO_API_VERSION 0x02
+#define GNUTLS_CRYPTO_API_VERSION 0x03
 
 #define gnutls_crypto_single_cipher_st gnutls_crypto_cipher_st
 #define gnutls_crypto_single_mac_st gnutls_crypto_mac_st
@@ -92,13 +92,18 @@ typedef struct
   int (*init) (gnutls_mac_algorithm_t, void **ctx);
   int (*setkey) (void *ctx, const void *key, size_t keysize);
   int (*hash) (void *ctx, const void *text, size_t textsize);
-  int (*copy) (void **dst_ctx, void *src_ctx);
   int (*output) (void *src_ctx, void *digest, size_t digestsize);
   void (*deinit) (void *ctx);
 } gnutls_crypto_mac_st;
 
-/* the same... setkey should be null */
-typedef gnutls_crypto_mac_st gnutls_crypto_digest_st;
+typedef struct
+{
+  int (*init) (gnutls_mac_algorithm_t, void **ctx);
+  int (*hash) (void *ctx, const void *text, size_t textsize);
+  int (*copy) (void **dst_ctx, void *src_ctx);
+  int (*output) (void *src_ctx, void *digest, size_t digestsize);
+  void (*deinit) (void *ctx);
+} gnutls_crypto_digest_st;
 
 /**
  * gnutls_rnd_level_t:

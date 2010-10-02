@@ -42,8 +42,9 @@
 # define EALG_MAX_BLOCK_LEN 16
 #endif
 
-
 static int cryptodev_fd = -1;
+
+static int register_mac (int cfd);
 
 struct cryptodev_ctx
 {
@@ -79,18 +80,7 @@ cryptodev_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx)
 
   ctx = *_ctx;
 
-  if (ioctl (cryptodev_fd, CRIOGET, &ctx->cfd))
-    {
-      gnutls_assert ();
-      return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
-    }
-
-  if (fcntl (ctx->cfd, F_SETFD, 1) == -1)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
-    }
-
+  ctx->cfd = cryptodev_fd;
   ctx->sess.cipher = cipher;
   ctx->sess.key = ctx->key;
   ctx->cryp.iv = ctx->iv;
@@ -99,7 +89,7 @@ cryptodev_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx)
 }
 
 static int
-cryptodev_setkey (void *_ctx, const void *key, size_t keysize)
+cryptodev_cipher_setkey (void *_ctx, const void *key, size_t keysize)
 {
   struct cryptodev_ctx *ctx = _ctx;
 
@@ -114,7 +104,6 @@ cryptodev_setkey (void *_ctx, const void *key, size_t keysize)
   ctx->cryp.ses = ctx->sess.ses;
 
   return 0;
-
 }
 
 static int
@@ -169,35 +158,16 @@ cryptodev_deinit (void *_ctx)
   struct cryptodev_ctx *ctx = _ctx;
 
   ioctl(ctx->cfd, CIOCFSESSION, &ctx->sess);
-  close (ctx->cfd);
   gnutls_free (ctx);
 }
 
 static const gnutls_crypto_cipher_st cipher_struct = {
   .init = cryptodev_cipher_init,
-  .setkey = cryptodev_setkey,
+  .setkey = cryptodev_cipher_setkey,
   .setiv = cryptodev_setiv,
   .encrypt = cryptodev_encrypt,
   .decrypt = cryptodev_decrypt,
   .deinit = cryptodev_deinit,
-};
-
-struct cipher_map
-{
-  gnutls_cipher_algorithm_t gnutls_cipher;
-  int cryptodev_cipher;
-  int keylen;
-};
-
-static const struct cipher_map cipher_map[] = {
-  {GNUTLS_CIPHER_3DES_CBC, CRYPTO_3DES_CBC, 21},
-  {GNUTLS_CIPHER_AES_128_CBC, CRYPTO_AES_CBC, 16},
-  {GNUTLS_CIPHER_AES_192_CBC, CRYPTO_AES_CBC, 24},
-  {GNUTLS_CIPHER_AES_256_CBC, CRYPTO_AES_CBC, 32},
-  {GNUTLS_CIPHER_CAMELLIA_128_CBC, CRYPTO_CAMELLIA_CBC, 16},
-  {GNUTLS_CIPHER_CAMELLIA_256_CBC, CRYPTO_CAMELLIA_CBC, 24},
-  {GNUTLS_CIPHER_DES_CBC, CRYPTO_DES_CBC, 8},
-  {GNUTLS_CIPHER_UNKNOWN, 0}
 };
 
 static int
@@ -208,11 +178,14 @@ register_crypto (int cfd)
   int i = 0, ret;
 
   memset (&sess, 0, sizeof (sess));
-  do
+
+  for (i=0;i<sizeof(gnutls_cipher_map)/sizeof(gnutls_cipher_map[0]);i++)
     {
+      if (gnutls_cipher_map[i] == 0) continue;
+
       /* test if a cipher is support it and if yes register it */
-      sess.cipher = cipher_map[i].cryptodev_cipher;
-      sess.keylen = cipher_map[i].keylen;
+      sess.cipher = gnutls_cipher_map[i];
+      sess.keylen = gnutls_cipher_get_key_size(i);
       sess.key = fake_key;
 
       if (ioctl (cfd, CIOCGSESSION, &sess))
@@ -222,10 +195,9 @@ register_crypto (int cfd)
 
       ioctl(cfd, CIOCFSESSION, &sess);
       
-      _gnutls_debug_log("/dev/crypto: registering: %s\n", gnutls_cipher_get_name(cipher_map[i].gnutls_cipher));
+      _gnutls_debug_log("/dev/crypto: registering: %s\n", gnutls_cipher_get_name(i));
       ret =
-	gnutls_crypto_single_cipher_register (cipher_map[i].gnutls_cipher, 90,
-					      &cipher_struct);
+	gnutls_crypto_single_cipher_register (i, 90, &cipher_struct);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -233,15 +205,13 @@ register_crypto (int cfd)
 	}
 
     }
-  while (cipher_map[i++].gnutls_cipher != GNUTLS_CIPHER_UNKNOWN);
 
   return 0;
 }
 
-int
-_gnutls_cryptodev_init (void)
+int _gnutls_cryptodev_init (void)
 {
-  int cfd = -1, ret;
+  int ret;
 
   /* Open the crypto device */
   cryptodev_fd = open ("/dev/crypto", O_RDWR, 0);
@@ -251,34 +221,195 @@ _gnutls_cryptodev_init (void)
       return GNUTLS_E_CRYPTODEV_DEVICE_ERROR;
     }
 
-  /* Clone file descriptor */
-  if (ioctl (cryptodev_fd, CRIOGET, &cfd))
+#ifndef CRIOGET_NOT_NEEDED
+  {
+    int cfd = -1;
+    /* Clone file descriptor */
+    if (ioctl (cryptodev_fd, CRIOGET, &cfd))
+      {
+        gnutls_assert ();
+        return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
+      }
+
+    /* Set close-on-exec (not really neede here) */
+    if (fcntl (cfd, F_SETFD, 1) == -1)
+      {
+        gnutls_assert ();
+        return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
+      }
+
+    close(cryptodev_fd);
+    cryptodev_fd = cfd;
+  }
+#endif
+
+  ret = register_crypto (cryptodev_fd);
+  if (ret < 0)
+          gnutls_assert();
+
+  if (ret >= 0)
     {
-      gnutls_assert ();
-      return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
+      ret = register_mac (cryptodev_fd);
+      if (ret < 0)
+          gnutls_assert();
     }
 
-  /* Set close-on-exec (not really neede here) */
-  if (fcntl (cfd, F_SETFD, 1) == -1)
+  if (ret < 0)
     {
-      gnutls_assert ();
-      return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
+      gnutls_assert();
+      close(cryptodev_fd);
     }
 
-  /* Run the test itself */
-  ret = register_crypto (cfd);
-
-  close (cfd);
   return ret;
 }
 
-void
-_gnutls_cryptodev_deinit ()
+void _gnutls_cryptodev_deinit(void)
 {
   close (cryptodev_fd);
 }
 
+/* MAC and digest stuff */
+
+/* if we are using linux /dev/crypto
+ */
+#if defined(COP_FLAG_UPDATE)
+
+static const int gnutls_mac_map[] = {
+   [GNUTLS_MAC_MD5] = CRYPTO_MD5_HMAC,
+   [GNUTLS_MAC_SHA1] = CRYPTO_SHA1_HMAC,
+   [GNUTLS_MAC_SHA256] = CRYPTO_SHA2_256_HMAC,
+   [GNUTLS_MAC_SHA384] = CRYPTO_SHA2_384_HMAC,
+   [GNUTLS_MAC_SHA512] = CRYPTO_SHA2_512_HMAC,
+};
+
+static int cryptodev_mac_init(gnutls_mac_algorithm_t algorithm, void **_ctx)
+{
+  struct cryptodev_ctx *ctx;
+  int mac = gnutls_mac_map[algorithm];
+
+  *_ctx = gnutls_calloc (1, sizeof (struct cryptodev_ctx));
+  if (*_ctx == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  ctx = *_ctx;
+
+  ctx->cfd = cryptodev_fd;
+
+  ctx->sess.mac = mac;
+  ctx->sess.mackey = ctx->key;
+
+  return 0;
+}
+
+static int
+cryptodev_mac_setkey (void *_ctx, const void *key, size_t keysize)
+{
+  struct cryptodev_ctx *ctx = _ctx;
+
+  ctx->sess.mackeylen = keysize;
+  memcpy (ctx->key, key, keysize);
+
+  if (ioctl (ctx->cfd, CIOCGSESSION, &ctx->sess))
+    {
+      gnutls_assert ();
+      return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
+    }
+  ctx->cryp.ses = ctx->sess.ses;
+
+  return 0;
+}
+
+static int cryptodev_mac_hash (void *_ctx, const void *text, size_t textsize)
+{
+  struct cryptodev_ctx *ctx = _ctx;
+  ctx->cryp.len = textsize;
+  ctx->cryp.src = (void *) text;
+  ctx->cryp.dst = NULL;
+  ctx->cryp.op = COP_ENCRYPT;
+  ctx->cryp.flags = COP_FLAG_UPDATE;
+  if (ioctl (ctx->cfd, CIOCCRYPT, &ctx->cryp))
+    {
+      gnutls_assert ();
+      return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
+    }
+  return 0;
+}
+
+static int cryptodev_mac_output (void *_ctx, void *digest, size_t digestsize)
+{
+  struct cryptodev_ctx *ctx = _ctx;
+  ctx->cryp.len = 0;
+  ctx->cryp.src = NULL;
+  ctx->cryp.mac = digest;
+  ctx->cryp.op = COP_ENCRYPT;
+  ctx->cryp.flags = COP_FLAG_FINAL;
+  if (ioctl (ctx->cfd, CIOCCRYPT, &ctx->cryp))
+    {
+      gnutls_assert ();
+      return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
+    }
+
+  return 0;
+}
+
+#define cryptodev_mac_deinit cryptodev_deinit
+
+static const gnutls_crypto_mac_st mac_struct = {
+  .init = cryptodev_mac_init,
+  .setkey = cryptodev_mac_setkey,
+  .hash = cryptodev_mac_hash,
+  .output = cryptodev_mac_output,
+  .deinit = cryptodev_mac_deinit
+};
+
+static int register_mac (int cfd)
+{
+  struct session_op sess;
+  char fake_key[CRYPTO_CIPHER_MAX_KEY_LEN];
+  int i = 0, ret;
+
+  memset (&sess, 0, sizeof (sess));
+  for (i=0;i<sizeof(gnutls_mac_map)/sizeof(gnutls_mac_map[0]);i++)
+    {
+      if (gnutls_mac_map[i] == 0) continue;
+
+      sess.mac = gnutls_mac_map[i];
+      sess.keylen = 8;
+      sess.key = fake_key;
+            
+      if (ioctl (cfd, CIOCGSESSION, &sess))
+	{
+	  continue;
+	}
+
+      ioctl(cfd, CIOCFSESSION, &sess);
+
+      _gnutls_debug_log("/dev/crypto: registering: %s\n", gnutls_mac_get_name(i));
+      ret =
+	gnutls_crypto_single_mac_register (i, 90, &mac_struct);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
+            
+    }
+
+  return 0;
+}
+
 #else
+static int register_mac (int cfd)
+{
+  return 0;
+}
+
+#endif /* defined(CIOCSESSIONCLONE) && defined(COP_FLAG_UPDATE) */
+
+#else /* ENABLE_CRYPTODEV */
 int
 _gnutls_cryptodev_init ()
 {
