@@ -26,9 +26,9 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   # Interfaces changed/added/removed:   CURRENT++       REVISION=0
   # Interfaces added:                             AGE++
   # Interfaces removed:                           AGE=0
-  AC_SUBST(LT_CURRENT, 43)
-  AC_SUBST(LT_REVISION, 1)
-  AC_SUBST(LT_AGE, 17)
+  AC_SUBST(LT_CURRENT, 44)
+  AC_SUBST(LT_REVISION, 0)
+  AC_SUBST(LT_AGE, 18)
 
   AC_SUBST(CXX_LT_CURRENT, 27)
   AC_SUBST(CXX_LT_REVISION, 0)
