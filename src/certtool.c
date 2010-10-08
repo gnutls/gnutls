@@ -2135,6 +2135,9 @@ generate_request (void)
       else
 	usage |= GNUTLS_KEY_DIGITAL_SIGNATURE;
 
+      if (get_ipsec_ike_status && (get_sign_status (get_tls_server_status()) !=1))
+	usage |= GNUTLS_KEY_NON_REPUDIATION;
+
       if (ca_status)
 	{
 	  ret = get_cert_sign_status ();
@@ -2171,15 +2174,6 @@ generate_request (void)
 	      if (ret < 0)
 		error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
 	    }
-
-	  ret = get_ipsec_ike_status ();
-	  if (ret)
-	    {
-	      ret = gnutls_x509_crq_set_key_purpose_oid
-		(crq, GNUTLS_KP_IPSEC_IKE, 0);
-	      if (ret < 0)
-		error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
-	    }
 	}
 
       ret = gnutls_x509_crq_set_key_usage (crq, usage);
@@ -2200,6 +2194,15 @@ generate_request (void)
 	{
 	  ret = gnutls_x509_crq_set_key_purpose_oid
 	    (crq, GNUTLS_KP_TLS_WWW_SERVER, 0);
+	  if (ret < 0)
+	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
+	}
+
+      ret = get_ipsec_ike_status ();
+      if (ret)
+	{
+	  ret = gnutls_x509_crq_set_key_purpose_oid
+	    (crq, GNUTLS_KP_IPSEC_IKE, 0);
 	  if (ret < 0)
 	    error (EXIT_FAILURE, 0, "key_kp: %s", gnutls_strerror (ret));
 	}
