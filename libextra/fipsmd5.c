@@ -133,40 +133,6 @@ hmacmd5hash (void *ctx, const void *text, size_t textsize)
 }
 
 static int
-hmacmd5copy (void **dst_ctx, void *src_ctx)
-{
-  struct hmacctx *p = src_ctx;
-  struct hmacctx *q;
-
-  q = gnutls_malloc (sizeof (struct hmacctx));
-  if (!q)
-    return -1;
-
-  q->data = gnutls_malloc (p->datasize);
-  if (!q->data)
-    {
-      gnutls_free (q);
-      return -1;
-    }
-  memcpy (q->data, p->data, p->datasize);
-  q->datasize = p->datasize;
-
-  q->key = gnutls_malloc (p->keysize);
-  if (!q->key)
-    {
-      gnutls_free (q);
-      gnutls_free (q->data);
-      return -1;
-    }
-  memcpy (q->key, p->key, p->keysize);
-  q->keysize = p->keysize;
-
-  *dst_ctx = q;
-
-  return 0;
-}
-
-static int
 hmacmd5output (void *ctx, void *digest, size_t digestsize)
 {
   struct hmacctx *p = ctx;
@@ -207,7 +173,6 @@ static gnutls_crypto_mac_st mac = {
   .init = hmacmd5init,
   .setkey = hmacmd5setkey,
   .hash = hmacmd5hash,
-  .copy = hmacmd5copy,
   .output = hmacmd5output,
   .deinit = hmacmd5deinit
 };
