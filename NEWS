@@ -5,9 +5,13 @@ See the end for copying conditions.
 
 * Version 2.11.4 (unreleased)
 
-** Update gnulib files.
+** doc: Added pkcs11.h header file to GTK-DOC manual.
 
-** Update translations.
+** build: Update gnulib files.
+
+** i18n: Update translations.
+
+** tests: Add self tests gendh.c.  Speed up Guile self checks.
 
 ** API and ABI modifications:
 No changes since last version.
