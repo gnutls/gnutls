@@ -59,9 +59,9 @@ bootstrap: autoreconf
 	./configure $(CFGFLAGS)
 
 glimport:
-	gnulib-tool --m4-base gl/m4 --import
-	cd lib && gnulib-tool --m4-base gl/m4 --import
-	cd libextra && gnulib-tool --m4-base gl/m4 --import
+	gnulib-tool --m4-base gl/m4 --add-import
+	cd lib && gnulib-tool --m4-base gl/m4 --add-import
+	cd libextra && gnulib-tool --m4-base gl/m4 --add-import
 
 # Code Coverage
 
