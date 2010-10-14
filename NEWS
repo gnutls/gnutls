@@ -3,6 +3,16 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 2.11.3 (unreleased)
+
+** Indent code to follow the GNU Coding Standard.
+You should be able to unpack the 2.11.2 release and run 'make indent'
+twice to get exactly the same content as 2.11.3 except for generated
+files.  Using GNU Indent 2.2.11.
+
+** API and ABI modifications:
+No changes since last version.
+
 * Version 2.11.2 (released 2010-10-08)
 
 ** libgnutls: Several bug fixes on session resumption
