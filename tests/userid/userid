@@ -31,4 +31,6 @@ if [ $RET !=  0 ];then
 	exit 1
 fi
 
+rm -f out
+
 exit 0
