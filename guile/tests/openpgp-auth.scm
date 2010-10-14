@@ -54,6 +54,10 @@
   (import-something pkcs1-import-rsa-parameters file
                     x509-certificate-format/pem))
 
+(define (import-dh-params file)
+  (import-something pkcs3-import-dh-parameters file
+                    x509-certificate-format/pem))
+
 ;; Debugging.
 ;; (set-log-level! 3)
 ;; (set-log-procedure! (lambda (level str)
@@ -96,7 +100,7 @@
 
               (let ((server (make-session connection-end/server))
                     (rsa    (import-rsa-params "rsa-parameters.pem"))
-                    (dh     (make-dh-parameters 1024)))
+                    (dh     (import-dh-params "dh-parameters.pem")))
                 ;; server-side
                 (set-session-default-priority! server)
                 (set-session-certificate-type-priority! server %certs)

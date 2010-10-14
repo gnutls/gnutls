@@ -38,6 +38,17 @@
 ;; Message sent by the client.
 (define %message (apply u8vector (iota 256)))
 
+(define (import-something import-proc file fmt)
+  (let* ((path (search-path %load-path file))
+         (size (stat:size (stat path)))
+         (raw  (make-u8vector size)))
+    (uniform-vector-read! raw (open-input-file path))
+    (import-proc raw fmt)))
+
+(define (import-dh-params file)
+  (import-something pkcs3-import-dh-parameters file
+                    x509-certificate-format/pem))
+
 ;; Debugging.
 ;; (set-log-level! 100)
 ;; (set-log-procedure! (lambda (level str)
@@ -82,7 +93,7 @@
 
               (set-session-transport-fd! server (fileno (cdr socket-pair)))
               (let ((cred (make-anonymous-server-credentials))
-                    (dh-params (make-dh-parameters 1024)))
+                    (dh-params (import-dh-params "dh-parameters.pem")))
                 ;; Note: DH parameter generation can take some time.
                 (set-anonymous-server-dh-parameters! cred dh-params)
                 (set-session-credentials! server cred))
