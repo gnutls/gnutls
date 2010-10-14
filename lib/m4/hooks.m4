@@ -45,10 +45,10 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
       libgcrypt=$withval,
       libgcrypt=no)
     if test "$libgcrypt" = "yes"; then
-  	cryptolib=libgcrypt
+        cryptolib=libgcrypt
         AC_DEFINE([HAVE_GCRYPT], 1, [whether the gcrypt library is in use])
 	AC_LIB_HAVE_LINKFLAGS([gcrypt], [gpg-error], [#include <gcrypt.h>],
-    [enum gcry_cipher_algos i = GCRY_CIPHER_CAMELLIA128])
+                      [enum gcry_cipher_algos i = GCRY_CIPHER_CAMELLIA128])
       if test "$ac_cv_libgcrypt" != yes; then
         AC_MSG_ERROR([[
 ***  

@@ -276,7 +276,7 @@ _gnutls_cryptodev_deinit (void)
 
 /* if we are using linux /dev/crypto
  */
-#if defined(COP_FLAG_UPDATE)
+#if defined COP_FLAG_UPDATE
 
 static const int gnutls_mac_map[] = {
   [GNUTLS_MAC_MD5] = CRYPTO_MD5_HMAC,

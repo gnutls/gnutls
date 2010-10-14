@@ -53,7 +53,7 @@
 #ifndef PKCS11_H
 #define PKCS11_H 1
 
-#if defined(__cplusplus)
+#ifdef __cplusplus
 extern "C"
 {
 #endif
@@ -79,7 +79,7 @@ extern "C"
 
 /* System dependencies.  */
 
-#if defined(_WIN32) || defined(CRYPTOKI_FORCE_WIN32)
+#if defined _WIN32 || defined CRYPTOKI_FORCE_WIN32
 
 /* There is a matching pop below.  */
 #pragma pack(push, cryptoki, 1)
@@ -1341,11 +1341,11 @@ ck_rv_t CK_SPEC name args
 
 
 /* System dependencies.  */
-#if defined(_WIN32) || defined(CRYPTOKI_FORCE_WIN32)
+#if defined _WIN32 || defined CRYPTOKI_FORCE_WIN32
 #pragma pack(pop, cryptoki)
 #endif
 
-#if defined(__cplusplus)
+#ifdef __cplusplus
 }
 #endif
 
