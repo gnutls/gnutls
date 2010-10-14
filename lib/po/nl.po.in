@@ -1,21 +1,22 @@
-# Dutch translations for libgnutls
-# Copyright (C) 2009 Free Software Foundation, Inc.
+# Dutch translations for libgnutls.
+# Copyright (C) 2010 Free Software Foundation, Inc.
 # This file is distributed under the same license as the libgnutls package.
-# Benno Schulenberg <benno@vertaalt.nl>, 2007, 2008.
-# Erwin Poeze <erwin.poeze@gmail.com>, 2009, 2010
+#
+# Benno Schulenberg <benno@vertaalt.nl>, 2007, 2008, 2010.
+# Erwin Poeze <erwin.poeze@gmail.com>, 2009, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: libgnutls-2.8.5\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
 "POT-Creation-Date: 2009-11-02 11:37+0100\n"
-"PO-Revision-Date: 2010-03-25 10:55+0100\n"
-"Last-Translator: Erwin Poeze <erwin.poeze@gmail.com>\n"
+"PO-Revision-Date: 2010-05-02 17:07+0200\n"
+"Last-Translator: Benno Schulenberg <benno@vertaalt.nl>\n"
 "Language-Team: Dutch <vertaling@vrijschrift.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Virtaal 0.3.1\n"
+"X-Generator: Lokalize 1.0\n"
 
 #: gnutls_errors.c:51
 msgid "Success."
@@ -227,7 +228,7 @@ msgstr "Er is een overtreding van het sleutelgebruik in het certificaat geconsta
 
 #: gnutls_errors.c:157
 msgid "Resource temporarily unavailable, try again."
-msgstr "Resource is tijdelijk niet beschikbaar, probeer later nogmaals."
+msgstr "Bron is tijdelijk niet beschikbaar; probeer het later nogmaals."
 
 #: gnutls_errors.c:159
 msgid "Function was interrupted."
@@ -614,7 +615,7 @@ msgstr "%s\t\t\tAlleen sleutel-decryptie.\n"
 
 #: x509/output.c:362
 msgid "warning: distributionPoint contains an embedded NUL, replacing with '!'\n"
-msgstr "Waarschuwing: distributiepunt bevat een NUL-waarde, vervangen door '!'\n"
+msgstr "Waarschuwing: distributiepunt bevat een NUL-waarde, wordt vervangen door '!'\n"
 
 #: x509/output.c:454
 #, c-format
@@ -668,7 +669,7 @@ msgstr "%s\t\t\tPadlengtebeperking: %d\n"
 
 #: x509/output.c:571 x509/output.c:651
 msgid "warning: SAN contains an embedded NUL, replacing with '!'\n"
-msgstr "waarschuwing: SAN bevat een NUL-waarde, vervangen door '!'\n"
+msgstr "Waarschuwing: SAN bevat een NUL-waarde, wordt vervangen door '!'\n"
 
 #: x509/output.c:657
 #, c-format
@@ -877,12 +878,12 @@ msgstr ""
 #: x509/output.c:1258
 #, c-format
 msgid "signed using %s (broken!), "
-msgstr "Ondertekend met %s (beschadigd!),"
+msgstr "ondertekend met %s (beschadigd!), "
 
 #: x509/output.c:1260
 #, c-format
 msgid "signed using %s, "
-msgstr "ondertekent met %s,"
+msgstr "ondertekend met %s, "
 
 #: x509/output.c:1373
 msgid "X.509 Certificate Information:\n"
@@ -970,16 +971,16 @@ msgstr "\tEigenschappen:\n"
 #: x509/output.c:1877
 #, c-format
 msgid "\t\tChallenge password: %s\n"
-msgstr "\t\tTest wachtwoord: %s\n"
+msgstr "\t\tTest-wachtwoord: %s\n"
 
 #: x509/output.c:1886
 #, c-format
 msgid "\t\tUnknown attribute %s:\n"
-msgstr "\t\tOnbekende uitbreiding %s:\n"
+msgstr "\t\tOnbekende eigenschap %s:\n"
 
 #: x509/output.c:1989
 msgid "PKCS #10 Certificate Request Information:\n"
-msgstr "Informatieverzoek PKCS #10-certificaat:\n"
+msgstr "Informatie over PKCS #10-certificaatverzoek:\n"
 
 #: openpgp/output.c:84
 msgid "\t\tKey Usage:\n"
@@ -1071,30 +1072,30 @@ msgstr ""
 #: openpgp/output.c:399
 #, c-format
 msgid "name[%d]: %s, "
-msgstr "naam[%d]: %s,"
+msgstr "naam[%d]: %s, "
 
 #: openpgp/output.c:401
 #, c-format
 msgid "revoked name[%d]: %s, "
-msgstr "ingetrokken naam[%d]: %s,"
+msgstr "ingetrokken naam[%d]: %s, "
 
 #: openpgp/output.c:415
 msgid "fingerprint: "
-msgstr "vingerafdruk:"
+msgstr "vingerafdruk: "
 
 #: openpgp/output.c:435
 #, c-format
 msgid "created: %s, "
-msgstr "aangemaakt: %s,"
+msgstr "aangemaakt: %s, "
 
 #: openpgp/output.c:445
 msgid "never expires, "
-msgstr "verloopt nooit,"
+msgstr "verloopt nooit, "
 
 #: openpgp/output.c:453
 #, c-format
 msgid "expires: %s, "
-msgstr "verloopt: %s,"
+msgstr "verloopt: %s, "
 
 #: openpgp/output.c:465
 #, c-format
