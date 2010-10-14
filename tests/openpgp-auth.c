@@ -169,7 +169,8 @@ doit ()
 
       sent = gnutls_record_send (session, message, sizeof (message));
       if (sent != sizeof (message))
-	fail ("client sent %li vs. %li\n", sent, sizeof (message));
+	fail ("client sent %li vs. %li\n",
+	      (long) sent, (long) sizeof (message));
 
       err = gnutls_bye (session, GNUTLS_SHUT_RDWR);
       if (err != 0)
@@ -262,7 +263,8 @@ doit ()
       received = gnutls_record_recv (session, greetings, sizeof (greetings));
       if (received != sizeof (message)
 	  || memcmp (greetings, message, sizeof (message)))
-	fail ("server received %li vs. %li\n", received, sizeof (message));
+	fail ("server received %li vs. %li\n",
+	      (long) received, (long) sizeof (message));
 
       err = gnutls_bye (session, GNUTLS_SHUT_RDWR);
       if (err != 0)
