@@ -24,7 +24,7 @@
  */
 
 #ifndef GNUTLS_MEM_H
-# define GNUTLS_MEM_H
+#define GNUTLS_MEM_H
 
 typedef void svoid;		/* for functions that allocate using gnutls_secure_malloc */
 

@@ -58,8 +58,8 @@ static const int servwrite_length = sizeof (servwrite) - 1;
  * (session->cipher_specs)
  */
 static int
-_gnutls_set_keys (gnutls_session_t session, record_parameters_st *params, int hash_size, int IV_size,
-		  int key_size, int export_flag)
+_gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
+		  int hash_size, int IV_size, int key_size, int export_flag)
 {
   /* FIXME: This function is too long
    */
@@ -73,8 +73,12 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st *params, int ha
 		   2 * MAX_CIPHER_BLOCK_SIZE];
   record_state_st *client_write, *server_write;
 
-  client_write = session->security_parameters.entity == GNUTLS_CLIENT ? &params->write : &params->read;
-  server_write = session->security_parameters.entity == GNUTLS_SERVER ? &params->write : &params->read;
+  client_write =
+    session->security_parameters.entity ==
+    GNUTLS_CLIENT ? &params->write : &params->read;
+  server_write =
+    session->security_parameters.entity ==
+    GNUTLS_SERVER ? &params->write : &params->read;
 
   block_size = 2 * hash_size + 2 * key_size;
   if (export_flag == 0)
@@ -117,15 +121,13 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st *params, int ha
     {
 
       if (_gnutls_sset_datum
-	  (&client_write->mac_secret,
-	   &key_block[pos], hash_size) < 0)
+	  (&client_write->mac_secret, &key_block[pos], hash_size) < 0)
 	return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
       pos += hash_size;
 
       if (_gnutls_sset_datum
-	  (&server_write->mac_secret,
-	   &key_block[pos], hash_size) < 0)
+	  (&server_write->mac_secret, &key_block[pos], hash_size) < 0)
 	return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
       pos += hash_size;
@@ -209,8 +211,7 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st *params, int ha
 	}
 
       if (_gnutls_sset_datum
-	  (&client_write->key,
-	   client_write_key, client_write_key_size) < 0)
+	  (&client_write->key, client_write_key, client_write_key_size) < 0)
 	return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
       _gnutls_hard_log ("INT: CLIENT WRITE KEY [%d]: %s\n",
@@ -220,8 +221,7 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st *params, int ha
 					 sizeof (buf), NULL));
 
       if (_gnutls_sset_datum
-	  (&server_write->key,
-	   server_write_key, server_write_key_size) < 0)
+	  (&server_write->key, server_write_key, server_write_key_size) < 0)
 	return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
       _gnutls_hard_log ("INT: SERVER WRITE KEY [%d]: %s\n",
@@ -238,15 +238,13 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st *params, int ha
   if (IV_size > 0 && export_flag == 0)
     {
       if (_gnutls_sset_datum
-	  (&client_write->IV, &key_block[pos],
-	   IV_size) < 0)
+	  (&client_write->IV, &key_block[pos], IV_size) < 0)
 	return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
       pos += IV_size;
 
       if (_gnutls_sset_datum
-	  (&server_write->IV, &key_block[pos],
-	   IV_size) < 0)
+	  (&server_write->IV, &key_block[pos], IV_size) < 0)
 	return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
       pos += IV_size;
@@ -281,13 +279,11 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st *params, int ha
       if (ret < 0)
 	return gnutls_assert_val (ret);
 
-      if (_gnutls_sset_datum
-	  (&client_write->IV, iv_block, IV_size) < 0)
+      if (_gnutls_sset_datum (&client_write->IV, iv_block, IV_size) < 0)
 	return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
       if (_gnutls_sset_datum
-	  (&server_write->IV,
-	   &iv_block[IV_size], IV_size) < 0)
+	  (&server_write->IV, &iv_block[IV_size], IV_size) < 0)
 	return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
     }
 
@@ -295,16 +291,15 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st *params, int ha
 }
 
 static int
-_gnutls_init_record_state (record_parameters_st *params, int read,
-			   record_state_st *state)
+_gnutls_init_record_state (record_parameters_st * params, int read,
+			   record_state_st * state)
 {
   int ret;
 
   ret = _gnutls_cipher_init (&state->cipher_state,
 			     params->cipher_algorithm,
 			     &state->key, &state->IV);
-  if (ret < 0
-      && params->cipher_algorithm != GNUTLS_CIPHER_NULL)
+  if (ret < 0 && params->cipher_algorithm != GNUTLS_CIPHER_NULL)
     return gnutls_assert_val (ret);
 
   state->compression_state =
@@ -318,8 +313,7 @@ _gnutls_init_record_state (record_parameters_st *params, int read,
 
 int
 _gnutls_epoch_set_cipher_suite (gnutls_session_t session,
-				int epoch_rel,
-				cipher_suite_st *suite)
+				int epoch_rel, cipher_suite_st * suite)
 {
   gnutls_cipher_algorithm_t cipher_algo;
   gnutls_mac_algorithm_t mac_algo;
@@ -335,7 +329,7 @@ _gnutls_epoch_set_cipher_suite (gnutls_session_t session,
       || params->mac_algorithm != GNUTLS_MAC_UNKNOWN)
     return gnutls_assert_val (GNUTLS_E_INTERNAL_ERROR);
 
-  cipher_algo =_gnutls_cipher_suite_get_cipher_algo (suite);
+  cipher_algo = _gnutls_cipher_suite_get_cipher_algo (suite);
   mac_algo = _gnutls_cipher_suite_get_mac_algo (suite);
 
   if (_gnutls_cipher_is_ok (cipher_algo) != 0
@@ -374,7 +368,7 @@ _gnutls_epoch_set_compression (gnutls_session_t session,
 
 void
 _gnutls_epoch_set_null_algos (gnutls_session_t session,
-			      record_parameters_st *params)
+			      record_parameters_st * params)
 {
   /* This is only called on startup. We are extra paranoid about this
      because it may cause unencrypted application data to go out on
@@ -385,10 +379,10 @@ _gnutls_epoch_set_null_algos (gnutls_session_t session,
       return;
     }
 
-  params->cipher_algorithm =  GNUTLS_CIPHER_NULL;
+  params->cipher_algorithm = GNUTLS_CIPHER_NULL;
   params->mac_algorithm = GNUTLS_MAC_NULL;
-  params->compression_algorithm =  GNUTLS_COMP_NULL;
-  params->initialized =  1;
+  params->compression_algorithm = GNUTLS_COMP_NULL;
+  params->initialized = 1;
 }
 
 int
@@ -436,14 +430,13 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
 
   ret = _gnutls_init_record_state (params, 1, &params->read);
   if (ret < 0)
-      return gnutls_assert_val (ret);
+    return gnutls_assert_val (ret);
 
   ret = _gnutls_init_record_state (params, 0, &params->write);
   if (ret < 0)
     return gnutls_assert_val (ret);
 
-  _gnutls_record_log
-    ("REC[%p]: Epoch #%u ready\n", session, params->epoch);
+  _gnutls_record_log ("REC[%p]: Epoch #%u ready\n", session, params->epoch);
 
   params->initialized = 1;
   return 0;
@@ -467,7 +460,8 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
 static void
 _gnutls_set_resumed_parameters (gnutls_session_t session)
 {
-  security_parameters_st *src = &session->internals.resumed_security_parameters;
+  security_parameters_st *src =
+    &session->internals.resumed_security_parameters;
   security_parameters_st *dst = &session->security_parameters;
 
   CPY_COMMON;
@@ -496,7 +490,8 @@ _gnutls_connection_state_init (gnutls_session_t session)
 
 static int
 _gnutls_check_algos (gnutls_session_t session,
-		     cipher_suite_st *suite, gnutls_compression_method_t comp_algo)
+		     cipher_suite_st * suite,
+		     gnutls_compression_method_t comp_algo)
 {
   gnutls_cipher_algorithm_t cipher_algo;
   gnutls_mac_algorithm_t mac_algo;
@@ -539,7 +534,8 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
   if (session->internals.resumed == RESUME_FALSE)
     {
       ret = _gnutls_check_algos (session,
-				 &session->security_parameters.current_cipher_suite,
+				 &session->
+				 security_parameters.current_cipher_suite,
 				 session->internals.compression_method);
       if (ret < 0)
 	return ret;
@@ -587,7 +583,8 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
   if (session->internals.resumed == RESUME_FALSE)
     {
       ret = _gnutls_check_algos (session,
-				 &session->security_parameters.current_cipher_suite,
+				 &session->
+				 security_parameters.current_cipher_suite,
 				 session->internals.compression_method);
       if (ret < 0)
 	return ret;
@@ -640,8 +637,8 @@ _gnutls_set_kx (gnutls_session_t session, gnutls_kx_algorithm_t algo)
 }
 
 static inline int
-epoch_resolve(gnutls_session_t session,
-	      unsigned int epoch_rel, uint16_t *epoch_out)
+epoch_resolve (gnutls_session_t session,
+	       unsigned int epoch_rel, uint16_t * epoch_out)
 {
   switch (epoch_rel)
     {
@@ -666,11 +663,10 @@ epoch_resolve(gnutls_session_t session,
     }
 }
 
-static inline record_parameters_st**
-epoch_get_slot(gnutls_session_t session, uint16_t epoch)
+static inline record_parameters_st **
+epoch_get_slot (gnutls_session_t session, uint16_t epoch)
 {
-  uint16_t epoch_index =
-    epoch - session->security_parameters.epoch_min;
+  uint16_t epoch_index = epoch - session->security_parameters.epoch_min;
 
   if (epoch_index >= MAX_EPOCH_INDEX)
     {
@@ -684,7 +680,7 @@ epoch_get_slot(gnutls_session_t session, uint16_t epoch)
 
 int
 _gnutls_epoch_get (gnutls_session_t session, unsigned int epoch_rel,
-		   record_parameters_st **params_out)
+		   record_parameters_st ** params_out)
 {
   uint16_t epoch;
   record_parameters_st **params;
@@ -704,21 +700,20 @@ _gnutls_epoch_get (gnutls_session_t session, unsigned int epoch_rel,
 }
 
 int
-_gnutls_epoch_alloc(gnutls_session_t session, uint16_t epoch,
-		    record_parameters_st **out)
+_gnutls_epoch_alloc (gnutls_session_t session, uint16_t epoch,
+		     record_parameters_st ** out)
 {
   record_parameters_st **slot;
 
-  _gnutls_record_log
-    ("REC[%p]: Allocating epoch #%u\n", session, epoch);
+  _gnutls_record_log ("REC[%p]: Allocating epoch #%u\n", session, epoch);
 
-  slot = epoch_get_slot(session, epoch);
+  slot = epoch_get_slot (session, epoch);
 
   /* If slot out of range or not empty. */
   if (slot == NULL)
     return gnutls_assert_val (GNUTLS_E_INVALID_REQUEST);
 
-  if(*slot != NULL)
+  if (*slot != NULL)
     return gnutls_assert_val (GNUTLS_E_INVALID_REQUEST);
 
   *slot = gnutls_calloc (1, sizeof (record_parameters_st));
@@ -726,9 +721,9 @@ _gnutls_epoch_alloc(gnutls_session_t session, uint16_t epoch,
     return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
   (*slot)->epoch = epoch;
-  (*slot)->cipher_algorithm =  GNUTLS_CIPHER_UNKNOWN;
+  (*slot)->cipher_algorithm = GNUTLS_CIPHER_UNKNOWN;
   (*slot)->mac_algorithm = GNUTLS_MAC_UNKNOWN;
-  (*slot)->compression_algorithm =  GNUTLS_COMP_UNKNOWN;
+  (*slot)->compression_algorithm = GNUTLS_COMP_UNKNOWN;
 
   if (out != NULL)
     *out = *slot;
@@ -737,7 +732,7 @@ _gnutls_epoch_alloc(gnutls_session_t session, uint16_t epoch,
 }
 
 static inline int
-epoch_alive (gnutls_session_t session, record_parameters_st *params)
+epoch_alive (gnutls_session_t session, record_parameters_st * params)
 {
   const security_parameters_st *sp = &session->security_parameters;
 
@@ -753,11 +748,10 @@ _gnutls_epoch_gc (gnutls_session_t session)
   int i, j;
   unsigned int min_index = 0;
 
-  _gnutls_record_log
-    ("REC[%p]: Start of epoch cleanup\n", session);
+  _gnutls_record_log ("REC[%p]: Start of epoch cleanup\n", session);
 
   /* Free all dead cipher state */
-  for(i=0; i < MAX_EPOCH_INDEX; i++)
+  for (i = 0; i < MAX_EPOCH_INDEX; i++)
     if (session->record_parameters[i] != NULL
 	&& !epoch_alive (session, session->record_parameters[i]))
       {
@@ -766,23 +760,24 @@ _gnutls_epoch_gc (gnutls_session_t session)
       }
 
   /* Look for contiguous NULLs at the start of the array */
-  for(i=0; i < MAX_EPOCH_INDEX && session->record_parameters[i] == NULL; i++);
+  for (i = 0; i < MAX_EPOCH_INDEX && session->record_parameters[i] == NULL;
+       i++);
   min_index = i;
 
   /* Pick up the slack in the epoch window. */
-  for(i=0, j=min_index; j < MAX_EPOCH_INDEX; i++, j++)
+  for (i = 0, j = min_index; j < MAX_EPOCH_INDEX; i++, j++)
     session->record_parameters[i] = session->record_parameters[j];
 
   /* Set the new epoch_min */
   if (session->record_parameters[0] != NULL)
-    session->security_parameters.epoch_min = session->record_parameters[0]->epoch;
+    session->security_parameters.epoch_min =
+      session->record_parameters[0]->epoch;
 
-  _gnutls_record_log
-    ("REC[%p]: End of epoch cleanup\n", session);
+  _gnutls_record_log ("REC[%p]: End of epoch cleanup\n", session);
 }
 
 static inline void
-free_record_state (record_state_st *state, int read)
+free_record_state (record_state_st * state, int read)
 {
   _gnutls_free_datum (&state->mac_secret);
   _gnutls_free_datum (&state->IV);
@@ -795,10 +790,9 @@ free_record_state (record_state_st *state, int read)
 }
 
 void
-_gnutls_epoch_free (gnutls_session_t session, record_parameters_st *params)
+_gnutls_epoch_free (gnutls_session_t session, record_parameters_st * params)
 {
-  _gnutls_record_log
-    ("REC[%p]: Epoch #%u freed\n", session, params->epoch);
+  _gnutls_record_log ("REC[%p]: Epoch #%u freed\n", session, params->epoch);
 
   free_record_state (&params->read, 1);
   free_record_state (&params->write, 0);

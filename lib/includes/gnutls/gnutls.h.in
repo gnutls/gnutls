@@ -35,13 +35,13 @@
 
 
 #ifndef GNUTLS_H
-# define GNUTLS_H
+#define GNUTLS_H
 
 /* Get size_t. */
 #include <stddef.h>
 /* Get ssize_t. */
 #ifndef HAVE_SSIZE_T
-# define HAVE_SSIZE_T
+#define HAVE_SSIZE_T
 /* *INDENT-OFF* */
 @DEFINE_SSIZE_T@
 /* *INDENT-ON* */
@@ -245,8 +245,8 @@ extern "C"
     GNUTLS_DIG_SHA384 = GNUTLS_MAC_SHA384,
     GNUTLS_DIG_SHA512 = GNUTLS_MAC_SHA512,
     GNUTLS_DIG_SHA224 = GNUTLS_MAC_SHA224
-    /* If you add anything here, make sure you align with
-       gnutls_mac_algorithm_t. */
+      /* If you add anything here, make sure you align with
+         gnutls_mac_algorithm_t. */
   } gnutls_digest_algorithm_t;
 
   /* exported for other gnutls headers. This is the maximum number of
@@ -585,21 +585,21 @@ extern "C"
    * Enumeration of different digital signature algorithms.
    */
   typedef enum
-    {
-      GNUTLS_SIGN_UNKNOWN = 0,
-      GNUTLS_SIGN_RSA_SHA1 = 1,
-      GNUTLS_SIGN_RSA_SHA = GNUTLS_SIGN_RSA_SHA1,
-      GNUTLS_SIGN_DSA_SHA1 = 2,
-      GNUTLS_SIGN_DSA_SHA = GNUTLS_SIGN_DSA_SHA1,
-      GNUTLS_SIGN_RSA_MD5 = 3,
-      GNUTLS_SIGN_RSA_MD2 = 4,
-      GNUTLS_SIGN_RSA_RMD160 = 5,
-      GNUTLS_SIGN_RSA_SHA256 = 6,
-      GNUTLS_SIGN_RSA_SHA384 = 7,
-      GNUTLS_SIGN_RSA_SHA512 = 8,
-      GNUTLS_SIGN_RSA_SHA224 = 9,
-      GNUTLS_SIGN_DSA_SHA224 = 10,
-      GNUTLS_SIGN_DSA_SHA256 = 11
+  {
+    GNUTLS_SIGN_UNKNOWN = 0,
+    GNUTLS_SIGN_RSA_SHA1 = 1,
+    GNUTLS_SIGN_RSA_SHA = GNUTLS_SIGN_RSA_SHA1,
+    GNUTLS_SIGN_DSA_SHA1 = 2,
+    GNUTLS_SIGN_DSA_SHA = GNUTLS_SIGN_DSA_SHA1,
+    GNUTLS_SIGN_RSA_MD5 = 3,
+    GNUTLS_SIGN_RSA_MD2 = 4,
+    GNUTLS_SIGN_RSA_RMD160 = 5,
+    GNUTLS_SIGN_RSA_SHA256 = 6,
+    GNUTLS_SIGN_RSA_SHA384 = 7,
+    GNUTLS_SIGN_RSA_SHA512 = 8,
+    GNUTLS_SIGN_RSA_SHA224 = 9,
+    GNUTLS_SIGN_DSA_SHA224 = 10,
+    GNUTLS_SIGN_DSA_SHA256 = 11
   } gnutls_sign_algorithm_t;
 
   const char *gnutls_sign_algorithm_get_name (gnutls_sign_algorithm_t sign);
@@ -616,14 +616,14 @@ extern "C"
    * Enumeration of security parameters for passive attacks
    */
   typedef enum
-    {
-      GNUTLS_SEC_PARAM_UNKNOWN,
-      GNUTLS_SEC_PARAM_WEAK,
-      GNUTLS_SEC_PARAM_LOW,
-      GNUTLS_SEC_PARAM_NORMAL,
-      GNUTLS_SEC_PARAM_HIGH,
-      GNUTLS_SEC_PARAM_ULTRA
-    } gnutls_sec_param_t;
+  {
+    GNUTLS_SEC_PARAM_UNKNOWN,
+    GNUTLS_SEC_PARAM_WEAK,
+    GNUTLS_SEC_PARAM_LOW,
+    GNUTLS_SEC_PARAM_NORMAL,
+    GNUTLS_SEC_PARAM_HIGH,
+    GNUTLS_SEC_PARAM_ULTRA
+  } gnutls_sec_param_t;
 
 
 /* If you want to change this, then also change the define in
@@ -685,10 +685,10 @@ extern "C"
   const char *gnutls_alert_get_name (gnutls_alert_description_t alert);
 
   gnutls_sec_param_t gnutls_pk_bits_to_sec_param (gnutls_pk_algorithm_t algo,
-                                      unsigned int bits);
-  const char * gnutls_sec_param_get_name (gnutls_sec_param_t param);
+						  unsigned int bits);
+  const char *gnutls_sec_param_get_name (gnutls_sec_param_t param);
   unsigned int gnutls_sec_param_to_pk_bits (gnutls_pk_algorithm_t algo,
-                                      gnutls_sec_param_t param);
+					    gnutls_sec_param_t param);
 
 /* get information on the current session */
   gnutls_cipher_algorithm_t gnutls_cipher_get (gnutls_session_t session);
@@ -1124,13 +1124,13 @@ extern "C"
   int gnutls_global_init (void);
   void gnutls_global_deinit (void);
 
-  typedef int (*mutex_init_func)(void** mutex);
-  typedef int (*mutex_lock_func)(void** mutex);
-  typedef int (*mutex_unlock_func)(void** mutex);
-  typedef int (*mutex_deinit_func)(void** mutex);
-  
-  void gnutls_global_set_mutex(mutex_init_func init, mutex_deinit_func, 
-    mutex_lock_func, mutex_unlock_func);
+  typedef int (*mutex_init_func) (void **mutex);
+  typedef int (*mutex_lock_func) (void **mutex);
+  typedef int (*mutex_unlock_func) (void **mutex);
+  typedef int (*mutex_deinit_func) (void **mutex);
+
+  void gnutls_global_set_mutex (mutex_init_func init, mutex_deinit_func,
+				mutex_lock_func, mutex_unlock_func);
 
   typedef void *(*gnutls_alloc_function) (size_t);
   typedef void *(*gnutls_calloc_function) (size_t, size_t);
@@ -1211,16 +1211,19 @@ extern "C"
 
 /* Session stuff
  */
-  typedef struct {
-    void  *iov_base;    /* Starting address */
-    size_t iov_len;     /* Number of bytes to transfer */
+  typedef struct
+  {
+    void *iov_base;		/* Starting address */
+    size_t iov_len;		/* Number of bytes to transfer */
   } giovec_t;
 
   typedef ssize_t (*gnutls_pull_func) (gnutls_transport_ptr_t, void *,
 				       size_t);
-  typedef ssize_t (*gnutls_push_func) (gnutls_transport_ptr_t, const void *, size_t);
+  typedef ssize_t (*gnutls_push_func) (gnutls_transport_ptr_t, const void *,
+				       size_t);
 
-  typedef ssize_t (*gnutls_vec_push_func) (gnutls_transport_ptr_t, const giovec_t *iov, int iovcnt);
+  typedef ssize_t (*gnutls_vec_push_func) (gnutls_transport_ptr_t,
+					   const giovec_t * iov, int iovcnt);
 
   typedef int (*gnutls_errno_func) (gnutls_transport_ptr_t);
 
@@ -1239,14 +1242,14 @@ extern "C"
 
 
   void gnutls_transport_set_push_function2 (gnutls_session_t session,
-                                      gnutls_vec_push_func vec_func);
+					    gnutls_vec_push_func vec_func);
   void gnutls_transport_set_push_function (gnutls_session_t session,
 					   gnutls_push_func push_func);
   void gnutls_transport_set_pull_function (gnutls_session_t session,
 					   gnutls_pull_func pull_func);
 
   void gnutls_transport_set_errno_function (gnutls_session_t session,
-					   gnutls_errno_func errno_func);
+					    gnutls_errno_func errno_func);
 
   void gnutls_transport_set_errno (gnutls_session_t session, int err);
   void gnutls_transport_set_global_errno (int err);
@@ -1460,19 +1463,20 @@ extern "C"
   typedef struct gnutls_openpgp_privkey_int *gnutls_openpgp_privkey_t;
 
   struct gnutls_pkcs11_privkey_st;
-  typedef struct gnutls_pkcs11_privkey_st* gnutls_pkcs11_privkey_t;
+  typedef struct gnutls_pkcs11_privkey_st *gnutls_pkcs11_privkey_t;
 
-  typedef enum {
-    GNUTLS_PRIVKEY_X509, /* gnutls_x509_privkey_t */
-    GNUTLS_PRIVKEY_OPENPGP, /* gnutls_openpgp_privkey_t */
-    GNUTLS_PRIVKEY_PKCS11 /* gnutls_pkcs11_privkey_t */
+  typedef enum
+  {
+    GNUTLS_PRIVKEY_X509,	/* gnutls_x509_privkey_t */
+    GNUTLS_PRIVKEY_OPENPGP,	/* gnutls_openpgp_privkey_t */
+    GNUTLS_PRIVKEY_PKCS11	/* gnutls_pkcs11_privkey_t */
   } gnutls_privkey_type_t;
 
   typedef struct gnutls_retr2_st
   {
     gnutls_certificate_type_t cert_type;
     gnutls_privkey_type_t key_type;
-    
+
     union
     {
       gnutls_x509_crt_t *x509;
@@ -1525,16 +1529,16 @@ extern "C"
    */
 
   typedef int gnutls_certificate_retrieve_function (gnutls_session_t,
-							   const
-							   gnutls_datum_t *
-							   req_ca_rdn,
-							   int nreqs,
-							   const
-							   gnutls_pk_algorithm_t
-							   * pk_algos,
-							   int
-							   pk_algos_length,
-							   gnutls_retr2_st *);
+						    const
+						    gnutls_datum_t *
+						    req_ca_rdn,
+						    int nreqs,
+						    const
+						    gnutls_pk_algorithm_t
+						    * pk_algos,
+						    int
+						    pk_algos_length,
+						    gnutls_retr2_st *);
 
 
   void gnutls_certificate_set_retrieve_function

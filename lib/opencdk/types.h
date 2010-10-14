@@ -26,26 +26,26 @@
 #define CDK_TYPES_H
 
 #ifndef HAVE_BYTE_TYPEDEF
-# undef byte
+#undef byte
 typedef unsigned char byte;
-# define HAVE_BYTE_TYPEDEF
+#define HAVE_BYTE_TYPEDEF
 #endif
 
 #ifndef HAVE_U16_TYPEDEF
-# undef u16
+#undef u16
 typedef unsigned short u16;
-# define HAVE_U16_TYPEDEF
+#define HAVE_U16_TYPEDEF
 #endif
 
 #ifndef HAVE_U32_TYPEDEF
-# undef u32
+#undef u32
 typedef unsigned int u32;
-# define HAVE_U32_TYPEDEF
+#define HAVE_U32_TYPEDEF
 #endif
 
 #ifndef DIM
-# define DIM(v) (sizeof (v)/sizeof ((v)[0]))
-# define DIMof(type, member)   DIM(((type *)0)->member)
+#define DIM(v) (sizeof (v)/sizeof ((v)[0]))
+#define DIMof(type, member)   DIM(((type *)0)->member)
 #endif
 
 #endif /* CDK_TYPES_H */

@@ -1,5 +1,5 @@
 #ifndef GNUTLSXX_H
-# define GNUTLSXX_H
+#define GNUTLSXX_H
 
 #include <exception>
 #include <vector>
@@ -310,8 +310,7 @@ namespace gnutls
 				 gnutls_x509_crt_fmt_t type,
 				 const char *password);
 
-    void set_retrieve_function (gnutls_certificate_retrieve_function *
-				func);
+    void set_retrieve_function (gnutls_certificate_retrieve_function * func);
 
   protected:
       gnutls_certificate_credentials_t cred;

@@ -24,7 +24,7 @@
  */
 
 #ifndef GNUTLS_PK_H
-# define GNUTLS_PK_H
+#define GNUTLS_PK_H
 
 extern int crypto_pk_prio;
 extern gnutls_crypto_pk_st _gnutls_pk_ops;
@@ -77,9 +77,11 @@ int
 _gnutls_decode_ber_rs (const gnutls_datum_t * sig_value, bigint_t * r,
 		       bigint_t * s);
 
-int _gnutls_calc_rsa_exp(bigint_t* params, unsigned int params_size);
+int _gnutls_calc_rsa_exp (bigint_t * params, unsigned int params_size);
 
-int _gnutls_pk_get_hash_algorithm(gnutls_pk_algorithm_t pk, bigint_t* params, int params_size,
-  gnutls_digest_algorithm_t *dig, unsigned int *mand);
+int _gnutls_pk_get_hash_algorithm (gnutls_pk_algorithm_t pk,
+				   bigint_t * params, int params_size,
+				   gnutls_digest_algorithm_t * dig,
+				   unsigned int *mand);
 
 #endif /* GNUTLS_PK_H */

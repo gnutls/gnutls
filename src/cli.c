@@ -188,9 +188,11 @@ load_keys (void)
 
 	  ret =
 	    gnutls_x509_crt_import_pkcs11_url (x509_crt[0], x509_certfile, 0);
-          
-          if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-  	    ret = gnutls_x509_crt_import_pkcs11_url (x509_crt[0], x509_certfile, GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+
+	  if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+	    ret =
+	      gnutls_x509_crt_import_pkcs11_url (x509_crt[0], x509_certfile,
+						 GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 
 	  if (ret < 0)
 	    {
@@ -241,12 +243,14 @@ load_keys (void)
 	{
 	  gnutls_pkcs11_privkey_init (&pkcs11_key);
 
-	  ret = gnutls_pkcs11_privkey_import_url (pkcs11_key, x509_keyfile, 0);
-	  if (ret < 0) 
+	  ret =
+	    gnutls_pkcs11_privkey_import_url (pkcs11_key, x509_keyfile, 0);
+	  if (ret < 0)
 	    {
-	      fprintf(stderr, "*** Error loading url: %s\n", gnutls_strerror(ret));
-	      exit(1);
-            }
+	      fprintf (stderr, "*** Error loading url: %s\n",
+		       gnutls_strerror (ret));
+	      exit (1);
+	    }
 	}
       else
 	{
@@ -303,11 +307,12 @@ load_keys (void)
 	  gnutls_pkcs11_privkey_init (&pkcs11_key);
 
 	  ret = gnutls_pkcs11_privkey_import_url (pkcs11_key, pgp_keyfile, 0);
-	  if (ret < 0) 
+	  if (ret < 0)
 	    {
-	      fprintf(stderr, "*** Error loading url: %s\n", gnutls_strerror(ret));
-	      exit(1);
-            }
+	      fprintf (stderr, "*** Error loading url: %s\n",
+		       gnutls_strerror (ret));
+	      exit (1);
+	    }
 	}
       else
 	{
@@ -482,21 +487,21 @@ cert_callback (gnutls_session_t session,
 	      return -1;
 	    }
 
-          if (x509_key != NULL)
-            {
+	  if (x509_key != NULL)
+	    {
 	      st->key.x509 = x509_key;
 	      st->key_type = GNUTLS_PRIVKEY_X509;
-            }
-          else if (pkcs11_key != NULL)
-            {
-              st->key.pkcs11 = pkcs11_key;
-              st->key_type = GNUTLS_PRIVKEY_PKCS11;
-            }
-          else
-            {
-              printf ("- Could not find a suitable key to send to server\n");
-              return -1;
-            }
+	    }
+	  else if (pkcs11_key != NULL)
+	    {
+	      st->key.pkcs11 = pkcs11_key;
+	      st->key_type = GNUTLS_PRIVKEY_PKCS11;
+	    }
+	  else
+	    {
+	      printf ("- Could not find a suitable key to send to server\n");
+	      return -1;
+	    }
 
 	  st->ncerts = x509_crt_size;
 
@@ -513,21 +518,21 @@ cert_callback (gnutls_session_t session,
       if (pgp_crt != NULL)
 	{
 
-          if (pgp_key != NULL)
-            {
-              st->key.pgp = pgp_key;
-              st->key_type = GNUTLS_PRIVKEY_OPENPGP;
-            }
-          else if (pkcs11_key != NULL)
-            {
-              st->key.pkcs11 = pkcs11_key;
-              st->key_type = GNUTLS_PRIVKEY_PKCS11;
-            }
-          else
-            {
-              printf ("- Could not find a suitable key to send to server\n");
-              return -1;
-            }
+	  if (pgp_key != NULL)
+	    {
+	      st->key.pgp = pgp_key;
+	      st->key_type = GNUTLS_PRIVKEY_OPENPGP;
+	    }
+	  else if (pkcs11_key != NULL)
+	    {
+	      st->key.pkcs11 = pkcs11_key;
+	      st->key_type = GNUTLS_PRIVKEY_PKCS11;
+	    }
+	  else
+	    {
+	      printf ("- Could not find a suitable key to send to server\n");
+	      return -1;
+	    }
 
 	  st->ncerts = 1;
 
@@ -594,7 +599,8 @@ init_tls_session (const char *hostname)
 
   gnutls_certificate_set_retrieve_function (xcred, cert_callback);
   gnutls_certificate_set_verify_function (xcred, cert_verify_callback);
-  gnutls_certificate_set_verify_flags(xcred, GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
+  gnutls_certificate_set_verify_flags (xcred,
+				       GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
 
   /* send the fingerprint */
 #ifdef ENABLE_OPENPGP
@@ -616,7 +622,7 @@ init_tls_session (const char *hostname)
     }
 
 #ifdef ENABLE_SESSION_TICKET
-  if (disable_extensions ==0 && !info.noticket)
+  if (disable_extensions == 0 && !info.noticket)
     gnutls_session_ticket_enable_client (session);
 #endif
 
@@ -830,8 +836,8 @@ after_handshake:
   signal (SIGALRM, &starttls_alarm);
 #endif
 
-  fflush(stdout);
-  fflush(stderr);
+  fflush (stdout);
+  fflush (stderr);
 
   /* do not buffer */
 #if !(defined _WIN32 || defined __WIN32__)

@@ -48,7 +48,7 @@ int _gnutls_gen_rsa_client_kx (gnutls_session_t, opaque **);
 static int gen_rsa_export_server_kx (gnutls_session_t, opaque **);
 static int proc_rsa_export_server_kx (gnutls_session_t, opaque *, size_t);
 static int proc_rsa_export_client_kx (gnutls_session_t session, opaque * data,
-			    size_t _data_size);
+				      size_t _data_size);
 
 const mod_auth_st rsa_export_auth_struct = {
   "RSA EXPORT",
@@ -99,18 +99,18 @@ _gnutls_get_private_rsa_params (gnutls_session_t session,
       (&session->security_parameters.current_cipher_suite)
       != GNUTLS_KX_RSA_EXPORT || bits < 512)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
   rsa_params =
-      _gnutls_certificate_get_rsa_params (cred->rsa_params,
-					    cred->params_func, session);
+    _gnutls_certificate_get_rsa_params (cred->rsa_params,
+					cred->params_func, session);
   /* EXPORT case: */
   if (rsa_params == NULL)
     {
-	  gnutls_assert ();
-	  return GNUTLS_E_NO_TEMPORARY_RSA_PARAMS;
+      gnutls_assert ();
+      return GNUTLS_E_NO_TEMPORARY_RSA_PARAMS;
     }
 
   /* In the export case, we do use temporary RSA params
@@ -123,8 +123,9 @@ _gnutls_get_private_rsa_params (gnutls_session_t session,
   return 0;
 }
 
-int proc_rsa_export_client_kx (gnutls_session_t session, opaque * data,
-			    size_t _data_size)
+int
+proc_rsa_export_client_kx (gnutls_session_t session, opaque * data,
+			   size_t _data_size)
 {
   gnutls_datum_t plaintext;
   gnutls_datum_t ciphertext;
@@ -268,7 +269,7 @@ gen_rsa_export_server_kx (gnutls_session_t session, opaque ** data)
   /* abort sending this message if we have a certificate
    * of 512 bits or less.
    */
-  gnutls_privkey_get_pk_algorithm(apr_pkey, &bits);
+  gnutls_privkey_get_pk_algorithm (apr_pkey, &bits);
   if (apr_pkey && bits <= 512)
     {
       gnutls_assert ();

@@ -80,7 +80,7 @@ _gnutls_srp_gx (opaque * text, size_t textsize, opaque ** result,
     }
   else
     {
-      gnutls_assert();
+      gnutls_assert ();
       ret = GNUTLS_E_MPI_PRINT_FAILED;
     }
 

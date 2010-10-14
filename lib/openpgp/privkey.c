@@ -87,13 +87,13 @@ gnutls_openpgp_privkey_deinit (gnutls_openpgp_privkey_t key)
 gnutls_sec_param_t
 gnutls_openpgp_privkey_sec_param (gnutls_openpgp_privkey_t key)
 {
-gnutls_pk_algorithm_t algo;
-unsigned int bits;
+  gnutls_pk_algorithm_t algo;
+  unsigned int bits;
 
   algo = gnutls_openpgp_privkey_get_pk_algorithm (key, &bits);
-  if (algo == GNUTLS_PK_UNKNOWN) 
+  if (algo == GNUTLS_PK_UNKNOWN)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_SEC_PARAM_UNKNOWN;
     }
 
@@ -718,7 +718,7 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
   gnutls_pk_params_st pk_params;
   cdk_packet_t pkt;
 
-  memset(&pk_params, 0, sizeof(pk_params));
+  memset (&pk_params, 0, sizeof (pk_params));
 
   if (keyid == NULL)
     pkt = cdk_kbnode_find_packet (pkey->knode, CDK_PKT_SECRET_KEY);
@@ -739,7 +739,7 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
     case GNUTLS_PK_RSA:
       /* openpgp does not hold all parameters as in PKCS #1
        */
-      pk_params.params_nr = RSA_PRIVATE_PARAMS-2;
+      pk_params.params_nr = RSA_PRIVATE_PARAMS - 2;
       break;
     case GNUTLS_PK_DSA:
       pk_params.params_nr = DSA_PRIVATE_PARAMS;
@@ -758,9 +758,9 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
 	  goto error;
 	}
     }
-    /* fixup will generate exp1 and exp2 that are not
-     * available here.
-     */
+  /* fixup will generate exp1 and exp2 that are not
+   * available here.
+   */
   result = _gnutls_pk_fixup (pk_algorithm, GNUTLS_IMPORT, &pk_params);
   if (result < 0)
     {
@@ -775,7 +775,7 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
     }
 
   *params_size = pk_params.params_nr;
-  for(i=0;i<pk_params.params_nr;i++)
+  for (i = 0; i < pk_params.params_nr; i++)
     params[i] = pk_params.params[i];
 
   return 0;

@@ -58,7 +58,8 @@ static int
 check_if_same_cert (gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2)
 {
   gnutls_datum_t cert1bin = { NULL, 0 }, cert2bin =
-  {NULL, 0};
+  {
+  NULL, 0};
   int result;
   opaque serial1[128], serial2[128];
   size_t serial1_size, serial2_size;
@@ -79,7 +80,8 @@ check_if_same_cert (gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2)
       goto cmp;
     }
 
-  if (serial2_size != serial1_size || memcmp(serial1, serial2, serial1_size) != 0)
+  if (serial2_size != serial1_size
+      || memcmp (serial1, serial2, serial1_size) != 0)
     {
       return 1;
     }
@@ -496,36 +498,35 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
    * self-signed E but already removed above), and we trust B, remove
    * B, C and D. */
   if (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_SAME))
-    i = 0; /* also replace the first one */
+    i = 0;			/* also replace the first one */
   else
-    i = 1; /* do not replace the first one */
-    
+    i = 1;			/* do not replace the first one */
+
   for (; i < clist_size; i++)
     {
       int j;
 
       for (j = 0; j < tcas_size; j++)
-        {
-          if (check_if_same_cert (certificate_list[i],
-				      trusted_cas[j]) == 0)
+	{
+	  if (check_if_same_cert (certificate_list[i], trusted_cas[j]) == 0)
 	    {
 	      /* explicity time check for trusted CA that we remove from
 	       * list. GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS
 	       */
 	      if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS)
-		      && !(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS))
-                {
-		      status |= check_time (trusted_cas[j], now);
-		      if (status != 0)
-			{
-			  return status;
-			}
+		  && !(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS))
+		{
+		  status |= check_time (trusted_cas[j], now);
+		  if (status != 0)
+		    {
+		      return status;
+		    }
 		}
-              clist_size = i;
+	      clist_size = i;
 	      break;
 	    }
-        }
-        /* clist_size may have been changed which gets out of loop */
+	}
+      /* clist_size may have been changed which gets out of loop */
     }
 
   if (clist_size == 0)
@@ -827,10 +828,10 @@ dsa_verify_sig (const gnutls_datum_t * text,
  */
 int
 pubkey_verify_sig (const gnutls_datum_t * tbs,
-	    const gnutls_datum_t * hash,
-	    const gnutls_datum_t * signature,
-	    gnutls_pk_algorithm_t pk, bigint_t * issuer_params,
-	    int issuer_params_size)
+		   const gnutls_datum_t * hash,
+		   const gnutls_datum_t * signature,
+		   gnutls_pk_algorithm_t pk, bigint_t * issuer_params,
+		   int issuer_params_size)
 {
 
   switch (pk)
@@ -864,17 +865,23 @@ pubkey_verify_sig (const gnutls_datum_t * tbs,
     }
 }
 
-gnutls_digest_algorithm_t _gnutls_dsa_q_to_hash(bigint_t q)
+gnutls_digest_algorithm_t
+_gnutls_dsa_q_to_hash (bigint_t q)
 {
-  int bits = _gnutls_mpi_get_nbits(q);
+  int bits = _gnutls_mpi_get_nbits (q);
 
-  if (bits <= 160) {
-    return GNUTLS_DIG_SHA1;
-  } else if (bits <= 224) {
-    return GNUTLS_DIG_SHA224;
-  } else {
-    return GNUTLS_DIG_SHA256;
-  }
+  if (bits <= 160)
+    {
+      return GNUTLS_DIG_SHA1;
+    }
+  else if (bits <= 224)
+    {
+      return GNUTLS_DIG_SHA224;
+    }
+  else
+    {
+      return GNUTLS_DIG_SHA256;
+    }
 }
 
 /* This will return the appropriate hash to verify the given signature.
@@ -885,28 +892,30 @@ int
 _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
 			       const gnutls_datum_t * signature,
 			       gnutls_pk_algorithm pk,
-			       bigint_t* issuer_params, unsigned int issuer_params_size)
+			       bigint_t * issuer_params,
+			       unsigned int issuer_params_size)
 {
   opaque digest[MAX_HASH_SIZE];
   gnutls_datum_t decrypted;
   int digest_size;
   int ret;
 
-  switch(pk)
+  switch (pk)
     {
     case GNUTLS_PK_DSA:
-      
+
       if (hash)
-	*hash = _gnutls_dsa_q_to_hash(issuer_params[1]);
+	*hash = _gnutls_dsa_q_to_hash (issuer_params[1]);
 
       ret = 0;
       break;
     case GNUTLS_PK_RSA:
-      if (signature == NULL) {/* return a sensible algorithm */
-        if (hash)
-          *hash = GNUTLS_DIG_SHA256;
-        return 0;
-      }
+      if (signature == NULL)
+	{			/* return a sensible algorithm */
+	  if (hash)
+	    *hash = GNUTLS_DIG_SHA256;
+	  return 0;
+	}
 
       ret =
 	_gnutls_pkcs1_rsa_decrypt (&decrypted, signature,
@@ -979,8 +988,8 @@ _gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
 
   ret =
     pubkey_verify_sig (tbs, hash, signature,
-		gnutls_x509_crt_get_pk_algorithm (issuer, NULL),
-		issuer_params, issuer_params_size);
+		       gnutls_x509_crt_get_pk_algorithm (issuer, NULL),
+		       issuer_params, issuer_params_size);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1010,7 +1019,7 @@ _gnutls_x509_privkey_verify_signature (const gnutls_datum_t * tbs,
   int ret;
 
   ret = pubkey_verify_sig (tbs, NULL, signature, issuer->pk_algorithm,
-		    issuer->params, issuer->params_size);
+			   issuer->params, issuer->params_size);
   if (ret < 0)
     {
       gnutls_assert ();

@@ -24,7 +24,7 @@
  */
 
 #ifndef GNUTLS_DATUM_H
-# define GNUTLS_DATUM_H
+#define GNUTLS_DATUM_H
 
 void _gnutls_write_datum16 (opaque * dest, gnutls_datum_t dat);
 void _gnutls_write_datum24 (opaque * dest, gnutls_datum_t dat);

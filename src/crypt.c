@@ -33,10 +33,10 @@
 #include <sys/stat.h>
 
 #ifndef _WIN32
-# include <pwd.h>
-# include <unistd.h>
+#include <pwd.h>
+#include <unistd.h>
 #else
-# include <windows.h>
+#include <windows.h>
 #endif
 
 /* Gnulib portability files. */

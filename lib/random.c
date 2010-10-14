@@ -70,7 +70,8 @@ _gnutls_rnd_deinit (void)
  *
  **/
 
-int gnutls_rnd (gnutls_rnd_level_t level, void *data, size_t len)
+int
+gnutls_rnd (gnutls_rnd_level_t level, void *data, size_t len)
 {
   if (len > 0)
     {

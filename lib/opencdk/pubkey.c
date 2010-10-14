@@ -193,7 +193,7 @@ cdk_pk_get_nskey (int algo)
   int ret;
 
   if (is_RSA (algo))
-    ret = RSA_PRIVATE_PARAMS-2; /* we don't have exp1 and exp2 */
+    ret = RSA_PRIVATE_PARAMS - 2;	/* we don't have exp1 and exp2 */
   else if (is_DSA (algo))
     ret = DSA_PRIVATE_PARAMS;
   else if (is_ELG (algo))
@@ -438,7 +438,7 @@ cdk_pk_get_fingerprint (cdk_pubkey_t pk, byte * fpr)
   err = _gnutls_hash_init (&hd, md_algo);
   if (err < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return map_gnutls_error (err);
     }
   _cdk_hash_pubkey (pk, &hd, 1);

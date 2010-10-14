@@ -26,7 +26,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -295,10 +295,10 @@ main (int argc, char *argv[])
 	}
     }
   while (
-	 /* Not done: */
-	 !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
-	 /* No error: */
-	 && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
+	  /* Not done: */
+	  !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
+	  /* No error: */
+	  && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
 
   if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_SUCCESS)
     exit_code = 1;
@@ -313,7 +313,7 @@ main (int argc, char *argv[])
 
   /* Check that this API does not affect anything after first
      handshake.
-  gnutls_safe_negotiation_set_initial (server, 0); */
+     gnutls_safe_negotiation_set_initial (server, 0); */
 
   sret = gnutls_rehandshake (server);
   if (debug_level > 0)
@@ -363,10 +363,10 @@ main (int argc, char *argv[])
 	}
     }
   while (
-	 /* Not done: */
-	 !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
-	 /* No error: */
-	 && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
+	  /* Not done: */
+	  !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
+	  /* No error: */
+	  && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
 
   if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_SUCCESS)
     exit_code = 1;
@@ -422,10 +422,10 @@ main (int argc, char *argv[])
 	}
     }
   while (
-	 /* Not done: */
-	 !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
-	 /* No error: */
-	 && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
+	  /* Not done: */
+	  !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
+	  /* No error: */
+	  && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
 
   if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_SUCCESS)
     exit_code = 1;

@@ -42,7 +42,7 @@ struct oid2string
   const char *ldap_desc;
   int choice;			/* of type DirectoryString */
   int printable;
-  const char* asn_desc; /* description in the pkix file */
+  const char *asn_desc;		/* description in the pkix file */
 };
 
 /* This list contains all the OIDs that may be
@@ -54,7 +54,8 @@ static const struct oid2string _oid2str[] = {
   {"1.3.6.1.5.5.7.9.1", "dateOfBirth", 0, 1, "PKIX1.GeneralizedTime"},
   {"1.3.6.1.5.5.7.9.2", "placeOfBirth", 0, 1, "PKIX1.DirectoryString"},
   {"1.3.6.1.5.5.7.9.3", "gender", 0, 1, "PKIX1.PrintableString"},
-  {"1.3.6.1.5.5.7.9.4", "countryOfCitizenship", 0, 1, "PKIX1.PrintableString"},
+  {"1.3.6.1.5.5.7.9.4", "countryOfCitizenship", 0, 1,
+   "PKIX1.PrintableString"},
   {"1.3.6.1.5.5.7.9.5", "countryOfResidence", 0, 1, "PKIX1.PrintableString"},
 
   {"2.5.4.6", "C", 0, 1, "PKIX1.PrintableString"},
@@ -83,9 +84,13 @@ static const struct oid2string _oid2str[] = {
 
   /* Extended validation
    */
-  {"1.3.6.1.4.1.311.60.2.1.1", "jurisdictionOfIncorporationLocalityName", 1, 1, "PKIX1.DirectoryString"},
-  {"1.3.6.1.4.1.311.60.2.1.2", "jurisdictionOfIncorporationStateOrProvinceName", 1, 1, "PKIX1.DirectoryString"},
-  {"1.3.6.1.4.1.311.60.2.1.3", "jurisdictionOfIncorporationCountryName", 0, 1, "PKIX1.PrintableString"},
+  {"1.3.6.1.4.1.311.60.2.1.1", "jurisdictionOfIncorporationLocalityName", 1,
+   1, "PKIX1.DirectoryString"},
+  {"1.3.6.1.4.1.311.60.2.1.2",
+   "jurisdictionOfIncorporationStateOrProvinceName", 1, 1,
+   "PKIX1.DirectoryString"},
+  {"1.3.6.1.4.1.311.60.2.1.3", "jurisdictionOfIncorporationCountryName", 0, 1,
+   "PKIX1.PrintableString"},
 
   /* PKCS #9
    */
@@ -231,7 +236,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  ANAME = _gnutls_x509_oid2asn_string(oid);
+  ANAME = _gnutls_x509_oid2asn_string (oid);
   CHOICE = _gnutls_x509_oid_data_choice (oid);
 
   if (ANAME == NULL)
@@ -1166,15 +1171,17 @@ cleanup:
   return result;
 }
 
-void _asnstr_append_name(char* name, size_t name_size, const char* part1, const char* part2)
+void
+_asnstr_append_name (char *name, size_t name_size, const char *part1,
+		     const char *part2)
 {
-  if (part1[0] != 0) 
+  if (part1[0] != 0)
     {
-	  _gnutls_str_cpy (name, name_size, part1);
-	  _gnutls_str_cat (name, name_size, part2);
+      _gnutls_str_cpy (name, name_size, part1);
+      _gnutls_str_cat (name, name_size, part2);
     }
   else
-	  _gnutls_str_cpy (name, name_size, part2+1 /* remove initial dot */);
+    _gnutls_str_cpy (name, name_size, part2 + 1 /* remove initial dot */ );
 }
 
 
@@ -1203,7 +1210,7 @@ _gnutls_x509_encode_and_copy_PKI_params (ASN1_TYPE dst,
 
   /* write the OID
    */
-  _asnstr_append_name(name, sizeof(name), dst_name, ".algorithm.algorithm");
+  _asnstr_append_name (name, sizeof (name), dst_name, ".algorithm.algorithm");
 
   result = asn1_write_value (dst, name, pk, 1);
   if (result != ASN1_SUCCESS)
@@ -1216,7 +1223,8 @@ _gnutls_x509_encode_and_copy_PKI_params (ASN1_TYPE dst,
     {
       /* disable parameters, which are not used in RSA.
        */
-	  _asnstr_append_name(name, sizeof(name), dst_name, ".algorithm.parameters");
+      _asnstr_append_name (name, sizeof (name), dst_name,
+			   ".algorithm.parameters");
 
       result = asn1_write_value (dst, name, NULL, 0);
       if (result != ASN1_SUCCESS)
@@ -1234,7 +1242,8 @@ _gnutls_x509_encode_and_copy_PKI_params (ASN1_TYPE dst,
 
       /* Write the DER parameters. (in bits)
        */
-	  _asnstr_append_name(name, sizeof(name), dst_name, ".subjectPublicKey");
+      _asnstr_append_name (name, sizeof (name), dst_name,
+			   ".subjectPublicKey");
       result = asn1_write_value (dst, name, der.data, der.size * 8);
 
       _gnutls_free_datum (&der);
@@ -1257,7 +1266,8 @@ _gnutls_x509_encode_and_copy_PKI_params (ASN1_TYPE dst,
 
       /* Write the DER parameters.
        */
-	  _asnstr_append_name(name, sizeof(name), dst_name, ".algorithm.parameters");
+      _asnstr_append_name (name, sizeof (name), dst_name,
+			   ".algorithm.parameters");
       result = asn1_write_value (dst, name, der.data, der.size);
 
       _gnutls_free_datum (&der);
@@ -1275,7 +1285,8 @@ _gnutls_x509_encode_and_copy_PKI_params (ASN1_TYPE dst,
 	  return result;
 	}
 
-	  _asnstr_append_name(name, sizeof(name), dst_name, ".subjectPublicKey");
+      _asnstr_append_name (name, sizeof (name), dst_name,
+			   ".subjectPublicKey");
       result = asn1_write_value (dst, name, der.data, der.size * 8);
 
       _gnutls_free_datum (&der);
@@ -1309,7 +1320,7 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
   char name[128];
 
 
-  _asnstr_append_name(name, sizeof(name), src_name, ".algorithm.algorithm");
+  _asnstr_append_name (name, sizeof (name), src_name, ".algorithm.algorithm");
   len = sizeof (oid);
   result = asn1_read_value (src, name, oid, &len);
 
@@ -1333,7 +1344,7 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
 
   /* Now read the parameters' bits 
    */
-  _asnstr_append_name(name, sizeof(name), src_name, ".subjectPublicKey");
+  _asnstr_append_name (name, sizeof (name), src_name, ".subjectPublicKey");
 
   len = 0;
   result = asn1_read_value (src, name, NULL, &len);
@@ -1358,7 +1369,7 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  _asnstr_append_name(name, sizeof(name), src_name, ".subjectPublicKey");
+  _asnstr_append_name (name, sizeof (name), src_name, ".subjectPublicKey");
 
   result = asn1_read_value (src, name, str, &len);
 

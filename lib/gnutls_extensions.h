@@ -37,26 +37,29 @@ void _gnutls_ext_deinit (void);
 void _gnutls_extension_list_add (gnutls_session_t session, uint16_t type);
 
 typedef void (*gnutls_ext_deinit_data_func) (extension_priv_data_t data);
-typedef int (*gnutls_ext_pack_func) (extension_priv_data_t data, gnutls_buffer_st* packed_data);
-typedef int (*gnutls_ext_unpack_func) (gnutls_buffer_st* packed_data, extension_priv_data_t* data);
+typedef int (*gnutls_ext_pack_func) (extension_priv_data_t data,
+				     gnutls_buffer_st * packed_data);
+typedef int (*gnutls_ext_unpack_func) (gnutls_buffer_st * packed_data,
+				       extension_priv_data_t * data);
 
-void _gnutls_ext_free_session_data(gnutls_session_t session);
+void _gnutls_ext_free_session_data (gnutls_session_t session);
 
 /* functions to be used by extensions internally
  */
-void _gnutls_ext_unset_session_data(gnutls_session_t session, uint16_t type);
-void _gnutls_ext_set_session_data(gnutls_session_t session, uint16_t type, 
-    extension_priv_data_t);
-int _gnutls_ext_get_session_data(gnutls_session_t session, 
-    uint16_t type, extension_priv_data_t*);
-int _gnutls_ext_get_resumed_session_data(gnutls_session_t session,
-    uint16_t type, extension_priv_data_t* data);
+void _gnutls_ext_unset_session_data (gnutls_session_t session, uint16_t type);
+void _gnutls_ext_set_session_data (gnutls_session_t session, uint16_t type,
+				   extension_priv_data_t);
+int _gnutls_ext_get_session_data (gnutls_session_t session,
+				  uint16_t type, extension_priv_data_t *);
+int _gnutls_ext_get_resumed_session_data (gnutls_session_t session,
+					  uint16_t type,
+					  extension_priv_data_t * data);
 
-void _gnutls_ext_restore_resumed_session(gnutls_session_t session);
+void _gnutls_ext_restore_resumed_session (gnutls_session_t session);
 
 /* for session packing */
-int _gnutls_ext_pack(gnutls_session_t session, gnutls_buffer_st* packed);
-int _gnutls_ext_unpack(gnutls_session_t session, gnutls_buffer_st* packed);
+int _gnutls_ext_pack (gnutls_session_t session, gnutls_buffer_st * packed);
+int _gnutls_ext_unpack (gnutls_session_t session, gnutls_buffer_st * packed);
 
 typedef struct
 {
@@ -76,15 +79,15 @@ typedef struct
    * < 0 on other error.
    */
   gnutls_ext_send_func send_func;
-  
-  gnutls_ext_deinit_data_func deinit_func; /* this will be called to deinitialize
-	* internal data 
-	*/
-  gnutls_ext_pack_func pack_func; /* packs internal data to machine independent format */
-  gnutls_ext_unpack_func unpack_func; /* unpacks internal data */
-  
+
+  gnutls_ext_deinit_data_func deinit_func;	/* this will be called to deinitialize
+						 * internal data 
+						 */
+  gnutls_ext_pack_func pack_func;	/* packs internal data to machine independent format */
+  gnutls_ext_unpack_func unpack_func;	/* unpacks internal data */
+
 } extension_entry_st;
 
-int _gnutls_ext_register (extension_entry_st*);
+int _gnutls_ext_register (extension_entry_st *);
 
 #endif

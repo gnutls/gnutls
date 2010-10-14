@@ -31,7 +31,8 @@
 /* Functions that refer to the initialization of the libgcrypt library.
  */
 
-int gnutls_crypto_init(void)
+int
+gnutls_crypto_init (void)
 {
-   return 0;
+  return 0;
 }

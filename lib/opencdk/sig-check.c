@@ -23,7 +23,7 @@
  *
  */
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 #include <stdio.h>
 #include <time.h>
@@ -53,10 +53,10 @@ hash_mpibuf (cdk_pubkey_t pk, digest_hd_st * md, int usefpr)
       err = _gnutls_mpi_print_pgp (pk->mpi[i], buf, &nbytes);
 
       if (err < 0)
-        {
-          gnutls_assert();
+	{
+	  gnutls_assert ();
 	  return map_gnutls_error (err);
-        }
+	}
 
       if (!usefpr || pk->version == 4)
 	_gnutls_hash (md, buf, nbytes);

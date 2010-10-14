@@ -58,7 +58,7 @@ const mod_auth_st rsa_auth_struct = {
   _gnutls_proc_cert_server_certificate,
   _gnutls_proc_cert_client_certificate,
   NULL,				/* proc server kx */
-  proc_rsa_client_kx,	/* proc client kx */
+  proc_rsa_client_kx,		/* proc client kx */
   _gnutls_proc_cert_client_cert_vrfy,	/* proc client cert vrfy */
   _gnutls_proc_cert_cert_req	/* proc server cert request */
 };
@@ -146,7 +146,7 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
 
 static int
 proc_rsa_client_kx (gnutls_session_t session, opaque * data,
-			    size_t _data_size)
+		    size_t _data_size)
 {
   gnutls_datum_t plaintext;
   gnutls_datum_t ciphertext;
@@ -177,7 +177,9 @@ proc_rsa_client_kx (gnutls_session_t session, opaque * data,
       ciphertext.size = dsize;
     }
 
-  ret = gnutls_privkey_decrypt_data (session->internals.selected_key, 0, &ciphertext, &plaintext);
+  ret =
+    gnutls_privkey_decrypt_data (session->internals.selected_key, 0,
+				 &ciphertext, &plaintext);
 
   if (ret < 0 || plaintext.size != GNUTLS_MASTER_SIZE)
     {

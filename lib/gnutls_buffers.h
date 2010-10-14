@@ -23,7 +23,7 @@
  *
  */
 #ifndef GNUTLS_BUFFERS_H
-# define GNUTLS_BUFFERS_H
+#define GNUTLS_BUFFERS_H
 
 #define MBUFFER_FLUSH 1
 
@@ -35,12 +35,11 @@ int _gnutls_record_buffer_get_size (content_type_t type,
 int _gnutls_record_buffer_get (content_type_t type,
 			       gnutls_session_t session, opaque * data,
 			       size_t length);
-ssize_t _gnutls_io_read_buffered (gnutls_session_t, size_t n,
-				  content_type_t);
+ssize_t _gnutls_io_read_buffered (gnutls_session_t, size_t n, content_type_t);
 int _gnutls_io_clear_peeked_data (gnutls_session_t session);
 
 ssize_t _gnutls_io_write_buffered (gnutls_session_t session,
-				   mbuffer_st *bufel, unsigned int mflag);
+				   mbuffer_st * bufel, unsigned int mflag);
 
 int _gnutls_handshake_buffer_get_size (gnutls_session_t session);
 int _gnutls_handshake_buffer_put (gnutls_session_t session, opaque * data,
@@ -58,8 +57,8 @@ ssize_t _gnutls_handshake_io_recv_int (gnutls_session_t, content_type_t,
 				       gnutls_handshake_description_t, void *,
 				       size_t);
 void _gnutls_handshake_io_cache_int (gnutls_session_t,
-				       gnutls_handshake_description_t,
-				       mbuffer_st *bufel);
+				     gnutls_handshake_description_t,
+				     mbuffer_st * bufel);
 ssize_t _gnutls_io_write_flush (gnutls_session_t session);
 ssize_t _gnutls_handshake_io_write_flush (gnutls_session_t session);
 

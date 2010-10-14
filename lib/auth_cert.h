@@ -24,14 +24,14 @@
  */
 
 #ifndef AUTH_CERT_H
-# define AUTH_CERT_H
-# include "gnutls_cert.h"
-# include "gnutls_auth.h"
-# include "auth_dh_common.h"
-# include "x509/x509_int.h"
-# include "openpgp/openpgp_int.h"
-# include <gnutls/abstract.h>
-# include <gnutls/compat.h>
+#define AUTH_CERT_H
+#include "gnutls_cert.h"
+#include "gnutls_auth.h"
+#include "auth_dh_common.h"
+#include "x509/x509_int.h"
+#include "openpgp/openpgp_int.h"
+#include <gnutls/abstract.h>
+#include <gnutls/compat.h>
 
 /* This structure may be complex, but it's the only way to
  * support a server that has multiple certificates
@@ -93,8 +93,8 @@ typedef struct gnutls_certificate_credentials_st
    */
   gnutls_datum_t x509_rdn_sequence;
 
-  gnutls_certificate_client_retrieve_function *client_get_cert_callback; /* deprecated */
-  gnutls_certificate_server_retrieve_function *server_get_cert_callback; /* deprecated */
+  gnutls_certificate_client_retrieve_function *client_get_cert_callback;	/* deprecated */
+  gnutls_certificate_server_retrieve_function *server_get_cert_callback;	/* deprecated */
   gnutls_certificate_verify_function *verify_callback;
 
   gnutls_certificate_retrieve_function *get_cert_callback;
@@ -167,7 +167,9 @@ int _gnutls_get_auth_info_gcert (gnutls_cert * gcert,
 				 cert_auth_info_t info,
 				 int flags /* OR of ConvFlags */ );
 
-int certificate_credential_append_crt_list( gnutls_certificate_credentials_t res, gnutls_cert *crt, int nr);
-int certificate_credentials_append_pkey( gnutls_certificate_credentials_t res, gnutls_privkey_t pkey);
+int certificate_credential_append_crt_list (gnutls_certificate_credentials_t
+					    res, gnutls_cert * crt, int nr);
+int certificate_credentials_append_pkey (gnutls_certificate_credentials_t res,
+					 gnutls_privkey_t pkey);
 
 #endif

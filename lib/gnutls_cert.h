@@ -24,7 +24,7 @@
  */
 
 #ifndef GNUTLS_CERT_H
-# define GNUTLS_CERT_H
+#define GNUTLS_CERT_H
 
 #include <gnutls_pk.h>
 #include "x509/x509_int.h"

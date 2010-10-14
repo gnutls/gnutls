@@ -24,7 +24,7 @@
  */
 
 #ifndef GNUTLS_SIG_H
-# define GNUTLS_SIG_H
+#define GNUTLS_SIG_H
 
 #include <gnutls/abstract.h>
 
@@ -35,7 +35,7 @@ int _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
 
 int _gnutls_handshake_sign_data (gnutls_session_t session,
 				 gnutls_cert * cert,
-				 gnutls_privkey_t  pkey,
+				 gnutls_privkey_t pkey,
 				 gnutls_datum_t * params,
 				 gnutls_datum_t * signature,
 				 gnutls_sign_algorithm_t * algo);
@@ -52,7 +52,8 @@ int _gnutls_handshake_verify_data (gnutls_session_t session,
 				   gnutls_sign_algorithm_t algo);
 
 int _gnutls_soft_sign (gnutls_pk_algorithm_t algo,
-		  bigint_t * params, int params_size,
-		  const gnutls_datum_t * data, gnutls_datum_t * signature);
+		       bigint_t * params, int params_size,
+		       const gnutls_datum_t * data,
+		       gnutls_datum_t * signature);
 
 #endif

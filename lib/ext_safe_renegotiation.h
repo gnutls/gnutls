@@ -23,16 +23,17 @@
  */
 
 #ifndef EXT_SAFE_RENEGOTIATION_H
-# define EXT_SAFE_RENEGOTIATION_H
+#define EXT_SAFE_RENEGOTIATION_H
 
 #include <gnutls_extensions.h>
 
-typedef struct {
+typedef struct
+{
   uint8_t client_verify_data[MAX_VERIFY_DATA_SIZE];
   size_t client_verify_data_len;
   uint8_t server_verify_data[MAX_VERIFY_DATA_SIZE];
   size_t server_verify_data_len;
-  uint8_t ri_extension_data[MAX_VERIFY_DATA_SIZE * 2];  /* max signal is 72 bytes in s->c sslv3 */
+  uint8_t ri_extension_data[MAX_VERIFY_DATA_SIZE * 2];	/* max signal is 72 bytes in s->c sslv3 */
   size_t ri_extension_data_len;
 
   int safe_renegotiation_received:1;
@@ -42,10 +43,10 @@ typedef struct {
 
 extern extension_entry_st ext_mod_sr;
 
-int _gnutls_ext_sr_finished( gnutls_session_t session, void* vdata, 
-    size_t vdata_size, int dir);
-int _gnutls_ext_sr_recv_cs(gnutls_session_t session);
-int _gnutls_ext_sr_verify(gnutls_session_t session);
-int _gnutls_ext_sr_send_cs(gnutls_session_t);
+int _gnutls_ext_sr_finished (gnutls_session_t session, void *vdata,
+			     size_t vdata_size, int dir);
+int _gnutls_ext_sr_recv_cs (gnutls_session_t session);
+int _gnutls_ext_sr_verify (gnutls_session_t session);
+int _gnutls_ext_sr_send_cs (gnutls_session_t);
 
 #endif /* EXT_SAFE_RENEGOTIATION_H */

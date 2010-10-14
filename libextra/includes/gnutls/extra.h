@@ -28,7 +28,7 @@
  */
 
 #ifndef GNUTLS_EXTRA_H
-# define GNUTLS_EXTRA_H
+#define GNUTLS_EXTRA_H
 
 #include <gnutls/gnutls.h>
 

@@ -23,7 +23,7 @@
  */
 
 #ifndef AUTH_PSK_H
-# define AUTH_PSK_H
+#define AUTH_PSK_H
 
 #include <gnutls_auth.h>
 #include <auth_dh_common.h>
@@ -70,7 +70,7 @@ typedef struct psk_auth_info_st psk_auth_info_st;
 int
 _gnutls_set_psk_session_key (gnutls_session_t session, gnutls_datum_t * psk2);
 #else
-# define _gnutls_set_psk_session_key(x,y) GNUTLS_E_INTERNAL_ERROR
+#define _gnutls_set_psk_session_key(x,y) GNUTLS_E_INTERNAL_ERROR
 #endif /* ENABLE_PSK */
 
 #endif

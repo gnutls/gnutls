@@ -2186,16 +2186,17 @@ gnutls_x509_crt_export (gnutls_x509_crt_t cert,
 }
 
 int
-_gnutls_get_key_id (gnutls_pk_algorithm_t pk, bigint_t* params, int params_size,
-		   unsigned char *output_data, size_t * output_data_size)
+_gnutls_get_key_id (gnutls_pk_algorithm_t pk, bigint_t * params,
+		    int params_size, unsigned char *output_data,
+		    size_t * output_data_size)
 {
   int result = 0;
   gnutls_datum_t der = { NULL, 0 };
   digest_hd_st hd;
 
-  if (output_data==NULL || *output_data_size < 20)
+  if (output_data == NULL || *output_data_size < 20)
     {
-      gnutls_assert();
+      gnutls_assert ();
       *output_data_size = 20;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
@@ -2257,7 +2258,9 @@ rsadsa_get_key_id (gnutls_x509_crt_t crt, int pk,
       return result;
     }
 
-  result = _gnutls_get_key_id(pk, params, params_size, output_data, output_data_size);
+  result =
+    _gnutls_get_key_id (pk, params, params_size, output_data,
+			output_data_size);
   if (result < 0)
     {
       gnutls_assert ();
@@ -2511,9 +2514,7 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
     }
 
   issuer_params_size = MAX_PUBLIC_PARAMS_SIZE;
-  ret =
-	_gnutls_x509_crt_get_mpis (crt, issuer_params,
-				   &issuer_params_size);
+  ret = _gnutls_x509_crt_get_mpis (crt, issuer_params, &issuer_params_size);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -2521,8 +2522,10 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
     }
 
   ret = _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) hash,
-			signature, gnutls_x509_crt_get_pk_algorithm (crt, NULL),
-			issuer_params, issuer_params_size);
+				       signature,
+				       gnutls_x509_crt_get_pk_algorithm (crt,
+									 NULL),
+				       issuer_params, issuer_params_size);
 
   /* release allocated mpis */
   for (i = 0; i < issuer_params_size; i++)
@@ -2552,7 +2555,8 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
  **/
 int
 gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
-				      gnutls_digest_algorithm_t * hash, unsigned int *mand)
+					      gnutls_digest_algorithm_t *
+					      hash, unsigned int *mand)
 {
   bigint_t issuer_params[MAX_PUBLIC_PARAMS_SIZE];
   int issuer_params_size;
@@ -2565,17 +2569,17 @@ gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
     }
 
   issuer_params_size = MAX_PUBLIC_PARAMS_SIZE;
-  ret =
-	_gnutls_x509_crt_get_mpis (crt, issuer_params,
-				   &issuer_params_size);
+  ret = _gnutls_x509_crt_get_mpis (crt, issuer_params, &issuer_params_size);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = _gnutls_pk_get_hash_algorithm(gnutls_x509_crt_get_pk_algorithm (crt, NULL),
-    issuer_params, issuer_params_size, hash, mand);
+  ret =
+    _gnutls_pk_get_hash_algorithm (gnutls_x509_crt_get_pk_algorithm
+				   (crt, NULL), issuer_params,
+				   issuer_params_size, hash, mand);
 
   /* release allocated mpis */
   for (i = 0; i < issuer_params_size; i++)
@@ -3216,21 +3220,25 @@ gnutls_x509_crt_get_subject_unique_id (gnutls_x509_crt_t crt, char *buf,
 {
   int result;
   gnutls_datum_t datum = { NULL, 0 };
-  
+
   result =
-    _gnutls_x509_read_value (crt->cert, "tbsCertificate.subjectUniqueID", &datum, 2);
-    
-  if (datum.size > *sizeof_buf) { /* then we're not going to fit */
-    *sizeof_buf = datum.size;
-    buf[0] = '\0';
-    result = GNUTLS_E_SHORT_MEMORY_BUFFER;
-  } else {
-    *sizeof_buf = datum.size;
-    memcpy(buf, datum.data, datum.size);
-  }
-  
-  _gnutls_free_datum(&datum);
-  
+    _gnutls_x509_read_value (crt->cert, "tbsCertificate.subjectUniqueID",
+			     &datum, 2);
+
+  if (datum.size > *sizeof_buf)
+    {				/* then we're not going to fit */
+      *sizeof_buf = datum.size;
+      buf[0] = '\0';
+      result = GNUTLS_E_SHORT_MEMORY_BUFFER;
+    }
+  else
+    {
+      *sizeof_buf = datum.size;
+      memcpy (buf, datum.data, datum.size);
+    }
+
+  _gnutls_free_datum (&datum);
+
   return result;
 }
 
@@ -3252,24 +3260,28 @@ gnutls_x509_crt_get_subject_unique_id (gnutls_x509_crt_t crt, char *buf,
  **/
 int
 gnutls_x509_crt_get_issuer_unique_id (gnutls_x509_crt_t crt, char *buf,
-				       size_t * sizeof_buf)
+				      size_t * sizeof_buf)
 {
   int result;
   gnutls_datum_t datum = { NULL, 0 };
-  
+
   result =
-    _gnutls_x509_read_value (crt->cert, "tbsCertificate.issuerUniqueID", &datum, 2);
-    
-  if (datum.size > *sizeof_buf) { /* then we're not going to fit */
-    *sizeof_buf = datum.size;
-    buf[0] = '\0';
-    result = GNUTLS_E_SHORT_MEMORY_BUFFER;
-  } else {
-    *sizeof_buf = datum.size;
-    memcpy(buf, datum.data, datum.size);
-  }
-  
-  _gnutls_free_datum(&datum);
-  
+    _gnutls_x509_read_value (crt->cert, "tbsCertificate.issuerUniqueID",
+			     &datum, 2);
+
+  if (datum.size > *sizeof_buf)
+    {				/* then we're not going to fit */
+      *sizeof_buf = datum.size;
+      buf[0] = '\0';
+      result = GNUTLS_E_SHORT_MEMORY_BUFFER;
+    }
+  else
+    {
+      *sizeof_buf = datum.size;
+      memcpy (buf, datum.data, datum.size);
+    }
+
+  _gnutls_free_datum (&datum);
+
   return result;
 }

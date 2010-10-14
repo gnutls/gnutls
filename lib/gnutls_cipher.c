@@ -77,7 +77,7 @@ _gnutls_encrypt (gnutls_session_t session, const opaque * headers,
 		 size_t headers_size, const opaque * data,
 		 size_t data_size, opaque * ciphertext,
 		 size_t ciphertext_size, content_type_t type, int random_pad,
-		 record_parameters_st *params)
+		 record_parameters_st * params)
 {
   gnutls_datum_t plain;
   gnutls_datum_t comp;
@@ -133,7 +133,7 @@ int
 _gnutls_decrypt (gnutls_session_t session, opaque * ciphertext,
 		 size_t ciphertext_size, uint8_t * data,
 		 size_t max_data_size, content_type_t type,
-		 record_parameters_st *params)
+		 record_parameters_st * params)
 {
   gnutls_datum_t gtxt;
   gnutls_datum_t gcipher;
@@ -342,7 +342,7 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
 			       opaque * cipher_data, int cipher_size,
 			       gnutls_datum_t compressed,
 			       content_type_t _type, int random_pad,
-			       record_parameters_st *params)
+			       record_parameters_st * params)
 {
   uint8_t MAC[MAX_HASH_SIZE];
   uint16_t c_length;
@@ -351,10 +351,8 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
   uint8_t type = _type;
   opaque preamble[PREAMBLE_SIZE];
   int preamble_size;
-  int hash_size =
-    _gnutls_hash_get_algo_len (params->mac_algorithm);
-  int blocksize =
-    gnutls_cipher_get_block_size (params->cipher_algorithm);
+  int hash_size = _gnutls_hash_get_algo_len (params->mac_algorithm);
+  int blocksize = gnutls_cipher_get_block_size (params->cipher_algorithm);
   cipher_type_t block_algo =
     _gnutls_cipher_is_block (params->cipher_algorithm);
   opaque *data_ptr;
@@ -440,8 +438,7 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
   /* Actual encryption (inplace).
    */
   ret =
-    _gnutls_cipher_encrypt (&params->write.cipher_state,
-			    cipher_data, length);
+    _gnutls_cipher_encrypt (&params->write.cipher_state, cipher_data, length);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -460,7 +457,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 			       opaque * compress_data,
 			       int compress_size,
 			       gnutls_datum_t ciphertext, uint8_t type,
-			       record_parameters_st *params)
+			       record_parameters_st * params)
 {
   uint8_t MAC[MAX_HASH_SIZE];
   uint16_t c_length;
@@ -471,11 +468,9 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
   opaque preamble[PREAMBLE_SIZE];
   int preamble_size;
   int ver = gnutls_protocol_get_version (session);
-  int hash_size =
-    _gnutls_hash_get_algo_len (params->mac_algorithm);
+  int hash_size = _gnutls_hash_get_algo_len (params->mac_algorithm);
 
-  blocksize =
-    gnutls_cipher_get_block_size (params->cipher_algorithm);
+  blocksize = gnutls_cipher_get_block_size (params->cipher_algorithm);
 
 
   /* actual decryption (inplace)

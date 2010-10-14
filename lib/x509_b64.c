@@ -414,7 +414,8 @@ cpydata (const uint8_t * data, int data_size, uint8_t ** result)
 
   for (j = i = 0; i < data_size; i++)
     {
-      if (data[i] == '\n' || data[i] == '\r' || data[i] == ' ' || data[i] == '\t')
+      if (data[i] == '\n' || data[i] == '\r' || data[i] == ' '
+	  || data[i] == '\t')
 	continue;
       (*result)[j] = data[i];
       j++;
@@ -462,7 +463,7 @@ _gnutls_fbase64_decode (const char *header, const opaque * data,
       return GNUTLS_E_BASE64_DECODING_ERROR;
     }
 
-  kdata = memmem (rdata+1, data_size-1, ENDSTR, sizeof (ENDSTR) - 1);
+  kdata = memmem (rdata + 1, data_size - 1, ENDSTR, sizeof (ENDSTR) - 1);
   /* allow CR as well.
    */
   if (kdata == NULL)

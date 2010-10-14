@@ -180,10 +180,10 @@ gnutls_global_init (void)
 
   bindtextdomain (PACKAGE, LOCALEDIR);
 
-  res = gnutls_crypto_init();
-  if (res != 0) 
+  res = gnutls_crypto_init ();
+  if (res != 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_CRYPTO_INIT_FAILED;
     }
 
@@ -231,8 +231,8 @@ gnutls_global_init (void)
       goto out;
     }
 
-  gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
-  
+  gnutls_pkcs11_init (GNUTLS_PKCS11_FLAG_AUTO, NULL);
+
   _gnutls_cryptodev_init ();
 
 out:
@@ -260,7 +260,7 @@ gnutls_global_deinit (void)
       asn1_delete_structure (&_gnutls_pkix1_asn);
       _gnutls_crypto_deregister ();
       _gnutls_cryptodev_deinit ();
-      gnutls_pkcs11_deinit();
+      gnutls_pkcs11_deinit ();
     }
   _gnutls_init--;
 }

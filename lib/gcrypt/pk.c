@@ -631,7 +631,7 @@ _rsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
 
   if (*resarr_len < RSA_PRIVATE_PARAMS)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
@@ -732,30 +732,30 @@ _rsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
   /* generate e1 and e2 */
 
   *resarr_len = 6;
-	
-  tmp = _gnutls_mpi_alloc_like(resarr[0]);
-  if (tmp == NULL)
-	{
-	  gnutls_assert ();
-	  ret = GNUTLS_E_MEMORY_ERROR;
-	  goto cleanup;
-	}
 
-  ret =  _gnutls_calc_rsa_exp(resarr, 2 + *resarr_len);
-  if (ret < 0)
+  tmp = _gnutls_mpi_alloc_like (resarr[0]);
+  if (tmp == NULL)
     {
-      gnutls_assert();
-      ret= GNUTLS_E_MEMORY_ERROR;
+      gnutls_assert ();
+      ret = GNUTLS_E_MEMORY_ERROR;
       goto cleanup;
     }
 
-  (*resarr_len)+=2;
+  ret = _gnutls_calc_rsa_exp (resarr, 2 + *resarr_len);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      ret = GNUTLS_E_MEMORY_ERROR;
+      goto cleanup;
+    }
+
+  (*resarr_len) += 2;
 
   return 0;
 
 cleanup:
-  for (i=0;i<*resarr_len;i++)
-	_gnutls_mpi_release(&resarr[i]);
+  for (i = 0; i < *resarr_len; i++)
+    _gnutls_mpi_release (&resarr[i]);
 
   return ret;
 }
@@ -807,7 +807,7 @@ wrap_gcry_pk_fixup (gnutls_pk_algorithm_t algo,
   if (algo != GNUTLS_PK_RSA)
     return 0;
 
-  if (params->params[5]==NULL)
+  if (params->params[5] == NULL)
     params->params[5] =
       _gnutls_mpi_new (_gnutls_mpi_get_nbits (params->params[0]));
 
@@ -820,21 +820,22 @@ wrap_gcry_pk_fixup (gnutls_pk_algorithm_t algo,
   ret = 1;
   if (direction == GNUTLS_IMPORT)
     {
-	  /* calculate exp1 [6] and exp2 [7] */
-      _gnutls_mpi_release(&params->params[6]);
-      _gnutls_mpi_release(&params->params[7]);
-	  result = _gnutls_calc_rsa_exp(params->params, RSA_PRIVATE_PARAMS);
-	  if (result < 0)
-	    {
-		  gnutls_assert();
-		  return result;
-	    }
+      /* calculate exp1 [6] and exp2 [7] */
+      _gnutls_mpi_release (&params->params[6]);
+      _gnutls_mpi_release (&params->params[7]);
+      result = _gnutls_calc_rsa_exp (params->params, RSA_PRIVATE_PARAMS);
+      if (result < 0)
+	{
+	  gnutls_assert ();
+	  return result;
+	}
 
       ret =
-        gcry_mpi_invm (params->params[5], params->params[3], params->params[4]);
+	gcry_mpi_invm (params->params[5], params->params[3],
+		       params->params[4]);
 
-	  params->params_nr = RSA_PRIVATE_PARAMS;
-	}
+      params->params_nr = RSA_PRIVATE_PARAMS;
+    }
   else if (direction == GNUTLS_EXPORT)
     ret =
       gcry_mpi_invm (params->params[5], params->params[4], params->params[3]);

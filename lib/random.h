@@ -23,7 +23,7 @@
  */
 
 #ifndef RANDOM_H
-# define RANDOM_H
+#define RANDOM_H
 
 #include <gnutls/crypto.h>
 

@@ -24,7 +24,7 @@
  */
 
 #ifndef GNUTLS_COMPAT8_H
-# define GNUTLS_COMPAT8_H
+#define GNUTLS_COMPAT8_H
 
 /* Extra definitions */
 #include <gnutls/openssl.h>

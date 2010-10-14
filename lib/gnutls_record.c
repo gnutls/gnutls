@@ -335,8 +335,9 @@ copy_record_version (gnutls_session_t session,
  */
 ssize_t
 _gnutls_send_int (gnutls_session_t session, content_type_t type,
-		  gnutls_handshake_description_t htype, unsigned int epoch_rel,
-		  const void *_data, size_t sizeofdata, unsigned int mflags)
+		  gnutls_handshake_description_t htype,
+		  unsigned int epoch_rel, const void *_data,
+		  size_t sizeofdata, unsigned int mflags)
 {
   mbuffer_st *bufel;
   size_t cipher_size;
@@ -427,7 +428,8 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
       cipher_size =
 	_gnutls_encrypt (session, headers, RECORD_HEADER_SIZE, data,
-			 data2send_size, _mbuffer_get_udata_ptr(bufel), cipher_size, type,
+			 data2send_size, _mbuffer_get_udata_ptr (bufel),
+			 cipher_size, type,
 			 (session->internals.priorities.no_padding ==
 			  0) ? 1 : 0, record_params);
       if (cipher_size <= 0)
@@ -452,7 +454,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 	  return GNUTLS_E_RECORD_LIMIT_REACHED;
 	}
 
-      _mbuffer_set_udata_size(bufel, cipher_size);
+      _mbuffer_set_udata_size (bufel, cipher_size);
       ret = _gnutls_io_write_buffered (session, bufel, mflags);
     }
 
@@ -485,7 +487,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 		      (int)
 		      _gnutls_uint64touint32
 		      (&record_state->sequence_number),
-		      _gnutls_packet2str (type), type, (int)cipher_size);
+		      _gnutls_packet2str (type), type, (int) cipher_size);
 
   return retval;
 }
@@ -501,7 +503,8 @@ _gnutls_send_change_cipher_spec (gnutls_session_t session, int again)
   _gnutls_handshake_log ("REC[%p]: Sent ChangeCipherSpec\n", session);
 
   if (again == 0)
-    return _gnutls_send_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1, EPOCH_WRITE_CURRENT, data, 1, MBUFFER_FLUSH);
+    return _gnutls_send_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1,
+			     EPOCH_WRITE_CURRENT, data, 1, MBUFFER_FLUSH);
   else
     {
       return _gnutls_io_write_flush (session);
@@ -760,12 +763,14 @@ record_check_type (gnutls_session_t session,
 	  if (session->security_parameters.entity == GNUTLS_SERVER)
 	    {
 	      gnutls_assert ();
-	      ret = _gnutls_record_buffer_put (recv_type, session, (void *) data, data_size);
-	      if (ret < 0) 
-	        {
-	          gnutls_assert();
-	          return ret;
-                }
+	      ret =
+		_gnutls_record_buffer_put (recv_type, session, (void *) data,
+					   data_size);
+	      if (ret < 0)
+		{
+		  gnutls_assert ();
+		  return ret;
+		}
 	      return GNUTLS_E_REHANDSHAKE;
 	    }
 
@@ -932,8 +937,7 @@ begin:
   header_size = RECORD_HEADER_SIZE;
 
   if ((ret =
-       _gnutls_io_read_buffered (session, header_size,
-				 -1)) != header_size)
+       _gnutls_io_read_buffered (session, header_size, -1)) != header_size)
     {
       if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
 	return ret;
@@ -950,10 +954,11 @@ begin:
     }
 
   ret = _mbuffer_linearize (&session->internals.record_recv_buffer);
-  if (ret != 0) {
-    gnutls_assert ();
-    return ret;
-  }
+  if (ret != 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
 
   _mbuffer_get_first (&session->internals.record_recv_buffer, &data_enc);
 
@@ -990,7 +995,8 @@ begin:
      _gnutls_packet2str (type), type, (int) sizeofdata);
   _gnutls_record_log ("REC[%p]: Received Packet[%d] %s(%d) with length: %d\n",
 		      session,
-		      (int) _gnutls_uint64touint32 (&record_state->sequence_number),
+		      (int)
+		      _gnutls_uint64touint32 (&record_state->sequence_number),
 		      _gnutls_packet2str (recv_type), recv_type, length);
 
   if (length > MAX_RECV_SIZE)
@@ -1025,10 +1031,11 @@ begin:
  */
 
   ret = _mbuffer_linearize (&session->internals.record_recv_buffer);
-  if (ret != 0) {
-    gnutls_assert ();
-    return ret;
-  }
+  if (ret != 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
   _mbuffer_get_first (&session->internals.record_recv_buffer, &data_enc);
   ciphertext = &data_enc.data[header_size];
 
@@ -1051,7 +1058,8 @@ begin:
       gnutls_assert ();
       return ret;
     }
-  _mbuffer_remove_bytes (&session->internals.record_recv_buffer, header_size + length);
+  _mbuffer_remove_bytes (&session->internals.record_recv_buffer,
+			 header_size + length);
   decrypted_length = ret;
 
 /* Check if this is a CHANGE_CIPHER_SPEC
@@ -1180,8 +1188,9 @@ ssize_t
 gnutls_record_send (gnutls_session_t session, const void *data,
 		    size_t sizeofdata)
 {
-  return _gnutls_send_int (session, GNUTLS_APPLICATION_DATA, -1, EPOCH_WRITE_CURRENT,
-			   data, sizeofdata, MBUFFER_FLUSH);
+  return _gnutls_send_int (session, GNUTLS_APPLICATION_DATA, -1,
+			   EPOCH_WRITE_CURRENT, data, sizeofdata,
+			   MBUFFER_FLUSH);
 }
 
 /**

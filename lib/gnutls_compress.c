@@ -40,7 +40,7 @@ int
 _gnutls_m_plaintext2compressed (gnutls_session_t session,
 				gnutls_datum_t * compressed,
 				const gnutls_datum_t * plaintext,
-				const record_parameters_st *params)
+				const record_parameters_st * params)
 {
   int size;
   opaque *data;
@@ -64,7 +64,7 @@ int
 _gnutls_m_compressed2plaintext (gnutls_session_t session,
 				gnutls_datum_t * plain,
 				const gnutls_datum_t * compressed,
-				const record_parameters_st *params)
+				const record_parameters_st * params)
 {
   int size;
   opaque *data;
@@ -300,17 +300,17 @@ _gnutls_supported_compression_methods (gnutls_session_t session,
 
 
 #ifdef USE_LZO
-# ifdef USE_MINILZO
+#ifdef USE_MINILZO
 /* Get the prototypes only.  Since LZO is a GPLed library, the
  * gnutls_global_init_extra() has to be called, before LZO compression
  * can be used.
  */
-#  include "../libextra/minilzo/minilzo.h"
-# elif HAVE_LZO_LZO1X_H
-#  include <lzo/lzo1x.h>
-# elif HAVE_LZO1X_H
-#  include <lzo1x.h>
-# endif
+#include "../libextra/minilzo/minilzo.h"
+#elif HAVE_LZO_LZO1X_H
+#include <lzo/lzo1x.h>
+#elif HAVE_LZO1X_H
+#include <lzo1x.h>
+#endif
 
 typedef int (*LZO_FUNC) ();
 

@@ -28,17 +28,17 @@
 #include <ext_inner_application.h>
 
 #ifdef HAVE_GCRYPT
-# include <gcrypt.h>
+#include <gcrypt.h>
 #endif
 
 #ifdef USE_LZO
-# ifdef USE_MINILZO
-#  include "minilzo/minilzo.h"
-# elif HAVE_LZO_LZO1X_H
-#  include <lzo/lzo1x.h>
-# elif HAVE_LZO1X_H
-#  include <lzo1x.h>
-# endif
+#ifdef USE_MINILZO
+#include "minilzo/minilzo.h"
+#elif HAVE_LZO_LZO1X_H
+#include <lzo/lzo1x.h>
+#elif HAVE_LZO1X_H
+#include <lzo1x.h>
+#endif
 #endif
 #include <gnutls/extra.h>
 
@@ -149,7 +149,7 @@ gnutls_global_init_extra (void)
 
 
 #ifdef HAVE_GCRYPT
-# ifdef gcry_fips_mode_active
+#ifdef gcry_fips_mode_active
   /* Libgcrypt manual says that gcry_version_check must be called
      before calling gcry_fips_mode_active. */
   gcry_check_version (NULL);
@@ -157,10 +157,10 @@ gnutls_global_init_extra (void)
     {
       ret = gnutls_register_md5_handler ();
       if (ret)
-       fprintf (stderr, "gnutls_register_md5_handler: %s\n",
-                gnutls_strerror (ret));
+	fprintf (stderr, "gnutls_register_md5_handler: %s\n",
+		 gnutls_strerror (ret));
     }
-# endif
+#endif
 #endif
 
   return 0;

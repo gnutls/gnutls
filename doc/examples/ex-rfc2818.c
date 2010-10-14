@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -25,7 +25,8 @@ extern void tcp_close (int sd);
 /* This function will try to verify the peer's certificate, and
  * also check if the hostname matches, and the activation, expiration dates.
  */
-static int verify_certificate_callback (gnutls_session_t session)
+static int
+verify_certificate_callback (gnutls_session_t session)
 {
   unsigned int status;
   const gnutls_datum_t *cert_list;
@@ -35,7 +36,7 @@ static int verify_certificate_callback (gnutls_session_t session)
   const char *hostname;
 
   /* read hostname */
-  hostname = gnutls_session_get_ptr(session);
+  hostname = gnutls_session_get_ptr (session);
 
   /* This verification function uses the trusted CAs in the credentials
    * structure. So you must have installed one or more CA certificates.
@@ -124,13 +125,14 @@ main (void)
    */
   gnutls_certificate_set_x509_trust_file (xcred, CAFILE, GNUTLS_X509_FMT_PEM);
   gnutls_certificate_set_verify_function (xcred, verify_certificate_callback);
-  gnutls_certificate_set_verify_flags(xcred, GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
+  gnutls_certificate_set_verify_flags (xcred,
+				       GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
 
   /* Initialize TLS session 
    */
   gnutls_init (&session, GNUTLS_CLIENT);
 
-  gnutls_session_set_ptr(session, (void*)"my_host_name");
+  gnutls_session_set_ptr (session, (void *) "my_host_name");
 
   /* Use default priorities */
   ret = gnutls_priority_set_direct (session, "PERFORMANCE", &err);

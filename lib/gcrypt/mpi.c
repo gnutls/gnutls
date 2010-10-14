@@ -76,18 +76,21 @@ wrap_gcry_mpi_print (const bigint_t a, void *buffer, size_t * nbytes,
     return GNUTLS_E_INVALID_REQUEST;
 
   ret = gcry_mpi_print (format, buffer, *nbytes, nbytes, a);
-  if (!ret) {
-    if (buffer==NULL || init_bytes < *nbytes) {
+  if (!ret)
+    {
+      if (buffer == NULL || init_bytes < *nbytes)
+	{
 
-      /* in STD format we may want to include
-        * an extra byte for zero. Sometimes the gcry_
-        * function doesn't add it.
-        */
-      if (format == GNUTLS_MPI_FORMAT_STD) (*nbytes)++;
-      return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	  /* in STD format we may want to include
+	   * an extra byte for zero. Sometimes the gcry_
+	   * function doesn't add it.
+	   */
+	  if (format == GNUTLS_MPI_FORMAT_STD)
+	    (*nbytes)++;
+	  return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
+      return 0;
     }
-    return 0;
-  }
 
   return GNUTLS_E_MPI_PRINT_FAILED;
 }

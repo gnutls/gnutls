@@ -49,19 +49,21 @@
 #include "debug.h"
 
 #ifdef ENABLE_OPENPGP
-# include "openpgp/gnutls_openpgp.h"
+#include "openpgp/gnutls_openpgp.h"
 
 static gnutls_privkey_t alloc_and_load_pgp_key (const gnutls_openpgp_privkey_t
-					       key, int deinit);
+						key, int deinit);
 static gnutls_cert *alloc_and_load_pgp_certs (gnutls_openpgp_crt_t cert);
 
 #endif
 
 static gnutls_cert *alloc_and_load_x509_certs (gnutls_x509_crt_t * certs,
 					       unsigned);
-static gnutls_privkey_t alloc_and_load_x509_key (gnutls_x509_privkey_t key, int deinit);
+static gnutls_privkey_t alloc_and_load_x509_key (gnutls_x509_privkey_t key,
+						 int deinit);
 
-static gnutls_privkey_t alloc_and_load_pkcs11_key ( gnutls_pkcs11_privkey_t key, int deinit);
+static gnutls_privkey_t alloc_and_load_pkcs11_key (gnutls_pkcs11_privkey_t
+						   key, int deinit);
 
 
 /* Copies data from a internal certificate struct (gnutls_cert) to 
@@ -411,29 +413,34 @@ get_issuers (gnutls_session_t session,
   return 0;
 }
 
-static void st_to_st2(gnutls_retr2_st *st2, gnutls_retr_st* st)
+static void
+st_to_st2 (gnutls_retr2_st * st2, gnutls_retr_st * st)
 {
-	st2->cert_type = st->type;
-	if (st->type == GNUTLS_CRT_OPENPGP) {
-		st2->key_type = GNUTLS_PRIVKEY_OPENPGP;
-	} else {
-		st2->key_type = GNUTLS_PRIVKEY_X509;
-	}
-	st2->ncerts = st->ncerts;
-	st2->deinit_all = st->deinit_all;
-	
-	switch(st2->cert_type) {
-		case GNUTLS_CRT_OPENPGP:
-			st2->cert.pgp = st->cert.pgp;
-			st2->key.pgp = st->key.pgp;
-			break;
-		case GNUTLS_CRT_X509:
-			st2->cert.x509 = st->cert.x509;
-			st2->key.x509 = st->key.x509;
-			break;
-		default:
-			return;
-	}
+  st2->cert_type = st->type;
+  if (st->type == GNUTLS_CRT_OPENPGP)
+    {
+      st2->key_type = GNUTLS_PRIVKEY_OPENPGP;
+    }
+  else
+    {
+      st2->key_type = GNUTLS_PRIVKEY_X509;
+    }
+  st2->ncerts = st->ncerts;
+  st2->deinit_all = st->deinit_all;
+
+  switch (st2->cert_type)
+    {
+    case GNUTLS_CRT_OPENPGP:
+      st2->cert.pgp = st->cert.pgp;
+      st2->key.pgp = st->key.pgp;
+      break;
+    case GNUTLS_CRT_X509:
+      st2->cert.x509 = st->cert.x509;
+      st2->key.x509 = st->key.x509;
+      break;
+    default:
+      return;
+    }
 
 }
 
@@ -464,39 +471,42 @@ call_get_cert_callback (gnutls_session_t session,
   memset (&st2, 0, sizeof (st2));
 
   if (cred->get_cert_callback)
-	{
-		ret = cred->get_cert_callback( session, issuers_dn, issuers_dn_length,
-					pk_algos, pk_algos_length, &st2);
+    {
+      ret = cred->get_cert_callback (session, issuers_dn, issuers_dn_length,
+				     pk_algos, pk_algos_length, &st2);
 
-	}
+    }
   else
-    { /* compatibility mode */
-	  gnutls_retr_st st;
-	  memset (&st, 0, sizeof (st));
-	  if (session->security_parameters.entity == GNUTLS_SERVER)
-		{
-			if (cred->server_get_cert_callback == NULL)
-				{
-				  gnutls_assert ();
-				  return GNUTLS_E_INTERNAL_ERROR;
-				}
-			ret = cred->server_get_cert_callback (session, &st);
-			if (ret >= 0) st_to_st2(&st2, &st);
-		}
-	  else
-		{				/* CLIENT */
-
-		  if (cred->client_get_cert_callback == NULL)
-			{
-			  gnutls_assert ();
-			  return GNUTLS_E_INTERNAL_ERROR;
-			}
-		  ret =	cred->client_get_cert_callback (session,
-						issuers_dn, issuers_dn_length,
-						pk_algos, pk_algos_length, &st);
-		  if (ret >= 0) st_to_st2(&st2, &st);
-		}
+    {				/* compatibility mode */
+      gnutls_retr_st st;
+      memset (&st, 0, sizeof (st));
+      if (session->security_parameters.entity == GNUTLS_SERVER)
+	{
+	  if (cred->server_get_cert_callback == NULL)
+	    {
+	      gnutls_assert ();
+	      return GNUTLS_E_INTERNAL_ERROR;
+	    }
+	  ret = cred->server_get_cert_callback (session, &st);
+	  if (ret >= 0)
+	    st_to_st2 (&st2, &st);
 	}
+      else
+	{			/* CLIENT */
+
+	  if (cred->client_get_cert_callback == NULL)
+	    {
+	      gnutls_assert ();
+	      return GNUTLS_E_INTERNAL_ERROR;
+	    }
+	  ret = cred->client_get_cert_callback (session,
+						issuers_dn, issuers_dn_length,
+						pk_algos, pk_algos_length,
+						&st);
+	  if (ret >= 0)
+	    st_to_st2 (&st2, &st);
+	}
+    }
 
   if (ret < 0)
     {
@@ -522,67 +532,70 @@ call_get_cert_callback (gnutls_session_t session,
   else
     {				/* PGP */
       if (st2.ncerts > 1)
-		{
-		  gnutls_assert ();
-		  ret = GNUTLS_E_INVALID_REQUEST;
-		  goto cleanup;
-		}
+	{
+	  gnutls_assert ();
+	  ret = GNUTLS_E_INVALID_REQUEST;
+	  goto cleanup;
+	}
 #ifdef ENABLE_OPENPGP
-	  {
-		local_certs = alloc_and_load_pgp_certs (st2.cert.pgp);
+      {
+	local_certs = alloc_and_load_pgp_certs (st2.cert.pgp);
       }
 #else
-		ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
-		goto cleanup;
+      ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
+      goto cleanup;
 #endif
     }
 
-  if (local_certs == NULL) {
-	  gnutls_assert();
-	  ret = GNUTLS_E_MEMORY_ERROR;
-	  goto cleanup;
-  }
+  if (local_certs == NULL)
+    {
+      gnutls_assert ();
+      ret = GNUTLS_E_MEMORY_ERROR;
+      goto cleanup;
+    }
 
-  switch(st2.key_type) {
-	  case GNUTLS_PRIVKEY_OPENPGP:
+  switch (st2.key_type)
+    {
+    case GNUTLS_PRIVKEY_OPENPGP:
 #ifdef ENABLE_OPENPGP
-		if (st2.key.pgp != NULL)
-		  {
-			local_key = alloc_and_load_pgp_key (st2.key.pgp, st2.deinit_all);
-			if (local_key == NULL)
-			  {
-				gnutls_assert ();
-				ret = GNUTLS_E_INTERNAL_ERROR;
-				goto cleanup;
-			  }
-		  }
-		  break;
-#endif
-	  case GNUTLS_PRIVKEY_PKCS11:
-		if (st2.key.pkcs11 != NULL)
-		  {
-			local_key = alloc_and_load_pkcs11_key (st2.key.pkcs11, st2.deinit_all);
-			if (local_key == NULL)
-			  {
-				gnutls_assert ();
-				ret = GNUTLS_E_INTERNAL_ERROR;
-				goto cleanup;
-			  }
-		  }
-		  break;
-	  case GNUTLS_PRIVKEY_X509:
-		  if (st2.key.x509 != NULL)
-			{
-			  local_key = alloc_and_load_x509_key (st2.key.x509, st2.deinit_all);
-			  if (local_key == NULL)
-				{
-				  gnutls_assert ();
-				  ret = GNUTLS_E_INTERNAL_ERROR;
-				  goto cleanup;
-				}
-			}
-			break;
+      if (st2.key.pgp != NULL)
+	{
+	  local_key = alloc_and_load_pgp_key (st2.key.pgp, st2.deinit_all);
+	  if (local_key == NULL)
+	    {
+	      gnutls_assert ();
+	      ret = GNUTLS_E_INTERNAL_ERROR;
+	      goto cleanup;
+	    }
 	}
+      break;
+#endif
+    case GNUTLS_PRIVKEY_PKCS11:
+      if (st2.key.pkcs11 != NULL)
+	{
+	  local_key =
+	    alloc_and_load_pkcs11_key (st2.key.pkcs11, st2.deinit_all);
+	  if (local_key == NULL)
+	    {
+	      gnutls_assert ();
+	      ret = GNUTLS_E_INTERNAL_ERROR;
+	      goto cleanup;
+	    }
+	}
+      break;
+    case GNUTLS_PRIVKEY_X509:
+      if (st2.key.x509 != NULL)
+	{
+	  local_key = alloc_and_load_x509_key (st2.key.x509, st2.deinit_all);
+	  if (local_key == NULL)
+	    {
+	      gnutls_assert ();
+	      ret = GNUTLS_E_INTERNAL_ERROR;
+	      goto cleanup;
+	    }
+	}
+      break;
+    }
 
   _gnutls_selected_certs_set (session, local_certs,
 			      (local_certs != NULL) ? st2.ncerts : 0,
@@ -595,27 +608,27 @@ cleanup:
   if (st2.cert_type == GNUTLS_CRT_X509)
     {
       if (st2.deinit_all)
-		{
-		  for (i = 0; i < st2.ncerts; i++)
-			{
-			  gnutls_x509_crt_deinit (st2.cert.x509[i]);
-			}
-		}
+	{
+	  for (i = 0; i < st2.ncerts; i++)
+	    {
+	      gnutls_x509_crt_deinit (st2.cert.x509[i]);
+	    }
+	}
     }
   else
     {
 #ifdef ENABLE_OPENPGP
-	if (st2.deinit_all)
-		{
-		  gnutls_openpgp_crt_deinit (st2.cert.pgp);
-		}
+      if (st2.deinit_all)
+	{
+	  gnutls_openpgp_crt_deinit (st2.cert.pgp);
+	}
 #endif
     }
-    
+
   if (ret < 0)
     {
       if (local_key != NULL)
-        gnutls_privkey_deinit(local_key);
+	gnutls_privkey_deinit (local_key);
     }
 
   return ret;
@@ -649,7 +662,8 @@ _select_client_cert (gnutls_session_t session,
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  if (cred->client_get_cert_callback != NULL || cred->get_cert_callback != NULL)
+  if (cred->client_get_cert_callback != NULL
+      || cred->get_cert_callback != NULL)
     {
 
       /* use a callback to get certificate 
@@ -1846,18 +1860,21 @@ alloc_and_load_x509_key (gnutls_x509_privkey_t key, int deinit)
   if (key == NULL)
     return NULL;
 
-  ret = gnutls_privkey_init(&local_key);
-  if (ret < 0) 
+  ret = gnutls_privkey_init (&local_key);
+  if (ret < 0)
     {
       gnutls_assert ();
       return NULL;
     }
 
-  ret = gnutls_privkey_import_x509 (local_key, key, deinit?GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE:0);
+  ret =
+    gnutls_privkey_import_x509 (local_key, key,
+				deinit ? GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE :
+				0);
   if (ret < 0)
     {
       gnutls_assert ();
-      gnutls_privkey_deinit(local_key);
+      gnutls_privkey_deinit (local_key);
       return NULL;
     }
 
@@ -1913,7 +1930,7 @@ alloc_and_load_pgp_certs (gnutls_openpgp_crt_t cert)
  * space for it.
  */
 static gnutls_privkey_t
-alloc_and_load_pgp_key ( gnutls_openpgp_privkey_t key, int deinit)
+alloc_and_load_pgp_key (gnutls_openpgp_privkey_t key, int deinit)
 {
   gnutls_privkey_t local_key;
   int ret = 0;
@@ -1921,18 +1938,21 @@ alloc_and_load_pgp_key ( gnutls_openpgp_privkey_t key, int deinit)
   if (key == NULL)
     return NULL;
 
-  ret = gnutls_privkey_init(&local_key);
+  ret = gnutls_privkey_init (&local_key);
   if (ret < 0)
     {
       gnutls_assert ();
       return NULL;
     }
 
-  ret = gnutls_privkey_import_openpgp (local_key, key, deinit?GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE:0);
+  ret =
+    gnutls_privkey_import_openpgp (local_key, key,
+				   deinit ? GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE
+				   : 0);
   if (ret < 0)
     {
       gnutls_assert ();
-      gnutls_privkey_deinit(local_key);
+      gnutls_privkey_deinit (local_key);
       return NULL;
     }
 
@@ -1944,7 +1964,7 @@ alloc_and_load_pgp_key ( gnutls_openpgp_privkey_t key, int deinit)
  * space for it.
  */
 static gnutls_privkey_t
-alloc_and_load_pkcs11_key ( gnutls_pkcs11_privkey_t key, int deinit)
+alloc_and_load_pkcs11_key (gnutls_pkcs11_privkey_t key, int deinit)
 {
   gnutls_privkey_t local_key;
   int ret = 0;
@@ -1952,18 +1972,21 @@ alloc_and_load_pkcs11_key ( gnutls_pkcs11_privkey_t key, int deinit)
   if (key == NULL)
     return NULL;
 
-  ret = gnutls_privkey_init(&local_key);
+  ret = gnutls_privkey_init (&local_key);
   if (ret < 0)
     {
       gnutls_assert ();
       return NULL;
     }
 
-  ret = gnutls_privkey_import_pkcs11 (local_key, key, deinit?GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE:0);
+  ret =
+    gnutls_privkey_import_pkcs11 (local_key, key,
+				  deinit ? GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE
+				  : 0);
   if (ret < 0)
     {
       gnutls_assert ();
-      gnutls_privkey_deinit(local_key);
+      gnutls_privkey_deinit (local_key);
       return NULL;
     }
 

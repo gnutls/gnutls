@@ -18,7 +18,7 @@
 /* Written by Ludovic Courtès <ludo@chbouib.org>.  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include "utils.h"

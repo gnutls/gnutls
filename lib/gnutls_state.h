@@ -24,7 +24,7 @@
  */
 
 #ifndef GNUTLS_STATE_H
-# define GNUTLS_STATE_H
+#define GNUTLS_STATE_H
 
 #include <gnutls_int.h>
 

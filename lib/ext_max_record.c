@@ -32,12 +32,15 @@
 #include <ext_max_record.h>
 
 static int _gnutls_max_record_recv_params (gnutls_session_t session,
-				    const opaque * data, size_t data_size);
-static int _gnutls_max_record_send_params (gnutls_session_t session, opaque * data,
-				    size_t);
+					   const opaque * data,
+					   size_t data_size);
+static int _gnutls_max_record_send_params (gnutls_session_t session,
+					   opaque * data, size_t);
 
-static int _gnutls_max_record_unpack(gnutls_buffer_st* ps, extension_priv_data_t* _priv);
-static int _gnutls_max_record_pack(extension_priv_data_t _priv, gnutls_buffer_st* ps);
+static int _gnutls_max_record_unpack (gnutls_buffer_st * ps,
+				      extension_priv_data_t * _priv);
+static int _gnutls_max_record_pack (extension_priv_data_t _priv,
+				    gnutls_buffer_st * ps);
 
 /* Maps record size to numbers according to the
  * extensions draft.
@@ -47,15 +50,15 @@ static int _gnutls_mre_record2num (uint16_t record_size);
 
 
 extension_entry_st ext_mod_max_record_size = {
-    .name = "MAX RECORD SIZE",
-    .type = GNUTLS_EXTENSION_MAX_RECORD_SIZE,
-    .parse_type = GNUTLS_EXT_TLS,
+  .name = "MAX RECORD SIZE",
+  .type = GNUTLS_EXTENSION_MAX_RECORD_SIZE,
+  .parse_type = GNUTLS_EXT_TLS,
 
-    .recv_func = _gnutls_max_record_recv_params,
-    .send_func = _gnutls_max_record_send_params,
-    .pack_func = _gnutls_max_record_pack,
-    .unpack_func = _gnutls_max_record_unpack,
-    .deinit_func = NULL
+  .recv_func = _gnutls_max_record_recv_params,
+  .send_func = _gnutls_max_record_send_params,
+  .pack_func = _gnutls_max_record_pack,
+  .unpack_func = _gnutls_max_record_unpack,
+  .deinit_func = NULL
 };
 
 /* 
@@ -96,16 +99,17 @@ _gnutls_max_record_recv_params (gnutls_session_t session,
 	}
     }
   else
-    {	/* CLIENT SIDE - we must check if the sent record size is the right one 
-	 */
+    {				/* CLIENT SIDE - we must check if the sent record size is the right one 
+				 */
       if (data_size > 0)
 	{
-	  ret = _gnutls_ext_get_session_data( session, 
-	    GNUTLS_EXTENSION_MAX_RECORD_SIZE, &epriv);
+	  ret = _gnutls_ext_get_session_data (session,
+					      GNUTLS_EXTENSION_MAX_RECORD_SIZE,
+					      &epriv);
 	  if (ret < 0)
 	    {
-		gnutls_assert();
-		return GNUTLS_E_INTERNAL_ERROR;
+	      gnutls_assert ();
+	      return GNUTLS_E_INTERNAL_ERROR;
 	    }
 
 	  if (data_size != 1)
@@ -123,8 +127,7 @@ _gnutls_max_record_recv_params (gnutls_session_t session,
 	    }
 	  else
 	    {
-	      session->security_parameters.max_record_recv_size =
-		epriv.num;
+	      session->security_parameters.max_record_recv_size = epriv.num;
 	    }
 
 	}
@@ -143,16 +146,17 @@ _gnutls_max_record_send_params (gnutls_session_t session, opaque * data,
 {
   uint16_t len;
   int ret;
-   
+
   /* this function sends the client extension data (dnsname) */
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
       extension_priv_data_t epriv;
-      
-      ret = _gnutls_ext_get_session_data( session, 
-	GNUTLS_EXTENSION_MAX_RECORD_SIZE, &epriv);
-      if (ret < 0) /* it is ok not to have it */
-        {
+
+      ret = _gnutls_ext_get_session_data (session,
+					  GNUTLS_EXTENSION_MAX_RECORD_SIZE,
+					  &epriv);
+      if (ret < 0)		/* it is ok not to have it */
+	{
 	  return 0;
 	}
 
@@ -165,8 +169,7 @@ _gnutls_max_record_send_params (gnutls_session_t session, opaque * data,
 	      return GNUTLS_E_SHORT_MEMORY_BUFFER;
 	    }
 
-	  data[0] =
-	    (uint8_t) _gnutls_mre_record2num (epriv.num);
+	  data[0] = (uint8_t) _gnutls_mre_record2num (epriv.num);
 	  return len;
 	}
 
@@ -198,26 +201,29 @@ _gnutls_max_record_send_params (gnutls_session_t session, opaque * data,
 }
 
 
-static int _gnutls_max_record_pack(extension_priv_data_t epriv, gnutls_buffer_st* ps)
+static int
+_gnutls_max_record_pack (extension_priv_data_t epriv, gnutls_buffer_st * ps)
 {
-int ret;
+  int ret;
 
-  BUFFER_APPEND_NUM(ps, epriv.num);
+  BUFFER_APPEND_NUM (ps, epriv.num);
 
   return 0;
-   
+
 }
 
-static int _gnutls_max_record_unpack(gnutls_buffer_st* ps, extension_priv_data_t* _priv)
+static int
+_gnutls_max_record_unpack (gnutls_buffer_st * ps,
+			   extension_priv_data_t * _priv)
 {
-extension_priv_data_t epriv;
-int ret;
+  extension_priv_data_t epriv;
+  int ret;
 
-  BUFFER_POP_NUM(ps, epriv.num);
-  
+  BUFFER_POP_NUM (ps, epriv.num);
+
   *_priv = epriv;
-  
-  ret = 0;  
+
+  ret = 0;
 error:
   return ret;
 }
@@ -325,7 +331,8 @@ gnutls_record_set_max_size (gnutls_session_t session, size_t size)
   session->security_parameters.max_record_send_size = size;
   epriv.num = size;
 
-  _gnutls_ext_set_session_data(session, GNUTLS_EXTENSION_MAX_RECORD_SIZE, epriv);
+  _gnutls_ext_set_session_data (session, GNUTLS_EXTENSION_MAX_RECORD_SIZE,
+				epriv);
 
   return 0;
 }

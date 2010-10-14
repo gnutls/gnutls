@@ -26,11 +26,11 @@
 /* Compiler twiddling.  */
 
 #ifdef __GNUC__
-# define EXPECT    __builtin_expect
-# define NO_RETURN __attribute__ ((__noreturn__))
+#define EXPECT    __builtin_expect
+#define NO_RETURN __attribute__ ((__noreturn__))
 #else
-# define EXPECT(_expr, _value) (_expr)
-# define NO_RETURN
+#define EXPECT(_expr, _value) (_expr)
+#define NO_RETURN
 #endif
 
 #define EXPECT_TRUE(_expr)  EXPECT ((_expr), 1)

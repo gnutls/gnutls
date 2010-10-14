@@ -40,20 +40,21 @@
 inline static int _gnutls_num2cert_type (int num);
 inline static int _gnutls_cert_type2num (int record_size);
 static int _gnutls_cert_type_recv_params (gnutls_session_t session,
-				   const opaque * data, size_t data_size);
-static int _gnutls_cert_type_send_params (gnutls_session_t session, opaque * data,
-				   size_t);
+					  const opaque * data,
+					  size_t data_size);
+static int _gnutls_cert_type_send_params (gnutls_session_t session,
+					  opaque * data, size_t);
 
 extension_entry_st ext_mod_cert_type = {
-    .name = "CERT TYPE",
-    .type = GNUTLS_EXTENSION_CERT_TYPE,
-    .parse_type = GNUTLS_EXT_TLS,
+  .name = "CERT TYPE",
+  .type = GNUTLS_EXTENSION_CERT_TYPE,
+  .parse_type = GNUTLS_EXT_TLS,
 
-    .recv_func = _gnutls_cert_type_recv_params,
-    .send_func = _gnutls_cert_type_send_params,
-    .pack_func = NULL,
-    .unpack_func = NULL,
-    .deinit_func = NULL
+  .recv_func = _gnutls_cert_type_recv_params,
+  .send_func = _gnutls_cert_type_send_params,
+  .pack_func = NULL,
+  .unpack_func = NULL,
+  .deinit_func = NULL
 };
 
 /* 

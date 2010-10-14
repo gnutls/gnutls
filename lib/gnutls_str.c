@@ -255,15 +255,15 @@ _gnutls_buffer_to_datum (gnutls_buffer_st * str, gnutls_datum_t * data)
 
   if (str->allocd != str->data)
     {
-      data->data = gnutls_malloc(str->length);
+      data->data = gnutls_malloc (str->length);
       if (data->data == NULL)
-        {
-          gnutls_assert();
-          return GNUTLS_E_MEMORY_ERROR;
-        }
-      memcpy(data->data, str->data, str->length);
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_MEMORY_ERROR;
+	}
+      memcpy (data->data, str->data, str->length);
       data->size = str->length;
-      _gnutls_buffer_clear(str);
+      _gnutls_buffer_clear (str);
     }
   else
     {
@@ -277,7 +277,8 @@ _gnutls_buffer_to_datum (gnutls_buffer_st * str, gnutls_datum_t * data)
 /* returns data from a string in a constant buffer.
  */
 void
-_gnutls_buffer_pop_data (gnutls_buffer_st * str, void *data, size_t * req_size)
+_gnutls_buffer_pop_data (gnutls_buffer_st * str, void *data,
+			 size_t * req_size)
 {
   gnutls_datum_t tdata;
 
@@ -310,96 +311,108 @@ _gnutls_buffer_append_printf (gnutls_buffer_st * dest, const char *fmt, ...)
   return len;
 }
 
-static int _gnutls_buffer_insert_data(gnutls_buffer_st * dest, int pos, const void* str, size_t str_size)
+static int
+_gnutls_buffer_insert_data (gnutls_buffer_st * dest, int pos, const void *str,
+			    size_t str_size)
 {
-        size_t orig_length = dest->length;
-        int ret;
+  size_t orig_length = dest->length;
+  int ret;
 
-        ret = _gnutls_buffer_resize(dest, dest->length+str_size); /* resize to make space */
-        if (ret < 0)
-                return ret;
+  ret = _gnutls_buffer_resize (dest, dest->length + str_size);	/* resize to make space */
+  if (ret < 0)
+    return ret;
 
-        memmove(&dest->data[pos+str_size], &dest->data[pos], orig_length-pos);
+  memmove (&dest->data[pos + str_size], &dest->data[pos], orig_length - pos);
 
-        memcpy(&dest->data[pos], str, str_size);
-        dest->length += str_size;
+  memcpy (&dest->data[pos], str, str_size);
+  dest->length += str_size;
 
-        return 0;
+  return 0;
 }
 
-static void _gnutls_buffer_delete_data(gnutls_buffer_st * dest, int pos, size_t str_size)
+static void
+_gnutls_buffer_delete_data (gnutls_buffer_st * dest, int pos, size_t str_size)
 {
-        memmove(&dest->data[pos], &dest->data[pos+str_size], dest->length-pos-str_size);
+  memmove (&dest->data[pos], &dest->data[pos + str_size],
+	   dest->length - pos - str_size);
 
-        dest->length -= str_size;
+  dest->length -= str_size;
 
-        return;
+  return;
 }
 
 
-int _gnutls_buffer_escape(gnutls_buffer_st * dest, const char *const invalid_chars)
+int
+_gnutls_buffer_escape (gnutls_buffer_st * dest,
+		       const char *const invalid_chars)
 {
-        static const char *x = "0123456789ABCDEF";
-        int rv = -1;
-        char t[5];
-        int pos = 0;
+  static const char *x = "0123456789ABCDEF";
+  int rv = -1;
+  char t[5];
+  int pos = 0;
 
-        /*_PKCS11H_ASSERT (target!=NULL); Not required*/
+	/*_PKCS11H_ASSERT (target!=NULL); Not required*/
 
-        while (pos < dest->length) {
+  while (pos < dest->length)
+    {
 
-                if (dest->data[pos] == '\\' || strchr(invalid_chars, dest->data[pos])
-                    || !isgraph(dest->data[pos])) {
+      if (dest->data[pos] == '\\' || strchr (invalid_chars, dest->data[pos])
+	  || !isgraph (dest->data[pos]))
+	{
 
-                        t[0] = '%';
-                        t[1] = x[(dest->data[pos] & 0xf0) >> 4];
-                        t[2] = x[(dest->data[pos] & 0x0f) >> 0];
+	  t[0] = '%';
+	  t[1] = x[(dest->data[pos] & 0xf0) >> 4];
+	  t[2] = x[(dest->data[pos] & 0x0f) >> 0];
 
-                        _gnutls_buffer_delete_data(dest, pos, 1);
+	  _gnutls_buffer_delete_data (dest, pos, 1);
 
-                        if (_gnutls_buffer_insert_data(dest, pos, t, 3) < 0) {
-                                        rv = -1;
-                                        goto cleanup;
-                        }
+	  if (_gnutls_buffer_insert_data (dest, pos, t, 3) < 0)
+	    {
+	      rv = -1;
+	      goto cleanup;
+	    }
 
-                }
-                pos++;
-        }
+	}
+      pos++;
+    }
 
-        rv = 0;
+  rv = 0;
 
-    cleanup:
+cleanup:
 
-        return rv;
+  return rv;
 }
 
-int _gnutls_buffer_unescape(gnutls_buffer_st * dest)
+int
+_gnutls_buffer_unescape (gnutls_buffer_st * dest)
 {
-        int rv = -1;
-        int pos = 0;
+  int rv = -1;
+  int pos = 0;
 
-        /*_PKCS11H_ASSERT (target!=NULL); Not required*/
+	/*_PKCS11H_ASSERT (target!=NULL); Not required*/
 
-        while (pos < dest->length) {
-                if (dest->data[pos] == '%') {
-                        char b[3];
-                        unsigned u;
-                        char x;
-                        b[0] = dest->data[pos+1];
-                        b[1] = dest->data[pos+2];
-                        b[2] = '\x0';
+  while (pos < dest->length)
+    {
+      if (dest->data[pos] == '%')
+	{
+	  char b[3];
+	  unsigned u;
+	  char x;
+	  b[0] = dest->data[pos + 1];
+	  b[1] = dest->data[pos + 2];
+	  b[2] = '\x0';
 
-                        sscanf(b, "%08x", &u);
-                        x = u & 0xff;
-                        _gnutls_buffer_delete_data(dest, pos, 3);
-                        _gnutls_buffer_insert_data(dest, pos, &x, 1);
-                }
-                pos++;
-        }
+	  sscanf (b, "%08x", &u);
+	  x = u & 0xff;
+	  _gnutls_buffer_delete_data (dest, pos, 3);
+	  _gnutls_buffer_insert_data (dest, pos, &x, 1);
+	}
+      pos++;
+    }
 
-        rv = 0;
+  rv = 0;
 
-        return rv;
+  return rv;
 }
 
 
@@ -416,7 +429,7 @@ _gnutls_bin2hex (const void *_old, size_t oldlen,
   const opaque *old = _old;
   int step = 2;
   const char empty[] = "";
-  
+
   if (separator != NULL && separator[0] != 0)
     step = 3;
   else
@@ -424,7 +437,7 @@ _gnutls_bin2hex (const void *_old, size_t oldlen,
 
   i = j = 0;
   sprintf (&buffer[j], "%.2x", old[i]);
-  j+=2;
+  j += 2;
   i++;
 
   for (; i < oldlen && j + step < buffer_size; j += step)
@@ -470,28 +483,30 @@ _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 
   for (i = j = 0; i < hex_size;)
     {
-        if (!isxdigit(hex_data[i])) /* skip non-hex such as the ':' in 00:FF */
-          {
-            i++;
-            continue;
-          }
+      if (!isxdigit (hex_data[i]))	/* skip non-hex such as the ':' in 00:FF */
+	{
+	  i++;
+	  continue;
+	}
 
-        if (j > *bin_size) {
-            gnutls_assert();
-            return GNUTLS_E_SHORT_MEMORY_BUFFER;
-        }
+      if (j > *bin_size)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_SHORT_MEMORY_BUFFER;
+	}
 
-        hex2_data[0] = hex_data[i];
-        hex2_data[1] = hex_data[i + 1];
-        i+=2;
+      hex2_data[0] = hex_data[i];
+      hex2_data[1] = hex_data[i + 1];
+      i += 2;
 
-        val = strtoul ((char *) hex2_data, NULL, 16);
-        if (val == ULONG_MAX) {
-            gnutls_assert ();
-            return GNUTLS_E_PARSING_ERROR;
-        }
-        bin_data[j] = val;
-        j++;
+      val = strtoul ((char *) hex2_data, NULL, 16);
+      if (val == ULONG_MAX)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_PARSING_ERROR;
+	}
+      bin_data[j] = val;
+      j++;
     }
   *bin_size = j;
 
@@ -544,88 +559,104 @@ _gnutls_hostname_compare (const char *certname,
   return 0;
 }
 
-int _gnutls_buffer_append_prefix (gnutls_buffer_st * buf, size_t data_size)
+int
+_gnutls_buffer_append_prefix (gnutls_buffer_st * buf, size_t data_size)
 {
-    opaque ss[4];
-    _gnutls_write_uint32(data_size, ss);
-    return _gnutls_buffer_append_data(buf, ss, 4);
+  opaque ss[4];
+  _gnutls_write_uint32 (data_size, ss);
+  return _gnutls_buffer_append_data (buf, ss, 4);
 }
 
 /* Reads an uint32 number from the buffer. If check is non zero it will also check whether
  * the number read, is less than the data in the buffer
  */
-int _gnutls_buffer_pop_prefix (gnutls_buffer_st * buf, size_t *data_size, int check)
+int
+_gnutls_buffer_pop_prefix (gnutls_buffer_st * buf, size_t * data_size,
+			   int check)
 {
-    size_t size;
-    
-    if (buf->length < 4) {
-	gnutls_assert();
-	return GNUTLS_E_PARSING_ERROR;
+  size_t size;
+
+  if (buf->length < 4)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_PARSING_ERROR;
     }
-    
-    size = _gnutls_read_uint32(buf->data);
-    if (check && size > buf->length-4) {
-	gnutls_assert();
-	return GNUTLS_E_PARSING_ERROR;
+
+  size = _gnutls_read_uint32 (buf->data);
+  if (check && size > buf->length - 4)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_PARSING_ERROR;
     }
-    
-    buf->data+=4;
-    buf->length-=4;
-    
-    *data_size = size;
-    
-    return 0;
+
+  buf->data += 4;
+  buf->length -= 4;
+
+  *data_size = size;
+
+  return 0;
 }
 
-int _gnutls_buffer_pop_datum_prefix (gnutls_buffer_st * buf, gnutls_datum_t* data)
+int
+_gnutls_buffer_pop_datum_prefix (gnutls_buffer_st * buf,
+				 gnutls_datum_t * data)
 {
-    size_t size;
-    int ret;
-    
-    ret = _gnutls_buffer_pop_prefix(buf, &size, 1);
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
+  size_t size;
+  int ret;
+
+  ret = _gnutls_buffer_pop_prefix (buf, &size, 1);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
     }
 
-    if (size > 0) {
-	size_t osize = size;
-	_gnutls_buffer_pop_datum(buf, data, size);
-	if (osize != data->size) {
-	    gnutls_assert();
-	    return GNUTLS_E_PARSING_ERROR;
+  if (size > 0)
+    {
+      size_t osize = size;
+      _gnutls_buffer_pop_datum (buf, data, size);
+      if (osize != data->size)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_PARSING_ERROR;
 	}
-    } else {
-	data->size = 0;
-	data->data = NULL;
     }
-    
-    return 0;
-}
-
-int _gnutls_buffer_append_data_prefix (gnutls_buffer_st * buf, const void *data,
-				size_t data_size)
-{
-    _gnutls_buffer_append_prefix(buf, data_size);
-    if (data_size > 0)
-      return _gnutls_buffer_append_data(buf, data, data_size);
-    
-    return 0;
-}
-
-int _gnutls_buffer_pop_data_prefix (gnutls_buffer_st * buf, void * data, size_t * data_size)
-{
-    size_t size;
-    int ret;
-    
-    ret = _gnutls_buffer_pop_prefix(buf, &size, 1);
-    if (ret < 0) {
-	gnutls_assert();
-	return ret;
+  else
+    {
+      data->size = 0;
+      data->data = NULL;
     }
 
-    if (size > 0)
-	_gnutls_buffer_pop_data(buf, data, data_size);
-    
-    return 0;
+  return 0;
+}
+
+int
+_gnutls_buffer_append_data_prefix (gnutls_buffer_st * buf, const void *data,
+				   size_t data_size)
+{
+  _gnutls_buffer_append_prefix (buf, data_size);
+  if (data_size > 0)
+    return _gnutls_buffer_append_data (buf, data, data_size);
+
+  return 0;
+}
+
+int
+_gnutls_buffer_pop_data_prefix (gnutls_buffer_st * buf, void *data,
+				size_t * data_size)
+{
+  size_t size;
+  int ret;
+
+  ret = _gnutls_buffer_pop_prefix (buf, &size, 1);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  if (size > 0)
+    _gnutls_buffer_pop_data (buf, data, data_size);
+
+  return 0;
 }

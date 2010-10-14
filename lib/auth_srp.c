@@ -144,12 +144,12 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
   char buf[64];
   uint8_t *data_b;
   extension_priv_data_t epriv;
-  srp_ext_st * priv;
+  srp_ext_st *priv;
 
-  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_SRP, &epriv);
-  if (ret < 0) /* peer didn't send a username */
+  ret = _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_SRP, &epriv);
+  if (ret < 0)			/* peer didn't send a username */
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_UNKNOWN_SRP_USERNAME;
     }
   priv = epriv.ptr;
@@ -257,7 +257,8 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
   _gnutls_write_uint16 (n_b, data_b);
 
   _gnutls_hard_log ("INT: SRP B[%d]: %s\n", (int) n_b,
-		    _gnutls_bin2hex (&data_b[2], n_b, buf, sizeof (buf), NULL));
+		    _gnutls_bin2hex (&data_b[2], n_b, buf, sizeof (buf),
+				     NULL));
 
   _gnutls_srp_entry_free (pwd_entry);
 
@@ -275,12 +276,12 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
   char buf[64];
   gnutls_srp_client_credentials_t cred;
   extension_priv_data_t epriv;
-  srp_ext_st * priv;
+  srp_ext_st *priv;
 
-  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_SRP, &epriv);
-  if (ret < 0) /* peer didn't send a username */
+  ret = _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_SRP, &epriv);
+  if (ret < 0)			/* peer didn't send a username */
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_UNKNOWN_SRP_USERNAME;
     }
   priv = epriv.ptr;
@@ -386,7 +387,8 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
     }
 
   _gnutls_hard_log ("INT: SRP A[%d]: %s\n", (int) n_a,
-		    _gnutls_bin2hex (&data_a[2], n_a, buf, sizeof (buf), NULL));
+		    _gnutls_bin2hex (&data_a[2], n_a, buf, sizeof (buf),
+				     NULL));
 
   _gnutls_mpi_release (&A);
 
@@ -737,12 +739,12 @@ _gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
   ssize_t data_size = _data_size;
   gnutls_srp_client_credentials_t cred;
   extension_priv_data_t epriv;
-  srp_ext_st * priv;
+  srp_ext_st *priv;
 
-  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_SRP, &epriv);
+  ret = _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_SRP, &epriv);
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_UNKNOWN_SRP_USERNAME;
     }
   priv = epriv.ptr;

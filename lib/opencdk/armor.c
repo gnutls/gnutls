@@ -28,7 +28,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 #include <stdio.h>
 #include <string.h>
@@ -39,9 +39,9 @@
 #include "filters.h"
 
 #ifdef __MINGW32__
-# define LF "\r\n"
+#define LF "\r\n"
 #else
-# define LF "\n"
+#define LF "\n"
 #endif
 
 #define CRCINIT 0xB704CE
@@ -283,7 +283,8 @@ compress_get_algo (cdk_stream_t inp, int *r_zipalgo)
 	  pkttype = *plain & 0x40 ? (*plain & 0x3f) : ((*plain >> 2) & 0xf);
 	  if (pkttype == CDK_PKT_COMPRESSED && r_zipalgo)
 	    {
-	      _gnutls_buffers_log ("armor compressed (algo=%d)\n", *(plain + 1));
+	      _gnutls_buffers_log ("armor compressed (algo=%d)\n",
+				   *(plain + 1));
 	      *r_zipalgo = *(plain + 1);
 	    }
 	  break;
@@ -596,8 +597,8 @@ armor_decode (void *data, FILE * in, FILE * out)
   afx->crc_okay = (afx->crc == crc2) ? 1 : 0;
   if (!afx->crc_okay && !rc)
     {
-      _gnutls_buffers_log ("file crc=%08X afx_crc=%08X\n", (unsigned int) crc2,
-		      (unsigned int) afx->crc);
+      _gnutls_buffers_log ("file crc=%08X afx_crc=%08X\n",
+			   (unsigned int) crc2, (unsigned int) afx->crc);
       rc = CDK_Armor_CRC_Error;
     }
 

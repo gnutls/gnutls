@@ -39,19 +39,19 @@
 #include <gnutls_datum.h>
 #include <gnutls_rsa_export.h>
 #include <gnutls_mbuffers.h>
-#include "../libextra/ext_inner_application.h" /* isn't this too much? */
+#include "../libextra/ext_inner_application.h"	/* isn't this too much? */
 
 /* This is a temporary function to be used before the generate_*
    internal API is changed to use mbuffers. For now we don't avoid the
    extra alloc + memcpy. */
 static inline int
-send_handshake (gnutls_session_t session, opaque *data, size_t size,
+send_handshake (gnutls_session_t session, opaque * data, size_t size,
 		gnutls_handshake_description_t type)
 {
   mbuffer_st *bufel;
 
-  if(data == NULL && size == 0)
-    return _gnutls_send_handshake(session, NULL, type);
+  if (data == NULL && size == 0)
+    return _gnutls_send_handshake (session, NULL, type);
 
   if (data == NULL && size > 0)
     {
@@ -59,16 +59,16 @@ send_handshake (gnutls_session_t session, opaque *data, size_t size,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  bufel = _gnutls_handshake_alloc(size, size);
+  bufel = _gnutls_handshake_alloc (size, size);
   if (bufel == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  _mbuffer_set_udata(bufel, data, size);
+  _mbuffer_set_udata (bufel, data, size);
 
-  return _gnutls_send_handshake(session, bufel, type);
+  return _gnutls_send_handshake (session, bufel, type);
 }
 
 
@@ -141,7 +141,7 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
     }
 
   /* TLS/IA inner secret is derived from the master secret. */
-  _gnutls_ia_derive_inner_secret(session);
+  _gnutls_ia_derive_inner_secret (session);
 
   if (!keep_premaster)
     _gnutls_free_datum (&PREMASTER);
@@ -152,7 +152,8 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
   _gnutls_hard_log ("INT: MASTER SECRET: %s\n",
 		    _gnutls_bin2hex (session->
 				     security_parameters.master_secret,
-				     GNUTLS_MASTER_SIZE, buf, sizeof (buf), NULL));
+				     GNUTLS_MASTER_SIZE, buf, sizeof (buf),
+				     NULL));
 
   return ret;
 }
@@ -280,8 +281,8 @@ _gnutls_send_client_kx_message (gnutls_session_t session, int again)
 	  return data_size;
 	}
     }
-  ret =  send_handshake (session, data, data_size,
-			 GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE);
+  ret = send_handshake (session, data, data_size,
+			GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE);
   gnutls_free (data);
 
   if (ret < 0)

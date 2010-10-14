@@ -97,7 +97,9 @@ _gnutls_send_inner_application (gnutls_session_t session,
       memcpy (p + 4, data, sizeofdata);
     }
 
-  len = _gnutls_send_int (session, GNUTLS_INNER_APPLICATION, -1, EPOCH_WRITE_CURRENT, p, plen, MBUFFER_FLUSH);
+  len =
+    _gnutls_send_int (session, GNUTLS_INNER_APPLICATION, -1,
+		      EPOCH_WRITE_CURRENT, p, plen, MBUFFER_FLUSH);
 
   if (p)
     gnutls_free (p);
@@ -175,10 +177,12 @@ _gnutls_ia_prf (gnutls_session_t session,
   extension_priv_data_t epriv;
   ia_ext_st *priv;
 
-  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_INNER_APPLICATION, &epriv);
+  ret =
+    _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_INNER_APPLICATION,
+				  &epriv);
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
   priv = epriv.ptr;
@@ -228,10 +232,12 @@ gnutls_ia_permute_inner_secret (gnutls_session_t session,
   ia_ext_st *priv;
   int ret;
 
-  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_INNER_APPLICATION, &epriv);
+  ret =
+    _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_INNER_APPLICATION,
+				  &epriv);
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
   priv = epriv.ptr;
@@ -241,8 +247,7 @@ gnutls_ia_permute_inner_secret (gnutls_session_t session,
 			 inner_permutation_label,
 			 session_keys_size,
 			 session_keys,
-			 GNUTLS_RANDOM_SIZE,
-			 priv->inner_secret);
+			 GNUTLS_RANDOM_SIZE, priv->inner_secret);
 }
 
 /**
@@ -288,10 +293,12 @@ gnutls_ia_extract_inner_secret (gnutls_session_t session, char *buffer)
   ia_ext_st *priv;
   int ret;
 
-  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_INNER_APPLICATION, &epriv);
+  ret =
+    _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_INNER_APPLICATION,
+				  &epriv);
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return;
     }
   priv = epriv.ptr;
@@ -327,10 +334,12 @@ gnutls_ia_endphase_send (gnutls_session_t session, int final_p)
   extension_priv_data_t epriv;
   ia_ext_st *priv;
 
-  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_INNER_APPLICATION, &epriv);
+  ret =
+    _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_INNER_APPLICATION,
+				  &epriv);
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
   priv = epriv.ptr;
@@ -390,10 +399,12 @@ gnutls_ia_verify_endphase (gnutls_session_t session, const char *checksum)
   extension_priv_data_t epriv;
   ia_ext_st *priv;
 
-  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_INNER_APPLICATION, &epriv);
+  ret =
+    _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_INNER_APPLICATION,
+				  &epriv);
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
   priv = epriv.ptr;
@@ -665,13 +676,15 @@ int
 gnutls_ia_handshake_p (gnutls_session_t session)
 {
   extension_priv_data_t epriv;
-  ia_ext_st * priv;
+  ia_ext_st *priv;
   int ret;
 
-  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_SERVER_NAME, &epriv);
+  ret =
+    _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_SERVER_NAME,
+				  &epriv);
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
   priv = epriv.ptr;
@@ -966,15 +979,16 @@ gnutls_ia_get_server_avp_ptr (gnutls_ia_server_credentials_t cred)
  * calling gnutls_ia_handshake() or one of the lower level gnutls_ia_*
  * functions.
  **/
-void gnutls_ia_enable (gnutls_session_t session, int allow_skip_on_resume)
+void
+gnutls_ia_enable (gnutls_session_t session, int allow_skip_on_resume)
 {
   extension_priv_data_t epriv;
-  ia_ext_st * priv;
+  ia_ext_st *priv;
 
-  priv = gnutls_calloc(1, sizeof(*priv));
+  priv = gnutls_calloc (1, sizeof (*priv));
   if (priv == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return;
     }
 
@@ -984,6 +998,7 @@ void gnutls_ia_enable (gnutls_session_t session, int allow_skip_on_resume)
   if (allow_skip_on_resume)
     priv->flags |= IA_ALLOW_SKIP;
 
-  _gnutls_ext_set_session_data(session, GNUTLS_EXTENSION_INNER_APPLICATION, epriv);
+  _gnutls_ext_set_session_data (session, GNUTLS_EXTENSION_INNER_APPLICATION,
+				epriv);
 
 }

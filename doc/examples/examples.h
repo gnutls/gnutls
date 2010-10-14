@@ -1,5 +1,5 @@
 #ifndef EXAMPLES_H
-# define EXAMPLES_H
+#define EXAMPLES_H
 
 void check_alert (gnutls_session_t session, int ret);
 

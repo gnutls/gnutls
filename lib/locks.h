@@ -1,5 +1,5 @@
 #ifndef GNUTLS_LOCKS_H
-# define GNUTLS_LOCKS_H
+#define GNUTLS_LOCKS_H
 
 #include <gnutls/gnutls.h>
 #include <gnutls_int.h>

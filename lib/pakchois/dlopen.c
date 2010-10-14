@@ -27,22 +27,25 @@
 
 #ifdef _WIN32
 
-# include <windows.h>
+#include <windows.h>
 
-void *dlopen(const char *filename, int flag)
+void *
+dlopen (const char *filename, int flag)
 {
-	return LoadLibrary(filename); 
+  return LoadLibrary (filename);
 }
 
 
-void *dlsym(void *handle, const char *symbol)
+void *
+dlsym (void *handle, const char *symbol)
 {
-	return GetProcAddress((HINSTANCE)handle, symbol);
+  return GetProcAddress ((HINSTANCE) handle, symbol);
 }
 
-int dlclose(void *handle)
+int
+dlclose (void *handle)
 {
-	FreeLibrary((HINSTANCE)handle);
+  FreeLibrary ((HINSTANCE) handle);
 }
 
 #endif

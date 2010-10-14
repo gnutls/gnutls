@@ -137,7 +137,7 @@ read_mpi (cdk_stream_t inp, bigint_t * ret_m, int secure)
   if (!rc && nread != ((nbits + 7) / 8))
     {
       _gnutls_write_log ("read_mpi: too short %d < %d\n", (int) nread,
-		      (int) ((nbits + 7) / 8));
+			 (int) ((nbits + 7) / 8));
       return CDK_MPI_Error;
     }
 
@@ -301,7 +301,8 @@ read_public_key (cdk_stream_t inp, size_t pktlen, cdk_pkt_pubkey_t pk)
   if (!npkey)
     {
       gnutls_assert ();
-      _gnutls_write_log ("invalid public key algorithm %d\n", pk->pubkey_algo);
+      _gnutls_write_log ("invalid public key algorithm %d\n",
+			 pk->pubkey_algo);
       return CDK_Inv_Algo;
     }
   for (i = 0; i < npkey; i++)

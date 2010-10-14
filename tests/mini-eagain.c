@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -229,7 +229,7 @@ doit (void)
 	fail ("server: didn't receive any data\n");
       else if (ret < 0)
 	{
-//	if (debug)
+//      if (debug)
 //          fputs ("#", stdout);
 	  if (ret != GNUTLS_E_AGAIN)
 	    {
@@ -240,14 +240,16 @@ doit (void)
       else
 	{
 	  transferred += ret;
-//	  if (debug)
-//	    fputs ("*", stdout);
+//        if (debug)
+//          fputs ("*", stdout);
 	}
 
-      msglen = strlen(MSG);
-      do {
-        ns = gnutls_record_send (server, MSG, msglen);
-      } while(ns == GNUTLS_E_AGAIN);
+      msglen = strlen (MSG);
+      do
+	{
+	  ns = gnutls_record_send (server, MSG, msglen);
+	}
+      while (ns == GNUTLS_E_AGAIN);
 
       ret = gnutls_record_recv (client, buffer, MAX_BUF);
       if (ret == 0)
@@ -257,7 +259,7 @@ doit (void)
       else if (ret < 0)
 	{
 	  if (debug)
-            fputs ("!", stdout);
+	    fputs ("!", stdout);
 	  if (ret != GNUTLS_E_AGAIN)
 	    {
 	      fail ("client: Error: %s\n", gnutls_strerror (ret));
@@ -266,14 +268,17 @@ doit (void)
 	}
       else
 	{
-	  if (msglen != ret || memcmp(buffer, MSG, msglen) != 0) {
+	  if (msglen != ret || memcmp (buffer, MSG, msglen) != 0)
+	    {
 	      fail ("client: Transmitted data do not match\n");
-          }
+	    }
 
-          /* echo back */
-          do {
-            ns = gnutls_record_send (client, buffer, msglen);
-          } while(ns == GNUTLS_E_AGAIN);
+	  /* echo back */
+	  do
+	    {
+	      ns = gnutls_record_send (client, buffer, msglen);
+	    }
+	  while (ns == GNUTLS_E_AGAIN);
 
 	  transferred += ret;
 	  if (debug)

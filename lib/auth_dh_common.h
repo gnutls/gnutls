@@ -24,7 +24,7 @@
  */
 
 #ifndef AUTH_DH_COMMON
-# define AUTH_DH_COMMON
+#define AUTH_DH_COMMON
 
 typedef struct
 {

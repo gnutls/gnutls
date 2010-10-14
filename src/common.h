@@ -10,14 +10,14 @@
 #include <netinet/in.h>
 #include <signal.h>
 #ifdef _WIN32
-# include <io.h>
-# include <winbase.h>
+#include <io.h>
+#include <winbase.h>
 #endif
 
 #ifndef __attribute__
-# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
-#  define __attribute__(Spec)	/* empty */
-# endif
+#if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
+#define __attribute__(Spec)	/* empty */
+#endif
 #endif
 
 /* the number of elements in the priority structures.
@@ -40,5 +40,5 @@ void parse_protocols (char **protocols, int protocols_size,
 		      int *protocol_priority);
 const char *raw_to_string (const unsigned char *raw, size_t raw_size);
 int service_to_port (const char *service);
-void pkcs11_common(void);
+void pkcs11_common (void);
 void sockets_init (void);

@@ -24,10 +24,10 @@
  */
 
 #ifndef GNUTLS_INT_H
-# define GNUTLS_INT_H
+#define GNUTLS_INT_H
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stddef.h>
@@ -39,7 +39,7 @@
 #include <stdint.h>
 
 #ifdef NO_SSIZE_T
-# define HAVE_SSIZE_T
+#define HAVE_SSIZE_T
 typedef int ssize_t;
 #endif
 
@@ -168,16 +168,16 @@ typedef enum handshake_state_t
 #define MAX_CIPHERSUITES 256
 
 typedef enum extensions_t
-  {
-    GNUTLS_EXTENSION_SERVER_NAME = 0,
-    GNUTLS_EXTENSION_MAX_RECORD_SIZE = 1,
-    GNUTLS_EXTENSION_CERT_TYPE = 9,
-    GNUTLS_EXTENSION_SRP = 12,
-    GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS = 13,
-    GNUTLS_EXTENSION_SESSION_TICKET = 35,
-    GNUTLS_EXTENSION_INNER_APPLICATION = 37703,
-    GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281	/* aka: 0xff01 */
-  } extensions_t;
+{
+  GNUTLS_EXTENSION_SERVER_NAME = 0,
+  GNUTLS_EXTENSION_MAX_RECORD_SIZE = 1,
+  GNUTLS_EXTENSION_CERT_TYPE = 9,
+  GNUTLS_EXTENSION_SRP = 12,
+  GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS = 13,
+  GNUTLS_EXTENSION_SESSION_TICKET = 35,
+  GNUTLS_EXTENSION_INNER_APPLICATION = 37703,
+  GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281	/* aka: 0xff01 */
+} extensions_t;
 
 typedef enum
 { CIPHER_STREAM, CIPHER_BLOCK } cipher_type_t;
@@ -207,7 +207,7 @@ typedef struct mbuffer_st
      message. Mark should only be non-zero when this buffer is the
      head of the queue. */
   size_t mark;
-  unsigned int user_mark; /* only used during fill in */
+  unsigned int user_mark;	/* only used during fill in */
   size_t maximum_size;
 } mbuffer_st;
 
@@ -222,8 +222,8 @@ typedef struct mbuffer_head_st
 
 typedef enum
 {
-  HANDSHAKE_MAC_TYPE_10 = 1, /* TLS 1.0 style */ 
-  HANDSHAKE_MAC_TYPE_12 /* TLS 1.2 style */
+  HANDSHAKE_MAC_TYPE_10 = 1,	/* TLS 1.0 style */
+  HANDSHAKE_MAC_TYPE_12		/* TLS 1.2 style */
 } handshake_mac_type_t;
 
 /* Store & Retrieve functions defines: 
@@ -341,7 +341,7 @@ typedef struct
 {
   gnutls_connection_end_t entity;
   gnutls_kx_algorithm_t kx_algorithm;
-  handshake_mac_type_t handshake_mac_handle_type;      /* one of HANDSHAKE_TYPE_10 and HANDSHAKE_TYPE_12 */
+  handshake_mac_type_t handshake_mac_handle_type;	/* one of HANDSHAKE_TYPE_10 and HANDSHAKE_TYPE_12 */
 
   /* The epoch used to read and write */
   uint16_t epoch_read;
@@ -389,9 +389,9 @@ struct record_state_st
   gnutls_datum_t mac_secret;
   gnutls_datum_t IV;
   gnutls_datum_t key;
-  cipher_hd_st   cipher_state;
-  comp_hd_t      compression_state;
-  uint64         sequence_number;
+  cipher_hd_st cipher_state;
+  comp_hd_t compression_state;
+  uint64 sequence_number;
 };
 
 /* These are used to resolve relative epochs. These values are just
@@ -407,8 +407,8 @@ struct record_parameters_st
   uint16_t epoch;
   int initialized;
 
-  gnutls_cipher_algorithm_t   cipher_algorithm;
-  gnutls_mac_algorithm_t      mac_algorithm;
+  gnutls_cipher_algorithm_t cipher_algorithm;
+  gnutls_mac_algorithm_t mac_algorithm;
   gnutls_compression_method_t compression_algorithm;
 
   record_state_st read;
@@ -421,7 +421,8 @@ typedef struct
   unsigned int algorithms;
 } priority_st;
 
-typedef enum {
+typedef enum
+{
   SR_DISABLED,
   SR_UNSAFE,
   SR_PARTIAL,
@@ -477,9 +478,9 @@ typedef struct
   gnutls_handshake_description_t recv_type;
 } handshake_header_buffer_st;
 
-typedef union 
+typedef union
 {
-  void* ptr;
+  void *ptr;
   uint32_t num;
 } extension_priv_data_t;
 
@@ -487,7 +488,7 @@ typedef struct
 {
   gnutls_buffer_st application_data_buffer;	/* holds data to be delivered to application layer */
   gnutls_buffer_st handshake_hash_buffer;	/* used to keep the last received handshake 
-					 * message */
+						 * message */
   union
   {
     struct
@@ -505,7 +506,7 @@ typedef struct
 
   gnutls_buffer_st handshake_data_buffer;	/* this is a buffer that holds the current handshake message */
   gnutls_buffer_st ia_data_buffer;	/* holds inner application data (TLS/IA) */
-  int resumable:1;	/* TRUE or FALSE - if we can resume that session */
+  int resumable:1;		/* TRUE or FALSE - if we can resume that session */
   handshake_state_t handshake_state;	/* holds
 					 * a number which indicates where
 					 * the handshake procedure has been
@@ -518,7 +519,7 @@ typedef struct
   int may_not_read:1;		/* if it's 0 then we can read/write, otherwise it's forbiden to read/write
 				 */
   int may_not_write:1;
-  int read_eof:1;			/* non-zero if we have received a closure alert. */
+  int read_eof:1;		/* non-zero if we have received a closure alert. */
 
   int last_alert;		/* last alert received */
 
@@ -534,7 +535,7 @@ typedef struct
   struct gnutls_priority_st priorities;
 
   /* resumed session */
-  int resumed:1;	/* RESUME_TRUE or FALSE - if we are resuming a session */
+  int resumed:1;		/* RESUME_TRUE or FALSE - if we are resuming a session */
   security_parameters_st resumed_security_parameters;
   gnutls_compression_method_t resumed_compression_method;
 
@@ -712,16 +713,18 @@ typedef struct
 
   int initial_negotiation_completed:1;
 
-  struct {
-      uint16_t type;
-      extension_priv_data_t priv;
-      int set:1;
+  struct
+  {
+    uint16_t type;
+    extension_priv_data_t priv;
+    int set:1;
   } extension_int_data[MAX_EXT_TYPES];
 
-  struct {
-      uint16_t type;
-      extension_priv_data_t priv;
-      int set:1;
+  struct
+  {
+    uint16_t type;
+    extension_priv_data_t priv;
+    int set:1;
   } resumed_extension_int_data[MAX_EXT_TYPES];
 
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().

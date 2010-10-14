@@ -25,10 +25,10 @@
 #include <gnutls/x509.h>
 
 #ifndef _WIN32
-# include <unistd.h>
-# include <signal.h>
+#include <unistd.h>
+#include <signal.h>
 #else
-# include <errno.h>
+#include <errno.h>
 #endif
 
 #include <stdio.h>
@@ -126,7 +126,7 @@ _gnutls_priority_set_direct (gnutls_session_t session, const char *str)
   if (ret < 0)
     {
       fprintf (stderr, "Error with string %s\n", str);
-      fprintf (stderr, "Error at %s: %s\n", err, gnutls_strerror(ret));
+      fprintf (stderr, "Error at %s: %s\n", err, gnutls_strerror (ret));
       exit (1);
     }
 }
@@ -193,7 +193,7 @@ test_export (gnutls_session_t session)
 
   sprintf (prio_str, INIT_STR
 	   "+ARCFOUR-40:+RSA-EXPORT:" ALL_COMP ":" ALL_CERTTYPES ":%s:"
-	   ALL_MACS ":" ALL_KX ":%s" , protocol_str, rest);
+	   ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
   _gnutls_priority_set_direct (session, prio_str);
 
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
@@ -301,7 +301,7 @@ test_safe_renegotiation_scsv (gnutls_session_t session)
 {
   int ret;
 
-  sprintf (prio_str, INIT_STR 
+  sprintf (prio_str, INIT_STR
 	   ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":+VERS-SSL3.0:"
 	   ALL_MACS ":" ALL_KX ":%%SAFE_RENEGOTIATION");
   _gnutls_priority_set_direct (session, prio_str);
@@ -654,7 +654,7 @@ test_record_padding (gnutls_session_t session)
     }
   else
     {
-      strcat(rest, ":%COMPAT");
+      strcat (rest, ":%COMPAT");
     }
 
   return ret;
@@ -709,8 +709,8 @@ test_tls1_1_fallback (gnutls_session_t session)
 
   sprintf (prio_str,
 	   INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES
-	   ":+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0:" ALL_MACS ":" ALL_KX ":%s",
-	   rest);
+	   ":+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0:" ALL_MACS ":" ALL_KX
+	   ":%s", rest);
   _gnutls_priority_set_direct (session, prio_str);
 
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);

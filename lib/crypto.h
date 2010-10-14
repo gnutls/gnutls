@@ -23,7 +23,7 @@
  */
 
 #ifndef CRYPTO_H
-# define CRYPTO_H
+#define CRYPTO_H
 
 const gnutls_crypto_cipher_st
   * _gnutls_get_crypto_cipher (gnutls_cipher_algorithm_t algo);

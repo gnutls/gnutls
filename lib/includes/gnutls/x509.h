@@ -28,14 +28,14 @@
  */
 
 #ifndef GNUTLS_X509_H
-# define GNUTLS_X509_H
+#define GNUTLS_X509_H
 
-# include <gnutls/gnutls.h>
+#include <gnutls/gnutls.h>
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
-# endif
+#endif
 
 /* Some OIDs usually found in Distinguished names, or
  * in Subject Directory Attribute extensions.
@@ -141,7 +141,9 @@ extern "C"
 				  unsigned char *output_data,
 				  size_t * output_data_size);
   int gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
-				      gnutls_digest_algorithm_t * hash, unsigned int *mand);
+						    gnutls_digest_algorithm_t
+						    * hash,
+						    unsigned int *mand);
 
   int gnutls_x509_crt_set_authority_key_id (gnutls_x509_crt_t cert,
 					    const void *id, size_t id_size);
@@ -625,7 +627,8 @@ extern "C"
 
   int gnutls_x509_privkey_init (gnutls_x509_privkey_t * key);
   void gnutls_x509_privkey_deinit (gnutls_x509_privkey_t key);
-  gnutls_sec_param_t gnutls_x509_privkey_sec_param (gnutls_x509_privkey_t key);
+  gnutls_sec_param_t gnutls_x509_privkey_sec_param (gnutls_x509_privkey_t
+						    key);
   int gnutls_x509_privkey_cpy (gnutls_x509_privkey_t dst,
 			       gnutls_x509_privkey_t src);
   int gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
@@ -644,14 +647,14 @@ extern "C"
 					  const gnutls_datum_t * q,
 					  const gnutls_datum_t * u);
   int gnutls_x509_privkey_import_rsa_raw2 (gnutls_x509_privkey_t key,
-					  const gnutls_datum_t * m,
-					  const gnutls_datum_t * e,
-					  const gnutls_datum_t * d,
-					  const gnutls_datum_t * p,
-					  const gnutls_datum_t * q,
-					  const gnutls_datum_t * u,
-					  const gnutls_datum_t *exp1,
-					  const gnutls_datum_t *exp2);
+					   const gnutls_datum_t * m,
+					   const gnutls_datum_t * e,
+					   const gnutls_datum_t * d,
+					   const gnutls_datum_t * p,
+					   const gnutls_datum_t * q,
+					   const gnutls_datum_t * u,
+					   const gnutls_datum_t * exp1,
+					   const gnutls_datum_t * exp2);
   int gnutls_x509_privkey_fix (gnutls_x509_privkey_t key);
 
   int gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
@@ -688,10 +691,14 @@ extern "C"
 					void *output_data,
 					size_t * output_data_size);
   int gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
-        gnutls_datum_t * m, gnutls_datum_t * e,
-        gnutls_datum_t * d, gnutls_datum_t * p,
-        gnutls_datum_t * q, gnutls_datum_t * u,
-        gnutls_datum_t* e1, gnutls_datum_t* e2);
+					   gnutls_datum_t * m,
+					   gnutls_datum_t * e,
+					   gnutls_datum_t * d,
+					   gnutls_datum_t * p,
+					   gnutls_datum_t * q,
+					   gnutls_datum_t * u,
+					   gnutls_datum_t * e1,
+					   gnutls_datum_t * e2);
   int gnutls_x509_privkey_export_rsa_raw (gnutls_x509_privkey_t key,
 					  gnutls_datum_t * m,
 					  gnutls_datum_t * e,
@@ -709,10 +716,10 @@ extern "C"
 				     void *signature,
 				     size_t * signature_size);
   int gnutls_x509_privkey_sign_data2 (gnutls_x509_privkey_t key,
-				     gnutls_digest_algorithm_t digest,
-				     unsigned int flags,
-				     const gnutls_datum_t * data,
-				     gnutls_datum_t *signature);
+				      gnutls_digest_algorithm_t digest,
+				      unsigned int flags,
+				      const gnutls_datum_t * data,
+				      gnutls_datum_t * signature);
   int gnutls_x509_privkey_verify_data (gnutls_x509_privkey_t key,
 				       unsigned int flags,
 				       const gnutls_datum_t * data,
@@ -750,7 +757,9 @@ extern "C"
 			      const gnutls_datum_t * data,
 			      gnutls_x509_crt_fmt_t format);
   int gnutls_x509_crq_get_preferred_hash_algorithm (gnutls_x509_crq_t crq,
-			      gnutls_digest_algorithm_t * hash, unsigned int* mand);
+						    gnutls_digest_algorithm_t
+						    * hash,
+						    unsigned int *mand);
 
   int gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf,
 			      size_t * sizeof_buf);
@@ -858,8 +867,8 @@ extern "C"
 					    void *buf, size_t * sizeof_buf,
 					    unsigned int *critical);
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 }
-# endif
+#endif
 
 #endif				/* GNUTLS_X509_H */

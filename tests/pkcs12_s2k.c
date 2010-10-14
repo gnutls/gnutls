@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -133,12 +133,14 @@ doit (void)
 	    fail ("_gnutls_pkcs12_string_to_key failed[0]: %d\n", rc);
 
 	  if (strcmp (_gnutls_bin2hex (key, sizeof (key),
-				       tmp, sizeof (tmp), NULL), values[x]) != 0)
+				       tmp, sizeof (tmp), NULL),
+		      values[x]) != 0)
 	    fail ("_gnutls_pkcs12_string_to_key failed[1]\n");
 
 	  if (debug)
 	    printf ("ij: %d.%d: %s\n", i, j,
-		    _gnutls_bin2hex (key, sizeof (key), tmp, sizeof (tmp), NULL));
+		    _gnutls_bin2hex (key, sizeof (key), tmp, sizeof (tmp),
+				     NULL));
 	  x++;
 	}
     }

@@ -24,7 +24,7 @@
  */
 
 #ifndef GNUTLS_AUTH_H
-# define GNUTLS_AUTH_H
+#define GNUTLS_AUTH_H
 
 typedef struct mod_auth_st_int
 {

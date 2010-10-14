@@ -93,52 +93,58 @@ cc_cleanup:
   return ret;
 }
 
-int _gnutls_cipher_encrypt (const cipher_hd_st * handle, void *text, int textlen)
+int
+_gnutls_cipher_encrypt (const cipher_hd_st * handle, void *text, int textlen)
 {
   if (handle != NULL && handle->handle != NULL)
     {
-      return handle->encrypt(handle->handle, text, textlen, text, textlen);
+      return handle->encrypt (handle->handle, text, textlen, text, textlen);
     }
   return 0;
 }
 
-int _gnutls_cipher_decrypt (const cipher_hd_st * handle, void *ciphertext,
+int
+_gnutls_cipher_decrypt (const cipher_hd_st * handle, void *ciphertext,
 			int ciphertextlen)
 {
   if (handle != NULL && handle->handle != NULL)
     {
-      return handle->decrypt(handle->handle, ciphertext, ciphertextlen, 
-	ciphertext, ciphertextlen);
+      return handle->decrypt (handle->handle, ciphertext, ciphertextlen,
+			      ciphertext, ciphertextlen);
     }
   return 0;
 }
 
-int _gnutls_cipher_encrypt2 (const cipher_hd_st * handle, const void *text, int textlen,
-  void* ciphertext, int ciphertextlen)
+int
+_gnutls_cipher_encrypt2 (const cipher_hd_st * handle, const void *text,
+			 int textlen, void *ciphertext, int ciphertextlen)
 {
   if (handle != NULL && handle->handle != NULL)
     {
-      return handle->encrypt(handle->handle, text, textlen, ciphertext, ciphertextlen);
+      return handle->encrypt (handle->handle, text, textlen, ciphertext,
+			      ciphertextlen);
     }
   return 0;
 }
 
-int _gnutls_cipher_decrypt2 (const cipher_hd_st * handle, const void *ciphertext,
-			int ciphertextlen, void* text, int textlen)
+int
+_gnutls_cipher_decrypt2 (const cipher_hd_st * handle, const void *ciphertext,
+			 int ciphertextlen, void *text, int textlen)
 {
   if (handle != NULL && handle->handle != NULL)
     {
-      return handle->decrypt(handle->handle, ciphertext, ciphertextlen, 
-	text, textlen);
+      return handle->decrypt (handle->handle, ciphertext, ciphertextlen,
+			      text, textlen);
     }
   return 0;
 }
 
-void _gnutls_cipher_deinit (cipher_hd_st * handle)
+void
+_gnutls_cipher_deinit (cipher_hd_st * handle)
 {
   if (handle != NULL && handle->handle != NULL)
     {
-      handle->deinit(handle->handle);
+      handle->deinit (handle->handle);
       handle->handle = NULL;
     }
 }

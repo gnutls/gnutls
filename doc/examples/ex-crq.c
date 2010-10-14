@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -35,7 +35,7 @@ main (void)
 
   /* Generate an RSA key of moderate security.
    */
-  bits = gnutls_sec_param_to_pk_bits( GNUTLS_PK_RSA, GNUTLS_SEC_PARAM_NORMAL);
+  bits = gnutls_sec_param_to_pk_bits (GNUTLS_PK_RSA, GNUTLS_SEC_PARAM_NORMAL);
   gnutls_x509_privkey_generate (key, GNUTLS_PK_RSA, bits, 0);
 
   /* Add stuff to the distinguished name

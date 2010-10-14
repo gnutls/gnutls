@@ -26,7 +26,7 @@
 typedef enum Optional
 { OPTIONAL_PACKET, MANDATORY_PACKET } Optional;
 
-int _gnutls_send_handshake (gnutls_session_t session, mbuffer_st *bufel,
+int _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
 			    gnutls_handshake_description_t type);
 int _gnutls_recv_hello_request (gnutls_session_t session, void *data,
 				uint32_t data_size);

@@ -34,13 +34,13 @@ typedef struct
 {
   const char *name;
   gnutls_sec_param_t sec_param;
-  int bits;		/* security level */
-  int pk_bits;		/* DH, RSA, SRP */
-  int dsa_bits;		/* bits for DSA. Handled differently since
-			 * choice of key size in DSA is political.
-			 */
-  int subgroup_bits;	/* subgroup bits */
-  int ecc_bits;		/* bits for ECC keys */
+  int bits;			/* security level */
+  int pk_bits;			/* DH, RSA, SRP */
+  int dsa_bits;			/* bits for DSA. Handled differently since
+				 * choice of key size in DSA is political.
+				 */
+  int subgroup_bits;		/* subgroup bits */
+  int ecc_bits;			/* bits for ECC keys */
 } gnutls_sec_params_entry;
 
 static const gnutls_sec_params_entry sec_params[] = {
@@ -2166,9 +2166,9 @@ static const gnutls_pk_entry pk_algorithms[] = {
   /* having duplicate entries is ok, as long as the one
    * we want to return OID from is first */
   {"RSA", PK_PKIX1_RSA_OID, GNUTLS_PK_RSA},
-  {"RSA (X.509)", PK_X509_RSA_OID, GNUTLS_PK_RSA}, /* some certificates use this OID for RSA */
-  {"RSA (MD5)", SIG_RSA_MD5_OID, GNUTLS_PK_RSA}, /* some other broken certificates set RSA with MD5 as an indicator of RSA */
-  {"RSA (SHA1)", SIG_RSA_SHA1_OID, GNUTLS_PK_RSA}, /* some other broken certificates set RSA with SHA1 as an indicator of RSA */
+  {"RSA (X.509)", PK_X509_RSA_OID, GNUTLS_PK_RSA},	/* some certificates use this OID for RSA */
+  {"RSA (MD5)", SIG_RSA_MD5_OID, GNUTLS_PK_RSA},	/* some other broken certificates set RSA with MD5 as an indicator of RSA */
+  {"RSA (SHA1)", SIG_RSA_SHA1_OID, GNUTLS_PK_RSA},	/* some other broken certificates set RSA with SHA1 as an indicator of RSA */
   {"DSA", PK_DSA_OID, GNUTLS_PK_DSA},
   {"GOST R 34.10-2001", PK_GOST_R3410_2001_OID, GNUTLS_PK_UNKNOWN},
   {"GOST R 34.10-94", PK_GOST_R3410_94_OID, GNUTLS_PK_UNKNOWN},
@@ -2328,19 +2328,26 @@ _gnutls_x509_pk_to_oid (gnutls_pk_algorithm_t algorithm)
  * Returns: The number of bits, or zero.
  *
  **/
-unsigned int gnutls_sec_param_to_pk_bits (gnutls_pk_algorithm_t algo,
-                                      gnutls_sec_param_t param)
+unsigned int
+gnutls_sec_param_to_pk_bits (gnutls_pk_algorithm_t algo,
+			     gnutls_sec_param_t param)
 {
-unsigned int ret = 0;
+  unsigned int ret = 0;
 
   /* handle DSA differently */
-  if (algo == GNUTLS_PK_DSA) 
+  if (algo == GNUTLS_PK_DSA)
     {
-	GNUTLS_SEC_PARAM_LOOP ( if (p->sec_param == param) { ret = p->dsa_bits; break; });
-	return ret;
+      GNUTLS_SEC_PARAM_LOOP (if (p->sec_param == param)
+			     {
+			     ret = p->dsa_bits; break;}
+      );
+      return ret;
     }
 
-  GNUTLS_SEC_PARAM_LOOP ( if (p->sec_param == param) { ret = p->pk_bits; break; });
+  GNUTLS_SEC_PARAM_LOOP (if (p->sec_param == param)
+			 {
+			 ret = p->pk_bits; break;}
+  );
 
   return ret;
 }
@@ -2348,11 +2355,15 @@ unsigned int ret = 0;
 /* Returns the corresponding size for subgroup bits (q),
  * given the group bits (p).
  */
-unsigned int _gnutls_pk_bits_to_subgroup_bits (unsigned int pk_bits)
+unsigned int
+_gnutls_pk_bits_to_subgroup_bits (unsigned int pk_bits)
 {
-unsigned int ret = 0;
+  unsigned int ret = 0;
 
-  GNUTLS_SEC_PARAM_LOOP ( if (p->pk_bits >= pk_bits) { ret = p->subgroup_bits; break; });
+  GNUTLS_SEC_PARAM_LOOP (if (p->pk_bits >= pk_bits)
+			 {
+			 ret = p->subgroup_bits; break;}
+  );
 
   return ret;
 }
@@ -2370,9 +2381,12 @@ unsigned int ret = 0;
 const char *
 gnutls_sec_param_get_name (gnutls_sec_param_t param)
 {
-const char* ret = "Unknown";
+  const char *ret = "Unknown";
 
-  GNUTLS_SEC_PARAM_LOOP ( if (p->sec_param == param) { ret = p->name; break; });
+  GNUTLS_SEC_PARAM_LOOP (if (p->sec_param == param)
+			 {
+			 ret = p->name; break;}
+  );
 
   return ret;
 }
@@ -2389,16 +2403,15 @@ const char* ret = "Unknown";
  * Returns: The security parameter.
  *
  **/
-gnutls_sec_param_t gnutls_pk_bits_to_sec_param (gnutls_pk_algorithm_t algo,
-                                      unsigned int bits)
+gnutls_sec_param_t
+gnutls_pk_bits_to_sec_param (gnutls_pk_algorithm_t algo, unsigned int bits)
 {
   gnutls_sec_param_t ret = GNUTLS_SEC_PARAM_WEAK;
 
-  GNUTLS_SEC_PARAM_LOOP ( 
-	if (p->pk_bits > bits) 
-	  { break; } 
-	ret = p->sec_param; 
-  );
+  GNUTLS_SEC_PARAM_LOOP (if (p->pk_bits > bits)
+			 {
+			 break;}
+			 ret = p->sec_param;);
 
   return ret;
 }

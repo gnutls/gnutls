@@ -30,15 +30,18 @@
 #include "debug.h"
 #include <gnutls_mpi.h>
 
-void _gnutls_dump_mpi(const char* prefix, bigint_t a)
+void
+_gnutls_dump_mpi (const char *prefix, bigint_t a)
 {
-        char buf[400];
-        char buf_hex[2*sizeof(buf)];
-        size_t n = sizeof buf;
+  char buf[400];
+  char buf_hex[2 * sizeof (buf)];
+  size_t n = sizeof buf;
 
-        if (_gnutls_mpi_print(a, buf, &n))
-                strcpy(buf, "[can't print value]"); /* Flawfinder: ignore */
-        _gnutls_debug_log( "MPI: length: %d\n\t%s%s\n", (int)n, prefix,  _gnutls_bin2hex(buf, n, buf_hex, sizeof(buf_hex), NULL));
+  if (_gnutls_mpi_print (a, buf, &n))
+    strcpy (buf, "[can't print value]");	/* Flawfinder: ignore */
+  _gnutls_debug_log ("MPI: length: %d\n\t%s%s\n", (int) n, prefix,
+		     _gnutls_bin2hex (buf, n, buf_hex, sizeof (buf_hex),
+				      NULL));
 }
 
 

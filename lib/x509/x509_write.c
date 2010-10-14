@@ -760,14 +760,14 @@ gnutls_x509_crt_sign2 (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  result = gnutls_privkey_init(&privkey);
+  result = gnutls_privkey_init (&privkey);
   if (result < 0)
     {
       gnutls_assert ();
       return result;
     }
 
-  result = gnutls_privkey_import_x509(privkey, issuer_key, 0);
+  result = gnutls_privkey_import_x509 (privkey, issuer_key, 0);
   if (result < 0)
     {
       gnutls_assert ();
@@ -784,7 +784,7 @@ gnutls_x509_crt_sign2 (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
   result = 0;
 
 fail:
-  gnutls_privkey_deinit(privkey);
+  gnutls_privkey_deinit (privkey);
 
   return result;
 }
@@ -1313,8 +1313,9 @@ gnutls_x509_crt_set_key_purpose_oid (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_privkey_sign (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
-		       gnutls_privkey_t issuer_key,
-		       gnutls_digest_algorithm_t dig, unsigned int flags)
+			      gnutls_privkey_t issuer_key,
+			      gnutls_digest_algorithm_t dig,
+			      unsigned int flags)
 {
   int result;
 

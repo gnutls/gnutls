@@ -24,7 +24,7 @@
  */
 
 #ifndef GNUTLS_HASH_INT_H
-# define GNUTLS_HASH_INT_H
+#define GNUTLS_HASH_INT_H
 
 #include <gnutls_int.h>
 #include <gnutls/crypto.h>
@@ -38,23 +38,23 @@ extern gnutls_crypto_mac_st _gnutls_mac_ops;
 extern int crypto_digest_prio;
 extern gnutls_crypto_digest_st _gnutls_digest_ops;
 
-typedef int (*hash_func)(void* handle, const void* text, size_t size);
-typedef int (*copy_func)(void **dst_ctx, void *src_ctx);
-typedef int (*output_func)(void *src_ctx, void *digest, size_t digestsize);
-typedef void (*deinit_func)(void* handle);
+typedef int (*hash_func) (void *handle, const void *text, size_t size);
+typedef int (*copy_func) (void **dst_ctx, void *src_ctx);
+typedef int (*output_func) (void *src_ctx, void *digest, size_t digestsize);
+typedef void (*deinit_func) (void *handle);
 
 typedef struct
 {
   gnutls_mac_algorithm_t algorithm;
   const void *key;
   int keysize;
-  
+
   hash_func hash;
   copy_func copy;
   output_func output;
   deinit_func deinit;
-  
-  void * handle;
+
+  void *handle;
 } digest_hd_st;
 
 /* basic functions */

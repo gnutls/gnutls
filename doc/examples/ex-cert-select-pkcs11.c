@@ -1,7 +1,7 @@
 /* This example code is placed in the public domain. */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -55,8 +55,8 @@ load_keys (void)
 
   /* some tokens require login to read data */
   if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-    ret = gnutls_x509_crt_import_pkcs11_url (crt, CERT_URL, 
-    GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+    ret = gnutls_x509_crt_import_pkcs11_url (crt, CERT_URL,
+					     GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 
   if (ret < 0)
     {
@@ -77,29 +77,33 @@ load_keys (void)
 
 }
 
-static int pin_callback(void* user, int attempt, const char *token_url,
-	const char *token_label, unsigned int flags, char* pin, size_t pin_max)
+static int
+pin_callback (void *user, int attempt, const char *token_url,
+	      const char *token_label, unsigned int flags, char *pin,
+	      size_t pin_max)
 {
-const char* password;
-int len;
+  const char *password;
+  int len;
 
-	printf("PIN required for token '%s' with URL '%s'\n", token_label, token_url);
-	if (flags & GNUTLS_PKCS11_PIN_FINAL_TRY)
-		printf("*** This is the final try before locking!\n");
-	if (flags & GNUTLS_PKCS11_PIN_COUNT_LOW)
-		printf("*** Only few tries left before locking!\n");
-	
-	password = getpass("Enter pin: ");
-	if (password==NULL || password[0] == 0) {
-		fprintf(stderr, "No password given\n");
-		exit(1);
-	}
-	
-	len = MIN(pin_max,strlen(password));
-	memcpy(pin, password, len);
-	pin[len] = 0;
-	
-	return 0;
+  printf ("PIN required for token '%s' with URL '%s'\n", token_label,
+	  token_url);
+  if (flags & GNUTLS_PKCS11_PIN_FINAL_TRY)
+    printf ("*** This is the final try before locking!\n");
+  if (flags & GNUTLS_PKCS11_PIN_COUNT_LOW)
+    printf ("*** Only few tries left before locking!\n");
+
+  password = getpass ("Enter pin: ");
+  if (password == NULL || password[0] == 0)
+    {
+      fprintf (stderr, "No password given\n");
+      exit (1);
+    }
+
+  len = MIN (pin_max, strlen (password));
+  memcpy (pin, password, len);
+  pin[len] = 0;
+
+  return 0;
 }
 
 int

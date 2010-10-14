@@ -28,14 +28,14 @@
  */
 
 #ifndef GNUTLS_OPENPGP_H
-# define GNUTLS_OPENPGP_H
+#define GNUTLS_OPENPGP_H
 
-# include <gnutls/gnutls.h>
+#include <gnutls/gnutls.h>
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
-# endif
+#endif
 
 /* Openpgp certificate stuff
  */
@@ -161,7 +161,8 @@ extern "C"
     gnutls_openpgp_privkey_get_pk_algorithm (gnutls_openpgp_privkey_t key,
 					     unsigned int *bits);
 
-  gnutls_sec_param_t gnutls_openpgp_privkey_sec_param (gnutls_openpgp_privkey_t key);
+    gnutls_sec_param_t
+    gnutls_openpgp_privkey_sec_param (gnutls_openpgp_privkey_t key);
   int gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
 				     const gnutls_datum_t * data,
 				     gnutls_openpgp_crt_fmt_t format,
@@ -169,18 +170,18 @@ extern "C"
 				     unsigned int flags);
 
   int gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
-            unsigned int flags, const gnutls_datum_t * ciphertext,
-				  gnutls_datum_t * plaintext);
+					   unsigned int flags,
+					   const gnutls_datum_t * ciphertext,
+					   gnutls_datum_t * plaintext);
   int gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
 					const gnutls_datum_t * hash,
 					gnutls_datum_t * signature);
   int gnutls_openpgp_privkey_get_fingerprint (gnutls_openpgp_privkey_t key,
 					      void *fpr, size_t * fprlen);
-  int
-    gnutls_openpgp_privkey_get_subkey_fingerprint (gnutls_openpgp_privkey_t
-						   key, unsigned int idx,
-						   void *fpr,
-						   size_t * fprlen);
+  int gnutls_openpgp_privkey_get_subkey_fingerprint (gnutls_openpgp_privkey_t
+						     key, unsigned int idx,
+						     void *fpr,
+						     size_t * fprlen);
   int gnutls_openpgp_privkey_get_key_id (gnutls_openpgp_privkey_t key,
 					 gnutls_openpgp_keyid_t keyid);
   int gnutls_openpgp_privkey_get_subkey_count (gnutls_openpgp_privkey_t key);
@@ -363,8 +364,8 @@ extern "C"
     (gnutls_certificate_credentials_t c, const char *file,
      gnutls_openpgp_crt_fmt_t format);
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 }
-# endif
+#endif
 
 #endif				/* GNUTLS_OPENPGP_H */

@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -274,10 +274,10 @@ main (int argc, char *argv[])
 	}
     }
   while (
-	 /* Not done: */
-	 !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
-	 /* No error: */
-	 && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
+	  /* Not done: */
+	  !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
+	  /* No error: */
+	  && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
 
   if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_SUCCESS)
     exit_code = 1;

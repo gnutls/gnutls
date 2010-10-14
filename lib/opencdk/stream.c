@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #ifdef HAVE_UNISTD_H
-# include <unistd.h>
+#include <unistd.h>
 #endif
 
 #include "opencdk.h"
@@ -460,7 +460,7 @@ cdk_stream_close (cdk_stream_t s)
     }
 
   _gnutls_read_log ("close stream ref=%d `%s'\n",
-		  s->fp_ref, s->fname ? s->fname : "[temp]");
+		    s->fp_ref, s->fname ? s->fname : "[temp]");
 
   /* In the user callback mode, we call the release cb if possible
      and just free the stream. */
@@ -757,7 +757,7 @@ stream_fp_replace (cdk_stream_t s, FILE ** tmp)
   assert (s);
 
   _gnutls_read_log ("replace stream fd=%d with fd=%d\n",
-		  fileno (s->fp), fileno (*tmp));
+		    fileno (s->fp), fileno (*tmp));
   rc = fclose (s->fp);
   if (rc)
     {
@@ -793,7 +793,7 @@ stream_filter_write (cdk_stream_t s)
 	continue;
       /* if there is no next filter, create the final output file */
       _gnutls_read_log ("filter [write]: last filter=%d fname=%s\n",
-		      f->next ? 1 : 0, s->fname);
+			f->next ? 1 : 0, s->fname);
       if (!f->next && s->fname)
 	f->tmp = fopen (s->fname, "w+b");
       else
@@ -852,7 +852,7 @@ stream_filter_read (cdk_stream_t s)
       if (f->flags.error)
 	{
 	  _gnutls_read_log ("filter %s [read]: has the error flag; skipped\n",
-			  s->fname ? s->fname : "[temp]");
+			    s->fname ? s->fname : "[temp]");
 	  continue;
 	}
 
@@ -864,7 +864,7 @@ stream_filter_read (cdk_stream_t s)
 	}
       rc = f->fnct (f->opaque, f->ctl, s->fp, f->tmp);
       _gnutls_read_log ("filter %s [read]: type=%d rc=%d\n",
-		      s->fname ? s->fname : "[temp]", f->type, rc);
+			s->fname ? s->fname : "[temp]", f->type, rc);
       if (rc)
 	{
 	  f->flags.error = 1;
@@ -1060,7 +1060,7 @@ cdk_stream_write (cdk_stream_t s, const void *buf, size_t count)
 	  memcpy (s->cache.buf, old, s->cache.size);
 	  cdk_free (old);
 	  _gnutls_read_log ("stream: enlarge cache to %d octets\n",
-			  (int) s->cache.alloced);
+			    (int) s->cache.alloced);
 	}
       memcpy (s->cache.buf + s->cache.size, buf, count);
       s->cache.size += count;
@@ -1350,7 +1350,7 @@ cdk_stream_enable_cache (cdk_stream_t s, int val)
       s->cache.buf = cdk_calloc (1, STREAM_BUFSIZE);
       s->cache.alloced = STREAM_BUFSIZE;
       _gnutls_read_log ("stream: allocate cache of %d octets\n",
-		      STREAM_BUFSIZE);
+			STREAM_BUFSIZE);
     }
   return 0;
 }
@@ -1580,7 +1580,7 @@ _cdk_stream_set_blockmode (cdk_stream_t s, size_t nbytes)
   assert (s);
 
   _gnutls_read_log ("stream: activate block mode with blocksize %d\n",
-		  (int) nbytes);
+		    (int) nbytes);
   s->blkmode = nbytes;
   return 0;
 }

@@ -1,8 +1,8 @@
 #ifndef OPENPGP_LOCAL_H
-# define OPENPGP_LOCAL_H
+#define OPENPGP_LOCAL_H
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #ifdef ENABLE_OPENPGP

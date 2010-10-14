@@ -203,8 +203,8 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
     case GNUTLS_PK_DSA:
       _gnutls_hash_deinit (&td_sha, concat);
 
-      if ((hash_algo != GNUTLS_DIG_SHA1) && (hash_algo != GNUTLS_DIG_SHA224) && \
-        (hash_algo != GNUTLS_DIG_SHA256))
+      if ((hash_algo != GNUTLS_DIG_SHA1) && (hash_algo != GNUTLS_DIG_SHA224)
+	  && (hash_algo != GNUTLS_DIG_SHA256))
 	{
 	  gnutls_assert ();
 	  return GNUTLS_E_INTERNAL_ERROR;
@@ -234,8 +234,8 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
  */
 int
 _gnutls_soft_sign (gnutls_pk_algorithm_t algo, bigint_t * params,
-	      int params_size, const gnutls_datum_t * data,
-	      gnutls_datum_t * signature)
+		   int params_size, const gnutls_datum_t * data,
+		   gnutls_datum_t * signature)
 {
   int ret;
 
@@ -303,7 +303,7 @@ _gnutls_tls_sign (gnutls_session_t session,
 	}
     }
 
-  return gnutls_privkey_sign_hash(pkey, hash_concat, signature);
+  return gnutls_privkey_sign_hash (pkey, hash_concat, signature);
 }
 
 static int

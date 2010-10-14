@@ -33,25 +33,29 @@
 
 extension_entry_st ext_mod_ia;
 
-typedef struct {
+typedef struct
+{
   unsigned int flags;
   /* For TLS/IA.  XXX: Move to IA credential? */
   opaque inner_secret[GNUTLS_MASTER_SIZE];
 } ia_ext_st;
 
-inline static void _gnutls_ia_derive_inner_secret(gnutls_session_t session)
+inline static void
+_gnutls_ia_derive_inner_secret (gnutls_session_t session)
 {
-extension_priv_data_t epriv;
-ia_ext_st *priv;
-int ret;
-  
-  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_INNER_APPLICATION, &epriv);
+  extension_priv_data_t epriv;
+  ia_ext_st *priv;
+  int ret;
+
+  ret =
+    _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_INNER_APPLICATION,
+				  &epriv);
   if (ret < 0)
     {
-      return ;
+      return;
     }
   priv = epriv.ptr;
-  
+
   memcpy (priv->inner_secret,
 	  session->security_parameters.master_secret, GNUTLS_MASTER_SIZE);
 

@@ -167,7 +167,8 @@ _gnutls_session_cert_type_supported (gnutls_session_t session,
       if (cred == NULL)
 	return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
 
-      if (cred->server_get_cert_callback == NULL && cred->get_cert_callback == NULL)
+      if (cred->server_get_cert_callback == NULL
+	  && cred->get_cert_callback == NULL)
 	{
 	  for (i = 0; i < cred->ncerts; i++)
 	    {
@@ -290,7 +291,7 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
     }
 
   /* Set all NULL algos on epoch 0 */
-  _gnutls_epoch_set_null_algos(*session, epoch);
+  _gnutls_epoch_set_null_algos (*session, epoch);
 
   (*session)->security_parameters.epoch_next = 1;
 
@@ -352,12 +353,12 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
   (*session)->internals.priorities.sr = SR_PARTIAL;
 
 #ifdef HAVE_WRITEV
-  gnutls_transport_set_push_function2(*session, system_writev);
+  gnutls_transport_set_push_function2 (*session, system_writev);
 #else
-  gnutls_transport_set_push_function(*session, system_write);
+  gnutls_transport_set_push_function (*session, system_write);
 #endif
-  gnutls_transport_set_pull_function(*session, system_read);
-  gnutls_transport_set_errno_function(*session, system_errno);
+  gnutls_transport_set_pull_function (*session, system_read);
+  gnutls_transport_set_errno_function (*session, system_errno);
 
   return 0;
 }
@@ -394,7 +395,7 @@ gnutls_deinit (gnutls_session_t session)
   _gnutls_handshake_io_buffer_clear (session);
   _gnutls_ext_free_session_data (session);
 
-  for(i=0; i < MAX_EPOCH_INDEX; i++)
+  for (i = 0; i < MAX_EPOCH_INDEX; i++)
     if (session->record_parameters[i] != NULL)
       {
 	_gnutls_epoch_free (session, session->record_parameters[i]);

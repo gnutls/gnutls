@@ -24,7 +24,7 @@
  */
 
 #ifndef GNUTLS_DH_H
-# define GNUTLS_DH_H
+#define GNUTLS_DH_H
 
 const bigint_t *_gnutls_dh_params_to_mpi (gnutls_dh_params_t);
 bigint_t gnutls_calc_dh_secret (bigint_t * ret_x, bigint_t g, bigint_t prime);

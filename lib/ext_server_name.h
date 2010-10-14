@@ -36,7 +36,8 @@ typedef struct
 
 #define MAX_SERVER_NAME_EXTENSIONS 3
 
-typedef struct {
+typedef struct
+{
   server_name_st server_names[MAX_SERVER_NAME_EXTENSIONS];
   /* limit server_name extensions */
   unsigned server_names_size;

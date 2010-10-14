@@ -35,9 +35,10 @@ static unsigned char data[64 * 1024];
 
 static int must_finish = 0;
 
-static void alarm_handler(int signo)
+static void
+alarm_handler (int signo)
 {
-        must_finish = 1;
+  must_finish = 1;
 }
 
 static void
@@ -46,29 +47,38 @@ tls_log_func (int level, const char *str)
   fprintf (stderr, "|<%d>| %s", level, str);
 }
 
-static void value2human(double bytes, double time, double* data, double* speed,char* metric)
+static void
+value2human (double bytes, double time, double *data, double *speed,
+	     char *metric)
 {
-        if (bytes > 1000 && bytes < 1000*1000) {
-                *data = ((double)bytes)/1000;
-                *speed = *data/time;
-                strcpy(metric, "Kb");
-                return;
-        } else if (bytes >= 1000*1000 && bytes < 1000*1000*1000) {
-                *data = ((double)bytes)/(1000*1000);
-                *speed = *data/time;
-                strcpy(metric, "Mb");
-                return;
-        } else if (bytes >= 1000*1000*1000) {
-                *data = ((double)bytes)/(1000*1000*1000);
-                *speed = *data/time;
-                strcpy(metric, "Gb");
-                return;
-        } else {
-                *data = (double)bytes;
-                *speed = *data/time;
-                strcpy(metric, "bytes");
-                return;
-        }
+  if (bytes > 1000 && bytes < 1000 * 1000)
+    {
+      *data = ((double) bytes) / 1000;
+      *speed = *data / time;
+      strcpy (metric, "Kb");
+      return;
+    }
+  else if (bytes >= 1000 * 1000 && bytes < 1000 * 1000 * 1000)
+    {
+      *data = ((double) bytes) / (1000 * 1000);
+      *speed = *data / time;
+      strcpy (metric, "Mb");
+      return;
+    }
+  else if (bytes >= 1000 * 1000 * 1000)
+    {
+      *data = ((double) bytes) / (1000 * 1000 * 1000);
+      *speed = *data / time;
+      strcpy (metric, "Gb");
+      return;
+    }
+  else
+    {
+      *data = (double) bytes;
+      *speed = *data / time;
+      strcpy (metric, "bytes");
+      return;
+    }
 }
 
 static void
@@ -105,10 +115,10 @@ cipher_bench (int algo, int size)
   printf ("Checking %s (%dkb payload)... ", gnutls_cipher_get_name (algo),
 	  size);
   fflush (stdout);
-  
+
   must_finish = 0;
-  alarm(5);
-  
+  alarm (5);
+
   gettime (&start);
 
   ret = gnutls_cipher_init (&ctx, algo, &key, &iv);
@@ -123,7 +133,7 @@ cipher_bench (int algo, int size)
       gnutls_cipher_encrypt (ctx, data, size * 1024);
       data_size += size * 1024;
     }
-  while(must_finish == 0);
+  while (must_finish == 0);
 
   gnutls_cipher_deinit (ctx);
 
@@ -132,8 +142,8 @@ cipher_bench (int algo, int size)
   secs = (stop.tv_sec * 1000 + stop.tv_nsec / (1000 * 1000) -
 	  (start.tv_sec * 1000 + start.tv_nsec / (1000 * 1000)));
   secs /= 1000;
-  
-  value2human(data_size, secs, &ddata, &dspeed, metric);
+
+  value2human (data_size, secs, &ddata, &dspeed, metric);
   printf ("Encrypted %.2f %s in %.2f secs: ", ddata, metric, secs);
   printf ("%.2f %s/sec\n", dspeed, metric);
 
@@ -163,7 +173,7 @@ mac_bench (int algo, int size)
   fflush (stdout);
 
   must_finish = 0;
-  alarm(5);
+  alarm (5);
 
   gettime (&start);
 
@@ -172,7 +182,7 @@ mac_bench (int algo, int size)
       gnutls_hmac_fast (algo, _key, blocksize, data, size * 1024, _key);
       data_size += size * 1024;
     }
-  while(must_finish == 0);
+  while (must_finish == 0);
 
   gettime (&stop);
 
@@ -181,7 +191,7 @@ mac_bench (int algo, int size)
      (start.tv_sec * 1000 + start.tv_nsec / (1000 * 1000)));
   secs /= 1000;
 
-  value2human(data_size, secs, &ddata, &dspeed, metric);
+  value2human (data_size, secs, &ddata, &dspeed, metric);
 
   printf ("Hashed %.2f %s in %.2f secs: ", ddata, metric, secs);
   printf ("%.2f %s/sec\n", dspeed, metric);
@@ -190,14 +200,14 @@ mac_bench (int algo, int size)
 }
 
 int
-main (int argc, char** argv)
+main (int argc, char **argv)
 {
   int debug_level = 0;
 
   if (argc > 1)
     debug_level = 2;
-    
-  signal(SIGALRM, alarm_handler);
+
+  signal (SIGALRM, alarm_handler);
 
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (debug_level);

@@ -737,19 +737,20 @@ listen_socket (const char *name, int listen_port)
 
 /* strips \r\n from the end of the string 
  */
-static void strip (char* data)
+static void
+strip (char *data)
 {
-int i;
-int len = strlen(data);
+  int i;
+  int len = strlen (data);
 
-  for (i=0;i<len;i++)
+  for (i = 0; i < len; i++)
     {
-      if (data[i] == '\r' && data[i+1] == '\n' && data[i+1] == 0)
-        {
-          data[i] = '\n';
-          data[i+1] = 0;
-          break;
-        }
+      if (data[i] == '\r' && data[i + 1] == '\n' && data[i + 1] == 0)
+	{
+	  data[i] = '\n';
+	  data[i + 1] = 0;
+	  break;
+	}
     }
 }
 
@@ -782,7 +783,7 @@ get_response (gnutls_session_t session, char *request,
     }
   else
     {
-      strip(request);
+      strip (request);
       fprintf (stderr, "received: %s\n", request);
       if (request[0] == request[1] && request[0] == '*')
 	{
@@ -891,7 +892,7 @@ main (int argc, char **argv)
       exit (1);
     }
 
-  pkcs11_common();
+  pkcs11_common ();
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (debug);
 

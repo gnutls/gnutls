@@ -23,16 +23,16 @@
  *
  */
 #ifndef GNUTLS_COMPRESS_H
-# define GNUTLS_COMPRESS_H
+#define GNUTLS_COMPRESS_H
 
 int _gnutls_m_plaintext2compressed (gnutls_session_t session,
 				    gnutls_datum_t * compressed,
 				    const gnutls_datum_t * plaintext,
-				    const record_parameters_st *params);
+				    const record_parameters_st * params);
 int _gnutls_m_compressed2plaintext (gnutls_session_t session,
 				    gnutls_datum_t * plain,
 				    const gnutls_datum_t * compressed,
-				    const record_parameters_st *params);
+				    const record_parameters_st * params);
 
 /* Algorithm handling. */
 int _gnutls_supported_compression_methods (gnutls_session_t session,
@@ -42,7 +42,7 @@ int _gnutls_compression_get_num (gnutls_compression_method_t algorithm);
 gnutls_compression_method_t _gnutls_compression_get_id (int num);
 
 #ifdef HAVE_LIBZ
-# include <zlib.h>
+#include <zlib.h>
 #endif
 
 #define GNUTLS_COMP_FAILED NULL

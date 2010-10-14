@@ -24,7 +24,7 @@
  */
 
 #ifndef COMMON_H
-# define COMMON_H
+#define COMMON_H
 
 #include <gnutls_algorithms.h>
 
@@ -75,7 +75,7 @@ int _gnutls_x509_oid_data2string (const char *OID, void *value,
 int _gnutls_x509_data2hex (const opaque * data, size_t data_size,
 			   opaque * out, size_t * sizeof_out);
 
-const char * _gnutls_x509_oid2asn_string (const char *oid);
+const char *_gnutls_x509_oid2asn_string (const char *oid);
 
 const char *_gnutls_x509_oid2ldap_string (const char *OID);
 
@@ -136,20 +136,22 @@ int _gnutls_x509_get_signed_data (ASN1_TYPE src, const char *src_name,
 int _gnutls_x509_get_signature (ASN1_TYPE src, const char *src_name,
 				gnutls_datum_t * signature);
 
-gnutls_digest_algorithm_t _gnutls_dsa_q_to_hash(bigint_t q);
+gnutls_digest_algorithm_t _gnutls_dsa_q_to_hash (bigint_t q);
 
 int _gnutls_get_asn_mpis (ASN1_TYPE asn, const char *root,
-          bigint_t * params, int *params_size);
+			  bigint_t * params, int *params_size);
 
-int _gnutls_get_key_id (gnutls_pk_algorithm_t pk, bigint_t* params, int params_size,
-                   unsigned char *output_data, size_t * output_data_size);
+int _gnutls_get_key_id (gnutls_pk_algorithm_t pk, bigint_t * params,
+			int params_size, unsigned char *output_data,
+			size_t * output_data_size);
 
-void _asnstr_append_name(char* name, size_t name_size, const char* part1, const char* part2);
+void _asnstr_append_name (char *name, size_t name_size, const char *part1,
+			  const char *part2);
 
 int pubkey_verify_sig (const gnutls_datum_t * tbs,
-	    const gnutls_datum_t * hash,
-	    const gnutls_datum_t * signature,
-	    gnutls_pk_algorithm_t pk, bigint_t * issuer_params,
-	    int issuer_params_size);
+		       const gnutls_datum_t * hash,
+		       const gnutls_datum_t * signature,
+		       gnutls_pk_algorithm_t pk, bigint_t * issuer_params,
+		       int issuer_params_size);
 
 #endif

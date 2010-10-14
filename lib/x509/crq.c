@@ -1022,14 +1022,14 @@ gnutls_x509_crq_sign2 (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  result = gnutls_privkey_init(&privkey);
+  result = gnutls_privkey_init (&privkey);
   if (result < 0)
     {
       gnutls_assert ();
       return result;
     }
 
-  result = gnutls_privkey_import_x509(privkey, key, 0);
+  result = gnutls_privkey_import_x509 (privkey, key, 0);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1046,7 +1046,7 @@ gnutls_x509_crq_sign2 (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key,
   result = 0;
 
 fail:
-  gnutls_privkey_deinit(privkey);
+  gnutls_privkey_deinit (privkey);
 
   return result;
 }
@@ -1065,12 +1065,12 @@ fail:
 int
 gnutls_x509_crq_sign (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
 {
-gnutls_digest_algorithm_t dig;
-int ret = gnutls_x509_crq_get_preferred_hash_algorithm (crq, &dig, NULL);
+  gnutls_digest_algorithm_t dig;
+  int ret = gnutls_x509_crq_get_preferred_hash_algorithm (crq, &dig, NULL);
 
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
 
@@ -2294,7 +2294,8 @@ gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t crq,
  **/
 int
 gnutls_x509_crq_get_preferred_hash_algorithm (gnutls_x509_crq_t crq,
-				      gnutls_digest_algorithm_t * hash, unsigned int *mand)
+					      gnutls_digest_algorithm_t *
+					      hash, unsigned int *mand)
 {
   bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
   int params_size;
@@ -2314,8 +2315,10 @@ gnutls_x509_crq_get_preferred_hash_algorithm (gnutls_x509_crq_t crq,
       return ret;
     }
 
-  ret = _gnutls_pk_get_hash_algorithm(gnutls_x509_crq_get_pk_algorithm (crq, NULL),
-    params, params_size, hash, mand);
+  ret =
+    _gnutls_pk_get_hash_algorithm (gnutls_x509_crq_get_pk_algorithm
+				   (crq, NULL), params, params_size, hash,
+				   mand);
 
   /* release allocated mpis */
   for (i = 0; i < params_size; i++)
@@ -2509,7 +2512,8 @@ gnutls_x509_crq_get_key_id (gnutls_x509_crq_t crq, unsigned int flags,
  **/
 int
 gnutls_x509_crq_privkey_sign (gnutls_x509_crq_t crq, gnutls_privkey_t key,
-		       gnutls_digest_algorithm_t dig, unsigned int flags)
+			      gnutls_digest_algorithm_t dig,
+			      unsigned int flags)
 {
   int result;
   gnutls_datum_t signature;
@@ -2534,9 +2538,7 @@ gnutls_x509_crq_privkey_sign (gnutls_x509_crq_t crq, gnutls_privkey_t key,
 
   /* Step 1. Self sign the request.
    */
-  result =
-    _gnutls_x509_get_tbs (crq->crq, "certificationRequestInfo",
-			   &tbs);
+  result = _gnutls_x509_get_tbs (crq->crq, "certificationRequestInfo", &tbs);
 
   if (result < 0)
     {
@@ -2545,7 +2547,7 @@ gnutls_x509_crq_privkey_sign (gnutls_x509_crq_t crq, gnutls_privkey_t key,
     }
 
   result = gnutls_privkey_sign_data (key, dig, 0, &tbs, &signature);
-  gnutls_free(tbs.data);
+  gnutls_free (tbs.data);
 
   if (result < 0)
     {
@@ -2570,7 +2572,8 @@ gnutls_x509_crq_privkey_sign (gnutls_x509_crq_t crq, gnutls_privkey_t key,
   /* Step 3. Write the signatureAlgorithm field.
    */
   result = _gnutls_x509_write_sig_params (crq->crq, "signatureAlgorithm",
-					  gnutls_privkey_get_pk_algorithm(key, NULL), dig);
+					  gnutls_privkey_get_pk_algorithm
+					  (key, NULL), dig);
   if (result < 0)
     {
       gnutls_assert ();

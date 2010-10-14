@@ -43,22 +43,23 @@ static struct gcry_thread_cbs gct = {
   .recvmsg = NULL,
 };
 
-int gnutls_crypto_init(void)
+int
+gnutls_crypto_init (void)
 {
   /* Initialize libgcrypt if it hasn't already been initialized. */
   if (gcry_control (GCRYCTL_ANY_INITIALIZATION_P) == 0)
     {
       const char *p;
 
-      if (gnutls_mutex_init != NULL) 
-        {
+      if (gnutls_mutex_init != NULL)
+	{
 	  gct.mutex_init = gnutls_mutex_init;
 	  gct.mutex_destroy = gnutls_mutex_deinit;
 	  gct.mutex_lock = gnutls_mutex_lock;
 	  gct.mutex_unlock = gnutls_mutex_unlock;
 
-  	  gcry_control (GCRYCTL_SET_THREAD_CBS, &gct);
-        }
+	  gcry_control (GCRYCTL_SET_THREAD_CBS, &gct);
+	}
 
       p = gcry_check_version (GNUTLS_MIN_LIBGCRYPT_VERSION);
 
@@ -75,9 +76,9 @@ int gnutls_crypto_init(void)
       gcry_control (GCRYCTL_DISABLE_SECMEM, NULL, 0);
 
       gcry_control (GCRYCTL_INITIALIZATION_FINISHED, NULL, 0);
-      
+
       gcry_control (GCRYCTL_ENABLE_QUICK_RANDOM, 0);
     }
 
-   return 0;
+  return 0;
 }

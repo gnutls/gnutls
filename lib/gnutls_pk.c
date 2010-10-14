@@ -610,15 +610,16 @@ gnutls_pk_params_release (gnutls_pk_params_st * p)
     }
 }
 
-int _gnutls_calc_rsa_exp(bigint_t* params, unsigned int params_size)
+int
+_gnutls_calc_rsa_exp (bigint_t * params, unsigned int params_size)
 {
-bigint_t tmp = _gnutls_mpi_alloc_like(params[0]);
+  bigint_t tmp = _gnutls_mpi_alloc_like (params[0]);
 
- if (params_size < RSA_PRIVATE_PARAMS-2)
-   {
-     gnutls_assert();
-     return GNUTLS_E_INTERNAL_ERROR;
-   }
+  if (params_size < RSA_PRIVATE_PARAMS - 2)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
+    }
 
   if (tmp == NULL)
     {
@@ -627,35 +628,38 @@ bigint_t tmp = _gnutls_mpi_alloc_like(params[0]);
     }
 
   /* [6] = d % p-1, [7] = d % q-1 */
-  _gnutls_mpi_sub_ui(tmp, params[3], 1);
-  params[6] = _gnutls_mpi_mod(params[2]/*d*/, tmp);
+  _gnutls_mpi_sub_ui (tmp, params[3], 1);
+  params[6] = _gnutls_mpi_mod (params[2] /*d */ , tmp);
 
-  _gnutls_mpi_sub_ui(tmp, params[4], 1);
-  params[7] = _gnutls_mpi_mod(params[2]/*d*/, tmp);
+  _gnutls_mpi_sub_ui (tmp, params[4], 1);
+  params[7] = _gnutls_mpi_mod (params[2] /*d */ , tmp);
 
-  _gnutls_mpi_release(&tmp);
+  _gnutls_mpi_release (&tmp);
 
   if (params[7] == NULL || params[6] == NULL)
     {
-       gnutls_assert ();
-       return GNUTLS_E_MEMORY_ERROR;
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
     }
 
   return 0;
 }
 
-int _gnutls_pk_get_hash_algorithm(gnutls_pk_algorithm_t pk, bigint_t* params, int params_size,
-  gnutls_digest_algorithm_t *dig, unsigned int *mand)
+int
+_gnutls_pk_get_hash_algorithm (gnutls_pk_algorithm_t pk, bigint_t * params,
+			       int params_size,
+			       gnutls_digest_algorithm_t * dig,
+			       unsigned int *mand)
 {
   if (mand)
     {
       if (pk == GNUTLS_PK_DSA)
-        *mand = 1;
+	*mand = 1;
       else
-        *mand = 0;
+	*mand = 0;
     }
 
   return _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) dig,
-			NULL, pk, params, params_size);
+					NULL, pk, params, params_size);
 
 }

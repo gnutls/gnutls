@@ -24,14 +24,14 @@
  */
 
 #ifndef GNUTLS_PKCS12_H
-# define GNUTLS_PKCS12_H
+#define GNUTLS_PKCS12_H
 
-# include <gnutls/x509.h>
+#include <gnutls/x509.h>
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 extern "C"
 {
-# endif
+#endif
 
   /* PKCS12 structures handling
    */
@@ -116,8 +116,8 @@ extern "C"
   int gnutls_pkcs12_bag_set_friendly_name (gnutls_pkcs12_bag_t bag, int indx,
 					   const char *name);
 
-# ifdef __cplusplus
+#ifdef __cplusplus
 }
-# endif
+#endif
 
 #endif				/* GNUTLS_PKCS12_H */

@@ -72,16 +72,16 @@ _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
   if (cc != NULL)
     {
       if (cc->init (algorithm, &dig->handle) < 0)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_HASH_FAILED;
-        }
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_HASH_FAILED;
+	}
 
       dig->hash = cc->hash;
       dig->copy = cc->copy;
       dig->output = cc->output;
       dig->deinit = cc->deinit;
-      
+
       return 0;
     }
 
@@ -113,7 +113,7 @@ _gnutls_hash (digest_hd_st * handle, const void *text, size_t textlen)
 {
   if (textlen > 0)
     {
-        handle->hash(handle->handle, text, textlen);
+      handle->hash (handle->handle, text, textlen);
     }
   return 0;
 }
@@ -130,7 +130,7 @@ _gnutls_hash_copy (digest_hd_st * dst, digest_hd_st * src)
   dst->output = src->output;
   dst->deinit = src->deinit;
 
-  return src->copy(&dst->handle, src->handle);
+  return src->copy (&dst->handle, src->handle);
 }
 
 /* when the current output is needed without calling deinit
@@ -241,17 +241,17 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
   if (cc != NULL)
     {
       if (cc->init (algorithm, &dig->handle) < 0)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_HASH_FAILED;
-        }
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_HASH_FAILED;
+	}
 
       if (cc->setkey (dig->handle, key, keylen) < 0)
-        {
-          gnutls_assert ();
-          cc->deinit (dig->handle);
-          return GNUTLS_E_HASH_FAILED;
-        }
+	{
+	  gnutls_assert ();
+	  cc->deinit (dig->handle);
+	  return GNUTLS_E_HASH_FAILED;
+	}
 
       dig->hash = cc->hash;
       dig->output = cc->output;
@@ -281,7 +281,7 @@ _gnutls_hmac (digest_hd_st * handle, const void *text, size_t textlen)
 {
   if (textlen > 0)
     {
-        return handle->hash(handle->handle, text, textlen);
+      return handle->hash (handle->handle, text, textlen);
     }
   return 0;
 }

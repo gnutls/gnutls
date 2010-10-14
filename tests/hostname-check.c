@@ -21,14 +21,14 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #ifdef ENABLE_OPENPGP
-# include <gnutls/openpgp.h>
+#include <gnutls/openpgp.h>
 #endif
 
 #include "utils.h"

@@ -37,7 +37,8 @@
 #define adds _gnutls_buffer_append_str
 
 static void
-hexdump (gnutls_buffer_st * str, const char *data, size_t len, const char *spc)
+hexdump (gnutls_buffer_st * str, const char *data, size_t len,
+	 const char *spc)
 {
   size_t j;
 
@@ -237,7 +238,9 @@ print_key_info (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert, int idx)
 	name = _("unknown");
 
       addf (str, _("\tPublic Key Algorithm: %s\n"), name);
-      addf (str, _("\tKey Security Level: %s\n"), gnutls_sec_param_get_name(gnutls_pk_bits_to_sec_param(err, bits)));
+      addf (str, _("\tKey Security Level: %s\n"),
+	    gnutls_sec_param_get_name (gnutls_pk_bits_to_sec_param
+				       (err, bits)));
 
       switch (err)
 	{

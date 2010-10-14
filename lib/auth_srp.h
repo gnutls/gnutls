@@ -24,7 +24,7 @@
  */
 
 #ifndef AUTH_SRP_H
-# define AUTH_SRP_H
+#define AUTH_SRP_H
 
 #include <gnutls_auth.h>
 

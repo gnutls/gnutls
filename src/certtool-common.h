@@ -39,11 +39,15 @@ enum
 #define TYPE_CRQ 2
 
 void certtool_version (void);
-void pkcs11_list( FILE*outfile, const char* url, int type, unsigned int login, unsigned int detailed);
-void pkcs11_export(FILE* outfile, const char *pkcs11_url, unsigned int login);
-void pkcs11_token_list(FILE* outfile, unsigned int detailed);
-void pkcs11_write(FILE* outfile, const char *pkcs11_url, const char* label, int trusted, unsigned int login);
-void pkcs11_delete(FILE* outfile, const char *pkcs11_url, int batch, unsigned int login);
+void pkcs11_list (FILE * outfile, const char *url, int type,
+		  unsigned int login, unsigned int detailed);
+void pkcs11_export (FILE * outfile, const char *pkcs11_url,
+		    unsigned int login);
+void pkcs11_token_list (FILE * outfile, unsigned int detailed);
+void pkcs11_write (FILE * outfile, const char *pkcs11_url, const char *label,
+		   int trusted, unsigned int login);
+void pkcs11_delete (FILE * outfile, const char *pkcs11_url, int batch,
+		    unsigned int login);
 
 #define PKCS11_TYPE_CRT_ALL 1
 #define PKCS11_TYPE_TRUSTED 2
@@ -65,7 +69,7 @@ gnutls_x509_crt_t load_cert (int mand);
 gnutls_pubkey_t load_pubkey (int mand);
 
 /* returns the bits specified in cmd */
-int get_bits(gnutls_pk_algorithm_t);
+int get_bits (gnutls_pk_algorithm_t);
 
 /* prime.c */
 int generate_prime (int how);

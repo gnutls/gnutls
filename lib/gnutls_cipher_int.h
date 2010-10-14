@@ -24,20 +24,22 @@
  */
 
 #ifndef GNUTLS_CIPHER_INT
-# define GNUTLS_CIPHER_INT
+#define GNUTLS_CIPHER_INT
 
 #include <gnutls/crypto.h>
 
 extern int crypto_cipher_prio;
 extern gnutls_crypto_cipher_st _gnutls_cipher_ops;
 
-typedef int (*cipher_encrypt_func)(void* hd, const void* plaintext, size_t, void* ciphertext, size_t);
-typedef int (*cipher_decrypt_func)(void* hd, const void* ciphertext, size_t, void* plaintext, size_t);
-typedef void (*cipher_deinit_func)(void* hd);
+typedef int (*cipher_encrypt_func) (void *hd, const void *plaintext, size_t,
+				    void *ciphertext, size_t);
+typedef int (*cipher_decrypt_func) (void *hd, const void *ciphertext, size_t,
+				    void *plaintext, size_t);
+typedef void (*cipher_deinit_func) (void *hd);
 
 typedef struct
 {
-  void* handle;
+  void *handle;
   cipher_encrypt_func encrypt;
   cipher_decrypt_func decrypt;
   cipher_deinit_func deinit;
@@ -51,9 +53,11 @@ int _gnutls_cipher_encrypt (const cipher_hd_st * handle, void *text,
 int _gnutls_cipher_decrypt (const cipher_hd_st * handle, void *ciphertext,
 			    int ciphertextlen);
 int _gnutls_cipher_encrypt2 (const cipher_hd_st * handle, const void *text,
-			    int textlen, void* ciphertext, int ciphertextlen);
-int _gnutls_cipher_decrypt2 (const cipher_hd_st * handle, const void *ciphertext,
-			    int ciphertextlen, void* text, int textlen);
+			     int textlen, void *ciphertext,
+			     int ciphertextlen);
+int _gnutls_cipher_decrypt2 (const cipher_hd_st * handle,
+			     const void *ciphertext, int ciphertextlen,
+			     void *text, int textlen);
 void _gnutls_cipher_deinit (cipher_hd_st * handle);
 
 #endif /* GNUTLS_CIPHER_INT */

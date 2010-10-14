@@ -43,7 +43,8 @@
 #define ERROR_STR (char*) "(error)"
 
 static void
-hexdump (gnutls_buffer_st * str, const char *data, size_t len, const char *spc)
+hexdump (gnutls_buffer_st * str, const char *data, size_t len,
+	 const char *spc)
 {
   size_t j;
 
@@ -707,7 +708,8 @@ print_altname (gnutls_buffer_st * str, const char *prefix, int altname_type,
 }
 
 static void
-guiddump (gnutls_buffer_st * str, const char *data, size_t len, const char *spc)
+guiddump (gnutls_buffer_st * str, const char *data, size_t len,
+	  const char *spc)
 {
   size_t j;
 
@@ -739,7 +741,7 @@ static void
 print_unique_ids (gnutls_buffer_st * str, const gnutls_x509_crt_t cert)
 {
   int result;
-  char buf[256]; /* if its longer, we won't bother to print it */
+  char buf[256];		/* if its longer, we won't bother to print it */
   ssize_t buf_size = 256;
 
   result = gnutls_x509_crt_get_issuer_unique_id (cert, buf, &buf_size);
@@ -747,9 +749,10 @@ print_unique_ids (gnutls_buffer_st * str, const gnutls_x509_crt_t cert)
     {
       addf (str, ("\t\tIssuer Unique ID:\n"));
       hexdump (str, buf, buf_size, "\t\t\t");
-      if (buf_size == 16) { /* this could be a GUID */
-	guiddump (str, buf, buf_size, "\t\t\t");
-      }
+      if (buf_size == 16)
+	{			/* this could be a GUID */
+	  guiddump (str, buf, buf_size, "\t\t\t");
+	}
     }
 
   buf_size = 256;
@@ -758,9 +761,10 @@ print_unique_ids (gnutls_buffer_st * str, const gnutls_x509_crt_t cert)
     {
       addf (str, ("\t\tSubject Unique ID:\n"));
       hexdump (str, buf, buf_size, "\t\t\t");
-      if (buf_size == 16) { /* this could be a GUID */
-	guiddump (str, buf, buf_size, "\t\t\t");
-      }
+      if (buf_size == 16)
+	{			/* this could be a GUID */
+	  guiddump (str, buf, buf_size, "\t\t\t");
+	}
     }
 }
 
@@ -1156,7 +1160,9 @@ print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
 	  name = _("unknown");
 
 	addf (str, _("\tSubject Public Key Algorithm: %s\n"), name);
-	addf (str, _("\tCertificate Security Level: %s\n"), gnutls_sec_param_get_name(gnutls_pk_bits_to_sec_param(err, bits)));
+	addf (str, _("\tCertificate Security Level: %s\n"),
+	      gnutls_sec_param_get_name (gnutls_pk_bits_to_sec_param
+					 (err, bits)));
 
 #ifdef ENABLE_PKI
 	switch (err)
@@ -1218,8 +1224,8 @@ print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
       }
   }
 
-  print_unique_ids(str, cert);
-  
+  print_unique_ids (str, cert);
+
   /* Extensions. */
   if (gnutls_x509_crt_get_version (cert) >= 3)
     {

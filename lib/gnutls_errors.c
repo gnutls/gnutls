@@ -27,7 +27,7 @@
 #include "gnutls_errors.h"
 #include <libtasn1.h>
 #ifdef STDC_HEADERS
-# include <stdarg.h>
+#include <stdarg.h>
 #endif
 
 /* I18n of error codes. */
@@ -43,9 +43,9 @@ struct gnutls_error_entry
   const char *desc;
   const char *_name;
   int number;
-  int fatal; /* whether this error is fatal and the session for handshake 
-              * should be terminated.
-              */
+  int fatal;			/* whether this error is fatal and the session for handshake 
+				 * should be terminated.
+				 */
 };
 typedef struct gnutls_error_entry gnutls_error_entry;
 
@@ -289,31 +289,31 @@ static const gnutls_error_entry error_algorithms[] = {
   ERROR_ENTRY (N_("PKCS #11 PIN should be saved."),
 	       GNUTLS_E_PKCS11_ERROR, 1),
   ERROR_ENTRY (N_("PKCS #11 error in slot"),
-	GNUTLS_E_PKCS11_SLOT_ERROR, 1),
+	       GNUTLS_E_PKCS11_SLOT_ERROR, 1),
   ERROR_ENTRY (N_("Thread locking error"),
-	GNUTLS_E_LOCKING_ERROR, 1),
+	       GNUTLS_E_LOCKING_ERROR, 1),
   ERROR_ENTRY (N_("PKCS #11 error in attribute"),
-    GNUTLS_E_PKCS11_ATTRIBUTE_ERROR, 1),
+	       GNUTLS_E_PKCS11_ATTRIBUTE_ERROR, 1),
   ERROR_ENTRY (N_("PKCS #11 error in device"),
-	GNUTLS_E_PKCS11_DEVICE_ERROR, 1),
+	       GNUTLS_E_PKCS11_DEVICE_ERROR, 1),
   ERROR_ENTRY (N_("PKCS #11 error in data"),
-	GNUTLS_E_PKCS11_DATA_ERROR, 1),
+	       GNUTLS_E_PKCS11_DATA_ERROR, 1),
   ERROR_ENTRY (N_("PKCS #11 unsupported feature"),
-	GNUTLS_E_PKCS11_UNSUPPORTED_FEATURE_ERROR, 1),
+	       GNUTLS_E_PKCS11_UNSUPPORTED_FEATURE_ERROR, 1),
   ERROR_ENTRY (N_("PKCS #11 error in key"),
-	GNUTLS_E_PKCS11_KEY_ERROR, 1),
+	       GNUTLS_E_PKCS11_KEY_ERROR, 1),
   ERROR_ENTRY (N_("PKCS #11 PIN expired"),
-	GNUTLS_E_PKCS11_PIN_EXPIRED, 1),
+	       GNUTLS_E_PKCS11_PIN_EXPIRED, 1),
   ERROR_ENTRY (N_("PKCS #11 PIN locked"),
-	GNUTLS_E_PKCS11_PIN_LOCKED, 1),
+	       GNUTLS_E_PKCS11_PIN_LOCKED, 1),
   ERROR_ENTRY (N_("PKCS #11 error in session"),
-	GNUTLS_E_PKCS11_SESSION_ERROR, 1),
+	       GNUTLS_E_PKCS11_SESSION_ERROR, 1),
   ERROR_ENTRY (N_("PKCS #11 error in signature"),
-	GNUTLS_E_PKCS11_SIGNATURE_ERROR, 1),
+	       GNUTLS_E_PKCS11_SIGNATURE_ERROR, 1),
   ERROR_ENTRY (N_("PKCS #11 error in token"),
-	GNUTLS_E_PKCS11_TOKEN_ERROR, 1),
+	       GNUTLS_E_PKCS11_TOKEN_ERROR, 1),
   ERROR_ENTRY (N_("PKCS #11 user error"),
-	GNUTLS_E_PKCS11_USER_ERROR, 1),
+	       GNUTLS_E_PKCS11_USER_ERROR, 1),
   {NULL, NULL, 0, 0}
 };
 
@@ -561,7 +561,7 @@ _gnutls_log (int level, const char *fmt, ...)
 }
 
 #ifndef DEBUG
-# ifndef C99_MACROS
+#ifndef C99_MACROS
 
 /* Without C99 macros these functions have to
  * be called. This may affect performance.
@@ -572,5 +572,5 @@ _gnutls_null_log (void *x, ...)
   return;
 }
 
-# endif	/* C99_MACROS */
+#endif /* C99_MACROS */
 #endif /* DEBUG */

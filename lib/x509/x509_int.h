@@ -24,7 +24,7 @@
  */
 
 #ifndef X509_H
-# define X509_H
+#define X509_H
 
 #include <gnutls/x509.h>
 #include <gnutls/abstract.h>
@@ -33,10 +33,10 @@
 
 /* Remove these when we require libtasn1 v1.6 or later. */
 #ifndef ASN1_MAX_NAME_SIZE
-# define ASN1_MAX_NAME_SIZE MAX_NAME_SIZE
+#define ASN1_MAX_NAME_SIZE MAX_NAME_SIZE
 #endif
 #ifndef ASN1_MAX_ERROR_DESCRIPTION_SIZE
-# define ASN1_MAX_ERROR_DESCRIPTION_SIZE MAX_ERROR_DESCRIPTION_SIZE
+#define ASN1_MAX_ERROR_DESCRIPTION_SIZE MAX_ERROR_DESCRIPTION_SIZE
 #endif
 
 #define MAX_CRQ_EXTENSIONS_SIZE 8*1024
@@ -72,7 +72,7 @@ typedef struct gnutls_pkcs7_int
   ASN1_TYPE pkcs7;
 } gnutls_pkcs7_int;
 
-#define MAX_PRIV_PARAMS_SIZE GNUTLS_MAX_PK_PARAMS /* ok for RSA and DSA */
+#define MAX_PRIV_PARAMS_SIZE GNUTLS_MAX_PK_PARAMS	/* ok for RSA and DSA */
 
 /* parameters should not be larger than this limit */
 #define DSA_PRIVATE_PARAMS 5
@@ -81,11 +81,11 @@ typedef struct gnutls_pkcs7_int
 #define RSA_PUBLIC_PARAMS 2
 
 #if MAX_PRIV_PARAMS_SIZE - RSA_PRIVATE_PARAMS < 0
-# error INCREASE MAX_PRIV_PARAMS
+#error INCREASE MAX_PRIV_PARAMS
 #endif
 
 #if MAX_PRIV_PARAMS_SIZE - DSA_PRIVATE_PARAMS < 0
-# error INCREASE MAX_PRIV_PARAMS
+#error INCREASE MAX_PRIV_PARAMS
 #endif
 
 typedef struct gnutls_x509_privkey_int
@@ -107,8 +107,8 @@ typedef struct gnutls_x509_privkey_int
    *          using fixup.
    *      The following two are also not always available thus fixup
    *      will generate them.
-   *	  [6] e1 == d mod (p-1)
-   *	  [7] e2 == d mod (q-1)
+   *      [6] e1 == d mod (p-1)
+   *      [7] e2 == d mod (q-1)
    * DSA: [0] is p
    *      [1] is q
    *      [2] is g
@@ -141,7 +141,7 @@ int _gnutls_x509_crl_get_raw_issuer_dn (gnutls_x509_crl_t crl,
 
 /* sign.c */
 int _gnutls_x509_get_tbs (ASN1_TYPE cert, const char *tbs_name,
-			   gnutls_datum_t * tbs);
+			  gnutls_datum_t * tbs);
 int _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
 			    gnutls_digest_algorithm_t,
 			    gnutls_x509_crt_t issuer,
@@ -190,7 +190,8 @@ int
 _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
 			       const gnutls_datum_t * signature,
 			       gnutls_pk_algorithm pk,
-			       bigint_t* issuer_params, unsigned int issuer_params_size);
+			       bigint_t * issuer_params,
+			       unsigned int issuer_params_size);
 
 int _gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
 				   const gnutls_datum_t * hash,

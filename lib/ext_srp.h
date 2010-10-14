@@ -28,18 +28,19 @@
 
 #include <gnutls_extensions.h>
 
-# ifdef ENABLE_SRP
+#ifdef ENABLE_SRP
 
-#  define IS_SRP_KX(kx) ((kx == GNUTLS_KX_SRP || (kx == GNUTLS_KX_SRP_RSA) || \
+#define IS_SRP_KX(kx) ((kx == GNUTLS_KX_SRP || (kx == GNUTLS_KX_SRP_RSA) || \
           kx == GNUTLS_KX_SRP_DSS)?1:0)
 
 extern extension_entry_st ext_mod_srp;
 
-typedef struct {
-    char* username;
-    char* password;
+typedef struct
+{
+  char *username;
+  char *password;
 } srp_ext_st;
 
-# endif
+#endif
 
 #endif

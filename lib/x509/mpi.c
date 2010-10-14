@@ -208,25 +208,25 @@ _gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, bigint_t * params)
  */
 int
 _gnutls_get_asn_mpis (ASN1_TYPE asn, const char *root,
-	  bigint_t * params, int *params_size)
+		      bigint_t * params, int *params_size)
 {
   int result;
   char name[256];
   gnutls_datum_t tmp = { NULL, 0 };
   gnutls_pk_algorithm pk_algorithm;
 
-  result = _gnutls_x509_get_pk_algorithm(asn, root, NULL);
+  result = _gnutls_x509_get_pk_algorithm (asn, root, NULL);
   if (result < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return result;
     }
-  
+
   pk_algorithm = result;
 
   /* Read the algorithm's parameters
    */
-  _asnstr_append_name(name, sizeof(name), root, ".subjectPublicKey");
+  _asnstr_append_name (name, sizeof (name), root, ".subjectPublicKey");
   result = _gnutls_x509_read_value (asn, name, &tmp, 2);
 
   if (result < 0)
@@ -284,7 +284,8 @@ _gnutls_get_asn_mpis (ASN1_TYPE asn, const char *root,
        */
       _gnutls_free_datum (&tmp);
 
-      _asnstr_append_name(name, sizeof(name), root, ".algorithm.parameters");
+      _asnstr_append_name (name, sizeof (name), root,
+			   ".algorithm.parameters");
       result = _gnutls_x509_read_value (asn, name, &tmp, 0);
 
       /* FIXME: If the parameters are not included in the certificate
@@ -333,8 +334,8 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
   /* Read the algorithm's OID
    */
   return _gnutls_get_asn_mpis (cert->cert,
-		   "tbsCertificate.subjectPublicKeyInfo", params,
-		   params_size);
+			       "tbsCertificate.subjectPublicKeyInfo", params,
+			       params_size);
 }
 
 #ifdef ENABLE_PKI
@@ -348,8 +349,8 @@ _gnutls_x509_crq_get_mpis (gnutls_x509_crq_t cert,
   /* Read the algorithm's OID
    */
   return _gnutls_get_asn_mpis (cert->crq,
-		   "certificationRequestInfo.subjectPKInfo", params,
-		   params_size);
+			       "certificationRequestInfo.subjectPKInfo",
+			       params, params_size);
 }
 
 #endif
@@ -436,7 +437,9 @@ _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
   if (pk == NULL)
     {
       gnutls_assert ();
-      _gnutls_debug_log("Cannot find OID for sign algorithm pk: %d dig: %d\n", (int)pk_algorithm, (int)dig);
+      _gnutls_debug_log
+	("Cannot find OID for sign algorithm pk: %d dig: %d\n",
+	 (int) pk_algorithm, (int) dig);
       return GNUTLS_E_INVALID_REQUEST;
     }
 

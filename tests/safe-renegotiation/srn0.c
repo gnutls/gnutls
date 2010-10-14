@@ -29,7 +29,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -289,10 +289,10 @@ main (int argc, char *argv[])
 	}
     }
   while (
-	 /* Not done: */
-	 !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
-	 /* No error: */
-	 && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
+	  /* Not done: */
+	  !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
+	  /* No error: */
+	  && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
 
   if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_SUCCESS)
     exit_code = 1;
@@ -300,7 +300,8 @@ main (int argc, char *argv[])
   if (!gnutls_safe_renegotiation_status (client) ||
       !gnutls_safe_renegotiation_status (server))
     {
-      tls_log_func (0, "Rehandshaked session not using safe renegotiation!\n");
+      tls_log_func (0,
+		    "Rehandshaked session not using safe renegotiation!\n");
       exit_code = EXIT_FAILURE;
     }
 

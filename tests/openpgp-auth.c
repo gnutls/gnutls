@@ -20,7 +20,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <gnutls/gnutls.h>
@@ -43,41 +43,40 @@ static const char message[] = "Hello, brave GNU world!";
 /* The OpenPGP key pair for use and the key ID in those keys.  */
 static const char pub_key_file[] = "../guile/tests/openpgp-pub.asc";
 static const char priv_key_file[] = "../guile/tests/openpgp-sec.asc";
-static const char *key_id =
-  NULL
+static const char *key_id = NULL
   /* FIXME: The values below don't work as expected.  */
   /* "auto" */
-  /* "bd572cdcccc07c35" */;
+  /* "bd572cdcccc07c35" */ ;
 
 static const char rsa_params_file[] = "../guile/tests/rsa-parameters.pem";
 
 static const int protocols[] = { GNUTLS_TLS1_0, 0 };
 static const int cert_types[] = { GNUTLS_CRT_OPENPGP, 0 };
-static const int ciphers[] =
-  {
-    GNUTLS_CIPHER_NULL, GNUTLS_CIPHER_ARCFOUR,
-    GNUTLS_CIPHER_AES_128_CBC, GNUTLS_CIPHER_AES_256_CBC,
-    0
-  };
-static const int kx[] =
-  {
-    GNUTLS_KX_RSA, GNUTLS_KX_RSA_EXPORT,
-    GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS,
-    0
-  };
-static const int macs[] =
-  {
-    GNUTLS_MAC_SHA1, GNUTLS_MAC_RMD160, GNUTLS_MAC_MD5,
-    0
-  };
+
+static const int ciphers[] = {
+  GNUTLS_CIPHER_NULL, GNUTLS_CIPHER_ARCFOUR,
+  GNUTLS_CIPHER_AES_128_CBC, GNUTLS_CIPHER_AES_256_CBC,
+  0
+};
+
+static const int kx[] = {
+  GNUTLS_KX_RSA, GNUTLS_KX_RSA_EXPORT,
+  GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS,
+  0
+};
+
+static const int macs[] = {
+  GNUTLS_MAC_SHA1, GNUTLS_MAC_RMD160, GNUTLS_MAC_MD5,
+  0
+};
 
 static void
 log_message (int level, const char *message)
 {
   fprintf (stderr, "[%5d|%2d] %s", getpid (), level, message);
 }
-
 
+
 void
 doit ()
 {
@@ -89,7 +88,7 @@ doit ()
 
   gnutls_global_init ();
 
-  srcdir = getenv ("srcdir") ?: ".";
+  srcdir = getenv ("srcdir") ? : ".";
 
   if (debug)
     {
@@ -131,7 +130,8 @@ doit ()
 
       gnutls_set_default_priority (session);
       gnutls_transport_set_ptr (session,
-				(gnutls_transport_ptr_t)(intptr_t) sockets[0]);
+				(gnutls_transport_ptr_t) (intptr_t)
+				sockets[0]);
 
       err = gnutls_certificate_allocate_credentials (&cred);
       if (err != 0)
@@ -196,7 +196,8 @@ doit ()
 
       gnutls_set_default_priority (session);
       gnutls_transport_set_ptr (session,
-				(gnutls_transport_ptr_t)(intptr_t) sockets[1]);
+				(gnutls_transport_ptr_t) (intptr_t)
+				sockets[1]);
 
       err = gnutls_certificate_allocate_credentials (&cred);
       if (err != 0)
@@ -212,16 +213,16 @@ doit ()
 
       err = gnutls_dh_params_init (&dh_params);
       if (err)
-      	fail ("server DH params init %d\n", err);
+	fail ("server DH params init %d\n", err);
 
       err = gnutls_dh_params_generate2 (dh_params, 1024);
       if (err)
-      	fail ("server DH params generate %d\n", err);
+	fail ("server DH params generate %d\n", err);
 
       gnutls_certificate_set_dh_params (cred, dh_params);
 
       rsa_data.data =
-      	(unsigned char *) read_binary_file (rsa_params_file, &rsa_size);
+	(unsigned char *) read_binary_file (rsa_params_file, &rsa_size);
       rsa_data.size = rsa_size;
 
       err = gnutls_rsa_params_init (&rsa_params);

@@ -24,7 +24,7 @@
  */
 
 #ifndef GNUTLS_GLOBAL_H
-# define GNUTLS_GLOBAL_H
+#define GNUTLS_GLOBAL_H
 
 #include <libtasn1.h>
 #include <gnutls/gnutls.h>
@@ -43,6 +43,6 @@ extern ASN1_TYPE _gnutls_gnutls_asn;
 
 extern gnutls_log_func _gnutls_log_func;
 extern int _gnutls_log_level;
-extern int gnutls_crypto_init(void);
+extern int gnutls_crypto_init (void);
 
 #endif

@@ -21,7 +21,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <gnutls/gnutls.h>
@@ -151,7 +151,8 @@ doit (void)
 				       i == 0 ? GNUTLS_PKCS8_USE_PKCS12_3DES
 				       : GNUTLS_PKCS_USE_PKCS12_RC2_40);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "bag_encrypt: %d: %s", ret, i==0?"3DES":"RC2-40");
+	error (EXIT_FAILURE, 0, "bag_encrypt: %d: %s", ret,
+	       i == 0 ? "3DES" : "RC2-40");
 
       ret = gnutls_pkcs12_set_bag (pkcs12, bag);
       if (ret < 0)

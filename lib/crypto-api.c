@@ -118,10 +118,10 @@ gnutls_cipher_decrypt (gnutls_cipher_hd_t handle, void *ciphertext,
  **/
 int
 gnutls_cipher_encrypt2 (gnutls_cipher_hd_t handle, void *text, size_t textlen,
-  void* ciphertext, size_t ciphertextlen)
+			void *ciphertext, size_t ciphertextlen)
 {
-  return _gnutls_cipher_encrypt2 ((cipher_hd_st *) handle, text, textlen, 
-    ciphertext, ciphertextlen);
+  return _gnutls_cipher_encrypt2 ((cipher_hd_st *) handle, text, textlen,
+				  ciphertext, ciphertextlen);
 }
 
 /**
@@ -141,10 +141,10 @@ gnutls_cipher_encrypt2 (gnutls_cipher_hd_t handle, void *text, size_t textlen,
  **/
 int
 gnutls_cipher_decrypt2 (gnutls_cipher_hd_t handle, const void *ciphertext,
-		       size_t ciphertextlen, void* text, size_t textlen)
+			size_t ciphertextlen, void *text, size_t textlen)
 {
   return _gnutls_cipher_decrypt2 ((cipher_hd_st *) handle, ciphertext,
-				 ciphertextlen, text, textlen);
+				  ciphertextlen, text, textlen);
 }
 
 /**
@@ -160,7 +160,7 @@ void
 gnutls_cipher_deinit (gnutls_cipher_hd_t handle)
 {
   _gnutls_cipher_deinit ((cipher_hd_st *) handle);
-  gnutls_free(handle);
+  gnutls_free (handle);
 }
 
 
@@ -245,7 +245,7 @@ void
 gnutls_hmac_deinit (gnutls_hmac_hd_t handle, void *digest)
 {
   _gnutls_hmac_deinit ((digest_hd_st *) handle, digest);
-  gnutls_free(handle);
+  gnutls_free (handle);
 }
 
 /**
@@ -366,7 +366,7 @@ void
 gnutls_hash_deinit (gnutls_hash_hd_t handle, void *digest)
 {
   _gnutls_hash_deinit ((digest_hd_st *) handle, digest);
-  gnutls_free(handle);
+  gnutls_free (handle);
 }
 
 /**

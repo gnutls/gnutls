@@ -49,7 +49,8 @@
  */
 static int
 encode_ber_digest_info (gnutls_digest_algorithm_t hash,
-			const gnutls_datum_t * digest, gnutls_datum_t * output)
+			const gnutls_datum_t * digest,
+			gnutls_datum_t * output)
 {
   ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
   int result;
@@ -131,7 +132,8 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
  * params[1] is public key
  */
 int
-pk_pkcs1_rsa_hash (gnutls_digest_algorithm_t hash, const gnutls_datum_t * text, gnutls_datum_t * output)
+pk_pkcs1_rsa_hash (gnutls_digest_algorithm_t hash,
+		   const gnutls_datum_t * text, gnutls_datum_t * output)
 {
   int ret;
   opaque _digest[MAX_HASH_SIZE];
@@ -163,23 +165,24 @@ pk_pkcs1_rsa_hash (gnutls_digest_algorithm_t hash, const gnutls_datum_t * text, 
 }
 
 int
-pk_dsa_hash (gnutls_digest_algorithm_t hash, const gnutls_datum_t * text, gnutls_datum_t * digest)
+pk_dsa_hash (gnutls_digest_algorithm_t hash, const gnutls_datum_t * text,
+	     gnutls_datum_t * digest)
 {
   int ret;
   digest_hd_st hd;
 
   if (hash != GNUTLS_DIG_SHA1 && hash != GNUTLS_DIG_SHA224 &&
-    hash != GNUTLS_DIG_SHA256)
+      hash != GNUTLS_DIG_SHA256)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  digest->size = _gnutls_hash_get_algo_len(hash);
-  digest->data = gnutls_malloc( digest->size);
+  digest->size = _gnutls_hash_get_algo_len (hash);
+  digest->data = gnutls_malloc (digest->size);
   if (digest->data == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
 
@@ -197,7 +200,7 @@ pk_dsa_hash (gnutls_digest_algorithm_t hash, const gnutls_datum_t * text, gnutls
   return 0;
 
 fail:
-  gnutls_free(digest->data);
+  gnutls_free (digest->data);
 
   return ret;
 }
@@ -208,7 +211,7 @@ fail:
  */
 int
 _gnutls_x509_get_tbs (ASN1_TYPE cert, const char *tbs_name,
-		       gnutls_datum_t * tbs)
+		      gnutls_datum_t * tbs)
 {
   int result;
   opaque *buf;
@@ -254,8 +257,7 @@ _gnutls_x509_get_tbs (ASN1_TYPE cert, const char *tbs_name,
 int
 _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
 			gnutls_digest_algorithm_t dig,
-			gnutls_x509_crt_t issuer,
-			gnutls_privkey_t issuer_key)
+			gnutls_x509_crt_t issuer, gnutls_privkey_t issuer_key)
 {
   int result;
   gnutls_datum_t signature;
@@ -280,7 +282,8 @@ _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
   _gnutls_str_cat (name, sizeof (name), ".signature");
 
   result = _gnutls_x509_write_sig_params (src, name,
-					  gnutls_privkey_get_pk_algorithm(issuer_key, NULL), dig);
+					  gnutls_privkey_get_pk_algorithm
+					  (issuer_key, NULL), dig);
   if (result < 0)
     {
       gnutls_assert ();
@@ -298,7 +301,7 @@ _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
     }
 
   result = gnutls_privkey_sign_data (issuer_key, dig, 0, &tbs, &signature);
-  gnutls_free(tbs.data);
+  gnutls_free (tbs.data);
 
   if (result < 0)
     {
@@ -324,7 +327,8 @@ _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
    */
 
   result = _gnutls_x509_write_sig_params (src, "signatureAlgorithm",
-					  gnutls_privkey_get_pk_algorithm(issuer_key, NULL), dig);
+					  gnutls_privkey_get_pk_algorithm
+					  (issuer_key, NULL), dig);
   if (result < 0)
     {
       gnutls_assert ();

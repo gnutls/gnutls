@@ -48,10 +48,11 @@
  * This function must be called before gnutls_global_init().
  *
  **/
-void gnutls_global_set_mutex(mutex_init_func init, mutex_deinit_func deinit, 
-        mutex_lock_func lock, mutex_unlock_func unlock)
+void
+gnutls_global_set_mutex (mutex_init_func init, mutex_deinit_func deinit,
+			 mutex_lock_func lock, mutex_unlock_func unlock)
 {
-  if (init == NULL || deinit == NULL || lock == NULL  || unlock == NULL)
+  if (init == NULL || deinit == NULL || lock == NULL || unlock == NULL)
     return;
 
   gnutls_mutex_init = init;

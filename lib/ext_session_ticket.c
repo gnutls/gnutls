@@ -46,24 +46,25 @@
 #define MAC_SIZE 32
 
 static int session_ticket_recv_params (gnutls_session_t session,
-					const opaque * data,
-					size_t data_size);
+				       const opaque * data, size_t data_size);
 static int session_ticket_send_params (gnutls_session_t session,
-					opaque * data, size_t data_size);
-static int session_ticket_unpack(gnutls_buffer_st* ps, extension_priv_data_t* _priv);
-static int session_ticket_pack(extension_priv_data_t _priv, gnutls_buffer_st* ps);
-static void session_ticket_deinit_data(extension_priv_data_t priv);
+				       opaque * data, size_t data_size);
+static int session_ticket_unpack (gnutls_buffer_st * ps,
+				  extension_priv_data_t * _priv);
+static int session_ticket_pack (extension_priv_data_t _priv,
+				gnutls_buffer_st * ps);
+static void session_ticket_deinit_data (extension_priv_data_t priv);
 
 extension_entry_st ext_mod_session_ticket = {
-    .name = "SESSION TICKET",
-    .type = GNUTLS_EXTENSION_SESSION_TICKET,
-    .parse_type = GNUTLS_EXT_TLS,
+  .name = "SESSION TICKET",
+  .type = GNUTLS_EXTENSION_SESSION_TICKET,
+  .parse_type = GNUTLS_EXT_TLS,
 
-    .recv_func = session_ticket_recv_params,
-    .send_func = session_ticket_send_params,
-    .pack_func = session_ticket_pack,
-    .unpack_func = session_ticket_unpack,
-    .deinit_func = session_ticket_deinit_data,
+  .recv_func = session_ticket_recv_params,
+  .send_func = session_ticket_send_params,
+  .pack_func = session_ticket_pack,
+  .unpack_func = session_ticket_unpack,
+  .deinit_func = session_ticket_deinit_data,
 };
 
 struct gnutls_session_ticket_key_st
@@ -73,15 +74,16 @@ struct gnutls_session_ticket_key_st
   opaque mac_secret[SESSION_TICKET_MAC_SECRET_SIZE];
 };
 
-typedef struct {
-    int session_ticket_enable;
-    int session_ticket_renew;
-    opaque session_ticket_IV[SESSION_TICKET_IV_SIZE];
+typedef struct
+{
+  int session_ticket_enable;
+  int session_ticket_renew;
+  opaque session_ticket_IV[SESSION_TICKET_IV_SIZE];
 
-    opaque* session_ticket;
-    int session_ticket_len;
+  opaque *session_ticket;
+  int session_ticket_len;
 
-    struct gnutls_session_ticket_key_st key;
+  struct gnutls_session_ticket_key_st key;
 } session_ticket_ext_st;
 
 struct ticket
@@ -120,7 +122,8 @@ digest_ticket (const gnutls_datum_t * key, struct ticket *ticket,
 }
 
 static int
-decrypt_ticket (gnutls_session_t session, session_ticket_ext_st* priv, struct ticket *ticket)
+decrypt_ticket (gnutls_session_t session, session_ticket_ext_st * priv,
+		struct ticket *ticket)
 {
   cipher_hd_st cipher_hd;
   gnutls_datum_t key, IV, mac_secret, state;
@@ -189,7 +192,8 @@ decrypt_ticket (gnutls_session_t session, session_ticket_ext_st* priv, struct ti
 }
 
 static int
-encrypt_ticket (gnutls_session_t session, session_ticket_ext_st* priv, struct ticket *ticket)
+encrypt_ticket (gnutls_session_t session, session_ticket_ext_st * priv,
+		struct ticket *ticket)
 {
   cipher_hd_st cipher_hd;
   gnutls_datum_t key, IV, mac_secret, state, encrypted_state;
@@ -263,14 +267,16 @@ encrypt_ticket (gnutls_session_t session, session_ticket_ext_st* priv, struct ti
 
 static int
 session_ticket_recv_params (gnutls_session_t session,
-				    const opaque * data, size_t _data_size)
+			    const opaque * data, size_t _data_size)
 {
   ssize_t data_size = _data_size;
-  session_ticket_ext_st* priv=NULL;
+  session_ticket_ext_st *priv = NULL;
   extension_priv_data_t epriv;
   int ret;
 
-  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_SESSION_TICKET, &epriv);
+  ret =
+    _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_SESSION_TICKET,
+				  &epriv);
   if (ret < 0)
     {
       return 0;
@@ -338,7 +344,7 @@ session_ticket_recv_params (gnutls_session_t session,
 	  return 0;
 	}
     }
-  else /* Client */
+  else				/* Client */
     {
       if (data_size == 0)
 	{
@@ -355,14 +361,16 @@ session_ticket_recv_params (gnutls_session_t session,
  */
 static int
 session_ticket_send_params (gnutls_session_t session,
-				    opaque * data, size_t _data_size)
+			    opaque * data, size_t _data_size)
 {
   ssize_t data_size = _data_size;
-  session_ticket_ext_st* priv=NULL;
+  session_ticket_ext_st *priv = NULL;
   extension_priv_data_t epriv;
   int ret;
 
-  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_SESSION_TICKET, &epriv);
+  ret =
+    _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_SESSION_TICKET,
+				  &epriv);
   if (ret >= 0)
     priv = epriv.ptr;
 
@@ -378,13 +386,16 @@ session_ticket_send_params (gnutls_session_t session,
     }
   else
     {
-      ret = _gnutls_ext_get_resumed_session_data( session, GNUTLS_EXTENSION_SESSION_TICKET, &epriv);
+      ret =
+	_gnutls_ext_get_resumed_session_data (session,
+					      GNUTLS_EXTENSION_SESSION_TICKET,
+					      &epriv);
       if (ret >= 0)
 	priv = epriv.ptr;
 
       /* no previous data. Just advertize it */
       if (ret < 0)
-        return GNUTLS_E_INT_RET_0;
+	return GNUTLS_E_INT_RET_0;
 
       /* previous data had session tickets disabled. Don't advertize. Ignore. */
       if (!priv->session_ticket_enable)
@@ -392,7 +403,8 @@ session_ticket_send_params (gnutls_session_t session,
 
       if (priv->session_ticket_len > 0)
 	{
-	  DECR_LENGTH_RET (data_size, priv->session_ticket_len, GNUTLS_E_SHORT_MEMORY_BUFFER);
+	  DECR_LENGTH_RET (data_size, priv->session_ticket_len,
+			   GNUTLS_E_SHORT_MEMORY_BUFFER);
 	  memcpy (data, priv->session_ticket, priv->session_ticket_len);
 
 	  return priv->session_ticket_len;
@@ -402,51 +414,54 @@ session_ticket_send_params (gnutls_session_t session,
 }
 
 
-static void session_ticket_deinit_data(extension_priv_data_t epriv)
+static void
+session_ticket_deinit_data (extension_priv_data_t epriv)
 {
-session_ticket_ext_st* priv = epriv.ptr;
+  session_ticket_ext_st *priv = epriv.ptr;
 
-    gnutls_free(priv->session_ticket);
-    gnutls_free(priv);
+  gnutls_free (priv->session_ticket);
+  gnutls_free (priv);
 }
 
-static int session_ticket_pack(extension_priv_data_t epriv, gnutls_buffer_st* ps)
+static int
+session_ticket_pack (extension_priv_data_t epriv, gnutls_buffer_st * ps)
 {
-session_ticket_ext_st* priv = epriv.ptr;
-int ret;
+  session_ticket_ext_st *priv = epriv.ptr;
+  int ret;
 
-  BUFFER_APPEND_PFX(ps, priv->session_ticket, priv->session_ticket_len);
-  BUFFER_APPEND_NUM(ps, priv->session_ticket_enable);
+  BUFFER_APPEND_PFX (ps, priv->session_ticket, priv->session_ticket_len);
+  BUFFER_APPEND_NUM (ps, priv->session_ticket_enable);
 
   return 0;
 }
 
-static int session_ticket_unpack(gnutls_buffer_st* ps, extension_priv_data_t* _priv)
+static int
+session_ticket_unpack (gnutls_buffer_st * ps, extension_priv_data_t * _priv)
 {
-session_ticket_ext_st* priv=NULL;
-int ret;
-extension_priv_data_t epriv;
-gnutls_datum ticket;
+  session_ticket_ext_st *priv = NULL;
+  int ret;
+  extension_priv_data_t epriv;
+  gnutls_datum ticket;
 
-  priv = gnutls_calloc(1, sizeof(*priv));
+  priv = gnutls_calloc (1, sizeof (*priv));
   if (priv == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
-  
-  BUFFER_POP_DATUM(ps, &ticket);
+
+  BUFFER_POP_DATUM (ps, &ticket);
   priv->session_ticket = ticket.data;
   priv->session_ticket_len = ticket.size;
-  BUFFER_POP_NUM(ps, priv->session_ticket_enable);
+  BUFFER_POP_NUM (ps, priv->session_ticket_enable);
 
   epriv.ptr = priv;
   *_priv = epriv;
-  
+
   return 0;
 
 error:
-  gnutls_free(priv);
+  gnutls_free (priv);
   return ret;
 }
 
@@ -504,7 +519,7 @@ gnutls_session_ticket_key_generate (gnutls_datum_t * key)
 int
 gnutls_session_ticket_enable_client (gnutls_session_t session)
 {
-  session_ticket_ext_st* priv=NULL;
+  session_ticket_ext_st *priv = NULL;
   extension_priv_data_t epriv;
 
   if (!session)
@@ -513,18 +528,18 @@ gnutls_session_ticket_enable_client (gnutls_session_t session)
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  priv = gnutls_calloc(1, sizeof(*priv));
+  priv = gnutls_calloc (1, sizeof (*priv));
   if (priv == NULL)
     {
-	gnutls_assert();
-	return GNUTLS_E_MEMORY_ERROR;
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
     }
   priv->session_ticket_enable = 1;
   epriv.ptr = priv;
 
-  _gnutls_ext_set_session_data(session, 
-    GNUTLS_EXTENSION_SESSION_TICKET, epriv);
-  
+  _gnutls_ext_set_session_data (session,
+				GNUTLS_EXTENSION_SESSION_TICKET, epriv);
+
   return 0;
 }
 
@@ -547,7 +562,7 @@ gnutls_session_ticket_enable_server (gnutls_session_t session,
 				     const gnutls_datum_t * key)
 {
   int ret;
-  session_ticket_ext_st* priv=NULL;
+  session_ticket_ext_st *priv = NULL;
   extension_priv_data_t epriv;
 
   if (!session || !key
@@ -557,27 +572,26 @@ gnutls_session_ticket_enable_server (gnutls_session_t session,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  priv = gnutls_calloc(1, sizeof(*priv));
+  priv = gnutls_calloc (1, sizeof (*priv));
   if (priv == NULL)
     {
-	gnutls_assert();
-	return GNUTLS_E_MEMORY_ERROR;
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
     }
   epriv.ptr = priv;
 
-  ret = _gnutls_rnd (GNUTLS_RND_RANDOM,
-		     priv->session_ticket_IV, IV_SIZE);
+  ret = _gnutls_rnd (GNUTLS_RND_RANDOM, priv->session_ticket_IV, IV_SIZE);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  memcpy(&priv->key, key->data, key->size);
+  memcpy (&priv->key, key->data, key->size);
   priv->session_ticket_enable = 1;
 
-  _gnutls_ext_set_session_data(session, 
-    GNUTLS_EXTENSION_SESSION_TICKET, epriv);
+  _gnutls_ext_set_session_data (session,
+				GNUTLS_EXTENSION_SESSION_TICKET, epriv);
 
   return 0;
 }
@@ -591,17 +605,20 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
   int ret;
   struct ticket ticket;
   uint16_t ticket_len;
-  session_ticket_ext_st* priv=NULL;
+  session_ticket_ext_st *priv = NULL;
   extension_priv_data_t epriv;
   uint16_t epoch_saved = session->security_parameters.epoch_write;
 
   if (again == 0)
     {
-      ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_SESSION_TICKET, &epriv);
+      ret =
+	_gnutls_ext_get_session_data (session,
+				      GNUTLS_EXTENSION_SESSION_TICKET,
+				      &epriv);
       if (ret < 0)
-        return 0;
+	return 0;
       priv = epriv.ptr;
-      
+
       if (!priv->session_ticket_renew)
 	return 0;
 
@@ -609,14 +626,17 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
          _gnutls_write_connection_state_init() does this job, but it also
          triggers encryption, while NewSessionTicket should not be
          encrypted in the record layer. */
-      ret = _gnutls_epoch_set_keys (session, session->security_parameters.epoch_next);
+      ret =
+	_gnutls_epoch_set_keys (session,
+				session->security_parameters.epoch_next);
       if (ret < 0)
 	{
 	  gnutls_assert ();
 	  return ret;
 	}
 
-      session->security_parameters.epoch_write = session->security_parameters.epoch_next;
+      session->security_parameters.epoch_write =
+	session->security_parameters.epoch_next;
 
       ret = encrypt_ticket (session, priv, &ticket);
       session->security_parameters.epoch_write = epoch_saved;
@@ -629,7 +649,8 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
       ticket_len = KEY_NAME_SIZE + IV_SIZE + 2 + ticket.encrypted_state_len
 	+ MAC_SIZE;
 
-      bufel = _gnutls_handshake_alloc (4 + 2 + ticket_len, 4+2+ticket_len);
+      bufel =
+	_gnutls_handshake_alloc (4 + 2 + ticket_len, 4 + 2 + ticket_len);
       if (!bufel)
 	{
 	  gnutls_assert ();
@@ -637,10 +658,10 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
 	  return GNUTLS_E_MEMORY_ERROR;
 	}
 
-      data = _mbuffer_get_udata_ptr(bufel);
+      data = _mbuffer_get_udata_ptr (bufel);
       p = data;
 
-      _gnutls_write_uint32 ( session->internals.expire_time, p);
+      _gnutls_write_uint32 (session->internals.expire_time, p);
       p += 4;
 
       _gnutls_write_uint16 (ticket_len, p);
@@ -678,14 +699,16 @@ _gnutls_recv_new_session_ticket (gnutls_session_t session)
   uint32_t lifetime_hint;
   uint16_t ticket_len;
   int ret;
-  session_ticket_ext_st* priv=NULL;
+  session_ticket_ext_st *priv = NULL;
   extension_priv_data_t epriv;
 
-  ret = _gnutls_ext_get_session_data( session, GNUTLS_EXTENSION_SESSION_TICKET, &epriv);
+  ret =
+    _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_SESSION_TICKET,
+				  &epriv);
   if (ret < 0)
     {
-	gnutls_assert();
-	return 0;
+      gnutls_assert ();
+      return 0;
     }
   priv = epriv.ptr;
 
@@ -724,7 +747,8 @@ _gnutls_recv_new_session_ticket (gnutls_session_t session)
 
   /* Discard the current session ID.  (RFC5077 3.4) */
   ret = _gnutls_generate_session_id (session->security_parameters.session_id,
-				     &session->security_parameters.session_id_size);
+				     &session->
+				     security_parameters.session_id_size);
   if (ret < 0)
     {
       gnutls_assert ();

@@ -54,7 +54,7 @@
  * Cost: O(1)
  */
 void
-_mbuffer_init (mbuffer_head_st *buf)
+_mbuffer_init (mbuffer_head_st * buf)
 {
   buf->head = NULL;
   buf->tail = &buf->head;
@@ -69,14 +69,14 @@ _mbuffer_init (mbuffer_head_st *buf)
  * n: Number of segments currently in the buffer.
  */
 void
-_mbuffer_clear (mbuffer_head_st *buf)
+_mbuffer_clear (mbuffer_head_st * buf)
 {
   mbuffer_st *bufel, *next;
 
-  for(bufel = buf->head; bufel != NULL; bufel = next)
+  for (bufel = buf->head; bufel != NULL; bufel = next)
     {
       next = bufel->next;
-      gnutls_free(bufel);
+      gnutls_free (bufel);
     }
 
   _mbuffer_init (buf);
@@ -87,7 +87,7 @@ _mbuffer_clear (mbuffer_head_st *buf)
  * Cost: O(1)
  */
 void
-_mbuffer_enqueue (mbuffer_head_st *buf, mbuffer_st *bufel)
+_mbuffer_enqueue (mbuffer_head_st * buf, mbuffer_st * bufel)
 {
   bufel->next = NULL;
 
@@ -104,7 +104,8 @@ _mbuffer_enqueue (mbuffer_head_st *buf, mbuffer_st *bufel)
  *
  * Cost: O(1)
  */
-mbuffer_st* _mbuffer_get_first (mbuffer_head_st *buf, gnutls_datum_t *msg)
+mbuffer_st *
+_mbuffer_get_first (mbuffer_head_st * buf, gnutls_datum_t * msg)
 {
   mbuffer_st *bufel = buf->head;
 
@@ -127,7 +128,8 @@ mbuffer_st* _mbuffer_get_first (mbuffer_head_st *buf, gnutls_datum_t *msg)
  *
  * Cost: O(1)
  */
-mbuffer_st* _mbuffer_get_next (mbuffer_st * cur, gnutls_datum_t *msg)
+mbuffer_st *
+_mbuffer_get_next (mbuffer_st * cur, gnutls_datum_t * msg)
 {
   mbuffer_st *bufel = cur->next;
 
@@ -152,11 +154,11 @@ mbuffer_st* _mbuffer_get_next (mbuffer_st * cur, gnutls_datum_t *msg)
  * Cost: O(1)
  */
 static inline void
-remove_front (mbuffer_head_st *buf)
+remove_front (mbuffer_head_st * buf)
 {
   mbuffer_st *bufel;
 
-  if(!buf->head)
+  if (!buf->head)
     return;
 
   bufel = buf->head;
@@ -164,7 +166,7 @@ remove_front (mbuffer_head_st *buf)
 
   buf->byte_length -= (bufel->msg.size - bufel->mark);
   buf->length -= 1;
-  gnutls_free(bufel);
+  gnutls_free (bufel);
 
   if (!buf->head)
     buf->tail = &buf->head;
@@ -180,7 +182,7 @@ remove_front (mbuffer_head_st *buf)
  * n: Number of segments needed to remove the specified amount of data.
  */
 int
-_mbuffer_remove_bytes (mbuffer_head_st *buf, size_t bytes)
+_mbuffer_remove_bytes (mbuffer_head_st * buf, size_t bytes)
 {
   size_t left = bytes;
   mbuffer_st *bufel, *next;
@@ -195,10 +197,10 @@ _mbuffer_remove_bytes (mbuffer_head_st *buf, size_t bytes)
     {
       next = bufel->next;
 
-      if(left >= (bufel->msg.size - bufel->mark))
+      if (left >= (bufel->msg.size - bufel->mark))
 	{
 	  left -= (bufel->msg.size - bufel->mark);
-	  remove_front(buf);
+	  remove_front (buf);
 	}
       else
 	{
@@ -226,9 +228,9 @@ _mbuffer_remove_bytes (mbuffer_head_st *buf, size_t bytes)
 mbuffer_st *
 _mbuffer_alloc (size_t payload_size, size_t maximum_size)
 {
-  mbuffer_st * st;
+  mbuffer_st *st;
 
-  st = gnutls_malloc (maximum_size+sizeof (mbuffer_st));
+  st = gnutls_malloc (maximum_size + sizeof (mbuffer_st));
   if (st == NULL)
     {
       gnutls_assert ();
@@ -236,7 +238,7 @@ _mbuffer_alloc (size_t payload_size, size_t maximum_size)
     }
 
   //payload points after the mbuffer_st structure
-  st->msg.data = (opaque*)st + sizeof (mbuffer_st);
+  st->msg.data = (opaque *) st + sizeof (mbuffer_st);
   st->msg.size = payload_size;
   st->mark = 0;
   st->user_mark = 0;
@@ -257,16 +259,16 @@ _mbuffer_alloc (size_t payload_size, size_t maximum_size)
  * n: number of bytes to copy
  */
 int
-_mbuffer_append_data (mbuffer_st *bufel, void* newdata, size_t newdata_size)
+_mbuffer_append_data (mbuffer_st * bufel, void *newdata, size_t newdata_size)
 {
-  if (bufel->msg.size+newdata_size <= bufel->maximum_size)
+  if (bufel->msg.size + newdata_size <= bufel->maximum_size)
     {
-      memcpy(&bufel->msg.data[bufel->msg.size], newdata, newdata_size);
-      bufel->msg.size+=newdata_size;
+      memcpy (&bufel->msg.data[bufel->msg.size], newdata, newdata_size);
+      bufel->msg.size += newdata_size;
     }
   else
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
@@ -282,25 +284,25 @@ _mbuffer_append_data (mbuffer_st *bufel, void* newdata, size_t newdata_size)
  * n: number of segments initially in the buffer
  */
 int
-_mbuffer_linearize (mbuffer_head_st *buf)
+_mbuffer_linearize (mbuffer_head_st * buf)
 {
   mbuffer_st *bufel, *cur;
   gnutls_datum_t msg;
-  size_t pos=0;
+  size_t pos = 0;
 
   if (buf->length <= 1)
     /* Nothing to do */
     return 0;
 
   bufel = _mbuffer_alloc (buf->byte_length, buf->byte_length);
-  if (!bufel) {
-    gnutls_assert ();
-    return GNUTLS_E_MEMORY_ERROR;
-  }
+  if (!bufel)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
 
-  for (cur = _mbuffer_get_first(buf, &msg);
-       msg.data != NULL;
-       cur = _mbuffer_get_next(cur, &msg))
+  for (cur = _mbuffer_get_first (buf, &msg);
+       msg.data != NULL; cur = _mbuffer_get_next (cur, &msg))
     {
       memcpy (&bufel->msg.data[pos], msg.data, cur->msg.size);
       pos += cur->msg.size;

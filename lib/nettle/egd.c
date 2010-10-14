@@ -40,80 +40,86 @@
 static int egd_socket = -1;
 
 static int
-do_write( int fd, void *buf, size_t nbytes )
+do_write (int fd, void *buf, size_t nbytes)
 {
   size_t nleft = nbytes;
   int nwritten;
-  
-  while( nleft > 0 ) 
+
+  while (nleft > 0)
     {
-      nwritten = write( fd, buf, nleft);
-      if( nwritten < 0 )
-        {
-          if( errno == EINTR )
-            continue;
-          return -1;
+      nwritten = write (fd, buf, nleft);
+      if (nwritten < 0)
+	{
+	  if (errno == EINTR)
+	    continue;
+	  return -1;
 	}
       nleft -= nwritten;
-      buf = (char*)buf + nwritten;
+      buf = (char *) buf + nwritten;
     }
   return 0;
 }
 
 static int
-do_read( int fd, void *buf, size_t nbytes )
+do_read (int fd, void *buf, size_t nbytes)
 {
   int n, nread = 0;
 
   do
     {
       do
-        {
-          n = read(fd, (char*)buf + nread, nbytes );
-        } 
-      while( n == -1 && errno == EINTR );
-      if( n == -1)
-        return nread? nread:-1;
-      if( n == 0)
-        return -1;
+	{
+	  n = read (fd, (char *) buf + nread, nbytes);
+	}
+      while (n == -1 && errno == EINTR);
+      if (n == -1)
+	return nread ? nread : -1;
+      if (n == 0)
+	return -1;
       nread += n;
       nbytes -= n;
-    } 
-  while( nread < nbytes );
+    }
+  while (nread < nbytes);
   return nread;
 }
 
-static const char* egd_names[] = { 
-  "/var/run/egd-pool", 
-  "/dev/egd-pool", 
-  "/etc/egd-pool", 
-  "/etc/entropy", 
-  "/var/run/entropy", 
+static const char *egd_names[] = {
+  "/var/run/egd-pool",
+  "/dev/egd-pool",
+  "/etc/egd-pool",
+  "/etc/entropy",
+  "/var/run/entropy",
   "/dev/entropy",
-  NULL 
+  NULL
 };
 
-static const char* find_egd_name(void)
+static const char *
+find_egd_name (void)
 {
-int i = 0;
-struct stat st;
+  int i = 0;
+  struct stat st;
 
-  do {
-    if (stat(egd_names[i], &st) != 0) continue;
-    
-    if (st.st_mode & S_IFSOCK) { /* found */
-      return egd_names[i];
+  do
+    {
+      if (stat (egd_names[i], &st) != 0)
+	continue;
+
+      if (st.st_mode & S_IFSOCK)
+	{			/* found */
+	  return egd_names[i];
+	}
+
     }
-  
-  } while(egd_names[++i] != NULL);
-  
+  while (egd_names[++i] != NULL);
+
   return NULL;
 }
 
 /* Connect to the EGD and return the file descriptor.  Return -1 on
    error.  With NOFAIL set to true, silently fail and return the
    error, otherwise print an error message and die. */
-int _rndegd_connect_socket (void)
+int
+_rndegd_connect_socket (void)
 {
   int fd;
   const char *name;
@@ -126,30 +132,31 @@ int _rndegd_connect_socket (void)
       egd_socket = -1;
     }
 
-  name = find_egd_name();
+  name = find_egd_name ();
 
-  if (strlen(name)+1 >= sizeof addr.sun_path) 
+  if (strlen (name) + 1 >= sizeof addr.sun_path)
     {
       _gnutls_debug_log ("EGD socketname is too long\n");
       return -1;
     }
-  
-  memset( &addr, 0, sizeof addr );
+
+  memset (&addr, 0, sizeof addr);
   addr.sun_family = AF_LOCAL;
-  strcpy( addr.sun_path, name );	  
-  addr_len = (offsetof( struct sockaddr_un, sun_path )
-              + strlen( addr.sun_path ));
-  
-  fd = socket(AF_LOCAL, SOCK_STREAM, 0);
+  strcpy (addr.sun_path, name);
+  addr_len = (offsetof (struct sockaddr_un, sun_path)
+	      + strlen (addr.sun_path));
+
+  fd = socket (AF_LOCAL, SOCK_STREAM, 0);
   if (fd == -1)
     {
-      _gnutls_debug_log("can't create unix domain socket: %s\n", strerror(errno) );
+      _gnutls_debug_log ("can't create unix domain socket: %s\n",
+			 strerror (errno));
       return -1;
     }
-  else if (connect (fd, (struct sockaddr*)&addr, addr_len) == -1)
+  else if (connect (fd, (struct sockaddr *) &addr, addr_len) == -1)
     {
-      _gnutls_debug_log("can't connect to EGD socket `%s': %s\n",
-		  name, strerror(errno) );
+      _gnutls_debug_log ("can't connect to EGD socket `%s': %s\n",
+			 name, strerror (errno));
       close (fd);
       fd = -1;
     }
@@ -167,20 +174,21 @@ int _rndegd_connect_socket (void)
  * Using a level of 0 should never block and better add nothing
  * to the pool.  So this is just a dummy for EGD.
  */
-int _rndegd_read (int * fd, void* _output, size_t _length)
+int
+_rndegd_read (int *fd, void *_output, size_t _length)
 {
   int n;
-  uint8_t buffer[256+2];
+  uint8_t buffer[256 + 2];
   int nbytes;
   int do_restart = 0;
-  unsigned char* output = _output;
+  unsigned char *output = _output;
   size_t length = _length;
 
-  if( !length )
+  if (!length)
     return 0;
 
 
- restart:
+restart:
   if (*fd == -1 || do_restart)
     *fd = _rndegd_connect_socket ();
 
@@ -188,68 +196,68 @@ int _rndegd_read (int * fd, void* _output, size_t _length)
 
   nbytes = length < 255 ? length : 255;
   /* First time we do it with a non blocking request */
-  buffer[0] = 1; /* non blocking */
+  buffer[0] = 1;		/* non blocking */
   buffer[1] = nbytes;
 
-  if( do_write( *fd, buffer, 2 ) == -1 )
-    _gnutls_debug_log("can't write to the EGD: %s\n", strerror(errno) );
+  if (do_write (*fd, buffer, 2) == -1)
+    _gnutls_debug_log ("can't write to the EGD: %s\n", strerror (errno));
 
-  n = do_read( *fd, buffer, 1 );
-  if( n == -1 )
+  n = do_read (*fd, buffer, 1);
+  if (n == -1)
     {
-      _gnutls_debug_log("read error on EGD: %s\n", strerror(errno));
+      _gnutls_debug_log ("read error on EGD: %s\n", strerror (errno));
       do_restart = 1;
       goto restart;
     }
 
   n = buffer[0];
-  if( n )
+  if (n)
     {
-      n = do_read( *fd, buffer, n );
-      if( n == -1 )
-        {
-          _gnutls_debug_log("read error on EGD: %s\n", strerror(errno));
-          do_restart = 1;
-          goto restart;
+      n = do_read (*fd, buffer, n);
+      if (n == -1)
+	{
+	  _gnutls_debug_log ("read error on EGD: %s\n", strerror (errno));
+	  do_restart = 1;
+	  goto restart;
 	}
 
       if (n > length)
-        {
-          _gnutls_debug_log("read error on EGD: returned more bytes!\n");
-          n = length;
-        }
+	{
+	  _gnutls_debug_log ("read error on EGD: returned more bytes!\n");
+	  n = length;
+	}
 
-      memcpy(output, buffer, n);
+      memcpy (output, buffer, n);
       output += n;
       length -= n;
     }
 
-  while( length )
+  while (length)
     {
-      nbytes = length < 255? length : 255;
+      nbytes = length < 255 ? length : 255;
 
-      buffer[0] = 2; /* blocking */
+      buffer[0] = 2;		/* blocking */
       buffer[1] = nbytes;
-      if( do_write( *fd, buffer, 2 ) == -1 )
-        _gnutls_debug_log("can't write to the EGD: %s\n", strerror(errno) );
-      n = do_read( *fd, buffer, nbytes );
-      if( n == -1 )
-        {
-          _gnutls_debug_log("read error on EGD: %s\n", strerror(errno));
-          do_restart = 1;
-          goto restart;
+      if (do_write (*fd, buffer, 2) == -1)
+	_gnutls_debug_log ("can't write to the EGD: %s\n", strerror (errno));
+      n = do_read (*fd, buffer, nbytes);
+      if (n == -1)
+	{
+	  _gnutls_debug_log ("read error on EGD: %s\n", strerror (errno));
+	  do_restart = 1;
+	  goto restart;
 	}
 
       if (n > length)
-        {
-          _gnutls_debug_log("read error on EGD: returned more bytes!\n");
-          n = length;
-        }
-      
-      memcpy(output, buffer, n);
+	{
+	  _gnutls_debug_log ("read error on EGD: returned more bytes!\n");
+	  n = length;
+	}
+
+      memcpy (output, buffer, n);
       output += n;
       length -= n;
     }
 
-  return _length; /* success */
+  return _length;		/* success */
 }
