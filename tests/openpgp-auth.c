@@ -83,12 +83,12 @@ doit ()
   int err;
   int sockets[2];
   const char *srcdir;
-  char *pub_key_path, *priv_key_path;
+  char *pub_key_path, *priv_key_path, *rsa_params_path;
   pid_t child;
 
   gnutls_global_init ();
 
-  srcdir = getenv ("srcdir") ? : ".";
+  srcdir = getenv ("srcdir") ? getenv ("srcdir") : ".";
 
   if (debug)
     {
@@ -109,6 +109,11 @@ doit ()
   strcpy (priv_key_path, srcdir);
   strcat (priv_key_path, "/");
   strcat (priv_key_path, priv_key_file);
+
+  rsa_params_path = alloca (strlen (srcdir) + strlen (rsa_params_file) + 2);
+  strcpy (rsa_params_path, srcdir);
+  strcat (rsa_params_path, "/");
+  strcat (rsa_params_path, rsa_params_file);
 
   child = fork ();
   if (child == -1)
@@ -139,7 +144,7 @@ doit ()
 
       err =
 	gnutls_certificate_set_openpgp_key_file2 (cred,
-						  pub_key_file, priv_key_file,
+						  pub_key_path, priv_key_path,
 						  key_id,
 						  GNUTLS_OPENPGP_FMT_BASE64);
       if (err != 0)
@@ -186,6 +191,7 @@ doit ()
       int status;
       size_t rsa_size;
       gnutls_datum_t rsa_data;
+      const gnutls_datum_t p3 = { (char *) pkcs3, strlen (pkcs3) };
 
       if (debug)
 	printf ("server process %i (child %i)\n", getpid (), child);
@@ -205,7 +211,7 @@ doit ()
 
       err =
 	gnutls_certificate_set_openpgp_key_file2 (cred,
-						  pub_key_file, priv_key_file,
+						  pub_key_path, priv_key_path,
 						  key_id,
 						  GNUTLS_OPENPGP_FMT_BASE64);
       if (err != 0)
@@ -215,14 +221,16 @@ doit ()
       if (err)
 	fail ("server DH params init %d\n", err);
 
-      err = gnutls_dh_params_generate2 (dh_params, 1024);
+      err = gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
       if (err)
 	fail ("server DH params generate %d\n", err);
 
       gnutls_certificate_set_dh_params (cred, dh_params);
 
       rsa_data.data =
-	(unsigned char *) read_binary_file (rsa_params_file, &rsa_size);
+	(unsigned char *) read_binary_file (rsa_params_path, &rsa_size);
+      if (rsa_data.data == NULL)
+	fail ("server rsa params error\n");
       rsa_data.size = rsa_size;
 
       err = gnutls_rsa_params_init (&rsa_params);
