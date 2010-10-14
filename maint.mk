@@ -103,6 +103,12 @@ endif
 # Override this in cfg.mk if you are using a different format in your
 # NEWS file.
 today = $(shell date +%Y-%m-%d)
+
+# Select which lines of NEWS are searched for $(news-check-regexp).
+# This is a sed line number spec.  The default says that we search
+# lines 1..10 of NEWS for $(news-check-regexp).
+# If you want to search only line 3 or only lines 20-22, use "3" or "20,22".
+news-check-lines-spec ?= 1,10
 news-check-regexp ?= '^\*.* $(VERSION_REGEXP) \($(today)\)'
 
 # Prevent programs like 'sort' from considering distinct strings to be equal.
@@ -662,8 +668,9 @@ sc_prohibit_always_true_header_tests:
 	@or=$(gl_header_upper_case_or_);				\
 	re="HAVE_($$or)_H";						\
 	prohibit='\<'"$$re"'\>'						\
-	halt='do not test the above HAVE_<header>_H symbol(s);\n'\
-'  with the corresponding gnulib module, they are always true'		\
+	halt=$$(printf '%s\n'						\
+	'do not test the above HAVE_<header>_H symbol(s);'		\
+	'  with the corresponding gnulib module, they are always true')	\
 	  $(_sc_search_regexp)
 
 # ==================================================================
@@ -874,8 +881,8 @@ sc_makefile_at_at_check:
 	  && { echo '$(ME): use $$(...), not @...@' 1>&2; exit 1; } || :
 
 news-check: NEWS
-	if head $(srcdir)/NEWS | grep -E $(news-check-regexp)		\
-	    >/dev/null; then						\
+	if sed -n $(news-check-lines-spec)p $(srcdir)/NEWS		\
+	    | grep -E $(news-check-regexp) >/dev/null; then		\
 	  :;								\
 	else								\
 	  echo 'NEWS: $$(news-check-regexp) failed to match' 1>&2;	\
@@ -948,7 +955,7 @@ writable-files:
 	  test "$$fail" && exit 1 || : ;				\
 	fi
 
-v_etc_file = lib/version-etc.c
+v_etc_file = $(gnulib_dir)/lib/version-etc.c
 sample-test = tests/sample-test
 texi = doc/$(PACKAGE).texi
 # Make sure that the copyright date in $(v_etc_file) is up to date.
@@ -1006,9 +1013,10 @@ sc_Wundef_boolean:
 sc_vulnerable_makefile_CVE-2009-4029:
 	@prohibit='perm -777 -exec chmod a\+rwx|chmod 777 \$$\(distdir\)' \
 	in_files=$$(find $(srcdir) -name Makefile.in)			\
-	halt='the above files are vulnerable; beware of running\n'\
-'"make dist*" rules, and upgrade to fixed automake\n'\
-'see http://bugzilla.redhat.com/542609 for details'			\
+	halt=$$(printf '%s\n'						\
+	  'the above files are vulnerable; beware of running'		\
+	  '  "make dist*" rules, and upgrade to fixed automake'		\
+	  '  see http://bugzilla.redhat.com/542609 for details')	\
 	  $(_sc_search_regexp)
 
 vc-diff-check:

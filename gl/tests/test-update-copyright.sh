@@ -23,6 +23,9 @@ else
   compare() { cmp "$@"; }
 fi
 
+# Ensure the update-copyright program gets found.
+PATH=$abs_aux_dir:$PATH
+
 TMP_BASE=update-copyright.test
 trap 'rm -f $TMP_BASE*' 0 1 2 3 15
 
@@ -46,6 +49,13 @@ echo a > $TMP-in
       'your system has insufficient support for Perl' 1>&2
     exit 77
   }
+
+# Skip this test if Perl is too old.  FIXME: 5.8.0 is just a guess.
+# We have a report that 5.6.1 is inadequate and that 5.8.0 works.
+perl -e 'require 5.8.0' || {
+  echo '$0: skipping this test; Perl version is too old' 1>&2
+  exit 77
+}
 
 # Do not let a different envvar setting perturb results.
 UPDATE_COPYRIGHT_MAX_LINE_LENGTH=72

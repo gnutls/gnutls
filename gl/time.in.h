@@ -19,6 +19,7 @@
 #if __GNUC__ >= 3
 @PRAGMA_SYSTEM_HEADER@
 #endif
+@PRAGMA_COLUMNS@
 
 /* Don't get in the way of glibc when it includes time.h merely to
    declare a few standard symbols, rather than to declare all the
@@ -48,10 +49,20 @@
 
 /* Some systems don't define struct timespec (e.g., AIX 4.1, Ultrix 4.3).
    Or they define it with the wrong member names or define it in <sys/time.h>
-   (e.g., FreeBSD circa 1997).  */
+   (e.g., FreeBSD circa 1997).  Stock Mingw does not define it, but the
+   pthreads-win32 library defines it in <pthread.h>.  */
 # if ! @TIME_H_DEFINES_STRUCT_TIMESPEC@
 #  if @SYS_TIME_H_DEFINES_STRUCT_TIMESPEC@
 #   include <sys/time.h>
+#  elif @PTHREAD_H_DEFINES_STRUCT_TIMESPEC@
+#   include <pthread.h>
+/* The pthreads-win32 <pthread.h> also defines a couple of broken macros.  */
+#   undef asctime_r
+#   undef ctime_r
+#   undef gmtime_r
+#   undef localtime_r
+#   undef rand_r
+#   undef strtok_r
 #  else
 
 #   ifdef __cplusplus

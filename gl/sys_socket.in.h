@@ -26,6 +26,7 @@
 #if __GNUC__ >= 3
 @PRAGMA_SYSTEM_HEADER@
 #endif
+@PRAGMA_COLUMNS@
 
 #if defined _GL_ALREADY_INCLUDING_SYS_SOCKET_H
 /* Special invocation convention:
@@ -122,8 +123,8 @@ struct sockaddr_storage
    adding AC_DEFINE(WINVER, 0x0501) to configure.ac.  Note that your
    code may not run on older Windows releases then.  My Windows 2000
    box was not able to run the code, for example.  The situation is
-   slightly confusing because:
-   http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winsock/winsock/getaddrinfo_2.asp
+   slightly confusing because
+   <http://msdn.microsoft.com/en-us/library/ms738520>
    suggests that getaddrinfo should be available on all Windows
    releases. */
 

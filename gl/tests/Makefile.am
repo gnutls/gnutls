@@ -96,6 +96,21 @@ EXTRA_DIST += test-arpa_inet.c
 
 ## end   gnulib module arpa_inet-tests
 
+## begin gnulib module binary-io
+
+libtests_a_SOURCES += binary-io.h
+
+## end   gnulib module binary-io
+
+## begin gnulib module binary-io-tests
+
+TESTS += test-binary-io.sh
+check_PROGRAMS += test-binary-io
+
+EXTRA_DIST += test-binary-io.sh test-binary-io.c macros.h
+
+## end   gnulib module binary-io-tests
+
 ## begin gnulib module c++defs
 
 # The BUILT_SOURCES created by this Makefile snippet are not used via #include
@@ -146,6 +161,15 @@ EXTRA_DIST += test-fseeko.c test-fseeko.sh test-fseeko2.sh signature.h macros.h
 
 ## end   gnulib module fseeko-tests
 
+## begin gnulib module ftello-tests
+
+TESTS += test-ftello.sh test-ftello2.sh test-ftello3
+check_PROGRAMS += test-ftello test-ftello3
+MOSTLYCLEANFILES += t-ftello3.tmp
+EXTRA_DIST += test-ftello.c test-ftello.sh test-ftello2.sh test-ftello3.c signature.h macros.h
+
+## end   gnulib module ftello-tests
+
 ## begin gnulib module getaddrinfo-tests
 
 TESTS += test-getaddrinfo
@@ -172,6 +196,15 @@ MOSTLYCLEANFILES += test-getline.txt
 EXTRA_DIST += test-getline.c signature.h macros.h
 
 ## end   gnulib module getline-tests
+
+## begin gnulib module getpagesize
+
+
+EXTRA_DIST += getpagesize.c
+
+EXTRA_libtests_a_SOURCES += getpagesize.c
+
+## end   gnulib module getpagesize
 
 ## begin gnulib module gettimeofday-tests
 
@@ -323,7 +356,7 @@ EXTRA_DIST += test-stdio.c
 
 TESTS += test-stdlib
 check_PROGRAMS += test-stdlib
-EXTRA_DIST += test-stdlib.c
+EXTRA_DIST += test-stdlib.c test-sys_wait.h
 
 ## end   gnulib module stdlib-tests
 
@@ -356,6 +389,7 @@ sys/ioctl.h: sys_ioctl.in.h $(CXXDEFS_H) $(WARN_ON_USE_H)
 	  sed -e 's|@''HAVE_SYS_IOCTL_H''@|$(HAVE_SYS_IOCTL_H)|g' \
 	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
 	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
+	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
 	      -e 's|@''NEXT_SYS_IOCTL_H''@|$(NEXT_SYS_IOCTL_H)|g' \
 	      -e 's|@''GNULIB_IOCTL''@|$(GNULIB_IOCTL)|g' \
 	      -e 's|@''SYS_IOCTL_H_HAVE_WINSOCK2_H''@|$(SYS_IOCTL_H_HAVE_WINSOCK2_H)|g' \
@@ -432,7 +466,7 @@ EXTRA_DIST += test-unistd.c
 ## begin gnulib module update-copyright-tests
 
 TESTS += test-update-copyright.sh
-TESTS_ENVIRONMENT += PATH='$(abs_aux_dir)'$(PATH_SEPARATOR)"$$PATH"
+TESTS_ENVIRONMENT += abs_aux_dir='$(abs_aux_dir)'
 EXTRA_DIST += test-update-copyright.sh
 
 ## end   gnulib module update-copyright-tests
@@ -450,7 +484,7 @@ EXTRA_DIST += test-vasnprintf.c macros.h
 
 TESTS += test-vc-list-files-git.sh
 TESTS += test-vc-list-files-cvs.sh
-TESTS_ENVIRONMENT += PATH='$(abs_aux_dir)'$(PATH_SEPARATOR)"$$PATH"
+TESTS_ENVIRONMENT += abs_aux_dir='$(abs_aux_dir)'
 EXTRA_DIST += test-vc-list-files-git.sh test-vc-list-files-cvs.sh init.sh
 
 ## end   gnulib module vc-list-files-tests

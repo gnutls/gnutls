@@ -57,66 +57,7 @@
 #   4. Finally
 #   $ exit
 
-# We require $(...) support unconditionally.
-# We require a few additional shell features only when $EXEEXT is nonempty,
-# in order to support automatic $EXEEXT emulation:
-# - hyphen-containing alias names
-# - we prefer to use ${var#...} substitution, rather than having
-#   to work around lack of support for that feature.
-# The following code attempts to find a shell with support for these features.
-# If the current shell passes the test, we're done.  Otherwise, test other
-# shells until we find one that passes.  If one is found, re-exec it.
-# If no acceptable shell is found, skip the current test.
-#
-# Use "9" to indicate success (rather than 0), in case some shell acts
-# like Solaris 10's /bin/sh but exits successfully instead of with status 2.
-
-gl_shell_test_script_='
-test $(echo y) = y || exit 1
-test -z "$EXEEXT" && exit 9
-shopt -s expand_aliases
-alias a-b="echo zoo"
-v=abx
-     test ${v%x} = ab \
-  && test ${v#a} = bx \
-  && test $(a-b) = zoo \
-  && exit 9
-'
-
-if test "x$1" = "x--no-reexec"; then
-  shift
-else
-  # 'eval'ing the above code makes Solaris 10's /bin/sh exit with $? set to 2.
-  # It does not evaluate any of the code after the "unexpected" `('.  Thus,
-  # we must run it in a subshell.
-  ( eval "$gl_shell_test_script_" ) > /dev/null 2>&1
-  if test $? = 9; then
-    : # The current shell is adequate.  No re-exec required.
-  else
-    # Search for a shell that meets our requirements.
-    for re_shell_ in "${CONFIG_SHELL:-no_shell}" /bin/sh bash dash zsh pdksh fail
-    do
-      test "$re_shell_" = no_shell && continue
-      test "$re_shell_" = fail && skip_ failed to find an adequate shell
-      "$re_shell_" -c "$gl_shell_test_script_" 2>/dev/null
-      if test $? = 9; then
-        # Found an acceptable shell.
-        exec "$re_shell_" "$0" --no-reexec "$@"
-        echo "$ME_: exec failed" 1>&2
-        exit 127
-      fi
-    done
-  fi
-fi
-
-test -n "$EXEEXT" && shopt -s expand_aliases
-
-# Enable glibc's malloc-perturbing option.
-# This is cheap and useful for exposing code that depends on the fact that
-# malloc-related functions often return memory that is mostly zeroed.
-# If you have the time and cycles, use valgrind to do an even better job.
-: ${MALLOC_PERTURB_=87}
-export MALLOC_PERTURB_
+ME_=`expr "./$0" : '.*/\(.*\)$'`
 
 # We use a trap below for cleanup.  This requires us to go through
 # hoops to get the right exit status transported through the handler.
@@ -136,7 +77,127 @@ Exit () { set +e; (exit $1); exit $1; }
 warn_() { echo "$@" 1>&$stderr_fileno_; }
 fail_() { warn_ "$ME_: failed test: $@"; Exit 1; }
 skip_() { warn_ "$ME_: skipped test: $@"; Exit 77; }
-framework_failure_() { warn_ "$ME_: set-up failure: $@"; Exit 1; }
+framework_failure_() { warn_ "$ME_: set-up failure: $@"; Exit 99; }
+
+# Sanitize this shell to POSIX mode, if possible.
+DUALCASE=1; export DUALCASE
+if test -n "${ZSH_VERSION+set}" && (emulate sh) >/dev/null 2>&1; then
+  emulate sh
+  NULLCMD=:
+  alias -g '${1+"$@"}'='"$@"'
+  setopt NO_GLOB_SUBST
+else
+  case `(set -o) 2>/dev/null` in
+    *posix*) set -o posix ;;
+  esac
+fi
+
+# We require $(...) support unconditionally.
+# We require a few additional shell features only when $EXEEXT is nonempty,
+# in order to support automatic $EXEEXT emulation:
+# - hyphen-containing alias names
+# - we prefer to use ${var#...} substitution, rather than having
+#   to work around lack of support for that feature.
+# The following code attempts to find a shell with support for these features.
+# If the current shell passes the test, we're done.  Otherwise, test other
+# shells until we find one that passes.  If one is found, re-exec it.
+# If no acceptable shell is found, skip the current test.
+#
+# The "...set -x; P=1 true 2>err..." test is to disqualify any shell that
+# emits "P=1" into err, as /bin/sh from SunOS 5.11 and OpenBSD 4.7 do.
+#
+# Use "9" to indicate success (rather than 0), in case some shell acts
+# like Solaris 10's /bin/sh but exits successfully instead of with status 2.
+
+# Eval this code in a subshell to determine a shell's suitability.
+# 10 - passes all tests; ok to use
+#  9 - ok, but enabling "set -x" corrupts application stderr; prefer higher score
+#  ? - not ok
+gl_shell_test_script_='
+test $(echo y) = y || exit 1
+score_=10
+if test "$VERBOSE" = yes; then
+  test -n "$( (exec 3>&1; set -x; P=1 true 2>&3) 2> /dev/null)" && score_=9
+fi
+test -z "$EXEEXT" && exit $score_
+shopt -s expand_aliases
+alias a-b="echo zoo"
+v=abx
+     test ${v%x} = ab \
+  && test ${v#a} = bx \
+  && test $(a-b) = zoo \
+  && exit $score_
+'
+
+if test "x$1" = "x--no-reexec"; then
+  shift
+else
+  # Assume a working shell.  Export to subshells (setup_ needs this).
+  gl_set_x_corrupts_stderr_=false
+  export gl_set_x_corrupts_stderr_
+
+  # Record the first marginally acceptable shell.
+  marginal_=
+
+  # Search for a shell that meets our requirements.
+  for re_shell_ in __current__ "${CONFIG_SHELL:-no_shell}" \
+      /bin/sh bash dash zsh pdksh fail
+  do
+    test "$re_shell_" = no_shell && continue
+
+    # If we've made it all the way to the sentinel, "fail" without
+    # finding even a marginal shell, skip this test.
+    if test "$re_shell_" = fail; then
+      test -z "$marginal_" && skip_ failed to find an adequate shell
+      re_shell_=$marginal_
+      break
+    fi
+
+    # When testing the current shell, simply "eval" the test code.
+    # Otherwise, run it via $re_shell_ -c ...
+    if test "$re_shell_" = __current__; then
+      # 'eval'ing this code makes Solaris 10's /bin/sh exit with
+      # $? set to 2.  It does not evaluate any of the code after the
+      # "unexpected" first `('.  Thus, we must run it in a subshell.
+      ( eval "$gl_shell_test_script_" ) > /dev/null 2>&1
+    else
+      "$re_shell_" -c "$gl_shell_test_script_" 2>/dev/null
+    fi
+
+    st_=$?
+
+    # $re_shell_ works just fine.  Use it.
+    test $st_ = 10 && break
+
+    # If this is our first marginally acceptable shell, remember it.
+    if test "$st_:$marginal_" = 9: ; then
+      marginal_="$re_shell_"
+      gl_set_x_corrupts_stderr_=true
+    fi
+  done
+
+  if test "$re_shell_" != __current__; then
+    # Found a usable shell.  Preserve -v and -x.
+    case $- in
+      *v*x* | *x*v*) opts_=-vx ;;
+      *v*) opts_=-v ;;
+      *x*) opts_=-x ;;
+      *) opts_= ;;
+    esac
+    exec "$re_shell_" $opts_ "$0" --no-reexec "$@"
+    echo "$ME_: exec failed" 1>&2
+    exit 127
+  fi
+fi
+
+test -n "$EXEEXT" && shopt -s expand_aliases
+
+# Enable glibc's malloc-perturbing option.
+# This is cheap and useful for exposing code that depends on the fact that
+# malloc-related functions often return memory that is mostly zeroed.
+# If you have the time and cycles, use valgrind to do an even better job.
+: ${MALLOC_PERTURB_=87}
+export MALLOC_PERTURB_
 
 # This is a stub function that is run upon trap (upon regular exit and
 # interrupt).  Override it with a per-test function, e.g., to unmount
@@ -179,6 +240,11 @@ find_exe_basenames_()
   feb_result_=
   feb_sp_=
   for feb_file_ in $feb_dir_/*.exe; do
+    # If there was no *.exe file, or there existed a file named "*.exe" that
+    # was deleted between the above glob expansion and the existence test
+    # below, just skip it.
+    test "x$feb_file_" = "x$feb_dir_/*.exe" && test ! -f "$feb_file_" \
+      && continue
     case $feb_file_ in
       *[!-a-zA-Z/0-9_.+]*) feb_fail_=1; break;;
       *) # Remove leading file name components as well as the .exe suffix.
@@ -196,7 +262,7 @@ find_exe_basenames_()
 # For each file name of the form PROG.exe, create an alias named
 # PROG that simply invokes PROG.exe, then return 0.  If any selected
 # file name or the directory name, $1, contains an unexpected character,
-# define no function and return 1.
+# define no alias and return 1.
 create_exe_shims_()
 {
   case $EXEEXT in
@@ -244,19 +310,29 @@ path_prepend_()
 
 setup_()
 {
-  test "$VERBOSE" = yes && set -x
+  if test "$VERBOSE" = yes; then
+    # Test whether set -x may cause the selected shell to corrupt an
+    # application's stderr.  Many do, including zsh-4.3.10 and the /bin/sh
+    # from SunOS 5.11, OpenBSD 4.7 and Irix 5.x and 6.5.
+    # If enabling verbose output this way would cause trouble, simply
+    # issue a warning and refrain.
+    if $gl_set_x_corrupts_stderr_; then
+      warn_ "using SHELL=$SHELL with 'set -x' corrupts stderr"
+    else
+      set -x
+    fi
+  fi
 
   initial_cwd_=$PWD
-  ME_=`expr "./$0" : '.*/\(.*\)$'`
 
   pfx_=`testdir_prefix_`
   test_dir_=`mktempd_ "$initial_cwd_" "$pfx_-$ME_.XXXX"` \
     || fail_ "failed to create temporary directory in $initial_cwd_"
   cd "$test_dir_"
 
-  # These trap statements ensure that the temporary directory, $test_dir_,
-  # is removed upon exit as well as upon receipt of any of the listed signals.
-  trap remove_tmp_ 0
+  # This trap statement, along with a trap on 0 below, ensure that the
+  # temporary directory, $test_dir_, is removed upon exit as well as
+  # upon receipt of any of the listed signals.
   for sig_ in 1 2 3 13 15; do
     eval "trap 'Exit $(expr $sig_ + 128)' $sig_"
   done
@@ -384,3 +460,6 @@ test -f "$srcdir/init.cfg" \
   && . "$srcdir/init.cfg"
 
 setup_ "$@"
+# This trap is here, rather than in the setup_ function, because some
+# shells run the exit trap at shell function exit, rather than script exit.
+trap remove_tmp_ 0

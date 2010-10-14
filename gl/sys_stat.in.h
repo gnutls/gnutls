@@ -24,6 +24,7 @@
 #if __GNUC__ >= 3
 @PRAGMA_SYSTEM_HEADER@
 #endif
+@PRAGMA_COLUMNS@
 
 #if defined __need_system_sys_stat_h
 /* Special invocation convention.  */
@@ -594,7 +595,8 @@ _GL_WARN_ON_USE (mknodat, "mknodat is not portable - "
 #  else /* !_LARGE_FILES */
 #   define stat(name, st) rpl_stat (name, st)
 #  endif /* !_LARGE_FILES */
-_GL_EXTERN_C int stat (const char *name, struct stat *buf) _GL_ARG_NONNULL ((1, 2));
+_GL_EXTERN_C int stat (const char *name, struct stat *buf)
+                      _GL_ARG_NONNULL ((1, 2));
 # endif
 #elif defined GNULIB_POSIXCHECK
 # undef stat

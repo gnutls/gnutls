@@ -12,7 +12,8 @@
 # This file represents the compiled summary of the specification in
 # gnulib-cache.m4. It lists the computed macro invocations that need
 # to be invoked from configure.ac.
-# In projects using CVS, this file can be treated like other built files.
+# In projects that use version control, this file can be treated like
+# other built files.
 
 
 # This macro should be invoked from ./configure.ac, in the section
@@ -29,6 +30,8 @@ AC_DEFUN([lgl_EARLY],
   # Code from module alloca-opt:
   # Code from module alloca-opt-tests:
   # Code from module arg-nonnull:
+  # Code from module binary-io:
+  # Code from module binary-io-tests:
   # Code from module byteswap:
   # Code from module byteswap-tests:
   # Code from module c++defs:
@@ -43,8 +46,12 @@ AC_DEFUN([lgl_EARLY],
   # Code from module fseeko:
   AC_REQUIRE([AC_FUNC_FSEEKO])
   # Code from module fseeko-tests:
+  # Code from module ftello:
+  AC_REQUIRE([AC_FUNC_FSEEKO])
+  # Code from module ftello-tests:
   # Code from module func:
   # Code from module func-tests:
+  # Code from module getpagesize:
   # Code from module gettext:
   # Code from module gettext-h:
   # Code from module havelib:
@@ -53,6 +60,7 @@ AC_DEFUN([lgl_EARLY],
   # Code from module lib-msvc-compat:
   # Code from module lib-symbol-versions:
   # Code from module lseek:
+  # Code from module malloc-posix:
   # Code from module memchr:
   # Code from module memchr-tests:
   # Code from module memmem-simple:
@@ -66,6 +74,7 @@ AC_DEFUN([lgl_EARLY],
   # Code from module size_max:
   # Code from module snprintf:
   # Code from module snprintf-tests:
+  # Code from module socketlib:
   # Code from module sockets:
   # Code from module sockets-tests:
   # Code from module socklen:
@@ -140,11 +149,14 @@ AC_DEFUN([lgl_INIT],
   # Code from module fseeko:
   gl_FUNC_FSEEKO
   gl_STDIO_MODULE_INDICATOR([fseeko])
+  # Code from module ftello:
+  gl_FUNC_FTELLO
+  gl_STDIO_MODULE_INDICATOR([ftello])
   # Code from module func:
   gl_FUNC
   # Code from module gettext:
   dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
-  AM_GNU_GETTEXT_VERSION([0.18])
+  AM_GNU_GETTEXT_VERSION([0.18.1])
   # Code from module gettext-h:
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
@@ -157,6 +169,9 @@ AC_DEFUN([lgl_INIT],
   # Code from module lseek:
   gl_FUNC_LSEEK
   gl_UNISTD_MODULE_INDICATOR([lseek])
+  # Code from module malloc-posix:
+  gl_FUNC_MALLOC_POSIX
+  gl_STDLIB_MODULE_INDICATOR([malloc-posix])
   # Code from module memchr:
   gl_FUNC_MEMCHR
   gl_STRING_MODULE_INDICATOR([memchr])
@@ -179,6 +194,8 @@ AC_DEFUN([lgl_INIT],
   # Code from module snprintf:
   gl_FUNC_SNPRINTF
   gl_STDIO_MODULE_INDICATOR([snprintf])
+  # Code from module socketlib:
+  gl_SOCKETLIB
   # Code from module sockets:
   gl_SOCKETS
   # Code from module socklen:
@@ -278,6 +295,13 @@ changequote([, ])dnl
   gl_module_indicator_condition=$lgltests_WITNESS
   m4_pushdef([gl_MODULE_INDICATOR_CONDITION], [$gl_module_indicator_condition])
   gl_FUNC_UNGETC_WORKS
+  gl_FUNC_UNGETC_WORKS
+  gl_FUNC_GETPAGESIZE
+  gl_UNISTD_MODULE_INDICATOR([getpagesize])
+  dnl Check for prerequisites for memory fence checks.
+  gl_FUNC_MMAP_ANON
+  AC_CHECK_HEADERS_ONCE([sys/mman.h])
+  AC_CHECK_FUNCS_ONCE([mprotect])
   gt_TYPE_WCHAR_T
   gt_TYPE_WINT_T
   AC_CHECK_FUNCS_ONCE([shutdown])
@@ -390,8 +414,10 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/float+.h
   lib/float.in.h
   lib/fseeko.c
+  lib/ftello.c
   lib/gettext.h
   lib/lseek.c
+  lib/malloc.c
   lib/memchr.c
   lib/memchr.valgrind
   lib/memmem.c
@@ -443,7 +469,9 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/fcntl-o.m4
   m4/float_h.m4
   m4/fseeko.m4
+  m4/ftello.m4
   m4/func.m4
+  m4/getpagesize.m4
   m4/gettext.m4
   m4/glibc2.m4
   m4/glibc21.m4
@@ -483,6 +511,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/realloc.m4
   m4/size_max.m4
   m4/snprintf.m4
+  m4/socketlib.m4
   m4/sockets.m4
   m4/socklen.m4
   m4/sockpfaf.m4
@@ -517,12 +546,18 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/macros.h
   tests/signature.h
   tests/test-alloca-opt.c
+  tests/test-binary-io.c
+  tests/test-binary-io.sh
   tests/test-byteswap.c
   tests/test-c-ctype.c
   tests/test-errno.c
   tests/test-fseeko.c
   tests/test-fseeko.sh
   tests/test-fseeko2.sh
+  tests/test-ftello.c
+  tests/test-ftello.sh
+  tests/test-ftello2.sh
+  tests/test-ftello3.c
   tests/test-func.c
   tests/test-memchr.c
   tests/test-netdb.c
@@ -539,6 +574,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-strverscmp.c
   tests/test-sys_socket.c
   tests/test-sys_stat.c
+  tests/test-sys_wait.h
   tests/test-time.c
   tests/test-unistd.c
   tests/test-vasnprintf.c
@@ -548,7 +584,9 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-vsnprintf.c
   tests/test-wchar.c
   tests/zerosize-ptr.h
+  tests=lib/binary-io.h
   tests=lib/dummy.c
+  tests=lib/getpagesize.c
   tests=lib/intprops.h
   tests=lib/verify.h
 ])

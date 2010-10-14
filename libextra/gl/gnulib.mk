@@ -21,6 +21,7 @@ libxgnu_la_LIBADD = $(xgl_LTLIBOBJS)
 libxgnu_la_DEPENDENCIES = $(xgl_LTLIBOBJS)
 EXTRA_libxgnu_la_SOURCES =
 libxgnu_la_LDFLAGS = $(AM_LDFLAGS)
+libxgnu_la_LDFLAGS += -no-undefined
 
 ## begin gnulib module crypto/hmac-md5
 

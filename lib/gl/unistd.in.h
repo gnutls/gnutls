@@ -18,6 +18,7 @@
 #if __GNUC__ >= 3
 @PRAGMA_SYSTEM_HEADER@
 #endif
+@PRAGMA_COLUMNS@
 
 /* Special invocation convention:
    - On mingw, several headers, including <winsock2.h>, include <unistd.h>,
@@ -1097,7 +1098,7 @@ _GL_CXXALIASWARN (readlinkat);
 # undef readlinkat
 # if HAVE_RAW_DECL_READLINKAT
 _GL_WARN_ON_USE (readlinkat, "readlinkat is not portable - "
-                 "use gnulib module symlinkat for portability");
+                 "use gnulib module readlinkat for portability");
 # endif
 #endif
 

@@ -79,6 +79,21 @@ EXTRA_DIST += $(top_srcdir)/build-aux/arg-nonnull.h
 
 ## end   gnulib module arg-nonnull
 
+## begin gnulib module binary-io
+
+libtests_a_SOURCES += binary-io.h
+
+## end   gnulib module binary-io
+
+## begin gnulib module binary-io-tests
+
+TESTS += test-binary-io.sh
+check_PROGRAMS += test-binary-io
+
+EXTRA_DIST += test-binary-io.sh test-binary-io.c macros.h
+
+## end   gnulib module binary-io-tests
+
 ## begin gnulib module byteswap-tests
 
 TESTS += test-byteswap
@@ -137,6 +152,15 @@ EXTRA_DIST += test-fseeko.c test-fseeko.sh test-fseeko2.sh signature.h macros.h
 
 ## end   gnulib module fseeko-tests
 
+## begin gnulib module ftello-tests
+
+TESTS += test-ftello.sh test-ftello2.sh test-ftello3
+check_PROGRAMS += test-ftello test-ftello3
+MOSTLYCLEANFILES += t-ftello3.tmp
+EXTRA_DIST += test-ftello.c test-ftello.sh test-ftello2.sh test-ftello3.c signature.h macros.h
+
+## end   gnulib module ftello-tests
+
 ## begin gnulib module func-tests
 
 TESTS += test-func
@@ -144,6 +168,15 @@ check_PROGRAMS += test-func
 EXTRA_DIST += test-func.c macros.h
 
 ## end   gnulib module func-tests
+
+## begin gnulib module getpagesize
+
+
+EXTRA_DIST += getpagesize.c
+
+EXTRA_libtests_a_SOURCES += getpagesize.c
+
+## end   gnulib module getpagesize
 
 ## begin gnulib module intprops
 
@@ -230,7 +263,7 @@ EXTRA_DIST += test-stdio.c
 
 TESTS += test-stdlib
 check_PROGRAMS += test-stdlib
-EXTRA_DIST += test-stdlib.c
+EXTRA_DIST += test-stdlib.c test-sys_wait.h
 
 ## end   gnulib module stdlib-tests
 

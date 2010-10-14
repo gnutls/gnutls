@@ -22,22 +22,33 @@
 
 #include "verify.h"
 
-int exitcode;
+/* Check that EXIT_SUCCESS is 0, per POSIX.  */
+static int exitcode = EXIT_SUCCESS;
+#if EXIT_SUCCESS
+"oops"
+#endif
+
+/* Check for GNU value (not guaranteed by POSIX, but is guaranteed by
+   gnulib).  */
+#if EXIT_FAILURE != 1
+"oops"
+#endif
 
 /* Check that NULL can be passed through varargs as a pointer type,
    per POSIX 2008.  */
 verify (sizeof NULL == sizeof (void *));
 
+#if GNULIB_TEST_SYSTEM_POSIX
+# include "test-sys_wait.h"
+#else
+# define test_sys_wait_macros() 0
+#endif
+
 int
 main (void)
 {
-  /* Check that some macros are defined and different integer constants.  */
-  switch (exitcode)
-    {
-    case EXIT_SUCCESS:
-    case EXIT_FAILURE:
-      break;
-    }
+  if (test_sys_wait_macros ())
+    return 1;
 
-  return 0;
+  return exitcode;
 }

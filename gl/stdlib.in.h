@@ -18,6 +18,7 @@
 #if __GNUC__ >= 3
 @PRAGMA_SYSTEM_HEADER@
 #endif
+@PRAGMA_COLUMNS@
 
 #if defined __need_malloc_and_calloc
 /* Special invocation convention inside glibc header files.  */
@@ -37,6 +38,11 @@
 
 /* NetBSD 5.0 mis-defines NULL.  */
 #include <stddef.h>
+
+/* MirBSD 10 defines WEXITSTATUS in <sys/wait.h>, not in <stdlib.h>.  */
+#if @GNULIB_SYSTEM_POSIX@ && !defined WEXITSTATUS
+# include <sys/wait.h>
+#endif
 
 /* Solaris declares getloadavg() in <sys/loadavg.h>.  */
 #if (@GNULIB_GETLOADAVG@ || defined GNULIB_POSIXCHECK) && @HAVE_SYS_LOADAVG_H@
@@ -74,6 +80,12 @@ struct random_data
 # include <unistd.h>
 #endif
 
+#ifndef __attribute__
+# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8)
+#  define __attribute__(Spec)   /* empty */
+# endif
+#endif
+
 /* The definitions of _GL_FUNCDECL_RPL etc. are copied here.  */
 
 /* The definition of _GL_ARG_NONNULL is copied here.  */
@@ -95,6 +107,23 @@ struct random_data
 #endif
 
 
+#if @GNULIB__EXIT@
+/* Terminate the current process with the given return code, without running
+   the 'atexit' handlers.  */
+# if !@HAVE__EXIT@
+_GL_FUNCDECL_SYS (_Exit, void, (int status) __attribute__ ((__noreturn__)));
+# endif
+_GL_CXXALIAS_SYS (_Exit, void, (int status));
+_GL_CXXALIASWARN (_Exit);
+#elif defined GNULIB_POSIXCHECK
+# undef _Exit
+# if HAVE_RAW_DECL__EXIT
+_GL_WARN_ON_USE (_Exit, "_Exit is unportable - "
+                 "use gnulib module _Exit for portability");
+# endif
+#endif
+
+
 #if @GNULIB_ATOLL@
 /* Parse a signed decimal integer.
    Returns the value of the integer.  Errors are not detected.  */
@@ -112,7 +141,7 @@ _GL_WARN_ON_USE (atoll, "atoll is unportable - "
 #endif
 
 #if @GNULIB_CALLOC_POSIX@
-# if !@HAVE_CALLOC_POSIX@
+# if @REPLACE_CALLOC@
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
 #   undef calloc
 #   define calloc rpl_calloc
@@ -149,7 +178,8 @@ _GL_CXXALIASWARN (canonicalize_file_name);
 #elif defined GNULIB_POSIXCHECK
 # undef canonicalize_file_name
 # if HAVE_RAW_DECL_CANONICALIZE_FILE_NAME
-_GL_WARN_ON_USE (canonicalize_file_name, "canonicalize_file_name is unportable - "
+_GL_WARN_ON_USE (canonicalize_file_name,
+                 "canonicalize_file_name is unportable - "
                  "use gnulib module canonicalize-lgpl for portability");
 # endif
 #endif
@@ -218,7 +248,7 @@ _GL_WARN_ON_USE (ptsname, "grantpt is not portable - "
 #endif
 
 #if @GNULIB_MALLOC_POSIX@
-# if !@HAVE_MALLOC_POSIX@
+# if @REPLACE_MALLOC@
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
 #   undef malloc
 #   define malloc rpl_malloc
@@ -477,7 +507,7 @@ _GL_WARN_ON_USE (setstate_r, "setstate_r is unportable - "
 
 
 #if @GNULIB_REALLOC_POSIX@
-# if !@HAVE_REALLOC_POSIX@
+# if @REPLACE_REALLOC@
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
 #   undef realloc
 #   define realloc rpl_realloc
@@ -652,7 +682,7 @@ _GL_CXXALIASWARN (unlockpt);
 #elif defined GNULIB_POSIXCHECK
 # undef unlockpt
 # if HAVE_RAW_DECL_UNLOCKPT
-_GL_WARN_ON_USE (ptsname, "unlockpt is not portable - "
+_GL_WARN_ON_USE (unlockpt, "unlockpt is not portable - "
                  "use gnulib module unlockpt for portability");
 # endif
 #endif
