@@ -1347,3 +1347,26 @@ gnutls_session_enable_compatibility_mode (gnutls_session_t session)
 {
   gnutls_record_disable_padding (session);
 }
+
+/**
+ * gnutls_session_channel_binding:
+ * @session: is a #gnutls_session_t structure.
+ * @cbtype: an #gnutls_channel_binding_t enumeration type
+ * @cb: output buffer array with data
+ *
+ * Extract given channel binding data of the @cbtype type.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success,
+ * %GNUTLS_E_UNIMPLEMENTED_FEATURE if the @cbtype is unsupported,
+ * %GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE if the data is not
+ * currently available, or an error code.
+ *
+ * Since: 2.12.0
+ **/
+int
+gnutls_session_channel_binding (gnutls_session_t session,
+				gnutls_channel_binding_t cbtype,
+				gnutls_datum_t *cb)
+{
+  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+}

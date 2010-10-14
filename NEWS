@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 2.11.4 (unreleased)
 
+** libgnutls: Add new API gnutls_session_channel_binding.
+The function is used to get the channel binding data.  Currently only
+the "tls-unique" (RFC 5929) channel binding type is supported, through
+the GNUTLS_CB_TLS_UNIQUE type.
+
 ** doc: Added pkcs11.h header file to GTK-DOC manual.
 
 ** build: Update gnulib files.
@@ -14,7 +19,10 @@ See the end for copying conditions.
 ** tests: Add self tests gendh.c.  Speed up Guile self checks.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_session_channel_binding: New function.
+gnutls_channel_binding_t: New enumeration.
+GNUTLS_CB_TLS_UNIQUE: New gnutls_channel_binding_t enum member.
+GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE: New error code.
 
 * Version 2.11.3 (released 2010-10-14)
 

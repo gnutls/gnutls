@@ -625,6 +625,16 @@ extern "C"
     GNUTLS_SEC_PARAM_ULTRA
   } gnutls_sec_param_t;
 
+  /**
+   * gnutls_channel_binding_t:
+   * @GNUTLS_CB_TLS_UNIQUE: "tls-unique" (RFC 5929) channel binding
+   *
+   * Enumeration of support channel binding types.
+   */
+  typedef enum
+    {
+      GNUTLS_CB_TLS_UNIQUE
+    } gnutls_channel_binding_t;
 
 /* If you want to change this, then also change the define in
  * gnutls_int.h, and recompile.
@@ -936,6 +946,10 @@ extern "C"
   void
     gnutls_session_set_finished_function (gnutls_session_t session,
 					  gnutls_finished_callback_func func);
+
+  int gnutls_session_channel_binding (gnutls_session_t session,
+				      gnutls_channel_binding_t cbtype,
+				      gnutls_datum_t *cb);
 
 /* checks if this session is a resumed one 
  */
@@ -1758,6 +1772,8 @@ extern "C"
 
 #define GNUTLS_E_CRYPTODEV_IOCTL_ERROR -211
 #define GNUTLS_E_CRYPTODEV_DEVICE_ERROR -212
+
+#define GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE -213
 
 /* PKCS11 related */
 #define GNUTLS_E_PKCS11_ERROR -300
