@@ -11,6 +11,7 @@
 * Miscellaneous examples::
 * Compatibility with the OpenSSL library::
 * Keying Material Exporters::
+* Channel Bindings::
 @end menu
 
 @node Preparation
@@ -450,3 +451,45 @@ rc = gnutls_prf (session, strlen (MYLABEL), MYLABEL, 0,
 
 If you don't want to mix in the client/server random, there is a more
 low-level TLS PRF interface called @ref{gnutls_prf_raw}.
+
+@node Channel Bindings
+@section Channel Bindings
+@cindex Channel Bindings
+
+In user authentication protocols (e.g., EAP or SASL mechanisms) it is
+useful to have a unique string that identifies the secure channel that
+is used, to bind together the user authentication with the secure
+channel.  This can protect against man-in-the-middle attacks in some
+situations.  The unique strings is a ``channel bindings''.  For
+background and more discussion see @xcite{RFC5056}.
+
+You can extract a channel bindings using the
+@ref{gnutls_session_channel_binding} function.  Currently only the
+@code{GNUTLS_CB_TLS_UNIQUE} type is supported, which corresponds to
+the @code{tls-unique} channel bindings for TLS defined in
+@xcite{RFC5929}.
+
+The following example describes how to print the channel binding data.
+Note that it must be run after a successful TLS handshake.
+
+@smallexample
+@{
+  gnutls_datum cb;
+  int rc;
+
+  rc = gnutls_session_channel_binding (session,
+                                       GNUTLS_CB_TLS_UNIQUE,
+                                       &cb);
+  if (rc)
+    fprintf (stderr, "Channel binding error: %s\n",
+             gnutls_strerror (rc));
+  else
+    @{
+      size_t i;
+      printf ("- Channel binding 'tls-unique': ");
+      for (i = 0; i < cb.size; i++)
+        printf ("%02x", cb.data[i]);
+      printf ("\n");
+    @}
+@}
+@end smallexample

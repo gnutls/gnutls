@@ -8,7 +8,8 @@ See the end for copying conditions.
 ** libgnutls: Add new API gnutls_session_channel_binding.
 The function is used to get the channel binding data.  Currently only
 the "tls-unique" (RFC 5929) channel binding type is supported, through
-the GNUTLS_CB_TLS_UNIQUE type.
+the GNUTLS_CB_TLS_UNIQUE type.  See new section "Channel Bindings" in
+the manual.
 
 ** doc: Added pkcs11.h header file to GTK-DOC manual.
 

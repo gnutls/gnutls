@@ -149,4 +149,12 @@ European Network of Excellence in Cryptology II, "ECRYPT II Yearly
 Report on Algorithms and Keysizes (2009-2010)", Available
 at @url{http://www.ecrypt.eu.org/documents/D.SPA.13.pdf}.
 
+@item @anchor{RFC5056}[RFC5056]
+N. Williams, "On the Use of Channel Bindings to Secure Channels",
+November 2007, available from @url{http://www.ietf.org/rfc/rfc5056}.
+
+@item @anchor{RFC5929}[RFC5929]
+J. Altman, N. Williams, L. Zhu, "Channel Bindings for TLS", July 2010,
+available from @url{http://www.ietf.org/rfc/rfc5929}.
+
 @end table
