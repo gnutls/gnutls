@@ -11,6 +11,8 @@ the "tls-unique" (RFC 5929) channel binding type is supported, through
 the GNUTLS_CB_TLS_UNIQUE type.  See new section "Channel Bindings" in
 the manual.
 
+** gnutls-cli, gnutls-serv: Print 'tls-unique' Channel Bindings.
+
 ** doc: Added pkcs11.h header file to GTK-DOC manual.
 
 ** build: Update gnulib files.
