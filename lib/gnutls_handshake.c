@@ -710,6 +710,18 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 	  return ret;
 	}
 
+      if ((session->internals.resumed == RESUME_FALSE
+	   && session->security_parameters.entity == GNUTLS_CLIENT)
+	  || (session->internals.resumed == RESUME_TRUE
+	      && session->security_parameters.entity == GNUTLS_SERVER))
+	{
+	  /* if we are a client not resuming - or we are a server resuming */
+	  _gnutls_handshake_log ("HSK[%p]: recording tls-unique CB (send)\n",
+				 session);
+	  memcpy (session->internals.cb_tls_unique, data, vdata_size);
+	  session->internals.cb_tls_unique_len = vdata_size;
+	}
+
       ret =
 	_gnutls_send_handshake (session, bufel, GNUTLS_HANDSHAKE_FINISHED);
     }
@@ -793,6 +805,18 @@ _gnutls_recv_finished (gnutls_session_t session)
     {
       gnutls_assert ();
       return ret;
+    }
+
+  if ((session->internals.resumed == RESUME_TRUE
+       && session->security_parameters.entity == GNUTLS_CLIENT)
+      || (session->internals.resumed == RESUME_FALSE
+	  && session->security_parameters.entity == GNUTLS_SERVER))
+    {
+      /* if we are a client resuming - or we are a server not resuming */
+      _gnutls_handshake_log ("HSK[%p]: recording tls-unique CB (recv)\n",
+			     session);
+      memcpy (session->internals.cb_tls_unique, data, data_size);
+      session->internals.cb_tls_unique_len = data_size;
     }
 
   session->internals.initial_negotiation_completed = 1;

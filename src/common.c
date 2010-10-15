@@ -488,6 +488,23 @@ print_info (gnutls_session_t session, const char *hostname, int insecure)
       printf ("- Session ID: %s\n", raw_to_string (id, id_size));
     }
 
+  {
+    gnutls_datum cb;
+    int rc;
+
+    rc = gnutls_session_channel_binding (session, GNUTLS_CB_TLS_UNIQUE, &cb);
+    if (rc)
+	fprintf (stderr, "Channel binding error: %s\n", gnutls_strerror (rc));
+    else
+      {
+	size_t i;
+
+	printf ("- Channel binding 'tls-unique': ");
+	for (i = 0; i < cb.size; i++)
+	  printf ("%02x", cb.data[i]);
+	printf ("\n");
+      }
+  }
 
   fflush (stdout);
 

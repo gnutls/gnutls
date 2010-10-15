@@ -727,6 +727,9 @@ typedef struct
     int set:1;
   } resumed_extension_int_data[MAX_EXT_TYPES];
 
+  unsigned int cb_tls_unique_len;
+  unsigned char cb_tls_unique[MAX_VERIFY_DATA_SIZE];
+
   /* If you add anything here, check _gnutls_handshake_internal_state_clear().
    */
 } internals_st;

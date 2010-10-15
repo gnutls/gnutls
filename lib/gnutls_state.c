@@ -1354,7 +1354,8 @@ gnutls_session_enable_compatibility_mode (gnutls_session_t session)
  * @cbtype: an #gnutls_channel_binding_t enumeration type
  * @cb: output buffer array with data
  *
- * Extract given channel binding data of the @cbtype type.
+ * Extract given channel binding data of the @cbtype (e.g.,
+ * %GNUTLS_CB_TLS_UNIQUE) type.
  *
  * Returns: %GNUTLS_E_SUCCESS on success,
  * %GNUTLS_E_UNIMPLEMENTED_FEATURE if the @cbtype is unsupported,
@@ -1368,5 +1369,18 @@ gnutls_session_channel_binding (gnutls_session_t session,
 				gnutls_channel_binding_t cbtype,
 				gnutls_datum_t *cb)
 {
-  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+  if (cbtype != GNUTLS_CB_TLS_UNIQUE)
+    return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+
+  if (!session->internals.initial_negotiation_completed)
+    return GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE;
+
+  cb->size = session->internals.cb_tls_unique_len;
+  cb->data = gnutls_malloc (cb->size);
+  if (cb->data == NULL)
+    return GNUTLS_E_MEMORY_ERROR;
+
+  memcpy (cb->data, session->internals.cb_tls_unique, cb->size);
+
+  return 0;
 }
