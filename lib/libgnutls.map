@@ -604,7 +604,7 @@ GNUTLS_2_10
     gnutls_safe_renegotiation_status;
 } GNUTLS_2_8;
 
-GNUTLS_2_11
+GNUTLS_2_12
 {
   global:
 	gnutls_certificate_set_retrieve_function;
