@@ -1,3 +1,176 @@
+2010-10-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.11.4.
+
+2010-10-15  Simon Josefsson <simon@josefsson.org>
+
+	* lib/libgnutls.map: Rename new symbol prefix after next stable
+	branch instead of development branch.
+
+2010-10-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2010-10-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/cha-bib.texi, doc/cha-gtls-app.texi: Document channel
+	binding API.
+
+2010-10-15  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_handshake.c, lib/gnutls_int.h, lib/gnutls_state.c,
+	src/common.c: Implement RFC 5929 tls-unique channel binding.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, doc/manpages/Makefile.am, lib/gnutls_errors.c,
+	lib/gnutls_state.c, lib/includes/gnutls/gnutls.h.in,
+	lib/libgnutls.map: Add gnutls_session_channel_binding API.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am, tests/gendh.c: Add self test gendh to check DH
+	generation.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* tests/openpgp-auth.c: Fix compiler warnings.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* guile/tests/Makefile.am, guile/tests/anonymous-auth.scm,
+	guile/tests/dh-parameters.pem, guile/tests/openpgp-auth.scm,
+	guile/tests/pkcs-import-export.scm,
+	guile/tests/session-record-port.scm, guile/tests/x509-auth.scm: 
+	Don't generate DH primes in Guile self checks (for speed).
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* tests/userid/userid: Cleanup, fixing distcheck.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* tests/openpgp-auth.c: Make it work with srcdir != objdir.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/gnutls-docs.sgml: Improve GTK-DOC manual.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* .x-sc_two_space_separator_in_usage, lib/cryptodev.c,
+	lib/m4/hooks.m4, lib/pakchois/pakchois11.h: Fix syntax-check
+	warning.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* build-aux/gendocs.sh, build-aux/pmccabe2html, doc/fdl-1.3.texi,
+	gl/Makefile.am, gl/arpa_inet.in.h, gl/errno.in.h, gl/float.in.h,
+	gl/ftello.c, gl/getaddrinfo.c, gl/m4/errno_h.m4, gl/m4/error.m4,
+	gl/m4/float_h.m4, gl/m4/ftello.m4, gl/m4/getpagesize.m4,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4, gl/m4/hostent.m4,
+	gl/m4/include_next.m4, gl/m4/intmax_t.m4, gl/m4/inttypes_h.m4,
+	gl/m4/lib-ld.m4, gl/m4/lib-link.m4, gl/m4/lseek.m4,
+	gl/m4/malloc.m4, gl/m4/memchr.m4, gl/m4/minmax.m4, gl/m4/printf.m4,
+	gl/m4/realloc.m4, gl/m4/servent.m4, gl/m4/size_max.m4,
+	gl/m4/socketlib.m4, gl/m4/sockets.m4, gl/m4/socklen.m4,
+	gl/m4/sockpfaf.m4, gl/m4/stdarg.m4, gl/m4/stdbool.m4,
+	gl/m4/stdint.m4, gl/m4/stdint_h.m4, gl/m4/stdlib_h.m4,
+	gl/m4/time_h.m4, gl/m4/wchar_t.m4, gl/m4/wint_t.m4, gl/malloc.c,
+	gl/netdb.in.h, gl/netinet_in.in.h, gl/read-file.c, gl/realloc.c,
+	gl/select.c, gl/stdarg.in.h, gl/stddef.in.h, gl/stdint.in.h,
+	gl/stdio.in.h, gl/stdlib.in.h, gl/strerror.c, gl/string.in.h,
+	gl/sys_select.in.h, gl/sys_socket.in.h, gl/sys_stat.in.h,
+	gl/sys_time.in.h, gl/tests/Makefile.am, gl/tests/binary-io.h,
+	gl/tests/getpagesize.c, gl/tests/init.sh, gl/tests/sys_ioctl.in.h,
+	gl/tests/test-binary-io.c, gl/tests/test-binary-io.sh,
+	gl/tests/test-ftello.c, gl/tests/test-ftello.sh,
+	gl/tests/test-ftello2.sh, gl/tests/test-ftello3.c,
+	gl/tests/test-getaddrinfo.c, gl/tests/test-memchr.c,
+	gl/tests/test-netdb.c, gl/tests/test-read-file.c,
+	gl/tests/test-stdbool.c, gl/tests/test-stddef.c,
+	gl/tests/test-stdlib.c, gl/tests/test-sys_socket.c,
+	gl/tests/test-sys_wait.h, gl/tests/test-update-copyright.sh,
+	gl/tests/test-vc-list-files-cvs.sh,
+	gl/tests/test-vc-list-files-git.sh, gl/tests/test-verify.c,
+	gl/time.in.h, gl/timespec.h, gl/unistd.in.h, gl/wchar.in.h,
+	lib/build-aux/config.rpath, lib/gl/Makefile.am, lib/gl/errno.in.h,
+	lib/gl/float.in.h, lib/gl/ftello.c, lib/gl/m4/codeset.m4,
+	lib/gl/m4/errno_h.m4, lib/gl/m4/fcntl-o.m4, lib/gl/m4/float_h.m4,
+	lib/gl/m4/ftello.m4, lib/gl/m4/getpagesize.m4,
+	lib/gl/m4/gettext.m4, lib/gl/m4/gnulib-cache.m4,
+	lib/gl/m4/gnulib-comp.m4, lib/gl/m4/iconv.m4,
+	lib/gl/m4/include_next.m4, lib/gl/m4/intdiv0.m4, lib/gl/m4/intl.m4,
+	lib/gl/m4/intlmacosx.m4, lib/gl/m4/intmax.m4,
+	lib/gl/m4/intmax_t.m4, lib/gl/m4/inttypes-pri.m4,
+	lib/gl/m4/inttypes_h.m4, lib/gl/m4/lcmessage.m4,
+	lib/gl/m4/ld-version-script.m4, lib/gl/m4/lib-ld.m4,
+	lib/gl/m4/lib-link.m4, lib/gl/m4/lock.m4, lib/gl/m4/lseek.m4,
+	lib/gl/m4/malloc.m4, lib/gl/m4/memchr.m4, lib/gl/m4/memmem.m4,
+	lib/gl/m4/minmax.m4, lib/gl/m4/printf-posix.m4,
+	lib/gl/m4/printf.m4, lib/gl/m4/progtest.m4, lib/gl/m4/realloc.m4,
+	lib/gl/m4/size_max.m4, lib/gl/m4/socketlib.m4,
+	lib/gl/m4/sockets.m4, lib/gl/m4/socklen.m4, lib/gl/m4/sockpfaf.m4,
+	lib/gl/m4/stdbool.m4, lib/gl/m4/stdint.m4, lib/gl/m4/stdint_h.m4,
+	lib/gl/m4/stdlib_h.m4, lib/gl/m4/threadlib.m4, lib/gl/m4/time_h.m4,
+	lib/gl/m4/visibility.m4, lib/gl/m4/wchar_t.m4, lib/gl/m4/wint_t.m4,
+	lib/gl/malloc.c, lib/gl/netdb.in.h, lib/gl/read-file.c,
+	lib/gl/realloc.c, lib/gl/stddef.in.h, lib/gl/stdint.in.h,
+	lib/gl/stdio.in.h, lib/gl/stdlib.in.h, lib/gl/str-two-way.h,
+	lib/gl/string.in.h, lib/gl/strings.in.h, lib/gl/sys_socket.in.h,
+	lib/gl/sys_stat.in.h, lib/gl/tests/Makefile.am,
+	lib/gl/tests/binary-io.h, lib/gl/tests/getpagesize.c,
+	lib/gl/tests/init.sh, lib/gl/tests/test-binary-io.c,
+	lib/gl/tests/test-binary-io.sh, lib/gl/tests/test-ftello.c,
+	lib/gl/tests/test-ftello.sh, lib/gl/tests/test-ftello2.sh,
+	lib/gl/tests/test-ftello3.c, lib/gl/tests/test-memchr.c,
+	lib/gl/tests/test-netdb.c, lib/gl/tests/test-read-file.c,
+	lib/gl/tests/test-stdbool.c, lib/gl/tests/test-stddef.c,
+	lib/gl/tests/test-stdlib.c, lib/gl/tests/test-sys_socket.c,
+	lib/gl/tests/test-sys_wait.h, lib/gl/tests/test-verify.c,
+	lib/gl/time.in.h, lib/gl/unistd.in.h, lib/gl/wchar.in.h,
+	libextra/gl/gnulib.mk, libextra/gl/m4/gnulib-cache.m4,
+	libextra/gl/m4/gnulib-comp.m4, libextra/gl/m4/ld-version-script.m4,
+	libextra/gl/m4/lib-ld.m4, libextra/gl/m4/lib-link.m4, maint.mk: 
+	Update gnulib files.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Don't assume chmod +x on gendocs.sh.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Use gnulib --add-import.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* .gitignore: Sort and update.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* lib/po/nl.po.in: Sync with TP.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2010-10-14  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2010-10-14  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.11.3.
