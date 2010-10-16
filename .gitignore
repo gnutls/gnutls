@@ -3,6 +3,7 @@
 *~
 .deps
 .libs
+tags
 ABOUT-NLS
 INSTALL
 Makefile
@@ -26,6 +27,9 @@ doc/Makefile
 doc/Makefile.in
 doc/algorithms.texi
 doc/core.c.texi
+doc/gnutls.dvi
+doc/gnutls.html
+doc/gnutls.ps
 doc/credentials/Makefile
 doc/credentials/Makefile.in
 doc/credentials/openpgp/Makefile
@@ -263,6 +267,7 @@ lib/libgnutlsxx.la
 lib/libtool
 lib/minitasn1/Makefile
 lib/minitasn1/Makefile.in
+lib/minitasn1/libminitasn1.la
 lib/nettle/libcrypto.la
 lib/opencdk/Makefile
 lib/opencdk/Makefile.in
@@ -431,3 +436,7 @@ tests/x509paths/
 tests/x509self
 tests/x509sign-verify
 tests/x509signself
+tests/suite/eagain-cli
+tests/suite/libecore.la
+tests/certuniqueid
+tests/gendh
