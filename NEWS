@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.11.5 (unreleased)
 
+** gnutls-cli: Print channel binding only in verbose mode.
+Before it printed it after the 'Compression:' output, thus breaking
+Emacs starttls.el string searches.
+
 ** API and ABI modifications:
 No changes since last version.
 
