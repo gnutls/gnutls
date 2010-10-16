@@ -31,7 +31,5 @@ check_PROGRAMS = $(ctests)
 TESTS = $(ctests)
 TESTS_ENVIRONMENT = $(VALGRIND)
 
-EXTRA_DIST = README params.dh
+EXTRA_DIST = README
 
-dist_check_SCRIPTS = testsrn
-#TESTS = testsrn

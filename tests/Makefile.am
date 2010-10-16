@@ -96,3 +96,6 @@ TESTS_ENVIRONMENT =						\
 	EXEEXT=$(EXEEXT)					\
 	srcdir="$(srcdir)"					\
 	$(VALGRIND)
+
+check-local:
+	[ -d suite ] && $(MAKE) -C suite check
