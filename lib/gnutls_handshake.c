@@ -2178,6 +2178,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
   ret =
     _gnutls_send_handshake (session, data, datalen,
 			    GNUTLS_HANDSHAKE_CLIENT_HELLO);
+  gnutls_free (extdata);
   gnutls_free (data);
 
   return ret;

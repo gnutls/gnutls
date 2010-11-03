@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.10.3 (unreleased)
 
+** libgnutls: Corrected memory leak in extension data calculation. 
+Reported by Mike Blumenkrantz.
+
 ** libgnutls: Remove trailing comma in enums in gnutls.h and x509.h.
 
 ** API and ABI modifications:
