@@ -243,6 +243,16 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
   a[a_val].value_len = sizeof (type);
   a_val++;
 
+  a[a_val].type = CKA_TOKEN;
+  a[a_val].value = &tval;
+  a[a_val].value_len = sizeof (tval);
+  a_val++;
+
+  a[a_val].type = CKA_PRIVATE;
+  a[a_val].value = &tval;
+  a[a_val].value_len = sizeof (tval);
+  a_val++;
+
   if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE)
     tval = 1;
   else
@@ -565,5 +575,140 @@ gnutls_pkcs11_delete_url (const char *object_url, unsigned int flags)
     }
 
   return find_data.deleted;
+
+}
+
+/**
+ * gnutls_pkcs11_token_init:
+ * @token_url: A PKCS #11 URL specifying a token
+ * @so_pin: Security Officer's PIN
+ * @label: A name to be used for the token
+ *
+ * This function will initialize (format) a token. If the token is
+ * at a factory defaults state the security officer's PIN given will be
+ * set to be the default. Otherwise it should match the officer's PIN.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_pkcs11_token_init (const char *token_url,
+				 const char* so_pin,
+				 const char *label)
+{
+  int ret;
+  struct pkcs11_url_info info;
+  ck_rv_t rv;
+  pakchois_module_t *module;
+  ck_slot_id_t slot;
+  char flabel[32];
+
+  ret = pkcs11_url_to_info (token_url, &info);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  ret = pkcs11_find_slot(&module, &slot, &info, NULL);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+
+  /* so it seems memset has other uses than zeroing! */
+  memset(flabel, ' ', sizeof(flabel));
+  if (label != NULL)
+    memcpy(flabel, label, strlen(label));
+
+  rv = pakchois_init_token(module, slot, (char*)so_pin, strlen(so_pin), flabel);
+  if (rv != CKR_OK)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("pkcs11: %s\n", pakchois_error (rv));
+      return pkcs11_rv_to_err (rv);
+    }
+
+  return 0;
+
+}
+
+/**
+ * gnutls_pkcs11_token_set_pin:
+ * @token_url: A PKCS #11 URL specifying a token
+ * @oldpin: old user's PIN
+ * @newpin: new user's PIN
+ * @flags: one of gnutls_pkcs11_pin_flag_t
+ *
+ * This function will modify or set a user's PIN for the given token. 
+ * If it is called to set a user pin for first time the oldpin must
+ * be NULL.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_pkcs11_token_set_pin (const char *token_url,
+			     const char* oldpin,
+			     const char* newpin,
+			     unsigned int flags)
+{
+  int ret;
+  pakchois_session_t *pks;
+  struct pkcs11_url_info info;
+  ck_rv_t rv;
+  unsigned int ses_flags;
+
+  ret = pkcs11_url_to_info (token_url, &info);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  if (((flags & GNUTLS_PKCS11_PIN_USER) && oldpin == NULL) || 
+    (flags & GNUTLS_PKCS11_PIN_SO))
+    ses_flags = SESSION_WRITE|SESSION_LOGIN|SESSION_SO;
+  else 
+    ses_flags = SESSION_WRITE|SESSION_LOGIN;
+
+  ret = pkcs11_open_session (&pks, &info, ses_flags);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+
+  if (oldpin == NULL)
+    {
+      rv = pakchois_init_pin(pks, (char*)newpin, strlen(newpin));
+      if (rv != CKR_OK)
+	{
+	  gnutls_assert ();
+	  _gnutls_debug_log ("pkcs11: %s\n", pakchois_error (rv));
+	  ret = pkcs11_rv_to_err (rv);
+	  goto finish;
+	}
+    }
+  else
+    {
+      rv = pakchois_set_pin(pks, 
+	(char*)oldpin, strlen(oldpin),
+	(char*)newpin, strlen(newpin));
+      if (rv != CKR_OK)
+	{
+	  gnutls_assert ();
+	  _gnutls_debug_log ("pkcs11: %s\n", pakchois_error (rv));
+	  ret = pkcs11_rv_to_err (rv);
+	  goto finish;
+	}
+    }
+
+  ret = 0;
+
+finish:
+  pakchois_close_session (pks);
+  return ret;
 
 }

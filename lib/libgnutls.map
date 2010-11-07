@@ -689,8 +689,10 @@ GNUTLS_2_12
 	gnutls_cipher_decrypt2;
 	gnutls_openpgp_privkey_sec_param;
 	gnutls_x509_privkey_sec_param;
-
 	gnutls_session_channel_binding;
+	gnutls_pkcs11_copy_secret_key;
+	gnutls_pkcs11_token_init;
+	gnutls_pkcs11_token_set_pin;
 } GNUTLS_2_10;
 
 GNUTLS_PRIVATE {

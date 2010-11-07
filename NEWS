@@ -5,12 +5,15 @@ See the end for copying conditions.
 
 * Version 2.11.5 (unreleased)
 
+** p11tool: Introduced. It allows manipulating pkcs 11 tokens.
+
 ** gnutls-cli: Print channel binding only in verbose mode.
 Before it printed it after the 'Compression:' output, thus breaking
 Emacs starttls.el string searches.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pkcs11_token_init: New function
+gnutls_pkcs11_token_set_pin: New function
 
 * Version 2.11.4 (released 2010-10-15)
 

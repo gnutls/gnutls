@@ -1088,12 +1088,10 @@ fix_strings (struct token_info *info)
 }
 
 int
-pkcs11_open_session (pakchois_session_t ** _pks,
-		     struct pkcs11_url_info *info, unsigned int flags)
+pkcs11_find_slot (pakchois_module_t** module, ck_slot_id_t *slot,
+		     struct pkcs11_url_info *info, struct token_info* _tinfo)
 {
-  ck_rv_t rv;
-  int x, z, ret;
-  pakchois_session_t *pks = NULL;
+  int x, z;
 
   for (x = 0; x < active_providers; x++)
     {
@@ -1101,21 +1099,11 @@ pkcs11_open_session (pakchois_session_t ** _pks,
 	{
 	  struct token_info tinfo;
 
-	  rv = pakchois_open_session (providers[x].module,
-				      providers[x].slots[z],
-				      ((flags & SESSION_WRITE)
-				       ? CKF_RW_SESSION : 0) |
-				      CKF_SERIAL_SESSION, NULL, NULL, &pks);
-	  if (rv != CKR_OK)
-	    {
-	      continue;
-	    }
-
 	  if (pakchois_get_token_info
 	      (providers[x].module, providers[x].slots[z],
 	       &tinfo.tinfo) != CKR_OK)
 	    {
-	      goto next;
+	      continue;
 	    }
 	  tinfo.sid = providers[x].slots[z];
 	  tinfo.prov = &providers[x];
@@ -1124,7 +1112,7 @@ pkcs11_open_session (pakchois_session_t ** _pks,
 	      (providers[x].module, providers[x].slots[z],
 	       &tinfo.sinfo) != CKR_OK)
 	    {
-	      goto next;
+	      continue;
 	    }
 
 	  /* XXX make wrapper for token_info? */
@@ -1133,30 +1121,67 @@ pkcs11_open_session (pakchois_session_t ** _pks,
 	  if (pkcs11_token_matches_info (info, &tinfo.tinfo,
 					 &providers[x].info) < 0)
 	    {
-	      goto next;
-	    }
-
-	  if (flags & SESSION_LOGIN)
-	    {
-	      ret = pkcs11_login (pks, &tinfo);
-	      if (ret < 0)
-		{
-		  gnutls_assert ();
-		  pakchois_close_session (pks);
-		  return ret;
-		}
+	      continue;
 	    }
 
 	  /* ok found */
-	  *_pks = pks;
-	  return 0;
+	  *module = providers[x].module;
+	  *slot = providers[x].slots[z];
+	  
+	  if (_tinfo != NULL)
+	    memcpy(_tinfo, &tinfo, sizeof(tinfo));
 
-	next:
-	  pakchois_close_session (pks);
+	  return 0;
 	}
     }
 
+  gnutls_assert();
   return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+}
+
+int
+pkcs11_open_session (pakchois_session_t ** _pks,
+		     struct pkcs11_url_info *info, unsigned int flags)
+{
+  ck_rv_t rv;
+  int ret;
+  pakchois_session_t *pks = NULL;
+  pakchois_module_t *module;
+  ck_slot_id_t slot;
+  struct token_info tinfo;
+
+  ret = pkcs11_find_slot(&module, &slot, info, &tinfo);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+
+  rv = pakchois_open_session (module,
+			      slot,
+			      ((flags & SESSION_WRITE)
+			       ? CKF_RW_SESSION : 0) |
+			      CKF_SERIAL_SESSION, NULL, NULL, &pks);
+  if (rv != CKR_OK)
+    {
+      gnutls_assert();
+      return pkcs11_rv_to_err (rv);
+    }
+
+  if (flags & SESSION_LOGIN)
+    {
+      ret = pkcs11_login (pks, &tinfo, (flags & SESSION_SO)?1:0);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  pakchois_close_session (pks);
+	  return ret;
+	}
+    }
+
+  /* ok found */
+  *_pks = pks;
+  return 0;
 }
 
 
@@ -1176,6 +1201,25 @@ _pkcs11_traverse_tokens (find_func_t find_func, void *input,
 
 	  ret = GNUTLS_E_PKCS11_ERROR;
 
+	  if (pakchois_get_token_info
+	      (providers[x].module, providers[x].slots[z],
+	       &info.tinfo) != CKR_OK)
+	    {
+	      continue;
+	    }
+	  info.sid = providers[x].slots[z];
+	  info.prov = &providers[x];
+
+	  if (pakchois_get_slot_info
+	      (providers[x].module, providers[x].slots[z],
+	       &info.sinfo) != CKR_OK)
+	    {
+	      continue;
+	    }
+
+	  /* XXX make wrapper for token_info? */
+	  fix_strings (&info);
+
 	  rv = pakchois_open_session (providers[x].module,
 				      providers[x].slots[z],
 				      ((flags & SESSION_WRITE)
@@ -1186,28 +1230,9 @@ _pkcs11_traverse_tokens (find_func_t find_func, void *input,
 	      continue;
 	    }
 
-	  if (pakchois_get_token_info
-	      (providers[x].module, providers[x].slots[z],
-	       &info.tinfo) != CKR_OK)
-	    {
-	      goto next;
-	    }
-	  info.sid = providers[x].slots[z];
-	  info.prov = &providers[x];
-
-	  if (pakchois_get_slot_info
-	      (providers[x].module, providers[x].slots[z],
-	       &info.sinfo) != CKR_OK)
-	    {
-	      goto next;
-	    }
-
-	  /* XXX make wrapper for token_info? */
-	  fix_strings (&info);
-
 	  if (flags & SESSION_LOGIN)
 	    {
-	      ret = pkcs11_login (pks, &info);
+	      ret = pkcs11_login (pks, &info, (flags & SESSION_SO)?1:0);
 	      if (ret < 0)
 		{
 		  gnutls_assert ();
@@ -1216,8 +1241,6 @@ _pkcs11_traverse_tokens (find_func_t find_func, void *input,
 	    }
 
 	  ret = find_func (pks, &info, &providers[x].info, input);
-
-	next:
 
 	  if (ret == 0)
 	    {
@@ -2005,8 +2028,8 @@ struct pkey_list
   size_t key_ids_size;
 };
 
-int
-pkcs11_login (pakchois_session_t * pks, const struct token_info *info)
+int pkcs11_login (pakchois_session_t * pks, 
+  const struct token_info *info, int so)
 {
   int attempt = 0, ret;
   ck_rv_t rv;
@@ -2015,7 +2038,7 @@ pkcs11_login (pakchois_session_t * pks, const struct token_info *info)
   struct pkcs11_url_info uinfo;
 
 
-  if ((info->tinfo.flags & CKF_LOGIN_REQUIRED) == 0)
+  if (so == 0 && (info->tinfo.flags & CKF_LOGIN_REQUIRED) == 0)
     {
       gnutls_assert ();
       _gnutls_debug_log ("pk11: No login required.\n");
@@ -2039,7 +2062,7 @@ pkcs11_login (pakchois_session_t * pks, const struct token_info *info)
    * required. */
   if (info->tinfo.flags & CKF_PROTECTED_AUTHENTICATION_PATH)
     {
-      if (pakchois_login (pks, CKU_USER, NULL, 0) == CKR_OK)
+      if (pakchois_login (pks, (so==0)?CKU_USER:CKU_SO, NULL, 0) == CKR_OK)
 	{
 	  return 0;
 	}
@@ -2083,10 +2106,22 @@ pkcs11_login (pakchois_session_t * pks, const struct token_info *info)
 	}
 
       flags = 0;
-      if (tinfo.flags & CKF_USER_PIN_COUNT_LOW)
-	flags |= GNUTLS_PKCS11_PIN_COUNT_LOW;
-      if (tinfo.flags & CKF_USER_PIN_FINAL_TRY)
-	flags |= GNUTLS_PKCS11_PIN_FINAL_TRY;
+      if (so == 0)
+        {
+	  flags |= GNUTLS_PKCS11_PIN_USER;
+	  if (tinfo.flags & CKF_USER_PIN_COUNT_LOW)
+	    flags |= GNUTLS_PKCS11_PIN_COUNT_LOW;
+	  if (tinfo.flags & CKF_USER_PIN_FINAL_TRY)
+	    flags |= GNUTLS_PKCS11_PIN_FINAL_TRY;
+	}
+      else
+        {
+	  flags |= GNUTLS_PKCS11_PIN_SO;
+	  if (tinfo.flags & CKF_SO_PIN_COUNT_LOW)
+	    flags |= GNUTLS_PKCS11_PIN_COUNT_LOW;
+	  if (tinfo.flags & CKF_SO_PIN_FINAL_TRY)
+	    flags |= GNUTLS_PKCS11_PIN_FINAL_TRY;
+	}
 
       ret = pin_func (pin_data, attempt++,
 		      (char *) token_url,
@@ -2099,7 +2134,8 @@ pkcs11_login (pakchois_session_t * pks, const struct token_info *info)
 	}
       pin_len = strlen (pin);
 
-      rv = pakchois_login (pks, CKU_USER, (unsigned char *) pin, pin_len);
+      rv = pakchois_login (pks, (so==0)?CKU_USER:CKU_SO, 
+	(unsigned char *) pin, pin_len);
 
       /* Try to scrub the pin off the stack.  Clever compilers will
        * probably optimize this away, oh well. */

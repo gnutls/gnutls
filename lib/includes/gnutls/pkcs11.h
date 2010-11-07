@@ -20,13 +20,19 @@ typedef int (*gnutls_pkcs11_token_callback_t) (void *const global_data,
 					       const unsigned retry);
 
 /* flags */
-#define GNUTLS_PKCS11_PIN_FINAL_TRY (1<<0)
-#define GNUTLS_PKCS11_PIN_COUNT_LOW (1<<1)
+typedef enum
+{
+  GNUTLS_PKCS11_PIN_USER = (1<<0),
+  GNUTLS_PKCS11_PIN_SO = (1<<1),
+  GNUTLS_PKCS11_PIN_FINAL_TRY = (1<<2),
+  GNUTLS_PKCS11_PIN_COUNT_LOW = (1<<3)
+} gnutls_pkcs11_pin_flag_t;
 
 typedef int (*gnutls_pkcs11_pin_callback_t) (void *userdata, int attempt,
 					     const char *token_url,
 					     const char *token_label,
-					     unsigned int flags, char *pin,
+					     unsigned int flags /*gnutls_pkcs11_pin_flag_t*/, 
+					     char *pin,
 					     size_t pin_max);
 
 struct gnutls_pkcs11_obj_st;
@@ -82,6 +88,12 @@ int gnutls_pkcs11_copy_x509_privkey (const char *token_url, gnutls_x509_privkey_
 int gnutls_pkcs11_delete_url (const char *object_url, unsigned int flags
 			      /* GNUTLS_PKCS11_OBJ_FLAG_* */ );
 
+int gnutls_pkcs11_copy_secret_key (const char *token_url, gnutls_datum_t* key,
+				 const char *label, 
+				 unsigned int key_usage /* GNUTLS_KEY_* */,
+				 unsigned int flags
+				 /* GNUTLS_PKCS11_OBJ_FLAG_* */ );
+
 typedef enum
 {
   GNUTLS_PKCS11_OBJ_ID_HEX = 1,
@@ -129,6 +141,15 @@ typedef enum
   GNUTLS_PKCS11_OBJ_SECRET_KEY,
   GNUTLS_PKCS11_OBJ_DATA
 } gnutls_pkcs11_obj_type_t;
+
+int
+gnutls_pkcs11_token_init (const char *token_url,
+				 const char* so_pin,
+				 const char *label);
+
+int
+gnutls_pkcs11_token_set_pin (const char *token_url,
+  const char* oldpin, const char* newpin, unsigned int flags/*gnutls_pkcs11_pin_flag_t*/);
 
 int gnutls_pkcs11_token_get_url (unsigned int seq,
 				 gnutls_pkcs11_url_type_t detailed,

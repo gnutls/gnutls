@@ -614,7 +614,16 @@ pkcs11_init (FILE * outfile, const char *url, const char *label, common_info_st*
     exit(0);
   
   ret =
-    gnutls_pkcs11_token_init (url, so_pin, pin, label);
+    gnutls_pkcs11_token_init (url, so_pin, label);
+  if (ret < 0)
+    {
+      fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+		   gnutls_strerror (ret));
+      exit (1);
+    }
+
+  ret =
+    gnutls_pkcs11_token_set_pin (url, NULL, pin, GNUTLS_PKCS11_PIN_USER);
   if (ret < 0)
     {
       fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,

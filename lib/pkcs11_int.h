@@ -60,11 +60,15 @@ typedef int (*find_func_t) (pakchois_session_t * pks,
 
 int pkcs11_rv_to_err (ck_rv_t rv);
 int pkcs11_url_to_info (const char *url, struct pkcs11_url_info *info);
+int
+pkcs11_find_slot (pakchois_module_t** module, ck_slot_id_t *slot,
+		     struct pkcs11_url_info *info, struct token_info* _tinfo);
 
 int pkcs11_get_info (struct pkcs11_url_info *info,
 		     gnutls_pkcs11_obj_info_t itype, void *output,
 		     size_t * output_size);
-int pkcs11_login (pakchois_session_t * pks, const struct token_info *info);
+int pkcs11_login (pakchois_session_t * pks, 
+  const struct token_info *info, int admin);
 
 extern gnutls_pkcs11_token_callback_t token_func;
 extern void *token_data;
@@ -73,8 +77,9 @@ void pkcs11_rescan_slots (void);
 int pkcs11_info_to_url (const struct pkcs11_url_info *info,
 			gnutls_pkcs11_url_type_t detailed, char **url);
 
-#define SESSION_WRITE 1
-#define SESSION_LOGIN 2
+#define SESSION_WRITE (1<<0)
+#define SESSION_LOGIN (1<<1)
+#define SESSION_SO (1<<2) /* security officer session */
 int pkcs11_open_session (pakchois_session_t ** _pks,
 			 struct pkcs11_url_info *info, unsigned int flags);
 int _pkcs11_traverse_tokens (find_func_t find_func, void *input,
