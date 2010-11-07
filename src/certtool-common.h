@@ -1,3 +1,6 @@
+#ifndef CERTTOOL_COMMON_H
+# define CERTTOOL_COMMON_H
+
 #include <gnutls/x509.h>
 #include <stdio.h>
 
@@ -26,11 +29,6 @@ enum
   ACTION_PGP_PRIVKEY_INFO,
   ACTION_RING_INFO,
   ACTION_REQUEST,
-  ACTION_PKCS11_LIST,
-  ACTION_PKCS11_TOKENS,
-  ACTION_PKCS11_EXPORT_URL,
-  ACTION_PKCS11_WRITE_URL,
-  ACTION_PKCS11_DELETE_URL,
   ACTION_PUBKEY_INFO,
   ACTION_CERT_PUBKEY,
 };
@@ -39,37 +37,42 @@ enum
 #define TYPE_CRQ 2
 
 void certtool_version (void);
-void pkcs11_list (FILE * outfile, const char *url, int type,
-		  unsigned int login, unsigned int detailed);
-void pkcs11_export (FILE * outfile, const char *pkcs11_url,
-		    unsigned int login);
-void pkcs11_token_list (FILE * outfile, unsigned int detailed);
-void pkcs11_write (FILE * outfile, const char *pkcs11_url, const char *label,
-		   int trusted, unsigned int login);
-void pkcs11_delete (FILE * outfile, const char *pkcs11_url, int batch,
-		    unsigned int login);
-
-#define PKCS11_TYPE_CRT_ALL 1
-#define PKCS11_TYPE_TRUSTED 2
-#define PKCS11_TYPE_PK 3
-#define PKCS11_TYPE_ALL 4
-#define PKCS11_TYPE_PRIVKEY 5
-
-extern unsigned char buffer[];
-extern const int buffer_size;
 
 #include <gnutls/x509.h>
 #include <gnutls/abstract.h>
 
-gnutls_x509_privkey_t load_private_key (int mand);
-gnutls_x509_crq_t load_request (void);
-gnutls_x509_privkey_t load_ca_private_key (void);
-gnutls_x509_crt_t load_ca_cert (void);
-gnutls_x509_crt_t load_cert (int mand);
-gnutls_pubkey_t load_pubkey (int mand);
+typedef struct common_info {
+  const char* secret_key;
+  const char* privkey;
+  const char* pubkey;
+  int pkcs8;
+  int incert_format;
+  const char* cert;
+  
+  const char* request;
+  const char* ca;
+  const char* ca_privkey;
+} common_info_st;
+
+gnutls_x509_privkey_t load_private_key (int mand, common_info_st* info);
+gnutls_x509_crq_t load_request (common_info_st* info);
+gnutls_x509_privkey_t load_ca_private_key (common_info_st* info);
+gnutls_x509_crt_t load_ca_cert (common_info_st* info);
+gnutls_x509_crt_t load_cert (int mand, common_info_st* info);
+gnutls_datum* load_secret_key (int mand, common_info_st* info);
+gnutls_pubkey_t load_pubkey (int mand, common_info_st* info);
+gnutls_x509_crt_t *load_cert_list (int mand, size_t * size, common_info_st* info);
 
 /* returns the bits specified in cmd */
 int get_bits (gnutls_pk_algorithm_t);
 
 /* prime.c */
 int generate_prime (int how);
+
+FILE * safe_open_rw (const char *file, int privkey_op);
+
+extern unsigned char buffer[];
+extern const int buffer_size;
+
+
+#endif

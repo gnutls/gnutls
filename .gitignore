@@ -379,6 +379,8 @@ m4/lt~obsolete.m4
 src/Makefile
 src/Makefile.in
 src/benchmark
+src/libcmd-p11tool.la
+src/p11tool
 src/certtool
 src/cfg/Makefile
 src/cfg/Makefile.in

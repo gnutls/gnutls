@@ -25,8 +25,9 @@
 #include <gnutls/abstract.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "certtool-common.h"
+#include "p11tool.h"
 #include "certtool-cfg.h"
+#include "certtool-common.h"
 #include <unistd.h>
 #include <string.h>
 
@@ -87,7 +88,7 @@ pkcs11_common (void)
 }
 
 void
-pkcs11_delete (FILE * outfile, const char *url, int batch, unsigned int login)
+pkcs11_delete (FILE * outfile, const char *url, int batch, unsigned int login, common_info_st* info)
 {
   int ret;
   unsigned int obj_flags = 0;
@@ -98,7 +99,7 @@ pkcs11_delete (FILE * outfile, const char *url, int batch, unsigned int login)
   if (!batch)
     {
       pkcs11_list (outfile, url, PKCS11_TYPE_ALL, login,
-		   GNUTLS_PKCS11_URL_LIB);
+		   GNUTLS_PKCS11_URL_LIB, info);
       ret =
 	read_yesno ("Are you sure you want to delete those objects? (y/N): ");
       if (ret == 0)
@@ -124,7 +125,7 @@ pkcs11_delete (FILE * outfile, const char *url, int batch, unsigned int login)
  */
 void
 pkcs11_list (FILE * outfile, const char *url, int type, unsigned int login,
-	     unsigned int detailed)
+	     unsigned int detailed, common_info_st* info)
 {
   gnutls_pkcs11_obj_t *crt_list;
   gnutls_x509_crt_t xcrt;
@@ -296,7 +297,7 @@ pkcs11_list (FILE * outfile, const char *url, int type, unsigned int login,
 }
 
 void
-pkcs11_export (FILE * outfile, const char *url, unsigned int login)
+pkcs11_export (FILE * outfile, const char *url, unsigned int login, common_info_st* info)
 {
   gnutls_pkcs11_obj_t crt;
   gnutls_x509_crt_t xcrt;
@@ -427,7 +428,7 @@ pkcs11_export (FILE * outfile, const char *url, unsigned int login)
 }
 
 void
-pkcs11_token_list (FILE * outfile, unsigned int detailed)
+pkcs11_token_list (FILE * outfile, unsigned int detailed, common_info_st* info)
 {
   int ret;
   int i;
@@ -514,13 +515,14 @@ pkcs11_token_list (FILE * outfile, unsigned int detailed)
 
 void
 pkcs11_write (FILE * outfile, const char *url, const char *label, int trusted,
-	      unsigned int login)
+	      unsigned int login, common_info_st* info)
 {
   gnutls_x509_crt_t xcrt;
   gnutls_x509_privkey_t xkey;
   int ret;
   unsigned int flags = 0;
-  unsigned int key_usage;
+  unsigned int key_usage = 0;
+  gnutls_datum_t* secret_key;
 
   if (login)
     flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
@@ -530,7 +532,22 @@ pkcs11_write (FILE * outfile, const char *url, const char *label, int trusted,
   if (url == NULL)
     url = "pkcs11:";
 
-  xcrt = load_cert (0);
+  secret_key = load_secret_key(0, info);
+  if (secret_key != NULL)
+    {
+      ret =
+	gnutls_pkcs11_copy_secret_key (url, secret_key, label, key_usage,
+					 flags |
+					 GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE);
+      if (ret < 0)
+	{
+	  fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+		   gnutls_strerror (ret));
+	  exit (1);
+	}
+    }
+
+  xcrt = load_cert (0, info);
   if (xcrt != NULL)
     {
       if (trusted)
@@ -546,7 +563,7 @@ pkcs11_write (FILE * outfile, const char *url, const char *label, int trusted,
       gnutls_x509_crt_get_key_usage (xcrt, &key_usage, NULL);
     }
 
-  xkey = load_private_key (0);
+  xkey = load_private_key (0, info);
   if (xkey != NULL)
     {
       ret =
@@ -561,10 +578,47 @@ pkcs11_write (FILE * outfile, const char *url, const char *label, int trusted,
 	}
     }
 
-  if (xkey == NULL && xcrt == NULL)
+  if (xkey == NULL && xcrt == NULL && secret_key != NULL)
     {
       fprintf (stderr,
-	       "You must use --load-privkey or --load-certificate to load the file to be copied\n");
+	       "You must use --load-privkey, --load-certificate or --secret-key to load the file to be copied\n");
+      exit (1);
+    }
+
+  return;
+}
+
+void
+pkcs11_init (FILE * outfile, const char *url, const char *label, common_info_st* info)
+{
+  int ret;
+  char * pin;
+  char so_pin[32];
+
+  pkcs11_common ();
+
+  if (url == NULL)
+    {
+      fprintf(stderr, "No token URL given to initialize!\n");
+      exit(1);
+    }
+
+  pin = getpass ("Enter Security Officer's PIN: ");
+  if (pin == NULL)
+    exit(0);
+  
+  strcpy(so_pin, pin);
+
+  pin = getpass ("Enter new User's PIN: ");
+  if (pin == NULL)
+    exit(0);
+  
+  ret =
+    gnutls_pkcs11_token_init (url, so_pin, pin, label);
+  if (ret < 0)
+    {
+      fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+		   gnutls_strerror (ret));
       exit (1);
     }
 

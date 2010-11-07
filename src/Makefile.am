@@ -32,7 +32,7 @@ AM_CPPFLAGS = \
 noinst_PROGRAMS = benchmark
 bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug
 if ENABLE_PKI
-bin_PROGRAMS += certtool
+bin_PROGRAMS += certtool p11tool
 endif
 if ENABLE_SRP
 bin_PROGRAMS += srptool
@@ -80,7 +80,9 @@ noinst_LTLIBRARIES += libcmd-cli-debug.la
 libcmd_cli_debug_la_CFLAGS =
 libcmd_cli_debug_la_SOURCES = tls_test.gaa tls_test-gaa.h tls_test-gaa.c
 
-certtool_SOURCES = certtool.c prime.c pkcs11.c
+#certtool
+
+certtool_SOURCES = certtool.c prime.c certtool-common.c
 certtool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
 certtool_LDADD += libcmd-certtool.la ../gl/libgnu.la
 certtool_LDADD += $(LTLIBGCRYPT)
@@ -97,16 +99,40 @@ certtool_LDADD += libcfg.la
 endif
 noinst_LTLIBRARIES += libcmd-certtool.la
 libcmd_certtool_la_CFLAGS =
-libcmd_certtool_la_SOURCES = certtool.gaa certtool-gaa.h	\
-	certtool-gaa.c certtool-cfg.h certtool-cfg.c
+libcmd_certtool_la_SOURCES = certtool-gaa.c certtool.gaa certtool-gaa.h	\
+	certtool-cfg.h certtool-cfg.c
 libcmd_certtool_la_LIBADD = ../gl/libgnu.la $(LTLIBREADLINE)
 libcmd_certtool_la_LIBADD += ../lib/libgnutls.la ../libextra/libgnutls-extra.la
 libcmd_certtool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
+
+# p11 tool
+p11tool_gaa_CFLAGS =
+p11tool_SOURCES = p11tool.gaa p11tool.c pkcs11.c certtool-common.c
+p11tool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
+p11tool_LDADD += libcmd-p11tool.la ../gl/libgnu.la
+p11tool_LDADD += $(LTLIBGCRYPT)
+
+if HAVE_LIBCFG
+p11tool_LDADD += -lcfg+
+else
+p11tool_LDADD += libcfg.la
+endif
+noinst_LTLIBRARIES += libcmd-p11tool.la
+libcmd_p11tool_la_CFLAGS =
+libcmd_p11tool_la_SOURCES = p11tool-gaa.c p11tool.gaa p11tool-gaa.h	\
+	certtool-cfg.h certtool-cfg.c
+libcmd_p11tool_la_LIBADD = ../gl/libgnu.la $(LTLIBREADLINE)
+libcmd_p11tool_la_LIBADD += ../lib/libgnutls.la
+libcmd_p11tool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
+
+
 
 psk-gaa.c: $(srcdir)/psk.gaa
 	-$(GAA) $< -o psk-gaa.c -i psk-gaa.h
 crypt-gaa.c: $(srcdir)/crypt.gaa
 	-$(GAA) $< -o crypt-gaa.c -i crypt-gaa.h
+p11tool-gaa.c: $(srcdir)/p11tool.gaa
+	-$(GAA) $< -o p11tool-gaa.c -i p11tool-gaa.h
 certtool-gaa.c: $(srcdir)/certtool.gaa
 	-$(GAA) $< -o certtool-gaa.c -i certtool-gaa.h
 cli-gaa.c: $(srcdir)/cli.gaa
