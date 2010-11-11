@@ -160,14 +160,6 @@ _gnutls_x509_cert_verify_peers (gnutls_session_t session,
 	  return ret;
 	}
 
-
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  CLEAR_CERTS;
-	  return ret;
-	}
-
       ret = check_bits (peer_certificate_list[i], cred->verify_bits);
       if (ret < 0)
 	{
