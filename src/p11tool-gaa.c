@@ -133,8 +133,8 @@ void gaa_help(void)
 	printf("p11tool help\nUsage: p11tool [options]\n");
 	printf("Usage: p11tool --list-tokens\n");
 	printf("Usage: p11tool --list-all\n");
-	printf("Usage: p11tool --url 'pkcs11:...'\n\n");
-	__gaa_helpsingle(0, "url", "URL ", "Specify a pkcs11 URL");
+	printf("Usage: p11tool --export 'pkcs11:...'\n\n");
+	__gaa_helpsingle(0, "export", "URL ", "Export an object specified by a pkcs11 URL");
 	__gaa_helpsingle(0, "list-tokens", "", "List all available tokens");
 	__gaa_helpsingle(0, "list-all", "", "List all objects specified by a PKCS#11 URL");
 	__gaa_helpsingle(0, "list-all-certs", "", "List all certificates specified by a PKCS#11 URL");
@@ -286,7 +286,7 @@ static int gaa_error = 0;
 #define GAAOPTID_list_all_certs	23
 #define GAAOPTID_list_all	24
 #define GAAOPTID_list_tokens	25
-#define GAAOPTID_url	26
+#define GAAOPTID_export	26
 
 #line 168 "gaa.skel"
 
@@ -539,7 +539,7 @@ struct GAAOPTION_initialize
 	int size1;
 };
 
-struct GAAOPTION_url 
+struct GAAOPTION_export 
 {
 	char* arg1;
 	int size1;
@@ -585,7 +585,7 @@ static int gaa_get_option_num(char *str, int status)
 			GAA_CHECK1STR("", GAAOPTID_delete);
 			GAA_CHECK1STR("", GAAOPTID_write);
 			GAA_CHECK1STR("", GAAOPTID_initialize);
-			GAA_CHECK1STR("", GAAOPTID_url);
+			GAA_CHECK1STR("", GAAOPTID_export);
         case GAA_MULTIPLE_OPTION:
 #line 375 "gaa.skel"
 			GAA_CHECK1STR("h", GAAOPTID_help);
@@ -631,7 +631,7 @@ static int gaa_get_option_num(char *str, int status)
 			GAA_CHECKSTR("list-all-certs", GAAOPTID_list_all_certs);
 			GAA_CHECKSTR("list-all", GAAOPTID_list_all);
 			GAA_CHECKSTR("list-tokens", GAAOPTID_list_tokens);
-			GAA_CHECKSTR("url", GAAOPTID_url);
+			GAA_CHECKSTR("export", GAAOPTID_export);
 
 #line 281 "gaa.skel"
 	break;
@@ -655,7 +655,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	struct GAAOPTION_delete GAATMP_delete;
 	struct GAAOPTION_write GAATMP_write;
 	struct GAAOPTION_initialize GAATMP_initialize;
-	struct GAAOPTION_url GAATMP_url;
+	struct GAAOPTION_export GAATMP_export;
 
 #line 393 "gaa.skel"
 #ifdef GAA_REST_EXISTS
@@ -884,13 +884,13 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 
 		return GAA_OK;
 		break;
-	case GAAOPTID_url:
+	case GAAOPTID_export:
 	OK = 0;
 		GAA_TESTMOREARGS;
-		GAA_FILL(GAATMP_url.arg1, gaa_getstr, GAATMP_url.size1);
+		GAA_FILL(GAATMP_export.arg1, gaa_getstr, GAATMP_export.size1);
 		gaa_index++;
 #line 22 "p11tool.gaa"
-{ gaaval->action = ACTION_PKCS11_EXPORT_URL; gaaval->pkcs11_url = GAATMP_url.arg1; ;};
+{ gaaval->action = ACTION_PKCS11_EXPORT_URL; gaaval->pkcs11_url = GAATMP_export.arg1; ;};
 
 		return GAA_OK;
 		break;

@@ -16,10 +16,10 @@
 helpnode "p11tool help\nUsage: p11tool [options]"
 helpnode "Usage: p11tool --list-tokens"
 helpnode "Usage: p11tool --list-all"
-helpnode "Usage: p11tool --url 'pkcs11:...'\n"
+helpnode "Usage: p11tool --export 'pkcs11:...'\n"
 
 #char* pkcs11_url;
-option (url) STR "URL" { $action = ACTION_PKCS11_EXPORT_URL; $pkcs11_url = $1; } "Specify a pkcs11 URL"
+option (export) STR "URL" { $action = ACTION_PKCS11_EXPORT_URL; $pkcs11_url = $1; } "Export an object specified by a pkcs11 URL"
 
 #int pkcs11_type;
 option (list-tokens) { $action = ACTION_PKCS11_TOKENS; } "List all available tokens"
