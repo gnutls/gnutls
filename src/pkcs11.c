@@ -578,7 +578,7 @@ pkcs11_write (FILE * outfile, const char *url, const char *label, int trusted,
 	}
     }
 
-  if (xkey == NULL && xcrt == NULL && secret_key != NULL)
+  if (xkey == NULL && xcrt == NULL && secret_key == NULL)
     {
       fprintf (stderr,
 	       "You must use --load-privkey, --load-certificate or --secret-key to load the file to be copied\n");
