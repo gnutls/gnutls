@@ -23,6 +23,9 @@ option (export) STR "URL" { $action = ACTION_PKCS11_EXPORT_URL; $pkcs11_url = $1
 
 #int pkcs11_type;
 option (list-tokens) { $action = ACTION_PKCS11_TOKENS; } "List all available tokens"
+
+option (list-mechanisms) STR "URL" { $pkcs11_url = $1; $action = ACTION_PKCS11_MECHANISMS; } "List all available mechanisms in token."
+
 option (list-all) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS11_TYPE_ALL; } "List all objects specified by a PKCS#11 URL"
 option (list-all-certs) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS11_TYPE_CRT_ALL; } "List all certificates specified by a PKCS#11 URL"
 option (list-certs) { $action = ACTION_PKCS11_LIST; $pkcs11_type=PKCS11_TYPE_PK; } "List certificates that have a private key specified by a PKCS#11 URL"

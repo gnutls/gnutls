@@ -136,6 +136,7 @@ void gaa_help(void)
 	printf("Usage: p11tool --export 'pkcs11:...'\n\n");
 	__gaa_helpsingle(0, "export", "URL ", "Export an object specified by a pkcs11 URL");
 	__gaa_helpsingle(0, "list-tokens", "", "List all available tokens");
+	__gaa_helpsingle(0, "list-mechanisms", "URL ", "List all available mechanisms in token.");
 	__gaa_helpsingle(0, "list-all", "", "List all objects specified by a PKCS#11 URL");
 	__gaa_helpsingle(0, "list-all-certs", "", "List all certificates specified by a PKCS#11 URL");
 	__gaa_helpsingle(0, "list-certs", "", "List certificates that have a private key specified by a PKCS#11 URL");
@@ -174,33 +175,33 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 77 "p11tool.gaa"
+#line 80 "p11tool.gaa"
 	int debug;
-#line 72 "p11tool.gaa"
+#line 75 "p11tool.gaa"
 	char *outfile;
-#line 69 "p11tool.gaa"
+#line 72 "p11tool.gaa"
 	int action;
-#line 68 "p11tool.gaa"
+#line 71 "p11tool.gaa"
 	char* pkcs11_provider;
-#line 64 "p11tool.gaa"
+#line 67 "p11tool.gaa"
 	int incert_format;
-#line 61 "p11tool.gaa"
+#line 64 "p11tool.gaa"
 	int pkcs8;
-#line 58 "p11tool.gaa"
+#line 61 "p11tool.gaa"
 	char *cert;
-#line 55 "p11tool.gaa"
+#line 58 "p11tool.gaa"
 	char *pubkey;
-#line 52 "p11tool.gaa"
+#line 55 "p11tool.gaa"
 	char *privkey;
-#line 49 "p11tool.gaa"
+#line 52 "p11tool.gaa"
 	char* secret_key;
-#line 45 "p11tool.gaa"
+#line 48 "p11tool.gaa"
 	int pkcs11_detailed_url;
-#line 42 "p11tool.gaa"
+#line 45 "p11tool.gaa"
 	int pkcs11_login;
-#line 39 "p11tool.gaa"
+#line 42 "p11tool.gaa"
 	int pkcs11_trusted;
-#line 32 "p11tool.gaa"
+#line 35 "p11tool.gaa"
 	char* pkcs11_label;
 #line 24 "p11tool.gaa"
 	int pkcs11_type;
@@ -260,7 +261,7 @@ static int gaa_error = 0;
 #define GAA_MULTIPLE_OPTION     3
 
 #define GAA_REST                0
-#define GAA_NB_OPTION           26
+#define GAA_NB_OPTION           27
 #define GAAOPTID_help	1
 #define GAAOPTID_debug	2
 #define GAAOPTID_outfile	3
@@ -285,8 +286,9 @@ static int gaa_error = 0;
 #define GAAOPTID_list_certs	22
 #define GAAOPTID_list_all_certs	23
 #define GAAOPTID_list_all	24
-#define GAAOPTID_list_tokens	25
-#define GAAOPTID_export	26
+#define GAAOPTID_list_mechanisms	25
+#define GAAOPTID_list_tokens	26
+#define GAAOPTID_export	27
 
 #line 168 "gaa.skel"
 
@@ -539,6 +541,12 @@ struct GAAOPTION_initialize
 	int size1;
 };
 
+struct GAAOPTION_list_mechanisms 
+{
+	char* arg1;
+	int size1;
+};
+
 struct GAAOPTION_export 
 {
 	char* arg1;
@@ -585,6 +593,7 @@ static int gaa_get_option_num(char *str, int status)
 			GAA_CHECK1STR("", GAAOPTID_delete);
 			GAA_CHECK1STR("", GAAOPTID_write);
 			GAA_CHECK1STR("", GAAOPTID_initialize);
+			GAA_CHECK1STR("", GAAOPTID_list_mechanisms);
 			GAA_CHECK1STR("", GAAOPTID_export);
         case GAA_MULTIPLE_OPTION:
 #line 375 "gaa.skel"
@@ -630,6 +639,7 @@ static int gaa_get_option_num(char *str, int status)
 			GAA_CHECKSTR("list-certs", GAAOPTID_list_certs);
 			GAA_CHECKSTR("list-all-certs", GAAOPTID_list_all_certs);
 			GAA_CHECKSTR("list-all", GAAOPTID_list_all);
+			GAA_CHECKSTR("list-mechanisms", GAAOPTID_list_mechanisms);
 			GAA_CHECKSTR("list-tokens", GAAOPTID_list_tokens);
 			GAA_CHECKSTR("export", GAAOPTID_export);
 
@@ -655,6 +665,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	struct GAAOPTION_delete GAATMP_delete;
 	struct GAAOPTION_write GAATMP_write;
 	struct GAAOPTION_initialize GAATMP_initialize;
+	struct GAAOPTION_list_mechanisms GAATMP_list_mechanisms;
 	struct GAAOPTION_export GAATMP_export;
 
 #line 393 "gaa.skel"
@@ -678,7 +689,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
     {
 	case GAAOPTID_help:
 	OK = 0;
-#line 80 "p11tool.gaa"
+#line 83 "p11tool.gaa"
 { gaa_help(); exit(0); ;};
 
 		return GAA_OK;
@@ -688,7 +699,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_debug.arg1, gaa_getint, GAATMP_debug.size1);
 		gaa_index++;
-#line 78 "p11tool.gaa"
+#line 81 "p11tool.gaa"
 { gaaval->debug = GAATMP_debug.arg1 ;};
 
 		return GAA_OK;
@@ -698,7 +709,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_outfile.arg1, gaa_getstr, GAATMP_outfile.size1);
 		gaa_index++;
-#line 73 "p11tool.gaa"
+#line 76 "p11tool.gaa"
 { gaaval->outfile = GAATMP_outfile.arg1 ;};
 
 		return GAA_OK;
@@ -708,28 +719,28 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_provider.arg1, gaa_getstr, GAATMP_provider.size1);
 		gaa_index++;
-#line 70 "p11tool.gaa"
+#line 73 "p11tool.gaa"
 { gaaval->pkcs11_provider = GAATMP_provider.arg1 ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_inraw:
 	OK = 0;
-#line 66 "p11tool.gaa"
+#line 69 "p11tool.gaa"
 { gaaval->incert_format=1 ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_inder:
 	OK = 0;
-#line 65 "p11tool.gaa"
+#line 68 "p11tool.gaa"
 { gaaval->incert_format=1 ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_pkcs8:
 	OK = 0;
-#line 62 "p11tool.gaa"
+#line 65 "p11tool.gaa"
 { gaaval->pkcs8=1 ;};
 
 		return GAA_OK;
@@ -739,7 +750,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_load_certificate.arg1, gaa_getstr, GAATMP_load_certificate.size1);
 		gaa_index++;
-#line 59 "p11tool.gaa"
+#line 62 "p11tool.gaa"
 { gaaval->cert = GAATMP_load_certificate.arg1 ;};
 
 		return GAA_OK;
@@ -749,7 +760,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_load_pubkey.arg1, gaa_getstr, GAATMP_load_pubkey.size1);
 		gaa_index++;
-#line 56 "p11tool.gaa"
+#line 59 "p11tool.gaa"
 { gaaval->pubkey = GAATMP_load_pubkey.arg1 ;};
 
 		return GAA_OK;
@@ -759,7 +770,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_load_privkey.arg1, gaa_getstr, GAATMP_load_privkey.size1);
 		gaa_index++;
-#line 53 "p11tool.gaa"
+#line 56 "p11tool.gaa"
 { gaaval->privkey = GAATMP_load_privkey.arg1 ;};
 
 		return GAA_OK;
@@ -769,35 +780,35 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_secret_key.arg1, gaa_getstr, GAATMP_secret_key.size1);
 		gaa_index++;
-#line 50 "p11tool.gaa"
+#line 53 "p11tool.gaa"
 { gaaval->secret_key = GAATMP_secret_key.arg1; ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_no_detailed_url:
 	OK = 0;
-#line 47 "p11tool.gaa"
+#line 50 "p11tool.gaa"
 { gaaval->pkcs11_detailed_url = 0; ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_detailed_url:
 	OK = 0;
-#line 46 "p11tool.gaa"
+#line 49 "p11tool.gaa"
 { gaaval->pkcs11_detailed_url = GNUTLS_PKCS11_URL_LIB; ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_login:
 	OK = 0;
-#line 43 "p11tool.gaa"
+#line 46 "p11tool.gaa"
 { gaaval->pkcs11_login = 1; ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_trusted:
 	OK = 0;
-#line 40 "p11tool.gaa"
+#line 43 "p11tool.gaa"
 { gaaval->pkcs11_trusted = 1; ;};
 
 		return GAA_OK;
@@ -807,7 +818,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_label.arg1, gaa_getstr, GAATMP_label.size1);
 		gaa_index++;
-#line 38 "p11tool.gaa"
+#line 41 "p11tool.gaa"
 { gaaval->pkcs11_label = GAATMP_label.arg1; ;};
 
 		return GAA_OK;
@@ -817,7 +828,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_delete.arg1, gaa_getstr, GAATMP_delete.size1);
 		gaa_index++;
-#line 35 "p11tool.gaa"
+#line 38 "p11tool.gaa"
 { gaaval->action = ACTION_PKCS11_DELETE_URL; gaaval->pkcs11_url = GAATMP_delete.arg1; ;};
 
 		return GAA_OK;
@@ -827,7 +838,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_write.arg1, gaa_getstr, GAATMP_write.size1);
 		gaa_index++;
-#line 34 "p11tool.gaa"
+#line 37 "p11tool.gaa"
 { gaaval->action = ACTION_PKCS11_WRITE_URL; gaaval->pkcs11_url = GAATMP_write.arg1; ;};
 
 		return GAA_OK;
@@ -837,43 +848,53 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAATMP_initialize.arg1, gaa_getstr, GAATMP_initialize.size1);
 		gaa_index++;
-#line 33 "p11tool.gaa"
+#line 36 "p11tool.gaa"
 { gaaval->action = ACTION_PKCS11_TOKEN_INIT; gaaval->pkcs11_url = GAATMP_initialize.arg1; ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_list_trusted:
 	OK = 0;
-#line 30 "p11tool.gaa"
+#line 33 "p11tool.gaa"
 { gaaval->action = ACTION_PKCS11_LIST; gaaval->pkcs11_type=PKCS11_TYPE_TRUSTED; ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_list_privkeys:
 	OK = 0;
-#line 29 "p11tool.gaa"
+#line 32 "p11tool.gaa"
 { gaaval->action = ACTION_PKCS11_LIST; gaaval->pkcs11_type=PKCS11_TYPE_PRIVKEY; ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_list_certs:
 	OK = 0;
-#line 28 "p11tool.gaa"
+#line 31 "p11tool.gaa"
 { gaaval->action = ACTION_PKCS11_LIST; gaaval->pkcs11_type=PKCS11_TYPE_PK; ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_list_all_certs:
 	OK = 0;
-#line 27 "p11tool.gaa"
+#line 30 "p11tool.gaa"
 { gaaval->action = ACTION_PKCS11_LIST; gaaval->pkcs11_type=PKCS11_TYPE_CRT_ALL; ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_list_all:
 	OK = 0;
-#line 26 "p11tool.gaa"
+#line 29 "p11tool.gaa"
 { gaaval->action = ACTION_PKCS11_LIST; gaaval->pkcs11_type=PKCS11_TYPE_ALL; ;};
+
+		return GAA_OK;
+		break;
+	case GAAOPTID_list_mechanisms:
+	OK = 0;
+		GAA_TESTMOREARGS;
+		GAA_FILL(GAATMP_list_mechanisms.arg1, gaa_getstr, GAATMP_list_mechanisms.size1);
+		gaa_index++;
+#line 27 "p11tool.gaa"
+{ gaaval->pkcs11_url = GAATMP_list_mechanisms.arg1; gaaval->action = ACTION_PKCS11_MECHANISMS; ;};
 
 		return GAA_OK;
 		break;
@@ -918,7 +939,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     if(inited == 0)
     {
 
-#line 82 "p11tool.gaa"
+#line 85 "p11tool.gaa"
 { 	gaaval->action = -1; gaaval->pkcs11_provider= NULL; gaaval->outfile = NULL; gaaval->pubkey = NULL; gaaval->privkey = NULL;
 	gaaval->pkcs11_url = NULL; gaaval->pkcs11_type = PKCS11_TYPE_PK; gaaval->pubkey=NULL; gaaval->pkcs11_label = NULL; 
 	gaaval->pkcs11_trusted=0; gaaval->pkcs11_login = 0; gaaval->pkcs11_detailed_url = GNUTLS_PKCS11_URL_LIB; 

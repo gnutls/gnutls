@@ -2762,7 +2762,7 @@ find_flags (pakchois_session_t * pks, struct token_info *info,
 /**
  * gnutls_pkcs11_token_get_flags:
  * @url: should contain a PKCS 11 URL
- * @flags: The output flags
+ * @flags: The output flags (GNUTLS_PKCS11_TOKEN_*)
  *
  * This function will return information about the PKCS 11 token flags.
  *
@@ -2791,6 +2791,67 @@ gnutls_pkcs11_token_get_flags (const char *url, unsigned int *flags)
   *flags = 0;
   if (find_data.slot_flags & CKF_HW_SLOT)
     *flags |= GNUTLS_PKCS11_TOKEN_HW;
+
+  return 0;
+
+}
+
+
+/**
+ * gnutls_pkcs11_token_get_mechanism:
+ * @url: should contain a PKCS 11 URL
+ * @idx: The index of the mechanism
+ * @mechanism: The PKCS #11 mechanism ID
+ *
+ * This function will return the names of the supported mechanisms
+ * by the token. It should be called with an increasing index until
+ * it return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
+ *
+ * Returns: zero on success or a negative value on error.
+ **/
+int
+gnutls_pkcs11_token_get_mechanism (const char *url, int idx, 
+  unsigned long* mechanism)
+{
+  int ret;
+  ck_rv_t rv;
+  pakchois_module_t *module;
+  ck_slot_id_t slot;
+  struct token_info tinfo;
+  struct pkcs11_url_info info;
+  unsigned long count;
+  ck_mechanism_type_t mlist[400];
+
+  ret = pkcs11_url_to_info (url, &info);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+
+  ret = pkcs11_find_slot(&module, &slot, &info, &tinfo);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+
+  count = sizeof(mlist)/sizeof(mlist[0]);
+  rv = pakchois_get_mechanism_list(module, slot, mlist, &count);
+  if (rv != CKR_OK)
+    {
+      gnutls_assert();
+      return pkcs11_rv_to_err (rv);
+    }
+
+  if (idx >= count)
+    {
+      gnutls_assert();
+      return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+  
+  *mechanism = mlist[idx];
 
   return 0;
 

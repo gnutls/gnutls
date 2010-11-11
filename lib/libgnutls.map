@@ -693,6 +693,7 @@ GNUTLS_2_12
 	gnutls_pkcs11_copy_secret_key;
 	gnutls_pkcs11_token_init;
 	gnutls_pkcs11_token_set_pin;
+	gnutls_pkcs11_token_get_mechanism;
 } GNUTLS_2_10;
 
 GNUTLS_PRIVATE {

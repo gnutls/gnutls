@@ -148,6 +148,10 @@ gnutls_pkcs11_token_init (const char *token_url,
 				 const char *label);
 
 int
+gnutls_pkcs11_token_get_mechanism (const char *url, int idx, 
+  unsigned long *mechanism);
+
+int
 gnutls_pkcs11_token_set_pin (const char *token_url,
   const char* oldpin, const char* newpin, unsigned int flags/*gnutls_pkcs11_pin_flag_t*/);
 
@@ -177,8 +181,9 @@ gnutls_pkcs11_obj_type_t gnutls_pkcs11_obj_get_type (gnutls_pkcs11_obj_t
 						     certificate);
 const char *gnutls_pkcs11_type_get_name (gnutls_pkcs11_obj_type_t);
 
-int gnutls_x509_crt_list_import_pkcs11 (gnutls_x509_crt_t * certs, unsigned int cert_max, gnutls_pkcs11_obj_t * const pkcs11_certs, unsigned int flags	/* must be zero */
-  );
+int gnutls_x509_crt_list_import_pkcs11 (gnutls_x509_crt_t * certs, 
+  unsigned int cert_max, gnutls_pkcs11_obj_t * const pkcs11_certs, 
+  unsigned int flags	/* must be zero */);
 
 
 /* private key functions...*/

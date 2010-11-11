@@ -5,6 +5,7 @@
 
 void pkcs11_list (FILE * outfile, const char *url, int type,
 		  unsigned int login, unsigned int detailed, common_info_st*);
+void pkcs11_mechanism_list (FILE * outfile, const char *url, unsigned int login, common_info_st*);
 void pkcs11_export (FILE * outfile, const char *pkcs11_url,
 		    unsigned int login, common_info_st*);
 void pkcs11_token_list (FILE * outfile, unsigned int detailed, common_info_st*);
@@ -29,6 +30,7 @@ enum
   ACTION_PKCS11_WRITE_URL,
   ACTION_PKCS11_DELETE_URL,
   ACTION_PKCS11_TOKEN_INIT,
+  ACTION_PKCS11_MECHANISMS,
 };
 
 #endif
