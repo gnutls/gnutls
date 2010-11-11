@@ -8,23 +8,23 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 75 "p11tool.gaa"
+#line 76 "p11tool.gaa"
 	int debug;
-#line 70 "p11tool.gaa"
+#line 71 "p11tool.gaa"
 	char *outfile;
-#line 67 "p11tool.gaa"
+#line 68 "p11tool.gaa"
 	int action;
-#line 66 "p11tool.gaa"
+#line 67 "p11tool.gaa"
 	char* pkcs11_provider;
-#line 62 "p11tool.gaa"
+#line 63 "p11tool.gaa"
 	int incert_format;
-#line 59 "p11tool.gaa"
+#line 60 "p11tool.gaa"
 	int pkcs8;
-#line 56 "p11tool.gaa"
+#line 57 "p11tool.gaa"
 	char *cert;
-#line 53 "p11tool.gaa"
+#line 54 "p11tool.gaa"
 	char *pubkey;
-#line 50 "p11tool.gaa"
+#line 51 "p11tool.gaa"
 	char *privkey;
 #line 45 "p11tool.gaa"
 	int pkcs11_detailed_url;
