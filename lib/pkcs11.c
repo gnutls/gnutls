@@ -1779,13 +1779,12 @@ cleanup:
 unsigned int
 pkcs11_obj_flags_to_int (unsigned int flags)
 {
-  switch (flags)
-    {
-    case GNUTLS_PKCS11_OBJ_FLAG_LOGIN:
-      return SESSION_LOGIN;
-    default:
-      return 0;
-    }
+unsigned int ret_flags = 0;
+
+  if (flags & GNUTLS_PKCS11_OBJ_FLAG_LOGIN)
+      ret_flags |= SESSION_LOGIN;
+  
+  return ret_flags;
 }
 
 /**

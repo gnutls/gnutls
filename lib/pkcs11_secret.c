@@ -27,6 +27,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_datum.h>
 #include <pkcs11_int.h>
+#include <random.h>
 
 /**
  * gnutls_pkcs11_copy_x509_crt:
@@ -53,16 +54,26 @@ int gnutls_pkcs11_copy_secret_key (const char *token_url, gnutls_datum_t* key,
   pakchois_session_t *pks;
   struct pkcs11_url_info info;
   ck_rv_t rv;
-  struct ck_attribute a[8];
+  struct ck_attribute a[12];
   ck_object_class_t class = CKO_SECRET_KEY;
   ck_object_handle_t obj;
+  ck_key_type_t keytype = CKK_GENERIC_SECRET;
   unsigned int tval = 1;
   int a_val;
+  opaque id[16];
 
   ret = pkcs11_url_to_info (token_url, &info);
   if (ret < 0)
     {
       gnutls_assert ();
+      return ret;
+    }
+
+  /* generate a unique ID */
+  ret = _gnutls_rnd (GNUTLS_RND_NONCE, id, sizeof(id));
+  if (ret < 0)
+    {
+      gnutls_assert();
       return ret;
     }
 
@@ -89,8 +100,14 @@ int gnutls_pkcs11_copy_secret_key (const char *token_url, gnutls_datum_t* key,
   a[3].type = CKA_PRIVATE;
   a[3].value = &tval;
   a[3].value_len = sizeof (tval);
+  a[4].type = CKA_KEY_TYPE;
+  a[4].value = &keytype;
+  a[4].value_len = sizeof (keytype);
+  a[5].type = CKA_ID;
+  a[5].value = id;
+  a[5].value_len = sizeof(id);
 
-  a_val = 4;
+  a_val = 6;
 
   if (label)
     {
