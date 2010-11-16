@@ -178,7 +178,7 @@ _encode_privkey (gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 	  return _gnutls_asn2err (ret);
 	}
 
-      ret = _gnutls_x509_write_int (spk, "", pkey->params[4], 0);
+      ret = _gnutls_x509_write_int (spk, "", pkey->params[4], 1);
       if (ret < 0)
 	{
 	  gnutls_assert ();
