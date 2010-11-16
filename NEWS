@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.10.3 (unreleased)
 
+** libgnutls: Correctly add leading zero to PKCS #8 encoded DSA key.
+Reported by Jeffrey Walton.
+
 ** libgnutls: Corrected memory leak in extension data calculation. 
 Reported by Mike Blumenkrantz.
 
