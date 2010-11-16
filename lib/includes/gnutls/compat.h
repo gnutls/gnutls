@@ -194,4 +194,9 @@ const void *gnutls_session_get_server_random (gnutls_session_t session) _GNUTLS_
 const void *gnutls_session_get_client_random (gnutls_session_t session) _GNUTLS_GCC_ATTR_DEPRECATED;
 const void *gnutls_session_get_master_secret (gnutls_session_t session) _GNUTLS_GCC_ATTR_DEPRECATED;
 
+int gnutls_psk_netconf_derive_key (const char *password,
+				     const char *psk_identity,
+				     const char *psk_identity_hint,
+				     gnutls_datum_t * output_key) _GNUTLS_GCC_ATTR_DEPRECATED;
+
 #endif /* _GNUTLS_COMPAT_H */

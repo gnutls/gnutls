@@ -342,9 +342,10 @@ the hint, for example in the callback function, using
 @ref{gnutls_psk_client_get_hint}.
 
 There is no standard mechanism to derive a PSK key from a password
-specified by the TLS PSK document.  However, GnuTLS provides
+specified by the TLS PSK document.  GnuTLS provides
 @ref{gnutls_psk_netconf_derive_key} which follows the algorithm
-specified in @file{draft-ietf-netconf-tls-02.txt}.
+specified in @file{draft-ietf-netconf-tls-02.txt}. This method
+is deprecated and might be removed in later versions of GnuTLS.
 
 Some helper functions such as:
 
