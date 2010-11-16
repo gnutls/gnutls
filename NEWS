@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.11.5 (unreleased)
 
+** libgnutls: Added Added SIGN-ALL, CTYPE-ALL, COMP-ALL, and VERS-TLS-ALL
+as priority strings. Those allow to set all the supported algorithms
+at once.
+
 ** p11tool: Introduced. It allows manipulating pkcs 11 tokens.
 
 ** gnutls-cli: Print channel binding only in verbose mode.

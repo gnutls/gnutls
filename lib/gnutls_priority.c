@@ -552,7 +552,9 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  * To avoid collisions in order to specify a compression algorithm in
  * this string you have to prefix it with "COMP-", protocol versions
  * with "VERS-", signature algorithms with "SIGN-" and certificate types with "CTYPE-". All other
- * algorithms don't need a prefix.
+ * algorithms don't need a prefix. The keywords "SIGN-ALL", "CTYPE-ALL", "COMP-ALL",
+ * and "VERS-TLS-ALL"  can be used to add all the support signature types, certificate
+ * types, compression methods and supported TLS version numbers.
  *
  * Examples:
  * "NORMAL:!AES-128-CBC" means normal ciphers except for AES-128.
@@ -560,7 +562,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  * "EXPORT:!VERS-TLS1.0:+COMP-DEFLATE" means that export ciphers are
  * enabled, TLS 1.0 is disabled, and libz compression enabled.
  *
- * "NONE:+VERS-TLS1.0:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1", "NORMAL",
+ * "NONE:+VERS-TLS-ALL:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1", "NORMAL",
  * "%COMPAT".
  *
  * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
@@ -680,39 +682,67 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	    fn (&(*priority_cache)->kx, algo);
 	  else if (strncasecmp (&broken_list[i][1], "VERS-", 5) == 0)
 	    {
-	      if ((algo =
-		   gnutls_protocol_get_id (&broken_list[i][6])) !=
-		  GNUTLS_VERSION_UNKNOWN)
-		fn (&(*priority_cache)->protocol, algo);
-	      else
-		goto error;
+	      if (strncasecmp (&broken_list[i][1], "VERS-TLS-ALL", 12) == 0)
+	        {
+	          _set_priority (&(*priority_cache)->protocol, protocol_priority);
+	        }
+	      else 
+	        {
+  	          if ((algo =
+		       gnutls_protocol_get_id (&broken_list[i][6])) !=
+		      GNUTLS_VERSION_UNKNOWN)
+                    fn (&(*priority_cache)->protocol, algo);
+                  else
+		    goto error;
+                }
 	    }			/* now check if the element is something like -ALGO */
 	  else if (strncasecmp (&broken_list[i][1], "COMP-", 5) == 0)
 	    {
-	      if ((algo =
-		   gnutls_compression_get_id (&broken_list[i][6])) !=
-		  GNUTLS_COMP_UNKNOWN)
-		fn (&(*priority_cache)->compression, algo);
-	      else
-		goto error;
+	      if (strncasecmp (&broken_list[i][1], "COMP-ALL", 8) == 0)
+	        {
+	          _set_priority (&(*priority_cache)->compression, comp_priority);
+	        }
+	      else 
+	        {
+	          if ((algo =
+		       gnutls_compression_get_id (&broken_list[i][6])) !=
+		       GNUTLS_COMP_UNKNOWN)
+                    fn (&(*priority_cache)->compression, algo);
+                  else
+                    goto error;
+                }
 	    }			/* now check if the element is something like -ALGO */
 	  else if (strncasecmp (&broken_list[i][1], "CTYPE-", 6) == 0)
 	    {
-	      if ((algo =
-		   gnutls_certificate_type_get_id (&broken_list[i][7])) !=
-		  GNUTLS_CRT_UNKNOWN)
-		fn (&(*priority_cache)->cert_type, algo);
-	      else
-		goto error;
+	      if (strncasecmp (&broken_list[i][1], "CTYPE-ALL", 9) == 0)
+	        {
+	          _set_priority (&(*priority_cache)->cert_type, cert_type_priority);
+	        }
+	      else 
+	        {
+	          if ((algo =
+		       gnutls_certificate_type_get_id (&broken_list[i][7])) !=
+		       GNUTLS_CRT_UNKNOWN)
+                    fn (&(*priority_cache)->cert_type, algo);
+                  else
+                    goto error;
+                }
 	    }			/* now check if the element is something like -ALGO */
 	  else if (strncasecmp (&broken_list[i][1], "SIGN-", 5) == 0)
 	    {
-	      if ((algo =
-		   gnutls_sign_get_id (&broken_list[i][6])) !=
-		  GNUTLS_SIGN_UNKNOWN)
-		fn (&(*priority_cache)->sign_algo, algo);
-	      else
-		goto error;
+	      if (strncasecmp (&broken_list[i][1], "SIGN-ALL", 8) == 0)
+	        {
+	          _set_priority (&(*priority_cache)->sign_algo, sign_priority_default);
+	        }
+	      else 
+	        {
+	          if ((algo =
+                      gnutls_sign_get_id (&broken_list[i][6])) !=
+                      GNUTLS_SIGN_UNKNOWN)
+    		    fn (&(*priority_cache)->sign_algo, algo);
+                  else
+                    goto error;
+                }
 	    }			/* now check if the element is something like -ALGO */
 	  else
 	    goto error;
