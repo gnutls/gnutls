@@ -581,8 +581,7 @@ _gnutls_x509_write_dsa_public_key (bigint_t * params, int params_size,
       goto cleanup;
     }
 
-  asn1_delete_structure (&spk);
-  return 0;
+  result = 0;
 
 cleanup:
   asn1_delete_structure (&spk);
