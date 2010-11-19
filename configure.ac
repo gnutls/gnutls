@@ -292,6 +292,10 @@ AC_CONFIG_FILES([
   tests/sha2/Makefile
   tests/userid/Makefile
 ])
+if test -d tests/suite;then
+AC_CONFIG_FILES([tests/suite/Makefile])
+fi
+
 AC_OUTPUT
 
 AC_MSG_NOTICE([summary of build options:
