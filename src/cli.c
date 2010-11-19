@@ -1138,8 +1138,11 @@ static int
 psk_callback (gnutls_session_t session, char **username, gnutls_datum_t * key)
 {
   const char *hint = gnutls_psk_client_get_hint (session);
+  unsigned char* rawkey;
   char *passwd;
   int ret;
+  size_t res_size;
+  gnutls_datum_t tmp;
 
   printf ("- PSK client callback. ");
   if (hint)
@@ -1176,15 +1179,22 @@ psk_callback (gnutls_session_t session, char **username, gnutls_datum_t * key)
   if (!*username)
     return GNUTLS_E_MEMORY_ERROR;
 
-  passwd = getpass ("Enter password: ");
+  passwd = getpass ("Enter key: ");
   if (passwd == NULL)
     {
-      fprintf (stderr, "No password given, aborting...\n");
+      fprintf (stderr, "No key given, aborting...\n");
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  ret = gnutls_psk_netconf_derive_key (passwd,
-				       *username, hint ? hint : "", key);
+  tmp.data = passwd;
+  tmp.size = strlen(passwd);
+  
+  res_size = tmp.size/2+1;
+  rawkey = gnutls_malloc(res_size);
+  if (rawkey == NULL)
+    return GNUTLS_E_MEMORY_ERROR;
+
+  ret = gnutls_hex_decode(&tmp, rawkey, &res_size);
   if (ret < 0)
     {
       fprintf (stderr, "Error deriving password: %s\n",
@@ -1192,11 +1202,14 @@ psk_callback (gnutls_session_t session, char **username, gnutls_datum_t * key)
       gnutls_free (*username);
       return ret;
     }
+    
+  key->data = rawkey;
+  key->size = res_size;
 
   if (info.debug)
     {
       char hexkey[41];
-      size_t res_size = sizeof (hexkey);
+      res_size = sizeof (hexkey);
       gnutls_hex_encode (key, hexkey, &res_size);
       fprintf (stderr, "PSK username: %s\n", *username);
       fprintf (stderr, "PSK hint: %s\n", hint);

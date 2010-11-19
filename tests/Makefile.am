@@ -74,7 +74,7 @@ endif
 
 if HAVE_FORK
 ctests += x509self x509dn anonself pskself dhepskself	\
-	tlsia resume netconf-psk setcredcrash
+	tlsia resume setcredcrash
 
 if ENABLE_OPENPGP
 ctests += openpgpself 
