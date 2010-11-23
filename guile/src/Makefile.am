@@ -122,7 +122,7 @@ extra-smob-types.i.c: $(srcdir)/make-smob-types.scm
 snarfcppopts = $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
 	       $(CFLAGS) $(AM_CFLAGS) $(GUILE_CFLAGS)
 
-.c.x:
+.c.x: $(BUILT_SOURCES)
 	$(guile_snarf) -o $@ $< $(snarfcppopts)
 
 # Target used by doc/Makefile, to create all built sources necessary
