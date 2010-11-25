@@ -1,8 +1,6 @@
 GnuTLS README -- Important introductory notes.
-
 Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
               2008, 2009, 2010  Free Software Foundation, Inc.
-
 See the end of this document for copying conditions.
 
 GnuTLS implements the TLS/SSL (Transport Layer Security aka Secure
@@ -16,7 +14,7 @@ README
 This README is targeted for users of the library who build from
 sources but do not necessarily develop.  If you are interested
 in developing and contributing to the GnuTLS project, please
-see README-alpha and visit 
+see README-alpha and visit
 http://www.gnu.org/software/gnutls/manual/html_node/Contributing.html.
 
 
@@ -78,7 +76,7 @@ The examples include client, server, and multi-threaded examples.
 
 SECURITY ADVISORIES
 -------------------
-The project collects and publishes information on past security 
+The project collects and publishes information on past security
 incidents and vulnerabilities.  Open information exchange, including
 information which is [sometimes] suppressed in non-open or non-free
 projects, is one of the goals of the GnuTLS project.  Please visit
