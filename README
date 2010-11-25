@@ -139,15 +139,19 @@ PATCHES
 Patches are welcome and encouraged.  Details of contributing can be found
 at http://www.gnu.org/software/gnutls/manual/html_node/Contributing.html.
 
-Patches are submitted through the bug tracking system.  When submitting
-patches, please be sure to use sources from the git repository.  To
+Patches are submitted through the bug tracking system or to the
+mailing list.  When submitting patches, please be sure to use sources
+from the git repository, and preferrably from the master branch.  To
 create a patch for the project from a local git repository, please use
 the following commands.  'gnutls' should be the local directory of a
-previous git clone, and <filename> should reflect a descriptive name for
-the patch.
+previous git clone.
 
     cd gnutls
-    git diff > <filename>.patch
+    git add the-file-you-modified.c another-file.c
+    git commit the-file-you-modified.c another-file.c
+    git format-patch
+
+For more information on use of Git, visit http://git-scm.com/
 
 ----------------------------------------------------------------------
 Copying and distribution of this file, with or without modification,
