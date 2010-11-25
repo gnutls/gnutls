@@ -8,7 +8,7 @@ See the end for copying conditions.
 ** libgnutls: Correctly add leading zero to PKCS #8 encoded DSA key.
 Reported by Jeffrey Walton.
 
-** libgnutls: Added Added SIGN-ALL, CTYPE-ALL, COMP-ALL, and VERS-TLS-ALL
+** libgnutls: Added SIGN-ALL, CTYPE-ALL, COMP-ALL, and VERS-TLS-ALL
 as priority strings. Those allow to set all the supported algorithms
 at once.
 
