@@ -649,11 +649,6 @@ _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
  * This function uses gnutls_x509_crt_list_verify() with the CAs in
  * the credentials as trusted CAs.
  *
- * Note that some commonly used X.509 Certificate Authorities are
- * still using Version 1 certificates.  If you want to accept them,
- * you need to call gnutls_certificate_set_verify_flags() with, e.g.,
- * %GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT parameter.
- *
  * Returns: a negative error code on error and zero on success.
  **/
 int

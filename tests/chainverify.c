@@ -687,15 +687,13 @@ static struct
   { "CVE-2008-4989", cve_2008_4989_chain, &cve_2008_4989_chain[2],
     0, GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID },
   { "verisign.com v1 fail", verisign_com_chain, &verisign_com_chain[3],
-    0, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
-  { "verisign.com v1 fail2", verisign_com_chain, &verisign_com_chain[3],
-    GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT,
+    0,
     GNUTLS_CERT_EXPIRED | GNUTLS_CERT_INVALID },
   { "verisign.com v1 ok", verisign_com_chain, &verisign_com_chain[3],
     GNUTLS_VERIFY_DISABLE_TIME_CHECKS | GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT,
     0 },
   { "citibank.com v1 fail", citibank_com_chain, &citibank_com_chain[2],
-    0, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
+    GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
   { "expired self signed", pem_self_cert, &pem_self_cert[0],
     0, GNUTLS_CERT_EXPIRED | GNUTLS_CERT_INVALID },
   { "self signed", pem_self_cert, &pem_self_cert[0],
@@ -706,7 +704,7 @@ static struct
   { "ca=false2", thea_chain, &thea_chain[1],
     0, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
   { "hbci v1 fail", hbci_chain, &hbci_chain[2],
-    0, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID},
+    GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID},
   { "hbci v1 ok expired", hbci_chain, &hbci_chain[2],
     GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT,
     GNUTLS_CERT_EXPIRED | GNUTLS_CERT_INVALID },
@@ -724,7 +722,7 @@ static struct
   { "rsa-md5 ok", mayfirst_chain, &mayfirst_chain[1],
     GNUTLS_VERIFY_DISABLE_TIME_CHECKS | GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5, 0 },
   { "v1ca fail", v1ca, &v1ca[2],
-    0, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
+    GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT, GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID },
   { "v1ca expired", v1ca, &v1ca[2],
     GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT,
     GNUTLS_CERT_EXPIRED | GNUTLS_CERT_INVALID  },
@@ -850,6 +848,15 @@ doit (void)
 	{
 	  fail ("chain[%s]: verify_status: %d expected: %d\n", chains[i].name,
 		verify_status, chains[i].expected_verify_result);
+
+#if 0
+              j=0;
+              do
+                {
+                  fprintf(stderr, "%s\n", chains[i].chain[j]);
+                }
+              while(chains[i].chain[++j] != NULL);
+#endif
 
 	  if (!debug)
 	    exit (1);

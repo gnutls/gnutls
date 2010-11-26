@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.11.5 (unreleased)
 
+** libgnutls: Reverted default behavior for verification and
+introduced GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT. Thus by default
+V1 trusted CAs are allowed, unless the new flag is specified.
+
 ** libgnutls: Correctly add leading zero to PKCS #8 encoded DSA key.
 Reported by Jeffrey Walton.
 
