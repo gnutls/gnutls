@@ -506,10 +506,10 @@ extern "C"
  * @GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS: If set a signer in the trusted
  *   list is never checked for expiration or activation.
  * @GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT: Allow only trusted CA
- *   certificates that have version 1.  This is safer than
- *   %GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT, and should be used
- *   instead. That way only signers in your trusted list will be
- *   allowed to have certificates of version 1.
+ *   certificates that have version 1.  This is the default.
+ * @GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT: Do not allow trusted CA
+ *   certificates that have version 1.  This option is to be used
+ *   to deprecate all V1 certificates.
  * @GNUTLS_VERIFY_DO_NOT_ALLOW_SAME: If a certificate is not signed by
  *   anyone trusted but exists in the trusted CA list do not treat it
  *   as trusted.
@@ -537,7 +537,8 @@ extern "C"
     GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2 = 16,
     GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5 = 32,
     GNUTLS_VERIFY_DISABLE_TIME_CHECKS = 64,
-    GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS = 128
+    GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS = 128,
+    GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT = 256
   } gnutls_certificate_verify_flags;
 
   int gnutls_x509_crt_check_issuer (gnutls_x509_crt_t cert,

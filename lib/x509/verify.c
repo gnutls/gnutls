@@ -171,7 +171,7 @@ check_if_ca (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
      these certs only if the appropriate flags are set. */
   else if ((result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) &&
 	   ((flags & GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT) ||
-	    ((flags & GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT) &&
+	    (!(flags & GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT) &&
 	     (gnutls_x509_crt_check_issuer (issuer, issuer) == 1))))
     {
       gnutls_assert ();
@@ -311,7 +311,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
     }
 
   if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN) &&
-      !((flags & GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT) && issuer_version == 1))
+      ((flags & GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT) || issuer_version != 1))
     {
       if (check_if_ca (cert, issuer, flags) == 0)
 	{

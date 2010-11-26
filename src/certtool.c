@@ -2065,8 +2065,8 @@ _verify_x509_mem (const void *cert, int cert_size)
 {
   const char *ptr;
   int ret, i;
-  char name[256];
-  char issuer_name[256];
+  char name[512];
+  char issuer_name[512];
   size_t name_size;
   size_t issuer_name_size;
   gnutls_datum_t tmp;
