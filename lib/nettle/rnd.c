@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2008, 2010 Free Software Foundation, Inc.
+ * Copyright (C) 2010 Free Software Foundation, Inc.
+ * Copyright (C) 2000, 2001, 2008 Niels Möller
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -22,7 +23,9 @@
  *
  */
 
-/* Here is the libgcrypt random generator layer.
+/* Here is the random generator layer. This code was based on the LSH 
+ * random generator and modified to fit gnutls' needs. Relicenced with 
+ * permission. Original author Niels Möller.
  */
 
 #include <gnutls_int.h>
