@@ -82,6 +82,7 @@ fi
 
 lgl_INIT
 
+AC_CHECK_FUNCS(getrusage,,)
 AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
 
 LIBGNUTLS_LIBS="-L${libdir} -lgnutls $LIBS"

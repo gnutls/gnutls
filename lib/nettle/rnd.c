@@ -155,6 +155,9 @@ wrap_nettle_rnd_deinit (void *ctx)
 #include <sys/time.h>
 #include <fcntl.h>
 #include <locks.h>
+#ifdef HAVE_GETRUSAGE
+# include <sys/resource.h>
+#endif
 #include "egd.h"
 
 #define DEVICE_READ_SIZE 16

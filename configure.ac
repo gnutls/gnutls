@@ -75,7 +75,7 @@ AC_DEFINE([HAVE_CTYPE_H], 1, [Hard-code for src/cfg/.])
 AC_DEFINE([HAVE_ERRNO_H], 1, [Hard-code for src/cfg/.])
 
 # No fork on MinGW, disable some self-tests until we fix them.
-AC_CHECK_FUNCS(fork getrusage,,)
+AC_CHECK_FUNCS(fork,,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
 AC_CHECK_TYPES(uint,,, [
