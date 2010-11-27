@@ -24,8 +24,9 @@
  */
 
 /* Here is the random generator layer. This code was based on the LSH 
- * random generator and modified to fit gnutls' needs. Relicenced with 
- * permission. Original author Niels Möller.
+ * random generator (the trivia and device source functions for POSIX)
+ * and modified to fit gnutls' needs. Relicenced with permission. 
+ * Original author Niels Möller.
  */
 
 #include <gnutls_int.h>
