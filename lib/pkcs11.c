@@ -1,11 +1,13 @@
 /*
  * GnuTLS PKCS#11 support
  * Copyright (C) 2010 Free Software Foundation
+ * Copyright (C) 2008, Joe Orton <joe@manyfish.co.uk>
  * 
  * Author: Nikos Mavrogiannopoulos
  *
- * Inspired and some parts based on neon PKCS #11 support by Joe Orton.
- * More ideas came from the pkcs11-helper library by Alon Bar-Lev.
+ * Inspired and some parts (pkcs11_login) based on neon PKCS #11 support 
+ * by Joe Orton. More ideas came from the pkcs11-helper library by 
+ * Alon Bar-Lev.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
