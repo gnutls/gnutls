@@ -869,7 +869,7 @@ pkcs11_mechanism_list (FILE * outfile, const char *url, unsigned int login,
             str = mech_list[mechanism];
           if (str == NULL) str = "UNKNOWN";
 
-          fprintf(outfile, "[%.4lx] %s\n", mechanism, str);
+          fprintf(outfile, "[0x%.4lx] %s\n", mechanism, str);
         }
     } while(ret >= 0);
 
