@@ -675,6 +675,23 @@ extern "C"
 #define CKM_X9_42_DH_PARAMETER_GEN	(0x2002)
 #define CKM_VENDOR_DEFINED		((unsigned long) (1 << 31))
 
+/* Ammendments */
+#define CKM_SHA224 (0x255)
+#define CKM_SHA224_HMAC (0x256)
+#define CKM_SHA224_HMAC_GENERAL (0x257)
+#define CKM_SHA224_RSA_PKCS (0x46)
+#define CKM_SHA224_RSA_PKCS_PSS (0x47)
+#define CKM_SHA224_KEY_DERIVATION (0x396)
+
+#define CKM_CAMELLIA_KEY_GEN (0x550)
+#define CKM_CAMELLIA_ECB (0x551)
+#define CKM_CAMELLIA_CBC (0x552)
+#define CKM_CAMELLIA_MAC (0x553)
+#define CKM_CAMELLIA_MAC_GENERAL (0x554)
+#define CKM_CAMELLIA_CBC_PAD (0x555)
+#define CKM_CAMELLIA_ECB_ENCRYPT_DATA (0x556)
+#define CKM_CAMELLIA_CBC_ENCRYPT_DATA (0x557)
+
 
   struct ck_mechanism
   {
