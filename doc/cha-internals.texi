@@ -98,7 +98,11 @@ consider adding support for the hypothetical TLS extension
 
 @item Add @code{configure} option like @code{--enable-foobar} or @code{--disable-foobar}.
 
-Which to chose depends on whether you intend to make the extension be
+This step is useful when the extension code is large and it might be desirable
+to disable the extension under some circumstances. Otherwise it can be safely
+skipped.
+
+Whether to chose enable or disable depends on whether you intend to make the extension be
 enabled by default.  Look at existing checks (i.e., SRP, authz) for
 how to model the code.  For example:
 
@@ -141,29 +145,47 @@ A typical entry would be:
    */
 
 #if ENABLE_FOOBAR
-  ret = gnutls_ext_register (GNUTLS_EXTENSION_FOOBAR,
-                             "FOOBAR",
-                             GNUTLS_EXT_TLS,
-                             _gnutls_foobar_recv_params,
-                             _gnutls_foobar_send_params);
+
+  ret = _gnutls_ext_register (&foobar_ext);
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
 #endif
 @end example
 
-The GNUTLS_EXTENSION_FOOBAR is the integer value you added to
-@code{gnutls_int.h} earlier.  The two functions are new functions that
-you will need to implement, most likely you'll need to add an
-@code{#include "ext_foobar.h"} as well.
+Most likely you'll need to add an @code{#include "ext_foobar.h"}, that
+will contain something like
+like:
+@example
+  extension_entry_st foobar_ext = {
+    .name = "FOOBAR",
+    .type = GNUTLS_EXTENSION_FOOBAR,
+    .parse_type = GNUTLS_EXT_TLS,
+    .recv_func = _foobar_recv_params,
+    .send_func = _foobar_send_params,
+    .pack_func = _foobar_pack,
+    .unpack_func = _foobar_unpack,
+    .deinit_func = NULL
+  }
+@end example
 
-@item Add new files @code{ext_foobar.c} and @code{ext_foobar.h} that implements the extension.
+The GNUTLS_EXTENSION_FOOBAR is the integer value you added to
+@code{gnutls_int.h} earlier.  In this structure you specify the
+functions to read the extension from the hello message, the function
+to send the reply to, and two more functions to pack and unpack from
+stored session data (e.g. when resumming a session). The @code{deinit} function
+will be called to deinitialize the extension's private parameters, if any.
+
+Note that the conditional @code{ENABLE_FOOBAR} definition should only be 
+used if step 1 with the @code{configure} options has taken place.
+
+@item Add new files @code{ext_foobar.c} and @code{ext_foobar.h} that implement the extension.
 
 The functions you are responsible to add are those mentioned in the
 previous step.  As a starter, you could add this:
 
 @example
 int
-_gnutls_foobar_recv_params (gnutls_session_t session,
+_foobar_recv_params (gnutls_session_t session,
                             const opaque * data,
                             size_t data_size)
 @{
@@ -171,29 +193,50 @@ _gnutls_foobar_recv_params (gnutls_session_t session,
 @}
 
 int
-_gnutls_foobar_send_params (gnutls_session_t session,
+_foobar_send_params (gnutls_session_t session,
                             opaque * data,
                             size_t _data_size)
 @{
   return 0;
 @}
+
+int
+_foobar_pack (extension_priv_data_t epriv, gnutls_buffer_st * ps)
+@{
+   /* Append the extension's internal state to buffer */
+   return 0;
+@}
+
+int
+_foobar_unpack (gnutls_buffer_st * ps, extension_priv_data_t * epriv)
+@{
+   /* Read the internal state from buffer */
+   return 0;
+@}
 @end example
 
-The @code{_gnutls_foobar_recv_params} function is responsible for
+The @code{_foobar_recv_params} function is responsible for
 parsing incoming extension data (both in the client and server).
 
-The @code{_gnutls_foobar_send_params} function is responsible for
+The @code{_foobar_send_params} function is responsible for
 sending extension data (both in the client and server).
+
+The @code{_foobar_pack} function is responsible for packing
+internal extension data to save them in the session storage.
+
+The @code{_foobar_unpack} function is responsible for
+restoring session data from the session storage.
 
 If you receive length fields that doesn't match, return
 @code{GNUTLS_E_UNEXPECTED_PACKET_LENGTH}.  If you receive invalid
 data, return @code{GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER}.  You can use
 other error codes too.  Return 0 on success.
 
-The function typically store some information in the @code{session}
-variable for later usage.  If you need to add new fields there, check
-@code{tls_ext_st} in @code{gnutls_int.h} and compare with existing TLS
-extension specific variables.
+The function could store some information in the @code{session}
+variable for later usage. That can be done using the functions 
+@code{_gnutls_ext_set_session_data} and
+@code{_gnutls_ext_get_session_data}. You can check simple examples
+at @code{ext_max_record.c} and @code{ext_server_name.c} extensions.
 
 Recall that both the client and server both send and receives
 parameters, and your code most likely will need to do different things
