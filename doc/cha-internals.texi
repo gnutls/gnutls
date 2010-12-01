@@ -156,7 +156,7 @@ Most likely you'll need to add an @code{#include "ext_foobar.h"}, that
 will contain something like
 like:
 @example
-  extension_entry_st foobar_ext = {
+  extension_entry_st foobar_ext = @{
     .name = "FOOBAR",
     .type = GNUTLS_EXTENSION_FOOBAR,
     .parse_type = GNUTLS_EXT_TLS,
@@ -165,7 +165,7 @@ like:
     .pack_func = _foobar_pack,
     .unpack_func = _foobar_unpack,
     .deinit_func = NULL
-  }
+  @}
 @end example
 
 The GNUTLS_EXTENSION_FOOBAR is the integer value you added to
