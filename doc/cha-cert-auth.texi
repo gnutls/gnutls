@@ -372,7 +372,7 @@ the user to insert the token. All the initialization functions are below.
 @subsection Reading Objects
 
 All @acronym{PKCS #11} objects are referenced by @acronym{GnuTLS} functions by
-URLs as described in @code{draft-pechanec-pkcs11uri-01}. For example a public
+URLs as described in @code{draft-pechanec-pkcs11uri-03}. For example a public
 key on a smart card may be referenced as:
 
 @example
@@ -415,6 +415,10 @@ Objects can be accessed with the following functions
 
 Functions that relate to token handling are shown below
 @itemize
+
+@item @ref{gnutls_pkcs11_token_init}: Initializes a token
+
+@item @ref{gnutls_pkcs11_token_set_pin}: Sets the token user's PIN
 
 @item @ref{gnutls_pkcs11_token_get_url}: Returns the URL of a token
 
