@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.11.6 (unreleased)
 
+** libgnutls: Use ASN1_NULL when writing parameters for RSA signatures. 
+This makes us comply with RFC3279. Reported by Michael Rommel.
+
 ** gnutls-serv: Corrected a buffer overflow. Reported and patch by Tomas Mraz.
 
 ** API and ABI modifications:

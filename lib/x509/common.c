@@ -1226,7 +1226,7 @@ _gnutls_x509_encode_and_copy_PKI_params (ASN1_TYPE dst,
       _asnstr_append_name (name, sizeof (name), dst_name,
 			   ".algorithm.parameters");
 
-      result = asn1_write_value (dst, name, NULL, 0);
+      result = asn1_write_value (dst, name, ASN1_NULL, ASN1_NULL_SIZE);
       if (result != ASN1_SUCCESS)
 	{
 	  gnutls_assert ();

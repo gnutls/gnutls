@@ -456,7 +456,10 @@ _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
   _gnutls_str_cpy (name, sizeof (name), dst_name);
   _gnutls_str_cat (name, sizeof (name), ".parameters");
 
-  result = asn1_write_value (dst, name, NULL, 0);
+  if (pk_algorithm == GNUTLS_PK_RSA)
+    result = asn1_write_value (dst, name, ASN1_NULL, ASN1_NULL_SIZE);
+  else
+    result = asn1_write_value (dst, name, NULL, 0);
 
   if (result != ASN1_SUCCESS && result != ASN1_ELEMENT_NOT_FOUND)
     {

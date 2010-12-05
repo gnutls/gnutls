@@ -684,8 +684,8 @@ decode_ber_digest_info (const gnutls_datum_t * info,
   /* To avoid permitting garbage in the parameters field, either the
      parameters field is not present, or it contains 0x05 0x00. */
   if (!(result == ASN1_ELEMENT_NOT_FOUND ||
-	(result == ASN1_SUCCESS && len == 2 &&
-	 str[0] == 0x05 && str[1] == 0x00)))
+	(result == ASN1_SUCCESS && len == ASN1_NULL_SIZE &&
+	 memcmp(str, ASN1_NULL, ASN1_NULL_SIZE) == 0)))
     {
       gnutls_assert ();
       asn1_delete_structure (&dinfo);

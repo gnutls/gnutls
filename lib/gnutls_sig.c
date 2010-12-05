@@ -40,6 +40,7 @@
 #include <libtasn1.h>
 #include <ext_signature.h>
 #include <gnutls_state.h>
+#include <x509/common.h>
 
 static int
 _gnutls_tls_sign (gnutls_session_t session,
@@ -90,7 +91,7 @@ _gnutls_rsa_encode_sig (gnutls_mac_algorithm_t algo,
 
   /* Use NULL parameters. */
   if ((result = asn1_write_value (di, "digestAlgorithm.parameters",
-				  "\x05\x00", 2)) != ASN1_SUCCESS)
+				  ASN1_NULL, ASN1_NULL_SIZE)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       asn1_delete_structure (&di);
