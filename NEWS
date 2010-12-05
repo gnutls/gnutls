@@ -7,6 +7,9 @@ See the end for copying conditions.
 
 ** gnutls-serv: Corrected a buffer overflow. Reported and patch by Tomas Mraz.
 
+** libgnutls: Use ASN1_NULL when writing parameters for RSA signatures. 
+This makes us comply with RFC3279. Reported by Michael Rommel.
+
 ** libgnutls: Reverted default behavior for verification and
 introduced GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT. Thus by default
 V1 trusted CAs are allowed, unless the new flag is specified.

@@ -83,7 +83,7 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
      Regardless of what is correct, this appears to be what most
      implementations do.  */
   result = asn1_write_value (dinfo, "digestAlgorithm.parameters",
-			     "\x05\x00", 2);
+			     ASN1_NULL, ASN1_NULL_SIZE);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
