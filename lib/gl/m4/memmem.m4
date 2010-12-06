@@ -1,4 +1,4 @@
-# memmem.m4 serial 16
+# memmem.m4 serial 19
 dnl Copyright (C) 2002, 2003, 2004, 2007, 2008, 2009, 2010 Free Software
 dnl Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
@@ -35,12 +35,13 @@ AC_DEFUN([gl_FUNC_MEMMEM_SIMPLE],
            [
 #ifdef __GNU_LIBRARY__
  #include <features.h>
- #if (__GLIBC__ == 2 && __GLIBC_MINOR__ > 12) || (__GLIBC__ > 2)
+ #if ((__GLIBC__ == 2 && __GLIBC_MINOR__ > 12) || (__GLIBC__ > 2)) \
+     && !defined __UCLIBC__
   Lucky user
  #endif
 #elif defined __CYGWIN__
  #include <cygwin/version.h>
- #if CYGWIN_VERSION_DLL_MAJOR >= 1007 && CYGWIN_VERSION_DLL_MINOR > 7
+ #if CYGWIN_VERSION_DLL_COMBINED > CYGWIN_VERSION_DLL_MAKE_COMBINED (1007, 7)
   Lucky user
  #endif
 #else
@@ -63,7 +64,7 @@ dnl Additionally, check that memmem is efficient and handles empty needles.
 AC_DEFUN([gl_FUNC_MEMMEM],
 [
   AC_REQUIRE([gl_FUNC_MEMMEM_SIMPLE])
-  if test $HAVE_MEMMEM = 1 && test $REPLACE_MEMMEM = 0; then
+  if test $HAVE_DECL_MEMMEM = 1 && test $REPLACE_MEMMEM = 0; then
     AC_CACHE_CHECK([whether memmem works in linear time],
       [gl_cv_func_memmem_works_fast],
       [AC_RUN_IFELSE([AC_LANG_PROGRAM([[
@@ -98,13 +99,14 @@ static void quit (int sig) { exit (sig + 128); }
            [
 #include <features.h>
 #ifdef __GNU_LIBRARY__
- #if (__GLIBC__ == 2 && __GLIBC_MINOR__ > 12) || (__GLIBC__ > 2)
+ #if ((__GLIBC__ == 2 && __GLIBC_MINOR__ > 12) || (__GLIBC__ > 2)) \
+     && !defined __UCLIBC__
   Lucky user
  #endif
 #endif
 #ifdef __CYGWIN__
  #include <cygwin/version.h>
- #if CYGWIN_VERSION_DLL_MAJOR >= 1007 && CYGWIN_VERSION_DLL_MINOR > 7
+ #if CYGWIN_VERSION_DLL_COMBINED > CYGWIN_VERSION_DLL_MAKE_COMBINED (1007, 7)
   Lucky user
  #endif
 #endif

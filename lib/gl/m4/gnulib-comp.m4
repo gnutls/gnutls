@@ -240,6 +240,7 @@ AC_DEFUN([lgl_INIT],
   m4_ifdef([AM_XGETTEXT_OPTION],
     [AM_][XGETTEXT_OPTION([--flag=asprintf:2:c-format])
      AM_][XGETTEXT_OPTION([--flag=vasprintf:2:c-format])])
+  # Code from module verify:
   # Code from module vsnprintf:
   gl_FUNC_VSNPRINTF
   gl_STDIO_MODULE_INDICATOR([vsnprintf])
@@ -455,6 +456,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/vasnprintf.c
   lib/vasnprintf.h
   lib/vasprintf.c
+  lib/verify.h
   lib/vsnprintf.c
   lib/w32sock.h
   lib/wchar.in.h
@@ -588,5 +590,4 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests=lib/dummy.c
   tests=lib/getpagesize.c
   tests=lib/intprops.h
-  tests=lib/verify.h
 ])

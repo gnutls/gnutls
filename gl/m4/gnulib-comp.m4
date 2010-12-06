@@ -437,6 +437,7 @@ AC_SUBST([LTALLOCA])
   # Code from module vasnprintf:
   gl_FUNC_VASNPRINTF
   # Code from module vc-list-files:
+  # Code from module verify:
   # Code from module version-etc:
   gl_VERSION_ETC
   # Code from module version-etc-fsf:
@@ -705,6 +706,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/unistd.in.h
   lib/vasnprintf.c
   lib/vasnprintf.h
+  lib/verify.h
   lib/version-etc-fsf.c
   lib/version-etc.c
   lib/version-etc.h
@@ -861,7 +863,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/getpagesize.c
   tests=lib/ioctl.c
   tests=lib/sys_ioctl.in.h
-  tests=lib/verify.h
   tests=lib/w32sock.h
   top/GNUmakefile
   top/maint.mk

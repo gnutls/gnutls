@@ -1,4 +1,4 @@
-# printf.m4 serial 35
+# printf.m4 serial 39
 dnl Copyright (C) 2003, 2007-2010 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -439,16 +439,9 @@ changequote(,)dnl
                                          # Guess yes on FreeBSD >= 6.
                    freebsd[1-5]*)        gl_cv_func_printf_infinite_long_double="guessing no";;
                    freebsd* | kfreebsd*) gl_cv_func_printf_infinite_long_double="guessing yes";;
-                                         # Guess yes on MacOS X >= 10.3.
-                   darwin[1-6].*)        gl_cv_func_printf_infinite_long_double="guessing no";;
-                   darwin*)              gl_cv_func_printf_infinite_long_double="guessing yes";;
                                          # Guess yes on HP-UX >= 11.
                    hpux[7-9]* | hpux10*) gl_cv_func_printf_infinite_long_double="guessing no";;
                    hpux*)                gl_cv_func_printf_infinite_long_double="guessing yes";;
-                                         # Guess yes on NetBSD >= 3.
-                   netbsd[1-2]* | netbsdelf[1-2]* | netbsdaout[1-2]* | netbsdcoff[1-2]*)
-                                         gl_cv_func_printf_infinite_long_double="guessing no";;
-                   netbsd*)              gl_cv_func_printf_infinite_long_double="guessing yes";;
                                          # If we don't know, assume the worst.
                    *)                    gl_cv_func_printf_infinite_long_double="guessing no";;
                  esac
@@ -533,7 +526,7 @@ int main ()
              AC_EGREP_CPP([BZ2908], [
                #include <features.h>
                #ifdef __GNU_LIBRARY__
-                #if (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 5) || (__GLIBC__ > 2)
+                #if ((__GLIBC__ == 2 && __GLIBC_MINOR__ >= 5) || (__GLIBC__ > 2)) && !defined __UCLIBC__
                  BZ2908
                 #endif
                #endif
@@ -889,8 +882,9 @@ changequote([,])dnl
 
 dnl Test whether the *printf family of functions supports large precisions.
 dnl On mingw, precisions larger than 512 are treated like 512, in integer,
-dnl floating-point or pointer output. On BeOS, precisions larger than 1044
-dnl crash the program.
+dnl floating-point or pointer output. On Solaris 10/x86, precisions larger
+dnl than 510 in floating-point output crash the program. On BeOS, precisions
+dnl larger than 1044 crash the program.
 dnl Result is gl_cv_func_printf_precision.
 
 AC_DEFUN([gl_PRINTF_PRECISION],
@@ -913,6 +907,8 @@ int main ()
 #endif
   if (sprintf (buf, "%.4000d %d", 1, 33, 44) < 4000 + 3)
     return 1;
+  if (sprintf (buf, "%.4000f %d", 1.0, 33, 44) < 4000 + 5)
+    return 2;
   return 0;
 }]])],
         [gl_cv_func_printf_precision=yes],
@@ -920,7 +916,8 @@ int main ()
         [
 changequote(,)dnl
          case "$host_os" in
-           # Guess no only on native Win32 and BeOS systems.
+           # Guess no only on Solaris, native Win32, and BeOS systems.
+           solaris*)     gl_cv_func_printf_precision="guessing no" ;;
            mingw* | pw*) gl_cv_func_printf_precision="guessing no" ;;
            beos*)        gl_cv_func_printf_precision="guessing no" ;;
            *)            gl_cv_func_printf_precision="guessing yes" ;;
@@ -1439,12 +1436,14 @@ dnl                                  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
 dnl   glibc 2.5                      .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
 dnl   glibc 2.3.6                    .  .  .  .  #  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
 dnl   FreeBSD 5.4, 6.1               .  .  .  .  #  .  .  .  .  .  .  #  .  #  .  .  .  .  .  .
+dnl   MacOS X 10.5.8                 .  .  .  #  #  .  .  .  .  .  .  #  .  .  .  .  .  .  .  .
 dnl   MacOS X 10.3.9                 .  .  .  .  #  .  .  .  .  .  .  #  .  #  .  .  .  .  .  .
 dnl   OpenBSD 3.9, 4.0               .  .  #  #  #  #  .  #  .  #  .  #  .  #  .  .  .  .  .  .
 dnl   Cygwin 1.7.0 (2009)            .  .  .  #  .  .  .  ?  .  .  .  .  .  ?  .  .  .  .  .  .
 dnl   Cygwin 1.5.25 (2008)           .  .  .  #  #  .  .  #  .  .  .  .  .  #  .  .  .  .  .  .
 dnl   Cygwin 1.5.19 (2006)           #  .  .  #  #  #  .  #  .  #  .  #  #  #  .  .  .  .  .  .
-dnl   Solaris 10                     .  .  #  #  #  .  .  #  .  .  .  #  .  .  .  .  .  .  .  .
+dnl   Solaris 11 2010-11             .  .  #  #  #  .  .  #  .  .  .  #  .  .  .  .  .  .  .  .
+dnl   Solaris 10                     .  .  #  #  #  .  .  #  .  .  .  #  #  .  .  .  .  .  .  .
 dnl   Solaris 2.6 ... 9              #  .  #  #  #  #  .  #  .  .  .  #  .  .  .  .  .  .  .  .
 dnl   Solaris 2.5.1                  #  .  #  #  #  #  .  #  .  .  .  #  .  .  #  #  #  #  #  #
 dnl   AIX 5.2, 7.1                   .  .  #  #  #  .  .  .  .  .  .  #  .  .  .  .  .  .  .  .
@@ -1455,6 +1454,7 @@ dnl   HP-UX 10.20                    #  .  #  .  #  #  .  ?  .  .  #  #  .  .  .
 dnl   IRIX 6.5                       #  .  #  #  #  #  .  #  .  .  .  #  .  .  .  .  #  .  .  .
 dnl   OSF/1 5.1                      #  .  #  #  #  #  .  .  .  .  .  #  .  .  .  .  #  .  .  #
 dnl   OSF/1 4.0d                     #  .  #  #  #  #  .  .  .  .  .  #  .  .  #  #  #  #  #  #
+dnl   NetBSD 5.0                     .  .  .  #  #  .  .  .  .  .  .  #  .  #  .  .  .  .  .  .
 dnl   NetBSD 4.0                     .  ?  ?  ?  ?  ?  .  ?  .  ?  ?  ?  ?  ?  .  .  .  ?  ?  ?
 dnl   NetBSD 3.0                     .  .  .  .  #  #  .  ?  #  #  ?  #  .  #  .  .  .  .  .  .
 dnl   Haiku                          .  .  .  #  #  #  .  #  .  .  .  .  .  ?  .  .  .  .  .  .

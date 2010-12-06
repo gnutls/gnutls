@@ -341,12 +341,6 @@ EXTRA_DIST += test-vasprintf.c signature.h macros.h
 
 ## end   gnulib module vasprintf-tests
 
-## begin gnulib module verify
-
-libtests_a_SOURCES += verify.h
-
-## end   gnulib module verify
-
 ## begin gnulib module verify-tests
 
 TESTS_ENVIRONMENT += MAKE='$(MAKE)'
