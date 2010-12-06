@@ -1367,7 +1367,7 @@ gnutls_session_enable_compatibility_mode (gnutls_session_t session)
 int
 gnutls_session_channel_binding (gnutls_session_t session,
 				gnutls_channel_binding_t cbtype,
-				gnutls_datum_t *cb)
+				gnutls_datum_t * cb)
 {
   if (cbtype != GNUTLS_CB_TLS_UNIQUE)
     return GNUTLS_E_UNIMPLEMENTED_FEATURE;

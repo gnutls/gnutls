@@ -222,7 +222,8 @@ doit ()
       if (err)
 	fail ("server DH params init %d\n", err);
 
-      err = gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
+      err =
+	gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
       if (err)
 	fail ("server DH params generate %d\n", err);
 

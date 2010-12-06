@@ -336,7 +336,8 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
     }
 
   if (!(flags & GNUTLS_VERIFY_DISABLE_CA_SIGN) &&
-      ((flags & GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT) || issuer_version != 1))
+      ((flags & GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT)
+       || issuer_version != 1))
     {
       if (check_if_ca (cert, issuer, flags) == 0)
 	{
@@ -685,7 +686,7 @@ decode_ber_digest_info (const gnutls_datum_t * info,
      parameters field is not present, or it contains 0x05 0x00. */
   if (!(result == ASN1_ELEMENT_NOT_FOUND ||
 	(result == ASN1_SUCCESS && len == ASN1_NULL_SIZE &&
-	 memcmp(str, ASN1_NULL, ASN1_NULL_SIZE) == 0)))
+	 memcmp (str, ASN1_NULL, ASN1_NULL_SIZE) == 0)))
     {
       gnutls_assert ();
       asn1_delete_structure (&dinfo);

@@ -170,19 +170,20 @@ gnutls_sign_callback_set (gnutls_session_t session,
 gnutls_sign_func
 gnutls_sign_callback_get (gnutls_session_t session, void **userdata);
 
-int gnutls_ext_register (int type,
+     int gnutls_ext_register (int type,
 			      const char *name,
 			      gnutls_ext_parse_type_t parse_type,
 			      gnutls_ext_recv_func recv_func,
 			      gnutls_ext_send_func send_func)
-_GNUTLS_GCC_ATTR_DEPRECATED;
+  _GNUTLS_GCC_ATTR_DEPRECATED;
 
-typedef void (*gnutls_finished_callback_func) (gnutls_session_t session,
-						 const void *finished,
-						 size_t len);
-void gnutls_session_set_finished_function (gnutls_session_t session,
-					  gnutls_finished_callback_func func)
-					  _GNUTLS_GCC_ATTR_DEPRECATED;
+     typedef void (*gnutls_finished_callback_func) (gnutls_session_t session,
+						    const void *finished,
+						    size_t len);
+     void gnutls_session_set_finished_function (gnutls_session_t session,
+						gnutls_finished_callback_func
+						func)
+  _GNUTLS_GCC_ATTR_DEPRECATED;
 
 /* returns security values. 
  * Do not use them unless you know what you're doing. Those are dangerous since
@@ -190,13 +191,18 @@ void gnutls_session_set_finished_function (gnutls_session_t session,
  */
 #define GNUTLS_MASTER_SIZE 48
 #define GNUTLS_RANDOM_SIZE 32
-const void *gnutls_session_get_server_random (gnutls_session_t session) _GNUTLS_GCC_ATTR_DEPRECATED;
-const void *gnutls_session_get_client_random (gnutls_session_t session) _GNUTLS_GCC_ATTR_DEPRECATED;
-const void *gnutls_session_get_master_secret (gnutls_session_t session) _GNUTLS_GCC_ATTR_DEPRECATED;
+     const void *gnutls_session_get_server_random (gnutls_session_t session)
+  _GNUTLS_GCC_ATTR_DEPRECATED;
+     const void *gnutls_session_get_client_random (gnutls_session_t session)
+  _GNUTLS_GCC_ATTR_DEPRECATED;
+     const void *gnutls_session_get_master_secret (gnutls_session_t session)
+  _GNUTLS_GCC_ATTR_DEPRECATED;
 
-int gnutls_psk_netconf_derive_key (const char *password,
-				     const char *psk_identity,
-				     const char *psk_identity_hint,
-				     gnutls_datum_t * output_key) _GNUTLS_GCC_ATTR_DEPRECATED;
+     int gnutls_psk_netconf_derive_key (const char *password,
+					const char *psk_identity,
+					const char *psk_identity_hint,
+					gnutls_datum_t *
+					output_key)
+  _GNUTLS_GCC_ATTR_DEPRECATED;
 
 #endif /* _GNUTLS_COMPAT_H */

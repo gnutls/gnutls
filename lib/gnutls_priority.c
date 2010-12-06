@@ -683,66 +683,70 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	  else if (strncasecmp (&broken_list[i][1], "VERS-", 5) == 0)
 	    {
 	      if (strncasecmp (&broken_list[i][1], "VERS-TLS-ALL", 12) == 0)
-	        {
-	          _set_priority (&(*priority_cache)->protocol, protocol_priority);
-	        }
-	      else 
-	        {
+		{
+		  _set_priority (&(*priority_cache)->protocol,
+				 protocol_priority);
+		}
+	      else
+		{
 		  if ((algo =
 		       gnutls_protocol_get_id (&broken_list[i][6])) !=
 		      GNUTLS_VERSION_UNKNOWN)
-                    fn (&(*priority_cache)->protocol, algo);
-                  else
+		    fn (&(*priority_cache)->protocol, algo);
+		  else
 		    goto error;
-                }
+		}
 	    }			/* now check if the element is something like -ALGO */
 	  else if (strncasecmp (&broken_list[i][1], "COMP-", 5) == 0)
 	    {
 	      if (strncasecmp (&broken_list[i][1], "COMP-ALL", 8) == 0)
-	        {
-	          _set_priority (&(*priority_cache)->compression, comp_priority);
-	        }
-	      else 
-	        {
-	          if ((algo =
+		{
+		  _set_priority (&(*priority_cache)->compression,
+				 comp_priority);
+		}
+	      else
+		{
+		  if ((algo =
 		       gnutls_compression_get_id (&broken_list[i][6])) !=
-		       GNUTLS_COMP_UNKNOWN)
-                    fn (&(*priority_cache)->compression, algo);
-                  else
-                    goto error;
-                }
+		      GNUTLS_COMP_UNKNOWN)
+		    fn (&(*priority_cache)->compression, algo);
+		  else
+		    goto error;
+		}
 	    }			/* now check if the element is something like -ALGO */
 	  else if (strncasecmp (&broken_list[i][1], "CTYPE-", 6) == 0)
 	    {
 	      if (strncasecmp (&broken_list[i][1], "CTYPE-ALL", 9) == 0)
-	        {
-	          _set_priority (&(*priority_cache)->cert_type, cert_type_priority);
-	        }
-	      else 
-	        {
-	          if ((algo =
+		{
+		  _set_priority (&(*priority_cache)->cert_type,
+				 cert_type_priority);
+		}
+	      else
+		{
+		  if ((algo =
 		       gnutls_certificate_type_get_id (&broken_list[i][7])) !=
-		       GNUTLS_CRT_UNKNOWN)
-                    fn (&(*priority_cache)->cert_type, algo);
-                  else
-                    goto error;
-                }
+		      GNUTLS_CRT_UNKNOWN)
+		    fn (&(*priority_cache)->cert_type, algo);
+		  else
+		    goto error;
+		}
 	    }			/* now check if the element is something like -ALGO */
 	  else if (strncasecmp (&broken_list[i][1], "SIGN-", 5) == 0)
 	    {
 	      if (strncasecmp (&broken_list[i][1], "SIGN-ALL", 8) == 0)
-	        {
-	          _set_priority (&(*priority_cache)->sign_algo, sign_priority_default);
-	        }
-	      else 
-	        {
-	          if ((algo =
+		{
+		  _set_priority (&(*priority_cache)->sign_algo,
+				 sign_priority_default);
+		}
+	      else
+		{
+		  if ((algo =
 		       gnutls_sign_get_id (&broken_list[i][6])) !=
-                      GNUTLS_SIGN_UNKNOWN)
+		      GNUTLS_SIGN_UNKNOWN)
 		    fn (&(*priority_cache)->sign_algo, algo);
-                  else
-                    goto error;
-                }
+		  else
+		    goto error;
+		}
 	    }			/* now check if the element is something like -ALGO */
 	  else
 	    goto error;

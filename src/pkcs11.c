@@ -88,7 +88,8 @@ pkcs11_common (void)
 }
 
 void
-pkcs11_delete (FILE * outfile, const char *url, int batch, unsigned int login, common_info_st* info)
+pkcs11_delete (FILE * outfile, const char *url, int batch, unsigned int login,
+	       common_info_st * info)
 {
   int ret;
   unsigned int obj_flags = 0;
@@ -125,7 +126,7 @@ pkcs11_delete (FILE * outfile, const char *url, int batch, unsigned int login, c
  */
 void
 pkcs11_list (FILE * outfile, const char *url, int type, unsigned int login,
-	     unsigned int detailed, common_info_st* info)
+	     unsigned int detailed, common_info_st * info)
 {
   gnutls_pkcs11_obj_t *crt_list;
   gnutls_x509_crt_t xcrt;
@@ -297,7 +298,8 @@ pkcs11_list (FILE * outfile, const char *url, int type, unsigned int login,
 }
 
 void
-pkcs11_export (FILE * outfile, const char *url, unsigned int login, common_info_st* info)
+pkcs11_export (FILE * outfile, const char *url, unsigned int login,
+	       common_info_st * info)
 {
   gnutls_pkcs11_obj_t crt;
   gnutls_x509_crt_t xcrt;
@@ -428,7 +430,8 @@ pkcs11_export (FILE * outfile, const char *url, unsigned int login, common_info_
 }
 
 void
-pkcs11_token_list (FILE * outfile, unsigned int detailed, common_info_st* info)
+pkcs11_token_list (FILE * outfile, unsigned int detailed,
+		   common_info_st * info)
 {
   int ret;
   int i;
@@ -515,14 +518,14 @@ pkcs11_token_list (FILE * outfile, unsigned int detailed, common_info_st* info)
 
 void
 pkcs11_write (FILE * outfile, const char *url, const char *label, int trusted,
-	      unsigned int login, common_info_st* info)
+	      unsigned int login, common_info_st * info)
 {
   gnutls_x509_crt_t xcrt;
   gnutls_x509_privkey_t xkey;
   int ret;
   unsigned int flags = 0;
   unsigned int key_usage = 0;
-  gnutls_datum_t* secret_key;
+  gnutls_datum_t *secret_key;
 
   if (login)
     flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
@@ -532,13 +535,13 @@ pkcs11_write (FILE * outfile, const char *url, const char *label, int trusted,
   if (url == NULL)
     url = "pkcs11:";
 
-  secret_key = load_secret_key(0, info);
+  secret_key = load_secret_key (0, info);
   if (secret_key != NULL)
     {
       ret =
 	gnutls_pkcs11_copy_secret_key (url, secret_key, label, key_usage,
-					 flags |
-					 GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE);
+				       flags |
+				       GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE);
       if (ret < 0)
 	{
 	  fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
@@ -589,52 +592,51 @@ pkcs11_write (FILE * outfile, const char *url, const char *label, int trusted,
 }
 
 void
-pkcs11_init (FILE * outfile, const char *url, const char *label, common_info_st* info)
+pkcs11_init (FILE * outfile, const char *url, const char *label,
+	     common_info_st * info)
 {
   int ret;
-  char * pin;
+  char *pin;
   char so_pin[32];
 
   pkcs11_common ();
 
   if (url == NULL)
     {
-      fprintf(stderr, "No token URL given to initialize!\n");
-      exit(1);
+      fprintf (stderr, "No token URL given to initialize!\n");
+      exit (1);
     }
 
   pin = getpass ("Enter Security Officer's PIN: ");
   if (pin == NULL)
-    exit(0);
-  
-  strcpy(so_pin, pin);
+    exit (0);
+
+  strcpy (so_pin, pin);
 
   pin = getpass ("Enter new User's PIN: ");
   if (pin == NULL)
-    exit(0);
-  
-  ret =
-    gnutls_pkcs11_token_init (url, so_pin, label);
+    exit (0);
+
+  ret = gnutls_pkcs11_token_init (url, so_pin, label);
   if (ret < 0)
     {
       fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
-		   gnutls_strerror (ret));
+	       gnutls_strerror (ret));
       exit (1);
     }
 
-  ret =
-    gnutls_pkcs11_token_set_pin (url, NULL, pin, GNUTLS_PKCS11_PIN_USER);
+  ret = gnutls_pkcs11_token_set_pin (url, NULL, pin, GNUTLS_PKCS11_PIN_USER);
   if (ret < 0)
     {
       fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
-		   gnutls_strerror (ret));
+	       gnutls_strerror (ret));
       exit (1);
     }
 
   return;
 }
 
-const char* mech_list[] = {
+const char *mech_list[] = {
   [0] = "CKM_RSA_PKCS_KEY_PAIR_GEN",
   [1] = "CKM_RSA_PKCS",
   [2] = "CKM_RSA_9796",
@@ -842,13 +844,13 @@ const char* mech_list[] = {
 
 void
 pkcs11_mechanism_list (FILE * outfile, const char *url, unsigned int login,
-	     common_info_st* info)
+		       common_info_st * info)
 {
   int ret;
   int idx;
   unsigned int obj_flags = 0;
   unsigned long mechanism;
-  const char* str;
+  const char *str;
 
   if (login)
     obj_flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
@@ -857,21 +859,23 @@ pkcs11_mechanism_list (FILE * outfile, const char *url, unsigned int login,
 
   if (url == NULL)
     url = "pkcs11:";
-  
-  idx = 0;
-  do 
-    {
-      ret = gnutls_pkcs11_token_get_mechanism(url, idx++, &mechanism);
-      if (ret >= 0)
-        {
-          str = NULL;
-          if (mechanism <= sizeof(mech_list)/sizeof(mech_list[0]))
-            str = mech_list[mechanism];
-          if (str == NULL) str = "UNKNOWN";
 
-          fprintf(outfile, "[0x%.4lx] %s\n", mechanism, str);
-        }
-    } while(ret >= 0);
+  idx = 0;
+  do
+    {
+      ret = gnutls_pkcs11_token_get_mechanism (url, idx++, &mechanism);
+      if (ret >= 0)
+	{
+	  str = NULL;
+	  if (mechanism <= sizeof (mech_list) / sizeof (mech_list[0]))
+	    str = mech_list[mechanism];
+	  if (str == NULL)
+	    str = "UNKNOWN";
+
+	  fprintf (outfile, "[0x%.4lx] %s\n", mechanism, str);
+	}
+    }
+  while (ret >= 0);
 
 
   return;

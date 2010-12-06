@@ -44,11 +44,11 @@
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  **/
-int gnutls_pkcs11_copy_secret_key (const char *token_url, gnutls_datum_t* key,
-				 const char *label, 
-				 unsigned int key_usage,
-				 unsigned int flags
-				 /* GNUTLS_PKCS11_OBJ_FLAG_* */ )
+int
+gnutls_pkcs11_copy_secret_key (const char *token_url, gnutls_datum_t * key,
+			       const char *label,
+			       unsigned int key_usage, unsigned int flags
+			       /* GNUTLS_PKCS11_OBJ_FLAG_* */ )
 {
   int ret;
   pakchois_session_t *pks;
@@ -70,10 +70,10 @@ int gnutls_pkcs11_copy_secret_key (const char *token_url, gnutls_datum_t* key,
     }
 
   /* generate a unique ID */
-  ret = _gnutls_rnd (GNUTLS_RND_NONCE, id, sizeof(id));
+  ret = _gnutls_rnd (GNUTLS_RND_NONCE, id, sizeof (id));
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
 
@@ -105,7 +105,7 @@ int gnutls_pkcs11_copy_secret_key (const char *token_url, gnutls_datum_t* key,
   a[4].value_len = sizeof (keytype);
   a[5].type = CKA_ID;
   a[5].value = id;
-  a[5].value_len = sizeof(id);
+  a[5].value_len = sizeof (id);
 
   a_val = 6;
 

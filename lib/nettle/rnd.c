@@ -156,7 +156,7 @@ wrap_nettle_rnd_deinit (void *ctx)
 #include <fcntl.h>
 #include <locks.h>
 #ifdef HAVE_GETRUSAGE
-# include <sys/resource.h>
+#include <sys/resource.h>
 #endif
 #include "egd.h"
 

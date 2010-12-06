@@ -1,5 +1,5 @@
 #ifndef CERTTOOL_COMMON_H
-# define CERTTOOL_COMMON_H
+#define CERTTOOL_COMMON_H
 
 #include <gnutls/x509.h>
 #include <stdio.h>
@@ -41,27 +41,29 @@ void certtool_version (void);
 #include <gnutls/x509.h>
 #include <gnutls/abstract.h>
 
-typedef struct common_info {
-  const char* secret_key;
-  const char* privkey;
-  const char* pubkey;
+typedef struct common_info
+{
+  const char *secret_key;
+  const char *privkey;
+  const char *pubkey;
   int pkcs8;
   int incert_format;
-  const char* cert;
-  
-  const char* request;
-  const char* ca;
-  const char* ca_privkey;
+  const char *cert;
+
+  const char *request;
+  const char *ca;
+  const char *ca_privkey;
 } common_info_st;
 
-gnutls_x509_privkey_t load_private_key (int mand, common_info_st* info);
-gnutls_x509_crq_t load_request (common_info_st* info);
-gnutls_x509_privkey_t load_ca_private_key (common_info_st* info);
-gnutls_x509_crt_t load_ca_cert (common_info_st* info);
-gnutls_x509_crt_t load_cert (int mand, common_info_st* info);
-gnutls_datum* load_secret_key (int mand, common_info_st* info);
-gnutls_pubkey_t load_pubkey (int mand, common_info_st* info);
-gnutls_x509_crt_t *load_cert_list (int mand, size_t * size, common_info_st* info);
+gnutls_x509_privkey_t load_private_key (int mand, common_info_st * info);
+gnutls_x509_crq_t load_request (common_info_st * info);
+gnutls_x509_privkey_t load_ca_private_key (common_info_st * info);
+gnutls_x509_crt_t load_ca_cert (common_info_st * info);
+gnutls_x509_crt_t load_cert (int mand, common_info_st * info);
+gnutls_datum *load_secret_key (int mand, common_info_st * info);
+gnutls_pubkey_t load_pubkey (int mand, common_info_st * info);
+gnutls_x509_crt_t *load_cert_list (int mand, size_t * size,
+				   common_info_st * info);
 
 /* returns the bits specified in cmd */
 int get_bits (gnutls_pk_algorithm_t);
@@ -69,7 +71,7 @@ int get_bits (gnutls_pk_algorithm_t);
 /* prime.c */
 int generate_prime (int how);
 
-FILE * safe_open_rw (const char *file, int privkey_op);
+FILE *safe_open_rw (const char *file, int privkey_op);
 
 extern unsigned char buffer[];
 extern const int buffer_size;

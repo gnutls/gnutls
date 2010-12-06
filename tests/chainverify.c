@@ -850,12 +850,12 @@ doit (void)
 		verify_status, chains[i].expected_verify_result);
 
 #if 0
-              j=0;
-              do
-                {
-                  fprintf(stderr, "%s\n", chains[i].chain[j]);
-                }
-              while(chains[i].chain[++j] != NULL);
+	  j = 0;
+	  do
+	    {
+	      fprintf (stderr, "%s\n", chains[i].chain[j]);
+	    }
+	  while (chains[i].chain[++j] != NULL);
 #endif
 
 	  if (!debug)

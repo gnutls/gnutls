@@ -56,20 +56,20 @@ void pkcs7_info (void);
 void crq_info (void);
 void smime_to_pkcs7 (void);
 void pkcs12_info (void);
-void generate_pkcs12 (common_info_st*);
-void generate_pkcs8 (common_info_st*);
+void generate_pkcs12 (common_info_st *);
+void generate_pkcs8 (common_info_st *);
 void verify_chain (void);
-void verify_crl (common_info_st* cinfo);
-void pubkey_info (gnutls_x509_crt crt, common_info_st*);
+void verify_crl (common_info_st * cinfo);
+void pubkey_info (gnutls_x509_crt crt, common_info_st *);
 void pgp_privkey_info (void);
 void pgp_ring_info (void);
-void certificate_info (int, common_info_st*);
+void certificate_info (int, common_info_st *);
 void pgp_certificate_info (void);
 void crl_info (void);
 void privkey_info (void);
 static void gaa_parser (int argc, char **argv);
-void generate_self_signed (common_info_st*);
-void generate_request (common_info_st* );
+void generate_self_signed (common_info_st *);
+void generate_request (common_info_st *);
 static void print_certificate_info (gnutls_x509_crt_t crt, FILE * out,
 				    unsigned int all);
 
@@ -359,7 +359,8 @@ generate_private_key (void)
 
 static gnutls_x509_crt_t
 generate_certificate (gnutls_x509_privkey_t * ret_key,
-		      gnutls_x509_crt_t ca_crt, int proxy, common_info_st* cinfo)
+		      gnutls_x509_crt_t ca_crt, int proxy,
+		      common_info_st * cinfo)
 {
   gnutls_x509_crt_t crt;
   gnutls_x509_privkey_t key = NULL;
@@ -685,7 +686,7 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
 }
 
 static gnutls_x509_crl_t
-generate_crl (gnutls_x509_crt_t ca_crt, common_info_st* cinfo)
+generate_crl (gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 {
   gnutls_x509_crl_t crl;
   gnutls_x509_crt_t *crts;
@@ -783,7 +784,7 @@ get_dig (gnutls_x509_crt crt)
 }
 
 void
-generate_self_signed (common_info_st* cinfo)
+generate_self_signed (common_info_st * cinfo)
 {
   gnutls_x509_crt_t crt;
   gnutls_x509_privkey_t key;
@@ -829,7 +830,7 @@ generate_self_signed (common_info_st* cinfo)
 }
 
 static void
-generate_signed_certificate (common_info_st* cinfo)
+generate_signed_certificate (common_info_st * cinfo)
 {
   gnutls_x509_crt_t crt;
   gnutls_x509_privkey_t key;
@@ -871,7 +872,7 @@ generate_signed_certificate (common_info_st* cinfo)
 }
 
 static void
-generate_proxy_certificate (common_info_st* cinfo)
+generate_proxy_certificate (common_info_st * cinfo)
 {
   gnutls_x509_crt_t crt, eecrt;
   gnutls_x509_privkey_t key, eekey;
@@ -905,7 +906,7 @@ generate_proxy_certificate (common_info_st* cinfo)
 }
 
 static void
-generate_signed_crl (common_info_st* cinfo)
+generate_signed_crl (common_info_st * cinfo)
 {
   gnutls_x509_crl_t crl;
   int result;
@@ -930,7 +931,7 @@ generate_signed_crl (common_info_st* cinfo)
 }
 
 static void
-update_signed_certificate (common_info_st* cinfo)
+update_signed_certificate (common_info_st * cinfo)
 {
   gnutls_x509_crt_t crt;
   size_t size;
@@ -1056,7 +1057,7 @@ gaa_parser (int argc, char **argv)
   if ((ret = gnutls_global_init_extra ()) < 0)
     error (EXIT_FAILURE, 0, "global_init_extra: %s", gnutls_strerror (ret));
 
-  memset(&cinfo, 0, sizeof(cinfo));
+  memset (&cinfo, 0, sizeof (cinfo));
   cinfo.privkey = info.privkey;
   cinfo.pubkey = info.pubkey;
   cinfo.pkcs8 = info.pkcs8;
@@ -1157,7 +1158,7 @@ gaa_parser (int argc, char **argv)
 
 #define MAX_CRTS 500
 void
-certificate_info (int pubkey, common_info_st* cinfo)
+certificate_info (int pubkey, common_info_st * cinfo)
 {
   gnutls_x509_crt_t crt[MAX_CRTS];
   size_t size;
@@ -1734,7 +1735,7 @@ privkey_info (void)
 /* Generate a PKCS #10 certificate request.
  */
 void
-generate_request (common_info_st* cinfo)
+generate_request (common_info_st * cinfo)
 {
   gnutls_x509_crq_t crq;
   gnutls_x509_privkey_t key;
@@ -2235,7 +2236,7 @@ verify_chain (void)
 }
 
 void
-verify_crl (common_info_st* cinfo)
+verify_crl (common_info_st * cinfo)
 {
   size_t size, dn_size;
   char dn[128];
@@ -2328,7 +2329,7 @@ verify_crl (common_info_st* cinfo)
 
 
 void
-generate_pkcs8 (common_info_st* cinfo)
+generate_pkcs8 (common_info_st * cinfo)
 {
   gnutls_x509_privkey_t key;
   int result;
@@ -2372,7 +2373,7 @@ generate_pkcs8 (common_info_st* cinfo)
 #include <unistd.h>
 
 void
-generate_pkcs12 (common_info_st* cinfo)
+generate_pkcs12 (common_info_st * cinfo)
 {
   gnutls_pkcs12_t pkcs12;
   gnutls_x509_crt_t *crts;
@@ -2879,7 +2880,7 @@ print_key_usage (FILE * outfile, unsigned int usage)
 }
 
 void
-pubkey_info (gnutls_x509_crt crt, common_info_st* cinfo)
+pubkey_info (gnutls_x509_crt crt, common_info_st * cinfo)
 {
   gnutls_pubkey_t pubkey;
   unsigned int bits, usage;

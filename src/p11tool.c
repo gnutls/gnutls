@@ -125,7 +125,7 @@ gaa_parser (int argc, char **argv)
   else
     outfile = stdout;
 
-  memset(&cinfo, 0, sizeof(cinfo));
+  memset (&cinfo, 0, sizeof (cinfo));
   cinfo.secret_key = info.secret_key;
   cinfo.privkey = info.privkey;
   cinfo.pkcs8 = info.pkcs8;
@@ -142,7 +142,8 @@ gaa_parser (int argc, char **argv)
       pkcs11_token_list (outfile, info.pkcs11_detailed_url, &cinfo);
       break;
     case ACTION_PKCS11_MECHANISMS:
-      pkcs11_mechanism_list (outfile, info.pkcs11_url, info.pkcs11_login, &cinfo);
+      pkcs11_mechanism_list (outfile, info.pkcs11_url, info.pkcs11_login,
+			     &cinfo);
       break;
     case ACTION_PKCS11_EXPORT_URL:
       pkcs11_export (outfile, info.pkcs11_url, info.pkcs11_login, &cinfo);

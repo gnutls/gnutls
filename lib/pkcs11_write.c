@@ -593,8 +593,7 @@ gnutls_pkcs11_delete_url (const char *object_url, unsigned int flags)
  **/
 int
 gnutls_pkcs11_token_init (const char *token_url,
-				 const char* so_pin,
-				 const char *label)
+			  const char *so_pin, const char *label)
 {
   int ret;
   struct pkcs11_url_info info;
@@ -610,19 +609,21 @@ gnutls_pkcs11_token_init (const char *token_url,
       return ret;
     }
 
-  ret = pkcs11_find_slot(&module, &slot, &info, NULL);
+  ret = pkcs11_find_slot (&module, &slot, &info, NULL);
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
 
   /* so it seems memset has other uses than zeroing! */
-  memset(flabel, ' ', sizeof(flabel));
+  memset (flabel, ' ', sizeof (flabel));
   if (label != NULL)
-    memcpy(flabel, label, strlen(label));
+    memcpy (flabel, label, strlen (label));
 
-  rv = pakchois_init_token(module, slot, (char*)so_pin, strlen(so_pin), flabel);
+  rv =
+    pakchois_init_token (module, slot, (char *) so_pin, strlen (so_pin),
+			 flabel);
   if (rv != CKR_OK)
     {
       gnutls_assert ();
@@ -650,9 +651,8 @@ gnutls_pkcs11_token_init (const char *token_url,
  **/
 int
 gnutls_pkcs11_token_set_pin (const char *token_url,
-			     const char* oldpin,
-			     const char* newpin,
-			     unsigned int flags)
+			     const char *oldpin,
+			     const char *newpin, unsigned int flags)
 {
   int ret;
   pakchois_session_t *pks;
@@ -667,22 +667,22 @@ gnutls_pkcs11_token_set_pin (const char *token_url,
       return ret;
     }
 
-  if (((flags & GNUTLS_PKCS11_PIN_USER) && oldpin == NULL) || 
-    (flags & GNUTLS_PKCS11_PIN_SO))
-    ses_flags = SESSION_WRITE|SESSION_LOGIN|SESSION_SO;
-  else 
-    ses_flags = SESSION_WRITE|SESSION_LOGIN;
+  if (((flags & GNUTLS_PKCS11_PIN_USER) && oldpin == NULL) ||
+      (flags & GNUTLS_PKCS11_PIN_SO))
+    ses_flags = SESSION_WRITE | SESSION_LOGIN | SESSION_SO;
+  else
+    ses_flags = SESSION_WRITE | SESSION_LOGIN;
 
   ret = pkcs11_open_session (&pks, &info, ses_flags);
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
 
   if (oldpin == NULL)
     {
-      rv = pakchois_init_pin(pks, (char*)newpin, strlen(newpin));
+      rv = pakchois_init_pin (pks, (char *) newpin, strlen (newpin));
       if (rv != CKR_OK)
 	{
 	  gnutls_assert ();
@@ -693,9 +693,9 @@ gnutls_pkcs11_token_set_pin (const char *token_url,
     }
   else
     {
-      rv = pakchois_set_pin(pks, 
-	(char*)oldpin, strlen(oldpin),
-	(char*)newpin, strlen(newpin));
+      rv = pakchois_set_pin (pks,
+			     (char *) oldpin, strlen (oldpin),
+			     (char *) newpin, strlen (newpin));
       if (rv != CKR_OK)
 	{
 	  gnutls_assert ();

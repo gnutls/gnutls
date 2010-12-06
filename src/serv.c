@@ -488,8 +488,8 @@ peer_print_info (gnutls_session_t session, int *ret_length,
     snprintf (tmp2, "%.2X", sesid[i]);
   snprintf (tmp2, "</i></p>\n");
   snprintf (tmp2,
-	   "<h5>If your browser supports session resuming, then you should see the "
-	   "same session ID, when you press the <b>reload</b> button.</h5>\n");
+	    "<h5>If your browser supports session resuming, then you should see the "
+	    "same session ID, when you press the <b>reload</b> button.</h5>\n");
 
   /* Here unlike print_info() we use the kx algorithm to distinguish
    * the functions to call.
@@ -513,7 +513,7 @@ peer_print_info (gnutls_session_t session, int *ret_length,
   if (kx_alg == GNUTLS_KX_SRP)
     {
       snprintf (tmp2, "<p>Connected as user '%s'.</p>\n",
-	       gnutls_srp_server_get_username (session));
+		gnutls_srp_server_get_username (session));
     }
 #endif
 
@@ -521,7 +521,7 @@ peer_print_info (gnutls_session_t session, int *ret_length,
   if (kx_alg == GNUTLS_KX_PSK)
     {
       snprintf (tmp2, "<p>Connected as user '%s'.</p>\n",
-	       gnutls_psk_server_get_username (session));
+		gnutls_psk_server_get_username (session));
     }
 #endif
 
@@ -529,16 +529,16 @@ peer_print_info (gnutls_session_t session, int *ret_length,
   if (kx_alg == GNUTLS_KX_ANON_DH)
     {
       snprintf (tmp2,
-	       "<p> Connect using anonymous DH (prime of %d bits)</p>\n",
-	       gnutls_dh_get_prime_bits (session));
+		"<p> Connect using anonymous DH (prime of %d bits)</p>\n",
+		gnutls_dh_get_prime_bits (session));
     }
 #endif
 
   if (kx_alg == GNUTLS_KX_DHE_RSA || kx_alg == GNUTLS_KX_DHE_DSS)
     {
       snprintf (tmp2,
-	       "Ephemeral DH using prime of <b>%d</b> bits.<br>\n",
-	       gnutls_dh_get_prime_bits (session));
+		"Ephemeral DH using prime of <b>%d</b> bits.<br>\n",
+		gnutls_dh_get_prime_bits (session));
     }
 
   /* print session information */
@@ -548,8 +548,8 @@ peer_print_info (gnutls_session_t session, int *ret_length,
   if (tmp == NULL)
     tmp = str_unknown;
   snprintf (tmp2,
-	   "<TABLE border=1><TR><TD>Protocol version:</TD><TD>%s</TD></TR>\n",
-	   tmp);
+	    "<TABLE border=1><TR><TD>Protocol version:</TD><TD>%s</TD></TR>\n",
+	    tmp);
 
   if (gnutls_auth_get_type (session) == GNUTLS_CRD_CERTIFICATE)
     {
@@ -558,7 +558,8 @@ peer_print_info (gnutls_session_t session, int *ret_length,
 					  (session));
       if (tmp == NULL)
 	tmp = str_unknown;
-      snprintf (tmp2, "<TR><TD>Certificate Type:</TD><TD>%s</TD></TR>\n", tmp);
+      snprintf (tmp2, "<TR><TD>Certificate Type:</TD><TD>%s</TD></TR>\n",
+		tmp);
     }
 
   tmp = gnutls_kx_get_name (kx_alg);
@@ -587,15 +588,16 @@ peer_print_info (gnutls_session_t session, int *ret_length,
   if (tmp == NULL)
     tmp = str_unknown;
   snprintf (tmp2, "<TR><TD>Ciphersuite</TD><TD>%s</TD></TR></p></TABLE>\n",
-	   tmp);
+	    tmp);
 
   if (crtinfo)
     {
-      snprintf(tmp2, "<hr><PRE>%s\n</PRE>\n", crtinfo);
+      snprintf (tmp2, "<hr><PRE>%s\n</PRE>\n", crtinfo);
       free (crtinfo);
     }
 
-  snprintf(tmp2, "<hr><P>Your HTTP header was:<PRE>%s</PRE></P>\n" HTTP_END, header);
+  snprintf (tmp2, "<hr><P>Your HTTP header was:<PRE>%s</PRE></P>\n" HTTP_END,
+	    header);
 
   *ret_length = strlen (http_buffer);
 

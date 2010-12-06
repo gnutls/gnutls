@@ -632,9 +632,9 @@ extern "C"
    * Enumeration of support channel binding types.
    */
   typedef enum
-    {
-      GNUTLS_CB_TLS_UNIQUE
-    } gnutls_channel_binding_t;
+  {
+    GNUTLS_CB_TLS_UNIQUE
+  } gnutls_channel_binding_t;
 
 /* If you want to change this, then also change the define in
  * gnutls_int.h, and recompile.
@@ -934,7 +934,7 @@ extern "C"
 
   int gnutls_session_channel_binding (gnutls_session_t session,
 				      gnutls_channel_binding_t cbtype,
-				      gnutls_datum_t *cb);
+				      gnutls_datum_t * cb);
 
 /* checks if this session is a resumed one 
  */

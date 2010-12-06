@@ -73,10 +73,10 @@ safe_open_rw (const char *file, int privkey_op)
 }
 
 gnutls_datum_t *
-load_secret_key (int mand, common_info_st* info)
+load_secret_key (int mand, common_info_st * info)
 {
   unsigned char raw_key[64];
-  size_t raw_key_size = sizeof(raw_key);
+  size_t raw_key_size = sizeof (raw_key);
   static gnutls_datum_t key;
   gnutls_datum_t hex_key;
   int ret;
@@ -91,16 +91,16 @@ load_secret_key (int mand, common_info_st* info)
 	return NULL;
     }
 
-  hex_key.data = (char*)info->secret_key;
-  hex_key.size = strlen(info->secret_key);
-  
-  ret = gnutls_hex_decode( &hex_key, raw_key, &raw_key_size);
+  hex_key.data = (char *) info->secret_key;
+  hex_key.size = strlen (info->secret_key);
+
+  ret = gnutls_hex_decode (&hex_key, raw_key, &raw_key_size);
   if (ret < 0)
-	error (EXIT_FAILURE, 0, "hex_decode: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "hex_decode: %s", gnutls_strerror (ret));
 
   key.data = raw_key;
   key.size = raw_key_size;
-  
+
   return &key;
 }
 
@@ -108,7 +108,7 @@ load_secret_key (int mand, common_info_st* info)
  * @mand should be non zero if it is required to read a private key.
  */
 gnutls_x509_privkey_t
-load_private_key (int mand, common_info_st* info)
+load_private_key (int mand, common_info_st * info)
 {
   gnutls_x509_privkey_t key;
   int ret;
@@ -162,7 +162,7 @@ load_private_key (int mand, common_info_st* info)
  * null will be returned if the certificate loading fails.
  */
 gnutls_x509_crt_t
-load_cert (int mand, common_info_st* info)
+load_cert (int mand, common_info_st * info)
 {
   gnutls_x509_crt_t *crt;
   size_t size;
@@ -177,7 +177,7 @@ load_cert (int mand, common_info_st* info)
 /* Loads a certificate list
  */
 gnutls_x509_crt_t *
-load_cert_list (int mand, size_t * crt_size, common_info_st* info)
+load_cert_list (int mand, size_t * crt_size, common_info_st * info)
 {
   FILE *fd;
   static gnutls_x509_crt_t crt[MAX_CERTS];
@@ -247,7 +247,7 @@ load_cert_list (int mand, size_t * crt_size, common_info_st* info)
 /* Load the Certificate Request.
  */
 gnutls_x509_crq_t
-load_request (common_info_st* info)
+load_request (common_info_st * info)
 {
   gnutls_x509_crq_t crq;
   int ret;
@@ -285,7 +285,7 @@ load_request (common_info_st* info)
 /* Load the CA's private key.
  */
 gnutls_x509_privkey_t
-load_ca_private_key (common_info_st* info)
+load_ca_private_key (common_info_st * info)
 {
   gnutls_x509_privkey_t key;
   int ret;
@@ -326,7 +326,7 @@ load_ca_private_key (common_info_st* info)
 /* Loads the CA's certificate
  */
 gnutls_x509_crt_t
-load_ca_cert (common_info_st* info)
+load_ca_cert (common_info_st * info)
 {
   gnutls_x509_crt_t crt;
   int ret;
@@ -344,7 +344,8 @@ load_ca_cert (common_info_st* info)
   dat.size = size;
 
   if (!dat.data)
-    error (EXIT_FAILURE, errno, "reading --load-ca-certificate: %s", info->ca);
+    error (EXIT_FAILURE, errno, "reading --load-ca-certificate: %s",
+	   info->ca);
 
   ret = gnutls_x509_crt_import (crt, &dat, info->incert_format);
   free (dat.data);
@@ -359,7 +360,7 @@ load_ca_cert (common_info_st* info)
  * @mand should be non zero if it is required to read a public key.
  */
 gnutls_pubkey_t
-load_pubkey (int mand, common_info_st* info)
+load_pubkey (int mand, common_info_st * info)
 {
   gnutls_pubkey_t key;
   int ret;
