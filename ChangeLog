@@ -1,3 +1,504 @@
+2010-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* tests/Makefile.am: Don't fail on 'make distcheck'.
+
+2010-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.11.6.
+
+2010-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_str.c: Indent.
+
+2010-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: documented SSL 3.0 record version change.
+
+2010-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_handshake.c, lib/gnutls_int.h, lib/gnutls_priority.c: 
+	SSL3_RECORD_VERSION priority option is now the default. That is in
+	order to not confuse non TLS 1.2 compliant implementations that
+	don't like a TLS 1.2 record.
+
+2010-12-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_str.c: simplified escape and unescape.
+
+2010-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* THANKS: Added Michael.
+
+2010-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk, lib/gnutls_priority.c, lib/gnutls_state.c,
+	lib/includes/gnutls/compat.h, lib/includes/gnutls/gnutls.h.in,
+	lib/includes/gnutls/pkcs11.h, lib/nettle/rnd.c, lib/pkcs11.c,
+	lib/pkcs11_int.h, lib/pkcs11_secret.c, lib/pkcs11_write.c,
+	lib/x509/verify.c, src/certtool-common.c, src/certtool-common.h,
+	src/certtool.c, src/cli.c, src/common.c, src/p11tool.c,
+	src/p11tool.h, src/pkcs11.c, src/serv.c, tests/chainverify.c,
+	tests/openpgp-auth.c: Indent code.
+
+2010-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* maint.mk: Update gnulib files.
+
+2010-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* gl/override/top/maint.mk.diff: Remove.
+
+2010-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* .gitignore: Update.
+
+2010-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_priority.c, lib/pkcs11_secret.c, src/p11tool.c,
+	src/p11tool.gaa: Fix syntax-check nits.
+
+2010-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* .x-sc_bindtextdomain: Ignore more.
+
+2010-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* GNUmakefile, build-aux/gendocs.sh, build-aux/pmccabe.css,
+	build-aux/pmccabe2html, gl/Makefile.am, gl/arpa_inet.in.h,
+	gl/float+.h, gl/gettext.h, gl/inet_ntop.c, gl/intprops.h,
+	gl/m4/alloca.m4, gl/m4/arpa_inet_h.m4, gl/m4/getdelim.m4,
+	gl/m4/getline.m4, gl/m4/getpass.m4, gl/m4/gnulib-common.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/mmap-anon.m4, gl/m4/printf.m4,
+	gl/m4/readline.m4, gl/m4/string_h.m4, gl/m4/sys_ioctl_h.m4,
+	gl/m4/sys_select_h.m4, gl/m4/sys_socket_h.m4, gl/m4/unistd_h.m4,
+	gl/m4/vasnprintf.m4, gl/m4/wchar_h.m4, gl/printf-parse.c,
+	gl/printf-parse.h, gl/stdint.in.h, gl/stdio.in.h, gl/stdlib.in.h,
+	gl/string.in.h, gl/sys_select.in.h, gl/sys_socket.in.h,
+	gl/tests/Makefile.am, gl/tests/init.sh,
+	gl/tests/test-select-stdin.c, gl/tests/test-select.c,
+	gl/tests/test-update-copyright.sh, gl/tests/verify.h, gl/time.in.h,
+	gl/unistd.in.h, gl/vasnprintf.c, gl/verify.h, gl/wchar.in.h,
+	lib/gl/Makefile.am, lib/gl/float+.h, lib/gl/gettext.h,
+	lib/gl/m4/alloca.m4, lib/gl/m4/glibc2.m4, lib/gl/m4/glibc21.m4,
+	lib/gl/m4/gnulib-common.m4, lib/gl/m4/gnulib-comp.m4,
+	lib/gl/m4/iconv.m4, lib/gl/m4/memmem.m4, lib/gl/m4/mmap-anon.m4,
+	lib/gl/m4/printf.m4, lib/gl/m4/string_h.m4,
+	lib/gl/m4/sys_socket_h.m4, lib/gl/m4/unistd_h.m4,
+	lib/gl/m4/vasnprintf.m4, lib/gl/m4/wchar_h.m4,
+	lib/gl/printf-parse.c, lib/gl/printf-parse.h, lib/gl/stdint.in.h,
+	lib/gl/stdio.in.h, lib/gl/stdlib.in.h, lib/gl/string.in.h,
+	lib/gl/sys_socket.in.h, lib/gl/tests/Makefile.am,
+	lib/gl/tests/init.sh, lib/gl/tests/intprops.h,
+	lib/gl/tests/verify.h, lib/gl/time.in.h, lib/gl/unistd.in.h,
+	lib/gl/vasnprintf.c, lib/gl/verify.h, lib/gl/wchar.in.h,
+	libextra/gl/m4/gnulib-common.m4, maint.mk: Update gnulib files.
+
+2010-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/Makefile.am: Temporarily remove gendh test. It takes
+	extremely long time under valgrind.
+
+2010-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_sig.c, lib/x509/common.c, lib/x509/common.h,
+	lib/x509/mpi.c, lib/x509/sign.c, lib/x509/verify.c: Use ASN1_NULL
+	when writing parameters for RSA signatures. This makes us comply
+	with RFC3279. Reported by Michael Rommel.
+
+2010-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, src/serv.c: Corrected buffer overflow in gnutls-serv by
+	Tomas Mraz.  The gnutls-serv uses fixed allocated buffer for the response which
+	can be pretty long if a client certificate is presented to it and
+	the http header is large. This causes buffer overflow and heap
+	corruption which then leads to random segfaults or aborts.  It was reported originally here:
+	https://bugzilla.redhat.com/show_bug.cgi?id=659259 The attached patch changes sprintf calls in peer_print_info() to
+	snprintf so the buffer is never overflowed.
+
+2010-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/m4/hooks.m4: increased revision
+
+2010-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/Makefile.am: Added p11tool.h
+
+2010-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: released 2.11.5
+
+2010-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-internals.texi: escaped chars.
+
+2010-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-internals.texi: Updated extension writing code. Still not
+	clear enough.
+
+2010-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-cert-auth.texi: PKCS #11 fixes
+
+2010-12-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/examples/ex-cert-select-pkcs11.c: Corrected pkcs11 example
+	URLs
+
+2010-11-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/pkcs11.c: Prefix mechanism number with 0x.
+
+2010-11-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/pakchois/pakchois11.h, src/pkcs11.c: Added camellia and
+	SHA224.
+
+2010-11-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* configure.ac, lib/configure.ac, lib/nettle/rnd.c: Use rusage if
+	present.  Moved check to correct config and included resource.h
+	header.
+
+2010-11-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/nettle/rnd.c: More details on the text
+
+2010-11-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/pkcs11.c: Corrected copyright statement
+
+2010-11-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/nettle/rnd.c: Corrected copyright header. Added Niels.
+
+2010-11-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_cert.c, lib/includes/gnutls/x509.h,
+	lib/x509/verify.c, src/certtool.c, src/cli.c, tests/chainverify.c: 
+	Reverted default behavior for verification and introduced
+	GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT.  Thus by default V1
+	trusted CAs are allowed, unless the new flag is specified.
+
+2010-11-25  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Typo.
+
+2010-11-25  Simon Josefsson <simon@josefsson.org>
+
+	* tests/suite/Makefile.in: Remove, it is generated.
+
+2010-11-25  Simon Josefsson <simon@josefsson.org>
+
+	* README: No space at eol.
+
+2010-11-25  Simon Josefsson <simon@josefsson.org>
+
+	* tests/safe-renegotiation/Makefile.am: Fix syntax-check warning.
+
+2010-11-25  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk: Ignore tests/suite for syntax-checks, not our code.
+
+2010-11-25  Simon Josefsson <simon@josefsson.org>
+
+	* README: Recommend git format-patch rather than git diff.
+
+2010-11-24  Jeffrey Walton <noloader@gmail.com>
+
+	* README: Attached is a proposed modification to the README file,
+	including recent comments by Simon.
+
+2010-11-23  Simon Josefsson <simon@josefsson.org>
+
+	* guile/src/Makefile.am: Fix dependencies, fixes parallel builds.  Tiny patch from Graham Gower <graham.gower@gmail.com>.
+
+2010-11-19  Simon Josefsson <simon@josefsson.org>
+
+	* doc/Makefile.am: Remove file.
+
+2010-11-19  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am: Generated.
+
+2010-11-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* configure.ac, tests/suite/Makefile.in: Create Makefile in
+	tests/suite/
+
+2010-11-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/cli.c, src/psk-gaa.c, src/psk-gaa.h, src/psk.c, src/psk.gaa,
+	tests/Makefile.am, tests/netconf-psk.c: Deprecate the netconf
+	password and use a key only.
+
+2010-11-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/credentials/gnutls-http-serv: correctly set psk params.
+
+2010-11-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: added info
+
+2010-11-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/privkey_pkcs8.c: Correctly write DSA public key in ASN.1
+	(add leading zero). Reported by Jeffrey Walton.
+
+2010-11-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/mpi.c: cleanups
+
+2010-11-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-auth.texi, lib/includes/gnutls/compat.h,
+	lib/includes/gnutls/gnutls.h.in: Deprecated the key derivation
+	method from netconf. The published RFC does not include this method
+	and it is not known whether it has been used at all in practice. No
+	need to support it.
+
+2010-11-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_priority.c: Added SIGN-ALL, CTYPE-ALL, COMP-ALL,
+	and VERS-TLS-ALL priority strings.
+
+2010-11-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_x509.c: Removed redundant error check. Reported by
+	Nicolas Kaiser.
+
+2010-11-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/includes/gnutls/pkcs11.h, lib/libgnutls.map, lib/pkcs11.c,
+	src/p11tool-gaa.c, src/p11tool-gaa.h, src/p11tool.c,
+	src/p11tool.gaa, src/p11tool.h, src/pkcs11.c: Added
+	--list-mechanisms option to p11tool. Lists all mechanisms supported
+	by a token.
+
+2010-11-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/manpages/Makefile.am, doc/manpages/p11tool.1: Added manpage
+	for p11tool.
+
+2010-11-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/manpages/certtool.1, doc/manpages/gnutls-cli.1,
+	doc/manpages/gnutls-serv.1, doc/manpages/srptool.1: Corrected my
+	name.
+
+2010-11-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/p11tool-gaa.c, src/p11tool.gaa: In p11tool --url was renamed
+	to --export.
+
+2010-11-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/p11tool-gaa.c, src/p11tool-gaa.h, src/p11tool.gaa,
+	src/pkcs11.c: Corrected bug in secret key copy. Rationalized the
+	--help of p11tool.
+
+2010-11-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/pkcs11.c, lib/pkcs11_secret.c: * Corrected flag conversion to internal representation.  * When generating secret keys include a generic key type and a
+	random ID.
+
+2010-11-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/p11tool-gaa.c, src/p11tool-gaa.h, src/p11tool.gaa: Added
+	option --no-detailed-url to p11tool. More detailed url is the
+	default now.
+
+2010-11-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/Makefile.am, lib/includes/gnutls/pkcs11.h,
+	lib/libgnutls.map, lib/pkcs11.c, lib/pkcs11_int.h,
+	lib/pkcs11_secret.c, lib/pkcs11_write.c, src/pkcs11.c: Added
+	gnutls_pkcs11_token_set_pin() and gnutls_pkcs11_token_init() to
+	enable manipulating tokens purely from PKCS #11.
+
+2010-11-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/README.gaa: Removed README.gaa.
+
+2010-11-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitignore, src/Makefile.am, src/certtool-common.c,
+	src/certtool-common.h, src/certtool-gaa.c, src/certtool-gaa.h,
+	src/certtool.c, src/certtool.gaa, src/p11tool-gaa.c,
+	src/p11tool-gaa.h, src/p11tool.c, src/p11tool.gaa, src/p11tool.h,
+	src/pkcs11.c: Introduced p11tool to separate PKCS #11 functionality
+	from certtool.
+
+2010-11-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/Makefile.am, tests/finished.c: Removed check on deprecated
+	feature (finished).
+
+2010-11-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/includes/gnutls/compat.h, lib/includes/gnutls/gnutls.h.in: 
+	Deprecated old functions.
+
+2010-11-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-intro-tls.texi: use @code for SAFE_RENEGOTIATION string.
+
+2010-06-07  Simon Josefsson <simon@josefsson.org>
+
+	* lib/gnutls_priority.c: Doc fix.
+
+2010-10-16  Simon Josefsson <simon@josefsson.org>
+
+	* .gitignore: Add.
+
+2010-10-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/Makefile.am, tests/safe-renegotiation/Makefile.am,
+	tests/safe-renegotiation/params.dh,
+	tests/safe-renegotiation/testsrn, tests/suite/Makefile.am,
+	tests/suite/README, tests/suite/eagain,
+	tests/suite/ecore/eina_config.h,
+	tests/suite/ecore/src/include/Eina.h,
+	tests/suite/ecore/src/include/eina_accessor.h,
+	tests/suite/ecore/src/include/eina_array.h,
+	tests/suite/ecore/src/include/eina_benchmark.h,
+	tests/suite/ecore/src/include/eina_binshare.h,
+	tests/suite/ecore/src/include/eina_config.h,
+	tests/suite/ecore/src/include/eina_convert.h,
+	tests/suite/ecore/src/include/eina_counter.h,
+	tests/suite/ecore/src/include/eina_cpu.h,
+	tests/suite/ecore/src/include/eina_error.h,
+	tests/suite/ecore/src/include/eina_file.h,
+	tests/suite/ecore/src/include/eina_fp.h,
+	tests/suite/ecore/src/include/eina_hamster.h,
+	tests/suite/ecore/src/include/eina_hash.h,
+	tests/suite/ecore/src/include/eina_inline_array.x,
+	tests/suite/ecore/src/include/eina_inline_f16p16.x,
+	tests/suite/ecore/src/include/eina_inline_f32p32.x,
+	tests/suite/ecore/src/include/eina_inline_f8p24.x,
+	tests/suite/ecore/src/include/eina_inline_fp.x,
+	tests/suite/ecore/src/include/eina_inline_hash.x,
+	tests/suite/ecore/src/include/eina_inline_list.x,
+	tests/suite/ecore/src/include/eina_inline_log.x,
+	tests/suite/ecore/src/include/eina_inline_mempool.x,
+	tests/suite/ecore/src/include/eina_inline_rbtree.x,
+	tests/suite/ecore/src/include/eina_inline_rectangle.x,
+	tests/suite/ecore/src/include/eina_inline_str.x,
+	tests/suite/ecore/src/include/eina_inline_stringshare.x,
+	tests/suite/ecore/src/include/eina_inline_tiler.x,
+	tests/suite/ecore/src/include/eina_inline_trash.x,
+	tests/suite/ecore/src/include/eina_inline_ustringshare.x,
+	tests/suite/ecore/src/include/eina_inlist.h,
+	tests/suite/ecore/src/include/eina_iterator.h,
+	tests/suite/ecore/src/include/eina_lalloc.h,
+	tests/suite/ecore/src/include/eina_list.h,
+	tests/suite/ecore/src/include/eina_log.h,
+	tests/suite/ecore/src/include/eina_magic.h,
+	tests/suite/ecore/src/include/eina_main.h,
+	tests/suite/ecore/src/include/eina_matrixsparse.h,
+	tests/suite/ecore/src/include/eina_mempool.h,
+	tests/suite/ecore/src/include/eina_module.h,
+	tests/suite/ecore/src/include/eina_quadtree.h,
+	tests/suite/ecore/src/include/eina_rbtree.h,
+	tests/suite/ecore/src/include/eina_rectangle.h,
+	tests/suite/ecore/src/include/eina_safety_checks.h,
+	tests/suite/ecore/src/include/eina_sched.h,
+	tests/suite/ecore/src/include/eina_str.h,
+	tests/suite/ecore/src/include/eina_strbuf.h,
+	tests/suite/ecore/src/include/eina_stringshare.h,
+	tests/suite/ecore/src/include/eina_tiler.h,
+	tests/suite/ecore/src/include/eina_trash.h,
+	tests/suite/ecore/src/include/eina_types.h,
+	tests/suite/ecore/src/include/eina_unicode.h,
+	tests/suite/ecore/src/include/eina_ustrbuf.h,
+	tests/suite/ecore/src/include/eina_ustringshare.h,
+	tests/suite/ecore/src/lib/Ecore.h,
+	tests/suite/ecore/src/lib/Ecore_Getopt.h,
+	tests/suite/ecore/src/lib/ecore.c,
+	tests/suite/ecore/src/lib/ecore_anim.c,
+	tests/suite/ecore/src/lib/ecore_app.c,
+	tests/suite/ecore/src/lib/ecore_events.c,
+	tests/suite/ecore/src/lib/ecore_exe.c,
+	tests/suite/ecore/src/lib/ecore_getopt.c,
+	tests/suite/ecore/src/lib/ecore_glib.c,
+	tests/suite/ecore/src/lib/ecore_idle_enterer.c,
+	tests/suite/ecore/src/lib/ecore_idle_exiter.c,
+	tests/suite/ecore/src/lib/ecore_idler.c,
+	tests/suite/ecore/src/lib/ecore_job.c,
+	tests/suite/ecore/src/lib/ecore_main.c,
+	tests/suite/ecore/src/lib/ecore_pipe.c,
+	tests/suite/ecore/src/lib/ecore_poll.c,
+	tests/suite/ecore/src/lib/ecore_private.h,
+	tests/suite/ecore/src/lib/ecore_signal.c,
+	tests/suite/ecore/src/lib/ecore_thread.c,
+	tests/suite/ecore/src/lib/ecore_time.c,
+	tests/suite/ecore/src/lib/ecore_timer.c,
+	tests/suite/ecore/src/lib/eina_accessor.c,
+	tests/suite/ecore/src/lib/eina_array.c,
+	tests/suite/ecore/src/lib/eina_benchmark.c,
+	tests/suite/ecore/src/lib/eina_binshare.c,
+	tests/suite/ecore/src/lib/eina_chained_mempool.c,
+	tests/suite/ecore/src/lib/eina_convert.c,
+	tests/suite/ecore/src/lib/eina_counter.c,
+	tests/suite/ecore/src/lib/eina_cpu.c,
+	tests/suite/ecore/src/lib/eina_error.c,
+	tests/suite/ecore/src/lib/eina_file.c,
+	tests/suite/ecore/src/lib/eina_fp.c,
+	tests/suite/ecore/src/lib/eina_hamster.c,
+	tests/suite/ecore/src/lib/eina_hash.c,
+	tests/suite/ecore/src/lib/eina_inlist.c,
+	tests/suite/ecore/src/lib/eina_iterator.c,
+	tests/suite/ecore/src/lib/eina_lalloc.c,
+	tests/suite/ecore/src/lib/eina_list.c,
+	tests/suite/ecore/src/lib/eina_log.c,
+	tests/suite/ecore/src/lib/eina_magic.c,
+	tests/suite/ecore/src/lib/eina_main.c,
+	tests/suite/ecore/src/lib/eina_matrixsparse.c,
+	tests/suite/ecore/src/lib/eina_mempool.c,
+	tests/suite/ecore/src/lib/eina_module.c,
+	tests/suite/ecore/src/lib/eina_private.h,
+	tests/suite/ecore/src/lib/eina_quadtree.c,
+	tests/suite/ecore/src/lib/eina_rbtree.c,
+	tests/suite/ecore/src/lib/eina_rectangle.c,
+	tests/suite/ecore/src/lib/eina_safety_checks.c,
+	tests/suite/ecore/src/lib/eina_sched.c,
+	tests/suite/ecore/src/lib/eina_share_common.c,
+	tests/suite/ecore/src/lib/eina_share_common.h,
+	tests/suite/ecore/src/lib/eina_str.c,
+	tests/suite/ecore/src/lib/eina_strbuf.c,
+	tests/suite/ecore/src/lib/eina_strbuf_common.c,
+	tests/suite/ecore/src/lib/eina_strbuf_common.h,
+	tests/suite/ecore/src/lib/eina_strbuf_template_c.x,
+	tests/suite/ecore/src/lib/eina_stringshare.c,
+	tests/suite/ecore/src/lib/eina_tiler.c,
+	tests/suite/ecore/src/lib/eina_unicode.c,
+	tests/suite/ecore/src/lib/eina_ustrbuf.c,
+	tests/suite/ecore/src/lib/eina_ustringshare.c,
+	tests/suite/ecore/src/lib/eina_value.c, tests/suite/mini-eagain2.c,
+	tests/suite/params.dh, tests/suite/testsrn: Added tests/suite which
+	contains tests to be executed during development time and will not
+	be distributed (not included in make dist).  Added "ecore" and a new
+	mini-eagain to test EAGAIN behavior.
+
+2010-10-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitignore: updated .gitignore.
+
+2010-10-16  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, src/common.c: gnutls-cli: Print channel binding only in
+	verbose mode.  Before it printed it after the 'Compression:' output, thus breaking
+	Emacs starttls.el string searches.
+
+2010-10-15  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2010-10-15  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2010-10-15  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.11.4.
