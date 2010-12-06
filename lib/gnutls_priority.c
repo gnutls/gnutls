@@ -688,7 +688,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	        }
 	      else 
 	        {
-  	          if ((algo =
+		  if ((algo =
 		       gnutls_protocol_get_id (&broken_list[i][6])) !=
 		      GNUTLS_VERSION_UNKNOWN)
                     fn (&(*priority_cache)->protocol, algo);
@@ -737,9 +737,9 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	      else 
 	        {
 	          if ((algo =
-                      gnutls_sign_get_id (&broken_list[i][6])) !=
+		       gnutls_sign_get_id (&broken_list[i][6])) !=
                       GNUTLS_SIGN_UNKNOWN)
-    		    fn (&(*priority_cache)->sign_algo, algo);
+		    fn (&(*priority_cache)->sign_algo, algo);
                   else
                     goto error;
                 }

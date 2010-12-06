@@ -82,7 +82,8 @@ option (d, debug) INT "LEVEL" { $debug = $1 } "specify the debug level. Default 
 
 option (h, help) { gaa_help(); exit(0); } "shows this help text"
 
-init { 	$action = -1; $pkcs11_provider= NULL; $outfile = NULL; $pubkey = NULL; $privkey = NULL;
+init {
+	$action = -1; $pkcs11_provider= NULL; $outfile = NULL; $pubkey = NULL; $privkey = NULL;
 	$pkcs11_url = NULL; $pkcs11_type = PKCS11_TYPE_PK; $pubkey=NULL; $pkcs11_label = NULL; 
 	$pkcs11_trusted=0; $pkcs11_login = 0; $pkcs11_detailed_url = GNUTLS_PKCS11_URL_LIB; 
 	$secret_key = NULL; $cert = NULL; $incert_format = 0; }

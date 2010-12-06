@@ -166,4 +166,3 @@ gaa_parser (int argc, char **argv)
   gnutls_pkcs11_deinit ();
   gnutls_global_deinit ();
 }
-
