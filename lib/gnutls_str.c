@@ -357,7 +357,7 @@ _gnutls_buffer_escape (gnutls_buffer_st * dest,
 	  || !isgraph (dest->data[pos]))
 	{
 
-	  snprintf(t, sizeof(t), "%%%.2X", (unsigned int)dest->data[pos]);
+	  snprintf (t, sizeof (t), "%%%.2X", (unsigned int) dest->data[pos]);
 
 	  _gnutls_buffer_delete_data (dest, pos, 1);
 
