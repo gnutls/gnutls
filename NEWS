@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.11.6 (unreleased)
 
+** libgnutls: Record version of Client Hellos is now set by default to
+SSL 3.0. To restore the previous default behavior use %LATEST_RECORD_VERSION
+priority string.
+
 ** libgnutls: Use ASN1_NULL when writing parameters for RSA signatures. 
 This makes us comply with RFC3279. Reported by Michael Rommel.
 
