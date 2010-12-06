@@ -1,3 +1,106 @@
+2010-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.10.4.
+
+2010-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, lib/minitasn1/coding.c, lib/minitasn1/element.c,
+	lib/minitasn1/libtasn1.h, lib/minitasn1/structure.c: minitasn1:
+	Updated to Libtasn1 2.9.
+
+2010-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* lib/configure.ac, lib/m4/hooks.m4, libextra/configure.ac: Bump
+	versions.
+
+2010-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_sig.c, lib/x509/common.c, lib/x509/common.h,
+	lib/x509/mpi.c, lib/x509/sign.c: Use ASN1_NULL when writing
+	parameters for RSA signatures. This makes us comply with RFC3279.
+	Reported by Michael Rommel.
+
+2010-12-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, src/serv.c: Corrected buffer overflow in gnutls-serv by
+	Tomas Mraz.  The gnutls-serv uses fixed allocated buffer for the response which
+	can be pretty long if a client certificate is presented to it and
+	the http header is large. This causes buffer overflow and heap
+	corruption which then leads to random segfaults or aborts.  It was reported originally here:
+	https://bugzilla.redhat.com/show_bug.cgi?id=659259 The attached patch changes sprintf calls in peer_print_info() to
+	snprintf so the buffer is never overflowed.
+
+2010-11-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_cert.c, lib/includes/gnutls/x509.h,
+	lib/x509/verify.c, src/certtool.c, src/cli.c, tests/chainverify.c: 
+	Reverted default behavior for verification and introduced
+	GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT.  Thus by default V1
+	trusted CAs are allowed, unless the new flag is specified.
+
+2010-11-23  Simon Josefsson <simon@josefsson.org>
+
+	* guile/src/Makefile.am: Fix dependencies, fixes parallel builds.  Tiny patch from Graham Gower <graham.gower@gmail.com>.
+
+2010-11-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: corrected news
+
+2010-11-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* configure.ac, lib/m4/hooks.m4: bumped version
+
+2010-11-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: added info
+
+2010-11-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/privkey_pkcs8.c: Correctly write DSA public key in ASN.1
+	(add leading zero). Reported by Jeffrey Walton.
+
+2010-11-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_x509.c: Removed redundant error check. Reported by
+	Nicolas Kaiser.
+
+2010-11-03  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_handshake.c: Corrected leak in extension data
+	calculation. Reported by Mike Blumenkrantz.
+
+2010-09-30  Simon Josefsson <simon@josefsson.org>
+
+	* tests/openpgp-certs/testselfsigs: Avoid bashism.  Reported by m.drochner@fz-juelich.de in
+	<http://savannah.gnu.org/support/?107449>.
+
+2010-09-30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/crypto-api.c: Don't return from void functions.  Reported by Dagobert Michelsen <dam@opencsw.org> in
+
+	<http://permalink.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/4566>.
+
+2010-09-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Add.
+
+2010-09-30  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2010-09-30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/includes/gnutls/gnutls.h.in: Remove spurious comma.
+
+2010-09-30  Simon Josefsson <simon@josefsson.org>
+
+	* lib/includes/gnutls/x509.h: Remove spurious comma.
+
+2010-09-30  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2010-09-30  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.10.2.
