@@ -1210,7 +1210,6 @@ INDENT_SOURCES ?= $(C_SOURCES)
 indent:
 	indent $(INDENT_SOURCES)
 	indent $(INDENT_SOURCES)
-	indent $(INDENT_SOURCES) # Ident is not idempotent!
 
 # If you want to set UPDATE_COPYRIGHT_* environment variables,
 # put the assignments in this variable.
