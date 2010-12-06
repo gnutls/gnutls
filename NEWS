@@ -14,6 +14,8 @@ This makes us comply with RFC3279. Reported by Michael Rommel.
 introduced GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT. Thus by default
 V1 trusted CAs are allowed, unless the new flag is specified.
 
+** minitasn1: Updated to Libtasn1 2.9.
+
 ** API and ABI modifications:
 No changes since last version.
 

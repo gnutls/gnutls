@@ -857,16 +857,11 @@ _asn1_ordering_set_of (unsigned char *der, int der_len, ASN1_TYPE node)
  * Creates the DER encoding for the NAME structure (inside *POINTER
  * structure).
  *
- * Returns:
- *
- *   %ASN1_SUCCESS: DER encoding OK.
- *
- *   %ASN1_ELEMENT_NOT_FOUND: NAME is not a valid element.
- *
- *   %ASN1_VALUE_NOT_FOUND: There is an element without a value.
- *
- *   %ASN1_MEM_ERROR: @ider vector isn't big enough. Also in this case
- *     LEN will contain the length needed.
+ * Returns: %ASN1_SUCCESS if DER encoding OK, %ASN1_ELEMENT_NOT_FOUND
+ *   if @name is not a valid element, %ASN1_VALUE_NOT_FOUND if there
+ *   is an element without a value, %ASN1_MEM_ERROR if the @ider
+ *   vector isn't big enough and in this case @len will contain the
+ *   length needed.
  **/
 asn1_retCode
 asn1_der_coding (ASN1_TYPE element, const char *name, void *ider, int *len,
