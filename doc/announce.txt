@@ -1,7 +1,7 @@
 To: help-gnutls@gnu.org, gnutls-devel@gnu.org, info-gnu@gnu.org
-Subject: GnuTLS 2.10.1 released
+Subject: GnuTLS 2.10.4 released
 <#part sign=pgpmime>
-We are proud to announce a new stable GnuTLS release: Version 2.10.1.
+We are proud to announce a new stable GnuTLS release: Version 2.10.4.
 
 GnuTLS is a modern C library that implements the standard network
 security protocol Transport Layer Security (TLS), for use by network
@@ -22,24 +22,16 @@ The project page of the library is available at:
 What's New
 ==========
 
-** libgnutls: Added support for broken certificates that indicate RSA
-with strange OIDs.
+** gnutls-serv: Corrected a buffer overflow. Reported and patch by Tomas Mraz.
 
-** gnutls-cli: Allow verification using V1 CAs.
+** libgnutls: Use ASN1_NULL when writing parameters for RSA signatures. 
+This makes us comply with RFC3279. Reported by Michael Rommel.
 
-** libgnutls: gnutls_x509_privkey_import() will fallback to
-gnutls_x509_privkey_import_pkcs8() without a password, if it
-is unable to decode the key.
+** libgnutls: Reverted default behavior for verification and
+introduced GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT. Thus by default
+V1 trusted CAs are allowed, unless the new flag is specified.
 
-** libgnutls: Correctly deinitialize crypto API functions to prevent
-a memory leak. Reported by Mads Kiilerich.
-
-certtool: If asked to generate DSA keys of size more than 1024 bits,
-issue a warning, that the output key might not be working everywhere.
-
-certtool: The --pkcs-cipher is taken into account when generating a
-private key. The default cipher used now is aes-128. The old behavior can
-be simulated by specifying "--pkcs-cipher 3des-pkcs12".
+** minitasn1: Updated to Libtasn1 2.9.
 
 ** API and ABI modifications:
 No changes since last version.
@@ -51,15 +43,15 @@ GnuTLS may be downloaded from one of the mirror sites or direct from
 <ftp://ftp.gnu.org/gnu/gnutls/>.  The list of mirrors can be found at
 <http://www.gnu.org/software/gnutls/download.html>.
 
-Here are the BZIP2 compressed sources (7.2MB):
+Here are the BZIP2 compressed sources (7.0MB):
 
-  ftp://ftp.gnu.org/gnu/gnutls/gnutls-2.10.1.tar.bz2
-  http://ftp.gnu.org/gnu/gnutls/gnutls-2.10.1.tar.bz2
+  ftp://ftp.gnu.org/gnu/gnutls/gnutls-2.10.4.tar.bz2
+  http://ftp.gnu.org/gnu/gnutls/gnutls-2.10.4.tar.bz2
 
 Here are OpenPGP detached signatures signed using key 0xB565716F:
 
-  ftp://ftp.gnu.org/gnu/gnutls/gnutls-2.10.1.tar.bz2.sig
-  http://ftp.gnu.org/gnu/gnutls/gnutls-2.10.1.tar.bz2.sig
+  ftp://ftp.gnu.org/gnu/gnutls/gnutls-2.10.4.tar.bz2.sig
+  http://ftp.gnu.org/gnu/gnutls/gnutls-2.10.4.tar.bz2.sig
 
 Note, that we don't distribute gzip compressed tarballs.
 
@@ -67,7 +59,7 @@ In order to check that the version of GnuTLS which you are going to
 install is an original and unmodified one, you should verify the OpenPGP
 signature.  You can use the command
 
-     gpg --verify gnutls-2.10.1.tar.bz2.sig
+     gpg --verify gnutls-2.10.4.tar.bz2.sig
 
 This checks whether the signature file matches the source file.  You
 should see a message indicating that the signature is good and made by
@@ -90,9 +82,9 @@ Alternatively, after successfully verifying the OpenPGP signature of
 this announcement, you could verify that the files match the following
 checksum values.  The values are for SHA-1 and SHA-224 respectively:
 
-507ff8ad7c1e042f8ecaa4314f32777e74caf0d3  gnutls-2.10.1.tar.bz2
+f0dcd7b68748b48d7b945c52b6a9e64d643e4b58  gnutls-2.10.4.tar.bz2
 
-4024b69acc70cb7e105742f8ad26bf68b7dc0e07657efbbaaf23d0bd  gnutls-2.10.1.tar.bz2
+7c57226444af5744a938f9c1ef12e6c8c5f5144f2368859613afe968  gnutls-2.10.4.tar.bz2
 
 Documentation
 =============
@@ -124,45 +116,6 @@ If you wish to participate in the development of GnuTLS, you are invited
 to join our gnutls-dev mailing list, see:
 
   http://lists.gnu.org/mailman/listinfo/gnutls-devel
-
-Windows installer
-=================
-
-GnuTLS has been ported to the Windows operating system, and a binary
-installer is available.  The installer contains DLLs for application
-development, manuals, examples, and source code.  The installer
-contains libgpg-error v1.8, libgcrypt v1.4.6, libtasn1 v2.7, and
-GnuTLS v2.10.1.
-
-For more information about GnuTLS for Windows:
-  http://josefsson.org/gnutls4win/
-
-The Windows binary installer and PGP signature:
-  http://josefsson.org/gnutls4win/gnutls-2.10.1.exe (17MB)
-  http://josefsson.org/gnutls4win/gnutls-2.10.1.exe.sig
-
-The checksum values for SHA-1 and SHA-224 are:
-
-f4f0c86ef9761c65941fc53713d17938ac450b3c  gnutls-2.10.1.exe
-
-cd2f69c8e271e26187cb3e64dc179df5f28e8d1b7e5f9d97a7e222fc  gnutls-2.10.1.exe
-
-A ZIP archive containing the Windows binaries:
-  http://josefsson.org/gnutls4win/gnutls-2.10.1.zip (5.6MB)
-  http://josefsson.org/gnutls4win/gnutls-2.10.1.zip.sig
-
-A Debian mingw32 package is also available:
-  http://josefsson.org/gnutls4win/mingw32-gnutls_2.7.10-1_all.deb (5.0MB)
-
-The checksum values for SHA-1 and SHA-224 are:
-
-fb6dbcabe30010e761c47589ef86869fb21f82be  gnutls-2.10.1.zip
-
-3a2b2457836dca9e1f8af86101d9a434a966abc544db1493c22797e4  gnutls-2.10.1.zip
-
-0ff1c0c1ded86a5054dd7bcd7b29629afe3169a9  mingw32-gnutls_2.10.1-1_all.deb
-
-066502f2fae542e6c80433090070ef46f02e5a71c80ca4f53b450ac9  mingw32-gnutls_2.10.1-1_all.deb
 
 Internationalization
 ====================
