@@ -141,9 +141,12 @@ gl/tests/sys/
 gl/tests/test-alignof
 gl/tests/test-alloca-opt
 gl/tests/test-arpa_inet
+gl/tests/test-binary-io
 gl/tests/test-c-ctype
 gl/tests/test-errno
 gl/tests/test-fseeko
+gl/tests/test-ftello
+gl/tests/test-ftello3
 gl/tests/test-getaddrinfo
 gl/tests/test-getdelim
 gl/tests/test-getline
@@ -176,6 +179,7 @@ gl/tests/test-sys_time
 gl/tests/test-time
 gl/tests/test-unistd
 gl/tests/test-vasnprintf
+gl/tests/test-verify
 gl/tests/test-version-etc
 gl/tests/test-wchar
 gl/tests/warn-on-use.h
@@ -229,10 +233,13 @@ lib/gl/tests/arg-nonnull.h
 lib/gl/tests/c++defs.h
 lib/gl/tests/libtests.a
 lib/gl/tests/test-alloca-opt
+lib/gl/tests/test-binary-io
 lib/gl/tests/test-byteswap
 lib/gl/tests/test-c-ctype
 lib/gl/tests/test-errno
 lib/gl/tests/test-fseeko
+lib/gl/tests/test-ftello
+lib/gl/tests/test-ftello3
 lib/gl/tests/test-func
 lib/gl/tests/test-memchr
 lib/gl/tests/test-netdb
@@ -253,6 +260,7 @@ lib/gl/tests/test-time
 lib/gl/tests/test-unistd
 lib/gl/tests/test-vasnprintf
 lib/gl/tests/test-vasprintf
+lib/gl/tests/test-verify
 lib/gl/tests/test-vsnprintf
 lib/gl/tests/test-wchar
 lib/gl/tests/warn-on-use.h
@@ -379,8 +387,6 @@ m4/lt~obsolete.m4
 src/Makefile
 src/Makefile.in
 src/benchmark
-src/libcmd-p11tool.la
-src/p11tool
 src/certtool
 src/cfg/Makefile
 src/cfg/Makefile.in
@@ -395,9 +401,11 @@ src/libcfg.la
 src/libcmd-certtool.la
 src/libcmd-cli-debug.la
 src/libcmd-cli.la
+src/libcmd-p11tool.la
 src/libcmd-psk.la
 src/libcmd-serv.la
 src/libcmd-srp.la
+src/p11tool
 src/psktool
 src/srptool
 stamp-h1
