@@ -542,6 +542,10 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  * causes operability problems, but is required for full protection.
  *
  * "%SSL3_RECORD_VERSION" will use SSL3.0 record version in client hello.
+ * This is the default.
+ *
+ * "%LATEST_RECORD_VERSION" will use the latest TLS version record
+ * version in client hello.
  *
  * "%VERIFY_ALLOW_SIGN_RSA_MD5" will allow RSA-MD5 signatures in
  * certificate chains.
@@ -767,7 +771,10 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
 	    }
 	  else if (strcasecmp (&broken_list[i][1],
 			       "SSL3_RECORD_VERSION") == 0)
-	    (*priority_cache)->ssl3_record_version = 1;
+	    (*priority_cache)->no_ssl3_record_version = 0;
+	  else if (strcasecmp (&broken_list[i][1],
+			       "LATEST_RECORD_VERSION") == 0)
+	    (*priority_cache)->no_ssl3_record_version = 1;
 	  else if (strcasecmp (&broken_list[i][1],
 			       "VERIFY_ALLOW_X509_V1_CA_CRT") == 0)
 	    (*priority_cache)->additional_verify_flags |=

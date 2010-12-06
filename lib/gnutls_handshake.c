@@ -2076,15 +2076,13 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       _gnutls_set_adv_version (session, hver);
       _gnutls_set_current_version (session, hver);
 
-      if (session->internals.priorities.ssl3_record_version)
+      if (session->internals.priorities.no_ssl3_record_version != 0)
 	{
-	  /* Some old implementations do not interoperate if we send a
-	   * different version in the record layer.
-	   * It seems they prefer to read the record's version
-	   * as the one we actually requested.
-	   * The proper behaviour is to use the one in the client hello 
-	   * handshake packet and ignore the one in the packet's record 
-	   * header.
+	  /* Advertize the SSL 3.0 record packet version in
+	   * record packets during the handshake.
+	   * That is to avoid confusing implementations
+	   * that do not support TLS 1.2 and don't know
+	   * how 3,3 version of record packets look like.
 	   */
 	  _gnutls_record_set_default_version (session, 3, 0);
 	}
