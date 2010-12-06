@@ -98,4 +98,4 @@ TESTS_ENVIRONMENT =						\
 	$(VALGRIND)
 
 check-local:
-	[ -d suite ] && $(MAKE) -C suite check
+	if test -d suite; then $(MAKE) -C suite check; fi
