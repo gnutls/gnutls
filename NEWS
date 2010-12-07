@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.11.7 (unreleased)
 
+** crypto.h: Fix use with C++.
+Reported by "Brendan Doherty" <brendand@gentrack.com>.
+
 ** API and ABI modifications:
 No changes since last version.
 
