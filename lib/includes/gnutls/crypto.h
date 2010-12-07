@@ -25,6 +25,11 @@
 #ifndef GNUTLS_CRYPTO_H
 #define GNUTLS_CRYPTO_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 typedef struct cipher_hd_st *gnutls_cipher_hd_t;
 
 int gnutls_cipher_init (gnutls_cipher_hd_t * handle,
@@ -282,17 +287,17 @@ typedef struct gnutls_crypto_pk
    * parameters, depending on the operation */
   int (*encrypt) (gnutls_pk_algorithm_t, gnutls_datum_t * ciphertext,
 		  const gnutls_datum_t * plaintext,
-		  const gnutls_pk_params_st * public);
+		  const gnutls_pk_params_st * pub);
   int (*decrypt) (gnutls_pk_algorithm_t, gnutls_datum_t * plaintext,
 		  const gnutls_datum_t * ciphertext,
-		  const gnutls_pk_params_st * private);
+		  const gnutls_pk_params_st * priv);
 
   int (*sign) (gnutls_pk_algorithm_t, gnutls_datum_t * signature,
 	       const gnutls_datum_t * data,
-	       const gnutls_pk_params_st * private);
+	       const gnutls_pk_params_st * priv);
   int (*verify) (gnutls_pk_algorithm_t, const gnutls_datum_t * data,
 		 const gnutls_datum_t * signature,
-		 const gnutls_pk_params_st * public);
+		 const gnutls_pk_params_st * pub);
 
   int (*generate) (gnutls_pk_algorithm_t, unsigned int nbits,
 		   gnutls_pk_params_st *);
@@ -361,5 +366,9 @@ int gnutls_crypto_pk_register2 (int priority, int version,
 				const gnutls_crypto_pk_st * s);
 int gnutls_crypto_bigint_register2 (int priority, int version,
 				    const gnutls_crypto_bigint_st * s);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
