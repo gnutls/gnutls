@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.11.7 (unreleased)
 
+** libgnutls: gnutls_*_export_raw() functions now add leading zero in
+integers.
+
 ** crypto.h: Fix use with C++.
 Reported by "Brendan Doherty" <brendand@gentrack.com>.
 
