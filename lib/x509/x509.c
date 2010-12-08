@@ -2933,14 +2933,14 @@ gnutls_x509_crt_get_pk_rsa_raw (gnutls_x509_crt_t crt,
       return ret;
     }
 
-  ret = _gnutls_mpi_dprint (params[0], m);
+  ret = _gnutls_mpi_dprint_lz (params[0], m);
   if (ret < 0)
     {
       gnutls_assert ();
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_dprint (params[1], e);
+  ret = _gnutls_mpi_dprint_lz (params[1], e);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -3004,7 +3004,7 @@ gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
 
 
   /* P */
-  ret = _gnutls_mpi_dprint (params[0], p);
+  ret = _gnutls_mpi_dprint_lz (params[0], p);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -3012,7 +3012,7 @@ gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
     }
 
   /* Q */
-  ret = _gnutls_mpi_dprint (params[1], q);
+  ret = _gnutls_mpi_dprint_lz (params[1], q);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -3022,7 +3022,7 @@ gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
 
 
   /* G */
-  ret = _gnutls_mpi_dprint (params[2], g);
+  ret = _gnutls_mpi_dprint_lz (params[2], g);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -3033,7 +3033,7 @@ gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
 
 
   /* Y */
-  ret = _gnutls_mpi_dprint (params[3], y);
+  ret = _gnutls_mpi_dprint_lz (params[3], y);
   if (ret < 0)
     {
       gnutls_assert ();

@@ -957,7 +957,7 @@ gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
       goto error;
     }
 
-  ret = _gnutls_mpi_dprint (pk_params.params[0], m);
+  ret = _gnutls_mpi_dprint_lz (pk_params.params[0], m);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -965,7 +965,7 @@ gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
     }
 
   /* E */
-  ret = _gnutls_mpi_dprint (pk_params.params[1], e);
+  ret = _gnutls_mpi_dprint_lz (pk_params.params[1], e);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -973,7 +973,7 @@ gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
     }
 
   /* D */
-  ret = _gnutls_mpi_dprint (pk_params.params[2], d);
+  ret = _gnutls_mpi_dprint_lz (pk_params.params[2], d);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -981,7 +981,7 @@ gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
     }
 
   /* P */
-  ret = _gnutls_mpi_dprint (pk_params.params[3], p);
+  ret = _gnutls_mpi_dprint_lz (pk_params.params[3], p);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -989,7 +989,7 @@ gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
     }
 
   /* Q */
-  ret = _gnutls_mpi_dprint (pk_params.params[4], q);
+  ret = _gnutls_mpi_dprint_lz (pk_params.params[4], q);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -997,7 +997,7 @@ gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
     }
 
   /* U */
-  ret = _gnutls_mpi_dprint (key->params[5], u);
+  ret = _gnutls_mpi_dprint_lz (key->params[5], u);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1007,7 +1007,7 @@ gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
   /* E1 */
   if (e1)
     {
-      ret = _gnutls_mpi_dprint (key->params[6], e1);
+      ret = _gnutls_mpi_dprint_lz (key->params[6], e1);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -1018,7 +1018,7 @@ gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
   /* E2 */
   if (e2)
     {
-      ret = _gnutls_mpi_dprint (key->params[7], e2);
+      ret = _gnutls_mpi_dprint_lz (key->params[7], e2);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -1072,7 +1072,7 @@ gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
     }
 
   /* P */
-  ret = _gnutls_mpi_dprint (key->params[0], p);
+  ret = _gnutls_mpi_dprint_lz (key->params[0], p);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1080,7 +1080,7 @@ gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
     }
 
   /* Q */
-  ret = _gnutls_mpi_dprint (key->params[1], q);
+  ret = _gnutls_mpi_dprint_lz (key->params[1], q);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1090,7 +1090,7 @@ gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
 
 
   /* G */
-  ret = _gnutls_mpi_dprint (key->params[2], g);
+  ret = _gnutls_mpi_dprint_lz (key->params[2], g);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1101,7 +1101,7 @@ gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
 
 
   /* Y */
-  ret = _gnutls_mpi_dprint (key->params[3], y);
+  ret = _gnutls_mpi_dprint_lz (key->params[3], y);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1112,7 +1112,7 @@ gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
     }
 
   /* X */
-  ret = _gnutls_mpi_dprint (key->params[4], x);
+  ret = _gnutls_mpi_dprint_lz (key->params[4], x);
   if (ret < 0)
     {
       gnutls_assert ();
