@@ -112,6 +112,9 @@
 #define LIBGNUTLS_VERSION_NUMBER GNUTLS_VERSION_NUMBER
 #define LIBGNUTLS_EXTRA_VERSION GNUTLS_VERSION
 
+/* The gnutls_retr_st was deprecated by gnutls_certificate_retrieve_function()
+ * and gnutls_retr2_st.
+ */
 typedef struct gnutls_retr_st
 {
   gnutls_certificate_type_t type;
@@ -155,7 +158,8 @@ void
    gnutls_certificate_server_retrieve_function *
    func) _GNUTLS_GCC_ATTR_DEPRECATED;
 
-  /* External signing callback.  Experimental. */
+  /* External signing callback.  No longer supported because it
+   * was deprecated by the PKCS #11 API. */
 typedef int (*gnutls_sign_func) (gnutls_session_t session,
 				 void *userdata,
 				 gnutls_certificate_type_t cert_type,
@@ -170,6 +174,9 @@ gnutls_sign_callback_set (gnutls_session_t session,
 gnutls_sign_func
 gnutls_sign_callback_get (gnutls_session_t session, void **userdata);
 
+/* Extension API is no longer exported because a lot of internal
+ * structures are used.
+ */
      int gnutls_ext_register (int type,
 			      const char *name,
 			      gnutls_ext_parse_type_t parse_type,
@@ -177,6 +184,9 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata);
 			      gnutls_ext_send_func send_func)
   _GNUTLS_GCC_ATTR_DEPRECATED;
 
+/* We no longer support the finished callback. Use
+ * gnutls_session_channel_binding for similar functionality.
+ */
      typedef void (*gnutls_finished_callback_func) (gnutls_session_t session,
 						    const void *finished,
 						    size_t len);
@@ -204,5 +214,13 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata);
 					gnutls_datum_t *
 					output_key)
   _GNUTLS_GCC_ATTR_DEPRECATED;
+
+/* This is a very dangerous and error-prone function.
+ * Do not use.
+ */
+  int gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
+				     const gnutls_datum_t * hash,
+				     gnutls_datum_t * signature)
+				     _GNUTLS_GCC_ATTR_DEPRECATED;
 
 #endif /* _GNUTLS_COMPAT_H */
