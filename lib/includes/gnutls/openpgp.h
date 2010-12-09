@@ -173,9 +173,6 @@ extern "C"
 					   unsigned int flags,
 					   const gnutls_datum_t * ciphertext,
 					   gnutls_datum_t * plaintext);
-  int gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
-					const gnutls_datum_t * hash,
-					gnutls_datum_t * signature);
   int gnutls_openpgp_privkey_get_fingerprint (gnutls_openpgp_privkey_t key,
 					      void *fpr, size_t * fprlen);
   int gnutls_openpgp_privkey_get_subkey_fingerprint (gnutls_openpgp_privkey_t

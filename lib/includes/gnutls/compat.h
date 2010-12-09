@@ -223,4 +223,9 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata);
 				     gnutls_datum_t * signature)
 				     _GNUTLS_GCC_ATTR_DEPRECATED;
 
+  int gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
+					const gnutls_datum_t * hash,
+					gnutls_datum_t * signature)
+					_GNUTLS_GCC_ATTR_DEPRECATED;
+
 #endif /* _GNUTLS_COMPAT_H */
