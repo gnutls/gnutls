@@ -1687,10 +1687,17 @@ gnutls_x509_privkey_sign_data2 (gnutls_x509_privkey_t signer,
   int ret;
   gnutls_datum_t digest;
 
+  ret = pk_hash_data(signer->pk_algorithm, hash, signer->params, data, signature);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+
   switch (signer->pk_algorithm)
     {
     case GNUTLS_PK_RSA:
-      ret = pk_pkcs1_rsa_hash (hash, data, &digest);
+      ret = pk_prepare_pkcs1_rsa_hash (hash, &digest);
       if (ret < 0)
 	{
 	  gnutls_assert ();
@@ -1698,23 +1705,15 @@ gnutls_x509_privkey_sign_data2 (gnutls_x509_privkey_t signer,
 	}
       break;
     case GNUTLS_PK_DSA:
-      /* override hash for DSA */
-      ret =
-	pk_dsa_hash (_gnutls_dsa_q_to_hash (signer->params[1]), data,
-		     &digest);
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
-
       break;
     default:
       gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
+      ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
+      goto cleanup;
     }
 
-  ret = gnutls_x509_privkey_sign_hash (signer, &digest, signature);
+  ret = _gnutls_soft_sign (signer->pk_algorithm, signer->params,
+			      signer->params_size, &digest, signature);
   _gnutls_free_datum (&digest);
 
   if (ret < 0)
@@ -1725,6 +1724,9 @@ gnutls_x509_privkey_sign_data2 (gnutls_x509_privkey_t signer,
 
   return 0;
 
+cleanup:
+  _gnutls_free_datum (&digest);
+  return ret;
 }
 
 /**

@@ -55,6 +55,8 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
   ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
   int result;
   const char *algo;
+  opaque* tmp_output;
+  int tmp_output_size;
 
   algo = _gnutls_x509_mac_to_oid ((gnutls_mac_algorithm_t) hash);
   if (algo == NULL)
@@ -102,10 +104,10 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
       return _gnutls_asn2err (result);
     }
 
-  output->size = 0;
-  asn1_der_coding (dinfo, "", NULL, &output->size, NULL);
+  tmp_output_size = 0;
+  asn1_der_coding (dinfo, "", NULL, &tmp_output_size, NULL);
 
-  output->data = gnutls_malloc (output->size);
+  tmp_output = gnutls_malloc (tmp_output_size);
   if (output->data == NULL)
     {
       gnutls_assert ();
@@ -113,7 +115,7 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  result = asn1_der_coding (dinfo, "", output->data, &output->size, NULL);
+  result = asn1_der_coding (dinfo, "", tmp_output, &tmp_output_size, NULL);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -122,60 +124,36 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
     }
 
   asn1_delete_structure (&dinfo);
+  
+  output->size = tmp_output_size;
+  output->data = tmp_output;
 
   return 0;
 }
 
-/* if hash==MD5 then we do RSA-MD5
- * if hash==SHA then we do RSA-SHA
- * params[0] is modulus
- * params[1] is public key
- */
-int
-pk_pkcs1_rsa_hash (gnutls_digest_algorithm_t hash,
-		   const gnutls_datum_t * text, gnutls_datum_t * output)
+int pk_hash_data(gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash,
+  bigint_t * params,
+  const gnutls_datum_t * data, gnutls_datum_t * digest)
 {
   int ret;
-  opaque _digest[MAX_HASH_SIZE];
-  digest_hd_st hd;
-  gnutls_datum_t digest;
 
-  ret = _gnutls_hash_init (&hd, HASH2MAC (hash));
-  if (ret < 0)
+  switch (pk)
     {
-      gnutls_assert ();
-      return ret;
-    }
-
-  _gnutls_hash (&hd, text->data, text->size);
-  _gnutls_hash_deinit (&hd, _digest);
-
-  digest.data = _digest;
-  digest.size = _gnutls_hash_get_algo_len (HASH2MAC (hash));
-
-  /* Encode the digest as a DigestInfo
-   */
-  if ((ret = encode_ber_digest_info (hash, &digest, output)) != 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  return 0;
-}
-
-int
-pk_dsa_hash (gnutls_digest_algorithm_t hash, const gnutls_datum_t * text,
-	     gnutls_datum_t * digest)
-{
-  int ret;
-  digest_hd_st hd;
-
-  if (hash != GNUTLS_DIG_SHA1 && hash != GNUTLS_DIG_SHA224 &&
-      hash != GNUTLS_DIG_SHA256)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
+    case GNUTLS_PK_RSA:
+      if (hash != GNUTLS_DIG_SHA1 && hash != GNUTLS_DIG_SHA224 &&
+        hash != GNUTLS_DIG_SHA256)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INVALID_REQUEST;
+        }
+      break;
+    case GNUTLS_PK_DSA:
+      if (params && hash != _gnutls_dsa_q_to_hash (params[1]))
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INVALID_REQUEST;
+        }
+      break;
     }
 
   digest->size = _gnutls_hash_get_algo_len (hash);
@@ -186,23 +164,43 @@ pk_dsa_hash (gnutls_digest_algorithm_t hash, const gnutls_datum_t * text,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  ret = _gnutls_hash_init (&hd, hash);
+  ret = _gnutls_hash_fast(hash, data->data, data->size, digest->data);
   if (ret < 0)
     {
-      gnutls_assert ();
-      goto fail;
+      gnutls_assert();
+      goto cleanup;
     }
-
-  _gnutls_hash (&hd, text->data, text->size);
-
-  _gnutls_hash_deinit (&hd, digest->data);
 
   return 0;
 
-fail:
-  gnutls_free (digest->data);
-
+cleanup:
+  gnutls_free(digest->data);
   return ret;
+}
+
+/* if hash==MD5 then we do RSA-MD5
+ * if hash==SHA then we do RSA-SHA
+ * params[0] is modulus
+ * params[1] is public key
+ */
+int
+pk_prepare_pkcs1_rsa_hash (gnutls_digest_algorithm_t hash,
+		   gnutls_datum_t * digest)
+{
+  int ret;
+  gnutls_datum old_digest = { digest->data, digest->size };
+
+  /* Encode the digest as a DigestInfo
+   */
+  if ((ret = encode_ber_digest_info (hash, digest, digest)) != 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  _gnutls_free_datum(&old_digest);
+
+  return 0;
 }
 
 /* This is the same as the _gnutls_x509_sign, but this one will decode
