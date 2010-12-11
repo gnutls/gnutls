@@ -840,8 +840,8 @@ _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert, gnutls_openpgp_crt_t cert)
 
 }
 
-/**
- * gnutls_openpgp_privkey_sign_hash:
+/*-
+ * _gnutls_openpgp_privkey_sign_hash:
  * @key: Holds the key
  * @hash: holds the data to be signed
  * @signature: will contain newly allocated signature
@@ -852,9 +852,9 @@ _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert, gnutls_openpgp_crt_t cert)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
- **/
+ -*/
 int
-gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
+_gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
 				  const gnutls_datum_t * hash,
 				  gnutls_datum_t * signature)
 {
@@ -911,6 +911,126 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
     }
 
   return 0;
+}
+
+/**
+ * gnutls_openpgp_privkey_sign_hash2:
+ * @signer: Holds the signer's key
+ * @hash_algo: The hash algorithm used
+ * @hash_data: holds the data to be signed
+ * @signature: will contain newly allocated signature
+ * @flags: zero for now
+ *
+ * This function will sign the given hash using the private key.  You
+ * should use gnutls_openpgp_privkey_set_preferred_key_id() before
+ * calling this function to set the subkey to use.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_openpgp_privkey_sign_hash2 (gnutls_openpgp_privkey_t signer,
+				gnutls_digest_algorithm_t hash_algo,
+				unsigned int flags,
+				const gnutls_datum_t * hash_data,
+				gnutls_datum_t * signature)
+{
+  int ret;
+  gnutls_datum_t digest;
+
+  digest.data = gnutls_malloc(hash_data->size);
+  if (digest.data == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+  digest.size = hash_data->size;
+  memcpy(digest.data, hash_data->data, digest.size);
+
+  switch (gnutls_openpgp_privkey_get_pk_algorithm (signer, NULL))
+    {
+    case GNUTLS_PK_RSA:
+      ret = pk_prepare_pkcs1_rsa_hash (hash_algo, &digest);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
+      break;
+    case GNUTLS_PK_DSA:
+      break;
+    default:
+      gnutls_assert ();
+      ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
+      goto cleanup;
+    }
+  return 0;
+
+  ret = _gnutls_openpgp_privkey_sign_hash (signer, &digest, signature);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  ret = 0;
+
+cleanup:
+  _gnutls_free_datum(&digest);
+  return ret;
+}
+
+/**
+ * gnutls_openpgp_privkey_sign_data2:
+ * @signer: Holds the key
+ * @digest: should be MD5 or SHA1
+ * @flags: should be 0 for now
+ * @data: holds the data to be signed
+ * @signature: will contain the signature allocate with gnutls_malloc()
+ *
+ * This function will sign the given data using a signature algorithm
+ * supported by the private key. Signature algorithms are always used
+ * together with a hash functions.  Different hash functions may be
+ * used for the RSA algorithm, but only SHA-XXX for the DSA keys.
+ *
+ * The RSA algorithm is used in PKCS #1 v1.5 mode.
+ *
+ * If the buffer provided is not long enough to hold the output, then
+ * *@signature_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will
+ * be returned.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_openpgp_privkey_sign_data2 (gnutls_openpgp_privkey_t signer,
+				gnutls_digest_algorithm_t hash,
+				unsigned int flags,
+				const gnutls_datum_t * data,
+				gnutls_datum_t * signature)
+{
+  int ret;
+  gnutls_datum_t digest;
+
+  ret = pk_hash_data(gnutls_openpgp_privkey_get_pk_algorithm(signer,NULL), hash, NULL, data, &digest);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+
+  ret = gnutls_openpgp_privkey_sign_hash2(signer, hash, flags, &digest, signature);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  ret = 0;
+
+cleanup:
+  _gnutls_free_datum (&digest);
+  return ret;
 }
 
 /**

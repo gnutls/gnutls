@@ -694,6 +694,10 @@ GNUTLS_2_12
 	gnutls_pkcs11_token_init;
 	gnutls_pkcs11_token_set_pin;
 	gnutls_pkcs11_token_get_mechanism;
+	gnutls_privkey_sign_hash2;
+	gnutls_openpgp_privkey_sign_data2;
+	gnutls_openpgp_privkey_sign_hash2;
+	gnutls_x509_privkey_sign_hash2;
 } GNUTLS_2_10;
 
 GNUTLS_PRIVATE {

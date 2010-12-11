@@ -169,6 +169,18 @@ extern "C"
 				     const char *password,
 				     unsigned int flags);
 
+  int gnutls_openpgp_privkey_sign_hash2 (gnutls_openpgp_privkey_t signer,
+				gnutls_digest_algorithm_t hash_algo,
+				unsigned int flags,
+				const gnutls_datum_t * hash_data,
+				gnutls_datum_t * signature);
+
+  int gnutls_openpgp_privkey_sign_data2 (gnutls_openpgp_privkey_t signer,
+				gnutls_digest_algorithm_t hash,
+				unsigned int flags,
+				const gnutls_datum_t * data,
+				gnutls_datum_t * signature);
+
   int gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
 					   unsigned int flags,
 					   const gnutls_datum_t * ciphertext,

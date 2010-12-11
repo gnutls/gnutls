@@ -1665,7 +1665,9 @@ cleanup:
  * This function will sign the given data using a signature algorithm
  * supported by the private key. Signature algorithms are always used
  * together with a hash functions.  Different hash functions may be
- * used for the RSA algorithm, but only SHA-1 for the DSA keys.
+ * used for the RSA algorithm, but only SHA-XXX for the DSA keys.
+ *
+ * The RSA algorithm is used in PKCS #1 v1.5 mode.
  *
  * If the buffer provided is not long enough to hold the output, then
  * *@signature_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will
@@ -1687,49 +1689,28 @@ gnutls_x509_privkey_sign_data2 (gnutls_x509_privkey_t signer,
   int ret;
   gnutls_datum_t digest;
 
-  ret = pk_hash_data(signer->pk_algorithm, hash, signer->params, data, signature);
+  ret = pk_hash_data(signer->pk_algorithm, hash, signer->params, data, &digest);
   if (ret < 0)
     {
       gnutls_assert();
       return ret;
     }
 
-  switch (signer->pk_algorithm)
-    {
-    case GNUTLS_PK_RSA:
-      ret = pk_prepare_pkcs1_rsa_hash (hash, &digest);
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
-      break;
-    case GNUTLS_PK_DSA:
-      break;
-    default:
-      gnutls_assert ();
-      ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
-      goto cleanup;
-    }
-
-  ret = _gnutls_soft_sign (signer->pk_algorithm, signer->params,
-			      signer->params_size, &digest, signature);
-  _gnutls_free_datum (&digest);
-
+  ret = gnutls_x509_privkey_sign_hash2(signer, hash, flags, &digest, signature);
   if (ret < 0)
     {
       gnutls_assert ();
-      return ret;
+      goto cleanup;
     }
 
-  return 0;
+  ret = 0;
 
 cleanup:
   _gnutls_free_datum (&digest);
   return ret;
 }
 
-/**
+/*-
  * gnutls_x509_privkey_sign_hash:
  * @key: Holds the key
  * @hash: holds the data to be signed
@@ -1742,7 +1723,7 @@ cleanup:
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
- **/
+ -*/
 int
 gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
 			       const gnutls_datum_t * hash,
@@ -1765,6 +1746,78 @@ gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
     }
 
   return 0;
+}
+
+/**
+ * gnutls_x509_privkey_sign_hash2:
+ * @signer: Holds the signer's key
+ * @hash_algo: The hash algorithm used
+ * @hash_data: holds the data to be signed
+ * @signature: will contain newly allocated signature
+ * @flags: zero for now
+ *
+ * This function will sign the given hashed data using a signature algorithm
+ * supported by the private key. Signature algorithms are always used
+ * together with a hash functions.  Different hash functions may be
+ * used for the RSA algorithm, but only SHA-XXX for the DSA keys.
+ *
+ * Use gnutls_x509_crt_get_preferred_hash_algorithm() to determine
+ * the hash algorithm.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_privkey_sign_hash2 (gnutls_x509_privkey_t signer,
+				gnutls_digest_algorithm_t hash_algo,
+				unsigned int flags,
+				const gnutls_datum_t * hash_data,
+				gnutls_datum_t * signature)
+{
+  int ret;
+  gnutls_datum_t digest;
+
+  digest.data = gnutls_malloc(hash_data->size);
+  if (digest.data == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+  digest.size = hash_data->size;
+  memcpy(digest.data, hash_data->data, digest.size);
+
+  switch (signer->pk_algorithm)
+    {
+    case GNUTLS_PK_RSA:
+      ret = pk_prepare_pkcs1_rsa_hash (hash_algo, &digest);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
+      break;
+    case GNUTLS_PK_DSA:
+      break;
+    default:
+      gnutls_assert ();
+      ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
+      goto cleanup;
+    }
+
+  ret = _gnutls_soft_sign (signer->pk_algorithm, signer->params,
+			      signer->params_size, &digest, signature);
+
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  ret = 0;
+
+cleanup:
+  _gnutls_free_datum(&digest);
+  return ret;
 }
 
 #ifdef ENABLE_PKI

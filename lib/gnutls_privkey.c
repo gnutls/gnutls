@@ -290,6 +290,76 @@ cleanup:
   return ret;
 }
 
+/**
+ * gnutls_privkey_sign_hash2:
+ * @signer: Holds the signer's key
+ * @hash_algo: The hash algorithm used
+ * @flags: zero for now
+ * @hash_data: holds the data to be signed
+ * @signature: will contain newly allocated signature
+ *
+ * This function will sign the given hashed data using a signature algorithm
+ * supported by the private key. Signature algorithms are always used
+ * together with a hash functions.  Different hash functions may be
+ * used for the RSA algorithm, but only SHA-XXX for the DSA keys.
+ *
+ * Use gnutls_x509_crt_get_preferred_hash_algorithm() to determine
+ * the hash algorithm.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_privkey_sign_hash2 (gnutls_privkey_t signer,
+				gnutls_digest_algorithm_t hash_algo,
+				unsigned int flags,
+				const gnutls_datum_t * hash_data,
+				gnutls_datum_t * signature)
+{
+  int ret;
+  gnutls_datum_t digest;
+
+  digest.data = gnutls_malloc(hash_data->size);
+  if (digest.data == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+  digest.size = hash_data->size;
+  memcpy(digest.data, hash_data->data, digest.size);
+
+  switch (signer->pk_algorithm)
+    {
+    case GNUTLS_PK_RSA:
+      ret = pk_prepare_pkcs1_rsa_hash (hash_algo, &digest);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
+      break;
+    case GNUTLS_PK_DSA:
+      break;
+    default:
+      gnutls_assert ();
+      ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
+      goto cleanup;
+    }
+
+  ret = _gnutls_privkey_sign_hash (signer, &digest, signature);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  ret = 0;
+
+cleanup:
+  _gnutls_free_datum(&digest);
+  return ret;
+}
+
 /*-
  * _gnutls_privkey_sign_hash:
  * @key: Holds the key
@@ -311,14 +381,15 @@ _gnutls_privkey_sign_hash (gnutls_privkey_t key,
     {
 #ifdef ENABLE_OPENPGP
     case GNUTLS_PRIVKEY_OPENPGP:
-      return gnutls_openpgp_privkey_sign_hash (key->key.openpgp,
+      return _gnutls_openpgp_privkey_sign_hash (key->key.openpgp,
 					       hash, signature);
 #endif
     case GNUTLS_PRIVKEY_PKCS11:
       return gnutls_pkcs11_privkey_sign_hash (key->key.pkcs11,
 					      hash, signature);
     case GNUTLS_PRIVKEY_X509:
-      return gnutls_x509_privkey_sign_hash (key->key.x509, hash, signature);
+      return _gnutls_soft_sign (key->key.x509->pk_algorithm, key->key.x509->params,
+        key->key.x509->params_size, hash, signature);
     default:
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
