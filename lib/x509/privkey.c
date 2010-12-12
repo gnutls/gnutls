@@ -1665,16 +1665,17 @@ cleanup:
  * This function will sign the given data using a signature algorithm
  * supported by the private key. Signature algorithms are always used
  * together with a hash functions.  Different hash functions may be
- * used for the RSA algorithm, but only SHA-XXX for the DSA keys.
+ * used for the RSA algorithm, but only SHA-1,SHA-224 and SHA-256 
+ * for the DSA keys, depending on their bit size.
+ *
+ * Use gnutls_x509_crt_get_preferred_hash_algorithm() to determine
+ * the hash algorithm.
  *
  * The RSA algorithm is used in PKCS #1 v1.5 mode.
  *
  * If the buffer provided is not long enough to hold the output, then
  * *@signature_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will
  * be returned.
- *
- * Use gnutls_x509_crt_get_preferred_hash_algorithm() to determine
- * the hash algorithm.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
@@ -1759,10 +1760,13 @@ gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
  * This function will sign the given hashed data using a signature algorithm
  * supported by the private key. Signature algorithms are always used
  * together with a hash functions.  Different hash functions may be
- * used for the RSA algorithm, but only SHA-XXX for the DSA keys.
+ * used for the RSA algorithm, but only SHA-1,SHA-224 and SHA-256 
+ * for the DSA keys, depending on their bit size.
  *
  * Use gnutls_x509_crt_get_preferred_hash_algorithm() to determine
  * the hash algorithm.
+ *
+ * The RSA algorithm is used in PKCS #1 v1.5 mode.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
