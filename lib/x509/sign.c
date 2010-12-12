@@ -154,6 +154,9 @@ int pk_hash_data(gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash,
           return GNUTLS_E_INVALID_REQUEST;
         }
       break;
+    default:
+      gnutls_assert();
+      return GNUTLS_E_INVALID_REQUEST;
     }
 
   digest->size = _gnutls_hash_get_algo_len (hash);
