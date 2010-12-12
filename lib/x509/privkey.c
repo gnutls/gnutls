@@ -34,7 +34,6 @@
 #include <x509_b64.h>
 #include <x509_int.h>
 #include <gnutls_pk.h>
-#include <sign.h>
 #include <gnutls_mpi.h>
 
 static int _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params);

@@ -97,4 +97,9 @@ int pkcs11_find_object (pakchois_session_t ** _pks,
 
 unsigned int pkcs11_obj_flags_to_int (unsigned int flags);
 
+int
+_gnutls_pkcs11_privkey_sign_hash (gnutls_pkcs11_privkey_t key,
+				 const gnutls_datum_t * hash,
+				 gnutls_datum_t * signature);
+
 #endif

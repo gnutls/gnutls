@@ -30,7 +30,6 @@
 #include <gnutls_datum.h>
 #include <pkcs11_int.h>
 #include <gnutls/abstract.h>
-#include <sign.h>
 #include <gnutls_pk.h>
 #include <x509_int.h>
 #include <openpgp/openpgp_int.h>

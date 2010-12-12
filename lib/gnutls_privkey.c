@@ -30,10 +30,11 @@
 #include <gnutls_datum.h>
 #include <pkcs11_int.h>
 #include <gnutls/abstract.h>
-#include <sign.h>
 #include <gnutls_pk.h>
 #include <x509_int.h>
 #include <openpgp/openpgp_int.h>
+#include <openpgp/gnutls_openpgp.h>
+#include <gnutls_sig.h>
 
 struct gnutls_privkey_st
 {
@@ -385,7 +386,7 @@ _gnutls_privkey_sign_hash (gnutls_privkey_t key,
 					       hash, signature);
 #endif
     case GNUTLS_PRIVKEY_PKCS11:
-      return gnutls_pkcs11_privkey_sign_hash (key->key.pkcs11,
+      return _gnutls_pkcs11_privkey_sign_hash (key->key.pkcs11,
 					      hash, signature);
     case GNUTLS_PRIVKEY_X509:
       return _gnutls_soft_sign (key->key.x509->pk_algorithm, key->key.x509->params,

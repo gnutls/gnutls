@@ -29,7 +29,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_datum.h>
 #include <pkcs11_int.h>
-#include <sign.h>
+#include <gnutls_sig.h>
 
 struct gnutls_pkcs11_privkey_st
 {
@@ -165,7 +165,7 @@ gnutls_pkcs11_privkey_sign_data (gnutls_pkcs11_privkey_t signer,
       goto cleanup;
     }
 
-  ret = gnutls_pkcs11_privkey_sign_hash (signer, &digest, signature);
+  ret = _gnutls_pkcs11_privkey_sign_hash (signer, &digest, signature);
   _gnutls_free_datum (&digest);
 
   if (ret < 0)
@@ -195,8 +195,8 @@ cleanup:
 		} \
 	} while (ret < 0);
 
-/**
- * gnutls_pkcs11_privkey_sign_hash:
+/*-
+ * _gnutls_pkcs11_privkey_sign_hash:
  * @key: Holds the key
  * @hash: holds the data to be signed (should be output of a hash)
  * @signature: will contain the signature allocated with gnutls_malloc()
@@ -207,9 +207,9 @@ cleanup:
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
- **/
+ -*/
 int
-gnutls_pkcs11_privkey_sign_hash (gnutls_pkcs11_privkey_t key,
+_gnutls_pkcs11_privkey_sign_hash (gnutls_pkcs11_privkey_t key,
 				 const gnutls_datum_t * hash,
 				 gnutls_datum_t * signature)
 {

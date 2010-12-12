@@ -34,6 +34,7 @@
 #include <openpgp_int.h>
 #include <gnutls_openpgp.h>
 #include <gnutls_cert.h>
+#include <gnutls_sig.h>
 
 /**
  * gnutls_openpgp_privkey_init:

@@ -304,7 +304,7 @@ _gnutls_tls_sign (gnutls_session_t session,
 	}
     }
 
-  return gnutls_privkey_sign_hash (pkey, hash_concat, signature);
+  return _gnutls_privkey_sign_hash (pkey, hash_concat, signature);
 }
 
 static int
@@ -795,4 +795,166 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
     }
 
   return ret;
+}
+
+int pk_hash_data(gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash,
+  bigint_t * params,
+  const gnutls_datum_t * data, gnutls_datum_t * digest)
+{
+  int ret;
+
+  switch (pk)
+    {
+    case GNUTLS_PK_RSA:
+      if (hash != GNUTLS_DIG_SHA1 && hash != GNUTLS_DIG_SHA224 &&
+        hash != GNUTLS_DIG_SHA256)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INVALID_REQUEST;
+        }
+      break;
+    case GNUTLS_PK_DSA:
+      if (params && hash != _gnutls_dsa_q_to_hash (params[1]))
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INVALID_REQUEST;
+        }
+      break;
+    default:
+      gnutls_assert();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  digest->size = _gnutls_hash_get_algo_len (hash);
+  digest->data = gnutls_malloc (digest->size);
+  if (digest->data == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  ret = _gnutls_hash_fast(hash, data->data, data->size, digest->data);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  return 0;
+
+cleanup:
+  gnutls_free(digest->data);
+  return ret;
+}
+
+/* Writes the digest information and the digest in a DER encoded
+ * structure. The digest info is allocated and stored into the info structure.
+ */
+static int
+encode_ber_digest_info (gnutls_digest_algorithm_t hash,
+			const gnutls_datum_t * digest,
+			gnutls_datum_t * output)
+{
+  ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
+  int result;
+  const char *algo;
+  opaque* tmp_output;
+  int tmp_output_size;
+
+  algo = _gnutls_x509_mac_to_oid ((gnutls_mac_algorithm_t) hash);
+  if (algo == NULL)
+    {
+      gnutls_assert ();
+      _gnutls_x509_log ("Hash algorithm: %d\n", hash);
+      return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+    }
+
+  if ((result = asn1_create_element (_gnutls_get_gnutls_asn (),
+				     "GNUTLS.DigestInfo",
+				     &dinfo)) != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  result = asn1_write_value (dinfo, "digestAlgorithm.algorithm", algo, 1);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return _gnutls_asn2err (result);
+    }
+
+  /* Write an ASN.1 NULL in the parameters field.  This matches RFC
+     3279 and RFC 4055, although is arguable incorrect from a historic
+     perspective (see those documents for more information).
+     Regardless of what is correct, this appears to be what most
+     implementations do.  */
+  result = asn1_write_value (dinfo, "digestAlgorithm.parameters",
+			     ASN1_NULL, ASN1_NULL_SIZE);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return _gnutls_asn2err (result);
+    }
+
+  result = asn1_write_value (dinfo, "digest", digest->data, digest->size);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return _gnutls_asn2err (result);
+    }
+
+  tmp_output_size = 0;
+  asn1_der_coding (dinfo, "", NULL, &tmp_output_size, NULL);
+
+  tmp_output = gnutls_malloc (tmp_output_size);
+  if (output->data == NULL)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  result = asn1_der_coding (dinfo, "", tmp_output, &tmp_output_size, NULL);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return _gnutls_asn2err (result);
+    }
+
+  asn1_delete_structure (&dinfo);
+  
+  output->size = tmp_output_size;
+  output->data = tmp_output;
+
+  return 0;
+}
+
+/* if hash==MD5 then we do RSA-MD5
+ * if hash==SHA then we do RSA-SHA
+ * params[0] is modulus
+ * params[1] is public key
+ */
+int
+pk_prepare_pkcs1_rsa_hash (gnutls_digest_algorithm_t hash,
+		   gnutls_datum_t * digest)
+{
+  int ret;
+  gnutls_datum old_digest = { digest->data, digest->size };
+
+  /* Encode the digest as a DigestInfo
+   */
+  if ((ret = encode_ber_digest_info (hash, digest, digest)) != 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  _gnutls_free_datum(&old_digest);
+
+  return 0;
 }

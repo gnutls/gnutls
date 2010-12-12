@@ -49,6 +49,11 @@ time_t _gnutls_openpgp_get_raw_key_creation_time (const gnutls_datum_t *
 time_t _gnutls_openpgp_get_raw_key_expiration_time (const gnutls_datum_t *
 						    cert);
 
+int
+_gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
+				  const gnutls_datum_t * hash,
+				  gnutls_datum_t * signature);
+
 
 #endif /*GNUTLS_OPENPGP_LOCAL_H */
 
