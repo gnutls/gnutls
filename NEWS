@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version 2.11.7 (unreleased)
 
+** libgnutls: The deprecated  gnutls_x509_privkey_sign_hash() was
+replaced by gnutls_privkey_sign_hash2().
+
+** libgnutls: Added gnutls_pkcs11_privkey_sign_hash2(), 
+gnutls_openpgp_privkey_sign_hash2(), gnutls_privkey_sign_hash2(),
+and gnutls_openpgp_crt_verify_hash().
+
 ** libgnutls: gnutls_*_export_raw() functions now add leading zero in
 integers.
 
@@ -19,7 +26,7 @@ gnutls_privkey_sign_hash2: ADDED
 gnutls_openpgp_privkey_sign_data2: ADDED
 gnutls_x509_privkey_sign_data2: ADDED
 gnutls_openpgp_crt_verify_hash: ADDED
-gnutls_openpgp_privkey_sign_hash: DEPRECATED
+gnutls_openpgp_privkey_sign_hash: REMOVED
 gnutls_x509_privkey_sign_hash: DEPRECATED
 gnutls_psk_netconf_derive_key: DEPRECATED
 gnutls_session_set_finished_function: DEPRECATED
