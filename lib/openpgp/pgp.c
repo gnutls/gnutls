@@ -33,6 +33,7 @@
 #include <openpgp_int.h>
 #include <gnutls_str.h>
 #include <gnutls_num.h>
+#include <x509/common.h>
 
 /**
  * gnutls_openpgp_crt_init:
@@ -1685,4 +1686,60 @@ gnutls_openpgp_crt_get_auth_subkey (gnutls_openpgp_crt_t crt,
     return 0;
   else
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+}
+
+/**
+ * gnutls_openpgp_crt_verify_hash:
+ * @crt: Holds the certificate
+ * @flags: should be 0 for now
+ * @hash: holds the hash digest to be verified
+ * @signature: contains the signature
+ *
+ * This function will verify the given signed digest, using the
+ * parameters from the certificate.
+ *
+ * Returns: In case of a verification failure 0 is returned, and 1 on
+ * success.
+ **/
+int
+gnutls_openpgp_crt_verify_hash (gnutls_openpgp_crt_t crt, unsigned int flags,
+			     const gnutls_datum_t * hash,
+			     const gnutls_datum_t * signature)
+{
+  int ret;
+  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
+  int params_size = MAX_PUBLIC_PARAMS_SIZE;
+  gnutls_pk_algorithm_t pk;
+  uint32_t kid[2];
+  
+  if (crt == NULL || !crt->preferred_set)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  ret = gnutls_openpgp_crt_get_pk_algorithm (crt, NULL);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+  pk = ret;
+  
+  KEYID_IMPORT (kid, crt->preferred_keyid);
+  ret = _gnutls_openpgp_crt_get_mpis (crt, kid, params, &params_size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  ret = pubkey_verify_sig( NULL, hash, signature, pk, params, params_size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return 0;
+    }
+
+  return ret;
 }

@@ -175,6 +175,11 @@ extern "C"
 				const gnutls_datum_t * hash_data,
 				gnutls_datum_t * signature);
 
+  int gnutls_openpgp_crt_verify_hash (gnutls_openpgp_crt_t crt, 
+           unsigned int flags,
+           const gnutls_datum_t * hash,
+           const gnutls_datum_t * signature);
+
   int gnutls_openpgp_privkey_sign_data2 (gnutls_openpgp_privkey_t signer,
 				gnutls_digest_algorithm_t hash,
 				unsigned int flags,

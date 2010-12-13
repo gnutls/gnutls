@@ -698,6 +698,7 @@ GNUTLS_2_12
 	gnutls_openpgp_privkey_sign_data2;
 	gnutls_openpgp_privkey_sign_hash2;
 	gnutls_x509_privkey_sign_hash2;
+	gnutls_openpgp_crt_verify_hash;
 } GNUTLS_2_10;
 
 GNUTLS_PRIVATE {

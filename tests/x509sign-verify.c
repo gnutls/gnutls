@@ -138,9 +138,8 @@ doit (void)
   gnutls_x509_privkey_t key;
   gnutls_x509_crt_t crt;
   gnutls_digest_algorithm_t hash_algo;
-  unsigned char _signature[128];
-  size_t _signature_size = sizeof (_signature);
   gnutls_datum_t signature;
+  gnutls_datum_t signature2;
   int ret;
   size_t i;
 
@@ -149,41 +148,52 @@ doit (void)
   for (i = 0; i < sizeof (key_dat) / sizeof (key_dat[0]); i++)
     {
       if (debug)
-	success ("loop %d\n", (int) i);
+        success ("loop %d\n", (int) i);
 
       ret = gnutls_x509_privkey_init (&key);
       if (ret < 0)
-	fail ("gnutls_x509_privkey_init\n");
+        fail ("gnutls_x509_privkey_init\n");
 
       ret =
-	gnutls_x509_privkey_import (key, &key_dat[i], GNUTLS_X509_FMT_PEM);
+        gnutls_x509_privkey_import (key, &key_dat[i], GNUTLS_X509_FMT_PEM);
       if (ret < 0)
-	fail ("gnutls_x509_privkey_import\n");
+        fail ("gnutls_x509_privkey_import\n");
 
-      ret = gnutls_x509_privkey_sign_data (key, GNUTLS_DIG_SHA1, 0, &raw_data,
-					   _signature, &_signature_size);
+      ret = gnutls_x509_privkey_sign_hash2 (key, GNUTLS_DIG_SHA1, 0, &hash_data,
+					   &signature2);
       if (ret < 0)
-	fail ("gnutls_x509_privkey_sign_hash\n");
+        fail ("gnutls_x509_privkey_sign_hash\n");
+
+      ret = gnutls_x509_privkey_sign_data2 (key, GNUTLS_DIG_SHA1, 0, &raw_data,
+					   &signature);
+      if (ret < 0)
+        fail ("gnutls_x509_privkey_sign_hash\n");
 
       ret = gnutls_x509_crt_init (&crt);
       if (ret < 0)
-	fail ("gnutls_x509_crt_init\n");
+        fail ("gnutls_x509_crt_init\n");
 
       ret = gnutls_x509_crt_import (crt, &cert_dat[i], GNUTLS_X509_FMT_PEM);
       if (ret < 0)
-	fail ("gnutls_x509_crt_import\n");
-
-      signature.data = _signature;
-      signature.size = _signature_size;
+        fail ("gnutls_x509_crt_import\n");
 
       ret =
-	gnutls_x509_crt_get_verify_algorithm (crt, &signature, &hash_algo);
+        gnutls_x509_crt_get_verify_algorithm (crt, &signature, &hash_algo);
       if (ret < 0 || hash_algo != GNUTLS_DIG_SHA1)
-	fail ("gnutls_x509_crt_get_verify_algorithm\n");
+        fail ("gnutls_x509_crt_get_verify_algorithm\n");
 
       ret = gnutls_x509_crt_verify_hash (crt, 0, &hash_data, &signature);
       if (ret < 0)
-	fail ("gnutls_x509_privkey_verify_hash\n");
+        fail ("gnutls_x509_privkey_verify_hash\n");
+
+      ret =
+        gnutls_x509_crt_get_verify_algorithm (crt, &signature2, &hash_algo);
+      if (ret < 0 || hash_algo != GNUTLS_DIG_SHA1)
+        fail ("gnutls_x509_crt_get_verify_algorithm (hashed data)\n");
+
+      ret = gnutls_x509_crt_verify_hash (crt, 0, &hash_data, &signature2);
+      if (ret < 0)
+        fail ("gnutls_x509_privkey_verify_hash (hashed data)\n");
 
       gnutls_x509_privkey_deinit (key);
       gnutls_x509_crt_deinit (crt);
