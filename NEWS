@@ -12,6 +12,13 @@ integers.
 Reported by "Brendan Doherty" <brendand@gentrack.com>.
 
 ** API and ABI modifications:
+gnutls_pkcs11_privkey_sign_hash2: ADDED
+gnutls_openpgp_privkey_sign_hash2: ADDED
+gnutls_x509_privkey_sign_hash2: ADDED
+gnutls_privkey_sign_hash2: ADDED
+gnutls_openpgp_privkey_sign_data2: ADDED
+gnutls_x509_privkey_sign_data2: ADDED
+gnutls_openpgp_crt_verify_hash: ADDED
 gnutls_openpgp_privkey_sign_hash: DEPRECATED
 gnutls_x509_privkey_sign_hash: DEPRECATED
 gnutls_psk_netconf_derive_key: DEPRECATED
