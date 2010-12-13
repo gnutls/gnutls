@@ -1789,21 +1789,10 @@ gnutls_x509_privkey_sign_hash2 (gnutls_x509_privkey_t signer,
   digest.size = hash_data->size;
   memcpy(digest.data, hash_data->data, digest.size);
 
-  switch (signer->pk_algorithm)
+  ret = pk_prepare_hash (signer->pk_algorithm, hash_algo, &digest);
+  if (ret < 0)
     {
-    case GNUTLS_PK_RSA:
-      ret = pk_prepare_pkcs1_rsa_hash (hash_algo, &digest);
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
-      break;
-    case GNUTLS_PK_DSA:
-      break;
-    default:
       gnutls_assert ();
-      ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
       goto cleanup;
     }
 

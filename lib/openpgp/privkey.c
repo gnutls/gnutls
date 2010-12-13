@@ -1332,24 +1332,13 @@ gnutls_openpgp_privkey_sign_hash2 (gnutls_openpgp_privkey_t signer,
   digest.size = hash_data->size;
   memcpy(digest.data, hash_data->data, digest.size);
 
-  switch (gnutls_openpgp_privkey_get_pk_algorithm (signer, NULL))
+  ret = pk_prepare_hash (gnutls_openpgp_privkey_get_pk_algorithm (signer, NULL),
+      hash_algo, &digest);
+  if (ret < 0)
     {
-    case GNUTLS_PK_RSA:
-      ret = pk_prepare_pkcs1_rsa_hash (hash_algo, &digest);
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
-      break;
-    case GNUTLS_PK_DSA:
-      break;
-    default:
       gnutls_assert ();
-      ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
       goto cleanup;
     }
-  return 0;
 
   ret = _gnutls_openpgp_privkey_sign_hash (signer, &digest, signature);
   if (ret < 0)

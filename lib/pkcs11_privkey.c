@@ -140,28 +140,17 @@ gnutls_pkcs11_privkey_sign_data (gnutls_pkcs11_privkey_t signer,
   int ret;
   gnutls_datum_t digest;
 
-  ret = pk_hash_data(signer->pk_algorithm, hash, NULL, data, signature);
+  ret = pk_hash_data(signer->pk_algorithm, hash, NULL, data, &digest);
   if (ret < 0)
     {
       gnutls_assert();
       return ret;
     }
 
-  switch (signer->pk_algorithm)
+  ret = pk_prepare_hash (signer->pk_algorithm, hash, &digest);
+  if (ret < 0)
     {
-    case GNUTLS_PK_RSA:
-      ret = pk_prepare_pkcs1_rsa_hash (hash, &digest);
-      if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
-      break;
-    case GNUTLS_PK_DSA:
-      break;
-    default:
       gnutls_assert ();
-      ret = GNUTLS_E_UNIMPLEMENTED_FEATURE;
       goto cleanup;
     }
 

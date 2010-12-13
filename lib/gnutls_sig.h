@@ -56,7 +56,7 @@ int _gnutls_soft_sign (gnutls_pk_algorithm_t algo,
 		       const gnutls_datum_t * data,
 		       gnutls_datum_t * signature);
 
-int pk_prepare_pkcs1_rsa_hash (gnutls_digest_algorithm_t hash,
+int pk_prepare_hash (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash,
 		       gnutls_datum_t * output);
 int pk_hash_data(gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash,
   bigint_t * params, const gnutls_datum_t * data, gnutls_datum_t * digest);

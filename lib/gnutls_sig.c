@@ -934,27 +934,37 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
   return 0;
 }
 
-/* if hash==MD5 then we do RSA-MD5
- * if hash==SHA then we do RSA-SHA
- * params[0] is modulus
- * params[1] is public key
+/* 
+ * This function will do RSA PKCS #1 1.5 encoding
+ * on the given digest. The given digest must be allocated
+ * and will be freed if replacement is required.
  */
 int
-pk_prepare_pkcs1_rsa_hash (gnutls_digest_algorithm_t hash,
-		   gnutls_datum_t * digest)
+pk_prepare_hash (gnutls_pk_algorithm_t pk,
+  gnutls_digest_algorithm_t hash,
+  gnutls_datum_t * digest)
 {
   int ret;
   gnutls_datum old_digest = { digest->data, digest->size };
 
-  /* Encode the digest as a DigestInfo
-   */
-  if ((ret = encode_ber_digest_info (hash, digest, digest)) != 0)
+  switch(pk)
     {
-      gnutls_assert ();
-      return ret;
-    }
+      case GNUTLS_PK_RSA:
+        /* Encode the digest as a DigestInfo
+         */
+        if ((ret = encode_ber_digest_info (hash, digest, digest)) != 0)
+          {
+            gnutls_assert ();
+            return ret;
+          }
 
-  _gnutls_free_datum(&old_digest);
+        _gnutls_free_datum(&old_digest);
+      case GNUTLS_PK_DSA:
+        break;
+      default:
+        gnutls_assert ();
+        return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+    }
 
   return 0;
 }
