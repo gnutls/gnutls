@@ -630,7 +630,6 @@ GNUTLS_2_12
 	gnutls_pkcs11_privkey_get_info;
 	gnutls_pkcs11_privkey_import_url;
 	gnutls_pkcs11_privkey_sign_data;
-	gnutls_pkcs11_privkey_sign_hash;
 	gnutls_pkcs11_privkey_decrypt_data;
 	gnutls_pkcs11_obj_export;
 	gnutls_pkcs11_type_get_name;
@@ -643,7 +642,6 @@ GNUTLS_2_12
 	gnutls_privkey_import_x509;
 	gnutls_privkey_import_openpgp;
 	gnutls_privkey_sign_data;
-	gnutls_privkey_sign_hash;
 	gnutls_privkey_decrypt_data;
 	gnutls_pkcs11_privkey_export_url;
 	gnutls_x509_crq_privkey_sign;
