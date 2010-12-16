@@ -970,6 +970,43 @@ gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
 }
 
 /**
+ * gnutls_pubkey_verify_data:
+ * @pubkey: Holds the public key
+ * @flags: should be 0 for now
+ * @data: holds the data to be signed
+ * @signature: contains the signature
+ *
+ * This function will verify the given signed data, using the
+ * parameters from the certificate.
+ *
+ * Returns: In case of a verification failure 0 is returned, and 1 on
+ * success.
+ **/
+int
+gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey, unsigned int flags,
+                             const gnutls_datum_t * data,
+                             const gnutls_datum_t * signature)
+{
+  int ret;
+
+  if (pubkey == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  ret = pubkey_verify_sig( data, NULL, signature, pubkey->pk_algorithm, 
+    pubkey->params, pubkey->params_size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+    }
+
+  return ret;
+}
+
+
+/**
  * gnutls_pubkey_verify_hash:
  * @key: Holds the certificate
  * @flags: should be 0 for now

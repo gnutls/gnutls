@@ -699,6 +699,7 @@ GNUTLS_2_12
 	gnutls_x509_privkey_sign_data2;
 	gnutls_pkcs11_privkey_sign_hash2;
 	gnutls_pubkey_import_privkey;
+	gnutls_pubkey_verify_data;
 } GNUTLS_2_10;
 
 GNUTLS_PRIVATE {

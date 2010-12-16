@@ -799,8 +799,13 @@ dsa_verify_sig (const gnutls_datum_t * text,
   gnutls_datum_t digest;
   digest_hd_st hd;
 
-  if (hash && hash->data && hash->size == 20)
+  if (hash)
     {
+      if (!hash->data || hash->size != 20)
+        {
+          gnutls_assert();
+          return GNUTLS_E_INVALID_REQUEST;
+        }
       digest = *hash;
     }
   else

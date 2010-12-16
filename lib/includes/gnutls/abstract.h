@@ -83,6 +83,11 @@ gnutls_pubkey_get_verify_algorithm (gnutls_pubkey_t key,
                                     const gnutls_datum_t * signature,
                                     gnutls_digest_algorithm_t * hash);
 
+int gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey,
+                                   unsigned int flags,
+                                   const gnutls_datum_t * data,
+                                   const gnutls_datum_t * signature);
+
 /* Private key operations */
 
 int gnutls_privkey_init (gnutls_privkey_t * key);
