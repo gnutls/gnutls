@@ -12,6 +12,9 @@
 struct gnutls_pubkey_st;
 typedef struct gnutls_pubkey_st *gnutls_pubkey_t;
 
+struct gnutls_privkey_st;
+typedef struct gnutls_privkey_st *gnutls_privkey_t;
+
 int gnutls_pubkey_init (gnutls_pubkey_t * key);
 void gnutls_pubkey_deinit (gnutls_pubkey_t key);
 int gnutls_pubkey_get_pk_algorithm (gnutls_pubkey_t key, unsigned int *bits);
@@ -24,6 +27,10 @@ int gnutls_pubkey_import_openpgp (gnutls_pubkey_t pkey,
 				  gnutls_openpgp_crt_t crt,
 				  gnutls_openpgp_keyid_t keyid,
 				  unsigned int flags);
+int
+gnutls_pubkey_import_privkey (gnutls_pubkey_t key, gnutls_privkey_t pkey,
+			   unsigned int usage, unsigned int flags);
+
 
 int gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
 						gnutls_digest_algorithm_t *
@@ -77,9 +84,6 @@ gnutls_pubkey_get_verify_algorithm (gnutls_pubkey_t key,
 				    gnutls_digest_algorithm_t * hash);
 
 /* Private key operations */
-
-struct gnutls_privkey_st;
-typedef struct gnutls_privkey_st *gnutls_privkey_t;
 
 int gnutls_privkey_init (gnutls_privkey_t * key);
 void gnutls_privkey_deinit (gnutls_privkey_t key);

@@ -37,6 +37,7 @@
 #include <gnutls_num.h>
 #include <x509/common.h>
 #include <x509_b64.h>
+#include <abstract_int.h>
 
 #define PK_PEM_HEADER "PUBLIC KEY"
 
@@ -185,6 +186,33 @@ gnutls_pubkey_import_x509 (gnutls_pubkey_t key, gnutls_x509_crt_t crt,
     }
 
   return 0;
+}
+
+/**
+ * gnutls_pubkey_import_privkey:
+ * @key: The public key
+ * @pkey: The private key
+ * @usage: GNUTLS_KEY_* key usage flags.
+ * @flags: should be zero
+ *
+ * This function will import the given public key to the abstract
+ * #gnutls_pubkey_t structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_pubkey_import_privkey (gnutls_pubkey_t key, gnutls_privkey_t pkey,
+			   unsigned int usage, unsigned int flags)
+{
+  key->pk_algorithm = gnutls_privkey_get_pk_algorithm (pkey, &key->bits);
+
+  key->key_usage = usage;
+
+  key->params_size = sizeof (key->params) / sizeof (key->params[0]);
+
+  return _gnutls_privkey_get_public_mpis (pkey, key->params,
+    &key->params_size);
 }
 
 /**

@@ -35,6 +35,7 @@
 #include <openpgp/openpgp_int.h>
 #include <openpgp/gnutls_openpgp.h>
 #include <gnutls_sig.h>
+#include <abstract_int.h>
 
 struct gnutls_privkey_st
 {
@@ -101,6 +102,95 @@ gnutls_privkey_get_pk_algorithm (gnutls_privkey_t key, unsigned int *bits)
       return GNUTLS_E_INVALID_REQUEST;
     }
 
+}
+
+static int privkey_to_pubkey(gnutls_pk_algorithm_t pk, 
+  const bigint_t * params, int params_size,
+  bigint_t *new_params, int* new_params_size)
+{
+  int ret, i;
+
+  switch(pk) {
+    case GNUTLS_PK_RSA:
+      if (*new_params_size < RSA_PUBLIC_PARAMS || params_size < RSA_PRIVATE_PARAMS)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INVALID_REQUEST;
+        }
+ 
+      new_params[0] = _gnutls_mpi_copy(params[0]);
+      new_params[1] = _gnutls_mpi_copy(params[1]);
+      
+      *new_params_size = RSA_PUBLIC_PARAMS;
+      
+      if (new_params[0] == NULL || new_params[1] == NULL)
+        {
+          gnutls_assert();
+          ret = GNUTLS_E_MEMORY_ERROR;
+          goto cleanup;
+        }
+        
+      break;
+    case GNUTLS_PK_DSA:
+      if (*new_params_size < DSA_PUBLIC_PARAMS || params_size < DSA_PRIVATE_PARAMS)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INVALID_REQUEST;
+        }
+ 
+      new_params[0] = _gnutls_mpi_copy(params[0]);
+      new_params[1] = _gnutls_mpi_copy(params[1]);
+      new_params[2] = _gnutls_mpi_copy(params[2]);
+      new_params[3] = _gnutls_mpi_copy(params[3]);
+
+      *new_params_size = DSA_PUBLIC_PARAMS;
+      
+      if (new_params[0] == NULL || new_params[1] == NULL || 
+        new_params[2] == NULL || new_params[3] == NULL)
+        {
+          gnutls_assert();
+          ret = GNUTLS_E_MEMORY_ERROR;
+          goto cleanup;
+        }
+        
+      break;
+    default:
+      gnutls_assert();
+      return GNUTLS_E_INVALID_REQUEST;
+  }
+  
+  return 0;
+cleanup:
+  for (i=0;i<*new_params_size;i++)
+    _gnutls_mpi_release(new_params[i]);
+  return ret;
+}
+  
+
+/* Returns the public key of the private key (if possible)
+ */
+int _gnutls_privkey_get_public_mpis (gnutls_privkey_t key, 
+  bigint_t * params, int *params_size)
+{
+  int ret;
+  
+  switch (key->type)
+    {
+    case GNUTLS_PRIVKEY_X509:
+      ret = privkey_to_pubkey( gnutls_privkey_get_pk_algorithm(key, NULL),
+        key->key.x509->params, key->key.x509->params_size, 
+        params, params_size);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          return ret;
+        }
+    default:
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+  
+  return 0;
 }
 
 /**
