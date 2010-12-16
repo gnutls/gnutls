@@ -85,10 +85,10 @@ system_errno (gnutls_transport_ptr ptr)
 
 ssize_t
 system_writev (gnutls_transport_ptr ptr, const giovec_t * iovec,
-	       int iovec_cnt)
+               int iovec_cnt)
 {
   return writev (GNUTLS_POINTER_TO_INT (ptr), (struct iovec *) iovec,
-		 iovec_cnt);
+                 iovec_cnt);
 
 }
 #endif
@@ -152,7 +152,7 @@ gnutls_system_mutex_unlock (void **priv)
 
 int
 _gnutls_atfork (void (*prepare) (void), void (*parent) (void),
-		void (*child) (void))
+                void (*child) (void))
 {
   return 0;
 }
@@ -218,7 +218,7 @@ gnutls_system_mutex_unlock (void **priv)
 
 int
 _gnutls_atfork (void (*prepare) (void), void (*parent) (void),
-		void (*child) (void))
+                void (*child) (void))
 {
   return pthread_atfork (prepare, parent, child);
 }
@@ -253,7 +253,7 @@ gnutls_system_mutex_unlock (void **priv)
 
 int
 _gnutls_atfork (void (*prepare) (void), void (*parent) (void),
-		void (*child) (void))
+                void (*child) (void))
 {
   return 0;
 }

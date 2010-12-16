@@ -53,11 +53,11 @@ doit (void)
 
   if (debug)
     success ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
-	     file, password);
+             file, password);
   ret = gnutls_certificate_set_x509_simple_pkcs12_file (x509cred,
-							file,
-							GNUTLS_X509_FMT_DER,
-							password);
+                                                        file,
+                                                        GNUTLS_X509_FMT_DER,
+                                                        password);
   if (ret < 0)
     fail ("x509_pkcs12 failed %d: %s\n", ret, gnutls_strerror (ret));
 
@@ -83,11 +83,11 @@ doit (void)
 
   if (debug)
     success ("Reading PKCS#12 blob from `%s' using password `%s'.\n",
-	     file, password);
+             file, password);
   ret = gnutls_certificate_set_x509_simple_pkcs12_file (x509cred,
-							file,
-							GNUTLS_X509_FMT_DER,
-							password);
+                                                        file,
+                                                        GNUTLS_X509_FMT_DER,
+                                                        password);
   if (ret < 0)
     fail ("x509_pkcs12 failed %d: %s\n", ret, gnutls_strerror (ret));
 

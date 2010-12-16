@@ -29,7 +29,7 @@
 #include <gnutls/crypto.h>
 #include <time.h>
 #include <signal.h>
-#include "timespec.h"		/* gnulib gettime */
+#include "timespec.h"           /* gnulib gettime */
 
 static unsigned char data[64 * 1024];
 
@@ -49,7 +49,7 @@ tls_log_func (int level, const char *str)
 
 static void
 value2human (double bytes, double time, double *data, double *speed,
-	     char *metric)
+             char *metric)
 {
   if (bytes > 1000 && bytes < 1000 * 1000)
     {
@@ -113,7 +113,7 @@ cipher_bench (int algo, int size)
   key.size = keysize;
 
   printf ("Checking %s (%dkb payload)... ", gnutls_cipher_get_name (algo),
-	  size);
+          size);
   fflush (stdout);
 
   must_finish = 0;
@@ -140,7 +140,7 @@ cipher_bench (int algo, int size)
   gettime (&stop);
 
   secs = (stop.tv_sec * 1000 + stop.tv_nsec / (1000 * 1000) -
-	  (start.tv_sec * 1000 + start.tv_nsec / (1000 * 1000)));
+          (start.tv_sec * 1000 + start.tv_nsec / (1000 * 1000)));
   secs /= 1000;
 
   value2human (data_size, secs, &ddata, &dspeed, metric);

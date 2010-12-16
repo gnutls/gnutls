@@ -44,9 +44,9 @@
  */
 int
 _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
-			   const gnutls_datum_t * plaintext,
-			   bigint_t * params, unsigned params_len,
-			   unsigned btype)
+                           const gnutls_datum_t * plaintext,
+                           bigint_t * params, unsigned params_len,
+                           unsigned btype)
 {
   unsigned int i, pad;
   int ret;
@@ -92,43 +92,43 @@ _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
     case 2:
       /* using public key */
       if (params_len < RSA_PUBLIC_PARAMS)
-	{
-	  gnutls_assert ();
-	  gnutls_free (edata);
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+        {
+          gnutls_assert ();
+          gnutls_free (edata);
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
 
       ret = _gnutls_rnd (GNUTLS_RND_RANDOM, ps, psize);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  gnutls_free (edata);
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          gnutls_free (edata);
+          return ret;
+        }
       for (i = 0; i < psize; i++)
-	while (ps[i] == 0)
-	  {
-	    ret = _gnutls_rnd (GNUTLS_RND_RANDOM, &ps[i], 1);
-	    if (ret < 0)
-	      {
-		gnutls_assert ();
-		gnutls_free (edata);
-		return ret;
-	      }
-	  }
+        while (ps[i] == 0)
+          {
+            ret = _gnutls_rnd (GNUTLS_RND_RANDOM, &ps[i], 1);
+            if (ret < 0)
+              {
+                gnutls_assert ();
+                gnutls_free (edata);
+                return ret;
+              }
+          }
       break;
     case 1:
       /* using private key */
 
       if (params_len < RSA_PRIVATE_PARAMS)
-	{
-	  gnutls_assert ();
-	  gnutls_free (edata);
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+        {
+          gnutls_assert ();
+          gnutls_free (edata);
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
 
       for (i = 0; i < psize; i++)
-	ps[i] = 0xff;
+        ps[i] = 0xff;
       break;
     default:
       gnutls_assert ();
@@ -142,10 +142,10 @@ _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
   to_encrypt.data = edata;
   to_encrypt.size = k;
 
-  if (btype == 2)		/* encrypt */
+  if (btype == 2)               /* encrypt */
     ret =
       _gnutls_pk_encrypt (GNUTLS_PK_RSA, &encrypted, &to_encrypt, &pk_params);
-  else				/* sign */
+  else                          /* sign */
     ret =
       _gnutls_pk_sign (GNUTLS_PK_RSA, &encrypted, &to_encrypt, &pk_params);
 
@@ -174,7 +174,7 @@ _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
       return 0;
     }
   else
-    {				/* psize > k !!! */
+    {                           /* psize > k !!! */
       /* This is an impossible situation */
       gnutls_assert ();
       _gnutls_free_datum (&encrypted);
@@ -207,9 +207,9 @@ _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
  */
 int
 _gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
-			   const gnutls_datum_t * ciphertext,
-			   bigint_t * params, unsigned params_len,
-			   unsigned btype)
+                           const gnutls_datum_t * ciphertext,
+                           bigint_t * params, unsigned params_len,
+                           unsigned btype)
 {
   unsigned int k, i;
   int ret;
@@ -239,12 +239,12 @@ _gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
   if (btype == 2)
     {
       ret =
-	_gnutls_pk_decrypt (GNUTLS_PK_RSA, plaintext, ciphertext, &pk_params);
+        _gnutls_pk_decrypt (GNUTLS_PK_RSA, plaintext, ciphertext, &pk_params);
     }
   else
     {
       ret =
-	_gnutls_pk_encrypt (GNUTLS_PK_RSA, plaintext, ciphertext, &pk_params);
+        _gnutls_pk_encrypt (GNUTLS_PK_RSA, plaintext, ciphertext, &pk_params);
     }
 
   if (ret < 0)
@@ -272,31 +272,31 @@ _gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
     {
     case 2:
       for (i = 2; i < plaintext->size; i++)
-	{
-	  if (plaintext->data[i] == 0)
-	    {
-	      ret = 0;
-	      break;
-	    }
-	}
+        {
+          if (plaintext->data[i] == 0)
+            {
+              ret = 0;
+              break;
+            }
+        }
       break;
     case 1:
       for (i = 2; i < plaintext->size; i++)
-	{
-	  if (plaintext->data[i] == 0 && i > 2)
-	    {
-	      ret = 0;
-	      break;
-	    }
-	  if (plaintext->data[i] != 0xff)
-	    {
-	      _gnutls_handshake_log ("PKCS #1 padding error");
-	      _gnutls_free_datum (plaintext);
-	      /* PKCS #1 padding error.  Don't use
-	         GNUTLS_E_PKCS1_WRONG_PAD here.  */
-	      break;
-	    }
-	}
+        {
+          if (plaintext->data[i] == 0 && i > 2)
+            {
+              ret = 0;
+              break;
+            }
+          if (plaintext->data[i] != 0xff)
+            {
+              _gnutls_handshake_log ("PKCS #1 padding error");
+              _gnutls_free_datum (plaintext);
+              /* PKCS #1 padding error.  Don't use
+                 GNUTLS_E_PKCS1_WRONG_PAD here.  */
+              break;
+            }
+        }
       break;
     default:
       gnutls_assert ();
@@ -321,8 +321,8 @@ _gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
 
 int
 _gnutls_rsa_verify (const gnutls_datum_t * vdata,
-		    const gnutls_datum_t * ciphertext, bigint_t * params,
-		    int params_len, int btype)
+                    const gnutls_datum_t * ciphertext, bigint_t * params,
+                    int params_len, int btype)
 {
 
   gnutls_datum_t plain;
@@ -331,7 +331,7 @@ _gnutls_rsa_verify (const gnutls_datum_t * vdata,
   /* decrypt signature */
   if ((ret =
        _gnutls_pkcs1_rsa_decrypt (&plain, ciphertext, params, params_len,
-				  btype)) < 0)
+                                  btype)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -353,7 +353,7 @@ _gnutls_rsa_verify (const gnutls_datum_t * vdata,
 
   _gnutls_free_datum (&plain);
 
-  return 0;			/* ok */
+  return 0;                     /* ok */
 }
 
 /* encodes the Dss-Sig-Value structure
@@ -366,8 +366,8 @@ _gnutls_encode_ber_rs (gnutls_datum_t * sig_value, bigint_t r, bigint_t s)
 
   if ((result =
        asn1_create_element (_gnutls_get_gnutls_asn (),
-			    "GNUTLS.DSASignatureValue",
-			    &sig)) != ASN1_SUCCESS)
+                            "GNUTLS.DSASignatureValue",
+                            &sig)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
@@ -407,8 +407,8 @@ _gnutls_encode_ber_rs (gnutls_datum_t * sig_value, bigint_t r, bigint_t s)
  */
 int
 _gnutls_dsa_sign (gnutls_datum_t * signature,
-		  const gnutls_datum_t * hash, bigint_t * params,
-		  unsigned int params_len)
+                  const gnutls_datum_t * hash, bigint_t * params,
+                  unsigned int params_len)
 {
   int ret;
   size_t i;
@@ -421,7 +421,7 @@ _gnutls_dsa_sign (gnutls_datum_t * signature,
 
   k = hash->size;
   if (k < 20)
-    {				/* SHA1 or better only */
+    {                           /* SHA1 or better only */
       gnutls_assert ();
       return GNUTLS_E_PK_SIGN_FAILED;
     }
@@ -442,15 +442,15 @@ _gnutls_dsa_sign (gnutls_datum_t * signature,
  */
 int
 _gnutls_decode_ber_rs (const gnutls_datum_t * sig_value, bigint_t * r,
-		       bigint_t * s)
+                       bigint_t * s)
 {
   ASN1_TYPE sig;
   int result;
 
   if ((result =
        asn1_create_element (_gnutls_get_gnutls_asn (),
-			    "GNUTLS.DSASignatureValue",
-			    &sig)) != ASN1_SUCCESS)
+                            "GNUTLS.DSASignatureValue",
+                            &sig)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
@@ -490,8 +490,8 @@ _gnutls_decode_ber_rs (const gnutls_datum_t * sig_value, bigint_t * r,
  */
 int
 _gnutls_dsa_verify (const gnutls_datum_t * vdata,
-		    const gnutls_datum_t * sig_value, bigint_t * params,
-		    int params_len)
+                    const gnutls_datum_t * sig_value, bigint_t * params,
+                    int params_len)
 {
 
   int ret, i;
@@ -502,7 +502,7 @@ _gnutls_dsa_verify (const gnutls_datum_t * vdata,
   pk_params.params_nr = params_len;
 
   if (vdata->size > 20)
-    {				/* SHA1 or better only */
+    {                           /* SHA1 or better only */
       gnutls_assert ();
       return GNUTLS_E_PK_SIG_VERIFY_FAILED;
     }
@@ -516,13 +516,13 @@ _gnutls_dsa_verify (const gnutls_datum_t * vdata,
       return ret;
     }
 
-  return 0;			/* ok */
+  return 0;                     /* ok */
 }
 
 /* some generic pk functions */
 static int
 _generate_params (int algo, bigint_t * resarr, unsigned int *resarr_len,
-		  int bits)
+                  int bits)
 {
   gnutls_pk_params_st params;
   int ret;
@@ -540,7 +540,7 @@ _generate_params (int algo, bigint_t * resarr, unsigned int *resarr_len,
     {
       *resarr_len = params.params_nr;
       for (i = 0; i < params.params_nr; i++)
-	resarr[i] = params.params[i];
+        resarr[i] = params.params[i];
     }
   else
     {
@@ -554,21 +554,21 @@ _generate_params (int algo, bigint_t * resarr, unsigned int *resarr_len,
 
 int
 _gnutls_rsa_generate_params (bigint_t * resarr, unsigned int *resarr_len,
-			     int bits)
+                             int bits)
 {
   return _generate_params (GNUTLS_PK_RSA, resarr, resarr_len, bits);
 }
 
 int
 _gnutls_dsa_generate_params (bigint_t * resarr, unsigned int *resarr_len,
-			     int bits)
+                             int bits)
 {
   return _generate_params (GNUTLS_PK_DSA, resarr, resarr_len, bits);
 }
 
 int
 _gnutls_pk_params_copy (gnutls_pk_params_st * dst, bigint_t * params,
-			int params_len)
+                        int params_len)
 {
   int i, j;
   dst->params_nr = 0;
@@ -583,11 +583,11 @@ _gnutls_pk_params_copy (gnutls_pk_params_st * dst, bigint_t * params,
     {
       dst->params[i] = _gnutls_mpi_set (NULL, params[i]);
       if (dst->params[i] == NULL)
-	{
-	  for (j = 0; j < i; j++)
-	    _gnutls_mpi_release (&dst->params[j]);
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+        {
+          for (j = 0; j < i; j++)
+            _gnutls_mpi_release (&dst->params[j]);
+          return GNUTLS_E_MEMORY_ERROR;
+        }
       dst->params_nr++;
     }
 
@@ -647,19 +647,19 @@ _gnutls_calc_rsa_exp (bigint_t * params, unsigned int params_size)
 
 int
 _gnutls_pk_get_hash_algorithm (gnutls_pk_algorithm_t pk, bigint_t * params,
-			       int params_size,
-			       gnutls_digest_algorithm_t * dig,
-			       unsigned int *mand)
+                               int params_size,
+                               gnutls_digest_algorithm_t * dig,
+                               unsigned int *mand)
 {
   if (mand)
     {
       if (pk == GNUTLS_PK_DSA)
-	*mand = 1;
+        *mand = 1;
       else
-	*mand = 0;
+        *mand = 0;
     }
 
   return _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) dig,
-					NULL, pk, params, params_size);
+                                        NULL, pk, params, params_size);
 
 }

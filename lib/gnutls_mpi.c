@@ -41,7 +41,7 @@
 
 bigint_t
 _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
-		       gnutls_rnd_level_t level)
+                       gnutls_rnd_level_t level)
 {
   size_t size = 1 + (bits / 8);
   int ret;
@@ -59,10 +59,10 @@ _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
     {
       buf = gnutls_malloc (size);
       if (buf == NULL)
-	{
-	  gnutls_assert ();
-	  goto cleanup;
-	}
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
       buf_release = 1;
     }
 
@@ -84,7 +84,7 @@ _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
   else
     {
       for (i = 8; i >= rem; i--)
-	buf[0] = clearbit (buf[0], i);
+        buf[0] = clearbit (buf[0], i);
     }
 
   ret = _gnutls_mpi_scan (&tmp, buf, size);
@@ -260,7 +260,7 @@ _gnutls_mpi_dprint_size (const bigint_t a, gnutls_datum_t * dest, size_t size)
     {
       size_t diff = size - bytes;
       for (i = 0; i < diff; i++)
-	buf[i] = 0;
+        buf[i] = 0;
       ret = _gnutls_mpi_print (a, &buf[diff], &bytes);
     }
   else
@@ -329,7 +329,7 @@ _gnutls_x509_read_int (ASN1_TYPE node, const char *value, bigint_t * ret_mpi)
  */
 int
 _gnutls_x509_write_int (ASN1_TYPE node, const char *value, bigint_t mpi,
-			int lz)
+                        int lz)
 {
   opaque *tmpstr;
   size_t s_len;

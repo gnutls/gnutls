@@ -58,46 +58,46 @@ generate_prime (int how)
     {
       ret = gnutls_dh_params_generate2 (dh_params, bits);
       if (ret < 0)
-	{
-	  fprintf (stderr, "Error generating parameters: %s\n",
-		   gnutls_strerror (ret));
-	  exit (1);
-	}
+        {
+          fprintf (stderr, "Error generating parameters: %s\n",
+                   gnutls_strerror (ret));
+          exit (1);
+        }
 
       ret = gnutls_dh_params_export_raw (dh_params, &p, &g, NULL);
       if (ret < 0)
-	{
-	  fprintf (stderr, "Error exporting parameters: %s\n",
-		   gnutls_strerror (ret));
-	  exit (1);
-	}
+        {
+          fprintf (stderr, "Error exporting parameters: %s\n",
+                   gnutls_strerror (ret));
+          exit (1);
+        }
     }
   else
     {
 #ifdef ENABLE_SRP
       if (bits <= 1024)
-	{
-	  p = gnutls_srp_1024_group_prime;
-	  g = gnutls_srp_1024_group_generator;
-	}
+        {
+          p = gnutls_srp_1024_group_prime;
+          g = gnutls_srp_1024_group_generator;
+        }
       else if (bits <= 1536)
-	{
-	  p = gnutls_srp_1536_group_prime;
-	  g = gnutls_srp_1536_group_generator;
-	}
+        {
+          p = gnutls_srp_1536_group_prime;
+          g = gnutls_srp_1536_group_generator;
+        }
       else
-	{
-	  p = gnutls_srp_2048_group_prime;
-	  g = gnutls_srp_2048_group_generator;
-	}
+        {
+          p = gnutls_srp_2048_group_prime;
+          g = gnutls_srp_2048_group_generator;
+        }
 
       ret = gnutls_dh_params_import_raw (dh_params, &p, &g);
       if (ret < 0)
-	{
-	  fprintf (stderr, "Error exporting parameters: %s\n",
-		   gnutls_strerror (ret));
-	  exit (1);
-	}
+        {
+          fprintf (stderr, "Error exporting parameters: %s\n",
+                   gnutls_strerror (ret));
+          exit (1);
+        }
 #else
       fprintf (stderr, "Parameters unavailable as SRP disabled.\n");
 #endif
@@ -110,13 +110,13 @@ generate_prime (int how)
       fprintf (outfile, "\nconst uint8 g[%d] = { ", g.size);
 
       for (i = 0; i < g.size; i++)
-	{
-	  if (i % 7 == 0)
-	    fprintf (outfile, "\n\t");
-	  fprintf (outfile, "0x%.2x", g.data[i]);
-	  if (i != g.size - 1)
-	    fprintf (outfile, ", ");
-	}
+        {
+          if (i % 7 == 0)
+            fprintf (outfile, "\n\t");
+          fprintf (outfile, "0x%.2x", g.data[i]);
+          if (i != g.size - 1)
+            fprintf (outfile, ", ");
+        }
 
       fprintf (outfile, "\n};\n\n");
     }
@@ -125,14 +125,14 @@ generate_prime (int how)
       fprintf (outfile, "\nGenerator: ");
 
       for (i = 0; i < g.size; i++)
-	{
-	  if (i != 0 && i % 12 == 0)
-	    fprintf (outfile, "\n\t");
-	  else if (i != 0 && i != g.size)
-	    fprintf (outfile, ":");
+        {
+          if (i != 0 && i % 12 == 0)
+            fprintf (outfile, "\n\t");
+          else if (i != 0 && i != g.size)
+            fprintf (outfile, ":");
 
-	  fprintf (outfile, "%.2x", g.data[i]);
-	}
+          fprintf (outfile, "%.2x", g.data[i]);
+        }
 
       fprintf (outfile, "\n\n");
     }
@@ -145,13 +145,13 @@ generate_prime (int how)
       fprintf (outfile, "\nconst uint8 prime[%d] = { ", p.size);
 
       for (i = 0; i < p.size; i++)
-	{
-	  if (i % 7 == 0)
-	    fprintf (outfile, "\n\t");
-	  fprintf (outfile, "0x%.2x", p.data[i]);
-	  if (i != p.size - 1)
-	    fprintf (outfile, ", ");
-	}
+        {
+          if (i % 7 == 0)
+            fprintf (outfile, "\n\t");
+          fprintf (outfile, "0x%.2x", p.data[i]);
+          if (i != p.size - 1)
+            fprintf (outfile, ", ");
+        }
 
       fprintf (outfile, "\n};\n");
     }
@@ -160,34 +160,34 @@ generate_prime (int how)
       fprintf (outfile, "Prime: ");
 
       for (i = 0; i < p.size; i++)
-	{
-	  if (i != 0 && i % 12 == 0)
-	    fprintf (outfile, "\n\t");
-	  else if (i != 0 && i != p.size)
-	    fprintf (outfile, ":");
-	  fprintf (outfile, "%.2x", p.data[i]);
-	}
+        {
+          if (i != 0 && i % 12 == 0)
+            fprintf (outfile, "\n\t");
+          else if (i != 0 && i != p.size)
+            fprintf (outfile, ":");
+          fprintf (outfile, "%.2x", p.data[i]);
+        }
 
       fprintf (outfile, "\n\n");
 
     }
 
   if (!cparams)
-    {				/* generate a PKCS#3 structure */
+    {                           /* generate a PKCS#3 structure */
 
       size_t len = buffer_size;
 
       ret = gnutls_dh_params_export_pkcs3 (dh_params, GNUTLS_X509_FMT_PEM,
-					   buffer, &len);
+                                           buffer, &len);
 
       if (ret == 0)
-	{
-	  fprintf (outfile, "\n%s", buffer);
-	}
+        {
+          fprintf (outfile, "\n%s", buffer);
+        }
       else
-	{
-	  fprintf (stderr, "Error: %s\n", gnutls_strerror (ret));
-	}
+        {
+          fprintf (stderr, "Error: %s\n", gnutls_strerror (ret));
+        }
 
     }
 

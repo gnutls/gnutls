@@ -62,7 +62,7 @@ main ()
   gnutls_global_init ();
 
   fprintf (stderr,
-	   "This test will perform some checks on X.509 certificate\n");
+           "This test will perform some checks on X.509 certificate\n");
   fprintf (stderr, "verification functions.\n\n");
 
   for (;;)
@@ -71,30 +71,30 @@ main ()
       file = test_files[i++].test_file;
 
       if (file == NULL)
-	break;
+        break;
       x = _verify_x509_file (file, CA_FILE);
 
       if (x < 0)
-	{
-	  fprintf (stderr, "Unexpected error: %d\n", x);
-	  exit (1);
-	}
+        {
+          fprintf (stderr, "Unexpected error: %d\n", x);
+          exit (1);
+        }
       printf ("Test %d, file %s: ", i, file);
 
       if (x != exp_result)
-	{
-	  printf ("failed.\n");
-	  fflush (stdout);
-	  fprintf (stderr, "Unexpected error in verification.\n");
-	  fprintf (stderr, "Certificate was found to be: \n");
-	  print_res (x);
-	}
+        {
+          printf ("failed.\n");
+          fflush (stdout);
+          fprintf (stderr, "Unexpected error in verification.\n");
+          fprintf (stderr, "Certificate was found to be: \n");
+          print_res (x);
+        }
       else
-	{
-	  printf ("ok.");
+        {
+          printf ("ok.");
 
-	  printf ("\n");
-	}
+          printf ("\n");
+        }
     }
 
   printf ("\n");
@@ -112,7 +112,7 @@ main ()
  */
 int
 _verify_x509_mem (const char *cert, int cert_size,
-		  const char *ca, int ca_size, const char *crl, int crl_size)
+                  const char *ca, int ca_size, const char *crl, int crl_size)
 {
   int siz, i;
   const char *ptr;
@@ -133,7 +133,7 @@ _verify_x509_mem (const char *cert, int cert_size,
   if (ret < 0)
     {
       fprintf (stderr, "Error parsing the CA certificate: %s\n",
-	       gnutls_strerror (ret));
+               gnutls_strerror (ret));
       exit (1);
     }
 
@@ -142,7 +142,7 @@ _verify_x509_mem (const char *cert, int cert_size,
   if (ret < 0)
     {
       fprintf (stderr, "Error parsing the CA certificate: %s\n",
-	       gnutls_strerror (ret));
+               gnutls_strerror (ret));
       exit (1);
     }
 
@@ -153,45 +153,45 @@ _verify_x509_mem (const char *cert, int cert_size,
 
   i = 1;
 
-  if (strstr (ptr, CRL_SEP) != NULL)	/* if CRLs exist */
+  if (strstr (ptr, CRL_SEP) != NULL)    /* if CRLs exist */
     do
       {
-	x509_crl_list =
-	  (gnutls_x509_crl *) realloc (x509_crl_list,
-				       i * sizeof (gnutls_x509_crl));
-	if (x509_crl_list == NULL)
-	  {
-	    fprintf (stderr, "memory error\n");
-	    exit (1);
-	  }
+        x509_crl_list =
+          (gnutls_x509_crl *) realloc (x509_crl_list,
+                                       i * sizeof (gnutls_x509_crl));
+        if (x509_crl_list == NULL)
+          {
+            fprintf (stderr, "memory error\n");
+            exit (1);
+          }
 
-	tmp.data = (char *) ptr;
-	tmp.size = siz;
+        tmp.data = (char *) ptr;
+        tmp.size = siz;
 
-	ret = gnutls_x509_crl_init (&x509_crl_list[i - 1]);
-	if (ret < 0)
-	  {
-	    fprintf (stderr, "Error parsing the CRL[%d]: %s\n", i,
-		     gnutls_strerror (ret));
-	    exit (1);
-	  }
+        ret = gnutls_x509_crl_init (&x509_crl_list[i - 1]);
+        if (ret < 0)
+          {
+            fprintf (stderr, "Error parsing the CRL[%d]: %s\n", i,
+                     gnutls_strerror (ret));
+            exit (1);
+          }
 
-	ret =
-	  gnutls_x509_crl_import (x509_crl_list[i - 1], &tmp,
-				  GNUTLS_X509_FMT_PEM);
-	if (ret < 0)
-	  {
-	    fprintf (stderr, "Error parsing the CRL[%d]: %s\n", i,
-		     gnutls_strerror (ret));
-	    exit (1);
-	  }
+        ret =
+          gnutls_x509_crl_import (x509_crl_list[i - 1], &tmp,
+                                  GNUTLS_X509_FMT_PEM);
+        if (ret < 0)
+          {
+            fprintf (stderr, "Error parsing the CRL[%d]: %s\n", i,
+                     gnutls_strerror (ret));
+            exit (1);
+          }
 
-	/* now we move ptr after the pem header */
-	ptr = strstr (ptr, CRL_SEP);
-	if (ptr != NULL)
-	  ptr++;
+        /* now we move ptr after the pem header */
+        ptr = strstr (ptr, CRL_SEP);
+        if (ptr != NULL)
+          ptr++;
 
-	i++;
+        i++;
       }
     while ((ptr = strstr (ptr, CRL_SEP)) != NULL);
 
@@ -208,39 +208,39 @@ _verify_x509_mem (const char *cert, int cert_size,
   do
     {
       x509_cert_list =
-	(gnutls_x509_crt *) realloc (x509_cert_list,
-				     i * sizeof (gnutls_x509_crt));
+        (gnutls_x509_crt *) realloc (x509_cert_list,
+                                     i * sizeof (gnutls_x509_crt));
       if (x509_cert_list == NULL)
-	{
-	  fprintf (stderr, "memory error\n");
-	  exit (1);
-	}
+        {
+          fprintf (stderr, "memory error\n");
+          exit (1);
+        }
 
       tmp.data = (char *) ptr;
       tmp.size = siz;
 
       ret = gnutls_x509_crt_init (&x509_cert_list[i - 1]);
       if (ret < 0)
-	{
-	  fprintf (stderr, "Error parsing the certificate[%d]: %s\n", i,
-		   gnutls_strerror (ret));
-	  exit (1);
-	}
+        {
+          fprintf (stderr, "Error parsing the certificate[%d]: %s\n", i,
+                   gnutls_strerror (ret));
+          exit (1);
+        }
 
       ret =
-	gnutls_x509_crt_import (x509_cert_list[i - 1], &tmp,
-				GNUTLS_X509_FMT_PEM);
+        gnutls_x509_crt_import (x509_cert_list[i - 1], &tmp,
+                                GNUTLS_X509_FMT_PEM);
       if (ret < 0)
-	{
-	  fprintf (stderr, "Error parsing the certificate[%d]: %s\n", i,
-		   gnutls_strerror (ret));
-	  exit (1);
-	}
+        {
+          fprintf (stderr, "Error parsing the certificate[%d]: %s\n", i,
+                   gnutls_strerror (ret));
+          exit (1);
+        }
 
       /* now we move ptr after the pem header */
       ptr = strstr (ptr, CERT_SEP);
       if (ptr != NULL)
-	ptr++;
+        ptr++;
 
       i++;
     }
@@ -249,8 +249,8 @@ _verify_x509_mem (const char *cert, int cert_size,
   x509_ncerts = i - 1;
 
   ret = gnutls_x509_crt_list_verify (x509_cert_list, x509_ncerts,
-				     &x509_ca, 1, x509_crl_list, x509_ncrls,
-				     0, &output);
+                                     &x509_ca, 1, x509_crl_list, x509_ncrls,
+                                     0, &output);
 
   gnutls_x509_crt_deinit (x509_ca);
 

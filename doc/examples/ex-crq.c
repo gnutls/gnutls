@@ -41,10 +41,10 @@ main (void)
   /* Add stuff to the distinguished name
    */
   gnutls_x509_crq_set_dn_by_oid (crq, GNUTLS_OID_X520_COUNTRY_NAME,
-				 0, "GR", 2);
+                                 0, "GR", 2);
 
   gnutls_x509_crq_set_dn_by_oid (crq, GNUTLS_OID_X520_COMMON_NAME,
-				 0, "Nikos", strlen ("Nikos"));
+                                 0, "Nikos", strlen ("Nikos"));
 
   /* Set the request version.
    */

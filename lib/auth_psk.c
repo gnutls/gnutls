@@ -42,7 +42,7 @@ int _gnutls_gen_psk_client_kx (gnutls_session_t, opaque **);
 int _gnutls_proc_psk_client_kx (gnutls_session_t, opaque *, size_t);
 
 int _gnutls_proc_psk_server_kx (gnutls_session_t session, opaque * data,
-				size_t _data_size);
+                                size_t _data_size);
 
 const mod_auth_st psk_auth_struct = {
   "PSK",
@@ -54,7 +54,7 @@ const mod_auth_st psk_auth_struct = {
   NULL,
 
   NULL,
-  NULL,				/* certificate */
+  NULL,                         /* certificate */
   _gnutls_proc_psk_server_kx,
   _gnutls_proc_psk_client_kx,
   NULL,
@@ -65,7 +65,7 @@ const mod_auth_st psk_auth_struct = {
  */
 int
 _gnutls_set_psk_session_key (gnutls_session_t session,
-			     gnutls_datum_t * dh_secret)
+                             gnutls_datum_t * dh_secret)
 {
   gnutls_datum_t pwd_psk = { NULL, 0 };
   gnutls_datum_t *ppsk;
@@ -77,19 +77,19 @@ _gnutls_set_psk_session_key (gnutls_session_t session,
       gnutls_psk_client_credentials_t cred;
 
       cred = (gnutls_psk_client_credentials_t)
-	_gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
+        _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
 
       if (cred == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+        }
 
       ppsk = &cred->key;
 
     }
   else
-    {				/* SERVER side */
+    {                           /* SERVER side */
       psk_auth_info_t info;
 
       info = _gnutls_get_auth_info (session);
@@ -98,10 +98,10 @@ _gnutls_set_psk_session_key (gnutls_session_t session,
        */
       ret = _gnutls_psk_pwd_find_entry (session, info->username, &pwd_psk);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
       ppsk = &pwd_psk;
     }
 
@@ -176,27 +176,27 @@ _gnutls_gen_psk_client_kx (gnutls_session_t session, opaque ** data)
 
       ret = cred->get_function (session, &username, &key);
       if (ret)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       ret = _gnutls_set_datum (&cred->username, username, strlen (username));
       gnutls_free (username);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  _gnutls_free_datum (&key);
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          _gnutls_free_datum (&key);
+          return ret;
+        }
 
       ret = _gnutls_set_datum (&cred->key, key.data, key.size);
       _gnutls_free_datum (&key);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
     }
   else if (cred->username.data == NULL || cred->key.data == NULL)
     {
@@ -228,7 +228,7 @@ _gnutls_gen_psk_client_kx (gnutls_session_t session, opaque ** data)
  */
 int
 _gnutls_proc_psk_client_kx (gnutls_session_t session, opaque * data,
-			    size_t _data_size)
+                            size_t _data_size)
 {
   ssize_t data_size = _data_size;
   int ret;
@@ -247,7 +247,7 @@ _gnutls_proc_psk_client_kx (gnutls_session_t session, opaque * data,
 
   if ((ret =
        _gnutls_auth_info_set (session, GNUTLS_CRD_PSK,
-			      sizeof (psk_auth_info_st), 1)) < 0)
+                              sizeof (psk_auth_info_st), 1)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -341,7 +341,7 @@ _gnutls_gen_psk_server_kx (gnutls_session_t session, opaque ** data)
  */
 int
 _gnutls_proc_psk_server_kx (gnutls_session_t session, opaque * data,
-			    size_t _data_size)
+                            size_t _data_size)
 {
   ssize_t data_size = _data_size;
   int ret;
@@ -360,7 +360,7 @@ _gnutls_proc_psk_server_kx (gnutls_session_t session, opaque * data,
 
   if ((ret =
        _gnutls_auth_info_set (session, GNUTLS_CRD_PSK,
-			      sizeof (psk_auth_info_st), 1)) < 0)
+                              sizeof (psk_auth_info_st), 1)) < 0)
     {
       gnutls_assert ();
       return ret;

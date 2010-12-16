@@ -87,33 +87,33 @@ doit (void)
   for (alt_name_count = 0;; ++alt_name_count)
     {
       ret =
-	gnutls_x509_crt_get_issuer_alt_name (cert, alt_name_count, data,
-					     &data_len, &critical);
+        gnutls_x509_crt_get_issuer_alt_name (cert, alt_name_count, data,
+                                             &data_len, &critical);
       if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-	break;
+        break;
 
       if (ret < 0)
-	fail ("get_issuer_alt_name: %d\n", ret);
+        fail ("get_issuer_alt_name: %d\n", ret);
 
       // TODO: print out / check results
       if (GNUTLS_SAN_URI == ret)
-	{
-	  if (strcmp (data, "http://ca.su.se") != 0)
-	    {
-	      fail ("unexpected issuer GNUTLS_SAN_URI: %s\n", data);
-	    }
-	}
+        {
+          if (strcmp (data, "http://ca.su.se") != 0)
+            {
+              fail ("unexpected issuer GNUTLS_SAN_URI: %s\n", data);
+            }
+        }
       else if (GNUTLS_SAN_RFC822NAME == ret)
-	{
-	  if (strcmp (data, "ca@su.se") != 0)
-	    {
-	      fail ("unexpected issuer GNUTLS_SAN_RFC822NAME: %s\n", data);
-	    }
-	}
+        {
+          if (strcmp (data, "ca@su.se") != 0)
+            {
+              fail ("unexpected issuer GNUTLS_SAN_RFC822NAME: %s\n", data);
+            }
+        }
       else
-	{
-	  fail ("unexpected alt name type: %d\n", ret);
-	}
+        {
+          fail ("unexpected alt name type: %d\n", ret);
+        }
       data_len = MAX_DATA_SIZE;
     }
 

@@ -44,13 +44,13 @@
  */
 
 int (*generate) (gnutls_pk_algorithm_t, unsigned int level /*bits */ ,
-		 gnutls_pk_params_st *);
+                 gnutls_pk_params_st *);
 
 static int
 _wrap_gcry_pk_encrypt (gnutls_pk_algorithm_t algo,
-		       gnutls_datum_t * ciphertext,
-		       const gnutls_datum_t * plaintext,
-		       const gnutls_pk_params_st * pk_params)
+                       gnutls_datum_t * ciphertext,
+                       const gnutls_datum_t * plaintext,
+                       const gnutls_pk_params_st * pk_params)
 {
   gcry_sexp_t s_ciph = NULL, s_data = NULL, s_pkey = NULL;
   int rc = -1;
@@ -69,9 +69,9 @@ _wrap_gcry_pk_encrypt (gnutls_pk_algorithm_t algo,
     {
     case GNUTLS_PK_RSA:
       if (pk_params->params_nr >= 2)
-	rc = gcry_sexp_build (&s_pkey, NULL,
-			      "(public-key(rsa(n%m)(e%m)))",
-			      pk_params->params[0], pk_params->params[1]);
+        rc = gcry_sexp_build (&s_pkey, NULL,
+                              "(public-key(rsa(n%m)(e%m)))",
+                              pk_params->params[0], pk_params->params[1]);
       break;
 
     default:
@@ -145,9 +145,9 @@ cleanup:
 
 static int
 _wrap_gcry_pk_decrypt (gnutls_pk_algorithm_t algo,
-		       gnutls_datum_t * plaintext,
-		       const gnutls_datum_t * ciphertext,
-		       const gnutls_pk_params_st * pk_params)
+                       gnutls_datum_t * plaintext,
+                       const gnutls_datum_t * ciphertext,
+                       const gnutls_pk_params_st * pk_params)
 {
   gcry_sexp_t s_plain = NULL, s_data = NULL, s_pkey = NULL;
   int rc = -1;
@@ -165,11 +165,11 @@ _wrap_gcry_pk_decrypt (gnutls_pk_algorithm_t algo,
     {
     case GNUTLS_PK_RSA:
       if (pk_params->params_nr >= 6)
-	rc = gcry_sexp_build (&s_pkey, NULL,
-			      "(private-key(rsa((n%m)(e%m)(d%m)(p%m)(q%m)(u%m))))",
-			      pk_params->params[0], pk_params->params[1],
-			      pk_params->params[2], pk_params->params[3],
-			      pk_params->params[4], pk_params->params[5]);
+        rc = gcry_sexp_build (&s_pkey, NULL,
+                              "(private-key(rsa((n%m)(e%m)(d%m)(p%m)(q%m)(u%m))))",
+                              pk_params->params[0], pk_params->params[1],
+                              pk_params->params[2], pk_params->params[3],
+                              pk_params->params[4], pk_params->params[5]);
       break;
 
     default:
@@ -238,8 +238,8 @@ cleanup:
  */
 static int
 _wrap_gcry_pk_sign (gnutls_pk_algorithm_t algo, gnutls_datum_t * signature,
-		    const gnutls_datum_t * vdata,
-		    const gnutls_pk_params_st * pk_params)
+                    const gnutls_datum_t * vdata,
+                    const gnutls_pk_params_st * pk_params)
 {
   gcry_sexp_t s_hash = NULL, s_key = NULL, s_sig = NULL;
   gcry_sexp_t list = NULL;
@@ -258,28 +258,28 @@ _wrap_gcry_pk_sign (gnutls_pk_algorithm_t algo, gnutls_datum_t * signature,
     {
     case GNUTLS_PK_DSA:
       if (pk_params->params_nr >= 5)
-	rc = gcry_sexp_build (&s_key, NULL,
-			      "(private-key(dsa(p%m)(q%m)(g%m)(y%m)(x%m)))",
-			      pk_params->params[0], pk_params->params[1],
-			      pk_params->params[2], pk_params->params[3],
-			      pk_params->params[4]);
+        rc = gcry_sexp_build (&s_key, NULL,
+                              "(private-key(dsa(p%m)(q%m)(g%m)(y%m)(x%m)))",
+                              pk_params->params[0], pk_params->params[1],
+                              pk_params->params[2], pk_params->params[3],
+                              pk_params->params[4]);
       else
-	{
-	  gnutls_assert ();
-	}
+        {
+          gnutls_assert ();
+        }
 
       break;
     case GNUTLS_PK_RSA:
       if (pk_params->params_nr >= 6)
-	rc = gcry_sexp_build (&s_key, NULL,
-			      "(private-key(rsa((n%m)(e%m)(d%m)(p%m)(q%m)(u%m))))",
-			      pk_params->params[0], pk_params->params[1],
-			      pk_params->params[2], pk_params->params[3],
-			      pk_params->params[4], pk_params->params[5]);
+        rc = gcry_sexp_build (&s_key, NULL,
+                              "(private-key(rsa((n%m)(e%m)(d%m)(p%m)(q%m)(u%m))))",
+                              pk_params->params[0], pk_params->params[1],
+                              pk_params->params[2], pk_params->params[3],
+                              pk_params->params[4], pk_params->params[5]);
       else
-	{
-	  gnutls_assert ();
-	}
+        {
+          gnutls_assert ();
+        }
       break;
 
     default:
@@ -319,56 +319,56 @@ _wrap_gcry_pk_sign (gnutls_pk_algorithm_t algo, gnutls_datum_t * signature,
     {
     case GNUTLS_PK_DSA:
       {
-	list = gcry_sexp_find_token (s_sig, "r", 0);
-	if (list == NULL)
-	  {
-	    gnutls_assert ();
-	    ret = GNUTLS_E_INTERNAL_ERROR;
-	    goto cleanup;
-	  }
+        list = gcry_sexp_find_token (s_sig, "r", 0);
+        if (list == NULL)
+          {
+            gnutls_assert ();
+            ret = GNUTLS_E_INTERNAL_ERROR;
+            goto cleanup;
+          }
 
-	res[0] = gcry_sexp_nth_mpi (list, 1, 0);
-	gcry_sexp_release (list);
+        res[0] = gcry_sexp_nth_mpi (list, 1, 0);
+        gcry_sexp_release (list);
 
-	list = gcry_sexp_find_token (s_sig, "s", 0);
-	if (list == NULL)
-	  {
-	    gnutls_assert ();
-	    ret = GNUTLS_E_INTERNAL_ERROR;
-	    goto cleanup;
-	  }
+        list = gcry_sexp_find_token (s_sig, "s", 0);
+        if (list == NULL)
+          {
+            gnutls_assert ();
+            ret = GNUTLS_E_INTERNAL_ERROR;
+            goto cleanup;
+          }
 
-	res[1] = gcry_sexp_nth_mpi (list, 1, 0);
-	gcry_sexp_release (list);
+        res[1] = gcry_sexp_nth_mpi (list, 1, 0);
+        gcry_sexp_release (list);
 
-	ret = _gnutls_encode_ber_rs (signature, res[0], res[1]);
-	if (ret < 0)
-	  {
-	    gnutls_assert ();
-	    goto cleanup;
-	  }
+        ret = _gnutls_encode_ber_rs (signature, res[0], res[1]);
+        if (ret < 0)
+          {
+            gnutls_assert ();
+            goto cleanup;
+          }
       }
       break;
 
     case GNUTLS_PK_RSA:
       {
-	list = gcry_sexp_find_token (s_sig, "s", 0);
-	if (list == NULL)
-	  {
-	    gnutls_assert ();
-	    ret = GNUTLS_E_INTERNAL_ERROR;
-	    goto cleanup;
-	  }
+        list = gcry_sexp_find_token (s_sig, "s", 0);
+        if (list == NULL)
+          {
+            gnutls_assert ();
+            ret = GNUTLS_E_INTERNAL_ERROR;
+            goto cleanup;
+          }
 
-	res[0] = gcry_sexp_nth_mpi (list, 1, 0);
-	gcry_sexp_release (list);
+        res[0] = gcry_sexp_nth_mpi (list, 1, 0);
+        gcry_sexp_release (list);
 
-	ret = _gnutls_mpi_dprint (res[0], signature);
-	if (ret < 0)
-	  {
-	    gnutls_assert ();
-	    goto cleanup;
-	  }
+        ret = _gnutls_mpi_dprint (res[0], signature);
+        if (ret < 0)
+          {
+            gnutls_assert ();
+            goto cleanup;
+          }
       }
       break;
 
@@ -398,9 +398,9 @@ cleanup:
 
 static int
 _wrap_gcry_pk_verify (gnutls_pk_algorithm_t algo,
-		      const gnutls_datum_t * vdata,
-		      const gnutls_datum_t * signature,
-		      const gnutls_pk_params_st * pk_params)
+                      const gnutls_datum_t * vdata,
+                      const gnutls_datum_t * signature,
+                      const gnutls_pk_params_st * pk_params)
 {
   gcry_sexp_t s_sig = NULL, s_hash = NULL, s_pkey = NULL;
   int rc = -1, ret;
@@ -418,16 +418,16 @@ _wrap_gcry_pk_verify (gnutls_pk_algorithm_t algo,
     {
     case GNUTLS_PK_DSA:
       if (pk_params->params_nr >= 4)
-	rc = gcry_sexp_build (&s_pkey, NULL,
-			      "(public-key(dsa(p%m)(q%m)(g%m)(y%m)))",
-			      pk_params->params[0], pk_params->params[1],
-			      pk_params->params[2], pk_params->params[3]);
+        rc = gcry_sexp_build (&s_pkey, NULL,
+                              "(public-key(dsa(p%m)(q%m)(g%m)(y%m)))",
+                              pk_params->params[0], pk_params->params[1],
+                              pk_params->params[2], pk_params->params[3]);
       break;
     case GNUTLS_PK_RSA:
       if (pk_params->params_nr >= 2)
-	rc = gcry_sexp_build (&s_pkey, NULL,
-			      "(public-key(rsa(n%m)(e%m)))",
-			      pk_params->params[0], pk_params->params[1]);
+        rc = gcry_sexp_build (&s_pkey, NULL,
+                              "(public-key(rsa(n%m)(e%m)))",
+                              pk_params->params[0], pk_params->params[1]);
       break;
 
     default:
@@ -456,12 +456,12 @@ _wrap_gcry_pk_verify (gnutls_pk_algorithm_t algo,
     case GNUTLS_PK_DSA:
       ret = _gnutls_decode_ber_rs (signature, &tmp[0], &tmp[1]);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto cleanup;
-	}
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
       rc = gcry_sexp_build (&s_sig, NULL,
-			    "(sig-val(dsa(r%m)(s%m)))", tmp[0], tmp[1]);
+                            "(sig-val(dsa(r%m)(s%m)))", tmp[0], tmp[1]);
       _gnutls_mpi_release (&tmp[0]);
       _gnutls_mpi_release (&tmp[1]);
       break;
@@ -469,10 +469,10 @@ _wrap_gcry_pk_verify (gnutls_pk_algorithm_t algo,
     case GNUTLS_PK_RSA:
       ret = _gnutls_mpi_scan_nz (&tmp[0], signature->data, signature->size);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto cleanup;
-	}
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
       rc = gcry_sexp_build (&s_sig, NULL, "(sig-val(rsa(s%m)))", tmp[0]);
       _gnutls_mpi_release (&tmp[0]);
       break;
@@ -763,8 +763,8 @@ cleanup:
 
 static int
 wrap_gcry_pk_generate_params (gnutls_pk_algorithm_t algo,
-			      unsigned int level /*bits */ ,
-			      gnutls_pk_params_st * params)
+                              unsigned int level /*bits */ ,
+                              gnutls_pk_params_st * params)
 {
 
   switch (algo)
@@ -773,19 +773,19 @@ wrap_gcry_pk_generate_params (gnutls_pk_algorithm_t algo,
     case GNUTLS_PK_DSA:
       params->params_nr = DSA_PRIVATE_PARAMS;
       if (params->params_nr > GNUTLS_MAX_PK_PARAMS)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
       return _dsa_generate_params (params->params, &params->params_nr, level);
 
     case GNUTLS_PK_RSA:
       params->params_nr = RSA_PRIVATE_PARAMS;
       if (params->params_nr > GNUTLS_MAX_PK_PARAMS)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
       return _rsa_generate_params (params->params, &params->params_nr, level);
 
     default:
@@ -797,8 +797,8 @@ wrap_gcry_pk_generate_params (gnutls_pk_algorithm_t algo,
 
 static int
 wrap_gcry_pk_fixup (gnutls_pk_algorithm_t algo,
-		    gnutls_direction_t direction,
-		    gnutls_pk_params_st * params)
+                    gnutls_direction_t direction,
+                    gnutls_pk_params_st * params)
 {
   int ret, result;
 
@@ -825,14 +825,14 @@ wrap_gcry_pk_fixup (gnutls_pk_algorithm_t algo,
       _gnutls_mpi_release (&params->params[7]);
       result = _gnutls_calc_rsa_exp (params->params, RSA_PRIVATE_PARAMS);
       if (result < 0)
-	{
-	  gnutls_assert ();
-	  return result;
-	}
+        {
+          gnutls_assert ();
+          return result;
+        }
 
       ret =
-	gcry_mpi_invm (params->params[5], params->params[3],
-		       params->params[4]);
+        gcry_mpi_invm (params->params[5], params->params[3],
+                       params->params[4]);
 
       params->params_nr = RSA_PRIVATE_PARAMS;
     }

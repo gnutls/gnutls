@@ -41,7 +41,7 @@ print_info (gnutls_session_t session)
 #ifdef ENABLE_SRP
     case GNUTLS_CRD_SRP:
       printf ("- SRP session with username %s\n",
-	      gnutls_srp_server_get_username (session));
+              gnutls_srp_server_get_username (session));
       break;
 #endif
 
@@ -49,37 +49,37 @@ print_info (gnutls_session_t session)
       /* This returns NULL in server side.
        */
       if (gnutls_psk_client_get_hint (session) != NULL)
-	printf ("- PSK authentication. PSK hint '%s'\n",
-		gnutls_psk_client_get_hint (session));
+        printf ("- PSK authentication. PSK hint '%s'\n",
+                gnutls_psk_client_get_hint (session));
       /* This returns NULL in client side.
        */
       if (gnutls_psk_server_get_username (session) != NULL)
-	printf ("- PSK authentication. Connected as '%s'\n",
-		gnutls_psk_server_get_username (session));
+        printf ("- PSK authentication. Connected as '%s'\n",
+                gnutls_psk_server_get_username (session));
       break;
 
-    case GNUTLS_CRD_ANON:	/* anonymous authentication */
+    case GNUTLS_CRD_ANON:      /* anonymous authentication */
 
       printf ("- Anonymous DH using prime of %d bits\n",
-	      gnutls_dh_get_prime_bits (session));
+              gnutls_dh_get_prime_bits (session));
       break;
 
-    case GNUTLS_CRD_CERTIFICATE:	/* certificate authentication */
+    case GNUTLS_CRD_CERTIFICATE:       /* certificate authentication */
 
       /* Check if we have been using ephemeral Diffie-Hellman.
        */
       if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS)
-	{
-	  printf ("\n- Ephemeral DH using prime of %d bits\n",
-		  gnutls_dh_get_prime_bits (session));
-	}
+        {
+          printf ("\n- Ephemeral DH using prime of %d bits\n",
+                  gnutls_dh_get_prime_bits (session));
+        }
 
       /* if the certificate list is available, then
        * print some information about it.
        */
       print_x509_certificate_info (session);
 
-    }				/* switch */
+    }                           /* switch */
 
   /* print the protocol's name (ie TLS 1.0) 
    */

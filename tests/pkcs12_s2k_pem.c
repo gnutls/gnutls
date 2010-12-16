@@ -273,19 +273,19 @@ main (void)
 
       ret = gnutls_x509_privkey_init (&key);
       if (ret < 0)
-	return 1;
+        return 1;
 
       tmp.data = (char *) keys[i].pkcs12key;
       tmp.size = strlen (tmp.data);
 
       ret = gnutls_x509_privkey_import_pkcs8 (key, &tmp,
-					      GNUTLS_X509_FMT_PEM,
-					      keys[i].password, 0);
+                                              GNUTLS_X509_FMT_PEM,
+                                              keys[i].password, 0);
       if (ret != keys[i].expected_result)
-	{
-	  printf ("fail[%d]: %d: %s\n", (int) i, ret, gnutls_strerror (ret));
-	  return 1;
-	}
+        {
+          printf ("fail[%d]: %d: %s\n", (int) i, ret, gnutls_strerror (ret));
+          return 1;
+        }
 
       gnutls_x509_privkey_deinit (key);
     }

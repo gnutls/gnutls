@@ -27,10 +27,10 @@
 #define GNUTLS_EXTENSIONS_H
 
 int _gnutls_parse_extensions (gnutls_session_t session,
-			      gnutls_ext_parse_type_t parse_type,
-			      const opaque * data, int data_size);
+                              gnutls_ext_parse_type_t parse_type,
+                              const opaque * data, int data_size);
 int _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
-			    size_t data_size, gnutls_ext_parse_type_t);
+                            size_t data_size, gnutls_ext_parse_type_t);
 int _gnutls_ext_init (void);
 void _gnutls_ext_deinit (void);
 
@@ -38,9 +38,9 @@ void _gnutls_extension_list_add (gnutls_session_t session, uint16_t type);
 
 typedef void (*gnutls_ext_deinit_data_func) (extension_priv_data_t data);
 typedef int (*gnutls_ext_pack_func) (extension_priv_data_t data,
-				     gnutls_buffer_st * packed_data);
+                                     gnutls_buffer_st * packed_data);
 typedef int (*gnutls_ext_unpack_func) (gnutls_buffer_st * packed_data,
-				       extension_priv_data_t * data);
+                                       extension_priv_data_t * data);
 
 void _gnutls_ext_free_session_data (gnutls_session_t session);
 
@@ -48,12 +48,12 @@ void _gnutls_ext_free_session_data (gnutls_session_t session);
  */
 void _gnutls_ext_unset_session_data (gnutls_session_t session, uint16_t type);
 void _gnutls_ext_set_session_data (gnutls_session_t session, uint16_t type,
-				   extension_priv_data_t);
+                                   extension_priv_data_t);
 int _gnutls_ext_get_session_data (gnutls_session_t session,
-				  uint16_t type, extension_priv_data_t *);
+                                  uint16_t type, extension_priv_data_t *);
 int _gnutls_ext_get_resumed_session_data (gnutls_session_t session,
-					  uint16_t type,
-					  extension_priv_data_t * data);
+                                          uint16_t type,
+                                          extension_priv_data_t * data);
 
 void _gnutls_ext_restore_resumed_session (gnutls_session_t session);
 
@@ -80,11 +80,11 @@ typedef struct
    */
   gnutls_ext_send_func send_func;
 
-  gnutls_ext_deinit_data_func deinit_func;	/* this will be called to deinitialize
-						 * internal data 
-						 */
-  gnutls_ext_pack_func pack_func;	/* packs internal data to machine independent format */
-  gnutls_ext_unpack_func unpack_func;	/* unpacks internal data */
+  gnutls_ext_deinit_data_func deinit_func;      /* this will be called to deinitialize
+                                                 * internal data 
+                                                 */
+  gnutls_ext_pack_func pack_func;       /* packs internal data to machine independent format */
+  gnutls_ext_unpack_func unpack_func;   /* unpacks internal data */
 
 } extension_entry_st;
 

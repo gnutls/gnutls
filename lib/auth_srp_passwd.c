@@ -56,7 +56,7 @@ pwd_put_values (SRP_PWD_ENTRY * entry, char *str)
   size_t verifier_size;
   int indx;
 
-  p = strrchr (str, ':');	/* we have index */
+  p = strrchr (str, ':');       /* we have index */
   if (p == NULL)
     {
       gnutls_assert ();
@@ -74,7 +74,7 @@ pwd_put_values (SRP_PWD_ENTRY * entry, char *str)
     }
 
   /* now go for salt */
-  p = strrchr (str, ':');	/* we have salt */
+  p = strrchr (str, ':');       /* we have salt */
   if (p == NULL)
     {
       gnutls_assert ();
@@ -95,7 +95,7 @@ pwd_put_values (SRP_PWD_ENTRY * entry, char *str)
     }
 
   /* now go for verifier */
-  p = strrchr (str, ':');	/* we have verifier */
+  p = strrchr (str, ':');       /* we have verifier */
   if (p == NULL)
     {
       _gnutls_free_datum (&entry->salt);
@@ -145,7 +145,7 @@ pwd_put_values2 (SRP_PWD_ENTRY * entry, char *str)
   opaque *tmp;
   int ret;
 
-  p = strrchr (str, ':');	/* we have g */
+  p = strrchr (str, ':');       /* we have g */
   if (p == NULL)
     {
       gnutls_assert ();
@@ -171,7 +171,7 @@ pwd_put_values2 (SRP_PWD_ENTRY * entry, char *str)
   entry->g.size = ret;
 
   /* now go for n - modulo */
-  p = strrchr (str, ':');	/* we have n */
+  p = strrchr (str, ':');       /* we have n */
   if (p == NULL)
     {
       _gnutls_free_datum (&entry->g);
@@ -210,7 +210,7 @@ pwd_read_conf (const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
   unsigned i, len;
   char indexstr[10];
 
-  sprintf (indexstr, "%d", idx);	/* Flawfinder: ignore */
+  sprintf (indexstr, "%d", idx);        /* Flawfinder: ignore */
 
   fd = fopen (pconf_file, "r");
   if (fd == NULL)
@@ -225,18 +225,18 @@ pwd_read_conf (const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
       /* move to first ':' */
       i = 0;
       while ((line[i] != ':') && (line[i] != '\0') && (i < sizeof (line)))
-	{
-	  i++;
-	}
+        {
+          i++;
+        }
       if (strncmp (indexstr, line, MAX (i, len)) == 0)
-	{
-	  if ((idx = pwd_put_values2 (entry, line)) >= 0)
-	    return 0;
-	  else
-	    {
-	      return GNUTLS_E_SRP_PWD_ERROR;
-	    }
-	}
+        {
+          if ((idx = pwd_put_values2 (entry, line)) >= 0)
+            return 0;
+          else
+            {
+              return GNUTLS_E_SRP_PWD_ERROR;
+            }
+        }
     }
   return GNUTLS_E_SRP_PWD_ERROR;
 
@@ -244,7 +244,7 @@ pwd_read_conf (const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
 
 int
 _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
-			    SRP_PWD_ENTRY ** _entry)
+                            SRP_PWD_ENTRY ** _entry)
 {
   gnutls_srp_server_credentials_t cred;
   FILE *fd;
@@ -277,34 +277,34 @@ _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
   if (cred->pwd_callback != NULL)
     {
       ret = cred->pwd_callback (state, username, &entry->salt,
-				&entry->v, &entry->g, &entry->n);
+                                &entry->v, &entry->g, &entry->n);
 
       if (ret == 1)
-	{			/* the user does not exist */
-	  if (entry->g.size != 0 && entry->n.size != 0)
-	    {
-	      ret = _randomize_pwd_entry (entry);
-	      if (ret < 0)
-		{
-		  gnutls_assert ();
-		  _gnutls_srp_entry_free (entry);
-		  return ret;
-		}
-	      return 0;
-	    }
-	  else
-	    {
-	      gnutls_assert ();
-	      ret = -1;		/* error in the callback */
-	    }
-	}
+        {                       /* the user does not exist */
+          if (entry->g.size != 0 && entry->n.size != 0)
+            {
+              ret = _randomize_pwd_entry (entry);
+              if (ret < 0)
+                {
+                  gnutls_assert ();
+                  _gnutls_srp_entry_free (entry);
+                  return ret;
+                }
+              return 0;
+            }
+          else
+            {
+              gnutls_assert ();
+              ret = -1;         /* error in the callback */
+            }
+        }
 
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  _gnutls_srp_entry_free (entry);
-	  return GNUTLS_E_SRP_PWD_ERROR;
-	}
+        {
+          gnutls_assert ();
+          _gnutls_srp_entry_free (entry);
+          return GNUTLS_E_SRP_PWD_ERROR;
+        }
 
       return 0;
     }
@@ -328,7 +328,7 @@ _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
       return GNUTLS_E_SRP_PWD_ERROR;
     }
 
-  last_idx = 1;			/* a default value */
+  last_idx = 1;                 /* a default value */
 
   len = strlen (username);
   while (fgets (line, sizeof (line), fd) != NULL)
@@ -336,37 +336,37 @@ _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
       /* move to first ':' */
       i = 0;
       while ((line[i] != ':') && (line[i] != '\0') && (i < sizeof (line)))
-	{
-	  i++;
-	}
+        {
+          i++;
+        }
 
       if (strncmp (username, line, MAX (i, len)) == 0)
-	{
-	  if ((idx = pwd_put_values (entry, line)) >= 0)
-	    {
-	      /* Keep the last index in memory, so we can retrieve fake parameters (g,n)
-	       * when the user does not exist.
-	       */
-	      /* XXX: last_idx will not be read as both if block branches return. */
-	      last_idx = idx;
-	      if (pwd_read_conf (cred->password_conf_file, entry, idx) == 0)
-		{
-		  return 0;
-		}
-	      else
-		{
-		  gnutls_assert ();
-		  _gnutls_srp_entry_free (entry);
-		  return GNUTLS_E_SRP_PWD_ERROR;
-		}
-	    }
-	  else
-	    {
-	      gnutls_assert ();
-	      _gnutls_srp_entry_free (entry);
-	      return GNUTLS_E_SRP_PWD_ERROR;
-	    }
-	}
+        {
+          if ((idx = pwd_put_values (entry, line)) >= 0)
+            {
+              /* Keep the last index in memory, so we can retrieve fake parameters (g,n)
+               * when the user does not exist.
+               */
+              /* XXX: last_idx will not be read as both if block branches return. */
+              last_idx = idx;
+              if (pwd_read_conf (cred->password_conf_file, entry, idx) == 0)
+                {
+                  return 0;
+                }
+              else
+                {
+                  gnutls_assert ();
+                  _gnutls_srp_entry_free (entry);
+                  return GNUTLS_E_SRP_PWD_ERROR;
+                }
+            }
+          else
+            {
+              gnutls_assert ();
+              _gnutls_srp_entry_free (entry);
+              return GNUTLS_E_SRP_PWD_ERROR;
+            }
+        }
     }
 
   /* user was not found. Fake him. Actually read the g,n values from
@@ -376,11 +376,11 @@ _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
     {
       ret = _randomize_pwd_entry (entry);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  _gnutls_srp_entry_free (entry);
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          _gnutls_srp_entry_free (entry);
+          return ret;
+        }
 
       return 0;
     }

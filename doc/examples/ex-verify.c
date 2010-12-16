@@ -22,12 +22,12 @@ gnutls_x509_crt_t *ca_list;
 int ca_list_size;
 
 static void verify_cert2 (gnutls_x509_crt_t crt,
-			  gnutls_x509_crt_t issuer,
-			  gnutls_x509_crl_t * crl_list, int crl_list_size);
+                          gnutls_x509_crt_t issuer,
+                          gnutls_x509_crl_t * crl_list, int crl_list_size);
 static void verify_last_cert (gnutls_x509_crt_t crt,
-			      gnutls_x509_crt_t * ca_list, int ca_list_size,
-			      gnutls_x509_crl_t * crl_list,
-			      int crl_list_size);
+                              gnutls_x509_crt_t * ca_list, int ca_list_size,
+                              gnutls_x509_crl_t * crl_list,
+                              int crl_list_size);
 
 
 /* This function will try to verify the peer's certificate chain, and
@@ -35,9 +35,9 @@ static void verify_last_cert (gnutls_x509_crt_t crt,
  */
 void
 verify_certificate_chain (gnutls_session_t session,
-			  const char *hostname,
-			  const gnutls_datum_t * cert_chain,
-			  int cert_chain_length)
+                          const char *hostname,
+                          const gnutls_datum_t * cert_chain,
+                          int cert_chain_length)
 {
   int i;
   gnutls_x509_crt_t *cert;
@@ -58,7 +58,7 @@ verify_certificate_chain (gnutls_session_t session,
    * list.
    */
   if (gnutls_x509_crt_check_issuer (cert[cert_chain_length - 1],
-				    cert[cert_chain_length - 1]) > 0
+                                    cert[cert_chain_length - 1]) > 0
       && cert_chain_length > 0)
     {
       cert_chain_length--;
@@ -76,14 +76,14 @@ verify_certificate_chain (gnutls_session_t session,
    * our trusted CA list.
    */
   verify_last_cert (cert[cert_chain_length - 1],
-		    ca_list, ca_list_size, crl_list, crl_list_size);
+                    ca_list, ca_list_size, crl_list, crl_list_size);
 
   /* Check if the name in the first certificate matches our destination!
    */
   if (!gnutls_x509_crt_check_hostname (cert[0], hostname))
     {
       printf ("The certificate's owner does not match hostname '%s'\n",
-	      hostname);
+              hostname);
     }
 
   for (i = 0; i < cert_chain_length; i++)
@@ -99,7 +99,7 @@ verify_certificate_chain (gnutls_session_t session,
  */
 static void
 verify_cert2 (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
-	      gnutls_x509_crl_t * crl_list, int crl_list_size)
+              gnutls_x509_crl_t * crl_list, int crl_list_size)
 {
   unsigned int output;
   int ret;
@@ -135,13 +135,13 @@ verify_cert2 (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
       fprintf (stderr, "Not trusted");
 
       if (output & GNUTLS_CERT_SIGNER_NOT_FOUND)
-	fprintf (stderr, ": no issuer was found");
+        fprintf (stderr, ": no issuer was found");
       if (output & GNUTLS_CERT_SIGNER_NOT_CA)
-	fprintf (stderr, ": issuer is not a CA");
+        fprintf (stderr, ": issuer is not a CA");
       if (output & GNUTLS_CERT_NOT_ACTIVATED)
-	fprintf (stderr, ": not yet activated\n");
+        fprintf (stderr, ": not yet activated\n");
       if (output & GNUTLS_CERT_EXPIRED)
-	fprintf (stderr, ": expired\n");
+        fprintf (stderr, ": expired\n");
 
       fprintf (stderr, "\n");
     }
@@ -152,7 +152,7 @@ verify_cert2 (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
    */
   ret = gnutls_x509_crt_check_revocation (crt, crl_list, crl_list_size);
   if (ret == 1)
-    {				/* revoked */
+    {                           /* revoked */
       fprintf (stderr, "Revoked\n");
     }
 }
@@ -163,8 +163,8 @@ verify_cert2 (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
  */
 static void
 verify_last_cert (gnutls_x509_crt_t crt,
-		  gnutls_x509_crt_t * ca_list, int ca_list_size,
-		  gnutls_x509_crl_t * crl_list, int crl_list_size)
+                  gnutls_x509_crt_t * ca_list, int ca_list_size,
+                  gnutls_x509_crl_t * crl_list, int crl_list_size)
 {
   unsigned int output;
   int ret;
@@ -187,18 +187,18 @@ verify_last_cert (gnutls_x509_crt_t crt,
   /* Do the actual verification.
    */
   gnutls_x509_crt_verify (crt, ca_list, ca_list_size,
-			  GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT, &output);
+                          GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT, &output);
 
   if (output & GNUTLS_CERT_INVALID)
     {
       fprintf (stderr, "Not trusted");
 
       if (output & GNUTLS_CERT_SIGNER_NOT_CA)
-	fprintf (stderr, ": Issuer is not a CA\n");
+        fprintf (stderr, ": Issuer is not a CA\n");
       if (output & GNUTLS_CERT_NOT_ACTIVATED)
-	fprintf (stderr, ": Not yet activated\n");
+        fprintf (stderr, ": Not yet activated\n");
       if (output & GNUTLS_CERT_EXPIRED)
-	fprintf (stderr, ": Expired\n");
+        fprintf (stderr, ": Expired\n");
       fprintf (stderr, "\n");
     }
   else
@@ -209,7 +209,7 @@ verify_last_cert (gnutls_x509_crt_t crt,
    */
   ret = gnutls_x509_crt_check_revocation (crt, crl_list, crl_list_size);
   if (ret == 1)
-    {				/* revoked */
+    {                           /* revoked */
       fprintf (stderr, "Revoked\n");
     }
 }

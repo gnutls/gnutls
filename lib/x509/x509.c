@@ -54,7 +54,7 @@ gnutls_x509_crt_init (gnutls_x509_crt_t * cert)
     return GNUTLS_E_MEMORY_ERROR;
 
   result = asn1_create_element (_gnutls_get_pkix (),
-				"PKIX1.Certificate", &tmp->cert);
+                                "PKIX1.Certificate", &tmp->cert);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -67,7 +67,7 @@ gnutls_x509_crt_init (gnutls_x509_crt_t * cert)
 
   *cert = tmp;
 
-  return 0;			/* success */
+  return 0;                     /* success */
 }
 
 /*-
@@ -162,8 +162,8 @@ gnutls_x509_crt_deinit (gnutls_x509_crt_t cert)
  **/
 int
 gnutls_x509_crt_import (gnutls_x509_crt_t cert,
-			const gnutls_datum_t * data,
-			gnutls_x509_crt_fmt_t format)
+                        const gnutls_datum_t * data,
+                        gnutls_x509_crt_fmt_t format)
 {
   int result = 0, need_free = 0;
   gnutls_datum_t _data;
@@ -185,23 +185,23 @@ gnutls_x509_crt_import (gnutls_x509_crt_t cert,
 
       /* Try the first header */
       result =
-	_gnutls_fbase64_decode (PEM_X509_CERT2, data->data, data->size, &out);
+        _gnutls_fbase64_decode (PEM_X509_CERT2, data->data, data->size, &out);
 
       if (result <= 0)
-	{
-	  /* try for the second header */
-	  result =
-	    _gnutls_fbase64_decode (PEM_X509_CERT, data->data,
-				    data->size, &out);
+        {
+          /* try for the second header */
+          result =
+            _gnutls_fbase64_decode (PEM_X509_CERT, data->data,
+                                    data->size, &out);
 
-	  if (result <= 0)
-	    {
-	      if (result == 0)
-		result = GNUTLS_E_INTERNAL_ERROR;
-	      gnutls_assert ();
-	      return result;
-	    }
-	}
+          if (result <= 0)
+            {
+              if (result == 0)
+                result = GNUTLS_E_INTERNAL_ERROR;
+              gnutls_assert ();
+              return result;
+            }
+        }
 
       _data.data = out;
       _data.size = result;
@@ -217,13 +217,13 @@ gnutls_x509_crt_import (gnutls_x509_crt_t cert,
       asn1_delete_structure (&cert->cert);
 
       result = asn1_create_element (_gnutls_get_pkix (),
-				    "PKIX1.Certificate", &cert->cert);
+                                    "PKIX1.Certificate", &cert->cert);
       if (result != ASN1_SUCCESS)
-	{
-	  result = _gnutls_asn2err (result);
-	  gnutls_assert ();
-	  goto cleanup;
-	}
+        {
+          result = _gnutls_asn2err (result);
+          gnutls_assert ();
+          goto cleanup;
+        }
     }
 
   result = asn1_der_decoding (&cert->cert, _data.data, _data.size, NULL);
@@ -268,7 +268,7 @@ cleanup:
  **/
 int
 gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert, char *buf,
-			       size_t * sizeof_buf)
+                               size_t * sizeof_buf)
 {
   if (cert == NULL)
     {
@@ -277,8 +277,8 @@ gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert, char *buf,
     }
 
   return _gnutls_x509_parse_dn (cert->cert,
-				"tbsCertificate.issuer.rdnSequence", buf,
-				sizeof_buf);
+                                "tbsCertificate.issuer.rdnSequence", buf,
+                                sizeof_buf);
 }
 
 /**
@@ -309,9 +309,9 @@ gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert, char *buf,
  **/
 int
 gnutls_x509_crt_get_issuer_dn_by_oid (gnutls_x509_crt_t cert,
-				      const char *oid, int indx,
-				      unsigned int raw_flag, void *buf,
-				      size_t * sizeof_buf)
+                                      const char *oid, int indx,
+                                      unsigned int raw_flag, void *buf,
+                                      size_t * sizeof_buf)
 {
   if (cert == NULL)
     {
@@ -320,8 +320,8 @@ gnutls_x509_crt_get_issuer_dn_by_oid (gnutls_x509_crt_t cert,
     }
 
   return _gnutls_x509_parse_dn_oid (cert->cert,
-				    "tbsCertificate.issuer.rdnSequence",
-				    oid, indx, raw_flag, buf, sizeof_buf);
+                                    "tbsCertificate.issuer.rdnSequence",
+                                    oid, indx, raw_flag, buf, sizeof_buf);
 }
 
 /**
@@ -342,7 +342,7 @@ gnutls_x509_crt_get_issuer_dn_by_oid (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_issuer_dn_oid (gnutls_x509_crt_t cert,
-				   int indx, void *oid, size_t * sizeof_oid)
+                                   int indx, void *oid, size_t * sizeof_oid)
 {
   if (cert == NULL)
     {
@@ -351,8 +351,8 @@ gnutls_x509_crt_get_issuer_dn_oid (gnutls_x509_crt_t cert,
     }
 
   return _gnutls_x509_get_dn_oid (cert->cert,
-				  "tbsCertificate.issuer.rdnSequence",
-				  indx, oid, sizeof_oid);
+                                  "tbsCertificate.issuer.rdnSequence",
+                                  indx, oid, sizeof_oid);
 }
 
 /**
@@ -374,7 +374,7 @@ gnutls_x509_crt_get_issuer_dn_oid (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_dn (gnutls_x509_crt_t cert, char *buf,
-			size_t * sizeof_buf)
+                        size_t * sizeof_buf)
 {
   if (cert == NULL)
     {
@@ -383,8 +383,8 @@ gnutls_x509_crt_get_dn (gnutls_x509_crt_t cert, char *buf,
     }
 
   return _gnutls_x509_parse_dn (cert->cert,
-				"tbsCertificate.subject.rdnSequence", buf,
-				sizeof_buf);
+                                "tbsCertificate.subject.rdnSequence", buf,
+                                sizeof_buf);
 }
 
 /**
@@ -415,8 +415,8 @@ gnutls_x509_crt_get_dn (gnutls_x509_crt_t cert, char *buf,
  **/
 int
 gnutls_x509_crt_get_dn_by_oid (gnutls_x509_crt_t cert, const char *oid,
-			       int indx, unsigned int raw_flag,
-			       void *buf, size_t * sizeof_buf)
+                               int indx, unsigned int raw_flag,
+                               void *buf, size_t * sizeof_buf)
 {
   if (cert == NULL)
     {
@@ -425,8 +425,8 @@ gnutls_x509_crt_get_dn_by_oid (gnutls_x509_crt_t cert, const char *oid,
     }
 
   return _gnutls_x509_parse_dn_oid (cert->cert,
-				    "tbsCertificate.subject.rdnSequence",
-				    oid, indx, raw_flag, buf, sizeof_buf);
+                                    "tbsCertificate.subject.rdnSequence",
+                                    oid, indx, raw_flag, buf, sizeof_buf);
 }
 
 /**
@@ -447,7 +447,7 @@ gnutls_x509_crt_get_dn_by_oid (gnutls_x509_crt_t cert, const char *oid,
  **/
 int
 gnutls_x509_crt_get_dn_oid (gnutls_x509_crt_t cert,
-			    int indx, void *oid, size_t * sizeof_oid)
+                            int indx, void *oid, size_t * sizeof_oid)
 {
   if (cert == NULL)
     {
@@ -456,8 +456,8 @@ gnutls_x509_crt_get_dn_oid (gnutls_x509_crt_t cert,
     }
 
   return _gnutls_x509_get_dn_oid (cert->cert,
-				  "tbsCertificate.subject.rdnSequence",
-				  indx, oid, sizeof_oid);
+                                  "tbsCertificate.subject.rdnSequence",
+                                  indx, oid, sizeof_oid);
 }
 
 /**
@@ -488,7 +488,7 @@ gnutls_x509_crt_get_signature_algorithm (gnutls_x509_crt_t cert)
    */
   result =
     _gnutls_x509_read_value (cert->cert, "signatureAlgorithm.algorithm",
-			     &sa, 0);
+                             &sa, 0);
 
   if (result < 0)
     {
@@ -516,7 +516,7 @@ gnutls_x509_crt_get_signature_algorithm (gnutls_x509_crt_t cert)
  **/
 int
 gnutls_x509_crt_get_signature (gnutls_x509_crt_t cert,
-			       char *sig, size_t * sizeof_sig)
+                               char *sig, size_t * sizeof_sig)
 {
   int result;
   int bits, len;
@@ -582,11 +582,11 @@ gnutls_x509_crt_get_version (gnutls_x509_crt_t cert)
   len = sizeof (version);
   if ((result =
        asn1_read_value (cert->cert, "tbsCertificate.version", version,
-			&len)) != ASN1_SUCCESS)
+                        &len)) != ASN1_SUCCESS)
     {
 
       if (result == ASN1_ELEMENT_NOT_FOUND)
-	return 1;		/* the DEFAULT version */
+        return 1;               /* the DEFAULT version */
       gnutls_assert ();
       return _gnutls_asn2err (result);
     }
@@ -613,7 +613,7 @@ gnutls_x509_crt_get_activation_time (gnutls_x509_crt_t cert)
     }
 
   return _gnutls_x509_get_time (cert->cert,
-				"tbsCertificate.validity.notBefore");
+                                "tbsCertificate.validity.notBefore");
 }
 
 /**
@@ -635,7 +635,7 @@ gnutls_x509_crt_get_expiration_time (gnutls_x509_crt_t cert)
     }
 
   return _gnutls_x509_get_time (cert->cert,
-				"tbsCertificate.validity.notAfter");
+                                "tbsCertificate.validity.notAfter");
 }
 
 /**
@@ -654,7 +654,7 @@ gnutls_x509_crt_get_expiration_time (gnutls_x509_crt_t cert)
  **/
 int
 gnutls_x509_crt_get_serial (gnutls_x509_crt_t cert, void *result,
-			    size_t * result_size)
+                            size_t * result_size)
 {
   int ret, len;
 
@@ -694,7 +694,7 @@ gnutls_x509_crt_get_serial (gnutls_x509_crt_t cert, void *result,
  **/
 int
 gnutls_x509_crt_get_subject_key_id (gnutls_x509_crt_t cert, void *ret,
-				    size_t * ret_size, unsigned int *critical)
+                                    size_t * ret_size, unsigned int *critical)
 {
   int result, len;
   gnutls_datum_t id;
@@ -714,7 +714,7 @@ gnutls_x509_crt_get_subject_key_id (gnutls_x509_crt_t cert, void *ret,
 
   if ((result =
        _gnutls_x509_crt_get_extension (cert, "2.5.29.14", 0, &id,
-				       critical)) < 0)
+                                       critical)) < 0)
     {
       return result;
     }
@@ -758,7 +758,7 @@ gnutls_x509_crt_get_subject_key_id (gnutls_x509_crt_t cert, void *ret,
   if (result != ASN1_SUCCESS)
     {
       if (result != ASN1_MEM_ERROR)
-	gnutls_assert ();
+        gnutls_assert ();
       return _gnutls_asn2err (result);
     }
 
@@ -782,8 +782,8 @@ gnutls_x509_crt_get_subject_key_id (gnutls_x509_crt_t cert, void *ret,
  **/
 int
 gnutls_x509_crt_get_authority_key_id (gnutls_x509_crt_t cert, void *ret,
-				      size_t * ret_size,
-				      unsigned int *critical)
+                                      size_t * ret_size,
+                                      unsigned int *critical)
 {
   int result, len;
   gnutls_datum_t id;
@@ -803,7 +803,7 @@ gnutls_x509_crt_get_authority_key_id (gnutls_x509_crt_t cert, void *ret,
 
   if ((result =
        _gnutls_x509_crt_get_extension (cert, "2.5.29.35", 0, &id,
-				       critical)) < 0)
+                                       critical)) < 0)
     {
       return result;
     }
@@ -847,7 +847,7 @@ gnutls_x509_crt_get_authority_key_id (gnutls_x509_crt_t cert, void *ret,
   if (result != ASN1_SUCCESS)
     {
       if (result != ASN1_MEM_ERROR)
-	gnutls_assert ();
+        gnutls_assert ();
       return _gnutls_asn2err (result);
     }
 
@@ -883,8 +883,8 @@ gnutls_x509_crt_get_pk_algorithm (gnutls_x509_crt_t cert, unsigned int *bits)
 
   result =
     _gnutls_x509_get_pk_algorithm (cert->cert,
-				   "tbsCertificate.subjectPublicKeyInfo",
-				   bits);
+                                   "tbsCertificate.subjectPublicKeyInfo",
+                                   bits);
 
   if (result < 0)
     {
@@ -913,8 +913,8 @@ is_type_printable (int type)
  */
 int
 _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
-			    int seq, void *name, size_t * name_size,
-			    unsigned int *ret_type, int othername_oid)
+                            int seq, void *name, size_t * name_size,
+                            unsigned int *ret_type, int othername_oid)
 {
   unsigned int len;
   char nptr[ASN1_MAX_NAME_SIZE];
@@ -922,7 +922,7 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
   opaque choice_type[128];
   gnutls_x509_subject_alt_name_t type;
 
-  seq++;			/* 0->1, 1->2 etc */
+  seq++;                        /* 0->1, 1->2 etc */
 
   if (src_name[0] != 0)
     snprintf (nptr, sizeof (nptr), "%s.?%u", src_name, seq);
@@ -957,100 +957,100 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
   if (type == GNUTLS_SAN_OTHERNAME)
     {
       if (othername_oid)
-	_gnutls_str_cat (nptr, sizeof (nptr), ".otherName.type-id");
+        _gnutls_str_cat (nptr, sizeof (nptr), ".otherName.type-id");
       else
-	_gnutls_str_cat (nptr, sizeof (nptr), ".otherName.value");
+        _gnutls_str_cat (nptr, sizeof (nptr), ".otherName.value");
 
       len = *name_size;
       result = asn1_read_value (src, nptr, name, &len);
       *name_size = len;
 
       if (result == ASN1_MEM_ERROR)
-	return GNUTLS_E_SHORT_MEMORY_BUFFER;
+        return GNUTLS_E_SHORT_MEMORY_BUFFER;
 
       if (result != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  return _gnutls_asn2err (result);
-	}
+        {
+          gnutls_assert ();
+          return _gnutls_asn2err (result);
+        }
 
       if (othername_oid)
-	{
-	  if (len > strlen (XMPP_OID) && strcmp (name, XMPP_OID) == 0)
-	    type = GNUTLS_SAN_OTHERNAME_XMPP;
-	}
+        {
+          if (len > strlen (XMPP_OID) && strcmp (name, XMPP_OID) == 0)
+            type = GNUTLS_SAN_OTHERNAME_XMPP;
+        }
       else
-	{
-	  char oid[42];
+        {
+          char oid[42];
 
-	  if (src_name[0] != 0)
-	    snprintf (nptr, sizeof (nptr), "%s.?%u.otherName.type-id",
-		      src_name, seq);
-	  else
-	    snprintf (nptr, sizeof (nptr), "?%u.otherName.type-id", seq);
+          if (src_name[0] != 0)
+            snprintf (nptr, sizeof (nptr), "%s.?%u.otherName.type-id",
+                      src_name, seq);
+          else
+            snprintf (nptr, sizeof (nptr), "?%u.otherName.type-id", seq);
 
-	  len = sizeof (oid);
-	  result = asn1_read_value (src, nptr, oid, &len);
-	  if (result != ASN1_SUCCESS)
-	    {
-	      gnutls_assert ();
-	      return _gnutls_asn2err (result);
-	    }
+          len = sizeof (oid);
+          result = asn1_read_value (src, nptr, oid, &len);
+          if (result != ASN1_SUCCESS)
+            {
+              gnutls_assert ();
+              return _gnutls_asn2err (result);
+            }
 
-	  if (len > strlen (XMPP_OID) && strcmp (oid, XMPP_OID) == 0)
-	    {
-	      ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-	      size_t orig_name_size = *name_size;
+          if (len > strlen (XMPP_OID) && strcmp (oid, XMPP_OID) == 0)
+            {
+              ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+              size_t orig_name_size = *name_size;
 
-	      result = asn1_create_element
-		(_gnutls_get_pkix (), "PKIX1.XmppAddr", &c2);
-	      if (result != ASN1_SUCCESS)
-		{
-		  gnutls_assert ();
-		  return _gnutls_asn2err (result);
-		}
+              result = asn1_create_element
+                (_gnutls_get_pkix (), "PKIX1.XmppAddr", &c2);
+              if (result != ASN1_SUCCESS)
+                {
+                  gnutls_assert ();
+                  return _gnutls_asn2err (result);
+                }
 
-	      result = asn1_der_decoding (&c2, name, *name_size, NULL);
-	      if (result != ASN1_SUCCESS)
-		{
-		  gnutls_assert ();
-		  asn1_delete_structure (&c2);
-		  return _gnutls_asn2err (result);
-		}
+              result = asn1_der_decoding (&c2, name, *name_size, NULL);
+              if (result != ASN1_SUCCESS)
+                {
+                  gnutls_assert ();
+                  asn1_delete_structure (&c2);
+                  return _gnutls_asn2err (result);
+                }
 
-	      len = *name_size;
-	      result = asn1_read_value (c2, "", name, &len);
-	      if (result != ASN1_SUCCESS)
-		{
-		  gnutls_assert ();
-		  asn1_delete_structure (&c2);
-		  *name_size = len + 1;
-		  return _gnutls_asn2err (result);
-		}
-	      asn1_delete_structure (&c2);
+              len = *name_size;
+              result = asn1_read_value (c2, "", name, &len);
+              if (result != ASN1_SUCCESS)
+                {
+                  gnutls_assert ();
+                  asn1_delete_structure (&c2);
+                  *name_size = len + 1;
+                  return _gnutls_asn2err (result);
+                }
+              asn1_delete_structure (&c2);
 
-	      if (len + 1 > orig_name_size)
-		{
-		  gnutls_assert ();
-		  *name_size = len + 1;
-		  return GNUTLS_E_SHORT_MEMORY_BUFFER;
-		}
+              if (len + 1 > orig_name_size)
+                {
+                  gnutls_assert ();
+                  *name_size = len + 1;
+                  return GNUTLS_E_SHORT_MEMORY_BUFFER;
+                }
 
-	      *name_size = len;
-	      /* null terminate it */
-	      ((char *) name)[*name_size] = 0;
-	    }
-	}
+              *name_size = len;
+              /* null terminate it */
+              ((char *) name)[*name_size] = 0;
+            }
+        }
     }
   else if (type == GNUTLS_SAN_DN)
     {
       _gnutls_str_cat (nptr, sizeof (nptr), ".directoryName");
       result = _gnutls_x509_parse_dn (src, nptr, name, name_size);
       if (result < 0)
-	{
-	  gnutls_assert ();
-	  return result;
-	}
+        {
+          gnutls_assert ();
+          return result;
+        }
     }
   else if (othername_oid)
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
@@ -1066,31 +1066,31 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
       *name_size = len;
 
       if (result == ASN1_MEM_ERROR)
-	{
-	  if (is_type_printable (type))
-	    (*name_size)++;
-	  return GNUTLS_E_SHORT_MEMORY_BUFFER;
-	}
+        {
+          if (is_type_printable (type))
+            (*name_size)++;
+          return GNUTLS_E_SHORT_MEMORY_BUFFER;
+        }
 
       if (result != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  return _gnutls_asn2err (result);
-	}
+        {
+          gnutls_assert ();
+          return _gnutls_asn2err (result);
+        }
 
       if (is_type_printable (type))
-	{
+        {
 
-	  if (len + 1 > orig_name_size)
-	    {
-	      gnutls_assert ();
-	      (*name_size)++;
-	      return GNUTLS_E_SHORT_MEMORY_BUFFER;
-	    }
+          if (len + 1 > orig_name_size)
+            {
+              gnutls_assert ();
+              (*name_size)++;
+              return GNUTLS_E_SHORT_MEMORY_BUFFER;
+            }
 
-	  /* null terminate it */
-	  ((char *) name)[*name_size] = 0;
-	}
+          /* null terminate it */
+          ((char *) name)[*name_size] = 0;
+        }
 
     }
 
@@ -1099,9 +1099,9 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
 
 static int
 get_alt_name (gnutls_x509_crt_t cert, const char *extension_id,
-	      unsigned int seq, void *ret,
-	      size_t * ret_size, unsigned int *ret_type,
-	      unsigned int *critical, int othername_oid)
+              unsigned int seq, void *ret,
+              size_t * ret_size, unsigned int *ret_type,
+              unsigned int *critical, int othername_oid)
 {
   int result;
   gnutls_datum_t dnsname;
@@ -1121,7 +1121,7 @@ get_alt_name (gnutls_x509_crt_t cert, const char *extension_id,
 
   if ((result =
        _gnutls_x509_crt_get_extension (cert, extension_id, 0, &dnsname,
-				       critical)) < 0)
+                                       critical)) < 0)
     {
       return result;
     }
@@ -1134,10 +1134,10 @@ get_alt_name (gnutls_x509_crt_t cert, const char *extension_id,
 
   if (strcmp ("2.5.29.17", extension_id) == 0)
     result = asn1_create_element (_gnutls_get_pkix (),
-				  "PKIX1.SubjectAltName", &c2);
+                                  "PKIX1.SubjectAltName", &c2);
   else if (strcmp ("2.5.29.18", extension_id) == 0)
     result = asn1_create_element (_gnutls_get_pkix (),
-				  "PKIX1.IssuerAltName", &c2);
+                                  "PKIX1.IssuerAltName", &c2);
   else
     {
       gnutls_assert ();
@@ -1163,7 +1163,7 @@ get_alt_name (gnutls_x509_crt_t cert, const char *extension_id,
 
   result =
     _gnutls_parse_general_name (c2, "", seq, ret, ret_size, ret_type,
-				othername_oid);
+                                othername_oid);
 
   asn1_delete_structure (&c2);
 
@@ -1210,12 +1210,12 @@ get_alt_name (gnutls_x509_crt_t cert, const char *extension_id,
  **/
 int
 gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
-				      unsigned int seq, void *ret,
-				      size_t * ret_size,
-				      unsigned int *critical)
+                                      unsigned int seq, void *ret,
+                                      size_t * ret_size,
+                                      unsigned int *critical)
 {
   return get_alt_name (cert, "2.5.29.17", seq, ret, ret_size, NULL, critical,
-		       0);
+                       0);
 }
 
 /**
@@ -1253,12 +1253,12 @@ gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_issuer_alt_name (gnutls_x509_crt_t cert,
-				     unsigned int seq, void *ret,
-				     size_t * ret_size,
-				     unsigned int *critical)
+                                     unsigned int seq, void *ret,
+                                     size_t * ret_size,
+                                     unsigned int *critical)
 {
   return get_alt_name (cert, "2.5.29.18", seq, ret, ret_size, NULL, critical,
-		       0);
+                       0);
 }
 
 /**
@@ -1287,13 +1287,13 @@ gnutls_x509_crt_get_issuer_alt_name (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_subject_alt_name2 (gnutls_x509_crt_t cert,
-				       unsigned int seq, void *ret,
-				       size_t * ret_size,
-				       unsigned int *ret_type,
-				       unsigned int *critical)
+                                       unsigned int seq, void *ret,
+                                       size_t * ret_size,
+                                       unsigned int *ret_type,
+                                       unsigned int *critical)
 {
   return get_alt_name (cert, "2.5.29.17", seq, ret, ret_size, ret_type,
-		       critical, 0);
+                       critical, 0);
 }
 
 /**
@@ -1325,13 +1325,13 @@ gnutls_x509_crt_get_subject_alt_name2 (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_issuer_alt_name2 (gnutls_x509_crt_t cert,
-				      unsigned int seq, void *ret,
-				      size_t * ret_size,
-				      unsigned int *ret_type,
-				      unsigned int *critical)
+                                      unsigned int seq, void *ret,
+                                      size_t * ret_size,
+                                      unsigned int *ret_type,
+                                      unsigned int *critical)
 {
   return get_alt_name (cert, "2.5.29.18", seq, ret, ret_size, ret_type,
-		       critical, 0);
+                       critical, 0);
 }
 
 /**
@@ -1362,8 +1362,8 @@ gnutls_x509_crt_get_issuer_alt_name2 (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_subject_alt_othername_oid (gnutls_x509_crt_t cert,
-					       unsigned int seq,
-					       void *ret, size_t * ret_size)
+                                               unsigned int seq,
+                                               void *ret, size_t * ret_size)
 {
   return get_alt_name (cert, "2.5.29.17", seq, ret, ret_size, NULL, NULL, 1);
 }
@@ -1398,8 +1398,8 @@ gnutls_x509_crt_get_subject_alt_othername_oid (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_issuer_alt_othername_oid (gnutls_x509_crt_t cert,
-					      unsigned int seq,
-					      void *ret, size_t * ret_size)
+                                              unsigned int seq,
+                                              void *ret, size_t * ret_size)
 {
   return get_alt_name (cert, "2.5.29.18", seq, ret, ret_size, NULL, NULL, 1);
 }
@@ -1426,8 +1426,8 @@ gnutls_x509_crt_get_issuer_alt_othername_oid (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_basic_constraints (gnutls_x509_crt_t cert,
-				       unsigned int *critical,
-				       int *ca, int *pathlen)
+                                       unsigned int *critical,
+                                       int *ca, int *pathlen)
 {
   int result;
   gnutls_datum_t basicConstraints;
@@ -1441,7 +1441,7 @@ gnutls_x509_crt_get_basic_constraints (gnutls_x509_crt_t cert,
 
   if ((result =
        _gnutls_x509_crt_get_extension (cert, "2.5.29.19", 0,
-				       &basicConstraints, critical)) < 0)
+                                       &basicConstraints, critical)) < 0)
     {
       return result;
     }
@@ -1454,9 +1454,9 @@ gnutls_x509_crt_get_basic_constraints (gnutls_x509_crt_t cert,
 
   result =
     _gnutls_x509_ext_extract_basicConstraints (&tmp_ca,
-					       pathlen,
-					       basicConstraints.data,
-					       basicConstraints.size);
+                                               pathlen,
+                                               basicConstraints.data,
+                                               basicConstraints.size);
   if (ca)
     *ca = tmp_ca;
   _gnutls_free_datum (&basicConstraints);
@@ -1492,7 +1492,7 @@ gnutls_x509_crt_get_ca_status (gnutls_x509_crt_t cert, unsigned int *critical)
 {
   int ca, pathlen;
   return gnutls_x509_crt_get_basic_constraints (cert, critical, &ca,
-						&pathlen);
+                                                &pathlen);
 }
 
 /**
@@ -1516,8 +1516,8 @@ gnutls_x509_crt_get_ca_status (gnutls_x509_crt_t cert, unsigned int *critical)
  **/
 int
 gnutls_x509_crt_get_key_usage (gnutls_x509_crt_t cert,
-			       unsigned int *key_usage,
-			       unsigned int *critical)
+                               unsigned int *key_usage,
+                               unsigned int *critical)
 {
   int result;
   gnutls_datum_t keyUsage;
@@ -1531,7 +1531,7 @@ gnutls_x509_crt_get_key_usage (gnutls_x509_crt_t cert,
 
   if ((result =
        _gnutls_x509_crt_get_extension (cert, "2.5.29.15", 0, &keyUsage,
-				       critical)) < 0)
+                                       critical)) < 0)
     {
       return result;
     }
@@ -1543,7 +1543,7 @@ gnutls_x509_crt_get_key_usage (gnutls_x509_crt_t cert,
     }
 
   result = _gnutls_x509_ext_extract_keyUsage (&_usage, keyUsage.data,
-					      keyUsage.size);
+                                              keyUsage.size);
   _gnutls_free_datum (&keyUsage);
 
   *key_usage = _usage;
@@ -1576,10 +1576,10 @@ gnutls_x509_crt_get_key_usage (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_proxy (gnutls_x509_crt_t cert,
-			   unsigned int *critical,
-			   int *pathlen,
-			   char **policyLanguage,
-			   char **policy, size_t * sizeof_policy)
+                           unsigned int *critical,
+                           int *pathlen,
+                           char **policyLanguage,
+                           char **policy, size_t * sizeof_policy)
 {
   int result;
   gnutls_datum_t proxyCertInfo;
@@ -1592,7 +1592,7 @@ gnutls_x509_crt_get_proxy (gnutls_x509_crt_t cert,
 
   if ((result =
        _gnutls_x509_crt_get_extension (cert, "1.3.6.1.5.5.7.1.14", 0,
-				       &proxyCertInfo, critical)) < 0)
+                                       &proxyCertInfo, critical)) < 0)
     {
       return result;
     }
@@ -1604,11 +1604,11 @@ gnutls_x509_crt_get_proxy (gnutls_x509_crt_t cert,
     }
 
   result = _gnutls_x509_ext_extract_proxyCertInfo (pathlen,
-						   policyLanguage,
-						   policy,
-						   sizeof_policy,
-						   proxyCertInfo.data,
-						   proxyCertInfo.size);
+                                                   policyLanguage,
+                                                   policy,
+                                                   sizeof_policy,
+                                                   proxyCertInfo.data,
+                                                   proxyCertInfo.size);
   _gnutls_free_datum (&proxyCertInfo);
   if (result < 0)
     {
@@ -1639,9 +1639,9 @@ gnutls_x509_crt_get_proxy (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_extension_by_oid (gnutls_x509_crt_t cert,
-				      const char *oid, int indx,
-				      void *buf, size_t * sizeof_buf,
-				      unsigned int *critical)
+                                      const char *oid, int indx,
+                                      void *buf, size_t * sizeof_buf,
+                                      unsigned int *critical)
 {
   int result;
   gnutls_datum_t output;
@@ -1654,7 +1654,7 @@ gnutls_x509_crt_get_extension_by_oid (gnutls_x509_crt_t cert,
 
   if ((result =
        _gnutls_x509_crt_get_extension (cert, oid, indx, &output,
-				       critical)) < 0)
+                                       critical)) < 0)
     {
       gnutls_assert ();
       return result;
@@ -1701,7 +1701,7 @@ gnutls_x509_crt_get_extension_by_oid (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
-				   void *oid, size_t * sizeof_oid)
+                                   void *oid, size_t * sizeof_oid)
 {
   int result;
 
@@ -1746,8 +1746,8 @@ gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
  **/
 int
 gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
-				    void *oid, size_t * sizeof_oid,
-				    int *critical)
+                                    void *oid, size_t * sizeof_oid,
+                                    int *critical)
 {
   int result;
   char str_critical[10];
@@ -1761,7 +1761,7 @@ gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
     }
 
   snprintf (name, sizeof (name), "tbsCertificate.extensions.?%u.extnID",
-	    indx + 1);
+            indx + 1);
 
   len = *sizeof_oid;
   result = asn1_read_value (cert->cert, name, oid, &len);
@@ -1776,7 +1776,7 @@ gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
     }
 
   snprintf (name, sizeof (name), "tbsCertificate.extensions.?%u.critical",
-	    indx + 1);
+            indx + 1);
   len = sizeof (str_critical);
   result = asn1_read_value (cert->cert, name, str_critical, &len);
   if (result != ASN1_SUCCESS)
@@ -1788,9 +1788,9 @@ gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
   if (critical)
     {
       if (str_critical[0] == 'T')
-	*critical = 1;
+        *critical = 1;
       else
-	*critical = 0;
+        *critical = 0;
     }
 
   return 0;
@@ -1820,7 +1820,7 @@ gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
  **/
 int
 gnutls_x509_crt_get_extension_data (gnutls_x509_crt_t cert, int indx,
-				    void *data, size_t * sizeof_data)
+                                    void *data, size_t * sizeof_data)
 {
   int result, len;
   char name[ASN1_MAX_NAME_SIZE];
@@ -1832,7 +1832,7 @@ gnutls_x509_crt_get_extension_data (gnutls_x509_crt_t cert, int indx,
     }
 
   snprintf (name, sizeof (name), "tbsCertificate.extensions.?%u.extnValue",
-	    indx + 1);
+            indx + 1);
 
   len = *sizeof_data;
   result = asn1_read_value (cert->cert, name, data, &len);
@@ -1851,7 +1851,7 @@ gnutls_x509_crt_get_extension_data (gnutls_x509_crt_t cert, int indx,
 
 static int
 _gnutls_x509_crt_get_raw_dn2 (gnutls_x509_crt_t cert,
-			      const char *whom, gnutls_datum_t * start)
+                              const char *whom, gnutls_datum_t * start)
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int result, len1;
@@ -1862,7 +1862,7 @@ _gnutls_x509_crt_get_raw_dn2 (gnutls_x509_crt_t cert,
    */
   if ((result =
        asn1_create_element (_gnutls_get_pkix (), "PKIX1.TBSCertificate",
-			    &c2)) != ASN1_SUCCESS)
+                            &c2)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
@@ -1887,7 +1887,7 @@ _gnutls_x509_crt_get_raw_dn2 (gnutls_x509_crt_t cert,
 
   result =
     asn1_der_decoding_startEnd (c2, signed_data.data, signed_data.size,
-				whom, &start1, &end1);
+                                whom, &start1, &end1);
 
   if (result != ASN1_SUCCESS)
     {
@@ -1922,7 +1922,7 @@ cleanup:
  **/
 int
 gnutls_x509_crt_get_raw_issuer_dn (gnutls_x509_crt_t cert,
-				   gnutls_datum_t * start)
+                                   gnutls_datum_t * start)
 {
   return _gnutls_x509_crt_get_raw_dn2 (cert, "issuer", start);
 }
@@ -2012,7 +2012,7 @@ gnutls_x509_crt_get_issuer (gnutls_x509_crt_t cert, gnutls_x509_dn_t * dn)
  **/
 int
 gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn,
-			    int irdn, int iava, gnutls_x509_ava_st * ava)
+                            int irdn, int iava, gnutls_x509_ava_st * ava)
 {
   ASN1_TYPE rdn, elem;
   long len;
@@ -2021,7 +2021,7 @@ gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn,
   unsigned char cls, *ptr;
 
   iava++;
-  irdn++;			/* 0->1, 1->2 etc */
+  irdn++;                       /* 0->1, 1->2 etc */
 
   snprintf (rbuf, sizeof (rbuf), "rdnSequence.?%d.?%d", irdn, iava);
   rdn = asn1_find_node (dn, rbuf);
@@ -2081,8 +2081,8 @@ gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn,
     tmp = asn1_get_length_der (ptr, remlen, &lenlen);
     if (tmp < 0)
       {
-	gnutls_assert ();
-	return GNUTLS_E_ASN1_DER_ERROR;
+        gnutls_assert ();
+        return GNUTLS_E_ASN1_DER_ERROR;
       }
     ava->value.size = tmp;
   }
@@ -2109,8 +2109,8 @@ gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn,
  **/
 int
 gnutls_x509_crt_get_fingerprint (gnutls_x509_crt_t cert,
-				 gnutls_digest_algorithm_t algo,
-				 void *buf, size_t * sizeof_buf)
+                                 gnutls_digest_algorithm_t algo,
+                                 void *buf, size_t * sizeof_buf)
 {
   opaque *cert_buf;
   int cert_buf_size;
@@ -2172,8 +2172,8 @@ gnutls_x509_crt_get_fingerprint (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_export (gnutls_x509_crt_t cert,
-			gnutls_x509_crt_fmt_t format, void *output_data,
-			size_t * output_data_size)
+                        gnutls_x509_crt_fmt_t format, void *output_data,
+                        size_t * output_data_size)
 {
   if (cert == NULL)
     {
@@ -2182,13 +2182,13 @@ gnutls_x509_crt_export (gnutls_x509_crt_t cert,
     }
 
   return _gnutls_x509_export_int (cert->cert, format, "CERTIFICATE",
-				  output_data, output_data_size);
+                                  output_data, output_data_size);
 }
 
 int
 _gnutls_get_key_id (gnutls_pk_algorithm_t pk, bigint_t * params,
-		    int params_size, unsigned char *output_data,
-		    size_t * output_data_size)
+                    int params_size, unsigned char *output_data,
+                    size_t * output_data_size)
 {
   int result = 0;
   gnutls_datum_t der = { NULL, 0 };
@@ -2205,19 +2205,19 @@ _gnutls_get_key_id (gnutls_pk_algorithm_t pk, bigint_t * params,
     {
       result = _gnutls_x509_write_rsa_params (params, params_size, &der);
       if (result < 0)
-	{
-	  gnutls_assert ();
-	  goto cleanup;
-	}
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
     }
   else if (pk == GNUTLS_PK_DSA)
     {
       result = _gnutls_x509_write_dsa_public_key (params, params_size, &der);
       if (result < 0)
-	{
-	  gnutls_assert ();
-	  goto cleanup;
-	}
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
     }
   else
     return GNUTLS_E_INTERNAL_ERROR;
@@ -2245,7 +2245,7 @@ cleanup:
 
 static int
 rsadsa_get_key_id (gnutls_x509_crt_t crt, int pk,
-		   unsigned char *output_data, size_t * output_data_size)
+                   unsigned char *output_data, size_t * output_data_size)
 {
   bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
   int params_size = MAX_PUBLIC_PARAMS_SIZE;
@@ -2260,7 +2260,7 @@ rsadsa_get_key_id (gnutls_x509_crt_t crt, int pk,
 
   result =
     _gnutls_get_key_id (pk, params, params_size, output_data,
-			output_data_size);
+                        output_data_size);
   if (result < 0)
     {
       gnutls_assert ();
@@ -2302,8 +2302,8 @@ cleanup:
  **/
 int
 gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
-			    unsigned char *output_data,
-			    size_t * output_data_size)
+                            unsigned char *output_data,
+                            size_t * output_data_size)
 {
   int pk, result = 0;
   gnutls_datum_t pubkey;
@@ -2343,7 +2343,7 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
    */
   pubkey.size = 0;
   result = asn1_der_coding (crt->cert, "tbsCertificate.subjectPublicKeyInfo",
-			    NULL, &pubkey.size, NULL);
+                            NULL, &pubkey.size, NULL);
   if (result != ASN1_MEM_ERROR)
     {
       gnutls_assert ();
@@ -2358,7 +2358,7 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
     }
 
   result = asn1_der_coding (crt->cert, "tbsCertificate.subjectPublicKeyInfo",
-			    pubkey.data, &pubkey.size, NULL);
+                            pubkey.data, &pubkey.size, NULL);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -2367,7 +2367,7 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
     }
 
   result = gnutls_fingerprint (GNUTLS_DIG_SHA1, &pubkey,
-			       output_data, output_data_size);
+                               output_data, output_data_size);
 
   gnutls_free (pubkey.data);
 
@@ -2391,8 +2391,8 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
  **/
 int
 gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
-				  const gnutls_x509_crl_t * crl_list,
-				  int crl_list_length)
+                                  const gnutls_x509_crl_t * crl_list,
+                                  int crl_list_length)
 {
   opaque serial[64];
   opaque cert_serial[64];
@@ -2407,44 +2407,44 @@ gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
     }
 
   for (j = 0; j < crl_list_length; j++)
-    {				/* do for all the crls */
+    {                           /* do for all the crls */
 
       /* Step 1. check if issuer's DN match
        */
       ret = _gnutls_x509_crl_get_raw_issuer_dn (crl_list[j], &dn1);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       ret = gnutls_x509_crt_get_raw_issuer_dn (cert, &dn2);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       ret = _gnutls_x509_compare_raw_dn (&dn1, &dn2);
       _gnutls_free_datum (&dn1);
       _gnutls_free_datum (&dn2);
       if (ret == 0)
-	{
-	  /* issuers do not match so don't even
-	   * bother checking.
-	   */
-	  continue;
-	}
+        {
+          /* issuers do not match so don't even
+           * bother checking.
+           */
+          continue;
+        }
 
       /* Step 2. Read the certificate's serial number
        */
       cert_serial_size = sizeof (cert_serial);
       ret = gnutls_x509_crt_get_serial (cert, cert_serial, &cert_serial_size);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       /* Step 3. cycle through the CRL serials and compare with
        *   certificate serial we have.
@@ -2452,36 +2452,36 @@ gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
 
       ncerts = gnutls_x509_crl_get_crt_count (crl_list[j]);
       if (ncerts < 0)
-	{
-	  gnutls_assert ();
-	  return ncerts;
-	}
+        {
+          gnutls_assert ();
+          return ncerts;
+        }
 
       for (i = 0; i < ncerts; i++)
-	{
-	  serial_size = sizeof (serial);
-	  ret =
-	    gnutls_x509_crl_get_crt_serial (crl_list[j], i, serial,
-					    &serial_size, NULL);
+        {
+          serial_size = sizeof (serial);
+          ret =
+            gnutls_x509_crl_get_crt_serial (crl_list[j], i, serial,
+                                            &serial_size, NULL);
 
-	  if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      return ret;
-	    }
+          if (ret < 0)
+            {
+              gnutls_assert ();
+              return ret;
+            }
 
-	  if (serial_size == cert_serial_size)
-	    {
-	      if (memcmp (serial, cert_serial, serial_size) == 0)
-		{
-		  /* serials match */
-		  return 1;	/* revoked! */
-		}
-	    }
-	}
+          if (serial_size == cert_serial_size)
+            {
+              if (memcmp (serial, cert_serial, serial_size) == 0)
+                {
+                  /* serials match */
+                  return 1;     /* revoked! */
+                }
+            }
+        }
 
     }
-  return 0;			/* not revoked. */
+  return 0;                     /* not revoked. */
 }
 
 /**
@@ -2500,8 +2500,8 @@ gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
-				      const gnutls_datum_t * signature,
-				      gnutls_digest_algorithm_t * hash)
+                                      const gnutls_datum_t * signature,
+                                      gnutls_digest_algorithm_t * hash)
 {
   bigint_t issuer_params[MAX_PUBLIC_PARAMS_SIZE];
   int issuer_params_size;
@@ -2522,10 +2522,10 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
     }
 
   ret = _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) hash,
-				       signature,
-				       gnutls_x509_crt_get_pk_algorithm (crt,
-									 NULL),
-				       issuer_params, issuer_params_size);
+                                       signature,
+                                       gnutls_x509_crt_get_pk_algorithm (crt,
+                                                                         NULL),
+                                       issuer_params, issuer_params_size);
 
   /* release allocated mpis */
   for (i = 0; i < issuer_params_size; i++)
@@ -2555,8 +2555,8 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
  **/
 int
 gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
-					      gnutls_digest_algorithm_t *
-					      hash, unsigned int *mand)
+                                              gnutls_digest_algorithm_t *
+                                              hash, unsigned int *mand)
 {
   bigint_t issuer_params[MAX_PUBLIC_PARAMS_SIZE];
   int issuer_params_size;
@@ -2578,8 +2578,8 @@ gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
 
   ret =
     _gnutls_pk_get_hash_algorithm (gnutls_x509_crt_get_pk_algorithm
-				   (crt, NULL), issuer_params,
-				   issuer_params_size, hash, mand);
+                                   (crt, NULL), issuer_params,
+                                   issuer_params_size, hash, mand);
 
   /* release allocated mpis */
   for (i = 0; i < issuer_params_size; i++)
@@ -2605,8 +2605,8 @@ gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
  **/
 int
 gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
-			     const gnutls_datum_t * data,
-			     const gnutls_datum_t * signature)
+                             const gnutls_datum_t * data,
+                             const gnutls_datum_t * signature)
 {
   int result;
 
@@ -2641,8 +2641,8 @@ gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
  **/
 int
 gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,
-			     const gnutls_datum_t * hash,
-			     const gnutls_datum_t * signature)
+                             const gnutls_datum_t * hash,
+                             const gnutls_datum_t * signature)
 {
   int result;
 
@@ -2695,10 +2695,10 @@ gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,
  **/
 int
 gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
-				     unsigned int seq, void *ret,
-				     size_t * ret_size,
-				     unsigned int *reason_flags,
-				     unsigned int *critical)
+                                     unsigned int seq, void *ret,
+                                     size_t * ret_size,
+                                     unsigned int *reason_flags,
+                                     unsigned int *critical)
 {
   int result;
   gnutls_datum_t dist_points = { NULL, 0 };
@@ -2724,7 +2724,7 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
 
   result =
     _gnutls_x509_crt_get_extension (cert, "2.5.29.31", 0, &dist_points,
-				    critical);
+                                    critical);
   if (result < 0)
     {
       return result;
@@ -2782,11 +2782,11 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
       result = asn1_read_value (c2, name, reasons, &len);
 
       if (result != ASN1_VALUE_NOT_FOUND && result != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  asn1_delete_structure (&c2);
-	  return _gnutls_asn2err (result);
-	}
+        {
+          gnutls_assert ();
+          asn1_delete_structure (&c2);
+          return _gnutls_asn2err (result);
+        }
 
       *reason_flags = reasons[0] | (reasons[1] << 8);
     }
@@ -2815,8 +2815,8 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_key_purpose_oid (gnutls_x509_crt_t cert,
-				     int indx, void *oid, size_t * sizeof_oid,
-				     unsigned int *critical)
+                                     int indx, void *oid, size_t * sizeof_oid,
+                                     unsigned int *critical)
 {
   char tmpstr[ASN1_MAX_NAME_SIZE];
   int result, len;
@@ -2836,7 +2836,7 @@ gnutls_x509_crt_get_key_purpose_oid (gnutls_x509_crt_t cert,
 
   if ((result =
        _gnutls_x509_crt_get_extension (cert, "2.5.29.37", 0, &id,
-				       critical)) < 0)
+                                       critical)) < 0)
     {
       return result;
     }
@@ -2906,7 +2906,7 @@ gnutls_x509_crt_get_key_purpose_oid (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_pk_rsa_raw (gnutls_x509_crt_t crt,
-				gnutls_datum_t * m, gnutls_datum_t * e)
+                                gnutls_datum_t * m, gnutls_datum_t * e)
 {
   int ret;
   bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
@@ -2974,8 +2974,8 @@ cleanup:
  **/
 int
 gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
-				gnutls_datum_t * p, gnutls_datum_t * q,
-				gnutls_datum_t * g, gnutls_datum_t * y)
+                                gnutls_datum_t * p, gnutls_datum_t * q,
+                                gnutls_datum_t * g, gnutls_datum_t * y)
 {
   int ret;
   bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
@@ -3075,9 +3075,9 @@ cleanup:
  **/
 int
 gnutls_x509_crt_list_import (gnutls_x509_crt_t * certs,
-			     unsigned int *cert_max,
-			     const gnutls_datum_t * data,
-			     gnutls_x509_crt_fmt_t format, unsigned int flags)
+                             unsigned int *cert_max,
+                             const gnutls_datum_t * data,
+                             gnutls_x509_crt_fmt_t format, unsigned int flags)
 {
   int size;
   const char *ptr;
@@ -3088,26 +3088,26 @@ gnutls_x509_crt_list_import (gnutls_x509_crt_t * certs,
   if (format == GNUTLS_X509_FMT_DER)
     {
       if (*cert_max < 1)
-	{
-	  *cert_max = 1;
-	  return GNUTLS_E_SHORT_MEMORY_BUFFER;
-	}
+        {
+          *cert_max = 1;
+          return GNUTLS_E_SHORT_MEMORY_BUFFER;
+        }
 
-      count = 1;		/* import only the first one */
+      count = 1;                /* import only the first one */
 
       ret = gnutls_x509_crt_init (&certs[0]);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto error;
-	}
+        {
+          gnutls_assert ();
+          goto error;
+        }
 
       ret = gnutls_x509_crt_import (certs[0], data, format);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto error;
-	}
+        {
+          gnutls_assert ();
+          goto error;
+        }
 
       *cert_max = 1;
       return 1;
@@ -3116,10 +3116,10 @@ gnutls_x509_crt_list_import (gnutls_x509_crt_t * certs,
   /* move to the certificate
    */
   ptr = memmem (data->data, data->size,
-		PEM_CERT_SEP, sizeof (PEM_CERT_SEP) - 1);
+                PEM_CERT_SEP, sizeof (PEM_CERT_SEP) - 1);
   if (ptr == NULL)
     ptr = memmem (data->data, data->size,
-		  PEM_CERT_SEP2, sizeof (PEM_CERT_SEP2) - 1);
+                  PEM_CERT_SEP2, sizeof (PEM_CERT_SEP2) - 1);
 
   if (ptr == NULL)
     {
@@ -3132,33 +3132,33 @@ gnutls_x509_crt_list_import (gnutls_x509_crt_t * certs,
   do
     {
       if (count >= *cert_max)
-	{
-	  if (!(flags & GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED))
-	    break;
-	  else
-	    nocopy = 1;
-	}
+        {
+          if (!(flags & GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED))
+            break;
+          else
+            nocopy = 1;
+        }
 
       if (!nocopy)
-	{
-	  ret = gnutls_x509_crt_init (&certs[count]);
-	  if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      goto error;
-	    }
+        {
+          ret = gnutls_x509_crt_init (&certs[count]);
+          if (ret < 0)
+            {
+              gnutls_assert ();
+              goto error;
+            }
 
-	  tmp.data = (void *) ptr;
-	  tmp.size = data->size - (ptr - (char *) data->data);
+          tmp.data = (void *) ptr;
+          tmp.size = data->size - (ptr - (char *) data->data);
 
-	  ret =
-	    gnutls_x509_crt_import (certs[count], &tmp, GNUTLS_X509_FMT_PEM);
-	  if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      goto error;
-	    }
-	}
+          ret =
+            gnutls_x509_crt_import (certs[count], &tmp, GNUTLS_X509_FMT_PEM);
+          if (ret < 0)
+            {
+              gnutls_assert ();
+              goto error;
+            }
+        }
 
       /* now we move ptr after the pem header 
        */
@@ -3168,18 +3168,18 @@ gnutls_x509_crt_list_import (gnutls_x509_crt_t * certs,
       size = data->size - (ptr - (char *) data->data);
 
       if (size > 0)
-	{
-	  char *ptr2;
+        {
+          char *ptr2;
 
-	  ptr2 = memmem (ptr, size, PEM_CERT_SEP, sizeof (PEM_CERT_SEP) - 1);
-	  if (ptr2 == NULL)
-	    ptr2 = memmem (ptr, size, PEM_CERT_SEP2,
-			   sizeof (PEM_CERT_SEP2) - 1);
+          ptr2 = memmem (ptr, size, PEM_CERT_SEP, sizeof (PEM_CERT_SEP) - 1);
+          if (ptr2 == NULL)
+            ptr2 = memmem (ptr, size, PEM_CERT_SEP2,
+                           sizeof (PEM_CERT_SEP2) - 1);
 
-	  ptr = ptr2;
-	}
+          ptr = ptr2;
+        }
       else
-	ptr = NULL;
+        ptr = NULL;
 
       count++;
     }
@@ -3216,17 +3216,17 @@ error:
  **/
 int
 gnutls_x509_crt_get_subject_unique_id (gnutls_x509_crt_t crt, char *buf,
-				       size_t * sizeof_buf)
+                                       size_t * sizeof_buf)
 {
   int result;
   gnutls_datum_t datum = { NULL, 0 };
 
   result =
     _gnutls_x509_read_value (crt->cert, "tbsCertificate.subjectUniqueID",
-			     &datum, 2);
+                             &datum, 2);
 
   if (datum.size > *sizeof_buf)
-    {				/* then we're not going to fit */
+    {                           /* then we're not going to fit */
       *sizeof_buf = datum.size;
       buf[0] = '\0';
       result = GNUTLS_E_SHORT_MEMORY_BUFFER;
@@ -3260,17 +3260,17 @@ gnutls_x509_crt_get_subject_unique_id (gnutls_x509_crt_t crt, char *buf,
  **/
 int
 gnutls_x509_crt_get_issuer_unique_id (gnutls_x509_crt_t crt, char *buf,
-				      size_t * sizeof_buf)
+                                      size_t * sizeof_buf)
 {
   int result;
   gnutls_datum_t datum = { NULL, 0 };
 
   result =
     _gnutls_x509_read_value (crt->cert, "tbsCertificate.issuerUniqueID",
-			     &datum, 2);
+                             &datum, 2);
 
   if (datum.size > *sizeof_buf)
-    {				/* then we're not going to fit */
+    {                           /* then we're not going to fit */
       *sizeof_buf = datum.size;
       buf[0] = '\0';
       result = GNUTLS_E_SHORT_MEMORY_BUFFER;

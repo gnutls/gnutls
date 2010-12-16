@@ -59,13 +59,13 @@ typedef struct
 
 /* basic functions */
 int _gnutls_hmac_init (digest_hd_st *, gnutls_mac_algorithm_t algorithm,
-		       const void *key, int keylen);
+                       const void *key, int keylen);
 int _gnutls_hmac_get_algo_len (gnutls_mac_algorithm_t algorithm);
 int _gnutls_hmac (digest_hd_st * handle, const void *text, size_t textlen);
 
 int _gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
-		       int keylen, const void *text, size_t textlen,
-		       void *digest);
+                       int keylen, const void *text, size_t textlen,
+                       void *digest);
 
 void _gnutls_hmac_deinit (digest_hd_st * handle, void *digest);
 void _gnutls_hmac_output (digest_hd_st * handle, void *digest);
@@ -78,22 +78,22 @@ void _gnutls_hash_output (digest_hd_st * handle, void *digest);
 
 int
 _gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,
-		   const void *text, size_t textlen, void *digest);
+                   const void *text, size_t textlen, void *digest);
 
 /* help functions */
 int _gnutls_mac_init_ssl3 (digest_hd_st *, gnutls_mac_algorithm_t algorithm,
-			   void *key, int keylen);
+                           void *key, int keylen);
 void _gnutls_mac_deinit_ssl3 (digest_hd_st * handle, void *digest);
 
 int _gnutls_ssl3_generate_random (void *secret, int secret_len,
-				  void *rnd, int random_len, int bytes,
-				  opaque * ret);
+                                  void *rnd, int random_len, int bytes,
+                                  opaque * ret);
 int _gnutls_ssl3_hash_md5 (const void *first, int first_len,
-			   const void *second, int second_len,
-			   int ret_len, opaque * ret);
+                           const void *second, int second_len,
+                           int ret_len, opaque * ret);
 
 void _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle, void *digest,
-					opaque * key, uint32_t key_size);
+                                        opaque * key, uint32_t key_size);
 
 int _gnutls_hash_copy (digest_hd_st * dst_handle, digest_hd_st * src_handle);
 

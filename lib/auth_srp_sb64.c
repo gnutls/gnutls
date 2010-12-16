@@ -82,61 +82,61 @@ encode (uint8_t * result, const uint8_t * rdata, int left)
     case 3:
       result[0] = b64table[((data[0] & 0xfc) >> 2)];
       result[1] =
-	b64table[(((((data[0] & 0x03) & 0xff) << 4) & 0xff) |
-		  ((data[1] & 0xf0) >> 4))];
+        b64table[(((((data[0] & 0x03) & 0xff) << 4) & 0xff) |
+                  ((data[1] & 0xf0) >> 4))];
       result[2] =
-	b64table[((((data[1] & 0x0f) << 2) & 0xff) |
-		  ((data[2] & 0xc0) >> 6))];
+        b64table[((((data[1] & 0x0f) << 2) & 0xff) |
+                  ((data[2] & 0xc0) >> 6))];
       result[3] = b64table[(data[2] & 0x3f) & 0xff];
       break;
     case 2:
       if ((c = ((data[0] & 0xf0) >> 4)) != 0)
-	{
-	  result[0] = b64table[c];
-	  result[1] =
-	    b64table[((((data[0] & 0x0f) << 2) & 0xff) |
-		      ((data[1] & 0xc0) >> 6))];
-	  result[2] = b64table[(data[1] & 0x3f) & 0xff];
-	  result[3] = '\0';
-	  ret -= 1;
-	}
+        {
+          result[0] = b64table[c];
+          result[1] =
+            b64table[((((data[0] & 0x0f) << 2) & 0xff) |
+                      ((data[1] & 0xc0) >> 6))];
+          result[2] = b64table[(data[1] & 0x3f) & 0xff];
+          result[3] = '\0';
+          ret -= 1;
+        }
       else
-	{
-	  if ((c = ((data[0] & 0x0f) << 2) | ((data[1] & 0xc0) >> 6)) != 0)
-	    {
-	      result[0] = b64table[c];
-	      result[1] = b64table[data[1] & 0x3f];
-	      result[2] = '\0';
-	      result[3] = '\0';
-	      ret -= 2;
-	    }
-	  else
-	    {
-	      result[0] = b64table[data[0] & 0x3f];
-	      result[1] = '\0';
-	      result[2] = '\0';
-	      result[3] = '\0';
-	      ret -= 3;
-	    }
-	}
+        {
+          if ((c = ((data[0] & 0x0f) << 2) | ((data[1] & 0xc0) >> 6)) != 0)
+            {
+              result[0] = b64table[c];
+              result[1] = b64table[data[1] & 0x3f];
+              result[2] = '\0';
+              result[3] = '\0';
+              ret -= 2;
+            }
+          else
+            {
+              result[0] = b64table[data[0] & 0x3f];
+              result[1] = '\0';
+              result[2] = '\0';
+              result[3] = '\0';
+              ret -= 3;
+            }
+        }
       break;
     case 1:
       if ((c = ((data[0] & 0xc0) >> 6)) != 0)
-	{
-	  result[0] = b64table[c];
-	  result[1] = b64table[(data[0] & 0x3f) & 0xff];
-	  result[2] = '\0';
-	  result[3] = '\0';
-	  ret -= 2;
-	}
+        {
+          result[0] = b64table[c];
+          result[1] = b64table[(data[0] & 0x3f) & 0xff];
+          result[2] = '\0';
+          result[3] = '\0';
+          ret -= 2;
+        }
       else
-	{
-	  result[0] = b64table[(data[0] & 0x3f) & 0xff];
-	  result[1] = '\0';
-	  result[2] = '\0';
-	  result[3] = '\0';
-	  ret -= 3;
-	}
+        {
+          result[0] = b64table[(data[0] & 0x3f) & 0xff];
+          result[1] = '\0';
+          result[2] = '\0';
+          result[3] = '\0';
+          ret -= 3;
+        }
       break;
     default:
       return -1;
@@ -176,10 +176,10 @@ _gnutls_sbase64_encode (uint8_t * data, size_t data_size, uint8_t ** result)
     {
       tmp = encode (tmpres, &data[0], mod);
       if (tmp < 0)
-	{
-	  gnutls_free ((*result));
-	  return tmp;
-	}
+        {
+          gnutls_free ((*result));
+          return tmp;
+        }
 
       memcpy (&(*result)[0], tmpres, tmp);
       i = mod;
@@ -192,10 +192,10 @@ _gnutls_sbase64_encode (uint8_t * data, size_t data_size, uint8_t ** result)
     {
       tmp = encode (tmpres, &data[i], data_size - i);
       if (tmp < 0)
-	{
-	  gnutls_free ((*result));
-	  return tmp;
-	}
+        {
+          gnutls_free ((*result));
+          return tmp;
+        }
       memcpy (&(*result)[j], tmpres, tmp);
     }
 
@@ -280,15 +280,15 @@ _gnutls_sbase64_decode (uint8_t * data, size_t idata_size, uint8_t ** result)
 
       tmp = decode (tmpres, datrev);
       if (tmp < 0)
-	{
-	  gnutls_free ((*result));
-	  *result = NULL;
-	  return tmp;
-	}
+        {
+          gnutls_free ((*result));
+          *result = NULL;
+          return tmp;
+        }
 
       memcpy (*result, &tmpres[3 - tmp], tmp);
       if (tmp < 3)
-	ret -= (3 - tmp);
+        ret -= (3 - tmp);
     }
 
   /* rest data */
@@ -296,14 +296,14 @@ _gnutls_sbase64_decode (uint8_t * data, size_t idata_size, uint8_t ** result)
     {
       tmp = decode (tmpres, &data[i]);
       if (tmp < 0)
-	{
-	  gnutls_free ((*result));
-	  *result = NULL;
-	  return tmp;
-	}
+        {
+          gnutls_free ((*result));
+          *result = NULL;
+          return tmp;
+        }
       memcpy (&(*result)[j], tmpres, tmp);
       if (tmp < 3)
-	ret -= (3 - tmp);
+        ret -= (3 - tmp);
       j += 3;
     }
 
@@ -329,7 +329,7 @@ _gnutls_sbase64_decode (uint8_t * data, size_t idata_size, uint8_t ** result)
  **/
 int
 gnutls_srp_base64_encode (const gnutls_datum_t * data, char *result,
-			  size_t * result_size)
+                          size_t * result_size)
 {
   opaque *ret;
   int size;
@@ -373,7 +373,7 @@ gnutls_srp_base64_encode (const gnutls_datum_t * data, char *result,
  **/
 int
 gnutls_srp_base64_encode_alloc (const gnutls_datum_t * data,
-				gnutls_datum_t * result)
+                                gnutls_datum_t * result)
 {
   opaque *ret;
   int size;
@@ -415,7 +415,7 @@ gnutls_srp_base64_encode_alloc (const gnutls_datum_t * data,
  **/
 int
 gnutls_srp_base64_decode (const gnutls_datum_t * b64_data, char *result,
-			  size_t * result_size)
+                          size_t * result_size)
 {
   opaque *ret;
   int size;
@@ -458,7 +458,7 @@ gnutls_srp_base64_decode (const gnutls_datum_t * b64_data, char *result,
  **/
 int
 gnutls_srp_base64_decode_alloc (const gnutls_datum_t * b64_data,
-				gnutls_datum_t * result)
+                                gnutls_datum_t * result)
 {
   opaque *ret;
   int size;

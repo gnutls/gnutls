@@ -108,7 +108,7 @@ client (struct params_res *params)
   gnutls_anon_allocate_client_credentials (&anoncred);
 
   for (t = 0; t < 2; t++)
-    {				/* connect 2 times to the server */
+    {                           /* connect 2 times to the server */
       /* connect to the peer
        */
       sd = tcp_connect ();
@@ -127,16 +127,16 @@ client (struct params_res *params)
 
 #ifdef ENABLE_SESSION_TICKET
       if (params->enable_session_ticket_client)
-	gnutls_session_ticket_enable_client (session);
+        gnutls_session_ticket_enable_client (session);
 #endif
 
       if (t > 0)
-	{
-	  /* if this is not the first time we connect */
-	  gnutls_session_set_data (session, session_data.data,
-				   session_data.size);
-	  gnutls_free (session_data.data);
-	}
+        {
+          /* if this is not the first time we connect */
+          gnutls_session_set_data (session, session_data.data,
+                                   session_data.size);
+          gnutls_free (session_data.data);
+        }
 
       gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
 
@@ -145,75 +145,75 @@ client (struct params_res *params)
       ret = gnutls_handshake (session);
 
       if (ret < 0)
-	{
-	  fail ("client: Handshake failed\n");
-	  gnutls_perror (ret);
-	  goto end;
-	}
+        {
+          fail ("client: Handshake failed\n");
+          gnutls_perror (ret);
+          goto end;
+        }
       else
-	{
-	  if (debug)
-	    success ("client: Handshake was completed\n");
-	}
+        {
+          if (debug)
+            success ("client: Handshake was completed\n");
+        }
 
       if (t == 0)
-	{			/* the first time we connect */
-	  /* get the session data size */
-	  ret = gnutls_session_get_data2 (session, &session_data);
-	  if (ret < 0)
-	    fail ("Getting resume data failed\n");
-	}
+        {                       /* the first time we connect */
+          /* get the session data size */
+          ret = gnutls_session_get_data2 (session, &session_data);
+          if (ret < 0)
+            fail ("Getting resume data failed\n");
+        }
       else
-	{			/* the second time we connect */
+        {                       /* the second time we connect */
 
-	  /* check if we actually resumed the previous session */
-	  if (gnutls_session_is_resumed (session) != 0)
-	    {
-	      if (params->expect_resume)
-		{
-		  if (debug)
-		    success ("- Previous session was resumed\n");
-		}
-	      else
-		fail ("- Previous session was resumed\n");
-	    }
-	  else
-	    {
-	      if (params->expect_resume)
-		fail ("*** Previous session was NOT resumed\n");
-	      else
-		{
-		  if (debug)
-		    success
-		      ("*** Previous session was NOT resumed (expected)\n");
-		}
-	    }
-	}
+          /* check if we actually resumed the previous session */
+          if (gnutls_session_is_resumed (session) != 0)
+            {
+              if (params->expect_resume)
+                {
+                  if (debug)
+                    success ("- Previous session was resumed\n");
+                }
+              else
+                fail ("- Previous session was resumed\n");
+            }
+          else
+            {
+              if (params->expect_resume)
+                fail ("*** Previous session was NOT resumed\n");
+              else
+                {
+                  if (debug)
+                    success
+                      ("*** Previous session was NOT resumed (expected)\n");
+                }
+            }
+        }
 
       gnutls_record_send (session, MSG, strlen (MSG));
 
       ret = gnutls_record_recv (session, buffer, MAX_BUF);
       if (ret == 0)
-	{
-	  if (debug)
-	    success ("client: Peer has closed the TLS connection\n");
-	  goto end;
-	}
+        {
+          if (debug)
+            success ("client: Peer has closed the TLS connection\n");
+          goto end;
+        }
       else if (ret < 0)
-	{
-	  fail ("client: Error: %s\n", gnutls_strerror (ret));
-	  goto end;
-	}
+        {
+          fail ("client: Error: %s\n", gnutls_strerror (ret));
+          goto end;
+        }
 
       if (debug)
-	{
-	  printf ("- Received %d bytes: ", ret);
-	  for (ii = 0; ii < ret; ii++)
-	    {
-	      fputc (buffer[ii], stdout);
-	    }
-	  fputs ("\n", stdout);
-	}
+        {
+          printf ("- Received %d bytes: ", ret);
+          for (ii = 0; ii < ret; ii++)
+            {
+              fputc (buffer[ii], stdout);
+            }
+          fputs ("\n", stdout);
+        }
 
       gnutls_bye (session, GNUTLS_SHUT_RDWR);
 
@@ -232,7 +232,7 @@ end:
 
 #define SA struct sockaddr
 #define MAX_BUF 1024
-#define PORT 5556		/* listen to 5556 port */
+#define PORT 5556               /* listen to 5556 port */
 #define DH_BITS 1024
 
 /* These are global */
@@ -313,10 +313,10 @@ global_start (void)
   memset (&sa_serv, '\0', sizeof (sa_serv));
   sa_serv.sin_family = AF_INET;
   sa_serv.sin_addr.s_addr = INADDR_ANY;
-  sa_serv.sin_port = htons (PORT);	/* Server Port number */
+  sa_serv.sin_port = htons (PORT);      /* Server Port number */
 
   setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *) &optval,
-	      sizeof (int));
+              sizeof (int));
 
   err = bind (listen_sd, (SA *) & sa_serv, sizeof (sa_serv));
   if (err == -1)
@@ -394,50 +394,50 @@ server (struct params_res *params)
       sd = accept (listen_sd, (SA *) & sa_cli, &client_len);
 
       if (debug)
-	success ("server: connection from %s, port %d\n",
-		 inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
-			    sizeof (topbuf)), ntohs (sa_cli.sin_port));
+        success ("server: connection from %s, port %d\n",
+                 inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
+                            sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
       gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
       ret = gnutls_handshake (session);
       if (ret < 0)
-	{
-	  close (sd);
-	  gnutls_deinit (session);
-	  fail ("server: Handshake has failed (%s)\n\n",
-		gnutls_strerror (ret));
-	  return;
-	}
+        {
+          close (sd);
+          gnutls_deinit (session);
+          fail ("server: Handshake has failed (%s)\n\n",
+                gnutls_strerror (ret));
+          return;
+        }
       if (debug)
-	success ("server: Handshake was completed\n");
+        success ("server: Handshake was completed\n");
 
       /* see the Getting peer's information example */
       /* print_info(session); */
 
       i = 0;
       for (;;)
-	{
-	  memset (buffer, 0, MAX_BUF + 1);
-	  ret = gnutls_record_recv (session, buffer, MAX_BUF);
+        {
+          memset (buffer, 0, MAX_BUF + 1);
+          ret = gnutls_record_recv (session, buffer, MAX_BUF);
 
-	  if (ret == 0)
-	    {
-	      if (debug)
-		success ("server: Peer has closed the GnuTLS connection\n");
-	      break;
-	    }
-	  else if (ret < 0)
-	    {
-	      fail ("server: Received corrupted data(%d). Closing...\n", ret);
-	      break;
-	    }
-	  else if (ret > 0)
-	    {
-	      /* echo data back to the client
-	       */
-	      gnutls_record_send (session, buffer, strlen (buffer));
-	    }
-	}
+          if (ret == 0)
+            {
+              if (debug)
+                success ("server: Peer has closed the GnuTLS connection\n");
+              break;
+            }
+          else if (ret < 0)
+            {
+              fail ("server: Received corrupted data(%d). Closing...\n", ret);
+              break;
+            }
+          else if (ret > 0)
+            {
+              /* echo data back to the client
+               */
+              gnutls_record_send (session, buffer, strlen (buffer));
+            }
+        }
       /* do not wait for the peer to close the connection.
        */
       gnutls_bye (session, GNUTLS_SHUT_WR);
@@ -469,34 +469,34 @@ doit (void)
   for (i = 0; resume_tests[i].desc; i++)
     {
       if (debug)
-	printf ("%s\n", resume_tests[i].desc);
+        printf ("%s\n", resume_tests[i].desc);
 
       global_start ();
       if (error_count)
-	return;
+        return;
 
       child = fork ();
       if (child < 0)
-	{
-	  perror ("fork");
-	  fail ("fork");
-	  return;
-	}
+        {
+          perror ("fork");
+          fail ("fork");
+          return;
+        }
 
       if (child)
-	{
-	  int status;
-	  /* parent */
-	  server (&resume_tests[i]);
-	  wait (&status);
-	  global_stop ();
-	}
+        {
+          int status;
+          /* parent */
+          server (&resume_tests[i]);
+          wait (&status);
+          global_stop ();
+        }
       else
-	{
-	  client (&resume_tests[i]);
-	  gnutls_global_deinit ();
-	  exit (0);
-	}
+        {
+          client (&resume_tests[i]);
+          gnutls_global_deinit ();
+          exit (0);
+        }
     }
 }
 
@@ -547,19 +547,19 @@ wrap_db_store (void *dbf, gnutls_datum_t key, gnutls_datum_t data)
       unsigned int i;
       printf ("key:\n");
       for (i = 0; i < key.size; i++)
-	{
-	  printf ("%02x ", key.data[i] & 0xFF);
-	  if ((i + 1) % 16 == 0)
-	    printf ("\n");
-	}
+        {
+          printf ("%02x ", key.data[i] & 0xFF);
+          if ((i + 1) % 16 == 0)
+            printf ("\n");
+        }
       printf ("\n");
       printf ("data:\n");
       for (i = 0; i < data.size; i++)
-	{
-	  printf ("%02x ", data.data[i] & 0xFF);
-	  if ((i + 1) % 16 == 0)
-	    printf ("\n");
-	}
+        {
+          printf ("%02x ", data.data[i] & 0xFF);
+          if ((i + 1) % 16 == 0)
+            printf ("\n");
+        }
       printf ("\n");
     }
 
@@ -596,11 +596,11 @@ wrap_db_fetch (void *dbf, gnutls_datum_t key)
       unsigned int i;
       printf ("key:\n");
       for (i = 0; i < key.size; i++)
-	{
-	  printf ("%02x ", key.data[i] & 0xFF);
-	  if ((i + 1) % 16 == 0)
-	    printf ("\n");
-	}
+        {
+          printf ("%02x ", key.data[i] & 0xFF);
+          if ((i + 1) % 16 == 0)
+            printf ("\n");
+        }
       printf ("\n");
     }
 
@@ -610,34 +610,34 @@ wrap_db_fetch (void *dbf, gnutls_datum_t key)
   for (i = 0; i < TLS_SESSION_CACHE; i++)
     {
       if (key.size == cache_db[i].session_id_size &&
-	  memcmp (key.data, cache_db[i].session_id, key.size) == 0)
-	{
-	  if (debug)
-	    success ("resume db fetch... return info\n");
+          memcmp (key.data, cache_db[i].session_id, key.size) == 0)
+        {
+          if (debug)
+            success ("resume db fetch... return info\n");
 
-	  res.size = cache_db[i].session_data_size;
+          res.size = cache_db[i].session_data_size;
 
-	  res.data = gnutls_malloc (res.size);
-	  if (res.data == NULL)
-	    return res;
+          res.data = gnutls_malloc (res.size);
+          if (res.data == NULL)
+            return res;
 
-	  memcpy (res.data, cache_db[i].session_data, res.size);
+          memcpy (res.data, cache_db[i].session_data, res.size);
 
-	  if (debug)
-	    {
-	      unsigned int i;
-	      printf ("data:\n");
-	      for (i = 0; i < res.size; i++)
-		{
-		  printf ("%02x ", res.data[i] & 0xFF);
-		  if ((i + 1) % 16 == 0)
-		    printf ("\n");
-		}
-	      printf ("\n");
-	    }
+          if (debug)
+            {
+              unsigned int i;
+              printf ("data:\n");
+              for (i = 0; i < res.size; i++)
+                {
+                  printf ("%02x ", res.data[i] & 0xFF);
+                  if ((i + 1) % 16 == 0)
+                    printf ("\n");
+                }
+              printf ("\n");
+            }
 
-	  return res;
-	}
+          return res;
+        }
     }
   return res;
 }
@@ -653,14 +653,14 @@ wrap_db_delete (void *dbf, gnutls_datum_t key)
   for (i = 0; i < TLS_SESSION_CACHE; i++)
     {
       if (key.size == cache_db[i].session_id_size &&
-	  memcmp (key.data, cache_db[i].session_id, key.size) == 0)
-	{
+          memcmp (key.data, cache_db[i].session_id, key.size) == 0)
+        {
 
-	  cache_db[i].session_id_size = 0;
-	  cache_db[i].session_data_size = 0;
+          cache_db[i].session_id_size = 0;
+          cache_db[i].session_data_size = 0;
 
-	  return 0;
-	}
+          return 0;
+        }
     }
 
   return -1;

@@ -25,12 +25,12 @@ extern void tcp_close (int sd);
 
 static int
 client_avp (gnutls_session_t session, void *ptr,
-	    const char *last, size_t lastlen, char **new, size_t * newlen)
+            const char *last, size_t lastlen, char **new, size_t * newlen)
 {
 
   if (last)
     printf ("- received %d bytes AVP: `%.*s'\n",
-	    (int) lastlen, (int) lastlen, last);
+            (int) lastlen, (int) lastlen, last);
   else
     printf ("- new application phase\n");
 
@@ -111,15 +111,15 @@ main (void)
       ret = gnutls_ia_handshake (session);
 
       if (ret < 0)
-	{
-	  fprintf (stderr, "*** TLS/IA handshake failed\n");
-	  gnutls_perror (ret);
-	  goto end;
-	}
+        {
+          fprintf (stderr, "*** TLS/IA handshake failed\n");
+          gnutls_perror (ret);
+          goto end;
+        }
       else
-	{
-	  printf ("- TLS/IA Handshake was completed\n");
-	}
+        {
+          printf ("- TLS/IA Handshake was completed\n");
+        }
     }
 
 

@@ -38,10 +38,10 @@ _gnutls_dump_mpi (const char *prefix, bigint_t a)
   size_t n = sizeof buf;
 
   if (_gnutls_mpi_print (a, buf, &n))
-    strcpy (buf, "[can't print value]");	/* Flawfinder: ignore */
+    strcpy (buf, "[can't print value]");        /* Flawfinder: ignore */
   _gnutls_debug_log ("MPI: length: %d\n\t%s%s\n", (int) n, prefix,
-		     _gnutls_bin2hex (buf, n, buf_hex, sizeof (buf_hex),
-				      NULL));
+                     _gnutls_bin2hex (buf, n, buf_hex, sizeof (buf_hex),
+                                      NULL));
 }
 
 

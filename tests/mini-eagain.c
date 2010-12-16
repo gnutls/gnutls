@@ -198,18 +198,18 @@ doit (void)
   do
     {
       if (cret == GNUTLS_E_AGAIN)
-	{
-	  //success ("loop invoking client:\n");
-	  cret = gnutls_handshake (client);
-	  //success ("client %d: %s\n", cret, gnutls_strerror (cret));
-	}
+        {
+          //success ("loop invoking client:\n");
+          cret = gnutls_handshake (client);
+          //success ("client %d: %s\n", cret, gnutls_strerror (cret));
+        }
 
       if (sret == GNUTLS_E_AGAIN)
-	{
-	  //success ("loop invoking server:\n");
-	  sret = gnutls_handshake (server);
-	  //success ("server %d: %s\n", sret, gnutls_strerror (sret));
-	}
+        {
+          //success ("loop invoking server:\n");
+          sret = gnutls_handshake (server);
+          //success ("server %d: %s\n", sret, gnutls_strerror (sret));
+        }
     }
   while (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN);
 
@@ -226,64 +226,64 @@ doit (void)
 
       ret = gnutls_record_recv (server, buffer, MAX_BUF);
       if (ret == 0)
-	fail ("server: didn't receive any data\n");
+        fail ("server: didn't receive any data\n");
       else if (ret < 0)
-	{
+        {
 //      if (debug)
 //          fputs ("#", stdout);
-	  if (ret != GNUTLS_E_AGAIN)
-	    {
-	      fail ("server: error: %s\n", gnutls_strerror (ret));
-	      break;
-	    }
-	}
+          if (ret != GNUTLS_E_AGAIN)
+            {
+              fail ("server: error: %s\n", gnutls_strerror (ret));
+              break;
+            }
+        }
       else
-	{
-	  transferred += ret;
+        {
+          transferred += ret;
 //        if (debug)
 //          fputs ("*", stdout);
-	}
+        }
 
       msglen = strlen (MSG);
       do
-	{
-	  ns = gnutls_record_send (server, MSG, msglen);
-	}
+        {
+          ns = gnutls_record_send (server, MSG, msglen);
+        }
       while (ns == GNUTLS_E_AGAIN);
 
       ret = gnutls_record_recv (client, buffer, MAX_BUF);
       if (ret == 0)
-	{
-	  fail ("client: Peer has closed the TLS connection\n");
-	}
+        {
+          fail ("client: Peer has closed the TLS connection\n");
+        }
       else if (ret < 0)
-	{
-	  if (debug)
-	    fputs ("!", stdout);
-	  if (ret != GNUTLS_E_AGAIN)
-	    {
-	      fail ("client: Error: %s\n", gnutls_strerror (ret));
-	      break;
-	    }
-	}
+        {
+          if (debug)
+            fputs ("!", stdout);
+          if (ret != GNUTLS_E_AGAIN)
+            {
+              fail ("client: Error: %s\n", gnutls_strerror (ret));
+              break;
+            }
+        }
       else
-	{
-	  if (msglen != ret || memcmp (buffer, MSG, msglen) != 0)
-	    {
-	      fail ("client: Transmitted data do not match\n");
-	    }
+        {
+          if (msglen != ret || memcmp (buffer, MSG, msglen) != 0)
+            {
+              fail ("client: Transmitted data do not match\n");
+            }
 
-	  /* echo back */
-	  do
-	    {
-	      ns = gnutls_record_send (client, buffer, msglen);
-	    }
-	  while (ns == GNUTLS_E_AGAIN);
+          /* echo back */
+          do
+            {
+              ns = gnutls_record_send (client, buffer, msglen);
+            }
+          while (ns == GNUTLS_E_AGAIN);
 
-	  transferred += ret;
-	  if (debug)
-	    fputs (".", stdout);
-	}
+          transferred += ret;
+          if (debug)
+            fputs (".", stdout);
+        }
     }
   while (transferred < 70000);
   if (debug)

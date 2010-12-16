@@ -27,11 +27,11 @@
 #define GNUTLS_CONSTATE_H
 
 int _gnutls_epoch_set_cipher_suite (gnutls_session_t session, int epoch_rel,
-				    cipher_suite_st * suite);
+                                    cipher_suite_st * suite);
 int _gnutls_epoch_set_compression (gnutls_session_t session, int epoch_rel,
-				   gnutls_compression_method_t comp_algo);
+                                   gnutls_compression_method_t comp_algo);
 void _gnutls_epoch_set_null_algos (gnutls_session_t session,
-				   record_parameters_st * params);
+                                   record_parameters_st * params);
 int _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch);
 int _gnutls_connection_state_init (gnutls_session_t session);
 int _gnutls_read_connection_state_init (gnutls_session_t session);
@@ -40,11 +40,11 @@ int _gnutls_write_connection_state_init (gnutls_session_t session);
 int _gnutls_set_kx (gnutls_session_t session, gnutls_kx_algorithm_t algo);
 
 int _gnutls_epoch_get (gnutls_session_t session, unsigned int epoch_rel,
-		       record_parameters_st ** params_out);
+                       record_parameters_st ** params_out);
 int _gnutls_epoch_alloc (gnutls_session_t session, uint16_t epoch,
-			 record_parameters_st ** out);
+                         record_parameters_st ** out);
 void _gnutls_epoch_gc (gnutls_session_t session);
 void _gnutls_epoch_free (gnutls_session_t session,
-			 record_parameters_st * state);
+                         record_parameters_st * state);
 
 #endif

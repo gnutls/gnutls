@@ -36,8 +36,8 @@
 
 static int
 get_extension (ASN1_TYPE asn, const char *root,
-	       const char *extension_id, int indx,
-	       gnutls_datum_t * ret, unsigned int *_critical)
+               const char *extension_id, int indx,
+               gnutls_datum_t * ret, unsigned int *_critical)
 {
   int k, result, len;
   char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
@@ -65,84 +65,84 @@ get_extension (ASN1_TYPE asn, const char *root,
        */
 
       if (result == ASN1_ELEMENT_NOT_FOUND)
-	{
-	  break;
-	}
+        {
+          break;
+        }
 
       do
-	{
+        {
 
-	  _gnutls_str_cpy (name2, sizeof (name2), name);
-	  _gnutls_str_cat (name2, sizeof (name2), ".extnID");
+          _gnutls_str_cpy (name2, sizeof (name2), name);
+          _gnutls_str_cat (name2, sizeof (name2), ".extnID");
 
-	  len = sizeof (extnID) - 1;
-	  result = asn1_read_value (asn, name2, extnID, &len);
+          len = sizeof (extnID) - 1;
+          result = asn1_read_value (asn, name2, extnID, &len);
 
-	  if (result == ASN1_ELEMENT_NOT_FOUND)
-	    {
-	      gnutls_assert ();
-	      break;
-	    }
-	  else if (result != ASN1_SUCCESS)
-	    {
-	      gnutls_assert ();
-	      return _gnutls_asn2err (result);
-	    }
+          if (result == ASN1_ELEMENT_NOT_FOUND)
+            {
+              gnutls_assert ();
+              break;
+            }
+          else if (result != ASN1_SUCCESS)
+            {
+              gnutls_assert ();
+              return _gnutls_asn2err (result);
+            }
 
-	  /* Handle Extension 
-	   */
-	  if (strcmp (extnID, extension_id) == 0 && indx == indx_counter++)
-	    {
-	      /* extension was found 
-	       */
+          /* Handle Extension 
+           */
+          if (strcmp (extnID, extension_id) == 0 && indx == indx_counter++)
+            {
+              /* extension was found 
+               */
 
-	      /* read the critical status.
-	       */
-	      _gnutls_str_cpy (name2, sizeof (name2), name);
-	      _gnutls_str_cat (name2, sizeof (name2), ".critical");
+              /* read the critical status.
+               */
+              _gnutls_str_cpy (name2, sizeof (name2), name);
+              _gnutls_str_cat (name2, sizeof (name2), ".critical");
 
-	      len = sizeof (str_critical);
-	      result = asn1_read_value (asn, name2, str_critical, &len);
+              len = sizeof (str_critical);
+              result = asn1_read_value (asn, name2, str_critical, &len);
 
-	      if (result == ASN1_ELEMENT_NOT_FOUND)
-		{
-		  gnutls_assert ();
-		  break;
-		}
-	      else if (result != ASN1_SUCCESS)
-		{
-		  gnutls_assert ();
-		  return _gnutls_asn2err (result);
-		}
+              if (result == ASN1_ELEMENT_NOT_FOUND)
+                {
+                  gnutls_assert ();
+                  break;
+                }
+              else if (result != ASN1_SUCCESS)
+                {
+                  gnutls_assert ();
+                  return _gnutls_asn2err (result);
+                }
 
-	      if (str_critical[0] == 'T')
-		critical = 1;
-	      else
-		critical = 0;
+              if (str_critical[0] == 'T')
+                critical = 1;
+              else
+                critical = 0;
 
-	      /* read the value.
-	       */
-	      _gnutls_str_cpy (name2, sizeof (name2), name);
-	      _gnutls_str_cat (name2, sizeof (name2), ".extnValue");
+              /* read the value.
+               */
+              _gnutls_str_cpy (name2, sizeof (name2), name);
+              _gnutls_str_cat (name2, sizeof (name2), ".extnValue");
 
-	      result = _gnutls_x509_read_value (asn, name2, &value, 0);
-	      if (result < 0)
-		{
-		  gnutls_assert ();
-		  return result;
-		}
+              result = _gnutls_x509_read_value (asn, name2, &value, 0);
+              if (result < 0)
+                {
+                  gnutls_assert ();
+                  return result;
+                }
 
-	      ret->data = value.data;
-	      ret->size = value.size;
+              ret->data = value.data;
+              ret->size = value.size;
 
-	      if (_critical)
-		*_critical = critical;
+              if (_critical)
+                *_critical = critical;
 
-	      return 0;
-	    }
+              return 0;
+            }
 
 
-	}
+        }
       while (0);
     }
   while (1);
@@ -169,20 +169,20 @@ get_extension (ASN1_TYPE asn, const char *root,
  */
 int
 _gnutls_x509_crt_get_extension (gnutls_x509_crt_t cert,
-				const char *extension_id, int indx,
-				gnutls_datum_t * ret, unsigned int *_critical)
+                                const char *extension_id, int indx,
+                                gnutls_datum_t * ret, unsigned int *_critical)
 {
   return get_extension (cert->cert, "tbsCertificate.extensions", extension_id,
-			indx, ret, _critical);
+                        indx, ret, _critical);
 }
 
 int
 _gnutls_x509_crl_get_extension (gnutls_x509_crl_t crl,
-				const char *extension_id, int indx,
-				gnutls_datum_t * ret, unsigned int *_critical)
+                                const char *extension_id, int indx,
+                                gnutls_datum_t * ret, unsigned int *_critical)
 {
   return get_extension (crl->crl, "tbsCertList.crlExtensions", extension_id,
-			indx, ret, _critical);
+                        indx, ret, _critical);
 }
 
 
@@ -194,7 +194,7 @@ _gnutls_x509_crl_get_extension (gnutls_x509_crl_t crl,
  */
 static int
 get_extension_oid (ASN1_TYPE asn, const char *root,
-		   int indx, void *oid, size_t * sizeof_oid)
+                   int indx, void *oid, size_t * sizeof_oid)
 {
   int k, result, len;
   char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
@@ -216,51 +216,51 @@ get_extension_oid (ASN1_TYPE asn, const char *root,
        */
 
       if (result == ASN1_ELEMENT_NOT_FOUND)
-	{
-	  break;
-	}
+        {
+          break;
+        }
 
       do
-	{
+        {
 
-	  _gnutls_str_cpy (name2, sizeof (name2), name);
-	  _gnutls_str_cat (name2, sizeof (name2), ".extnID");
+          _gnutls_str_cpy (name2, sizeof (name2), name);
+          _gnutls_str_cat (name2, sizeof (name2), ".extnID");
 
-	  len = sizeof (extnID) - 1;
-	  result = asn1_read_value (asn, name2, extnID, &len);
+          len = sizeof (extnID) - 1;
+          result = asn1_read_value (asn, name2, extnID, &len);
 
-	  if (result == ASN1_ELEMENT_NOT_FOUND)
-	    {
-	      gnutls_assert ();
-	      break;
-	    }
-	  else if (result != ASN1_SUCCESS)
-	    {
-	      gnutls_assert ();
-	      return _gnutls_asn2err (result);
-	    }
+          if (result == ASN1_ELEMENT_NOT_FOUND)
+            {
+              gnutls_assert ();
+              break;
+            }
+          else if (result != ASN1_SUCCESS)
+            {
+              gnutls_assert ();
+              return _gnutls_asn2err (result);
+            }
 
-	  /* Handle Extension 
-	   */
-	  if (indx == indx_counter++)
-	    {
-	      len = strlen (extnID) + 1;
+          /* Handle Extension 
+           */
+          if (indx == indx_counter++)
+            {
+              len = strlen (extnID) + 1;
 
-	      if (*sizeof_oid < (unsigned) len)
-		{
-		  *sizeof_oid = len;
-		  gnutls_assert ();
-		  return GNUTLS_E_SHORT_MEMORY_BUFFER;
-		}
+              if (*sizeof_oid < (unsigned) len)
+                {
+                  *sizeof_oid = len;
+                  gnutls_assert ();
+                  return GNUTLS_E_SHORT_MEMORY_BUFFER;
+                }
 
-	      memcpy (oid, extnID, len);
-	      *sizeof_oid = len - 1;
+              memcpy (oid, extnID, len);
+              *sizeof_oid = len - 1;
 
-	      return 0;
-	    }
+              return 0;
+            }
 
 
-	}
+        }
       while (0);
     }
   while (1);
@@ -284,18 +284,18 @@ get_extension_oid (ASN1_TYPE asn, const char *root,
  */
 int
 _gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert,
-				    int indx, void *oid, size_t * sizeof_oid)
+                                    int indx, void *oid, size_t * sizeof_oid)
 {
   return get_extension_oid (cert->cert, "tbsCertificate.extensions", indx,
-			    oid, sizeof_oid);
+                            oid, sizeof_oid);
 }
 
 int
 _gnutls_x509_crl_get_extension_oid (gnutls_x509_crl_t crl,
-				    int indx, void *oid, size_t * sizeof_oid)
+                                    int indx, void *oid, size_t * sizeof_oid)
 {
   return get_extension_oid (crl->crl, "tbsCertList.crlExtensions", indx, oid,
-			    sizeof_oid);
+                            sizeof_oid);
 }
 
 /* This function will attempt to set the requested extension in
@@ -305,7 +305,7 @@ _gnutls_x509_crl_get_extension_oid (gnutls_x509_crl_t crl,
  */
 static int
 add_extension (ASN1_TYPE asn, const char *root, const char *extension_id,
-	       const gnutls_datum_t * ext_data, unsigned int critical)
+               const gnutls_datum_t * ext_data, unsigned int critical)
 {
   int result;
   const char *str;
@@ -371,7 +371,7 @@ add_extension (ASN1_TYPE asn, const char *root, const char *extension_id,
  */
 static int
 overwrite_extension (ASN1_TYPE asn, const char *root, unsigned int indx,
-		     const gnutls_datum_t * ext_data, unsigned int critical)
+                     const gnutls_datum_t * ext_data, unsigned int critical)
 {
   char name[ASN1_MAX_NAME_SIZE], name2[ASN1_MAX_NAME_SIZE];
   const char *str;
@@ -412,8 +412,8 @@ overwrite_extension (ASN1_TYPE asn, const char *root, unsigned int indx,
 
 static int
 set_extension (ASN1_TYPE asn, const char *root,
-	       const char *ext_id,
-	       const gnutls_datum_t * ext_data, unsigned int critical)
+               const char *ext_id,
+               const gnutls_datum_t * ext_data, unsigned int critical)
 {
   int result;
   int k, len;
@@ -428,9 +428,9 @@ set_extension (ASN1_TYPE asn, const char *root,
       k++;
 
       if (root[0] != 0)
-	snprintf (name, sizeof (name), "%s.?%u", root, k);
+        snprintf (name, sizeof (name), "%s.?%u", root, k);
       else
-	snprintf (name, sizeof (name), "?%u", k);
+        snprintf (name, sizeof (name), "?%u", k);
 
       len = sizeof (extnID) - 1;
       result = asn1_read_value (asn, name, extnID, &len);
@@ -439,41 +439,41 @@ set_extension (ASN1_TYPE asn, const char *root,
        */
 
       if (result == ASN1_ELEMENT_NOT_FOUND)
-	{
-	  break;
-	}
+        {
+          break;
+        }
 
       do
-	{
+        {
 
-	  _gnutls_str_cpy (name2, sizeof (name2), name);
-	  _gnutls_str_cat (name2, sizeof (name2), ".extnID");
+          _gnutls_str_cpy (name2, sizeof (name2), name);
+          _gnutls_str_cat (name2, sizeof (name2), ".extnID");
 
-	  len = sizeof (extnID) - 1;
-	  result = asn1_read_value (asn, name2, extnID, &len);
+          len = sizeof (extnID) - 1;
+          result = asn1_read_value (asn, name2, extnID, &len);
 
-	  if (result == ASN1_ELEMENT_NOT_FOUND)
-	    {
-	      gnutls_assert ();
-	      break;
-	    }
-	  else if (result != ASN1_SUCCESS)
-	    {
-	      gnutls_assert ();
-	      return _gnutls_asn2err (result);
-	    }
+          if (result == ASN1_ELEMENT_NOT_FOUND)
+            {
+              gnutls_assert ();
+              break;
+            }
+          else if (result != ASN1_SUCCESS)
+            {
+              gnutls_assert ();
+              return _gnutls_asn2err (result);
+            }
 
-	  /* Handle Extension 
-	   */
-	  if (strcmp (extnID, ext_id) == 0)
-	    {
-	      /* extension was found 
-	       */
-	      return overwrite_extension (asn, root, k, ext_data, critical);
-	    }
+          /* Handle Extension 
+           */
+          if (strcmp (extnID, ext_id) == 0)
+            {
+              /* extension was found 
+               */
+              return overwrite_extension (asn, root, k, ext_data, critical);
+            }
 
 
-	}
+        }
       while (0);
     }
   while (1);
@@ -499,30 +499,30 @@ set_extension (ASN1_TYPE asn, const char *root,
  */
 int
 _gnutls_x509_crt_set_extension (gnutls_x509_crt_t cert,
-				const char *ext_id,
-				const gnutls_datum_t * ext_data,
-				unsigned int critical)
+                                const char *ext_id,
+                                const gnutls_datum_t * ext_data,
+                                unsigned int critical)
 {
   return set_extension (cert->cert, "tbsCertificate.extensions", ext_id,
-			ext_data, critical);
+                        ext_data, critical);
 }
 
 int
 _gnutls_x509_crl_set_extension (gnutls_x509_crl_t crl,
-				const char *ext_id,
-				const gnutls_datum_t * ext_data,
-				unsigned int critical)
+                                const char *ext_id,
+                                const gnutls_datum_t * ext_data,
+                                unsigned int critical)
 {
   return set_extension (crl->crl, "tbsCertList.crlExtensions", ext_id,
-			ext_data, critical);
+                        ext_data, critical);
 }
 
 #ifdef ENABLE_PKI
 int
 _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
-				const char *ext_id,
-				const gnutls_datum_t * ext_data,
-				unsigned int critical)
+                                const char *ext_id,
+                                const gnutls_datum_t * ext_data,
+                                unsigned int critical)
 {
   unsigned char *extensions = NULL;
   size_t extensions_size = 0;
@@ -531,33 +531,33 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
   int result;
 
   result = gnutls_x509_crq_get_attribute_by_oid (crq, "1.2.840.113549.1.9.14",
-						 0, NULL, &extensions_size);
+                                                 0, NULL, &extensions_size);
   if (result == GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
       extensions = gnutls_malloc (extensions_size);
       if (extensions == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
 
       result = gnutls_x509_crq_get_attribute_by_oid (crq,
-						     "1.2.840.113549.1.9.14",
-						     0, extensions,
-						     &extensions_size);
+                                                     "1.2.840.113549.1.9.14",
+                                                     0, extensions,
+                                                     &extensions_size);
     }
   if (result < 0)
     {
       if (result == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-	{
-	  extensions_size = 0;
-	}
+        {
+          extensions_size = 0;
+        }
       else
-	{
-	  gnutls_assert ();
-	  gnutls_free (extensions);
-	  return result;
-	}
+        {
+          gnutls_assert ();
+          gnutls_free (extensions);
+          return result;
+        }
     }
 
   result = asn1_create_element (_gnutls_get_pkix (), "PKIX1.Extensions", &c2);
@@ -573,11 +573,11 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
       result = asn1_der_decoding (&c2, extensions, extensions_size, NULL);
       gnutls_free (extensions);
       if (result != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  asn1_delete_structure (&c2);
-	  return _gnutls_asn2err (result);
-	}
+        {
+          gnutls_assert ();
+          asn1_delete_structure (&c2);
+          return _gnutls_asn2err (result);
+        }
     }
 
   result = set_extension (c2, "", ext_id, ext_data, critical);
@@ -599,7 +599,7 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
     }
 
   result = gnutls_x509_crq_set_attribute_by_oid (crq, "1.2.840.113549.1.9.14",
-						 der.data, der.size);
+                                                 der.data, der.size);
   gnutls_free (der.data);
   if (result < 0)
     {
@@ -618,7 +618,7 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
  */
 int
 _gnutls_x509_ext_extract_keyUsage (uint16_t * keyUsage,
-				   opaque * extnValue, int extnValueLen)
+                                   opaque * extnValue, int extnValueLen)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int len, result;
@@ -663,9 +663,9 @@ _gnutls_x509_ext_extract_keyUsage (uint16_t * keyUsage,
  */
 int
 _gnutls_x509_ext_extract_basicConstraints (int *CA,
-					   int *pathLenConstraint,
-					   opaque * extnValue,
-					   int extnValueLen)
+                                           int *pathLenConstraint,
+                                           opaque * extnValue,
+                                           int extnValueLen)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   char str[128];
@@ -689,15 +689,15 @@ _gnutls_x509_ext_extract_basicConstraints (int *CA,
   if (pathLenConstraint)
     {
       result = _gnutls_x509_read_uint (ext, "pathLenConstraint",
-				       pathLenConstraint);
+                                       pathLenConstraint);
       if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
-	*pathLenConstraint = -1;
+        *pathLenConstraint = -1;
       else if (result != GNUTLS_E_SUCCESS)
-	{
-	  gnutls_assert ();
-	  asn1_delete_structure (&ext);
-	  return _gnutls_asn2err (result);
-	}
+        {
+          gnutls_assert ();
+          asn1_delete_structure (&ext);
+          return _gnutls_asn2err (result);
+        }
     }
 
   /* the default value of cA is false.
@@ -721,8 +721,8 @@ _gnutls_x509_ext_extract_basicConstraints (int *CA,
  */
 int
 _gnutls_x509_ext_gen_basicConstraints (int CA,
-				       int pathLenConstraint,
-				       gnutls_datum_t * der_ext)
+                                       int pathLenConstraint,
+                                       gnutls_datum_t * der_ext)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   const char *str;
@@ -753,11 +753,11 @@ _gnutls_x509_ext_gen_basicConstraints (int CA,
     {
       result = asn1_write_value (ext, "pathLenConstraint", NULL, 0);
       if (result < 0)
-	result = _gnutls_asn2err (result);
+        result = _gnutls_asn2err (result);
     }
   else
     result = _gnutls_x509_write_uint32 (ext, "pathLenConstraint",
-					pathLenConstraint);
+                                        pathLenConstraint);
   if (result < 0)
     {
       gnutls_assert ();
@@ -782,8 +782,8 @@ _gnutls_x509_ext_gen_basicConstraints (int CA,
  */
 int
 _gnutls_x509_ext_extract_number (opaque * number,
-				 size_t * _nr_size,
-				 opaque * extnValue, int extnValueLen)
+                                 size_t * _nr_size,
+                                 opaque * extnValue, int extnValueLen)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int result;
@@ -794,7 +794,7 @@ _gnutls_x509_ext_extract_number (opaque * number,
    */
   if ((result = asn1_create_element
        (_gnutls_get_pkix (), "PKIX1.CertificateSerialNumber",
-	&ext)) != ASN1_SUCCESS)
+        &ext)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
@@ -827,14 +827,14 @@ _gnutls_x509_ext_extract_number (opaque * number,
  */
 int
 _gnutls_x509_ext_gen_number (const opaque * number, size_t nr_size,
-			     gnutls_datum_t * der_ext)
+                             gnutls_datum_t * der_ext)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int result;
 
   result =
     asn1_create_element (_gnutls_get_pkix (), "PKIX1.CertificateSerialNumber",
-			 &ext);
+                         &ext);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -905,8 +905,8 @@ _gnutls_x509_ext_gen_keyUsage (uint16_t usage, gnutls_datum_t * der_ext)
 
 static int
 write_new_general_name (ASN1_TYPE ext, const char *ext_name,
-			gnutls_x509_subject_alt_name_t type,
-			const void *data, unsigned int data_size)
+                        gnutls_x509_subject_alt_name_t type,
+                        const void *data, unsigned int data_size)
 {
   const char *str;
   int result;
@@ -939,7 +939,7 @@ write_new_general_name (ASN1_TYPE ext, const char *ext_name,
     }
 
   if (ext_name[0] == 0)
-    {				/* no dot */
+    {                           /* no dot */
       _gnutls_str_cpy (name, sizeof (name), "?LAST");
     }
   else
@@ -974,10 +974,10 @@ write_new_general_name (ASN1_TYPE ext, const char *ext_name,
  */
 int
 _gnutls_x509_ext_gen_subject_alt_name (gnutls_x509_subject_alt_name_t
-				       type, const void *data,
-				       unsigned int data_size,
-				       gnutls_datum_t * prev_der_ext,
-				       gnutls_datum_t * der_ext)
+                                       type, const void *data,
+                                       unsigned int data_size,
+                                       gnutls_datum_t * prev_der_ext,
+                                       gnutls_datum_t * der_ext)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int result;
@@ -994,15 +994,15 @@ _gnutls_x509_ext_gen_subject_alt_name (gnutls_x509_subject_alt_name_t
       && prev_der_ext->size != 0)
     {
       result =
-	asn1_der_decoding (&ext, prev_der_ext->data, prev_der_ext->size,
-			   NULL);
+        asn1_der_decoding (&ext, prev_der_ext->data, prev_der_ext->size,
+                           NULL);
 
       if (result != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  asn1_delete_structure (&ext);
-	  return _gnutls_asn2err (result);
-	}
+        {
+          gnutls_assert ();
+          asn1_delete_structure (&ext);
+          return _gnutls_asn2err (result);
+        }
     }
 
   result = write_new_general_name (ext, "", type, data, data_size);
@@ -1030,14 +1030,14 @@ _gnutls_x509_ext_gen_subject_alt_name (gnutls_x509_subject_alt_name_t
  */
 int
 _gnutls_x509_ext_gen_key_id (const void *id, size_t id_size,
-			     gnutls_datum_t * der_ext)
+                             gnutls_datum_t * der_ext)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int result;
 
   result =
     asn1_create_element (_gnutls_get_pkix (),
-			 "PKIX1.SubjectKeyIdentifier", &ext);
+                         "PKIX1.SubjectKeyIdentifier", &ext);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -1069,14 +1069,14 @@ _gnutls_x509_ext_gen_key_id (const void *id, size_t id_size,
  */
 int
 _gnutls_x509_ext_gen_auth_key_id (const void *id, size_t id_size,
-				  gnutls_datum_t * der_ext)
+                                  gnutls_datum_t * der_ext)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int result;
 
   result =
     asn1_create_element (_gnutls_get_pkix (),
-			 "PKIX1.AuthorityKeyIdentifier", &ext);
+                         "PKIX1.AuthorityKeyIdentifier", &ext);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -1115,10 +1115,10 @@ _gnutls_x509_ext_gen_auth_key_id (const void *id, size_t id_size,
  */
 int
 _gnutls_x509_ext_gen_crl_dist_points (gnutls_x509_subject_alt_name_t
-				      type, const void *data,
-				      unsigned int data_size,
-				      unsigned int reason_flags,
-				      gnutls_datum_t * der_ext)
+                                      type, const void *data,
+                                      unsigned int data_size,
+                                      unsigned int reason_flags,
+                                      gnutls_datum_t * der_ext)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   gnutls_datum_t gnames = { NULL, 0 };
@@ -1130,7 +1130,7 @@ _gnutls_x509_ext_gen_crl_dist_points (gnutls_x509_subject_alt_name_t
 
   result =
     asn1_create_element (_gnutls_get_pkix (),
-			 "PKIX1.CRLDistributionPoints", &ext);
+                         "PKIX1.CRLDistributionPoints", &ext);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -1150,21 +1150,21 @@ _gnutls_x509_ext_gen_crl_dist_points (gnutls_x509_subject_alt_name_t
     {
       result = asn1_write_value (ext, "?LAST.reasons", reasons, 9);
       if (result != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  result = _gnutls_asn2err (result);
-	  goto cleanup;
-	}
+        {
+          gnutls_assert ();
+          result = _gnutls_asn2err (result);
+          goto cleanup;
+        }
     }
   else
     {
       result = asn1_write_value (ext, "?LAST.reasons", NULL, 0);
       if (result != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  result = _gnutls_asn2err (result);
-	  goto cleanup;
-	}
+        {
+          gnutls_assert ();
+          result = _gnutls_asn2err (result);
+          goto cleanup;
+        }
     }
 
   result = asn1_write_value (ext, "?LAST.cRLIssuer", NULL, 0);
@@ -1188,13 +1188,13 @@ _gnutls_x509_ext_gen_crl_dist_points (gnutls_x509_subject_alt_name_t
 #if 0
   /* only needed in old code (where defined as SEQUENCE OF) */
   asn1_write_value (ext,
-		    "?LAST.distributionPoint.nameRelativeToCRLIssuer",
-		    NULL, 0);
+                    "?LAST.distributionPoint.nameRelativeToCRLIssuer",
+                    NULL, 0);
 #endif
 
   result =
     write_new_general_name (ext, "?LAST.distributionPoint.fullName",
-			    type, data, data_size);
+                            type, data, data_size);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1222,10 +1222,10 @@ cleanup:
  */
 int
 _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
-					char **policyLanguage,
-					char **policy,
-					size_t * sizeof_policy,
-					opaque * extnValue, int extnValueLen)
+                                        char **policyLanguage,
+                                        char **policy,
+                                        size_t * sizeof_policy,
+                                        opaque * extnValue, int extnValueLen)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int result;
@@ -1249,18 +1249,18 @@ _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
   if (pathLenConstraint)
     {
       result = _gnutls_x509_read_uint (ext, "pCPathLenConstraint",
-				       pathLenConstraint);
+                                       pathLenConstraint);
       if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
-	*pathLenConstraint = -1;
+        *pathLenConstraint = -1;
       else if (result != GNUTLS_E_SUCCESS)
-	{
-	  asn1_delete_structure (&ext);
-	  return _gnutls_asn2err (result);
-	}
+        {
+          asn1_delete_structure (&ext);
+          return _gnutls_asn2err (result);
+        }
     }
 
   result = _gnutls_x509_read_value (ext, "proxyPolicy.policyLanguage",
-				    &value, 0);
+                                    &value, 0);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1275,9 +1275,9 @@ _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
   if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
     {
       if (policy)
-	*policy = NULL;
+        *policy = NULL;
       if (sizeof_policy)
-	*sizeof_policy = 0;
+        *sizeof_policy = 0;
     }
   else if (result < 0)
     {
@@ -1288,9 +1288,9 @@ _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
   else
     {
       if (policy)
-	*policy = value.data;
+        *policy = value.data;
       if (sizeof_policy)
-	*sizeof_policy = value.size;
+        *sizeof_policy = value.size;
     }
 
   asn1_delete_structure (&ext);
@@ -1302,16 +1302,16 @@ _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
  */
 int
 _gnutls_x509_ext_gen_proxyCertInfo (int pathLenConstraint,
-				    const char *policyLanguage,
-				    const char *policy,
-				    size_t sizeof_policy,
-				    gnutls_datum_t * der_ext)
+                                    const char *policyLanguage,
+                                    const char *policy,
+                                    size_t sizeof_policy,
+                                    gnutls_datum_t * der_ext)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int result;
 
   result = asn1_create_element (_gnutls_get_pkix (),
-				"PKIX1.ProxyCertInfo", &ext);
+                                "PKIX1.ProxyCertInfo", &ext);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -1322,11 +1322,11 @@ _gnutls_x509_ext_gen_proxyCertInfo (int pathLenConstraint,
     {
       result = asn1_write_value (ext, "pCPathLenConstraint", NULL, 0);
       if (result < 0)
-	result = _gnutls_asn2err (result);
+        result = _gnutls_asn2err (result);
     }
   else
     result = _gnutls_x509_write_uint32 (ext, "pCPathLenConstraint",
-					pathLenConstraint);
+                                        pathLenConstraint);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1335,7 +1335,7 @@ _gnutls_x509_ext_gen_proxyCertInfo (int pathLenConstraint,
     }
 
   result = asn1_write_value (ext, "proxyPolicy.policyLanguage",
-			     policyLanguage, 1);
+                             policyLanguage, 1);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1344,7 +1344,7 @@ _gnutls_x509_ext_gen_proxyCertInfo (int pathLenConstraint,
     }
 
   result = asn1_write_value (ext, "proxyPolicy.policy",
-			     policy, sizeof_policy);
+                             policy, sizeof_policy);
   if (result < 0)
     {
       gnutls_assert ();

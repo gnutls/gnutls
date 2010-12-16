@@ -121,42 +121,42 @@ doit (void)
     {
       ret = gnutls_pkcs12_bag_init (&bag);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "bag_init: %d", ret);
+        error (EXIT_FAILURE, 0, "bag_init: %d", ret);
 
       ret = gnutls_pkcs12_bag_set_crt (bag, i == 0 ? client : ca);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "set_crt: %d", ret);
+        error (EXIT_FAILURE, 0, "set_crt: %d", ret);
 
       indx = ret;
 
       ret = gnutls_pkcs12_bag_set_friendly_name (bag, indx,
-						 i == 0 ? "client" : "ca");
+                                                 i == 0 ? "client" : "ca");
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "set_friendly_name: %d", ret);
+        error (EXIT_FAILURE, 0, "set_friendly_name: %d", ret);
 
       size = sizeof (key_id_buf);
       ret = gnutls_x509_crt_get_key_id (i == 0 ? client : ca, 0,
-					key_id_buf, &size);
+                                        key_id_buf, &size);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "get_key_id: %d", ret);
+        error (EXIT_FAILURE, 0, "get_key_id: %d", ret);
 
       key_id.data = key_id_buf;
       key_id.size = size;
 
       ret = gnutls_pkcs12_bag_set_key_id (bag, indx, &key_id);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "bag_set_key_id: %d", ret);
+        error (EXIT_FAILURE, 0, "bag_set_key_id: %d", ret);
 
       ret = gnutls_pkcs12_bag_encrypt (bag, "pass",
-				       i == 0 ? GNUTLS_PKCS8_USE_PKCS12_3DES
-				       : GNUTLS_PKCS_USE_PKCS12_RC2_40);
+                                       i == 0 ? GNUTLS_PKCS8_USE_PKCS12_3DES
+                                       : GNUTLS_PKCS_USE_PKCS12_RC2_40);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "bag_encrypt: %d: %s", ret,
-	       i == 0 ? "3DES" : "RC2-40");
+        error (EXIT_FAILURE, 0, "bag_encrypt: %d: %s", ret,
+               i == 0 ? "3DES" : "RC2-40");
 
       ret = gnutls_pkcs12_set_bag (pkcs12, bag);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "set_bag: %d", ret);
+        error (EXIT_FAILURE, 0, "set_bag: %d", ret);
 
       gnutls_pkcs12_bag_deinit (bag);
     }

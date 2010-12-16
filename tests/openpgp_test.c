@@ -36,7 +36,7 @@ get_pktime (long timestamp)
 
   tb = localtime (&timestamp);
   sprintf (buf, "%04d-%02d-%02d", tb->tm_year + 1900, tb->tm_mon + 1,
-	   tb->tm_mday);
+           tb->tm_mday);
   return buf;
 }
 

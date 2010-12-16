@@ -41,7 +41,7 @@ mbuffer_st *_mbuffer_get_next (mbuffer_st * cur, gnutls_datum_t * msg);
  * one.
  */
 int _mbuffer_append_data (mbuffer_st * bufel, void *newdata,
-			  size_t newdata_size);
+                          size_t newdata_size);
 int _mbuffer_linearize (mbuffer_head_st * buf);
 
 
@@ -96,7 +96,7 @@ inline static mbuffer_st *
 _gnutls_handshake_alloc (size_t size, size_t maximum)
 {
   mbuffer_st *ret = _mbuffer_alloc (HANDSHAKE_HEADER_SIZE + size,
-				    HANDSHAKE_HEADER_SIZE + maximum);
+                                    HANDSHAKE_HEADER_SIZE + maximum);
 
   if (!ret)
     return NULL;

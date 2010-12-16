@@ -36,7 +36,7 @@ main (void)
 
   gnutls_psk_allocate_client_credentials (&pskcred);
   gnutls_psk_set_client_credentials (pskcred, "test", &key,
-				     GNUTLS_PSK_KEY_HEX);
+                                     GNUTLS_PSK_KEY_HEX);
 
   /* Initialize TLS session
    */
@@ -47,9 +47,9 @@ main (void)
   if (ret < 0)
     {
       if (ret == GNUTLS_E_INVALID_REQUEST)
-	{
-	  fprintf (stderr, "Syntax error at: %s\n", err);
-	}
+        {
+          fprintf (stderr, "Syntax error at: %s\n", err);
+        }
       exit (1);
     }
 

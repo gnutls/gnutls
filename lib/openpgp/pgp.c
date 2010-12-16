@@ -49,7 +49,7 @@ gnutls_openpgp_crt_init (gnutls_openpgp_crt_t * key)
   *key = gnutls_calloc (1, sizeof (gnutls_openpgp_crt_int));
 
   if (*key)
-    return 0;			/* success */
+    return 0;                   /* success */
   return GNUTLS_E_MEMORY_ERROR;
 }
 
@@ -88,8 +88,8 @@ gnutls_openpgp_crt_deinit (gnutls_openpgp_crt_t key)
  **/
 int
 gnutls_openpgp_crt_import (gnutls_openpgp_crt_t key,
-			   const gnutls_datum_t * data,
-			   gnutls_openpgp_crt_fmt_t format)
+                           const gnutls_datum_t * data,
+                           gnutls_openpgp_crt_fmt_t format)
 {
   cdk_stream_t inp;
   cdk_packet_t pkt;
@@ -105,35 +105,35 @@ gnutls_openpgp_crt_import (gnutls_openpgp_crt_t key,
     {
       rc = cdk_kbnode_read_from_mem (&key->knode, data->data, data->size);
       if (rc)
-	{
-	  rc = _gnutls_map_cdk_rc (rc);
-	  gnutls_assert ();
-	  return rc;
-	}
+        {
+          rc = _gnutls_map_cdk_rc (rc);
+          gnutls_assert ();
+          return rc;
+        }
     }
   else
     {
       rc = cdk_stream_tmp_from_mem (data->data, data->size, &inp);
       if (rc)
-	{
-	  rc = _gnutls_map_cdk_rc (rc);
-	  gnutls_assert ();
-	  return rc;
-	}
+        {
+          rc = _gnutls_map_cdk_rc (rc);
+          gnutls_assert ();
+          return rc;
+        }
       if (cdk_armor_filter_use (inp))
-	rc = cdk_stream_set_armor_flag (inp, 0);
+        rc = cdk_stream_set_armor_flag (inp, 0);
       if (!rc)
-	rc = cdk_keydb_get_keyblock (inp, &key->knode);
+        rc = cdk_keydb_get_keyblock (inp, &key->knode);
       cdk_stream_close (inp);
       if (rc)
-	{
-	  if (rc == CDK_Inv_Packet)
-	    rc = GNUTLS_E_OPENPGP_GETKEY_FAILED;
-	  else
-	    rc = _gnutls_map_cdk_rc (rc);
-	  gnutls_assert ();
-	  return rc;
-	}
+        {
+          if (rc == CDK_Inv_Packet)
+            rc = GNUTLS_E_OPENPGP_GETKEY_FAILED;
+          else
+            rc = _gnutls_map_cdk_rc (rc);
+          gnutls_assert ();
+          return rc;
+        }
     }
 
   /* Test if the import was successful. */
@@ -151,9 +151,9 @@ gnutls_openpgp_crt_import (gnutls_openpgp_crt_t key,
  */
 int
 _gnutls_openpgp_export (cdk_kbnode_t node,
-			gnutls_openpgp_crt_fmt_t format,
-			void *output_data,
-			size_t * output_data_size, int private)
+                        gnutls_openpgp_crt_fmt_t format,
+                        void *output_data,
+                        size_t * output_data_size, int private)
 {
   size_t input_data_size = *output_data_size;
   size_t calc_size;
@@ -183,30 +183,30 @@ _gnutls_openpgp_export (cdk_kbnode_t node,
       /* Calculate the size of the encoded data and check if the provided
          buffer is large enough. */
       rc = cdk_armor_encode_buffer (in, *output_data_size,
-				    NULL, 0, &calc_size,
-				    private ? CDK_ARMOR_SECKEY :
-				    CDK_ARMOR_PUBKEY);
+                                    NULL, 0, &calc_size,
+                                    private ? CDK_ARMOR_SECKEY :
+                                    CDK_ARMOR_PUBKEY);
       if (rc || calc_size > input_data_size)
-	{
-	  gnutls_free (in);
-	  *output_data_size = calc_size;
-	  gnutls_assert ();
-	  return GNUTLS_E_SHORT_MEMORY_BUFFER;
-	}
+        {
+          gnutls_free (in);
+          *output_data_size = calc_size;
+          gnutls_assert ();
+          return GNUTLS_E_SHORT_MEMORY_BUFFER;
+        }
 
       rc = cdk_armor_encode_buffer (in, *output_data_size,
-				    output_data, input_data_size, &calc_size,
-				    private ? CDK_ARMOR_SECKEY :
-				    CDK_ARMOR_PUBKEY);
+                                    output_data, input_data_size, &calc_size,
+                                    private ? CDK_ARMOR_SECKEY :
+                                    CDK_ARMOR_PUBKEY);
       gnutls_free (in);
       *output_data_size = calc_size;
 
       if (rc)
-	{
-	  rc = _gnutls_map_cdk_rc (rc);
-	  gnutls_assert ();
-	  return rc;
-	}
+        {
+          rc = _gnutls_map_cdk_rc (rc);
+          gnutls_assert ();
+          return rc;
+        }
     }
 
   return 0;
@@ -229,11 +229,11 @@ _gnutls_openpgp_export (cdk_kbnode_t node,
  **/
 int
 gnutls_openpgp_crt_export (gnutls_openpgp_crt_t key,
-			   gnutls_openpgp_crt_fmt_t format,
-			   void *output_data, size_t * output_data_size)
+                           gnutls_openpgp_crt_fmt_t format,
+                           void *output_data, size_t * output_data_size)
 {
   return _gnutls_openpgp_export (key->knode, format, output_data,
-				 output_data_size, 0);
+                                 output_data_size, 0);
 }
 
 /**
@@ -249,7 +249,7 @@ gnutls_openpgp_crt_export (gnutls_openpgp_crt_t key,
  **/
 int
 gnutls_openpgp_crt_get_fingerprint (gnutls_openpgp_crt_t key,
-				    void *fpr, size_t * fprlen)
+                                    void *fpr, size_t * fprlen)
 {
   cdk_packet_t pkt;
   cdk_pkt_pubkey_t pk = NULL;
@@ -296,7 +296,7 @@ _gnutls_openpgp_count_key_names (gnutls_openpgp_crt_t key)
     {
       pkt = cdk_kbnode_get_packet (p);
       if (pkt->pkttype == CDK_PKT_USER_ID)
-	nuids++;
+        nuids++;
     }
 
   return nuids;
@@ -320,7 +320,7 @@ _gnutls_openpgp_count_key_names (gnutls_openpgp_crt_t key)
  **/
 int
 gnutls_openpgp_crt_get_name (gnutls_openpgp_crt_t key,
-			     int idx, char *buf, size_t * sizeof_buf)
+                             int idx, char *buf, size_t * sizeof_buf)
 {
   cdk_kbnode_t ctx = NULL, p;
   cdk_packet_t pkt = NULL;
@@ -341,11 +341,11 @@ gnutls_openpgp_crt_get_name (gnutls_openpgp_crt_t key,
     {
       pkt = cdk_kbnode_get_packet (p);
       if (pkt->pkttype == CDK_PKT_USER_ID)
-	{
-	  if (pos == idx)
-	    break;
-	  pos++;
-	}
+        {
+          if (pos == idx)
+            break;
+          pos++;
+        }
     }
 
   if (!pkt)
@@ -365,7 +365,7 @@ gnutls_openpgp_crt_get_name (gnutls_openpgp_crt_t key,
   if (buf)
     {
       memcpy (buf, uid->name, uid->len);
-      buf[uid->len] = '\0';	/* make sure it's a string */
+      buf[uid->len] = '\0';     /* make sure it's a string */
     }
   *sizeof_buf = uid->len + 1;
 
@@ -392,7 +392,7 @@ gnutls_openpgp_crt_get_name (gnutls_openpgp_crt_t key,
  **/
 gnutls_pk_algorithm_t
 gnutls_openpgp_crt_get_pk_algorithm (gnutls_openpgp_crt_t key,
-				     unsigned int *bits)
+                                     unsigned int *bits)
 {
   cdk_packet_t pkt;
   int algo;
@@ -408,7 +408,7 @@ gnutls_openpgp_crt_get_pk_algorithm (gnutls_openpgp_crt_t key,
   if (pkt)
     {
       if (bits)
-	*bits = cdk_pk_get_nbits (pkt->pkt.public_key);
+        *bits = cdk_pk_get_nbits (pkt->pkt.public_key);
       algo = _gnutls_openpgp_get_algo (pkt->pkt.public_key->pubkey_algo);
     }
 
@@ -510,7 +510,7 @@ gnutls_openpgp_crt_get_expiration_time (gnutls_openpgp_crt_t key)
  **/
 int
 gnutls_openpgp_crt_get_key_id (gnutls_openpgp_crt_t key,
-			       gnutls_openpgp_keyid_t keyid)
+                               gnutls_openpgp_keyid_t keyid)
 {
   cdk_packet_t pkt;
   uint32_t kid[2];
@@ -576,7 +576,7 @@ gnutls_openpgp_crt_get_revoked_status (gnutls_openpgp_crt_t key)
  **/
 int
 gnutls_openpgp_crt_check_hostname (gnutls_openpgp_crt_t key,
-				   const char *hostname)
+                                   const char *hostname)
 {
   char dnsname[MAX_CN];
   size_t dnsnamesize;
@@ -590,14 +590,14 @@ gnutls_openpgp_crt_check_hostname (gnutls_openpgp_crt_t key,
       ret = gnutls_openpgp_crt_get_name (key, i, dnsname, &dnsnamesize);
 
       if (ret == 0)
-	{
-	  /* Length returned by gnutls_openpgp_crt_get_name includes
-	     the terminating zero. */
-	  dnsnamesize--;
+        {
+          /* Length returned by gnutls_openpgp_crt_get_name includes
+             the terminating zero. */
+          dnsnamesize--;
 
-	  if (_gnutls_hostname_compare (dnsname, dnsnamesize, hostname))
-	    return 1;
-	}
+          if (_gnutls_hostname_compare (dnsname, dnsnamesize, hostname))
+            return 1;
+        }
     }
 
   /* not found a matching name */
@@ -636,7 +636,7 @@ _gnutls_get_pgp_key_usage (unsigned int cdk_usage)
  */
 int
 gnutls_openpgp_crt_get_key_usage (gnutls_openpgp_crt_t key,
-				  unsigned int *key_usage)
+                                  unsigned int *key_usage)
 {
   cdk_packet_t pkt;
 
@@ -685,7 +685,7 @@ gnutls_openpgp_crt_get_subkey_count (gnutls_openpgp_crt_t key)
     {
       pkt = cdk_kbnode_get_packet (p);
       if (pkt->pkttype == CDK_PKT_PUBLIC_SUBKEY)
-	subkeys++;
+        subkeys++;
     }
 
   return subkeys;
@@ -711,7 +711,7 @@ _get_public_subkey (gnutls_openpgp_crt_t key, unsigned int indx)
     {
       pkt = cdk_kbnode_get_packet (p);
       if (pkt->pkttype == CDK_PKT_PUBLIC_SUBKEY && indx == subkeys++)
-	return pkt;
+        return pkt;
     }
 
   return NULL;
@@ -724,7 +724,7 @@ _get_public_subkey (gnutls_openpgp_crt_t key, unsigned int indx)
  */
 cdk_packet_t
 _gnutls_openpgp_find_key (cdk_kbnode_t knode, uint32_t keyid[2],
-			  unsigned int priv)
+                          unsigned int priv)
 {
   cdk_kbnode_t p, ctx;
   cdk_packet_t pkt;
@@ -736,24 +736,24 @@ _gnutls_openpgp_find_key (cdk_kbnode_t knode, uint32_t keyid[2],
       pkt = cdk_kbnode_get_packet (p);
 
       if ((priv == 0
-	   && (pkt->pkttype == CDK_PKT_PUBLIC_SUBKEY
-	       || pkt->pkttype == CDK_PKT_PUBLIC_KEY)) || (priv != 0
-							   && (pkt->pkttype ==
-							       CDK_PKT_SECRET_SUBKEY
-							       || pkt->pkttype
-							       ==
-							       CDK_PKT_SECRET_KEY)))
-	{
-	  if (priv == 0)
-	    cdk_pk_get_keyid (pkt->pkt.public_key, local_keyid);
-	  else
-	    cdk_pk_get_keyid (pkt->pkt.secret_key->pk, local_keyid);
+           && (pkt->pkttype == CDK_PKT_PUBLIC_SUBKEY
+               || pkt->pkttype == CDK_PKT_PUBLIC_KEY)) || (priv != 0
+                                                           && (pkt->pkttype ==
+                                                               CDK_PKT_SECRET_SUBKEY
+                                                               || pkt->pkttype
+                                                               ==
+                                                               CDK_PKT_SECRET_KEY)))
+        {
+          if (priv == 0)
+            cdk_pk_get_keyid (pkt->pkt.public_key, local_keyid);
+          else
+            cdk_pk_get_keyid (pkt->pkt.secret_key->pk, local_keyid);
 
-	  if (local_keyid[0] == keyid[0] && local_keyid[1] == keyid[1])
-	    {
-	      return pkt;
-	    }
-	}
+          if (local_keyid[0] == keyid[0] && local_keyid[1] == keyid[1])
+            {
+              return pkt;
+            }
+        }
     }
 
   gnutls_assert ();
@@ -767,7 +767,7 @@ _gnutls_openpgp_find_key (cdk_kbnode_t knode, uint32_t keyid[2],
  */
 int
 _gnutls_openpgp_find_subkey_idx (cdk_kbnode_t knode, uint32_t keyid[2],
-				 unsigned int priv)
+                                 unsigned int priv)
 {
   cdk_kbnode_t p, ctx;
   cdk_packet_t pkt;
@@ -782,21 +782,21 @@ _gnutls_openpgp_find_subkey_idx (cdk_kbnode_t knode, uint32_t keyid[2],
       pkt = cdk_kbnode_get_packet (p);
 
       if ((priv == 0 && (pkt->pkttype == CDK_PKT_PUBLIC_SUBKEY)) ||
-	  (priv != 0 && (pkt->pkttype == CDK_PKT_SECRET_SUBKEY)))
-	{
-	  if (priv == 0)
-	    cdk_pk_get_keyid (pkt->pkt.public_key, local_keyid);
-	  else
-	    cdk_pk_get_keyid (pkt->pkt.secret_key->pk, local_keyid);
+          (priv != 0 && (pkt->pkttype == CDK_PKT_SECRET_SUBKEY)))
+        {
+          if (priv == 0)
+            cdk_pk_get_keyid (pkt->pkt.public_key, local_keyid);
+          else
+            cdk_pk_get_keyid (pkt->pkt.secret_key->pk, local_keyid);
 
-	  _gnutls_hard_log ("Found keyid: %x.%x\n", local_keyid[0],
-			    local_keyid[1]);
-	  if (local_keyid[0] == keyid[0] && local_keyid[1] == keyid[1])
-	    {
-	      return i;
-	    }
-	  i++;
-	}
+          _gnutls_hard_log ("Found keyid: %x.%x\n", local_keyid[0],
+                            local_keyid[1]);
+          if (local_keyid[0] == keyid[0] && local_keyid[1] == keyid[1])
+            {
+              return i;
+            }
+          i++;
+        }
     }
 
   gnutls_assert ();
@@ -817,7 +817,7 @@ _gnutls_openpgp_find_subkey_idx (cdk_kbnode_t knode, uint32_t keyid[2],
  **/
 int
 gnutls_openpgp_crt_get_subkey_revoked_status (gnutls_openpgp_crt_t key,
-					      unsigned int idx)
+                                              unsigned int idx)
 {
   cdk_packet_t pkt;
 
@@ -856,8 +856,8 @@ gnutls_openpgp_crt_get_subkey_revoked_status (gnutls_openpgp_crt_t key,
  **/
 gnutls_pk_algorithm_t
 gnutls_openpgp_crt_get_subkey_pk_algorithm (gnutls_openpgp_crt_t key,
-					    unsigned int idx,
-					    unsigned int *bits)
+                                            unsigned int idx,
+                                            unsigned int *bits)
 {
   cdk_packet_t pkt;
   int algo;
@@ -874,7 +874,7 @@ gnutls_openpgp_crt_get_subkey_pk_algorithm (gnutls_openpgp_crt_t key,
   if (pkt)
     {
       if (bits)
-	*bits = cdk_pk_get_nbits (pkt->pkt.public_key);
+        *bits = cdk_pk_get_nbits (pkt->pkt.public_key);
       algo = _gnutls_openpgp_get_algo (pkt->pkt.public_key->pubkey_algo);
     }
 
@@ -894,7 +894,7 @@ gnutls_openpgp_crt_get_subkey_pk_algorithm (gnutls_openpgp_crt_t key,
  **/
 time_t
 gnutls_openpgp_crt_get_subkey_creation_time (gnutls_openpgp_crt_t key,
-					     unsigned int idx)
+                                             unsigned int idx)
 {
   cdk_packet_t pkt;
   time_t timestamp;
@@ -926,7 +926,7 @@ gnutls_openpgp_crt_get_subkey_creation_time (gnutls_openpgp_crt_t key,
  **/
 time_t
 gnutls_openpgp_crt_get_subkey_expiration_time (gnutls_openpgp_crt_t key,
-					       unsigned int idx)
+                                               unsigned int idx)
 {
   cdk_packet_t pkt;
   time_t expiredate;
@@ -955,8 +955,8 @@ gnutls_openpgp_crt_get_subkey_expiration_time (gnutls_openpgp_crt_t key,
  **/
 int
 gnutls_openpgp_crt_get_subkey_id (gnutls_openpgp_crt_t key,
-				  unsigned int idx,
-				  gnutls_openpgp_keyid_t keyid)
+                                  unsigned int idx,
+                                  gnutls_openpgp_keyid_t keyid)
 {
   cdk_packet_t pkt;
   uint32_t kid[2];
@@ -994,8 +994,8 @@ gnutls_openpgp_crt_get_subkey_id (gnutls_openpgp_crt_t key,
  **/
 int
 gnutls_openpgp_crt_get_subkey_fingerprint (gnutls_openpgp_crt_t key,
-					   unsigned int idx,
-					   void *fpr, size_t * fprlen)
+                                           unsigned int idx,
+                                           void *fpr, size_t * fprlen)
 {
   cdk_packet_t pkt;
   cdk_pkt_pubkey_t pk = NULL;
@@ -1036,7 +1036,7 @@ gnutls_openpgp_crt_get_subkey_fingerprint (gnutls_openpgp_crt_t key,
  **/
 int
 gnutls_openpgp_crt_get_subkey_idx (gnutls_openpgp_crt_t key,
-				   const gnutls_openpgp_keyid_t keyid)
+                                   const gnutls_openpgp_keyid_t keyid)
 {
   int ret;
   uint32_t kid[2];
@@ -1076,8 +1076,8 @@ gnutls_openpgp_crt_get_subkey_idx (gnutls_openpgp_crt_t key,
  */
 int
 gnutls_openpgp_crt_get_subkey_usage (gnutls_openpgp_crt_t key,
-				     unsigned int idx,
-				     unsigned int *key_usage)
+                                     unsigned int idx,
+                                     unsigned int *key_usage)
 {
   cdk_packet_t pkt;
 
@@ -1098,7 +1098,7 @@ gnutls_openpgp_crt_get_subkey_usage (gnutls_openpgp_crt_t key,
 
 int
 _gnutls_read_pgp_mpi (cdk_packet_t pkt, unsigned int priv, size_t idx,
-		      bigint_t * m)
+                      bigint_t * m)
 {
   size_t buf_size = 512;
   opaque *buf = gnutls_malloc (buf_size);
@@ -1119,47 +1119,47 @@ _gnutls_read_pgp_mpi (cdk_packet_t pkt, unsigned int priv, size_t idx,
   if (priv == 0)
     err =
       cdk_pk_get_mpi (pkt->pkt.public_key, idx, buf, buf_size, &buf_size,
-		      NULL);
+                      NULL);
   else
     {
       if (idx < max_pub_params)
-	err =
-	  cdk_pk_get_mpi (pkt->pkt.secret_key->pk, idx, buf, buf_size,
-			  &buf_size, NULL);
+        err =
+          cdk_pk_get_mpi (pkt->pkt.secret_key->pk, idx, buf, buf_size,
+                          &buf_size, NULL);
       else
-	{
-	  err =
-	    cdk_sk_get_mpi (pkt->pkt.secret_key, idx - max_pub_params, buf,
-			    buf_size, &buf_size, NULL);
-	}
+        {
+          err =
+            cdk_sk_get_mpi (pkt->pkt.secret_key, idx - max_pub_params, buf,
+                            buf_size, &buf_size, NULL);
+        }
     }
 
   if (err == CDK_Too_Short)
     {
       buf = gnutls_realloc_fast (buf, buf_size);
       if (buf == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
 
       if (priv == 0)
-	err =
-	  cdk_pk_get_mpi (pkt->pkt.public_key, idx, buf, buf_size, &buf_size,
-			  NULL);
+        err =
+          cdk_pk_get_mpi (pkt->pkt.public_key, idx, buf, buf_size, &buf_size,
+                          NULL);
       else
-	{
-	  if (idx < max_pub_params)
-	    err =
-	      cdk_pk_get_mpi (pkt->pkt.secret_key->pk, idx, buf, buf_size,
-			      &buf_size, NULL);
-	  else
-	    {
-	      err =
-		cdk_sk_get_mpi (pkt->pkt.secret_key, idx - max_pub_params,
-				buf, buf_size, &buf_size, NULL);
-	    }
-	}
+        {
+          if (idx < max_pub_params)
+            err =
+              cdk_pk_get_mpi (pkt->pkt.secret_key->pk, idx, buf, buf_size,
+                              &buf_size, NULL);
+          else
+            {
+              err =
+                cdk_sk_get_mpi (pkt->pkt.secret_key, idx - max_pub_params,
+                                buf, buf_size, &buf_size, NULL);
+            }
+        }
     }
 
   if (err != CDK_Success)
@@ -1186,8 +1186,8 @@ _gnutls_read_pgp_mpi (cdk_packet_t pkt, unsigned int priv, size_t idx,
  */
 int
 _gnutls_openpgp_crt_get_mpis (gnutls_openpgp_crt_t cert,
-			      uint32_t * keyid /* [2] */ ,
-			      bigint_t * params, int *params_size)
+                              uint32_t * keyid /* [2] */ ,
+                              bigint_t * params, int *params_size)
 {
   int result, i;
   int pk_algorithm, local_params;
@@ -1231,10 +1231,10 @@ _gnutls_openpgp_crt_get_mpis (gnutls_openpgp_crt_t cert,
     {
       result = _gnutls_read_pgp_mpi (pkt, 0, i, &params[i]);
       if (result < 0)
-	{
-	  gnutls_assert ();
-	  goto error;
-	}
+        {
+          gnutls_assert ();
+          goto error;
+        }
     }
 
   return 0;
@@ -1253,7 +1253,7 @@ error:
  */
 static int
 _get_pk_rsa_raw (gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid,
-		 gnutls_datum_t * m, gnutls_datum_t * e)
+                 gnutls_datum_t * m, gnutls_datum_t * e)
 {
   int pk_algorithm, ret, i;
   cdk_packet_t pkt;
@@ -1318,8 +1318,8 @@ cleanup:
 
 static int
 _get_pk_dsa_raw (gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid,
-		 gnutls_datum_t * p, gnutls_datum_t * q,
-		 gnutls_datum_t * g, gnutls_datum_t * y)
+                 gnutls_datum_t * p, gnutls_datum_t * q,
+                 gnutls_datum_t * g, gnutls_datum_t * y)
 {
   int pk_algorithm, ret, i;
   cdk_packet_t pkt;
@@ -1424,7 +1424,7 @@ cleanup:
  **/
 int
 gnutls_openpgp_crt_get_pk_rsa_raw (gnutls_openpgp_crt_t crt,
-				   gnutls_datum_t * m, gnutls_datum_t * e)
+                                   gnutls_datum_t * m, gnutls_datum_t * e)
 {
   gnutls_openpgp_keyid_t keyid;
   int ret;
@@ -1457,8 +1457,8 @@ gnutls_openpgp_crt_get_pk_rsa_raw (gnutls_openpgp_crt_t crt,
  **/
 int
 gnutls_openpgp_crt_get_pk_dsa_raw (gnutls_openpgp_crt_t crt,
-				   gnutls_datum_t * p, gnutls_datum_t * q,
-				   gnutls_datum_t * g, gnutls_datum_t * y)
+                                   gnutls_datum_t * p, gnutls_datum_t * q,
+                                   gnutls_datum_t * g, gnutls_datum_t * y)
 {
   gnutls_openpgp_keyid_t keyid;
   int ret;
@@ -1490,9 +1490,9 @@ gnutls_openpgp_crt_get_pk_dsa_raw (gnutls_openpgp_crt_t crt,
  **/
 int
 gnutls_openpgp_crt_get_subkey_pk_rsa_raw (gnutls_openpgp_crt_t crt,
-					  unsigned int idx,
-					  gnutls_datum_t * m,
-					  gnutls_datum_t * e)
+                                          unsigned int idx,
+                                          gnutls_datum_t * m,
+                                          gnutls_datum_t * e)
 {
   gnutls_openpgp_keyid_t keyid;
   int ret;
@@ -1526,11 +1526,11 @@ gnutls_openpgp_crt_get_subkey_pk_rsa_raw (gnutls_openpgp_crt_t crt,
  **/
 int
 gnutls_openpgp_crt_get_subkey_pk_dsa_raw (gnutls_openpgp_crt_t crt,
-					  unsigned int idx,
-					  gnutls_datum_t * p,
-					  gnutls_datum_t * q,
-					  gnutls_datum_t * g,
-					  gnutls_datum_t * y)
+                                          unsigned int idx,
+                                          gnutls_datum_t * p,
+                                          gnutls_datum_t * q,
+                                          gnutls_datum_t * g,
+                                          gnutls_datum_t * y)
 {
   gnutls_openpgp_keyid_t keyid;
   int ret;
@@ -1557,7 +1557,7 @@ gnutls_openpgp_crt_get_subkey_pk_dsa_raw (gnutls_openpgp_crt_t crt,
  **/
 int
 gnutls_openpgp_crt_get_preferred_key_id (gnutls_openpgp_crt_t key,
-					 gnutls_openpgp_keyid_t keyid)
+                                         gnutls_openpgp_keyid_t keyid)
 {
   if (!key || !keyid || !key->preferred_set)
     {
@@ -1583,7 +1583,7 @@ gnutls_openpgp_crt_get_preferred_key_id (gnutls_openpgp_crt_t key,
  **/
 int
 gnutls_openpgp_crt_set_preferred_key_id (gnutls_openpgp_crt_t key,
-					 const gnutls_openpgp_keyid_t keyid)
+                                         const gnutls_openpgp_keyid_t keyid)
 {
   int ret;
 
@@ -1627,8 +1627,8 @@ gnutls_openpgp_crt_set_preferred_key_id (gnutls_openpgp_crt_t key,
  **/
 int
 gnutls_openpgp_crt_get_auth_subkey (gnutls_openpgp_crt_t crt,
-				    gnutls_openpgp_keyid_t keyid,
-				    unsigned int flag)
+                                    gnutls_openpgp_keyid_t keyid,
+                                    unsigned int flag)
 {
   int ret, subkeys, i;
   unsigned int usage;
@@ -1648,38 +1648,38 @@ gnutls_openpgp_crt_get_auth_subkey (gnutls_openpgp_crt_t crt,
     {
 
       ret = gnutls_openpgp_crt_get_subkey_revoked_status (crt, i);
-      if (ret != 0)		/* it is revoked. ignore it */
-	continue;
+      if (ret != 0)             /* it is revoked. ignore it */
+        continue;
 
       if (keyid_init == 0)
-	{			/* keep the first valid subkey */
-	  ret = gnutls_openpgp_crt_get_subkey_id (crt, i, keyid);
-	  if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      return ret;
-	    }
+        {                       /* keep the first valid subkey */
+          ret = gnutls_openpgp_crt_get_subkey_id (crt, i, keyid);
+          if (ret < 0)
+            {
+              gnutls_assert ();
+              return ret;
+            }
 
-	  keyid_init = 1;
-	}
+          keyid_init = 1;
+        }
 
       ret = gnutls_openpgp_crt_get_subkey_usage (crt, i, &usage);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       if (usage & GNUTLS_KEY_KEY_AGREEMENT)
-	{
-	  ret = gnutls_openpgp_crt_get_subkey_id (crt, i, keyid);
-	  if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      return ret;
-	    }
-	  return 0;
-	}
+        {
+          ret = gnutls_openpgp_crt_get_subkey_id (crt, i, keyid);
+          if (ret < 0)
+            {
+              gnutls_assert ();
+              return ret;
+            }
+          return 0;
+        }
     }
 
   if (flag && keyid_init)
@@ -1703,15 +1703,15 @@ gnutls_openpgp_crt_get_auth_subkey (gnutls_openpgp_crt_t crt,
  **/
 int
 gnutls_openpgp_crt_verify_hash (gnutls_openpgp_crt_t crt, unsigned int flags,
-			     const gnutls_datum_t * hash,
-			     const gnutls_datum_t * signature)
+                                const gnutls_datum_t * hash,
+                                const gnutls_datum_t * signature)
 {
   int ret;
   bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
   int params_size = MAX_PUBLIC_PARAMS_SIZE;
   gnutls_pk_algorithm_t pk;
   uint32_t kid[2];
-  
+
   if (crt == NULL || !crt->preferred_set)
     {
       gnutls_assert ();
@@ -1725,7 +1725,7 @@ gnutls_openpgp_crt_verify_hash (gnutls_openpgp_crt_t crt, unsigned int flags,
       return ret;
     }
   pk = ret;
-  
+
   KEYID_IMPORT (kid, crt->preferred_keyid);
   ret = _gnutls_openpgp_crt_get_mpis (crt, kid, params, &params_size);
   if (ret < 0)
@@ -1734,7 +1734,7 @@ gnutls_openpgp_crt_verify_hash (gnutls_openpgp_crt_t crt, unsigned int flags,
       return ret;
     }
 
-  ret = pubkey_verify_sig( NULL, hash, signature, pk, params, params_size);
+  ret = pubkey_verify_sig (NULL, hash, signature, pk, params, params_size);
   if (ret < 0)
     {
       gnutls_assert ();

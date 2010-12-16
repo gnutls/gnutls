@@ -54,10 +54,10 @@
 #define GUILE_GNUTLS_MAX_OPENPGP_NAME_LENGTH  2048
 
 SCM_DEFINE (scm_gnutls_import_openpgp_certificate,
-	    "import-openpgp-certificate", 2, 0, 0, (SCM data, SCM format),
-	    "Return a new OpenPGP certificate object resulting from the "
-	    "import of @var{data} (a uniform array) according to "
-	    "@var{format}.")
+            "import-openpgp-certificate", 2, 0, 0, (SCM data, SCM format),
+            "Return a new OpenPGP certificate object resulting from the "
+            "import of @var{data} (a uniform array) according to "
+            "@var{format}.")
 #define FUNC_NAME s_scm_gnutls_import_openpgp_certificate
 {
   int err;
@@ -72,7 +72,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_certificate,
   c_format = scm_to_gnutls_openpgp_certificate_format (format, 2, FUNC_NAME);
 
   c_data = scm_gnutls_get_array (data, &c_data_handle, &c_data_len,
-				 FUNC_NAME);
+                                 FUNC_NAME);
   c_data_d.data = (unsigned char *) c_data;
   c_data_d.size = c_data_len;
 
@@ -98,11 +98,11 @@ SCM_DEFINE (scm_gnutls_import_openpgp_certificate,
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_import_openpgp_private_key,
-	    "import-openpgp-private-key", 2, 1, 0, (SCM data, SCM format,
-						    SCM pass),
-	    "Return a new OpenPGP private key object resulting from the "
-	    "import of @var{data} (a uniform array) according to "
-	    "@var{format}.  Optionally, a passphrase may be provided.")
+            "import-openpgp-private-key", 2, 1, 0, (SCM data, SCM format,
+                                                    SCM pass),
+            "Return a new OpenPGP private key object resulting from the "
+            "import of @var{data} (a uniform array) according to "
+            "@var{format}.  Optionally, a passphrase may be provided.")
 #define FUNC_NAME s_scm_gnutls_import_openpgp_private_key
 {
   int err;
@@ -127,7 +127,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_private_key,
     }
 
   c_data = scm_gnutls_get_array (data, &c_data_handle, &c_data_len,
-				 FUNC_NAME);
+                                 FUNC_NAME);
   c_data_d.data = (unsigned char *) c_data;
   c_data_d.size = c_data_len;
 
@@ -139,7 +139,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_private_key,
     }
 
   err = gnutls_openpgp_privkey_import (c_key, &c_data_d, c_format, c_pass,
-				       0 /* currently unused */ );
+                                       0 /* currently unused */ );
   scm_gnutls_release_array (&c_data_handle);
 
   if (EXPECT_FALSE (err))
@@ -154,10 +154,10 @@ SCM_DEFINE (scm_gnutls_import_openpgp_private_key,
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_id, "openpgp-certificate-id",
-	    1, 0, 0,
-	    (SCM key),
-	    "Return the ID (an 8-element u8vector) of certificate "
-	    "@var{key}.")
+            1, 0, 0,
+            (SCM key),
+            "Return the ID (an 8-element u8vector) of certificate "
+            "@var{key}.")
 #define FUNC_NAME s_scm_gnutls_openpgp_certificate_id
 {
   int err;
@@ -180,10 +180,10 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_id, "openpgp-certificate-id",
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_id_x, "openpgp-certificate-id!",
-	    2, 0, 0,
-	    (SCM key, SCM id),
-	    "Store the ID (an 8 byte sequence) of certificate "
-	    "@var{key} in @var{id} (a u8vector).")
+            2, 0, 0,
+            (SCM key, SCM id),
+            "Store the ID (an 8 byte sequence) of certificate "
+            "@var{key} in @var{id} (a u8vector).")
 #define FUNC_NAME s_scm_gnutls_openpgp_certificate_id_x
 {
   int err;
@@ -194,7 +194,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_id_x, "openpgp-certificate-id!",
 
   c_key = scm_to_gnutls_openpgp_certificate (key, 1, FUNC_NAME);
   c_id = scm_gnutls_get_writable_array (id, &c_id_handle, &c_id_size,
-					FUNC_NAME);
+                                        FUNC_NAME);
 
   if (EXPECT_FALSE (c_id_size < 8))
     {
@@ -214,11 +214,11 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_id_x, "openpgp-certificate-id!",
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerpint_x,
-	    "openpgp-certificate-fingerprint!",
-	    2, 0, 0,
-	    (SCM key, SCM fpr),
-	    "Store in @var{fpr} (a u8vector) the fingerprint of @var{key}.  "
-	    "Return the number of bytes stored in @var{fpr}.")
+            "openpgp-certificate-fingerprint!",
+            2, 0, 0,
+            (SCM key, SCM fpr),
+            "Store in @var{fpr} (a u8vector) the fingerprint of @var{key}.  "
+            "Return the number of bytes stored in @var{fpr}.")
 #define FUNC_NAME s_scm_gnutls_openpgp_certificate_fingerpint_x
 {
   int err;
@@ -231,7 +231,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerpint_x,
   SCM_VALIDATE_ARRAY (2, fpr);
 
   c_fpr = scm_gnutls_get_writable_array (fpr, &c_fpr_handle, &c_fpr_len,
-					 FUNC_NAME);
+                                         FUNC_NAME);
 
   err = gnutls_openpgp_crt_get_fingerprint (c_key, c_fpr, &c_actual_len);
   scm_gnutls_release_array (&c_fpr_handle);
@@ -245,10 +245,10 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerpint_x,
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerprint,
-	    "openpgp-certificate-fingerprint",
-	    1, 0, 0,
-	    (SCM key),
-	    "Return a new u8vector denoting the fingerprint of " "@var{key}.")
+            "openpgp-certificate-fingerprint",
+            1, 0, 0,
+            (SCM key),
+            "Return a new u8vector denoting the fingerprint of " "@var{key}.")
 #define FUNC_NAME s_scm_gnutls_openpgp_certificate_fingerprint
 {
   int err;
@@ -269,22 +269,22 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerprint,
       c_actual_len = 0;
       err = gnutls_openpgp_crt_get_fingerprint (c_key, c_fpr, &c_actual_len);
       if (err == GNUTLS_E_SHORT_MEMORY_BUFFER)
-	{
-	  /* Grow C_FPR.  */
-	  unsigned char *c_new;
+        {
+          /* Grow C_FPR.  */
+          unsigned char *c_new;
 
-	  c_new = (unsigned char *) realloc (c_fpr, c_fpr_len * 2);
-	  if (EXPECT_FALSE (c_new == NULL))
-	    {
-	      free (c_fpr);
-	      scm_gnutls_error (GNUTLS_E_MEMORY_ERROR, FUNC_NAME);
-	    }
-	  else
-	    {
-	      c_fpr_len *= 2;
-	      c_fpr = c_new;
-	    }
-	}
+          c_new = (unsigned char *) realloc (c_fpr, c_fpr_len * 2);
+          if (EXPECT_FALSE (c_new == NULL))
+            {
+              free (c_fpr);
+              scm_gnutls_error (GNUTLS_E_MEMORY_ERROR, FUNC_NAME);
+            }
+          else
+            {
+              c_fpr_len *= 2;
+              c_fpr = c_new;
+            }
+        }
     }
   while (err == GNUTLS_E_SHORT_MEMORY_BUFFER);
 
@@ -304,9 +304,9 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_fingerprint,
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_name, "openpgp-certificate-name",
-	    2, 0, 0,
-	    (SCM key, SCM index),
-	    "Return the @var{index}th name of @var{key}.")
+            2, 0, 0,
+            (SCM key, SCM index),
+            "Return the @var{index}th name of @var{key}.")
 #define FUNC_NAME s_scm_gnutls_openpgp_certificate_name
 {
   int err;
@@ -329,7 +329,7 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_name, "openpgp-certificate-name",
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_names, "openpgp-certificate-names",
-	    1, 0, 0, (SCM key), "Return the list of names for @var{key}.")
+            1, 0, 0, (SCM key), "Return the list of names for @var{key}.")
 #define FUNC_NAME s_scm_gnutls_openpgp_certificate_names
 {
   int err;
@@ -345,10 +345,10 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_names, "openpgp-certificate-names",
     {
       err = gnutls_openpgp_crt_get_name (c_key, c_index, c_name, &c_name_len);
       if (!err)
-	{
-	  result = scm_cons (scm_from_locale_string (c_name), result);
-	  c_index++;
-	}
+        {
+          result = scm_cons (scm_from_locale_string (c_name), result);
+          c_index++;
+        }
     }
   while (!err);
 
@@ -361,11 +361,11 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_names, "openpgp-certificate-names",
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_algorithm,
-	    "openpgp-certificate-algorithm",
-	    1, 0, 0,
-	    (SCM key),
-	    "Return two values: the certificate algorithm used by "
-	    "@var{key} and the number of bits used.")
+            "openpgp-certificate-algorithm",
+            1, 0, 0,
+            (SCM key),
+            "Return two values: the certificate algorithm used by "
+            "@var{key} and the number of bits used.")
 #define FUNC_NAME s_scm_gnutls_openpgp_certificate_algorithm
 {
   gnutls_openpgp_crt_t c_key;
@@ -376,17 +376,17 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_algorithm,
   c_algo = gnutls_openpgp_crt_get_pk_algorithm (c_key, &c_bits);
 
   return (scm_values (scm_list_2 (scm_from_gnutls_pk_algorithm (c_algo),
-				  scm_from_uint (c_bits))));
+                                  scm_from_uint (c_bits))));
 }
 
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_version,
-	    "openpgp-certificate-version",
-	    1, 0, 0,
-	    (SCM key),
-	    "Return the version of the OpenPGP message format (RFC2440) "
-	    "honored by @var{key}.")
+            "openpgp-certificate-version",
+            1, 0, 0,
+            (SCM key),
+            "Return the version of the OpenPGP message format (RFC2440) "
+            "honored by @var{key}.")
 #define FUNC_NAME s_scm_gnutls_openpgp_certificate_version
 {
   int c_version;
@@ -401,9 +401,9 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_version,
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_certificate_usage, "openpgp-certificate-usage",
-	    1, 0, 0,
-	    (SCM key),
-	    "Return a list of values denoting the key usage of @var{key}.")
+            1, 0, 0,
+            (SCM key),
+            "Return a list of values denoting the key usage of @var{key}.")
 #define FUNC_NAME s_scm_gnutls_openpgp_certificate_usage
 {
   int err;
@@ -426,10 +426,10 @@ SCM_DEFINE (scm_gnutls_openpgp_certificate_usage, "openpgp-certificate-usage",
 /* OpenPGP keyrings.  */
 
 SCM_DEFINE (scm_gnutls_import_openpgp_keyring, "import-openpgp-keyring",
-	    2, 0, 0,
-	    (SCM data, SCM format),
-	    "Import @var{data} (a u8vector) according to @var{format} "
-	    "and return the imported keyring.")
+            2, 0, 0,
+            (SCM data, SCM format),
+            "Import @var{data} (a u8vector) according to @var{format} "
+            "and return the imported keyring.")
 #define FUNC_NAME s_scm_gnutls_import_openpgp_keyring
 {
   int err;
@@ -444,7 +444,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_keyring, "import-openpgp-keyring",
   c_format = scm_to_gnutls_openpgp_certificate_format (format, 2, FUNC_NAME);
 
   c_data = scm_gnutls_get_array (data, &c_data_handle, &c_data_len,
-				 FUNC_NAME);
+                                 FUNC_NAME);
 
   c_data_d.data = (unsigned char *) c_data;
   c_data_d.size = c_data_len;
@@ -471,11 +471,11 @@ SCM_DEFINE (scm_gnutls_import_openpgp_keyring, "import-openpgp-keyring",
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_openpgp_keyring_contains_key_id_p,
-	    "openpgp-keyring-contains-key-id?",
-	    2, 0, 0,
-	    (SCM keyring, SCM id),
-	    "Return @code{#f} if key ID @var{id} is in @var{keyring}, "
-	    "@code{#f} otherwise.")
+            "openpgp-keyring-contains-key-id?",
+            2, 0, 0,
+            (SCM keyring, SCM id),
+            "Return @code{#f} if key ID @var{id} is in @var{keyring}, "
+            "@code{#f} otherwise.")
 #define FUNC_NAME s_scm_gnutls_openpgp_keyring_contains_key_id_p
 {
   int c_result;
@@ -495,8 +495,8 @@ SCM_DEFINE (scm_gnutls_openpgp_keyring_contains_key_id_p,
     }
 
   c_result = gnutls_openpgp_keyring_check_id (c_keyring,
-					      (unsigned char *) c_id,
-					      0 /* unused */ );
+                                              (unsigned char *) c_id,
+                                              0 /* unused */ );
 
   scm_gnutls_release_array (&c_id_handle);
 
@@ -509,11 +509,11 @@ SCM_DEFINE (scm_gnutls_openpgp_keyring_contains_key_id_p,
 /* Certificates.  */
 
 SCM_DEFINE (scm_gnutls_set_certificate_credentials_openpgp_keys_x,
-	    "set-certificate-credentials-openpgp-keys!",
-	    3, 0, 0,
-	    (SCM cred, SCM pub, SCM sec),
-	    "Use certificate @var{pub} and secret key @var{sec} in "
-	    "certificate credentials @var{cred}.")
+            "set-certificate-credentials-openpgp-keys!",
+            3, 0, 0,
+            (SCM cred, SCM pub, SCM sec),
+            "Use certificate @var{pub} and secret key @var{sec} in "
+            "certificate credentials @var{cred}.")
 #define FUNC_NAME s_scm_gnutls_set_certificate_credentials_openpgp_keys_x
 {
   int err;

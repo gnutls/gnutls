@@ -55,7 +55,7 @@ typedef struct
 
 typedef struct
 {
-  const char *le;		/* line endings */
+  const char *le;               /* line endings */
   const char *hdrlines;
   u32 crc;
   int crc_okay;
@@ -65,7 +65,7 @@ typedef struct
 typedef struct
 {
   cdk_lit_format_t mode;
-  char *orig_filename;		/* This original name of the input file. */
+  char *orig_filename;          /* This original name of the input file. */
   char *filename;
   digest_hd_st md;
   int md_initialized;
@@ -82,7 +82,7 @@ typedef struct
   byte inbuf[8192];
   size_t outbufsize;
   byte outbuf[8192];
-  int algo;			/* compress algo */
+  int algo;                     /* compress algo */
   int level;
 } compress_filter_t;
 
@@ -105,6 +105,6 @@ int _cdk_filter_text (void *opaque, int ctl, FILE * in, FILE * out);
 
 /*-- compress.c --*/
 cdk_error_t _cdk_filter_compress (void *opaque, int ctl,
-				  FILE * in, FILE * out);
+                                  FILE * in, FILE * out);
 
 #endif /* CDK_FILTERS_H */

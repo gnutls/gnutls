@@ -108,7 +108,7 @@ typedef struct
 
 ssize_t socket_recv (const socket_st * socket, void *buffer, int buffer_size);
 ssize_t socket_send (const socket_st * socket, const void *buffer,
-		     int buffer_size);
+                     int buffer_size);
 void socket_open (socket_st * hd, const char *hostname, const char *service);
 void socket_connect (const socket_st * hd);
 void socket_bye (socket_st * socket);
@@ -157,7 +157,7 @@ get_keyid (gnutls_openpgp_keyid_t keyid, const char *str)
   if (strlen (str) != 16)
     {
       fprintf (stderr,
-	       "The OpenPGP subkey ID has to be 16 hexadecimal characters.\n");
+               "The OpenPGP subkey ID has to be 16 hexadecimal characters.\n");
       exit (1);
     }
 
@@ -182,195 +182,195 @@ load_keys (void)
   if (x509_certfile != NULL && x509_keyfile != NULL)
     {
       if (strncmp (x509_certfile, "pkcs11:", 7) == 0)
-	{
-	  crt_num = 1;
-	  gnutls_x509_crt_init (&x509_crt[0]);
+        {
+          crt_num = 1;
+          gnutls_x509_crt_init (&x509_crt[0]);
 
-	  ret =
-	    gnutls_x509_crt_import_pkcs11_url (x509_crt[0], x509_certfile, 0);
+          ret =
+            gnutls_x509_crt_import_pkcs11_url (x509_crt[0], x509_certfile, 0);
 
-	  if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-	    ret =
-	      gnutls_x509_crt_import_pkcs11_url (x509_crt[0], x509_certfile,
-						 GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+          if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+            ret =
+              gnutls_x509_crt_import_pkcs11_url (x509_crt[0], x509_certfile,
+                                                 GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 
-	  if (ret < 0)
-	    {
-	      fprintf (stderr, "*** Error loading cert file.\n");
-	      exit (1);
-	    }
-	  x509_crt_size = 1;
-	}
+          if (ret < 0)
+            {
+              fprintf (stderr, "*** Error loading cert file.\n");
+              exit (1);
+            }
+          x509_crt_size = 1;
+        }
       else
-	{
+        {
 
-	  data = load_file (x509_certfile);
-	  if (data.data == NULL)
-	    {
-	      fprintf (stderr, "*** Error loading cert file.\n");
-	      exit (1);
-	    }
+          data = load_file (x509_certfile);
+          if (data.data == NULL)
+            {
+              fprintf (stderr, "*** Error loading cert file.\n");
+              exit (1);
+            }
 
-	  crt_num = MAX_CRT;
-	  ret =
-	    gnutls_x509_crt_list_import (x509_crt, &crt_num, &data,
-					 GNUTLS_X509_FMT_PEM,
-					 GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
-	  if (ret < 0)
-	    {
-	      if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
-		{
-		  fprintf (stderr,
-			   "*** Error loading cert file: Too many certs %d\n",
-			   crt_num);
+          crt_num = MAX_CRT;
+          ret =
+            gnutls_x509_crt_list_import (x509_crt, &crt_num, &data,
+                                         GNUTLS_X509_FMT_PEM,
+                                         GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+          if (ret < 0)
+            {
+              if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
+                {
+                  fprintf (stderr,
+                           "*** Error loading cert file: Too many certs %d\n",
+                           crt_num);
 
-		}
-	      else
-		{
-		  fprintf (stderr,
-			   "*** Error loading cert file: %s\n",
-			   gnutls_strerror (ret));
-		}
-	      exit (1);
-	    }
-	  x509_crt_size = ret;
-	}
+                }
+              else
+                {
+                  fprintf (stderr,
+                           "*** Error loading cert file: %s\n",
+                           gnutls_strerror (ret));
+                }
+              exit (1);
+            }
+          x509_crt_size = ret;
+        }
       fprintf (stderr, "Processed %d client certificates...\n", ret);
 
       unload_file (data);
 
       if (strncmp (x509_keyfile, "pkcs11:", 7) == 0)
-	{
-	  gnutls_pkcs11_privkey_init (&pkcs11_key);
+        {
+          gnutls_pkcs11_privkey_init (&pkcs11_key);
 
-	  ret =
-	    gnutls_pkcs11_privkey_import_url (pkcs11_key, x509_keyfile, 0);
-	  if (ret < 0)
-	    {
-	      fprintf (stderr, "*** Error loading url: %s\n",
-		       gnutls_strerror (ret));
-	      exit (1);
-	    }
-	}
+          ret =
+            gnutls_pkcs11_privkey_import_url (pkcs11_key, x509_keyfile, 0);
+          if (ret < 0)
+            {
+              fprintf (stderr, "*** Error loading url: %s\n",
+                       gnutls_strerror (ret));
+              exit (1);
+            }
+        }
       else
-	{
-	  data = load_file (x509_keyfile);
-	  if (data.data == NULL)
-	    {
-	      fprintf (stderr, "*** Error loading key file.\n");
-	      exit (1);
-	    }
+        {
+          data = load_file (x509_keyfile);
+          if (data.data == NULL)
+            {
+              fprintf (stderr, "*** Error loading key file.\n");
+              exit (1);
+            }
 
-	  gnutls_x509_privkey_init (&x509_key);
+          gnutls_x509_privkey_init (&x509_key);
 
-	  ret =
-	    gnutls_x509_privkey_import (x509_key, &data, GNUTLS_X509_FMT_PEM);
-	  if (ret < 0)
-	    {
-	      fprintf (stderr, "*** Error loading key file: %s\n",
-		       gnutls_strerror (ret));
-	      exit (1);
-	    }
+          ret =
+            gnutls_x509_privkey_import (x509_key, &data, GNUTLS_X509_FMT_PEM);
+          if (ret < 0)
+            {
+              fprintf (stderr, "*** Error loading key file: %s\n",
+                       gnutls_strerror (ret));
+              exit (1);
+            }
 
-	  unload_file (data);
-	}
+          unload_file (data);
+        }
 
       fprintf (stderr, "Processed %d client X.509 certificates...\n",
-	       x509_crt_size);
+               x509_crt_size);
     }
 #ifdef ENABLE_OPENPGP
   if (pgp_certfile != NULL && pgp_keyfile != NULL)
     {
       data = load_file (pgp_certfile);
       if (data.data == NULL)
-	{
-	  fprintf (stderr, "*** Error loading PGP cert file.\n");
-	  exit (1);
-	}
+        {
+          fprintf (stderr, "*** Error loading PGP cert file.\n");
+          exit (1);
+        }
       gnutls_openpgp_crt_init (&pgp_crt);
 
       ret =
-	gnutls_openpgp_crt_import (pgp_crt, &data, GNUTLS_OPENPGP_FMT_BASE64);
+        gnutls_openpgp_crt_import (pgp_crt, &data, GNUTLS_OPENPGP_FMT_BASE64);
       if (ret < 0)
-	{
-	  fprintf (stderr,
-		   "*** Error loading PGP cert file: %s\n",
-		   gnutls_strerror (ret));
-	  exit (1);
-	}
+        {
+          fprintf (stderr,
+                   "*** Error loading PGP cert file: %s\n",
+                   gnutls_strerror (ret));
+          exit (1);
+        }
 
 
       unload_file (data);
 
       if (strncmp (pgp_keyfile, "pkcs11:", 7) == 0)
-	{
-	  gnutls_pkcs11_privkey_init (&pkcs11_key);
+        {
+          gnutls_pkcs11_privkey_init (&pkcs11_key);
 
-	  ret = gnutls_pkcs11_privkey_import_url (pkcs11_key, pgp_keyfile, 0);
-	  if (ret < 0)
-	    {
-	      fprintf (stderr, "*** Error loading url: %s\n",
-		       gnutls_strerror (ret));
-	      exit (1);
-	    }
-	}
+          ret = gnutls_pkcs11_privkey_import_url (pkcs11_key, pgp_keyfile, 0);
+          if (ret < 0)
+            {
+              fprintf (stderr, "*** Error loading url: %s\n",
+                       gnutls_strerror (ret));
+              exit (1);
+            }
+        }
       else
-	{
+        {
 
-	  data = load_file (pgp_keyfile);
-	  if (data.data == NULL)
-	    {
-	      fprintf (stderr, "*** Error loading PGP key file.\n");
-	      exit (1);
-	    }
+          data = load_file (pgp_keyfile);
+          if (data.data == NULL)
+            {
+              fprintf (stderr, "*** Error loading PGP key file.\n");
+              exit (1);
+            }
 
-	  gnutls_openpgp_privkey_init (&pgp_key);
+          gnutls_openpgp_privkey_init (&pgp_key);
 
-	  ret =
-	    gnutls_openpgp_privkey_import (pgp_key, &data,
-					   GNUTLS_OPENPGP_FMT_BASE64, NULL,
-					   0);
-	  if (ret < 0)
-	    {
-	      fprintf (stderr,
-		       "*** Error loading PGP key file: %s\n",
-		       gnutls_strerror (ret));
-	      exit (1);
-	    }
+          ret =
+            gnutls_openpgp_privkey_import (pgp_key, &data,
+                                           GNUTLS_OPENPGP_FMT_BASE64, NULL,
+                                           0);
+          if (ret < 0)
+            {
+              fprintf (stderr,
+                       "*** Error loading PGP key file: %s\n",
+                       gnutls_strerror (ret));
+              exit (1);
+            }
 
-	  unload_file (data);
-	}
+          unload_file (data);
+        }
 
       if (info.pgp_subkey != NULL)
-	{
-	  gnutls_openpgp_keyid_t keyid;
+        {
+          gnutls_openpgp_keyid_t keyid;
 
-	  if (strcasecmp (info.pgp_subkey, "auto") == 0)
-	    {
-	      ret = gnutls_openpgp_crt_get_auth_subkey (pgp_crt, keyid, 1);
-	      if (ret < 0)
-		{
-		  fprintf (stderr,
-			   "*** Error setting preferred sub key id (%s): %s\n",
-			   info.pgp_subkey, gnutls_strerror (ret));
-		  exit (1);
-		}
-	    }
-	  else
-	    get_keyid (keyid, info.pgp_subkey);
+          if (strcasecmp (info.pgp_subkey, "auto") == 0)
+            {
+              ret = gnutls_openpgp_crt_get_auth_subkey (pgp_crt, keyid, 1);
+              if (ret < 0)
+                {
+                  fprintf (stderr,
+                           "*** Error setting preferred sub key id (%s): %s\n",
+                           info.pgp_subkey, gnutls_strerror (ret));
+                  exit (1);
+                }
+            }
+          else
+            get_keyid (keyid, info.pgp_subkey);
 
-	  ret = gnutls_openpgp_crt_set_preferred_key_id (pgp_crt, keyid);
-	  if (ret >= 0)
-	    ret =
-	      gnutls_openpgp_privkey_set_preferred_key_id (pgp_key, keyid);
-	  if (ret < 0)
-	    {
-	      fprintf (stderr,
-		       "*** Error setting preferred sub key id (%s): %s\n",
-		       info.pgp_subkey, gnutls_strerror (ret));
-	      exit (1);
-	    }
-	}
+          ret = gnutls_openpgp_crt_set_preferred_key_id (pgp_crt, keyid);
+          if (ret >= 0)
+            ret =
+              gnutls_openpgp_privkey_set_preferred_key_id (pgp_key, keyid);
+          if (ret < 0)
+            {
+              fprintf (stderr,
+                       "*** Error setting preferred sub key id (%s): %s\n",
+                       info.pgp_subkey, gnutls_strerror (ret));
+              exit (1);
+            }
+        }
 
       fprintf (stderr, "Processed 1 client PGP certificate...\n");
     }
@@ -392,7 +392,7 @@ cert_verify_callback (gnutls_session_t session)
     {
       printf ("*** Verifying server certificate failed...\n");
       if (!insecure)
-	return -1;
+        return -1;
     }
 
   return 0;
@@ -405,9 +405,9 @@ cert_verify_callback (gnutls_session_t session)
 
 static int
 cert_callback (gnutls_session_t session,
-	       const gnutls_datum_t * req_ca_rdn, int nreqs,
-	       const gnutls_pk_algorithm_t * sign_algos,
-	       int sign_algos_length, gnutls_retr2_st * st)
+               const gnutls_datum_t * req_ca_rdn, int nreqs,
+               const gnutls_pk_algorithm_t * sign_algos,
+               int sign_algos_length, gnutls_retr2_st * st)
 {
   char issuer_dn[256];
   int i, ret;
@@ -418,21 +418,21 @@ cert_callback (gnutls_session_t session,
       /* Print the server's trusted CAs
        */
       if (nreqs > 0)
-	printf ("- Server's trusted authorities:\n");
+        printf ("- Server's trusted authorities:\n");
       else
-	printf ("- Server did not send us any trusted authorities names.\n");
+        printf ("- Server did not send us any trusted authorities names.\n");
 
       /* print the names (if any) */
       for (i = 0; i < nreqs; i++)
-	{
-	  len = sizeof (issuer_dn);
-	  ret = gnutls_x509_rdn_get (&req_ca_rdn[i], issuer_dn, &len);
-	  if (ret >= 0)
-	    {
-	      printf ("   [%d]: ", i);
-	      printf ("%s\n", issuer_dn);
-	    }
-	}
+        {
+          len = sizeof (issuer_dn);
+          ret = gnutls_x509_rdn_get (&req_ca_rdn[i], issuer_dn, &len);
+          if (ret >= 0)
+            {
+              printf ("   [%d]: ", i);
+              printf ("%s\n", issuer_dn);
+            }
+        }
     }
 
   /* Select a certificate and return it.
@@ -450,98 +450,98 @@ cert_callback (gnutls_session_t session,
       int i, match = 0;
 
       if (x509_crt_size > 0)
-	{
-	  ret = gnutls_x509_crt_get_signature_algorithm (x509_crt[0]);
-	  if (ret < 0)
-	    {
-	      /* error reading signature algorithm */
-	      return -1;
-	    }
-	  cert_algo = ret;
+        {
+          ret = gnutls_x509_crt_get_signature_algorithm (x509_crt[0]);
+          if (ret < 0)
+            {
+              /* error reading signature algorithm */
+              return -1;
+            }
+          cert_algo = ret;
 
-	  i = 0;
-	  do
-	    {
-	      ret =
-		gnutls_sign_algorithm_get_requested (session, i, &req_algo);
-	      if (ret >= 0 && cert_algo == req_algo)
-		{
-		  match = 1;
-		  break;
-		}
+          i = 0;
+          do
+            {
+              ret =
+                gnutls_sign_algorithm_get_requested (session, i, &req_algo);
+              if (ret >= 0 && cert_algo == req_algo)
+                {
+                  match = 1;
+                  break;
+                }
 
-	      /* server has not requested anything specific */
-	      if (i == 0 && ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-		{
-		  match = 1;
-		  break;
-		}
-	      i++;
-	    }
-	  while (ret >= 0);
+              /* server has not requested anything specific */
+              if (i == 0 && ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+                {
+                  match = 1;
+                  break;
+                }
+              i++;
+            }
+          while (ret >= 0);
 
-	  if (match == 0)
-	    {
-	      printf
-		("- Could not find a suitable certificate to send to server\n");
-	      return -1;
-	    }
+          if (match == 0)
+            {
+              printf
+                ("- Could not find a suitable certificate to send to server\n");
+              return -1;
+            }
 
-	  if (x509_key != NULL)
-	    {
-	      st->key.x509 = x509_key;
-	      st->key_type = GNUTLS_PRIVKEY_X509;
-	    }
-	  else if (pkcs11_key != NULL)
-	    {
-	      st->key.pkcs11 = pkcs11_key;
-	      st->key_type = GNUTLS_PRIVKEY_PKCS11;
-	    }
-	  else
-	    {
-	      printf ("- Could not find a suitable key to send to server\n");
-	      return -1;
-	    }
+          if (x509_key != NULL)
+            {
+              st->key.x509 = x509_key;
+              st->key_type = GNUTLS_PRIVKEY_X509;
+            }
+          else if (pkcs11_key != NULL)
+            {
+              st->key.pkcs11 = pkcs11_key;
+              st->key_type = GNUTLS_PRIVKEY_PKCS11;
+            }
+          else
+            {
+              printf ("- Could not find a suitable key to send to server\n");
+              return -1;
+            }
 
-	  st->ncerts = x509_crt_size;
+          st->ncerts = x509_crt_size;
 
-	  st->cert.x509 = x509_crt;
+          st->cert.x509 = x509_crt;
 
-	  st->deinit_all = 0;
+          st->deinit_all = 0;
 
-	  return 0;
-	}
+          return 0;
+        }
 
     }
   else if (st->cert_type == GNUTLS_CRT_OPENPGP)
     {
       if (pgp_crt != NULL)
-	{
+        {
 
-	  if (pgp_key != NULL)
-	    {
-	      st->key.pgp = pgp_key;
-	      st->key_type = GNUTLS_PRIVKEY_OPENPGP;
-	    }
-	  else if (pkcs11_key != NULL)
-	    {
-	      st->key.pkcs11 = pkcs11_key;
-	      st->key_type = GNUTLS_PRIVKEY_PKCS11;
-	    }
-	  else
-	    {
-	      printf ("- Could not find a suitable key to send to server\n");
-	      return -1;
-	    }
+          if (pgp_key != NULL)
+            {
+              st->key.pgp = pgp_key;
+              st->key_type = GNUTLS_PRIVKEY_OPENPGP;
+            }
+          else if (pkcs11_key != NULL)
+            {
+              st->key.pkcs11 = pkcs11_key;
+              st->key_type = GNUTLS_PRIVKEY_PKCS11;
+            }
+          else
+            {
+              printf ("- Could not find a suitable key to send to server\n");
+              return -1;
+            }
 
-	  st->ncerts = 1;
+          st->ncerts = 1;
 
-	  st->cert.pgp = pgp_crt;
+          st->cert.pgp = pgp_crt;
 
-	  st->deinit_all = 0;
+          st->deinit_all = 0;
 
-	  return 0;
-	}
+          return 0;
+        }
     }
 
   printf ("- Successfully sent %d certificate(s) to server.\n", st->ncerts);
@@ -572,9 +572,9 @@ init_tls_session (const char *hostname)
     {
       gnutls_handshake_set_private_extensions (session, 1);
       gnutls_server_name_set (session, GNUTLS_NAME_DNS, hostname,
-			      strlen (hostname));
+                              strlen (hostname));
       if (cert_type_priority[0])
-	gnutls_certificate_type_set_priority (session, cert_type_priority);
+        gnutls_certificate_type_set_priority (session, cert_type_priority);
     }
 
   if (cipher_priority[0])
@@ -611,13 +611,13 @@ init_tls_session (const char *hostname)
   if (record_max_size > 0 && disable_extensions == 0)
     {
       if (gnutls_record_set_max_size (session, record_max_size) < 0)
-	{
-	  fprintf (stderr,
-		   "Cannot set the maximum record size to %d.\n",
-		   record_max_size);
-	  fprintf (stderr, "Possible values: 512, 1024, 2048, 4096.\n");
-	  exit (1);
-	}
+        {
+          fprintf (stderr,
+                   "Cannot set the maximum record size to %d.\n",
+                   record_max_size);
+          fprintf (stderr, "Possible values: 512, 1024, 2048, 4096.\n");
+          exit (1);
+        }
     }
 
 #ifdef ENABLE_SESSION_TICKET
@@ -663,7 +663,7 @@ handle_error (socket_st * hd, int err)
       alert = gnutls_alert_get (hd->session);
       str = gnutls_alert_get_name (alert);
       if (str == NULL)
-	str = str_unknown;
+        str = str_unknown;
       printf ("*** Received alert [%d]: %s\n", alert, str);
 
       /* In SRP if the alert is MISSING_SRP_USERNAME,
@@ -754,58 +754,58 @@ main (int argc, char **argv)
 
 
       if (i == 1)
-	{
-	  hd.session = init_tls_session (hostname);
-	  gnutls_session_set_data (hd.session, session_data,
-				   session_data_size);
-	  free (session_data);
-	}
+        {
+          hd.session = init_tls_session (hostname);
+          gnutls_session_set_data (hd.session, session_data,
+                                   session_data_size);
+          free (session_data);
+        }
 
       ret = do_handshake (&hd);
 
       if (ret < 0)
-	{
-	  fprintf (stderr, "*** Handshake has failed\n");
-	  gnutls_perror (ret);
-	  gnutls_deinit (hd.session);
-	  return 1;
-	}
+        {
+          fprintf (stderr, "*** Handshake has failed\n");
+          gnutls_perror (ret);
+          gnutls_deinit (hd.session);
+          return 1;
+        }
       else
-	{
-	  printf ("- Handshake was completed\n");
-	  if (gnutls_session_is_resumed (hd.session) != 0)
-	    printf ("*** This is a resumed session\n");
-	}
+        {
+          printf ("- Handshake was completed\n");
+          if (gnutls_session_is_resumed (hd.session) != 0)
+            printf ("*** This is a resumed session\n");
+        }
 
       if (resume != 0 && i == 0)
-	{
+        {
 
-	  gnutls_session_get_data (hd.session, NULL, &session_data_size);
-	  session_data = malloc (session_data_size);
+          gnutls_session_get_data (hd.session, NULL, &session_data_size);
+          session_data = malloc (session_data_size);
 
-	  gnutls_session_get_data (hd.session, session_data,
-				   &session_data_size);
+          gnutls_session_get_data (hd.session, session_data,
+                                   &session_data_size);
 
-	  gnutls_session_get_id (hd.session, NULL, &session_id_size);
+          gnutls_session_get_id (hd.session, NULL, &session_id_size);
 
-	  session_id = malloc (session_id_size);
-	  gnutls_session_get_id (hd.session, session_id, &session_id_size);
+          session_id = malloc (session_id_size);
+          gnutls_session_get_id (hd.session, session_id, &session_id_size);
 
-	  /* print some information */
-	  print_info (hd.session, hostname, info.insecure);
+          /* print some information */
+          print_info (hd.session, hostname, info.insecure);
 
-	  printf ("- Disconnecting\n");
-	  socket_bye (&hd);
+          printf ("- Disconnecting\n");
+          socket_bye (&hd);
 
-	  printf
-	    ("\n\n- Connecting again- trying to resume previous session\n");
-	  socket_open (&hd, hostname, service);
-	  socket_connect (&hd);
-	}
+          printf
+            ("\n\n- Connecting again- trying to resume previous session\n");
+          socket_open (&hd, hostname, service);
+          socket_connect (&hd);
+        }
       else
-	{
-	  break;
-	}
+        {
+          break;
+        }
     }
 
 after_handshake:
@@ -819,16 +819,16 @@ after_handshake:
       ret = do_handshake (&hd);
 
       if (ret < 0)
-	{
-	  fprintf (stderr, "*** ReHandshake has failed\n");
-	  gnutls_perror (ret);
-	  gnutls_deinit (hd.session);
-	  return 1;
-	}
+        {
+          fprintf (stderr, "*** ReHandshake has failed\n");
+          gnutls_perror (ret);
+          gnutls_deinit (hd.session);
+          return 1;
+        }
       else
-	{
-	  printf ("- ReHandshake was completed\n");
-	}
+        {
+          printf ("- ReHandshake was completed\n");
+        }
     }
 
 #ifndef _WIN32
@@ -848,20 +848,20 @@ after_handshake:
   for (;;)
     {
       if (starttls_alarmed && !hd.secure)
-	{
-	  /* Warning!  Do not touch this text string, it is used by
-	     external programs to search for when gnutls-cli has
-	     reached this point. */
-	  fprintf (stderr, "*** Starting TLS handshake\n");
-	  ret = do_handshake (&hd);
-	  if (ret < 0)
-	    {
-	      fprintf (stderr, "*** Handshake has failed\n");
-	      user_term = 1;
-	      retval = 1;
-	      break;
-	    }
-	}
+        {
+          /* Warning!  Do not touch this text string, it is used by
+             external programs to search for when gnutls-cli has
+             reached this point. */
+          fprintf (stderr, "*** Starting TLS handshake\n");
+          ret = do_handshake (&hd);
+          if (ret < 0)
+            {
+              fprintf (stderr, "*** Handshake has failed\n");
+              user_term = 1;
+              retval = 1;
+              break;
+            }
+        }
 
       FD_ZERO (&rset);
       FD_SET (fileno (stdin), &rset);
@@ -873,89 +873,89 @@ after_handshake:
 
       err = select (maxfd + 1, &rset, NULL, NULL, &tv);
       if (err < 0)
-	continue;
+        continue;
 
       if (FD_ISSET (hd.fd, &rset))
-	{
-	  memset (buffer, 0, MAX_BUF + 1);
-	  ret = socket_recv (&hd, buffer, MAX_BUF);
+        {
+          memset (buffer, 0, MAX_BUF + 1);
+          ret = socket_recv (&hd, buffer, MAX_BUF);
 
-	  if (ret == 0)
-	    {
-	      printf ("- Peer has closed the GnuTLS connection\n");
-	      break;
-	    }
-	  else if (handle_error (&hd, ret) < 0 && user_term == 0)
-	    {
-	      fprintf (stderr,
-		       "*** Server has terminated the connection abnormally.\n");
-	      retval = 1;
-	      break;
-	    }
-	  else if (ret > 0)
-	    {
-	      if (verbose != 0)
-		printf ("- Received[%d]: ", ret);
-	      for (ii = 0; ii < ret; ii++)
-		{
-		  fputc (buffer[ii], stdout);
-		}
-	      fflush (stdout);
-	    }
+          if (ret == 0)
+            {
+              printf ("- Peer has closed the GnuTLS connection\n");
+              break;
+            }
+          else if (handle_error (&hd, ret) < 0 && user_term == 0)
+            {
+              fprintf (stderr,
+                       "*** Server has terminated the connection abnormally.\n");
+              retval = 1;
+              break;
+            }
+          else if (ret > 0)
+            {
+              if (verbose != 0)
+                printf ("- Received[%d]: ", ret);
+              for (ii = 0; ii < ret; ii++)
+                {
+                  fputc (buffer[ii], stdout);
+                }
+              fflush (stdout);
+            }
 
-	  if (user_term != 0)
-	    break;
-	}
+          if (user_term != 0)
+            break;
+        }
 
       if (FD_ISSET (fileno (stdin), &rset))
-	{
-	  if ((bytes = read (fileno (stdin), buffer, MAX_BUF - 1)) <= 0)
-	    {
-	      if (hd.secure == 0)
-		{
-		  /* Warning!  Do not touch this text string, it is
-		     used by external programs to search for when
-		     gnutls-cli has reached this point. */
-		  fprintf (stderr, "*** Starting TLS handshake\n");
-		  ret = do_handshake (&hd);
-		  clearerr (stdin);
-		  if (ret < 0)
-		    {
-		      fprintf (stderr, "*** Handshake has failed\n");
-		      user_term = 1;
-		      retval = 1;
-		      break;
-		    }
-		}
-	      else
-		{
-		  user_term = 1;
-		  break;
-		}
-	      continue;
-	    }
+        {
+          if ((bytes = read (fileno (stdin), buffer, MAX_BUF - 1)) <= 0)
+            {
+              if (hd.secure == 0)
+                {
+                  /* Warning!  Do not touch this text string, it is
+                     used by external programs to search for when
+                     gnutls-cli has reached this point. */
+                  fprintf (stderr, "*** Starting TLS handshake\n");
+                  ret = do_handshake (&hd);
+                  clearerr (stdin);
+                  if (ret < 0)
+                    {
+                      fprintf (stderr, "*** Handshake has failed\n");
+                      user_term = 1;
+                      retval = 1;
+                      break;
+                    }
+                }
+              else
+                {
+                  user_term = 1;
+                  break;
+                }
+              continue;
+            }
 
-	  if (crlf != 0)
-	    {
-	      char *b = strchr (buffer, '\n');
-	      if (b != NULL)
-		{
-		  strcpy (b, "\r\n");
-		  bytes++;
-		}
-	    }
+          if (crlf != 0)
+            {
+              char *b = strchr (buffer, '\n');
+              if (b != NULL)
+                {
+                  strcpy (b, "\r\n");
+                  bytes++;
+                }
+            }
 
-	  ret = socket_send (&hd, buffer, bytes);
+          ret = socket_send (&hd, buffer, bytes);
 
-	  if (ret > 0)
-	    {
-	      if (verbose != 0)
-		printf ("- Sent: %d bytes\n", ret);
-	    }
-	  else
-	    handle_error (&hd, ret);
+          if (ret > 0)
+            {
+              if (verbose != 0)
+                printf ("- Sent: %d bytes\n", ret);
+            }
+          else
+            handle_error (&hd, ret);
 
-	}
+        }
     }
 
   if (user_term != 0)
@@ -989,7 +989,7 @@ gaa_parser (int argc, char **argv)
   if (gaa (argc, argv, &info) != -1)
     {
       fprintf (stderr,
-	       "Error in the arguments. Use the --help or -h parameters to get more information.\n");
+               "Error in the arguments. Use the --help or -h parameters to get more information.\n");
       exit (1);
     }
 
@@ -1051,7 +1051,7 @@ cli_version (void)
   if (strcmp (gnutls_check_version (NULL), PACKAGE_VERSION) != 0)
     p = PACKAGE_STRING;
   version_etc (stdout, program_name, p, gnutls_check_version (NULL),
-	       "Nikos Mavrogiannopoulos", (char *) NULL);
+               "Nikos Mavrogiannopoulos", (char *) NULL);
 }
 
 
@@ -1071,13 +1071,13 @@ check_rehandshake (socket_st * socket, int ret)
       ret = do_handshake (socket);
 
       if (ret == 0)
-	{
-	  printf ("*** Rehandshake was performed.\n");
-	}
+        {
+          printf ("*** Rehandshake was performed.\n");
+        }
       else
-	{
-	  printf ("*** Rehandshake Failed.\n");
-	}
+        {
+          printf ("*** Rehandshake Failed.\n");
+        }
     }
 }
 
@@ -1088,16 +1088,16 @@ do_handshake (socket_st * socket)
   int ret;
 
   gnutls_transport_set_ptr (socket->session,
-			    (gnutls_transport_ptr_t)
-			    gl_fd_to_handle (socket->fd));
+                            (gnutls_transport_ptr_t)
+                            gl_fd_to_handle (socket->fd));
   do
     {
       ret = gnutls_handshake (socket->session);
 
       if (ret < 0)
-	{
-	  handle_error (socket, ret);
-	}
+        {
+          handle_error (socket, ret);
+        }
     }
   while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
 
@@ -1120,7 +1120,7 @@ do_handshake (socket_st * socket)
 
 static int
 srp_username_callback (gnutls_session_t session,
-		       char **username, char **password)
+                       char **username, char **password)
 {
   if (srp_username == NULL || srp_passwd == NULL)
     {
@@ -1162,15 +1162,15 @@ psk_callback (gnutls_session_t session, char **username, gnutls_datum_t * key)
       len = getline (&tmp, &n, stdin);
 
       if (tmp == NULL)
-	{
-	  fprintf (stderr, "No username given, aborting...\n");
-	  return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-	}
+        {
+          fprintf (stderr, "No username given, aborting...\n");
+          return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+        }
 
       if (tmp[strlen (tmp) - 1] == '\n')
-	tmp[strlen (tmp) - 1] = '\0';
+        tmp[strlen (tmp) - 1] = '\0';
       if (tmp[strlen (tmp) - 1] == '\r')
-	tmp[strlen (tmp) - 1] = '\0';
+        tmp[strlen (tmp) - 1] = '\0';
 
       *username = gnutls_strdup (tmp);
       free (tmp);
@@ -1197,7 +1197,7 @@ psk_callback (gnutls_session_t session, char **username, gnutls_datum_t * key)
   if (ret < 0)
     {
       fprintf (stderr, "Error deriving password: %s\n",
-	       gnutls_strerror (ret));
+               gnutls_strerror (ret));
       gnutls_free (*username);
       return ret;
     }
@@ -1233,29 +1233,29 @@ init_global_tls_stuff (void)
   if (x509_cafile != NULL)
     {
       ret = gnutls_certificate_set_x509_trust_file (xcred,
-						    x509_cafile, x509ctype);
+                                                    x509_cafile, x509ctype);
       if (ret < 0)
-	{
-	  fprintf (stderr, "Error setting the x509 trust file\n");
-	}
+        {
+          fprintf (stderr, "Error setting the x509 trust file\n");
+        }
       else
-	{
-	  printf ("Processed %d CA certificate(s).\n", ret);
-	}
+        {
+          printf ("Processed %d CA certificate(s).\n", ret);
+        }
     }
 #ifdef ENABLE_PKI
   if (x509_crlfile != NULL)
     {
       ret = gnutls_certificate_set_x509_crl_file (xcred, x509_crlfile,
-						  x509ctype);
+                                                  x509ctype);
       if (ret < 0)
-	{
-	  fprintf (stderr, "Error setting the x509 CRL file\n");
-	}
+        {
+          fprintf (stderr, "Error setting the x509 CRL file\n");
+        }
       else
-	{
-	  printf ("Processed %d CRL(s).\n", ret);
-	}
+        {
+          printf ("Processed %d CRL(s).\n", ret);
+        }
     }
 #endif
 
@@ -1265,12 +1265,12 @@ init_global_tls_stuff (void)
   if (pgp_keyring != NULL)
     {
       ret =
-	gnutls_certificate_set_openpgp_keyring_file (xcred, pgp_keyring,
-						     GNUTLS_OPENPGP_FMT_BASE64);
+        gnutls_certificate_set_openpgp_keyring_file (xcred, pgp_keyring,
+                                                     GNUTLS_OPENPGP_FMT_BASE64);
       if (ret < 0)
-	{
-	  fprintf (stderr, "Error setting the OpenPGP keyring file\n");
-	}
+        {
+          fprintf (stderr, "Error setting the OpenPGP keyring file\n");
+        }
     }
 #endif
 
@@ -1279,12 +1279,12 @@ init_global_tls_stuff (void)
     {
       /* SRP stuff */
       if (gnutls_srp_allocate_client_credentials (&srp_cred) < 0)
-	{
-	  fprintf (stderr, "SRP authentication error\n");
-	}
+        {
+          fprintf (stderr, "SRP authentication error\n");
+        }
 
       gnutls_srp_set_client_credentials_function (srp_cred,
-						  srp_username_callback);
+                                                  srp_username_callback);
     }
 #endif
 
@@ -1298,13 +1298,13 @@ init_global_tls_stuff (void)
   if (psk_username && psk_key.data)
     {
       ret = gnutls_psk_set_client_credentials (psk_cred,
-					       psk_username, &psk_key,
-					       GNUTLS_PSK_KEY_HEX);
+                                               psk_username, &psk_key,
+                                               GNUTLS_PSK_KEY_HEX);
       if (ret < 0)
-	{
-	  fprintf (stderr, "Error setting the PSK credentials: %s\n",
-		   gnutls_strerror (ret));
-	}
+        {
+          fprintf (stderr, "Error setting the PSK credentials: %s\n",
+                   gnutls_strerror (ret));
+        }
     }
   gnutls_psk_set_client_credentials_function (psk_cred, psk_callback);
 #endif
@@ -1330,13 +1330,13 @@ socket_recv (const socket_st * socket, void *buffer, int buffer_size)
   if (socket->secure)
     do
       {
-	ret = gnutls_record_recv (socket->session, buffer, buffer_size);
+        ret = gnutls_record_recv (socket->session, buffer, buffer_size);
       }
     while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
   else
     do
       {
-	ret = recv (socket->fd, buffer, buffer_size, 0);
+        ret = recv (socket->fd, buffer, buffer_size, 0);
       }
     while (ret == -1 && errno == EINTR);
 
@@ -1351,19 +1351,19 @@ socket_send (const socket_st * socket, const void *buffer, int buffer_size)
   if (socket->secure)
     do
       {
-	ret = gnutls_record_send (socket->session, buffer, buffer_size);
+        ret = gnutls_record_send (socket->session, buffer, buffer_size);
       }
     while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
   else
     do
       {
-	ret = send (socket->fd, buffer, buffer_size, 0);
+        ret = send (socket->fd, buffer, buffer_size, 0);
       }
     while (ret == -1 && errno == EINTR);
 
   if (ret > 0 && ret != buffer_size && verbose)
     fprintf (stderr,
-	     "*** Only sent %d bytes instead of %d.\n", ret, buffer_size);
+             "*** Only sent %d bytes instead of %d.\n", ret, buffer_size);
 
   return ret;
 }
@@ -1375,11 +1375,11 @@ socket_bye (socket_st * socket)
   if (socket->secure)
     {
       do
-	ret = gnutls_bye (socket->session, GNUTLS_SHUT_WR);
+        ret = gnutls_bye (socket->session, GNUTLS_SHUT_WR);
       while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
       if (ret < 0)
-	fprintf (stderr, "*** gnutls_bye() error: %s\n",
-		 gnutls_strerror (ret));
+        fprintf (stderr, "*** gnutls_bye() error: %s\n",
+                 gnutls_strerror (ret));
       gnutls_deinit (socket->session);
       socket->session = NULL;
     }
@@ -1391,7 +1391,7 @@ socket_bye (socket_st * socket)
   free (socket->hostname);
   free (socket->service);
 
-  shutdown (socket->fd, SHUT_RDWR);	/* no more receptions */
+  shutdown (socket->fd, SHUT_RDWR);     /* no more receptions */
   close (socket->fd);
 
   socket->fd = -1;
@@ -1409,7 +1409,7 @@ socket_connect (const socket_st * hd)
   if (err < 0)
     {
       fprintf (stderr, "Cannot connect to %s:%s: %s\n", hd->hostname,
-	       hd->service, strerror (errno));
+               hd->service, strerror (errno));
       exit (1);
     }
 }
@@ -1429,7 +1429,7 @@ socket_open (socket_st * hd, const char *hostname, const char *service)
   if ((err = getaddrinfo (hostname, service, &hints, &res)))
     {
       fprintf (stderr, "Cannot resolve %s:%s: %s\n", hostname, service,
-	       gai_strerror (err));
+               gai_strerror (err));
       exit (1);
     }
 
@@ -1438,16 +1438,16 @@ socket_open (socket_st * hd, const char *hostname, const char *service)
     {
       sd = socket (ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
       if (sd == -1)
-	continue;
+        continue;
 
       if ((err = getnameinfo (ptr->ai_addr, ptr->ai_addrlen, buffer, MAX_BUF,
-			      portname, sizeof (portname),
-			      NI_NUMERICHOST | NI_NUMERICSERV)) != 0)
-	{
-	  fprintf (stderr, "getnameinfo(): %s\n", gai_strerror (err));
-	  freeaddrinfo (res);
-	  exit (1);
-	}
+                              portname, sizeof (portname),
+                              NI_NUMERICHOST | NI_NUMERICSERV)) != 0)
+        {
+          fprintf (stderr, "getnameinfo(): %s\n", gai_strerror (err));
+          freeaddrinfo (res);
+          exit (1);
+        }
 
       break;
     }

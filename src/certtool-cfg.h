@@ -5,9 +5,9 @@ void cfg_init (void);
 int template_parse (const char *template);
 
 void read_crt_set (gnutls_x509_crt_t crt, const char *input_str,
-		   const char *oid);
+                   const char *oid);
 void read_crq_set (gnutls_x509_crq_t crq, const char *input_str,
-		   const char *oid);
+                   const char *oid);
 int read_int (const char *input_str);
 const char *read_str (const char *input_str);
 int read_yesno (const char *input_str);

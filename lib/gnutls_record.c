@@ -63,7 +63,7 @@ gnutls_protocol_get_version (gnutls_session_t session)
 
 void
 _gnutls_set_current_version (gnutls_session_t session,
-			     gnutls_protocol_t version)
+                             gnutls_protocol_t version)
 {
   session->security_parameters.version = version;
 }
@@ -115,7 +115,7 @@ gnutls_record_disable_padding (gnutls_session_t session)
  **/
 void
 gnutls_transport_set_ptr (gnutls_session_t session,
-			  gnutls_transport_ptr_t ptr)
+                          gnutls_transport_ptr_t ptr)
 {
   session->internals.transport_recv_ptr = ptr;
   session->internals.transport_send_ptr = ptr;
@@ -134,8 +134,8 @@ gnutls_transport_set_ptr (gnutls_session_t session,
  **/
 void
 gnutls_transport_set_ptr2 (gnutls_session_t session,
-			   gnutls_transport_ptr_t recv_ptr,
-			   gnutls_transport_ptr_t send_ptr)
+                           gnutls_transport_ptr_t recv_ptr,
+                           gnutls_transport_ptr_t send_ptr)
 {
   session->internals.transport_send_ptr = send_ptr;
   session->internals.transport_recv_ptr = recv_ptr;
@@ -169,8 +169,8 @@ gnutls_transport_get_ptr (gnutls_session_t session)
  **/
 void
 gnutls_transport_get_ptr2 (gnutls_session_t session,
-			   gnutls_transport_ptr_t * recv_ptr,
-			   gnutls_transport_ptr_t * send_ptr)
+                           gnutls_transport_ptr_t * recv_ptr,
+                           gnutls_transport_ptr_t * send_ptr)
 {
 
   *recv_ptr = session->internals.transport_recv_ptr;
@@ -222,41 +222,41 @@ gnutls_bye (gnutls_session_t session, gnutls_close_request_t how)
       ret = _gnutls_io_write_flush (session);
       STATE = STATE60;
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
     case STATE61:
       ret =
-	gnutls_alert_send (session, GNUTLS_AL_WARNING, GNUTLS_A_CLOSE_NOTIFY);
+        gnutls_alert_send (session, GNUTLS_AL_WARNING, GNUTLS_A_CLOSE_NOTIFY);
       STATE = STATE61;
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
     case STATE62:
       STATE = STATE62;
       if (how == GNUTLS_SHUT_RDWR)
-	{
-	  do
-	    {
-	      _gnutls_io_clear_peeked_data (session);
-	      ret = _gnutls_recv_int (session, GNUTLS_ALERT, -1, NULL, 0);
-	    }
-	  while (ret == GNUTLS_E_GOT_APPLICATION_DATA);
+        {
+          do
+            {
+              _gnutls_io_clear_peeked_data (session);
+              ret = _gnutls_recv_int (session, GNUTLS_ALERT, -1, NULL, 0);
+            }
+          while (ret == GNUTLS_E_GOT_APPLICATION_DATA);
 
-	  if (ret >= 0)
-	    session->internals.may_not_read = 1;
+          if (ret >= 0)
+            session->internals.may_not_read = 1;
 
-	  if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      return ret;
-	    }
-	}
+          if (ret < 0)
+            {
+              gnutls_assert ();
+              return ret;
+            }
+        }
       STATE = STATE62;
 
       break;
@@ -300,7 +300,7 @@ session_is_valid (gnutls_session_t session)
  */
 inline static void
 copy_record_version (gnutls_session_t session,
-		     gnutls_handshake_description_t htype, opaque version[2])
+                     gnutls_handshake_description_t htype, opaque version[2])
 {
   gnutls_protocol_t lver;
 
@@ -335,9 +335,9 @@ copy_record_version (gnutls_session_t session,
  */
 ssize_t
 _gnutls_send_int (gnutls_session_t session, content_type_t type,
-		  gnutls_handshake_description_t htype,
-		  unsigned int epoch_rel, const void *_data,
-		  size_t sizeofdata, unsigned int mflags)
+                  gnutls_handshake_description_t htype,
+                  unsigned int epoch_rel, const void *_data,
+                  size_t sizeofdata, unsigned int mflags)
 {
   mbuffer_st *bufel;
   size_t cipher_size;
@@ -375,11 +375,11 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  if (type != GNUTLS_ALERT)	/* alert messages are sent anyway */
+  if (type != GNUTLS_ALERT)     /* alert messages are sent anyway */
     if (session_is_valid (session) || session->internals.may_not_write != 0)
       {
-	gnutls_assert ();
-	return GNUTLS_E_INVALID_SESSION;
+        gnutls_assert ();
+        return GNUTLS_E_INVALID_SESSION;
       }
 
   headers[0] = type;
@@ -407,9 +407,9 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
     {
       ret = _gnutls_io_write_flush (session);
       if (ret > 0)
-	cipher_size = ret;
+        cipher_size = ret;
       else
-	cipher_size = 0;
+        cipher_size = 0;
 
       retval = session->internals.record_send_buffer_user_size;
     }
@@ -421,25 +421,25 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
       cipher_size = data2send_size + MAX_RECORD_OVERHEAD;
       bufel = _mbuffer_alloc (cipher_size, cipher_size);
       if (bufel == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
 
       cipher_size =
-	_gnutls_encrypt (session, headers, RECORD_HEADER_SIZE, data,
-			 data2send_size, _mbuffer_get_udata_ptr (bufel),
-			 cipher_size, type,
-			 (session->internals.priorities.no_padding ==
-			  0) ? 1 : 0, record_params);
+        _gnutls_encrypt (session, headers, RECORD_HEADER_SIZE, data,
+                         data2send_size, _mbuffer_get_udata_ptr (bufel),
+                         cipher_size, type,
+                         (session->internals.priorities.no_padding ==
+                          0) ? 1 : 0, record_params);
       if (cipher_size <= 0)
-	{
-	  gnutls_assert ();
-	  if (cipher_size == 0)
-	    cipher_size = GNUTLS_E_ENCRYPTION_FAILED;
-	  gnutls_free (bufel);
-	  return cipher_size;	/* error */
-	}
+        {
+          gnutls_assert ();
+          if (cipher_size == 0)
+            cipher_size = GNUTLS_E_ENCRYPTION_FAILED;
+          gnutls_free (bufel);
+          return cipher_size;   /* error */
+        }
 
       retval = data2send_size;
       session->internals.record_send_buffer_user_size = data2send_size;
@@ -447,12 +447,12 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
       /* increase sequence number
        */
       if (_gnutls_uint64pp (&record_state->sequence_number) != 0)
-	{
-	  session_invalidate (session);
-	  gnutls_assert ();
-	  gnutls_free (bufel);
-	  return GNUTLS_E_RECORD_LIMIT_REACHED;
-	}
+        {
+          session_invalidate (session);
+          gnutls_assert ();
+          gnutls_free (bufel);
+          return GNUTLS_E_RECORD_LIMIT_REACHED;
+        }
 
       _mbuffer_set_udata_size (bufel, cipher_size);
       ret = _gnutls_io_write_buffered (session, bufel, mflags);
@@ -461,19 +461,19 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
   if (ret != cipher_size)
     {
       if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
-	{
-	  /* If we have sent any data then just return
-	   * the error value. Do not invalidate the session.
-	   */
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          /* If we have sent any data then just return
+           * the error value. Do not invalidate the session.
+           */
+          gnutls_assert ();
+          return ret;
+        }
 
       if (ret > 0)
-	{
-	  gnutls_assert ();
-	  ret = GNUTLS_E_INTERNAL_ERROR;
-	}
+        {
+          gnutls_assert ();
+          ret = GNUTLS_E_INTERNAL_ERROR;
+        }
       session_unresumable (session);
       session->internals.may_not_write = 1;
       gnutls_assert ();
@@ -483,11 +483,11 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
   session->internals.record_send_buffer_user_size = 0;
 
   _gnutls_record_log ("REC[%p]: Sent Packet[%d] %s(%d) with length: %d\n",
-		      session,
-		      (int)
-		      _gnutls_uint64touint32
-		      (&record_state->sequence_number),
-		      _gnutls_packet2str (type), type, (int) cipher_size);
+                      session,
+                      (int)
+                      _gnutls_uint64touint32
+                      (&record_state->sequence_number),
+                      _gnutls_packet2str (type), type, (int) cipher_size);
 
   return retval;
 }
@@ -504,7 +504,7 @@ _gnutls_send_change_cipher_spec (gnutls_session_t session, int again)
 
   if (again == 0)
     return _gnutls_send_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1,
-			     EPOCH_WRITE_CURRENT, data, 1, MBUFFER_FLUSH);
+                             EPOCH_WRITE_CURRENT, data, 1, MBUFFER_FLUSH);
   else
     {
       return _gnutls_io_write_flush (session);
@@ -535,7 +535,7 @@ check_recv_type (content_type_t recv_type)
  */
 static int
 check_buffers (gnutls_session_t session, content_type_t type,
-	       opaque * data, int sizeofdata)
+               opaque * data, int sizeofdata)
 {
   if ((type == GNUTLS_APPLICATION_DATA ||
        type == GNUTLS_HANDSHAKE ||
@@ -545,20 +545,20 @@ check_buffers (gnutls_session_t session, content_type_t type,
       int ret, ret2;
       ret = _gnutls_record_buffer_get (type, session, data, sizeofdata);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       /* if the buffer just got empty */
       if (_gnutls_record_buffer_get_size (type, session) == 0)
-	{
-	  if ((ret2 = _gnutls_io_clear_peeked_data (session)) < 0)
-	    {
-	      gnutls_assert ();
-	      return ret2;
-	    }
-	}
+        {
+          if ((ret2 = _gnutls_io_clear_peeked_data (session)) < 0)
+            {
+              gnutls_assert ();
+              return ret2;
+            }
+        }
 
       return ret;
     }
@@ -572,12 +572,12 @@ check_buffers (gnutls_session_t session, content_type_t type,
  */
 static int
 record_check_headers (gnutls_session_t session,
-		      uint8_t headers[RECORD_HEADER_SIZE],
-		      content_type_t type,
-		      gnutls_handshake_description_t htype,
-		      /*output */ content_type_t * recv_type,
-		      opaque version[2], uint16_t * length,
-		      uint16_t * header_size)
+                      uint8_t headers[RECORD_HEADER_SIZE],
+                      content_type_t type,
+                      gnutls_handshake_description_t htype,
+                      /*output */ content_type_t * recv_type,
+                      opaque version[2], uint16_t * length,
+                      uint16_t * header_size)
 {
 
   /* Read the first two bytes to determine if this is a 
@@ -591,15 +591,15 @@ record_check_headers (gnutls_session_t session,
       /* if msb set and expecting handshake message
        * it should be SSL 2 hello 
        */
-      version[0] = 3;		/* assume SSL 3.0 */
+      version[0] = 3;           /* assume SSL 3.0 */
       version[1] = 0;
 
       *length = (((headers[0] & 0x7f) << 8)) | headers[1];
 
       /* SSL 2.0 headers */
       *header_size = 2;
-      *recv_type = GNUTLS_HANDSHAKE;	/* we accept only v2 client hello
-					 */
+      *recv_type = GNUTLS_HANDSHAKE;    /* we accept only v2 client hello
+                                         */
 
       /* in order to assist the handshake protocol.
        * V2 compatibility is a mess.
@@ -607,7 +607,7 @@ record_check_headers (gnutls_session_t session,
       session->internals.v2_hello = *length;
 
       _gnutls_record_log ("REC[%p]: V2 packet received. Length: %d\n",
-			  session, *length);
+                          session, *length);
 
     }
   else
@@ -631,24 +631,24 @@ record_check_headers (gnutls_session_t session,
  */
 inline static int
 record_check_version (gnutls_session_t session,
-		      gnutls_handshake_description_t htype, opaque version[2])
+                      gnutls_handshake_description_t htype, opaque version[2])
 {
   if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO)
     {
       /* Reject hello packets with major version higher than 3.
        */
       if (version[0] > 3)
-	{
-	  gnutls_assert ();
-	  _gnutls_record_log
-	    ("REC[%p]: INVALID VERSION PACKET: (%d) %d.%d\n", session,
-	     htype, version[0], version[1]);
-	  return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
-	}
+        {
+          gnutls_assert ();
+          _gnutls_record_log
+            ("REC[%p]: INVALID VERSION PACKET: (%d) %d.%d\n", session,
+             htype, version[0], version[1]);
+          return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
+        }
     }
   else if (htype != GNUTLS_HANDSHAKE_SERVER_HELLO &&
-	   gnutls_protocol_get_version (session) !=
-	   _gnutls_version_get (version[0], version[1]))
+           gnutls_protocol_get_version (session) !=
+           _gnutls_version_get (version[0], version[1]))
     {
       /* Reject record packets that have a different version than the
        * one negotiated. Note that this version is not protected by any
@@ -656,7 +656,7 @@ record_check_version (gnutls_session_t session,
        */
       gnutls_assert ();
       _gnutls_record_log ("REC[%p]: INVALID VERSION PACKET: (%d) %d.%d\n",
-			  session, htype, version[0], version[1]);
+                          session, htype, version[0], version[1]);
 
       return GNUTLS_E_UNSUPPORTED_VERSION_PACKET;
     }
@@ -669,141 +669,141 @@ record_check_version (gnutls_session_t session,
  */
 static int
 record_check_type (gnutls_session_t session,
-		   content_type_t recv_type, content_type_t type,
-		   gnutls_handshake_description_t htype, opaque * data,
-		   int data_size)
+                   content_type_t recv_type, content_type_t type,
+                   gnutls_handshake_description_t htype, opaque * data,
+                   int data_size)
 {
 
   int ret;
 
   if ((recv_type == type)
       && (type == GNUTLS_APPLICATION_DATA ||
-	  type == GNUTLS_HANDSHAKE || type == GNUTLS_INNER_APPLICATION))
+          type == GNUTLS_HANDSHAKE || type == GNUTLS_INNER_APPLICATION))
     {
       _gnutls_record_buffer_put (type, session, (void *) data, data_size);
     }
   else
     {
       switch (recv_type)
-	{
-	case GNUTLS_ALERT:
+        {
+        case GNUTLS_ALERT:
 
-	  _gnutls_record_log
-	    ("REC[%p]: Alert[%d|%d] - %s - was received\n", session,
-	     data[0], data[1], gnutls_alert_get_name ((int) data[1]));
+          _gnutls_record_log
+            ("REC[%p]: Alert[%d|%d] - %s - was received\n", session,
+             data[0], data[1], gnutls_alert_get_name ((int) data[1]));
 
-	  session->internals.last_alert = data[1];
+          session->internals.last_alert = data[1];
 
-	  /* if close notify is received and
-	   * the alert is not fatal
-	   */
-	  if (data[1] == GNUTLS_A_CLOSE_NOTIFY && data[0] != GNUTLS_AL_FATAL)
-	    {
-	      /* If we have been expecting for an alert do 
-	       */
-	      session->internals.read_eof = 1;
-	      return GNUTLS_E_INT_RET_0;	/* EOF */
-	    }
-	  else
-	    {
+          /* if close notify is received and
+           * the alert is not fatal
+           */
+          if (data[1] == GNUTLS_A_CLOSE_NOTIFY && data[0] != GNUTLS_AL_FATAL)
+            {
+              /* If we have been expecting for an alert do 
+               */
+              session->internals.read_eof = 1;
+              return GNUTLS_E_INT_RET_0;        /* EOF */
+            }
+          else
+            {
 
-	      /* if the alert is FATAL or WARNING
-	       * return the apropriate message
-	       */
+              /* if the alert is FATAL or WARNING
+               * return the apropriate message
+               */
 
-	      gnutls_assert ();
-	      ret = GNUTLS_E_WARNING_ALERT_RECEIVED;
-	      if (data[0] == GNUTLS_AL_FATAL)
-		{
-		  session_unresumable (session);
-		  session_invalidate (session);
-		  ret = GNUTLS_E_FATAL_ALERT_RECEIVED;
-		}
+              gnutls_assert ();
+              ret = GNUTLS_E_WARNING_ALERT_RECEIVED;
+              if (data[0] == GNUTLS_AL_FATAL)
+                {
+                  session_unresumable (session);
+                  session_invalidate (session);
+                  ret = GNUTLS_E_FATAL_ALERT_RECEIVED;
+                }
 
-	      return ret;
-	    }
-	  break;
+              return ret;
+            }
+          break;
 
-	case GNUTLS_CHANGE_CIPHER_SPEC:
-	  /* this packet is now handled in the recv_int()
-	   * function
-	   */
-	  gnutls_assert ();
+        case GNUTLS_CHANGE_CIPHER_SPEC:
+          /* this packet is now handled in the recv_int()
+           * function
+           */
+          gnutls_assert ();
 
-	  return GNUTLS_E_UNEXPECTED_PACKET;
+          return GNUTLS_E_UNEXPECTED_PACKET;
 
-	case GNUTLS_APPLICATION_DATA:
-	  /* even if data is unexpected put it into the buffer */
-	  if ((ret =
-	       _gnutls_record_buffer_put (recv_type, session,
-					  (void *) data, data_size)) < 0)
-	    {
-	      gnutls_assert ();
-	      return ret;
-	    }
+        case GNUTLS_APPLICATION_DATA:
+          /* even if data is unexpected put it into the buffer */
+          if ((ret =
+               _gnutls_record_buffer_put (recv_type, session,
+                                          (void *) data, data_size)) < 0)
+            {
+              gnutls_assert ();
+              return ret;
+            }
 
-	  /* the got_application data is only returned
-	   * if expecting client hello (for rehandshake
-	   * reasons). Otherwise it is an unexpected packet
-	   */
-	  if (type == GNUTLS_ALERT || (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO
-				       && type == GNUTLS_HANDSHAKE))
-	    return GNUTLS_E_GOT_APPLICATION_DATA;
-	  else
-	    {
-	      gnutls_assert ();
-	      return GNUTLS_E_UNEXPECTED_PACKET;
-	    }
+          /* the got_application data is only returned
+           * if expecting client hello (for rehandshake
+           * reasons). Otherwise it is an unexpected packet
+           */
+          if (type == GNUTLS_ALERT || (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO
+                                       && type == GNUTLS_HANDSHAKE))
+            return GNUTLS_E_GOT_APPLICATION_DATA;
+          else
+            {
+              gnutls_assert ();
+              return GNUTLS_E_UNEXPECTED_PACKET;
+            }
 
-	  break;
-	case GNUTLS_HANDSHAKE:
-	  /* This is legal if HELLO_REQUEST is received - and we are a client.
-	   * If we are a server, a client may initiate a renegotiation at any time.
-	   */
-	  if (session->security_parameters.entity == GNUTLS_SERVER)
-	    {
-	      gnutls_assert ();
-	      ret =
-		_gnutls_record_buffer_put (recv_type, session, (void *) data,
-					   data_size);
-	      if (ret < 0)
-		{
-		  gnutls_assert ();
-		  return ret;
-		}
-	      return GNUTLS_E_REHANDSHAKE;
-	    }
+          break;
+        case GNUTLS_HANDSHAKE:
+          /* This is legal if HELLO_REQUEST is received - and we are a client.
+           * If we are a server, a client may initiate a renegotiation at any time.
+           */
+          if (session->security_parameters.entity == GNUTLS_SERVER)
+            {
+              gnutls_assert ();
+              ret =
+                _gnutls_record_buffer_put (recv_type, session, (void *) data,
+                                           data_size);
+              if (ret < 0)
+                {
+                  gnutls_assert ();
+                  return ret;
+                }
+              return GNUTLS_E_REHANDSHAKE;
+            }
 
-	  /* If we are already in a handshake then a Hello
-	   * Request is illegal. But here we don't really care
-	   * since this message will never make it up here.
-	   */
+          /* If we are already in a handshake then a Hello
+           * Request is illegal. But here we don't really care
+           * since this message will never make it up here.
+           */
 
-	  /* So we accept it */
-	  return _gnutls_recv_hello_request (session, data, data_size);
+          /* So we accept it */
+          return _gnutls_recv_hello_request (session, data, data_size);
 
-	  break;
-	case GNUTLS_INNER_APPLICATION:
-	  /* even if data is unexpected put it into the buffer */
-	  if ((ret = _gnutls_record_buffer_put (recv_type, session,
-						(void *) data,
-						data_size)) < 0)
-	    {
-	      gnutls_assert ();
-	      return ret;
-	    }
-	  gnutls_assert ();
-	  return GNUTLS_E_UNEXPECTED_PACKET;
-	  break;
-	default:
+          break;
+        case GNUTLS_INNER_APPLICATION:
+          /* even if data is unexpected put it into the buffer */
+          if ((ret = _gnutls_record_buffer_put (recv_type, session,
+                                                (void *) data,
+                                                data_size)) < 0)
+            {
+              gnutls_assert ();
+              return ret;
+            }
+          gnutls_assert ();
+          return GNUTLS_E_UNEXPECTED_PACKET;
+          break;
+        default:
 
-	  _gnutls_record_log
-	    ("REC[%p]: Received Unknown packet %d expecting %d\n",
-	     session, recv_type, type);
+          _gnutls_record_log
+            ("REC[%p]: Received Unknown packet %d expecting %d\n",
+             session, recv_type, type);
 
-	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+          gnutls_assert ();
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
     }
 
   return 0;
@@ -838,13 +838,13 @@ get_temp_recv_buffer (gnutls_session_t session, gnutls_datum_t * tmp)
       /* Initialize the internal buffer.
        */
       session->internals.recv_buffer.data =
-	gnutls_realloc (session->internals.recv_buffer.data, max_record_size);
+        gnutls_realloc (session->internals.recv_buffer.data, max_record_size);
 
       if (session->internals.recv_buffer.data == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
 
       session->internals.recv_buffer.size = max_record_size;
     }
@@ -867,8 +867,8 @@ get_temp_recv_buffer (gnutls_session_t session, gnutls_datum_t * tmp)
  */
 ssize_t
 _gnutls_recv_int (gnutls_session_t session, content_type_t type,
-		  gnutls_handshake_description_t htype,
-		  opaque * data, size_t sizeofdata)
+                  gnutls_handshake_description_t htype,
+                  opaque * data, size_t sizeofdata)
 {
   int decrypted_length;
   opaque version[2];
@@ -918,7 +918,7 @@ begin:
       return 0;
     }
   else if (session_is_valid (session) != 0
-	   || session->internals.may_not_read != 0)
+           || session->internals.may_not_read != 0)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_SESSION;
@@ -940,14 +940,14 @@ begin:
        _gnutls_io_read_buffered (session, header_size, -1)) != header_size)
     {
       if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
-	return ret;
+        return ret;
 
       session_invalidate (session);
       if (type == GNUTLS_ALERT)
-	{
-	  gnutls_assert ();
-	  return 0;		/* we were expecting close notify */
-	}
+        {
+          gnutls_assert ();
+          return 0;             /* we were expecting close notify */
+        }
       session_unresumable (session);
       gnutls_assert ();
       return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
@@ -964,7 +964,7 @@ begin:
 
   if ((ret =
        record_check_headers (session, data_enc.data, type, htype, &recv_type,
-			     version, &length, &header_size)) < 0)
+                             version, &length, &header_size)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -994,16 +994,16 @@ begin:
      (int) _gnutls_uint64touint32 (&record_state->sequence_number),
      _gnutls_packet2str (type), type, (int) sizeofdata);
   _gnutls_record_log ("REC[%p]: Received Packet[%d] %s(%d) with length: %d\n",
-		      session,
-		      (int)
-		      _gnutls_uint64touint32 (&record_state->sequence_number),
-		      _gnutls_packet2str (recv_type), recv_type, length);
+                      session,
+                      (int)
+                      _gnutls_uint64touint32 (&record_state->sequence_number),
+                      _gnutls_packet2str (recv_type), recv_type, length);
 
   if (length > MAX_RECV_SIZE)
     {
       _gnutls_record_log
-	("REC[%p]: FATAL ERROR: Received packet with length: %d\n",
-	 session, length);
+        ("REC[%p]: FATAL ERROR: Received packet with length: %d\n",
+         session, length);
 
       session_unresumable (session);
       session_invalidate (session);
@@ -1015,10 +1015,10 @@ begin:
  */
   if ((ret =
        _gnutls_io_read_buffered (session, header_size + length,
-				 recv_type)) != header_size + length)
+                                 recv_type)) != header_size + length)
     {
       if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
-	return ret;
+        return ret;
 
       session_unresumable (session);
       session_invalidate (session);
@@ -1050,7 +1050,7 @@ begin:
  */
   ret =
     _gnutls_decrypt (session, ciphertext, length, tmp.data, tmp.size,
-		     recv_type, record_params);
+                     recv_type, record_params);
   if (ret < 0)
     {
       session_unresumable (session);
@@ -1059,7 +1059,7 @@ begin:
       return ret;
     }
   _mbuffer_remove_bytes (&session->internals.record_recv_buffer,
-			 header_size + length);
+                         header_size + length);
   decrypted_length = ret;
 
 /* Check if this is a CHANGE_CIPHER_SPEC
@@ -1069,13 +1069,13 @@ begin:
     {
 
       _gnutls_record_log
-	("REC[%p]: ChangeCipherSpec Packet was received\n", session);
+        ("REC[%p]: ChangeCipherSpec Packet was received\n", session);
 
       if ((size_t) ret != sizeofdata)
-	{			/* sizeofdata should be 1 */
-	  gnutls_assert ();
-	  return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
+        {                       /* sizeofdata should be 1 */
+          gnutls_assert ();
+          return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+        }
       memcpy (data, tmp.data, sizeofdata);
 
       return ret;
@@ -1097,11 +1097,11 @@ begin:
 
   ret =
     record_check_type (session, recv_type, type, htype, tmp.data,
-		       decrypted_length);
+                       decrypted_length);
   if (ret < 0)
     {
       if (ret == GNUTLS_E_INT_RET_0)
-	return 0;
+        return 0;
       gnutls_assert ();
       return ret;
     }
@@ -1115,21 +1115,21 @@ begin:
 
       ret = _gnutls_record_buffer_get (type, session, data, sizeofdata);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       /* if the buffer just got empty 
        */
       if (_gnutls_record_buffer_get_size (type, session) == 0)
-	{
-	  if ((ret2 = _gnutls_io_clear_peeked_data (session)) < 0)
-	    {
-	      gnutls_assert ();
-	      return ret2;
-	    }
-	}
+        {
+          if ((ret2 = _gnutls_io_clear_peeked_data (session)) < 0)
+            {
+              gnutls_assert ();
+              return ret2;
+            }
+        }
     }
   else
     {
@@ -1186,11 +1186,11 @@ begin:
   **/
 ssize_t
 gnutls_record_send (gnutls_session_t session, const void *data,
-		    size_t sizeofdata)
+                    size_t sizeofdata)
 {
   return _gnutls_send_int (session, GNUTLS_APPLICATION_DATA, -1,
-			   EPOCH_WRITE_CURRENT, data, sizeofdata,
-			   MBUFFER_FLUSH);
+                           EPOCH_WRITE_CURRENT, data, sizeofdata,
+                           MBUFFER_FLUSH);
 }
 
 /**
@@ -1227,5 +1227,5 @@ ssize_t
 gnutls_record_recv (gnutls_session_t session, void *data, size_t sizeofdata)
 {
   return _gnutls_recv_int (session, GNUTLS_APPLICATION_DATA, -1, data,
-			   sizeofdata);
+                           sizeofdata);
 }

@@ -38,7 +38,7 @@
 
 static void
 hexdump (gnutls_buffer_st * str, const char *data, size_t len,
-	 const char *spc)
+         const char *spc)
 {
   size_t j;
 
@@ -47,15 +47,15 @@ hexdump (gnutls_buffer_st * str, const char *data, size_t len,
   for (j = 0; j < len; j++)
     {
       if (((j + 1) % 16) == 0)
-	{
-	  addf (str, "%.2x\n", (unsigned char) data[j]);
-	  if (spc && j != (len - 1))
-	    adds (str, spc);
-	}
+        {
+          addf (str, "%.2x\n", (unsigned char) data[j]);
+          if (spc && j != (len - 1))
+            adds (str, spc);
+        }
       else if (j == (len - 1))
-	addf (str, "%.2x", (unsigned char) data[j]);
+        addf (str, "%.2x", (unsigned char) data[j]);
       else
-	addf (str, "%.2x:", (unsigned char) data[j]);
+        addf (str, "%.2x:", (unsigned char) data[j]);
     }
   if ((j % 16) != 0)
     adds (str, "\n");
@@ -71,13 +71,13 @@ hexprint (gnutls_buffer_st * str, const char *data, size_t len)
   else
     {
       for (j = 0; j < len; j++)
-	addf (str, "%.2x", (unsigned char) data[j]);
+        addf (str, "%.2x", (unsigned char) data[j]);
     }
 }
 
 static void
 print_key_usage (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert,
-		 unsigned int idx)
+                 unsigned int idx)
 {
   unsigned int key_usage;
   int err;
@@ -204,16 +204,16 @@ print_key_times (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert, int idx)
 
     if (tim == 0)
       {
-	adds (str, _("\t\tExpiration: Never\n"));
+        adds (str, _("\t\tExpiration: Never\n"));
       }
     else
       {
-	if (gmtime_r (&tim, &t) == NULL)
-	  addf (str, "error: gmtime_r (%ld)\n", (unsigned long) tim);
-	else if (strftime (s, max, "%a %b %e %H:%M:%S UTC %Y", &t) == 0)
-	  addf (str, "error: strftime (%ld)\n", (unsigned long) tim);
-	else
-	  addf (str, _("\t\tExpiration: %s\n"), s);
+        if (gmtime_r (&tim, &t) == NULL)
+          addf (str, "error: gmtime_r (%ld)\n", (unsigned long) tim);
+        else if (strftime (s, max, "%a %b %e %H:%M:%S UTC %Y", &t) == 0)
+          addf (str, "error: strftime (%ld)\n", (unsigned long) tim);
+        else
+          addf (str, _("\t\tExpiration: %s\n"), s);
       }
   }
 }
@@ -235,77 +235,77 @@ print_key_info (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert, int idx)
     {
       const char *name = gnutls_pk_algorithm_get_name (err);
       if (name == NULL)
-	name = _("unknown");
+        name = _("unknown");
 
       addf (str, _("\tPublic Key Algorithm: %s\n"), name);
       addf (str, _("\tKey Security Level: %s\n"),
-	    gnutls_sec_param_get_name (gnutls_pk_bits_to_sec_param
-				       (err, bits)));
+            gnutls_sec_param_get_name (gnutls_pk_bits_to_sec_param
+                                       (err, bits)));
 
       switch (err)
-	{
-	case GNUTLS_PK_RSA:
-	  {
-	    gnutls_datum_t m, e;
+        {
+        case GNUTLS_PK_RSA:
+          {
+            gnutls_datum_t m, e;
 
-	    if (idx == -1)
-	      err = gnutls_openpgp_crt_get_pk_rsa_raw (cert, &m, &e);
-	    else
-	      err =
-		gnutls_openpgp_crt_get_subkey_pk_rsa_raw (cert, idx, &m, &e);
+            if (idx == -1)
+              err = gnutls_openpgp_crt_get_pk_rsa_raw (cert, &m, &e);
+            else
+              err =
+                gnutls_openpgp_crt_get_subkey_pk_rsa_raw (cert, idx, &m, &e);
 
-	    if (err < 0)
-	      addf (str, "error: get_pk_rsa_raw: %s\n",
-		    gnutls_strerror (err));
-	    else
-	      {
-		addf (str, _("\t\tModulus (bits %d):\n"), bits);
-		hexdump (str, m.data, m.size, "\t\t\t");
-		adds (str, _("\t\tExponent:\n"));
-		hexdump (str, e.data, e.size, "\t\t\t");
+            if (err < 0)
+              addf (str, "error: get_pk_rsa_raw: %s\n",
+                    gnutls_strerror (err));
+            else
+              {
+                addf (str, _("\t\tModulus (bits %d):\n"), bits);
+                hexdump (str, m.data, m.size, "\t\t\t");
+                adds (str, _("\t\tExponent:\n"));
+                hexdump (str, e.data, e.size, "\t\t\t");
 
-		gnutls_free (m.data);
-		gnutls_free (e.data);
-	      }
+                gnutls_free (m.data);
+                gnutls_free (e.data);
+              }
 
-	  }
-	  break;
+          }
+          break;
 
-	case GNUTLS_PK_DSA:
-	  {
-	    gnutls_datum_t p, q, g, y;
+        case GNUTLS_PK_DSA:
+          {
+            gnutls_datum_t p, q, g, y;
 
-	    if (idx == -1)
-	      err = gnutls_openpgp_crt_get_pk_dsa_raw (cert, &p, &q, &g, &y);
-	    else
-	      err =
-		gnutls_openpgp_crt_get_subkey_pk_dsa_raw (cert, idx, &p, &q,
-							  &g, &y);
-	    if (err < 0)
-	      addf (str, "error: get_pk_dsa_raw: %s\n",
-		    gnutls_strerror (err));
-	    else
-	      {
-		addf (str, _("\t\tPublic key (bits %d):\n"), bits);
-		hexdump (str, y.data, y.size, "\t\t\t");
-		adds (str, _("\t\tP:\n"));
-		hexdump (str, p.data, p.size, "\t\t\t");
-		adds (str, _("\t\tQ:\n"));
-		hexdump (str, q.data, q.size, "\t\t\t");
-		adds (str, _("\t\tG:\n"));
-		hexdump (str, g.data, g.size, "\t\t\t");
+            if (idx == -1)
+              err = gnutls_openpgp_crt_get_pk_dsa_raw (cert, &p, &q, &g, &y);
+            else
+              err =
+                gnutls_openpgp_crt_get_subkey_pk_dsa_raw (cert, idx, &p, &q,
+                                                          &g, &y);
+            if (err < 0)
+              addf (str, "error: get_pk_dsa_raw: %s\n",
+                    gnutls_strerror (err));
+            else
+              {
+                addf (str, _("\t\tPublic key (bits %d):\n"), bits);
+                hexdump (str, y.data, y.size, "\t\t\t");
+                adds (str, _("\t\tP:\n"));
+                hexdump (str, p.data, p.size, "\t\t\t");
+                adds (str, _("\t\tQ:\n"));
+                hexdump (str, q.data, q.size, "\t\t\t");
+                adds (str, _("\t\tG:\n"));
+                hexdump (str, g.data, g.size, "\t\t\t");
 
-		gnutls_free (p.data);
-		gnutls_free (q.data);
-		gnutls_free (g.data);
-		gnutls_free (y.data);
-	      }
-	  }
-	  break;
+                gnutls_free (p.data);
+                gnutls_free (q.data);
+                gnutls_free (g.data);
+                gnutls_free (y.data);
+              }
+          }
+          break;
 
-	default:
-	  break;
-	}
+        default:
+          break;
+        }
     }
 }
 
@@ -340,29 +340,29 @@ print_cert (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
 
       err = gnutls_openpgp_crt_get_name (cert, i, NULL, &dn_size);
       if (err != GNUTLS_E_SHORT_MEMORY_BUFFER
-	  && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
-	  && err != GNUTLS_E_OPENPGP_UID_REVOKED)
-	addf (str, "error: get_name: %s\n", gnutls_strerror (err));
+          && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+          && err != GNUTLS_E_OPENPGP_UID_REVOKED)
+        addf (str, "error: get_name: %s\n", gnutls_strerror (err));
       else
-	{
-	  dn = gnutls_malloc (dn_size);
-	  if (!dn)
-	    addf (str, "error: malloc (%d): %s\n", (int) dn_size,
-		  gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
-	  else
-	    {
-	      err = gnutls_openpgp_crt_get_name (cert, i, dn, &dn_size);
-	      if (err < 0 && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE &&
-		  err != GNUTLS_E_OPENPGP_UID_REVOKED)
-		addf (str, "error: get_name: %s\n", gnutls_strerror (err));
-	      else if (err >= 0)
-		addf (str, _("\tName[%d]: %s\n"), i, dn);
-	      else if (err == GNUTLS_E_OPENPGP_UID_REVOKED)
-		addf (str, _("\tRevoked Name[%d]: %s\n"), i, dn);
+        {
+          dn = gnutls_malloc (dn_size);
+          if (!dn)
+            addf (str, "error: malloc (%d): %s\n", (int) dn_size,
+                  gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
+          else
+            {
+              err = gnutls_openpgp_crt_get_name (cert, i, dn, &dn_size);
+              if (err < 0 && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE &&
+                  err != GNUTLS_E_OPENPGP_UID_REVOKED)
+                addf (str, "error: get_name: %s\n", gnutls_strerror (err));
+              else if (err >= 0)
+                addf (str, _("\tName[%d]: %s\n"), i, dn);
+              else if (err == GNUTLS_E_OPENPGP_UID_REVOKED)
+                addf (str, _("\tRevoked Name[%d]: %s\n"), i, dn);
 
-	      gnutls_free (dn);
-	    }
-	}
+              gnutls_free (dn);
+            }
+        }
 
       i++;
     }
@@ -403,29 +403,29 @@ print_oneline (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
 
       err = gnutls_openpgp_crt_get_name (cert, i, NULL, &dn_size);
       if (err != GNUTLS_E_SHORT_MEMORY_BUFFER
-	  && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
-	  && err != GNUTLS_E_OPENPGP_UID_REVOKED)
-	addf (str, "unknown name (%s), ", gnutls_strerror (err));
+          && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+          && err != GNUTLS_E_OPENPGP_UID_REVOKED)
+        addf (str, "unknown name (%s), ", gnutls_strerror (err));
       else
-	{
-	  dn = gnutls_malloc (dn_size);
-	  if (!dn)
-	    addf (str, "unknown name (%s), ",
-		  gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
-	  else
-	    {
-	      err = gnutls_openpgp_crt_get_name (cert, i, dn, &dn_size);
-	      if (err < 0 && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE &&
-		  err != GNUTLS_E_OPENPGP_UID_REVOKED)
-		addf (str, "unknown name (%s), ", gnutls_strerror (err));
-	      else if (err >= 0)
-		addf (str, _("name[%d]: %s, "), i, dn);
-	      else if (err == GNUTLS_E_OPENPGP_UID_REVOKED)
-		addf (str, _("revoked name[%d]: %s, "), i, dn);
+        {
+          dn = gnutls_malloc (dn_size);
+          if (!dn)
+            addf (str, "unknown name (%s), ",
+                  gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
+          else
+            {
+              err = gnutls_openpgp_crt_get_name (cert, i, dn, &dn_size);
+              if (err < 0 && err != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE &&
+                  err != GNUTLS_E_OPENPGP_UID_REVOKED)
+                addf (str, "unknown name (%s), ", gnutls_strerror (err));
+              else if (err >= 0)
+                addf (str, _("name[%d]: %s, "), i, dn);
+              else if (err == GNUTLS_E_OPENPGP_UID_REVOKED)
+                addf (str, _("revoked name[%d]: %s, "), i, dn);
 
-	      gnutls_free (dn);
-	    }
-	}
+              gnutls_free (dn);
+            }
+        }
 
       i++;
     }
@@ -441,9 +441,9 @@ print_oneline (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
       addf (str, "error: get_fingerprint: %s\n", gnutls_strerror (err));
     else
       {
-	adds (str, _("fingerprint: "));
-	hexprint (str, fpr, fpr_size);
-	addf (str, ", ");
+        adds (str, _("fingerprint: "));
+        hexprint (str, fpr, fpr_size);
+        addf (str, ", ");
       }
   }
 
@@ -457,11 +457,11 @@ print_oneline (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
       struct tm t;
 
       if (gmtime_r (&tim, &t) == NULL)
-	addf (str, "error: gmtime_r (%ld), ", (unsigned long) tim);
+        addf (str, "error: gmtime_r (%ld), ", (unsigned long) tim);
       else if (strftime (s, max, "%Y-%m-%d %H:%M:%S UTC", &t) == 0)
-	addf (str, "error: strftime (%ld), ", (unsigned long) tim);
+        addf (str, "error: strftime (%ld), ", (unsigned long) tim);
       else
-	addf (str, _("created: %s, "), s);
+        addf (str, _("created: %s, "), s);
     }
 
     tim = gnutls_openpgp_crt_get_expiration_time (cert);
@@ -471,16 +471,16 @@ print_oneline (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
       struct tm t;
 
       if (tim == 0)
-	adds (str, _("never expires, "));
+        adds (str, _("never expires, "));
       else
-	{
-	  if (gmtime_r (&tim, &t) == NULL)
-	    addf (str, "error: gmtime_r (%ld), ", (unsigned long) tim);
-	  else if (strftime (s, max, "%Y-%m-%d %H:%M:%S UTC", &t) == 0)
-	    addf (str, "error: strftime (%ld), ", (unsigned long) tim);
-	  else
-	    addf (str, _("expires: %s, "), s);
-	}
+        {
+          if (gmtime_r (&tim, &t) == NULL)
+            addf (str, "error: gmtime_r (%ld), ", (unsigned long) tim);
+          else if (strftime (s, max, "%Y-%m-%d %H:%M:%S UTC", &t) == 0)
+            addf (str, "error: strftime (%ld), ", (unsigned long) tim);
+          else
+            addf (str, _("expires: %s, "), s);
+        }
     }
   }
 
@@ -514,8 +514,8 @@ print_oneline (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
  **/
 int
 gnutls_openpgp_crt_print (gnutls_openpgp_crt_t cert,
-			  gnutls_certificate_print_formats_t format,
-			  gnutls_datum_t * out)
+                          gnutls_certificate_print_formats_t format,
+                          gnutls_datum_t * out)
 {
   gnutls_buffer_st str;
 
@@ -526,7 +526,7 @@ gnutls_openpgp_crt_print (gnutls_openpgp_crt_t cert,
   else
     {
       _gnutls_buffer_append_str (&str,
-				 _("OpenPGP Certificate Information:\n"));
+                                 _("OpenPGP Certificate Information:\n"));
       print_cert (&str, cert);
     }
 

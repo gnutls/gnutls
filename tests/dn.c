@@ -68,21 +68,21 @@ print_dn (gnutls_x509_dn_t dn)
   for (i = 0; ret == 0; i++)
     for (j = 0; ret == 0; j++)
       {
-	ret = gnutls_x509_dn_get_rdn_ava (dn, i, j, &ava);
-	if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
-	  {
-	    if (j > 0)
-	      {
-		j = 0;
-		ret = 0;
-	      }
-	    break;
-	  }
-	if (ret < 0)
-	  fail ("get_rdn_ava %d\n", ret);
-	if (debug)
-	  printf ("dn[%d][%d] OID=%.*s\n\tDATA=%.*s\n", i, j,
-		  ava.oid.size, ava.oid.data, ava.value.size, ava.value.data);
+        ret = gnutls_x509_dn_get_rdn_ava (dn, i, j, &ava);
+        if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
+          {
+            if (j > 0)
+              {
+                j = 0;
+                ret = 0;
+              }
+            break;
+          }
+        if (ret < 0)
+          fail ("get_rdn_ava %d\n", ret);
+        if (debug)
+          printf ("dn[%d][%d] OID=%.*s\n\tDATA=%.*s\n", i, j,
+                  ava.oid.size, ava.oid.data, ava.value.size, ava.value.data);
       }
 }
 

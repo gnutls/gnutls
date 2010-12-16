@@ -30,7 +30,7 @@
 #include "x509/x509_int.h"
 #include <gnutls/openpgp.h>
 
-#define MAX_PUBLIC_PARAMS_SIZE 4	/* ok for RSA and DSA */
+#define MAX_PUBLIC_PARAMS_SIZE 4        /* ok for RSA and DSA */
 
 /* parameters should not be larger than this limit */
 #define DSA_PUBLIC_PARAMS 4
@@ -61,12 +61,12 @@ typedef struct gnutls_cert
    *      [3] is public key
    */
   bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
-  int params_size;		/* holds the size of MPI params */
+  int params_size;              /* holds the size of MPI params */
 
   gnutls_pk_algorithm_t subject_pk_algorithm;
 
-  unsigned int key_usage;	/* bits from KEY_*
-				 */
+  unsigned int key_usage;       /* bits from KEY_*
+                                 */
 
   unsigned int version;
   /* holds the type (PGP, X509)
@@ -93,15 +93,15 @@ typedef enum ConvFlags
 } ConvFlags;
 
 int _gnutls_x509_raw_cert_to_gcert (gnutls_cert * gcert,
-				    const gnutls_datum_t * derCert,
-				    int flags);
+                                    const gnutls_datum_t * derCert,
+                                    int flags);
 int _gnutls_x509_crt_to_gcert (gnutls_cert * gcert, gnutls_x509_crt_t cert,
-			       unsigned int flags);
+                               unsigned int flags);
 
 void _gnutls_gcert_deinit (gnutls_cert * cert);
 
 int _gnutls_selected_cert_supported_kx (struct gnutls_session_int *session,
-					gnutls_kx_algorithm_t ** alg,
-					int *alg_size);
+                                        gnutls_kx_algorithm_t ** alg,
+                                        int *alg_size);
 
 #endif

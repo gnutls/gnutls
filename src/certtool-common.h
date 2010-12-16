@@ -63,7 +63,7 @@ gnutls_x509_crt_t load_cert (int mand, common_info_st * info);
 gnutls_datum *load_secret_key (int mand, common_info_st * info);
 gnutls_pubkey_t load_pubkey (int mand, common_info_st * info);
 gnutls_x509_crt_t *load_cert_list (int mand, size_t * size,
-				   common_info_st * info);
+                                   common_info_st * info);
 
 /* returns the bits specified in cmd */
 int get_bits (gnutls_pk_algorithm_t);

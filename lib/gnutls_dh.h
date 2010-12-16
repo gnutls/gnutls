@@ -32,7 +32,7 @@ bigint_t gnutls_calc_dh_key (bigint_t f, bigint_t x, bigint_t prime);
 
 gnutls_dh_params_t
 _gnutls_get_dh_params (gnutls_dh_params_t dh_params,
-		       gnutls_params_function * func,
-		       gnutls_session_t session);
+                       gnutls_params_function * func,
+                       gnutls_session_t session);
 
 #endif

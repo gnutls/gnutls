@@ -46,18 +46,18 @@ _gnutls_uint64pp (uint64 * x)
     {
       y = 0;
       if (x->i[i] == 0xff)
-	{
-	  x->i[i] = 0;
-	  y = 1;
-	}
+        {
+          x->i[i] = 0;
+          y = 1;
+        }
       else
-	x->i[i]++;
+        x->i[i]++;
 
       if (y == 0)
-	break;
+        break;
     }
   if (y != 0)
-    return -1;			/* over 64 bits! WOW */
+    return -1;                  /* over 64 bits! WOW */
 
   return 0;
 }

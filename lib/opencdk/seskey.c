@@ -40,7 +40,7 @@
  */
 static cdk_error_t
 do_encode_md (byte ** r_frame, size_t * r_flen, const byte * md, int algo,
-	      size_t len, unsigned nbits, const byte * asn, size_t asnlen)
+              size_t len, unsigned nbits, const byte * asn, size_t asnlen)
 {
   byte *frame = NULL;
   size_t nframe = (nbits + 7) / 8;
@@ -81,43 +81,43 @@ do_encode_md (byte ** r_frame, size_t * r_flen, const byte * md, int algo,
   return 0;
 }
 
-static const byte md5_asn[18] =	/* Object ID is 1.2.840.113549.2.5 */
+static const byte md5_asn[18] = /* Object ID is 1.2.840.113549.2.5 */
 { 0x30, 0x20, 0x30, 0x0c, 0x06, 0x08, 0x2a, 0x86, 0x48,
   0x86, 0xf7, 0x0d, 0x02, 0x05, 0x05, 0x00, 0x04, 0x10
 };
 
-static const byte sha1_asn[15] =	/* Object ID is 1.3.14.3.2.26 */
+static const byte sha1_asn[15] =        /* Object ID is 1.3.14.3.2.26 */
 { 0x30, 0x21, 0x30, 0x09, 0x06, 0x05, 0x2b, 0x0e, 0x03,
   0x02, 0x1a, 0x05, 0x00, 0x04, 0x14
 };
 
-static const byte sha224_asn[19] =	/* Object ID is 2.16.840.1.101.3.4.2.4 */
+static const byte sha224_asn[19] =      /* Object ID is 2.16.840.1.101.3.4.2.4 */
 { 0x30, 0x2D, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86, 0x48,
   0x01, 0x65, 0x03, 0x04, 0x02, 0x04, 0x05, 0x00, 0x04,
   0x1C
 };
 
-static const byte sha256_asn[19] =	/* Object ID is  2.16.840.1.101.3.4.2.1 */
+static const byte sha256_asn[19] =      /* Object ID is  2.16.840.1.101.3.4.2.1 */
 { 0x30, 0x31, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86,
   0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x05,
   0x00, 0x04, 0x20
 };
 
-static const byte sha512_asn[] =	/* Object ID is 2.16.840.1.101.3.4.2.3 */
+static const byte sha512_asn[] =        /* Object ID is 2.16.840.1.101.3.4.2.3 */
 {
   0x30, 0x51, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86,
   0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x03, 0x05,
   0x00, 0x04, 0x40
 };
 
-static const byte sha384_asn[] =	/* Object ID is 2.16.840.1.101.3.4.2.2 */
+static const byte sha384_asn[] =        /* Object ID is 2.16.840.1.101.3.4.2.2 */
 {
   0x30, 0x41, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86,
   0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x02, 0x05,
   0x00, 0x04, 0x30
 };
 
-static const byte rmd160_asn[15] =	/* Object ID is 1.3.36.3.2.1 */
+static const byte rmd160_asn[15] =      /* Object ID is 1.3.36.3.2.1 */
 { 0x30, 0x21, 0x30, 0x09, 0x06, 0x05, 0x2b, 0x24, 0x03,
   0x02, 0x01, 0x05, 0x00, 0x04, 0x14
 };
@@ -158,7 +158,7 @@ _gnutls_get_digest_oid (gnutls_digest_algorithm_t algo, const byte ** data)
 /* Encode the given digest into a pkcs#1 compatible format. */
 cdk_error_t
 _cdk_digest_encode_pkcs1 (byte ** r_md, size_t * r_mdlen, int pk_algo,
-			  const byte * md, int digest_algo, unsigned nbits)
+                          const byte * md, int digest_algo, unsigned nbits)
 {
   size_t dlen;
 
@@ -169,10 +169,10 @@ _cdk_digest_encode_pkcs1 (byte ** r_md, size_t * r_mdlen, int pk_algo,
   if (dlen <= 0)
     return CDK_Inv_Algo;
   if (is_DSA (pk_algo))
-    {				/* DSS does not use a special encoding. */
+    {                           /* DSS does not use a special encoding. */
       *r_md = cdk_malloc (dlen + 1);
       if (!*r_md)
-	return CDK_Out_Of_Core;
+        return CDK_Out_Of_Core;
       *r_mdlen = dlen;
       memcpy (*r_md, md, dlen);
       return 0;
@@ -185,10 +185,10 @@ _cdk_digest_encode_pkcs1 (byte ** r_md, size_t * r_mdlen, int pk_algo,
 
       asnlen = _gnutls_get_digest_oid (digest_algo, &asn);
       if (asnlen < 0)
-	return asnlen;
+        return asnlen;
 
       rc = do_encode_md (r_md, r_mdlen, md, digest_algo, dlen,
-			 nbits, asn, asnlen);
+                         nbits, asn, asnlen);
       return rc;
     }
   return 0;
@@ -207,7 +207,7 @@ _cdk_digest_encode_pkcs1 (byte ** r_md, size_t * r_mdlen, int pk_algo,
  **/
 cdk_error_t
 cdk_s2k_new (cdk_s2k_t * ret_s2k, int mode, int digest_algo,
-	     const byte * salt)
+             const byte * salt)
 {
   cdk_s2k_t s2k;
 

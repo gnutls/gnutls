@@ -51,15 +51,15 @@ const mod_auth_st dhe_rsa_auth_struct = {
   _gnutls_gen_cert_client_certificate,
   gen_dhe_server_kx,
   _gnutls_gen_dh_common_client_kx,
-  _gnutls_gen_cert_client_cert_vrfy,	/* gen client cert vrfy */
-  _gnutls_gen_cert_server_cert_req,	/* server cert request */
+  _gnutls_gen_cert_client_cert_vrfy,    /* gen client cert vrfy */
+  _gnutls_gen_cert_server_cert_req,     /* server cert request */
 
   _gnutls_proc_cert_server_certificate,
   _gnutls_proc_cert_client_certificate,
   proc_dhe_server_kx,
   proc_dhe_client_kx,
-  _gnutls_proc_cert_client_cert_vrfy,	/* proc client cert vrfy */
-  _gnutls_proc_cert_cert_req	/* proc server cert request */
+  _gnutls_proc_cert_client_cert_vrfy,   /* proc client cert vrfy */
+  _gnutls_proc_cert_cert_req    /* proc server cert request */
 };
 
 const mod_auth_st dhe_dss_auth_struct = {
@@ -68,15 +68,15 @@ const mod_auth_st dhe_dss_auth_struct = {
   _gnutls_gen_cert_client_certificate,
   gen_dhe_server_kx,
   _gnutls_gen_dh_common_client_kx,
-  _gnutls_gen_cert_client_cert_vrfy,	/* gen client cert vrfy */
-  _gnutls_gen_cert_server_cert_req,	/* server cert request */
+  _gnutls_gen_cert_client_cert_vrfy,    /* gen client cert vrfy */
+  _gnutls_gen_cert_server_cert_req,     /* server cert request */
 
   _gnutls_proc_cert_server_certificate,
   _gnutls_proc_cert_client_certificate,
   proc_dhe_server_kx,
   proc_dhe_client_kx,
-  _gnutls_proc_cert_client_cert_vrfy,	/* proc client cert vrfy */
-  _gnutls_proc_cert_cert_req	/* proc server cert request */
+  _gnutls_proc_cert_client_cert_vrfy,   /* proc client cert vrfy */
+  _gnutls_proc_cert_cert_req    /* proc server cert request */
 };
 
 
@@ -106,7 +106,7 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
   /* find the appropriate certificate */
   if ((ret =
        _gnutls_get_selected_cert (session, &apr_cert_list,
-				  &apr_cert_list_length, &apr_pkey)) < 0)
+                                  &apr_cert_list_length, &apr_pkey)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -125,7 +125,7 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
   g = mpis[1];
 
   if ((ret = _gnutls_auth_info_set (session, GNUTLS_CRD_CERTIFICATE,
-				    sizeof (cert_auth_info_st), 0)) < 0)
+                                    sizeof (cert_auth_info_st), 0)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -149,19 +149,19 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
   if (apr_cert_list_length > 0)
     {
       if ((ret =
-	   _gnutls_handshake_sign_data (session, &apr_cert_list[0],
-					apr_pkey, &ddata, &signature,
-					&sign_algo)) < 0)
-	{
-	  gnutls_assert ();
-	  gnutls_free (*data);
-	  return ret;
-	}
+           _gnutls_handshake_sign_data (session, &apr_cert_list[0],
+                                        apr_pkey, &ddata, &signature,
+                                        &sign_algo)) < 0)
+        {
+          gnutls_assert ();
+          gnutls_free (*data);
+          return ret;
+        }
     }
   else
     {
       gnutls_assert ();
-      return data_size;		/* do not put a signature - ILLEGAL! */
+      return data_size;         /* do not put a signature - ILLEGAL! */
     }
 
   *data = gnutls_realloc_fast (*data, data_size + signature.size + 4);
@@ -177,11 +177,11 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
       sign_algorithm_st aid;
 
       if (sign_algo == GNUTLS_SIGN_UNKNOWN)
-	{
-	  _gnutls_free_datum (&signature);
-	  gnutls_assert ();
-	  return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
-	}
+        {
+          _gnutls_free_datum (&signature);
+          gnutls_assert ();
+          return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+        }
 
       aid = _gnutls_sign_to_tls_aid (sign_algo);
       (*data)[data_size++] = aid.hash_algorithm;
@@ -198,7 +198,7 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
 
 static int
 proc_dhe_server_kx (gnutls_session_t session, opaque * data,
-		    size_t _data_size)
+                    size_t _data_size)
 {
   int sigsize;
   opaque *sigdata;
@@ -240,10 +240,10 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
       aid.sign_algorithm = *sigdata++;
       sign_algo = _gnutls_tls_aid_to_sign (&aid);
       if (sign_algo == GNUTLS_SIGN_UNKNOWN)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
+        }
     }
   DECR_LEN (data_size, 2);
   sigsize = _gnutls_read_uint16 (sigdata);
@@ -255,8 +255,8 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
 
   if ((ret =
        _gnutls_get_auth_info_gcert (&peer_cert,
-				    session->security_parameters.cert_type,
-				    info, CERT_NO_COPY)) < 0)
+                                    session->security_parameters.cert_type,
+                                    info, CERT_NO_COPY)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -264,7 +264,7 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
 
   ret =
     _gnutls_handshake_verify_data (session, &peer_cert, &vparams, &signature,
-				   sign_algo);
+                                   sign_algo);
 
   _gnutls_gcert_deinit (&peer_cert);
   if (ret < 0)
@@ -280,7 +280,7 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
 
 static int
 proc_dhe_client_kx (gnutls_session_t session, opaque * data,
-		    size_t _data_size)
+                    size_t _data_size)
 {
   gnutls_certificate_credentials_t cred;
   int ret;

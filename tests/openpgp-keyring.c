@@ -213,7 +213,7 @@ doit (void)
   data.data = raw_keyring;
   data.size = sizeof (raw_keyring) / sizeof (raw_keyring[0]);
   ret = gnutls_openpgp_keyring_import (keyring, &data,
-				       GNUTLS_OPENPGP_FMT_RAW);
+                                       GNUTLS_OPENPGP_FMT_RAW);
   if (ret < 0)
     fail ("keyring-import %d\n", ret);
 

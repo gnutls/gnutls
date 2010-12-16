@@ -44,7 +44,7 @@
 
 int
 _gnutls_srp_gx (opaque * text, size_t textsize, opaque ** result,
-		bigint_t g, bigint_t prime, gnutls_alloc_function galloc_func)
+                bigint_t g, bigint_t prime, gnutls_alloc_function galloc_func)
 {
   bigint_t x, e;
   size_t result_size;
@@ -73,7 +73,7 @@ _gnutls_srp_gx (opaque * text, size_t textsize, opaque ** result,
     {
       *result = galloc_func (result_size);
       if ((*result) == NULL)
-	return GNUTLS_E_MEMORY_ERROR;
+        return GNUTLS_E_MEMORY_ERROR;
 
       _gnutls_mpi_print (e, *result, &result_size);
       ret = result_size;
@@ -187,7 +187,7 @@ _gnutls_calc_srp_u (bigint_t A, bigint_t B, bigint_t n)
   if (a_size > n_size || b_size > n_size)
     {
       gnutls_assert ();
-      return NULL;		/* internal error */
+      return NULL;              /* internal error */
     }
 
   holder_size = n_size + n_size;
@@ -211,7 +211,7 @@ _gnutls_calc_srp_u (bigint_t A, bigint_t B, bigint_t n)
 
   /* convert the bytes of hd to integer
    */
-  hash_size = 20;		/* SHA */
+  hash_size = 20;               /* SHA */
   ret = _gnutls_mpi_scan_nz (&res, hd, hash_size);
   gnutls_free (holder);
 
@@ -229,7 +229,7 @@ _gnutls_calc_srp_u (bigint_t A, bigint_t B, bigint_t n)
  */
 bigint_t
 _gnutls_calc_srp_S1 (bigint_t A, bigint_t b, bigint_t u, bigint_t v,
-		     bigint_t n)
+                     bigint_t n)
 {
   bigint_t tmp1 = NULL, tmp2 = NULL;
   bigint_t S = NULL;
@@ -294,8 +294,8 @@ _gnutls_calc_srp_A (bigint_t * a, bigint_t g, bigint_t n)
  */
 static int
 _gnutls_calc_srp_sha (const char *username, const char *password,
-		      opaque * salt, int salt_size, size_t * size,
-		      void *digest)
+                      opaque * salt, int salt_size, size_t * size,
+                      void *digest)
 {
   digest_hd_st td;
   opaque res[MAX_HASH_SIZE];
@@ -321,7 +321,7 @@ _gnutls_calc_srp_sha (const char *username, const char *password,
     }
 
   _gnutls_hash (&td, salt, salt_size);
-  _gnutls_hash (&td, res, 20);	/* 20 bytes is the output of sha1 */
+  _gnutls_hash (&td, res, 20);  /* 20 bytes is the output of sha1 */
 
   _gnutls_hash_deinit (&td, digest);
 
@@ -330,11 +330,11 @@ _gnutls_calc_srp_sha (const char *username, const char *password,
 
 int
 _gnutls_calc_srp_x (char *username, char *password, opaque * salt,
-		    size_t salt_size, size_t * size, void *digest)
+                    size_t salt_size, size_t * size, void *digest)
 {
 
   return _gnutls_calc_srp_sha (username, password, salt,
-			       salt_size, size, digest);
+                               salt_size, size, digest);
 }
 
 
@@ -343,7 +343,7 @@ _gnutls_calc_srp_x (char *username, char *password, opaque * salt,
  */
 bigint_t
 _gnutls_calc_srp_S2 (bigint_t B, bigint_t g, bigint_t x, bigint_t a,
-		     bigint_t u, bigint_t n)
+                     bigint_t u, bigint_t n)
 {
   bigint_t S = NULL, tmp1 = NULL, tmp2 = NULL;
   bigint_t tmp4 = NULL, tmp3 = NULL, k = NULL;
@@ -367,8 +367,8 @@ _gnutls_calc_srp_S2 (bigint_t B, bigint_t g, bigint_t x, bigint_t a,
       goto freeall;
     }
 
-  _gnutls_mpi_powm (tmp1, g, x, n);	/* g^x */
-  _gnutls_mpi_mulm (tmp3, tmp1, k, n);	/* k*g^x mod n */
+  _gnutls_mpi_powm (tmp1, g, x, n);     /* g^x */
+  _gnutls_mpi_mulm (tmp3, tmp1, k, n);  /* k*g^x mod n */
   _gnutls_mpi_subm (tmp2, B, tmp3, n);
 
   tmp4 = _gnutls_mpi_alloc_like (n);
@@ -450,7 +450,7 @@ gnutls_srp_allocate_client_credentials (gnutls_srp_client_credentials_t * sc)
  **/
 int
 gnutls_srp_set_client_credentials (gnutls_srp_client_credentials_t res,
-				   const char *username, const char *password)
+                                   const char *username, const char *password)
 {
 
   if (username == NULL || password == NULL)
@@ -526,8 +526,8 @@ gnutls_srp_allocate_server_credentials (gnutls_srp_server_credentials_t * sc)
  **/
 int
 gnutls_srp_set_server_credentials_file (gnutls_srp_server_credentials_t res,
-					const char *password_file,
-					const char *password_conf_file)
+                                        const char *password_file,
+                                        const char *password_conf_file)
 {
 
   if (password_file == NULL || password_conf_file == NULL)
@@ -600,9 +600,9 @@ gnutls_srp_set_server_credentials_file (gnutls_srp_server_credentials_t res,
  **/
 void
 gnutls_srp_set_server_credentials_function (gnutls_srp_server_credentials_t
-					    cred,
-					    gnutls_srp_server_credentials_function
-					    * func)
+                                            cred,
+                                            gnutls_srp_server_credentials_function
+                                            * func)
 {
   cred->pwd_callback = func;
 }
@@ -634,9 +634,9 @@ gnutls_srp_set_server_credentials_function (gnutls_srp_server_credentials_t
  **/
 void
 gnutls_srp_set_client_credentials_function (gnutls_srp_client_credentials_t
-					    cred,
-					    gnutls_srp_client_credentials_function
-					    * func)
+                                            cred,
+                                            gnutls_srp_client_credentials_function
+                                            * func)
 {
   cred->get_function = func;
 }
@@ -688,9 +688,9 @@ gnutls_srp_server_get_username (gnutls_session_t session)
  **/
 int
 gnutls_srp_verifier (const char *username, const char *password,
-		     const gnutls_datum_t * salt,
-		     const gnutls_datum_t * generator,
-		     const gnutls_datum_t * prime, gnutls_datum_t * res)
+                     const gnutls_datum_t * salt,
+                     const gnutls_datum_t * generator,
+                     const gnutls_datum_t * prime, gnutls_datum_t * res)
 {
   bigint_t _n, _g;
   int ret;
@@ -698,7 +698,7 @@ gnutls_srp_verifier (const char *username, const char *password,
   opaque digest[20];
 
   ret = _gnutls_calc_srp_sha (username, password, salt->data,
-			      salt->size, &digest_size, digest);
+                              salt->size, &digest_size, digest);
   if (ret < 0)
     {
       gnutls_assert ();

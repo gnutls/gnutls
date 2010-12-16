@@ -87,16 +87,16 @@ main (void)
   if (rc)
     {
       printf ("gnutls_openpgp_privkey_init rc %d: %s\n",
-	      rc, gnutls_strerror (rc));
+              rc, gnutls_strerror (rc));
       return 1;
     }
 
   rc = gnutls_openpgp_privkey_import (key, &keydatum,
-				      GNUTLS_OPENPGP_FMT_BASE64, NULL, 0);
+                                      GNUTLS_OPENPGP_FMT_BASE64, NULL, 0);
   if (rc)
     {
       printf ("gnutls_openpgp_privkey_import rc %d: %s\n",
-	      rc, gnutls_strerror (rc));
+              rc, gnutls_strerror (rc));
       return 1;
     }
 

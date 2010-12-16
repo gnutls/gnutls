@@ -60,7 +60,7 @@ struct
 
 
 static cdk_error_t file_verify_clearsign (cdk_ctx_t, const char *,
-					  const char *);
+                                          const char *);
 
 
 /**
@@ -74,7 +74,7 @@ static cdk_error_t file_verify_clearsign (cdk_ctx_t, const char *,
  */
 cdk_error_t
 cdk_stream_verify (cdk_ctx_t hd, cdk_stream_t inp, cdk_stream_t data,
-		   cdk_stream_t out)
+                   cdk_stream_t out)
 {
   /* FIXME: out is not currently used. */
   if (cdk_armor_filter_use (inp))
@@ -93,7 +93,7 @@ cdk_stream_verify (cdk_ctx_t hd, cdk_stream_t inp, cdk_stream_t data,
  **/
 cdk_error_t
 cdk_file_verify (cdk_ctx_t hd, const char *file, const char *data_file,
-		 const char *output)
+                 const char *output)
 {
   struct stat stbuf;
   cdk_stream_t inp, data;
@@ -113,13 +113,13 @@ cdk_file_verify (cdk_ctx_t hd, const char *file, const char *data_file,
     {
       n = cdk_stream_peek (inp, (byte *) buf, DIM (buf) - 1);
       if (!n || n == -1)
-	return CDK_EOF;
+        return CDK_EOF;
       buf[n] = '\0';
       if (strstr (buf, "BEGIN PGP SIGNED MESSAGE"))
-	{
-	  cdk_stream_close (inp);
-	  return file_verify_clearsign (hd, file, output);
-	}
+        {
+          cdk_stream_close (inp);
+          return file_verify_clearsign (hd, file, output);
+        }
       cdk_stream_set_armor_flag (inp, 0);
     }
 
@@ -127,10 +127,10 @@ cdk_file_verify (cdk_ctx_t hd, const char *file, const char *data_file,
     {
       rc = cdk_stream_open (data_file, &data);
       if (rc)
-	{
-	  cdk_stream_close (inp);
-	  return rc;
-	}
+        {
+          cdk_stream_close (inp);
+          return rc;
+        }
     }
   else
     data = NULL;
@@ -183,14 +183,14 @@ file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
     {
       rc = cdk_stream_create (output, &out);
       if (rc)
-	return rc;
+        return rc;
     }
 
   rc = cdk_stream_open (file, &inp);
   if (rc)
     {
       if (output)
-	cdk_stream_close (out);
+        cdk_stream_close (out);
       return rc;
     }
 
@@ -199,12 +199,12 @@ file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
     {
       nbytes = _cdk_stream_gets (inp, buf, DIM (buf) - 1);
       if (!nbytes || nbytes == -1)
-	break;
+        break;
       if (!strncmp (buf, s, strlen (s)))
-	{
-	  is_signed = 1;
-	  break;
-	}
+        {
+          is_signed = 1;
+          break;
+        }
     }
 
   if (cdk_stream_eof (inp) && !is_signed)
@@ -217,20 +217,20 @@ file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
     {
       nbytes = _cdk_stream_gets (inp, buf, DIM (buf) - 1);
       if (!nbytes || nbytes == -1)
-	break;
-      if (nbytes == 1)		/* Empty line */
-	break;
+        break;
+      if (nbytes == 1)          /* Empty line */
+        break;
       else if (!strncmp (buf, "Hash: ", 6))
-	{
-	  for (i = 0; digest_table[i].name; i++)
-	    {
-	      if (!strcmp (buf + 6, digest_table[i].name))
-		{
-		  digest_algo = digest_table[i].algo;
-		  break;
-		}
-	    }
-	}
+        {
+          for (i = 0; digest_table[i].name; i++)
+            {
+              if (!strcmp (buf + 6, digest_table[i].name))
+                {
+                  digest_algo = digest_table[i].algo;
+                  break;
+                }
+            }
+        }
     }
 
   if (digest_algo && _gnutls_hash_get_algo_len (digest_algo) <= 0)
@@ -255,27 +255,27 @@ file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
     {
       nbytes = _cdk_stream_gets (inp, buf, DIM (buf) - 1);
       if (!nbytes || nbytes == -1)
-	break;
+        break;
       if (!strncmp (buf, s, strlen (s)))
-	break;
+        break;
       else
-	{
-	  cdk_stream_peek (inp, (byte *) chk, DIM (chk) - 1);
-	  i = strncmp (chk, s, strlen (s));
-	  if (strlen (buf) == 0 && i == 0)
-	    continue;		/* skip last '\n' */
-	  _cdk_trim_string (buf, i == 0 ? 0 : 1);
-	  _gnutls_hash (&md, buf, strlen (buf));
-	}
-      if (!strncmp (buf, "- ", 2))	/* FIXME: handle it recursive. */
-	memmove (buf, buf + 2, nbytes - 2);
+        {
+          cdk_stream_peek (inp, (byte *) chk, DIM (chk) - 1);
+          i = strncmp (chk, s, strlen (s));
+          if (strlen (buf) == 0 && i == 0)
+            continue;           /* skip last '\n' */
+          _cdk_trim_string (buf, i == 0 ? 0 : 1);
+          _gnutls_hash (&md, buf, strlen (buf));
+        }
+      if (!strncmp (buf, "- ", 2))      /* FIXME: handle it recursive. */
+        memmove (buf, buf + 2, nbytes - 2);
       if (out)
-	{
-	  if (strstr (buf, "\r\n"))
-	    buf[strlen (buf) - 2] = '\0';
-	  cdk_stream_write (out, buf, strlen (buf));
-	  _cdk_stream_puts (out, _cdk_armor_get_lineend ());
-	}
+        {
+          if (strstr (buf, "\r\n"))
+            buf[strlen (buf) - 2] = '\0';
+          cdk_stream_write (out, buf, strlen (buf));
+          _cdk_stream_puts (out, _cdk_armor_get_lineend ());
+        }
     }
 
   /* We create a temporary stream object to store the
@@ -290,12 +290,12 @@ file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
     {
       nbytes = _cdk_stream_gets (inp, buf, DIM (buf) - 1);
       if (!nbytes || nbytes == -1)
-	break;
+        break;
       if (nbytes < (int) (DIM (buf) - 3))
-	{
-	  buf[nbytes - 1] = '\n';
-	  buf[nbytes] = '\0';
-	}
+        {
+          buf[nbytes - 1] = '\n';
+          buf[nbytes] = '\0';
+        }
       cdk_stream_write (tmp, buf, nbytes);
     }
 

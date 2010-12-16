@@ -195,13 +195,13 @@ main (int argc, char **argv)
   if ((err = getaddrinfo (hostname, portname, &hints, &res)) != 0)
     {
       fprintf (stderr, "Cannot resolve %s: %s\n", hostname,
-	       gai_strerror (err));
+               gai_strerror (err));
       exit (1);
     }
 
   /* X509 stuff */
   if (gnutls_certificate_allocate_credentials (&xcred) < 0)
-    {				/* space for 2 certificates */
+    {                           /* space for 2 certificates */
       fprintf (stderr, "memory error\n");
       exit (1);
     }
@@ -230,64 +230,64 @@ main (int argc, char **argv)
     {
 
       if (tls_tests[i].test_name == NULL)
-	break;			/* finished */
+        break;                  /* finished */
 
       /* if neither of SSL3 and TLSv1 are supported, exit
        */
       if (i > 6 && tls1_1_ok == 0 && tls1_ok == 0 && ssl3_ok == 0)
-	{
-	  fprintf (stderr,
-		   "\nServer does not support any of SSL 3.0, TLS 1.0 and TLS 1.1\n");
-	  break;
-	}
+        {
+          fprintf (stderr,
+                   "\nServer does not support any of SSL 3.0, TLS 1.0 and TLS 1.1\n");
+          break;
+        }
 
       sd = -1;
       for (ptr = res; ptr != NULL; ptr = ptr->ai_next)
-	{
-	  sd = socket (ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
-	  if (sd == -1)
-	    {
-	      continue;
-	    }
+        {
+          sd = socket (ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+          if (sd == -1)
+            {
+              continue;
+            }
 
-	  getnameinfo (ptr->ai_addr, ptr->ai_addrlen, buffer, MAX_BUF,
-		       NULL, 0, NI_NUMERICHOST);
-	  if (tt++ == 0)
-	    printf ("Connecting to '%s:%d'...\n", buffer, port);
-	  if ((err = connect (sd, ptr->ai_addr, ptr->ai_addrlen)) != 0)
-	    {
-	      close (sd);
-	      sd = -1;
-	      continue;
-	    }
-	}
+          getnameinfo (ptr->ai_addr, ptr->ai_addrlen, buffer, MAX_BUF,
+                       NULL, 0, NI_NUMERICHOST);
+          if (tt++ == 0)
+            printf ("Connecting to '%s:%d'...\n", buffer, port);
+          if ((err = connect (sd, ptr->ai_addr, ptr->ai_addrlen)) != 0)
+            {
+              close (sd);
+              sd = -1;
+              continue;
+            }
+        }
       ERR (err, "connect") gnutls_init (&state, GNUTLS_CLIENT);
       gnutls_transport_set_ptr (state, (gnutls_transport_ptr_t)
-				gl_fd_to_handle (sd));
+                                gl_fd_to_handle (sd));
 
       do
-	{
-	  printf ("Checking %s...", tls_tests[i].test_name);
+        {
+          printf ("Checking %s...", tls_tests[i].test_name);
 
-	  ret = tls_tests[i].func (state);
+          ret = tls_tests[i].func (state);
 
-	  if (ret == TEST_SUCCEED)
-	    printf (" %s\n", tls_tests[i].suc_str);
-	  else if (ret == TEST_FAILED)
-	    printf (" %s\n", tls_tests[i].fail_str);
-	  else if (ret == TEST_UNSURE)
-	    printf (" %s\n", tls_tests[i].unsure_str);
-	  else if (ret == TEST_IGNORE)
-	    {
-	      printf (" N/A\n");
-	      i++;
-	    }
-	}
+          if (ret == TEST_SUCCEED)
+            printf (" %s\n", tls_tests[i].suc_str);
+          else if (ret == TEST_FAILED)
+            printf (" %s\n", tls_tests[i].fail_str);
+          else if (ret == TEST_UNSURE)
+            printf (" %s\n", tls_tests[i].unsure_str);
+          else if (ret == TEST_IGNORE)
+            {
+              printf (" N/A\n");
+              i++;
+            }
+        }
       while (ret == TEST_IGNORE && tls_tests[i].test_name != NULL);
 
       gnutls_deinit (state);
 
-      shutdown (sd, SHUT_RDWR);	/* no more receptions */
+      shutdown (sd, SHUT_RDWR); /* no more receptions */
       close (sd);
 
       i++;
@@ -315,7 +315,7 @@ gaa_parser (int argc, char **argv)
   if (gaa (argc, argv, &info) != -1)
     {
       fprintf (stderr,
-	       "Error in the arguments. Use the -h or --help parameters to get more info.\n");
+               "Error in the arguments. Use the -h or --help parameters to get more info.\n");
       exit (1);
     }
 
@@ -340,5 +340,5 @@ tls_test_version (void)
   if (strcmp (gnutls_check_version (NULL), PACKAGE_VERSION) != 0)
     p = PACKAGE_STRING;
   version_etc (stdout, "gnutls-cli-debug", p, gnutls_check_version (NULL),
-	       "Nikos Mavrogiannopoulos", (char *) NULL);
+               "Nikos Mavrogiannopoulos", (char *) NULL);
 }

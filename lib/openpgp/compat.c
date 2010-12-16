@@ -47,8 +47,8 @@
  -*/
 int
 _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
-			    const gnutls_datum_t * cert_list,
-			    int cert_list_length, unsigned int *status)
+                            const gnutls_datum_t * cert_list,
+                            int cert_list_length, unsigned int *status)
 {
   int ret = 0;
   gnutls_openpgp_crt_t key = NULL;
@@ -79,10 +79,10 @@ _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t cred,
     {
       ret = gnutls_openpgp_crt_verify_ring (key, cred->keyring, 0, &verify);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto leave;
-	}
+        {
+          gnutls_assert ();
+          goto leave;
+        }
     }
 
   /* Now try the self signature. */
@@ -118,7 +118,7 @@ leave:
  -*/
 int
 _gnutls_openpgp_fingerprint (const gnutls_datum_t * cert,
-			     unsigned char *fpr, size_t * fprlen)
+                             unsigned char *fpr, size_t * fprlen)
 {
   gnutls_openpgp_crt_t key;
   int ret;

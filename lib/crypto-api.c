@@ -48,8 +48,8 @@
  **/
 int
 gnutls_cipher_init (gnutls_cipher_hd_t * handle,
-		    gnutls_cipher_algorithm_t cipher,
-		    const gnutls_datum_t * key, const gnutls_datum_t * iv)
+                    gnutls_cipher_algorithm_t cipher,
+                    const gnutls_datum_t * key, const gnutls_datum_t * iv)
 {
   *handle = gnutls_malloc (sizeof (cipher_hd_st));
   if (*handle == NULL)
@@ -95,10 +95,10 @@ gnutls_cipher_encrypt (gnutls_cipher_hd_t handle, void *text, size_t textlen)
  **/
 int
 gnutls_cipher_decrypt (gnutls_cipher_hd_t handle, void *ciphertext,
-		       size_t ciphertextlen)
+                       size_t ciphertextlen)
 {
   return _gnutls_cipher_decrypt ((cipher_hd_st *) handle, ciphertext,
-				 ciphertextlen);
+                                 ciphertextlen);
 }
 
 /**
@@ -118,10 +118,10 @@ gnutls_cipher_decrypt (gnutls_cipher_hd_t handle, void *ciphertext,
  **/
 int
 gnutls_cipher_encrypt2 (gnutls_cipher_hd_t handle, void *text, size_t textlen,
-			void *ciphertext, size_t ciphertextlen)
+                        void *ciphertext, size_t ciphertextlen)
 {
   return _gnutls_cipher_encrypt2 ((cipher_hd_st *) handle, text, textlen,
-				  ciphertext, ciphertextlen);
+                                  ciphertext, ciphertextlen);
 }
 
 /**
@@ -141,10 +141,10 @@ gnutls_cipher_encrypt2 (gnutls_cipher_hd_t handle, void *text, size_t textlen,
  **/
 int
 gnutls_cipher_decrypt2 (gnutls_cipher_hd_t handle, const void *ciphertext,
-			size_t ciphertextlen, void *text, size_t textlen)
+                        size_t ciphertextlen, void *text, size_t textlen)
 {
   return _gnutls_cipher_decrypt2 ((cipher_hd_st *) handle, ciphertext,
-				  ciphertextlen, text, textlen);
+                                  ciphertextlen, text, textlen);
 }
 
 /**
@@ -184,8 +184,8 @@ gnutls_cipher_deinit (gnutls_cipher_hd_t handle)
  **/
 int
 gnutls_hmac_init (gnutls_hmac_hd_t * dig,
-		  gnutls_digest_algorithm_t algorithm,
-		  const void *key, size_t keylen)
+                  gnutls_digest_algorithm_t algorithm,
+                  const void *key, size_t keylen)
 {
   *dig = gnutls_malloc (sizeof (digest_hd_st));
   if (*dig == NULL)
@@ -283,8 +283,8 @@ gnutls_hmac_get_len (gnutls_mac_algorithm_t algorithm)
  **/
 int
 gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm,
-		  const void *key, size_t keylen,
-		  const void *text, size_t textlen, void *digest)
+                  const void *key, size_t keylen,
+                  const void *text, size_t textlen, void *digest)
 {
   return _gnutls_hmac_fast (algorithm, key, keylen, text, textlen, digest);
 }
@@ -402,7 +402,7 @@ gnutls_hash_get_len (gnutls_digest_algorithm_t algorithm)
  **/
 int
 gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,
-		  const void *text, size_t textlen, void *digest)
+                  const void *text, size_t textlen, void *digest)
 {
   return _gnutls_hash_fast (algorithm, text, textlen, digest);
 }

@@ -26,7 +26,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_datum.h>
-#include <x509_b64.h>		/* for PKCS3 PEM decoding */
+#include <x509_b64.h>           /* for PKCS3 PEM decoding */
 #include <gnutls_global.h>
 #include <gnutls_dh.h>
 #include <gnutls_pk.h>
@@ -65,8 +65,8 @@ _gnutls_dh_params_to_mpi (gnutls_dh_params_t dh_primes)
  **/
 int
 gnutls_dh_params_import_raw (gnutls_dh_params_t dh_params,
-			     const gnutls_datum_t * prime,
-			     const gnutls_datum_t * generator)
+                             const gnutls_datum_t * prime,
+                             const gnutls_datum_t * generator)
 {
   bigint_t tmp_prime, tmp_g;
   size_t siz;
@@ -220,8 +220,8 @@ gnutls_dh_params_generate2 (gnutls_dh_params_t params, unsigned int bits)
  **/
 int
 gnutls_dh_params_import_pkcs3 (gnutls_dh_params_t params,
-			       const gnutls_datum_t * pkcs3_params,
-			       gnutls_x509_crt_fmt_t format)
+                               const gnutls_datum_t * pkcs3_params,
+                               gnutls_x509_crt_fmt_t format)
 {
   ASN1_TYPE c2;
   int result, need_free = 0;
@@ -232,16 +232,16 @@ gnutls_dh_params_import_pkcs3 (gnutls_dh_params_t params,
       opaque *out;
 
       result = _gnutls_fbase64_decode ("DH PARAMETERS",
-				       pkcs3_params->data,
-				       pkcs3_params->size, &out);
+                                       pkcs3_params->data,
+                                       pkcs3_params->size, &out);
 
       if (result <= 0)
-	{
-	  if (result == 0)
-	    result = GNUTLS_E_INTERNAL_ERROR;
-	  gnutls_assert ();
-	  return result;
-	}
+        {
+          if (result == 0)
+            result = GNUTLS_E_INTERNAL_ERROR;
+          gnutls_assert ();
+          return result;
+        }
 
       _params.data = out;
       _params.size = result;
@@ -261,10 +261,10 @@ gnutls_dh_params_import_pkcs3 (gnutls_dh_params_t params,
     {
       gnutls_assert ();
       if (need_free != 0)
-	{
-	  gnutls_free (_params.data);
-	  _params.data = NULL;
-	}
+        {
+          gnutls_free (_params.data);
+          _params.data = NULL;
+        }
       return _gnutls_asn2err (result);
     }
 
@@ -332,9 +332,9 @@ gnutls_dh_params_import_pkcs3 (gnutls_dh_params_t params,
  **/
 int
 gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
-			       gnutls_x509_crt_fmt_t format,
-			       unsigned char *params_data,
-			       size_t * params_data_size)
+                               gnutls_x509_crt_fmt_t format,
+                               unsigned char *params_data,
+                               size_t * params_data_size)
 {
   ASN1_TYPE c2;
   int result, _params_data_size;
@@ -374,7 +374,7 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
   /* Write PRIME 
    */
   if ((result = asn1_write_value (c2, "prime",
-				  p_data, p_size)) != ASN1_SUCCESS)
+                                  p_data, p_size)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       gnutls_free (all_data);
@@ -385,7 +385,7 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
   /* Write the GENERATOR
    */
   if ((result = asn1_write_value (c2, "base",
-				  g_data, g_size)) != ASN1_SUCCESS)
+                                  g_data, g_size)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       gnutls_free (all_data);
@@ -396,7 +396,7 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
   gnutls_free (all_data);
 
   if ((result = asn1_write_value (c2, "privateValueLength",
-				  NULL, 0)) != ASN1_SUCCESS)
+                                  NULL, 0)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       asn1_delete_structure (&c2);
@@ -406,26 +406,26 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
   if (format == GNUTLS_X509_FMT_DER)
     {
       if (params_data == NULL)
-	*params_data_size = 0;
+        *params_data_size = 0;
 
       _params_data_size = *params_data_size;
       result =
-	asn1_der_coding (c2, "", params_data, &_params_data_size, NULL);
+        asn1_der_coding (c2, "", params_data, &_params_data_size, NULL);
       *params_data_size = _params_data_size;
       asn1_delete_structure (&c2);
 
       if (result != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  if (result == ASN1_MEM_ERROR)
-	    return GNUTLS_E_SHORT_MEMORY_BUFFER;
+        {
+          gnutls_assert ();
+          if (result == ASN1_MEM_ERROR)
+            return GNUTLS_E_SHORT_MEMORY_BUFFER;
 
-	  return _gnutls_asn2err (result);
-	}
+          return _gnutls_asn2err (result);
+        }
 
     }
   else
-    {				/* PEM */
+    {                           /* PEM */
       opaque *tmp;
       opaque *out;
       int len;
@@ -435,20 +435,20 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
 
       tmp = gnutls_malloc (len);
       if (tmp == NULL)
-	{
-	  gnutls_assert ();
-	  asn1_delete_structure (&c2);
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+        {
+          gnutls_assert ();
+          asn1_delete_structure (&c2);
+          return GNUTLS_E_MEMORY_ERROR;
+        }
 
       if ((result =
-	   asn1_der_coding (c2, "", tmp, &len, NULL)) != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  gnutls_free (tmp);
-	  asn1_delete_structure (&c2);
-	  return _gnutls_asn2err (result);
-	}
+           asn1_der_coding (c2, "", tmp, &len, NULL)) != ASN1_SUCCESS)
+        {
+          gnutls_assert ();
+          gnutls_free (tmp);
+          asn1_delete_structure (&c2);
+          return _gnutls_asn2err (result);
+        }
 
       asn1_delete_structure (&c2);
 
@@ -457,30 +457,30 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
       gnutls_free (tmp);
 
       if (result < 0)
-	{
-	  gnutls_assert ();
-	  return result;
-	}
+        {
+          gnutls_assert ();
+          return result;
+        }
 
       if (result == 0)
-	{			/* oooops */
-	  gnutls_assert ();
-	  gnutls_free (out);
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+        {                       /* oooops */
+          gnutls_assert ();
+          gnutls_free (out);
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
 
       if ((unsigned) result > *params_data_size)
-	{
-	  gnutls_assert ();
-	  gnutls_free (out);
-	  *params_data_size = result;
-	  return GNUTLS_E_SHORT_MEMORY_BUFFER;
-	}
+        {
+          gnutls_assert ();
+          gnutls_free (out);
+          *params_data_size = result;
+          return GNUTLS_E_SHORT_MEMORY_BUFFER;
+        }
 
       *params_data_size = result - 1;
 
       if (params_data)
-	memcpy (params_data, out, result);
+        memcpy (params_data, out, result);
 
       gnutls_free (out);
 
@@ -506,8 +506,8 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
  **/
 int
 gnutls_dh_params_export_raw (gnutls_dh_params_t params,
-			     gnutls_datum_t * prime,
-			     gnutls_datum_t * generator, unsigned int *bits)
+                             gnutls_datum_t * prime,
+                             gnutls_datum_t * generator, unsigned int *bits)
 {
   int ret;
 

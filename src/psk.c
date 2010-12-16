@@ -44,7 +44,7 @@ main (int argc, char **argv)
 #include <gnutls/extra.h>
 #include <psk-gaa.h>
 
-#include "../lib/random.h"	/* for random */
+#include "../lib/random.h"      /* for random */
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -61,7 +61,7 @@ main (int argc, char **argv)
 #include "getpass.h"
 
 static int write_key (const char *username, const char *key, int key_size,
-		      char *passwd_file);
+                      char *passwd_file);
 
 #define KPASSWD "/etc/passwd.psk"
 #define MAX_KEY_SIZE 64
@@ -101,10 +101,10 @@ main (int argc, char **argv)
       pwd = getpwuid (getuid ());
 
       if (pwd == NULL)
-	{
-	  fprintf (stderr, "No such user\n");
-	  return -1;
-	}
+        {
+          fprintf (stderr, "No such user\n");
+          return -1;
+        }
 
       info.username = pwd->pw_name;
 #else
@@ -175,7 +175,7 @@ filecopy (char *src, char *dst)
     {
       p = fgets (line, sizeof (line) - 1, fd2);
       if (p == NULL)
-	break;
+        break;
 
       fputs (line, fd);
     }
@@ -189,7 +189,7 @@ filecopy (char *src, char *dst)
 
 static int
 write_key (const char *username, const char *key, int key_size,
-	   char *passwd_file)
+           char *passwd_file)
 {
   FILE *fd;
   char line[5 * 1024];
@@ -243,22 +243,22 @@ write_key (const char *username, const char *key, int key_size,
     {
       p = fgets (line, sizeof (line) - 1, fd2);
       if (p == NULL)
-	break;
+        break;
 
       pp = strchr (line, ':');
       if (pp == NULL)
-	continue;
+        continue;
 
       if (strncmp (p, username,
-		   MAX (strlen (username), (unsigned int) (pp - p))) == 0)
-	{
-	  put = 1;
-	  fprintf (fd, "%s:%s\n", username, key);
-	}
+                   MAX (strlen (username), (unsigned int) (pp - p))) == 0)
+        {
+          put = 1;
+          fprintf (fd, "%s:%s\n", username, key);
+        }
       else
-	{
-	  fputs (line, fd);
-	}
+        {
+          fputs (line, fd);
+        }
     }
   while (1);
 
@@ -287,5 +287,5 @@ psktool_version (void)
   if (strcmp (gnutls_check_version (NULL), PACKAGE_VERSION) != 0)
     p = PACKAGE_STRING;
   version_etc (stdout, "psktool", p, gnutls_check_version (NULL),
-	       "Nikos Mavrogiannopoulos", (char *) NULL);
+               "Nikos Mavrogiannopoulos", (char *) NULL);
 }

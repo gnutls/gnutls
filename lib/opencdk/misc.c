@@ -140,16 +140,16 @@ _cdk_memistr (const char *buf, size_t buflen, const char *sub)
   for (t = (byte *) buf, n = buflen, s = (byte *) sub; n; t++, n--)
     {
       if (toupper (*t) == toupper (*s))
-	{
-	  for (buf = t++, buflen = n--, s++;
-	       n && toupper (*t) == toupper ((byte) * s); t++, s++, n--)
-	    ;
-	  if (!*s)
-	    return buf;
-	  t = (byte *) buf;
-	  n = buflen;
-	  s = (byte *) sub;
-	}
+        {
+          for (buf = t++, buflen = n--, s++;
+               n && toupper (*t) == toupper ((byte) * s); t++, s++, n--)
+            ;
+          if (!*s)
+            return buf;
+          t = (byte *) buf;
+          n = buflen;
+          s = (byte *) sub;
+        }
     }
 
   return NULL;
@@ -175,9 +175,9 @@ void
 _cdk_trim_string (char *s, int canon)
 {
   while (s && *s &&
-	 (s[strlen (s) - 1] == '\t' ||
-	  s[strlen (s) - 1] == '\r' ||
-	  s[strlen (s) - 1] == '\n' || s[strlen (s) - 1] == ' '))
+         (s[strlen (s) - 1] == '\t' ||
+          s[strlen (s) - 1] == '\r' ||
+          s[strlen (s) - 1] == '\n' || s[strlen (s) - 1] == ' '))
     s[strlen (s) - 1] = '\0';
   if (canon)
     strcat (s, "\r\n");
@@ -226,7 +226,7 @@ _cdk_tmpfile (void)
 
   /* We need to make sure the file will be deleted when it is closed. */
   fd = _open (buf, _O_CREAT | _O_EXCL | _O_TEMPORARY |
-	      _O_RDWR | _O_BINARY, _S_IREAD | _S_IWRITE);
+              _O_RDWR | _O_BINARY, _S_IREAD | _S_IWRITE);
   if (fd == -1)
     return NULL;
   fp = fdopen (fd, "w+b");

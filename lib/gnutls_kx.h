@@ -28,7 +28,7 @@ int _gnutls_send_client_kx_message (gnutls_session_t session, int again);
 int _gnutls_recv_server_kx_message (gnutls_session_t session);
 int _gnutls_recv_client_kx_message (gnutls_session_t session);
 int _gnutls_send_client_certificate_verify (gnutls_session_t session,
-					    int again);
+                                            int again);
 int _gnutls_send_server_certificate (gnutls_session_t session, int again);
 int _gnutls_generate_master (gnutls_session_t session, int keep_premaster);
 int _gnutls_recv_client_certificate (gnutls_session_t session);
@@ -36,5 +36,5 @@ int _gnutls_recv_server_certificate (gnutls_session_t session);
 int _gnutls_send_client_certificate (gnutls_session_t session, int again);
 int _gnutls_recv_server_certificate_request (gnutls_session_t session);
 int _gnutls_send_server_certificate_request (gnutls_session_t session,
-					     int again);
+                                             int again);
 int _gnutls_recv_client_certificate_verify_message (gnutls_session_t session);

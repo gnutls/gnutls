@@ -72,7 +72,7 @@ typedef struct gnutls_pkcs7_int
   ASN1_TYPE pkcs7;
 } gnutls_pkcs7_int;
 
-#define MAX_PRIV_PARAMS_SIZE GNUTLS_MAX_PK_PARAMS	/* ok for RSA and DSA */
+#define MAX_PRIV_PARAMS_SIZE GNUTLS_MAX_PK_PARAMS       /* ok for RSA and DSA */
 
 /* parameters should not be larger than this limit */
 #define DSA_PRIVATE_PARAMS 5
@@ -115,7 +115,7 @@ typedef struct gnutls_x509_privkey_int
    *      [3] is y (public key)
    *      [4] is x (private key)
    */
-  int params_size;		/* holds the number of params */
+  int params_size;              /* holds the number of params */
 
   gnutls_pk_algorithm_t pk_algorithm;
 
@@ -132,20 +132,20 @@ int _gnutls_x509_crt_cpy (gnutls_x509_crt_t dest, gnutls_x509_crt_t src);
 
 
 int _gnutls_x509_compare_raw_dn (const gnutls_datum_t * dn1,
-				 const gnutls_datum_t * dn2);
+                                 const gnutls_datum_t * dn2);
 
 
 int _gnutls_x509_crl_cpy (gnutls_x509_crl_t dest, gnutls_x509_crl_t src);
 int _gnutls_x509_crl_get_raw_issuer_dn (gnutls_x509_crl_t crl,
-					gnutls_datum_t * dn);
+                                        gnutls_datum_t * dn);
 
 /* sign.c */
 int _gnutls_x509_get_tbs (ASN1_TYPE cert, const char *tbs_name,
-			  gnutls_datum_t * tbs);
+                          gnutls_datum_t * tbs);
 int _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
-			    gnutls_digest_algorithm_t,
-			    gnutls_x509_crt_t issuer,
-			    gnutls_privkey_t issuer_key);
+                            gnutls_digest_algorithm_t,
+                            gnutls_x509_crt_t issuer,
+                            gnutls_privkey_t issuer_key);
 
 /* dn.c */
 #define OID_X520_COUNTRY_NAME		"2.5.4.6"
@@ -159,160 +159,160 @@ int _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
 #define OID_PKCS9_EMAIL			"1.2.840.113549.1.9.1"
 
 int _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
-			   const char *asn1_rdn_name, char *buf,
-			   size_t * sizeof_buf);
+                           const char *asn1_rdn_name, char *buf,
+                           size_t * sizeof_buf);
 
 int _gnutls_x509_parse_dn_oid (ASN1_TYPE asn1_struct,
-			       const char *asn1_rdn_name, const char *oid,
-			       int indx, unsigned int raw_flag, void *buf,
-			       size_t * sizeof_buf);
+                               const char *asn1_rdn_name, const char *oid,
+                               int indx, unsigned int raw_flag, void *buf,
+                               size_t * sizeof_buf);
 
 int _gnutls_x509_set_dn_oid (ASN1_TYPE asn1_struct,
-			     const char *asn1_rdn_name, const char *oid,
-			     int raw_flag, const char *name, int sizeof_name);
+                             const char *asn1_rdn_name, const char *oid,
+                             int raw_flag, const char *name, int sizeof_name);
 
 int _gnutls_x509_get_dn_oid (ASN1_TYPE asn1_struct,
-			     const char *asn1_rdn_name,
-			     int indx, void *_oid, size_t * sizeof_oid);
+                             const char *asn1_rdn_name,
+                             int indx, void *_oid, size_t * sizeof_oid);
 
 int _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
-				int seq, void *name, size_t * name_size,
-				unsigned int *ret_type, int othername_oid);
+                                int seq, void *name, size_t * name_size,
+                                unsigned int *ret_type, int othername_oid);
 
 /* dsa.c */
 
 
 /* verify.c */
 int gnutls_x509_crt_is_issuer (gnutls_x509_crt_t cert,
-			       gnutls_x509_crt_t issuer);
+                               gnutls_x509_crt_t issuer);
 
 int
 _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
-			       const gnutls_datum_t * signature,
-			       gnutls_pk_algorithm pk,
-			       bigint_t * issuer_params,
-			       unsigned int issuer_params_size);
+                               const gnutls_datum_t * signature,
+                               gnutls_pk_algorithm pk,
+                               bigint_t * issuer_params,
+                               unsigned int issuer_params_size);
 
 int _gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
-				   const gnutls_datum_t * hash,
-				   const gnutls_datum_t * signature,
-				   gnutls_x509_crt_t issuer);
+                                   const gnutls_datum_t * hash,
+                                   const gnutls_datum_t * signature,
+                                   gnutls_x509_crt_t issuer);
 int _gnutls_x509_privkey_verify_signature (const gnutls_datum_t * tbs,
-					   const gnutls_datum_t * signature,
-					   gnutls_x509_privkey_t issuer);
+                                           const gnutls_datum_t * signature,
+                                           gnutls_x509_privkey_t issuer);
 
 /* privkey.h */
 ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t *
-						raw_key,
-						gnutls_x509_privkey_t pkey);
+                                                raw_key,
+                                                gnutls_x509_privkey_t pkey);
 int _gnutls_asn1_encode_dsa (ASN1_TYPE * c2, bigint_t * params);
 
 /* extensions.c */
 int _gnutls_x509_crl_get_extension (gnutls_x509_crl_t crl,
-				    const char *extension_id, int indx,
-				    gnutls_datum_t * ret,
-				    unsigned int *_critical);
+                                    const char *extension_id, int indx,
+                                    gnutls_datum_t * ret,
+                                    unsigned int *_critical);
 
 int _gnutls_x509_crl_get_extension_oid (gnutls_x509_crl_t crl,
-					int indx, void *oid,
-					size_t * sizeof_oid);
+                                        int indx, void *oid,
+                                        size_t * sizeof_oid);
 
 int _gnutls_x509_crl_set_extension (gnutls_x509_crl_t crl,
-				    const char *ext_id,
-				    const gnutls_datum_t * ext_data,
-				    unsigned int critical);
+                                    const char *ext_id,
+                                    const gnutls_datum_t * ext_data,
+                                    unsigned int critical);
 
 int _gnutls_x509_crt_get_extension (gnutls_x509_crt_t cert,
-				    const char *extension_id, int indx,
-				    gnutls_datum_t * ret,
-				    unsigned int *critical);
+                                    const char *extension_id, int indx,
+                                    gnutls_datum_t * ret,
+                                    unsigned int *critical);
 int _gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert,
-					int indx, void *ret,
-					size_t * ret_size);
+                                        int indx, void *ret,
+                                        size_t * ret_size);
 int _gnutls_x509_ext_extract_keyUsage (uint16_t * keyUsage,
-				       opaque * extnValue, int extnValueLen);
+                                       opaque * extnValue, int extnValueLen);
 int _gnutls_x509_ext_extract_basicConstraints (int *CA,
-					       int *pathLenConstraint,
-					       opaque * extnValue,
-					       int extnValueLen);
+                                               int *pathLenConstraint,
+                                               opaque * extnValue,
+                                               int extnValueLen);
 int _gnutls_x509_crt_set_extension (gnutls_x509_crt_t cert,
-				    const char *extension_id,
-				    const gnutls_datum_t * ext_data,
-				    unsigned int critical);
+                                    const char *extension_id,
+                                    const gnutls_datum_t * ext_data,
+                                    unsigned int critical);
 
 int
 _gnutls_x509_ext_extract_number (opaque * number,
-				 size_t * nr_size,
-				 opaque * extnValue, int extnValueLen);
+                                 size_t * nr_size,
+                                 opaque * extnValue, int extnValueLen);
 int
 _gnutls_x509_ext_gen_number (const opaque * nuber, size_t nr_size,
-			     gnutls_datum_t * der_ext);
+                             gnutls_datum_t * der_ext);
 
 
 int _gnutls_x509_ext_gen_basicConstraints (int CA, int pathLenConstraint,
-					   gnutls_datum_t * der_ext);
+                                           gnutls_datum_t * der_ext);
 int _gnutls_x509_ext_gen_keyUsage (uint16_t usage, gnutls_datum_t * der_ext);
 int _gnutls_x509_ext_gen_subject_alt_name (gnutls_x509_subject_alt_name_t
-					   type, const void *data,
-					   unsigned int data_size,
-					   gnutls_datum_t * prev_der_ext,
-					   gnutls_datum_t * der_ext);
+                                           type, const void *data,
+                                           unsigned int data_size,
+                                           gnutls_datum_t * prev_der_ext,
+                                           gnutls_datum_t * der_ext);
 int _gnutls_x509_ext_gen_crl_dist_points (gnutls_x509_subject_alt_name_t type,
-					  const void *data,
-					  unsigned int data_size,
-					  unsigned int reason_flags,
-					  gnutls_datum_t * der_ext);
+                                          const void *data,
+                                          unsigned int data_size,
+                                          unsigned int reason_flags,
+                                          gnutls_datum_t * der_ext);
 int _gnutls_x509_ext_gen_key_id (const void *id, size_t id_size,
-				 gnutls_datum_t * der_data);
+                                 gnutls_datum_t * der_data);
 int _gnutls_x509_ext_gen_auth_key_id (const void *id, size_t id_size,
-				      gnutls_datum_t * der_data);
+                                      gnutls_datum_t * der_data);
 int _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
-					    char **policyLanguage,
-					    char **policy,
-					    size_t * sizeof_policy,
-					    opaque * extnValue,
-					    int extnValueLen);
+                                            char **policyLanguage,
+                                            char **policy,
+                                            size_t * sizeof_policy,
+                                            opaque * extnValue,
+                                            int extnValueLen);
 int _gnutls_x509_ext_gen_proxyCertInfo (int pathLenConstraint,
-					const char *policyLanguage,
-					const char *policy,
-					size_t sizeof_policy,
-					gnutls_datum_t * der_ext);
+                                        const char *policyLanguage,
+                                        const char *policy,
+                                        size_t sizeof_policy,
+                                        gnutls_datum_t * der_ext);
 
 /* mpi.c */
 int _gnutls_x509_crq_get_mpis (gnutls_x509_crq_t cert,
-			       bigint_t * params, int *params_size);
+                               bigint_t * params, int *params_size);
 
 int _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
-			       bigint_t * params, int *params_size);
+                               bigint_t * params, int *params_size);
 int _gnutls_x509_read_rsa_params (opaque * der, int dersize,
-				  bigint_t * params);
+                                  bigint_t * params);
 int _gnutls_x509_read_dsa_pubkey (opaque * der, int dersize,
-				  bigint_t * params);
+                                  bigint_t * params);
 int _gnutls_x509_read_dsa_params (opaque * der, int dersize,
-				  bigint_t * params);
+                                  bigint_t * params);
 
 int _gnutls_x509_write_rsa_params (bigint_t * params, int params_size,
-				   gnutls_datum_t * der);
+                                   gnutls_datum_t * der);
 int _gnutls_x509_write_dsa_params (bigint_t * params, int params_size,
-				   gnutls_datum_t * der);
+                                   gnutls_datum_t * der);
 int _gnutls_x509_write_dsa_public_key (bigint_t * params, int params_size,
-				       gnutls_datum_t * der);
+                                       gnutls_datum_t * der);
 
 int _gnutls_x509_read_uint (ASN1_TYPE node, const char *value,
-			    unsigned int *ret);
+                            unsigned int *ret);
 
 int _gnutls_x509_read_der_int (opaque * der, int dersize, bigint_t * out);
 
 int _gnutls_x509_read_int (ASN1_TYPE node, const char *value,
-			   bigint_t * ret_mpi);
+                           bigint_t * ret_mpi);
 int _gnutls_x509_write_int (ASN1_TYPE node, const char *value, bigint_t mpi,
-			    int lz);
+                            int lz);
 int _gnutls_x509_write_uint32 (ASN1_TYPE node, const char *value,
-			       uint32_t num);
+                               uint32_t num);
 
 int _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
-				   gnutls_pk_algorithm_t pk_algorithm,
-				   gnutls_digest_algorithm_t);
+                                   gnutls_pk_algorithm_t pk_algorithm,
+                                   gnutls_digest_algorithm_t);
 
 /* pkcs12.h */
 #include <gnutls/pkcs12.h>
@@ -356,45 +356,45 @@ typedef struct gnutls_pkcs12_bag_int
 
 int
 _gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
-			      unsigned int salt_size, unsigned int iter,
-			      const char *pw, unsigned int req_keylen,
-			      opaque * keybuf);
+                              unsigned int salt_size, unsigned int iter,
+                              const char *pw, unsigned int req_keylen,
+                              opaque * keybuf);
 
 int _gnutls_pkcs7_decrypt_data (const gnutls_datum_t * data,
-				const char *password, gnutls_datum_t * dec);
+                                const char *password, gnutls_datum_t * dec);
 
 typedef enum schema_id
 {
-  PBES2_GENERIC,		/* when the algorithm is unknown, temporal use when reading only */
-  PBES2_3DES,			/* the stuff in PKCS #5 */
+  PBES2_GENERIC,                /* when the algorithm is unknown, temporal use when reading only */
+  PBES2_3DES,                   /* the stuff in PKCS #5 */
   PBES2_AES_128,
   PBES2_AES_192,
   PBES2_AES_256,
-  PKCS12_3DES_SHA1,		/* the stuff in PKCS #12 */
+  PKCS12_3DES_SHA1,             /* the stuff in PKCS #12 */
   PKCS12_ARCFOUR_SHA1,
   PKCS12_RC2_40_SHA1
 } schema_id;
 
 int _gnutls_pkcs_flags_to_schema (unsigned int flags);
 int _gnutls_pkcs7_encrypt_data (schema_id schema,
-				const gnutls_datum_t * data,
-				const char *password, gnutls_datum_t * enc);
+                                const gnutls_datum_t * data,
+                                const char *password, gnutls_datum_t * enc);
 int _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
-				  gnutls_pkcs12_bag_t bag);
+                                  gnutls_pkcs12_bag_t bag);
 
 int
 _pkcs12_encode_safe_contents (gnutls_pkcs12_bag_t bag, ASN1_TYPE * content,
-			      int *enc);
+                              int *enc);
 
 int _pkcs12_decode_crt_bag (gnutls_pkcs12_bag_type_t type,
-			    const gnutls_datum_t * in, gnutls_datum_t * out);
+                            const gnutls_datum_t * in, gnutls_datum_t * out);
 int _pkcs12_encode_crt_bag (gnutls_pkcs12_bag_type_t type,
-			    const gnutls_datum_t * raw, gnutls_datum_t * out);
+                            const gnutls_datum_t * raw, gnutls_datum_t * out);
 
 /* crq */
 int _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
-				    const char *ext_id,
-				    const gnutls_datum_t * ext_data,
-				    unsigned int critical);
+                                    const char *ext_id,
+                                    const gnutls_datum_t * ext_data,
+                                    unsigned int critical);
 
 #endif

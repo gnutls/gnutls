@@ -72,10 +72,10 @@ _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
   if (cc != NULL)
     {
       if (cc->init (algorithm, &dig->handle) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_HASH_FAILED;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_HASH_FAILED;
+        }
 
       dig->hash = cc->hash;
       dig->copy = cc->copy;
@@ -165,7 +165,7 @@ _gnutls_hash_deinit (digest_hd_st * handle, void *digest)
 
 int
 _gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,
-		   const void *text, size_t textlen, void *digest)
+                   const void *text, size_t textlen, void *digest)
 {
   digest_hd_st dig;
   int ret;
@@ -200,7 +200,7 @@ _gnutls_hmac_get_algo_len (gnutls_mac_algorithm_t algorithm)
 
 int
 _gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
-		   int keylen, const void *text, size_t textlen, void *digest)
+                   int keylen, const void *text, size_t textlen, void *digest)
 {
   digest_hd_st dig;
   int ret;
@@ -226,7 +226,7 @@ _gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
 
 int
 _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
-		   const void *key, int keylen)
+                   const void *key, int keylen)
 {
   int result;
   const gnutls_crypto_mac_st *cc = NULL;
@@ -241,17 +241,17 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
   if (cc != NULL)
     {
       if (cc->init (algorithm, &dig->handle) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_HASH_FAILED;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_HASH_FAILED;
+        }
 
       if (cc->setkey (dig->handle, key, keylen) < 0)
-	{
-	  gnutls_assert ();
-	  cc->deinit (dig->handle);
-	  return GNUTLS_E_HASH_FAILED;
-	}
+        {
+          gnutls_assert ();
+          cc->deinit (dig->handle);
+          return GNUTLS_E_HASH_FAILED;
+        }
 
       dig->hash = cc->hash;
       dig->output = cc->output;
@@ -334,7 +334,7 @@ get_padsize (gnutls_mac_algorithm_t algorithm)
 
 int
 _gnutls_mac_init_ssl3 (digest_hd_st * ret, gnutls_mac_algorithm_t algorithm,
-		       void *key, int keylen)
+                       void *key, int keylen)
 {
   opaque ipad[48];
   int padsize, result;
@@ -397,7 +397,7 @@ _gnutls_mac_deinit_ssl3 (digest_hd_st * handle, void *digest)
 
   _gnutls_hash (&td, opad, padsize);
   block = _gnutls_hmac_get_algo_len (handle->algorithm);
-  _gnutls_hash_deinit (handle, ret);	/* get the previous hash */
+  _gnutls_hash_deinit (handle, ret);    /* get the previous hash */
   _gnutls_hash (&td, ret, block);
 
   _gnutls_hash_deinit (&td, digest);
@@ -407,8 +407,8 @@ _gnutls_mac_deinit_ssl3 (digest_hd_st * handle, void *digest)
 
 void
 _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle,
-				   void *digest, opaque * key,
-				   uint32_t key_size)
+                                   void *digest, opaque * key,
+                                   uint32_t key_size)
 {
   opaque ret[MAX_HASH_SIZE];
   digest_hd_st td;
@@ -443,7 +443,7 @@ _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle,
   if (key_size > 0)
     _gnutls_hash (handle, key, key_size);
   _gnutls_hash (handle, ipad, padsize);
-  _gnutls_hash_deinit (handle, ret);	/* get the previous hash */
+  _gnutls_hash_deinit (handle, ret);    /* get the previous hash */
 
   _gnutls_hash (&td, ret, block);
 
@@ -454,7 +454,7 @@ _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle,
 
 static int
 ssl3_sha (int i, opaque * secret, int secret_len,
-	  opaque * rnd, int rnd_len, void *digest)
+          opaque * rnd, int rnd_len, void *digest)
 {
   int j, ret;
   opaque text1[26];
@@ -463,7 +463,7 @@ ssl3_sha (int i, opaque * secret, int secret_len,
 
   for (j = 0; j < i + 1; j++)
     {
-      text1[j] = 65 + i;	/* A==65 */
+      text1[j] = 65 + i;        /* A==65 */
     }
 
   ret = _gnutls_hash_init (&td, GNUTLS_MAC_SHA1);
@@ -483,7 +483,7 @@ ssl3_sha (int i, opaque * secret, int secret_len,
 
 static int
 ssl3_md5 (int i, opaque * secret, int secret_len,
-	  opaque * rnd, int rnd_len, void *digest)
+          opaque * rnd, int rnd_len, void *digest)
 {
   opaque tmp[MAX_HASH_SIZE];
   digest_hd_st td;
@@ -514,8 +514,8 @@ ssl3_md5 (int i, opaque * secret, int secret_len,
 
 int
 _gnutls_ssl3_hash_md5 (const void *first, int first_len,
-		       const void *second, int second_len,
-		       int ret_len, opaque * ret)
+                       const void *second, int second_len,
+                       int ret_len, opaque * ret)
 {
   opaque digest[MAX_HASH_SIZE];
   digest_hd_st td;
@@ -548,8 +548,8 @@ _gnutls_ssl3_hash_md5 (const void *first, int first_len,
 
 int
 _gnutls_ssl3_generate_random (void *secret, int secret_len,
-			      void *rnd, int rnd_len,
-			      int ret_bytes, opaque * ret)
+                              void *rnd, int rnd_len,
+                              int ret_bytes, opaque * ret)
 {
   int i = 0, copy, output_bytes;
   opaque digest[MAX_HASH_SIZE];
@@ -570,19 +570,19 @@ _gnutls_ssl3_generate_random (void *secret, int secret_len,
 
       result = ssl3_md5 (i, secret, secret_len, rnd, rnd_len, digest);
       if (result < 0)
-	{
-	  gnutls_assert ();
-	  return result;
-	}
+        {
+          gnutls_assert ();
+          return result;
+        }
 
       if ((1 + i) * block < ret_bytes)
-	{
-	  copy = block;
-	}
+        {
+          copy = block;
+        }
       else
-	{
-	  copy = ret_bytes - (i) * block;
-	}
+        {
+          copy = ret_bytes - (i) * block;
+        }
 
       memcpy (&ret[i * block], digest, copy);
     }

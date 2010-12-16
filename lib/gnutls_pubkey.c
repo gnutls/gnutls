@@ -45,7 +45,7 @@
 struct gnutls_pubkey_st
 {
   gnutls_pk_algorithm_t pk_algorithm;
-  unsigned int bits;		/* an indication of the security parameter */
+  unsigned int bits;            /* an indication of the security parameter */
 
   /* the size of params depends on the public
    * key algorithm
@@ -57,9 +57,9 @@ struct gnutls_pubkey_st
    *      [3] is public key
    */
   bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
-  int params_size;		/* holds the size of MPI params */
+  int params_size;              /* holds the size of MPI params */
 
-  unsigned int key_usage;	/* bits from GNUTLS_KEY_* */
+  unsigned int key_usage;       /* bits from GNUTLS_KEY_* */
 };
 
 /**
@@ -150,7 +150,7 @@ gnutls_pubkey_deinit (gnutls_pubkey_t key)
  **/
 int
 gnutls_pubkey_import_x509 (gnutls_pubkey_t key, gnutls_x509_crt_t crt,
-			   unsigned int flags)
+                           unsigned int flags)
 {
   int ret;
 
@@ -166,18 +166,18 @@ gnutls_pubkey_import_x509 (gnutls_pubkey_t key, gnutls_x509_crt_t crt,
     case GNUTLS_PK_RSA:
       ret = _gnutls_x509_crt_get_mpis (crt, key->params, &key->params_size);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
       break;
     case GNUTLS_PK_DSA:
       ret = _gnutls_x509_crt_get_mpis (crt, key->params, &key->params_size);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       break;
     default:
@@ -203,7 +203,7 @@ gnutls_pubkey_import_x509 (gnutls_pubkey_t key, gnutls_x509_crt_t crt,
  **/
 int
 gnutls_pubkey_import_privkey (gnutls_pubkey_t key, gnutls_privkey_t pkey,
-			   unsigned int usage, unsigned int flags)
+                              unsigned int usage, unsigned int flags)
 {
   key->pk_algorithm = gnutls_privkey_get_pk_algorithm (pkey, &key->bits);
 
@@ -212,7 +212,7 @@ gnutls_pubkey_import_privkey (gnutls_pubkey_t key, gnutls_privkey_t pkey,
   key->params_size = sizeof (key->params) / sizeof (key->params[0]);
 
   return _gnutls_privkey_get_public_mpis (pkey, key->params,
-    &key->params_size);
+                                          &key->params_size);
 }
 
 /**
@@ -232,8 +232,8 @@ gnutls_pubkey_import_privkey (gnutls_pubkey_t key, gnutls_privkey_t pkey,
  **/
 int
 gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
-					    gnutls_digest_algorithm_t *
-					    hash, unsigned int *mand)
+                                            gnutls_digest_algorithm_t *
+                                            hash, unsigned int *mand)
 {
   int ret;
 
@@ -244,8 +244,8 @@ gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
     }
 
   ret = _gnutls_pk_get_hash_algorithm (key->pk_algorithm,
-				       key->params, key->params_size,
-				       hash, mand);
+                                       key->params, key->params_size,
+                                       hash, mand);
 
   return ret;
 }
@@ -265,7 +265,7 @@ gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
  **/
 int
 gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t key,
-			     gnutls_pkcs11_obj_t obj, unsigned int flags)
+                             gnutls_pkcs11_obj_t obj, unsigned int flags)
 {
   int ret;
 
@@ -282,12 +282,12 @@ gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t key,
     {
     case GNUTLS_PK_RSA:
       ret = gnutls_pubkey_import_rsa_raw (key, &obj->pubkey[0],
-					  &obj->pubkey[1]);
+                                          &obj->pubkey[1]);
       break;
     case GNUTLS_PK_DSA:
       ret = gnutls_pubkey_import_dsa_raw (key, &obj->pubkey[0],
-					  &obj->pubkey[1],
-					  &obj->pubkey[2], &obj->pubkey[3]);
+                                          &obj->pubkey[1],
+                                          &obj->pubkey[2], &obj->pubkey[3]);
       break;
     default:
       gnutls_assert ();
@@ -318,9 +318,9 @@ gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t key,
  **/
 int
 gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
-			      gnutls_openpgp_crt_t crt,
-			      gnutls_openpgp_keyid_t keyid,
-			      unsigned int flags)
+                              gnutls_openpgp_crt_t crt,
+                              gnutls_openpgp_keyid_t keyid,
+                              unsigned int flags)
 {
   int ret;
   uint32_t kid32[2];
@@ -344,23 +344,23 @@ gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
     {
     case GNUTLS_PK_RSA:
       ret =
-	_gnutls_openpgp_crt_get_mpis (crt, kid32, key->params,
-				      &key->params_size);
+        _gnutls_openpgp_crt_get_mpis (crt, kid32, key->params,
+                                      &key->params_size);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
       break;
     case GNUTLS_PK_DSA:
       ret =
-	_gnutls_openpgp_crt_get_mpis (crt, kid32, key->params,
-				      &key->params_size);
+        _gnutls_openpgp_crt_get_mpis (crt, kid32, key->params,
+                                      &key->params_size);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
       break;
     default:
       gnutls_assert ();
@@ -394,8 +394,8 @@ gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
  **/
 int
 gnutls_pubkey_export (gnutls_pubkey_t key,
-		      gnutls_x509_crt_fmt_t format, void *output_data,
-		      size_t * output_data_size)
+                      gnutls_x509_crt_fmt_t format, void *output_data,
+                      size_t * output_data_size)
 {
   int result;
   ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -416,8 +416,8 @@ gnutls_pubkey_export (gnutls_pubkey_t key,
 
   result =
     _gnutls_x509_encode_and_copy_PKI_params (spk, "",
-					     key->pk_algorithm,
-					     key->params, key->params_size);
+                                             key->pk_algorithm,
+                                             key->params, key->params_size);
   if (result < 0)
     {
       gnutls_assert ();
@@ -425,8 +425,8 @@ gnutls_pubkey_export (gnutls_pubkey_t key,
     }
 
   result = _gnutls_x509_export_int_named (spk, "",
-					  format, PK_PEM_HEADER,
-					  output_data, output_data_size);
+                                          format, PK_PEM_HEADER,
+                                          output_data, output_data_size);
   if (result < 0)
     {
       gnutls_assert ();
@@ -464,8 +464,8 @@ cleanup:
  **/
 int
 gnutls_pubkey_get_key_id (gnutls_pubkey_t key, unsigned int flags,
-			  unsigned char *output_data,
-			  size_t * output_data_size)
+                          unsigned char *output_data,
+                          size_t * output_data_size)
 {
   int ret = 0;
 
@@ -477,7 +477,7 @@ gnutls_pubkey_get_key_id (gnutls_pubkey_t key, unsigned int flags,
 
   ret =
     _gnutls_get_key_id (key->pk_algorithm, key->params,
-			key->params_size, output_data, output_data_size);
+                        key->params_size, output_data, output_data_size);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -501,7 +501,7 @@ gnutls_pubkey_get_key_id (gnutls_pubkey_t key, unsigned int flags,
  **/
 int
 gnutls_pubkey_get_pk_rsa_raw (gnutls_pubkey_t key,
-			      gnutls_datum_t * m, gnutls_datum_t * e)
+                              gnutls_datum_t * m, gnutls_datum_t * e)
 {
   int ret;
 
@@ -551,8 +551,8 @@ gnutls_pubkey_get_pk_rsa_raw (gnutls_pubkey_t key,
  **/
 int
 gnutls_pubkey_get_pk_dsa_raw (gnutls_pubkey_t key,
-			      gnutls_datum_t * p, gnutls_datum_t * q,
-			      gnutls_datum_t * g, gnutls_datum_t * y)
+                              gnutls_datum_t * p, gnutls_datum_t * q,
+                              gnutls_datum_t * g, gnutls_datum_t * y)
 {
   int ret;
 
@@ -626,8 +626,8 @@ gnutls_pubkey_get_pk_dsa_raw (gnutls_pubkey_t key,
  **/
 int
 gnutls_pubkey_import (gnutls_pubkey_t key,
-		      const gnutls_datum_t * data,
-		      gnutls_x509_crt_fmt_t format)
+                      const gnutls_datum_t * data,
+                      gnutls_x509_crt_fmt_t format)
 {
   int result = 0, need_free = 0;
   gnutls_datum_t _data;
@@ -650,15 +650,15 @@ gnutls_pubkey_import (gnutls_pubkey_t key,
 
       /* Try the first header */
       result =
-	_gnutls_fbase64_decode (PK_PEM_HEADER, data->data, data->size, &out);
+        _gnutls_fbase64_decode (PK_PEM_HEADER, data->data, data->size, &out);
 
       if (result <= 0)
-	{
-	  if (result == 0)
-	    result = GNUTLS_E_INTERNAL_ERROR;
-	  gnutls_assert ();
-	  return result;
-	}
+        {
+          if (result == 0)
+            result = GNUTLS_E_INTERNAL_ERROR;
+          gnutls_assert ();
+          return result;
+        }
 
       _data.data = out;
       _data.size = result;
@@ -729,10 +729,10 @@ gnutls_x509_crt_set_pubkey (gnutls_x509_crt_t crt, gnutls_pubkey_t key)
     }
 
   result = _gnutls_x509_encode_and_copy_PKI_params (crt->cert,
-						    "tbsCertificate.subjectPublicKeyInfo",
-						    key->pk_algorithm,
-						    key->params,
-						    key->params_size);
+                                                    "tbsCertificate.subjectPublicKeyInfo",
+                                                    key->pk_algorithm,
+                                                    key->params,
+                                                    key->params_size);
 
   if (result < 0)
     {
@@ -818,7 +818,7 @@ gnutls_pubkey_set_key_usage (gnutls_pubkey_t key, unsigned int usage)
 
 int
 gnutls_pubkey_import_pkcs11_url (gnutls_pubkey_t key, const char *url,
-				 unsigned int flags)
+                                 unsigned int flags)
 {
   gnutls_pkcs11_obj_t pcrt;
   int ret;
@@ -866,8 +866,8 @@ cleanup:
  **/
 int
 gnutls_pubkey_import_rsa_raw (gnutls_pubkey_t key,
-			      const gnutls_datum_t * m,
-			      const gnutls_datum_t * e)
+                              const gnutls_datum_t * m,
+                              const gnutls_datum_t * e)
 {
   size_t siz = 0;
 
@@ -915,10 +915,10 @@ gnutls_pubkey_import_rsa_raw (gnutls_pubkey_t key,
  **/
 int
 gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
-			      const gnutls_datum_t * p,
-			      const gnutls_datum_t * q,
-			      const gnutls_datum_t * g,
-			      const gnutls_datum_t * y)
+                              const gnutls_datum_t * p,
+                              const gnutls_datum_t * q,
+                              const gnutls_datum_t * g,
+                              const gnutls_datum_t * y)
 {
   size_t siz = 0;
 
@@ -984,8 +984,8 @@ gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
  **/
 int
 gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
-			   const gnutls_datum_t * hash,
-			   const gnutls_datum_t * signature)
+                           const gnutls_datum_t * hash,
+                           const gnutls_datum_t * signature)
 {
   int ret;
 
@@ -997,7 +997,7 @@ gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
 
   ret =
     pubkey_verify_sig (NULL, hash, signature, key->pk_algorithm,
-		       key->params, key->params_size);
+                       key->params, key->params_size);
 
   return ret;
 }
@@ -1016,8 +1016,8 @@ gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
  **/
 int
 gnutls_pubkey_get_verify_algorithm (gnutls_pubkey_t key,
-				    const gnutls_datum_t * signature,
-				    gnutls_digest_algorithm_t * hash)
+                                    const gnutls_datum_t * signature,
+                                    gnutls_digest_algorithm_t * hash)
 {
   if (key == NULL)
     {
@@ -1026,8 +1026,8 @@ gnutls_pubkey_get_verify_algorithm (gnutls_pubkey_t key,
     }
 
   return _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *)
-					hash, signature,
-					key->pk_algorithm,
-					key->params, key->params_size);
+                                        hash, signature,
+                                        key->pk_algorithm,
+                                        key->params, key->params_size);
 
 }

@@ -55,7 +55,7 @@ const mod_auth_st srp_rsa_auth_struct = {
   NULL,
 
   _gnutls_proc_cert_server_certificate,
-  NULL,				/* certificate */
+  NULL,                         /* certificate */
   proc_srp_cert_server_kx,
   _gnutls_proc_srp_client_kx,
   NULL,
@@ -72,7 +72,7 @@ const mod_auth_st srp_dss_auth_struct = {
   NULL,
 
   _gnutls_proc_cert_server_certificate,
-  NULL,				/* certificate */
+  NULL,                         /* certificate */
   proc_srp_cert_server_kx,
   _gnutls_proc_srp_client_kx,
   NULL,
@@ -110,7 +110,7 @@ gen_srp_cert_server_kx (gnutls_session_t session, opaque ** data)
   /* find the appropriate certificate */
   if ((ret =
        _gnutls_get_selected_cert (session, &apr_cert_list,
-				  &apr_cert_list_length, &apr_pkey)) < 0)
+                                  &apr_cert_list_length, &apr_pkey)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -118,8 +118,8 @@ gen_srp_cert_server_kx (gnutls_session_t session, opaque ** data)
 
   if ((ret =
        _gnutls_handshake_sign_data (session, &apr_cert_list[0],
-				    apr_pkey, &ddata, &signature,
-				    &sign_algo)) < 0)
+                                    apr_pkey, &ddata, &signature,
+                                    &sign_algo)) < 0)
     {
       gnutls_assert ();
       gnutls_free (*data);
@@ -145,7 +145,7 @@ gen_srp_cert_server_kx (gnutls_session_t session, opaque ** data)
 
 static int
 proc_srp_cert_server_kx (gnutls_session_t session, opaque * data,
-			 size_t _data_size)
+                         size_t _data_size)
 {
   ssize_t ret;
   int sigsize;
@@ -171,7 +171,7 @@ proc_srp_cert_server_kx (gnutls_session_t session, opaque * data,
 
   /* VERIFY SIGNATURE */
 
-  vparams.size = ret;		/* all the data minus the signature */
+  vparams.size = ret;           /* all the data minus the signature */
   vparams.data = data;
 
   p = &data[vparams.size];
@@ -185,8 +185,8 @@ proc_srp_cert_server_kx (gnutls_session_t session, opaque * data,
 
   ret =
     _gnutls_get_auth_info_gcert (&peer_cert,
-				 session->security_parameters.cert_type,
-				 info, CERT_NO_COPY);
+                                 session->security_parameters.cert_type,
+                                 info, CERT_NO_COPY);
 
   if (ret < 0)
     {
@@ -196,7 +196,7 @@ proc_srp_cert_server_kx (gnutls_session_t session, opaque * data,
 
   ret =
     _gnutls_handshake_verify_data (session, &peer_cert, &vparams, &signature,
-				   GNUTLS_SIGN_UNKNOWN);
+                                   GNUTLS_SIGN_UNKNOWN);
 
   _gnutls_gcert_deinit (&peer_cert);
   if (ret < 0)

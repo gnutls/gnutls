@@ -43,7 +43,7 @@
 
 
 static void _gnutls_ext_unset_resumed_session_data (gnutls_session_t session,
-						    uint16_t type);
+                                                    uint16_t type);
 
 
 static size_t extfunc_size = 0;
@@ -57,7 +57,7 @@ _gnutls_ext_parse_type (uint16_t type)
   for (i = 0; i < extfunc_size; i++)
     {
       if (extfunc[i].type == type)
-	return extfunc[i].parse_type;
+        return extfunc[i].parse_type;
     }
 
   return GNUTLS_EXT_NONE;
@@ -71,7 +71,7 @@ _gnutls_ext_func_recv (uint16_t type, gnutls_ext_parse_type_t parse_type)
   for (i = 0; i < extfunc_size; i++)
     if (extfunc[i].type == type)
       if (parse_type == GNUTLS_EXT_ANY || extfunc[i].parse_type == parse_type)
-	return extfunc[i].recv_func;
+        return extfunc[i].recv_func;
 
   return NULL;
 }
@@ -124,10 +124,10 @@ _gnutls_extension_list_check (gnutls_session_t session, uint16_t type)
       int i;
 
       for (i = 0; i < session->internals.extensions_sent_size; i++)
-	{
-	  if (type == session->internals.extensions_sent[i])
-	    return 0;		/* ok found */
-	}
+        {
+          if (type == session->internals.extensions_sent[i])
+            return 0;           /* ok found */
+        }
 
       return GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION;
     }
@@ -137,8 +137,8 @@ _gnutls_extension_list_check (gnutls_session_t session, uint16_t type)
 
 int
 _gnutls_parse_extensions (gnutls_session_t session,
-			  gnutls_ext_parse_type_t parse_type,
-			  const opaque * data, int data_size)
+                          gnutls_ext_parse_type_t parse_type,
+                          const opaque * data, int data_size)
 {
   int next, ret;
   int pos = 0;
@@ -153,10 +153,10 @@ _gnutls_parse_extensions (gnutls_session_t session,
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     for (i = 0; i < session->internals.extensions_sent_size; i++)
       {
-	_gnutls_debug_log ("EXT[%d]: expecting extension '%s'\n",
-			   session,
-			   _gnutls_extension_get_name
-			   (session->internals.extensions_sent[i]));
+        _gnutls_debug_log ("EXT[%d]: expecting extension '%s'\n",
+                           session,
+                           _gnutls_extension_get_name
+                           (session->internals.extensions_sent[i]));
       }
 #endif
 
@@ -174,14 +174,14 @@ _gnutls_parse_extensions (gnutls_session_t session,
 
 #if 0
       _gnutls_debug_log ("EXT[%p]: Found extension '%s/%d'\n", session,
-			 _gnutls_extension_get_name (type), type);
+                         _gnutls_extension_get_name (type), type);
 #endif
 
       if ((ret = _gnutls_extension_list_check (session, type)) < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       DECR_LENGTH_RET (next, 2, 0);
       size = _gnutls_read_uint16 (&data[pos]);
@@ -193,17 +193,17 @@ _gnutls_parse_extensions (gnutls_session_t session,
 
       ext_recv = _gnutls_ext_func_recv (type, parse_type);
       if (ext_recv == NULL)
-	continue;
+        continue;
 
       _gnutls_debug_log ("EXT[%p]: Parsing extension '%s/%d' (%d bytes)\n",
-			 session, _gnutls_extension_get_name (type), type,
-			 size);
+                         session, _gnutls_extension_get_name (type), type,
+                         size);
 
       if ((ret = ext_recv (session, sdata, size)) < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
     }
   while (next > 2);
@@ -223,21 +223,21 @@ _gnutls_extension_list_add (gnutls_session_t session, uint16_t type)
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
       if (session->internals.extensions_sent_size < MAX_EXT_TYPES)
-	{
-	  session->internals.extensions_sent[session->internals.
-					     extensions_sent_size] = type;
-	  session->internals.extensions_sent_size++;
-	}
+        {
+          session->internals.extensions_sent[session->internals.
+                                             extensions_sent_size] = type;
+          session->internals.extensions_sent_size++;
+        }
       else
-	{
-	  _gnutls_debug_log ("extensions: Increase MAX_EXT_TYPES\n");
-	}
+        {
+          _gnutls_debug_log ("extensions: Increase MAX_EXT_TYPES\n");
+        }
     }
 }
 
 int
 _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
-			size_t data_size, gnutls_ext_parse_type_t parse_type)
+                        size_t data_size, gnutls_ext_parse_type_t parse_type)
 {
   int size;
   uint16_t pos = 0;
@@ -267,57 +267,57 @@ _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
       extension_entry_st *p = &extfunc[i];
 
       if (p->send_func == NULL)
-	continue;
+        continue;
 
       if (parse_type != GNUTLS_EXT_ANY && p->parse_type != parse_type)
-	continue;
+        continue;
 
       size = p->send_func (session, sdata, sdata_size);
       if (size > 0 || size == GNUTLS_E_INT_RET_0)
-	{
-	  if (size == GNUTLS_E_INT_RET_0)
-	    size = 0;
+        {
+          if (size == GNUTLS_E_INT_RET_0)
+            size = 0;
 
-	  if (data_size < pos + (size_t) size + 4)
-	    {
-	      gnutls_assert ();
-	      gnutls_free (sdata);
-	      return GNUTLS_E_INTERNAL_ERROR;
-	    }
+          if (data_size < pos + (size_t) size + 4)
+            {
+              gnutls_assert ();
+              gnutls_free (sdata);
+              return GNUTLS_E_INTERNAL_ERROR;
+            }
 
-	  /* write extension type */
-	  _gnutls_write_uint16 (p->type, &data[pos]);
-	  pos += 2;
+          /* write extension type */
+          _gnutls_write_uint16 (p->type, &data[pos]);
+          pos += 2;
 
-	  /* write size */
-	  _gnutls_write_uint16 (size, &data[pos]);
-	  pos += 2;
+          /* write size */
+          _gnutls_write_uint16 (size, &data[pos]);
+          pos += 2;
 
-	  memcpy (&data[pos], sdata, size);
-	  pos += size;
+          memcpy (&data[pos], sdata, size);
+          pos += size;
 
-	  /* add this extension to the extension list
-	   */
-	  _gnutls_extension_list_add (session, p->type);
+          /* add this extension to the extension list
+           */
+          _gnutls_extension_list_add (session, p->type);
 
-	  _gnutls_debug_log ("EXT[%p]: Sending extension %s (%d bytes)\n",
-			     session, p->name, size);
-	}
+          _gnutls_debug_log ("EXT[%p]: Sending extension %s (%d bytes)\n",
+                             session, p->name, size);
+        }
       else if (size < 0)
-	{
-	  gnutls_assert ();
-	  gnutls_free (sdata);
-	  return size;
-	}
+        {
+          gnutls_assert ();
+          gnutls_free (sdata);
+          return size;
+        }
     }
 
   size = pos;
-  pos -= 2;			/* remove the size of the size header! */
+  pos -= 2;                     /* remove the size of the size header! */
 
   _gnutls_write_uint16 (pos, data);
 
   if (size == 2)
-    {				/* empty */
+    {                           /* empty */
       size = 0;
     }
 
@@ -412,10 +412,10 @@ _gnutls_ext_register (extension_entry_st * mod)
  **/
 int
 gnutls_ext_register (int type,
-		     const char *name,
-		     gnutls_ext_parse_type_t parse_type,
-		     gnutls_ext_recv_func recv_func,
-		     gnutls_ext_send_func send_func)
+                     const char *name,
+                     gnutls_ext_parse_type_t parse_type,
+                     gnutls_ext_recv_func recv_func,
+                     gnutls_ext_send_func send_func)
 {
   extension_entry_st ee;
 
@@ -447,26 +447,26 @@ _gnutls_ext_pack (gnutls_session_t session, gnutls_buffer_st * packed)
     {
       ret = _gnutls_ext_get_session_data (session, extfunc[i].type, &data);
       if (ret >= 0 && extfunc[i].pack_func != NULL)
-	{
-	  BUFFER_APPEND_NUM (packed, extfunc[i].type);
+        {
+          BUFFER_APPEND_NUM (packed, extfunc[i].type);
 
-	  size_offset = packed->length;
-	  BUFFER_APPEND_NUM (packed, 0);
+          size_offset = packed->length;
+          BUFFER_APPEND_NUM (packed, 0);
 
-	  cur_size = packed->length;
+          cur_size = packed->length;
 
-	  ret = extfunc[i].pack_func (data, packed);
-	  if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      return ret;
-	    }
+          ret = extfunc[i].pack_func (data, packed);
+          if (ret < 0)
+            {
+              gnutls_assert ();
+              return ret;
+            }
 
-	  exts++;
-	  /* write the actual size */
-	  _gnutls_write_uint32 (packed->length - cur_size,
-				packed->data + size_offset);
-	}
+          exts++;
+          /* write the actual size */
+          _gnutls_write_uint32 (packed->length - cur_size,
+                                packed->data + size_offset);
+        }
     }
 
   _gnutls_write_uint32 (exts, packed->data + total_exts_pos);
@@ -485,34 +485,34 @@ _gnutls_ext_restore_resumed_session (gnutls_session_t session)
   for (i = 0; i < MAX_EXT_TYPES; i++)
     {
       if (session->internals.extension_int_data[i].set != 0 &&
-	  _gnutls_ext_parse_type (session->internals.
-				  extension_int_data[i].type) !=
-	  GNUTLS_EXT_MANDATORY)
-	{
-	  _gnutls_ext_unset_session_data (session,
-					  session->
-					  internals.extension_int_data[i].
-					  type);
-	}
+          _gnutls_ext_parse_type (session->internals.
+                                  extension_int_data[i].type) !=
+          GNUTLS_EXT_MANDATORY)
+        {
+          _gnutls_ext_unset_session_data (session,
+                                          session->
+                                          internals.extension_int_data[i].
+                                          type);
+        }
     }
 
   /* copy resumed to main */
   for (i = 0; i < MAX_EXT_TYPES; i++)
     {
       if (session->internals.resumed_extension_int_data[i].set != 0 &&
-	  _gnutls_ext_parse_type (session->
-				  internals.resumed_extension_int_data[i].
-				  type) != GNUTLS_EXT_MANDATORY)
-	{
-	  _gnutls_ext_set_session_data (session,
-					session->
-					internals.resumed_extension_int_data
-					[i].type,
-					session->
-					internals.resumed_extension_int_data
-					[i].priv);
-	  session->internals.resumed_extension_int_data[i].set = 0;
-	}
+          _gnutls_ext_parse_type (session->
+                                  internals.resumed_extension_int_data[i].
+                                  type) != GNUTLS_EXT_MANDATORY)
+        {
+          _gnutls_ext_set_session_data (session,
+                                        session->
+                                        internals.resumed_extension_int_data
+                                        [i].type,
+                                        session->
+                                        internals.resumed_extension_int_data
+                                        [i].priv);
+          session->internals.resumed_extension_int_data[i].set = 0;
+        }
     }
 
 }
@@ -520,24 +520,24 @@ _gnutls_ext_restore_resumed_session (gnutls_session_t session)
 
 static void
 _gnutls_ext_set_resumed_session_data (gnutls_session_t session, uint16_t type,
-				      extension_priv_data_t data)
+                                      extension_priv_data_t data)
 {
   int i;
 
   for (i = 0; i < MAX_EXT_TYPES; i++)
     {
       if (session->internals.resumed_extension_int_data[i].type == type
-	  || session->internals.resumed_extension_int_data[i].set == 0)
-	{
+          || session->internals.resumed_extension_int_data[i].set == 0)
+        {
 
-	  if (session->internals.resumed_extension_int_data[i].set != 0)
-	    _gnutls_ext_unset_resumed_session_data (session, type);
+          if (session->internals.resumed_extension_int_data[i].set != 0)
+            _gnutls_ext_unset_resumed_session_data (session, type);
 
-	  session->internals.resumed_extension_int_data[i].type = type;
-	  session->internals.resumed_extension_int_data[i].priv = data;
-	  session->internals.resumed_extension_int_data[i].set = 1;
-	  return;
-	}
+          session->internals.resumed_extension_int_data[i].type = type;
+          session->internals.resumed_extension_int_data[i].priv = data;
+          session->internals.resumed_extension_int_data[i].set = 1;
+          return;
+        }
     }
 }
 
@@ -562,25 +562,25 @@ _gnutls_ext_unpack (gnutls_session_t session, gnutls_buffer_st * packed)
 
       unpack = _gnutls_ext_func_unpack (type);
       if (unpack == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_PARSING_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_PARSING_ERROR;
+        }
 
       ret = unpack (packed, &data);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       /* verify that unpack read the correct bytes */
       cur_pos = cur_pos - packed->length;
       if (cur_pos /* read length */  != size_for_type)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_PARSING_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_PARSING_ERROR;
+        }
 
       _gnutls_ext_set_resumed_session_data (session, type, data);
     }
@@ -609,17 +609,17 @@ _gnutls_ext_unset_session_data (gnutls_session_t session, uint16_t type)
   for (i = 0; i < MAX_EXT_TYPES; i++)
     {
       if (session->internals.extension_int_data[i].type == type)
-	{
-	  session->internals.extension_int_data[i].set = 0;
-	  return;
-	}
+        {
+          session->internals.extension_int_data[i].set = 0;
+          return;
+        }
     }
 
 }
 
 static void
 _gnutls_ext_unset_resumed_session_data (gnutls_session_t session,
-					uint16_t type)
+                                        uint16_t type)
 {
   gnutls_ext_deinit_data_func deinit;
   extension_priv_data_t data;
@@ -636,10 +636,10 @@ _gnutls_ext_unset_resumed_session_data (gnutls_session_t session,
   for (i = 0; i < MAX_EXT_TYPES; i++)
     {
       if (session->internals.resumed_extension_int_data[i].type == type)
-	{
-	  session->internals.resumed_extension_int_data[i].set = 0;
-	  return;
-	}
+        {
+          session->internals.resumed_extension_int_data[i].set = 0;
+          return;
+        }
     }
 
 }
@@ -669,7 +669,7 @@ _gnutls_ext_free_session_data (gnutls_session_t session)
  */
 void
 _gnutls_ext_set_session_data (gnutls_session_t session, uint16_t type,
-			      extension_priv_data_t data)
+                              extension_priv_data_t data)
 {
   int i;
   gnutls_ext_deinit_data_func deinit;
@@ -679,54 +679,54 @@ _gnutls_ext_set_session_data (gnutls_session_t session, uint16_t type,
   for (i = 0; i < MAX_EXT_TYPES; i++)
     {
       if (session->internals.extension_int_data[i].type == type
-	  || session->internals.extension_int_data[i].set == 0)
-	{
-	  if (session->internals.extension_int_data[i].set != 0)
-	    {
-	      if (deinit)
-		deinit (session->internals.extension_int_data[i].priv);
-	    }
-	  session->internals.extension_int_data[i].type = type;
-	  session->internals.extension_int_data[i].priv = data;
-	  session->internals.extension_int_data[i].set = 1;
-	  return;
-	}
+          || session->internals.extension_int_data[i].set == 0)
+        {
+          if (session->internals.extension_int_data[i].set != 0)
+            {
+              if (deinit)
+                deinit (session->internals.extension_int_data[i].priv);
+            }
+          session->internals.extension_int_data[i].type = type;
+          session->internals.extension_int_data[i].priv = data;
+          session->internals.extension_int_data[i].set = 1;
+          return;
+        }
     }
 }
 
 int
 _gnutls_ext_get_session_data (gnutls_session_t session,
-			      uint16_t type, extension_priv_data_t * data)
+                              uint16_t type, extension_priv_data_t * data)
 {
   int i;
 
   for (i = 0; i < MAX_EXT_TYPES; i++)
     {
       if (session->internals.extension_int_data[i].set != 0 &&
-	  session->internals.extension_int_data[i].type == type)
-	{
-	  *data = session->internals.extension_int_data[i].priv;
-	  return 0;
-	}
+          session->internals.extension_int_data[i].type == type)
+        {
+          *data = session->internals.extension_int_data[i].priv;
+          return 0;
+        }
     }
   return GNUTLS_E_INVALID_REQUEST;
 }
 
 int
 _gnutls_ext_get_resumed_session_data (gnutls_session_t session,
-				      uint16_t type,
-				      extension_priv_data_t * data)
+                                      uint16_t type,
+                                      extension_priv_data_t * data)
 {
   int i;
 
   for (i = 0; i < MAX_EXT_TYPES; i++)
     {
       if (session->internals.resumed_extension_int_data[i].set != 0 &&
-	  session->internals.resumed_extension_int_data[i].type == type)
-	{
-	  *data = session->internals.resumed_extension_int_data[i].priv;
-	  return 0;
-	}
+          session->internals.resumed_extension_int_data[i].type == type)
+        {
+          *data = session->internals.resumed_extension_int_data[i].priv;
+          return 0;
+        }
     }
   return GNUTLS_E_INVALID_REQUEST;
 }

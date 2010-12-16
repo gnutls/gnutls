@@ -189,22 +189,22 @@ doit (void)
   do
     {
       if (cret == GNUTLS_E_AGAIN)
-	{
-	  if (debug)
-	    success ("loop invoking client:\n");
-	  cret = gnutls_handshake (client);
-	  if (debug)
-	    success ("client %d: %s\n", cret, gnutls_strerror (cret));
-	}
+        {
+          if (debug)
+            success ("loop invoking client:\n");
+          cret = gnutls_handshake (client);
+          if (debug)
+            success ("client %d: %s\n", cret, gnutls_strerror (cret));
+        }
 
       if (sret == GNUTLS_E_AGAIN)
-	{
-	  if (debug)
-	    success ("loop invoking server:\n");
-	  sret = gnutls_handshake (server);
-	  if (debug)
-	    success ("server %d: %s\n", sret, gnutls_strerror (sret));
-	}
+        {
+          if (debug)
+            success ("loop invoking server:\n");
+          sret = gnutls_handshake (server);
+          if (debug)
+            success ("server %d: %s\n", sret, gnutls_strerror (sret));
+        }
     }
   while (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN);
 
@@ -223,12 +223,12 @@ doit (void)
   else
     {
       if (debug)
-	{
-	  printf ("server: received %d: ", ret);
-	  for (n = 0; n < ret; n++)
-	    fputc (buffer[n], stdout);
-	  fputs ("\n", stdout);
-	}
+        {
+          printf ("server: received %d: ", ret);
+          for (n = 0; n < ret; n++)
+            fputc (buffer[n], stdout);
+          fputs ("\n", stdout);
+        }
     }
 
   ns = gnutls_record_send (server, MSG, strlen (MSG));
@@ -247,12 +247,12 @@ doit (void)
   else
     {
       if (debug)
-	{
-	  printf ("client: received %d: ", ret);
-	  for (n = 0; n < ret; n++)
-	    fputc (buffer[n], stdout);
-	  fputs ("\n", stdout);
-	}
+        {
+          printf ("client: received %d: ", ret);
+          for (n = 0; n < ret; n++)
+            fputc (buffer[n], stdout);
+          fputs ("\n", stdout);
+        }
     }
 
   gnutls_bye (client, GNUTLS_SHUT_RDWR);

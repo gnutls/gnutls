@@ -38,7 +38,7 @@ tls_log_func (int level, const char *str)
   fprintf (stderr, "|<%d>| %s", level, str);
 }
 
-#define RND_BITS 510		/* not multiple of 8 */
+#define RND_BITS 510            /* not multiple of 8 */
 void
 doit (void)
 {

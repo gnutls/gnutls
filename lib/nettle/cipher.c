@@ -42,15 +42,15 @@
 #define MAX_BLOCK_SIZE 32
 
 typedef void (*encrypt_func) (void *, nettle_crypt_func, unsigned, uint8_t *,
-			      unsigned, uint8_t *, const uint8_t *);
+                              unsigned, uint8_t *, const uint8_t *);
 typedef void (*decrypt_func) (void *, nettle_crypt_func, unsigned, uint8_t *,
-			      unsigned, uint8_t *, const uint8_t *);
+                              unsigned, uint8_t *, const uint8_t *);
 typedef void (*setkey_func) (void *, unsigned, const uint8_t *);
 
 static void
 stream_encrypt (void *ctx, nettle_crypt_func func, unsigned block_size,
-		uint8_t * iv, unsigned length, uint8_t * dst,
-		const uint8_t * src)
+                uint8_t * iv, unsigned length, uint8_t * dst,
+                const uint8_t * src)
 {
   func (ctx, length, dst, src);
 }
@@ -63,7 +63,7 @@ struct aes_bidi_ctx
 
 static void
 aes_bidi_setkey (struct aes_bidi_ctx *ctx, unsigned length,
-		 const uint8_t * key)
+                 const uint8_t * key)
 {
   aes_set_encrypt_key (&ctx->encrypt, length, key);
   aes_invert_key (&ctx->decrypt, &ctx->encrypt);
@@ -71,14 +71,14 @@ aes_bidi_setkey (struct aes_bidi_ctx *ctx, unsigned length,
 
 static void
 aes_bidi_encrypt (struct aes_bidi_ctx *ctx,
-		  unsigned length, uint8_t * dst, const uint8_t * src)
+                  unsigned length, uint8_t * dst, const uint8_t * src)
 {
   aes_encrypt (&ctx->encrypt, length, dst, src);
 }
 
 static void
 aes_bidi_decrypt (struct aes_bidi_ctx *ctx,
-		  unsigned length, uint8_t * dst, const uint8_t * src)
+                  unsigned length, uint8_t * dst, const uint8_t * src)
 {
   aes_decrypt (&ctx->decrypt, length, dst, src);
 }
@@ -91,7 +91,7 @@ struct camellia_bidi_ctx
 
 static void
 camellia_bidi_setkey (struct camellia_bidi_ctx *ctx, unsigned length,
-		      const uint8_t * key)
+                      const uint8_t * key)
 {
   camellia_set_encrypt_key (&ctx->encrypt, length, key);
   camellia_invert_key (&ctx->decrypt, &ctx->encrypt);
@@ -99,14 +99,14 @@ camellia_bidi_setkey (struct camellia_bidi_ctx *ctx, unsigned length,
 
 static void
 camellia_bidi_encrypt (struct camellia_bidi_ctx *ctx,
-		       unsigned length, uint8_t * dst, const uint8_t * src)
+                       unsigned length, uint8_t * dst, const uint8_t * src)
 {
   camellia_crypt (&ctx->encrypt, length, dst, src);
 }
 
 static void
 camellia_bidi_decrypt (struct camellia_bidi_ctx *ctx,
-		       unsigned length, uint8_t * dst, const uint8_t * src)
+                       unsigned length, uint8_t * dst, const uint8_t * src)
 {
   camellia_crypt (&ctx->decrypt, length, dst, src);
 }
@@ -231,34 +231,34 @@ wrap_nettle_cipher_setkey (void *_ctx, const void *key, size_t keysize)
       break;
     case GNUTLS_CIPHER_3DES_CBC:
       if (keysize != DES3_KEY_SIZE)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
 
       des_fix_parity (keysize, des_key, key);
 
       /* this fails on weak keys */
       if (des3_set_key (ctx->ctx_ptr, des_key) != 1)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
       break;
     case GNUTLS_CIPHER_DES_CBC:
       if (keysize != DES_KEY_SIZE)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
 
       des_fix_parity (keysize, des_key, key);
 
       if (des_set_key (ctx->ctx_ptr, des_key) != 1)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
       break;
     case GNUTLS_CIPHER_ARCFOUR_128:
     case GNUTLS_CIPHER_ARCFOUR_40:
@@ -292,24 +292,24 @@ wrap_nettle_cipher_setiv (void *_ctx, const void *iv, size_t ivsize)
 
 static int
 wrap_nettle_cipher_decrypt (void *_ctx, const void *encr, size_t encrsize,
-			    void *plain, size_t plainsize)
+                            void *plain, size_t plainsize)
 {
   struct nettle_cipher_ctx *ctx = _ctx;
 
   ctx->decrypt (ctx->ctx_ptr, ctx->i_decrypt, ctx->block_size, ctx->iv,
-		encrsize, plain, encr);
+                encrsize, plain, encr);
 
   return 0;
 }
 
 static int
 wrap_nettle_cipher_encrypt (void *_ctx, const void *plain, size_t plainsize,
-			    void *encr, size_t encrsize)
+                            void *encr, size_t encrsize)
 {
   struct nettle_cipher_ctx *ctx = _ctx;
 
   ctx->encrypt (ctx->ctx_ptr, ctx->i_encrypt, ctx->block_size, ctx->iv,
-		plainsize, encr, plain);
+                plainsize, encr, plain);
 
   return 0;
 }

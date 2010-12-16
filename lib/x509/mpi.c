@@ -69,7 +69,7 @@ _gnutls_x509_read_rsa_params (opaque * der, int dersize, bigint_t * params)
     }
 
   if ((result = _gnutls_x509_read_int (spk, "publicExponent",
-				       &params[1])) < 0)
+                                       &params[1])) < 0)
     {
       gnutls_assert ();
       _gnutls_mpi_release (&params[0]);
@@ -163,7 +163,7 @@ _gnutls_x509_read_der_int (opaque * der, int dersize, bigint_t * out)
   /* == INTEGER */
   if ((result = asn1_create_element
        (_gnutls_get_gnutls_asn (), "GNUTLS.DSAPublicKey",
-	&spk)) != ASN1_SUCCESS)
+        &spk)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
@@ -208,7 +208,7 @@ _gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, bigint_t * params)
  */
 int
 _gnutls_get_asn_mpis (ASN1_TYPE asn, const char *root,
-		      bigint_t * params, int *params_size)
+                      bigint_t * params, int *params_size)
 {
   int result;
   char name[256];
@@ -242,19 +242,19 @@ _gnutls_get_asn_mpis (ASN1_TYPE asn, const char *root,
        * params[1] is the exponent
        */
       if (*params_size < RSA_PUBLIC_PARAMS)
-	{
-	  gnutls_assert ();
-	  /* internal error. Increase the bigint_ts in params */
-	  result = GNUTLS_E_INTERNAL_ERROR;
-	  goto error;
-	}
+        {
+          gnutls_assert ();
+          /* internal error. Increase the bigint_ts in params */
+          result = GNUTLS_E_INTERNAL_ERROR;
+          goto error;
+        }
 
       if ((result =
-	   _gnutls_x509_read_rsa_params (tmp.data, tmp.size, params)) < 0)
-	{
-	  gnutls_assert ();
-	  goto error;
-	}
+           _gnutls_x509_read_rsa_params (tmp.data, tmp.size, params)) < 0)
+        {
+          gnutls_assert ();
+          goto error;
+        }
       *params_size = RSA_PUBLIC_PARAMS;
 
       break;
@@ -266,26 +266,26 @@ _gnutls_get_asn_mpis (ASN1_TYPE asn, const char *root,
        */
 
       if (*params_size < DSA_PUBLIC_PARAMS)
-	{
-	  gnutls_assert ();
-	  /* internal error. Increase the bigint_ts in params */
-	  result = GNUTLS_E_INTERNAL_ERROR;
-	  goto error;
-	}
+        {
+          gnutls_assert ();
+          /* internal error. Increase the bigint_ts in params */
+          result = GNUTLS_E_INTERNAL_ERROR;
+          goto error;
+        }
 
       if ((result =
-	   _gnutls_x509_read_dsa_pubkey (tmp.data, tmp.size, params)) < 0)
-	{
-	  gnutls_assert ();
-	  goto error;
-	}
+           _gnutls_x509_read_dsa_pubkey (tmp.data, tmp.size, params)) < 0)
+        {
+          gnutls_assert ();
+          goto error;
+        }
 
       /* Now read the parameters
        */
       _gnutls_free_datum (&tmp);
 
       _asnstr_append_name (name, sizeof (name), root,
-			   ".algorithm.parameters");
+                           ".algorithm.parameters");
       result = _gnutls_x509_read_value (asn, name, &tmp, 0);
 
       /* FIXME: If the parameters are not included in the certificate
@@ -294,17 +294,17 @@ _gnutls_get_asn_mpis (ASN1_TYPE asn, const char *root,
        */
 
       if (result < 0)
-	{
-	  gnutls_assert ();
-	  goto error;
-	}
+        {
+          gnutls_assert ();
+          goto error;
+        }
 
       if ((result =
-	   _gnutls_x509_read_dsa_params (tmp.data, tmp.size, params)) < 0)
-	{
-	  gnutls_assert ();
-	  goto error;
-	}
+           _gnutls_x509_read_dsa_params (tmp.data, tmp.size, params)) < 0)
+        {
+          gnutls_assert ();
+          goto error;
+        }
       *params_size = DSA_PUBLIC_PARAMS;
 
       break;
@@ -329,13 +329,13 @@ error:
  */
 int
 _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
-			   bigint_t * params, int *params_size)
+                           bigint_t * params, int *params_size)
 {
   /* Read the algorithm's OID
    */
   return _gnutls_get_asn_mpis (cert->cert,
-			       "tbsCertificate.subjectPublicKeyInfo", params,
-			       params_size);
+                               "tbsCertificate.subjectPublicKeyInfo", params,
+                               params_size);
 }
 
 #ifdef ENABLE_PKI
@@ -344,13 +344,13 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
  */
 int
 _gnutls_x509_crq_get_mpis (gnutls_x509_crq_t cert,
-			   bigint_t * params, int *params_size)
+                           bigint_t * params, int *params_size)
 {
   /* Read the algorithm's OID
    */
   return _gnutls_get_asn_mpis (cert->crq,
-			       "certificationRequestInfo.subjectPKInfo",
-			       params, params_size);
+                               "certificationRequestInfo.subjectPKInfo",
+                               params, params_size);
 }
 
 #endif
@@ -364,7 +364,7 @@ _gnutls_x509_crq_get_mpis (gnutls_x509_crq_t cert,
  */
 int
 _gnutls_x509_write_rsa_params (bigint_t * params, int params_size,
-			       gnutls_datum_t * der)
+                               gnutls_datum_t * der)
 {
   int result;
   ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -423,8 +423,8 @@ cleanup:
  */
 int
 _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
-			       gnutls_pk_algorithm_t pk_algorithm,
-			       gnutls_digest_algorithm_t dig)
+                               gnutls_pk_algorithm_t pk_algorithm,
+                               gnutls_digest_algorithm_t dig)
 {
   int result;
   char name[128];
@@ -438,8 +438,8 @@ _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
     {
       gnutls_assert ();
       _gnutls_debug_log
-	("Cannot find OID for sign algorithm pk: %d dig: %d\n",
-	 (int) pk_algorithm, (int) dig);
+        ("Cannot find OID for sign algorithm pk: %d dig: %d\n",
+         (int) pk_algorithm, (int) dig);
       return GNUTLS_E_INVALID_REQUEST;
     }
 
@@ -481,7 +481,7 @@ _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
  */
 int
 _gnutls_x509_write_dsa_params (bigint_t * params, int params_size,
-			       gnutls_datum_t * der)
+                               gnutls_datum_t * der)
 {
   int result;
   ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -547,7 +547,7 @@ cleanup:
  */
 int
 _gnutls_x509_write_dsa_public_key (bigint_t * params, int params_size,
-				   gnutls_datum_t * der)
+                                   gnutls_datum_t * der)
 {
   int result;
   ASN1_TYPE spk = ASN1_TYPE_EMPTY;

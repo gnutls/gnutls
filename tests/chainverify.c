@@ -781,97 +781,97 @@ doit (void)
       size_t j;
 
       if (debug)
-	printf ("Chain '%s' (%d)...\n", chains[i].name, (int) i);
+        printf ("Chain '%s' (%d)...\n", chains[i].name, (int) i);
 
       for (j = 0; chains[i].chain[j]; j++)
-	{
-	  if (debug > 2)
-	    printf ("\tAdding certificate %d...", (int) j);
+        {
+          if (debug > 2)
+            printf ("\tAdding certificate %d...", (int) j);
 
-	  ret = gnutls_x509_crt_init (&certs[j]);
-	  if (ret < 0)
-	    error (EXIT_FAILURE, 0, "gnutls_x509_crt_init[%d,%d]: %s",
-		   (int) i, (int) j, gnutls_strerror (ret));
+          ret = gnutls_x509_crt_init (&certs[j]);
+          if (ret < 0)
+            error (EXIT_FAILURE, 0, "gnutls_x509_crt_init[%d,%d]: %s",
+                   (int) i, (int) j, gnutls_strerror (ret));
 
-	  tmp.data = (char *) chains[i].chain[j];
-	  tmp.size = strlen (chains[i].chain[j]);
+          tmp.data = (char *) chains[i].chain[j];
+          tmp.size = strlen (chains[i].chain[j]);
 
-	  ret = gnutls_x509_crt_import (certs[j], &tmp, GNUTLS_X509_FMT_PEM);
-	  if (debug > 2)
-	    printf ("done\n");
-	  if (ret < 0)
-	    error (EXIT_FAILURE, 0, "gnutls_x509_crt_import[%d,%d]: %s",
-		   (int) i, (int) j, gnutls_strerror (ret));
+          ret = gnutls_x509_crt_import (certs[j], &tmp, GNUTLS_X509_FMT_PEM);
+          if (debug > 2)
+            printf ("done\n");
+          if (ret < 0)
+            error (EXIT_FAILURE, 0, "gnutls_x509_crt_import[%d,%d]: %s",
+                   (int) i, (int) j, gnutls_strerror (ret));
 
-	  gnutls_x509_crt_print (certs[j], GNUTLS_CRT_PRINT_ONELINE, &tmp);
-	  if (debug)
-	    printf ("\tCertificate %d: %.*s\n", (int) j, tmp.size, tmp.data);
-	  gnutls_free (tmp.data);
-	}
+          gnutls_x509_crt_print (certs[j], GNUTLS_CRT_PRINT_ONELINE, &tmp);
+          if (debug)
+            printf ("\tCertificate %d: %.*s\n", (int) j, tmp.size, tmp.data);
+          gnutls_free (tmp.data);
+        }
 
       if (debug > 2)
-	printf ("\tAdding CA certificate...");
+        printf ("\tAdding CA certificate...");
 
       ret = gnutls_x509_crt_init (&ca);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "gnutls_x509_crt_init: %s",
-	       gnutls_strerror (ret));
+        error (EXIT_FAILURE, 0, "gnutls_x509_crt_init: %s",
+               gnutls_strerror (ret));
 
       tmp.data = (char *) *chains[i].ca;
       tmp.size = strlen (*chains[i].ca);
 
       ret = gnutls_x509_crt_import (ca, &tmp, GNUTLS_X509_FMT_PEM);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "gnutls_x509_crt_import: %s",
-	       gnutls_strerror (ret));
+        error (EXIT_FAILURE, 0, "gnutls_x509_crt_import: %s",
+               gnutls_strerror (ret));
 
       if (debug > 2)
-	printf ("done\n");
+        printf ("done\n");
 
       gnutls_x509_crt_print (ca, GNUTLS_CRT_PRINT_ONELINE, &tmp);
       if (debug)
-	printf ("\tCA Certificate: %.*s\n", tmp.size, tmp.data);
+        printf ("\tCA Certificate: %.*s\n", tmp.size, tmp.data);
       gnutls_free (tmp.data);
 
       if (debug)
-	printf ("\tVerifying...");
+        printf ("\tVerifying...");
 
       ret = gnutls_x509_crt_list_verify (certs, j,
-					 &ca, 1, NULL, 0,
-					 chains[i].verify_flags,
-					 &verify_status);
+                                         &ca, 1, NULL, 0,
+                                         chains[i].verify_flags,
+                                         &verify_status);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "gnutls_x509_crt_list_verify[%d,%d]: %s",
-	       (int) i, (int) j, gnutls_strerror (ret));
+        error (EXIT_FAILURE, 0, "gnutls_x509_crt_list_verify[%d,%d]: %s",
+               (int) i, (int) j, gnutls_strerror (ret));
 
       if (verify_status != chains[i].expected_verify_result)
-	{
-	  fail ("chain[%s]: verify_status: %d expected: %d\n", chains[i].name,
-		verify_status, chains[i].expected_verify_result);
+        {
+          fail ("chain[%s]: verify_status: %d expected: %d\n", chains[i].name,
+                verify_status, chains[i].expected_verify_result);
 
 #if 0
-	  j = 0;
-	  do
-	    {
-	      fprintf (stderr, "%s\n", chains[i].chain[j]);
-	    }
-	  while (chains[i].chain[++j] != NULL);
+          j = 0;
+          do
+            {
+              fprintf (stderr, "%s\n", chains[i].chain[j]);
+            }
+          while (chains[i].chain[++j] != NULL);
 #endif
 
-	  if (!debug)
-	    exit (1);
-	}
+          if (!debug)
+            exit (1);
+        }
       else if (debug)
-	printf ("done\n");
+        printf ("done\n");
       if (debug)
-	printf ("\tCleanup...");
+        printf ("\tCleanup...");
 
       gnutls_x509_crt_deinit (ca);
       for (j = 0; chains[i].chain[j]; j++)
-	gnutls_x509_crt_deinit (certs[j]);
+        gnutls_x509_crt_deinit (certs[j]);
 
       if (debug)
-	printf ("done\n\n\n");
+        printf ("done\n\n\n");
     }
 
   gnutls_global_deinit ();

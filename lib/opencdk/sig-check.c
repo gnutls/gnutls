@@ -38,7 +38,7 @@
 static int
 hash_mpibuf (cdk_pubkey_t pk, digest_hd_st * md, int usefpr)
 {
-  byte buf[MAX_MPI_BYTES];	/* FIXME: do not use hardcoded length. */
+  byte buf[MAX_MPI_BYTES];      /* FIXME: do not use hardcoded length. */
   size_t nbytes;
   size_t i, npkey;
   int err;
@@ -53,15 +53,15 @@ hash_mpibuf (cdk_pubkey_t pk, digest_hd_st * md, int usefpr)
       err = _gnutls_mpi_print_pgp (pk->mpi[i], buf, &nbytes);
 
       if (err < 0)
-	{
-	  gnutls_assert ();
-	  return map_gnutls_error (err);
-	}
+        {
+          gnutls_assert ();
+          return map_gnutls_error (err);
+        }
 
       if (!usefpr || pk->version == 4)
-	_gnutls_hash (md, buf, nbytes);
-      else			/* without the prefix. */
-	_gnutls_hash (md, buf + 2, nbytes - 2);
+        _gnutls_hash (md, buf, nbytes);
+      else                      /* without the prefix. */
+        _gnutls_hash (md, buf + 2, nbytes - 2);
     }
   return 0;
 }
@@ -105,7 +105,7 @@ _cdk_hash_pubkey (cdk_pubkey_t pk, digest_hd_st * md, int usefpr)
 
       /* Convert the expiration date into days. */
       if (pk->expiredate)
-	a = (u16) ((pk->expiredate - pk->timestamp) / 86400L);
+        a = (u16) ((pk->expiredate - pk->timestamp) / 86400L);
       buf[i++] = a >> 8;
       buf[i++] = a;
     }
@@ -178,24 +178,24 @@ _cdk_hash_sig_data (cdk_pkt_signature_t sig, digest_hd_st * md)
       tmp = _gnutls_hash_algo_to_pgp (sig->digest_algo);
       _gnutls_hash (md, &tmp, 1);
       if (sig->hashed != NULL)
-	{
-	  byte *p = _cdk_subpkt_get_array (sig->hashed, 0, &n);
-	  assert (p != NULL);
-	  buf[0] = n >> 8;
-	  buf[1] = n >> 0;
-	  _gnutls_hash (md, buf, 2);
-	  _gnutls_hash (md, p, n);
-	  cdk_free (p);
-	  sig->hashed_size = n;
-	  n = sig->hashed_size + 6;
-	}
+        {
+          byte *p = _cdk_subpkt_get_array (sig->hashed, 0, &n);
+          assert (p != NULL);
+          buf[0] = n >> 8;
+          buf[1] = n >> 0;
+          _gnutls_hash (md, buf, 2);
+          _gnutls_hash (md, p, n);
+          cdk_free (p);
+          sig->hashed_size = n;
+          n = sig->hashed_size + 6;
+        }
       else
-	{
-	  tmp = 0x00;
-	  _gnutls_hash (md, &tmp, 1);
-	  _gnutls_hash (md, &tmp, 1);
-	  n = 6;
-	}
+        {
+          tmp = 0x00;
+          _gnutls_hash (md, &tmp, 1);
+          _gnutls_hash (md, &tmp, 1);
+          n = 6;
+        }
       _gnutls_hash (md, &sig->version, 1);
       tmp = 0xff;
       _gnutls_hash (md, &tmp, 1);
@@ -232,7 +232,7 @@ cache_sig_result (cdk_pkt_signature_t sig, int res)
    Use the digest handle @digest. */
 cdk_error_t
 _cdk_sig_check (cdk_pubkey_t pk, cdk_pkt_signature_t sig,
-		digest_hd_st * digest, int *r_expired)
+                digest_hd_st * digest, int *r_expired)
 {
   cdk_error_t rc;
   byte md[MAX_DIGEST_LEN];
@@ -274,8 +274,8 @@ _cdk_sig_check (cdk_pubkey_t pk, cdk_pkt_signature_t sig,
    @knode is the key node and @snode the signature node. */
 cdk_error_t
 _cdk_pk_check_sig (cdk_keydb_hd_t keydb,
-		   cdk_kbnode_t knode, cdk_kbnode_t snode, int *is_selfsig,
-		   char **ret_uid)
+                   cdk_kbnode_t knode, cdk_kbnode_t snode, int *is_selfsig,
+                   char **ret_uid)
 {
   digest_hd_st md;
   int err;
@@ -312,74 +312,74 @@ _cdk_pk_check_sig (cdk_keydb_hd_t keydb,
 
   is_expired = 0;
   if (sig->sig_class == 0x20)
-    {				/* key revocation */
+    {                           /* key revocation */
       cdk_kbnode_hash (knode, &md, 0, 0, 0);
       rc = _cdk_sig_check (pk, sig, &md, &is_expired);
     }
   else if (sig->sig_class == 0x28)
-    {				/* subkey revocation */
+    {                           /* subkey revocation */
       node = cdk_kbnode_find_prev (knode, snode, CDK_PKT_PUBLIC_SUBKEY);
       if (!node)
-	{			/* no subkey for subkey revocation packet */
-	  gnutls_assert ();
-	  rc = CDK_Error_No_Key;
-	  goto fail;
-	}
+        {                       /* no subkey for subkey revocation packet */
+          gnutls_assert ();
+          rc = CDK_Error_No_Key;
+          goto fail;
+        }
       cdk_kbnode_hash (knode, &md, 0, 0, 0);
       cdk_kbnode_hash (node, &md, 0, 0, 0);
       rc = _cdk_sig_check (pk, sig, &md, &is_expired);
     }
   else if (sig->sig_class == 0x18 || sig->sig_class == 0x19)
-    {				/* primary/secondary key binding */
+    {                           /* primary/secondary key binding */
       node = cdk_kbnode_find_prev (knode, snode, CDK_PKT_PUBLIC_SUBKEY);
       if (!node)
-	{			/* no subkey for subkey binding packet */
-	  gnutls_assert ();
-	  rc = CDK_Error_No_Key;
-	  goto fail;
-	}
+        {                       /* no subkey for subkey binding packet */
+          gnutls_assert ();
+          rc = CDK_Error_No_Key;
+          goto fail;
+        }
       cdk_kbnode_hash (knode, &md, 0, 0, 0);
       cdk_kbnode_hash (node, &md, 0, 0, 0);
       rc = _cdk_sig_check (pk, sig, &md, &is_expired);
     }
   else if (sig->sig_class == 0x1F)
-    {				/* direct key signature */
+    {                           /* direct key signature */
       cdk_kbnode_hash (knode, &md, 0, 0, 0);
       rc = _cdk_sig_check (pk, sig, &md, &is_expired);
     }
   else
-    {				/* all other classes */
+    {                           /* all other classes */
       cdk_pkt_userid_t uid;
       node = cdk_kbnode_find_prev (knode, snode, CDK_PKT_USER_ID);
       if (!node)
-	{			/* no user ID for key signature packet */
-	  gnutls_assert ();
-	  rc = CDK_Error_No_Key;
-	  goto fail;
-	}
+        {                       /* no user ID for key signature packet */
+          gnutls_assert ();
+          rc = CDK_Error_No_Key;
+          goto fail;
+        }
 
       uid = node->pkt->pkt.user_id;
       if (ret_uid)
-	{
-	  *ret_uid = uid->name;
-	}
+        {
+          *ret_uid = uid->name;
+        }
       cdk_kbnode_hash (knode, &md, 0, 0, 0);
       cdk_kbnode_hash (node, &md, sig->version == 4, 0, 0);
 
       if (pk->keyid[0] == sig->keyid[0] && pk->keyid[1] == sig->keyid[1])
-	{
-	  rc = _cdk_sig_check (pk, sig, &md, &is_expired);
-	  if (is_selfsig)
-	    *is_selfsig = 1;
-	}
+        {
+          rc = _cdk_sig_check (pk, sig, &md, &is_expired);
+          if (is_selfsig)
+            *is_selfsig = 1;
+        }
       else if (keydb != NULL)
-	{
-	  cdk_pubkey_t sig_pk;
-	  rc = cdk_keydb_get_pk (keydb, sig->keyid, &sig_pk);
-	  if (!rc)
-	    rc = _cdk_sig_check (sig_pk, sig, &md, &is_expired);
-	  cdk_pk_release (sig_pk);
-	}
+        {
+          cdk_pubkey_t sig_pk;
+          rc = cdk_keydb_get_pk (keydb, sig->keyid, &sig_pk);
+          if (!rc)
+            rc = _cdk_sig_check (sig_pk, sig, &md, &is_expired);
+          cdk_pk_release (sig_pk);
+        }
     }
 fail:
   _gnutls_hash_deinit (&md, NULL);
@@ -395,17 +395,17 @@ struct verify_uid
 
 static int
 uid_list_add_sig (struct verify_uid **list, const char *uid,
-		  unsigned int flag)
+                  unsigned int flag)
 {
   if (*list == NULL)
     {
       *list = cdk_calloc (1, sizeof (struct verify_uid));
       if (*list == NULL)
-	return CDK_Out_Of_Core;
+        return CDK_Out_Of_Core;
       (*list)->name = uid;
 
       if (flag != 0)
-	(*list)->nsigs++;
+        (*list)->nsigs++;
     }
   else
     {
@@ -415,30 +415,30 @@ uid_list_add_sig (struct verify_uid **list, const char *uid,
       p = *list;
 
       while (p != NULL)
-	{
-	  if (strcmp (uid, p->name) == 0)
-	    {
-	      found = 1;
-	      break;
-	    }
-	  prev_p = p;
-	  p = p->next;
-	}
+        {
+          if (strcmp (uid, p->name) == 0)
+            {
+              found = 1;
+              break;
+            }
+          prev_p = p;
+          p = p->next;
+        }
 
       if (found == 0)
-	{			/* not found add to the last */
-	  prev_p->next = cdk_calloc (1, sizeof (struct verify_uid));
-	  if (prev_p->next == NULL)
-	    return CDK_Out_Of_Core;
-	  prev_p->next->name = uid;
-	  if (flag != 0)
-	    prev_p->next->nsigs++;
-	}
+        {                       /* not found add to the last */
+          prev_p->next = cdk_calloc (1, sizeof (struct verify_uid));
+          if (prev_p->next == NULL)
+            return CDK_Out_Of_Core;
+          prev_p->next->name = uid;
+          if (flag != 0)
+            prev_p->next->nsigs++;
+        }
       else
-	{			/* found... increase sigs */
-	  if (flag != 0)
-	    p->nsigs++;
-	}
+        {                       /* found... increase sigs */
+          if (flag != 0)
+            p->nsigs++;
+        }
     }
 
   return CDK_Success;
@@ -474,12 +474,12 @@ uid_list_all_signed (struct verify_uid *list)
   while (p != NULL)
     {
       if (p->nsigs == 0)
-	{
-	  return 0;
-	}
+        {
+          return 0;
+        }
       p = p->next;
     }
-  return 1;			/* all signed */
+  return 1;                     /* all signed */
 }
 
 /**
@@ -530,42 +530,42 @@ cdk_pk_check_sigs (cdk_kbnode_t key, cdk_keydb_hd_t keydb, int *r_status)
   for (node = key; node; node = node->next)
     {
       if (node->pkt->pkttype != CDK_PKT_SIGNATURE)
-	continue;
+        continue;
       sig = node->pkt->pkt.signature;
       rc = _cdk_pk_check_sig (keydb, key, node, &is_selfsig, &uid_name);
 
       if (rc && rc != CDK_Error_No_Key)
-	{
-	  /* It might be possible that a single signature has been
-	     corrupted, thus we do not consider it a problem when
-	     one ore more signatures are bad. But at least the self
-	     signature has to be valid. */
-	  if (is_selfsig)
-	    {
-	      key_status |= CDK_KEY_INVALID;
-	      break;
-	    }
-	}
+        {
+          /* It might be possible that a single signature has been
+             corrupted, thus we do not consider it a problem when
+             one ore more signatures are bad. But at least the self
+             signature has to be valid. */
+          if (is_selfsig)
+            {
+              key_status |= CDK_KEY_INVALID;
+              break;
+            }
+        }
 
       _cdk_log_debug ("signature %s: signer %08X keyid %08X\n",
-		      rc == CDK_Bad_Sig ? "BAD" : "good",
-		      (unsigned int) sig->keyid[1], (unsigned int) keyid);
+                      rc == CDK_Bad_Sig ? "BAD" : "good",
+                      (unsigned int) sig->keyid[1], (unsigned int) keyid);
 
       if (IS_UID_SIG (sig) && uid_name != NULL)
-	{
-	  /* add every uid in the uid list. Only consider valid:
-	   * - verification was ok
-	   * - not a selfsig
-	   */
-	  rc =
-	    uid_list_add_sig (&uid_list, uid_name,
-			      (rc == CDK_Success && is_selfsig == 0) ? 1 : 0);
-	  if (rc != CDK_Success)
-	    {
-	      gnutls_assert ();
-	      goto exit;
-	    }
-	}
+        {
+          /* add every uid in the uid list. Only consider valid:
+           * - verification was ok
+           * - not a selfsig
+           */
+          rc =
+            uid_list_add_sig (&uid_list, uid_name,
+                              (rc == CDK_Success && is_selfsig == 0) ? 1 : 0);
+          if (rc != CDK_Success)
+            {
+              gnutls_assert ();
+              goto exit;
+            }
+        }
 
     }
 
@@ -609,40 +609,40 @@ cdk_pk_check_self_sig (cdk_kbnode_t key, int *r_status)
     {
       pkt = cdk_kbnode_get_packet (p);
       if (pkt->pkttype != CDK_PKT_PUBLIC_SUBKEY
-	  && pkt->pkttype != CDK_PKT_PUBLIC_KEY)
-	continue;
+          && pkt->pkttype != CDK_PKT_PUBLIC_KEY)
+        continue;
 
       /* FIXME: we should set expire/revoke here also but callers
          expect CDK_KEY_VALID=0 if the key is okay. */
       sig_ok = 0;
       for (node = p; node; node = node->next)
-	{
-	  if (node->pkt->pkttype != CDK_PKT_SIGNATURE)
-	    continue;
-	  sig = node->pkt->pkt.signature;
+        {
+          if (node->pkt->pkttype != CDK_PKT_SIGNATURE)
+            continue;
+          sig = node->pkt->pkt.signature;
 
-	  cdk_sig_get_keyid (sig, sigid);
-	  if (sigid[0] != keyid[0] || sigid[1] != keyid[1])
-	    continue;
-	  /* FIXME: Now we check all self signatures. */
-	  rc = _cdk_pk_check_sig (NULL, p, node, &is_selfsig, NULL);
-	  if (rc)
-	    {
-	      *r_status = CDK_KEY_INVALID;
-	      return rc;
-	    }
-	  else			/* For each valid self sig we increase this counter. */
-	    sig_ok++;
-	}
+          cdk_sig_get_keyid (sig, sigid);
+          if (sigid[0] != keyid[0] || sigid[1] != keyid[1])
+            continue;
+          /* FIXME: Now we check all self signatures. */
+          rc = _cdk_pk_check_sig (NULL, p, node, &is_selfsig, NULL);
+          if (rc)
+            {
+              *r_status = CDK_KEY_INVALID;
+              return rc;
+            }
+          else                  /* For each valid self sig we increase this counter. */
+            sig_ok++;
+        }
 
       /* A key without a self signature is not valid. At least one
        * signature for the given key has to be found.
        */
       if (!sig_ok)
-	{
-	  *r_status = CDK_KEY_INVALID;
-	  return CDK_General_Error;
-	}
+        {
+          *r_status = CDK_KEY_INVALID;
+          return CDK_General_Error;
+        }
     }
 
   /* No flags indicate a valid key. */

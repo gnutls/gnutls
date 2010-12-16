@@ -50,25 +50,25 @@ const mod_auth_st rsa_auth_struct = {
   "RSA",
   _gnutls_gen_cert_server_certificate,
   _gnutls_gen_cert_client_certificate,
-  NULL,				/* gen server kx */
+  NULL,                         /* gen server kx */
   _gnutls_gen_rsa_client_kx,
-  _gnutls_gen_cert_client_cert_vrfy,	/* gen client cert vrfy */
-  _gnutls_gen_cert_server_cert_req,	/* server cert request */
+  _gnutls_gen_cert_client_cert_vrfy,    /* gen client cert vrfy */
+  _gnutls_gen_cert_server_cert_req,     /* server cert request */
 
   _gnutls_proc_cert_server_certificate,
   _gnutls_proc_cert_client_certificate,
-  NULL,				/* proc server kx */
-  proc_rsa_client_kx,		/* proc client kx */
-  _gnutls_proc_cert_client_cert_vrfy,	/* proc client cert vrfy */
-  _gnutls_proc_cert_cert_req	/* proc server cert request */
+  NULL,                         /* proc server kx */
+  proc_rsa_client_kx,           /* proc client kx */
+  _gnutls_proc_cert_client_cert_vrfy,   /* proc client cert vrfy */
+  _gnutls_proc_cert_cert_req    /* proc server cert request */
 };
 
 /* This function reads the RSA parameters from peer's certificate;
  */
 static int
 _gnutls_get_public_rsa_params (gnutls_session_t session,
-			       bigint_t params[MAX_PUBLIC_PARAMS_SIZE],
-			       int *params_len)
+                               bigint_t params[MAX_PUBLIC_PARAMS_SIZE],
+                               int *params_len)
 {
   int ret;
   cert_auth_info_t info;
@@ -87,8 +87,8 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
 
   ret =
     _gnutls_get_auth_info_gcert (&peer_cert,
-				 session->security_parameters.cert_type,
-				 info, CERT_ONLY_PUBKEY | CERT_NO_COPY);
+                                 session->security_parameters.cert_type,
+                                 info, CERT_ONLY_PUBKEY | CERT_NO_COPY);
 
   if (ret < 0)
     {
@@ -107,21 +107,21 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
       _gnutls_gcert_deinit (&peer_cert);
 
       if (session->key->rsa[0] == NULL || session->key->rsa[1] == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
 
       if (*params_len < 2)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
       *params_len = 2;
       for (i = 0; i < *params_len; i++)
-	{
-	  params[i] = _gnutls_mpi_copy (session->key->rsa[i]);
-	}
+        {
+          params[i] = _gnutls_mpi_copy (session->key->rsa[i]);
+        }
 
       return 0;
     }
@@ -146,7 +146,7 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
 
 static int
 proc_rsa_client_kx (gnutls_session_t session, opaque * data,
-		    size_t _data_size)
+                    size_t _data_size)
 {
   gnutls_datum_t plaintext;
   gnutls_datum_t ciphertext;
@@ -170,16 +170,16 @@ proc_rsa_client_kx (gnutls_session_t session, opaque * data,
       dsize = _gnutls_read_uint16 (data);
 
       if (dsize != data_size)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+        }
       ciphertext.size = dsize;
     }
 
   ret =
     gnutls_privkey_decrypt_data (session->internals.selected_key, 0,
-				 &ciphertext, &plaintext);
+                                 &ciphertext, &plaintext);
 
   if (ret < 0 || plaintext.size != GNUTLS_MASTER_SIZE)
     {
@@ -197,18 +197,18 @@ proc_rsa_client_kx (gnutls_session_t session, opaque * data,
        * check the version number.
        */
       if (_gnutls_get_adv_version_major (session) != plaintext.data[0]
-	  || _gnutls_get_adv_version_minor (session) != plaintext.data[1])
-	{
-	  /* No error is returned here, if the version number check
-	   * fails. We proceed normally.
-	   * That is to defend against the attack described in the paper
-	   * "Attacking RSA-based sessions in SSL/TLS" by Vlastimil Klima,
-	   * Ondej Pokorny and Tomas Rosa.
-	   */
-	  gnutls_assert ();
-	  _gnutls_x509_log
-	    ("auth_rsa: Possible PKCS #1 version check format attack\n");
-	}
+          || _gnutls_get_adv_version_minor (session) != plaintext.data[1])
+        {
+          /* No error is returned here, if the version number check
+           * fails. We proceed normally.
+           * That is to defend against the attack described in the paper
+           * "Attacking RSA-based sessions in SSL/TLS" by Vlastimil Klima,
+           * Ondej Pokorny and Tomas Rosa.
+           */
+          gnutls_assert ();
+          _gnutls_x509_log
+            ("auth_rsa: Possible PKCS #1 version check format attack\n");
+        }
     }
 
   if (randomize_key != 0)
@@ -216,20 +216,20 @@ proc_rsa_client_kx (gnutls_session_t session, opaque * data,
       session->key->key.size = GNUTLS_MASTER_SIZE;
       session->key->key.data = gnutls_malloc (session->key->key.size);
       if (session->key->key.data == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
 
       /* we do not need strong random numbers here.
        */
       ret = _gnutls_rnd (GNUTLS_RND_NONCE, session->key->key.data,
-			 session->key->key.size);
+                         session->key->key.size);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
     }
   else
@@ -255,7 +255,7 @@ int
 _gnutls_gen_rsa_client_kx (gnutls_session_t session, opaque ** data)
 {
   cert_auth_info_t auth = session->key->auth_info;
-  gnutls_datum_t sdata;		/* data to send */
+  gnutls_datum_t sdata;         /* data to send */
   bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
   int params_len = MAX_PUBLIC_PARAMS_SIZE;
   int ret, i;
@@ -280,7 +280,7 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, opaque ** data)
     }
 
   ret = _gnutls_rnd (GNUTLS_RND_RANDOM, session->key->key.data,
-		     session->key->key.size);
+                     session->key->key.size);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -295,7 +295,7 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, opaque ** data)
       session->key->key.data[1] = _gnutls_version_get_minor (ver);
     }
   else
-    {				/* use the version provided */
+    {                           /* use the version provided */
       session->key->key.data[0] = session->internals.rsa_pms_version[0];
       session->key->key.data[1] = session->internals.rsa_pms_version[1];
     }
@@ -311,7 +311,7 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, opaque ** data)
 
   if ((ret =
        _gnutls_pkcs1_rsa_encrypt (&sdata, &session->key->key,
-				  params, params_len, 2)) < 0)
+                                  params, params_len, 2)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -327,13 +327,13 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, opaque ** data)
       return sdata.size;
     }
   else
-    {				/* TLS 1 */
+    {                           /* TLS 1 */
       *data = gnutls_malloc (sdata.size + 2);
       if (*data == NULL)
-	{
-	  _gnutls_free_datum (&sdata);
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+        {
+          _gnutls_free_datum (&sdata);
+          return GNUTLS_E_MEMORY_ERROR;
+        }
       _gnutls_write_datum16 (*data, sdata);
       ret = sdata.size + 2;
       _gnutls_free_datum (&sdata);

@@ -50,9 +50,9 @@ main (void)
   if (ret < 0)
     {
       if (ret == GNUTLS_E_INVALID_REQUEST)
-	{
-	  fprintf (stderr, "Syntax error at: %s\n", err);
-	}
+        {
+          fprintf (stderr, "Syntax error at: %s\n", err);
+        }
       exit (1);
     }
 

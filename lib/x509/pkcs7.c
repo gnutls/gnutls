@@ -45,7 +45,7 @@
  */
 static int
 _decode_pkcs7_signed_data (ASN1_TYPE pkcs7, ASN1_TYPE * sdata,
-			   gnutls_datum_t * raw)
+                           gnutls_datum_t * raw)
 {
   char oid[MAX_OID_SIZE];
   ASN1_TYPE c2;
@@ -157,15 +157,15 @@ gnutls_pkcs7_init (gnutls_pkcs7_t * pkcs7)
   if (*pkcs7)
     {
       int result = asn1_create_element (_gnutls_get_pkix (),
-					"PKIX1.pkcs-7-ContentInfo",
-					&(*pkcs7)->pkcs7);
+                                        "PKIX1.pkcs-7-ContentInfo",
+                                        &(*pkcs7)->pkcs7);
       if (result != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  gnutls_free (*pkcs7);
-	  return _gnutls_asn2err (result);
-	}
-      return 0;			/* success */
+        {
+          gnutls_assert ();
+          gnutls_free (*pkcs7);
+          return _gnutls_asn2err (result);
+        }
+      return 0;                 /* success */
     }
   return GNUTLS_E_MEMORY_ERROR;
 }
@@ -205,7 +205,7 @@ gnutls_pkcs7_deinit (gnutls_pkcs7_t pkcs7)
  **/
 int
 gnutls_pkcs7_import (gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
-		     gnutls_x509_crt_fmt_t format)
+                     gnutls_x509_crt_fmt_t format)
 {
   int result = 0, need_free = 0;
   gnutls_datum_t _data;
@@ -223,15 +223,15 @@ gnutls_pkcs7_import (gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
       opaque *out;
 
       result = _gnutls_fbase64_decode (PEM_PKCS7, data->data, data->size,
-				       &out);
+                                       &out);
 
       if (result <= 0)
-	{
-	  if (result == 0)
-	    result = GNUTLS_E_INTERNAL_ERROR;
-	  gnutls_assert ();
-	  return result;
-	}
+        {
+          if (result == 0)
+            result = GNUTLS_E_INTERNAL_ERROR;
+          gnutls_assert ();
+          return result;
+        }
 
       _data.data = out;
       _data.size = result;
@@ -280,8 +280,8 @@ cleanup:
  **/
 int
 gnutls_pkcs7_get_crt_raw (gnutls_pkcs7_t pkcs7,
-			  int indx, void *certificate,
-			  size_t * certificate_size)
+                          int indx, void *certificate,
+                          size_t * certificate_size)
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int result, len;
@@ -330,26 +330,26 @@ gnutls_pkcs7_get_crt_raw (gnutls_pkcs7_t pkcs7,
       int start, end;
 
       result = asn1_der_decoding_startEnd (c2, tmp.data, tmp.size,
-					   root2, &start, &end);
+                                           root2, &start, &end);
 
       if (result != ASN1_SUCCESS)
-	{
-	  gnutls_assert ();
-	  result = _gnutls_asn2err (result);
-	  goto cleanup;
-	}
+        {
+          gnutls_assert ();
+          result = _gnutls_asn2err (result);
+          goto cleanup;
+        }
 
       end = end - start + 1;
 
       if ((unsigned) end > *certificate_size)
-	{
-	  *certificate_size = end;
-	  result = GNUTLS_E_SHORT_MEMORY_BUFFER;
-	  goto cleanup;
-	}
+        {
+          *certificate_size = end;
+          result = GNUTLS_E_SHORT_MEMORY_BUFFER;
+          goto cleanup;
+        }
 
       if (certificate)
-	memcpy (certificate, &tmp.data[start], end);
+        memcpy (certificate, &tmp.data[start], end);
 
       *certificate_size = end;
 
@@ -405,7 +405,7 @@ gnutls_pkcs7_get_crt_count (gnutls_pkcs7_t pkcs7)
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      return 0;			/* no certificates */
+      return 0;                 /* no certificates */
     }
 
   return count;
@@ -434,14 +434,14 @@ gnutls_pkcs7_get_crt_count (gnutls_pkcs7_t pkcs7)
   **/
 int
 gnutls_pkcs7_export (gnutls_pkcs7_t pkcs7,
-		     gnutls_x509_crt_fmt_t format, void *output_data,
-		     size_t * output_data_size)
+                     gnutls_x509_crt_fmt_t format, void *output_data,
+                     size_t * output_data_size)
 {
   if (pkcs7 == NULL)
     return GNUTLS_E_INVALID_REQUEST;
 
   return _gnutls_x509_export_int (pkcs7->pkcs7, format, PEM_PKCS7,
-				  output_data, output_data_size);
+                                  output_data, output_data_size);
 }
 
 /* Creates an empty signed data structure in the pkcs7
@@ -457,7 +457,7 @@ create_empty_signed_data (ASN1_TYPE pkcs7, ASN1_TYPE * sdata)
 
   if ((result = asn1_create_element
        (_gnutls_get_pkix (), "PKIX1.pkcs-7-SignedData",
-	sdata)) != ASN1_SUCCESS)
+        sdata)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       result = _gnutls_asn2err (result);
@@ -480,7 +480,7 @@ create_empty_signed_data (ASN1_TYPE pkcs7, ASN1_TYPE * sdata)
   /* id-data */
   result =
     asn1_write_value (*sdata, "encapContentInfo.eContentType",
-		      "1.2.840.113549.1.7.5", 1);
+                      "1.2.840.113549.1.7.5", 1);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -562,10 +562,10 @@ gnutls_pkcs7_set_crt_raw (gnutls_pkcs7_t pkcs7, const gnutls_datum_t * crt)
        */
       result = create_empty_signed_data (pkcs7->pkcs7, &c2);
       if (result < 0)
-	{
-	  gnutls_assert ();
-	  return result;
-	}
+        {
+          gnutls_assert ();
+          return result;
+        }
     }
 
   /* Step 2. Append the new certificate.
@@ -589,7 +589,7 @@ gnutls_pkcs7_set_crt_raw (gnutls_pkcs7_t pkcs7, const gnutls_datum_t * crt)
 
   result =
     asn1_write_value (c2, "certificates.?LAST.certificate", crt->data,
-		      crt->size);
+                      crt->size);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -742,7 +742,7 @@ cleanup:
  **/
 int
 gnutls_pkcs7_get_crl_raw (gnutls_pkcs7_t pkcs7,
-			  int indx, void *crl, size_t * crl_size)
+                          int indx, void *crl, size_t * crl_size)
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   int result;
@@ -770,7 +770,7 @@ gnutls_pkcs7_get_crl_raw (gnutls_pkcs7_t pkcs7,
   /* Get the raw CRL 
    */
   result = asn1_der_decoding_startEnd (c2, tmp.data, tmp.size,
-				       root2, &start, &end);
+                                       root2, &start, &end);
 
   if (result != ASN1_SUCCESS)
     {
@@ -839,7 +839,7 @@ gnutls_pkcs7_get_crl_count (gnutls_pkcs7_t pkcs7)
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      return 0;			/* no crls */
+      return 0;                 /* no crls */
     }
 
   return count;
@@ -884,10 +884,10 @@ gnutls_pkcs7_set_crl_raw (gnutls_pkcs7_t pkcs7, const gnutls_datum_t * crl)
        */
       result = create_empty_signed_data (pkcs7->pkcs7, &c2);
       if (result < 0)
-	{
-	  gnutls_assert ();
-	  return result;
-	}
+        {
+          gnutls_assert ();
+          return result;
+        }
     }
 
   /* Step 2. Append the new crl.

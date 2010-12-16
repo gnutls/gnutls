@@ -43,58 +43,58 @@ wrap_gcry_cipher_init (gnutls_cipher_algorithm_t algo, void **ctx)
     {
     case GNUTLS_CIPHER_AES_128_CBC:
       err =
-	gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_AES128,
-			  GCRY_CIPHER_MODE_CBC, 0);
+        gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_AES128,
+                          GCRY_CIPHER_MODE_CBC, 0);
       break;
 
     case GNUTLS_CIPHER_AES_192_CBC:
       err =
-	gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_AES192,
-			  GCRY_CIPHER_MODE_CBC, 0);
+        gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_AES192,
+                          GCRY_CIPHER_MODE_CBC, 0);
       break;
 
     case GNUTLS_CIPHER_AES_256_CBC:
       err =
-	gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_AES256,
-			  GCRY_CIPHER_MODE_CBC, 0);
+        gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_AES256,
+                          GCRY_CIPHER_MODE_CBC, 0);
       break;
 
     case GNUTLS_CIPHER_3DES_CBC:
       err =
-	gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_3DES,
-			  GCRY_CIPHER_MODE_CBC, 0);
+        gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_3DES,
+                          GCRY_CIPHER_MODE_CBC, 0);
       break;
 
     case GNUTLS_CIPHER_DES_CBC:
       err =
-	gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_DES,
-			  GCRY_CIPHER_MODE_CBC, 0);
+        gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_DES,
+                          GCRY_CIPHER_MODE_CBC, 0);
       break;
 
     case GNUTLS_CIPHER_ARCFOUR_128:
     case GNUTLS_CIPHER_ARCFOUR_40:
       err =
-	gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_ARCFOUR,
-			  GCRY_CIPHER_MODE_STREAM, 0);
+        gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_ARCFOUR,
+                          GCRY_CIPHER_MODE_STREAM, 0);
       break;
 
     case GNUTLS_CIPHER_RC2_40_CBC:
       err =
-	gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_RFC2268_40,
-			  GCRY_CIPHER_MODE_CBC, 0);
+        gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_RFC2268_40,
+                          GCRY_CIPHER_MODE_CBC, 0);
       break;
 
 #ifdef	ENABLE_CAMELLIA
     case GNUTLS_CIPHER_CAMELLIA_128_CBC:
       err =
-	gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_CAMELLIA128,
-			  GCRY_CIPHER_MODE_CBC, 0);
+        gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_CAMELLIA128,
+                          GCRY_CIPHER_MODE_CBC, 0);
       break;
 
     case GNUTLS_CIPHER_CAMELLIA_256_CBC:
       err =
-	gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_CAMELLIA256,
-			  GCRY_CIPHER_MODE_CBC, 0);
+        gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_CAMELLIA256,
+                          GCRY_CIPHER_MODE_CBC, 0);
       break;
 #endif
     default:
@@ -125,7 +125,7 @@ wrap_gcry_cipher_setiv (void *ctx, const void *iv, size_t ivsize)
 
 static int
 wrap_gcry_cipher_decrypt (void *ctx, const void *encr, size_t encrsize,
-			  void *plain, size_t plainsize)
+                          void *plain, size_t plainsize)
 {
   int err;
 
@@ -139,7 +139,7 @@ wrap_gcry_cipher_decrypt (void *ctx, const void *encr, size_t encrsize,
 
 static int
 wrap_gcry_cipher_encrypt (void *ctx, const void *plain, size_t plainsize,
-			  void *encr, size_t encrsize)
+                          void *encr, size_t encrsize)
 {
   int err;
 

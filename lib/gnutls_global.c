@@ -30,7 +30,7 @@
 #include <random.h>
 #include <gnutls/pkcs11.h>
 
-#include <gnutls_extensions.h>	/* for _gnutls_ext_init */
+#include <gnutls_extensions.h>  /* for _gnutls_ext_init */
 #include <gnutls_cryptodev.h>
 #include <locks.h>
 
@@ -48,7 +48,7 @@ ASN1_TYPE _gnutls_pkix1_asn;
 ASN1_TYPE _gnutls_gnutls_asn;
 
 gnutls_log_func _gnutls_log_func;
-int _gnutls_log_level = 0;	/* default log level */
+int _gnutls_log_level = 0;      /* default log level */
 
 /**
  * gnutls_global_set_log_function:
@@ -104,10 +104,10 @@ gnutls_global_set_log_level (int level)
  **/
 void
 gnutls_global_set_mem_functions (gnutls_alloc_function alloc_func,
-				 gnutls_alloc_function secure_alloc_func,
-				 gnutls_is_secure_function is_secure_func,
-				 gnutls_realloc_function realloc_func,
-				 gnutls_free_function free_func)
+                                 gnutls_alloc_function secure_alloc_func,
+                                 gnutls_is_secure_function is_secure_func,
+                                 gnutls_realloc_function realloc_func,
+                                 gnutls_free_function free_func)
 {
   gnutls_secure_malloc = secure_alloc_func;
   gnutls_malloc = alloc_func;
@@ -127,7 +127,7 @@ gnutls_global_set_mem_functions (gnutls_alloc_function alloc_func,
       gnutls_calloc = calloc;
     }
   else
-    {				/* use the included ones */
+    {                           /* use the included ones */
       gnutls_calloc = _gnutls_calloc;
     }
   gnutls_strdup = _gnutls_strdup;
@@ -195,8 +195,8 @@ gnutls_global_init (void)
     {
       gnutls_assert ();
       _gnutls_debug_log ("Checking for libtasn1 failed: %s < %s\n",
-			 asn1_check_version (NULL),
-			 GNUTLS_MIN_LIBTASN1_VERSION);
+                         asn1_check_version (NULL),
+                         GNUTLS_MIN_LIBTASN1_VERSION);
       return GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY;
     }
 

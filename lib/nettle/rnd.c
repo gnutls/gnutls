@@ -88,7 +88,7 @@ do_trivia_source (int init)
     }
 
   return yarrow256_update (&yctx, RANDOM_SOURCE_TRIVIA, entropy,
-			   sizeof (event), (const uint8_t *) &event);
+                           sizeof (event), (const uint8_t *) &event);
 }
 
 static int
@@ -102,14 +102,14 @@ do_device_source (int init)
       int old;
 
       if (!CryptAcquireContext
-	  (&device_fd, NULL, NULL, PROV_RSA_FULL,
-	   CRYPT_SILENT | CRYPT_VERIFYCONTEXT))
-	{
-	  _gnutls_debug_log ("error in CryptAcquireContext!\n");
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+          (&device_fd, NULL, NULL, PROV_RSA_FULL,
+           CRYPT_SILENT | CRYPT_VERIFYCONTEXT))
+        {
+          _gnutls_debug_log ("error in CryptAcquireContext!\n");
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
       device_last_read = now;
-      read_size = DEVICE_READ_SIZE_MAX;	/* initially read more data */
+      read_size = DEVICE_READ_SIZE_MAX; /* initially read more data */
     }
 
   if ((device_fd != NULL)
@@ -120,17 +120,17 @@ do_device_source (int init)
       uint8_t buf[DEVICE_READ_SIZE_MAX];
 
       if (!CryptGenRandom (device_fd, (DWORD) read_size, buf))
-	{
-	  _gnutls_debug_log ("Error in CryptGenRandom: %s\n",
-			     GetLastError ());
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+        {
+          _gnutls_debug_log ("Error in CryptGenRandom: %s\n",
+                             GetLastError ());
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
 
       device_last_read = now;
       return yarrow256_update (&yctx, RANDOM_SOURCE_DEVICE,
-			       read_size * 8 /
-			       2 /* we trust the system RNG */ ,
-			       read_size, buf);
+                               read_size * 8 /
+                               2 /* we trust the system RNG */ ,
+                               read_size, buf);
     }
   return 0;
 }
@@ -204,22 +204,22 @@ do_trivia_source (int init)
       event.count = trivia_time_count++;
 
       if (event.now.tv_sec != trivia_previous_time)
-	{
-	  /* Count one bit of entropy if we either have more than two
-	   * invocations in one second, or more than two seconds
-	   * between invocations. */
-	  if ((trivia_time_count > 2)
-	      || ((event.now.tv_sec - trivia_previous_time) > 2))
-	    entropy++;
+        {
+          /* Count one bit of entropy if we either have more than two
+           * invocations in one second, or more than two seconds
+           * between invocations. */
+          if ((trivia_time_count > 2)
+              || ((event.now.tv_sec - trivia_previous_time) > 2))
+            entropy++;
 
-	  trivia_time_count = 0;
-	}
+          trivia_time_count = 0;
+        }
     }
   trivia_previous_time = event.now.tv_sec;
   event.pid = getpid ();
 
   return yarrow256_update (&yctx, RANDOM_SOURCE_TRIVIA, entropy,
-			   sizeof (event), (const uint8_t *) &event);
+                           sizeof (event), (const uint8_t *) &event);
 }
 
 static int
@@ -234,16 +234,16 @@ do_device_source_urandom (int init)
 
       device_fd = open ("/dev/urandom", O_RDONLY);
       if (device_fd < 0)
-	{
-	  _gnutls_debug_log ("Cannot open urandom!\n");
-	  return GNUTLS_E_FILE_ERROR;
-	}
+        {
+          _gnutls_debug_log ("Cannot open urandom!\n");
+          return GNUTLS_E_FILE_ERROR;
+        }
 
       old = fcntl (device_fd, F_GETFD);
       fcntl (device_fd, F_SETFD, old | 1);
       device_last_read = now;
 
-      read_size = DEVICE_READ_SIZE_MAX;	/* initially read more data */
+      read_size = DEVICE_READ_SIZE_MAX; /* initially read more data */
     }
 
   if ((device_fd > 0)
@@ -255,35 +255,35 @@ do_device_source_urandom (int init)
       uint32_t done;
 
       for (done = 0; done < read_size;)
-	{
-	  int res;
-	  do
-	    res = read (device_fd, buf + done, sizeof (buf) - done);
-	  while (res < 0 && errno == EINTR);
+        {
+          int res;
+          do
+            res = read (device_fd, buf + done, sizeof (buf) - done);
+          while (res < 0 && errno == EINTR);
 
-	  if (res <= 0)
-	    {
-	      if (res < 0)
-		{
-		  _gnutls_debug_log ("Failed to read /dev/urandom: %s\n",
-				     strerror (errno));
-		}
-	      else
-		{
-		  _gnutls_debug_log
-		    ("Failed to read /dev/urandom: end of file\n");
-		}
+          if (res <= 0)
+            {
+              if (res < 0)
+                {
+                  _gnutls_debug_log ("Failed to read /dev/urandom: %s\n",
+                                     strerror (errno));
+                }
+              else
+                {
+                  _gnutls_debug_log
+                    ("Failed to read /dev/urandom: end of file\n");
+                }
 
-	      return GNUTLS_E_INTERNAL_ERROR;
-	    }
+              return GNUTLS_E_INTERNAL_ERROR;
+            }
 
-	  done += res;
-	}
+          done += res;
+        }
 
       device_last_read = now;
       return yarrow256_update (&yctx, RANDOM_SOURCE_DEVICE,
-			       read_size * 8 / 2 /* we trust the RNG */ ,
-			       read_size, buf);
+                               read_size * 8 / 2 /* we trust the RNG */ ,
+                               read_size, buf);
     }
   return 0;
 }
@@ -298,14 +298,14 @@ do_device_source_egd (int init)
     {
       device_fd = _rndegd_connect_socket ();
       if (device_fd < 0)
-	{
-	  _gnutls_debug_log ("Cannot open egd socket!\n");
-	  return GNUTLS_E_FILE_ERROR;
-	}
+        {
+          _gnutls_debug_log ("Cannot open egd socket!\n");
+          return GNUTLS_E_FILE_ERROR;
+        }
 
       device_last_read = now;
 
-      read_size = DEVICE_READ_SIZE_MAX;	/* initially read more data */
+      read_size = DEVICE_READ_SIZE_MAX; /* initially read more data */
     }
 
   if ((device_fd > 0)
@@ -317,28 +317,28 @@ do_device_source_egd (int init)
       uint32_t done;
 
       for (done = 0; done < read_size;)
-	{
-	  int res;
-	  res = _rndegd_read (&device_fd, buf + done, sizeof (buf) - done);
-	  if (res <= 0)
-	    {
-	      if (res < 0)
-		{
-		  _gnutls_debug_log ("Failed to read egd.\n");
-		}
-	      else
-		{
-		  _gnutls_debug_log ("Failed to read egd: end of file\n");
-		}
+        {
+          int res;
+          res = _rndegd_read (&device_fd, buf + done, sizeof (buf) - done);
+          if (res <= 0)
+            {
+              if (res < 0)
+                {
+                  _gnutls_debug_log ("Failed to read egd.\n");
+                }
+              else
+                {
+                  _gnutls_debug_log ("Failed to read egd: end of file\n");
+                }
 
-	      return GNUTLS_E_INTERNAL_ERROR;
-	    }
-	  done += res;
-	}
+              return GNUTLS_E_INTERNAL_ERROR;
+            }
+          done += res;
+        }
 
       device_last_read = now;
       return yarrow256_update (&yctx, RANDOM_SOURCE_DEVICE, read_size * 8 / 2,
-			       read_size, buf);
+                               read_size, buf);
     }
   return 0;
 }
@@ -357,16 +357,16 @@ do_device_source (int init)
       do_source = do_device_source_urandom;
       ret = do_source (init);
       if (ret < 0)
-	{
-	  do_source = do_device_source_egd;
-	  ret = do_source (init);
-	}
+        {
+          do_source = do_device_source_egd;
+          ret = do_source (init);
+        }
 
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       return ret;
     }

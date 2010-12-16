@@ -114,7 +114,7 @@ SSL_CTX_use_PrivateKey_file (SSL_CTX * ctx, const char *keyfile, int type)
 
 void
 SSL_CTX_set_verify (SSL_CTX * ctx, int verify_mode,
-		    int (*verify_callback) (int, X509_STORE_CTX *))
+                    int (*verify_callback) (int, X509_STORE_CTX *))
 {
   ctx->verify_mode = verify_mode;
   ctx->verify_callback = verify_callback;
@@ -232,24 +232,24 @@ SSL_new (SSL_CTX * ctx)
   gnutls_init (&ssl->gnutls_state, ctx->method->connend);
 
   gnutls_protocol_set_priority (ssl->gnutls_state,
-				ctx->method->protocol_priority);
+                                ctx->method->protocol_priority);
   gnutls_cipher_set_priority (ssl->gnutls_state,
-			      ctx->method->cipher_priority);
+                              ctx->method->cipher_priority);
   gnutls_compression_set_priority (ssl->gnutls_state,
-				   ctx->method->comp_priority);
+                                   ctx->method->comp_priority);
   gnutls_kx_set_priority (ssl->gnutls_state, ctx->method->kx_priority);
   gnutls_mac_set_priority (ssl->gnutls_state, ctx->method->mac_priority);
 
   gnutls_credentials_set (ssl->gnutls_state, GNUTLS_CRD_CERTIFICATE,
-			  ssl->gnutls_cred);
+                          ssl->gnutls_cred);
   if (ctx->certfile)
     gnutls_certificate_set_x509_trust_file (ssl->gnutls_cred,
-					    ctx->certfile,
-					    ctx->certfile_type);
+                                            ctx->certfile,
+                                            ctx->certfile_type);
   if (ctx->keyfile)
     gnutls_certificate_set_x509_key_file (ssl->gnutls_cred,
-					  ctx->certfile, ctx->keyfile,
-					  ctx->keyfile_type);
+                                          ctx->certfile, ctx->keyfile,
+                                          ctx->keyfile_type);
   ssl->ctx = ctx;
   ssl->verify_mode = ctx->verify_mode;
   ssl->verify_callback = ctx->verify_callback;
@@ -333,7 +333,7 @@ SSL_pending (SSL * ssl)
 
 void
 SSL_set_verify (SSL * ssl, int verify_mode,
-		int (*verify_callback) (int, X509_STORE_CTX *))
+                int (*verify_callback) (int, X509_STORE_CTX *))
 {
   ssl->verify_mode = verify_mode;
   ssl->verify_callback = verify_callback;
@@ -346,7 +346,7 @@ SSL_get_peer_certificate (SSL * ssl)
   int cert_list_size = 0;
 
   cert_list = gnutls_certificate_get_peers (ssl->gnutls_state,
-					    &cert_list_size);
+                                            &cert_list_size);
 
   return cert_list;
 }
@@ -367,17 +367,17 @@ SSL_connect (SSL * ssl)
   if (ssl->options & SSL_OP_NO_TLSv1)
     {
       for (i = 0, j = 0;
-	   i < GNUTLS_MAX_ALGORITHM_NUM && x_priority[i] != 0; i++, j++)
-	{
-	  if (ssl->ctx->method->protocol_priority[j] == GNUTLS_TLS1)
-	    j++;
-	  else
-	    x_priority[i] = ssl->ctx->method->protocol_priority[j];
-	}
+           i < GNUTLS_MAX_ALGORITHM_NUM && x_priority[i] != 0; i++, j++)
+        {
+          if (ssl->ctx->method->protocol_priority[j] == GNUTLS_TLS1)
+            j++;
+          else
+            x_priority[i] = ssl->ctx->method->protocol_priority[j];
+        }
       if (i < GNUTLS_MAX_ALGORITHM_NUM)
-	x_priority[i] = 0;
+        x_priority[i] = 0;
       gnutls_protocol_set_priority (ssl->gnutls_state,
-				    ssl->ctx->method->protocol_priority);
+                                    ssl->ctx->method->protocol_priority);
     }
 
   err = gnutls_handshake (ssl->gnutls_state);
@@ -392,7 +392,7 @@ SSL_connect (SSL * ssl)
   store = (X509_STORE_CTX *) calloc (1, sizeof (X509_STORE_CTX));
   store->ssl = ssl;
   store->cert_list = gnutls_certificate_get_peers (ssl->gnutls_state,
-						   &cert_list_size);
+                                                   &cert_list_size);
 
   if (ssl->verify_callback)
     {
@@ -422,17 +422,17 @@ SSL_accept (SSL * ssl)
   if (ssl->options & SSL_OP_NO_TLSv1)
     {
       for (i = 0, j = 0;
-	   i < GNUTLS_MAX_ALGORITHM_NUM && x_priority[i] != 0; i++, j++)
-	{
-	  if (ssl->ctx->method->protocol_priority[j] == GNUTLS_TLS1)
-	    j++;
-	  else
-	    x_priority[i] = ssl->ctx->method->protocol_priority[j];
-	}
+           i < GNUTLS_MAX_ALGORITHM_NUM && x_priority[i] != 0; i++, j++)
+        {
+          if (ssl->ctx->method->protocol_priority[j] == GNUTLS_TLS1)
+            j++;
+          else
+            x_priority[i] = ssl->ctx->method->protocol_priority[j];
+        }
       if (i < GNUTLS_MAX_ALGORITHM_NUM)
-	x_priority[i] = 0;
+        x_priority[i] = 0;
       gnutls_protocol_set_priority (ssl->gnutls_state,
-				    ssl->ctx->method->protocol_priority);
+                                    ssl->ctx->method->protocol_priority);
     }
 
   /* FIXME: dh params, do we want client cert? */
@@ -449,7 +449,7 @@ SSL_accept (SSL * ssl)
   store = (X509_STORE_CTX *) calloc (1, sizeof (X509_STORE_CTX));
   store->ssl = ssl;
   store->cert_list = gnutls_certificate_get_peers (ssl->gnutls_state,
-						   &cert_list_size);
+                                                   &cert_list_size);
 
   if (ssl->verify_callback)
     {
@@ -788,7 +788,7 @@ SSL_CIPHER_get_name (SSL_CIPHER * cipher)
     return ("NONE");
 
   return gnutls_cipher_suite_get_name (cipher->kx,
-				       cipher->cipher, cipher->mac);
+                                       cipher->cipher, cipher->mac);
 }
 
 int
@@ -843,13 +843,13 @@ SSL_CIPHER_description (SSL_CIPHER * cipher, char *buf, int size)
     }
 
   if (snprintf (tmpbuf, tmpsize, "%s %s %s %s",
-		gnutls_protocol_get_name (cipher->version),
-		gnutls_kx_get_name (cipher->kx),
-		gnutls_cipher_get_name (cipher->cipher),
-		gnutls_mac_get_name (cipher->mac)) == -1)
+                gnutls_protocol_get_name (cipher->version),
+                gnutls_kx_get_name (cipher->kx),
+                gnutls_cipher_get_name (cipher->cipher),
+                gnutls_mac_get_name (cipher->mac)) == -1)
     {
       if (local_alloc)
-	free (tmpbuf);
+        free (tmpbuf);
       return (char *) "Buffer too small";
     }
 
@@ -894,10 +894,10 @@ X509_NAME_oneline (gnutls_x509_dn * name, char *buf, int len)
   memset (buf, 0, len);
 
   snprintf (buf, len - 1,
-	    "C=%s, ST=%s, L=%s, O=%s, OU=%s, CN=%s/Email=%s",
-	    name->country, name->state_or_province_name,
-	    name->locality_name, name->organization,
-	    name->organizational_unit_name, name->common_name, name->email);
+            "C=%s, ST=%s, L=%s, O=%s, OU=%s, CN=%s/Email=%s",
+            name->country, name->state_or_province_name,
+            name->locality_name, name->organization,
+            name->organizational_unit_name, name->common_name, name->email);
   return buf;
 }
 

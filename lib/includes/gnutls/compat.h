@@ -123,7 +123,7 @@ typedef struct gnutls_retr_st
     gnutls_x509_crt_t *x509;
     gnutls_openpgp_crt_t pgp;
   } cert;
-  unsigned int ncerts;		/* one for pgp keys */
+  unsigned int ncerts;          /* one for pgp keys */
 
   union
   {
@@ -131,22 +131,22 @@ typedef struct gnutls_retr_st
     gnutls_openpgp_privkey_t pgp;
   } key;
 
-  unsigned int deinit_all;	/* if non zero all keys will be deinited */
+  unsigned int deinit_all;      /* if non zero all keys will be deinited */
 } gnutls_retr_st;
 
 typedef int gnutls_certificate_client_retrieve_function (gnutls_session_t,
-							 const
-							 gnutls_datum_t *
-							 req_ca_rdn,
-							 int nreqs,
-							 const
-							 gnutls_pk_algorithm_t
-							 * pk_algos,
-							 int
-							 pk_algos_length,
-							 gnutls_retr_st *);
+                                                         const
+                                                         gnutls_datum_t *
+                                                         req_ca_rdn,
+                                                         int nreqs,
+                                                         const
+                                                         gnutls_pk_algorithm_t
+                                                         * pk_algos,
+                                                         int
+                                                         pk_algos_length,
+                                                         gnutls_retr_st *);
 typedef int gnutls_certificate_server_retrieve_function (gnutls_session_t,
-							 gnutls_retr_st *);
+                                                         gnutls_retr_st *);
 
 void gnutls_certificate_client_set_retrieve_function
   (gnutls_certificate_credentials_t cred,
@@ -161,15 +161,15 @@ void
   /* External signing callback.  No longer supported because it
    * was deprecated by the PKCS #11 API. */
 typedef int (*gnutls_sign_func) (gnutls_session_t session,
-				 void *userdata,
-				 gnutls_certificate_type_t cert_type,
-				 const gnutls_datum_t * cert,
-				 const gnutls_datum_t * hash,
-				 gnutls_datum_t * signature);
+                                 void *userdata,
+                                 gnutls_certificate_type_t cert_type,
+                                 const gnutls_datum_t * cert,
+                                 const gnutls_datum_t * hash,
+                                 gnutls_datum_t * signature);
 
 void
 gnutls_sign_callback_set (gnutls_session_t session,
-			  gnutls_sign_func sign_func, void *userdata)
+                          gnutls_sign_func sign_func, void *userdata)
   _GNUTLS_GCC_ATTR_DEPRECATED;
 gnutls_sign_func
 gnutls_sign_callback_get (gnutls_session_t session, void **userdata);
@@ -178,21 +178,21 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata);
  * structures are used.
  */
      int gnutls_ext_register (int type,
-			      const char *name,
-			      gnutls_ext_parse_type_t parse_type,
-			      gnutls_ext_recv_func recv_func,
-			      gnutls_ext_send_func send_func)
+                              const char *name,
+                              gnutls_ext_parse_type_t parse_type,
+                              gnutls_ext_recv_func recv_func,
+                              gnutls_ext_send_func send_func)
   _GNUTLS_GCC_ATTR_DEPRECATED;
 
 /* We no longer support the finished callback. Use
  * gnutls_session_channel_binding for similar functionality.
  */
      typedef void (*gnutls_finished_callback_func) (gnutls_session_t session,
-						    const void *finished,
-						    size_t len);
+                                                    const void *finished,
+                                                    size_t len);
      void gnutls_session_set_finished_function (gnutls_session_t session,
-						gnutls_finished_callback_func
-						func)
+                                                gnutls_finished_callback_func
+                                                func)
   _GNUTLS_GCC_ATTR_DEPRECATED;
 
 /* returns security values. 
@@ -209,18 +209,18 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata);
   _GNUTLS_GCC_ATTR_DEPRECATED;
 
      int gnutls_psk_netconf_derive_key (const char *password,
-					const char *psk_identity,
-					const char *psk_identity_hint,
-					gnutls_datum_t *
-					output_key)
+                                        const char *psk_identity,
+                                        const char *psk_identity_hint,
+                                        gnutls_datum_t *
+                                        output_key)
   _GNUTLS_GCC_ATTR_DEPRECATED;
 
 /* This is a very dangerous and error-prone function.
  * Do not use.
  */
-  int gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
-				     const gnutls_datum_t * hash,
-				     gnutls_datum_t * signature)
-				     _GNUTLS_GCC_ATTR_DEPRECATED;
+     int gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
+                                        const gnutls_datum_t * hash,
+                                        gnutls_datum_t * signature)
+  _GNUTLS_GCC_ATTR_DEPRECATED;
 
 #endif /* _GNUTLS_COMPAT_H */

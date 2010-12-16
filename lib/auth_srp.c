@@ -48,7 +48,7 @@ const mod_auth_st srp_auth_struct = {
   NULL,
 
   NULL,
-  NULL,				/* certificate */
+  NULL,                         /* certificate */
   _gnutls_proc_srp_server_kx,
   _gnutls_proc_srp_client_kx,
   NULL,
@@ -147,7 +147,7 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
   srp_ext_st *priv;
 
   ret = _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_SRP, &epriv);
-  if (ret < 0)			/* peer didn't send a username */
+  if (ret < 0)                  /* peer didn't send a username */
     {
       gnutls_assert ();
       return GNUTLS_E_UNKNOWN_SRP_USERNAME;
@@ -156,7 +156,7 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
 
   if ((ret =
        _gnutls_auth_info_set (session, GNUTLS_CRD_SRP,
-			      sizeof (srp_server_auth_info_st), 1)) < 0)
+                              sizeof (srp_server_auth_info_st), 1)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -217,7 +217,7 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
    */
 
   data_size = (pwd_entry->n.size + 2 + pwd_entry->g.size + 2 +
-	       pwd_entry->salt.size + 1) + (n_b + 2);
+               pwd_entry->salt.size + 1) + (n_b + 2);
 
   (*data) = gnutls_malloc (data_size);
   if ((*data) == NULL)
@@ -257,8 +257,8 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
   _gnutls_write_uint16 (n_b, data_b);
 
   _gnutls_hard_log ("INT: SRP B[%d]: %s\n", (int) n_b,
-		    _gnutls_bin2hex (&data_b[2], n_b, buf, sizeof (buf),
-				     NULL));
+                    _gnutls_bin2hex (&data_b[2], n_b, buf, sizeof (buf),
+                                     NULL));
 
   _gnutls_srp_entry_free (pwd_entry);
 
@@ -279,7 +279,7 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
   srp_ext_st *priv;
 
   ret = _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_SRP, &epriv);
-  if (ret < 0)			/* peer didn't send a username */
+  if (ret < 0)                  /* peer didn't send a username */
     {
       gnutls_assert ();
       return GNUTLS_E_UNKNOWN_SRP_USERNAME;
@@ -387,8 +387,8 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
     }
 
   _gnutls_hard_log ("INT: SRP A[%d]: %s\n", (int) n_a,
-		    _gnutls_bin2hex (&data_a[2], n_a, buf, sizeof (buf),
-				     NULL));
+                    _gnutls_bin2hex (&data_a[2], n_a, buf, sizeof (buf),
+                                     NULL));
 
   _gnutls_mpi_release (&A);
 
@@ -401,7 +401,7 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
 /* just read A and put it to session */
 int
 _gnutls_proc_srp_client_kx (gnutls_session_t session, opaque * data,
-			    size_t _data_size)
+                            size_t _data_size)
 {
   size_t _n_A;
   ssize_t data_size = _data_size;
@@ -623,8 +623,8 @@ group_check_g_n (gnutls_session_t session, bigint_t g, bigint_t n)
   int ret;
 
   if (_gnutls_mpi_get_nbits (n) < (session->internals.srp_prime_bits
-				   ? session->internals.srp_prime_bits
-				   : 2048))
+                                   ? session->internals.srp_prime_bits
+                                   : 2048))
     {
       gnutls_assert ();
       return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
@@ -724,7 +724,7 @@ error:
  */
 int
 _gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
-			    size_t _data_size)
+                            size_t _data_size)
 {
   uint8_t n_s;
   uint16_t n_g, n_n, n_b;
@@ -849,10 +849,10 @@ _gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
     {
       _gnutls_x509_log ("Checking the SRP group parameters.\n");
       if ((ret = group_check_g_n (session, G, N)) < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
     }
 
   /* Checks if b % n == 0
@@ -869,7 +869,7 @@ _gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
    */
   if ((ret =
        _gnutls_calc_srp_x (username, password, (opaque *) data_s, n_s,
-			   &_n_g, hd)) < 0)
+                           &_n_g, hd)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -882,9 +882,9 @@ _gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
     }
 
 
-  return i;			/* return the processed data
-				 * needed in auth_srp_rsa.
-				 */
+  return i;                     /* return the processed data
+                                 * needed in auth_srp_rsa.
+                                 */
 }
 
 #endif /* ENABLE_SRP */

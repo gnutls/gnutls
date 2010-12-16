@@ -48,7 +48,7 @@
  **/
 int
 gnutls_session_get_data (gnutls_session_t session,
-			 void *session_data, size_t * session_data_size)
+                         void *session_data, size_t * session_data_size)
 {
 
   gnutls_datum_t psession;
@@ -146,7 +146,7 @@ gnutls_session_get_data2 (gnutls_session_t session, gnutls_datum_t * data)
  **/
 int
 gnutls_session_get_id (gnutls_session_t session,
-		       void *session_id, size_t * session_id_size)
+                       void *session_id, size_t * session_id_size)
 {
   size_t given_session_id_size = *session_id_size;
 
@@ -164,7 +164,7 @@ gnutls_session_get_id (gnutls_session_t session,
     }
 
   memcpy (session_id, &session->security_parameters.session_id,
-	  *session_id_size);
+          *session_id_size);
 
   return 0;
 }
@@ -189,7 +189,7 @@ gnutls_session_get_id (gnutls_session_t session,
  **/
 int
 gnutls_session_set_data (gnutls_session_t session,
-			 const void *session_data, size_t session_data_size)
+                         const void *session_data, size_t session_data_size)
 {
   int ret;
   gnutls_datum_t psession;

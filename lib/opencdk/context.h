@@ -133,7 +133,7 @@ struct cdk_dek_s
   int algo;
   int keylen;
   int use_mdc;
-  byte key[32];			/* 256-bit */
+  byte key[32];                 /* 256-bit */
 };
 
 struct cdk_strlist_s

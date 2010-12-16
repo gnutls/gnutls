@@ -198,16 +198,16 @@ _mbuffer_remove_bytes (mbuffer_head_st * buf, size_t bytes)
       next = bufel->next;
 
       if (left >= (bufel->msg.size - bufel->mark))
-	{
-	  left -= (bufel->msg.size - bufel->mark);
-	  remove_front (buf);
-	}
+        {
+          left -= (bufel->msg.size - bufel->mark);
+          remove_front (buf);
+        }
       else
-	{
-	  bufel->mark += left;
-	  buf->byte_length -= left;
-	  left = 0;
-	}
+        {
+          bufel->mark += left;
+          buf->byte_length -= left;
+          left = 0;
+        }
     }
 
   return 0;

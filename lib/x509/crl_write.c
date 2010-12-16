@@ -97,8 +97,8 @@ gnutls_x509_crl_set_version (gnutls_x509_crl_t crl, unsigned int version)
  **/
 int
 gnutls_x509_crl_sign2 (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
-		       gnutls_x509_privkey_t issuer_key,
-		       gnutls_digest_algorithm_t dig, unsigned int flags)
+                       gnutls_x509_privkey_t issuer_key,
+                       gnutls_digest_algorithm_t dig, unsigned int flags)
 {
   int result;
   gnutls_privkey_t privkey;
@@ -152,7 +152,7 @@ fail:
  **/
 int
 gnutls_x509_crl_sign (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
-		      gnutls_x509_privkey_t issuer_key)
+                      gnutls_x509_privkey_t issuer_key)
 {
   return gnutls_x509_crl_sign2 (crl, issuer, issuer_key, GNUTLS_DIG_SHA1, 0);
 }
@@ -214,8 +214,8 @@ gnutls_x509_crl_set_next_update (gnutls_x509_crl_t crl, time_t exp_time)
  **/
 int
 gnutls_x509_crl_set_crt_serial (gnutls_x509_crl_t crl,
-				const void *serial, size_t serial_size,
-				time_t revocation_time)
+                                const void *serial, size_t serial_size,
+                                time_t revocation_time)
 {
   int ret;
 
@@ -235,8 +235,8 @@ gnutls_x509_crl_set_crt_serial (gnutls_x509_crl_t crl,
 
   ret =
     asn1_write_value (crl->crl,
-		      "tbsCertList.revokedCertificates.?LAST.userCertificate",
-		      serial, serial_size);
+                      "tbsCertList.revokedCertificates.?LAST.userCertificate",
+                      serial, serial_size);
   if (ret != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -245,8 +245,8 @@ gnutls_x509_crl_set_crt_serial (gnutls_x509_crl_t crl,
 
   ret =
     _gnutls_x509_set_time (crl->crl,
-			   "tbsCertList.revokedCertificates.?LAST.revocationDate",
-			   revocation_time);
+                           "tbsCertList.revokedCertificates.?LAST.revocationDate",
+                           revocation_time);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -255,8 +255,8 @@ gnutls_x509_crl_set_crt_serial (gnutls_x509_crl_t crl,
 
   ret =
     asn1_write_value (crl->crl,
-		      "tbsCertList.revokedCertificates.?LAST.crlEntryExtensions",
-		      NULL, 0);
+                      "tbsCertList.revokedCertificates.?LAST.crlEntryExtensions",
+                      NULL, 0);
   if (ret != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -279,7 +279,7 @@ gnutls_x509_crl_set_crt_serial (gnutls_x509_crl_t crl,
  **/
 int
 gnutls_x509_crl_set_crt (gnutls_x509_crl_t crl, gnutls_x509_crt_t crt,
-			 time_t revocation_time)
+                         time_t revocation_time)
 {
   int ret;
   opaque serial[128];
@@ -301,7 +301,7 @@ gnutls_x509_crl_set_crt (gnutls_x509_crl_t crl, gnutls_x509_crt_t crt,
 
   ret =
     gnutls_x509_crl_set_crt_serial (crl, serial, serial_size,
-				    revocation_time);
+                                    revocation_time);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -343,7 +343,7 @@ disable_optional_stuff (gnutls_x509_crl_t crl)
  **/
 int
 gnutls_x509_crl_set_authority_key_id (gnutls_x509_crl_t crl,
-				      const void *id, size_t id_size)
+                                      const void *id, size_t id_size)
 {
   int result;
   gnutls_datum_t old_id, der_data;
@@ -407,7 +407,7 @@ gnutls_x509_crl_set_authority_key_id (gnutls_x509_crl_t crl,
  **/
 int
 gnutls_x509_crl_set_number (gnutls_x509_crl_t crl,
-			    const void *nr, size_t nr_size)
+                            const void *nr, size_t nr_size)
 {
   int result;
   gnutls_datum_t old_id, der_data;
@@ -475,9 +475,9 @@ gnutls_x509_crl_set_number (gnutls_x509_crl_t crl,
  **/
 int
 gnutls_x509_crl_privkey_sign (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
-			      gnutls_privkey_t issuer_key,
-			      gnutls_digest_algorithm_t dig,
-			      unsigned int flags)
+                              gnutls_privkey_t issuer_key,
+                              gnutls_digest_algorithm_t dig,
+                              unsigned int flags)
 {
   int result;
 
@@ -492,7 +492,7 @@ gnutls_x509_crl_privkey_sign (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
   disable_optional_stuff (crl);
 
   result = _gnutls_x509_pkix_sign (crl->crl, "tbsCertList",
-				   dig, issuer, issuer_key);
+                                   dig, issuer, issuer_key);
   if (result < 0)
     {
       gnutls_assert ();

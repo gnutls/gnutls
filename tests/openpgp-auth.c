@@ -127,32 +127,32 @@ doit ()
       ssize_t sent;
 
       if (debug)
-	printf ("client process %i\n", getpid ());
+        printf ("client process %i\n", getpid ());
 
       err = gnutls_init (&session, GNUTLS_CLIENT);
       if (err != 0)
-	fail ("client session %d\n", err);
+        fail ("client session %d\n", err);
 
       gnutls_set_default_priority (session);
       gnutls_transport_set_ptr (session,
-				(gnutls_transport_ptr_t) (intptr_t)
-				sockets[0]);
+                                (gnutls_transport_ptr_t) (intptr_t)
+                                sockets[0]);
 
       err = gnutls_certificate_allocate_credentials (&cred);
       if (err != 0)
-	fail ("client credentials %d\n", err);
+        fail ("client credentials %d\n", err);
 
       err =
-	gnutls_certificate_set_openpgp_key_file2 (cred,
-						  pub_key_path, priv_key_path,
-						  key_id,
-						  GNUTLS_OPENPGP_FMT_BASE64);
+        gnutls_certificate_set_openpgp_key_file2 (cred,
+                                                  pub_key_path, priv_key_path,
+                                                  key_id,
+                                                  GNUTLS_OPENPGP_FMT_BASE64);
       if (err != 0)
-	fail ("client openpgp keys %d\n", err);
+        fail ("client openpgp keys %d\n", err);
 
       err = gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, cred);
       if (err != 0)
-	fail ("client credential_set %d\n", err);
+        fail ("client credential_set %d\n", err);
 
       gnutls_protocol_set_priority (session, protocols);
       gnutls_certificate_type_set_priority (session, cert_types);
@@ -163,21 +163,21 @@ doit ()
 
       err = gnutls_handshake (session);
       if (err != 0)
-	fail ("client handshake %d\n", err);
+        fail ("client handshake %d\n", err);
       else if (debug)
-	printf ("client handshake successful\n");
+        printf ("client handshake successful\n");
 
       sent = gnutls_record_send (session, message, sizeof (message));
       if (sent != sizeof (message))
-	fail ("client sent %li vs. %li\n",
-	      (long) sent, (long) sizeof (message));
+        fail ("client sent %li vs. %li\n",
+              (long) sent, (long) sizeof (message));
 
       err = gnutls_bye (session, GNUTLS_SHUT_RDWR);
       if (err != 0)
-	fail ("client bye %d\n", err);
+        fail ("client bye %d\n", err);
 
       if (debug)
-	printf ("client done\n");
+        printf ("client done\n");
     }
   else
     {
@@ -195,60 +195,60 @@ doit ()
       const gnutls_datum_t p3 = { (char *) pkcs3, strlen (pkcs3) };
 
       if (debug)
-	printf ("server process %i (child %i)\n", getpid (), child);
+        printf ("server process %i (child %i)\n", getpid (), child);
 
       err = gnutls_init (&session, GNUTLS_SERVER);
       if (err != 0)
-	fail ("server session %d\n", err);
+        fail ("server session %d\n", err);
 
       gnutls_set_default_priority (session);
       gnutls_transport_set_ptr (session,
-				(gnutls_transport_ptr_t) (intptr_t)
-				sockets[1]);
+                                (gnutls_transport_ptr_t) (intptr_t)
+                                sockets[1]);
 
       err = gnutls_certificate_allocate_credentials (&cred);
       if (err != 0)
-	fail ("server credentials %d\n", err);
+        fail ("server credentials %d\n", err);
 
       err =
-	gnutls_certificate_set_openpgp_key_file2 (cred,
-						  pub_key_path, priv_key_path,
-						  key_id,
-						  GNUTLS_OPENPGP_FMT_BASE64);
+        gnutls_certificate_set_openpgp_key_file2 (cred,
+                                                  pub_key_path, priv_key_path,
+                                                  key_id,
+                                                  GNUTLS_OPENPGP_FMT_BASE64);
       if (err != 0)
-	fail ("server openpgp keys %d\n", err);
+        fail ("server openpgp keys %d\n", err);
 
       err = gnutls_dh_params_init (&dh_params);
       if (err)
-	fail ("server DH params init %d\n", err);
+        fail ("server DH params init %d\n", err);
 
       err =
-	gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
+        gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
       if (err)
-	fail ("server DH params generate %d\n", err);
+        fail ("server DH params generate %d\n", err);
 
       gnutls_certificate_set_dh_params (cred, dh_params);
 
       rsa_data.data =
-	(unsigned char *) read_binary_file (rsa_params_path, &rsa_size);
+        (unsigned char *) read_binary_file (rsa_params_path, &rsa_size);
       if (rsa_data.data == NULL)
-	fail ("server rsa params error\n");
+        fail ("server rsa params error\n");
       rsa_data.size = rsa_size;
 
       err = gnutls_rsa_params_init (&rsa_params);
       if (err)
-	fail ("server RSA params init %d\n", err);
+        fail ("server RSA params init %d\n", err);
 
       err = gnutls_rsa_params_import_pkcs1 (rsa_params, &rsa_data,
-					    GNUTLS_X509_FMT_PEM);
+                                            GNUTLS_X509_FMT_PEM);
       if (err)
-	fail ("server RSA params import %d\n", err);
+        fail ("server RSA params import %d\n", err);
 
       gnutls_certificate_set_rsa_export_params (cred, rsa_params);
 
       err = gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, cred);
       if (err != 0)
-	fail ("server credential_set %d\n", err);
+        fail ("server credential_set %d\n", err);
 
       gnutls_protocol_set_priority (session, protocols);
       gnutls_certificate_type_set_priority (session, cert_types);
@@ -259,36 +259,36 @@ doit ()
 
       err = gnutls_handshake (session);
       if (err != 0)
-	fail ("server handshake %d\n", err);
+        fail ("server handshake %d\n", err);
 
       received = gnutls_record_recv (session, greetings, sizeof (greetings));
       if (received != sizeof (message)
-	  || memcmp (greetings, message, sizeof (message)))
-	fail ("server received %li vs. %li\n",
-	      (long) received, (long) sizeof (message));
+          || memcmp (greetings, message, sizeof (message)))
+        fail ("server received %li vs. %li\n",
+              (long) received, (long) sizeof (message));
 
       err = gnutls_bye (session, GNUTLS_SHUT_RDWR);
       if (err != 0)
-	fail ("server bye %d\n", err);
+        fail ("server bye %d\n", err);
 
       if (debug)
-	printf ("server done\n");
+        printf ("server done\n");
 
       done = wait (&status);
       if (done < 0)
-	fail ("wait %s\n", strerror (errno));
+        fail ("wait %s\n", strerror (errno));
 
       if (done != child)
-	fail ("who's that?! %d\n", done);
+        fail ("who's that?! %d\n", done);
 
       if (WIFEXITED (status))
-	{
-	  if (WEXITSTATUS (status) != 0)
-	    fail ("child exited with status %d\n", WEXITSTATUS (status));
-	}
+        {
+          if (WEXITSTATUS (status) != 0)
+            fail ("child exited with status %d\n", WEXITSTATUS (status));
+        }
       else if (WIFSIGNALED (status))
-	fail ("child stopped by signal %d\n", WTERMSIG (status));
+        fail ("child stopped by signal %d\n", WTERMSIG (status));
       else
-	fail ("child failed: %d\n", status);
+        fail ("child failed: %d\n", status);
     }
 }

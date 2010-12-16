@@ -43,8 +43,8 @@
  **/
 int
 gnutls_pkcs11_copy_x509_crt (const char *token_url,
-			     gnutls_x509_crt_t crt, const char *label,
-			     unsigned int flags)
+                             gnutls_x509_crt_t crt, const char *label,
+                             unsigned int flags)
 {
   int ret;
   pakchois_session_t *pks;
@@ -69,7 +69,7 @@ gnutls_pkcs11_copy_x509_crt (const char *token_url,
 
   ret =
     pkcs11_open_session (&pks, &info,
-			 SESSION_WRITE | pkcs11_obj_flags_to_int (flags));
+                         SESSION_WRITE | pkcs11_obj_flags_to_int (flags));
   if (ret < 0)
     {
       gnutls_assert ();
@@ -181,9 +181,9 @@ cleanup:
  **/
 int
 gnutls_pkcs11_copy_x509_privkey (const char *token_url,
-				 gnutls_x509_privkey_t key,
-				 const char *label,
-				 unsigned int key_usage, unsigned int flags)
+                                 gnutls_x509_privkey_t key,
+                                 const char *label,
+                                 unsigned int key_usage, unsigned int flags)
 {
   int ret;
   pakchois_session_t *pks;
@@ -219,7 +219,7 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
 
   ret =
     pkcs11_open_session (&pks, &info,
-			 SESSION_WRITE | pkcs11_obj_flags_to_int (flags));
+                         SESSION_WRITE | pkcs11_obj_flags_to_int (flags));
   if (ret < 0)
     {
       gnutls_assert ();
@@ -269,92 +269,92 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
     case GNUTLS_PK_RSA:
       {
 
-	ret =
-	  gnutls_x509_privkey_export_rsa_raw2 (key, &m,
-					       &e, &d, &p,
-					       &q, &u, &exp1, &exp2);
-	if (ret < 0)
-	  {
-	    gnutls_assert ();
-	    goto cleanup;
-	  }
+        ret =
+          gnutls_x509_privkey_export_rsa_raw2 (key, &m,
+                                               &e, &d, &p,
+                                               &q, &u, &exp1, &exp2);
+        if (ret < 0)
+          {
+            gnutls_assert ();
+            goto cleanup;
+          }
 
-	type = CKK_RSA;
+        type = CKK_RSA;
 
-	a[a_val].type = CKA_MODULUS;
-	a[a_val].value = m.data;
-	a[a_val].value_len = m.size;
-	a_val++;
+        a[a_val].type = CKA_MODULUS;
+        a[a_val].value = m.data;
+        a[a_val].value_len = m.size;
+        a_val++;
 
-	a[a_val].type = CKA_PUBLIC_EXPONENT;
-	a[a_val].value = e.data;
-	a[a_val].value_len = e.size;
-	a_val++;
+        a[a_val].type = CKA_PUBLIC_EXPONENT;
+        a[a_val].value = e.data;
+        a[a_val].value_len = e.size;
+        a_val++;
 
-	a[a_val].type = CKA_PRIVATE_EXPONENT;
-	a[a_val].value = d.data;
-	a[a_val].value_len = d.size;
-	a_val++;
+        a[a_val].type = CKA_PRIVATE_EXPONENT;
+        a[a_val].value = d.data;
+        a[a_val].value_len = d.size;
+        a_val++;
 
-	a[a_val].type = CKA_PRIME_1;
-	a[a_val].value = p.data;
-	a[a_val].value_len = p.size;
-	a_val++;
+        a[a_val].type = CKA_PRIME_1;
+        a[a_val].value = p.data;
+        a[a_val].value_len = p.size;
+        a_val++;
 
-	a[a_val].type = CKA_PRIME_2;
-	a[a_val].value = q.data;
-	a[a_val].value_len = q.size;
-	a_val++;
+        a[a_val].type = CKA_PRIME_2;
+        a[a_val].value = q.data;
+        a[a_val].value_len = q.size;
+        a_val++;
 
-	a[a_val].type = CKA_COEFFICIENT;
-	a[a_val].value = u.data;
-	a[a_val].value_len = u.size;
-	a_val++;
+        a[a_val].type = CKA_COEFFICIENT;
+        a[a_val].value = u.data;
+        a[a_val].value_len = u.size;
+        a_val++;
 
-	a[a_val].type = CKA_EXPONENT_1;
-	a[a_val].value = exp1.data;
-	a[a_val].value_len = exp1.size;
-	a_val++;
+        a[a_val].type = CKA_EXPONENT_1;
+        a[a_val].value = exp1.data;
+        a[a_val].value_len = exp1.size;
+        a_val++;
 
-	a[a_val].type = CKA_EXPONENT_2;
-	a[a_val].value = exp2.data;
-	a[a_val].value_len = exp2.size;
-	a_val++;
+        a[a_val].type = CKA_EXPONENT_2;
+        a[a_val].value = exp2.data;
+        a[a_val].value_len = exp2.size;
+        a_val++;
 
-	break;
+        break;
       }
     case GNUTLS_PK_DSA:
       {
-	ret = gnutls_x509_privkey_export_dsa_raw (key, &p, &q, &g, &y, &x);
-	if (ret < 0)
-	  {
-	    gnutls_assert ();
-	    goto cleanup;
-	  }
+        ret = gnutls_x509_privkey_export_dsa_raw (key, &p, &q, &g, &y, &x);
+        if (ret < 0)
+          {
+            gnutls_assert ();
+            goto cleanup;
+          }
 
-	type = CKK_DSA;
+        type = CKK_DSA;
 
-	a[a_val].type = CKA_PRIME;
-	a[a_val].value = p.data;
-	a[a_val].value_len = p.size;
-	a_val++;
+        a[a_val].type = CKA_PRIME;
+        a[a_val].value = p.data;
+        a[a_val].value_len = p.size;
+        a_val++;
 
-	a[a_val].type = CKA_SUBPRIME;
-	a[a_val].value = q.data;
-	a[a_val].value_len = q.size;
-	a_val++;
+        a[a_val].type = CKA_SUBPRIME;
+        a[a_val].value = q.data;
+        a[a_val].value_len = q.size;
+        a_val++;
 
-	a[a_val].type = CKA_BASE;
-	a[a_val].value = g.data;
-	a[a_val].value_len = g.size;
-	a_val++;
+        a[a_val].type = CKA_BASE;
+        a[a_val].value = g.data;
+        a[a_val].value_len = g.size;
+        a_val++;
 
-	a[a_val].type = CKA_VALUE;
-	a[a_val].value = x.data;
-	a[a_val].value_len = x.size;
-	a_val++;
+        a[a_val].type = CKA_VALUE;
+        a[a_val].value = x.data;
+        a[a_val].value_len = x.size;
+        a_val++;
 
-	break;
+        break;
       }
     default:
       gnutls_assert ();
@@ -378,24 +378,24 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
     {
     case GNUTLS_PK_RSA:
       {
-	gnutls_free (m.data);
-	gnutls_free (e.data);
-	gnutls_free (d.data);
-	gnutls_free (p.data);
-	gnutls_free (q.data);
-	gnutls_free (u.data);
-	gnutls_free (exp1.data);
-	gnutls_free (exp2.data);
-	break;
+        gnutls_free (m.data);
+        gnutls_free (e.data);
+        gnutls_free (d.data);
+        gnutls_free (p.data);
+        gnutls_free (q.data);
+        gnutls_free (u.data);
+        gnutls_free (exp1.data);
+        gnutls_free (exp2.data);
+        break;
       }
     case GNUTLS_PK_DSA:
       {
-	gnutls_free (p.data);
-	gnutls_free (q.data);
-	gnutls_free (g.data);
-	gnutls_free (y.data);
-	gnutls_free (x.data);
-	break;
+        gnutls_free (p.data);
+        gnutls_free (q.data);
+        gnutls_free (g.data);
+        gnutls_free (y.data);
+        gnutls_free (x.data);
+        break;
       }
     default:
       gnutls_assert ();
@@ -415,13 +415,13 @@ cleanup:
 struct delete_data_st
 {
   struct pkcs11_url_info info;
-  unsigned int deleted;		/* how many */
+  unsigned int deleted;         /* how many */
 };
 
 static int
 delete_obj_url (pakchois_session_t * pks,
-		struct token_info *info,
-		struct ck_info *lib_info, void *input)
+                struct token_info *info,
+                struct ck_info *lib_info, void *input)
 {
   struct delete_data_st *find_data = input;
   struct ck_attribute a[4];
@@ -434,7 +434,7 @@ delete_obj_url (pakchois_session_t * pks,
 
 
   if (info == NULL)
-    {				/* we don't support multiple calls */
+    {                           /* we don't support multiple calls */
       gnutls_assert ();
       return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
     }
@@ -448,19 +448,19 @@ delete_obj_url (pakchois_session_t * pks,
       return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
     }
 
-  class = CKO_CERTIFICATE;	/* default  */
+  class = CKO_CERTIFICATE;      /* default  */
 
   if (find_data->info.type[0] != 0)
     {
       class = pkcs11_strtype_to_class (find_data->info.type);
       if (class == CKO_CERTIFICATE)
-	type = CKC_X_509;
+        type = CKC_X_509;
 
       if (class == -1)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INVALID_REQUEST;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INVALID_REQUEST;
+        }
     }
 
   a_vals = 0;
@@ -511,14 +511,14 @@ delete_obj_url (pakchois_session_t * pks,
     {
       rv = pakchois_destroy_object (pks, obj);
       if (rv != CKR_OK)
-	{
-	  _gnutls_debug_log
-	    ("pkcs11: Cannot destroy object: %s\n", pakchois_error (rv));
-	}
+        {
+          _gnutls_debug_log
+            ("pkcs11: Cannot destroy object: %s\n", pakchois_error (rv));
+        }
       else
-	{
-	  find_data->deleted++;
-	}
+        {
+          find_data->deleted++;
+        }
 
       found = 1;
     }
@@ -567,7 +567,7 @@ gnutls_pkcs11_delete_url (const char *object_url, unsigned int flags)
 
   ret =
     _pkcs11_traverse_tokens (delete_obj_url, &find_data,
-			     SESSION_WRITE | pkcs11_obj_flags_to_int (flags));
+                             SESSION_WRITE | pkcs11_obj_flags_to_int (flags));
   if (ret < 0)
     {
       gnutls_assert ();
@@ -593,7 +593,7 @@ gnutls_pkcs11_delete_url (const char *object_url, unsigned int flags)
  **/
 int
 gnutls_pkcs11_token_init (const char *token_url,
-			  const char *so_pin, const char *label)
+                          const char *so_pin, const char *label)
 {
   int ret;
   struct pkcs11_url_info info;
@@ -623,7 +623,7 @@ gnutls_pkcs11_token_init (const char *token_url,
 
   rv =
     pakchois_init_token (module, slot, (char *) so_pin, strlen (so_pin),
-			 flabel);
+                         flabel);
   if (rv != CKR_OK)
     {
       gnutls_assert ();
@@ -651,8 +651,8 @@ gnutls_pkcs11_token_init (const char *token_url,
  **/
 int
 gnutls_pkcs11_token_set_pin (const char *token_url,
-			     const char *oldpin,
-			     const char *newpin, unsigned int flags)
+                             const char *oldpin,
+                             const char *newpin, unsigned int flags)
 {
   int ret;
   pakchois_session_t *pks;
@@ -684,25 +684,25 @@ gnutls_pkcs11_token_set_pin (const char *token_url,
     {
       rv = pakchois_init_pin (pks, (char *) newpin, strlen (newpin));
       if (rv != CKR_OK)
-	{
-	  gnutls_assert ();
-	  _gnutls_debug_log ("pkcs11: %s\n", pakchois_error (rv));
-	  ret = pkcs11_rv_to_err (rv);
-	  goto finish;
-	}
+        {
+          gnutls_assert ();
+          _gnutls_debug_log ("pkcs11: %s\n", pakchois_error (rv));
+          ret = pkcs11_rv_to_err (rv);
+          goto finish;
+        }
     }
   else
     {
       rv = pakchois_set_pin (pks,
-			     (char *) oldpin, strlen (oldpin),
-			     (char *) newpin, strlen (newpin));
+                             (char *) oldpin, strlen (oldpin),
+                             (char *) newpin, strlen (newpin));
       if (rv != CKR_OK)
-	{
-	  gnutls_assert ();
-	  _gnutls_debug_log ("pkcs11: %s\n", pakchois_error (rv));
-	  ret = pkcs11_rv_to_err (rv);
-	  goto finish;
-	}
+        {
+          gnutls_assert ();
+          _gnutls_debug_log ("pkcs11: %s\n", pakchois_error (rv));
+          ret = pkcs11_rv_to_err (rv);
+          goto finish;
+        }
     }
 
   ret = 0;

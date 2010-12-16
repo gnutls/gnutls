@@ -78,7 +78,7 @@ cdk_kbnode_release (cdk_kbnode_t node)
     {
       n2 = node->next;
       if (!node->is_cloned)
-	cdk_pkt_release (node->pkt);
+        cdk_pkt_release (node->pkt);
       cdk_free (node);
       node = n2;
     }
@@ -122,7 +122,7 @@ _cdk_kbnode_add (cdk_kbnode_t root, cdk_kbnode_t node)
  **/
 void
 cdk_kbnode_insert (cdk_kbnode_t root, cdk_kbnode_t node,
-		   cdk_packet_type_t pkttype)
+                   cdk_packet_type_t pkttype)
 {
   if (!pkttype)
     {
@@ -134,12 +134,12 @@ cdk_kbnode_insert (cdk_kbnode_t root, cdk_kbnode_t node,
       cdk_kbnode_t n1;
 
       for (n1 = root; n1->next; n1 = n1->next)
-	if (pkttype != n1->next->pkt->pkttype)
-	  {
-	    node->next = n1->next;
-	    n1->next = node;
-	    return;
-	  }
+        if (pkttype != n1->next->pkt->pkttype)
+          {
+            node->next = n1->next;
+            n1->next = node;
+            return;
+          }
       /* No such packet, append */
       node->next = NULL;
       n1->next = node;
@@ -158,14 +158,14 @@ cdk_kbnode_insert (cdk_kbnode_t root, cdk_kbnode_t node,
  **/
 cdk_kbnode_t
 cdk_kbnode_find_prev (cdk_kbnode_t root, cdk_kbnode_t node,
-		      cdk_packet_type_t pkttype)
+                      cdk_packet_type_t pkttype)
 {
   cdk_kbnode_t n1;
 
   for (n1 = NULL; root && root != node; root = root->next)
     {
       if (!pkttype || root->pkt->pkttype == pkttype)
-	n1 = root;
+        n1 = root;
     }
   return n1;
 }
@@ -189,18 +189,18 @@ cdk_kbnode_find_next (cdk_kbnode_t node, cdk_packet_type_t pkttype)
   for (node = node->next; node; node = node->next)
     {
       if (!pkttype)
-	return node;
+        return node;
       else if (pkttype == CDK_PKT_USER_ID &&
-	       (node->pkt->pkttype == CDK_PKT_PUBLIC_KEY ||
-		node->pkt->pkttype == CDK_PKT_SECRET_KEY))
-	return NULL;
+               (node->pkt->pkttype == CDK_PKT_PUBLIC_KEY ||
+                node->pkt->pkttype == CDK_PKT_SECRET_KEY))
+        return NULL;
       else if (pkttype == CDK_PKT_SIGNATURE &&
-	       (node->pkt->pkttype == CDK_PKT_USER_ID ||
-		node->pkt->pkttype == CDK_PKT_PUBLIC_KEY ||
-		node->pkt->pkttype == CDK_PKT_SECRET_KEY))
-	return NULL;
+               (node->pkt->pkttype == CDK_PKT_USER_ID ||
+                node->pkt->pkttype == CDK_PKT_PUBLIC_KEY ||
+                node->pkt->pkttype == CDK_PKT_SECRET_KEY))
+        return NULL;
       else if (node->pkt->pkttype == pkttype)
-	return node;
+        return node;
     }
   return NULL;
 }
@@ -219,7 +219,7 @@ cdk_kbnode_find (cdk_kbnode_t node, cdk_packet_type_t pkttype)
   for (; node; node = node->next)
     {
       if (node->pkt->pkttype == pkttype)
-	return node;
+        return node;
     }
   return NULL;
 }
@@ -258,15 +258,15 @@ cdk_kbnode_walk (cdk_kbnode_t root, cdk_kbnode_t * ctx, int all)
   do
     {
       if (!*ctx)
-	{
-	  *ctx = root;
-	  n = root;
-	}
+        {
+          *ctx = root;
+          n = root;
+        }
       else
-	{
-	  n = (*ctx)->next;
-	  *ctx = n;
-	}
+        {
+          n = (*ctx)->next;
+          *ctx = n;
+        }
     }
   while (!all && n && n->is_deleted);
   return n;
@@ -292,18 +292,18 @@ cdk_kbnode_commit (cdk_kbnode_t * root)
   for (n = *root, nl = NULL; n; n = nl->next)
     {
       if (n->is_deleted)
-	{
-	  if (n == *root)
-	    *root = nl = n->next;
-	  else
-	    nl->next = n->next;
-	  if (!n->is_cloned)
-	    cdk_pkt_release (n->pkt);
-	  cdk_free (n);
-	  changed = 1;
-	}
+        {
+          if (n == *root)
+            *root = nl = n->next;
+          else
+            nl->next = n->next;
+          if (!n->is_cloned)
+            cdk_pkt_release (n->pkt);
+          cdk_free (n);
+          changed = 1;
+        }
       else
-	nl = n;
+        nl = n;
     }
   return changed;
 }
@@ -324,17 +324,17 @@ cdk_kbnode_remove (cdk_kbnode_t * root, cdk_kbnode_t node)
   for (n = *root, nl = NULL; n; n = nl->next)
     {
       if (n == node)
-	{
-	  if (n == *root)
-	    *root = nl = n->next;
-	  else
-	    nl->next = n->next;
-	  if (!n->is_cloned)
-	    cdk_pkt_release (n->pkt);
-	  cdk_free (n);
-	}
+        {
+          if (n == *root)
+            *root = nl = n->next;
+          else
+            nl->next = n->next;
+          if (!n->is_cloned)
+            cdk_pkt_release (n->pkt);
+          cdk_free (n);
+        }
       else
-	nl = n;
+        nl = n;
     }
 }
 
@@ -358,18 +358,18 @@ cdk_kbnode_move (cdk_kbnode_t * root, cdk_kbnode_t node, cdk_kbnode_t where)
   for (prev = *root; prev && prev->next != node; prev = prev->next)
     ;
   if (!prev)
-    return;			/* Node is not in the list */
+    return;                     /* Node is not in the list */
 
   if (!where)
-    {				/* Move node before root */
+    {                           /* Move node before root */
       if (node == *root)
-	return;
+        return;
       prev->next = node->next;
       node->next = *root;
       *root = node;
       return;
     }
-  if (node == where)		/* Move it after where. */
+  if (node == where)            /* Move it after where. */
     return;
   tmp = node->next;
   node->next = where->next;
@@ -405,7 +405,7 @@ cdk_kbnode_get_packet (cdk_kbnode_t node)
  **/
 cdk_error_t
 cdk_kbnode_read_from_mem (cdk_kbnode_t * ret_node,
-			  const byte * buf, size_t buflen)
+                          const byte * buf, size_t buflen)
 {
   cdk_stream_t inp;
   cdk_error_t rc;
@@ -439,7 +439,7 @@ cdk_kbnode_read_from_mem (cdk_kbnode_t * ret_node,
  */
 cdk_error_t
 cdk_kbnode_write_to_mem_alloc (cdk_kbnode_t node,
-			       byte ** r_buf, size_t * r_buflen)
+                               byte ** r_buf, size_t * r_buflen)
 {
   cdk_kbnode_t n;
   cdk_stream_t s;
@@ -466,20 +466,20 @@ cdk_kbnode_write_to_mem_alloc (cdk_kbnode_t node,
     {
       /* Skip all packets which cannot occur in a key composition. */
       if (n->pkt->pkttype != CDK_PKT_PUBLIC_KEY &&
-	  n->pkt->pkttype != CDK_PKT_PUBLIC_SUBKEY &&
-	  n->pkt->pkttype != CDK_PKT_SECRET_KEY &&
-	  n->pkt->pkttype != CDK_PKT_SECRET_SUBKEY &&
-	  n->pkt->pkttype != CDK_PKT_SIGNATURE &&
-	  n->pkt->pkttype != CDK_PKT_USER_ID &&
-	  n->pkt->pkttype != CDK_PKT_ATTRIBUTE)
-	continue;
+          n->pkt->pkttype != CDK_PKT_PUBLIC_SUBKEY &&
+          n->pkt->pkttype != CDK_PKT_SECRET_KEY &&
+          n->pkt->pkttype != CDK_PKT_SECRET_SUBKEY &&
+          n->pkt->pkttype != CDK_PKT_SIGNATURE &&
+          n->pkt->pkttype != CDK_PKT_USER_ID &&
+          n->pkt->pkttype != CDK_PKT_ATTRIBUTE)
+        continue;
       rc = cdk_pkt_write (s, n->pkt);
       if (rc)
-	{
-	  cdk_stream_close (s);
-	  gnutls_assert ();
-	  return rc;
-	}
+        {
+          cdk_stream_close (s);
+          gnutls_assert ();
+          return rc;
+        }
     }
 
   cdk_stream_seek (s, 0);
@@ -527,27 +527,27 @@ cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte * buf, size_t * r_nbytes)
     {
       /* Skip all packets which cannot occur in a key composition. */
       if (n->pkt->pkttype != CDK_PKT_PUBLIC_KEY &&
-	  n->pkt->pkttype != CDK_PKT_PUBLIC_SUBKEY &&
-	  n->pkt->pkttype != CDK_PKT_SECRET_KEY &&
-	  n->pkt->pkttype != CDK_PKT_SECRET_SUBKEY &&
-	  n->pkt->pkttype != CDK_PKT_SIGNATURE &&
-	  n->pkt->pkttype != CDK_PKT_USER_ID &&
-	  n->pkt->pkttype != CDK_PKT_ATTRIBUTE)
-	continue;
+          n->pkt->pkttype != CDK_PKT_PUBLIC_SUBKEY &&
+          n->pkt->pkttype != CDK_PKT_SECRET_KEY &&
+          n->pkt->pkttype != CDK_PKT_SECRET_SUBKEY &&
+          n->pkt->pkttype != CDK_PKT_SIGNATURE &&
+          n->pkt->pkttype != CDK_PKT_USER_ID &&
+          n->pkt->pkttype != CDK_PKT_ATTRIBUTE)
+        continue;
       rc = cdk_pkt_write (s, n->pkt);
       if (rc)
-	{
-	  cdk_stream_close (s);
-	  gnutls_assert ();
-	  return rc;
-	}
+        {
+          cdk_stream_close (s);
+          gnutls_assert ();
+          return rc;
+        }
     }
 
   cdk_stream_seek (s, 0);
   len = cdk_stream_get_length (s);
   if (!buf)
     {
-      *r_nbytes = len;		/* Only return the length of the buffer */
+      *r_nbytes = len;          /* Only return the length of the buffer */
       cdk_stream_close (s);
       return 0;
     }
@@ -580,7 +580,7 @@ cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte * buf, size_t * r_nbytes)
  **/
 cdk_error_t
 cdk_kbnode_hash (cdk_kbnode_t node, digest_hd_st * md, int is_v4,
-		 cdk_packet_type_t pkttype, int flags)
+                 cdk_packet_type_t pkttype, int flags)
 {
   cdk_packet_t pkt;
 
@@ -598,10 +598,10 @@ cdk_kbnode_hash (cdk_kbnode_t node, digest_hd_st * md, int is_v4,
     {
       pkt = cdk_kbnode_find_packet (node, pkttype);
       if (!pkt)
-	{
-	  gnutls_assert ();
-	  return CDK_Inv_Packet;
-	}
+        {
+          gnutls_assert ();
+          return CDK_Inv_Packet;
+        }
     }
 
   switch (pkttype)

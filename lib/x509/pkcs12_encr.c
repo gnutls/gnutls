@@ -41,7 +41,7 @@ _pkcs12_check_pass (const char *pass, size_t plen)
   for (i = 0; i < plen; i++)
     {
       if (isascii (p[i]))
-	continue;
+        continue;
       return GNUTLS_E_INVALID_PASSWORD;
     }
 
@@ -55,9 +55,9 @@ _pkcs12_check_pass (const char *pass, size_t plen)
  */
 int
 _gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
-			      unsigned int salt_size, unsigned int iter,
-			      const char *pw, unsigned int req_keylen,
-			      opaque * keybuf)
+                              unsigned int salt_size, unsigned int iter,
+                              const char *pw, unsigned int req_keylen,
+                              opaque * keybuf)
 {
   int rc;
   unsigned int i, j;
@@ -68,7 +68,7 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
   opaque hash[20], buf_b[64], buf_i[128], *p;
   size_t cur_keylen;
   size_t n, m;
-  const opaque buf_512[] =	/* 2^64 */
+  const opaque buf_512[] =      /* 2^64 */
   { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -110,12 +110,12 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
   if (pw)
     {
       for (i = j = 0; i < 64; i += 2)
-	{
-	  *p++ = 0;
-	  *p++ = pw[j];
-	  if (++j > pwlen)	/* Note, that we include the trailing zero */
-	    j = 0;
-	}
+        {
+          *p++ = 0;
+          *p++ = pw[j];
+          if (++j > pwlen)      /* Note, that we include the trailing zero */
+            j = 0;
+        }
     }
   else
     memset (p, 0, 64);
@@ -124,72 +124,72 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
     {
       rc = _gnutls_hash_init (&md, GNUTLS_MAC_SHA1);
       if (rc < 0)
-	{
-	  gnutls_assert ();
-	  goto cleanup;
-	}
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
       for (i = 0; i < 64; i++)
-	{
-	  unsigned char lid = id & 0xFF;
-	  _gnutls_hash (&md, &lid, 1);
-	}
+        {
+          unsigned char lid = id & 0xFF;
+          _gnutls_hash (&md, &lid, 1);
+        }
       _gnutls_hash (&md, buf_i, pw ? 128 : 64);
       _gnutls_hash_deinit (&md, hash);
       for (i = 1; i < iter; i++)
-	{
-	  rc = _gnutls_hash_init (&md, GNUTLS_MAC_SHA1);
-	  if (rc < 0)
-	    {
-	      gnutls_assert ();
-	      goto cleanup;
-	    }
-	  _gnutls_hash (&md, hash, 20);
-	  _gnutls_hash_deinit (&md, hash);
-	}
+        {
+          rc = _gnutls_hash_init (&md, GNUTLS_MAC_SHA1);
+          if (rc < 0)
+            {
+              gnutls_assert ();
+              goto cleanup;
+            }
+          _gnutls_hash (&md, hash, 20);
+          _gnutls_hash_deinit (&md, hash);
+        }
       for (i = 0; i < 20 && cur_keylen < req_keylen; i++)
-	keybuf[cur_keylen++] = hash[i];
+        keybuf[cur_keylen++] = hash[i];
       if (cur_keylen == req_keylen)
-	{
-	  rc = 0;		/* ready */
-	  goto cleanup;
-	}
+        {
+          rc = 0;               /* ready */
+          goto cleanup;
+        }
 
       /* need more bytes. */
       for (i = 0; i < 64; i++)
-	buf_b[i] = hash[i % 20];
+        buf_b[i] = hash[i % 20];
       n = 64;
       rc = _gnutls_mpi_scan (&num_b1, buf_b, n);
       if (rc < 0)
-	{
-	  gnutls_assert ();
-	  goto cleanup;
-	}
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
       _gnutls_mpi_add_ui (num_b1, num_b1, 1);
       for (i = 0; i < 128; i += 64)
-	{
-	  n = 64;
-	  rc = _gnutls_mpi_scan (&num_ij, buf_i + i, n);
-	  if (rc < 0)
-	    {
-	      gnutls_assert ();
-	      goto cleanup;
-	    }
-	  _gnutls_mpi_addm (num_ij, num_ij, num_b1, mpi512);
-	  n = 64;
+        {
+          n = 64;
+          rc = _gnutls_mpi_scan (&num_ij, buf_i + i, n);
+          if (rc < 0)
+            {
+              gnutls_assert ();
+              goto cleanup;
+            }
+          _gnutls_mpi_addm (num_ij, num_ij, num_b1, mpi512);
+          n = 64;
 #ifndef PKCS12_BROKEN_KEYGEN
-	  m = (_gnutls_mpi_get_nbits (num_ij) + 7) / 8;
+          m = (_gnutls_mpi_get_nbits (num_ij) + 7) / 8;
 #else
-	  m = n;
+          m = n;
 #endif
-	  memset (buf_i + i, 0, n - m);
-	  rc = _gnutls_mpi_print (num_ij, buf_i + i + n - m, &n);
-	  if (rc < 0)
-	    {
-	      gnutls_assert ();
-	      goto cleanup;
-	    }
-	  _gnutls_mpi_release (&num_ij);
-	}
+          memset (buf_i + i, 0, n - m);
+          rc = _gnutls_mpi_print (num_ij, buf_i + i + n - m, &n);
+          if (rc < 0)
+            {
+              gnutls_assert ();
+              goto cleanup;
+            }
+          _gnutls_mpi_release (&num_ij);
+        }
     }
 cleanup:
   _gnutls_mpi_release (&num_ij);

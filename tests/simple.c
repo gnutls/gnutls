@@ -52,13 +52,13 @@ doit (void)
 
     for (i = 0; algs[i]; i++)
       {
-	if (debug)
-	  printf ("pk_list[%d] = %d = %s = %d\n", (int) i, algs[i],
-		  gnutls_pk_algorithm_get_name (algs[i]),
-		  gnutls_pk_get_id (gnutls_pk_algorithm_get_name (algs[i])));
-	if (gnutls_pk_get_id (gnutls_pk_algorithm_get_name (algs[i]))
-	    != algs[i])
-	  fail ("gnutls_pk id's doesn't match\n");
+        if (debug)
+          printf ("pk_list[%d] = %d = %s = %d\n", (int) i, algs[i],
+                  gnutls_pk_algorithm_get_name (algs[i]),
+                  gnutls_pk_get_id (gnutls_pk_algorithm_get_name (algs[i])));
+        if (gnutls_pk_get_id (gnutls_pk_algorithm_get_name (algs[i]))
+            != algs[i])
+          fail ("gnutls_pk id's doesn't match\n");
       }
 
     pk = gnutls_pk_get_id ("foo");
@@ -80,14 +80,14 @@ doit (void)
 
     for (i = 0; algs[i]; i++)
       {
-	if (debug)
-	  printf ("sign_list[%d] = %d = %s = %d\n", (int) i, algs[i],
-		  gnutls_sign_algorithm_get_name (algs[i]),
-		  gnutls_sign_get_id (gnutls_sign_algorithm_get_name
-				      (algs[i])));
-	if (gnutls_sign_get_id (gnutls_sign_algorithm_get_name (algs[i])) !=
-	    algs[i])
-	  fail ("gnutls_sign id's doesn't match\n");
+        if (debug)
+          printf ("sign_list[%d] = %d = %s = %d\n", (int) i, algs[i],
+                  gnutls_sign_algorithm_get_name (algs[i]),
+                  gnutls_sign_get_id (gnutls_sign_algorithm_get_name
+                                      (algs[i])));
+        if (gnutls_sign_get_id (gnutls_sign_algorithm_get_name (algs[i])) !=
+            algs[i])
+          fail ("gnutls_sign id's doesn't match\n");
       }
 
     pk = gnutls_sign_get_id ("foo");

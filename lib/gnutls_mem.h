@@ -26,7 +26,7 @@
 #ifndef GNUTLS_MEM_H
 #define GNUTLS_MEM_H
 
-typedef void svoid;		/* for functions that allocate using gnutls_secure_malloc */
+typedef void svoid;             /* for functions that allocate using gnutls_secure_malloc */
 
 extern int (*_gnutls_is_secure_memory) (const void *);
 

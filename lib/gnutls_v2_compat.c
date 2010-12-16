@@ -46,14 +46,14 @@
 /* This selects the best supported ciphersuite from the ones provided */
 static int
 _gnutls_handshake_select_v2_suite (gnutls_session_t session,
-				   opaque * data, int datalen)
+                                   opaque * data, int datalen)
 {
   int i, j, ret;
   opaque *_data;
   int _datalen;
 
   _gnutls_handshake_log ("HSK[%p]: Parsing a version 2.0 client hello.\n",
-			 session);
+                         session);
 
   _data = gnutls_malloc (datalen);
   if (_data == NULL)
@@ -72,11 +72,11 @@ _gnutls_handshake_select_v2_suite (gnutls_session_t session,
   for (j = 0; j < datalen; j += 3)
     {
       if (data[j] == 0)
-	{
-	  memcpy (&_data[i], &data[j + 1], 2);
-	  i += 2;
-	  _datalen += 2;
-	}
+        {
+          memcpy (&_data[i], &data[j + 1], 2);
+          i += 2;
+          _datalen += 2;
+        }
     }
 
   ret = _gnutls_server_select_suite (session, _data, _datalen);
@@ -92,7 +92,7 @@ _gnutls_handshake_select_v2_suite (gnutls_session_t session,
  */
 int
 _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
-			      int datalen)
+                              int datalen)
 {
   uint16_t session_id_len = 0;
   int pos = 0;
@@ -180,7 +180,7 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
   if (_gnutls_get_kx_cred
       (session,
        _gnutls_cipher_suite_get_kx_algo (&session->
-					 security_parameters.current_cipher_suite),
+                                         security_parameters.current_cipher_suite),
        &err) == NULL && err != 0)
     {
       gnutls_assert ();
@@ -193,14 +193,14 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
    */
   session->internals.auth_struct =
     _gnutls_kx_auth_struct (_gnutls_cipher_suite_get_kx_algo
-			    (&session->
-			     security_parameters.current_cipher_suite));
+                            (&session->
+                             security_parameters.current_cipher_suite));
   if (session->internals.auth_struct == NULL)
     {
 
       _gnutls_handshake_log
-	("HSK[%p]: SSL 2.0 Hello: Cannot find the appropriate handler for the KX algorithm\n",
-	 session);
+        ("HSK[%p]: SSL 2.0 Hello: Cannot find the appropriate handler for the KX algorithm\n",
+         session);
 
       gnutls_assert ();
       return GNUTLS_E_INTERNAL_ERROR;
@@ -209,7 +209,7 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
 
 
   /* read random new values -skip session id for now */
-  DECR_LEN (len, session_id_len);	/* skip session id for now */
+  DECR_LEN (len, session_id_len);       /* skip session id for now */
   memcpy (session_id, &data[pos], session_id_len);
   pos += session_id_len;
 
@@ -234,12 +234,12 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
   ret = _gnutls_server_restore_session (session, session_id, session_id_len);
 
   if (ret == 0)
-    {				/* resumed! */
+    {                           /* resumed! */
       /* get the new random values */
       memcpy (session->internals.resumed_security_parameters.server_random,
-	      session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
+              session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
       memcpy (session->internals.resumed_security_parameters.client_random,
-	      session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
+              session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
 
       session->internals.resumed = RESUME_TRUE;
       return 0;
@@ -247,8 +247,8 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
   else
     {
       _gnutls_generate_session_id (session->security_parameters.session_id,
-				   &session->
-				   security_parameters.session_id_size);
+                                   &session->
+                                   security_parameters.session_id_size);
       session->internals.resumed = RESUME_FALSE;
     }
 

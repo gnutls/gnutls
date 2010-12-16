@@ -51,9 +51,9 @@
 #include "gnutls_num.h"
 
 typedef int (*supp_recv_func) (gnutls_session_t session,
-			       const opaque * data, size_t data_size);
+                               const opaque * data, size_t data_size);
 typedef int (*supp_send_func) (gnutls_session_t session,
-			       gnutls_buffer_st * buf);
+                               gnutls_buffer_st * buf);
 
 typedef struct
 {
@@ -123,28 +123,28 @@ _gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer_st * buf)
       /* Make room for supplement type and length byte length field. */
       ret = _gnutls_buffer_append_data (buf, "\0\0\0\0", 4);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       ret = supp_send (session, buf);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       /* If data were added, store type+length, otherwise reset. */
       if (buf->length > sizepos + 4)
-	{
-	  buf->data[sizepos] = 0;
-	  buf->data[sizepos + 1] = p->type;
-	  buf->data[sizepos + 2] = ((buf->length - sizepos - 4) >> 8) & 0xFF;
-	  buf->data[sizepos + 3] = (buf->length - sizepos - 4) & 0xFF;
-	}
+        {
+          buf->data[sizepos] = 0;
+          buf->data[sizepos + 1] = p->type;
+          buf->data[sizepos + 2] = ((buf->length - sizepos - 4) >> 8) & 0xFF;
+          buf->data[sizepos + 3] = (buf->length - sizepos - 4) & 0xFF;
+        }
       else
-	buf->length -= 4;
+        buf->length -= 4;
     }
 
   buf->data[0] = ((buf->length - 3) >> 16) & 0xFF;
@@ -152,14 +152,14 @@ _gnutls_gen_supplemental (gnutls_session_t session, gnutls_buffer_st * buf)
   buf->data[2] = (buf->length - 3) & 0xFF;
 
   _gnutls_debug_log ("EXT[%p]: Sending %d bytes of supplemental data\n",
-		     session, (int) buf->length);
+                     session, (int) buf->length);
 
   return buf->length;
 }
 
 int
 _gnutls_parse_supplemental (gnutls_session_t session,
-			    const uint8_t * data, int datalen)
+                            const uint8_t * data, int datalen)
 {
   const opaque *p = data;
   ssize_t dsize = datalen;
@@ -190,23 +190,23 @@ _gnutls_parse_supplemental (gnutls_session_t session,
       p += 2;
 
       _gnutls_debug_log ("EXT[%p]: Got supplemental type=%02x length=%d\n",
-			 session, supp_data_type, supp_data_length);
+                         session, supp_data_type, supp_data_length);
 
       recv_func = get_supp_func_recv (supp_data_type);
       if (recv_func)
-	{
-	  int ret = recv_func (session, p, supp_data_length);
-	  if (ret < 0)
-	    {
-	      gnutls_assert ();
-	      return ret;
-	    }
-	}
+        {
+          int ret = recv_func (session, p, supp_data_length);
+          if (ret < 0)
+            {
+              gnutls_assert ();
+              return ret;
+            }
+        }
       else
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+        }
 
       DECR_LEN (dsize, supp_data_length);
       p += supp_data_length;

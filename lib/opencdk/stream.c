@@ -48,7 +48,7 @@ static cdk_error_t stream_flush (cdk_stream_t s);
 static cdk_error_t stream_filter_write (cdk_stream_t s);
 static int stream_cache_flush (cdk_stream_t s, FILE * fp);
 struct stream_filter_s *filter_add (cdk_stream_t s, filter_fnct_t fnc,
-				    int type);
+                                    int type);
 
 
 /* FIXME: The read/write/putc/getc function cannot directly
@@ -74,7 +74,7 @@ cdk_stream_open (const char *file, cdk_stream_t * ret_s)
 /* Helper function to allow to open a stream in different modes. */
 cdk_error_t
 _cdk_stream_open_mode (const char *file, const char *mode,
-		       cdk_stream_t * ret_s)
+                       cdk_stream_t * ret_s)
 {
   cdk_stream_t s;
 
@@ -125,7 +125,7 @@ _cdk_stream_open_mode (const char *file, const char *mode,
  */
 cdk_error_t
 cdk_stream_new_from_cbs (cdk_stream_cbs_t cbs, void *opa,
-			 cdk_stream_t * ret_s)
+                         cdk_stream_t * ret_s)
 {
   cdk_stream_t s;
 
@@ -192,11 +192,11 @@ cdk_stream_new (const char *file, cdk_stream_t * ret_s)
     {
       s->fname = cdk_strdup (file);
       if (!s->fname)
-	{
-	  cdk_free (s);
-	  gnutls_assert ();
-	  return CDK_Out_Of_Core;
-	}
+        {
+          cdk_free (s);
+          gnutls_assert ();
+          return CDK_Out_Of_Core;
+        }
     }
   s->fp = _cdk_tmpfile ();
   if (!s->fp)
@@ -410,19 +410,19 @@ cdk_stream_flush (cdk_stream_t s)
   if (!s->flags.filtrated)
     {
       if (!cdk_stream_get_length (s))
-	return 0;
+        return 0;
       rc = cdk_stream_seek (s, 0);
       if (!rc)
-	rc = stream_flush (s);
+        rc = stream_flush (s);
       if (!rc)
-	rc = stream_filter_write (s);
+        rc = stream_filter_write (s);
       s->flags.filtrated = 1;
       if (rc)
-	{
-	  s->error = rc;
-	  gnutls_assert ();
-	  return rc;
-	}
+        {
+          s->error = rc;
+          gnutls_assert ();
+          return rc;
+        }
     }
   return 0;
 }
@@ -460,16 +460,16 @@ cdk_stream_close (cdk_stream_t s)
     }
 
   _gnutls_read_log ("close stream ref=%d `%s'\n",
-		    s->fp_ref, s->fname ? s->fname : "[temp]");
+                    s->fp_ref, s->fname ? s->fname : "[temp]");
 
   /* In the user callback mode, we call the release cb if possible
      and just free the stream. */
   if (s->cbs_hd)
     {
       if (s->cbs.release)
-	rc = s->cbs.release (s->cbs_hd);
+        rc = s->cbs.release (s->cbs_hd);
       else
-	rc = 0;
+        rc = 0;
       cdk_free (s);
       gnutls_assert ();
       return rc;
@@ -487,7 +487,7 @@ cdk_stream_close (cdk_stream_t s)
       err = fclose (s->fp);
       s->fp = NULL;
       if (err)
-	rc = CDK_File_Error;
+        rc = CDK_File_Error;
     }
 
   /* Iterate over the filter list and use the cleanup flag to
@@ -497,7 +497,7 @@ cdk_stream_close (cdk_stream_t s)
     {
       f2 = f->next;
       if (f->fnct)
-	f->fnct (f->opaque, STREAMCTL_FREE, NULL, NULL);
+        f->fnct (f->opaque, STREAMCTL_FREE, NULL, NULL);
       cdk_free (f);
       f = f2;
     }
@@ -627,7 +627,7 @@ filter_search (cdk_stream_t s, filter_fnct_t fnc)
   for (f = s->filters; f; f = f->next)
     {
       if (f->fnct == fnc)
-	return f;
+        return f;
     }
 
   return NULL;
@@ -757,7 +757,7 @@ stream_fp_replace (cdk_stream_t s, FILE ** tmp)
   assert (s);
 
   _gnutls_read_log ("replace stream fd=%d with fd=%d\n",
-		    fileno (s->fp), fileno (*tmp));
+                    fileno (s->fp), fileno (*tmp));
   rc = fclose (s->fp);
   if (rc)
     {
@@ -790,40 +790,40 @@ stream_filter_write (cdk_stream_t s)
   for (f = s->filters; f; f = f->next)
     {
       if (!f->flags.enabled)
-	continue;
+        continue;
       /* if there is no next filter, create the final output file */
       _gnutls_read_log ("filter [write]: last filter=%d fname=%s\n",
-			f->next ? 1 : 0, s->fname);
+                        f->next ? 1 : 0, s->fname);
       if (!f->next && s->fname)
-	f->tmp = fopen (s->fname, "w+b");
+        f->tmp = fopen (s->fname, "w+b");
       else
-	f->tmp = _cdk_tmpfile ();
+        f->tmp = _cdk_tmpfile ();
       if (!f->tmp)
-	{
-	  rc = CDK_File_Error;
-	  break;
-	}
+        {
+          rc = CDK_File_Error;
+          break;
+        }
       /* If there is no next filter, flush the cache. We also do this
          when the next filter is the armor filter because this filter
          is special and before it starts, all data should be written. */
       if ((!f->next || f->next->type == fARMOR) && s->cache.size)
-	{
-	  rc = stream_cache_flush (s, f->tmp);
-	  if (rc)
-	    break;
-	}
+        {
+          rc = stream_cache_flush (s, f->tmp);
+          if (rc)
+            break;
+        }
       rc = f->fnct (f->opaque, f->ctl, s->fp, f->tmp);
       _gnutls_read_log ("filter [write]: type=%d rc=%d\n", f->type, rc);
       if (!rc)
-	rc = stream_fp_replace (s, &f->tmp);
+        rc = stream_fp_replace (s, &f->tmp);
       if (!rc)
-	rc = cdk_stream_seek (s, 0);
+        rc = cdk_stream_seek (s, 0);
       if (rc)
-	{
-	  _gnutls_read_log ("filter [close]: fd=%d\n", fileno (f->tmp));
-	  fclose (f->tmp);
-	  break;
-	}
+        {
+          _gnutls_read_log ("filter [close]: fd=%d\n", fileno (f->tmp));
+          fclose (f->tmp);
+          break;
+        }
     }
   return rc;
 }
@@ -848,46 +848,46 @@ stream_filter_read (cdk_stream_t s)
   for (f = s->filters; f; f = f->next)
     {
       if (!f->flags.enabled)
-	continue;
+        continue;
       if (f->flags.error)
-	{
-	  _gnutls_read_log ("filter %s [read]: has the error flag; skipped\n",
-			    s->fname ? s->fname : "[temp]");
-	  continue;
-	}
+        {
+          _gnutls_read_log ("filter %s [read]: has the error flag; skipped\n",
+                            s->fname ? s->fname : "[temp]");
+          continue;
+        }
 
       f->tmp = _cdk_tmpfile ();
       if (!f->tmp)
-	{
-	  rc = CDK_File_Error;
-	  break;
-	}
+        {
+          rc = CDK_File_Error;
+          break;
+        }
       rc = f->fnct (f->opaque, f->ctl, s->fp, f->tmp);
       _gnutls_read_log ("filter %s [read]: type=%d rc=%d\n",
-			s->fname ? s->fname : "[temp]", f->type, rc);
+                        s->fname ? s->fname : "[temp]", f->type, rc);
       if (rc)
-	{
-	  f->flags.error = 1;
-	  break;
-	}
+        {
+          f->flags.error = 1;
+          break;
+        }
 
       f->flags.error = 0;
       /* If the filter is read-only, do not replace the FP because
          the contents were not altered in any way. */
       if (!f->flags.rdonly)
-	{
-	  rc = stream_fp_replace (s, &f->tmp);
-	  if (rc)
-	    break;
-	}
+        {
+          rc = stream_fp_replace (s, &f->tmp);
+          if (rc)
+            break;
+        }
       else
-	{
-	  fclose (f->tmp);
-	  f->tmp = NULL;
-	}
+        {
+          fclose (f->tmp);
+          f->tmp = NULL;
+        }
       rc = cdk_stream_seek (s, 0);
       if (rc)
-	break;
+        break;
       /* Disable the filter after it was successfully used. The idea
          is the following: let's say the armor filter was pushed and
          later more filters were added. The second time the filter code
@@ -911,7 +911,7 @@ _cdk_stream_get_opaque (cdk_stream_t s, int fid)
   for (f = s->filters; f; f = f->next)
     {
       if ((int) f->type == fid)
-	return f->opaque;
+        return f->opaque;
     }
   return NULL;
 }
@@ -943,7 +943,7 @@ cdk_stream_read (cdk_stream_t s, void *buf, size_t buflen)
   if (s->cbs_hd)
     {
       if (s->cbs.read)
-	return s->cbs.read (s->cbs_hd, buf, buflen);
+        return s->cbs.read (s->cbs_hd, buf, buflen);
       return 0;
     }
 
@@ -951,20 +951,20 @@ cdk_stream_read (cdk_stream_t s, void *buf, size_t buflen)
     {
       s->error = CDK_Inv_Mode;
       gnutls_assert ();
-      return EOF;		/* This is a write stream */
+      return EOF;               /* This is a write stream */
     }
 
   if (!s->flags.no_filter && !s->cache.on && !s->flags.filtrated)
     {
       rc = stream_filter_read (s);
       if (rc)
-	{
-	  s->error = rc;
-	  if (feof (s->fp))
-	    s->flags.eof = 1;
-	  gnutls_assert ();
-	  return EOF;
-	}
+        {
+          s->error = rc;
+          if (feof (s->fp))
+            s->flags.eof = 1;
+          gnutls_assert ();
+          return EOF;
+        }
       s->flags.filtrated = 1;
     }
 
@@ -1031,13 +1031,13 @@ cdk_stream_write (cdk_stream_t s, const void *buf, size_t count)
   if (s->cbs_hd)
     {
       if (s->cbs.write)
-	return s->cbs.write (s->cbs_hd, buf, count);
+        return s->cbs.write (s->cbs_hd, buf, count);
       return 0;
     }
 
   if (!s->flags.write)
     {
-      s->error = CDK_Inv_Mode;	/* this is a read stream */
+      s->error = CDK_Inv_Mode;  /* this is a read stream */
       gnutls_assert ();
       return EOF;
     }
@@ -1051,17 +1051,17 @@ cdk_stream_write (cdk_stream_t s, const void *buf, size_t count)
          fit into it. We allocate more memory to avoid to resize it the
          next time the function is used. */
       if (s->cache.size + count > s->cache.alloced)
-	{
-	  byte *old = s->cache.buf;
+        {
+          byte *old = s->cache.buf;
 
-	  s->cache.buf =
-	    cdk_calloc (1, s->cache.alloced + count + STREAM_BUFSIZE);
-	  s->cache.alloced += (count + STREAM_BUFSIZE);
-	  memcpy (s->cache.buf, old, s->cache.size);
-	  cdk_free (old);
-	  _gnutls_read_log ("stream: enlarge cache to %d octets\n",
-			    (int) s->cache.alloced);
-	}
+          s->cache.buf =
+            cdk_calloc (1, s->cache.alloced + count + STREAM_BUFSIZE);
+          s->cache.alloced += (count + STREAM_BUFSIZE);
+          memcpy (s->cache.buf, old, s->cache.size);
+          cdk_free (old);
+          _gnutls_read_log ("stream: enlarge cache to %d octets\n",
+                            (int) s->cache.alloced);
+        }
       memcpy (s->cache.buf + s->cache.size, buf, count);
       s->cache.size += count;
       return count;
@@ -1114,7 +1114,7 @@ cdk_stream_seek (cdk_stream_t s, off_t offset)
   if (s->cbs_hd)
     {
       if (s->cbs.seek)
-	return s->cbs.seek (s->cbs_hd, offset);
+        return s->cbs.seek (s->cbs_hd, offset);
       return 0;
     }
 
@@ -1192,7 +1192,7 @@ cdk_stream_set_armor_flag (cdk_stream_t s, int armor_type)
  **/
 cdk_error_t
 cdk_stream_set_literal_flag (cdk_stream_t s, cdk_lit_format_t mode,
-			     const char *fname)
+                             const char *fname)
 {
   struct stream_filter_s *f;
   const char *orig_fname;
@@ -1350,7 +1350,7 @@ cdk_stream_enable_cache (cdk_stream_t s, int val)
       s->cache.buf = cdk_calloc (1, STREAM_BUFSIZE);
       s->cache.alloced = STREAM_BUFSIZE;
       _gnutls_read_log ("stream: allocate cache of %d octets\n",
-			STREAM_BUFSIZE);
+                        STREAM_BUFSIZE);
     }
   return 0;
 }
@@ -1368,10 +1368,10 @@ stream_cache_flush (cdk_stream_t s, FILE * fp)
     {
       nwritten = fwrite (s->cache.buf, 1, s->cache.size, fp);
       if (!nwritten)
-	{
-	  gnutls_assert ();
-	  return CDK_File_Error;
-	}
+        {
+          gnutls_assert ();
+          return CDK_File_Error;
+        }
       s->cache.size = 0;
       s->cache.on = 0;
       wipemem (s->cache.buf, s->cache.alloced);
@@ -1405,13 +1405,13 @@ cdk_stream_kick_off (cdk_stream_t inp, cdk_stream_t out)
     {
       nread = cdk_stream_read (inp, buf, DIM (buf));
       if (!nread || nread == EOF)
-	break;
+        break;
       nwritten = cdk_stream_write (out, buf, nread);
       if (!nwritten || nwritten == EOF)
-	{			/* In case of errors, we leave the loop. */
-	  rc = inp->error;
-	  break;
-	}
+        {                       /* In case of errors, we leave the loop. */
+          rc = inp->error;
+          break;
+        }
     }
 
   wipemem (buf, sizeof (buf));
@@ -1432,7 +1432,7 @@ cdk_stream_kick_off (cdk_stream_t inp, cdk_stream_t out)
  **/
 cdk_error_t
 cdk_stream_mmap_part (cdk_stream_t s, off_t off, size_t len,
-		      byte ** ret_buf, size_t * ret_buflen)
+                      byte ** ret_buf, size_t * ret_buflen)
 {
   cdk_error_t rc;
   off_t oldpos;
@@ -1554,10 +1554,10 @@ _cdk_stream_gets (cdk_stream_t s, char *buf, size_t count)
     {
       c = cdk_stream_getc (s);
       if (c == EOF || c == '\r' || c == '\n')
-	{
-	  buf[i++] = '\0';
-	  break;
-	}
+        {
+          buf[i++] = '\0';
+          break;
+        }
       buf[i++] = c;
       count--;
     }
@@ -1580,7 +1580,7 @@ _cdk_stream_set_blockmode (cdk_stream_t s, size_t nbytes)
   assert (s);
 
   _gnutls_read_log ("stream: activate block mode with blocksize %d\n",
-		    (int) nbytes);
+                    (int) nbytes);
   s->blkmode = nbytes;
   return 0;
 }

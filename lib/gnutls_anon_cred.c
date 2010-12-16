@@ -59,7 +59,7 @@ gnutls_anon_free_server_credentials (gnutls_anon_server_credentials_t sc)
  **/
 int
 gnutls_anon_allocate_server_credentials (gnutls_anon_server_credentials_t *
-					 sc)
+                                         sc)
 {
 
   *sc = gnutls_calloc (1, sizeof (anon_server_credentials_st));
@@ -94,7 +94,7 @@ static const gnutls_anon_client_credentials_t anon_dummy = &anon_dummy_struct;
  **/
 int
 gnutls_anon_allocate_client_credentials (gnutls_anon_client_credentials_t *
-					 sc)
+                                         sc)
 {
   /* anon_dummy is only there for *sc not to be null.
    * it is not used at all;
@@ -115,7 +115,7 @@ gnutls_anon_allocate_client_credentials (gnutls_anon_client_credentials_t *
  **/
 void
 gnutls_anon_set_server_dh_params (gnutls_anon_server_credentials_t res,
-				  gnutls_dh_params_t dh_params)
+                                  gnutls_dh_params_t dh_params)
 {
   res->dh_params = dh_params;
 }
@@ -131,7 +131,7 @@ gnutls_anon_set_server_dh_params (gnutls_anon_server_credentials_t res,
  **/
 void
 gnutls_anon_set_server_params_function (gnutls_anon_server_credentials_t res,
-					gnutls_params_function * func)
+                                        gnutls_params_function * func)
 {
   res->params_func = func;
 }

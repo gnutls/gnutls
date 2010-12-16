@@ -47,7 +47,7 @@ cdk_error_t map_gnutls_error (int err);
 
 /* This is the default block size for the partial length packet mode. */
 #define DEF_BLOCKSIZE 8192
-#define DEF_BLOCKBITS   13	/* 2^13 = 8192 */
+#define DEF_BLOCKBITS   13      /* 2^13 = 8192 */
 
 /* For now SHA-1 is used to create fingerprint for keys.
    But if this will ever change, it is a good idea to
@@ -107,9 +107,9 @@ FILE *_cdk_tmpfile (void);
 
 /*-- proc-packet.c --*/
 cdk_error_t _cdk_proc_packets (cdk_ctx_t hd, cdk_stream_t inp,
-			       cdk_stream_t data,
-			       const char *output, cdk_stream_t outstream,
-			       digest_hd_st * md);
+                               cdk_stream_t data,
+                               const char *output, cdk_stream_t outstream,
+                               digest_hd_st * md);
 cdk_error_t _cdk_pkt_write2 (cdk_stream_t out, int pkttype, void *pktctx);
 
 /*-- pubkey.c --*/
@@ -126,15 +126,15 @@ void _cdk_pkt_detach_free (cdk_packet_t pkt, int *r_pkttype, void **ctx);
 
 /*-- sig-check.c --*/
 cdk_error_t _cdk_sig_check (cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig,
-			    digest_hd_st * digest, int *r_expired);
+                            digest_hd_st * digest, int *r_expired);
 cdk_error_t _cdk_hash_sig_data (cdk_pkt_signature_t sig, digest_hd_st * hd);
 cdk_error_t _cdk_hash_userid (cdk_pkt_userid_t uid, int sig_version,
-			      digest_hd_st * md);
+                              digest_hd_st * md);
 cdk_error_t _cdk_hash_pubkey (cdk_pkt_pubkey_t pk, digest_hd_st * md,
-			      int use_fpr);
+                              int use_fpr);
 cdk_error_t _cdk_pk_check_sig (cdk_keydb_hd_t hd, cdk_kbnode_t knode,
-			       cdk_kbnode_t snode, int *is_selfsig,
-			       char **ret_uid);
+                               cdk_kbnode_t snode, int *is_selfsig,
+                               char **ret_uid);
 
 /*-- kbnode.c --*/
 void _cdk_kbnode_add (cdk_kbnode_t root, cdk_kbnode_t node);
@@ -142,31 +142,31 @@ void _cdk_kbnode_clone (cdk_kbnode_t node);
 
 /*-- sesskey.c --*/
 cdk_error_t _cdk_digest_encode_pkcs1 (byte ** r_md, size_t * r_mdlen,
-				      int pk_algo,
-				      const byte * md,
-				      int digest_algo, unsigned nbits);
+                                      int pk_algo,
+                                      const byte * md,
+                                      int digest_algo, unsigned nbits);
 cdk_error_t _cdk_sk_unprotect_auto (cdk_ctx_t hd, cdk_pkt_seckey_t sk);
 
 /*-- keydb.c --*/
 int _cdk_keydb_is_secret (cdk_keydb_hd_t db);
 cdk_error_t _cdk_keydb_get_pk_byusage (cdk_keydb_hd_t hd, const char *name,
-				       cdk_pkt_pubkey_t * ret_pk, int usage);
+                                       cdk_pkt_pubkey_t * ret_pk, int usage);
 cdk_error_t _cdk_keydb_get_sk_byusage (cdk_keydb_hd_t hd, const char *name,
-				       cdk_pkt_seckey_t * ret_sk, int usage);
+                                       cdk_pkt_seckey_t * ret_sk, int usage);
 cdk_error_t _cdk_keydb_check_userid (cdk_keydb_hd_t hd, u32 * keyid,
-				     const char *id);
+                                     const char *id);
 
 /*-- sign.c --*/
 int _cdk_sig_hash_for (cdk_pkt_pubkey_t pk);
 void _cdk_trim_string (char *s, int canon);
 cdk_error_t _cdk_sig_create (cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig);
 cdk_error_t _cdk_sig_complete (cdk_pkt_signature_t sig, cdk_pkt_seckey_t sk,
-			       digest_hd_st * hd);
+                               digest_hd_st * hd);
 
 /*-- stream.c --*/
 void _cdk_stream_set_compress_algo (cdk_stream_t s, int algo);
 cdk_error_t _cdk_stream_open_mode (const char *file, const char *mode,
-				   cdk_stream_t * ret_s);
+                                   cdk_stream_t * ret_s);
 void *_cdk_stream_get_opaque (cdk_stream_t s, int fid);
 const char *_cdk_stream_get_fname (cdk_stream_t s);
 FILE *_cdk_stream_get_fp (cdk_stream_t s);
@@ -177,7 +177,7 @@ cdk_error_t _cdk_stream_set_blockmode (cdk_stream_t s, size_t nbytes);
 int _cdk_stream_get_blockmode (cdk_stream_t s);
 int _cdk_stream_puts (cdk_stream_t s, const char *buf);
 cdk_error_t _cdk_stream_fpopen (FILE * fp, unsigned write_mode,
-				cdk_stream_t * ret_out);
+                                cdk_stream_t * ret_out);
 
 /*-- verify.c --*/
 void _cdk_result_verify_free (cdk_verify_result_t res);

@@ -202,11 +202,11 @@ extern "C"
   void SSL_CTX_free (SSL_CTX * ctx);
   int SSL_CTX_set_default_verify_paths (SSL_CTX * ctx);
   int SSL_CTX_use_certificate_file (SSL_CTX * ctx, const char *certfile,
-				    int type);
+                                    int type);
   int SSL_CTX_use_PrivateKey_file (SSL_CTX * ctx, const char *keyfile,
-				   int type);
+                                   int type);
   void SSL_CTX_set_verify (SSL_CTX * ctx, int verify_mode,
-			   int (*verify_callback) (int, X509_STORE_CTX *));
+                           int (*verify_callback) (int, X509_STORE_CTX *));
   unsigned long SSL_CTX_set_options (SSL_CTX * ctx, unsigned long options);
   long SSL_CTX_set_mode (SSL_CTX * ctx, long mode);
   int SSL_CTX_set_cipher_list (SSL_CTX * ctx, const char *list);
@@ -239,7 +239,7 @@ extern "C"
   void SSL_set_connect_state (SSL * ssl);
   int SSL_pending (SSL * ssl);
   void SSL_set_verify (SSL * ssl, int verify_mode,
-		       int (*verify_callback) (int, X509_STORE_CTX *));
+                       int (*verify_callback) (int, X509_STORE_CTX *));
   const X509 *SSL_get_peer_certificate (SSL * ssl);
 
 /* SSL connection open/close/read/write functions */
@@ -322,13 +322,13 @@ extern "C"
   void MD5_Update (MD5_CTX * ctx, const void *buf, int len);
   void MD5_Final (unsigned char *md, MD5_CTX * ctx);
   unsigned char *MD5 (const unsigned char *buf, unsigned long len,
-		      unsigned char *md);
+                      unsigned char *md);
 
   void RIPEMD160_Init (RIPEMD160_CTX * ctx);
   void RIPEMD160_Update (RIPEMD160_CTX * ctx, const void *buf, int len);
   void RIPEMD160_Final (unsigned char *md, RIPEMD160_CTX * ctx);
   unsigned char *RIPEMD160 (const unsigned char *buf, unsigned long len,
-			    unsigned char *md);
+                            unsigned char *md);
 
 #ifdef __cplusplus
 }

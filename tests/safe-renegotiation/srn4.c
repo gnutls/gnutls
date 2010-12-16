@@ -180,8 +180,8 @@ main (int argc, char *argv[])
   /* Init server */
   gnutls_certificate_allocate_credentials (&serverx509cred);
   gnutls_certificate_set_x509_key_mem (serverx509cred,
-				       &server_cert, &server_key,
-				       GNUTLS_X509_FMT_PEM);
+                                       &server_cert, &server_key,
+                                       GNUTLS_X509_FMT_PEM);
   gnutls_init (&server, GNUTLS_SERVER);
   gnutls_credentials_set (server, GNUTLS_CRD_CERTIFICATE, serverx509cred);
   gnutls_priority_set_direct (server, "NORMAL", NULL);
@@ -193,7 +193,7 @@ main (int argc, char *argv[])
   gnutls_init (&client, GNUTLS_CLIENT);
   gnutls_credentials_set (client, GNUTLS_CRD_CERTIFICATE, clientx509cred);
   gnutls_priority_set_direct (client, "NORMAL:%DISABLE_SAFE_RENEGOTIATION",
-			      NULL);
+                              NULL);
   gnutls_transport_set_push_function (client, client_push);
   gnutls_transport_set_pull_function (client, client_pull);
 
@@ -201,35 +201,35 @@ main (int argc, char *argv[])
     {
       static int max_iter = 0;
       if (max_iter++ > 10)
-	abort ();
+        abort ();
 
       if (cret == GNUTLS_E_AGAIN)
-	{
-	  cret = gnutls_handshake (client);
-	  if (debug_level > 0)
-	    {
-	      tls_log_func (0, "gnutls_handshake (client)...\n");
-	      tls_log_func (0, gnutls_strerror (cret));
-	      tls_log_func (0, "\n");
-	    }
-	}
+        {
+          cret = gnutls_handshake (client);
+          if (debug_level > 0)
+            {
+              tls_log_func (0, "gnutls_handshake (client)...\n");
+              tls_log_func (0, gnutls_strerror (cret));
+              tls_log_func (0, "\n");
+            }
+        }
 
       if (sret == GNUTLS_E_AGAIN)
-	{
-	  sret = gnutls_handshake (server);
-	  if (debug_level > 0)
-	    {
-	      tls_log_func (0, "gnutls_handshake (server)...\n");
-	      tls_log_func (0, gnutls_strerror (sret));
-	      tls_log_func (0, "\n");
-	    }
-	}
+        {
+          sret = gnutls_handshake (server);
+          if (debug_level > 0)
+            {
+              tls_log_func (0, "gnutls_handshake (server)...\n");
+              tls_log_func (0, gnutls_strerror (sret));
+              tls_log_func (0, "\n");
+            }
+        }
     }
   while (
-	  /* Not done: */
-	  !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
-	  /* No error: */
-	  && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
+          /* Not done: */
+          !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
+          /* No error: */
+          && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
 
   if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_SUCCESS)
     exit_code = EXIT_FAILURE;
@@ -264,36 +264,36 @@ main (int argc, char *argv[])
     {
       static int max_iter = 0;
       if (max_iter++ > 10)
-	abort ();
+        abort ();
 
       if (cret == GNUTLS_E_AGAIN)
-	{
-	  cret = gnutls_handshake (client);
-	  if (debug_level > 0)
-	    {
-	      tls_log_func (0, "second gnutls_handshake (client)...\n");
-	      tls_log_func (0, gnutls_strerror (cret));
-	      tls_log_func (0, "\n");
-	    }
-	}
+        {
+          cret = gnutls_handshake (client);
+          if (debug_level > 0)
+            {
+              tls_log_func (0, "second gnutls_handshake (client)...\n");
+              tls_log_func (0, gnutls_strerror (cret));
+              tls_log_func (0, "\n");
+            }
+        }
 
       if (sret == GNUTLS_E_AGAIN)
-	{
-	  sret = gnutls_handshake (server);
-	  if (debug_level > 0)
-	    {
-	      tls_log_func (0, "second gnutls_handshake (server)...\n");
-	      tls_log_func (0, gnutls_strerror (sret));
-	      tls_log_func (0, "\n");
-	    }
-	}
+        {
+          sret = gnutls_handshake (server);
+          if (debug_level > 0)
+            {
+              tls_log_func (0, "second gnutls_handshake (server)...\n");
+              tls_log_func (0, gnutls_strerror (sret));
+              tls_log_func (0, "\n");
+            }
+        }
     }
   while (
-	  /* Not done: */
-	  !(cret == GNUTLS_E_AGAIN
-	    && sret == GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED)
-	  /* No error: */
-	  && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
+          /* Not done: */
+          !(cret == GNUTLS_E_AGAIN
+            && sret == GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED)
+          /* No error: */
+          && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
 
   if (cret != GNUTLS_E_AGAIN && sret != GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED)
     exit_code = 1;
@@ -302,7 +302,7 @@ main (int argc, char *argv[])
       gnutls_safe_renegotiation_status (server))
     {
       tls_log_func (0,
-		    "Rehandshaked session not using safe renegotiation!\n");
+                    "Rehandshaked session not using safe renegotiation!\n");
       exit_code = EXIT_FAILURE;
     }
 
@@ -322,9 +322,9 @@ main (int argc, char *argv[])
   if (debug_level > 0)
     {
       if (exit_code == 0)
-	puts ("Self-test successful");
+        puts ("Self-test successful");
       else
-	puts ("Self-test failed");
+        puts ("Self-test failed");
     }
 
   return exit_code;

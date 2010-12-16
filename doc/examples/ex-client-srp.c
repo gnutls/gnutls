@@ -43,7 +43,7 @@ main (void)
   gnutls_certificate_allocate_credentials (&cert_cred);
 
   gnutls_certificate_set_x509_trust_file (cert_cred, CAFILE,
-					  GNUTLS_X509_FMT_PEM);
+                                          GNUTLS_X509_FMT_PEM);
   gnutls_srp_set_client_credentials (srp_cred, USERNAME, PASSWORD);
 
   /* connects to server
@@ -87,15 +87,15 @@ main (void)
   if (gnutls_error_is_fatal (ret) == 1 || ret == 0)
     {
       if (ret == 0)
-	{
-	  printf ("- Peer has closed the GnuTLS connection\n");
-	  goto end;
-	}
+        {
+          printf ("- Peer has closed the GnuTLS connection\n");
+          goto end;
+        }
       else
-	{
-	  fprintf (stderr, "*** Error: %s\n", gnutls_strerror (ret));
-	  goto end;
-	}
+        {
+          fprintf (stderr, "*** Error: %s\n", gnutls_strerror (ret));
+          goto end;
+        }
     }
   else
     check_alert (session, ret);
@@ -104,9 +104,9 @@ main (void)
     {
       printf ("- Received %d bytes: ", ret);
       for (ii = 0; ii < ret; ii++)
-	{
-	  fputc (buffer[ii], stdout);
-	}
+        {
+          fputc (buffer[ii], stdout);
+        }
       fputs ("\n", stdout);
     }
   gnutls_bye (session, GNUTLS_SHUT_RDWR);

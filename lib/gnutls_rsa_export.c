@@ -66,12 +66,12 @@ _gnutls_rsa_params_to_mpi (gnutls_rsa_params_t rsa_params)
  **/
 int
 gnutls_rsa_params_import_raw (gnutls_rsa_params_t rsa_params,
-			      const gnutls_datum_t * m,
-			      const gnutls_datum_t * e,
-			      const gnutls_datum_t * d,
-			      const gnutls_datum_t * p,
-			      const gnutls_datum_t * q,
-			      const gnutls_datum_t * u)
+                              const gnutls_datum_t * m,
+                              const gnutls_datum_t * e,
+                              const gnutls_datum_t * d,
+                              const gnutls_datum_t * p,
+                              const gnutls_datum_t * q,
+                              const gnutls_datum_t * u)
 {
   return gnutls_x509_privkey_import_rsa_raw (rsa_params, m, e, d, p, q, u);
 }
@@ -167,8 +167,8 @@ gnutls_rsa_params_generate2 (gnutls_rsa_params_t params, unsigned int bits)
  **/
 int
 gnutls_rsa_params_import_pkcs1 (gnutls_rsa_params_t params,
-				const gnutls_datum_t * pkcs1_params,
-				gnutls_x509_crt_fmt_t format)
+                                const gnutls_datum_t * pkcs1_params,
+                                gnutls_x509_crt_fmt_t format)
 {
   return gnutls_x509_privkey_import (params, pkcs1_params, format);
 }
@@ -191,12 +191,12 @@ gnutls_rsa_params_import_pkcs1 (gnutls_rsa_params_t params,
  **/
 int
 gnutls_rsa_params_export_pkcs1 (gnutls_rsa_params_t params,
-				gnutls_x509_crt_fmt_t format,
-				unsigned char *params_data,
-				size_t * params_data_size)
+                                gnutls_x509_crt_fmt_t format,
+                                unsigned char *params_data,
+                                size_t * params_data_size)
 {
   return gnutls_x509_privkey_export (params, format,
-				     params_data, params_data_size);
+                                     params_data, params_data_size);
 }
 
 /**
@@ -218,10 +218,10 @@ gnutls_rsa_params_export_pkcs1 (gnutls_rsa_params_t params,
  **/
 int
 gnutls_rsa_params_export_raw (gnutls_rsa_params_t params,
-			      gnutls_datum_t * m, gnutls_datum_t * e,
-			      gnutls_datum_t * d, gnutls_datum_t * p,
-			      gnutls_datum_t * q, gnutls_datum_t * u,
-			      unsigned int *bits)
+                              gnutls_datum_t * m, gnutls_datum_t * e,
+                              gnutls_datum_t * d, gnutls_datum_t * p,
+                              gnutls_datum_t * q, gnutls_datum_t * u,
+                              unsigned int *bits)
 {
   int ret;
 

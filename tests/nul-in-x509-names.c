@@ -121,7 +121,7 @@ doit (void)
   if (ret == 0)
     {
       if (debug)
-	success ("gnutls_x509_crt_check_hostname OK (NUL-IN-CN)");
+        success ("gnutls_x509_crt_check_hostname OK (NUL-IN-CN)");
     }
   else
     {
@@ -139,7 +139,7 @@ doit (void)
   if (ret == 0)
     {
       if (debug)
-	success ("gnutls_x509_crt_check_hostname OK (NUL-IN-SAN)");
+        success ("gnutls_x509_crt_check_hostname OK (NUL-IN-SAN)");
     }
   else
     {

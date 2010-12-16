@@ -36,7 +36,7 @@ extern gnutls_crypto_pk_st _gnutls_pk_ops;
 
 inline static int
 _gnutls_pk_fixup (gnutls_pk_algorithm_t algo, gnutls_direction_t direction,
-		  gnutls_pk_params_st * params)
+                  gnutls_pk_params_st * params)
 {
   if (_gnutls_pk_ops.pk_fixup_private_params)
     return _gnutls_pk_ops.pk_fixup_private_params (algo, direction, params);
@@ -44,44 +44,44 @@ _gnutls_pk_fixup (gnutls_pk_algorithm_t algo, gnutls_direction_t direction,
 }
 
 int _gnutls_pk_params_copy (gnutls_pk_params_st * dst, bigint_t * params,
-			    int params_len);
+                            int params_len);
 
 int _gnutls_rsa_generate_params (bigint_t * resarr, unsigned int *resarr_len,
-				 int bits);
+                                 int bits);
 int _gnutls_dsa_generate_params (bigint_t * resarr, unsigned int *resarr_len,
-				 int bits);
+                                 int bits);
 
 /* The internal PK interface */
 int _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
-			       const gnutls_datum_t * plaintext,
-			       bigint_t * params, unsigned params_len,
-			       unsigned btype);
+                               const gnutls_datum_t * plaintext,
+                               bigint_t * params, unsigned params_len,
+                               unsigned btype);
 int _gnutls_dsa_sign (gnutls_datum_t * signature,
-		      const gnutls_datum_t * plaintext, bigint_t * params,
-		      unsigned params_len);
+                      const gnutls_datum_t * plaintext, bigint_t * params,
+                      unsigned params_len);
 int _gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
-			       const gnutls_datum_t * ciphertext,
-			       bigint_t * params, unsigned params_len,
-			       unsigned btype);
+                               const gnutls_datum_t * ciphertext,
+                               bigint_t * params, unsigned params_len,
+                               unsigned btype);
 int _gnutls_rsa_verify (const gnutls_datum_t * vdata,
-			const gnutls_datum_t * ciphertext, bigint_t * params,
-			int params_len, int btype);
+                        const gnutls_datum_t * ciphertext, bigint_t * params,
+                        int params_len, int btype);
 int _gnutls_dsa_verify (const gnutls_datum_t * vdata,
-			const gnutls_datum_t * sig_value, bigint_t * params,
-			int params_len);
+                        const gnutls_datum_t * sig_value, bigint_t * params,
+                        int params_len);
 
 int
 _gnutls_encode_ber_rs (gnutls_datum_t * sig_value, bigint_t r, bigint_t s);
 
 int
 _gnutls_decode_ber_rs (const gnutls_datum_t * sig_value, bigint_t * r,
-		       bigint_t * s);
+                       bigint_t * s);
 
 int _gnutls_calc_rsa_exp (bigint_t * params, unsigned int params_size);
 
 int _gnutls_pk_get_hash_algorithm (gnutls_pk_algorithm_t pk,
-				   bigint_t * params, int params_size,
-				   gnutls_digest_algorithm_t * dig,
-				   unsigned int *mand);
+                                   bigint_t * params, int params_size,
+                                   gnutls_digest_algorithm_t * dig,
+                                   unsigned int *mand);
 
 #endif /* GNUTLS_PK_H */

@@ -52,10 +52,10 @@ hash_encode (void *data, FILE * in, FILE * out)
     {
       err = _gnutls_hash_init (&mfx->md, mfx->digest_algo);
       if (err < 0)
-	{
-	  gnutls_assert ();
-	  return map_gnutls_error (err);
-	}
+        {
+          gnutls_assert ();
+          return map_gnutls_error (err);
+        }
 
       mfx->md_initialized = 1;
     }
@@ -64,7 +64,7 @@ hash_encode (void *data, FILE * in, FILE * out)
     {
       nread = fread (buf, 1, BUFSIZE, in);
       if (!nread)
-	break;
+        break;
       _gnutls_hash (&mfx->md, buf, nread);
     }
 
@@ -81,12 +81,12 @@ _cdk_filter_hash (void *data, int ctl, FILE * in, FILE * out)
     {
       md_filter_t *mfx = data;
       if (mfx)
-	{
-	  _cdk_log_debug ("free hash filter\n");
-	  _gnutls_hash_deinit (&mfx->md, NULL);
-	  mfx->md_initialized = 0;
-	  return 0;
-	}
+        {
+          _cdk_log_debug ("free hash filter\n");
+          _gnutls_hash_deinit (&mfx->md, NULL);
+          mfx->md_initialized = 0;
+          return 0;
+        }
     }
 
   gnutls_assert ();

@@ -75,8 +75,8 @@ static const char challenge_label[] = "inner application challenge";
    with data==NULL&&sizeofdata=0NULL until it returns successfully. */
 static ssize_t
 _gnutls_send_inner_application (gnutls_session_t session,
-				gnutls_ia_apptype_t msg_type,
-				const char *data, size_t sizeofdata)
+                                gnutls_ia_apptype_t msg_type,
+                                const char *data, size_t sizeofdata)
 {
   opaque *p = NULL;
   size_t plen = 0;
@@ -87,10 +87,10 @@ _gnutls_send_inner_application (gnutls_session_t session,
       plen = sizeofdata + 4;
       p = gnutls_malloc (plen);
       if (!p)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
 
       *(unsigned char *) p = (unsigned char) (msg_type & 0xFF);
       _gnutls_write_uint24 (sizeofdata, p + 1);
@@ -99,7 +99,7 @@ _gnutls_send_inner_application (gnutls_session_t session,
 
   len =
     _gnutls_send_int (session, GNUTLS_INNER_APPLICATION, -1,
-		      EPOCH_WRITE_CURRENT, p, plen, MBUFFER_FLUSH);
+                      EPOCH_WRITE_CURRENT, p, plen, MBUFFER_FLUSH);
 
   if (p)
     gnutls_free (p);
@@ -112,8 +112,8 @@ _gnutls_send_inner_application (gnutls_session_t session,
    number of bytes read, or an error code. */
 static ssize_t
 _gnutls_recv_inner_application (gnutls_session_t session,
-				gnutls_ia_apptype_t * msg_type,
-				opaque * data, size_t sizeofdata)
+                                gnutls_ia_apptype_t * msg_type,
+                                opaque * data, size_t sizeofdata)
 {
   ssize_t len;
   uint32_t len24;
@@ -147,13 +147,13 @@ _gnutls_recv_inner_application (gnutls_session_t session,
       uint32_t tmplen = len24;
 
       len24 = _gnutls_recv_int (session, GNUTLS_INNER_APPLICATION, -1,
-				data, tmplen);
+                                data, tmplen);
       if (len24 != tmplen)
-	{
-	  gnutls_assert ();
-	  /* XXX Correct? */
-	  return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-	}
+        {
+          gnutls_assert ();
+          /* XXX Correct? */
+          return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+        }
     }
 
   return len24;
@@ -166,10 +166,10 @@ _gnutls_recv_inner_application (gnutls_session_t session,
    result is placed in pre-allocated OUT of OUTSIZE length. */
 static int
 _gnutls_ia_prf (gnutls_session_t session,
-		size_t label_size,
-		const char *label,
-		size_t extra_size,
-		const char *extra, size_t outsize, opaque * out)
+                size_t label_size,
+                const char *label,
+                size_t extra_size,
+                const char *extra, size_t outsize, opaque * out)
 {
   int ret;
   opaque *seed;
@@ -179,7 +179,7 @@ _gnutls_ia_prf (gnutls_session_t session,
 
   ret =
     _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_INNER_APPLICATION,
-				  &epriv);
+                                  &epriv);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -195,14 +195,14 @@ _gnutls_ia_prf (gnutls_session_t session,
     }
 
   memcpy (seed, session->security_parameters.server_random,
-	  GNUTLS_RANDOM_SIZE);
+          GNUTLS_RANDOM_SIZE);
   memcpy (seed + GNUTLS_RANDOM_SIZE,
-	  session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
+          session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
   memcpy (seed + 2 * GNUTLS_RANDOM_SIZE, extra, extra_size);
 
   ret = _gnutls_PRF (session, priv->inner_secret,
-		     GNUTLS_MASTER_SIZE,
-		     label, label_size, seed, seedsize, outsize, out);
+                     GNUTLS_MASTER_SIZE,
+                     label, label_size, seed, seedsize, outsize, out);
 
   gnutls_free (seed);
 
@@ -225,8 +225,8 @@ _gnutls_ia_prf (gnutls_session_t session,
  **/
 int
 gnutls_ia_permute_inner_secret (gnutls_session_t session,
-				size_t session_keys_size,
-				const char *session_keys)
+                                size_t session_keys_size,
+                                const char *session_keys)
 {
   extension_priv_data_t epriv;
   ia_ext_st *priv;
@@ -234,7 +234,7 @@ gnutls_ia_permute_inner_secret (gnutls_session_t session,
 
   ret =
     _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_INNER_APPLICATION,
-				  &epriv);
+                                  &epriv);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -243,11 +243,11 @@ gnutls_ia_permute_inner_secret (gnutls_session_t session,
   priv = epriv.ptr;
 
   return _gnutls_ia_prf (session,
-			 sizeof (inner_permutation_label) - 1,
-			 inner_permutation_label,
-			 session_keys_size,
-			 session_keys,
-			 GNUTLS_RANDOM_SIZE, priv->inner_secret);
+                         sizeof (inner_permutation_label) - 1,
+                         inner_permutation_label,
+                         session_keys_size,
+                         session_keys,
+                         GNUTLS_RANDOM_SIZE, priv->inner_secret);
 }
 
 /**
@@ -263,11 +263,11 @@ gnutls_ia_permute_inner_secret (gnutls_session_t session,
  **/
 int
 gnutls_ia_generate_challenge (gnutls_session_t session,
-			      size_t buffer_size, char *buffer)
+                              size_t buffer_size, char *buffer)
 {
   return _gnutls_ia_prf (session,
-			 sizeof (challenge_label) - 1,
-			 challenge_label, 0, NULL, buffer_size, buffer);
+                         sizeof (challenge_label) - 1,
+                         challenge_label, 0, NULL, buffer_size, buffer);
 }
 
 /**
@@ -295,7 +295,7 @@ gnutls_ia_extract_inner_secret (gnutls_session_t session, char *buffer)
 
   ret =
     _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_INNER_APPLICATION,
-				  &epriv);
+                                  &epriv);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -336,7 +336,7 @@ gnutls_ia_endphase_send (gnutls_session_t session, int final_p)
 
   ret =
     _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_INNER_APPLICATION,
-				  &epriv);
+                                  &epriv);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -345,9 +345,9 @@ gnutls_ia_endphase_send (gnutls_session_t session, int final_p)
   priv = epriv.ptr;
 
   ret = _gnutls_PRF (session, priv->inner_secret,
-		     GNUTLS_MASTER_SIZE, label, size_of_label - 1,
-		     /* XXX specification unclear on seed. */
-		     "", 0, CHECKSUM_SIZE, local_checksum);
+                     GNUTLS_MASTER_SIZE, label, size_of_label - 1,
+                     /* XXX specification unclear on seed. */
+                     "", 0, CHECKSUM_SIZE, local_checksum);
   if (ret < 0)
     return ret;
 
@@ -401,7 +401,7 @@ gnutls_ia_verify_endphase (gnutls_session_t session, const char *checksum)
 
   ret =
     _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_INNER_APPLICATION,
-				  &epriv);
+                                  &epriv);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -410,9 +410,9 @@ gnutls_ia_verify_endphase (gnutls_session_t session, const char *checksum)
   priv = epriv.ptr;
 
   ret = _gnutls_PRF (session, priv->inner_secret,
-		     GNUTLS_MASTER_SIZE,
-		     label, size_of_label - 1,
-		     "", 0, CHECKSUM_SIZE, local_checksum);
+                     GNUTLS_MASTER_SIZE,
+                     label, size_of_label - 1,
+                     "", 0, CHECKSUM_SIZE, local_checksum);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -422,12 +422,12 @@ gnutls_ia_verify_endphase (gnutls_session_t session, const char *checksum)
   if (memcmp (local_checksum, checksum, CHECKSUM_SIZE) != 0)
     {
       ret = gnutls_alert_send (session, GNUTLS_AL_FATAL,
-			       GNUTLS_A_INNER_APPLICATION_VERIFICATION);
+                               GNUTLS_A_INNER_APPLICATION_VERIFICATION);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       return GNUTLS_E_IA_VERIFY_FAILED;
     }
@@ -468,8 +468,8 @@ gnutls_ia_send (gnutls_session_t session, const char *data, size_t sizeofdata)
   ssize_t len;
 
   len = _gnutls_send_inner_application (session,
-					GNUTLS_IA_APPLICATION_PAYLOAD,
-					data, sizeofdata);
+                                        GNUTLS_IA_APPLICATION_PAYLOAD,
+                                        data, sizeofdata);
 
   return len;
 }
@@ -527,7 +527,7 @@ _gnutls_ia_client_handshake (gnutls_session_t session)
 {
   char *buf = NULL;
   size_t buflen = 0;
-  char tmp[1024];		/* XXX */
+  char tmp[1024];               /* XXX */
   ssize_t len;
   int ret;
   const struct gnutls_ia_client_credentials_st *cred =
@@ -542,47 +542,47 @@ _gnutls_ia_client_handshake (gnutls_session_t session)
       size_t avplen;
 
       ret = cred->avp_func (session, cred->avp_ptr,
-			    buf, buflen, &avp, &avplen);
+                            buf, buflen, &avp, &avplen);
       if (ret)
-	{
-	  int tmpret;
-	  tmpret = gnutls_alert_send (session, GNUTLS_AL_FATAL,
-				      GNUTLS_A_INNER_APPLICATION_FAILURE);
-	  if (tmpret < 0)
-	    gnutls_assert ();
-	  return ret;
-	}
+        {
+          int tmpret;
+          tmpret = gnutls_alert_send (session, GNUTLS_AL_FATAL,
+                                      GNUTLS_A_INNER_APPLICATION_FAILURE);
+          if (tmpret < 0)
+            gnutls_assert ();
+          return ret;
+        }
 
       len = gnutls_ia_send (session, avp, avplen);
       gnutls_free (avp);
       if (len < 0)
-	return len;
+        return len;
 
       len = gnutls_ia_recv (session, tmp, sizeof (tmp));
       if (len == GNUTLS_E_WARNING_IA_IPHF_RECEIVED ||
-	  len == GNUTLS_E_WARNING_IA_FPHF_RECEIVED)
-	{
-	  ret = gnutls_ia_verify_endphase (session, tmp);
-	  if (ret < 0)
-	    return ret;
+          len == GNUTLS_E_WARNING_IA_FPHF_RECEIVED)
+        {
+          ret = gnutls_ia_verify_endphase (session, tmp);
+          if (ret < 0)
+            return ret;
 
-	  ret = gnutls_ia_endphase_send
-	    (session, len == GNUTLS_E_WARNING_IA_FPHF_RECEIVED);
-	  if (ret < 0)
-	    return ret;
-	}
+          ret = gnutls_ia_endphase_send
+            (session, len == GNUTLS_E_WARNING_IA_FPHF_RECEIVED);
+          if (ret < 0)
+            return ret;
+        }
 
       if (len == GNUTLS_E_WARNING_IA_IPHF_RECEIVED)
-	{
-	  buf = NULL;
-	  buflen = 0;
-	  continue;
-	}
+        {
+          buf = NULL;
+          buflen = 0;
+          continue;
+        }
       else if (len == GNUTLS_E_WARNING_IA_FPHF_RECEIVED)
-	break;
+        break;
 
       if (len < 0)
-	return len;
+        return len;
 
       buflen = len;
       buf = tmp;
@@ -611,51 +611,51 @@ _gnutls_ia_server_handshake (gnutls_session_t session)
 
       len = gnutls_ia_recv (session, buf, sizeof (buf));
       if (len == GNUTLS_E_WARNING_IA_IPHF_RECEIVED ||
-	  len == GNUTLS_E_WARNING_IA_FPHF_RECEIVED)
-	{
-	  ret = gnutls_ia_verify_endphase (session, buf);
-	  if (ret < 0)
-	    return ret;
-	}
+          len == GNUTLS_E_WARNING_IA_FPHF_RECEIVED)
+        {
+          ret = gnutls_ia_verify_endphase (session, buf);
+          if (ret < 0)
+            return ret;
+        }
 
       if (len == GNUTLS_E_WARNING_IA_IPHF_RECEIVED)
-	continue;
+        continue;
       else if (len == GNUTLS_E_WARNING_IA_FPHF_RECEIVED)
-	break;
+        break;
 
       if (len < 0)
-	return len;
+        return len;
 
       avp = NULL;
       avplen = 0;
 
       ret = cred->avp_func (session, cred->avp_ptr, buf, len, &avp, &avplen);
       if (ret < 0)
-	{
-	  int tmpret;
-	  tmpret = gnutls_alert_send (session, GNUTLS_AL_FATAL,
-				      GNUTLS_A_INNER_APPLICATION_FAILURE);
-	  if (tmpret < 0)
-	    gnutls_assert ();
-	  return ret;
-	}
+        {
+          int tmpret;
+          tmpret = gnutls_alert_send (session, GNUTLS_AL_FATAL,
+                                      GNUTLS_A_INNER_APPLICATION_FAILURE);
+          if (tmpret < 0)
+            gnutls_assert ();
+          return ret;
+        }
 
       msg_type = ret;
 
       if (msg_type != GNUTLS_IA_APPLICATION_PAYLOAD)
-	{
-	  ret = gnutls_ia_endphase_send (session, msg_type ==
-					 GNUTLS_IA_FINAL_PHASE_FINISHED);
-	  if (ret < 0)
-	    return ret;
-	}
+        {
+          ret = gnutls_ia_endphase_send (session, msg_type ==
+                                         GNUTLS_IA_FINAL_PHASE_FINISHED);
+          if (ret < 0)
+            return ret;
+        }
       else
-	{
-	  len = gnutls_ia_send (session, avp, avplen);
-	  gnutls_free (avp);
-	  if (len < 0)
-	    return len;
-	}
+        {
+          len = gnutls_ia_send (session, avp, avplen);
+          gnutls_free (avp);
+          if (len < 0)
+            return len;
+        }
     }
   while (1);
 
@@ -681,7 +681,7 @@ gnutls_ia_handshake_p (gnutls_session_t session)
 
   ret =
     _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_SERVER_NAME,
-				  &epriv);
+                                  &epriv);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -804,7 +804,7 @@ gnutls_ia_free_client_credentials (gnutls_ia_client_credentials_t sc)
  **/
 void
 gnutls_ia_set_client_avp_function (gnutls_ia_client_credentials_t cred,
-				   gnutls_ia_avp_func avp_func)
+                                   gnutls_ia_avp_func avp_func)
 {
   cred->avp_func = avp_func;
 }
@@ -920,7 +920,7 @@ gnutls_ia_free_server_credentials (gnutls_ia_server_credentials_t sc)
  **/
 void
 gnutls_ia_set_server_avp_function (gnutls_ia_server_credentials_t cred,
-				   gnutls_ia_avp_func avp_func)
+                                   gnutls_ia_avp_func avp_func)
 {
   cred->avp_func = avp_func;
 }
@@ -999,6 +999,6 @@ gnutls_ia_enable (gnutls_session_t session, int allow_skip_on_resume)
     priv->flags |= IA_ALLOW_SKIP;
 
   _gnutls_ext_set_session_data (session, GNUTLS_EXTENSION_INNER_APPLICATION,
-				epriv);
+                                epriv);
 
 }

@@ -67,12 +67,12 @@ main (void)
   if (rc)
     {
       printf ("gnutls_certificate_allocate_credentials rc %d: %s\n",
-	      rc, gnutls_strerror (rc));
+              rc, gnutls_strerror (rc));
       return 1;
     }
 
   rc = gnutls_certificate_set_x509_crl_mem (crt, &crldatum,
-					    GNUTLS_X509_FMT_PEM);
+                                            GNUTLS_X509_FMT_PEM);
   if (rc != 1)
     {
       printf ("gnutls_certificate_set_x509_crl_mem num %d\n", rc);
@@ -97,7 +97,7 @@ main (void)
   if (rc)
     {
       printf ("gnutls_certificate_set_x509_crl rc %d: %s\n",
-	      rc, gnutls_strerror (rc));
+              rc, gnutls_strerror (rc));
       return 1;
     }
 

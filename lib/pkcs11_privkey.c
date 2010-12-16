@@ -84,10 +84,10 @@ gnutls_pkcs11_privkey_deinit (gnutls_pkcs11_privkey_t key)
  **/
 int
 gnutls_pkcs11_privkey_get_pk_algorithm (gnutls_pkcs11_privkey_t key,
-					unsigned int *bits)
+                                        unsigned int *bits)
 {
   if (bits)
-    *bits = 0;			/* FIXME */
+    *bits = 0;                  /* FIXME */
   return key->pk_algorithm;
 }
 
@@ -107,8 +107,8 @@ gnutls_pkcs11_privkey_get_pk_algorithm (gnutls_pkcs11_privkey_t key,
  **/
 int
 gnutls_pkcs11_privkey_get_info (gnutls_pkcs11_privkey_t pkey,
-				gnutls_pkcs11_obj_info_t itype,
-				void *output, size_t * output_size)
+                                gnutls_pkcs11_obj_info_t itype,
+                                void *output, size_t * output_size)
 {
   return pkcs11_get_info (&pkey->info, itype, output, output_size);
 }
@@ -132,18 +132,18 @@ gnutls_pkcs11_privkey_get_info (gnutls_pkcs11_privkey_t pkey,
  **/
 int
 gnutls_pkcs11_privkey_sign_data (gnutls_pkcs11_privkey_t signer,
-				 gnutls_digest_algorithm_t hash,
-				 unsigned int flags,
-				 const gnutls_datum_t * data,
-				 gnutls_datum_t * signature)
+                                 gnutls_digest_algorithm_t hash,
+                                 unsigned int flags,
+                                 const gnutls_datum_t * data,
+                                 gnutls_datum_t * signature)
 {
   int ret;
   gnutls_datum_t digest;
 
-  ret = pk_hash_data(signer->pk_algorithm, hash, NULL, data, &digest);
+  ret = pk_hash_data (signer->pk_algorithm, hash, NULL, data, &digest);
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
 
@@ -199,8 +199,8 @@ cleanup:
  -*/
 int
 _gnutls_pkcs11_privkey_sign_hash (gnutls_pkcs11_privkey_t key,
-				 const gnutls_datum_t * hash,
-				 gnutls_datum_t * signature)
+                                  const gnutls_datum_t * hash,
+                                  gnutls_datum_t * signature)
 {
   ck_rv_t rv;
   int ret;
@@ -278,22 +278,22 @@ cleanup:
  **/
 int
 gnutls_pkcs11_privkey_sign_hash2 (gnutls_pkcs11_privkey_t signer,
-				gnutls_digest_algorithm_t hash_algo,
-				unsigned int flags,
-				const gnutls_datum_t * hash_data,
-				gnutls_datum_t * signature)
+                                  gnutls_digest_algorithm_t hash_algo,
+                                  unsigned int flags,
+                                  const gnutls_datum_t * hash_data,
+                                  gnutls_datum_t * signature)
 {
   int ret;
   gnutls_datum_t digest;
 
-  digest.data = gnutls_malloc(hash_data->size);
+  digest.data = gnutls_malloc (hash_data->size);
   if (digest.data == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
   digest.size = hash_data->size;
-  memcpy(digest.data, hash_data->data, digest.size);
+  memcpy (digest.data, hash_data->data, digest.size);
 
   ret = pk_prepare_hash (signer->pk_algorithm, hash_algo, &digest);
   if (ret < 0)
@@ -312,7 +312,7 @@ gnutls_pkcs11_privkey_sign_hash2 (gnutls_pkcs11_privkey_t signer,
   ret = 0;
 
 cleanup:
-  _gnutls_free_datum(&digest);
+  _gnutls_free_datum (&digest);
   return ret;
 }
 
@@ -332,7 +332,7 @@ cleanup:
  **/
 int
 gnutls_pkcs11_privkey_import_url (gnutls_pkcs11_privkey_t pkey,
-				  const char *url, unsigned int flags)
+                                  const char *url, unsigned int flags)
 {
   int ret;
 
@@ -375,9 +375,9 @@ gnutls_pkcs11_privkey_import_url (gnutls_pkcs11_privkey_t pkey,
  **/
 int
 gnutls_pkcs11_privkey_decrypt_data (gnutls_pkcs11_privkey_t key,
-				    unsigned int flags,
-				    const gnutls_datum_t * ciphertext,
-				    gnutls_datum_t * plaintext)
+                                    unsigned int flags,
+                                    const gnutls_datum_t * ciphertext,
+                                    gnutls_datum_t * plaintext)
 {
   ck_rv_t rv;
   int ret;
@@ -405,7 +405,7 @@ gnutls_pkcs11_privkey_decrypt_data (gnutls_pkcs11_privkey_t key,
 
   /* Work out how long the plaintext must be: */
   rv = pakchois_decrypt (pks, ciphertext->data, ciphertext->size,
-			 NULL, &siglen);
+                         NULL, &siglen);
   if (rv != CKR_OK)
     {
       gnutls_assert ();
@@ -417,7 +417,7 @@ gnutls_pkcs11_privkey_decrypt_data (gnutls_pkcs11_privkey_t key,
   plaintext->size = siglen;
 
   rv = pakchois_decrypt (pks, ciphertext->data, ciphertext->size,
-			 plaintext->data, &siglen);
+                         plaintext->data, &siglen);
   if (rv != CKR_OK)
     {
       gnutls_free (plaintext->data);
@@ -449,8 +449,8 @@ cleanup:
  **/
 int
 gnutls_pkcs11_privkey_export_url (gnutls_pkcs11_privkey_t key,
-				  gnutls_pkcs11_url_type_t detailed,
-				  char **url)
+                                  gnutls_pkcs11_url_type_t detailed,
+                                  char **url)
 {
   int ret;
 

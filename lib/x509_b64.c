@@ -45,7 +45,7 @@ static const uint8_t asciitable[128] = {
   0xff, 0x3e, 0xff, 0xff, 0xff, 0x3f,
   0x34, 0x35, 0x36, 0x37, 0x38, 0x39,
   0x3a, 0x3b, 0x3c, 0x3d, 0xff, 0xff,
-  0xff, 0xf1, 0xff, 0xff, 0xff, 0x00,	/* 0xf1 for '=' */
+  0xff, 0xf1, 0xff, 0xff, 0xff, 0x00,   /* 0xf1 for '=' */
   0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
   0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
   0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12,
@@ -75,17 +75,17 @@ encode (char *result, const uint8_t * data, int left)
     case 3:
       result[0] = b64table[(data[0] >> 2)];
       result[1] =
-	b64table[(((((data[0] & 0x03) & 0xff) << 4) & 0xff) |
-		  (data[1] >> 4))];
+        b64table[(((((data[0] & 0x03) & 0xff) << 4) & 0xff) |
+                  (data[1] >> 4))];
       result[2] =
-	b64table[((((data[1] & 0x0f) << 2) & 0xff) | (data[2] >> 6))];
+        b64table[((((data[1] & 0x0f) << 2) & 0xff) | (data[2] >> 6))];
       result[3] = b64table[(((data[2] << 2) & 0xff) >> 2)];
       break;
     case 2:
       result[0] = b64table[(data[0] >> 2)];
       result[1] =
-	b64table[(((((data[0] & 0x03) & 0xff) << 4) & 0xff) |
-		  (data[1] >> 4))];
+        b64table[(((((data[0] & 0x03) & 0xff) << 4) & 0xff) |
+                  (data[1] >> 4))];
       result[2] = b64table[(((data[1] << 4) & 0xff) >> 2)];
       result[3] = '=';
       break;
@@ -144,7 +144,7 @@ decode (uint8_t * result, const opaque * data)
  */
 int
 _gnutls_base64_encode (const uint8_t * data, size_t data_size,
-		       uint8_t ** result)
+                       uint8_t ** result)
 {
   unsigned int i, j;
   int ret, tmp;
@@ -160,13 +160,13 @@ _gnutls_base64_encode (const uint8_t * data, size_t data_size,
     {
       tmp = encode (tmpres, &data[i], data_size - i);
       if (tmp == -1)
-	{
-	  gnutls_free ((*result));
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+        {
+          gnutls_free ((*result));
+          return GNUTLS_E_MEMORY_ERROR;
+        }
       memcpy (&(*result)[j], tmpres, tmp);
     }
-  (*result)[ret] = 0;		/* null terminated */
+  (*result)[ret] = 0;           /* null terminated */
 
   return ret;
 }
@@ -186,7 +186,7 @@ _gnutls_base64_encode (const uint8_t * data, size_t data_size,
  */
 int
 _gnutls_fbase64_encode (const char *msg, const uint8_t * data,
-			int data_size, uint8_t ** result)
+                        int data_size, uint8_t ** result)
 {
   int i, ret, tmp, j;
   char tmpres[4];
@@ -205,13 +205,13 @@ _gnutls_fbase64_encode (const char *msg, const uint8_t * data,
   memset (bottom, 0, sizeof (bottom));
   memset (top, 0, sizeof (top));
 
-  strcat (top, "-----BEGIN ");	/* Flawfinder: ignore */
-  strcat (top, msg);		/* Flawfinder: ignore */
-  strcat (top, "-----");	/* Flawfinder: ignore */
+  strcat (top, "-----BEGIN ");  /* Flawfinder: ignore */
+  strcat (top, msg);            /* Flawfinder: ignore */
+  strcat (top, "-----");        /* Flawfinder: ignore */
 
-  strcat (bottom, "\n-----END ");	/* Flawfinder: ignore */
-  strcat (bottom, msg);		/* Flawfinder: ignore */
-  strcat (bottom, "-----\n");	/* Flawfinder: ignore */
+  strcat (bottom, "\n-----END ");       /* Flawfinder: ignore */
+  strcat (bottom, msg);         /* Flawfinder: ignore */
+  strcat (bottom, "-----\n");   /* Flawfinder: ignore */
 
   top_len = strlen (top);
   bottom_len = strlen (bottom);
@@ -229,53 +229,53 @@ _gnutls_fbase64_encode (const char *msg, const uint8_t * data,
   INCR (bytes, top_len);
   pos = top_len;
 
-  strcpy (*result, top);	/* Flawfinder: ignore */
+  strcpy (*result, top);        /* Flawfinder: ignore */
 
   for (i = j = 0; i < data_size; i += 3, j += 4)
     {
 
       tmp = encode (tmpres, &data[i], data_size - i);
       if (tmp == -1)
-	{
-	  gnutls_assert ();
-	  gnutls_free ((*result));
-	  *result = NULL;
-	  return GNUTLS_E_BASE64_ENCODING_ERROR;
-	}
+        {
+          gnutls_assert ();
+          gnutls_free ((*result));
+          *result = NULL;
+          return GNUTLS_E_BASE64_ENCODING_ERROR;
+        }
 
       INCR (bytes, 4);
       ptr = &(*result)[j + pos];
 
       if ((j) % 64 == 0)
-	{
-	  INCR (bytes, 1);
-	  pos++;
-	  *ptr++ = '\n';
-	}
+        {
+          INCR (bytes, 1);
+          pos++;
+          *ptr++ = '\n';
+        }
       *ptr++ = tmpres[0];
 
       if ((j + 1) % 64 == 0)
-	{
-	  INCR (bytes, 1);
-	  pos++;
-	  *ptr++ = '\n';
-	}
+        {
+          INCR (bytes, 1);
+          pos++;
+          *ptr++ = '\n';
+        }
       *ptr++ = tmpres[1];
 
       if ((j + 2) % 64 == 0)
-	{
-	  INCR (bytes, 1);
-	  pos++;
-	  *ptr++ = '\n';
-	}
+        {
+          INCR (bytes, 1);
+          pos++;
+          *ptr++ = '\n';
+        }
       *ptr++ = tmpres[2];
 
       if ((j + 3) % 64 == 0)
-	{
-	  INCR (bytes, 1);
-	  pos++;
-	  *ptr++ = '\n';
-	}
+        {
+          INCR (bytes, 1);
+          pos++;
+          *ptr++ = '\n';
+        }
       *ptr++ = tmpres[3];
     }
 
@@ -306,7 +306,7 @@ _gnutls_fbase64_encode (const char *msg, const uint8_t * data,
  **/
 int
 gnutls_pem_base64_encode (const char *msg, const gnutls_datum_t * data,
-			  char *result, size_t * result_size)
+                          char *result, size_t * result_size)
 {
   opaque *ret;
   int size;
@@ -349,8 +349,8 @@ gnutls_pem_base64_encode (const char *msg, const gnutls_datum_t * data,
  **/
 int
 gnutls_pem_base64_encode_alloc (const char *msg,
-				const gnutls_datum_t * data,
-				gnutls_datum_t * result)
+                                const gnutls_datum_t * data,
+                                gnutls_datum_t * result)
 {
   opaque *ret;
   int size;
@@ -373,7 +373,7 @@ gnutls_pem_base64_encode_alloc (const char *msg,
  */
 int
 _gnutls_base64_decode (const uint8_t * data, size_t data_size,
-		       uint8_t ** result)
+                       uint8_t ** result)
 {
   unsigned int i, j;
   int ret, tmp, est;
@@ -389,11 +389,11 @@ _gnutls_base64_decode (const uint8_t * data, size_t data_size,
     {
       tmp = decode (tmpres, &data[i]);
       if (tmp < 0)
-	{
-	  gnutls_free (*result);
-	  *result = NULL;
-	  return tmp;
-	}
+        {
+          gnutls_free (*result);
+          *result = NULL;
+          return tmp;
+        }
       memcpy (&(*result)[j], tmpres, tmp);
       ret += tmp;
     }
@@ -415,8 +415,8 @@ cpydata (const uint8_t * data, int data_size, uint8_t ** result)
   for (j = i = 0; i < data_size; i++)
     {
       if (data[i] == '\n' || data[i] == '\r' || data[i] == ' '
-	  || data[i] == '\t')
-	continue;
+          || data[i] == '\t')
+        continue;
       (*result)[j] = data[i];
       j++;
     }
@@ -431,7 +431,7 @@ cpydata (const uint8_t * data, int data_size, uint8_t ** result)
 #define ENDSTR "-----"
 int
 _gnutls_fbase64_decode (const char *header, const opaque * data,
-			size_t data_size, uint8_t ** result)
+                        size_t data_size, uint8_t ** result)
 {
   int ret;
   static const char top[] = "-----BEGIN ";
@@ -540,8 +540,8 @@ _gnutls_fbase64_decode (const char *header, const opaque * data,
  **/
 int
 gnutls_pem_base64_decode (const char *header,
-			  const gnutls_datum_t * b64_data,
-			  unsigned char *result, size_t * result_size)
+                          const gnutls_datum_t * b64_data,
+                          unsigned char *result, size_t * result_size)
 {
   opaque *ret;
   int size;
@@ -586,8 +586,8 @@ gnutls_pem_base64_decode (const char *header,
  **/
 int
 gnutls_pem_base64_decode_alloc (const char *header,
-				const gnutls_datum_t * b64_data,
-				gnutls_datum_t * result)
+                                const gnutls_datum_t * b64_data,
+                                gnutls_datum_t * result)
 {
   opaque *ret;
   int size;

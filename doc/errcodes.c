@@ -49,7 +49,7 @@ main (int argc, char *argv[])
   int i, j;
   const char *desc;
   const char *_name;
-  error_name names_to_sort[400];	/* up to 400 names  */
+  error_name names_to_sort[400];        /* up to 400 names  */
 
   printf ("@table @code\n");
 
@@ -59,7 +59,7 @@ main (int argc, char *argv[])
     {
       _name = gnutls_strerror_name (i);
       if (_name == NULL)
-	continue;
+        continue;
 
       strcpy (names_to_sort[j].name, _name);
       names_to_sort[j].error_index = i;
@@ -73,7 +73,7 @@ main (int argc, char *argv[])
       _name = names_to_sort[i].name;
       desc = gnutls_strerror (names_to_sort[i].error_index);
       if (desc == NULL || _name == NULL)
-	continue;
+        continue;
 
       printf ("@item %s:\n%s\n\n", _name, desc);
     }

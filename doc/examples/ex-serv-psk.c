@@ -28,7 +28,7 @@
 #define SA struct sockaddr
 #define SOCKET_ERR(err,s) if(err==-1) {perror(s);return(1);}
 #define MAX_BUF 1024
-#define PORT 5556		/* listen to 5556 port */
+#define PORT 5556               /* listen to 5556 port */
 #define DH_BITS 1024
 
 /* These are global */
@@ -106,13 +106,13 @@ main (void)
 
   gnutls_certificate_allocate_credentials (&x509_cred);
   gnutls_certificate_set_x509_trust_file (x509_cred, CAFILE,
-					  GNUTLS_X509_FMT_PEM);
+                                          GNUTLS_X509_FMT_PEM);
 
   gnutls_certificate_set_x509_crl_file (x509_cred, CRLFILE,
-					GNUTLS_X509_FMT_PEM);
+                                        GNUTLS_X509_FMT_PEM);
 
   gnutls_certificate_set_x509_key_file (x509_cred, CERTFILE, KEYFILE,
-					GNUTLS_X509_FMT_PEM);
+                                        GNUTLS_X509_FMT_PEM);
 
   gnutls_psk_allocate_server_credentials (&psk_cred);
   gnutls_psk_set_server_credentials_function (psk_cred, pskfunc);
@@ -132,10 +132,10 @@ main (void)
   memset (&sa_serv, '\0', sizeof (sa_serv));
   sa_serv.sin_family = AF_INET;
   sa_serv.sin_addr.s_addr = INADDR_ANY;
-  sa_serv.sin_port = htons (PORT);	/* Server Port number */
+  sa_serv.sin_port = htons (PORT);      /* Server Port number */
 
   setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *) &optval,
-	      sizeof (int));
+              sizeof (int));
 
   err = bind (listen_sd, (SA *) & sa_serv, sizeof (sa_serv));
   SOCKET_ERR (err, "bind");
@@ -152,47 +152,47 @@ main (void)
       sd = accept (listen_sd, (SA *) & sa_cli, &client_len);
 
       printf ("- connection from %s, port %d\n",
-	      inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
-			 sizeof (topbuf)), ntohs (sa_cli.sin_port));
+              inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
+                         sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
       gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
       ret = gnutls_handshake (session);
       if (ret < 0)
-	{
-	  close (sd);
-	  gnutls_deinit (session);
-	  fprintf (stderr, "*** Handshake has failed (%s)\n\n",
-		   gnutls_strerror (ret));
-	  continue;
-	}
+        {
+          close (sd);
+          gnutls_deinit (session);
+          fprintf (stderr, "*** Handshake has failed (%s)\n\n",
+                   gnutls_strerror (ret));
+          continue;
+        }
       printf ("- Handshake was completed\n");
 
       /* see the Getting peer's information example */
       /* print_info(session); */
 
       for (;;)
-	{
-	  memset (buffer, 0, MAX_BUF + 1);
-	  ret = gnutls_record_recv (session, buffer, MAX_BUF);
+        {
+          memset (buffer, 0, MAX_BUF + 1);
+          ret = gnutls_record_recv (session, buffer, MAX_BUF);
 
-	  if (ret == 0)
-	    {
-	      printf ("\n- Peer has closed the GnuTLS connection\n");
-	      break;
-	    }
-	  else if (ret < 0)
-	    {
-	      fprintf (stderr, "\n*** Received corrupted "
-		       "data(%d). Closing the connection.\n\n", ret);
-	      break;
-	    }
-	  else if (ret > 0)
-	    {
-	      /* echo data back to the client
-	       */
-	      gnutls_record_send (session, buffer, strlen (buffer));
-	    }
-	}
+          if (ret == 0)
+            {
+              printf ("\n- Peer has closed the GnuTLS connection\n");
+              break;
+            }
+          else if (ret < 0)
+            {
+              fprintf (stderr, "\n*** Received corrupted "
+                       "data(%d). Closing the connection.\n\n", ret);
+              break;
+            }
+          else if (ret > 0)
+            {
+              /* echo data back to the client
+               */
+              gnutls_record_send (session, buffer, strlen (buffer));
+            }
+        }
       printf ("\n");
       /* do not wait for the peer to close the connection.
        */

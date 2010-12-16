@@ -54,8 +54,8 @@ _gnutls_free_dh_info (dh_info_st * dh)
 
 int
 _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
-				  opaque * data, size_t _data_size,
-				  bigint_t g, bigint_t p)
+                                  opaque * data, size_t _data_size,
+                                  bigint_t g, bigint_t p)
 {
   uint16_t n_Y;
   size_t _n_Y;
@@ -95,15 +95,15 @@ _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
     {
       ret = _gnutls_mpi_dprint (session->key->KEY, &session->key->key);
     }
-  else				/* In DHE_PSK the key is set differently */
+  else                          /* In DHE_PSK the key is set differently */
     {
       gnutls_datum_t tmp_dh_key;
       ret = _gnutls_mpi_dprint (session->key->KEY, &tmp_dh_key);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       ret = _gnutls_set_psk_session_key (session, &tmp_dh_key);
       _gnutls_free_datum (&tmp_dh_key);
@@ -130,7 +130,7 @@ _gnutls_gen_dh_common_client_kx (gnutls_session_t session, opaque ** data)
   *data = NULL;
 
   X = gnutls_calc_dh_secret (&x, session->key->client_g,
-			     session->key->client_p);
+                             session->key->client_p);
   if (X == NULL || x == NULL)
     {
       gnutls_assert ();
@@ -176,15 +176,15 @@ _gnutls_gen_dh_common_client_kx (gnutls_session_t session, opaque ** data)
     {
       ret = _gnutls_mpi_dprint (session->key->KEY, &session->key->key);
     }
-  else				/* In DHE_PSK the key is set differently */
+  else                          /* In DHE_PSK the key is set differently */
     {
       gnutls_datum_t tmp_dh_key;
       ret = _gnutls_mpi_dprint (session->key->KEY, &tmp_dh_key);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto error;
-	}
+        {
+          gnutls_assert ();
+          goto error;
+        }
 
       ret = _gnutls_set_psk_session_key (session, &tmp_dh_key);
       _gnutls_free_datum (&tmp_dh_key);
@@ -211,7 +211,7 @@ error:
 
 int
 _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
-				  opaque * data, size_t _data_size, int psk)
+                                  opaque * data, size_t _data_size, int psk)
 {
   uint16_t n_Y, n_g, n_p;
   size_t _n_Y, _n_g, _n_p;
@@ -292,7 +292,7 @@ _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
     }
 
   _gnutls_dh_set_group (session, session->key->client_g,
-			session->key->client_p);
+                        session->key->client_p);
   _gnutls_dh_set_peer_public (session, session->key->client_Y);
 
   ret = n_Y + n_p + n_g + 6;
@@ -306,8 +306,8 @@ _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
  * be inserted */
 int
 _gnutls_dh_common_print_server_kx (gnutls_session_t session,
-				   bigint_t g, bigint_t p, opaque ** data,
-				   int psk)
+                                   bigint_t g, bigint_t p, opaque ** data,
+                                   int psk)
 {
   bigint_t x, X;
   size_t n_X, n_g, n_p;

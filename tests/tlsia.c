@@ -59,7 +59,7 @@ tls_log_func (int level, const char *str)
 
 static int
 client_avp (gnutls_session_t session, void *ptr,
-	    const char *last, size_t lastlen, char **new, size_t * newlen)
+            const char *last, size_t lastlen, char **new, size_t * newlen)
 {
   static int iter = 0;
   const char *p;
@@ -67,10 +67,10 @@ client_avp (gnutls_session_t session, void *ptr,
   if (debug)
     {
       if (last)
-	printf ("client: received %d bytes AVP: `%.*s'\n",
-		(int) lastlen, (int) lastlen, last);
+        printf ("client: received %d bytes AVP: `%.*s'\n",
+                (int) lastlen, (int) lastlen, last);
       else
-	printf ("client: new application phase\n");
+        printf ("client: new application phase\n");
     }
 
   switch (iter)
@@ -171,7 +171,7 @@ client (void)
   else
     {
       if (debug)
-	success ("client: Handshake was completed\n");
+        success ("client: Handshake was completed\n");
     }
 
   /*
@@ -186,21 +186,21 @@ client (void)
   else
     {
       if (debug)
-	success ("client: TLS/IA handshake\n");
+        success ("client: TLS/IA handshake\n");
 
       ret = gnutls_ia_handshake (session);
 
       if (ret < 0)
-	{
-	  fail ("client: TLS/IA handshake failed\n");
-	  gnutls_perror (ret);
-	  goto end;
-	}
+        {
+          fail ("client: TLS/IA handshake failed\n");
+          gnutls_perror (ret);
+          goto end;
+        }
       else
-	{
-	  if (debug)
-	    success ("client: TLS/IA Handshake was completed\n");
-	}
+        {
+          if (debug)
+            success ("client: TLS/IA Handshake was completed\n");
+        }
     }
 
   gnutls_record_send (session, MSG, strlen (MSG));
@@ -209,7 +209,7 @@ client (void)
   if (ret == 0)
     {
       if (debug)
-	success ("client: Peer has closed the TLS connection\n");
+        success ("client: Peer has closed the TLS connection\n");
       goto end;
     }
   else if (ret < 0)
@@ -222,9 +222,9 @@ client (void)
     {
       printf ("- Received %d bytes: ", ret);
       for (ii = 0; ii < ret; ii++)
-	{
-	  fputc (buffer[ii], stdout);
-	}
+        {
+          fputc (buffer[ii], stdout);
+        }
       fputs ("\n", stdout);
     }
 
@@ -248,7 +248,7 @@ end:
 
 #define SA struct sockaddr
 #define MAX_BUF 1024
-#define PORT 5556		/* listen to 5556 port */
+#define PORT 5556               /* listen to 5556 port */
 #define DH_BITS 1024
 
 /* These are global */
@@ -303,14 +303,14 @@ int optval = 1;
 
 static int
 server_avp (gnutls_session_t session, void *ptr,
-	    const char *last, size_t lastlen, char **new, size_t * newlen)
+            const char *last, size_t lastlen, char **new, size_t * newlen)
 {
   static int iter = 0;
   const char *p;
 
   if (last && debug)
     printf ("server: received %d bytes AVP: `%.*s'\n",
-	    (int) lastlen, (int) lastlen, last);
+            (int) lastlen, (int) lastlen, last);
 
   gnutls_ia_permute_inner_secret (session, 3, "foo");
 
@@ -360,14 +360,14 @@ server_avp (gnutls_session_t session, void *ptr,
   if (strcmp (p, "1") == 0)
     {
       if (debug)
-	success ("server: Sending IntermediatePhaseFinished...\n");
+        success ("server: Sending IntermediatePhaseFinished...\n");
       return 1;
     }
 
   if (strcmp (p, "2") == 0)
     {
       if (debug)
-	success ("server: Sending FinalPhaseFinished...\n");
+        success ("server: Sending FinalPhaseFinished...\n");
       return 2;
     }
 
@@ -398,10 +398,10 @@ server_start (void)
   memset (&sa_serv, '\0', sizeof (sa_serv));
   sa_serv.sin_family = AF_INET;
   sa_serv.sin_addr.s_addr = INADDR_ANY;
-  sa_serv.sin_port = htons (PORT);	/* Server Port number */
+  sa_serv.sin_port = htons (PORT);      /* Server Port number */
 
   setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *) &optval,
-	      sizeof (int));
+              sizeof (int));
 
   err = bind (listen_sd, (SA *) & sa_serv, sizeof (sa_serv));
   if (err == -1)
@@ -457,8 +457,8 @@ server (void)
 
   if (debug)
     success ("server: connection from %s, port %d\n",
-	     inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
-			sizeof (topbuf)), ntohs (sa_cli.sin_port));
+             inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
+                        sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
   gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
 
@@ -482,21 +482,21 @@ server (void)
   else
     {
       if (debug)
-	success ("server: TLS/IA handshake\n");
+        success ("server: TLS/IA handshake\n");
 
       ret = gnutls_ia_handshake (session);
 
       if (ret < 0)
-	{
-	  fail ("server: TLS/IA handshake failed\n");
-	  gnutls_perror (ret);
-	  return;
-	}
+        {
+          fail ("server: TLS/IA handshake failed\n");
+          gnutls_perror (ret);
+          return;
+        }
       else
-	{
-	  if (debug)
-	    success ("server: TLS/IA Handshake was completed\n");
-	}
+        {
+          if (debug)
+            success ("server: TLS/IA Handshake was completed\n");
+        }
     }
 
   /* see the Getting peer's information example */
@@ -509,32 +509,32 @@ server (void)
       ret = gnutls_record_recv (session, buffer, MAX_BUF);
 
       if (ret == 0)
-	{
-	  if (debug)
-	    success ("server: Peer has closed the GnuTLS connection\n");
-	  break;
-	}
+        {
+          if (debug)
+            success ("server: Peer has closed the GnuTLS connection\n");
+          break;
+        }
       else if (ret < 0)
-	{
-	  if (ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
-	    {
-	      gnutls_alert_description_t alert;
-	      const char *err;
-	      alert = gnutls_alert_get (session);
-	      err = gnutls_alert_get_name (alert);
-	      if (err)
-		printf ("Fatal alert: %s\n", err);
-	    }
+        {
+          if (ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
+            {
+              gnutls_alert_description_t alert;
+              const char *err;
+              alert = gnutls_alert_get (session);
+              err = gnutls_alert_get_name (alert);
+              if (err)
+                printf ("Fatal alert: %s\n", err);
+            }
 
-	  fail ("server: Received corrupted data(%d). Closing...\n", ret);
-	  break;
-	}
+          fail ("server: Received corrupted data(%d). Closing...\n", ret);
+          break;
+        }
       else if (ret > 0)
-	{
-	  /* echo data back to the client
-	   */
-	  gnutls_record_send (session, buffer, strlen (buffer));
-	}
+        {
+          /* echo data back to the client
+           */
+          gnutls_record_send (session, buffer, strlen (buffer));
+        }
     }
   /* do not wait for the peer to close the connection.
    */

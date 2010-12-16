@@ -75,7 +75,7 @@ gnutls_calc_dh_secret (bigint_t * ret_x, bigint_t g, bigint_t prime)
     {
       gnutls_assert ();
       if (ret_x)
-	*ret_x = NULL;
+        *ret_x = NULL;
 
       _gnutls_mpi_release (&x);
       return NULL;
@@ -121,8 +121,8 @@ gnutls_calc_dh_key (bigint_t f, bigint_t x, bigint_t prime)
  -*/
 gnutls_dh_params_t
 _gnutls_get_dh_params (gnutls_dh_params_t dh_params,
-		       gnutls_params_function * func,
-		       gnutls_session_t session)
+                       gnutls_params_function * func,
+                       gnutls_session_t session)
 {
   gnutls_params_st params;
   int ret;
@@ -139,10 +139,10 @@ _gnutls_get_dh_params (gnutls_dh_params_t dh_params,
     {
       ret = func (session, GNUTLS_PARAMS_DH, &params);
       if (ret == 0 && params.type == GNUTLS_PARAMS_DH)
-	{
-	  session->internals.params.dh_params = params.params.dh;
-	  session->internals.params.free_dh_params = params.deinit;
-	}
+        {
+          session->internals.params.dh_params = params.params.dh;
+          session->internals.params.free_dh_params = params.deinit;
+        }
     }
 
   return session->internals.params.dh_params;

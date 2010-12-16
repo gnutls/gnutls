@@ -32,10 +32,10 @@
 #define YES 1
 
 static int _gnutls_inner_application_recv_params (gnutls_session_t session,
-						  const opaque * data,
-						  size_t data_size);
+                                                  const opaque * data,
+                                                  size_t data_size);
 static int _gnutls_inner_application_send_params (gnutls_session_t session,
-						  opaque * data, size_t);
+                                                  opaque * data, size_t);
 static int ia_unpack (gnutls_buffer_st * ps, extension_priv_data_t * _priv);
 static int ia_pack (extension_priv_data_t _priv, gnutls_buffer_st * ps);
 static void ia_deinit_data (extension_priv_data_t priv);
@@ -54,7 +54,7 @@ extension_entry_st ext_mod_ia = {
 
 static int
 _gnutls_inner_application_recv_params (gnutls_session_t session,
-				       const opaque * data, size_t data_size)
+                                       const opaque * data, size_t data_size)
 {
   extension_priv_data_t epriv;
   ia_ext_st *priv;
@@ -68,20 +68,20 @@ _gnutls_inner_application_recv_params (gnutls_session_t session,
 
   ret =
     _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_INNER_APPLICATION,
-				  &epriv);
+                                  &epriv);
   if (ret < 0)
     {
       priv = gnutls_calloc (1, sizeof (*priv));
       if (priv == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
 
       epriv.ptr = priv;
       _gnutls_ext_set_session_data (session,
-				    GNUTLS_EXTENSION_INNER_APPLICATION,
-				    epriv);
+                                    GNUTLS_EXTENSION_INNER_APPLICATION,
+                                    epriv);
     }
   else
     priv = epriv.ptr;
@@ -91,7 +91,7 @@ _gnutls_inner_application_recv_params (gnutls_session_t session,
 
   switch ((unsigned char) *data)
     {
-    case NO:			/* Peer's ia_on_resume == no */
+    case NO:                   /* Peer's ia_on_resume == no */
       priv->flags |= IA_PEER_ALLOW_SKIP;
       break;
 
@@ -111,7 +111,7 @@ _gnutls_inner_application_recv_params (gnutls_session_t session,
  */
 static int
 _gnutls_inner_application_send_params (gnutls_session_t session,
-				       opaque * data, size_t data_size)
+                                       opaque * data, size_t data_size)
 {
   extension_priv_data_t epriv;
   ia_ext_st *priv = NULL;
@@ -119,20 +119,20 @@ _gnutls_inner_application_send_params (gnutls_session_t session,
 
   ret =
     _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_INNER_APPLICATION,
-				  &epriv);
+                                  &epriv);
   if (ret < 0)
     {
       priv = gnutls_calloc (1, sizeof (*priv));
       if (priv == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
 
       epriv.ptr = priv;
       _gnutls_ext_set_session_data (session,
-				    GNUTLS_EXTENSION_INNER_APPLICATION,
-				    epriv);
+                                    GNUTLS_EXTENSION_INNER_APPLICATION,
+                                    epriv);
     }
   else
     priv = epriv.ptr;
@@ -143,20 +143,20 @@ _gnutls_inner_application_send_params (gnutls_session_t session,
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
       gnutls_ia_client_credentials_t cred = (gnutls_ia_client_credentials_t)
-	_gnutls_get_cred (session->key, GNUTLS_CRD_IA, NULL);
+        _gnutls_get_cred (session->key, GNUTLS_CRD_IA, NULL);
 
       if (cred)
-	priv->flags |= IA_ENABLE;
+        priv->flags |= IA_ENABLE;
     }
-  else				/* SERVER */
+  else                          /* SERVER */
     {
       gnutls_ia_server_credentials_t cred;
 
       cred = (gnutls_ia_server_credentials_t)
-	_gnutls_get_cred (session->key, GNUTLS_CRD_IA, NULL);
+        _gnutls_get_cred (session->key, GNUTLS_CRD_IA, NULL);
 
       if (cred)
-	priv->flags |= IA_PEER_ENABLE;
+        priv->flags |= IA_PEER_ENABLE;
     }
 
   /* If we don't want gnutls_ia locally, or we are a server and the
@@ -188,7 +188,7 @@ _gnutls_inner_application_send_params (gnutls_session_t session,
       /* Client: value follows local setting */
 
       if (priv->flags & IA_ALLOW_SKIP)
-	*data = NO;
+        *data = NO;
     }
   else
     {
@@ -206,9 +206,9 @@ _gnutls_inner_application_send_params (gnutls_session_t session,
        * to record the peer's support for IA at all. Simon? */
 
       if ((priv->flags & IA_ALLOW_SKIP) &&
-	  (priv->flags & IA_PEER_ALLOW_SKIP) &&
-	  session->internals.resumed == RESUME_TRUE)
-	*data = NO;
+          (priv->flags & IA_PEER_ALLOW_SKIP) &&
+          session->internals.resumed == RESUME_TRUE)
+        *data = NO;
     }
 
   return 1;

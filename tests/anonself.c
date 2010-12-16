@@ -103,13 +103,13 @@ client (void)
   else
     {
       if (debug)
-	success ("client: Handshake was completed\n");
+        success ("client: Handshake was completed\n");
     }
 
   if (debug)
     success ("client: TLS version is: %s\n",
-	     gnutls_protocol_get_name (gnutls_protocol_get_version
-				       (session)));
+             gnutls_protocol_get_name (gnutls_protocol_get_version
+                                       (session)));
 
   gnutls_record_send (session, MSG, strlen (MSG));
 
@@ -117,7 +117,7 @@ client (void)
   if (ret == 0)
     {
       if (debug)
-	success ("client: Peer has closed the TLS connection\n");
+        success ("client: Peer has closed the TLS connection\n");
       goto end;
     }
   else if (ret < 0)
@@ -130,9 +130,9 @@ client (void)
     {
       printf ("- Received %d bytes: ", ret);
       for (ii = 0; ii < ret; ii++)
-	{
-	  fputc (buffer[ii], stdout);
-	}
+        {
+          fputc (buffer[ii], stdout);
+        }
       fputs ("\n", stdout);
     }
 
@@ -154,7 +154,7 @@ end:
 
 #define SA struct sockaddr
 #define MAX_BUF 1024
-#define PORT 5556		/* listen to 5556 port */
+#define PORT 5556               /* listen to 5556 port */
 #define DH_BITS 1024
 
 /* These are global */
@@ -222,10 +222,10 @@ server_start (void)
   memset (&sa_serv, '\0', sizeof (sa_serv));
   sa_serv.sin_family = AF_INET;
   sa_serv.sin_addr.s_addr = INADDR_ANY;
-  sa_serv.sin_port = htons (PORT);	/* Server Port number */
+  sa_serv.sin_port = htons (PORT);      /* Server Port number */
 
   setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *) &optval,
-	      sizeof (int));
+              sizeof (int));
 
   err = bind (listen_sd, (SA *) & sa_serv, sizeof (sa_serv));
   if (err == -1)
@@ -275,8 +275,8 @@ server (void)
 
   if (debug)
     success ("server: connection from %s, port %d\n",
-	     inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
-			sizeof (topbuf)), ntohs (sa_cli.sin_port));
+             inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
+                        sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
   gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
   ret = gnutls_handshake (session);
@@ -292,8 +292,8 @@ server (void)
 
   if (debug)
     success ("server: TLS version is: %s\n",
-	     gnutls_protocol_get_name (gnutls_protocol_get_version
-				       (session)));
+             gnutls_protocol_get_name (gnutls_protocol_get_version
+                                       (session)));
 
   /* see the Getting peer's information example */
   /* print_info(session); */
@@ -305,22 +305,22 @@ server (void)
       ret = gnutls_record_recv (session, buffer, MAX_BUF);
 
       if (ret == 0)
-	{
-	  if (debug)
-	    success ("server: Peer has closed the GnuTLS connection\n");
-	  break;
-	}
+        {
+          if (debug)
+            success ("server: Peer has closed the GnuTLS connection\n");
+          break;
+        }
       else if (ret < 0)
-	{
-	  fail ("server: Received corrupted data(%d). Closing...\n", ret);
-	  break;
-	}
+        {
+          fail ("server: Received corrupted data(%d). Closing...\n", ret);
+          break;
+        }
       else if (ret > 0)
-	{
-	  /* echo data back to the client
-	   */
-	  gnutls_record_send (session, buffer, strlen (buffer));
-	}
+        {
+          /* echo data back to the client
+           */
+          gnutls_record_send (session, buffer, strlen (buffer));
+        }
     }
   /* do not wait for the peer to close the connection.
    */

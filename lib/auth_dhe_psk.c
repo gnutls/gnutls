@@ -55,7 +55,7 @@ const mod_auth_st dhe_psk_auth_struct = {
   NULL,
 
   NULL,
-  NULL,				/* certificate */
+  NULL,                         /* certificate */
   proc_psk_server_kx,
   proc_psk_client_kx,
   NULL,
@@ -146,7 +146,7 @@ gen_psk_server_kx (gnutls_session_t session, opaque ** data)
 
   if ((ret =
        _gnutls_auth_info_set (session, GNUTLS_CRD_PSK,
-			      sizeof (psk_auth_info_st), 1)) < 0)
+                              sizeof (psk_auth_info_st), 1)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -166,7 +166,7 @@ gen_psk_server_kx (gnutls_session_t session, opaque ** data)
 
 static int
 proc_psk_client_kx (gnutls_session_t session, opaque * data,
-		    size_t _data_size)
+                    size_t _data_size)
 {
   int ret;
   bigint_t p, g;
@@ -188,7 +188,7 @@ proc_psk_client_kx (gnutls_session_t session, opaque * data,
 
   if ((ret =
        _gnutls_auth_info_set (session, GNUTLS_CRD_PSK,
-			      sizeof (psk_auth_info_st), 1)) < 0)
+                              sizeof (psk_auth_info_st), 1)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -237,7 +237,7 @@ proc_psk_client_kx (gnutls_session_t session, opaque * data,
 
 int
 proc_psk_server_kx (gnutls_session_t session, opaque * data,
-		    size_t _data_size)
+                    size_t _data_size)
 {
 
   int ret;
@@ -245,7 +245,7 @@ proc_psk_server_kx (gnutls_session_t session, opaque * data,
   /* set auth_info */
   if ((ret =
        _gnutls_auth_info_set (session, GNUTLS_CRD_PSK,
-			      sizeof (psk_auth_info_st), 1)) < 0)
+                              sizeof (psk_auth_info_st), 1)) < 0)
     {
       gnutls_assert ();
       return ret;

@@ -30,7 +30,7 @@
 
 #ifndef __attribute__
 #if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 5)
-#define __attribute__(Spec)	/* empty */
+#define __attribute__(Spec)     /* empty */
 #endif
 #endif
 

@@ -84,7 +84,7 @@ gaa_parser (int argc, char **argv)
   if (gaa (argc, argv, &info) != -1)
     {
       fprintf (stderr, "Try `%s --help' for more information.\n",
-	       program_name);
+               program_name);
       exit (1);
     }
 
@@ -100,27 +100,27 @@ gaa_parser (int argc, char **argv)
     {
       ret = gnutls_pkcs11_init (GNUTLS_PKCS11_FLAG_MANUAL, NULL);
       if (ret < 0)
-	fprintf (stderr, "pkcs11_init: %s", gnutls_strerror (ret));
+        fprintf (stderr, "pkcs11_init: %s", gnutls_strerror (ret));
       else
-	{
-	  ret = gnutls_pkcs11_add_provider (info.pkcs11_provider, NULL);
-	  if (ret < 0)
-	    error (EXIT_FAILURE, 0, "pkcs11_add_provider: %s",
-		   gnutls_strerror (ret));
-	}
+        {
+          ret = gnutls_pkcs11_add_provider (info.pkcs11_provider, NULL);
+          if (ret < 0)
+            error (EXIT_FAILURE, 0, "pkcs11_add_provider: %s",
+                   gnutls_strerror (ret));
+        }
     }
   else
     {
       ret = gnutls_pkcs11_init (GNUTLS_PKCS11_FLAG_AUTO, NULL);
       if (ret < 0)
-	fprintf (stderr, "pkcs11_init: %s", gnutls_strerror (ret));
+        fprintf (stderr, "pkcs11_init: %s", gnutls_strerror (ret));
     }
 
   if (info.outfile)
     {
       outfile = safe_open_rw (info.outfile, 0);
       if (outfile == NULL)
-	error (EXIT_FAILURE, errno, "%s", info.outfile);
+        error (EXIT_FAILURE, errno, "%s", info.outfile);
     }
   else
     outfile = stdout;
@@ -136,21 +136,21 @@ gaa_parser (int argc, char **argv)
     {
     case ACTION_PKCS11_LIST:
       pkcs11_list (outfile, info.pkcs11_url, info.pkcs11_type,
-		   info.pkcs11_login, info.pkcs11_detailed_url, &cinfo);
+                   info.pkcs11_login, info.pkcs11_detailed_url, &cinfo);
       break;
     case ACTION_PKCS11_TOKENS:
       pkcs11_token_list (outfile, info.pkcs11_detailed_url, &cinfo);
       break;
     case ACTION_PKCS11_MECHANISMS:
       pkcs11_mechanism_list (outfile, info.pkcs11_url, info.pkcs11_login,
-			     &cinfo);
+                             &cinfo);
       break;
     case ACTION_PKCS11_EXPORT_URL:
       pkcs11_export (outfile, info.pkcs11_url, info.pkcs11_login, &cinfo);
       break;
     case ACTION_PKCS11_WRITE_URL:
       pkcs11_write (outfile, info.pkcs11_url, info.pkcs11_label,
-		    info.pkcs11_trusted, info.pkcs11_login, &cinfo);
+                    info.pkcs11_trusted, info.pkcs11_login, &cinfo);
       break;
     case ACTION_PKCS11_TOKEN_INIT:
       pkcs11_init (outfile, info.pkcs11_url, info.pkcs11_label, &cinfo);

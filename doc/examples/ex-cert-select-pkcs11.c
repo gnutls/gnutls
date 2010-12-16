@@ -35,9 +35,9 @@ extern int tcp_connect (void);
 extern void tcp_close (int sd);
 
 static int cert_callback (gnutls_session_t session,
-			  const gnutls_datum_t * req_ca_rdn, int nreqs,
-			  const gnutls_pk_algorithm_t * sign_algos,
-			  int sign_algos_length, gnutls_retr2_st * st);
+                          const gnutls_datum_t * req_ca_rdn, int nreqs,
+                          const gnutls_pk_algorithm_t * sign_algos,
+                          int sign_algos_length, gnutls_retr2_st * st);
 
 gnutls_x509_crt_t crt;
 gnutls_pkcs11_privkey_t key;
@@ -56,12 +56,12 @@ load_keys (void)
   /* some tokens require login to read data */
   if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
     ret = gnutls_x509_crt_import_pkcs11_url (crt, CERT_URL,
-					     GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
+                                             GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 
   if (ret < 0)
     {
       fprintf (stderr, "*** Error loading key file: %s\n",
-	       gnutls_strerror (ret));
+               gnutls_strerror (ret));
       exit (1);
     }
 
@@ -71,7 +71,7 @@ load_keys (void)
   if (ret < 0)
     {
       fprintf (stderr, "*** Error loading key file: %s\n",
-	       gnutls_strerror (ret));
+               gnutls_strerror (ret));
       exit (1);
     }
 
@@ -79,14 +79,14 @@ load_keys (void)
 
 static int
 pin_callback (void *user, int attempt, const char *token_url,
-	      const char *token_label, unsigned int flags, char *pin,
-	      size_t pin_max)
+              const char *token_label, unsigned int flags, char *pin,
+              size_t pin_max)
 {
   const char *password;
   int len;
 
   printf ("PIN required for token '%s' with URL '%s'\n", token_label,
-	  token_url);
+          token_url);
   if (flags & GNUTLS_PKCS11_PIN_FINAL_TRY)
     printf ("*** This is the final try before locking!\n");
   if (flags & GNUTLS_PKCS11_PIN_COUNT_LOW)
@@ -216,9 +216,9 @@ end:
 
 static int
 cert_callback (gnutls_session_t session,
-	       const gnutls_datum_t * req_ca_rdn, int nreqs,
-	       const gnutls_pk_algorithm_t * sign_algos,
-	       int sign_algos_length, gnutls_retr2_st * st)
+               const gnutls_datum_t * req_ca_rdn, int nreqs,
+               const gnutls_pk_algorithm_t * sign_algos,
+               int sign_algos_length, gnutls_retr2_st * st)
 {
   char issuer_dn[256];
   int i, ret;
@@ -238,10 +238,10 @@ cert_callback (gnutls_session_t session,
       len = sizeof (issuer_dn);
       ret = gnutls_x509_rdn_get (&req_ca_rdn[i], issuer_dn, &len);
       if (ret >= 0)
-	{
-	  printf ("   [%d]: ", i);
-	  printf ("%s\n", issuer_dn);
-	}
+        {
+          printf ("   [%d]: ", i);
+          printf ("%s\n", issuer_dn);
+        }
     }
 
   /* Select a certificate and return it.
@@ -259,39 +259,39 @@ cert_callback (gnutls_session_t session,
 
       ret = gnutls_x509_crt_get_signature_algorithm (crt);
       if (ret < 0)
-	{
-	  /* error reading signature algorithm
-	   */
-	  return -1;
-	}
+        {
+          /* error reading signature algorithm
+           */
+          return -1;
+        }
       cert_algo = ret;
 
       i = 0;
       do
-	{
-	  ret = gnutls_sign_algorithm_get_requested (session, i, &req_algo);
-	  if (ret >= 0 && cert_algo == req_algo)
-	    {
-	      match = 1;
-	      break;
-	    }
+        {
+          ret = gnutls_sign_algorithm_get_requested (session, i, &req_algo);
+          if (ret >= 0 && cert_algo == req_algo)
+            {
+              match = 1;
+              break;
+            }
 
-	  /* server has not requested anything specific */
-	  if (i == 0 && ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-	    {
-	      match = 1;
-	      break;
-	    }
-	  i++;
-	}
+          /* server has not requested anything specific */
+          if (i == 0 && ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+            {
+              match = 1;
+              break;
+            }
+          i++;
+        }
       while (ret >= 0);
 
       if (match == 0)
-	{
-	  printf
-	    ("- Could not find a suitable certificate to send to server\n");
-	  return -1;
-	}
+        {
+          printf
+            ("- Could not find a suitable certificate to send to server\n");
+          return -1;
+        }
 
       st->cert_type = type;
       st->ncerts = 1;

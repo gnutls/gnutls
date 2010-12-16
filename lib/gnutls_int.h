@@ -176,7 +176,7 @@ typedef enum extensions_t
   GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS = 13,
   GNUTLS_EXTENSION_SESSION_TICKET = 35,
   GNUTLS_EXTENSION_INNER_APPLICATION = 37703,
-  GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281	/* aka: 0xff01 */
+  GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281   /* aka: 0xff01 */
 } extensions_t;
 
 typedef enum
@@ -207,7 +207,7 @@ typedef struct mbuffer_st
      message. Mark should only be non-zero when this buffer is the
      head of the queue. */
   size_t mark;
-  unsigned int user_mark;	/* only used during fill in */
+  unsigned int user_mark;       /* only used during fill in */
   size_t maximum_size;
 } mbuffer_st;
 
@@ -222,8 +222,8 @@ typedef struct mbuffer_head_st
 
 typedef enum
 {
-  HANDSHAKE_MAC_TYPE_10 = 1,	/* TLS 1.0 style */
-  HANDSHAKE_MAC_TYPE_12		/* TLS 1.2 style */
+  HANDSHAKE_MAC_TYPE_10 = 1,    /* TLS 1.0 style */
+  HANDSHAKE_MAC_TYPE_12         /* TLS 1.2 style */
 } handshake_mac_type_t;
 
 /* Store & Retrieve functions defines: 
@@ -267,11 +267,11 @@ struct gnutls_key_st
    */
   void *auth_info;
   gnutls_credentials_type_t auth_info_type;
-  int auth_info_size;		/* needed in order to store to db for restoring 
-				 */
+  int auth_info_size;           /* needed in order to store to db for restoring 
+                                 */
   uint8_t crypt_algo;
 
-  auth_cred_st *cred;		/* used to specify keys/certificates etc */
+  auth_cred_st *cred;           /* used to specify keys/certificates etc */
 
   int certificate_requested;
   /* some ciphersuites use this
@@ -307,7 +307,7 @@ typedef struct
 typedef struct
 {
   uint8_t hash_algorithm;
-  uint8_t sign_algorithm;	/* pk algorithm actually */
+  uint8_t sign_algorithm;       /* pk algorithm actually */
 } sign_algorithm_st;
 
 /* This structure holds parameters got from TLS extension
@@ -317,7 +317,7 @@ typedef struct
 
 #define MAX_SIGNATURE_ALGORITHMS 16
 
-#define MAX_VERIFY_DATA_SIZE 36	/* in SSL 3.0, 12 in TLS 1.0 */
+#define MAX_VERIFY_DATA_SIZE 36 /* in SSL 3.0, 12 in TLS 1.0 */
 
 /* auth_info_t structures now MAY contain malloced 
  * elements.
@@ -341,7 +341,7 @@ typedef struct
 {
   gnutls_connection_end_t entity;
   gnutls_kx_algorithm_t kx_algorithm;
-  handshake_mac_type_t handshake_mac_handle_type;	/* one of HANDSHAKE_TYPE_10 and HANDSHAKE_TYPE_12 */
+  handshake_mac_type_t handshake_mac_handle_type;       /* one of HANDSHAKE_TYPE_10 and HANDSHAKE_TYPE_12 */
 
   /* The epoch used to read and write */
   uint16_t epoch_read;
@@ -372,7 +372,7 @@ typedef struct
   uint16_t max_record_recv_size;
   /* holds the negotiated certificate type */
   gnutls_certificate_type_t cert_type;
-  gnutls_protocol_t version;	/* moved here */
+  gnutls_protocol_t version;    /* moved here */
 
   /* FIXME: The following are not saved in the session storage
    * for session resumption.
@@ -486,42 +486,42 @@ typedef union
 
 typedef struct
 {
-  gnutls_buffer_st application_data_buffer;	/* holds data to be delivered to application layer */
-  gnutls_buffer_st handshake_hash_buffer;	/* used to keep the last received handshake 
-						 * message */
+  gnutls_buffer_st application_data_buffer;     /* holds data to be delivered to application layer */
+  gnutls_buffer_st handshake_hash_buffer;       /* used to keep the last received handshake 
+                                                 * message */
   union
   {
     struct
     {
-      digest_hd_st sha;		/* hash of the handshake messages */
-      digest_hd_st md5;		/* hash of the handshake messages */
+      digest_hd_st sha;         /* hash of the handshake messages */
+      digest_hd_st md5;         /* hash of the handshake messages */
     } tls10;
     struct
     {
-      digest_hd_st sha1;	/* hash of the handshake messages for TLS 1.2+ */
-      digest_hd_st sha256;	/* hash of the handshake messages for TLS 1.2+ */
+      digest_hd_st sha1;        /* hash of the handshake messages for TLS 1.2+ */
+      digest_hd_st sha256;      /* hash of the handshake messages for TLS 1.2+ */
     } tls12;
   } handshake_mac_handle;
-  int handshake_mac_handle_init;	/* 1 when the previous union and type were initialized */
+  int handshake_mac_handle_init;        /* 1 when the previous union and type were initialized */
 
-  gnutls_buffer_st handshake_data_buffer;	/* this is a buffer that holds the current handshake message */
-  gnutls_buffer_st ia_data_buffer;	/* holds inner application data (TLS/IA) */
-  int resumable:1;		/* TRUE or FALSE - if we can resume that session */
-  handshake_state_t handshake_state;	/* holds
-					 * a number which indicates where
-					 * the handshake procedure has been
-					 * interrupted. If it is 0 then
-					 * no interruption has happened.
-					 */
+  gnutls_buffer_st handshake_data_buffer;       /* this is a buffer that holds the current handshake message */
+  gnutls_buffer_st ia_data_buffer;      /* holds inner application data (TLS/IA) */
+  int resumable:1;              /* TRUE or FALSE - if we can resume that session */
+  handshake_state_t handshake_state;    /* holds
+                                         * a number which indicates where
+                                         * the handshake procedure has been
+                                         * interrupted. If it is 0 then
+                                         * no interruption has happened.
+                                         */
 
-  int invalid_connection:1;	/* true or FALSE - if this session is valid */
+  int invalid_connection:1;     /* true or FALSE - if this session is valid */
 
-  int may_not_read:1;		/* if it's 0 then we can read/write, otherwise it's forbiden to read/write
-				 */
+  int may_not_read:1;           /* if it's 0 then we can read/write, otherwise it's forbiden to read/write
+                                 */
   int may_not_write:1;
-  int read_eof:1;		/* non-zero if we have received a closure alert. */
+  int read_eof:1;               /* non-zero if we have received a closure alert. */
 
-  int last_alert;		/* last alert received */
+  int last_alert;               /* last alert received */
 
   /* The last handshake messages sent or received.
    */
@@ -535,7 +535,7 @@ typedef struct
   struct gnutls_priority_st priorities;
 
   /* resumed session */
-  int resumed:1;		/* RESUME_TRUE or FALSE - if we are resuming a session */
+  int resumed:1;                /* RESUME_TRUE or FALSE - if we are resuming a session */
   security_parameters_st resumed_security_parameters;
   gnutls_compression_method_t resumed_compression_method;
 
@@ -555,25 +555,25 @@ typedef struct
    * non blocking IO.
    */
   mbuffer_head_st record_recv_buffer;
-  mbuffer_head_st record_send_buffer;	/* holds cached data
-					 * for the gnutls_io_write_buffered()
-					 * function.
-					 */
-  size_t record_send_buffer_user_size;	/* holds the
-					 * size of the user specified data to
-					 * send.
-					 */
+  mbuffer_head_st record_send_buffer;   /* holds cached data
+                                         * for the gnutls_io_write_buffered()
+                                         * function.
+                                         */
+  size_t record_send_buffer_user_size;  /* holds the
+                                         * size of the user specified data to
+                                         * send.
+                                         */
 
 
   /* 0 if no peeked data was kept, 1 otherwise.
    */
   int have_peeked_data:1;
 
-  int expire_time;		/* after expire_time seconds this session will expire */
-  struct mod_auth_st_int *auth_struct;	/* used in handshake packets and KX algorithms */
-  int v2_hello;			/* 0 if the client hello is v3+.
-				 * non-zero if we got a v2 hello.
-				 */
+  int expire_time;              /* after expire_time seconds this session will expire */
+  struct mod_auth_st_int *auth_struct;  /* used in handshake packets and KX algorithms */
+  int v2_hello;                 /* 0 if the client hello is v3+.
+                                 * non-zero if we got a v2 hello.
+                                 */
   /* keeps the headers of the handshake packet 
    */
   handshake_header_buffer_st handshake_header_buffer;
@@ -650,10 +650,10 @@ typedef struct
 
   void *user_ptr;
 
-  int enable_private;		/* non zero to
-				 * enable cipher suites
-				 * which have 0xFF status.
-				 */
+  int enable_private;           /* non zero to
+                                 * enable cipher suites
+                                 * which have 0xFF status.
+                                 */
 
   /* Holds 0 if the last called function was interrupted while
    * receiving, and non zero otherwise.
@@ -750,7 +750,7 @@ struct gnutls_session_int
 /* functions 
  */
 void _gnutls_set_current_version (gnutls_session_t session,
-				  gnutls_protocol_t version);
+                                  gnutls_protocol_t version);
 void _gnutls_free_auth_info (gnutls_session_t session);
 
 /* These two macros return the advertized TLS version of

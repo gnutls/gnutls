@@ -55,9 +55,9 @@ typedef struct gnutls_certificate_credentials_st
   /* contains the number of the certificates in a
    * row (should be 1 for OpenPGP keys).
    */
-  unsigned ncerts;		/* contains the number of columns in cert_list.
-				 * This is the same with the number of pkeys.
-				 */
+  unsigned ncerts;              /* contains the number of columns in cert_list.
+                                 * This is the same with the number of pkeys.
+                                 */
 
   gnutls_privkey_t *pkey;
   /* private keys. It contains ncerts private
@@ -73,16 +73,16 @@ typedef struct gnutls_certificate_credentials_st
   /* X509 specific stuff */
 
   gnutls_x509_crt_t *x509_ca_list;
-  unsigned x509_ncas;		/* number of CAs in the ca_list 
-				 */
+  unsigned x509_ncas;           /* number of CAs in the ca_list 
+                                 */
 
   gnutls_x509_crl_t *x509_crl_list;
-  unsigned x509_ncrls;		/* number of CRLs in the crl_list 
-				 */
+  unsigned x509_ncrls;          /* number of CRLs in the crl_list 
+                                 */
 
-  unsigned int verify_flags;	/* flags to be used at 
-				 * certificate verification.
-				 */
+  unsigned int verify_flags;    /* flags to be used at 
+                                 * certificate verification.
+                                 */
   unsigned int verify_depth;
   unsigned int verify_bits;
 
@@ -93,8 +93,8 @@ typedef struct gnutls_certificate_credentials_st
    */
   gnutls_datum_t x509_rdn_sequence;
 
-  gnutls_certificate_client_retrieve_function *client_get_cert_callback;	/* deprecated */
-  gnutls_certificate_server_retrieve_function *server_get_cert_callback;	/* deprecated */
+  gnutls_certificate_client_retrieve_function *client_get_cert_callback;        /* deprecated */
+  gnutls_certificate_server_retrieve_function *server_get_cert_callback;        /* deprecated */
   gnutls_certificate_verify_function *verify_callback;
 
   gnutls_certificate_retrieve_function *get_cert_callback;
@@ -117,10 +117,10 @@ typedef struct cert_auth_info_st
   dh_info_st dh;
   rsa_info_st rsa_export;
 
-  gnutls_datum_t *raw_certificate_list;	/* holds the raw certificate of the
-					 * peer.
-					 */
-  unsigned int ncerts;		/* holds the size of the list above */
+  gnutls_datum_t *raw_certificate_list; /* holds the raw certificate of the
+                                         * peer.
+                                         */
+  unsigned int ncerts;          /* holds the size of the list above */
 
   gnutls_certificate_type_t cert_type;
   gnutls_sign_algorithm_t sign_algo;
@@ -143,33 +143,33 @@ int _gnutls_proc_cert_cert_req (gnutls_session_t, opaque *, size_t);
 int _gnutls_proc_cert_client_cert_vrfy (gnutls_session_t, opaque *, size_t);
 int _gnutls_proc_cert_server_certificate (gnutls_session_t, opaque *, size_t);
 int _gnutls_get_selected_cert (gnutls_session_t session,
-			       gnutls_cert ** apr_cert_list,
-			       int *apr_cert_list_length,
-			       gnutls_privkey_t * apr_pkey);
+                               gnutls_cert ** apr_cert_list,
+                               int *apr_cert_list_length,
+                               gnutls_privkey_t * apr_pkey);
 
 int _gnutls_server_select_cert (struct gnutls_session_int *,
-				gnutls_pk_algorithm_t);
+                                gnutls_pk_algorithm_t);
 void _gnutls_selected_certs_deinit (gnutls_session_t session);
 void _gnutls_selected_certs_set (gnutls_session_t session,
-				 gnutls_cert * certs, int ncerts,
-				 gnutls_privkey_t key, int need_free);
+                                 gnutls_cert * certs, int ncerts,
+                                 gnutls_privkey_t key, int need_free);
 
 #define _gnutls_proc_cert_client_certificate _gnutls_proc_cert_server_certificate
 
 gnutls_rsa_params_t _gnutls_certificate_get_rsa_params (gnutls_rsa_params_t
-							rsa_params,
-							gnutls_params_function
-							* func,
-							gnutls_session_t);
+                                                        rsa_params,
+                                                        gnutls_params_function
+                                                        * func,
+                                                        gnutls_session_t);
 
 int _gnutls_get_auth_info_gcert (gnutls_cert * gcert,
-				 gnutls_certificate_type_t type,
-				 cert_auth_info_t info,
-				 int flags /* OR of ConvFlags */ );
+                                 gnutls_certificate_type_t type,
+                                 cert_auth_info_t info,
+                                 int flags /* OR of ConvFlags */ );
 
 int certificate_credential_append_crt_list (gnutls_certificate_credentials_t
-					    res, gnutls_cert * crt, int nr);
+                                            res, gnutls_cert * crt, int nr);
 int certificate_credentials_append_pkey (gnutls_certificate_credentials_t res,
-					 gnutls_privkey_t pkey);
+                                         gnutls_privkey_t pkey);
 
 #endif

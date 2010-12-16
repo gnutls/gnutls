@@ -137,7 +137,7 @@ write_mpibuf (cdk_stream_t out, bigint_t mpi[MAX_CDK_PK_PARTS], size_t count)
     {
       rc = write_mpi (out, mpi[i]);
       if (rc)
-	return rc;
+        return rc;
     }
   return 0;
 }
@@ -163,13 +163,13 @@ pkt_encode_len (cdk_stream_t out, size_t pktlen)
       pktlen -= 192;
       rc = stream_putc (out, (pktlen / 256) + 192);
       if (!rc)
-	rc = stream_putc (out, (pktlen % 256));
+        rc = stream_putc (out, (pktlen % 256));
     }
   else
     {
       rc = stream_putc (out, 255);
       if (!rc)
-	rc = write_32 (out, pktlen);
+        rc = write_32 (out, pktlen);
     }
 
   return rc;
@@ -217,11 +217,11 @@ write_head_old (cdk_stream_t out, size_t size, int type)
   if (!rc)
     {
       if (size < 256)
-	rc = stream_putc (out, size);
+        rc = stream_putc (out, size);
       else if (size < 65536)
-	rc = write_16 (out, size);
+        rc = write_16 (out, size);
       else
-	rc = write_32 (out, size);
+        rc = write_32 (out, size);
     }
 
   return rc;
@@ -301,7 +301,7 @@ write_mdc (cdk_stream_t out, cdk_pkt_mdc_t mdc)
     _gnutls_write_log ("write_mdc:\n");
 
   /* This packet requires a fixed header encoding */
-  rc = stream_putc (out, 0xD3);	/* packet ID and 1 byte length */
+  rc = stream_putc (out, 0xD3); /* packet ID and 1 byte length */
   if (!rc)
     rc = stream_putc (out, 0x14);
   if (!rc)
@@ -399,7 +399,7 @@ write_signature (cdk_stream_t out, cdk_pkt_signature_t sig, int old_ctb)
     {
       buf = _cdk_subpkt_get_array (sig->hashed, 0, &nbytes);
       if (!buf)
-	return CDK_Out_Of_Core;
+        return CDK_Out_Of_Core;
       rc = stream_write (out, buf, nbytes);
       cdk_free (buf);
     }
@@ -409,7 +409,7 @@ write_signature (cdk_stream_t out, cdk_pkt_signature_t sig, int old_ctb)
     {
       buf = _cdk_subpkt_get_array (sig->unhashed, 0, &nbytes);
       if (!buf)
-	return CDK_Out_Of_Core;
+        return CDK_Out_Of_Core;
       rc = stream_write (out, buf, nbytes);
       cdk_free (buf);
     }
@@ -425,7 +425,7 @@ write_signature (cdk_stream_t out, cdk_pkt_signature_t sig, int old_ctb)
 
 static cdk_error_t
 write_public_key (cdk_stream_t out, cdk_pkt_pubkey_t pk,
-		  int is_subkey, int old_ctb)
+                  int is_subkey, int old_ctb)
 {
   int pkttype, ndays = 0;
   size_t npkey = 0, size = 6;
@@ -445,7 +445,7 @@ write_public_key (cdk_stream_t out, cdk_pkt_pubkey_t pk,
   if (!npkey)
     return CDK_Inv_Algo;
   if (pk->version < 4)
-    size += 2;			/* expire date */
+    size += 2;                  /* expire date */
   if (is_subkey)
     old_ctb = 0;
   size += calc_mpisize (pk->mpi, npkey);
@@ -460,7 +460,7 @@ write_public_key (cdk_stream_t out, cdk_pkt_pubkey_t pk,
   if (!rc && pk->version < 4)
     {
       if (pk->expiredate)
-	ndays = (u16) ((pk->expiredate - pk->timestamp) / 86400L);
+        ndays = (u16) ((pk->expiredate - pk->timestamp) / 86400L);
       rc = write_16 (out, ndays);
     }
   if (!rc)
@@ -491,14 +491,14 @@ calc_s2ksize (cdk_pkt_seckey_t sk)
       break;
     }
   nbytes += sk->protect.ivlen;
-  nbytes++;			/* single cipher byte */
+  nbytes++;                     /* single cipher byte */
   return nbytes;
 }
 
 
 static cdk_error_t
 write_secret_key (cdk_stream_t out, cdk_pkt_seckey_t sk,
-		  int is_subkey, int old_ctb)
+                  int is_subkey, int old_ctb)
 {
   cdk_pkt_pubkey_t pk = NULL;
   size_t size = 6, npkey, nskey;
@@ -536,16 +536,16 @@ write_secret_key (cdk_stream_t out, cdk_pkt_seckey_t sk,
   if (sk->version == 3 || !sk->is_protected)
     {
       if (sk->version == 3)
-	{
-	  size += 2;		/* force simple checksum */
-	  sk->protect.sha1chk = 0;
-	}
+        {
+          size += 2;            /* force simple checksum */
+          sk->protect.sha1chk = 0;
+        }
       else
-	size += sk->protect.sha1chk ? 20 : 2;
+        size += sk->protect.sha1chk ? 20 : 2;
       size += calc_mpisize (sk->mpi, nskey);
     }
-  else				/* We do not know anything about the encrypted mpi's so we
-				   treat the data as opaque. */
+  else                          /* We do not know anything about the encrypted mpi's so we
+                                   treat the data as opaque. */
     size += sk->enclen;
 
   pkttype = is_subkey ? CDK_PKT_SECRET_SUBKEY : CDK_PKT_SECRET_KEY;
@@ -558,7 +558,7 @@ write_secret_key (cdk_stream_t out, cdk_pkt_seckey_t sk,
     {
       u16 ndays = 0;
       if (pk->expiredate)
-	ndays = (u16) ((pk->expiredate - pk->timestamp) / 86400L);
+        ndays = (u16) ((pk->expiredate - pk->timestamp) / 86400L);
       rc = write_16 (out, ndays);
     }
   if (!rc)
@@ -570,50 +570,50 @@ write_secret_key (cdk_stream_t out, cdk_pkt_seckey_t sk,
   if (!rc)
     {
       if (sk->is_protected == 0)
-	rc = stream_putc (out, 0x00);
+        rc = stream_putc (out, 0x00);
       else
-	{
-	  if (is_RSA (pk->pubkey_algo) && pk->version < 4)
-	    rc = stream_putc (out, _gnutls_cipher_to_pgp (sk->protect.algo));
-	  else if (sk->protect.s2k)
-	    {
-	      s2k_mode = sk->protect.s2k->mode;
-	      rc = stream_putc (out, sk->protect.sha1chk ? 0xFE : 0xFF);
-	      if (!rc)
-		rc =
-		  stream_putc (out, _gnutls_cipher_to_pgp (sk->protect.algo));
-	      if (!rc)
-		rc = stream_putc (out, sk->protect.s2k->mode);
-	      if (!rc)
-		rc = stream_putc (out, sk->protect.s2k->hash_algo);
-	      if (!rc && (s2k_mode == 1 || s2k_mode == 3))
-		{
-		  rc = stream_write (out, sk->protect.s2k->salt, 8);
-		  if (!rc && s2k_mode == 3)
-		    rc = stream_putc (out, sk->protect.s2k->count);
-		}
-	    }
-	  else
-	    return CDK_Inv_Value;
-	  if (!rc)
-	    rc = stream_write (out, sk->protect.iv, sk->protect.ivlen);
-	}
+        {
+          if (is_RSA (pk->pubkey_algo) && pk->version < 4)
+            rc = stream_putc (out, _gnutls_cipher_to_pgp (sk->protect.algo));
+          else if (sk->protect.s2k)
+            {
+              s2k_mode = sk->protect.s2k->mode;
+              rc = stream_putc (out, sk->protect.sha1chk ? 0xFE : 0xFF);
+              if (!rc)
+                rc =
+                  stream_putc (out, _gnutls_cipher_to_pgp (sk->protect.algo));
+              if (!rc)
+                rc = stream_putc (out, sk->protect.s2k->mode);
+              if (!rc)
+                rc = stream_putc (out, sk->protect.s2k->hash_algo);
+              if (!rc && (s2k_mode == 1 || s2k_mode == 3))
+                {
+                  rc = stream_write (out, sk->protect.s2k->salt, 8);
+                  if (!rc && s2k_mode == 3)
+                    rc = stream_putc (out, sk->protect.s2k->count);
+                }
+            }
+          else
+            return CDK_Inv_Value;
+          if (!rc)
+            rc = stream_write (out, sk->protect.iv, sk->protect.ivlen);
+        }
     }
   if (!rc && sk->is_protected && pk->version == 4)
     {
       if (sk->encdata && sk->enclen)
-	rc = stream_write (out, sk->encdata, sk->enclen);
+        rc = stream_write (out, sk->encdata, sk->enclen);
     }
   else
     {
       if (!rc)
-	rc = write_mpibuf (out, sk->mpi, nskey);
+        rc = write_mpibuf (out, sk->mpi, nskey);
       if (!rc)
-	{
-	  if (!sk->csum)
-	    sk->csum = _cdk_sk_get_csum (sk);
-	  rc = write_16 (out, sk->csum);
-	}
+        {
+          if (!sk->csum)
+            sk->csum = _cdk_sk_get_csum (sk);
+          rc = write_16 (out, sk->csum);
+        }
     }
 
   return rc;
@@ -680,7 +680,7 @@ write_literal (cdk_stream_t out, cdk_pkt_literal_t pt, int old_ctb)
     {
       rc = stream_read (pt->buf, buf, DIM (buf), &size);
       if (!rc)
-	rc = stream_write (out, buf, size);
+        rc = stream_write (out, buf, size);
     }
 
   wipemem (buf, sizeof (buf));
@@ -723,7 +723,7 @@ write_onepass_sig (cdk_stream_t out, cdk_pkt_onepass_sig_t sig)
 
 static cdk_error_t
 write_user_id (cdk_stream_t out, cdk_pkt_userid_t id, int old_ctb,
-	       int pkttype)
+               int pkttype)
 {
   cdk_error_t rc;
 
@@ -733,11 +733,11 @@ write_user_id (cdk_stream_t out, cdk_pkt_userid_t id, int old_ctb,
   if (pkttype == CDK_PKT_ATTRIBUTE)
     {
       if (!id->attrib_img)
-	return CDK_Inv_Value;
+        return CDK_Inv_Value;
       rc =
-	pkt_write_head (out, old_ctb, id->attrib_len + 6, CDK_PKT_ATTRIBUTE);
+        pkt_write_head (out, old_ctb, id->attrib_len + 6, CDK_PKT_ATTRIBUTE);
       if (rc)
-	return rc;
+        return rc;
       /* Write subpacket part. */
       stream_putc (out, 255);
       write_32 (out, id->attrib_len + 1);
@@ -747,10 +747,10 @@ write_user_id (cdk_stream_t out, cdk_pkt_userid_t id, int old_ctb,
   else
     {
       if (!id->name)
-	return CDK_Inv_Value;
+        return CDK_Inv_Value;
       rc = pkt_write_head (out, old_ctb, id->len, CDK_PKT_USER_ID);
       if (!rc)
-	rc = stream_write (out, id->name, id->len);
+        rc = stream_write (out, id->name, id->len);
     }
 
   return rc;

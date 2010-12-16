@@ -39,7 +39,7 @@
 
 static int
 wrap_nettle_mpi_print (const bigint_t a, void *buffer, size_t * nbytes,
-		       gnutls_bigint_format_t format)
+                       gnutls_bigint_format_t format)
 {
   unsigned int size;
   mpz_t *p = (void *) a;
@@ -103,7 +103,7 @@ wrap_nettle_mpi_new (int nbits)
 
 static bigint_t
 wrap_nettle_mpi_scan (const void *buffer, size_t nbytes,
-		      gnutls_bigint_format_t format)
+                      gnutls_bigint_format_t format)
 {
   bigint_t r = wrap_nettle_mpi_new (nbytes * 8);
 
@@ -127,19 +127,19 @@ wrap_nettle_mpi_scan (const void *buffer, size_t nbytes,
       size_t size;
 
       if (nbytes < 3)
-	{
-	  gnutls_assert ();
-	  goto fail;
-	}
+        {
+          gnutls_assert ();
+          goto fail;
+        }
 
       size = (buf[0] << 8) | buf[1];
       size = (size + 7) / 8;
 
       if (size > nbytes - 2)
-	{
-	  gnutls_assert ();
-	  goto fail;
-	}
+        {
+          gnutls_assert ();
+          goto fail;
+        }
       nettle_mpz_set_str_256_u (TOMPZ (r), size, buf + 2);
     }
   else
@@ -228,7 +228,7 @@ wrap_nettle_mpi_mod (const bigint_t a, const bigint_t b)
 
 static bigint_t
 wrap_nettle_mpi_powm (bigint_t w, const bigint_t b, const bigint_t e,
-		      const bigint_t m)
+                      const bigint_t m)
 {
   if (w == NULL)
     w = wrap_nettle_mpi_new (wrap_nettle_mpi_get_nbits (m));
@@ -243,7 +243,7 @@ wrap_nettle_mpi_powm (bigint_t w, const bigint_t b, const bigint_t e,
 
 static bigint_t
 wrap_nettle_mpi_addm (bigint_t w, const bigint_t a, const bigint_t b,
-		      const bigint_t m)
+                      const bigint_t m)
 {
   if (w == NULL)
     w = wrap_nettle_mpi_new (wrap_nettle_mpi_get_nbits (a));
@@ -259,7 +259,7 @@ wrap_nettle_mpi_addm (bigint_t w, const bigint_t a, const bigint_t b,
 
 static bigint_t
 wrap_nettle_mpi_subm (bigint_t w, const bigint_t a, const bigint_t b,
-		      const bigint_t m)
+                      const bigint_t m)
 {
   if (w == NULL)
     w = wrap_nettle_mpi_new (wrap_nettle_mpi_get_nbits (a));
@@ -275,7 +275,7 @@ wrap_nettle_mpi_subm (bigint_t w, const bigint_t a, const bigint_t b,
 
 static bigint_t
 wrap_nettle_mpi_mulm (bigint_t w, const bigint_t a, const bigint_t b,
-		      const bigint_t m)
+                      const bigint_t m)
 {
   if (w == NULL)
     w = wrap_nettle_mpi_new (wrap_nettle_mpi_get_nbits (m));
@@ -402,7 +402,7 @@ wrap_nettle_prime_check (bigint_t pp)
       return 0;
     }
 
-  return GNUTLS_E_INTERNAL_ERROR;	/* ignored */
+  return GNUTLS_E_INTERNAL_ERROR;       /* ignored */
 }
 
 
@@ -444,7 +444,7 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
   _gnutls_debug_log
     ("Generating group of prime of %u bits and format of 2wq+1. q_size=%u bits\n",
      nbits, q_bytes * 8);
-  buffer = gnutls_malloc (p_bytes);	/* p_bytes > q_bytes */
+  buffer = gnutls_malloc (p_bytes);     /* p_bytes > q_bytes */
   if (buffer == NULL)
     {
       gnutls_assert ();
@@ -463,10 +463,10 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
     {
       ret = _gnutls_rnd (GNUTLS_RND_RANDOM, buffer, q_bytes);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto fail;
-	}
+        {
+          gnutls_assert ();
+          goto fail;
+        }
 
       nettle_mpz_set_str_256_u (q, q_bytes, buffer);
       /* always odd */
@@ -474,9 +474,9 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
 
       ret = mpz_probab_prime_p (q, PRIME_CHECK_PARAM);
       if (ret > 0)
-	{
-	  break;
-	}
+        {
+          break;
+        }
     }
 
   /* now generate w of size p_bytes - q_bytes */
@@ -495,10 +495,10 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
     {
       ret = _gnutls_rnd (GNUTLS_RND_RANDOM, buffer, w_bytes);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       nettle_mpz_set_str_256_u (w, w_bytes, buffer);
       /* always odd */
@@ -506,9 +506,9 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
 
       ret = mpz_probab_prime_p (w, PRIME_CHECK_PARAM);
       if (ret == 0)
-	{
-	  continue;
-	}
+        {
+          continue;
+        }
 
       /* check if 2wq+1 is prime */
       mpz_mul_ui (*prime, w, 2);
@@ -517,13 +517,13 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
 
       ret = mpz_probab_prime_p (*prime, PRIME_CHECK_PARAM);
       if (ret > 0)
-	{
-	  break;
-	}
+        {
+          break;
+        }
     }
 
   _gnutls_debug_log ("Found prime w of %u bits. Looking for generator...\n",
-		     wrap_nettle_mpi_get_nbits (&w));
+                     wrap_nettle_mpi_get_nbits (&w));
 
   /* finally a prime! Let calculate generator
    */
@@ -536,17 +536,17 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
    */
   r_bytes = p_bytes;
 
-  mpz_mul_ui (w, w, 2);		/* w = w*2 */
+  mpz_mul_ui (w, w, 2);         /* w = w*2 */
   mpz_fdiv_r (w, w, *prime);
 
   for (;;)
     {
       ret = _gnutls_rnd (GNUTLS_RND_RANDOM, buffer, r_bytes);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
       nettle_mpz_set_str_256_u (q, r_bytes, buffer);
       mpz_fdiv_r (q, q, *prime);
@@ -555,15 +555,15 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
       mpz_powm (*generator, q, w, *prime);
 
       if (mpz_cmp_ui (*generator, 1) == 0)
-	continue;
+        continue;
       else
-	break;
+        break;
     }
 
   _gnutls_debug_log ("Found generator g of %u bits\n",
-		     wrap_nettle_mpi_get_nbits (generator));
+                     wrap_nettle_mpi_get_nbits (generator));
   _gnutls_debug_log ("Prime n is of %u bits\n",
-		     wrap_nettle_mpi_get_nbits (prime));
+                     wrap_nettle_mpi_get_nbits (prime));
 
   mpz_clear (q);
   mpz_clear (w);

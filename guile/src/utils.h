@@ -45,7 +45,7 @@ extern const char scm_gnutls_array_error_message[];
    corresponding to ARRAY.  */
 static inline const char *
 scm_gnutls_get_array (SCM array, scm_t_array_handle * c_handle,
-		      size_t * c_len, const char *func_name)
+                      size_t * c_len, const char *func_name)
 {
   const char *c_array = NULL;
   const scm_t_array_dim *c_dims;
@@ -56,7 +56,7 @@ scm_gnutls_get_array (SCM array, scm_t_array_handle * c_handle,
     {
       scm_array_handle_release (c_handle);
       scm_misc_error (func_name, scm_gnutls_array_error_message,
-		      scm_list_1 (array));
+                      scm_list_1 (array));
     }
   else
     {
@@ -75,7 +75,7 @@ scm_gnutls_get_array (SCM array, scm_t_array_handle * c_handle,
    corresponding to ARRAY.  The returned array can be written to.  */
 static inline char *
 scm_gnutls_get_writable_array (SCM array, scm_t_array_handle * c_handle,
-			       size_t * c_len, const char *func_name)
+                               size_t * c_len, const char *func_name)
 {
   char *c_array = NULL;
   const scm_t_array_dim *c_dims;
@@ -86,7 +86,7 @@ scm_gnutls_get_writable_array (SCM array, scm_t_array_handle * c_handle,
     {
       scm_array_handle_release (c_handle);
       scm_misc_error (func_name, scm_gnutls_array_error_message,
-		      scm_list_1 (array));
+                      scm_list_1 (array));
     }
   else
     {
@@ -96,7 +96,7 @@ scm_gnutls_get_writable_array (SCM array, scm_t_array_handle * c_handle,
       *c_len = c_elem_size * (c_dims->ubnd - c_dims->lbnd + 1);
 
       c_array =
-	(char *) scm_array_handle_uniform_writable_elements (c_handle);
+        (char *) scm_array_handle_uniform_writable_elements (c_handle);
     }
 
   return (c_array);

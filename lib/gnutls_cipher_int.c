@@ -37,7 +37,7 @@
 
 int
 _gnutls_cipher_init (cipher_hd_st * handle, gnutls_cipher_algorithm_t cipher,
-		     const gnutls_datum_t * key, const gnutls_datum_t * iv)
+                     const gnutls_datum_t * key, const gnutls_datum_t * iv)
 {
   int ret = GNUTLS_E_INTERNAL_ERROR;
   const gnutls_crypto_cipher_st *cc = NULL;
@@ -55,7 +55,7 @@ _gnutls_cipher_init (cipher_hd_st * handle, gnutls_cipher_algorithm_t cipher,
       handle->deinit = cc->deinit;
 
       if (iv && iv->data && iv->size && cc->setiv)
-	SR (cc->setiv (handle->handle, iv->data, iv->size), cc_cleanup);
+        SR (cc->setiv (handle->handle, iv->data, iv->size), cc_cleanup);
       return 0;
     }
 
@@ -105,36 +105,36 @@ _gnutls_cipher_encrypt (const cipher_hd_st * handle, void *text, int textlen)
 
 int
 _gnutls_cipher_decrypt (const cipher_hd_st * handle, void *ciphertext,
-			int ciphertextlen)
+                        int ciphertextlen)
 {
   if (handle != NULL && handle->handle != NULL)
     {
       return handle->decrypt (handle->handle, ciphertext, ciphertextlen,
-			      ciphertext, ciphertextlen);
+                              ciphertext, ciphertextlen);
     }
   return 0;
 }
 
 int
 _gnutls_cipher_encrypt2 (const cipher_hd_st * handle, const void *text,
-			 int textlen, void *ciphertext, int ciphertextlen)
+                         int textlen, void *ciphertext, int ciphertextlen)
 {
   if (handle != NULL && handle->handle != NULL)
     {
       return handle->encrypt (handle->handle, text, textlen, ciphertext,
-			      ciphertextlen);
+                              ciphertextlen);
     }
   return 0;
 }
 
 int
 _gnutls_cipher_decrypt2 (const cipher_hd_st * handle, const void *ciphertext,
-			 int ciphertextlen, void *text, int textlen)
+                         int ciphertextlen, void *text, int textlen)
 {
   if (handle != NULL && handle->handle != NULL)
     {
       return handle->decrypt (handle->handle, ciphertext, ciphertextlen,
-			      text, textlen);
+                              text, textlen);
     }
   return 0;
 }

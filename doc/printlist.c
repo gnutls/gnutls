@@ -41,12 +41,12 @@ main (void)
     printf ("Available cipher suites:\n");
     printf ("@multitable @columnfractions .60 .20 .20\n");
     for (i = 0; (name = gnutls_cipher_suite_info
-		 (i, id, &kx, &cipher, &mac, &version)); i++)
+                 (i, id, &kx, &cipher, &mac, &version)); i++)
       {
-	printf ("@item %s\n@tab 0x%02x 0x%02x\n@tab %s\n",
-		name,
-		(unsigned char) id[0], (unsigned char) id[1],
-		gnutls_protocol_get_name (version));
+        printf ("@item %s\n@tab 0x%02x 0x%02x\n@tab %s\n",
+                name,
+                (unsigned char) id[0], (unsigned char) id[1],
+                gnutls_protocol_get_name (version));
       }
     printf ("@end multitable\n");
   }
@@ -57,7 +57,7 @@ main (void)
     printf ("\n\nAvailable certificate types:\n@itemize\n");
     for (; *p; p++)
       {
-	printf ("@item %s\n", gnutls_certificate_type_get_name (*p));
+        printf ("@item %s\n", gnutls_certificate_type_get_name (*p));
       }
     printf ("@end itemize\n");
   }
@@ -68,7 +68,7 @@ main (void)
     printf ("\nAvailable protocols:\n@itemize\n");
     for (; *p; p++)
       {
-	printf ("@item %s\n", gnutls_protocol_get_name (*p));
+        printf ("@item %s\n", gnutls_protocol_get_name (*p));
       }
     printf ("@end itemize\n");
   }
@@ -79,7 +79,7 @@ main (void)
     printf ("\nAvailable ciphers:\n@itemize\n");
     for (; *p; p++)
       {
-	printf ("@item %s\n", gnutls_cipher_get_name (*p));
+        printf ("@item %s\n", gnutls_cipher_get_name (*p));
       }
     printf ("@end itemize\n");
   }
@@ -90,7 +90,7 @@ main (void)
     printf ("\nAvailable MAC algorithms:\n@itemize\n");
     for (; *p; p++)
       {
-	printf ("@item %s\n", gnutls_mac_get_name (*p));
+        printf ("@item %s\n", gnutls_mac_get_name (*p));
       }
     printf ("@end itemize\n");
   }
@@ -101,7 +101,7 @@ main (void)
     printf ("\nAvailable key exchange methods:\n@itemize\n");
     for (; *p; p++)
       {
-	printf ("@item %s\n", gnutls_kx_get_name (*p));
+        printf ("@item %s\n", gnutls_kx_get_name (*p));
       }
     printf ("@end itemize\n");
   }
@@ -112,7 +112,7 @@ main (void)
     printf ("\nAvailable public key algorithms:\n@itemize\n");
     for (; *p; p++)
       {
-	printf ("@item %s\n", gnutls_pk_get_name (*p));
+        printf ("@item %s\n", gnutls_pk_get_name (*p));
       }
     printf ("@end itemize\n");
   }
@@ -123,7 +123,7 @@ main (void)
     printf ("\nAvailable public key signature algorithms:\n@itemize\n");
     for (; *p; p++)
       {
-	printf ("@item %s\n", gnutls_sign_get_name (*p));
+        printf ("@item %s\n", gnutls_sign_get_name (*p));
       }
     printf ("@end itemize\n");
   }
@@ -134,7 +134,7 @@ main (void)
     printf ("\nAvailable compression methods:\n@itemize\n");
     for (; *p; p++)
       {
-	printf ("@item %s\n", gnutls_compression_get_name (*p));
+        printf ("@item %s\n", gnutls_compression_get_name (*p));
       }
     printf ("@end itemize\n");
   }

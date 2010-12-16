@@ -37,10 +37,10 @@ _gnutls_rnd_init (void)
   if (_gnutls_rnd_ops.init != NULL)
     {
       if (_gnutls_rnd_ops.init (&rnd_ctx) < 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_RANDOM_FAILED;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_RANDOM_FAILED;
+        }
     }
 
   return 0;

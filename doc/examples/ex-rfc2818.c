@@ -96,7 +96,7 @@ verify_certificate_callback (gnutls_session_t session)
   if (!gnutls_x509_crt_check_hostname (cert, hostname))
     {
       printf ("The certificate's owner does not match hostname '%s'\n",
-	      hostname);
+              hostname);
       return GNUTLS_E_CERTIFICATE_ERROR;
     }
 
@@ -126,7 +126,7 @@ main (void)
   gnutls_certificate_set_x509_trust_file (xcred, CAFILE, GNUTLS_X509_FMT_PEM);
   gnutls_certificate_set_verify_function (xcred, verify_certificate_callback);
   gnutls_certificate_set_verify_flags (xcred,
-				       GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
+                                       GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
 
   /* Initialize TLS session 
    */
@@ -139,9 +139,9 @@ main (void)
   if (ret < 0)
     {
       if (ret == GNUTLS_E_INVALID_REQUEST)
-	{
-	  fprintf (stderr, "Syntax error at: %s\n", err);
-	}
+        {
+          fprintf (stderr, "Syntax error at: %s\n", err);
+        }
       exit (1);
     }
 

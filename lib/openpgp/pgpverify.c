@@ -58,8 +58,8 @@
  **/
 int
 gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
-				gnutls_openpgp_keyring_t keyring,
-				unsigned int flags, unsigned int *verify)
+                                gnutls_openpgp_keyring_t keyring,
+                                unsigned int flags, unsigned int *verify)
 {
   gnutls_openpgp_keyid_t id;
   cdk_error_t rc;
@@ -101,15 +101,15 @@ gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
     {
       rc = gnutls_openpgp_crt_get_key_id (key, id);
       if (rc < 0)
-	{
-	  gnutls_assert ();
-	  return rc;
-	}
+        {
+          gnutls_assert ();
+          return rc;
+        }
 
       rc = gnutls_openpgp_keyring_check_id (keyring, id, 0);
       /* If it exists in the keyring don't treat it as unknown. */
       if (rc == 0 && *verify & GNUTLS_CERT_SIGNER_NOT_FOUND)
-	*verify ^= GNUTLS_CERT_SIGNER_NOT_FOUND;
+        *verify ^= GNUTLS_CERT_SIGNER_NOT_FOUND;
     }
 
   return 0;
@@ -132,7 +132,7 @@ gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
  **/
 int
 gnutls_openpgp_crt_verify_self (gnutls_openpgp_crt_t key,
-				unsigned int flags, unsigned int *verify)
+                                unsigned int flags, unsigned int *verify)
 {
   int status;
   cdk_error_t rc;

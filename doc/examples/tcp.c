@@ -54,6 +54,6 @@ tcp_connect (void)
 extern void
 tcp_close (int sd)
 {
-  shutdown (sd, SHUT_RDWR);	/* no more receptions */
+  shutdown (sd, SHUT_RDWR);     /* no more receptions */
   close (sd);
 }

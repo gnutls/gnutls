@@ -129,9 +129,9 @@ pkcs11ize (const char *name)
   if (suffix != NULL)
     {
       if (strncmp (suffix, ".so", 3) == 0)
-	{
-	  suffix[0] = 0;	/* null terminate before . */
-	}
+        {
+          suffix[0] = 0;        /* null terminate before . */
+        }
     }
 
   /* check and remove for -p11 or -pkcs11 */
@@ -139,11 +139,11 @@ pkcs11ize (const char *name)
   while ((suffix = strchr (suffix, '-')) != NULL)
     {
       if (strncasecmp (suffix, "-p11", 4) == 0 ||
-	  strncasecmp (suffix, "-pkcs11", 7) == 0)
-	{
-	  suffix[0] = 0;
-	  break;
-	}
+          strncasecmp (suffix, "-pkcs11", 7) == 0)
+        {
+          suffix[0] = 0;
+          break;
+        }
       suffix++;
     }
 
@@ -192,30 +192,30 @@ find_pkcs11_module_name (const char *hint, dev_t * dev, ino_t * ino)
       unsigned i;
 
       if (sep)
-	{
-	  *sep++ = '\0';
-	  next = sep;
-	}
+        {
+          *sep++ = '\0';
+          next = sep;
+        }
       else
-	{
-	  next = NULL;
-	}
+        {
+          next = NULL;
+        }
 
       for (i = 0; suffix_prefixes[i][0]; i++)
-	{
-	  char path[PATH_MAX];
+        {
+          char path[PATH_MAX];
 
-	  snprintf (path, sizeof path, "%s/%s%s%s", dir,
-		    suffix_prefixes[i][0], hint, suffix_prefixes[i][1]);
+          snprintf (path, sizeof path, "%s/%s%s%s", dir,
+                    suffix_prefixes[i][0], hint, suffix_prefixes[i][1]);
 
-	  if (stat (path, &st) < 0)
-	    continue;
+          if (stat (path, &st) < 0)
+            continue;
 
-	  *dev = st.st_dev;
-	  *ino = st.st_ino;
+          *dev = st.st_dev;
+          *ino = st.st_ino;
 
-	  return strdup (path);
-	}
+          return strdup (path);
+        }
     }
 
   return NULL;
@@ -236,11 +236,11 @@ find_real_module_name (const char *name, dev_t * dev, ino_t * ino)
 
   len = wordexp (name, &we, 0);
   if (len == 0)
-    {				/* success */
+    {                           /* success */
       if (we.we_wordc > 0)
-	{			/* we care about the 1st */
-	  exname = strdup (we.we_wordv[0]);
-	}
+        {                       /* we care about the 1st */
+          exname = strdup (we.we_wordv[0]);
+        }
       wordfree (&we);
     }
 #endif
@@ -252,15 +252,15 @@ find_real_module_name (const char *name, dev_t * dev, ino_t * ino)
   if (exname != NULL)
     {
       if (stat (exname, &st) >= 0)
-	{
-	  *dev = st.st_dev;
-	  *ino = st.st_ino;
-	}
+        {
+          *dev = st.st_dev;
+          *ino = st.st_ino;
+        }
       else
-	{
-	  free (exname);
-	  return NULL;
-	}
+        {
+          free (exname);
+          return NULL;
+        }
     }
 
   return exname;
@@ -274,9 +274,9 @@ find_provider (dev_t dev, ino_t ino)
   for (p = provider_list; p; p = p->next)
     {
       if (dev == p->dev && ino == p->ino)
-	{
-	  return p;
-	}
+        {
+          return p;
+        }
     }
 
   return NULL;
@@ -286,7 +286,7 @@ find_provider (dev_t dev, ino_t ino)
  */
 static ck_rv_t
 load_pkcs11_module (struct provider **provider,
-		    const char *name, dev_t dev, ino_t ino, void *reserved)
+                    const char *name, dev_t dev, ino_t ino, void *reserved)
 {
   struct provider *prov;
   CK_C_GetFunctionList gfl;
@@ -372,7 +372,7 @@ fail_dso:
  */
 static ck_rv_t
 load_provider (struct provider **provider, const char *name,
-	       void *reserved, int real_name)
+               void *reserved, int real_name)
 {
   ck_rv_t rv;
   char *cname = NULL;
@@ -439,7 +439,7 @@ providers_reinit (void)
     {
       args.reserved = p->reserved;
       rv = p->fns->C_Initialize (&args);
-      assert (rv == CKR_OK);	/* what can we do? */
+      assert (rv == CKR_OK);    /* what can we do? */
     }
 
   gnutls_mutex_unlock (&provider_mutex);
@@ -447,7 +447,7 @@ providers_reinit (void)
 
 static ck_rv_t
 load_module (pakchois_module_t ** module, const char *name,
-	     void *reserved, unsigned int real_name)
+             void *reserved, unsigned int real_name)
 {
   ck_rv_t rv;
   pakchois_module_t *pm = malloc (sizeof *pm);
@@ -499,36 +499,36 @@ pakchois_module_load_abs (pakchois_module_t ** module, const char *name)
 
 ck_rv_t
 pakchois_module_nssload (pakchois_module_t ** module,
-			 const char *name,
-			 const char *directory,
-			 const char *cert_prefix,
-			 const char *key_prefix, const char *secmod_db)
+                         const char *name,
+                         const char *directory,
+                         const char *cert_prefix,
+                         const char *key_prefix, const char *secmod_db)
 {
   char buf[256];
 
   snprintf (buf, sizeof buf,
-	    "configdir='%s' certPrefix='%s' keyPrefix='%s' secmod='%s'",
-	    directory, cert_prefix ? cert_prefix : "",
-	    key_prefix ? key_prefix : "",
-	    secmod_db ? secmod_db : "secmod.db");
+            "configdir='%s' certPrefix='%s' keyPrefix='%s' secmod='%s'",
+            directory, cert_prefix ? cert_prefix : "",
+            key_prefix ? key_prefix : "",
+            secmod_db ? secmod_db : "secmod.db");
 
   return load_module (module, name, buf, 0);
 }
 
 ck_rv_t
 pakchois_module_nssload_abs (pakchois_module_t ** module,
-			     const char *name,
-			     const char *directory,
-			     const char *cert_prefix,
-			     const char *key_prefix, const char *secmod_db)
+                             const char *name,
+                             const char *directory,
+                             const char *cert_prefix,
+                             const char *key_prefix, const char *secmod_db)
 {
   char buf[256];
 
   snprintf (buf, sizeof buf,
-	    "configdir='%s' certPrefix='%s' keyPrefix='%s' secmod='%s'",
-	    directory, cert_prefix ? cert_prefix : "",
-	    key_prefix ? key_prefix : "",
-	    secmod_db ? secmod_db : "secmod.db");
+            "configdir='%s' certPrefix='%s' keyPrefix='%s' secmod='%s'",
+            directory, cert_prefix ? cert_prefix : "",
+            key_prefix ? key_prefix : "",
+            secmod_db ? secmod_db : "secmod.db");
 
   return load_module (module, name, buf, 1);
 }
@@ -546,9 +546,9 @@ provider_unref (struct provider *prov)
       dlclose (prov->handle);
       *prov->prevref = prov->next;
       if (prov->next)
-	{
-	  prov->next->prevref = prov->prevref;
-	}
+        {
+          prov->next->prevref = prov->prevref;
+        }
       free (prov->name);
       free (prov);
     }
@@ -592,30 +592,30 @@ pakchois_get_info (pakchois_module_t * mod, struct ck_info *info)
 
 ck_rv_t
 pakchois_get_slot_list (pakchois_module_t * mod,
-			unsigned char token_present,
-			ck_slot_id_t * slot_list, unsigned long *count)
+                        unsigned char token_present,
+                        ck_slot_id_t * slot_list, unsigned long *count)
 {
   return CALL (GetSlotList, (token_present, slot_list, count));
 }
 
 ck_rv_t
 pakchois_get_slot_info (pakchois_module_t * mod,
-			ck_slot_id_t slot_id, struct ck_slot_info * info)
+                        ck_slot_id_t slot_id, struct ck_slot_info * info)
 {
   return CALL (GetSlotInfo, (slot_id, info));
 }
 
 ck_rv_t
 pakchois_get_token_info (pakchois_module_t * mod,
-			 ck_slot_id_t slot_id, struct ck_token_info * info)
+                         ck_slot_id_t slot_id, struct ck_token_info * info)
 {
   return CALL (GetTokenInfo, (slot_id, info));
 }
 
 ck_rv_t
 pakchois_wait_for_slot_event (pakchois_module_t * mod,
-			      ck_flags_t flags, ck_slot_id_t * slot,
-			      void *reserved)
+                              ck_flags_t flags, ck_slot_id_t * slot,
+                              void *reserved)
 {
   ck_rv_t rv;
 
@@ -631,48 +631,48 @@ pakchois_wait_for_slot_event (pakchois_module_t * mod,
 
 ck_rv_t
 pakchois_get_mechanism_list (pakchois_module_t * mod,
-			     ck_slot_id_t slot_id,
-			     ck_mechanism_type_t * mechanism_list,
-			     unsigned long *count)
+                             ck_slot_id_t slot_id,
+                             ck_mechanism_type_t * mechanism_list,
+                             unsigned long *count)
 {
   return CALL (GetMechanismList, (slot_id, mechanism_list, count));
 }
 
 ck_rv_t
 pakchois_get_mechanism_info (pakchois_module_t * mod,
-			     ck_slot_id_t slot_id,
-			     ck_mechanism_type_t type,
-			     struct ck_mechanism_info * info)
+                             ck_slot_id_t slot_id,
+                             ck_mechanism_type_t type,
+                             struct ck_mechanism_info * info)
 {
   return CALL (GetMechanismInfo, (slot_id, type, info));
 }
 
 ck_rv_t
 pakchois_init_token (pakchois_module_t * mod,
-		     ck_slot_id_t slot_id, unsigned char *pin,
-		     unsigned long pin_len, unsigned char *label)
+                     ck_slot_id_t slot_id, unsigned char *pin,
+                     unsigned long pin_len, unsigned char *label)
 {
   return CALL (InitToken, (slot_id, pin, pin_len, label));
 }
 
 ck_rv_t
 pakchois_init_pin (pakchois_session_t * sess, unsigned char *pin,
-		   unsigned long pin_len)
+                   unsigned long pin_len)
 {
   return CALLS2 (InitPIN, pin, pin_len);
 }
 
 ck_rv_t
 pakchois_set_pin (pakchois_session_t * sess, unsigned char *old_pin,
-		  unsigned long old_len, unsigned char *new_pin,
-		  unsigned long new_len)
+                  unsigned long old_len, unsigned char *new_pin,
+                  unsigned long new_len)
 {
   return CALLS4 (SetPIN, old_pin, old_len, new_pin, new_len);
 }
 
 static ck_rv_t
 notify_thunk (ck_session_handle_t session,
-	      ck_notification_t event, void *application)
+              ck_notification_t event, void *application)
 {
   pakchois_session_t *sess = application;
 
@@ -717,7 +717,7 @@ find_or_create_slot (pakchois_module_t * mod, ck_slot_id_t id)
 
 static ck_rv_t
 insert_session (pakchois_module_t * mod,
-		pakchois_session_t * session, ck_slot_id_t id)
+                pakchois_session_t * session, ck_slot_id_t id)
 {
   struct slot *slot = find_or_create_slot (mod, id);
 
@@ -739,9 +739,9 @@ insert_session (pakchois_module_t * mod,
 
 ck_rv_t
 pakchois_open_session (pakchois_module_t * mod,
-		       ck_slot_id_t slot_id, ck_flags_t flags,
-		       void *application, pakchois_notify_t notify,
-		       pakchois_session_t ** session)
+                       ck_slot_id_t slot_id, ck_flags_t flags,
+                       void *application, pakchois_notify_t notify,
+                       pakchois_session_t ** session)
 {
   ck_session_handle_t sh;
   pakchois_session_t *sess;
@@ -799,9 +799,9 @@ pakchois_close_all_sessions (pakchois_module_t * mod, ck_slot_id_t slot_id)
     {
       rv = pakchois_close_session (slot->sessions);
       if (rv != CKR_OK)
-	{
-	  frv = rv;
-	}
+        {
+          frv = rv;
+        }
     }
 
   return frv;
@@ -809,33 +809,33 @@ pakchois_close_all_sessions (pakchois_module_t * mod, ck_slot_id_t slot_id)
 
 ck_rv_t
 pakchois_get_session_info (pakchois_session_t * sess,
-			   struct ck_session_info * info)
+                           struct ck_session_info * info)
 {
   return CALLS1 (GetSessionInfo, info);
 }
 
 ck_rv_t
 pakchois_get_operation_state (pakchois_session_t * sess,
-			      unsigned char *operation_state,
-			      unsigned long *operation_state_len)
+                              unsigned char *operation_state,
+                              unsigned long *operation_state_len)
 {
   return CALLS2 (GetOperationState, operation_state, operation_state_len);
 }
 
 ck_rv_t
 pakchois_set_operation_state (pakchois_session_t * sess,
-			      unsigned char *operation_state,
-			      unsigned long operation_state_len,
-			      ck_object_handle_t encryption_key,
-			      ck_object_handle_t authentiation_key)
+                              unsigned char *operation_state,
+                              unsigned long operation_state_len,
+                              ck_object_handle_t encryption_key,
+                              ck_object_handle_t authentiation_key)
 {
   return CALLS4 (SetOperationState, operation_state,
-		 operation_state_len, encryption_key, authentiation_key);
+                 operation_state_len, encryption_key, authentiation_key);
 }
 
 ck_rv_t
 pakchois_login (pakchois_session_t * sess, ck_user_type_t user_type,
-		unsigned char *pin, unsigned long pin_len)
+                unsigned char *pin, unsigned long pin_len)
 {
   return CALLS3 (Login, user_type, pin, pin_len);
 }
@@ -848,17 +848,17 @@ pakchois_logout (pakchois_session_t * sess)
 
 ck_rv_t
 pakchois_create_object (pakchois_session_t * sess,
-			struct ck_attribute * templ,
-			unsigned long count, ck_object_handle_t * object)
+                        struct ck_attribute * templ,
+                        unsigned long count, ck_object_handle_t * object)
 {
   return CALLS3 (CreateObject, templ, count, object);
 }
 
 ck_rv_t
 pakchois_copy_object (pakchois_session_t * sess,
-		      ck_object_handle_t object,
-		      struct ck_attribute * templ,
-		      unsigned long count, ck_object_handle_t * new_object)
+                      ck_object_handle_t object,
+                      struct ck_attribute * templ,
+                      unsigned long count, ck_object_handle_t * new_object)
 {
   return CALLS4 (CopyObject, object, templ, count, new_object);
 }
@@ -871,41 +871,41 @@ pakchois_destroy_object (pakchois_session_t * sess, ck_object_handle_t object)
 
 ck_rv_t
 pakchois_get_object_size (pakchois_session_t * sess,
-			  ck_object_handle_t object, unsigned long *size)
+                          ck_object_handle_t object, unsigned long *size)
 {
   return CALLS2 (GetObjectSize, object, size);
 }
 
 ck_rv_t
 pakchois_get_attribute_value (pakchois_session_t * sess,
-			      ck_object_handle_t object,
-			      struct ck_attribute * templ,
-			      unsigned long count)
+                              ck_object_handle_t object,
+                              struct ck_attribute * templ,
+                              unsigned long count)
 {
   return CALLS3 (GetAttributeValue, object, templ, count);
 }
 
 ck_rv_t
 pakchois_set_attribute_value (pakchois_session_t * sess,
-			      ck_object_handle_t object,
-			      struct ck_attribute * templ,
-			      unsigned long count)
+                              ck_object_handle_t object,
+                              struct ck_attribute * templ,
+                              unsigned long count)
 {
   return CALLS3 (SetAttributeValue, object, templ, count);
 }
 
 ck_rv_t
 pakchois_find_objects_init (pakchois_session_t * sess,
-			    struct ck_attribute * templ, unsigned long count)
+                            struct ck_attribute * templ, unsigned long count)
 {
   return CALLS2 (FindObjectsInit, templ, count);
 }
 
 ck_rv_t
 pakchois_find_objects (pakchois_session_t * sess,
-		       ck_object_handle_t * object,
-		       unsigned long max_object_count,
-		       unsigned long *object_count)
+                       ck_object_handle_t * object,
+                       unsigned long max_object_count,
+                       unsigned long *object_count)
 {
   return CALLS3 (FindObjects, object, max_object_count, object_count);
 }
@@ -918,93 +918,93 @@ pakchois_find_objects_final (pakchois_session_t * sess)
 
 ck_rv_t
 pakchois_encrypt_init (pakchois_session_t * sess,
-		       struct ck_mechanism * mechanism,
-		       ck_object_handle_t key)
+                       struct ck_mechanism * mechanism,
+                       ck_object_handle_t key)
 {
   return CALLS2 (EncryptInit, mechanism, key);
 }
 
 ck_rv_t
 pakchois_encrypt (pakchois_session_t * sess,
-		  unsigned char *data, unsigned long data_len,
-		  unsigned char *encrypted_data,
-		  unsigned long *encrypted_data_len)
+                  unsigned char *data, unsigned long data_len,
+                  unsigned char *encrypted_data,
+                  unsigned long *encrypted_data_len)
 {
   return CALLS4 (Encrypt, data, data_len, encrypted_data, encrypted_data_len);
 }
 
 ck_rv_t
 pakchois_encrypt_update (pakchois_session_t * sess,
-			 unsigned char *part,
-			 unsigned long part_len,
-			 unsigned char *encrypted_part,
-			 unsigned long *encrypted_part_len)
+                         unsigned char *part,
+                         unsigned long part_len,
+                         unsigned char *encrypted_part,
+                         unsigned long *encrypted_part_len)
 {
   return CALLS4 (EncryptUpdate, part, part_len,
-		 encrypted_part, encrypted_part_len);
+                 encrypted_part, encrypted_part_len);
 }
 
 ck_rv_t
 pakchois_encrypt_final (pakchois_session_t * sess,
-			unsigned char *last_encrypted_part,
-			unsigned long *last_encrypted_part_len)
+                        unsigned char *last_encrypted_part,
+                        unsigned long *last_encrypted_part_len)
 {
   return CALLS2 (EncryptFinal, last_encrypted_part, last_encrypted_part_len);
 }
 
 ck_rv_t
 pakchois_decrypt_init (pakchois_session_t * sess,
-		       struct ck_mechanism * mechanism,
-		       ck_object_handle_t key)
+                       struct ck_mechanism * mechanism,
+                       ck_object_handle_t key)
 {
   return CALLS2 (DecryptInit, mechanism, key);
 }
 
 ck_rv_t
 pakchois_decrypt (pakchois_session_t * sess,
-		  unsigned char *encrypted_data,
-		  unsigned long encrypted_data_len,
-		  unsigned char *data, unsigned long *data_len)
+                  unsigned char *encrypted_data,
+                  unsigned long encrypted_data_len,
+                  unsigned char *data, unsigned long *data_len)
 {
   return CALLS4 (Decrypt, encrypted_data, encrypted_data_len, data, data_len);
 }
 
 ck_rv_t
 pakchois_decrypt_update (pakchois_session_t * sess,
-			 unsigned char *encrypted_part,
-			 unsigned long encrypted_part_len,
-			 unsigned char *part, unsigned long *part_len)
+                         unsigned char *encrypted_part,
+                         unsigned long encrypted_part_len,
+                         unsigned char *part, unsigned long *part_len)
 {
   return CALLS4 (DecryptUpdate, encrypted_part, encrypted_part_len,
-		 part, part_len);
+                 part, part_len);
 }
 
 ck_rv_t
 pakchois_decrypt_final (pakchois_session_t * sess,
-			unsigned char *last_part,
-			unsigned long *last_part_len)
+                        unsigned char *last_part,
+                        unsigned long *last_part_len)
 {
   return CALLS2 (DecryptFinal, last_part, last_part_len);
 }
 
 ck_rv_t
 pakchois_digest_init (pakchois_session_t * sess,
-		      struct ck_mechanism * mechanism)
+                      struct ck_mechanism * mechanism)
 {
   return CALLS1 (DigestInit, mechanism);
 }
 
 ck_rv_t
 pakchois_digest (pakchois_session_t * sess, unsigned char *data,
-		 unsigned long data_len, unsigned char *digest,
-		 unsigned long *digest_len)
+                 unsigned long data_len, unsigned char *digest,
+                 unsigned long *digest_len)
 {
   return CALLS4 (Digest, data, data_len, digest, digest_len);
 }
 
 ck_rv_t
 pakchois_digest_update (pakchois_session_t * sess,
-			unsigned char *part, unsigned long part_len)
+                        unsigned char *part, unsigned long part_len)
 {
   return CALLS2 (DigestUpdate, part, part_len);
 }
@@ -1017,203 +1017,203 @@ pakchois_digest_key (pakchois_session_t * sess, ck_object_handle_t key)
 
 ck_rv_t
 pakchois_digest_final (pakchois_session_t * sess,
-		       unsigned char *digest, unsigned long *digest_len)
+                       unsigned char *digest, unsigned long *digest_len)
 {
   return CALLS2 (DigestFinal, digest, digest_len);
 }
 
 ck_rv_t
 pakchois_sign_init (pakchois_session_t * sess,
-		    struct ck_mechanism * mechanism, ck_object_handle_t key)
+                    struct ck_mechanism * mechanism, ck_object_handle_t key)
 {
   return CALLS2 (SignInit, mechanism, key);
 }
 
 ck_rv_t
 pakchois_sign (pakchois_session_t * sess, unsigned char *data,
-	       unsigned long data_len, unsigned char *signature,
-	       unsigned long *signature_len)
+               unsigned long data_len, unsigned char *signature,
+               unsigned long *signature_len)
 {
   return CALLS4 (Sign, data, data_len, signature, signature_len);
 }
 
 ck_rv_t
 pakchois_sign_update (pakchois_session_t * sess,
-		      unsigned char *part, unsigned long part_len)
+                      unsigned char *part, unsigned long part_len)
 {
   return CALLS2 (SignUpdate, part, part_len);
 }
 
 ck_rv_t
 pakchois_sign_final (pakchois_session_t * sess,
-		     unsigned char *signature, unsigned long *signature_len)
+                     unsigned char *signature, unsigned long *signature_len)
 {
   return CALLS2 (SignFinal, signature, signature_len);
 }
 
 ck_rv_t
 pakchois_sign_recover_init (pakchois_session_t * sess,
-			    struct ck_mechanism * mechanism,
-			    ck_object_handle_t key)
+                            struct ck_mechanism * mechanism,
+                            ck_object_handle_t key)
 {
   return CALLS2 (SignRecoverInit, mechanism, key);
 }
 
 ck_rv_t
 pakchois_sign_recover (pakchois_session_t * sess,
-		       unsigned char *data, unsigned long data_len,
-		       unsigned char *signature, unsigned long *signature_len)
+                       unsigned char *data, unsigned long data_len,
+                       unsigned char *signature, unsigned long *signature_len)
 {
   return CALLS4 (SignRecover, data, data_len, signature, signature_len);
 }
 
 ck_rv_t
 pakchois_verify_init (pakchois_session_t * sess,
-		      struct ck_mechanism * mechanism, ck_object_handle_t key)
+                      struct ck_mechanism * mechanism, ck_object_handle_t key)
 {
   return CALLS2 (VerifyInit, mechanism, key);
 }
 
 ck_rv_t
 pakchois_verify (pakchois_session_t * sess, unsigned char *data,
-		 unsigned long data_len, unsigned char *signature,
-		 unsigned long signature_len)
+                 unsigned long data_len, unsigned char *signature,
+                 unsigned long signature_len)
 {
   return CALLS4 (Verify, data, data_len, signature, signature_len);
 }
 
 ck_rv_t
 pakchois_verify_update (pakchois_session_t * sess,
-			unsigned char *part, unsigned long part_len)
+                        unsigned char *part, unsigned long part_len)
 {
   return CALLS2 (VerifyUpdate, part, part_len);
 }
 
 ck_rv_t
 pakchois_verify_final (pakchois_session_t * sess,
-		       unsigned char *signature, unsigned long signature_len)
+                       unsigned char *signature, unsigned long signature_len)
 {
   return CALLS2 (VerifyFinal, signature, signature_len);
 }
 
 ck_rv_t
 pakchois_verify_recover_init (pakchois_session_t * sess,
-			      struct ck_mechanism * mechanism,
-			      ck_object_handle_t key)
+                              struct ck_mechanism * mechanism,
+                              ck_object_handle_t key)
 {
   return CALLS2 (VerifyRecoverInit, mechanism, key);
 }
 
 ck_rv_t
 pakchois_verify_recover (pakchois_session_t * sess,
-			 unsigned char *signature,
-			 unsigned long signature_len,
-			 unsigned char *data, unsigned long *data_len)
+                         unsigned char *signature,
+                         unsigned long signature_len,
+                         unsigned char *data, unsigned long *data_len)
 {
   return CALLS4 (VerifyRecover, signature, signature_len, data, data_len);
 }
 
 ck_rv_t
 pakchois_digest_encrypt_update (pakchois_session_t * sess,
-				unsigned char *part,
-				unsigned long part_len,
-				unsigned char *encrypted_part,
-				unsigned long *encrypted_part_len)
+                                unsigned char *part,
+                                unsigned long part_len,
+                                unsigned char *encrypted_part,
+                                unsigned long *encrypted_part_len)
 {
   return CALLS4 (DigestEncryptUpdate, part, part_len,
-		 encrypted_part, encrypted_part_len);
+                 encrypted_part, encrypted_part_len);
 }
 
 ck_rv_t
 pakchois_decrypt_digest_update (pakchois_session_t * sess,
-				unsigned char *encrypted_part,
-				unsigned long encrypted_part_len,
-				unsigned char *part, unsigned long *part_len)
+                                unsigned char *encrypted_part,
+                                unsigned long encrypted_part_len,
+                                unsigned char *part, unsigned long *part_len)
 {
   return CALLS4 (DecryptDigestUpdate, encrypted_part,
-		 encrypted_part_len, part, part_len);
+                 encrypted_part_len, part, part_len);
 }
 
 ck_rv_t
 pakchois_sign_encrypt_update (pakchois_session_t * sess,
-			      unsigned char *part,
-			      unsigned long part_len,
-			      unsigned char *encrypted_part,
-			      unsigned long *encrypted_part_len)
+                              unsigned char *part,
+                              unsigned long part_len,
+                              unsigned char *encrypted_part,
+                              unsigned long *encrypted_part_len)
 {
   return CALLS4 (SignEncryptUpdate, part, part_len,
-		 encrypted_part, encrypted_part_len);
+                 encrypted_part, encrypted_part_len);
 }
 
 ck_rv_t
 pakchois_decrypt_verify_update (pakchois_session_t * sess,
-				unsigned char *encrypted_part,
-				unsigned long encrypted_part_len,
-				unsigned char *part, unsigned long *part_len)
+                                unsigned char *encrypted_part,
+                                unsigned long encrypted_part_len,
+                                unsigned char *part, unsigned long *part_len)
 {
   return CALLS4 (DecryptVerifyUpdate, encrypted_part,
-		 encrypted_part_len, part, part_len);
+                 encrypted_part_len, part, part_len);
 }
 
 ck_rv_t
 pakchois_generate_key (pakchois_session_t * sess,
-		       struct ck_mechanism * mechanism,
-		       struct ck_attribute * templ,
-		       unsigned long count, ck_object_handle_t * key)
+                       struct ck_mechanism * mechanism,
+                       struct ck_attribute * templ,
+                       unsigned long count, ck_object_handle_t * key)
 {
   return CALLS4 (GenerateKey, mechanism, templ, count, key);
 }
 
 ck_rv_t
 pakchois_generate_key_pair (pakchois_session_t * sess,
-			    struct ck_mechanism * mechanism,
-			    struct ck_attribute *
-			    public_key_template,
-			    unsigned long
-			    public_key_attribute_count,
-			    struct ck_attribute *
-			    private_key_template,
-			    unsigned long
-			    private_key_attribute_count,
-			    ck_object_handle_t * public_key,
-			    ck_object_handle_t * private_key)
+                            struct ck_mechanism * mechanism,
+                            struct ck_attribute *
+                            public_key_template,
+                            unsigned long
+                            public_key_attribute_count,
+                            struct ck_attribute *
+                            private_key_template,
+                            unsigned long
+                            private_key_attribute_count,
+                            ck_object_handle_t * public_key,
+                            ck_object_handle_t * private_key)
 {
   return CALLS7 (GenerateKeyPair, mechanism,
-		 public_key_template, public_key_attribute_count,
-		 private_key_template, private_key_attribute_count,
-		 public_key, private_key);
+                 public_key_template, public_key_attribute_count,
+                 private_key_template, private_key_attribute_count,
+                 public_key, private_key);
 }
 
 ck_rv_t
 pakchois_wrap_key (pakchois_session_t * sess,
-		   struct ck_mechanism * mechanism,
-		   ck_object_handle_t wrapping_key,
-		   ck_object_handle_t key,
-		   unsigned char *wrapped_key, unsigned long *wrapped_key_len)
+                   struct ck_mechanism * mechanism,
+                   ck_object_handle_t wrapping_key,
+                   ck_object_handle_t key,
+                   unsigned char *wrapped_key, unsigned long *wrapped_key_len)
 {
   return CALLS5 (WrapKey, mechanism, wrapping_key,
-		 key, wrapped_key, wrapped_key_len);
+                 key, wrapped_key, wrapped_key_len);
 }
 
 ck_rv_t
 pakchois_unwrap_key (pakchois_session_t * sess,
-		     struct ck_mechanism * mechanism,
-		     ck_object_handle_t unwrapping_key,
-		     unsigned char *wrapped_key,
-		     unsigned long wrapped_key_len,
-		     struct ck_attribute * templ,
-		     unsigned long attribute_count, ck_object_handle_t * key)
+                     struct ck_mechanism * mechanism,
+                     ck_object_handle_t unwrapping_key,
+                     unsigned char *wrapped_key,
+                     unsigned long wrapped_key_len,
+                     struct ck_attribute * templ,
+                     unsigned long attribute_count, ck_object_handle_t * key)
 {
   return CALLS7 (UnwrapKey, mechanism, unwrapping_key,
-		 wrapped_key, wrapped_key_len, templ, attribute_count, key);
+                 wrapped_key, wrapped_key_len, templ, attribute_count, key);
 }
 
 ck_rv_t
 pakchois_derive_key (pakchois_session_t * sess,
-		     struct ck_mechanism * mechanism,
-		     ck_object_handle_t base_key,
-		     struct ck_attribute * templ,
-		     unsigned long attribute_count, ck_object_handle_t * key)
+                     struct ck_mechanism * mechanism,
+                     ck_object_handle_t base_key,
+                     struct ck_attribute * templ,
+                     unsigned long attribute_count, ck_object_handle_t * key)
 {
   return CALLS5 (DeriveKey, mechanism, base_key, templ, attribute_count, key);
 }
@@ -1221,15 +1221,15 @@ pakchois_derive_key (pakchois_session_t * sess,
 
 ck_rv_t
 pakchois_seed_random (pakchois_session_t * sess,
-		      unsigned char *seed, unsigned long seed_len)
+                      unsigned char *seed, unsigned long seed_len)
 {
   return CALLS2 (SeedRandom, seed, seed_len);
 }
 
 ck_rv_t
 pakchois_generate_random (pakchois_session_t * sess,
-			  unsigned char *random_data,
-			  unsigned long random_len)
+                          unsigned char *random_data,
+                          unsigned long random_len)
 {
   return CALLS2 (GenerateRandom, random_data, random_len);
 }

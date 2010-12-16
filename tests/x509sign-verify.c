@@ -159,13 +159,15 @@ doit (void)
       if (ret < 0)
         fail ("gnutls_x509_privkey_import\n");
 
-      ret = gnutls_x509_privkey_sign_hash2 (key, GNUTLS_DIG_SHA1, 0, &hash_data,
-					   &signature2);
+      ret =
+        gnutls_x509_privkey_sign_hash2 (key, GNUTLS_DIG_SHA1, 0, &hash_data,
+                                        &signature2);
       if (ret < 0)
         fail ("gnutls_x509_privkey_sign_hash\n");
 
-      ret = gnutls_x509_privkey_sign_data2 (key, GNUTLS_DIG_SHA1, 0, &raw_data,
-					   &signature);
+      ret =
+        gnutls_x509_privkey_sign_data2 (key, GNUTLS_DIG_SHA1, 0, &raw_data,
+                                        &signature);
       if (ret < 0)
         fail ("gnutls_x509_privkey_sign_hash\n");
 

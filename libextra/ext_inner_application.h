@@ -49,7 +49,7 @@ _gnutls_ia_derive_inner_secret (gnutls_session_t session)
 
   ret =
     _gnutls_ext_get_session_data (session, GNUTLS_EXTENSION_INNER_APPLICATION,
-				  &epriv);
+                                  &epriv);
   if (ret < 0)
     {
       return;
@@ -57,7 +57,7 @@ _gnutls_ia_derive_inner_secret (gnutls_session_t session)
   priv = epriv.ptr;
 
   memcpy (priv->inner_secret,
-	  session->security_parameters.master_secret, GNUTLS_MASTER_SIZE);
+          session->security_parameters.master_secret, GNUTLS_MASTER_SIZE);
 
 }
 

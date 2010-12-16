@@ -65,7 +65,7 @@ _gnutls_add_lzo_comp (void)
   for (i = 0; i < _gnutls_comp_algorithms_size; i++)
     {
       if (_gnutls_compression_algorithms[i].name == NULL)
-	break;
+        break;
     }
 
   if (_gnutls_compression_algorithms[i].name == NULL
@@ -81,7 +81,7 @@ _gnutls_add_lzo_comp (void)
       _gnutls_lzo1x_decompress_safe = lzo1x_decompress_safe;
       _gnutls_lzo1x_1_compress = lzo1x_1_compress;
 
-      return 0;			/* ok */
+      return 0;                 /* ok */
     }
 
 
@@ -157,8 +157,8 @@ gnutls_global_init_extra (void)
     {
       ret = gnutls_register_md5_handler ();
       if (ret)
-	fprintf (stderr, "gnutls_register_md5_handler: %s\n",
-		 gnutls_strerror (ret));
+        fprintf (stderr, "gnutls_register_md5_handler: %s\n",
+                 gnutls_strerror (ret));
     }
 #endif
 #endif

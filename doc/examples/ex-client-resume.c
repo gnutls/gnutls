@@ -42,7 +42,7 @@ main (void)
   gnutls_certificate_set_x509_trust_file (xcred, CAFILE, GNUTLS_X509_FMT_PEM);
 
   for (t = 0; t < 2; t++)
-    {				/* connect 2 times to the server */
+    {                           /* connect 2 times to the server */
 
       sd = tcp_connect ();
 
@@ -53,11 +53,11 @@ main (void)
       gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
 
       if (t > 0)
-	{
-	  /* if this is not the first time we connect */
-	  gnutls_session_set_data (session, session_data, session_data_size);
-	  free (session_data);
-	}
+        {
+          /* if this is not the first time we connect */
+          gnutls_session_set_data (session, session_data, session_data_size);
+          free (session_data);
+        }
 
       gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
 
@@ -66,39 +66,39 @@ main (void)
       ret = gnutls_handshake (session);
 
       if (ret < 0)
-	{
-	  fprintf (stderr, "*** Handshake failed\n");
-	  gnutls_perror (ret);
-	  goto end;
-	}
+        {
+          fprintf (stderr, "*** Handshake failed\n");
+          gnutls_perror (ret);
+          goto end;
+        }
       else
-	{
-	  printf ("- Handshake was completed\n");
-	}
+        {
+          printf ("- Handshake was completed\n");
+        }
 
       if (t == 0)
-	{			/* the first time we connect */
-	  /* get the session data size */
-	  gnutls_session_get_data (session, NULL, &session_data_size);
-	  session_data = malloc (session_data_size);
+        {                       /* the first time we connect */
+          /* get the session data size */
+          gnutls_session_get_data (session, NULL, &session_data_size);
+          session_data = malloc (session_data_size);
 
-	  /* put session data to the session variable */
-	  gnutls_session_get_data (session, session_data, &session_data_size);
+          /* put session data to the session variable */
+          gnutls_session_get_data (session, session_data, &session_data_size);
 
-	}
+        }
       else
-	{			/* the second time we connect */
+        {                       /* the second time we connect */
 
-	  /* check if we actually resumed the previous session */
-	  if (gnutls_session_is_resumed (session) != 0)
-	    {
-	      printf ("- Previous session was resumed\n");
-	    }
-	  else
-	    {
-	      fprintf (stderr, "*** Previous session was NOT resumed\n");
-	    }
-	}
+          /* check if we actually resumed the previous session */
+          if (gnutls_session_is_resumed (session) != 0)
+            {
+              printf ("- Previous session was resumed\n");
+            }
+          else
+            {
+              fprintf (stderr, "*** Previous session was NOT resumed\n");
+            }
+        }
 
       /* This function was defined in a previous example
        */
@@ -108,21 +108,21 @@ main (void)
 
       ret = gnutls_record_recv (session, buffer, MAX_BUF);
       if (ret == 0)
-	{
-	  printf ("- Peer has closed the TLS connection\n");
-	  goto end;
-	}
+        {
+          printf ("- Peer has closed the TLS connection\n");
+          goto end;
+        }
       else if (ret < 0)
-	{
-	  fprintf (stderr, "*** Error: %s\n", gnutls_strerror (ret));
-	  goto end;
-	}
+        {
+          fprintf (stderr, "*** Error: %s\n", gnutls_strerror (ret));
+          goto end;
+        }
 
       printf ("- Received %d bytes: ", ret);
       for (ii = 0; ii < ret; ii++)
-	{
-	  fputc (buffer[ii], stdout);
-	}
+        {
+          fputc (buffer[ii], stdout);
+        }
       fputs ("\n", stdout);
 
       gnutls_bye (session, GNUTLS_SHUT_RDWR);
@@ -133,7 +133,7 @@ main (void)
 
       gnutls_deinit (session);
 
-    }				/* for() */
+    }                           /* for() */
 
   gnutls_certificate_free_credentials (xcred);
 

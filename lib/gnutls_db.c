@@ -52,7 +52,7 @@
  **/
 void
 gnutls_db_set_retrieve_function (gnutls_session_t session,
-				 gnutls_db_retr_func retr_func)
+                                 gnutls_db_retr_func retr_func)
 {
   session->internals.db_retrieve_func = retr_func;
 }
@@ -70,7 +70,7 @@ gnutls_db_set_retrieve_function (gnutls_session_t session,
  **/
 void
 gnutls_db_set_remove_function (gnutls_session_t session,
-			       gnutls_db_remove_func rem_func)
+                               gnutls_db_remove_func rem_func)
 {
   session->internals.db_remove_func = rem_func;
 }
@@ -88,7 +88,7 @@ gnutls_db_set_remove_function (gnutls_session_t session,
  **/
 void
 gnutls_db_set_store_function (gnutls_session_t session,
-			      gnutls_db_store_func store_func)
+                              gnutls_db_store_func store_func)
 {
   session->internals.db_store_func = store_func;
 }
@@ -157,11 +157,11 @@ gnutls_db_check_entry (gnutls_session_t session, gnutls_datum_t session_entry)
 
   if (session_entry.data != NULL)
     if (timestamp -
-	((security_parameters_st *) (session_entry.data))->timestamp <=
-	session->internals.expire_time
-	|| ((security_parameters_st *) (session_entry.data))->timestamp >
-	timestamp
-	|| ((security_parameters_st *) (session_entry.data))->timestamp == 0)
+        ((security_parameters_st *) (session_entry.data))->timestamp <=
+        session->internals.expire_time
+        || ((security_parameters_st *) (session_entry.data))->timestamp >
+        timestamp
+        || ((security_parameters_st *) (session_entry.data))->timestamp == 0)
       return GNUTLS_E_EXPIRED;
 
   return 0;
@@ -224,7 +224,7 @@ _gnutls_db_func_is_ok (gnutls_session_t session)
 
 int
 _gnutls_server_restore_session (gnutls_session_t session,
-				uint8_t * session_id, int session_id_size)
+                                uint8_t * session_id, int session_id_size)
 {
   gnutls_datum_t data;
   gnutls_datum_t key;
@@ -262,7 +262,7 @@ _gnutls_server_restore_session (gnutls_session_t session,
 
 int
 _gnutls_db_remove_session (gnutls_session_t session, uint8_t * session_id,
-			   int session_id_size)
+                           int session_id_size)
 {
   gnutls_datum_t key;
 
@@ -277,7 +277,7 @@ _gnutls_db_remove_session (gnutls_session_t session, uint8_t * session_id,
  */
 int
 _gnutls_store_session (gnutls_session_t session,
-		       gnutls_datum_t session_id, gnutls_datum_t session_data)
+                       gnutls_datum_t session_id, gnutls_datum_t session_data)
 {
   int ret = 0;
 
@@ -308,7 +308,7 @@ _gnutls_store_session (gnutls_session_t session,
   if (session->internals.db_store_func != NULL)
     ret =
       session->internals.db_store_func (session->internals.db_ptr,
-					session_id, session_data);
+                                        session_id, session_data);
 
   return (ret == 0 ? ret : GNUTLS_E_DB_ERROR);
 
@@ -330,7 +330,7 @@ _gnutls_retrieve_session (gnutls_session_t session, gnutls_datum_t session_id)
   if (session->internals.db_retrieve_func != NULL)
     ret =
       session->internals.db_retrieve_func (session->internals.db_ptr,
-					   session_id);
+                                           session_id);
 
   return ret;
 
@@ -355,7 +355,7 @@ _gnutls_remove_session (gnutls_session_t session, gnutls_datum_t session_id)
   if (session->internals.db_remove_func != NULL)
     ret =
       session->internals.db_remove_func (session->internals.db_ptr,
-					 session_id);
+                                         session_id);
 
   return (ret == 0 ? ret : GNUTLS_E_DB_ERROR);
 
@@ -377,6 +377,6 @@ void
 gnutls_db_remove_session (gnutls_session_t session)
 {
   _gnutls_db_remove_session (session,
-			     session->security_parameters.session_id,
-			     session->security_parameters.session_id_size);
+                             session->security_parameters.session_id,
+                             session->security_parameters.session_id_size);
 }

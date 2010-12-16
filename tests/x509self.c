@@ -128,7 +128,7 @@ client (void)
    */
   gnutls_certificate_set_x509_trust_mem (xcred, &ca, GNUTLS_X509_FMT_PEM);
   gnutls_certificate_set_x509_key_mem (xcred, &cert, &key,
-				       GNUTLS_X509_FMT_PEM);
+                                       GNUTLS_X509_FMT_PEM);
 
   /* Initialize TLS session
    */
@@ -164,8 +164,8 @@ client (void)
 
   if (debug)
     success ("client: TLS version is: %s\n",
-	     gnutls_protocol_get_name (gnutls_protocol_get_version
-				       (session)));
+             gnutls_protocol_get_name (gnutls_protocol_get_version
+                                       (session)));
 
   /* see the Getting peer's information example */
   if (debug)
@@ -176,7 +176,7 @@ client (void)
   if (ret == strlen (MSG))
     {
       if (debug)
-	success ("client: sent record.\n");
+        success ("client: sent record.\n");
     }
   else
     {
@@ -193,24 +193,24 @@ client (void)
   if (ret == GNUTLS_E_REHANDSHAKE)
     {
       if (debug)
-	success ("client: doing handshake!\n");
+        success ("client: doing handshake!\n");
       ret = gnutls_handshake (session);
       if (ret == 0)
-	{
-	  if (debug)
-	    success ("client: handshake complete, reading again.\n");
-	  ret = gnutls_record_recv (session, buffer, MAX_BUF);
-	}
+        {
+          if (debug)
+            success ("client: handshake complete, reading again.\n");
+          ret = gnutls_record_recv (session, buffer, MAX_BUF);
+        }
       else
-	{
-	  fail ("client: handshake failed.\n");
-	}
+        {
+          fail ("client: handshake failed.\n");
+        }
     }
 
   if (ret == 0)
     {
       if (debug)
-	success ("client: Peer has closed the TLS connection\n");
+        success ("client: Peer has closed the TLS connection\n");
       goto end;
     }
   else if (ret < 0)
@@ -223,9 +223,9 @@ client (void)
     {
       printf ("- Received %d bytes: ", ret);
       for (ii = 0; ii < ret; ii++)
-	{
-	  fputc (buffer[ii], stdout);
-	}
+        {
+          fputc (buffer[ii], stdout);
+        }
       fputs ("\n", stdout);
     }
 
@@ -247,7 +247,7 @@ end:
 
 #define SA struct sockaddr
 #define MAX_BUF 1024
-#define PORT 5556		/* listen to 5556 port */
+#define PORT 5556               /* listen to 5556 port */
 #define DH_BITS 1024
 
 /* These are global */
@@ -360,10 +360,10 @@ server_start (void)
   memset (&sa_serv, '\0', sizeof (sa_serv));
   sa_serv.sin_family = AF_INET;
   sa_serv.sin_addr.s_addr = INADDR_ANY;
-  sa_serv.sin_port = htons (PORT);	/* Server Port number */
+  sa_serv.sin_port = htons (PORT);      /* Server Port number */
 
   setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *) &optval,
-	      sizeof (int));
+              sizeof (int));
 
   err = bind (listen_sd, (SA *) & sa_serv, sizeof (sa_serv));
   if (err == -1)
@@ -400,7 +400,7 @@ server (void)
   gnutls_certificate_set_x509_trust_mem (x509_cred, &ca, GNUTLS_X509_FMT_PEM);
 
   gnutls_certificate_set_x509_key_mem (x509_cred, &server_cert, &server_key,
-				       GNUTLS_X509_FMT_PEM);
+                                       GNUTLS_X509_FMT_PEM);
 
   if (debug)
     success ("Launched, generating DH parameters...\n");
@@ -417,8 +417,8 @@ server (void)
 
   if (debug)
     success ("server: connection from %s, port %d\n",
-	     inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
-			sizeof (topbuf)), ntohs (sa_cli.sin_port));
+             inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,
+                        sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
   gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
   ret = gnutls_handshake (session);
@@ -433,8 +433,8 @@ server (void)
     {
       success ("server: Handshake was completed\n");
       success ("server: TLS version is: %s\n",
-	       gnutls_protocol_get_name (gnutls_protocol_get_version
-					 (session)));
+               gnutls_protocol_get_name (gnutls_protocol_get_version
+                                         (session)));
     }
 
   /* see the Getting peer's information example */
@@ -448,47 +448,47 @@ server (void)
       ret = gnutls_record_recv (session, buffer, MAX_BUF);
 
       if (ret == 0)
-	{
-	  if (debug)
-	    success ("server: Peer has closed the GnuTLS connection\n");
-	  break;
-	}
+        {
+          if (debug)
+            success ("server: Peer has closed the GnuTLS connection\n");
+          break;
+        }
       else if (ret < 0)
-	{
-	  fail ("server: Received corrupted data(%d). Closing...\n", ret);
-	  break;
-	}
+        {
+          fail ("server: Received corrupted data(%d). Closing...\n", ret);
+          break;
+        }
       else if (ret > 0)
-	{
-	  gnutls_certificate_server_set_request (session,
-						 GNUTLS_CERT_REQUEST);
+        {
+          gnutls_certificate_server_set_request (session,
+                                                 GNUTLS_CERT_REQUEST);
 
-	  if (debug)
-	    success ("server: got data, forcing rehandshake.\n");
+          if (debug)
+            success ("server: got data, forcing rehandshake.\n");
 
-	  ret = gnutls_rehandshake (session);
-	  if (ret < 0)
-	    {
-	      fail ("server: rehandshake failed\n");
-	      gnutls_perror (ret);
-	      break;
-	    }
+          ret = gnutls_rehandshake (session);
+          if (ret < 0)
+            {
+              fail ("server: rehandshake failed\n");
+              gnutls_perror (ret);
+              break;
+            }
 
-	  ret = gnutls_handshake (session);
-	  if (ret < 0)
-	    {
-	      fail ("server: (re)handshake failed\n");
-	      gnutls_perror (ret);
-	      break;
-	    }
+          ret = gnutls_handshake (session);
+          if (ret < 0)
+            {
+              fail ("server: (re)handshake failed\n");
+              gnutls_perror (ret);
+              break;
+            }
 
-	  if (debug)
-	    success ("server: rehandshake complete.\n");
+          if (debug)
+            success ("server: rehandshake complete.\n");
 
-	  /* echo data back to the client
-	   */
-	  gnutls_record_send (session, buffer, strlen (buffer));
-	}
+          /* echo data back to the client
+           */
+          gnutls_record_send (session, buffer, strlen (buffer));
+        }
     }
   /* do not wait for the peer to close the connection.
    */

@@ -86,9 +86,9 @@ load_secret_key (int mand, common_info_st * info)
   if (info->secret_key == NULL)
     {
       if (mand)
-	error (EXIT_FAILURE, 0, "missing --secret-key");
+        error (EXIT_FAILURE, 0, "missing --secret-key");
       else
-	return NULL;
+        return NULL;
     }
 
   hex_key.data = (char *) info->secret_key;
@@ -135,8 +135,8 @@ load_private_key (int mand, common_info_st * info)
     {
       const char *pass = get_pass ();
       ret =
-	gnutls_x509_privkey_import_pkcs8 (key, &dat, info->incert_format,
-					  pass, 0);
+        gnutls_x509_privkey_import_pkcs8 (key, &dat, info->incert_format,
+                                          pass, 0);
     }
   else
     ret = gnutls_x509_privkey_import (key, &dat, info->incert_format);
@@ -146,13 +146,13 @@ load_private_key (int mand, common_info_st * info)
   if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
     {
       error (EXIT_FAILURE, 0,
-	     "import error: could not find a valid PEM header; "
-	     "check if your key is PKCS #8 or PKCS #12 encoded");
+             "import error: could not find a valid PEM header; "
+             "check if your key is PKCS #8 or PKCS #12 encoded");
     }
 
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing --load-privkey: %s: %s",
-	   info->privkey, gnutls_strerror (ret));
+           info->privkey, gnutls_strerror (ret));
 
   return key;
 }
@@ -193,9 +193,9 @@ load_cert_list (int mand, size_t * crt_size, common_info_st * info)
   if (info->cert == NULL)
     {
       if (mand)
-	error (EXIT_FAILURE, 0, "missing --load-certificate");
+        error (EXIT_FAILURE, 0, "missing --load-certificate");
       else
-	return NULL;
+        return NULL;
     }
 
   fd = fopen (info->cert, "r");
@@ -214,28 +214,28 @@ load_cert_list (int mand, size_t * crt_size, common_info_st * info)
     {
       ret = gnutls_x509_crt_init (&crt[i]);
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "crt_init: %s", gnutls_strerror (ret));
+        error (EXIT_FAILURE, 0, "crt_init: %s", gnutls_strerror (ret));
 
       dat.data = ptr;
       dat.size = ptr_size;
 
       ret = gnutls_x509_crt_import (crt[i], &dat, info->incert_format);
       if (ret < 0 && *crt_size > 0)
-	break;
+        break;
       if (ret < 0)
-	error (EXIT_FAILURE, 0, "crt_import: %s", gnutls_strerror (ret));
+        error (EXIT_FAILURE, 0, "crt_import: %s", gnutls_strerror (ret));
 
       ptr = strstr (ptr, "---END");
       if (ptr == NULL)
-	break;
+        break;
       ptr++;
 
       ptr_size = size;
       ptr_size -=
-	(unsigned int) ((unsigned char *) ptr - (unsigned char *) buffer);
+        (unsigned int) ((unsigned char *) ptr - (unsigned char *) buffer);
 
       if (ptr_size < 0)
-	break;
+        break;
 
       (*crt_size)++;
     }
@@ -271,13 +271,13 @@ load_request (common_info_st * info)
   if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
     {
       error (EXIT_FAILURE, 0,
-	     "import error: could not find a valid PEM header");
+             "import error: could not find a valid PEM header");
     }
 
   free (dat.data);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing --load-request: %s: %s",
-	   info->request, gnutls_strerror (ret));
+           info->request, gnutls_strerror (ret));
 
   return crq;
 }
@@ -304,21 +304,21 @@ load_ca_private_key (common_info_st * info)
 
   if (!dat.data)
     error (EXIT_FAILURE, errno, "reading --load-ca-privkey: %s",
-	   info->ca_privkey);
+           info->ca_privkey);
 
   if (info->pkcs8)
     {
       const char *pass = get_pass ();
       ret =
-	gnutls_x509_privkey_import_pkcs8 (key, &dat, info->incert_format,
-					  pass, 0);
+        gnutls_x509_privkey_import_pkcs8 (key, &dat, info->incert_format,
+                                          pass, 0);
     }
   else
     ret = gnutls_x509_privkey_import (key, &dat, info->incert_format);
   free (dat.data);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing --load-ca-privkey: %s: %s",
-	   info->ca_privkey, gnutls_strerror (ret));
+           info->ca_privkey, gnutls_strerror (ret));
 
   return key;
 }
@@ -345,13 +345,13 @@ load_ca_cert (common_info_st * info)
 
   if (!dat.data)
     error (EXIT_FAILURE, errno, "reading --load-ca-certificate: %s",
-	   info->ca);
+           info->ca);
 
   ret = gnutls_x509_crt_import (crt, &dat, info->incert_format);
   free (dat.data);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing --load-ca-certificate: %s: %s",
-	   info->ca, gnutls_strerror (ret));
+           info->ca, gnutls_strerror (ret));
 
   return crt;
 }
@@ -390,13 +390,13 @@ load_pubkey (int mand, common_info_st * info)
   if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
     {
       error (EXIT_FAILURE, 0,
-	     "import error: could not find a valid PEM header; "
-	     "check if your key has the PUBLIC KEY header");
+             "import error: could not find a valid PEM header; "
+             "check if your key has the PUBLIC KEY header");
     }
 
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing --load-pubkey: %s: %s",
-	   info->pubkey, gnutls_strerror (ret));
+           info->pubkey, gnutls_strerror (ret));
 
   return key;
 }

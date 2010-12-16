@@ -53,8 +53,8 @@
 
 int
 _gnutls_pbkdf2_sha1 (const char *P, size_t Plen,
-		     const char *S, size_t Slen,
-		     unsigned int c, char *DK, size_t dkLen)
+                     const char *S, size_t Slen,
+                     unsigned int c, char *DK, size_t dkLen)
 {
   unsigned int hLen = 20;
   char U[20];
@@ -164,29 +164,29 @@ _gnutls_pbkdf2_sha1 (const char *P, size_t Plen,
       memset (T, 0, hLen);
 
       for (u = 1; u <= c; u++)
-	{
-	  if (u == 1)
-	    {
-	      tmp[Slen + 0] = (i & 0xff000000) >> 24;
-	      tmp[Slen + 1] = (i & 0x00ff0000) >> 16;
-	      tmp[Slen + 2] = (i & 0x0000ff00) >> 8;
-	      tmp[Slen + 3] = (i & 0x000000ff) >> 0;
+        {
+          if (u == 1)
+            {
+              tmp[Slen + 0] = (i & 0xff000000) >> 24;
+              tmp[Slen + 1] = (i & 0x00ff0000) >> 16;
+              tmp[Slen + 2] = (i & 0x0000ff00) >> 8;
+              tmp[Slen + 3] = (i & 0x000000ff) >> 0;
 
-	      rc =
-		_gnutls_hmac_fast (GNUTLS_MAC_SHA1, P, Plen, tmp, tmplen, U);
-	    }
-	  else
-	    rc = _gnutls_hmac_fast (GNUTLS_MAC_SHA1, P, Plen, U, hLen, U);
+              rc =
+                _gnutls_hmac_fast (GNUTLS_MAC_SHA1, P, Plen, tmp, tmplen, U);
+            }
+          else
+            rc = _gnutls_hmac_fast (GNUTLS_MAC_SHA1, P, Plen, U, hLen, U);
 
-	  if (rc < 0)
-	    {
-	      gnutls_free (tmp);
-	      return rc;
-	    }
+          if (rc < 0)
+            {
+              gnutls_free (tmp);
+              return rc;
+            }
 
-	  for (k = 0; k < hLen; k++)
-	    T[k] ^= U[k];
-	}
+          for (k = 0; k < hLen; k++)
+            T[k] ^= U[k];
+        }
 
       memcpy (DK + (i - 1) * hLen, T, i == l ? r : hLen);
     }

@@ -51,7 +51,7 @@ _format_conv (gnutls_bigint_format_t format)
  */
 static bigint_t
 wrap_gcry_mpi_scan (const void *buffer, size_t nbytes,
-		    gnutls_bigint_format_t format)
+                    gnutls_bigint_format_t format)
 {
   gcry_mpi_t ret_mpi = NULL;
   int ret;
@@ -65,7 +65,7 @@ wrap_gcry_mpi_scan (const void *buffer, size_t nbytes,
 
 static int
 wrap_gcry_mpi_print (const bigint_t a, void *buffer, size_t * nbytes,
-		     gnutls_bigint_format_t format)
+                     gnutls_bigint_format_t format)
 {
   int ret;
   size_t init_bytes = *nbytes;
@@ -79,16 +79,16 @@ wrap_gcry_mpi_print (const bigint_t a, void *buffer, size_t * nbytes,
   if (!ret)
     {
       if (buffer == NULL || init_bytes < *nbytes)
-	{
+        {
 
-	  /* in STD format we may want to include
-	   * an extra byte for zero. Sometimes the gcry_
-	   * function doesn't add it.
-	   */
-	  if (format == GNUTLS_MPI_FORMAT_STD)
-	    (*nbytes)++;
-	  return GNUTLS_E_SHORT_MEMORY_BUFFER;
-	}
+          /* in STD format we may want to include
+           * an extra byte for zero. Sometimes the gcry_
+           * function doesn't add it.
+           */
+          if (format == GNUTLS_MPI_FORMAT_STD)
+            (*nbytes)++;
+          return GNUTLS_E_SHORT_MEMORY_BUFFER;
+        }
       return 0;
     }
 
@@ -155,7 +155,7 @@ wrap_gcry_mpi_mod (const bigint_t a, const bigint_t b)
 
 static bigint_t
 wrap_gcry_mpi_powm (bigint_t w, const bigint_t b, const bigint_t e,
-		    const bigint_t m)
+                    const bigint_t m)
 {
   if (w == NULL)
     w = _gnutls_mpi_alloc_like (m);
@@ -170,7 +170,7 @@ wrap_gcry_mpi_powm (bigint_t w, const bigint_t b, const bigint_t e,
 
 static bigint_t
 wrap_gcry_mpi_addm (bigint_t w, const bigint_t a, const bigint_t b,
-		    const bigint_t m)
+                    const bigint_t m)
 {
   if (w == NULL)
     w = _gnutls_mpi_alloc_like (m);
@@ -185,7 +185,7 @@ wrap_gcry_mpi_addm (bigint_t w, const bigint_t a, const bigint_t b,
 
 static bigint_t
 wrap_gcry_mpi_subm (bigint_t w, const bigint_t a, const bigint_t b,
-		    const bigint_t m)
+                    const bigint_t m)
 {
   if (w == NULL)
     w = _gnutls_mpi_alloc_like (m);
@@ -200,7 +200,7 @@ wrap_gcry_mpi_subm (bigint_t w, const bigint_t a, const bigint_t b,
 
 static bigint_t
 wrap_gcry_mpi_mulm (bigint_t w, const bigint_t a, const bigint_t b,
-		    const bigint_t m)
+                    const bigint_t m)
 {
   if (w == NULL)
     w = _gnutls_mpi_alloc_like (m);
@@ -336,7 +336,7 @@ wrap_gcry_generate_group (gnutls_group_st * group, unsigned int bits)
       qbits = (bits / 40) + 105;
     }
 
-  if (qbits & 1)		/* better have an even number */
+  if (qbits & 1)                /* better have an even number */
     qbits++;
 
   /* find a prime number of size bits.
@@ -344,19 +344,19 @@ wrap_gcry_generate_group (gnutls_group_st * group, unsigned int bits)
   do
     {
       if (times)
-	{
-	  gcry_mpi_release (prime);
-	  gcry_prime_release_factors (factors);
-	}
+        {
+          gcry_mpi_release (prime);
+          gcry_prime_release_factors (factors);
+        }
 
       err = gcry_prime_generate (&prime, bits, qbits, &factors,
-				 NULL, NULL, GCRY_STRONG_RANDOM,
-				 GCRY_PRIME_FLAG_SPECIAL_FACTOR);
+                                 NULL, NULL, GCRY_STRONG_RANDOM,
+                                 GCRY_PRIME_FLAG_SPECIAL_FACTOR);
       if (err != 0)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_INTERNAL_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INTERNAL_ERROR;
+        }
 
       err = gcry_prime_check (prime, 0);
 

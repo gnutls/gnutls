@@ -48,10 +48,10 @@ _gnutls_str_cat (char *dest, size_t dest_tot_size, const char *src)
   else
     {
       if (dest_tot_size - dest_size > 0)
-	{
-	  strncat (dest, src, (dest_tot_size - dest_size) - 1);
-	  dest[dest_tot_size - 1] = 0;
-	}
+        {
+          strncat (dest, src, (dest_tot_size - dest_size) - 1);
+          dest[dest_tot_size - 1] = 0;
+        }
     }
 }
 
@@ -67,16 +67,16 @@ _gnutls_str_cpy (char *dest, size_t dest_tot_size, const char *src)
   else
     {
       if (dest_tot_size > 0)
-	{
-	  strncpy (dest, src, (dest_tot_size) - 1);
-	  dest[dest_tot_size - 1] = 0;
-	}
+        {
+          strncpy (dest, src, (dest_tot_size) - 1);
+          dest[dest_tot_size - 1] = 0;
+        }
     }
 }
 
 void
 _gnutls_mem_cpy (char *dest, size_t dest_tot_size, const char *src,
-		 size_t src_size)
+                 size_t src_size)
 {
 
   if (dest_tot_size >= src_size)
@@ -86,9 +86,9 @@ _gnutls_mem_cpy (char *dest, size_t dest_tot_size, const char *src,
   else
     {
       if (dest_tot_size > 0)
-	{
-	  memcpy (dest, src, dest_tot_size);
-	}
+        {
+          memcpy (dest, src, dest_tot_size);
+        }
     }
 }
 
@@ -116,7 +116,7 @@ _gnutls_buffer_clear (gnutls_buffer_st * str)
 
 int
 _gnutls_buffer_append_data (gnutls_buffer_st * dest, const void *data,
-			    size_t data_size)
+                            size_t data_size)
 {
   size_t tot_len = data_size + dest->length;
 
@@ -125,12 +125,12 @@ _gnutls_buffer_append_data (gnutls_buffer_st * dest, const void *data,
       size_t unused = MEMSUB (dest->data, dest->allocd);
 
       if (dest->max_length - unused <= tot_len)
-	{
-	  if (dest->length && dest->data)
-	    memmove (dest->allocd, dest->data, dest->length);
+        {
+          if (dest->length && dest->data)
+            memmove (dest->allocd, dest->data, dest->length);
 
-	  dest->data = dest->allocd;
-	}
+          dest->data = dest->allocd;
+        }
       memmove (&dest->data[dest->length], data, data_size);
       dest->length = tot_len;
 
@@ -140,19 +140,19 @@ _gnutls_buffer_append_data (gnutls_buffer_st * dest, const void *data,
     {
       size_t unused = MEMSUB (dest->data, dest->allocd);
       size_t new_len =
-	MAX (data_size, MIN_CHUNK) + MAX (dest->max_length, MIN_CHUNK);
+        MAX (data_size, MIN_CHUNK) + MAX (dest->max_length, MIN_CHUNK);
 
       dest->allocd = gnutls_realloc (dest->allocd, new_len);
       if (dest->allocd == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
       dest->max_length = new_len;
       dest->data = dest->allocd + unused;
 
       if (dest->length && dest->data)
-	memmove (dest->allocd, dest->data, dest->length);
+        memmove (dest->allocd, dest->data, dest->length);
       dest->data = dest->allocd;
 
       memcpy (&dest->data[dest->length], data, data_size);
@@ -169,11 +169,11 @@ _gnutls_buffer_resize (gnutls_buffer_st * dest, size_t new_size)
     {
       size_t unused = MEMSUB (dest->data, dest->allocd);
       if (dest->max_length - unused <= new_size)
-	{
-	  if (dest->length && dest->data)
-	    memmove (dest->allocd, dest->data, dest->length);
-	  dest->data = dest->allocd;
-	}
+        {
+          if (dest->length && dest->data)
+            memmove (dest->allocd, dest->data, dest->length);
+          dest->data = dest->allocd;
+        }
 
       return 0;
     }
@@ -181,19 +181,19 @@ _gnutls_buffer_resize (gnutls_buffer_st * dest, size_t new_size)
     {
       size_t unused = MEMSUB (dest->data, dest->allocd);
       size_t alloc_len =
-	MAX (new_size, MIN_CHUNK) + MAX (dest->max_length, MIN_CHUNK);
+        MAX (new_size, MIN_CHUNK) + MAX (dest->max_length, MIN_CHUNK);
 
       dest->allocd = gnutls_realloc (dest->allocd, alloc_len);
       if (dest->allocd == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
       dest->max_length = alloc_len;
       dest->data = dest->allocd + unused;
 
       if (dest->length && dest->data)
-	memmove (dest->allocd, dest->data, dest->length);
+        memmove (dest->allocd, dest->data, dest->length);
       dest->data = dest->allocd;
 
       return 0;
@@ -212,7 +212,7 @@ _gnutls_buffer_append_str (gnutls_buffer_st * dest, const char *src)
  */
 void
 _gnutls_buffer_pop_datum (gnutls_buffer_st * str, gnutls_datum_t * data,
-			  size_t req_size)
+                          size_t req_size)
 {
 
   if (str->length == 0)
@@ -257,10 +257,10 @@ _gnutls_buffer_to_datum (gnutls_buffer_st * str, gnutls_datum_t * data)
     {
       data->data = gnutls_malloc (str->length);
       if (data->data == NULL)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
       memcpy (data->data, str->data, str->length);
       data->size = str->length;
       _gnutls_buffer_clear (str);
@@ -278,7 +278,7 @@ _gnutls_buffer_to_datum (gnutls_buffer_st * str, gnutls_datum_t * data)
  */
 void
 _gnutls_buffer_pop_data (gnutls_buffer_st * str, void *data,
-			 size_t * req_size)
+                         size_t * req_size)
 {
   gnutls_datum_t tdata;
 
@@ -313,12 +313,12 @@ _gnutls_buffer_append_printf (gnutls_buffer_st * dest, const char *fmt, ...)
 
 static int
 _gnutls_buffer_insert_data (gnutls_buffer_st * dest, int pos, const void *str,
-			    size_t str_size)
+                            size_t str_size)
 {
   size_t orig_length = dest->length;
   int ret;
 
-  ret = _gnutls_buffer_resize (dest, dest->length + str_size);	/* resize to make space */
+  ret = _gnutls_buffer_resize (dest, dest->length + str_size);  /* resize to make space */
   if (ret < 0)
     return ret;
 
@@ -334,7 +334,7 @@ static void
 _gnutls_buffer_delete_data (gnutls_buffer_st * dest, int pos, size_t str_size)
 {
   memmove (&dest->data[pos], &dest->data[pos + str_size],
-	   dest->length - pos - str_size);
+           dest->length - pos - str_size);
 
   dest->length -= str_size;
 
@@ -344,7 +344,7 @@ _gnutls_buffer_delete_data (gnutls_buffer_st * dest, int pos, size_t str_size)
 
 int
 _gnutls_buffer_escape (gnutls_buffer_st * dest,
-		       const char *const invalid_chars)
+                       const char *const invalid_chars)
 {
   int rv = -1;
   char t[5];
@@ -354,20 +354,20 @@ _gnutls_buffer_escape (gnutls_buffer_st * dest,
     {
 
       if (dest->data[pos] == '\\' || strchr (invalid_chars, dest->data[pos])
-	  || !isgraph (dest->data[pos]))
-	{
+          || !isgraph (dest->data[pos]))
+        {
 
-	  snprintf (t, sizeof (t), "%%%.2X", (unsigned int) dest->data[pos]);
+          snprintf (t, sizeof (t), "%%%.2X", (unsigned int) dest->data[pos]);
 
-	  _gnutls_buffer_delete_data (dest, pos, 1);
+          _gnutls_buffer_delete_data (dest, pos, 1);
 
-	  if (_gnutls_buffer_insert_data (dest, pos, t, 3) < 0)
-	    {
-	      rv = -1;
-	      goto cleanup;
-	    }
+          if (_gnutls_buffer_insert_data (dest, pos, t, 3) < 0)
+            {
+              rv = -1;
+              goto cleanup;
+            }
 
-	}
+        }
       pos++;
     }
 
@@ -387,22 +387,22 @@ _gnutls_buffer_unescape (gnutls_buffer_st * dest)
   while (pos < dest->length)
     {
       if (dest->data[pos] == '%')
-	{
-	  char b[3];
-	  unsigned int u;
-	  unsigned char x;
+        {
+          char b[3];
+          unsigned int u;
+          unsigned char x;
 
-	  b[0] = dest->data[pos + 1];
-	  b[1] = dest->data[pos + 2];
-	  b[2] = 0;
+          b[0] = dest->data[pos + 1];
+          b[1] = dest->data[pos + 2];
+          b[2] = 0;
 
-	  sscanf (b, "%02x", &u);
+          sscanf (b, "%02x", &u);
 
-	  x = u;
+          x = u;
 
-	  _gnutls_buffer_delete_data (dest, pos, 3);
-	  _gnutls_buffer_insert_data (dest, pos, &x, 1);
-	}
+          _gnutls_buffer_delete_data (dest, pos, 3);
+          _gnutls_buffer_insert_data (dest, pos, &x, 1);
+        }
       pos++;
     }
 
@@ -419,7 +419,7 @@ _gnutls_buffer_unescape (gnutls_buffer_st * dest)
  */
 char *
 _gnutls_bin2hex (const void *_old, size_t oldlen,
-		 char *buffer, size_t buffer_size, const char *separator)
+                 char *buffer, size_t buffer_size, const char *separator)
 {
   unsigned int i, j;
   const opaque *old = _old;
@@ -462,14 +462,14 @@ _gnutls_bin2hex (const void *_old, size_t oldlen,
  **/
 int
 gnutls_hex2bin (const char *hex_data,
-		size_t hex_size, char *bin_data, size_t * bin_size)
+                size_t hex_size, char *bin_data, size_t * bin_size)
 {
   return _gnutls_hex2bin (hex_data, (int) hex_size, bin_data, bin_size);
 }
 
 int
 _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
-		 size_t * bin_size)
+                 size_t * bin_size)
 {
   int i, j;
   opaque hex2_data[3];
@@ -479,17 +479,17 @@ _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 
   for (i = j = 0; i < hex_size;)
     {
-      if (!isxdigit (hex_data[i]))	/* skip non-hex such as the ':' in 00:FF */
-	{
-	  i++;
-	  continue;
-	}
+      if (!isxdigit (hex_data[i]))      /* skip non-hex such as the ':' in 00:FF */
+        {
+          i++;
+          continue;
+        }
 
       if (j > *bin_size)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_SHORT_MEMORY_BUFFER;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_SHORT_MEMORY_BUFFER;
+        }
 
       hex2_data[0] = hex_data[i];
       hex2_data[1] = hex_data[i + 1];
@@ -497,10 +497,10 @@ _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 
       val = strtoul ((char *) hex2_data, NULL, 16);
       if (val == ULONG_MAX)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_PARSING_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_PARSING_ERROR;
+        }
       bin_data[j] = val;
       j++;
     }
@@ -518,7 +518,7 @@ _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
  */
 int
 _gnutls_hostname_compare (const char *certname,
-			  size_t certnamesize, const char *hostname)
+                          size_t certnamesize, const char *hostname)
 {
   /* find the first different character */
   for (; *certname && *hostname && toupper (*certname) == toupper (*hostname);
@@ -537,17 +537,17 @@ _gnutls_hostname_compare (const char *certname,
       certnamesize--;
 
       while (1)
-	{
-	  /* Use a recursive call to allow multiple wildcards */
-	  if (_gnutls_hostname_compare (certname, certnamesize, hostname))
-	    return 1;
+        {
+          /* Use a recursive call to allow multiple wildcards */
+          if (_gnutls_hostname_compare (certname, certnamesize, hostname))
+            return 1;
 
-	  /* wildcards are only allowed to match a single domain
-	     component or component fragment */
-	  if (*hostname == '\0' || *hostname == '.')
-	    break;
-	  hostname++;
-	}
+          /* wildcards are only allowed to match a single domain
+             component or component fragment */
+          if (*hostname == '\0' || *hostname == '.')
+            break;
+          hostname++;
+        }
 
       return 0;
     }
@@ -568,7 +568,7 @@ _gnutls_buffer_append_prefix (gnutls_buffer_st * buf, size_t data_size)
  */
 int
 _gnutls_buffer_pop_prefix (gnutls_buffer_st * buf, size_t * data_size,
-			   int check)
+                           int check)
 {
   size_t size;
 
@@ -595,7 +595,7 @@ _gnutls_buffer_pop_prefix (gnutls_buffer_st * buf, size_t * data_size,
 
 int
 _gnutls_buffer_pop_datum_prefix (gnutls_buffer_st * buf,
-				 gnutls_datum_t * data)
+                                 gnutls_datum_t * data)
 {
   size_t size;
   int ret;
@@ -612,10 +612,10 @@ _gnutls_buffer_pop_datum_prefix (gnutls_buffer_st * buf,
       size_t osize = size;
       _gnutls_buffer_pop_datum (buf, data, size);
       if (osize != data->size)
-	{
-	  gnutls_assert ();
-	  return GNUTLS_E_PARSING_ERROR;
-	}
+        {
+          gnutls_assert ();
+          return GNUTLS_E_PARSING_ERROR;
+        }
     }
   else
     {
@@ -628,7 +628,7 @@ _gnutls_buffer_pop_datum_prefix (gnutls_buffer_st * buf,
 
 int
 _gnutls_buffer_append_data_prefix (gnutls_buffer_st * buf, const void *data,
-				   size_t data_size)
+                                   size_t data_size)
 {
   _gnutls_buffer_append_prefix (buf, data_size);
   if (data_size > 0)
@@ -639,7 +639,7 @@ _gnutls_buffer_append_data_prefix (gnutls_buffer_st * buf, const void *data,
 
 int
 _gnutls_buffer_pop_data_prefix (gnutls_buffer_st * buf, void *data,
-				size_t * data_size)
+                                size_t * data_size)
 {
   size_t size;
   int ret;

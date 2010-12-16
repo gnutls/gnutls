@@ -133,7 +133,7 @@ doit (void)
   ret = gnutls_x509_crq_get_challenge_password (crq, smallbuf, &s);
   if (ret != 0 || s != 3 || strcmp (smallbuf, "foo") != 0)
     fail ("gnutls_x509_crq_get_challenge_password3 %d/%d/%s\n",
-	  ret, (int) s, smallbuf);
+          ret, (int) s, smallbuf);
 
   s = 0;
   ret = gnutls_x509_crq_get_extension_info (crq, 0, NULL, &s, NULL);
@@ -146,22 +146,22 @@ doit (void)
     fail ("gnutls_x509_crq_get_extension_data\n");
 
   ret = gnutls_x509_crq_set_subject_alt_name (crq, GNUTLS_SAN_DNSNAME,
-					      "foo", 3, 1);
+                                              "foo", 3, 1);
   if (ret != 0)
     fail ("gnutls_x509_crq_set_subject_alt_name\n");
 
   ret = gnutls_x509_crq_set_subject_alt_name (crq, GNUTLS_SAN_DNSNAME,
-					      "bar", 3, 1);
+                                              "bar", 3, 1);
   if (ret != 0)
     fail ("gnutls_x509_crq_set_subject_alt_name\n");
 
   ret = gnutls_x509_crq_set_subject_alt_name (crq, GNUTLS_SAN_DNSNAME,
-					      "apa", 3, 0);
+                                              "apa", 3, 0);
   if (ret != 0)
     fail ("gnutls_x509_crq_set_subject_alt_name\n");
 
   ret = gnutls_x509_crq_set_subject_alt_name (crq, GNUTLS_SAN_DNSNAME,
-					      "foo", 3, 1);
+                                              "foo", 3, 1);
   if (ret != 0)
     fail ("gnutls_x509_crq_set_subject_alt_name\n");
 

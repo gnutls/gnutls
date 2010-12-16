@@ -35,7 +35,7 @@
 #include <gnutls_cert.h>
 #include <libtasn1.h>
 #include <gnutls_global.h>
-#include <gnutls_num.h>		/* MAX */
+#include <gnutls_num.h>         /* MAX */
 #include <gnutls_sig.h>
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
@@ -49,7 +49,7 @@
  */
 int
 _gnutls_x509_get_tbs (ASN1_TYPE cert, const char *tbs_name,
-		      gnutls_datum_t * tbs)
+                      gnutls_datum_t * tbs)
 {
   int result;
   opaque *buf;
@@ -94,8 +94,8 @@ _gnutls_x509_get_tbs (ASN1_TYPE cert, const char *tbs_name,
  -*/
 int
 _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
-			gnutls_digest_algorithm_t dig,
-			gnutls_x509_crt_t issuer, gnutls_privkey_t issuer_key)
+                        gnutls_digest_algorithm_t dig,
+                        gnutls_x509_crt_t issuer, gnutls_privkey_t issuer_key)
 {
   int result;
   gnutls_datum_t signature;
@@ -120,8 +120,8 @@ _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
   _gnutls_str_cat (name, sizeof (name), ".signature");
 
   result = _gnutls_x509_write_sig_params (src, name,
-					  gnutls_privkey_get_pk_algorithm
-					  (issuer_key, NULL), dig);
+                                          gnutls_privkey_get_pk_algorithm
+                                          (issuer_key, NULL), dig);
   if (result < 0)
     {
       gnutls_assert ();
@@ -165,8 +165,8 @@ _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
    */
 
   result = _gnutls_x509_write_sig_params (src, "signatureAlgorithm",
-					  gnutls_privkey_get_pk_algorithm
-					  (issuer_key, NULL), dig);
+                                          gnutls_privkey_get_pk_algorithm
+                                          (issuer_key, NULL), dig);
   if (result < 0)
     {
       gnutls_assert ();

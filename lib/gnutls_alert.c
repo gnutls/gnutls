@@ -118,7 +118,7 @@ gnutls_alert_get_name (gnutls_alert_description_t alert)
  **/
 int
 gnutls_alert_send (gnutls_session_t session, gnutls_alert_level_t level,
-		   gnutls_alert_description_t desc)
+                   gnutls_alert_description_t desc)
 {
   uint8_t data[2];
   int ret;
@@ -131,11 +131,11 @@ gnutls_alert_send (gnutls_session_t session, gnutls_alert_level_t level,
   if (name == NULL)
     name = "(unknown)";
   _gnutls_record_log ("REC: Sending Alert[%d|%d] - %s\n", data[0],
-		      data[1], name);
+                      data[1], name);
 
   if ((ret =
        _gnutls_send_int (session, GNUTLS_ALERT, -1, EPOCH_WRITE_CURRENT, data,
-			 2, MBUFFER_FLUSH)) >= 0)
+                         2, MBUFFER_FLUSH)) >= 0)
     return 0;
   else
     return ret;
@@ -163,7 +163,7 @@ gnutls_error_to_alert (int err, int *level)
   int ret, _level = -1;
 
   switch (err)
-    {				/* send appropriate alert */
+    {                           /* send appropriate alert */
     case GNUTLS_E_DECRYPTION_FAILED:
       /* GNUTLS_A_DECRYPTION_FAILED is not sent, because
        * it is not defined in SSL3. Note that we must

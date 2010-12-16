@@ -29,7 +29,7 @@
 
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
-#include <string.h>		/* memset */
+#include <string.h>             /* memset */
 #include <x509/x509_int.h>
 #include <libtasn1.h>
 #include <gnutls/x509.h>
@@ -54,7 +54,7 @@ gnutls_x509_extract_dn (const gnutls_datum_t * idn, gnutls_x509_dn * rdn)
 
   if ((result =
        asn1_create_element (_gnutls_get_pkix (),
-			    "PKIX1.Name", &dn)) != ASN1_SUCCESS)
+                            "PKIX1.Name", &dn)) != ASN1_SUCCESS)
     {
       return _gnutls_asn2err (result);
     }
@@ -71,33 +71,33 @@ gnutls_x509_extract_dn (const gnutls_datum_t * idn, gnutls_x509_dn * rdn)
 
   len = sizeof (rdn->country);
   _gnutls_x509_parse_dn_oid (dn, "", GNUTLS_OID_X520_COUNTRY_NAME, 0, 0,
-			     rdn->country, &len);
+                             rdn->country, &len);
 
   len = sizeof (rdn->organization);
   _gnutls_x509_parse_dn_oid (dn, "", GNUTLS_OID_X520_ORGANIZATION_NAME, 0,
-			     0, rdn->organization, &len);
+                             0, rdn->organization, &len);
 
   len = sizeof (rdn->organizational_unit_name);
   _gnutls_x509_parse_dn_oid (dn, "",
-			     GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0,
-			     0, rdn->organizational_unit_name, &len);
+                             GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME, 0,
+                             0, rdn->organizational_unit_name, &len);
 
   len = sizeof (rdn->common_name);
   _gnutls_x509_parse_dn_oid (dn, "", GNUTLS_OID_X520_COMMON_NAME, 0, 0,
-			     rdn->common_name, &len);
+                             rdn->common_name, &len);
 
   len = sizeof (rdn->locality_name);
   _gnutls_x509_parse_dn_oid (dn, "", GNUTLS_OID_X520_LOCALITY_NAME, 0, 0,
-			     rdn->locality_name, &len);
+                             rdn->locality_name, &len);
 
   len = sizeof (rdn->state_or_province_name);
   _gnutls_x509_parse_dn_oid (dn, "",
-			     GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0, 0,
-			     rdn->state_or_province_name, &len);
+                             GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME, 0, 0,
+                             rdn->state_or_province_name, &len);
 
   len = sizeof (rdn->email);
   _gnutls_x509_parse_dn_oid (dn, "", GNUTLS_OID_PKCS9_EMAIL, 0, 0,
-			     rdn->email, &len);
+                             rdn->email, &len);
 
   asn1_delete_structure (&dn);
 
@@ -116,7 +116,7 @@ gnutls_x509_extract_dn (const gnutls_datum_t * idn, gnutls_x509_dn * rdn)
  -*/
 int
 gnutls_x509_extract_certificate_dn (const gnutls_datum_t * cert,
-				    gnutls_x509_dn * ret)
+                                    gnutls_x509_dn * ret)
 {
   gnutls_x509_crt_t xcert;
   int result;
@@ -135,33 +135,33 @@ gnutls_x509_extract_certificate_dn (const gnutls_datum_t * cert,
 
   len = sizeof (ret->country);
   gnutls_x509_crt_get_dn_by_oid (xcert, GNUTLS_OID_X520_COUNTRY_NAME, 0,
-				 0, ret->country, &len);
+                                 0, ret->country, &len);
 
   len = sizeof (ret->organization);
   gnutls_x509_crt_get_dn_by_oid (xcert, GNUTLS_OID_X520_ORGANIZATION_NAME,
-				 0, 0, ret->organization, &len);
+                                 0, 0, ret->organization, &len);
 
   len = sizeof (ret->organizational_unit_name);
   gnutls_x509_crt_get_dn_by_oid (xcert,
-				 GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME,
-				 0, 0, ret->organizational_unit_name, &len);
+                                 GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME,
+                                 0, 0, ret->organizational_unit_name, &len);
 
   len = sizeof (ret->common_name);
   gnutls_x509_crt_get_dn_by_oid (xcert, GNUTLS_OID_X520_COMMON_NAME, 0, 0,
-				 ret->common_name, &len);
+                                 ret->common_name, &len);
 
   len = sizeof (ret->locality_name);
   gnutls_x509_crt_get_dn_by_oid (xcert, GNUTLS_OID_X520_LOCALITY_NAME, 0,
-				 0, ret->locality_name, &len);
+                                 0, ret->locality_name, &len);
 
   len = sizeof (ret->state_or_province_name);
   gnutls_x509_crt_get_dn_by_oid (xcert,
-				 GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME,
-				 0, 0, ret->state_or_province_name, &len);
+                                 GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME,
+                                 0, 0, ret->state_or_province_name, &len);
 
   len = sizeof (ret->email);
   gnutls_x509_crt_get_dn_by_oid (xcert, GNUTLS_OID_PKCS9_EMAIL, 0, 0,
-				 ret->email, &len);
+                                 ret->email, &len);
 
   gnutls_x509_crt_deinit (xcert);
 
@@ -180,7 +180,7 @@ gnutls_x509_extract_certificate_dn (const gnutls_datum_t * cert,
  -*/
 int
 gnutls_x509_extract_certificate_issuer_dn (const gnutls_datum_t * cert,
-					   gnutls_x509_dn * ret)
+                                           gnutls_x509_dn * ret)
 {
   gnutls_x509_crt_t xcert;
   int result;
@@ -199,39 +199,39 @@ gnutls_x509_extract_certificate_issuer_dn (const gnutls_datum_t * cert,
 
   len = sizeof (ret->country);
   gnutls_x509_crt_get_issuer_dn_by_oid (xcert,
-					GNUTLS_OID_X520_COUNTRY_NAME, 0,
-					0, ret->country, &len);
+                                        GNUTLS_OID_X520_COUNTRY_NAME, 0,
+                                        0, ret->country, &len);
 
   len = sizeof (ret->organization);
   gnutls_x509_crt_get_issuer_dn_by_oid (xcert,
-					GNUTLS_OID_X520_ORGANIZATION_NAME,
-					0, 0, ret->organization, &len);
+                                        GNUTLS_OID_X520_ORGANIZATION_NAME,
+                                        0, 0, ret->organization, &len);
 
   len = sizeof (ret->organizational_unit_name);
   gnutls_x509_crt_get_issuer_dn_by_oid (xcert,
-					GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME,
-					0, 0,
-					ret->organizational_unit_name, &len);
+                                        GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME,
+                                        0, 0,
+                                        ret->organizational_unit_name, &len);
 
   len = sizeof (ret->common_name);
   gnutls_x509_crt_get_issuer_dn_by_oid (xcert,
-					GNUTLS_OID_X520_COMMON_NAME, 0, 0,
-					ret->common_name, &len);
+                                        GNUTLS_OID_X520_COMMON_NAME, 0, 0,
+                                        ret->common_name, &len);
 
   len = sizeof (ret->locality_name);
   gnutls_x509_crt_get_issuer_dn_by_oid (xcert,
-					GNUTLS_OID_X520_LOCALITY_NAME, 0,
-					0, ret->locality_name, &len);
+                                        GNUTLS_OID_X520_LOCALITY_NAME, 0,
+                                        0, ret->locality_name, &len);
 
   len = sizeof (ret->state_or_province_name);
   gnutls_x509_crt_get_issuer_dn_by_oid (xcert,
-					GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME,
-					0, 0, ret->state_or_province_name,
-					&len);
+                                        GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME,
+                                        0, 0, ret->state_or_province_name,
+                                        &len);
 
   len = sizeof (ret->email);
   gnutls_x509_crt_get_issuer_dn_by_oid (xcert, GNUTLS_OID_PKCS9_EMAIL, 0,
-					0, ret->email, &len);
+                                        0, ret->email, &len);
 
   gnutls_x509_crt_deinit (xcert);
 
@@ -258,8 +258,8 @@ gnutls_x509_extract_certificate_issuer_dn (const gnutls_datum_t * cert,
  -*/
 int
 gnutls_x509_extract_certificate_subject_alt_name (const gnutls_datum_t *
-						  cert, int seq,
-						  char *ret, int *ret_size)
+                                                  cert, int seq,
+                                                  char *ret, int *ret_size)
 {
   gnutls_x509_crt_t xcert;
   int result;
@@ -434,7 +434,7 @@ gnutls_x509_extract_certificate_version (const gnutls_datum_t * cert)
  -*/
 int
 gnutls_x509_extract_certificate_serial (const gnutls_datum_t * cert,
-					char *result, int *result_size)
+                                        char *result, int *result_size)
 {
   gnutls_x509_crt_t xcert;
   size_t size = *result_size;
@@ -478,7 +478,7 @@ gnutls_x509_extract_certificate_serial (const gnutls_datum_t * cert,
  -*/
 int
 gnutls_x509_extract_certificate_pk_algorithm (const gnutls_datum_t *
-					      cert, int *bits)
+                                              cert, int *bits)
 {
   gnutls_x509_crt_t xcert;
   int result;
@@ -518,9 +518,9 @@ gnutls_x509_extract_certificate_pk_algorithm (const gnutls_datum_t *
  -*/
 int
 gnutls_x509_extract_certificate_dn_string (char *buf,
-					   unsigned int sizeof_buf,
-					   const gnutls_datum_t * cert,
-					   int issuer)
+                                           unsigned int sizeof_buf,
+                                           const gnutls_datum_t * cert,
+                                           int issuer)
 {
   gnutls_x509_crt_t xcert;
   int result;
@@ -584,11 +584,11 @@ gnutls_x509_extract_certificate_dn_string (char *buf,
  -*/
 int
 gnutls_x509_verify_certificate (const gnutls_datum_t * cert_list,
-				int cert_list_length,
-				const gnutls_datum_t * CA_list,
-				int CA_list_length,
-				const gnutls_datum_t * CRL_list,
-				int CRL_list_length)
+                                int cert_list_length,
+                                const gnutls_datum_t * CA_list,
+                                int CA_list_length,
+                                const gnutls_datum_t * CRL_list,
+                                int CRL_list_length)
 {
   unsigned int verify;
   gnutls_x509_crt_t *peer_certificate_list = NULL;
@@ -640,19 +640,19 @@ gnutls_x509_verify_certificate (const gnutls_datum_t * cert_list,
     {
       ret = gnutls_x509_crt_init (&peer_certificate_list[i]);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto cleanup;
-	}
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
 
       ret =
-	gnutls_x509_crt_import (peer_certificate_list[i],
-				&cert_list[i], GNUTLS_X509_FMT_DER);
+        gnutls_x509_crt_import (peer_certificate_list[i],
+                                &cert_list[i], GNUTLS_X509_FMT_DER);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto cleanup;
-	}
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
     }
 
   /* convert CA_list to gnutls_x509_cert* list
@@ -661,19 +661,19 @@ gnutls_x509_verify_certificate (const gnutls_datum_t * cert_list,
     {
       ret = gnutls_x509_crt_init (&ca_certificate_list[i]);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto cleanup;
-	}
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
 
       ret =
-	gnutls_x509_crt_import (ca_certificate_list[i],
-				&CA_list[i], GNUTLS_X509_FMT_DER);
+        gnutls_x509_crt_import (ca_certificate_list[i],
+                                &CA_list[i], GNUTLS_X509_FMT_DER);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto cleanup;
-	}
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
     }
 
 #ifdef ENABLE_PKI
@@ -683,19 +683,19 @@ gnutls_x509_verify_certificate (const gnutls_datum_t * cert_list,
     {
       ret = gnutls_x509_crl_init (&crl_list[i]);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto cleanup;
-	}
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
 
       ret =
-	gnutls_x509_crl_import (crl_list[i],
-				&CRL_list[i], GNUTLS_X509_FMT_DER);
+        gnutls_x509_crl_import (crl_list[i],
+                                &CRL_list[i], GNUTLS_X509_FMT_DER);
       if (ret < 0)
-	{
-	  gnutls_assert ();
-	  goto cleanup;
-	}
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
     }
 #endif
 
@@ -703,10 +703,10 @@ gnutls_x509_verify_certificate (const gnutls_datum_t * cert_list,
    */
   ret =
     gnutls_x509_crt_list_verify (peer_certificate_list,
-				 peer_certificate_list_size,
-				 ca_certificate_list,
-				 ca_certificate_list_size, crl_list,
-				 crl_list_size, 0, &verify);
+                                 peer_certificate_list_size,
+                                 ca_certificate_list,
+                                 ca_certificate_list_size, crl_list,
+                                 crl_list_size, 0, &verify);
 
   if (ret < 0)
     {
@@ -721,22 +721,22 @@ cleanup:
   if (peer_certificate_list != NULL)
     for (x = 0; x < peer_certificate_list_size; x++)
       {
-	if (peer_certificate_list[x] != NULL)
-	  gnutls_x509_crt_deinit (peer_certificate_list[x]);
+        if (peer_certificate_list[x] != NULL)
+          gnutls_x509_crt_deinit (peer_certificate_list[x]);
       }
 
   if (ca_certificate_list != NULL)
     for (x = 0; x < ca_certificate_list_size; x++)
       {
-	if (ca_certificate_list[x] != NULL)
-	  gnutls_x509_crt_deinit (ca_certificate_list[x]);
+        if (ca_certificate_list[x] != NULL)
+          gnutls_x509_crt_deinit (ca_certificate_list[x]);
       }
 #ifdef ENABLE_PKI
   if (crl_list != NULL)
     for (x = 0; x < crl_list_size; x++)
       {
-	if (crl_list[x] != NULL)
-	  gnutls_x509_crl_deinit (crl_list[x]);
+        if (crl_list[x] != NULL)
+          gnutls_x509_crl_deinit (crl_list[x]);
       }
 
   gnutls_free (crl_list);
@@ -802,9 +802,9 @@ gnutls_x509_extract_key_pk_algorithm (const gnutls_datum_t * key)
  -*/
 int
 gnutls_x509_pkcs7_extract_certificate (const gnutls_datum_t *
-				       pkcs7_struct, int indx,
-				       char *certificate,
-				       int *certificate_size)
+                                       pkcs7_struct, int indx,
+                                       char *certificate,
+                                       int *certificate_size)
 {
   gnutls_pkcs7_t pkcs7;
   int result;

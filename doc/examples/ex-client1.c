@@ -41,7 +41,7 @@ main (void)
 
   /* Use default priorities */
   gnutls_priority_set_direct (session, "PERFORMANCE:+ANON-DH:!ARCFOUR-128",
-			      NULL);
+                              NULL);
 
   /* put the anonymous credentials to the current session
    */

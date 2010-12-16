@@ -52,25 +52,25 @@ gnutls_crypto_init (void)
       const char *p;
 
       if (gnutls_mutex_init != NULL)
-	{
-	  gct.mutex_init = gnutls_mutex_init;
-	  gct.mutex_destroy = gnutls_mutex_deinit;
-	  gct.mutex_lock = gnutls_mutex_lock;
-	  gct.mutex_unlock = gnutls_mutex_unlock;
+        {
+          gct.mutex_init = gnutls_mutex_init;
+          gct.mutex_destroy = gnutls_mutex_deinit;
+          gct.mutex_lock = gnutls_mutex_lock;
+          gct.mutex_unlock = gnutls_mutex_unlock;
 
-	  gcry_control (GCRYCTL_SET_THREAD_CBS, &gct);
-	}
+          gcry_control (GCRYCTL_SET_THREAD_CBS, &gct);
+        }
 
       p = gcry_check_version (GNUTLS_MIN_LIBGCRYPT_VERSION);
 
       if (p == NULL)
-	{
-	  gnutls_assert ();
-	  _gnutls_debug_log ("Checking for libgcrypt failed: %s < %s\n",
-			     gcry_check_version (NULL),
-			     GNUTLS_MIN_LIBGCRYPT_VERSION);
-	  return GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY;
-	}
+        {
+          gnutls_assert ();
+          _gnutls_debug_log ("Checking for libgcrypt failed: %s < %s\n",
+                             gcry_check_version (NULL),
+                             GNUTLS_MIN_LIBGCRYPT_VERSION);
+          return GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY;
+        }
 
       /* for gcrypt in order to be able to allocate memory */
       gcry_control (GCRYCTL_DISABLE_SECMEM, NULL, 0);

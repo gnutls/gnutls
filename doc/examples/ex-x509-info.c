@@ -74,10 +74,10 @@ print_x509_certificate_info (gnutls_session_t session)
 
       ret = gnutls_x509_crt_print (cert, GNUTLS_CRT_PRINT_ONELINE, &cinfo);
       if (ret == 0)
-	{
-	  printf ("\t%s\n", cinfo.data);
-	  gnutls_free (cinfo.data);
-	}
+        {
+          printf ("\t%s\n", cinfo.data);
+          gnutls_free (cinfo.data);
+        }
 
       /* If you want to extract fields manually for some other reason,
          below are popular example calls. */
@@ -100,13 +100,13 @@ print_x509_certificate_info (gnutls_session_t session)
       algo = gnutls_x509_crt_get_pk_algorithm (cert, &bits);
 
       printf ("Certificate public key: %s",
-	      gnutls_pk_algorithm_get_name (algo));
+              gnutls_pk_algorithm_get_name (algo));
 
       /* Print the version of the X.509
        * certificate.
        */
       printf ("\tCertificate version: #%d\n",
-	      gnutls_x509_crt_get_version (cert));
+              gnutls_x509_crt_get_version (cert));
 
       size = sizeof (dn);
       gnutls_x509_crt_get_dn (cert, dn, &size);
