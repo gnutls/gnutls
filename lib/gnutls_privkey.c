@@ -104,93 +104,136 @@ gnutls_privkey_get_pk_algorithm (gnutls_privkey_t key, unsigned int *bits)
 
 }
 
-static int privkey_to_pubkey(gnutls_pk_algorithm_t pk, 
-  const bigint_t * params, int params_size,
-  bigint_t *new_params, int* new_params_size)
+static int
+privkey_to_pubkey (gnutls_pk_algorithm_t pk,
+		   const bigint_t * params, int params_size,
+		   bigint_t * new_params, int *new_params_size)
 {
   int ret, i;
 
-  switch(pk) {
+  switch (pk)
+    {
     case GNUTLS_PK_RSA:
-      if (*new_params_size < RSA_PUBLIC_PARAMS || params_size < RSA_PRIVATE_PARAMS)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_INVALID_REQUEST;
-        }
- 
-      new_params[0] = _gnutls_mpi_copy(params[0]);
-      new_params[1] = _gnutls_mpi_copy(params[1]);
-      
+      if (*new_params_size < RSA_PUBLIC_PARAMS
+	  || params_size < RSA_PRIVATE_PARAMS)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_INVALID_REQUEST;
+	}
+
+      new_params[0] = _gnutls_mpi_copy (params[0]);
+      new_params[1] = _gnutls_mpi_copy (params[1]);
+
       *new_params_size = RSA_PUBLIC_PARAMS;
-      
+
       if (new_params[0] == NULL || new_params[1] == NULL)
-        {
-          gnutls_assert();
-          ret = GNUTLS_E_MEMORY_ERROR;
-          goto cleanup;
-        }
-        
+	{
+	  gnutls_assert ();
+	  ret = GNUTLS_E_MEMORY_ERROR;
+	  goto cleanup;
+	}
+
       break;
     case GNUTLS_PK_DSA:
-      if (*new_params_size < DSA_PUBLIC_PARAMS || params_size < DSA_PRIVATE_PARAMS)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_INVALID_REQUEST;
-        }
- 
-      new_params[0] = _gnutls_mpi_copy(params[0]);
-      new_params[1] = _gnutls_mpi_copy(params[1]);
-      new_params[2] = _gnutls_mpi_copy(params[2]);
-      new_params[3] = _gnutls_mpi_copy(params[3]);
+      if (*new_params_size < DSA_PUBLIC_PARAMS
+	  || params_size < DSA_PRIVATE_PARAMS)
+	{
+	  gnutls_assert ();
+	  return GNUTLS_E_INVALID_REQUEST;
+	}
+
+      new_params[0] = _gnutls_mpi_copy (params[0]);
+      new_params[1] = _gnutls_mpi_copy (params[1]);
+      new_params[2] = _gnutls_mpi_copy (params[2]);
+      new_params[3] = _gnutls_mpi_copy (params[3]);
 
       *new_params_size = DSA_PUBLIC_PARAMS;
-      
-      if (new_params[0] == NULL || new_params[1] == NULL || 
-        new_params[2] == NULL || new_params[3] == NULL)
-        {
-          gnutls_assert();
-          ret = GNUTLS_E_MEMORY_ERROR;
-          goto cleanup;
-        }
-        
-      break;
-    default:
-      gnutls_assert();
-      return GNUTLS_E_INVALID_REQUEST;
-  }
-  
-  return 0;
-cleanup:
-  for (i=0;i<*new_params_size;i++)
-    _gnutls_mpi_release(new_params[i]);
-  return ret;
-}
-  
 
-/* Returns the public key of the private key (if possible)
- */
-int _gnutls_privkey_get_public_mpis (gnutls_privkey_t key, 
-  bigint_t * params, int *params_size)
-{
-  int ret;
-  
-  switch (key->type)
-    {
-    case GNUTLS_PRIVKEY_X509:
-      ret = privkey_to_pubkey( gnutls_privkey_get_pk_algorithm(key, NULL),
-        key->key.x509->params, key->key.x509->params_size, 
-        params, params_size);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          return ret;
-        }
+      if (new_params[0] == NULL || new_params[1] == NULL ||
+	  new_params[2] == NULL || new_params[3] == NULL)
+	{
+	  gnutls_assert ();
+	  ret = GNUTLS_E_MEMORY_ERROR;
+	  goto cleanup;
+	}
+
+      break;
     default:
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
-  
+
   return 0;
+cleanup:
+  for (i = 0; i < *new_params_size; i++)
+    _gnutls_mpi_release (new_params[i]);
+  return ret;
+}
+
+
+/* Returns the public key of the private key (if possible)
+ */
+int
+_gnutls_privkey_get_public_mpis (gnutls_privkey_t key,
+				 bigint_t * params, int *params_size)
+{
+  int ret;
+  gnutls_pk_algorithm_t pk = gnutls_privkey_get_pk_algorithm (key, NULL);
+
+  switch (key->type)
+    {
+#ifdef ENABLE_OPENPGP
+    case GNUTLS_PRIVKEY_OPENPGP:
+      {
+	bigint_t tmp_params[MAX_PRIV_PARAMS_SIZE];
+	int tmp_params_size = MAX_PRIV_PARAMS_SIZE;
+	uint32_t kid[2], i;
+	gnutls_openpgp_keyid_t keyid;
+
+	ret =
+	  gnutls_openpgp_privkey_get_preferred_key_id (key->key.openpgp,
+						       keyid);
+	if (ret == 0)
+	  {
+	    KEYID_IMPORT (kid, keyid);
+	    ret = _gnutls_openpgp_privkey_get_mpis (key->key.openpgp, kid,
+						    tmp_params,
+						    &tmp_params_size);
+	  }
+	else
+	  ret = _gnutls_openpgp_privkey_get_mpis (key->key.openpgp, NULL,
+						  tmp_params,
+						  &tmp_params_size);
+
+	if (ret < 0)
+	  {
+	    gnutls_assert ();
+	    return ret;
+	  }
+
+	ret = privkey_to_pubkey (pk,
+				 tmp_params, tmp_params_size,
+				 params, params_size);
+
+	for (i = 0; i < tmp_params_size; i++)
+	  _gnutls_mpi_release (&tmp_params[i]);
+
+      }
+
+      break;
+#endif
+    case GNUTLS_PRIVKEY_X509:
+      ret = privkey_to_pubkey (pk,
+			       key->key.x509->params,
+			       key->key.x509->params_size, params,
+			       params_size);
+      break;
+    default:
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  return ret;
 }
 
 /**
@@ -340,17 +383,17 @@ gnutls_privkey_sign_data (gnutls_privkey_t signer,
   int ret;
   gnutls_datum_t digest;
 
-  ret = pk_hash_data(signer->pk_algorithm, hash, NULL, data, signature);
+  ret = pk_hash_data (signer->pk_algorithm, hash, NULL, data, signature);
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return ret;
     }
 
   ret = pk_prepare_hash (signer->pk_algorithm, hash, &digest);
   if (ret < 0)
     {
-      gnutls_assert();
+      gnutls_assert ();
       goto cleanup;
     }
 
@@ -391,22 +434,22 @@ cleanup:
  **/
 int
 gnutls_privkey_sign_hash2 (gnutls_privkey_t signer,
-				gnutls_digest_algorithm_t hash_algo,
-				unsigned int flags,
-				const gnutls_datum_t * hash_data,
-				gnutls_datum_t * signature)
+			   gnutls_digest_algorithm_t hash_algo,
+			   unsigned int flags,
+			   const gnutls_datum_t * hash_data,
+			   gnutls_datum_t * signature)
 {
   int ret;
   gnutls_datum_t digest;
 
-  digest.data = gnutls_malloc(hash_data->size);
+  digest.data = gnutls_malloc (hash_data->size);
   if (digest.data == NULL)
     {
-      gnutls_assert();
+      gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
   digest.size = hash_data->size;
-  memcpy(digest.data, hash_data->data, digest.size);
+  memcpy (digest.data, hash_data->data, digest.size);
 
   ret = pk_prepare_hash (signer->pk_algorithm, hash_algo, &digest);
   if (ret < 0)
@@ -425,7 +468,7 @@ gnutls_privkey_sign_hash2 (gnutls_privkey_t signer,
   ret = 0;
 
 cleanup:
-  _gnutls_free_datum(&digest);
+  _gnutls_free_datum (&digest);
   return ret;
 }
 
@@ -443,22 +486,23 @@ cleanup:
  -*/
 int
 _gnutls_privkey_sign_hash (gnutls_privkey_t key,
-			  const gnutls_datum_t * hash,
-			  gnutls_datum_t * signature)
+			   const gnutls_datum_t * hash,
+			   gnutls_datum_t * signature)
 {
   switch (key->type)
     {
 #ifdef ENABLE_OPENPGP
     case GNUTLS_PRIVKEY_OPENPGP:
       return _gnutls_openpgp_privkey_sign_hash (key->key.openpgp,
-					       hash, signature);
+						hash, signature);
 #endif
     case GNUTLS_PRIVKEY_PKCS11:
       return _gnutls_pkcs11_privkey_sign_hash (key->key.pkcs11,
-					      hash, signature);
+					       hash, signature);
     case GNUTLS_PRIVKEY_X509:
-      return _gnutls_soft_sign (key->key.x509->pk_algorithm, key->key.x509->params,
-        key->key.x509->params_size, hash, signature);
+      return _gnutls_soft_sign (key->key.x509->pk_algorithm,
+				key->key.x509->params,
+				key->key.x509->params_size, hash, signature);
     default:
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
