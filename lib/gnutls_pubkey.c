@@ -894,6 +894,7 @@ gnutls_pubkey_import_rsa_raw (gnutls_pubkey_t key,
 
   key->params_size = RSA_PUBLIC_PARAMS;
   key->pk_algorithm = GNUTLS_PK_RSA;
+  key->bits = _gnutls_mpi_get_nbits(key->params[0]);
 
   return 0;
 }
@@ -964,6 +965,7 @@ gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
 
   key->params_size = DSA_PUBLIC_PARAMS;
   key->pk_algorithm = GNUTLS_PK_DSA;
+  key->bits = _gnutls_mpi_get_nbits(key->params[3]);
 
   return 0;
 
