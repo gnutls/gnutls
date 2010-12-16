@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** libgnutls: The deprecated  gnutls_x509_privkey_sign_hash() was
 replaced by gnutls_privkey_sign_hash2().
 
+** Added helper functions for signature verification:
+gnutls_pubkey_verify_data() and gnutls_pubkey_import_privkey().
+
 ** libgnutls: Added gnutls_pkcs11_privkey_sign_hash2(), 
 gnutls_openpgp_privkey_sign_hash2(), gnutls_privkey_sign_hash2(),
 and gnutls_openpgp_crt_verify_hash().
@@ -19,6 +22,8 @@ integers.
 Reported by "Brendan Doherty" <brendand@gentrack.com>.
 
 ** API and ABI modifications:
+gnutls_pubkey_import_privkey: ADDED
+gnutls_pubkey_verify_data: ADDED
 gnutls_pkcs11_privkey_sign_hash2: ADDED
 gnutls_openpgp_privkey_sign_hash2: ADDED
 gnutls_x509_privkey_sign_hash2: ADDED
