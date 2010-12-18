@@ -727,14 +727,14 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_inraw:
 	OK = 0;
 #line 69 "p11tool.gaa"
-{ gaaval->incert_format=1 ;};
+{ gaaval->incert_format=GNUTLS_X509_FMT_DER ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_inder:
 	OK = 0;
 #line 68 "p11tool.gaa"
-{ gaaval->incert_format=1 ;};
+{ gaaval->incert_format=GNUTLS_X509_FMT_DER ;};
 
 		return GAA_OK;
 		break;
@@ -940,10 +940,11 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     {
 
 #line 85 "p11tool.gaa"
-{ 	gaaval->action = -1; gaaval->pkcs11_provider= NULL; gaaval->outfile = NULL; gaaval->pubkey = NULL; gaaval->privkey = NULL;
+{
+	gaaval->action = -1; gaaval->pkcs11_provider= NULL; gaaval->outfile = NULL; gaaval->pubkey = NULL; gaaval->privkey = NULL;
 	gaaval->pkcs11_url = NULL; gaaval->pkcs11_type = PKCS11_TYPE_PK; gaaval->pubkey=NULL; gaaval->pkcs11_label = NULL; 
 	gaaval->pkcs11_trusted=0; gaaval->pkcs11_login = 0; gaaval->pkcs11_detailed_url = GNUTLS_PKCS11_URL_LIB; 
-	gaaval->secret_key = NULL; gaaval->cert = NULL; gaaval->incert_format = 0; ;};
+	gaaval->secret_key = NULL; gaaval->cert = NULL; gaaval->incert_format = GNUTLS_X509_FMT_PEM; ;};
 
     }
     inited = 1;

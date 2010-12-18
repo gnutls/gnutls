@@ -65,8 +65,8 @@ option (load-certificate) STR "FILE" { $cert = $1 } "Certificate file to use."
 option (8, pkcs8) { $pkcs8=1 } "Use PKCS #8 format for private keys."
 
 #int incert_format;
-option (inder) { $incert_format=1 } "Use DER format for input certificates and private keys."
-option (inraw) { $incert_format=1 } "Use RAW/DER format for input certificates and private keys."
+option (inder) { $incert_format=GNUTLS_X509_FMT_DER } "Use DER format for input certificates and private keys."
+option (inraw) { $incert_format=GNUTLS_X509_FMT_DER } "Use RAW/DER format for input certificates and private keys."
 
 #char* pkcs11_provider;
 #int action;
@@ -86,4 +86,4 @@ init {
 	$action = -1; $pkcs11_provider= NULL; $outfile = NULL; $pubkey = NULL; $privkey = NULL;
 	$pkcs11_url = NULL; $pkcs11_type = PKCS11_TYPE_PK; $pubkey=NULL; $pkcs11_label = NULL; 
 	$pkcs11_trusted=0; $pkcs11_login = 0; $pkcs11_detailed_url = GNUTLS_PKCS11_URL_LIB; 
-	$secret_key = NULL; $cert = NULL; $incert_format = 0; }
+	$secret_key = NULL; $cert = NULL; $incert_format = GNUTLS_X509_FMT_PEM; }
