@@ -383,7 +383,7 @@ gnutls_privkey_sign_data (gnutls_privkey_t signer,
   int ret;
   gnutls_datum_t digest;
 
-  ret = pk_hash_data (signer->pk_algorithm, hash, NULL, data, signature);
+  ret = pk_hash_data (signer->pk_algorithm, hash, NULL, data, &digest);
   if (ret < 0)
     {
       gnutls_assert ();
