@@ -952,13 +952,14 @@ pk_prepare_hash (gnutls_pk_algorithm_t pk,
     case GNUTLS_PK_RSA:
       /* Encode the digest as a DigestInfo
        */
-      if ((ret = encode_ber_digest_info (hash, digest, digest)) != 0)
+      if ((ret = encode_ber_digest_info (hash, &old_digest, digest)) != 0)
         {
           gnutls_assert ();
           return ret;
         }
 
       _gnutls_free_datum (&old_digest);
+      break;
     case GNUTLS_PK_DSA:
       break;
     default:
