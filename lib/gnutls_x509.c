@@ -237,8 +237,7 @@ parse_der_cert_mem (gnutls_certificate_credentials_t res,
   if (ret < 0)
     {
       gnutls_assert ();
-      gnutls_free (ccert);
-      return ret;
+      goto cleanup;
     }
 
   tmp.data = (opaque *) input_cert;
@@ -249,8 +248,7 @@ parse_der_cert_mem (gnutls_certificate_credentials_t res,
     {
       gnutls_assert ();
       gnutls_x509_crt_deinit (crt);
-      gnutls_free (ccert);
-      return ret;
+      goto cleanup;
     }
 
   ret = _gnutls_x509_crt_to_gcert (ccert, crt, 0);
@@ -259,18 +257,20 @@ parse_der_cert_mem (gnutls_certificate_credentials_t res,
   if (ret < 0)
     {
       gnutls_assert ();
-      gnutls_free (ccert);
-      return ret;
+      goto cleanup;
     }
 
   ret = certificate_credential_append_crt_list (res, ccert, 1);
   if (ret < 0)
     {
       gnutls_assert ();
-      gnutls_free (ccert);
-      return ret;
+      goto cleanup;
     }
 
+  return ret;
+
+cleanup:
+  gnutls_free (ccert);
   return ret;
 }
 
@@ -285,7 +285,7 @@ parse_pem_cert_mem (gnutls_certificate_credentials_t res,
   const char *ptr;
   opaque *ptr2;
   gnutls_datum_t tmp;
-  int ret, count;
+  int ret, count, i;
   gnutls_cert *certs = NULL;
 
   /* move to the certificate
@@ -309,11 +309,11 @@ parse_pem_cert_mem (gnutls_certificate_credentials_t res,
     {
 
       siz2 = _gnutls_fbase64_decode (NULL, ptr, size, &ptr2);
-
       if (siz2 < 0)
         {
           gnutls_assert ();
-          return GNUTLS_E_BASE64_DECODING_ERROR;
+          ret = GNUTLS_E_BASE64_DECODING_ERROR;
+          goto cleanup;
         }
 
       certs = gnutls_realloc_fast (certs, (count + 1) * sizeof (gnutls_cert));
@@ -321,7 +321,8 @@ parse_pem_cert_mem (gnutls_certificate_credentials_t res,
       if (certs == NULL)
         {
           gnutls_assert ();
-          return GNUTLS_E_MEMORY_ERROR;
+          ret = GNUTLS_E_MEMORY_ERROR;
+          goto cleanup;
         }
 
       tmp.data = ptr2;
@@ -331,8 +332,7 @@ parse_pem_cert_mem (gnutls_certificate_credentials_t res,
       if (ret < 0)
         {
           gnutls_assert ();
-          gnutls_free (certs);
-          return ret;
+          goto cleanup;
         }
 
       _gnutls_free_datum (&tmp);        /* free ptr2 */
@@ -367,11 +367,16 @@ parse_pem_cert_mem (gnutls_certificate_credentials_t res,
   if (ret < 0)
     {
       gnutls_assert ();
-      gnutls_free (certs);
-      return ret;
+      goto cleanup;
     }
 
   return count;
+
+cleanup:
+  for (i=0;i<count;i++)
+    _gnutls_gcert_deinit(&certs[i]);
+  gnutls_free(certs);
+  return ret;
 }
 
 
@@ -1080,7 +1085,7 @@ _gnutls_check_key_usage (const gnutls_cert * cert, gnutls_kx_algorithm_t alg)
                * type algorithm, and key's usage does not permit
                * encipherment, then fail.
                */
-              if (!(key_usage & KEY_KEY_ENCIPHERMENT))
+              if (!(key_usage & GNUTLS_KEY_KEY_ENCIPHERMENT))
                 {
                   gnutls_assert ();
                   return GNUTLS_E_KEY_USAGE_VIOLATION;
@@ -1091,7 +1096,7 @@ _gnutls_check_key_usage (const gnutls_cert * cert, gnutls_kx_algorithm_t alg)
             {
               /* The same as above, but for sign only keys
                */
-              if (!(key_usage & KEY_DIGITAL_SIGNATURE))
+              if (!(key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE))
                 {
                   gnutls_assert ();
                   return GNUTLS_E_KEY_USAGE_VIOLATION;

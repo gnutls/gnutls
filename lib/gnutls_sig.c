@@ -286,7 +286,7 @@ _gnutls_tls_sign (gnutls_session_t session,
   if (cert != NULL)
     {
       if (cert->key_usage != 0)
-        if (!(cert->key_usage & KEY_DIGITAL_SIGNATURE))
+        if (!(cert->key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE))
           {
             gnutls_assert ();
             return GNUTLS_E_KEY_USAGE_VIOLATION;
@@ -327,7 +327,7 @@ _gnutls_verify_sig (gnutls_cert * cert,
   /* If the certificate supports signing continue.
    */
   if (cert->key_usage != 0)
-    if (!(cert->key_usage & KEY_DIGITAL_SIGNATURE))
+    if (!(cert->key_usage & GNUTLS_KEY_DIGITAL_SIGNATURE))
       {
         gnutls_assert ();
         return GNUTLS_E_KEY_USAGE_VIOLATION;

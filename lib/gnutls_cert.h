@@ -36,19 +36,6 @@
 #define DSA_PUBLIC_PARAMS 4
 #define RSA_PUBLIC_PARAMS 2
 
-/* For key Usage, test as:
- * if (st.key_usage & KEY_DIGITAL_SIGNATURE) ...
- */
-#define KEY_DIGITAL_SIGNATURE		128
-#define KEY_NON_REPUDIATION		64
-#define KEY_KEY_ENCIPHERMENT		32
-#define KEY_DATA_ENCIPHERMENT		16
-#define KEY_KEY_AGREEMENT		8
-#define KEY_KEY_CERT_SIGN		4
-#define KEY_CRL_SIGN			2
-#define KEY_ENCIPHER_ONLY		1
-#define KEY_DECIPHER_ONLY		32768
-
 typedef struct gnutls_cert
 {
   /* the size of params depends on the public
