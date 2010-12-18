@@ -299,7 +299,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   gnutls_datum_t cert_signed_data = { NULL, 0 };
   gnutls_datum_t cert_signature = { NULL, 0 };
   gnutls_x509_crt_t issuer = NULL;
-  int ret, issuer_version, result;
+  int issuer_version, result;
 
   if (output)
     *output = 0;
@@ -365,20 +365,21 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
       goto cleanup;
     }
 
-  ret =
+  result =
     _gnutls_x509_verify_signature (&cert_signed_data, NULL, &cert_signature,
                                    issuer);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-    }
-  else if (ret == 0)
+  if (result == GNUTLS_E_PK_SIG_VERIFY_FAILED)
     {
       gnutls_assert ();
       /* error. ignore it */
       if (output)
         *output |= GNUTLS_CERT_INVALID;
-      ret = 0;
+      result = 0;
+    }
+  else if (result < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
     }
 
   /* If the certificate is not self signed check if the algorithms
@@ -398,11 +399,9 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
         {
           if (output)
             *output |= GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID;
-          ret = 0;
+          result = 0;
         }
     }
-
-  result = ret;
 
 cleanup:
   _gnutls_free_datum (&cert_signed_data);
@@ -829,8 +828,8 @@ dsa_verify_sig (const gnutls_datum_t * text,
   return ret;
 }
 
-/* Verifies the signature data, and returns 0 if not verified,
- * or 1 otherwise.
+/* Verifies the signature data, and returns GNUTLS_E_PK_SIG_VERIFY_FAILED if 
+ * not verified, or 1 otherwise.
  */
 int
 pubkey_verify_sig (const gnutls_datum_t * tbs,
@@ -848,7 +847,7 @@ pubkey_verify_sig (const gnutls_datum_t * tbs,
           (tbs, hash, signature, issuer_params, issuer_params_size) != 0)
         {
           gnutls_assert ();
-          return 0;
+          return GNUTLS_E_PK_SIG_VERIFY_FAILED;
         }
 
       return 1;
@@ -859,7 +858,7 @@ pubkey_verify_sig (const gnutls_datum_t * tbs,
           (tbs, hash, signature, issuer_params, issuer_params_size) != 0)
         {
           gnutls_assert ();
-          return 0;
+          return GNUTLS_E_PK_SIG_VERIFY_FAILED;
         }
 
       return 1;
@@ -967,7 +966,7 @@ cleanup:
 }
 
 /* verifies if the certificate is properly signed.
- * returns 0 on failure and 1 on success.
+ * returns GNUTLS_E_PK_VERIFY_SIG_FAILED on failure and 1 on success.
  * 
  * 'tbs' is the signed data
  * 'signature' is the signature!
@@ -1012,7 +1011,7 @@ _gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
 }
 
 /* verifies if the certificate is properly signed.
- * returns 0 on failure and 1 on success.
+ * returns GNUTLS_E_PK_VERIFY_SIG_FAILED on failure and 1 on success.
  * 
  * 'tbs' is the signed data
  * 'signature' is the signature!
@@ -1244,7 +1243,7 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
   gnutls_datum_t crl_signed_data = { NULL, 0 };
   gnutls_datum_t crl_signature = { NULL, 0 };
   gnutls_x509_crt_t issuer;
-  int ret, result;
+  int result;
 
   if (output)
     *output = 0;
@@ -1296,20 +1295,21 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
       goto cleanup;
     }
 
-  ret =
+  result =
     _gnutls_x509_verify_signature (&crl_signed_data, NULL, &crl_signature,
                                    issuer);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-    }
-  else if (ret == 0)
+  if (result == GNUTLS_E_PK_SIG_VERIFY_FAILED)
     {
       gnutls_assert ();
       /* error. ignore it */
       if (output)
         *output |= GNUTLS_CERT_INVALID;
-      ret = 0;
+      result = 0;
+    }
+  else if (result < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
     }
 
   {
@@ -1324,11 +1324,9 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
       {
         if (output)
           *output |= GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID;
-        ret = 0;
+        result = 0;
       }
   }
-
-  result = ret;
 
 cleanup:
   _gnutls_free_datum (&crl_signed_data);

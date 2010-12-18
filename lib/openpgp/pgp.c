@@ -1698,8 +1698,8 @@ gnutls_openpgp_crt_get_auth_subkey (gnutls_openpgp_crt_t crt,
  * This function will verify the given signed digest, using the
  * parameters from the certificate.
  *
- * Returns: In case of a verification failure 0 is returned, and 1 on
- * success.
+ * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
+ * is returned, and a positive code on success.
  **/
 int
 gnutls_openpgp_crt_verify_hash (gnutls_openpgp_crt_t crt, unsigned int flags,
@@ -1738,7 +1738,7 @@ gnutls_openpgp_crt_verify_hash (gnutls_openpgp_crt_t crt, unsigned int flags,
   if (ret < 0)
     {
       gnutls_assert ();
-      return 0;
+      return ret;
     }
 
   return ret;

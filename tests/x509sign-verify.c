@@ -195,7 +195,7 @@ doit (void)
         fail ("gnutls_x509_crt_get_verify_algorithm\n");
 
       ret = gnutls_x509_crt_verify_hash (crt, 0, &hash_data, &signature);
-      if (ret <= 0)
+      if (ret < 0)
         fail ("gnutls_x509_privkey_verify_hash\n");
 
       ret =
@@ -204,12 +204,12 @@ doit (void)
         fail ("gnutls_x509_crt_get_verify_algorithm (hashed data)\n");
 
       ret = gnutls_x509_crt_verify_hash (crt, 0, &hash_data, &signature2);
-      if (ret <= 0)
+      if (ret < 0)
         fail ("gnutls_x509_privkey_verify_hash (hashed data)\n");
 
       /* should fail */
       ret = gnutls_x509_crt_verify_hash (crt, 0, &invalid_hash_data, &signature2);
-      if (ret < 0 || ret == 1)
+      if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
         fail ("gnutls_x509_privkey_verify_hash (hashed data)\n");
 
 
@@ -262,13 +262,13 @@ doit (void)
     fail ("gnutls_pubkey_get_verify_algorithm\n");
 
   /* should fail */
-  ret = gnutls_pubkey_verify_hash (pubkey, 0, &invalid_hash_data, &signature);
-  if (ret < 0 || ret == 1)
+  ret = gnutls_pubkey_verify_hash (pubkey, 0, &invalid_hash_data,
+  &signature); if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
     fail ("gnutls_x509_privkey_verify_hash 1\n");
 
   /* should succeed */
   ret = gnutls_pubkey_verify_data (pubkey, 0, &raw_data, &signature);
-  if (ret <= 0)
+  if (ret < 0)
     fail ("gnutls_x509_privkey_verify_data\n");
 
   gnutls_x509_privkey_deinit(key);

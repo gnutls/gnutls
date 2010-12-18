@@ -1889,8 +1889,8 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
  * This function will verify the given signed data, using the
  * parameters in the private key.
  *
- * Returns: In case of a verification failure 0 is returned, and 1 on
- *   success.
+ * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
+ * is returned, and a positive code on success.
  **/
 int
 gnutls_x509_privkey_verify_data (gnutls_x509_privkey_t key,
@@ -1910,7 +1910,7 @@ gnutls_x509_privkey_verify_data (gnutls_x509_privkey_t key,
   if (result < 0)
     {
       gnutls_assert ();
-      return 0;
+      return result;
     }
 
   return result;

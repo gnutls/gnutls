@@ -2600,8 +2600,8 @@ gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
  * This function will verify the given signed data, using the
  * parameters from the certificate.
  *
- * Returns: In case of a verification failure 0 is returned, and 1 on
- * success.
+ * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
+ * is returned, and a positive code on success.
  **/
 int
 gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
@@ -2620,7 +2620,7 @@ gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
   if (result < 0)
     {
       gnutls_assert ();
-      return 0;
+      return result;
     }
 
   return result;
@@ -2636,8 +2636,8 @@ gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
  * This function will verify the given signed digest, using the
  * parameters from the certificate.
  *
- * Returns: In case of a verification failure 0 is returned, and 1 on
- * success.
+ * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
+ * is returned, and a positive code on success.
  **/
 int
 gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,
@@ -2656,7 +2656,7 @@ gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,
   if (result < 0)
     {
       gnutls_assert ();
-      return 0;
+      return result;
     }
 
   return result;

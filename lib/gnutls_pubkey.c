@@ -981,8 +981,8 @@ gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
  * This function will verify the given signed data, using the
  * parameters from the certificate.
  *
- * Returns: In case of a verification failure 0 is returned, and 1 on
- * success.
+ * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
+ * is returned, and a positive code on success.
  **/
 int
 gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey, unsigned int flags,
@@ -1018,8 +1018,8 @@ gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey, unsigned int flags,
  * This function will verify the given signed digest, using the
  * parameters from the certificate.
  *
- * Returns: In case of a verification failure 0 is returned, and 1 on
- * success.
+ * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
+ * is returned, and a positive code on success.
  **/
 int
 gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
