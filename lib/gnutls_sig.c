@@ -807,12 +807,6 @@ pk_hash_data (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash,
   switch (pk)
     {
     case GNUTLS_PK_RSA:
-      if (hash != GNUTLS_DIG_SHA1 && hash != GNUTLS_DIG_SHA224 &&
-          hash != GNUTLS_DIG_SHA256)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_INVALID_REQUEST;
-        }
       break;
     case GNUTLS_PK_DSA:
       if (params && hash != _gnutls_dsa_q_to_hash (params[1]))
