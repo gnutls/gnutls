@@ -102,4 +102,10 @@ _gnutls_pkcs11_privkey_sign_hash (gnutls_pkcs11_privkey_t key,
                                   const gnutls_datum_t * hash,
                                   gnutls_datum_t * signature);
 
+int
+_gnutls_pkcs11_privkey_decrypt_data (gnutls_pkcs11_privkey_t key,
+                                    unsigned int flags,
+                                    const gnutls_datum_t * ciphertext,
+                                    gnutls_datum_t * plaintext);
+
 #endif

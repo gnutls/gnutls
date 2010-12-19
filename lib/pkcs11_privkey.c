@@ -114,62 +114,6 @@ gnutls_pkcs11_privkey_get_info (gnutls_pkcs11_privkey_t pkey,
 }
 
 
-/**
- * gnutls_pkcs11_privkey_sign_data:
- * @signer: Holds the key
- * @digest: should be MD5 or SHA1
- * @flags: should be 0 for now
- * @data: holds the data to be signed
- * @signature: will contain the signature allocated with gnutls_malloc()
- *
- * This function will sign the given data using a signature algorithm
- * supported by the private key. Signature algorithms are always used
- * together with a hash functions.  Different hash functions may be
- * used for the RSA algorithm, but only SHA-1 for the DSA keys.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value.
- **/
-int
-gnutls_pkcs11_privkey_sign_data (gnutls_pkcs11_privkey_t signer,
-                                 gnutls_digest_algorithm_t hash,
-                                 unsigned int flags,
-                                 const gnutls_datum_t * data,
-                                 gnutls_datum_t * signature)
-{
-  int ret;
-  gnutls_datum_t digest;
-
-  ret = pk_hash_data (signer->pk_algorithm, hash, NULL, data, &digest);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  ret = pk_prepare_hash (signer->pk_algorithm, hash, &digest);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  ret = _gnutls_pkcs11_privkey_sign_hash (signer, &digest, signature);
-  _gnutls_free_datum (&digest);
-
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  return 0;
-
-cleanup:
-  _gnutls_free_datum (&digest);
-  return ret;
-}
-
 #define FIND_OBJECT(pks, obj, key) \
 	do { \
 		int retries = 0; \
@@ -258,65 +202,6 @@ cleanup:
 }
 
 /**
- * gnutls_pkcs11_privkey_sign_hash2:
- * @signer: Holds the signer's key
- * @hash_algo: The hash algorithm used
- * @flags: zero for now
- * @hash_data: holds the data to be signed
- * @signature: will contain newly allocated signature
- *
- * This function will sign the given hashed data using a signature algorithm
- * supported by the private key. Signature algorithms are always used
- * together with a hash functions.  Different hash functions may be
- * used for the RSA algorithm, but only SHA-XXX for the DSA keys.
- *
- * Use gnutls_x509_crt_get_preferred_hash_algorithm() to determine
- * the hash algorithm.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value.
- **/
-int
-gnutls_pkcs11_privkey_sign_hash2 (gnutls_pkcs11_privkey_t signer,
-                                  gnutls_digest_algorithm_t hash_algo,
-                                  unsigned int flags,
-                                  const gnutls_datum_t * hash_data,
-                                  gnutls_datum_t * signature)
-{
-  int ret;
-  gnutls_datum_t digest;
-
-  digest.data = gnutls_malloc (hash_data->size);
-  if (digest.data == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-  digest.size = hash_data->size;
-  memcpy (digest.data, hash_data->data, digest.size);
-
-  ret = pk_prepare_hash (signer->pk_algorithm, hash_algo, &digest);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  ret = _gnutls_pkcs11_privkey_sign_hash (signer, &digest, signature);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  ret = 0;
-
-cleanup:
-  _gnutls_free_datum (&digest);
-  return ret;
-}
-
-/**
  * gnutls_pkcs11_privkey_import_url:
  * @pkey: The structure to store the parsed key
  * @url: a PKCS 11 url identifying the key
@@ -360,8 +245,8 @@ gnutls_pkcs11_privkey_import_url (gnutls_pkcs11_privkey_t pkey,
   return 0;
 }
 
-/**
- * gnutls_pkcs11_privkey_decrypt_data:
+/*-
+ * _gnutls_pkcs11_privkey_decrypt_data:
  * @key: Holds the key
  * @flags: should be 0 for now
  * @ciphertext: holds the data to be signed
@@ -372,9 +257,9 @@ gnutls_pkcs11_privkey_import_url (gnutls_pkcs11_privkey_t pkey,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
- **/
+ -*/
 int
-gnutls_pkcs11_privkey_decrypt_data (gnutls_pkcs11_privkey_t key,
+_gnutls_pkcs11_privkey_decrypt_data (gnutls_pkcs11_privkey_t key,
                                     unsigned int flags,
                                     const gnutls_datum_t * ciphertext,
                                     gnutls_datum_t * plaintext)

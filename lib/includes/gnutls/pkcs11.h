@@ -195,23 +195,6 @@ int gnutls_pkcs11_privkey_get_info (gnutls_pkcs11_privkey_t crt,
 int gnutls_pkcs11_privkey_import_url (gnutls_pkcs11_privkey_t key,
                                       const char *url, unsigned int flags);
 
-int gnutls_pkcs11_privkey_sign_data (gnutls_pkcs11_privkey_t signer,
-                                     gnutls_digest_algorithm_t hash,
-                                     unsigned int flags,
-                                     const gnutls_datum_t * data,
-                                     gnutls_datum_t * signature);
-int
-gnutls_pkcs11_privkey_sign_hash2 (gnutls_pkcs11_privkey_t signer,
-                                  gnutls_digest_algorithm_t hash_algo,
-                                  unsigned int flags,
-                                  const gnutls_datum_t * hash_data,
-                                  gnutls_datum_t * signature);
-
-int
-gnutls_pkcs11_privkey_decrypt_data (gnutls_pkcs11_privkey_t key,
-                                    unsigned int flags,
-                                    const gnutls_datum_t * ciphertext,
-                                    gnutls_datum_t * plaintext);
 int gnutls_pkcs11_privkey_export_url (gnutls_pkcs11_privkey_t key,
                                       gnutls_pkcs11_url_type_t detailed,
                                       char **url);

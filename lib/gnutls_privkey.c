@@ -546,7 +546,7 @@ gnutls_privkey_decrypt_data (gnutls_privkey_t key,
                                         key->key.x509->params,
                                         key->key.x509->params_size, 2);
     case GNUTLS_PRIVKEY_PKCS11:
-      return gnutls_pkcs11_privkey_decrypt_data (key->key.pkcs11,
+      return _gnutls_pkcs11_privkey_decrypt_data (key->key.pkcs11,
                                                  flags,
                                                  ciphertext, plaintext);
     default:
