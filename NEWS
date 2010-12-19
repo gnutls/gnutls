@@ -34,6 +34,7 @@ gnutls_privkey_sign_hash2: ADDED
 gnutls_x509_privkey_sign_hash2: ADDED
 gnutls_x509_privkey_sign_data2: ADDED
 gnutls_x509_privkey_sign_hash: DEPRECATED
+gnutls_x509_privkey_verify_data: DEPRECATED
 gnutls_psk_netconf_derive_key: DEPRECATED
 gnutls_session_set_finished_function: DEPRECATED
 gnutls_ext_register: DEPRECATED

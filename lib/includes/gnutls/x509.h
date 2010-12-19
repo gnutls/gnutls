@@ -721,10 +721,6 @@ extern "C"
                                       unsigned int flags,
                                       const gnutls_datum_t * data,
                                       gnutls_datum_t * signature);
-  int gnutls_x509_privkey_verify_data (gnutls_x509_privkey_t key,
-                                       unsigned int flags,
-                                       const gnutls_datum_t * data,
-                                       const gnutls_datum_t * signature);
   int gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt,
                                    unsigned int flags,
                                    const gnutls_datum_t * data,

@@ -223,4 +223,13 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata);
                                         gnutls_datum_t * signature)
   _GNUTLS_GCC_ATTR_DEPRECATED;
 
+/* Deprecated because verify_* functions are moved to public
+ * keys. Check abstract.h for similar functionality.
+ */
+  int gnutls_x509_privkey_verify_data (gnutls_x509_privkey_t key,
+                                       unsigned int flags,
+                                       const gnutls_datum_t * data,
+                                       const gnutls_datum_t * signature)
+                                       _GNUTLS_GCC_ATTR_DEPRECATED;
+
 #endif /* _GNUTLS_COMPAT_H */
