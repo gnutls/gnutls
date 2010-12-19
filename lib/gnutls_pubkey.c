@@ -805,7 +805,9 @@ gnutls_x509_crq_set_pubkey (gnutls_x509_crq_t crq, gnutls_pubkey_t key)
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @usage: an ORed sequence of the GNUTLS_KEY_* elements.
  *
- * This function will set the keyUsage certificate extension.
+ * This function will set the key usage flags of the public key. This
+ * is only useful if the key is to be exported to a certificate or
+ * certificate request.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
