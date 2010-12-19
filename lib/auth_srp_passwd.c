@@ -210,7 +210,7 @@ pwd_read_conf (const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
   unsigned i, len;
   char indexstr[10];
 
-  sprintf (indexstr, "%d", idx);        /* Flawfinder: ignore */
+  snprintf (indexstr, sizeof(indexstr), "%u", (unsigned int)idx);
 
   fd = fopen (pconf_file, "r");
   if (fd == NULL)
