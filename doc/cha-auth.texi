@@ -341,11 +341,12 @@ by sending a hint.  In the server, specify the hint by calling
 the hint, for example in the callback function, using
 @ref{gnutls_psk_client_get_hint}.
 
-There is no standard mechanism to derive a PSK key from a password
+There is no mechanism to derive a PSK key from a password
 specified by the TLS PSK document@footnote{GnuTLS used to provide
 @code{gnutls_psk_netconf_derive_key} which follows the algorithm
 specified in @file{draft-ietf-netconf-tls-02.txt}. This method
 is deprecated and might be removed in later versions of GnuTLS.}.
+For password-based authentication check @ref{Authentication using SRP}.
 
 Some helper functions such as:
 
