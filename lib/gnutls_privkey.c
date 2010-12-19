@@ -538,7 +538,7 @@ gnutls_privkey_decrypt_data (gnutls_privkey_t key,
     {
 #ifdef ENABLE_OPENPGP
     case GNUTLS_PRIVKEY_OPENPGP:
-      return gnutls_openpgp_privkey_decrypt_data (key->key.openpgp, flags,
+      return _gnutls_openpgp_privkey_decrypt_data (key->key.openpgp, flags,
                                                   ciphertext, plaintext);
 #endif
     case GNUTLS_PRIVKEY_X509:

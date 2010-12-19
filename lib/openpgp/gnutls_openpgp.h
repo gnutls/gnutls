@@ -55,6 +55,12 @@ _gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
                                    gnutls_datum_t * signature);
 
 
+int
+_gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
+                                     unsigned int flags,
+                                     const gnutls_datum_t * ciphertext,
+                                     gnutls_datum_t * plaintext);
+
 #endif /*GNUTLS_OPENPGP_LOCAL_H */
 
 #endif /*ENABLE_OPENPGP */

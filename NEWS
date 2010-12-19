@@ -30,20 +30,18 @@ Reported by "Brendan Doherty" <brendand@gentrack.com>.
 ** API and ABI modifications:
 gnutls_pubkey_import_privkey: ADDED
 gnutls_pubkey_verify_data: ADDED
-gnutls_pkcs11_privkey_sign_hash2: ADDED
-gnutls_openpgp_privkey_sign_hash2: ADDED
-gnutls_x509_privkey_sign_hash2: ADDED
 gnutls_privkey_sign_hash2: ADDED
-gnutls_openpgp_privkey_sign_data2: ADDED
+gnutls_pkcs11_privkey_sign_hash2: ADDED
+gnutls_x509_privkey_sign_hash2: ADDED
 gnutls_x509_privkey_sign_data2: ADDED
-gnutls_openpgp_crt_verify_hash: ADDED
-gnutls_openpgp_privkey_sign_hash: REMOVED
-gnutls_pkcs11_privkey_sign_hash: REMOVED
-gnutls_privkey_sign_hash: REMOVED
 gnutls_x509_privkey_sign_hash: DEPRECATED
 gnutls_psk_netconf_derive_key: DEPRECATED
 gnutls_session_set_finished_function: DEPRECATED
 gnutls_ext_register: DEPRECATED
+gnutls_openpgp_privkey_sign_hash: REMOVED
+gnutls_openpgp_privkey_decrypt_data: REMOVED
+gnutls_pkcs11_privkey_sign_hash: REMOVED
+gnutls_privkey_sign_hash: REMOVED
 
 * Version 2.11.6 (released 2010-12-06)
 
