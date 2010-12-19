@@ -431,6 +431,12 @@ _gnutls_bin2hex (const void *_old, size_t oldlen,
   else
     separator = empty;
 
+  if (buffer_size < 3)
+    {
+      gnutls_assert();
+      return NULL;
+    }
+
   i = j = 0;
   sprintf (&buffer[j], "%.2x", old[i]);
   j += 2;
