@@ -172,10 +172,12 @@ gnutls_sign_callback_set (gnutls_session_t session,
                           gnutls_sign_func sign_func, void *userdata)
   _GNUTLS_GCC_ATTR_DEPRECATED;
 gnutls_sign_func
-gnutls_sign_callback_get (gnutls_session_t session, void **userdata);
+gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
+ _GNUTLS_GCC_ATTR_DEPRECATED;
 
 /* Extension API is no longer exported because a lot of internal
- * structures are used.
+ * structures are used. Currently it works due to a compatibility
+ * layer, but will be removed in later versions.
  */
      int gnutls_ext_register (int type,
                               const char *name,

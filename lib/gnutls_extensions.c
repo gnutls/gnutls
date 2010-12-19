@@ -396,7 +396,7 @@ _gnutls_ext_register (extension_entry_st * mod)
   return GNUTLS_E_SUCCESS;
 }
 
-/**
+/*-
  * gnutls_ext_register:
  * @type: the 16-bit integer referring to the extension type
  * @name: human printable name of the extension used for debugging
@@ -408,8 +408,8 @@ _gnutls_ext_register (extension_entry_st * mod)
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  *
- * Since: 2.6.0
- **/
+ * Deprecated in: 2.11.0
+ -*/
 int
 gnutls_ext_register (int type,
                      const char *name,

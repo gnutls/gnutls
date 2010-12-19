@@ -1062,7 +1062,7 @@ gnutls_prf (gnutls_session_t session,
   return ret;
 }
 
-/**
+/*-
  * gnutls_session_get_client_random:
  * @session: is a #gnutls_session_t structure.
  *
@@ -1074,14 +1074,16 @@ gnutls_prf (gnutls_session_t session,
  * expected.
  *
  * Returns: pointer to client random data.
- **/
+ *
+ * Deprecated in: 2.11.0
+ -*/
 const void *
 gnutls_session_get_client_random (gnutls_session_t session)
 {
   return (char *) session->security_parameters.client_random;
 }
 
-/**
+/*-
  * gnutls_session_get_server_random:
  * @session: is a #gnutls_session_t structure.
  *
@@ -1093,14 +1095,16 @@ gnutls_session_get_client_random (gnutls_session_t session)
  * expected.
  *
  * Returns: pointer to server random data.
- **/
+ *
+ * Deprecated in: 2.11.0
+ -*/
 const void *
 gnutls_session_get_server_random (gnutls_session_t session)
 {
   return (char *) session->security_parameters.server_random;
 }
 
-/**
+/*-
  * gnutls_session_get_master_secret:
  * @session: is a #gnutls_session_t structure.
  *
@@ -1115,14 +1119,16 @@ gnutls_session_get_server_random (gnutls_session_t session)
  * secret and use it to derive further data.
  *
  * Returns: pointer to master secret data.
- **/
+ *
+ * Deprecated in: 2.11.0
+ -*/
 const void *
 gnutls_session_get_master_secret (gnutls_session_t session)
 {
   return (char *) session->security_parameters.master_secret;
 }
 
-/**
+/*-
  * gnutls_session_set_finished_function:
  * @session: is a #gnutls_session_t structure.
  * @func: a #gnutls_finished_callback_func callback.
@@ -1146,7 +1152,8 @@ gnutls_session_get_master_secret (gnutls_session_t session)
  * finished message for later use.
  *
  * Since: 2.6.0
- **/
+ * Deprecated in: 2.11.0
+ -*/
 void
 gnutls_session_set_finished_function (gnutls_session_t session,
                                       gnutls_finished_callback_func func)
