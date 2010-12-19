@@ -62,6 +62,20 @@ struct gnutls_pubkey_st
   unsigned int key_usage;       /* bits from GNUTLS_KEY_* */
 };
 
+static int pubkey_to_bits(gnutls_pk_algorithm_t pk, bigint_t* params, int params_size)
+{
+  switch(pk) 
+    {
+      case GNUTLS_PK_RSA:
+        return _gnutls_mpi_get_nbits(params[0]);
+      case GNUTLS_PK_DSA:
+        if (params_size < 3) return 0;
+        return _gnutls_mpi_get_nbits(params[3]);
+      default:
+        return 0;
+    }
+}
+
 /**
  * gnutls_pubkey_get_pk_algorithm:
  * @key: should contain a #gnutls_pubkey_t structure
@@ -695,6 +709,7 @@ gnutls_pubkey_import (gnutls_pubkey_t key,
    * fail.
    */
   key->pk_algorithm = _gnutls_x509_get_pk_algorithm (spk, "", NULL);
+  key->bits = pubkey_to_bits(key->pk_algorithm, key->params, key->params_size);
 
   result = 0;
 
@@ -894,7 +909,7 @@ gnutls_pubkey_import_rsa_raw (gnutls_pubkey_t key,
 
   key->params_size = RSA_PUBLIC_PARAMS;
   key->pk_algorithm = GNUTLS_PK_RSA;
-  key->bits = _gnutls_mpi_get_nbits(key->params[0]);
+  key->bits = pubkey_to_bits(GNUTLS_PK_RSA, key->params, key->params_size);
 
   return 0;
 }
@@ -965,7 +980,7 @@ gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
 
   key->params_size = DSA_PUBLIC_PARAMS;
   key->pk_algorithm = GNUTLS_PK_DSA;
-  key->bits = _gnutls_mpi_get_nbits(key->params[3]);
+  key->bits = pubkey_to_bits(GNUTLS_PK_DSA, key->params, key->params_size);
 
   return 0;
 
