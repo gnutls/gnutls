@@ -121,10 +121,10 @@ ip_to_string (void *_ip, int ip_size, char *string, int string_size)
   switch (ip_size)
     {
     case 4:
-      sprintf (string, "%u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
+      snprintf (string, string_size, "%u.%u.%u.%u", ip[0], ip[1], ip[2], ip[3]);
       break;
     case 16:
-      sprintf (string, "%x:%x:%x:%x:%x:%x:%x:%x",
+      snprintf (string, string_size, "%x:%x:%x:%x:%x:%x:%x:%x",
                (ip[0] << 8) | ip[1], (ip[2] << 8) | ip[3],
                (ip[4] << 8) | ip[5], (ip[6] << 8) | ip[7],
                (ip[8] << 8) | ip[9], (ip[10] << 8) | ip[11],
