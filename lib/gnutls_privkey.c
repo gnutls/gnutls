@@ -374,7 +374,7 @@ gnutls_privkey_import_openpgp (gnutls_privkey_t pkey,
  * negative error value.
  **/
 int
-gnutls_privkey_sign_data (gnutls_privkey_t signer,
+gnutls_privkey_sign_data2 (gnutls_privkey_t signer,
                           gnutls_digest_algorithm_t hash,
                           unsigned int flags,
                           const gnutls_datum_t * data,

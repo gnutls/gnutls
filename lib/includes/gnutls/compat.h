@@ -234,4 +234,14 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
                                        const gnutls_datum_t * signature)
                                        _GNUTLS_GCC_ATTR_DEPRECATED;
 
+/* we support the gnutls_x509_privkey_sign_data2() instead.
+ */
+  int gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
+                                     gnutls_digest_algorithm_t digest,
+                                     unsigned int flags,
+                                     const gnutls_datum_t * data,
+                                     void *signature,
+                                     size_t * signature_size)
+                                     _GNUTLS_GCC_ATTR_DEPRECATED;
+
 #endif /* _GNUTLS_COMPAT_H */

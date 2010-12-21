@@ -1653,6 +1653,7 @@ cleanup:
 }
 
 
+#ifdef ENABLE_PKI
 /**
  * gnutls_x509_privkey_sign_data2:
  * @signer: Holds the key
@@ -1816,8 +1817,7 @@ cleanup:
   return ret;
 }
 
-#ifdef ENABLE_PKI
-/**
+/*-
  * gnutls_x509_privkey_sign_data:
  * @key: Holds the key
  * @digest: should be MD5 or SHA1
@@ -1841,7 +1841,7 @@ cleanup:
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
- **/
+ -*/
 int
 gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
                                gnutls_digest_algorithm_t digest,

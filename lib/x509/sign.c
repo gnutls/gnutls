@@ -138,7 +138,7 @@ _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
       return result;
     }
 
-  result = gnutls_privkey_sign_data (issuer_key, dig, 0, &tbs, &signature);
+  result = gnutls_privkey_sign_data2 (issuer_key, dig, 0, &tbs, &signature);
   gnutls_free (tbs.data);
 
   if (result < 0)

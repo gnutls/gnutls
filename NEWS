@@ -33,6 +33,8 @@ gnutls_pubkey_verify_data: ADDED
 gnutls_privkey_sign_hash2: ADDED
 gnutls_x509_privkey_sign_hash2: ADDED
 gnutls_x509_privkey_sign_data2: ADDED
+gnutls_privkey_sign_data2: ADDED (in place of gnutls_privkey_sign_data)
+gnutls_x509_privkey_sign_data: DEPRECATED
 gnutls_x509_privkey_sign_hash: DEPRECATED
 gnutls_x509_privkey_verify_data: DEPRECATED
 gnutls_psk_netconf_derive_key: DEPRECATED
