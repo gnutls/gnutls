@@ -319,19 +319,53 @@ is summarized in the following diagram.
 
 @node Cryptographic Backend
 @section Cryptographic Backend
-Several new systems provide hardware assisted cryptographic algorithm
-implementations that offer implementations some orders of magnitude
-faster than the software. For this reason GnuTLS supports by default
-the /dev/crypto device usually found in FreeBSD and OpenBSD system, to
-take advantage of installed hardware. 
+Today most new processors, either for embedded or desktop systems
+include either instructions  intended to speed up cryptographic operations,
+or a co-processor with cryptographic capabilities. Taking advantage of 
+those is a challenging task for every cryptographic  application or 
+library. Unfortunately the cryptographic libraries that GnuTLS is based 
+on take no advantage of these properties. For this reason GnuTLS handles 
+this internally by following a layered approach to accessing
+cryptographic operations as in the following figure. 
 
-In addition it is possible to override parts of the crypto backend or the
-whole. It is possible to override them both at runtime and compile
-time, however here we will discuss the runtime possibility. The API
+@image{gnutls-crypto-layers,12cm}
+
+The TLS layer uses a cryptographic provider layer, that will in turn either 
+use the default crypto provider - a crypto library, or use an external
+crypto provider, if available.
+
+@subsection Cryptographic Library layer
+The Cryptographic Library layer, can  currently be used either with
+libgcrypt or libnettle, each of one has its advantages and some 
+disadvantages. Libgcrypt is a self-contained library, pretty broad 
+in scope that supports many algorithms. In some processors like VIA, 
+it will also use the available crypto instruction set hence providing
+performance benefit comparing to plain software implementation.
+Libnettle provides only software implementation
+of the basic algorithms required in TLS, and is on average 30% faster
+that libgcrypt on almost all algorithms. For
+this reason libnettle is library used by default in GnuTLS.
+
+@subsection External cryptography provider
+Systems that include a cryptographic co-processor, typically come with
+kernel drivers to utilize the operations from software. For this reason 
+GnuTLS provides a layer where each individual algorithm used can be replaced
+by another implementation, i.e. the one provided by the driver. The
+FreeBSD, OpenBSD and Linux kernels@footnote{Check @url{http://home.gna.org/cryptodev-linux/} 
+for the Linux kernel implementation of @code{/dev/crypto}.} include already 
+a number of hardware assisted implementations, and also provide an interface 
+to access them, called @code{/dev/crypto}.
+GnuTLS will take advantage of this interface if compiled with special
+options. That is because in most systems where hardware-assisted 
+cryptographic operations are not available, using this interface might 
+actually reduce performance.
+
+It is possible to override parts of crypto backend both at runtime and compile
+time. Here we discuss the runtime possibility. The API
 available for this functionality is in @code{gnutls/crypto.h} header
 file.
 
-@subsection Override specific algorithms
+@subsubsection Override specific algorithms
 When an optimized implementation of a single algorithm is available,
 say a hardware assisted version of @acronym{AES-CBC} then the
 following functions can be used to register those algorithms.
@@ -349,7 +383,7 @@ To register a hash (digest) or MAC algorithm.
 Those registration functions will only replace the specified algorithm
 and leave the rest of subsystem intact.
 
-@subsection Override parts of the backend
+@subsubsection Override parts of the backend
 In some systems, such as embedded ones, it might be desirable to
 override big parts of the cryptographic backend, or even all of
 them. For this reason the following functions are provided.
