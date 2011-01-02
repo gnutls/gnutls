@@ -1,5 +1,5 @@
 # Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-# 2009, 2010 Free Software Foundation, Inc.
+# 2009, 2010, 2011 Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos, Simon Josefsson
 #
@@ -52,7 +52,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
       if test "$ac_cv_libgcrypt" != yes; then
         AC_MSG_ERROR([[
 ***  
-*** libgcrypt was not found. You may want to get it from
+*** Libgcrypt v1.4.0 or later was not found. You may want to get it from
 *** ftp://ftp.gnupg.org/gcrypt/libgcrypt/
 ***
     ]])
