@@ -9,15 +9,23 @@ See the end for copying conditions.
 replaced by gnutls_privkey_sign_hash2().
 
 ** libgnutls: gnutls_pubkey_verify_data, gnutls_pubkey_verify_hash,
-gnutls_openpgp_crt_verify_hash, gnutls_x509_privkey_verify_data,
-gnutls_x509_crt_verify_data, gnutls_x509_crt_verify_hash
-return the negative error code GNUTLS_E_PK_SIG_VERIFY_FAILED
-if verification fails to simplify error checking.
+gnutls_x509_privkey_verify_data, gnutls_x509_crt_verify_data, 
+gnutls_x509_crt_verify_hash return the negative error code 
+GNUTLS_E_PK_SIG_VERIFY_FAILED if verification fails to simplify error 
+checking.
 
 ** libgnutls: Added helper functions for signature verification:
 gnutls_pubkey_verify_data() and gnutls_pubkey_import_privkey().
 
 ** libgnutls: Added gnutls_privkey_sign_hash2().
+
+** gnutls_x509_crl_privkey_sign2(), gnutls_x509_crq_sign2()
+gnutls_x509_privkey_sign_hash(), gnutls_x509_privkey_sign_data(), 
+gnutls_x509_crt_verify_hash(), gnutls_x509_crt_verify_data(), 
+were deprecated for gnutls_x509_crl_privkey_sign(), 
+gnutls_x509_crq_privkey_sign(), gnutls_privkey_sign_hash2(),
+gnutls_privkey_sign_data2(), gnutls_pubkey_verify_hash()
+gnutls_pubkey_verify_data() respectively.
 
 ** libgnutls: gnutls_*_export_raw() functions now add leading zero in
 integers.
@@ -30,18 +38,21 @@ gnutls_pubkey_import_privkey: ADDED
 gnutls_pubkey_verify_data: ADDED
 gnutls_privkey_sign_hash2: ADDED
 gnutls_privkey_sign_data2: ADDED (in place of gnutls_privkey_sign_data)
-gnutls_x509_crq_sign2: DEPRECATED
-gnutls_x509_crq_sign: DEPRECATED
-gnutls_x509_privkey_sign_data: DEPRECATED
-gnutls_x509_privkey_sign_hash: DEPRECATED
-gnutls_x509_privkey_verify_data: DEPRECATED
+gnutls_x509_crq_sign2: DEPRECATED (use: gnutls_x509_crq_privkey_sign)
+gnutls_x509_crq_sign: DEPRECATED (use: gnutls_x509_crq_privkey_sign)
+gnutls_x509_crq_get_preferred_hash_algorithm: DEPRECATED
+gnutls_x509_crl_sign: DEPRECATED (use: gnutls_x509_crl_privkey_sign)
+gnutls_x509_crl_sign2: DEPRECATED (use: gnutls_x509_crl_privkey_sign)
+gnutls_x509_privkey_sign_data: DEPRECATED (use: gnutls_privkey_sign_data2)
+gnutls_x509_privkey_sign_hash: DEPRECATED (use: gnutls_privkey_sign_hash2)
+gnutls_x509_privkey_verify_data: DEPRECATED (use: gnutls_pubkey_verify_data)
 gnutls_psk_netconf_derive_key: DEPRECATED
 gnutls_session_set_finished_function: DEPRECATED
 gnutls_ext_register: DEPRECATED
-gnutls_x509_crt_verify_hash: DEPRECATED
-gnutls_x509_crt_verify_data: DEPRECATED
-gnutls_x509_crt_get_verify_algorithm: DEPRECATED
-gnutls_x509_crt_get_preferred_hash_algorithm: DEPRECATED
+gnutls_x509_crt_verify_hash: DEPRECATED (use: gnutls_pubkey_verify_hash)
+gnutls_x509_crt_verify_data: DEPRECATED (use: gnutls_pubkey_verify_data)
+gnutls_x509_crt_get_verify_algorithm: DEPRECATED (use: gnutls_pubkey_get_verify_algorithm)
+gnutls_x509_crt_get_preferred_hash_algorithm: DEPRECATED (use: gnutls_pubkey_get_preferred_hash_algorithm)
 gnutls_openpgp_privkey_sign_hash: REMOVED
 gnutls_openpgp_privkey_decrypt_data: REMOVED
 gnutls_pkcs11_privkey_sign_hash: REMOVED

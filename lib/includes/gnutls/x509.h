@@ -426,14 +426,6 @@ extern "C"
  */
   int gnutls_x509_crl_set_version (gnutls_x509_crl_t crl,
                                    unsigned int version);
-  int gnutls_x509_crl_sign (gnutls_x509_crl_t crl,
-                            gnutls_x509_crt_t issuer,
-                            gnutls_x509_privkey_t issuer_key);
-  int gnutls_x509_crl_sign2 (gnutls_x509_crl_t crl,
-                             gnutls_x509_crt_t issuer,
-                             gnutls_x509_privkey_t issuer_key,
-                             gnutls_digest_algorithm_t dig,
-                             unsigned int flags);
   int gnutls_x509_crl_set_this_update (gnutls_x509_crl_t crl,
                                        time_t act_time);
   int gnutls_x509_crl_set_next_update (gnutls_x509_crl_t crl,
@@ -718,10 +710,6 @@ extern "C"
   int gnutls_x509_crq_import (gnutls_x509_crq_t crq,
                               const gnutls_datum_t * data,
                               gnutls_x509_crt_fmt_t format);
-  int gnutls_x509_crq_get_preferred_hash_algorithm (gnutls_x509_crq_t crq,
-                                                    gnutls_digest_algorithm_t
-                                                    * hash,
-                                                    unsigned int *mand);
 
   int gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf,
                               size_t * sizeof_buf);
@@ -829,3 +817,4 @@ extern "C"
 #endif
 
 #endif                          /* GNUTLS_X509_H */
+
