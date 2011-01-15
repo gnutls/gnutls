@@ -409,7 +409,8 @@ static const char DEFAULT_DATA[] =
 
 /* Creates html with the current session information.
  */
-#define tmp2 &http_buffer[strlen(http_buffer)], len-strlen(http_buffer)
+#define tmp_buffer &http_buffer[strlen(http_buffer)]
+#define tmp_buffer_size len-strlen(http_buffer)
 static char *
 peer_print_info (gnutls_session_t session, int *ret_length,
                  const char *header)
@@ -483,11 +484,11 @@ peer_print_info (gnutls_session_t session, int *ret_length,
 
   /* print session_id */
   gnutls_session_get_id (session, sesid, &sesid_size);
-  snprintf (tmp2, "\n<p>Session ID: <i>");
+  snprintf (tmp_buffer, tmp_buffer_size, "\n<p>Session ID: <i>");
   for (i = 0; i < sesid_size; i++)
-    snprintf (tmp2, "%.2X", sesid[i]);
-  snprintf (tmp2, "</i></p>\n");
-  snprintf (tmp2,
+    snprintf (tmp_buffer, tmp_buffer_size, "%.2X", sesid[i]);
+  snprintf (tmp_buffer, tmp_buffer_size, "</i></p>\n");
+  snprintf (tmp_buffer, tmp_buffer_size,
             "<h5>If your browser supports session resuming, then you should see the "
             "same session ID, when you press the <b>reload</b> button.</h5>\n");
 
@@ -501,7 +502,7 @@ peer_print_info (gnutls_session_t session, int *ret_length,
 
     if (gnutls_server_name_get (session, dns, &dns_size, &type, 0) == 0)
       {
-        snprintf (tmp2, "\n<p>Server Name: %s</p>\n", dns);
+        snprintf (tmp_buffer, tmp_buffer_size, "\n<p>Server Name: %s</p>\n", dns);
       }
 
   }
@@ -512,7 +513,7 @@ peer_print_info (gnutls_session_t session, int *ret_length,
 #ifdef ENABLE_SRP
   if (kx_alg == GNUTLS_KX_SRP)
     {
-      snprintf (tmp2, "<p>Connected as user '%s'.</p>\n",
+      snprintf (tmp_buffer, tmp_buffer_size, "<p>Connected as user '%s'.</p>\n",
                 gnutls_srp_server_get_username (session));
     }
 #endif
@@ -520,7 +521,7 @@ peer_print_info (gnutls_session_t session, int *ret_length,
 #ifdef ENABLE_PSK
   if (kx_alg == GNUTLS_KX_PSK)
     {
-      snprintf (tmp2, "<p>Connected as user '%s'.</p>\n",
+      snprintf (tmp_buffer, tmp_buffer_size, "<p>Connected as user '%s'.</p>\n",
                 gnutls_psk_server_get_username (session));
     }
 #endif
@@ -528,7 +529,7 @@ peer_print_info (gnutls_session_t session, int *ret_length,
 #ifdef ENABLE_ANON
   if (kx_alg == GNUTLS_KX_ANON_DH)
     {
-      snprintf (tmp2,
+      snprintf (tmp_buffer, tmp_buffer_size,
                 "<p> Connect using anonymous DH (prime of %d bits)</p>\n",
                 gnutls_dh_get_prime_bits (session));
     }
@@ -536,7 +537,7 @@ peer_print_info (gnutls_session_t session, int *ret_length,
 
   if (kx_alg == GNUTLS_KX_DHE_RSA || kx_alg == GNUTLS_KX_DHE_DSS)
     {
-      snprintf (tmp2,
+      snprintf (tmp_buffer, tmp_buffer_size,
                 "Ephemeral DH using prime of <b>%d</b> bits.<br>\n",
                 gnutls_dh_get_prime_bits (session));
     }
@@ -547,7 +548,7 @@ peer_print_info (gnutls_session_t session, int *ret_length,
   tmp = gnutls_protocol_get_name (gnutls_protocol_get_version (session));
   if (tmp == NULL)
     tmp = str_unknown;
-  snprintf (tmp2,
+  snprintf (tmp_buffer, tmp_buffer_size,
             "<TABLE border=1><TR><TD>Protocol version:</TD><TD>%s</TD></TR>\n",
             tmp);
 
@@ -558,45 +559,45 @@ peer_print_info (gnutls_session_t session, int *ret_length,
                                           (session));
       if (tmp == NULL)
         tmp = str_unknown;
-      snprintf (tmp2, "<TR><TD>Certificate Type:</TD><TD>%s</TD></TR>\n",
+      snprintf (tmp_buffer, tmp_buffer_size, "<TR><TD>Certificate Type:</TD><TD>%s</TD></TR>\n",
                 tmp);
     }
 
   tmp = gnutls_kx_get_name (kx_alg);
   if (tmp == NULL)
     tmp = str_unknown;
-  snprintf (tmp2, "<TR><TD>Key Exchange:</TD><TD>%s</TD></TR>\n", tmp);
+  snprintf (tmp_buffer, tmp_buffer_size, "<TR><TD>Key Exchange:</TD><TD>%s</TD></TR>\n", tmp);
 
   tmp = gnutls_compression_get_name (gnutls_compression_get (session));
   if (tmp == NULL)
     tmp = str_unknown;
-  snprintf (tmp2, "<TR><TD>Compression</TD><TD>%s</TD></TR>\n", tmp);
+  snprintf (tmp_buffer, tmp_buffer_size, "<TR><TD>Compression</TD><TD>%s</TD></TR>\n", tmp);
 
   tmp = gnutls_cipher_get_name (gnutls_cipher_get (session));
   if (tmp == NULL)
     tmp = str_unknown;
-  snprintf (tmp2, "<TR><TD>Cipher</TD><TD>%s</TD></TR>\n", tmp);
+  snprintf (tmp_buffer, tmp_buffer_size, "<TR><TD>Cipher</TD><TD>%s</TD></TR>\n", tmp);
 
   tmp = gnutls_mac_get_name (gnutls_mac_get (session));
   if (tmp == NULL)
     tmp = str_unknown;
-  snprintf (tmp2, "<TR><TD>MAC</TD><TD>%s</TD></TR>\n", tmp);
+  snprintf (tmp_buffer, tmp_buffer_size, "<TR><TD>MAC</TD><TD>%s</TD></TR>\n", tmp);
 
   tmp = gnutls_cipher_suite_get_name (kx_alg,
                                       gnutls_cipher_get (session),
                                       gnutls_mac_get (session));
   if (tmp == NULL)
     tmp = str_unknown;
-  snprintf (tmp2, "<TR><TD>Ciphersuite</TD><TD>%s</TD></TR></p></TABLE>\n",
+  snprintf (tmp_buffer, tmp_buffer_size, "<TR><TD>Ciphersuite</TD><TD>%s</TD></TR></p></TABLE>\n",
             tmp);
 
   if (crtinfo)
     {
-      snprintf (tmp2, "<hr><PRE>%s\n</PRE>\n", crtinfo);
+      snprintf (tmp_buffer, tmp_buffer_size, "<hr><PRE>%s\n</PRE>\n", crtinfo);
       free (crtinfo);
     }
 
-  snprintf (tmp2, "<hr><P>Your HTTP header was:<PRE>%s</PRE></P>\n" HTTP_END,
+  snprintf (tmp_buffer, tmp_buffer_size, "<hr><P>Your HTTP header was:<PRE>%s</PRE></P>\n" HTTP_END,
             header);
 
   *ret_length = strlen (http_buffer);
