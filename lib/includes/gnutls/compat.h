@@ -17,6 +17,8 @@
 #define _GNUTLS_GCC_ATTR_DEPRECATED
 #endif
 
+#include <gnutls/x509.h>
+
 #define gnutls_cipher_algorithm gnutls_cipher_algorithm_t
 #define gnutls_kx_algorithm gnutls_kx_algorithm_t
 #define gnutls_paramsype gnutls_paramsype_t
