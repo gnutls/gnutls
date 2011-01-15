@@ -189,7 +189,7 @@ int gnutls_x509_crt_is_issuer (gnutls_x509_crt_t cert,
 int
 _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
                                const gnutls_datum_t * signature,
-                               gnutls_pk_algorithm pk,
+                               gnutls_pk_algorithm_t pk,
                                bigint_t * issuer_params,
                                unsigned int issuer_params_size);
 
