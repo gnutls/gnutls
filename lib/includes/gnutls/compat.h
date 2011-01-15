@@ -218,7 +218,7 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
   _GNUTLS_GCC_ATTR_DEPRECATED;
 
 /* This is a very dangerous and error-prone function.
- * Do not use.
+ * Use gnutls_privkey_sign_hash2() instead.
  */
      int gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
                                         const gnutls_datum_t * hash,
@@ -234,7 +234,7 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
                                        const gnutls_datum_t * signature)
                                        _GNUTLS_GCC_ATTR_DEPRECATED;
 
-/* we support the gnutls_x509_privkey_sign_data2() instead.
+/* we support the gnutls_privkey_sign_data2() instead.
  */
   int gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
                                      gnutls_digest_algorithm_t digest,
@@ -243,5 +243,34 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
                                      void *signature,
                                      size_t * signature_size)
                                      _GNUTLS_GCC_ATTR_DEPRECATED;
+
+  /* gnutls_pubkey_verify_data() */
+  int gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt,
+                                   unsigned int flags,
+                                   const gnutls_datum_t * data,
+                                   const gnutls_datum_t * signature)
+                                   _GNUTLS_GCC_ATTR_DEPRECATED;
+
+
+  /* gnutls_pubkey_verify_hash() */
+  int gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt,
+                                   unsigned int flags,
+                                   const gnutls_datum_t * hash,
+                                   const gnutls_datum_t * signature)
+                                   _GNUTLS_GCC_ATTR_DEPRECATED;
+
+  /* gnutls_pubkey_get_verify_algorithm() */
+  int gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
+                                            const gnutls_datum_t * signature,
+                                            gnutls_digest_algorithm_t * hash)
+                                            _GNUTLS_GCC_ATTR_DEPRECATED;
+
+  /* gnutls_pubkey_get_preferred_hash_algorithm() */
+  int gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
+                                                    gnutls_digest_algorithm_t
+                                                    * hash,
+                                                    unsigned int *mand)
+                                                    _GNUTLS_GCC_ATTR_DEPRECATED;
+
 
 #endif /* _GNUTLS_COMPAT_H */

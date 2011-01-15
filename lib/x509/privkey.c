@@ -1654,107 +1654,8 @@ cleanup:
 
 
 #ifdef ENABLE_PKI
-/**
- * gnutls_x509_privkey_sign_data2:
- * @signer: Holds the key
- * @digest: should be MD5 or SHA1
- * @flags: should be 0 for now
- * @data: holds the data to be signed
- * @signature: will contain the signature allocate with gnutls_malloc()
- *
- * This function will sign the given data using a signature algorithm
- * supported by the private key. Signature algorithms are always used
- * together with a hash functions.  Different hash functions may be
- * used for the RSA algorithm, but only SHA-1,SHA-224 and SHA-256 
- * for the DSA keys, depending on their bit size.
- *
- * Use gnutls_x509_crt_get_preferred_hash_algorithm() to determine
- * the hash algorithm.
- *
- * The RSA algorithm is used in PKCS #1 v1.5 mode.
- *
- * If the buffer provided is not long enough to hold the output, then
- * *@signature_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will
- * be returned.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value.
- **/
-int
-gnutls_x509_privkey_sign_data2 (gnutls_x509_privkey_t signer,
-                                gnutls_digest_algorithm_t hash,
-                                unsigned int flags,
-                                const gnutls_datum_t * data,
-                                gnutls_datum_t * signature)
-{
-  int ret;
-  gnutls_datum_t digest;
-
-  ret =
-    pk_hash_data (signer->pk_algorithm, hash, signer->params, data, &digest);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  ret =
-    gnutls_x509_privkey_sign_hash2 (signer, hash, flags, &digest, signature);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  ret = 0;
-
-cleanup:
-  _gnutls_free_datum (&digest);
-  return ret;
-}
-
 /*-
- * gnutls_x509_privkey_sign_hash:
- * @key: Holds the key
- * @hash: holds the data to be signed
- * @signature: will contain newly allocated signature
- *
- * This function will sign the given hash using the private key. Do not
- * use this function directly unless you know what it is. Typical signing
- * requires the data to be hashed and stored in special formats 
- * (e.g. BER Digest-Info for RSA).
- *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value.
- *
- * Deprecated in: 2.11.0
- -*/
-int
-gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
-                               const gnutls_datum_t * hash,
-                               gnutls_datum_t * signature)
-{
-  int result;
-
-  if (key == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  result = _gnutls_soft_sign (key->pk_algorithm, key->params,
-                              key->params_size, hash, signature);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      return result;
-    }
-
-  return 0;
-}
-
-/**
- * gnutls_x509_privkey_sign_hash2:
+ * _gnutls_x509_privkey_sign_hash2:
  * @signer: Holds the signer's key
  * @hash_algo: The hash algorithm used
  * @hash_data: holds the data to be signed
@@ -1774,9 +1675,9 @@ gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
- **/
-int
-gnutls_x509_privkey_sign_hash2 (gnutls_x509_privkey_t signer,
+ -*/
+static int
+_gnutls_x509_privkey_sign_hash2 (gnutls_x509_privkey_t signer,
                                 gnutls_digest_algorithm_t hash_algo,
                                 unsigned int flags,
                                 const gnutls_datum_t * hash_data,
@@ -1818,6 +1719,46 @@ cleanup:
 }
 
 /*-
+ * _gnutls_x509_privkey_sign_hash:
+ * @key: Holds the key
+ * @hash: holds the data to be signed
+ * @signature: will contain newly allocated signature
+ *
+ * This function will sign the given hash using the private key. Do not
+ * use this function directly unless you know what it is. Typical signing
+ * requires the data to be hashed and stored in special formats 
+ * (e.g. BER Digest-Info for RSA).
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ *
+ * Deprecated in: 2.11.0
+ -*/
+int
+gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
+                               const gnutls_datum_t * hash,
+                               gnutls_datum_t * signature)
+{
+  int result;
+
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  result = _gnutls_soft_sign (key->pk_algorithm, key->params,
+                              key->params_size, hash, signature);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  return 0;
+}
+
+/*-
  * gnutls_x509_privkey_sign_data:
  * @key: Holds the key
  * @digest: should be MD5 or SHA1
@@ -1851,6 +1792,7 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
 {
   int result;
   gnutls_datum_t sig = { NULL, 0 };
+  gnutls_datum_t hash;
 
   if (key == NULL)
     {
@@ -1858,13 +1800,25 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  result = gnutls_x509_privkey_sign_data2 (key, digest, flags, data, &sig);
+  result =
+    pk_hash_data (key->pk_algorithm, digest, key->params, data, &hash);
   if (result < 0)
     {
       gnutls_assert ();
       return result;
     }
 
+  result =
+    _gnutls_x509_privkey_sign_hash2 (key, digest, flags, &hash, signature);
+
+  _gnutls_free_datum(&hash);
+
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+    
   if (*signature_size < sig.size)
     {
       *signature_size = sig.size;

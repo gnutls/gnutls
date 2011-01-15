@@ -766,15 +766,27 @@ static gnutls_digest_algorithm_t
 get_dig (gnutls_x509_crt crt)
 {
   gnutls_digest_algorithm_t dig;
+  gnutls_pubkey_t pubkey;
   int result;
   unsigned int mand;
 
-  result = gnutls_x509_crt_get_preferred_hash_algorithm (crt, &dig, &mand);
+  gnutls_pubkey_init(&pubkey);
+
+  result = gnutls_pubkey_import_x509(pubkey, crt, 0);
   if (result < 0)
     {
-      error (EXIT_FAILURE, 0, "crl_preferred_hash_algorithm: %s",
+      error (EXIT_FAILURE, 0, "gnutls_pubkey_import_x509: %s",
              gnutls_strerror (result));
     }
+
+  result = gnutls_pubkey_get_preferred_hash_algorithm (pubkey, &dig, &mand);
+  if (result < 0)
+    {
+      error (EXIT_FAILURE, 0, "crt_get_preferred_hash_algorithm: %s",
+             gnutls_strerror (result));
+    }
+
+  gnutls_pubkey_deinit(pubkey);
 
   /* if algorithm allows alternatives */
   if (mand == 0 && default_dig != GNUTLS_DIG_UNKNOWN)

@@ -140,10 +140,6 @@ extern "C"
                                   unsigned int flags,
                                   unsigned char *output_data,
                                   size_t * output_data_size);
-  int gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
-                                                    gnutls_digest_algorithm_t
-                                                    * hash,
-                                                    unsigned int *mand);
 
   int gnutls_x509_crt_set_authority_key_id (gnutls_x509_crt_t cert,
                                             const void *id, size_t id_size);
@@ -707,35 +703,6 @@ extern "C"
                                           gnutls_datum_t * p,
                                           gnutls_datum_t * q,
                                           gnutls_datum_t * u);
-
-/* Signing stuff.
- */
-  int gnutls_x509_privkey_sign_data2 (gnutls_x509_privkey_t key,
-                                      gnutls_digest_algorithm_t digest,
-                                      unsigned int flags,
-                                      const gnutls_datum_t * data,
-                                      gnutls_datum_t * signature);
-  int gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt,
-                                   unsigned int flags,
-                                   const gnutls_datum_t * data,
-                                   const gnutls_datum_t * signature);
-
-  int gnutls_x509_privkey_sign_hash2 (gnutls_x509_privkey_t signer,
-                                      gnutls_digest_algorithm_t hash_algo,
-                                      unsigned int flags,
-                                      const gnutls_datum_t * hash_data,
-                                      gnutls_datum_t * signature);
-
-  int gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt,
-                                   unsigned int flags,
-                                   const gnutls_datum_t * hash,
-                                   const gnutls_datum_t * signature);
-
-  int gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
-                                            const gnutls_datum_t * signature,
-                                            gnutls_digest_algorithm_t * hash);
-
-
 
 /* Certificate request stuff.
  */

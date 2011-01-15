@@ -2493,6 +2493,8 @@ gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
  * This function will read the certifcate and the signed data to
  * determine the hash algorithm used to generate the signature.
  *
+ * Deprecated: Use gnutls_pubkey_get_verify_algorithm() instead.
+ *
  * Returns: the 0 if the hash algorithm is found. A negative value is
  * returned on error.
  *
@@ -2548,6 +2550,8 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
  * algorithm to use for signing with this certificate. Some certificates (i.e.
  * DSA might not be able to sign without the preferred algorithm).
  *
+ * Deprecated: Please use gnutls_pubkey_get_preferred_hash_algorithm().
+ *
  * Returns: the 0 if the hash algorithm is found. A negative value is
  * returned on error.
  *
@@ -2600,6 +2604,8 @@ gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
  * This function will verify the given signed data, using the
  * parameters from the certificate.
  *
+ * Deprecated. Please use gnutls_pubkey_verify_data().
+ *
  * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
  * is returned, and a positive code on success.
  **/
@@ -2635,6 +2641,8 @@ gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
  *
  * This function will verify the given signed digest, using the
  * parameters from the certificate.
+ *
+ * Deprecated. Please use gnutls_pubkey_verify_data().
  *
  * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
  * is returned, and a positive code on success.

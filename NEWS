@@ -31,8 +31,6 @@ Reported by "Brendan Doherty" <brendand@gentrack.com>.
 gnutls_pubkey_import_privkey: ADDED
 gnutls_pubkey_verify_data: ADDED
 gnutls_privkey_sign_hash2: ADDED
-gnutls_x509_privkey_sign_hash2: ADDED
-gnutls_x509_privkey_sign_data2: ADDED
 gnutls_privkey_sign_data2: ADDED (in place of gnutls_privkey_sign_data)
 gnutls_x509_privkey_sign_data: DEPRECATED
 gnutls_x509_privkey_sign_hash: DEPRECATED
@@ -40,6 +38,10 @@ gnutls_x509_privkey_verify_data: DEPRECATED
 gnutls_psk_netconf_derive_key: DEPRECATED
 gnutls_session_set_finished_function: DEPRECATED
 gnutls_ext_register: DEPRECATED
+gnutls_x509_crt_verify_hash: DEPRECATED
+gnutls_x509_crt_verify_data: DEPRECATED
+gnutls_x509_crt_get_verify_algorithm: DEPRECATED
+gnutls_x509_crt_get_preferred_hash_algorithm: DEPRECATED
 gnutls_openpgp_privkey_sign_hash: REMOVED
 gnutls_openpgp_privkey_decrypt_data: REMOVED
 gnutls_pkcs11_privkey_sign_hash: REMOVED
