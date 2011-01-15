@@ -741,11 +741,6 @@ extern "C"
   int gnutls_x509_crq_get_version (gnutls_x509_crq_t crq);
   int gnutls_x509_crq_set_key (gnutls_x509_crq_t crq,
                                gnutls_x509_privkey_t key);
-  int gnutls_x509_crq_sign2 (gnutls_x509_crq_t crq,
-                             gnutls_x509_privkey_t key,
-                             gnutls_digest_algorithm_t dig,
-                             unsigned int flags);
-  int gnutls_x509_crq_sign (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key);
 
   int gnutls_x509_crq_set_challenge_password (gnutls_x509_crq_t crq,
                                               const char *pass);

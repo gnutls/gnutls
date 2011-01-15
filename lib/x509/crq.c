@@ -1003,6 +1003,8 @@ gnutls_x509_crq_set_challenge_password (gnutls_x509_crq_t crq,
  * the digest algorithm to use with the specified public key
  * algorithm.
  *
+ * Deprecated: Use gnutls_x509_crq_privkey_sign() instead.
+ *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
  *   %GNUTLS_E_ASN1_VALUE_NOT_FOUND is returned if you didn't set all
  *   information in the certificate request (e.g., the version using
@@ -1051,7 +1053,7 @@ fail:
   return result;
 }
 
-/**
+/*-
  * gnutls_x509_crq_sign:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @key: holds a private key
@@ -1061,7 +1063,7 @@ fail:
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
- **/
+ -*/
 int
 gnutls_x509_crq_sign (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
 {

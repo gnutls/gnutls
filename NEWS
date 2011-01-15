@@ -30,6 +30,8 @@ gnutls_pubkey_import_privkey: ADDED
 gnutls_pubkey_verify_data: ADDED
 gnutls_privkey_sign_hash2: ADDED
 gnutls_privkey_sign_data2: ADDED (in place of gnutls_privkey_sign_data)
+gnutls_x509_crq_sign2: DEPRECATED
+gnutls_x509_crq_sign: DEPRECATED
 gnutls_x509_privkey_sign_data: DEPRECATED
 gnutls_x509_privkey_sign_hash: DEPRECATED
 gnutls_x509_privkey_verify_data: DEPRECATED
