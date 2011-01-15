@@ -1090,6 +1090,9 @@ extern "C"
   struct gnutls_x509_crt_int;
   typedef struct gnutls_x509_crt_int *gnutls_x509_crt_t;
 
+  struct gnutls_x509_crq_int;
+  typedef struct gnutls_x509_crq_int *gnutls_x509_crq_t;
+
   struct gnutls_openpgp_keyring_int;
   typedef struct gnutls_openpgp_keyring_int *gnutls_openpgp_keyring_t;
 

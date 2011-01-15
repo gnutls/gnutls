@@ -698,8 +698,6 @@ extern "C"
 
 /* Certificate request stuff.
  */
-  struct gnutls_x509_crq_int;
-  typedef struct gnutls_x509_crq_int *gnutls_x509_crq_t;
 
   int gnutls_x509_crq_print (gnutls_x509_crq_t crq,
                              gnutls_certificate_print_formats_t format,

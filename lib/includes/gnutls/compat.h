@@ -7,8 +7,10 @@
 
 #define _GNUTLS_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 
+#if !defined(GNUTLS_INTERNAL_BUILD)
 #if _GNUTLS_GCC_VERSION >= 30100
 #define _GNUTLS_GCC_ATTR_DEPRECATED __attribute__ ((__deprecated__))
+#endif
 #endif
 
 #endif /* __GNUC__ */
@@ -16,8 +18,6 @@
 #ifndef _GNUTLS_GCC_ATTR_DEPRECATED
 #define _GNUTLS_GCC_ATTR_DEPRECATED
 #endif
-
-#include <gnutls/x509.h>
 
 #define gnutls_cipher_algorithm gnutls_cipher_algorithm_t
 #define gnutls_kx_algorithm gnutls_kx_algorithm_t
@@ -287,6 +287,7 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
                              _GNUTLS_GCC_ATTR_DEPRECATED;
   int gnutls_x509_crq_sign (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
                               _GNUTLS_GCC_ATTR_DEPRECATED;
+
 
 
   /* gnutls_x509_crl_privkey_sign */

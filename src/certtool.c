@@ -923,6 +923,7 @@ generate_signed_crl (common_info_st * cinfo)
   gnutls_x509_crl_t crl;
   int result;
   gnutls_x509_privkey_t ca_key;
+  gnutls_privkey_t ca_pkey;
   gnutls_x509_crt_t ca_crt;
 
   fprintf (stderr, "Generating a signed CRL...\n");
@@ -931,14 +932,23 @@ generate_signed_crl (common_info_st * cinfo)
   ca_crt = load_ca_cert (cinfo);
   crl = generate_crl (ca_crt, cinfo);
 
+  result = gnutls_privkey_init(&ca_pkey);
+  if (result < 0)
+    error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (result));
+
+  result = gnutls_privkey_import_x509(ca_pkey, ca_key, 0);
+  if (result < 0)
+    error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (result));
+
   fprintf (stderr, "\n");
 
-  result = gnutls_x509_crl_sign (crl, ca_crt, ca_key);
+  result = gnutls_x509_crl_privkey_sign(crl, ca_crt, ca_pkey, GNUTLS_DIG_SHA1, 0);
   if (result < 0)
-    error (EXIT_FAILURE, 0, "crl_sign: %s", gnutls_strerror (result));
+    error (EXIT_FAILURE, 0, "crl_privkey_sign: %s", gnutls_strerror (result));
 
   print_crl_info (crl, stderr);
 
+  gnutls_privkey_deinit( ca_pkey);
   gnutls_x509_crl_deinit (crl);
 }
 
@@ -1751,6 +1761,7 @@ generate_request (common_info_st * cinfo)
 {
   gnutls_x509_crq_t crq;
   gnutls_x509_privkey_t key;
+  gnutls_privkey_t pkey;
   int ret, ca_status, path_len;
   const char *pass;
   unsigned int usage = 0;
@@ -1761,6 +1772,10 @@ generate_request (common_info_st * cinfo)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crq_init: %s", gnutls_strerror (ret));
 
+  ret = gnutls_privkey_init (&pkey);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
+
   /* Load the private key.
    */
   key = load_private_key (0, cinfo);
@@ -1770,6 +1785,10 @@ generate_request (common_info_st * cinfo)
 
       print_private_key (key);
     }
+
+  ret = gnutls_privkey_import_x509(pkey, key, 0);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "privkey_import_x509: %s", gnutls_strerror (ret));
 
   /* Set the DN.
    */
@@ -1892,13 +1911,14 @@ generate_request (common_info_st * cinfo)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "set_key: %s", gnutls_strerror (ret));
 
-  ret = gnutls_x509_crq_sign (crq, key);
+  ret = gnutls_x509_crq_privkey_sign (crq, pkey, GNUTLS_DIG_SHA1, 0);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "sign: %s", gnutls_strerror (ret));
 
   print_crq_info (crq, outfile);
 
   gnutls_x509_crq_deinit (crq);
+  gnutls_privkey_deinit( pkey);
   gnutls_x509_privkey_deinit (key);
 
 }

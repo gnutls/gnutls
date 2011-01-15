@@ -30,6 +30,7 @@
 #include <gcrypt.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
+#include <gnutls/abstract.h>
 
 #include "utils.h"
 
@@ -43,6 +44,7 @@ void
 doit (void)
 {
   gnutls_x509_privkey_t pkey;
+  gnutls_privkey_t abs_pkey;
   gnutls_x509_crq_t crq;
 
   size_t pkey_key_id_len;
@@ -73,6 +75,12 @@ doit (void)
       if (ret < 0)
         {
           fail ("gnutls_x509_privkey_init: %d\n", ret);
+        }
+
+      ret = gnutls_privkey_init (&abs_pkey);
+      if (ret < 0)
+        {
+          fail ("gnutls_privkey_init: %d\n", ret);
         }
 
       ret = gnutls_x509_privkey_generate (pkey, algorithm, 1024, 0);
@@ -123,7 +131,13 @@ doit (void)
           fail ("gnutls_x509_crq_set_dn_by_oid: %d\n", ret);
         }
 
-      ret = gnutls_x509_crq_sign (crq, pkey);
+      ret = gnutls_privkey_import_x509( abs_pkey, pkey, 0);
+      if (ret < 0)
+        {
+          fail ("gnutls_privkey_import_x509: %d\n", ret);
+        }
+
+      ret = gnutls_x509_crq_privkey_sign (crq, abs_pkey, GNUTLS_DIG_SHA1, 0);
       if (ret)
         {
           fail ("gnutls_x509_crq_sign: %d\n", ret);
@@ -177,6 +191,7 @@ doit (void)
 
       gnutls_x509_crq_deinit (crq);
       gnutls_x509_privkey_deinit (pkey);
+      gnutls_privkey_deinit (abs_pkey);
     }
 
   gnutls_global_deinit ();
