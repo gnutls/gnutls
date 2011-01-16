@@ -282,6 +282,16 @@ gnutls_privkey_deinit (gnutls_privkey_t key)
   gnutls_free (key);
 }
 
+/* will fail if the private key contains an actual key.
+ */
+static int check_if_clean(gnutls_privkey_t key)
+{
+  if (key->type != 0)
+    return GNUTLS_E_INVALID_REQUEST;
+
+  return 0;
+}
+
 /**
  * gnutls_privkey_import_pkcs11:
  * @pkey: The private key
@@ -291,6 +301,9 @@ gnutls_privkey_deinit (gnutls_privkey_t key)
  * This function will import the given private key to the abstract
  * #gnutls_privkey_t structure.
  *
+ * The #gnutls_pkcs11_privkey_t object must not be deallocated
+ * during the lifetime of this structure.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  **/
@@ -298,6 +311,15 @@ int
 gnutls_privkey_import_pkcs11 (gnutls_privkey_t pkey,
                               gnutls_pkcs11_privkey_t key, unsigned int flags)
 {
+int ret;
+
+  ret = check_if_clean(pkey);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+
   pkey->key.pkcs11 = key;
   pkey->type = GNUTLS_PRIVKEY_PKCS11;
   pkey->pk_algorithm = gnutls_pkcs11_privkey_get_pk_algorithm (key, NULL);
@@ -315,6 +337,9 @@ gnutls_privkey_import_pkcs11 (gnutls_privkey_t pkey,
  * This function will import the given private key to the abstract
  * #gnutls_privkey_t structure.
  *
+ * The #gnutls_x509_privkey_t object must not be deallocated
+ * during the lifetime of this structure.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  **/
@@ -322,6 +347,15 @@ int
 gnutls_privkey_import_x509 (gnutls_privkey_t pkey,
                             gnutls_x509_privkey_t key, unsigned int flags)
 {
+int ret;
+
+  ret = check_if_clean(pkey);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+
   pkey->key.x509 = key;
   pkey->type = GNUTLS_PRIVKEY_X509;
   pkey->pk_algorithm = gnutls_x509_privkey_get_pk_algorithm (key);
@@ -340,6 +374,9 @@ gnutls_privkey_import_x509 (gnutls_privkey_t pkey,
  * This function will import the given private key to the abstract
  * #gnutls_privkey_t structure.
  *
+ * The #gnutls_openpgp_privkey_t object must not be deallocated
+ * during the lifetime of this structure.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  **/
@@ -348,6 +385,15 @@ gnutls_privkey_import_openpgp (gnutls_privkey_t pkey,
                                gnutls_openpgp_privkey_t key,
                                unsigned int flags)
 {
+int ret;
+
+  ret = check_if_clean(pkey);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+
   pkey->key.openpgp = key;
   pkey->type = GNUTLS_PRIVKEY_OPENPGP;
   pkey->pk_algorithm = gnutls_openpgp_privkey_get_pk_algorithm (key, NULL);
@@ -554,3 +600,4 @@ gnutls_privkey_decrypt_data (gnutls_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 }
+
