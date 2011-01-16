@@ -1226,7 +1226,7 @@ gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key,
 }
 
 /*-
- * _gnutls_openpgp_privkey_sign_hash:
+ * gnutls_openpgp_privkey_sign_hash:
  * @key: Holds the key
  * @hash: holds the data to be signed
  * @signature: will contain newly allocated signature
@@ -1239,7 +1239,7 @@ gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key,
  *   negative error value.
  -*/
 int
-_gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
+gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
                                    const gnutls_datum_t * hash,
                                    gnutls_datum_t * signature)
 {

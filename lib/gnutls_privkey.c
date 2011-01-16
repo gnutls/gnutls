@@ -539,7 +539,7 @@ _gnutls_privkey_sign_hash (gnutls_privkey_t key,
     {
 #ifdef ENABLE_OPENPGP
     case GNUTLS_PRIVKEY_OPENPGP:
-      return _gnutls_openpgp_privkey_sign_hash (key->key.openpgp,
+      return gnutls_openpgp_privkey_sign_hash (key->key.openpgp,
                                                 hash, signature);
 #endif
     case GNUTLS_PRIVKEY_PKCS11:

@@ -222,10 +222,16 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
 /* This is a very dangerous and error-prone function.
  * Use gnutls_privkey_sign_hash2() instead.
  */
-     int gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
+  int gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
                                         const gnutls_datum_t * hash,
                                         gnutls_datum_t * signature)
-  _GNUTLS_GCC_ATTR_DEPRECATED;
+                                        _GNUTLS_GCC_ATTR_DEPRECATED;
+
+  int gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
+                                       const gnutls_datum_t * hash,
+                                       gnutls_datum_t * signature)
+                                       _GNUTLS_GCC_ATTR_DEPRECATED;
+
 
 /* Deprecated because verify_* functions are moved to public
  * keys. Check abstract.h for similar functionality.
