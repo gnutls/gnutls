@@ -63,6 +63,7 @@ struct provider
   void *mutex;
   const struct ck_function_list *fns;
   unsigned int refcount;
+  unsigned int finalize:1; /* whether to finalize this one */
   struct provider *next, **prevref;
   void *reserved;
 };
@@ -342,10 +343,18 @@ load_pkcs11_module (struct provider **provider,
   args.reserved = reserved;
 
   rv = fns->C_Initialize (&args);
-  if (rv != CKR_OK)
+  if (rv != CKR_OK && rv != CKR_CRYPTOKI_ALREADY_INITIALIZED)
     {
       goto fail_ctx;
     }
+
+  /* no need to finalize if someone else has 
+   * initialized the library before us.
+   */
+  if (rv == CKR_CRYPTOKI_ALREADY_INITIALIZED)
+    prov->finalize = 0;
+  else
+    prov->finalize = 1;
 
   prov->next = provider_list;
   prov->prevref = &provider_list;
@@ -542,7 +551,8 @@ provider_unref (struct provider *prov)
 
   if (--prov->refcount == 0)
     {
-      prov->fns->C_Finalize (NULL);
+      if (prov->finalize)
+        prov->fns->C_Finalize (NULL);
       dlclose (prov->handle);
       *prov->prevref = prov->next;
       if (prov->next)
