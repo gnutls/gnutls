@@ -34,6 +34,7 @@ integers.
 Reported by "Brendan Doherty" <brendand@gentrack.com>.
 
 ** API and ABI modifications:
+gnutls_x509_crl_get_raw_issuer_dn: ADDED
 gnutls_pubkey_import_privkey: ADDED
 gnutls_pubkey_verify_data: ADDED
 gnutls_privkey_sign_hash2: ADDED

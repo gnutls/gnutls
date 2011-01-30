@@ -1183,7 +1183,7 @@ is_crl_issuer (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer_cert)
   NULL, 0};
   int ret;
 
-  ret = _gnutls_x509_crl_get_raw_issuer_dn (crl, &dn1);
+  ret = gnutls_x509_crl_get_raw_issuer_dn (crl, &dn1);
   if (ret < 0)
     {
       gnutls_assert ();

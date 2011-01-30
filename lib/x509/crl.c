@@ -532,8 +532,8 @@ gnutls_x509_crl_get_crt_serial (gnutls_x509_crl_t crl, int indx,
   return 0;
 }
 
-/*-
- * _gnutls_x509_crl_get_raw_issuer_dn - This function returns the issuer's DN DER encoded
+/**
+ * gnutls_x509_crl_get_raw_issuer_dn - This function returns the issuer's DN DER encoded
  * @crl: should contain a gnutls_x509_crl_t structure
  * @dn: will hold the starting point of the DN
  *
@@ -541,9 +541,9 @@ gnutls_x509_crl_get_crt_serial (gnutls_x509_crl_t crl, int indx,
  * the length.
  *
  * Returns a negative value on error, and zero on success.
- -*/
+ **/
 int
-_gnutls_x509_crl_get_raw_issuer_dn (gnutls_x509_crl_t crl,
+gnutls_x509_crl_get_raw_issuer_dn (gnutls_x509_crl_t crl,
                                     gnutls_datum_t * dn)
 {
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;

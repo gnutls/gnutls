@@ -395,6 +395,10 @@ extern "C"
                               gnutls_x509_crt_fmt_t format,
                               void *output_data, size_t * output_data_size);
 
+  int
+  gnutls_x509_crl_get_raw_issuer_dn (gnutls_x509_crl_t crl,
+                                      gnutls_datum_t * dn);
+
   int gnutls_x509_crl_get_issuer_dn (const gnutls_x509_crl_t crl,
                                      char *buf, size_t * sizeof_buf);
   int gnutls_x509_crl_get_issuer_dn_by_oid (gnutls_x509_crl_t crl,

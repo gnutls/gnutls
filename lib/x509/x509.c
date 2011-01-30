@@ -2411,7 +2411,7 @@ gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
 
       /* Step 1. check if issuer's DN match
        */
-      ret = _gnutls_x509_crl_get_raw_issuer_dn (crl_list[j], &dn1);
+      ret = gnutls_x509_crl_get_raw_issuer_dn (crl_list[j], &dn1);
       if (ret < 0)
         {
           gnutls_assert ();
