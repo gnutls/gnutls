@@ -128,9 +128,9 @@ _gnutls_x509_crt_cpy (gnutls_x509_crt_t dest, gnutls_x509_crt_t src)
 
 /**
  * gnutls_x509_crt_deinit:
- * @cert: The structure to be initialized
+ * @cert: The structure to be deinitialized
  *
- * This function will deinitialize a CRL structure.
+ * This function will deinitialize a certificate structure.
  **/
 void
 gnutls_x509_crt_deinit (gnutls_x509_crt_t cert)
