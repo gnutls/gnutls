@@ -1960,7 +1960,7 @@ static int detailed_verification(gnutls_x509_crt_t cert,
       if (ret < 0)
         error (EXIT_FAILURE, 0, "gnutls_x509_crt_get_issuer_dn: %s", gnutls_strerror (ret));
 
-      fprintf (outfile, "\tVerified against: %s\n", issuer_name);
+      fprintf (outfile, "\tChecked against: %s\n", issuer_name);
     }
 
   if (crl != NULL)
@@ -1987,7 +1987,7 @@ static int detailed_verification(gnutls_x509_crt_t cert,
           if (ret < 0)
             error (EXIT_FAILURE, 0, "gnutls_hex_encode: %s", gnutls_strerror (ret));
         }
-      fprintf (outfile, "\tVerified against CRL[%s] of: %s\n", name, issuer_name);
+      fprintf (outfile, "\tChecked against CRL[%s] of: %s\n", name, issuer_name);
     }
 
   fprintf (outfile, "\tOutput: ");
