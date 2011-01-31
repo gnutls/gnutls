@@ -701,6 +701,8 @@ GNUTLS_2_12
 	gnutls_x509_trust_list_init;
 	gnutls_x509_trust_list_deinit;
 	gnutls_x509_crl_list_import;
+	gnutls_x509_crl_list_import2;
+	gnutls_x509_crt_list_import2;
 } GNUTLS_2_10;
 
 GNUTLS_PRIVATE {

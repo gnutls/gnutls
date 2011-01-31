@@ -1026,6 +1026,63 @@ gnutls_x509_crl_get_extension_data (gnutls_x509_crl_t crl, int indx,
 }
 
 /**
+ * gnutls_x509_crl_list_import2:
+ * @crls: The structures to store the parsed crl list. Must not be initialized.
+ * @size: It will contain the size of the list.
+ * @data: The PEM encoded CRL.
+ * @format: One of DER or PEM.
+ * @flags: must be zero or an OR'd sequence of gnutls_certificate_import_flags.
+ *
+ * This function will convert the given PEM encoded CRL list
+ * to the native gnutls_x509_crl_t format. The output will be stored
+ * in @crls.  They will be automatically initialized.
+ *
+ * If the Certificate is PEM encoded it should have a header of "X509
+ * CRL".
+ *
+ * Returns: the number of certificates read or a negative error value.
+ **/
+int
+gnutls_x509_crl_list_import2 (gnutls_x509_crl_t ** crls,
+                             unsigned int * size,
+                             const gnutls_datum_t * data,
+                             gnutls_x509_crt_fmt_t format, unsigned int flags)
+{
+unsigned int init = 1024;
+int ret;
+
+  *crls = gnutls_malloc(sizeof(gnutls_x509_crl_t*)*init);
+  if (*crls == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  ret = gnutls_x509_crl_list_import(*crls, &init, data, format, GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+  if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
+    {
+      *crls = gnutls_realloc_fast(*crls, sizeof(gnutls_x509_crl_t*)*init);
+      if (*crls == NULL)
+        {
+          gnutls_assert();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
+      
+      ret = gnutls_x509_crl_list_import(*crls, &init, data, format, flags);
+    }
+
+  if (ret < 0)
+    {
+      gnutls_free(*crls);
+      *crls = NULL;
+      return ret;
+    }
+
+  *size = init;
+  return 0;
+}
+
+/**
  * gnutls_x509_crl_list_import:
  * @crls: The structures to store the parsed CRLs. Must not be initialized.
  * @crl_max: Initially must hold the maximum number of crls. It will be updated with the number of crls available.

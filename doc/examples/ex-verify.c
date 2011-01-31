@@ -41,8 +41,8 @@ verify_certificate_chain (gnutls_session_t session,
   unsigned int output;
 
   /* Initialize the trusted certificate list. This should be done
-   * once on initialization. gnutls_x509_crt_list_import() and
-   * gnutls_x509_crl_list_import() can be used to load them.
+   * once on initialization. gnutls_x509_crt_list_import2() and
+   * gnutls_x509_crl_list_import2() can be used to load them.
    */
   gnutls_x509_trust_list_init(&tlist);
 

@@ -71,15 +71,7 @@ typedef struct gnutls_certificate_credentials_st
 #endif
 
   /* X509 specific stuff */
-
-  gnutls_x509_crt_t *x509_ca_list;
-  unsigned x509_ncas;           /* number of CAs in the ca_list 
-                                 */
-
-  gnutls_x509_crl_t *x509_crl_list;
-  unsigned x509_ncrls;          /* number of CRLs in the crl_list 
-                                 */
-
+  gnutls_x509_trust_list_t tlist;
   unsigned int verify_flags;    /* flags to be used at 
                                  * certificate verification.
                                  */

@@ -98,18 +98,8 @@ gnutls_certificate_free_keys (gnutls_certificate_credentials_t sc)
 void
 gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc)
 {
-  unsigned j;
-
-  for (j = 0; j < sc->x509_ncas; j++)
-    {
-      gnutls_x509_crt_deinit (sc->x509_ca_list[j]);
-    }
-
-  sc->x509_ncas = 0;
-
-  gnutls_free (sc->x509_ca_list);
-  sc->x509_ca_list = NULL;
-
+  /* do nothing for now */
+  return;
 }
 
 /**
@@ -122,14 +112,15 @@ gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc)
  * credentials.
  *
  * Since: 2.4.0
+ * Deprecated and defunctional since: 2.11.0
  **/
 void
 gnutls_certificate_get_x509_cas (gnutls_certificate_credentials_t sc,
                                  gnutls_x509_crt_t ** x509_ca_list,
                                  unsigned int *ncas)
 {
-  *x509_ca_list = sc->x509_ca_list;
-  *ncas = sc->x509_ncas;
+  *x509_ca_list = NULL;
+  *ncas = 0;
 }
 
 /**
@@ -142,14 +133,15 @@ gnutls_certificate_get_x509_cas (gnutls_certificate_credentials_t sc,
  * credentials.
  *
  * Since: 2.4.0
+ * Deprecated and defunctional since: 2.11.0
  **/
 void
 gnutls_certificate_get_x509_crls (gnutls_certificate_credentials_t sc,
                                   gnutls_x509_crl_t ** x509_crl_list,
                                   unsigned int *ncrls)
 {
-  *x509_crl_list = sc->x509_crl_list;
-  *ncrls = sc->x509_ncrls;
+  *x509_crl_list = NULL;
+  *ncrls = 0;
 }
 
 #ifdef ENABLE_OPENPGP
@@ -246,12 +238,9 @@ _gnutls_certificate_get_rsa_params (gnutls_rsa_params_t rsa_params,
 void
 gnutls_certificate_free_credentials (gnutls_certificate_credentials_t sc)
 {
+  gnutls_x509_trust_list_deinit(sc->tlist, 1);
   gnutls_certificate_free_keys (sc);
-  gnutls_certificate_free_cas (sc);
   gnutls_certificate_free_ca_names (sc);
-#ifdef ENABLE_PKI
-  gnutls_certificate_free_crls (sc);
-#endif
 
 #ifdef ENABLE_OPENPGP
   gnutls_openpgp_keyring_deinit (sc->keyring);
@@ -274,11 +263,20 @@ int
 gnutls_certificate_allocate_credentials (gnutls_certificate_credentials_t *
                                          res)
 {
+int ret;
+
   *res = gnutls_calloc (1, sizeof (certificate_credentials_st));
 
   if (*res == NULL)
     return GNUTLS_E_MEMORY_ERROR;
 
+  ret = gnutls_x509_trust_list_init( &(*res)->tlist);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      gnutls_free(*res);
+      return GNUTLS_E_MEMORY_ERROR;
+    }
   (*res)->verify_bits = DEFAULT_VERIFY_BITS;
   (*res)->verify_depth = DEFAULT_VERIFY_DEPTH;
 

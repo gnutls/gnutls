@@ -1925,8 +1925,6 @@ generate_request (common_info_st * cinfo)
 
 static void print_verification_res (FILE* outfile, unsigned int output);
 
-#define MAX_LIST 512
-
 static int detailed_verification(gnutls_x509_crt_t cert,
     gnutls_x509_crt_t issuer, gnutls_x509_crl_t crl, 
     unsigned int verification_output)
@@ -2005,8 +2003,8 @@ _verify_x509_mem (const void *cert, int cert_size)
 {
   int ret;
   gnutls_datum_t tmp;
-  gnutls_x509_crt_t x509_cert_list[MAX_LIST];
-  gnutls_x509_crl_t x509_crl_list[MAX_LIST];
+  gnutls_x509_crt_t *x509_cert_list = NULL;
+  gnutls_x509_crl_t *x509_crl_list = NULL;
   unsigned int x509_ncerts, x509_ncrls = 0;
   gnutls_x509_trust_list_t list;
   unsigned int output;
@@ -2014,19 +2012,18 @@ _verify_x509_mem (const void *cert, int cert_size)
   tmp.data = (void*)cert;
   tmp.size = cert_size;
 
-  x509_ncrls = MAX_LIST;
-  ret = gnutls_x509_crl_list_import( x509_crl_list, &x509_ncrls, &tmp, 
-    GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+  ret = gnutls_x509_crl_list_import2( &x509_crl_list, &x509_ncrls, &tmp, 
+    GNUTLS_X509_FMT_PEM, 0);
   if (ret < 0)
     {
+      x509_crl_list = NULL;
       x509_ncrls = 0;
     }
 
   /* ignore errors. CRL might not be given */
 
-  x509_ncerts = MAX_LIST;
-  ret = gnutls_x509_crt_list_import( x509_cert_list, &x509_ncerts, &tmp, 
-    GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+  ret = gnutls_x509_crt_list_import2( &x509_cert_list, &x509_ncerts, &tmp, 
+    GNUTLS_X509_FMT_PEM, 0);
   if (ret < 0 || x509_ncerts < 1)
      error (EXIT_FAILURE, 0, "error parsing CRTs: %s", 
                  gnutls_strerror (ret));
@@ -2047,6 +2044,8 @@ _verify_x509_mem (const void *cert, int cert_size)
   if (ret < 0)
      error (EXIT_FAILURE, 0, "gnutls_x509_trust_add_crls: %s", 
                  gnutls_strerror (ret));
+
+  gnutls_free(x509_crl_list);
 
   ret = gnutls_x509_trust_list_verify_crt (list, x509_cert_list, x509_ncerts,
     GNUTLS_VERIFY_DO_NOT_ALLOW_SAME|GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT, &output,
@@ -2083,6 +2082,7 @@ _verify_x509_mem (const void *cert, int cert_size)
       }
   }
 
+  gnutls_free(x509_cert_list);
   gnutls_x509_trust_list_deinit(list, 1);
 
   if (ret < 0)

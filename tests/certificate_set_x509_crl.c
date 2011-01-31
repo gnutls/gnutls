@@ -94,7 +94,7 @@ main (void)
     }
 
   rc = gnutls_certificate_set_x509_crl (crt, &crl, 1);
-  if (rc)
+  if (rc < 0)
     {
       printf ("gnutls_certificate_set_x509_crl rc %d: %s\n",
               rc, gnutls_strerror (rc));

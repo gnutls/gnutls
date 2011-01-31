@@ -37,11 +37,16 @@ gnutls_pubkey_verify_data() respectively.
 ** libgnutls: gnutls_*_export_raw() functions now add leading zero in
 integers.
 
+** libgnutls: Added convenience functions gnutls_x509_crl_list_import2()
+and gnutls_x509_crt_list_import2().
+
 ** crypto.h: Fix use with C++.
 Reported by "Brendan Doherty" <brendand@gentrack.com>.
 
 ** API and ABI modifications:
 gnutls_x509_crl_list_import: ADDED
+gnutls_x509_crl_list_import2: ADDED
+gnutls_x509_crt_list_import2: ADDED
 gnutls_x509_trust_list_verify_crt: ADDED
 gnutls_x509_trust_list_add_crls: ADDED
 gnutls_x509_trust_list_add_cas: ADDED
@@ -63,6 +68,8 @@ gnutls_x509_privkey_verify_data: DEPRECATED (use: gnutls_pubkey_verify_data)
 gnutls_psk_netconf_derive_key: DEPRECATED
 gnutls_session_set_finished_function: DEPRECATED
 gnutls_ext_register: DEPRECATED
+gnutls_certificate_get_x509_crls: DEPRECATED
+gnutls_certificate_get_x509_cas: DEPRECATED
 gnutls_x509_crt_verify_hash: DEPRECATED (use: gnutls_pubkey_verify_hash)
 gnutls_x509_crt_verify_data: DEPRECATED (use: gnutls_pubkey_verify_data)
 gnutls_x509_crt_get_verify_algorithm: DEPRECATED (use: gnutls_pubkey_get_verify_algorithm)

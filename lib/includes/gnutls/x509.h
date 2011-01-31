@@ -105,6 +105,10 @@ extern "C"
   int gnutls_x509_crt_import (gnutls_x509_crt_t cert,
                               const gnutls_datum_t * data,
                               gnutls_x509_crt_fmt_t format);
+  int gnutls_x509_crt_list_import2 (gnutls_x509_crt_t ** certs,
+                             unsigned int * size,
+                             const gnutls_datum_t * data,
+                             gnutls_x509_crt_fmt_t format, unsigned int flags);
   int gnutls_x509_crt_list_import (gnutls_x509_crt_t * certs,
                                    unsigned int *cert_max,
                                    const gnutls_datum_t * data,
@@ -425,6 +429,11 @@ extern "C"
 
   int gnutls_x509_crl_check_issuer (gnutls_x509_crl_t crl,
                                     gnutls_x509_crt_t issuer);
+
+  int gnutls_x509_crl_list_import2 (gnutls_x509_crl_t ** crls,
+                             unsigned int * size,
+                             const gnutls_datum_t * data,
+                             gnutls_x509_crt_fmt_t format, unsigned int flags);
 
   int gnutls_x509_crl_list_import (gnutls_x509_crl_t * crls,
                                    unsigned int *crl_max,

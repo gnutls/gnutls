@@ -3078,6 +3078,63 @@ cleanup:
 }
 
 #endif
+/**
+ * gnutls_x509_crt_list_import2:
+ * @certs: The structures to store the parsed certificate. Must not be initialized.
+ * @size: It will contain the size of the list.
+ * @data: The PEM encoded certificate.
+ * @format: One of DER or PEM.
+ * @flags: must be zero or an OR'd sequence of gnutls_certificate_import_flags.
+ *
+ * This function will convert the given PEM encoded certificate list
+ * to the native gnutls_x509_crt_t format. The output will be stored
+ * in @certs.  They will be automatically initialized.
+ *
+ * If the Certificate is PEM encoded it should have a header of "X509
+ * CERTIFICATE", or "CERTIFICATE".
+ *
+ * Returns: the number of certificates read or a negative error value.
+ **/
+int
+gnutls_x509_crt_list_import2 (gnutls_x509_crt_t ** certs,
+                             unsigned int * size,
+                             const gnutls_datum_t * data,
+                             gnutls_x509_crt_fmt_t format, unsigned int flags)
+{
+unsigned int init = 1024;
+int ret;
+
+  *certs = gnutls_malloc(sizeof(gnutls_x509_crt_t*)*init);
+  if (*certs == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  ret = gnutls_x509_crt_list_import(*certs, &init, data, format, GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+  if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
+    {
+      *certs = gnutls_realloc_fast(*certs, sizeof(gnutls_x509_crt_t*)*init);
+      if (*certs == NULL)
+        {
+          gnutls_assert();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
+      
+      ret = gnutls_x509_crt_list_import(*certs, &init, data, format, flags);
+    }
+
+  if (ret < 0)
+    {
+      gnutls_free(*certs);
+      *certs = NULL;
+      return ret;
+    }
+
+  *size = init;
+  return 0;
+}
+
 
 /**
  * gnutls_x509_crt_list_import:
