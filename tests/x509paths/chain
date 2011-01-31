@@ -30,25 +30,25 @@ test -d X509tests || tar xfz x509tests.tgz
 
 i=1
 while test -d X509tests/test$i; do
-    find X509tests/test$i -name *.crl -print0 |sort -r -z|xargs -n1 --null $CERTTOOL --crl-info --inder --infile > chain$i.pem
-    find X509tests/test$i -name E*.crt -print0 |sort -r -z|xargs -n1 --null $CERTTOOL --certificate-info --inder --infile >> chain$i.pem
+    find X509tests/test$i -name *.crl -print0 |sort -r -z|xargs -n1 --null $CERTTOOL --crl-info --inder --infile > chain$i.pem  2>/dev/null
+    find X509tests/test$i -name E*.crt -print0 |sort -r -z|xargs -n1 --null $CERTTOOL --certificate-info --inder --infile >> chain$i.pem 2>/dev/null
     if test "$i" -gt 1; then
-	find X509tests/test$i -name I*.crt -print0 |sort -r -z|xargs -n1 --null $CERTTOOL --certificate-info --inder --infile >> chain$i.pem
+	find X509tests/test$i -name I*.crt -print0 |sort -r -z|xargs -n1 --null $CERTTOOL --certificate-info --inder --infile >> chain$i.pem 2>/dev/null
     fi
-    find X509tests/test$i -name T*.crt -print0 |sort -r -z|xargs -n1 --null $CERTTOOL --certificate-info --inder --infile >> chain$i.pem
+    find X509tests/test$i -name T*.crt -print0 |sort -r -z|xargs -n1 --null $CERTTOOL --certificate-info --inder --infile >> chain$i.pem 2>/dev/null
     $CERTTOOL -e --infile chain$i.pem > out 2>&1
     rc=$?
     if test $rc != 0; then
 	echo "Chain $i FATAL failure."
     else
-	if echo "$SUCCESS" | grep " $i " > /dev/null; then
-	    if grep 'Verification output:' out | grep -v 'Verification output: Verified\.$' > /dev/null; then
+	if echo "$SUCCESS" | grep " $i " > /dev/null 2>&1; then
+	    if grep 'Chain verification output:' out | grep -v 'Chain verification output: Verified\.$' > /dev/null 2>&1; then
 		echo "Chain $i verification failure UNEXPECTED."
 	    else
 		echo "Chain $i verification success as expected."
 	    fi
-	elif echo "$FAILURE" | grep " $i "; then
-	    if grep 'Verification output:' out | grep -v 'Verification output: Verified\.$' > /dev/null; then
+	elif echo "$FAILURE" | grep " $i " >/dev/null 2>&1; then
+	    if grep 'Chain verification output:' out | grep -v 'Chain verification output: Verified\.$' > /dev/null 2>&1; then
 		echo "Chain $i verification failure as expected."
 	    else
 		echo "Chain $i verification success UNEXPECTED. "
