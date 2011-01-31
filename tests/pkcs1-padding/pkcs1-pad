@@ -33,7 +33,7 @@ fi
 
 # Test 1, PKCS#1 pad digestAlgorithm.parameters
 
-EXPECT1=3102
+EXPECT1=2002
 
 datefudge "2006-09-23" $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-ok.pem | tee out1 >/dev/null 2>&1
 datefudge "2006-09-23" $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken.pem | tee out2 >/dev/null 2>&1
@@ -81,7 +81,7 @@ echo "PKCS1-PAD2 OK"
 # by Andrei Pyshkin, Erik Tews and Ralf-Philipp Weinmann.
 
 
-EXPECT3=12
+EXPECT3=02
 
 datefudge "2006-09-23" $CERTTOOL --verify-chain --infile $srcdir/pkcs1-pad-broken3.pem | tee out1 >/dev/null 2>&1
 
