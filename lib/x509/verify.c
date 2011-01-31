@@ -359,7 +359,6 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
       out = GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID;
       if (output)
         *output |= out;
-
       result = 0;
       goto cleanup;
     }
@@ -373,7 +372,6 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
       if (output)
         *output |= out;
       gnutls_assert ();
-
       result = 0;
       goto cleanup;
     }
@@ -578,10 +576,12 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
                   status |= check_time (trusted_cas[j], now);
                   if (status != 0)
                     {
-                      if (func) func(trusted_cas[j], NULL, NULL, status);
+                      if (func) func(certificate_list[i], trusted_cas[j], NULL, status);
                       return status;
                     }
                 }
+
+              if (func) func(certificate_list[i], trusted_cas[j], NULL, status);
               clist_size = i;
               break;
             }
@@ -590,9 +590,11 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
     }
 
   if (clist_size == 0)
-    /* The certificate is already present in the trusted certificate list.
-     * Nothing to verify. */
-    return status;
+    {
+      /* The certificate is already present in the trusted certificate list.
+       * Nothing to verify. */
+      return status;
+    }
 
   /* Verify the last certificate in the certificate path
    * against the trusted CA certificate list.
@@ -631,7 +633,7 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
           status |= check_time (issuer, now);
           if (status != 0)
             {
-              if (func) func(issuer, NULL, NULL, status);
+              if (func) func(certificate_list[clist_size - 1], issuer, NULL, status);
               return status;
             }
         }
