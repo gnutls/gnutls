@@ -21,17 +21,12 @@ int crl_list_size;
 gnutls_x509_crt_t *ca_list;
 int ca_list_size;
 
-static void verify_cert2 (gnutls_x509_crt_t crt,
-                          gnutls_x509_crt_t issuer,
-                          gnutls_x509_crl_t * crl_list, int crl_list_size);
-static void verify_last_cert (gnutls_x509_crt_t crt,
-                              gnutls_x509_crt_t * ca_list, int ca_list_size,
-                              gnutls_x509_crl_t * crl_list,
-                              int crl_list_size);
-
+static int print_details_func(gnutls_x509_crt_t cert,
+    gnutls_x509_crt_t issuer, gnutls_x509_crl_t crl, 
+    unsigned int verification_output);
 
 /* This function will try to verify the peer's certificate chain, and
- * also check if the hostname matches, and the activation, expiration dates.
+ * also check if the hostname matches.
  */
 void
 verify_certificate_chain (gnutls_session_t session,
@@ -40,7 +35,20 @@ verify_certificate_chain (gnutls_session_t session,
                           int cert_chain_length)
 {
   int i;
+  gnutls_x509_trust_list_t tlist;
   gnutls_x509_crt_t *cert;
+  
+  unsigned int output;
+
+  /* Initialize the trusted certificate list. This should be done
+   * once on initialization. gnutls_x509_crt_list_import() and
+   * gnutls_x509_crl_list_import() can be used to load them.
+   */
+  gnutls_x509_trust_list_init(&tlist);
+
+  gnutls_x509_trust_list_add_cas(tlist, ca_list, ca_list_size, 0);
+  gnutls_x509_trust_list_add_crls(tlist, crl_list, crl_list_size, 
+    GNUTLS_TL_VERIFY_CRL, 0);
 
   cert = malloc (sizeof (*cert) * cert_chain_length);
 
@@ -53,82 +61,8 @@ verify_certificate_chain (gnutls_session_t session,
       gnutls_x509_crt_import (cert[i], &cert_chain[i], GNUTLS_X509_FMT_DER);
     }
 
-  /* If the last certificate in the chain is self signed ignore it.
-   * That is because we want to check against our trusted certificate
-   * list.
-   */
-  if (gnutls_x509_crt_check_issuer (cert[cert_chain_length - 1],
-                                    cert[cert_chain_length - 1]) > 0
-      && cert_chain_length > 0)
-    {
-      cert_chain_length--;
-    }
-
-  /* Now verify the certificates against their issuers
-   * in the chain.
-   */
-  for (i = 1; i < cert_chain_length; i++)
-    {
-      verify_cert2 (cert[i - 1], cert[i], crl_list, crl_list_size);
-    }
-
-  /* Here we must verify the last certificate in the chain against
-   * our trusted CA list.
-   */
-  verify_last_cert (cert[cert_chain_length - 1],
-                    ca_list, ca_list_size, crl_list, crl_list_size);
-
-  /* Check if the name in the first certificate matches our destination!
-   */
-  if (!gnutls_x509_crt_check_hostname (cert[0], hostname))
-    {
-      printf ("The certificate's owner does not match hostname '%s'\n",
-              hostname);
-    }
-
-  for (i = 0; i < cert_chain_length; i++)
-    gnutls_x509_crt_deinit (cert[i]);
-
-  return;
-}
-
-
-/* Verifies a certificate against an other certificate
- * which is supposed to be it's issuer. Also checks the
- * crl_list if the certificate is revoked.
- */
-static void
-verify_cert2 (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
-              gnutls_x509_crl_t * crl_list, int crl_list_size)
-{
-  unsigned int output;
-  int ret;
-  size_t name_size;
-  char name[64];
-
-  /* Print information about the certificates to
-   * be checked.
-   */
-  name_size = sizeof (name);
-  gnutls_x509_crt_get_dn (crt, name, &name_size);
-
-  fprintf (stderr, "\nCertificate: %s\n", name);
-
-  name_size = sizeof (name);
-  gnutls_x509_crt_get_issuer_dn (crt, name, &name_size);
-
-  fprintf (stderr, "Issued by: %s\n", name);
-
-  /* Get the DN of the issuer cert.
-   */
-  name_size = sizeof (name);
-  gnutls_x509_crt_get_dn (issuer, name, &name_size);
-
-  fprintf (stderr, "Checking against: %s\n", name);
-
-  /* Do the actual verification.
-   */
-  gnutls_x509_crt_verify (crt, &issuer, 1, 0, &output);
+  gnutls_x509_trust_list_verify_crt(tlist, cert, cert_chain_length, 0, 
+    &output, print_details_func);
 
   if (output & GNUTLS_CERT_INVALID)
     {
@@ -148,68 +82,54 @@ verify_cert2 (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
   else
     fprintf (stderr, "Trusted\n");
 
-  /* Check if the certificate is revoked.
+  /* Check if the name in the first certificate matches our destination!
    */
-  ret = gnutls_x509_crt_check_revocation (crt, crl_list, crl_list_size);
-  if (ret == 1)
-    {                           /* revoked */
-      fprintf (stderr, "Revoked\n");
+  if (!gnutls_x509_crt_check_hostname (cert[0], hostname))
+    {
+      printf ("The certificate's owner does not match hostname '%s'\n",
+              hostname);
     }
+
+  gnutls_x509_trust_list_deinit(tlist, 1);
+
+  return;
 }
 
-
-/* Verifies a certificate against our trusted CA list.
- * Also checks the crl_list if the certificate is revoked.
- */
-static void
-verify_last_cert (gnutls_x509_crt_t crt,
-                  gnutls_x509_crt_t * ca_list, int ca_list_size,
-                  gnutls_x509_crl_t * crl_list, int crl_list_size)
+static int print_details_func(gnutls_x509_crt_t cert,
+    gnutls_x509_crt_t issuer, gnutls_x509_crl_t crl, 
+    unsigned int verification_output)
 {
-  unsigned int output;
-  int ret;
+  char name[512];
+  char issuer_name[512];
   size_t name_size;
-  char name[64];
+  size_t issuer_name_size;
 
-  /* Print information about the certificates to
-   * be checked.
-   */
-  name_size = sizeof (name);
-  gnutls_x509_crt_get_dn (crt, name, &name_size);
-
-  fprintf (stderr, "\nCertificate: %s\n", name);
+  issuer_name_size = sizeof (issuer_name);
+  gnutls_x509_crt_get_issuer_dn (cert, issuer_name, &issuer_name_size);
 
   name_size = sizeof (name);
-  gnutls_x509_crt_get_issuer_dn (crt, name, &name_size);
+  gnutls_x509_crt_get_dn (cert, name, &name_size);
 
-  fprintf (stderr, "Issued by: %s\n", name);
+  fprintf (stdout, "\tSubject: %s\n", name);
+  fprintf (stdout, "\tIssuer: %s\n", issuer_name);
 
-  /* Do the actual verification.
-   */
-  gnutls_x509_crt_verify (crt, ca_list, ca_list_size,
-                          GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT, &output);
-
-  if (output & GNUTLS_CERT_INVALID)
+  if (issuer != NULL)
     {
-      fprintf (stderr, "Not trusted");
+      issuer_name_size = sizeof (issuer_name);
+      gnutls_x509_crt_get_dn (issuer, issuer_name, &issuer_name_size);
 
-      if (output & GNUTLS_CERT_SIGNER_NOT_CA)
-        fprintf (stderr, ": Issuer is not a CA\n");
-      if (output & GNUTLS_CERT_NOT_ACTIVATED)
-        fprintf (stderr, ": Not yet activated\n");
-      if (output & GNUTLS_CERT_EXPIRED)
-        fprintf (stderr, ": Expired\n");
-      fprintf (stderr, "\n");
+      fprintf (stdout, "\tVerified against: %s\n", issuer_name);
     }
-  else
-    fprintf (stderr, "Trusted\n");
 
+  if (crl != NULL)
+    {
+      issuer_name_size = sizeof (issuer_name);
+      gnutls_x509_crl_get_issuer_dn (crl, issuer_name, &issuer_name_size);
 
-  /* Check if the certificate is revoked.
-   */
-  ret = gnutls_x509_crt_check_revocation (crt, crl_list, crl_list_size);
-  if (ret == 1)
-    {                           /* revoked */
-      fprintf (stderr, "Revoked\n");
+      fprintf (stdout, "\tVerified against CRL of: %s\n", issuer_name);
     }
+
+  fprintf (stdout, "\tVerification output: %x\n\n", verification_output);
+
+  return 0;
 }

@@ -426,6 +426,11 @@ extern "C"
   int gnutls_x509_crl_check_issuer (gnutls_x509_crl_t crl,
                                     gnutls_x509_crt_t issuer);
 
+  int gnutls_x509_crl_list_import (gnutls_x509_crl_t * crls,
+                                   unsigned int *crl_max,
+                                   const gnutls_datum_t * data,
+                                   gnutls_x509_crt_fmt_t format,
+                                   unsigned int flags);
 /* CRL writing.
  */
   int gnutls_x509_crl_set_version (gnutls_x509_crl_t crl,
@@ -813,6 +818,44 @@ extern "C"
                                             const char *oid, int indx,
                                             void *buf, size_t * sizeof_buf,
                                             unsigned int *critical);
+
+  typedef struct gnutls_x509_trust_list_st *gnutls_x509_trust_list_t;
+
+  int
+  gnutls_x509_trust_list_init (gnutls_x509_trust_list_t * list);
+
+  void
+  gnutls_x509_trust_list_deinit (gnutls_x509_trust_list_t list, unsigned int all);
+
+  int
+  gnutls_x509_trust_list_add_cas (gnutls_x509_trust_list_t list, 
+    const gnutls_x509_crt_t * clist, int clist_size, unsigned int flags);
+
+#define GNUTLS_TL_VERIFY_CRL 1
+  int
+  gnutls_x509_trust_list_add_crls (gnutls_x509_trust_list_t list, 
+    const gnutls_x509_crl_t * crl_list, int crl_size, unsigned int flags,
+    unsigned int verification_flags);
+
+  typedef int gnutls_verify_output_function (
+    gnutls_x509_crt_t cert,
+    gnutls_x509_crt_t issuer, /* The issuer if verification failed 
+     * because of him. might be null.
+     */
+    gnutls_x509_crl_t crl, /* The CRL that caused verification failure 
+     * if any. Might be null. 
+     */
+    unsigned int verification_output);
+
+  int
+  gnutls_x509_trust_list_verify_crt (
+    gnutls_x509_trust_list_t list,
+    gnutls_x509_crt_t *cert_list,
+    unsigned int cert_list_size,
+    unsigned int flags,
+    unsigned int *verify,
+    gnutls_verify_output_function func);
+
 
 #ifdef __cplusplus
 }

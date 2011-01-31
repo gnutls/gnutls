@@ -39,12 +39,6 @@
 #include "x509_int.h"
 #include <common.h>
 
-static int _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
-                                        const gnutls_x509_crt_t * trusted_cas,
-                                        int tcas_size, unsigned int flags,
-                                        unsigned int *output,
-                                        gnutls_x509_crt_t * issuer);
-
 static int is_crl_issuer (gnutls_x509_crl_t crl,
                           gnutls_x509_crt_t issuer_cert);
 
@@ -255,12 +249,49 @@ cleanup:
 
 }
 
+/* Checks if the DN of two certificates is the same.
+ * Returns 1 if they match and zero if they don't match. Otherwise
+ * a negative value is returned to indicate error.
+ */
+int
+_gnutls_is_same_dn (gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2)
+{
+  gnutls_datum_t dn1 = { NULL, 0 }, dn2 =
+  {
+  NULL, 0};
+  int ret;
 
+  ret = gnutls_x509_crt_get_raw_dn (cert1, &dn1);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  ret = gnutls_x509_crt_get_raw_dn (cert2, &dn2);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  ret = _gnutls_x509_compare_raw_dn (&dn1, &dn2);
+
+cleanup:
+  _gnutls_free_datum (&dn1);
+  _gnutls_free_datum (&dn2);
+  return ret;
+}
+
+/* Finds an issuer of the certificate. If multiple issuers
+ * are present, returns one that is activated and not expired.
+ */
 static inline gnutls_x509_crt_t
 find_issuer (gnutls_x509_crt_t cert,
              const gnutls_x509_crt_t * trusted_cas, int tcas_size)
 {
-  int i;
+int i;
+gnutls_x509_crt_t issuer = NULL;
 
   /* this is serial search. 
    */
@@ -268,11 +299,25 @@ find_issuer (gnutls_x509_crt_t cert,
   for (i = 0; i < tcas_size; i++)
     {
       if (is_issuer (cert, trusted_cas[i]) == 1)
-        return trusted_cas[i];
+        {
+          if (issuer == NULL) 
+            {
+              issuer = trusted_cas[i];
+            }
+          else
+            {
+              time_t now = time(0);
+
+              if (now < gnutls_x509_crt_get_expiration_time(trusted_cas[i]) && 
+                now >= gnutls_x509_crt_get_activation_time(trusted_cas[i]))
+                {
+                  issuer = trusted_cas[i];
+                }
+            }
+        }
     }
 
-  gnutls_assert ();
-  return NULL;
+  return issuer;
 }
 
 
@@ -294,12 +339,14 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
                              const gnutls_x509_crt_t * trusted_cas,
                              int tcas_size, unsigned int flags,
                              unsigned int *output,
-                             gnutls_x509_crt_t * _issuer)
+                             gnutls_x509_crt_t * _issuer,
+                             gnutls_verify_output_function func)
 {
   gnutls_datum_t cert_signed_data = { NULL, 0 };
   gnutls_datum_t cert_signature = { NULL, 0 };
   gnutls_x509_crt_t issuer = NULL;
   int issuer_version, result;
+  unsigned int out = 0;
 
   if (output)
     *output = 0;
@@ -309,9 +356,12 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   else
     {
       gnutls_assert ();
+      out = GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID;
       if (output)
-        *output |= GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID;
-      return 0;
+        *output |= out;
+
+      result = 0;
+      goto cleanup;
     }
 
   /* issuer is not in trusted certificate
@@ -319,10 +369,13 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
    */
   if (issuer == NULL)
     {
+      out = GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID;
       if (output)
-        *output |= GNUTLS_CERT_SIGNER_NOT_FOUND | GNUTLS_CERT_INVALID;
+        *output |= out;
       gnutls_assert ();
-      return 0;
+
+      result = 0;
+      goto cleanup;
     }
 
   if (_issuer != NULL)
@@ -342,9 +395,11 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
       if (check_if_ca (cert, issuer, flags) == 0)
         {
           gnutls_assert ();
+          out = GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID;
           if (output)
-            *output |= GNUTLS_CERT_SIGNER_NOT_CA | GNUTLS_CERT_INVALID;
-          return 0;
+            *output |= out;
+          result = 0;
+          goto cleanup;
         }
     }
 
@@ -371,9 +426,10 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   if (result == GNUTLS_E_PK_SIG_VERIFY_FAILED)
     {
       gnutls_assert ();
+      out |= GNUTLS_CERT_INVALID;
       /* error. ignore it */
       if (output)
-        *output |= GNUTLS_CERT_INVALID;
+        *output |= out;
       result = 0;
     }
   else if (result < 0)
@@ -397,13 +453,16 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
           ((sigalg == GNUTLS_SIGN_RSA_MD5) &&
            !(flags & GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5)))
         {
+          out = GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID;
           if (output)
-            *output |= GNUTLS_CERT_INSECURE_ALGORITHM | GNUTLS_CERT_INVALID;
+            *output |= out;
           result = 0;
         }
     }
 
 cleanup:
+  if (result >= 0 && func) func(cert, issuer, NULL, out);
+
   _gnutls_free_datum (&cert_signed_data);
   _gnutls_free_datum (&cert_signature);
 
@@ -461,13 +520,13 @@ check_time (gnutls_x509_crt_t crt, time_t now)
  * This function verifies a X.509 certificate list. The certificate
  * list should lead to a trusted certificate in order to be trusted.
  */
-static unsigned int
+unsigned int
 _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
                                  int clist_size,
                                  const gnutls_x509_crt_t * trusted_cas,
                                  int tcas_size,
-                                 const gnutls_x509_crl_t * CRLs,
-                                 int crls_size, unsigned int flags)
+                                 unsigned int flags, 
+                                 gnutls_verify_output_function func)
 {
   int i = 0, ret;
   unsigned int status = 0, output;
@@ -519,6 +578,7 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
                   status |= check_time (trusted_cas[j], now);
                   if (status != 0)
                     {
+                      if (func) func(trusted_cas[j], NULL, NULL, status);
                       return status;
                     }
                 }
@@ -542,7 +602,7 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
    */
   ret = _gnutls_verify_certificate2 (certificate_list[clist_size - 1],
                                      trusted_cas, tcas_size, flags, &output,
-                                     &issuer);
+                                     &issuer, func);
   if (ret == 0)
     {
       /* if the last certificate in the certificate
@@ -554,23 +614,6 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
       status |= GNUTLS_CERT_INVALID;
       return status;
     }
-
-  /* Check for revoked certificates in the chain
-   */
-#ifdef ENABLE_PKI
-  for (i = 0; i < clist_size; i++)
-    {
-      ret = gnutls_x509_crt_check_revocation (certificate_list[i],
-                                              CRLs, crls_size);
-      if (ret == 1)
-        {                       /* revoked */
-          status |= GNUTLS_CERT_REVOKED;
-          status |= GNUTLS_CERT_INVALID;
-          return status;
-        }
-    }
-#endif
-
 
   /* Check activation/expiration times
    */
@@ -588,6 +631,7 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
           status |= check_time (issuer, now);
           if (status != 0)
             {
+              if (func) func(issuer, NULL, NULL, status);
               return status;
             }
         }
@@ -597,6 +641,7 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
           status |= check_time (certificate_list[i], now);
           if (status != 0)
             {
+              if (func) func(certificate_list[i], NULL, NULL, status);
               return status;
             }
         }
@@ -617,7 +662,7 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
       if ((ret =
            _gnutls_verify_certificate2 (certificate_list[i - 1],
                                         &certificate_list[i], 1, flags,
-                                        NULL, NULL)) == 0)
+                                        NULL, NULL, func)) == 0)
         {
           status |= GNUTLS_CERT_INVALID;
           return status;
@@ -1074,6 +1119,8 @@ gnutls_x509_crt_list_verify (const gnutls_x509_crt_t * cert_list,
                              int CRL_list_length, unsigned int flags,
                              unsigned int *verify)
 {
+int i, ret;
+
   if (cert_list == NULL || cert_list_length == 0)
     return GNUTLS_E_NO_CERTIFICATE_FOUND;
 
@@ -1081,8 +1128,23 @@ gnutls_x509_crt_list_verify (const gnutls_x509_crt_t * cert_list,
    */
   *verify =
     _gnutls_x509_verify_certificate (cert_list, cert_list_length,
-                                     CA_list, CA_list_length, CRL_list,
-                                     CRL_list_length, flags);
+                                     CA_list, CA_list_length, 
+                                     flags, NULL);
+
+  /* Check for revoked certificates in the chain. 
+   */
+#ifdef ENABLE_PKI
+  for (i = 0; i < cert_list_length; i++)
+    {
+      ret = gnutls_x509_crt_check_revocation (cert_list[i],
+                                              CRL_list, CRL_list_length);
+      if (ret == 1)
+        {                       /* revoked */
+          *verify |= GNUTLS_CERT_REVOKED;
+          *verify |= GNUTLS_CERT_INVALID;
+        }
+    }
+#endif
 
   return 0;
 }
@@ -1111,7 +1173,8 @@ gnutls_x509_crt_verify (gnutls_x509_crt_t cert,
    */
   *verify =
     _gnutls_x509_verify_certificate (&cert, 1,
-                                     CA_list, CA_list_length, NULL, 0, flags);
+                                     CA_list, CA_list_length, 
+                                     flags, NULL);
   return 0;
 }
 

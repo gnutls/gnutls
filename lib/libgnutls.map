@@ -695,6 +695,12 @@ GNUTLS_2_12
 	gnutls_openpgp_crt_verify_hash;
 	gnutls_pubkey_import_privkey;
 	gnutls_pubkey_verify_data;
+	gnutls_x509_trust_list_verify_crt;
+	gnutls_x509_trust_list_add_crls;
+	gnutls_x509_trust_list_add_cas;
+	gnutls_x509_trust_list_init;
+	gnutls_x509_trust_list_deinit;
+	gnutls_x509_crl_list_import;
 } GNUTLS_2_10;
 
 GNUTLS_PRIVATE {

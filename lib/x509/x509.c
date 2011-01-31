@@ -2377,25 +2377,17 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
 
 #ifdef ENABLE_PKI
 
-/**
- * gnutls_x509_crt_check_revocation:
- * @cert: should contain a #gnutls_x509_crt_t structure
- * @crl_list: should contain a list of gnutls_x509_crl_t structures
- * @crl_list_length: the length of the crl_list
- *
- * This function will return check if the given certificate is
- * revoked.  It is assumed that the CRLs have been verified before.
- *
- * Returns: 0 if the certificate is NOT revoked, and 1 if it is.  A
- * negative value is returned on error.
- **/
+/* This is exactly as gnutls_x509_crt_check_revocation() except that
+ * it calls func.
+ */
 int
-gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
+_gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
                                   const gnutls_x509_crl_t * crl_list,
-                                  int crl_list_length)
+                                  int crl_list_length,
+                                  gnutls_verify_output_function func)
 {
-  opaque serial[64];
-  opaque cert_serial[64];
+  opaque serial[128];
+  opaque cert_serial[128];
   size_t serial_size, cert_serial_size;
   int ncerts, ret, i, j;
   gnutls_datum_t dn1, dn2;
@@ -2475,13 +2467,36 @@ gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
               if (memcmp (serial, cert_serial, serial_size) == 0)
                 {
                   /* serials match */
+                  if (func) func(cert, NULL, crl_list[j], GNUTLS_CERT_REVOKED|GNUTLS_CERT_INVALID);
                   return 1;     /* revoked! */
                 }
             }
         }
+      if (func) func(cert, NULL, crl_list[j], 0);
 
     }
   return 0;                     /* not revoked. */
+}
+
+
+/**
+ * gnutls_x509_crt_check_revocation:
+ * @cert: should contain a #gnutls_x509_crt_t structure
+ * @crl_list: should contain a list of gnutls_x509_crl_t structures
+ * @crl_list_length: the length of the crl_list
+ *
+ * This function will return check if the given certificate is
+ * revoked.  It is assumed that the CRLs have been verified before.
+ *
+ * Returns: 0 if the certificate is NOT revoked, and 1 if it is.  A
+ * negative value is returned on error.
+ **/
+int
+gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
+                                  const gnutls_x509_crl_t * crl_list,
+                                  int crl_list_length)
+{
+  return _gnutls_x509_crt_check_revocation(cert, crl_list, crl_list_length, NULL);
 }
 
 /**

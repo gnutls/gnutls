@@ -1923,205 +1923,140 @@ generate_request (common_info_st * cinfo)
 
 }
 
-static void print_verification_res (gnutls_x509_crt_t crt,
-                                    gnutls_x509_crt_t issuer,
-                                    gnutls_x509_crl_t * crl_list,
-                                    int crl_list_size, unsigned int flags);
+static void print_verification_res (FILE* outfile, unsigned int output);
 
-#define CERT_SEP "-----BEGIN CERT"
-#define CRL_SEP "-----BEGIN X509 CRL"
-static int
-_verify_x509_mem (const void *cert, int cert_size)
+#define MAX_LIST 512
+
+static int detailed_verification(gnutls_x509_crt_t cert,
+    gnutls_x509_crt_t issuer, gnutls_x509_crl_t crl, 
+    unsigned int verification_output)
 {
-  const char *ptr;
-  int ret, i;
   char name[512];
+  char tmp[255];
   char issuer_name[512];
   size_t name_size;
   size_t issuer_name_size;
-  gnutls_datum_t tmp;
-  gnutls_x509_crt_t *x509_cert_list = NULL;
-  gnutls_x509_crl_t *x509_crl_list = NULL;
-  int x509_ncerts, x509_ncrls;
+  int ret;
 
 
-  /* Decode the CA certificate
-   */
-
-  /* Decode the CRL list
-   */
-  ptr = cert;
-
-  i = 1;
-
-  if (strstr (ptr, CRL_SEP) != NULL)    /* if CRLs exist */
-    do
-      {
-        x509_crl_list =
-          (gnutls_x509_crl_t *) realloc (x509_crl_list,
-                                         i * sizeof (gnutls_x509_crl_t));
-        if (x509_crl_list == NULL)
-          error (EXIT_FAILURE, 0, "memory error");
-
-        tmp.data = (char *) ptr;
-        tmp.size = cert_size;
-        tmp.size -=
-          (unsigned int) ((unsigned char *) ptr - (unsigned char *) cert);
-
-        ret = gnutls_x509_crl_init (&x509_crl_list[i - 1]);
-        if (ret < 0)
-          error (EXIT_FAILURE, 0, "error parsing CRL[%d]: %s", i,
-                 gnutls_strerror (ret));
-
-        ret = gnutls_x509_crl_import (x509_crl_list[i - 1], &tmp,
-                                      GNUTLS_X509_FMT_PEM);
-        if (ret < 0)
-          error (EXIT_FAILURE, 0, "error parsing CRL[%d]: %s", i,
-                 gnutls_strerror (ret));
-
-        /* now we move ptr after the pem header */
-        ptr = strstr (ptr, CRL_SEP);
-        if (ptr != NULL)
-          ptr++;
-
-        i++;
-      }
-    while ((ptr = strstr (ptr, CRL_SEP)) != NULL);
-
-  x509_ncrls = i - 1;
-
-
-  /* Decode the certificate chain. 
-   */
-  ptr = cert;
-
-  i = 1;
-
-  do
-    {
-      x509_cert_list =
-        (gnutls_x509_crt_t *) realloc (x509_cert_list,
-                                       i * sizeof (gnutls_x509_crt_t));
-      if (x509_cert_list == NULL)
-        error (EXIT_FAILURE, 0, "memory error");
-
-
-      tmp.data = (char *) ptr;
-      tmp.size = cert_size;
-      tmp.size -=
-        (unsigned int) ((unsigned char *) ptr - (unsigned char *) cert);
-
-      ret = gnutls_x509_crt_init (&x509_cert_list[i - 1]);
-      if (ret < 0)
-        error (EXIT_FAILURE, 0, "error parsing certificate[%d]: %s", i,
-               gnutls_strerror (ret));
-
-      ret =
-        gnutls_x509_crt_import (x509_cert_list[i - 1], &tmp,
-                                GNUTLS_X509_FMT_PEM);
-      if (ret < 0)
-        error (EXIT_FAILURE, 0, "error parsing certificate[%d]: %s", i,
-               gnutls_strerror (ret));
-
-
-      if (i - 1 != 0)
-        {
-          /* verify the previous certificate using this one 
-           * as CA.
-           */
-
-          name_size = sizeof (name);
-          ret =
-            gnutls_x509_crt_get_dn (x509_cert_list[i - 2], name, &name_size);
-          if (ret < 0)
-            error (EXIT_FAILURE, 0, "get_dn: %s", gnutls_strerror (ret));
-
-          fprintf (outfile, "Certificate[%d]: %s\n", i - 2, name);
-
-          /* print issuer 
-           */
-          issuer_name_size = sizeof (issuer_name);
-          ret =
-            gnutls_x509_crt_get_issuer_dn (x509_cert_list[i - 2],
-                                           issuer_name, &issuer_name_size);
-          if (ret < 0)
-            error (EXIT_FAILURE, 0, "get_issuer_dn: %s",
-                   gnutls_strerror (ret));
-
-          fprintf (outfile, "\tIssued by: %s\n", issuer_name);
-
-          /* Get the Issuer's name
-           */
-          name_size = sizeof (name);
-          ret =
-            gnutls_x509_crt_get_dn (x509_cert_list[i - 1], name, &name_size);
-          if (ret < 0)
-            error (EXIT_FAILURE, 0, "get_dn: %s", gnutls_strerror (ret));
-
-          fprintf (outfile, "\tVerifying against certificate[%d].\n", i - 1);
-
-          if (strcmp (issuer_name, name) != 0)
-            {
-              fprintf (stderr, "Error: Issuer's name: %s\n", name);
-              error (EXIT_FAILURE, 0,
-                     "issuer name does not match the next certificate");
-            }
-
-          fprintf (outfile, "\tVerification output: ");
-          print_verification_res (x509_cert_list[i - 2],
-                                  x509_cert_list[i - 1], x509_crl_list,
-                                  x509_ncrls,
-                                  GNUTLS_VERIFY_DO_NOT_ALLOW_SAME);
-          fprintf (outfile, ".\n\n");
-
-        }
-
-
-      /* now we move ptr after the pem header 
-       */
-      ptr = strstr (ptr, CERT_SEP);
-      if (ptr != NULL)
-        ptr++;
-
-      i++;
-    }
-  while ((ptr = strstr (ptr, CERT_SEP)) != NULL);
-
-  x509_ncerts = i - 1;
-
-  /* The last certificate in the list will be used as
-   * a CA (should be self signed).
-   */
-  name_size = sizeof (name);
-  ret = gnutls_x509_crt_get_dn (x509_cert_list[x509_ncerts - 1], name,
-                                &name_size);
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "get_dn: %s", gnutls_strerror (ret));
-
-  fprintf (outfile, "Certificate[%d]: %s\n", x509_ncerts - 1, name);
-
-  /* print issuer 
-   */
   issuer_name_size = sizeof (issuer_name);
   ret =
-    gnutls_x509_crt_get_issuer_dn (x509_cert_list[x509_ncerts - 1],
-                                   issuer_name, &issuer_name_size);
+    gnutls_x509_crt_get_issuer_dn (cert, issuer_name, &issuer_name_size);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "get_issuer_dn: %s", gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "gnutls_x509_crt_get_issuer_dn: %s", gnutls_strerror (ret));
 
-  fprintf (outfile, "\tIssued by: %s\n", name);
+  name_size = sizeof (name);
+  ret =
+    gnutls_x509_crt_get_dn (cert, name, &name_size);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "gnutls_x509_crt_get_dn: %s", gnutls_strerror (ret));
 
-  if (strcmp (issuer_name, name) != 0)
-    error (EXIT_FAILURE, 0, "the last certificate is not self signed");
+  fprintf (outfile, "\tSubject: %s\n", name);
+  fprintf (outfile, "\tIssuer: %s\n", issuer_name);
 
-  fprintf (outfile, "\tVerification output: ");
-  print_verification_res (x509_cert_list[x509_ncerts - 1],
-                          x509_cert_list[x509_ncerts - 1], x509_crl_list,
-                          /* we add GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT since it is
-                           * self signed. */
-                          x509_ncrls,
-                          GNUTLS_VERIFY_DO_NOT_ALLOW_SAME |
-                          GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
+  if (issuer != NULL)
+    {
+      issuer_name_size = sizeof (issuer_name);
+      ret =
+        gnutls_x509_crt_get_dn (issuer, issuer_name, &issuer_name_size);
+      if (ret < 0)
+        error (EXIT_FAILURE, 0, "gnutls_x509_crt_get_issuer_dn: %s", gnutls_strerror (ret));
+
+      fprintf (outfile, "\tVerified against: %s\n", issuer_name);
+    }
+
+  if (crl != NULL)
+    {
+      gnutls_datum data;
+
+      issuer_name_size = sizeof (issuer_name);
+      ret =
+        gnutls_x509_crl_get_issuer_dn (crl, issuer_name, &issuer_name_size);
+      if (ret < 0)
+        error (EXIT_FAILURE, 0, "gnutls_x509_crl_get_issuer_dn: %s", gnutls_strerror (ret));
+
+      name_size = sizeof(tmp);
+      ret = gnutls_x509_crl_get_number(crl, tmp, &name_size, NULL);
+      if (ret < 0)
+        strcpy(name, "unnumbered");
+      else
+        {
+          data.data = tmp;
+          data.size = name_size;
+
+          name_size = sizeof(name);
+          ret = gnutls_hex_encode(&data, name, &name_size);
+          if (ret < 0)
+            error (EXIT_FAILURE, 0, "gnutls_hex_encode: %s", gnutls_strerror (ret));
+        }
+      fprintf (outfile, "\tVerified against CRL[%s] of: %s\n", name, issuer_name);
+    }
+
+  fprintf (outfile, "\tOutput: ");
+  print_verification_res(outfile, verification_output);
+
+  fputs(".\n\n", outfile);
+
+  return 0;
+}
+
+static int
+_verify_x509_mem (const void *cert, int cert_size)
+{
+  int ret;
+  gnutls_datum_t tmp;
+  gnutls_x509_crt_t x509_cert_list[MAX_LIST];
+  gnutls_x509_crl_t x509_crl_list[MAX_LIST];
+  unsigned int x509_ncerts, x509_ncrls = 0;
+  gnutls_x509_trust_list_t list;
+  unsigned int output;
+
+  tmp.data = (void*)cert;
+  tmp.size = cert_size;
+
+  x509_ncrls = MAX_LIST;
+  ret = gnutls_x509_crl_list_import( x509_crl_list, &x509_ncrls, &tmp, 
+    GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+  if (ret < 0)
+    {
+      x509_ncrls = 0;
+    }
+
+  /* ignore errors. CRL might not be given */
+
+  x509_ncerts = MAX_LIST;
+  ret = gnutls_x509_crt_list_import( x509_cert_list, &x509_ncerts, &tmp, 
+    GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
+  if (ret < 0 || x509_ncerts < 1)
+     error (EXIT_FAILURE, 0, "error parsing CRTs: %s", 
+                 gnutls_strerror (ret));
+
+  fprintf(stdout, "Loaded %d certificates and %d CRLs\n\n", x509_ncerts, x509_ncrls);
+
+  ret = gnutls_x509_trust_list_init(&list);
+  if (ret < 0)
+     error (EXIT_FAILURE, 0, "gnutls_x509_trust_list_init: %s", 
+                 gnutls_strerror (ret));
+
+  ret = gnutls_x509_trust_list_add_cas(list, &x509_cert_list[x509_ncerts - 1], 1, 0);
+  if (ret < 0)
+     error (EXIT_FAILURE, 0, "gnutls_x509_trust_add_cas: %s", 
+                 gnutls_strerror (ret));
+
+  ret = gnutls_x509_trust_list_add_crls(list, x509_crl_list, x509_ncrls, 0, 0);
+  if (ret < 0)
+     error (EXIT_FAILURE, 0, "gnutls_x509_trust_add_crls: %s", 
+                 gnutls_strerror (ret));
+
+  ret = gnutls_x509_trust_list_verify_crt (list, x509_cert_list, x509_ncerts,
+    GNUTLS_VERIFY_DO_NOT_ALLOW_SAME|GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT, &output,
+    detailed_verification);
+  if (ret < 0)
+     error (EXIT_FAILURE, 0, "gnutls_x509_trusted_list_verify_crt: %s", 
+                 gnutls_strerror (ret));
+
+  fprintf (outfile, "Chain verification output: ");
+  print_verification_res(outfile, output);
 
   fprintf (outfile, ".\n\n");
 
@@ -2140,40 +2075,15 @@ _verify_x509_mem (const void *cert, int cert_size)
       error (EXIT_FAILURE, 0, "gnutls_x509_crt_list_verify: %s",
              gnutls_strerror (ret));
 
-    fprintf (outfile, "Chain verification output: ");
-
-    if (verify_status & GNUTLS_CERT_INVALID)
+    if (output != verify_status)
       {
-        fprintf (outfile, "Not verified");
+        fprintf (outfile, "Chain verification output[via internal]: ");
+        print_verification_res(outfile, verify_status);
+        fprintf (outfile, ".\n");
       }
-    else
-      {
-        fprintf (outfile, "Verified");
-      }
-
-    if (verify_status & GNUTLS_CERT_SIGNER_NOT_CA)
-      {
-        fprintf (outfile, ", ");
-        fprintf (outfile, "Issuer is not a CA");
-      }
-
-    if (verify_status & GNUTLS_CERT_INSECURE_ALGORITHM)
-      {
-        fprintf (outfile, ", ");
-        fprintf (outfile, "Insecure algorithm");
-      }
-
-    fprintf (outfile, ".\n");
   }
 
-  for (i = 0; i < x509_ncerts; i++)
-    gnutls_x509_crt_deinit (x509_cert_list[i]);
-
-  for (i = 0; i < x509_ncrls; i++)
-    gnutls_x509_crl_deinit (x509_crl_list[i]);
-
-  free (x509_cert_list);
-  free (x509_crl_list);
+  gnutls_x509_trust_list_deinit(list, 1);
 
   if (ret < 0)
     error (EXIT_FAILURE, 0, "verification error: %s", gnutls_strerror (ret));
@@ -2182,18 +2092,9 @@ _verify_x509_mem (const void *cert, int cert_size)
 }
 
 static void
-print_verification_res (gnutls_x509_crt_t crt,
-                        gnutls_x509_crt_t issuer,
-                        gnutls_x509_crl_t * crl_list, int crl_list_size,
-                        unsigned int flags)
+print_verification_res (FILE* outfile, unsigned int output)
 {
-  unsigned int output;
   int comma = 0;
-  int ret;
-
-  ret = gnutls_x509_crt_verify (crt, &issuer, 1, flags, &output);
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "verification error: %s", gnutls_strerror (ret));
 
   if (output & GNUTLS_CERT_INVALID)
     {
@@ -2238,16 +2139,12 @@ print_verification_res (gnutls_x509_crt_t crt,
       comma = 1;
     }
 
-  ret = gnutls_x509_crt_check_revocation (crt, crl_list, crl_list_size);
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "revocation check: %s", gnutls_strerror (ret));
-
-  if (ret == 1)
-    {                           /* revoked */
+  if (output & GNUTLS_CERT_REVOKED)
+    {
       if (comma)
         fprintf (outfile, ", ");
-      comma = 1;
       fprintf (outfile, "Revoked");
+      comma = 1;
     }
 }
 

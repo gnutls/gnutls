@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version 2.11.7 (unreleased)
 
+** libgnutls: Added new certificate verification functions, that
+can provide more details and are more efficient. Check 
+gnutls_x509_trust_list_*.
+
+** certtool: Uses the new certificate verification functions for
+--verify-chain.
+
 ** libgnutls: The deprecated  gnutls_x509_privkey_sign_hash() was
 replaced by gnutls_privkey_sign_hash2().
 
@@ -34,6 +41,12 @@ integers.
 Reported by "Brendan Doherty" <brendand@gentrack.com>.
 
 ** API and ABI modifications:
+gnutls_x509_crl_list_import: ADDED
+gnutls_x509_trust_list_verify_crt: ADDED
+gnutls_x509_trust_list_add_crls: ADDED
+gnutls_x509_trust_list_add_cas: ADDED
+gnutls_x509_trust_list_init: ADDED
+gnutls_x509_trust_list_deinit: ADDED
 gnutls_x509_crl_get_raw_issuer_dn: ADDED
 gnutls_pubkey_import_privkey: ADDED
 gnutls_pubkey_verify_data: ADDED

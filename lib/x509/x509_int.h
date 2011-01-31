@@ -397,4 +397,21 @@ int _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
                                     const gnutls_datum_t * ext_data,
                                     unsigned int critical);
 
+unsigned int
+_gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
+                                 int clist_size,
+                                 const gnutls_x509_crt_t * trusted_cas,
+                                 int tcas_size,
+                                 unsigned int flags,
+                                 gnutls_verify_output_function func);
+
+int
+_gnutls_is_same_dn (gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2);
+
+int
+_gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
+                                  const gnutls_x509_crl_t * crl_list,
+                                  int crl_list_length,
+                                  gnutls_verify_output_function func);
+
 #endif
