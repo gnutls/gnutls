@@ -234,11 +234,6 @@ treat the connection as being a secure one.
 
 @verbatiminclude examples/ex-rfc2818.c
 
-Another example is listed below which uses the high level verification
-functions.
-
-@verbatiminclude examples/ex-verify.c
-
 @node Using a callback to select the certificate to use
 @subsection Using a Callback to Select the Certificate to Use
 
@@ -249,6 +244,14 @@ certificate selection callback.
 
 @verbatiminclude examples/ex-cert-select.c
 
+@node Verifying a certificate
+@subsection Verifying a Certificate
+@anchor{ex:verify2}
+
+An example is listed below which uses the high level verification
+functions to verify a given certificate list.
+
+@verbatiminclude examples/ex-verify.c
 
 @node Client using a PKCS #11 token with TLS
 @subsection Using a @acronym{PKCS #11} token with TLS

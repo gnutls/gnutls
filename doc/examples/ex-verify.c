@@ -29,8 +29,7 @@ static int print_details_func(gnutls_x509_crt_t cert,
  * also check if the hostname matches.
  */
 void
-verify_certificate_chain (gnutls_session_t session,
-                          const char *hostname,
+verify_certificate_chain (const char *hostname,
                           const gnutls_datum_t * cert_chain,
                           int cert_chain_length)
 {

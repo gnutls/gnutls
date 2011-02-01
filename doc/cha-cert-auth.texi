@@ -132,13 +132,45 @@ section @ref{ex:x509-info}.
 @cindex Verifying certificate paths
 
 Verifying certificate paths is important in @acronym{X.509}
-authentication. For this purpose the function
-@ref{gnutls_x509_crt_verify} is provided. The output of this function
-is the bitwise OR of the elements of the
-@code{gnutls_certificate_status_t} enumeration.  A detailed
-description of these elements can be found in figure below.  The
-function @ref{gnutls_certificate_verify_peers2} is equivalent to the
-previous one, and will verify the peer's certificate in a TLS session.
+authentication. For this purpose the following functions are
+provided.
+
+@table @code
+
+@item @ref{gnutls_x509_trust_list_init}:
+A function to initialize a list that will hold trusted
+certificate authorities and certificate revocation lists.
+
+@item @ref{gnutls_x509_trust_list_deinit}:
+Deinitializes the list.
+
+@item @ref{gnutls_x509_trust_list_add_cas}:
+Adds certificate authorities to the list.
+
+@item @ref{gnutls_x509_trust_list_add_crls}:
+Adds certificate revocation lists.
+
+@item @ref{gnutls_x509_trust_list_verify_crt}:
+Verifies a certificate chain using the previously setup trusted
+list. A callback can be specified that will provide information
+about the verification procedure (and detailed reasons of failure).
+
+@end table
+
+The verification function will verify a given certificate chain against a list of certificate
+authorities and certificate revocation lists, and output
+a bitwise OR of elements of the @code{gnutls_certificate_status_t} 
+enumeration.  A detailed description of these elements can be found 
+in figure below.  An example of these functions in use can be found
+in @ref{ex:verify2}.
+
+When operating in the context of a TLS session, the trusted certificate
+authority list has been set via the
+@ref{gnutls_certificate_set_x509_trust_file} and @ref{gnutls_certificate_set_x509_crl_file},
+thus it is not required to setup a trusted list as above.
+Convenience functions such as @ref{gnutls_certificate_verify_peers2} 
+are equivalent and will verify the peer's certificate chain
+in a TLS session.
 
 @table @code
 
@@ -166,7 +198,7 @@ MD5.  These algorithms have been broken and should not be trusted.
 @end table
 
 There is also to possibility to pass some input to the verification
-functions in the form of flags. For @ref{gnutls_x509_crt_verify} the
+functions in the form of flags. For @ref{gnutls_x509_trust_list_verify_crt} the
 flags are passed straightforward, but
 @ref{gnutls_certificate_verify_peers2} depends on the flags set by
 calling @ref{gnutls_certificate_set_verify_flags}.  All the available
