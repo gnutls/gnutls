@@ -122,8 +122,8 @@ Available from @url{http://www.ietf.org/rfc/rfc3546.txt}.
 
 @item @anchor{TLSPGP}[TLSPGP]
 Nikos Mavrogiannopoulos, "Using OpenPGP keys for TLS authentication",
-April 2004, November 2007. Available from
-@url{http://www.ietf.org/rfc/rfc5081.txt}.
+January 2011. Available from
+@url{http://www.ietf.org/rfc/rfc6091.txt}.
 
 @item @anchor{TLSSRP}[TLSSRP]
 David Taylor, Trevor Perrin, Tom Wu and Nikos Mavrogiannopoulos,
