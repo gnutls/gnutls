@@ -831,7 +831,7 @@ extern "C"
   typedef struct gnutls_x509_trust_list_st *gnutls_x509_trust_list_t;
 
   int
-  gnutls_x509_trust_list_init (gnutls_x509_trust_list_t * list);
+  gnutls_x509_trust_list_init (gnutls_x509_trust_list_t * list, unsigned int size);
 
   void
   gnutls_x509_trust_list_deinit (gnutls_x509_trust_list_t list, unsigned int all);

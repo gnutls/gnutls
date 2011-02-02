@@ -2030,7 +2030,7 @@ _verify_x509_mem (const void *cert, int cert_size)
 
   fprintf(stdout, "Loaded %d certificates and %d CRLs\n\n", x509_ncerts, x509_ncrls);
 
-  ret = gnutls_x509_trust_list_init(&list);
+  ret = gnutls_x509_trust_list_init(&list, 0);
   if (ret < 0)
      error (EXIT_FAILURE, 0, "gnutls_x509_trust_list_init: %s", 
                  gnutls_strerror (ret));

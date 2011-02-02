@@ -43,7 +43,7 @@ verify_certificate_chain (const char *hostname,
    * once on initialization. gnutls_x509_crt_list_import2() and
    * gnutls_x509_crl_list_import2() can be used to load them.
    */
-  gnutls_x509_trust_list_init(&tlist);
+  gnutls_x509_trust_list_init(&tlist, 0);
 
   gnutls_x509_trust_list_add_cas(tlist, ca_list, ca_list_size, 0);
   gnutls_x509_trust_list_add_crls(tlist, crl_list, crl_list_size, 

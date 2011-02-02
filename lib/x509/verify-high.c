@@ -36,7 +36,7 @@
 #include "x509_int.h"
 #include <common.h>
 
-#define LIST_SIZE 457
+#define DEFAULT_SIZE 503
 #define INIT_HASH 0x33a1
 struct node_st {
   /* The trusted certificates */
@@ -49,12 +49,14 @@ struct node_st {
 };
 
 struct gnutls_x509_trust_list_st {
-  struct node_st node[LIST_SIZE];
+  int size;
+  struct node_st *node;
 };
 
 /**
  * gnutls_x509_trust_list_init:
  * @list: The structure to be initialized
+ * @size: The size of the internal hash table. Use zero for default size.
  *
  * This function will initialize an X.509 trust list structure.
  *
@@ -62,12 +64,23 @@ struct gnutls_x509_trust_list_st {
  *   negative error value.
  **/
 int
-gnutls_x509_trust_list_init (gnutls_x509_trust_list_t * list)
+gnutls_x509_trust_list_init (gnutls_x509_trust_list_t * list, unsigned int size)
 {
   gnutls_x509_trust_list_t tmp = gnutls_calloc (1, sizeof (struct gnutls_x509_trust_list_st));
 
   if (!tmp)
     return GNUTLS_E_MEMORY_ERROR;
+
+  if (size == 0) size = DEFAULT_SIZE;
+  tmp->size = size;
+  
+  tmp->node = gnutls_malloc(tmp->size * sizeof(tmp->node[0]));
+  if (tmp->node == NULL)
+    {
+      gnutls_assert();
+      gnutls_free(tmp);
+      return GNUTLS_E_MEMORY_ERROR;
+    }
 
   *list = tmp;
 
@@ -91,7 +104,7 @@ int i, j;
 
   if (all)
     {
-      for (i=0;i<LIST_SIZE;i++)
+      for (i=0;i<list->size;i++)
         {
           for (j=0;j<list->node[i].crt_size;j++)
             {
@@ -139,7 +152,7 @@ uint32_t hash;
           }
 
         hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
-        hash %= LIST_SIZE;
+        hash %= list->size;
 
         list->node[hash].crts = gnutls_realloc_fast( list->node[hash].crts, (list->node[hash].crt_size+1)*sizeof(list->node[hash].crts[0]));
         if (list->node[hash].crts == NULL)
@@ -203,7 +216,7 @@ uint32_t hash;
           }
 
         hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
-        hash %= LIST_SIZE;
+        hash %= list->size;
 
         _gnutls_free_datum(&dn);
 
@@ -273,7 +286,7 @@ uint32_t hash;
     }
 
   hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
-  hash %= LIST_SIZE;
+  hash %= list->size;
 
   _gnutls_free_datum(&dn);
 
@@ -306,7 +319,7 @@ uint32_t hash;
         }
 
       hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
-      hash %= LIST_SIZE;
+      hash %= list->size;
 
       _gnutls_free_datum(&dn);
 

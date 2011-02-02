@@ -270,7 +270,7 @@ int ret;
   if (*res == NULL)
     return GNUTLS_E_MEMORY_ERROR;
 
-  ret = gnutls_x509_trust_list_init( &(*res)->tlist);
+  ret = gnutls_x509_trust_list_init( &(*res)->tlist, 0);
   if (ret < 0)
     {
       gnutls_assert();
