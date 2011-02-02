@@ -178,6 +178,7 @@ implemented by another example.
 * Obtaining session information::
 * Verifying peer's certificate::
 * Using a callback to select the certificate to use::
+* Verifying a certificate::
 * Client using a PKCS #11 token with TLS::
 * Client with Resume capability example::
 * Simple client example with SRP authentication::
