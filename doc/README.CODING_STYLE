@@ -3,17 +3,10 @@ The rules here are not always used, although we try to stick to them.
 
 
 *** File names:
-  All file names are usually prefixed with "gnutls_", "auth_", or
- "x509_", or something else that indicates the part of gnutls
- where this file refers to. The suffix should be more
- specific. I.e., "gnutls_record.c" refers to the TLS library
- and, more specifically, to the TLS record protocol. "auth_rsa.c"
- is the implementation of the RSA certificate authentication
- method.
-
- Another way to distinguish files might be using different
- subdirectories. Use the lib/x509/ directory, which contains
- all the X.509 certificate and crl stuff.
+  Files are split to directories according to the subsystem
+ they belong to. Examples are x509/, minitasn1/, openpgp/,
+ opencdk/ etc. The files in the root directory are of concern
+ to the main TLS protocol implementation.
 
 
 *** Function names:
@@ -36,8 +29,11 @@ The rules here are not always used, although we try to stick to them.
  Internal functions -- that are not exported in the API -- should
  be prefixed with an underscore. E.g. _gnutls_handshake_begin()
 
- All exported functions must be listed in gnutls.sym and gnutls-extra.sym
- in order to be exported. [this is not true for now]
+ Internal structures should not be exported. Especially pointers to
+ internal data. Doing so harms future reorganization/rewrite of subsystems.
+
+ All exported functions must be listed in libgnutls.map and libgnutls-extra.map
+ in order to be exported.
 
 *** Constructed types:
   The constructed types in gnutls always have the "gnutls_" prefix.
