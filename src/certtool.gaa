@@ -31,6 +31,8 @@ option (q, generate-request) { $action=ACTION_GENERATE_REQUEST; } "Generate a PK
 
 option (e, verify-chain) { $action=ACTION_VERIFY_CHAIN; } "Verify a PEM encoded certificate chain. The last certificate in the chain must be a self signed one."
 
+option (verify) { $action=ACTION_VERIFY; } "Verify a PEM encoded certificate chain. CA certificates must be loaded with --load-ca-certificate."
+
 option (verify-crl) { $action=ACTION_VERIFY_CRL; } "Verify a CRL."
 
 option (generate-dh-params) { $action=ACTION_GENERATE_DH; } "Generate PKCS #3 encoded Diffie-Hellman parameters."

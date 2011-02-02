@@ -58,7 +58,7 @@ void smime_to_pkcs7 (void);
 void pkcs12_info (void);
 void generate_pkcs12 (common_info_st *);
 void generate_pkcs8 (common_info_st *);
-void verify_chain (void);
+static void verify_chain (void);
 void verify_crl (common_info_st * cinfo);
 void pubkey_info (gnutls_x509_crt crt, common_info_st *);
 void pgp_privkey_info (void);
@@ -72,6 +72,7 @@ void generate_self_signed (common_info_st *);
 void generate_request (common_info_st *);
 static void print_certificate_info (gnutls_x509_crt_t crt, FILE * out,
                                     unsigned int all);
+static void verify_certificate (common_info_st * cinfo);
 
 static void print_hex_datum (gnutls_datum_t * dat);
 
@@ -1112,6 +1113,9 @@ gaa_parser (int argc, char **argv)
     case ACTION_VERIFY_CHAIN:
       verify_chain ();
       break;
+    case ACTION_VERIFY:
+      verify_certificate (&cinfo);
+      break;
     case ACTION_PRIVKEY_INFO:
       privkey_info ();
       break;
@@ -1998,19 +2002,44 @@ static int detailed_verification(gnutls_x509_crt_t cert,
   return 0;
 }
 
+/* Will verify a certificate chain. If no CA certificates
+ * are provided, then the last certificate in the certificate
+ * chain is used as a CA.
+ */
 static int
-_verify_x509_mem (const void *cert, int cert_size)
+_verify_x509_mem (const void *cert, int cert_size, const void* ca, int ca_size)
 {
   int ret;
   gnutls_datum_t tmp;
   gnutls_x509_crt_t *x509_cert_list = NULL;
+  gnutls_x509_crt_t *x509_ca_list = NULL;
   gnutls_x509_crl_t *x509_crl_list = NULL;
-  unsigned int x509_ncerts, x509_ncrls = 0;
+  unsigned int x509_ncerts, x509_ncrls = 0, x509_ncas = 0;
   gnutls_x509_trust_list_t list;
   unsigned int output;
 
-  tmp.data = (void*)cert;
-  tmp.size = cert_size;
+  ret = gnutls_x509_trust_list_init(&list, 0);
+  if (ret < 0)
+     error (EXIT_FAILURE, 0, "gnutls_x509_trust_list_init: %s", 
+                 gnutls_strerror (ret));
+
+  if (ca == NULL)
+    {
+      tmp.data = (void*)cert;
+      tmp.size = cert_size;
+    }
+  else
+    {
+      tmp.data = (void*)ca;
+      tmp.size = ca_size;
+
+      /* Load CAs */
+      ret = gnutls_x509_crt_list_import2( &x509_ca_list, &x509_ncas, &tmp, 
+        GNUTLS_X509_FMT_PEM, 0);
+      if (ret < 0 || x509_ncas < 1)
+         error (EXIT_FAILURE, 0, "error parsing CAs: %s", 
+                     gnutls_strerror (ret));
+    }
 
   ret = gnutls_x509_crl_list_import2( &x509_crl_list, &x509_ncrls, &tmp, 
     GNUTLS_X509_FMT_PEM, 0);
@@ -2020,22 +2049,26 @@ _verify_x509_mem (const void *cert, int cert_size)
       x509_ncrls = 0;
     }
 
-  /* ignore errors. CRL might not be given */
+  tmp.data = (void*)cert;
+  tmp.size = cert_size;
 
+  /* ignore errors. CRLs might not be given */
   ret = gnutls_x509_crt_list_import2( &x509_cert_list, &x509_ncerts, &tmp, 
     GNUTLS_X509_FMT_PEM, 0);
   if (ret < 0 || x509_ncerts < 1)
      error (EXIT_FAILURE, 0, "error parsing CRTs: %s", 
                  gnutls_strerror (ret));
 
-  fprintf(stdout, "Loaded %d certificates and %d CRLs\n\n", x509_ncerts, x509_ncrls);
+  if (ca == NULL)
+    {
+      x509_ca_list = &x509_cert_list[x509_ncerts - 1];
+      x509_ncas = 1;
+    }
 
-  ret = gnutls_x509_trust_list_init(&list, 0);
-  if (ret < 0)
-     error (EXIT_FAILURE, 0, "gnutls_x509_trust_list_init: %s", 
-                 gnutls_strerror (ret));
+  fprintf(stdout, "Loaded %d certificates, %d CAs and %d CRLs\n\n", 
+    x509_ncerts, x509_ncas, x509_ncrls);
 
-  ret = gnutls_x509_trust_list_add_cas(list, &x509_cert_list[x509_ncerts - 1], 1, 0);
+  ret = gnutls_x509_trust_list_add_cas(list, x509_ca_list, x509_ncas, 0);
   if (ret < 0)
      error (EXIT_FAILURE, 0, "gnutls_x509_trust_add_cas: %s", 
                  gnutls_strerror (ret));
@@ -2058,29 +2091,6 @@ _verify_x509_mem (const void *cert, int cert_size)
   print_verification_res(outfile, output);
 
   fprintf (outfile, ".\n\n");
-
-  /* Verify using internal algorithm too. */
-  {
-    int verify_status;
-
-    ret = gnutls_x509_crt_list_verify (x509_cert_list, x509_ncerts,
-                                       &x509_cert_list[x509_ncerts - 1], 1,
-                                       x509_crl_list,
-                                       x509_ncrls,
-                                       GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT |
-                                       GNUTLS_VERIFY_DO_NOT_ALLOW_SAME,
-                                       &verify_status);
-    if (ret < 0)
-      error (EXIT_FAILURE, 0, "gnutls_x509_crt_list_verify: %s",
-             gnutls_strerror (ret));
-
-    if (output != verify_status)
-      {
-        fprintf (outfile, "Chain verification output[via internal]: ");
-        print_verification_res(outfile, verify_status);
-        fprintf (outfile, ".\n");
-      }
-  }
 
   gnutls_free(x509_cert_list);
   gnutls_x509_trust_list_deinit(list, 1);
@@ -2148,7 +2158,7 @@ print_verification_res (FILE* outfile, unsigned int output)
     }
 }
 
-void
+static void
 verify_chain (void)
 {
   char *buf;
@@ -2160,7 +2170,36 @@ verify_chain (void)
 
   buf[size] = 0;
 
-  _verify_x509_mem (buf, size);
+  _verify_x509_mem (buf, size, NULL, 0);
+
+}
+
+static void
+verify_certificate (common_info_st * cinfo)
+{
+  char *cert;
+  char *cas;
+  size_t cert_size, ca_size;
+  FILE * ca_file = fopen(cinfo->ca, "r");
+  
+  if (ca_file == NULL)
+    error (EXIT_FAILURE, errno, "opening CA file");
+
+  cert = fread_file (infile, &cert_size);
+  if (cert == NULL)
+    error (EXIT_FAILURE, errno, "reading certificate chain");
+
+  cert[cert_size] = 0;
+
+  cas = fread_file (ca_file, &ca_size);
+  if (cas == NULL)
+    error (EXIT_FAILURE, errno, "reading CA list");
+
+  cas[ca_size] = 0;
+  fclose(ca_file);
+
+  _verify_x509_mem (cert, cert_size, cas, ca_size);
+
 
 }
 

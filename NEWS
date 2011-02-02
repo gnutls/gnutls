@@ -12,6 +12,10 @@ gnutls_x509_trust_list_*.
 ** certtool: Uses the new certificate verification functions for
 --verify-chain.
 
+** certtool: Added new certificate verification functionality
+using the --verify option. Combined with --load-ca-certificate
+it can verify a certificate chain against a list of certificates.
+
 ** libgnutls: The deprecated  gnutls_x509_privkey_sign_hash() was
 replaced by gnutls_privkey_sign_hash2().
 
