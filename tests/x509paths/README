@@ -19,14 +19,16 @@ not a real problem.
 Chain 15-18: We should succeed, the reason we don't is that we use
 memcmp for DN comparisons.
 
-Chain 19: I don't understand why this test should fail?  The chain
-seems fine to me.
+Chain 19: This requires advanced verification that we don't support
+yet. It requires to check that this path contains no revocation data.
+We shouldn't make these tests.
 
 Chain 28-29: We fail to check keyCertSign (non-)critical key usage in
 intermediate certificates.  XXX
 
 Chain 31-32: The CRL is issued by a issuer without CRLSign
 (non-)critical keyCertSign.  We don't check the CRL, so this is not a
-real problem.
+real problem. This is easier to be supported now with the trust_list
+that can verify CRLs on addition.
 
 Chain 54-63: We don't check path length constraints properly. XXX
