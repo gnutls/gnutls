@@ -320,7 +320,30 @@ gnutls_x509_crt_t issuer = NULL;
   return issuer;
 }
 
+static unsigned int
+check_time (gnutls_x509_crt_t crt, time_t now)
+{
+  int status = 0;
+  time_t t;
 
+  t = gnutls_x509_crt_get_activation_time (crt);
+  if (t == (time_t) - 1 || now < t)
+    {
+      status |= GNUTLS_CERT_NOT_ACTIVATED;
+      status |= GNUTLS_CERT_INVALID;
+      return status;
+    }
+
+  t = gnutls_x509_crt_get_expiration_time (crt);
+  if (t == (time_t) - 1 || now > t)
+    {
+      status |= GNUTLS_CERT_EXPIRED;
+      status |= GNUTLS_CERT_INVALID;
+      return status;
+    }
+
+  return 0;
+}
 
 /* 
  * Verifies the given certificate again a certificate list of
@@ -340,6 +363,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
                              int tcas_size, unsigned int flags,
                              unsigned int *output,
                              gnutls_x509_crt_t * _issuer,
+                             time_t now,
                              gnutls_verify_output_function func)
 {
   gnutls_datum_t cert_signed_data = { NULL, 0 };
@@ -458,9 +482,31 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
         }
     }
 
+  /* Check activation/expiration times
+   */
+  if (!(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS))
+    {
+      /* check the time of the issuer first */
+      if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS))
+        {
+          out |= check_time (issuer, now);
+          if (out != 0)
+            {
+              result = 0;
+              if (output) *output |= out;
+            }
+        }
+
+      out |= check_time (cert, now);
+      if (out != 0)
+        {
+          result = 0;
+          if (output) *output |= out;
+        }
+    }
+
 cleanup:
   if (result >= 0 && func) func(cert, issuer, NULL, out);
-
   _gnutls_free_datum (&cert_signed_data);
   _gnutls_free_datum (&cert_signature);
 
@@ -484,31 +530,6 @@ gnutls_x509_crt_check_issuer (gnutls_x509_crt_t cert,
                               gnutls_x509_crt_t issuer)
 {
   return is_issuer (cert, issuer);
-}
-
-static unsigned int
-check_time (gnutls_x509_crt_t crt, time_t now)
-{
-  int status = 0;
-  time_t t;
-
-  t = gnutls_x509_crt_get_activation_time (crt);
-  if (t == (time_t) - 1 || now < t)
-    {
-      status |= GNUTLS_CERT_NOT_ACTIVATED;
-      status |= GNUTLS_CERT_INVALID;
-      return status;
-    }
-
-  t = gnutls_x509_crt_get_expiration_time (crt);
-  if (t == (time_t) - 1 || now > t)
-    {
-      status |= GNUTLS_CERT_EXPIRED;
-      status |= GNUTLS_CERT_INVALID;
-      return status;
-    }
-
-  return 0;
 }
 
 /* Verify X.509 certificate chain.
@@ -602,9 +623,10 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
    * If no CAs are present returns CERT_INVALID. Thus works
    * in self signed etc certificates.
    */
+  output = 0;
   ret = _gnutls_verify_certificate2 (certificate_list[clist_size - 1],
                                      trusted_cas, tcas_size, flags, &output,
-                                     &issuer, func);
+                                     &issuer, now, func);
   if (ret == 0)
     {
       /* if the last certificate in the certificate
@@ -617,42 +639,11 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
       return status;
     }
 
-  /* Check activation/expiration times
-   */
-  if (!(flags & GNUTLS_VERIFY_DISABLE_TIME_CHECKS))
-    {
-      /* check the time of the issuer first */
-      if (!(flags & GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS))
-        {
-          if (issuer == NULL)
-            {
-              gnutls_assert ();
-              return GNUTLS_E_INTERNAL_ERROR;
-            }
-
-          status |= check_time (issuer, now);
-          if (status != 0)
-            {
-              if (func) func(certificate_list[clist_size - 1], issuer, NULL, status);
-              return status;
-            }
-        }
-
-      for (i = 0; i < clist_size; i++)
-        {
-          status |= check_time (certificate_list[i], now);
-          if (status != 0)
-            {
-              if (func) func(certificate_list[i], NULL, NULL, status);
-              return status;
-            }
-        }
-    }
-
   /* Verify the certificate path (chain)
    */
   for (i = clist_size - 1; i > 0; i--)
     {
+      output = 0;
       if (i - 1 < 0)
         break;
 
@@ -664,8 +655,9 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
       if ((ret =
            _gnutls_verify_certificate2 (certificate_list[i - 1],
                                         &certificate_list[i], 1, flags,
-                                        NULL, NULL, func)) == 0)
+                                        &output, NULL, now, func)) == 0)
         {
+          status |= output;
           status |= GNUTLS_CERT_INVALID;
           return status;
         }
