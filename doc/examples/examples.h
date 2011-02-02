@@ -14,8 +14,7 @@ int print_info (gnutls_session_t session);
 void print_x509_certificate_info (gnutls_session_t session);
 
 void
-verify_certificate_chain (gnutls_session_t session,
-                          const char *hostname,
+verify_certificate_chain (const char *hostname,
                           const gnutls_datum_t * cert_chain,
                           int cert_chain_length);
 
