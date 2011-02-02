@@ -74,7 +74,7 @@ gnutls_x509_trust_list_init (gnutls_x509_trust_list_t * list, unsigned int size)
   if (size == 0) size = DEFAULT_SIZE;
   tmp->size = size;
   
-  tmp->node = gnutls_malloc(tmp->size * sizeof(tmp->node[0]));
+  tmp->node = gnutls_calloc(1, tmp->size * sizeof(tmp->node[0]));
   if (tmp->node == NULL)
     {
       gnutls_assert();
