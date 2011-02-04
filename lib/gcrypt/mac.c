@@ -96,6 +96,12 @@ wrap_gcry_md_close (void *hd)
   gcry_md_close (hd);
 }
 
+static void
+wrap_gcry_md_reset (void *hd)
+{
+  gcry_md_reset (hd);
+}
+
 static int
 wrap_gcry_hash_init (gnutls_mac_algorithm_t algo, void **ctx)
 {
@@ -164,6 +170,7 @@ gnutls_crypto_mac_st _gnutls_mac_ops = {
   .init = wrap_gcry_mac_init,
   .setkey = wrap_gcry_md_setkey,
   .hash = wrap_gcry_md_write,
+  .reset = wrap_gcry_md_reset,
   .output = wrap_gcry_mac_output,
   .deinit = wrap_gcry_md_close,
 };
@@ -172,6 +179,7 @@ gnutls_crypto_digest_st _gnutls_digest_ops = {
   .init = wrap_gcry_hash_init,
   .hash = wrap_gcry_md_write,
   .copy = wrap_gcry_md_copy,
+  .reset = wrap_gcry_md_reset,
   .output = wrap_gcry_mac_output,
   .deinit = wrap_gcry_md_close,
 };

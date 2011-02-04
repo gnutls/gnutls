@@ -70,6 +70,15 @@ if test "$cryptolib" = "nettle";then
   *** Libnettle 2.1 was not found. 
   ]])
     fi
+    AC_TRY_COMPILE(,
+  [
+    #include <nettle/gcm.h> 
+    gcm_set_nonce(0, 0, 0);
+    return 0;
+  ], [
+    AC_DEFINE([NETTLE_GCM], 1, [Nettle supports GCM])
+  ], [
+  ])
     NETTLE_LIBS="-lgmp -lpthread -lhogweed"
 else
   AC_MSG_RESULT(no)

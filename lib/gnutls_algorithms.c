@@ -169,9 +169,10 @@ struct gnutls_cipher_entry
   gnutls_cipher_algorithm_t id;
   uint16_t blocksize;
   uint16_t keysize;
-  cipher_type_t block;
-  uint16_t iv;
-  int export_flag;              /* 0 non export */
+  unsigned block:1;
+  uint16_t iv; /* the size of IV */
+  unsigned export_flag:1; /* 0 non export */
+  unsigned auth:1; /* Whether it is authenc cipher */
 };
 typedef struct gnutls_cipher_entry gnutls_cipher_entry;
 
@@ -183,39 +184,40 @@ typedef struct gnutls_cipher_entry gnutls_cipher_entry;
  * Make sure to updated MAX_CIPHER_BLOCK_SIZE and MAX_CIPHER_KEY_SIZE as well.
  */
 static const gnutls_cipher_entry algorithms[] = {
-  {"AES-256-CBC", GNUTLS_CIPHER_AES_256_CBC, 16, 32, CIPHER_BLOCK, 16, 0},
-  {"AES-192-CBC", GNUTLS_CIPHER_AES_192_CBC, 16, 24, CIPHER_BLOCK, 16, 0},
-  {"AES-128-CBC", GNUTLS_CIPHER_AES_128_CBC, 16, 16, CIPHER_BLOCK, 16, 0},
-  {"3DES-CBC", GNUTLS_CIPHER_3DES_CBC, 8, 24, CIPHER_BLOCK, 8, 0},
-  {"DES-CBC", GNUTLS_CIPHER_DES_CBC, 8, 8, CIPHER_BLOCK, 8, 0},
-  {"ARCFOUR-128", GNUTLS_CIPHER_ARCFOUR_128, 1, 16, CIPHER_STREAM, 0, 0},
-  {"ARCFOUR-40", GNUTLS_CIPHER_ARCFOUR_40, 1, 5, CIPHER_STREAM, 0, 1},
-  {"RC2-40", GNUTLS_CIPHER_RC2_40_CBC, 8, 5, CIPHER_BLOCK, 8, 1},
+  {"AES-256-CBC", GNUTLS_CIPHER_AES_256_CBC, 16, 32, CIPHER_BLOCK, 16, 0, 0},
+  {"AES-192-CBC", GNUTLS_CIPHER_AES_192_CBC, 16, 24, CIPHER_BLOCK, 16, 0, 0},
+  {"AES-128-CBC", GNUTLS_CIPHER_AES_128_CBC, 16, 16, CIPHER_BLOCK, 16, 0, 0},
+  {"AES-128-GCM", GNUTLS_CIPHER_AES_128_GCM, 16, 16, CIPHER_STREAM, 4, 0, 1},
+  {"3DES-CBC", GNUTLS_CIPHER_3DES_CBC, 8, 24, CIPHER_BLOCK, 8, 0, 0},
+  {"DES-CBC", GNUTLS_CIPHER_DES_CBC, 8, 8, CIPHER_BLOCK, 8, 0, 0},
+  {"ARCFOUR-128", GNUTLS_CIPHER_ARCFOUR_128, 1, 16, CIPHER_STREAM, 0, 0, 0},
+  {"ARCFOUR-40", GNUTLS_CIPHER_ARCFOUR_40, 1, 5, CIPHER_STREAM, 0, 1, 0},
+  {"RC2-40", GNUTLS_CIPHER_RC2_40_CBC, 8, 5, CIPHER_BLOCK, 8, 1, 0},
 #ifdef	ENABLE_CAMELLIA
   {"CAMELLIA-256-CBC", GNUTLS_CIPHER_CAMELLIA_256_CBC, 16, 32, CIPHER_BLOCK,
-   16, 0},
+   16, 0, 0},
   {"CAMELLIA-128-CBC", GNUTLS_CIPHER_CAMELLIA_128_CBC, 16, 16, CIPHER_BLOCK,
-   16, 0},
+   16, 0, 0},
 #endif
 
 #ifdef ENABLE_OPENPGP
-  {"IDEA-PGP-CFB", GNUTLS_CIPHER_IDEA_PGP_CFB, 8, 16, CIPHER_BLOCK, 8, 0},
-  {"3DES-PGP-CFB", GNUTLS_CIPHER_3DES_PGP_CFB, 8, 24, CIPHER_BLOCK, 8, 0},
-  {"CAST5-PGP-CFB", GNUTLS_CIPHER_CAST5_PGP_CFB, 8, 16, CIPHER_BLOCK, 8, 0},
+  {"IDEA-PGP-CFB", GNUTLS_CIPHER_IDEA_PGP_CFB, 8, 16, CIPHER_BLOCK, 8, 0, 0},
+  {"3DES-PGP-CFB", GNUTLS_CIPHER_3DES_PGP_CFB, 8, 24, CIPHER_BLOCK, 8, 0, 0},
+  {"CAST5-PGP-CFB", GNUTLS_CIPHER_CAST5_PGP_CFB, 8, 16, CIPHER_BLOCK, 8, 0, 0},
   {"BLOWFISH-PGP-CFB", GNUTLS_CIPHER_BLOWFISH_PGP_CFB, 8,
-   16 /*actually unlimited */ , CIPHER_BLOCK, 8, 0},
+   16 /*actually unlimited */ , CIPHER_BLOCK, 8, 0, 0},
   {"SAFER-SK128-PGP-CFB", GNUTLS_CIPHER_SAFER_SK128_PGP_CFB, 8, 16,
-   CIPHER_BLOCK, 8, 0},
+   CIPHER_BLOCK, 8, 0, 0},
   {"AES-128-PGP-CFB", GNUTLS_CIPHER_AES128_PGP_CFB, 16, 16, CIPHER_BLOCK, 16,
-   0},
+   0, 0},
   {"AES-192-PGP-CFB", GNUTLS_CIPHER_AES192_PGP_CFB, 16, 24, CIPHER_BLOCK, 16,
-   0},
+   0, 0},
   {"AES-256-PGP-CFB", GNUTLS_CIPHER_AES256_PGP_CFB, 16, 32, CIPHER_BLOCK, 16,
-   0},
+   0, 0},
   {"TWOFISH-PGP-CFB", GNUTLS_CIPHER_TWOFISH_PGP_CFB, 16, 16, CIPHER_BLOCK, 16,
-   0},
+   0, 0},
 #endif
-  {"NULL", GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0, 0},
+  {"NULL", GNUTLS_CIPHER_NULL, 1, 0, CIPHER_STREAM, 0, 0, 0},
   {0, 0, 0, 0, 0, 0, 0}
 };
 
@@ -259,6 +261,7 @@ static const gnutls_hash_entry hash_algorithms[] = {
   {"SHA256", HASH_OID_SHA256, GNUTLS_MAC_SHA256, 32},
   {"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384, 48},
   {"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512, 64},
+  {"AEAD", NULL, GNUTLS_MAC_AEAD, 0},
   {"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0},     /* not used as MAC */
   {"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160, 20},
   {"MAC-NULL", NULL, GNUTLS_MAC_NULL, 0},
@@ -497,6 +500,9 @@ typedef struct
 
 #define GNUTLS_DHE_RSA_AES_128_CBC_SHA256 { 0x00, 0x67 }
 #define GNUTLS_DHE_RSA_AES_256_CBC_SHA256 { 0x00, 0x6B }
+
+/* GCM: RFC5288 */
+#define GNUTLS_RSA_AES_128_GCM_SHA256 { 0x00, 0x9C }
 
 /* Safe renegotiation */
 
@@ -752,6 +758,12 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_RSA,
                              GNUTLS_MAC_SHA256, GNUTLS_TLS1_2,
                              GNUTLS_VERSION_MAX),
+/* GCM */
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_RSA_AES_128_GCM_SHA256,
+                             GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_RSA,
+                             GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
+                             GNUTLS_VERSION_MAX),
+/* Renegotiation hack */
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_RENEGO_PROTECTION_REQUEST,
                              GNUTLS_CIPHER_UNKNOWN, GNUTLS_KX_UNKNOWN,
                              GNUTLS_MAC_UNKNOWN, GNUTLS_SSL3,
@@ -941,6 +953,16 @@ _gnutls_cipher_is_block (gnutls_cipher_algorithm_t algorithm)
   size_t ret = 0;
 
   GNUTLS_ALG_LOOP (ret = p->block);
+  return ret;
+
+}
+
+int
+_gnutls_cipher_is_aead (gnutls_cipher_algorithm_t algorithm)
+{
+  size_t ret = 0;
+
+  GNUTLS_ALG_LOOP (ret = p->auth);
   return ret;
 
 }
@@ -1779,9 +1801,11 @@ _gnutls_supported_ciphersuites (gnutls_session_t session,
       if (_gnutls_kx_priority
           (session, _gnutls_cipher_suite_get_kx_algo (&tmp_ciphers[i])) < 0)
         continue;
+
       if (_gnutls_mac_priority
           (session, _gnutls_cipher_suite_get_mac_algo (&tmp_ciphers[i])) < 0)
         continue;
+
       if (_gnutls_cipher_priority
           (session,
            _gnutls_cipher_suite_get_cipher_algo (&tmp_ciphers[i])) < 0)

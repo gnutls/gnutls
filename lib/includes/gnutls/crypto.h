@@ -76,7 +76,7 @@ extern "C"
 
 /* register ciphers */
 
-#define GNUTLS_CRYPTO_API_VERSION 0x03
+#define GNUTLS_CRYPTO_API_VERSION 0x04
 
 #define gnutls_crypto_single_cipher_st gnutls_crypto_cipher_st
 #define gnutls_crypto_single_mac_st gnutls_crypto_mac_st
@@ -91,6 +91,8 @@ extern "C"
                     void *encr, size_t encrsize);
     int (*decrypt) (void *ctx, const void *encr, size_t encrsize,
                     void *plain, size_t plainsize);
+    int (*auth) (void *ctx, const void *data, size_t datasize);
+    void (*tag) (void *ctx, void *tag, size_t tagsize);
     void (*deinit) (void *ctx);
   } gnutls_crypto_cipher_st;
 
@@ -98,6 +100,7 @@ extern "C"
   {
     int (*init) (gnutls_mac_algorithm_t, void **ctx);
     int (*setkey) (void *ctx, const void *key, size_t keysize);
+    void (*reset) (void *ctx);
     int (*hash) (void *ctx, const void *text, size_t textsize);
     int (*output) (void *src_ctx, void *digest, size_t digestsize);
     void (*deinit) (void *ctx);
@@ -106,6 +109,7 @@ extern "C"
   typedef struct
   {
     int (*init) (gnutls_mac_algorithm_t, void **ctx);
+    void (*reset) (void *ctx);
     int (*hash) (void *ctx, const void *text, size_t textsize);
     int (*copy) (void **dst_ctx, void *src_ctx);
     int (*output) (void *src_ctx, void *digest, size_t digestsize);

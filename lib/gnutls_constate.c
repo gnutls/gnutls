@@ -291,14 +291,20 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
 }
 
 static int
-_gnutls_init_record_state (record_parameters_st * params, int read,
+_gnutls_init_record_state (record_parameters_st * params, int ver, int read,
                            record_state_st * state)
 {
   int ret;
+  gnutls_datum_t * iv = NULL;
 
-  ret = _gnutls_cipher_init (&state->cipher_state,
-                             params->cipher_algorithm,
-                             &state->key, &state->IV);
+  if (!_gnutls_version_has_explicit_iv(ver))
+    {
+      iv = &state->IV;
+    }
+
+  ret = _gnutls_auth_cipher_init (&state->cipher_state,
+    params->cipher_algorithm, &state->key, iv,
+    params->mac_algorithm, &state->mac_secret, (ver==GNUTLS_SSL3)?1:0);
   if (ret < 0 && params->cipher_algorithm != GNUTLS_CIPHER_NULL)
     return gnutls_assert_val (ret);
 
@@ -396,6 +402,7 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
   gnutls_compression_method_t comp_algo;
   record_parameters_st *params;
   int ret;
+  int ver = gnutls_protocol_get_version (session);
 
   ret = _gnutls_epoch_get (session, epoch, &params);
   if (ret < 0)
@@ -428,11 +435,11 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
   if (ret < 0)
     return gnutls_assert_val (ret);
 
-  ret = _gnutls_init_record_state (params, 1, &params->read);
+  ret = _gnutls_init_record_state (params, ver, 1, &params->read);
   if (ret < 0)
     return gnutls_assert_val (ret);
 
-  ret = _gnutls_init_record_state (params, 0, &params->write);
+  ret = _gnutls_init_record_state (params, ver, 0, &params->write);
   if (ret < 0)
     return gnutls_assert_val (ret);
 
@@ -673,7 +680,6 @@ epoch_get_slot (gnutls_session_t session, uint16_t epoch)
       gnutls_assert ();
       return NULL;
     }
-
   /* The slot may still be empty (NULL) */
   return &session->record_parameters[epoch_index];
 }
@@ -783,7 +789,7 @@ free_record_state (record_state_st * state, int read)
   _gnutls_free_datum (&state->IV);
   _gnutls_free_datum (&state->key);
 
-  _gnutls_cipher_deinit (&state->cipher_state);
+  _gnutls_auth_cipher_deinit (&state->cipher_state);
 
   if (state->compression_state != NULL)
     _gnutls_comp_deinit (state->compression_state, read);

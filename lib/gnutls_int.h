@@ -118,7 +118,7 @@ typedef struct
 #define MAX_RECORD_RECV_SIZE (size_t)session->security_parameters.max_record_recv_size
 #define MAX_PAD_SIZE 255
 #define EXTRA_COMP_SIZE 2048
-#define MAX_RECORD_OVERHEAD (MAX_PAD_SIZE+EXTRA_COMP_SIZE)
+#define MAX_RECORD_OVERHEAD (MAX_CIPHER_BLOCK_SIZE/*iv*/+MAX_PAD_SIZE+EXTRA_COMP_SIZE)
 #define MAX_RECV_SIZE (MAX_RECORD_OVERHEAD+MAX_RECORD_RECV_SIZE+RECORD_HEADER_SIZE)
 
 #define HANDSHAKE_HEADER_SIZE 4
@@ -392,7 +392,7 @@ struct record_state_st
   gnutls_datum_t mac_secret;
   gnutls_datum_t IV;
   gnutls_datum_t key;
-  cipher_hd_st cipher_state;
+  auth_cipher_hd_st cipher_state;
   comp_hd_t compression_state;
   uint64 sequence_number;
 };

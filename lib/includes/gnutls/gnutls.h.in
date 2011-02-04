@@ -73,13 +73,14 @@ extern "C"
    * @GNUTLS_CIPHER_ARCFOUR_128: ARCFOUR stream cipher with 128-bit keys.
    * @GNUTLS_CIPHER_3DES_CBC: 3DES in CBC mode.
    * @GNUTLS_CIPHER_AES_128_CBC: AES in CBC mode with 128-bit keys.
+   * @GNUTLS_CIPHER_AES_192_CBC: AES in CBC mode with 192-bit keys.
    * @GNUTLS_CIPHER_AES_256_CBC: AES in CBC mode with 256-bit keys.
    * @GNUTLS_CIPHER_ARCFOUR_40: ARCFOUR stream cipher with 40-bit keys.
    * @GNUTLS_CIPHER_CAMELLIA_128_CBC: Camellia in CBC mode with 128-bit keys.
    * @GNUTLS_CIPHER_CAMELLIA_256_CBC: Camellia in CBC mode with 256-bit keys.
    * @GNUTLS_CIPHER_RC2_40_CBC: RC2 in CBC mode with 40-bit keys.
    * @GNUTLS_CIPHER_DES_CBC: DES in CBC mode (56-bit keys).
-   * @GNUTLS_CIPHER_AES_192_CBC: AES in CBC mode with 192-bit keys.
+   * @GNUTLS_CIPHER_AES_128_GCM: AES in GCM mode with 128-bit keys.
    * @GNUTLS_CIPHER_IDEA_PGP_CFB: IDEA in CFB mode.
    * @GNUTLS_CIPHER_3DES_PGP_CFB: 3DES in CFB mode.
    * @GNUTLS_CIPHER_CAST5_PGP_CFB: CAST5 in CFB mode.
@@ -106,6 +107,7 @@ extern "C"
     GNUTLS_CIPHER_RC2_40_CBC = 90,
     GNUTLS_CIPHER_DES_CBC = 91,
     GNUTLS_CIPHER_AES_192_CBC = 92,
+    GNUTLS_CIPHER_AES_128_GCM = 93,
 
     /* used only for PGP internals. Ignored in TLS/SSL
      */
@@ -213,9 +215,10 @@ extern "C"
     GNUTLS_MAC_SHA256 = 6,
     GNUTLS_MAC_SHA384 = 7,
     GNUTLS_MAC_SHA512 = 8,
-    GNUTLS_MAC_SHA224 = 9
+    GNUTLS_MAC_SHA224 = 9,
       /* If you add anything here, make sure you align with
          gnutls_digest_algorithm_t. */
+    GNUTLS_MAC_AEAD = 200 /* indicates that MAC is on the cipher */
   } gnutls_mac_algorithm_t;
 
   /**

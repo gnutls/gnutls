@@ -35,6 +35,9 @@
 #include <nettle/des.h>
 #include <nettle/nettle-meta.h>
 #include <nettle/cbc.h>
+# ifdef NETTLE_GCM
+#include <nettle/gcm.h>
+# endif
 
 /* Functions that refer to the libgcrypt library.
  */
@@ -45,6 +48,10 @@ typedef void (*encrypt_func) (void *, nettle_crypt_func, unsigned, uint8_t *,
                               unsigned, uint8_t *, const uint8_t *);
 typedef void (*decrypt_func) (void *, nettle_crypt_func, unsigned, uint8_t *,
                               unsigned, uint8_t *, const uint8_t *);
+typedef void (*auth_func) (void *, unsigned, const uint8_t *);
+
+typedef void (*tag_func) (void *, unsigned, uint8_t *);
+
 typedef void (*setkey_func) (void *, unsigned, const uint8_t *);
 
 static void
@@ -122,6 +129,12 @@ struct nettle_cipher_ctx
     struct des3_ctx des3;
     struct des_ctx des;
   } ctx;
+#ifdef NETTLE_GCM
+  union
+  {
+    struct gcm_ctx gcm;
+  } mode_ctx;
+#endif
   void *ctx_ptr;
   uint8_t iv[MAX_BLOCK_SIZE];
   gnutls_cipher_algorithm_t algo;
@@ -130,9 +143,30 @@ struct nettle_cipher_ctx
   nettle_crypt_func *i_decrypt;
   encrypt_func encrypt;
   decrypt_func decrypt;
+  auth_func auth;
+  tag_func tag;
 };
 
+#ifdef NETTLE_GCM
+static void _gcm_encrypt(void *ctx, nettle_crypt_func f,  
+            unsigned block_size, uint8_t *iv,
+            unsigned length, uint8_t *dst,
+            const uint8_t *src)
+{
+  gcm_set_nonce(ctx, GCM_DEFAULT_NONCE_SIZE, iv);
 
+  return gcm_encrypt(ctx, length, dst, src);
+}
+
+static void _gcm_decrypt(void *ctx, nettle_crypt_func f,  
+            unsigned block_size, uint8_t *iv,
+            unsigned length, uint8_t *dst,
+            const uint8_t *src)
+{
+  gcm_set_nonce(ctx, GCM_DEFAULT_NONCE_SIZE, iv);
+  return gcm_decrypt(ctx, length, dst, src);
+}
+#endif
 
 static int
 wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
@@ -150,6 +184,16 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
 
   switch (algo)
     {
+#ifdef NETTLE_GCM
+    case GNUTLS_CIPHER_AES_128_GCM:
+      ctx->encrypt = _gcm_encrypt;
+      ctx->decrypt = _gcm_decrypt;
+      ctx->auth = (auth_func)gcm_auth;
+      ctx->tag = (tag_func)gcm_tag;
+      ctx->ctx_ptr = &ctx->mode_ctx.gcm;
+      ctx->block_size = AES_BLOCK_SIZE;
+      break;
+#endif
     case GNUTLS_CIPHER_CAMELLIA_128_CBC:
     case GNUTLS_CIPHER_CAMELLIA_256_CBC:
       ctx->encrypt = cbc_encrypt;
@@ -220,6 +264,15 @@ wrap_nettle_cipher_setkey (void *_ctx, const void *key, size_t keysize)
 
   switch (ctx->algo)
     {
+#ifdef NETTLE_GCM
+    case GNUTLS_CIPHER_AES_128_GCM:
+      aes_bidi_setkey (&ctx->ctx.aes_bidi, keysize, key);
+  
+      gcm_init(&ctx->mode_ctx.gcm, &ctx->ctx.aes_bidi, (nettle_crypt_func *) aes_bidi_encrypt,
+        AES_BLOCK_SIZE);
+
+      break;
+#endif
     case GNUTLS_CIPHER_AES_128_CBC:
     case GNUTLS_CIPHER_AES_192_CBC:
     case GNUTLS_CIPHER_AES_256_CBC:
@@ -314,6 +367,25 @@ wrap_nettle_cipher_encrypt (void *_ctx, const void *plain, size_t plainsize,
   return 0;
 }
 
+static int
+wrap_nettle_cipher_auth (void *_ctx, const void *plain, size_t plainsize)
+{
+  struct nettle_cipher_ctx *ctx = _ctx;
+
+  ctx->auth (ctx->ctx_ptr, plainsize, plain);
+
+  return 0;
+}
+
+static void
+wrap_nettle_cipher_tag (void *_ctx, void *tag, size_t tagsize)
+{
+  struct nettle_cipher_ctx *ctx = _ctx;
+
+  ctx->tag (ctx->ctx_ptr, tagsize, tag);
+
+}
+
 static void
 wrap_nettle_cipher_close (void *h)
 {
@@ -322,9 +394,11 @@ wrap_nettle_cipher_close (void *h)
 
 gnutls_crypto_cipher_st _gnutls_cipher_ops = {
   .init = wrap_nettle_cipher_init,
-  .setkey = wrap_nettle_cipher_setkey,
   .setiv = wrap_nettle_cipher_setiv,
+  .setkey = wrap_nettle_cipher_setkey,
   .encrypt = wrap_nettle_cipher_encrypt,
   .decrypt = wrap_nettle_cipher_decrypt,
   .deinit = wrap_nettle_cipher_close,
+  .auth = wrap_nettle_cipher_auth,
+  .tag = wrap_nettle_cipher_tag,
 };

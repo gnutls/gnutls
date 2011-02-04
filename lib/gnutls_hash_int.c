@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2004, 2005, 2007, 2008, 2010 Free Software
+ * Copyright (C) 2000, 2001, 2004, 2005, 2007, 2008, 2010, 2011 Free Software
  * Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
@@ -37,6 +37,7 @@ digest_length (gnutls_digest_algorithm_t algo)
   switch (algo)
     {
     case GNUTLS_DIG_NULL:
+    case GNUTLS_MAC_AEAD:
       return 0;
     case GNUTLS_DIG_MD5:
     case GNUTLS_DIG_MD2:
@@ -79,6 +80,7 @@ _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
 
       dig->hash = cc->hash;
       dig->copy = cc->copy;
+      dig->reset = cc->reset;
       dig->output = cc->output;
       dig->deinit = cc->deinit;
 
@@ -94,6 +96,7 @@ _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
 
   dig->hash = _gnutls_digest_ops.hash;
   dig->copy = _gnutls_digest_ops.copy;
+  dig->reset = _gnutls_digest_ops.reset;
   dig->output = _gnutls_digest_ops.output;
   dig->deinit = _gnutls_digest_ops.deinit;
 
@@ -161,6 +164,17 @@ _gnutls_hash_deinit (digest_hd_st * handle, void *digest)
 
   handle->deinit (handle->handle);
   handle->handle = NULL;
+}
+
+void
+_gnutls_hash_reset (digest_hd_st * handle)
+{
+  if (handle->handle == NULL)
+    {
+      return;
+    }
+
+  handle->reset (handle->handle);
 }
 
 int
@@ -256,6 +270,7 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
       dig->hash = cc->hash;
       dig->output = cc->output;
       dig->deinit = cc->deinit;
+      dig->reset = cc->reset;
 
       return 0;
     }
@@ -272,6 +287,7 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
   dig->hash = _gnutls_mac_ops.hash;
   dig->output = _gnutls_mac_ops.output;
   dig->deinit = _gnutls_mac_ops.deinit;
+  dig->reset = _gnutls_mac_ops.reset;
 
   return 0;
 }
@@ -312,6 +328,17 @@ _gnutls_hmac_deinit (digest_hd_st * handle, void *digest)
 
   handle->deinit (handle->handle);
   handle->handle = NULL;
+}
+
+void
+_gnutls_hmac_reset (digest_hd_st * handle)
+{
+  if (handle->handle == NULL)
+    {
+      return;
+    }
+
+  handle->reset (handle->handle);
 }
 
 inline static int
@@ -366,7 +393,7 @@ _gnutls_mac_init_ssl3 (digest_hd_st * ret, gnutls_mac_algorithm_t algorithm,
 }
 
 void
-_gnutls_mac_deinit_ssl3 (digest_hd_st * handle, void *digest)
+_gnutls_mac_output_ssl3 (digest_hd_st * handle, void *digest)
 {
   opaque ret[MAX_HASH_SIZE];
   digest_hd_st td;
@@ -378,7 +405,6 @@ _gnutls_mac_deinit_ssl3 (digest_hd_st * handle, void *digest)
   if (padsize == 0)
     {
       gnutls_assert ();
-      _gnutls_hash_deinit (handle, NULL);
       return;
     }
 
@@ -388,7 +414,6 @@ _gnutls_mac_deinit_ssl3 (digest_hd_st * handle, void *digest)
   if (rc < 0)
     {
       gnutls_assert ();
-      _gnutls_hash_deinit (handle, NULL);
       return;
     }
 
@@ -397,12 +422,17 @@ _gnutls_mac_deinit_ssl3 (digest_hd_st * handle, void *digest)
 
   _gnutls_hash (&td, opad, padsize);
   block = _gnutls_hmac_get_algo_len (handle->algorithm);
-  _gnutls_hash_deinit (handle, ret);    /* get the previous hash */
+  _gnutls_hash_output (handle, ret);    /* get the previous hash */
   _gnutls_hash (&td, ret, block);
 
   _gnutls_hash_deinit (&td, digest);
+}
 
-  return;
+void
+_gnutls_mac_deinit_ssl3 (digest_hd_st * handle, void *digest)
+{
+  if (digest != NULL) _gnutls_mac_output_ssl3(handle, digest);
+  _gnutls_hash_deinit(handle, NULL);
 }
 
 void
