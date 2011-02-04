@@ -75,10 +75,12 @@ The supported cryptographic hash algorithms are:
 
 @table @code
 @item MD2
-MD2 is a cryptographic hash algorithm designed by Ron Rivest. It is
-optimized for 8-bit processors. Outputs 128 bits of data. There are no
-known weaknesses of this algorithm but since this algorithm is rarely
-used and not really studied it should not be used today.
+MD2 is a cryptographic hash algorithm designed by Ron Rivest.  It is
+optimized for 8-bit processors.  Outputs 128 bits of data.  There are
+several known weaknesses of this algorithm and it should not be used.
+Unfortunately some CA certificates signed with RSA-MD2 are still in
+use, but this is acceptable because the RSA-MD2 signature is not
+involved in certificate validation.
 
 @item MD5
 MD5 is a cryptographic hash algorithm designed by Ron Rivest. Outputs
