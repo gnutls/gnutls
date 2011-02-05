@@ -94,6 +94,10 @@ fi
   AC_MSG_RESULT($included_libtasn1)
   AM_CONDITIONAL(ENABLE_MINITASN1, test "$included_libtasn1" = "yes")
 
+  if test "$included_libtasn1" = "no"; then
+    GNUTLS_REQUIRES_PRIVATE="Requires.private: libtasn1"
+  fi
+
   AC_ARG_WITH(included-pakchois,
     AS_HELP_STRING([--with-included-pakchois], [use the included pakchois]),
       included_pakchois=$withval,

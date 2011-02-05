@@ -80,6 +80,15 @@ else
  AC_MSG_RESULT(no)
 fi
 
+if test x$ac_zlib != xno; then
+  if test x$GNUTLS_REQUIRES_PRIVATE = x; then
+    GNUTLS_REQUIRES_PRIVATE="Requires.private: zlib"
+  else
+    GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE , zlib"
+  fi
+fi
+AC_SUBST(GNUTLS_REQUIRES_PRIVATE)
+
 lgl_INIT
 
 AC_CHECK_FUNCS(getrusage,,)
