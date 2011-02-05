@@ -92,6 +92,9 @@ typedef struct
 #define SESSION_TICKET_IV_SIZE 16
 #define SESSION_TICKET_MAC_SECRET_SIZE 32
 
+#define GNUTLS_MASTER_SIZE 48
+#define GNUTLS_RANDOM_SIZE 32
+
 /* we can receive up to MAX_EXT_TYPES extensions.
  */
 #define MAX_EXT_TYPES 32
