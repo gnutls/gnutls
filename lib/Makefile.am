@@ -145,7 +145,7 @@ endif
 libgnutls_la_LDFLAGS += $(LTLIBPAKCHOIS)
 
 if ENABLE_NETTLE
-libgnutls_la_LDFLAGS += $(LTLIBNETTLE) -lgmp -lpthread -lhogweed
+libgnutls_la_LDFLAGS += $(NETTLE_LIBS)
 libgnutls_la_LIBADD += nettle/libcrypto.la
 else
 libgnutls_la_LDFLAGS += $(LTLIBGCRYPT)
