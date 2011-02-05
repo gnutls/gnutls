@@ -70,9 +70,11 @@ if test "$cryptolib" = "nettle";then
   *** Libnettle 2.1 was not found. 
   ]])
     fi
+    NETTLE_LIBS="-lgmp -lpthread -lhogweed"
 else
   AC_MSG_RESULT(no)
 fi
+    AC_SUBST(NETTLE_LIBS)
   AM_CONDITIONAL(ENABLE_NETTLE, test "$cryptolib" = "nettle")
 
   AC_ARG_WITH(included-libtasn1,
