@@ -177,17 +177,6 @@ gnutls_sign_func
 gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
  _GNUTLS_GCC_ATTR_DEPRECATED;
 
-/* Extension API is no longer exported because a lot of internal
- * structures are used. Currently it works due to a compatibility
- * layer, but will be removed in later versions.
- */
-     int gnutls_ext_register (int type,
-                              const char *name,
-                              gnutls_ext_parse_type_t parse_type,
-                              gnutls_ext_recv_func recv_func,
-                              gnutls_ext_send_func send_func)
-  _GNUTLS_GCC_ATTR_DEPRECATED;
-
 /* We no longer support the finished callback. Use
  * gnutls_session_channel_binding for similar functionality.
  */
@@ -307,19 +296,5 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
                              gnutls_digest_algorithm_t dig,
                              unsigned int flags)
                              _GNUTLS_GCC_ATTR_DEPRECATED;
-
-/* These functions cannot be supported. They export internal
- * structure.
- */
-  void gnutls_certificate_get_x509_cas (gnutls_certificate_credentials_t sc,
-                                        gnutls_x509_crt_t ** x509_ca_list,
-                                        unsigned int *ncas)
-                                        _GNUTLS_GCC_ATTR_DEPRECATED;
-
-  void gnutls_certificate_get_x509_crls (gnutls_certificate_credentials_t sc,
-                                         gnutls_x509_crl_t ** x509_crl_list,
-                                         unsigned int *ncrls)
-                                         _GNUTLS_GCC_ATTR_DEPRECATED;
-
 
 #endif /* _GNUTLS_COMPAT_H */

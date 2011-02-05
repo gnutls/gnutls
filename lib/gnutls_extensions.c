@@ -396,40 +396,6 @@ _gnutls_ext_register (extension_entry_st * mod)
   return GNUTLS_E_SUCCESS;
 }
 
-/*-
- * gnutls_ext_register:
- * @type: the 16-bit integer referring to the extension type
- * @name: human printable name of the extension used for debugging
- * @parse_type: either #GNUTLS_EXT_TLS or %GNUTLS_EXT_APPLICATION.
- * @recv_func: a function to receive extension data
- * @send_func: a function to send extension data
- *
- * This function is used to register a new TLS extension handler.
- *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
- *
- * Deprecated in: 2.11.0
- -*/
-int
-gnutls_ext_register (int type,
-                     const char *name,
-                     gnutls_ext_parse_type_t parse_type,
-                     gnutls_ext_recv_func recv_func,
-                     gnutls_ext_send_func send_func)
-{
-  extension_entry_st ee;
-
-  memset (&ee, 0, sizeof (ee));
-
-  ee.type = type;
-  ee.name = name;
-  ee.parse_type = parse_type;
-  ee.recv_func = recv_func;
-  ee.send_func = send_func;
-  /* FIXME: Why is this exported? Should it be removed? */
-  return _gnutls_ext_register (&ee);
-}
-
 int
 _gnutls_ext_pack (gnutls_session_t session, gnutls_buffer_st * packed)
 {

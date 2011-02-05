@@ -98,50 +98,8 @@ gnutls_certificate_free_keys (gnutls_certificate_credentials_t sc)
 void
 gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc)
 {
-  /* do nothing for now */
+  /* FIXME: do nothing for now */
   return;
-}
-
-/**
- * gnutls_certificate_get_x509_cas:
- * @sc: is a #gnutls_certificate_credentials_t structure.
- * @x509_ca_list: will point to the CA list. Should be treated as constant
- * @ncas: the number of CAs
- *
- * This function will export all the CAs associated with the given
- * credentials.
- *
- * Since: 2.4.0
- * Deprecated and defunctional since: 2.11.0
- **/
-void
-gnutls_certificate_get_x509_cas (gnutls_certificate_credentials_t sc,
-                                 gnutls_x509_crt_t ** x509_ca_list,
-                                 unsigned int *ncas)
-{
-  *x509_ca_list = NULL;
-  *ncas = 0;
-}
-
-/**
- * gnutls_certificate_get_x509_crls:
- * @sc: is a #gnutls_certificate_credentials_t structure.
- * @x509_crl_list: the exported CRL list. Should be treated as constant
- * @ncrls: the number of exported CRLs
- *
- * This function will export all the CRLs associated with the given
- * credentials.
- *
- * Since: 2.4.0
- * Deprecated and defunctional since: 2.11.0
- **/
-void
-gnutls_certificate_get_x509_crls (gnutls_certificate_credentials_t sc,
-                                  gnutls_x509_crl_t ** x509_crl_list,
-                                  unsigned int *ncrls)
-{
-  *x509_crl_list = NULL;
-  *ncrls = 0;
 }
 
 #ifdef ENABLE_OPENPGP
