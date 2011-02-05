@@ -309,4 +309,21 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
                              _GNUTLS_GCC_ATTR_DEPRECATED;
 
 
+  void gnutls_certificate_get_x509_cas (gnutls_certificate_credentials_t sc,
+                                        gnutls_x509_crt_t ** x509_ca_list,
+                                        unsigned int *ncas)
+                                        _GNUTLS_GCC_ATTR_DEPRECATED;
+
+  void gnutls_certificate_get_x509_crls (gnutls_certificate_credentials_t sc,
+                                         gnutls_x509_crl_t ** x509_crl_list,
+                                         unsigned int *ncrls)
+                                         _GNUTLS_GCC_ATTR_DEPRECATED;
+
+  void
+    gnutls_certificate_get_openpgp_keyring (gnutls_certificate_credentials_t
+                                            sc,
+                                            gnutls_openpgp_keyring_t *
+                                            keyring)
+                                            _GNUTLS_GCC_ATTR_DEPRECATED;
+
 #endif /* _GNUTLS_COMPAT_H */
