@@ -71,9 +71,6 @@ gnutls_x509_privkey_sign_hash: DEPRECATED (use: gnutls_privkey_sign_hash2)
 gnutls_x509_privkey_verify_data: DEPRECATED (use: gnutls_pubkey_verify_data)
 gnutls_psk_netconf_derive_key: DEPRECATED
 gnutls_session_set_finished_function: DEPRECATED
-gnutls_session_get_server_random: DEPRECATED
-gnutls_session_get_client_random: DEPRECATED
-gnutls_session_get_master_secret: DEPRECATED
 gnutls_x509_crt_verify_hash: DEPRECATED (use: gnutls_pubkey_verify_hash)
 gnutls_x509_crt_verify_data: DEPRECATED (use: gnutls_pubkey_verify_data)
 gnutls_x509_crt_get_verify_algorithm: DEPRECATED (use: gnutls_pubkey_get_verify_algorithm)
@@ -85,6 +82,9 @@ gnutls_privkey_sign_hash: REMOVED (was added in 2.11.0)
 gnutls_ext_register: REMOVED
 gnutls_certificate_get_x509_crls: REMOVED
 gnutls_certificate_get_x509_cas: REMOVED
+gnutls_session_get_server_random: REMOVED
+gnutls_session_get_client_random: REMOVED
+gnutls_session_get_master_secret: REMOVED
 
 * Version 2.11.6 (released 2010-12-06)
 

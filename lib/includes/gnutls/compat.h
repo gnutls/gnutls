@@ -188,19 +188,6 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
                                                 func)
   _GNUTLS_GCC_ATTR_DEPRECATED;
 
-/* returns security values. 
- * Do not use them unless you know what you're doing. Those are dangerous since
- * they depend on a particular TLS version number
- */
-#define GNUTLS_MASTER_SIZE 48
-#define GNUTLS_RANDOM_SIZE 32
-     const void *gnutls_session_get_server_random (gnutls_session_t session)
-  _GNUTLS_GCC_ATTR_DEPRECATED;
-     const void *gnutls_session_get_client_random (gnutls_session_t session)
-  _GNUTLS_GCC_ATTR_DEPRECATED;
-     const void *gnutls_session_get_master_secret (gnutls_session_t session)
-  _GNUTLS_GCC_ATTR_DEPRECATED;
-
      int gnutls_psk_netconf_derive_key (const char *password,
                                         const char *psk_identity,
                                         const char *psk_identity_hint,
