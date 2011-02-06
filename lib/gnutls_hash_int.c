@@ -282,12 +282,17 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
       return result;
     }
 
-  _gnutls_mac_ops.setkey (dig->handle, key, keylen);
-
   dig->hash = _gnutls_mac_ops.hash;
   dig->output = _gnutls_mac_ops.output;
   dig->deinit = _gnutls_mac_ops.deinit;
   dig->reset = _gnutls_mac_ops.reset;
+
+  if (_gnutls_mac_ops.setkey (dig->handle, key, keylen) < 0)
+    {
+      gnutls_assert();
+      dig->deinit(dig->handle);
+      return GNUTLS_E_HASH_FAILED;
+    }
 
   return 0;
 }
