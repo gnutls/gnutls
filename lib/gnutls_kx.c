@@ -75,6 +75,7 @@ send_handshake (gnutls_session_t session, opaque * data, size_t size,
  */
 
 #define MASTER_SECRET "master secret"
+#define MASTER_SECRET_SIZE (sizeof(MASTER_SECRET)-1)
 static int generate_normal_master (gnutls_session_t session, int);
 
 int
@@ -134,7 +135,7 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
 
       ret =
         _gnutls_PRF (session, PREMASTER.data, PREMASTER.size,
-                     MASTER_SECRET, strlen (MASTER_SECRET),
+                     MASTER_SECRET, MASTER_SECRET_SIZE,
                      rnd, 2 * GNUTLS_RANDOM_SIZE, GNUTLS_MASTER_SIZE,
                      session->security_parameters.master_secret);
     }
