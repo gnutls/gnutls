@@ -58,7 +58,12 @@ struct nettle_hash_ctx
   digest_func digest;
 };
 
-#define MAX_HMAC_KEY 128
+/* FIXME: Nettle doesn't have a reset function for
+ * hmac so we need to manually reset a context, by
+ * calling set_key(). For that reason we need to
+ * store the hmac key here.
+ */
+#define MAX_HMAC_KEY 1024
 
 struct nettle_hmac_ctx
 {
