@@ -665,12 +665,6 @@ handle_error (socket_st * hd, int err)
       if (str == NULL)
         str = str_unknown;
       printf ("*** Received alert [%d]: %s\n", alert, str);
-
-      /* In SRP if the alert is MISSING_SRP_USERNAME,
-       * we should read the username/password and
-       * call gnutls_handshake(). This is not implemented
-       * here.
-       */
     }
 
   check_rehandshake (hd, err);
@@ -1108,7 +1102,6 @@ do_handshake (socket_st * socket)
 
 
       socket->secure = 1;
-
     }
   else
     {
