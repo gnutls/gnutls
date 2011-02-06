@@ -74,13 +74,12 @@ endif
 
 if HAVE_FORK
 ctests += x509self x509dn anonself pskself dhepskself	\
-	tlsia resume setcredcrash
+	resume setcredcrash
 
 if ENABLE_OPENPGP
 ctests += openpgpself 
 endif
 
-tlsia_LDADD = ../libextra/libgnutls-extra.la $(LDADD) $(LTLIBREADLINE)
 endif
 
 check_PROGRAMS = $(ctests)

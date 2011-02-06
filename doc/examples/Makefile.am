@@ -56,7 +56,6 @@ endif
 
 if ENABLE_ANON
 noinst_PROGRAMS += ex-client1 ex-serv-anon
-noinst_PROGRAMS += ex-client-tlsia 
 endif
 
 if ENABLE_OPENPGP

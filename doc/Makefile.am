@@ -40,7 +40,7 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi lgpl-2.1.texi gpl-3.0.texi \
 gnutls_TEXINFOS += examples/ex-client1.c examples/ex-client2.c		\
 	examples/ex-session-info.c examples/ex-verify.c			\
 	examples/ex-cert-select.c examples/ex-client-resume.c		\
-	examples/ex-client-srp.c examples/ex-client-tlsia.c		\
+	examples/ex-client-srp.c 	\
 	examples/ex-rfc2818.c examples/ex-serv1.c			\
 	examples/ex-serv-anon.c		\
 	examples/ex-serv-pgp.c examples/ex-serv-srp.c			\

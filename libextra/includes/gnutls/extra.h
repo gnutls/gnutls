@@ -125,19 +125,15 @@ extern "C"
                                     size_t session_keys_size,
                                     const char *session_keys)
                                     _GNUTLS_GCC_ATTR_DEPRECATED;
-  extern int gnutls_ia_endphase_send (gnutls_session_t session, int final_p)
-  _GNUTLS_GCC_ATTR_DEPRECATED;
+  extern int gnutls_ia_endphase_send (gnutls_session_t session, int final_p);
 
   extern int gnutls_ia_verify_endphase (gnutls_session_t session,
-                                        const char *checksum)
-                                        _GNUTLS_GCC_ATTR_DEPRECATED;
+                                        const char *checksum);
 
   extern ssize_t gnutls_ia_send (gnutls_session_t session,
-                                 const char *data, size_t sizeofdata)
-                                 _GNUTLS_GCC_ATTR_DEPRECATED;
+                                 const char *data, size_t sizeofdata);
   extern ssize_t gnutls_ia_recv (gnutls_session_t session,
-                                 char *data, size_t sizeofdata)
-                                 _GNUTLS_GCC_ATTR_DEPRECATED;
+                                 char *data, size_t sizeofdata);
 
   /* Utility stuff. */
   extern int gnutls_ia_generate_challenge (gnutls_session_t session,
