@@ -40,7 +40,7 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi lgpl-2.1.texi gpl-3.0.texi \
 gnutls_TEXINFOS += examples/ex-client1.c examples/ex-client2.c		\
 	examples/ex-session-info.c examples/ex-verify.c			\
 	examples/ex-cert-select.c examples/ex-client-resume.c		\
-	examples/ex-client-srp.c examples/ex-client-tlsia.c		\
+	examples/ex-client-srp.c 	\
 	examples/ex-rfc2818.c examples/ex-serv1.c			\
 	examples/ex-serv-anon.c		\
 	examples/ex-serv-pgp.c examples/ex-serv-srp.c			\
@@ -100,9 +100,9 @@ MAINTAINERCLEANFILES =
 
 # Generated texinfos.
 
-gnutls_TEXINFOS += gnutls-api.texi extra-api.texi ia-api.texi	\
+gnutls_TEXINFOS += gnutls-api.texi extra-api.texi \
 	x509-api.texi pgp-api.texi
-MAINTAINERCLEANFILES += gnutls-api.texi extra-api.texi ia-api.texi	\
+MAINTAINERCLEANFILES += gnutls-api.texi extra-api.texi \
 	x509-api.texi pgp-api.texi
 
 gnutls-api.texi: $(srcdir)/../lib/*.c
@@ -139,17 +139,6 @@ pgp-api.texi: $(srcdir)/../lib/openpgp/*.c
 	mv -f $@-tmp2 $@
 
 extra-api.texi: $(srcdir)/../libextra/gnutls_extra.c
-	echo "" > $@-tmp
-	for i in $^; do \
-		echo -n "Creating documentation for file $$i... " && \
-		$(srcdir)/scripts/gdoc -texinfo $$i >> $@-tmp && \
-		echo "ok"; \
-	done
-	$(srcdir)/scripts/sort2.pl < $@-tmp > $@-tmp2
-	rm -f $@-tmp
-	mv -f $@-tmp2 $@
-
-ia-api.texi: $(srcdir)/../libextra/gnutls_ia.c
 	echo "" > $@-tmp
 	for i in $^; do \
 		echo -n "Creating documentation for file $$i... " && \

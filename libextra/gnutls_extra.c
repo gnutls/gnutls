@@ -25,7 +25,6 @@
 #include <gnutls_errors.h>
 #include <gnutls_extensions.h>
 #include <gnutls_algorithms.h>
-#include <ext_inner_application.h>
 
 #ifdef HAVE_GCRYPT
 #include <gcrypt.h>
@@ -110,8 +109,6 @@ static int _gnutls_init_extra = 0;
 int
 gnutls_global_init_extra (void)
 {
-  int ret;
-
   /* If the version of libgnutls != version of
    * libextra, then do not initialize the library.
    * This is because it may break things.
@@ -125,10 +122,6 @@ gnutls_global_init_extra (void)
 
   if (_gnutls_init_extra != 1)
     return 0;
-
-  ret = _gnutls_ext_register (&ext_mod_ia);
-  if (ret != GNUTLS_E_SUCCESS)
-    return ret;
 
   /* Initialize the LZO library
    */

@@ -3,7 +3,10 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 2.11.7 (unreleased)
+* Version 2.99.0 (unreleased)
+
+** libgnutls-extra: Inner application extension was removed.
+It was never standardized nor published as an RFC.
 
 ** libgnutls: Added new certificate verification functions, that
 can provide more details and are more efficient. Check 
@@ -15,6 +18,36 @@ gnutls_x509_trust_list_*.
 ** certtool: Added new certificate verification functionality
 using the --verify option. Combined with --load-ca-certificate
 it can verify a certificate chain against a list of certificates.
+
+** API and ABI modifications:
+gnutls_ext_register: REMOVED
+gnutls_certificate_get_x509_crls: REMOVED
+gnutls_certificate_get_x509_cas: REMOVED
+gnutls_session_get_server_random: REMOVED
+gnutls_session_get_client_random: REMOVED
+gnutls_session_get_master_secret: REMOVED
+gnutls_ia_allocate_client_credentials: REMOVED
+gnutls_ia_allocate_server_credentials: REMOVED
+gnutls_ia_enable: REMOVED
+gnutls_ia_endphase_send: REMOVED
+gnutls_ia_extract_inner_secret: REMOVED
+gnutls_ia_free_client_credentials: REMOVED
+gnutls_ia_free_server_credentials: REMOVED
+gnutls_ia_generate_challenge: REMOVED
+gnutls_ia_get_client_avp_ptr: REMOVED
+gnutls_ia_get_server_avp_ptr: REMOVED
+gnutls_ia_handshake: REMOVED
+gnutls_ia_handshake_p: REMOVED
+gnutls_ia_permute_inner_secret: REMOVED
+gnutls_ia_recv: REMOVED
+gnutls_ia_send: REMOVED
+gnutls_ia_set_client_avp_function: REMOVED
+gnutls_ia_set_client_avp_ptr: REMOVED
+gnutls_ia_set_server_avp_function: REMOVED
+gnutls_ia_set_server_avp_ptr: REMOVED
+gnutls_ia_verify_endphase: REMOVED
+
+* Version 2.11.7
 
 ** libgnutls: The deprecated  gnutls_x509_privkey_sign_hash() was
 replaced by gnutls_privkey_sign_hash2().
@@ -79,12 +112,6 @@ gnutls_openpgp_privkey_sign_hash: DEPRECATED (use: gnutls_privkey_sign_hash2)
 gnutls_pkcs11_privkey_sign_hash: REMOVED (was added in 2.11.0)
 gnutls_pkcs11_privkey_decrypt_data: REMOVED (was added in 2.11.0)
 gnutls_privkey_sign_hash: REMOVED (was added in 2.11.0)
-gnutls_ext_register: REMOVED
-gnutls_certificate_get_x509_crls: REMOVED
-gnutls_certificate_get_x509_cas: REMOVED
-gnutls_session_get_server_random: REMOVED
-gnutls_session_get_client_random: REMOVED
-gnutls_session_get_master_secret: REMOVED
 
 * Version 2.11.6 (released 2010-12-06)
 

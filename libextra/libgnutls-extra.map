@@ -26,26 +26,6 @@ GNUTLS_1_4
   global:
     gnutls_extra_check_version;
     gnutls_global_init_extra;
-    gnutls_ia_allocate_client_credentials;
-    gnutls_ia_allocate_server_credentials;
-    gnutls_ia_enable;
-    gnutls_ia_endphase_send;
-    gnutls_ia_extract_inner_secret;
-    gnutls_ia_free_client_credentials;
-    gnutls_ia_free_server_credentials;
-    gnutls_ia_generate_challenge;
-    gnutls_ia_get_client_avp_ptr;
-    gnutls_ia_get_server_avp_ptr;
-    gnutls_ia_handshake;
-    gnutls_ia_handshake_p;
-    gnutls_ia_permute_inner_secret;
-    gnutls_ia_recv;
-    gnutls_ia_send;
-    gnutls_ia_set_client_avp_function;
-    gnutls_ia_set_client_avp_ptr;
-    gnutls_ia_set_server_avp_function;
-    gnutls_ia_set_server_avp_ptr;
-    gnutls_ia_verify_endphase;
     gnutls_register_md5_handler;
 
   local:

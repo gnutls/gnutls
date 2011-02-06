@@ -39,7 +39,6 @@
 #include <gnutls_datum.h>
 #include <gnutls_rsa_export.h>
 #include <gnutls_mbuffers.h>
-#include "../libextra/ext_inner_application.h"  /* isn't this too much? */
 
 /* This is a temporary function to be used before the generate_*
    internal API is changed to use mbuffers. For now we don't avoid the
@@ -139,9 +138,6 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
                      rnd, 2 * GNUTLS_RANDOM_SIZE, GNUTLS_MASTER_SIZE,
                      session->security_parameters.master_secret);
     }
-
-  /* TLS/IA inner secret is derived from the master secret. */
-  _gnutls_ia_derive_inner_secret (session);
 
   if (!keep_premaster)
     _gnutls_free_datum (&PREMASTER);

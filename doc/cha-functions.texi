@@ -105,8 +105,6 @@ The control flow in a typical server is similar to the above, use
 @code{gnutls_ia_client_credentials_t}, and replace the call to the
 client functions with the corresponding server functions.
 
-@include ia-api.texi
-
 @node Error codes and descriptions
 @section Error Codes and Descriptions
 @anchor{Error Codes}

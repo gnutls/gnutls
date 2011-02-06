@@ -182,7 +182,6 @@ implemented by another example.
 * Client using a PKCS #11 token with TLS::
 * Client with Resume capability example::
 * Simple client example with SRP authentication::
-* Simple client example with TLS/IA support::
 * Simple client example in C++::
 * Helper function for TCP connections::
 @end menu
@@ -285,14 +284,6 @@ client which connects to a server and authenticates using a
 itself using a certificate, and in that case it has to be verified.
 
 @verbatiminclude examples/ex-client-srp.c
-
-@node Simple client example with TLS/IA support
-@subsection Simple Client Example with @acronym{TLS/IA} Support
-
-The following client is a simple client which uses the
-@acronym{TLS/IA} extension to authenticate with the server.
-
-@verbatiminclude examples/ex-client-tlsia.c
 
 @node Simple client example in C++
 @subsection Simple Client Example using the C++ API
