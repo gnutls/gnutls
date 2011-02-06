@@ -71,66 +71,86 @@ extern "C"
 
   /* Allocate and free TLS/IA credentials. */
   extern void
-    gnutls_ia_free_client_credentials (gnutls_ia_client_credentials_t sc);
+    gnutls_ia_free_client_credentials (gnutls_ia_client_credentials_t sc) 
+    _GNUTLS_GCC_ATTR_DEPRECATED;
   extern int
     gnutls_ia_allocate_client_credentials (gnutls_ia_client_credentials_t *
-                                           sc);
+                                           sc)
+                                           _GNUTLS_GCC_ATTR_DEPRECATED;
 
   extern void
-    gnutls_ia_free_server_credentials (gnutls_ia_server_credentials_t sc);
+    gnutls_ia_free_server_credentials (gnutls_ia_server_credentials_t sc)
+    _GNUTLS_GCC_ATTR_DEPRECATED;
   extern int
     gnutls_ia_allocate_server_credentials (gnutls_ia_server_credentials_t *
-                                           sc);
+                                           sc)
+                                           _GNUTLS_GCC_ATTR_DEPRECATED;
 
   /* Client TLS/IA credential functions. */
   extern void
     gnutls_ia_set_client_avp_function (gnutls_ia_client_credentials_t cred,
-                                       gnutls_ia_avp_func avp_func);
+                                       gnutls_ia_avp_func avp_func)
+                                       _GNUTLS_GCC_ATTR_DEPRECATED;
   extern void
     gnutls_ia_set_client_avp_ptr (gnutls_ia_client_credentials_t cred,
-                                  void *ptr);
+                                  void *ptr)
+                                  _GNUTLS_GCC_ATTR_DEPRECATED;
   extern void *gnutls_ia_get_client_avp_ptr (gnutls_ia_client_credentials_t
-                                             cred);
+                                             cred)
+                                             _GNUTLS_GCC_ATTR_DEPRECATED;
 
   /* Server TLS/IA credential functions. */
   extern void
     gnutls_ia_set_server_avp_function (gnutls_ia_server_credentials_t cred,
-                                       gnutls_ia_avp_func avp_func);
+                                       gnutls_ia_avp_func avp_func)
+                                       _GNUTLS_GCC_ATTR_DEPRECATED;
   extern void
     gnutls_ia_set_server_avp_ptr (gnutls_ia_server_credentials_t cred,
-                                  void *ptr);
+                                  void *ptr)
+                                  _GNUTLS_GCC_ATTR_DEPRECATED;
   extern void *gnutls_ia_get_server_avp_ptr (gnutls_ia_server_credentials_t
-                                             cred);
+                                             cred)
+                                             _GNUTLS_GCC_ATTR_DEPRECATED;
 
   /* TLS/IA handshake. */
-  extern int gnutls_ia_handshake_p (gnutls_session_t session);
+  extern int gnutls_ia_handshake_p (gnutls_session_t session)
+  _GNUTLS_GCC_ATTR_DEPRECATED;
 
-  extern int gnutls_ia_handshake (gnutls_session_t session);
+  extern int gnutls_ia_handshake (gnutls_session_t session)
+  _GNUTLS_GCC_ATTR_DEPRECATED;
 
   /* TLS/IA low level interface. */
   extern int
     gnutls_ia_permute_inner_secret (gnutls_session_t session,
                                     size_t session_keys_size,
-                                    const char *session_keys);
-  extern int gnutls_ia_endphase_send (gnutls_session_t session, int final_p);
+                                    const char *session_keys)
+                                    _GNUTLS_GCC_ATTR_DEPRECATED;
+  extern int gnutls_ia_endphase_send (gnutls_session_t session, int final_p)
+  _GNUTLS_GCC_ATTR_DEPRECATED;
 
   extern int gnutls_ia_verify_endphase (gnutls_session_t session,
-                                        const char *checksum);
+                                        const char *checksum)
+                                        _GNUTLS_GCC_ATTR_DEPRECATED;
 
   extern ssize_t gnutls_ia_send (gnutls_session_t session,
-                                 const char *data, size_t sizeofdata);
+                                 const char *data, size_t sizeofdata)
+                                 _GNUTLS_GCC_ATTR_DEPRECATED;
   extern ssize_t gnutls_ia_recv (gnutls_session_t session,
-                                 char *data, size_t sizeofdata);
+                                 char *data, size_t sizeofdata)
+                                 _GNUTLS_GCC_ATTR_DEPRECATED;
 
   /* Utility stuff. */
   extern int gnutls_ia_generate_challenge (gnutls_session_t session,
-                                           size_t buffer_size, char *buffer);
+                                           size_t buffer_size, char *buffer)
+                                           _GNUTLS_GCC_ATTR_DEPRECATED;
   extern void gnutls_ia_extract_inner_secret (gnutls_session_t session,
-                                              char *buffer);
+                                              char *buffer)
+                                              _GNUTLS_GCC_ATTR_DEPRECATED;
 
   /* Define whether inner phases are wanted. */
   extern void gnutls_ia_enable (gnutls_session_t session,
-                                int allow_skip_on_resume);
+                                int allow_skip_on_resume)
+                                _GNUTLS_GCC_ATTR_DEPRECATED;
 
   int gnutls_global_init_extra (void);
 
