@@ -62,23 +62,91 @@ typedef struct
 /* basic functions */
 int _gnutls_hmac_init (digest_hd_st *, gnutls_mac_algorithm_t algorithm,
                        const void *key, int keylen);
-int _gnutls_hmac_get_algo_len (gnutls_mac_algorithm_t algorithm);
-int _gnutls_hmac (digest_hd_st * handle, const void *text, size_t textlen);
-void _gnutls_hmac_reset (digest_hd_st * handle);
-
+int _gnutls_hash_get_algo_len (gnutls_digest_algorithm_t algorithm);
+#define _gnutls_hmac_get_algo_len _gnutls_hash_get_algo_len
 int _gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
                        int keylen, const void *text, size_t textlen,
                        void *digest);
 
-void _gnutls_hmac_deinit (digest_hd_st * handle, void *digest);
-void _gnutls_hmac_output (digest_hd_st * handle, void *digest);
+inline static int
+_gnutls_hmac (digest_hd_st * handle, const void *text, size_t textlen)
+{
+  if (textlen > 0)
+    {
+      return handle->hash (handle->handle, text, textlen);
+    }
+  return 0;
+}
 
+inline static void
+_gnutls_hmac_output (digest_hd_st * handle, void *digest)
+{
+  int maclen;
+
+  maclen = _gnutls_hmac_get_algo_len (handle->algorithm);
+
+  if (digest != NULL)
+    {
+      handle->output (handle->handle, digest, maclen);
+    }
+}
+
+void
+_gnutls_hmac_deinit (digest_hd_st * handle, void *digest);
+
+inline static void
+_gnutls_hmac_reset (digest_hd_st * handle)
+{
+  if (handle->handle == NULL)
+    {
+      return;
+    }
+
+  handle->reset (handle->handle);
+}
+
+
+/* Hash interface */
 int _gnutls_hash_init (digest_hd_st *, gnutls_digest_algorithm_t algorithm);
-int _gnutls_hash_get_algo_len (gnutls_digest_algorithm_t algorithm);
-int _gnutls_hash (digest_hd_st * handle, const void *text, size_t textlen);
-void _gnutls_hash_deinit (digest_hd_st * handle, void *digest);
-void _gnutls_hash_reset (digest_hd_st * handle);
-void _gnutls_hash_output (digest_hd_st * handle, void *digest);
+
+inline static int
+_gnutls_hash (digest_hd_st * handle, const void *text, size_t textlen)
+{
+  if (textlen > 0)
+    {
+      handle->hash (handle->handle, text, textlen);
+    }
+  return 0;
+}
+
+/* when the current output is needed without calling deinit
+ */
+inline static void
+_gnutls_hash_output (digest_hd_st * handle, void *digest)
+{
+  size_t maclen;
+
+  maclen = _gnutls_hash_get_algo_len (handle->algorithm);
+
+  if (digest != NULL)
+    {
+      handle->output (handle->handle, digest, maclen);
+    }
+}
+
+inline static void
+_gnutls_hash_reset (digest_hd_st * handle)
+{
+  if (handle->handle == NULL)
+    {
+      return;
+    }
+
+  handle->reset (handle->handle);
+}
+
+void
+_gnutls_hash_deinit (digest_hd_st * handle, void *digest);
 
 int
 _gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,

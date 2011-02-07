@@ -57,28 +57,71 @@ int _gnutls_cipher_init (cipher_hd_st *, gnutls_cipher_algorithm_t cipher,
                          const gnutls_datum_t * key,
                          const gnutls_datum_t * iv);
 
-/* Add auth data for AUTHENC ciphers
- */
-int _gnutls_cipher_auth (const cipher_hd_st * handle, const void *text,
-                             int textlen);
+inline static void _gnutls_cipher_setiv (const cipher_hd_st * handle, 
+    const void *iv, int ivlen)
+{
+  handle->setiv(handle->handle, iv, ivlen);
+}
 
-void _gnutls_cipher_setiv (const cipher_hd_st * handle, const void *iv,
-                            int ivlen);
+inline static int
+_gnutls_cipher_encrypt2 (const cipher_hd_st * handle, const void *text,
+                         int textlen, void *ciphertext, int ciphertextlen)
+{
+  if (handle != NULL && handle->handle != NULL)
+    {
+      return handle->encrypt (handle->handle, text, textlen, ciphertext,
+                              ciphertextlen);
+    }
 
-int _gnutls_cipher_encrypt2 (const cipher_hd_st * handle, const void *text,
-                             int textlen, void *ciphertext,
-                             int ciphertextlen);
-int _gnutls_cipher_decrypt2 (const cipher_hd_st * handle,
-                             const void *ciphertext, int ciphertextlen,
-                             void *text, int textlen);
+  return 0;
+}
+
+inline static int
+_gnutls_cipher_decrypt2 (const cipher_hd_st * handle, const void *ciphertext,
+                         int ciphertextlen, void *text, int textlen)
+{
+  if (handle != NULL && handle->handle != NULL)
+    {
+      return handle->decrypt (handle->handle, ciphertext, ciphertextlen,
+                              text, textlen);
+    }
+
+  return 0;
+}
+
+inline static void
+_gnutls_cipher_deinit (cipher_hd_st * handle)
+{
+  if (handle != NULL && handle->handle != NULL)
+    {
+      handle->deinit (handle->handle);
+      handle->handle = NULL;
+    }
+}
 
 /* returns the tag in AUTHENC ciphers */
-void _gnutls_cipher_tag( const cipher_hd_st * handle, void* tag, int tag_size);
+inline static void _gnutls_cipher_tag( const cipher_hd_st * handle, void* tag, int tag_size)
+{
+  if (handle != NULL && handle->handle != NULL)
+    {
+      handle->tag (handle->handle, tag, tag_size);
+    }
+}
+
+/* Add auth data for AUTHENC ciphers
+ */
+inline static int _gnutls_cipher_auth (const cipher_hd_st * handle, const void *text,
+                             int textlen)
+{
+  if (handle != NULL && handle->handle != NULL)
+    {
+      return handle->auth (handle->handle, text, textlen);
+    }
+  return GNUTLS_E_INTERNAL_ERROR;
+}
 
 #define _gnutls_cipher_encrypt(x,y,z) _gnutls_cipher_encrypt2(x,y,z,y,z)
 #define _gnutls_cipher_decrypt(x,y,z) _gnutls_cipher_decrypt2(x,y,z,y,z)
-
-void _gnutls_cipher_deinit (cipher_hd_st * handle);
 
 /* auth_cipher API. Allows combining a cipher with a MAC.
  */

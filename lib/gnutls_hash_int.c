@@ -103,22 +103,27 @@ _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
   return 0;
 }
 
+void
+_gnutls_hash_deinit (digest_hd_st * handle, void *digest)
+{
+  if (handle->handle == NULL)
+    {
+      return;
+    }
+
+  if (digest != NULL)
+    _gnutls_hash_output (handle, digest);
+
+  handle->deinit (handle->handle);
+  handle->handle = NULL;
+}
+
 /* returns the output size of the given hash/mac algorithm
  */
 int
 _gnutls_hash_get_algo_len (gnutls_digest_algorithm_t algorithm)
 {
   return digest_length (algorithm);
-}
-
-int
-_gnutls_hash (digest_hd_st * handle, const void *text, size_t textlen)
-{
-  if (textlen > 0)
-    {
-      handle->hash (handle->handle, text, textlen);
-    }
-  return 0;
 }
 
 int
@@ -136,46 +141,7 @@ _gnutls_hash_copy (digest_hd_st * dst, digest_hd_st * src)
   return src->copy (&dst->handle, src->handle);
 }
 
-/* when the current output is needed without calling deinit
- */
-void
-_gnutls_hash_output (digest_hd_st * handle, void *digest)
-{
-  size_t maclen;
 
-  maclen = _gnutls_hash_get_algo_len (handle->algorithm);
-
-  if (digest != NULL)
-    {
-      handle->output (handle->handle, digest, maclen);
-    }
-}
-
-void
-_gnutls_hash_deinit (digest_hd_st * handle, void *digest)
-{
-  if (handle->handle == NULL)
-    {
-      return;
-    }
-
-  if (digest != NULL)
-    _gnutls_hash_output (handle, digest);
-
-  handle->deinit (handle->handle);
-  handle->handle = NULL;
-}
-
-void
-_gnutls_hash_reset (digest_hd_st * handle)
-{
-  if (handle->handle == NULL)
-    {
-      return;
-    }
-
-  handle->reset (handle->handle);
-}
 
 int
 _gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,
@@ -205,12 +171,6 @@ _gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,
 
 
 /* HMAC interface */
-
-int
-_gnutls_hmac_get_algo_len (gnutls_mac_algorithm_t algorithm)
-{
-  return digest_length (algorithm);
-}
 
 int
 _gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
@@ -297,29 +257,6 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
   return 0;
 }
 
-int
-_gnutls_hmac (digest_hd_st * handle, const void *text, size_t textlen)
-{
-  if (textlen > 0)
-    {
-      return handle->hash (handle->handle, text, textlen);
-    }
-  return 0;
-}
-
-void
-_gnutls_hmac_output (digest_hd_st * handle, void *digest)
-{
-  int maclen;
-
-  maclen = _gnutls_hmac_get_algo_len (handle->algorithm);
-
-  if (digest != NULL)
-    {
-      handle->output (handle->handle, digest, maclen);
-    }
-}
-
 void
 _gnutls_hmac_deinit (digest_hd_st * handle, void *digest)
 {
@@ -335,17 +272,6 @@ _gnutls_hmac_deinit (digest_hd_st * handle, void *digest)
   handle->handle = NULL;
 }
 
-void
-_gnutls_hmac_reset (digest_hd_st * handle)
-{
-  if (handle->handle == NULL)
-    {
-      return;
-    }
-
-  handle->reset (handle->handle);
-}
-
 inline static int
 get_padsize (gnutls_mac_algorithm_t algorithm)
 {
@@ -359,7 +285,6 @@ get_padsize (gnutls_mac_algorithm_t algorithm)
       return 0;
     }
 }
-
 
 /* Special functions for SSL3 MAC
  */

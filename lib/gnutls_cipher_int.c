@@ -108,67 +108,6 @@ cc_cleanup:
   return ret;
 }
 
-void _gnutls_cipher_setiv (const cipher_hd_st * handle, 
-    const void *iv, int ivlen)
-{
-  handle->setiv(handle->handle, iv, ivlen);
-}
-
-int
-_gnutls_cipher_encrypt2 (const cipher_hd_st * handle, const void *text,
-                         int textlen, void *ciphertext, int ciphertextlen)
-{
-  if (handle != NULL && handle->handle != NULL)
-    {
-      return handle->encrypt (handle->handle, text, textlen, ciphertext,
-                              ciphertextlen);
-    }
-
-  return 0;
-}
-
-int
-_gnutls_cipher_decrypt2 (const cipher_hd_st * handle, const void *ciphertext,
-                         int ciphertextlen, void *text, int textlen)
-{
-  if (handle != NULL && handle->handle != NULL)
-    {
-      return handle->decrypt (handle->handle, ciphertext, ciphertextlen,
-                              text, textlen);
-    }
-
-  return 0;
-}
-
-void
-_gnutls_cipher_deinit (cipher_hd_st * handle)
-{
-  if (handle != NULL && handle->handle != NULL)
-    {
-      handle->deinit (handle->handle);
-      handle->handle = NULL;
-    }
-}
-
-/* returns the tag in AUTHENC ciphers */
-void _gnutls_cipher_tag( const cipher_hd_st * handle, void* tag, int tag_size)
-{
-  if (handle != NULL && handle->handle != NULL)
-    {
-      handle->tag (handle->handle, tag, tag_size);
-    }
-}
-
-int _gnutls_cipher_auth (const cipher_hd_st * handle, const void *text,
-                             int textlen)
-{
-  if (handle != NULL && handle->handle != NULL)
-    {
-      return handle->auth (handle->handle, text, textlen);
-    }
-  return GNUTLS_E_INTERNAL_ERROR;
-}
-
 /* Auth_cipher API 
  */
 int _gnutls_auth_cipher_init (auth_cipher_hd_st * handle, 
