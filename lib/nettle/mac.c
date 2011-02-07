@@ -58,13 +58,6 @@ struct nettle_hash_ctx
   digest_func digest;
 };
 
-/* FIXME: Nettle doesn't have a reset function for
- * hmac so we need to manually reset a context, by
- * calling set_key(). For that reason we need to
- * store the hmac key here.
- */
-#define MAX_HMAC_KEY 1024
-
 struct nettle_hmac_ctx
 {
   union
@@ -82,7 +75,13 @@ struct nettle_hmac_ctx
   update_func update;
   digest_func digest;
   set_key_func setkey;
-  opaque key[MAX_HMAC_KEY];
+
+/* FIXME: Nettle doesn't have a reset function for
+ * hmac so we need to manually reset a context, by
+ * calling set_key(). For that reason we need to
+ * store the hmac key here.
+ */
+  opaque *key;
   size_t key_size;
 };
 
@@ -91,7 +90,7 @@ wrap_nettle_hmac_init (gnutls_mac_algorithm_t algo, void **_ctx)
 {
   struct nettle_hmac_ctx *ctx;
 
-  ctx = gnutls_malloc (sizeof (struct nettle_hmac_ctx));
+  ctx = gnutls_calloc (1, sizeof (struct nettle_hmac_ctx));
   if (ctx == NULL)
     {
       gnutls_assert ();
@@ -159,11 +158,13 @@ wrap_nettle_hmac_setkey (void *_ctx, const void *key, size_t keylen)
 {
   struct nettle_hmac_ctx *ctx = _ctx;
 
-  if (keylen > MAX_HMAC_KEY)
-    {
-      gnutls_assert();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
+  if (ctx->key)
+    gnutls_free(ctx->key);
+
+  ctx->key = gnutls_malloc(keylen);
+  if (ctx->key == NULL)
+    return GNUTLS_E_MEMORY_ERROR;
+
   memcpy(ctx->key, key, keylen);
   ctx->key_size = keylen;
 
@@ -178,7 +179,6 @@ wrap_nettle_hmac_reset (void *_ctx)
   struct nettle_hmac_ctx *ctx = _ctx;
 
   ctx->setkey (ctx->ctx_ptr, ctx->key_size, ctx->key);
-  
 }
 
 static int
@@ -191,6 +191,17 @@ wrap_nettle_hmac_update (void *_ctx, const void *text, size_t textsize)
   return GNUTLS_E_SUCCESS;
 }
 
+static void
+wrap_nettle_hmac_deinit (void *hd)
+{
+  struct nettle_hmac_ctx *ctx = hd;
+
+  gnutls_free (ctx->key);
+  gnutls_free (hd);
+}
+
+/* Hash functions 
+ */
 static int
 wrap_nettle_hash_update (void *_ctx, const void *text, size_t textsize)
 {
@@ -364,7 +375,7 @@ gnutls_crypto_mac_st _gnutls_mac_ops = {
   .hash = wrap_nettle_hmac_update,
   .reset = wrap_nettle_hmac_reset,
   .output = wrap_nettle_hmac_output,
-  .deinit = wrap_nettle_hash_deinit,
+  .deinit = wrap_nettle_hmac_deinit,
 };
 
 gnutls_crypto_digest_st _gnutls_digest_ops = {
