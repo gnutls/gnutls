@@ -1498,13 +1498,6 @@ gaa_parser (int argc, char **argv)
   psk_passwd = info.psk_passwd;
 
   pgp_keyring = info.pgp_keyring;
-
-  parse_protocols (info.proto, info.nproto, protocol_priority);
-  parse_ciphers (info.ciphers, info.nciphers, cipher_priority);
-  parse_macs (info.macs, info.nmacs, mac_priority);
-  parse_ctypes (info.ctype, info.nctype, cert_type_priority);
-  parse_kx (info.kx, info.nkx, kx_priority);
-  parse_comp (info.comp, info.ncomp, comp_priority);
 }
 
 extern void serv_version (void);

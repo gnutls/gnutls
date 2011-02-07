@@ -88,30 +88,6 @@ option (srppasswdconf) STR "FILE" { $srp_passwd_conf = $1 } "SRP password conf f
 #char *opaque_prf_input;
 option (opaque-prf-input) STR "DATA" { $opaque_prf_input = $1 } "Use Opaque PRF Input DATA."
 
-#int nciphers;
-#char **ciphers;
-option (ciphers) *STR "cipher1 cipher2..." { $ciphers = $1; $nciphers = @1 } "Ciphers to enable."
-
-#int nproto;
-#char **proto;
-option (protocols) *STR "protocol1 protocol2..." { $proto = $1; $nproto = @1 } "Protocols to enable."
-
-#int ncomp;
-#char **comp;
-option (comp) *STR "comp1 comp2..." { $comp = $1; $ncomp = @1 } "Compression methods to enable."
-
-#int nmacs;
-#char **macs;
-option (macs) *STR "mac1 mac2..." { $macs = $1; $nmacs = @1 } "MACs to enable."
-
-#int nkx;
-#char **kx;
-option (kx) *STR "kx1 kx2..." { $kx = $1; $nkx = @1 } "Key exchange methods to enable."
-
-#int nctype;
-#char **ctype;
-option (ctypes) *STR "certType1 certType2..." { $ctype = $1; $nctype = @1 } "Certificate types to enable."
-
 #char *priorities;
 option (priority) STR "PRIORITY STRING" { $priorities = $1 } "Priorities string."
 
@@ -122,9 +98,7 @@ option (v, version) { serv_version(); exit(0); } "prints the program's version n
 
 INCOMP ra
 
-init { $generate=0; $port=5556; $http=0; $ciphers=NULL;
-	$kx=NULL; $comp=NULL; $macs=NULL; $ctype=NULL; $nciphers=0;
-	$nkx=0; $ncomp=0; $nmacs=0; $nctype = 0; $nodb = 0; $noticket = 0;
+init { $generate=0; $port=5556; $http=0; $nodb = 0; $noticket = 0;
 	$x509_cafile = NULL; $pgp_keyfile=NULL; $pgp_certfile=NULL;
 	$x509_keyfile=NULL; $x509_certfile=NULL; $x509_crlfile = NULL;
 	$x509_dsakeyfile=NULL; $x509_dsacertfile=NULL; 

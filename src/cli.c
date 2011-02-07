@@ -1027,13 +1027,6 @@ gaa_parser (int argc, char **argv)
     hostname = "localhost";
   else
     hostname = info.rest_args;
-
-  parse_protocols (info.proto, info.nproto, protocol_priority);
-  parse_ciphers (info.ciphers, info.nciphers, cipher_priority);
-  parse_macs (info.macs, info.nmacs, mac_priority);
-  parse_ctypes (info.ctype, info.nctype, cert_type_priority);
-  parse_kx (info.kx, info.nkx, kx_priority);
-  parse_comp (info.comp, info.ncomp, comp_priority);
 }
 
 void cli_version (void);
