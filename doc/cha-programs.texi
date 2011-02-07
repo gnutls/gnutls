@@ -792,20 +792,12 @@ Usage : psktool [options]
      -u, --username username
                               specify username.
      -p, --passwd FILE        specify a password file.
-     -n, --netconf-hint HINT
-                              derive key from Netconf password, using 
-                              HINT as the psk_identity_hint.
      -s, --keysize SIZE       specify the key size in bytes.
      -v, --version            prints the program's version number
      -h, --help               shows this help text
 @end verbatim
 
-Normally the file will generate random keys for the indicate username.
-You may also derive PSK keys from passwords, using the algorithm
-specified in @file{draft-ietf-netconf-tls-02.txt}.  The algorithm
-needs a PSK identity hint, which you specify using
-@code{--netconf-hint}.  To derive a PSK key from a password with an
-empty PSK identity hint, using @code{--netconf-hint ""}.
+Normally the file will generate random keys for the indicated username.
 
 @node Invoking srptool
 @section Invoking srptool

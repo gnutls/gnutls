@@ -27,6 +27,7 @@ it can verify a certificate chain against a list of certificates.
 ** API and ABI modifications:
 gnutls_cipher_add_auth: ADDED
 gnutls_cipher_tag: ADDED
+gnutls_psk_netconf_derive_key: REMOVED
 gnutls_certificate_verify_peers: REMOVED
 gnutls_session_set_finished_function: REMOVED
 gnutls_ext_register: REMOVED
@@ -112,7 +113,6 @@ gnutls_x509_crl_sign2: DEPRECATED (use: gnutls_x509_crl_privkey_sign)
 gnutls_x509_privkey_sign_data: DEPRECATED (use: gnutls_privkey_sign_data2)
 gnutls_x509_privkey_sign_hash: DEPRECATED (use: gnutls_privkey_sign_hash2)
 gnutls_x509_privkey_verify_data: DEPRECATED (use: gnutls_pubkey_verify_data)
-gnutls_psk_netconf_derive_key: DEPRECATED
 gnutls_session_set_finished_function: DEPRECATED
 gnutls_x509_crt_verify_hash: DEPRECATED (use: gnutls_pubkey_verify_hash)
 gnutls_x509_crt_verify_data: DEPRECATED (use: gnutls_pubkey_verify_data)

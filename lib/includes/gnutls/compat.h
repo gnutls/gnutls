@@ -177,13 +177,6 @@ gnutls_sign_func
 gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
  _GNUTLS_GCC_ATTR_DEPRECATED;
 
-     int gnutls_psk_netconf_derive_key (const char *password,
-                                        const char *psk_identity,
-                                        const char *psk_identity_hint,
-                                        gnutls_datum_t *
-                                        output_key)
-  _GNUTLS_GCC_ATTR_DEPRECATED;
-
 /* This is a very dangerous and error-prone function.
  * Use gnutls_privkey_sign_hash2() instead.
  */

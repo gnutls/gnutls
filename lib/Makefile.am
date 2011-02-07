@@ -60,7 +60,7 @@ SRP_COBJECTS = ext_srp.c gnutls_srp.c auth_srp.c auth_srp_passwd.c	\
 	auth_srp_sb64.c auth_srp_rsa.c
 
 PSK_COBJECTS = auth_psk.c auth_psk_passwd.c gnutls_psk.c	\
-	auth_dhe_psk.c gnutls_psk_netconf.c
+	auth_dhe_psk.c
 
 SESSION_TICKET_COBJECTS = ext_session_ticket.c
 
