@@ -397,7 +397,7 @@ _gnutls_mac_init_ssl3 (digest_hd_st * ret, gnutls_mac_algorithm_t algorithm,
   return 0;
 }
 
-void
+int 
 _gnutls_mac_output_ssl3 (digest_hd_st * handle, void *digest)
 {
   opaque ret[MAX_HASH_SIZE];
@@ -410,7 +410,7 @@ _gnutls_mac_output_ssl3 (digest_hd_st * handle, void *digest)
   if (padsize == 0)
     {
       gnutls_assert ();
-      return;
+      return GNUTLS_E_INTERNAL_ERROR;
     }
 
   memset (opad, 0x5C, padsize);
@@ -419,7 +419,7 @@ _gnutls_mac_output_ssl3 (digest_hd_st * handle, void *digest)
   if (rc < 0)
     {
       gnutls_assert ();
-      return;
+      return rc;
     }
 
   if (handle->keysize > 0)
@@ -431,16 +431,22 @@ _gnutls_mac_output_ssl3 (digest_hd_st * handle, void *digest)
   _gnutls_hash (&td, ret, block);
 
   _gnutls_hash_deinit (&td, digest);
+  
+  return 0;
 }
 
-void
+int
 _gnutls_mac_deinit_ssl3 (digest_hd_st * handle, void *digest)
 {
-  if (digest != NULL) _gnutls_mac_output_ssl3(handle, digest);
+int ret = 0;
+
+  if (digest != NULL) ret = _gnutls_mac_output_ssl3(handle, digest);
   _gnutls_hash_deinit(handle, NULL);
+  
+  return ret;
 }
 
-void
+int
 _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle,
                                    void *digest, opaque * key,
                                    uint32_t key_size)
@@ -456,7 +462,8 @@ _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle,
   if (padsize == 0)
     {
       gnutls_assert ();
-      return;
+      rc = GNUTLS_E_INTERNAL_ERROR;
+      goto cleanup;
     }
 
   memset (opad, 0x5C, padsize);
@@ -466,7 +473,7 @@ _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle,
   if (rc < 0)
     {
       gnutls_assert ();
-      return;
+      goto cleanup;
     }
 
   if (key_size > 0)
@@ -484,7 +491,11 @@ _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle,
 
   _gnutls_hash_deinit (&td, digest);
 
-  return;
+  return 0;
+
+cleanup:
+  _gnutls_hash_deinit(handle, NULL);
+  return rc;
 }
 
 static int

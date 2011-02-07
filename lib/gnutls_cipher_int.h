@@ -110,7 +110,7 @@ int _gnutls_auth_cipher_encrypt2_tag (auth_cipher_hd_st * handle, const uint8_t 
 int _gnutls_auth_cipher_decrypt2 (auth_cipher_hd_st * handle,
                              const void *ciphertext, int ciphertextlen,
                              void *text, int textlen);
-void _gnutls_auth_cipher_tag( auth_cipher_hd_st * handle, void* tag, int tag_size);
+int _gnutls_auth_cipher_tag( auth_cipher_hd_st * handle, void* tag, int tag_size);
 
 inline static void _gnutls_auth_cipher_setiv (const auth_cipher_hd_st * handle, 
     const void *iv, int ivlen)

@@ -579,7 +579,9 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
       return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
     }
 
-  _gnutls_auth_cipher_tag(&params->read.cipher_state, tag, tag_size);
+  ret = _gnutls_auth_cipher_tag(&params->read.cipher_state, tag, tag_size);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   /* This one was introduced to avoid a timing attack against the TLS
    * 1.0 protocol.

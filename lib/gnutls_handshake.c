@@ -223,14 +223,26 @@ _gnutls_ssl3_finished (gnutls_session_t session, int type, opaque * ret)
   _gnutls_hash (&td_md5, mesg, siz);
   _gnutls_hash (&td_sha, mesg, siz);
 
-  _gnutls_mac_deinit_ssl3_handshake (&td_md5, ret,
+  rc = _gnutls_mac_deinit_ssl3_handshake (&td_md5, ret,
                                      session->
                                      security_parameters.master_secret,
                                      GNUTLS_MASTER_SIZE);
-  _gnutls_mac_deinit_ssl3_handshake (&td_sha, &ret[16],
+  if (rc < 0)
+    {
+      _gnutls_hash_deinit (&td_md5, NULL);
+      _gnutls_hash_deinit (&td_sha, NULL);
+      return gnutls_assert_val(rc);
+    }
+
+  rc = _gnutls_mac_deinit_ssl3_handshake (&td_sha, &ret[16],
                                      session->
                                      security_parameters.master_secret,
                                      GNUTLS_MASTER_SIZE);
+  if (rc < 0)
+    {
+      _gnutls_hash_deinit (&td_sha, NULL);
+      return gnutls_assert_val(rc);
+    }
 
   return 0;
 }

@@ -255,24 +255,23 @@ int ret;
           gnutls_assert();
           return ret;
         }
-      _gnutls_auth_cipher_tag(handle, tag_ptr, tag_size);
+      ret = _gnutls_auth_cipher_tag(handle, tag_ptr, tag_size);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
 
       ret = _gnutls_cipher_encrypt2(&handle->cipher, text, textlen, ciphertext, ciphertextlen);
       if (ret < 0)
-        {
-          gnutls_assert();
-          return ret;
-        }
+        return gnutls_assert_val(ret);
     }
   else if (handle->is_auth)
     {
       ret = _gnutls_cipher_encrypt2(&handle->cipher, text, textlen, ciphertext, ciphertextlen);
       if (ret < 0)
-        {
-          gnutls_assert();
-          return ret;
-        }
-      _gnutls_auth_cipher_tag(handle, tag_ptr, tag_size);
+        return gnutls_assert_val(ret);
+
+      ret = _gnutls_auth_cipher_tag(handle, tag_ptr, tag_size);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
 
   return 0;
@@ -306,13 +305,17 @@ int ret;
   return 0;
 }
 
-void _gnutls_auth_cipher_tag(auth_cipher_hd_st * handle, void* tag, int tag_size)
+int _gnutls_auth_cipher_tag(auth_cipher_hd_st * handle, void* tag, int tag_size)
 {
+int ret = 0;
   if (handle->is_mac)
     {
       if (handle->ssl_hmac)
         {
-          _gnutls_mac_output_ssl3 (&handle->mac, tag);
+          ret = _gnutls_mac_output_ssl3 (&handle->mac, tag);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+
           _gnutls_hash_reset (&handle->mac);
         }
       else
@@ -325,13 +328,15 @@ void _gnutls_auth_cipher_tag(auth_cipher_hd_st * handle, void* tag, int tag_size
     {
       _gnutls_cipher_tag(&handle->cipher, tag, tag_size);
     }
+    
+  return 0;
 }
 
 void _gnutls_auth_cipher_deinit (auth_cipher_hd_st * handle)
 {
   if (handle->is_mac)
     {
-      if (handle->ssl_hmac)
+      if (handle->ssl_hmac) /* failure here doesn't matter */
         _gnutls_mac_deinit_ssl3 (&handle->mac, NULL);
       else
         _gnutls_hmac_deinit(&handle->mac, NULL);

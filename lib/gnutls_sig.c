@@ -585,18 +585,29 @@ _gnutls_handshake_verify_cert_vrfy (gnutls_session_t session,
       ret = _gnutls_generate_master (session, 1);
       if (ret < 0)
         {
-          gnutls_assert ();
-          return ret;
+          _gnutls_hash_deinit (&td_md5, NULL);
+          _gnutls_hash_deinit (&td_sha, NULL);
+          return gnutls_assert_val(ret);
         }
 
-      _gnutls_mac_deinit_ssl3_handshake (&td_md5, concat,
+      ret = _gnutls_mac_deinit_ssl3_handshake (&td_md5, concat,
                                          session->
                                          security_parameters.master_secret,
                                          GNUTLS_MASTER_SIZE);
-      _gnutls_mac_deinit_ssl3_handshake (&td_sha, &concat[16],
+      if (ret < 0)
+        {
+          _gnutls_hash_deinit (&td_sha, NULL);
+          return gnutls_assert_val(ret);
+        }
+
+      ret = _gnutls_mac_deinit_ssl3_handshake (&td_sha, &concat[16],
                                          session->
                                          security_parameters.master_secret,
                                          GNUTLS_MASTER_SIZE);
+      if (ret < 0)
+        {
+          return gnutls_assert_val(ret);
+        }
     }
   else
     {
@@ -744,13 +755,16 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
       if (ret < 0)
         {
           gnutls_assert ();
+          _gnutls_hash_deinit (&td_sha, NULL);
           return ret;
         }
 
-      _gnutls_mac_deinit_ssl3_handshake (&td_sha, &concat[16],
+      ret = _gnutls_mac_deinit_ssl3_handshake (&td_sha, &concat[16],
                                          session->
                                          security_parameters.master_secret,
                                          GNUTLS_MASTER_SIZE);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
   else
     _gnutls_hash_deinit (&td_sha, &concat[16]);
@@ -769,10 +783,14 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
         }
 
       if (ver == GNUTLS_SSL3)
-        _gnutls_mac_deinit_ssl3_handshake (&td_md5, concat,
+        {
+          ret = _gnutls_mac_deinit_ssl3_handshake (&td_md5, concat,
                                            session->
                                            security_parameters.master_secret,
                                            GNUTLS_MASTER_SIZE);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+        }
       else
         _gnutls_hash_deinit (&td_md5, concat);
 

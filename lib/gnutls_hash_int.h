@@ -87,8 +87,8 @@ _gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,
 /* help functions */
 int _gnutls_mac_init_ssl3 (digest_hd_st *, gnutls_mac_algorithm_t algorithm,
                            void *key, int keylen);
-void _gnutls_mac_deinit_ssl3 (digest_hd_st * handle, void *digest);
-void _gnutls_mac_output_ssl3 (digest_hd_st * handle, void *digest);
+int _gnutls_mac_deinit_ssl3 (digest_hd_st * handle, void *digest);
+int _gnutls_mac_output_ssl3 (digest_hd_st * handle, void *digest);
 
 int _gnutls_ssl3_generate_random (void *secret, int secret_len,
                                   void *rnd, int random_len, int bytes,
@@ -97,7 +97,7 @@ int _gnutls_ssl3_hash_md5 (const void *first, int first_len,
                            const void *second, int second_len,
                            int ret_len, opaque * ret);
 
-void _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle, void *digest,
+int _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle, void *digest,
                                         opaque * key, uint32_t key_size);
 
 int _gnutls_hash_copy (digest_hd_st * dst_handle, digest_hd_st * src_handle);
