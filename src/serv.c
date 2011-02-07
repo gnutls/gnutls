@@ -326,13 +326,6 @@ generate_rsa_params (void)
 
 LIST_DECLARE_INIT (listener_list, listener_item, listener_free);
 
-static int protocol_priority[PRI_MAX];
-static int kx_priority[PRI_MAX];
-static int cipher_priority[PRI_MAX];
-static int comp_priority[PRI_MAX];
-static int mac_priority[PRI_MAX];
-static int cert_type_priority[PRI_MAX];
-
 static gnutls_session_t
 initialize_session (void)
 {
@@ -362,19 +355,6 @@ initialize_session (void)
       fprintf (stderr, "Syntax error at: %s\n", err);
       exit (1);
     }
-
-  if (cipher_priority[0])
-    gnutls_cipher_set_priority (session, cipher_priority);
-  if (comp_priority[0])
-    gnutls_compression_set_priority (session, comp_priority);
-  if (kx_priority[0])
-    gnutls_kx_set_priority (session, kx_priority);
-  if (protocol_priority[0])
-    gnutls_protocol_set_priority (session, protocol_priority);
-  if (mac_priority[0])
-    gnutls_mac_set_priority (session, mac_priority);
-  if (cert_type_priority[0])
-    gnutls_certificate_type_set_priority (session, cert_type_priority);
 
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, dh_cred);
 
@@ -1498,13 +1478,6 @@ gaa_parser (int argc, char **argv)
   psk_passwd = info.psk_passwd;
 
   pgp_keyring = info.pgp_keyring;
-
-  parse_protocols (info.proto, info.nproto, protocol_priority);
-  parse_ciphers (info.ciphers, info.nciphers, cipher_priority);
-  parse_macs (info.macs, info.nmacs, mac_priority);
-  parse_ctypes (info.ctype, info.nctype, cert_type_priority);
-  parse_kx (info.kx, info.nkx, kx_priority);
-  parse_comp (info.comp, info.ncomp, comp_priority);
 }
 
 extern void serv_version (void);

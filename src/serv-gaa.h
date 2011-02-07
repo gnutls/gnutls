@@ -8,32 +8,8 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 115 "serv.gaa"
-	char *priorities;
-#line 112 "serv.gaa"
-	char **ctype;
-#line 111 "serv.gaa"
-	int nctype;
-#line 108 "serv.gaa"
-	char **kx;
-#line 107 "serv.gaa"
-	int nkx;
-#line 104 "serv.gaa"
-	char **macs;
-#line 103 "serv.gaa"
-	int nmacs;
-#line 100 "serv.gaa"
-	char **comp;
-#line 99 "serv.gaa"
-	int ncomp;
-#line 96 "serv.gaa"
-	char **proto;
-#line 95 "serv.gaa"
-	int nproto;
-#line 92 "serv.gaa"
-	char **ciphers;
 #line 91 "serv.gaa"
-	int nciphers;
+	char *priorities;
 #line 88 "serv.gaa"
 	char *opaque_prf_input;
 #line 85 "serv.gaa"
