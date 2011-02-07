@@ -102,27 +102,6 @@ gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc)
   return;
 }
 
-#ifdef ENABLE_OPENPGP
-
-/**
- * gnutls_certificate_get_openpgp_keyring:
- * @sc: is a #gnutls_certificate_credentials_t structure.
- * @keyring: the exported keyring. Should be treated as constant
- *
- * This function will export the OpenPGP keyring associated with the
- * given credentials.
- *
- * Since: 2.4.0
- **/
-void
-gnutls_certificate_get_openpgp_keyring (gnutls_certificate_credentials_t sc,
-                                        gnutls_openpgp_keyring_t * keyring)
-{
-  *keyring = sc->keyring;
-}
-
-#endif
-
 /**
  * gnutls_certificate_free_ca_names:
  * @sc: is a #gnutls_certificate_credentials_t structure.
