@@ -187,7 +187,7 @@ static const gnutls_cipher_entry algorithms[] = {
   {"AES-256-CBC", GNUTLS_CIPHER_AES_256_CBC, 16, 32, CIPHER_BLOCK, 16, 0, 0},
   {"AES-192-CBC", GNUTLS_CIPHER_AES_192_CBC, 16, 24, CIPHER_BLOCK, 16, 0, 0},
   {"AES-128-CBC", GNUTLS_CIPHER_AES_128_CBC, 16, 16, CIPHER_BLOCK, 16, 0, 0},
-  {"AES-128-GCM", GNUTLS_CIPHER_AES_128_GCM, 16, 16, CIPHER_STREAM, 4, 0, 1},
+  {"AES-128-GCM", GNUTLS_CIPHER_AES_128_GCM, 16, 16, CIPHER_STREAM, AEAD_IMPLICIT_DATA_SIZE, 0, 1},
   {"3DES-CBC", GNUTLS_CIPHER_3DES_CBC, 8, 24, CIPHER_BLOCK, 8, 0, 0},
   {"DES-CBC", GNUTLS_CIPHER_DES_CBC, 8, 8, CIPHER_BLOCK, 8, 0, 0},
   {"ARCFOUR-128", GNUTLS_CIPHER_ARCFOUR_128, 1, 16, CIPHER_STREAM, 0, 0, 0},
@@ -503,6 +503,9 @@ typedef struct
 
 /* GCM: RFC5288 */
 #define GNUTLS_RSA_AES_128_GCM_SHA256 { 0x00, 0x9C }
+#define GNUTLS_DHE_RSA_WITH_AES_128_GCM_SHA256 {0x00,0x9E}
+#define GNUTLS_DHE_DSS_WITH_AES_128_GCM_SHA256 {0x00,0xA2}
+#define GNUTLS_DH_ANON_WITH_AES_128_GCM_SHA256 {0x00,0xA6}
 
 /* Safe renegotiation */
 
@@ -763,11 +766,24 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_RSA,
                              GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
                              GNUTLS_VERSION_MAX),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_RSA_WITH_AES_128_GCM_SHA256,
+                             GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_DHE_RSA,
+                             GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
+                             GNUTLS_VERSION_MAX),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_DSS_WITH_AES_128_GCM_SHA256,
+                             GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_DHE_DSS,
+                             GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
+                             GNUTLS_VERSION_MAX),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DH_ANON_WITH_AES_128_GCM_SHA256,
+                             GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_ANON_DH,
+                             GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
+                             GNUTLS_VERSION_MAX),
 /* Renegotiation hack */
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_RENEGO_PROTECTION_REQUEST,
                              GNUTLS_CIPHER_UNKNOWN, GNUTLS_KX_UNKNOWN,
                              GNUTLS_MAC_UNKNOWN, GNUTLS_SSL3,
                              GNUTLS_VERSION_MAX),
+
   {0, {{0, 0}}, 0, 0, 0, 0, 0}
 };
 
@@ -1334,7 +1350,15 @@ _gnutls_version_is_supported (gnutls_session_t session,
 int
 _gnutls_version_has_selectable_prf (gnutls_protocol_t version)
 {
-  return version == GNUTLS_TLS1_2;
+  switch (version)
+    {
+    case GNUTLS_TLS1_1:
+    case GNUTLS_TLS1_0:
+    case GNUTLS_SSL3:
+      return 0;
+    default:
+      return 1;
+    }
 }
 
 /* This function determines if the version specified has selectable
@@ -1342,7 +1366,15 @@ _gnutls_version_has_selectable_prf (gnutls_protocol_t version)
 int
 _gnutls_version_has_selectable_sighash (gnutls_protocol_t version)
 {
-  return version == GNUTLS_TLS1_2;
+  switch (version)
+    {
+    case GNUTLS_TLS1_1:
+    case GNUTLS_TLS1_0:
+    case GNUTLS_SSL3:
+      return 0;
+    default:
+      return 1;
+    }
 }
 
 /* This function determines if the version specified has support for
@@ -1352,12 +1384,14 @@ _gnutls_version_has_extensions (gnutls_protocol_t version)
 {
   switch (version)
     {
-    case GNUTLS_TLS1_0:
-    case GNUTLS_TLS1_1:
-    case GNUTLS_TLS1_2:
-      return 1;
-    default:
+    case GNUTLS_SSL3:
       return 0;
+    default:
+      /* Versions after TLS 1.0 are required to handle extensions.
+       * SSL 3.0 also required extensions to be ignored, but
+       * some earlier draft didn't.
+       */
+      return 1;
     }
 }
 
@@ -1368,11 +1402,12 @@ _gnutls_version_has_explicit_iv (gnutls_protocol_t version)
 {
   switch (version)
     {
-    case GNUTLS_TLS1_1:
-    case GNUTLS_TLS1_2:
-      return 1;
-    default:
+    case GNUTLS_TLS1_0:
+    case GNUTLS_SSL3:
       return 0;
+    default:
+      /* All versions after TLS 1.1 have explicit IV */
+      return 1;
     }
 }
 
@@ -1383,12 +1418,10 @@ _gnutls_version_has_variable_padding (gnutls_protocol_t version)
 {
   switch (version)
     {
-    case GNUTLS_TLS1_0:
-    case GNUTLS_TLS1_1:
-    case GNUTLS_TLS1_2:
-      return 1;
-    default:
+    case GNUTLS_SSL3:
       return 0;
+    default:
+      return 1;
     }
 }
 
