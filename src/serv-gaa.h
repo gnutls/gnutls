@@ -8,10 +8,8 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 91 "serv.gaa"
-	char *priorities;
 #line 88 "serv.gaa"
-	char *opaque_prf_input;
+	char *priorities;
 #line 85 "serv.gaa"
 	char *srp_passwd_conf;
 #line 82 "serv.gaa"

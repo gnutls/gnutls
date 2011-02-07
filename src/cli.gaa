@@ -86,9 +86,6 @@ option (pskusername) STR "NAME" { $psk_username = $1 } "PSK username to use."
 #char *psk_key;
 option (pskkey) STR "KEY" { $psk_key = $1 } "PSK key (in hex) to use."
 
-#char *opaque_prf_input;
-option (opaque-prf-input) STR "DATA" { $opaque_prf_input = $1 } "Use Opaque PRF Input DATA."
-
 #char *port;
 option (p, port) STR "PORT" { $port = $1 } "The port to connect to."
 
@@ -111,4 +108,4 @@ init { $resume=0; $noticket=0; $port="443"; $rest_args=NULL;
 	$srp_username=NULL; $srp_passwd=NULL; $fmtder = 0; $starttls =0; 
 	$debug = 0; $print_cert = 0; $verbose = 0; $psk_key = NULL; 
 	$psk_username = NULL; $priorities = NULL;
-	$opaque_prf_input = NULL; $pgp_subkey = NULL; $rehandshake = 0; }
+	$pgp_subkey = NULL; $rehandshake = 0; }

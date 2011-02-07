@@ -8,14 +8,12 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 103 "cli.gaa"
+#line 100 "cli.gaa"
 	char *rest_args;
-#line 95 "cli.gaa"
-	int insecure;
 #line 92 "cli.gaa"
-	char *port;
+	int insecure;
 #line 89 "cli.gaa"
-	char *opaque_prf_input;
+	char *port;
 #line 86 "cli.gaa"
 	char *psk_key;
 #line 83 "cli.gaa"

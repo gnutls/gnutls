@@ -85,9 +85,6 @@ option (srppasswd) STR "FILE" { $srp_passwd = $1 } "SRP password file to use."
 #char *srp_passwd_conf;
 option (srppasswdconf) STR "FILE" { $srp_passwd_conf = $1 } "SRP password conf file to use."
 
-#char *opaque_prf_input;
-option (opaque-prf-input) STR "DATA" { $opaque_prf_input = $1 } "Use Opaque PRF Input DATA."
-
 #char *priorities;
 option (priority) STR "PRIORITY STRING" { $priorities = $1 } "Priorities string."
 
@@ -106,4 +103,4 @@ init { $generate=0; $port=5556; $http=0; $nodb = 0; $noticket = 0;
 	$pgp_keyring=NULL; $fmtder = 0;
 	$disable_client_cert = 0; $priorities = NULL;
 	$dh_params_file=NULL; $debug=0; $require_cert = 0; $psk_passwd = 0;
-	$opaque_prf_input=NULL; $pgp_subkey = NULL;}
+	$pgp_subkey = NULL;}
