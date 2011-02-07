@@ -74,7 +74,7 @@ static const gnutls_error_entry error_algorithms[] = {
                GNUTLS_E_DH_PRIME_UNACCEPTABLE, 1),
   ERROR_ENTRY (N_("A TLS packet with unexpected length was received."),
                GNUTLS_E_UNEXPECTED_PACKET_LENGTH, 1),
-  ERROR_ENTRY (N_("A TLS connection was non-properly terminated."),
+  ERROR_ENTRY (N_("The TLS connection was non-properly terminated."),
                GNUTLS_E_PREMATURE_TERMINATION, 1),
   ERROR_ENTRY (N_
                ("The specified session has been invalidated for some reason."),
