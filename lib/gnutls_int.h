@@ -709,9 +709,6 @@ typedef struct
   gnutls_sign_func sign_func;
   void *sign_func_userdata;
 
-  /* Callback to extract TLS Finished message. */
-  gnutls_finished_callback_func finished_func;
-
   /* minimum bits to allow for SRP
    * use gnutls_srp_set_prime_bits() to adjust it.
    */

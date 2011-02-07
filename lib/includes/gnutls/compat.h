@@ -177,17 +177,6 @@ gnutls_sign_func
 gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
  _GNUTLS_GCC_ATTR_DEPRECATED;
 
-/* We no longer support the finished callback. Use
- * gnutls_session_channel_binding for similar functionality.
- */
-     typedef void (*gnutls_finished_callback_func) (gnutls_session_t session,
-                                                    const void *finished,
-                                                    size_t len);
-     void gnutls_session_set_finished_function (gnutls_session_t session,
-                                                gnutls_finished_callback_func
-                                                func)
-  _GNUTLS_GCC_ATTR_DEPRECATED;
-
      int gnutls_psk_netconf_derive_key (const char *password,
                                         const char *psk_identity,
                                         const char *psk_identity_hint,

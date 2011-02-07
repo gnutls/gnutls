@@ -27,6 +27,7 @@ it can verify a certificate chain against a list of certificates.
 ** API and ABI modifications:
 gnutls_cipher_add_auth: ADDED
 gnutls_cipher_tag: ADDED
+gnutls_session_set_finished_function: REMOVED
 gnutls_ext_register: REMOVED
 gnutls_certificate_get_x509_crls: REMOVED
 gnutls_certificate_get_x509_cas: REMOVED

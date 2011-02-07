@@ -712,9 +712,6 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 
       vdata_size = _mbuffer_get_udata_size (bufel);
 
-      if (session->internals.finished_func)
-        session->internals.finished_func (session, data, vdata_size);
-
       ret = _gnutls_ext_sr_finished (session, data, vdata_size, 0);
       if (ret < 0)
         {

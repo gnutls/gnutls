@@ -1062,39 +1062,6 @@ gnutls_prf (gnutls_session_t session,
   return ret;
 }
 
-/*-
- * gnutls_session_set_finished_function:
- * @session: is a #gnutls_session_t structure.
- * @func: a #gnutls_finished_callback_func callback.
- *
- * Register a callback function for the session that will be called
- * when a TLS Finished message has been generated.  The function is
- * typically used to copy away the TLS finished message for later use
- * as a channel binding or similar purpose.
- *
- * The callback should follow this prototype:
- *
- * void callback (gnutls_session_t @session, const void *@finished, size_t @len);
- *
- * The @finished parameter will contain the binary TLS finished
- * message, and @len will contains its length.  For SSLv3 connections,
- * the @len parameter will be 36 and for TLS connections it will be
- * 12.
- *
- * It is recommended that the function returns quickly in order to not
- * delay the handshake.  Use the function to store a copy of the TLS
- * finished message for later use.
- *
- * Since: 2.6.0
- * Deprecated in: 2.11.0
- -*/
-void
-gnutls_session_set_finished_function (gnutls_session_t session,
-                                      gnutls_finished_callback_func func)
-{
-  session->internals.finished_func = func;
-}
-
 /**
  * gnutls_session_is_resumed:
  * @session: is a #gnutls_session_t structure.
