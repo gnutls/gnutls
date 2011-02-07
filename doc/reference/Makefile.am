@@ -71,7 +71,7 @@ IGNORE_HFILES=compat.h gnutlsxx.h
 # cd lib/ && echo *.h | sed 's/crypto.h//'
 IGNORE_HFILES += auth_anon.h auth_cert.h auth_dh_common.h auth_psk.h	\
 	auth_psk_passwd.h auth_srp.h auth_srp_passwd.h config.h		\
-	debug.h ext_cert_type.h ext_max_record.h ext_oprfi.h	\
+	debug.h ext_cert_type.h ext_max_record.h \
 	ext_safe_renegotiation.h ext_server_name.h			\
 	ext_session_ticket.h ext_signature.h ext_srp.h			\
 	gnutls_algorithms.h gnutls_auth.h gnutls_buffers.h		\
