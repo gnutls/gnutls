@@ -51,6 +51,9 @@ typedef struct
   cipher_tag_func tag;
   cipher_setiv_func setiv;
   cipher_deinit_func deinit;
+  
+  int tag_size;
+  int is_aead:1;
 } cipher_hd_st;
 
 int _gnutls_cipher_init (cipher_hd_st *, gnutls_cipher_algorithm_t cipher,
@@ -99,6 +102,16 @@ _gnutls_cipher_deinit (cipher_hd_st * handle)
     }
 }
 
+inline static unsigned int _gnutls_cipher_tag_len( cipher_hd_st * handle)
+{
+  return handle->tag_size;
+}
+
+inline static unsigned int _gnutls_cipher_is_aead( cipher_hd_st * handle)
+{
+  return handle->is_aead;
+}
+
 /* returns the tag in AUTHENC ciphers */
 inline static void _gnutls_cipher_tag( const cipher_hd_st * handle, void* tag, int tag_size)
 {
@@ -130,7 +143,6 @@ typedef struct
 {
   cipher_hd_st cipher;
   digest_hd_st mac;
-  int is_auth:1;
   int is_mac:1;
   int ssl_hmac:1;
   int tag_size;
@@ -168,7 +180,7 @@ inline static unsigned int _gnutls_auth_cipher_tag_len( auth_cipher_hd_st * hand
 
 inline static unsigned int _gnutls_auth_cipher_is_aead( auth_cipher_hd_st * handle)
 {
-  return handle->is_auth;
+  return _gnutls_cipher_is_aead(&handle->cipher);
 }
 
 #define _gnutls_auth_cipher_encrypt_tag(x,y,z,t,s,a) _gnutls_auth_cipher_encrypt2_tag(x,y,z,y,z,t,s,a)

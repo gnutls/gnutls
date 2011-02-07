@@ -43,6 +43,10 @@ _gnutls_cipher_init (cipher_hd_st * handle, gnutls_cipher_algorithm_t cipher,
   int ret = GNUTLS_E_INTERNAL_ERROR;
   const gnutls_crypto_cipher_st *cc = NULL;
 
+  handle->is_aead = _gnutls_cipher_algo_is_aead(cipher);
+  if (handle->is_aead)
+     handle->tag_size = gnutls_cipher_get_block_size(cipher);
+
   /* check if a cipher has been registered
    */
   cc = _gnutls_get_crypto_cipher (cipher);
@@ -146,12 +150,8 @@ int ret;
 
       handle->tag_size = _gnutls_hash_get_algo_len(mac);
     }
-  else
-    {
-      handle->is_auth = _gnutls_cipher_is_aead(cipher);
-      if (handle->is_auth)
-        handle->tag_size = gnutls_cipher_get_block_size(cipher);
-    }
+  else if (_gnutls_cipher_is_aead(&handle->cipher))
+    handle->tag_size = _gnutls_cipher_tag_len(&handle->cipher);
 
   return 0;
 cleanup:
@@ -170,7 +170,7 @@ int _gnutls_auth_cipher_add_auth (auth_cipher_hd_st * handle, const void *text,
       else
         return _gnutls_hmac(&handle->mac, text, textlen);
     }
-  else if (handle->is_auth)
+  else if (_gnutls_cipher_is_aead(&handle->cipher))
     return _gnutls_cipher_auth(&handle->cipher, text, textlen);
   else
     return 0;
@@ -202,7 +202,7 @@ int ret;
       if (ret < 0)
         return gnutls_assert_val(ret);
     }
-  else if (handle->is_auth)
+  else if (_gnutls_cipher_is_aead(&handle->cipher))
     {
       ret = _gnutls_cipher_encrypt2(&handle->cipher, text, textlen, ciphertext, ciphertextlen);
       if (ret < 0)
@@ -263,7 +263,7 @@ int ret = 0;
           _gnutls_hmac_reset (&handle->mac);
         }
     }
-  else if (handle->is_auth)
+  else if (_gnutls_cipher_is_aead(&handle->cipher))
     {
       _gnutls_cipher_tag(&handle->cipher, tag, tag_size);
     }

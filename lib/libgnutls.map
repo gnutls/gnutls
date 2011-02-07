@@ -52,11 +52,8 @@ GNUTLS_1_4
     gnutls_certificate_free_credentials;
     gnutls_certificate_free_crls;
     gnutls_certificate_free_keys;
-    gnutls_certificate_get_openpgp_keyring;
     gnutls_certificate_get_ours;
     gnutls_certificate_get_peers;
-    gnutls_certificate_get_x509_cas;
-    gnutls_certificate_get_x509_crls;
     gnutls_certificate_send_x509_rdn_sequence;
     gnutls_certificate_server_set_request;
     gnutls_certificate_server_set_retrieve_function;
@@ -139,7 +136,6 @@ GNUTLS_1_4
     gnutls_dh_set_prime_bits;
     gnutls_error_is_fatal;
     gnutls_error_to_alert;
-    gnutls_ext_register;
     gnutls_fingerprint;
     gnutls_free;
     gnutls_global_deinit;
@@ -334,13 +330,10 @@ GNUTLS_1_4
     gnutls_server_name_get;
     gnutls_server_name_set;
     gnutls_session_enable_compatibility_mode;
-    gnutls_session_get_client_random;
     gnutls_session_get_data2;
     gnutls_session_get_data;
     gnutls_session_get_id;
-    gnutls_session_get_master_secret;
     gnutls_session_get_ptr;
-    gnutls_session_get_server_random;
     gnutls_session_is_resumed;
     gnutls_session_set_data;
     gnutls_session_set_finished_function;
@@ -703,6 +696,8 @@ GNUTLS_2_12
 	gnutls_x509_crl_list_import;
 	gnutls_x509_crl_list_import2;
 	gnutls_x509_crt_list_import2;
+	gnutls_cipher_tag;
+	gnutls_cipher_add_auth;
 } GNUTLS_2_10;
 
 GNUTLS_PRIVATE {

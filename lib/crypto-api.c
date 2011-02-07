@@ -62,6 +62,57 @@ gnutls_cipher_init (gnutls_cipher_hd_t * handle,
 }
 
 /**
+ * gnutls_cipher_tag:
+ * @handle: is a #gnutls_cipher_hd_t structure.
+ * @tag: will hold the tag
+ * @tag_size: The length of the tag to return
+ *
+ * This function operates on authenticated encryption with
+ * associated data (AEAD) ciphers and will return the
+ * output tag.
+ *
+ * Returns: Zero or a negative value on error.
+ *
+ * Since: 2.99.0
+ **/
+int
+gnutls_cipher_tag (gnutls_cipher_hd_t handle, void *tag, size_t tag_size)
+{
+  if (_gnutls_cipher_is_aead( (cipher_hd_st*)handle)==0)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  _gnutls_cipher_tag( (cipher_hd_st*)handle, tag, tag_size);
+  
+  return 0;
+}
+
+/**
+ * gnutls_cipher_add_auth:
+ * @handle: is a #gnutls_cipher_hd_t structure.
+ * @text: the data to be authenticated
+ * @text_size: The length of the data
+ *
+ * This function operates on authenticated encryption with
+ * associated data (AEAD) ciphers and authenticate the
+ * input data. This function can only be called before
+ * encryption operations.
+ *
+ * Returns: Zero or a negative value on error.
+ *
+ * Since: 2.99.0
+ **/
+int
+gnutls_cipher_add_auth (gnutls_cipher_hd_t handle, const void *text, size_t text_size)
+{
+  if (_gnutls_cipher_is_aead( (cipher_hd_st*)handle)==0)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  _gnutls_cipher_auth( (cipher_hd_st*)handle, text, text_size);
+  
+  return 0;
+}
+
+/**
  * gnutls_cipher_encrypt:
  * @handle: is a #gnutls_cipher_hd_t structure.
  * @text: the data to encrypt

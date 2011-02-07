@@ -22,9 +22,12 @@ using the --verify option. Combined with --load-ca-certificate
 it can verify a certificate chain against a list of certificates.
 
 ** API and ABI modifications:
+gnutls_cipher_add_auth: ADDED
+gnutls_cipher_tag: ADDED
 gnutls_ext_register: REMOVED
 gnutls_certificate_get_x509_crls: REMOVED
 gnutls_certificate_get_x509_cas: REMOVED
+gnutls_certificate_get_openpgp_keyring: REMOVED
 gnutls_session_get_server_random: REMOVED
 gnutls_session_get_client_random: REMOVED
 gnutls_session_get_master_secret: REMOVED

@@ -82,7 +82,93 @@ value2human (double bytes, double time, double *data, double *speed,
 }
 
 static void
-cipher_bench (int algo, int size)
+cipher_mac_bench (int algo, int mac_algo, int size)
+{
+  int ret;
+  gnutls_cipher_hd_t ctx;
+  gnutls_hmac_hd_t mac_ctx;
+  void *_key, *_iv;
+  gnutls_datum_t key, iv;
+  struct timespec start, stop;
+  double secs;
+  double data_size = 0;
+  double dspeed, ddata;
+  int blocksize = gnutls_cipher_get_block_size (algo);
+  int keysize = gnutls_cipher_get_key_size (algo);
+  char metric[16];
+  int step = size*1024;
+
+  _key = malloc (keysize);
+  if (_key == NULL)
+    return;
+  memset (_key, 0xf0, keysize);
+
+  _iv = malloc (blocksize);
+  if (_iv == NULL)
+    return;
+  memset (_iv, 0xf0, blocksize);
+
+  iv.data = _iv;
+  iv.size = blocksize;
+
+  key.data = _key;
+  key.size = keysize;
+
+  printf ("Checking %s with %s (%dkb payload)... ", gnutls_cipher_get_name (algo),
+      gnutls_mac_get_name(mac_algo), size);
+  fflush (stdout);
+
+  must_finish = 0;
+  alarm (5);
+
+  gettime (&start);
+
+  ret = gnutls_hmac_init(&mac_ctx, mac_algo, key.data, key.size);
+  if (ret < 0)
+    {
+      fprintf (stderr, "error: %s\n", gnutls_strerror (ret));
+      goto leave;
+    }
+
+  ret = gnutls_cipher_init (&ctx, algo, &key, &iv);
+  if (ret < 0)
+    {
+      fprintf (stderr, "error: %s\n", gnutls_strerror (ret));
+      goto leave;
+    }
+
+  gnutls_hmac(mac_ctx, data, 1024);
+
+  do
+    {
+      gnutls_hmac(mac_ctx, data, step);
+      gnutls_cipher_encrypt (ctx, data, step);
+      data_size += step;
+    }
+  while (must_finish == 0);
+
+  gnutls_cipher_deinit (ctx);
+  gnutls_hmac_deinit(mac_ctx, NULL);
+
+  gettime (&stop);
+
+  secs = (stop.tv_sec * 1000 + stop.tv_nsec / (1000 * 1000) -
+          (start.tv_sec * 1000 + start.tv_nsec / (1000 * 1000)));
+  secs /= 1000;
+
+  value2human (data_size, secs, &ddata, &dspeed, metric);
+  printf ("Encrypted and hashed %.2f %s in %.2f secs: ", ddata, metric, secs);
+  printf ("%.2f %s/sec\n", dspeed, metric);
+
+leave:
+  free (_key);
+  free (_iv);
+
+}
+
+
+static void
+cipher_bench (int algo, int size, int aead)
 {
   int ret;
   gnutls_cipher_hd_t ctx;
@@ -95,6 +181,7 @@ cipher_bench (int algo, int size)
   int blocksize = gnutls_cipher_get_block_size (algo);
   int keysize = gnutls_cipher_get_key_size (algo);
   char metric[16];
+  int step = size*1024;
 
   _key = malloc (keysize);
   if (_key == NULL)
@@ -128,10 +215,13 @@ cipher_bench (int algo, int size)
       goto leave;
     }
 
+  if (aead)
+    gnutls_cipher_add_auth (ctx, data, 1024);
+
   do
     {
-      gnutls_cipher_encrypt (ctx, data, size * 1024);
-      data_size += size * 1024;
+      gnutls_cipher_encrypt (ctx, data, step);
+      data_size += step;
     }
   while (must_finish == 0);
 
@@ -163,6 +253,7 @@ mac_bench (int algo, int size)
   double ddata, dspeed;
   int blocksize = gnutls_hmac_get_len (algo);
   char metric[16];
+  int step = size*1024;
 
   _key = malloc (blocksize);
   if (_key == NULL)
@@ -179,8 +270,8 @@ mac_bench (int algo, int size)
 
   do
     {
-      gnutls_hmac_fast (algo, _key, blocksize, data, size * 1024, _key);
-      data_size += size * 1024;
+      gnutls_hmac_fast (algo, _key, blocksize, data, step, _key);
+      data_size += step;
     }
   while (must_finish == 0);
 
@@ -213,25 +304,21 @@ main (int argc, char **argv)
   gnutls_global_set_log_level (debug_level);
   gnutls_global_init ();
 
-  mac_bench (GNUTLS_MAC_SHA1, 4);
-  mac_bench (GNUTLS_MAC_SHA1, 8);
+  gnutls_rnd( GNUTLS_RND_NONCE, data, sizeof(data));
+
+  cipher_bench ( GNUTLS_CIPHER_AES_128_GCM, 16, 1);
+  cipher_mac_bench ( GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA256, 16);
+  cipher_mac_bench ( GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1, 16);
+
   mac_bench (GNUTLS_MAC_SHA1, 16);
 
-  mac_bench (GNUTLS_MAC_SHA256, 4);
-  mac_bench (GNUTLS_MAC_SHA256, 8);
   mac_bench (GNUTLS_MAC_SHA256, 16);
 
-  cipher_bench (GNUTLS_CIPHER_3DES_CBC, 4);
-  cipher_bench (GNUTLS_CIPHER_3DES_CBC, 8);
-  cipher_bench (GNUTLS_CIPHER_3DES_CBC, 16);
+  cipher_bench (GNUTLS_CIPHER_3DES_CBC, 16, 0);
 
-  cipher_bench (GNUTLS_CIPHER_AES_128_CBC, 4);
-  cipher_bench (GNUTLS_CIPHER_AES_128_CBC, 8);
-  cipher_bench (GNUTLS_CIPHER_AES_128_CBC, 16);
+  cipher_bench (GNUTLS_CIPHER_AES_128_CBC, 16, 0);
 
-  cipher_bench (GNUTLS_CIPHER_ARCFOUR, 4);
-  cipher_bench (GNUTLS_CIPHER_ARCFOUR, 8);
-  cipher_bench (GNUTLS_CIPHER_ARCFOUR, 16);
+  cipher_bench (GNUTLS_CIPHER_ARCFOUR, 16, 0);
 
   return 0;
 }

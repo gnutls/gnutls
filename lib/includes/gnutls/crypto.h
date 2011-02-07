@@ -47,6 +47,9 @@ extern "C"
                               size_t textlen, void *ciphertext,
                               size_t ciphertextlen);
 
+  int gnutls_cipher_tag( gnutls_cipher_hd_t handle, void* tag, size_t tag_size);
+  int gnutls_cipher_add_auth( gnutls_cipher_hd_t handle, const void* test, size_t textlen);
+
   void gnutls_cipher_deinit (gnutls_cipher_hd_t handle);
   int gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm);
 
