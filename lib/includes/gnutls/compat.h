@@ -273,8 +273,4 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
                              unsigned int flags)
                              _GNUTLS_GCC_ATTR_DEPRECATED;
 
-  /* this is obsolete (?). */
-  int gnutls_certificate_verify_peers (gnutls_session_t session)
-  _GNUTLS_GCC_ATTR_DEPRECATED;
-
 #endif /* _GNUTLS_COMPAT_H */
