@@ -194,7 +194,8 @@ cipher_bench (int algo, int size, int aead)
   memset (_iv, 0xf0, blocksize);
 
   iv.data = _iv;
-  iv.size = blocksize;
+  if (aead) iv.size = 12;
+  else iv.size = blocksize;
 
   key.data = _key;
   key.size = keysize;
