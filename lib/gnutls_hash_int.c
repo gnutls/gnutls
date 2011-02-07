@@ -452,6 +452,9 @@ ssl3_sha (int i, opaque * secret, int secret_len,
   return 0;
 }
 
+#define SHA1_DIGEST_OUTPUT 20
+#define MD5_DIGEST_OUTPUT 16
+
 static int
 ssl3_md5 (int i, opaque * secret, int secret_len,
           opaque * rnd, int rnd_len, void *digest)
@@ -477,7 +480,7 @@ ssl3_md5 (int i, opaque * secret, int secret_len,
       return ret;
     }
 
-  _gnutls_hash (&td, tmp, _gnutls_hash_get_algo_len (GNUTLS_MAC_SHA1));
+  _gnutls_hash (&td, tmp, SHA1_DIGEST_OUTPUT);
 
   _gnutls_hash_deinit (&td, digest);
   return 0;
@@ -490,7 +493,7 @@ _gnutls_ssl3_hash_md5 (const void *first, int first_len,
 {
   opaque digest[MAX_HASH_SIZE];
   digest_hd_st td;
-  int block = _gnutls_hash_get_algo_len (GNUTLS_MAC_MD5);
+  int block = MD5_DIGEST_OUTPUT;
   int rc;
 
   rc = _gnutls_hash_init (&td, GNUTLS_MAC_MD5);
@@ -524,7 +527,7 @@ _gnutls_ssl3_generate_random (void *secret, int secret_len,
 {
   int i = 0, copy, output_bytes;
   opaque digest[MAX_HASH_SIZE];
-  int block = _gnutls_hash_get_algo_len (GNUTLS_MAC_MD5);
+  int block = MD5_DIGEST_OUTPUT;
   int result, times;
 
   output_bytes = 0;
