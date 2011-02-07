@@ -42,9 +42,6 @@
 #include "gnutls_constate.h"
 #include <random.h>
 
-#define AEAD_EXPLICIT_DATA 8
-#define AEAD_IMPLICIT_DATA 4
-
 static int _gnutls_compressed2ciphertext (gnutls_session_t session,
                                    opaque * cipher_data, int cipher_size,
                                    gnutls_datum_t compressed,
@@ -226,7 +223,7 @@ calc_enc_length (gnutls_session_t session, int data_size,
     case CIPHER_STREAM:
       length = data_size + hash_size;
       if (auth_cipher)
-        length += AEAD_EXPLICIT_DATA;
+        length += AEAD_EXPLICIT_DATA_SIZE;
 
       break;
     case CIPHER_BLOCK:
@@ -267,7 +264,11 @@ calc_enc_length (gnutls_session_t session, int data_size,
   return length;
 }
 
-#define PREAMBLE_SIZE 16
+#define MAX_PREAMBLE_SIZE 16
+
+/* generates the authentication data (data to be hashed only
+ * and are not to be send). Returns their size.
+ */
 static inline int
 make_preamble (opaque * uint64_data, opaque type, int length,
                opaque ver, opaque * preamble)
@@ -283,8 +284,8 @@ make_preamble (opaque * uint64_data, opaque type, int length,
   p += 8;
   *p = type;
   p++;
-  if (_gnutls_version_has_variable_padding (ver))
-    { /* TLS 1.0 or higher */
+  if (ver != GNUTLS_SSL3)
+    { /* TLS protocols */
       *p = major;
       p++;
       *p = minor;
@@ -294,18 +295,6 @@ make_preamble (opaque * uint64_data, opaque type, int length,
   p += 2;
   return p - preamble;
 }
-
-#if 0
-static void dump(const char* desc, uint8_t * data, int data_size)
-{
-int i;
-
-  fprintf(stderr, "%s[%d]: ", desc, data_size);
-  for (i=0;i<data_size;i++)
-    fprintf(stderr, "%.2x:", data[i]);
-  fprintf(stderr, "\n");
-}
-#endif
 
 /* This is the actual encryption 
  * Encrypts the given compressed datum, and puts the result to cipher_data,
@@ -322,7 +311,7 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
   uint8_t * tag_ptr = NULL;
   uint8_t pad;
   int length, length_to_encrypt, ret;
-  opaque preamble[PREAMBLE_SIZE];
+  opaque preamble[MAX_PREAMBLE_SIZE];
   int preamble_size;
   int tag_size = _gnutls_auth_cipher_tag_len (&params->write.cipher_state);
   int blocksize = gnutls_cipher_get_block_size (params->cipher_algorithm);
@@ -360,18 +349,16 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
 
   if (explicit_iv)
     {
-      uint8_t nonce[blocksize];
-
-      /* copy the random IV.
-       */
-      ret = _gnutls_rnd (GNUTLS_RND_NONCE, nonce, blocksize);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
 
       if (block_algo == CIPHER_BLOCK)
         {
-          memcpy(data_ptr, nonce, blocksize);
-          _gnutls_auth_cipher_setiv(&params->write.cipher_state, nonce, blocksize);
+          /* copy the random IV.
+           */
+          ret = _gnutls_rnd (GNUTLS_RND_NONCE, data_ptr, blocksize);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+
+          _gnutls_auth_cipher_setiv(&params->write.cipher_state, data_ptr, blocksize);
 
           data_ptr += blocksize;
           cipher_data += blocksize;
@@ -379,23 +366,36 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
         }
       else if (auth_cipher)
         {
+          uint8_t nonce[blocksize];
+
           /* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
            */
-          if (params->write.IV.data == NULL || params->write.IV.size != 4)
+          if (params->write.IV.data == NULL || params->write.IV.size != AEAD_IMPLICIT_DATA_SIZE)
             return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-          memcpy(nonce, params->write.IV.data, AEAD_IMPLICIT_DATA);
-          _gnutls_auth_cipher_setiv(&params->write.cipher_state, nonce, AEAD_IMPLICIT_DATA+AEAD_EXPLICIT_DATA);
+          /* Instead of generating a new nonce on every packet, we use the
+           * write.sequence_number (It is a MAY on RFC 5288).
+           */
+          memcpy(nonce, params->write.IV.data, params->write.IV.size);
+          memcpy(&nonce[AEAD_IMPLICIT_DATA_SIZE], UINT64DATA(params->write.sequence_number), 8);
+
+          _gnutls_auth_cipher_setiv(&params->write.cipher_state, nonce, AEAD_IMPLICIT_DATA_SIZE+AEAD_EXPLICIT_DATA_SIZE);
 
           /* copy the explicit part */
-          memcpy(data_ptr, &nonce[AEAD_IMPLICIT_DATA], AEAD_EXPLICIT_DATA);
+          memcpy(data_ptr, &nonce[AEAD_IMPLICIT_DATA_SIZE], AEAD_EXPLICIT_DATA_SIZE);
 
-          data_ptr += AEAD_EXPLICIT_DATA;
-          cipher_data += AEAD_EXPLICIT_DATA;
+          data_ptr += AEAD_EXPLICIT_DATA_SIZE;
+          cipher_data += AEAD_EXPLICIT_DATA_SIZE;
           /* In AEAD ciphers we don't encrypt the tag 
            */
-          length_to_encrypt -= AEAD_EXPLICIT_DATA + tag_size;
+          length_to_encrypt -= AEAD_EXPLICIT_DATA_SIZE + tag_size;
         }
+    }
+  else
+    {
+      /* AEAD ciphers have an explicit IV. Shouldn't be used otherwise.
+       */
+      if (auth_cipher) return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
     }
 
   memcpy (data_ptr, compressed.data, compressed.size);
@@ -441,7 +441,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
   int length, length_to_decrypt;
   uint16_t blocksize;
   int ret, i, pad_failed = 0;
-  opaque preamble[PREAMBLE_SIZE];
+  opaque preamble[MAX_PREAMBLE_SIZE];
   int preamble_size;
   int ver = gnutls_protocol_get_version (session);
   int tag_size = _gnutls_auth_cipher_tag_len (&params->read.cipher_state);
@@ -465,16 +465,16 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
           if (params->read.IV.data == NULL || params->read.IV.size != 4)
             return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
           
-          if (ciphertext.size < tag_size+AEAD_EXPLICIT_DATA)
+          if (ciphertext.size < tag_size+AEAD_EXPLICIT_DATA_SIZE)
             return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
-          memcpy(nonce, params->read.IV.data, AEAD_IMPLICIT_DATA);
-          memcpy(&nonce[AEAD_IMPLICIT_DATA], ciphertext.data, AEAD_EXPLICIT_DATA);
+          memcpy(nonce, params->read.IV.data, AEAD_IMPLICIT_DATA_SIZE);
+          memcpy(&nonce[AEAD_IMPLICIT_DATA_SIZE], ciphertext.data, AEAD_EXPLICIT_DATA_SIZE);
           
-          _gnutls_auth_cipher_setiv(&params->read.cipher_state, nonce, AEAD_EXPLICIT_DATA+AEAD_IMPLICIT_DATA);
+          _gnutls_auth_cipher_setiv(&params->read.cipher_state, nonce, AEAD_EXPLICIT_DATA_SIZE+AEAD_IMPLICIT_DATA_SIZE);
 
-          ciphertext.data += AEAD_EXPLICIT_DATA;
-          ciphertext.size -= AEAD_EXPLICIT_DATA;
+          ciphertext.data += AEAD_EXPLICIT_DATA_SIZE;
+          ciphertext.size -= AEAD_EXPLICIT_DATA_SIZE;
           
           length_to_decrypt = ciphertext.size - tag_size;
         }
