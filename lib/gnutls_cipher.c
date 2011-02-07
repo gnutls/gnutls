@@ -269,12 +269,15 @@ calc_enc_length (gnutls_session_t session, int data_size,
 
 #define PREAMBLE_SIZE 16
 static inline int
-make_preamble (opaque * uint64_data, opaque type, uint16_t c_length,
+make_preamble (opaque * uint64_data, opaque type, int length,
                opaque ver, opaque * preamble)
 {
   opaque minor = _gnutls_version_get_minor (ver);
   opaque major = _gnutls_version_get_major (ver);
   opaque *p = preamble;
+  uint16_t c_length;
+
+  c_length = _gnutls_conv_uint16 (length);
 
   memcpy (p, uint64_data, 8);
   p += 8;
@@ -317,7 +320,6 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
                                record_parameters_st * params)
 {
   uint8_t * tag_ptr = NULL;
-  uint16_t c_length;
   uint8_t pad;
   int length, length_to_encrypt, ret;
   opaque preamble[PREAMBLE_SIZE];
@@ -331,12 +333,11 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
   int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
   int auth_cipher = _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
   
-  c_length = _gnutls_conv_uint16 (compressed.size);
 
   preamble_size =
     make_preamble (UINT64DATA
                    (params->write.sequence_number),
-                   type, c_length, ver, preamble);
+                   type, compressed.size, ver, preamble);
 
   /* Calculate the encrypted length (padding etc.)
    */
@@ -436,7 +437,6 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
                                record_parameters_st * params)
 {
   uint8_t tag[MAX_HASH_SIZE];
-  uint16_t c_length;
   uint8_t pad;
   int length, length_to_decrypt;
   uint16_t blocksize;
@@ -487,7 +487,6 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
         }
 
       length = ciphertext.size - tag_size;
-      c_length = _gnutls_conv_uint16 ((uint16_t) (length));
 
       /* Pass the type, version, length and compressed through
        * MAC.
@@ -495,7 +494,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
       preamble_size =
         make_preamble (UINT64DATA
                        (params->read.sequence_number), type,
-                       c_length, ver, preamble);
+                       length, ver, preamble);
 
       _gnutls_auth_cipher_add_auth (&params->read.cipher_state, preamble, preamble_size);
 
@@ -564,7 +563,6 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 
       if (length < 0)
         length = 0;
-      c_length = _gnutls_conv_uint16 ((uint16_t) length);
 
       /* Pass the type, version, length and compressed through
        * MAC.
@@ -572,7 +570,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
       preamble_size =
         make_preamble (UINT64DATA
                        (params->read.sequence_number), type,
-                       c_length, ver, preamble);
+                       length, ver, preamble);
       _gnutls_auth_cipher_add_auth (&params->read.cipher_state, preamble, preamble_size);
       _gnutls_auth_cipher_add_auth (&params->read.cipher_state, ciphertext.data, length);
 
