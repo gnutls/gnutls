@@ -70,10 +70,6 @@ static const gnutls_alert_entry sup_alerts[] = {
    N_("The server name sent was not recognized")},
   {GNUTLS_A_UNKNOWN_PSK_IDENTITY,
    N_("The SRP/PSK username is missing or not known")},
-  {GNUTLS_A_INNER_APPLICATION_FAILURE,
-   N_("Inner application negotiation failed")},
-  {GNUTLS_A_INNER_APPLICATION_VERIFICATION,
-   N_("Inner application verification failed")},
   {0, NULL}
 };
 
