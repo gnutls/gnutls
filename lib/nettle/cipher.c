@@ -164,8 +164,6 @@ static void _gcm_encrypt(void *_ctx, nettle_crypt_func f,
 {
 struct gcm_full_ctx *ctx = _ctx;
 
-  gcm_set_iv(&ctx->gcm, GCM_DEFAULT_NONCE_SIZE, iv);
-
   return gcm_encrypt(&ctx->gcm, ctx->cipher, ctx->f, length, dst, src);
 }
 
@@ -175,8 +173,6 @@ static void _gcm_decrypt(void *_ctx, nettle_crypt_func f,
             const uint8_t *src)
 {
 struct gcm_full_ctx *ctx = _ctx;
-
-  gcm_set_iv(&ctx->gcm, GCM_DEFAULT_NONCE_SIZE, iv);
 
   return gcm_decrypt(&ctx->gcm, ctx->cipher, ctx->f, length, dst, src);
 }
@@ -356,14 +352,31 @@ wrap_nettle_cipher_setkey (void *_ctx, const void *key, size_t keysize)
 static int
 wrap_nettle_cipher_setiv (void *_ctx, const void *iv, size_t ivsize)
 {
-  struct nettle_cipher_ctx *ctx = _ctx;
+struct nettle_cipher_ctx *ctx = _ctx;
 
-  if (ivsize > ctx->block_size)
+  switch (ctx->algo)
     {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
+#ifdef NETTLE_GCM
+    case GNUTLS_CIPHER_AES_128_GCM:
+      if (ivsize != GCM_DEFAULT_NONCE_SIZE)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INVALID_REQUEST;
+        }
+
+      ctx->mode_ctx.gcm.gcm.data_size = ctx->mode_ctx.gcm.gcm.auth_size = 0;
+      gcm_set_iv(&ctx->mode_ctx.gcm.gcm, GCM_DEFAULT_NONCE_SIZE, iv);
+      break;
+#endif
+    default:
+      if (ivsize > ctx->block_size)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INVALID_REQUEST;
+        }
+
+      memcpy (ctx->iv, iv, ivsize);
     }
-  memcpy (ctx->iv, iv, ivsize);
 
   return 0;
 }
