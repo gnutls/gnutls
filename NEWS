@@ -5,7 +5,7 @@ See the end for copying conditions.
 
 * Version 2.99.0 (unreleased)
 
-** libgnutls: Added GCM mode (still untested)
+** libgnutls: Added GCM mode (interoperates with tls.secg.org)
 
 ** libgnutls-extra: Inner application extension was removed.
 It was never standardized nor published as an RFC.
