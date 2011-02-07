@@ -949,7 +949,11 @@ begin:
           return 0;             /* we were expecting close notify */
         }
       session_unresumable (session);
-      gnutls_assert ();
+      gnutls_assert();
+
+      if (ret == 0)
+       return GNUTLS_E_PREMATURE_TERMINATION;
+      else
       return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
     }
 

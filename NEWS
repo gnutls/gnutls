@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.99.0 (unreleased)
 
+** libgnutls: gnutls_recv() return GNUTLS_E_PREMATURE_TERMINATION
+on unexpected EOF, instead of GNUTLS_E_UNEXPECTED_PACKET_LENGTH.
+
 ** libgnutls: Added GCM mode (interoperates with tls.secg.org)
 
 ** libgnutls-extra: Inner application extension was removed.
