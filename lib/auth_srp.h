@@ -58,8 +58,8 @@ int _gnutls_proc_srp_server_hello (gnutls_session_t state,
 int _gnutls_gen_srp_server_hello (gnutls_session_t state, opaque * data,
                                   size_t data_size);
 
-int _gnutls_gen_srp_server_kx (gnutls_session_t, opaque **);
-int _gnutls_gen_srp_client_kx (gnutls_session_t, opaque **);
+int _gnutls_gen_srp_server_kx (gnutls_session_t, gnutls_buffer_st*);
+int _gnutls_gen_srp_client_kx (gnutls_session_t, gnutls_buffer_st*);
 
 int _gnutls_proc_srp_server_kx (gnutls_session_t, opaque *, size_t);
 int _gnutls_proc_srp_client_kx (gnutls_session_t, opaque *, size_t);

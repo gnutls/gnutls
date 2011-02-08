@@ -40,8 +40,8 @@
 #include <auth_dh_common.h>
 #include <gnutls_datum.h>
 
-static int gen_psk_server_kx (gnutls_session_t, opaque **);
-static int gen_psk_client_kx (gnutls_session_t, opaque **);
+static int gen_psk_server_kx (gnutls_session_t, gnutls_buffer_st*);
+static int gen_psk_client_kx (gnutls_session_t, gnutls_buffer_st*);
 static int proc_psk_client_kx (gnutls_session_t, opaque *, size_t);
 static int proc_psk_server_kx (gnutls_session_t, opaque *, size_t);
 
@@ -63,11 +63,9 @@ const mod_auth_st dhe_psk_auth_struct = {
 };
 
 static int
-gen_psk_client_kx (gnutls_session_t session, opaque ** data)
+gen_psk_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
   int ret;
-  opaque *tmp_data = NULL;
-  int data_size, tmp_data_size;
   gnutls_psk_client_credentials_t cred;
 
   cred = (gnutls_psk_client_credentials_t)
@@ -85,38 +83,25 @@ gen_psk_client_kx (gnutls_session_t session, opaque ** data)
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
+  ret = _gnutls_buffer_append_data_prefix(data, 16, cred->username.data, cred->username.size);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+
   /* The PSK key is set in there */
-  ret = _gnutls_gen_dh_common_client_kx (session, &tmp_data);
+  ret = _gnutls_gen_dh_common_client_kx (session, data);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  tmp_data_size = ret;
-  data_size = tmp_data_size + cred->username.size + 2;
-
-  (*data) = gnutls_malloc (data_size);
-  if ((*data) == NULL)
-    {
-      gnutls_assert ();
-      ret = GNUTLS_E_MEMORY_ERROR;
-      goto error;
-    }
-
-  _gnutls_write_datum16 (*data, cred->username);
-  memcpy (&(*data)[cred->username.size + 2], tmp_data, tmp_data_size);
-
-  ret = data_size;
-
-error:
-  gnutls_free (tmp_data);
-  return ret;
+  return data->length;
 
 }
 
 static int
-gen_psk_server_kx (gnutls_session_t session, opaque ** data)
+gen_psk_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
   bigint_t g, p;
   const bigint_t *mpis;

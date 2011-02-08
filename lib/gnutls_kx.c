@@ -163,45 +163,44 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
 int
 _gnutls_send_server_kx_message (gnutls_session_t session, int again)
 {
-  uint8_t *data = NULL;
-  int data_size = 0;
+  gnutls_buffer_st data;
   int ret = 0;
 
   if (session->internals.auth_struct->gnutls_generate_server_kx == NULL)
     return 0;
 
-  data = NULL;
-  data_size = 0;
+  _gnutls_buffer_init( &data);
 
   if (again == 0)
     {
-      data_size =
+      ret =
         session->internals.auth_struct->gnutls_generate_server_kx (session,
                                                                    &data);
 
-      if (data_size == GNUTLS_E_INT_RET_0)
+      if (ret == GNUTLS_E_INT_RET_0)
         {
           gnutls_assert ();
-          return 0;
+          ret = 0;
+          goto cleanup;
         }
 
-      if (data_size < 0)
+      if (ret < 0)
         {
           gnutls_assert ();
-          return data_size;
+          goto cleanup;
         }
     }
 
-  ret = send_handshake (session, data, data_size,
+  ret = send_handshake (session, data.data, data.length,
                         GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE);
-  gnutls_free (data);
-
   if (ret < 0)
     {
       gnutls_assert ();
-      return ret;
     }
-  return data_size;
+  
+cleanup:
+  _gnutls_buffer_clear (&data);
+  return ret;
 }
 
 /* This function sends a certificate request message to the
@@ -210,8 +209,7 @@ _gnutls_send_server_kx_message (gnutls_session_t session, int again)
 int
 _gnutls_send_server_certificate_request (gnutls_session_t session, int again)
 {
-  uint8_t *data = NULL;
-  int data_size = 0;
+  gnutls_buffer_st data;
   int ret = 0;
 
   if (session->internals.
@@ -221,32 +219,32 @@ _gnutls_send_server_certificate_request (gnutls_session_t session, int again)
   if (session->internals.send_cert_req <= 0)
     return 0;
 
-  data = NULL;
-  data_size = 0;
+  _gnutls_buffer_init( &data);
 
   if (again == 0)
     {
-      data_size =
+      ret =
         session->internals.
         auth_struct->gnutls_generate_server_certificate_request (session,
                                                                  &data);
 
-      if (data_size < 0)
+      if (ret < 0)
         {
           gnutls_assert ();
-          return data_size;
+          goto cleanup;
         }
     }
-  ret = send_handshake (session, data, data_size,
-                        GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST);
-  gnutls_free (data);
 
+  ret = send_handshake (session, data.data, data.length,
+                        GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST);
   if (ret < 0)
     {
       gnutls_assert ();
-      return ret;
     }
-  return data_size;
+  
+cleanup:
+  _gnutls_buffer_clear (&data);
+  return ret;
 }
 
 
@@ -256,38 +254,34 @@ _gnutls_send_server_certificate_request (gnutls_session_t session, int again)
 int
 _gnutls_send_client_kx_message (gnutls_session_t session, int again)
 {
-  uint8_t *data;
-  int data_size;
+  gnutls_buffer_st data;
   int ret = 0;
 
   if (session->internals.auth_struct->gnutls_generate_client_kx == NULL)
     return 0;
 
-
-  data = NULL;
-  data_size = 0;
+  _gnutls_buffer_init( &data);
 
   if (again == 0)
     {
-      data_size =
+      ret =
         session->internals.auth_struct->gnutls_generate_client_kx (session,
                                                                    &data);
-      if (data_size < 0)
+      if (ret < 0)
         {
-          gnutls_assert ();
-          return data_size;
+          gnutls_assert();
+          goto cleanup;
         }
     }
-  ret = send_handshake (session, data, data_size,
+  ret = send_handshake (session, data.data, data.length,
                         GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE);
-  gnutls_free (data);
-
   if (ret < 0)
     {
       gnutls_assert ();
-      return ret;
     }
-
+  
+cleanup:
+  _gnutls_buffer_clear (&data);
   return ret;
 }
 
@@ -298,9 +292,8 @@ _gnutls_send_client_kx_message (gnutls_session_t session, int again)
 int
 _gnutls_send_client_certificate_verify (gnutls_session_t session, int again)
 {
-  uint8_t *data;
+  gnutls_buffer_st data;
   int ret = 0;
-  int data_size;
 
   /* This is a packet that is only sent by the client
    */
@@ -312,6 +305,7 @@ _gnutls_send_client_certificate_verify (gnutls_session_t session, int again)
   if (session->key->certificate_requested == 0)
     return 0;
 
+
   if (session->internals.auth_struct->gnutls_generate_client_cert_vrfy ==
       NULL)
     {
@@ -320,27 +314,134 @@ _gnutls_send_client_certificate_verify (gnutls_session_t session, int again)
                                  */
     }
 
-  data = NULL;
-  data_size = 0;
+  _gnutls_buffer_init( &data);
 
   if (again == 0)
     {
-      data_size =
+      ret =
         session->internals.
         auth_struct->gnutls_generate_client_cert_vrfy (session, &data);
-      if (data_size < 0)
+      if (ret < 0)
         {
-          gnutls_assert ();
-          return data_size;
+          gnutls_assert();
+          goto cleanup;
         }
-      if (data_size == 0)
-        return 0;
+
+      if (ret == 0)
+          goto cleanup;
 
     }
-  ret = send_handshake (session, data, data_size,
+  ret = send_handshake (session, data.data, data.length,
                         GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY);
-  gnutls_free (data);
 
+  if (ret < 0)
+    {
+      gnutls_assert ();
+    }
+  
+cleanup:
+  _gnutls_buffer_clear (&data);
+  return ret;
+}
+
+/* This is called when we want send our certificate
+ */
+int
+_gnutls_send_client_certificate (gnutls_session_t session, int again)
+{
+  gnutls_buffer_st data;
+  int ret = 0;
+
+
+  if (session->key->certificate_requested == 0)
+    return 0;
+
+  if (session->internals.auth_struct->gnutls_generate_client_certificate ==
+      NULL)
+    return 0;
+
+  _gnutls_buffer_init( &data);
+
+  if (again == 0)
+    {
+      if (gnutls_protocol_get_version (session) != GNUTLS_SSL3 ||
+          session->internals.selected_cert_list_length > 0)
+        {
+          /* TLS 1.0 or SSL 3.0 with a valid certificate 
+           */
+          ret =
+            session->internals.
+            auth_struct->gnutls_generate_client_certificate (session, &data);
+
+          if (ret < 0)
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
+        }
+    }
+
+  /* In the SSL 3.0 protocol we need to send a
+   * no certificate alert instead of an
+   * empty certificate.
+   */
+  if (gnutls_protocol_get_version (session) == GNUTLS_SSL3 &&
+      session->internals.selected_cert_list_length == 0)
+    {
+      ret =
+        gnutls_alert_send (session, GNUTLS_AL_WARNING,
+                           GNUTLS_A_SSL3_NO_CERTIFICATE);
+
+    }
+  else
+    {                           /* TLS 1.0 or SSL 3.0 with a valid certificate 
+                                 */
+      ret = send_handshake (session, data.data, data.length,
+                            GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
+    }
+
+cleanup:
+  _gnutls_buffer_clear (&data);
+  return ret;
+}
+
+
+/* This is called when we want send our certificate
+ */
+int
+_gnutls_send_server_certificate (gnutls_session_t session, int again)
+{
+  gnutls_buffer_st data;
+  int ret = 0;
+
+
+  if (session->internals.auth_struct->gnutls_generate_server_certificate ==
+      NULL)
+    return 0;
+
+  _gnutls_buffer_init( &data);
+
+  if (again == 0)
+    {
+      ret =
+        session->internals.
+        auth_struct->gnutls_generate_server_certificate (session, &data);
+
+        if (ret < 0)
+          {
+            gnutls_assert();
+            goto cleanup;
+          }
+    }
+  ret = send_handshake (session, data.data, data.length,
+                        GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+    }
+  
+cleanup:
+  _gnutls_buffer_clear (&data);
   return ret;
 }
 
@@ -464,116 +565,6 @@ _gnutls_recv_client_kx_message (gnutls_session_t session)
 }
 
 
-/* This is called when we want send our certificate
- */
-int
-_gnutls_send_client_certificate (gnutls_session_t session, int again)
-{
-  uint8_t *data = NULL;
-  int data_size = 0;
-  int ret = 0;
-
-
-  if (session->key->certificate_requested == 0)
-    return 0;
-
-  if (session->internals.auth_struct->gnutls_generate_client_certificate ==
-      NULL)
-    return 0;
-
-  data = NULL;
-  data_size = 0;
-
-  if (again == 0)
-    {
-      if (gnutls_protocol_get_version (session) != GNUTLS_SSL3 ||
-          session->internals.selected_cert_list_length > 0)
-        {
-          /* TLS 1.0 or SSL 3.0 with a valid certificate 
-           */
-          data_size =
-            session->internals.
-            auth_struct->gnutls_generate_client_certificate (session, &data);
-
-          if (data_size < 0)
-            {
-              gnutls_assert ();
-              return data_size;
-            }
-        }
-    }
-
-  /* In the SSL 3.0 protocol we need to send a
-   * no certificate alert instead of an
-   * empty certificate.
-   */
-  if (gnutls_protocol_get_version (session) == GNUTLS_SSL3 &&
-      session->internals.selected_cert_list_length == 0)
-    {
-      ret =
-        gnutls_alert_send (session, GNUTLS_AL_WARNING,
-                           GNUTLS_A_SSL3_NO_CERTIFICATE);
-
-    }
-  else
-    {                           /* TLS 1.0 or SSL 3.0 with a valid certificate 
-                                 */
-      ret = send_handshake (session, data, data_size,
-                            GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
-      gnutls_free (data);
-    }
-
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  return data_size;
-}
-
-
-/* This is called when we want send our certificate
- */
-int
-_gnutls_send_server_certificate (gnutls_session_t session, int again)
-{
-  uint8_t *data = NULL;
-  int data_size = 0;
-  int ret = 0;
-
-
-  if (session->internals.auth_struct->gnutls_generate_server_certificate ==
-      NULL)
-    return 0;
-
-  data = NULL;
-  data_size = 0;
-
-  if (again == 0)
-    {
-      data_size =
-        session->internals.
-        auth_struct->gnutls_generate_server_certificate (session, &data);
-
-      if (data_size < 0)
-        {
-          gnutls_assert ();
-          return data_size;
-        }
-    }
-  ret = send_handshake (session, data, data_size,
-                        GNUTLS_HANDSHAKE_CERTIFICATE_PKT);
-  gnutls_free (data);
-
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  return data_size;
-}
 
 
 int

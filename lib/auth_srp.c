@@ -131,18 +131,13 @@ check_a_mod_n (bigint_t a, bigint_t n)
  * Data is allocated by the caller, and should have data_size size.
  */
 int
-_gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
+_gnutls_gen_srp_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
   int ret;
-  uint8_t *data_n, *data_s;
-  uint8_t *data_g;
   char *username;
   SRP_PWD_ENTRY *pwd_entry;
   srp_server_auth_info_t info;
-  ssize_t data_size;
-  size_t n_b, tmp_size;
-  char buf[64];
-  uint8_t *data_b;
+  size_t tmp_size;
   extension_priv_data_t epriv;
   srp_ext_st *priv;
 
@@ -180,21 +175,24 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
   if (_gnutls_mpi_scan_nz (&G, pwd_entry->g.data, tmp_size) < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_MPI_SCAN_FAILED;
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
     }
 
   tmp_size = pwd_entry->n.size;
   if (_gnutls_mpi_scan_nz (&N, pwd_entry->n.data, tmp_size) < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_MPI_SCAN_FAILED;
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
     }
 
   tmp_size = pwd_entry->v.size;
   if (_gnutls_mpi_scan_nz (&V, pwd_entry->v.data, tmp_size) < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_MPI_SCAN_FAILED;
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
     }
 
   /* Calculate:  B = (k*v + g^b) % N 
@@ -203,77 +201,67 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, opaque ** data)
   if (B == NULL)
     {
       gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  if (_gnutls_mpi_print (B, NULL, &n_b) != GNUTLS_E_SHORT_MEMORY_BUFFER)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MPI_PRINT_FAILED;
-    }
-
-
-  /* Allocate size to hold the N, g, s, B 
-   */
-
-  data_size = (pwd_entry->n.size + 2 + pwd_entry->g.size + 2 +
-               pwd_entry->salt.size + 1) + (n_b + 2);
-
-  (*data) = gnutls_malloc (data_size);
-  if ((*data) == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
+      ret = GNUTLS_E_MEMORY_ERROR;
+      goto cleanup;
     }
 
   /* copy N (mod n) 
    */
-  data_n = *data;
-  _gnutls_write_datum16 (data_n, pwd_entry->n);
-
+  ret = _gnutls_buffer_append_data_prefix( data, 16, pwd_entry->n.data,
+    pwd_entry->n.size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
 
   /* copy G (generator) to data 
    */
-  data_g = &data_n[2 + pwd_entry->n.size];
-  _gnutls_write_datum16 (data_g, pwd_entry->g);
-
+  ret = _gnutls_buffer_append_data_prefix( data, 16, pwd_entry->g.data,
+    pwd_entry->g.size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
 
   /* copy the salt 
    */
-  data_s = &data_g[2 + pwd_entry->g.size];
-  _gnutls_write_datum8 (data_s, pwd_entry->salt);
-
+  ret = _gnutls_buffer_append_data_prefix( data, 8, pwd_entry->salt.data,
+    pwd_entry->salt.size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
 
   /* Copy the B value
    */
 
-  data_b = &data_s[1 + pwd_entry->salt.size];
-  if (_gnutls_mpi_print (B, &data_b[2], &n_b) != 0)
+  ret = _gnutls_buffer_append_mpi( data, 16, B, 0);
+  if (ret < 0)
     {
-      gnutls_assert ();
-      return GNUTLS_E_MPI_PRINT_FAILED;
+      gnutls_assert();
+      goto cleanup;
     }
 
-  _gnutls_write_uint16 (n_b, data_b);
-
-  _gnutls_hard_log ("INT: SRP B[%d]: %s\n", (int) n_b,
-                    _gnutls_bin2hex (&data_b[2], n_b, buf, sizeof (buf),
-                                     NULL));
+  _gnutls_mpi_log ("SRP B: ", B);
 
   _gnutls_srp_entry_free (pwd_entry);
 
-  return data_size;
+  ret = data->length;
+
+cleanup:
+  _gnutls_srp_entry_free (pwd_entry);
+  return ret;
 }
 
 /* return A = g^a % N */
 int
-_gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
+_gnutls_gen_srp_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
-  size_t n_a;
   int ret;
-  uint8_t *data_a;
   char *username, *password;
-  char buf[64];
   gnutls_srp_client_credentials_t cred;
   extension_priv_data_t epriv;
   srp_ext_st *priv;
@@ -365,36 +353,15 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, opaque ** data)
       return ret;
     }
 
-  if (_gnutls_mpi_print (A, NULL, &n_a) != GNUTLS_E_SHORT_MEMORY_BUFFER)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MPI_PRINT_FAILED;
-    }
+  ret = _gnutls_buffer_append_mpi(data, 16, A, 0);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
-  (*data) = gnutls_malloc (n_a + 2);
-  if ((*data) == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  /* copy A */
-  data_a = (*data);
-  if (_gnutls_mpi_print (A, &data_a[2], &n_a) != 0)
-    {
-      gnutls_free (*data);
-      return GNUTLS_E_MPI_PRINT_FAILED;
-    }
-
-  _gnutls_hard_log ("INT: SRP A[%d]: %s\n", (int) n_a,
-                    _gnutls_bin2hex (&data_a[2], n_a, buf, sizeof (buf),
-                                     NULL));
+  _gnutls_mpi_log ("SRP A: ", A);
 
   _gnutls_mpi_release (&A);
 
-  _gnutls_write_uint16 (n_a, data_a);
-
-  return n_a + 2;
+  return data->length;
 }
 
 

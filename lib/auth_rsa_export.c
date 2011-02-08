@@ -44,8 +44,8 @@
 #include <gnutls_state.h>
 #include <random.h>
 
-int _gnutls_gen_rsa_client_kx (gnutls_session_t, opaque **);
-static int gen_rsa_export_server_kx (gnutls_session_t, opaque **);
+int _gnutls_gen_rsa_client_kx (gnutls_session_t, gnutls_buffer_st*);
+static int gen_rsa_export_server_kx (gnutls_session_t, gnutls_buffer_st*);
 static int proc_rsa_export_server_kx (gnutls_session_t, opaque *, size_t);
 static int proc_rsa_export_client_kx (gnutls_session_t session, opaque * data,
                                       size_t _data_size);
@@ -234,13 +234,11 @@ proc_rsa_export_client_kx (gnutls_session_t session, opaque * data,
 }
 
 static int
-gen_rsa_export_server_kx (gnutls_session_t session, opaque ** data)
+gen_rsa_export_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
   gnutls_rsa_params_t rsa_params;
   const bigint_t *rsa_mpis;
-  size_t n_e, n_m;
-  uint8_t *data_e, *data_m;
-  int ret = 0, data_size;
+  int ret = 0;
   gnutls_cert *apr_cert_list;
   gnutls_privkey_t apr_pkey;
   int apr_cert_list_length;
@@ -295,32 +293,18 @@ gen_rsa_export_server_kx (gnutls_session_t session, opaque ** data)
 
   _gnutls_rsa_export_set_pubkey (session, rsa_mpis[1], rsa_mpis[0]);
 
-  _gnutls_mpi_print (rsa_mpis[0], NULL, &n_m);
-  _gnutls_mpi_print (rsa_mpis[1], NULL, &n_e);
+  ret = _gnutls_buffer_append_mpi( data, 16, rsa_mpis[0], 0);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
-  (*data) = gnutls_malloc (n_e + n_m + 4);
-  if (*data == NULL)
-    {
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  data_m = &(*data)[0];
-  _gnutls_mpi_print (rsa_mpis[0], &data_m[2], &n_m);
-
-  _gnutls_write_uint16 (n_m, data_m);
-
-  data_e = &data_m[2 + n_m];
-  _gnutls_mpi_print (rsa_mpis[1], &data_e[2], &n_e);
-
-  _gnutls_write_uint16 (n_e, data_e);
-
-  data_size = n_m + n_e + 4;
-
+  ret = _gnutls_buffer_append_mpi( data, 16, rsa_mpis[1], 0);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   /* Generate the signature. */
 
-  ddata.data = *data;
-  ddata.size = data_size;
+  ddata.data = data->data;
+  ddata.size = data->length;
 
   if (apr_cert_list_length > 0)
     {
@@ -330,31 +314,22 @@ gen_rsa_export_server_kx (gnutls_session_t session, opaque ** data)
                                         &sign_algo)) < 0)
         {
           gnutls_assert ();
-          gnutls_free (*data);
-          *data = NULL;
           return ret;
         }
     }
   else
     {
       gnutls_assert ();
-      return data_size;         /* do not put a signature - ILLEGAL! */
+      return data->length;         /* do not put a signature - ILLEGAL! */
     }
 
-  *data = gnutls_realloc_fast (*data, data_size + signature.size + 2);
-  if (*data == NULL)
-    {
-      _gnutls_free_datum (&signature);
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  _gnutls_write_datum16 (&((*data)[data_size]), signature);
-  data_size += signature.size + 2;
-
+  ret = _gnutls_buffer_append_data_prefix( data, 16, signature.data, signature.size);
   _gnutls_free_datum (&signature);
 
-  return data_size;
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  return data->length;
 }
 
 /* if the peer's certificate is of 512 bits or less, returns non zero.

@@ -42,7 +42,7 @@
 #include <auth_srp.h>
 #include <gnutls_x509.h>
 
-static int gen_srp_cert_server_kx (gnutls_session_t, opaque **);
+static int gen_srp_cert_server_kx (gnutls_session_t, gnutls_buffer_st*);
 static int proc_srp_cert_server_kx (gnutls_session_t, opaque *, size_t);
 
 const mod_auth_st srp_rsa_auth_struct = {
@@ -80,7 +80,7 @@ const mod_auth_st srp_dss_auth_struct = {
 };
 
 static int
-gen_srp_cert_server_kx (gnutls_session_t session, opaque ** data)
+gen_srp_cert_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
   ssize_t ret, data_size;
   gnutls_datum_t signature, ddata;
@@ -96,8 +96,8 @@ gen_srp_cert_server_kx (gnutls_session_t session, opaque ** data)
     return ret;
 
   data_size = ret;
-  ddata.data = *data;
-  ddata.size = data_size;
+  ddata.data = data->data;
+  ddata.size = data->length;
 
   cred = (gnutls_certificate_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -122,24 +122,17 @@ gen_srp_cert_server_kx (gnutls_session_t session, opaque ** data)
                                     &sign_algo)) < 0)
     {
       gnutls_assert ();
-      gnutls_free (*data);
       return ret;
     }
 
-  *data = gnutls_realloc_fast (*data, data_size + signature.size + 2);
-  if (*data == NULL)
-    {
-      _gnutls_free_datum (&signature);
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  _gnutls_write_datum16 (&(*data)[data_size], signature);
-  data_size += signature.size + 2;
+  ret = _gnutls_buffer_append_data_prefix( data, 16, signature.data, signature.size);
 
   _gnutls_free_datum (&signature);
 
-  return data_size;
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  return data->length;
 
 }
 

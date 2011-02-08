@@ -36,8 +36,8 @@
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
 
-int _gnutls_gen_psk_server_kx (gnutls_session_t session, opaque ** data);
-int _gnutls_gen_psk_client_kx (gnutls_session_t, opaque **);
+int _gnutls_gen_psk_server_kx (gnutls_session_t session, gnutls_buffer_st* data);
+int _gnutls_gen_psk_client_kx (gnutls_session_t, gnutls_buffer_st*);
 
 int _gnutls_proc_psk_client_kx (gnutls_session_t, opaque *, size_t);
 
@@ -154,7 +154,7 @@ error:
  *
  */
 int
-_gnutls_gen_psk_client_kx (gnutls_session_t session, opaque ** data)
+_gnutls_gen_psk_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
   int ret;
   gnutls_psk_client_credentials_t cred;
@@ -211,16 +211,7 @@ _gnutls_gen_psk_client_kx (gnutls_session_t session, opaque ** data)
       return ret;
     }
 
-  (*data) = gnutls_malloc (2 + cred->username.size);
-  if ((*data) == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  _gnutls_write_datum16 (*data, cred->username);
-
-  return (cred->username.size + 2);
+  return _gnutls_buffer_append_data_prefix(data, 16, cred->username.data, cred->username.size);
 }
 
 
@@ -300,7 +291,7 @@ error:
  *
  */
 int
-_gnutls_gen_psk_server_kx (gnutls_session_t session, opaque ** data)
+_gnutls_gen_psk_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
   gnutls_psk_server_credentials_t cred;
   gnutls_datum_t hint;
@@ -324,16 +315,7 @@ _gnutls_gen_psk_server_kx (gnutls_session_t session, opaque ** data)
   hint.data = cred->hint;
   hint.size = strlen (cred->hint);
 
-  (*data) = gnutls_malloc (2 + hint.size);
-  if ((*data) == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  _gnutls_write_datum16 (*data, hint);
-
-  return hint.size + 2;
+  return _gnutls_buffer_append_data_prefix(data, 16, hint.data, hint.size);
 }
 
 

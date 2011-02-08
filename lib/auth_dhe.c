@@ -41,7 +41,7 @@
 #include <gnutls_state.h>
 #include <auth_dh_common.h>
 
-static int gen_dhe_server_kx (gnutls_session_t, opaque **);
+static int gen_dhe_server_kx (gnutls_session_t, gnutls_buffer_st*);
 static int proc_dhe_server_kx (gnutls_session_t, opaque *, size_t);
 static int proc_dhe_client_kx (gnutls_session_t, opaque *, size_t);
 
@@ -81,7 +81,7 @@ const mod_auth_st dhe_dss_auth_struct = {
 
 
 static int
-gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
+gen_dhe_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
   bigint_t g, p;
   const bigint_t *mpis;
@@ -143,8 +143,8 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
 
   /* Generate the signature. */
 
-  ddata.data = *data;
-  ddata.size = data_size;
+  ddata.data = data->data;
+  ddata.size = data->length;
 
   if (apr_cert_list_length > 0)
     {
@@ -164,17 +164,10 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
       goto cleanup;
     }
 
-  *data = gnutls_realloc_fast (*data, data_size + signature.size + 4);
-  if (*data == NULL)
-    {
-      gnutls_assert ();
-      ret = GNUTLS_E_MEMORY_ERROR;
-      goto cleanup;
-    }
-
   if (_gnutls_version_has_selectable_sighash (ver))
     {
       const sign_algorithm_st *aid;
+      uint8_t p[2];
 
       if (sign_algo == GNUTLS_SIGN_UNKNOWN)
         {
@@ -190,20 +183,27 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
           goto cleanup;
         }
       
-      (*data)[data_size++] = aid->hash_algorithm;
-      (*data)[data_size++] = aid->sign_algorithm;
+      p[0] = aid->hash_algorithm;
+      p[1] = aid->sign_algorithm;
+      
+      ret = _gnutls_buffer_append_data(data, p, 2);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
     }
 
-  _gnutls_write_datum16 (&(*data)[data_size], signature);
-  data_size += signature.size + 2;
+  ret = _gnutls_buffer_append_data_prefix(data, 16, signature.data, signature.size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+    }
 
-  _gnutls_free_datum (&signature);
-
-  return data_size;
+  ret = data->length;
 
 cleanup:
   _gnutls_free_datum (&signature);
-  gnutls_free(*data);
   return ret;
 
 }

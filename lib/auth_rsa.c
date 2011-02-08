@@ -43,7 +43,7 @@
 #include <random.h>
 #include <gnutls_mpi.h>
 
-int _gnutls_gen_rsa_client_kx (gnutls_session_t, opaque **);
+int _gnutls_gen_rsa_client_kx (gnutls_session_t, gnutls_buffer_st*);
 static int proc_rsa_client_kx (gnutls_session_t, opaque *, size_t);
 
 const mod_auth_st rsa_auth_struct = {
@@ -252,7 +252,7 @@ proc_rsa_client_kx (gnutls_session_t session, opaque * data,
 /* return RSA(random) using the peers public key 
  */
 int
-_gnutls_gen_rsa_client_kx (gnutls_session_t session, opaque ** data)
+_gnutls_gen_rsa_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
   cert_auth_info_t auth = session->key->auth_info;
   gnutls_datum_t sdata;         /* data to send */
@@ -323,19 +323,14 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, opaque ** data)
   if (gnutls_protocol_get_version (session) == GNUTLS_SSL3)
     {
       /* SSL 3.0 */
-      *data = sdata.data;
-      return sdata.size;
+      _gnutls_buffer_replace_data( data, &sdata);
+
+      return data->length;
     }
   else
-    {                           /* TLS 1 */
-      *data = gnutls_malloc (sdata.size + 2);
-      if (*data == NULL)
-        {
-          _gnutls_free_datum (&sdata);
-          return GNUTLS_E_MEMORY_ERROR;
-        }
-      _gnutls_write_datum16 (*data, sdata);
-      ret = sdata.size + 2;
+    {  /* TLS 1 */
+      ret = _gnutls_buffer_append_data_prefix( data, 16, sdata.data, sdata.size);
+
       _gnutls_free_datum (&sdata);
       return ret;
     }

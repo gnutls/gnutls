@@ -100,6 +100,13 @@ _gnutls_buffer_init (gnutls_buffer_st * str)
   str->length = 0;
 }
 
+void _gnutls_buffer_replace_data( gnutls_buffer_st * buf, gnutls_datum_t * data)
+{
+    gnutls_free(buf->allocd);
+    buf->allocd = buf->data = data->data;
+    buf->max_length = buf->length = data->size;
+}
+
 void
 _gnutls_buffer_clear (gnutls_buffer_st * str)
 {
@@ -562,11 +569,34 @@ _gnutls_hostname_compare (const char *certname,
 }
 
 int
-_gnutls_buffer_append_prefix (gnutls_buffer_st * buf, size_t data_size)
+_gnutls_buffer_append_prefix (gnutls_buffer_st * buf, int pfx_size, size_t data_size)
 {
   opaque ss[4];
-  _gnutls_write_uint32 (data_size, ss);
-  return _gnutls_buffer_append_data (buf, ss, 4);
+
+  if (pfx_size == 32)
+    {
+      _gnutls_write_uint32 (data_size, ss);
+      pfx_size = 4;
+    }
+  else if (pfx_size == 24)
+    {
+      _gnutls_write_uint24 (data_size, ss);
+      pfx_size = 3;
+    }
+  else if (pfx_size == 16)
+    {
+      _gnutls_write_uint16 (data_size, ss);
+      pfx_size = 2;
+    }
+  else if (pfx_size == 8)
+    {
+      ss[0] = data_size;
+      pfx_size = 1;
+    }
+  else
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  return _gnutls_buffer_append_data (buf, ss, pfx_size);
 }
 
 /* Reads an uint32 number from the buffer. If check is non zero it will also check whether
@@ -633,14 +663,44 @@ _gnutls_buffer_pop_datum_prefix (gnutls_buffer_st * buf,
 }
 
 int
-_gnutls_buffer_append_data_prefix (gnutls_buffer_st * buf, const void *data,
-                                   size_t data_size)
+_gnutls_buffer_append_data_prefix (gnutls_buffer_st * buf, 
+    int pfx_size, const void *data, size_t data_size)
 {
-  _gnutls_buffer_append_prefix (buf, data_size);
-  if (data_size > 0)
-    return _gnutls_buffer_append_data (buf, data, data_size);
+int ret = 0, ret1;
 
-  return 0;
+  ret1 = _gnutls_buffer_append_prefix (buf, pfx_size, data_size);
+  if (ret1 < 0)
+    return gnutls_assert_val(ret1);
+
+  if (data_size > 0)
+    {
+      ret = _gnutls_buffer_append_data (buf, data, data_size);
+
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+    }
+
+  return ret + ret1;
+}
+
+int _gnutls_buffer_append_mpi (gnutls_buffer_st * buf, int pfx_size, bigint_t mpi, int lz)
+{
+gnutls_datum_t dd;
+int ret;
+
+  if (lz)
+    ret = _gnutls_mpi_dprint_lz (mpi, &dd);
+  else
+    ret = _gnutls_mpi_dprint (mpi, &dd);
+
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  ret = _gnutls_buffer_append_data_prefix(buf, pfx_size, dd.data, dd.size);
+  
+  _gnutls_free_datum(&dd);
+  
+  return ret;
 }
 
 int

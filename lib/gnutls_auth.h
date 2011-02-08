@@ -26,16 +26,18 @@
 #ifndef GNUTLS_AUTH_H
 #define GNUTLS_AUTH_H
 
+#include <gnutls_str.h>
+
 typedef struct mod_auth_st_int
 {
   const char *name;             /* null terminated */
-  int (*gnutls_generate_server_certificate) (gnutls_session_t, opaque **);
-  int (*gnutls_generate_client_certificate) (gnutls_session_t, opaque **);
-  int (*gnutls_generate_server_kx) (gnutls_session_t, opaque **);
-  int (*gnutls_generate_client_kx) (gnutls_session_t, opaque **);       /* used in SRP */
-  int (*gnutls_generate_client_cert_vrfy) (gnutls_session_t, opaque **);
+  int (*gnutls_generate_server_certificate) (gnutls_session_t, gnutls_buffer_st*);
+  int (*gnutls_generate_client_certificate) (gnutls_session_t, gnutls_buffer_st*);
+  int (*gnutls_generate_server_kx) (gnutls_session_t, gnutls_buffer_st*);
+  int (*gnutls_generate_client_kx) (gnutls_session_t, gnutls_buffer_st*);       /* used in SRP */
+  int (*gnutls_generate_client_cert_vrfy) (gnutls_session_t, gnutls_buffer_st *);
   int (*gnutls_generate_server_certificate_request) (gnutls_session_t,
-                                                     opaque **);
+                                                     gnutls_buffer_st *);
 
   int (*gnutls_process_server_certificate) (gnutls_session_t, opaque *,
                                             size_t);

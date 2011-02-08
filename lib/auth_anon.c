@@ -41,7 +41,7 @@
 #include <gnutls_state.h>
 #include <auth_dh_common.h>
 
-static int gen_anon_server_kx (gnutls_session_t, opaque **);
+static int gen_anon_server_kx (gnutls_session_t, gnutls_buffer_st*);
 static int proc_anon_client_kx (gnutls_session_t, opaque *, size_t);
 static int proc_anon_server_kx (gnutls_session_t, opaque *, size_t);
 
@@ -63,7 +63,7 @@ const mod_auth_st anon_auth_struct = {
 };
 
 static int
-gen_anon_server_kx (gnutls_session_t session, opaque ** data)
+gen_anon_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
   bigint_t g, p;
   const bigint_t *mpis;

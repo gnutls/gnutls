@@ -753,10 +753,9 @@ cleanup:
  */
 
 static int
-_gnutls_gen_x509_crt (gnutls_session_t session, opaque ** data)
+_gnutls_gen_x509_crt (gnutls_session_t session, gnutls_buffer_st * data)
 {
   int ret, i;
-  opaque *pdata;
   gnutls_cert *apr_cert_list;
   gnutls_privkey_t apr_pkey;
   int apr_cert_list_length;
@@ -788,23 +787,19 @@ _gnutls_gen_x509_crt (gnutls_session_t session, opaque ** data)
    * the one produced here )
    */
 
-  (*data) = gnutls_malloc (ret);
-  pdata = (*data);
+  ret = _gnutls_buffer_append_prefix(data, 24, ret - 3);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
-  if (pdata == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-  _gnutls_write_uint24 (ret - 3, pdata);
-  pdata += 3;
   for (i = 0; i < apr_cert_list_length; i++)
     {
-      _gnutls_write_datum24 (pdata, apr_cert_list[i].raw);
-      pdata += (3 + apr_cert_list[i].raw.size);
+      ret = _gnutls_buffer_append_data_prefix( data, 24, apr_cert_list[i].raw.data,
+        apr_cert_list[i].raw.size);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
 
-  return ret;
+  return data->length;
 }
 
 enum PGPKeyDescriptorType
@@ -812,13 +807,13 @@ enum PGPKeyDescriptorType
 
 #ifdef ENABLE_OPENPGP
 static int
-_gnutls_gen_openpgp_certificate (gnutls_session_t session, opaque ** data)
+_gnutls_gen_openpgp_certificate (gnutls_session_t session, gnutls_buffer_st * data)
 {
   int ret;
-  opaque *pdata;
   gnutls_cert *apr_cert_list;
   gnutls_privkey_t apr_pkey;
   int apr_cert_list_length;
+  uint8_t type;
 
   /* find the appropriate certificate */
   if ((ret =
@@ -840,56 +835,59 @@ _gnutls_gen_openpgp_certificate (gnutls_session_t session, opaque ** data)
       ret += apr_cert_list[0].raw.size;
     }
 
-  (*data) = gnutls_malloc (ret);
-  pdata = (*data);
-
-  if (pdata == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  _gnutls_write_uint24 (ret - 3, pdata);
-  pdata += 3;
+  ret = _gnutls_buffer_append_prefix( data, 24, ret - 3);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
 
   if (apr_cert_list_length > 0)
     {
       if (apr_cert_list[0].use_subkey != 0)
         {
-          *pdata = PGP_KEY_SUBKEY;
-          pdata++;
-          *pdata = sizeof (apr_cert_list[0].subkey_id);
-          pdata++;
-          memcpy (pdata, apr_cert_list[0].subkey_id,
-                  sizeof (apr_cert_list[0].subkey_id));
-          pdata += sizeof (apr_cert_list[0].subkey_id);
+          type = PGP_KEY_SUBKEY;
+
+          ret = _gnutls_buffer_append_data( data, &type, 1);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+
+          ret = _gnutls_buffer_append_data_prefix( data, 8, apr_cert_list[0].subkey_id,
+              sizeof (apr_cert_list[0].subkey_id));
+          if (ret < 0)
+            return gnutls_assert_val(ret);
         }
       else
         {
-          *pdata = PGP_KEY;
-          pdata++;
+          type = PGP_KEY;
+          ret = _gnutls_buffer_append_data( data, &type, 1);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
         }
 
-      _gnutls_write_datum24 (pdata, apr_cert_list[0].raw);
-      pdata += (3 + apr_cert_list[0].raw.size);
+      ret = _gnutls_buffer_append_data_prefix( data, 24, apr_cert_list[0].raw.data,
+        apr_cert_list[0].raw.size);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
   else                          /* empty - no certificate */
     {
-      *pdata = PGP_KEY;
-      pdata++;
-      _gnutls_write_uint24 (0, pdata);
+      ret = _gnutls_buffer_append_data( data, &type, 1);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+
+      ret = _gnutls_buffer_append_prefix( data, 24, 0);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
 
-  return ret;
+  return data->length;
 }
 
 static int
-_gnutls_gen_openpgp_certificate_fpr (gnutls_session_t session, opaque ** data)
+_gnutls_gen_openpgp_certificate_fpr (gnutls_session_t session, gnutls_buffer_st * data)
 {
   int ret, packet_size;
+  uint8_t type, fpr[20];
   size_t fpr_size;
-  opaque *pdata;
   gnutls_cert *apr_cert_list;
   gnutls_privkey_t apr_pkey;
   int apr_cert_list_length;
@@ -915,54 +913,50 @@ _gnutls_gen_openpgp_certificate_fpr (gnutls_session_t session, opaque ** data)
   else                          /* empty certificate case */
     return _gnutls_gen_openpgp_certificate (session, data);
 
-  (*data) = gnutls_malloc (packet_size);
-  pdata = (*data);
-
-  if (pdata == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  _gnutls_write_uint24 (packet_size - 3, pdata);
-  pdata += 3;
+  ret = _gnutls_buffer_append_prefix( data, 24, packet_size - 3);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   if (apr_cert_list[0].use_subkey)
     {
-      *pdata = PGP_KEY_FINGERPRINT_SUBKEY;
-      pdata++;
-      *pdata = sizeof (apr_cert_list[0].subkey_id);
-      pdata++;
-      memcpy (pdata, apr_cert_list[0].subkey_id,
-              sizeof (apr_cert_list[0].subkey_id));
-      pdata += sizeof (apr_cert_list[0].subkey_id);
+      type = PGP_KEY_FINGERPRINT_SUBKEY;
+      ret = _gnutls_buffer_append_data( data, &type, 1);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+      
+      ret = _gnutls_buffer_append_data_prefix( data, 8, 
+        apr_cert_list[0].subkey_id, sizeof(apr_cert_list[0].subkey_id));
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
   else
     {
-      *pdata = PGP_KEY_FINGERPRINT;     /* key fingerprint */
-      pdata++;
+      type = PGP_KEY_FINGERPRINT;     /* key fingerprint */
+      ret = _gnutls_buffer_append_data( data, &type, 1);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
 
-  *pdata = 20;
-  pdata++;
-
-  fpr_size = 20;
-
+  fpr_size = sizeof(fpr);
   if ((ret =
-       _gnutls_openpgp_fingerprint (&apr_cert_list[0].raw, pdata,
+       _gnutls_openpgp_fingerprint (&apr_cert_list[0].raw, fpr,
                                     &fpr_size)) < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  return packet_size;
+  ret = _gnutls_buffer_append_data_prefix( data, 8, fpr, fpr_size);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  return data->length;
 }
 #endif
 
 
 int
-_gnutls_gen_cert_client_certificate (gnutls_session_t session, opaque ** data)
+_gnutls_gen_cert_client_certificate (gnutls_session_t session, gnutls_buffer_st * data)
 {
   switch (session->security_parameters.cert_type)
     {
@@ -983,7 +977,7 @@ _gnutls_gen_cert_client_certificate (gnutls_session_t session, opaque ** data)
 }
 
 int
-_gnutls_gen_cert_server_certificate (gnutls_session_t session, opaque ** data)
+_gnutls_gen_cert_server_certificate (gnutls_session_t session, gnutls_buffer_st * data)
 {
   switch (session->security_parameters.cert_type)
     {
@@ -1526,19 +1520,16 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, opaque * data,
 }
 
 int
-_gnutls_gen_cert_client_cert_vrfy (gnutls_session_t session, opaque ** data)
+_gnutls_gen_cert_client_cert_vrfy (gnutls_session_t session, gnutls_buffer_st * data)
 {
   int ret;
   gnutls_cert *apr_cert_list;
   gnutls_privkey_t apr_pkey;
-  int apr_cert_list_length, size;
+  int apr_cert_list_length;
   gnutls_datum_t signature = { NULL, 0 };
   int total_data;
-  opaque *p;
   gnutls_sign_algorithm_t sign_algo;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
-
-  *data = NULL;
 
   /* find the appropriate certificate */
   if ((ret =
@@ -1574,43 +1565,36 @@ _gnutls_gen_cert_client_cert_vrfy (gnutls_session_t session, opaque ** data)
       total_data += 2;
     }
 
-  *data = gnutls_malloc (total_data);
-  if (*data == NULL)
-    {
-      _gnutls_free_datum (&signature);
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  p = *data;
   if (_gnutls_version_has_selectable_sighash (ver))
     {
       const sign_algorithm_st *aid;
+      uint8_t p[2];
       /* error checking is not needed here since we have used those algorithms */
       aid = _gnutls_sign_to_tls_aid (sign_algo);
       if (aid == NULL)
-        {
-          ret = GNUTLS_E_UNKNOWN_ALGORITHM;
-          goto cleanup;
-        }
+        return gnutls_assert_val(GNUTLS_E_UNKNOWN_ALGORITHM);
 
       p[0] = aid->hash_algorithm;
       p[1] = aid->sign_algorithm;
-      p += 2;
+      ret = _gnutls_buffer_append_data(data, p, 2);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
     }
 
-  size = signature.size;
-  _gnutls_write_uint16 (size, p);
+  ret = _gnutls_buffer_append_data_prefix(data, 16, signature.data, signature.size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
 
-  p += 2;
-  memcpy (p, signature.data, size);
-
-  _gnutls_free_datum (&signature);
-
-  return total_data;
+  return data->length;
 
 cleanup:
   _gnutls_free_datum (&signature);
-  gnutls_free(*data);
   return ret;
 }
 
@@ -1692,14 +1676,14 @@ _gnutls_proc_cert_client_cert_vrfy (gnutls_session_t session,
 
 
 #define CERTTYPE_SIZE 3
+#define SIGN_ALGO_SIZE (2 + MAX_SIGNATURE_ALGORITHMS * 2)
 int
-_gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
+_gnutls_gen_cert_server_cert_req (gnutls_session_t session, gnutls_buffer_st * data)
 {
   gnutls_certificate_credentials_t cred;
   int size, ret;
-  opaque *pdata;
+  uint8_t tmp_data[CERTTYPE_SIZE];
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
-  const int signalgosize = 2 + MAX_SIGNATURE_ALGORITHMS * 2;
 
   /* Now we need to generate the RDN sequence. This is
    * already in the CERTIFICATE_CRED structure, to improve
@@ -1724,27 +1708,22 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
   if (_gnutls_version_has_selectable_sighash (ver))
     /* Need two bytes to announce the number of supported hash
        functions (see below).  */
-    size += signalgosize;
+    size += SIGN_ALGO_SIZE;
 
-  (*data) = gnutls_malloc (size);
-  pdata = (*data);
+  tmp_data[0] = CERTTYPE_SIZE - 1;
+  tmp_data[1] = RSA_SIGN;
+  tmp_data[2] = DSA_SIGN;          /* only these for now */
 
-  if (pdata == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  pdata[0] = CERTTYPE_SIZE - 1;
-
-  pdata[1] = RSA_SIGN;
-  pdata[2] = DSA_SIGN;          /* only these for now */
-  pdata += CERTTYPE_SIZE;
+  ret = _gnutls_buffer_append_data( data, tmp_data, CERTTYPE_SIZE);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   if (_gnutls_version_has_selectable_sighash (ver))
     {
+      uint8_t p[SIGN_ALGO_SIZE];
+
       ret =
-        _gnutls_sign_algorithm_write_params (session, pdata, signalgosize);
+        _gnutls_sign_algorithm_write_params (session, p, SIGN_ALGO_SIZE);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -1752,23 +1731,29 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, opaque ** data)
         }
 
       /* recalculate size */
-      size = size - signalgosize + ret;
-      pdata += ret;
+      size -= SIGN_ALGO_SIZE + ret;
+
+      ret = _gnutls_buffer_append_data( data, p, ret);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
 
   if (session->security_parameters.cert_type == GNUTLS_CRT_X509 &&
       session->internals.ignore_rdn_sequence == 0)
     {
-      _gnutls_write_datum16 (pdata, cred->x509_rdn_sequence);
-      /* pdata += cred->x509_rdn_sequence.size + 2; */
+      ret = _gnutls_buffer_append_data_prefix( data, 16, cred->x509_rdn_sequence.data,
+        cred->x509_rdn_sequence.size);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
   else
     {
-      _gnutls_write_uint16 (0, pdata);
-      /* pdata+=2; */
+      ret = _gnutls_buffer_append_prefix( data, 16, 0);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
 
-  return size;
+  return data->length;
 }
 
 

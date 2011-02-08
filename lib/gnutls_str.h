@@ -52,9 +52,13 @@ int _gnutls_buffer_append_data (gnutls_buffer_st *, const void *data,
 
 #include <gnutls_num.h>
 
-int _gnutls_buffer_append_prefix (gnutls_buffer_st * buf, size_t data_size);
+void _gnutls_buffer_replace_data( gnutls_buffer_st * buf, gnutls_datum_t * data);
 
-int _gnutls_buffer_append_data_prefix (gnutls_buffer_st * buf,
+int _gnutls_buffer_append_prefix (gnutls_buffer_st * buf, int pfx_size, size_t data_size);
+
+int _gnutls_buffer_append_mpi (gnutls_buffer_st * buf, int pfx_size, bigint_t, int lz);
+
+int _gnutls_buffer_append_data_prefix (gnutls_buffer_st * buf, int pfx_size, 
                                        const void *data, size_t data_size);
 void _gnutls_buffer_pop_data (gnutls_buffer_st *, void *, size_t * size);
 void _gnutls_buffer_pop_datum (gnutls_buffer_st *, gnutls_datum_t *,
@@ -103,7 +107,7 @@ int _gnutls_hostname_compare (const char *certname, size_t certnamesize,
     }
 
 #define BUFFER_APPEND_PFX(b, x, s) { \
-        ret = _gnutls_buffer_append_data_prefix(b, x, s); \
+        ret = _gnutls_buffer_append_data_prefix(b, 32, x, s); \
         if (ret < 0) { \
             gnutls_assert(); \
             return ret; \
@@ -111,7 +115,7 @@ int _gnutls_hostname_compare (const char *certname, size_t certnamesize,
     }
 
 #define BUFFER_APPEND_NUM(b, s) { \
-        ret = _gnutls_buffer_append_prefix(b, s); \
+        ret = _gnutls_buffer_append_prefix(b, 32, s); \
         if (ret < 0) { \
             gnutls_assert(); \
             return ret; \

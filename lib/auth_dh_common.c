@@ -121,13 +121,10 @@ _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
 }
 
 int
-_gnutls_gen_dh_common_client_kx (gnutls_session_t session, opaque ** data)
+_gnutls_gen_dh_common_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
   bigint_t x = NULL, X = NULL;
-  size_t n_X;
   int ret;
-
-  *data = NULL;
 
   X = gnutls_calc_dh_secret (&x, session->key->client_g,
                              session->key->client_p);
@@ -140,18 +137,12 @@ _gnutls_gen_dh_common_client_kx (gnutls_session_t session, opaque ** data)
 
   _gnutls_dh_set_secret_bits (session, _gnutls_mpi_get_nbits (x));
 
-  _gnutls_mpi_print (X, NULL, &n_X);
-  (*data) = gnutls_malloc (n_X + 2);
-  if (*data == NULL)
+  ret = _gnutls_buffer_append_mpi( data, 16, X, 0);
+  if (ret < 0)
     {
-      ret = GNUTLS_E_MEMORY_ERROR;
+      gnutls_assert();
       goto error;
     }
-
-  _gnutls_mpi_print (X, &(*data)[2], &n_X);
-  _gnutls_mpi_release (&X);
-
-  _gnutls_write_uint16 (n_X, &(*data)[0]);
 
   /* calculate the key after calculating the message */
   session->key->KEY =
@@ -199,13 +190,11 @@ _gnutls_gen_dh_common_client_kx (gnutls_session_t session, opaque ** data)
       goto error;
     }
 
-  return n_X + 2;
+  return data->length;
 
 error:
   _gnutls_mpi_release (&x);
   _gnutls_mpi_release (&X);
-  gnutls_free (*data);
-  *data = NULL;
   return ret;
 }
 
@@ -306,13 +295,11 @@ _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
  * be inserted */
 int
 _gnutls_dh_common_print_server_kx (gnutls_session_t session,
-                                   bigint_t g, bigint_t p, opaque ** data,
+                                   bigint_t g, bigint_t p, gnutls_buffer_st* data,
                                    int psk)
 {
   bigint_t x, X;
-  size_t n_X, n_g, n_p;
-  int ret, data_size, pos;
-  uint8_t *pdata;
+  int ret;
 
   X = gnutls_calc_dh_secret (&x, g, p);
   if (X == NULL || x == NULL)
@@ -324,51 +311,24 @@ _gnutls_dh_common_print_server_kx (gnutls_session_t session,
   session->key->dh_secret = x;
   _gnutls_dh_set_secret_bits (session, _gnutls_mpi_get_nbits (x));
 
-  _gnutls_mpi_print (g, NULL, &n_g);
-  _gnutls_mpi_print (p, NULL, &n_p);
-  _gnutls_mpi_print (X, NULL, &n_X);
-
-  data_size = n_g + n_p + n_X + 6;
-  if (psk != 0)
-    data_size += 2;
-
-  (*data) = gnutls_malloc (data_size);
-  if (*data == NULL)
-    {
-      _gnutls_mpi_release (&X);
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  pos = 0;
-  pdata = *data;
-
   if (psk != 0)
     {
-      _gnutls_write_uint16 (0, &pdata[pos]);
-      pos += 2;
+      ret = _gnutls_buffer_append_prefix(data, 16, 0);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
 
-  _gnutls_mpi_print (p, &pdata[pos + 2], &n_p);
-  _gnutls_write_uint16 (n_p, &pdata[pos]);
+  ret = _gnutls_buffer_append_mpi(data, 16, p, 0);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
-  pos += n_p + 2;
+  ret = _gnutls_buffer_append_mpi(data, 16, g, 0);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
-  _gnutls_mpi_print (g, &pdata[pos + 2], &n_g);
-  _gnutls_write_uint16 (n_g, &pdata[pos]);
+  ret = _gnutls_buffer_append_mpi(data, 16, X, 0);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
-  pos += n_g + 2;
-
-  _gnutls_mpi_print (X, &pdata[pos + 2], &n_X);
-  _gnutls_mpi_release (&X);
-
-  _gnutls_write_uint16 (n_X, &pdata[pos]);
-
-  /* do not use data_size. _gnutls_mpi_print() might
-   * have been pessimist and might have returned initially
-   * more data */
-  ret = n_g + n_p + n_X + 6;
-  if (psk != 0)
-    ret += 2;
-
-  return ret;
+  return data->length;
 }

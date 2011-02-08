@@ -26,6 +26,8 @@
 #ifndef AUTH_DH_COMMON
 #define AUTH_DH_COMMON
 
+#include <gnutls_auth.h>
+
 typedef struct
 {
   int secret_bits;
@@ -36,12 +38,12 @@ typedef struct
 } dh_info_st;
 
 void _gnutls_free_dh_info (dh_info_st * dh);
-int _gnutls_gen_dh_common_client_kx (gnutls_session_t, opaque **);
+int _gnutls_gen_dh_common_client_kx (gnutls_session_t, gnutls_buffer_st*);
 int _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
                                       opaque * data, size_t _data_size,
                                       bigint_t p, bigint_t g);
 int _gnutls_dh_common_print_server_kx (gnutls_session_t, bigint_t g,
-                                       bigint_t p, opaque ** data, int psk);
+                                       bigint_t p, gnutls_buffer_st* data, int psk);
 int _gnutls_proc_dh_common_server_kx (gnutls_session_t session, opaque * data,
                                       size_t _data_size, int psk);
 
