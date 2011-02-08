@@ -330,4 +330,22 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
   int gnutls_certificate_verify_peers (gnutls_session_t session)
   _GNUTLS_GCC_ATTR_DEPRECATED;
 
+  /* functions to set priority of cipher suites
+   */
+  int gnutls_cipher_set_priority (gnutls_session_t session, const int *list)
+  _GNUTLS_GCC_ATTR_DEPRECATED;
+  int gnutls_mac_set_priority (gnutls_session_t session, const int *list)
+  _GNUTLS_GCC_ATTR_DEPRECATED;
+  int gnutls_compression_set_priority (gnutls_session_t session,
+                                       const int *list)
+                                       _GNUTLS_GCC_ATTR_DEPRECATED;
+  int gnutls_kx_set_priority (gnutls_session_t session, const int *list)
+  _GNUTLS_GCC_ATTR_DEPRECATED;
+  int gnutls_protocol_set_priority (gnutls_session_t session,
+                                    const int *list)
+                                    _GNUTLS_GCC_ATTR_DEPRECATED;
+  int gnutls_certificate_type_set_priority (gnutls_session_t session,
+                                            const int *list)
+                                            _GNUTLS_GCC_ATTR_DEPRECATED;
+
 #endif /* _GNUTLS_COMPAT_H */
