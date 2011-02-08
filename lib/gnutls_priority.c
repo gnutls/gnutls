@@ -346,11 +346,13 @@ static const int comp_priority[] = {
 };
 
 static const int sign_priority_default[] = {
-  GNUTLS_SIGN_RSA_SHA1,
-  GNUTLS_SIGN_DSA_SHA1,
+  GNUTLS_SIGN_DSA_SHA224,
+  GNUTLS_SIGN_DSA_SHA256,
   GNUTLS_SIGN_RSA_SHA256,
   GNUTLS_SIGN_RSA_SHA384,
   GNUTLS_SIGN_RSA_SHA512,
+  GNUTLS_SIGN_RSA_SHA1,
+  GNUTLS_SIGN_DSA_SHA1,
   0
 };
 
@@ -369,6 +371,7 @@ static const int sign_priority_secure256[] = {
 
 static const int mac_priority_performance[] = {
   GNUTLS_MAC_SHA1,
+  GNUTLS_MAC_SHA256,
   GNUTLS_MAC_AEAD,
   0
 };
@@ -376,8 +379,8 @@ static const int mac_priority_performance[] = {
 
 static const int mac_priority_secure[] = {
   GNUTLS_MAC_SHA256,
-  GNUTLS_MAC_SHA1,
   GNUTLS_MAC_AEAD,
+  GNUTLS_MAC_SHA1,
   0
 };
 
@@ -476,28 +479,10 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  * @err_pos: In case of an error this will have the position in the string the error occured
  *
  * Sets priorities for the ciphers, key exchange methods, macs and
- * compression methods. This is to avoid using the
- * gnutls_*_priority() functions.
+ * compression methods.
  *
  * The #priorities option allows you to specify a colon
  * separated list of the cipher priorities to enable.
- *
- * Unless the first keyword is "NONE" the defaults (in preference
- * order) are for TLS protocols TLS 1.2, TLS1.1, TLS1.0, SSL3.0; for
- * compression NULL; for certificate types X.509, OpenPGP.
- *
- * For key exchange algorithms when in NORMAL or SECURE levels the
- * perfect forward secrecy algorithms take precedence of the other
- * protocols.  In all cases all the supported key exchange algorithms
- * are enabled (except for the RSA-EXPORT which is only enabled in
- * EXPORT level).
- *
- * Note that although one can select very long key sizes (such as 256 bits)
- * for symmetric algorithms, to actually increase security the public key
- * algorithms have to use longer key sizes as well.
- *
- * For all the current available algorithms and protocols use
- * "gnutls-cli -l" to get a listing.
  *
  * Common keywords: Some keywords are defined to provide quick access
  * to common preferences.
@@ -527,56 +512,21 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  *
  * "+" appended with an algorithm will add this algorithm.
  *
- * "%COMPAT" will enable compatibility features for a server.
- *
- * "%DISABLE_SAFE_RENEGOTIATION" will disable safe renegotiation
- * completely.  Do not use unless you know what you are doing.
- * Testing purposes only.
- *
- * "%UNSAFE_RENEGOTIATION" will allow handshakes and rehandshakes
- * without the safe renegotiation extension.  Note that for clients
- * this mode is insecure (you may be under attack), and for servers it
- * will allow insecure clients to connect (which could be fooled by an
- * attacker).  Do not use unless you know what you are doing and want
- * maximum compatibility.
- *
- * "%PARTIAL_RENEGOTIATION" will allow initial handshakes to proceed,
- * but not rehandshakes.  This leaves the client vulnerable to attack,
- * and servers will be compatible with non-upgraded clients for
- * initial handshakes.  This is currently the default for clients and
- * servers, for compatibility reasons.
- *
- * "%SAFE_RENEGOTIATION" will enforce safe renegotiation.  Clients and
- * servers will refuse to talk to an insecure peer.  Currently this
- * causes operability problems, but is required for full protection.
- *
- * "%SSL3_RECORD_VERSION" will use SSL3.0 record version in client hello.
- * This is the default.
- *
- * "%LATEST_RECORD_VERSION" will use the latest TLS version record
- * version in client hello.
- *
- * "%VERIFY_ALLOW_SIGN_RSA_MD5" will allow RSA-MD5 signatures in
- * certificate chains.
- *
- * "%VERIFY_ALLOW_X509_V1_CA_CRT" will allow V1 CAs in chains.
- *
- * Namespace concern:
- * To avoid collisions in order to specify a compression algorithm in
- * this string you have to prefix it with "COMP-", protocol versions
- * with "VERS-", signature algorithms with "SIGN-" and certificate types with "CTYPE-". All other
- * algorithms don't need a prefix. The keywords "SIGN-ALL", "CTYPE-ALL", "COMP-ALL",
- * and "VERS-TLS-ALL"  can be used to add all the support signature types, certificate
- * types, compression methods and supported TLS version numbers.
+ * Check the GnuTLS manual section "Priority strings" for detailed
+ * information.
  *
  * Examples:
- * "NORMAL:!AES-128-CBC" means normal ciphers except for AES-128.
  *
- * "EXPORT:!VERS-TLS1.0:+COMP-DEFLATE" means that export ciphers are
- * enabled, TLS 1.0 is disabled, and libz compression enabled.
+ * "NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+AES-128-CBC:+SIGN-ALL:+COMP-NULL"
  *
- * "NONE:+VERS-TLS-ALL:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1", "NORMAL",
- * "%COMPAT".
+ * "NORMAL:-ARCFOUR-128" means normal ciphers except for ARCFOUR-128.
+ *
+ * "SECURE:-VERS-SSL3.0:+COMP-DEFLATE" means that only secure ciphers are
+ * enabled, SSL3.0 is disabled, and libz compression enabled.
+ *
+ * "NONE:+VERS-TLS-ALL:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1", 
+ *
+ * "NORMAL:%COMPAT" is the most compatible mode.
  *
  * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
  * %GNUTLS_E_SUCCESS on success, or an error code.
@@ -760,7 +710,17 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
                   else
                     goto error;
                 }
-            }                   /* now check if the element is something like -ALGO */
+            }
+          else if (strncasecmp (&broken_list[i][1], "MAC-ALL", 7) == 0)
+            {
+                  _set_priority (&(*priority_cache)->mac,
+                                mac_priority_secure);
+            }
+          else if (strncasecmp (&broken_list[i][1], "CIPHER-ALL", 7) == 0)
+            {
+                  _set_priority (&(*priority_cache)->cipher,
+                                cipher_priority_normal);
+            }
           else
             goto error;
         }
