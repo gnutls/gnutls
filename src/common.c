@@ -579,7 +579,7 @@ print_list (int verbose)
     printf ("Certificate types: ");
     for (; *p; p++)
       {
-        printf ("%s", gnutls_certificate_type_get_name (*p));
+        printf ("CTYPE-%s", gnutls_certificate_type_get_name (*p));
         if (*(p + 1))
           printf (", ");
         else
@@ -593,7 +593,7 @@ print_list (int verbose)
     printf ("Protocols: ");
     for (; *p; p++)
       {
-        printf ("%s", gnutls_protocol_get_name (*p));
+        printf ("VERS-%s", gnutls_protocol_get_name (*p));
         if (*(p + 1))
           printf (", ");
         else
@@ -649,7 +649,7 @@ print_list (int verbose)
     printf ("Compression: ");
     for (; *p; p++)
       {
-        printf ("%s", gnutls_compression_get_name (*p));
+        printf ("COMP-%s", gnutls_compression_get_name (*p));
         if (*(p + 1))
           printf (", ");
         else
@@ -677,7 +677,7 @@ print_list (int verbose)
     printf ("PK-signatures: ");
     for (; *p; p++)
       {
-        printf ("%s", gnutls_sign_algorithm_get_name (*p));
+        printf ("SIGN-%s", gnutls_sign_algorithm_get_name (*p));
         if (*(p + 1))
           printf (", ");
         else

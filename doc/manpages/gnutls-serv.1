@@ -31,15 +31,7 @@ Act as an Echo Server.
 .SS TLS/SSL control options
 .IP "\-\-priority \fIPRIORITY STRING\fR"
 TLS algorithms and protocols to enable.
-Unless the first keyword is "NONE" the defaults are:
-.IP 
-Protocols: TLS1.1, TLS1.0, and SSL3.0.
-.IP 
-Compression: NULL.
-.IP 
-Certificate types: X.509, OpenPGP.
-.IP
-You can also use predefined sets of ciphersuites such as: 
+You can use predefined sets of ciphersuites such as: 
 .IP
 .B "PERFORMANCE"
 all the "secure" ciphersuites are enabled, limited to 128 bit
@@ -66,38 +58,24 @@ low-security 40 bit ciphers.
 nothing is enabled. This disables even protocols and
 compression methods.
 .IP
-.IP 
-Special keywords:
 .IP
-"!" or "-" appended with an algorithm will remove this algorithm.
-.IP
-"+" appended with an algorithm will add this algorithm.
-.IP
-"%COMPAT" will enable compatibility features for a server.
-.IP
-"%UNSAFE_RENEGOTIATION" Permits (re-)handshakes even unsafe ones.
-.IP
-"%PARTIAL_RENEGOTIATION" Prevents renegotiation with clients and servers not
-supporting the safe renegotiation extension. (default)
-.IP
-"%SAFE_RENEGOTIATION" will enable safe renegotiation. This is the most
-secure and recommended option for clients. However this will prevent from
-connecting to legacy servers.
-.IP
-To avoid collisions in order to specify a compression algorithm in
-this string you have to prefix it with "COMP-", protocol versions
-with "VERS-" and certificate types with "CTYPE-". All other
-algorithms don't need a prefix.
+Check the GnuTLS manual on section "Priority strings" for
+more information on allowed keywords.
 .IP 
 .B Examples:
 .IP 
 "NORMAL"
 .IP 
-"NORMAL:%COMPAT"
+"NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+AES-128-CBC:+SIGN-ALL:+COMP-NULL"
 .IP 
-"NORMAL:!AES-128-CBC"
+"NORMAL:-ARCFOUR-128" means normal ciphers except for ARCFOUR-128.
 .IP 
-"NONE:+VERS-TLS1.0:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL"
+"SECURE:-VERS-SSL3.0:+COMP-DEFLATE" means that only secure ciphers are
+enabled, SSL3.0 is disabled, and libz compression enabled.
+.IP
+ "NONE:+VERS-TLS-ALL:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1"
+.IP 
+"NORMAL:%COMPAT" is the most compatible mode
 
 .IP "\-g, \-\-generate"
 Generate Diffie-Hellman Parameters.
