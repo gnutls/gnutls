@@ -1720,39 +1720,11 @@ _gnutls_compare_algo (gnutls_session_t session, const void *i_A1,
     }
 }
 
-#ifdef SORT_DEBUG
-static void
-_gnutls_bsort (gnutls_session_t session, void *_base, size_t nmemb,
-               size_t size, int (*compar) (gnutls_session_t, const void *,
-                                           const void *))
-{
-  unsigned int i, j;
-  int full = nmemb * size;
-  char *base = _base;
-  char tmp[MAX_ELEM_SIZE];
-
-  for (i = 0; i < full; i += size)
-    {
-      for (j = 0; j < full; j += size)
-        {
-          if (compar (session, &base[i], &base[j]) < 0)
-            {
-              SWAP (&base[j], &base[i]);
-            }
-        }
-    }
-
-}
-#endif
-
 int
 _gnutls_supported_ciphersuites_sorted (gnutls_session_t session,
                                        cipher_suite_st ** ciphers)
 {
 
-#ifdef SORT_DEBUG
-  unsigned int i;
-#endif
   int count;
 
   count = _gnutls_supported_ciphersuites (session, ciphers);
@@ -1761,22 +1733,9 @@ _gnutls_supported_ciphersuites_sorted (gnutls_session_t session,
       gnutls_assert ();
       return count;
     }
-#ifdef SORT_DEBUG
-  _gnutls_debug_log ("Unsorted: \n");
-  for (i = 0; i < count; i++)
-    _gnutls_debug_log ("\t%d: %s\n", i,
-                       _gnutls_cipher_suite_get_name ((*ciphers)[i]));
-#endif
 
   _gnutls_qsort (session, *ciphers, count,
                  sizeof (cipher_suite_st), _gnutls_compare_algo);
-
-#ifdef SORT_DEBUG
-  _gnutls_debug_log ("Sorted: \n");
-  for (i = 0; i < count; i++)
-    _gnutls_debug_log ("\t%d: %s\n", i,
-                       _gnutls_cipher_suite_get_name ((*ciphers)[i]));
-#endif
 
   return count;
 }
