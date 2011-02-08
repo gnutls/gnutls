@@ -601,8 +601,6 @@ extern "C"
     GNUTLS_SIGN_DSA_SHA256 = 11
   } gnutls_sign_algorithm_t;
 
-  const char *gnutls_sign_algorithm_get_name (gnutls_sign_algorithm_t sign);
-
   /**
    * gnutls_sec_param_t:
    * @GNUTLS_SEC_PARAM_UNKNOWN: Cannot be known
@@ -724,6 +722,7 @@ extern "C"
                                                 type);
   const char *gnutls_pk_get_name (gnutls_pk_algorithm_t algorithm);
   const char *gnutls_sign_get_name (gnutls_sign_algorithm_t algorithm);
+#define gnutls_sign_algorithm_get_name gnutls_sign_get_name
 
   gnutls_mac_algorithm_t gnutls_mac_get_id (const char *name);
   gnutls_compression_method_t gnutls_compression_get_id (const char *name);

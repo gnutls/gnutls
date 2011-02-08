@@ -2000,7 +2000,7 @@ static const gnutls_sign_algorithm_t supported_sign[] = {
   GNUTLS_SIGN_LOOP( if(p->id && p->id == sign) { a; break; } )
 
 /**
- * gnutls_sign_algorithm_get_name:
+ * gnutls_sign_get_name:
  * @sign: is a sign algorithm
  *
  * Convert a #gnutls_sign_algorithm_t value to a string.
@@ -2009,7 +2009,7 @@ static const gnutls_sign_algorithm_t supported_sign[] = {
  *   algorithm, or %NULL.
  **/
 const char *
-gnutls_sign_algorithm_get_name (gnutls_sign_algorithm_t sign)
+gnutls_sign_get_name (gnutls_sign_algorithm_t sign)
 {
   const char *ret = NULL;
 
@@ -2052,27 +2052,6 @@ gnutls_sign_get_id (const char *name)
 
   return ret;
 
-}
-
-/**
- * gnutls_sign_get_name:
- * @algorithm: is a public key signature algorithm
- *
- * Convert a #gnutls_sign_algorithm_t value to a string.
- *
- * Returns: a pointer to a string that contains the name of the
- *   specified public key signature algorithm, or %NULL.
- *
- * Since: 2.6.0
- **/
-const char *
-gnutls_sign_get_name (gnutls_sign_algorithm_t algorithm)
-{
-  const char *ret = "SIGN_UNKNOWN";
-
-  GNUTLS_SIGN_LOOP (if (p->id == algorithm) ret = p->name);
-
-  return ret;
 }
 
 gnutls_sign_algorithm_t
