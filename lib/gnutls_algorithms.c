@@ -1925,11 +1925,12 @@ struct gnutls_sign_entry
   gnutls_mac_algorithm_t mac;
   /* See RFC 5246 HashAlgorithm and SignatureAlgorithm
      for values to use in aid struct. */
-  sign_algorithm_st aid;
+  const sign_algorithm_st aid;
 };
 typedef struct gnutls_sign_entry gnutls_sign_entry;
 
 #define TLS_SIGN_AID_UNKNOWN {255, 255}
+static const sign_algorithm_st unknown_tls_aid = TLS_SIGN_AID_UNKNOWN;
 
 static const gnutls_sign_entry sign_algorithms[] = {
   {"RSA-SHA1", SIG_RSA_SHA1_OID, GNUTLS_SIGN_RSA_SHA1, GNUTLS_PK_RSA,
@@ -2131,21 +2132,31 @@ _gnutls_tls_aid_to_sign (const sign_algorithm_st * aid)
 {
   gnutls_sign_algorithm_t ret = GNUTLS_SIGN_UNKNOWN;
 
+  if (memcmp(aid, &unknown_tls_aid, sizeof(aid))==0)
+    return ret;
+
   GNUTLS_SIGN_LOOP (if (p->aid.hash_algorithm == aid->hash_algorithm
                         && p->aid.sign_algorithm == aid->sign_algorithm)
                     {
-                    ret = p->id; break;}
+                      ret = p->id; break;
+                    }
   );
+
 
   return ret;
 }
 
-sign_algorithm_st
+/* Returns NULL if a valid AID is not found
+ */
+const sign_algorithm_st*
 _gnutls_sign_to_tls_aid (gnutls_sign_algorithm_t sign)
 {
-  sign_algorithm_st ret = TLS_SIGN_AID_UNKNOWN;
+  const sign_algorithm_st * ret = NULL;
 
-  GNUTLS_SIGN_ALG_LOOP (ret = p->aid);
+  GNUTLS_SIGN_ALG_LOOP (ret = &p->aid);
+
+  if (ret != NULL && memcmp(ret, &unknown_tls_aid, sizeof(*ret))==0)
+    return NULL;
 
   return ret;
 }

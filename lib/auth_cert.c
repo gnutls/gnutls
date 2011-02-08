@@ -1532,7 +1532,7 @@ _gnutls_gen_cert_client_cert_vrfy (gnutls_session_t session, opaque ** data)
   gnutls_cert *apr_cert_list;
   gnutls_privkey_t apr_pkey;
   int apr_cert_list_length, size;
-  gnutls_datum_t signature;
+  gnutls_datum_t signature = { NULL, 0 };
   int total_data;
   opaque *p;
   gnutls_sign_algorithm_t sign_algo;
@@ -1584,11 +1584,17 @@ _gnutls_gen_cert_client_cert_vrfy (gnutls_session_t session, opaque ** data)
   p = *data;
   if (_gnutls_version_has_selectable_sighash (ver))
     {
-      sign_algorithm_st aid;
+      const sign_algorithm_st *aid;
       /* error checking is not needed here since we have used those algorithms */
       aid = _gnutls_sign_to_tls_aid (sign_algo);
-      p[0] = aid.hash_algorithm;
-      p[1] = aid.sign_algorithm;
+      if (aid == NULL)
+        {
+          ret = GNUTLS_E_UNKNOWN_ALGORITHM;
+          goto cleanup;
+        }
+
+      p[0] = aid->hash_algorithm;
+      p[1] = aid->sign_algorithm;
       p += 2;
     }
 
@@ -1601,6 +1607,11 @@ _gnutls_gen_cert_client_cert_vrfy (gnutls_session_t session, opaque ** data)
   _gnutls_free_datum (&signature);
 
   return total_data;
+
+cleanup:
+  _gnutls_free_datum (&signature);
+  gnutls_free(*data);
+  return ret;
 }
 
 int

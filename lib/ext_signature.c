@@ -72,31 +72,41 @@ int
 _gnutls_sign_algorithm_write_params (gnutls_session_t session, opaque * data,
                                      size_t max_data_size)
 {
-  opaque *p = data;
+  opaque *p = data, *len_p;
   int len, i, j;
-  sign_algorithm_st aid;
+  const sign_algorithm_st *aid;
 
-  len = session->internals.priorities.sign_algo.algorithms * 2;
-  if (max_data_size < len + 2)
+  if (max_data_size < (session->internals.priorities.sign_algo.algorithms*2) + 2)
     {
       gnutls_assert ();
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
-  _gnutls_write_uint16 (len, p);
+  len = 0;
+  len_p = p;
+
   p += 2;
 
-  for (i = j = 0; i < len; i += 2, j++)
+  for (i = j = 0; i < session->internals.priorities.sign_algo.algorithms; i += 2, j++)
     {
       aid =
         _gnutls_sign_to_tls_aid (session->internals.priorities.
                                  sign_algo.priority[j]);
-      *p = aid.hash_algorithm;
-      p++;
-      *p = aid.sign_algorithm;
-      p++;
 
+      if (aid == NULL)
+        continue;
+        
+       _gnutls_debug_log ("EXT[SIGA]: sent signature algo (%d.%d) %s\n", aid->hash_algorithm, 
+         aid->sign_algorithm, gnutls_sign_get_name(session->internals.priorities.sign_algo.priority[j]));
+      *p = aid->hash_algorithm;
+      p++;
+      *p = aid->sign_algorithm;
+      p++;
+      len+=2;
     }
+
+  _gnutls_write_uint16 (len, len_p);
+
   return len + 2;
 }
 
@@ -127,6 +137,10 @@ _gnutls_sign_algorithm_parse_data (gnutls_session_t session,
       aid.sign_algorithm = data[i + 1];
 
       sig = _gnutls_tls_aid_to_sign (&aid);
+
+       _gnutls_debug_log ("EXT[SIGA]: rcvd signature algo (%d.%d) %s\n", aid.hash_algorithm, 
+         aid.sign_algorithm, gnutls_sign_get_name(sig));
+
       if (sig != GNUTLS_SIGN_UNKNOWN)
         {
           priv->sign_algorithms[priv->sign_algorithms_size++] = sig;

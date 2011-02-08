@@ -89,7 +89,7 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
   gnutls_cert *apr_cert_list;
   gnutls_privkey_t apr_pkey;
   int apr_cert_list_length;
-  gnutls_datum_t signature, ddata;
+  gnutls_datum_t signature = { NULL, 0 }, ddata;
   gnutls_certificate_credentials_t cred;
   gnutls_dh_params_t dh_params;
   gnutls_sign_algorithm_t sign_algo;
@@ -154,38 +154,44 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
                                         &sign_algo)) < 0)
         {
           gnutls_assert ();
-          gnutls_free (*data);
-          return ret;
+          goto cleanup;
         }
     }
   else
     {
       gnutls_assert ();
-      return data_size;         /* do not put a signature - ILLEGAL! */
+      ret = data_size;         /* do not put a signature - ILLEGAL! */
+      goto cleanup;
     }
 
   *data = gnutls_realloc_fast (*data, data_size + signature.size + 4);
   if (*data == NULL)
     {
-      _gnutls_free_datum (&signature);
       gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
+      ret = GNUTLS_E_MEMORY_ERROR;
+      goto cleanup;
     }
 
   if (_gnutls_version_has_selectable_sighash (ver))
     {
-      sign_algorithm_st aid;
+      const sign_algorithm_st *aid;
 
       if (sign_algo == GNUTLS_SIGN_UNKNOWN)
         {
-          _gnutls_free_datum (&signature);
-          gnutls_assert ();
-          return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+          ret = GNUTLS_E_UNKNOWN_ALGORITHM;
+          goto cleanup;
         }
 
       aid = _gnutls_sign_to_tls_aid (sign_algo);
-      (*data)[data_size++] = aid.hash_algorithm;
-      (*data)[data_size++] = aid.sign_algorithm;
+      if (aid == NULL)
+        {
+          gnutls_assert();
+          ret = GNUTLS_E_UNKNOWN_ALGORITHM;
+          goto cleanup;
+        }
+      
+      (*data)[data_size++] = aid->hash_algorithm;
+      (*data)[data_size++] = aid->sign_algorithm;
     }
 
   _gnutls_write_datum16 (&(*data)[data_size], signature);
@@ -194,6 +200,12 @@ gen_dhe_server_kx (gnutls_session_t session, opaque ** data)
   _gnutls_free_datum (&signature);
 
   return data_size;
+
+cleanup:
+  _gnutls_free_datum (&signature);
+  gnutls_free(*data);
+  return ret;
+
 }
 
 static int

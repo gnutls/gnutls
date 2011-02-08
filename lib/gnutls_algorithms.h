@@ -113,7 +113,7 @@ const char *_gnutls_x509_sign_to_oid (gnutls_pk_algorithm_t,
                                       gnutls_mac_algorithm_t mac);
 gnutls_sign_algorithm_t _gnutls_tls_aid_to_sign (const sign_algorithm_st *
                                                  aid);
-sign_algorithm_st _gnutls_sign_to_tls_aid (gnutls_sign_algorithm_t sign);
+const sign_algorithm_st* _gnutls_sign_to_tls_aid (gnutls_sign_algorithm_t sign);
 gnutls_mac_algorithm_t
 _gnutls_sign_get_hash_algorithm (gnutls_sign_algorithm_t);
 gnutls_pk_algorithm_t _gnutls_sign_get_pk_algorithm (gnutls_sign_algorithm_t);
