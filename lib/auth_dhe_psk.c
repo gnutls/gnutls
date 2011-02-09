@@ -65,38 +65,43 @@ const mod_auth_st dhe_psk_auth_struct = {
 static int
 gen_psk_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
-  int ret;
+  int ret, free;
   gnutls_psk_client_credentials_t cred;
+  gnutls_datum_t username, key;
 
   cred = (gnutls_psk_client_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
 
   if (cred == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-    }
+    return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
-  if (cred->username.data == NULL || cred->key.data == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-    }
-
-  ret = _gnutls_buffer_append_data_prefix(data, 16, cred->username.data, cred->username.size);
+  ret = _gnutls_find_psk_key( session, cred, &username, &key, &free);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
+  ret = _gnutls_buffer_append_data_prefix(data, 16, username.data, username.size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
 
   /* The PSK key is set in there */
-  ret = _gnutls_gen_dh_common_client_kx (session, data);
+  ret = _gnutls_gen_dh_common_client_kx_int (session, data, &key);
   if (ret < 0)
     {
       gnutls_assert ();
-      return ret;
+      goto cleanup;
     }
 
-  return data->length;
+  ret = data->length;
+
+cleanup:
+  if (free)
+    _gnutls_free_datum(&username);
+    _gnutls_free_datum(&key);
+
+  return ret;
 
 }
 
