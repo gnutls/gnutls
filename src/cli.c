@@ -1292,7 +1292,8 @@ init_global_tls_stuff (void)
                    gnutls_strerror (ret));
         }
     }
-  gnutls_psk_set_client_credentials_function (psk_cred, psk_callback);
+  else
+    gnutls_psk_set_client_credentials_function (psk_cred, psk_callback);
 #endif
 
 #ifdef ENABLE_ANON
