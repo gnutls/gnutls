@@ -5,6 +5,12 @@ See the end for copying conditions.
 
 * Version 2.11.7 (unreleased)
 
+** libgnutls: SRP and PSK are no longer set on the default priorities. 
+They have to be explicitly set.
+
+** libgnutls: During handshake message verification using DSS
+use the hash algorithm required by it.
+
 ** libgnutls: The deprecated  gnutls_x509_privkey_sign_hash() was
 replaced by gnutls_privkey_sign_hash2().
 
