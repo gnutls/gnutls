@@ -219,11 +219,6 @@ static const int kx_priority_performance[] = {
   GNUTLS_KX_RSA,
   GNUTLS_KX_DHE_RSA,
   GNUTLS_KX_DHE_DSS,
-  GNUTLS_KX_PSK,
-  GNUTLS_KX_DHE_PSK,
-  GNUTLS_KX_SRP_RSA,
-  GNUTLS_KX_SRP_DSS,
-  GNUTLS_KX_SRP,
   /* GNUTLS_KX_ANON_DH: Man-in-the-middle prone, don't add!
    * GNUTLS_KX_RSA_EXPORT: Deprecated, don't add!
    */
@@ -234,11 +229,6 @@ static const int kx_priority_export[] = {
   GNUTLS_KX_RSA,
   GNUTLS_KX_DHE_RSA,
   GNUTLS_KX_DHE_DSS,
-  GNUTLS_KX_PSK,
-  GNUTLS_KX_DHE_PSK,
-  GNUTLS_KX_SRP_RSA,
-  GNUTLS_KX_SRP_DSS,
-  GNUTLS_KX_SRP,
   GNUTLS_KX_RSA_EXPORT,
   0
 };
@@ -249,12 +239,7 @@ static const int kx_priority_secure[] = {
    */
   GNUTLS_KX_DHE_RSA,
   GNUTLS_KX_DHE_DSS,
-  GNUTLS_KX_DHE_PSK,
-  GNUTLS_KX_SRP_RSA,
-  GNUTLS_KX_SRP_DSS,
   GNUTLS_KX_RSA,
-  GNUTLS_KX_PSK,
-  GNUTLS_KX_SRP,
   /* GNUTLS_KX_ANON_DH: Man-in-the-middle prone, don't add!
    * GNUTLS_KX_RSA_EXPORT: Deprecated, don't add!
    */
