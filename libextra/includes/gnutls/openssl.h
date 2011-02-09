@@ -99,11 +99,7 @@ extern "C"
 
   typedef struct
   {
-    int protocol_priority[GNUTLS_MAX_ALGORITHM_NUM];
-    int cipher_priority[GNUTLS_MAX_ALGORITHM_NUM];
-    int comp_priority[GNUTLS_MAX_ALGORITHM_NUM];
-    int kx_priority[GNUTLS_MAX_ALGORITHM_NUM];
-    int mac_priority[GNUTLS_MAX_ALGORITHM_NUM];
+    char priority_string[256];
     gnutls_connection_end_t connend;
   } SSL_METHOD;
 
