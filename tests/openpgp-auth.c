@@ -50,26 +50,6 @@ static const char *key_id = NULL
 
 static const char rsa_params_file[] = "../guile/tests/rsa-parameters.pem";
 
-static const int protocols[] = { GNUTLS_TLS1_0, 0 };
-static const int cert_types[] = { GNUTLS_CRT_OPENPGP, 0 };
-
-static const int ciphers[] = {
-  GNUTLS_CIPHER_NULL, GNUTLS_CIPHER_ARCFOUR,
-  GNUTLS_CIPHER_AES_128_CBC, GNUTLS_CIPHER_AES_256_CBC,
-  0
-};
-
-static const int kx[] = {
-  GNUTLS_KX_RSA, GNUTLS_KX_RSA_EXPORT,
-  GNUTLS_KX_DHE_RSA, GNUTLS_KX_DHE_DSS,
-  0
-};
-
-static const int macs[] = {
-  GNUTLS_MAC_SHA1, GNUTLS_MAC_RMD160, GNUTLS_MAC_MD5,
-  0
-};
-
 static void
 log_message (int level, const char *message)
 {
@@ -133,7 +113,7 @@ doit ()
       if (err != 0)
         fail ("client session %d\n", err);
 
-      gnutls_set_default_priority (session);
+      gnutls_priority_set_direct (session, "NORMAL:+CTYPE-OPENPGP:-CTYPE-X.509", NULL);
       gnutls_transport_set_ptr (session,
                                 (gnutls_transport_ptr_t) (intptr_t)
                                 sockets[0]);
@@ -154,16 +134,11 @@ doit ()
       if (err != 0)
         fail ("client credential_set %d\n", err);
 
-      gnutls_protocol_set_priority (session, protocols);
-      gnutls_certificate_type_set_priority (session, cert_types);
-      gnutls_cipher_set_priority (session, ciphers);
-      gnutls_kx_set_priority (session, kx);
-      gnutls_mac_set_priority (session, macs);
       gnutls_dh_set_prime_bits (session, 1024);
 
       err = gnutls_handshake (session);
       if (err != 0)
-        fail ("client handshake %d\n", err);
+        fail ("client handshake %s (%d) \n", gnutls_strerror(err), err);
       else if (debug)
         printf ("client handshake successful\n");
 
@@ -201,7 +176,7 @@ doit ()
       if (err != 0)
         fail ("server session %d\n", err);
 
-      gnutls_set_default_priority (session);
+      gnutls_priority_set_direct (session, "NORMAL:+CTYPE-OPENPGP:-CTYPE-X.509", NULL);
       gnutls_transport_set_ptr (session,
                                 (gnutls_transport_ptr_t) (intptr_t)
                                 sockets[1]);
@@ -250,16 +225,11 @@ doit ()
       if (err != 0)
         fail ("server credential_set %d\n", err);
 
-      gnutls_protocol_set_priority (session, protocols);
-      gnutls_certificate_type_set_priority (session, cert_types);
-      gnutls_cipher_set_priority (session, ciphers);
-      gnutls_kx_set_priority (session, kx);
-      gnutls_mac_set_priority (session, macs);
       gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUIRE);
 
       err = gnutls_handshake (session);
       if (err != 0)
-        fail ("server handshake %d\n", err);
+        fail ("server handshake %s (%d) \n", gnutls_strerror(err), err);
 
       received = gnutls_record_recv (session, greetings, sizeof (greetings));
       if (received != sizeof (message)
@@ -269,7 +239,7 @@ doit ()
 
       err = gnutls_bye (session, GNUTLS_SHUT_RDWR);
       if (err != 0)
-        fail ("server bye %d\n", err);
+        fail ("server bye %s (%d) \n", gnutls_strerror(err), err);
 
       if (debug)
         printf ("server done\n");
