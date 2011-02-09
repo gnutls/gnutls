@@ -38,6 +38,11 @@
 #include <errno.h>
 #include <stdio.h>
 
+/* This is the same test as openpgp-auth but tests
+ * openpgp under the latest TLS protocol (TLSv1.2). In
+ * addition it tests DSS signatures under that.
+ */
+
 static const char message[] = "Hello, brave GNU world!";
 
 /* The OpenPGP key pair for use and the key ID in those keys.  */
@@ -113,7 +118,7 @@ doit ()
       if (err != 0)
         fail ("client session %d\n", err);
 
-      gnutls_priority_set_direct (session, "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+DHE-DSS:+CTYPE-OPENPGP", NULL);
+      gnutls_priority_set_direct (session, "NONE:+VERS-TLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+DHE-DSS:+CTYPE-OPENPGP", NULL);
       gnutls_transport_set_ptr (session,
                                 (gnutls_transport_ptr_t) (intptr_t)
                                 sockets[0]);
@@ -176,7 +181,7 @@ doit ()
       if (err != 0)
         fail ("server session %d\n", err);
 
-      gnutls_priority_set_direct (session, "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+DHE-DSS:+CTYPE-OPENPGP", NULL);
+      gnutls_priority_set_direct (session, "NONE:+VERS-TLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+DHE-DSS:+CTYPE-OPENPGP", NULL);
       gnutls_transport_set_ptr (session,
                                 (gnutls_transport_ptr_t) (intptr_t)
                                 sockets[1]);

@@ -68,7 +68,7 @@ openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
 endif
 
 if ENABLE_OPENPGP
-ctests += openpgp-auth openpgp-keyring pgps2kgnu
+ctests += openpgp-auth openpgp-auth2 openpgp-keyring pgps2kgnu
 openpgp_keyring_LDADD = $(LDADD) ../libextra/libgnutls-extra.la
 endif
 
