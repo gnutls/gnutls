@@ -243,8 +243,7 @@ _gnutls_signature_algorithm_send_params (gnutls_session_t session,
  */
 gnutls_sign_algorithm_t
 _gnutls_session_get_sign_algo (gnutls_session_t session,
-                               gnutls_pk_algorithm_t pk,
-                               gnutls_digest_algorithm_t * hash)
+                               gnutls_pk_algorithm_t pk)
 {
   unsigned i;
   int ret;
@@ -262,15 +261,13 @@ _gnutls_session_get_sign_algo (gnutls_session_t session,
       || priv->sign_algorithms_size == 0)
     /* none set, allow all */
     {
-      *hash = GNUTLS_DIG_SHA1;
-      return _gnutls_x509_pk_to_sign (pk, *hash);
+      return _gnutls_x509_pk_to_sign (pk, GNUTLS_DIG_SHA1);
     }
 
   for (i = 0; i < priv->sign_algorithms_size; i++)
     {
       if (_gnutls_sign_get_pk_algorithm (priv->sign_algorithms[i]) == pk)
         {
-          *hash = _gnutls_sign_get_hash_algorithm (priv->sign_algorithms[i]);
           return priv->sign_algorithms[i];
         }
     }

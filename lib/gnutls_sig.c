@@ -121,7 +121,40 @@ _gnutls_rsa_encode_sig (gnutls_mac_algorithm_t algo,
   return 0;
 }
 
+static int 
+get_hash_algo(gnutls_session_t session, gnutls_cert* cert, 
+  gnutls_sign_algorithm_t sign_algo,
+  gnutls_digest_algorithm_t *hash_algo)
+{
+int ret;
+gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
+  if (cert->subject_pk_algorithm == GNUTLS_PK_DSA)
+    { /* override */
+      *hash_algo = _gnutls_dsa_q_to_hash (cert->params[1]);
+
+      if (!_gnutls_version_has_selectable_sighash (ver) && *hash_algo != GNUTLS_DIG_SHA1)
+        {
+          /* In TLS < 1.2 one cannot use anything but SHA1
+           */
+          gnutls_assert();
+          return GNUTLS_E_INVALID_REQUEST;
+        }
+      
+      ret = _gnutls_session_sign_algo_requested(session, _gnutls_x509_pk_to_sign (GNUTLS_PK_DSA, *hash_algo));
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+    }
+  else
+    {
+      if (sign_algo == GNUTLS_SIGN_UNKNOWN)
+        *hash_algo = GNUTLS_DIG_SHA1;
+      else
+        *hash_algo = _gnutls_sign_get_hash_algorithm (sign_algo);
+    }
+
+  return 0;
+}
 
 /* Generates a signature of all the random data and the parameters.
  * Used in DHE_* ciphersuites.
@@ -140,13 +173,16 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
   gnutls_digest_algorithm_t hash_algo;
 
   *sign_algo =
-    _gnutls_session_get_sign_algo (session, cert->subject_pk_algorithm,
-                                   &hash_algo);
+    _gnutls_session_get_sign_algo (session, cert->subject_pk_algorithm);
   if (*sign_algo == GNUTLS_SIGN_UNKNOWN)
     {
       gnutls_assert ();
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
+
+  ret = get_hash_algo(session, cert, *sign_algo, &hash_algo);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   ret = _gnutls_hash_init (&td_sha, hash_algo);
   if (ret < 0)
@@ -164,7 +200,7 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
   switch (cert->subject_pk_algorithm)
     {
     case GNUTLS_PK_RSA:
-      if (!_gnutls_version_has_selectable_prf (ver))
+      if (!_gnutls_version_has_selectable_sighash (ver))
         {
           digest_hd_st td_md5;
 
@@ -392,7 +428,7 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_cert * cert,
   digest_hd_st td_sha;
   opaque concat[MAX_SIG_SIZE];
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
-  gnutls_digest_algorithm_t hash_algo = GNUTLS_DIG_SHA1;
+  gnutls_digest_algorithm_t hash_algo;
 
   ret = _gnutls_session_sign_algo_enabled (session, algo);
   if (ret < 0)
@@ -401,7 +437,7 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_cert * cert,
       return ret;
     }
 
-  if (!_gnutls_version_has_selectable_prf (ver))
+  if (!_gnutls_version_has_selectable_sighash (ver))
     {
       ret = _gnutls_hash_init (&td_md5, GNUTLS_MAC_MD5);
       if (ret < 0)
@@ -417,14 +453,15 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_cert * cert,
       _gnutls_hash (&td_md5, params->data, params->size);
     }
 
-  if (algo != GNUTLS_SIGN_UNKNOWN)
-    hash_algo = _gnutls_sign_get_hash_algorithm (algo);
+  ret = get_hash_algo(session, cert, algo, &hash_algo);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   ret = _gnutls_hash_init (&td_sha, hash_algo);
   if (ret < 0)
     {
       gnutls_assert ();
-      if (!_gnutls_version_has_selectable_prf (ver))
+      if (!_gnutls_version_has_selectable_sighash (ver))
         _gnutls_hash_deinit (&td_md5, NULL);
       return ret;
     }
@@ -435,7 +472,7 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_cert * cert,
                 GNUTLS_RANDOM_SIZE);
   _gnutls_hash (&td_sha, params->data, params->size);
 
-  if (!_gnutls_version_has_selectable_prf (ver))
+  if (!_gnutls_version_has_selectable_sighash (ver))
     {
       _gnutls_hash_deinit (&td_md5, concat);
       _gnutls_hash_deinit (&td_sha, &concat[16]);
