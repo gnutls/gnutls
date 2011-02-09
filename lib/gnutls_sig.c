@@ -127,7 +127,6 @@ get_hash_algo(gnutls_session_t session, gnutls_cert* cert,
   gnutls_digest_algorithm_t *hash_algo)
 {
 int ret;
-gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
   if (cert->subject_pk_algorithm == GNUTLS_PK_DSA)
     { /* override */
