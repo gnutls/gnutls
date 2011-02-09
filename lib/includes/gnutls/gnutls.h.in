@@ -840,18 +840,6 @@ extern "C"
   int gnutls_session_ticket_enable_server (gnutls_session_t session,
                                            const gnutls_datum_t * key);
 
-  /* functions to set priority of cipher suites
-   */
-  int gnutls_cipher_set_priority (gnutls_session_t session, const int *list);
-  int gnutls_mac_set_priority (gnutls_session_t session, const int *list);
-  int gnutls_compression_set_priority (gnutls_session_t session,
-                                       const int *list);
-  int gnutls_kx_set_priority (gnutls_session_t session, const int *list);
-  int gnutls_protocol_set_priority (gnutls_session_t session,
-                                    const int *list);
-  int gnutls_certificate_type_set_priority (gnutls_session_t session,
-                                            const int *list);
-
 /* if you just want some defaults, use the following.
  */
   int gnutls_priority_init (gnutls_priority_t * priority_cache,
