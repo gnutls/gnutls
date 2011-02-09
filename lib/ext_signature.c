@@ -87,7 +87,7 @@ _gnutls_sign_algorithm_write_params (gnutls_session_t session, opaque * data,
 
   p += 2;
 
-  for (i = j = 0; i < session->internals.priorities.sign_algo.algorithms; i += 2, j++)
+  for (i = j = 0; j < session->internals.priorities.sign_algo.algorithms; i += 2, j++)
     {
       aid =
         _gnutls_sign_to_tls_aid (session->internals.priorities.
