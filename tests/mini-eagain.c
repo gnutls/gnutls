@@ -161,7 +161,6 @@ doit (void)
   gnutls_session_t client;
   int cret = GNUTLS_E_AGAIN;
   /* Need to enable anonymous KX specifically. */
-  const int kx_prio[] = { GNUTLS_KX_ANON_DH, 0 };
   char buffer[MAX_BUF + 1];
   ssize_t ns;
   int ret, transferred = 0, msglen;
@@ -178,8 +177,7 @@ doit (void)
   gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
   gnutls_anon_set_server_dh_params (s_anoncred, dh_params);
   gnutls_init (&server, GNUTLS_SERVER);
-  gnutls_set_default_priority (server);
-  gnutls_kx_set_priority (server, kx_prio);
+  gnutls_priority_set_direct (server, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
   gnutls_credentials_set (server, GNUTLS_CRD_ANON, s_anoncred);
   gnutls_dh_set_prime_bits (server, 1024);
   gnutls_transport_set_push_function (server, server_push);
@@ -188,8 +186,7 @@ doit (void)
   /* Init client */
   gnutls_anon_allocate_client_credentials (&c_anoncred);
   gnutls_init (&client, GNUTLS_CLIENT);
-  gnutls_set_default_priority (client);
-  gnutls_kx_set_priority (client, kx_prio);
+  gnutls_priority_set_direct (client, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
   gnutls_credentials_set (client, GNUTLS_CRD_ANON, c_anoncred);
   gnutls_transport_set_push_function (client, client_push);
   gnutls_transport_set_pull_function (client, client_pull);

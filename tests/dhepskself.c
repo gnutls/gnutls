@@ -66,8 +66,8 @@ client (void)
   gnutls_global_init ();
 
   gnutls_global_set_log_function (tls_log_func);
-//  if (debug)
-//    gnutls_global_set_log_level (99);
+  if (debug)
+    gnutls_global_set_log_level (5);
 
   gnutls_psk_allocate_client_credentials (&pskcred);
   gnutls_psk_set_client_credentials (pskcred, "test", &key,
@@ -78,7 +78,7 @@ client (void)
   gnutls_init (&session, GNUTLS_CLIENT);
 
   /* Use default priorities */
-  gnutls_set_default_priority (session);
+  gnutls_priority_set_direct (session, "NORMAL:+DHE-PSK", NULL);
 
   /* put the anonymous credentials to the current session
    */
@@ -162,7 +162,7 @@ initialize_tls_session (void)
   /* avoid calling all the priority functions, since the defaults
    * are adequate.
    */
-  gnutls_set_default_priority (session);
+  gnutls_priority_set_direct(session, "NORMAL:+DHE-PSK", NULL);
 
   gnutls_credentials_set (session, GNUTLS_CRD_PSK, server_pskcred);
 
