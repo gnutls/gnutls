@@ -43,7 +43,7 @@ static int _gnutls_cert_type_recv_params (gnutls_session_t session,
                                           const opaque * data,
                                           size_t data_size);
 static int _gnutls_cert_type_send_params (gnutls_session_t session,
-                                          opaque * data, size_t);
+                                          gnutls_buffer_st * extdata);
 
 extension_entry_st ext_mod_cert_type = {
   .name = "CERT TYPE",
@@ -153,8 +153,6 @@ _gnutls_cert_type_recv_params (gnutls_session_t session,
 
           _gnutls_session_cert_type_set (session, new_type);
         }
-
-
     }
 
   return 0;
@@ -163,11 +161,12 @@ _gnutls_cert_type_recv_params (gnutls_session_t session,
 /* returns data_size or a negative number on failure
  */
 static int
-_gnutls_cert_type_send_params (gnutls_session_t session, opaque * data,
-                               size_t data_size)
+_gnutls_cert_type_send_params (gnutls_session_t session, gnutls_buffer_st* extdata)
 {
   unsigned len, i;
-
+  int ret;
+  uint8_t p;
+  
   /* this function sends the client extension data (dnsname) */
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
@@ -187,21 +186,21 @@ _gnutls_cert_type_send_params (gnutls_session_t session, opaque * data,
               return 0;
             }
 
-          if (data_size < len + 1)
-            {
-              gnutls_assert ();
-              return GNUTLS_E_SHORT_MEMORY_BUFFER;
-            }
-
           /* this is a vector!
            */
-          data[0] = (uint8_t) len;
+          p = (uint8_t) len;
+          ret = _gnutls_buffer_append_data(extdata, &p, 1);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
 
           for (i = 0; i < len; i++)
             {
-              data[i + 1] =
+              p =
                 _gnutls_cert_type2num (session->internals.priorities.
                                        cert_type.priority[i]);
+              ret = _gnutls_buffer_append_data(extdata, &p, 1);
+              if (ret < 0)
+                return gnutls_assert_val(ret);
             }
           return len + 1;
         }
@@ -212,14 +211,13 @@ _gnutls_cert_type_send_params (gnutls_session_t session, opaque * data,
       if (session->security_parameters.cert_type != DEFAULT_CERT_TYPE)
         {
           len = 1;
-          if (data_size < len)
-            {
-              gnutls_assert ();
-              return GNUTLS_E_SHORT_MEMORY_BUFFER;
-            }
 
-          data[0] =
+          p =
             _gnutls_cert_type2num (session->security_parameters.cert_type);
+          ret = _gnutls_buffer_append_data(extdata, &p, 1);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+
           return len;
         }
 

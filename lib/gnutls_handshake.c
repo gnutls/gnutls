@@ -1874,14 +1874,14 @@ _gnutls_read_server_hello (gnutls_session_t session,
  */
 static int
 _gnutls_copy_ciphersuites (gnutls_session_t session,
-                           opaque * ret_data, size_t ret_data_size,
+                           gnutls_buffer_st * cdata, 
                            int add_scsv)
 {
   int ret, i;
   cipher_suite_st *cipher_suites;
   uint16_t cipher_num;
-  int datalen, pos;
   uint16_t loop_max;
+  size_t init_length = cdata->length;
 
   ret = _gnutls_supported_ciphersuites_sorted (session, &cipher_suites);
   if (ret < 0)
@@ -1919,44 +1919,52 @@ _gnutls_copy_ciphersuites (gnutls_session_t session,
 
   cipher_num *= sizeof (uint16_t);      /* in order to get bytes */
 
-  datalen = pos = 0;
-
-  datalen += sizeof (uint16_t) + cipher_num;
-
-  if ((size_t) datalen > ret_data_size)
+  ret = _gnutls_buffer_append_prefix(cdata, 16, cipher_num);
+  if (ret < 0)
     {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
+      gnutls_assert();
+      goto cleanup;
     }
 
-  _gnutls_write_uint16 (cipher_num, ret_data);
-  pos += 2;
 
   loop_max = add_scsv ? cipher_num - 2 : cipher_num;
-
   for (i = 0; i < (loop_max / 2); i++)
     {
-      memcpy (&ret_data[pos], cipher_suites[i].suite, 2);
-      pos += 2;
+      ret = _gnutls_buffer_append_data( cdata, cipher_suites[i].suite, 2);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
     }
 
   if (add_scsv)
     {
+      uint8_t p[2];
       /* Safe renegotiation signalling CS value is { 0x00, 0xff } */
-      ret_data[pos++] = 0x00;
-      ret_data[pos++] = 0xff;
+      p[0] = 0x00;
+      p[1] = 0xff;
+      ret = _gnutls_buffer_append_data( cdata, p, 2);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+
       ret = _gnutls_ext_sr_send_cs (session);
       if (ret < 0)
         {
           gnutls_assert ();
-          gnutls_free (cipher_suites);
-          return ret;
+          goto cleanup;
         }
     }
 
+  ret = cdata->length - init_length;
+
+cleanup:
   gnutls_free (cipher_suites);
 
-  return datalen;
+  return ret;
 }
 
 
@@ -1965,11 +1973,11 @@ _gnutls_copy_ciphersuites (gnutls_session_t session,
  */
 static int
 _gnutls_copy_comp_methods (gnutls_session_t session,
-                           opaque * ret_data, size_t ret_data_size)
+                           gnutls_buffer_st * cdata)
 {
   int ret, i;
   uint8_t *compression_methods, comp_num;
-  int datalen, pos;
+  size_t init_length = cdata->length;
 
   ret = _gnutls_supported_compression_methods (session, &compression_methods);
   if (ret < 0)
@@ -1980,25 +1988,30 @@ _gnutls_copy_comp_methods (gnutls_session_t session,
 
   comp_num = ret;
 
-  datalen = pos = 0;
-  datalen += comp_num + 1;
-
-  if ((size_t) datalen > ret_data_size)
+  /* put the number of compression methods */
+  ret = _gnutls_buffer_append_prefix(cdata, 8, comp_num);
+  if (ret < 0)
     {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
+      gnutls_assert();
+      goto cleanup;
     }
-
-  ret_data[pos++] = comp_num;   /* put the number of compression methods */
 
   for (i = 0; i < comp_num; i++)
     {
-      ret_data[pos++] = compression_methods[i];
+      ret = _gnutls_buffer_append_data(cdata, &compression_methods[i], 1);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
     }
 
+  ret = cdata->length - init_length;
+
+cleanup:
   gnutls_free (compression_methods);
 
-  return datalen;
+  return ret;
 }
 
 /* This should be sufficient by now. It should hold all the extensions
@@ -2013,15 +2026,16 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 {
   mbuffer_st *bufel = NULL;
   opaque *data = NULL;
-  int extdatalen;
   int pos = 0, type;
   int datalen = 0, ret = 0;
   opaque rnd[GNUTLS_RANDOM_SIZE];
   gnutls_protocol_t hver;
-  opaque *extdata = NULL;
+  gnutls_buffer_st extdata;
   int rehandshake = 0;
   uint8_t session_id_len =
     session->internals.resumed_security_parameters.session_id_size;
+
+  _gnutls_buffer_init(&extdata);
 
   /* note that rehandshake is different than resuming
    */
@@ -2043,14 +2057,6 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
           return GNUTLS_E_MEMORY_ERROR;
         }
       data = _mbuffer_get_udata_ptr (bufel);
-      extdatalen = MAX_EXT_DATA_LENGTH;
-
-      extdata = gnutls_malloc (extdatalen);
-      if (extdata == NULL)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_MEMORY_ERROR;
-        }
 
       /* if we are resuming a session then we set the
        * version number to the previously established.
@@ -2072,7 +2078,6 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
         {
           gnutls_assert ();
           gnutls_free (bufel);
-          gnutls_free (extdata);
           return GNUTLS_E_INTERNAL_ERROR;
         }
 
@@ -2132,55 +2137,26 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
           gnutls_protocol_get_version (session) == GNUTLS_SSL3)
         {
           ret =
-            _gnutls_copy_ciphersuites (session, extdata, extdatalen, TRUE);
+            _gnutls_copy_ciphersuites (session, &extdata, TRUE);
           _gnutls_extension_list_add (session,
                                       GNUTLS_EXTENSION_SAFE_RENEGOTIATION);
         }
       else
-        ret = _gnutls_copy_ciphersuites (session, extdata, extdatalen, FALSE);
+        ret = _gnutls_copy_ciphersuites (session, &extdata, FALSE);
 
-      if (ret > 0)
+      if (ret < 0)
         {
-          ret = _mbuffer_append_data (bufel, extdata, ret);
-          if (ret < 0)
-            {
-              gnutls_assert ();
-              gnutls_free (extdata);
-              return ret;
-            }
+          gnutls_assert();
+          goto cleanup;
         }
-      else
-        {
-          if (extdatalen == 0)
-            extdatalen = GNUTLS_E_INTERNAL_ERROR;
-          gnutls_free (bufel);
-          gnutls_free (extdata);
-          gnutls_assert ();
-          return ret;
-        }
-
 
       /* Copy the compression methods.
        */
-      ret = _gnutls_copy_comp_methods (session, extdata, extdatalen);
-      if (ret > 0)
+      ret = _gnutls_copy_comp_methods (session, &extdata);
+      if (ret < 0)
         {
-          ret = _mbuffer_append_data (bufel, extdata, ret);
-          if (ret < 0)
-            {
-              gnutls_assert ();
-              gnutls_free (extdata);
-              return ret;
-            }
-        }
-      else
-        {
-          if (extdatalen == 0)
-            extdatalen = GNUTLS_E_INTERNAL_ERROR;
-          gnutls_free (bufel);
-          gnutls_free (extdata);
-          gnutls_assert ();
-          return ret;
+          gnutls_assert();
+          goto cleanup;
         }
 
       /* Generate and copy TLS extensions.
@@ -2195,32 +2171,29 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
             type = GNUTLS_EXT_NONE;
         }
 
-      ret = _gnutls_gen_extensions (session, extdata, extdatalen, type);
-
-      if (ret > 0)
+      ret = _gnutls_gen_extensions (session, &extdata, type);
+      if (ret < 0)
         {
-          ret = _mbuffer_append_data (bufel, extdata, ret);
-          if (ret < 0)
-            {
-              gnutls_assert ();
-              gnutls_free (extdata);
-              return ret;
-            }
+          gnutls_assert();
+          goto cleanup;
         }
-      else if (ret < 0)
+
+      ret = _mbuffer_append_data (bufel, extdata.data, extdata.length);
+      if (ret < 0)
         {
           gnutls_assert ();
-          gnutls_free (bufel);
-          gnutls_free (extdata);
-          return ret;
+          goto cleanup;
         }
     }
 
-  gnutls_free (extdata);
+  _gnutls_buffer_clear(&extdata);
 
-  ret =
+  return
     _gnutls_send_handshake (session, bufel, GNUTLS_HANDSHAKE_CLIENT_HELLO);
 
+cleanup:
+  gnutls_free (bufel);
+  _gnutls_buffer_clear(&extdata);
   return ret;
 }
 
@@ -2229,8 +2202,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 {
   mbuffer_st *bufel = NULL;
   opaque *data = NULL;
-  opaque *extdata = NULL;
-  int extdatalen;
+  gnutls_buffer_st extdata;
   int pos = 0;
   int datalen, ret = 0;
   uint8_t comp;
@@ -2239,30 +2211,21 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
 
   datalen = 0;
 
+  _gnutls_buffer_init(&extdata);
+
   if (again == 0)
     {
-
-      extdata = gnutls_malloc (MAX_EXT_DATA_LENGTH);
-      if (extdata == NULL)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_MEMORY_ERROR;
-        }
-
       datalen = 2 + session_id_len + 1 + GNUTLS_RANDOM_SIZE + 3;
       ret =
-        _gnutls_gen_extensions (session, extdata, MAX_EXT_DATA_LENGTH,
-                                GNUTLS_EXT_ANY);
-
+        _gnutls_gen_extensions (session, &extdata, GNUTLS_EXT_ANY);
       if (ret < 0)
         {
           gnutls_assert ();
           goto fail;
         }
-      extdatalen = ret;
 
       bufel =
-        _gnutls_handshake_alloc (datalen + extdatalen, datalen + extdatalen);
+        _gnutls_handshake_alloc (datalen + extdata.length, datalen + extdata.length);
       if (bufel == NULL)
         {
           gnutls_assert ();
@@ -2303,11 +2266,10 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
       data[pos++] = comp;
 
 
-      if (extdatalen > 0)
+      if (extdata.length > 0)
         {
-          datalen += extdatalen;
-
-          memcpy (&data[pos], extdata, extdatalen);
+          datalen += extdata.length;
+          memcpy (&data[pos], extdata.data, extdata.length);
         }
     }
 
@@ -2315,7 +2277,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
     _gnutls_send_handshake (session, bufel, GNUTLS_HANDSHAKE_SERVER_HELLO);
 
 fail:
-  gnutls_free (extdata);
+  _gnutls_buffer_clear(&extdata);
   return ret;
 }
 

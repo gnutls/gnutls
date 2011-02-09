@@ -236,32 +236,16 @@ _gnutls_extension_list_add (gnutls_session_t session, uint16_t type)
 }
 
 int
-_gnutls_gen_extensions (gnutls_session_t session, opaque * data,
-                        size_t data_size, gnutls_ext_parse_type_t parse_type)
+_gnutls_gen_extensions (gnutls_session_t session, gnutls_buffer_st * extdata,
+                        gnutls_ext_parse_type_t parse_type)
 {
   int size;
-  uint16_t pos = 0;
-  opaque *sdata;
-  size_t sdata_size;
-  size_t i;
+  int pos, size_pos, ret;
+  size_t i, init_size = extdata->length;
 
-  if (data_size < 2)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
+  pos = extdata->length; /* we will store length later on */
+  _gnutls_buffer_append_prefix( extdata, 16, 0);
 
-  /* allocate enough data for each extension.
-   */
-  sdata_size = data_size;
-  sdata = gnutls_malloc (sdata_size);
-  if (sdata == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  pos += 2;
   for (i = 0; i < extfunc_size; i++)
     {
       extension_entry_st *p = &extfunc[i];
@@ -272,30 +256,27 @@ _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
       if (parse_type != GNUTLS_EXT_ANY && p->parse_type != parse_type)
         continue;
 
-      size = p->send_func (session, sdata, sdata_size);
+      ret = _gnutls_buffer_append_prefix( extdata, 16, p->type);
+      if (ret < 0)
+        return gnutls_assert_val(ret); 
+
+      size_pos = extdata->length;
+      ret = _gnutls_buffer_append_prefix (extdata, 16, 0);
+      if (ret < 0)
+        return gnutls_assert_val(ret); 
+
+      size = p->send_func (session, extdata);
+      /* returning GNUTLS_E_INT_RET_0 means to send an empty
+       * extension of this type.
+       */
       if (size > 0 || size == GNUTLS_E_INT_RET_0)
         {
           if (size == GNUTLS_E_INT_RET_0)
             size = 0;
-
-          if (data_size < pos + (size_t) size + 4)
-            {
-              gnutls_assert ();
-              gnutls_free (sdata);
-              return GNUTLS_E_INTERNAL_ERROR;
-            }
-
-          /* write extension type */
-          _gnutls_write_uint16 (p->type, &data[pos]);
-          pos += 2;
-
-          /* write size */
-          _gnutls_write_uint16 (size, &data[pos]);
-          pos += 2;
-
-          memcpy (&data[pos], sdata, size);
-          pos += size;
-
+            
+          /* write the real size */
+          _gnutls_write_uint16(size, &extdata->data[size_pos]);
+          
           /* add this extension to the extension list
            */
           _gnutls_extension_list_add (session, p->type);
@@ -306,24 +287,19 @@ _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
       else if (size < 0)
         {
           gnutls_assert ();
-          gnutls_free (sdata);
           return size;
         }
+      else if (size == 0)
+        extdata->length -= 4; /* reset type and size */
     }
 
-  size = pos;
-  pos -= 2;                     /* remove the size of the size header! */
+  /* remove any initial data, and the size of the header */
+  size = extdata->length - init_size - 2;
+  
+  if ( size > 0)
+    _gnutls_write_uint16(size, &extdata->data[pos]);
 
-  _gnutls_write_uint16 (pos, data);
-
-  if (size == 2)
-    {                           /* empty */
-      size = 0;
-    }
-
-  gnutls_free (sdata);
   return size;
-
 }
 
 int

@@ -797,37 +797,6 @@ extern "C"
                       size_t seed_size, const char *seed,
                       size_t outsize, char *out);
 
-/* TLS Extensions */
-
-  typedef int (*gnutls_ext_recv_func) (gnutls_session_t session,
-                                       const unsigned char *data, size_t len);
-  typedef int (*gnutls_ext_send_func) (gnutls_session_t session,
-                                       unsigned char *data, size_t len);
-
-  /**
-   * gnutls_ext_parse_type_t:
-   * @GNUTLS_EXT_NONE: Never parsed
-   * @GNUTLS_EXT_ANY: Any extension type.
-   * @GNUTLS_EXT_APPLICATION: Application extension.
-   * @GNUTLS_EXT_TLS: TLS-internal extension.
-   * @GNUTLS_EXT_MANDATORY: Extension parsed even if resuming (or extensions are disabled).
-   *
-   * Enumeration of different TLS extension types.  This flag
-   * indicates for an extension whether it is useful to application
-   * level or TLS level only.  This is (only) used to parse the
-   * application level extensions before the "client_hello" callback
-   * is called.
-   */
-  typedef enum
-  {
-    GNUTLS_EXT_ANY = 0,
-    GNUTLS_EXT_APPLICATION = 1,
-    GNUTLS_EXT_TLS = 2,
-    GNUTLS_EXT_MANDATORY = 3,
-    GNUTLS_EXT_NONE = 4
-  } gnutls_ext_parse_type_t;
-
-
   /**
    * gnutls_server_name_type_t:
    * @GNUTLS_NAME_DNS: Domain Name System name type.

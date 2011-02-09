@@ -288,6 +288,7 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
         if (vdata->size != _gnutls_hash_get_algo_len (hash))
           {
             gnutls_assert ();
+            _gnutls_debug_log("Asked to sign %d bytes with hash %s\n", vdata->size, gnutls_mac_get_name(hash));
             ret = GNUTLS_E_PK_SIGN_FAILED;
             goto dsa_fail;
           }

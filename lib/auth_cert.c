@@ -1674,9 +1674,7 @@ _gnutls_proc_cert_client_cert_vrfy (gnutls_session_t session,
   return 0;
 }
 
-
 #define CERTTYPE_SIZE 3
-#define SIGN_ALGO_SIZE (2 + MAX_SIGNATURE_ALGORITHMS * 2)
 int
 _gnutls_gen_cert_server_cert_req (gnutls_session_t session, gnutls_buffer_st * data)
 {
@@ -1708,7 +1706,7 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, gnutls_buffer_st * d
   if (_gnutls_version_has_selectable_sighash (ver))
     /* Need two bytes to announce the number of supported hash
        functions (see below).  */
-    size += SIGN_ALGO_SIZE;
+    size += MAX_SIGN_ALGO_SIZE;
 
   tmp_data[0] = CERTTYPE_SIZE - 1;
   tmp_data[1] = RSA_SIGN;
@@ -1720,10 +1718,10 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, gnutls_buffer_st * d
 
   if (_gnutls_version_has_selectable_sighash (ver))
     {
-      uint8_t p[SIGN_ALGO_SIZE];
+      uint8_t p[MAX_SIGN_ALGO_SIZE];
 
       ret =
-        _gnutls_sign_algorithm_write_params (session, p, SIGN_ALGO_SIZE);
+        _gnutls_sign_algorithm_write_params (session, p, MAX_SIGN_ALGO_SIZE);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -1731,7 +1729,7 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, gnutls_buffer_st * d
         }
 
       /* recalculate size */
-      size -= SIGN_ALGO_SIZE + ret;
+      size -= MAX_SIGN_ALGO_SIZE + ret;
 
       ret = _gnutls_buffer_append_data( data, p, ret);
       if (ret < 0)
@@ -2040,7 +2038,7 @@ _gnutls_server_select_cert (gnutls_session_t session,
                             gnutls_pk_algorithm_t requested_algo)
 {
   unsigned i;
-  int idx;
+  int idx, ret;
   gnutls_certificate_credentials_t cred;
 
   cred = (gnutls_certificate_credentials_t)
@@ -2055,17 +2053,30 @@ _gnutls_server_select_cert (gnutls_session_t session,
    * use it and leave.
    */
   if (cred->server_get_cert_callback != NULL)
-    return call_get_cert_callback (session, NULL, 0, NULL, 0);
+    {
+      ret = call_get_cert_callback (session, NULL, 0, NULL, 0);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+      return ret;
+    }
 
   /* Otherwise... */
 
   idx = -1;                     /* default is use no certificate */
 
 
+  _gnutls_handshake_log("HSK[%p]: Requested PK algorithm: %s (%d) -- ctype: %s (%d)\n", session, 
+    gnutls_pk_get_name(requested_algo), requested_algo, 
+    gnutls_certificate_type_get_name(session->security_parameters.cert_type), session->security_parameters.cert_type);
+  
   for (i = 0; i < cred->ncerts; i++)
     {
       /* find one compatible certificate
        */
+      _gnutls_handshake_log("HSK[%p]: certificate[%d] PK algorithm: %s (%d) - ctype: %s (%d) - sig: %s (%d)\n", session, i,
+        gnutls_pk_get_name(cred->cert_list[i][0].subject_pk_algorithm), cred->cert_list[i][0].subject_pk_algorithm,
+        gnutls_certificate_type_get_name(cred->cert_list[i][0].cert_type), cred->cert_list[i][0].cert_type,
+        gnutls_sign_get_name(cred->cert_list[i][0].sign_algo), cred->cert_list[i][0].sign_algo);
       if (requested_algo == GNUTLS_PK_ANY ||
           requested_algo == cred->cert_list[i][0].subject_pk_algorithm)
         {
@@ -2077,9 +2088,6 @@ _gnutls_server_select_cert (gnutls_session_t session,
 	      && (cred->cert_list[i][0].cert_type == GNUTLS_CRT_OPENPGP
 		  ||	/* FIXME: make this a check for certificate
 			   type capabilities */
-		  !_gnutls_version_has_selectable_sighash
-		  (gnutls_protocol_get_version (session))
-		  ||
 		  _gnutls_session_sign_algo_requested
 		  (session, cred->cert_list[i][0].sign_algo) == 0))
 	    {
@@ -2101,8 +2109,11 @@ _gnutls_server_select_cert (gnutls_session_t session,
                                   cred->pkey[idx], 0);
     }
   else
-    /* Certificate does not support REQUESTED_ALGO.  */
-    return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+    {
+      gnutls_assert();
+      /* Certificate does not support REQUESTED_ALGO.  */
+      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+    }
 
   return 0;
 }

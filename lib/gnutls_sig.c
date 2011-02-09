@@ -147,6 +147,9 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
       gnutls_assert ();
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
+  
+  _gnutls_handshake_log("HSK[%p]: hash from highest priority sigalgorithm: %s (%d)\n", 
+    session, gnutls_mac_get_name(hash_algo), hash_algo);
 
   ret = _gnutls_hash_init (&td_sha, hash_algo);
   if (ret < 0)
@@ -219,6 +222,8 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
       _gnutls_hash_deinit (&td_sha, NULL);
       return GNUTLS_E_INTERNAL_ERROR;
     }
+
+fprintf(stderr, "asking to sign: %d bytes\n", dconcat.size);
   ret = _gnutls_tls_sign (session, cert, pkey, &dconcat, signature);
   if (ret < 0)
     {

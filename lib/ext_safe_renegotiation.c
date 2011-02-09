@@ -29,8 +29,7 @@
 
 static int _gnutls_sr_recv_params (gnutls_session_t state,
                                    const opaque * data, size_t data_size);
-static int _gnutls_sr_send_params (gnutls_session_t state,
-                                   opaque * data, size_t);
+static int _gnutls_sr_send_params (gnutls_session_t state, gnutls_buffer_st*);
 static void _gnutls_sr_deinit_data (extension_priv_data_t priv);
 
 extension_entry_st ext_mod_sr = {
@@ -362,18 +361,17 @@ _gnutls_sr_recv_params (gnutls_session_t session,
 }
 
 static int
-_gnutls_sr_send_params (gnutls_session_t session,
-                        opaque * data, size_t _data_size)
+_gnutls_sr_send_params (gnutls_session_t session, gnutls_buffer_st* extdata)
 {
   /* The format of this extension is a one-byte length of verify data followed
    * by the verify data itself. Note that the length byte does not include
    * itself; IOW, empty verify data is represented as a length of 0. That means
    * the minimum extension is one byte: 0x00.
    */
-  ssize_t data_size = _data_size;
   sr_ext_st *priv;
-  int ret, set = 0;
+  int ret, set = 0, len;
   extension_priv_data_t epriv;
+  size_t init_length = extdata->length;
 
   if (session->internals.priorities.sr == SR_DISABLED)
     {
@@ -406,36 +404,35 @@ _gnutls_sr_send_params (gnutls_session_t session,
   else
     priv = epriv.ptr;
 
-  data[0] = 0;
-
   /* Always offer the extension if we're a client */
   if (priv->connection_using_safe_renegotiation ||
       session->security_parameters.entity == GNUTLS_CLIENT)
     {
-      DECR_LEN (data_size, 1);
-      data[0] = priv->client_verify_data_len;
+      len = priv->client_verify_data_len;
+      if (session->security_parameters.entity == GNUTLS_SERVER)
+        len += priv->server_verify_data_len;
+      
+      ret = _gnutls_buffer_append_prefix(extdata, 8, len);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
 
-      DECR_LEN (data_size, priv->client_verify_data_len);
-
-      if (priv->client_verify_data_len > 0)
-        memcpy (&data[1], priv->client_verify_data,
-                priv->client_verify_data_len);
+      ret = _gnutls_buffer_append_data(extdata, priv->client_verify_data,
+        priv->client_verify_data_len);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
 
       if (session->security_parameters.entity == GNUTLS_SERVER)
         {
-          data[0] += priv->server_verify_data_len;
-
-          DECR_LEN (data_size, priv->server_verify_data_len);
-
-          if (priv->server_verify_data_len > 0)
-            memcpy (&data[1 + priv->client_verify_data_len],
-                    priv->server_verify_data, priv->server_verify_data_len);
+          ret = _gnutls_buffer_append_data(extdata, priv->server_verify_data,
+            priv->server_verify_data_len);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
         }
     }
   else
     return 0;
 
-  return 1 + data[0];           /* don't forget the length byte */
+  return extdata->length - init_length;
 }
 
 static void

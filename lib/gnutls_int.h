@@ -98,9 +98,34 @@ typedef struct
 #define GNUTLS_MASTER_SIZE 48
 #define GNUTLS_RANDOM_SIZE 32
 
+/* TLS Extensions */
 /* we can receive up to MAX_EXT_TYPES extensions.
  */
 #define MAX_EXT_TYPES 32
+
+  /**
+   * gnutls_ext_parse_type_t:
+   * @GNUTLS_EXT_NONE: Never parsed
+   * @GNUTLS_EXT_ANY: Any extension type.
+   * @GNUTLS_EXT_APPLICATION: Application extension.
+   * @GNUTLS_EXT_TLS: TLS-internal extension.
+   * @GNUTLS_EXT_MANDATORY: Extension parsed even if resuming (or extensions are disabled).
+   *
+   * Enumeration of different TLS extension types.  This flag
+   * indicates for an extension whether it is useful to application
+   * level or TLS level only.  This is (only) used to parse the
+   * application level extensions before the "client_hello" callback
+   * is called.
+   */
+  typedef enum
+  {
+    GNUTLS_EXT_ANY = 0,
+    GNUTLS_EXT_APPLICATION = 1,
+    GNUTLS_EXT_TLS = 2,
+    GNUTLS_EXT_MANDATORY = 3,
+    GNUTLS_EXT_NONE = 4
+  } gnutls_ext_parse_type_t;
+
 
 /* The initial size of the receive
  * buffer size. This will grow if larger
@@ -322,6 +347,7 @@ typedef struct
  */
 
 #define MAX_SIGNATURE_ALGORITHMS 16
+#define MAX_SIGN_ALGO_SIZE (2 + MAX_SIGNATURE_ALGORITHMS * 2)
 
 #define MAX_VERIFY_DATA_SIZE 36 /* in SSL 3.0, 12 in TLS 1.0 */
 

@@ -26,11 +26,18 @@
 #ifndef GNUTLS_EXTENSIONS_H
 #define GNUTLS_EXTENSIONS_H
 
+#include <gnutls_str.h>
+
+typedef int (*gnutls_ext_recv_func) (gnutls_session_t session,
+                                       const unsigned char *data, size_t len);
+typedef int (*gnutls_ext_send_func) (gnutls_session_t session,
+                                       gnutls_buffer_st *extdata);
+
 int _gnutls_parse_extensions (gnutls_session_t session,
                               gnutls_ext_parse_type_t parse_type,
                               const opaque * data, int data_size);
-int _gnutls_gen_extensions (gnutls_session_t session, opaque * data,
-                            size_t data_size, gnutls_ext_parse_type_t);
+int _gnutls_gen_extensions (gnutls_session_t session, gnutls_buffer_st * extdata,
+                            gnutls_ext_parse_type_t);
 int _gnutls_ext_init (void);
 void _gnutls_ext_deinit (void);
 

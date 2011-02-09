@@ -421,7 +421,7 @@ _gnutls_dsa_sign (gnutls_datum_t * signature,
 
   k = hash->size;
   if (k < 20)
-    {                           /* SHA1 or better only */
+    { /* SHA1 or better only */
       gnutls_assert ();
       return GNUTLS_E_PK_SIGN_FAILED;
     }

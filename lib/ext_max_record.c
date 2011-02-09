@@ -35,7 +35,7 @@ static int _gnutls_max_record_recv_params (gnutls_session_t session,
                                            const opaque * data,
                                            size_t data_size);
 static int _gnutls_max_record_send_params (gnutls_session_t session,
-                                           opaque * data, size_t);
+  gnutls_buffer_st* extdata);
 
 static int _gnutls_max_record_unpack (gnutls_buffer_st * ps,
                                       extension_priv_data_t * _priv);
@@ -141,10 +141,9 @@ _gnutls_max_record_recv_params (gnutls_session_t session,
 /* returns data_size or a negative number on failure
  */
 static int
-_gnutls_max_record_send_params (gnutls_session_t session, opaque * data,
-                                size_t data_size)
+_gnutls_max_record_send_params (gnutls_session_t session, gnutls_buffer_st* extdata)
 {
-  uint16_t len;
+  uint8_t p;
   int ret;
 
   /* this function sends the client extension data (dnsname) */
@@ -162,15 +161,12 @@ _gnutls_max_record_send_params (gnutls_session_t session, opaque * data,
 
       if (epriv.num != DEFAULT_MAX_RECORD_SIZE)
         {
-          len = 1;
-          if (data_size < len)
-            {
-              gnutls_assert ();
-              return GNUTLS_E_SHORT_MEMORY_BUFFER;
-            }
+          p = (uint8_t) _gnutls_mre_record2num (epriv.num);
+          ret = _gnutls_buffer_append_data( extdata, &p, 1);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
 
-          data[0] = (uint8_t) _gnutls_mre_record2num (epriv.num);
-          return len;
+          return 1;
         }
 
     }
@@ -180,21 +176,17 @@ _gnutls_max_record_send_params (gnutls_session_t session, opaque * data,
       if (session->security_parameters.max_record_recv_size !=
           DEFAULT_MAX_RECORD_SIZE)
         {
-          len = 1;
-          if (data_size < len)
-            {
-              gnutls_assert ();
-              return GNUTLS_E_SHORT_MEMORY_BUFFER;
-            }
-
-          data[0] =
+          p =
             (uint8_t)
             _gnutls_mre_record2num
             (session->security_parameters.max_record_recv_size);
-          return len;
+
+          ret = _gnutls_buffer_append_data( extdata, &p, 1);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+
+          return 1;
         }
-
-
     }
 
   return 0;

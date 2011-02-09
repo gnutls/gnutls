@@ -33,7 +33,7 @@ static int _gnutls_server_name_recv_params (gnutls_session_t session,
                                             const opaque * data,
                                             size_t data_size);
 static int _gnutls_server_name_send_params (gnutls_session_t session,
-                                            opaque * data, size_t);
+                                            gnutls_buffer_st* extdata);
 
 static int _gnutls_server_name_unpack (gnutls_buffer_st * ps,
                                        extension_priv_data_t * _priv);
@@ -174,12 +174,10 @@ _gnutls_server_name_recv_params (gnutls_session_t session,
  */
 static int
 _gnutls_server_name_send_params (gnutls_session_t session,
-                                 opaque * data, size_t _data_size)
+                                 gnutls_buffer_st* extdata)
 {
   uint16_t len;
-  opaque *p;
   unsigned i;
-  ssize_t data_size = _data_size;
   int total_size = 0, ret;
   server_name_ext_st *priv;
   extension_priv_data_t epriv;
@@ -214,13 +212,12 @@ _gnutls_server_name_send_params (gnutls_session_t session,
           total_size += 1 + 2 + len;
         }
 
-      p = data;
-
       /* UINT16: write total size of all names
        */
-      DECR_LENGTH_RET (data_size, 2, GNUTLS_E_SHORT_MEMORY_BUFFER);
-      _gnutls_write_uint16 (total_size - 2, p);
-      p += 2;
+      ret = _gnutls_buffer_append_prefix(extdata, 16, total_size - 2);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+
       for (i = 0; i < priv->server_names_size; i++)
         {
 
@@ -235,17 +232,14 @@ _gnutls_server_name_send_params (gnutls_session_t session,
                * UINT16: size of the first name
                * LEN: the actual server name.
                */
-              DECR_LENGTH_RET (data_size, len + 3,
-                               GNUTLS_E_SHORT_MEMORY_BUFFER);
+              ret = _gnutls_buffer_append_prefix(extdata, 8, 0);
+              if (ret < 0)
+                return gnutls_assert_val(ret);
 
-              *p = 0;           /* NAME_DNS type */
-              p++;
+              ret = _gnutls_buffer_append_data_prefix(extdata, 16, priv->server_names[i].name, len);
+              if (ret < 0)
+                return gnutls_assert_val(ret);
 
-              _gnutls_write_uint16 (len, p);
-              p += 2;
-
-              memcpy (p, priv->server_names[i].name, len);
-              p += len;
               break;
             default:
               gnutls_assert ();

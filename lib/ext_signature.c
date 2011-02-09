@@ -39,7 +39,7 @@ static int _gnutls_signature_algorithm_recv_params (gnutls_session_t session,
                                                     const opaque * data,
                                                     size_t data_size);
 static int _gnutls_signature_algorithm_send_params (gnutls_session_t session,
-                                                    opaque * data, size_t);
+                                                    gnutls_buffer_st * extdata);
 static void signature_algorithms_deinit_data (extension_priv_data_t priv);
 static int signature_algorithms_pack (extension_priv_data_t epriv,
                                       gnutls_buffer_st * ps);
@@ -87,7 +87,7 @@ _gnutls_sign_algorithm_write_params (gnutls_session_t session, opaque * data,
 
   p += 2;
 
-  for (i = j = 0; i < session->internals.priorities.sign_algo.algorithms; i += 2, j++)
+  for (i = j = 0; j < session->internals.priorities.sign_algo.algorithms; i += 2, j++)
     {
       aid =
         _gnutls_sign_to_tls_aid (session->internals.priorities.
@@ -96,7 +96,7 @@ _gnutls_sign_algorithm_write_params (gnutls_session_t session, opaque * data,
       if (aid == NULL)
         continue;
         
-       _gnutls_debug_log ("EXT[SIGA]: sent signature algo (%d.%d) %s\n", aid->hash_algorithm, 
+       _gnutls_debug_log ("EXT[%p]: sent signature algo (%d.%d) %s\n", session, aid->hash_algorithm, 
          aid->sign_algorithm, gnutls_sign_get_name(session->internals.priorities.sign_algo.priority[j]));
       *p = aid->hash_algorithm;
       p++;
@@ -106,7 +106,6 @@ _gnutls_sign_algorithm_write_params (gnutls_session_t session, opaque * data,
     }
 
   _gnutls_write_uint16 (len, len_p);
-
   return len + 2;
 }
 
@@ -138,7 +137,7 @@ _gnutls_sign_algorithm_parse_data (gnutls_session_t session,
 
       sig = _gnutls_tls_aid_to_sign (&aid);
 
-       _gnutls_debug_log ("EXT[SIGA]: rcvd signature algo (%d.%d) %s\n", aid.hash_algorithm, 
+       _gnutls_debug_log ("EXT[%p]: rcvd signature algo (%d.%d) %s\n", session, aid.hash_algorithm, 
          aid.sign_algorithm, gnutls_sign_get_name(sig));
 
       if (sig != GNUTLS_SIGN_UNKNOWN)
@@ -211,9 +210,10 @@ _gnutls_signature_algorithm_recv_params (gnutls_session_t session,
  */
 static int
 _gnutls_signature_algorithm_send_params (gnutls_session_t session,
-                                         opaque * data, size_t data_size)
+                                         gnutls_buffer_st* extdata)
 {
   int ret;
+  size_t init_length = extdata->length;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
   /* this function sends the client extension data */
@@ -222,14 +222,18 @@ _gnutls_signature_algorithm_send_params (gnutls_session_t session,
     {
       if (session->internals.priorities.sign_algo.algorithms > 0)
         {
+          uint8_t p[MAX_SIGN_ALGO_SIZE];
+
           ret =
-            _gnutls_sign_algorithm_write_params (session, data, data_size);
+            _gnutls_sign_algorithm_write_params (session, p, sizeof(p));
           if (ret < 0)
-            {
-              gnutls_assert ();
-              return ret;
-            }
-          return ret;
+            return gnutls_assert_val(ret);
+
+          ret = _gnutls_buffer_append_data(extdata, p, ret);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+            
+          return extdata->length - init_length;
         }
     }
 
@@ -322,6 +326,10 @@ _gnutls_session_sign_algo_requested (gnutls_session_t session,
 
   for (i = 0; i < priv->sign_algorithms_size; i++)
     {
+      _gnutls_handshake_log("HSK[%p]: allowed sign algorithm: %s (%d)-- want %s (%d)\n", session,
+            gnutls_sign_get_name(priv->sign_algorithms[i]), priv->sign_algorithms[i],
+            gnutls_sign_get_name(sig), sig);
+            
       if (priv->sign_algorithms[i] == sig)
         {
           return 0;             /* ok */

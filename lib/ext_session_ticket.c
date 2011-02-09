@@ -48,7 +48,7 @@
 static int session_ticket_recv_params (gnutls_session_t session,
                                        const opaque * data, size_t data_size);
 static int session_ticket_send_params (gnutls_session_t session,
-                                       opaque * data, size_t data_size);
+                                       gnutls_buffer_st* extdata);
 static int session_ticket_unpack (gnutls_buffer_st * ps,
                                   extension_priv_data_t * _priv);
 static int session_ticket_pack (extension_priv_data_t _priv,
@@ -361,9 +361,8 @@ session_ticket_recv_params (gnutls_session_t session,
  */
 static int
 session_ticket_send_params (gnutls_session_t session,
-                            opaque * data, size_t _data_size)
+                            gnutls_buffer_st * extdata)
 {
-  ssize_t data_size = _data_size;
   session_ticket_ext_st *priv = NULL;
   extension_priv_data_t epriv;
   int ret;
@@ -403,9 +402,9 @@ session_ticket_send_params (gnutls_session_t session,
 
       if (priv->session_ticket_len > 0)
         {
-          DECR_LENGTH_RET (data_size, priv->session_ticket_len,
-                           GNUTLS_E_SHORT_MEMORY_BUFFER);
-          memcpy (data, priv->session_ticket, priv->session_ticket_len);
+          ret = _gnutls_buffer_append_data( extdata, priv->session_ticket, priv->session_ticket_len);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
 
           return priv->session_ticket_len;
         }
