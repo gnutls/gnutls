@@ -5,6 +5,12 @@ See the end for copying conditions.
 
 * Version 2.99.0 (unreleased)
 
+** libgnutls: SRP and PSK are no longer set on the default priorities. 
+They have to be explicitly set.
+
+** libgnutls: During handshake message verification using DSS
+use the hash algorithm required by it.
+
 ** libgnutls: gnutls_recv() return GNUTLS_E_PREMATURE_TERMINATION
 on unexpected EOF, instead of GNUTLS_E_UNEXPECTED_PACKET_LENGTH.
 

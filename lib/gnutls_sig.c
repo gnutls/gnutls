@@ -133,14 +133,6 @@ gnutls_protocol_t ver = gnutls_protocol_get_version (session);
     { /* override */
       *hash_algo = _gnutls_dsa_q_to_hash (cert->params[1]);
 
-      if (!_gnutls_version_has_selectable_sighash (ver) && *hash_algo != GNUTLS_DIG_SHA1)
-        {
-          /* In TLS < 1.2 one cannot use anything but SHA1
-           */
-          gnutls_assert();
-          return GNUTLS_E_INVALID_REQUEST;
-        }
-      
       ret = _gnutls_session_sign_algo_requested(session, _gnutls_x509_pk_to_sign (GNUTLS_PK_DSA, *hash_algo));
       if (ret < 0)
         return gnutls_assert_val(ret);
