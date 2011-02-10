@@ -68,13 +68,6 @@ struct aes_bidi_ctx
   struct aes_ctx decrypt;
 };
 
-struct gcm_full_ctx
-{
-  struct gcm_ctx gcm;
-  void *cipher;
-  nettle_crypt_func *f;
-};
-
 static void
 aes_bidi_setkey (struct aes_bidi_ctx *ctx, unsigned length,
                  const uint8_t * key)
@@ -135,13 +128,10 @@ struct nettle_cipher_ctx
     struct arctwo_ctx arctwo;
     struct des3_ctx des3;
     struct des_ctx des;
-  } ctx;
 #ifdef NETTLE_GCM
-  union
-  {
-    struct gcm_full_ctx gcm;
-  } mode_ctx;
+    struct gcm_aes_ctx aes_gcm;
 #endif
+  } ctx;
   void *ctx_ptr;
   uint8_t iv[MAX_BLOCK_SIZE];
   gnutls_cipher_algorithm_t algo;
@@ -162,9 +152,7 @@ static void _gcm_encrypt(void *_ctx, nettle_crypt_func f,
             unsigned length, uint8_t *dst,
             const uint8_t *src)
 {
-struct gcm_full_ctx *ctx = _ctx;
-
-  return gcm_encrypt(&ctx->gcm, ctx->cipher, ctx->f, length, dst, src);
+  return gcm_aes_encrypt(_ctx, length, dst, src);
 }
 
 static void _gcm_decrypt(void *_ctx, nettle_crypt_func f,  
@@ -172,17 +160,9 @@ static void _gcm_decrypt(void *_ctx, nettle_crypt_func f,
             unsigned length, uint8_t *dst,
             const uint8_t *src)
 {
-struct gcm_full_ctx *ctx = _ctx;
-
-  return gcm_decrypt(&ctx->gcm, ctx->cipher, ctx->f, length, dst, src);
+  return gcm_aes_decrypt(_ctx, length, dst, src);
 }
 
-static void _gcm_tag(void *_ctx, unsigned length, uint8_t *dst)
-{
-struct gcm_full_ctx *ctx = _ctx;
-
-  gcm_digest(&ctx->gcm, ctx->cipher, ctx->f, length, dst);
-}
 #endif
 
 static int
@@ -205,10 +185,10 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
     case GNUTLS_CIPHER_AES_128_GCM:
       ctx->encrypt = _gcm_encrypt;
       ctx->decrypt = _gcm_decrypt;
-      ctx->i_encrypt = (nettle_crypt_func *) aes_bidi_encrypt;
-      ctx->auth = (auth_func)gcm_auth;
-      ctx->tag = _gcm_tag;
-      ctx->ctx_ptr = &ctx->mode_ctx.gcm;
+      ctx->i_encrypt = (nettle_crypt_func*) aes_bidi_encrypt;
+      ctx->auth = (auth_func)gcm_aes_auth;
+      ctx->tag = (tag_func)gcm_aes_digest;
+      ctx->ctx_ptr = &ctx->ctx.aes_gcm;
       ctx->block_size = AES_BLOCK_SIZE;
       break;
 #endif
@@ -284,14 +264,7 @@ wrap_nettle_cipher_setkey (void *_ctx, const void *key, size_t keysize)
     {
 #ifdef NETTLE_GCM
     case GNUTLS_CIPHER_AES_128_GCM:
-      aes_bidi_setkey (&ctx->ctx.aes_bidi, keysize, key);
-
-      ctx->mode_ctx.gcm.cipher = &ctx->ctx.aes_bidi;
-      ctx->mode_ctx.gcm.f = ctx->i_encrypt;
-  
-      gcm_set_key(&ctx->mode_ctx.gcm.gcm, ctx->mode_ctx.gcm.cipher,
-        ctx->mode_ctx.gcm.f);
-
+      gcm_aes_set_key(&ctx->ctx.aes_gcm, keysize, key);
       break;
 #endif
     case GNUTLS_CIPHER_AES_128_CBC:
@@ -364,7 +337,7 @@ struct nettle_cipher_ctx *ctx = _ctx;
           return GNUTLS_E_INVALID_REQUEST;
         }
 
-      gcm_set_iv(&ctx->mode_ctx.gcm.gcm, GCM_DEFAULT_NONCE_SIZE, iv);
+      gcm_aes_set_iv(&ctx->ctx.aes_gcm, GCM_DEFAULT_NONCE_SIZE, iv);
       break;
 #endif
     default:
