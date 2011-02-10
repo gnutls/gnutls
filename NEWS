@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.11.7 (unreleased)
 
+** libgnutls: Corrected issue in DHE-PSK ciphersuites that ignored
+the PSK callback.
+
 ** libgnutls: SRP and PSK are no longer set on the default priorities. 
 They have to be explicitly set.
 
