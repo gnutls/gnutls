@@ -204,10 +204,11 @@ _gnutls_gen_psk_client_kx (gnutls_session_t session, opaque ** data)
   if ((*data) == NULL)
     {
       gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
+      ret = GNUTLS_E_MEMORY_ERROR;
+      goto cleanup;
     }
 
-  _gnutls_write_datum16 (*data, cred->username);
+  _gnutls_write_datum16 (*data, username);
 
 cleanup:
   if (free) 
