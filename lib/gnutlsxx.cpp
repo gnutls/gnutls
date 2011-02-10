@@ -7,14 +7,6 @@
 namespace gnutls
 {
 
-  inline static int RETWRAP_NET (int ret)
-  {
-    if (gnutls_error_is_fatal (ret))
-      throw (exception (ret));
-    else
-      return ret;
-  }
-
   inline static int RETWRAP (int ret)
   {
     if (ret < 0)
@@ -34,12 +26,12 @@ namespace gnutls
 
   int session::bye (gnutls_close_request_t how)
   {
-    return RETWRAP_NET (gnutls_bye (s, how));
+    return RETWRAP (gnutls_bye (s, how));
   }
 
   int session::handshake ()
   {
-    return RETWRAP_NET (gnutls_handshake (s));
+    return RETWRAP (gnutls_handshake (s));
   }
 
   server_session::server_session ():session (GNUTLS_SERVER)
@@ -52,7 +44,7 @@ namespace gnutls
 
   int server_session::rehandshake ()
   {
-    return RETWRAP_NET (gnutls_rehandshake (s));
+    return RETWRAP (gnutls_rehandshake (s));
   }
 
   gnutls_alert_description_t session::get_alert () const
@@ -63,12 +55,12 @@ namespace gnutls
   int session::send_alert (gnutls_alert_level_t level,
 			   gnutls_alert_description_t desc)
   {
-    return RETWRAP_NET (gnutls_alert_send (s, level, desc));
+    return RETWRAP (gnutls_alert_send (s, level, desc));
   }
 
   int session::send_appropriate_alert (int err)
   {
-    return RETWRAP_NET (gnutls_alert_send_appropriate (s, err));
+    return RETWRAP (gnutls_alert_send_appropriate (s, err));
   }
 
   gnutls_cipher_algorithm_t session::get_cipher () const
@@ -113,12 +105,12 @@ namespace gnutls
 
   ssize_t session::send (const void *data, size_t sizeofdata)
   {
-    return RETWRAP_NET (gnutls_record_send (s, data, sizeofdata));
+    return RETWRAP (gnutls_record_send (s, data, sizeofdata));
   }
 
   ssize_t session::recv (void *data, size_t sizeofdata)
   {
-    return RETWRAP_NET (gnutls_record_recv (s, data, sizeofdata));
+    return RETWRAP (gnutls_record_recv (s, data, sizeofdata));
   }
 
   bool session::get_record_direction () const

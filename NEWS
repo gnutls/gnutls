@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version 2.99.0 (unreleased)
 
+** libgnutlsxx: The C++ interface returns exception on
+every error and not only on fatal ones. This allows easier
+handling of errors.
+
+** libgnutls: Corrected issue in DHE-PSK ciphersuites that ignored    
+the PSK callback.
+
 ** libgnutls: SRP and PSK are no longer set on the default priorities. 
 They have to be explicitly set.
 
