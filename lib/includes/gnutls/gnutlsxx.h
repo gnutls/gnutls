@@ -133,13 +133,6 @@ namespace gnutls
                   size_t seed_size, const char *seed,
                   size_t outsize, char *out);
 
-    void set_cipher_priority (const int *list);
-    void set_mac_priority (const int *list);
-    void set_compression_priority (const int *list);
-    void set_kx_priority (const int *list);
-    void set_protocol_priority (const int *list);
-    void set_certificate_type_priority (const int *list);
-
     /* if you just want some defaults, use the following.
      */
     void set_priority (const char *prio, const char **err_pos);
