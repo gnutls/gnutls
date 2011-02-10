@@ -163,32 +163,32 @@ namespace gnutls
 
   void session::set_cipher_priority (const int *list)
   {
-    RETWRAP (gnutls_cipher_set_priority (s, list));
+    RETWRAP (GNUTLS_E_UNIMPLEMENTED_FEATURE);
   }
 
   void session::set_mac_priority (const int *list)
   {
-    RETWRAP (gnutls_mac_set_priority (s, list));
+    RETWRAP (GNUTLS_E_UNIMPLEMENTED_FEATURE);
   }
 
   void session::set_compression_priority (const int *list)
   {
-    RETWRAP (gnutls_compression_set_priority (s, list));
+    RETWRAP (GNUTLS_E_UNIMPLEMENTED_FEATURE);
   }
 
   void session::set_kx_priority (const int *list)
   {
-    RETWRAP (gnutls_kx_set_priority (s, list));
+    RETWRAP (GNUTLS_E_UNIMPLEMENTED_FEATURE);
   }
 
   void session::set_protocol_priority (const int *list)
   {
-    RETWRAP (gnutls_protocol_set_priority (s, list));
+    RETWRAP (GNUTLS_E_UNIMPLEMENTED_FEATURE);
   }
 
   void session::set_certificate_type_priority (const int *list)
   {
-    RETWRAP (gnutls_certificate_type_set_priority (s, list));
+    RETWRAP (GNUTLS_E_UNIMPLEMENTED_FEATURE);
   }
 
 
