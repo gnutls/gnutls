@@ -84,13 +84,6 @@ static gnutls_certificate_credentials_t xcred;
 
 static gaainfo info;
 
-static int protocol_priority[PRI_MAX];
-static int kx_priority[PRI_MAX];
-static int cipher_priority[PRI_MAX];
-static int comp_priority[PRI_MAX];
-static int mac_priority[PRI_MAX];
-static int cert_type_priority[PRI_MAX];
-
 /* end of global stuff */
 
 /* prototypes */
@@ -573,20 +566,7 @@ init_tls_session (const char *hostname)
       gnutls_handshake_set_private_extensions (session, 1);
       gnutls_server_name_set (session, GNUTLS_NAME_DNS, hostname,
                               strlen (hostname));
-      if (cert_type_priority[0])
-        gnutls_certificate_type_set_priority (session, cert_type_priority);
     }
-
-  if (cipher_priority[0])
-    gnutls_cipher_set_priority (session, cipher_priority);
-  if (comp_priority[0])
-    gnutls_compression_set_priority (session, comp_priority);
-  if (kx_priority[0])
-    gnutls_kx_set_priority (session, kx_priority);
-  if (protocol_priority[0])
-    gnutls_protocol_set_priority (session, protocol_priority);
-  if (mac_priority[0])
-    gnutls_mac_set_priority (session, mac_priority);
 
   gnutls_dh_set_prime_bits (session, 512);
 
