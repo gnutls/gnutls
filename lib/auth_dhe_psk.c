@@ -65,52 +65,53 @@ const mod_auth_st dhe_psk_auth_struct = {
 static int
 gen_psk_client_kx (gnutls_session_t session, opaque ** data)
 {
-  int ret;
+  int ret, free;
   opaque *tmp_data = NULL;
   int data_size, tmp_data_size;
   gnutls_psk_client_credentials_t cred;
+  gnutls_datum_t username, key;
 
   cred = (gnutls_psk_client_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_PSK, NULL);
 
   if (cred == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-    }
+    return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
-  if (cred->username.data == NULL || cred->key.data == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-    }
+
+  ret = _gnutls_find_psk_key( session, cred, &username, &key, &free);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   /* The PSK key is set in there */
-  ret = _gnutls_gen_dh_common_client_kx (session, &tmp_data);
+  ret = _gnutls_gen_dh_common_client_kx_int (session, &tmp_data, &key);
   if (ret < 0)
     {
       gnutls_assert ();
-      return ret;
+      goto cleanup;
     }
 
   tmp_data_size = ret;
-  data_size = tmp_data_size + cred->username.size + 2;
+  data_size = tmp_data_size + username.size + 2;
 
   (*data) = gnutls_malloc (data_size);
   if ((*data) == NULL)
     {
       gnutls_assert ();
       ret = GNUTLS_E_MEMORY_ERROR;
-      goto error;
+      goto cleanup;
     }
 
-  _gnutls_write_datum16 (*data, cred->username);
-  memcpy (&(*data)[cred->username.size + 2], tmp_data, tmp_data_size);
+  _gnutls_write_datum16 (*data, username);
+  memcpy (&(*data)[username.size + 2], tmp_data, tmp_data_size);
 
   ret = data_size;
 
-error:
+cleanup:
   gnutls_free (tmp_data);
+  if (free)
+    _gnutls_free_datum(&username);
+    _gnutls_free_datum(&key);
+
   return ret;
 
 }

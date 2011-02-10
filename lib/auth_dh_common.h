@@ -36,6 +36,7 @@ typedef struct
 } dh_info_st;
 
 void _gnutls_free_dh_info (dh_info_st * dh);
+int _gnutls_gen_dh_common_client_kx_int (gnutls_session_t, opaque **, gnutls_datum_t* pskkey);
 int _gnutls_gen_dh_common_client_kx (gnutls_session_t, opaque **);
 int _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
                                       opaque * data, size_t _data_size,

@@ -105,7 +105,7 @@ _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
           return ret;
         }
 
-      ret = _gnutls_set_psk_session_key (session, &tmp_dh_key);
+      ret = _gnutls_set_psk_session_key (session, NULL, &tmp_dh_key);
       _gnutls_free_datum (&tmp_dh_key);
 
     }
@@ -120,8 +120,13 @@ _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
   return 0;
 }
 
+int _gnutls_gen_dh_common_client_kx (gnutls_session_t session, opaque** data)
+{
+  return _gnutls_gen_dh_common_client_kx_int(session, data, NULL);
+}
+
 int
-_gnutls_gen_dh_common_client_kx (gnutls_session_t session, opaque ** data)
+_gnutls_gen_dh_common_client_kx_int (gnutls_session_t session, opaque ** data, gnutls_datum_t* pskkey)
 {
   bigint_t x = NULL, X = NULL;
   size_t n_X;
@@ -179,6 +184,7 @@ _gnutls_gen_dh_common_client_kx (gnutls_session_t session, opaque ** data)
   else                          /* In DHE_PSK the key is set differently */
     {
       gnutls_datum_t tmp_dh_key;
+
       ret = _gnutls_mpi_dprint (session->key->KEY, &tmp_dh_key);
       if (ret < 0)
         {
@@ -186,9 +192,8 @@ _gnutls_gen_dh_common_client_kx (gnutls_session_t session, opaque ** data)
           goto error;
         }
 
-      ret = _gnutls_set_psk_session_key (session, &tmp_dh_key);
+      ret = _gnutls_set_psk_session_key (session, pskkey, &tmp_dh_key);
       _gnutls_free_datum (&tmp_dh_key);
-
     }
 
   _gnutls_mpi_release (&session->key->KEY);

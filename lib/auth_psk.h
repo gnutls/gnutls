@@ -68,7 +68,11 @@ typedef struct psk_auth_info_st
 typedef struct psk_auth_info_st psk_auth_info_st;
 
 int
-_gnutls_set_psk_session_key (gnutls_session_t session, gnutls_datum_t * psk2);
+_gnutls_set_psk_session_key (gnutls_session_t session, gnutls_datum_t* key, gnutls_datum_t * psk2);
+
+int _gnutls_find_psk_key( gnutls_session_t session, gnutls_psk_client_credentials_t cred, 
+  gnutls_datum_t * username, gnutls_datum* key, int* free);
+
 #else
 #define _gnutls_set_psk_session_key(x,y) GNUTLS_E_INTERNAL_ERROR
 #endif /* ENABLE_PSK */
