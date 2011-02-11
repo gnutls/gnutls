@@ -709,7 +709,7 @@ _gnutls_ext_get_session_data (gnutls_session_t session,
           return 0;
         }
     }
-  return GNUTLS_E_INVALID_REQUEST;
+  return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 }
 
 int
