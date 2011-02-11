@@ -236,8 +236,6 @@ _gnutls_handshake_internal_state_init (gnutls_session_t session)
   session->internals.v2_hello = 0;
   memset (&session->internals.handshake_header_buffer, 0,
           sizeof (handshake_header_buffer_st));
-  session->internals.adv_version_minor = 0;
-  session->internals.adv_version_minor = 0;
   session->internals.direction = 0;
 
   /* use out of band data for the last
