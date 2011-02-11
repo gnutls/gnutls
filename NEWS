@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.99.0 (unreleased)
 
+** libgnutls: Corrected signature generation and verification
+in the Certificate Verify message when in TLS 1.2. Reported
+by Todd A. Ouska.
+
 ** libgnutlsxx: The C++ interface returns exception on
 every error and not only on fatal ones. This allows easier
 handling of errors.
