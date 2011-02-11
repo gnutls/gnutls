@@ -198,7 +198,12 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
 	  dconcat.data = concat;
 	  dconcat.size = sizeof concat;
 
-	  _gnutls_rsa_encode_sig (hash_algo, &hash, &dconcat);
+	  ret = _gnutls_rsa_encode_sig (hash_algo, &hash, &dconcat);
+	  if (ret < 0)
+	    {
+	      gnutls_assert();
+	      return ret;
+            }
 	}
       break;
     case GNUTLS_PK_DSA:
@@ -453,7 +458,12 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_cert * cert,
       dconcat.data = concat;
       dconcat.size = sizeof concat;
 
-      _gnutls_rsa_encode_sig (hash_algo, &hash, &dconcat);
+      ret = _gnutls_rsa_encode_sig (hash_algo, &hash, &dconcat);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          return ret;
+        }
     }
 
   ret = _gnutls_verify_sig (cert, &dconcat, signature,
@@ -485,6 +495,7 @@ _gnutls_handshake_verify_cert_vrfy12 (gnutls_session_t session,
   opaque concat[MAX_SIG_SIZE];
   digest_hd_st td;
   gnutls_datum_t dconcat;
+  gnutls_datum_t hash;
   gnutls_sign_algorithm_t _sign_algo;
   gnutls_digest_algorithm_t hash_algo;
   digest_hd_st *handshake_td;
@@ -516,8 +527,18 @@ _gnutls_handshake_verify_cert_vrfy12 (gnutls_session_t session,
 
   _gnutls_hash_deinit (&td, concat);
 
+  hash.data = concat;
+  hash.size = _gnutls_hash_get_algo_len (hash_algo);
+
   dconcat.data = concat;
-  dconcat.size = _gnutls_hash_get_algo_len (hash_algo);
+  dconcat.size = sizeof concat;
+
+  ret = _gnutls_rsa_encode_sig (hash_algo, &hash, &dconcat);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
 
   ret =
     _gnutls_verify_sig (cert, &dconcat, signature, 0,
@@ -627,7 +648,7 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
 				    gnutls_cert * cert, gnutls_privkey * pkey,
 				    gnutls_datum_t * signature)
 {
-  gnutls_datum_t dconcat;
+  gnutls_datum_t dconcat, hash;
   int ret;
   opaque concat[MAX_SIG_SIZE];
   digest_hd_st td;
@@ -682,8 +703,18 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
 
   _gnutls_hash_deinit (&td, concat);
 
+  hash.data = concat;
+  hash.size = _gnutls_hash_get_algo_len (hash_algo);
+
   dconcat.data = concat;
-  dconcat.size = _gnutls_hash_get_algo_len (hash_algo);
+  dconcat.size = sizeof concat;
+
+  ret = _gnutls_rsa_encode_sig (hash_algo, &hash, &dconcat);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
 
   ret = _gnutls_tls_sign (session, cert, pkey, &dconcat, signature);
   if (ret < 0)
