@@ -98,8 +98,10 @@ gen_psk_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
 
 cleanup:
   if (free)
-    _gnutls_free_datum(&username);
-    _gnutls_free_datum(&key);
+    {
+      _gnutls_free_datum(&username);
+      _gnutls_free_datum(&key);
+    }
 
   return ret;
 
