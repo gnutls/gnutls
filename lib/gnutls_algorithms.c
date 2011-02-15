@@ -524,6 +524,11 @@ typedef struct
 
 #define CIPHER_SUITES_COUNT sizeof(cs_algorithms)/sizeof(gnutls_cipher_suite_entry)-1
 
+/* FIXME: what we don't handle here is TLS 1.2 requirement
+ * that each ciphersuite has it's own PRF algorithm. Now we
+ * assume that each one uses the SHA-256 PRF in TLS 1.2.
+ */
+
 static const gnutls_cipher_suite_entry cs_algorithms[] = {
   /* ANON_DH */
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ANON_DH_ARCFOUR_MD5,
