@@ -504,9 +504,21 @@ typedef struct
 
 /* GCM: RFC5288 */
 #define GNUTLS_RSA_AES_128_GCM_SHA256 { 0x00, 0x9C }
-#define GNUTLS_DHE_RSA_WITH_AES_128_GCM_SHA256 {0x00,0x9E}
-#define GNUTLS_DHE_DSS_WITH_AES_128_GCM_SHA256 {0x00,0xA2}
-#define GNUTLS_DH_ANON_WITH_AES_128_GCM_SHA256 {0x00,0xA6}
+#define GNUTLS_DHE_RSA_AES_128_GCM_SHA256 {0x00,0x9E}
+#define GNUTLS_DHE_DSS_AES_128_GCM_SHA256 {0x00,0xA2}
+#define GNUTLS_DH_ANON_AES_128_GCM_SHA256 {0x00,0xA6}
+
+/* RFC 5487 */
+/* GCM-PSK */
+#define GNUTLS_PSK_AES_128_GCM_SHA256 { 0x00, 0xA8 }
+#define GNUTLS_DHE_PSK_AES_128_GCM_SHA256 { 0x00, 0xAA }
+
+/* PSK - SHA256 HMAC */
+#define GNUTLS_PSK_AES_128_CBC_SHA256 { 0x00, 0xAE }
+#define GNUTLS_DHE_PSK_AES_128_CBC_SHA256 { 0x00, 0xB2 }
+
+#define GNUTLS_PSK_NULL_SHA256 { 0x00, 0xB0 }
+#define GNUTLS_DHE_PSK_NULL_SHA256 { 0x00, 0xB4 }
 
 /* Safe renegotiation */
 
@@ -570,6 +582,18 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_PSK,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_PSK_AES_128_CBC_SHA256,
+                             GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_PSK,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1,
+                             GNUTLS_VERSION_MAX),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_PSK_AES_128_GCM_SHA256,
+                             GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_PSK,
+                             GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
+                             GNUTLS_VERSION_MAX),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_PSK_NULL_SHA256,
+                             GNUTLS_CIPHER_NULL, GNUTLS_KX_PSK,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1,
+                             GNUTLS_VERSION_MAX),
 
   /* DHE-PSK */
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_PSK_SHA_ARCFOUR_SHA1,
@@ -587,6 +611,18 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_PSK_SHA_AES_256_CBC_SHA1,
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_DHE_PSK,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
+                             GNUTLS_VERSION_MAX),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_PSK_AES_128_CBC_SHA256,
+                             GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_DHE_PSK,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1,
+                             GNUTLS_VERSION_MAX),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_PSK_AES_128_GCM_SHA256,
+                             GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_DHE_PSK,
+                             GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
+                             GNUTLS_VERSION_MAX),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_PSK_NULL_SHA256,
+                             GNUTLS_CIPHER_NULL, GNUTLS_KX_DHE_PSK,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX),
 
   /* SRP */
@@ -767,15 +803,15 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_RSA,
                              GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
                              GNUTLS_VERSION_MAX),
-  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_RSA_WITH_AES_128_GCM_SHA256,
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_RSA_AES_128_GCM_SHA256,
                              GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_DHE_RSA,
                              GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
                              GNUTLS_VERSION_MAX),
-  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_DSS_WITH_AES_128_GCM_SHA256,
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_DSS_AES_128_GCM_SHA256,
                              GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_DHE_DSS,
                              GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
                              GNUTLS_VERSION_MAX),
-  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DH_ANON_WITH_AES_128_GCM_SHA256,
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DH_ANON_AES_128_GCM_SHA256,
                              GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_ANON_DH,
                              GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
                              GNUTLS_VERSION_MAX),
