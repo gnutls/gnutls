@@ -68,7 +68,9 @@ gnutls_cipher_set_priority (gnutls_session_t session, const int *list)
   return 0;
 }
 
-inline static int
+typedef void (bulk_rmadd_func) (priority_st * priority_list, const int *);
+
+inline static void
 _set_priority (priority_st * st, const int *list)
 {
   int num = 0, i;
@@ -84,8 +86,13 @@ _set_priority (priority_st * st, const int *list)
       st->priority[i] = list[i];
     }
 
-  return 0;
+  return;
+}
 
+static void
+_clear_priorities (priority_st * st, const int *list)
+{
+  memset(st, 0, sizeof(*st));  
 }
 
 /**
@@ -105,7 +112,8 @@ _set_priority (priority_st * st, const int *list)
 int
 gnutls_kx_set_priority (gnutls_session_t session, const int *list)
 {
-  return _set_priority (&session->internals.priorities.kx, list);
+  _set_priority (&session->internals.priorities.kx, list);
+  return 0;
 }
 
 /**
@@ -125,7 +133,8 @@ gnutls_kx_set_priority (gnutls_session_t session, const int *list)
 int
 gnutls_mac_set_priority (gnutls_session_t session, const int *list)
 {
-  return _set_priority (&session->internals.priorities.mac, list);
+  _set_priority (&session->internals.priorities.mac, list);
+  return 0;
 }
 
 /**
@@ -149,7 +158,8 @@ gnutls_mac_set_priority (gnutls_session_t session, const int *list)
 int
 gnutls_compression_set_priority (gnutls_session_t session, const int *list)
 {
-  return _set_priority (&session->internals.priorities.compression, list);
+  _set_priority (&session->internals.priorities.compression, list);
+  return 0;
 }
 
 /**
@@ -166,9 +176,7 @@ gnutls_compression_set_priority (gnutls_session_t session, const int *list)
 int
 gnutls_protocol_set_priority (gnutls_session_t session, const int *list)
 {
-  int ret;
-
-  ret = _set_priority (&session->internals.priorities.protocol, list);
+  _set_priority (&session->internals.priorities.protocol, list);
 
   /* set the current version to the first in the chain.
    * This will be overridden later.
@@ -176,7 +184,7 @@ gnutls_protocol_set_priority (gnutls_session_t session, const int *list)
   if (list)
     _gnutls_set_current_version (session, list[0]);
 
-  return ret;
+  return 0;
 }
 
 /**
@@ -198,8 +206,8 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
                                       const int *list)
 {
 #ifdef ENABLE_OPENPGP
-  return _set_priority (&session->internals.priorities.cert_type, list);
-
+  _set_priority (&session->internals.priorities.cert_type, list);
+  return 0;
 #else
 
   return GNUTLS_E_UNIMPLEMENTED_FEATURE;
@@ -525,6 +533,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
   char *darg = NULL;
   int algo;
   rmadd_func *fn;
+  bulk_rmadd_func *bulk_fn;
 
   *priority_cache = gnutls_calloc (1, sizeof (struct gnutls_priority_st));
   if (*priority_cache == NULL)
@@ -615,9 +624,15 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
                || broken_list[i][0] == '-')
         {
           if (broken_list[i][0] == '+')
-            fn = prio_add;
+            {
+              fn = prio_add;
+              bulk_fn = _set_priority;
+            }
           else
-            fn = prio_remove;
+            {
+              fn = prio_remove;
+              bulk_fn = _clear_priorities;
+            }
 
           if ((algo =
                gnutls_mac_get_id (&broken_list[i][1])) != GNUTLS_MAC_UNKNOWN)
@@ -632,7 +647,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
             {
               if (strncasecmp (&broken_list[i][1], "VERS-TLS-ALL", 12) == 0)
                 {
-                  _set_priority (&(*priority_cache)->protocol,
+                  bulk_fn (&(*priority_cache)->protocol,
                                  protocol_priority);
                 }
               else
@@ -643,13 +658,14 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
                     fn (&(*priority_cache)->protocol, algo);
                   else
                     goto error;
+
                 }
             }                   /* now check if the element is something like -ALGO */
           else if (strncasecmp (&broken_list[i][1], "COMP-", 5) == 0)
             {
               if (strncasecmp (&broken_list[i][1], "COMP-ALL", 8) == 0)
                 {
-                  _set_priority (&(*priority_cache)->compression,
+                  bulk_fn (&(*priority_cache)->compression,
                                  comp_priority);
                 }
               else
@@ -666,7 +682,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
             {
               if (strncasecmp (&broken_list[i][1], "CTYPE-ALL", 9) == 0)
                 {
-                  _set_priority (&(*priority_cache)->cert_type,
+                  bulk_fn (&(*priority_cache)->cert_type,
                                  cert_type_priority);
                 }
               else
@@ -683,7 +699,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
             {
               if (strncasecmp (&broken_list[i][1], "SIGN-ALL", 8) == 0)
                 {
-                  _set_priority (&(*priority_cache)->sign_algo,
+                  bulk_fn (&(*priority_cache)->sign_algo,
                                  sign_priority_default);
                 }
               else
@@ -698,12 +714,12 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
             }
           else if (strncasecmp (&broken_list[i][1], "MAC-ALL", 7) == 0)
             {
-                  _set_priority (&(*priority_cache)->mac,
+                  bulk_fn (&(*priority_cache)->mac,
                                 mac_priority_secure);
             }
           else if (strncasecmp (&broken_list[i][1], "CIPHER-ALL", 7) == 0)
             {
-                  _set_priority (&(*priority_cache)->cipher,
+                  bulk_fn (&(*priority_cache)->cipher,
                                 cipher_priority_normal);
             }
           else
