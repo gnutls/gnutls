@@ -522,8 +522,6 @@ typedef struct
 
 /* Safe renegotiation */
 
-#define GNUTLS_RENEGO_PROTECTION_REQUEST { GNUTLS_RENEGO_PROTECTION_REQUEST_MAJOR, GNUTLS_RENEGO_PROTECTION_REQUEST_MINOR }
-
 #define CIPHER_SUITES_COUNT sizeof(cs_algorithms)/sizeof(gnutls_cipher_suite_entry)-1
 
 static const gnutls_cipher_suite_entry cs_algorithms[] = {
@@ -814,11 +812,6 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DH_ANON_AES_128_GCM_SHA256,
                              GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_ANON_DH,
                              GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
-                             GNUTLS_VERSION_MAX),
-/* Renegotiation hack */
-  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_RENEGO_PROTECTION_REQUEST,
-                             GNUTLS_CIPHER_UNKNOWN, GNUTLS_KX_UNKNOWN,
-                             GNUTLS_MAC_UNKNOWN, GNUTLS_SSL3,
                              GNUTLS_VERSION_MAX),
 
   {0, {{0, 0}}, 0, 0, 0, 0, 0}
