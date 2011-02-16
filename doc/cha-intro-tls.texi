@@ -316,10 +316,38 @@ To set whether client certificate is required or not.
 To initiate the handshake.
 @end table
 
+@subsection TLS Cipher Suites
+
+The Handshake Protocol of @acronym{TLS} negotiates cipher suites of
+the form @code{TLS_DHE_RSA_WITH_3DES_CBC_SHA}.  The usual cipher
+suites contain these parameters:
+
+@itemize
+
+@item The key exchange algorithm.
+@code{DHE_RSA} in the example.
+
+@item The Symmetric encryption algorithm and mode
+@code{3DES_CBC} in this example.
+
+@item The MAC@footnote{MAC stands for Message Authentication Code. It can be described as a keyed hash algorithm. See RFC2104.} algorithm used for authentication.
+@code{MAC_SHA} is used in the above example.
+
+@end itemize
+
+The cipher suite negotiated in the handshake protocol will affect the
+Record Protocol, by enabling encryption and data authentication.  Note
+that you should not over rely on @acronym{TLS} to negotiate the
+strongest available cipher suite. Do not enable ciphers and algorithms
+that you consider weak.
+
+All the supported ciphersuites are shown in @ref{ciphersuites}.
+
 @subsection Priority strings
-The previously shown priority functions accept a string
+In order to specify cipher suite preferences, the
+previously shown priority functions accept a string
 that specifies the algorithms to be enabled in a TLS handshake.
-This string may contain some high level keyword such as:
+That string may contain some high level keyword such as:
 
 @table @asis
 @item PERFORMANCE:
@@ -462,38 +490,6 @@ will allow RSA-MD5 signatures in certificate chains.
 will allow V1 CAs in chains.
 
 @end table
-
-@subsection TLS Cipher Suites
-
-The Handshake Protocol of @acronym{TLS} negotiates cipher suites of
-the form @code{TLS_DHE_RSA_WITH_3DES_CBC_SHA}.  The usual cipher
-suites contain these parameters:
-
-@itemize
-
-@item The key exchange algorithm.
-@code{DHE_RSA} in the example.
-
-@item The Symmetric encryption algorithm and mode
-@code{3DES_CBC} in this example.
-
-@item The MAC@footnote{MAC stands for Message Authentication Code. It can be described as a keyed hash algorithm. See RFC2104.} algorithm used for authentication.
-@code{MAC_SHA} is used in the above example.
-
-@end itemize
-
-The cipher suite negotiated in the handshake protocol will affect the
-Record Protocol, by enabling encryption and data authentication.  Note
-that you should not over rely on @acronym{TLS} to negotiate the
-strongest available cipher suite. Do not enable ciphers and algorithms
-that you consider weak.
-
-The priority functions, dicussed above, allow the application layer to
-enable and set priorities on the individual ciphers. It may imply that
-all combinations of ciphersuites are allowed, but this is not
-true. For several reasons, not discussed here, some combinations were
-not defined in the @acronym{TLS} protocol.  The supported ciphersuites
-are shown in @ref{ciphersuites}.
 
 @subsection Client Authentication
 @cindex Client Certificate authentication
