@@ -2278,7 +2278,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
           goto fail;
         }
 
-      bufel = _gnutls_handshake_alloc (session, datalen + extdatalen, datalen + extdatalen);
+      bufel = _gnutls_handshake_alloc (session, datalen + extdata.length, datalen + extdata.length);
       if (bufel == NULL)
         {
           gnutls_assert ();
