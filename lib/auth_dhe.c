@@ -253,6 +253,7 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
       sign_algo = _gnutls_tls_aid_to_sign (&aid);
       if (sign_algo == GNUTLS_SIGN_UNKNOWN)
         {
+          _gnutls_x509_log("unknown signature %d.%d\n", aid.sign_algorithm, aid.hash_algorithm);
           gnutls_assert ();
           return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
         }

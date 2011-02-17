@@ -52,7 +52,7 @@ static int _gnutls_ciphertext2compressed (gnutls_session_t session,
                                    opaque * compress_data,
                                    int compress_size,
                                    gnutls_datum_t ciphertext, uint8_t type,
-                                   record_parameters_st * params);
+                                   record_parameters_st * params, uint64* sequence);
 
 inline static int
 is_write_comp_null (record_parameters_st * record_params)

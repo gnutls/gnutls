@@ -1413,6 +1413,7 @@ _gnutls_version_has_selectable_sighash (gnutls_protocol_t version)
 {
   switch (version)
     {
+    case GNUTLS_DTLS1_0:
     case GNUTLS_TLS1_1:
     case GNUTLS_TLS1_0:
     case GNUTLS_SSL3:
