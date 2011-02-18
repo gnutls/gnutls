@@ -452,7 +452,7 @@ _gnutls_recv_server_kx_message (gnutls_session_t session)
   uint8_t *data = NULL;
   int datasize;
   int ret = 0;
-  Optional optflag = MANDATORY_PACKET;
+  optional_t optflag = MANDATORY_PACKET;
 
   if (session->internals.auth_struct->gnutls_process_server_kx != NULL)
     {

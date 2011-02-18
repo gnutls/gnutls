@@ -1488,7 +1488,7 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
 int
 _gnutls_recv_handshake (gnutls_session_t session, uint8_t ** data,
                         int *datalen, gnutls_handshake_description_t type,
-                        Optional optional)
+                        optional_t optional)
 {
   int ret;
   uint32_t length32 = 0;
@@ -1541,8 +1541,9 @@ _gnutls_recv_handshake (gnutls_session_t session, uint8_t ** data,
       if (ret <= 0)
         {
           gnutls_assert ();
-          gnutls_free (dataptr);
-          return (ret == 0) ? GNUTLS_E_UNEXPECTED_PACKET_LENGTH : ret;
+          if (ret == 0) 
+            ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+          goto cleanup;
         }
     }
 
@@ -1557,12 +1558,6 @@ _gnutls_recv_handshake (gnutls_session_t session, uint8_t ** data,
                                           session->
                                           internals.handshake_header_buffer.
                                           header_size, dataptr, length32);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      _gnutls_handshake_header_buffer_clear (session);
-      return ret;
-    }
 
   /* If we fail before this then we will reuse the handshake header
    * have have received above. if we get here the we clear the handshake
@@ -1570,47 +1565,57 @@ _gnutls_recv_handshake (gnutls_session_t session, uint8_t ** data,
    */
   _gnutls_handshake_header_buffer_clear (session);
 
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
   switch (recv_type)
     {
     case GNUTLS_HANDSHAKE_CLIENT_HELLO:
     case GNUTLS_HANDSHAKE_SERVER_HELLO:
       ret = _gnutls_recv_hello (session, dataptr, length32);
-
-      /* dataptr is freed because the caller does not
-       * need it */
-      gnutls_free (dataptr);
-      if (data != NULL)
-        *data = NULL;
-
       if (ret < 0)
-        break;
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
 
       /* initialize the hashes for both - (client will know server's version
        * and server as well at this point) */
       if ((ret = _gnutls_handshake_hash_init (session)) < 0)
         {
           gnutls_assert ();
-          return ret;
+          goto cleanup;
         }
+
+      goto cleanup; /* caller doesn't need dataptr */
 
       break;
     case GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST:
       ret = _gnutls_recv_hello_verify_request (session, dataptr, length32);
-      gnutls_free (dataptr);
-
       if (ret < 0)
-	break;
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
       else
 	/* Signal our caller we have received a verification cookie
 	   and ClientHello needs to be sent again. */
 	ret = 1;
+	
+      goto cleanup; /* caller doesn't need dataptr */
 
       break;
     case GNUTLS_HANDSHAKE_SERVER_HELLO_DONE:
       if (length32 == 0)
         ret = 0;
       else
-        ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+        {
+          ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+          goto cleanup;
+        }
       break;
     case GNUTLS_HANDSHAKE_CERTIFICATE_PKT:
     case GNUTLS_HANDSHAKE_FINISHED:
@@ -1624,12 +1629,16 @@ _gnutls_recv_handshake (gnutls_session_t session, uint8_t ** data,
       break;
     default:
       gnutls_assert ();
-      gnutls_free (dataptr);
-      if (data != NULL)
-        *data = NULL;
       ret = GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
+      goto cleanup;
     }
 
+  return ret;
+
+cleanup:
+  gnutls_free (dataptr);
+  if (data != NULL)
+    *data = NULL;
   return ret;
 }
 
