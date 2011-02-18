@@ -1523,10 +1523,9 @@ _gnutls_cipher_suite_is_version_supported (gnutls_session_t session, const ciphe
   int ret = 0;
   int version = gnutls_protocol_get_version( session);
   
-  GNUTLS_CIPHER_SUITE_ALG_LOOP ((version >= p->min_version
-                                 && version <= p->max_version
-                                 && (IS_DTLS && p->dtls)) ? 
-                                 (ret = 1) : (ret = 0));
+  GNUTLS_CIPHER_SUITE_ALG_LOOP (if (version >= p->min_version
+                                 && version <= p->max_version) ret = 1;
+                                 if (IS_DTLS && p->dtls==0) ret = 0;);
   return ret;
 }
 
