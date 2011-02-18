@@ -27,7 +27,7 @@
 
 #include "types.h"
 
-#define _cdk_log_debug _gnutls_debug_log
+#define _cdk_log_debug _gnutls_hard_log
 #define _cdk_log_info _gnutls_x509_log
 #define _cdk_get_log_level() _gnutls_log_level
 
