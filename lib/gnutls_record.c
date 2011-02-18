@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
- * 2009, 2010 Free Software Foundation, Inc.
+ * 2009, 2010, 2011 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -327,7 +327,7 @@ sequence_increment (gnutls_session_t session,
 {
   if (_gnutls_is_dtls(session))
     {
-      return _gnutls_uint48pp((uint48*)&value->i[2]);
+      return _gnutls_uint48pp(value);
     }
   else
     {
@@ -422,7 +422,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
    */
   copy_record_version (session, htype, &headers[1]);
 
-  header_size = RECORD_HEADER_SIZE;
+  header_size = RECORD_HEADER_SIZE(session);
   /* Adjust header length and add sequence for DTLS */
     sequence_write(&record_state->sequence_number, &headers[3]);
 
@@ -465,9 +465,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
       cipher_size =
         _gnutls_encrypt (session, headers, header_size, data,
                          data2send_size, _mbuffer_get_udata_ptr (bufel),
-                         cipher_size, type,
-                         (session->internals.priorities.no_padding ==
-                          0) ? 1 : 0, record_params);
+                         cipher_size, type, record_params);
       if (cipher_size <= 0)
         {
           gnutls_assert ();
@@ -526,25 +524,6 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
                       _gnutls_packet2str (type), type, (int) cipher_size);
 
   return retval;
-}
-
-/* This function is to be called if the handshake was successfully 
- * completed. This sends a Change Cipher Spec packet to the peer.
- */
-ssize_t
-_gnutls_send_change_cipher_spec (gnutls_session_t session, int again)
-{
-  static const opaque data[1] = { GNUTLS_TYPE_CHANGE_CIPHER_SPEC };
-
-  _gnutls_handshake_log ("REC[%p]: Sent ChangeCipherSpec\n", session);
-
-  if (again == 0)
-    return _gnutls_send_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1,
-                             EPOCH_WRITE_CURRENT, data, 1, MBUFFER_FLUSH);
-  else
-    {
-      return _gnutls_io_write_flush (session);
-    }
 }
 
 inline static int
@@ -685,7 +664,7 @@ record_check_version (gnutls_session_t session,
     {
       /* Reject hello packets with major version higher than 3.
        */
-      if (version[0] > 3)
+      if (!(IS_DTLS(session)) && version[0] > 3)
         {
           gnutls_assert ();
           _gnutls_record_log
@@ -968,7 +947,7 @@ begin:
 
 /* default headers for TLS 1.0
  */
-  header_size = RECORD_HEADER_SIZE;
+  header_size = RECORD_HEADER_SIZE(session);
 
   if ((ret =
        _gnutls_io_read_buffered (session, header_size, -1)) != header_size)
@@ -1047,7 +1026,7 @@ begin:
                       _gnutls_uint64touint32 (&record_state->sequence_number),
                       _gnutls_packet2str (recv_type), recv_type, length);
 
-  if (length > MAX_RECV_SIZE)
+  if (length > MAX_RECV_SIZE(session))
     {
       _gnutls_record_log
         ("REC[%p]: FATAL ERROR: Received packet with length: %d\n",
@@ -1094,8 +1073,10 @@ begin:
       return ret;
     }
 
-  decrypt_sequence =
-    _gnutls_is_dtls(session) ? &dtls_sequence : &record_state->sequence_number;
+  if (IS_DTLS(session))
+    decrypt_sequence = &dtls_sequence;
+  else
+    decrypt_sequence = &record_state->sequence_number;
 
 /* decrypt the data we got. 
  */

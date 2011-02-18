@@ -111,6 +111,9 @@ _gnutls_handshake2str (gnutls_handshake_description_t handshake)
     case GNUTLS_HANDSHAKE_NEW_SESSION_TICKET:
       return "NEW SESSION TICKET";
       break;
+    case GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC:
+      return "CHANGE CIPHER SPEC";
+      break;
     default:
       return "Unknown Handshake packet";
 

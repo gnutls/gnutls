@@ -105,6 +105,22 @@ system_read_peek (gnutls_transport_ptr ptr, void *data, size_t data_size)
   return recv (GNUTLS_POINTER_TO_INT (ptr), data, data_size, MSG_PEEK);
 }
 
+/* Wait for data to be received within a timeout period in milliseconds
+ */
+int system_recv_timeout(gnutls_transport_ptr ptr, size_t ms)
+{
+fd_set rfds;
+struct timeval tv;
+
+  FD_ZERO(&rfds);
+  FD_SET(GNUTLS_POINTER_TO_INT(ptr), &rfds);
+  
+  tv.tv_sec = 0;
+  tv.tv_usec = ms * 1000;
+  
+  return select(GNUTLS_POINTER_TO_INT(ptr)+1, &rfds, NULL, NULL, &tv);
+}
+
 /* Thread stuff */
 
 #ifdef HAVE_WIN32_LOCKS

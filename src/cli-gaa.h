@@ -55,7 +55,7 @@ struct _gaainfo
 #line 32 "cli.gaa"
 	int crlf;
 #line 29 "cli.gaa"
-	int dtls;
+	int udp;
 #line 26 "cli.gaa"
 	int starttls;
 #line 23 "cli.gaa"

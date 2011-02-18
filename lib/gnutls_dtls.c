@@ -31,6 +31,8 @@
 #include "gnutls_dtls.h"
 #include "gnutls_record.h"
 #include <gnutls_mbuffers.h>
+#include <gnutls_buffers.h>
+#include <gnutls_constate.h>
 
 /* This function is called once a handshake message is ready to be
  * queued in the next outgoing flight. The actual transmission occurs
@@ -45,6 +47,12 @@ _gnutls_dtls_handshake_enqueue (gnutls_session_t session,
 				uint16_t sequence)
 {
   dtls_hsk_retransmit_buffer *msg;
+  record_parameters_st * params;
+  int ret;
+
+  ret = _gnutls_epoch_get( session, EPOCH_WRITE_CURRENT, &params);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   msg = gnutls_malloc (sizeof(dtls_hsk_retransmit_buffer));
   if (msg == NULL)
@@ -56,8 +64,8 @@ _gnutls_dtls_handshake_enqueue (gnutls_session_t session,
   msg->bufel = bufel;
 
   msg->next = NULL;
-  /* FIXME: dummy epoch */
-  msg->epoch = 0;
+
+  msg->epoch = params->epoch;
   msg->type = type;
   msg->sequence = sequence;
 
@@ -81,6 +89,14 @@ transmit_message (gnutls_session_t session,
   int ret = 0;
   unsigned int offset, frag_len, data_size;
   const uint mtu = session->internals.dtls.hsk_mtu;
+
+  if (msg->type == GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC)
+    {
+      return _gnutls_send_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1,
+        msg->epoch, 
+        _mbuffer_get_uhead_ptr(msg->bufel), 
+        _mbuffer_get_uhead_size(msg->bufel), 0);
+    }
 
   mtu_data = gnutls_malloc(mtu + DTLS_HANDSHAKE_HEADER_SIZE);
   if (mtu_data == NULL)
@@ -106,9 +122,9 @@ transmit_message (gnutls_session_t session,
     {
       /* Calculate fragment length */
       if(offset + mtu > data_size)
-	frag_len = data_size - offset;
+        frag_len = data_size - offset;
       else
-	frag_len = mtu;
+        frag_len = mtu;
 
       /* Fragment offset */
       _gnutls_write_uint24 (offset, &mtu_data[6]);
@@ -126,10 +142,11 @@ transmit_message (gnutls_session_t session,
 			msg->type, data_size, offset, frag_len);
 
       /* FIXME: We should collaborate with the record layer to pack as
-	 many records possible into a single datagram. We should also
-	 tell the record layer which epoch to use for encryption. */
-      ret = _gnutls_send_int (session, GNUTLS_HANDSHAKE, msg->type, EPOCH_WRITE_CURRENT,
-			mtu_data, DTLS_HANDSHAKE_HEADER_SIZE + frag_len, 0);
+       * many records possible into a single datagram. We should also
+       * tell the record layer which epoch to use for encryption. 
+       */
+      ret = _gnutls_send_int (session, GNUTLS_HANDSHAKE, msg->type, msg->epoch,
+        mtu_data, DTLS_HANDSHAKE_HEADER_SIZE + frag_len, 0);
       if (ret < 0)
         break;
    }
@@ -147,15 +164,26 @@ transmit_message (gnutls_session_t session,
 int
 _gnutls_dtls_transmit (gnutls_session_t session)
 {
+int ret;
+
   /* PREPARING -> SENDING state transition */
   dtls_hsk_retransmit_buffer *msg;
 
+restart:
   _gnutls_dtls_log ("DTLS[%p]: Start of flight transmission.\n", session);
 
   for (msg = session->internals.dtls.retransmit; msg != NULL; msg = msg->next)
     transmit_message (session, msg);
-  _gnutls_io_write_flush (session);
 
+  ret = _gnutls_io_write_flush (session);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  ret = _gnutls_io_check_recv(session, 100);
+  if (ret == GNUTLS_E_TIMEDOUT)
+    goto restart;
+  else if (ret < 0)
+    return gnutls_assert_val(ret);
 
   _gnutls_dtls_log ("DTLS[%p]: End of flight transmission.\n", session);
 
@@ -187,6 +215,7 @@ _gnutls_dtls_clear_outgoing_buffer (gnutls_session_t session)
   session->internals.dtls.retransmit = NULL;
 }
 
+#if 0
 void
 _gnutls_dtls_split_sequence (const uint64 *input,
 			     uint16_t *epoch, uint64_t *sequence)
@@ -196,3 +225,4 @@ _gnutls_dtls_split_sequence (const uint64 *input,
 
 //  fprintf(stderr, "%04x:%012lx\n", *epoch, *sequence);
 }
+#endif

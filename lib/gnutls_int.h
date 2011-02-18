@@ -57,11 +57,6 @@ typedef struct
   unsigned char i[8];
 } uint64;
 
-typedef struct
-{
-  unsigned char i[6];
-} uint48;
-
 #include <gnutls/gnutls.h>
 
 /*
@@ -151,12 +146,12 @@ typedef enum transport_t
 } transport_t;
 
 /* the maximum size of encrypted packets */
-#define IS_DTLS (session->internals.transport == GNUTLS_DGRAM)
+#define IS_DTLS(session) (session->internals.transport == GNUTLS_DGRAM)
 
 #define DEFAULT_MAX_RECORD_SIZE 16384
 #define TLS_RECORD_HEADER_SIZE 5
 #define DTLS_RECORD_HEADER_SIZE (TLS_RECORD_HEADER_SIZE+8)
-#define RECORD_HEADER_SIZE (IS_DTLS ? DTLS_RECORD_HEADER_SIZE : TLS_RECORD_HEADER_SIZE)
+#define RECORD_HEADER_SIZE(session) (IS_DTLS(session) ? DTLS_RECORD_HEADER_SIZE : TLS_RECORD_HEADER_SIZE)
 #define MAX_RECORD_HEADER_SIZE DTLS_RECORD_HEADER_SIZE
 
 #define MAX_RECORD_SEND_SIZE (size_t)session->security_parameters.max_record_send_size
@@ -164,11 +159,11 @@ typedef enum transport_t
 #define MAX_PAD_SIZE 255
 #define EXTRA_COMP_SIZE 2048
 #define MAX_RECORD_OVERHEAD (MAX_CIPHER_BLOCK_SIZE/*iv*/+MAX_PAD_SIZE+EXTRA_COMP_SIZE)
-#define MAX_RECV_SIZE (MAX_RECORD_OVERHEAD+MAX_RECORD_RECV_SIZE+RECORD_HEADER_SIZE)
+#define MAX_RECV_SIZE(session) (MAX_RECORD_OVERHEAD+MAX_RECORD_RECV_SIZE+RECORD_HEADER_SIZE(session))
 
 #define TLS_HANDSHAKE_HEADER_SIZE 4
 #define DTLS_HANDSHAKE_HEADER_SIZE (TLS_HANDSHAKE_HEADER_SIZE+8)
-#define HANDSHAKE_HEADER_SIZE (IS_DTLS ? DTLS_HANDSHAKE_HEADER_SIZE : TLS_HANDSHAKE_HEADER_SIZE)
+#define HANDSHAKE_HEADER_SIZE(session) (IS_DTLS(session) ? DTLS_HANDSHAKE_HEADER_SIZE : TLS_HANDSHAKE_HEADER_SIZE)
 #define MAX_HANDSHAKE_HEADER_SIZE DTLS_HANDSHAKE_HEADER_SIZE
 
 /* This is the maximum handshake message size we send without
@@ -207,10 +202,6 @@ typedef struct
 } uint24;
 
 #include <gnutls_mpi.h>
-
-typedef enum change_cipher_spec_t
-{ GNUTLS_TYPE_CHANGE_CIPHER_SPEC = 1
-} change_cipher_spec_t;
 
 typedef enum handshake_state_t
 { STATE0 = 0, STATE1, STATE2,
@@ -273,6 +264,9 @@ typedef struct mbuffer_st
   size_t mark;
   unsigned int user_mark;       /* only used during fill in */
   size_t maximum_size;
+  
+  gnutls_handshake_description_t htype;
+  content_type_t type;
 } mbuffer_st;
 
 typedef struct mbuffer_head_st
@@ -651,7 +645,6 @@ typedef struct
    * protocol only. freed using _gnutls_handshake_io_buffer_clear();
    */
   mbuffer_head_st handshake_send_buffer;
-  gnutls_handshake_description_t handshake_send_buffer_htype;
   content_type_t handshake_recv_buffer_type;
   gnutls_handshake_description_t handshake_recv_buffer_htype;
   gnutls_buffer_st handshake_recv_buffer;

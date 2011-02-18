@@ -27,7 +27,7 @@ int _gnutls_encrypt (gnutls_session_t session, const opaque * headers,
                      size_t headers_size, const opaque * data,
                      size_t data_size, opaque * ciphertext,
                      size_t ciphertext_size, content_type_t type,
-                     int random_pad, record_parameters_st * params);
+                     record_parameters_st * params);
 
 int _gnutls_decrypt (gnutls_session_t session, opaque * ciphertext,
                      size_t ciphertext_size, uint8_t * data, size_t data_size,

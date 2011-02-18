@@ -2064,7 +2064,6 @@ _gnutls_server_select_cert (gnutls_session_t session,
 
   idx = -1;                     /* default is use no certificate */
 
-
   _gnutls_handshake_log("HSK[%p]: Requested PK algorithm: %s (%d) -- ctype: %s (%d)\n", session, 
     gnutls_pk_get_name(requested_algo), requested_algo, 
     gnutls_certificate_type_get_name(session->security_parameters.cert_type), session->security_parameters.cert_type);
@@ -2077,6 +2076,7 @@ _gnutls_server_select_cert (gnutls_session_t session,
         gnutls_pk_get_name(cred->cert_list[i][0].subject_pk_algorithm), cred->cert_list[i][0].subject_pk_algorithm,
         gnutls_certificate_type_get_name(cred->cert_list[i][0].cert_type), cred->cert_list[i][0].cert_type,
         gnutls_sign_get_name(cred->cert_list[i][0].sign_algo), cred->cert_list[i][0].sign_algo);
+
       if (requested_algo == GNUTLS_PK_ANY ||
           requested_algo == cred->cert_list[i][0].subject_pk_algorithm)
         {

@@ -385,6 +385,7 @@ extern "C"
   /**
    * gnutls_handshake_description_t:
    * @GNUTLS_HANDSHAKE_HELLO_REQUEST: Hello request.
+   * @GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST: DTLS Hello verify request.
    * @GNUTLS_HANDSHAKE_CLIENT_HELLO: Client hello.
    * @GNUTLS_HANDSHAKE_SERVER_HELLO: Server hello.
    * @GNUTLS_HANDSHAKE_NEW_SESSION_TICKET: New session ticket.
@@ -396,6 +397,7 @@ extern "C"
    * @GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE: Client key exchange.
    * @GNUTLS_HANDSHAKE_FINISHED: Finished.
    * @GNUTLS_HANDSHAKE_SUPPLEMENTAL: Supplemental.
+   * @GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC: Change Cipher Spec
    *
    * Enumeration of different TLS handshake packets.
    */
@@ -413,7 +415,8 @@ extern "C"
     GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY = 15,
     GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE = 16,
     GNUTLS_HANDSHAKE_FINISHED = 20,
-    GNUTLS_HANDSHAKE_SUPPLEMENTAL = 23
+    GNUTLS_HANDSHAKE_SUPPLEMENTAL = 23,
+    GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC = 254
   } gnutls_handshake_description_t;
 
   /**
@@ -1737,6 +1740,8 @@ extern "C"
 #define GNUTLS_E_PKCS11_USER_ERROR -317
 
 #define GNUTLS_E_CRYPTO_INIT_FAILED -318
+
+#define GNUTLS_E_TIMEDOUT -319
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 

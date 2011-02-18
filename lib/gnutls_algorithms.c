@@ -1398,6 +1398,7 @@ _gnutls_version_has_selectable_prf (gnutls_protocol_t version)
 {
   switch (version)
     {
+    case GNUTLS_DTLS1_0:
     case GNUTLS_TLS1_1:
     case GNUTLS_TLS1_0:
     case GNUTLS_SSL3:
@@ -1489,6 +1490,9 @@ _gnutls_map_kx_get_kx (gnutls_credentials_type_t type, int server)
   return ret;
 }
 
+/* Returns the credentials type required for this
+ * Key exchange method.
+ */
 gnutls_credentials_type_t
 _gnutls_map_kx_get_cred (gnutls_kx_algorithm_t algorithm, int server)
 {
@@ -1525,7 +1529,7 @@ _gnutls_cipher_suite_is_version_supported (gnutls_session_t session, const ciphe
   
   GNUTLS_CIPHER_SUITE_ALG_LOOP (if (version >= p->min_version
                                  && version <= p->max_version) ret = 1;
-                                 if (IS_DTLS && p->dtls==0) ret = 0;);
+                                 if (IS_DTLS(session) && p->dtls==0) ret = 0;);
   return ret;
 }
 

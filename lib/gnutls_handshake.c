@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
- * 2009, 2010 Free Software Foundation, Inc.
+ * 2009, 2010, 2011 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -839,7 +839,7 @@ _gnutls_recv_finished (gnutls_session_t session)
  * RSA algorithms, PK_DSA if DSS, and PK_ANY for both or PK_NONE for none.
  */
 static int
-_gnutls_server_find_pk_algos_in_ciphersuites (const opaque *
+server_find_pk_algos_in_ciphersuites (const opaque *
                                               data, unsigned int datalen)
 {
   unsigned int j;
@@ -910,7 +910,7 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
         }
     }
 
-  pk_algo = _gnutls_server_find_pk_algos_in_ciphersuites (data, datalen);
+  pk_algo = server_find_pk_algos_in_ciphersuites (data, datalen);
 
   x = _gnutls_supported_ciphersuites (session, &ciphers);
   if (x < 0)
@@ -1295,7 +1295,7 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
   int ret;
   uint32_t length32 = 0;
   uint8_t *dataptr = NULL;      /* for realloc */
-  size_t handshake_header_size = HANDSHAKE_HEADER_SIZE;
+  size_t handshake_header_size = HANDSHAKE_HEADER_SIZE(session);
 
   /* if we have data into the buffer then return them, do not read the next packet.
    * In order to return we need a full TLS handshake header, or in case of a version 2
@@ -1358,7 +1358,7 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
                                        [session->
                                         internals.handshake_header_buffer.
                                         header_size],
-                                       HANDSHAKE_HEADER_SIZE -
+                                       HANDSHAKE_HEADER_SIZE(session) -
                                        session->
                                        internals.handshake_header_buffer.
                                        header_size);
@@ -1368,7 +1368,7 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
           return (ret < 0) ? ret : GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
         }
       if ((size_t) ret !=
-          HANDSHAKE_HEADER_SIZE -
+          HANDSHAKE_HEADER_SIZE(session) -
           session->internals.handshake_header_buffer.header_size)
         {
           gnutls_assert ();
@@ -1380,11 +1380,11 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
        * that the packet has enough data.
        */
       length32 = _gnutls_read_uint24 (&dataptr[1]);
-      handshake_header_size = HANDSHAKE_HEADER_SIZE;
+      handshake_header_size = HANDSHAKE_HEADER_SIZE(session);
 
       _gnutls_handshake_log ("HSK[%p]: %s was received [%ld bytes]\n",
                              session, _gnutls_handshake2str (dataptr[0]),
-                             (long int) (length32 + HANDSHAKE_HEADER_SIZE));
+                             (long int) (length32 + HANDSHAKE_HEADER_SIZE(session)));
 
     }
   else
@@ -2973,6 +2973,51 @@ _gnutls_handshake_client (gnutls_session_t session)
   return 0;
 }
 
+
+
+/* This function is to be called if the handshake was successfully 
+ * completed. This sends a Change Cipher Spec packet to the peer.
+ */
+static ssize_t
+send_change_cipher_spec (gnutls_session_t session, int again)
+{
+  opaque* data;
+  mbuffer_st * bufel;
+  int ret;
+  
+  if (again == 0)
+    {
+      bufel = _gnutls_handshake_alloc (session, 1, 1);
+      if (bufel == NULL)
+        return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+      _mbuffer_set_uhead_size(bufel, 1);
+      _mbuffer_set_udata_size(bufel, 0);
+
+      data = _mbuffer_get_uhead_ptr (bufel);
+      
+      data[0] = 1;
+
+      ret = _gnutls_handshake_io_cache_int (session, GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC, bufel);
+      if (ret < 0)
+        {
+          _mbuffer_xfree(&bufel);
+          return gnutls_assert_val(ret);
+        }
+
+      if (!IS_DTLS(session)) /* remove once combined */
+        {
+          ret = _gnutls_handshake_io_write_flush (session);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+        }
+
+      _gnutls_handshake_log ("REC[%p]: Sent ChangeCipherSpec\n", session);
+    }
+
+    return 0;
+}
+
 /* This function sends the final handshake packets and initializes connection 
  */
 static int
@@ -2986,19 +3031,8 @@ _gnutls_send_handshake_final (gnutls_session_t session, int init)
     {
     case STATE0:
     case STATE20:
-
-      STATE = STATE20;
-
-      ret = _gnutls_handshake_io_write_flush (session);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-
-    case STATE21:
-      ret = _gnutls_send_change_cipher_spec (session, AGAIN (STATE21));
-      STATE = STATE21;
+      ret = send_change_cipher_spec (session, AGAIN (STATE20));
+      STATE = STATE0;
 
       if (ret < 0)
         {
@@ -3025,10 +3059,10 @@ _gnutls_send_handshake_final (gnutls_session_t session, int init)
           return ret;
         }
 
-    case STATE22:
+    case STATE21:
       /* send the finished message */
-      ret = _gnutls_send_finished (session, AGAIN (STATE22));
-      STATE = STATE22;
+      ret = _gnutls_send_finished (session, AGAIN (STATE21));
+      STATE = STATE21;
       if (ret < 0)
         {
           ERR ("send Finished", ret);

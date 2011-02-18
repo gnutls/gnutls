@@ -132,7 +132,7 @@ void gaa_help(void)
 	__gaa_helpsingle('e', "rehandshake", "", "Connect, establish a session and rehandshake immediately.");
 	__gaa_helpsingle(0, "noticket", "", "Doesn't accept session tickets.");
 	__gaa_helpsingle('s', "starttls", "", "Connect, establish a plain session and start TLS when EOF or a SIGALRM is received.");
-	__gaa_helpsingle('u', "dtls", "", "Use DTLS (datagram TLS).");
+	__gaa_helpsingle('u', "udp", "", "Use DTLS (datagram TLS).");
 	__gaa_helpsingle(0, "crlf", "", "Send CR LF instead of LF.");
 	__gaa_helpsingle(0, "x509fmtder", "", "Use DER format for certificates to read from.");
 	__gaa_helpsingle('f', "fingerprint", "", "Send the openpgp fingerprint, instead of the key.");
@@ -219,7 +219,7 @@ struct _gaainfo
 #line 32 "cli.gaa"
 	int crlf;
 #line 29 "cli.gaa"
-	int dtls;
+	int udp;
 #line 26 "cli.gaa"
 	int starttls;
 #line 23 "cli.gaa"
@@ -310,7 +310,7 @@ static int gaa_error = 0;
 #define GAAOPTID_fingerprint	23
 #define GAAOPTID_x509fmtder	24
 #define GAAOPTID_crlf	25
-#define GAAOPTID_dtls	26
+#define GAAOPTID_udp	26
 #define GAAOPTID_starttls	27
 #define GAAOPTID_noticket	28
 #define GAAOPTID_rehandshake	29
@@ -662,7 +662,7 @@ static int gaa_get_option_num(char *str, int status)
 			GAA_CHECK1STR("f", GAAOPTID_fingerprint);
 			GAA_CHECK1STR("", GAAOPTID_x509fmtder);
 			GAA_CHECK1STR("", GAAOPTID_crlf);
-			GAA_CHECK1STR("u", GAAOPTID_dtls);
+			GAA_CHECK1STR("u", GAAOPTID_udp);
 			GAA_CHECK1STR("s", GAAOPTID_starttls);
 			GAA_CHECK1STR("", GAAOPTID_noticket);
 			GAA_CHECK1STR("e", GAAOPTID_rehandshake);
@@ -696,7 +696,7 @@ static int gaa_get_option_num(char *str, int status)
 			GAA_CHECKSTR("fingerprint", GAAOPTID_fingerprint);
 			GAA_CHECKSTR("x509fmtder", GAAOPTID_x509fmtder);
 			GAA_CHECKSTR("crlf", GAAOPTID_crlf);
-			GAA_CHECKSTR("dtls", GAAOPTID_dtls);
+			GAA_CHECKSTR("udp", GAAOPTID_udp);
 			GAA_CHECKSTR("starttls", GAAOPTID_starttls);
 			GAA_CHECKSTR("noticket", GAAOPTID_noticket);
 			GAA_CHECKSTR("rehandshake", GAAOPTID_rehandshake);
@@ -970,10 +970,10 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 
 		return GAA_OK;
 		break;
-	case GAAOPTID_dtls:
+	case GAAOPTID_udp:
 	OK = 0;
 #line 30 "cli.gaa"
-{ gaaval->dtls = 1 ;};
+{ gaaval->udp = 1 ;};
 
 		return GAA_OK;
 		break;
@@ -1057,7 +1057,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
 	gaaval->srp_username=NULL; gaaval->srp_passwd=NULL; gaaval->fmtder = 0; gaaval->starttls =0; 
 	gaaval->debug = 0; gaaval->print_cert = 0; gaaval->verbose = 0; gaaval->psk_key = NULL; 
 	gaaval->psk_username = NULL; gaaval->priorities = NULL;
-	gaaval->pgp_subkey = NULL; gaaval->rehandshake = 0; gaaval->dtls = 0; ;};
+	gaaval->pgp_subkey = NULL; gaaval->rehandshake = 0; gaaval->udp = 0; ;};
 
     }
     inited = 1;

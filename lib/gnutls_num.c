@@ -67,27 +67,17 @@ _gnutls_uint64pp (uint64 * x)
  * has been reached.
  */
 int
-_gnutls_uint48pp (uint48 * x)
+_gnutls_uint48pp (uint64 * x)
 {
-  register int i, y = 0;
-
-  for (i = 5; i >= 0; i--)
-    {
-      y = 0;
-      if (x->i[i] == 0xff)
-	{
-	  x->i[i] = 0;
-	  y = 1;
-	}
-      else
-	x->i[i]++;
-
-      if (y == 0)
-	break;
-    }
-  if (y != 0)
-    return -1;			/* over 48 bits! meh... */
-
+  int ret;
+  
+  ret = _gnutls_uint64pp(x);
+  if (ret != 0)
+    return ret;
+  
+  if (x->i[6] != 0)
+    return -1;
+    
   return 0;
 }
 
@@ -112,20 +102,6 @@ _gnutls_uint32touint24 (uint32_t num)
   ret.pint[2] = ((uint8_t *) & num)[3];
   return ret;
 
-}
-
-uint64_t
-_gnutls_uint48touint64 (uint48 num)
-{
-  uint64_t ret=0;
-
-  ((uint8_t *) & ret)[2] = num.i[0];
-  ((uint8_t *) & ret)[3] = num.i[1];
-  ((uint8_t *) & ret)[4] = num.i[2];
-  ((uint8_t *) & ret)[5] = num.i[3];
-  ((uint8_t *) & ret)[6] = num.i[4];
-  ((uint8_t *) & ret)[7] = num.i[5];
-  return ret;
 }
 
 /* data should be at least 3 bytes */
@@ -237,18 +213,3 @@ _gnutls_uint64touint32 (const uint64 * num)
   return ret;
 }
 
-uint64_t
-_gnutls_read_uint48 (const opaque * data)
-{
-  uint64_t ret;
-  uint48 num;
-
-  memcpy(num.i, data, 6);
-
-  ret = _gnutls_uint48touint64 (num);
-#ifndef WORDS_BIGENDIAN
-  ret = bswap_64 (ret);
-#endif
-
-  return ret;
-}

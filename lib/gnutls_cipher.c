@@ -46,7 +46,7 @@
 static int _gnutls_compressed2ciphertext (gnutls_session_t session,
                                    opaque * cipher_data, int cipher_size,
                                    gnutls_datum_t compressed,
-                                   content_type_t _type, int random_pad,
+                                   content_type_t _type, 
                                    record_parameters_st * params);
 static int _gnutls_ciphertext2compressed (gnutls_session_t session,
                                    opaque * compress_data,
@@ -82,7 +82,7 @@ int
 _gnutls_encrypt (gnutls_session_t session, const opaque * headers,
                  size_t headers_size, const opaque * data,
                  size_t data_size, opaque * ciphertext,
-                 size_t ciphertext_size, content_type_t type, int random_pad,
+                 size_t ciphertext_size, content_type_t type, 
                  record_parameters_st * params)
 {
   gnutls_datum_t plain;
@@ -115,7 +115,7 @@ _gnutls_encrypt (gnutls_session_t session, const opaque * headers,
 
   ret = _gnutls_compressed2ciphertext (session, &ciphertext[headers_size],
                                        ciphertext_size - headers_size,
-                                       comp, type, random_pad, params);
+                                       comp, type, params);
 
   if (free_comp)
     _gnutls_free_datum (&comp);
@@ -310,7 +310,7 @@ static int
 _gnutls_compressed2ciphertext (gnutls_session_t session,
                                opaque * cipher_data, int cipher_size,
                                gnutls_datum_t compressed,
-                               content_type_t type, int random_pad,
+                               content_type_t type, 
                                record_parameters_st * params)
 {
   uint8_t * tag_ptr = NULL;
@@ -326,8 +326,11 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
   int ver = gnutls_protocol_get_version (session);
   int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
   int auth_cipher = _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
+  int random_pad = (session->internals.priorities.no_padding == 0) ? 1 : 0;
   
-
+  _gnutls_hard_log("ENC[%p]: cipher: %s, MAC: %s, Epoch: %u\n",
+    session, gnutls_cipher_get_name(params->cipher_algorithm), gnutls_mac_get_name(params->mac_algorithm),
+    (unsigned int)params->epoch);
   preamble_size =
     make_preamble (UINT64DATA
                    (params->write.sequence_number),
@@ -572,8 +575,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
        * MAC.
        */
       preamble_size =
-        make_preamble (UINT64DATA
-                       (params->read.sequence_number), type,
+        make_preamble (UINT64DATA(*sequence), type,
                        length, ver, preamble);
       _gnutls_auth_cipher_add_auth (&params->read.cipher_state, preamble, preamble_size);
       _gnutls_auth_cipher_add_auth (&params->read.cipher_state, ciphertext.data, length);

@@ -272,8 +272,8 @@ static ssize_t
 _gnutls_dgram_read (gnutls_session_t session, mbuffer_st **bufel,
 		    gnutls_pull_func pull_func)
 {
-  ssize_t i;
-  char *ptr = alloca (MAX_RECV_SIZE);
+  ssize_t i, ret;
+  char *ptr;
   gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
 
   if (!bufel)
@@ -282,11 +282,15 @@ _gnutls_dgram_read (gnutls_session_t session, mbuffer_st **bufel,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
+  ptr = gnutls_malloc(MAX_RECV_SIZE(session));
+  if (ptr == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
   session->internals.direction = 0;
 
   reset_errno (session);
 
-  i = pull_func (fd, ptr, MAX_RECV_SIZE);
+  i = pull_func (fd, ptr, MAX_RECV_SIZE(session));
 
   if (i < 0)
     {
@@ -296,13 +300,20 @@ _gnutls_dgram_read (gnutls_session_t session, mbuffer_st **bufel,
 			(int) i, fd, errno, session->internals.errnum);
 
       if (err == EAGAIN)
-	return GNUTLS_E_AGAIN;
+        {
+	  ret = GNUTLS_E_AGAIN;
+	  goto cleanup;
+        }
       else if (err == EINTR)
-	return GNUTLS_E_INTERRUPTED;
+        {
+	  ret = GNUTLS_E_INTERRUPTED;
+	  goto cleanup;
+        }
       else
 	{
 	  gnutls_assert ();
-	  return GNUTLS_E_PULL_ERROR;
+	  ret = GNUTLS_E_PULL_ERROR;
+	  goto cleanup;
 	}
     }
   else
@@ -312,23 +323,28 @@ _gnutls_dgram_read (gnutls_session_t session, mbuffer_st **bufel,
 	/* If we get here, we likely have a stream socket.
 	 * FIXME: this probably breaks DCCP. */
 	gnutls_assert ();
-	return GNUTLS_E_INTERNAL_ERROR;
+	ret = GNUTLS_E_INTERNAL_ERROR;
+	goto cleanup;
       }
 
       *bufel = _mbuffer_alloc (0, i);
       if (!*bufel)
 	{
 	  gnutls_assert ();
-	  return GNUTLS_E_MEMORY_ERROR;
+	  ret = GNUTLS_E_MEMORY_ERROR;
+	  goto cleanup;
 	}
 
       _mbuffer_append_data (*bufel, ptr, i);
     }
 
-  if (_gnutls_log_level >= 7)
-    _gnutls_read_log ("READ: read %d bytes from %p\n", (int) i, fd);
-
-  return i;
+  _gnutls_read_log ("READ: read %d bytes from %p\n", (int) i, fd);
+  
+  ret = i;
+  
+cleanup:
+  gnutls_free(ptr);
+  return ret;
 }
 
 static ssize_t
@@ -406,12 +422,8 @@ _gnutls_stream_read (gnutls_session_t session, mbuffer_st **bufel,
 
 finish:
 
-  if (_gnutls_log_level >= 7)
-    {
-      _gnutls_read_log ("READ: read %d bytes from %p\n",
+  _gnutls_read_log ("READ: read %d bytes from %p\n",
                         (int) (size - left), fd);
-
-    }
 
   return (size - left);
 }
@@ -550,7 +562,7 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
   mbuffer_st *bufel = NULL;
   size_t recvlowat, recvdata, readsize;
 
-  if (total > MAX_RECV_SIZE || total == 0)
+  if (total > MAX_RECV_SIZE(session) || total == 0)
     {
       gnutls_assert ();         /* internal error */
       return GNUTLS_E_INVALID_REQUEST;
@@ -611,7 +623,7 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
    * receive are longer than the maximum receive buffer size.
    */
   if ((session->internals.record_recv_buffer.byte_length + recvdata) >
-      MAX_RECV_SIZE)
+      MAX_RECV_SIZE(session))
     {
       gnutls_assert ();         /* internal error */
       return GNUTLS_E_INVALID_REQUEST;
@@ -824,6 +836,29 @@ _gnutls_io_write_flush (gnutls_session_t session)
   return sent;
 }
 
+#include "debug.h"
+/* Checks whether there are received data within
+ * a timeframe.
+ *
+ * Returns 0 if data were received, GNUTLS_E_TIMEDOUT
+ * on timeout and a negative value on error.
+ */
+int
+_gnutls_io_check_recv (gnutls_session_t session, int ms)
+{
+  gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
+  int ret;
+  
+  
+  ret = system_recv_timeout(fd, ms);
+  if (ret == -1)
+    return gnutls_assert_val(GNUTLS_E_PULL_ERROR);
+  
+  if (ret > 0)
+    return 0;
+  else return GNUTLS_E_TIMEDOUT;
+}
+
 /* This function writes the data that are left in the
  * Handshake write buffer (ie. because the previous write was
  * interrupted.
@@ -842,17 +877,17 @@ _gnutls_handshake_io_write_flush (gnutls_session_t session)
   _gnutls_write_log ("HWRITE FLUSH: %d bytes in buffer.\n",
                      (int) send_buffer->byte_length);
 
-  if (IS_DTLS)
+  if (IS_DTLS(session))
     return _gnutls_dtls_transmit(session);
 
 
   for (cur = _mbuffer_get_first (send_buffer, &msg);
        cur != NULL; cur = _mbuffer_get_first (send_buffer, &msg))
     {
-      ret = _gnutls_send_int (session, GNUTLS_HANDSHAKE,
-                              session->internals.handshake_send_buffer_htype,
+      ret = _gnutls_send_int (session, cur->type,
+                              cur->htype,
                               EPOCH_WRITE_CURRENT,
-                              msg.data, msg.size, 0 /* do not flush */ );
+                              msg.data, msg.size, 0);
 
       if (ret >= 0)
         {
@@ -889,14 +924,19 @@ _gnutls_handshake_io_cache_int (gnutls_session_t session,
 {
   mbuffer_head_st * send_buffer;
   
-  if (IS_DTLS)
+  if (IS_DTLS(session))
     return _gnutls_dtls_handshake_enqueue(session, bufel, htype, session->internals.dtls.hsk_write_seq-1);
   
   send_buffer =
     &session->internals.handshake_send_buffer;
 
+  bufel->htype = htype;
+  if (bufel->htype == GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC)
+    bufel->type = GNUTLS_CHANGE_CIPHER_SPEC;
+  else
+    bufel->type = GNUTLS_HANDSHAKE;
+
   _mbuffer_enqueue (send_buffer, bufel);
-  session->internals.handshake_send_buffer_htype = htype;
 
   _gnutls_write_log
     ("HWRITE: enqueued %d. Total %d bytes.\n",

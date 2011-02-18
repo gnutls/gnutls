@@ -77,7 +77,11 @@ gnutls_cipher_algorithm_t
 gnutls_cipher_get (gnutls_session_t session)
 {
   record_parameters_st *record_params;
-  _gnutls_epoch_get (session, EPOCH_READ_CURRENT, &record_params);
+  int ret;
+  
+  ret = _gnutls_epoch_get (session, EPOCH_READ_CURRENT, &record_params);
+  if (ret < 0)
+    return gnutls_assert_val(GNUTLS_CIPHER_NULL);
 
   return record_params->cipher_algorithm;
 }
@@ -126,7 +130,11 @@ gnutls_mac_algorithm_t
 gnutls_mac_get (gnutls_session_t session)
 {
   record_parameters_st *record_params;
-  _gnutls_epoch_get (session, EPOCH_READ_CURRENT, &record_params);
+  int ret;
+  
+  ret = _gnutls_epoch_get (session, EPOCH_READ_CURRENT, &record_params);
+  if (ret < 0)
+    return gnutls_assert_val(GNUTLS_MAC_NULL);
 
   return record_params->mac_algorithm;
 }
@@ -144,7 +152,11 @@ gnutls_compression_method_t
 gnutls_compression_get (gnutls_session_t session)
 {
   record_parameters_st *record_params;
-  _gnutls_epoch_get (session, EPOCH_READ_CURRENT, &record_params);
+  int ret;
+  
+  ret = _gnutls_epoch_get (session, EPOCH_READ_CURRENT, &record_params);
+  if (ret < 0)
+    return gnutls_assert_val(GNUTLS_COMP_NULL);
 
   return record_params->compression_algorithm;
 }
