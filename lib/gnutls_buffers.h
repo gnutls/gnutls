@@ -56,7 +56,7 @@ int _gnutls_handshake_buffer_get_ptr (gnutls_session_t session,
 ssize_t _gnutls_handshake_io_recv_int (gnutls_session_t, content_type_t,
                                        gnutls_handshake_description_t, void *,
                                        size_t);
-void _gnutls_handshake_io_cache_int (gnutls_session_t,
+int _gnutls_handshake_io_cache_int (gnutls_session_t,
                                      gnutls_handshake_description_t,
                                      mbuffer_st * bufel);
 ssize_t _gnutls_io_write_flush (gnutls_session_t session);

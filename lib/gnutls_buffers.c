@@ -55,6 +55,7 @@
 #include <gnutls_buffers.h>
 #include <gnutls_mbuffers.h>
 #include <gnutls_state.h>
+#include <gnutls_dtls.h>
 #include <system.h>
 
 #include <errno.h>
@@ -841,6 +842,10 @@ _gnutls_handshake_io_write_flush (gnutls_session_t session)
   _gnutls_write_log ("HWRITE FLUSH: %d bytes in buffer.\n",
                      (int) send_buffer->byte_length);
 
+  if (IS_DTLS)
+    return _gnutls_dtls_transmit(session);
+
+
   for (cur = _mbuffer_get_first (send_buffer, &msg);
        cur != NULL; cur = _mbuffer_get_first (send_buffer, &msg))
     {
@@ -877,12 +882,17 @@ _gnutls_handshake_io_write_flush (gnutls_session_t session)
  * protocol. Just makes sure that all data have been sent.
  *
  */
-void
+int
 _gnutls_handshake_io_cache_int (gnutls_session_t session,
                                 gnutls_handshake_description_t htype,
                                 mbuffer_st * bufel)
 {
-  mbuffer_head_st *const send_buffer =
+  mbuffer_head_st * send_buffer;
+  
+  if (IS_DTLS)
+    return _gnutls_dtls_handshake_enqueue(session, bufel, htype, session->internals.dtls.hsk_write_seq-1);
+  
+  send_buffer =
     &session->internals.handshake_send_buffer;
 
   _mbuffer_enqueue (send_buffer, bufel);
@@ -892,7 +902,7 @@ _gnutls_handshake_io_cache_int (gnutls_session_t session,
     ("HWRITE: enqueued %d. Total %d bytes.\n",
      (int) bufel->msg.size, (int) send_buffer->byte_length);
 
-  return;
+  return 0;
 }
 
 /* This is a receive function for the gnutls handshake 

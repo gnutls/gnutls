@@ -33,7 +33,6 @@
 #include "gnutls_algorithms.h"
 #include "gnutls_compress.h"
 #include "gnutls_cipher.h"
-#include "gnutls_dtls.h"
 #include "gnutls_buffers.h"
 #include "gnutls_mbuffers.h"
 #include "gnutls_kx.h"
@@ -1241,17 +1240,19 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
          _gnutls_handshake_hash_add_sent (session, type, data, datasize)) < 0)
       {
         gnutls_assert ();
-        gnutls_free (bufel);
+      _mbuffer_xfree(&bufel);
         return ret;
       }
 
   session->internals.last_handshake_out = type;
 
-  if (_gnutls_is_dtls(session))
-    _gnutls_dtls_handshake_enqueue (session, data, datasize, type,
-				    session->internals.dtls.hsk_write_seq-1);
-  else
-    _gnutls_handshake_io_cache_int (session, type, bufel);
+  ret = _gnutls_handshake_io_cache_int (session, type, bufel);
+  if (ret < 0)
+    {
+      _mbuffer_xfree(&bufel);
+      gnutls_assert();
+      return ret;
+    }
 
   switch (type)
     {
@@ -2867,8 +2868,6 @@ _gnutls_handshake_client (gnutls_session_t session)
       STATE = STATE1;
       IMED_RET ("send hello", ret, 1);
 
-      _gnutls_dtls_transmit(session);
-
     case STATE11:
       if (_gnutls_is_dtls (session))
 	{
@@ -2964,7 +2963,6 @@ _gnutls_handshake_client (gnutls_session_t session)
           _gnutls_send_client_certificate_verify (session, AGAIN (STATE9));
       STATE = STATE9;
       IMED_RET ("send client certificate verify", ret, 1);
-      _gnutls_dtls_transmit(session);
 
       STATE = STATE0;
     default:
@@ -3038,7 +3036,6 @@ _gnutls_send_handshake_final (gnutls_session_t session, int init)
           return ret;
         }
 
-      _gnutls_dtls_transmit(session);
       STATE = STATE0;
     default:
       break;

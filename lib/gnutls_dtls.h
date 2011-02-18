@@ -27,11 +27,11 @@
 
 #include "gnutls_int.h"
 
-int _gnutls_dtls_handshake_enqueue(gnutls_session_t session,
-				   opaque *data,
-				   uint32_t datasize,
-				   gnutls_handshake_description_t type,
-				   uint16_t sequence);
+int
+_gnutls_dtls_handshake_enqueue (gnutls_session_t session,
+				mbuffer_st* bufel,
+				gnutls_handshake_description_t type,
+				uint16_t sequence);
 
 int _gnutls_dtls_transmit(gnutls_session_t session);
 void _gnutls_dtls_clear_outgoing_buffer(gnutls_session_t session);
