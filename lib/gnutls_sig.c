@@ -56,7 +56,8 @@ sign_tls_hash (gnutls_session_t session, gnutls_digest_algorithm_t hash_algo,
 #define MAX_SIG_SIZE 19 + MAX_HASH_SIZE
 
 static int 
-get_hash_algo(gnutls_session_t session, gnutls_cert* cert, 
+get_hash_algo(gnutls_session_t session, int version,
+  gnutls_cert* cert, 
   gnutls_sign_algorithm_t sign_algo,
   gnutls_digest_algorithm_t *hash_algo)
 {
@@ -64,11 +65,16 @@ int ret;
 
   if (cert->subject_pk_algorithm == GNUTLS_PK_DSA)
     { /* override */
-      *hash_algo = _gnutls_dsa_q_to_hash (cert->params[1]);
+      if (!_gnutls_version_has_selectable_sighash (version))
+        *hash_algo = GNUTLS_DIG_SHA1;
+      else
+        {
+          *hash_algo = _gnutls_dsa_q_to_hash (cert->params[1]);
 
-      ret = _gnutls_session_sign_algo_requested(session, _gnutls_x509_pk_to_sign (GNUTLS_PK_DSA, *hash_algo));
-      if (ret < 0)
-        return gnutls_assert_val(ret);
+          ret = _gnutls_session_sign_algo_requested(session, _gnutls_x509_pk_to_sign (GNUTLS_PK_DSA, *hash_algo));
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+        }
     }
   else
     {
@@ -105,7 +111,7 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
 
-  ret = get_hash_algo(session, cert, *sign_algo, &hash_algo);
+  ret = get_hash_algo(session, ver, cert, *sign_algo, &hash_algo);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -387,7 +393,7 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_cert * cert,
       _gnutls_hash (&td_md5, params->data, params->size);
     }
 
-  ret = get_hash_algo(session, cert, algo, &hash_algo);
+  ret = get_hash_algo(session, ver, cert, algo, &hash_algo);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
