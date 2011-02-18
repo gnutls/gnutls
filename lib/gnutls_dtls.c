@@ -200,5 +200,5 @@ _gnutls_dtls_split_sequence (const uint64 *input,
   *epoch = _gnutls_read_uint16 (UINT64DATA(*input));
   *sequence = _gnutls_read_uint48 (&UINT64DATA(*input)[2]);
 
-  fprintf(stderr, "%04x:%012lx\n", *epoch, *sequence);
+//  fprintf(stderr, "%04x:%012lx\n", *epoch, *sequence);
 }
