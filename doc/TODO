@@ -3,7 +3,13 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
-+ Support PKCS#8 AES and DES-MD5 (tests/enc3pkcs8.pem) encrypted keys.
++ Allow setting a list of trusted plain certificates (not CAs) in the
+  gnutls_x509_trust_list_t, to verify against.
+* Allow setting a PKCS #11 module to gnutls_x509_trust_list_t, to verify 
+  against, similarly to NSS way.
+* Support replacing individual algorithms via a PKCS #11 module -
+  maybe use p11-kit for that.
+* Support PKCS#8 AES and DES-MD5 (tests/enc3pkcs8.pem) encrypted keys.
 * Implement Datagram-TLS (DTLS).
 * Implement TLS-PSK with PKCS #11.
 * Verify added CRLs (is it really needed?)
