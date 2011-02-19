@@ -697,6 +697,7 @@ GNUTLS_2_12
 	gnutls_x509_crt_list_import2;
 	gnutls_cipher_tag;
 	gnutls_cipher_add_auth;
+	gnutls_dtls_set_timeouts;
 } GNUTLS_2_10;
 
 GNUTLS_PRIVATE {

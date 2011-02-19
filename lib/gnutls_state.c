@@ -48,6 +48,7 @@
 #include <gnutls_rsa_export.h>
 #include <gnutls_extensions.h>
 #include <system.h>
+#include <gnutls/dtls.h>
 
 /* These should really be static, but src/tests.c calls them.  Make
    them public functions?  */
@@ -405,6 +406,9 @@ gnutls_init_dtls (gnutls_session_t * session,
 
   /* Initialize pointer used to enqueue messages for retransmit. */
   (*session)->internals.dtls.retransmit_end = &(*session)->internals.dtls.retransmit;
+
+  (*session)->internals.dtls.retrans_timeout = 100;
+  (*session)->internals.dtls.total_timeout = 3000;
 
   return 0;
 }

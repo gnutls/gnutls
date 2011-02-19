@@ -559,6 +559,9 @@ typedef struct
   uint16_t hsk_read_seq;
   uint16_t hsk_mtu;
 
+  unsigned int retrans_timeout;
+  unsigned int total_timeout;
+
   /* Head of the next outgoing flight. */
   dtls_hsk_retransmit_buffer *retransmit;
   dtls_hsk_retransmit_buffer **retransmit_end;

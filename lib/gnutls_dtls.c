@@ -33,6 +33,7 @@
 #include <gnutls_mbuffers.h>
 #include <gnutls_buffers.h>
 #include <gnutls_constate.h>
+#include <gnutls/dtls.h>
 
 /* This function is called once a handshake message is ready to be
  * queued in the next outgoing flight. The actual transmission occurs
@@ -168,29 +169,43 @@ int ret;
 
   /* PREPARING -> SENDING state transition */
   dtls_hsk_retransmit_buffer *msg;
+  unsigned int total_timeout = 0;
 
-restart:
-  _gnutls_dtls_log ("DTLS[%p]: Start of flight transmission.\n", session);
+  do 
+    {
+      _gnutls_dtls_log ("DTLS[%p]: Start of flight transmission.\n", session);
 
-  for (msg = session->internals.dtls.retransmit; msg != NULL; msg = msg->next)
-    transmit_message (session, msg);
+      for (msg = session->internals.dtls.retransmit; msg != NULL; msg = msg->next)
+        transmit_message (session, msg);
 
-  ret = _gnutls_io_write_flush (session);
+      ret = _gnutls_io_write_flush (session);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+
+      ret = _gnutls_io_check_recv(session, session->internals.dtls.retrans_timeout);
+      total_timeout += session->internals.dtls.retrans_timeout;
+
+      if (total_timeout >= session->internals.dtls.total_timeout) {
+        ret = gnutls_assert_val(GNUTLS_E_TIMEDOUT);
+        goto cleanup;
+      }
+
+    } while(ret == GNUTLS_E_TIMEDOUT);
+
   if (ret < 0)
-    return gnutls_assert_val(ret);
-
-  ret = _gnutls_io_check_recv(session, 100);
-  if (ret == GNUTLS_E_TIMEDOUT)
-    goto restart;
-  else if (ret < 0)
-    return gnutls_assert_val(ret);
+    {
+      ret = gnutls_assert_val(ret);
+      goto cleanup;
+    }
 
   _gnutls_dtls_log ("DTLS[%p]: End of flight transmission.\n", session);
+  ret = 0;
 
+cleanup:
   _gnutls_dtls_clear_outgoing_buffer (session);
 
   /* SENDING -> WAITING state transition */
-  return 0;
+  return ret;
 }
 
 /* This function clears the outgoing flight buffer. */
@@ -215,14 +230,25 @@ _gnutls_dtls_clear_outgoing_buffer (gnutls_session_t session)
   session->internals.dtls.retransmit = NULL;
 }
 
-#if 0
-void
-_gnutls_dtls_split_sequence (const uint64 *input,
-			     uint16_t *epoch, uint64_t *sequence)
+/**
+ * gnutls_dtls_set_timeouts:
+ * @session: is a #gnutls_session_t structure.
+ * @retrans_timeout: The time at which a retransmission will occur in milliseconds
+ * @total_timeout: The time at which the connection will be aborted, in milliseconds.
+ *
+ * This function will set the timeouts required for the DTLS handshake
+ * protocol. The retransmission timeout is the time after which a
+ * message from the peer is not received, the previous messages will
+ * be retransmitted. The total timeout is the time after which the
+ * handshake will be aborted with %GNUTLS_E_TIMEDOUT.
+ *
+ * If the retransmission timeout is zero then the handshake will operate
+ * in a non-blocking way, i.e., return %GNUTLS_E_AGAIN.
+ *
+ **/
+void gnutls_dtls_set_timeouts (gnutls_session_t session, unsigned int retrans_timeout,
+  unsigned int total_timeout)
 {
-  *epoch = _gnutls_read_uint16 (UINT64DATA(*input));
-  *sequence = _gnutls_read_uint48 (&UINT64DATA(*input)[2]);
-
-//  fprintf(stderr, "%04x:%012lx\n", *epoch, *sequence);
+  session->internals.dtls.retrans_timeout  = retrans_timeout;
+  session->internals.dtls.total_timeout  = total_timeout;
 }
-#endif

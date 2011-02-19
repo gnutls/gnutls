@@ -34,6 +34,7 @@
 #include <error.h>
 
 #include <gnutls/gnutls.h>
+#include <gnutls/dtls.h>
 #include <gnutls/extra.h>
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
