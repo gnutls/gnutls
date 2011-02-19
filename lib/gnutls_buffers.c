@@ -68,58 +68,6 @@
  */
 #define MAX_QUEUE 16
 
-/**
- * gnutls_transport_set_errno:
- * @session: is a #gnutls_session_t structure.
- * @err: error value to store in session-specific errno variable.
- *
- * Store @err in the session-specific errno variable.  Useful values
- * for @err is EAGAIN and EINTR, other values are treated will be
- * treated as real errors in the push/pull function.
- *
- * This function is useful in replacement push/pull functions set by
- * gnutls_transport_set_push_function and
- * gnutls_transport_set_pullpush_function under Windows, where the
- * replacement push/pull may not have access to the same @errno
- * variable that is used by GnuTLS (e.g., the application is linked to
- * msvcr71.dll and gnutls is linked to msvcrt.dll).
- *
- * If you don't have the @session variable easily accessible from the
- * push/pull function, and don't worry about thread conflicts, you can
- * also use gnutls_transport_set_global_errno().
- **/
-void
-gnutls_transport_set_errno (gnutls_session_t session, int err)
-{
-  session->internals.errnum = err;
-}
-
-/**
- * gnutls_transport_set_global_errno:
- * @err: error value to store in global errno variable.
- *
- * Store @err in the global errno variable.  Useful values for @err is
- * EAGAIN and EINTR, other values are treated will be treated as real
- * errors in the push/pull function.
- *
- * This function is useful in replacement push/pull functions set by
- * gnutls_transport_set_push_function and
- * gnutls_transport_set_pullpush_function under Windows, where the
- * replacement push/pull may not have access to the same @errno
- * variable that is used by GnuTLS (e.g., the application is linked to
- * msvcr71.dll and gnutls is linked to msvcrt.dll).
- *
- * Whether this function is thread safe or not depends on whether the
- * global variable errno is thread safe, some system libraries make it
- * a thread-local variable.  When feasible, using the guaranteed
- * thread-safe gnutls_transport_set_errno() may be better.
- **/
-void
-gnutls_transport_set_global_errno (int err)
-{
-  errno = err;
-}
-
 /* Buffers received packets of type APPLICATION DATA and
  * HANDSHAKE DATA.
  */
@@ -451,16 +399,11 @@ _gnutls_writev_emu (gnutls_session_t session, const giovec_t * giovec,
 {
   int ret, j = 0;
   gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
-  void *iptr;
-  size_t sizeOfPtr;
   size_t total = 0;
 
   for (j = 0; j < giovec_cnt; j++)
     {
-      sizeOfPtr = giovec[j].iov_len;
-      iptr = giovec[j].iov_base;
-
-      ret = session->internals.push_func (fd, iptr, sizeOfPtr);
+      ret = session->internals.push_func (fd, giovec[j].iov_base, giovec[j].iov_len);
 
       if (ret == -1)
         break;
@@ -673,7 +616,8 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
    * select think, that the socket is ready for reading.
    * MSG_PEEK is only used with berkeley style sockets.
    */
-  if (ret == readsize && recvlowat > 0 && !_gnutls_is_dtls(session))
+  if (ret == readsize && recvlowat > 0 && !_gnutls_is_dtls(session) && 
+    session->internals.pull_func == system_read)
     {
       ret2 = _gnutls_read (session, &bufel, recvlowat, system_read_peek);
 
@@ -844,13 +788,16 @@ _gnutls_io_write_flush (gnutls_session_t session)
  * on timeout and a negative value on error.
  */
 int
-_gnutls_io_check_recv (gnutls_session_t session, int ms)
+_gnutls_io_check_recv (gnutls_session_t session, void* data, size_t data_size, unsigned int ms)
 {
   gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
   int ret;
   
-  
-  ret = system_recv_timeout(fd, ms);
+  if (session->internals.pull_timeout_func == system_recv_timeout && 
+    session->internals.pull_func != system_read)
+    return gnutls_assert_val(GNUTLS_E_PULL_ERROR);
+
+  ret = session->internals.pull_timeout_func(fd, data, data_size, ms);
   if (ret == -1)
     return gnutls_assert_val(GNUTLS_E_PULL_ERROR);
   
@@ -1111,84 +1058,3 @@ _gnutls_handshake_buffer_clear (gnutls_session_t session)
   return 0;
 }
 
-/**
- * gnutls_transport_set_pull_function:
- * @session: is a #gnutls_session_t structure.
- * @pull_func: a callback function similar to read()
- *
- * This is the function where you set a function for gnutls to receive
- * data.  Normally, if you use berkeley style sockets, do not need to
- * use this function since the default (recv(2)) will probably be ok.
- *
- * PULL_FUNC is of the form,
- * ssize_t (*gnutls_pull_func)(gnutls_transport_ptr_t, void*, size_t);
- **/
-void
-gnutls_transport_set_pull_function (gnutls_session_t session,
-                                    gnutls_pull_func pull_func)
-{
-  session->internals.pull_func = pull_func;
-}
-
-/**
- * gnutls_transport_set_push_function:
- * @session: is a #gnutls_session_t structure.
- * @push_func: a callback function similar to write()
- *
- * This is the function where you set a push function for gnutls to
- * use in order to send data.  If you are going to use berkeley style
- * sockets, you do not need to use this function since the default
- * (send(2)) will probably be ok.  Otherwise you should specify this
- * function for gnutls to be able to send data.
- *
- * PUSH_FUNC is of the form,
- * ssize_t (*gnutls_push_func)(gnutls_transport_ptr_t, const void*, size_t);
- **/
-void
-gnutls_transport_set_push_function (gnutls_session_t session,
-                                    gnutls_push_func push_func)
-{
-  session->internals.push_func = push_func;
-  session->internals.vec_push_func = NULL;
-}
-
-/**
- * gnutls_transport_set_push_function2:
- * @session: is a #gnutls_session_t structure.
- * @vec_func: a callback function similar to writev()
- *
- * This is the function where you set a push function for gnutls to
- * use in order to send data.  If you are going to use berkeley style
- * sockets, you do not need to use this function since the default
- * (send(2)) will probably be ok.  Otherwise you should specify this
- * function for gnutls to be able to send data.
- *
- * PUSH_FUNC is of the form,
- * ssize_t (*gnutls_push_func)(gnutls_transport_ptr_t, const void*, size_t);
- **/
-void
-gnutls_transport_set_push_function2 (gnutls_session_t session,
-                                     gnutls_vec_push_func vec_func)
-{
-  session->internals.push_func = NULL;
-  session->internals.vec_push_func = vec_func;
-}
-
-/**
- * gnutls_transport_set_errno_function:
- * @session: is a #gnutls_session_t structure.
- * @errno_func: a callback function similar to write()
- *
- * This is the function where you set a function to retrieve errno
- * after a failed push or pull operation.
- *
- * errno_func is of the form,
- * int (*gnutls_errno_func)(gnutls_transport_ptr_t);
- * and should return the errno.
- **/
-void
-gnutls_transport_set_errno_function (gnutls_session_t session,
-                                     gnutls_errno_func errno_func)
-{
-  session->internals.errno_func = errno_func;
-}

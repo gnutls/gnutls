@@ -8,7 +8,7 @@
 #endif
 
 int system_errno (gnutls_transport_ptr);
-int system_recv_timeout(gnutls_transport_ptr ptr, size_t ms);
+int system_recv_timeout(gnutls_transport_ptr ptr,void*data, size_t, unsigned int ms);
 
 #ifdef _WIN32
 ssize_t system_write (gnutls_transport_ptr ptr, const void *data,

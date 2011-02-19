@@ -625,7 +625,6 @@ GNUTLS_2_12
 	gnutls_pkcs11_privkey_decrypt_data;
 	gnutls_pkcs11_obj_export;
 	gnutls_pkcs11_type_get_name;
-
 	gnutls_privkey_init;
 	gnutls_privkey_deinit;
 	gnutls_privkey_get_pk_algorithm;
@@ -667,7 +666,6 @@ GNUTLS_2_12
 	gnutls_global_set_mutex;
         gnutls_transport_set_push_function2;
         gnutls_transport_set_errno_function;
-
 	gnutls_sec_param_to_pk_bits;
 	gnutls_sec_param_get_name;
 	gnutls_pk_bits_to_sec_param;
@@ -687,6 +685,10 @@ GNUTLS_2_12
 	gnutls_openpgp_crt_verify_hash;
 	gnutls_pubkey_import_privkey;
 	gnutls_pubkey_verify_data;
+} GNUTLS_2_10;
+
+GNUTLS_3_0_0 {
+  global:
 	gnutls_x509_trust_list_verify_crt;
 	gnutls_x509_trust_list_add_crls;
 	gnutls_x509_trust_list_add_cas;
@@ -698,7 +700,8 @@ GNUTLS_2_12
 	gnutls_cipher_tag;
 	gnutls_cipher_add_auth;
 	gnutls_dtls_set_timeouts;
-} GNUTLS_2_10;
+	gnutls_transport_set_pull_timeout_function;
+} GNUTLS_2_12;
 
 GNUTLS_PRIVATE {
   global:

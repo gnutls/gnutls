@@ -8,44 +8,46 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 88 "serv.gaa"
+#line 91 "serv.gaa"
 	char *priorities;
-#line 85 "serv.gaa"
+#line 88 "serv.gaa"
 	char *srp_passwd_conf;
-#line 82 "serv.gaa"
+#line 85 "serv.gaa"
 	char *srp_passwd;
-#line 79 "serv.gaa"
+#line 82 "serv.gaa"
 	char *psk_hint;
-#line 76 "serv.gaa"
+#line 79 "serv.gaa"
 	char *psk_passwd;
-#line 73 "serv.gaa"
+#line 76 "serv.gaa"
 	int disable_client_cert;
-#line 70 "serv.gaa"
+#line 73 "serv.gaa"
 	int require_cert;
-#line 67 "serv.gaa"
+#line 70 "serv.gaa"
 	char *x509_dsacertfile;
-#line 64 "serv.gaa"
+#line 67 "serv.gaa"
 	char *x509_dsakeyfile;
-#line 61 "serv.gaa"
+#line 64 "serv.gaa"
 	char *x509_certfile;
-#line 58 "serv.gaa"
+#line 61 "serv.gaa"
 	char *x509_keyfile;
-#line 55 "serv.gaa"
+#line 58 "serv.gaa"
 	char *pgp_subkey;
-#line 52 "serv.gaa"
+#line 55 "serv.gaa"
 	char *pgp_certfile;
-#line 49 "serv.gaa"
+#line 52 "serv.gaa"
 	char *pgp_keyfile;
-#line 46 "serv.gaa"
+#line 49 "serv.gaa"
 	char *pgp_keyring;
-#line 43 "serv.gaa"
+#line 46 "serv.gaa"
 	char *x509_crlfile;
-#line 40 "serv.gaa"
+#line 43 "serv.gaa"
 	char *x509_cafile;
-#line 37 "serv.gaa"
+#line 40 "serv.gaa"
 	int fmtder;
-#line 34 "serv.gaa"
+#line 37 "serv.gaa"
 	char *dh_params_file;
+#line 34 "serv.gaa"
+	int udp;
 #line 30 "serv.gaa"
 	int http;
 #line 27 "serv.gaa"

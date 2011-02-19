@@ -40,7 +40,7 @@ endif
 
 noinst_LTLIBRARIES =
 
-gnutls_serv_SOURCES = list.h serv.c common.h common.c certtool-common.h
+gnutls_serv_SOURCES = list.h serv.c udp-serv.c common.h common.c certtool-common.h
 gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
 gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la
 gnutls_serv_LDADD += $(LTLIBGCRYPT) $(LIBSOCKET) $(GETADDRINFO_LIB)

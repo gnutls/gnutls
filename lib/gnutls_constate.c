@@ -677,6 +677,7 @@ epoch_get_slot (gnutls_session_t session, uint16_t epoch)
 
   if (epoch_index >= MAX_EPOCH_INDEX)
     {
+      _gnutls_dtls_log("Epoch %d out of range (idx: %d, max: %d)\n", (int)epoch, (int)epoch_index, MAX_EPOCH_INDEX);
       gnutls_assert ();
       return NULL;
     }
@@ -746,9 +747,19 @@ epoch_alive (gnutls_session_t session, record_parameters_st * params)
   const security_parameters_st *sp = &session->security_parameters;
 
   /* DTLS will, in addition, need to check the epoch timeout value. */
-  return (params->epoch == sp->epoch_read
-          || params->epoch == sp->epoch_write
-          || params->epoch == sp->epoch_next);
+  if (params->usage_cnt > 0)
+    return 1;
+
+  if (params->epoch == sp->epoch_read)
+    return 1;
+  
+  if (params->epoch == sp->epoch_write)
+    return 1;
+  
+  if (params->epoch == sp->epoch_next)
+    return 1;
+
+  return 0;
 }
 
 void

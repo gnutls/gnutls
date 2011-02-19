@@ -60,7 +60,8 @@ int _gnutls_handshake_io_cache_int (gnutls_session_t,
                                      gnutls_handshake_description_t,
                                      mbuffer_st * bufel);
 ssize_t _gnutls_io_write_flush (gnutls_session_t session);
-int _gnutls_io_check_recv (gnutls_session_t session, int ms);
+int
+_gnutls_io_check_recv (gnutls_session_t session, void* data, size_t data_size, unsigned int ms);
 ssize_t _gnutls_handshake_io_write_flush (gnutls_session_t session);
 
 #endif

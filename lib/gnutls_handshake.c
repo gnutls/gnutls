@@ -518,6 +518,16 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
       session->internals.resumed = RESUME_FALSE;
     }
 
+  if (_gnutls_is_dtls(session))
+   {
+     int cookie_size;
+
+     DECR_LEN (len, 1);
+     cookie_size = data[pos++];
+     DECR_LEN (len, cookie_size);
+     pos+=cookie_size;
+   }
+
   /* Remember ciphersuites for later
    */
   DECR_LEN (len, 2);
@@ -943,31 +953,20 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
       gnutls_assert ();
       return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
     }
-#ifdef HANDSHAKE_DEBUG
 
-  _gnutls_handshake_log ("HSK[%p]: Requested cipher suites: \n", session);
-  for (j = 0; j < datalen; j += 2)
-    {
-      memcpy (&cs.suite, &data[j], 2);
-      _gnutls_handshake_log ("\t%s\n", _gnutls_cipher_suite_get_name (&cs));
-    }
-  _gnutls_handshake_log ("HSK[%p]: Supported cipher suites: \n", session);
-  for (j = 0; j < x; j++)
-    _gnutls_handshake_log ("\t%s\n",
-                           _gnutls_cipher_suite_get_name (&ciphers[j]));
-#endif
-  memset (session->security_parameters.current_cipher_suite.suite, '\0', 2);
+  memset (session->security_parameters.current_cipher_suite.suite, 0, 2);
 
   retval = GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 
+  _gnutls_handshake_log ("HSK[%p]: Requested cipher suites[size: %d]: \n", session, (int)datalen);
   for (j = 0; j < datalen; j += 2)
     {
+      memcpy (&cs.suite, &data[j], 2);
+      _gnutls_handshake_log ("\t0x%.2x, 0x%.2x %s\n", data[j], data[j+1], _gnutls_cipher_suite_get_name (&cs));
       for (i = 0; i < x; i++)
         {
           if (memcmp (ciphers[i].suite, &data[j], 2) == 0)
             {
-              memcpy (&cs.suite, &data[j], 2);
-
               _gnutls_handshake_log
                 ("HSK[%p]: Selected cipher suite: %s\n", session,
                  _gnutls_cipher_suite_get_name (&cs));
@@ -1212,7 +1211,7 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
       pos += 3;
     }
 
-  _gnutls_handshake_log ("HSK[%p]: %s was sent [%ld bytes]\n",
+  _gnutls_handshake_log ("HSK[%p]: %s was queued [%ld bytes]\n",
                          session, _gnutls_handshake2str (type),
                          (long) datasize);
 
@@ -1240,7 +1239,7 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
          _gnutls_handshake_hash_add_sent (session, type, data, datasize)) < 0)
       {
         gnutls_assert ();
-      _mbuffer_xfree(&bufel);
+        _mbuffer_xfree(&bufel);
         return ret;
       }
 
@@ -1418,6 +1417,9 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
     return length32;
   else if (*recv_type != type)
     {
+      _gnutls_handshake_log ("HSK[%p]: %s was received, expected %s\n",
+                             session, _gnutls_handshake2str (*recv_type),
+                              _gnutls_handshake2str (type));
       gnutls_assert ();
       return GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
     }
@@ -1604,7 +1606,7 @@ _gnutls_recv_handshake (gnutls_session_t session, uint8_t ** data,
       else
 	/* Signal our caller we have received a verification cookie
 	   and ClientHello needs to be sent again. */
-	ret = 1;
+        ret = 1;
 	
       goto cleanup; /* caller doesn't need dataptr */
 
@@ -2282,7 +2284,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
     _gnutls_send_handshake (session, bufel, GNUTLS_HANDSHAKE_CLIENT_HELLO);
 
 cleanup:
-  gnutls_free (bufel);
+  _mbuffer_xfree(&bufel);
   _gnutls_buffer_clear(&extdata);
   return ret;
 }
@@ -2870,20 +2872,20 @@ _gnutls_handshake_client (gnutls_session_t session)
 
     case STATE11:
       if (_gnutls_is_dtls (session))
-	{
-	  ret =
-	    _gnutls_recv_handshake (session, NULL, NULL,
-				    GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST,
-				    OPTIONAL_PACKET);
-	  STATE = STATE11;
-	  IMED_RET ("recv hello verify", ret, 1);
+        {
+          ret =
+            _gnutls_recv_handshake (session, NULL, NULL,
+                  GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST,
+                  OPTIONAL_PACKET);
+          STATE = STATE11;
+          IMED_RET ("recv hello verify", ret, 1);
 
-	  if (ret == 1)
-	    {
-	      STATE = STATE0;
-	      return 1;
-	    }
-	}
+          if (ret == 1)
+            {
+              STATE = STATE0;
+              return 1;
+            }
+        }
     case STATE2:
       /* receive the server hello */
       ret =

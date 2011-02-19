@@ -49,6 +49,7 @@
 #include "read-file.h"
 #include "minmax.h"
 #include "sockets.h"
+#include "udp-serv.h"
 
 /* konqueror cannot handle sending the page in multiple
  * pieces.
@@ -56,7 +57,6 @@
 /* global stuff */
 static int generate = 0;
 static int http = 0;
-static int port = 0;
 static int x509ctype;
 static int debug;
 
@@ -81,6 +81,7 @@ char *dh_params_file;
 char *x509_crlfile = NULL;
 
 gnutls_datum_t session_ticket_key;
+static int tcp_server(const char* name, int port);
 
 /* end of globals */
 
@@ -326,13 +327,15 @@ generate_rsa_params (void)
 
 LIST_DECLARE_INIT (listener_list, listener_item, listener_free);
 
-static gnutls_session_t
-initialize_session (void)
+gnutls_session_t initialize_session (int dtls)
 {
   gnutls_session_t session;
   const char *err;
 
-  gnutls_init (&session, GNUTLS_SERVER);
+  if (dtls)
+    gnutls_init_dtls (&session, GNUTLS_SERVER, 0);
+  else
+    gnutls_init (&session, GNUTLS_SERVER);
 
   /* allow the use of private ciphersuites.
    */
@@ -585,7 +588,7 @@ peer_print_info (gnutls_session_t session, int *ret_length,
   return http_buffer;
 }
 
-static const char *
+const char *
 human_addr (const struct sockaddr *sa, socklen_t salen,
             char *buf, size_t buflen)
 {
@@ -633,8 +636,52 @@ human_addr (const struct sockaddr *sa, socklen_t salen,
   return save_buf;
 }
 
-static int
-listen_socket (const char *name, int listen_port)
+int wait_for_connection(void)
+{
+  listener_item *j;
+  fd_set rd, wr;
+  int n, sock = -1;
+
+  FD_ZERO (&rd);
+  FD_ZERO (&wr);
+  n = 0;
+
+  lloopstart (listener_list, j)
+  {
+    if (j->listen_socket)
+      {
+        FD_SET (j->fd, &rd);
+        n = MAX (n, j->fd);
+      }
+  }
+  lloopend (listener_list, j);
+
+  /* waiting part */
+  n = select (n + 1, &rd, &wr, NULL, NULL);
+  if (n == -1 && errno == EINTR)
+    return -1;
+  if (n < 0)
+    {
+      perror ("select()");
+      exit (1);
+    }
+
+  /* find which one is ready */
+  lloopstart (listener_list, j)
+    {
+      /* a new connection has arrived */
+      if (FD_ISSET (j->fd, &rd) && j->listen_socket)
+        {
+          sock = j->fd;
+          break;
+        }
+    }
+  lloopend (listener_list, j);
+  return sock;
+}
+
+int
+listen_socket (const char *name, int listen_port, int socktype)
 {
   struct addrinfo hints, *res, *ptr;
   char portname[6];
@@ -644,7 +691,7 @@ listen_socket (const char *name, int listen_port)
 
   snprintf (portname, sizeof (portname), "%d", listen_port);
   memset (&hints, 0, sizeof (hints));
-  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_socktype = socktype;
   hints.ai_flags = AI_PASSIVE;
 
   if ((s = getaddrinfo (NULL, portname, &hints, &res)) != 0)
@@ -671,26 +718,32 @@ listen_socket (const char *name, int listen_port)
           continue;
         }
 
-      yes = 1;
-      if (setsockopt (s, SOL_SOCKET, SO_REUSEADDR,
-                      (const void *) &yes, sizeof (yes)) < 0)
+      if (socktype == SOCK_STREAM)
         {
-          perror ("setsockopt() failed");
-        failed:
-          close (s);
-          continue;
+          yes = 1;
+          if (setsockopt (s, SOL_SOCKET, SO_REUSEADDR,
+                          (const void *) &yes, sizeof (yes)) < 0)
+            {
+              perror ("setsockopt() failed");
+              close (s);
+              continue;
+            }
         }
 
       if (bind (s, ptr->ai_addr, ptr->ai_addrlen) < 0)
         {
           perror ("bind() failed");
-          goto failed;
+          close (s);
+          continue;
         }
 
-      if (listen (s, 10) < 0)
+      if (socktype == SOCK_STREAM)
         {
-          perror ("listen() failed");
-          goto failed;
+          if (listen (s, 10) < 0)
+            {
+              perror ("listen() failed");
+              exit(1);
+            }
         }
 
       /* new list entry for the connection */
@@ -706,10 +759,8 @@ listen_socket (const char *name, int listen_port)
   fflush (stderr);
 
   freeaddrinfo (res);
-  if (!j)
-    return -1;
 
-  return 0;
+  return s;
 }
 
 /* strips \r\n from the end of the string 
@@ -824,12 +875,8 @@ static void gaa_parser (int argc, char **argv);
 int
 main (int argc, char **argv)
 {
-  int ret, n;
-  char topbuf[512];
+  int ret;
   char name[256];
-  int accept_fd;
-  struct sockaddr_storage client_address;
-  socklen_t calen;
 
   set_program_name (argv[0]);
 
@@ -1049,7 +1096,22 @@ main (int argc, char **argv)
     gnutls_session_ticket_key_generate (&session_ticket_key);
 #endif
 
-  if (listen_socket (name, port) < 0)
+  if (info.udp)
+    return udp_server(name, info.port);
+  else
+    return tcp_server(name, info.port);
+}
+
+static int tcp_server(const char* name, int port)
+{
+  int n, s;
+  char topbuf[512];
+  int accept_fd;
+  struct sockaddr_storage client_address;
+  socklen_t calen;
+
+  s = listen_socket (name, port, SOCK_STREAM);
+  if (s < 0)
     exit (1);
 
   for (;;)
@@ -1112,7 +1174,7 @@ main (int argc, char **argv)
           {
             gnutls_session_t tls_session;
 
-            tls_session = initialize_session ();
+            tls_session = initialize_session (0);
 
             calen = sizeof (client_address);
             memset (&client_address, 0, calen);
@@ -1461,8 +1523,6 @@ gaa_parser (int argc, char **argv)
     generate = 1;
 
   dh_params_file = info.dh_params_file;
-
-  port = info.port;
 
   x509_certfile = info.x509_certfile;
   x509_keyfile = info.x509_keyfile;

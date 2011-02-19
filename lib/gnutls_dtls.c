@@ -57,10 +57,7 @@ _gnutls_dtls_handshake_enqueue (gnutls_session_t session,
 
   msg = gnutls_malloc (sizeof(dtls_hsk_retransmit_buffer));
   if (msg == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
   msg->bufel = bufel;
 
@@ -70,9 +67,11 @@ _gnutls_dtls_handshake_enqueue (gnutls_session_t session,
   msg->type = type;
   msg->sequence = sequence;
 
-  _gnutls_dtls_log ("DTLS[%p]: Enqueued Packet[%u] %s(%d) with length: %u\n",
+  params->usage_cnt++;
+
+  _gnutls_dtls_log ("DTLS[%p]: Enqueued Packet[%u] %s(%d) with length: %u on epoch %d\n",
 		    session, (uint)sequence, _gnutls_handshake2str (type),
-		    type, msg->bufel->msg.size);
+		    type, msg->bufel->msg.size, msg->epoch);
 
   *(session->internals.dtls.retransmit_end) = msg;
   session->internals.dtls.retransmit_end = &msg->next;
@@ -93,10 +92,11 @@ transmit_message (gnutls_session_t session,
 
   if (msg->type == GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC)
     {
-      return _gnutls_send_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1,
+      ret = _gnutls_send_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1,
         msg->epoch, 
         _mbuffer_get_uhead_ptr(msg->bufel), 
         _mbuffer_get_uhead_size(msg->bufel), 0);
+      goto leave_epoch;
     }
 
   mtu_data = gnutls_malloc(mtu + DTLS_HANDSHAKE_HEADER_SIZE);
@@ -119,7 +119,7 @@ transmit_message (gnutls_session_t session,
   _gnutls_write_uint16 (msg->sequence, &mtu_data[4]);
 
   /* Chop up and send handshake message into mtu-size pieces. */
-  for (offset=0; offset < data_size; offset += mtu)
+  for (offset=0; offset <= data_size; offset += mtu)
     {
       /* Calculate fragment length */
       if(offset + mtu > data_size)
@@ -153,7 +153,27 @@ transmit_message (gnutls_session_t session,
    }
 
   gnutls_free (mtu_data);
+leave_epoch:
+
   return ret;
+}
+
+static int drop_usage_count(gnutls_session_t session)
+{
+  dtls_hsk_retransmit_buffer *msg;
+  record_parameters_st * params;
+  int ret;
+
+  for (msg = session->internals.dtls.retransmit; msg != NULL; msg = msg->next)
+    {
+      ret = _gnutls_epoch_get( session, msg->epoch, &params);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+      params->usage_cnt--;
+      if (params->usage_cnt < 0)
+        return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+    }
+  return 0;
 }
 
 /* This function transmits the flight that has been previously
@@ -170,26 +190,47 @@ int ret;
   /* PREPARING -> SENDING state transition */
   dtls_hsk_retransmit_buffer *msg;
   unsigned int total_timeout = 0;
+  gnutls_handshake_description_t last_type = 0;
 
   do 
     {
       _gnutls_dtls_log ("DTLS[%p]: Start of flight transmission.\n", session);
 
       for (msg = session->internals.dtls.retransmit; msg != NULL; msg = msg->next)
-        transmit_message (session, msg);
+        {
+          transmit_message (session, msg);
+          last_type = msg->type;
+        }
 
       ret = _gnutls_io_write_flush (session);
       if (ret < 0)
         return gnutls_assert_val(ret);
 
-      ret = _gnutls_io_check_recv(session, session->internals.dtls.retrans_timeout);
-      total_timeout += session->internals.dtls.retrans_timeout;
+      /* last message in handshake -> no ack */
+      if (session->security_parameters.entity == GNUTLS_SERVER &&
+        last_type == GNUTLS_HANDSHAKE_FINISHED)
+        {
+          opaque c;
+          ret = _gnutls_io_check_recv(session, &c, 1, session->internals.dtls.retrans_timeout);
+          if (ret == GNUTLS_E_TIMEDOUT)
+            ret = 0;
+          else if (ret >= 0)
+            {
+              if (c == GNUTLS_HANDSHAKE) /* retransmit */
+                ret = GNUTLS_E_TIMEDOUT;
+            }
+          total_timeout += session->internals.dtls.retrans_timeout;
+        }
+      else /* all other messages -> implicit ack (receive of next flight) */
+        {
+          ret = _gnutls_io_check_recv(session, NULL, 0, session->internals.dtls.retrans_timeout);
+          total_timeout += session->internals.dtls.retrans_timeout;
+        }
 
       if (total_timeout >= session->internals.dtls.total_timeout) {
         ret = gnutls_assert_val(GNUTLS_E_TIMEDOUT);
         goto cleanup;
       }
-
     } while(ret == GNUTLS_E_TIMEDOUT);
 
   if (ret < 0)
@@ -202,6 +243,7 @@ int ret;
   ret = 0;
 
 cleanup:
+  drop_usage_count(session);
   _gnutls_dtls_clear_outgoing_buffer (session);
 
   /* SENDING -> WAITING state transition */

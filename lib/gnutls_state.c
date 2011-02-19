@@ -372,6 +372,7 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
 #endif
   gnutls_transport_set_pull_function (*session, system_read);
   gnutls_transport_set_errno_function (*session, system_errno);
+  gnutls_transport_set_pull_timeout_function (*session, system_recv_timeout);
 
   return 0;
 }
@@ -407,8 +408,8 @@ gnutls_init_dtls (gnutls_session_t * session,
   /* Initialize pointer used to enqueue messages for retransmit. */
   (*session)->internals.dtls.retransmit_end = &(*session)->internals.dtls.retransmit;
 
-  (*session)->internals.dtls.retrans_timeout = 100;
-  (*session)->internals.dtls.total_timeout = 3000;
+  (*session)->internals.dtls.retrans_timeout = 1000;
+  (*session)->internals.dtls.total_timeout = 4000;
 
   return 0;
 }

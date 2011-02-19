@@ -491,6 +491,12 @@ struct record_parameters_st
 
   record_state_st read;
   record_state_st write;
+  
+  /* Whether this state is in use, i.e., if there is
+     a pending handshake message waiting to be encrypted
+     under this epoch's parameters.
+   */
+  int usage_cnt;
 };
 
 typedef struct
@@ -703,6 +709,7 @@ typedef struct
 
   /* PUSH & PULL functions.
    */
+  gnutls_pull_timeout_func pull_timeout_func;
   gnutls_pull_func pull_func;
   gnutls_push_func push_func;
   gnutls_vec_push_func vec_push_func;
