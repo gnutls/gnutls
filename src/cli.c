@@ -622,7 +622,7 @@ handle_error (socket_st * hd, int err)
   int alert, ret;
   const char *err_type, *str;
 
-  if (err >= 0)
+  if (err >= 0 || err == GNUTLS_E_AGAIN || err == GNUTLS_E_INTERRUPTED)
     return 0;
 
   if (gnutls_error_is_fatal (err) == 0)
