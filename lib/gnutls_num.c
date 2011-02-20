@@ -71,7 +71,7 @@ _gnutls_uint48pp (uint64 * x)
 {
   register int i, y = 0;
 
-  for (i = 5; i >= 0; i--)
+  for (i = 7; i >= 3; i--)
     {
       y = 0;
       if (x->i[i] == 0xff)
