@@ -47,4 +47,18 @@ void _gnutls_epoch_gc (gnutls_session_t session);
 void _gnutls_epoch_free (gnutls_session_t session,
                          record_parameters_st * state);
 
+static inline void _gnutls_epoch_refcount_inc(record_parameters_st * params)
+{
+  params->usage_cnt++;
+}
+
+static inline int _gnutls_epoch_refcount_dec(record_parameters_st * params)
+{
+  params->usage_cnt--;
+  if (params->usage_cnt < 0)
+    return GNUTLS_E_INTERNAL_ERROR;
+  
+  return 0;
+}
+
 #endif

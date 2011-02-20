@@ -126,9 +126,10 @@ static int drop_usage_count(gnutls_session_t session)
       ret = _gnutls_epoch_get( session, cur->epoch, &params);
       if (ret < 0)
         return gnutls_assert_val(ret);
-      params->usage_cnt--;
-      if (params->usage_cnt < 0)
-        return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+      ret = _gnutls_epoch_refcount_dec(params);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
 
   return 0;

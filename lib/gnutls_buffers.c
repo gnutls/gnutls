@@ -883,7 +883,7 @@ _gnutls_handshake_io_cache_int (gnutls_session_t session,
       bufel->htype = htype;
       bufel->sequence = session->internals.dtls.hsk_write_seq-1;
 
-      params->usage_cnt++;
+      _gnutls_epoch_refcount_inc(params);
     }
   
   send_buffer =
