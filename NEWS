@@ -57,8 +57,8 @@ gnutls_x509_crq_sign: DEPRECATED (use: gnutls_x509_crq_privkey_sign)
 gnutls_x509_crq_get_preferred_hash_algorithm: DEPRECATED
 gnutls_x509_crl_sign: DEPRECATED (use: gnutls_x509_crl_privkey_sign)
 gnutls_x509_crl_sign2: DEPRECATED (use: gnutls_x509_crl_privkey_sign)
-gnutls_x509_privkey_sign_data: DEPRECATED (use: gnutls_privkey_sign_data2)
-gnutls_x509_privkey_sign_hash: DEPRECATED (use: gnutls_privkey_sign_hash2)
+gnutls_x509_privkey_sign_data: DEPRECATED (use: gnutls_privkey_sign_data)
+gnutls_x509_privkey_sign_hash: DEPRECATED (use: gnutls_privkey_sign_hash)
 gnutls_x509_privkey_verify_data: DEPRECATED (use: gnutls_pubkey_verify_data)
 gnutls_psk_netconf_derive_key: DEPRECATED
 gnutls_session_set_finished_function: DEPRECATED
@@ -73,10 +73,9 @@ gnutls_x509_crt_verify_hash: DEPRECATED (use: gnutls_pubkey_verify_hash)
 gnutls_x509_crt_verify_data: DEPRECATED (use: gnutls_pubkey_verify_data)
 gnutls_x509_crt_get_verify_algorithm: DEPRECATED (use: gnutls_pubkey_get_verify_algorithm)
 gnutls_x509_crt_get_preferred_hash_algorithm: DEPRECATED (use: gnutls_pubkey_get_preferred_hash_algorithm)
-gnutls_openpgp_privkey_sign_hash: DEPRECATED (use: gnutls_privkey_sign_hash2)
+gnutls_openpgp_privkey_sign_hash: DEPRECATED (use: gnutls_privkey_sign_hash)
 gnutls_pkcs11_privkey_sign_hash: REMOVED (was added in 2.11.0)
 gnutls_pkcs11_privkey_decrypt_data: REMOVED (was added in 2.11.0)
-gnutls_privkey_sign_hash: REMOVED (was added in 2.11.0)
 
 * Version 2.11.6 (released 2010-12-06)
 
