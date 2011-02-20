@@ -214,6 +214,8 @@ gnutls_pubkey_import_x509 (gnutls_pubkey_t key, gnutls_x509_crt_t crt,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_import_privkey (gnutls_pubkey_t key, gnutls_privkey_t pkey,
