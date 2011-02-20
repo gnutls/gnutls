@@ -1225,7 +1225,7 @@ gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key,
   return 0;
 }
 
-/*-
+/**
  * gnutls_openpgp_privkey_sign_hash:
  * @key: Holds the key
  * @hash: holds the data to be signed
@@ -1237,7 +1237,9 @@ gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
- -*/
+ *
+ * Deprecated: Use gnutls_privkey_sign_hash() instead.
+ */
 int
 gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
                                    const gnutls_datum_t * hash,
