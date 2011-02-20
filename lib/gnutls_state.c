@@ -405,9 +405,6 @@ gnutls_init_dtls (gnutls_session_t * session,
   (*session)->internals.dtls.hsk_mtu = DTLS_DEFAULT_MTU;
   (*session)->internals.transport = GNUTLS_DGRAM;
 
-  /* Initialize pointer used to enqueue messages for retransmit. */
-  (*session)->internals.dtls.retransmit_end = &(*session)->internals.dtls.retransmit;
-
   (*session)->internals.dtls.retrans_timeout = 1000;
   (*session)->internals.dtls.total_timeout = 4000;
 

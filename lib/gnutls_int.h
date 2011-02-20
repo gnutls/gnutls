@@ -265,8 +265,15 @@ typedef struct mbuffer_st
   unsigned int user_mark;       /* only used during fill in */
   size_t maximum_size;
   
-  gnutls_handshake_description_t htype;
+  /* record layer content type */
   content_type_t type;
+
+  /* Record layer epoch of message */
+  uint16_t epoch;
+
+  /* Handshake layer type and sequence of message */
+  gnutls_handshake_description_t htype;
+  uint16_t sequence;
 } mbuffer_st;
 
 typedef struct mbuffer_head_st
@@ -277,25 +284,6 @@ typedef struct mbuffer_head_st
   unsigned int length;
   size_t byte_length;
 } mbuffer_head_st;
-
-/* This is a linked list used to buffer the next flight of outgoing
-   handshake messages. Messages are queued whole; they are fragmented
-   dynamically on transmit. */
-typedef struct dtls_hsk_retransmit_buffer
-{
-  struct dtls_hsk_retransmit_buffer *next;
-
-  /* The actual handshake message */
-  mbuffer_st* bufel;
-
-  /* Record layer epoch of message */
-  uint16_t epoch;
-
-  /* Handshake layer type and sequence of message */
-  gnutls_handshake_description_t type;
-  uint16_t sequence;
-} dtls_hsk_retransmit_buffer;
-
 
 typedef enum
 {
@@ -567,10 +555,6 @@ typedef struct
 
   unsigned int retrans_timeout;
   unsigned int total_timeout;
-
-  /* Head of the next outgoing flight. */
-  dtls_hsk_retransmit_buffer *retransmit;
-  dtls_hsk_retransmit_buffer **retransmit_end;
 
   unsigned int hsk_hello_verify_requests;
 } dtls_st;

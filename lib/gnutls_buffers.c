@@ -57,7 +57,7 @@
 #include <gnutls_state.h>
 #include <gnutls_dtls.h>
 #include <system.h>
-
+#include <gnutls_constate.h> /* gnutls_epoch_get */
 #include <errno.h>
 
 #ifndef EAGAIN
@@ -827,7 +827,6 @@ _gnutls_handshake_io_write_flush (gnutls_session_t session)
   if (IS_DTLS(session))
     return _gnutls_dtls_transmit(session);
 
-
   for (cur = _mbuffer_get_first (send_buffer, &msg);
        cur != NULL; cur = _mbuffer_get_first (send_buffer, &msg))
     {
@@ -870,9 +869,22 @@ _gnutls_handshake_io_cache_int (gnutls_session_t session,
                                 mbuffer_st * bufel)
 {
   mbuffer_head_st * send_buffer;
-  
+
   if (IS_DTLS(session))
-    return _gnutls_dtls_handshake_enqueue(session, bufel, htype, session->internals.dtls.hsk_write_seq-1);
+    {
+      record_parameters_st * params;
+      int ret;
+
+      ret = _gnutls_epoch_get( session, EPOCH_WRITE_CURRENT, &params);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+
+      bufel->epoch = params->epoch;
+      bufel->htype = htype;
+      bufel->sequence = session->internals.dtls.hsk_write_seq-1;
+
+      params->usage_cnt++;
+    }
   
   send_buffer =
     &session->internals.handshake_send_buffer;
