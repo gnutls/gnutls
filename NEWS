@@ -124,7 +124,7 @@ gnutls_privkey_sign_hash: MODIFIED (was added in 2.11.0)
 gnutls_privkey_sign_data: MODIFIED (was added in 2.11.0)
 gnutls_x509_crq_sign2: DEPRECATED (use: gnutls_x509_crq_privkey_sign)
 gnutls_x509_crq_sign: DEPRECATED (use: gnutls_x509_crq_privkey_sign)
-gnutls_x509_crq_get_preferred_hash_algorithm: DEPRECATED
+gnutls_x509_crq_get_preferred_hash_algorithm: REMOVED (was added in 2.11.0)
 gnutls_x509_crl_sign: DEPRECATED (use: gnutls_x509_crl_privkey_sign)
 gnutls_x509_crl_sign2: DEPRECATED (use: gnutls_x509_crl_privkey_sign)
 gnutls_x509_privkey_sign_data: DEPRECATED (use: gnutls_privkey_sign_data2)

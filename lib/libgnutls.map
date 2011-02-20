@@ -668,7 +668,6 @@ GNUTLS_2_12
 	gnutls_sec_param_get_name;
 	gnutls_pk_bits_to_sec_param;
 	gnutls_rnd;
-	gnutls_x509_crq_get_preferred_hash_algorithm;
 	gnutls_cipher_encrypt2;
 	gnutls_cipher_decrypt2;
 	gnutls_openpgp_privkey_sec_param;

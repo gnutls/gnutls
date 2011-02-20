@@ -439,7 +439,6 @@ APIMANS += gnutls_x509_crq_set_basic_constraints.3
 APIMANS += gnutls_x509_crq_set_key_usage.3
 APIMANS += gnutls_x509_crq_get_key_purpose_oid.3
 APIMANS += gnutls_x509_crq_set_key_purpose_oid.3
-APIMANS += gnutls_x509_crq_get_preferred_hash_algorithm.3
 APIMANS += gnutls_x509_crq_get_key_id.3
 APIMANS += gnutls_x509_crq_privkey_sign.3
 APIMANS += gnutls_x509_dn_init.3
