@@ -551,7 +551,7 @@ typedef struct
 
   /* For DTLS handshake fragmentation and reassembly. */
   uint16_t hsk_write_seq;
-  uint16_t hsk_read_seq;
+  int hsk_read_seq;
   uint16_t mtu;
 
   unsigned int retrans_timeout;
@@ -569,6 +569,11 @@ typedef struct
   /* this holds the length of the handshake packet */
   size_t packet_length;
   gnutls_handshake_description_t recv_type;
+  
+  /* DTLS fields */
+  uint16_t sequence;
+  size_t frag_offset;
+  size_t frag_length;
 } handshake_header_buffer_st;
 
 typedef union

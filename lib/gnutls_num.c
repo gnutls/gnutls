@@ -69,15 +69,25 @@ _gnutls_uint64pp (uint64 * x)
 int
 _gnutls_uint48pp (uint64 * x)
 {
-  int ret;
-  
-  ret = _gnutls_uint64pp(x);
-  if (ret != 0)
-    return ret;
-  
-  if (x->i[6] != 0)
-    return -1;
-    
+  register int i, y = 0;
+
+  for (i = 5; i >= 0; i--)
+    {
+      y = 0;
+      if (x->i[i] == 0xff)
+        {
+          x->i[i] = 0;
+          y = 1;
+        }
+      else
+        x->i[i]++;
+
+      if (y == 0)
+        break;
+    }
+  if (y != 0)
+    return -1;                  /* over 48 bits */
+
   return 0;
 }
 

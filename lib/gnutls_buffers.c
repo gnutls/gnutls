@@ -895,8 +895,34 @@ _gnutls_handshake_io_cache_int (gnutls_session_t session,
   _mbuffer_enqueue (send_buffer, bufel);
 
   _gnutls_write_log
-    ("HWRITE: enqueued %d. Total %d bytes.\n",
-     (int) bufel->msg.size, (int) send_buffer->byte_length);
+    ("HWRITE: enqueued [%s] %d. Total %d bytes.\n",
+     _gnutls_handshake2str (bufel->htype), (int) bufel->msg.size, (int) send_buffer->byte_length);
+
+  return 0;
+}
+
+/* Skips a handshake packet
+ */
+int
+_gnutls_handshake_io_recv_skip (gnutls_session_t session,
+                               content_type_t type,
+                               gnutls_handshake_description_t htype,
+                               size_t ptr_size)
+{
+  opaque * ptr;
+  int ret;
+
+  if (ptr_size == 0) return 0;
+
+  ptr = gnutls_malloc(ptr_size);
+  if (ptr == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+  ret = _gnutls_handshake_io_recv_int(session, type, htype, ptr, ptr_size);
+  gnutls_free(ptr);
+
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   return 0;
 }
@@ -908,7 +934,7 @@ ssize_t
 _gnutls_handshake_io_recv_int (gnutls_session_t session,
                                content_type_t type,
                                gnutls_handshake_description_t htype,
-                               void *iptr, size_t sizeOfPtr)
+                               void *iptr, size_t ptr_size)
 {
   size_t left;
   ssize_t i;
@@ -916,9 +942,9 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
   size_t dsize;
 
   ptr = iptr;
-  left = sizeOfPtr;
+  left = ptr_size;
 
-  if (sizeOfPtr == 0 || iptr == NULL)
+  if (ptr_size == 0 || iptr == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -929,20 +955,20 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
       size_t tmp;
 
       /* if we have already received some data */
-      if (sizeOfPtr <= session->internals.handshake_recv_buffer.length)
+      if (ptr_size <= session->internals.handshake_recv_buffer.length)
         {
           /* if requested less data then return it.
            */
           gnutls_assert ();
 
-          tmp = sizeOfPtr;
+          tmp = ptr_size;
           _gnutls_buffer_pop_data (&session->internals.handshake_recv_buffer,
                                    iptr, &tmp);
           return tmp;
         }
       gnutls_assert ();
 
-      tmp = sizeOfPtr;
+      tmp = ptr_size;
       _gnutls_buffer_pop_data (&session->internals.handshake_recv_buffer,
                                iptr, &tmp);
       left -= tmp;
@@ -950,7 +976,7 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
 
   while (left > 0)
     {
-      dsize = sizeOfPtr - left;
+      dsize = ptr_size - left;
       i = _gnutls_recv_int (session, type, htype, &ptr[dsize], left);
       if (i < 0)
         {
@@ -977,7 +1003,7 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
 
   session->internals.handshake_recv_buffer.length = 0;
 
-  return sizeOfPtr - left;
+  return ptr_size - left;
 }
 
 /* Buffer for handshake packets. Keeps the packets in order

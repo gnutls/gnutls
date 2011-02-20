@@ -1279,6 +1279,11 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
   return ret;
 }
 
+#define _gnutls_handshake_header_buffer_clear( session) session->internals.handshake_header_buffer.header_size = 0; \
+  session->internals.handshake_header_buffer.sequence = -1; \
+  session->internals.handshake_header_buffer.frag_offset = 0; \
+  session->internals.handshake_header_buffer.frag_length = 0
+
 /* This function will read the handshake header and return it to the caller. If the
  * received handshake packet is not the one expected then it buffers the header, and
  * returns UNEXPECTED_HANDSHAKE_PACKET.
@@ -1381,6 +1386,14 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
       length32 = _gnutls_read_uint24 (&dataptr[1]);
       handshake_header_size = HANDSHAKE_HEADER_SIZE(session);
 
+      if (IS_DTLS(session))
+        {
+          session->internals.handshake_header_buffer.sequence = _gnutls_read_uint16 (&dataptr[4]);
+          session->internals.handshake_header_buffer.frag_offset = _gnutls_read_uint24 (&dataptr[6]);
+          session->internals.handshake_header_buffer.frag_length = _gnutls_read_uint24 (&dataptr[9]);
+        }
+          
+
       _gnutls_handshake_log ("HSK[%p]: %s was received [%ld bytes]\n",
                              session, _gnutls_handshake2str (dataptr[0]),
                              (long int) (length32 + HANDSHAKE_HEADER_SIZE(session)));
@@ -1398,7 +1411,10 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
                              session, _gnutls_handshake2str (*recv_type),
                              (long int) (length32 + handshake_header_size));
 
-      if (*recv_type != GNUTLS_HANDSHAKE_CLIENT_HELLO)
+      /* The IS_DTLS() check is redundant since the record layer will
+       * prevent us from reaching here.
+       */
+      if (IS_DTLS(session) || *recv_type != GNUTLS_HANDSHAKE_CLIENT_HELLO)
         {                       /* it should be one or nothing */
           gnutls_assert ();
           return GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
@@ -1411,11 +1427,26 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
   session->internals.handshake_header_buffer.packet_length = length32;
   session->internals.handshake_header_buffer.recv_type = *recv_type;
 
-  if (_gnutls_is_dtls (session)
-      && type == GNUTLS_HANDSHAKE_SERVER_HELLO
-      && *recv_type == GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST)
-    return length32;
-  else if (*recv_type != type)
+  if (IS_DTLS(session))
+    {
+      if ((int)session->internals.handshake_header_buffer.sequence <= session->internals.dtls.hsk_read_seq)
+        {
+          _gnutls_audit_log("Dropping replayed handshake packet with sequence %d\n", session->internals.handshake_header_buffer.sequence);
+          ret = _gnutls_handshake_io_recv_skip(session, GNUTLS_HANDSHAKE, *recv_type, length32);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+
+          _gnutls_handshake_header_buffer_clear (session);
+          return GNUTLS_E_AGAIN;
+        }
+      session->internals.dtls.hsk_read_seq = session->internals.handshake_header_buffer.sequence;
+
+      if (type == GNUTLS_HANDSHAKE_SERVER_HELLO
+        && *recv_type == GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST)
+        return length32;
+    }
+
+  if (*recv_type != type)
     {
       _gnutls_handshake_log ("HSK[%p]: %s was received, expected %s\n",
                              session, _gnutls_handshake2str (*recv_type),
@@ -1426,10 +1457,6 @@ _gnutls_recv_handshake_header (gnutls_session_t session,
 
   return length32;
 }
-
-#define _gnutls_handshake_header_buffer_clear( session) session->internals.handshake_header_buffer.header_size = 0
-
-
 
 /* This function will hash the handshake headers and the
  * handshake data.
@@ -1501,7 +1528,6 @@ _gnutls_recv_handshake (gnutls_session_t session, uint8_t ** data,
   ret = _gnutls_recv_handshake_header (session, type, &recv_type);
   if (ret < 0)
     {
-
       if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET
           && optional == OPTIONAL_PACKET)
         {
@@ -1552,7 +1578,6 @@ _gnutls_recv_handshake (gnutls_session_t session, uint8_t ** data,
 
   if (data != NULL && length32 > 0)
     *data = dataptr;
-
 
   ret = _gnutls_handshake_hash_add_recvd (session, recv_type,
                                           session->

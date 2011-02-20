@@ -59,6 +59,12 @@ ssize_t _gnutls_handshake_io_recv_int (gnutls_session_t, content_type_t,
 int _gnutls_handshake_io_cache_int (gnutls_session_t,
                                      gnutls_handshake_description_t,
                                      mbuffer_st * bufel);
+int
+_gnutls_handshake_io_recv_skip (gnutls_session_t session,
+                               content_type_t type,
+                               gnutls_handshake_description_t htype,
+                               size_t ptr_size);
+
 ssize_t _gnutls_io_write_flush (gnutls_session_t session);
 int
 _gnutls_io_check_recv (gnutls_session_t session, void* data, size_t data_size, unsigned int ms);
