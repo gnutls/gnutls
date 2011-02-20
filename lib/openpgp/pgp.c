@@ -1597,7 +1597,7 @@ gnutls_openpgp_crt_set_preferred_key_id (gnutls_openpgp_crt_t key,
   ret = gnutls_openpgp_crt_get_subkey_idx (key, keyid);
   if (ret < 0)
     {
-      _gnutls_x509_log ("the requested subkey does not exist\n");
+      _gnutls_debug_log ("the requested subkey does not exist\n");
       gnutls_assert ();
       return ret;
     }

@@ -2114,7 +2114,7 @@ _gnutls_x509_oid2sign_algorithm (const char *oid)
 
   if (ret == 0)
     {
-      _gnutls_x509_log ("Unknown SIGN OID: '%s'\n", oid);
+      _gnutls_debug_log ("Unknown SIGN OID: '%s'\n", oid);
       return GNUTLS_SIGN_UNKNOWN;
     }
   return ret;

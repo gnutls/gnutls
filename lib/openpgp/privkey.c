@@ -268,7 +268,7 @@ _gnutls_openpgp_get_algo (int cdk_algo)
     algo = GNUTLS_PK_DSA;
   else
     {
-      _gnutls_x509_log ("Unknown OpenPGP algorithm %d\n", cdk_algo);
+      _gnutls_debug_log ("Unknown OpenPGP algorithm %d\n", cdk_algo);
       algo = GNUTLS_PK_UNKNOWN;
     }
 
@@ -1214,7 +1214,7 @@ gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key,
   ret = gnutls_openpgp_privkey_get_subkey_idx (key, keyid);
   if (ret < 0)
     {
-      _gnutls_x509_log ("the requested subkey does not exist\n");
+      _gnutls_debug_log ("the requested subkey does not exist\n");
       gnutls_assert ();
       return ret;
     }

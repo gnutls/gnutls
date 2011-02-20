@@ -280,7 +280,7 @@ gnutls_dh_params_import_pkcs3 (gnutls_dh_params_t params,
     {
       /* couldn't decode DER */
 
-      _gnutls_x509_log ("DHParams: Decoding error %d\n", result);
+      _gnutls_debug_log ("DHParams: Decoding error %d\n", result);
       gnutls_assert ();
       asn1_delete_structure (&c2);
       return _gnutls_asn2err (result);

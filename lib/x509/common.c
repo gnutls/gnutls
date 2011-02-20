@@ -258,7 +258,7 @@ _gnutls_x509_oid_data2string (const char *oid, void *value,
                           asn1_err)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      _gnutls_x509_log ("asn1_der_decoding: %s:%s\n", str, asn1_err);
+      _gnutls_debug_log ("asn1_der_decoding: %s:%s\n", str, asn1_err);
       asn1_delete_structure (&tmpasn);
       return _gnutls_asn2err (result);
     }
@@ -1333,7 +1333,7 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
   algo = _gnutls_x509_oid2pk_algorithm (oid);
   if (algo == GNUTLS_PK_UNKNOWN)
     {
-      _gnutls_x509_log
+      _gnutls_debug_log
         ("%s: unknown public key algorithm: %s\n", __func__, oid);
     }
 

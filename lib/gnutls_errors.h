@@ -50,7 +50,7 @@ _gnutls_log (int, const char *fmt, ...)
  ;
 #endif
 
-     void _gnutls_mpi_log (const char *prefix, bigint_t a);
+void _gnutls_mpi_log (const char *prefix, bigint_t a);
 
 #ifdef C99_MACROS
 #define LEVEL(l, ...) do { if (_gnutls_log_level >= l || _gnutls_log_level > 9) \
@@ -68,7 +68,7 @@ _gnutls_log (int, const char *fmt, ...)
 #define _gnutls_dtls_log(...) LEVEL(6, __VA_ARGS__)
 #define _gnutls_read_log(...) LEVEL_EQ(7, __VA_ARGS__)
 #define _gnutls_write_log(...) LEVEL_EQ(7, __VA_ARGS__)
-#define _gnutls_x509_log(...) LEVEL(1, __VA_ARGS__)
+#define _gnutls_audit_log(...) LEVEL(1, __VA_ARGS__)
 #else
 #define _gnutls_debug_log _gnutls_null_log
 #define _gnutls_handshake_log _gnutls_null_log
@@ -79,9 +79,9 @@ _gnutls_log (int, const char *fmt, ...)
 #define _gnutls_dtls_log _gnutls_null_log
 #define _gnutls_read_log _gnutls_null_log
 #define _gnutls_write_log _gnutls_null_log
-#define _gnutls_x509_log _gnutls_null_log
+#define _gnutls_audit_log _gnutls_null_log
 
-     void _gnutls_null_log (void *, ...);
+void _gnutls_null_log (void *, ...);
 
 #endif /* C99_MACROS */
 
@@ -89,11 +89,11 @@ _gnutls_log (int, const char *fmt, ...)
    otherwise. Making this a macro has been tried, but it interacts
    badly with the do..while in the expansion. Welcome to the dark
    side. */
-     static inline
+static inline
 #ifdef __GNUC__
        __attribute__ ((always_inline))
 #endif
-     int gnutls_assert_val_int (int val, const char *file, int line)
+int gnutls_assert_val_int (int val, const char *file, int line)
 {
   _gnutls_debug_log ("ASSERT: %s:%d\n", file, line);
   return val;

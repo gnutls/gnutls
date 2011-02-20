@@ -279,7 +279,7 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
           if (result < 0)
             {
               gnutls_assert ();
-              _gnutls_x509_log
+              _gnutls_debug_log
                 ("Found OID: '%s' with value '%s'\n",
                  oid, _gnutls_bin2hex (value2, len, escaped, sizeof_escaped,
                                        NULL));
@@ -660,7 +660,7 @@ _gnutls_x509_encode_and_write_attribute (const char *given_oid,
   if (val_name == NULL)
     {
       gnutls_assert ();
-      _gnutls_x509_log ("Cannot find OID: %s\n", given_oid);
+      _gnutls_debug_log ("Cannot find OID: %s\n", given_oid);
       return GNUTLS_E_X509_UNSUPPORTED_OID;
     }
 
@@ -1001,7 +1001,7 @@ gnutls_x509_dn_import (gnutls_x509_dn_t dn, const gnutls_datum_t * data)
   if (result != ASN1_SUCCESS)
     {
       /* couldn't decode DER */
-      _gnutls_x509_log ("ASN.1 Decoding error: %s\n", err);
+      _gnutls_debug_log ("ASN.1 Decoding error: %s\n", err);
       gnutls_assert ();
       return _gnutls_asn2err (result);
     }

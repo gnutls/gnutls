@@ -188,7 +188,7 @@ proc_rsa_client_kx (gnutls_session_t session, opaque * data,
        * attack against pkcs-1 formating).
        */
       gnutls_assert ();
-      _gnutls_x509_log ("auth_rsa: Possible PKCS #1 format attack\n");
+      _gnutls_audit_log ("auth_rsa: Possible PKCS #1 format attack\n");
       randomize_key = 1;
     }
   else
@@ -206,7 +206,7 @@ proc_rsa_client_kx (gnutls_session_t session, opaque * data,
            * Ondej Pokorny and Tomas Rosa.
            */
           gnutls_assert ();
-          _gnutls_x509_log
+          _gnutls_audit_log
             ("auth_rsa: Possible PKCS #1 version check format attack\n");
         }
     }

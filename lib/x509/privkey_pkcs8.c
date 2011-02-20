@@ -120,7 +120,7 @@ check_schema (const char *oid)
   if (strcmp (oid, PKCS12_PBE_RC2_40_SHA1_OID) == 0)
     return PKCS12_RC2_40_SHA1;
 
-  _gnutls_x509_log ("PKCS encryption schema OID '%s' is unsupported.\n", oid);
+  _gnutls_debug_log ("PKCS encryption schema OID '%s' is unsupported.\n", oid);
 
   return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 }
@@ -438,7 +438,7 @@ _gnutls_pkcs_flags_to_schema (unsigned int flags)
   else
     {
       gnutls_assert ();
-      _gnutls_x509_log
+      _gnutls_debug_log
         ("Selecting default encryption PKCS12_3DES_SHA1 (flags: %u).\n",
          flags);
       schema = PKCS12_3DES_SHA1;
@@ -1106,7 +1106,7 @@ decode_private_key_info (const gnutls_datum_t * der,
   else
     {
       gnutls_assert ();
-      _gnutls_x509_log
+      _gnutls_debug_log
         ("PKCS #8 private key OID '%s' is unsupported.\n", oid);
       result = GNUTLS_E_UNKNOWN_PK_ALGORITHM;
       goto error;
@@ -1273,7 +1273,7 @@ read_pbkdf2_params (ASN1_TYPE pbes2_asn,
   if (strcmp (oid, PBKDF2_OID) != 0)
     {
       gnutls_assert ();
-      _gnutls_x509_log
+      _gnutls_debug_log
         ("PKCS #8 key derivation OID '%s' is unsupported.\n", oid);
       return _gnutls_asn2err (result);
     }
@@ -1473,7 +1473,7 @@ oid2cipher (const char *oid, gnutls_cipher_algorithm_t * algo)
       return 0;
     }
 
-  _gnutls_x509_log ("PKCS #8 encryption OID '%s' is unsupported.\n", oid);
+  _gnutls_debug_log ("PKCS #8 encryption OID '%s' is unsupported.\n", oid);
   return GNUTLS_E_UNKNOWN_CIPHER_TYPE;
 }
 

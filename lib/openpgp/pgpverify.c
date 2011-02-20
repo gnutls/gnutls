@@ -82,12 +82,12 @@ gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
     }
   else if (rc != CDK_Success)
     {
-      _gnutls_x509_log ("cdk_pk_check_sigs: error %d\n", rc);
+      _gnutls_debug_log ("cdk_pk_check_sigs: error %d\n", rc);
       rc = _gnutls_map_cdk_rc (rc);
       gnutls_assert ();
       return rc;
     }
-  _gnutls_x509_log ("status: %x\n", status);
+  _gnutls_debug_log ("status: %x\n", status);
 
   if (status & CDK_KEY_INVALID)
     *verify |= GNUTLS_CERT_INVALID;

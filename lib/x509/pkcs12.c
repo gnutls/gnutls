@@ -65,7 +65,7 @@ _decode_pkcs12_auth_safe (ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
   if (strcmp (oid, DATA_OID) != 0)
     {
       gnutls_assert ();
-      _gnutls_x509_log ("Unknown PKCS12 Content OID '%s'\n", oid);
+      _gnutls_debug_log ("Unknown PKCS12 Content OID '%s'\n", oid);
       return GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE;
     }
 
@@ -96,7 +96,7 @@ _decode_pkcs12_auth_safe (ASN1_TYPE pkcs12, ASN1_TYPE * authen_safe,
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      _gnutls_x509_log ("DER error: %s\n", error_str);
+      _gnutls_debug_log ("DER error: %s\n", error_str);
       result = _gnutls_asn2err (result);
       goto cleanup;
     }
@@ -236,7 +236,7 @@ gnutls_pkcs12_import (gnutls_pkcs12_t pkcs12,
   if (result != ASN1_SUCCESS)
     {
       result = _gnutls_asn2err (result);
-      _gnutls_x509_log ("DER error: %s\n", error_str);
+      _gnutls_debug_log ("DER error: %s\n", error_str);
       gnutls_assert ();
       goto cleanup;
     }
@@ -486,7 +486,7 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
                   {
                     _gnutls_free_datum (&attr_val);
                     gnutls_assert ();
-                    _gnutls_x509_log
+                    _gnutls_debug_log
                       ("Error decoding PKCS12 Bag Attribute OID '%s'\n", oid);
                     continue;
                   }
@@ -504,7 +504,7 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
                   {
                     _gnutls_free_datum (&attr_val);
                     gnutls_assert ();
-                    _gnutls_x509_log
+                    _gnutls_debug_log
                       ("Error decoding PKCS12 Bag Attribute OID '%s'\n", oid);
                     continue;
                   }
@@ -514,7 +514,7 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
             else
               {
                 _gnutls_free_datum (&attr_val);
-                _gnutls_x509_log
+                _gnutls_debug_log
                   ("Unknown PKCS12 Bag Attribute OID '%s'\n", oid);
               }
           }

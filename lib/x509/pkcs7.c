@@ -63,7 +63,7 @@ _decode_pkcs7_signed_data (ASN1_TYPE pkcs7, ASN1_TYPE * sdata,
   if (strcmp (oid, SIGNED_DATA_OID) != 0)
     {
       gnutls_assert ();
-      _gnutls_x509_log ("Unknown PKCS7 Content OID '%s'\n", oid);
+      _gnutls_debug_log ("Unknown PKCS7 Content OID '%s'\n", oid);
       return GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE;
     }
 

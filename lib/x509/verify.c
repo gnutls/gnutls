@@ -711,7 +711,7 @@ decode_ber_digest_info (const gnutls_datum_t * info,
   if (*hash == GNUTLS_MAC_UNKNOWN)
     {
 
-      _gnutls_x509_log ("verify.c: HASH OID: %s\n", str);
+      _gnutls_debug_log ("verify.c: HASH OID: %s\n", str);
 
       gnutls_assert ();
       asn1_delete_structure (&dinfo);

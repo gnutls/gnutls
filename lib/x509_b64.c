@@ -469,7 +469,7 @@ _gnutls_fbase64_decode (const char *header, const opaque * data,
   if (kdata == NULL)
     {
       gnutls_assert ();
-      _gnutls_x509_log ("Could not find '%s'\n", ENDSTR);
+      _gnutls_debug_log ("Could not find '%s'\n", ENDSTR);
       return GNUTLS_E_BASE64_DECODING_ERROR;
     }
   data_size -= strlen (ENDSTR);

@@ -3515,7 +3515,7 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
       if (ret < 0)
         {
           gnutls_assert ();
-          _gnutls_x509_log ("Could not find an appropriate certificate: %s\n",
+          _gnutls_debug_log ("Could not find an appropriate certificate: %s\n",
                             gnutls_strerror (ret));
           cert_cred = NULL;
         }

@@ -643,7 +643,7 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
       if (ret < 0)
         {
           gnutls_assert ();
-          _gnutls_x509_log
+          _gnutls_debug_log
             ("Server did not allow either '%s' or '%s' for signing\n",
              gnutls_mac_get_name (hash_algo),
              gnutls_mac_get_name (session->internals.handshake_mac_handle.
@@ -652,7 +652,7 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
         }
     }
 
-  _gnutls_x509_log ("sign handshake cert vrfy: picked %s with %s\n",
+  _gnutls_debug_log ("sign handshake cert vrfy: picked %s with %s\n",
                     gnutls_sign_algorithm_get_name (sign_algo),
                     gnutls_mac_get_name (hash_algo));
 
@@ -850,7 +850,7 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
   if (algo == NULL)
     {
       gnutls_assert ();
-      _gnutls_x509_log ("Hash algorithm: %d\n", hash);
+      _gnutls_debug_log ("Hash algorithm: %d has no OID\n", hash);
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
 
