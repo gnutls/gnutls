@@ -90,22 +90,23 @@ else
 SUBDIRS += gcrypt
 endif
 
-HFILES = debug.h gnutls_compress.h gnutls_cipher.h gnutls_buffers.h	\
-	gnutls_errors.h gnutls_int.h gnutls_handshake.h gnutls_num.h	\
-	gnutls_algorithms.h gnutls_dh.h gnutls_kx.h gnutls_hash_int.h	\
-	gnutls_cipher_int.h gnutls_db.h gnutls_auth.h auth_anon.h	\
-	gnutls_extensions.h x509_b64.h gnutls_v2_compat.h		\
-	gnutls_datum.h auth_cert.h gnutls_mpi.h gnutls_pk.h		\
-	gnutls_record.h gnutls_cert.h gnutls_constate.h			\
-	gnutls_global.h gnutls_sig.h gnutls_mem.h			\
+HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
+	gnutls_buffers.h gnutls_errors.h gnutls_int.h			\
+	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h		\
+	gnutls_dh.h gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h	\
+	gnutls_db.h gnutls_auth.h auth_anon.h gnutls_extensions.h	\
+	x509_b64.h gnutls_v2_compat.h gnutls_datum.h auth_cert.h	\
+	gnutls_mpi.h gnutls_pk.h gnutls_record.h gnutls_cert.h		\
+	gnutls_constate.h gnutls_global.h gnutls_sig.h gnutls_mem.h	\
 	ext_max_record.h gnutls_session_pack.h gnutls_str.h		\
 	gnutls_state.h gnutls_x509.h ext_cert_type.h			\
 	gnutls_rsa_export.h ext_server_name.h auth_dh_common.h		\
 	ext_srp.h gnutls_srp.h auth_srp.h auth_srp_passwd.h		\
 	gnutls_helper.h auth_psk.h auth_psk_passwd.h			\
-	gnutls_supplemental.h crypto.h random.h	system.h	\
+	gnutls_supplemental.h crypto.h random.h system.h		\
 	ext_session_ticket.h ext_signature.h gnutls_cryptodev.h		\
-	ext_safe_renegotiation.h locks.h gnutls_mbuffers.h pkcs11_int.h
+	ext_safe_renegotiation.h locks.h gnutls_mbuffers.h		\
+	pkcs11_int.h
 
 if ENABLE_LOCAL_PAKCHOIS
 COBJECTS+=pakchois/pakchois.c pakchois/errors.c pakchois/dlopen.c
