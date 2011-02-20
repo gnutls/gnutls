@@ -701,6 +701,8 @@ GNUTLS_3_0_0 {
 	gnutls_cipher_add_auth;
 	gnutls_dtls_set_timeouts;
 	gnutls_transport_set_pull_timeout_function;
+	gnutls_dtls_get_mtu;
+	gnutls_dtls_set_mtu;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

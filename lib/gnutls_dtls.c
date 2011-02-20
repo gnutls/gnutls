@@ -45,7 +45,7 @@ transmit_message (gnutls_session_t session,
   opaque *data, *mtu_data;
   int ret = 0;
   unsigned int offset, frag_len, data_size;
-  const uint mtu = session->internals.dtls.hsk_mtu;
+  const uint mtu = session->internals.dtls.mtu;
 
   if (bufel->htype == GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC)
     {
@@ -234,4 +234,32 @@ void gnutls_dtls_set_timeouts (gnutls_session_t session, unsigned int retrans_ti
 {
   session->internals.dtls.retrans_timeout  = retrans_timeout;
   session->internals.dtls.total_timeout  = total_timeout;
+}
+
+/**
+ * gnutls_dtls_set_mtu:
+ * @session: is a #gnutls_session_t structure.
+ * @mtu: The maximum transfer unit of the interface
+ *
+ * This function will set the maximum transfer unit of the interface
+ * that DTLS packets are expected to leave from.
+ *
+ **/
+void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu)
+{
+  session->internals.dtls.mtu  = mtu;
+}
+
+/**
+ * gnutls_dtls_get_mtu:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function will return the actual maximum transfer unit for
+ * application data. I.e. DTLS headers are subtracted from the
+ * actual MTU.
+ *
+ **/
+unsigned int gnutls_dtls_get_mtu (gnutls_session_t session)
+{
+  return session->internals.dtls.mtu - RECORD_HEADER_SIZE(session);
 }

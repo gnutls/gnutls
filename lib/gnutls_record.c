@@ -431,8 +431,8 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
      (int) _gnutls_uint64touint32 (&record_state->sequence_number),
      _gnutls_packet2str (type), type, (int) sizeofdata);
 
-  if (sizeofdata > MAX_RECORD_SEND_SIZE)
-    data2send_size = MAX_RECORD_SEND_SIZE;
+  if (sizeofdata > MAX_RECORD_SEND_SIZE(session))
+    data2send_size = MAX_RECORD_SEND_SIZE(session);
   else
     data2send_size = sizeofdata;
 
@@ -849,9 +849,9 @@ get_temp_recv_buffer (gnutls_session_t session, gnutls_datum_t * tmp)
 
   if (gnutls_compression_get (session) != GNUTLS_COMP_NULL ||
       session->internals.priorities.allow_large_records != 0)
-    max_record_size = MAX_RECORD_RECV_SIZE + EXTRA_COMP_SIZE;
+    max_record_size = MAX_RECORD_RECV_SIZE(session) + EXTRA_COMP_SIZE;
   else
-    max_record_size = MAX_RECORD_RECV_SIZE;
+    max_record_size = MAX_RECORD_RECV_SIZE(session);
 
   /* We allocate MAX_RECORD_RECV_SIZE length
    * because we cannot predict the output data by the record

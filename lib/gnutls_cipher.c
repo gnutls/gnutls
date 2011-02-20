@@ -187,7 +187,7 @@ _gnutls_decrypt (gnutls_session_t session, opaque * ciphertext,
           return ret;
         }
 
-      if (gtxt.size > MAX_RECORD_RECV_SIZE)
+      if (gtxt.size > MAX_RECORD_RECV_SIZE(session))
         {
           _gnutls_free_datum (&gtxt);
           /* This shouldn't have happen and
@@ -197,7 +197,7 @@ _gnutls_decrypt (gnutls_session_t session, opaque * ciphertext,
         }
 
       /* This check is not really needed */
-      if (max_data_size < MAX_RECORD_RECV_SIZE)
+      if (max_data_size < MAX_RECORD_RECV_SIZE(session))
         {
           _gnutls_free_datum (&gtxt);
           return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);

@@ -43,6 +43,9 @@ int gnutls_init_dtls (gnutls_session_t * session,
 void gnutls_dtls_set_timeouts (gnutls_session_t session, unsigned int retrans_timeout,
   unsigned int total_timeout);
 
+unsigned int gnutls_dtls_get_mtu (gnutls_session_t session);
+void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu);
+
 #ifdef __cplusplus
 }
 #endif
