@@ -1783,7 +1783,7 @@ gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  *
- * Deprecated: 2.12.0
+ * Deprecated: Use gnutls_privkey_sign_data().
  */
 int
 gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
@@ -1837,7 +1837,7 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
 }
 
 
-/*-
+/**
  * gnutls_x509_privkey_verify_data:
  * @key: Holds the key
  * @flags: should be 0 for now
@@ -1850,8 +1850,8 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
  * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
  * is returned, and a positive code on success.
  *
- * Deprecated in: 2.11.0
- -*/
+ * Deprecated: Use gnutls_pubkey_verify_data().
+ */
 int
 gnutls_x509_privkey_verify_data (gnutls_x509_privkey_t key,
                                  unsigned int flags,
