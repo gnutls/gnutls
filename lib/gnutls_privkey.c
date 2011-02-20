@@ -404,7 +404,7 @@ int ret;
 #endif
 
 /**
- * gnutls_privkey_sign_data:
+ * gnutls_privkey_sign_data2:
  * @signer: Holds the key
  * @digest: should be a digest algorithm
  * @flags: should be 0 for now

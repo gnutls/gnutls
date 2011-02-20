@@ -1718,8 +1718,8 @@ cleanup:
   return ret;
 }
 
-/*-
- * _gnutls_x509_privkey_sign_hash:
+/**
+ * gnutls_x509_privkey_sign_hash:
  * @key: Holds the key
  * @hash: holds the data to be signed
  * @signature: will contain newly allocated signature
@@ -1732,8 +1732,8 @@ cleanup:
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
  *
- * Deprecated in: 2.11.0
- -*/
+ * Deprecated in: 2.12.0
+ */
 int
 gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
                                const gnutls_datum_t * hash,
@@ -1758,7 +1758,7 @@ gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
   return 0;
 }
 
-/*-
+/**
  * gnutls_x509_privkey_sign_data:
  * @key: Holds the key
  * @digest: should be MD5 or SHA1
@@ -1782,7 +1782,9 @@ gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
- -*/
+ *
+ * Deprecated: 2.12.0
+ */
 int
 gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
                                gnutls_digest_algorithm_t digest,
