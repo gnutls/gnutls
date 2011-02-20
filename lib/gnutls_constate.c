@@ -568,7 +568,6 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
                           security_parameters.current_cipher_suite));
 
   session->security_parameters.epoch_read = epoch_next;
-  _gnutls_epoch_gc (session);
 
   return 0;
 }
@@ -619,7 +618,6 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
     ("HSK[%p]: Initializing internal [write] cipher sessions\n", session);
 
   session->security_parameters.epoch_write = epoch_next;
-  _gnutls_epoch_gc (session);
 
   return 0;
 }

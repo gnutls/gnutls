@@ -213,7 +213,7 @@ _mbuffer_remove_bytes (mbuffer_head_st * buf, size_t bytes)
         }
     }
 
-  return 0;
+  return ret;
 }
 
 /* Allocate a buffer segment. The segment is not initially "owned" by
