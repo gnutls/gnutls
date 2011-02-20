@@ -63,7 +63,12 @@ int udp_server(const char* name, int port)
         gnutls_transport_set_pull_function (session, pull_func);
         gnutls_transport_set_pull_timeout_function (session, pull_timeout_func);
 
-        ret = gnutls_handshake(session);
+        do
+          {
+            ret = gnutls_handshake(session);
+          }
+        while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
         if (ret < 0)
           {
             fprintf(stderr, "Error in handshake(): %s\n", gnutls_strerror(ret));
