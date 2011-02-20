@@ -1054,6 +1054,7 @@ begin:
       return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
     }
 
+
 /* ok now we are sure that we can read all the data - so
  * move on !
  */
@@ -1074,8 +1075,23 @@ begin:
       return ret;
     }
 
-  if (IS_DTLS(session))
-    decrypt_sequence = &dtls_sequence;
+  /* Check if the DTLS epoch is valid */
+  if (IS_DTLS(session)) 
+    {
+      uint16_t epoch = _gnutls_read_uint16(dtls_sequence.i);
+      
+      if (_gnutls_epoch_is_valid(session, epoch) == 0)
+        {
+          _gnutls_audit_log("Discarded message with invalid epoch 0x%.2x%.2x current: 0x%.4x\n",
+            (int)dtls_sequence.i[0], (int)dtls_sequence.i[1], (int)record_params->epoch);
+
+          _mbuffer_remove_bytes (&session->internals.record_recv_buffer,
+                         header_size + length);
+          return GNUTLS_E_AGAIN;
+        }
+        
+      decrypt_sequence = &dtls_sequence;
+    }
   else
     decrypt_sequence = &record_state->sequence_number;
 
@@ -1104,7 +1120,7 @@ begin:
       ret = _dtls_record_check(session, decrypt_sequence);
       if (ret < 0)
         {
-          _gnutls_audit_log("Duplicate message with sequence %u\n",
+          _gnutls_audit_log("Discarded duplicate message with sequence %u\n",
             (unsigned int) _gnutls_uint64touint32 (decrypt_sequence));
           return GNUTLS_E_AGAIN;
         }

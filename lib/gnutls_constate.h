@@ -47,6 +47,19 @@ void _gnutls_epoch_gc (gnutls_session_t session);
 void _gnutls_epoch_free (gnutls_session_t session,
                          record_parameters_st * state);
 
+static inline int _gnutls_epoch_is_valid(gnutls_session_t session, int epoch)
+{
+  record_parameters_st * params;
+  int ret;
+
+  ret = _gnutls_epoch_get( session, epoch, &params);
+  if (ret < 0)
+    return 0;
+
+  return 1;
+}
+
+
 static inline int _gnutls_epoch_refcount_inc(gnutls_session_t session, int epoch)
 {
   record_parameters_st * params;
