@@ -539,6 +539,8 @@ typedef struct
   int free_rsa_params;
 } internal_params_st;
 
+#define DTLS_RECORD_WINDOW_SIZE 64
+
 /* DTLS session state
  */
 typedef struct
@@ -558,6 +560,9 @@ typedef struct
   unsigned int total_timeout;
 
   unsigned int hsk_hello_verify_requests;
+  
+  uint64_t record_sw[DTLS_RECORD_WINDOW_SIZE];
+  int record_sw_size;
 } dtls_st;
 
 

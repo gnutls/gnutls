@@ -144,7 +144,7 @@ static int drop_usage_count(gnutls_session_t session)
  * record layer.
  */
 int
-_gnutls_dtls_transmit (gnutls_session_t session)
+_dtls_transmit (gnutls_session_t session)
 {
 int ret;
 
@@ -213,6 +213,105 @@ cleanup:
 
   /* SENDING -> WAITING state transition */
   return ret;
+}
+
+#define window_table session->internals.dtls.record_sw
+#define window_size session->internals.dtls.record_sw_size
+
+/* FIXME: could we modify that code to avoid using
+ * uint64_t?
+ */
+
+static void rot_window(gnutls_session_t session, int places)
+{
+  window_size -= places;
+  memmove(window_table, &window_table[places], window_size*sizeof(window_table[0]));
+}
+
+#define MOVE_SIZE 20
+/* Checks if a sequence number is not replayed. If replayed
+ * returns a negative value, otherwise zero.
+ */
+int _dtls_record_check(gnutls_session_t session, uint64 * _seq)
+{
+uint64_t seq = 0, diff;
+int i, offset = 0;
+
+  for (i=0;i<8;i++) 
+    {
+      seq |= _seq->i[i];
+      seq <<= 8;
+    }
+
+  if (window_size == 0)
+    {
+      window_size = 1;
+      window_table[0] = seq;
+      return 0;
+    }
+
+  if (seq <= window_table[0])
+    {
+      return -1;
+    }
+
+  if (window_size == DTLS_RECORD_WINDOW_SIZE) {
+    rot_window(session, MOVE_SIZE);
+  }
+
+  if (seq < window_table[window_size-1])
+    {
+      /* is between first and last */
+      diff = window_table[window_size-1] - seq;
+
+      if (diff >= window_size) 
+        {
+          return -1;
+        }
+
+      offset = window_size-1-diff;
+
+      if (window_table[offset] == seq)
+        {
+          return -1;
+        }
+      else
+        {
+          window_table[offset] = seq;
+        }
+    }
+  else /* seq >= last */
+    {
+      if (seq == window_table[window_size-1]) 
+        {
+          return -1;
+        }
+
+      diff = seq - window_table[window_size-1];
+      if (diff <= DTLS_RECORD_WINDOW_SIZE - window_size)
+        { /* fits in our empty space */
+          offset = diff + window_size-1;
+
+          window_table[offset] = seq;
+          window_size = offset + 1;
+        }
+      else
+        {
+          if (diff > DTLS_RECORD_WINDOW_SIZE/2)
+            { /* difference is too big */
+              window_table[DTLS_RECORD_WINDOW_SIZE-1] = seq;
+              window_size = DTLS_RECORD_WINDOW_SIZE;
+            }
+          else
+            {
+              rot_window(session, diff);
+              offset = diff + window_size-1;
+              window_table[offset] = seq;
+              window_size = offset + 1;            
+            }
+        }
+    }
+  return 0;
 }
 
 

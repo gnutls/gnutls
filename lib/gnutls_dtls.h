@@ -27,6 +27,7 @@
 
 #include "gnutls_int.h"
 
-int _gnutls_dtls_transmit(gnutls_session_t session);
+int _dtls_transmit(gnutls_session_t session);
+int _dtls_record_check(gnutls_session_t session, uint64 * _seq);
 
 #endif

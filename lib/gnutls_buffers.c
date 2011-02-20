@@ -826,7 +826,7 @@ _gnutls_handshake_io_write_flush (gnutls_session_t session)
                      (int) send_buffer->byte_length);
 
   if (IS_DTLS(session))
-    return _gnutls_dtls_transmit(session);
+    return _dtls_transmit(session);
 
   for (cur = _mbuffer_get_first (send_buffer, &msg);
        cur != NULL; cur = _mbuffer_get_first (send_buffer, &msg))

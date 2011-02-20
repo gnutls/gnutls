@@ -412,6 +412,8 @@ gnutls_init_dtls (gnutls_session_t * session,
   (*session)->internals.dtls.retrans_timeout = 300;
   (*session)->internals.dtls.total_timeout = 6000;
 
+  (*session)->internals.dtls.record_sw_size = 0;
+
   return 0;
 }
 

@@ -45,6 +45,7 @@
 #include "gnutls_constate.h"
 #include "ext_max_record.h"
 #include <gnutls_state.h>
+#include <gnutls_dtls.h>
 #include <gnutls_dh.h>
 
 /**
@@ -427,8 +428,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
     sequence_write(&record_state->sequence_number, &headers[3]);
 
   _gnutls_record_log
-    ("REC[%p]: Sending Packet[%d] %s(%d) with length: %d\n", session,
-     (int) _gnutls_uint64touint32 (&record_state->sequence_number),
+    ("REC[%p]: Preparing Packet %s(%d) with length: %d\n", session,
      _gnutls_packet2str (type), type, (int) sizeofdata);
 
   if (sizeofdata > MAX_RECORD_SEND_SIZE(session))
@@ -518,7 +518,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
   _gnutls_record_log ("REC[%p]: Sent Packet[%d] %s(%d) with length: %d\n",
                       session,
-                      (int)
+                      (unsigned int)
                       _gnutls_uint64touint32
                       (&record_state->sequence_number),
                       _gnutls_packet2str (type), type, (int) cipher_size);
@@ -1094,6 +1094,21 @@ begin:
                          header_size + length);
   decrypted_length = ret;
 
+  /* check for duplicates. We check after the message
+   * is processed an authenticated to avoid someone
+   * messing with our windows.
+   */
+  if (IS_DTLS(session)) 
+    {
+      ret = _dtls_record_check(session, decrypt_sequence);
+      if (ret < 0)
+        {
+          _gnutls_audit_log("Duplicate message with sequence %u\n",
+            (unsigned int) _gnutls_uint64touint32 (decrypt_sequence));
+          return GNUTLS_E_AGAIN;
+        }
+    }
+
 /* Check if this is a CHANGE_CIPHER_SPEC
  */
   if (type == GNUTLS_CHANGE_CIPHER_SPEC &&
@@ -1103,19 +1118,19 @@ begin:
       _gnutls_record_log
         ("REC[%p]: ChangeCipherSpec Packet was received\n", session);
 
-      if ((size_t) ret != sizeofdata)
+      if ((size_t) decrypted_length != sizeofdata)
         {                       /* sizeofdata should be 1 */
           gnutls_assert ();
           return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
         }
       memcpy (data, tmp.data, sizeofdata);
 
-      return ret;
+      return decrypted_length;
     }
 
   _gnutls_record_log
     ("REC[%p]: Decrypted Packet[%d] %s(%d) with length: %d\n", session,
-     (int) _gnutls_uint64touint32 (&record_state->sequence_number),
+     (int) _gnutls_uint64touint32 (decrypt_sequence),
      _gnutls_packet2str (recv_type), recv_type, decrypted_length);
 
 /* increase sequence number 
