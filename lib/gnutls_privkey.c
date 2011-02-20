@@ -404,7 +404,7 @@ int ret;
 #endif
 
 /**
- * gnutls_privkey_sign_data2:
+ * gnutls_privkey_sign_data:
  * @signer: Holds the key
  * @digest: should be a digest algorithm
  * @flags: should be 0 for now
@@ -418,9 +418,11 @@ int ret;
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  * negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
-gnutls_privkey_sign_data2 (gnutls_privkey_t signer,
+gnutls_privkey_sign_data (gnutls_privkey_t signer,
                           gnutls_digest_algorithm_t hash,
                           unsigned int flags,
                           const gnutls_datum_t * data,
@@ -460,7 +462,7 @@ cleanup:
 }
 
 /**
- * gnutls_privkey_sign_hash2:
+ * gnutls_privkey_sign_hash:
  * @signer: Holds the signer's key
  * @hash_algo: The hash algorithm used
  * @flags: zero for now
@@ -477,13 +479,15 @@ cleanup:
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
-gnutls_privkey_sign_hash2 (gnutls_privkey_t signer,
-                           gnutls_digest_algorithm_t hash_algo,
-                           unsigned int flags,
-                           const gnutls_datum_t * hash_data,
-                           gnutls_datum_t * signature)
+gnutls_privkey_sign_hash (gnutls_privkey_t signer,
+			  gnutls_digest_algorithm_t hash_algo,
+			  unsigned int flags,
+			  const gnutls_datum_t * hash_data,
+			  gnutls_datum_t * signature)
 {
   int ret;
   gnutls_datum_t digest;
