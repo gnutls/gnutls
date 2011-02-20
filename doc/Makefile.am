@@ -51,6 +51,8 @@ gnutls_TEXINFOS += gnutls-internals.dia gnutls-internals.eps		\
                    gnutls-internals.png gnutls-internals.pdf
 gnutls_TEXINFOS += gnutls-layers.dia gnutls-layers.eps			\
                    gnutls-layers.png gnutls-layers.pdf
+gnutls_TEXINFOS += gnutls-crypto-layers.dia gnutls-crypto-layers.eps	\
+                   gnutls-crypto-layers.png gnutls-crypto-layers.pdf
 gnutls_TEXINFOS += gnutls-pgp.dia gnutls-pgp.eps gnutls-pgp.png		\
                    gnutls-pgp.pdf
 gnutls_TEXINFOS += gnutls-x509.dia gnutls-x509.eps gnutls-x509.png	\
