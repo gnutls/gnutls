@@ -2548,7 +2548,7 @@ gnutls_x509_crq_privkey_sign (gnutls_x509_crq_t crq, gnutls_privkey_t key,
       return result;
     }
 
-  result = gnutls_privkey_sign_data2 (key, dig, 0, &tbs, &signature);
+  result = gnutls_privkey_sign_data (key, dig, 0, &tbs, &signature);
   gnutls_free (tbs.data);
 
   if (result < 0)

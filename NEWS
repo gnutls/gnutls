@@ -89,14 +89,14 @@ checking.
 ** libgnutls: Added helper functions for signature verification:
 gnutls_pubkey_verify_data() and gnutls_pubkey_import_privkey().
 
-** libgnutls: Added gnutls_privkey_sign_hash2().
+** libgnutls: Modified gnutls_privkey_sign_data().
 
 ** gnutls_x509_crl_privkey_sign2(), gnutls_x509_crq_sign2()
-gnutls_x509_privkey_sign_hash(), gnutls_x509_privkey_sign_data(), 
-gnutls_x509_crt_verify_hash(), gnutls_x509_crt_verify_data(), 
-were deprecated for gnutls_x509_crl_privkey_sign(), 
-gnutls_x509_crq_privkey_sign(), gnutls_privkey_sign_hash2(),
-gnutls_privkey_sign_data2(), gnutls_pubkey_verify_hash()
+gnutls_x509_privkey_sign_hash(), gnutls_x509_privkey_sign_data(),
+gnutls_x509_crt_verify_hash(), gnutls_x509_crt_verify_data(), were
+deprecated for gnutls_x509_crl_privkey_sign(),
+gnutls_x509_crq_privkey_sign(), gnutls_privkey_sign_hash(),
+gnutls_privkey_sign_data(), gnutls_pubkey_verify_hash()
 gnutls_pubkey_verify_data() respectively.
 
 ** libgnutls: gnutls_*_export_raw() functions now add leading zero in
@@ -120,8 +120,8 @@ gnutls_x509_trust_list_deinit: ADDED
 gnutls_x509_crl_get_raw_issuer_dn: ADDED
 gnutls_pubkey_import_privkey: ADDED
 gnutls_pubkey_verify_data: ADDED
-gnutls_privkey_sign_hash2: ADDED
-gnutls_privkey_sign_data2: ADDED (in place of gnutls_privkey_sign_data)
+gnutls_privkey_sign_hash: MODIFIED (was added in 2.11.0)
+gnutls_privkey_sign_data: MODIFIED (was added in 2.11.0)
 gnutls_x509_crq_sign2: DEPRECATED (use: gnutls_x509_crq_privkey_sign)
 gnutls_x509_crq_sign: DEPRECATED (use: gnutls_x509_crq_privkey_sign)
 gnutls_x509_crq_get_preferred_hash_algorithm: DEPRECATED

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free Software
+ * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free Software
  * Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos, Simon Josefsson
@@ -181,15 +181,13 @@ doit (void)
       if (ret < 0)
         fail ("gnutls_privkey_import_x509\n");
 
-      ret =
-        gnutls_privkey_sign_hash2 (privkey, GNUTLS_DIG_SHA1, 0, &hash_data,
-                                        &signature2);
+      ret = gnutls_privkey_sign_hash (privkey, GNUTLS_DIG_SHA1, 0,
+				      &hash_data, &signature2);
       if (ret < 0)
         fail ("gnutls_privkey_sign_hash\n");
 
-      ret =
-        gnutls_privkey_sign_data2 (privkey, GNUTLS_DIG_SHA1, 0, &raw_data,
-                                        &signature);
+      ret = gnutls_privkey_sign_data (privkey, GNUTLS_DIG_SHA1, 0,
+				      &raw_data, &signature);
       if (ret < 0)
         fail ("gnutls_x509_privkey_sign_hash\n");
 

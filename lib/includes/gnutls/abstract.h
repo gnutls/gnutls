@@ -108,18 +108,17 @@ int gnutls_privkey_import_openpgp (gnutls_privkey_t pkey,
                                    gnutls_openpgp_privkey_t key,
                                    unsigned int flags);
 
-int gnutls_privkey_sign_data2 (gnutls_privkey_t signer,
+int gnutls_privkey_sign_data (gnutls_privkey_t signer,
                               gnutls_digest_algorithm_t hash,
                               unsigned int flags,
                               const gnutls_datum_t * data,
                               gnutls_datum_t * signature);
 
-int
-gnutls_privkey_sign_hash2 (gnutls_privkey_t signer,
-                           gnutls_digest_algorithm_t hash_algo,
-                           unsigned int flags,
-                           const gnutls_datum_t * hash_data,
-                           gnutls_datum_t * signature);
+int gnutls_privkey_sign_hash (gnutls_privkey_t signer,
+			      gnutls_digest_algorithm_t hash_algo,
+			      unsigned int flags,
+			      const gnutls_datum_t * hash_data,
+			      gnutls_datum_t * signature);
 
 int gnutls_privkey_decrypt_data (gnutls_privkey_t signer,
                                  unsigned int flags,
