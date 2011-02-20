@@ -692,10 +692,11 @@ record_check_version (gnutls_session_t session,
 }
 
 /* This function will check if the received record type is
- * the one we actually expect.
+ * the one we actually expect and adds it to the proper
+ * buffer.
  */
 static int
-record_check_type (gnutls_session_t session,
+record_add (gnutls_session_t session,
                    content_type_t recv_type, content_type_t type,
                    gnutls_handshake_description_t htype, opaque * data,
                    int data_size)
@@ -1143,7 +1144,7 @@ begin:
     }
 
   ret =
-    record_check_type (session, recv_type, type, htype, tmp.data,
+    record_add (session, recv_type, type, htype, tmp.data,
                        decrypted_length);
   if (ret < 0)
     {
