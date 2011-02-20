@@ -601,7 +601,7 @@ record_check_headers (gnutls_session_t session,
    */
 
   if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO && type == GNUTLS_HANDSHAKE
-      && headers[0] > 127)
+      && headers[0] > 127 && !(IS_DTLS(session)))
     {
 
       /* if msb set and expecting handshake message
@@ -626,7 +626,7 @@ record_check_headers (gnutls_session_t session,
                           session, *length);
 
     }
-  else if(_gnutls_is_dtls(session))
+  else if(IS_DTLS(session))
     {
       /* dtls version 1.0 */
       *recv_type = headers[0];
