@@ -946,9 +946,6 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
       _gnutls_buffer_pop_data (&session->internals.handshake_recv_buffer,
                                iptr, &tmp);
       left -= tmp;
-
-      htype = session->internals.handshake_recv_buffer_htype;
-      type = session->internals.handshake_recv_buffer_type;
     }
 
   while (left > 0)
@@ -964,9 +961,6 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
 
               _gnutls_buffer_append_data (&session->internals.
                                           handshake_recv_buffer, iptr, dsize);
-
-              session->internals.handshake_recv_buffer_htype = htype;
-              session->internals.handshake_recv_buffer_type = type;
             }
 
           return i;
