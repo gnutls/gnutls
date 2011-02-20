@@ -10,8 +10,8 @@
     <title>GnuTLS API Reference Manual</title>
 
     <para>
-      GnuTLS implements the TLS (Transport Layer Security) and SSL
-      (Secure Sockets Layer) protocols for the GNU project.
+      GnuTLS implements the Transport Layer Security (TLS) and Secure
+      Sockets Layer (SSL) protocols for the GNU project.
     </para>
 
     <para>
