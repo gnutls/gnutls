@@ -48,9 +48,9 @@ transmit_message (gnutls_session_t session,
   unsigned int offset, frag_len, data_size;
   const uint mtu = session->internals.dtls.mtu;
 
-  if (bufel->htype == GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC)
+  if (bufel->type == GNUTLS_CHANGE_CIPHER_SPEC)
     {
-      return _gnutls_send_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1,
+      return _gnutls_send_int (session, bufel->type, -1,
         bufel->epoch, 
         _mbuffer_get_uhead_ptr(bufel), 
         _mbuffer_get_uhead_size(bufel), 0);
@@ -102,7 +102,7 @@ transmit_message (gnutls_session_t session,
        * many records possible into a single datagram. We should also
        * tell the record layer which epoch to use for encryption. 
        */
-      ret = _gnutls_send_int (session, GNUTLS_HANDSHAKE, bufel->htype, 
+      ret = _gnutls_send_int (session, bufel->type, bufel->htype, 
         bufel->epoch, mtu_data, DTLS_HANDSHAKE_HEADER_SIZE + frag_len, 0);
       if (ret < 0)
         break;
@@ -116,7 +116,6 @@ transmit_message (gnutls_session_t session,
 static int drop_usage_count(gnutls_session_t session)
 {
   int ret;
-  record_parameters_st * params;
   mbuffer_head_st *const send_buffer =
     &session->internals.handshake_send_buffer;
   mbuffer_st *cur;
@@ -124,11 +123,7 @@ static int drop_usage_count(gnutls_session_t session)
   for (cur = send_buffer->head;
        cur != NULL; cur = cur->next)
     {
-      ret = _gnutls_epoch_get( session, cur->epoch, &params);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-
-      ret = _gnutls_epoch_refcount_dec(params);
+      ret = _gnutls_epoch_refcount_dec(session, cur->epoch);
       if (ret < 0)
         return gnutls_assert_val(ret);
     }

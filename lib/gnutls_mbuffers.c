@@ -176,7 +176,8 @@ remove_front (mbuffer_head_st * buf)
  *
  * Useful for uses that treat the buffer as a simple array of bytes.
  *
- * Returns 0 on success or an error code otherwise.
+ * If more than one mbuffer_st have been removed it
+ * returns 1, 0 otherwise and an error code on error.
  *
  * Cost: O(n)
  * n: Number of segments needed to remove the specified amount of data.
@@ -186,6 +187,7 @@ _mbuffer_remove_bytes (mbuffer_head_st * buf, size_t bytes)
 {
   size_t left = bytes;
   mbuffer_st *bufel, *next;
+  int ret = 0;
 
   if (bytes > buf->byte_length)
     {
@@ -201,6 +203,7 @@ _mbuffer_remove_bytes (mbuffer_head_st * buf, size_t bytes)
         {
           left -= (bufel->msg.size - bufel->mark);
           remove_front (buf);
+          ret = 1;
         }
       else
         {

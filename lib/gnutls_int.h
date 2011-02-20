@@ -639,6 +639,7 @@ typedef struct
    * protocol only. freed using _gnutls_handshake_io_buffer_clear();
    */
   mbuffer_head_st handshake_send_buffer;
+
   content_type_t handshake_recv_buffer_type;
   gnutls_handshake_description_t handshake_recv_buffer_htype;
   gnutls_buffer_st handshake_recv_buffer;

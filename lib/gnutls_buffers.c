@@ -818,6 +818,7 @@ _gnutls_handshake_io_write_flush (gnutls_session_t session)
     &session->internals.handshake_send_buffer;
   gnutls_datum_t msg;
   int ret;
+  uint16_t epoch;
   ssize_t total = 0;
   mbuffer_st *cur;
 
@@ -830,19 +831,24 @@ _gnutls_handshake_io_write_flush (gnutls_session_t session)
   for (cur = _mbuffer_get_first (send_buffer, &msg);
        cur != NULL; cur = _mbuffer_get_first (send_buffer, &msg))
     {
+      epoch = cur->epoch;
+
       ret = _gnutls_send_int (session, cur->type,
                               cur->htype,
-                              EPOCH_WRITE_CURRENT,
+                              epoch,
                               msg.data, msg.size, 0);
 
       if (ret >= 0)
         {
-          _mbuffer_remove_bytes (send_buffer, ret);
+          total += ret;
+          
+          ret = _mbuffer_remove_bytes (send_buffer, ret);
+          if (ret == 1)
+            _gnutls_epoch_refcount_dec(session, epoch);
 
           _gnutls_write_log ("HWRITE: wrote %d bytes, %d bytes left.\n",
                              ret, (int) send_buffer->byte_length);
 
-          total += ret;
         }
       else
         {
@@ -872,22 +878,13 @@ _gnutls_handshake_io_cache_int (gnutls_session_t session,
 
   if (IS_DTLS(session))
     {
-      record_parameters_st * params;
-      int ret;
-
-      ret = _gnutls_epoch_get( session, EPOCH_WRITE_CURRENT, &params);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-
-      bufel->epoch = params->epoch;
-      bufel->htype = htype;
       bufel->sequence = session->internals.dtls.hsk_write_seq-1;
-
-      _gnutls_epoch_refcount_inc(params);
     }
   
   send_buffer =
     &session->internals.handshake_send_buffer;
+
+  bufel->epoch = (uint16_t)_gnutls_epoch_refcount_inc(session, EPOCH_WRITE_CURRENT);
 
   bufel->htype = htype;
   if (bufel->htype == GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC)

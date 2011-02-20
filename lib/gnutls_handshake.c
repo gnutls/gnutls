@@ -1226,10 +1226,10 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
     {
       _gnutls_handshake_hash_buffers_clear (session);
       if ((ret = _gnutls_handshake_hash_init (session)) < 0)
-	{
-	  gnutls_assert ();
-	  return ret;
-	}
+        {
+          gnutls_assert ();
+          return ret;
+        }
     }
 
   /* Here we keep the handshake messages in order to hash them...
@@ -2115,9 +2115,9 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
   if (again == 0)
     {
       if(_gnutls_is_dtls(session))
-	{
-	  cookie_len = session->internals.dtls.cookie_len + 1;
-	}
+        {
+          cookie_len = session->internals.dtls.cookie_len + 1;
+        }
       else
 	{
 	  cookie_len = 0;
@@ -2185,15 +2185,15 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       /* Generate random data 
        */
       if (!_gnutls_is_dtls (session)
-	  || session->internals.dtls.hsk_hello_verify_requests == 0)
-	{
-	  _gnutls_tls_create_random (rnd);
-	  _gnutls_set_client_random (session, rnd);
+        || session->internals.dtls.hsk_hello_verify_requests == 0)
+        {
+          _gnutls_tls_create_random (rnd);
+          _gnutls_set_client_random (session, rnd);
 
-	  memcpy (&data[pos], rnd, GNUTLS_RANDOM_SIZE);
-	}
+          memcpy (&data[pos], rnd, GNUTLS_RANDOM_SIZE);
+        }
       else
-	memcpy (&data[pos], session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
+        memcpy (&data[pos], session->security_parameters.client_random, GNUTLS_RANDOM_SIZE);
 
       pos += GNUTLS_RANDOM_SIZE;
 
@@ -2212,11 +2212,11 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       /* Copy the DTLS cookie
        */
       if (_gnutls_is_dtls(session))
-	{
-	  data[pos++] = session->internals.dtls.cookie_len;
-	  memcpy(&data[pos], &session->internals.dtls.cookie, session->internals.dtls.cookie_len);
-	  pos += session->internals.dtls.cookie_len;
-	}
+        {
+          data[pos++] = session->internals.dtls.cookie_len;
+          memcpy(&data[pos], &session->internals.dtls.cookie, session->internals.dtls.cookie_len);
+          pos += session->internals.dtls.cookie_len;
+        }
 
       /* Copy the ciphersuites.
        *
@@ -3005,13 +3005,6 @@ send_change_cipher_spec (gnutls_session_t session, int again)
         {
           _mbuffer_xfree(&bufel);
           return gnutls_assert_val(ret);
-        }
-
-      if (!IS_DTLS(session)) /* remove once combined */
-        {
-          ret = _gnutls_handshake_io_write_flush (session);
-          if (ret < 0)
-            return gnutls_assert_val(ret);
         }
 
       _gnutls_handshake_log ("REC[%p]: Sent ChangeCipherSpec\n", session);
