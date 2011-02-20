@@ -20,9 +20,8 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = TODO certtool.cfg gnutls.ps gnutls.pdf	\
-	gnutls.html doxygen/Doxyfile.in doxygen/Doxyfile.orig	\
-	texinfo.css
+EXTRA_DIST = TODO certtool.cfg gnutls.ps gnutls.pdf gnutls.html	\
+	doxygen/Doxyfile.in doxygen/Doxyfile.orig texinfo.css
 
 SUBDIRS = examples cyclo scripts manpages credentials
 if ENABLE_GTK_DOC
@@ -30,19 +29,19 @@ SUBDIRS += reference
 endif
 
 info_TEXINFOS = gnutls.texi
-gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi lgpl-2.1.texi gpl-3.0.texi \
-	cha-auth.texi cha-bib.texi cha-cert-auth.texi cha-ciphersuites.texi \
-	cha-copying.texi cha-functions.texi cha-gtls-app.texi \
-	cha-internals.texi cha-intro-tls.texi cha-library.texi \
-	cha-preface.texi cha-programs.texi cha-tls-app.texi
+gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi lgpl-2.1.texi gpl-3.0.texi	\
+	cha-auth.texi cha-bib.texi cha-cert-auth.texi			\
+	cha-ciphersuites.texi cha-copying.texi cha-functions.texi	\
+	cha-gtls-app.texi cha-internals.texi cha-intro-tls.texi		\
+	cha-library.texi cha-preface.texi cha-programs.texi		\
+	cha-tls-app.texi
 
 # Examples.
 gnutls_TEXINFOS += examples/ex-client1.c examples/ex-client2.c		\
 	examples/ex-session-info.c examples/ex-verify.c			\
 	examples/ex-cert-select.c examples/ex-client-resume.c		\
-	examples/ex-client-srp.c 	\
-	examples/ex-rfc2818.c examples/ex-serv1.c			\
-	examples/ex-serv-anon.c		\
+	examples/ex-client-srp.c examples/ex-rfc2818.c			\
+	examples/ex-serv1.c examples/ex-serv-anon.c			\
 	examples/ex-serv-pgp.c examples/ex-serv-srp.c			\
 	examples/ex-alert.c examples/ex-x509-info.c examples/ex-crq.c	\
 	examples/ex-pkcs12.c

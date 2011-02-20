@@ -7,7 +7,7 @@
 
 #define _GNUTLS_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 
-#if !defined(GNUTLS_INTERNAL_BUILD)
+#if !defined GNUTLS_INTERNAL_BUILD
 #if _GNUTLS_GCC_VERSION >= 30100
 #define _GNUTLS_GCC_ATTR_DEPRECATED __attribute__ ((__deprecated__))
 #endif
