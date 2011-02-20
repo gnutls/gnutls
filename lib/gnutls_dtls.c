@@ -33,6 +33,7 @@
 #include <gnutls_mbuffers.h>
 #include <gnutls_buffers.h>
 #include <gnutls_constate.h>
+#include <gnutls_state.h>
 #include <gnutls/dtls.h>
 
 
@@ -262,5 +263,11 @@ void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu)
  **/
 unsigned int gnutls_dtls_get_mtu (gnutls_session_t session)
 {
-  return session->internals.dtls.mtu - RECORD_HEADER_SIZE(session);
+int ret;
+
+  ret = _gnutls_record_overhead_rt(session);
+  if (ret >= 0)
+    return session->internals.dtls.mtu - ret;
+  else
+    return session->internals.dtls.mtu - RECORD_HEADER_SIZE(session);
 }

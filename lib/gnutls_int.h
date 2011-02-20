@@ -155,10 +155,11 @@ typedef enum transport_t
 #define MAX_RECORD_HEADER_SIZE DTLS_RECORD_HEADER_SIZE
 
 #define MAX_RECORD_SEND_SIZE(session) (IS_DTLS(session)?((size_t)session->internals.dtls.mtu-DTLS_RECORD_HEADER_SIZE):(size_t)session->security_parameters.max_record_send_size)
-#define MAX_RECORD_RECV_SIZE(session) (size_t)session->security_parameters.max_record_recv_size
+#define MAX_RECORD_RECV_SIZE(session) ((size_t)session->security_parameters.max_record_recv_size)
 #define MAX_PAD_SIZE 255
 #define EXTRA_COMP_SIZE 2048
-#define MAX_RECORD_OVERHEAD (MAX_CIPHER_BLOCK_SIZE/*iv*/+MAX_PAD_SIZE+EXTRA_COMP_SIZE)
+#define MAX_RECORD_OVERHEAD (MAX_CIPHER_BLOCK_SIZE/*iv*/+MAX_PAD_SIZE+EXTRA_COMP_SIZE+MAX_HASH_SIZE/*MAC*/)
+#define MAX_RECORD_OVERHEAD_RT(session) (2*MAX_CIPHER_BLOCK_SIZE/*iv+pad*/+MAX_HASH_SIZE)
 #define MAX_RECV_SIZE(session) (MAX_RECORD_OVERHEAD+MAX_RECORD_RECV_SIZE(session)+RECORD_HEADER_SIZE(session))
 
 #define TLS_HANDSHAKE_HEADER_SIZE 4
@@ -800,6 +801,7 @@ typedef struct
    */
   uint16_t srp_prime_bits;
 
+  /* A handshake process has been completed */
   int initial_negotiation_completed:1;
 
   struct

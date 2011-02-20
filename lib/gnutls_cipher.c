@@ -326,7 +326,14 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
   int ver = gnutls_protocol_get_version (session);
   int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
   int auth_cipher = _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
-  int random_pad = (session->internals.priorities.no_padding == 0) ? 1 : 0;
+  int random_pad;
+  
+  /* We don't use long padding if requested or if we are in DTLS.
+   */
+  if (session->internals.priorities.no_padding == 0 && (!IS_DTLS(session)))
+    random_pad = 1;
+  else
+    random_pad = 0;
   
   _gnutls_hard_log("ENC[%p]: cipher: %s, MAC: %s, Epoch: %u\n",
     session, gnutls_cipher_get_name(params->cipher_algorithm), gnutls_mac_get_name(params->mac_algorithm),
