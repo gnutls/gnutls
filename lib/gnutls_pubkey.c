@@ -1000,13 +1000,16 @@ gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
  * This function will verify the given signed data, using the
  * parameters from the certificate.
  *
- * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
- * is returned, and a positive code on success.
+ * Returns: In case of a verification failure
+ *   %GNUTLS_E_PK_SIG_VERIFY_FAILED is returned, and a positive code
+ *   on success.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey, unsigned int flags,
-                             const gnutls_datum_t * data,
-                             const gnutls_datum_t * signature)
+			   const gnutls_datum_t * data,
+			   const gnutls_datum_t * signature)
 {
   int ret;
 
