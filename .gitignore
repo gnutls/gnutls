@@ -136,6 +136,7 @@ gl/tests/Makefile
 gl/tests/Makefile.in
 gl/tests/arg-nonnull.h
 gl/tests/c++defs.h
+gl/tests/fcntl.h
 gl/tests/libtests.a
 gl/tests/sys/
 gl/tests/test-alignof
@@ -231,6 +232,7 @@ lib/gl/tests/Makefile
 lib/gl/tests/Makefile.in
 lib/gl/tests/arg-nonnull.h
 lib/gl/tests/c++defs.h
+lib/gl/tests/fcntl.h
 lib/gl/tests/libtests.a
 lib/gl/tests/test-alloca-opt
 lib/gl/tests/test-binary-io
