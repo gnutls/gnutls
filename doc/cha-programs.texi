@@ -943,4 +943,3 @@ $ p11tool --login --write pkcs11:(TOKEN URL) --load-certificate (certificate fil
 
 Note that typically PKCS #11 private key objects are not allowed
 to be extracted from the token.
-

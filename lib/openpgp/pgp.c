@@ -1687,4 +1687,3 @@ gnutls_openpgp_crt_get_auth_subkey (gnutls_openpgp_crt_t crt,
   else
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 }
-

@@ -600,4 +600,3 @@ gnutls_privkey_decrypt_data (gnutls_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 }
-

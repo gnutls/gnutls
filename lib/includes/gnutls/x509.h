@@ -819,4 +819,3 @@ extern "C"
 #endif
 
 #endif                          /* GNUTLS_X509_H */
-
