@@ -31,7 +31,7 @@
 #ifdef ENABLE_PSK
 
 
-/*-
+/**
  * gnutls_psk_netconf_derive_key:
  * @password: zero terminated string containing password.
  * @psk_identity: zero terminated string with PSK identity.
@@ -44,8 +44,11 @@
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  *
  * Since: 2.4.0
- * Deprecated in: 2.11.0
- -*/
+ *
+ * Deprecated: The need for this interface was dropped from the
+ * standard on publication as a RFC.  The function works now but will
+ * return a hard failure in a future release.
+ */
 int
 gnutls_psk_netconf_derive_key (const char *password,
                                const char *psk_identity,
