@@ -1003,7 +1003,7 @@ _gnutls_gcert_deinit (gnutls_cert * cert)
  * can be used to store application-specific data needed in the
  * callback function.  See also gnutls_sign_callback_get().
  *
- * Deprecated in: 2.12.0
+ * Deprecated: Use the PKCS 11 interfaces instead.
  */
 void
 gnutls_sign_callback_set (gnutls_session_t session,
@@ -1023,7 +1023,7 @@ gnutls_sign_callback_set (gnutls_session_t session,
  * Returns: The function pointer set by gnutls_sign_callback_set(), or
  *   if not set, %NULL.
  *
- * Deprecated in: 2.12.0
+ * Deprecated: Use the PKCS 11 interfaces instead.
  */
 gnutls_sign_func
 gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
