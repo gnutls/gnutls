@@ -92,10 +92,10 @@ gnutls_x509_crl_set_version (gnutls_x509_crl_t crl, unsigned int version)
  * This must be the last step in a certificate CRL since all
  * the previously set parameters are now signed.
  *
- * Deprecated: Use gnutls_x509_crl_privkey_sign() instead.
- *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
+ *
+ * Deprecated: Use gnutls_x509_crl_privkey_sign() instead.
  **/
 int
 gnutls_x509_crl_sign2 (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
@@ -140,7 +140,7 @@ fail:
   return result;
 }
 
-/*-
+/**
  * gnutls_x509_crl_sign:
  * @crl: should contain a gnutls_x509_crl_t structure
  * @issuer: is the certificate of the certificate issuer
@@ -151,7 +151,9 @@ fail:
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
- -*/
+ *
+ * Deprecated: Use gnutls_x509_crl_privkey_sign().
+ */
 int
 gnutls_x509_crl_sign (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
                       gnutls_x509_privkey_t issuer_key)
