@@ -1,5 +1,5 @@
-# stdint.m4 serial 36
-dnl Copyright (C) 2001-2010 Free Software Foundation, Inc.
+# stdint.m4 serial 39
+dnl Copyright (C) 2001-2011 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -26,6 +26,15 @@ AC_DEFUN([gl_STDINT_H],
     HAVE_UNSIGNED_LONG_LONG_INT=0
   fi
   AC_SUBST([HAVE_UNSIGNED_LONG_LONG_INT])
+
+  dnl Check for <wchar.h>, in the same way as gl_WCHAR_H does.
+  AC_CHECK_HEADERS_ONCE([wchar.h])
+  if test $ac_cv_header_wchar_h = yes; then
+    HAVE_WCHAR_H=1
+  else
+    HAVE_WCHAR_H=0
+  fi
+  AC_SUBST([HAVE_WCHAR_H])
 
   dnl Check for <inttypes.h>.
   dnl AC_INCLUDES_DEFAULT defines $ac_cv_header_inttypes_h.
@@ -145,9 +154,11 @@ uintmax_t j = UINTMAX_MAX;
 
 #include <limits.h> /* for CHAR_BIT */
 #define TYPE_MINIMUM(t) \
-  ((t) ((t) 0 < (t) -1 ? (t) 0 : ~ (t) 0 << (sizeof (t) * CHAR_BIT - 1)))
+  ((t) ((t) 0 < (t) -1 ? (t) 0 : ~ TYPE_MAXIMUM (t)))
 #define TYPE_MAXIMUM(t) \
-  ((t) ((t) 0 < (t) -1 ? (t) -1 : ~ (~ (t) 0 << (sizeof (t) * CHAR_BIT - 1))))
+  ((t) ((t) 0 < (t) -1 \
+        ? (t) -1 \
+        : ((((t) 1 << (sizeof (t) * CHAR_BIT - 2)) - 1) * 2 + 1)))
 struct s {
   int check_PTRDIFF:
       PTRDIFF_MIN == TYPE_MINIMUM (ptrdiff_t)
@@ -289,10 +300,6 @@ static const char *macro_values[] =
       HAVE_SYS_BITYPES_H=0
     fi
     AC_SUBST([HAVE_SYS_BITYPES_H])
-
-    dnl Check for <wchar.h> (missing in Linux uClibc when built without wide
-    dnl character support).
-    AC_CHECK_HEADERS_ONCE([wchar.h])
 
     gl_STDINT_TYPE_PROPERTIES
     STDINT_H=stdint.h

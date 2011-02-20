@@ -1,5 +1,5 @@
-# unistd_h.m4 serial 48
-dnl Copyright (C) 2006-2010 Free Software Foundation, Inc.
+# unistd_h.m4 serial 53
+dnl Copyright (C) 2006-2011 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -14,8 +14,6 @@ AC_DEFUN([gl_UNISTD_H],
   AC_REQUIRE([AC_C_INLINE])
 
   gl_CHECK_NEXT_HEADERS([unistd.h])
-
-  AC_CHECK_HEADERS_ONCE([unistd.h])
   if test $ac_cv_header_unistd_h = yes; then
     HAVE_UNISTD_H=1
   else
@@ -38,7 +36,7 @@ AC_DEFUN([gl_UNISTD_H],
     ]], [chown dup2 dup3 environ euidaccess faccessat fchdir fchownat
     fsync ftruncate getcwd getdomainname getdtablesize getgroups
     gethostname getlogin getlogin_r getpagesize getusershell setusershell
-    endusershell lchown link linkat lseek pipe2 pread pwrite readlink
+    endusershell lchown link linkat lseek pipe pipe2 pread pwrite readlink
     readlinkat rmdir sleep symlink symlinkat ttyname_r unlink unlinkat
     usleep])
 ])
@@ -78,6 +76,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   GNULIB_LINK=0;             AC_SUBST([GNULIB_LINK])
   GNULIB_LINKAT=0;           AC_SUBST([GNULIB_LINKAT])
   GNULIB_LSEEK=0;            AC_SUBST([GNULIB_LSEEK])
+  GNULIB_PIPE=0;             AC_SUBST([GNULIB_PIPE])
   GNULIB_PIPE2=0;            AC_SUBST([GNULIB_PIPE2])
   GNULIB_PREAD=0;            AC_SUBST([GNULIB_PREAD])
   GNULIB_PWRITE=0;           AC_SUBST([GNULIB_PWRITE])
@@ -112,6 +111,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   HAVE_LCHOWN=1;          AC_SUBST([HAVE_LCHOWN])
   HAVE_LINK=1;            AC_SUBST([HAVE_LINK])
   HAVE_LINKAT=1;          AC_SUBST([HAVE_LINKAT])
+  HAVE_PIPE=1;            AC_SUBST([HAVE_PIPE])
   HAVE_PIPE2=1;           AC_SUBST([HAVE_PIPE2])
   HAVE_PREAD=1;           AC_SUBST([HAVE_PREAD])
   HAVE_PWRITE=1;          AC_SUBST([HAVE_PWRITE])
@@ -120,14 +120,15 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   HAVE_SLEEP=1;           AC_SUBST([HAVE_SLEEP])
   HAVE_SYMLINK=1;         AC_SUBST([HAVE_SYMLINK])
   HAVE_SYMLINKAT=1;       AC_SUBST([HAVE_SYMLINKAT])
-  HAVE_TTYNAME_R=1;       AC_SUBST([HAVE_TTYNAME_R])
   HAVE_UNLINKAT=1;        AC_SUBST([HAVE_UNLINKAT])
   HAVE_USLEEP=1;          AC_SUBST([HAVE_USLEEP])
   HAVE_DECL_ENVIRON=1;    AC_SUBST([HAVE_DECL_ENVIRON])
+  HAVE_DECL_FCHDIR=1;     AC_SUBST([HAVE_DECL_FCHDIR])
   HAVE_DECL_GETDOMAINNAME=1; AC_SUBST([HAVE_DECL_GETDOMAINNAME])
   HAVE_DECL_GETLOGIN_R=1; AC_SUBST([HAVE_DECL_GETLOGIN_R])
   HAVE_DECL_GETPAGESIZE=1; AC_SUBST([HAVE_DECL_GETPAGESIZE])
   HAVE_DECL_GETUSERSHELL=1; AC_SUBST([HAVE_DECL_GETUSERSHELL])
+  HAVE_DECL_TTYNAME_R=1;  AC_SUBST([HAVE_DECL_TTYNAME_R])
   HAVE_OS_H=0;            AC_SUBST([HAVE_OS_H])
   HAVE_SYS_PARAM_H=0;     AC_SUBST([HAVE_SYS_PARAM_H])
   REPLACE_CHOWN=0;        AC_SUBST([REPLACE_CHOWN])
@@ -137,6 +138,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   REPLACE_FCHOWNAT=0;     AC_SUBST([REPLACE_FCHOWNAT])
   REPLACE_GETCWD=0;       AC_SUBST([REPLACE_GETCWD])
   REPLACE_GETDOMAINNAME=0; AC_SUBST([REPLACE_GETDOMAINNAME])
+  REPLACE_GETLOGIN_R=0;   AC_SUBST([REPLACE_GETLOGIN_R])
   REPLACE_GETGROUPS=0;    AC_SUBST([REPLACE_GETGROUPS])
   REPLACE_GETPAGESIZE=0;  AC_SUBST([REPLACE_GETPAGESIZE])
   REPLACE_LCHOWN=0;       AC_SUBST([REPLACE_LCHOWN])

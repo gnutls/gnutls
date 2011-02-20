@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2010 Free Software Foundation, Inc.
+# Copyright (C) 2002-2011 Free Software Foundation, Inc.
 #
 # This file is free software, distributed under the terms of the GNU
 # General Public License.  As a special exception to the GNU General
@@ -42,6 +42,8 @@ AC_DEFUN([lgl_EARLY],
   # Code from module errno-tests:
   # Code from module extensions:
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
+  # Code from module fcntl-h:
+  # Code from module fcntl-h-tests:
   # Code from module float:
   # Code from module fseeko:
   AC_REQUIRE([AC_FUNC_FSEEKO])
@@ -113,8 +115,6 @@ AC_DEFUN([lgl_EARLY],
   # Code from module vsnprintf:
   # Code from module vsnprintf-tests:
   # Code from module warn-on-use:
-  # Code from module wchar:
-  # Code from module wchar-tests:
   # Code from module xsize:
 ])
 
@@ -194,6 +194,7 @@ AC_DEFUN([lgl_INIT],
   # Code from module snprintf:
   gl_FUNC_SNPRINTF
   gl_STDIO_MODULE_INDICATOR([snprintf])
+  gl_MODULE_INDICATOR([snprintf])
   # Code from module socketlib:
   gl_SOCKETLIB
   # Code from module sockets:
@@ -245,8 +246,6 @@ AC_DEFUN([lgl_INIT],
   gl_FUNC_VSNPRINTF
   gl_STDIO_MODULE_INDICATOR([vsnprintf])
   # Code from module warn-on-use:
-  # Code from module wchar:
-  gl_WCHAR_H
   # Code from module xsize:
   gl_XSIZE
   # End of code from modules
@@ -295,6 +294,7 @@ changequote([, ])dnl
   AC_SUBST([lgltests_WITNESS])
   gl_module_indicator_condition=$lgltests_WITNESS
   m4_pushdef([gl_MODULE_INDICATOR_CONDITION], [$gl_module_indicator_condition])
+  gl_FCNTL_H
   gl_FUNC_UNGETC_WORKS
   gl_FUNC_UNGETC_WORKS
   gl_FUNC_GETPAGESIZE
@@ -459,7 +459,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/verify.h
   lib/vsnprintf.c
   lib/w32sock.h
-  lib/wchar.in.h
   lib/xsize.h
   m4/00gnulib.m4
   m4/alloca.m4
@@ -469,6 +468,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/errno_h.m4
   m4/extensions.m4
   m4/fcntl-o.m4
+  m4/fcntl_h.m4
   m4/float_h.m4
   m4/fseeko.m4
   m4/ftello.m4
@@ -540,7 +540,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/visibility.m4
   m4/vsnprintf.m4
   m4/warn-on-use.m4
-  m4/wchar_h.m4
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
@@ -553,6 +552,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-byteswap.c
   tests/test-c-ctype.c
   tests/test-errno.c
+  tests/test-fcntl-h.c
   tests/test-fseeko.c
   tests/test-fseeko.sh
   tests/test-fseeko2.sh
@@ -584,10 +584,10 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-verify.c
   tests/test-verify.sh
   tests/test-vsnprintf.c
-  tests/test-wchar.c
   tests/zerosize-ptr.h
   tests=lib/binary-io.h
   tests=lib/dummy.c
+  tests=lib/fcntl.in.h
   tests=lib/getpagesize.c
   tests=lib/intprops.h
 ])

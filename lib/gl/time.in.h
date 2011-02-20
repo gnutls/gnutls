@@ -1,6 +1,6 @@
 /* A more-standard <time.h>.
 
-   Copyright (C) 2007-2010 Free Software Foundation, Inc.
+   Copyright (C) 2007-2011 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -69,13 +69,16 @@
 extern "C" {
 #   endif
 
-#   undef timespec
-#   define timespec rpl_timespec
+#   if !GNULIB_defined_struct_timespec
+#    undef timespec
+#    define timespec rpl_timespec
 struct timespec
 {
   time_t tv_sec;
   long int tv_nsec;
 };
+#    define GNULIB_defined_struct_timespec 1
+#   endif
 
 #   ifdef __cplusplus
 }
@@ -84,6 +87,7 @@ struct timespec
 #  endif
 # endif
 
+# if !GNULIB_defined_struct_time_t_must_be_integral
 /* Per http://austingroupbugs.net/view.php?id=327, POSIX requires
    time_t to be an integer type, even though C99 permits floating
    point.  We don't know of any implementation that uses floating
@@ -92,6 +96,8 @@ struct timespec
 struct __time_t_must_be_integral {
   unsigned int __floating_time_t_unsupported : (time_t) 1;
 };
+#  define GNULIB_defined_struct_time_t_must_be_integral 1
+# endif
 
 /* Sleep for at least RQTP seconds unless interrupted,  If interrupted,
    return -1 and store the remaining time into RMTP.  See
@@ -147,7 +153,7 @@ _GL_FUNCDECL_RPL (localtime_r, struct tm *, (time_t const *restrict __timer,
 _GL_CXXALIAS_RPL (localtime_r, struct tm *, (time_t const *restrict __timer,
                                              struct tm *restrict __result));
 #  else
-#   if ! @HAVE_LOCALTIME_R@
+#   if ! @HAVE_DECL_LOCALTIME_R@
 _GL_FUNCDECL_SYS (localtime_r, struct tm *, (time_t const *restrict __timer,
                                              struct tm *restrict __result)
                                             _GL_ARG_NONNULL ((1, 2)));
@@ -155,7 +161,9 @@ _GL_FUNCDECL_SYS (localtime_r, struct tm *, (time_t const *restrict __timer,
 _GL_CXXALIAS_SYS (localtime_r, struct tm *, (time_t const *restrict __timer,
                                              struct tm *restrict __result));
 #  endif
+#  if @HAVE_DECL_LOCALTIME_R@
 _GL_CXXALIASWARN (localtime_r);
+#  endif
 #  if @REPLACE_LOCALTIME_R@
 #   if !(defined __cplusplus && defined GNULIB_NAMESPACE)
 #    undef gmtime_r
@@ -167,7 +175,7 @@ _GL_FUNCDECL_RPL (gmtime_r, struct tm *, (time_t const *restrict __timer,
 _GL_CXXALIAS_RPL (gmtime_r, struct tm *, (time_t const *restrict __timer,
                                           struct tm *restrict __result));
 #  else
-#   if ! @HAVE_LOCALTIME_R@
+#   if ! @HAVE_DECL_LOCALTIME_R@
 _GL_FUNCDECL_SYS (gmtime_r, struct tm *, (time_t const *restrict __timer,
                                           struct tm *restrict __result)
                                          _GL_ARG_NONNULL ((1, 2)));
@@ -175,7 +183,9 @@ _GL_FUNCDECL_SYS (gmtime_r, struct tm *, (time_t const *restrict __timer,
 _GL_CXXALIAS_SYS (gmtime_r, struct tm *, (time_t const *restrict __timer,
                                           struct tm *restrict __result));
 #  endif
+#  if @HAVE_DECL_LOCALTIME_R@
 _GL_CXXALIASWARN (gmtime_r);
+#  endif
 # endif
 
 /* Parse BUF as a time stamp, assuming FORMAT specifies its layout, and store

@@ -1,5 +1,5 @@
 /* Test of snprintf() function.
-   Copyright (C) 2007-2010 Free Software Foundation, Inc.
+   Copyright (C) 2007-2011 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -34,15 +34,16 @@ main (int argc, char *argv[])
   int size;
   int retval;
 
+  retval = snprintf (NULL, 0, "%d", 12345);
+  ASSERT (retval == 5);
+
   for (size = 0; size <= 8; size++)
     {
       memcpy (buf, "DEADBEEF", 8);
       retval = snprintf (buf, size, "%d", 12345);
+      ASSERT (retval == 5);
       if (size < 6)
         {
-#if CHECK_SNPRINTF_POSIX
-          ASSERT (retval < 0 || retval >= size);
-#endif
           if (size > 0)
             {
               ASSERT (memcmp (buf, "12345", size - 1) == 0);
@@ -55,7 +56,6 @@ main (int argc, char *argv[])
         }
       else
         {
-          ASSERT (retval == 5);
           ASSERT (memcmp (buf, "12345\0EF", 8) == 0);
         }
     }

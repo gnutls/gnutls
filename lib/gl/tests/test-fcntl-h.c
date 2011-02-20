@@ -1,5 +1,5 @@
-/* Test of <wchar.h> substitute.
-   Copyright (C) 2007-2010 Free Software Foundation, Inc.
+/* Test of <fcntl.h> substitute.
+   Copyright (C) 2007, 2009-2011 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,17 +18,18 @@
 
 #include <config.h>
 
-#include <wchar.h>
+#include <fcntl.h>
 
-#include "verify.h"
+/* Check that the various O_* macros are defined.  */
+int o = O_DIRECT | O_DIRECTORY | O_DSYNC | O_NDELAY | O_NOATIME | O_NONBLOCK
+        | O_NOCTTY | O_NOFOLLOW | O_NOLINKS | O_RSYNC | O_SYNC | O_TTY_INIT
+        | O_BINARY | O_TEXT;
 
-/* Check that the types wchar_t and wint_t are defined.  */
-wchar_t a = 'c';
-wint_t b = 'x';
+/* Check that the various SEEK_* macros are defined.  */
+int sk[] = { SEEK_CUR, SEEK_END, SEEK_SET };
 
-/* Check that NULL can be passed through varargs as a pointer type,
-   per POSIX 2008.  */
-verify (sizeof NULL == sizeof (void *));
+/* Check that the FD_* macros are defined.  */
+int fd = FD_CLOEXEC;
 
 int
 main (void)

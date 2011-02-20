@@ -1,5 +1,5 @@
 /* Convenience header for conditional use of GNU <libintl.h>.
-   Copyright (C) 1995-1998, 2000-2002, 2004-2006, 2009-2010 Free Software
+   Copyright (C) 1995-1998, 2000-2002, 2004-2006, 2009-2011 Free Software
    Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -91,6 +91,12 @@
 # define bind_textdomain_codeset(Domainname, Codeset) \
     ((void) (Domainname), (const char *) (Codeset))
 
+#endif
+
+/* Prefer gnulib's setlocale override over libintl's setlocale override.  */
+#ifdef GNULIB_defined_setlocale
+# undef setlocale
+# define setlocale rpl_setlocale
 #endif
 
 /* A pseudo function call that serves as a marker for the automated

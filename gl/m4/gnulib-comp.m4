@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2010 Free Software Foundation, Inc.
+# Copyright (C) 2002-2011 Free Software Foundation, Inc.
 #
 # This file is free software, distributed under the terms of the GNU
 # General Public License.  As a special exception to the GNU General
@@ -53,6 +53,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module extensions:
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
   # Code from module fclose:
+  # Code from module fcntl-h:
+  # Code from module fcntl-h-tests:
   # Code from module fdl-1.3:
   # Code from module float:
   # Code from module fseeko:
@@ -103,6 +105,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module netinet_in-tests:
   # Code from module perror:
   # Code from module perror-tests:
+  # Code from module pipe-posix:
+  # Code from module pipe-posix-tests:
   # Code from module pmccabe2html:
   # Code from module progname:
   # Code from module read-file:
@@ -174,8 +178,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module version-etc-tests:
   # Code from module warn-on-use:
   # Code from module warnings:
-  # Code from module wchar:
-  # Code from module wchar-tests:
   # Code from module xsize:
 ])
 
@@ -374,6 +376,7 @@ AC_SUBST([LTALLOCA])
   # Code from module snprintf:
   gl_FUNC_SNPRINTF
   gl_STDIO_MODULE_INDICATOR([snprintf])
+  gl_MODULE_INDICATOR([snprintf])
   # Code from module socket:
   AC_REQUIRE([gl_HEADER_SYS_SOCKET])
   if test "$ac_cv_header_winsock2_h" = yes; then
@@ -444,8 +447,6 @@ AC_SUBST([LTALLOCA])
   # Code from module warn-on-use:
   # Code from module warnings:
   AC_SUBST([WARN_CFLAGS])
-  # Code from module wchar:
-  gl_WCHAR_H
   # Code from module xsize:
   gl_XSIZE
   # End of code from modules
@@ -494,6 +495,7 @@ changequote([, ])dnl
   AC_SUBST([gltests_WITNESS])
   gl_module_indicator_condition=$gltests_WITNESS
   m4_pushdef([gl_MODULE_INDICATOR_CONDITION], [$gl_module_indicator_condition])
+  gl_FCNTL_H
   gl_FUNC_UNGETC_WORKS
   gl_FUNC_UNGETC_WORKS
   gl_FUNC_GETPAGESIZE
@@ -506,7 +508,9 @@ changequote([, ])dnl
   gl_FUNC_MMAP_ANON
   AC_CHECK_HEADERS_ONCE([sys/mman.h])
   AC_CHECK_FUNCS_ONCE([mprotect])
-  AC_CHECK_HEADERS_ONCE([unistd.h sys/wait.h])
+  gl_FUNC_PIPE
+  gl_UNISTD_MODULE_INDICATOR([pipe])
+  AC_CHECK_HEADERS_ONCE([sys/wait.h])
   gt_TYPE_WCHAR_T
   gt_TYPE_WINT_T
   gl_SYS_IOCTL_H
@@ -711,7 +715,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/version-etc.c
   lib/version-etc.h
   lib/w32sock.h
-  lib/wchar.in.h
   lib/xsize.h
   m4/00gnulib.m4
   m4/alloca.m4
@@ -724,6 +727,8 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/error.m4
   m4/extensions.m4
   m4/fclose.m4
+  m4/fcntl-o.m4
+  m4/fcntl_h.m4
   m4/float_h.m4
   m4/fseeko.m4
   m4/ftello.m4
@@ -756,6 +761,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/netdb_h.m4
   m4/netinet_in_h.m4
   m4/perror.m4
+  m4/pipe.m4
   m4/printf.m4
   m4/read-file.m4
   m4/readline.m4
@@ -791,7 +797,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/version-etc.m4
   m4/warn-on-use.m4
   m4/warnings.m4
-  m4/wchar_h.m4
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
@@ -805,6 +810,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-binary-io.sh
   tests/test-c-ctype.c
   tests/test-errno.c
+  tests/test-fcntl-h.c
   tests/test-fseeko.c
   tests/test-fseeko.sh
   tests/test-fseeko2.sh
@@ -825,6 +831,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-netinet_in.c
   tests/test-perror.c
   tests/test-perror.sh
+  tests/test-pipe.c
   tests/test-read-file.c
   tests/test-select-fd.c
   tests/test-select-in.sh
@@ -856,12 +863,13 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-verify.sh
   tests/test-version-etc.c
   tests/test-version-etc.sh
-  tests/test-wchar.c
   tests/zerosize-ptr.h
   tests=lib/binary-io.h
   tests=lib/dummy.c
+  tests=lib/fcntl.in.h
   tests=lib/getpagesize.c
   tests=lib/ioctl.c
+  tests=lib/pipe.c
   tests=lib/sys_ioctl.in.h
   tests=lib/w32sock.h
   top/GNUmakefile

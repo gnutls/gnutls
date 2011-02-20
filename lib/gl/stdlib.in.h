@@ -1,6 +1,6 @@
 /* A GNU-like <stdlib.h>.
 
-   Copyright (C) 1995, 2001-2004, 2006-2010 Free Software Foundation, Inc.
+   Copyright (C) 1995, 2001-2004, 2006-2011 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -49,21 +49,23 @@
 # include <sys/loadavg.h>
 #endif
 
+#if @GNULIB_RANDOM_R@
+
 /* OSF/1 5.1 declares 'struct random_data' in <random.h>, which is included
-   from <stdlib.h> if _REENTRANT is defined.  Include it always.  */
-#if @HAVE_RANDOM_H@
-# include <random.h>
-#endif
+   from <stdlib.h> if _REENTRANT is defined.  Include it whenever we need
+   'struct random_data'.  */
+# if @HAVE_RANDOM_H@
+#  include <random.h>
+# endif
 
-#if !@HAVE_STRUCT_RANDOM_DATA@ || (@GNULIB_RANDOM_R@ && !@HAVE_RANDOM_R@) \
-    || defined GNULIB_POSIXCHECK
-# include <stdint.h>
-#endif
+# if !@HAVE_STRUCT_RANDOM_DATA@ || !@HAVE_RANDOM_R@
+#  include <stdint.h>
+# endif
 
-#if !@HAVE_STRUCT_RANDOM_DATA@
+# if !@HAVE_STRUCT_RANDOM_DATA@
 /* Define 'struct random_data'.
    But allow multiple gnulib generated <stdlib.h> replacements to coexist.  */
-# if !GNULIB_defined_struct_random_data
+#  if !GNULIB_defined_struct_random_data
 struct random_data
 {
   int32_t *fptr;                /* Front pointer.  */
@@ -74,7 +76,8 @@ struct random_data
   int rand_sep;                 /* Distance between front and rear.  */
   int32_t *end_ptr;             /* Pointer behind state table.  */
 };
-#  define GNULIB_defined_struct_random_data 1
+#   define GNULIB_defined_struct_random_data 1
+#  endif
 # endif
 #endif
 
@@ -85,10 +88,10 @@ struct random_data
 # include <unistd.h>
 #endif
 
-#ifndef __attribute__
-# if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 8)
-#  define __attribute__(Spec)   /* empty */
-# endif
+#if 3 <= __GNUC__ || __GNUC__ == 2 && 8 <= __GNUC_MINOR__
+# define _GL_ATTRIBUTE_NORETURN __attribute__ ((__noreturn__))
+#else
+# define _GL_ATTRIBUTE_NORETURN
 #endif
 
 /* The definitions of _GL_FUNCDECL_RPL etc. are copied here.  */
@@ -116,7 +119,7 @@ struct random_data
 /* Terminate the current process with the given return code, without running
    the 'atexit' handlers.  */
 # if !@HAVE__EXIT@
-_GL_FUNCDECL_SYS (_Exit, void, (int status) __attribute__ ((__noreturn__)));
+_GL_FUNCDECL_SYS (_Exit, void, (int status) _GL_ATTRIBUTE_NORETURN);
 # endif
 _GL_CXXALIAS_SYS (_Exit, void, (int status));
 _GL_CXXALIASWARN (_Exit);
@@ -584,7 +587,7 @@ _GL_FUNCDECL_RPL (setenv, int,
 _GL_CXXALIAS_RPL (setenv, int,
                   (const char *name, const char *value, int replace));
 # else
-#  if !@HAVE_SETENV@
+#  if !@HAVE_DECL_SETENV@
 _GL_FUNCDECL_SYS (setenv, int,
                   (const char *name, const char *value, int replace)
                   _GL_ARG_NONNULL ((1)));
@@ -592,7 +595,9 @@ _GL_FUNCDECL_SYS (setenv, int,
 _GL_CXXALIAS_SYS (setenv, int,
                   (const char *name, const char *value, int replace));
 # endif
+# if !(@REPLACE_SETENV@ && !@HAVE_DECL_SETENV@)
 _GL_CXXALIASWARN (setenv);
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef setenv
 # if HAVE_RAW_DECL_SETENV
@@ -702,12 +707,14 @@ _GL_WARN_ON_USE (unlockpt, "unlockpt is not portable - "
 _GL_FUNCDECL_RPL (unsetenv, int, (const char *name) _GL_ARG_NONNULL ((1)));
 _GL_CXXALIAS_RPL (unsetenv, int, (const char *name));
 # else
-#  if !@HAVE_UNSETENV@
+#  if !@HAVE_DECL_UNSETENV@
 _GL_FUNCDECL_SYS (unsetenv, int, (const char *name) _GL_ARG_NONNULL ((1)));
 #  endif
 _GL_CXXALIAS_SYS (unsetenv, int, (const char *name));
 # endif
+# if !(@REPLACE_UNSETENV@ && !@HAVE_DECL_UNSETENV@)
 _GL_CXXALIASWARN (unsetenv);
+# endif
 #elif defined GNULIB_POSIXCHECK
 # undef unsetenv
 # if HAVE_RAW_DECL_UNSETENV

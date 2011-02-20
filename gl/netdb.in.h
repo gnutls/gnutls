@@ -1,5 +1,5 @@
 /* Provide a netdb.h header file for systems lacking it (read: MinGW).
-   Copyright (C) 2008-2010 Free Software Foundation, Inc.
+   Copyright (C) 2008-2011 Free Software Foundation, Inc.
    Written by Simon Josefsson.
 
    This program is free software; you can redistribute it and/or modify
@@ -51,6 +51,7 @@
 
 # if !@HAVE_STRUCT_ADDRINFO@
 
+#  if !GNULIB_defined_struct_addrinfo
 /* Structure to contain information about address of a service provider.  */
 struct addrinfo
 {
@@ -63,6 +64,8 @@ struct addrinfo
   char *ai_canonname;           /* Canonical name for service location.  */
   struct addrinfo *ai_next;     /* Pointer to next in list.  */
 };
+#   define GNULIB_defined_struct_addrinfo 1
+#  endif
 # endif
 
 /* Possible values for `ai_flags' field in `addrinfo' structure.  */
