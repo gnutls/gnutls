@@ -336,22 +336,6 @@ sequence_increment (gnutls_session_t session,
     }
 }
 
-/* Read epoch and sequence from a DTLS packet */
-inline static void
-sequence_read (uint64 * sequence,
-	       opaque * data)
-{
-  memcpy(sequence->i, data, 8);
-}
-
-/* Write epoch and sequence to a DTLS packet */
-inline static void
-sequence_write (uint64 * sequence,
-		opaque * data)
-{
-  memcpy(data, sequence->i, 8);
-}
-
 /* This function behaves exactly like write(). The only difference is
  * that it accepts, the gnutls_session_t and the content_type_t of data to
  * send (if called by the user the Content is specific)
@@ -425,7 +409,8 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
   header_size = RECORD_HEADER_SIZE(session);
   /* Adjust header length and add sequence for DTLS */
-    sequence_write(&record_state->sequence_number, &headers[3]);
+  if (IS_DTLS(session))
+    memcpy(&headers[3], &record_state->sequence_number.i, 8);
 
   _gnutls_record_log
     ("REC[%p]: Preparing Packet %s(%d) with length: %d\n", session,
@@ -539,6 +524,7 @@ check_recv_type (content_type_t recv_type)
       return 0;
     default:
       gnutls_assert ();
+      _gnutls_audit_log("Received record packet of unknown type %u\n", (unsigned int)recv_type);
       return GNUTLS_E_UNEXPECTED_PACKET;
     }
 
@@ -582,76 +568,6 @@ check_buffers (gnutls_session_t session, content_type_t type,
 }
 
 
-/* Checks the record headers and returns the length, version and
- * content type.
- */
-static int
-record_check_headers (gnutls_session_t session,
-                      uint8_t headers[MAX_RECORD_HEADER_SIZE],
-                      content_type_t type,
-                      gnutls_handshake_description_t htype,
-                      /*output */ content_type_t * recv_type,
-                      opaque version[2], uint64* sequence,
-                      uint16_t * length,
-                      uint16_t * header_size)
-{
-
-  /* Read the first two bytes to determine if this is a 
-   * version 2 message 
-   */
-
-  if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO && type == GNUTLS_HANDSHAKE
-      && headers[0] > 127 && !(IS_DTLS(session)))
-    {
-
-      /* if msb set and expecting handshake message
-       * it should be SSL 2 hello 
-       */
-      version[0] = 3;           /* assume SSL 3.0 */
-      version[1] = 0;
-
-      *length = (((headers[0] & 0x7f) << 8)) | headers[1];
-
-      /* SSL 2.0 headers */
-      *header_size = 2;
-      *recv_type = GNUTLS_HANDSHAKE;    /* we accept only v2 client hello
-                                         */
-
-      /* in order to assist the handshake protocol.
-       * V2 compatibility is a mess.
-       */
-      session->internals.v2_hello = *length;
-
-      _gnutls_record_log ("REC[%p]: V2 packet received. Length: %d\n",
-                          session, *length);
-
-    }
-  else if(IS_DTLS(session))
-    {
-      /* dtls version 1.0 */
-      *recv_type = headers[0];
-      version[0] = headers[1];
-      version[1] = headers[2];
-
-      sequence_read(sequence, &headers[3]);
-
-      *length = _gnutls_read_uint16 (&headers[11]);
-    }
-  else
-    {
-      /* version 3.x 
-       */
-      *recv_type = headers[0];
-      version[0] = headers[1];
-      version[1] = headers[2];
-
-      /* No DECR_LEN, since headers has enough size. 
-       */
-      *length = _gnutls_read_uint16 (&headers[3]);
-    }
-
-  return 0;
-}
 
 /* Here we check if the advertized version is the one we
  * negotiated in the handshake.
@@ -696,7 +612,7 @@ record_check_version (gnutls_session_t session,
  * buffer.
  */
 static int
-record_add (gnutls_session_t session,
+record_add_to_buffers (gnutls_session_t session,
                    content_type_t recv_type, content_type_t type,
                    gnutls_handshake_description_t htype, opaque * data,
                    int data_size)
@@ -883,6 +799,156 @@ get_temp_recv_buffer (gnutls_session_t session, gnutls_datum_t * tmp)
   return 0;
 }
 
+struct tls_record_st {
+  uint16_t header_size;
+  uint8_t version[2];
+  uint64 sequence; /* DTLS */
+  uint16_t length;
+  uint16_t packet_size; /* header_size + length */
+  content_type_t type;
+  /* the data */
+  gnutls_datum_t data;
+};
+
+/* Checks the record headers and returns the length, version and
+ * content type.
+ */
+static void
+record_read_headers (gnutls_session_t session,
+                      uint8_t headers[MAX_RECORD_HEADER_SIZE],
+                      content_type_t type,
+                      gnutls_handshake_description_t htype,
+                      struct tls_record_st* record)
+{
+
+  /* Read the first two bytes to determine if this is a 
+   * version 2 message 
+   */
+
+  if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO && type == GNUTLS_HANDSHAKE
+      && headers[0] > 127 && !(IS_DTLS(session)))
+    {
+
+      /* if msb set and expecting handshake message
+       * it should be SSL 2 hello 
+       */
+      record->version[0] = 3;           /* assume SSL 3.0 */
+      record->version[1] = 0;
+
+      record->length = (((headers[0] & 0x7f) << 8)) | headers[1];
+
+      /* SSL 2.0 headers */
+      record->header_size = 2;
+      record->type = GNUTLS_HANDSHAKE;    /* we accept only v2 client hello
+                                         */
+
+      /* in order to assist the handshake protocol.
+       * V2 compatibility is a mess.
+       */
+      session->internals.v2_hello = record->length;
+
+      _gnutls_record_log ("REC[%p]: V2 packet received. Length: %d\n",
+                          session, record->length);
+
+    }
+  else 
+    {
+      /* dtls version 1.0 and TLS version 1.x */
+      record->type = headers[0];
+      record->version[0] = headers[1];
+      record->version[1] = headers[2];
+
+      if(IS_DTLS(session))
+        {
+          memcpy(record->sequence.i, &headers[3], 8);
+          record->length = _gnutls_read_uint16 (&headers[11]);
+        }
+      else
+        record->length = _gnutls_read_uint16 (&headers[3]);
+    }
+
+  record->packet_size += record->length;
+}
+
+
+static int recv_headers( gnutls_session_t session, content_type_t type, 
+  gnutls_handshake_description_t htype, struct tls_record_st* record)
+{
+int ret;
+  /* Read the headers.
+   */
+  record->header_size = record->packet_size = RECORD_HEADER_SIZE(session);
+
+  if ((ret =
+       _gnutls_io_read_buffered (session, record->header_size, -1)) != record->header_size)
+    {
+      gnutls_assert();
+      return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+    }
+
+  ret = _mbuffer_linearize (&session->internals.record_recv_buffer);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  _mbuffer_get_first (&session->internals.record_recv_buffer, &record->data);
+
+  record_read_headers (session, record->data.data, type, htype, record);
+
+  /* Check if the DTLS epoch is valid */
+  if (IS_DTLS(session)) 
+    {
+      uint16_t epoch = _gnutls_read_uint16(record->sequence.i);
+      
+      if (_gnutls_epoch_is_valid(session, epoch) == 0)
+        {
+          _gnutls_audit_log("Discarded message[%u] with invalid epoch 0x%.2x%.2x.\n",
+            (unsigned int)_gnutls_uint64touint32 (&record->sequence), (int)record->sequence.i[0], 
+            (int)record->sequence.i[1]);
+          gnutls_assert();
+          /* doesn't matter, just a fatal error */
+          return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+        }
+    }
+
+  /* Here we check if the Type of the received packet is
+   * ok. 
+   */
+  if ((ret = check_recv_type (record->type)) < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  /* Here we check if the advertized version is the one we
+   * negotiated in the handshake.
+   */
+  if ((ret = record_check_version (session, htype, record->version)) < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  if (record->length > MAX_RECV_SIZE(session))
+    {
+      _gnutls_audit_log
+        ("Received packet with illegal length: %u\n", (unsigned int)record->length);
+      gnutls_assert ();
+      return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+    }
+
+  _gnutls_record_log
+    ("REC[%p]: Expected Packet %s(%d)\n", session,
+     _gnutls_packet2str (type), type);
+  _gnutls_record_log ("REC[%p]: Received Packet %s(%d) with length: %d\n",
+                      session,
+                      _gnutls_packet2str (record->type), record->type, record->length);
+
+  
+  return 0;
+}
 
 #define MAX_EMPTY_PACKETS_SEQUENCE 4
 
@@ -896,23 +962,20 @@ get_temp_recv_buffer (gnutls_session_t session, gnutls_datum_t * tmp)
 ssize_t
 _gnutls_recv_int (gnutls_session_t session, content_type_t type,
                   gnutls_handshake_description_t htype,
-                  opaque * data, size_t sizeofdata)
+                  opaque * data, size_t data_size)
 {
-  int decrypted_length;
-  opaque version[2];
-  uint64 dtls_sequence;
-  uint64 *decrypt_sequence;
-  content_type_t recv_type;
-  uint16_t length;
+  uint64 *packet_sequence;
   uint8_t *ciphertext;
   int ret, ret2;
-  uint16_t header_size;
   int empty_packet = 0;
-  gnutls_datum_t data_enc, tmp;
+  gnutls_datum_t decrypted;
   record_parameters_st *record_params;
   record_state_st *record_state;
+  struct tls_record_st record;
 
-  if (type != GNUTLS_ALERT && (sizeofdata == 0 || data == NULL))
+  memset(&record, 0, sizeof(record));
+
+  if (type != GNUTLS_ALERT && (data_size == 0 || data == NULL))
     {
       return GNUTLS_E_INVALID_REQUEST;
     }
@@ -938,221 +1001,127 @@ begin:
       return GNUTLS_E_INVALID_SESSION;
     }
 
-/* If we have enough data in the cache do not bother receiving
- * a new packet. (in order to flush the cache)
- */
-  ret = check_buffers (session, type, data, sizeofdata);
+  /* If we have enough data in the cache do not bother receiving
+   * a new packet. (in order to flush the cache)
+   */
+  ret = check_buffers (session, type, data, data_size);
   if (ret != 0)
     return ret;
 
-
-/* default headers for TLS 1.0
- */
-  header_size = RECORD_HEADER_SIZE(session);
-
-  if ((ret =
-       _gnutls_io_read_buffered (session, header_size, -1)) != header_size)
+  ret = recv_headers(session, type, htype, &record);
+  if (ret < 0)
     {
-      if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
-        return ret;
-
-      session_invalidate (session);
-      if (type == GNUTLS_ALERT)
-        {
-          gnutls_assert ();
-          return 0;             /* we were expecting close notify */
-        }
-      session_unresumable (session);
       gnutls_assert();
-
-      if (ret == 0)
-       return GNUTLS_E_PREMATURE_TERMINATION;
-      else
-      return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+      goto recv_error;
     }
 
-  ret = _mbuffer_linearize (&session->internals.record_recv_buffer);
-  if (ret != 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  _mbuffer_get_first (&session->internals.record_recv_buffer, &data_enc);
-
-  if ((ret =
-       record_check_headers (session, data_enc.data, type, htype, &recv_type,
-			     version, &dtls_sequence, &length, &header_size)) < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
+  /* get the record state parameters */
   ret = _gnutls_epoch_get (session, EPOCH_READ_CURRENT, &record_params);
   if (ret < 0)
     return gnutls_assert_val (ret);
 
   /* Safeguard against processing data with an incomplete cipher state. */
   if (!record_params->initialized)
-    return gnutls_assert_val (GNUTLS_E_INVALID_REQUEST);
+    return gnutls_assert_val (GNUTLS_E_INTERNAL_ERROR);
 
   record_state = &record_params->read;
 
-/* Here we check if the Type of the received packet is
- * ok. 
- */
-  if ((ret = check_recv_type (recv_type)) < 0)
+  /* Check if the DTLS epoch is valid */
+  if (IS_DTLS(session)) 
+    packet_sequence = &record.sequence;
+  else
+    packet_sequence = &record_state->sequence_number;
+
+
+  /* Read the packet data and insert it to record_recv_buffer.
+   */
+  ret =
+       _gnutls_io_read_buffered (session, record.packet_size,
+                                 record.type);
+  if (ret != record.packet_size)
     {
-      gnutls_assert ();
-      return ret;
+      gnutls_assert();
+      goto recv_error;
     }
 
-/* Here we check if the advertized version is the one we
- * negotiated in the handshake.
- */
-  if ((ret = record_check_version (session, htype, version)) < 0)
-    {
-      gnutls_assert ();
-      session_invalidate (session);
-      return ret;
-    }
-
-  _gnutls_record_log
-    ("REC[%p]: Expected Packet[%d] %s(%d) with length: %d\n", session,
-     (int) _gnutls_uint64touint32 (&record_state->sequence_number),
-     _gnutls_packet2str (type), type, (int) sizeofdata);
-  _gnutls_record_log ("REC[%p]: Received Packet[%d] %s(%d) with length: %d\n",
-                      session,
-                      (int)
-                      _gnutls_uint64touint32 (&record_state->sequence_number),
-                      _gnutls_packet2str (recv_type), recv_type, length);
-
-  if (length > MAX_RECV_SIZE(session))
-    {
-      _gnutls_record_log
-        ("REC[%p]: FATAL ERROR: Received packet with length: %d\n",
-         session, length);
-
-      session_unresumable (session);
-      session_invalidate (session);
-      gnutls_assert ();
-      return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-    }
-
-/* check if we have that data into buffer. 
- */
-  if ((ret =
-       _gnutls_io_read_buffered (session, header_size + length,
-                                 recv_type)) != header_size + length)
-    {
-      if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
-        return ret;
-
-      session_unresumable (session);
-      session_invalidate (session);
-      gnutls_assert ();
-      return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-    }
-
-
-/* ok now we are sure that we can read all the data - so
- * move on !
- */
-
+  /* ok now we are sure that we have read all the data - so
+   * move on !
+   */
   ret = _mbuffer_linearize (&session->internals.record_recv_buffer);
   if (ret != 0)
     {
       gnutls_assert ();
       return ret;
     }
-  _mbuffer_get_first (&session->internals.record_recv_buffer, &data_enc);
-  ciphertext = &data_enc.data[header_size];
+  _mbuffer_get_first (&session->internals.record_recv_buffer, &record.data);
+  ciphertext = &record.data.data[record.header_size];
 
-  ret = get_temp_recv_buffer (session, &tmp);
+  ret = get_temp_recv_buffer (session, &decrypted);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  /* Check if the DTLS epoch is valid */
-  if (IS_DTLS(session)) 
-    {
-      uint16_t epoch = _gnutls_read_uint16(dtls_sequence.i);
-      
-      if (_gnutls_epoch_is_valid(session, epoch) == 0)
-        {
-          _gnutls_audit_log("Discarded message with invalid epoch 0x%.2x%.2x current: 0x%.4x\n",
-            (int)dtls_sequence.i[0], (int)dtls_sequence.i[1], (int)record_params->epoch);
-
-          _mbuffer_remove_bytes (&session->internals.record_recv_buffer,
-                         header_size + length);
-          return GNUTLS_E_AGAIN;
-        }
-        
-      decrypt_sequence = &dtls_sequence;
-    }
-  else
-    decrypt_sequence = &record_state->sequence_number;
-
-/* decrypt the data we got. 
- */
+  /* decrypt the data we got. 
+   */
   ret =
-    _gnutls_decrypt (session, ciphertext, length, tmp.data, tmp.size,
-		     recv_type, record_params, decrypt_sequence);
+    _gnutls_decrypt (session, ciphertext, record.length, decrypted.data, decrypted.size,
+		     record.type, record_params, packet_sequence);
+  decrypted.size = ret;
+
   if (ret < 0)
     {
-      session_unresumable (session);
-      session_invalidate (session);
-      gnutls_assert ();
-      return ret;
+      gnutls_assert();
+      goto sanity_check_error;
     }
+
+  /* remove the decrypted packet from buffers */
   _mbuffer_remove_bytes (&session->internals.record_recv_buffer,
-                         header_size + length);
-  decrypted_length = ret;
+                         record.packet_size);
 
   /* check for duplicates. We check after the message
-   * is processed an authenticated to avoid someone
+   * is processed and authenticated to avoid someone
    * messing with our windows.
    */
   if (IS_DTLS(session)) 
     {
-      ret = _dtls_record_check(session, decrypt_sequence);
+      ret = _dtls_record_check(session, packet_sequence);
       if (ret < 0)
         {
-          _gnutls_audit_log("Discarded duplicate message with sequence %u\n",
-            (unsigned int) _gnutls_uint64touint32 (decrypt_sequence));
-          return GNUTLS_E_AGAIN;
+          _gnutls_audit_log("Discarded duplicate message[%u]\n",
+            (unsigned int) _gnutls_uint64touint32 (packet_sequence));
+          goto discard2;
         }
     }
 
-/* Check if this is a CHANGE_CIPHER_SPEC
- */
-  if (type == GNUTLS_CHANGE_CIPHER_SPEC &&
-      recv_type == GNUTLS_CHANGE_CIPHER_SPEC)
+  /* Check if this is a CHANGE_CIPHER_SPEC
+   */
+  if (type == GNUTLS_CHANGE_CIPHER_SPEC && type == record.type)
     {
 
       _gnutls_record_log
         ("REC[%p]: ChangeCipherSpec Packet was received\n", session);
 
-      if ((size_t) decrypted_length != sizeofdata)
-        {                       /* sizeofdata should be 1 */
+      if ((size_t) decrypted.size != data_size)
+        {                       /* data_size should be 1 */
           gnutls_assert ();
-          return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+          ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+          goto sanity_check_error;
         }
-      memcpy (data, tmp.data, sizeofdata);
-
-      return decrypted_length;
+      data[0] = decrypted.data[0];
+      
+      return 1;
     }
 
   _gnutls_record_log
     ("REC[%p]: Decrypted Packet[%d] %s(%d) with length: %d\n", session,
-     (int) _gnutls_uint64touint32 (decrypt_sequence),
-     _gnutls_packet2str (recv_type), recv_type, decrypted_length);
+     (int) _gnutls_uint64touint32 (packet_sequence),
+     _gnutls_packet2str (record.type), record.type, decrypted.size);
 
-/* increase sequence number 
- */
-  if (sequence_increment (session, &record_state->sequence_number) != 0)
+  /* increase sequence number 
+   */
+  if (!IS_DTLS(session) && sequence_increment (session, &record_state->sequence_number) != 0)
     {
       session_invalidate (session);
       gnutls_assert ();
@@ -1160,8 +1129,7 @@ begin:
     }
 
   ret =
-    record_add (session, recv_type, type, htype, tmp.data,
-                       decrypted_length);
+    record_add_to_buffers (session, record.type, type, htype, decrypted.data, decrypted.size);
   if (ret < 0)
     {
       if (ret == GNUTLS_E_INT_RET_0)
@@ -1170,14 +1138,14 @@ begin:
       return ret;
     }
 
-/* Get Application data from buffer 
- */
-  if ((recv_type == type) &&
+  /* Get Application data from buffer 
+   */
+  if ((record.type == type) &&
       (type == GNUTLS_APPLICATION_DATA ||
        type == GNUTLS_HANDSHAKE || type == GNUTLS_INNER_APPLICATION))
     {
 
-      ret = _gnutls_record_buffer_get (type, session, data, sizeofdata);
+      ret = _gnutls_record_buffer_get (type, session, data, data_size);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -1217,6 +1185,45 @@ begin:
     }
 
   return ret;
+
+discard:
+  _mbuffer_remove_bytes (&session->internals.record_recv_buffer,
+                         record.packet_size);
+discard2:
+  return GNUTLS_E_AGAIN;
+
+sanity_check_error:
+  if (IS_DTLS(session))
+    {
+      _gnutls_audit_log("Discarded message[%u] due to invalid decryption\n", 
+            (unsigned int)_gnutls_uint64touint32 (packet_sequence));
+      goto discard2;
+    }
+  session_unresumable (session);
+  session_invalidate (session);
+  return ret;
+
+recv_error:
+  if (gnutls_error_is_fatal (ret) == 0)
+    return ret;
+
+  if (IS_DTLS(session))
+    {
+      goto discard;
+    }
+
+  session_invalidate (session);
+  if (type == GNUTLS_ALERT) /* we were expecting close notify */
+    {
+      gnutls_assert ();
+      return 0;             
+    }
+  session_unresumable (session);
+
+  if (ret == 0)
+    return GNUTLS_E_PREMATURE_TERMINATION;
+  else
+    return ret;
 }
 
 
