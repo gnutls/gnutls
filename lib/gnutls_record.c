@@ -1312,7 +1312,12 @@ gnutls_record_recv (gnutls_session_t session, void *data, size_t data_size)
  *
  * This function is the same as gnutls_record_recv(), except that
  * it returns in addition to data, the sequence number of the data.
- * This is useful in DTLS.
+ * This is useful in DTLS where record packets might be received
+ * out-of-order.
+ *
+ * In DTLS the least significant 48-bits are a unique sequence
+ * number, per handshake. If your application is using TLS re-handshakes
+ * then the full 64-bits should be used as a unique sequence.
  *
  * Returns: the number of bytes received and zero on EOF.  A negative
  *   error code is returned in case of an error.  The number of bytes
