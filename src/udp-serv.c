@@ -29,6 +29,7 @@ int udp_server(const char* name, int port)
     char buffer[MAX_BUFFER];
     priv_data_st priv;
     gnutls_session_t session;
+    unsigned char sequence[8];
 
     ret = listen_socket (name, port, SOCK_DGRAM);
     if (ret < 0)
@@ -77,7 +78,10 @@ int udp_server(const char* name, int port)
 
         for(;;)
           {
-            ret = gnutls_record_recv(session, buffer, MAX_BUFFER);
+            do {
+              ret = gnutls_record_recv_seq(session, buffer, MAX_BUFFER, sequence);
+            } while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
+
             if (ret < 0)
               {
                 fprintf(stderr, "Error in recv(): %s\n", gnutls_strerror(ret));
@@ -89,7 +93,8 @@ int udp_server(const char* name, int port)
                 break;
               }
             buffer[ret] = 0;
-            printf("received[%d]: %s\n", ret, buffer);
+            printf("received[%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x]: %s\n", sequence[0], sequence[1], sequence[2],
+              sequence[3], sequence[4], sequence[5], sequence[6], sequence[7], buffer);
 
             /* reply back */
             ret = gnutls_record_send(session, buffer, ret);

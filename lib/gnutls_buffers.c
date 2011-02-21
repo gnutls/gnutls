@@ -977,7 +977,7 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
   while (left > 0)
     {
       dsize = ptr_size - left;
-      i = _gnutls_recv_int (session, type, htype, &ptr[dsize], left);
+      i = _gnutls_recv_int (session, type, htype, &ptr[dsize], left, NULL);
       if (i < 0)
         {
 

@@ -245,7 +245,7 @@ gnutls_bye (gnutls_session_t session, gnutls_close_request_t how)
           do
             {
               _gnutls_io_clear_peeked_data (session);
-              ret = _gnutls_recv_int (session, GNUTLS_ALERT, -1, NULL, 0);
+              ret = _gnutls_recv_int (session, GNUTLS_ALERT, -1, NULL, 0, NULL);
             }
           while (ret == GNUTLS_E_GOT_APPLICATION_DATA);
 
@@ -354,7 +354,7 @@ ssize_t
 _gnutls_send_int (gnutls_session_t session, content_type_t type,
                   gnutls_handshake_description_t htype,
                   unsigned int epoch_rel, const void *_data,
-                  size_t sizeofdata, unsigned int mflags)
+                  size_t data_size, unsigned int mflags)
 {
   mbuffer_st *bufel;
   size_t cipher_size;
@@ -387,7 +387,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
    * ok, and means to resume.
    */
   if (session->internals.record_send_buffer.byte_length == 0 &&
-      (sizeofdata == 0 && _data == NULL))
+      (data_size == 0 && _data == NULL))
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -414,12 +414,12 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
   _gnutls_record_log
     ("REC[%p]: Preparing Packet %s(%d) with length: %d\n", session,
-     _gnutls_packet2str (type), type, (int) sizeofdata);
+     _gnutls_packet2str (type), type, (int) data_size);
 
-  if (sizeofdata > MAX_RECORD_SEND_SIZE(session))
+  if (data_size > MAX_RECORD_SEND_SIZE(session))
     data2send_size = MAX_RECORD_SEND_SIZE(session);
   else
-    data2send_size = sizeofdata;
+    data2send_size = data_size;
 
   /* Only encrypt if we don't have data to send 
    * from the previous run. - probably interrupted.
@@ -536,7 +536,7 @@ check_recv_type (content_type_t recv_type)
  */
 static int
 check_buffers (gnutls_session_t session, content_type_t type,
-               opaque * data, int sizeofdata)
+               opaque * data, int data_size)
 {
   if ((type == GNUTLS_APPLICATION_DATA ||
        type == GNUTLS_HANDSHAKE ||
@@ -544,7 +544,7 @@ check_buffers (gnutls_session_t session, content_type_t type,
       && _gnutls_record_buffer_get_size (type, session) > 0)
     {
       int ret, ret2;
-      ret = _gnutls_record_buffer_get (type, session, data, sizeofdata);
+      ret = _gnutls_record_buffer_get (type, session, data, data_size);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -962,7 +962,7 @@ int ret;
 ssize_t
 _gnutls_recv_int (gnutls_session_t session, content_type_t type,
                   gnutls_handshake_description_t htype,
-                  opaque * data, size_t data_size)
+                  opaque * data, size_t data_size, void* seq)
 {
   uint64 *packet_sequence;
   uint8_t *ciphertext;
@@ -1032,6 +1032,8 @@ begin:
   else
     packet_sequence = &record_state->sequence_number;
 
+  if (seq)
+    memcpy(seq, packet_sequence, 8);
 
   /* Read the packet data and insert it to record_recv_buffer.
    */
@@ -1231,7 +1233,7 @@ recv_error:
  * gnutls_record_send:
  * @session: is a #gnutls_session_t structure.
  * @data: contains the data to send
- * @sizeofdata: is the length of the data
+ * @data_size: is the length of the data
  *
  * This function has the similar semantics with send().  The only
  * difference is that it accepts a GnuTLS session, and uses different
@@ -1251,16 +1253,16 @@ recv_error:
  * size. cf. gnutls_record_get_direction().
  *
  * Returns: the number of bytes sent, or a negative error code.  The
- *   number of bytes sent might be less than @sizeofdata.  The maximum
+ *   number of bytes sent might be less than @data_size.  The maximum
  *   number of bytes this function can send in a single call depends
  *   on the negotiated maximum record size.
   **/
 ssize_t
 gnutls_record_send (gnutls_session_t session, const void *data,
-                    size_t sizeofdata)
+                    size_t data_size)
 {
   return _gnutls_send_int (session, GNUTLS_APPLICATION_DATA, -1,
-                           EPOCH_WRITE_CURRENT, data, sizeofdata,
+                           EPOCH_WRITE_CURRENT, data, data_size,
                            MBUFFER_FLUSH);
 }
 
@@ -1268,7 +1270,7 @@ gnutls_record_send (gnutls_session_t session, const void *data,
  * gnutls_record_recv:
  * @session: is a #gnutls_session_t structure.
  * @data: the buffer that the data will be read into
- * @sizeofdata: the number of requested bytes
+ * @data_size: the number of requested bytes
  *
  * This function has the similar semantics with recv().  The only
  * difference is that it accepts a GnuTLS session, and uses different
@@ -1292,11 +1294,34 @@ gnutls_record_send (gnutls_session_t session, const void *data,
  *
  * Returns: the number of bytes received and zero on EOF.  A negative
  *   error code is returned in case of an error.  The number of bytes
- *   received might be less than @sizeofdata.
+ *   received might be less than @data_size.
  **/
 ssize_t
-gnutls_record_recv (gnutls_session_t session, void *data, size_t sizeofdata)
+gnutls_record_recv (gnutls_session_t session, void *data, size_t data_size)
 {
   return _gnutls_recv_int (session, GNUTLS_APPLICATION_DATA, -1, data,
-                           sizeofdata);
+                           data_size, NULL);
+}
+
+/**
+ * gnutls_record_recv_seq:
+ * @session: is a #gnutls_session_t structure.
+ * @data: the buffer that the data will be read into
+ * @data_size: the number of requested bytes
+ * @seq: is the packet's 64-bit sequence number.
+ *
+ * This function is the same as gnutls_record_recv(), except that
+ * it returns in addition to data, the sequence number of the data.
+ * This is useful in DTLS.
+ *
+ * Returns: the number of bytes received and zero on EOF.  A negative
+ *   error code is returned in case of an error.  The number of bytes
+ *   received might be less than @data_size.
+ **/
+ssize_t
+gnutls_record_recv_seq (gnutls_session_t session, void *data, size_t data_size,
+  unsigned char seq[8])
+{
+  return _gnutls_recv_int (session, GNUTLS_APPLICATION_DATA, -1, data,
+                           data_size, seq);
 }

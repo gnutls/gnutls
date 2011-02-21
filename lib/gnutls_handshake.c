@@ -3112,7 +3112,7 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
     {
     case STATE0:
     case STATE30:
-      ret = _gnutls_recv_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1, &ch, 1);
+      ret = _gnutls_recv_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1, &ch, 1, NULL);
       STATE = STATE30;
       if (ret <= 0)
         {

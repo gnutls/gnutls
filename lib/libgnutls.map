@@ -703,6 +703,7 @@ GNUTLS_3_0_0 {
 	gnutls_transport_set_pull_timeout_function;
 	gnutls_dtls_get_mtu;
 	gnutls_dtls_set_mtu;
+        gnutls_record_recv_seq;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {
