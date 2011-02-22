@@ -766,17 +766,17 @@ pack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
   cur_size = ps->length;
 
 
-  BUFFER_APPEND (ps, &session->security_parameters.entity, 1);
-  BUFFER_APPEND (ps, &session->security_parameters.kx_algorithm, 1);
+  BUFFER_APPEND_NUM (ps, session->security_parameters.entity);
+  BUFFER_APPEND_NUM (ps, session->security_parameters.kx_algorithm);
   BUFFER_APPEND (ps,
                  &session->security_parameters.current_cipher_suite.suite[0],
                  1);
   BUFFER_APPEND (ps,
                  &session->security_parameters.current_cipher_suite.suite[1],
                  1);
-  BUFFER_APPEND (ps, &params->compression_algorithm, 1);
-  BUFFER_APPEND (ps, &session->security_parameters.cert_type, 1);
-  BUFFER_APPEND (ps, &session->security_parameters.version, 1);
+  BUFFER_APPEND_NUM (ps, params->compression_algorithm);
+  BUFFER_APPEND_NUM (ps, session->security_parameters.cert_type);
+  BUFFER_APPEND_NUM (ps, session->security_parameters.version);
 
   BUFFER_APPEND (ps, session->security_parameters.master_secret,
                  GNUTLS_MASTER_SIZE);
@@ -813,20 +813,18 @@ unpack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
   memset (&session->internals.resumed_security_parameters, 0,
           sizeof (session->internals.resumed_security_parameters));
 
-  BUFFER_POP (ps, &session->internals.resumed_security_parameters.entity, 1);
-  BUFFER_POP (ps,
-              &session->internals.resumed_security_parameters.kx_algorithm,
-              1);
+  BUFFER_POP_NUM (ps, session->internals.resumed_security_parameters.entity);
+  BUFFER_POP_NUM (ps,
+              session->internals.resumed_security_parameters.kx_algorithm);
   BUFFER_POP (ps,
               &session->internals.
               resumed_security_parameters.current_cipher_suite.suite[0], 1);
   BUFFER_POP (ps,
               &session->internals.resumed_security_parameters.
               current_cipher_suite.suite[1], 1);
-  BUFFER_POP (ps, &session->internals.resumed_compression_method, 1);
-  BUFFER_POP (ps, &session->internals.resumed_security_parameters.cert_type,
-              1);
-  BUFFER_POP (ps, &session->internals.resumed_security_parameters.version, 1);
+  BUFFER_POP_NUM (ps, session->internals.resumed_compression_method);
+  BUFFER_POP_NUM (ps, session->internals.resumed_security_parameters.cert_type);
+  BUFFER_POP_NUM (ps, session->internals.resumed_security_parameters.version);
 
   BUFFER_POP (ps,
               &session->internals.resumed_security_parameters.master_secret,
