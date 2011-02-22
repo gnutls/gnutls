@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007, 2010 Free Software Foundation, Inc.
+;;; Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -356,8 +356,7 @@ certificate-revoked certificate-expired certificate-unknown illegal-parameter
 unknown-ca access-denied decode-error decrypt-error export-restriction
 protocol-version insufficient-security internal-error user-canceled
 no-renegotiation unsupported-extension certificate-unobtainable
-unrecognized-name unknown-psk-identity
-inner-application-failure inner-application-verification)
+unrecognized-name unknown-psk-identity)
                   #f
                   "GNUTLS_A_"))
 
