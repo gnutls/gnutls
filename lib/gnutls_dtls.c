@@ -137,6 +137,9 @@ static int drop_usage_count(gnutls_session_t session)
   return 0;
 }
 
+#define MAX_TIMEOUT 60000
+#define FINISHED_TIMEOUT 3000
+
 /* This function transmits the flight that has been previously
  * buffered.
  *
@@ -153,6 +156,7 @@ int ret;
     &session->internals.handshake_send_buffer;
   mbuffer_st *cur;
   unsigned int total_timeout = 0;
+  unsigned int timeout = session->internals.dtls.retrans_timeout;
   gnutls_handshake_description_t last_type = 0;
 
   do 
@@ -176,7 +180,7 @@ int ret;
          (session->security_parameters.entity == GNUTLS_CLIENT && session->internals.resumed == RESUME_TRUE)))
         {
           opaque c;
-          ret = _gnutls_io_check_recv(session, &c, 1, session->internals.dtls.retrans_timeout);
+          ret = _gnutls_io_check_recv(session, &c, 1, FINISHED_TIMEOUT);
           if (ret == GNUTLS_E_TIMEDOUT)
             ret = 0;
           else if (ret >= 0)
@@ -184,13 +188,15 @@ int ret;
               if (c == GNUTLS_HANDSHAKE) /* retransmit */
                 ret = GNUTLS_E_TIMEDOUT;
             }
-          total_timeout += session->internals.dtls.retrans_timeout;
         }
       else /* all other messages -> implicit ack (receive of next flight) */
         {
-          ret = _gnutls_io_check_recv(session, NULL, 0, session->internals.dtls.retrans_timeout);
-          total_timeout += session->internals.dtls.retrans_timeout;
+          ret = _gnutls_io_check_recv(session, NULL, 0, timeout);
         }
+
+      total_timeout += timeout;
+      timeout *= 2;
+      timeout %= MAX_TIMEOUT;
 
       if (total_timeout >= session->internals.dtls.total_timeout) {
         ret = gnutls_assert_val(GNUTLS_E_TIMEDOUT);
