@@ -1207,7 +1207,7 @@ extern "C"
   void gnutls_transport_set_lowat (gnutls_session_t session, int num);
 
 
-  void gnutls_transport_set_push_function2 (gnutls_session_t session,
+  void gnutls_transport_set_vec_push_function (gnutls_session_t session,
                                             gnutls_vec_push_func vec_func);
   void gnutls_transport_set_push_function (gnutls_session_t session,
                                            gnutls_push_func push_func);

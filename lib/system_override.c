@@ -160,7 +160,7 @@ gnutls_transport_set_push_function (gnutls_session_t session,
 }
 
 /**
- * gnutls_transport_set_push_function2:
+ * gnutls_transport_set_vec_push_function:
  * @session: is a #gnutls_session_t structure.
  * @vec_func: a callback function similar to writev()
  *
@@ -175,7 +175,7 @@ gnutls_transport_set_push_function (gnutls_session_t session,
  *
  **/
 void
-gnutls_transport_set_push_function2 (gnutls_session_t session,
+gnutls_transport_set_vec_push_function (gnutls_session_t session,
                                      gnutls_vec_push_func vec_func)
 {
   session->internals.push_func = NULL;

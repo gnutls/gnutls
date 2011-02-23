@@ -370,7 +370,7 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
   (*session)->internals.priorities.sr = SR_PARTIAL;
 
 #ifdef HAVE_WRITEV
-  gnutls_transport_set_push_function2 (*session, system_writev);
+  gnutls_transport_set_vec_push_function (*session, system_writev);
 #else
   gnutls_transport_set_push_function (*session, system_write);
 #endif
