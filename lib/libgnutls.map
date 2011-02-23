@@ -671,7 +671,7 @@ GNUTLS_2_12
 	gnutls_pubkey_get_preferred_hash_algorithm;
 	gnutls_x509_crt_get_preferred_hash_algorithm;
 	gnutls_global_set_mutex;
-        gnutls_transport_set_push_function2;
+        gnutls_transport_set_vec_push_function;
         gnutls_transport_set_errno_function;
 
 	gnutls_sec_param_to_pk_bits;
