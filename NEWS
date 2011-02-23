@@ -43,7 +43,7 @@ gnutls_pubkey_verify_data() respectively.
 ** libgnutls: gnutls_*_export_raw() functions now add leading zero in
 integers.
 
-** libgnutls: Added gnutls_transport_set_push_function2() that
+** libgnutls: Added gnutls_transport_set_vec_push_function() that
 can be used to specify a writev() like function. Using that gnutls
 can provide more efficient writes to network layer in systems that 
 support it.
