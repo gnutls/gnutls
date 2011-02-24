@@ -155,6 +155,7 @@ wrap_nettle_rnd_deinit (void *ctx)
 #include <sys/time.h>
 #include <fcntl.h>
 #include <locks.h>
+#include <unistd.h> /* getpid */
 #ifdef HAVE_GETRUSAGE
 #include <sys/resource.h>
 #endif
@@ -346,6 +347,7 @@ do_device_source_egd (int init)
 static int
 do_device_source (int init)
 {
+  static pid_t pid; /* detect fork() */
   int ret;
   static int (*do_source) (int init) = NULL;
 /* using static var here is ok since we are
@@ -354,6 +356,8 @@ do_device_source (int init)
 
   if (init == 1)
     {
+      pid = getpid();
+
       do_source = do_device_source_urandom;
       ret = do_source (init);
       if (ret < 0)
@@ -372,6 +376,12 @@ do_device_source (int init)
     }
   else
     {
+      if (getpid() != pid) 
+        { /* fork() detected */
+          device_last_read = 0;
+          pid = getpid();
+        }
+    
       return do_source (init);
     }
 }
