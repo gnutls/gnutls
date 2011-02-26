@@ -28,17 +28,17 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 
-void _mbuffer_init (mbuffer_head_st * buf);
-void _mbuffer_clear (mbuffer_head_st * buf);
+void _mbuffer_head_init (mbuffer_head_st * buf);
+void _mbuffer_head_clear (mbuffer_head_st * buf);
 void _mbuffer_enqueue (mbuffer_head_st * buf, mbuffer_st * bufel);
-int _mbuffer_remove_bytes (mbuffer_head_st * buf, size_t bytes);
+int _mbuffer_head_remove_bytes (mbuffer_head_st * buf, size_t bytes);
 mbuffer_st *_mbuffer_alloc (size_t payload_size, size_t maximum_size);
 
-mbuffer_st *_mbuffer_get_first (mbuffer_head_st * buf, gnutls_datum_t * msg);
-mbuffer_st *_mbuffer_get_next (mbuffer_st * cur, gnutls_datum_t * msg);
+mbuffer_st *_mbuffer_head_get_first (mbuffer_head_st * buf, gnutls_datum_t * msg);
+mbuffer_st *_mbuffer_head_get_next (mbuffer_st * cur, gnutls_datum_t * msg);
 
 mbuffer_st *
-_mbuffer_pop_first (mbuffer_head_st * buf);
+_mbuffer_head_pop_first (mbuffer_head_st * buf);
 
 /* This is dangerous since it will replace bufel with a new
  * one.

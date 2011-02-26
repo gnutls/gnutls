@@ -215,7 +215,7 @@ int ret;
 
 cleanup:
   drop_usage_count(session);
-  _mbuffer_clear(send_buffer);
+  _mbuffer_head_clear(send_buffer);
 
   /* SENDING -> WAITING state transition */
   return ret;

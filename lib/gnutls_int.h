@@ -260,14 +260,22 @@ typedef struct mbuffer_st
   unsigned int user_mark;       /* only used during fill in */
   size_t maximum_size;
 
+  /* Filled in by record layer on recv:
+   * type, record_sequence
+   */
+
+  /* Filled in by handshake layer on send:
+   * type, epoch, htype, handshake_sequence
+   */
+
   /* record layer content type */
   content_type_t type;
 
-  /* Record layer epoch of message */
-  uint16_t epoch;
-
   /* record layer sequence */
   uint64 record_sequence;
+
+  /* Record layer epoch of message */
+  uint16_t epoch;
 
   /* Handshake layer type and sequence of message */
   gnutls_handshake_description_t htype;
@@ -586,8 +594,8 @@ typedef union
 
 typedef struct
 {
-  mbuffer_head_st application_data_buffer;     /* holds data to be delivered to application layer */ 
-  mbuffer_head_st handshake_data_buffer;       /* this is a buffer that holds the current handshake message */
+  /* holds all the data received by the record layer */
+  mbuffer_head_st record_buffer; 
 
   gnutls_buffer_st handshake_hash_buffer;       /* used to keep the last received handshake 
                                                  * message */
@@ -651,7 +659,7 @@ typedef struct
   /* this buffer holds a record packet -mostly used for
    * non blocking IO.
    */
-  mbuffer_head_st record_recv_buffer;
+  mbuffer_head_st record_recv_buffer;   /* buffer holding the record that is currently being received */
   mbuffer_head_st record_send_buffer;   /* holds cached data
                                          * for the gnutls_io_write_buffered()
                                          * function.

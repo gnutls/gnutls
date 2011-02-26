@@ -54,7 +54,7 @@
  * Cost: O(1)
  */
 void
-_mbuffer_init (mbuffer_head_st * buf)
+_mbuffer_head_init (mbuffer_head_st * buf)
 {
   buf->head = NULL;
   buf->tail = &buf->head;
@@ -69,7 +69,7 @@ _mbuffer_init (mbuffer_head_st * buf)
  * n: Number of segments currently in the buffer.
  */
 void
-_mbuffer_clear (mbuffer_head_st * buf)
+_mbuffer_head_clear (mbuffer_head_st * buf)
 {
   mbuffer_st *bufel, *next;
 
@@ -79,7 +79,7 @@ _mbuffer_clear (mbuffer_head_st * buf)
       gnutls_free (bufel);
     }
 
-  _mbuffer_init (buf);
+  _mbuffer_head_init (buf);
 }
 
 /* Append a segment to the end of this buffer.
@@ -106,7 +106,7 @@ _mbuffer_enqueue (mbuffer_head_st * buf, mbuffer_st * bufel)
  * Cost: O(1)
  */
 mbuffer_st *
-_mbuffer_pop_first (mbuffer_head_st * buf)
+_mbuffer_head_pop_first (mbuffer_head_st * buf)
 {
   mbuffer_st *bufel = buf->head;
 
@@ -128,7 +128,7 @@ _mbuffer_pop_first (mbuffer_head_st * buf)
  * Cost: O(1)
  */
 mbuffer_st *
-_mbuffer_get_first (mbuffer_head_st * buf, gnutls_datum_t * msg)
+_mbuffer_head_get_first (mbuffer_head_st * buf, gnutls_datum_t * msg)
 {
   mbuffer_st *bufel = buf->head;
 
@@ -155,7 +155,7 @@ _mbuffer_get_first (mbuffer_head_st * buf, gnutls_datum_t * msg)
  * Cost: O(1)
  */
 mbuffer_st *
-_mbuffer_get_next (mbuffer_st * cur, gnutls_datum_t * msg)
+_mbuffer_head_get_next (mbuffer_st * cur, gnutls_datum_t * msg)
 {
   mbuffer_st *bufel = cur->next;
 
@@ -209,7 +209,7 @@ remove_front (mbuffer_head_st * buf)
  * n: Number of segments needed to remove the specified amount of data.
  */
 int
-_mbuffer_remove_bytes (mbuffer_head_st * buf, size_t bytes)
+_mbuffer_head_remove_bytes (mbuffer_head_st * buf, size_t bytes)
 {
   size_t left = bytes;
   mbuffer_st *bufel, *next;
@@ -330,14 +330,14 @@ _mbuffer_linearize (mbuffer_head_st * buf)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  for (cur = _mbuffer_get_first (buf, &msg);
-       msg.data != NULL; cur = _mbuffer_get_next (cur, &msg))
+  for (cur = _mbuffer_head_get_first (buf, &msg);
+       msg.data != NULL; cur = _mbuffer_head_get_next (cur, &msg))
     {
       memcpy (&bufel->msg.data[pos], msg.data, cur->msg.size);
       pos += cur->msg.size;
     }
 
-  _mbuffer_clear (buf);
+  _mbuffer_head_clear (buf);
   _mbuffer_enqueue (buf, bufel);
 
   return 0;

@@ -318,12 +318,11 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
   /* Initialize buffers */
   _gnutls_buffer_init (&(*session)->internals.handshake_hash_buffer);
 
-  _mbuffer_init (&(*session)->internals.application_data_buffer);
-  _mbuffer_init (&(*session)->internals.handshake_data_buffer);
-  _mbuffer_init (&(*session)->internals.record_send_buffer);
-  _mbuffer_init (&(*session)->internals.record_recv_buffer);
+  _mbuffer_head_init (&(*session)->internals.record_buffer);
+  _mbuffer_head_init (&(*session)->internals.record_send_buffer);
+  _mbuffer_head_init (&(*session)->internals.record_recv_buffer);
 
-  _mbuffer_init (&(*session)->internals.handshake_send_buffer);
+  _mbuffer_head_init (&(*session)->internals.handshake_send_buffer);
   _gnutls_buffer_init (&(*session)->internals.handshake_recv_buffer);
 
   (*session)->key = gnutls_calloc (1, sizeof (struct gnutls_key_st));
@@ -454,10 +453,9 @@ gnutls_deinit (gnutls_session_t session)
       }
 
   _gnutls_buffer_clear (&session->internals.handshake_hash_buffer);
-  _mbuffer_clear (&session->internals.handshake_data_buffer);
-  _mbuffer_clear (&session->internals.application_data_buffer);
-  _mbuffer_clear (&session->internals.record_recv_buffer);
-  _mbuffer_clear (&session->internals.record_send_buffer);
+  _mbuffer_head_clear (&session->internals.record_buffer);
+  _mbuffer_head_clear (&session->internals.record_recv_buffer);
+  _mbuffer_head_clear (&session->internals.record_send_buffer);
 
   gnutls_credentials_clear (session);
   _gnutls_selected_certs_deinit (session);

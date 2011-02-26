@@ -31,8 +31,12 @@ int
 _gnutls_record_buffer_put (gnutls_session_t session,
   content_type_t type, uint64* seq, mbuffer_st* bufel);
 
-int _gnutls_record_buffer_get_size (content_type_t type,
-                                    gnutls_session_t session);
+inline static int
+_gnutls_record_buffer_get_size (content_type_t type, gnutls_session_t session)
+{
+  return session->internals.record_buffer.byte_length;
+}
+
 int _gnutls_record_buffer_get (content_type_t type,
                                gnutls_session_t session, opaque * data,
                                size_t length, opaque seq[8]);
@@ -51,7 +55,7 @@ int _gnutls_handshake_buffer_get_ptr (gnutls_session_t session,
                                       opaque ** data_ptr, size_t * length);
 
 #define _gnutls_handshake_io_buffer_clear( session) \
-        _mbuffer_clear( &session->internals.handshake_send_buffer); \
+        _mbuffer_head_clear( &session->internals.handshake_send_buffer); \
         _gnutls_buffer_clear( &session->internals.handshake_recv_buffer);
 
 ssize_t _gnutls_handshake_io_recv_int (gnutls_session_t, content_type_t,

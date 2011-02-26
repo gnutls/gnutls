@@ -538,7 +538,8 @@ check_buffers (gnutls_session_t session, content_type_t type,
                opaque * data, int data_size, void* seq)
 {
   if ((type == GNUTLS_APPLICATION_DATA ||
-       type == GNUTLS_HANDSHAKE)
+       type == GNUTLS_HANDSHAKE ||
+       type == GNUTLS_CHANGE_CIPHER_SPEC)
       && _gnutls_record_buffer_get_size (type, session) > 0)
     {
       int ret, ret2;
@@ -622,6 +623,7 @@ record_add_to_buffers (gnutls_session_t session,
 
   if ((recv_type == type)
       && (type == GNUTLS_APPLICATION_DATA ||
+          type == GNUTLS_CHANGE_CIPHER_SPEC ||
           type == GNUTLS_HANDSHAKE))
     {
       _gnutls_record_buffer_put (session, type, seq, bufel);
@@ -865,7 +867,7 @@ gnutls_datum_t raw; /* raw headers */
       return ret;
     }
 
-  _mbuffer_get_first (&session->internals.record_recv_buffer, &raw);
+  _mbuffer_head_get_first (&session->internals.record_recv_buffer, &raw);
 
   record_read_headers (session, raw.data, type, htype, record);
 
@@ -924,33 +926,21 @@ gnutls_datum_t raw; /* raw headers */
 
 #define MAX_EMPTY_PACKETS_SEQUENCE 4
 
-/* This function behaves exactly like read(). The only difference is
- * that it accepts the gnutls_session_t and the content_type_t of data to
- * receive (if called by the user the Content is Userdata only)
- * It is intended to receive data, under the current session.
- *
- * The gnutls_handshake_description_t was introduced to support SSL V2.0 client hellos.
+/* This will receive record layer packets and add them to 
+ * application_data_buffer and handshake_data_buffer.
  */
-ssize_t
-_gnutls_recv_int (gnutls_session_t session, content_type_t type,
-                  gnutls_handshake_description_t htype,
-                  opaque * data, size_t data_size, void* seq)
+static ssize_t
+_gnutls_recv_in_buffers (gnutls_session_t session, content_type_t type,
+                  gnutls_handshake_description_t htype)
 {
   uint64 *packet_sequence;
   uint8_t *ciphertext;
   mbuffer_st* bufel = NULL;
-  int ret, ret2;
+  int ret;
   int empty_packet = 0;
   record_parameters_st *record_params;
   record_state_st *record_state;
   struct tls_record_st record;
-
-  memset(&record, 0, sizeof(record));
-
-  if (type != GNUTLS_ALERT && (data_size == 0 || data == NULL))
-    {
-      return GNUTLS_E_INVALID_REQUEST;
-    }
 
 begin:
 
@@ -959,6 +949,8 @@ begin:
       gnutls_assert ();
       return GNUTLS_E_TOO_MANY_EMPTY_PACKETS;
     }
+
+  memset(&record, 0, sizeof(record));
 
   if (session->internals.read_eof != 0)
     {
@@ -973,20 +965,6 @@ begin:
       return GNUTLS_E_INVALID_SESSION;
     }
 
-  /* If we have enough data in the cache do not bother receiving
-   * a new packet. (in order to flush the cache)
-   */
-  ret = check_buffers (session, type, data, data_size, seq);
-  if (ret != 0)
-    return ret;
-
-  ret = recv_headers(session, type, htype, &record);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto recv_error;
-    }
-
   /* get the record state parameters */
   ret = _gnutls_epoch_get (session, EPOCH_READ_CURRENT, &record_params);
   if (ret < 0)
@@ -998,7 +976,14 @@ begin:
 
   record_state = &record_params->read;
 
-  /* Check if the DTLS epoch is valid */
+  /* receive headers */
+  ret = recv_headers(session, type, htype, &record);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto recv_error;
+    }
+
   if (IS_DTLS(session)) 
     packet_sequence = &record.sequence;
   else
@@ -1024,7 +1009,7 @@ begin:
       gnutls_assert ();
       return ret;
     }
-  bufel = _mbuffer_pop_first (&session->internals.record_recv_buffer);
+  bufel = _mbuffer_head_pop_first (&session->internals.record_recv_buffer);
   ciphertext = &bufel->msg.data[record.header_size];
 
   /* decrypt the data we got. 
@@ -1058,26 +1043,6 @@ begin:
         }
     }
 
-  /* Check if this is a CHANGE_CIPHER_SPEC
-   */
-  if (type == GNUTLS_CHANGE_CIPHER_SPEC && type == record.type)
-    {
-
-      _gnutls_record_log
-        ("REC[%p]: ChangeCipherSpec Packet was received\n", session);
-
-      if ((size_t) bufel->msg.size != data_size)
-        {                       /* data_size should be 1 */
-          gnutls_assert ();
-          ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-          goto sanity_check_error;
-        }
-      data[0] = bufel->msg.data[0];
-      
-      ret = 1; 
-      goto cleanup;
-    }
-
   _gnutls_record_log
     ("REC[%p]: Decrypted Packet[%d] %s(%d) with length: %d\n", session,
      (int) _gnutls_uint64touint32 (packet_sequence),
@@ -1091,6 +1056,20 @@ begin:
       gnutls_assert ();
       ret = GNUTLS_E_RECORD_LIMIT_REACHED;
       goto sanity_check_error;
+    }
+
+/* (originally for) TLS 1.0 CBC protection. 
+ * Actually this code is called if we just received
+ * an empty packet. An empty TLS packet is usually
+ * sent to protect some vulnerabilities in the CBC mode.
+ * In that case we go to the beginning and start reading
+ * the next packet.
+ */
+  if (bufel->msg.size == 0)
+    {
+      _mbuffer_xfree(&bufel);
+      empty_packet++;
+      goto begin;
     }
 
   ret =
@@ -1109,56 +1088,10 @@ begin:
       return ret;
     }
 
-  /* Get Application data from buffer 
-   */
-  if ((record.type == type) &&
-      (type == GNUTLS_APPLICATION_DATA ||
-       type == GNUTLS_HANDSHAKE))
-    {
-
-      ret = _gnutls_record_buffer_get (type, session, data, data_size, seq);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-
-      /* if the buffer just got empty 
-       */
-      if (_gnutls_record_buffer_get_size (type, session) == 0)
-        {
-          if ((ret2 = _gnutls_io_clear_peeked_data (session)) < 0)
-            {
-              gnutls_assert ();
-              return ret2;
-            }
-        }
-    }
-  else
-    {
-      gnutls_assert ();
-      return GNUTLS_E_UNEXPECTED_PACKET;
-      /* we didn't get what we wanted to 
-       */
-    }
-
-/* (originally for) TLS 1.0 CBC protection. 
- * Actually this code is called if we just received
- * an empty packet. An empty TLS packet is usually
- * sent to protect some vulnerabilities in the CBC mode.
- * In that case we go to the beginning and start reading
- * the next packet.
- */
-  if (ret == 0)
-    {
-      empty_packet++;
-      goto begin;
-    }
-
   return ret;
 
 discard:
-  bufel = _mbuffer_pop_first(&session->internals.record_recv_buffer);
+  bufel = _mbuffer_head_pop_first(&session->internals.record_recv_buffer);
   _mbuffer_xfree(&bufel);
   return GNUTLS_E_AGAIN;
 
@@ -1199,6 +1132,52 @@ recv_error:
     return GNUTLS_E_PREMATURE_TERMINATION;
   else
     return ret;
+}
+
+/* This function behaves exactly like read(). The only difference is
+ * that it accepts the gnutls_session_t and the content_type_t of data to
+ * receive (if called by the user the Content is Userdata only)
+ * It is intended to receive data, under the current session.
+ *
+ * The gnutls_handshake_description_t was introduced to support SSL V2.0 client hellos.
+ */
+ssize_t
+_gnutls_recv_int (gnutls_session_t session, content_type_t type,
+                  gnutls_handshake_description_t htype,
+                  opaque * data, size_t data_size, void* seq)
+{
+  int ret;
+
+  if (type != GNUTLS_ALERT && (data_size == 0 || data == NULL))
+    {
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  if (session->internals.read_eof != 0)
+    {
+      /* if we have already read an EOF
+       */
+      return 0;
+    }
+  else if (session_is_valid (session) != 0
+           || session->internals.may_not_read != 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_SESSION;
+    }
+
+  /* If we have enough data in the cache do not bother receiving
+   * a new packet. (in order to flush the cache)
+   */
+  ret = check_buffers (session, type, data, data_size, seq);
+  if (ret != 0)
+    return ret;
+
+  ret = _gnutls_recv_in_buffers(session, type, htype);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  return check_buffers (session, type, data, data_size, seq);
 }
 
 

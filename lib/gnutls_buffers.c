@@ -79,41 +79,11 @@ _gnutls_record_buffer_put (gnutls_session_t session,
   bufel->type = type;
   memcpy(&bufel->record_sequence, seq, sizeof(*seq));
 
-  switch (type)
-    {
-    case GNUTLS_APPLICATION_DATA:
-      _mbuffer_enqueue(&session->internals.application_data_buffer, bufel);
-      _gnutls_buffers_log ("BUF[REC]: Inserted %d bytes of Data(%d)\n",
-                           (int) bufel->msg.size, (int) type);
-      break;
-
-    case GNUTLS_HANDSHAKE:
-      _mbuffer_enqueue(&session->internals.handshake_data_buffer, bufel);
-      _gnutls_buffers_log ("BUF[HSK]: Inserted %d bytes of Data(%d)\n",
-                           (int) bufel->msg.size, (int) type);
-      break;
-
-    default:
-      return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-    }
+  _mbuffer_enqueue(&session->internals.record_buffer, bufel);
+  _gnutls_buffers_log ("BUF[REC]: Inserted %d bytes of Data(%d)\n",
+                       (int) bufel->msg.size, (int) type);
 
   return 0;
-}
-
-int
-_gnutls_record_buffer_get_size (content_type_t type, gnutls_session_t session)
-{
-  switch (type)
-    {
-    case GNUTLS_APPLICATION_DATA:
-      return session->internals.application_data_buffer.byte_length;
-
-    case GNUTLS_HANDSHAKE:
-      return session->internals.handshake_data_buffer.byte_length;
-
-    default:
-      return GNUTLS_E_INVALID_REQUEST;
-    }
 }
 
 /**
@@ -143,7 +113,6 @@ _gnutls_record_buffer_get (content_type_t type,
                            size_t length, opaque seq[8])
 {
 gnutls_datum_t msg;
-mbuffer_head_st* head;
 mbuffer_st* bufel;
 
   if (length == 0 || data == NULL)
@@ -152,24 +121,12 @@ mbuffer_st* bufel;
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  switch (type)
-    {
-    case GNUTLS_APPLICATION_DATA:
-      head = &session->internals.application_data_buffer;
-      break;
-
-    case GNUTLS_HANDSHAKE:
-      head = &session->internals.handshake_data_buffer;
-      break;
-
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  bufel = _mbuffer_get_first(head, &msg);
+  bufel = _mbuffer_head_get_first(&session->internals.record_buffer, &msg);
   if (bufel == NULL)
-    return gnutls_assert_val(GNUTLS_E_AGAIN);
+    return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
+  if (type != bufel->type)
+    return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
 
   if (msg.size <= length)
     length = msg.size;
@@ -178,7 +135,7 @@ mbuffer_st* bufel;
     memcpy(seq, bufel->record_sequence.i, 8);
 
   memcpy(data, msg.data, length);
-  _mbuffer_remove_bytes(head, length);
+  _mbuffer_head_remove_bytes(&session->internals.record_buffer, length);
   
   return length;
 }
@@ -705,8 +662,8 @@ _gnutls_io_write_flush (gnutls_session_t session)
   _gnutls_write_log ("WRITE FLUSH: %d bytes in buffer.\n",
                      (int) send_buffer->byte_length);
 
-  for (cur = _mbuffer_get_first (send_buffer, &msg);
-       cur != NULL; cur = _mbuffer_get_next (cur, &msg))
+  for (cur = _mbuffer_head_get_first (send_buffer, &msg);
+       cur != NULL; cur = _mbuffer_head_get_next (cur, &msg))
     {
       iovec[i].iov_base = msg.data;
       iovec[i++].iov_len = msg.size;
@@ -723,7 +680,7 @@ _gnutls_io_write_flush (gnutls_session_t session)
   ret = _gnutls_writev (session, iovec, i);
   if (ret >= 0)
     {
-      _mbuffer_remove_bytes (send_buffer, ret);
+      _mbuffer_head_remove_bytes (send_buffer, ret);
       _gnutls_write_log ("WRITE: wrote %d bytes, %d bytes left.\n",
                          ret, (int) send_buffer->byte_length);
 
@@ -801,8 +758,8 @@ _gnutls_handshake_io_write_flush (gnutls_session_t session)
   if (IS_DTLS(session))
     return _dtls_transmit(session);
 
-  for (cur = _mbuffer_get_first (send_buffer, &msg);
-       cur != NULL; cur = _mbuffer_get_first (send_buffer, &msg))
+  for (cur = _mbuffer_head_get_first (send_buffer, &msg);
+       cur != NULL; cur = _mbuffer_head_get_first (send_buffer, &msg))
     {
       epoch = cur->epoch;
 
@@ -815,7 +772,7 @@ _gnutls_handshake_io_write_flush (gnutls_session_t session)
         {
           total += ret;
           
-          ret = _mbuffer_remove_bytes (send_buffer, ret);
+          ret = _mbuffer_head_remove_bytes (send_buffer, ret);
           if (ret == 1)
             _gnutls_epoch_refcount_dec(session, epoch);
 
