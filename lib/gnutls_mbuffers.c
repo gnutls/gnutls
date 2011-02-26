@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009 Free Software Foundation
+ * Copyright (C) 2009,2011 Free Software Foundation
  *
  * Author: Jonathan Bastien-Filiatrault
  *
@@ -98,6 +98,29 @@ _mbuffer_enqueue (mbuffer_head_st * buf, mbuffer_st * bufel)
   buf->tail = &bufel->next;
 }
 
+/* Get a reference to the first segment of the buffer and
+ * remove it from the list.
+ *
+ * Used to start iteration.
+ *
+ * Cost: O(1)
+ */
+mbuffer_st *
+_mbuffer_pop_first (mbuffer_head_st * buf)
+{
+  mbuffer_st *bufel = buf->head;
+
+  buf->head = bufel->next;
+
+  buf->byte_length -= (bufel->msg.size - bufel->mark);
+  buf->length -= 1;
+
+  if (!buf->head)
+    buf->tail = &buf->head;
+    
+  return bufel;
+}
+
 /* Get a reference to the first segment of the buffer and its data.
  *
  * Used to start iteration or to peek at the data.
@@ -109,15 +132,18 @@ _mbuffer_get_first (mbuffer_head_st * buf, gnutls_datum_t * msg)
 {
   mbuffer_st *bufel = buf->head;
 
-  if (bufel)
+  if (msg)
     {
-      msg->data = bufel->msg.data + bufel->mark;
-      msg->size = bufel->msg.size - bufel->mark;
-    }
-  else
-    {
-      msg->data = NULL;
-      msg->size = 0;
+      if (bufel)
+        {
+          msg->data = bufel->msg.data + bufel->mark;
+          msg->size = bufel->msg.size - bufel->mark;
+      }
+    else
+      {
+        msg->data = NULL;
+        msg->size = 0;
+      }
     }
   return bufel;
 }

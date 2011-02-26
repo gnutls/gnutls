@@ -37,6 +37,9 @@ mbuffer_st *_mbuffer_alloc (size_t payload_size, size_t maximum_size);
 mbuffer_st *_mbuffer_get_first (mbuffer_head_st * buf, gnutls_datum_t * msg);
 mbuffer_st *_mbuffer_get_next (mbuffer_st * cur, gnutls_datum_t * msg);
 
+mbuffer_st *
+_mbuffer_pop_first (mbuffer_head_st * buf);
+
 /* This is dangerous since it will replace bufel with a new
  * one.
  */
@@ -52,6 +55,7 @@ inline static void
 _mbuffer_set_udata (mbuffer_st * bufel, void *data, size_t data_size)
 {
   memcpy (bufel->msg.data + bufel->user_mark, data, data_size);
+  bufel->msg.size = data_size + bufel->user_mark;
 }
 
 inline static void *

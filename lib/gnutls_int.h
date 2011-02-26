@@ -71,6 +71,8 @@ typedef struct
 #define DEBUG
 */
 
+#define GMAX(x,y) ((x>y)?(x):(y))
+
 /* The size of a handshake message should not
  * be larger than this value.
  */
@@ -126,12 +128,6 @@ typedef struct
     GNUTLS_EXT_NONE = 4
   } gnutls_ext_parse_type_t;
 
-
-/* The initial size of the receive
- * buffer size. This will grow if larger
- * packets are received.
- */
-#define INITIAL_RECV_BUFFER_SIZE 256
 
 /* the default for TCP */
 #define DEFAULT_LOWAT 0
@@ -263,16 +259,19 @@ typedef struct mbuffer_st
   size_t mark;
   unsigned int user_mark;       /* only used during fill in */
   size_t maximum_size;
-  
+
   /* record layer content type */
   content_type_t type;
 
   /* Record layer epoch of message */
   uint16_t epoch;
 
+  /* record layer sequence */
+  uint64 record_sequence;
+
   /* Handshake layer type and sequence of message */
   gnutls_handshake_description_t htype;
-  uint16_t sequence;
+  uint16_t handshake_sequence;
 } mbuffer_st;
 
 typedef struct mbuffer_head_st
@@ -587,7 +586,9 @@ typedef union
 
 typedef struct
 {
-  gnutls_buffer_st application_data_buffer;     /* holds data to be delivered to application layer */
+  mbuffer_head_st application_data_buffer;     /* holds data to be delivered to application layer */ 
+  mbuffer_head_st handshake_data_buffer;       /* this is a buffer that holds the current handshake message */
+
   gnutls_buffer_st handshake_hash_buffer;       /* used to keep the last received handshake 
                                                  * message */
   union
@@ -605,7 +606,6 @@ typedef struct
   } handshake_mac_handle;
   int handshake_mac_handle_init;        /* 1 when the previous union and type were initialized */
 
-  gnutls_buffer_st handshake_data_buffer;       /* this is a buffer that holds the current handshake message */
   int resumable:1;              /* TRUE or FALSE - if we can resume that session */
   handshake_state_t handshake_state;    /* holds
                                          * a number which indicates where
@@ -779,11 +779,6 @@ typedef struct
    * minimize external calls.
    */
   internal_params_st params;
-
-  /* This buffer is used by the record recv functions,
-   * as a temporary store buffer.
-   */
-  gnutls_datum_t recv_buffer;
 
   /* To avoid using global variables, and especially on Windows where
    * the application may use a different errno variable than GnuTLS,

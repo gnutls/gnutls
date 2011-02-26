@@ -268,8 +268,6 @@ _gnutls_handshake_internal_state_clear (gnutls_session_t session)
 {
   _gnutls_handshake_internal_state_init (session);
 
-  _gnutls_free_datum (&session->internals.recv_buffer);
-
   deinit_internal_params (session);
   
   _gnutls_epoch_gc(session);
@@ -318,10 +316,10 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
   (*session)->security_parameters.cert_type = DEFAULT_CERT_TYPE;
 
   /* Initialize buffers */
-  _gnutls_buffer_init (&(*session)->internals.application_data_buffer);
-  _gnutls_buffer_init (&(*session)->internals.handshake_data_buffer);
   _gnutls_buffer_init (&(*session)->internals.handshake_hash_buffer);
 
+  _mbuffer_init (&(*session)->internals.application_data_buffer);
+  _mbuffer_init (&(*session)->internals.handshake_data_buffer);
   _mbuffer_init (&(*session)->internals.record_send_buffer);
   _mbuffer_init (&(*session)->internals.record_recv_buffer);
 
@@ -456,8 +454,8 @@ gnutls_deinit (gnutls_session_t session)
       }
 
   _gnutls_buffer_clear (&session->internals.handshake_hash_buffer);
-  _gnutls_buffer_clear (&session->internals.handshake_data_buffer);
-  _gnutls_buffer_clear (&session->internals.application_data_buffer);
+  _mbuffer_clear (&session->internals.handshake_data_buffer);
+  _mbuffer_clear (&session->internals.application_data_buffer);
   _mbuffer_clear (&session->internals.record_recv_buffer);
   _mbuffer_clear (&session->internals.record_send_buffer);
 

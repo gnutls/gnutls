@@ -52,7 +52,7 @@ transmit_message (gnutls_session_t session,
     {
       _gnutls_dtls_log ("DTLS[%p]: Sending Packet[%u] fragment %s(%d) with "
 			"length: %u, offset: %u, fragment length: %u\n",
-			session, bufel->sequence,
+			session, bufel->handshake_sequence,
 			_gnutls_handshake2str (bufel->htype),
 			bufel->htype, data_size, offset, frag_len);
 
@@ -79,7 +79,7 @@ transmit_message (gnutls_session_t session,
   _gnutls_write_uint24 (data_size, &mtu_data[1]);
 
   /* Handshake sequence */
-  _gnutls_write_uint16 (bufel->sequence, &mtu_data[4]);
+  _gnutls_write_uint16 (bufel->handshake_sequence, &mtu_data[4]);
 
   /* Chop up and send handshake message into mtu-size pieces. */
   for (offset=0; offset <= data_size; offset += mtu)
@@ -100,7 +100,7 @@ transmit_message (gnutls_session_t session,
 
       _gnutls_dtls_log ("DTLS[%p]: Sending Packet[%u] fragment %s(%d) with "
 			"length: %u, offset: %u, fragment length: %u\n",
-			session, bufel->sequence,
+			session, bufel->handshake_sequence,
 			_gnutls_handshake2str (bufel->htype),
 			bufel->htype, data_size, offset, frag_len);
 
