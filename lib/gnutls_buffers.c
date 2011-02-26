@@ -95,12 +95,6 @@ _gnutls_record_buffer_put (content_type_t type,
                            (int) length, (int) type);
       break;
 
-    case GNUTLS_INNER_APPLICATION:
-      buf = &session->internals.ia_data_buffer;
-      _gnutls_buffers_log ("BUF[IA]: Inserted %d bytes of Data(%d)\n",
-                           (int) length, (int) type);
-      break;
-
     default:
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -125,9 +119,6 @@ _gnutls_record_buffer_get_size (content_type_t type, gnutls_session_t session)
 
     case GNUTLS_HANDSHAKE:
       return session->internals.handshake_data_buffer.length;
-
-    case GNUTLS_INNER_APPLICATION:
-      return session->internals.ia_data_buffer.length;
 
     default:
       return GNUTLS_E_INVALID_REQUEST;
@@ -179,14 +170,6 @@ _gnutls_record_buffer_get (content_type_t type,
       _gnutls_buffer_pop_data (&session->internals.handshake_data_buffer,
                                data, &length);
       _gnutls_buffers_log ("BUF[REC][HD]: Read %d bytes of Data(%d)\n",
-                           (int) length, (int) type);
-      break;
-
-    case GNUTLS_INNER_APPLICATION:
-
-      _gnutls_buffer_pop_data (&session->internals.ia_data_buffer, data,
-                               &length);
-      _gnutls_buffers_log ("BUF[REC][IA]: Read %d bytes of Data(%d)\n",
                            (int) length, (int) type);
       break;
 

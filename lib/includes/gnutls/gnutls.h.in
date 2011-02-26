@@ -345,8 +345,6 @@ extern "C"
    *   recognized.
    * @GNUTLS_A_UNKNOWN_PSK_IDENTITY: The SRP/PSK username is missing
    *   or not known.
-   * @GNUTLS_A_INNER_APPLICATION_FAILURE: Inner application
-   *   negotiation failed.
    *
    * Enumeration of different TLS alerts.
    */

@@ -230,7 +230,6 @@ typedef enum extensions_t
   GNUTLS_EXTENSION_SRP = 12,
   GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS = 13,
   GNUTLS_EXTENSION_SESSION_TICKET = 35,
-  GNUTLS_EXTENSION_INNER_APPLICATION = 37703,
   GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281   /* aka: 0xff01 */
 } extensions_t;
 
@@ -245,7 +244,6 @@ typedef enum content_type_t
 {
   GNUTLS_CHANGE_CIPHER_SPEC = 20, GNUTLS_ALERT,
   GNUTLS_HANDSHAKE, GNUTLS_APPLICATION_DATA,
-  GNUTLS_INNER_APPLICATION = 24
 } content_type_t;
 
 
@@ -608,7 +606,6 @@ typedef struct
   int handshake_mac_handle_init;        /* 1 when the previous union and type were initialized */
 
   gnutls_buffer_st handshake_data_buffer;       /* this is a buffer that holds the current handshake message */
-  gnutls_buffer_st ia_data_buffer;      /* holds inner application data (TLS/IA) */
   int resumable:1;              /* TRUE or FALSE - if we can resume that session */
   handshake_state_t handshake_state;    /* holds
                                          * a number which indicates where

@@ -520,7 +520,6 @@ check_recv_type (content_type_t recv_type)
     case GNUTLS_ALERT:
     case GNUTLS_HANDSHAKE:
     case GNUTLS_APPLICATION_DATA:
-    case GNUTLS_INNER_APPLICATION:
       return 0;
     default:
       gnutls_assert ();
@@ -539,8 +538,7 @@ check_buffers (gnutls_session_t session, content_type_t type,
                opaque * data, int data_size)
 {
   if ((type == GNUTLS_APPLICATION_DATA ||
-       type == GNUTLS_HANDSHAKE ||
-       type == GNUTLS_INNER_APPLICATION)
+       type == GNUTLS_HANDSHAKE)
       && _gnutls_record_buffer_get_size (type, session) > 0)
     {
       int ret, ret2;
@@ -622,7 +620,7 @@ record_add_to_buffers (gnutls_session_t session,
 
   if ((recv_type == type)
       && (type == GNUTLS_APPLICATION_DATA ||
-          type == GNUTLS_HANDSHAKE || type == GNUTLS_INNER_APPLICATION))
+          type == GNUTLS_HANDSHAKE))
     {
       _gnutls_record_buffer_put (type, session, (void *) data->data, data->size);
     }
@@ -730,18 +728,6 @@ record_add_to_buffers (gnutls_session_t session,
           /* So we accept it */
           return _gnutls_recv_hello_request (session, data->data, data->size);
 
-          break;
-        case GNUTLS_INNER_APPLICATION:
-          /* even if data is unexpected put it into the buffer */
-          if ((ret = _gnutls_record_buffer_put (recv_type, session,
-                                                (void *) data->data,
-                                                data->size)) < 0)
-            {
-              gnutls_assert ();
-              return ret;
-            }
-          gnutls_assert ();
-          return GNUTLS_E_UNEXPECTED_PACKET;
           break;
         default:
 
@@ -1147,7 +1133,7 @@ begin:
    */
   if ((record.type == type) &&
       (type == GNUTLS_APPLICATION_DATA ||
-       type == GNUTLS_HANDSHAKE || type == GNUTLS_INNER_APPLICATION))
+       type == GNUTLS_HANDSHAKE))
     {
 
       ret = _gnutls_record_buffer_get (type, session, data, data_size);
