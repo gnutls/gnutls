@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 # Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-# 2009, 2010 Free Software Foundation, Inc.
+# 2009, 2010, 2011 Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -192,7 +192,8 @@ GUILE_FOR_BUILD =				\
 SNARF_CPPFLAGS = -I$(top_srcdir) -I$(top_builddir)			\
 	 -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes	\
 	 -I$(top_srcdir)/libextra/includes				\
-         -I$(top_srcdir)/guile/src -I$(top_builddir)/guile/src
+         -I$(top_srcdir)/guile/src -I$(top_builddir)/guile/src		\
+	 $(GUILE_CFLAGS)
 
 core.c.texi: $(top_srcdir)/guile/src/core.c
 	$(MAKE) -C ../guile/src built-sources &&			\
