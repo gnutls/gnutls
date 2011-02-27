@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007, 2010 Free Software Foundation, Inc.
+;;; Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -64,6 +64,9 @@
     (format port "  ~a *c_items;~%"
             (enum-type-c-type enum))
     (format port "  long int c_len, i;~%")
+    (format port "  scm_c_issue_deprecation_warning \
+(\"`set-session-~a-priority!'is deprecated, \
+use `set-session-priorities!' instead\");~%" (enum-type-subsystem enum))
     (format port "  c_session = scm_to_gnutls_session (session, 1, FUNC_NAME);~%")
     (format port "  SCM_VALIDATE_LIST_COPYLEN (2, items, c_len);~%")
     (format port "  c_items = (~a *) alloca (sizeof (* c_items) * c_len);~%"

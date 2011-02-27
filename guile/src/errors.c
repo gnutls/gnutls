@@ -1,5 +1,5 @@
 /* GnuTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007, 2009, 2010 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009, 2010, 2011 Free Software Foundation, Inc.
 
    GnuTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -30,7 +30,7 @@
 SCM_SYMBOL (gnutls_error_key, "gnutls-error");
 
 void
-scm_gnutls_error (int c_err, const char *c_func)
+scm_gnutls_error_with_args (int c_err, const char *c_func, SCM args)
 {
   SCM err, func;
 
@@ -38,13 +38,20 @@ scm_gnutls_error (int c_err, const char *c_func)
   err = scm_from_gnutls_error (c_err);
   func = scm_from_locale_symbol (c_func);
 
-  (void) scm_throw (gnutls_error_key, scm_list_2 (err, func));
+  (void) scm_throw (gnutls_error_key, scm_cons2 (err, func, args));
 
   /* XXX: This is actually never reached, but since the Guile headers don't
      declare `scm_throw ()' as `noreturn', we must add this to avoid GCC's
      complaints.  */
   abort ();
 }
+
+void
+scm_gnutls_error (int c_err, const char *c_func)
+{
+  scm_gnutls_error_with_args (c_err, c_func, SCM_EOL);
+}
+
 
 
 void

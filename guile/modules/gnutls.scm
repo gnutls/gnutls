@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007, 2010 Free Software Foundation, Inc.
+;;; Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -70,7 +70,10 @@
            set-psk-server-credentials-file!
            server-session-psk-username
 
-           ;; priority functions
+           ;; priorities
+           set-session-priorities!
+
+           ;; priority functions (deprecated)
            set-session-cipher-priority! set-session-mac-priority!
            set-session-compression-method-priority!
            set-session-kx-priority! set-session-protocol-priority!

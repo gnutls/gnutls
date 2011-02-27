@@ -1,5 +1,5 @@
 #  GnuTLS --- Guile bindings for GnuTLS.
-#  Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+#  Copyright (C) 2007, 2008, 2009, 2010, 2011 Free Software Foundation, Inc.
 #
 #  GnuTLS is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -15,10 +15,11 @@
 #  License along with GnuTLS; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-TESTS = anonymous-auth.scm session-record-port.scm		\
-        pkcs-import-export.scm					\
-        errors.scm						\
-	x509-certificates.scm x509-auth.scm
+TESTS = anonymous-auth.scm session-record-port.scm	\
+        pkcs-import-export.scm				\
+        errors.scm					\
+	x509-certificates.scm x509-auth.scm		\
+	priorities.scm
 
 if ENABLE_OPENPGP
 TESTS += openpgp-keys.scm openpgp-keyring.scm openpgp-auth.scm

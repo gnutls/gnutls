@@ -1,5 +1,5 @@
 /* GnuTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007, 2010 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
 
    GnuTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -22,12 +22,12 @@
 
 #include "utils.h"
 
-SCM_API void
-scm_gnutls_error (int, const char *)
+SCM_API void scm_gnutls_error_with_args (int, const char *, SCM)
   NO_RETURN;
-     SCM_API void scm_init_gnutls_error (void);
+
+SCM_API void scm_gnutls_error (int, const char *)
+  NO_RETURN;
+
+SCM_API void scm_init_gnutls_error (void);
 
 #endif
-
-/* arch-tag: e7a92e44-b399-4c85-99d4-2dd3564600f7
- */

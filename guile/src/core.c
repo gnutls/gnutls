@@ -1,5 +1,5 @@
 /* GnuTLS --- Guile bindings for GnuTLS.
-   Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2008, 2009, 2010, 2011 Free Software Foundation, Inc.
 
    GnuTLS is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -532,7 +532,49 @@ SCM_DEFINE (scm_gnutls_set_default_export_priority_x,
 
   return SCM_UNSPECIFIED;
 }
+#undef FUNC_NAME
 
+SCM_DEFINE (scm_gnutls_set_session_priorities_x,
+	    "set-session-priorities!", 2, 0, 0,
+	    (SCM session, SCM priorities),
+	    "Have @var{session} use the given @var{priorities} for "
+	    "the ciphers, key exchange methods, MACs and compression "
+	    "methods.  @var{priorities} must be a string; see the "
+	    "manual for the syntax.  When @var{priorities} cannot be "
+	    "parsed, an @code{error/invalid-request} error is raised, "
+	    "with an extra argument indication the position of the "
+	    "error.\n")
+#define FUNC_NAME s_scm_gnutls_set_session_priorities_x
+{
+  int err;
+  char *c_priorities;
+  const char *err_pos;
+  gnutls_session_t c_session;
+
+  c_session = scm_to_gnutls_session (session, 1, FUNC_NAME);
+  c_priorities = scm_to_locale_string (priorities); /* XXX: to_latin1_string */
+
+  err = gnutls_priority_set_direct (c_session, c_priorities, &err_pos);
+  free (c_priorities);
+
+  switch (err)
+    {
+    case GNUTLS_E_SUCCESS:
+      break;
+    case GNUTLS_E_INVALID_REQUEST:
+      {
+	size_t pos;
+	pos = err_pos - c_priorities;
+	scm_gnutls_error_with_args (err, FUNC_NAME,
+				    scm_list_1 (scm_from_size_t (pos)));
+	break;
+      }
+    default:
+      scm_gnutls_error (err, FUNC_NAME);
+    }
+
+  return SCM_UNSPECIFIED;
+}
 #undef FUNC_NAME
 
 SCM_DEFINE (scm_gnutls_cipher_suite_to_string, "cipher-suite->string",

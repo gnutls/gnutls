@@ -485,6 +485,7 @@ insufficient-credentials
 insuficient-credentials
 insufficient-cred
 insuficient-cred
+invalid-request
 hash-failed
 base64-decoding-error
 mpi-print-failed
