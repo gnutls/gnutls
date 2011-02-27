@@ -316,6 +316,14 @@ To set whether client certificate is required or not.
 To initiate the handshake.
 @end table
 
+@menu
+* TLS Cipher Suites::           TLS session parameters.
+* Priority Strings::            Defining how parameters are negotiated.
+* Client Authentication::       Requesting a certificate from the client.
+* Resuming Sessions::           Reusing previously established keys.
+@end menu
+
+@node TLS Cipher Suites
 @subsection TLS Cipher Suites
 
 The Handshake Protocol of @acronym{TLS} negotiates cipher suites of
@@ -343,7 +351,8 @@ that you consider weak.
 
 All the supported ciphersuites are shown in @ref{ciphersuites}.
 
-@subsection Priority strings
+@node Priority Strings
+@subsection Priority Strings
 In order to specify cipher suite preferences, the
 previously shown priority functions accept a string
 that specifies the algorithms to be enabled in a TLS handshake.
@@ -492,6 +501,7 @@ will allow V1 CAs in chains.
 
 @end table
 
+@node Client Authentication
 @subsection Client Authentication
 @cindex Client Certificate authentication
 
@@ -513,6 +523,7 @@ Sending of the names of the CAs can be controlled using
 @ref{gnutls_certificate_send_x509_rdn_sequence}. The client, then, may
 send a certificate, signed by one of the server's acceptable signers.
 
+@node Resuming Sessions
 @subsection Resuming Sessions
 @anchor{resume}
 @cindex Resuming sessions
