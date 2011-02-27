@@ -132,12 +132,16 @@ gnutls_global_init_extra (void)
   /* Add the LZO compression method in the list of compression
    * methods.
    */
-  ret = _gnutls_add_lzo_comp ();
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+  {
+    int ret;
+
+    ret = _gnutls_add_lzo_comp ();
+    if (ret < 0)
+      {
+	gnutls_assert ();
+	return ret;
+      }
+  }
 #endif
 
 
