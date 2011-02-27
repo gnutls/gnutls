@@ -1,6 +1,6 @@
 ;;; c-snarf.scm  --  Parsing documentation "snarffed" from C files.
 ;;;
-;;; Copyright 2006, 2007, 2010 Free Software Foundation, Inc.
+;;; Copyright 2006, 2007, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,7 @@
 
   :export (run-cpp-and-extract-snarfing
            parse-snarfing
-           parse-snarfed-line snarf-line?))
+           parse-snarfed-line))
 
 ;;; Author:  Ludovic Courtès
 ;;;
@@ -54,12 +54,6 @@
 ;;;
 ;;; Parsing magic-snarffed CPP output.
 ;;;
-
-(define (snarf-line? line)
-  "Return true if @var{line} (a string) can be considered a line produced by
-the @code{snarf.h} snarfing macros."
-  (and (>= (string-length line) 4)
-       (string=? (substring line 0 4) "^^ {")))
 
 (define (parse-c-argument-list arg-string)
   "Parse @var{arg-string} (a string representing a ANSI C argument list,
@@ -99,7 +93,6 @@ of a procedure's documentation: @code{c-name}, @code{scheme-name},
           (string-concatenate (reverse! result))
           (loop (read) (cons str result)))))
 
-  ;;(format (current-error-port) "doc-item: ~a~%" item)
   (let* ((item (string-trim-both item #\space))
 	 (space (string-index item #\space)))
     (if (not space)
@@ -142,7 +135,7 @@ of a procedure's documentation: @code{c-name}, @code{scheme-name},
 (define (parse-snarfed-line line)
   "Parse @var{line}, a string that contains documentation returned for a
 single function by the C preprocessor with the @code{-DSCM_MAGIC_SNARF_DOCS}
-option.  @var{line} is assumed to obey the @code{snarf-line?} predicate."
+option.  @var{line} is assumed to be a complete \"^^ { ... ^^ }\" sequence."
   (define (caret-split str)
     (let loop ((str str)
 	       (result '()))
@@ -168,16 +161,43 @@ option.  @var{line} is assumed to obey the @code{snarf-line?} predicate."
 defined) output from @var{port} a return a list of alist, each of which
 contains information about a specific function described in the C
 preprocessor output."
+  (define start-marker "^^ {")
+  (define end-marker   "^^ }")
+
+  (define (read-snarf-lines start)
+    ;; Read the snarf lines that follow START until and end marker is found.
+    (let loop ((line   start)
+               (result '()))
+      (cond ((eof-object? line)
+             ;; EOF in the middle of a "^^ { ... ^^ }" sequence; shouldn't
+             ;; happen.
+             line)
+            ((string-contains line end-marker)
+             =>
+             (lambda (end)
+               (let ((result (cons (string-take line (+ 3 end))
+                                   result)))
+                 (string-concatenate-reverse result))))
+            ((string-prefix? "#" line)
+             ;; Presumably a "# LINENUM" directive; skip it.
+             (loop (read-line port) result))
+            (else
+             (loop (read-line port)
+                   (cons line result))))))
+
   (let loop ((line (read-line port))
 	     (result '()))
-    ;;(format (current-error-port) "line: ~a~%" line)
-    (if (eof-object? line)
-	result
-	(cond ((snarf-line? line)
-	       (loop (read-line port)
-		     (cons (parse-snarfed-line line) result)))
-	      (else
-	       (loop (read-line port) result))))))
+    (cond ((eof-object? line)
+           result)
+          ((string-contains line start-marker)
+           =>
+           (lambda (start)
+             (let ((line
+                    (read-snarf-lines (string-drop line start))))
+               (loop (read-line port)
+                     (cons (parse-snarfed-line line) result)))))
+          (else
+           (loop (read-line port) result)))))
 
 
 ;;; c-snarf.scm ends here
