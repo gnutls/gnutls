@@ -780,12 +780,14 @@ _gnutls_recv_finished (gnutls_session_t session)
       return ret;
     }
 
-  if (memcmp (vrfy, data, data_size) != 0)
+  ret = memcmp (vrfy, data, data_size);
+  gnutls_free (vrfy);
+  
+  if (ret != 0)
     {
       gnutls_assert ();
-      ret = GNUTLS_E_ERROR_IN_FINISHED_PACKET;
+      return GNUTLS_E_ERROR_IN_FINISHED_PACKET;
     }
-  gnutls_free (vrfy);
 
   /* Save peer's verify data for safe renegotiation */
   if (data_size > MAX_VERIFY_DATA_SIZE)
@@ -809,7 +811,7 @@ _gnutls_recv_finished (gnutls_session_t session)
 
   session->internals.initial_negotiation_completed = 1;
 
-  return ret;
+  return 0;
 }
 
 /* returns PK_RSA if the given cipher suite list only supports,
