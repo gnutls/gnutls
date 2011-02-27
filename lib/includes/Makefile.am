@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 # Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-# 2010 Free Software Foundation, Inc.
+# 2010, 2011 Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -22,7 +22,8 @@
 # MA 02110-1301, USA
 
 nobase_include_HEADERS = gnutls/x509.h gnutls/pkcs12.h gnutls/compat.h	\
-	gnutls/openpgp.h gnutls/crypto.h gnutls/pkcs11.h gnutls/abstract.h
+	gnutls/openpgp.h gnutls/crypto.h gnutls/pkcs11.h		\
+	gnutls/abstract.h gnutls/dtls.h
 
 if ENABLE_CXX
 nobase_include_HEADERS += gnutls/gnutlsxx.h
