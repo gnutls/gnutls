@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 # Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-# 2009, 2010 Free Software Foundation, Inc.
+# 2009, 2010, 2011 Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -91,7 +91,7 @@ SUBDIRS += gcrypt
 endif
 
 HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
-	gnutls_buffers.h gnutls_errors.h gnutls_int.h			\
+	gnutls_buffers.h gnutls_errors.h gnutls_int.h gnutls_dtls.h	\
 	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h		\
 	gnutls_dh.h gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h	\
 	gnutls_db.h gnutls_auth.h auth_anon.h gnutls_extensions.h	\
