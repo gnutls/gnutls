@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.10.5 (unreleased)
 
+** libgnutls: Corrected verification of finished messages.
+
 ** libgnutls: Corrected signature generation and verification
 in the Certificate Verify message when in TLS 1.2. Reported
 by Todd A. Ouska.
