@@ -501,7 +501,7 @@ _gnutls_dsa_verify (const gnutls_datum_t * vdata,
     pk_params.params[i] = params[i];
   pk_params.params_nr = params_len;
 
-  if (vdata->size > 20)
+  if (vdata->size < 20)
     {				/* SHA1 or better only */
       gnutls_assert ();
       return GNUTLS_E_PK_SIG_VERIFY_FAILED;
