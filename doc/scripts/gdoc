@@ -1,4 +1,6 @@
-#!/usr/bin/perl
+eval '(exit $?0)' && eval 'exec perl -wS "$0" ${1+"$@"}'
+  & eval 'exec perl -wS "$0" $argv:q'
+    if 0;
 
 ## Copyright (c) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Simon Josefsson
 ##                    added -texinfo, -listfunc, -pkg-name
