@@ -575,9 +575,6 @@ GNUTLS_2_8
 GNUTLS_2_10
 {
   global:
-    gnutls_session_ticket_key_generate;
-    gnutls_session_ticket_enable_client;
-    gnutls_session_ticket_enable_server;
     gnutls_x509_crt_get_issuer_alt_name2;
     gnutls_x509_crt_get_issuer_alt_name;
     gnutls_x509_crt_get_issuer_alt_othername_oid;
