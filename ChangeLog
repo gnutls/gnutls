@@ -1,3 +1,67 @@
+2011-02-28  Simon Josefsson <simon@josefsson.org>
+
+	* lib/configure.ac: Handle multi-word $GNUTLS_REQUIRES_PRIVATE's.
+
+2011-02-28  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Version 2.10.5.
+
+2011-02-27  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS: Document pkg-config changes.
+
+2011-02-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_pk.c: SHA1 or better check fixed.
+
+2011-02-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: documented fix.
+
+2011-02-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_handshake.c: corrected finished packet check.
+
+2011-02-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_sig.c: Corrected signature generation and
+	verification in the Certificate Verify message when in TLS 1.2.
+	Reported by Todd A. Ouska.
+
+2010-02-28  Andreas Metzler <ametzler@downhill.at.eu.org>
+
+	* lib/configure.ac, lib/m4/hooks.m4: pkg-config: If gnutls is built
+	with zlib support list zlib in Requires.private.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2010-02-28  Andreas Metzler <ametzler@downhill.at.eu.org>
+
+	* lib/gnutls.pc.in: pkg-config: drop @LIBGNUTLS_LIBS@ from
+	Libs.private. This library only contains gnutls itself nowadays,
+	which is in Libs already.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2010-02-28  Andreas Metzler <ametzler@downhill.at.eu.org>
+
+	* lib/gnutls.pc.in, lib/m4/hooks.m4: pkg-config: Move libtasn1 from
+	Libs.private to Requires.private since libtasn1 provides a .pc file.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2010-02-28  Andreas Metzler <ametzler@downhill.at.eu.org>
+
+	* lib/gnutls.pc.in: adapt pkg-config file for switch from
+	AM_PATH_LIBGCRYPT to AC_LIB_HAVE_LINKFLAGS Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2010-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, configure.ac, lib/configure.ac, lib/m4/hooks.m4,
+	libextra/configure.ac: Bump versions.
+
+2010-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* doc/announce.txt: Update for 2.10.4.
+
+2010-12-06  Simon Josefsson <simon@josefsson.org>
+
+	* ChangeLog: Generated.
+
 2010-12-06  Simon Josefsson <simon@josefsson.org>
 
 	* NEWS: Version 2.10.4.
