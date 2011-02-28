@@ -425,8 +425,8 @@ Individual algorithms:
 @item Ciphers: 
 AES-128-CBC, AES-256-CBC, AES-128-GCM, CAMELLIA-128-CBC,
 CAMELLIA-256-CBC, ARCFOUR-128, 3DES-CBC ARCFOUR-40. Catch all
-name is CIPHER-ALL which will add all the non-weak algorithms, i.e.
-all except ARCFOUR-40.
+name is CIPHER-ALL which will add all the algorithms from NORMAL
+priority.
 
 @item Key exchange: 
 RSA, DHE-RSA, DHE-DSS, SRP, SRP-RSA, SRP-DSS,
@@ -435,7 +435,7 @@ key exchange methods do not have a catch all.
 
 @item MAC: 
 MD5, SHA1, SHA256, AEAD (used with
-GCM ciphers only). Catch all is MAC-ALL.
+GCM ciphers only). All algorithms from NORMAL priority can be accessed with MAC-ALL.
 
 @item Compression algorithms: 
 COMP-NULL, COMP-DEFLATE. Catch all is COMP-ALL.
