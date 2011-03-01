@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007, 2010 Free Software Foundation, Inc.
+;;; Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -28,12 +28,8 @@
 
 
 ;; TLS session settings.
-(define %protos  (list protocol/tls-1.0))
-(define %certs   '())
-(define %ciphers (list cipher/null cipher/arcfour cipher/aes-128-cbc
-                       cipher/aes-256-cbc))
-(define %kx      (list kx/anon-dh))
-(define %macs    (list mac/sha1 mac/rmd160 mac/md5))
+(define priorities
+  "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH")
 
 ;; Message sent by the client.
 (define %message (apply u8vector (iota 256)))
@@ -65,12 +61,7 @@
 
             (let ((client (make-session connection-end/client)))
               ;; client-side (child process)
-              (set-session-default-priority! client)
-              (set-session-certificate-type-priority! client %certs)
-              (set-session-kx-priority! client %kx)
-              (set-session-protocol-priority! client %protos)
-              (set-session-cipher-priority! client %ciphers)
-              (set-session-mac-priority! client %macs)
+              (set-session-priorities! client priorities)
 
               (set-session-transport-fd! client (fileno (car socket-pair)))
               (set-session-credentials! client (make-anonymous-client-credentials))
@@ -84,12 +75,7 @@
 
             (let ((server (make-session connection-end/server)))
               ;; server-side
-              (set-session-default-priority! server)
-              (set-session-certificate-type-priority! server %certs)
-              (set-session-kx-priority! server %kx)
-              (set-session-protocol-priority! server %protos)
-              (set-session-cipher-priority! server %ciphers)
-              (set-session-mac-priority! server %macs)
+              (set-session-priorities! server priorities)
 
               (set-session-transport-fd! server (fileno (cdr socket-pair)))
               (let ((cred (make-anonymous-server-credentials))

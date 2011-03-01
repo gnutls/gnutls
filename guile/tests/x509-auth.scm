@@ -27,7 +27,7 @@
              (srfi srfi-4))
 
 
-;; TLS session settings.
+;; TLS session settings (using the deprecated method).
 (define %protos  (list protocol/tls-1.0))
 (define %certs   (list certificate-type/x509))
 (define %ciphers (list cipher/null cipher/arcfour cipher/aes-128-cbc

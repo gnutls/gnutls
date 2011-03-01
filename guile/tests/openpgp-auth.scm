@@ -1,5 +1,5 @@
 ;;; GnuTLS-extra --- Guile bindings for GnuTLS-EXTRA.
-;;; Copyright (C) 2007, 2008, 2010 Free Software Foundation, Inc.
+;;; Copyright (C) 2007, 2008, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS-extra is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -29,12 +29,8 @@
 
 
 ;; TLS session settings.
-(define %protos  (list protocol/tls-1.0))
-(define %certs   (list certificate-type/openpgp))
-(define %ciphers (list cipher/null cipher/arcfour cipher/aes-128-cbc
-                       cipher/aes-256-cbc))
-(define %kx      (list kx/rsa kx/rsa-export kx/dhe-rsa kx/dhe-dss))
-(define %macs    (list mac/sha1 mac/rmd160 mac/md5))
+(define priorities
+  "NONE:+VERS-TLS-ALL:+CTYPE-OPENPGP:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+DHE-DSS:+COMP-ALL")
 
 ;; Message sent by the client.
 (define %message
@@ -79,12 +75,7 @@
               (let ((client (make-session connection-end/client))
                     (cred   (make-certificate-credentials)))
                 ;; client-side (child process)
-                (set-session-default-priority! client)
-                (set-session-certificate-type-priority! client %certs)
-                (set-session-kx-priority! client %kx)
-                (set-session-protocol-priority! client %protos)
-                (set-session-cipher-priority! client %ciphers)
-                (set-session-mac-priority! client %macs)
+                (set-session-priorities! client priorities)
 
                 (set-certificate-credentials-openpgp-keys! cred pub sec)
                 (set-session-credentials! client cred)
@@ -102,12 +93,7 @@
                     (rsa    (import-rsa-params "rsa-parameters.pem"))
                     (dh     (import-dh-params "dh-parameters.pem")))
                 ;; server-side
-                (set-session-default-priority! server)
-                (set-session-certificate-type-priority! server %certs)
-                (set-session-kx-priority! server %kx)
-                (set-session-protocol-priority! server %protos)
-                (set-session-cipher-priority! server %ciphers)
-                (set-session-mac-priority! server %macs)
+                (set-session-priorities! server priorities)
                 (set-server-session-certificate-request! server
                          certificate-request/require)
 
