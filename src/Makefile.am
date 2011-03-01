@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 # Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-# 2009, 2010 Free Software Foundation, Inc.
+# 2009, 2010, 2011 Free Software Foundation, Inc.
 #
 # This file is part of GnuTLS.
 #
@@ -40,7 +40,11 @@ endif
 
 noinst_LTLIBRARIES =
 
-gnutls_serv_SOURCES = list.h serv.c udp-serv.c common.h common.c certtool-common.h
+gnutls_serv_SOURCES =				\
+  list.h serv.c					\
+  udp-serv.c udp-serv.h				\
+  common.h common.c				\
+  certtool-common.h
 gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
 gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la
 gnutls_serv_LDADD += $(LTLIBGCRYPT) $(LIBSOCKET) $(GETADDRINFO_LIB)
