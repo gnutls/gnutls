@@ -251,7 +251,7 @@ read_int_with_default (const char *input_str, int def)
   char *endptr;
   long l;
 
-  printf (input_str, def);
+  fprintf (stderr, input_str, def);
   in = readline ("");
   if (in == NULL)
     {
