@@ -2436,6 +2436,13 @@ generate_pkcs12 (common_info_st * cinfo)
     pass = info.pass;
   else
     pass = get_pass ();
+    
+  if (pass == NULL)
+    {
+      fprintf(stderr, "No password given for PKCS #12. Assuming null password...\n");
+      pass = "";
+    }
+    
 
   for (i = 0; i < ncrts; i++)
     {
