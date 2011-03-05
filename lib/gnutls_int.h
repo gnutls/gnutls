@@ -71,8 +71,6 @@ typedef struct
 #define DEBUG
 */
 
-#define GMAX(x,y) ((x>y)?(x):(y))
-
 /* The size of a handshake message should not
  * be larger than this value.
  */

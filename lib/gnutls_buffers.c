@@ -240,7 +240,7 @@ _gnutls_stream_read (gnutls_session_t session, mbuffer_st **bufel,
   char *ptr;
   gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
 
-  *bufel = _mbuffer_alloc (0, GMAX(max_size, size));
+  *bufel = _mbuffer_alloc (0, MAX(max_size, size));
   if (!*bufel)
     {
       gnutls_assert ();
