@@ -105,9 +105,6 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
   uint16_t challenge;
   opaque session_id[TLS_MAX_SESSION_ID_SIZE];
 
-  /* we only want to get here once - only in client hello */
-  session->internals.v2_hello = 0;
-
   DECR_LEN (len, 2);
 
   _gnutls_handshake_log

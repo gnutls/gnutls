@@ -32,9 +32,9 @@ int _gnutls_recv_hello_request (gnutls_session_t session, void *data,
                                 uint32_t data_size);
 int _gnutls_send_hello (gnutls_session_t session, int again);
 int _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen);
-int _gnutls_recv_handshake (gnutls_session_t session, uint8_t **, int *,
-                            gnutls_handshake_description_t,
-                            optional_t optional);
+int _gnutls_recv_handshake (gnutls_session_t session, 
+                        gnutls_handshake_description_t type,
+                        optional_t optional, gnutls_buffer_st* buf);
 int _gnutls_generate_session_id (opaque * session_id, uint8_t * len);
 int _gnutls_handshake_common (gnutls_session_t session);
 int _gnutls_handshake_client (gnutls_session_t session);

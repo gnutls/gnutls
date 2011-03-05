@@ -49,30 +49,61 @@ ssize_t _gnutls_io_write_buffered (gnutls_session_t session,
 int _gnutls_handshake_buffer_get_size (gnutls_session_t session);
 int _gnutls_handshake_buffer_put (gnutls_session_t session, opaque * data,
                                   size_t length);
-int _gnutls_handshake_buffer_clear (gnutls_session_t session);
 int _gnutls_handshake_buffer_empty (gnutls_session_t session);
 int _gnutls_handshake_buffer_get_ptr (gnutls_session_t session,
                                       opaque ** data_ptr, size_t * length);
 
-#define _gnutls_handshake_io_buffer_clear( session) \
-        _mbuffer_head_clear( &session->internals.handshake_send_buffer); \
-        _gnutls_buffer_clear( &session->internals.handshake_recv_buffer);
-
-ssize_t _gnutls_handshake_io_recv_int (gnutls_session_t, content_type_t,
-                                       gnutls_handshake_description_t, void *,
-                                       size_t);
 int _gnutls_handshake_io_cache_int (gnutls_session_t,
                                      gnutls_handshake_description_t,
                                      mbuffer_st * bufel);
-int
-_gnutls_handshake_io_recv_skip (gnutls_session_t session,
-                               content_type_t type,
+
+ssize_t
+_gnutls_handshake_io_recv_int (gnutls_session_t session,
                                gnutls_handshake_description_t htype,
-                               size_t ptr_size);
+                               handshake_buffer_st * hsk);
 
 ssize_t _gnutls_io_write_flush (gnutls_session_t session);
 int
 _gnutls_io_check_recv (gnutls_session_t session, void* data, size_t data_size, unsigned int ms);
 ssize_t _gnutls_handshake_io_write_flush (gnutls_session_t session);
+
+inline static void _gnutls_handshake_buffer_clear(handshake_buffer_st* hsk)
+{
+  _gnutls_buffer_clear(&hsk->data);
+  hsk->htype = -1;
+}
+
+inline static void _gnutls_handshake_buffer_init(handshake_buffer_st* hsk)
+{
+  memset(hsk, 0, sizeof(*hsk));
+  _gnutls_buffer_init(&hsk->data);
+  hsk->htype = -1;
+}
+
+inline static void _gnutls_handshake_recv_buffer_clear(gnutls_session_t session)
+{
+int i;
+  for (i=0;i<session->internals.handshake_recv_buffer_size;i++)
+    _gnutls_handshake_buffer_clear(&session->internals.handshake_recv_buffer[i]);
+  session->internals.handshake_recv_buffer_size = 0;
+}
+
+inline static void _gnutls_handshake_recv_buffer_init(gnutls_session_t session)
+{
+int i;
+  for (i=0;i<MAX_HANDSHAKE_MSGS;i++)
+    {
+      _gnutls_handshake_buffer_init(&session->internals.handshake_recv_buffer[i]);
+    }
+  session->internals.handshake_recv_buffer_size = 0;
+}
+
+ssize_t
+_gnutls_recv_in_buffers (gnutls_session_t session, content_type_t type,
+                  gnutls_handshake_description_t htype);
+
+#define _gnutls_handshake_io_buffer_clear( session) \
+        _mbuffer_head_clear( &session->internals.handshake_send_buffer); \
+        _gnutls_handshake_recv_buffer_clear( session);
 
 #endif

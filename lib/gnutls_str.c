@@ -127,6 +127,8 @@ _gnutls_buffer_append_data (gnutls_buffer_st * dest, const void *data,
 {
   size_t tot_len = data_size + dest->length;
 
+  if (data_size == 0) return 0;
+
   if (dest->max_length >= tot_len)
     {
       size_t unused = MEMSUB (dest->data, dest->allocd);

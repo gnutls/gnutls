@@ -780,6 +780,7 @@ struct tls_record_st {
   uint16_t length;
   uint16_t packet_size; /* header_size + length */
   content_type_t type;
+  int v2:1; /* whether an SSLv2 client hello */
   /* the data */
 };
 
@@ -818,15 +819,19 @@ record_read_headers (gnutls_session_t session,
       /* in order to assist the handshake protocol.
        * V2 compatibility is a mess.
        */
-      session->internals.v2_hello = record->length;
+      record->v2 = 1;
 
-      _gnutls_record_log ("REC[%p]: V2 packet received. Length: %d\n",
-                          session, record->length);
+      _gnutls_record_log ("REC[%p]: SSL 2.0 %s packet received. Length: %d\n",
+                          session, 
+                          _gnutls_packet2str (record->type),
+                          record->length);
 
     }
   else 
     {
       /* dtls version 1.0 and TLS version 1.x */
+      record->v2 = 0;
+
       record->type = headers[0];
       record->version[0] = headers[1];
       record->version[1] = headers[2];
@@ -838,6 +843,12 @@ record_read_headers (gnutls_session_t session,
         }
       else
         record->length = _gnutls_read_uint16 (&headers[3]);
+
+      _gnutls_record_log ("REC[%p]: SSL %d.%d %s packet received. Length: %d\n",
+                          session, (int)record->version[0], (int)record->version[1], 
+                          _gnutls_packet2str (record->type),
+                          record->length);
+
     }
 
   record->packet_size += record->length;
@@ -871,6 +882,8 @@ gnutls_datum_t raw; /* raw headers */
     }
 
   _mbuffer_head_get_first (&session->internals.record_recv_buffer, &raw);
+  if (raw.size < RECORD_HEADER_SIZE(session))
+    return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
   record_read_headers (session, raw.data, type, htype, record);
 
@@ -932,13 +945,13 @@ gnutls_datum_t raw; /* raw headers */
 /* This will receive record layer packets and add them to 
  * application_data_buffer and handshake_data_buffer.
  */
-static ssize_t
+ssize_t
 _gnutls_recv_in_buffers (gnutls_session_t session, content_type_t type,
                   gnutls_handshake_description_t htype)
 {
   uint64 *packet_sequence;
   uint8_t *ciphertext;
-  mbuffer_st* bufel = NULL;
+  mbuffer_st* bufel = NULL, *decrypted = NULL;
   int ret;
   int empty_packet = 0;
   record_parameters_st *record_params;
@@ -1007,29 +1020,34 @@ begin:
    * move on !
    */
   ret = _mbuffer_linearize (&session->internals.record_recv_buffer);
-  if (ret != 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-  bufel = _mbuffer_head_pop_first (&session->internals.record_recv_buffer);
-  ciphertext = &bufel->msg.data[record.header_size];
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  bufel = _mbuffer_head_get_first (&session->internals.record_recv_buffer, NULL);
+  if (bufel == NULL)
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+  decrypted = _mbuffer_alloc(record.length+EXTRA_COMP_SIZE, record.length+EXTRA_COMP_SIZE);
+  if (decrypted == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+  ciphertext = (opaque*)_mbuffer_get_udata_ptr(bufel) + record.header_size;
 
   /* decrypt the data we got. 
    */
   ret =
-    _gnutls_decrypt (session, ciphertext, record.length, bufel->msg.data, bufel->maximum_size,
+    _gnutls_decrypt (session, ciphertext, record.length, 
+        _mbuffer_get_udata_ptr(decrypted), _mbuffer_get_udata_size(decrypted),
 		     record.type, record_params, packet_sequence);
-  bufel->msg.size = ret;
+  if (ret >= 0) _mbuffer_set_udata_size(decrypted, ret);
 
+  _mbuffer_head_remove_bytes (&session->internals.record_recv_buffer,
+                         record.header_size + record.length);
   if (ret < 0)
     {
       gnutls_assert();
       goto sanity_check_error;
     }
-
-  /* bufel now holds the decrypted data
-   */
 
   /* check for duplicates. We check after the message
    * is processed and authenticated to avoid someone
@@ -1049,7 +1067,7 @@ begin:
   _gnutls_record_log
     ("REC[%p]: Decrypted Packet[%d] %s(%d) with length: %d\n", session,
      (int) _gnutls_uint64touint32 (packet_sequence),
-     _gnutls_packet2str (record.type), record.type, bufel->msg.size);
+     _gnutls_packet2str (record.type), record.type, (int)_mbuffer_get_udata_size(decrypted));
 
   /* increase sequence number 
    */
@@ -1068,16 +1086,21 @@ begin:
  * In that case we go to the beginning and start reading
  * the next packet.
  */
-  if (bufel->msg.size == 0)
+  if (_mbuffer_get_udata_size(decrypted) == 0)
     {
-      _mbuffer_xfree(&bufel);
+      _mbuffer_xfree(&decrypted);
       empty_packet++;
       goto begin;
     }
 
+  if (record.v2)
+    decrypted->htype = GNUTLS_HANDSHAKE_CLIENT_HELLO_V2;
+  else
+    decrypted->htype = -1;
+
   ret =
     record_add_to_buffers (session, record.type, type, htype, 
-      packet_sequence, bufel);
+      packet_sequence, decrypted);
 
   /* bufel is now either deinitialized or buffered somewhere else */
 
@@ -1094,6 +1117,7 @@ begin:
   return ret;
 
 discard:
+  /* discard the whole received fragment. */
   bufel = _mbuffer_head_pop_first(&session->internals.record_recv_buffer);
   _mbuffer_xfree(&bufel);
   return GNUTLS_E_AGAIN;
@@ -1111,7 +1135,7 @@ sanity_check_error:
   session_invalidate (session);
 
 cleanup:
-  _mbuffer_xfree(&bufel);
+  _mbuffer_xfree(&decrypted);
   return ret;
 
 recv_error:

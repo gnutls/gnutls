@@ -46,7 +46,7 @@ transmit_message (gnutls_session_t session,
   opaque *data, *mtu_data;
   int ret = 0;
   unsigned int offset, frag_len, data_size;
-  const uint mtu = session->internals.dtls.mtu;
+  const uint mtu = gnutls_dtls_get_mtu(session) - DTLS_HANDSHAKE_HEADER_SIZE;
 
   if (bufel->type == GNUTLS_CHANGE_CIPHER_SPEC)
     {
@@ -96,7 +96,7 @@ transmit_message (gnutls_session_t session,
       /* Fragment length */
       _gnutls_write_uint24 (frag_len, &mtu_data[9]);
 
-      memcpy (&mtu_data[12], data+offset, frag_len);
+      memcpy (&mtu_data[DTLS_HANDSHAKE_HEADER_SIZE], data+offset, frag_len);
 
       _gnutls_dtls_log ("DTLS[%p]: Sending Packet[%u] fragment %s(%d) with "
 			"length: %u, offset: %u, fragment length: %u\n",

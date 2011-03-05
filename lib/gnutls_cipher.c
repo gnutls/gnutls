@@ -612,7 +612,8 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
   if (compress_size < length)
     return gnutls_assert_val(GNUTLS_E_DECOMPRESSION_FAILED);
 
-  memmove (compress_data, ciphertext.data, length);
+  if (compress_data != ciphertext.data)
+    memcpy (compress_data, ciphertext.data, length);
 
   return length;
 }

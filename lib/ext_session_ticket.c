@@ -690,8 +690,9 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
 int
 _gnutls_recv_new_session_ticket (gnutls_session_t session)
 {
-  uint8_t *data = NULL, *p;
+  uint8_t *p;
   int data_size;
+  gnutls_buffer_st buf;
   uint32_t lifetime_hint;
   uint16_t ticket_len;
   int ret;
@@ -711,34 +712,35 @@ _gnutls_recv_new_session_ticket (gnutls_session_t session)
   if (!priv->session_ticket_renew)
     return 0;
 
-  ret = _gnutls_recv_handshake (session, &data, &data_size,
+  ret = _gnutls_recv_handshake (session, 
                                 GNUTLS_HANDSHAKE_NEW_SESSION_TICKET,
-                                MANDATORY_PACKET);
+                                MANDATORY_PACKET, &buf);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  p = data;
-  DECR_LENGTH_COM (data_size, 4, goto error);
+  p = buf.data;
+  data_size = buf.length;
+
+  DECR_LENGTH_COM (data_size, 4, ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH; goto error);
   lifetime_hint = _gnutls_read_uint32 (p);
   p += 4;
 
-  DECR_LENGTH_COM (data_size, 2, goto error);
+  DECR_LENGTH_COM (data_size, 2, ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH; goto error);
   ticket_len = _gnutls_read_uint16 (p);
   p += 2;
 
-  DECR_LENGTH_COM (data_size, ticket_len, goto error);
+  DECR_LENGTH_COM (data_size, ticket_len, ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH; goto error);
   priv->session_ticket = gnutls_realloc (priv->session_ticket, ticket_len);
   if (!priv->session_ticket)
     {
       gnutls_assert ();
-      gnutls_free (data);
-      return GNUTLS_E_MEMORY_ERROR;
+      ret = GNUTLS_E_MEMORY_ERROR;
+      goto error;
     }
   memcpy (priv->session_ticket, p, ticket_len);
-  gnutls_free (data);
   priv->session_ticket_len = ticket_len;
 
   /* Discard the current session ID.  (RFC5077 3.4) */
@@ -750,13 +752,15 @@ _gnutls_recv_new_session_ticket (gnutls_session_t session)
       gnutls_assert ();
       gnutls_free (priv->session_ticket);
       priv->session_ticket = NULL;
-      return GNUTLS_E_INTERNAL_ERROR;
+      ret = GNUTLS_E_INTERNAL_ERROR;
+      goto error;
     }
-  return 0;
+  ret = 0;
 
 error:
-  gnutls_free (data);
-  return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+  _gnutls_buffer_clear (&buf);
+  
+  return ret;
 }
 
 #endif

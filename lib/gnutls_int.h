@@ -153,7 +153,6 @@ typedef enum transport_t
 #define MAX_PAD_SIZE 255
 #define EXTRA_COMP_SIZE 2048
 #define MAX_RECORD_OVERHEAD (MAX_CIPHER_BLOCK_SIZE/*iv*/+MAX_PAD_SIZE+EXTRA_COMP_SIZE+MAX_HASH_SIZE/*MAC*/)
-#define MAX_RECORD_OVERHEAD_RT(session) (2*MAX_CIPHER_BLOCK_SIZE/*iv+pad*/+MAX_HASH_SIZE)
 #define MAX_RECV_SIZE(session) (MAX_RECORD_OVERHEAD+MAX_RECORD_RECV_SIZE(session)+RECORD_HEADER_SIZE(session))
 
 #define TLS_HANDSHAKE_HEADER_SIZE 4
@@ -246,24 +245,53 @@ typedef enum content_type_t
 
 /* Message buffers (mbuffers) structures */
 
+/* this is actually the maximum number of distinct handshake
+ * messages that can arrive in a single flight
+ */
+#define MAX_HANDSHAKE_MSGS 6
+typedef struct
+{
+  /* Handshake layer type and sequence of message */
+  gnutls_handshake_description_t htype;
+  uint32_t length;
+
+  /* valid in DTLS */
+  uint16_t sequence;
+
+  /* indicate whether that message is complete.
+   * complete means start_offset == 0 and end_offset == length
+   */
+  uint32_t start_offset;
+  uint32_t end_offset;
+  
+  opaque header[MAX_HANDSHAKE_HEADER_SIZE];
+  int header_size;
+
+  gnutls_buffer_st data;
+} handshake_buffer_st;
+
 typedef struct mbuffer_st
 {
+  /* when used in mbuffer_head_st */
   struct mbuffer_st *next;
+  struct mbuffer_st *prev;
 
-  gnutls_datum_t msg;
   /* msg->size - mark = number of bytes left to process in this
      message. Mark should only be non-zero when this buffer is the
      head of the queue. */
   size_t mark;
-  unsigned int user_mark;       /* only used during fill in */
+
+
+  /* the data */
+  gnutls_datum_t msg;
   size_t maximum_size;
+
+  /* used during fill in, to separate header from data
+   * body. */
+  unsigned int user_mark;
 
   /* Filled in by record layer on recv:
    * type, record_sequence
-   */
-
-  /* Filled in by handshake layer on send:
-   * type, epoch, htype, handshake_sequence
    */
 
   /* record layer content type */
@@ -271,6 +299,10 @@ typedef struct mbuffer_st
 
   /* record layer sequence */
   uint64 record_sequence;
+
+  /* Filled in by handshake layer on send:
+   * type, epoch, htype, handshake_sequence
+   */
 
   /* Record layer epoch of message */
   uint16_t epoch;
@@ -283,7 +315,7 @@ typedef struct mbuffer_st
 typedef struct mbuffer_head_st
 {
   mbuffer_st *head;
-  mbuffer_st **tail;
+  mbuffer_st *tail;
 
   unsigned int length;
   size_t byte_length;
@@ -569,21 +601,6 @@ typedef struct
 } dtls_st;
 
 
-typedef struct
-{
-  opaque header[MAX_HANDSHAKE_HEADER_SIZE];
-  /* this holds the number of bytes in the handshake_header[] */
-  size_t header_size;
-  /* this holds the length of the handshake packet */
-  size_t packet_length;
-  gnutls_handshake_description_t recv_type;
-  
-  /* DTLS fields */
-  uint16_t sequence;
-  size_t frag_offset;
-  size_t frag_length;
-} handshake_header_buffer_st;
-
 typedef union
 {
   void *ptr;
@@ -652,7 +669,8 @@ typedef struct
    * protocol only. freed using _gnutls_handshake_io_buffer_clear();
    */
   mbuffer_head_st handshake_send_buffer;
-  gnutls_buffer_st handshake_recv_buffer;
+  handshake_buffer_st handshake_recv_buffer[MAX_HANDSHAKE_MSGS];
+  int handshake_recv_buffer_size;
 
   /* this buffer holds a record packet -mostly used for
    * non blocking IO.
@@ -674,12 +692,6 @@ typedef struct
 
   int expire_time;              /* after expire_time seconds this session will expire */
   struct mod_auth_st_int *auth_struct;  /* used in handshake packets and KX algorithms */
-  int v2_hello;                 /* 0 if the client hello is v3+.
-                                 * non-zero if we got a v2 hello.
-                                 */
-  /* keeps the headers of the handshake packet 
-   */
-  handshake_header_buffer_st handshake_header_buffer;
 
   /* this is the highest version available
    * to the peer. (advertized version).

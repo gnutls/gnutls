@@ -246,9 +246,6 @@ _gnutls_handshake_internal_state_init (gnutls_session_t session)
   /* by default no selected certificate */
   session->internals.adv_version_major = 0;
   session->internals.adv_version_minor = 0;
-  session->internals.v2_hello = 0;
-  memset (&session->internals.handshake_header_buffer, 0,
-          sizeof (handshake_header_buffer_st));
   session->internals.direction = 0;
 
   /* use out of band data for the last
@@ -259,7 +256,7 @@ _gnutls_handshake_internal_state_init (gnutls_session_t session)
 
   session->internals.resumable = RESUME_TRUE;
   
-  session->internals.dtls.hsk_read_seq = -1;
+  session->internals.dtls.hsk_read_seq = 0;
   session->internals.dtls.hsk_write_seq = 0;
 }
 
@@ -323,7 +320,7 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
   _mbuffer_head_init (&(*session)->internals.record_recv_buffer);
 
   _mbuffer_head_init (&(*session)->internals.handshake_send_buffer);
-  _gnutls_buffer_init (&(*session)->internals.handshake_recv_buffer);
+  _gnutls_handshake_recv_buffer_init(*session);
 
   (*session)->key = gnutls_calloc (1, sizeof (struct gnutls_key_st));
   if ((*session)->key == NULL)
@@ -1352,7 +1349,7 @@ record_parameters_st *params;
 int total = 0, ret, iv_size;
 
   if (session->internals.initial_negotiation_completed == 0)
-    return 0;
+    return RECORD_HEADER_SIZE(session);
 
   ret = _gnutls_epoch_get (session, EPOCH_WRITE_CURRENT, &params);
   if (ret < 0)

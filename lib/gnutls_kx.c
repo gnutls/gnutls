@@ -449,8 +449,7 @@ cleanup:
 int
 _gnutls_recv_server_kx_message (gnutls_session_t session)
 {
-  uint8_t *data = NULL;
-  int datasize;
+  gnutls_buffer_st buf;
   int ret = 0;
   optional_t optflag = MANDATORY_PACKET;
 
@@ -471,10 +470,9 @@ _gnutls_recv_server_kx_message (gnutls_session_t session)
         optflag = OPTIONAL_PACKET;
 
       ret =
-        _gnutls_recv_handshake (session, &data,
-                                &datasize,
+        _gnutls_recv_handshake (session, 
                                 GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE,
-                                optflag);
+                                optflag, &buf);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -483,9 +481,9 @@ _gnutls_recv_server_kx_message (gnutls_session_t session)
 
       ret =
         session->internals.auth_struct->gnutls_process_server_kx (session,
-                                                                  data,
-                                                                  datasize);
-      gnutls_free (data);
+                                                                  buf.data,
+                                                                  buf.length);
+      _gnutls_buffer_clear(&buf);
 
       if (ret < 0)
         {
@@ -500,8 +498,7 @@ _gnutls_recv_server_kx_message (gnutls_session_t session)
 int
 _gnutls_recv_server_certificate_request (gnutls_session_t session)
 {
-  uint8_t *data;
-  int datasize;
+  gnutls_buffer_st buf;
   int ret = 0;
 
   if (session->internals.
@@ -509,21 +506,23 @@ _gnutls_recv_server_certificate_request (gnutls_session_t session)
     {
 
       ret =
-        _gnutls_recv_handshake (session, &data,
-                                &datasize,
+        _gnutls_recv_handshake (session, 
                                 GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST,
-                                OPTIONAL_PACKET);
+                                OPTIONAL_PACKET, &buf);
       if (ret < 0)
         return ret;
 
-      if (ret == 0 && datasize == 0)
-        return 0;               /* ignored */
+      if (ret == 0 && buf.length == 0)
+        {
+          _gnutls_buffer_clear(&buf);
+          return 0;               /* ignored */
+        }
 
       ret =
         session->internals.
-        auth_struct->gnutls_process_server_certificate_request (session, data,
-                                                                datasize);
-      gnutls_free (data);
+        auth_struct->gnutls_process_server_certificate_request (session, buf.data,
+                                                                buf.length);
+      _gnutls_buffer_clear (&buf);
       if (ret < 0)
         return ret;
 
@@ -534,8 +533,7 @@ _gnutls_recv_server_certificate_request (gnutls_session_t session)
 int
 _gnutls_recv_client_kx_message (gnutls_session_t session)
 {
-  uint8_t *data;
-  int datasize;
+  gnutls_buffer_st buf;
   int ret = 0;
 
 
@@ -544,18 +542,17 @@ _gnutls_recv_client_kx_message (gnutls_session_t session)
     {
 
       ret =
-        _gnutls_recv_handshake (session, &data,
-                                &datasize,
+        _gnutls_recv_handshake (session, 
                                 GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE,
-                                MANDATORY_PACKET);
+                                MANDATORY_PACKET, &buf);
       if (ret < 0)
         return ret;
 
       ret =
         session->internals.auth_struct->gnutls_process_client_kx (session,
-                                                                  data,
-                                                                  datasize);
-      gnutls_free (data);
+                                                                  buf.data,
+                                                                  buf.length);
+      _gnutls_buffer_clear (&buf);
       if (ret < 0)
         return ret;
 
@@ -565,107 +562,102 @@ _gnutls_recv_client_kx_message (gnutls_session_t session)
 }
 
 
-
-
 int
 _gnutls_recv_client_certificate (gnutls_session_t session)
 {
-  int datasize;
-  opaque *data;
+  gnutls_buffer_st buf;
   int ret = 0;
   int optional;
 
-  if (session->internals.auth_struct->gnutls_process_client_certificate !=
+  if (session->internals.auth_struct->gnutls_process_client_certificate ==
       NULL)
+    return 0;
+
+  /* if we have not requested a certificate then just return
+   */
+  if (session->internals.send_cert_req == 0)
     {
-
-      /* if we have not requested a certificate then just return
-       */
-      if (session->internals.send_cert_req == 0)
-        {
-          return 0;
-        }
-
-      if (session->internals.send_cert_req == GNUTLS_CERT_REQUIRE)
-        optional = MANDATORY_PACKET;
-      else
-        optional = OPTIONAL_PACKET;
-
-      ret =
-        _gnutls_recv_handshake (session, &data,
-                                &datasize,
-                                GNUTLS_HANDSHAKE_CERTIFICATE_PKT, optional);
-
-      if (ret < 0)
-        {
-          /* Handle the case of old SSL3 clients who send
-           * a warning alert instead of an empty certificate to indicate
-           * no certificate.
-           */
-          if (optional == OPTIONAL_PACKET &&
-              ret == GNUTLS_E_WARNING_ALERT_RECEIVED &&
-              gnutls_protocol_get_version (session) == GNUTLS_SSL3 &&
-              gnutls_alert_get (session) == GNUTLS_A_SSL3_NO_CERTIFICATE)
-            {
-
-              /* SSL3 does not send an empty certificate,
-               * but this alert. So we just ignore it.
-               */
-              gnutls_assert ();
-              return 0;
-            }
-
-          /* certificate was required 
-           */
-          if ((ret == GNUTLS_E_WARNING_ALERT_RECEIVED
-               || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
-              && optional == MANDATORY_PACKET)
-            {
-              gnutls_assert ();
-              return GNUTLS_E_NO_CERTIFICATE_FOUND;
-            }
-
-          return ret;
-        }
-
-      if (ret == 0 && datasize == 0 && optional == OPTIONAL_PACKET)
-        {
-          /* Client has not sent the certificate message.
-           * well I'm not sure we should accept this
-           * behaviour.
-           */
-          gnutls_assert ();
-          return 0;
-        }
-      ret =
-        session->internals.
-        auth_struct->gnutls_process_client_certificate (session, data,
-                                                        datasize);
-
-      gnutls_free (data);
-      if (ret < 0 && ret != GNUTLS_E_NO_CERTIFICATE_FOUND)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-
-      /* ok we should expect a certificate verify message now 
-       */
-      if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND && optional == OPTIONAL_PACKET)
-        ret = 0;
-      else
-        session->key->certificate_requested = 1;
-
+      return 0;
     }
 
+  if (session->internals.send_cert_req == GNUTLS_CERT_REQUIRE)
+    optional = MANDATORY_PACKET;
+  else
+    optional = OPTIONAL_PACKET;
+
+  ret =
+    _gnutls_recv_handshake (session, GNUTLS_HANDSHAKE_CERTIFICATE_PKT, 
+      optional, &buf);
+
+  if (ret < 0)
+    {
+      /* Handle the case of old SSL3 clients who send
+       * a warning alert instead of an empty certificate to indicate
+       * no certificate.
+       */
+      if (optional == OPTIONAL_PACKET &&
+          ret == GNUTLS_E_WARNING_ALERT_RECEIVED &&
+          gnutls_protocol_get_version (session) == GNUTLS_SSL3 &&
+          gnutls_alert_get (session) == GNUTLS_A_SSL3_NO_CERTIFICATE)
+        {
+
+          /* SSL3 does not send an empty certificate,
+           * but this alert. So we just ignore it.
+           */
+          gnutls_assert ();
+          return 0;
+        }
+
+      /* certificate was required 
+       */
+      if ((ret == GNUTLS_E_WARNING_ALERT_RECEIVED
+           || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
+          && optional == MANDATORY_PACKET)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_NO_CERTIFICATE_FOUND;
+        }
+
+      return ret;
+    }
+
+  if (ret == 0 && buf.length == 0 && optional == OPTIONAL_PACKET)
+    {
+      /* Client has not sent the certificate message.
+       * well I'm not sure we should accept this
+       * behaviour.
+       */
+      gnutls_assert ();
+      ret = 0;
+      goto cleanup;
+    }
+  ret =
+    session->internals.
+    auth_struct->gnutls_process_client_certificate (session, buf.data,
+                                                    buf.length);
+
+  if (ret < 0 && ret != GNUTLS_E_NO_CERTIFICATE_FOUND)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  /* ok we should expect a certificate verify message now 
+   */
+  if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND && optional == OPTIONAL_PACKET)
+    ret = 0;
+  else
+    session->key->certificate_requested = 1;
+
+cleanup:
+  _gnutls_buffer_clear(&buf);
   return ret;
 }
 
 int
 _gnutls_recv_server_certificate (gnutls_session_t session)
 {
-  int datasize;
-  opaque *data;
+  gnutls_buffer_st buf;
   int ret = 0;
 
   if (session->internals.auth_struct->gnutls_process_server_certificate !=
@@ -673,10 +665,9 @@ _gnutls_recv_server_certificate (gnutls_session_t session)
     {
 
       ret =
-        _gnutls_recv_handshake (session, &data,
-                                &datasize,
+        _gnutls_recv_handshake (session, 
                                 GNUTLS_HANDSHAKE_CERTIFICATE_PKT,
-                                MANDATORY_PACKET);
+                                MANDATORY_PACKET, &buf);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -685,9 +676,9 @@ _gnutls_recv_server_certificate (gnutls_session_t session)
 
       ret =
         session->internals.
-        auth_struct->gnutls_process_server_certificate (session, data,
-                                                        datasize);
-      gnutls_free (data);
+        auth_struct->gnutls_process_server_certificate (session, buf.data,
+                                                        buf.length);
+      _gnutls_buffer_clear(&buf);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -705,45 +696,41 @@ _gnutls_recv_server_certificate (gnutls_session_t session)
 int
 _gnutls_recv_client_certificate_verify_message (gnutls_session_t session)
 {
-  uint8_t *data;
-  int datasize;
+  gnutls_buffer_st buf;
   int ret = 0;
 
 
-  if (session->internals.auth_struct->gnutls_process_client_cert_vrfy != NULL)
+  if (session->internals.auth_struct->gnutls_process_client_cert_vrfy == NULL)
+    return 0;
+
+  if (session->internals.send_cert_req == 0 ||
+      session->key->certificate_requested == 0)
     {
-
-      if (session->internals.send_cert_req == 0 ||
-          session->key->certificate_requested == 0)
-        {
-          return 0;
-        }
-
-      ret =
-        _gnutls_recv_handshake (session, &data,
-                                &datasize,
-                                GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY,
-                                OPTIONAL_PACKET);
-      if (ret < 0)
-        return ret;
-
-      if (ret == 0 && datasize == 0
-          && session->internals.send_cert_req == GNUTLS_CERT_REQUIRE)
-        {
-          /* certificate was required */
-          gnutls_assert ();
-          return GNUTLS_E_NO_CERTIFICATE_FOUND;
-        }
-
-      ret =
-        session->internals.
-        auth_struct->gnutls_process_client_cert_vrfy (session, data,
-                                                      datasize);
-      gnutls_free (data);
-      if (ret < 0)
-        return ret;
-
+      return 0;
     }
 
+  ret =
+    _gnutls_recv_handshake (session, 
+                            GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY,
+                            OPTIONAL_PACKET, &buf);
+  if (ret < 0)
+    return ret;
+
+  if (ret == 0 && buf.length == 0
+      && session->internals.send_cert_req == GNUTLS_CERT_REQUIRE)
+    {
+      /* certificate was required */
+      gnutls_assert ();
+      ret = GNUTLS_E_NO_CERTIFICATE_FOUND;
+      goto cleanup;
+    }
+
+  ret =
+    session->internals.
+    auth_struct->gnutls_process_client_cert_vrfy (session, buf.data,
+                                                  buf.length);
+
+cleanup:
+  _gnutls_buffer_clear(&buf);
   return ret;
 }
