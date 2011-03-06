@@ -1216,7 +1216,6 @@ extern "C"
                                   gnutls_transport_ptr_t * recv_ptr,
                                   gnutls_transport_ptr_t * send_ptr);
 
-  void gnutls_transport_set_lowat (gnutls_session_t session, int num);
 
 
   void gnutls_transport_set_vec_push_function (gnutls_session_t session,
