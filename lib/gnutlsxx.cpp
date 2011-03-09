@@ -4,6 +4,11 @@
 
 #include <gnutls/gnutlsxx.h>
 
+extern "C" {
+void
+_gnutls_transport_set_lowat (gnutls_session_t session, int num);
+}
+
 namespace gnutls
 {
 
@@ -457,7 +462,7 @@ namespace gnutls
 
   void session::set_transport_lowat (size_t num)
   {
-    gnutls_transport_set_lowat (s, num);
+    _gnutls_transport_set_lowat(s, num);
   }
 
   void session::set_transport_push_function (gnutls_push_func push_func)

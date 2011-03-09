@@ -47,6 +47,9 @@
 #include <gnutls_state.h>
 #include <gnutls_dh.h>
 
+void
+_gnutls_transport_set_lowat (gnutls_session_t session, int num);
+
 /**
  * gnutls_protocol_get_version:
  * @session: is a #gnutls_session_t structure.
@@ -68,6 +71,15 @@ _gnutls_set_current_version (gnutls_session_t session,
   session->security_parameters.version = version;
 }
 
+/* Added to avoid issue in C++ interface not being able to
+ * call deprecated functions.
+ */
+void
+_gnutls_transport_set_lowat (gnutls_session_t session, int num)
+{
+  session->internals.lowat = num;
+}
+
 /**
  * gnutls_transport_set_lowat:
  * @session: is a #gnutls_session_t structure.
@@ -83,7 +95,7 @@ _gnutls_set_current_version (gnutls_session_t session,
 void
 gnutls_transport_set_lowat (gnutls_session_t session, int num)
 {
-  session->internals.lowat = num;
+  _gnutls_transport_set_lowat(session, num);
 }
 
 /**
