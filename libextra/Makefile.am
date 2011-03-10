@@ -89,6 +89,10 @@ libgnutls_extra_la_LDFLAGS = -no-undefined
 libgnutls_extra_la_SOURCES += \
 	ext_inner_application.h ext_inner_application.c gnutls_ia.c
 
+if !ENABLE_NETTLE
+libgnutls_extra_la_LIBADD += $(LTLIBGCRYPT)
+endif
+
 # Rest
 
 if HAVE_LD_OUTPUT_DEF
