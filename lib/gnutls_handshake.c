@@ -1354,6 +1354,10 @@ _gnutls_recv_handshake (gnutls_session_t session,
           if (buf) _gnutls_buffer_init(buf);
           return 0;
         }
+
+       _gnutls_audit_log("Received unexpected handshake message '%s' (%d). Expected '%s' (%d)\n",
+         _gnutls_handshake2str(hsk.htype), (int)hsk.htype, _gnutls_handshake2str(type), (int)type);
+
       return gnutls_assert_val(ret);
     }
 
@@ -1430,6 +1434,9 @@ _gnutls_recv_handshake (gnutls_session_t session,
       break;
     default:
       gnutls_assert ();
+      /* we shouldn't actually arrive here in any case .
+       * unexpected messages should be catched after _gnutls_handshake_io_recv_int()
+       */
       ret = GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET;
       goto cleanup;
     }

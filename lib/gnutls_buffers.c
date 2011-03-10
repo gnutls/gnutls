@@ -1008,7 +1008,10 @@ handshake_buffer_st* recv_buf = session->internals.handshake_recv_buffer;
         return gnutls_assert_val(GNUTLS_E_AGAIN);
 
       if (htype != recv_buf[LAST_ELEMENT].htype)
-        return gnutls_assert_val(GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET);
+        {
+          hsk->htype = recv_buf[LAST_ELEMENT].htype;
+          return gnutls_assert_val(GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET);
+        }
 
       else if ((recv_buf[LAST_ELEMENT].start_offset == 0 &&
         recv_buf[LAST_ELEMENT].end_offset == recv_buf[LAST_ELEMENT].length -1) || 
@@ -1017,7 +1020,6 @@ handshake_buffer_st* recv_buf = session->internals.handshake_recv_buffer;
           session->internals.dtls.hsk_read_seq++;
           _gnutls_handshake_buffer_move(hsk, &recv_buf[LAST_ELEMENT]);
           session->internals.handshake_recv_buffer_size--;
-
           return 0;
         }
       else
@@ -1027,11 +1029,18 @@ handshake_buffer_st* recv_buf = session->internals.handshake_recv_buffer;
     {
       if (session->internals.handshake_recv_buffer_size > 0 && recv_buf[0].length == recv_buf[0].data.length)
         {
+          if (recv_buf[0].htype != htype)
+            {
+              hsk->htype = recv_buf[LAST_ELEMENT].htype;
+              return gnutls_assert_val(GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET);
+            }
+
           _gnutls_handshake_buffer_move(hsk, &recv_buf[0]);
+          session->internals.handshake_recv_buffer_size--;
           return 0;
         }
       else
-        return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+        return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
     }
 }
 
@@ -1078,7 +1087,7 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
                 recv_buf[0].data.length;
 
           /* this is the rest of a previous message */
-          if (recv_buf[0].length > 0 && remain > 0)
+          if (session->internals.handshake_recv_buffer_size > 0 && recv_buf[0].length > 0 && remain > 0)
             {
               if (msg.size <= remain)
                 append = msg.size;
@@ -1100,11 +1109,6 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
               header_size = ret;
               session->internals.handshake_recv_buffer_size = 1;
 
-              if (htype != recv_buf[0].htype)
-                { /* an unexpected packet */
-                  return gnutls_assert_val(GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET);
-                }
-
               _mbuffer_set_uhead_size(bufel, header_size);
 
               data_size = MIN(recv_buf[0].length, _mbuffer_get_udata_size(bufel));
@@ -1113,6 +1117,13 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
                 return gnutls_assert_val(ret);
 
               _mbuffer_head_remove_bytes(&session->internals.record_buffer, data_size+header_size);
+
+              if (htype != recv_buf[0].htype)
+                { /* an unexpected packet */
+                  hsk->htype = recv_buf[0].htype;
+                  return gnutls_assert_val(GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET);
+                }
+
             }
 
           /* if packet is complete then return it
