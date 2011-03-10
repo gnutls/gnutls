@@ -64,7 +64,7 @@ libgnutls_openssl_la_SOURCES = gnutls_openssl.c openssl_compat.h	\
 libgnutls_openssl_la_LIBADD = ../lib/gl/liblgnu.la $(LIBSOCKET) \
 	../lib/libgnutls.la
 
-libgnutls_openssl_la_LDFLAGS += -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+libgnutls_openssl_la_LDFLAGS += -version-info $(LT_SSL_CURRENT):$(LT_SSL_REVISION):$(LT_SSL_AGE)
 
 if ENABLE_MINITASN1
 libgnutls_openssl_la_LIBADD += ../lib/minitasn1/libminitasn1.la
