@@ -84,6 +84,10 @@ endif
 libgnutls_extra_la_LIBADD = $(LIBSOCKET)
 libgnutls_extra_la_LDFLAGS = -no-undefined
 
+if !ENABLE_NETTLE
+libgnutls_extra_la_LIBADD += $(LTLIBGCRYPT)
+endif
+
 # Rest
 
 if HAVE_LD_OUTPUT_DEF
