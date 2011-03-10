@@ -519,7 +519,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 
       break;
     case CIPHER_BLOCK:
-      if ((ciphertext.size < blocksize+tag_size) || (ciphertext.size % blocksize != 0))
+      if (ciphertext.size < MAX(blocksize, tag_size) || (ciphertext.size % blocksize != 0))
         return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
       /* ignore the IV in TLS 1.1+
