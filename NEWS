@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.xx.y (unreleased)
 
+** libgnutls-openssl: modified to use modern gnutls' functions.
+This introduces an ABI incompatibility with previous versions.
+
 ** API and ABI modifications:
 No changes since last version.
 
