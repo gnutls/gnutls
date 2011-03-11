@@ -34,6 +34,9 @@ option (echo) { $http = 0 } "Act as an Echo Server."
 #int udp;
 option (udp) { $udp = 1 } "Enable UDP server instead of TCP."
 
+#int mtu;
+option (mtu) INT "integer" { $mtu = $1 } "Set MTU for datagram TLS."
+
 #char *dh_params_file;
 option (dhparams) STR "FILE" { $dh_params_file = $1 } "DH params file to use."
 
@@ -106,4 +109,4 @@ init { $generate=0; $port=5556; $http=0; $nodb = 0; $noticket = 0;
 	$pgp_keyring=NULL; $fmtder = 0;
 	$disable_client_cert = 0; $priorities = NULL;
 	$dh_params_file=NULL; $debug=0; $require_cert = 0; $psk_passwd = 0;
-	$pgp_subkey = NULL; $udp = 0; }
+	$pgp_subkey = NULL; $udp = 0; $mtu = 1300; }

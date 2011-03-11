@@ -54,7 +54,7 @@
 #define MAX_BUF 4096
 
 /* global stuff here */
-int resume, starttls, insecure, rehandshake, udp;
+int resume, starttls, insecure, rehandshake, udp, mtu;
 const char *hostname = NULL;
 char *service;
 int record_max_size;
@@ -553,9 +553,14 @@ init_tls_session (const char *hostname)
   gnutls_session_t session;
 
   if (udp)
-    gnutls_init_dtls (&session, GNUTLS_CLIENT, 0);
+    {
+      gnutls_init_dtls (&session, GNUTLS_CLIENT, 0);
+      if (mtu)
+        gnutls_dtls_set_mtu(session, mtu);
+    }
   else
     gnutls_init (&session, GNUTLS_CLIENT);
+
 
   if (gnutls_priority_set_direct (session, info.priorities, &err) < 0)
     {
@@ -979,6 +984,7 @@ gaa_parser (int argc, char **argv)
   rehandshake = info.rehandshake;
   insecure = info.insecure;
   udp = info.udp;
+  mtu = info.mtu;
   service = info.port;
   record_max_size = info.record_size;
   fingerprint = info.fingerprint;

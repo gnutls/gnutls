@@ -1097,7 +1097,7 @@ main (int argc, char **argv)
 #endif
 
   if (info.udp)
-    return udp_server(name, info.port);
+    return udp_server(name, info.port, info.mtu);
   else
     return tcp_server(name, info.port);
 }

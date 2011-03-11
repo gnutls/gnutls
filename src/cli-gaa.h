@@ -8,52 +8,54 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 103 "cli.gaa"
+#line 106 "cli.gaa"
 	char *rest_args;
-#line 95 "cli.gaa"
+#line 98 "cli.gaa"
 	int insecure;
-#line 92 "cli.gaa"
+#line 95 "cli.gaa"
 	char *port;
-#line 89 "cli.gaa"
+#line 92 "cli.gaa"
 	char *psk_key;
-#line 86 "cli.gaa"
+#line 89 "cli.gaa"
 	char *psk_username;
-#line 83 "cli.gaa"
+#line 86 "cli.gaa"
 	char *srp_passwd;
-#line 80 "cli.gaa"
+#line 83 "cli.gaa"
 	char *srp_username;
-#line 77 "cli.gaa"
+#line 80 "cli.gaa"
 	char *x509_certfile;
-#line 74 "cli.gaa"
+#line 77 "cli.gaa"
 	char *x509_keyfile;
-#line 71 "cli.gaa"
+#line 74 "cli.gaa"
 	char *pgp_subkey;
-#line 68 "cli.gaa"
+#line 71 "cli.gaa"
 	char *pgp_certfile;
-#line 65 "cli.gaa"
+#line 68 "cli.gaa"
 	char *pgp_keyring;
-#line 62 "cli.gaa"
+#line 65 "cli.gaa"
 	char *pgp_keyfile;
-#line 59 "cli.gaa"
+#line 62 "cli.gaa"
 	char *x509_crlfile;
-#line 56 "cli.gaa"
+#line 59 "cli.gaa"
 	char *x509_cafile;
-#line 53 "cli.gaa"
+#line 56 "cli.gaa"
 	char *priorities;
-#line 50 "cli.gaa"
+#line 53 "cli.gaa"
 	int verbose;
-#line 47 "cli.gaa"
+#line 50 "cli.gaa"
 	int record_size;
-#line 44 "cli.gaa"
+#line 47 "cli.gaa"
 	int print_cert;
-#line 41 "cli.gaa"
+#line 44 "cli.gaa"
 	int disable_extensions;
-#line 38 "cli.gaa"
+#line 41 "cli.gaa"
 	int fingerprint;
-#line 35 "cli.gaa"
+#line 38 "cli.gaa"
 	int fmtder;
-#line 32 "cli.gaa"
+#line 35 "cli.gaa"
 	int crlf;
+#line 32 "cli.gaa"
+	int mtu;
 #line 29 "cli.gaa"
 	int udp;
 #line 26 "cli.gaa"
