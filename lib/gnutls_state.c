@@ -402,7 +402,7 @@ gnutls_init_dtls (gnutls_session_t * session,
   (*session)->internals.dtls.mtu = DTLS_DEFAULT_MTU;
   (*session)->internals.transport = GNUTLS_DGRAM;
 
-  (*session)->internals.dtls.retrans_timeout = 800;
+  (*session)->internals.dtls.retrans_timeout = 1000;
   (*session)->internals.dtls.total_timeout = 60000;
 
   (*session)->internals.dtls.record_sw_size = 0;
