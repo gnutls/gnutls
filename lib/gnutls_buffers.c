@@ -923,6 +923,7 @@ static void _gnutls_handshake_buffer_move(handshake_buffer_st* dst, handshake_bu
 
 /* will merge the given handshake_buffer_st to the handshake_recv_buffer
  * list. The given hsk packet will be released in any case (success or failure).
+ * Only used in DTLS.
  */
 static int merge_handshake_packet(gnutls_session_t session, handshake_buffer_st* hsk)
 {
@@ -959,11 +960,14 @@ int ret;
         }
       
       session->internals.handshake_recv_buffer_size++;
-      _gnutls_handshake_buffer_move(&session->internals.handshake_recv_buffer[pos], hsk);
 
       /* rewrite headers to make them look as each packet came as a single fragment */
+      _gnutls_write_uint24(hsk->length, &hsk->header[1]);
       _gnutls_write_uint24(0, &hsk->header[6]);
       _gnutls_write_uint24(hsk->length, &hsk->header[9]);
+
+      _gnutls_handshake_buffer_move(&session->internals.handshake_recv_buffer[pos], hsk);
+
     }
   else
     {
