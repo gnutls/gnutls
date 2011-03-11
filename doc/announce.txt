@@ -167,7 +167,7 @@ and binary level.
 
 The following symbols have been added to the library:
 
-gnutls_transport_set_push_function2: ADDED
+gnutls_transport_set_vec_push_function: ADDED
 gnutls_x509_crl_get_raw_issuer_dn: ADDED
 gnutls_session_channel_binding: New function.
 gnutls_channel_binding_t: New enumeration.
