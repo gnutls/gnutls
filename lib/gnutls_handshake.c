@@ -1216,23 +1216,6 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
                          session, _gnutls_handshake2str (type),
                          (long) datasize);
 
-
-  /* If we send a second or more ClientHello due to a
-     HelloVerifyRequest, we only remember the last ClientHello
-     sent for hashing purposes. */
-  if (_gnutls_is_dtls(session)
-      && type == GNUTLS_HANDSHAKE_CLIENT_HELLO
-      && (session->internals.last_handshake_out == GNUTLS_HANDSHAKE_CLIENT_HELLO
-	  || session->internals.last_handshake_out == -1))
-    {
-      _gnutls_handshake_hash_buffers_clear (session);
-      if ((ret = _gnutls_handshake_hash_init (session)) < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-    }
-
   /* Here we keep the handshake messages in order to hash them...
    */
   if (type != GNUTLS_HANDSHAKE_HELLO_REQUEST)
@@ -1291,6 +1274,10 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
 {
   int ret;
 
+  if (recv_type == GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST ||
+      recv_type == GNUTLS_HANDSHAKE_HELLO_REQUEST)
+    return 0;
+
   /* The idea here is to hash the previous message we received,
    * and add the one we just received into the handshake_hash_buffer.
    */
@@ -1307,24 +1294,20 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
     }
 
   /* here we buffer the handshake messages - needed at Finished message */
-  if (recv_type != GNUTLS_HANDSHAKE_HELLO_REQUEST)
+  if ((ret =
+       _gnutls_handshake_buffer_put (session, header, header_size)) < 0)
     {
+      gnutls_assert ();
+      return ret;
+    }
 
+  if (datalen > 0)
+    {
       if ((ret =
-           _gnutls_handshake_buffer_put (session, header, header_size)) < 0)
+           _gnutls_handshake_buffer_put (session, dataptr, datalen)) < 0)
         {
           gnutls_assert ();
           return ret;
-        }
-
-      if (datalen > 0)
-        {
-          if ((ret =
-               _gnutls_handshake_buffer_put (session, dataptr, datalen)) < 0)
-            {
-              gnutls_assert ();
-              return ret;
-            }
         }
     }
 
@@ -1355,15 +1338,16 @@ _gnutls_recv_handshake (gnutls_session_t session,
           return 0;
         }
 
-       _gnutls_audit_log("Received unexpected handshake message '%s' (%d). Expected '%s' (%d)\n",
+       if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET)
+        _gnutls_audit_log("Received unexpected handshake message '%s' (%d). Expected '%s' (%d)\n",
          _gnutls_handshake2str(hsk.htype), (int)hsk.htype, _gnutls_handshake2str(type), (int)type);
 
       return gnutls_assert_val(ret);
     }
 
   ret = _gnutls_handshake_hash_add_recvd (session, hsk.htype,
-                                          hsk.header, hsk.header_size,
-                                          hsk.data.data, hsk.data.length);
+                                              hsk.header, hsk.header_size,
+                                              hsk.data.data, hsk.data.length);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -2242,6 +2226,7 @@ _gnutls_recv_hello_verify_request (gnutls_session_t session,
 {
   ssize_t len = datalen;
   size_t pos = 0;
+  int ret;
   uint8_t cookie_len;
   unsigned int nb_verifs;
 
@@ -2249,7 +2234,7 @@ _gnutls_recv_hello_verify_request (gnutls_session_t session,
       || session->security_parameters.entity == GNUTLS_SERVER)
     {
       gnutls_assert ();
-      return GNUTLS_E_UNEXPECTED_PACKET;
+      return GNUTLS_E_INTERNAL_ERROR;
     }
 
   nb_verifs = ++session->internals.dtls.hsk_hello_verify_requests;
@@ -2287,6 +2272,9 @@ _gnutls_recv_hello_verify_request (gnutls_session_t session,
       gnutls_assert ();
       return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
     }
+
+  /* reset handshake hash buffers */
+  _gnutls_handshake_buffer_empty (session);
 
   return 0;
 }
