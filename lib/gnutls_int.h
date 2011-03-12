@@ -646,9 +646,6 @@ typedef struct
   int last_handshake_in;
   int last_handshake_out;
 
-  /* this is the compression method we are going to use */
-  gnutls_compression_method_t compression_method;
-
   /* priorities */
   struct gnutls_priority_st priorities;
 

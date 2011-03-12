@@ -526,6 +526,18 @@ _gnutls_check_algos (gnutls_session_t session,
   return 0;
 }
 
+int _gnutls_epoch_get_compression(gnutls_session_t session, int epoch)
+{
+record_parameters_st *params;
+int ret;
+
+  ret = _gnutls_epoch_get (session, epoch, &params);
+  if (ret < 0)
+    return GNUTLS_COMP_UNKNOWN;
+
+  return params->compression_algorithm;
+}
+
 /* Initializes the read connection session
  * (read encrypted data)
  */
@@ -540,10 +552,11 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
    */
   if (session->internals.resumed == RESUME_FALSE)
     {
+
       ret = _gnutls_check_algos (session,
                                  &session->
                                  security_parameters.current_cipher_suite,
-                                 session->internals.compression_method);
+                                 _gnutls_epoch_get_compression(session, epoch_next));
       if (ret < 0)
         return ret;
 
@@ -591,7 +604,7 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
       ret = _gnutls_check_algos (session,
                                  &session->
                                  security_parameters.current_cipher_suite,
-                                 session->internals.compression_method);
+                                 _gnutls_epoch_get_compression(session, epoch_next));
       if (ret < 0)
         return ret;
 

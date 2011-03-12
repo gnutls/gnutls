@@ -1045,8 +1045,6 @@ _gnutls_server_select_comp_method (gnutls_session_t session,
       return x;
     }
 
-  session->internals.compression_method = 0;
-
   for (j = 0; j < datalen; j++)
     {
       for (i = 0; i < x; i++)
@@ -1056,15 +1054,13 @@ _gnutls_server_select_comp_method (gnutls_session_t session,
               gnutls_compression_method_t method =
                 _gnutls_compression_get_id (comps[i]);
 
-              session->internals.compression_method = method;
               gnutls_free (comps);
 
               _gnutls_epoch_set_compression (session, EPOCH_NEXT, method);
 
               _gnutls_handshake_log
                 ("HSK[%p]: Selected Compression Method: %s\n", session,
-                 gnutls_compression_get_name (session->
-                                              internals.compression_method));
+                 gnutls_compression_get_name (method));
 
 
               return 0;
@@ -1553,10 +1549,7 @@ _gnutls_client_set_comp_method (gnutls_session_t session, opaque comp_method)
       return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
     }
 
-  session->internals.compression_method =
-    _gnutls_compression_get_id (comp_method);
-  _gnutls_epoch_set_compression (session, EPOCH_NEXT,
-                                 session->internals.compression_method);
+  _gnutls_epoch_set_compression (session, EPOCH_NEXT, _gnutls_compression_get_id(comp_method));
 
   return 0;
 }
@@ -2142,10 +2135,9 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
       pos += 2;
 
       comp =
-        (uint8_t) _gnutls_compression_get_num (session->internals.
-                                               compression_method);
+        (uint8_t) _gnutls_compression_get_num ( 
+         _gnutls_epoch_get_compression (session, session->security_parameters.epoch_next));
       data[pos++] = comp;
-
 
       if (extdata.length > 0)
         {
