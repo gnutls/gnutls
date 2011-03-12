@@ -42,6 +42,7 @@
 #include "gnutls_extensions.h"
 #include "gnutls_auth.h"
 #include "gnutls_v2_compat.h"
+#include "gnutls_constate.h"
 
 /* This selects the best supported ciphersuite from the ones provided */
 static int
@@ -253,6 +254,7 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
     }
 
   session->internals.compression_method = GNUTLS_COMP_NULL;
+  _gnutls_epoch_set_compression (session, EPOCH_NEXT, session->internals.compression_method);
 
   return 0;
 }
