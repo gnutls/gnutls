@@ -61,6 +61,7 @@ static const gnutls_alert_entry sup_alerts[] = {
   {GNUTLS_A_PROTOCOL_VERSION, N_("Error in protocol version")},
   {GNUTLS_A_INSUFFICIENT_SECURITY, N_("Insufficient security")},
   {GNUTLS_A_USER_CANCELED, N_("User canceled")},
+  {GNUTLS_A_SSL3_NO_CERTIFICATE, N_("No certificate (SSL 3.0)")},
   {GNUTLS_A_INTERNAL_ERROR, N_("Internal error")},
   {GNUTLS_A_NO_RENEGOTIATION, N_("No renegotiation is allowed")},
   {GNUTLS_A_CERTIFICATE_UNOBTAINABLE,
