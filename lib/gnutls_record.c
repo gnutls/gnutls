@@ -316,7 +316,7 @@ copy_record_version (gnutls_session_t session,
 {
   gnutls_protocol_t lver;
 
-  if (htype != GNUTLS_HANDSHAKE_CLIENT_HELLO
+  if (session->internals.initial_negotiation_completed || htype != GNUTLS_HANDSHAKE_CLIENT_HELLO
       || session->internals.default_record_version[0] == 0)
     {
       lver = gnutls_protocol_get_version (session);
