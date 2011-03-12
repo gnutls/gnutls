@@ -742,10 +742,10 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
             }
           else if (strcasecmp (&broken_list[i][1],
                                "SSL3_RECORD_VERSION") == 0)
-            (*priority_cache)->no_ssl3_record_version = 0;
+            (*priority_cache)->ssl3_record_version = 1;
           else if (strcasecmp (&broken_list[i][1],
                                "LATEST_RECORD_VERSION") == 0)
-            (*priority_cache)->no_ssl3_record_version = 1;
+            (*priority_cache)->ssl3_record_version = 0;
           else if (strcasecmp (&broken_list[i][1],
                                "VERIFY_ALLOW_X509_V1_CA_CRT") == 0)
             (*priority_cache)->additional_verify_flags |=

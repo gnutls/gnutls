@@ -1958,7 +1958,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
       _gnutls_set_adv_version (session, hver);
       _gnutls_set_current_version (session, hver);
 
-      if (session->internals.priorities.no_ssl3_record_version != 0)
+      if (session->internals.priorities.ssl3_record_version != 0)
         {
           /* Advertize the SSL 3.0 record packet version in
            * record packets during the handshake.
