@@ -75,6 +75,9 @@ _gnutls_handshake2str (gnutls_handshake_description_t handshake)
     case GNUTLS_HANDSHAKE_CLIENT_HELLO:
       return "CLIENT HELLO";
       break;
+    case GNUTLS_HANDSHAKE_CLIENT_HELLO_V2:
+      return "SSL2 CLIENT HELLO";
+      break;
     case GNUTLS_HANDSHAKE_SERVER_HELLO:
       return "SERVER HELLO";
       break;

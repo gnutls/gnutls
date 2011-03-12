@@ -349,17 +349,11 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
   ret = _gnutls_epoch_get (session, epoch_rel, &record_params);
   if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+    return gnutls_assert_val(ret);
 
   /* Safeguard against processing data with an incomplete cipher state. */
   if (!record_params->initialized)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
   record_state = &record_params->write;
 
@@ -782,7 +776,7 @@ record_read_headers (gnutls_session_t session,
       record->length = (((headers[0] & 0x7f) << 8)) | headers[1];
 
       /* SSL 2.0 headers */
-      record->header_size = 2;
+      record->header_size = record->packet_size = 2;
       record->type = GNUTLS_HANDSHAKE;    /* we accept only v2 client hello
                                          */
 

@@ -745,14 +745,13 @@ parse_handshake_header (gnutls_session_t session, mbuffer_st* bufel, gnutls_hand
     return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
   dataptr = _mbuffer_get_udata_ptr(bufel);
-
   /* if reading a client hello of SSLv2 */
   if (!IS_DTLS(session) && htype == GNUTLS_HANDSHAKE_CLIENT_HELLO &&
     bufel->htype == GNUTLS_HANDSHAKE_CLIENT_HELLO_V2)
     {
-      hsk->length = _mbuffer_get_udata_size(bufel) - SSL2_HEADERS;    /* we've read the first byte */
-
       handshake_header_size = SSL2_HEADERS; /* we've already read one byte */
+
+      hsk->length = _mbuffer_get_udata_size(bufel) - handshake_header_size;    /* we've read the first byte */
 
       if (dataptr[0] != GNUTLS_HANDSHAKE_CLIENT_HELLO)
         return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
@@ -892,6 +891,17 @@ int ret;
   return 0;
 }
 
+/* returns non-zero on match and zero on mismatch
+ */
+inline static int cmp_hsk_types(gnutls_handshake_description_t expected, gnutls_handshake_description_t recvd)
+{
+  if ((expected != GNUTLS_HANDSHAKE_CLIENT_HELLO || recvd != GNUTLS_HANDSHAKE_CLIENT_HELLO_V2) &&
+        (expected != recvd))
+    return 0;
+  
+  return 1; 
+}
+
 #define LAST_ELEMENT (session->internals.handshake_recv_buffer_size-1)
 
 /* returns the last stored handshake packet.
@@ -929,7 +939,7 @@ handshake_buffer_st* recv_buf = session->internals.handshake_recv_buffer;
     {
       if (session->internals.handshake_recv_buffer_size > 0 && recv_buf[0].length == recv_buf[0].data.length)
         {
-          if (recv_buf[0].htype != htype)
+          if (cmp_hsk_types(htype, recv_buf[0].htype) == 0)
             {
               hsk->htype = recv_buf[LAST_ELEMENT].htype;
               return gnutls_assert_val(GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET);
@@ -940,15 +950,15 @@ handshake_buffer_st* recv_buf = session->internals.handshake_recv_buffer;
           return 0;
         }
       else
-        return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+        return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
     }
 }
 
 /* This is a receive function for the gnutls handshake 
  * protocol. Makes sure that we have received all data.
  */
-ssize_t
-_gnutls_handshake_io_recv_int (gnutls_session_t session,
+static int
+parse_record_buffered_msgs (gnutls_session_t session,
                                gnutls_handshake_description_t htype,
                                handshake_buffer_st * hsk)
 {
@@ -958,19 +968,9 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
   size_t data_size;
   handshake_buffer_st* recv_buf = session->internals.handshake_recv_buffer;
 
-  ret = get_last_packet(session, htype, hsk);
-  if (ret >= 0)
-    return ret;
-
-  /* if we don't have a complete message waiting for us, try 
-   * receiving more */
-  ret = _gnutls_recv_in_buffers(session, GNUTLS_HANDSHAKE, htype);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
-
   bufel = _mbuffer_head_get_first(&session->internals.record_buffer, &msg);
   if (bufel == NULL)
-    return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+    return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
 
   if (!IS_DTLS(session))
     {
@@ -1018,7 +1018,8 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
 
               _mbuffer_head_remove_bytes(&session->internals.record_buffer, data_size+header_size);
 
-              if (htype != recv_buf[0].htype)
+
+              if (cmp_hsk_types(htype, recv_buf[0].htype) == 0)
                 { /* an unexpected packet */
                   hsk->htype = recv_buf[0].htype;
                   return gnutls_assert_val(GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET);
@@ -1115,6 +1116,40 @@ next:
 
         return get_last_packet(session, htype, hsk);
     }
+}
+
+/* This is a receive function for the gnutls handshake 
+ * protocol. Makes sure that we have received all data.
+ */
+ssize_t
+_gnutls_handshake_io_recv_int (gnutls_session_t session,
+                               gnutls_handshake_description_t htype,
+                               handshake_buffer_st * hsk)
+{
+  gnutls_datum_t msg;
+  mbuffer_st* bufel = NULL, *prev = NULL;
+  int ret;
+  size_t data_size;
+  handshake_buffer_st* recv_buf = session->internals.handshake_recv_buffer;
+
+  ret = get_last_packet(session, htype, hsk);
+  if (ret >= 0)
+    return ret;
+
+  /* try using the already existing records before
+   * trying to receive.
+   */
+  ret = parse_record_buffered_msgs(session, htype, hsk);
+  if (ret >= 0)
+    return ret;
+
+  /* if we don't have a complete message waiting for us, try 
+   * receiving more */
+  ret = _gnutls_recv_in_buffers(session, GNUTLS_HANDSHAKE, htype);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  return parse_record_buffered_msgs(session, htype, hsk); 
 }
 
 /* Buffer for handshake packets. Keeps the packets in order

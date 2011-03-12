@@ -1045,8 +1045,7 @@ _gnutls_server_select_comp_method (gnutls_session_t session,
       return x;
     }
 
-  memset (&session->internals.compression_method, 0,
-          sizeof (gnutls_compression_method_t));
+  session->internals.compression_method = 0;
 
   for (j = 0; j < datalen; j++)
     {
@@ -1284,7 +1283,7 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
   if ((session->security_parameters.entity == GNUTLS_SERVER
        || recv_type != GNUTLS_HANDSHAKE_SERVER_HELLO)
       && (session->security_parameters.entity == GNUTLS_CLIENT
-          || recv_type != GNUTLS_HANDSHAKE_CLIENT_HELLO))
+          || (recv_type != GNUTLS_HANDSHAKE_CLIENT_HELLO && recv_type != GNUTLS_HANDSHAKE_CLIENT_HELLO_V2)))
     {
       if ((ret = _gnutls_handshake_hash_pending (session)) < 0)
         {
@@ -2571,10 +2570,7 @@ gnutls_handshake (gnutls_session_t session)
         _gnutls_epoch_alloc (session, session->security_parameters.epoch_next,
                              NULL);
       if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
+        return gnutls_assert_val(ret);
     }
 
   if (session->security_parameters.entity == GNUTLS_CLIENT)

@@ -675,7 +675,7 @@ epoch_get_slot (gnutls_session_t session, uint16_t epoch)
 
   if (epoch_index >= MAX_EPOCH_INDEX)
     {
-      _gnutls_dtls_log("Epoch %d out of range (idx: %d, max: %d)\n", (int)epoch, (int)epoch_index, MAX_EPOCH_INDEX);
+      _gnutls_handshake_log("Epoch %d out of range (idx: %d, max: %d)\n", (int)epoch, (int)epoch_index, MAX_EPOCH_INDEX);
       gnutls_assert ();
       return NULL;
     }
