@@ -127,7 +127,7 @@ _gnutls_encrypt (gnutls_session_t session, const opaque * headers,
   /* copy the headers */
   memcpy (ciphertext, headers, headers_size);
   
-  if(_gnutls_is_dtls(session))
+  if(IS_DTLS(session))
     _gnutls_write_uint16 (ret, &ciphertext[11]);
   else
     _gnutls_write_uint16 (ret, &ciphertext[3]);

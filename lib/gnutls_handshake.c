@@ -513,7 +513,7 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
       session->internals.resumed = RESUME_FALSE;
     }
 
-  if (_gnutls_is_dtls(session))
+  if (IS_DTLS(session))
    {
      int cookie_size;
 
@@ -1197,7 +1197,7 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
    * fragmented later by the fragmentation sub-layer. All fields must
    * be set properly for HMAC. The HMAC requires we pretend that the
    * message was sent in a single fragment. */
-  if (_gnutls_is_dtls(session))
+  if (IS_DTLS(session))
     {
       _gnutls_write_uint16 (session->internals.dtls.hsk_write_seq++, &data[pos]);
       pos += 2;
@@ -1904,7 +1904,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 
   if (again == 0)
     {
-      if(_gnutls_is_dtls(session))
+      if(IS_DTLS(session))
         {
           cookie_len = session->internals.dtls.cookie_len + 1;
         }
@@ -1974,7 +1974,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 
       /* Generate random data 
        */
-      if (!_gnutls_is_dtls (session)
+      if (!IS_DTLS (session)
         || session->internals.dtls.hsk_hello_verify_requests == 0)
         {
           _gnutls_tls_create_random (rnd);
@@ -2001,7 +2001,7 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 
       /* Copy the DTLS cookie
        */
-      if (_gnutls_is_dtls(session))
+      if (IS_DTLS(session))
         {
           data[pos++] = session->internals.dtls.cookie_len;
           memcpy(&data[pos], &session->internals.dtls.cookie, session->internals.dtls.cookie_len);
@@ -2228,7 +2228,7 @@ _gnutls_recv_hello_verify_request (gnutls_session_t session,
   uint8_t cookie_len;
   unsigned int nb_verifs;
 
-  if (!_gnutls_is_dtls (session)
+  if (!IS_DTLS (session)
       || session->security_parameters.entity == GNUTLS_SERVER)
     {
       gnutls_assert ();
@@ -2660,7 +2660,7 @@ _gnutls_handshake_client (gnutls_session_t session)
       IMED_RET ("send hello", ret, 1);
 
     case STATE11:
-      if (_gnutls_is_dtls (session))
+      if (IS_DTLS (session))
         {
           ret =
             _gnutls_recv_handshake (session, 

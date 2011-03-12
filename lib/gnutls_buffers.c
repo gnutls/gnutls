@@ -315,7 +315,7 @@ static ssize_t
 _gnutls_read (gnutls_session_t session, mbuffer_st **bufel,
 	      size_t size, gnutls_pull_func pull_func)
 {
-  if (_gnutls_is_dtls (session))
+  if (IS_DTLS (session))
     /* Size is not passed, since a whole datagram will be read. */
     return _gnutls_dgram_read (session, bufel, pull_func);
   else
@@ -482,7 +482,7 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
       return 0;
     }
 
-  if(_gnutls_is_dtls(session))
+  if(IS_DTLS(session))
     ret = MIN(total, session->internals.record_recv_buffer.byte_length);
   else
     ret = session->internals.record_recv_buffer.byte_length;

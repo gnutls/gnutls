@@ -307,7 +307,7 @@ inline static int
 sequence_increment (gnutls_session_t session,
 		    uint64 * value)
 {
-  if (_gnutls_is_dtls(session))
+  if (IS_DTLS(session))
     {
       return _gnutls_uint48pp(value);
     }

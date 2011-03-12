@@ -730,7 +730,7 @@ _gnutls_epoch_alloc (gnutls_session_t session, uint16_t epoch,
   (*slot)->mac_algorithm = GNUTLS_MAC_UNKNOWN;
   (*slot)->compression_algorithm = GNUTLS_COMP_UNKNOWN;
 
-  if (_gnutls_is_dtls (session))
+  if (IS_DTLS (session))
     _gnutls_write_uint16 (epoch, UINT64DATA((*slot)->write.sequence_number));
 
   if (out != NULL)
