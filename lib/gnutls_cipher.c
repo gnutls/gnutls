@@ -550,7 +550,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
         return gnutls_assert_val(ret);
 
       pad = ciphertext.data[ciphertext.size - 1] + 1;   /* pad */
-
+      
       if ((int) pad > (int) ciphertext.size - tag_size)
         {
           gnutls_assert ();
@@ -567,7 +567,7 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
 
       /* Check the pading bytes (TLS 1.x)
        */
-      if (_gnutls_version_has_variable_padding (ver) && pad_failed == 0)
+      if (ver != GNUTLS_SSL3 && pad_failed == 0)
         for (i = 2; i < pad; i++)
           {
             if (ciphertext.data[ciphertext.size - i] !=

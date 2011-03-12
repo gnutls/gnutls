@@ -291,7 +291,7 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
 }
 
 static int
-_gnutls_init_record_state (record_parameters_st * params, int ver, int d,
+_gnutls_init_record_state (record_parameters_st * params, gnutls_protocol_t ver, int d,
                            record_state_st * state)
 {
   int ret;
@@ -402,7 +402,7 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
   gnutls_compression_method_t comp_algo;
   record_parameters_st *params;
   int ret;
-  int ver = gnutls_protocol_get_version (session);
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
   ret = _gnutls_epoch_get (session, epoch, &params);
   if (ret < 0)

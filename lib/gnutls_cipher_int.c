@@ -255,7 +255,7 @@ int ret = 0;
           if (ret < 0)
             return gnutls_assert_val(ret);
 
-          _gnutls_hash_reset (&handle->mac);
+          _gnutls_mac_reset_ssl3 (&handle->mac);
         }
       else
         {

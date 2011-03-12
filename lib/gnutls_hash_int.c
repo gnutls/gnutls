@@ -322,6 +322,25 @@ _gnutls_mac_init_ssl3 (digest_hd_st * ret, gnutls_mac_algorithm_t algorithm,
   return 0;
 }
 
+void
+_gnutls_mac_reset_ssl3 (digest_hd_st * handle)
+{
+  opaque ipad[48];
+  int padsize;
+
+  padsize = get_padsize (handle->algorithm);
+
+  memset (ipad, 0x36, padsize);
+
+  _gnutls_hash_reset(handle);
+
+  if (handle->keysize > 0)
+    _gnutls_hash (handle, handle->key, handle->keysize);
+  _gnutls_hash (handle, ipad, padsize);
+
+  return;
+}
+
 int 
 _gnutls_mac_output_ssl3 (digest_hd_st * handle, void *digest)
 {
