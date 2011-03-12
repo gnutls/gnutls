@@ -1111,7 +1111,7 @@ parse_pem_ca_mem (gnutls_certificate_credentials_t res,
 {
   gnutls_x509_crt_t *x509_cert_list;
   unsigned int x509_ncerts;
-  gnutls_datum tmp;
+  gnutls_datum_t tmp;
   int ret;
 
   tmp.data = (void*)input_cert;
@@ -1151,7 +1151,7 @@ parse_der_ca_mem (gnutls_certificate_credentials_t res,
                   const void *input_cert, int input_cert_size)
 {
   gnutls_x509_crt_t crt;
-  gnutls_datum tmp;
+  gnutls_datum_t tmp;
   int ret;
 
   tmp.data = (void*)input_cert;
@@ -1362,7 +1362,7 @@ parse_pem_crl_mem (gnutls_x509_trust_list_t tlist,
 {
   gnutls_x509_crl_t *x509_crl_list;
   unsigned int x509_ncrls;
-  gnutls_datum tmp;
+  gnutls_datum_t tmp;
   int ret;
 
   tmp.data = (void*)input_crl;
@@ -1396,7 +1396,7 @@ parse_der_crl_mem (gnutls_x509_trust_list_t tlist,
                    const void *input_crl, int input_crl_size)
 {
   gnutls_x509_crl_t crl;
-  gnutls_datum tmp;
+  gnutls_datum_t tmp;
   int ret;
 
   tmp.data = (void*)input_crl;

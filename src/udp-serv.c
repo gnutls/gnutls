@@ -15,7 +15,7 @@ typedef struct {
   socklen_t cli_addr_size;
 } priv_data_st;
 
-static int pull_timeout_func(gnutls_transport_ptr ptr, void* data, size_t data_size, unsigned int ms);
+static int pull_timeout_func(gnutls_transport_ptr_t ptr, void* data, size_t data_size, unsigned int ms);
 static ssize_t push_func (gnutls_transport_ptr_t p, const void * data, size_t size);
 static ssize_t pull_func(gnutls_transport_ptr_t p, void * data, size_t size);
 
@@ -111,7 +111,7 @@ int udp_server(const char* name, int port, int mtu)
 
 /* Wait for data to be received within a timeout period in milliseconds
  */
-static int pull_timeout_func(gnutls_transport_ptr ptr, void* data, size_t data_size, unsigned int ms)
+static int pull_timeout_func(gnutls_transport_ptr_t ptr, void* data, size_t data_size, unsigned int ms)
 {
 fd_set rfds;
 struct timeval tv;

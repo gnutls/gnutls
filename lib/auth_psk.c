@@ -130,7 +130,7 @@ error:
  * Free is non zero if they have to be freed.
  */
 int _gnutls_find_psk_key( gnutls_session_t session, gnutls_psk_client_credentials_t cred, 
-  gnutls_datum_t * username, gnutls_datum* key, int* free)
+  gnutls_datum_t * username, gnutls_datum_t* key, int* free)
 {
 char* user_p;
 int ret;

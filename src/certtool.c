@@ -60,7 +60,7 @@ void generate_pkcs12 (common_info_st *);
 void generate_pkcs8 (common_info_st *);
 static void verify_chain (void);
 void verify_crl (common_info_st * cinfo);
-void pubkey_info (gnutls_x509_crt crt, common_info_st *);
+void pubkey_info (gnutls_x509_crt_t crt, common_info_st *);
 void pgp_privkey_info (void);
 void pgp_ring_info (void);
 void certificate_info (int, common_info_st *);
@@ -764,7 +764,7 @@ generate_crl (gnutls_x509_crt_t ca_crt, common_info_st * cinfo)
 }
 
 static gnutls_digest_algorithm_t
-get_dig (gnutls_x509_crt crt)
+get_dig (gnutls_x509_crt_t crt)
 {
   gnutls_digest_algorithm_t dig;
   gnutls_pubkey_t pubkey;
@@ -1969,7 +1969,7 @@ static int detailed_verification(gnutls_x509_crt_t cert,
 
   if (crl != NULL)
     {
-      gnutls_datum data;
+      gnutls_datum_t data;
 
       issuer_name_size = sizeof (issuer_name);
       ret =
@@ -2855,7 +2855,7 @@ print_key_usage (FILE * outfile, unsigned int usage)
 }
 
 void
-pubkey_info (gnutls_x509_crt crt, common_info_st * cinfo)
+pubkey_info (gnutls_x509_crt_t crt, common_info_st * cinfo)
 {
   gnutls_pubkey_t pubkey;
   unsigned int bits, usage;

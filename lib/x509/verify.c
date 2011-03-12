@@ -935,7 +935,7 @@ _gnutls_dsa_q_to_hash (bigint_t q)
 int
 _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
                                const gnutls_datum_t * signature,
-                               gnutls_pk_algorithm pk,
+                               gnutls_pk_algorithm_t pk,
                                bigint_t * issuer_params,
                                unsigned int issuer_params_size)
 {

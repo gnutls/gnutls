@@ -46,7 +46,7 @@ struct gnutls_pkcs11_obj_st
 
   /* only when pubkey */
   gnutls_datum_t pubkey[MAX_PUBLIC_PARAMS_SIZE];
-  gnutls_pk_algorithm pk_algorithm;
+  gnutls_pk_algorithm_t pk_algorithm;
   unsigned int key_usage;
 };
 

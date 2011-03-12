@@ -490,7 +490,7 @@ print_info (gnutls_session_t session, const char *hostname, int insecure)
 
   if (verbose)
     {
-      gnutls_datum cb;
+      gnutls_datum_t cb;
       int rc;
 
       rc =

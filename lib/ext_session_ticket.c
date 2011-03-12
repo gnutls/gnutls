@@ -440,7 +440,7 @@ session_ticket_unpack (gnutls_buffer_st * ps, extension_priv_data_t * _priv)
   session_ticket_ext_st *priv = NULL;
   int ret;
   extension_priv_data_t epriv;
-  gnutls_datum ticket;
+  gnutls_datum_t ticket;
 
   priv = gnutls_calloc (1, sizeof (*priv));
   if (priv == NULL)

@@ -213,7 +213,7 @@ _gnutls_get_asn_mpis (ASN1_TYPE asn, const char *root,
   int result;
   char name[256];
   gnutls_datum_t tmp = { NULL, 0 };
-  gnutls_pk_algorithm pk_algorithm;
+  gnutls_pk_algorithm_t pk_algorithm;
 
   result = _gnutls_x509_get_pk_algorithm (asn, root, NULL);
   if (result < 0)

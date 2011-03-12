@@ -78,13 +78,13 @@ system_write (gnutls_transport_ptr ptr, const void *data, size_t data_size)
 }
 #else /* POSIX */
 int
-system_errno (gnutls_transport_ptr ptr)
+system_errno (gnutls_transport_ptr_t ptr)
 {
   return errno;
 }
 
 ssize_t
-system_writev (gnutls_transport_ptr ptr, const giovec_t * iovec,
+system_writev (gnutls_transport_ptr_t ptr, const giovec_t * iovec,
                int iovec_cnt)
 {
   return writev (GNUTLS_POINTER_TO_INT (ptr), (struct iovec *) iovec,
@@ -94,13 +94,13 @@ system_writev (gnutls_transport_ptr ptr, const giovec_t * iovec,
 #endif
 
 ssize_t
-system_read (gnutls_transport_ptr ptr, void *data, size_t data_size)
+system_read (gnutls_transport_ptr_t ptr, void *data, size_t data_size)
 {
   return recv (GNUTLS_POINTER_TO_INT (ptr), data, data_size, 0);
 }
 
 ssize_t
-system_read_peek (gnutls_transport_ptr ptr, void *data, size_t data_size)
+system_read_peek (gnutls_transport_ptr_t ptr, void *data, size_t data_size)
 {
   return recv (GNUTLS_POINTER_TO_INT (ptr), data, data_size, MSG_PEEK);
 }
@@ -109,7 +109,7 @@ system_read_peek (gnutls_transport_ptr ptr, void *data, size_t data_size)
  * If data_size > 0 it will return the specified amount of data in
  * peek mode.
  */
-int system_recv_timeout(gnutls_transport_ptr ptr, void* data, size_t data_size, unsigned int ms)
+int system_recv_timeout(gnutls_transport_ptr_t ptr, void* data, size_t data_size, unsigned int ms)
 {
 fd_set rfds;
 struct timeval tv;

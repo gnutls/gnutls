@@ -224,7 +224,7 @@ _gnutls_srp_unpack (gnutls_buffer_st * ps, extension_priv_data_t * _priv)
   srp_ext_st *priv;
   int ret;
   extension_priv_data_t epriv;
-  gnutls_datum username = { NULL, 0 }, password =
+  gnutls_datum_t username = { NULL, 0 }, password =
   {
   NULL, 0};
 

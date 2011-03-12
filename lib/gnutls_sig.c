@@ -929,7 +929,7 @@ pk_prepare_hash (gnutls_pk_algorithm_t pk,
                  gnutls_digest_algorithm_t hash, gnutls_datum_t * digest)
 {
   int ret;
-  gnutls_datum old_digest = { digest->data, digest->size };
+  gnutls_datum_t old_digest = { digest->data, digest->size };
 
   switch (pk)
     {

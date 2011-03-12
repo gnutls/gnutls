@@ -394,7 +394,7 @@ pkcs11_export (FILE * outfile, const char *url, unsigned int login,
       break;
     default:
       {
-        gnutls_datum data, enc;
+        gnutls_datum_t data, enc;
 
         size = buffer_size;
         ret = gnutls_pkcs11_obj_export (crt, buffer, &size);
