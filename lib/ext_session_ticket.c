@@ -716,7 +716,7 @@ _gnutls_recv_new_session_ticket (gnutls_session_t session)
                                 GNUTLS_HANDSHAKE_NEW_SESSION_TICKET,
                                 MANDATORY_PACKET, &buf);
   if (ret < 0)
-    return gnutls_assert_val(ret);
+    return gnutls_assert_val_fatal(ret);
 
   p = buf.data;
   data_size = buf.length;
