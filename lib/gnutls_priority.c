@@ -537,6 +537,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
    * when we make it the default.
    */
   (*priority_cache)->sr = SR_PARTIAL;
+  (*priority_cache)->ssl3_record_version = 1;
 
   if (priorities == NULL)
     priorities = "NORMAL";
