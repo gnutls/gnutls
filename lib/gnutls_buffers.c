@@ -574,8 +574,7 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
 
   if (ret > 0 && ret < recvlowat)
     {
-      gnutls_assert ();
-      return GNUTLS_E_AGAIN;
+      return gnutls_assert_val(GNUTLS_E_AGAIN);
     }
 
   if (ret == 0)
@@ -592,8 +591,7 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
   if ((ret > 0) && ((size_t) ret < total))
     {
       /* Short Read */
-      gnutls_assert ();
-      return GNUTLS_E_AGAIN;
+      return gnutls_assert_val(GNUTLS_E_AGAIN);
     }
   else
     {
@@ -694,8 +692,7 @@ _gnutls_io_write_flush (gnutls_session_t session)
 
   if (sent < tosend)
     {
-      gnutls_assert ();
-      return GNUTLS_E_AGAIN;
+      return gnutls_assert_val(GNUTLS_E_AGAIN);
     }
 
   return sent;

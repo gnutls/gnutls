@@ -870,16 +870,12 @@ gnutls_datum_t raw; /* raw headers */
       if (gnutls_error_is_fatal (ret) == 0)
         return ret;
 
-      gnutls_assert();
-      return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+      return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
     }
 
   ret = _mbuffer_linearize (&session->internals.record_recv_buffer);
   if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+    return gnutls_assert_val(ret);
 
   _mbuffer_head_get_first (&session->internals.record_recv_buffer, &raw);
   if (raw.size < RECORD_HEADER_SIZE(session))
@@ -907,26 +903,19 @@ gnutls_datum_t raw; /* raw headers */
    * ok. 
    */
   if ((ret = check_recv_type (record->type)) < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+    return gnutls_assert_val(ret);
 
   /* Here we check if the advertized version is the one we
    * negotiated in the handshake.
    */
   if ((ret = record_check_version (session, htype, record->version)) < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+    return gnutls_assert_val(ret);
 
   if (record->length > MAX_RECV_SIZE(session))
     {
       _gnutls_audit_log
         ("Received packet with illegal length: %u\n", (unsigned int)record->length);
-      gnutls_assert ();
-      return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+      return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
     }
 
   _gnutls_record_log
@@ -976,10 +965,7 @@ begin:
     }
   else if (session_is_valid (session) != 0
            || session->internals.may_not_read != 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_SESSION;
-    }
+    return gnutls_assert_val(GNUTLS_E_INVALID_SESSION);
 
   /* get the record state parameters */
   ret = _gnutls_epoch_get (session, EPOCH_READ_CURRENT, &record_params);
@@ -1120,14 +1106,14 @@ discard:
   /* discard the whole received fragment. */
   bufel = _mbuffer_head_pop_first(&session->internals.record_recv_buffer);
   _mbuffer_xfree(&bufel);
-  return GNUTLS_E_AGAIN;
+  return gnutls_assert_val(GNUTLS_E_AGAIN);
 
 sanity_check_error:
   if (IS_DTLS(session))
     {
       _gnutls_audit_log("Discarded message[%u] due to invalid decryption\n", 
             (unsigned int)_gnutls_uint64touint32 (packet_sequence));
-      ret = GNUTLS_E_AGAIN;
+      ret = gnutls_assert_val(GNUTLS_E_AGAIN);
       goto cleanup;
     }
 
