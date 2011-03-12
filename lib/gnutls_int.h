@@ -441,7 +441,7 @@ typedef struct
  */
 typedef struct
 {
-  gnutls_connection_end_t entity;
+  int entity; /* GNUTLS_SERVER or GNUTLS_CLIENT */
   gnutls_kx_algorithm_t kx_algorithm;
   handshake_mac_type_t handshake_mac_handle_type;       /* one of HANDSHAKE_TYPE_10 and HANDSHAKE_TYPE_12 */
 
@@ -583,8 +583,6 @@ typedef struct
   /* HelloVerifyRequest DOS prevention cookie */
   opaque  cookie[DTLS_MAX_COOKIE_SIZE];
   uint8_t cookie_len;
-
-  gnutls_dtls_flags_t flags;
 
   /* For DTLS handshake fragmentation and reassembly. */
   uint16_t hsk_write_seq;

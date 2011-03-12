@@ -279,17 +279,17 @@ extern "C"
   } gnutls_compression_method_t;
 
   /**
-   * gnutls_connection_end_t:
+   * Flags for gnutls_init()
+   *
    * @GNUTLS_SERVER: Connection end is a server.
    * @GNUTLS_CLIENT: Connection end is a client.
+   * @GNUTLS_DATAGRAM: Connection is datagram oriented (DTLS).
    *
    * Enumeration of different TLS connection end types.
    */
-  typedef enum
-  {
-    GNUTLS_SERVER = 1,
-    GNUTLS_CLIENT
-  } gnutls_connection_end_t;
+#define GNUTLS_SERVER 1
+#define GNUTLS_CLIENT (1<<1)
+#define GNUTLS_DATAGRAM (1<<2)
 
   /**
    * gnutls_alert_level_t:
@@ -298,13 +298,6 @@ extern "C"
    *
    * Enumeration of different TLS alert severities.
    */
-  typedef enum
-  {
-    /* Nothing for now. There will be flags for transport-dependent
-       behavior (DCCP, SCTP) here in the future. */
-    GNUTLS_DTLS_DUMMY = 0
-  } gnutls_dtls_flags_t;
-
   typedef enum
   {
     GNUTLS_AL_WARNING = 1,
@@ -687,7 +680,7 @@ extern "C"
 /* internal functions */
 
   int gnutls_init (gnutls_session_t * session,
-                   gnutls_connection_end_t con_end);
+                   unsigned int flags);
   void gnutls_deinit (gnutls_session_t session);
 #define _gnutls_deinit(x) gnutls_deinit(x)
 

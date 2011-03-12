@@ -36,10 +36,6 @@ extern "C"
 {
 #endif
 
-int gnutls_init_dtls (gnutls_session_t * session,
-			gnutls_connection_end_t con_end,
-			gnutls_dtls_flags_t flags);
-
 void gnutls_dtls_set_timeouts (gnutls_session_t session, unsigned int retrans_timeout,
   unsigned int total_timeout);
 

@@ -554,7 +554,7 @@ init_tls_session (const char *hostname)
 
   if (udp)
     {
-      gnutls_init_dtls (&session, GNUTLS_CLIENT, 0);
+      gnutls_init (&session, GNUTLS_CLIENT|GNUTLS_DATAGRAM);
       if (mtu)
         gnutls_dtls_set_mtu(session, mtu);
     }

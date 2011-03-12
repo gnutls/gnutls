@@ -273,20 +273,21 @@ _gnutls_handshake_internal_state_clear (gnutls_session_t session)
 #define MIN_DH_BITS 727
 /**
  * gnutls_init:
- * @con_end: indicate if this session is to be used for server or client.
  * @session: is a pointer to a #gnutls_session_t structure.
+ * @flags: indicate if this session is to be used for server or client.
  *
  * This function initializes the current session to null. Every
  * session must be initialized before use, so internal structures can
  * be allocated.  This function allocates structures which can only
  * be free'd by calling gnutls_deinit().  Returns zero on success.
  *
- * @con_end can be one of %GNUTLS_CLIENT and %GNUTLS_SERVER.
+ * @flags can be one of %GNUTLS_CLIENT and %GNUTLS_SERVER and might
+ * include %GNUTLS_DATAGRAM to enable datagram TLS (DTLS).
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
-gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
+gnutls_init (gnutls_session_t * session, unsigned int flags)
 {
   int ret;
   record_parameters_st *epoch;
@@ -307,7 +308,7 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
 
   (*session)->security_parameters.epoch_next = 1;
 
-  (*session)->security_parameters.entity = con_end;
+  (*session)->security_parameters.entity = (flags&GNUTLS_SERVER?GNUTLS_SERVER:GNUTLS_CLIENT);
 
   /* the default certificate type for TLS */
   (*session)->security_parameters.cert_type = DEFAULT_CERT_TYPE;
@@ -371,41 +372,16 @@ gnutls_init (gnutls_session_t * session, gnutls_connection_end_t con_end)
   gnutls_transport_set_errno_function (*session, system_errno);
   gnutls_transport_set_pull_timeout_function (*session, system_recv_timeout);
 
-  return 0;
-}
+  if (flags & GNUTLS_DATAGRAM)
+    {
+      (*session)->internals.dtls.mtu = DTLS_DEFAULT_MTU;
+      (*session)->internals.transport = GNUTLS_DGRAM;
 
-/**
-  * gnutls_init_dtls - initialize the session like gnutls_init, but
-  * with a DTLS compatible transport.
-  * @con_end: indicate if this session is to be used for server or client.
-  * @session: is a pointer to a #gnutls_session_t structure.
-  * @flags: dtls flags for optional behavior.
-  *
-  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
-  **/
-int
-gnutls_init_dtls (gnutls_session_t * session,
-		  gnutls_connection_end_t con_end,
-		  gnutls_dtls_flags_t flags)
-{
-  int ret;
+      (*session)->internals.dtls.retrans_timeout = 1000;
+      (*session)->internals.dtls.total_timeout = 60000;
 
-  /* FIXME, we should inhibit the allocation of many buffers that are
-     useless with datagram transport. */
-  ret = gnutls_init(session, con_end);
-
-  if(ret != 0)
-    return ret;
-
-  /* Flags do nothing, so just copy them into the struct for now. */
-  (*session)->internals.dtls.flags = flags;
-  (*session)->internals.dtls.mtu = DTLS_DEFAULT_MTU;
-  (*session)->internals.transport = GNUTLS_DGRAM;
-
-  (*session)->internals.dtls.retrans_timeout = 1000;
-  (*session)->internals.dtls.total_timeout = 60000;
-
-  (*session)->internals.dtls.record_sw_size = 0;
+      (*session)->internals.dtls.record_sw_size = 0;
+    }
 
   return 0;
 }

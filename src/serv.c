@@ -333,7 +333,7 @@ gnutls_session_t initialize_session (int dtls)
   const char *err;
 
   if (dtls)
-    gnutls_init_dtls (&session, GNUTLS_SERVER, 0);
+    gnutls_init (&session, GNUTLS_SERVER|GNUTLS_DATAGRAM);
   else
     gnutls_init (&session, GNUTLS_SERVER);
 

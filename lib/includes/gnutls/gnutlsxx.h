@@ -89,7 +89,7 @@ namespace gnutls
   protected:
     gnutls_session_t s;
   public:
-    session (gnutls_connection_end_t);
+    session (unsigned int);
     virtual ~ session ();
 
     int bye (gnutls_close_request_t how);

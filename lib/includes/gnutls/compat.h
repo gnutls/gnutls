@@ -19,6 +19,10 @@
 #define _GNUTLS_GCC_ATTR_DEPRECATED
 #endif
 
+/* gnutls_connection_end_t was made redundant in 2.99.0 */
+#define gnutls_connection_end_t unsigned int
+
+/* Stuff deprected in 2.x */
 #define gnutls_cipher_algorithm gnutls_cipher_algorithm_t
 #define gnutls_kx_algorithm gnutls_kx_algorithm_t
 #define gnutls_paramsype gnutls_paramsype_t

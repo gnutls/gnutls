@@ -14,9 +14,9 @@ namespace gnutls
     return ret;
   }
 
-  session::session (gnutls_connection_end_t end)
+  session::session (unsigned int flags)
   {
-    RETWRAP (gnutls_init (&s, end));
+    RETWRAP (gnutls_init (&s, flags));
   }
 
   session::~session ()

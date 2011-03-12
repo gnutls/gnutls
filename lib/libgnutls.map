@@ -153,7 +153,6 @@ GNUTLS_1_4
     gnutls_hex_decode;
     gnutls_hex_encode;
     gnutls_init;
-    gnutls_init_dtls;
     gnutls_kx_get;
     gnutls_kx_get_id;
     gnutls_kx_get_name;
