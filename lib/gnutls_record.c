@@ -286,7 +286,7 @@ copy_record_version (gnutls_session_t session,
 {
   gnutls_protocol_t lver;
 
-  if (htype != GNUTLS_HANDSHAKE_CLIENT_HELLO
+  if (session->internals.initial_negotiation_completed || htype != GNUTLS_HANDSHAKE_CLIENT_HELLO
       || session->internals.default_record_version[0] == 0)
     {
       lver = gnutls_protocol_get_version (session);
@@ -641,7 +641,7 @@ record_add_to_buffers (gnutls_session_t session,
                 {
                   session_unresumable (session);
                   session_invalidate (session);
-                  ret = GNUTLS_E_FATAL_ALERT_RECEIVED;
+                  ret = gnutls_assert_val(GNUTLS_E_FATAL_ALERT_RECEIVED);
                 }
 
               goto cleanup;
@@ -673,13 +673,12 @@ record_add_to_buffers (gnutls_session_t session,
           if (type == GNUTLS_ALERT || (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO
                                        && type == GNUTLS_HANDSHAKE))
             {
-              ret = GNUTLS_E_GOT_APPLICATION_DATA;
+              ret = gnutls_assert_val(GNUTLS_E_GOT_APPLICATION_DATA);
               goto cleanup;
             }
           else
             {
-              gnutls_assert ();
-              ret = GNUTLS_E_UNEXPECTED_PACKET;
+              ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
               goto cleanup;
             }
 
@@ -1067,8 +1066,7 @@ begin:
         {
           return 0;
         }
-      gnutls_assert ();
-      return ret;
+      return gnutls_assert_val(ret);
     }
 
   return ret;
