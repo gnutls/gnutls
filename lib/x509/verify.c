@@ -48,7 +48,7 @@ static int _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
                                 unsigned int *output);
 
 /* Checks if two certs are identical.  Return 0 on match. */
-static int
+int
 check_if_same_cert (gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2)
 {
   gnutls_datum_t cert1bin = { NULL, 0 }, cert2bin =

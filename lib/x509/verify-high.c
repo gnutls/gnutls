@@ -40,8 +40,8 @@
 #define INIT_HASH 0x33a1
 struct node_st {
   /* The trusted certificates */
-  gnutls_x509_crt_t * crts;
-  unsigned int crt_size;
+  gnutls_x509_crt_t * trusted_crts;
+  unsigned int trusted_crt_size;
 
   /* The trusted CRLs */
   gnutls_x509_crl_t * crls;
@@ -106,9 +106,9 @@ int i, j;
     {
       for (i=0;i<list->size;i++)
         {
-          for (j=0;j<list->node[i].crt_size;j++)
+          for (j=0;j<list->node[i].trusted_crt_size;j++)
             {
-              gnutls_x509_crt_deinit(list->node[i].crts[j]);
+              gnutls_x509_crt_deinit(list->node[i].trusted_crts[j]);
             }
           for (j=0;j<list->node[i].crl_size;j++)
             {
@@ -154,15 +154,15 @@ uint32_t hash;
         hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
         hash %= list->size;
 
-        list->node[hash].crts = gnutls_realloc_fast( list->node[hash].crts, (list->node[hash].crt_size+1)*sizeof(list->node[hash].crts[0]));
-        if (list->node[hash].crts == NULL)
+        list->node[hash].trusted_crts = gnutls_realloc_fast( list->node[hash].trusted_crts, (list->node[hash].trusted_crt_size+1)*sizeof(list->node[hash].trusted_crts[0]));
+        if (list->node[hash].trusted_crts == NULL)
           {
             gnutls_assert();
             return i;
           }
 
-        list->node[hash].crts[list->node[hash].crt_size] = clist[i];
-        list->node[hash].crt_size++;
+        list->node[hash].trusted_crts[list->node[hash].trusted_crt_size] = clist[i];
+        list->node[hash].trusted_crt_size++;
 
         _gnutls_free_datum(&dn);
     }
@@ -223,13 +223,13 @@ uint32_t hash;
         if (flags & GNUTLS_TL_VERIFY_CRL)
           {
 
-            ret = gnutls_x509_crl_verify(crl_list[i], list->node[hash].crts,
-              list->node[hash].crt_size, verification_flags, &vret);
+            ret = gnutls_x509_crl_verify(crl_list[i], list->node[hash].trusted_crts,
+              list->node[hash].trusted_crt_size, verification_flags, &vret);
             if (ret < 0 || vret != 0)
               continue;
           }
 
-        list->node[hash].crls = gnutls_realloc_fast( list->node[hash].crls, (list->node[hash].crl_size+1)*sizeof(list->node[hash].crts[0]));
+        list->node[hash].crls = gnutls_realloc_fast( list->node[hash].crls, (list->node[hash].crl_size+1)*sizeof(list->node[hash].trusted_crts[0]));
         if (list->node[hash].crls == NULL)
           {
             gnutls_assert();
@@ -242,6 +242,74 @@ uint32_t hash;
     }
 
   return j;
+}
+
+/* Takes a certificate list and shortens it if there are
+ * intermedia certificates already trusted by us.
+ *
+ * FIXME: This is very similar to _gnutls_x509_verify_certificate().
+ *
+ * Returns the new size of the list or a negative number on error.
+ */
+int shorten_clist(gnutls_x509_trust_list_t list,
+  gnutls_x509_crt_t* certificate_list, int clist_size)
+{
+int i, j, ret;
+uint32_t hash;
+gnutls_datum_t dn;
+
+  if (clist_size > 1)
+    {
+      /* Check if the last certificate in the path is self signed.
+       * In that case ignore it (a certificate is trusted only if it
+       * leads to a trusted party by us, not the server's).
+       *
+       * This prevents from verifying self signed certificates against
+       * themselves. This (although not bad) caused verification
+       * failures on some root self signed certificates that use the
+       * MD2 algorithm.
+       */
+      if (gnutls_x509_crt_check_issuer (certificate_list[clist_size - 1],
+                                        certificate_list[clist_size - 1]) > 0)
+        {
+          clist_size--;
+        }
+    }
+
+  /* We want to shorten the chain by removing the cert that matches
+   * one of the certs we trust and all the certs after that i.e. if
+   * cert chain is A signed-by B signed-by C signed-by D (signed-by
+   * self-signed E but already removed above), and we trust B, remove
+   * B, C and D. */
+  for (i=1; i < clist_size; i++)
+    {
+      int j;
+
+      ret = gnutls_x509_crt_get_raw_issuer_dn(certificate_list[i], &dn);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          return ret;
+        }
+
+      hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
+      hash %= list->size;
+
+      _gnutls_free_datum(&dn);
+
+      for (j = 0; j < list->node[hash].trusted_crt_size; j++)
+        {
+          if (check_if_same_cert (certificate_list[i], list->node[hash].trusted_crts[j]) == 0)
+            {
+              /* cut the list at the point of first the trusted certificate */
+              clist_size = i+1;
+              break;
+            }
+        }
+      /* clist_size may have been changed which gets out of loop */
+    }
+
+  return clist_size;
 }
 
 
@@ -273,10 +341,11 @@ int ret, i;
 uint32_t hash;
 
   if (cert_list == NULL || cert_list_size < 1)
-    {
-      gnutls_assert();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  cert_list_size = shorten_clist(list, cert_list, cert_list_size);
+  if (cert_list_size <= 0)
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   ret = gnutls_x509_crt_get_raw_issuer_dn(cert_list[cert_list_size-1], &dn);
   if (ret < 0)
@@ -291,7 +360,7 @@ uint32_t hash;
   _gnutls_free_datum(&dn);
 
   *verify = _gnutls_x509_verify_certificate(cert_list, cert_list_size, 
-    list->node[hash].crts, list->node[hash].crt_size, 
+    list->node[hash].trusted_crts, list->node[hash].trusted_crt_size, 
     flags, func);
 
   if (*verify != 0) return 0;

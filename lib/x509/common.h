@@ -157,4 +157,7 @@ int pubkey_verify_sig (const gnutls_datum_t * tbs,
                        gnutls_pk_algorithm_t pk, bigint_t * issuer_params,
                        int issuer_params_size);
 
+int
+check_if_same_cert (gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2);
+
 #endif
