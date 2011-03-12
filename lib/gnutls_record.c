@@ -70,24 +70,6 @@ _gnutls_set_current_version (gnutls_session_t session,
 }
 
 /**
- * gnutls_transport_set_lowat:
- * @session: is a #gnutls_session_t structure.
- * @num: is the low water value.
- *
- * Used to set the lowat value in order for select to check if there
- * are pending data to socket buffer. Used only if you have changed
- * the default low water value (default is 1).  Normally you will not
- * need that function.  This function is only useful if using
- * berkeley style sockets.  Otherwise it must be called and set lowat
- * to zero.
- **/
-void
-gnutls_transport_set_lowat (gnutls_session_t session, int num)
-{
-  session->internals.lowat = num;
-}
-
-/**
  * gnutls_record_disable_padding:
  * @session: is a #gnutls_session_t structure.
  *
@@ -244,7 +226,6 @@ gnutls_bye (gnutls_session_t session, gnutls_close_request_t how)
         {
           do
             {
-              _gnutls_io_clear_peeked_data (session);
               ret = _gnutls_recv_int (session, GNUTLS_ALERT, -1, NULL, 0, NULL);
             }
           while (ret == GNUTLS_E_GOT_APPLICATION_DATA);
@@ -542,22 +523,12 @@ check_buffers (gnutls_session_t session, content_type_t type,
        type == GNUTLS_CHANGE_CIPHER_SPEC)
       && _gnutls_record_buffer_get_size (type, session) > 0)
     {
-      int ret, ret2;
+      int ret;
       ret = _gnutls_record_buffer_get (type, session, data, data_size, seq);
       if (ret < 0)
         {
           gnutls_assert ();
           return ret;
-        }
-
-      /* if the buffer just got empty */
-      if (_gnutls_record_buffer_get_size (type, session) == 0)
-        {
-          if ((ret2 = _gnutls_io_clear_peeked_data (session)) < 0)
-            {
-              gnutls_assert ();
-              return ret2;
-            }
         }
 
       return ret;

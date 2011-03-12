@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.99.0 (unreleased)
 
+** libgnutls: gnutls_transport_set_lowat() is no more.
+
 ** libgnutls-openssl: modified to use modern gnutls' functions.
 This introduces an ABI incompatibility with previous versions.
 

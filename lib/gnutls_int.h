@@ -127,9 +127,6 @@ typedef struct
   } gnutls_ext_parse_type_t;
 
 
-/* the default for TCP */
-#define DEFAULT_LOWAT 0
-
 /* expire time for resuming sessions */
 #define DEFAULT_EXPIRE_TIME 3600
 
@@ -660,9 +657,6 @@ typedef struct
   security_parameters_st resumed_security_parameters;
   gnutls_compression_method_t resumed_compression_method;
 
-  /* sockets internals */
-  int lowat;
-
   /* These buffers are used in the handshake
    * protocol only. freed using _gnutls_handshake_io_buffer_clear();
    */
@@ -682,11 +676,6 @@ typedef struct
                                          * size of the user specified data to
                                          * send.
                                          */
-
-
-  /* 0 if no peeked data was kept, 1 otherwise.
-   */
-  int have_peeked_data:1;
 
   int expire_time;              /* after expire_time seconds this session will expire */
   struct mod_auth_st_int *auth_struct;  /* used in handshake packets and KX algorithms */

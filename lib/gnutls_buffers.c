@@ -377,45 +377,6 @@ _gnutls_writev (gnutls_session_t session, const giovec_t * giovec,
   return i;
 }
 
-#define RCVLOWAT session->internals.lowat
-
-/* This function is only used with berkeley style sockets.
- * Clears the peeked data (read with MSG_PEEK).
- */
-int
-_gnutls_io_clear_peeked_data (gnutls_session_t session)
-{
-  mbuffer_st *peekdata;
-  int ret, sum;
-
-  if (session->internals.have_peeked_data == 0 || RCVLOWAT == 0)
-    return 0;
-
-  /* this was already read by using MSG_PEEK - so it shouldn't fail */
-  sum = 0;
-  do
-    {                           /* we need this to finish now */
-      ret =
-        _gnutls_read (session, &peekdata, RCVLOWAT - sum,
-                      session->internals.pull_func);
-      if (ret > 0)
-        sum += ret;
-      _mbuffer_xfree (&peekdata);
-    }
-  while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN
-         || sum < RCVLOWAT);
-
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  session->internals.have_peeked_data = 0;
-
-  return 0;
-}
-
 /* This function is like recv(with MSG_PEEK). But it does not return -1 on error.
  * It does return gnutls_errno instead.
  * This function reads data from the socket and keeps them in a buffer, of up to
@@ -429,38 +390,16 @@ ssize_t
 _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
                           content_type_t recv_type)
 {
-  ssize_t ret = 0, ret2 = 0;
+  ssize_t ret = 0;
   size_t min;
   mbuffer_st *bufel = NULL;
-  size_t recvlowat, recvdata, readsize;
+  size_t recvdata, readsize;
 
   if (total > MAX_RECV_SIZE(session) || total == 0)
     {
       gnutls_assert ();         /* internal error */
       return GNUTLS_E_INVALID_REQUEST;
     }
-
-  /* If an external pull function is used, then do not leave
-   * any data into the kernel buffer.
-   */
-  if (session->internals.pull_func != system_read)
-    {
-      recvlowat = 0;
-    }
-  else
-    {
-      /* leave peeked data to the kernel space only if application data
-       * is received and we don't have any peeked 
-       * data in gnutls session.
-       */
-      if (recv_type != GNUTLS_APPLICATION_DATA
-          && session->internals.have_peeked_data == 0)
-        recvlowat = 0;
-      else
-        recvlowat = RCVLOWAT;
-    }
-
-
 
   /* calculate the actual size, ie. get the minimum of the
    * buffered data and the requested data.
@@ -481,7 +420,7 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
    * receive in order to return the requested data.
    */
   recvdata = total - min;
-  readsize = recvdata - recvlowat;
+  readsize = recvdata;
 
   /* Check if the previously read data plus the new data to
    * receive are longer than the maximum receive buffer size.
@@ -531,50 +470,10 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
   else
     _mbuffer_xfree (&bufel);
 
-
-  /* This is hack in order for select to work. Just leave recvlowat data,
-   * into the kernel buffer (using a read with MSG_PEEK), thus making
-   * select think, that the socket is ready for reading.
-   * MSG_PEEK is only used with berkeley style sockets.
-   */
-  if (ret == readsize && recvlowat > 0 && !_gnutls_is_dtls(session) && 
-    session->internals.pull_func == system_read)
-    {
-      ret2 = _gnutls_read (session, &bufel, recvlowat, system_read_peek);
-
-      if (ret2 < 0 && gnutls_error_is_fatal (ret2) == 0)
-        {
-          _mbuffer_xfree (&bufel);
-          return ret2;
-        }
-
-      if (ret2 > 0)
-        {
-          _gnutls_read_log ("RB-PEEK: Read %d bytes in PEEK MODE.\n",
-                            (int) ret2);
-          _gnutls_read_log
-            ("RB-PEEK: Have %d bytes into buffer. Adding %d bytes.\nRB: Requested %d bytes\n",
-             (int) session->internals.record_recv_buffer.byte_length,
-             (int) ret2, (int) total);
-          session->internals.have_peeked_data = 1;
-          _mbuffer_enqueue (&session->internals.record_recv_buffer, bufel);
-        }
-      else
-        _mbuffer_xfree (&bufel);
-    }
-
-  if (ret < 0 || ret2 < 0)
+  if (ret < 0)
     {
       gnutls_assert ();
-      /* that's because they are initialized to 0 */
-      return MIN (ret, ret2);
-    }
-
-  ret += ret2;
-
-  if (ret > 0 && ret < recvlowat)
-    {
-      return gnutls_assert_val(GNUTLS_E_AGAIN);
+      return ret;
     }
 
   if (ret == 0)

@@ -66,7 +66,6 @@ required callbacks to access the transport layer.
 @item @ref{gnutls_transport_set_push_function}
 @item @ref{gnutls_transport_set_pull_function}
 @item @ref{gnutls_transport_set_ptr}
-@item @ref{gnutls_transport_set_lowat}
 @item @ref{gnutls_transport_set_errno}
 @end itemize
 
@@ -89,15 +88,8 @@ again), if any of these error codes is returned.  The error codes
 above refer to the system call, not the @acronym{GnuTLS} function,
 since signals do not interrupt @acronym{GnuTLS}' functions.
 
-For non blocking sockets or other custom made pull/push functions
-the @ref{gnutls_transport_set_lowat} must be called, with a zero
-low water mark value.
-
 By default, if the transport functions are not set, @acronym{GnuTLS}
-will use the Berkeley Sockets functions.  In this case
-@acronym{GnuTLS} will use some hacks in order for @code{select} to
-work, thus making it easy to add @acronym{TLS} support to existing
-TCP/IP servers.
+will use the Berkeley Sockets functions. 
 
 @node The TLS record protocol
 @section The TLS Record Protocol

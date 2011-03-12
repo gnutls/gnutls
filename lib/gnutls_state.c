@@ -335,8 +335,6 @@ gnutls_init (gnutls_session_t * session, unsigned int flags)
 
   gnutls_dh_set_prime_bits ((*session), MIN_DH_BITS);
 
-  gnutls_transport_set_lowat ((*session), DEFAULT_LOWAT);       /* the default for tcp */
-
   gnutls_handshake_set_max_packet_length ((*session),
                                           MAX_HANDSHAKE_PACKET_SIZE);
 
