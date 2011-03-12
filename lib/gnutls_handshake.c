@@ -1341,7 +1341,7 @@ _gnutls_recv_handshake (gnutls_session_t session,
         _gnutls_audit_log("Received unexpected handshake message '%s' (%d). Expected '%s' (%d)\n",
          _gnutls_handshake2str(hsk.htype), (int)hsk.htype, _gnutls_handshake2str(type), (int)type);
 
-      return gnutls_assert_val(ret);
+      return gnutls_assert_val_fatal(ret);
     }
 
   ret = _gnutls_handshake_hash_add_recvd (session, hsk.htype,
@@ -2225,7 +2225,6 @@ _gnutls_recv_hello_verify_request (gnutls_session_t session,
 {
   ssize_t len = datalen;
   size_t pos = 0;
-  int ret;
   uint8_t cookie_len;
   unsigned int nb_verifs;
 

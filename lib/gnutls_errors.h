@@ -100,5 +100,6 @@ int gnutls_assert_val_int (int val, const char *file, int line)
 }
 
 #define gnutls_assert_val(x) gnutls_assert_val_int(x, __FILE__, __LINE__)
+#define gnutls_assert_val_fatal(x) (((x)!=GNUTLS_E_AGAIN && (x)!=GNUTLS_E_INTERRUPTED)?gnutls_assert_val_int(x, __FILE__, __LINE__):(x))
 
 #endif /* GNUTLS_ERRORS_H */

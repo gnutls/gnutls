@@ -251,10 +251,10 @@ uint32_t hash;
  *
  * Returns the new size of the list or a negative number on error.
  */
-int shorten_clist(gnutls_x509_trust_list_t list,
+static int shorten_clist(gnutls_x509_trust_list_t list,
   gnutls_x509_crt_t* certificate_list, int clist_size)
 {
-int i, j, ret;
+int i, ret;
 uint32_t hash;
 gnutls_datum_t dn;
 

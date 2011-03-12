@@ -1126,11 +1126,7 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
                                gnutls_handshake_description_t htype,
                                handshake_buffer_st * hsk)
 {
-  gnutls_datum_t msg;
-  mbuffer_st* bufel = NULL, *prev = NULL;
   int ret;
-  size_t data_size;
-  handshake_buffer_st* recv_buf = session->internals.handshake_recv_buffer;
 
   ret = get_last_packet(session, htype, hsk);
   if (ret >= 0)
@@ -1147,7 +1143,7 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
    * receiving more */
   ret = _gnutls_recv_in_buffers(session, GNUTLS_HANDSHAKE, htype);
   if (ret < 0)
-    return gnutls_assert_val(ret);
+    return gnutls_assert_val_fatal(ret);
 
   return parse_record_buffered_msgs(session, htype, hsk); 
 }
