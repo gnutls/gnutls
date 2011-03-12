@@ -47,7 +47,6 @@ int _gnutls_version_has_selectable_prf (gnutls_protocol_t version);
 int _gnutls_version_has_selectable_sighash (gnutls_protocol_t version);
 int _gnutls_version_has_extensions (gnutls_protocol_t version);
 int _gnutls_version_has_explicit_iv (gnutls_protocol_t version);
-int _gnutls_version_has_variable_padding (gnutls_protocol_t version);
 
 /* Functions for MACs. */
 int _gnutls_mac_is_ok (gnutls_mac_algorithm_t algorithm);
