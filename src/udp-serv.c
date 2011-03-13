@@ -30,7 +30,7 @@ int udp_server(const char* name, int port, int mtu)
     priv_data_st priv;
     gnutls_session_t session;
     gnutls_datum_t cookie_key;
-    gnutls_cookie_st cookie;
+    gnutls_dtls_prestate_st prestate;
     unsigned char sequence[8];
 
     ret = gnutls_key_generate(&cookie_key, GNUTLS_COOKIE_KEY_SIZE);
@@ -58,8 +58,8 @@ int udp_server(const char* name, int port, int mtu)
         ret = recvfrom(sock, buffer, sizeof(buffer), MSG_PEEK, (struct sockaddr*)&cli_addr, &cli_addr_size);
         if (ret > 0)
           {
-            memset(&cookie, 0, sizeof(cookie));
-            ret = gnutls_dtls_cookie_verify(&cookie_key, &cli_addr, sizeof(cli_addr), buffer, ret, &cookie);
+            memset(&prestate, 0, sizeof(prestate));
+            ret = gnutls_dtls_cookie_verify(&cookie_key, &cli_addr, sizeof(cli_addr), buffer, ret, &prestate);
             if (ret < 0) /* cookie not valid */
               {
                 priv_data_st s;
@@ -71,7 +71,7 @@ int udp_server(const char* name, int port, int mtu)
                 
                 printf("Sending hello verify request to %s\n", human_addr ((struct sockaddr *)
                   &cli_addr, sizeof(cli_addr), buffer, sizeof(buffer)));
-                gnutls_dtls_cookie_send(&cookie_key, &cli_addr, sizeof(cli_addr), &cookie, (gnutls_transport_ptr_t)&s, push_func);
+                gnutls_dtls_cookie_send(&cookie_key, &cli_addr, sizeof(cli_addr), &prestate, (gnutls_transport_ptr_t)&s, push_func);
 
                 /* discard peeked data*/
                 recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr*)&cli_addr, &cli_addr_size);
@@ -87,7 +87,7 @@ int udp_server(const char* name, int port, int mtu)
           continue;
 
         session = initialize_session(1);
-        gnutls_dtls_cookie_set(session, &cookie);
+        gnutls_dtls_prestate_set(session, &prestate);
         if (mtu) gnutls_dtls_set_mtu(session, mtu);
 
         priv.session = session;

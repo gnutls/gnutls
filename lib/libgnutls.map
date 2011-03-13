@@ -699,7 +699,7 @@ GNUTLS_3_0_0 {
 	gnutls_key_generate;
 	gnutls_dtls_cookie_verify;
 	gnutls_dtls_cookie_send;
-	gnutls_dtls_cookie_set;
+	gnutls_dtls_prestate_set;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

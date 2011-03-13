@@ -380,11 +380,11 @@ int ret;
     return session->internals.dtls.mtu - RECORD_HEADER_SIZE(session);
 }
 
-#define COOKIE_SIZE 19
+#define COOKIE_SIZE 16
 #define COOKIE_MAC_SIZE 16
 
-/* record seq || hsk read seq || hsk write seq ||   MAC
- *   1 byte         1 byte           1 byte       16 bytes
+/*   MAC
+ * 16 bytes
  *
  * total 19 bytes
  */
@@ -412,10 +412,9 @@ int ret;
  *
  **/
 int gnutls_dtls_cookie_send(gnutls_datum_t* key, void* client_data, size_t client_data_size, 
-  gnutls_cookie_st* cookie,
+  gnutls_dtls_prestate_st* prestate,
   gnutls_transport_ptr_t ptr, gnutls_push_func push_func)
 {
-
 opaque hvr[20+DTLS_HANDSHAKE_HEADER_SIZE+COOKIE_SIZE];
 int hvr_size = 0, ret;
 uint8_t digest[C_HASH_SIZE];
@@ -455,7 +454,8 @@ uint8_t digest[C_HASH_SIZE];
   
   /* epoch + seq */
   memset(&hvr[hvr_size], 0, 8);
-  hvr_size += 8;
+  hvr_size += 7;
+  hvr[hvr_size++] = prestate->record_seq;
 
   /* length */
   _gnutls_write_uint16(DTLS_HANDSHAKE_HEADER_SIZE+COOKIE_SIZE+3, &hvr[hvr_size]);
@@ -467,8 +467,8 @@ uint8_t digest[C_HASH_SIZE];
   hvr_size += 3;
   
   /* handshake seq */
-  memset(&hvr[hvr_size], 0, 2);
-  hvr_size += 2;
+  hvr[hvr_size++] = 0;
+  hvr[hvr_size++] = prestate->hsk_write_seq;
 
   _gnutls_write_uint24(0, &hvr[hvr_size]);
   hvr_size += 3;
@@ -484,19 +484,6 @@ uint8_t digest[C_HASH_SIZE];
   ret = _gnutls_hmac_fast(C_HASH, key->data, key->size, client_data, client_data_size, digest);
   if (ret < 0)
     return gnutls_assert_val(ret);
-
-  if (cookie && cookie->cookie_size > 3)
-    {
-      hvr[hvr_size++] = cookie->cookie[0]+1/* record */;
-      hvr[hvr_size++] = cookie->cookie[1]+1/* hsk read seq*/;
-      hvr[hvr_size++] = cookie->cookie[2]+1/* hsk write seq */;
-    }
-  else
-    {
-      hvr[hvr_size++] = 1;
-      hvr[hvr_size++] = 1;
-      hvr[hvr_size++] = 1;
-    }
 
   memcpy(&hvr[hvr_size], digest, COOKIE_MAC_SIZE);
   hvr_size+= COOKIE_MAC_SIZE;
@@ -520,14 +507,14 @@ uint8_t digest[C_HASH_SIZE];
  * This function will verify an incoming message for
  * a valid cookie. If a valid cookie is returned then
  * it should be associated with the session using
- * gnutls_dtls_cookie_set();
+ * gnutls_dtls_prestate_set();
  *
  * Returns: zero on success, or a negative error code.  
  *
  **/
 int gnutls_dtls_cookie_verify(gnutls_datum_t* key, 
   void* client_data, size_t client_data_size, 
-  void* _msg, size_t msg_size, gnutls_cookie_st* out)
+  void* _msg, size_t msg_size, gnutls_dtls_prestate_st* out)
 {
 gnutls_datum_t cookie;
 int sid_size;
@@ -572,32 +559,34 @@ uint8_t digest[C_HASH_SIZE];
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  if (memcmp(digest, &cookie.data[3], COOKIE_MAC_SIZE) != 0)
+  if (memcmp(digest, cookie.data, COOKIE_MAC_SIZE) != 0)
     return gnutls_assert_val(GNUTLS_E_BAD_COOKIE);
   
-  memcpy(out->cookie, cookie.data, cookie.size);
-  out->cookie_size = cookie.size;
-
+  out->record_seq = msg[10]; /* client's record seq */
+  out->hsk_read_seq =  msg[DTLS_RECORD_HEADER_SIZE+5];/* client's hsk seq */
+  out->hsk_write_seq = out->hsk_read_seq;/* client's hsk seq */
+  
   return 0;
 }
 
 /**
- * gnutls_dtls_cookie_set:
+ * gnutls_dtls_prestate_set:
  * @session: a new session
- * @cookie: contains the client's cookie
+ * @prestate: contains the client's prestate
  *
- * This function will associate the received cookie by
- * the client, with the newly established session.
+ * This function will associate the prestate acquired by
+ * the cookie authentication with the client, with the newly 
+ * established session.
  *
  * Returns: zero on success, or a negative error code.  
  *
  **/
-void gnutls_dtls_cookie_set(gnutls_session_t session, gnutls_cookie_st* st)
+void gnutls_dtls_prestate_set(gnutls_session_t session, gnutls_dtls_prestate_st* st)
 {
   record_parameters_st *params;
   int ret;
 
-  if (st == NULL || st->cookie_size == 0)
+  if (st == NULL)
     return;
 
   /* we do not care about read_params, since we accept anything
@@ -607,16 +596,8 @@ void gnutls_dtls_cookie_set(gnutls_session_t session, gnutls_cookie_st* st)
   if (ret < 0)
     return;
 
-  if (st->cookie_size < 3)
-    return;
+  params->write.sequence_number.i[7] = st->record_seq;
 
-  params->write.sequence_number.i[7] = st->cookie[0];
-
-  session->internals.dtls.hsk_read_seq = st->cookie[1];
-  session->internals.dtls.hsk_write_seq = st->cookie[2];
-
-fprintf(stderr, "record send seq: %d\n", (int)st->cookie[0]);
-fprintf(stderr, "hsk read seq: %d\n", (int)st->cookie[1]);
-fprintf(stderr, "hsk write seq: %d\n", (int)st->cookie[2]);
-
+  session->internals.dtls.hsk_read_seq = st->hsk_read_seq;
+  session->internals.dtls.hsk_write_seq = st->hsk_write_seq;
 }
