@@ -1960,7 +1960,10 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
            * that do not support TLS 1.2 and don't know
            * how 3,3 version of record packets look like.
            */
-          _gnutls_record_set_default_version (session, 3, 0);
+          if (!IS_DTLS(session))
+            _gnutls_record_set_default_version (session, 3, 0);
+          else
+            _gnutls_record_set_default_version (session, 254, 255);
         }
 
       /* In order to know when this session was initiated.
