@@ -2014,11 +2014,14 @@ static const gnutls_sign_entry sign_algorithms[] = {
 /* Keep the contents of this struct the same as the previous one. */
 static const gnutls_sign_algorithm_t supported_sign[] = {
   GNUTLS_SIGN_RSA_SHA1,
+  GNUTLS_SIGN_RSA_SHA224,
   GNUTLS_SIGN_RSA_SHA256,
   GNUTLS_SIGN_RSA_SHA384,
   GNUTLS_SIGN_RSA_SHA512,
   GNUTLS_SIGN_RSA_RMD160,
   GNUTLS_SIGN_DSA_SHA1,
+  GNUTLS_SIGN_DSA_SHA224,
+  GNUTLS_SIGN_DSA_SHA256,
   GNUTLS_SIGN_RSA_MD5,
   GNUTLS_SIGN_RSA_MD2,
   0
