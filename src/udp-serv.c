@@ -29,11 +29,23 @@ int udp_server(const char* name, int port, int mtu)
     char buffer[MAX_BUFFER];
     priv_data_st priv;
     gnutls_session_t session;
+    gnutls_datum_t cookie_key;
+    gnutls_cookie_st cookie;
     unsigned char sequence[8];
+
+    ret = gnutls_key_generate(&cookie_key, GNUTLS_COOKIE_KEY_SIZE);
+    if (ret < 0)
+      {
+        fprintf(stderr, "Cannot generate key\n");
+        exit(1);
+      }
 
     ret = listen_socket (name, port, SOCK_DGRAM);
     if (ret < 0)
-      exit (1);
+      {
+        fprintf(stderr, "Cannot listen\n");
+        exit (1);
+      }
 
     for (;;)
       {
@@ -43,16 +55,39 @@ int udp_server(const char* name, int port, int mtu)
           continue;
 
         cli_addr_size = sizeof(cli_addr);
-        ret = recvfrom(sock, buffer, 1, MSG_PEEK, (struct sockaddr*)&cli_addr, &cli_addr_size);
-        if (ret == 1)
-          printf ("Accepted connection from %s\n",
+        ret = recvfrom(sock, buffer, sizeof(buffer), MSG_PEEK, (struct sockaddr*)&cli_addr, &cli_addr_size);
+        if (ret > 0)
+          {
+            memset(&cookie, 0, sizeof(cookie));
+            ret = gnutls_dtls_cookie_verify(&cookie_key, &cli_addr, sizeof(cli_addr), buffer, ret, &cookie);
+            if (ret < 0) /* cookie not valid */
+              {
+                priv_data_st s;
+                
+                memset(&s,0,sizeof(s));
+                s.fd = sock;
+                s.cli_addr = (void*)&cli_addr;
+                s.cli_addr_size = sizeof(cli_addr);
+                
+                printf("Sending hello verify request to %s\n", human_addr ((struct sockaddr *)
+                  &cli_addr, sizeof(cli_addr), buffer, sizeof(buffer)));
+                gnutls_dtls_cookie_send(&cookie_key, &cli_addr, sizeof(cli_addr), &cookie, (gnutls_transport_ptr_t)&s, push_func);
+
+                /* discard peeked data*/
+                recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr*)&cli_addr, &cli_addr_size);
+                usleep(100);
+                continue;
+              }
+            printf ("Accepted connection from %s\n",
                             human_addr ((struct sockaddr *)
                                         &cli_addr, sizeof(cli_addr), buffer,
                                         sizeof (buffer)));
+          }
         else
           continue;
 
         session = initialize_session(1);
+        gnutls_dtls_cookie_set(session, &cookie);
         if (mtu) gnutls_dtls_set_mtu(session, mtu);
 
         priv.session = session;

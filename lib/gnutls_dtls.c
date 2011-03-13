@@ -366,6 +366,8 @@ void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu)
  * application data. I.e. DTLS headers are subtracted from the
  * actual MTU.
  *
+ * Returns: the maximum allowed transfer unit.
+ *
  **/
 unsigned int gnutls_dtls_get_mtu (gnutls_session_t session)
 {
@@ -376,4 +378,245 @@ int ret;
     return session->internals.dtls.mtu - ret;
   else
     return session->internals.dtls.mtu - RECORD_HEADER_SIZE(session);
+}
+
+#define COOKIE_SIZE 19
+#define COOKIE_MAC_SIZE 16
+
+/* record seq || hsk read seq || hsk write seq ||   MAC
+ *   1 byte         1 byte           1 byte       16 bytes
+ *
+ * total 19 bytes
+ */
+
+#define C_HASH GNUTLS_MAC_SHA1
+#define C_HASH_SIZE 20
+
+/**
+ * gnutls_dtls_cookie_send:
+ * @key: is a random key to be used at cookie generation
+ * @client_data: contains data identifying the client (i.e. address)
+ * @client_data_size: The size of client's data
+ * @cookie: The previous cookie returned by gnutls_dtls_cookie_verify()
+ * @ptr: A transport pointer to be used by @push_func
+ * @push_func: A function that will be used to reply
+ *
+ * This function can be used to prevent denial of service
+ * attacks to a DTLS server by requiring the client to
+ * reply using a cookie sent by this function. That way
+ * it can be ensured that a client we allocated resources
+ * for (i.e. #gnutls_session_t) is the one that the 
+ * original incoming packet was originated from.
+ *
+ * Returns: the number of bytes sent, or a negative error code.  
+ *
+ **/
+int gnutls_dtls_cookie_send(gnutls_datum_t* key, void* client_data, size_t client_data_size, 
+  gnutls_cookie_st* cookie,
+  gnutls_transport_ptr_t ptr, gnutls_push_func push_func)
+{
+
+opaque hvr[20+DTLS_HANDSHAKE_HEADER_SIZE+COOKIE_SIZE];
+int hvr_size = 0, ret;
+uint8_t digest[C_HASH_SIZE];
+
+  if (key == NULL || key->data == NULL || key->size == 0)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+/* send
+ *  struct {
+ *    ContentType type - 1 byte GNUTLS_HANDSHAKE;
+ *    ProtocolVersion version; - 2 bytes (254,255)
+ *    uint16 epoch; - 2 bytes (0, 0)
+ *    uint48 sequence_number; - 4 bytes (0,0,0,0)
+ *    uint16 length; - 2 bytes (COOKIE_SIZE+1+2)+DTLS_HANDSHAKE_HEADER_SIZE
+ *    opaque fragment[DTLSPlaintext.length];
+ *  } DTLSPlaintext;
+ *
+ *
+ * struct {
+ *    HandshakeType msg_type; 1 byte - GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST
+ *    uint24 length; - COOKIE_SIZE+3
+ *    uint16 message_seq; - 2 bytes (0,0)
+ *    uint24 fragment_offset; - 3 bytes (0,0,0)
+ *    uint24 fragment_length; - same as length
+ * }
+ *
+ * struct {
+ *   ProtocolVersion server_version;
+ *   opaque cookie<0..32>;
+ * } HelloVerifyRequest;
+ */ 
+
+  hvr[hvr_size++] = GNUTLS_HANDSHAKE;
+  /* version */
+  hvr[hvr_size++] = 254;
+  hvr[hvr_size++] = 255;
+  
+  /* epoch + seq */
+  memset(&hvr[hvr_size], 0, 8);
+  hvr_size += 8;
+
+  /* length */
+  _gnutls_write_uint16(DTLS_HANDSHAKE_HEADER_SIZE+COOKIE_SIZE+3, &hvr[hvr_size]);
+  hvr_size += 2;
+
+  /* now handshake headers */
+  hvr[hvr_size++] = GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST;
+  _gnutls_write_uint24(COOKIE_SIZE+3, &hvr[hvr_size]);
+  hvr_size += 3;
+  
+  /* handshake seq */
+  memset(&hvr[hvr_size], 0, 2);
+  hvr_size += 2;
+
+  _gnutls_write_uint24(0, &hvr[hvr_size]);
+  hvr_size += 3;
+
+  _gnutls_write_uint24(COOKIE_SIZE+3, &hvr[hvr_size]);
+  hvr_size += 3;
+
+  /* version */
+  hvr[hvr_size++] = 254;
+  hvr[hvr_size++] = 255;
+  hvr[hvr_size++] = COOKIE_SIZE;
+
+  ret = _gnutls_hmac_fast(C_HASH, key->data, key->size, client_data, client_data_size, digest);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  if (cookie && cookie->cookie_size > 3)
+    {
+      hvr[hvr_size++] = cookie->cookie[0]+1/* record */;
+      hvr[hvr_size++] = cookie->cookie[1]+1/* hsk read seq*/;
+      hvr[hvr_size++] = cookie->cookie[2]+1/* hsk write seq */;
+    }
+  else
+    {
+      hvr[hvr_size++] = 1;
+      hvr[hvr_size++] = 1;
+      hvr[hvr_size++] = 1;
+    }
+
+  memcpy(&hvr[hvr_size], digest, COOKIE_MAC_SIZE);
+  hvr_size+= COOKIE_MAC_SIZE;
+
+  ret = push_func(ptr, hvr, hvr_size);
+  if (ret < 0)
+    ret = GNUTLS_E_PUSH_ERROR;
+
+  return ret;
+}
+
+/**
+ * gnutls_dtls_cookie_verify:
+ * @key: is a random key to be used at cookie generation
+ * @client_data: contains data identifying the client (i.e. address)
+ * @client_data_size: The size of client's data
+ * @msg: An incoming message that initiates a connection.
+ * @msg_size: The size of the message.
+ * @cookie: The cookie of this client.
+ *
+ * This function will verify an incoming message for
+ * a valid cookie. If a valid cookie is returned then
+ * it should be associated with the session using
+ * gnutls_dtls_cookie_set();
+ *
+ * Returns: zero on success, or a negative error code.  
+ *
+ **/
+int gnutls_dtls_cookie_verify(gnutls_datum_t* key, 
+  void* client_data, size_t client_data_size, 
+  void* _msg, size_t msg_size, gnutls_cookie_st* out)
+{
+gnutls_datum_t cookie;
+int sid_size;
+int pos, ret;
+uint8_t * msg = _msg;
+uint8_t digest[C_HASH_SIZE];
+
+  if (key == NULL || key->data == NULL || key->size == 0)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  /* format:
+   * version - 2 bytes
+   * random - 32 bytes
+   * session_id - 1 byte length + content
+   * cookie - 1 byte length + content
+   */
+
+  pos = 34+DTLS_RECORD_HEADER_SIZE+DTLS_HANDSHAKE_HEADER_SIZE;
+
+  if (msg_size < pos+1)
+    return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
+  sid_size = msg[pos++];
+
+  if (sid_size > 32 || msg_size < pos+sid_size+1)
+    return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+
+  pos += sid_size;
+  cookie.size = msg[pos++];
+
+  if (msg_size < pos+cookie.size+1)
+    return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+  
+  cookie.data = &msg[pos];
+  if (cookie.size != COOKIE_SIZE)
+    {
+      if (cookie.size > 0) _gnutls_audit_log("Received cookie with illegal size %d. Expected %d\n", (int)cookie.size, COOKIE_SIZE);
+      return gnutls_assert_val(GNUTLS_E_BAD_COOKIE);
+    }
+
+  ret = _gnutls_hmac_fast(C_HASH, key->data, key->size, client_data, client_data_size, digest);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  if (memcmp(digest, &cookie.data[3], COOKIE_MAC_SIZE) != 0)
+    return gnutls_assert_val(GNUTLS_E_BAD_COOKIE);
+  
+  memcpy(out->cookie, cookie.data, cookie.size);
+  out->cookie_size = cookie.size;
+
+  return 0;
+}
+
+/**
+ * gnutls_dtls_cookie_set:
+ * @session: a new session
+ * @cookie: contains the client's cookie
+ *
+ * This function will associate the received cookie by
+ * the client, with the newly established session.
+ *
+ * Returns: zero on success, or a negative error code.  
+ *
+ **/
+void gnutls_dtls_cookie_set(gnutls_session_t session, gnutls_cookie_st* st)
+{
+  record_parameters_st *params;
+  int ret;
+
+  if (st == NULL || st->cookie_size == 0)
+    return;
+
+  /* we do not care about read_params, since we accept anything
+   * the peer sends.
+   */
+  ret = _gnutls_epoch_get (session, EPOCH_WRITE_CURRENT, &params);
+  if (ret < 0)
+    return;
+
+  if (st->cookie_size < 3)
+    return;
+
+  params->write.sequence_number.i[7] = st->cookie[0];
+
+  session->internals.dtls.hsk_read_seq = st->cookie[1];
+  session->internals.dtls.hsk_write_seq = st->cookie[2];
+
+fprintf(stderr, "record send seq: %d\n", (int)st->cookie[0]);
+fprintf(stderr, "hsk read seq: %d\n", (int)st->cookie[1]);
+fprintf(stderr, "hsk write seq: %d\n", (int)st->cookie[2]);
+
 }

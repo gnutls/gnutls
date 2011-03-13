@@ -696,6 +696,10 @@ GNUTLS_3_0_0 {
 	gnutls_dtls_get_mtu;
 	gnutls_dtls_set_mtu;
         gnutls_record_recv_seq;
+	gnutls_key_generate;
+	gnutls_dtls_cookie_verify;
+	gnutls_dtls_cookie_send;
+	gnutls_dtls_cookie_set;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

@@ -173,6 +173,7 @@ static const gnutls_error_entry error_algorithms[] = {
   ERROR_ENTRY (N_("The given memory buffer is too short to hold parameters."),
                GNUTLS_E_SHORT_MEMORY_BUFFER, 1),
   ERROR_ENTRY (N_("The request is invalid."), GNUTLS_E_INVALID_REQUEST, 1),
+  ERROR_ENTRY (N_("The cookie was bad."), GNUTLS_E_BAD_COOKIE, 1),
   ERROR_ENTRY (N_("An illegal parameter has been received."),
                GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 1),
   ERROR_ENTRY (N_("Error while reading file."), GNUTLS_E_FILE_ERROR, 1),
