@@ -847,6 +847,8 @@ extern "C"
   int gnutls_session_ticket_enable_server (gnutls_session_t session,
                                            const gnutls_datum_t * key);
 
+  int gnutls_key_generate (gnutls_datum_t * key, unsigned int key_size);
+
 /* if you just want some defaults, use the following.
  */
   int gnutls_priority_init (gnutls_priority_t * priority_cache,
@@ -1711,6 +1713,7 @@ extern "C"
 #define GNUTLS_E_CRYPTODEV_DEVICE_ERROR -212
 
 #define GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE -213
+#define GNUTLS_E_BAD_COOKIE -214
 
 /* PKCS11 related */
 #define GNUTLS_E_PKCS11_ERROR -300

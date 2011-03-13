@@ -28,6 +28,7 @@
 #include <gnutls_cipher_int.h>
 #include <gnutls_datum.h>
 #include <gnutls/crypto.h>
+#include <random.h>
 #include <crypto.h>
 
 /**
@@ -456,4 +457,41 @@ gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,
                   const void *text, size_t textlen, void *digest)
 {
   return _gnutls_hash_fast (algorithm, text, textlen, digest);
+}
+
+/**
+ * gnutls_key_generate:
+ * @key: is a pointer to a #gnutls_datum_t which will contain a newly
+ * created key.
+ * @key_size: The number of bytes of the key.
+ *
+ * Generates a random key of @key_bytes size.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
+ * error code.
+ *
+ * Since: 3.0.0
+ **/
+int
+gnutls_key_generate (gnutls_datum_t * key, unsigned int key_size)
+{
+  int ret;
+
+  key->size = key_size;
+  key->data = gnutls_malloc (key->size);
+  if (!key->data)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  ret = _gnutls_rnd (GNUTLS_RND_RANDOM, key->data, key->size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      _gnutls_free_datum (key);
+      return ret;
+    }
+
+  return 0;
 }

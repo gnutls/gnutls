@@ -480,25 +480,7 @@ error:
 int
 gnutls_session_ticket_key_generate (gnutls_datum_t * key)
 {
-  int ret;
-
-  key->size = SESSION_KEY_SIZE;
-  key->data = gnutls_malloc (key->size);
-  if (!key->data)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  ret = _gnutls_rnd (GNUTLS_RND_RANDOM, key->data, key->size);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      _gnutls_free_datum (key);
-      return ret;
-    }
-
-  return 0;
+  return gnutls_key_generate(key, SESSION_KEY_SIZE);
 }
 
 /**
