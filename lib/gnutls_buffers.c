@@ -38,13 +38,8 @@
  *  (see _gnutls_io_read_buffered(), _gnutls_io_write_buffered() etc.)
  * 
  * HANDSHAKE LAYER:
- *  1. Uses a buffer to hold data that was not sent or received
- *  complete. (E.g. sent 10 bytes of a handshake packet that is 20 bytes
- *  long).
- * (see _gnutls_handshake_send_int(), _gnutls_handshake_recv_int())
- *
- *  2. Uses buffer to hold the last received handshake message.
- *  (see _gnutls_handshake_buffer_put() etc.)
+ *  1. Uses buffer to hold the last received handshake message.
+ *  (see _gnutls_handshake_hash_buffer_put() etc.)
  *
  */
 
@@ -1153,7 +1148,7 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
  * and finished messages.
  */
 int
-_gnutls_handshake_buffer_put (gnutls_session_t session, opaque * data,
+_gnutls_handshake_hash_buffer_put (gnutls_session_t session, opaque * data,
                               size_t length)
 {
 
@@ -1180,7 +1175,7 @@ _gnutls_handshake_buffer_put (gnutls_session_t session, opaque * data,
 }
 
 int
-_gnutls_handshake_buffer_get_size (gnutls_session_t session)
+_gnutls_handshake_hash_buffer_get_size (gnutls_session_t session)
 {
 
   return session->internals.handshake_hash_buffer.length;
@@ -1190,7 +1185,7 @@ _gnutls_handshake_buffer_get_size (gnutls_session_t session)
  * and returns data from it (peek mode!)
  */
 int
-_gnutls_handshake_buffer_get_ptr (gnutls_session_t session,
+_gnutls_handshake_hash_buffer_get_ptr (gnutls_session_t session,
                                   opaque ** data_ptr, size_t * length)
 {
   if (length != NULL)
@@ -1205,15 +1200,3 @@ _gnutls_handshake_buffer_get_ptr (gnutls_session_t session,
   return 0;
 }
 
-/* Does not free the buffer
- */
-int
-_gnutls_handshake_buffer_empty (gnutls_session_t session)
-{
-
-  _gnutls_buffers_log ("BUF[HSK]: Emptied buffer\n");
-
-  session->internals.handshake_hash_buffer.length = 0;
-
-  return 0;
-}

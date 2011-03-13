@@ -103,6 +103,8 @@ _gnutls_handshake_hash_buffers_clear (gnutls_session_t session)
     }
   session->security_parameters.handshake_mac_handle_type = 0;
   session->internals.handshake_mac_handle_init = 0;
+
+  _gnutls_handshake_hash_buffer_clear (session);
 }
 
 /* this will copy the required values for resuming to
@@ -634,7 +636,7 @@ _gnutls_handshake_hash_pending (gnutls_session_t session)
 
   /* We check if there are pending data to hash.
    */
-  if ((ret = _gnutls_handshake_buffer_get_ptr (session, &data, &siz)) < 0)
+  if ((ret = _gnutls_handshake_hash_buffer_get_ptr (session, &data, &siz)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -660,7 +662,7 @@ _gnutls_handshake_hash_pending (gnutls_session_t session)
         }
     }
 
-  _gnutls_handshake_buffer_empty (session);
+  _gnutls_handshake_hash_buffer_empty (session);
 
   return 0;
 }
@@ -1118,7 +1120,7 @@ _gnutls_handshake_hash_add_sent (gnutls_session_t session,
     {
       /* do not hash immediatelly since the hash has not yet been initialized */
       if ((ret =
-           _gnutls_handshake_buffer_put (session, dataptr, datalen)) < 0)
+           _gnutls_handshake_hash_buffer_put (session, dataptr, datalen)) < 0)
         {
           gnutls_assert ();
           return ret;
@@ -1290,7 +1292,7 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
 
   /* here we buffer the handshake messages - needed at Finished message */
   if ((ret =
-       _gnutls_handshake_buffer_put (session, header, header_size)) < 0)
+       _gnutls_handshake_hash_buffer_put (session, header, header_size)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -1299,7 +1301,7 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
   if (datalen > 0)
     {
       if ((ret =
-           _gnutls_handshake_buffer_put (session, dataptr, datalen)) < 0)
+           _gnutls_handshake_hash_buffer_put (session, dataptr, datalen)) < 0)
         {
           gnutls_assert ();
           return ret;
@@ -2264,7 +2266,7 @@ _gnutls_recv_hello_verify_request (gnutls_session_t session,
     }
 
   /* reset handshake hash buffers */
-  _gnutls_handshake_buffer_empty (session);
+  _gnutls_handshake_hash_buffer_empty (session);
 
   return 0;
 }
