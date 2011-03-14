@@ -64,6 +64,7 @@ required callbacks to access the transport layer.
 
 @itemize
 @item @ref{gnutls_transport_set_push_function}
+@item @ref{gnutls_transport_set_vec_push_function}
 @item @ref{gnutls_transport_set_pull_function}
 @item @ref{gnutls_transport_set_ptr}
 @item @ref{gnutls_transport_set_lowat}
