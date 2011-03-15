@@ -388,7 +388,7 @@ gnutls_openpgp_crt_get_name (gnutls_openpgp_crt_t key,
  * For DSA the bits returned are of the public exponent.
  *
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
- *   success, or a negative value on error.
+ *   success, or GNUTLS_PK_UNKNOWN on error.
  **/
 gnutls_pk_algorithm_t
 gnutls_openpgp_crt_get_pk_algorithm (gnutls_openpgp_crt_t key,
@@ -850,7 +850,7 @@ gnutls_openpgp_crt_get_subkey_revoked_status (gnutls_openpgp_crt_t key,
  * For DSA the bits returned are of the public exponent.
  *
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
- *   success, or a negative value on error.
+ *   success, or GNUTLS_PK_UNKNOWN on error.
  *
  * Since: 2.4.0
  **/
@@ -1646,7 +1646,10 @@ gnutls_openpgp_crt_get_auth_subkey (gnutls_openpgp_crt_t crt,
    */
   for (i = 0; i < subkeys; i++)
     {
-
+      ret = gnutls_openpgp_crt_get_subkey_pk_algorithm(crt, i, NULL);
+      if (ret == GNUTLS_PK_UNKNOWN)
+        continue;
+      
       ret = gnutls_openpgp_crt_get_subkey_revoked_status (crt, i);
       if (ret != 0)             /* it is revoked. ignore it */
         continue;
