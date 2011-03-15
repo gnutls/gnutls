@@ -797,10 +797,14 @@ dsa_verify_sig (const gnutls_datum_t * text,
   opaque _digest[MAX_HASH_SIZE];
   gnutls_datum_t digest;
   digest_hd_st hd;
+  gnutls_digest_algorithm_t algo;
+
+  algo = _gnutls_dsa_q_to_hash (params[1]);
 
   if (hash)
     {
-      if (!hash->data || hash->size != 20)
+      /* SHA1 or better allowed */
+      if (!hash->data || hash->size != _gnutls_hash_get_algo_len(algo))
         {
           gnutls_assert();
           return GNUTLS_E_INVALID_REQUEST;
@@ -809,7 +813,8 @@ dsa_verify_sig (const gnutls_datum_t * text,
     }
   else
     {
-      ret = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1);
+
+      ret = _gnutls_hash_init (&hd, algo);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -820,7 +825,7 @@ dsa_verify_sig (const gnutls_datum_t * text,
       _gnutls_hash_deinit (&hd, _digest);
 
       digest.data = _digest;
-      digest.size = 20;
+      digest.size = _gnutls_hash_get_algo_len(algo);
     }
 
   ret = _gnutls_dsa_verify (&digest, signature, params, params_len);
