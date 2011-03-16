@@ -126,7 +126,9 @@ _gnutls_openpgp_raw_crt_to_gcert (gnutls_cert * gcert,
  * called more than once (in case multiple keys/certificates exist
  * for the server).
  *
- * With this function the subkeys of the certificate are not used.
+ * Note that this function requires that the preferred key ids have
+ * been set and be used. See gnutls_openpgp_crt_set_preferred_key_id().
+ * Otherwise the master key will be used.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
  *   otherwise an error code is returned.
@@ -139,6 +141,7 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
   int ret;
   gnutls_privkey_t privkey;
   gnutls_cert *ccert;
+
   /* this should be first */
 
   ret = gnutls_privkey_init (&privkey);
@@ -147,7 +150,7 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
       gnutls_assert ();
       return ret;
     }
-
+  
   ret =
     gnutls_privkey_import_openpgp (privkey, pkey,
                                    GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);

@@ -25,7 +25,6 @@ int gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t pkey,
                                  gnutls_pkcs11_obj_t crt, unsigned int flags);
 int gnutls_pubkey_import_openpgp (gnutls_pubkey_t pkey,
                                   gnutls_openpgp_crt_t crt,
-                                  gnutls_openpgp_keyid_t keyid,
                                   unsigned int flags);
 int
 gnutls_pubkey_import_privkey (gnutls_pubkey_t key, gnutls_privkey_t pkey,
