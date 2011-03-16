@@ -2208,6 +2208,7 @@ typedef struct gnutls_pk_entry gnutls_pk_entry;
 static const gnutls_pk_entry pk_algorithms[] = {
   /* having duplicate entries is ok, as long as the one
    * we want to return OID from is first */
+  {"UNKNOWN", NULL, GNUTLS_PK_UNKNOWN},
   {"RSA", PK_PKIX1_RSA_OID, GNUTLS_PK_RSA},
   {"RSA (X.509)", PK_X509_RSA_OID, GNUTLS_PK_RSA},      /* some certificates use this OID for RSA */
   {"RSA (MD5)", SIG_RSA_MD5_OID, GNUTLS_PK_RSA},        /* some other broken certificates set RSA with MD5 as an indicator of RSA */
