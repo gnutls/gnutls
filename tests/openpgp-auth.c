@@ -65,19 +65,19 @@ doit ()
 
   srcdir = getenv ("srcdir") ? getenv ("srcdir") : ".";
 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < 4; i++)
     {
 
-      if (i == 0)
+      if (i <= 1)
         key_id = NULL;          /* try using the master key */
-      else if (i == 1)
-        key_id = "auto";        /* test auto */
       else if (i == 2)
+        key_id = "auto";        /* test auto */
+      else if (i == 3)
         key_id = "f30fd423c143e7ba";
 
       if (debug)
         {
-          gnutls_global_set_log_level (10);
+          gnutls_global_set_log_level (5);
           gnutls_global_set_log_function (log_message);
         }
 
@@ -113,7 +113,12 @@ doit ()
           if (err != 0)
             fail ("client session %d\n", err);
 
-          gnutls_priority_set_direct (session,
+          if (i==0) /* we use the primary key which is RSA. Test the RSA ciphersuite */
+            gnutls_priority_set_direct (session,
+                                      "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+RSA:+CTYPE-OPENPGP",
+                                      NULL);
+          else
+            gnutls_priority_set_direct (session,
                                       "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+DHE-DSS:+DHE-RSA:+CTYPE-OPENPGP",
                                       NULL);
           gnutls_transport_set_ptr (session,
@@ -177,7 +182,7 @@ doit ()
             fail ("server session %d\n", err);
 
           gnutls_priority_set_direct (session,
-                                      "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+DHE-DSS:+DHE-RSA:+CTYPE-OPENPGP",
+                                      "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+DHE-DSS:+DHE-RSA:+RSA:+CTYPE-OPENPGP",
                                       NULL);
           gnutls_transport_set_ptr (session,
                                     (gnutls_transport_ptr_t) (intptr_t)
