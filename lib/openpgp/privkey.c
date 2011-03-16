@@ -759,6 +759,7 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
           goto error;
         }
     }
+  
   /* fixup will generate exp1 and exp2 that are not
    * available here.
    */
@@ -1324,8 +1325,8 @@ _gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
                                      gnutls_datum_t * plaintext)
 {
   int result, i;
-  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
-  int params_size = MAX_PUBLIC_PARAMS_SIZE;
+  bigint_t params[MAX_PRIV_PARAMS_SIZE];
+  int params_size = MAX_PRIV_PARAMS_SIZE;
   int pk_algorithm;
   gnutls_openpgp_keyid_t keyid;
 
@@ -1343,11 +1344,18 @@ _gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
       KEYID_IMPORT (kid, keyid);
       result = _gnutls_openpgp_privkey_get_mpis (key, kid,
                                                  params, &params_size);
+
+      i = gnutls_openpgp_privkey_get_subkey_idx (key, keyid);
+
+      pk_algorithm = gnutls_openpgp_privkey_get_subkey_pk_algorithm (key, i, NULL);
     }
   else
     {
+      pk_algorithm = gnutls_openpgp_privkey_get_pk_algorithm (key, NULL);
+
       result = _gnutls_openpgp_privkey_get_mpis (key, NULL,
                                                  params, &params_size);
+
     }
 
   if (result < 0)
@@ -1355,8 +1363,6 @@ _gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
       gnutls_assert ();
       return result;
     }
-
-  pk_algorithm = gnutls_openpgp_privkey_get_pk_algorithm (key, NULL);
 
   if (pk_algorithm != GNUTLS_PK_RSA)
     {
