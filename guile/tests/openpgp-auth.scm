@@ -30,7 +30,7 @@
 
 ;; TLS session settings.
 (define priorities
-  "NONE:+VERS-TLS-ALL:+CTYPE-OPENPGP:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+DHE-DSS:+COMP-ALL")
+  "NONE:+VERS-TLS-ALL:+CTYPE-OPENPGP:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+DHE-RSA:+DHE-DSS:+COMP-ALL")
 
 ;; Message sent by the client.
 (define %message
@@ -55,9 +55,9 @@
                     x509-certificate-format/pem))
 
 ;; Debugging.
- (set-log-level! 3)
- (set-log-procedure! (lambda (level str)
-                       (format #t "[~a|~a] ~a" (getpid) level str)))
+;; (set-log-level! 3)
+;; (set-log-procedure! (lambda (level str)
+;;                       (format #t "[~a|~a] ~a" (getpid) level str)))
 
 (dynamic-wind
     (lambda ()
