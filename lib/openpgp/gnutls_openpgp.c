@@ -277,7 +277,7 @@ leave:
  * @format: the format of the keys
  *
  * This funtion is used to load OpenPGP keys into the GnuTLS credential 
- * structure. The files should contain non encrypted keys.
+ * structure. The datum should contain at least one valid non encrypted subkey.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
@@ -300,8 +300,7 @@ gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t res,
  * @format: the format of the keys
  *
  * This funtion is used to load OpenPGP keys into the GnuTLS
- * credentials structure.  The files should only contain one key which
- * is not encrypted.
+ * credentials structure. The file should contain at least one valid non encrypted subkey.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
@@ -346,8 +345,7 @@ get_keyid (gnutls_openpgp_keyid_t keyid, const char *str)
  * @format: the format of the keys
  *
  * This funtion is used to load OpenPGP keys into the GnuTLS
- * credentials structure.  The files should only contain one key which
- * is not encrypted.
+ * credentials structure. The datum should contain at least one valid non encrypted subkey.
  *
  * The special keyword "auto" is also accepted as @subkey_id.  In that
  * case the gnutls_openpgp_crt_get_auth_subkey() will be used to
@@ -444,7 +442,7 @@ gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t res,
  * @format: the format of the keys
  *
  * This funtion is used to load OpenPGP keys into the GnuTLS credential 
- * structure. The files should contain non encrypted keys.
+ * structure. The file should contain at least one valid non encrypted subkey.
  *
  * The special keyword "auto" is also accepted as @subkey_id.  In that
  * case the gnutls_openpgp_crt_get_auth_subkey() will be used to
