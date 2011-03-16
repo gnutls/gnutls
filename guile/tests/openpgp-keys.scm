@@ -30,10 +30,10 @@
              (srfi srfi-11))
 
 (define %certificate-file
-  (search-path %load-path "openpgp-pub.asc"))
+  (search-path %load-path "openpgp-elg-pub.asc"))
 
 (define %private-key-file
-  (search-path %load-path "openpgp-sec.asc"))
+  (search-path %load-path "openpgp-elg-sec.asc"))
 
 (define %key-id
   ;; Change me if you change the key files.

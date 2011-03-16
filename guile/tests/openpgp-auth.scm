@@ -55,9 +55,9 @@
                     x509-certificate-format/pem))
 
 ;; Debugging.
-;; (set-log-level! 3)
-;; (set-log-procedure! (lambda (level str)
-;;                       (format #t "[~a|~a] ~a" (getpid) level str)))
+ (set-log-level! 3)
+ (set-log-procedure! (lambda (level str)
+                       (format #t "[~a|~a] ~a" (getpid) level str)))
 
 (dynamic-wind
     (lambda ()
