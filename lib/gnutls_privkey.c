@@ -385,7 +385,8 @@ gnutls_privkey_import_openpgp (gnutls_privkey_t pkey,
                                gnutls_openpgp_privkey_t key,
                                unsigned int flags)
 {
-int ret;
+int ret, idx;
+gnutls_openpgp_keyid_t keyid;
 
   ret = check_if_clean(pkey);
   if (ret < 0)
@@ -396,7 +397,14 @@ int ret;
 
   pkey->key.openpgp = key;
   pkey->type = GNUTLS_PRIVKEY_OPENPGP;
-  pkey->pk_algorithm = gnutls_openpgp_privkey_get_pk_algorithm (key, NULL);
+  
+  ret = gnutls_openpgp_privkey_get_preferred_key_id (key, keyid);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+   
+  idx = gnutls_openpgp_privkey_get_subkey_idx (key, keyid);
+  
+  pkey->pk_algorithm = gnutls_openpgp_privkey_get_subkey_pk_algorithm (key, idx, NULL);
   pkey->flags = flags;
 
   return 0;
