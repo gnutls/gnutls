@@ -1559,7 +1559,10 @@ int
 gnutls_openpgp_crt_get_preferred_key_id (gnutls_openpgp_crt_t key,
                                          gnutls_openpgp_keyid_t keyid)
 {
-  if (!key || !keyid || !key->preferred_set)
+  if (!key->preferred_set)
+    return gnutls_assert_val(GNUTLS_E_OPENPGP_PREFERRED_KEY_ERROR);
+
+  if (!key || !keyid)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
