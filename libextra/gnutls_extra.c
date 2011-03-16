@@ -152,6 +152,8 @@ gnutls_global_init_extra (void)
   gcry_check_version (NULL);
   if (gcry_fips_mode_active ())
     {
+      int ret;
+
       ret = gnutls_register_md5_handler ();
       if (ret)
         fprintf (stderr, "gnutls_register_md5_handler: %s\n",
