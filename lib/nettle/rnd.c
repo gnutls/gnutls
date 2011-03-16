@@ -250,7 +250,6 @@ do_device_source_urandom (int init)
   if ((device_fd > 0)
       && (init || ((now - device_last_read) > DEVICE_READ_INTERVAL)))
     {
-
       /* More than a minute since we last read the device */
       uint8_t buf[DEVICE_READ_SIZE_MAX];
       uint32_t done;
@@ -348,7 +347,7 @@ static int
 do_device_source (int init)
 {
   static pid_t pid; /* detect fork() */
-  int ret;
+  int ret, reseed = 0;
   static int (*do_source) (int init) = NULL;
 /* using static var here is ok since we are
  * always called with mutexes down 
@@ -380,9 +379,15 @@ do_device_source (int init)
         { /* fork() detected */
           device_last_read = 0;
           pid = getpid();
+          reseed = 1;
         }
     
-      return do_source (init);
+      ret = do_source (init);
+      
+      if (reseed)
+        yarrow256_slow_reseed (&yctx);
+      
+      return ret;
     }
 }
 
