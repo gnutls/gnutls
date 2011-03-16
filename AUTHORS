@@ -67,6 +67,7 @@ Initial TLS safe renegotiation patch.
 Jonathan Bastien-Filiatrault <joe@x2a.org>
 Fix TLS-version checks.
 Redesign and implementation of the buffering layer.
+Initial DTLS implementation.
 
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 URL: http://josefsson.org/key.txt (always latest version)
