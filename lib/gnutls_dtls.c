@@ -563,8 +563,8 @@ uint8_t digest[C_HASH_SIZE];
     return gnutls_assert_val(GNUTLS_E_BAD_COOKIE);
   
   out->record_seq = msg[10]; /* client's record seq */
-  out->hsk_read_seq =  msg[DTLS_RECORD_HEADER_SIZE+5];/* client's hsk seq */
-  out->hsk_write_seq = out->hsk_read_seq;/* client's hsk seq */
+  out->hsk_read_seq =  msg[DTLS_RECORD_HEADER_SIZE+5]; /* client's hsk seq */
+  out->hsk_write_seq = 0;/* we always send zero for this msg */
   
   return 0;
 }
@@ -599,5 +599,5 @@ void gnutls_dtls_prestate_set(gnutls_session_t session, gnutls_dtls_prestate_st*
   params->write.sequence_number.i[7] = st->record_seq;
 
   session->internals.dtls.hsk_read_seq = st->hsk_read_seq;
-  session->internals.dtls.hsk_write_seq = st->hsk_write_seq;
+  session->internals.dtls.hsk_write_seq = st->hsk_write_seq + 1;
 }
