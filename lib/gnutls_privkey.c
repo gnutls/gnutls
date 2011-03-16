@@ -375,7 +375,8 @@ int ret;
  * #gnutls_privkey_t structure.
  *
  * The #gnutls_openpgp_privkey_t object must not be deallocated
- * during the lifetime of this structure.
+ * during the lifetime of this structure. The subkey set as
+ * preferred will be used, or the master key otherwise.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
@@ -399,12 +400,20 @@ gnutls_openpgp_keyid_t keyid;
   pkey->type = GNUTLS_PRIVKEY_OPENPGP;
   
   ret = gnutls_openpgp_privkey_get_preferred_key_id (key, keyid);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
-   
-  idx = gnutls_openpgp_privkey_get_subkey_idx (key, keyid);
+  if (ret == GNUTLS_E_OPENPGP_PREFERRED_KEY_ERROR)
+    {
+      pkey->pk_algorithm = gnutls_openpgp_privkey_get_pk_algorithm(key, NULL);
+    }
+  else
+    {
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+
+      idx = gnutls_openpgp_privkey_get_subkey_idx (key, keyid);
   
-  pkey->pk_algorithm = gnutls_openpgp_privkey_get_subkey_pk_algorithm (key, idx, NULL);
+      pkey->pk_algorithm = gnutls_openpgp_privkey_get_subkey_pk_algorithm (key, idx, NULL);
+    }
+
   pkey->flags = flags;
 
   return 0;

@@ -327,7 +327,8 @@ gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t key,
  * @flags: should be zero
  *
  * This function will import the given public key to the abstract
- * #gnutls_pubkey_t structure.
+ * #gnutls_pubkey_t structure. The subkey set as preferred will be
+ * imported or the master key otherwise.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
@@ -335,32 +336,50 @@ gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t key,
 int
 gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
                               gnutls_openpgp_crt_t crt,
-                              gnutls_openpgp_keyid_t keyid,
                               unsigned int flags)
 {
-  int ret;
+  int ret, idx;
   uint32_t kid32[2];
+  uint32_t *k;
+  gnutls_openpgp_keyid_t keyid;
 
   ret = gnutls_openpgp_crt_get_preferred_key_id (crt, keyid);
-  if (ret < 0)
+  if (ret == GNUTLS_E_OPENPGP_PREFERRED_KEY_ERROR)
     {
-      gnutls_assert ();
-      return ret;
+      key->pk_algorithm = gnutls_openpgp_crt_get_pk_algorithm(crt, NULL);
+      key->pk_algorithm = gnutls_openpgp_crt_get_pk_algorithm (crt, &key->bits);
+
+      ret = gnutls_openpgp_crt_get_key_usage (crt, &key->key_usage);
+      if (ret < 0)
+        key->key_usage = 0;
+      
+      k = NULL;
     }
+  else
+    {
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          return ret;
+        }
 
-  KEYID_IMPORT (kid32, keyid);
+        KEYID_IMPORT (kid32, keyid);
+        k = kid32;
 
-  key->pk_algorithm = gnutls_openpgp_crt_get_pk_algorithm (crt, &key->bits);
+        idx = gnutls_openpgp_crt_get_subkey_idx (crt, keyid);
 
-  ret = gnutls_openpgp_crt_get_key_usage (crt, &key->key_usage);
-  if (ret < 0)
-    key->key_usage = 0;
+        ret = gnutls_openpgp_crt_get_subkey_usage (crt, idx, &key->key_usage);
+        if (ret < 0)
+          key->key_usage = 0;
+
+      key->pk_algorithm = gnutls_openpgp_crt_get_subkey_pk_algorithm (crt, idx, NULL);
+    }
 
   switch (key->pk_algorithm)
     {
     case GNUTLS_PK_RSA:
       ret =
-        _gnutls_openpgp_crt_get_mpis (crt, kid32, key->params,
+        _gnutls_openpgp_crt_get_mpis (crt, k, key->params,
                                       &key->params_size);
       if (ret < 0)
         {
@@ -370,7 +389,7 @@ gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
       break;
     case GNUTLS_PK_DSA:
       ret =
-        _gnutls_openpgp_crt_get_mpis (crt, kid32, key->params,
+        _gnutls_openpgp_crt_get_mpis (crt, k, key->params,
                                       &key->params_size);
       if (ret < 0)
         {

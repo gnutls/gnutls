@@ -53,8 +53,6 @@ static const char *key_id = NULL
   /* "auto" */
   /* "bd572cdcccc07c35" */ ;
 
-static const char rsa_params_file[] = "../guile/tests/rsa-parameters.pem";
-
 static void
 log_message (int level, const char *message)
 {
@@ -68,7 +66,7 @@ doit ()
   int err;
   int sockets[2];
   const char *srcdir;
-  char *pub_key_path, *priv_key_path, *rsa_params_path;
+  char *pub_key_path, *priv_key_path;
   pid_t child;
 
   gnutls_global_init ();
@@ -95,11 +93,6 @@ doit ()
   strcat (priv_key_path, "/");
   strcat (priv_key_path, priv_key_file);
 
-  rsa_params_path = alloca (strlen (srcdir) + strlen (rsa_params_file) + 2);
-  strcpy (rsa_params_path, srcdir);
-  strcat (rsa_params_path, "/");
-  strcat (rsa_params_path, rsa_params_file);
-
   child = fork ();
   if (child == -1)
     fail ("fork %s\n", strerror (errno));
@@ -118,7 +111,7 @@ doit ()
       if (err != 0)
         fail ("client session %d\n", err);
 
-      gnutls_priority_set_direct (session, "NONE:+VERS-TLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+DHE-DSS:+CTYPE-OPENPGP", NULL);
+      gnutls_priority_set_direct (session, "NONE:+VERS-TLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+DHE-DSS:+DHE-RSA:+CTYPE-OPENPGP", NULL);
       gnutls_transport_set_ptr (session,
                                 (gnutls_transport_ptr_t) (intptr_t)
                                 sockets[0]);
@@ -164,14 +157,11 @@ doit ()
       /* Parent process (server).  */
       gnutls_session_t session;
       gnutls_dh_params_t dh_params;
-      gnutls_rsa_params_t rsa_params;
       gnutls_certificate_credentials_t cred;
       char greetings[sizeof (message) * 2];
       ssize_t received;
       pid_t done;
       int status;
-      size_t rsa_size;
-      gnutls_datum_t rsa_data;
       const gnutls_datum_t p3 = { (char *) pkcs3, strlen (pkcs3) };
 
       if (debug)
@@ -181,7 +171,7 @@ doit ()
       if (err != 0)
         fail ("server session %d\n", err);
 
-      gnutls_priority_set_direct (session, "NONE:+VERS-TLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+DHE-DSS:+CTYPE-OPENPGP", NULL);
+      gnutls_priority_set_direct (session, "NONE:+VERS-TLS1.2:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+DHE-DSS:+DHE-RSA:+CTYPE-OPENPGP", NULL);
       gnutls_transport_set_ptr (session,
                                 (gnutls_transport_ptr_t) (intptr_t)
                                 sockets[1]);
@@ -208,23 +198,6 @@ doit ()
         fail ("server DH params generate %d\n", err);
 
       gnutls_certificate_set_dh_params (cred, dh_params);
-
-      rsa_data.data =
-        (unsigned char *) read_binary_file (rsa_params_path, &rsa_size);
-      if (rsa_data.data == NULL)
-        fail ("server rsa params error\n");
-      rsa_data.size = rsa_size;
-
-      err = gnutls_rsa_params_init (&rsa_params);
-      if (err)
-        fail ("server RSA params init %d\n", err);
-
-      err = gnutls_rsa_params_import_pkcs1 (rsa_params, &rsa_data,
-                                            GNUTLS_X509_FMT_PEM);
-      if (err)
-        fail ("server RSA params import %d\n", err);
-
-      gnutls_certificate_set_rsa_export_params (cred, rsa_params);
 
       err = gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, cred);
       if (err != 0)
