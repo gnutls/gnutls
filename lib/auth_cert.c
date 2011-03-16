@@ -870,6 +870,8 @@ _gnutls_gen_openpgp_certificate (gnutls_session_t session, gnutls_buffer_st * da
     }
   else                          /* empty - no certificate */
     {
+      type = PGP_KEY;
+
       ret = _gnutls_buffer_append_data( data, &type, 1);
       if (ret < 0)
         return gnutls_assert_val(ret);
