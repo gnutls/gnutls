@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 2.xx.y (unreleased)
 
+** libgnutls: Bug fixes in the RSA ciphersuite behavior with openpgp keys.
+
+** libgnutls: Force state update when fork is detected in the nettle
+rng.
+
 ** libgnutls: modified gnutls_pubkey_import_openpgp() to use the preferred
 subkey instead of setting explitly one.
 
