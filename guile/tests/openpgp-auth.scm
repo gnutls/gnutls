@@ -31,9 +31,9 @@
 ;; TLS session settings.
 (define %protos  (list protocol/tls-1.0))
 (define %certs   (list certificate-type/openpgp))
-(define %ciphers (list cipher/null cipher/arcfour cipher/aes-128-cbc
+(define %ciphers (list cipher/arcfour cipher/aes-128-cbc
                        cipher/aes-256-cbc))
-(define %kx      (list kx/rsa kx/rsa-export kx/dhe-rsa kx/dhe-dss))
+(define %kx      (list kx/dhe-rsa kx/dhe-dss))
 (define %macs    (list mac/sha1 mac/rmd160 mac/md5))
 
 ;; Message sent by the client.
@@ -59,9 +59,9 @@
                     x509-certificate-format/pem))
 
 ;; Debugging.
- (set-log-level! 3)
- (set-log-procedure! (lambda (level str)
-                       (format #t "[~a|~a] ~a" (getpid) level str)))
+;; (set-log-level! 3)
+;; (set-log-procedure! (lambda (level str)
+;;                       (format #t "[~a|~a] ~a" (getpid) level str)))
 
 (dynamic-wind
     (lambda ()
