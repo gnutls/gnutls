@@ -99,6 +99,8 @@ gnutls_transport_set_global_errno (int err)
  * This is the function where you set a function for gnutls to receive
  * data.  Normally, if you use berkeley style sockets, do not need to
  * use this function since the default (recv(2)) will probably be ok.
+ * The callback should return 0 on connection termination, a positive
+ * number indicating the number of bytes received, and -1 on error.
  *
  * gnutls_pull_func is of the form,
  * ssize_t (*gnutls_pull_func)(gnutls_transport_ptr_t, void*, size_t);
@@ -146,6 +148,8 @@ gnutls_transport_set_pull_timeout_function (gnutls_session_t session,
  * sockets, you do not need to use this function since the default
  * (send(2)) will probably be ok.  Otherwise you should specify this
  * function for gnutls to be able to send data.
+ * The callback should return a positive number indicating the
+ * bytes sent, and -1 on error.
  *
  * push_func is of the form,
  * ssize_t (*gnutls_push_func)(gnutls_transport_ptr_t, const void*, size_t);
