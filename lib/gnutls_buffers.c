@@ -603,7 +603,7 @@ int
 _gnutls_io_check_recv (gnutls_session_t session, void* data, size_t data_size, unsigned int ms)
 {
   gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
-  int ret;
+  int ret = 0;
   
   if (session->internals.pull_timeout_func == system_recv_timeout && 
     session->internals.pull_func != system_read)

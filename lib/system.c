@@ -108,12 +108,14 @@ system_read_peek (gnutls_transport_ptr_t ptr, void *data, size_t data_size)
 /* Wait for data to be received within a timeout period in milliseconds.
  * If data_size > 0 it will return the specified amount of data in
  * peek mode.
+ *
+ * Returns -1 on error, 0 on timeout.
  */
 int system_recv_timeout(gnutls_transport_ptr_t ptr, void* data, size_t data_size, unsigned int ms)
 {
 fd_set rfds;
 struct timeval tv;
-int ret;
+int ret, ret2;
 
   FD_ZERO(&rfds);
   FD_SET(GNUTLS_POINTER_TO_INT(ptr), &rfds);
@@ -122,9 +124,18 @@ int ret;
   tv.tv_usec = ms * 1000;
   
   ret = select(GNUTLS_POINTER_TO_INT(ptr)+1, &rfds, NULL, NULL, &tv);
-
-  if (ret <= 0 || data_size == 0)
+  if (ret <= 0)
     return ret;
+
+  
+  if (data_size == 0)
+    {
+      ret2 = recv(GNUTLS_POINTER_TO_INT(ptr), NULL, 0, MSG_PEEK);
+      if (ret2 == -1)
+        return ret2;
+      
+      return ret;
+    }
 
   /* only report ok if the next message is from the peer we expect
    * from 
