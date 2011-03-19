@@ -53,6 +53,9 @@ the "tls-unique" (RFC 5929) channel binding type is supported, through
 the GNUTLS_CB_TLS_UNIQUE type.  See new section "Channel Bindings" in
 the manual.
 
+** libgnutls: Removed support for opaque PRF (it was disabled by
+default in previous gnutls versions)
+
 ** libgnutls: Added gnutls_global_set_mutex() to allow setting
 alternative locking procedures. By default the system available
 locking is used. In *NIX pthreads are used and in windows the
@@ -256,11 +259,69 @@ gnutls_pkcs11_copy_x509_crt: ADDED
 gnutls_pkcs11_copy_x509_privkey: ADDED
 gnutls_pkcs11_delete_url: ADDED
 
+The following symbols were deprecated because have been replaced
+by newer functions:
+gnutls_cipher_set_priority: DEPRECATED (use: gnutls_priority_set_direct)
+gnutls_mac_set_priority: DEPRECATED (use: gnutls_priority_set_direct)
+gnutls_compression_set_priority: DEPRECATED (use: gnutls_priority_set_direct)
+gnutls_kx_set_priority: DEPRECATED (use: gnutls_priority_set_direct)
+gnutls_protocol_set_priority: DEPRECATED (use: gnutls_priority_set_direct)
+gnutls_certificate_type_set_priority: DEPRECATED (use: gnutls_priority_set_direct)
+gnutls_certificate_client_retrieve_function: DEPRECATED (use: gnutls_certificate_set_retrieve_function)
+gnutls_certificate_server_retrieve_function: DEPRECATED (use: gnutls_certificate_set_retrieve_function)
+gnutls_certificate_verify_peers: DEPRECATED (use: gnutls_certificate_verify_peers2)
+gnutls_x509_crl_sign: DEPRECATED (use: gnutls_x509_crl_privkey_sign)
+gnutls_x509_crl_sign2: DEPRECATED (use: gnutls_x509_crl_privkey_sign)
+gnutls_x509_privkey_sign_data: DEPRECATED (use: gnutls_privkey_sign_data)
+gnutls_x509_privkey_verify_data: DEPRECATED (use: gnutls_pubkey_verify_data)
+gnutls_x509_crt_verify_data: DEPRECATED (use: gnutls_pubkey_verify_data)
+gnutls_x509_crt_verify_hash: DEPRECATED (use: gnutls_pubkey_verify_hash)
+gnutls_x509_crt_get_verify_algorithm: DEPRECATED (use: gnutls_pubkey_get_verify_algorithm)
+gnutls_x509_privkey_sign_hash: DEPRECATED (use: gnutls_privkey_sign_hash)
+gnutls_x509_crq_sign2: DEPRECATED (use: gnutls_x509_crq_privkey_sign)
+gnutls_x509_crq_sign: DEPRECATED (use: gnutls_x509_crq_privkey_sign)
+
+Symbols deprecated because they exported internal structures, making
+modification of gnutls' inner workings hard:
+gnutls_session_get_server_random: DEPRECATED
+gnutls_session_get_client_random: DEPRECATED
+gnutls_session_get_master_secret: DEPRECATED
+gnutls_session_set_finished_function: DEPRECATED
+gnutls_certificate_get_x509_cas: DEPRECATED
+gnutls_certificate_get_x509_crls: DEPRECATED
+gnutls_certificate_get_openpgp_keyring: DEPRECATED
+
+Deprecated symbols because functionality will not be supported in the
+future:
+gnutls_session_set_finished_function: DEPRECATED
+gnutls_transport_set_lowat: DEPRECATED
+gnutls_psk_netconf_derive_key: DEPRECATED
+
 In addition to the functions above, the following non-function
 definitions have been added to the header files:
 
 GNUTLS_CB_TLS_UNIQUE: New gnutls_channel_binding_t enum member.
 GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE: New error code.
+GNUTLS_E_OPENPGP_PREFERRED_KEY_ERROR: New error code.
+GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL: New error code.
+GNUTLS_E_PKCS11_ERROR: New error code.
+GNUTLS_E_PKCS11_LOAD_ERROR: New error code.
+GNUTLS_E_PARSING_ERROR: New error code.
+GNUTLS_E_PKCS11_PIN_ERROR: New error code.
+GNUTLS_E_PKCS11_SLOT_ERROR: New error code.
+GNUTLS_E_LOCKING_ERROR: New error code.
+GNUTLS_E_PKCS11_ATTRIBUTE_ERROR: New error code.
+GNUTLS_E_PKCS11_DEVICE_ERROR: New error code.
+GNUTLS_E_PKCS11_DATA_ERROR: New error code.
+GNUTLS_E_PKCS11_UNSUPPORTED_FEATURE_ERROR: New error code.
+GNUTLS_E_PKCS11_KEY_ERROR: New error code.
+GNUTLS_E_PKCS11_PIN_EXPIRED: New error code.
+GNUTLS_E_PKCS11_PIN_LOCKED: New error code.
+GNUTLS_E_PKCS11_SESSION_ERROR: New error code.
+GNUTLS_E_PKCS11_SIGNATURE_ERROR: New error code.
+GNUTLS_E_PKCS11_TOKEN_ERROR: New error code.
+GNUTLS_E_PKCS11_USER_ERROR: New error code.
+GNUTLS_E_CRYPTO_INIT_FAILED: New error code.
 
 Getting the Software
 ====================
