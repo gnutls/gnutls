@@ -276,6 +276,7 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
         struct dsa_public_key pub;
         struct dsa_private_key priv;
         struct dsa_signature sig;
+        int hash_len;
 
         dsa_public_key_init (&pub);
         dsa_private_key_init (&priv);
@@ -285,7 +286,8 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
         dsa_signature_init (&sig);
 
         hash = _gnutls_dsa_q_to_hash (pub.q);
-        if (vdata->size != _gnutls_hash_get_algo_len (hash))
+        hash_len = _gnutls_hash_get_algo_len (hash);
+        if (hash_len > vdata->size)
           {
             gnutls_assert ();
             _gnutls_debug_log("Asked to sign %d bytes with hash %s\n", vdata->size, gnutls_mac_get_name(hash));
@@ -295,7 +297,7 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
 
         ret =
           _dsa_sign (&pub, &priv, NULL, rnd_func,
-                     vdata->size, vdata->data, &sig);
+                     hash_len, vdata->data, &sig);
         if (ret == 0)
           {
             gnutls_assert ();
@@ -426,6 +428,7 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         memcpy (&sig.s, tmp[1], sizeof (sig.s));
 
         hash = _gnutls_dsa_q_to_hash (pub.q);
+
         if (vdata->size != _gnutls_hash_get_algo_len (hash))
           {
             gnutls_assert ();
@@ -435,7 +438,10 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
 
         ret = _dsa_verify (&pub, vdata->size, vdata->data, &sig);
         if (ret == 0)
-          ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
+          {
+            gnutls_assert();
+            ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
+          }
         else
           ret = 0;
 
