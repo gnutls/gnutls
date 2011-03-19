@@ -72,7 +72,7 @@ $SERV -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile $sr
 # give the server a chance to initialize
 sleep 2
 
-$CLI -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null && \
+$CLI -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null 2>&1 && \
   fail "Succeeded connection to a server with DSA 2048 key and TLS 1.0. Should have failed!"
 
 kill %1
@@ -102,7 +102,7 @@ $SERV -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile $sr
 # give the server a chance to initialize
 sleep 2
 
-$CLI -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null && \
+$CLI -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null 2>&1 && \
   fail "Succeeded connection to a server with DSA 2048 key and TLS 1.0. Should have failed!"
 
 kill %1
