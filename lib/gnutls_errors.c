@@ -94,6 +94,8 @@ static const gnutls_error_entry error_algorithms[] = {
                GNUTLS_E_ERROR_IN_FINISHED_PACKET, 1),
   ERROR_ENTRY (N_("The peer did not send any certificate."),
                GNUTLS_E_NO_CERTIFICATE_FOUND, 1),
+  ERROR_ENTRY (N_("The given DSA key is incompatible with the selected TLS protocol."),
+               GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL, 1),
 
   ERROR_ENTRY (N_("There is already a crypto algorithm with lower priority."),
                GNUTLS_E_CRYPTO_ALREADY_REGISTERED, 1),

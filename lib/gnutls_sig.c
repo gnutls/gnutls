@@ -65,16 +65,15 @@ int ret;
 
   if (cert->subject_pk_algorithm == GNUTLS_PK_DSA)
     { /* override */
-      if (!_gnutls_version_has_selectable_sighash (version))
-        *hash_algo = GNUTLS_DIG_SHA1;
-      else
-        {
-          *hash_algo = _gnutls_dsa_q_to_hash (cert->params[1]);
+      *hash_algo = _gnutls_dsa_q_to_hash (cert->params[1]);
 
-          ret = _gnutls_session_sign_algo_requested(session, _gnutls_x509_pk_to_sign (GNUTLS_PK_DSA, *hash_algo));
-          if (ret < 0)
-            return gnutls_assert_val(ret);
-        }
+      /* DSA keys over 1024 bits cannot be used with TLS 1.x, x<2 */
+      if (!_gnutls_version_has_selectable_sighash (version) && *hash_algo != GNUTLS_DIG_SHA1)
+        return gnutls_assert_val(GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL);
+
+      ret = _gnutls_session_sign_algo_requested(session, _gnutls_x509_pk_to_sign (GNUTLS_PK_DSA, *hash_algo));
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
   else
     {
