@@ -252,14 +252,18 @@ generate_private_key_int (void)
   bits = get_bits (key_type);
 
   fprintf (stderr, "Generating a %d bit %s private key...\n",
-           get_bits (key_type), gnutls_pk_algorithm_get_name (key_type));
+           bits, gnutls_pk_algorithm_get_name (key_type));
 
   if (info.quick_random == 0)
     fprintf (stderr,
              "This might take several minutes depending on availability of randomness"
              " in /dev/random.\n");
 
-  ret = gnutls_x509_privkey_generate (key, key_type, get_bits (key_type), 0);
+  if (bits > 1024 && key_type == GNUTLS_PK_DSA)
+    fprintf (stderr,
+             "Note that DSA keys with size over 1024 can only be used with TLS 1.2 or later.\n\n");
+
+  ret = gnutls_x509_privkey_generate (key, key_type,bits, 0);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "privkey_generate: %s", gnutls_strerror (ret));
 
