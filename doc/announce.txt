@@ -280,6 +280,7 @@ gnutls_x509_crt_get_verify_algorithm: DEPRECATED (use: gnutls_pubkey_get_verify_
 gnutls_x509_privkey_sign_hash: DEPRECATED (use: gnutls_privkey_sign_hash)
 gnutls_x509_crq_sign2: DEPRECATED (use: gnutls_x509_crq_privkey_sign)
 gnutls_x509_crq_sign: DEPRECATED (use: gnutls_x509_crq_privkey_sign)
+gnutls_openpgp_privkey_sign_hash: DEPRECATED (use: gnutls_privkey_sign_hash)
 
 Symbols deprecated because they exported internal structures, making
 modification of gnutls' inner workings hard:
@@ -332,13 +333,13 @@ GnuTLS may be downloaded from one of the mirror sites or direct from
 
 Here are the BZIP2 compressed sources (6.0MB):
 
-  ftp://ftp.gnu.org/gnu/gnutls/gnutls-2.10.0.tar.bz2
-  http://ftp.gnu.org/gnu/gnutls/gnutls-2.10.0.tar.bz2
+  ftp://ftp.gnu.org/gnu/gnutls/gnutls-2.12.0.tar.bz2
+  http://ftp.gnu.org/gnu/gnutls/gnutls-2.12.0.tar.bz2
 
 Here are OpenPGP detached signatures signed using key 0xB565716F:
 
-  ftp://ftp.gnu.org/gnu/gnutls/gnutls-2.10.0.tar.bz2.sig
-  http://ftp.gnu.org/gnu/gnutls/gnutls-2.10.0.tar.bz2.sig
+  ftp://ftp.gnu.org/gnu/gnutls/gnutls-2.12.0.tar.bz2.sig
+  http://ftp.gnu.org/gnu/gnutls/gnutls-2.12.0.tar.bz2.sig
 
 Note, that we don't distribute gzip compressed tarballs.
 
@@ -346,7 +347,7 @@ In order to check that the version of GnuTLS which you are going to
 install is an original and unmodified one, you should verify the OpenPGP
 signature.  You can use the command
 
-     gpg --verify gnutls-2.10.0.tar.bz2.sig
+     gpg --verify gnutls-2.12.0.tar.bz2.sig
 
 This checks whether the signature file matches the source file.  You
 should see a message indicating that the signature is good and made by
@@ -369,9 +370,9 @@ Alternatively, after successfully verifying the OpenPGP signature of
 this announcement, you could verify that the files match the following
 checksum values.  The values are for SHA-1 and SHA-224 respectively:
 
-7c102253bb4e817f393b9979a62c647010312eac  gnutls-2.10.0.tar.bz2
+7c102253bb4e817f393b9979a62c647010312eac  gnutls-2.12.0.tar.bz2
 
-57ee306f261ed331b8386baf854f737fbf24da7b3bcc32331d34176b  gnutls-2.10.0.tar.bz2
+57ee306f261ed331b8386baf854f737fbf24da7b3bcc32331d34176b  gnutls-2.12.0.tar.bz2
 
 Documentation
 =============
@@ -410,33 +411,33 @@ GnuTLS has been ported to the Windows operating system, and a binary
 installer is available.  The installer contains DLLs for application
 development, manuals, examples, and source code.  The installer uses
 libgpg-error v1.7, libgcrypt v1.4.5, libtasn1 v2.6, and GnuTLS
-v2.10.0.
+v2.12.0.
 
 For more information about GnuTLS for Windows:
   http://josefsson.org/gnutls4win/
 
 The Windows binary installer and PGP signature:
-  http://josefsson.org/gnutls4win/gnutls-2.10.0.exe (15MB)
-  http://josefsson.org/gnutls4win/gnutls-2.10.0.exe.sig
+  http://josefsson.org/gnutls4win/gnutls-2.12.0.exe (15MB)
+  http://josefsson.org/gnutls4win/gnutls-2.12.0.exe.sig
 
 The checksum values for SHA-1 and SHA-224 are:
 
-8a7965168c542edec3259469b6c0e87a9a2b4626  gnutls-2.10.0.exe
+8a7965168c542edec3259469b6c0e87a9a2b4626  gnutls-2.12.0.exe
 
-5f76c907eac768b714dc7187a17f87c0393439cf1ef44ab145aab6e3  gnutls-2.10.0.exe
+5f76c907eac768b714dc7187a17f87c0393439cf1ef44ab145aab6e3  gnutls-2.12.0.exe
 
 A ZIP archive containing the Windows binaries:
-  http://josefsson.org/gnutls4win/gnutls-2.10.0.zip (5.3MB)
-  http://josefsson.org/gnutls4win/gnutls-2.10.0.zip.sig
+  http://josefsson.org/gnutls4win/gnutls-2.12.0.zip (5.3MB)
+  http://josefsson.org/gnutls4win/gnutls-2.12.0.zip.sig
 
 A Debian mingw32 package is also available:
   http://josefsson.org/gnutls4win/mingw32-gnutls_2.7.10-1_all.deb (4.8MB)
 
 The checksum values for SHA-1 and SHA-224 are:
 
-aca9f9f1adba09b952e095039595d4c5d9e67d46  mingw32-gnutls_2.10.0-1_all.deb
+aca9f9f1adba09b952e095039595d4c5d9e67d46  mingw32-gnutls_2.12.0-1_all.deb
 
-269020738a9f36135e3f231a94cdb2cabc0edd3658092d76b87c27dc  mingw32-gnutls_2.10.0-1_all.deb
+269020738a9f36135e3f231a94cdb2cabc0edd3658092d76b87c27dc  mingw32-gnutls_2.12.0-1_all.deb
 
 Internationalization
 ====================
