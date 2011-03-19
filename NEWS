@@ -18,7 +18,7 @@ key with the negotiated protocol is encountered.
 rng.
 
 ** libgnutls: modified gnutls_pubkey_import_openpgp() to use the preferred
-subkey instead of setting explitly one.
+subkey instead of setting explicitly one.
 
 ** libgnutls: Corrected default behavior in record version of Client Hellos.
 
