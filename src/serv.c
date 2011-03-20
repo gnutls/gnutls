@@ -729,7 +729,16 @@ listen_socket (const char *name, int listen_port, int socktype)
               continue;
             }
         }
-
+      else
+        {
+          yes = 1;
+          if (setsockopt (s, IPPROTO_IP, IP_DF,
+                          (const void *) &yes, sizeof (yes)) < 0)
+            {
+              perror ("setsockopt(IP_DF) failed");
+            }
+        }
+      
       if (bind (s, ptr->ai_addr, ptr->ai_addrlen) < 0)
         {
           perror ("bind() failed");

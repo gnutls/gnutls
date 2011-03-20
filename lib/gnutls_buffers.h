@@ -79,7 +79,7 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
 
 ssize_t _gnutls_io_write_flush (gnutls_session_t session);
 int
-_gnutls_io_check_recv (gnutls_session_t session, void* data, size_t data_size, unsigned int ms);
+_gnutls_io_check_recv (gnutls_session_t session, unsigned int ms);
 ssize_t _gnutls_handshake_io_write_flush (gnutls_session_t session);
 
 inline static void _gnutls_handshake_buffer_clear(handshake_buffer_st* hsk)

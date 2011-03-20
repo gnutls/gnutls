@@ -8,6 +8,7 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <netinet/ip.h>
 #include <signal.h>
 #ifdef _WIN32
 #include <io.h>

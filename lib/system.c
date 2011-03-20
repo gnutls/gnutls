@@ -111,7 +111,7 @@ system_read_peek (gnutls_transport_ptr_t ptr, void *data, size_t data_size)
  *
  * Returns -1 on error, 0 on timeout.
  */
-int system_recv_timeout(gnutls_transport_ptr_t ptr, void* data, size_t data_size, unsigned int ms)
+int system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 {
 fd_set rfds;
 struct timeval tv;
@@ -128,27 +128,11 @@ int ret, ret2;
     return ret;
 
   
-  if (data_size == 0)
-    {
-      ret2 = recv(GNUTLS_POINTER_TO_INT(ptr), NULL, 0, MSG_PEEK);
-      if (ret2 == -1)
-        return ret2;
+  ret2 = recv(GNUTLS_POINTER_TO_INT(ptr), NULL, 0, MSG_PEEK);
+  if (ret2 == -1)
+    return ret2;
       
-      return ret;
-    }
-
-  /* only report ok if the next message is from the peer we expect
-   * from 
-   */
-  ret = recv(GNUTLS_POINTER_TO_INT(ptr), data, data_size, MSG_PEEK);
-  if (ret > 0)
-    {
-      return ret;
-    }
-  else
-    {
-       return -1;
-    }
+  return ret;
 }
 
 /* Thread stuff */

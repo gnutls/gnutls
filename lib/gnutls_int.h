@@ -593,6 +593,14 @@ typedef struct
   
   uint64_t record_sw[DTLS_RECORD_WINDOW_SIZE];
   int record_sw_size;
+  
+  /* timers to handle async handshake after gnutls_handshake()
+   * has terminated. Required to handle retransmissions.
+   */
+  time_t async_term;
+  
+  /* last retransmission triggered by record layer */
+  time_t last_retransmit;
 } dtls_st;
 
 

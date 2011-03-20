@@ -48,6 +48,19 @@
 #include <gnutls_dtls.h>
 #include <gnutls_dh.h>
 
+struct tls_record_st {
+  uint16_t header_size;
+  uint8_t version[2];
+  uint64 sequence; /* DTLS */
+  uint16_t length;
+  uint16_t packet_size; /* header_size + length */
+  content_type_t type;
+  uint16_t epoch; /* valid in DTLS only */
+  int v2:1; /* whether an SSLv2 client hello */
+  /* the data */
+};
+
+
 /**
  * gnutls_protocol_get_version:
  * @session: is a #gnutls_session_t structure.
@@ -578,7 +591,7 @@ record_check_version (gnutls_session_t session,
  */
 static int
 record_add_to_buffers (gnutls_session_t session,
-                   content_type_t recv_type, content_type_t type,
+                   struct tls_record_st *recv, content_type_t type,
                    gnutls_handshake_description_t htype, 
                    uint64* seq,
                    mbuffer_st* bufel)
@@ -586,18 +599,22 @@ record_add_to_buffers (gnutls_session_t session,
 
   int ret;
 
-  if ((recv_type == type)
+  if ((recv->type == type)
       && (type == GNUTLS_APPLICATION_DATA ||
           type == GNUTLS_CHANGE_CIPHER_SPEC ||
           type == GNUTLS_HANDSHAKE))
     {
       _gnutls_record_buffer_put (session, type, seq, bufel);
+      
+      /* if we received application data as expected then we
+       * deactivate the async timer */
+      _dtls_async_timer_delete(session);
     }
   else
     {
       /* if the expected type is different than the received 
        */
-      switch (recv_type)
+      switch (recv->type)
         {
         case GNUTLS_ALERT:
           if (bufel->msg.size < 2)
@@ -651,9 +668,15 @@ record_add_to_buffers (gnutls_session_t session,
           return GNUTLS_E_UNEXPECTED_PACKET;
 
         case GNUTLS_APPLICATION_DATA:
+          if (session->internals.initial_negotiation_completed == 0)
+            {
+              ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+              goto cleanup;
+            }
+
           /* even if data is unexpected put it into the buffer */
           if ((ret =
-               _gnutls_record_buffer_put (session, recv_type, seq,
+               _gnutls_record_buffer_put (session, recv->type, seq,
                                           bufel)) < 0)
             {
               gnutls_assert ();
@@ -678,6 +701,15 @@ record_add_to_buffers (gnutls_session_t session,
 
           break;
         case GNUTLS_HANDSHAKE:
+          /* In DTLS we might receive a handshake replay from the peer to indicate
+           * the our last TLS handshake messages were not received.
+           */
+          if (_dtls_is_async(session) && _dtls_async_timer_active(session))
+            {
+              ret = _dtls_retransmit(session);
+              goto cleanup;
+            }
+          
           /* This is legal if HELLO_REQUEST is received - and we are a client.
            * If we are a server, a client may initiate a renegotiation at any time.
            */
@@ -685,7 +717,7 @@ record_add_to_buffers (gnutls_session_t session,
             {
               gnutls_assert ();
               ret =
-                _gnutls_record_buffer_put (session, recv_type, seq, bufel);
+                _gnutls_record_buffer_put (session, recv->type, seq, bufel);
               if (ret < 0)
                 {
                   gnutls_assert ();
@@ -708,7 +740,7 @@ record_add_to_buffers (gnutls_session_t session,
 
           _gnutls_record_log
             ("REC[%p]: Received Unknown packet %d expecting %d\n",
-             session, recv_type, type);
+             session, recv->type, type);
 
           gnutls_assert ();
           ret = GNUTLS_E_INTERNAL_ERROR;
@@ -736,17 +768,6 @@ int ret;
 
   return ret;
 }
-
-struct tls_record_st {
-  uint16_t header_size;
-  uint8_t version[2];
-  uint64 sequence; /* DTLS */
-  uint16_t length;
-  uint16_t packet_size; /* header_size + length */
-  content_type_t type;
-  int v2:1; /* whether an SSLv2 client hello */
-  /* the data */
-};
 
 /* Checks the record headers and returns the length, version and
  * content type.
@@ -784,6 +805,7 @@ record_read_headers (gnutls_session_t session,
        * V2 compatibility is a mess.
        */
       record->v2 = 1;
+      record->epoch = 0;
 
       _gnutls_record_log ("REC[%p]: SSL 2.0 %s packet received. Length: %d\n",
                           session, 
@@ -799,14 +821,18 @@ record_read_headers (gnutls_session_t session,
       record->type = headers[0];
       record->version[0] = headers[1];
       record->version[1] = headers[2];
-
+      
       if(IS_DTLS(session))
         {
           memcpy(record->sequence.i, &headers[3], 8);
           record->length = _gnutls_read_uint16 (&headers[11]);
+          record->epoch = _gnutls_read_uint16(record->sequence.i);
         }
       else
-        record->length = _gnutls_read_uint16 (&headers[3]);
+        {
+          record->length = _gnutls_read_uint16 (&headers[3]);
+          record->epoch = 0;
+        }
 
       _gnutls_record_log ("REC[%p]: SSL %d.%d %s packet received. Length: %d\n",
                           session, (int)record->version[0], (int)record->version[1], 
@@ -850,9 +876,7 @@ gnutls_datum_t raw; /* raw headers */
   /* Check if the DTLS epoch is valid */
   if (IS_DTLS(session)) 
     {
-      uint16_t epoch = _gnutls_read_uint16(record->sequence.i);
-      
-      if (_gnutls_epoch_is_valid(session, epoch) == 0)
+      if (_gnutls_epoch_is_valid(session, record->epoch) == 0)
         {
           _gnutls_audit_log("Discarded message[%u] with invalid epoch 0x%.2x%.2x.\n",
             (unsigned int)_gnutls_uint64touint32 (&record->sequence), (int)record->sequence.i[0], 
@@ -1049,7 +1073,7 @@ begin:
     decrypted->htype = -1;
 
   ret =
-    record_add_to_buffers (session, record.type, type, htype, 
+    record_add_to_buffers (session, &record, type, htype, 
       packet_sequence, decrypted);
 
   /* bufel is now either deinitialized or buffered somewhere else */
@@ -1142,6 +1166,8 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
       return GNUTLS_E_INVALID_SESSION;
     }
 
+  _dtls_async_timer_check(session);
+  
   /* If we have enough data in the cache do not bother receiving
    * a new packet. (in order to flush the cache)
    */
@@ -1220,9 +1246,9 @@ gnutls_record_send (gnutls_session_t session, const void *data,
  * initiated a handshake. In that case the server can only initiate a
  * handshake or terminate the connection.
  *
- * Returns: the number of bytes received and zero on EOF.  A negative
- *   error code is returned in case of an error.  The number of bytes
- *   received might be less than @data_size.
+ * Returns: the number of bytes received and zero on EOF (for stream
+ * connections).  A negative error code is returned in case of an error.  
+ * The number of bytes received might be less than the requested @data_size.
  **/
 ssize_t
 gnutls_record_recv (gnutls_session_t session, void *data, size_t data_size)

@@ -46,7 +46,7 @@ transmit_message (gnutls_session_t session,
   opaque *data, *mtu_data;
   int ret = 0;
   unsigned int offset, frag_len, data_size;
-  const uint mtu = gnutls_dtls_get_mtu(session) - DTLS_HANDSHAKE_HEADER_SIZE;
+  const uint mtu = gnutls_dtls_get_data_mtu(session) - DTLS_HANDSHAKE_HEADER_SIZE;
 
   if (bufel->type == GNUTLS_CHANGE_CIPHER_SPEC)
     {
@@ -104,14 +104,13 @@ transmit_message (gnutls_session_t session,
 			_gnutls_handshake2str (bufel->htype),
 			bufel->htype, data_size, offset, frag_len);
 
-      /* FIXME: We should collaborate with the record layer to pack as
-       * many records possible into a single datagram. We should also
-       * tell the record layer which epoch to use for encryption. 
-       */
       ret = _gnutls_send_int (session, bufel->type, bufel->htype, 
         bufel->epoch, mtu_data, DTLS_HANDSHAKE_HEADER_SIZE + frag_len, 0);
       if (ret < 0)
-        break;
+        {
+          gnutls_assert();
+          break;
+        }
    }
 
   gnutls_free (mtu_data);
@@ -119,11 +118,9 @@ transmit_message (gnutls_session_t session,
   return ret;
 }
 
-static int drop_usage_count(gnutls_session_t session)
+static int drop_usage_count(gnutls_session_t session, mbuffer_head_st *const send_buffer)
 {
   int ret;
-  mbuffer_head_st *const send_buffer =
-    &session->internals.handshake_send_buffer;
   mbuffer_st *cur;
 
   for (cur = send_buffer->head;
@@ -137,8 +134,26 @@ static int drop_usage_count(gnutls_session_t session)
   return 0;
 }
 
-#define MAX_TIMEOUT 60000
-#define FINISHED_TIMEOUT 3000
+#define RETRANSMIT_WINDOW 2
+
+/* This function is to be called from record layer once
+ * a handshake replay is detected. It will make sure
+ * it transmits only once per few seconds. Otherwise
+ * it is the same as _dtls_transmit().
+ */
+int _dtls_retransmit(gnutls_session_t session)
+{
+time_t now = time(0);
+
+  if (now - session->internals.dtls.last_retransmit > RETRANSMIT_WINDOW)
+    {
+      session->internals.dtls.last_retransmit = now;
+      return _dtls_transmit(session);
+    }
+  else
+    return 0;
+
+}
 
 /* This function transmits the flight that has been previously
  * buffered.
@@ -175,28 +190,22 @@ int ret;
         return gnutls_assert_val(ret);
 
       /* last message in handshake -> no ack */
-      if (last_type == GNUTLS_HANDSHAKE_FINISHED &&
-        ((session->security_parameters.entity == GNUTLS_SERVER && session->internals.resumed == RESUME_FALSE) ||
-         (session->security_parameters.entity == GNUTLS_CLIENT && session->internals.resumed == RESUME_TRUE)))
+      if (last_type == GNUTLS_HANDSHAKE_FINISHED && _dtls_is_async(session))
         {
-          opaque c;
-          ret = _gnutls_io_check_recv(session, &c, 1, FINISHED_TIMEOUT);
-          if (ret == GNUTLS_E_TIMEDOUT)
-            ret = 0;
-          else if (ret >= 0)
-            {
-              if (c == GNUTLS_HANDSHAKE) /* retransmit */
-                ret = GNUTLS_E_TIMEDOUT;
-            }
+          /* we cannot do anything here. We just return 0 and
+           * if a retransmission occurs because peer didn't receive it
+           * we rely on the record layer calling this function again.
+           */
+          return 0;
         }
       else /* all other messages -> implicit ack (receive of next flight) */
         {
-          ret = _gnutls_io_check_recv(session, NULL, 0, timeout);
+          ret = _gnutls_io_check_recv(session, timeout);
         }
 
       total_timeout += timeout;
       timeout *= 2;
-      timeout %= MAX_TIMEOUT;
+      timeout %= MAX_DTLS_TIMEOUT;
 
       if (total_timeout >= session->internals.dtls.total_timeout) {
         ret = gnutls_assert_val(GNUTLS_E_TIMEDOUT);
@@ -214,7 +223,7 @@ int ret;
   ret = 0;
 
 cleanup:
-  drop_usage_count(session);
+  drop_usage_count(session, send_buffer);
   _mbuffer_head_clear(send_buffer);
 
   /* SENDING -> WAITING state transition */

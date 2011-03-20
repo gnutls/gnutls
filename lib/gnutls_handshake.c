@@ -56,6 +56,7 @@
 #include <auth_anon.h>          /* for gnutls_anon_server_credentials_t */
 #include <auth_psk.h>           /* for gnutls_psk_server_credentials_t */
 #include <random.h>
+#include <gnutls_dtls.h>
 
 #ifdef HANDSHAKE_DEBUG
 #define ERR(x, y) _gnutls_handshake_log("HSK[%p]: %s (%d)\n", session, x,y)
@@ -2603,7 +2604,15 @@ gnutls_handshake (gnutls_session_t session)
 
   STATE = STATE0;
 
-  _gnutls_handshake_io_buffer_clear (session);
+  if (IS_DTLS(session)==0)
+    {
+      _gnutls_handshake_io_buffer_clear (session);
+    }
+  else
+    {
+      _dtls_async_timer_init(session);
+    }
+
   _gnutls_handshake_internal_state_clear (session);
 
   session->security_parameters.epoch_next++;

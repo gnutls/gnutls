@@ -15,7 +15,7 @@ typedef struct {
   socklen_t cli_addr_size;
 } priv_data_st;
 
-static int pull_timeout_func(gnutls_transport_ptr_t ptr, void* data, size_t data_size, unsigned int ms);
+static int pull_timeout_func(gnutls_transport_ptr_t ptr, unsigned int ms);
 static ssize_t push_func (gnutls_transport_ptr_t p, const void * data, size_t size);
 static ssize_t pull_func(gnutls_transport_ptr_t p, void * data, size_t size);
 
@@ -146,7 +146,7 @@ int udp_server(const char* name, int port, int mtu)
 
 /* Wait for data to be received within a timeout period in milliseconds
  */
-static int pull_timeout_func(gnutls_transport_ptr_t ptr, void* data, size_t data_size, unsigned int ms)
+static int pull_timeout_func(gnutls_transport_ptr_t ptr, unsigned int ms)
 {
 fd_set rfds;
 struct timeval tv;
@@ -167,17 +167,11 @@ char c;
   if (ret <= 0)
     return ret;
 
-  if (data_size == 0)
-    {
-      data = &c;
-      data_size = 1;
-    }
-
   /* only report ok if the next message is from the peer we expect
    * from 
    */
   cli_addr_size = sizeof(cli_addr);
-  ret = recvfrom(priv->fd, data, data_size, MSG_PEEK, (struct sockaddr*)&cli_addr, &cli_addr_size);
+  ret = recvfrom(priv->fd, &c, 1, MSG_PEEK, (struct sockaddr*)&cli_addr, &cli_addr_size);
   if (ret > 0)
     {
       if (cli_addr_size == priv->cli_addr_size && memcmp(&cli_addr, priv->cli_addr, sizeof(cli_addr))==0)

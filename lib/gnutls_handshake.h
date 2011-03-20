@@ -23,6 +23,9 @@
  *
  */
 
+#ifndef HANDSHAKE_H
+#define HANDSHAKE_H
+
 typedef enum Optional
 { OPTIONAL_PACKET, MANDATORY_PACKET } optional_t;
 
@@ -63,3 +66,5 @@ void _gnutls_handshake_hash_buffers_clear (gnutls_session_t session);
  */
 #define AGAIN(target) (STATE==target?1:0)
 #define AGAIN2(state, target) (state==target?1:0)
+
+#endif

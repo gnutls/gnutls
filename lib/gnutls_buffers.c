@@ -600,7 +600,7 @@ _gnutls_io_write_flush (gnutls_session_t session)
  * on timeout and a negative value on error.
  */
 int
-_gnutls_io_check_recv (gnutls_session_t session, void* data, size_t data_size, unsigned int ms)
+_gnutls_io_check_recv (gnutls_session_t session, unsigned int ms)
 {
   gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
   int ret = 0;
@@ -609,7 +609,7 @@ _gnutls_io_check_recv (gnutls_session_t session, void* data, size_t data_size, u
     session->internals.pull_func != system_read)
     return gnutls_assert_val(GNUTLS_E_PULL_ERROR);
 
-  ret = session->internals.pull_timeout_func(fd, data, data_size, ms);
+  ret = session->internals.pull_timeout_func(fd, ms);
   if (ret == -1)
     return gnutls_assert_val(GNUTLS_E_PULL_ERROR);
   
@@ -740,6 +740,8 @@ parse_handshake_header (gnutls_session_t session, mbuffer_st* bufel, gnutls_hand
     return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
   dataptr = _mbuffer_get_udata_ptr(bufel);
+  data_size = _mbuffer_get_udata_size(bufel) - handshake_header_size;
+
   /* if reading a client hello of SSLv2 */
   if (!IS_DTLS(session) && htype == GNUTLS_HANDSHAKE_CLIENT_HELLO &&
     bufel->htype == GNUTLS_HANDSHAKE_CLIENT_HELLO_V2)
@@ -785,14 +787,16 @@ parse_handshake_header (gnutls_session_t session, mbuffer_st* bufel, gnutls_hand
   /* make the length offset */
   if (hsk->end_offset > 0) hsk->end_offset--;
 
-  _gnutls_handshake_log ("HSK[%p]: %s was received. Length %d, frag offset %d, frag length: %d, sequence: %d\n",
+  _gnutls_handshake_log ("HSK[%p]: %s was received. Length %d[%d], frag offset %d, frag length: %d, sequence: %d\n",
                          session, _gnutls_handshake2str (hsk->htype),
-                         (int) hsk->length, hsk->start_offset, hsk->end_offset-hsk->start_offset+1, (int)hsk->sequence);
+                         (int) hsk->length, (int)data_size, hsk->start_offset, hsk->end_offset-hsk->start_offset+1, (int)hsk->sequence);
 
   hsk->header_size = handshake_header_size;
   memcpy(hsk->header, _mbuffer_get_udata_ptr(bufel), handshake_header_size);
 
-  data_size = _mbuffer_get_udata_size(bufel) - handshake_header_size;
+  if (hsk->length > 0 && 
+        (hsk->end_offset-hsk->start_offset >=  data_size))
+    return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
   if (hsk->length > 0 && (hsk->start_offset >= hsk->end_offset ||
       hsk->end_offset-hsk->start_offset >=  data_size ||

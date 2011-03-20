@@ -1399,6 +1399,7 @@ socket_open (socket_st * hd, const char *hostname, const char *service)
   int sd, err;
   char buffer[MAX_BUF + 1];
   char portname[16] = { 0 };
+  int yes;
 
   printf ("Resolving '%s'...\n", hostname);
   /* get server name */
@@ -1434,6 +1435,16 @@ socket_open (socket_st * hd, const char *hostname, const char *service)
     {
       fprintf (stderr, "socket(): %s\n", strerror (errno));
       exit (1);
+    }
+
+  if (hints.ai_socktype == SOCK_DGRAM)
+    {
+      yes = 1;
+      if (setsockopt (sd, IPPROTO_IP, IP_DF,
+                          (const void *) &yes, sizeof (yes)) < 0)
+        {
+          perror ("setsockopt(IP_DF) failed");
+        }
     }
 
   hd->secure = 0;

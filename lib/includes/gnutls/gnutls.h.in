@@ -1180,7 +1180,7 @@ extern "C"
   typedef ssize_t (*gnutls_push_func) (gnutls_transport_ptr_t, const void *,
                                        size_t);
 
-  typedef int (*gnutls_pull_timeout_func) (gnutls_transport_ptr_t, void*data, size_t size, unsigned int ms);
+  typedef int (*gnutls_pull_timeout_func) (gnutls_transport_ptr_t, unsigned int ms);
 
   typedef ssize_t (*gnutls_vec_push_func) (gnutls_transport_ptr_t,
                                            const giovec_t * iov, int iovcnt);
