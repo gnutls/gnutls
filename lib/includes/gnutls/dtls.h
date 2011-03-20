@@ -42,6 +42,8 @@ void gnutls_dtls_set_timeouts (gnutls_session_t session, unsigned int retrans_ti
   unsigned int total_timeout);
 
 unsigned int gnutls_dtls_get_mtu (gnutls_session_t session);
+unsigned int gnutls_dtls_get_data_mtu (gnutls_session_t session);
+
 void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu);
 
 typedef struct {

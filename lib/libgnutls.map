@@ -700,6 +700,7 @@ GNUTLS_3_0_0 {
 	gnutls_dtls_cookie_verify;
 	gnutls_dtls_cookie_send;
 	gnutls_dtls_prestate_set;
+	gnutls_dtls_get_data_mtu;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

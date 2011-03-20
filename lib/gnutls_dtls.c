@@ -333,6 +333,9 @@ int i, offset = 0;
  * be retransmitted. The total timeout is the time after which the
  * handshake will be aborted with %GNUTLS_E_TIMEDOUT.
  *
+ * The DTLS protocol recommends the values of 1 sec and 60 seconds
+ * respectively.
+ *
  * If the retransmission timeout is zero then the handshake will operate
  * in a non-blocking way, i.e., return %GNUTLS_E_AGAIN.
  *
@@ -359,7 +362,7 @@ void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu)
 }
 
 /**
- * gnutls_dtls_get_mtu:
+ * gnutls_dtls_get_data_mtu:
  * @session: is a #gnutls_session_t structure.
  *
  * This function will return the actual maximum transfer unit for
@@ -369,7 +372,7 @@ void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu)
  * Returns: the maximum allowed transfer unit.
  *
  **/
-unsigned int gnutls_dtls_get_mtu (gnutls_session_t session)
+unsigned int gnutls_dtls_get_data_mtu (gnutls_session_t session)
 {
 int ret;
 
@@ -378,6 +381,23 @@ int ret;
     return session->internals.dtls.mtu - ret;
   else
     return session->internals.dtls.mtu - RECORD_HEADER_SIZE(session);
+}
+
+/**
+ * gnutls_dtls_get_mtu:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function will return the MTU size as set with
+ * gnutls_dtls_set_mtu(). This is not the actual MTU
+ * of data you can transmit. Use gnutls_dtls_get_data_mtu()
+ * for that reason.
+ *
+ * Returns: the set maximum transfer unit.
+ *
+ **/
+unsigned int gnutls_dtls_get_mtu (gnutls_session_t session)
+{
+  return session->internals.dtls.mtu;
 }
 
 #define COOKIE_SIZE 16
