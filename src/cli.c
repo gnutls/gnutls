@@ -1399,7 +1399,6 @@ socket_open (socket_st * hd, const char *hostname, const char *service)
   int sd, err;
   char buffer[MAX_BUF + 1];
   char portname[16] = { 0 };
-  int yes;
 
   printf ("Resolving '%s'...\n", hostname);
   /* get server name */
@@ -1440,7 +1439,7 @@ socket_open (socket_st * hd, const char *hostname, const char *service)
 #ifdef IP_DONTFRAG
   if (hints.ai_socktype == SOCK_DGRAM)
     {
-      yes = 1;
+      int yes = 1;
       if (setsockopt (sd, IPPROTO_IP, IP_DONTFRAG,
                           (const void *) &yes, sizeof (yes)) < 0)
         {
