@@ -729,15 +729,17 @@ listen_socket (const char *name, int listen_port, int socktype)
               continue;
             }
         }
+#ifdef IP_DONTFRAG
       else
         {
           yes = 1;
-          if (setsockopt (s, IPPROTO_IP, IP_DF,
+          if (setsockopt (s, IPPROTO_IP, IP_DONTFRAG,
                           (const void *) &yes, sizeof (yes)) < 0)
             {
               perror ("setsockopt(IP_DF) failed");
             }
         }
+#endif
       
       if (bind (s, ptr->ai_addr, ptr->ai_addrlen) < 0)
         {
