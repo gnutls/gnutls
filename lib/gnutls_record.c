@@ -747,8 +747,7 @@ record_check_type (gnutls_session_t session,
         case GNUTLS_APPLICATION_DATA:
           if (session->internals.initial_negotiation_completed == 0)
             {
-              ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
-              goto cleanup;
+              return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
             }
 
           /* even if data is unexpected put it into the buffer */
