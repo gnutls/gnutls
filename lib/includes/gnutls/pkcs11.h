@@ -19,7 +19,15 @@ typedef int (*gnutls_pkcs11_token_callback_t) (void *const global_data,
                                                const char *const label,
                                                const unsigned retry);
 
-/* flags */
+  /**
+   * gnutls_pkcs11_pin_flag_t:
+   * @GNUTLS_PKCS11_PIN_USER: The PIN for the user.
+   * @GNUTLS_PKCS11_PIN_SO: The PIN for the security officer.
+   * @GNUTLS_PKCS11_PIN_FINAL_TRY: This is the final try before blocking.
+   * @GNUTLS_PKCS11_PIN_COUNT_LOW: Few tries remain before token blocks.
+   *
+   * Enumeration of different PIN flags.
+   */
 typedef enum
 {
   GNUTLS_PKCS11_PIN_USER = (1 << 0),
@@ -60,6 +68,14 @@ int gnutls_pkcs11_obj_init (gnutls_pkcs11_obj_t * certificate);
 #define GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED (1<<1)      /* object marked as trusted */
 #define GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE (1<<2)    /* object marked as sensitive (unexportable) */
 
+  /**
+   * gnutls_pkcs11_url_type_t:
+   * @GNUTLS_PKCS11_URL_GENERIC: A generic-purpose URL.
+   * @GNUTLS_PKCS11_URL_LIB: A URL that specifies the library used as well.
+   * @GNUTLS_PKCS11_URL_LIB_VERSION: A URL that specifies the library and its version.
+   *
+   * Enumeration of different URL extraction flags.
+   */
 typedef enum
 {
   GNUTLS_PKCS11_URL_GENERIC,    /* URL specifies the object on token level */
@@ -94,6 +110,21 @@ int gnutls_pkcs11_copy_secret_key (const char *token_url,
                                    unsigned int flags
                                    /* GNUTLS_PKCS11_OBJ_FLAG_* */ );
 
+  /**
+   * gnutls_pkcs11_obj_info_t:
+   * @GNUTLS_PKCS11_OBJ_ID_HEX: The object ID in hex.
+   * @GNUTLS_PKCS11_OBJ_LABEL: The object label.
+   * @GNUTLS_PKCS11_OBJ_TOKEN_LABEL: The token's label.
+   * @GNUTLS_PKCS11_OBJ_TOKEN_SERIAL: The token's serial number.
+   * @GNUTLS_PKCS11_OBJ_TOKEN_MANUFACTURER: The token's manufacturer.
+   * @GNUTLS_PKCS11_OBJ_TOKEN_MODEL: The token's model.
+   * @GNUTLS_PKCS11_OBJ_ID: The object ID.
+   * @GNUTLS_PKCS11_OBJ_LIBRARY_VERSION: The library's used to access the object version.
+   * @GNUTLS_PKCS11_OBJ_LIBRARY_DESCRIPTION: The library's used to access the object description (name).
+   * @GNUTLS_PKCS11_OBJ_LIBRARY_MANUFACTURER: The library's used to access the object manufacturer name.
+   *
+   * Enumeration of several object information types.
+   */
 typedef enum
 {
   GNUTLS_PKCS11_OBJ_ID_HEX = 1,
@@ -113,6 +144,17 @@ int gnutls_pkcs11_obj_get_info (gnutls_pkcs11_obj_t crt,
                                 gnutls_pkcs11_obj_info_t itype, void *output,
                                 size_t * output_size);
 
+  /**
+   * gnutls_pkcs11_obj_attr_t:
+   * @GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL: Specify all certificates.
+   * @GNUTLS_PKCS11_OBJ_ATTR_CRT_TRUSTED: Specify all certificates marked as trusted.
+   * @GNUTLS_PKCS11_OBJ_ATTR_CRT_WITH_PRIVKEY: Specify all certificates with a corresponding private key.
+   * @GNUTLS_PKCS11_OBJ_ATTR_PUBKEY: Specify all public keys.
+   * @GNUTLS_PKCS11_OBJ_ATTR_PRIVKEY: Specify all private keys.
+   * @GNUTLS_PKCS11_OBJ_ATTR_ALL: Specify all objects.
+   *
+   * Enumeration of several attributes for object enumeration.
+   */
 typedef enum
 {
   GNUTLS_PKCS11_OBJ_ATTR_CRT_ALL = 1,   /* all certificates */
@@ -123,7 +165,15 @@ typedef enum
   GNUTLS_PKCS11_OBJ_ATTR_ALL    /* everything! */
 } gnutls_pkcs11_obj_attr_t;
 
-/* token info */
+  /**
+   * gnutls_pkcs11_token_info_t:
+   * @GNUTLS_PKCS11_TOKEN_LABEL: The token's label
+   * @GNUTLS_PKCS11_TOKEN_SERIAL: The token's serial number
+   * @GNUTLS_PKCS11_TOKEN_MANUFACTURER: The token's manufacturer
+   * @GNUTLS_PKCS11_TOKEN_MODEL: The token's model
+   *
+   * Enumeration of types for retrieving token information.
+   */
 typedef enum
 {
   GNUTLS_PKCS11_TOKEN_LABEL,
@@ -132,6 +182,17 @@ typedef enum
   GNUTLS_PKCS11_TOKEN_MODEL
 } gnutls_pkcs11_token_info_t;
 
+  /**
+   * gnutls_pkcs11_obj_type_t:
+   * @GNUTLS_PKCS11_OBJ_UNKNOWN: Unknown PKCS11 object.
+   * @GNUTLS_PKCS11_OBJ_X509_CRT: X.509 certificate.
+   * @GNUTLS_PKCS11_OBJ_PUBKEY: Public key.
+   * @GNUTLS_PKCS11_OBJ_PRIVKEY: Private key.
+   * @GNUTLS_PKCS11_OBJ_SECRET_KEY: Secret key.
+   * @GNUTLS_PKCS11_OBJ_DATA: Data object.
+   *
+   * Enumeration of object types.
+   */
 typedef enum
 {
   GNUTLS_PKCS11_OBJ_UNKNOWN,

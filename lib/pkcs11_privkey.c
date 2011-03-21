@@ -93,7 +93,7 @@ gnutls_pkcs11_privkey_get_pk_algorithm (gnutls_pkcs11_privkey_t key,
 
 /**
  * gnutls_pkcs11_privkey_get_info:
- * @key: should contain a #gnutls_pkcs11_privkey_t structure
+ * @pkey: should contain a #gnutls_pkcs11_privkey_t structure
  * @itype: Denotes the type of information requested
  * @output: where output will be stored
  * @output_size: contains the maximum size of the output and will be overwritten with actual

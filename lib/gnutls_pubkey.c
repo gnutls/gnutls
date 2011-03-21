@@ -203,7 +203,7 @@ gnutls_pubkey_import_x509 (gnutls_pubkey_t key, gnutls_x509_crt_t crt,
 }
 
 /**
- * gnutls_pubkey_import_privkey:
+ * gnutls_pubkey_import_privkey: Imports the public key from a private
  * @key: The public key
  * @pkey: The private key
  * @usage: GNUTLS_KEY_* key usage flags.
@@ -268,7 +268,7 @@ gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
 
 
 /**
- * gnutls_pubkey_import_pkcs11:
+ * gnutls_pubkey_import_pkcs11: Imports a public key from a pkcs11 key
  * @key: The public key
  * @obj: The parameters to be imported
  * @flags: should be zero
@@ -321,7 +321,7 @@ gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t key,
 
 #ifdef ENABLE_OPENPGP
 /**
- * gnutls_pubkey_import_openpgp:
+ * gnutls_pubkey_import_openpgp: Imports a public key from an openpgp key
  * @key: The public key
  * @crt: The certificate to be imported
  * @flags: should be zero
@@ -823,7 +823,7 @@ gnutls_x509_crq_set_pubkey (gnutls_x509_crq_t crq, gnutls_pubkey_t key)
 
 /**
  * gnutls_pubkey_set_key_usage:
- * @crt: a certificate of type #gnutls_x509_crt_t
+ * @key: a certificate of type #gnutls_x509_crt_t
  * @usage: an ORed sequence of the GNUTLS_KEY_* elements.
  *
  * This function will set the key usage flags of the public key. This

@@ -940,15 +940,15 @@ gnutls_pkcs11_obj_init (gnutls_pkcs11_obj_t * crt)
 
 /**
  * gnutls_pkcs11_obj_deinit:
- * @key: The structure to be initialized
+ * @obj: The structure to be initialized
  *
  * This function will deinitialize a certificate structure.
  **/
 void
-gnutls_pkcs11_obj_deinit (gnutls_pkcs11_obj_t crt)
+gnutls_pkcs11_obj_deinit (gnutls_pkcs11_obj_t obj)
 {
-  _gnutls_free_datum (&crt->raw);
-  free (crt);
+  _gnutls_free_datum (&obj->raw);
+  free (obj);
 }
 
 /**
@@ -1921,7 +1921,7 @@ gnutls_pkcs11_token_get_url (unsigned int seq,
 /**
  * gnutls_pkcs11_token_get_info:
  * @url: should contain a PKCS 11 URL
- * @itype: Denotes the type of information requested
+ * @ttype: Denotes the type of information requested
  * @output: where output will be stored
  * @output_size: contains the maximum size of the output and will be overwritten with actual
  *
@@ -2669,7 +2669,7 @@ cleanup:
 /**
  * gnutls_x509_crt_import_pkcs11:
  * @crt: A certificate of type #gnutls_x509_crt_t
- * @pkcs11_obj: A PKCS 11 object that contains a certificate
+ * @pkcs11_crt: A PKCS 11 object that contains a certificate
  *
  * This function will import a PKCS 11 certificate to a #gnutls_x509_crt_t
  * structure.
@@ -2686,7 +2686,7 @@ gnutls_x509_crt_import_pkcs11 (gnutls_x509_crt_t crt,
 
 /**
  * gnutls_x509_crt_list_import_pkcs11:
- * @cert: A list of certificates of type #gnutls_x509_crt_t
+ * @certs: A list of certificates of type #gnutls_x509_crt_t
  * @cert_max: The maximum size of the list
  * @objs: A list of PKCS 11 objects
  * @flags: 0 for now
