@@ -423,7 +423,7 @@ gnutls_openpgp_keyid_t keyid;
 /**
  * gnutls_privkey_sign_data:
  * @signer: Holds the key
- * @digest: should be a digest algorithm
+ * @hash: should be a digest algorithm
  * @flags: should be 0 for now
  * @data: holds the data to be signed
  * @signature: will contain the signature allocate with gnutls_malloc()
