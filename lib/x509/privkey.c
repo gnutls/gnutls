@@ -507,6 +507,8 @@ gnutls_x509_privkey_import_rsa_raw (gnutls_x509_privkey_t key,
  * @p: holds the first prime (p)
  * @q: holds the second prime (q)
  * @u: holds the coefficient
+ * @e1: holds e1 = d mod (p-1)
+ * @e2: holds e2 = d mod (q-1)
  *
  * This function will convert the given RSA raw parameters to the
  * native #gnutls_x509_privkey_t format.  The output will be stored in
@@ -911,8 +913,8 @@ gnutls_x509_privkey_export_rsa_raw (gnutls_x509_privkey_t key,
  * @p: will hold the first prime (p)
  * @q: will hold the second prime (q)
  * @u: will hold the coefficient
- * @e1: will hold the exponent 1
- * @e2: will hold the exponent 2
+ * @e1: will hold e1 = d mod (p-1)
+ * @e2: will hold e2 = d mod (q-1)
  *
  * This function will export the RSA private key's parameters found
  * in the given structure. The new parameters will be allocated using

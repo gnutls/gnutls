@@ -30,10 +30,9 @@
 #include <random.h>
 
 /**
- * gnutls_pkcs11_copy_x509_crt:
+ * gnutls_pkcs11_copy_secret_key:
  * @token_url: A PKCS #11 URL specifying a token
  * @key: The raw key
- * @key_size: the size of the key
  * @label: A name to be used for the stored data
  * @key_usage: One of GNUTLS_KEY_*
  * @flags: One of GNUTLS_PKCS11_OBJ_FLAG_*
