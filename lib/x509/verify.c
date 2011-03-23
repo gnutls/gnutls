@@ -839,13 +839,13 @@ dsa_verify_sig (const gnutls_datum_t * text,
   gnutls_digest_algorithm_t algo;
 
   algo = _gnutls_dsa_q_to_hash (params[1]);
-
   if (hash)
     {
       /* SHA1 or better allowed */
       if (!hash->data || hash->size != _gnutls_hash_get_algo_len(algo))
         {
           gnutls_assert();
+          _gnutls_debug_log("Hash size (%d) does not correspond to hash %s", (int)hash->size, gnutls_mac_get_name(algo));
           return GNUTLS_E_INVALID_REQUEST;
         }
       digest = *hash;

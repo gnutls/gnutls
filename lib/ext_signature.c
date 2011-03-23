@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2009, 2010 Free Software
+ * Copyright (C) 2002,2003,2004,2005,2009,2010,2011 Free Software
  * Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
@@ -34,6 +34,8 @@
 #include <gnutls_state.h>
 #include <gnutls_num.h>
 #include <gnutls_algorithms.h>
+#include <x509/common.h> /* dsa_q_to_hash */
+#include <gnutls_cert.h>
 
 static int _gnutls_signature_algorithm_recv_params (gnutls_session_t session,
                                                     const opaque * data,
@@ -248,13 +250,36 @@ _gnutls_signature_algorithm_send_params (gnutls_session_t session,
   return 0;
 }
 
+int cert_compatible_with_sig(gnutls_cert* cert, gnutls_protocol_t ver, 
+  gnutls_sign_algorithm_t sign)
+{
+  if (cert->subject_pk_algorithm == GNUTLS_PK_DSA)
+    { /* override */
+      int hash_algo = _gnutls_dsa_q_to_hash (cert->params[1]);
+
+      /* DSA keys over 1024 bits cannot be used with TLS 1.x, x<2 */
+      if (!_gnutls_version_has_selectable_sighash (ver))
+        {
+          if (hash_algo != GNUTLS_DIG_SHA1)
+            return gnutls_assert_val(GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL);
+        }
+      else
+        {
+          if (_gnutls_sign_get_hash_algorithm(sign) != hash_algo)
+            return GNUTLS_E_UNWANTED_ALGORITHM;
+        }
+        
+    }
+
+  return 0;
+}
+
 /* Returns a requested by the peer signature algorithm that
  * matches the given public key algorithm. Index can be increased
  * to return the second choice etc.
  */
 gnutls_sign_algorithm_t
-_gnutls_session_get_sign_algo (gnutls_session_t session,
-                               gnutls_pk_algorithm_t pk)
+_gnutls_session_get_sign_algo (gnutls_session_t session, gnutls_cert* cert)
 {
   unsigned i;
   int ret;
@@ -270,15 +295,18 @@ _gnutls_session_get_sign_algo (gnutls_session_t session,
 
   if (ret < 0 || !_gnutls_version_has_selectable_sighash (ver)
       || priv->sign_algorithms_size == 0)
-    /* none set, allow all */
+    /* none set, allow SHA-1 only */
     {
-      return _gnutls_x509_pk_to_sign (pk, GNUTLS_DIG_SHA1);
+      return _gnutls_x509_pk_to_sign (cert->subject_pk_algorithm, GNUTLS_DIG_SHA1);
     }
 
   for (i = 0; i < priv->sign_algorithms_size; i++)
     {
-      if (_gnutls_sign_get_pk_algorithm (priv->sign_algorithms[i]) == pk)
+      if (_gnutls_sign_get_pk_algorithm (priv->sign_algorithms[i]) == cert->subject_pk_algorithm)
         {
+          if (cert_compatible_with_sig(cert, ver, priv->sign_algorithms[i]) < 0)
+            continue;
+
           return priv->sign_algorithms[i];
         }
     }
