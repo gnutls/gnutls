@@ -19,7 +19,7 @@ int gnutls_pubkey_init (gnutls_pubkey_t * key);
 void gnutls_pubkey_deinit (gnutls_pubkey_t key);
 int gnutls_pubkey_get_pk_algorithm (gnutls_pubkey_t key, unsigned int *bits);
 
-int gnutls_pubkey_import_x509 (gnutls_pubkey_t pkey, gnutls_x509_crt_t crt,
+int gnutls_pubkey_import_x509 (gnutls_pubkey_t key, gnutls_x509_crt_t crt,
                                unsigned int flags);
 int gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t pkey,
                                  gnutls_pkcs11_obj_t crt, unsigned int flags);
@@ -35,9 +35,9 @@ int gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
                                                 gnutls_digest_algorithm_t *
                                                 hash, unsigned int *mand);
 
-int gnutls_pubkey_get_pk_rsa_raw (gnutls_pubkey_t crt,
+int gnutls_pubkey_get_pk_rsa_raw (gnutls_pubkey_t key,
                                   gnutls_datum_t * m, gnutls_datum_t * e);
-int gnutls_pubkey_get_pk_dsa_raw (gnutls_pubkey_t crt,
+int gnutls_pubkey_get_pk_dsa_raw (gnutls_pubkey_t key,
                                   gnutls_datum_t * p, gnutls_datum_t * q,
                                   gnutls_datum_t * g, gnutls_datum_t * y);
 
@@ -65,7 +65,7 @@ int gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
                                   const gnutls_datum_t * q,
                                   const gnutls_datum_t * g,
                                   const gnutls_datum_t * y);
-int gnutls_pubkey_import_rsa_raw (gnutls_pubkey_t pubkey,
+int gnutls_pubkey_import_rsa_raw (gnutls_pubkey_t key,
                                   const gnutls_datum_t * m,
                                   const gnutls_datum_t * e);
 
@@ -124,7 +124,7 @@ int gnutls_privkey_sign_hash (gnutls_privkey_t signer,
 			      const gnutls_datum_t * hash_data,
 			      gnutls_datum_t * signature);
 
-int gnutls_privkey_decrypt_data (gnutls_privkey_t signer,
+int gnutls_privkey_decrypt_data (gnutls_privkey_t key,
                                  unsigned int flags,
                                  const gnutls_datum_t * ciphertext,
                                  gnutls_datum_t * plaintext);

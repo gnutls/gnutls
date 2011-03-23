@@ -646,8 +646,8 @@ extern "C"
                                            const gnutls_datum_t * p,
                                            const gnutls_datum_t * q,
                                            const gnutls_datum_t * u,
-                                           const gnutls_datum_t * exp1,
-                                           const gnutls_datum_t * exp2);
+                                           const gnutls_datum_t * e1,
+                                           const gnutls_datum_t * e2);
   int gnutls_x509_privkey_fix (gnutls_x509_privkey_t key);
 
   int gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,

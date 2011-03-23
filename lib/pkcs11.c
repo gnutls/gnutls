@@ -496,7 +496,7 @@ gnutls_pkcs11_set_pin_function (gnutls_pkcs11_pin_callback_t fn,
 
 /**
  * gnutls_pkcs11_set_token_function:
- * @fn: The PIN callback
+ * @fn: The token callback
  * @userdata: data to be supplied to callback
  *
  * This function will set a callback function to be used when a token
@@ -918,7 +918,7 @@ cleanup:
 
 /**
  * gnutls_pkcs11_obj_init:
- * @crt: The structure to be initialized
+ * @obj: The structure to be initialized
  *
  * This function will initialize a pkcs11 certificate structure.
  *
@@ -926,10 +926,10 @@ cleanup:
  *   negative error value.
  **/
 int
-gnutls_pkcs11_obj_init (gnutls_pkcs11_obj_t * crt)
+gnutls_pkcs11_obj_init (gnutls_pkcs11_obj_t * obj)
 {
-  *crt = gnutls_calloc (1, sizeof (struct gnutls_pkcs11_obj_st));
-  if (*crt == NULL)
+  *obj = gnutls_calloc (1, sizeof (struct gnutls_pkcs11_obj_st));
+  if (*obj == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
@@ -953,7 +953,7 @@ gnutls_pkcs11_obj_deinit (gnutls_pkcs11_obj_t obj)
 
 /**
  * gnutls_pkcs11_obj_export:
- * @key: Holds the object
+ * @obj: Holds the object
  * @output_data: will contain a certificate PEM or DER encoded
  * @output_data_size: holds the size of output_data (and will be
  *   replaced by the actual size of parameters)
@@ -1983,7 +1983,7 @@ gnutls_pkcs11_token_get_info (const char *url,
 
 /**
  * gnutls_pkcs11_obj_export_url:
- * @crt: Holds the PKCS 11 certificate
+ * @obj: Holds the PKCS 11 certificate
  * @detailed: non zero if a detailed URL is required
  * @url: will contain an allocated url
  *
@@ -1993,12 +1993,12 @@ gnutls_pkcs11_token_get_info (const char *url,
  *   negative error value.
  **/
 int
-gnutls_pkcs11_obj_export_url (gnutls_pkcs11_obj_t cert,
+gnutls_pkcs11_obj_export_url (gnutls_pkcs11_obj_t obj,
                               gnutls_pkcs11_url_type_t detailed, char **url)
 {
   int ret;
 
-  ret = pkcs11_info_to_url (&cert->info, detailed, url);
+  ret = pkcs11_info_to_url (&obj->info, detailed, url);
   if (ret < 0)
     {
       gnutls_assert ();
