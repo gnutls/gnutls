@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** certtool: Warns on generation of DSA keys of over 1024 bits, about
 the incompatibility with TLS other than 1.2.
 
+** libgnutls: Modified signature algorithm selection in client
+certificate request, to avoid failures in DSA certificates.
+
 ** libgnutls: Instead of failing with internal error, return 
 GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL if an incompatible DSA
 key with the negotiated protocol is encountered.
