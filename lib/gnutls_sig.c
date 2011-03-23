@@ -55,37 +55,6 @@ sign_tls_hash (gnutls_session_t session, gnutls_digest_algorithm_t hash_algo,
  */
 #define MAX_SIG_SIZE 19 + MAX_HASH_SIZE
 
-static int 
-get_hash_algo(gnutls_session_t session, int version,
-  gnutls_cert* cert, 
-  gnutls_sign_algorithm_t sign_algo,
-  gnutls_digest_algorithm_t *hash_algo)
-{
-int ret;
-
-  if (cert->subject_pk_algorithm == GNUTLS_PK_DSA)
-    { /* override */
-      *hash_algo = _gnutls_dsa_q_to_hash (cert->params[1]);
-
-      /* DSA keys over 1024 bits cannot be used with TLS 1.x, x<2 */
-      if (!_gnutls_version_has_selectable_sighash (version) && *hash_algo != GNUTLS_DIG_SHA1)
-        return gnutls_assert_val(GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL);
-
-      ret = _gnutls_session_sign_algo_requested(session, _gnutls_x509_pk_to_sign (GNUTLS_PK_DSA, *hash_algo));
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-    }
-  else
-    {
-      if (sign_algo == GNUTLS_SIGN_UNKNOWN)
-        *hash_algo = GNUTLS_DIG_SHA1;
-      else
-        *hash_algo = _gnutls_sign_get_hash_algorithm (sign_algo);
-    }
-
-  return 0;
-}
-
 /* Generates a signature of all the random data and the parameters.
  * Used in DHE_* ciphersuites.
  */
@@ -103,16 +72,17 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_cert * cert,
   gnutls_digest_algorithm_t hash_algo;
 
   *sign_algo =
-    _gnutls_session_get_sign_algo (session, cert->subject_pk_algorithm);
+    _gnutls_session_get_sign_algo (session, cert);
   if (*sign_algo == GNUTLS_SIGN_UNKNOWN)
     {
       gnutls_assert ();
       return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
 
-  ret = get_hash_algo(session, ver, cert, *sign_algo, &hash_algo);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+  hash_algo = _gnutls_sign_get_hash_algorithm (*sign_algo);
+
+  _gnutls_handshake_log ("HSK[%p]: signing handshake data: using %s\n",
+                    session, gnutls_sign_algorithm_get_name (*sign_algo));
 
   ret = _gnutls_hash_init (&td_sha, hash_algo);
   if (ret < 0)
@@ -366,14 +336,22 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_cert * cert,
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
   gnutls_digest_algorithm_t hash_algo;
 
-  ret = _gnutls_session_sign_algo_enabled (session, algo);
-  if (ret < 0)
+  if (_gnutls_version_has_selectable_sighash (ver))
     {
-      gnutls_assert ();
-      return ret;
-    }
+      _gnutls_handshake_log ("HSK[%p]: verify handshake data: using %s\n",
+                    session, gnutls_sign_algorithm_get_name (algo));
 
-  if (!_gnutls_version_has_selectable_sighash (ver))
+      ret = cert_compatible_with_sig(cert, ver, algo);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+
+      ret = _gnutls_session_sign_algo_enabled (session, algo);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+
+      hash_algo = _gnutls_sign_get_hash_algorithm (algo);
+    }
+  else
     {
       ret = _gnutls_hash_init (&td_md5, GNUTLS_MAC_MD5);
       if (ret < 0)
@@ -387,11 +365,9 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_cert * cert,
       _gnutls_hash (&td_md5, session->security_parameters.server_random,
                     GNUTLS_RANDOM_SIZE);
       _gnutls_hash (&td_md5, params->data, params->size);
-    }
 
-  ret = get_hash_algo(session, ver, cert, algo, &hash_algo);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+      hash_algo = GNUTLS_DIG_SHA1;
+    }
 
   ret = _gnutls_hash_init (&td_sha, hash_algo);
   if (ret < 0)
@@ -516,6 +492,9 @@ _gnutls_handshake_verify_cert_vrfy (gnutls_session_t session,
   gnutls_datum_t dconcat;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
+  _gnutls_handshake_log ("HSK[%p]: verify cert vrfy: using %s\n",
+                    session, gnutls_sign_algorithm_get_name (sign_algo));
+
   if (session->security_parameters.handshake_mac_handle_type ==
       HANDSHAKE_MAC_TYPE_12)
     {
@@ -603,43 +582,26 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
   gnutls_digest_algorithm_t hash_algo;
   digest_hd_st *handshake_td;
 
-  handshake_td = &session->internals.handshake_mac_handle.tls12.sha1;
-  hash_algo = handshake_td->algorithm;
-  sign_algo = _gnutls_x509_pk_to_sign (cert->subject_pk_algorithm, hash_algo);
-
-  /* The idea here is to try signing with the one of the algorithms
-   * that have been initiated at handshake (SHA1, SHA256). If they
-   * are not requested by peer... tough luck
-   */
-  ret = _gnutls_session_sign_algo_requested (session, sign_algo);
-  if (sign_algo == GNUTLS_SIGN_UNKNOWN || ret < 0)
+  sign_algo =
+    _gnutls_session_get_sign_algo (session, cert);
+  if (sign_algo == GNUTLS_SIGN_UNKNOWN)
     {
-      handshake_td = &session->internals.handshake_mac_handle.tls12.sha256;
-      hash_algo = handshake_td->algorithm;
-      sign_algo =
-        _gnutls_x509_pk_to_sign (cert->subject_pk_algorithm, hash_algo);
-      if (sign_algo == GNUTLS_SIGN_UNKNOWN)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
-        }
-
-      ret = _gnutls_session_sign_algo_requested (session, sign_algo);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          _gnutls_x509_log
-            ("Server did not allow either '%s' or '%s' for signing\n",
-             gnutls_mac_get_name (hash_algo),
-             gnutls_mac_get_name (session->internals.handshake_mac_handle.
-                                  tls12.sha1.algorithm));
-          return ret;
-        }
+      gnutls_assert ();
+      return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
     }
 
-  _gnutls_x509_log ("sign handshake cert vrfy: picked %s with %s\n",
+  hash_algo = _gnutls_sign_get_hash_algorithm (sign_algo);
+
+  _gnutls_debug_log ("sign handshake cert vrfy: picked %s with %s\n",
                     gnutls_sign_algorithm_get_name (sign_algo),
                     gnutls_mac_get_name (hash_algo));
+
+  if (hash_algo == session->internals.handshake_mac_handle.tls12.sha1.algorithm)
+    handshake_td = &session->internals.handshake_mac_handle.tls12.sha1;
+  else if (hash_algo == session->internals.handshake_mac_handle.tls12.sha256.algorithm)
+    handshake_td = &session->internals.handshake_mac_handle.tls12.sha256;
+  else
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR); /* too bad we only support SHA1 and SHA256 */
 
   ret = _gnutls_hash_copy (&td, handshake_td);
   if (ret < 0)
@@ -678,7 +640,7 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
                                   gnutls_datum_t * signature)
 {
   gnutls_datum_t dconcat;
-  int ret;
+  int ret, hash_algo;
   opaque concat[MAX_SIG_SIZE];
   digest_hd_st td_md5;
   digest_hd_st td_sha;
@@ -748,13 +710,17 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
       dconcat.size = 36;
       break;
     case GNUTLS_PK_DSA:
+      /* ensure 1024 bit DSA keys are used */
+      hash_algo = _gnutls_dsa_q_to_hash (cert->params[1]);
+      if (!_gnutls_version_has_selectable_sighash (ver) && hash_algo != GNUTLS_DIG_SHA1)
+        return gnutls_assert_val(GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL);
+
       dconcat.data = &concat[16];
       dconcat.size = 20;
       break;
 
     default:
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
+      return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
     }
   ret = sign_tls_hash (session, GNUTLS_DIG_NULL, cert, pkey, &dconcat, signature);
   if (ret < 0)

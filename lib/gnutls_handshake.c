@@ -2491,7 +2491,6 @@ _gnutls_handshake_hash_init (gnutls_session_t session)
         session->security_parameters.handshake_mac_handle_type =
           HANDSHAKE_MAC_TYPE_10;
 
-
       if (session->security_parameters.handshake_mac_handle_type ==
           HANDSHAKE_MAC_TYPE_10)
         {
