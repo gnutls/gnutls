@@ -229,7 +229,7 @@ load_keys (void)
             }
           x509_crt_size = ret;
         }
-      fprintf (stderr, "Processed %d client certificates...\n", ret);
+      fprintf (stdout, "Processed %d client certificates...\n", ret);
 
       unload_file (data);
 
@@ -269,7 +269,7 @@ load_keys (void)
           unload_file (data);
         }
 
-      fprintf (stderr, "Processed %d client X.509 certificates...\n",
+      fprintf (stdout, "Processed %d client X.509 certificates...\n",
                x509_crt_size);
     }
 #ifdef ENABLE_OPENPGP
@@ -366,7 +366,7 @@ load_keys (void)
             }
         }
 
-      fprintf (stderr, "Processed 1 client PGP certificate...\n");
+      fprintf (stdout, "Processed 1 client PGP certificate...\n");
     }
 #endif
 
