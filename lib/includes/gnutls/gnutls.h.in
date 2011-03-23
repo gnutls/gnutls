@@ -255,7 +255,7 @@ extern "C"
   /* exported for other gnutls headers. This is the maximum number of
    * algorithms (ciphers, kx or macs).
    */
-#define GNUTLS_MAX_ALGORITHM_NUM 16
+#define GNUTLS_MAX_ALGORITHM_NUM 32
 
   /**
    * gnutls_compression_method_t:

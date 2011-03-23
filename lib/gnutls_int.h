@@ -208,9 +208,7 @@ typedef enum handshake_state_t
 /* This is the maximum number of algorithms (ciphers or macs etc).
  * keep it synced with GNUTLS_MAX_ALGORITHM_NUM in gnutls.h
  */
-#define MAX_ALGOS 16
-
-#define MAX_CIPHERSUITES 256
+#define MAX_ALGOS GNUTLS_MAX_ALGORITHM_NUM
 
 typedef enum extensions_t
 {

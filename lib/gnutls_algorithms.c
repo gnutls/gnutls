@@ -149,16 +149,6 @@ static const gnutls_version_entry sup_versions[] = {
   {0, 0, 0, 0, 0}
 };
 
-/* Keep the contents of this struct the same as the previous one. */
-static const gnutls_protocol_t supported_protocols[] = {
-  GNUTLS_SSL3,
-  GNUTLS_TLS1,
-  GNUTLS_TLS1_1,
-  GNUTLS_TLS1_2,
-  GNUTLS_DTLS1_0,
-  0
-};
-
 #define GNUTLS_VERSION_LOOP(b) \
         const gnutls_version_entry *p; \
                 for(p = sup_versions; p->name != NULL; p++) { b ; }
@@ -224,29 +214,12 @@ static const gnutls_cipher_entry algorithms[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 
-/* Keep the contents of this struct the same as the previous one. */
-static const gnutls_cipher_algorithm_t supported_ciphers[] = {
-  GNUTLS_CIPHER_AES_256_CBC,
-  GNUTLS_CIPHER_AES_128_CBC,
-  GNUTLS_CIPHER_3DES_CBC,
-  GNUTLS_CIPHER_DES_CBC,
-  GNUTLS_CIPHER_ARCFOUR_128,
-  GNUTLS_CIPHER_ARCFOUR_40,
-  GNUTLS_CIPHER_RC2_40_CBC,
-#ifdef	ENABLE_CAMELLIA
-  GNUTLS_CIPHER_CAMELLIA_256_CBC,
-  GNUTLS_CIPHER_CAMELLIA_128_CBC,
-#endif
-  GNUTLS_CIPHER_NULL,
-  0
-};
-
-#define GNUTLS_LOOP(b) \
+#define GNUTLS_CIPHER_LOOP(b) \
         const gnutls_cipher_entry *p; \
                 for(p = algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_ALG_LOOP(a) \
-                        GNUTLS_LOOP( if(p->id == algorithm) { a; break; } )
+                        GNUTLS_CIPHER_LOOP( if(p->id == algorithm) { a; break; } )
 
 
 struct gnutls_hash_entry
@@ -272,18 +245,6 @@ static const gnutls_hash_entry hash_algorithms[] = {
   {0, 0, 0, 0}
 };
 
-/* Keep the contents of this struct the same as the previous one. */
-static const gnutls_mac_algorithm_t supported_macs[] = {
-  GNUTLS_MAC_SHA1,
-  GNUTLS_MAC_MD5,
-  GNUTLS_MAC_SHA256,
-  GNUTLS_MAC_SHA384,
-  GNUTLS_MAC_SHA512,
-  GNUTLS_MAC_MD2,
-  GNUTLS_MAC_RMD160,
-  GNUTLS_MAC_NULL,
-  0
-};
 
 #define GNUTLS_HASH_LOOP(b) \
         const gnutls_hash_entry *p; \
@@ -337,27 +298,6 @@ static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
    1 /* needs DHE params */ , 0},
 #endif
   {0, 0, 0, 0, 0}
-};
-
-/* Keep the contents of this struct the same as the previous one. */
-static const gnutls_kx_algorithm_t supported_kxs[] = {
-#ifdef ENABLE_ANON
-  GNUTLS_KX_ANON_DH,
-#endif
-  GNUTLS_KX_RSA,
-  GNUTLS_KX_RSA_EXPORT,
-  GNUTLS_KX_DHE_RSA,
-  GNUTLS_KX_DHE_DSS,
-#ifdef ENABLE_SRP
-  GNUTLS_KX_SRP_DSS,
-  GNUTLS_KX_SRP_RSA,
-  GNUTLS_KX_SRP,
-#endif
-#ifdef ENABLE_PSK
-  GNUTLS_KX_PSK,
-  GNUTLS_KX_DHE_PSK,
-#endif
-  0
 };
 
 #define GNUTLS_KX_LOOP(b) \
@@ -918,12 +858,24 @@ gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm)
  * example, MD2 is not supported as a cipher suite, but is supported
  * for other purposes (e.g., X.509 signature verification or similar).
  *
+ * This function is not thread safe.
+ *
  * Returns: Return a zero-terminated list of #gnutls_mac_algorithm_t
  *   integers indicating the available MACs.
  **/
 const gnutls_mac_algorithm_t *
 gnutls_mac_list (void)
 {
+static gnutls_mac_algorithm_t supported_macs[MAX_ALGOS] = { 0 };
+
+  if (supported_macs[0] == 0)
+    {
+      int i = 0;
+
+      GNUTLS_HASH_LOOP ( supported_macs[i++]=p->id);
+      supported_macs[i++]=0;
+    }
+
   return supported_macs;
 }
 
@@ -1092,7 +1044,7 @@ gnutls_cipher_get_id (const char *name)
 {
   gnutls_cipher_algorithm_t ret = GNUTLS_CIPHER_UNKNOWN;
 
-  GNUTLS_LOOP (if (strcasecmp (p->name, name) == 0) ret = p->id);
+  GNUTLS_CIPHER_LOOP (if (strcasecmp (p->name, name) == 0) ret = p->id);
 
   return ret;
 }
@@ -1105,6 +1057,8 @@ gnutls_cipher_get_id (const char *name)
  * example, DES is not supported as a cipher suite, but is supported
  * for other purposes (e.g., PKCS#8 or similar).
  *
+ * This function is not thread safe.
+ *
  * Returns: a zero-terminated list of #gnutls_cipher_algorithm_t
  *   integers indicating the available ciphers.
  *
@@ -1112,6 +1066,16 @@ gnutls_cipher_get_id (const char *name)
 const gnutls_cipher_algorithm_t *
 gnutls_cipher_list (void)
 {
+static gnutls_cipher_algorithm_t supported_ciphers[MAX_ALGOS] = {0};
+
+  if (supported_ciphers[0] == 0)
+    {
+      int i = 0;
+
+      GNUTLS_CIPHER_LOOP (supported_ciphers[i++]=p->id);
+      supported_ciphers[i++]=0;
+    }
+
   return supported_ciphers;
 }
 
@@ -1196,12 +1160,24 @@ gnutls_kx_get_id (const char *name)
  *
  * Get a list of supported key exchange algorithms.
  *
+ * This function is not thread safe.
+ *
  * Returns: a zero-terminated list of #gnutls_kx_algorithm_t integers
  * indicating the available key exchange algorithms.
  **/
 const gnutls_kx_algorithm_t *
 gnutls_kx_list (void)
 {
+static gnutls_kx_algorithm_t supported_kxs[MAX_ALGOS] = {0};
+
+  if (supported_kxs[0] == 0)
+    {
+      int i = 0;
+
+      GNUTLS_KX_LOOP (supported_kxs[i++]=p->algorithm);
+      supported_kxs[i++]=0;
+    }
+
   return supported_kxs;
 }
 
@@ -1332,6 +1308,8 @@ gnutls_protocol_get_id (const char *name)
  *
  * Get a list of supported protocols, e.g. SSL 3.0, TLS 1.0 etc.
  *
+ * This function is not threat safe.
+ *
  * Returns: a zero-terminated list of #gnutls_protocol_t integers
  * indicating the available protocols.
  *
@@ -1339,6 +1317,16 @@ gnutls_protocol_get_id (const char *name)
 const gnutls_protocol_t *
 gnutls_protocol_list (void)
 {
+static gnutls_protocol_t supported_protocols[MAX_ALGOS] = {0};
+
+  if (supported_protocols[0] == 0)
+    {
+      int i = 0;
+
+      GNUTLS_VERSION_LOOP (supported_protocols[i++]=p->id);
+      supported_protocols[i++]=0;
+    }
+
   return supported_protocols;
 }
 
@@ -2011,22 +1999,6 @@ static const gnutls_sign_entry sign_algorithms[] = {
   {0, 0, 0, 0, 0, TLS_SIGN_AID_UNKNOWN}
 };
 
-/* Keep the contents of this struct the same as the previous one. */
-static const gnutls_sign_algorithm_t supported_sign[] = {
-  GNUTLS_SIGN_RSA_SHA1,
-  GNUTLS_SIGN_RSA_SHA224,
-  GNUTLS_SIGN_RSA_SHA256,
-  GNUTLS_SIGN_RSA_SHA384,
-  GNUTLS_SIGN_RSA_SHA512,
-  GNUTLS_SIGN_RSA_RMD160,
-  GNUTLS_SIGN_DSA_SHA1,
-  GNUTLS_SIGN_DSA_SHA224,
-  GNUTLS_SIGN_DSA_SHA256,
-  GNUTLS_SIGN_RSA_MD5,
-  GNUTLS_SIGN_RSA_MD2,
-  0
-};
-
 #define GNUTLS_SIGN_LOOP(b) \
   do {								       \
     const gnutls_sign_entry *p;					       \
@@ -2068,6 +2040,16 @@ gnutls_sign_get_name (gnutls_sign_algorithm_t sign)
 const gnutls_sign_algorithm_t *
 gnutls_sign_list (void)
 {
+static gnutls_sign_algorithm_t supported_sign[MAX_ALGOS] = {0};
+
+  if (supported_sign[0] == 0)
+    {
+      int i = 0;
+
+      GNUTLS_SIGN_LOOP (supported_sign[i++]=p->id);
+      supported_sign[i++]=0;
+    }
+
   return supported_sign;
 }
 
@@ -2219,6 +2201,11 @@ static const gnutls_pk_entry pk_algorithms[] = {
   {0, 0, 0}
 };
 
+#define GNUTLS_PK_LOOP(b) \
+	{ const gnutls_pk_entry *p; \
+                for(p = pk_algorithms; p->name != NULL; p++) { b ; } }
+
+
 /**
  * gnutls_pk_algorithm_get_name:
  * @algorithm: is a pk algorithm
@@ -2232,14 +2219,14 @@ const char *
 gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm)
 {
   const char *ret = NULL;
-  const gnutls_pk_entry *p;
 
-  for (p = pk_algorithms; p->name != NULL; p++)
+  GNUTLS_PK_LOOP(
     if (p->id == algorithm)
       {
         ret = p->name;
         break;
       }
+  );
 
   return ret;
 }
@@ -2249,6 +2236,8 @@ gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm)
  *
  * Get a list of supported public key algorithms.
  *
+ * This function is not thread safe.
+ *
  * Returns: a zero-terminated list of #gnutls_pk_algorithm_t integers
  *   indicating the available ciphers.
  *
@@ -2257,15 +2246,15 @@ gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm)
 const gnutls_pk_algorithm_t *
 gnutls_pk_list (void)
 {
-  static const gnutls_pk_algorithm_t supported_pks[] = {
-    GNUTLS_PK_RSA,
-    GNUTLS_PK_DSA,
-    /* GNUTLS_PK_DH is not returned because it is not
-     * a real public key algorithm. I.e. cannot be used
-     * as a public key algorithm of a certificate.
-     */
-    0
-  };
+static gnutls_pk_algorithm_t supported_pks[MAX_ALGOS] = {0};
+
+  if (supported_pks[0] == 0)
+    {
+      int i = 0;
+
+      GNUTLS_PK_LOOP (if (p->id != GNUTLS_PK_UNKNOWN && supported_pks[i>0?(i-1):0]!=p->id) supported_pks[i++]=p->id);
+      supported_pks[i++]=0;
+    }
 
   return supported_pks;
 }
