@@ -421,7 +421,7 @@ gnutls_openpgp_keyid_t keyid;
 #endif
 
 /**
- * gnutls_privkey_sign_data2:
+ * gnutls_privkey_sign_data:
  * @signer: Holds the key
  * @hash: should be a digest algorithm
  * @flags: should be 0 for now
@@ -431,7 +431,10 @@ gnutls_openpgp_keyid_t keyid;
  * This function will sign the given data using a signature algorithm
  * supported by the private key. Signature algorithms are always used
  * together with a hash functions.  Different hash functions may be
- * used for the RSA algorithm, but only SHA-1 for the DSA keys.
+ * used for the RSA algorithm, but only the SHA family for the DSA keys.
+ *
+ * Use gnutls_pubkey_get_preferred_hash_algorithm() to determine
+ * the hash algorithm.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  * negative error value.
@@ -491,7 +494,7 @@ cleanup:
  * together with a hash functions.  Different hash functions may be
  * used for the RSA algorithm, but only SHA-XXX for the DSA keys.
  *
- * Use gnutls_x509_crt_get_preferred_hash_algorithm() to determine
+ * Use gnutls_pubkey_get_preferred_hash_algorithm() to determine
  * the hash algorithm.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
