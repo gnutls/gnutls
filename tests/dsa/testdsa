@@ -24,6 +24,7 @@ srcdir="${srcdir:-.}"
 SERV="${SERV:-../../src/gnutls-serv} -q"
 CLI="${CLI:-../../src/gnutls-cli}"
 PORT="${PORT:-5559}"
+DEBUG=""
 unset RETCODE
 
 fail() {
@@ -37,13 +38,31 @@ echo "Checking various DSA key sizes"
 
 echo "Checking DSA-1024 with TLS 1.0"
 
-$SERV -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile $srcdir/cert.dsa.1024.pem --x509keyfile $srcdir/dsa.1024.pem >/dev/null 2>&1 &
+$SERV $DEBUG -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile $srcdir/cert.dsa.1024.pem --x509keyfile $srcdir/dsa.1024.pem >/dev/null 2>&1 &
 
 # give the server a chance to initialize
 sleep 2
 
-$CLI -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null || \
+$CLI $DEBUG -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null || \
   fail "Failed connection to a server with DSA 1024 key and TLS 1.0!"
+
+echo "Checking server DSA-1024 with client DSA-1024 and TLS 1.0"
+
+#try with client key of 1024 bits (should succeed) 
+$CLI $DEBUG -p $PORT 127.0.0.1 --insecure --x509certfile $srcdir/cert.dsa.1024.pem --x509keyfile $srcdir/dsa.1024.pem </dev/null >/dev/null || \
+  fail "Failed connection to a server with DSA 1024 key and TLS 1.0!"
+
+echo "Checking server DSA-1024 with client DSA-2048 and TLS 1.0"
+
+#try with client key of 2048 bits (should fail) 
+$CLI $DEBUG -p $PORT 127.0.0.1 --insecure --x509certfile $srcdir/cert.dsa.2048.pem --x509keyfile $srcdir/dsa.2048.pem </dev/null >/dev/null 2>&1 && \
+  fail "Succeeded connection to a server with a client DSA 2048 key and TLS 1.0!"
+
+echo "Checking server DSA-1024 with client DSA-3072 and TLS 1.0"
+
+#try with client key of 3072 bits (should fail) 
+$CLI $DEBUG -p $PORT 127.0.0.1 --insecure --x509certfile $srcdir/cert.dsa.3072.pem --x509keyfile $srcdir/dsa.3072.pem </dev/null >/dev/null 2>&1 && \
+  fail "Succeeded connection to a server with a client DSA 3072 key and TLS 1.0!"
 
 kill %1
 wait
@@ -52,13 +71,32 @@ wait
 
 echo "Checking DSA-1024 with TLS 1.2"
 
-$SERV -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2" --x509certfile $srcdir/cert.dsa.1024.pem --x509keyfile $srcdir/dsa.1024.pem >/dev/null 2>&1 &
+$SERV $DEBUG -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2" --x509certfile $srcdir/cert.dsa.1024.pem --x509keyfile $srcdir/dsa.1024.pem >/dev/null 2>&1 &
 
 # give the server a chance to initialize
 sleep 2
 
-$CLI -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null || \
+$CLI $DEBUG -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null || \
   fail "Failed connection to a server with DSA 1024 key and TLS 1.2!"
+
+echo "Checking server DSA-1024 with client DSA-1024 and TLS 1.2"
+
+#try with client key of 1024 bits (should succeed) 
+$CLI $DEBUG -p $PORT 127.0.0.1 --insecure --x509certfile $srcdir/cert.dsa.1024.pem --x509keyfile $srcdir/dsa.1024.pem </dev/null >/dev/null || \
+  fail "Failed connection to a server with DSA 1024 key and TLS 1.2!"
+
+echo "Checking server DSA-1024 with client DSA-2048 and TLS 1.2"
+
+#try with client key of 2048 bits (should succeed) 
+$CLI $DEBUG -p $PORT 127.0.0.1 --insecure --x509certfile $srcdir/cert.dsa.2048.pem --x509keyfile $srcdir/dsa.2048.pem </dev/null >/dev/null || \
+  fail "Failed connection to a server with a client DSA 2048 key and TLS 1.2!"
+
+echo "Checking server DSA-1024 with client DSA-3072 and TLS 1.2"
+
+#try with client key of 3072 bits (should succeed) 
+$CLI $DEBUG -p $PORT 127.0.0.1 --insecure --x509certfile $srcdir/cert.dsa.3072.pem --x509keyfile $srcdir/dsa.3072.pem </dev/null >/dev/null || \
+  fail "Failed connection to a server with a client DSA 3072 key and TLS 1.2!"
+
 
 kill %1
 wait
@@ -67,12 +105,12 @@ wait
 
 echo "Checking DSA-2048 with TLS 1.0"
 
-$SERV -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile $srcdir/cert.dsa.2048.pem --x509keyfile $srcdir/dsa.2048.pem >/dev/null 2>&1 &
+$SERV $DEBUG -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile $srcdir/cert.dsa.2048.pem --x509keyfile $srcdir/dsa.2048.pem >/dev/null 2>&1 &
 
 # give the server a chance to initialize
 sleep 2
 
-$CLI -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null 2>&1 && \
+$CLI $DEBUG -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null 2>&1 && \
   fail "Succeeded connection to a server with DSA 2048 key and TLS 1.0. Should have failed!"
 
 kill %1
@@ -82,12 +120,12 @@ wait
 
 echo "Checking DSA-2048 with TLS 1.2"
 
-$SERV -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2" --x509certfile $srcdir/cert.dsa.2048.pem --x509keyfile $srcdir/dsa.2048.pem >/dev/null 2>&1 &
+$SERV $DEBUG -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2" --x509certfile $srcdir/cert.dsa.2048.pem --x509keyfile $srcdir/dsa.2048.pem >/dev/null 2>&1 &
 
 # give the server a chance to initialize
 sleep 2
 
-$CLI -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null || \
+$CLI $DEBUG -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null || \
   fail "Failed connection to a server with DSA 2048 key and TLS 1.2!"
 
 kill %1
@@ -97,12 +135,12 @@ wait
 
 echo "Checking DSA-3072 with TLS 1.0"
 
-$SERV -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile $srcdir/cert.dsa.3072.pem --x509keyfile $srcdir/dsa.3072.pem >/dev/null 2>&1 &
+$SERV $DEBUG -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile $srcdir/cert.dsa.3072.pem --x509keyfile $srcdir/dsa.3072.pem >/dev/null 2>&1 &
 
 # give the server a chance to initialize
 sleep 2
 
-$CLI -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null 2>&1 && \
+$CLI $DEBUG -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null 2>&1 && \
   fail "Succeeded connection to a server with DSA 2048 key and TLS 1.0. Should have failed!"
 
 kill %1
@@ -112,12 +150,12 @@ wait
 
 echo "Checking DSA-3072 with TLS 1.2"
 
-$SERV -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2" --x509certfile $srcdir/cert.dsa.3072.pem --x509keyfile $srcdir/dsa.3072.pem >/dev/null 2>&1 &
+$SERV $DEBUG -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2" --x509certfile $srcdir/cert.dsa.3072.pem --x509keyfile $srcdir/dsa.3072.pem >/dev/null 2>&1 &
 
 # give the server a chance to initialize
 sleep 2
 
-$CLI -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null || \
+$CLI $DEBUG -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null || \
   fail "Failed connection to a server with DSA 3072 key and TLS 1.2!"
 
 kill %1
