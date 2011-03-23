@@ -541,7 +541,7 @@ gnutls_x509_crl_get_crt_serial (gnutls_x509_crl_t crl, int indx,
  * This function will return a pointer to the DER encoded DN structure
  * and the length.
  *
- * Returns a negative value on error, and zero on success.
+ * Returns: a negative value on error, and zero on success.
  *
  * Since: 2.12.0
  **/
