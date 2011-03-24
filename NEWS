@@ -80,6 +80,36 @@ gnutls_ia_set_server_avp_function: REMOVED
 gnutls_ia_set_server_avp_ptr: REMOVED
 gnutls_ia_verify_endphase: REMOVED
 
+
+* Version 2.12.0 (released 2011-03-24)
+
+** certtool: Warns on generation of DSA keys of over 1024 bits, about
+the incompatibility with TLS other than 1.2.
+
+** libgnutls: Modified signature algorithm selection in client
+certificate request, to avoid failures in DSA certificates.
+
+** libgnutls: Instead of failing with internal error, return 
+GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL if an incompatible DSA
+key with the negotiated protocol is encountered.
+
+** libgnutls: Bug fixes in the RSA ciphersuite behavior with openpgp keys.
+
+** libgnutls: Force state update when fork is detected in the nettle
+rng.
+
+** libgnutls: modified gnutls_pubkey_import_openpgp() to use the preferred
+subkey instead of setting explicitly one.
+
+** libgnutls: Corrected default behavior in record version of Client Hellos.
+
+** libgnutls-openssl: modified to use modern gnutls' functions.
+This introduces an ABI incompatibility with previous versions.
+
+** API and ABI modifications:
+gnutls_pubkey_import_openpgp: MODIFIED
+
+
 * Version 2.11.7
 
 ** libgnutls: The deprecated  gnutls_x509_privkey_sign_hash() was
