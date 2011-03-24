@@ -34,6 +34,7 @@ TESTS_ENVIRONMENT =					\
 
 
 EXTRA_DIST = $(TESTS) openpgp-pub.asc openpgp-sec.asc	\
+		openpgp-elg-pub.asc openpgp-elg-sec.asc \
              openpgp-keyring.gpg openpgp-keyring.asc	\
 	     rsa-parameters.pem dh-parameters.pem	\
 	     x509-certificate.pem x509-key.pem
