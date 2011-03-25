@@ -3,6 +3,11 @@
 #ifndef _GNUTLS_COMPAT_H
 #define _GNUTLS_COMPAT_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #ifdef __GNUC__
 
 #define _GNUTLS_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
@@ -344,5 +349,9 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
                                             _GNUTLS_GCC_ATTR_DEPRECATED;
 
   void gnutls_transport_set_lowat (gnutls_session_t session, int num) _GNUTLS_GCC_ATTR_DEPRECATED;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _GNUTLS_COMPAT_H */
