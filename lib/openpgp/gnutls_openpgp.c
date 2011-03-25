@@ -321,7 +321,7 @@ gnutls_certificate_set_openpgp_key_file (gnutls_certificate_credentials_t res,
 static int
 get_keyid (gnutls_openpgp_keyid_t keyid, const char *str)
 {
-  size_t keyid_size = sizeof (keyid);
+  size_t keyid_size = GNUTLS_OPENPGP_KEYID_SIZE;
 
   if (strlen (str) != 16)
     {
@@ -744,7 +744,7 @@ _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert, gnutls_openpgp_crt_t cert)
 
       _gnutls_debug_log
         ("Importing Openpgp cert and using openpgp sub key: %s\n",
-         _gnutls_bin2hex (keyid, sizeof (keyid), err_buf, sizeof (err_buf),
+         _gnutls_bin2hex (keyid, GNUTLS_OPENPGP_KEYID_SIZE, err_buf, sizeof (err_buf),
                           NULL));
 
       KEYID_IMPORT (kid32, keyid);
@@ -762,7 +762,7 @@ _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert, gnutls_openpgp_crt_t cert)
       gnutls_openpgp_crt_get_subkey_usage (cert, idx, &gcert->key_usage);
       gcert->use_subkey = 1;
 
-      memcpy (gcert->subkey_id, keyid, sizeof (keyid));
+      memcpy (gcert->subkey_id, keyid, GNUTLS_OPENPGP_KEYID_SIZE);
 
       ret =
         _gnutls_openpgp_crt_get_mpis (cert, kid32, gcert->params,
