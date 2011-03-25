@@ -179,6 +179,8 @@ file_verify_clearsign (cdk_ctx_t hd, const char *file, const char *output)
   int err;
   cdk_error_t rc;
 
+  memset(&md, 0, sizeof(md));
+
   if (output)
     {
       rc = cdk_stream_create (output, &out);
