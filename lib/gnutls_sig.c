@@ -596,9 +596,9 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
                     gnutls_sign_algorithm_get_name (sign_algo),
                     gnutls_mac_get_name (hash_algo));
 
-  if (hash_algo == session->internals.handshake_mac_handle.tls12.sha1.algorithm)
+  if ((gnutls_mac_algorithm_t)hash_algo == session->internals.handshake_mac_handle.tls12.sha1.algorithm)
     handshake_td = &session->internals.handshake_mac_handle.tls12.sha1;
-  else if (hash_algo == session->internals.handshake_mac_handle.tls12.sha256.algorithm)
+  else if ((gnutls_mac_algorithm_t)hash_algo == session->internals.handshake_mac_handle.tls12.sha256.algorithm)
     handshake_td = &session->internals.handshake_mac_handle.tls12.sha256;
   else
     return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR); /* too bad we only support SHA1 and SHA256 */
