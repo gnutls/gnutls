@@ -30,6 +30,8 @@
 
 #define CHECKSUM_SIZE 12
 
+extension_entry_st ext_mod_ia;
+
 struct gnutls_ia_client_credentials_st
 {
   gnutls_ia_avp_func avp_func;

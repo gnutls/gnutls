@@ -31,7 +31,7 @@
 #define IA_ENABLE (1 << 3)
 #define IA_ALLOW_SKIP (1 << 4)
 
-extension_entry_st ext_mod_ia;
+extern extension_entry_st ext_mod_ia;
 
 typedef struct
 {
