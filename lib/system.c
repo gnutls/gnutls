@@ -50,7 +50,7 @@
 #ifdef _WIN32
 
 int
-system_errno (gnutls_transport_ptr)
+system_errno (gnutls_transport_ptr p)
 {
   int tmperr = WSAGetLastError ();
   int ret = 0;
