@@ -1568,7 +1568,7 @@ gnutls_openpgp_crt_get_preferred_key_id (gnutls_openpgp_crt_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  memcpy (keyid, key->preferred_keyid, sizeof (gnutls_openpgp_keyid_t));
+  memcpy (keyid, key->preferred_keyid, GNUTLS_OPENPGP_KEYID_SIZE);
 
   return 0;
 }
@@ -1606,7 +1606,7 @@ gnutls_openpgp_crt_set_preferred_key_id (gnutls_openpgp_crt_t key,
     }
 
   key->preferred_set = 1;
-  memcpy (key->preferred_keyid, keyid, sizeof (gnutls_openpgp_keyid_t));
+  memcpy (key->preferred_keyid, keyid, GNUTLS_OPENPGP_KEYID_SIZE);
 
   return 0;
 }
