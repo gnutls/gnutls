@@ -53,7 +53,8 @@ extern "C"
     GNUTLS_OPENPGP_FMT_BASE64
   } gnutls_openpgp_crt_fmt_t;
 
-  typedef unsigned char gnutls_openpgp_keyid_t[8];
+#define GNUTLS_OPENPGP_KEYID_SIZE 8
+  typedef unsigned char gnutls_openpgp_keyid_t[GNUTLS_OPENPGP_KEYID_SIZE];
 
 /* gnutls_openpgp_cert_t should be defined in gnutls.h
  */
