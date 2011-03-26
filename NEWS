@@ -3,6 +3,21 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010, 2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 2.12.0 (unreleased)
+
+** libgnutls: Bug fixes in opencdk code. Reported by Vitaly Kruglikov.
+
+** libgnutls: Corrected windows system_errno() function prototype.
+
+** libgnutls: C++ compatibility fix for compat.h. Reported by Mark Brand.
+
+** libgnutls: Fix size of gnutls_openpgp_keyid_t by using the
+GNUTLS_OPENPGP_KEYID_SIZE definition. Reported by Andreas Metzler.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 2.12.0 (released 2011-03-24)
 
 ** certtool: Warns on generation of DSA keys of over 1024 bits, about
@@ -31,7 +46,6 @@ This introduces an ABI incompatibility with previous versions.
 ** API and ABI modifications:
 gnutls_pubkey_import_openpgp: MODIFIED
 
-No changes since last version.
 
 * Version 2.11.7 (released 2011-03-09)
 
