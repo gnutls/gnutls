@@ -3,6 +3,11 @@
 #ifndef GNUTLS_COMPAT_H
 # define GNUTLS_COMPAT_H
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #define gnutls_cipher_algorithm gnutls_cipher_algorithm_t
 #define gnutls_kx_algorithm gnutls_kx_algorithm_t
 #define gnutls_paramsype gnutls_paramsype_t
@@ -97,5 +102,9 @@
 #define LIBGNUTLS_VERSION_PATCH GNUTLS_VERSION_PATCH
 #define LIBGNUTLS_VERSION_NUMBER GNUTLS_VERSION_NUMBER
 #define LIBGNUTLS_EXTRA_VERSION GNUTLS_VERSION
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* GNUTLS_COMPAT_H */
