@@ -761,6 +761,7 @@ stream_fp_replace (cdk_stream_t s, FILE ** tmp)
   rc = fclose (s->fp);
   if (rc)
     {
+      s->fp = NULL;
       gnutls_assert ();
       return CDK_File_Error;
     }
@@ -819,11 +820,12 @@ stream_filter_write (cdk_stream_t s)
       if (!rc)
 	rc = cdk_stream_seek (s, 0);
       if (rc)
-	{
-	  _cdk_log_debug ("filter [close]: fd=%d\n", fileno (f->tmp));
-	  fclose (f->tmp);
-	  break;
-	}
+        {
+          _gnutls_read_log ("filter [close]: fd=%d\n", fileno (f->tmp));
+          fclose (f->tmp);
+          f->tmp = NULL;
+          break;
+        }
     }
   return rc;
 }
@@ -958,13 +960,13 @@ cdk_stream_read (cdk_stream_t s, void *buf, size_t buflen)
     {
       rc = stream_filter_read (s);
       if (rc)
-	{
-	  s->error = rc;
-	  if (feof (s->fp))
-	    s->flags.eof = 1;
-	  gnutls_assert ();
-	  return EOF;
-	}
+        {
+          s->error = rc;
+          if (s->fp && feof (s->fp))
+            s->flags.eof = 1;
+          gnutls_assert ();
+          return EOF;
+        }
       s->flags.filtrated = 1;
     }
 
