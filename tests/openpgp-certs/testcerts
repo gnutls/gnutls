@@ -24,6 +24,7 @@ srcdir="${srcdir:-.}"
 SERV="${SERV:-../../src/gnutls-serv} -q"
 CLI="${CLI:-../../src/gnutls-cli}"
 PORT="${PORT:-5557}"
+DEBUG=""
 unset RETCODE
 
 fail() {
@@ -45,10 +46,10 @@ sleep 2
 #$CLI -p $PORT 127.0.0.1 --pgpkeyring ca-public.gpg </dev/null >/dev/null || \
 #  fail "Connection to verified IP address should have succeeded! (error code $?)" $?
 
-$CLI -p $PORT 127.0.0.2 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null && \
+$CLI $DEBUG -p $PORT 127.0.0.2 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null 2>&1 && \
   fail "Connection to unrecognized IP address should have failed!"
 
-$CLI -p $PORT localhost --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null && \
+$CLI $DEBUG -p $PORT localhost --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null 2>&1 && \
   fail "Connection to unverified (but present) 'localhost' should have failed!"
 
 kill $PID
@@ -60,10 +61,10 @@ trap "kill $PID" 1 15 2
 # give the server a chance to initialize
 sleep 2
 
-echo | $CLI -p $PORT 127.0.0.1 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null && \
+echo | $CLI $DEBUG -p $PORT 127.0.0.1 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null 2>&1 && \
   fail "Connection to unverified IP address should have failed! (error code $?)" $?
 
-$CLI -p $PORT 127.0.0.2 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null && \
+$CLI $DEBUG -p $PORT 127.0.0.2 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null 2>&1 && \
   fail "Connection to unrecognized IP address should have failed!"
 
 #see reason above
@@ -78,10 +79,10 @@ trap "kill $PID" 1 15 2
 
 # give the server a chance to initialize
 sleep 2
-echo | $CLI -p $PORT 127.0.0.1 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null || \
+echo | $CLI $DEBUG -p $PORT 127.0.0.1 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null || \
   fail "Connection to signed PGP certificate should have succeeded! (error code $?)" $?
 
-$CLI -p $PORT 127.0.0.2 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null && \
+$CLI $DEBUG -p $PORT 127.0.0.2 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null && \
   fail "Connection to unrecognized IP address should have failed!"
 
 kill $PID
