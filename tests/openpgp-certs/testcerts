@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Copyright (C) 2010 Free Software Foundation, Inc.
 #
@@ -33,7 +33,8 @@ fail() {
 
 echo "Checking OpenPGP certificate verification"
 
-$SERV -p $PORT --pgpcertfile $srcdir/srv-public-127.0.0.1-signed.gpg --pgpkeyfile $srcdir/srv-secret.gpg >/dev/null 2>&1 &
+$SERV -p $PORT --pgpcertfile $srcdir/srv-public-127.0.0.1-signed.gpg --pgpkeyfile $srcdir/srv-secret.gpg >/dev/null 2>&1 & PID=$!
+trap "kill $PID" 1 15 2
 
 # give the server a chance to initialize
 sleep 2
@@ -50,10 +51,12 @@ $CLI -p $PORT 127.0.0.2 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null
 $CLI -p $PORT localhost --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null && \
   fail "Connection to unverified (but present) 'localhost' should have failed!"
 
-kill %1
+kill $PID
 wait
 
-$SERV -p $PORT --pgpcertfile $srcdir/srv-public-localhost-signed.gpg --pgpkeyfile $srcdir/srv-secret.gpg >/dev/null 2>&1 &
+$SERV -p $PORT --pgpcertfile $srcdir/srv-public-localhost-signed.gpg --pgpkeyfile $srcdir/srv-secret.gpg >/dev/null 2>&1 & PID=$!
+trap "kill $PID" 1 15 2
+
 # give the server a chance to initialize
 sleep 2
 
@@ -67,10 +70,12 @@ $CLI -p $PORT 127.0.0.2 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null
 #$CLI -p $PORT localhost --pgpkeyring ca-public.gpg </dev/null >/dev/null || \
 #  fail "Connection to verified 'localhost' should have succeded! (error code $?)" $?
 
-kill %1 >/dev/null 2>&1
+kill $PID
 wait
 
-$SERV -p $PORT --pgpcertfile $srcdir/srv-public-all-signed.gpg --pgpkeyfile $srcdir/srv-secret.gpg >/dev/null 2>&1 &
+$SERV -p $PORT --pgpcertfile $srcdir/srv-public-all-signed.gpg --pgpkeyfile $srcdir/srv-secret.gpg >/dev/null 2>&1 & PID=$!
+trap "kill $PID" 1 15 2
+
 # give the server a chance to initialize
 sleep 2
 echo | $CLI -p $PORT 127.0.0.1 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null || \
@@ -79,7 +84,7 @@ echo | $CLI -p $PORT 127.0.0.1 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/d
 $CLI -p $PORT 127.0.0.2 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null && \
   fail "Connection to unrecognized IP address should have failed!"
 
-kill %1 >/dev/null 2>&1
+kill $PID
 wait
 
 exit ${RETCODE:-0}
