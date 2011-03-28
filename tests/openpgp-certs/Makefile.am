@@ -29,7 +29,7 @@ dist_check_SCRIPTS = testselfsigs testcerts
 if ENABLE_OPENPGP
 # The selftest is disabled until we can make it work under Wine and
 # under Debian buildds (problem with 127.0.0.2?).
-TESTS = testselfsigs #testcerts
+TESTS = testselfsigs testcerts
 endif
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)
