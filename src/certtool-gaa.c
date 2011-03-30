@@ -1201,7 +1201,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_generate_request:
 	OK = 0;
 #line 30 "certtool.gaa"
-{ gaaval->action=ACTION_GENERATE_REQUEST; ;};
+{ gaaval->privkey_op=1; gaaval->action=ACTION_GENERATE_REQUEST; ;};
 
 		return GAA_OK;
 		break;

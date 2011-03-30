@@ -27,7 +27,7 @@ option (u, update-certificate) { $action=ACTION_UPDATE_CERTIFICATE; } "Update a 
 
 option (p, generate-privkey) { $privkey_op=1; $action=ACTION_GENERATE_PRIVKEY; } "Generate a private key."
 
-option (q, generate-request) { $action=ACTION_GENERATE_REQUEST; } "Generate a PKCS #10 certificate request."
+option (q, generate-request) { $privkey_op=1; $action=ACTION_GENERATE_REQUEST; } "Generate a PKCS #10 certificate request."
 
 option (e, verify-chain) { $action=ACTION_VERIFY_CHAIN; } "Verify a PEM encoded certificate chain. The last certificate in the chain must be a self signed one."
 
