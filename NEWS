@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.12.0 (unreleased)
 
+** certtool: Generated certificate request with stricter permissions.
+Reported by Luca Capello.
+
 ** libgnutls: Bug fixes in opencdk code. Reported by Vitaly Kruglikov.
 
 ** libgnutls: Corrected windows system_errno() function prototype.
