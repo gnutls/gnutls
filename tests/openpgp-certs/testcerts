@@ -27,18 +27,14 @@ PORT="${PORT:-5557}"
 DEBUG=""
 unset RETCODE
 
-fail() {
-   echo "Failure: $1" >&2
-   RETCODE=${RETCODE:-${2:-1}}
-}
+. ../scripts/common.sh
 
 echo "Checking OpenPGP certificate verification"
 
-$SERV -p $PORT --pgpcertfile $srcdir/srv-public-127.0.0.1-signed.gpg --pgpkeyfile $srcdir/srv-secret.gpg >/dev/null 2>&1 & PID=$!
-trap "kill $PID" 1 15 2
+launch_server $$ --pgpcertfile $srcdir/srv-public-127.0.0.1-signed.gpg --pgpkeyfile $srcdir/srv-secret.gpg >/dev/null 2>&1 & PID=$!
+wait_server $PID
 
 # give the server a chance to initialize
-sleep 2
 
 #gnutls currently only considers PGP certificates verified only if
 #all user IDs in the certificate were signed.
@@ -55,11 +51,8 @@ $CLI $DEBUG -p $PORT localhost --pgpkeyring $srcdir/ca-public.gpg </dev/null >/d
 kill $PID
 wait
 
-$SERV -p $PORT --pgpcertfile $srcdir/srv-public-localhost-signed.gpg --pgpkeyfile $srcdir/srv-secret.gpg >/dev/null 2>&1 & PID=$!
-trap "kill $PID" 1 15 2
-
-# give the server a chance to initialize
-sleep 2
+launch_server $$ --pgpcertfile $srcdir/srv-public-localhost-signed.gpg --pgpkeyfile $srcdir/srv-secret.gpg >/dev/null 2>&1 & PID=$!
+wait_server $PID
 
 echo | $CLI $DEBUG -p $PORT 127.0.0.1 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null 2>&1 && \
   fail "Connection to unverified IP address should have failed! (error code $?)" $?
@@ -74,11 +67,10 @@ $CLI $DEBUG -p $PORT 127.0.0.2 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/d
 kill $PID
 wait
 
-$SERV -p $PORT --pgpcertfile $srcdir/srv-public-all-signed.gpg --pgpkeyfile $srcdir/srv-secret.gpg >/dev/null 2>&1 & PID=$!
-trap "kill $PID" 1 15 2
+launch_server $$ --pgpcertfile $srcdir/srv-public-all-signed.gpg --pgpkeyfile $srcdir/srv-secret.gpg >/dev/null 2>&1 & PID=$!
+wait_server $PID
 
 # give the server a chance to initialize
-sleep 2
 echo | $CLI $DEBUG -p $PORT 127.0.0.1 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null || \
   fail "Connection to signed PGP certificate should have succeeded! (error code $?)" $?
 

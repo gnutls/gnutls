@@ -27,10 +27,7 @@ PORT="${PORT:-5559}"
 DEBUG=""
 unset RETCODE
 
-fail() {
-   echo "Failure: $1" >&2
-   exit 1
-}
+. ../scripts/common.sh
 
 echo "Checking various DSA key sizes"
 
@@ -38,11 +35,8 @@ echo "Checking various DSA key sizes"
 
 echo "Checking DSA-1024 with TLS 1.0"
 
-$SERV $DEBUG -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile $srcdir/cert.dsa.1024.pem --x509keyfile $srcdir/dsa.1024.pem >/dev/null 2>&1 & PID=$!
-trap "kill $PID" 1 15 2
-
-# give the server a chance to initialize
-sleep 2
+launch_server $$ --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile $srcdir/cert.dsa.1024.pem --x509keyfile $srcdir/dsa.1024.pem >/dev/null 2>&1 & PID=$!
+wait_server $PID
 
 $CLI $DEBUG -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null || \
   fail "Failed connection to a server with DSA 1024 key and TLS 1.0!"
@@ -72,11 +66,8 @@ wait
 
 echo "Checking DSA-1024 with TLS 1.2"
 
-$SERV $DEBUG -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2" --x509certfile $srcdir/cert.dsa.1024.pem --x509keyfile $srcdir/dsa.1024.pem >/dev/null 2>&1 & PID=$!
-trap "kill $PID" 1 15 2
-
-# give the server a chance to initialize
-sleep 2
+launch_server $$  --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2" --x509certfile $srcdir/cert.dsa.1024.pem --x509keyfile $srcdir/dsa.1024.pem >/dev/null 2>&1 & PID=$!
+wait_server $PID
 
 $CLI $DEBUG -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null || \
   fail "Failed connection to a server with DSA 1024 key and TLS 1.2!"
@@ -107,11 +98,8 @@ wait
 
 echo "Checking DSA-2048 with TLS 1.0"
 
-$SERV $DEBUG -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile $srcdir/cert.dsa.2048.pem --x509keyfile $srcdir/dsa.2048.pem >/dev/null 2>&1 & PID=$!
-trap "kill $PID" 1 15 2
-
-# give the server a chance to initialize
-sleep 2
+launch_server $$  --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile $srcdir/cert.dsa.2048.pem --x509keyfile $srcdir/dsa.2048.pem >/dev/null 2>&1 & PID=$!
+wait_server $PID
 
 $CLI $DEBUG -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null 2>&1 && \
   fail "Succeeded connection to a server with DSA 2048 key and TLS 1.0. Should have failed!"
@@ -123,11 +111,8 @@ wait
 
 echo "Checking DSA-2048 with TLS 1.2"
 
-$SERV $DEBUG -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2" --x509certfile $srcdir/cert.dsa.2048.pem --x509keyfile $srcdir/dsa.2048.pem >/dev/null 2>&1 & PID=$!
-trap "kill $PID" 1 15 2
-
-# give the server a chance to initialize
-sleep 2
+launch_server $$  --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2" --x509certfile $srcdir/cert.dsa.2048.pem --x509keyfile $srcdir/dsa.2048.pem >/dev/null 2>&1 & PID=$!
+wait_server $PID
 
 $CLI $DEBUG -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null || \
   fail "Failed connection to a server with DSA 2048 key and TLS 1.2!"
@@ -139,11 +124,8 @@ wait
 
 echo "Checking DSA-3072 with TLS 1.0"
 
-$SERV $DEBUG -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile $srcdir/cert.dsa.3072.pem --x509keyfile $srcdir/dsa.3072.pem >/dev/null 2>&1 & PID=$!
-trap "kill $PID" 1 15 2
-
-# give the server a chance to initialize
-sleep 2
+launch_server $$  --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0" --x509certfile $srcdir/cert.dsa.3072.pem --x509keyfile $srcdir/dsa.3072.pem >/dev/null 2>&1 & PID=$!
+wait_server $PID
 
 $CLI $DEBUG -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null 2>&1 && \
   fail "Succeeded connection to a server with DSA 2048 key and TLS 1.0. Should have failed!"
@@ -155,11 +137,8 @@ wait
 
 echo "Checking DSA-3072 with TLS 1.2"
 
-$SERV $DEBUG -p $PORT --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2" --x509certfile $srcdir/cert.dsa.3072.pem --x509keyfile $srcdir/dsa.3072.pem >/dev/null 2>&1 & PID=$!
-trap "kill $PID" 1 15 2
-
-# give the server a chance to initialize
-sleep 2
+launch_server $$  --priority "NORMAL:-VERS-TLS-ALL:+VERS-TLS1.2" --x509certfile $srcdir/cert.dsa.3072.pem --x509keyfile $srcdir/dsa.3072.pem >/dev/null 2>&1 & PID=$!
+wait_server $PID
 
 $CLI $DEBUG -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null || \
   fail "Failed connection to a server with DSA 3072 key and TLS 1.2!"
