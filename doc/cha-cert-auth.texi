@@ -369,6 +369,11 @@ the user to insert the token. All the initialization functions are below.
 
 @end itemize
 
+Note that due to limitations of @acronym{PKCS #11} there might be issues when multiple libraries 
+are sharing a module. If this is the case we suggest to use p11-kit@footnote{http://p11-glue.freedesktop.org/}
+that provides an intermediate module to control access to resources over the
+multiple users.
+
 @subsection Reading Objects
 
 All @acronym{PKCS #11} objects are referenced by @acronym{GnuTLS} functions by
