@@ -26,7 +26,6 @@
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
 #include <gnutls_mpi.h>
-#include <gcrypt.h>
 
 /* Functions that refer to the initialization of the libgcrypt library.
  */
