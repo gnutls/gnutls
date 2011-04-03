@@ -389,8 +389,13 @@ verify_passwd (char *conffile, char *tpasswd, char *username,
 #define KPASSWD "/etc/tpasswd"
 #define KPASSWD_CONF "/etc/tpasswd.conf"
 
-int
-main (int argc, char **argv)
+static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "|<%d>| %s", level, str);
+}
+
+int main (int argc, char **argv)
 {
   gaainfo info;
   const char *passwd;
@@ -412,6 +417,9 @@ main (int argc, char **argv)
       fprintf (stderr, "Error in the arguments.\n");
       return -1;
     }
+
+  gnutls_global_set_log_function (tls_log_func);
+  gnutls_global_set_log_level (info.debug);
 
   if (info.create_conf != NULL)
     {

@@ -13,6 +13,9 @@ void srptool_version(void);
 
 helpnode "Srptool help\nUsage : srptool [options]"
 
+#int debug;
+option (d, debug) INT "integer" { $debug = $1 } "Enable debugging" 
+
 #char *username;
 option (u,username) STR "username" { $username = $1 } "specify username."
 
@@ -39,4 +42,4 @@ option (h, help) { gaa_help(); exit(0); } "shows this help text"
 
 init { $username=NULL; $passwd=NULL; $salt=0;
        $create_conf=NULL; $passwd_conf=NULL; $verify = 0; 
-       $index = 1; }
+       $index = 1; $debug = 0; }
