@@ -69,7 +69,7 @@ _gnutls_srp_gx (opaque * text, size_t textsize, opaque ** result,
   _gnutls_mpi_release (&x);
 
   ret = _gnutls_mpi_print (e, NULL, &result_size);
-  if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
+  if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
       *result = galloc_func (result_size);
       if ((*result) == NULL)
