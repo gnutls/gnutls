@@ -4,7 +4,9 @@
 #include <gnutls_int.h>
 
 #ifndef _WIN32
-#include <sys/uio.h>            /* for writev */
+# include <sys/uio.h>            /* for writev */
+#else
+# include <windows.h>            /* for Sleep */
 #endif
 
 int system_errno (gnutls_transport_ptr_t);
@@ -34,5 +36,18 @@ ssize_t system_read_peek (gnutls_transport_ptr_t ptr, void *data,
 
 int _gnutls_atfork (void (*prepare) (void), void (*parent) (void),
                     void (*child) (void));
+
+static inline void millisleep(unsigned int ms)
+{
+#ifdef _WIN32
+  Sleep(ms);
+#else
+struct timespec ts;
+  ts.tv_sec = 0;
+  ts.tv_nsec = ms*1000*1000;
+  
+  nanosleep(&ts, NULL);
+#endif
+}
 
 #endif /* SYSTEM_H */

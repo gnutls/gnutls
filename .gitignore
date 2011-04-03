@@ -412,6 +412,8 @@ src/psktool
 src/srptool
 stamp-h1
 tags
+tests/rng-fork
+tests/mini-eagain-dtls
 tests/*/out
 tests/Makefile
 tests/Makefile.in
@@ -446,6 +448,7 @@ tests/mpi
 tests/netconf-psk
 tests/nul-in-x509-names
 tests/openpgp-auth
+tests/openpgp-auth2
 tests/openpgp-certs/Makefile
 tests/openpgp-certs/Makefile.in
 tests/openpgp-keyring

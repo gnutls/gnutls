@@ -60,7 +60,7 @@ success (const char *format, ...)
   va_list arg_ptr;
 
   va_start (arg_ptr, format);
-  vfprintf (stdout, format, arg_ptr);
+  vfprintf (stderr, format, arg_ptr);
   va_end (arg_ptr);
 }
 

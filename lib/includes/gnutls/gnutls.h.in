@@ -284,12 +284,14 @@ extern "C"
    * @GNUTLS_SERVER: Connection end is a server.
    * @GNUTLS_CLIENT: Connection end is a client.
    * @GNUTLS_DATAGRAM: Connection is datagram oriented (DTLS).
+   * @GNUTLS_NONBLOCK: Connection should not block (DTLS).
    *
    * Enumeration of different TLS connection end types.
    */
 #define GNUTLS_SERVER 1
 #define GNUTLS_CLIENT (1<<1)
 #define GNUTLS_DATAGRAM (1<<2)
+#define GNUTLS_NONBLOCK (1<<3)
 
   /**
    * gnutls_alert_level_t:

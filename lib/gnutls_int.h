@@ -581,17 +581,30 @@ typedef struct
 
   /* For DTLS handshake fragmentation and reassembly. */
   uint16_t hsk_write_seq;
-  int hsk_read_seq;
+  unsigned int hsk_read_seq;
   uint16_t mtu;
 
+  /* a flight transmission is in process */
+  unsigned int flight_init:1;
+  /* whether this is the last flight in the protocol  */
+  unsigned int last_flight:1;
   unsigned int retrans_timeout;
   unsigned int total_timeout;
 
   unsigned int hsk_hello_verify_requests;
   
   uint64_t record_sw[DTLS_RECORD_WINDOW_SIZE];
-  int record_sw_size;
-  
+  unsigned int record_sw_size;
+
+  /* non blocking stuff variables */
+  unsigned int blocking:1;
+  /* starting time of current handshake */
+  time_t handshake_start_time;
+  /* time in seconds of the last handshake call */
+  time_t handshake_last_call;
+  /* The actual retrans_timeout for the next message (e.g. doubled or so) */
+  unsigned int actual_retrans_timeout;
+
   /* timers to handle async handshake after gnutls_handshake()
    * has terminated. Required to handle retransmissions.
    */
@@ -848,7 +861,6 @@ struct gnutls_session_int
   internals_st internals;
   gnutls_key_st key;
 };
-
 
 
 /* functions 

@@ -30,7 +30,6 @@
 #include <errno.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
-
 #include "utils.h"
 #include "eagain-common.h"
 
@@ -66,31 +65,33 @@ doit (void)
   gnutls_global_init ();
   gnutls_global_set_log_function (tls_log_func);
   if (debug)
-    gnutls_global_set_log_level (2);
+    gnutls_global_set_log_level (99);
 
   /* Init server */
   gnutls_anon_allocate_server_credentials (&s_anoncred);
   gnutls_dh_params_init (&dh_params);
   gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
   gnutls_anon_set_server_dh_params (s_anoncred, dh_params);
-  gnutls_init (&server, GNUTLS_SERVER);
-  ret = gnutls_priority_set_direct (server, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
+  gnutls_init (&server, GNUTLS_SERVER|GNUTLS_DATAGRAM|GNUTLS_NONBLOCK);
+  ret = gnutls_priority_set_direct (server, "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
   if (ret < 0)
     exit(1);
   gnutls_credentials_set (server, GNUTLS_CRD_ANON, s_anoncred);
   gnutls_dh_set_prime_bits (server, 1024);
   gnutls_transport_set_push_function (server, server_push);
   gnutls_transport_set_pull_function (server, server_pull);
+  gnutls_transport_set_pull_timeout_function (server, server_pull_timeout_func);
 
   /* Init client */
   gnutls_anon_allocate_client_credentials (&c_anoncred);
-  gnutls_init (&client, GNUTLS_CLIENT);
-  ret = gnutls_priority_set_direct (client, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
-  if (ret < 0)
+  gnutls_init (&client, GNUTLS_CLIENT|GNUTLS_DATAGRAM|GNUTLS_NONBLOCK);
+  cret = gnutls_priority_set_direct (client, "NONE:+VERS-DTLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
+  if (cret < 0)
     exit(1);
   gnutls_credentials_set (client, GNUTLS_CRD_ANON, c_anoncred);
   gnutls_transport_set_push_function (client, client_push);
   gnutls_transport_set_pull_function (client, client_pull);
+  gnutls_transport_set_pull_timeout_function (client, client_pull_timeout_func);
 
   handshake = 1;
   sret = cret = GNUTLS_E_AGAIN;
@@ -110,7 +111,7 @@ doit (void)
           //success ("server %d: %s\n", sret, gnutls_strerror (sret));
         }
     }
-  while (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN);
+  while ((cret == GNUTLS_E_AGAIN && gnutls_error_is_fatal(sret)==0) || (sret == GNUTLS_E_AGAIN && gnutls_error_is_fatal(cret)==0));
 
   if (cret < 0 || sret < 0)
     {
@@ -168,6 +169,7 @@ doit (void)
           ret = gnutls_record_recv (client, buffer, MAX_BUF);
         }
       while(ret == GNUTLS_E_AGAIN);
+
 
       if (ret == 0)
         {

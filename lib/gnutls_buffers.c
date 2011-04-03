@@ -54,6 +54,7 @@
 #include <system.h>
 #include <gnutls_constate.h> /* gnutls_epoch_get */
 #include <errno.h>
+#include <system.h>
 
 #ifndef EAGAIN
 #define EAGAIN EWOULDBLOCK
@@ -61,7 +62,7 @@
 
 /* this is the maximum number of messages allowed to queue.
  */
-#define MAX_QUEUE 16
+#define MAX_QUEUE 32
 
 /* Buffers received packets of type APPLICATION DATA and
  * HANDSHAKE DATA.
@@ -553,7 +554,7 @@ _gnutls_io_write_flush (gnutls_session_t session)
       tosend += msg.size;
 
       /* we buffer up to MAX_QUEUE messages */
-      if (i >= sizeof (iovec) / sizeof (iovec[0]))
+      if (i >= MAX_QUEUE)
         {
           gnutls_assert ();
           return GNUTLS_E_INTERNAL_ERROR;
@@ -676,7 +677,6 @@ _gnutls_handshake_io_write_flush (gnutls_session_t session)
     }
 
   return _gnutls_io_write_flush (session);
-
 }
 
 
@@ -914,7 +914,7 @@ handshake_buffer_st* recv_buf = session->internals.handshake_recv_buffer;
     {
       if (session->internals.handshake_recv_buffer_size == 0 ||
         (session->internals.dtls.hsk_read_seq != recv_buf[LAST_ELEMENT].sequence))
-        return gnutls_assert_val(GNUTLS_E_AGAIN);
+        goto timeout;
 
       if (htype != recv_buf[LAST_ELEMENT].htype)
         {
@@ -932,7 +932,7 @@ handshake_buffer_st* recv_buf = session->internals.handshake_recv_buffer;
           return 0;
         }
       else
-        return gnutls_assert_val(GNUTLS_E_AGAIN);
+        goto timeout;
     }
   else /* TLS */
     {
@@ -949,7 +949,18 @@ handshake_buffer_st* recv_buf = session->internals.handshake_recv_buffer;
           return 0;
         }
       else
-        return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+        return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+    }
+
+timeout:
+  if (time(0)-session->internals.dtls.handshake_start_time > session->internals.dtls.total_timeout/1000) 
+    return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
+  else
+    {
+      if (session->internals.dtls.blocking != 0)
+        millisleep(50);
+        
+      return gnutls_assert_val(GNUTLS_E_AGAIN);
     }
 }
 
@@ -1108,7 +1119,7 @@ next:
       while(session->internals.handshake_recv_buffer_size > 0 &&
         recv_buf[LAST_ELEMENT].sequence < session->internals.dtls.hsk_read_seq)
         {
-          _gnutls_audit_log("Discarded replayed handshake packet with sequence %d\n", tmp.sequence);
+          _gnutls_audit_log("Discarded replayed handshake packet with sequence %d\n", recv_buf[LAST_ELEMENT].sequence);
           _gnutls_handshake_buffer_clear(&recv_buf[LAST_ELEMENT]);
           session->internals.handshake_recv_buffer_size--;
         }
@@ -1128,8 +1139,10 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
   int ret;
 
   ret = get_last_packet(session, htype, hsk);
-  if (ret >= 0)
-    return ret;
+  if (ret != GNUTLS_E_AGAIN && ret != GNUTLS_E_INTERRUPTED && ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+    {
+      return gnutls_assert_val(ret);
+    }
 
   /* try using the already existing records before
    * trying to receive.
