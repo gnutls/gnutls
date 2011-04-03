@@ -43,6 +43,7 @@ CXX_LDADD = $(LDADD) \
 
 noinst_PROGRAMS = ex-client2 ex-client-resume
 noinst_PROGRAMS += ex-cert-select ex-rfc2818
+noinst_PROGRAMS += ex-cert-select-pkcs11
 
 if ENABLE_PKI
 noinst_PROGRAMS += ex-crq ex-serv1
@@ -77,4 +78,4 @@ noinst_LTLIBRARIES = libexamples.la
 
 libexamples_la_SOURCES = examples.h ex-alert.c ex-pkcs12.c		\
 	ex-session-info.c ex-x509-info.c ex-verify.c	\
-	tcp.c ex-cert-select-pkcs11.c
+	tcp.c 
