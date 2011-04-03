@@ -8,21 +8,21 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 37 "crypt.gaa"
+#line 37 "srptool.gaa"
 	char *create_conf;
-#line 34 "crypt.gaa"
+#line 34 "srptool.gaa"
 	char *passwd_conf;
-#line 31 "crypt.gaa"
+#line 31 "srptool.gaa"
 	int verify;
-#line 28 "crypt.gaa"
+#line 28 "srptool.gaa"
 	int salt;
-#line 25 "crypt.gaa"
+#line 25 "srptool.gaa"
 	int index;
-#line 22 "crypt.gaa"
+#line 22 "srptool.gaa"
 	char *passwd;
-#line 19 "crypt.gaa"
+#line 19 "srptool.gaa"
 	char *username;
-#line 16 "crypt.gaa"
+#line 16 "srptool.gaa"
 	int debug;
 
 #line 114 "gaa.skel"

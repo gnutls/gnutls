@@ -53,11 +53,11 @@ libcmd_serv_la_CFLAGS =
 libcmd_serv_la_SOURCES = serv.gaa serv-gaa.h serv-gaa.c
 
 if ENABLE_SRP
-srptool_SOURCES = crypt.c
+srptool_SOURCES = srptool.c
 srptool_LDADD = ../lib/libgnutls.la libcmd-srp.la ../gl/libgnu.la
 noinst_LTLIBRARIES += libcmd-srp.la
 libcmd_srp_la_CFLAGS =
-libcmd_srp_la_SOURCES = crypt.gaa crypt-gaa.h crypt-gaa.c
+libcmd_srp_la_SOURCES = srptool.gaa srptool-gaa.h srptool-gaa.c
 endif
 
 psktool_SOURCES = psk.c
@@ -133,8 +133,8 @@ libcmd_p11tool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
 
 psk-gaa.c: $(srcdir)/psk.gaa
 	-$(GAA) $< -o psk-gaa.c -i psk-gaa.h
-crypt-gaa.c: $(srcdir)/crypt.gaa
-	-$(GAA) $< -o crypt-gaa.c -i crypt-gaa.h
+srptool-gaa.c: $(srcdir)/srptool.gaa
+	-$(GAA) $< -o srptool-gaa.c -i srptool-gaa.h
 p11tool-gaa.c: $(srcdir)/p11tool.gaa
 	-$(GAA) $< -o p11tool-gaa.c -i p11tool-gaa.h
 certtool-gaa.c: $(srcdir)/certtool.gaa
