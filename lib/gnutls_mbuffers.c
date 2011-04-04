@@ -90,11 +90,11 @@ void
 _mbuffer_enqueue (mbuffer_head_st * buf, mbuffer_st * bufel)
 {
   bufel->next = NULL;
+  bufel->prev = buf->tail;
 
   buf->length++;
   buf->byte_length += bufel->msg.size - bufel->mark;
 
-  bufel->prev = buf->tail;
   if (buf->tail != NULL)
     buf->tail->next = bufel;
   else
@@ -122,6 +122,9 @@ mbuffer_st* ret = bufel->next;
   if (bufel->prev)
     bufel->prev->next = bufel->next;
 
+  if (bufel->next)
+    bufel->next->prev = NULL;
+
   buf->length--;
   buf->byte_length -= bufel->msg.size - bufel->mark;
   
@@ -145,15 +148,7 @@ _mbuffer_head_pop_first (mbuffer_head_st * buf)
   if (buf->head == NULL)
     return NULL;
 
-  buf->head = bufel->next;
-  if (bufel->next)
-    bufel->next->prev = NULL;
-
-  buf->byte_length -= (bufel->msg.size - bufel->mark);
-  buf->length -= 1;
-
-  if (!buf->head)
-    buf->tail = NULL;
+  _mbuffer_dequeue(buf, bufel);
     
   return bufel;
 }
@@ -222,22 +217,13 @@ _mbuffer_head_get_next (mbuffer_st * cur, gnutls_datum_t * msg)
 static inline void
 remove_front (mbuffer_head_st * buf)
 {
-  mbuffer_st *bufel;
+  mbuffer_st *bufel = buf->head;
 
-  if (!buf->head)
+  if (!bufel)
     return;
 
-  bufel = buf->head;
-  buf->head = bufel->next;
-  if (bufel->next)
-    bufel->next->prev = NULL;
-
-  buf->byte_length -= (bufel->msg.size - bufel->mark);
-  buf->length -= 1;
+  _mbuffer_dequeue(buf, bufel);
   gnutls_free (bufel);
-
-  if (!buf->head)
-    buf->tail = NULL;
 }
 
 /* Remove a specified number of bytes from the start of the buffer.
@@ -301,7 +287,7 @@ _mbuffer_alloc (size_t payload_size, size_t maximum_size)
 {
   mbuffer_st *st;
 
-  st = gnutls_malloc (maximum_size + sizeof (mbuffer_st));
+  st = gnutls_calloc (1, maximum_size + sizeof (mbuffer_st));
   if (st == NULL)
     {
       gnutls_assert ();
@@ -311,9 +297,6 @@ _mbuffer_alloc (size_t payload_size, size_t maximum_size)
   /* payload points after the mbuffer_st structure */
   st->msg.data = (opaque *) st + sizeof (mbuffer_st);
   st->msg.size = payload_size;
-  st->mark = 0;
-  st->user_mark = 0;
-  st->next = NULL;
   st->maximum_size = maximum_size;
 
   return st;
