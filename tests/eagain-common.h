@@ -1,6 +1,90 @@
 #define min(x,y) ((x)<(y)?(x):(y))
 //#define EAGAIN_DEBUG
-#define RANDOMIZE
+
+#define HANDSHAKE(c, s) \
+  sret = cret = GNUTLS_E_AGAIN; \
+  do \
+    { \
+      if (cret == GNUTLS_E_AGAIN) \
+        { \
+          cret = gnutls_handshake (c); \
+        } \
+      if (sret == GNUTLS_E_AGAIN) \
+        { \
+          sret = gnutls_handshake (s); \
+        } \
+    } \
+  while (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN); \
+  if (cret < 0 || sret < 0) \
+    { \
+      fprintf(stderr, "client: %s\n", gnutls_strerror(cret)); \
+      fprintf(stderr, "server: %s\n", gnutls_strerror(sret)); \
+      fail("Handshake failed\n"); \
+      exit(1); \
+    }
+
+#define TRANSFER(c, s, msg, msglen, buf, buflen) \
+  do \
+    { \
+      ret = gnutls_record_send (c, msg, msglen); \
+    } \
+  while(ret == GNUTLS_E_AGAIN); \
+  do \
+    { \
+      do \
+        { \
+          ret = gnutls_record_recv (s, buf, buflen); \
+        } \
+      while(ret == GNUTLS_E_AGAIN); \
+      if (ret == 0) \
+        fail ("server: didn't receive any data\n"); \
+      else if (ret < 0) \
+        { \
+          fail ("server: error: %s\n", gnutls_strerror (ret)); \
+        } \
+      else \
+        { \
+          transferred += ret; \
+        } \
+      do \
+        { \
+          ns = gnutls_record_send (server, msg, msglen); \
+        } \
+      while (ns == GNUTLS_E_AGAIN); \
+      do \
+        { \
+          ret = gnutls_record_recv (client, buf, buflen); \
+        } \
+      while(ret == GNUTLS_E_AGAIN); \
+      if (ret == 0) \
+        { \
+          fail ("client: Peer has closed the TLS connection\n"); \
+        } \
+      else if (ret < 0) \
+        { \
+          if (debug) \
+            fputs ("!", stdout); \
+          fail ("client: Error: %s\n", gnutls_strerror (ret)); \
+        } \
+      else \
+        { \
+          if (msglen != ret || memcmp (buf, msg, msglen) != 0) \
+            { \
+              fail ("client: Transmitted data do not match\n"); \
+            } \
+          /* echo back */ \
+          do \
+            { \
+              ns = gnutls_record_send (client, buf, msglen); \
+            } \
+          while (ns == GNUTLS_E_AGAIN); \
+          transferred += ret; \
+          if (debug) \
+            fputs (".", stdout); \
+        } \
+    } \
+  while (transferred < 70000)
+
 
 static char to_server[64*1024];
 static size_t to_server_len = 0;

@@ -31,6 +31,7 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
 #include "utils.h"
+#define RANDOMIZE
 #include "eagain-common.h"
 
 static void
@@ -94,32 +95,7 @@ doit (void)
   gnutls_transport_set_pull_timeout_function (client, client_pull_timeout_func);
 
   handshake = 1;
-  sret = cret = GNUTLS_E_AGAIN;
-  do
-    {
-      if (cret == GNUTLS_E_AGAIN)
-        {
-          //success ("loop invoking client:\n");
-          cret = gnutls_handshake (client);
-          //success ("client %d: %s\n", cret, gnutls_strerror (cret));
-        }
-
-      if (sret == GNUTLS_E_AGAIN)
-        {
-          //success ("loop invoking server:\n");
-          sret = gnutls_handshake (server);
-          //success ("server %d: %s\n", sret, gnutls_strerror (sret));
-        }
-    }
-  while ((cret == GNUTLS_E_AGAIN && gnutls_error_is_fatal(sret)==0) || (sret == GNUTLS_E_AGAIN && gnutls_error_is_fatal(cret)==0));
-
-  if (cret < 0 || sret < 0)
-    {
-      fprintf(stderr, "client: %s\n", gnutls_strerror(cret));
-      fprintf(stderr, "server: %s\n", gnutls_strerror(sret));
-      fail("Handshake failed\n");
-      exit(1);
-    }
+  HANDSHAKE(client, server);
 
   handshake = 0;
   if (debug)
@@ -132,75 +108,9 @@ doit (void)
   while(ret == GNUTLS_E_AGAIN);
   //success ("client: sent %d\n", ns);
 
-  do
-    {
-      //success("transferred: %d\n", transferred);
+  msglen = strlen(MSG);
+  TRANSFER(client, server, MSG, msglen, buffer, MAX_BUF);
 
-      do
-        {
-          ret = gnutls_record_recv (server, buffer, MAX_BUF);
-        }
-      while(ret == GNUTLS_E_AGAIN);
-
-      if (ret == 0)
-        fail ("server: didn't receive any data\n");
-      else if (ret < 0)
-        {
-          //      if (debug)
-          //          fputs ("#", stdout);
-          fail ("server: error: %s\n", gnutls_strerror (ret));
-        }
-      else
-        {
-          transferred += ret;
-            //        if (debug)
-              //          fputs ("*", stdout);
-        }
-
-      msglen = strlen (MSG);
-      do
-        {
-          ns = gnutls_record_send (server, MSG, msglen);
-        }
-      while (ns == GNUTLS_E_AGAIN);
-
-      do
-        {
-          ret = gnutls_record_recv (client, buffer, MAX_BUF);
-        }
-      while(ret == GNUTLS_E_AGAIN);
-
-
-      if (ret == 0)
-        {
-          fail ("client: Peer has closed the TLS connection\n");
-        }
-      else if (ret < 0)
-        {
-          if (debug)
-            fputs ("!", stdout);
-          fail ("client: Error: %s\n", gnutls_strerror (ret));
-        }
-      else
-        {
-          if (msglen != ret || memcmp (buffer, MSG, msglen) != 0)
-            {
-              fail ("client: Transmitted data do not match\n");
-            }
-
-          /* echo back */
-          do
-            {
-              ns = gnutls_record_send (client, buffer, msglen);
-            }
-          while (ns == GNUTLS_E_AGAIN);
-
-          transferred += ret;
-          if (debug)
-            fputs (".", stdout);
-        }
-    }
-  while (transferred < 70000);
   if (debug)
     fputs ("\n", stdout);
 
