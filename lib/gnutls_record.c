@@ -690,13 +690,11 @@ record_add_to_buffers (gnutls_session_t session,
           if (type == GNUTLS_ALERT || (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO
                                        && type == GNUTLS_HANDSHAKE))
             {
-              ret = gnutls_assert_val(GNUTLS_E_GOT_APPLICATION_DATA);
-              goto cleanup;
+              return gnutls_assert_val(GNUTLS_E_GOT_APPLICATION_DATA);
             }
           else
             {
-              ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
-              goto cleanup;
+              return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
             }
 
           break;
