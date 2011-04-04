@@ -32,6 +32,8 @@
 #include <gnutls/crypto.h>
 
 #include "utils.h"
+#define RANDOMIZE
+#include "eagain-common.h"
 
 static void
 tls_log_func (int level, const char *str)
@@ -40,109 +42,6 @@ tls_log_func (int level, const char *str)
 }
 
 static int handshake = 0;
-
-char *to_server;
-size_t to_server_len;
-
-char *to_client;
-size_t to_client_len;
-
-
-static ssize_t
-client_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
-{
-//  success ("client_pull len %d has %d\n", len, to_client_len);
-  static unsigned char rnd = 0;
-
-  if (rnd++ % 2 == 0 || to_client_len < len)
-    {
-      gnutls_transport_set_global_errno (EAGAIN);
-      return -1;
-    }
-
-  memcpy (data, to_client, len);
-
-  memmove (to_client, to_client + len, to_client_len - len);
-  to_client_len -= len;
-
-  return len;
-}
-
-static ssize_t
-client_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
-{
-  char *tmp;
-  size_t newlen = to_server_len + len;
-  static unsigned char rnd = 0;
-
-  if (rnd++ % 2 == 0)
-    {
-      gnutls_transport_set_global_errno (EAGAIN);
-      return -1;
-    }
-
-  tmp = realloc (to_server, newlen);
-  if (!tmp)
-    {
-      fail ("Memory allocation failure...\n");
-      exit (1);
-    }
-  to_server = tmp;
-
-  memcpy (to_server + to_server_len, data, len);
-  to_server_len = newlen;
-
-  return len;
-}
-
-static ssize_t
-server_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
-{
-  //success ("server_pull len %d has %d\n", len, to_server_len);
-  static unsigned char rnd = 0;
-
-  if (rnd++ % 2 == 0 || to_server_len < len)
-    {
-      gnutls_transport_set_global_errno (EAGAIN);
-      return -1;
-    }
-
-  memcpy (data, to_server, len);
-
-  memmove (to_server, to_server + len, to_server_len - len);
-  to_server_len -= len;
-
-  return len;
-}
-
-static ssize_t
-server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
-{
-  char *tmp;
-  size_t newlen = to_client_len + len;
-  static unsigned char rnd = 0;
-
-  if (rnd++ % 2 == 0)
-    {
-      gnutls_transport_set_global_errno (EAGAIN);
-      return -1;
-    }
-
-//  hexprint (data, len);
-
-  tmp = realloc (to_client, newlen);
-  if (!tmp)
-    {
-      fail ("Memory allocation failure...\n");
-      exit (1);
-    }
-  to_client = tmp;
-
-  memcpy (to_client + to_client_len, data, len);
-  to_client_len = newlen;
-
-  return len;
-}
 
 #define MAX_BUF 1024
 #define MSG "Hello TLS, and hi and how are you and more data here... and more... and even more and even more more data..."
@@ -155,11 +54,10 @@ doit (void)
   const gnutls_datum_t p3 = { (char *) pkcs3, strlen (pkcs3) };
   static gnutls_dh_params_t dh_params;
   gnutls_session_t server;
-  int sret = GNUTLS_E_AGAIN;
+  int sret, cret;
   /* Client stuff. */
   gnutls_anon_client_credentials_t c_anoncred;
   gnutls_session_t client;
-  int cret = GNUTLS_E_AGAIN;
   /* Need to enable anonymous KX specifically. */
   char buffer[MAX_BUF + 1];
   ssize_t ns;
@@ -169,7 +67,7 @@ doit (void)
   gnutls_global_init ();
   gnutls_global_set_log_function (tls_log_func);
   if (debug)
-    gnutls_global_set_log_level (99);
+    gnutls_global_set_log_level (2);
 
   /* Init server */
   gnutls_anon_allocate_server_credentials (&s_anoncred);
@@ -177,112 +75,35 @@ doit (void)
   gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
   gnutls_anon_set_server_dh_params (s_anoncred, dh_params);
   gnutls_init (&server, GNUTLS_SERVER);
-  gnutls_priority_set_direct (server, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
+  ret = gnutls_priority_set_direct (server, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
+  if (ret < 0)
+    exit(1);
   gnutls_credentials_set (server, GNUTLS_CRD_ANON, s_anoncred);
   gnutls_dh_set_prime_bits (server, 1024);
   gnutls_transport_set_push_function (server, server_push);
   gnutls_transport_set_pull_function (server, server_pull);
+  gnutls_transport_set_ptr (server, (gnutls_transport_ptr_t)server);
 
   /* Init client */
   gnutls_anon_allocate_client_credentials (&c_anoncred);
   gnutls_init (&client, GNUTLS_CLIENT);
-  gnutls_priority_set_direct (client, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
+  ret = gnutls_priority_set_direct (client, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
+  if (ret < 0)
+    exit(1);
   gnutls_credentials_set (client, GNUTLS_CRD_ANON, c_anoncred);
   gnutls_transport_set_push_function (client, client_push);
   gnutls_transport_set_pull_function (client, client_pull);
+  gnutls_transport_set_ptr (client, (gnutls_transport_ptr_t)client);
 
   handshake = 1;
-  do
-    {
-      if (cret == GNUTLS_E_AGAIN)
-        {
-          //success ("loop invoking client:\n");
-          cret = gnutls_handshake (client);
-          //success ("client %d: %s\n", cret, gnutls_strerror (cret));
-        }
-
-      if (sret == GNUTLS_E_AGAIN)
-        {
-          //success ("loop invoking server:\n");
-          sret = gnutls_handshake (server);
-          //success ("server %d: %s\n", sret, gnutls_strerror (sret));
-        }
-    }
-  while (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN);
+  HANDSHAKE(client, server);
 
   handshake = 0;
   if (debug)
     success ("Handshake established\n");
 
-  ns = gnutls_record_send (client, MSG, strlen (MSG));
-  //success ("client: sent %d\n", ns);
-
-  do
-    {
-      //success("transferred: %d\n", transferred);
-
-      ret = gnutls_record_recv (server, buffer, MAX_BUF);
-      if (ret == 0)
-        fail ("server: didn't receive any data\n");
-      else if (ret < 0)
-        {
-//      if (debug)
-//          fputs ("#", stdout);
-          if (ret != GNUTLS_E_AGAIN)
-            {
-              fail ("server: error: %s\n", gnutls_strerror (ret));
-              break;
-            }
-        }
-      else
-        {
-          transferred += ret;
-//        if (debug)
-//          fputs ("*", stdout);
-        }
-
-      msglen = strlen (MSG);
-      do
-        {
-          ns = gnutls_record_send (server, MSG, msglen);
-        }
-      while (ns == GNUTLS_E_AGAIN);
-
-      ret = gnutls_record_recv (client, buffer, MAX_BUF);
-      if (ret == 0)
-        {
-          fail ("client: Peer has closed the TLS connection\n");
-        }
-      else if (ret < 0)
-        {
-          if (debug)
-            fputs ("!", stdout);
-          if (ret != GNUTLS_E_AGAIN)
-            {
-              fail ("client: Error: %s\n", gnutls_strerror (ret));
-              break;
-            }
-        }
-      else
-        {
-          if (msglen != ret || memcmp (buffer, MSG, msglen) != 0)
-            {
-              fail ("client: Transmitted data do not match\n");
-            }
-
-          /* echo back */
-          do
-            {
-              ns = gnutls_record_send (client, buffer, msglen);
-            }
-          while (ns == GNUTLS_E_AGAIN);
-
-          transferred += ret;
-          if (debug)
-            fputs (".", stdout);
-        }
-    }
-  while (transferred < 70000);
+  msglen = strlen(MSG);
+  TRANSFER(client, server, MSG, msglen, buffer, MAX_BUF);
   if (debug)
     fputs ("\n", stdout);
 
@@ -291,9 +112,6 @@ doit (void)
 
   gnutls_deinit (client);
   gnutls_deinit (server);
-
-  free (to_server);
-  free (to_client);
 
   gnutls_anon_free_client_credentials (c_anoncred);
   gnutls_anon_free_server_credentials (s_anoncred);
