@@ -550,11 +550,15 @@ SCM_DEFINE (scm_gnutls_set_session_priorities_x,
   char *c_priorities;
   const char *err_pos;
   gnutls_session_t c_session;
+  size_t pos;
 
   c_session = scm_to_gnutls_session (session, 1, FUNC_NAME);
   c_priorities = scm_to_locale_string (priorities); /* XXX: to_latin1_string */
 
   err = gnutls_priority_set_direct (c_session, c_priorities, &err_pos);
+  if (err == GNUTLS_E_INVALID_REQUEST)
+    pos = err_pos - c_priorities;
+
   free (c_priorities);
 
   switch (err)
@@ -563,8 +567,6 @@ SCM_DEFINE (scm_gnutls_set_session_priorities_x,
       break;
     case GNUTLS_E_INVALID_REQUEST:
       {
-	size_t pos;
-	pos = err_pos - c_priorities;
 	scm_gnutls_error_with_args (err, FUNC_NAME,
 				    scm_list_1 (scm_from_size_t (pos)));
 	break;
