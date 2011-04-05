@@ -2093,6 +2093,8 @@ pkcs11_login (pakchois_session_t * pks, const struct token_info *info, int so)
       char pin[GNUTLS_PKCS11_MAX_PIN_LEN];
       unsigned int flags;
 
+      memcpy(&tinfo, &info->tinfo, sizeof(tinfo));
+
       /* If login has been attempted once already, check the token
        * status again, the flags might change. */
       if (attempt)
