@@ -1141,11 +1141,12 @@ _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
   memset (&pk_params, 0, sizeof (pk_params));
 
   memset (&m, 0, sizeof (m));
-  memset (&p, 0, sizeof (e));
-  memset (&q, 0, sizeof (d));
   memset (&p, 0, sizeof (p));
   memset (&q, 0, sizeof (q));
+  memset (&p, 0, sizeof (p));
   memset (&u, 0, sizeof (u));
+  memset (&e, 0, sizeof (e));
+  memset (&d, 0, sizeof (d));
   memset (&exp1, 0, sizeof (exp1));
   memset (&exp2, 0, sizeof (exp2));
 
