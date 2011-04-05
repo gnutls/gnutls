@@ -51,11 +51,10 @@ transmit_message (gnutls_session_t session,
 
   if (bufel->type == GNUTLS_CHANGE_CIPHER_SPEC)
     {
-      _gnutls_dtls_log ("DTLS[%p]: Sending Packet[%u] fragment %s(%d) with "
-			"length: %u, offset: %u, fragment length: %u\n",
+      _gnutls_dtls_log ("DTLS[%p]: Sending Packet[%u] fragment %s(%d)\n",
 			session, bufel->handshake_sequence,
 			_gnutls_handshake2str (bufel->htype),
-			bufel->htype, data_size, offset, frag_len);
+			bufel->htype);
 
       return _gnutls_send_int (session, bufel->type, -1,
         bufel->epoch, 
