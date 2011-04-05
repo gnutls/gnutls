@@ -812,6 +812,7 @@ pakchois_close_all_sessions (pakchois_module_t * mod, ck_slot_id_t slot_id)
         {
           frv = rv;
         }
+      slot = slot->next;
     }
 
   return frv;
