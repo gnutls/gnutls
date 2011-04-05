@@ -1063,7 +1063,6 @@ extern "C"
 
   void cdk_strlist_free (cdk_strlist_t sl);
   cdk_strlist_t cdk_strlist_add (cdk_strlist_t * list, const char *string);
-  cdk_strlist_t cdk_strlist_next (cdk_strlist_t root, const char **r_str);
   const char *cdk_check_version (const char *req_version);
 /* UTF8 */
   char *cdk_utf8_encode (const char *string);
