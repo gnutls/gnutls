@@ -684,7 +684,7 @@ main (int argc, char **argv)
   char *session_data = NULL;
   char *session_id = NULL;
   size_t session_data_size;
-  size_t session_id_size;
+  size_t session_id_size = 0;
   fd_set rset;
   int maxfd;
   struct timeval tv;
