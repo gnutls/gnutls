@@ -137,6 +137,8 @@ gnutls_openpgp_crt_verify_self (gnutls_openpgp_crt_t key,
   int status;
   cdk_error_t rc;
 
+  *verify = 0;
+
   rc = cdk_pk_check_self_sig (key->knode, &status);
   if (rc || status != CDK_KEY_VALID)
     *verify |= GNUTLS_CERT_INVALID;
