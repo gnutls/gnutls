@@ -186,7 +186,7 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
                                  unsigned int key_usage, unsigned int flags)
 {
   int ret;
-  pakchois_session_t *pks;
+  pakchois_session_t *pks = NULL;
   struct pkcs11_url_info info;
   ck_rv_t rv;
   size_t id_size;
@@ -406,7 +406,8 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
   ret = 0;
 
 cleanup:
-  pakchois_close_session (pks);
+  if (pks != NULL)
+    pakchois_close_session (pks);
 
   return ret;
 
