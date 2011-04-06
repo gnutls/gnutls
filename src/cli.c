@@ -918,6 +918,7 @@ after_handshake:
               continue;
             }
 
+          buffer[bytes] = 0;
           if (crlf != 0)
             {
               char *b = strchr (buffer, '\n');
