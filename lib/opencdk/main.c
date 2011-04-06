@@ -318,21 +318,6 @@ cdk_handle_set_passphrase_cb (cdk_ctx_t hd,
   hd->passphrase_cb_value = cb_value;
 }
 
-
-/**
- * cdk_handle_verify_get_result:
- * @hd: the session handle
- * 
- * Return the verify result for the current session.
- * Do not free the pointer.
- **/
-cdk_verify_result_t
-cdk_handle_verify_get_result (cdk_ctx_t hd)
-{
-  return hd->result.verify;
-}
-
-
 /**
  * cdk_handle_free:
  * @hd: the handle
@@ -344,7 +329,6 @@ cdk_handle_free (cdk_ctx_t hd)
 {
   if (!hd)
     return;
-  _cdk_result_verify_free (hd->result.verify);
 
   /* If cdk_handle_set_keyring() were used, we need to free the key db
      handles here because the handles are not controlled by the user. */
