@@ -161,6 +161,12 @@ _verify_passwd_int (const char *username, const char *passwd,
   if (salt == NULL || verifier == NULL)
     return -1;
 
+  if (strlen(salt) >= sizeof(_salt))
+    {
+      fprintf (stderr, "Too long salt.\n");
+      return -1;
+    }
+
   /* copy salt, and null terminate after the ':' */
   strcpy (_salt, salt);
   pos = strchr (_salt, ':');
