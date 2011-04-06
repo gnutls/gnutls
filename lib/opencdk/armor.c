@@ -746,7 +746,9 @@ _cdk_filter_armor (void *data, int ctl, FILE * in, FILE * out)
  * @nwritten: actual length of the base64 data
  * @type: the base64 file type.
  * 
- * Encode the given buffer into base64 format.
+ * Encode the given buffer into base64 format. The base64
+ * string will be null terminated but the null will
+ * not be contained in the size.
  **/
 cdk_error_t
 cdk_armor_encode_buffer (const byte * inbuf, size_t inlen,
@@ -772,13 +774,14 @@ cdk_armor_encode_buffer (const byte * inbuf, size_t inlen,
   head = armor_begin[type];
   tail = armor_end[type];
   le = _cdk_armor_get_lineend ();
-  pos = strlen (head) + 10 + 2 + 2 + strlen (tail) + 10 + 2 + 5 + 2;
+  pos = strlen (head) + 10 + 2 + 2 + strlen (tail) + 10 + 2 + 5 + 2 + 1;
   /* The output data is 4/3 times larger, plus a line end for each line. */
-  pos += (4 * inlen / 3) + 2 * (4 * inlen / 3 / 64);
+  pos += (4 * inlen / 3) + 2 * (4 * inlen / 3 / 64) + 1;
 
   if (outbuf && outlen < pos)
     {
       gnutls_assert ();
+      *nwritten = pos;
       return CDK_Too_Short;
     }
 
@@ -832,6 +835,7 @@ cdk_armor_encode_buffer (const byte * inbuf, size_t inlen,
   pos += 5;
   memcpy (outbuf + pos, le, strlen (le));
   pos += strlen (le);
-  *nwritten = pos;
+  outbuf[pos] = 0;
+  *nwritten = pos - 1;
   return 0;
 }
