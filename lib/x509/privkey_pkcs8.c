@@ -1256,7 +1256,7 @@ read_pbkdf2_params (ASN1_TYPE pbes2_asn,
   ASN1_TYPE pbkdf2_asn = ASN1_TYPE_EMPTY;
   char oid[64];
 
-  memset (params, 0, sizeof (params));
+  memset (params, 0, sizeof (*params));
 
   /* Check the key derivation algorithm
    */
@@ -1364,7 +1364,7 @@ read_pkcs12_kdf_params (ASN1_TYPE pbes2_asn, struct pbkdf2_params *params)
 {
   int result;
 
-  memset (params, 0, sizeof (params));
+  memset (params, 0, sizeof (*params));
 
   /* read the salt */
   params->salt_size = sizeof (params->salt);
@@ -1490,7 +1490,7 @@ read_pbe_enc_params (ASN1_TYPE pbes2_asn,
   char oid[64];
   const char *eparams;
 
-  memset (params, 0, sizeof (params));
+  memset (params, 0, sizeof (*params));
 
   /* Check the encryption algorithm
    */
