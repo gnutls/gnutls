@@ -60,10 +60,10 @@ pin_callback (void *user, int attempt, const char *token_url,
         }
     }
 
-  password = getpass ("Enter pin: ");
+  password = getpass ("Enter PIN: ");
   if (password == NULL || password[0] == 0)
     {
-      fprintf (stderr, "No password given\n");
+      fprintf (stderr, "No PIN given\n");
       exit (1);
     }
 
@@ -72,6 +72,12 @@ pin_callback (void *user, int attempt, const char *token_url,
   pin[len] = 0;
 
   /* cache */
+  if (strlen(pin) >= sizeof(cached_pin))
+    {
+      fprintf (stderr, "Too long PIN given\n");
+      exit (1);
+    }
+
   strcpy (cached_pin, pin);
   free (cached_url);
   cached_url = strdup (token_url);
@@ -609,13 +615,16 @@ pkcs11_init (FILE * outfile, const char *url, const char *label,
 
   pin = getpass ("Enter Security Officer's PIN: ");
   if (pin == NULL)
-    exit (0);
+    exit (1);
+
+  if (strlen(pin) >= sizeof(so_pin))
+    exit (1);
 
   strcpy (so_pin, pin);
 
   pin = getpass ("Enter new User's PIN: ");
   if (pin == NULL)
-    exit (0);
+    exit (1);
 
   ret = gnutls_pkcs11_token_init (url, so_pin, label);
   if (ret < 0)

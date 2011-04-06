@@ -748,6 +748,12 @@ pin_callback (void *user, int attempt, const char *token_url,
     {
       if (strcmp (cached_url, token_url) == 0)
         {
+          if (strlen(pin) >= sizeof(cached_pin))
+            {
+              fprintf (stderr, "Too long PIN given\n");
+              exit (1);
+            }
+
           strcpy (pin, cached_pin);
           return 0;
         }
