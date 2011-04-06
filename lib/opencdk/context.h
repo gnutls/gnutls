@@ -77,10 +77,6 @@ struct cdk_ctx_s
   } opt;
   struct
   {
-    cdk_verify_result_t verify;
-  } result;
-  struct
-  {
     cdk_pkt_seckey_t sk;
     unsigned on:1;
   } cache;

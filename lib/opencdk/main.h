@@ -179,10 +179,6 @@ int _cdk_stream_puts (cdk_stream_t s, const char *buf);
 cdk_error_t _cdk_stream_fpopen (FILE * fp, unsigned write_mode,
                                 cdk_stream_t * ret_out);
 
-/*-- verify.c --*/
-void _cdk_result_verify_free (cdk_verify_result_t res);
-cdk_verify_result_t _cdk_result_verify_new (void);
-
 
 /*-- read-packet.c --*/
 size_t _cdk_pkt_read_len (FILE * inp, size_t * ret_partial);
