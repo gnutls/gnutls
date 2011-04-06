@@ -158,7 +158,7 @@ cdk_error_t _cdk_keydb_check_userid (cdk_keydb_hd_t hd, u32 * keyid,
 
 /*-- sign.c --*/
 int _cdk_sig_hash_for (cdk_pkt_pubkey_t pk);
-void _cdk_trim_string (char *s, int canon);
+void _cdk_trim_string (char *s);
 cdk_error_t _cdk_sig_create (cdk_pkt_pubkey_t pk, cdk_pkt_signature_t sig);
 cdk_error_t _cdk_sig_complete (cdk_pkt_signature_t sig, cdk_pkt_seckey_t sk,
                                digest_hd_st * hd);
