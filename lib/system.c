@@ -59,6 +59,9 @@ system_errno (gnutls_transport_ptr p)
     case WSAEWOULDBLOCK:
       ret = EAGAIN;
       break;
+    case NO_ERROR:
+      ret = 0;
+      break;
     case WSAEINTR:
       ret = EINTR;
       break;

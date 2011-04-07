@@ -92,7 +92,20 @@ void
 gnutls_transport_set_global_errno (int err)
 {
 #ifdef _WIN32
-  WSASetLastError (err);
+  /* Keep this in sync with system_errno */
+  switch (err)
+    {
+    case EAGAIN:
+      SetLastError (WSAEWOULDBLOCK);
+      break;
+    case EINTR:
+      SetLastError (WSAEINTR);
+      break;
+    default:
+      /* We don't care about anything else */
+      SetLastError (NO_ERROR);
+      break;
+    }
 #else
   errno = err;
 #endif
@@ -140,7 +153,7 @@ gnutls_transport_set_pull_function (gnutls_session_t session,
  **/
 void
 gnutls_transport_set_pull_timeout_function (gnutls_session_t session,
-                                    gnutls_pull_timeout_func func)
+                                            gnutls_pull_timeout_func func)
 {
   session->internals.pull_timeout_func = func;
 }
@@ -187,7 +200,7 @@ gnutls_transport_set_push_function (gnutls_session_t session,
  **/
 void
 gnutls_transport_set_vec_push_function (gnutls_session_t session,
-                                     gnutls_vec_push_func vec_func)
+                                        gnutls_vec_push_func vec_func)
 {
   session->internals.push_func = NULL;
   session->internals.vec_push_func = vec_func;
