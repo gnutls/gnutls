@@ -187,7 +187,7 @@ print_key_times (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert, int idx)
 
     if (gmtime_r (&tim, &t) == NULL)
       addf (str, "error: gmtime_r (%ld)\n", (unsigned long) tim);
-    else if (strftime (s, max, "%a %b %e %H:%M:%S UTC %Y", &t) == 0)
+    else if (strftime (s, max, "%a %b %d %H:%M:%S UTC %Y", &t) == 0)
       addf (str, "error: strftime (%ld)\n", (unsigned long) tim);
     else
       addf (str, _("\t\tCreation: %s\n"), s);
@@ -210,7 +210,7 @@ print_key_times (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert, int idx)
       {
         if (gmtime_r (&tim, &t) == NULL)
           addf (str, "error: gmtime_r (%ld)\n", (unsigned long) tim);
-        else if (strftime (s, max, "%a %b %e %H:%M:%S UTC %Y", &t) == 0)
+        else if (strftime (s, max, "%a %b %d %H:%M:%S UTC %Y", &t) == 0)
           addf (str, "error: strftime (%ld)\n", (unsigned long) tim);
         else
           addf (str, _("\t\tExpiration: %s\n"), s);
