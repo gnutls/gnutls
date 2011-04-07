@@ -57,6 +57,9 @@
 #include <system.h>
 
 #include <errno.h>
+#ifdef _WIN32
+# include <windows.h>
+#endif
 
 #ifndef EAGAIN
 #define EAGAIN EWOULDBLOCK
@@ -115,7 +118,24 @@ gnutls_transport_set_errno (gnutls_session_t session, int err)
 void
 gnutls_transport_set_global_errno (int err)
 {
+#ifdef _WIN32
+  /* Keep this in sync with system_errno */
+  switch (err)
+    {
+    case EAGAIN:
+      SetLastError (WSAEWOULDBLOCK);
+      break;
+    case EINTR:
+      SetLastError (WSAEINTR);
+      break;
+    default:
+      /* We don't care about anything else */
+      SetLastError (NO_ERROR);
+      break;
+    }
+#else
   errno = err;
+#endif
 }
 
 /* Buffers received packets of type APPLICATION DATA and
