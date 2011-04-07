@@ -38,6 +38,9 @@
 #include <system.h>
 
 #include <errno.h>
+#ifdef _WIN32
+# include <windows.h>
+#endif
 
 /**
  * gnutls_transport_set_errno:
@@ -88,7 +91,11 @@ gnutls_transport_set_errno (gnutls_session_t session, int err)
 void
 gnutls_transport_set_global_errno (int err)
 {
+#ifdef _WIN32
+  WSASetLastError (err);
+#else
   errno = err;
+#endif
 }
 
 /**
