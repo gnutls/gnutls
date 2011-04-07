@@ -35,11 +35,52 @@ static unsigned char data[64 * 1024];
 
 static int must_finish = 0;
 
+#if !defined(_WIN32)
 static void
 alarm_handler (int signo)
 {
   must_finish = 1;
 }
+#else
+#include <windows.h>
+DWORD WINAPI alarm_handler (LPVOID lpParameter);
+DWORD WINAPI
+alarm_handler (LPVOID lpParameter)
+{
+  HANDLE wtimer = *((HANDLE *) lpParameter);
+  WaitForSingleObject (wtimer, INFINITE);
+  must_finish = 1;
+  return 0;
+}
+
+#define W32_ALARM_VARIABLES HANDLE wtimer = NULL, wthread = NULL; \
+  LARGE_INTEGER alarm_timeout
+#define W32_ALARM_TRIGGER(timeout, leave) { \
+  wtimer = CreateWaitableTimer (NULL, TRUE, NULL); \
+  if (wtimer == NULL) \
+    { \
+      fprintf (stderr, "error: CreateWaitableTimer %u\n", GetLastError ()); \
+      leave; \
+    } \
+  wthread = CreateThread (NULL, 0, alarm_handler, &wtimer, 0, NULL); \
+  if (wthread == NULL) \
+    { \
+      fprintf (stderr, "error: CreateThread %u\n", GetLastError ()); \
+      leave; \
+    } \
+  alarm_timeout.QuadPart = timeout * 10000000; \
+  if (SetWaitableTimer (wtimer, &alarm_timeout, 0, NULL, NULL, FALSE) == 0) \
+    { \
+      fprintf (stderr, "error: SetWaitableTimer %u\n", GetLastError ()); \
+      leave; \
+    } \
+  }
+#define W32_ALARM_CLEANUP { \
+  if (wtimer != NULL) \
+    CloseHandle (wtimer); \
+  if (wthread != NULL) \
+    CloseHandle (wthread);}
+#endif
 
 static void
 tls_log_func (int level, const char *str)
@@ -95,6 +136,9 @@ cipher_bench (int algo, int size)
   int blocksize = gnutls_cipher_get_block_size (algo);
   int keysize = gnutls_cipher_get_key_size (algo);
   char metric[16];
+#if defined(_WIN32)
+  W32_ALARM_VARIABLES;
+#endif
 
   _key = malloc (keysize);
   if (_key == NULL)
@@ -117,7 +161,11 @@ cipher_bench (int algo, int size)
   fflush (stdout);
 
   must_finish = 0;
+#if !defined(_WIN32)
   alarm (5);
+#else
+  W32_ALARM_TRIGGER(5, goto leave);
+#endif
 
   gettime (&start);
 
@@ -150,7 +198,9 @@ cipher_bench (int algo, int size)
 leave:
   free (_key);
   free (_iv);
-
+#if defined(_WIN32)
+  W32_ALARM_CLEANUP;
+#endif
 }
 
 static void
@@ -163,6 +213,9 @@ mac_bench (int algo, int size)
   double ddata, dspeed;
   int blocksize = gnutls_hmac_get_len (algo);
   char metric[16];
+#if defined(_WIN32)
+  W32_ALARM_VARIABLES;
+#endif
 
   _key = malloc (blocksize);
   if (_key == NULL)
@@ -173,7 +226,11 @@ mac_bench (int algo, int size)
   fflush (stdout);
 
   must_finish = 0;
+#if !defined(_WIN32)
   alarm (5);
+#else
+  W32_ALARM_TRIGGER(5, goto leave);
+#endif
 
   gettime (&start);
 
@@ -195,7 +252,10 @@ mac_bench (int algo, int size)
 
   printf ("Hashed %.2f %s in %.2f secs: ", ddata, metric, secs);
   printf ("%.2f %s/sec\n", dspeed, metric);
-
+#if defined(_WIN32)
+leave:
+  W32_ALARM_CLEANUP;
+#endif
   free (_key);
 }
 
@@ -207,7 +267,9 @@ main (int argc, char **argv)
   if (argc > 1)
     debug_level = 2;
 
+#if !defined(_WIN32)
   signal (SIGALRM, alarm_handler);
+#endif
 
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (debug_level);
