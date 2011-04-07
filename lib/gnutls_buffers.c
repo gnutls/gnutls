@@ -319,11 +319,10 @@ _gnutls_read (gnutls_session_t session, mbuffer_st **bufel,
 }
 
 static ssize_t
-_gnutls_writev_emu (gnutls_session_t session, const giovec_t * giovec,
+_gnutls_writev_emu (gnutls_session_t session, gnutls_transport_ptr_t fd, const giovec_t * giovec,
                     int giovec_cnt)
 {
   int ret, j = 0;
-  gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
   size_t total = 0;
 
   for (j = 0; j < giovec_cnt; j++)
@@ -352,7 +351,7 @@ _gnutls_writev (gnutls_session_t session, const giovec_t * giovec,
   reset_errno (session);
 
   if (session->internals.push_func != NULL)
-    i = _gnutls_writev_emu (session, giovec, giovec_cnt);
+    i = _gnutls_writev_emu (session, fd, giovec, giovec_cnt);
   else
     i = session->internals.vec_push_func (fd, giovec, giovec_cnt);
 
