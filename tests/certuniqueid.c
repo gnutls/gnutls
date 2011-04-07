@@ -145,7 +145,7 @@ doit (void)
   };
 
   char buf[17];
-  ssize_t buf_size;
+  size_t buf_size;
 
   ret = gnutls_global_init ();
   if (ret < 0)

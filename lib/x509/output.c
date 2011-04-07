@@ -742,7 +742,7 @@ print_unique_ids (gnutls_buffer_st * str, const gnutls_x509_crt_t cert)
 {
   int result;
   char buf[256];                /* if its longer, we won't bother to print it */
-  ssize_t buf_size = 256;
+  size_t buf_size = 256;
 
   result = gnutls_x509_crt_get_issuer_unique_id (cert, buf, &buf_size);
   if (result >= 0)
