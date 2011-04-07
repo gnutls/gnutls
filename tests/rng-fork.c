@@ -27,13 +27,16 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
+#if !defined(_WIN32)
 #include <sys/wait.h>
+#endif
 
 #include "utils.h"
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
 #include "../lib/random.h"
 
+#if !defined(_WIN32)
 static void dump(const char* name, unsigned char* buf, int buf_size)
 {
 int i;
@@ -98,3 +101,10 @@ doit (void)
       success("success");
     }
 }
+#else
+void
+doit (void)
+{
+  exit (77);
+}
+#endif

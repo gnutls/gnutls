@@ -31,10 +31,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#if !defined(_WIN32)
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <arpa/inet.h>
+#endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 
