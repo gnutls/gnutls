@@ -115,7 +115,6 @@ static int
 gnutls_system_mutex_init (void **priv)
 {
   CRITICAL_SECTION *lock = malloc (sizeof (CRITICAL_SECTION));
-  int ret;
 
   if (lock == NULL)
     return GNUTLS_E_MEMORY_ERROR;
