@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.12.2 (unreleased)
 
+** libgnutls: Several updates and fixes for win32. Patches by LRN.
+
+** libgnutls: Several bug fixes.
+
 ** srptool: Accepts the -d option to enable debugging.
 
 ** libgnutls: Corrected bug in gnutls_srp_verifier() that prevented
