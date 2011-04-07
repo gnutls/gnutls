@@ -1643,7 +1643,7 @@ _gnutls_proc_cert_client_cert_vrfy (gnutls_session_t session,
       aid.sign_algorithm = pdata[1];
 
       sign_algo = _gnutls_tls_aid_to_sign (&aid);
-      if (sign_algo == GNUTLS_PK_UNKNOWN)
+      if (sign_algo == GNUTLS_SIGN_UNKNOWN)
         {
           gnutls_assert ();
           return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
