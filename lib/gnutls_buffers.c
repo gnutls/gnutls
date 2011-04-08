@@ -322,7 +322,7 @@ static ssize_t
 _gnutls_writev_emu (gnutls_session_t session, gnutls_transport_ptr_t fd, const giovec_t * giovec,
                     int giovec_cnt)
 {
-  int ret, j = 0;
+  int ret = 0, j = 0;
   size_t total = 0;
 
   for (j = 0; j < giovec_cnt; j++)
