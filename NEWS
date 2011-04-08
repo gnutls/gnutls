@@ -5,6 +5,11 @@ See the end for copying conditions.
 
 * Version 2.99.0 (unreleased)
 
+** libgnutls: Uses a single configure file and a single
+gnulib library to save space.
+
+** libgnutls: Several bug fixes.
+
 ** libgnutls: gnutls_transport_set_lowat() is no more.
 
 ** libgnutls-openssl: modified to use modern gnutls' functions.
