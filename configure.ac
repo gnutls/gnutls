@@ -64,6 +64,7 @@ if test "$use_cxx" != "no"; then
   AC_LANG_POP(C++)
 fi
 AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
+AM_CONDITIONAL(WANT_TEST_SUITE, [test -f tests/suite/mini-eagain2.c])
 
 LIBGNUTLS_HOOKS
 LIBGNUTLS_EXTRA_HOOKS
@@ -374,10 +375,8 @@ AC_CONFIG_FILES([
   lib/x509/Makefile
   lib/gcrypt/Makefile
   lib/nettle/Makefile
+  tests/suite/Makefile
 ])
-if test -d tests/suite;then
-AC_CONFIG_FILES([tests/suite/Makefile])
-fi
 
 AC_OUTPUT
 

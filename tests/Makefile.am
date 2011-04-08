@@ -27,6 +27,10 @@ if ENABLE_OPENPGP
 SUBDIRS += openpgp-certs
 endif
 
+if WANT_TEST_SUITE
+SUBDIRS += suite
+endif
+
 EXTRA_DIST = libgcrypt.supp eagain-common.h
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)

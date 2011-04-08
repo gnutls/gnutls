@@ -20,8 +20,6 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = params.dh
-
 AM_CFLAGS = $(WARN_CFLAGS)
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/gl			\
@@ -51,7 +49,7 @@ libecore_la_CPPFLAGS = -I$(top_srcdir)/tests/suite/ecore/ -I$(top_srcdir)/tests/
 	-DHAVE_CLOCK_GETTIME -DHAVE_GETTIMEOFDAY -DPACKAGE_LIB_DIR=\"/usr/lib\" -DMODULE_ARCH=\"unix\" \
 	-DSHARED_LIB_SUFFIX=\".so\"
 libecore_la_CFLAGS = -w
-libecore_la_SOURCES = ecore/src/lib/ecore_anim.c ecore/src/lib/ecore_app.c \
+nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c ecore/src/lib/ecore_app.c \
 	ecore/src/lib/ecore.c ecore/src/lib/ecore_events.c ecore/src/lib/ecore_exe.c \
 	ecore/src/lib/ecore_getopt.c ecore/src/lib/ecore_glib.c ecore/src/lib/ecore_idle_enterer.c \
 	ecore/src/lib/ecore_idle_exiter.c ecore/src/lib/ecore_idler.c ecore/src/lib/ecore_job.c \
@@ -70,10 +68,10 @@ libecore_la_SOURCES = ecore/src/lib/ecore_anim.c ecore/src/lib/ecore_app.c \
 	ecore/src/lib/eina_ustrbuf.c ecore/src/lib/eina_ustringshare.c ecore/src/lib/eina_value.c
 
 eagain_cli_LDADD = $(LDADD) libecore.la -lrt -lm
-eagain_cli_SOURCES = mini-eagain2.c
+nodist_eagain_cli_SOURCES = mini-eagain2.c
 
 noinst_PROGRAMS = eagain-cli
 
-dist_check_SCRIPTS = eagain #testsrn
+nodist_check_SCRIPTS = eagain #testsrn
 
 TESTS = eagain #testsrn
