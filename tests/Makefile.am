@@ -21,13 +21,13 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 SUBDIRS = . rsa-md5-collision pkcs1-padding pkcs8-decode pkcs12-decode	\
-	userid pathlen key-id sha2 safe-renegotiation dsa
+	userid pathlen key-id sha2 safe-renegotiation dsa suite
 
 if ENABLE_OPENPGP
 SUBDIRS += openpgp-certs
 endif
 
-EXTRA_DIST = libgcrypt.supp
+EXTRA_DIST = libgcrypt.supp eagain-common.h
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -95,6 +95,3 @@ TESTS_ENVIRONMENT =						\
 	EXEEXT=$(EXEEXT)					\
 	srcdir="$(srcdir)"					\
 	$(VALGRIND)
-
-check-local:
-	if test -d suite; then $(MAKE) -C suite check; fi
