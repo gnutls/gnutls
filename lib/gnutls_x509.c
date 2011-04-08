@@ -847,7 +847,6 @@ certificate_credentials_append_pkey (gnutls_certificate_credentials_t res,
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
-
   res->pkey[res->ncerts] = pkey;
   return 0;
 

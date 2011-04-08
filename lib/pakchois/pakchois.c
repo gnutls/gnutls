@@ -581,18 +581,14 @@ pakchois_module_destroy (pakchois_module_t * mod)
   free (mod);
 }
 
-#ifdef __GNUC__
-static void pakchois_destructor (void) __attribute__ ((destructor));
-
-static void
-pakchois_destructor (void)
+void pakchois_destructor (void)
 {
   if (provider_mutex != NULL)
-    gnutls_mutex_deinit (&provider_mutex);
+    {
+      gnutls_mutex_deinit (&provider_mutex);
+      provider_mutex = NULL;
+    }
 }
-#else
-#warning need destructor support
-#endif
 
 ck_rv_t
 pakchois_get_info (pakchois_module_t * mod, struct ck_info *info)

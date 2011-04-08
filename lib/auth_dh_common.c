@@ -153,7 +153,6 @@ _gnutls_gen_dh_common_client_kx_int (gnutls_session_t session, gnutls_buffer_st*
   session->key->KEY =
     gnutls_calc_dh_key (session->key->client_Y, x, session->key->client_p);
 
-  _gnutls_mpi_release (&x);
   if (session->key->KEY == NULL)
     {
       gnutls_assert ();
@@ -195,7 +194,7 @@ _gnutls_gen_dh_common_client_kx_int (gnutls_session_t session, gnutls_buffer_st*
       goto error;
     }
 
-  return data->length;
+  ret = data->length;
 
 error:
   _gnutls_mpi_release (&x);
@@ -320,20 +319,35 @@ _gnutls_dh_common_print_server_kx (gnutls_session_t session,
     {
       ret = _gnutls_buffer_append_prefix(data, 16, 0);
       if (ret < 0)
-        return gnutls_assert_val(ret);
+        {
+          ret = gnutls_assert_val(ret);
+          goto cleanup;
+        }
     }
 
   ret = _gnutls_buffer_append_mpi(data, 16, p, 0);
   if (ret < 0)
-    return gnutls_assert_val(ret);
+    {
+      ret = gnutls_assert_val(ret);
+      goto cleanup;
+    }
 
   ret = _gnutls_buffer_append_mpi(data, 16, g, 0);
   if (ret < 0)
-    return gnutls_assert_val(ret);
+    {
+      ret = gnutls_assert_val(ret);
+      goto cleanup;
+    }
 
   ret = _gnutls_buffer_append_mpi(data, 16, X, 0);
   if (ret < 0)
-    return gnutls_assert_val(ret);
+    {
+      ret = gnutls_assert_val(ret);
+      goto cleanup;
+    }
+
+cleanup:
+  _gnutls_mpi_release (&X);
 
   return data->length;
 }

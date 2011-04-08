@@ -117,6 +117,7 @@ int i, j;
         }
     }
 
+  gnutls_free (list->node);
   gnutls_free (list);
 }
 

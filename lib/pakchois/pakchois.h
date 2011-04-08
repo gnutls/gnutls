@@ -96,6 +96,8 @@ ck_rv_t pakchois_module_nssload_abs (pakchois_module_t ** module,
 /* Destroy a PKCS#11 module. */
 void pakchois_module_destroy (pakchois_module_t * module);
 
+void pakchois_destructor (void);
+
 /* Return the error string corresponding to the given return value.
  * Never returns NULL.  */
 const char *pakchois_error (ck_rv_t rv);
