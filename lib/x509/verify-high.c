@@ -110,10 +110,12 @@ int i, j;
             {
               gnutls_x509_crt_deinit(list->node[i].trusted_crts[j]);
             }
+          gnutls_free(list->node[i].trusted_crts);
           for (j=0;j<list->node[i].crl_size;j++)
             {
               gnutls_x509_crl_deinit(list->node[i].crls[j]);
             }
+          gnutls_free(list->node[i].crls);
         }
     }
 
