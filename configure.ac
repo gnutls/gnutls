@@ -62,6 +62,7 @@ if test "$use_cxx" != "no"; then
   AC_LANG_POP(C++)
 fi
 AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
+AM_CONDITIONAL(WANT_TEST_SUITE, [test -f tests/suite/mini-eagain2.c])
 
 LIBGNUTLS_HOOKS
 LIBGNUTLS_EXTRA_HOOKS
@@ -292,10 +293,8 @@ AC_CONFIG_FILES([
   tests/rsa-md5-collision/Makefile
   tests/sha2/Makefile
   tests/userid/Makefile
+  tests/suite/Makefile
 ])
-if test -d tests/suite;then
-AC_CONFIG_FILES([tests/suite/Makefile])
-fi
 
 AC_OUTPUT
 
