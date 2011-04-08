@@ -273,11 +273,14 @@ gnutls_privkey_deinit (gnutls_privkey_t key)
 #ifdef ENABLE_OPENPGP
       case GNUTLS_PRIVKEY_OPENPGP:
         gnutls_openpgp_privkey_deinit (key->key.openpgp);
+        break;
 #endif
       case GNUTLS_PRIVKEY_PKCS11:
         gnutls_pkcs11_privkey_deinit (key->key.pkcs11);
+        break;
       case GNUTLS_PRIVKEY_X509:
         gnutls_x509_privkey_deinit (key->key.x509);
+        break;
       }
   gnutls_free (key);
 }
