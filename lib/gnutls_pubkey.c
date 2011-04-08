@@ -147,6 +147,13 @@ gnutls_pubkey_init (gnutls_pubkey_t * key)
 void
 gnutls_pubkey_deinit (gnutls_pubkey_t key)
 {
+int i;
+
+  for (i = 0; i < key->params_size; i++)
+    {
+      _gnutls_mpi_release (&key->params[i]);
+    }
+
   gnutls_free (key);
 }
 
