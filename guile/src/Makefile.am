@@ -40,8 +40,8 @@ GNUTLS_CORE_LIBS  = $(top_builddir)/lib/libgnutls.la
 GNUTLS_EXTRA_LIBS = $(top_builddir)/libextra/libgnutls-extra.la
 
 # Linking against Gnulib modules.
-GNULIB_LIBS    = $(top_builddir)/lib/gl/liblgnu.la
-GNULIB_CFLAGS  = -I$(top_builddir)/lib/gl -I$(top_srcdir)/lib/gl
+GNULIB_LIBS    = $(top_builddir)/gl/libgnu.la
+GNULIB_CFLAGS  = -I$(top_builddir)/gl -I$(top_srcdir)/gl
 
 
 libguile_gnutls_v_1_la_SOURCES = core.c errors.c utils.c

@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2010 Free Software Foundation, Inc.
+# Copyright (C) 2002-2011 Free Software Foundation, Inc.
 #
 # This file is free software, distributed under the terms of the GNU
 # General Public License.  As a special exception to the GNU General
@@ -15,52 +15,50 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --with-tests --libtool --macro-prefix=gl --no-vc-files accept arpa_inet autobuild bind close connect error fdl-1.3 gendocs getaddrinfo getline getpass-gnu gettime gnupload gpl-3.0 inet_ntop inet_pton lgpl-2.1 listen maintainer-makefile manywarnings minmax perror pmccabe2html progname read-file readline recv select send setsockopt shutdown socket sockets sys_stat update-copyright valgrind-tests version-etc-fsf warnings
+#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lseek-tests --libtool --macro-prefix=gl alloca byteswap c-ctype crypto/hmac-md5 crypto/md5 extensions func getpass gettext gettime havelib lib-msvc-compat lib-symbol-versions manywarnings memmem-simple minmax netdb netinet_in progname read-file snprintf sockets socklen stdint strcase strverscmp sys_socket sys_stat time_r timespec u64 unistd vasprintf version-etc version-etc-fsf vsnprintf warnings
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([gl/override])
 gl_MODULES([
-  accept
-  arpa_inet
-  autobuild
-  bind
-  close
-  connect
-  error
-  fdl-1.3
-  gendocs
-  getaddrinfo
-  getline
-  getpass-gnu
+  alloca
+  byteswap
+  c-ctype
+  crypto/hmac-md5
+  crypto/md5
+  extensions
+  func
+  getpass
+  gettext
   gettime
-  gnupload
-  gpl-3.0
-  inet_ntop
-  inet_pton
-  lgpl-2.1
-  listen
-  maintainer-makefile
+  havelib
+  lib-msvc-compat
+  lib-symbol-versions
   manywarnings
+  memmem-simple
   minmax
-  perror
-  pmccabe2html
+  netdb
+  netinet_in
   progname
   read-file
-  readline
-  recv
-  select
-  send
-  setsockopt
-  shutdown
-  socket
+  snprintf
   sockets
+  socklen
+  stdint
+  strcase
+  strverscmp
+  sys_socket
   sys_stat
-  update-copyright
-  valgrind-tests
+  time_r
+  timespec
+  u64
+  unistd
+  vasprintf
+  version-etc
   version-etc-fsf
+  vsnprintf
   warnings
 ])
-gl_AVOID([])
+gl_AVOID([alignof-tests lseek-tests])
 gl_SOURCE_BASE([gl])
 gl_M4_BASE([gl/m4])
 gl_PO_BASE([])
@@ -72,4 +70,3 @@ gl_MAKEFILE_NAME([])
 gl_LIBTOOL
 gl_MACRO_PREFIX([gl])
 gl_PO_DOMAIN([])
-gl_VC_FILES([false])

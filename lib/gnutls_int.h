@@ -48,6 +48,7 @@ typedef int ssize_t;
 #include <sys/stat.h>
 #include <sys/socket.h>
 #include <time.h>
+#include <u64.h> /* gnulib for uint64_t */
 
 /* some systems had problems with long long int, thus,
  * it is not used.

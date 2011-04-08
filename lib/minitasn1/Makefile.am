@@ -22,8 +22,7 @@
 # MA 02110-1301, USA
 
 AM_CPPFLAGS = -DASN1_BUILDING		\
-	-I$(srcdir)/../gl		\
-	-I$(builddir)/../gl		\
+	-I$(srcdir)/../../gl		\
 	-I$(srcdir)/..
 
 noinst_LTLIBRARIES = libminitasn1.la

@@ -36,6 +36,9 @@ AC_MSG_RESULT([***
 
 dnl Checks for programs.
 AC_PROG_CC
+AC_PROG_CXX
+gl_EARLY
+
 AC_PROG_LN_S
 GTK_DOC_CHECK(1.1)
 AC_PATH_PROG([GAA], [gaa])
@@ -48,7 +51,6 @@ if test "x$GAA" = "x"; then
 ***]])
 fi
 
-gl_EARLY
 AC_C_INLINE
 
 # For the C++ code
@@ -65,6 +67,12 @@ AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
 
 LIBGNUTLS_HOOKS
 LIBGNUTLS_EXTRA_HOOKS
+
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.17])
+
+AC_C_BIGENDIAN
+
 
 AC_HEADER_STDC
 AC_DEFINE([HAVE_STRINGS_H], 1, [Hard-code for src/cfg/.])
@@ -189,7 +197,57 @@ AC_MSG_RESULT($libcfg_enabled)
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
+# For includes/gnutls/gnutls.h.in.
+AC_SUBST(MAJOR_VERSION, `echo $PACKAGE_VERSION | sed 's/\(.*\)\..*\..*/\1/g'`)
+AC_SUBST(MINOR_VERSION, `echo $PACKAGE_VERSION | sed 's/.*\.\(.*\)\..*/\1/g'`)
+AC_SUBST(PATCH_VERSION, `echo $PACKAGE_VERSION | sed 's/.*\..*\.\(.*\)/\1/g'`)
+AC_SUBST(NUMBER_VERSION, `printf "0x%02x%02x%02x" $MAJOR_VERSION $MINOR_VERSION $PATCH_VERSION`)
+AC_CHECK_TYPE(ssize_t,
+  [
+    DEFINE_SSIZE_T="#include <sys/types.h>"
+    AC_SUBST(DEFINE_SSIZE_T)
+  ], [
+    AC_DEFINE(NO_SSIZE_T, 1, [no ssize_t type was found])
+    DEFINE_SSIZE_T="typedef int ssize_t;"
+    AC_SUBST(DEFINE_SSIZE_T)
+  ], [
+    #include <sys/types.h>
+  ])
+
+# For minitasn1.
+AC_CHECK_SIZEOF(unsigned long int, 4)
+AC_CHECK_SIZEOF(unsigned int, 4)
+
+AC_ARG_WITH(zlib, AS_HELP_STRING([--without-zlib],
+                                 [disable zlib compression support]),
+            ac_zlib=$withval, ac_zlib=yes)
+AC_MSG_CHECKING([whether to include zlib compression support])
+if test x$ac_zlib != xno; then
+ AC_MSG_RESULT(yes)
+ AC_LIB_HAVE_LINKFLAGS(z,, [#include <zlib.h>], [compress (0, 0, 0, 0);])
+ if test x$ac_cv_libz != xyes; then
+   AC_MSG_WARN(
+*** 
+*** ZLIB was not found. You will not be able to use ZLIB compression.)
+ fi
+else
+ AC_MSG_RESULT(no)
+fi
+
+if test x$ac_zlib != xno; then
+  if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
+    GNUTLS_REQUIRES_PRIVATE="Requires.private: zlib"
+  else
+    GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE , zlib"
+  fi
+fi
+AC_SUBST(GNUTLS_REQUIRES_PRIVATE)
+
+AC_CHECK_FUNCS(getrusage,,)
+AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
+
 gl_INIT
+
 
 AC_ARG_ENABLE([gcc-warnings],
   [AS_HELP_STRING([--enable-gcc-warnings],
@@ -201,6 +259,7 @@ AC_ARG_ENABLE([gcc-warnings],
    gl_gcc_warnings=$enableval],
   [gl_gcc_warnings=no]
 )
+
 
 if test "$gl_gcc_warnings" = yes; then
   gl_WARN_ADD([-Werror], [WERROR_CFLAGS])
@@ -245,16 +304,24 @@ if test "$gl_gcc_warnings" = yes; then
   gl_WARN_ADD([-fdiagnostics-show-option])
 fi
 
-# Export things for */configure.ac.
-export WERROR_CFLAGS
-export WSTACK_CFLAGS
-export WARN_CFLAGS
-export use_cxx
+AC_SUBST([WERROR_CFLAGS])
+AC_SUBST([WSTACK_CFLAGS])
+AC_SUBST([WARN_CFLAGS])
+AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
+
+LIBGNUTLS_EXTRA_LIBS="-L${libdir} -lgnutls-extra $LZO_LIBS $LIBGNUTLS_LIBS"
+LIBGNUTLS_EXTRA_CFLAGS="-I${includedir}"
+AC_SUBST(LIBGNUTLS_EXTRA_LIBS)
+AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
+
+LIBGNUTLS_LIBS="-L${libdir} -lgnutls $LIBS"
+LIBGNUTLS_CFLAGS="-I${includedir}"
+AC_SUBST(LIBGNUTLS_LIBS)
+AC_SUBST(LIBGNUTLS_CFLAGS)
+
 
 AC_DEFINE([GNUTLS_COMPAT_H], 1, [Make sure we don't use old features in code.])
-
-AC_CONFIG_SUBDIRS([lib])
-AC_CONFIG_SUBDIRS([libextra])
+AC_DEFINE([GNUTLS_INTERNAL_BUILD], 1, [We allow temporarily usage of deprecated functions - until they are removed.])
 
 AC_CONFIG_FILES([guile/pre-inst-guile], [chmod +x guile/pre-inst-guile])
 AC_CONFIG_FILES([
@@ -293,6 +360,20 @@ AC_CONFIG_FILES([
   tests/rsa-md5-collision/Makefile
   tests/sha2/Makefile
   tests/userid/Makefile
+  libextra/Makefile
+  libextra/gnutls-extra.pc
+  libextra/includes/Makefile
+  lib/Makefile
+  lib/gnutls.pc
+  lib/includes/Makefile
+  lib/includes/gnutls/gnutls.h
+  lib/minitasn1/Makefile
+  lib/opencdk/Makefile
+  lib/openpgp/Makefile
+  po/Makefile.in
+  lib/x509/Makefile
+  lib/gcrypt/Makefile
+  lib/nettle/Makefile
 ])
 if test -d tests/suite;then
 AC_CONFIG_FILES([tests/suite/Makefile])

@@ -1,6 +1,6 @@
 ## DO NOT EDIT! GENERATED AUTOMATICALLY!
 ## Process this file with automake to produce Makefile.in.
-# Copyright (C) 2002-2010 Free Software Foundation, Inc.
+# Copyright (C) 2002-2011 Free Software Foundation, Inc.
 #
 # This file is free software, distributed under the terms of the GNU
 # General Public License.  As a special exception to the GNU General
@@ -46,15 +46,6 @@ AM_LIBTOOLFLAGS = --preserve-dup-deps
 
 TESTS_ENVIRONMENT += EXEEXT='@EXEEXT@' srcdir='$(srcdir)'
 
-## begin gnulib module alignof-tests
-
-TESTS += test-alignof
-check_PROGRAMS += test-alignof
-
-EXTRA_DIST += test-alignof.c
-
-## end   gnulib module alignof-tests
-
 ## begin gnulib module alloca-opt-tests
 
 TESTS += test-alloca-opt
@@ -88,14 +79,6 @@ EXTRA_DIST += $(top_srcdir)/build-aux/arg-nonnull.h
 
 ## end   gnulib module arg-nonnull
 
-## begin gnulib module arpa_inet-tests
-
-TESTS += test-arpa_inet
-check_PROGRAMS += test-arpa_inet
-EXTRA_DIST += test-arpa_inet.c
-
-## end   gnulib module arpa_inet-tests
-
 ## begin gnulib module binary-io
 
 libtests_a_SOURCES += binary-io.h
@@ -110,6 +93,14 @@ check_PROGRAMS += test-binary-io
 EXTRA_DIST += test-binary-io.sh test-binary-io.c macros.h
 
 ## end   gnulib module binary-io-tests
+
+## begin gnulib module byteswap-tests
+
+TESTS += test-byteswap
+check_PROGRAMS += test-byteswap
+EXTRA_DIST += test-byteswap.c macros.h
+
+## end   gnulib module byteswap-tests
 
 ## begin gnulib module c++defs
 
@@ -144,6 +135,22 @@ EXTRA_DIST += test-c-ctype.c macros.h
 
 ## end   gnulib module c-ctype-tests
 
+## begin gnulib module crypto/hmac-md5-tests
+
+TESTS += test-hmac-md5
+check_PROGRAMS += test-hmac-md5
+EXTRA_DIST += test-hmac-md5.c
+
+## end   gnulib module crypto/hmac-md5-tests
+
+## begin gnulib module crypto/md5-tests
+
+TESTS += test-md5
+check_PROGRAMS += test-md5
+EXTRA_DIST += test-md5.c
+
+## end   gnulib module crypto/md5-tests
+
 ## begin gnulib module errno-tests
 
 TESTS += test-errno
@@ -152,6 +159,47 @@ check_PROGRAMS += test-errno
 EXTRA_DIST += test-errno.c
 
 ## end   gnulib module errno-tests
+
+## begin gnulib module fcntl-h
+
+BUILT_SOURCES += fcntl.h
+
+# We need the following in order to create <fcntl.h> when the system
+# doesn't have one that works with the given compiler.
+fcntl.h: fcntl.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(WARN_ON_USE_H)
+	$(AM_V_GEN)rm -f $@-t $@ && \
+	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
+	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
+	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
+	      -e 's|@''NEXT_FCNTL_H''@|$(NEXT_FCNTL_H)|g' \
+	      -e 's|@''GNULIB_FCNTL''@|$(GNULIB_FCNTL)|g' \
+	      -e 's|@''GNULIB_OPEN''@|$(GNULIB_OPEN)|g' \
+	      -e 's|@''GNULIB_OPENAT''@|$(GNULIB_OPENAT)|g' \
+	      -e 's|@''HAVE_FCNTL''@|$(HAVE_FCNTL)|g' \
+	      -e 's|@''HAVE_OPENAT''@|$(HAVE_OPENAT)|g' \
+	      -e 's|@''REPLACE_FCNTL''@|$(REPLACE_FCNTL)|g' \
+	      -e 's|@''REPLACE_OPEN''@|$(REPLACE_OPEN)|g' \
+	      -e 's|@''REPLACE_OPENAT''@|$(REPLACE_OPENAT)|g' \
+	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
+	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
+	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
+	      < $(srcdir)/fcntl.in.h; \
+	} > $@-t && \
+	mv $@-t $@
+MOSTLYCLEANFILES += fcntl.h fcntl.h-t
+
+EXTRA_DIST += fcntl.in.h
+
+## end   gnulib module fcntl-h
+
+## begin gnulib module fcntl-h-tests
+
+TESTS += test-fcntl-h
+check_PROGRAMS += test-fcntl-h
+EXTRA_DIST += test-fcntl-h.c
+
+## end   gnulib module fcntl-h-tests
 
 ## begin gnulib module fseeko-tests
 
@@ -170,14 +218,13 @@ EXTRA_DIST += test-ftello.c test-ftello.sh test-ftello2.sh test-ftello3.c signat
 
 ## end   gnulib module ftello-tests
 
-## begin gnulib module getaddrinfo-tests
+## begin gnulib module func-tests
 
-TESTS += test-getaddrinfo
-check_PROGRAMS += test-getaddrinfo
-test_getaddrinfo_LDADD = $(LDADD) @GETADDRINFO_LIB@ @LIBINTL@
-EXTRA_DIST += signature.h test-getaddrinfo.c
+TESTS += test-func
+check_PROGRAMS += test-func
+EXTRA_DIST += test-func.c macros.h
 
-## end   gnulib module getaddrinfo-tests
+## end   gnulib module func-tests
 
 ## begin gnulib module getdelim-tests
 
@@ -215,40 +262,12 @@ EXTRA_DIST += signature.h test-gettimeofday.c
 
 ## end   gnulib module gettimeofday-tests
 
-## begin gnulib module inet_ntop-tests
-
-TESTS += test-inet_ntop
-check_PROGRAMS += test-inet_ntop
-test_inet_ntop_LDADD = $(LDADD) @INET_NTOP_LIB@
-EXTRA_DIST += test-inet_ntop.c signature.h macros.h
-
-## end   gnulib module inet_ntop-tests
-
-## begin gnulib module inet_pton-tests
-
-TESTS += test-inet_pton
-check_PROGRAMS += test-inet_pton
-test_inet_pton_LDADD = $(LDADD) @INET_PTON_LIB@
-EXTRA_DIST += test-inet_pton.c signature.h macros.h
-
-## end   gnulib module inet_pton-tests
-
-## begin gnulib module ioctl
+## begin gnulib module intprops
 
 
-EXTRA_DIST += ioctl.c w32sock.h
+EXTRA_DIST += intprops.h
 
-EXTRA_libtests_a_SOURCES += ioctl.c
-
-## end   gnulib module ioctl
-
-## begin gnulib module lseek-tests
-
-TESTS += test-lseek.sh
-check_PROGRAMS += test-lseek
-EXTRA_DIST += test-lseek.c test-lseek.sh signature.h macros.h
-
-## end   gnulib module lseek-tests
+## end   gnulib module intprops
 
 ## begin gnulib module memchr-tests
 
@@ -274,14 +293,6 @@ EXTRA_DIST += test-netinet_in.c
 
 ## end   gnulib module netinet_in-tests
 
-## begin gnulib module perror-tests
-
-TESTS += test-perror.sh
-check_PROGRAMS += test-perror
-EXTRA_DIST += signature.h test-perror.c test-perror.sh
-
-## end   gnulib module perror-tests
-
 ## begin gnulib module read-file-tests
 
 TESTS += test-read-file
@@ -289,18 +300,6 @@ check_PROGRAMS += test-read-file
 EXTRA_DIST += test-read-file.c
 
 ## end   gnulib module read-file-tests
-
-## begin gnulib module select-tests
-
-TESTS += test-select test-select-in.sh test-select-out.sh
-# test-select-stdin has to be run by hand.
-check_PROGRAMS += test-select test-select-fd test-select-stdin
-test_select_LDADD = $(LDADD) @LIBSOCKET@ $(INET_PTON_LIB)
-test_select_fd_LDADD = $(LDADD) @LIBSOCKET@
-test_select_stdin_LDADD = $(LDADD) @LIBSOCKET@
-EXTRA_DIST += macros.h signature.h test-select.c test-select-fd.c test-select-in.sh test-select-out.sh test-select-stdin.c
-
-## end   gnulib module select-tests
 
 ## begin gnulib module snprintf-tests
 
@@ -360,14 +359,6 @@ EXTRA_DIST += test-stdlib.c test-sys_wait.h
 
 ## end   gnulib module stdlib-tests
 
-## begin gnulib module strerror-tests
-
-TESTS += test-strerror
-check_PROGRAMS += test-strerror
-EXTRA_DIST += test-strerror.c signature.h macros.h
-
-## end   gnulib module strerror-tests
-
 ## begin gnulib module string-tests
 
 TESTS += test-string
@@ -376,52 +367,21 @@ EXTRA_DIST += test-string.c
 
 ## end   gnulib module string-tests
 
-## begin gnulib module sys_ioctl
+## begin gnulib module strings-tests
 
-BUILT_SOURCES += sys/ioctl.h
+TESTS += test-strings
+check_PROGRAMS += test-strings
+EXTRA_DIST += test-strings.c
 
-# We need the following in order to create <sys/ioctl.h> when the system
-# does not have a complete one.
-sys/ioctl.h: sys_ioctl.in.h $(CXXDEFS_H) $(WARN_ON_USE_H)
-	$(AM_V_at)$(MKDIR_P) sys
-	$(AM_V_GEN)rm -f $@-t $@ && \
-	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
-	  sed -e 's|@''HAVE_SYS_IOCTL_H''@|$(HAVE_SYS_IOCTL_H)|g' \
-	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
-	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
-	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
-	      -e 's|@''NEXT_SYS_IOCTL_H''@|$(NEXT_SYS_IOCTL_H)|g' \
-	      -e 's|@''GNULIB_IOCTL''@|$(GNULIB_IOCTL)|g' \
-	      -e 's|@''SYS_IOCTL_H_HAVE_WINSOCK2_H''@|$(SYS_IOCTL_H_HAVE_WINSOCK2_H)|g' \
-	      -e 's|@''SYS_IOCTL_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS''@|$(SYS_IOCTL_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS)|g' \
-	      -e 's|@''REPLACE_IOCTL''@|$(REPLACE_IOCTL)|g' \
-	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
-	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
-	      < $(srcdir)/sys_ioctl.in.h; \
-	} > $@-t && \
-	mv $@-t $@
-MOSTLYCLEANFILES += sys/ioctl.h sys/ioctl.h-t
-MOSTLYCLEANDIRS += sys
+## end   gnulib module strings-tests
 
-EXTRA_DIST += sys_ioctl.in.h
+## begin gnulib module strverscmp-tests
 
-## end   gnulib module sys_ioctl
+TESTS += test-strverscmp
+check_PROGRAMS += test-strverscmp
+EXTRA_DIST += test-strverscmp.c signature.h macros.h
 
-## begin gnulib module sys_ioctl-tests
-
-TESTS += test-sys_ioctl
-check_PROGRAMS += test-sys_ioctl
-EXTRA_DIST += test-sys_ioctl.c
-
-## end   gnulib module sys_ioctl-tests
-
-## begin gnulib module sys_select-tests
-
-TESTS += test-sys_select
-check_PROGRAMS += test-sys_select
-EXTRA_DIST += test-sys_select.c
-
-## end   gnulib module sys_select-tests
+## end   gnulib module strverscmp-tests
 
 ## begin gnulib module sys_socket-tests
 
@@ -455,6 +415,14 @@ EXTRA_DIST += test-time.c
 
 ## end   gnulib module time-tests
 
+## begin gnulib module u64-tests
+
+TESTS += test-u64
+check_PROGRAMS += test-u64
+EXTRA_DIST += test-u64.c
+
+## end   gnulib module u64-tests
+
 ## begin gnulib module unistd-tests
 
 TESTS += test-unistd
@@ -462,14 +430,6 @@ check_PROGRAMS += test-unistd
 EXTRA_DIST += test-unistd.c
 
 ## end   gnulib module unistd-tests
-
-## begin gnulib module update-copyright-tests
-
-TESTS += test-update-copyright.sh
-TESTS_ENVIRONMENT += abs_aux_dir='$(abs_aux_dir)'
-EXTRA_DIST += test-update-copyright.sh
-
-## end   gnulib module update-copyright-tests
 
 ## begin gnulib module vasnprintf-tests
 
@@ -480,14 +440,14 @@ EXTRA_DIST += test-vasnprintf.c macros.h
 
 ## end   gnulib module vasnprintf-tests
 
-## begin gnulib module vc-list-files-tests
+## begin gnulib module vasprintf-tests
 
-TESTS += test-vc-list-files-git.sh
-TESTS += test-vc-list-files-cvs.sh
-TESTS_ENVIRONMENT += abs_aux_dir='$(abs_aux_dir)'
-EXTRA_DIST += test-vc-list-files-git.sh test-vc-list-files-cvs.sh init.sh
+TESTS += test-vasprintf
+check_PROGRAMS += test-vasprintf
 
-## end   gnulib module vc-list-files-tests
+EXTRA_DIST += test-vasprintf.c signature.h macros.h
+
+## end   gnulib module vasprintf-tests
 
 ## begin gnulib module verify-tests
 
@@ -506,6 +466,15 @@ test_version_etc_LDADD = $(LDADD) @LIBINTL@
 EXTRA_DIST += test-version-etc.c test-version-etc.sh
 
 ## end   gnulib module version-etc-tests
+
+## begin gnulib module vsnprintf-tests
+
+TESTS += test-vsnprintf
+check_PROGRAMS += test-vsnprintf
+
+EXTRA_DIST += test-vsnprintf.c signature.h macros.h
+
+## end   gnulib module vsnprintf-tests
 
 ## begin gnulib module warn-on-use
 

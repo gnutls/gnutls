@@ -21,9 +21,9 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 # MA 02110-1301, USA
 
-ACLOCAL_AMFLAGS = -I m4 -I gl/m4
+ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
-SUBDIRS = gl po includes x509
+SUBDIRS = includes x509
 if ENABLE_MINITASN1
 SUBDIRS += minitasn1
 endif
@@ -33,10 +33,8 @@ localedir = $(datadir)/locale
 AM_CFLAGS = $(WERROR_CFLAGS) $(WSTACK_CFLAGS) $(WARN_CFLAGS)
 AM_CPPFLAGS = \
 	-DLOCALEDIR=\"$(localedir)\"		\
-	-I$(srcdir)/gl				\
-	-I$(builddir)/gl			\
+	-I$(srcdir)/../gl				\
 	-I$(srcdir)/includes			\
-	-I$(builddir)/includes			\
 	-I$(srcdir)/x509
 
 if ENABLE_OPENPGP
@@ -122,7 +120,7 @@ libgnutls_la_SOURCES = $(HFILES) $(COBJECTS) $(SRP_COBJECTS)	\
 libgnutls_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
-libgnutls_la_LIBADD = gl/liblgnu.la x509/libgnutls_x509.la \
+libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	$(LTLIBZ)  $(LTLIBINTL) $(LIBSOCKET)
 
 if ENABLE_OPENPGP
@@ -164,7 +162,7 @@ endif
 if ENABLE_CXX
 libgnutlsxx_la_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_builddir)/includes
 
-AM_CXXFLAGS = -I$(top_srcdir)/includes/
+AM_CXXFLAGS = -I$(srcdir)/includes
 
 lib_LTLIBRARIES += libgnutlsxx.la
 

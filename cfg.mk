@@ -23,7 +23,7 @@ WFLAGS ?= --enable-gcc-warnings
 ADDFLAGS ?=
 CFGFLAGS ?= --enable-gtk-doc --enable-gtk-doc-pdf $(ADDFLAGS) $(WFLAGS)
 
-INDENT_SOURCES = `find . -name \*.[ch] -o -name gnutls.h.in | grep -v -e ^./build-aux/ -e ^./lib/minitasn1/ -e ^./lib/build-aux/ -e ^./lib/gl/ -e ^./gl/ -e ^./libextra/gl/ -e ^./src/cfg/ -e -gaa.[ch] -e asn1_tab.c -e ^./tests/suite/`
+INDENT_SOURCES = `find . -name \*.[ch] -o -name gnutls.h.in | grep -v -e ^./build-aux/ -e ^./lib/minitasn1/ -e ^./lib/build-aux/ -e ^./gl/ -e ^./src/cfg/ -e -gaa.[ch] -e asn1_tab.c -e ^./tests/suite/`
 
 ifeq ($(.DEFAULT_GOAL),abort-due-to-no-makefile)
 .DEFAULT_GOAL := bootstrap
@@ -46,7 +46,7 @@ autoreconf:
 	done
 	mv lib/build-aux/config.rpath lib/build-aux/config.rpath-
 	test -f ./configure || autoreconf --install
-	test `hostname` = "gaggia" && cp lib/gl/m4/size_max.m4 lib/m4/ || true
+	test `hostname` = "gaggia" && cp gl/m4/size_max.m4 m4/ || true
 	mv lib/build-aux/config.rpath- lib/build-aux/config.rpath
 
 update-po: refresh-po
@@ -59,10 +59,20 @@ update-po: refresh-po
 bootstrap: autoreconf
 	./configure $(CFGFLAGS)
 
+#Two runs the first should add the LGPL components and the
+#second the components used by src/ files.
 glimport:
-	gnulib-tool --m4-base gl/m4 --add-import
-	cd lib && gnulib-tool --m4-base gl/m4 --add-import
-	cd libextra && gnulib-tool --m4-base gl/m4 --add-import
+	../gnulib/gnulib-tool --m4-base gl/m4 --tests-base=gl/tests --libtool \
+	--dir=. --local-dir=gl/override --lib=libgnu --source-base=gl \
+	--aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lseek-tests \
+	--import crypto/hmac-md5 crypto/md5 extensions havelib lib-msvc-compat lib-symbol-versions \
+	byteswap c-ctype func gettext lib-msvc-compat lib-symbol-versions memmem-simple minmax \
+	netdb read-file snprintf sockets socklen stdint strcase strverscmp sys_socket sys_stat time_r unistd \
+	vasprintf vsnprintf manywarnings warnings netinet_in alloca getpass u64
+	../gnulib/gnulib-tool --m4-base gl/m4 --tests-base=gl/tests --libtool \
+	--dir=. --local-dir=gl/override --lib=libgnu --source-base=gl \
+	--aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lseek-tests \
+	--add-import progname version-etc timespec version-etc-fsf gettime
 
 # Code Coverage
 

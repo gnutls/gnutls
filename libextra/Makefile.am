@@ -21,13 +21,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I ../lib/m4 -I ../lib/gl/m4
+ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
 AM_CFLAGS = $(WERROR_CFLAGS) $(WSTACK_CFLAGS) $(WARN_CFLAGS)
 AM_CPPFLAGS = \
-	-I$(srcdir)/../lib/gl		\
-	-I$(builddir)/../lib/gl		\
-	-I$(srcdir)/gl			\
+	-I$(srcdir)/../gl			\
 	-I$(builddir)/../lib/includes	\
 	-I$(srcdir)/../lib/includes	\
 	-I$(srcdir)/includes		\
@@ -37,7 +35,7 @@ if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../lib/minitasn1
 endif
 
-SUBDIRS = gl includes
+SUBDIRS = includes
 
 # Pkg-config script.
 pkgconfigdir = $(libdir)/pkgconfig
@@ -61,7 +59,7 @@ lib_LTLIBRARIES += libgnutls-openssl.la
 libgnutls_openssl_la_SOURCES = gnutls_openssl.c openssl_compat.h	\
 	openssl_compat.c
 
-libgnutls_openssl_la_LIBADD = ../lib/gl/liblgnu.la $(LIBSOCKET) \
+libgnutls_openssl_la_LIBADD = ../gl/libgnu.la $(LIBSOCKET) \
 	../lib/libgnutls.la
 
 libgnutls_openssl_la_LDFLAGS += -version-info $(LT_SSL_CURRENT):$(LT_SSL_REVISION):$(LT_SSL_AGE)
@@ -102,7 +100,7 @@ libgnutls_extra_la_LDFLAGS += \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
 	$(LZO_LIBS)
 
-libgnutls_extra_la_LIBADD += ../lib/gl/liblgnu.la gl/libxgnu.la \
+libgnutls_extra_la_LIBADD += ../gl/libgnu.la \
 	../lib/libgnutls.la
 
 if HAVE_LD_VERSION_SCRIPT
