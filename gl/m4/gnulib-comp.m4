@@ -137,6 +137,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module u64-tests:
   # Code from module unistd:
   # Code from module unistd-tests:
+  # Code from module valgrind-tests:
   # Code from module vasnprintf:
   # Code from module vasnprintf-tests:
   # Code from module vasprintf:
@@ -315,6 +316,8 @@ AC_SUBST([LTALLOCA])
   AC_REQUIRE([AC_C_INLINE])
   # Code from module unistd:
   gl_UNISTD_H
+  # Code from module valgrind-tests:
+  gl_VALGRIND_TESTS
   # Code from module vasnprintf:
   gl_FUNC_VASNPRINTF
   # Code from module vasprintf:
@@ -395,6 +398,7 @@ changequote([, ])dnl
   gt_TYPE_WCHAR_T
   gt_TYPE_WINT_T
   AC_CHECK_FUNCS_ONCE([shutdown])
+  gl_VALGRIND_TESTS
   m4_popdef([gl_MODULE_INDICATOR_CONDITION])
   m4_ifval(gltests_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([gltests_LIBSOURCES_DIR])[ ||
@@ -662,6 +666,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/uintmax_t.m4
   m4/ungetc.m4
   m4/unistd_h.m4
+  m4/valgrind-tests.m4
   m4/vasnprintf.m4
   m4/vasprintf.m4
   m4/version-etc.m4

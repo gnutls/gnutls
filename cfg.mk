@@ -72,7 +72,7 @@ glimport:
 	gnulib-tool --m4-base gl/m4 --tests-base=gl/tests --libtool \
 	--dir=. --local-dir=gl/override --lib=libgnu --source-base=gl \
 	--aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lseek-tests \
-	--add-import progname version-etc timespec version-etc-fsf gettime
+	--add-import progname version-etc timespec version-etc-fsf gettime valgrind-tests
 
 # Code Coverage
 

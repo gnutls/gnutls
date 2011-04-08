@@ -47,3 +47,4 @@
 /gettime.m4
 /gettimeofday.m4
 /sys_time_h.m4
+/valgrind-tests.m4
