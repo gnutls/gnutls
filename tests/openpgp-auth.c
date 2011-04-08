@@ -161,6 +161,9 @@ doit ()
 
           if (debug)
             printf ("client done\n");
+          
+          gnutls_deinit(session);
+          gnutls_certificate_free_credentials (cred);
         }
       else
         {
@@ -237,6 +240,10 @@ doit ()
 
           if (debug)
             printf ("server done\n");
+
+          gnutls_deinit(session);
+          gnutls_certificate_free_credentials (cred);
+          gnutls_dh_params_deinit (dh_params);
 
           done = wait (&status);
           if (done < 0)
