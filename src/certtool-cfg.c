@@ -40,7 +40,6 @@
 
 /* Gnulib portability files. */
 #include <getpass.h>
-#include "readline.h"
 #include "certtool-common.h"
 
 extern int batch;
@@ -198,6 +197,8 @@ template_parse (const char *template)
   return 0;
 }
 
+#define IS_NEWLINE(x) ((x[0] == '\n') || (x[0] == '\r'))
+
 void
 read_crt_set (gnutls_x509_crt_t crt, const char *input_str, const char *oid)
 {
@@ -208,7 +209,7 @@ read_crt_set (gnutls_x509_crt_t crt, const char *input_str, const char *oid)
   if (fgets (input, sizeof (input), stdin) == NULL)
     return;
 
-  if (strlen (input) == 1)      /* only newline */
+  if (IS_NEWLINE(input))
     return;
 
   ret =
@@ -230,7 +231,7 @@ read_crq_set (gnutls_x509_crq_t crq, const char *input_str, const char *oid)
   if (fgets (input, sizeof (input), stdin) == NULL)
     return;
 
-  if (strlen (input) == 1)      /* only newline */
+  if (IS_NEWLINE(input))
     return;
 
   ret =
@@ -247,37 +248,35 @@ read_crq_set (gnutls_x509_crq_t crq, const char *input_str, const char *oid)
 static int
 read_int_with_default (const char *input_str, int def)
 {
-  char *in;
   char *endptr;
-  long l;
+  long l, len;
+  static char input[128];
 
   fprintf (stderr, input_str, def);
-  in = readline ("");
-  if (in == NULL)
-    {
-      return def;
-    }
+  if (fgets (input, sizeof (input), stdin) == NULL)
+    return def;
 
-  l = strtol (in, &endptr, 0);
+  if (IS_NEWLINE(input))
+    return def;
 
-  if (*endptr != '\0')
+  len = strlen (input);
+
+  l = strtol (input, &endptr, 0);
+
+  if (*endptr != '\0' && *endptr != '\r' && *endptr != '\n')
     {
       fprintf (stderr, "Trailing garbage ignored: `%s'\n", endptr);
-      free (in);
       return 0;
     }
 
   if (l <= INT_MIN || l >= INT_MAX)
     {
-      fprintf (stderr, "Integer out of range: `%s'\n", in);
-      free (in);
+      fprintf (stderr, "Integer out of range: `%s'\n", input);
       return 0;
     }
 
-  if (in == endptr)
+  if (input == endptr)
     l = def;
-
-  free (in);
 
   return (int) l;
 }
@@ -296,6 +295,9 @@ read_str (const char *input_str)
 
   fputs (input_str, stderr);
   if (fgets (input, sizeof (input), stdin) == NULL)
+    return NULL;
+
+  if (IS_NEWLINE(input))
     return NULL;
 
   len = strlen (input);
@@ -318,7 +320,7 @@ read_yesno (const char *input_str)
   if (fgets (input, sizeof (input), stdin) == NULL)
     return 0;
 
-  if (strlen (input) == 1)      /* only newline */
+  if (IS_NEWLINE(input))
     return 0;
 
   if (input[0] == 'y' || input[0] == 'Y')
