@@ -382,7 +382,7 @@ static ssize_t
 _gnutls_writev_emu (gnutls_session_t session, const giovec_t * giovec,
                     int giovec_cnt)
 {
-  int ret, j = 0;
+  int ret = 0, j = 0;
   gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
   void *iptr;
   size_t sizeOfPtr;
