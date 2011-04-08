@@ -27,6 +27,10 @@ PORT="${PORT:-5557}"
 DEBUG=""
 unset RETCODE
 
+if test "${WINDIR}" != "";then
+  exit 77
+fi 
+
 . ../scripts/common.sh
 
 echo "Checking OpenPGP certificate verification"
