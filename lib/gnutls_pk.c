@@ -185,8 +185,8 @@ _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
   if (ciphertext->data == NULL)
     {
       gnutls_assert ();
-      _gnutls_free_datum (&encrypted);
-      return GNUTLS_E_MEMORY_ERROR;
+      ret = GNUTLS_E_MEMORY_ERROR;
+      goto cleanup;
     }
 
   memcpy (&ciphertext->data[pad], encrypted.data, encrypted.size);
@@ -195,9 +195,12 @@ _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
 
   ciphertext->size = k;
 
+  ret = 0;
+
+cleanup:
   _gnutls_free_datum (&encrypted);
 
-  return 0;
+  return ret;
 }
 
 

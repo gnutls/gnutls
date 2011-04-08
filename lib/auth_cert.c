@@ -1593,7 +1593,7 @@ _gnutls_gen_cert_client_cert_vrfy (gnutls_session_t session, gnutls_buffer_st * 
       goto cleanup;
     }
 
-  return data->length;
+  ret = data->length;
 
 cleanup:
   _gnutls_free_datum (&signature);
