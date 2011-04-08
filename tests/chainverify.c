@@ -761,6 +761,13 @@ doit (void)
   size_t i;
   int ret;
 
+  /* The overloading of time() seems to work in linux (ELF?)
+   * systems only. Disable it on windows.
+   */
+#ifdef _WIN32
+  exit(77);
+#endif
+
   ret = gnutls_global_init ();
   if (ret != 0)
     {
