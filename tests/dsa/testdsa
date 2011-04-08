@@ -27,6 +27,10 @@ PORT="${PORT:-5559}"
 DEBUG=""
 unset RETCODE
 
+if test "${WINDIR}" != "";then
+  exit 77
+fi 
+
 fail() {
    echo "Failure: $1" >&2
    exit 1
