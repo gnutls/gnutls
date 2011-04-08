@@ -236,6 +236,7 @@ main (int argc, char *argv[])
   free (to_client);
 
   gnutls_certificate_free_credentials (serverx509cred);
+  gnutls_certificate_free_credentials (clientx509cred);
 
   gnutls_global_deinit ();
 

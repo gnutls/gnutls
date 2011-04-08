@@ -7,7 +7,7 @@ See the end for copying conditions.
 
 ** libgnutls: Several updates and fixes for win32. Patches by LRN.
 
-** libgnutls: Several bug fixes.
+** libgnutls: Several bug and memory leak fixes.
 
 ** srptool: Accepts the -d option to enable debugging.
 

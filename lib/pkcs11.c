@@ -456,6 +456,7 @@ gnutls_pkcs11_deinit (void)
       pakchois_module_destroy (providers[i].module);
     }
   active_providers = 0;
+  pakchois_destructor();
 }
 
 /**
