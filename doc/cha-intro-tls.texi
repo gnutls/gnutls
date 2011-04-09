@@ -1,5 +1,5 @@
 @node Introduction to TLS
-@chapter Introduction to @acronym{TLS}
+@chapter Introduction to @acronym{TLS} and @acronym{DTLS}
 
 @acronym{TLS} stands for ``Transport Layer Security'' and is the
 successor of SSL, the Secure Sockets Layer protocol @xcite{SSL3}
@@ -12,11 +12,17 @@ It is open to any interested individual.}, described in @acronym{RFC}
 4346 and also in @xcite{RESCORLA}.  The protocol provides
 confidentiality, and authentication layers over any reliable transport
 layer.  The description, below, refers to @acronym{TLS} 1.0 but also
-applies to @acronym{TLS} 1.1 @xcite{RFC4346} and @acronym{SSL} 3.0,
-since the differences of these protocols are minor.  Older protocols
-such as @acronym{SSL} 2.0 are not discussed nor implemented in
-@acronym{GnuTLS} since they are not considered secure today.  GnuTLS
-also supports @acronym{X.509} and @acronym{OpenPGP} @xcite{RFC4880}.
+applies to @acronym{TLS} 1.2 @xcite{RFC4346} and @acronym{SSL} 3.0,
+since the differences of these protocols are not major.  
+
+The @acronym{DTLS} protocol, or ``Datagram @acronym{TLS}'' is a
+protocol with identical goals as @acronym{TLS}, but can operate
+under unreliable transport layers, such as @acronym{UDP}. The
+discussions below apply to this protocol as well, except when
+noted otherwise.
+
+Older protocols such as @acronym{SSL} 2.0 are not discussed nor implemented in
+@acronym{GnuTLS} since they are not considered secure today.  
 
 @menu
 * TLS layers::
@@ -65,6 +71,7 @@ required callbacks to access the transport layer.
 @itemize
 @item @ref{gnutls_transport_set_push_function}
 @item @ref{gnutls_transport_set_vec_push_function}
+@item @ref{gnutls_transport_set_pull_timeout_function} (for @acronym{DTLS} only)
 @item @ref{gnutls_transport_set_pull_function}
 @item @ref{gnutls_transport_set_ptr}
 @item @ref{gnutls_transport_set_errno}
@@ -89,6 +96,12 @@ again), if any of these error codes is returned.  The error codes
 above refer to the system call, not the @acronym{GnuTLS} function,
 since signals do not interrupt @acronym{GnuTLS}' functions.
 
+@acronym{DTLS} however deviates from this rule. Because it requires
+timers and waiting for peer's messages during the handshake process,
+@acronym{GnuTLS} will block and might be interrupted by signals. The
+blocking operation of @acronym{GnuTLS} during @acronym{DTLS} handshake
+can be changed using the appropriate flags in @ref{gnutls_init}.
+
 By default, if the transport functions are not set, @acronym{GnuTLS}
 will use the Berkeley Sockets functions. 
 
@@ -103,14 +116,29 @@ The following functions are available:
 @table @asis
 
 @item @ref{gnutls_record_send}:
-To send a record packet (with application data).
+To send a record packet with application data.
 
 @item @ref{gnutls_record_recv}:
-To receive a record packet (with application data).
+To receive a record packet with application data.
+
+@item @ref{gnutls_record_recv_seq}:
+To receive a record packet with application data as well
+as the sequence number of that. This is useful in @acronym{DTLS}
+where packets might be lost or received out of order.
 
 @item @ref{gnutls_record_get_direction}:
 To get the direction of the last interrupted function call.
 @end table
+
+In @acronym{TLS} those functions can be called at any time after
+the handshake process is finished, when there is need to receive
+or send data. In @acronym{DTLS} however, due to re-transmission
+timers used in the handshake out-of-order handshake data might
+be received for some time (maximum 60 seconds) after the handshake
+process is finished. For this reason programs using @acronym{DTLS}
+should call @ref{gnutls_record_recv} or @ref{gnutls_record_recv_seq}
+for every packet received by the peer, even if no data were
+expected. 
 
 As you may have already noticed, the functions which access the Record
 protocol, are quite limited, given the importance of this protocol in
@@ -161,6 +189,10 @@ which is considered weak.
 @item AES_CBC
 AES or RIJNDAEL is the block cipher algorithm that replaces the old
 DES algorithm.  Has 128 bits block size and is used in CBC mode.
+
+@item AES_GCM
+This is the AES algorithm in the authenticated encryption GCM mode.
+This mode combines message authentication and encryption.
 @end table
 
 Supported MAC algorithms:

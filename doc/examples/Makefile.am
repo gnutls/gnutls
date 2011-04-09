@@ -40,7 +40,7 @@ LDADD = libexamples.la				\
 CXX_LDADD = $(LDADD) \
 	../../lib/libgnutlsxx.la
 
-noinst_PROGRAMS = ex-client2 ex-client-resume
+noinst_PROGRAMS = ex-client2 ex-client-resume ex-client-udp
 noinst_PROGRAMS += ex-cert-select ex-rfc2818
 noinst_PROGRAMS += ex-cert-select-pkcs11
 
@@ -77,4 +77,4 @@ noinst_LTLIBRARIES = libexamples.la
 
 libexamples_la_SOURCES = examples.h ex-alert.c ex-pkcs12.c		\
 	ex-session-info.c ex-x509-info.c ex-verify.c	\
-	tcp.c 
+	tcp.c udp.c

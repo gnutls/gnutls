@@ -436,3 +436,4 @@ doc/examples/ex-cert-select-pkcs11
 gl/m4/fcntl-o.m4
 gl/m4/fcntl_h.m4
 gl/m4/pipe.m4
+doc/examples/ex-client-udp

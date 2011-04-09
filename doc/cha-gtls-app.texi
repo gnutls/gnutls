@@ -175,6 +175,7 @@ implemented by another example.
 @menu
 * Simple client example with anonymous authentication::
 * Simple client example with X.509 certificate support::
+* Simple Datagram TLS client example::
 * Obtaining session information::
 * Verifying peer's certificate::
 * Using a callback to select the certificate to use::
@@ -209,6 +210,15 @@ in this example are used in most of the other examples below, without
 redefining them.
 
 @verbatiminclude examples/ex-client2.c
+
+@node Simple Datagram TLS client example
+@subsection Simple Datagram @acronym{TLS} client example
+
+This is a client that uses @acronym{UDP} to connect to a
+server. This is the @acronym{DTLS} equivalent to 
+@ref{Simple client example with X.509 certificate support} above.
+
+@verbatiminclude examples/ex-client-udp.c
 
 @node Obtaining session information
 @subsection Obtaining Session Information
