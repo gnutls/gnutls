@@ -3,7 +3,9 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 2.99.0 (unreleased)
+* Version 2.99.0 (released 2011-04-09)
+
+** libgnutls: Added Datagram TLS support.
 
 ** libgnutls: Uses a single configure file and a single
 gnulib library to save space.
@@ -52,6 +54,18 @@ using the --verify option. Combined with --load-ca-certificate
 it can verify a certificate chain against a list of certificates.
 
 ** API and ABI modifications:
+gnutls_dtls_set_timeouts: ADDED
+gnutls_dtls_get_mtu: ADDED
+gnutls_dtls_get_data_mtu: ADDED
+gnutls_dtls_set_mtu: ADDED
+gnutls_dtls_cookie_send: ADDED
+gnutls_dtls_cookie_verify: ADDED
+gnutls_dtls_prestate_set: ADDED
+gnutls_x509_trust_list_verify_crt: ADDED
+gnutls_x509_trust_list_add_crls: ADDED
+gnutls_x509_trust_list_add_cas: ADDED
+gnutls_x509_trust_list_init: ADDED
+gnutls_x509_trust_list_deinit: ADDED
 gnutls_cipher_add_auth: ADDED
 gnutls_cipher_tag: ADDED
 gnutls_psk_netconf_derive_key: REMOVED
@@ -84,6 +98,41 @@ gnutls_ia_set_client_avp_ptr: REMOVED
 gnutls_ia_set_server_avp_function: REMOVED
 gnutls_ia_set_server_avp_ptr: REMOVED
 gnutls_ia_verify_endphase: REMOVED
+
+
+* Version 2.12.2 (released 2011-04-08)
+
+** libgnutls: Several updates and fixes for win32. Patches by LRN.
+
+** libgnutls: Several bug and memory leak fixes.
+
+** srptool: Accepts the -d option to enable debugging.
+
+** libgnutls: Corrected bug in gnutls_srp_verifier() that prevented
+the allocation of a verifier. Reported by Andrew Wiseman.
+
+** API and ABI modifications:
+No changes since last version.
+
+
+* Version 2.12.1 (released 2011-04-02)
+
+** certtool: Generated certificate request with stricter permissions.
+Reported by Luca Capello.
+
+** libgnutls: Bug fixes in opencdk code. Reported by Vitaly Kruglikov.
+
+** libgnutls: Corrected windows system_errno() function prototype.
+
+** libgnutls: C++ compatibility fix for compat.h. Reported by Mark Brand.
+
+** libgnutls: Fix size of gnutls_openpgp_keyid_t by using the
+GNUTLS_OPENPGP_KEYID_SIZE definition. Reported by Andreas Metzler.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 
 
 * Version 2.12.0 (released 2011-03-24)
@@ -152,11 +201,6 @@ Reported by "Brendan Doherty" <brendand@gentrack.com>.
 gnutls_x509_crl_list_import: ADDED
 gnutls_x509_crl_list_import2: ADDED
 gnutls_x509_crt_list_import2: ADDED
-gnutls_x509_trust_list_verify_crt: ADDED
-gnutls_x509_trust_list_add_crls: ADDED
-gnutls_x509_trust_list_add_cas: ADDED
-gnutls_x509_trust_list_init: ADDED
-gnutls_x509_trust_list_deinit: ADDED
 gnutls_x509_crl_get_raw_issuer_dn: ADDED
 gnutls_pubkey_import_privkey: ADDED
 gnutls_pubkey_verify_data: ADDED
