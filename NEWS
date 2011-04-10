@@ -7,8 +7,13 @@ See the end for copying conditions.
 
 ** libgnutls-extra: Dropped support of LZO compression via liblzo.
 
+** libgnutls: gnutls_transport_set_global_errno() was removed. This
+function required GnuTLS to access system specific data, for no reason.
+Use gnutls_transport_set_errno(), or your system's errno fascility
+instead.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_transport_set_global_errno: REMOVED
 
 
 * Version 2.99.0 (released 2011-04-09)

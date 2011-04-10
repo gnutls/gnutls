@@ -58,57 +58,11 @@
  * variable that is used by GnuTLS (e.g., the application is linked to
  * msvcr71.dll and gnutls is linked to msvcrt.dll).
  *
- * If you don't have the @session variable easily accessible from the
- * push/pull function, and don't worry about thread conflicts, you can
- * also use gnutls_transport_set_global_errno().
  **/
 void
 gnutls_transport_set_errno (gnutls_session_t session, int err)
 {
   session->internals.errnum = err;
-}
-
-/**
- * gnutls_transport_set_global_errno:
- * @err: error value to store in global errno variable.
- *
- * Store @err in the global errno variable.  Useful values for @err is
- * EAGAIN and EINTR, other values are treated will be treated as real
- * errors in the push/pull function.
- *
- * This function is useful in replacement push/pull functions set by
- * gnutls_transport_set_push_function and
- * gnutls_transport_set_pullpush_function under Windows, where the
- * replacement push/pull may not have access to the same @errno
- * variable that is used by GnuTLS (e.g., the application is linked to
- * msvcr71.dll and gnutls is linked to msvcrt.dll).
- *
- * Whether this function is thread safe or not depends on whether the
- * global variable errno is thread safe, some system libraries make it
- * a thread-local variable.  When feasible, using the guaranteed
- * thread-safe gnutls_transport_set_errno() may be better.
- **/
-void
-gnutls_transport_set_global_errno (int err)
-{
-#ifdef _WIN32
-  /* Keep this in sync with system_errno */
-  switch (err)
-    {
-    case EAGAIN:
-      SetLastError (WSAEWOULDBLOCK);
-      break;
-    case EINTR:
-      SetLastError (WSAEINTR);
-      break;
-    default:
-      /* We don't care about anything else */
-      SetLastError (NO_ERROR);
-      break;
-    }
-#else
-  errno = err;
-#endif
 }
 
 /**
