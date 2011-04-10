@@ -23,7 +23,8 @@
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes	\
-	-I$(top_srcdir)/libextra/includes
+	-I$(top_srcdir)/libextra/includes \
+	-I$(top_srcdir)/gl
 
 # Gnulib warns and suggests use of fseeko instead of fseek, which is
 # used in ex-cert-select.c, but certificate files will not be > 4 GB,
