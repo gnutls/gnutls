@@ -30,7 +30,7 @@ ifeq ($(.DEFAULT_GOAL),abort-due-to-no-makefile)
 .DEFAULT_GOAL := bootstrap
 endif
 
-PODIR := lib/po
+PODIR := po
 PO_DOMAIN := libgnutls
 
 local-checks-to-skip = sc_prohibit_strcmp sc_prohibit_atoi_atof		\
@@ -45,10 +45,10 @@ autoreconf:
 	for f in $(PODIR)/*.po.in; do \
 		cp $$f `echo $$f | sed 's/.in//'`; \
 	done
-	mv lib/build-aux/config.rpath lib/build-aux/config.rpath-
+	mv build-aux/config.rpath build-aux/config.rpath-
 	test -f ./configure || autoreconf --install
 	test `hostname` = "gaggia" && cp gl/m4/size_max.m4 m4/ || true
-	mv lib/build-aux/config.rpath- lib/build-aux/config.rpath
+	mv build-aux/config.rpath- build-aux/config.rpath
 
 update-po: refresh-po
 	for f in `ls $(PODIR)/*.po | grep -v quot.po`; do \
