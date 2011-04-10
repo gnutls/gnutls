@@ -2011,7 +2011,7 @@ gnutls_pkcs11_obj_export_url (gnutls_pkcs11_obj_t obj,
 
 /**
  * gnutls_pkcs11_obj_get_type:
- * @certificate: Holds the PKCS 11 certificate
+ * @obj: Holds the PKCS 11 object
  *
  * This function will return the type of the certificate being
  * stored in the structure.

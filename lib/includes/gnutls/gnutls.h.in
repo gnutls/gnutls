@@ -782,7 +782,7 @@ extern "C"
 #define gnutls_read gnutls_record_recv
 #define gnutls_write gnutls_record_send
   ssize_t gnutls_record_recv_seq (gnutls_session_t session, void *data, size_t data_size,
-    unsigned char seq[8]);
+    unsigned char *seq);
 
   void gnutls_session_enable_compatibility_mode (gnutls_session_t session);
 

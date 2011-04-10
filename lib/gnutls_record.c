@@ -1260,7 +1260,7 @@ gnutls_record_recv (gnutls_session_t session, void *data, size_t data_size)
  * @session: is a #gnutls_session_t structure.
  * @data: the buffer that the data will be read into
  * @data_size: the number of requested bytes
- * @seq: is the packet's 64-bit sequence number.
+ * @seq: is the packet's 64-bit sequence number. Should have space for 8 bytes.
  *
  * This function is the same as gnutls_record_recv(), except that
  * it returns in addition to data, the sequence number of the data.
@@ -1277,7 +1277,7 @@ gnutls_record_recv (gnutls_session_t session, void *data, size_t data_size)
  **/
 ssize_t
 gnutls_record_recv_seq (gnutls_session_t session, void *data, size_t data_size,
-  unsigned char seq[8])
+  unsigned char *seq)
 {
   return _gnutls_recv_int (session, GNUTLS_APPLICATION_DATA, -1, data,
                            data_size, seq);

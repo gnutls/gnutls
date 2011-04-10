@@ -75,6 +75,7 @@ gnutls_pkcs11_privkey_deinit (gnutls_pkcs11_privkey_t key)
 /**
  * gnutls_pkcs11_privkey_get_pk_algorithm:
  * @key: should contain a #gnutls_pkcs11_privkey_t structure
+ * @bits: if bits is non null it will hold the size of the parameters' in bits
  *
  * This function will return the public key algorithm of a private
  * key.

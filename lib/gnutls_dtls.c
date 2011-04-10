@@ -498,7 +498,7 @@ unsigned int gnutls_dtls_get_mtu (gnutls_session_t session)
  * @key: is a random key to be used at cookie generation
  * @client_data: contains data identifying the client (i.e. address)
  * @client_data_size: The size of client's data
- * @cookie: The previous cookie returned by gnutls_dtls_cookie_verify()
+ * @prestate: The previous cookie returned by gnutls_dtls_cookie_verify()
  * @ptr: A transport pointer to be used by @push_func
  * @push_func: A function that will be used to reply
  *
@@ -601,9 +601,9 @@ uint8_t digest[C_HASH_SIZE];
  * @key: is a random key to be used at cookie generation
  * @client_data: contains data identifying the client (i.e. address)
  * @client_data_size: The size of client's data
- * @msg: An incoming message that initiates a connection.
+ * @_msg: An incoming message that initiates a connection.
  * @msg_size: The size of the message.
- * @cookie: The cookie of this client.
+ * @prestate: The cookie of this client.
  *
  * This function will verify an incoming message for
  * a valid cookie. If a valid cookie is returned then
@@ -615,7 +615,7 @@ uint8_t digest[C_HASH_SIZE];
  **/
 int gnutls_dtls_cookie_verify(gnutls_datum_t* key, 
   void* client_data, size_t client_data_size, 
-  void* _msg, size_t msg_size, gnutls_dtls_prestate_st* out)
+  void* _msg, size_t msg_size, gnutls_dtls_prestate_st* prestate)
 {
 gnutls_datum_t cookie;
 int sid_size;
@@ -663,9 +663,9 @@ uint8_t digest[C_HASH_SIZE];
   if (memcmp(digest, cookie.data, COOKIE_MAC_SIZE) != 0)
     return gnutls_assert_val(GNUTLS_E_BAD_COOKIE);
   
-  out->record_seq = msg[10]; /* client's record seq */
-  out->hsk_read_seq =  msg[DTLS_RECORD_HEADER_SIZE+5]; /* client's hsk seq */
-  out->hsk_write_seq = 0;/* we always send zero for this msg */
+  prestate->record_seq = msg[10]; /* client's record seq */
+  prestate->hsk_read_seq =  msg[DTLS_RECORD_HEADER_SIZE+5]; /* client's hsk seq */
+  prestate->hsk_write_seq = 0;/* we always send zero for this msg */
   
   return 0;
 }
@@ -682,12 +682,12 @@ uint8_t digest[C_HASH_SIZE];
  * Returns: zero on success, or a negative error code.  
  *
  **/
-void gnutls_dtls_prestate_set(gnutls_session_t session, gnutls_dtls_prestate_st* st)
+void gnutls_dtls_prestate_set(gnutls_session_t session, gnutls_dtls_prestate_st* prestate)
 {
   record_parameters_st *params;
   int ret;
 
-  if (st == NULL)
+  if (prestate == NULL)
     return;
 
   /* we do not care about read_params, since we accept anything
@@ -697,8 +697,8 @@ void gnutls_dtls_prestate_set(gnutls_session_t session, gnutls_dtls_prestate_st*
   if (ret < 0)
     return;
 
-  params->write.sequence_number.i[7] = st->record_seq;
+  params->write.sequence_number.i[7] = prestate->record_seq;
 
-  session->internals.dtls.hsk_read_seq = st->hsk_read_seq;
-  session->internals.dtls.hsk_write_seq = st->hsk_write_seq + 1;
+  session->internals.dtls.hsk_read_seq = prestate->hsk_read_seq;
+  session->internals.dtls.hsk_write_seq = prestate->hsk_write_seq + 1;
 }

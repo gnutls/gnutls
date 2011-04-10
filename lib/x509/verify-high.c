@@ -319,7 +319,8 @@ gnutls_datum_t dn;
 /**
  * gnutls_x509_trust_list_verify_crt:
  * @list: The structure of the list
- * @cert: is the certificate to be verified
+ * @cert_list: is the certificate list to be verified
+ * @cert_list_size: is the certificate list size
  * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
  * @verify: will hold the certificate verification output.
  * @func: If non-null will be called on each chain element verification with the output.

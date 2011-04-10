@@ -1572,7 +1572,7 @@ gnutls_cipher_suite_get_name (gnutls_kx_algorithm_t kx_algorithm,
  * @kx: output variable indicating key exchange algorithm, or %NULL.
  * @cipher: output variable indicating cipher, or %NULL.
  * @mac: output variable indicating MAC algorithm, or %NULL.
- * @version: output variable indicating TLS protocol version, or %NULL.
+ * @min_version: output variable indicating TLS protocol version, or %NULL.
  *
  * Get information about supported cipher suites.  Use the function
  * iteratively to get information about all supported cipher suites.

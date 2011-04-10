@@ -1194,10 +1194,10 @@ gnutls_x509_crt_verify (gnutls_x509_crt_t cert,
  *   negative error value.
  **/
 int
-gnutls_x509_crl_check_issuer (gnutls_x509_crl_t cert,
+gnutls_x509_crl_check_issuer (gnutls_x509_crl_t crl,
                               gnutls_x509_crt_t issuer)
 {
-  return is_crl_issuer (cert, issuer);
+  return is_crl_issuer (crl, issuer);
 }
 
 /**

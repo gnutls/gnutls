@@ -78,7 +78,7 @@ gnutls_psk_allocate_client_credentials (gnutls_psk_client_credentials_t * sc)
  * @res: is a #gnutls_psk_client_credentials_t structure.
  * @username: is the user's zero-terminated userid
  * @key: is the user's key
- * @format: indicate the format of the key, either
+ * @flags: indicate the format of the key, either
  *   %GNUTLS_PSK_KEY_RAW or %GNUTLS_PSK_KEY_HEX.
  *
  * This function sets the username and password, in a
