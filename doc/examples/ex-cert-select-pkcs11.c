@@ -4,6 +4,8 @@
 #include <config.h>
 #endif
 
+#include <getpass.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

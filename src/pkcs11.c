@@ -19,6 +19,8 @@
  */
 #include <config.h>
 
+#include <getpass.h>
+
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include <gnutls/pkcs11.h>
