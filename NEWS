@@ -5,10 +5,13 @@ See the end for copying conditions.
 
 * Version 2.12.3 (unreleased)
 
+* libgnutls: gnutls_transport_set_global_errno() was deprecated.
+Use your system's errno fascility or gnutls_transport_set_errno().
+
 * tests: More fixes and updates for win32. Patches by LRN.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_transport_set_global_errno: DEPRECATED
 
 
 * Version 2.12.2 (released 2011-04-08)

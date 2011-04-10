@@ -350,6 +350,8 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
 
   void gnutls_transport_set_lowat (gnutls_session_t session, int num) _GNUTLS_GCC_ATTR_DEPRECATED;
 
+  void gnutls_transport_set_global_errno (int err) _GNUTLS_GCC_ATTR_DEPRECATED;
+
 #ifdef __cplusplus
 }
 #endif

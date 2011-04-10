@@ -1229,7 +1229,6 @@ extern "C"
                                             gnutls_errno_func errno_func);
 
   void gnutls_transport_set_errno (gnutls_session_t session, int err);
-  void gnutls_transport_set_global_errno (int err);
 
 /* session specific 
  */
