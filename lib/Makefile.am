@@ -23,7 +23,7 @@
 
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
-SUBDIRS = includes x509
+SUBDIRS = includes x509 accelerated
 if ENABLE_MINITASN1
 SUBDIRS += minitasn1
 endif
@@ -121,6 +121,7 @@ libgnutls_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
+	accelerated/libaccelerated.la \
 	$(LTLIBZ)  $(LTLIBINTL) $(LIBSOCKET)
 
 if ENABLE_OPENPGP

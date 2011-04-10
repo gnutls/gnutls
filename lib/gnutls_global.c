@@ -33,6 +33,7 @@
 #include <gnutls_extensions.h>  /* for _gnutls_ext_init */
 #include <gnutls_cryptodev.h>
 #include <locks.h>
+#include <accelerated/accelerated.h>
 
 #include "sockets.h"
 #include "gettext.h"
@@ -186,6 +187,8 @@ gnutls_global_init (void)
       gnutls_assert ();
       return GNUTLS_E_CRYPTO_INIT_FAILED;
     }
+
+  _gnutls_register_accel_crypto();
 
   /* initialize ASN.1 parser
    * This should not deal with files in the final

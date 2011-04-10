@@ -91,85 +91,27 @@ AC_CHECK_TYPES(uint,,, [
 # include <sys/types.h>
 ])
 
-# For Guile bindings.
-opt_guile_bindings=yes
-AC_MSG_CHECKING([whether building Guile bindings])
-AC_ARG_ENABLE(guile,
-	AS_HELP_STRING([--enable-guile], [build GNU Guile bindings]),
-opt_guile_bindings=$enableval)
-AC_MSG_RESULT($opt_guile_bindings)
+AC_ARG_ENABLE(hardware-acceleration,
+  AS_HELP_STRING([--disable-hardware-acceleration], [unconditionally disable hardware acceleration]),
+    use_accel=$enableval, use_accel=yes)
+hw_accel=none
 
-AC_ARG_WITH([--with-guile-site-dir],
-  [AS_HELP_STRING([--with-guile-site-dir],
-     [use the given directory as the Guile site (use with care)])])
+if test "$use_accel" != "no"; then
+case $host_cpu in
+  i?86 | x86_64 | amd64)
+    GCC_FLAG_ADD([-maes -mpclmul],[X86])
 
-if test "$opt_guile_bindings" = "yes"; then
-   AC_MSG_RESULT([***
-*** Detecting GNU Guile...
-])
+    if test "x$X86" = "xyes";then
+      hw_accel="x86"
+    fi
+  ;;
+  *)
+  ;;
+esac
 
-   AC_PATH_PROG([guile_snarf], [guile-snarf])
-   if test "x$guile_snarf" = "x"; then
-      AC_MSG_WARN([`guile-snarf' from Guile 1.8 not found.  Guile bindings not built.])
-      opt_guile_bindings=no
-   else
-      GUILE_PROGS
-      GUILE_FLAGS
-
-      save_CFLAGS="$CFLAGS"
-      save_LIBS="$LIBS"
-      CFLAGS="$CFLAGS $GUILE_CFLAGS"
-      LIBS="$LIBS $GUILE_LDFLAGS"
-      AC_MSG_CHECKING([whether GNU Guile is recent enough])
-      AC_LINK_IFELSE(AC_LANG_CALL([], [scm_from_locale_string]),
-        [], [opt_guile_bindings=no])
-      CFLAGS="$save_CFLAGS"
-      LIBS="$save_LIBS"
-
-      if test "$opt_guile_bindings" = "yes"; then
-        AC_MSG_RESULT([yes])
-	case "x$with_guile_site_dir" in 
-	     xno)
-		# Use the default $(GUILE_SITE).
-		GUILE_SITE_DIR
-		;;
-	     x|xyes)
-		# Automatically derive $(GUILE_SITE) from $(pkgdatadir).  This
-		# hack is used to allow `distcheck' to work (see
-		# `DISTCHECK_CONFIGURE_FLAGS' in the top-level `Makefile.am').
-		GUILE_SITE="\$(datadir)/guile/site"
-		AC_SUBST(GUILE_SITE)
-		;;
-	     *)
-		# Use the user-specified directory as $(GUILE_SITE).
-		GUILE_SITE="$with_guile_site_dir"
-		AC_SUBST(GUILE_SITE)
-		;;
-	esac
-        AC_MSG_CHECKING([whether gcc supports -fgnu89-inline])
-        _gcc_cflags_save="$CFLAGS"
-        CFLAGS="${CFLAGS} -fgnu89-inline"
-        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
-                          gnu89_inline=yes, gnu89_inline=no)
-        AC_MSG_RESULT($gnu89_inline)
-        CFLAGS="$_gcc_cflags_save"
-
-	# Optional Guile functions.
-	save_CFLAGS="$CFLAGS"
-	save_LIBS="$LIBS"
-	CFLAGS="$CFLAGS $GUILE_CFLAGS"
-	LIBS="$LIBS $GUILE_LDFLAGS"
-	AC_CHECK_FUNCS([scm_gc_malloc_pointerless])
-	CFLAGS="$save_CFLAGS"
-	LIBS="$save_LIBS"
-      else
-        AC_MSG_RESULT([no])
-        AC_MSG_WARN([A sufficiently recent GNU Guile not found.  Guile bindings not built.])
-        opt_guile_bindings=no
-      fi
-   fi
 fi
-AM_CONDITIONAL(HAVE_GUILE, test "$opt_guile_bindings" = "yes")
+
+AM_CONDITIONAL(TRY_X86_OPTIMIZATIONS, test "$X86" = "yes")
 AM_CONDITIONAL(HAVE_GCC_GNU89_INLINE_OPTION, test "$gnu89_inline" = "yes"])
 AM_CONDITIONAL(HAVE_GCC, test "$GCC" = "yes")
 
@@ -310,6 +252,87 @@ AC_SUBST([WSTACK_CFLAGS])
 AC_SUBST([WARN_CFLAGS])
 AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
 
+# For Guile bindings.
+opt_guile_bindings=yes
+AC_MSG_CHECKING([whether building Guile bindings])
+AC_ARG_ENABLE(guile,
+	AS_HELP_STRING([--enable-guile], [build GNU Guile bindings]),
+opt_guile_bindings=$enableval)
+AC_MSG_RESULT($opt_guile_bindings)
+
+AC_ARG_WITH([--with-guile-site-dir],
+  [AS_HELP_STRING([--with-guile-site-dir],
+     [use the given directory as the Guile site (use with care)])])
+
+if test "$opt_guile_bindings" = "yes"; then
+   AC_MSG_RESULT([***
+*** Detecting GNU Guile...
+])
+
+   AC_PATH_PROG([guile_snarf], [guile-snarf])
+   if test "x$guile_snarf" = "x"; then
+      AC_MSG_WARN([`guile-snarf' from Guile 1.8 not found.  Guile bindings not built.])
+      opt_guile_bindings=no
+   else
+      GUILE_PROGS
+      GUILE_FLAGS
+
+      save_CFLAGS="$CFLAGS"
+      save_LIBS="$LIBS"
+      CFLAGS="$CFLAGS $GUILE_CFLAGS"
+      LIBS="$LIBS $GUILE_LDFLAGS"
+      AC_MSG_CHECKING([whether GNU Guile is recent enough])
+      AC_LINK_IFELSE(AC_LANG_CALL([], [scm_from_locale_string]),
+        [], [opt_guile_bindings=no])
+      CFLAGS="$save_CFLAGS"
+      LIBS="$save_LIBS"
+
+      if test "$opt_guile_bindings" = "yes"; then
+        AC_MSG_RESULT([yes])
+	case "x$with_guile_site_dir" in 
+	     xno)
+		# Use the default $(GUILE_SITE).
+		GUILE_SITE_DIR
+		;;
+	     x|xyes)
+		# Automatically derive $(GUILE_SITE) from $(pkgdatadir).  This
+		# hack is used to allow `distcheck' to work (see
+		# `DISTCHECK_CONFIGURE_FLAGS' in the top-level `Makefile.am').
+		GUILE_SITE="\$(datadir)/guile/site"
+		AC_SUBST(GUILE_SITE)
+		;;
+	     *)
+		# Use the user-specified directory as $(GUILE_SITE).
+		GUILE_SITE="$with_guile_site_dir"
+		AC_SUBST(GUILE_SITE)
+		;;
+	esac
+        AC_MSG_CHECKING([whether gcc supports -fgnu89-inline])
+        _gcc_cflags_save="$CFLAGS"
+        CFLAGS="${CFLAGS} -fgnu89-inline"
+        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                          gnu89_inline=yes, gnu89_inline=no)
+        AC_MSG_RESULT($gnu89_inline)
+        CFLAGS="$_gcc_cflags_save"
+
+	# Optional Guile functions.
+	save_CFLAGS="$CFLAGS"
+	save_LIBS="$LIBS"
+	CFLAGS="$CFLAGS $GUILE_CFLAGS"
+	LIBS="$LIBS $GUILE_LDFLAGS"
+	AC_CHECK_FUNCS([scm_gc_malloc_pointerless])
+	CFLAGS="$save_CFLAGS"
+	LIBS="$save_LIBS"
+      else
+        AC_MSG_RESULT([no])
+        AC_MSG_WARN([A sufficiently recent GNU Guile not found.  Guile bindings not built.])
+        opt_guile_bindings=no
+      fi
+   fi
+fi
+AM_CONDITIONAL(HAVE_GUILE, test "$opt_guile_bindings" = "yes")
+
+
 LIBGNUTLS_EXTRA_LIBS="-L${libdir} -lgnutls-extra $LZO_LIBS $LIBGNUTLS_LIBS"
 LIBGNUTLS_EXTRA_CFLAGS="-I${includedir}"
 AC_SUBST(LIBGNUTLS_EXTRA_LIBS)
@@ -376,6 +399,7 @@ AC_CONFIG_FILES([
   lib/gcrypt/Makefile
   lib/nettle/Makefile
   tests/suite/Makefile
+  lib/accelerated/Makefile
 ])
 
 AC_OUTPUT
@@ -386,6 +410,7 @@ AC_MSG_NOTICE([summary of build options:
   Host type:        ${host}
   Install prefix:   ${prefix}
   Compiler:         ${CC}
+  CFlags:           ${CFLAGS}
   Warning flags:    errors: ${WERROR_CFLAGS} warnings: ${WARN_CFLAGS}
   Library types:    Shared=${enable_shared}, Static=${enable_static}
   Valgrind:         $opt_valgrind_tests ${VALGRIND}
@@ -393,5 +418,6 @@ AC_MSG_NOTICE([summary of build options:
   C++ library:      $use_cxx
   OpenSSL library:  $enable_openssl
   /dev/crypto:      $enable_cryptodev
+  Hardware accel:   $hw_accel
   Crypto library:   $cryptolib
 ])
