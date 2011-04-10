@@ -40,8 +40,10 @@
 
 #ifdef __MINGW32__
 #define LF "\r\n"
+#define ALTLF "\n"
 #else
 #define LF "\n"
+#define ALTLF "\r\n"
 #endif
 
 #define CRCINIT 0xB704CE
@@ -493,6 +495,7 @@ armor_decode (void *data, FILE * in, FILE * out)
   ssize_t nread = 0;
   int i, pgp_data = 0;
   cdk_error_t rc = 0;
+  int len;
 
   if (!afx)
     {
@@ -526,7 +529,7 @@ armor_decode (void *data, FILE * in, FILE * out)
       s = fgets (buf, DIM (buf) - 1, in);
       if (!s)
         return CDK_EOF;
-      if (strlen (s) == strlen (LF))
+      if (strcmp (s, LF) == 0 || strcmp (s, ALTLF) == 0)
         {
           rc = 0;
           break;                /* empty line */
@@ -560,7 +563,13 @@ armor_decode (void *data, FILE * in, FILE * out)
       s = fgets (buf, DIM (buf) - 1, in);
       if (!s)
         break;
-      buf[strlen (buf) - strlen (LF)] = '\0';
+        
+      len = strlen(buf);
+
+      if (buf[len - 1] == '\n')
+        buf[len - 1] = '\0';
+      if (buf[len - 1] == '\r')
+        buf[len - 1] = '\0';
       if (buf[0] == '=' && strlen (s) == 5)
         {                       /* CRC */
           memset (crcbuf, 0, sizeof (crcbuf));
@@ -582,7 +591,11 @@ armor_decode (void *data, FILE * in, FILE * out)
   s = fgets (buf, DIM (buf) - 1, in);
   if (s)
     {
-      buf[strlen (buf) - strlen (LF)] = '\0';
+      int len = strlen(buf);
+      if (buf[len - 1] == '\n')
+        buf[len - 1] = '\0';
+      if (buf[len - 1] == '\r')
+        buf[len - 1] = '\0';
       rc = CDK_General_Error;
       afx->idx2 = search_header (buf, armor_end);
       if (afx->idx2 >= 0)
