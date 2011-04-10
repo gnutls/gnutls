@@ -5,6 +5,7 @@ in order to avoid having people working on the same thing.
 Current list:
 + Allow setting a list of trusted plain certificates (not CAs) in the
   gnutls_x509_trust_list_t, to verify against.
+* Allow override of the system time() function.
 * Allow setting a PKCS #11 module to gnutls_x509_trust_list_t, to verify 
   against, similarly to NSS way.
 * Support replacing individual algorithms via a PKCS #11 module -
