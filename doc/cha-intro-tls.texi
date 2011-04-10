@@ -236,12 +236,6 @@ The supported compression algorithms are:
 @item DEFLATE
 Zlib compression, using the deflate algorithm.
 
-@item LZO
-LZO is a very fast compression algorithm.  This algorithm is only
-available if the @acronym{GnuTLS-extra} library has been initialized
-and the private extensions are enabled, and if GnuTLS was built with
-LZO support.
-
 @end table
 
 @node Weaknesses and countermeasures

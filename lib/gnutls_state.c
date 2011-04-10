@@ -764,9 +764,8 @@ _gnutls_record_set_default_version (gnutls_session_t session,
  * suites (the ones that start with 0xFF).  By default or if @allow
  * is 0 then these cipher suites will not be advertized nor used.
  *
- * Unless this function is called with the option to allow (1), then
- * no compression algorithms, like LZO.  That is because these
- * algorithms are not yet defined in any RFC or even internet draft.
+ * Currently GnuTLS does not include such cipher-suites or
+ * compression algorithms.
  *
  * Enabling the private ciphersuites when talking to other than
  * gnutls servers and clients may cause interoperability problems.

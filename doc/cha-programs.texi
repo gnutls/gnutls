@@ -506,7 +506,6 @@ Checking for ARCFOUR 40 cipher support... no
 Checking for MD5 MAC support... yes
 Checking for SHA1 MAC support... yes
 Checking for ZLIB compression support (TLS extension)... yes
-Checking for LZO compression support (GnuTLS extension)... yes
 Checking for max record size (TLS extension)... yes
 Checking for SRP authentication support (TLS extension)... yes
 Checking for OpenPGP authentication support (TLS extension)... no

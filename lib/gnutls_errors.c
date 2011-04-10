@@ -224,8 +224,6 @@ static const gnutls_error_entry error_algorithms[] = {
                GNUTLS_E_OPENPGP_KEYRING_ERROR, 1),
   ERROR_ENTRY (N_("The initialization of crypto backend has failed."),
                GNUTLS_E_CRYPTO_INIT_FAILED, 1),
-  ERROR_ENTRY (N_("The initialization of LZO has failed."),
-               GNUTLS_E_LZO_INIT_FAILED, 1),
   ERROR_ENTRY (N_("No supported compression algorithms have been found."),
                GNUTLS_E_NO_COMPRESSION_ALGORITHMS, 1),
   ERROR_ENTRY (N_("No supported cipher suites have been found."),

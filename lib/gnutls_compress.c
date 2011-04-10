@@ -103,9 +103,6 @@ gnutls_compression_entry _gnutls_compression_algorithms[MAX_COMP_METHODS] = {
 };
 
 static const gnutls_compression_method_t supported_compressions[] = {
-#ifdef USE_LZO
-  GNUTLS_COMP_LZO,
-#endif
 #ifdef HAVE_LIBZ
   GNUTLS_COMP_DEFLATE,
 #endif
@@ -168,9 +165,7 @@ gnutls_compression_get_id (const char *name)
 /**
  * gnutls_compression_list:
  *
- * Get a list of compression methods.  Note that to be able to use LZO
- * compression, you must link to libgnutls-extra and call
- * gnutls_global_init_extra().
+ * Get a list of compression methods.  
  *
  * Returns: a zero-terminated list of #gnutls_compression_method_t
  *   integers indicating the available compression methods.
@@ -299,26 +294,6 @@ _gnutls_supported_compression_methods (gnutls_session_t session,
 }
 
 
-#ifdef USE_LZO
-#ifdef USE_MINILZO
-/* Get the prototypes only.  Since LZO is a GPLed library, the
- * gnutls_global_init_extra() has to be called, before LZO compression
- * can be used.
- */
-#include "../libextra/minilzo/minilzo.h"
-#elif HAVE_LZO_LZO1X_H
-#include <lzo/lzo1x.h>
-#elif HAVE_LZO1X_H
-#include <lzo1x.h>
-#endif
-
-typedef int (*LZO_FUNC) ();
-
-LZO_FUNC _gnutls_lzo1x_decompress_safe = NULL;
-LZO_FUNC _gnutls_lzo1x_1_compress = NULL;
-
-#endif
-
 /* The flag d is the direction (compress, decompress). Non zero is
  * decompress.
  */
@@ -379,21 +354,6 @@ _gnutls_comp_init (gnutls_compression_method_t method, int d)
             goto cleanup_ret;
           }
       }
-      break;
-#endif
-    case GNUTLS_COMP_LZO:
-#ifdef USE_LZO
-      /* LZO does not use memory on decompressor */
-      if (!d)
-        {
-          ret->handle = gnutls_malloc (LZO1X_1_MEM_COMPRESS);
-
-          if (ret->handle == NULL)
-            {
-              gnutls_assert ();
-              goto cleanup_ret;
-            }
-        }
       break;
 #endif
     case GNUTLS_COMP_NULL:
@@ -459,39 +419,6 @@ _gnutls_compress (comp_hd_t handle, const opaque * plain,
 
   switch (handle->algo)
     {
-#ifdef USE_LZO
-    case GNUTLS_COMP_LZO:
-      {
-        lzo_uint out_len;
-        size_t size;
-        int err;
-
-        if (_gnutls_lzo1x_1_compress == NULL)
-          return GNUTLS_E_COMPRESSION_FAILED;
-
-        size = plain_size + plain_size / 64 + 16 + 3;
-        *compressed = gnutls_malloc (size);
-        if (*compressed == NULL)
-          {
-            gnutls_assert ();
-            return GNUTLS_E_MEMORY_ERROR;
-          }
-
-        err = _gnutls_lzo1x_1_compress (plain, plain_size, *compressed,
-                                        &out_len, handle->handle);
-
-        if (err != LZO_E_OK)
-          {
-            gnutls_assert ();
-            gnutls_free (*compressed);
-            *compressed = NULL;
-            return GNUTLS_E_COMPRESSION_FAILED;
-          }
-
-        compressed_size = out_len;
-        break;
-      }
-#endif
 #ifdef HAVE_LIBZ
     case GNUTLS_COMP_DEFLATE:
       {
@@ -574,51 +501,6 @@ _gnutls_decompress (comp_hd_t handle, opaque * compressed,
 
   switch (handle->algo)
     {
-#ifdef USE_LZO
-    case GNUTLS_COMP_LZO:
-      {
-        lzo_uint out_size;
-        lzo_uint new_size;
-        int err;
-
-        if (_gnutls_lzo1x_decompress_safe == NULL)
-          return GNUTLS_E_DECOMPRESSION_FAILED;
-
-        *plain = NULL;
-        out_size = compressed_size + compressed_size;
-        plain_size = 0;
-
-        do
-          {
-            out_size += 512;
-            *plain = gnutls_realloc_fast (*plain, out_size);
-            if (*plain == NULL)
-              {
-                gnutls_assert ();
-                return GNUTLS_E_MEMORY_ERROR;
-              }
-
-            new_size = out_size;
-            err =
-              _gnutls_lzo1x_decompress_safe (compressed,
-                                             compressed_size, *plain,
-                                             &new_size, NULL);
-
-          }
-        while ((err == LZO_E_OUTPUT_OVERRUN && out_size < max_record_size));
-
-        if (err != LZO_E_OK)
-          {
-            gnutls_assert ();
-            gnutls_free (*plain);
-            *plain = NULL;
-            return GNUTLS_E_DECOMPRESSION_FAILED;
-          }
-
-        plain_size = new_size;
-        break;
-      }
-#endif
 #ifdef HAVE_LIBZ
     case GNUTLS_COMP_DEFLATE:
       {

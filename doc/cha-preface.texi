@@ -122,9 +122,8 @@ distribution archive.  Typically you invoke @code{./configure} and
 then @code{make check install}.  There are a number of compile-time
 parameters, as discussed below.
 
-The compression libraries (libz and lzo) are optional dependencies.
-You can get libz from @url{http://www.zlib.net/}.  You can get lzo
-from @url{http://www.oberhumer.com/opensource/lzo/}.
+The compression library (libz) is an optional dependency.
+You can get libz from @url{http://www.zlib.net/}.  
 
 The X.509 part of GnuTLS needs ASN.1 functionality, from a library
 called libtasn1.  A copy of libtasn1 is included in GnuTLS.  If you

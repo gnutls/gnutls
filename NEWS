@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.99.1 (unreleased)
 
+** libgnutls-extra: Dropped support of LZO compression via liblzo.
+
 ** API and ABI modifications:
 No changes since last version.
 

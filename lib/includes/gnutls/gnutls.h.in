@@ -263,7 +263,6 @@ extern "C"
    * @GNUTLS_COMP_NULL: The NULL compression method (uncompressed).
    * @GNUTLS_COMP_DEFLATE: The deflate/zlib compression method.
    * @GNUTLS_COMP_ZLIB: Same as %GNUTLS_COMP_DEFLATE.
-   * @GNUTLS_COMP_LZO: The non-standard LZO compression method.
    *
    * Enumeration of different TLS compression methods.
    */
@@ -273,9 +272,6 @@ extern "C"
     GNUTLS_COMP_NULL = 1,
     GNUTLS_COMP_DEFLATE = 2,
     GNUTLS_COMP_ZLIB = GNUTLS_COMP_DEFLATE,
-    GNUTLS_COMP_LZO = 3         /* only available if gnutls-extra has
-                                   been initialized
-                                 */
   } gnutls_compression_method_t;
 
   /**
@@ -1644,7 +1640,6 @@ extern "C"
    */
 #define GNUTLS_E_NO_TEMPORARY_RSA_PARAMS -84
 
-#define GNUTLS_E_LZO_INIT_FAILED -85
 #define GNUTLS_E_NO_COMPRESSION_ALGORITHMS -86
 #define GNUTLS_E_NO_CIPHER_SUITES -87
 

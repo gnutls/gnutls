@@ -25,67 +25,10 @@
 #include <gnutls_errors.h>
 #include <gnutls_extensions.h>
 #include <gnutls_algorithms.h>
+#include <gnutls/extra.h>
 
 #ifdef HAVE_GCRYPT
 #include <gcrypt.h>
-#endif
-
-#ifdef USE_LZO
-#ifdef USE_MINILZO
-#include "minilzo/minilzo.h"
-#elif HAVE_LZO_LZO1X_H
-#include <lzo/lzo1x.h>
-#elif HAVE_LZO1X_H
-#include <lzo1x.h>
-#endif
-#endif
-#include <gnutls/extra.h>
-
-#ifdef USE_LZO
-#include <gnutls_compress.h>
-
-/* the number of the compression algorithms available in the compression
- * structure.
- */
-extern int _gnutls_comp_algorithms_size;
-
-typedef int (*LZO_FUNC) ();
-extern LZO_FUNC _gnutls_lzo1x_decompress_safe;
-extern LZO_FUNC _gnutls_lzo1x_1_compress;
-
-extern gnutls_compression_entry _gnutls_compression_algorithms[];
-
-static int
-_gnutls_add_lzo_comp (void)
-{
-  int i;
-
-  /* find the last element */
-  for (i = 0; i < _gnutls_comp_algorithms_size; i++)
-    {
-      if (_gnutls_compression_algorithms[i].name == NULL)
-        break;
-    }
-
-  if (_gnutls_compression_algorithms[i].name == NULL
-      && (i < _gnutls_comp_algorithms_size - 1))
-    {
-      _gnutls_compression_algorithms[i].name = "GNUTLS_COMP_LZO";
-      _gnutls_compression_algorithms[i].id = GNUTLS_COMP_LZO;
-      _gnutls_compression_algorithms[i].num = 0xf2;
-
-      _gnutls_compression_algorithms[i + 1].name = 0;
-
-      /* Now enable the lzo functions: */
-      _gnutls_lzo1x_decompress_safe = lzo1x_decompress_safe;
-      _gnutls_lzo1x_1_compress = lzo1x_1_compress;
-
-      return 0;                 /* ok */
-    }
-
-
-  return GNUTLS_E_MEMORY_ERROR;
-}
 #endif
 
 static int _gnutls_init_extra = 0;
@@ -122,28 +65,6 @@ gnutls_global_init_extra (void)
 
   if (_gnutls_init_extra != 1)
     return 0;
-
-  /* Initialize the LZO library
-   */
-#ifdef USE_LZO
-  if (lzo_init () != LZO_E_OK)
-    return GNUTLS_E_LZO_INIT_FAILED;
-
-  /* Add the LZO compression method in the list of compression
-   * methods.
-   */
-  {
-    int ret;
-
-    ret = _gnutls_add_lzo_comp ();
-    if (ret < 0)
-      {
-	gnutls_assert ();
-	return ret;
-      }
-  }
-#endif
-
 
 #ifdef HAVE_GCRYPT
 #ifdef gcry_fips_mode_active

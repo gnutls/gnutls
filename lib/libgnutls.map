@@ -717,8 +717,6 @@ GNUTLS_PRIVATE {
     # Internal symbols needed by libgnutls-extra for LZO:
     _gnutls_compression_algorithms;
     _gnutls_comp_algorithms_size;
-    _gnutls_lzo1x_decompress_safe;
-    _gnutls_lzo1x_1_compress;
     # Internal symbols needed by libgnutls-openssl:
     _gnutls_pkix1_asn;
     _gnutls_x509_parse_dn_oid;
