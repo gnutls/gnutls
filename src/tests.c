@@ -388,9 +388,10 @@ test_bye (gnutls_session_t session)
 {
   int ret;
   char data[20];
-  int old, secs = 6;
-
+  int secs = 6;
 #ifndef _WIN32
+  int old;
+
   signal (SIGALRM, got_alarm);
 #endif
 

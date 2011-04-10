@@ -1129,7 +1129,9 @@ static int tcp_server(const char* name, int port)
     {
       listener_item *j;
       fd_set rd, wr;
+#ifndef _WIN32
       int val;
+#endif
 
       FD_ZERO (&rd);
       FD_ZERO (&wr);

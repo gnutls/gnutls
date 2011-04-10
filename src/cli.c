@@ -663,11 +663,13 @@ handle_error (socket_st * hd, int err)
 
 int starttls_alarmed = 0;
 
+#ifndef _WIN32
 static void
 starttls_alarm (int signum)
 {
   starttls_alarmed = 1;
 }
+#endif
 
 static void
 tls_log_func (int level, const char *str)

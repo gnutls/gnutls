@@ -406,7 +406,9 @@ int main (int argc, char **argv)
   gaainfo info;
   const char *passwd;
   int salt_size, ret;
-  struct passwd *pwd;
+#ifndef _WIN32
+   struct passwd *pwd;
+#endif
 
   set_program_name (argv[0]);
 

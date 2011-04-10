@@ -70,7 +70,9 @@ main (int argc, char **argv)
 {
   gaainfo info;
   int ret;
+#ifndef _WIN32
   struct passwd *pwd;
+#endif
   unsigned char key[MAX_KEY_SIZE];
   char hex_key[MAX_KEY_SIZE * 2 + 1];
   gnutls_datum_t dkey;
