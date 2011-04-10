@@ -23,7 +23,8 @@ AM_CPPFLAGS = \
 	-I$(top_builddir)/lib/includes
 
 AM_LDFLAGS = -no-install
-LDADD = ../../lib/libgnutls.la $(LTLIBGCRYPT) $(LIBSOCKET)
+LDADD = ../libutils.la \
+	../../lib/libgnutls.la $(LTLIBGCRYPT) $(LIBSOCKET)
 
 ctests = srn0 srn1 srn2 srn3 srn4 srn5
 
