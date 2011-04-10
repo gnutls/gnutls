@@ -1,6 +1,4 @@
-eval '(exit $?0)' && eval 'exec perl -wS "$0" ${1+"$@"}'
-  & eval 'exec perl -wS "$0" $argv:q'
-    if 0;
+#!/usr/bin/perl
 
 ## Copyright (c) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Simon Josefsson
 ##                    added -texinfo, -listfunc, -pkg-name
@@ -184,7 +182,7 @@ $blankline_man = "";
 		     $type_struct, "\$1",
 		     $type_param, "\$1" );
 $blankline_text = "";
-
+my $lineprefix = "";
 
 sub usage {
     print "Usage: $0 [ -v ] [ -docbook | -html | -text | -man | -tex | -texinfo  -listfunc ]\n";
@@ -746,7 +744,7 @@ sub dump_function {
 #	    print STDERR " :> @args\n";
 	    $type = join " ", @args;
 
-	    if ($parameters{$param} eq "" && $param != "void") {
+	    if ((!defined($parameters{$param}) || $parameters{$param} eq "") && $param ne "void") {
 		$parameters{$param} = "-- undescribed --";
 		print STDERR "warning: $lineno: Function parameter '$param' not described in '$function_name'\n";
 	    }

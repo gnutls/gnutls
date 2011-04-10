@@ -7,11 +7,19 @@ sub key_of_record {
 
   # Split record into lines:
   my @lines = split /\n/, $record;
+  my $max = @lines;
+  if ($max > 5) {
+    $max = 5;
+  }
+  
+  if ($max < 2) {
+    return "";
+  }
 
   my ($i) = 1;
   my ($key) = $lines[$i];
 
-  while( !($key =~ /^\@deftypefun/) && ($i < 5)) { $i=$i+1; $key = $lines[$i]; }
+  while( !($key =~ /^\@deftypefun/) && ($i < $max)) { $i=$i+1; $key = $lines[$i]; }
 
   $key = $1 if $key =~ /^\@deftypefun {.*} {(.*)}/;
 
@@ -20,7 +28,7 @@ sub key_of_record {
   return $key;
 }
 
-$/="@end deftypefun";          # Records are separated by blank lines.
+$/="\@end deftypefun";          # Records are separated by blank lines.
 @records = <>;  # Read in whole file, one record per array element.
 
 @records = sort { key_of_record($a) cmp key_of_record($b) } @records;
