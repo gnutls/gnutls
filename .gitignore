@@ -437,3 +437,15 @@ gl/m4/fcntl-o.m4
 gl/m4/fcntl_h.m4
 gl/m4/pipe.m4
 doc/examples/ex-client-udp
+gl/tests/test-byteswap
+gl/tests/test-fcntl-h
+gl/tests/test-func
+gl/tests/test-hmac-md5
+gl/tests/test-md5
+gl/tests/test-strings
+gl/tests/test-strverscmp
+gl/tests/test-u64
+gl/tests/test-vasprintf
+gl/tests/test-vsnprintf
+lib/accelerated/libaccelerated.la
+gl/time.h
