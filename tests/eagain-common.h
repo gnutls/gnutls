@@ -1,7 +1,7 @@
 #define min(x,y) ((x)<(y)?(x):(y))
 //#define EAGAIN_DEBUG
 
-#define HANDSHAKE(c, s) \
+#define HANDSHAKE_EXPECT(c, s, clierr, serverr) \
   sret = cret = GNUTLS_E_AGAIN; \
   do \
     { \
@@ -14,14 +14,17 @@
           sret = gnutls_handshake (s); \
         } \
     } \
-  while (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN); \
-  if (cret < 0 || sret < 0) \
+  while ((cret == GNUTLS_E_AGAIN || (cret == 0 && sret == GNUTLS_E_AGAIN)) && (sret == GNUTLS_E_AGAIN || (sret == 0 && cret == GNUTLS_E_AGAIN))); \
+  if (cret != clierr || sret != serverr) \
     { \
       fprintf(stderr, "client: %s\n", gnutls_strerror(cret)); \
       fprintf(stderr, "server: %s\n", gnutls_strerror(sret)); \
       fail("Handshake failed\n"); \
       exit(1); \
     }
+
+#define HANDSHAKE(c, s) \
+  HANDSHAKE_EXPECT(c,s,0,0)
 
 #define TRANSFER(c, s, msg, msglen, buf, buflen) \
   do \
@@ -131,7 +134,7 @@ client_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
 #ifdef EAGAIN_DEBUG
       fprintf(stderr, "eagain: Not enough data by server (asked for: %d, have: %d)\n", (int)len, (int)to_client_len);
 #endif
-      gnutls_transport_set_global_errno (EAGAIN);
+      gnutls_transport_set_errno ((gnutls_session_t)tr, EAGAIN);
       return -1;
     }
 
@@ -158,7 +161,7 @@ server_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
 #ifdef EAGAIN_DEBUG
       fprintf(stderr, "eagain: Not enough data by client (asked for: %d, have: %d)\n", (int)len, (int)to_server_len);
 #endif
-      gnutls_transport_set_global_errno (EAGAIN);
+      gnutls_transport_set_errno ((gnutls_session_t)tr, EAGAIN);
       return -1;
     }
 

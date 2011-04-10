@@ -34,85 +34,13 @@
 #include <string.h>
 #include <errno.h>
 #include <gnutls/gnutls.h>
+#include "../eagain-common.h"
+#include "../utils.h"
 
 static void
 tls_log_func (int level, const char *str)
 {
   fprintf (stderr, "|<%d>| %s", level, str);
-}
-
-static char *to_server;
-static size_t to_server_len;
-
-static char *to_client;
-static size_t to_client_len;
-
-static ssize_t
-client_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
-{
-  if (to_client_len < len)
-    {
-      gnutls_transport_set_global_errno (EAGAIN);
-      return -1;
-    }
-
-  memcpy (data, to_client, len);
-
-  memmove (to_client, to_client + len, to_client_len - len);
-  to_client_len -= len;
-
-  return len;
-}
-
-static ssize_t
-client_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
-{
-  size_t newlen = to_server_len + len;
-  char *tmp;
-
-  tmp = realloc (to_server, newlen);
-  if (!tmp)
-    abort ();
-  to_server = tmp;
-
-  memcpy (to_server + to_server_len, data, len);
-  to_server_len = newlen;
-
-  return len;
-}
-
-static ssize_t
-server_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
-{
-  if (to_server_len < len)
-    {
-      gnutls_transport_set_global_errno (EAGAIN);
-      return -1;
-    }
-
-  memcpy (data, to_server, len);
-
-  memmove (to_server, to_server + len, to_server_len - len);
-  to_server_len -= len;
-
-  return len;
-}
-
-static ssize_t
-server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
-{
-  size_t newlen = to_client_len + len;
-  char *tmp;
-
-  tmp = realloc (to_client, newlen);
-  if (!tmp)
-    abort ();
-  to_client = tmp;
-
-  memcpy (to_client + to_client_len, data, len);
-  to_client_len = newlen;
-
-  return len;
 }
 
 static unsigned char server_cert_pem[] =
@@ -156,11 +84,8 @@ const gnutls_datum_t server_key = { server_key_pem,
   sizeof (server_key_pem)
 };
 
-int
-main (int argc, char *argv[])
+void doit(void)
 {
-  int debug_level = argc - 1;
-  int exit_code = EXIT_SUCCESS;
   /* Server stuff. */
   gnutls_certificate_credentials_t serverx509cred;
   gnutls_session_t server;
@@ -173,7 +98,7 @@ main (int argc, char *argv[])
   /* General init. */
   gnutls_global_init ();
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (debug_level);
+  if (debug) gnutls_global_set_log_level (2);
 
   /* Init server */
   gnutls_certificate_allocate_credentials (&serverx509cred);
@@ -185,6 +110,7 @@ main (int argc, char *argv[])
   gnutls_priority_set_direct (server, "NORMAL", NULL);
   gnutls_transport_set_push_function (server, server_push);
   gnutls_transport_set_pull_function (server, server_pull);
+  gnutls_transport_set_ptr (server, (gnutls_transport_ptr_t)server);
 
   /* Init client */
   gnutls_certificate_allocate_credentials (&clientx509cred);
@@ -193,6 +119,7 @@ main (int argc, char *argv[])
   gnutls_priority_set_direct (client, "NORMAL", NULL);
   gnutls_transport_set_push_function (client, client_push);
   gnutls_transport_set_pull_function (client, client_pull);
+  gnutls_transport_set_ptr (client, (gnutls_transport_ptr_t)client);
 
   /* Check that initially no session use the extension. */
   if (gnutls_safe_renegotiation_status (server)
@@ -202,42 +129,7 @@ main (int argc, char *argv[])
       abort ();
     }
 
-  do
-    {
-      static int max_iter = 0;
-      if (max_iter++ > 10)
-        abort ();
-
-      if (cret == GNUTLS_E_AGAIN)
-        {
-          cret = gnutls_handshake (client);
-          if (debug_level > 0)
-            {
-              tls_log_func (0, "gnutls_handshake (client)...\n");
-              tls_log_func (0, gnutls_strerror (cret));
-              tls_log_func (0, "\n");
-            }
-        }
-
-      if (sret == GNUTLS_E_AGAIN)
-        {
-          sret = gnutls_handshake (server);
-          if (debug_level > 0)
-            {
-              tls_log_func (0, "gnutls_handshake (server)...\n");
-              tls_log_func (0, gnutls_strerror (sret));
-              tls_log_func (0, "\n");
-            }
-        }
-    }
-  while (
-          /* Not done: */
-          !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
-          /* No error: */
-          && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
-
-  if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_SUCCESS)
-    exit_code = EXIT_FAILURE;
+  HANDSHAKE(client, server);
 
   /* Check that both sessions use the extension. */
   if (!gnutls_safe_renegotiation_status (server)
@@ -248,7 +140,7 @@ main (int argc, char *argv[])
     }
 
   sret = gnutls_rehandshake (server);
-  if (debug_level > 0)
+  if (debug)
     {
       tls_log_func (0, "gnutls_rehandshake (server)...\n");
       tls_log_func (0, gnutls_strerror (sret));
@@ -263,45 +155,7 @@ main (int argc, char *argv[])
       abort ();
   }
 
-  cret = GNUTLS_E_AGAIN;
-  sret = GNUTLS_E_AGAIN;
-
-  do
-    {
-      static int max_iter = 0;
-      if (max_iter++ > 10)
-        abort ();
-
-      if (cret == GNUTLS_E_AGAIN)
-        {
-          cret = gnutls_handshake (client);
-          if (debug_level > 0)
-            {
-              tls_log_func (0, "second gnutls_handshake (client)...\n");
-              tls_log_func (0, gnutls_strerror (cret));
-              tls_log_func (0, "\n");
-            }
-        }
-
-      if (sret == GNUTLS_E_AGAIN)
-        {
-          sret = gnutls_handshake (server);
-          if (debug_level > 0)
-            {
-              tls_log_func (0, "second gnutls_handshake (server)...\n");
-              tls_log_func (0, gnutls_strerror (sret));
-              tls_log_func (0, "\n");
-            }
-        }
-    }
-  while (
-          /* Not done: */
-          !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
-          /* No error: */
-          && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
-
-  if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_SUCCESS)
-    exit_code = 1;
+  HANDSHAKE(client, server);
 
   /* Check that session still use the extension. */
   if (!gnutls_safe_renegotiation_status (server)
@@ -316,7 +170,7 @@ main (int argc, char *argv[])
      gnutls_safe_negotiation_set_initial (server, 0); */
 
   sret = gnutls_rehandshake (server);
-  if (debug_level > 0)
+  if (debug)
     {
       tls_log_func (0, "gnutls_rehandshake (server)...\n");
       tls_log_func (0, gnutls_strerror (sret));
@@ -331,51 +185,13 @@ main (int argc, char *argv[])
       abort ();
   }
 
-  cret = GNUTLS_E_AGAIN;
-  sret = GNUTLS_E_AGAIN;
-
-  do
-    {
-      static int max_iter = 0;
-      if (max_iter++ > 10)
-        abort ();
-
-      if (cret == GNUTLS_E_AGAIN)
-        {
-          cret = gnutls_handshake (client);
-          if (debug_level > 0)
-            {
-              tls_log_func (0, "second gnutls_handshake (client)...\n");
-              tls_log_func (0, gnutls_strerror (cret));
-              tls_log_func (0, "\n");
-            }
-        }
-
-      if (sret == GNUTLS_E_AGAIN)
-        {
-          sret = gnutls_handshake (server);
-          if (debug_level > 0)
-            {
-              tls_log_func (0, "second gnutls_handshake (server)...\n");
-              tls_log_func (0, gnutls_strerror (sret));
-              tls_log_func (0, "\n");
-            }
-        }
-    }
-  while (
-          /* Not done: */
-          !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
-          /* No error: */
-          && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
-
-  if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_SUCCESS)
-    exit_code = 1;
+  HANDSHAKE(client, server);
 
   /* Check that disabling the extension will break rehandshakes.
      gnutls_safe_renegotiation_set (client, 0); */
 
   sret = gnutls_rehandshake (server);
-  if (debug_level > 0)
+  if (debug)
     {
       tls_log_func (0, "gnutls_rehandshake (server)...\n");
       tls_log_func (0, gnutls_strerror (sret));
@@ -390,45 +206,7 @@ main (int argc, char *argv[])
       abort ();
   }
 
-  cret = GNUTLS_E_AGAIN;
-  sret = GNUTLS_E_AGAIN;
-
-  do
-    {
-      static int max_iter = 0;
-      if (max_iter++ > 10)
-        abort ();
-
-      if (cret == GNUTLS_E_AGAIN)
-        {
-          cret = gnutls_handshake (client);
-          if (debug_level > 0)
-            {
-              tls_log_func (0, "second gnutls_handshake (client)...\n");
-              tls_log_func (0, gnutls_strerror (cret));
-              tls_log_func (0, "\n");
-            }
-        }
-
-      if (sret == GNUTLS_E_AGAIN)
-        {
-          sret = gnutls_handshake (server);
-          if (debug_level > 0)
-            {
-              tls_log_func (0, "second gnutls_handshake (server)...\n");
-              tls_log_func (0, gnutls_strerror (sret));
-              tls_log_func (0, "\n");
-            }
-        }
-    }
-  while (
-          /* Not done: */
-          !(cret == GNUTLS_E_SUCCESS && sret == GNUTLS_E_SUCCESS)
-          /* No error: */
-          && (cret == GNUTLS_E_AGAIN || sret == GNUTLS_E_AGAIN));
-
-  if (cret != GNUTLS_E_SUCCESS && sret != GNUTLS_E_SUCCESS)
-    exit_code = 1;
+  HANDSHAKE(client, server);
 
   gnutls_bye (client, GNUTLS_SHUT_RDWR);
   gnutls_bye (server, GNUTLS_SHUT_RDWR);
@@ -436,20 +214,15 @@ main (int argc, char *argv[])
   gnutls_deinit (client);
   gnutls_deinit (server);
 
-  free (to_server);
-  free (to_client);
-
   gnutls_certificate_free_credentials (serverx509cred);
+  gnutls_certificate_free_credentials (clientx509cred);
 
   gnutls_global_deinit ();
 
-  if (debug_level > 0)
+  if (debug)
     {
-      if (exit_code == 0)
-        puts ("Self-test successful");
-      else
-        puts ("Self-test failed");
+      puts ("Self-test successful");
     }
 
-  return exit_code;
+  return;
 }
