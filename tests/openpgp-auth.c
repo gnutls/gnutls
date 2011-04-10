@@ -33,11 +33,13 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#if !defined(_WIN32)
 #include <sys/wait.h>
+#endif
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
-
+#if !defined(_WIN32)
 static const char message[] = "Hello, brave GNU world!";
 
 /* The OpenPGP key pair for use and the key ID in those keys.  */
@@ -265,3 +267,10 @@ doit ()
 
     }
 }
+#else
+void
+doit ()
+{
+  exit (77);
+}
+#endif
