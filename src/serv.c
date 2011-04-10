@@ -1056,7 +1056,9 @@ main (int argc, char **argv)
     {
       listener_item *j;
       fd_set rd, wr;
+#ifndef _WIN32
       int val;
+#endif
 
       FD_ZERO (&rd);
       FD_ZERO (&wr);
