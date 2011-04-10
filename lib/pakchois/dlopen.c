@@ -45,7 +45,7 @@ dlsym (void *handle, const char *symbol)
 int
 dlclose (void *handle)
 {
-  FreeLibrary ((HINSTANCE) handle);
+  return !FreeLibrary ((HINSTANCE) handle);
 }
 
 #endif
