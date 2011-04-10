@@ -5,7 +5,6 @@
 
 @menu
 * Preparation::
-* Multi-threaded applications::
 * Client examples::
 * Server examples::
 * Miscellaneous examples::
@@ -123,46 +122,6 @@ specifying both options to @command{pkg-config}:
 gcc -o foo foo.c `pkg-config gnutls --cflags --libs`
 @end example
 
-@node Multi-threaded applications
-@section Multi-Threaded Applications
-
-Although the @acronym{GnuTLS} library is thread safe by design, some
-parts of the cryptographic backend, such as the random generator, are not.
-Applications can either call @ref{gnutls_global_init} and use the default 
-operating system provided locks (i.e. @code{pthreads} on GNU/Linux), or
-specify manualy the locking system using the function @ref{gnutls_global_set_mutex}
-before calling @ref{gnutls_global_init}. Setting manually mutexes is recommended
-only to applications that have full control of the underlying libraries. If this
-is not the case, the use of the operating system defaults is recommended.
-
-
-There are helper macros to help you properly initialize the libraries.
-Examples are shown below.
-
-@itemize
-
-@item POSIX threads in GNU/Linux
-@example
-#include <gnutls.h>
-#include <errno.h>
-#include <pthread.h>
-
-int main()
-@{
-   gnutls_global_init();
-@}
-@end example
-
-@item Other thread packages
-@example
-
-int main()
-@{
-   gnutls_global_mutex_set (mutex_init, mutex_deinit, mutex_lock, mutex_unlock);
-   gnutls_global_init();
-@}
-@end example
-@end itemize
 
 @node Client examples
 @section Client Examples

@@ -62,6 +62,7 @@ small library, with the required features, can be generated.
 * General Idea::
 * Error handling::
 * Memory handling::
+* Thread safety::
 * Callback functions::
 @end menu
 
@@ -152,6 +153,46 @@ such secure memory allocation functions available. These should be
 used in cases where even the system's swap memory is not considered
 secure. See the documentation of @acronym{Libgcrypt} for more
 information.
+
+@node Thread safety
+@section Thread safety
+
+Although the @acronym{GnuTLS} library is thread safe by design, some
+parts of the cryptographic backend, such as the random generator, are not.
+Applications can either call @ref{gnutls_global_init} which will use the default
+operating system provided locks (i.e. @code{pthreads} on GNU/Linux and
+@code{CriticalSection} on Windows), or specify manualy the locking system using 
+the function @ref{gnutls_global_set_mutex} before calling @ref{gnutls_global_init}. 
+Setting manually mutexes is recommended
+only to applications that have full control of the underlying libraries. If this
+is not the case, the use of the operating system defaults is suggested.
+
+
+There are helper macros to help you properly initialize the libraries.
+Examples are shown below.
+
+@itemize
+
+@item Native threads
+@example
+#include <gnutls.h>
+
+int main()
+@{
+   gnutls_global_init();
+@}
+@end example
+
+@item Other thread packages
+@example
+
+int main()
+@{
+   gnutls_global_mutex_set (mutex_init, mutex_deinit, mutex_lock, mutex_unlock);
+   gnutls_global_init();
+@}
+@end example
+@end itemize
 
 @node Callback functions
 @section Callback Functions
