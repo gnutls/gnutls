@@ -21,10 +21,6 @@
 #endif
 @PRAGMA_COLUMNS@
 
-#ifdef __cplusplus
-# define restrict
-#endif
-
 /* Don't get in the way of glibc when it includes time.h merely to
    declare a few standard symbols, rather than to declare all the
    symbols.  Also, Solaris 8 <time.h> eventually includes itself

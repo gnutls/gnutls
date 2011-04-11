@@ -1,3 +1,4 @@
+#include <config.h>
 #include <iostream>
 #include <stdexcept>
 #include <gnutls/gnutls.h>
