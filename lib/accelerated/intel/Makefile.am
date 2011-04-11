@@ -22,25 +22,39 @@
 # MA 02110-1301, USA
 
 AM_CFLAGS = $(WERROR_CFLAGS) $(WSTACK_CFLAGS) $(WARN_CFLAGS)
-SUBDIRS = 
 AM_CPPFLAGS = \
-	-I$(srcdir)/../../gl		\
-	-I$(srcdir)/../includes		\
-	-I$(builddir)/../includes	\
-	-I$(srcdir)/..
+	-I$(srcdir)/../../../gl		\
+	-I$(srcdir)/../../includes	\
+	-I$(srcdir)/../../ \
+	-I$(srcdir)/../
 
 if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../minitasn1
 endif
 
-noinst_LTLIBRARIES = libaccelerated.la
+noinst_LTLIBRARIES = libintel.la
 
-EXTRA_DIST = x86.h aes-x86.h accelerated.h
-libaccelerated_la_SOURCES = accelerated.c
-libaccelerated_la_LIBADD =
+EXTRA_DIST = aes-x86.h
+libintel_la_SOURCES = aes-x86.c
+libintel_la_LIBADD =
 
-if TRY_X86_OPTIMIZATIONS
-SUBDIRS += intel
-AM_CFLAGS += -DTRY_X86_OPTIMIZATIONS
-libaccelerated_la_LIBADD += intel/libintel.la
+YASM_OPTS = -D__linux__
+
+x64_do_rdtsc.o: asm/x64_do_rdtsc.s
+	$(YASM) $(YASM_OPTS) -f elf64 $^ -o $@
+
+x64_iaesx64.o: asm/x64_iaesx64.s
+	$(YASM) $(YASM_OPTS) -f elf64 $^ -o $@
+
+x86_do_rdtsc.o: asm/x86_do_rdtsc.s
+	$(YASM) $(YASM_OPTS) -f elf32 $^ -o $@
+
+x86_iaesx86.o: asm/x86_iaesx86.s
+	$(YASM) $(YASM_OPTS) -f elf32 $^ -o $@
+
+if ASM_X86_64
+libintel_la_LIBADD += x64_do_rdtsc.o x64_iaesx64.o
+else
+libintel_la_LIBADD += x86_do_rdtsc.o x86_iaesx86.o
 endif
+

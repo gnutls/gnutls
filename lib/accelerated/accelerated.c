@@ -1,6 +1,6 @@
 #include <accelerated.h>
 #ifdef TRY_X86_OPTIMIZATIONS
-# include <aes-x86.h>
+# include <intel/aes-x86.h>
 #endif
 
 void _gnutls_register_accel_crypto(void)

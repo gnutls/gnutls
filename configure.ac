@@ -90,6 +90,7 @@ AC_CHECK_TYPES(uint,,, [
 # include <sys/types.h>
 ])
 
+
 AC_ARG_ENABLE(hardware-acceleration,
   AS_HELP_STRING([--disable-hardware-acceleration], [unconditionally disable hardware acceleration]),
     use_accel=$enableval, use_accel=yes)
@@ -99,9 +100,18 @@ if test "$use_accel" != "no"; then
 case $host_cpu in
   i?86 | x86_64 | amd64)
     GCC_FLAG_ADD([-maes -mpclmul],[X86])
+    AC_CHECK_PROGS(YASM, yasm)
 
-    if test "x$X86" = "xyes";then
-      hw_accel="x86"
+    if test "x$YASM" != "x";then
+      if test "x$X86" = "xyes";then
+        if test "$host_cpu" = "x86_64" -o "$host_cpu" = "amd64";then
+          hw_accel="x86-64"
+        else
+          hw_accel="x86"
+        fi
+      fi
+    else
+      AC_MSG_WARN([[yasm assembler not found. Disabling AES-NI compilation.]])
     fi
   ;;
   *)
@@ -110,7 +120,8 @@ esac
 
 fi
 
-AM_CONDITIONAL(TRY_X86_OPTIMIZATIONS, test "$X86" = "yes")
+AM_CONDITIONAL(TRY_X86_OPTIMIZATIONS, test x"$hw_accel" = x"x86" -o x"$hw_accel" = x"x86-64")
+AM_CONDITIONAL(ASM_X86_64, test x"$hw_accel" = x"x86-64")
 AM_CONDITIONAL(HAVE_GCC_GNU89_INLINE_OPTION, test "$gnu89_inline" = "yes"])
 AM_CONDITIONAL(HAVE_GCC, test "$GCC" = "yes")
 
@@ -399,6 +410,7 @@ AC_CONFIG_FILES([
   lib/nettle/Makefile
   tests/suite/Makefile
   lib/accelerated/Makefile
+  lib/accelerated/intel/Makefile
 ])
 
 AC_OUTPUT

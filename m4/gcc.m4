@@ -15,7 +15,7 @@ AC_DEFUN([GCC_FLAG_ADD],
 AC_CACHE_CHECK([whether compiler handles $1], [GCC_FLAG], [
   save_CFLAGS="$CFLAGS"
   CFLAGS="${CFLAGS} $1"
-  AC_PREPROC_IFELSE([AC_LANG_PROGRAM([])],
+  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
                     [AS_VAR_SET([GCC_FLAG], [yes])],
                     [AS_VAR_SET([GCC_FLAG], [no])])
   CFLAGS="$save_CFLAGS"
