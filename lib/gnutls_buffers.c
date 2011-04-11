@@ -779,7 +779,7 @@ parse_handshake_header (gnutls_session_t session, mbuffer_st* bufel, gnutls_hand
         {
           hsk->sequence = 0;
           hsk->start_offset = 0;
-          hsk->end_offset = _mbuffer_get_udata_size(bufel) - handshake_header_size;
+          hsk->end_offset = hsk->length;
         }
     }
 
@@ -1024,9 +1024,8 @@ parse_record_buffered_msgs (gnutls_session_t session,
               ret = _gnutls_buffer_append_data(&recv_buf[0].data, _mbuffer_get_udata_ptr(bufel), data_size);
               if (ret < 0)
                 return gnutls_assert_val(ret);
-
+              _mbuffer_set_uhead_size(bufel, 0);
               _mbuffer_head_remove_bytes(&session->internals.record_buffer, data_size+header_size);
-
 
               if (cmp_hsk_types(htype, recv_buf[0].htype) == 0)
                 { /* an unexpected packet */
@@ -1147,8 +1146,16 @@ _gnutls_handshake_io_recv_int (gnutls_session_t session,
    * trying to receive.
    */
   ret = parse_record_buffered_msgs(session, htype, hsk);
-  if (ret >= 0)
-    return ret;
+  if (IS_DTLS(session))
+    {
+      if (ret >= 0)
+        return ret;
+    }
+  else
+    {
+      if ((ret != GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE && ret < 0) || ret >= 0)
+        return gnutls_assert_val(ret);
+    }
 
   /* if we don't have a complete message waiting for us, try 
    * receiving more */
