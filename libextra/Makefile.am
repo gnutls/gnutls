@@ -97,8 +97,7 @@ endif
 DISTCLEANFILES += $(defexec_DATA)
 
 libgnutls_extra_la_LDFLAGS += \
-	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
-	$(LZO_LIBS)
+	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 libgnutls_extra_la_LIBADD += ../gl/libgnu.la \
 	../lib/libgnutls.la

@@ -331,7 +331,7 @@
 
 (define %compression-method-enum
   (make-enum-type 'compression-method "gnutls_compression_method_t"
-                  '(null deflate lzo)
+                  '(null deflate)
                   "gnutls_compression_get_name"
                   "GNUTLS_COMP_"))
 
@@ -516,7 +516,6 @@ unknown-pk-algorithm
 init-libextra
 library-version-mismatch
 no-temporary-rsa-params
-lzo-init-failed
 no-compression-algorithms
 no-cipher-suites
 openpgp-getkey-failed
