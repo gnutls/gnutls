@@ -35,7 +35,7 @@ endif
 
 noinst_LTLIBRARIES = libaccelerated.la
 
-EXTRA_DIST = x86.h aes-x86.h accelerated.h
+EXTRA_DIST = x86.h accelerated.h
 libaccelerated_la_SOURCES = accelerated.c
 libaccelerated_la_LIBADD =
 
