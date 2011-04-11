@@ -54,7 +54,6 @@ fi
 AC_C_INLINE
 
 # For the C++ code
-AC_PROG_CXX
 AC_ARG_ENABLE(cxx,
   AS_HELP_STRING([--disable-cxx], [unconditionally disable the C++ library]),
     use_cxx=$enableval, use_cxx=yes)
