@@ -114,6 +114,23 @@ gnutls_cipher_add_auth (gnutls_cipher_hd_t handle, const void *text, size_t text
 }
 
 /**
+ * gnutls_cipher_set_iv:
+ * @handle: is a #gnutls_cipher_hd_t structure.
+ * @iv: the IV to set
+ * @ivlen: The length of the IV
+ *
+ * This function will set the IV to be used for the next
+ * encryption block.
+ *
+ * Since: 2.99.0
+ **/
+void
+gnutls_cipher_set_iv (gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
+{
+  _gnutls_cipher_setiv((cipher_hd_st *)handle, iv, ivlen);
+}
+
+/**
  * gnutls_cipher_encrypt:
  * @handle: is a #gnutls_cipher_hd_t structure.
  * @text: the data to encrypt
