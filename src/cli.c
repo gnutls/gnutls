@@ -677,19 +677,58 @@ tls_log_func (int level, const char *str)
   fprintf (stderr, "|<%d>| %s", level, str);
 }
 
+#define IN_KEYBOARD 1
+#define IN_NET 2
+#define IN_NONE 0
+/* returns IN_KEYBOARD for keyboard input and IN_NET for network input
+ */
+static int check_net_or_keyboard_input(socket_st* hd)
+{
+  int maxfd;
+  fd_set rset;
+  int err;
+  struct timeval tv;
+
+  do
+    {
+      FD_ZERO (&rset);
+      FD_SET (fileno (stdin), &rset);
+      FD_SET (hd->fd, &rset);
+
+      maxfd = MAX (fileno (stdin), hd->fd);
+      tv.tv_sec = 0;
+      tv.tv_usec = 500 * 1000;
+
+      if (hd->secure == 1)
+        if (gnutls_record_check_pending(hd->session))
+          return IN_NET;
+
+      err = select (maxfd + 1, &rset, NULL, NULL, &tv);
+      if (err < 0)
+        continue;
+
+      if (FD_ISSET (hd->fd, &rset))
+        return IN_NET;
+
+
+      if (FD_ISSET (fileno (stdin), &rset))
+        return IN_KEYBOARD;
+    }
+  while(err == 0);
+  
+  return IN_NONE;
+}
+
 int
 main (int argc, char **argv)
 {
-  int err, ret;
-  int ii, i;
+  int ret;
+  int ii, i, inp;
   char buffer[MAX_BUF + 1];
   char *session_data = NULL;
   char *session_id = NULL;
   size_t session_data_size;
   size_t session_id_size = 0;
-  fd_set rset;
-  int maxfd;
-  struct timeval tv;
   int user_term = 0, retval = 0;
   socket_st hd;
   ssize_t bytes;
@@ -848,19 +887,9 @@ after_handshake:
             }
         }
 
-      FD_ZERO (&rset);
-      FD_SET (fileno (stdin), &rset);
-      FD_SET (hd.fd, &rset);
+      inp = check_net_or_keyboard_input(&hd);
 
-      maxfd = MAX (fileno (stdin), hd.fd);
-      tv.tv_sec = 3;
-      tv.tv_usec = 0;
-
-      err = select (maxfd + 1, &rset, NULL, NULL, &tv);
-      if (err < 0)
-        continue;
-
-      if (FD_ISSET (hd.fd, &rset))
+      if (inp == IN_NET)
         {
           memset (buffer, 0, MAX_BUF + 1);
           ret = socket_recv (&hd, buffer, MAX_BUF);
@@ -892,7 +921,7 @@ after_handshake:
             break;
         }
 
-      if (FD_ISSET (fileno (stdin), &rset))
+      if (inp == IN_KEYBOARD)
         {
           if ((bytes = read (fileno (stdin), buffer, MAX_BUF - 1)) <= 0)
             {
