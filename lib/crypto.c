@@ -156,7 +156,7 @@ _gnutls_crypto_deregister (void)
  * This function will register a cipher algorithm to be used by
  * gnutls.  Any algorithm registered will override the included
  * algorithms and by convention kernel implemented algorithms have
- * priority of 90.  The algorithm with the lowest priority will be
+ * priority of 90 and CPU-assisted of 80.  The algorithm with the lowest priority will be
  * used by gnutls.
  *
  * This function should be called before gnutls_global_init().
@@ -197,7 +197,7 @@ _gnutls_get_crypto_cipher (gnutls_cipher_algorithm_t algo)
  * This function will register a random generator to be used by
  * gnutls.  Any generator registered will override the included
  * generator and by convention kernel implemented generators have
- * priority of 90.  The generator with the lowest priority will be
+ * priority of 90 and CPU-assisted of 80. The generator with the lowest priority will be
  * used by gnutls.
  *
  * This function should be called before gnutls_global_init().
@@ -238,7 +238,8 @@ gnutls_crypto_rnd_register2 (int priority, int version,
  *
  * This function will register a MAC algorithm to be used by gnutls.
  * Any algorithm registered will override the included algorithms and
- * by convention kernel implemented algorithms have priority of 90.
+ * by convention kernel implemented algorithms have priority of 90
+ *  and CPU-assisted of 80.
  * The algorithm with the lowest priority will be used by gnutls.
  *
  * This function should be called before gnutls_global_init().
@@ -280,7 +281,7 @@ _gnutls_get_crypto_mac (gnutls_mac_algorithm_t algo)
  * This function will register a digest (hash) algorithm to be used by
  * gnutls.  Any algorithm registered will override the included
  * algorithms and by convention kernel implemented algorithms have
- * priority of 90.  The algorithm with the lowest priority will be
+ * priority of 90  and CPU-assisted of 80.  The algorithm with the lowest priority will be
  * used by gnutls.
  *
  * This function should be called before gnutls_global_init().
@@ -409,7 +410,7 @@ gnutls_crypto_pk_register2 (int priority, int version,
  * This function will register a cipher interface to be used by
  * gnutls. Any interface registered will override the included engine
  * and by convention kernel implemented interfaces should have
- * priority of 90. The interface with the lowest priority will be used
+ * priority of 90  and CPU-assisted of 80. The interface with the lowest priority will be used
  * by gnutls.
  *
  * This function should be called before gnutls_global_init().
@@ -450,7 +451,7 @@ gnutls_crypto_cipher_register2 (int priority, int version,
  * This function will register a mac interface to be used by
  * gnutls. Any interface registered will override the included engine
  * and by convention kernel implemented interfaces should have
- * priority of 90. The interface with the lowest priority will be used
+ * priority of 90  and CPU-assisted of 80. The interface with the lowest priority will be used
  * by gnutls.
  *
  * This function should be called before gnutls_global_init().
@@ -491,7 +492,7 @@ gnutls_crypto_mac_register2 (int priority, int version,
  * This function will register a digest interface to be used by
  * gnutls. Any interface registered will override the included engine
  * and by convention kernel implemented interfaces should have
- * priority of 90. The interface with the lowest priority will be used
+ * priority of 90  and CPU-assisted of 80. The interface with the lowest priority will be used
  * by gnutls.
  *
  * This function should be called before gnutls_global_init().

@@ -43,7 +43,7 @@ extern "C"
   int gnutls_cipher_decrypt2 (gnutls_cipher_hd_t handle,
                               const void *ciphertext, size_t ciphertextlen,
                               void *text, size_t textlen);
-  int gnutls_cipher_encrypt2 (gnutls_cipher_hd_t handle, void *text,
+  int gnutls_cipher_encrypt2 (gnutls_cipher_hd_t handle, const void *text,
                               size_t textlen, void *ciphertext,
                               size_t ciphertextlen);
 
