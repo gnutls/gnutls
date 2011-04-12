@@ -17,6 +17,8 @@ Reported by Herbert J. Skuhra.
 ** API and ABI modifications:
 gnutls_transport_set_global_errno: DEPRECATED
 
+** Several files unnecessarily included <gcrypt.h>; this has been fixed.
+
 
 * Version 2.12.2 (released 2011-04-08)
 

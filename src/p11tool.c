@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Free Software Foundation, Inc.
+ * Copyright (C) 2010, 2011 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -29,8 +29,6 @@
 #include <gnutls/pkcs12.h>
 #include <gnutls/pkcs11.h>
 #include <gnutls/abstract.h>
-
-#include <gcrypt.h>
 
 #include <stdio.h>
 #include <stdlib.h>
