@@ -64,7 +64,7 @@ ctests = simple gc set_pkcs12_cred certder certuniqueid mpi			\
 	crq_key_id x509sign-verify cve-2009-1415 cve-2009-1416		\
 	crq_apis init_roundtrip pkcs12_s2k_pem dn2 mini-eagain		\
 	nul-in-x509-names x509_altname pkcs12_encode mini-x509		\
-	mini-x509-rehandshake rng-fork mini-eagain-dtls #gendh
+	mini-x509-rehandshake rng-fork mini-eagain-dtls cipher-test #gendh
 
 if ENABLE_OPENSSL
 ctests +=  openssl
@@ -100,5 +100,3 @@ TESTS_ENVIRONMENT =						\
 	srcdir="$(srcdir)"					\
 	$(VALGRIND)
 
-check-local:
-	if test -d suite; then $(MAKE) -C suite check; fi
