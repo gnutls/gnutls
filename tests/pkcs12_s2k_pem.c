@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2010 Free Software Foundation, Inc.
+ * Copyright (C) 2009, 2010, 2011 Free Software Foundation, Inc.
  *
  * Author: Simon Josefsson
  *
@@ -34,7 +34,6 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-#include <gcrypt.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
