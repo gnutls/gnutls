@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.99.1 (unreleased)
 
+** libgnutls: Added support for AES-NI if detected. Uses
+Intel AES-NI code.
+
 ** libgnutls-extra: Dropped support of LZO compression via liblzo.
 
 ** libgnutls: gnutls_transport_set_global_errno() was removed. This

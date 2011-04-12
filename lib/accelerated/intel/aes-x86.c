@@ -31,7 +31,6 @@
 #include <gnutls_errors.h>
 #include <aes-x86.h>
 #include <x86.h>
-#include "iaesni.h"
 #include "iaes_asm_interface.h"
 
 #ifdef __GNUC__
@@ -43,9 +42,9 @@
 typedef void (*enc_func)(sAesData*);
 
 struct aes_ctx {
-	uint8_t iv[16];
 	uint8_t ALIGN16 expanded_key[16*16];
 	uint8_t ALIGN16 expanded_key_dec[16*16];
+	uint8_t iv[16];
 	enc_func enc;
 	enc_func dec;
 	size_t keysize;
@@ -99,6 +98,8 @@ struct aes_ctx *ctx = _ctx;
       ctx->enc = iEnc256_CBC;
       ctx->dec = iDec256_CBC;
     }
+  else
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
   ctx->keysize = keysize;
 
@@ -111,7 +112,6 @@ aes_setiv (void *_ctx, const void *iv, size_t iv_size)
   struct aes_ctx *ctx = _ctx;
 
   memcpy (ctx->iv, iv, 16);
-
   return 0;
 }
 
@@ -121,11 +121,12 @@ aes_encrypt (void *_ctx, const void *plain, size_t plainsize,
 {
 struct aes_ctx *ctx = _ctx;
 sAesData aesData;
-
+  
+  aesData.iv = ctx->iv;
   aesData.in_block = (void*)plain;
   aesData.out_block = encr;
   aesData.expanded_key = ctx->expanded_key;
-  aesData.num_blocks = length % 16;
+  aesData.num_blocks = (plainsize + 1) / 16;
 
   ctx->enc(&aesData);
 
@@ -139,10 +140,11 @@ aes_decrypt (void *_ctx, const void *encr, size_t encrsize,
 struct aes_ctx *ctx = _ctx;
 sAesData aesData;
 
+  aesData.iv = ctx->iv;
   aesData.in_block = (void*)encr;
   aesData.out_block = plain;
-  aesData.expanded_key = ctx->expanded_key;
-  aesData.num_blocks = length % 16;
+  aesData.expanded_key = ctx->expanded_key_dec;
+  aesData.num_blocks = (encrsize + 1) / 16;
 
   ctx->dec(&aesData);
 

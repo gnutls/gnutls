@@ -79,6 +79,7 @@ static int test_aes(void)
 	fprintf(stdout, "Tests on AES Encryption: ");
 	for (i = 0; i < sizeof(aes_vectors) / sizeof(aes_vectors[0]); i++) {
 		memset(_iv, 0, sizeof(_iv));
+		memset(tmp, 0, sizeof(tmp));
 		key.data = (void*)aes_vectors[i].key;
 		key.size = 16;
 		
@@ -123,6 +124,7 @@ static int test_aes(void)
 	for (i = 0; i < sizeof(aes_vectors) / sizeof(aes_vectors[0]); i++) {
 
 		memset(_iv, 0, sizeof(_iv));
+		memset(tmp, 0x33, sizeof(tmp));
 
 		key.data = (void*)aes_vectors[i].key;
 		key.size = 16;
@@ -316,11 +318,14 @@ static int test_hash(void)
 
 int main(int argc, char** argv)
 {
+        gnutls_global_init();
+
 	if (test_aes())
 		return 1;
 
 	if (test_hash())
 		return 1;
 
+        gnutls_global_deinit();
 	return 0;
 }
