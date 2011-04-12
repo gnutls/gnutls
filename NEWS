@@ -8,6 +8,10 @@ See the end for copying conditions.
 * libgnutls: gnutls_transport_set_global_errno() was deprecated.
 Use your system's errno fascility or gnutls_transport_set_errno().
 
+* gnutls-cli: Correction with usage of select to check for
+pending data in gnutls sessions. It now uses gnutls_record_check_pending().
+Reported by Herbert J. Skuhra.
+
 * tests: More fixes and updates for win32. Patches by LRN.
 
 ** API and ABI modifications:
