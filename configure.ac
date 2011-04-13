@@ -123,6 +123,8 @@ AC_CHECK_FUNCS(fork,,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 AC_CHECK_FUNCS(getrusage,,)
 AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
+dnl for pakchois
+AC_LIB_HAVE_LINKFLAGS(dl,, [#include <dlfcn.h>], [dlclose (0);])
 
 dnl Check for libcfg+
 SAVED_LIBS=$LIBS

@@ -121,7 +121,7 @@ libgnutls_la_LDFLAGS = -no-undefined \
 
 libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	accelerated/libaccelerated.la \
-	$(LTLIBZ)  $(LTLIBINTL) $(LIBSOCKET)
+	$(LTLIBZ)  $(LTLIBINTL) $(LIBSOCKET) $(LTLIBDL)
 
 if ENABLE_OPENPGP
 libgnutls_la_LIBADD += openpgp/libgnutls_openpgp.la
