@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version 2.12.3 (unreleased)
 
+* libgnutls: depend on libdl.
+
 * libgnutls: gnutls_transport_set_global_errno() was deprecated.
 Use your system's errno fascility or gnutls_transport_set_errno().
 
