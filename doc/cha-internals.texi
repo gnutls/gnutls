@@ -194,8 +194,7 @@ _foobar_recv_params (gnutls_session_t session,
 
 int
 _foobar_send_params (gnutls_session_t session,
-                            opaque * data,
-                            size_t _data_size)
+                            gnutls_buffer_st* data)
 @{
   return 0;
 @}
@@ -258,13 +257,12 @@ _gnutls_foobar_recv_params (gnutls_session_t session,
 
 int
 _gnutls_foobar_send_params (gnutls_session_t session,
-                            opaque * data,
-                            size_t data_size)
+                            gnutls_buffer_st * data)
 @{
   if (session->security_parameters.entity == GNUTLS_CLIENT)
-    return foobar_send_client (session, data, data_size);
+    return foobar_send_client (session, data);
   else
-    return foobar_send_server (session, data, data_size);
+    return foobar_send_server (session, data);
 @}
 @end example
 
@@ -360,8 +358,15 @@ options. That is because in most systems where hardware-assisted
 cryptographic operations are not available, using this interface might 
 actually reduce performance.
 
-It is possible to override parts of crypto backend both at runtime and compile
-time. Here we discuss the runtime possibility. The API
+In systems that include cryptographic instructions with the CPU's
+instructions set, using the kernel interface will introduce an
+unneeded layer. For this reason GnuTLS includes such optimizations
+found in popular processors such as the AES-NI instruction set.
+This is achieved using a mechanism that
+overrides parts of crypto backend at runtime, once the cryptographic
+instructions are detected.
+
+The next section discusses the runtime possibility. The API
 available for this functionality is in @code{gnutls/crypto.h} header
 file.
 
