@@ -186,7 +186,7 @@ gnutls_cipher_decrypt (gnutls_cipher_hd_t handle, void *ciphertext,
  * Since: 2.10.0
  **/
 int
-gnutls_cipher_encrypt2 (gnutls_cipher_hd_t handle, void *text, size_t textlen,
+gnutls_cipher_encrypt2 (gnutls_cipher_hd_t handle, const void *text, size_t textlen,
                         void *ciphertext, size_t ciphertextlen)
 {
   return _gnutls_cipher_encrypt2 ((cipher_hd_st *) handle, text, textlen,
