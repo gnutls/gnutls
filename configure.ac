@@ -39,19 +39,22 @@ AC_PROG_CC
 AC_PROG_CXX
 gl_EARLY
 
-AC_PROG_LN_S
-GTK_DOC_CHECK(1.1)
-AC_PATH_PROG([GAA], [gaa])
-if test "x$GAA" = "x"; then
-   AC_MSG_WARN([[***
-*** GAA was not found.  It is only needed if you wish to modify
-*** the source code or command-line description files.  In this case,
-*** you may want to get it from http://gaa.sourceforge.net/ and
-*** read doc/README.gaa.
-***]])
-fi
+# For includes/gnutls/gnutls.h.in.
+AC_SUBST(MAJOR_VERSION, `echo $PACKAGE_VERSION | sed 's/\(.*\)\..*\..*/\1/g'`)
+AC_SUBST(MINOR_VERSION, `echo $PACKAGE_VERSION | sed 's/.*\.\(.*\)\..*/\1/g'`)
+AC_SUBST(PATCH_VERSION, `echo $PACKAGE_VERSION | sed 's/.*\..*\.\(.*\)/\1/g'`)
+AC_SUBST(NUMBER_VERSION, `printf "0x%02x%02x%02x" $MAJOR_VERSION $MINOR_VERSION $PATCH_VERSION`)
 
+
+dnl C and C++ capabilities
 AC_C_INLINE
+AC_HEADER_STDC
+AC_DEFINE([HAVE_STRINGS_H], 1, [Hard-code for src/cfg/.])
+AC_DEFINE([HAVE_FLOAT_H], 1, [Hard-code for src/cfg/.])
+AC_DEFINE([HAVE_LIMITS_H], 1, [Hard-code for src/cfg/.])
+AC_DEFINE([HAVE_MATH_H], 1, [Hard-code for src/cfg/.])
+AC_DEFINE([HAVE_CTYPE_H], 1, [Hard-code for src/cfg/.])
+AC_DEFINE([HAVE_ERRNO_H], 1, [Hard-code for src/cfg/.])
 
 # For the C++ code
 AC_ARG_ENABLE(cxx,
@@ -65,32 +68,8 @@ fi
 AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
 AM_CONDITIONAL(WANT_TEST_SUITE, [test -f tests/suite/mini-eagain2.c])
 
-LIBGNUTLS_HOOKS
-LIBGNUTLS_EXTRA_HOOKS
 
-AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION([0.17])
-
-AC_C_BIGENDIAN
-
-
-AC_HEADER_STDC
-AC_DEFINE([HAVE_STRINGS_H], 1, [Hard-code for src/cfg/.])
-AC_DEFINE([HAVE_FLOAT_H], 1, [Hard-code for src/cfg/.])
-AC_DEFINE([HAVE_LIMITS_H], 1, [Hard-code for src/cfg/.])
-AC_DEFINE([HAVE_MATH_H], 1, [Hard-code for src/cfg/.])
-AC_DEFINE([HAVE_CTYPE_H], 1, [Hard-code for src/cfg/.])
-AC_DEFINE([HAVE_ERRNO_H], 1, [Hard-code for src/cfg/.])
-
-# No fork on MinGW, disable some self-tests until we fix them.
-AC_CHECK_FUNCS(fork,,)
-AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
-
-AC_CHECK_TYPES(uint,,, [
-# include <sys/types.h>
-])
-
-
+dnl Hardware Acceleration
 AC_ARG_ENABLE(hardware-acceleration,
   AS_HELP_STRING([--disable-hardware-acceleration], [unconditionally disable hardware acceleration]),
     use_accel=$enableval, use_accel=yes)
@@ -125,8 +104,27 @@ AM_CONDITIONAL(ASM_X86_64, test x"$hw_accel" = x"x86-64")
 AM_CONDITIONAL(HAVE_GCC_GNU89_INLINE_OPTION, test "$gnu89_inline" = "yes"])
 AM_CONDITIONAL(HAVE_GCC, test "$GCC" = "yes")
 
-dnl Check for libcfg+
+dnl Try the hooks.m4
+LIBGNUTLS_HOOKS
+LIBGNUTLS_EXTRA_HOOKS
 
+GTK_DOC_CHECK(1.1)
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.17])
+
+AC_C_BIGENDIAN
+
+
+
+dnl Checks for functions
+
+dnl No fork on MinGW, disable some self-tests until we fix them.
+AC_CHECK_FUNCS(fork,,)
+AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
+AC_CHECK_FUNCS(getrusage,,)
+AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
+
+dnl Check for libcfg+
 SAVED_LIBS=$LIBS
 AC_ARG_WITH(included-libcfg,
 	AS_HELP_STRING([--with-included-libcfg],
@@ -147,14 +145,6 @@ LIBS=$SAVED_LIBS
 AC_MSG_CHECKING([whether to use the included libcfg])
 AC_MSG_RESULT($libcfg_enabled)
 
-AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
-
-# For includes/gnutls/gnutls.h.in.
-AC_SUBST(MAJOR_VERSION, `echo $PACKAGE_VERSION | sed 's/\(.*\)\..*\..*/\1/g'`)
-AC_SUBST(MINOR_VERSION, `echo $PACKAGE_VERSION | sed 's/.*\.\(.*\)\..*/\1/g'`)
-AC_SUBST(PATCH_VERSION, `echo $PACKAGE_VERSION | sed 's/.*\..*\.\(.*\)/\1/g'`)
-AC_SUBST(NUMBER_VERSION, `printf "0x%02x%02x%02x" $MAJOR_VERSION $MINOR_VERSION $PATCH_VERSION`)
 AC_CHECK_TYPE(ssize_t,
   [
     DEFINE_SSIZE_T="#include <sys/types.h>"
@@ -196,11 +186,10 @@ if test x$ac_zlib != xno; then
 fi
 AC_SUBST(GNUTLS_REQUIRES_PRIVATE)
 
-AC_CHECK_FUNCS(getrusage,,)
-AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
 
 gl_INIT
 
+dnl GCC warnings to enable
 
 AC_ARG_ENABLE([gcc-warnings],
   [AS_HELP_STRING([--enable-gcc-warnings],
@@ -212,7 +201,6 @@ AC_ARG_ENABLE([gcc-warnings],
    gl_gcc_warnings=$enableval],
   [gl_gcc_warnings=no]
 )
-
 
 if test "$gl_gcc_warnings" = yes; then
   gl_WARN_ADD([-Werror], [WERROR_CFLAGS])
@@ -260,9 +248,23 @@ fi
 AC_SUBST([WERROR_CFLAGS])
 AC_SUBST([WSTACK_CFLAGS])
 AC_SUBST([WARN_CFLAGS])
-AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
 
-# For Guile bindings.
+dnl Programs for compilation or development
+AC_PROG_LN_S
+AC_LIBTOOL_WIN32_DLL
+AC_PROG_LIBTOOL
+AC_PATH_PROG([GAA], [gaa])
+if test "x$GAA" = "x"; then
+   AC_MSG_WARN([[***
+*** GAA was not found.  It is only needed if you wish to modify
+*** the source code or command-line description files.  In this case,
+*** you may want to get it from http://gaa.sourceforge.net/ and
+*** read doc/README.gaa.
+***]])
+fi
+
+
+dnl Guile bindings.
 opt_guile_bindings=yes
 AC_MSG_CHECKING([whether building Guile bindings])
 AC_ARG_ENABLE(guile,
