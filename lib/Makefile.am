@@ -23,6 +23,7 @@
 
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
+EXTRA_DIST = pakchois/README
 SUBDIRS = includes x509 accelerated
 if ENABLE_MINITASN1
 SUBDIRS += minitasn1
@@ -106,10 +107,8 @@ HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
 	ext_safe_renegotiation.h locks.h gnutls_mbuffers.h pkcs11_int.h \
 	hash.h
 
-if ENABLE_LOCAL_PAKCHOIS
 COBJECTS+=pakchois/pakchois.c pakchois/errors.c pakchois/dlopen.c
 HFILES+=pakchois/pakchois.h pakchois/pakchois11.h pakchois/dlopen.h
-endif
 
 # Separate so we can create the documentation
 
@@ -140,8 +139,6 @@ libgnutls_la_LIBADD += minitasn1/libminitasn1.la
 else
 libgnutls_la_LDFLAGS += $(LTLIBTASN1)
 endif
-
-libgnutls_la_LDFLAGS += $(LTLIBPAKCHOIS)
 
 if ENABLE_NETTLE
 libgnutls_la_LDFLAGS += $(LTLIBNETTLE) $(NETTLE_LIBS)
