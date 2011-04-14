@@ -142,29 +142,6 @@ fi
     AC_MSG_WARN([C99 macros not supported. This may affect compiling.])
   ])
 
-  AC_MSG_CHECKING([whether to enable Opaque PRF input support])
-  AC_ARG_ENABLE(opaque-prf-input,
-    AS_HELP_STRING([--enable-opaque-prf-input=DD],
-                   [enable Opaque PRF input using DD as extension type]),
-    ac_opaque_prf_input=$enableval, ac_opaque_prf_input=no)
-  if test "$ac_opaque_prf_input" != "no"; then
-    if ! echo $ac_opaque_prf_input | egrep -q '^[[0-9]]+$'; then
-      ac_opaque_prf_input=no
-      AC_MSG_WARN([[
-  *** Could not parse Opaque PRF Input extension type.
-  *** Use --enable-opaque-prf-input=XX where XX is decimal, for example
-  *** to use extension value 42 use --enable-opqaue-prf-input=42]])
-    fi
-  fi
-  if test "$ac_opaque_prf_input" != "no"; then
-   AC_MSG_RESULT([yes (extension value $ac_opaque_prf_input)])
-   AC_DEFINE_UNQUOTED([ENABLE_OPRFI], $ac_opaque_prf_input,
-                      [enable Opaque PRF Input])
-  else
-   AC_MSG_RESULT(no)
-  fi
-  AM_CONDITIONAL(ENABLE_OPRFI, test "$ac_opaque_prf_input" != "no")
-  
   AC_MSG_CHECKING([whether to disable SRP authentication support])
   AC_ARG_ENABLE(srp-authentication,
     AS_HELP_STRING([--disable-srp-authentication],
