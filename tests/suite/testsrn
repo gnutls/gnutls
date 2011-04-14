@@ -26,18 +26,17 @@ CLI="${CLI:-../../src/gnutls-cli$EXEEXT}"
 PORT="${PORT:-5558}"
 unset RETCODE
 
-fail() {
-   echo "Failure: $1" >&2
-   RETCODE=${RETCODE:-${2:-1}}
-}
+if test "${WINDIR}" != "";then
+  exit 77
+fi 
+
+. ../scripts/common.sh
 
 echo "Checking Safe renegotiation"
 
-$SERV -p $PORT --echo --priority NORMAL:+ANON-DH:%PARTIAL_RENEGOTIATION --dhparams $srcdir/params.dh >/dev/null 2>&1 &
-pid=$!
-
-# give the server a chance to initialize
-sleep 2
+launch_server $$ --echo --priority NORMAL:+ANON-DH:%PARTIAL_RENEGOTIATION --dhparams $srcdir/params.dh >/dev/null 2>&1 &
+PID=$!
+wait_server $PID
 
 $CLI -p $PORT 127.0.0.1 --rehandshake --priority NONE:+AES-128-CBC:+MD5:+SHA1:+VERS-SSL3.0:+ANON-DH:+COMP-NULL:%SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
   fail "0. Renegotiation should have succeeded!"
@@ -55,14 +54,12 @@ $CLI -p $PORT 127.0.0.1 --rehandshake --priority NORMAL:+ANON-DH:%DISABLE_SAFE_R
   fail "4. Unsafe renegotiation should have failed!"
 
 
-kill $pid
+kill $PID
 wait
 
-$SERV -p $PORT --echo --priority NORMAL:+ANON-DH:%SAFE_RENEGOTIATION --dhparams $srcdir/params.dh >/dev/null 2>&1 &
-pid=$!
-
-# give the server a chance to initialize
-sleep 2
+launch_server $$  --echo --priority NORMAL:+ANON-DH:%SAFE_RENEGOTIATION --dhparams $srcdir/params.dh >/dev/null 2>&1 &
+PID=$!
+wait_server $PID
 
 $CLI -p $PORT 127.0.0.1 --rehandshake --priority NORMAL:+ANON-DH:%SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
   fail "5. Safe rehandshake should have succeeded!"
@@ -76,14 +73,12 @@ $CLI -p $PORT 127.0.0.1 --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION <
 $CLI -p $PORT 127.0.0.1 --rehandshake --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 && \
   fail "8. Unsafe renegotiation should have failed!"
 
-kill $pid
+kill $PID
 wait
 
-$SERV -p $PORT --echo --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION --dhparams $srcdir/params.dh >/dev/null 2>&1 &
-pid=$!
-
-# give the server a chance to initialize
-sleep 2
+launch_server $$ --echo --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION --dhparams $srcdir/params.dh >/dev/null 2>&1 &
+PID=$!
+wait_server $PID
 
 $CLI -p $PORT 127.0.0.1 --priority NORMAL:+ANON-DH:%SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 && \
   fail "9. Initial connection should have failed!"
@@ -97,7 +92,7 @@ $CLI -p $PORT 127.0.0.1 --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION <
 $CLI -p $PORT 127.0.0.1 --rehandshake --priority NORMAL:+ANON-DH:%DISABLE_SAFE_RENEGOTIATION </dev/null >/dev/null 2>&1 || \
   fail "12. Unsafe renegotiation should have succeeded!"
 
-kill $pid
+kill $PID
 wait
 
-exit ${RETCODE:-0}
+exit 0
