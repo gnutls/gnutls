@@ -95,10 +95,7 @@ the @ref{gnutls_transport_set_lowat} must be called, with a zero
 low water mark value.
 
 By default, if the transport functions are not set, @acronym{GnuTLS}
-will use the Berkeley Sockets functions.  In this case
-@acronym{GnuTLS} will use some hacks in order for @code{select} to
-work, thus making it easy to add @acronym{TLS} support to existing
-TCP/IP servers.
+will use the Berkeley Sockets functions. 
 
 @node The TLS record protocol
 @section The TLS Record Protocol
