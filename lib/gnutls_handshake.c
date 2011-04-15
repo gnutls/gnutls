@@ -3046,7 +3046,6 @@ _gnutls_handshake_common (gnutls_session_t session)
       ret = _gnutls_recv_handshake_final (session, TRUE);
       IMED_RET ("recv handshake final", ret, 1);
 
-#ifdef ENABLE_SESSION_TICKET
       switch (STATE)
         {
         case STATE0:
@@ -3058,7 +3057,6 @@ _gnutls_handshake_common (gnutls_session_t session)
         default:
           break;
         }
-#endif
 
       ret = _gnutls_send_handshake_final (session, FALSE);
       IMED_RET ("send handshake final", ret, 1);
@@ -3076,7 +3074,6 @@ _gnutls_handshake_common (gnutls_session_t session)
       ret = _gnutls_send_handshake_final (session, TRUE);
       IMED_RET ("send handshake final 2", ret, 1);
 
-#ifdef ENABLE_SESSION_TICKET
       switch (STATE)
         {
         case STATE0:
@@ -3088,7 +3085,6 @@ _gnutls_handshake_common (gnutls_session_t session)
         default:
           break;
         }
-#endif
 
       ret = _gnutls_recv_handshake_final (session, FALSE);
       IMED_RET ("recv handshake final 2", ret, 1);
