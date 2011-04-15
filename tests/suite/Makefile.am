@@ -72,6 +72,7 @@ nodist_eagain_cli_SOURCES = mini-eagain2.c
 
 noinst_PROGRAMS = eagain-cli
 
-nodist_check_SCRIPTS = eagain testsrn
+nodist_check_SCRIPTS = eagain testsrn testbig
 
-TESTS = eagain testsrn
+TESTS = eagain testsrn testbig
+

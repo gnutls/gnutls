@@ -1,0 +1,244 @@
+#!/bin/sh
+
+# Copyright (C) 2010 Free Software Foundation, Inc.
+#
+# Author: Nikos Mavrogiannopoulos
+#
+# This file is part of GnuTLS.
+#
+# GnuTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# GnuTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GnuTLS; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+srcdir="${srcdir:-.}"
+CLI="${CLI:-../../src/gnutls-cli$EXEEXT}"
+PORT="${PORT:-5558}"
+unset RETCODE
+
+if test "${WINDIR}" != "";then
+  exit 77
+fi 
+
+. ../scripts/common.sh
+
+echo "Compatibility checks using "`openssl version`
+
+DSA_CERT=$srcdir/../dsa/cert.dsa.1024.pem
+DSA_KEY=$srcdir/../dsa/dsa.1024.pem
+
+RSA_CERT=$srcdir/../certs/cert-rsa-2432.pem
+RSA_KEY=$srcdir/../certs/rsa-2432.pem
+
+CA_CERT=$srcdir/../../doc/credentials/x509-ca.pem
+CLI_CERT=$srcdir/../../doc/credentials/x509-client.pem
+CLI_KEY=$srcdir/../../doc/credentials/x509-client-key.pem
+
+SERV_CERT=$srcdir/../../doc/credentials/x509-server.pem
+SERV_KEY=$srcdir/../../doc/credentials/x509-server-key.pem
+SERV_DSA_CERT=$srcdir/../../doc/credentials/x509-server-dsa.pem
+SERV_DSA_KEY=$srcdir/../../doc/credentials/x509-server-key-dsa.pem
+
+echo "#####################"
+echo "# Client mode tests #"
+echo "#####################"
+
+SERV=openssl
+
+launch_bare_server $$ s_server -quiet -www -accept $PORT -keyform pem -certform pem -ssl3 -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -dkey $DSA_KEY -dcert $DSA_CERT -Verify 1 -CAfile $CA_CERT &
+PID=$!
+wait_server $PID
+
+# Test SSL 3.0 with RSA ciphersuite
+echo "Checking SSL 3.0 with RSA..." 
+$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+  fail "Failed"
+
+# Test SSL 3.0 with DHE-RSA ciphersuite
+echo "Checking SSL 3.0 with DHE-RSA..." 
+$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+  fail "Failed"
+
+# Test SSL 3.0 with DHE-DSS ciphersuite
+echo "Checking SSL 3.0 with DHE-DSS..." 
+$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-DSS" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+  fail "Failed"
+
+kill $PID
+wait
+
+launch_bare_server $$ s_server -quiet -www -accept $PORT -keyform pem -certform pem -tls1 -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -dkey $DSA_KEY -dcert $DSA_CERT -Verify 1 -CAfile $CA_CERT &
+PID=$!
+wait_server $PID
+
+# Test TLS 1.0 with RSA ciphersuite
+echo "Checking TLS 1.0 with RSA..." 
+$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+  fail "Failed"
+
+# Test TLS 1.0 with DHE-RSA ciphersuite
+echo "Checking TLS 1.0 with DHE-RSA..." 
+$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+  fail "Failed"
+
+# Test TLS 1.0 with DHE-DSS ciphersuite
+echo "Checking TLS 1.0 with DHE-DSS..." 
+$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-DSS" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+  fail "Failed"
+
+kill $PID
+wait
+
+launch_bare_server $$ s_server -quiet -accept $PORT -keyform pem -certform pem -dtls1 -mtu 1000 -timeout -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -dkey $DSA_KEY -dcert $DSA_CERT -Verify 1 -CAfile $CA_CERT &
+PID=$!
+wait_server $PID
+
+# Test DTLS 1.0 with RSA ciphersuite
+echo "Checking DTLS 1.0 with RSA..." 
+$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+RSA" --udp --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+  fail "Failed"
+
+kill $PID
+wait
+
+launch_bare_server $$ s_server -quiet -accept $PORT -keyform pem -certform pem -dtls1 -mtu 1000 -timeout -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -dkey $DSA_KEY -dcert $DSA_CERT -Verify 1 -CAfile $CA_CERT &
+PID=$!
+wait_server $PID
+
+# Test DTLS 1.0 with DHE-RSA ciphersuite
+echo "Checking DTLS 1.0 with DHE-RSA..." 
+$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+DHE-RSA" --udp --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+  fail "Failed"
+
+kill $PID
+wait
+
+launch_bare_server $$ s_server -quiet -accept $PORT -keyform pem -certform pem -dtls1 -mtu 1000 -timeout -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -dkey $DSA_KEY -dcert $DSA_CERT -Verify 1 -CAfile $CA_CERT &
+PID=$!
+wait_server $PID
+
+# Test DTLS 1.0 with DHE-DSS ciphersuite
+echo "Checking DTLS 1.0 with DHE-DSS..." 
+$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+DHE-DSS" --udp --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+  fail "Failed"
+
+kill $PID
+wait
+
+echo "Client mode tests were successfully completed"
+echo ""
+echo "#####################"
+echo "# Server mode tests #"
+echo "#####################"
+SERV="../../src/gnutls-serv$EXEEXT -q"
+CLI="openssl"
+PORT="5559"
+
+# Note that openssl s_client does not return error code on failure
+
+echo "Check SSL 3.0 with RSA ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
+wait_server $PID
+
+$CLI s_client  -host localhost -port $PORT -ssl3 -cert $CLI_CERT -key $CLI_KEY -CAfile $CA_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail "Failed"
+
+kill $PID
+wait
+
+echo "Check SSL 3.0 with DHE-RSA ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-RSA" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
+wait_server $PID
+
+$CLI s_client  -host localhost -port $PORT -ssl3 -cert $CLI_CERT -key $CLI_KEY -CAfile $CA_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail "Failed"
+
+kill $PID
+wait
+
+echo "Check SSL 3.0 with DHE-DSS ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-DSS" --x509certfile $SERV_DSA_CERT --x509keyfile $SERV_DSA_KEY --dhparams params.dh  & PID=$!
+wait_server $PID
+
+$CLI s_client  -host localhost -port $PORT -ssl3 -cert $CLI_CERT -key $CLI_KEY -CAfile $CA_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail "Failed"
+
+kill $PID
+wait
+
+#TLS 1.0
+
+echo "Check TLS 1.0 with RSA ciphersuite (SSLv2 hello)"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh & PID=$!
+wait_server $PID
+
+$CLI s_client  -host localhost -port $PORT -cert $CLI_CERT -key $CLI_KEY -CAfile $CA_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail "Failed"
+
+kill $PID
+wait
+
+echo "Check TLS 1.0 with DHE-RSA ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-RSA" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
+wait_server $PID
+
+$CLI s_client  -host localhost -tls1 -port $PORT -cert $CLI_CERT -key $CLI_KEY -CAfile $CA_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail "Failed"
+
+kill $PID
+wait
+
+echo "Check TLS 1.0 with DHE-DSS ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-DSS" --x509certfile $SERV_DSA_CERT --x509keyfile $SERV_DSA_KEY --dhparams params.dh  & PID=$!
+wait_server $PID
+
+$CLI s_client  -host localhost -tls1 -port $PORT -cert $CLI_CERT -key $CLI_KEY -CAfile $CA_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail "Failed"
+
+kill $PID
+wait
+
+
+# DTLS
+echo "Check DTLS 1.0 with RSA ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+RSA" --udp --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
+wait_server $PID
+
+$CLI s_client  -host localhost -port $PORT -dtls1 -cert $CLI_CERT -key $CLI_KEY -CAfile $CA_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail "Failed"
+
+kill $PID
+wait
+
+echo "Check DTLS 1.0 with DHE-RSA ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+DHE-RSA" --udp --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
+wait_server $PID
+
+$CLI s_client  -host localhost -port $PORT -dtls1 -cert $CLI_CERT -key $CLI_KEY -CAfile $CA_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail "Failed"
+
+kill $PID
+wait
+
+echo "Check DTLS 1.0 with DHE-DSS ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+DHE-DSS" --udp --x509certfile $SERV_DSA_CERT --x509keyfile $SERV_DSA_KEY --dhparams params.dh  & PID=$!
+wait_server $PID
+
+$CLI s_client  -host localhost -port $PORT -dtls1 -cert $CLI_CERT -key $CLI_KEY -CAfile $CA_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail "Failed"
+
+kill $PID
+wait
+
+
+
+exit 0
