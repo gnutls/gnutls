@@ -35,8 +35,8 @@ endif
 
 noinst_LTLIBRARIES = libaccelerated.la
 
-EXTRA_DIST = x86.h accelerated.h
-libaccelerated_la_SOURCES = accelerated.c
+EXTRA_DIST = x86.h accelerated.h gnutls_cryptodev.h
+libaccelerated_la_SOURCES = accelerated.c cryptodev.c
 libaccelerated_la_LIBADD =
 
 if TRY_X86_OPTIMIZATIONS

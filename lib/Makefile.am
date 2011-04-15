@@ -68,7 +68,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_datum.c gnutls_session_pack.c gnutls_mpi.c	\
 	gnutls_pk.c gnutls_cert.c gnutls_global.c gnutls_constate.c	\
 	gnutls_anon_cred.c pkix_asn1_tab.c gnutls_asn1_tab.c		\
-	gnutls_mem.c gnutls_ui.c gnutls_sig.c cryptodev.c	\
+	gnutls_mem.c gnutls_ui.c gnutls_sig.c				\
 	gnutls_dh_primes.c gnutls_alert.c system.c		\
 	gnutls_str.c gnutls_state.c gnutls_x509.c gnutls_rsa_export.c  	\
 	gnutls_helper.c gnutls_supplemental.c crypto.c random.c  \
@@ -95,7 +95,6 @@ HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
 	gnutls_state.h gnutls_x509.h 			\
 	gnutls_rsa_export.h gnutls_srp.h auth/srp.h auth/srp_passwd.h	\
 	gnutls_helper.h gnutls_supplemental.h crypto.h random.h system.h\
-	gnutls_cryptodev.h		\
 	locks.h gnutls_mbuffers.h pkcs11_int.h \
 	hash.h
 

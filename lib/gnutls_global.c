@@ -31,8 +31,8 @@
 #include <gnutls/pkcs11.h>
 
 #include <gnutls_extensions.h>  /* for _gnutls_ext_init */
-#include <gnutls_cryptodev.h>
 #include <locks.h>
+#include <accelerated/cryptodev.h>
 #include <accelerated/accelerated.h>
 
 #include "sockets.h"
