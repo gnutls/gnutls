@@ -733,7 +733,6 @@ parse_handshake_header (gnutls_session_t session, mbuffer_st* bufel, gnutls_hand
     return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
   dataptr = _mbuffer_get_udata_ptr(bufel);
-  data_size = _mbuffer_get_udata_size(bufel) - handshake_header_size;
 
   /* if reading a client hello of SSLv2 */
   if (!IS_DTLS(session) && htype == GNUTLS_HANDSHAKE_CLIENT_HELLO &&
@@ -776,6 +775,7 @@ parse_handshake_header (gnutls_session_t session, mbuffer_st* bufel, gnutls_hand
           hsk->end_offset = hsk->length;
         }
     }
+  data_size = _mbuffer_get_udata_size(bufel) - handshake_header_size;
 
   /* make the length offset */
   if (hsk->end_offset > 0) hsk->end_offset--;
