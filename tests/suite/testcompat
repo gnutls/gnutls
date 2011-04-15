@@ -24,4 +24,4 @@ if ! test -x /usr/bin/openssl;then
   exit 77
 fi
 
-datefudge "2007-04-22" ./testbig-main
+datefudge "2007-04-22" ./testcompat-main
