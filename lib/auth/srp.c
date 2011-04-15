@@ -28,15 +28,15 @@
 #ifdef ENABLE_SRP
 
 #include "gnutls_errors.h"
-#include "auth_srp_passwd.h"
+#include <auth/srp_passwd.h>
 #include "gnutls_auth.h"
 #include "gnutls_auth.h"
 #include "gnutls_srp.h"
 #include "gnutls_num.h"
-#include "auth_srp.h"
+#include <auth/srp.h>
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
-#include <ext_srp.h>
+#include <ext/srp.h>
 
 const mod_auth_st srp_auth_struct = {
   "SRP",

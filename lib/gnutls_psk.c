@@ -27,12 +27,12 @@
 
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
-#include <auth_psk.h>
+#include <auth/psk.h>
 #include <gnutls_state.h>
 
 #ifdef ENABLE_PSK
 
-#include <auth_psk_passwd.h>
+#include <auth/psk_passwd.h>
 #include <gnutls_num.h>
 #include <gnutls_helper.h>
 #include <gnutls_datum.h>

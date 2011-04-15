@@ -31,14 +31,14 @@
 #include "gnutls_int.h"
 #include "gnutls_extensions.h"
 #include "gnutls_errors.h"
-#include "ext_max_record.h"
-#include <ext_cert_type.h>
-#include <ext_server_name.h>
-#include <ext_srp.h>
-#include <ext_session_ticket.h>
-#include <ext_safe_renegotiation.h>
-#include <ext_signature.h>
-#include <ext_safe_renegotiation.h>
+#include "ext/max_record.h"
+#include <ext/cert_type.h>
+#include <ext/server_name.h>
+#include <ext/srp.h>
+#include <ext/session_ticket.h>
+#include <ext/safe_renegotiation.h>
+#include <ext/signature.h>
+#include <ext/safe_renegotiation.h>
 #include <gnutls_num.h>
 
 

@@ -26,7 +26,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <x509_b64.h>
-#include <auth_cert.h>
+#include <auth/cert.h>
 #include <gnutls_algorithms.h>
 #include <gnutls_cert.h>
 #include <gnutls_datum.h>
@@ -38,7 +38,7 @@
 #include <gnutls_sig.h>
 #include <gnutls_kx.h>
 #include <libtasn1.h>
-#include <ext_signature.h>
+#include <ext/signature.h>
 #include <gnutls_state.h>
 #include <x509/common.h>
 

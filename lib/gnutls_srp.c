@@ -25,13 +25,13 @@
 
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
-#include <auth_srp.h>
+#include <auth/srp.h>
 #include <gnutls_state.h>
 
 #ifdef ENABLE_SRP
 
 #include <gnutls_srp.h>
-#include <auth_srp_passwd.h>
+#include <auth/srp_passwd.h>
 #include <gnutls_mpi.h>
 #include <gnutls_num.h>
 #include <gnutls_helper.h>

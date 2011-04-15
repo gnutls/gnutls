@@ -230,20 +230,6 @@ fi
   fi
   AM_CONDITIONAL(ENABLE_OPENPGP, test "$ac_enable_openpgp" = "yes")
 
-  AC_MSG_CHECKING([whether to disable SessionTicket extension support])
-  AC_ARG_ENABLE(session-ticket,
-    AS_HELP_STRING([--disable-session-ticket],
-                   [disable the SessionTicket extension support]),
-    ac_session_ticket=no)
-  if test x$ac_session_ticket != xno; then
-   AC_MSG_RESULT(no)
-   AC_DEFINE([ENABLE_SESSION_TICKET], 1, [enable SessionTicket extension])
-  else
-   ac_full=0
-   AC_MSG_RESULT(yes)
-  fi
-  AM_CONDITIONAL(ENABLE_SESSION_TICKET, test "$ac_enable_session_ticket" != "no")
-
   # For cryptodev
   AC_MSG_CHECKING([whether to add cryptodev support])
   AC_ARG_ENABLE(cryptodev,

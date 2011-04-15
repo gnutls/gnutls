@@ -29,13 +29,13 @@
 
 #include <gnutls_int.h>
 #ifdef ENABLE_SRP
-#include <auth_srp.h>
+#include <auth/srp.h>
 #endif
 #ifdef ENABLE_PSK
-#include <auth_psk.h>
+#include <auth/psk.h>
 #endif
-#include <auth_anon.h>
-#include <auth_cert.h>
+#include <auth/anon.h>
+#include <auth/cert.h>
 #include <gnutls_errors.h>
 #include <gnutls_auth.h>
 #include <gnutls_session_pack.h>

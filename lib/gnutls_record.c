@@ -43,7 +43,7 @@
 #include "gnutls_record.h"
 #include "gnutls_datum.h"
 #include "gnutls_constate.h"
-#include "ext_max_record.h"
+#include "ext/max_record.h"
 #include <gnutls_state.h>
 #include <gnutls_dtls.h>
 #include <gnutls_dh.h>

@@ -41,9 +41,9 @@
 #include <gnutls_mbuffers.h>
 #include <gnutls_state.h>
 #include <gnutls_constate.h>
-#include <auth_cert.h>
-#include <auth_anon.h>
-#include <auth_psk.h>
+#include <auth/cert.h>
+#include <auth/anon.h>
+#include <auth/psk.h>
 #include <gnutls_algorithms.h>
 #include <gnutls_rsa_export.h>
 #include <gnutls_extensions.h>

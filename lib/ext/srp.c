@@ -24,12 +24,12 @@
  */
 
 #include <gnutls_int.h>
-#include <ext_srp.h>
+#include <ext/srp.h>
 
 #ifdef ENABLE_SRP
 
 #include "gnutls_auth.h"
-#include "auth_srp.h"
+#include <auth/srp.h>
 #include "gnutls_errors.h"
 #include "gnutls_algorithms.h"
 #include <gnutls_num.h>

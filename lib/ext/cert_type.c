@@ -30,7 +30,7 @@
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_num.h"
-#include "ext_cert_type.h"
+#include <ext/cert_type.h>
 #include <gnutls_state.h>
 #include <gnutls_num.h>
 

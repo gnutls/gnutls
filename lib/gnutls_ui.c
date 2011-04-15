@@ -28,10 +28,10 @@
  */
 
 #include <gnutls_int.h>
-#include <auth_srp.h>
-#include <auth_anon.h>
-#include <auth_cert.h>
-#include <auth_psk.h>
+#include <auth/srp.h>
+#include <auth/anon.h>
+#include <auth/cert.h>
+#include <auth/psk.h>
 #include <gnutls_errors.h>
 #include <gnutls_auth.h>
 #include <gnutls_state.h>

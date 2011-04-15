@@ -23,7 +23,7 @@
  */
 
 #include <gnutls_int.h>
-#include <ext_safe_renegotiation.h>
+#include <ext/safe_renegotiation.h>
 #include <gnutls_errors.h>
 
 

@@ -28,7 +28,7 @@
 #ifdef ENABLE_ANON
 
 #include "gnutls_errors.h"
-#include "auth_anon.h"
+#include <auth/anon.h>
 #include "gnutls_auth.h"
 #include "gnutls_dh.h"
 #include "gnutls_num.h"

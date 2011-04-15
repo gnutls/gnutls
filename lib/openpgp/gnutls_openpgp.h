@@ -5,7 +5,7 @@
 #ifndef GNUTLS_OPENPGP_LOCAL_H
 #define GNUTLS_OPENPGP_LOCAL_H
 
-#include <auth_cert.h>
+#include <auth/cert.h>
 #include <opencdk.h>
 #include <gnutls/abstract.h>
 

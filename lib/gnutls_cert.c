@@ -29,7 +29,7 @@
 
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
-#include <auth_cert.h>
+#include <auth/cert.h>
 #include <gnutls_cert.h>
 #include <gnutls_datum.h>
 #include <gnutls_mpi.h>

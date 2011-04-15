@@ -36,10 +36,10 @@
 #include "gnutls_sig.h"
 #include <gnutls_datum.h>
 #include <gnutls_algorithms.h>
-#include <auth_cert.h>
+#include <auth/cert.h>
 #include <gnutls_x509.h>
 #include <gnutls_state.h>
-#include <auth_dh_common.h>
+#include <auth/dh_common.h>
 
 static int gen_dhe_server_kx (gnutls_session_t, gnutls_buffer_st*);
 static int proc_dhe_server_kx (gnutls_session_t, opaque *, size_t);

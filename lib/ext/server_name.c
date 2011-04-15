@@ -27,7 +27,7 @@
 #include "gnutls_auth.h"
 #include "gnutls_errors.h"
 #include "gnutls_num.h"
-#include <ext_server_name.h>
+#include <ext/server_name.h>
 
 static int _gnutls_server_name_recv_params (gnutls_session_t session,
                                             const opaque * data,

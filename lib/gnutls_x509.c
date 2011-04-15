@@ -27,7 +27,7 @@
 #include "gnutls_auth.h"
 #include "gnutls_errors.h"
 #include <gnutls_cert.h>
-#include <auth_cert.h>
+#include <auth/cert.h>
 #include "gnutls_dh.h"
 #include "gnutls_num.h"
 #include "gnutls_datum.h"

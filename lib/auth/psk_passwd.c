@@ -30,8 +30,8 @@
 
 #include "x509_b64.h"
 #include "gnutls_errors.h"
-#include <auth_psk_passwd.h>
-#include "auth_psk.h"
+#include <auth/psk_passwd.h>
+#include <auth/psk.h>
 #include "gnutls_auth.h"
 #include "gnutls_dh.h"
 #include "debug.h"

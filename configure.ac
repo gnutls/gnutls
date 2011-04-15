@@ -415,6 +415,8 @@ AC_CONFIG_FILES([
   tests/suite/Makefile
   lib/accelerated/Makefile
   lib/accelerated/intel/Makefile
+  lib/ext/Makefile
+  lib/auth/Makefile
 ])
 
 AC_OUTPUT

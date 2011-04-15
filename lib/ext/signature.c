@@ -30,7 +30,7 @@
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "gnutls_num.h"
-#include <ext_signature.h>
+#include <ext/signature.h>
 #include <gnutls_state.h>
 #include <gnutls_num.h>
 #include <gnutls_algorithms.h>

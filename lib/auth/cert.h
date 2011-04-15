@@ -27,7 +27,7 @@
 #define AUTH_CERT_H
 #include "gnutls_cert.h"
 #include "gnutls_auth.h"
-#include "auth_dh_common.h"
+#include <auth/dh_common.h>
 #include "x509/x509_int.h"
 #include "openpgp/openpgp_int.h"
 #include <gnutls/abstract.h>

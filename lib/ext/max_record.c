@@ -29,7 +29,7 @@
 #include "gnutls_errors.h"
 #include "gnutls_num.h"
 #include <gnutls_extensions.h>
-#include <ext_max_record.h>
+#include <ext/max_record.h>
 
 static int _gnutls_max_record_recv_params (gnutls_session_t session,
                                            const opaque * data,

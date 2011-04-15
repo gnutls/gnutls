@@ -31,7 +31,7 @@
 #include <gnutls_constate.h>
 #include <gnutls_session_pack.h>
 #include <random.h>
-#include <ext_session_ticket.h>
+#include <ext/session_ticket.h>
 #include <gnutls_mbuffers.h>
 #include <gnutls_extensions.h>
 #include <gnutls_constate.h>

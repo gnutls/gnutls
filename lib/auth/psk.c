@@ -31,8 +31,8 @@
 #include "gnutls_auth.h"
 #include "debug.h"
 #include "gnutls_num.h"
-#include <auth_psk.h>
-#include <auth_psk_passwd.h>
+#include <auth/psk.h>
+#include <auth/psk_passwd.h>
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
 

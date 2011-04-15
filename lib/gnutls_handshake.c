@@ -44,17 +44,17 @@
 #include "gnutls_supplemental.h"
 #include "gnutls_auth.h"
 #include "gnutls_v2_compat.h"
-#include "auth_cert.h"
+#include <auth/cert.h>
 #include "gnutls_cert.h"
 #include "gnutls_constate.h"
 #include <gnutls_record.h>
 #include <gnutls_state.h>
-#include <ext_srp.h>
-#include <ext_session_ticket.h>
-#include <ext_safe_renegotiation.h>
+#include <ext/srp.h>
+#include <ext/session_ticket.h>
+#include <ext/safe_renegotiation.h>
 #include <gnutls_rsa_export.h>  /* for gnutls_get_rsa_params() */
-#include <auth_anon.h>          /* for gnutls_anon_server_credentials_t */
-#include <auth_psk.h>           /* for gnutls_psk_server_credentials_t */
+#include <auth/anon.h>          /* for gnutls_anon_server_credentials_t */
+#include <auth/psk.h>           /* for gnutls_psk_server_credentials_t */
 #include <random.h>
 #include <gnutls_dtls.h>
 

@@ -28,11 +28,11 @@
 #include "gnutls_auth.h"
 #include "gnutls_auth.h"
 #include "gnutls_algorithms.h"
-#include "auth_cert.h"
-#include "auth_psk.h"
+#include <auth/cert.h>
+#include <auth/psk.h>
+#include <auth/anon.h>
 #include <gnutls_datum.h>
 
-#include "auth_anon.h"
 /* The functions here are used in order for authentication algorithms
  * to be able to retrieve the needed credentials eg public and private
  * key etc.

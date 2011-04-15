@@ -31,8 +31,8 @@
 
 #include "x509_b64.h"
 #include "gnutls_errors.h"
-#include <auth_srp_passwd.h>
-#include "auth_srp.h"
+#include <auth/srp_passwd.h>
+#include <auth/srp.h>
 #include "gnutls_auth.h"
 #include "gnutls_srp.h"
 #include "gnutls_dh.h"

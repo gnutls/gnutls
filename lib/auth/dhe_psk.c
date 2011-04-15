@@ -33,11 +33,11 @@
 #include "gnutls_auth.h"
 #include "gnutls_errors.h"
 #include "gnutls_dh.h"
-#include "auth_psk.h"
+#include <auth/psk.h>
 #include "gnutls_num.h"
 #include "gnutls_mpi.h"
 #include <gnutls_state.h>
-#include <auth_dh_common.h>
+#include <auth/dh_common.h>
 #include <gnutls_datum.h>
 
 static int gen_psk_server_kx (gnutls_session_t, gnutls_buffer_st*);
