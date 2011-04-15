@@ -27,8 +27,6 @@ also supports @acronym{X.509} and @acronym{OpenPGP} @xcite{RFC4880}.
 * TLS Extensions::
 * Selecting cryptographic key sizes::
 * On SSL 2 and older protocols::
-* On Record Padding::
-* Safe Renegotiation::
 @end menu
 
 @node TLS layers
@@ -130,6 +128,7 @@ just after the handshake protocol has finished.
 * Encryption algorithms used in the record layer::
 * Compression algorithms used in the record layer::
 * Weaknesses and countermeasures::
+* On Record Padding::
 @end menu
 
 @node Encryption algorithms used in the record layer
@@ -244,6 +243,42 @@ Those weaknesses were solved in @acronym{TLS} 1.1 @xcite{RFC4346}
 which is implemented in @acronym{GnuTLS}. For a detailed discussion
 see the archives of the TLS Working Group mailing list and the paper
 @xcite{CBCATT}.
+
+@node On Record Padding
+@subsection On Record Padding
+@cindex Record padding
+@cindex Bad record MAC
+
+The TLS protocol allows for random padding of records, to make it more
+difficult to perform analysis on the length of exchanged messages (RFC 5246 6.2.3.2).  
+GnuTLS appears to be one of few implementation that take advantage of this text, 
+and pad records by a random length.
+
+The TLS implementation in the Symbian operating system, frequently
+used by Nokia and Sony-Ericsson mobile phones, cannot handle
+non-minimal record padding.  What happens when one of these clients
+handshake with a GnuTLS server is that the client will fail to compute
+the correct MAC for the record.  The client sends a TLS alert
+(@code{bad_record_mac}) and disconnects.  Typically this will result
+in error messages such as 'A TLS fatal alert has been received', 'Bad
+record MAC', or both, on the GnuTLS server side.
+
+GnuTLS implements a work around for this problem.  However, it has to
+be enabled specifically.  It can be enabled by using
+@ref{gnutls_record_disable_padding}, or @ref{gnutls_priority_set} with
+the @code{%COMPAT} priority string.
+
+If you implement an application that have a configuration file, we
+recommend that you make it possible for users or administrators to
+specify a GnuTLS protocol priority string, which is used by your
+application via @ref{gnutls_priority_set}.  To allow the best
+flexibility, make it possible to have a different priority string for
+different incoming IP addresses.
+
+To enable the workaround in the @code{gnutls-cli} client or the
+@code{gnutls-serv} server, for testing of other implementations, use
+the following parameter: @code{--priority "NORMAL:%COMPAT"}.
+
 
 @node The TLS Alert Protocol
 @section The TLS Alert Protocol
@@ -579,6 +614,7 @@ in @acronym{GnuTLS} are:
 @item Maximum fragment length negotiation
 @item Server name indication
 @item Session tickets
+@item Safe Renegotiation
 @end itemize
 
 and they will be discussed in the subsections that follow.
@@ -627,6 +663,107 @@ Clients can enable support for TLS tickets with
 @ref{gnutls_session_ticket_enable_server} to enable the extension.
 Clients resume sessions using the ticket using the normal session
 resume functions, @ref{resume}.
+
+@subsection Safe Renegotiation
+@cindex renegotiation
+
+TLS gives the option to two communicating parties to renegotiate
+and update their security parameters. One useful example of this feature
+was for a client to initially connect using anonymous negotiation to a
+server, and the renegotiate using some authenticated ciphersuite. This occured
+to avoid having the client sending its credentials in the clear.
+
+However this renegotiation, as initially designed would not ensure that
+the party one is renegotiating is the same as the one in the initial negotiation.
+For example one server could forward all renegotiation traffic to an other
+server who will see this traffic as an initial negotiation attempt.
+
+This might be seen as a valid design decision, but it seems it was
+not widely known or understood, thus today some application protocols the TLS
+renegotiation feature in a manner that enables a malicious server to insert
+content of his choice in the beginning of a TLS session.
+
+The most prominent vulnerability was with HTTPS. There servers request
+a renegotiation to enforce an anonymous user to use a certificate in order
+to access certain parts of a web site.  The
+attack works by having the attacker simulate a client and connect to a
+server, with server-only authentication, and send some data intended
+to cause harm.  The server will then require renegotiation from him
+in order to perform the request. 
+When the proper client attempts to contact the server,
+the attacker hijacks that connection and forwards traffic to
+the initial server that requested renegotiation.  The
+attacker will not be able to read the data exchanged between the
+client and the server.  However, the server will (incorrectly) assume
+that the initial request sent by the attacker was sent by the now authenticated
+client.  The result is a prefix plain-text injection attack.
+
+The above is just one example.  Other vulnerabilities exists that do
+not rely on the TLS renegotiation to change the client's authenticated
+status (either TLS or application layer).
+
+While fixing these application protocols and implementations would be
+one natural reaction, an extension to TLS has been designed that
+cryptographically binds together any renegotiated handshakes with the
+initial negotiation.  When the extension is used, the attack is
+detected and the session can be terminated.  The extension is
+specified in @xcite{RFC5746}.
+
+GnuTLS supports the safe renegotiation extension.  The default
+behavior is as follows.  Clients will attempt to negotiate the safe
+renegotiation extension when talking to servers.  Servers will accept
+the extension when presented by clients.  Clients and servers will
+permit an initial handshake to complete even when the other side does
+not support the safe renegotiation extension.  Clients and servers
+will refuse renegotiation attempts when the extension has not been
+negotiated.
+
+Note that permitting clients to connect to servers when the safe
+renegotiation extension is not enabled, is open up for attacks.
+Changing this default behaviour would prevent interoperability against
+the majority of deployed servers out there.  We will reconsider this
+default behaviour in the future when more servers have been upgraded.
+Note that it is easy to configure clients to always require the safe
+renegotiation extension from servers (see below on the
+@code{%SAFE_RENEGOTIATION} priority string).
+
+To modify the default behaviour, we have introduced some new priority
+strings.  The priority strings can be used by applications
+(@pxref{gnutls_priority_set}) and end users (e.g., @code{--priority}
+parameter to @code{gnutls-cli} and @code{gnutls-serv}).
+
+The @code{%UNSAFE_RENEGOTIATION} priority string permits
+(re-)handshakes even when the safe renegotiation extension was not
+negotiated. The default behavior is @code{%PARTIAL_RENEGOTIATION} that will
+prevent renegotiation with clients and servers not supporting the
+extension. This is secure for servers but leaves clients vulnerable
+to some attacks, but this is a tradeoff between security and compatibility
+with old servers. The @code{%SAFE_RENEGOTIATION} priority string makes
+clients and servers require the extension for every handshake. The latter
+is the most secure option for clients, at the cost of not being able
+to connect to legacy servers. Servers will also deny clients that
+do not support the extension from connecting.
+
+It is possible to disable use of the extension completely, in both
+clients and servers, by using the @code{%DISABLE_SAFE_RENEGOTIATION}
+priority string however we strongly recommend you to only do this for
+debugging and test purposes.
+
+The default values if the flags above are not specified are:
+@table @code
+
+@item Server:
+%PARTIAL_RENEGOTIATION
+
+@item Client:
+%PARTIAL_RENEGOTIATION
+
+@end table
+
+For applications we have introduced a new API related to safe
+renegotiation.  The @ref{gnutls_safe_renegotiation_status} function is
+used to check if the extension has been negotiated on a session, and
+can be used both by clients and servers.
 
 @node Selecting cryptographic key sizes
 @section Selecting Cryptographic Key Sizes
@@ -762,140 +899,4 @@ Other protocols such as Microsoft's @acronym{PCT} 1 and @acronym{PCT}
 2 were not implemented because they were also abandoned and deprecated
 by @acronym{SSL} 3.0 and later @acronym{TLS} 1.0.
 
-@node On Record Padding
-@section On Record Padding
-@cindex Record padding
-@cindex Bad record MAC
 
-The TLS protocol allows for random padding of records, to make it more
-difficult to perform analysis on the length of exchanged messages.
-(In RFC 4346 this is specified in section 6.2.3.2.)  GnuTLS appears to
-be one of few implementation that take advantage of this text, and pad
-records by a random length.
-
-The TLS implementation in the Symbian operating system, frequently
-used by Nokia and Sony-Ericsson mobile phones, cannot handle
-non-minimal record padding.  What happens when one of these clients
-handshake with a GnuTLS server is that the client will fail to compute
-the correct MAC for the record.  The client sends a TLS alert
-(@code{bad_record_mac}) and disconnects.  Typically this will result
-in error messages such as 'A TLS fatal alert has been received', 'Bad
-record MAC', or both, on the GnuTLS server side.
-
-GnuTLS implements a work around for this problem.  However, it has to
-be enabled specifically.  It can be enabled by using
-@ref{gnutls_record_disable_padding}, or @ref{gnutls_priority_set} with
-the @code{%COMPAT} priority string.
-
-If you implement an application that have a configuration file, we
-recommend that you make it possible for users or administrators to
-specify a GnuTLS protocol priority string, which is used by your
-application via @ref{gnutls_priority_set}.  To allow the best
-flexibility, make it possible to have a different priority string for
-different incoming IP addresses.
-
-To enable the workaround in the @code{gnutls-cli} client or the
-@code{gnutls-serv} server, for testing of other implementations, use
-the following parameter: @code{--priority "NORMAL:%COMPAT"}.
-
-@node Safe Renegotiation
-@section Safe Renegotiation
-@cindex renegotiation
-
-TLS gives the option to two communicating parties to renegotiate
-and update their security parameters. One useful example of this feature
-was for a client to initially connect using anonymous negotiation to a
-server, and the renegotiate using some authenticated ciphersuite. This occured
-to avoid having the client sending its credentials in the clear.
-
-However this renegotiation, as initially designed would not ensure that
-the party one is renegotiating is the same as the one in the initial negotiation.
-For example one server could forward all renegotiation traffic to an other
-server who will see this traffic as an initial negotiation attempt.
-
-This might be seen as a valid design decision, but it seems it was
-not widely known or understood, thus today some application protocols the TLS
-renegotiation feature in a manner that enables a malicious server to insert
-content of his choice in the beginning of a TLS session.
-
-The most prominent vulnerability was with HTTPS. There servers request
-a renegotiation to enforce an anonymous user to use a certificate in order
-to access certain parts of a web site.  The
-attack works by having the attacker simulate a client and connect to a
-server, with server-only authentication, and send some data intended
-to cause harm.  The server will then require renegotiation from him
-in order to perform the request. 
-When the proper client attempts to contact the server,
-the attacker hijacks that connection and forwards traffic to
-the initial server that requested renegotiation.  The
-attacker will not be able to read the data exchanged between the
-client and the server.  However, the server will (incorrectly) assume
-that the initial request sent by the attacker was sent by the now authenticated
-client.  The result is a prefix plain-text injection attack.
-
-The above is just one example.  Other vulnerabilities exists that do
-not rely on the TLS renegotiation to change the client's authenticated
-status (either TLS or application layer).
-
-While fixing these application protocols and implementations would be
-one natural reaction, an extension to TLS has been designed that
-cryptographically binds together any renegotiated handshakes with the
-initial negotiation.  When the extension is used, the attack is
-detected and the session can be terminated.  The extension is
-specified in @xcite{RFC5746}.
-
-GnuTLS supports the safe renegotiation extension.  The default
-behavior is as follows.  Clients will attempt to negotiate the safe
-renegotiation extension when talking to servers.  Servers will accept
-the extension when presented by clients.  Clients and servers will
-permit an initial handshake to complete even when the other side does
-not support the safe renegotiation extension.  Clients and servers
-will refuse renegotiation attempts when the extension has not been
-negotiated.
-
-Note that permitting clients to connect to servers when the safe
-renegotiation extension is not enabled, is open up for attacks.
-Changing this default behaviour would prevent interoperability against
-the majority of deployed servers out there.  We will reconsider this
-default behaviour in the future when more servers have been upgraded.
-Note that it is easy to configure clients to always require the safe
-renegotiation extension from servers (see below on the
-@code{%SAFE_RENEGOTIATION} priority string).
-
-To modify the default behaviour, we have introduced some new priority
-strings.  The priority strings can be used by applications
-(@pxref{gnutls_priority_set}) and end users (e.g., @code{--priority}
-parameter to @code{gnutls-cli} and @code{gnutls-serv}).
-
-The @code{%UNSAFE_RENEGOTIATION} priority string permits
-(re-)handshakes even when the safe renegotiation extension was not
-negotiated. The default behavior is @code{%PARTIAL_RENEGOTIATION} that will
-prevent renegotiation with clients and servers not supporting the
-extension. This is secure for servers but leaves clients vulnerable
-to some attacks, but this is a tradeoff between security and compatibility
-with old servers. The @code{%SAFE_RENEGOTIATION} priority string makes
-clients and servers require the extension for every handshake. The latter
-is the most secure option for clients, at the cost of not being able
-to connect to legacy servers. Servers will also deny clients that
-do not support the extension from connecting.
-
-It is possible to disable use of the extension completely, in both
-clients and servers, by using the @code{%DISABLE_SAFE_RENEGOTIATION}
-priority string however we strongly recommend you to only do this for
-debugging and test purposes.
-
-The default values if the flags above are not specified are:
-@table @code
-
-@item Server:
-%PARTIAL_RENEGOTIATION
-
-@item Client:
-%PARTIAL_RENEGOTIATION
-
-@end table
-
-For applications we have introduced a new API related to safe
-renegotiation.  The @ref{gnutls_safe_renegotiation_status} function is
-used to check if the extension has been negotiated on a session, and
-can be used both by clients and servers.
