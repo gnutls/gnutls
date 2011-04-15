@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
