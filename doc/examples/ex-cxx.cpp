@@ -58,7 +58,6 @@ int main(void)
         int ret = session.handshake();
         if (ret < 0)
         {
-//             gnutls_perror(ret);
             throw std::runtime_error("Handshake failed");
         }
         else
