@@ -97,7 +97,7 @@ if test "$cryptolib" = "nettle";then
     AC_DEFINE([NETTLE_GCM], 1, [Nettle supports GCM])
   ], [
   ])
-    NETTLE_LIBS="-lgmp -lpthread -lhogweed"
+    NETTLE_LIBS="-lgmp -lhogweed"
 else
   AC_MSG_RESULT(no)
 fi
