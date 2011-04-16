@@ -545,7 +545,7 @@ test_zlib (gnutls_session_t session)
   int ret;
 
   sprintf (prio_str,
-           INIT_STR ALL_CIPHERS ":+COMP-ZLIB:" ALL_CERTTYPES ":%s:" ALL_MACS
+           INIT_STR ALL_CIPHERS ":+COMP-DEFLATE:" ALL_CERTTYPES ":%s:" ALL_MACS
            ":" ALL_KX ":%s", protocol_str, rest);
   _gnutls_priority_set_direct (session, prio_str);
 
