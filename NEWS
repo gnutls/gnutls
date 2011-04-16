@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.12.3 (unreleased)
 
+* libgnutls: Restored HMAC-MD5 for compatibility. Although considered 
+weak, several sites require it for connection. It is enabled for
+"NORMAL" and "PERFORMANCE" priority strings.
+
 * libgnutls: depend on libdl.
 
 * libgnutls: gnutls_transport_set_global_errno() was deprecated.
