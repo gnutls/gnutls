@@ -1,3 +1,3 @@
-The Intel AES library is not part of the GnuTLS library, but is used with
-GnuTLS. The license of Intel AES library is included in license.txt.
+The AES-NI implementation by Andy Polyakov is not part of the GnuTLS library, but is 
+used with GnuTLS. Its license is included in license.txt.
 

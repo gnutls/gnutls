@@ -36,6 +36,7 @@ AC_MSG_RESULT([***
 
 dnl Checks for programs.
 AC_PROG_CC
+AM_PROG_AS
 AC_PROG_CXX
 gl_EARLY
 
@@ -79,18 +80,13 @@ if test "$use_accel" != "no"; then
 case $host_cpu in
   i?86 | x86_64 | amd64)
     GCC_FLAG_ADD([-maes -mpclmul],[X86])
-    AC_CHECK_PROGS(YASM, yasm)
 
-    if test "x$YASM" != "x";then
-      if test "x$X86" = "xyes";then
-        if test "$host_cpu" = "x86_64" -o "$host_cpu" = "amd64";then
-          hw_accel="x86-64"
-        else
-          hw_accel="x86"
-        fi
+    if test "x$X86" = "xyes";then
+      if test "$host_cpu" = "x86_64" -o "$host_cpu" = "amd64";then
+        hw_accel="x86-64"
+      else
+        hw_accel="x86"
       fi
-    else
-      AC_MSG_WARN([[yasm assembler not found. Disabling AES-NI compilation.]])
     fi
   ;;
   *)

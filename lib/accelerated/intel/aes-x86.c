@@ -31,33 +31,44 @@
 #include <gnutls_errors.h>
 #include <aes-x86.h>
 #include <x86.h>
-#include "iaes_asm_interface.h"
 
 #ifdef __GNUC__
-# define ALIGN16 __attribute__ ((aligned (16))) 
+# define ALIGN16 __attribute__ ((aligned (16)))
 #else
 # define ALIGN16
 #endif
 
-typedef void (*enc_func)(sAesData*);
+#define AES_MAXNR 14
+typedef struct
+{
+  uint32_t ALIGN16 rd_key[4 * (AES_MAXNR + 1)];
+  int rounds;
+} AES_KEY;
 
-struct aes_ctx {
-	uint8_t ALIGN16 expanded_key[16*16];
-	uint8_t ALIGN16 expanded_key_dec[16*16];
-	uint8_t iv[16];
-	enc_func enc;
-	enc_func dec;
-	size_t keysize;
+void aesni_cbc_encrypt (const unsigned char *in, unsigned char *out,
+                        size_t len, const AES_KEY * key,
+                        unsigned char *ivec, const int enc);
+int aesni_set_decrypt_key (const unsigned char *userKey, const int bits,
+                           AES_KEY * key);
+int aesni_set_encrypt_key (const unsigned char *userKey, const int bits,
+                           AES_KEY * key);
+
+struct aes_ctx
+{
+  AES_KEY expanded_key;
+  AES_KEY expanded_key_dec;
+  uint8_t iv[16];
 };
 
 static int
 aes_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx)
 {
   struct aes_ctx *ctx;
-  
+
   /* we use key size to distinguish */
-  if (algorithm != GNUTLS_CIPHER_AES_128_CBC && algorithm != GNUTLS_CIPHER_AES_192_CBC 
-    && algorithm != GNUTLS_CIPHER_AES_256_CBC)
+  if (algorithm != GNUTLS_CIPHER_AES_128_CBC
+      && algorithm != GNUTLS_CIPHER_AES_192_CBC
+      && algorithm != GNUTLS_CIPHER_AES_256_CBC)
     return GNUTLS_E_INVALID_REQUEST;
 
   *_ctx = gnutls_calloc (1, sizeof (struct aes_ctx));
@@ -75,33 +86,16 @@ aes_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx)
 static int
 aes_cipher_setkey (void *_ctx, const void *userkey, size_t keysize)
 {
-struct aes_ctx *ctx = _ctx;
+  struct aes_ctx *ctx = _ctx;
+  int ret;
 
-  if (keysize == 128/8)
-    {
-      iEncExpandKey128((void*)userkey, ctx->expanded_key);
-      iDecExpandKey128((void*)userkey, ctx->expanded_key_dec);
-      ctx->enc = iEnc128_CBC;
-      ctx->dec = iDec128_CBC;
-    }
-  else if (keysize == 192/8)
-    {
-      iEncExpandKey192((void*)userkey, ctx->expanded_key);
-      iDecExpandKey192((void*)userkey, ctx->expanded_key_dec);
-      ctx->enc = iEnc192_CBC;
-      ctx->dec = iDec192_CBC;
-    }
-  else if (keysize == 256/8)
-    {
-      iEncExpandKey256((void*)userkey, ctx->expanded_key);
-      iDecExpandKey256((void*)userkey, ctx->expanded_key_dec);
-      ctx->enc = iEnc256_CBC;
-      ctx->dec = iDec256_CBC;
-    }
-  else
-    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+  ret = aesni_set_encrypt_key (userkey, keysize * 8, &ctx->expanded_key);
+  if (ret != 0)
+    return gnutls_assert_val (GNUTLS_E_ENCRYPTION_FAILED);
 
-  ctx->keysize = keysize;
+  ret = aesni_set_decrypt_key (userkey, keysize * 8, &ctx->expanded_key_dec);
+  if (ret != 0)
+    return gnutls_assert_val (GNUTLS_E_ENCRYPTION_FAILED);
 
   return 0;
 }
@@ -117,36 +111,22 @@ aes_setiv (void *_ctx, const void *iv, size_t iv_size)
 
 static int
 aes_encrypt (void *_ctx, const void *plain, size_t plainsize,
-                   void *encr, size_t length)
+             void *encr, size_t length)
 {
-struct aes_ctx *ctx = _ctx;
-sAesData aesData;
-  
-  aesData.iv = ctx->iv;
-  aesData.in_block = (void*)plain;
-  aesData.out_block = encr;
-  aesData.expanded_key = ctx->expanded_key;
-  aesData.num_blocks = (plainsize + 1) / 16;
+  struct aes_ctx *ctx = _ctx;
 
-  ctx->enc(&aesData);
-
+  aesni_cbc_encrypt (plain, encr, plainsize, &ctx->expanded_key, ctx->iv, 1);
   return 0;
 }
 
 static int
 aes_decrypt (void *_ctx, const void *encr, size_t encrsize,
-                   void *plain, size_t length)
+             void *plain, size_t length)
 {
-struct aes_ctx *ctx = _ctx;
-sAesData aesData;
+  struct aes_ctx *ctx = _ctx;
 
-  aesData.iv = ctx->iv;
-  aesData.in_block = (void*)encr;
-  aesData.out_block = plain;
-  aesData.expanded_key = ctx->expanded_key_dec;
-  aesData.num_blocks = (encrsize + 1) / 16;
-
-  ctx->dec(&aesData);
+  aesni_cbc_encrypt (encr, plain, encrsize,
+                     &ctx->expanded_key_dec, ctx->iv, 0);
 
   return 0;
 }
@@ -166,38 +146,46 @@ static const gnutls_crypto_cipher_st cipher_struct = {
   .deinit = aes_deinit,
 };
 
-static unsigned check_optimized_aes(void)
+static unsigned
+check_optimized_aes (void)
 {
-unsigned int a,b,c,d;
-  cpuid(1, a,b,c,d);
-  
+  unsigned int a, b, c, d;
+  cpuid (1, a, b, c, d);
+
   return (c & 0x2000000);
 }
 
 void
 register_x86_crypto (void)
 {
-int ret;
-	if (check_optimized_aes()) {
-	        fprintf(stderr, "Intel AES accelerator was detected\n");
-		ret = gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_128_CBC, 80, &cipher_struct);
-		if (ret < 0)
-		{
-		  gnutls_assert ();
-		}
+  int ret;
+  if (check_optimized_aes ())
+    {
+      fprintf (stderr, "Intel AES accelerator was detected\n");
+      ret =
+        gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_128_CBC, 80,
+                                              &cipher_struct);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+        }
 
-		ret = gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_192_CBC, 80, &cipher_struct);
-		if (ret < 0)
-		{
-		  gnutls_assert ();
-		}
+      ret =
+        gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_192_CBC, 80,
+                                              &cipher_struct);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+        }
 
-		ret = gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_256_CBC, 80, &cipher_struct);
-		if (ret < 0)
-		{
-		  gnutls_assert ();
-		}
-	}
+      ret =
+        gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_256_CBC, 80,
+                                              &cipher_struct);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+        }
+    }
 
-	return;
+  return;
 }

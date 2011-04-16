@@ -32,25 +32,16 @@ if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../../minitasn1
 endif
 
-EXTRA_DIST = aes-x86.h README license.txt iaes_asm_interface.h iaesni.h \
-	asm/x64_iaesx64.s asm/x86_iaesx86.s
+EXTRA_DIST = aes-x86.h README license.txt
 
 noinst_LTLIBRARIES = libintel.la
 
 libintel_la_SOURCES = aes-x86.c
 libintel_la_LIBADD =
 
-YASM_OPTS = -D__linux__
-
-x64_iaesx64.o: asm/x64_iaesx64.s
-	$(YASM) $(YASM_OPTS) -f elf64 $^ -o $@
-
-x86_iaesx86.o: asm/x86_iaesx86.s
-	$(YASM) $(YASM_OPTS) -f elf32 $^ -o $@
-
 if ASM_X86_64
-libintel_la_LIBADD += x64_iaesx64.o
+libintel_la_SOURCES += asm/appro-aes-x86-64.s
 else
-libintel_la_LIBADD += x86_iaesx86.o
+libintel_la_SOURCES += asm/appro-aes-x86.s
 endif
 
