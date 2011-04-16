@@ -155,10 +155,33 @@ check_optimized_aes (void)
   return (c & 0x2000000);
 }
 
+static unsigned
+check_intel_or_amd (void)
+{
+  unsigned int a, b, c, d;
+  cpuid (0, a, b, c, d);
+
+  if ((memcmp(&b, "Genu", 4) == 0 &&
+		memcmp(&d, "ineI", 4) == 0 &&
+		memcmp(&c, "ntel", 4) == 0) ||
+     (memcmp(&b, "Auth", 4) == 0 &&
+		memcmp(&d, "enti", 4) == 0 &&
+		memcmp(&c, "cAMD", 4) == 0))
+    {
+      return 1;
+    }
+
+  return 0;
+}
+
 void
 register_x86_crypto (void)
 {
   int ret;
+
+  if (check_intel_or_amd() == 0)
+    return;
+
   if (check_optimized_aes ())
     {
       fprintf (stderr, "Intel AES accelerator was detected\n");
