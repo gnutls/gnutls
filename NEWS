@@ -8,6 +8,12 @@ See the end for copying conditions.
 ** libgnutls: Added support for AES-NI if detected. Uses
 Andy Polyakov's AES-NI code.
 
+* libgnutls: Restored HMAC-MD5 for compatibility. Although considered 
+weak, several sites require it for connection. It is enabled for
+"NORMAL" and "PERFORMANCE" priority strings.
+
+* libgnutls: depend on libdl.
+
 ** libgnutls-extra: Dropped support of LZO compression via liblzo.
 
 ** libgnutls: gnutls_transport_set_global_errno() was removed. This

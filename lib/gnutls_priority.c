@@ -363,10 +363,11 @@ static const int sign_priority_secure256[] = {
   0
 };
 
-static const int mac_priority_performance[] = {
+static const int mac_priority_normal[] = {
   GNUTLS_MAC_SHA1,
   GNUTLS_MAC_SHA256,
   GNUTLS_MAC_AEAD,
+  GNUTLS_MAC_MD5,
   0
 };
 
@@ -583,7 +584,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
           _set_priority (&(*priority_cache)->cipher,
                          cipher_priority_performance);
           _set_priority (&(*priority_cache)->kx, kx_priority_performance);
-          _set_priority (&(*priority_cache)->mac, mac_priority_performance);
+          _set_priority (&(*priority_cache)->mac, mac_priority_normal);
           _set_priority (&(*priority_cache)->sign_algo,
                          sign_priority_default);
         }
@@ -591,7 +592,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
         {
           _set_priority (&(*priority_cache)->cipher, cipher_priority_normal);
           _set_priority (&(*priority_cache)->kx, kx_priority_secure);
-          _set_priority (&(*priority_cache)->mac, mac_priority_secure);
+          _set_priority (&(*priority_cache)->mac, mac_priority_normal);
           _set_priority (&(*priority_cache)->sign_algo,
                          sign_priority_default);
         }
