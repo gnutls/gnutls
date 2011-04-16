@@ -25,7 +25,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_int.h>
 #include <gnutls/crypto.h>
-#include <gnutls_cryptodev.h>
+#include <accelerated/cryptodev.h>
 #include <gnutls_errors.h>
 
 #ifdef ENABLE_CRYPTODEV
