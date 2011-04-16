@@ -36,8 +36,6 @@
 #include <gnutls_extensions.h>
 #include <gnutls_constate.h>
 
-#ifdef ENABLE_SESSION_TICKET
-
 #define KEY_NAME_SIZE SESSION_TICKET_KEY_NAME_SIZE
 #define KEY_SIZE SESSION_TICKET_KEY_SIZE
 #define IV_SIZE SESSION_TICKET_IV_SIZE
@@ -739,5 +737,3 @@ error:
   
   return ret;
 }
-
-#endif
