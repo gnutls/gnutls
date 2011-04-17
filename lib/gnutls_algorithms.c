@@ -26,7 +26,6 @@
 #include "gnutls_int.h"
 #include "gnutls_algorithms.h"
 #include "gnutls_errors.h"
-#include "gnutls_cert.h"
 #include <x509/common.h>
 
 

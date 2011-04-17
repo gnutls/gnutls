@@ -86,7 +86,7 @@ gen_dhe_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
   bigint_t g, p;
   const bigint_t *mpis;
   int ret = 0, data_size;
-  gnutls_cert *apr_cert_list;
+  gnutls_pcert_st *apr_cert_list;
   gnutls_privkey_t apr_pkey;
   int apr_cert_list_length;
   gnutls_datum_t signature = { NULL, 0 }, ddata;
@@ -218,7 +218,7 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
   int ret;
   cert_auth_info_t info = _gnutls_get_auth_info (session);
   ssize_t data_size = _data_size;
-  gnutls_cert peer_cert;
+  gnutls_pcert_st peer_cert;
   gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
@@ -267,9 +267,9 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
   signature.size = sigsize;
 
   if ((ret =
-       _gnutls_get_auth_info_gcert (&peer_cert,
+       _gnutls_get_auth_info_pcert (&peer_cert,
                                     session->security_parameters.cert_type,
-                                    info, CERT_NO_COPY)) < 0)
+                                    info)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -279,7 +279,7 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
     _gnutls_handshake_verify_data (session, &peer_cert, &vparams, &signature,
                                    sign_algo);
 
-  _gnutls_gcert_deinit (&peer_cert);
+  gnutls_pcert_deinit (&peer_cert);
   if (ret < 0)
     {
       gnutls_assert ();

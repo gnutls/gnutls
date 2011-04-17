@@ -59,6 +59,7 @@ typedef struct
 } uint64;
 
 #include <gnutls/gnutls.h>
+#include <gnutls/abstract.h>
 
 /*
  * They are not needed any more. You can simply enable
@@ -394,7 +395,6 @@ typedef struct record_parameters_st record_parameters_st;
 #include <gnutls_hash_int.h>
 #include <gnutls_cipher_int.h>
 #include <gnutls_compress.h>
-#include <gnutls_cert.h>
 
 typedef struct
 {
@@ -748,7 +748,7 @@ typedef struct
    * use _gnutls_selected_certs_deinit() and _gnutls_selected_certs_set()
    * to change them.
    */
-  gnutls_cert *selected_cert_list;
+  gnutls_pcert_st *selected_cert_list;
   int selected_cert_list_length;
   struct gnutls_privkey_st *selected_key;
   int selected_need_free:1;

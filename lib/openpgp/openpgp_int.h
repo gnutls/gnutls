@@ -18,7 +18,7 @@
 typedef struct gnutls_openpgp_crt_int
 {
   cdk_kbnode_t knode;
-  gnutls_openpgp_keyid_t preferred_keyid;
+  uint8_t preferred_keyid[GNUTLS_OPENPGP_KEYID_SIZE];
   int preferred_set;
 } gnutls_openpgp_crt_int;
 
@@ -26,7 +26,7 @@ typedef struct gnutls_openpgp_crt_int
 typedef struct gnutls_openpgp_privkey_int
 {
   cdk_kbnode_t knode;
-  gnutls_openpgp_keyid_t preferred_keyid;
+  uint8_t preferred_keyid[GNUTLS_OPENPGP_KEYID_SIZE];
   int preferred_set;
 } gnutls_openpgp_privkey_int;
 
@@ -42,9 +42,6 @@ int _gnutls_openpgp_export (cdk_kbnode_t node,
                             gnutls_openpgp_crt_fmt_t format,
                             void *output_data, size_t * output_data_size,
                             int private);
-
-int _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert,
-                                  gnutls_openpgp_crt_t cert);
 
 cdk_packet_t _gnutls_get_valid_subkey (cdk_kbnode_t knode, int key_type);
 

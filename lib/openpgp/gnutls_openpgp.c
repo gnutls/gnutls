@@ -27,11 +27,11 @@
 #include "gnutls_errors.h"
 #include "gnutls_mpi.h"
 #include "gnutls_num.h"
-#include "gnutls_cert.h"
 #include "gnutls_datum.h"
 #include "gnutls_global.h"
 #include "gnutls_openpgp.h"
 #include "read-file.h"
+#include <gnutls/abstract.h>
 #include <gnutls_str.h>
 #include <gnutls_sig.h>
 #include <stdio.h>
@@ -67,54 +67,6 @@ _gnutls_map_cdk_rc (int rc)
     }
 }
 
-/*-
- * _gnutls_openpgp_raw_crt_to_gcert - Converts raw OpenPGP data to GnuTLS certs
- * @cert: the certificate to store the data.
- * @raw: the buffer which contains the whole OpenPGP key packets.
- *
- * The RFC2440 (OpenPGP Message Format) data is converted to a GnuTLS
- * specific certificate.
- -*/
-int
-_gnutls_openpgp_raw_crt_to_gcert (gnutls_cert * gcert,
-                                  const gnutls_datum_t * raw,
-                                  const gnutls_openpgp_keyid_t keyid)
-{
-  gnutls_openpgp_crt_t pcrt;
-  int ret;
-
-  ret = gnutls_openpgp_crt_init (&pcrt);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  ret = gnutls_openpgp_crt_import (pcrt, raw, GNUTLS_OPENPGP_FMT_RAW);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      gnutls_openpgp_crt_deinit (pcrt);
-      return ret;
-    }
-
-  if (keyid != NULL)
-    {
-      ret = gnutls_openpgp_crt_set_preferred_key_id (pcrt, keyid);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          gnutls_openpgp_crt_deinit (pcrt);
-          return ret;
-        }
-    }
-
-  ret = _gnutls_openpgp_crt_to_gcert (gcert, pcrt);
-  gnutls_openpgp_crt_deinit (pcrt);
-
-  return ret;
-}
-
 /**
  * gnutls_certificate_set_openpgp_key:
  * @res: is a #gnutls_certificate_credentials_t structure.
@@ -140,7 +92,7 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
 {
   int ret;
   gnutls_privkey_t privkey;
-  gnutls_cert *ccert;
+  gnutls_pcert_st *ccert;
 
   /* this should be first */
 
@@ -162,7 +114,7 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
     }
 
 
-  ccert = gnutls_calloc (1, sizeof (gnutls_cert));
+  ccert = gnutls_calloc (1, sizeof (gnutls_pcert_st));
   if (ccert == NULL)
     {
       gnutls_assert ();
@@ -170,7 +122,7 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  ret = _gnutls_openpgp_crt_to_gcert (ccert, crt);
+  ret = gnutls_pcert_import_openpgp (ccert, crt, 0);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -369,7 +321,7 @@ gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t res,
   gnutls_openpgp_privkey_t pkey;
   gnutls_openpgp_crt_t crt;
   int ret;
-  gnutls_openpgp_keyid_t keyid;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
   ret = gnutls_openpgp_privkey_init (&pkey);
   if (ret < 0)
@@ -718,125 +670,3 @@ gnutls_openpgp_set_recv_key_function (gnutls_session_t session,
   session->internals.openpgp_recv_key_func = func;
 }
 
-
-/* Converts a parsed gnutls_openpgp_crt_t to a gnutls_cert structure.
- */
-int
-_gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert, gnutls_openpgp_crt_t cert)
-{
-  int ret;
-  gnutls_openpgp_keyid_t keyid;
-  char err_buf[33];
-
-  memset (gcert, 0, sizeof (gnutls_cert));
-  gcert->cert_type = GNUTLS_CRT_OPENPGP;
-  gcert->sign_algo = GNUTLS_SIGN_UNKNOWN;       /* N/A here */
-
-  gcert->version = gnutls_openpgp_crt_get_version (cert);
-  gcert->params_size = MAX_PUBLIC_PARAMS_SIZE;
-
-  ret = gnutls_openpgp_crt_get_preferred_key_id (cert, keyid);
-
-  if (ret == 0)
-    {
-      int idx;
-      uint32_t kid32[2];
-
-      _gnutls_debug_log
-        ("Importing Openpgp cert and using openpgp sub key: %s\n",
-         _gnutls_bin2hex (keyid, GNUTLS_OPENPGP_KEYID_SIZE, err_buf, sizeof (err_buf),
-                          NULL));
-
-      KEYID_IMPORT (kid32, keyid);
-
-      idx = gnutls_openpgp_crt_get_subkey_idx (cert, keyid);
-      if (idx < 0)
-        {
-          gnutls_assert ();
-          return idx;
-        }
-
-      gcert->subject_pk_algorithm =
-        gnutls_openpgp_crt_get_subkey_pk_algorithm (cert, idx, NULL);
-
-      gnutls_openpgp_crt_get_subkey_usage (cert, idx, &gcert->key_usage);
-      gcert->use_subkey = 1;
-
-      memcpy (gcert->subkey_id, keyid, GNUTLS_OPENPGP_KEYID_SIZE);
-
-      ret =
-        _gnutls_openpgp_crt_get_mpis (cert, kid32, gcert->params,
-                                      &gcert->params_size);
-    }
-  else
-    {
-      _gnutls_debug_log
-        ("Importing Openpgp cert and using main openpgp key\n");
-      gcert->subject_pk_algorithm =
-        gnutls_openpgp_crt_get_pk_algorithm (cert, NULL);
-
-      gnutls_openpgp_crt_get_key_usage (cert, &gcert->key_usage);
-      ret =
-        _gnutls_openpgp_crt_get_mpis (cert, NULL, gcert->params,
-                                      &gcert->params_size);
-      gcert->use_subkey = 0;
-    }
-
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  {                             /* copy the raw certificate */
-#define SMALL_RAW 512
-    opaque *raw;
-    size_t raw_size = SMALL_RAW;
-
-    /* initially allocate a bogus size, just in case the certificate
-     * fits in it. That way we minimize the DER encodings performed.
-     */
-    raw = gnutls_malloc (raw_size);
-    if (raw == NULL)
-      {
-        gnutls_assert ();
-        return GNUTLS_E_MEMORY_ERROR;
-      }
-
-    ret =
-      gnutls_openpgp_crt_export (cert, GNUTLS_OPENPGP_FMT_RAW, raw,
-                                 &raw_size);
-    if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
-      {
-        gnutls_assert ();
-        gnutls_free (raw);
-        return ret;
-      }
-
-    if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
-      {
-        raw = gnutls_realloc (raw, raw_size);
-        if (raw == NULL)
-          {
-            gnutls_assert ();
-            return GNUTLS_E_MEMORY_ERROR;
-          }
-
-        ret =
-          gnutls_openpgp_crt_export (cert, GNUTLS_OPENPGP_FMT_RAW, raw,
-                                     &raw_size);
-        if (ret < 0)
-          {
-            gnutls_assert ();
-            gnutls_free (raw);
-            return ret;
-          }
-      }
-
-    gcert->raw.data = raw;
-    gcert->raw.size = raw_size;
-  }
-
-  return 0;
-
-}

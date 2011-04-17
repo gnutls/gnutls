@@ -479,7 +479,7 @@ gnutls_certificate_get_ours (gnutls_session_t session)
   if (session->internals.selected_cert_list == NULL)
     return NULL;
 
-  return &session->internals.selected_cert_list[0].raw;
+  return &session->internals.selected_cert_list[0].cert;
 }
 
 /**

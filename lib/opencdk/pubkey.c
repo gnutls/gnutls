@@ -27,7 +27,8 @@
 #endif
 #include <gnutls_int.h>
 #include <gnutls_datum.h>
-
+#include <gnutls_pk.h>
+#include <x509/common.h>
 #include "opencdk.h"
 #include "main.h"
 #include "packet.h"

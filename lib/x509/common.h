@@ -27,6 +27,7 @@
 #define COMMON_H
 
 #include <gnutls_algorithms.h>
+#include <x509/x509_int.h>
 
 #define MAX_STRING_LEN 512
 

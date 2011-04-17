@@ -32,7 +32,6 @@
 #ifdef ENABLE_PKI
 
 #include <gnutls_errors.h>
-#include <gnutls_cert.h>
 #include <libtasn1.h>
 #include <gnutls_global.h>
 #include <gnutls_num.h>         /* MAX */

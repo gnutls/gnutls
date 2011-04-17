@@ -1426,7 +1426,7 @@ int
 gnutls_openpgp_crt_get_pk_rsa_raw (gnutls_openpgp_crt_t crt,
                                    gnutls_datum_t * m, gnutls_datum_t * e)
 {
-  gnutls_openpgp_keyid_t keyid;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
   int ret;
 
   ret = gnutls_openpgp_crt_get_key_id (crt, keyid);
@@ -1460,7 +1460,7 @@ gnutls_openpgp_crt_get_pk_dsa_raw (gnutls_openpgp_crt_t crt,
                                    gnutls_datum_t * p, gnutls_datum_t * q,
                                    gnutls_datum_t * g, gnutls_datum_t * y)
 {
-  gnutls_openpgp_keyid_t keyid;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
   int ret;
 
   ret = gnutls_openpgp_crt_get_key_id (crt, keyid);
@@ -1494,7 +1494,7 @@ gnutls_openpgp_crt_get_subkey_pk_rsa_raw (gnutls_openpgp_crt_t crt,
                                           gnutls_datum_t * m,
                                           gnutls_datum_t * e)
 {
-  gnutls_openpgp_keyid_t keyid;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
   int ret;
 
   ret = gnutls_openpgp_crt_get_subkey_id (crt, idx, keyid);
@@ -1532,7 +1532,7 @@ gnutls_openpgp_crt_get_subkey_pk_dsa_raw (gnutls_openpgp_crt_t crt,
                                           gnutls_datum_t * g,
                                           gnutls_datum_t * y)
 {
-  gnutls_openpgp_keyid_t keyid;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
   int ret;
 
   ret = gnutls_openpgp_crt_get_subkey_id (crt, idx, keyid);

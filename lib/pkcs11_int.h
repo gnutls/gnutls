@@ -3,6 +3,7 @@
 
 #include <pakchois/pakchois.h>
 #include <gnutls/pkcs11.h>
+#include <x509/x509_int.h>
 
 #define PKCS11_ID_SIZE 128
 #define PKCS11_LABEL_SIZE 128

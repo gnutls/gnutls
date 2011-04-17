@@ -28,6 +28,7 @@
 
 #include <gnutls_mpi.h>
 #include <gnutls_errors.h>
+#include <x509_int.h>
 
 /* Returns 0 if the password is ok, or a negative error
  * code instead.

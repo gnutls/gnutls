@@ -33,6 +33,7 @@
 #include <gnutls_num.h>
 #include <gnutls_mpi.h>
 #include <random.h>
+#include <x509/x509_int.h>
 
 /* Functions that refer to the mpi library.
  */

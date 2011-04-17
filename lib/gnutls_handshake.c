@@ -45,7 +45,6 @@
 #include "gnutls_auth.h"
 #include "gnutls_v2_compat.h"
 #include <auth/cert.h>
-#include "gnutls_cert.h"
 #include "gnutls_constate.h"
 #include <gnutls_record.h>
 #include <gnutls_state.h>

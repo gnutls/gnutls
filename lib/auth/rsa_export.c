@@ -43,6 +43,7 @@
 #include <gnutls_rsa_export.h>
 #include <gnutls_state.h>
 #include <random.h>
+#include <abstract_int.h>
 
 int _gnutls_gen_rsa_client_kx (gnutls_session_t, gnutls_buffer_st*);
 static int gen_rsa_export_server_kx (gnutls_session_t, gnutls_buffer_st*);
@@ -73,7 +74,7 @@ static int
 _gnutls_get_private_rsa_params (gnutls_session_t session,
                                 bigint_t ** params, int *params_size)
 {
-  int bits;
+  int ret;
   gnutls_certificate_credentials_t cred;
   gnutls_rsa_params_t rsa_params;
 
@@ -91,13 +92,11 @@ _gnutls_get_private_rsa_params (gnutls_session_t session,
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  bits =
-    _gnutls_mpi_get_nbits (session->internals.
-                           selected_cert_list[0].params[0]);
+  ret = _gnutls_pubkey_is_over_rsa_512(session->internals.selected_cert_list[0].pubkey);
 
   if (_gnutls_cipher_suite_get_kx_algo
       (&session->security_parameters.current_cipher_suite)
-      != GNUTLS_KX_RSA_EXPORT || bits < 512)
+      != GNUTLS_KX_RSA_EXPORT || ret < 0)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -239,7 +238,7 @@ gen_rsa_export_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
   gnutls_rsa_params_t rsa_params;
   const bigint_t *rsa_mpis;
   int ret = 0;
-  gnutls_cert *apr_cert_list;
+  gnutls_pcert_st *apr_cert_list;
   gnutls_privkey_t apr_pkey;
   int apr_cert_list_length;
   gnutls_datum_t signature, ddata;
@@ -337,7 +336,7 @@ gen_rsa_export_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 int
 _gnutls_peers_cert_less_512 (gnutls_session_t session)
 {
-  gnutls_cert peer_cert;
+  gnutls_pcert_st peer_cert;
   int ret;
   cert_auth_info_t info = _gnutls_get_auth_info (session);
 
@@ -349,28 +348,28 @@ _gnutls_peers_cert_less_512 (gnutls_session_t session)
     }
 
   if ((ret =
-       _gnutls_get_auth_info_gcert (&peer_cert,
+       _gnutls_get_auth_info_pcert (&peer_cert,
                                     session->security_parameters.cert_type,
-                                    info, CERT_NO_COPY)) < 0)
+                                    info)) < 0)
     {
       gnutls_assert ();
       return 0;
     }
 
-  if (peer_cert.subject_pk_algorithm != GNUTLS_PK_RSA)
+  if (gnutls_pubkey_get_pk_algorithm(peer_cert.pubkey, NULL) != GNUTLS_PK_RSA)
     {
       gnutls_assert ();
-      _gnutls_gcert_deinit (&peer_cert);
+      gnutls_pcert_deinit (&peer_cert);
       return 0;
     }
 
-  if (_gnutls_mpi_get_nbits (peer_cert.params[0]) <= 512)
+  if (_gnutls_pubkey_is_over_rsa_512(peer_cert.pubkey) < 0)
     {
-      _gnutls_gcert_deinit (&peer_cert);
+      gnutls_pcert_deinit (&peer_cert);
       return 1;
     }
 
-  _gnutls_gcert_deinit (&peer_cert);
+  gnutls_pcert_deinit (&peer_cert);
 
   return 0;
 }
@@ -388,7 +387,7 @@ proc_rsa_export_server_kx (gnutls_session_t session,
   int ret;
   ssize_t data_size = _data_size;
   cert_auth_info_t info;
-  gnutls_cert peer_cert;
+  gnutls_pcert_st peer_cert;
 
   info = _gnutls_get_auth_info (session);
   if (info == NULL || info->ncerts == 0)
@@ -448,9 +447,9 @@ proc_rsa_export_server_kx (gnutls_session_t session,
   signature.size = sigsize;
 
   if ((ret =
-       _gnutls_get_auth_info_gcert (&peer_cert,
+       _gnutls_get_auth_info_pcert (&peer_cert,
                                     session->security_parameters.cert_type,
-                                    info, CERT_NO_COPY)) < 0)
+                                    info)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -460,7 +459,7 @@ proc_rsa_export_server_kx (gnutls_session_t session,
     _gnutls_handshake_verify_data (session, &peer_cert, &vparams, &signature,
                                    GNUTLS_SIGN_UNKNOWN);
 
-  _gnutls_gcert_deinit (&peer_cert);
+  gnutls_pcert_deinit (&peer_cert);
   if (ret < 0)
     {
       gnutls_assert ();

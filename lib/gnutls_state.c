@@ -187,7 +187,7 @@ _gnutls_session_cert_type_supported (gnutls_session_t session,
         {
           for (i = 0; i < cred->ncerts; i++)
             {
-              if (cred->cert_list[i][0].cert_type == cert_type)
+              if (cred->cert_list[i][0].type == cert_type)
                 {
                   cert_found = 1;
                   break;

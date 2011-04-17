@@ -85,7 +85,7 @@ gen_srp_cert_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
   ssize_t ret, data_size;
   gnutls_datum_t signature, ddata;
   gnutls_certificate_credentials_t cred;
-  gnutls_cert *apr_cert_list;
+  gnutls_pcert_st *apr_cert_list;
   gnutls_privkey_t apr_pkey;
   int apr_cert_list_length;
   gnutls_sign_algorithm_t sign_algo;
@@ -145,7 +145,7 @@ proc_srp_cert_server_kx (gnutls_session_t session, opaque * data,
   gnutls_datum_t vparams, signature;
   ssize_t data_size;
   cert_auth_info_t info;
-  gnutls_cert peer_cert;
+  gnutls_pcert_st peer_cert;
   opaque *p;
 
   ret = _gnutls_proc_srp_server_kx (session, data, _data_size);
@@ -177,9 +177,9 @@ proc_srp_cert_server_kx (gnutls_session_t session, opaque * data,
   signature.size = sigsize;
 
   ret =
-    _gnutls_get_auth_info_gcert (&peer_cert,
+    _gnutls_get_auth_info_pcert (&peer_cert,
                                  session->security_parameters.cert_type,
-                                 info, CERT_NO_COPY);
+                                 info);
 
   if (ret < 0)
     {
@@ -191,7 +191,7 @@ proc_srp_cert_server_kx (gnutls_session_t session, opaque * data,
     _gnutls_handshake_verify_data (session, &peer_cert, &vparams, &signature,
                                    GNUTLS_SIGN_UNKNOWN);
 
-  _gnutls_gcert_deinit (&peer_cert);
+  gnutls_pcert_deinit (&peer_cert);
   if (ret < 0)
     {
       gnutls_assert ();

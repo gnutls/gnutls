@@ -29,15 +29,15 @@
 
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
-#include <gnutls_cert.h>
 #include <libtasn1.h>
 #include <gnutls_global.h>
 #include <gnutls_num.h>         /* MAX */
 #include <gnutls_sig.h>
 #include <gnutls_str.h>
 #include <gnutls_datum.h>
-#include "x509_int.h"
+#include <x509_int.h>
 #include <common.h>
+#include <gnutls_pk.h>
 
 static int is_crl_issuer (gnutls_x509_crl_t crl,
                           gnutls_x509_crt_t issuer_cert);

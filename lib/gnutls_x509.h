@@ -37,7 +37,7 @@ int _gnutls_x509_cert_verify_peers (gnutls_session_t session,
 #define PEM_KEY_RSA_SEP "-----BEGIN RSA"
 #define PEM_KEY_DSA_SEP "-----BEGIN DSA"
 
-int _gnutls_check_key_usage (const gnutls_cert * cert,
+int _gnutls_check_key_usage (const gnutls_pcert_st* cert,
                              gnutls_kx_algorithm_t alg);
 
 int _gnutls_x509_raw_privkey_to_gkey (gnutls_privkey_t * privkey,

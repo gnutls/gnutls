@@ -41,6 +41,8 @@
 
 #define PK_PEM_HEADER "PUBLIC KEY"
 
+#define OPENPGP_KEY_PRIMARY 2
+#define OPENPGP_KEY_SUBKEY 1
 
 struct gnutls_pubkey_st
 {
@@ -58,6 +60,9 @@ struct gnutls_pubkey_st
    */
   bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
   int params_size;              /* holds the size of MPI params */
+
+  uint8_t openpgp_key_id[GNUTLS_OPENPGP_KEYID_SIZE];
+  int openpgp_key_id_set;
 
   unsigned int key_usage;       /* bits from GNUTLS_KEY_* */
 };
@@ -348,13 +353,17 @@ gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
   int ret, idx;
   uint32_t kid32[2];
   uint32_t *k;
-  gnutls_openpgp_keyid_t keyid;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
   ret = gnutls_openpgp_crt_get_preferred_key_id (crt, keyid);
   if (ret == GNUTLS_E_OPENPGP_PREFERRED_KEY_ERROR)
     {
-      key->pk_algorithm = gnutls_openpgp_crt_get_pk_algorithm(crt, NULL);
       key->pk_algorithm = gnutls_openpgp_crt_get_pk_algorithm (crt, &key->bits);
+      key->openpgp_key_id_set = OPENPGP_KEY_PRIMARY;
+
+      ret = gnutls_openpgp_crt_get_key_id(crt, key->openpgp_key_id);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
 
       ret = gnutls_openpgp_crt_get_key_usage (crt, &key->key_usage);
       if (ret < 0)
@@ -369,11 +378,16 @@ gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
           gnutls_assert ();
           return ret;
         }
+        key->openpgp_key_id_set = OPENPGP_KEY_SUBKEY;
 
         KEYID_IMPORT (kid32, keyid);
         k = kid32;
 
         idx = gnutls_openpgp_crt_get_subkey_idx (crt, keyid);
+
+        ret = gnutls_openpgp_crt_get_subkey_id(crt, idx, key->openpgp_key_id);
+        if (ret < 0)
+          return gnutls_assert_val(ret);
 
         ret = gnutls_openpgp_crt_get_subkey_usage (crt, idx, &key->key_usage);
         if (ret < 0)
@@ -385,6 +399,7 @@ gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
   switch (key->pk_algorithm)
     {
     case GNUTLS_PK_RSA:
+      key->params_size = MAX_PUBLIC_PARAMS_SIZE;
       ret =
         _gnutls_openpgp_crt_get_mpis (crt, k, key->params,
                                       &key->params_size);
@@ -395,6 +410,7 @@ gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
         }
       break;
     case GNUTLS_PK_DSA:
+      key->params_size = MAX_PUBLIC_PARAMS_SIZE;
       ret =
         _gnutls_openpgp_crt_get_mpis (crt, k, key->params,
                                       &key->params_size);
@@ -408,6 +424,60 @@ gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
+
+  return 0;
+}
+
+/**
+ * gnutls_pubkey_get_openpgp_key_id:
+ * @key: Holds the public key
+ * @flags: should be 0 for now
+ * @output_data: will contain the key ID
+ * @output_data_size: holds the size of output_data (and will be
+ *   replaced by the actual size of parameters)
+ * @subkey: Will be non zero if the key ID corresponds to a subkey
+ *
+ * This function will return a unique ID the depends on the public
+ * key parameters. This ID can be used in checking whether a
+ * certificate corresponds to the given public key.
+ *
+ * If the buffer provided is not long enough to hold the output, then
+ * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
+ * be returned.  The output will normally be a SHA-1 hash output,
+ * which is 20 bytes.
+ *
+ * Return value: In case of failure a negative value will be
+ *   returned, and 0 on success.
+ **/
+int
+gnutls_pubkey_get_openpgp_key_id (gnutls_pubkey_t key, unsigned int flags,
+                          unsigned char *output_data,
+                          size_t * output_data_size,
+                          unsigned int *subkey)
+{
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  if (*output_data_size < sizeof(key->openpgp_key_id))
+    {
+      *output_data_size = sizeof(key->openpgp_key_id);
+      return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+    }
+
+  if (key->openpgp_key_id_set == 0)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  if (key->openpgp_key_id_set == OPENPGP_KEY_SUBKEY)
+    if (subkey) *subkey = 1;
+
+  if (output_data)
+    {
+      memcpy(output_data, key->openpgp_key_id, sizeof(key->openpgp_key_id));
+    }
+  *output_data_size = sizeof(key->openpgp_key_id);
 
   return 0;
 }
@@ -1020,7 +1090,7 @@ gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
  * gnutls_pubkey_verify_data:
  * @pubkey: Holds the public key
  * @flags: should be 0 for now
- * @data: holds the data to be signed
+ * @data: holds the signed data
  * @signature: contains the signature
  *
  * This function will verify the given signed data, using the
@@ -1074,19 +1144,20 @@ gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
                            const gnutls_datum_t * hash,
                            const gnutls_datum_t * signature)
 {
-  int ret;
-
   if (key == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret =
-    pubkey_verify_sig (NULL, hash, signature, key->pk_algorithm,
+  if (flags & GNUTLS_PUBKEY_VERIFY_FLAG_TLS_RSA)
+    return _gnutls_rsa_verify (hash, signature, key->params,
+                                     key->params_size, 1);
+  else
+    {
+      return pubkey_verify_sig (NULL, hash, signature, key->pk_algorithm,
                        key->params, key->params_size);
-
-  return ret;
+    }
 }
 
 /**
@@ -1117,4 +1188,57 @@ gnutls_pubkey_get_verify_algorithm (gnutls_pubkey_t key,
                                         key->pk_algorithm,
                                         key->params, key->params_size);
 
+}
+
+
+int _gnutls_pubkey_compatible_with_sig(gnutls_pubkey_t pubkey, gnutls_protocol_t ver, 
+  gnutls_sign_algorithm_t sign)
+{
+  if (pubkey->pk_algorithm == GNUTLS_PK_DSA)
+    { /* override */
+      int hash_algo = _gnutls_dsa_q_to_hash (pubkey->params[1]);
+
+      /* DSA keys over 1024 bits cannot be used with TLS 1.x, x<2 */
+      if (!_gnutls_version_has_selectable_sighash (ver))
+        {
+          if (hash_algo != GNUTLS_DIG_SHA1)
+            return gnutls_assert_val(GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL);
+        }
+      else if (sign != GNUTLS_SIGN_UNKNOWN)
+        {
+          if (_gnutls_sign_get_hash_algorithm(sign) != hash_algo)
+            return GNUTLS_E_UNWANTED_ALGORITHM;
+        }
+        
+    }
+
+  return 0;
+}
+
+/* Returns zero if the public key has more than 512 bits */
+int _gnutls_pubkey_is_over_rsa_512(gnutls_pubkey_t pubkey)
+{
+  if (pubkey->pk_algorithm == GNUTLS_PK_RSA && _gnutls_mpi_get_nbits (pubkey->params[0]) > 512)
+    return 0;
+  else
+    return GNUTLS_E_INVALID_REQUEST; /* doesn't matter */
+
+}
+
+/* Returns the public key. The mpis are the internal copy. Should
+ * not be deallocated.
+ */
+int
+_gnutls_pubkey_get_mpis (gnutls_pubkey_t key,
+                                 bigint_t * params, int *params_size)
+{
+  int i;
+
+  if (*params_size < key->params_size)
+    return gnutls_assert_val(GNUTLS_E_SHORT_MEMORY_BUFFER);
+
+  for (i=0;i<key->params_size;i++)
+    params[i] = key->params[i];
+
+  return 0;
 }

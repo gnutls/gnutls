@@ -34,6 +34,7 @@
 #include <x509_b64.h>
 #include <x509_int.h>
 #include <libtasn1.h>
+#include <gnutls_pk.h>
 
 /**
  * gnutls_x509_crt_init:

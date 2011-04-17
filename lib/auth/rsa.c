@@ -42,6 +42,7 @@
 #include <gnutls_x509.h>
 #include <random.h>
 #include <gnutls_mpi.h>
+#include <abstract_int.h>
 
 int _gnutls_gen_rsa_client_kx (gnutls_session_t, gnutls_buffer_st*);
 static int proc_rsa_client_kx (gnutls_session_t, opaque *, size_t);
@@ -72,7 +73,9 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
 {
   int ret;
   cert_auth_info_t info;
-  gnutls_cert peer_cert;
+  gnutls_pcert_st peer_cert;
+  bigint_t tmp_params[RSA_PUBLIC_PARAMS];
+  int tmp_params_size;
   int i;
 
   /* normal non export case */
@@ -86,9 +89,9 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
     }
 
   ret =
-    _gnutls_get_auth_info_gcert (&peer_cert,
+    _gnutls_get_auth_info_pcert (&peer_cert,
                                  session->security_parameters.cert_type,
-                                 info, CERT_ONLY_PUBKEY | CERT_NO_COPY);
+                                 info);
 
   if (ret < 0)
     {
@@ -96,50 +99,54 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
       return ret;
     }
 
+  if (*params_len < RSA_PUBLIC_PARAMS)
+    {
+      gnutls_assert ();
+      ret = GNUTLS_E_INTERNAL_ERROR;
+      goto cleanup;
+    }
+  *params_len = RSA_PUBLIC_PARAMS;
 
   /* EXPORT case: */
   if (_gnutls_cipher_suite_get_kx_algo
       (&session->security_parameters.current_cipher_suite) ==
-      GNUTLS_KX_RSA_EXPORT
-      && _gnutls_mpi_get_nbits (peer_cert.params[0]) > 512)
+      GNUTLS_KX_RSA_EXPORT &&
+      _gnutls_pubkey_is_over_rsa_512(peer_cert.pubkey) == 0)
     {
-
-      _gnutls_gcert_deinit (&peer_cert);
-
       if (session->key->rsa[0] == NULL || session->key->rsa[1] == NULL)
         {
           gnutls_assert ();
-          return GNUTLS_E_INTERNAL_ERROR;
+          ret = GNUTLS_E_INTERNAL_ERROR;
+          goto cleanup;
         }
 
-      if (*params_len < 2)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_INTERNAL_ERROR;
-        }
-      *params_len = 2;
       for (i = 0; i < *params_len; i++)
         {
           params[i] = _gnutls_mpi_copy (session->key->rsa[i]);
         }
 
-      return 0;
+      ret = 0;
+      goto cleanup;
+    }
+
+  tmp_params_size = RSA_PUBLIC_PARAMS;
+  ret = _gnutls_pubkey_get_mpis(peer_cert.pubkey, tmp_params, &tmp_params_size);
+  if (ret < 0)
+    {
+      ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+      goto cleanup;
     }
 
   /* end of export case */
-
-  if (*params_len < peer_cert.params_size)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-  *params_len = peer_cert.params_size;
-
   for (i = 0; i < *params_len; i++)
     {
-      params[i] = _gnutls_mpi_copy (peer_cert.params[i]);
+      params[i] = _gnutls_mpi_copy (tmp_params[i]);
     }
-  _gnutls_gcert_deinit (&peer_cert);
+    
+  ret = 0;
+  
+cleanup:
+  gnutls_pcert_deinit (&peer_cert);
 
   return 0;
 }

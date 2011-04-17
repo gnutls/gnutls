@@ -188,7 +188,7 @@ _gnutls_privkey_get_public_mpis (gnutls_privkey_t key,
         bigint_t tmp_params[MAX_PRIV_PARAMS_SIZE];
         int tmp_params_size = MAX_PRIV_PARAMS_SIZE;
         uint32_t kid[2], i;
-        gnutls_openpgp_keyid_t keyid;
+        uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
         ret =
           gnutls_openpgp_privkey_get_preferred_key_id (key->key.openpgp,
@@ -390,7 +390,7 @@ gnutls_privkey_import_openpgp (gnutls_privkey_t pkey,
                                unsigned int flags)
 {
 int ret, idx;
-gnutls_openpgp_keyid_t keyid;
+uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
   ret = check_if_clean(pkey);
   if (ret < 0)

@@ -49,6 +49,12 @@ int gnutls_pubkey_get_key_id (gnutls_pubkey_t key, unsigned int flags,
                               unsigned char *output_data,
                               size_t * output_data_size);
 
+int
+gnutls_pubkey_get_openpgp_key_id (gnutls_pubkey_t key, unsigned int flags,
+                          unsigned char *output_data,
+                          size_t * output_data_size,
+                          unsigned int *subkey);
+
 int gnutls_pubkey_get_key_usage (gnutls_pubkey_t key, unsigned int *usage);
 int gnutls_pubkey_set_key_usage (gnutls_pubkey_t key, unsigned int usage);
 
@@ -73,6 +79,7 @@ int gnutls_x509_crt_set_pubkey (gnutls_x509_crt_t crt, gnutls_pubkey_t key);
 
 int gnutls_x509_crq_set_pubkey (gnutls_x509_crq_t crq, gnutls_pubkey_t key);
 
+#define GNUTLS_PUBKEY_VERIFY_FLAG_TLS_RSA 1
 int
 gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
                            const gnutls_datum_t * hash,
@@ -145,5 +152,35 @@ int gnutls_x509_crq_privkey_sign (gnutls_x509_crq_t crq,
                                   gnutls_privkey_t key,
                                   gnutls_digest_algorithm_t dig,
                                   unsigned int flags);
+
+/* pcert */
+typedef struct gnutls_pcert_st {
+	gnutls_pubkey_t pubkey;
+  gnutls_datum_t cert;
+	gnutls_certificate_type_t type;    /* type of the certificate */
+	gnutls_sign_algorithm_t sign_algo; /* sign algorithm of the certificate */
+} gnutls_pcert_st;
+
+/* Do not initialize the "cert" element of
+ * the certificate */
+#define GNUTLS_PCERT_NO_CERT 1
+
+int gnutls_pcert_import_x509 (gnutls_pcert_st* pcert,
+	gnutls_x509_crt_t crt, unsigned int flags);
+
+int gnutls_pcert_import_x509_raw (gnutls_pcert_st* pcert,
+	const gnutls_datum_t* cert, 
+	gnutls_x509_crt_fmt_t format, unsigned int flags);
+
+int gnutls_pcert_import_openpgp_raw (gnutls_pcert_st* pcert,
+	const gnutls_datum_t* cert, 
+	gnutls_openpgp_crt_fmt_t format, 
+	gnutls_openpgp_keyid_t keyid, unsigned int flags);
+
+int gnutls_pcert_import_openpgp (gnutls_pcert_st* pcert,
+	gnutls_openpgp_crt_t crt, unsigned int flags);
+
+void gnutls_pcert_deinit (gnutls_pcert_st* pcert);
+
 
 #endif

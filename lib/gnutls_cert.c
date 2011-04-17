@@ -30,7 +30,6 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <auth/cert.h>
-#include <gnutls_cert.h>
 #include <gnutls_datum.h>
 #include <gnutls_mpi.h>
 #include <gnutls_global.h>
@@ -63,7 +62,7 @@ gnutls_certificate_free_keys (gnutls_certificate_credentials_t sc)
     {
       for (j = 0; j < sc->cert_list_length[i]; j++)
         {
-          _gnutls_gcert_deinit (&sc->cert_list[i][j]);
+          gnutls_pcert_deinit (&sc->cert_list[i][j]);
         }
       gnutls_free (sc->cert_list[i]);
     }
@@ -233,9 +232,9 @@ _gnutls_selected_cert_supported_kx (gnutls_session_t session,
                                     int *alg_size)
 {
   gnutls_kx_algorithm_t kx;
-  gnutls_pk_algorithm_t pk;
+  gnutls_pk_algorithm_t pk, cert_pk;
   gnutls_kx_algorithm_t kxlist[MAX_ALGOS];
-  gnutls_cert *cert;
+  gnutls_pcert_st *cert;
   int i;
 
   if (session->internals.selected_cert_list_length == 0)
@@ -246,12 +245,13 @@ _gnutls_selected_cert_supported_kx (gnutls_session_t session,
     }
 
   cert = &session->internals.selected_cert_list[0];
+  cert_pk = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
   i = 0;
 
   for (kx = 0; kx < MAX_ALGOS; kx++)
     {
       pk = _gnutls_map_pk_get_pk (kx);
-      if (pk == cert->subject_pk_algorithm)
+      if (pk == cert_pk)
         {
           /* then check key usage */
           if (_gnutls_check_key_usage (cert, kx) == 0)
@@ -709,183 +709,6 @@ gnutls_certificate_activation_time_peers (gnutls_session_t session)
     }
 }
 
-/* Converts the first certificate for the cert_auth_info structure
- * to a gcert.
- */
-int
-_gnutls_get_auth_info_gcert (gnutls_cert * gcert,
-                             gnutls_certificate_type_t type,
-                             cert_auth_info_t info,
-                             int flags /* OR of ConvFlags */ )
-{
-  switch (type)
-    {
-    case GNUTLS_CRT_X509:
-      return _gnutls_x509_raw_cert_to_gcert (gcert,
-                                             &info->raw_certificate_list[0],
-                                             flags);
-#ifdef ENABLE_OPENPGP
-    case GNUTLS_CRT_OPENPGP:
-      return _gnutls_openpgp_raw_crt_to_gcert (gcert,
-                                               &info->raw_certificate_list[0],
-                                               info->use_subkey ? info->
-                                               subkey_id : NULL);
-#endif
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-}
-
-/* This function will convert a der certificate to a format
- * (structure) that gnutls can understand and use. Actually the
- * important thing on this function is that it extracts the 
- * certificate's (public key) parameters.
- *
- * The noext flag is used to complete the handshake even if the
- * extensions found in the certificate are unsupported and critical. 
- * The critical extensions will be catched by the verification functions.
- */
-int
-_gnutls_x509_raw_cert_to_gcert (gnutls_cert * gcert,
-                                const gnutls_datum_t * derCert,
-                                int flags /* OR of ConvFlags */ )
-{
-  int ret;
-  gnutls_x509_crt_t cert;
-
-  ret = gnutls_x509_crt_init (&cert);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  ret = gnutls_x509_crt_import (cert, derCert, GNUTLS_X509_FMT_DER);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      gnutls_x509_crt_deinit (cert);
-      return ret;
-    }
-
-  ret = _gnutls_x509_crt_to_gcert (gcert, cert, flags);
-  gnutls_x509_crt_deinit (cert);
-
-  return ret;
-}
-
-/* Like above but it accepts a parsed certificate instead.
- */
-int
-_gnutls_x509_crt_to_gcert (gnutls_cert * gcert,
-                           gnutls_x509_crt_t cert, unsigned int flags)
-{
-  int ret = 0;
-
-  memset (gcert, 0, sizeof (gnutls_cert));
-  gcert->cert_type = GNUTLS_CRT_X509;
-  gcert->sign_algo = gnutls_x509_crt_get_signature_algorithm (cert);
-
-  if (!(flags & CERT_NO_COPY))
-    {
-#define SMALL_DER 1536
-      opaque *der;
-      size_t der_size = SMALL_DER;
-
-      /* initially allocate a bogus size, just in case the certificate
-       * fits in it. That way we minimize the DER encodings performed.
-       */
-      der = gnutls_malloc (SMALL_DER);
-      if (der == NULL)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_MEMORY_ERROR;
-        }
-
-      ret =
-        gnutls_x509_crt_export (cert, GNUTLS_X509_FMT_DER, der, &der_size);
-      if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
-        {
-          gnutls_assert ();
-          gnutls_free (der);
-          return ret;
-        }
-
-      if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
-        {
-          der = gnutls_realloc (der, der_size);
-          if (der == NULL)
-            {
-              gnutls_assert ();
-              return GNUTLS_E_MEMORY_ERROR;
-            }
-
-          ret =
-            gnutls_x509_crt_export (cert, GNUTLS_X509_FMT_DER, der,
-                                    &der_size);
-          if (ret < 0)
-            {
-              gnutls_assert ();
-              gnutls_free (der);
-              return ret;
-            }
-        }
-
-      gcert->raw.data = der;
-      gcert->raw.size = der_size;
-    }
-  else
-    /* now we have 0 or a bitwise or of things to decode */
-    flags ^= CERT_NO_COPY;
-
-
-  if (flags & CERT_ONLY_EXTENSIONS || flags == 0)
-    {
-      ret = gnutls_x509_crt_get_key_usage (cert, &gcert->key_usage, NULL);
-      if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-        gcert->key_usage = 0;
-      else if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-      gcert->version = gnutls_x509_crt_get_version (cert);
-    }
-  gcert->subject_pk_algorithm = gnutls_x509_crt_get_pk_algorithm (cert, NULL);
-
-  if (flags & CERT_ONLY_PUBKEY || flags == 0)
-    {
-      gcert->params_size = MAX_PUBLIC_PARAMS_SIZE;
-      ret =
-        _gnutls_x509_crt_get_mpis (cert, gcert->params, &gcert->params_size);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-    }
-
-  return 0;
-
-}
-
-void
-_gnutls_gcert_deinit (gnutls_cert * cert)
-{
-  int i;
-
-  if (cert == NULL)
-    return;
-
-  for (i = 0; i < cert->params_size; i++)
-    {
-      _gnutls_mpi_release (&cert->params[i]);
-    }
-
-  _gnutls_free_datum (&cert->raw);
-}
-
 /**
  * gnutls_sign_callback_set:
  * @session: is a gnutls session
@@ -934,3 +757,5 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
     *userdata = session->internals.sign_func_userdata;
   return session->internals.sign_func;
 }
+
+
