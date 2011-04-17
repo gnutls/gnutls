@@ -18,7 +18,7 @@
 typedef struct gnutls_openpgp_crt_int
 {
   cdk_kbnode_t knode;
-  gnutls_openpgp_keyid_t preferred_keyid;
+  uint8_t preferred_keyid[GNUTLS_OPENPGP_KEYID_SIZE];
   int preferred_set;
 } gnutls_openpgp_crt_int;
 

@@ -65,7 +65,7 @@ typedef struct gnutls_cert
 
 #ifdef ENABLE_OPENPGP
   int use_subkey;
-  gnutls_openpgp_keyid_t subkey_id;
+  uint8_t subkey_id[GNUTLS_OPENPGP_KEYID_SIZE];
 #endif
 } gnutls_cert;
 

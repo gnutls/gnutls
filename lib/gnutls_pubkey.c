@@ -348,12 +348,11 @@ gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
   int ret, idx;
   uint32_t kid32[2];
   uint32_t *k;
-  gnutls_openpgp_keyid_t keyid;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
   ret = gnutls_openpgp_crt_get_preferred_key_id (crt, keyid);
   if (ret == GNUTLS_E_OPENPGP_PREFERRED_KEY_ERROR)
     {
-      key->pk_algorithm = gnutls_openpgp_crt_get_pk_algorithm(crt, NULL);
       key->pk_algorithm = gnutls_openpgp_crt_get_pk_algorithm (crt, &key->bits);
 
       ret = gnutls_openpgp_crt_get_key_usage (crt, &key->key_usage);

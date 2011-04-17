@@ -1032,7 +1032,7 @@ gnutls_openpgp_privkey_export_rsa_raw (gnutls_openpgp_privkey_t pkey,
                                        gnutls_datum_t * d, gnutls_datum_t * p,
                                        gnutls_datum_t * q, gnutls_datum_t * u)
 {
-  gnutls_openpgp_keyid_t keyid;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
   int ret;
 
   ret = gnutls_openpgp_privkey_get_key_id (pkey, keyid);
@@ -1068,7 +1068,7 @@ gnutls_openpgp_privkey_export_dsa_raw (gnutls_openpgp_privkey_t pkey,
                                        gnutls_datum_t * g, gnutls_datum_t * y,
                                        gnutls_datum_t * x)
 {
-  gnutls_openpgp_keyid_t keyid;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
   int ret;
 
   ret = gnutls_openpgp_privkey_get_key_id (pkey, keyid);
@@ -1110,7 +1110,7 @@ gnutls_openpgp_privkey_export_subkey_rsa_raw (gnutls_openpgp_privkey_t pkey,
                                               gnutls_datum_t * q,
                                               gnutls_datum_t * u)
 {
-  gnutls_openpgp_keyid_t keyid;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
   int ret;
 
   ret = gnutls_openpgp_privkey_get_subkey_id (pkey, idx, keyid);
@@ -1150,7 +1150,7 @@ gnutls_openpgp_privkey_export_subkey_dsa_raw (gnutls_openpgp_privkey_t pkey,
                                               gnutls_datum_t * y,
                                               gnutls_datum_t * x)
 {
-  gnutls_openpgp_keyid_t keyid;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
   int ret;
 
   ret = gnutls_openpgp_privkey_get_subkey_id (pkey, idx, keyid);
@@ -1253,7 +1253,7 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
   bigint_t params[MAX_PRIV_PARAMS_SIZE];
   int params_size = MAX_PRIV_PARAMS_SIZE;
   int pk_algorithm;
-  gnutls_openpgp_keyid_t keyid;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
   if (key == NULL)
     {
@@ -1328,7 +1328,7 @@ _gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
   bigint_t params[MAX_PRIV_PARAMS_SIZE];
   int params_size = MAX_PRIV_PARAMS_SIZE;
   int pk_algorithm;
-  gnutls_openpgp_keyid_t keyid;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
   if (key == NULL)
     {

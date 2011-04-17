@@ -123,10 +123,9 @@ typedef struct cert_auth_info_st
   unsigned int ncerts;          /* holds the size of the list above */
 
   gnutls_certificate_type_t cert_type;
-  gnutls_sign_algorithm_t sign_algo;
 #ifdef ENABLE_OPENPGP
   int use_subkey;
-  gnutls_openpgp_keyid_t subkey_id;
+  uint8_t subkey_id[GNUTLS_OPENPGP_KEYID_SIZE];
 #endif
 } *cert_auth_info_t;
 

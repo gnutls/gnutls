@@ -117,7 +117,6 @@ _gnutls_copy_certificate_auth_info (cert_auth_info_t info,
   info->ncerts = ncerts;
 
   info->cert_type = cert[0].cert_type;
-  info->sign_algo = cert[0].sign_algo;
 
 #ifdef ENABLE_OPENPGP
   if (cert[0].cert_type == GNUTLS_CRT_OPENPGP)
@@ -1170,7 +1169,7 @@ _gnutls_proc_openpgp_server_certificate (gnutls_session_t session,
   gnutls_cert *peer_certificate_list = NULL;
   int peer_certificate_list_size = 0;
   gnutls_datum_t tmp, akey = { NULL, 0 };
-  gnutls_openpgp_keyid_t subkey_id;
+  uint8_t subkey_id[GNUTLS_OPENPGP_KEYID_SIZE];
   unsigned int subkey_id_set = 0;
 
   cred = (gnutls_certificate_credentials_t)

@@ -369,7 +369,7 @@ gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t res,
   gnutls_openpgp_privkey_t pkey;
   gnutls_openpgp_crt_t crt;
   int ret;
-  gnutls_openpgp_keyid_t keyid;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
   ret = gnutls_openpgp_privkey_init (&pkey);
   if (ret < 0)
@@ -725,7 +725,7 @@ int
 _gnutls_openpgp_crt_to_gcert (gnutls_cert * gcert, gnutls_openpgp_crt_t cert)
 {
   int ret;
-  gnutls_openpgp_keyid_t keyid;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
   char err_buf[33];
 
   memset (gcert, 0, sizeof (gnutls_cert));

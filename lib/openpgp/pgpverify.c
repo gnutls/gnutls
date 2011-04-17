@@ -61,7 +61,7 @@ gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
                                 gnutls_openpgp_keyring_t keyring,
                                 unsigned int flags, unsigned int *verify)
 {
-  gnutls_openpgp_keyid_t id;
+  uint8_t id[GNUTLS_OPENPGP_KEYID_SIZE];
   cdk_error_t rc;
   int status;
 
