@@ -453,3 +453,5 @@ lib/accelerated/intel/libintel.la
 doc/cyclo/cyclo-gnutls.html
 lib/ext/libgnutls_ext.la
 lib/auth/libgnutls_auth.la
+tests/cipher-test
+tests/suite/x509paths/X509tests
