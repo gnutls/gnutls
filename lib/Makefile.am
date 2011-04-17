@@ -108,10 +108,8 @@ HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
 	ext_safe_renegotiation.h locks.h gnutls_mbuffers.h		\
 	pkcs11_int.h
 
-if ENABLE_LOCAL_PAKCHOIS
 COBJECTS+=pakchois/pakchois.c pakchois/errors.c pakchois/dlopen.c
 HFILES+=pakchois/pakchois.h pakchois/pakchois11.h pakchois/dlopen.h
-endif
 
 # Separate so we can create the documentation
 
@@ -123,7 +121,8 @@ libgnutls_la_LDFLAGS = -no-undefined \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 libgnutls_la_LIBADD = gl/liblgnu.la x509/libgnutls_x509.la \
-	$(LTLIBZ)  $(LTLIBINTL) $(LIBSOCKET) $(LTLIBDL)
+	$(LTLIBZ)  $(LTLIBINTL) $(LIBSOCKET) $(LTLIBDL) \
+	$(LTLIBPTHREAD)
 
 if ENABLE_OPENPGP
 libgnutls_la_LIBADD += openpgp/libgnutls_openpgp.la

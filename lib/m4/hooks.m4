@@ -74,7 +74,7 @@ if test "$cryptolib" = "nettle";then
   *** Libnettle 2.1 was not found. 
   ]])
     fi
-    NETTLE_LIBS="-lgmp -lpthread -lhogweed"
+    NETTLE_LIBS="-lgmp -lhogweed"
 else
   AC_MSG_RESULT(no)
 fi
@@ -102,35 +102,6 @@ fi
 
   if test "$included_libtasn1" = "no"; then
     GNUTLS_REQUIRES_PRIVATE="Requires.private: libtasn1"
-  fi
-
-  AC_ARG_WITH(included-pakchois,
-    AS_HELP_STRING([--with-included-pakchois], [use the included pakchois]),
-      included_pakchois=$withval,
-      included_pakchois=no)
-  if test "$included_pakchois" = "no"; then
-    AC_LIB_HAVE_LINKFLAGS(pakchois,, [#include <pakchois/pakchois.h>],
-                          [pakchois_module_load(0,0);])
-    if test "$ac_cv_pakchois" != yes; then
-      included_pakchois=yes
-      AC_MSG_WARN([[
-  *** 
-  *** Pakchois was not found. Will use the included one.
-  ]])
-    fi
-  fi
-  #not other option for now. The released pakchois cannot open an arbitrary PKCS11 module,
-  #and the author is reluctant to add such feature.
-  included_pakchois=yes
-  AC_MSG_CHECKING([whether to use the included pakchois])
-  AC_MSG_RESULT($included_pakchois)
-  AM_CONDITIONAL(ENABLE_LOCAL_PAKCHOIS, test "$included_pakchois" = "yes")
-  if test "$included_pakchois" = "yes";then
-	AC_CHECK_LIB(pthread, pthread_mutex_lock,,
-	   [AC_MSG_WARN([could not find pthread_mutex_lock])])
-	AC_CHECK_LIB(dl, dlopen,,
-	   [AC_MSG_WARN([could not find dlopen])])
-
   fi
 
   AC_ARG_WITH(lzo,
