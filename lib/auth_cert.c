@@ -2068,7 +2068,8 @@ _gnutls_server_select_cert (gnutls_session_t session,
   /* If the callback which retrieves certificate has been set,
    * use it and leave.
    */
-  if (cred->server_get_cert_callback != NULL)
+  if (cred->server_get_cert_callback != NULL ||
+    cred->get_cert_callback != NULL)
     return call_get_cert_callback (session, NULL, 0, NULL, 0);
 
   /* Otherwise... */
