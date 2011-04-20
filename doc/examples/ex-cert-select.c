@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
+#include <gnutls/abstract.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -30,13 +31,15 @@
 extern int tcp_connect (void);
 extern void tcp_close (int sd);
 
-static int cert_callback (gnutls_session_t session,
-                          const gnutls_datum_t * req_ca_rdn, int nreqs,
-                          const gnutls_pk_algorithm_t * sign_algos,
-                          int sign_algos_length, gnutls_retr2_st * st);
+static int
+cert_callback (gnutls_session_t session,
+               const gnutls_datum_t * req_ca_rdn, int nreqs,
+               const gnutls_pk_algorithm_t * sign_algos,
+               int sign_algos_length, gnutls_pcert_st** pcert,
+               unsigned int *pcert_length, gnutls_privkey_t* pkey);
 
-gnutls_x509_crt_t crt;
-gnutls_x509_privkey_t key;
+gnutls_pcert_st crt;
+gnutls_privkey_t key;
 
 /* Helper functions to load a certificate and key
  * files into memory.
@@ -77,19 +80,19 @@ load_keys (void)
 {
   int ret;
   gnutls_datum_t data;
+  gnutls_x509_privkey_t x509_key;
 
   data = load_file (CERT_FILE);
   if (data.data == NULL)
     {
-      fprintf (stderr, "*** Error loading cert file.\n");
+      fprintf (stderr, "*** Error loading certificate file.\n");
       exit (1);
     }
-  gnutls_x509_crt_init (&crt);
-
-  ret = gnutls_x509_crt_import (crt, &data, GNUTLS_X509_FMT_PEM);
+  
+  ret = gnutls_pcert_import_x509_raw(&crt, &data, GNUTLS_X509_FMT_PEM, 0);
   if (ret < 0)
     {
-      fprintf (stderr, "*** Error loading key file: %s\n",
+      fprintf (stderr, "*** Error loading certificate file: %s\n",
                gnutls_strerror (ret));
       exit (1);
     }
@@ -103,9 +106,9 @@ load_keys (void)
       exit (1);
     }
 
-  gnutls_x509_privkey_init (&key);
+  gnutls_x509_privkey_init (&x509_key);
 
-  ret = gnutls_x509_privkey_import (key, &data, GNUTLS_X509_FMT_PEM);
+  ret = gnutls_x509_privkey_import (x509_key, &data, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
     {
       fprintf (stderr, "*** Error loading key file: %s\n",
@@ -113,8 +116,17 @@ load_keys (void)
       exit (1);
     }
 
-  unload_file (data);
+  gnutls_privkey_init (&key);
 
+  ret = gnutls_privkey_import_x509(key, x509_key, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+  if (ret < 0)
+    {
+      fprintf (stderr, "*** Error importing key: %s\n", 
+               gnutls_strerror (ret));
+      exit (1);
+    }
+
+  unload_file (data);
 }
 
 int
@@ -143,7 +155,7 @@ main (void)
    */
   gnutls_certificate_set_x509_trust_file (xcred, CAFILE, GNUTLS_X509_FMT_PEM);
 
-  gnutls_certificate_set_retrieve_function (xcred, cert_callback);
+  gnutls_certificate_set_retrieve_function2 (xcred, cert_callback);
 
   /* Initialize TLS session 
    */
@@ -225,7 +237,8 @@ static int
 cert_callback (gnutls_session_t session,
                const gnutls_datum_t * req_ca_rdn, int nreqs,
                const gnutls_pk_algorithm_t * sign_algos,
-               int sign_algos_length, gnutls_retr2_st * st)
+               int sign_algos_length, gnutls_pcert_st** pcert,
+               unsigned int *pcert_length, gnutls_privkey_t* pkey)
 {
   char issuer_dn[256];
   int i, ret;
@@ -255,59 +268,12 @@ cert_callback (gnutls_session_t session,
    * The certificate must be of any of the "sign algorithms"
    * supported by the server.
    */
-
   type = gnutls_certificate_type_get (session);
   if (type == GNUTLS_CRT_X509)
     {
-      /* check if the certificate we are sending is signed
-       * with an algorithm that the server accepts */
-      gnutls_sign_algorithm_t cert_algo, req_algo;
-      int i, match = 0;
-
-      ret = gnutls_x509_crt_get_signature_algorithm (crt);
-      if (ret < 0)
-        {
-          /* error reading signature algorithm 
-           */
-          return -1;
-        }
-      cert_algo = ret;
-
-      i = 0;
-      do
-        {
-          ret = gnutls_sign_algorithm_get_requested (session, i, &req_algo);
-          if (ret >= 0 && cert_algo == req_algo)
-            {
-              match = 1;
-              break;
-            }
-
-          /* server has not requested anything specific */
-          if (i == 0 && ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-            {
-              match = 1;
-              break;
-            }
-          i++;
-        }
-      while (ret >= 0);
-
-      if (match == 0)
-        {
-          printf
-            ("- Could not find a suitable certificate to send to server\n");
-          return -1;
-        }
-
-      st->cert_type = type;
-      st->ncerts = 1;
-
-      st->cert.x509 = &crt;
-      st->key.x509 = key;
-      st->key_type = GNUTLS_PRIVKEY_X509;
-
-      st->deinit_all = 0;
+      *pcert_length = 1;
+      *pcert = &crt;
+      *pkey = key;
     }
   else
     {

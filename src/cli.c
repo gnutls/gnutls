@@ -34,8 +34,8 @@
 #include <error.h>
 
 #include <gnutls/gnutls.h>
+#include <gnutls/abstract.h>
 #include <gnutls/dtls.h>
-#include <gnutls/extra.h>
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
 #include <gnutls/pkcs11.h>
@@ -135,13 +135,11 @@ unload_file (gnutls_datum_t data)
 
 #define MAX_CRT 6
 static unsigned int x509_crt_size;
-static gnutls_x509_crt_t x509_crt[MAX_CRT];
-static gnutls_x509_privkey_t x509_key = NULL;
+static gnutls_pcert_st x509_crt[MAX_CRT];
+static gnutls_privkey_t x509_key = NULL;
 
-static gnutls_pkcs11_privkey_t pkcs11_key = NULL;
-
-static gnutls_openpgp_crt_t pgp_crt = NULL;
-static gnutls_openpgp_privkey_t pgp_key = NULL;
+static gnutls_pcert_st pgp_crt;
+static gnutls_privkey_t pgp_key = NULL;
 
 static void
 get_keyid (gnutls_openpgp_keyid_t keyid, const char *str)
@@ -170,22 +168,26 @@ static void
 load_keys (void)
 {
   unsigned int crt_num;
-  int ret;
+  int ret, i;
   gnutls_datum_t data;
+  gnutls_x509_crt_t crt_list[MAX_CRT];
+  gnutls_pkcs11_privkey_t pkcs11_key;
+  gnutls_x509_privkey_t tmp_key;
+  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
   if (x509_certfile != NULL && x509_keyfile != NULL)
     {
       if (strncmp (x509_certfile, "pkcs11:", 7) == 0)
         {
           crt_num = 1;
-          gnutls_x509_crt_init (&x509_crt[0]);
+          gnutls_x509_crt_init (&crt_list[0]);
 
           ret =
-            gnutls_x509_crt_import_pkcs11_url (x509_crt[0], x509_certfile, 0);
+            gnutls_x509_crt_import_pkcs11_url (crt_list[0], x509_certfile, 0);
 
           if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
             ret =
-              gnutls_x509_crt_import_pkcs11_url (x509_crt[0], x509_certfile,
+              gnutls_x509_crt_import_pkcs11_url (crt_list[0], x509_certfile,
                                                  GNUTLS_PKCS11_OBJ_FLAG_LOGIN);
 
           if (ret < 0)
@@ -207,7 +209,7 @@ load_keys (void)
 
           crt_num = MAX_CRT;
           ret =
-            gnutls_x509_crt_list_import (x509_crt, &crt_num, &data,
+            gnutls_x509_crt_list_import (crt_list, &crt_num, &data,
                                          GNUTLS_X509_FMT_PEM,
                                          GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
           if (ret < 0)
@@ -229,9 +231,28 @@ load_keys (void)
             }
           x509_crt_size = ret;
         }
-      fprintf (stdout, "Processed %d client certificates...\n", ret);
+      
+      for (i=0;i<x509_crt_size;i++)
+        {
+          ret = gnutls_pcert_import_x509(&x509_crt[i], crt_list[i], 0);
+          if (ret < 0)
+            {
+              fprintf(stderr, "*** Error importing crt to pcert: %s\n",
+                gnutls_strerror(ret));
+              exit(1);
+            }
+          gnutls_x509_crt_deinit(crt_list[i]);
+        }
 
       unload_file (data);
+
+      ret = gnutls_privkey_init(&x509_key);
+      if (ret < 0)
+         {
+           fprintf (stderr, "*** Error initializing key: %s\n",
+                    gnutls_strerror (ret));
+           exit (1);
+         }
 
       if (strncmp (x509_keyfile, "pkcs11:", 7) == 0)
         {
@@ -239,6 +260,14 @@ load_keys (void)
 
           ret =
             gnutls_pkcs11_privkey_import_url (pkcs11_key, x509_keyfile, 0);
+          if (ret < 0)
+            {
+              fprintf (stderr, "*** Error loading url: %s\n",
+                       gnutls_strerror (ret));
+              exit (1);
+            }
+
+          ret = gnutls_privkey_import_pkcs11( x509_key, pkcs11_key, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
           if (ret < 0)
             {
               fprintf (stderr, "*** Error loading url: %s\n",
@@ -255,13 +284,21 @@ load_keys (void)
               exit (1);
             }
 
-          gnutls_x509_privkey_init (&x509_key);
+          gnutls_x509_privkey_init (&tmp_key);
 
           ret =
-            gnutls_x509_privkey_import (x509_key, &data, GNUTLS_X509_FMT_PEM);
+            gnutls_x509_privkey_import (tmp_key, &data, GNUTLS_X509_FMT_PEM);
           if (ret < 0)
             {
               fprintf (stderr, "*** Error loading key file: %s\n",
+                       gnutls_strerror (ret));
+              exit (1);
+            }
+
+          ret = gnutls_privkey_import_x509( x509_key, tmp_key, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+          if (ret < 0)
+            {
+              fprintf (stderr, "*** Error loading url: %s\n",
                        gnutls_strerror (ret));
               exit (1);
             }
@@ -272,19 +309,29 @@ load_keys (void)
       fprintf (stdout, "Processed %d client X.509 certificates...\n",
                x509_crt_size);
     }
+
+
 #ifdef ENABLE_OPENPGP
+  if (info.pgp_subkey != NULL)
+    {
+      get_keyid (keyid, info.pgp_subkey);
+    }
+
   if (pgp_certfile != NULL && pgp_keyfile != NULL)
     {
+      gnutls_openpgp_crt_t tmp_pgp_crt;
+
       data = load_file (pgp_certfile);
       if (data.data == NULL)
         {
           fprintf (stderr, "*** Error loading PGP cert file.\n");
           exit (1);
         }
-      gnutls_openpgp_crt_init (&pgp_crt);
+
+      gnutls_openpgp_crt_init (&tmp_pgp_crt);
 
       ret =
-        gnutls_openpgp_crt_import (pgp_crt, &data, GNUTLS_OPENPGP_FMT_BASE64);
+        gnutls_pcert_import_openpgp_raw (&pgp_crt, &data, GNUTLS_OPENPGP_FMT_BASE64, info.pgp_subkey!=NULL?keyid:NULL, 0);
       if (ret < 0)
         {
           fprintf (stderr,
@@ -292,9 +339,16 @@ load_keys (void)
                    gnutls_strerror (ret));
           exit (1);
         }
-
-
+ 
       unload_file (data);
+
+      ret = gnutls_privkey_init(&pgp_key);
+      if (ret < 0)
+         {
+           fprintf (stderr, "*** Error initializing key: %s\n",
+                    gnutls_strerror (ret));
+           exit (1);
+         }
 
       if (strncmp (pgp_keyfile, "pkcs11:", 7) == 0)
         {
@@ -307,9 +361,18 @@ load_keys (void)
                        gnutls_strerror (ret));
               exit (1);
             }
+
+          ret = gnutls_privkey_import_pkcs11( pgp_key, pkcs11_key, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+          if (ret < 0)
+            {
+              fprintf (stderr, "*** Error loading url: %s\n",
+                       gnutls_strerror (ret));
+              exit (1);
+            }
         }
       else
         {
+          gnutls_openpgp_privkey_t tmp_pgp_key;
 
           data = load_file (pgp_keyfile);
           if (data.data == NULL)
@@ -318,10 +381,10 @@ load_keys (void)
               exit (1);
             }
 
-          gnutls_openpgp_privkey_init (&pgp_key);
+          gnutls_openpgp_privkey_init (&tmp_pgp_key);
 
           ret =
-            gnutls_openpgp_privkey_import (pgp_key, &data,
+            gnutls_openpgp_privkey_import (tmp_pgp_key, &data,
                                            GNUTLS_OPENPGP_FMT_BASE64, NULL,
                                            0);
           if (ret < 0)
@@ -332,39 +395,30 @@ load_keys (void)
               exit (1);
             }
 
-          unload_file (data);
-        }
-
-      if (info.pgp_subkey != NULL)
-        {
-          gnutls_openpgp_keyid_t keyid;
-
-          if (strcasecmp (info.pgp_subkey, "auto") == 0)
+          if (info.pgp_subkey != NULL)
             {
-              ret = gnutls_openpgp_crt_get_auth_subkey (pgp_crt, keyid, 1);
+              ret =
+                gnutls_openpgp_privkey_set_preferred_key_id (tmp_pgp_key, keyid);
               if (ret < 0)
                 {
                   fprintf (stderr,
-                           "*** Error setting preferred sub key id (%s): %s\n",
-                           info.pgp_subkey, gnutls_strerror (ret));
+                      "*** Error setting preferred sub key id (%s): %s\n",
+                      info.pgp_subkey, gnutls_strerror (ret));
                   exit (1);
                 }
             }
-          else
-            get_keyid (keyid, info.pgp_subkey);
 
-          ret = gnutls_openpgp_crt_set_preferred_key_id (pgp_crt, keyid);
-          if (ret >= 0)
-            ret =
-              gnutls_openpgp_privkey_set_preferred_key_id (pgp_key, keyid);
+          ret = gnutls_privkey_import_openpgp( pgp_key, tmp_pgp_key, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
           if (ret < 0)
             {
-              fprintf (stderr,
-                       "*** Error setting preferred sub key id (%s): %s\n",
-                       info.pgp_subkey, gnutls_strerror (ret));
+              fprintf (stderr, "*** Error loading url: %s\n",
+                       gnutls_strerror (ret));
               exit (1);
             }
+
+          unload_file (data);
         }
+
 
       fprintf (stdout, "Processed 1 client PGP certificate...\n");
     }
@@ -401,10 +455,11 @@ static int
 cert_callback (gnutls_session_t session,
                const gnutls_datum_t * req_ca_rdn, int nreqs,
                const gnutls_pk_algorithm_t * sign_algos,
-               int sign_algos_length, gnutls_retr2_st * st)
+               int sign_algos_length, gnutls_pcert_st **pcert,
+               unsigned int *pcert_length, gnutls_privkey_t * pkey)
 {
   char issuer_dn[256];
-  int i, ret;
+  int i, ret, cert_type;
   size_t len;
 
   if (verbose)
@@ -434,62 +489,17 @@ cert_callback (gnutls_session_t session,
    * supported by the server.
    */
 
-  st->cert_type = gnutls_certificate_type_get (session);
+  cert_type = gnutls_certificate_type_get (session);
 
-  st->ncerts = 0;
+  *pcert_length = 0;
 
-  if (st->cert_type == GNUTLS_CRT_X509)
+  if (cert_type == GNUTLS_CRT_X509)
     {
-      gnutls_sign_algorithm_t cert_algo, req_algo;
-      int i, match = 0;
-
       if (x509_crt_size > 0)
         {
-          ret = gnutls_x509_crt_get_signature_algorithm (x509_crt[0]);
-          if (ret < 0)
-            {
-              /* error reading signature algorithm */
-              return -1;
-            }
-          cert_algo = ret;
-
-          i = 0;
-          do
-            {
-              ret =
-                gnutls_sign_algorithm_get_requested (session, i, &req_algo);
-              if (ret >= 0 && cert_algo == req_algo)
-                {
-                  match = 1;
-                  break;
-                }
-
-              /* server has not requested anything specific */
-              if (i == 0 && ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-                {
-                  match = 1;
-                  break;
-                }
-              i++;
-            }
-          while (ret >= 0);
-
-          if (match == 0)
-            {
-              printf
-                ("- Could not find a suitable certificate to send to server\n");
-              return -1;
-            }
-
           if (x509_key != NULL)
             {
-              st->key.x509 = x509_key;
-              st->key_type = GNUTLS_PRIVKEY_X509;
-            }
-          else if (pkcs11_key != NULL)
-            {
-              st->key.pkcs11 = pkcs11_key;
-              st->key_type = GNUTLS_PRIVKEY_PKCS11;
+              *pkey = x509_key;
             }
           else
             {
@@ -497,48 +507,23 @@ cert_callback (gnutls_session_t session,
               return -1;
             }
 
-          st->ncerts = x509_crt_size;
-
-          st->cert.x509 = x509_crt;
-
-          st->deinit_all = 0;
-
-          return 0;
+          *pcert_length = x509_crt_size;
+          *pcert = x509_crt;
         }
 
     }
-  else if (st->cert_type == GNUTLS_CRT_OPENPGP)
+  else if (cert_type == GNUTLS_CRT_OPENPGP)
     {
-      if (pgp_crt != NULL)
+      if (pgp_key != NULL)
         {
+          *pkey = pgp_key;
 
-          if (pgp_key != NULL)
-            {
-              st->key.pgp = pgp_key;
-              st->key_type = GNUTLS_PRIVKEY_OPENPGP;
-            }
-          else if (pkcs11_key != NULL)
-            {
-              st->key.pkcs11 = pkcs11_key;
-              st->key_type = GNUTLS_PRIVKEY_PKCS11;
-            }
-          else
-            {
-              printf ("- Could not find a suitable key to send to server\n");
-              return -1;
-            }
-
-          st->ncerts = 1;
-
-          st->cert.pgp = pgp_crt;
-
-          st->deinit_all = 0;
-
-          return 0;
+          *pcert_length = 1;
+          *pcert = &pgp_crt;
         }
     }
 
-  printf ("- Successfully sent %d certificate(s) to server.\n", st->ncerts);
+  printf ("- Successfully sent %u certificate(s) to server.\n", *pcert_length);
   return 0;
 
 }
@@ -586,7 +571,7 @@ init_tls_session (const char *hostname)
     gnutls_credentials_set (session, GNUTLS_CRD_PSK, psk_cred);
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
 
-  gnutls_certificate_set_retrieve_function (xcred, cert_callback);
+  gnutls_certificate_set_retrieve_function2 (xcred, cert_callback);
   gnutls_certificate_set_verify_function (xcred, cert_verify_callback);
   gnutls_certificate_set_verify_flags (xcred, 0);
 
@@ -738,12 +723,6 @@ main (int argc, char **argv)
   if ((ret = gnutls_global_init ()) < 0)
     {
       fprintf (stderr, "global_init: %s\n", gnutls_strerror (ret));
-      exit (1);
-    }
-
-  if ((ret = gnutls_global_init_extra ()) < 0)
-    {
-      fprintf (stderr, "global_init_extra: %s\n", gnutls_strerror (ret));
       exit (1);
     }
 
@@ -1490,3 +1469,4 @@ socket_open (socket_st * hd, const char *hostname, const char *service)
 
   return;
 }
+

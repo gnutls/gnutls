@@ -459,6 +459,8 @@ call_get_cert_callback (gnutls_session_t session,
   gnutls_certificate_type_t type = gnutls_certificate_type_get (session);
   gnutls_certificate_credentials_t cred;
   gnutls_retr2_st st2;
+  gnutls_pcert_st *pcert = NULL;
+  unsigned int pcert_length = 0;
 
   cred = (gnutls_certificate_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -470,7 +472,31 @@ call_get_cert_callback (gnutls_session_t session,
 
   memset (&st2, 0, sizeof (st2));
 
-  if (cred->get_cert_callback)
+  if (cred->get_cert_callback2)
+    {
+      /* we avoid all allocations and transformations */
+      ret = cred->get_cert_callback2 (session, issuers_dn, issuers_dn_length,
+                                     pk_algos, pk_algos_length, 
+                                     &pcert, &pcert_length, &local_key);
+      if (ret < 0)
+        return gnutls_assert_val(GNUTLS_E_USER_ERROR);
+
+      if (pcert_length > 0 && type != pcert[0].type)
+        return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+      if (pcert_length == 0)
+        {
+          pcert = NULL;
+          local_key = NULL;
+        }
+      _gnutls_selected_certs_set (session, pcert,
+                              pcert_length,
+                              local_key, 0);
+      
+      return 0;
+
+    }
+  else if (cred->get_cert_callback)
     {
       ret = cred->get_cert_callback (session, issuers_dn, issuers_dn_length,
                                      pk_algos, pk_algos_length, &st2);
@@ -511,7 +537,7 @@ call_get_cert_callback (gnutls_session_t session,
   if (ret < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
+      return GNUTLS_E_USER_ERROR;
     }
 
   if (st2.ncerts == 0)
@@ -663,7 +689,7 @@ _select_client_cert (gnutls_session_t session,
     }
 
   if (cred->client_get_cert_callback != NULL
-      || cred->get_cert_callback != NULL)
+      || cred->get_cert_callback != NULL || cred->get_cert_callback2 != NULL)
     {
 
       /* use a callback to get certificate 
@@ -2046,7 +2072,8 @@ _gnutls_server_select_cert (gnutls_session_t session,
   /* If the callback which retrieves certificate has been set,
    * use it and leave.
    */
-  if (cred->server_get_cert_callback != NULL)
+  if (cred->server_get_cert_callback != NULL || cred->server_get_cert_callback ||
+      cred->get_cert_callback2)
     {
       ret = call_get_cert_callback (session, NULL, 0, NULL, 0);
       if (ret < 0)
@@ -2074,11 +2101,10 @@ _gnutls_server_select_cert (gnutls_session_t session,
       if (requested_algo == GNUTLS_PK_ANY ||
           requested_algo == pk)
         {
-          /* if cert type and signature algorithm matches
+          /* if cert type matches
            */
 	  /* *INDENT-OFF* */
-	  if (session->security_parameters.cert_type == cred->cert_list[i][0].type
-	      && (cred->cert_list[i][0].type == GNUTLS_CRT_OPENPGP))
+	  if (session->security_parameters.cert_type == cred->cert_list[i][0].type)
 	    {
 	      idx = i;
 	      break;

@@ -84,11 +84,15 @@ typedef struct gnutls_certificate_credentials_st
    */
   gnutls_datum_t x509_rdn_sequence;
 
+  /* It's a mess here. However we need to keep the old 3 functions
+   * for compatibility */
+  gnutls_certificate_retrieve_function *get_cert_callback; /* deprecated */
   gnutls_certificate_client_retrieve_function *client_get_cert_callback;        /* deprecated */
   gnutls_certificate_server_retrieve_function *server_get_cert_callback;        /* deprecated */
+  gnutls_certificate_retrieve_function2 *get_cert_callback2;
+
   gnutls_certificate_verify_function *verify_callback;
 
-  gnutls_certificate_retrieve_function *get_cert_callback;
 } certificate_credentials_st;
 
 typedef struct rsa_info_st

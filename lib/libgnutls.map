@@ -708,6 +708,7 @@ GNUTLS_3_0_0 {
 	gnutls_pcert_import_openpgp;
 	gnutls_pcert_import_openpgp_raw;
 	gnutls_pubkey_get_openpgp_key_id;
+	gnutls_certificate_set_retrieve_function2;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

@@ -305,6 +305,8 @@ gnutls_certificate_server_set_request (gnutls_session_t session,
  *
  * This function sets a callback to be called in order to retrieve the
  * certificate to be used in the handshake.
+ * You are advised to use gnutls_certificate_set_retrieve_function2() because it
+ * is much more efficient in the processing it requires from gnutls.
  *
  * The callback's function prototype is:
  * int (*callback)(gnutls_session_t, const gnutls_datum_t* req_ca_dn, int nreqs,
@@ -343,6 +345,8 @@ void gnutls_certificate_client_set_retrieve_function
  *
  * This function sets a callback to be called in order to retrieve the
  * certificate to be used in the handshake.
+ * You are advised to use gnutls_certificate_set_retrieve_function2() because it
+ * is much more efficient in the processing it requires from gnutls.
  *
  * The callback's function prototype is:
  * int (*callback)(gnutls_session_t, gnutls_retr_st* st);
@@ -369,7 +373,9 @@ void gnutls_certificate_server_set_retrieve_function
  * @func: is the callback function
  *
  * This function sets a callback to be called in order to retrieve the
- * certificate to be used in the handshake.
+ * certificate to be used in the handshake. You are advised
+ * to use gnutls_certificate_set_retrieve_function2() because it
+ * is much more efficient in the processing it requires from gnutls.
  *
  * The callback's function prototype is:
  * int (*callback)(gnutls_session_t, const gnutls_datum_t* req_ca_dn, int nreqs,
@@ -401,6 +407,46 @@ void gnutls_certificate_set_retrieve_function
    gnutls_certificate_retrieve_function * func)
 {
   cred->get_cert_callback = func;
+}
+
+/**
+ * gnutls_certificate_set_retrieve_function2:
+ * @cred: is a #gnutls_certificate_credentials_t structure.
+ * @func: is the callback function
+ *
+ * This function sets a callback to be called in order to retrieve the
+ * certificate to be used in the handshake.
+ *
+ * The callback's function prototype is:
+ * int (*callback)(gnutls_session_t, const gnutls_datum_t* req_ca_dn, int nreqs,
+ * const gnutls_pk_algorithm_t* pk_algos, int pk_algos_length, gnutls_pcert_st* st);
+ *
+ * @req_ca_cert is only used in X.509 certificates.
+ * Contains a list with the CA names that the server considers trusted.
+ * Normally we should send a certificate that is signed
+ * by one of these CAs. These names are DER encoded. To get a more
+ * meaningful value use the function gnutls_x509_rdn_get().
+ *
+ * @pk_algos contains a list with server's acceptable signature algorithms.
+ * The certificate returned should support the server's given algorithms.
+ *
+ * @st should contain the certificates and private keys.
+ *
+ * If the callback function is provided then gnutls will call it, in the
+ * handshake, after the certificate request message has been received.
+ *
+ * In server side pk_algos and req_ca_dn are NULL.
+ *
+ * The callback function should set the certificate list to be sent,
+ * and return 0 on success. If no certificate was selected then the
+ * number of certificates should be set to zero. The value (-1)
+ * indicates error and the handshake will be terminated.
+ **/
+void gnutls_certificate_set_retrieve_function2
+  (gnutls_certificate_credentials_t cred,
+   gnutls_certificate_retrieve_function2 * func)
+{
+  cred->get_cert_callback2 = func;
 }
 
 /**
