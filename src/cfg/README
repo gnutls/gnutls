@@ -1,0 +1,6 @@
+The libcfg+ library is not part of the GnuTLS library, but is 
+used by GnuTLS programs. It is licensed under the GNU GPL v2.
+
+Original site:
+http://platon.sk/projects/libcfg+/
+
