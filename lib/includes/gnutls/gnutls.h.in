@@ -1479,6 +1479,25 @@ extern "C"
 
   /* These are set on the credentials structure.
    */
+  
+  /* This is the same as gnutls_certificate_retrieve_function()
+   * but retrieves a gnutls_pcert_st which requires much less processing
+   * within the library.
+   */
+  typedef int gnutls_certificate_retrieve_function2 (gnutls_session_t,
+                                                    const gnutls_datum_t *
+                                                    req_ca_rdn,
+                                                    int nreqs,
+                                                    const
+                                                    gnutls_pk_algorithm_t
+                                                    * pk_algos,
+                                                    int pk_algos_length,
+                                                    gnutls_pcert_st *);
+
+
+  void gnutls_certificate_set_retrieve_function2
+    (gnutls_certificate_credentials_t cred,
+     gnutls_certificate_retrieve_function2 * func);
 
   typedef int gnutls_certificate_retrieve_function (gnutls_session_t,
                                                     const
@@ -1734,8 +1753,8 @@ extern "C"
 #define GNUTLS_E_PKCS11_USER_ERROR -317
 
 #define GNUTLS_E_CRYPTO_INIT_FAILED -318
-
 #define GNUTLS_E_TIMEDOUT -319
+#define GNUTLS_E_USER_ERROR -320
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 

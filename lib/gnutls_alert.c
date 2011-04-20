@@ -214,6 +214,10 @@ gnutls_error_to_alert (int err, int *level)
       ret = GNUTLS_A_UNSUPPORTED_EXTENSION;
       _level = GNUTLS_AL_FATAL;
       break;
+    case GNUTLS_E_USER_ERROR:
+      ret = GNUTLS_A_USER_CANCELED;
+      _level = GNUTLS_AL_FATAL;
+      break;
     case GNUTLS_E_UNEXPECTED_PACKET:
     case GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET:
       ret = GNUTLS_A_UNEXPECTED_MESSAGE;
