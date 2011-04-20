@@ -79,15 +79,14 @@ hw_accel=none
 if test "$use_accel" != "no"; then
 case $host_cpu in
   i?86 | x86_64 | amd64)
-    GCC_FLAG_ADD([-maes -mpclmul],[X86])
-
-    if test "x$X86" = "xyes";then
+dnl    GCC_FLAG_ADD([-maes -mpclmul],[X86])
+dnl    if test "x$X86" = "xyes";then
       if test "$host_cpu" = "x86_64" -o "$host_cpu" = "amd64";then
         hw_accel="x86-64"
       else
         hw_accel="x86"
       fi
-    fi
+dnl    fi
   ;;
   *)
   ;;
