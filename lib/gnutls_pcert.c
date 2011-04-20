@@ -53,7 +53,6 @@ size_t sz;
   memset(pcert, 0, sizeof(*pcert));
 
   pcert->type = GNUTLS_CRT_X509;
-  pcert->sign_algo = gnutls_x509_crt_get_signature_algorithm(crt);
   pcert->cert.data = NULL;
 
   sz = 0;
@@ -173,7 +172,6 @@ size_t sz;
   memset(pcert, 0, sizeof(*pcert));
 
   pcert->type = GNUTLS_CRT_OPENPGP;
-  pcert->sign_algo = GNUTLS_SIGN_UNKNOWN;
   pcert->cert.data = NULL;
 
   sz = 0;

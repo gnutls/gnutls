@@ -156,9 +156,8 @@ int gnutls_x509_crq_privkey_sign (gnutls_x509_crq_t crq,
 /* pcert */
 typedef struct gnutls_pcert_st {
 	gnutls_pubkey_t pubkey;
-  gnutls_datum_t cert;
+	gnutls_datum_t cert;
 	gnutls_certificate_type_t type;    /* type of the certificate */
-	gnutls_sign_algorithm_t sign_algo; /* sign algorithm of the certificate */
 } gnutls_pcert_st;
 
 /* Do not initialize the "cert" element of
