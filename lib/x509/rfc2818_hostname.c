@@ -80,16 +80,6 @@ gnutls_x509_crt_check_hostname (gnutls_x509_crt_t cert, const char *hostname)
               return 1;
             }
         }
-      else if (ret == GNUTLS_SAN_IPADDRESS)
-        {
-          found_dnsname = 1;    /* RFC 2818 is unclear whether the CN
-                                   should be compared for IP addresses
-                                   too, but we won't do it.  */
-          if (_gnutls_hostname_compare (dnsname, dnsnamesize, hostname))
-            {
-              return 1;
-            }
-        }
     }
 
   if (!found_dnsname)
