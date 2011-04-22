@@ -100,7 +100,7 @@ mingw32: autoreconf
 # Release
 
 ChangeLog:
-	git log --pretty --numstat --summary --since="2005 November 07" -- | git2cl > ChangeLog
+	git log --pretty --numstat --summary --since="2008 November 07" -- | git2cl > ChangeLog
 	cat .clcopying >> ChangeLog
 
 tag = $(PACKAGE)_`echo $(VERSION) | sed 's/\./_/g'`
