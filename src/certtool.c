@@ -1313,7 +1313,7 @@ void
 pgp_privkey_info (void)
 {
   gnutls_openpgp_privkey_t key;
-  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
+  unsigned char keyid[GNUTLS_OPENPGP_KEYID_SIZE];
   size_t size;
   int ret, i, subkeys;
   gnutls_datum_t pem;
