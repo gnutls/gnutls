@@ -280,69 +280,6 @@ char pem4[] =
   "FAMjWofnMxAyEViiu/HlWoiHu4AbtrsSGMsV1Tr8meRCWrpF\n"
   "-----END CERTIFICATE-----\n";
 
-/* Certificate with ipaddress CN but no SAN. */
-char pem5[] =
-  "X.509 Certificate Information:"
-  "        Version: 3\n"
-  "        Serial Number (hex): 00\n"
-  "        Issuer: CN=www.example.org\n"
-  "        Validity:\n"
-  "                Not Before: Fri Feb 16 13:44:29 UTC 2007\n"
-  "                Not After: Fri Mar 30 13:44:30 UTC 2007\n"
-  "        Subject: CN=www.example.org\n"
-  "        Subject Public Key Algorithm: RSA\n"
-  "                Modulus (bits 1024):\n"
-  "                        be:ec:98:7a:1d:6f:7e:6b:25:9e:e8:20:78:42:a0:64\n"
-  "                        05:66:43:99:6d:49:d5:18:ec:7d:b9:58:64:b2:80:a3\n"
-  "                        14:61:9d:0a:4f:be:2f:f0:2e:fc:d2:ab:5c:36:df:53\n"
-  "                        ec:43:c7:fc:de:91:bc:1e:01:a6:b7:6c:b2:07:10:2e\n"
-  "                        cb:61:47:75:ca:03:ce:23:6e:38:f1:34:27:1a:1a:cd\n"
-  "                        f7:96:f3:b3:f0:0d:67:7f:ca:77:84:3f:9c:29:f4:62\n"
-  "                        91:f6:12:5b:62:5a:cc:ba:ed:08:2e:32:44:26:ac:fd\n"
-  "                        23:ce:53:1b:bb:f2:87:fe:dc:78:93:7c:59:bf:a1:75\n"
-  "                Exponent:\n"
-  "                        01:00:01\n"
-  "        Extensions:\n"
-  "                Basic Constraints (critical):\n"
-  "                        Certificate Authority (CA): TRUE\n"
-  "                Subject Alternative Name (not critical):\n"
-  "                        IPAddress: 1.2.3.4\n"
-  "                Key Purpose (not critical):\n"
-  "                        TLS WWW Server.\n"
-  "                Subject Key Identifier (not critical):\n"
-  "                        e93c1cfbad926ee606a4562ca2e1c05327c8f295\n"
-  "        Signature Algorithm: RSA-SHA\n"
-  "        Signature:\n"
-  "                66:b1:32:9f:6e:06:d7:da:28:bf:3a:d7:56:d5:b6:fe\n"
-  "                78:40:f0:48:92:3a:19:8a:1c:37:ad:59:6f:bc:af:f2\n"
-  "                f0:89:81:33:33:01:a8:e4:1a:c1:31:a7:3c:6d:4a:9f\n"
-  "                a5:86:6d:22:6e:5b:8b:69:65:83:28:b5:b8:68:72:c5\n"
-  "                2b:af:99:89:dd:48:ad:fc:f6:90:55:c3:a5:41:f3:d7\n"
-  "                bc:a2:57:56:25:f1:d1:12:fb:08:70:58:d5:45:57:86\n"
-  "                1b:aa:f2:d4:63:62:c6:fd:b3:04:64:60:9c:77:c3:4b\n"
-  "                d1:e4:c7:77:00:17:79:d2:2b:1f:14:ad:e9:34:c8:da\n"
-  "Other Information:\n"
-  "        MD5 fingerprint:\n"
-  "                cdffe1ac9bf42a4f04a15298f9d18bf6\n"
-  "        SHA-1 fingerprint:\n"
-  "                4fa47b29e928499142c88c598ea175b9453957f7\n"
-  "        Public Key Id:\n"
-  "                e93c1cfbad926ee606a4562ca2e1c05327c8f295\n"
-  "\n"
-  "-----BEGIN CERTIFICATE-----\n"
-  "MIIB/jCCAWmgAwIBAgIBADALBgkqhkiG9w0BAQUwGjEYMBYGA1UEAxMPd3d3LmV4\n"
-  "YW1wbGUub3JnMB4XDTA3MDIxNjEzNDQyOVoXDTA3MDMzMDEzNDQzMFowGjEYMBYG\n"
-  "A1UEAxMPd3d3LmV4YW1wbGUub3JnMIGcMAsGCSqGSIb3DQEBAQOBjAAwgYgCgYC+\n"
-  "7Jh6HW9+ayWe6CB4QqBkBWZDmW1J1RjsfblYZLKAoxRhnQpPvi/wLvzSq1w231Ps\n"
-  "Q8f83pG8HgGmt2yyBxAuy2FHdcoDziNuOPE0JxoazfeW87PwDWd/yneEP5wp9GKR\n"
-  "9hJbYlrMuu0ILjJEJqz9I85TG7vyh/7ceJN8Wb+hdQIDAQABo1swWTAPBgNVHRMB\n"
-  "Af8EBTADAQH/MBIGA1UdEQQLMAmHBzEuMi4zLjQwEwYDVR0lBAwwCgYIKwYBBQUH\n"
-  "AwEwHQYDVR0OBBYEFOk8HPutkm7mBqRWLKLhwFMnyPKVMAsGCSqGSIb3DQEBBQOB\n"
-  "gQBmsTKfbgbX2ii/OtdW1bb+eEDwSJI6GYocN61Zb7yv8vCJgTMzAajkGsExpzxt\n"
-  "Sp+lhm0ibluLaWWDKLW4aHLFK6+Zid1Irfz2kFXDpUHz17yiV1Yl8dES+whwWNVF\n"
-  "V4YbqvLUY2LG/bMEZGCcd8NL0eTHdwAXedIrHxSt6TTI2g==\n"
-  "-----END CERTIFICATE-----\n";
-
 /* Certificate with multiple wildcards SAN but no CN. */
 char pem6[] =
   "X.509 Certificate Information:\n"
@@ -770,27 +707,6 @@ doit (void)
     fail ("Hostname incorrectly does not match (%d)\n", ret);
 
   ret = gnutls_x509_crt_check_hostname (x509, "foo.example.com");
-  if (ret)
-    fail ("Hostname incorrectly matches (%d)\n", ret);
-
-  if (debug)
-    success ("Testing pem5...\n");
-  data.data = pem5;
-  data.size = strlen (pem5);
-
-  ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
-  if (ret < 0)
-    fail ("gnutls_x509_crt_import: %d\n", ret);
-
-  ret = gnutls_x509_crt_check_hostname (x509, "foo");
-  if (ret)
-    fail ("Hostname incorrectly matches (%d)\n", ret);
-
-  ret = gnutls_x509_crt_check_hostname (x509, "1.2.3.4");
-  if (!ret)
-    fail ("Hostname incorrectly does not match (%d)\n", ret);
-
-  ret = gnutls_x509_crt_check_hostname (x509, "www.example.org");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
 
