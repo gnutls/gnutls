@@ -70,7 +70,7 @@ _gnutls_map_cdk_rc (int rc)
 /**
  * gnutls_certificate_set_openpgp_key:
  * @res: is a #gnutls_certificate_credentials_t structure.
- * @key: contains an openpgp public key
+ * @crt: contains an openpgp public key
  * @pkey: is an openpgp private key
  *
  * This function sets a certificate/private key pair in the

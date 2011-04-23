@@ -153,7 +153,7 @@ cleanup:
 /**
  * gnutls_pcert_import_openpgp:
  * @pcert: The pcert structure
- * @cert: The raw certificate to be imported
+ * @crt: The raw certificate to be imported
  * @flags: zero for now
  *
  * This convenience function will import the given certificate to a
