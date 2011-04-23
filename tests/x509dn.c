@@ -39,6 +39,7 @@
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
+#include <gnutls/abstract.h>
 
 #include "utils.h"
 
