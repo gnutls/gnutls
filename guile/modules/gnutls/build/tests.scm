@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
+;;; Copyright (C) 2011 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -15,26 +15,27 @@
 ;;; License along with GnuTLS; if not, write to the Free Software
 ;;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-;;; Written by Ludovic Courtès <ludo@chbouib.org>.
+;;; Written by Ludovic CourtÃ¨s <ludo@gnu.org>.
 
+(define-module (gnutls build tests)
+  #:export (run-test))
 
-;;;
-;;; Test the error/exception mechanism.
-;;;
-
-(use-modules (gnutls)
-             (gnutls build tests))
-
-(run-test
-    (lambda ()
-      (let ((s (make-session connection-end/server)))
-        (catch 'gnutls-error
-          (lambda ()
-            (handshake s))
-          (lambda (key err function . currently-unused)
-            (and (eq? key 'gnutls-error)
-                 err
-                 (string? (error->string err))
-                 (eq? function 'handshake)))))))
-
-;;; arch-tag: 73ed6229-378d-4a12-a5c6-4c2586c6e3a2
+(define (run-test thunk)
+  "Call `(exit (THUNK))'.  If THUNK raises an exception, then call `(exit 1)' and
+display a backtrace.  Otherwise, return THUNK's return value."
+  (exit
+   (catch #t
+     thunk
+     (lambda (key . args)
+       ;; Never reached.
+       (exit 1))
+     (lambda (key . args)
+       (dynamic-wind ;; to be on the safe side
+         (lambda () #t)
+         (lambda ()
+           (format (current-error-port)
+                   "~%throw to `~a' with args ~s~%" key args)
+           (display-backtrace (make-stack #t) (current-output-port)))
+         (lambda ()
+           (exit 1)))
+       (exit 1)))))

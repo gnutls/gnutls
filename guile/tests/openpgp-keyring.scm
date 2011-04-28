@@ -1,5 +1,5 @@
 ;;; GnuTLS-extra --- Guile bindings for GnuTLS-EXTRA.
-;;; Copyright (C) 2007, 2010 Free Software Foundation, Inc.
+;;; Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS-extra is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 ;;;
 
 (use-modules (gnutls extra) (gnutls)
+             (gnutls build tests)
              (srfi srfi-1)
              (srfi srfi-4))
 
@@ -59,21 +60,12 @@
                     (openpgp-keyring-contains-key-id? keyring id))
                   %ids-in-keyring)))))
 
-(dynamic-wind
-
+(run-test
     (lambda ()
-      #t)
-
-    (lambda ()
-      (exit
-       (every valid-keyring?
-              (list %raw-keyring-file
-                    %ascii-keyring-file)
-              (list openpgp-certificate-format/raw
-                    openpgp-certificate-format/base64))))
-
-    (lambda ()
-      ;; failure
-      (exit 1)))
+      (every valid-keyring?
+             (list %raw-keyring-file
+                   %ascii-keyring-file)
+             (list openpgp-certificate-format/raw
+                   openpgp-certificate-format/base64))))
 
 ;;; arch-tag: 516bf608-5c8b-4787-abe9-5f7b6e6d660b

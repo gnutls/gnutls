@@ -25,6 +25,7 @@
 
 (use-modules (gnutls)
              (gnutls extra)
+             (gnutls build tests)
              (srfi srfi-4))
 
 
@@ -59,10 +60,7 @@
 ;; (set-log-procedure! (lambda (level str)
 ;;                       (format #t "[~a|~a] ~a" (getpid) level str)))
 
-(dynamic-wind
-    (lambda ()
-      #t)
-
+(run-test
     (lambda ()
       (let ((socket-pair (socketpair PF_UNIX SOCK_STREAM 0))
             (pub         (import-key import-openpgp-certificate
@@ -87,7 +85,7 @@
                 (write %message (session-record-port client))
                 (bye client close-request/rdwr)
 
-                (exit))
+                (primitive-exit))
 
               (let ((server (make-session connection-end/server))
                     (rsa    (import-rsa-params "rsa-parameters.pem"))
@@ -109,11 +107,7 @@
                 (let ((msg (read (session-record-port server)))
                       (auth-type (session-authentication-type server)))
                   (bye server close-request/rdwr)
-                  (exit (and (eq? auth-type credentials/certificate)
-                             (equal? msg %message)))))))))
-
-    (lambda ()
-      ;; failure
-      (exit 1)))
+                  (and (eq? auth-type credentials/certificate)
+                       (equal? msg %message)))))))))
 
 ;;; arch-tag: 1a973ed5-f45d-45a4-8160-900b6a8c27ff

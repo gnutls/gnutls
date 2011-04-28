@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007, 2010 Free Software Foundation, Inc.
+;;; Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@
 ;;;
 
 (use-modules (gnutls)
+             (gnutls build tests)
              (srfi srfi-4))
 
 (define (import-something import-proc file fmt)
@@ -36,25 +37,16 @@
   (import-something pkcs3-import-dh-parameters file
                     x509-certificate-format/pem))
 
-(dynamic-wind
-
+(run-test
     (lambda ()
-      #t)
-
-    (lambda ()
-      (exit
-       (let* ((dh-params (import-dh-params "dh-parameters.pem"))
-              (export
-               (pkcs3-export-dh-parameters dh-params
-                                           x509-certificate-format/pem)))
-         (and (u8vector? export)
-              (let ((import
-                     (pkcs3-import-dh-parameters export
-                                                 x509-certificate-format/pem)))
-                (dh-parameters? import))))))
-
-    (lambda ()
-      ;; failure
-      (exit 1)))
+      (let* ((dh-params (import-dh-params "dh-parameters.pem"))
+             (export
+              (pkcs3-export-dh-parameters dh-params
+                                          x509-certificate-format/pem)))
+        (and (u8vector? export)
+             (let ((import
+                    (pkcs3-import-dh-parameters export
+                                                x509-certificate-format/pem)))
+               (dh-parameters? import))))))
 
 ;;; arch-tag: adff0f07-479e-421e-b47f-8956e06b9902

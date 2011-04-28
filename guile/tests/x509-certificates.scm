@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007, 2010 Free Software Foundation, Inc.
+;;; Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,7 @@
 ;;;
 
 (use-modules (gnutls)
+             (gnutls build tests)
              (srfi srfi-4)
              (srfi srfi-11))
 
@@ -45,11 +46,7 @@
   (stat:size (stat file)))
 
 
-(dynamic-wind
-
-    (lambda ()
-      #t)
-
+(run-test
     (lambda ()
       (let ((raw-certificate (make-u8vector (file-size %certificate-file)))
             (raw-privkey     (make-u8vector (file-size %private-key-file))))
@@ -64,23 +61,19 @@
               (sec  (import-x509-private-key raw-privkey
                                              x509-certificate-format/pem)))
 
-          (exit (and (x509-certificate? cert)
-                     (x509-private-key? sec)
-                     (string? (x509-certificate-dn cert))
-                     (string? (x509-certificate-issuer-dn cert))
-                     (string=? (x509-certificate-dn-oid cert 0) %first-oid)
-                     (eq? (x509-certificate-signature-algorithm cert)
-                          %signature-algorithm)
-                     (x509-certificate-matches-hostname? cert "localhost")
-                     (let-values (((type name)
-                                   (x509-certificate-subject-alternative-name
-                                    cert 0)))
-                       (and (string? name)
-                            (string?
-                             (x509-subject-alternative-name->string type)))))))))
-
-    (lambda ()
-      ;; failure
-      (exit 1)))
+          (and (x509-certificate? cert)
+               (x509-private-key? sec)
+               (string? (x509-certificate-dn cert))
+               (string? (x509-certificate-issuer-dn cert))
+               (string=? (x509-certificate-dn-oid cert 0) %first-oid)
+               (eq? (x509-certificate-signature-algorithm cert)
+                    %signature-algorithm)
+               (x509-certificate-matches-hostname? cert "localhost")
+               (let-values (((type name)
+                             (x509-certificate-subject-alternative-name
+                              cert 0)))
+                 (and (string? name)
+                      (string?
+                       (x509-subject-alternative-name->string type)))))))))
 
 ;;; arch-tag: eef09b52-30e8-472a-8b93-cb636434f6eb

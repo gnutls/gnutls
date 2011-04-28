@@ -1,5 +1,5 @@
 ;;; GnuTLS-extra --- Guile bindings for GnuTLS-EXTRA.
-;;; Copyright (C) 2007, 2010 Free Software Foundation, Inc.
+;;; Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS-extra is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 
 (use-modules (gnutls)
              (gnutls extra)
+             (gnutls build tests)
              (srfi srfi-1)
              (srfi srfi-4)
              (srfi srfi-11))
@@ -43,11 +44,7 @@
   (stat:size (stat file)))
 
 
-(dynamic-wind
-
-    (lambda ()
-      #t)
-
+(run-test
     (lambda ()
       (let ((raw-pubkey  (make-u8vector (file-size %certificate-file)))
             (raw-privkey (make-u8vector (file-size %private-key-file))))
@@ -60,20 +57,16 @@
               (sec (import-openpgp-private-key raw-privkey
                                            openpgp-certificate-format/base64)))
 
-          (exit (and (openpgp-certificate? pub)
-                     (openpgp-private-key? sec)
-                     (equal? (openpgp-certificate-id pub) %key-id)
-                     (u8vector? (openpgp-certificate-fingerprint pub))
-                     (every string? (openpgp-certificate-names pub))
-                     (member (openpgp-certificate-version pub) '(3 4))
-                     (list? (openpgp-certificate-usage pub))
-                     (let-values (((pk bits)
-                                   (openpgp-certificate-algorithm pub)))
-                       (and (string? (pk-algorithm->string pk))
-                            (number? bits))))))))
-
-    (lambda ()
-      ;; failure
-      (exit 1)))
+          (and (openpgp-certificate? pub)
+               (openpgp-private-key? sec)
+               (equal? (openpgp-certificate-id pub) %key-id)
+               (u8vector? (openpgp-certificate-fingerprint pub))
+               (every string? (openpgp-certificate-names pub))
+               (member (openpgp-certificate-version pub) '(3 4))
+               (list? (openpgp-certificate-usage pub))
+               (let-values (((pk bits)
+                             (openpgp-certificate-algorithm pub)))
+                 (and (string? (pk-algorithm->string pk))
+                      (number? bits))))))))
 
 ;;; arch-tag: 2ee2a377-7f4d-4031-92a8-275090e4f83d

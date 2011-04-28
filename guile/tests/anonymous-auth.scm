@@ -24,6 +24,7 @@
 ;;;
 
 (use-modules (gnutls)
+             (gnutls build tests)
              (srfi srfi-4))
 
 
@@ -50,10 +51,7 @@
 ;; (set-log-procedure! (lambda (level str)
 ;;                       (format #t "[~a|~a] ~a" (getpid) level str)))
 
-(dynamic-wind
-    (lambda ()
-      #t)
-
+(run-test
     (lambda ()
       (let ((socket-pair (socketpair PF_UNIX SOCK_STREAM 0))
             (pid         (primitive-fork)))
@@ -71,7 +69,7 @@
               (record-send client %message)
               (bye client close-request/rdwr)
 
-              (exit))
+              (primitive-exit))
 
             (let ((server (make-session connection-end/server)))
               ;; server-side
@@ -89,11 +87,7 @@
               (let* ((buf (make-u8vector (u8vector-length %message)))
                      (amount (record-receive! server buf)))
                 (bye server close-request/rdwr)
-                (exit (= amount (u8vector-length %message))
-                      (equal? buf %message)))))))
-
-    (lambda ()
-      ;; failure
-      (exit 1)))
+                (and (= amount (u8vector-length %message))
+                     (equal? buf %message))))))))
 
 ;;; arch-tag: 8c98de24-0a53-4290-974e-4b071ad162a0
