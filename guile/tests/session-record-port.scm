@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007, 2010 Free Software Foundation, Inc.
+;;; Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,7 @@
 ;;;
 
 (use-modules (gnutls)
+             (gnutls build tests)
              (srfi srfi-4))
 
 
@@ -54,10 +55,7 @@
 ;; (set-log-procedure! (lambda (level str)
 ;;                       (format #t "[~a|~a] ~a" (getpid) level str)))
 
-(dynamic-wind
-    (lambda ()
-      #t)
-
+(run-test
     (lambda ()
       ;; Stress the GC.  In 0.0, this triggered an abort due to
       ;; "scm_unprotect_object called during GC".
@@ -104,7 +102,7 @@
               (uniform-vector-write %message (session-record-port client))
               (bye client close-request/rdwr)
 
-              (exit))
+              (primitive-exit))
 
             (let ((server (make-session connection-end/server)))
               ;; server-side
@@ -130,15 +128,11 @@
                 (bye server close-request/rdwr)
 
                 ;; Make sure we got everything right.
-                (exit (eq? (session-record-port server)
-                           (session-record-port server))
-                      (= amount (u8vector-length %message))
-                      (equal? buf %message)
-                      (eof-object?
-                       (read-char (session-record-port server)))))))))
-
-    (lambda ()
-      ;; failure
-      (exit 1)))
+                (and (eq? (session-record-port server)
+                          (session-record-port server))
+                     (= amount (u8vector-length %message))
+                     (equal? buf %message)
+                     (eof-object?
+                      (read-char (session-record-port server))))))))))
 
 ;;; arch-tag: e873226a-d0b6-4a93-87ec-a1b5ad2ae8a2

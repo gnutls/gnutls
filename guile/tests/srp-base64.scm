@@ -1,5 +1,5 @@
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007, 2010 Free Software Foundation, Inc.
+;;; Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -22,7 +22,8 @@
 ;;; Test SRP base64 encoding and decoding.
 ;;;
 
-(use-modules (gnutls))
+(use-modules (gnutls)
+             (gnutls build tests))
 
 (define %message
   "GnuTLS is free software; you can redistribute it and/or
@@ -30,10 +31,12 @@ modify it under the terms of the GNU Lesser General Public
 License as published by the Free Software Foundation; either
 version 2.1 of the License, or (at your option) any later version.")
 
-(exit (let ((encoded (srp-base64-encode %message)))
-        (and (string? encoded)
-             (string=? (srp-base64-decode encoded)
-                       %message))))
+(run-test
+ (lambda ()
+   (let ((encoded (srp-base64-encode %message)))
+     (and (string? encoded)
+          (string=? (srp-base64-decode encoded)
+                    %message)))))
 
 
 ;;; arch-tag: ea1534a5-d513-4208-9a75-54bd4710f915
