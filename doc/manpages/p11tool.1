@@ -49,10 +49,10 @@ Exports the object (e.g. certificate) specified by the URL.
 .IP "\-\-delete URL"
 Deletes the object specified by the URL. Note that several tokens do not
 support deletion.
-.IP "\-\-detailed-url"
+.IP "\-\-detailed\-url"
 When printing URLs print them in a detailed (to the PKCS #11 module used)
 form.
-.IP "\-\-no\-detailed-url"
+.IP "\-\-no\-detailed\-url"
 When printing URLs, do not print details on the module used.
 
 .SS Storing objects
@@ -81,8 +81,8 @@ To store a private key and certificate, run:
 
 .RS
 .nf
-$ p11tool \-\-login \-\-write "pkcs11:XXX"  \-\-load-privkey key.pem --label "MyKey"
-$ p11tool \-\-login \-\-write "pkcs11:XXX"  \-\-load-certificate cert.pem --label "MyCert"
+$ p11tool \-\-login \-\-write "pkcs11:XXX"  \-\-load\-privkey key.pem \-\-label "MyKey"
+$ p11tool \-\-login \-\-write "pkcs11:XXX"  \-\-load\-certificate cert.pem \-\-label "MyCert"
 .fi
 .RE
 
