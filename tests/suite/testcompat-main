@@ -102,6 +102,12 @@ launch_bare_server $$ s_server -quiet -accept $PORT -keyform pem -certform pem -
 PID=$!
 wait_server $PID
 
+openssl version|grep -e 1\.0 >/dev/null 2>&1
+if test $? != 0;then
+  echo "OpenSSL 1.0.0 is required for DTLS tests"
+  exit 77
+fi
+
 # Test DTLS 1.0 with RSA ciphersuite
 echo "Checking DTLS 1.0 with RSA..." 
 $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+RSA" --udp --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
