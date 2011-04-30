@@ -957,7 +957,7 @@ gnutls_ia_get_server_avp_ptr (gnutls_ia_server_credentials_t cred)
 /**
  * gnutls_ia_enable:
  * @session: is a #gnutls_session_t structure.
- * @allow_skip_on_resume: non-zero if local party allows to skip the
+ * @allow_skip_on_resume: non-zero if local party allows one to skip the
  *			  TLS/IA application phases for a resumed session.
  *
  * Specify whether we must advertise support for the TLS/IA extension
