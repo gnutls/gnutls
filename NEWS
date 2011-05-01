@@ -5,14 +5,18 @@ See the end for copying conditions.
 
 * Version 2.99.1 (released 2011-04-23)
 
+** libgnutls: LZO support was removed.
+
+** libgnutls: Corrections in SSLv2 client hello parsing.
+
 ** libgnutls: Added support for AES-NI if detected. Uses
 Andy Polyakov's AES-NI code.
 
-* libgnutls: Restored HMAC-MD5 for compatibility. Although considered 
+** libgnutls: Restored HMAC-MD5 for compatibility. Although considered 
 weak, several sites require it for connection. It is enabled for
 "NORMAL" and "PERFORMANCE" priority strings.
 
-* libgnutls: depend on libdl.
+** libgnutls: depend on libdl.
 
 ** libgnutls-extra: Dropped support of LZO compression via liblzo.
 
