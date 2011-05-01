@@ -433,9 +433,6 @@ tests/x509self
 tests/x509sign-verify
 tests/x509signself
 doc/examples/ex-cert-select-pkcs11
-gl/m4/fcntl-o.m4
-gl/m4/fcntl_h.m4
-gl/m4/pipe.m4
 doc/examples/ex-client-udp
 gl/tests/test-byteswap
 gl/tests/test-fcntl-h
