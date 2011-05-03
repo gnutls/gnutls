@@ -314,6 +314,50 @@ gnutls_datum_t dn;
   return clist_size;
 }
 
+/**
+ * gnutls_x509_trust_list_get_issuer:
+ * @list: The structure of the list
+ * @cert: is the certificate to find issuer for
+ * @issuer: Will hold the issuer if any. Should be treated as constant.
+ * @flags: Use zero.
+ *
+ * This function will attempt to find the issuer of the
+ * given certificate.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int gnutls_trust_list_get_issuer(gnutls_x509_trust_list_t list,
+  gnutls_x509_crt_t cert, gnutls_x509_crt_t* issuer, unsigned int flags)
+{
+gnutls_datum_t dn;
+int ret, i;
+uint32_t hash;
+
+  ret = gnutls_x509_crt_get_raw_issuer_dn(cert, &dn);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+
+  hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
+  hash %= list->size;
+
+  _gnutls_free_datum(&dn);
+
+  for (i=0;i<list->node[hash].trusted_crt_size;i++)
+    {
+      ret = gnutls_x509_crt_check_issuer (cert, list->node[hash].trusted_crts[i]);
+      if (ret == 1)
+        {
+          *issuer = list->node[hash].trusted_crts[i];
+          return 0;
+        }
+    }
+
+  return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+}
 
 /**
  * gnutls_x509_trust_list_verify_crt:

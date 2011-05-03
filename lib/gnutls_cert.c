@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
- * 2010 Free Software Foundation, Inc.
+ * 2010,2011 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -99,6 +99,25 @@ gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc)
 {
   /* FIXME: do nothing for now */
   return;
+}
+
+/**
+ * gnutls_certificate_get_issuer:
+ * @sc: is a #gnutls_certificate_credentials_t structure.
+ * @cert: is the certificate to find issuer for
+ * @issuer: Will hold the issuer if any. Should be treated as constant.
+ * @flags: Use zero.
+ *
+ * This function will return the issuer of a given certificate.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_certificate_get_issuer (gnutls_certificate_credentials_t sc,
+  gnutls_x509_crt_t cert, gnutls_x509_crt_t* issuer, unsigned int flags)
+{
+  return gnutls_trust_list_get_issuer(sc->tlist, cert, issuer, flags);
 }
 
 /**

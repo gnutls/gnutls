@@ -944,6 +944,24 @@ extern "C"
                               gnutls_credentials_type_t type, void *cred);
 #define gnutls_cred_set	gnutls_credentials_set
 
+/* x.509 types */
+
+  struct gnutls_x509_privkey_int;
+  typedef struct gnutls_x509_privkey_int *gnutls_x509_privkey_t;
+
+  struct gnutls_x509_crl_int;
+  typedef struct gnutls_x509_crl_int *gnutls_x509_crl_t;
+
+  struct gnutls_x509_crt_int;
+  typedef struct gnutls_x509_crt_int *gnutls_x509_crt_t;
+
+  struct gnutls_x509_crq_int;
+  typedef struct gnutls_x509_crq_int *gnutls_x509_crq_t;
+
+  struct gnutls_openpgp_keyring_int;
+  typedef struct gnutls_openpgp_keyring_int *gnutls_openpgp_keyring_t;
+
+
 /* Credential structures - used in gnutls_credentials_set(); */
 
   struct gnutls_certificate_credentials_st;
@@ -987,6 +1005,10 @@ extern "C"
   int
     gnutls_certificate_allocate_credentials (gnutls_certificate_credentials_t
                                              * res);
+
+  int
+    gnutls_certificate_get_issuer (gnutls_certificate_credentials_t sc,
+    gnutls_x509_crt_t cert, gnutls_x509_crt_t* issuer, unsigned int flags);
 
   void gnutls_certificate_free_keys (gnutls_certificate_credentials_t sc);
   void gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc);
@@ -1043,20 +1065,6 @@ extern "C"
 
 /* New functions to allow setting already parsed X.509 stuff.
  */
-  struct gnutls_x509_privkey_int;
-  typedef struct gnutls_x509_privkey_int *gnutls_x509_privkey_t;
-
-  struct gnutls_x509_crl_int;
-  typedef struct gnutls_x509_crl_int *gnutls_x509_crl_t;
-
-  struct gnutls_x509_crt_int;
-  typedef struct gnutls_x509_crt_int *gnutls_x509_crt_t;
-
-  struct gnutls_x509_crq_int;
-  typedef struct gnutls_x509_crq_int *gnutls_x509_crq_t;
-
-  struct gnutls_openpgp_keyring_int;
-  typedef struct gnutls_openpgp_keyring_int *gnutls_openpgp_keyring_t;
 
   int gnutls_certificate_set_x509_key (gnutls_certificate_credentials_t res,
                                        gnutls_x509_crt_t * cert_list,

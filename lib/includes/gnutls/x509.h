@@ -836,6 +836,9 @@ extern "C"
   void
   gnutls_x509_trust_list_deinit (gnutls_x509_trust_list_t list, unsigned int all);
 
+  int gnutls_trust_list_get_issuer(gnutls_x509_trust_list_t list,
+    gnutls_x509_crt_t cert, gnutls_x509_crt_t* issuer, unsigned int flags);
+
   int
   gnutls_x509_trust_list_add_cas (gnutls_x509_trust_list_t list, 
     const gnutls_x509_crt_t * clist, int clist_size, unsigned int flags);

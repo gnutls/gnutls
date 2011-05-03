@@ -3,6 +3,16 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 2.99.2 (unreleased)
+
+** libgnutls: Added gnutls_certificate_get_issuer() and
+gnutls_x509_trust_list_get_issuer() to compensate for the
+missing gnutls_certificate_get_x509_cas().
+
+** API and ABI modifications:
+gnutls_certificate_get_issuer: ADDED
+gnutls_x509_trust_list_get_issuer: ADDED
+
 * Version 2.99.1 (released 2011-04-23)
 
 ** libgnutls: LZO support was removed.
