@@ -87,6 +87,37 @@ gnutls_certificate_free_keys (gnutls_certificate_credentials_t sc)
 }
 
 /**
+ * gnutls_certificate_get_issuer:
+ * @sc: is a #gnutls_certificate_credentials_t structure.
+ * @cert: is the certificate to find issuer for
+ * @issuer: Will hold the issuer if any. Should be treated as constant.
+ * @flags: Use zero.
+ *
+ * This function will return the issuer of a given certificate.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_certificate_get_issuer (gnutls_certificate_credentials_t sc,
+  gnutls_x509_crt_t cert, gnutls_x509_crt_t* issuer, unsigned int flags)
+{
+int i, ret;
+
+  for (i=0;i<sc->x509_ncas;i++)
+    {
+      ret = gnutls_x509_crt_check_issuer(cert, sc->x509_ca_list[i]);
+      if (ret > 0)
+        {
+          *issuer = sc->x509_ca_list[i];
+          return 0;
+        }
+    }
+  
+  return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+}
+
+/**
  * gnutls_certificate_free_cas:
  * @sc: is a #gnutls_certificate_credentials_t structure.
  *

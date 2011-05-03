@@ -689,6 +689,7 @@ GNUTLS_2_12
 	gnutls_openpgp_crt_verify_hash;
 	gnutls_pubkey_import_privkey;
 	gnutls_pubkey_verify_data;
+	gnutls_certificate_get_issuer;
 } GNUTLS_2_10;
 
 GNUTLS_PRIVATE {

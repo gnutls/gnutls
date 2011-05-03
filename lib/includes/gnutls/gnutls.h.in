@@ -1084,6 +1084,10 @@ extern "C"
   struct gnutls_openpgp_keyring_int;
   typedef struct gnutls_openpgp_keyring_int *gnutls_openpgp_keyring_t;
 
+  int
+    gnutls_certificate_get_issuer (gnutls_certificate_credentials_t sc,
+    gnutls_x509_crt_t cert, gnutls_x509_crt_t* issuer, unsigned int flags);
+
   int gnutls_certificate_set_x509_key (gnutls_certificate_credentials_t res,
                                        gnutls_x509_crt_t * cert_list,
                                        int cert_list_size,
