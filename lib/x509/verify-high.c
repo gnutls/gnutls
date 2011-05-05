@@ -349,7 +349,7 @@ uint32_t hash;
   for (i=0;i<list->node[hash].trusted_crt_size;i++)
     {
       ret = gnutls_x509_crt_check_issuer (cert, list->node[hash].trusted_crts[i]);
-      if (ret == 1)
+      if (ret > 0)
         {
           *issuer = list->node[hash].trusted_crts[i];
           return 0;
