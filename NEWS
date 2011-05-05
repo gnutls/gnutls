@@ -9,7 +9,7 @@ See the end for copying conditions.
 compensate for the deprecated gnutls_certificate_get_x509_cas().
 
 ** libgnutls: Limited allowed wildcards to gnutls_x509_crt_check_hostname()
-to prevent denial of service attacks.
+to prevent denial of service attacks. Reported by Kalle Olavi Niemitalo.
 
 ** API and ABI modifications:
 gnutls_certificate_get_issuer: ADDED
