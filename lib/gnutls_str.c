@@ -521,12 +521,18 @@ _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
  * return 1 on success or 0 on error
  *
  * note: certnamesize is required as X509 certs can contain embedded NULs in
- * the strings such as CN or subjectAltName
+ * the strings such as CN or subjectAltName.
+ *
+ * @level: is used for recursion. Use 0 when you call this function.
  */
 int
 _gnutls_hostname_compare (const char *certname,
-                          size_t certnamesize, const char *hostname)
+                          size_t certnamesize, const char *hostname, int level)
 {
+
+  if (level > 5)
+    return 0;
+
   /* find the first different character */
   for (; *certname && *hostname && c_toupper (*certname) == c_toupper (*hostname);
        certname++, hostname++, certnamesize--)
@@ -546,7 +552,7 @@ _gnutls_hostname_compare (const char *certname,
       while (1)
         {
           /* Use a recursive call to allow multiple wildcards */
-          if (_gnutls_hostname_compare (certname, certnamesize, hostname))
+          if (_gnutls_hostname_compare (certname, certnamesize, hostname, level+1))
             return 1;
 
           /* wildcards are only allowed to match a single domain
