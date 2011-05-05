@@ -572,6 +572,32 @@ char pem10[] =
   "170AX8R58vurxg6iAYuhQnPelik+v9fZUafUmAd/8PTNAKHhrGwFrKuTG7BcLBOt\n"
   "/yfcgJk0Zr3jMVTVtj/O1AijUihhXr0=\n" "-----END CERTIFICATE-----\n";
 
+char pem_too_many[] = "\n"
+  "      Subject: C=BE,CN=******************.gnutls.org\n"
+  "\n"
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIDljCCAk6gAwIBAgIETcMNdjANBgkqhkiG9w0BAQsFADA6MQswCQYDVQQGEwJC\n"
+  "RTErMCkGA1UEAxMiKioqKioqKioqKioqKioqKioqKioqKiouZ251dGxzLm9yZzAe\n"
+  "Fw0xMTA1MDUyMDQ5NTlaFw02NDAxMTUyMDUwMDJaMDoxCzAJBgNVBAYTAkJFMSsw\n"
+  "KQYDVQQDEyIqKioqKioqKioqKioqKioqKioqKioqKi5nbnV0bHMub3JnMIIBUjAN\n"
+  "BgkqhkiG9w0BAQEFAAOCAT8AMIIBOgKCATEA3c+X0qUdld2GGNjEua2mDLSdttz6\n"
+  "3CHhOmI0B+gzsuiX7ixB0hLxX+3kdv9lJh4Mx0EVaV8N+a2JFI3q1xZSmkfBuwAC\n"
+  "5IhFc3ikrts4w8YH0mQOh+10jGvEwAJQfE6m0Vjp5RMJqdta6usPBoBcCe+UyOn7\n"
+  "Ny514ayTrZs3E0tmOnYz2MTXTPthyJIhB/zfqYhU5KOpR9JsuOM5iRGIOC2i3D5e\n"
+  "SqmkjtUfstDdQTzaEGieRxtlAqLFKHMCgwMJ/fUpfpfcKk5LqnlGRnCGG5u49oq+\n"
+  "KYd9X9qll2vvyEMJQ+IfihZ+HVBd9doC7vLDKkjmazDqAtfvrIsMuMGF2L98hage\n"
+  "g75cJi55e0f1Sj9mYpL9QSC2LADwUsomBi18z3pQfQ/L3ZcgyG/k4FD04wIDAQAB\n"
+  "o0QwQjAMBgNVHRMBAf8EAjAAMBMGA1UdJQQMMAoGCCsGAQUFBwMBMB0GA1UdDgQW\n"
+  "BBSSU9ZxufhoqrNT9o31OUVmnKflMTANBgkqhkiG9w0BAQsFAAOCATEAUMK435LP\n"
+  "0XpmpWLBBuC6VLLIsAGmXRv7odw8sG9fOctalsbK3zd9pDOaoFI/128GOmlTp1aC\n"
+  "n4a/pZ9G5wTKRvdxVqecdYkozDtAS35uwCSQPU/P12Oug6kA4NNJDxF3FGm5eov6\n"
+  "SnZDL0Qlhat9y0yOakaOkVNwESAwgUEYClZeR45htvH5oP48XEgwqHQ9jPS2MXAe\n"
+  "QLBjqqeYzIvWqwT4z14tIkN0VWWqqVo/dzV+lfNwQy0UL8iWVYnks8wKs2SBkVHx\n"
+  "41wBR3uCgCDwlYGDLIG1cm0n7mXrnE7KNcrwQKXL8WGNRAVvx5MVO1vDoWPyQ1Y4\n"
+  "sDdnQiVER9ee/KxO6IgCTGh+nCBTSSYgLX2E/m789quPvzyi9Hf/go28he6E3dSK\n"
+  "q7/LRSxaZenB/Q==\n"
+  "-----END CERTIFICATE-----\n";
+
 #ifdef ENABLE_OPENPGP
 /* Check basic OpenPGP comparison too.
    <http://thread.gmane.org/gmane.comp.encryption.gpg.gnutls.devel/3812>. */
@@ -806,6 +832,19 @@ doit (void)
   ret = gnutls_x509_crt_check_hostname (x509, "localhost");
   if (ret)
     fail ("Hostname incorrectly matches (%d)\n", ret);
+
+  if (debug)
+    success ("Testing pem_too_many...\n");
+  data.data = pem_too_many;
+  data.size = strlen (pem_too_many);
+
+  ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
+  if (ret < 0)
+    fail ("gnutls_x509_crt_import: %d\n", ret);
+
+  ret = gnutls_x509_crt_check_hostname (x509, "localhost.gnutls.gnutls.org");
+  if (ret)
+    fail ("Hostname verification should have failed (too many wildcards)\n");
 
 #ifdef ENABLE_OPENPGP
   if (debug)
