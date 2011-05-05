@@ -28,6 +28,7 @@
 #include <gnutls_num.h>
 #include <gnutls_str.h>
 #include <stdarg.h>
+#include <c-ctype.h>
 
 /* These function are like strcat, strcpy. They only
  * do bound checking (they shouldn't cause buffer overruns),
@@ -536,7 +537,7 @@ _gnutls_hostname_compare (const char *certname,
                           size_t certnamesize, const char *hostname)
 {
   /* find the first different character */
-  for (; *certname && *hostname && toupper (*certname) == toupper (*hostname);
+  for (; *certname && *hostname && c_toupper (*certname) == c_toupper (*hostname);
        certname++, hostname++, certnamesize--)
     ;
 

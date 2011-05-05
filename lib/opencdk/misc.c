@@ -29,6 +29,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/stat.h>
+#include <c-ctype.h>
 
 #include "opencdk.h"
 #include "main.h"
@@ -113,10 +114,10 @@ _cdk_memistr (const char *buf, size_t buflen, const char *sub)
 
   for (t = (byte *) buf, n = buflen, s = (byte *) sub; n; t++, n--)
     {
-      if (toupper (*t) == toupper (*s))
+      if (c_toupper (*t) == c_toupper (*s))
         {
           for (buf = t++, buflen = n--, s++;
-               n && toupper (*t) == toupper ((byte) * s); t++, s++, n--)
+               n && c_toupper (*t) == c_toupper ((byte) * s); t++, s++, n--)
             ;
           if (!*s)
             return buf;
