@@ -595,7 +595,7 @@ gnutls_openpgp_crt_check_hostname (gnutls_openpgp_crt_t key,
              the terminating zero. */
           dnsnamesize--;
 
-          if (_gnutls_hostname_compare (dnsname, dnsnamesize, hostname))
+          if (_gnutls_hostname_compare (dnsname, dnsnamesize, hostname, 0))
             return 1;
         }
     }

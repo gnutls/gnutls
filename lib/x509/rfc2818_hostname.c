@@ -75,7 +75,7 @@ gnutls_x509_crt_check_hostname (gnutls_x509_crt_t cert, const char *hostname)
       if (ret == GNUTLS_SAN_DNSNAME)
         {
           found_dnsname = 1;
-          if (_gnutls_hostname_compare (dnsname, dnsnamesize, hostname))
+          if (_gnutls_hostname_compare (dnsname, dnsnamesize, hostname, 0))
             {
               return 1;
             }
@@ -95,7 +95,7 @@ gnutls_x509_crt_check_hostname (gnutls_x509_crt_t cert, const char *hostname)
           return 0;
         }
 
-      if (_gnutls_hostname_compare (dnsname, dnsnamesize, hostname))
+      if (_gnutls_hostname_compare (dnsname, dnsnamesize, hostname, 0))
         {
           return 1;
         }
