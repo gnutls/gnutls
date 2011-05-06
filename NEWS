@@ -11,6 +11,10 @@ compensate for the deprecated gnutls_certificate_get_x509_cas().
 ** libgnutls: Limited allowed wildcards to gnutls_x509_crt_check_hostname()
 to prevent denial of service attacks. Reported by Kalle Olavi Niemitalo.
 
+** guile: Fix tests to match the `exit' behavior introduced in Guile 2.0.1.
+This fix makes tests behave correctly wrt. to the Guile bug fix at
+<http://git.sv.gnu.org/cgit/guile.git/commit/?id=e309f3bf9ee910c4772353ca3ff95f6f4ef466b5>.
+
 ** API and ABI modifications:
 gnutls_certificate_get_issuer: ADDED
 
