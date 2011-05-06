@@ -46,8 +46,8 @@ int i;
   printf("\n");
 }
   
-    
-
+#define FILENAME "./rng-test"
+   
 void
 doit (void)
 {
@@ -57,13 +57,11 @@ doit (void)
   int ret;
   FILE* fp;
 
-
   gnutls_global_init ();
-  
   pid = fork();
   if (pid == 0)
     {
-      fp = fopen("/tmp/rng-test", "w");
+      fp = fopen(FILENAME, "w");
       if (fp == NULL)
         fail("cannot open file");
       
@@ -80,11 +78,14 @@ doit (void)
       if (debug) dump("buf2", buf2, sizeof(buf2));
       waitpid(pid, NULL, 0);
       
-      fp = fopen("/tmp/rng-test", "r");
+      fp = fopen(FILENAME, "r");
       if (fp == NULL)
         fail("cannot open file");
         
       ret = fread(buf1, 1, sizeof(buf1), fp);
+      
+      fclose(fp);
+      remove(FILENAME);
       
       if (ret != sizeof(buf1))
         {
