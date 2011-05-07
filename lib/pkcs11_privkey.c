@@ -1,6 +1,6 @@
 /*
  * GnuTLS PKCS#11 support
- * Copyright (C) 2010 Free Software Foundation
+ * Copyright (C) 2010,2011 Free Software Foundation
  * 
  * Author: Nikos Mavrogiannopoulos
  *
@@ -121,8 +121,11 @@ gnutls_pkcs11_privkey_get_info (gnutls_pkcs11_privkey_t pkey,
 		ret = pkcs11_find_object (&pks, &obj, &key->info, \
 			SESSION_LOGIN); \
 		if (ret < 0) { \
-			rret = token_func(token_data, key->info.token, retries++); \
-			if (rret == 0) continue; \
+			if (token_func) \
+			  { \
+			    rret = token_func(token_data, key->info.token, retries++); \
+  			    if (rret == 0) continue; \
+                          } \
 			gnutls_assert(); \
 			return ret; \
 		} \
@@ -220,6 +223,10 @@ gnutls_pkcs11_privkey_import_url (gnutls_pkcs11_privkey_t pkey,
                                   const char *url, unsigned int flags)
 {
   int ret;
+  pakchois_session_t *pks;
+  ck_object_handle_t obj;
+  struct ck_attribute a[4];
+  ck_key_type_t key_type;
 
   ret = pkcs11_url_to_info (url, &pkey->info);
   if (ret < 0)
@@ -242,7 +249,34 @@ gnutls_pkcs11_privkey_import_url (gnutls_pkcs11_privkey_t pkey,
       return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
     }
 
-  return 0;
+  FIND_OBJECT (pks, obj, pkey);
+  a[0].type = CKA_KEY_TYPE;
+  a[0].value = &key_type;
+  a[0].value_len = sizeof (key_type);
+
+  if (pakchois_get_attribute_value (pks, obj, a, 1) == CKR_OK)
+    {
+      switch (key_type)
+        {
+        case CKK_RSA:
+          pkey->pk_algorithm = GNUTLS_PK_RSA;
+          break;
+        case CKK_DSA:
+          pkey->pk_algorithm = GNUTLS_PK_DSA;
+          break;
+        default:
+          _gnutls_debug_log("Cannot determine PKCS #11 key algorithm\n");
+          ret = GNUTLS_E_UNKNOWN_ALGORITHM;
+          goto cleanup;
+        }
+    }
+
+  ret = 0;
+
+cleanup:
+  pakchois_close_session (pks);
+
+  return ret;
 }
 
 /*-
