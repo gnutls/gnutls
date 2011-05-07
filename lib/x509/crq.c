@@ -2567,7 +2567,7 @@ int ret, params_size = 0, i;
 
   ret = pubkey_verify_sig(&data, NULL, &signature,
                           gnutls_x509_crq_get_pk_algorithm (crq, NULL),
-    params, params_size);
+                          params, params_size);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -2581,9 +2581,9 @@ cleanup:
   _gnutls_free_datum (&signature);
 
   for (i = 0; i < params_size; i++)
-      {
-            _gnutls_mpi_release (&params[i]);
-      }
+    {
+      _gnutls_mpi_release (&params[i]);
+    }
 
   return ret;
 }

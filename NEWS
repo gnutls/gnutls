@@ -5,6 +5,12 @@ See the end for copying conditions.
 
 * Version 2.99.2 (unreleased)
 
+** certtool: Can now load private keys and public keys from PKCS #11 tokens
+via URLs.
+
+** libgnutls: gnutls_pkcs11_privkey_import_url() will now correctly read
+the public key algorithm of the key.
+
 ** libgnutls: Added gnutls_certificate_get_issuer() and
 gnutls_x509_trust_list_get_issuer() to compensate for the
 missing gnutls_certificate_get_x509_cas().
