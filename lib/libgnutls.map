@@ -677,6 +677,8 @@ GNUTLS_2_12
 	gnutls_openpgp_crt_verify_hash;
 	gnutls_pubkey_import_privkey;
 	gnutls_pubkey_verify_data;
+	gnutls_certificate_get_issuer;
+	gnutls_x509_crq_verify;
 } GNUTLS_2_10;
 
 GNUTLS_3_0_0 {
@@ -710,7 +712,6 @@ GNUTLS_3_0_0 {
 	gnutls_pubkey_get_openpgp_key_id;
 	gnutls_certificate_set_retrieve_function2;
 	gnutls_x509_trust_list_get_issuer;
-	gnutls_certificate_get_issuer;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

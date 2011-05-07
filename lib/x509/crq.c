@@ -2521,5 +2521,72 @@ gnutls_x509_crq_privkey_sign (gnutls_x509_crq_t crq, gnutls_privkey_t key,
 }
 
 
+/**
+ * gnutls_x509_crq_verify:
+ * @crq: is the crq to be verified
+ * @flags: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
+ *
+ * This function will verify self signature in the certificate
+ * request and return its status.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, %GNUTLS_E_PK_SIG_VERIFY_FAILED
+ * if verification failed, otherwise a negative error value.
+ **/
+int
+gnutls_x509_crq_verify (gnutls_x509_crq_t crq,
+                        unsigned int flags)
+{
+gnutls_datum data = { NULL, 0 };
+gnutls_datum signature = { NULL, 0 };
+bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
+int ret, params_size = 0, i;
+
+  ret =
+    _gnutls_x509_get_signed_data (crq->crq, "certificationRequestInfo", &data);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  ret = _gnutls_x509_get_signature (crq->crq, "signature", &signature);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  params_size = MAX_PUBLIC_PARAMS_SIZE;
+  ret =
+    _gnutls_x509_crq_get_mpis(crq, params, &params_size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  ret = pubkey_verify_sig(&data, NULL, &signature,
+                          gnutls_x509_crq_get_pk_algorithm (crq, NULL),
+    params, params_size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  ret = 0;
+
+cleanup:
+  _gnutls_free_datum (&data);
+  _gnutls_free_datum (&signature);
+
+  for (i = 0; i < params_size; i++)
+      {
+            _gnutls_mpi_release (&params[i]);
+      }
+
+  return ret;
+}
 
 #endif /* ENABLE_PKI */
+

@@ -9,9 +9,19 @@ See the end for copying conditions.
 gnutls_x509_trust_list_get_issuer() to compensate for the
 missing gnutls_certificate_get_x509_cas().
 
+** libgnutls: Added gnutls_x509_crq_verify() to allow
+verification of the self signature in a certificate request.
+This allows verifying whether the owner of the private key
+is the generator of the request.
+
+** libgnutls: gnutls_x509_crt_set_crq() implicitly verifies
+the self signature of the request.
+
 ** API and ABI modifications:
 gnutls_certificate_get_issuer: ADDED
 gnutls_x509_trust_list_get_issuer: ADDED
+gnutls_x509_crq_verify: ADDED
+
 
 * Version 2.99.1 (released 2011-04-23)
 
