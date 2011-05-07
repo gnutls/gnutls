@@ -26,10 +26,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <gnutls/openssl.h>
 #include "../lib/gnutls_int.h"
 #include "../lib/random.h"
 #include "../lib/gnutls_hash_int.h"
+
+/* In win32 X509_NAME is defined in wincrypt.h.
+ * undefine it to avoid the conflict with openssl.h.
+ */
+#ifdef X509_NAME
+# undef X509_NAME
+#endif
+#include <gnutls/openssl.h>
 
 /* Gnulib re-defines shutdown on mingw.  We only use it as a variable
    name, so restore the original name. */
