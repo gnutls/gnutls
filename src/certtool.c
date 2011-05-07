@@ -22,7 +22,6 @@
 #include <config.h>
 
 #include <gnutls/gnutls.h>
-#include <gnutls/extra.h>
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
 #include <gnutls/pkcs12.h>
@@ -1078,9 +1077,6 @@ gaa_parser (int argc, char **argv)
 
   if ((ret = gnutls_global_init ()) < 0)
     error (EXIT_FAILURE, 0, "global_init: %s", gnutls_strerror (ret));
-
-  if ((ret = gnutls_global_init_extra ()) < 0)
-    error (EXIT_FAILURE, 0, "global_init_extra: %s", gnutls_strerror (ret));
 
   memset (&cinfo, 0, sizeof (cinfo));
   cinfo.privkey = info.privkey;
