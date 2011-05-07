@@ -42,8 +42,8 @@ noinst_LTLIBRARIES =
 gnutls_serv_SOURCES =				\
   list.h serv.c					\
   udp-serv.c udp-serv.h				\
-  common.h common.c				\
-  certtool-common.h
+  common.h common.c	p11common.c		\
+  certtool-common.h p11common.h
 gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
 gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la
 gnutls_serv_LDADD += $(LTLIBGCRYPT) $(LIBSOCKET) $(GETADDRINFO_LIB)
@@ -68,7 +68,7 @@ libcmd_psk_la_SOURCES = psk.gaa psk-gaa.h psk-gaa.c
 benchmark_SOURCES = benchmark.c
 benchmark_LDADD = ../lib/libgnutls.la ../gl/libgnu.la $(LIB_CLOCK_GETTIME)
 
-gnutls_cli_SOURCES = cli.c common.h common.c
+gnutls_cli_SOURCES = cli.c common.h common.c p11common.c p11common.h
 gnutls_cli_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
 gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la
 gnutls_cli_LDADD += $(LTLIBGCRYPT) $(LIBSOCKET) $(GETADDRINFO_LIB)
@@ -76,7 +76,7 @@ noinst_LTLIBRARIES += libcmd-cli.la
 libcmd_cli_la_CFLAGS =
 libcmd_cli_la_SOURCES = cli.gaa cli-gaa.h cli-gaa.c
 
-gnutls_cli_debug_SOURCES = tls_test.c tests.h tests.c common.h common.c
+gnutls_cli_debug_SOURCES = tls_test.c tests.h tests.c common.h common.c p11common.c p11common.h
 gnutls_cli_debug_LDADD = ../lib/libgnutls.la libcmd-cli-debug.la
 gnutls_cli_debug_LDADD += ../gl/libgnu.la $(LIBSOCKET) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-cli-debug.la
@@ -85,7 +85,7 @@ libcmd_cli_debug_la_SOURCES = tls_test.gaa tls_test-gaa.h tls_test-gaa.c
 
 #certtool
 
-certtool_SOURCES = certtool.c prime.c certtool-common.c
+certtool_SOURCES = certtool.c prime.c certtool-common.c p11common.c p11common.h
 certtool_LDADD = ../lib/libgnutls.la 
 certtool_LDADD += libcmd-certtool.la ../gl/libgnu.la
 certtool_LDADD += $(LTLIBGCRYPT)
