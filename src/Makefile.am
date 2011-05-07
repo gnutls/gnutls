@@ -86,7 +86,7 @@ libcmd_cli_debug_la_SOURCES = tls_test.gaa tls_test-gaa.h tls_test-gaa.c
 #certtool
 
 certtool_SOURCES = certtool.c prime.c certtool-common.c
-certtool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
+certtool_LDADD = ../lib/libgnutls.la 
 certtool_LDADD += libcmd-certtool.la ../gl/libgnu.la
 certtool_LDADD += $(LTLIBGCRYPT)
 if HAVE_LIBCFG
@@ -105,13 +105,13 @@ libcmd_certtool_la_CFLAGS =
 libcmd_certtool_la_SOURCES = certtool-gaa.c certtool.gaa certtool-gaa.h	\
 	certtool-cfg.h certtool-cfg.c
 libcmd_certtool_la_LIBADD = ../gl/libgnu.la $(LTLIBREADLINE)
-libcmd_certtool_la_LIBADD += ../lib/libgnutls.la ../libextra/libgnutls-extra.la
+libcmd_certtool_la_LIBADD += ../lib/libgnutls.la 
 libcmd_certtool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
 
 # p11 tool
 p11tool_gaa_CFLAGS =
 p11tool_SOURCES = p11tool.gaa p11tool.c pkcs11.c certtool-common.c p11tool.h
-p11tool_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
+p11tool_LDADD = ../lib/libgnutls.la 
 p11tool_LDADD += libcmd-p11tool.la ../gl/libgnu.la
 p11tool_LDADD += $(LTLIBGCRYPT)
 
