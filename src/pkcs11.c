@@ -574,7 +574,7 @@ pkcs11_write (FILE * outfile, const char *url, const char *label, int trusted,
       gnutls_x509_crt_get_key_usage (xcrt, &key_usage, NULL);
     }
 
-  xkey = load_private_key (0, info);
+  xkey = load_x509_private_key (0, info);
   if (xkey != NULL)
     {
       ret =

@@ -103,11 +103,198 @@ load_secret_key (int mand, common_info_st * info)
   return &key;
 }
 
+static gnutls_privkey_t _load_privkey(gnutls_datum_t *dat, common_info_st * info)
+{
+int ret;
+gnutls_privkey_t key;
+gnutls_x509_privkey_t xkey;
+
+  ret = gnutls_x509_privkey_init (&xkey);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "x509_privkey_init: %s", gnutls_strerror (ret));
+
+  ret = gnutls_privkey_init (&key);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
+
+  if (info->pkcs8)
+    {
+      const char *pass = get_pass ();
+      ret =
+        gnutls_x509_privkey_import_pkcs8 (xkey, dat, info->incert_format,
+                                          pass, 0);
+    }
+  else
+    ret = gnutls_x509_privkey_import (xkey, dat, info->incert_format);
+
+  if (ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
+    {
+      error (EXIT_FAILURE, 0,
+             "import error: could not find a valid PEM header; "
+             "check if your key is PKCS #8 or PKCS #12 encoded");
+    }
+
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "importing --load-privkey: %s: %s",
+           info->privkey, gnutls_strerror (ret));
+
+  ret = gnutls_privkey_import_x509(key, xkey, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "gnutls_privkey_import_x509: %s",
+           gnutls_strerror (ret));
+  
+  return key;
+}
+
+static gnutls_privkey_t _load_pkcs11_privkey(const char* url)
+{
+int ret;
+gnutls_pkcs11_privkey_t p11key;
+gnutls_privkey_t key;
+
+  ret = gnutls_privkey_init (&key);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
+
+  ret = gnutls_pkcs11_privkey_init (&p11key);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "pkcs11_privkey_init: %s", gnutls_strerror (ret));
+
+  ret = gnutls_pkcs11_privkey_import_url(p11key, url, 0);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "importing PKCS #11 key: %s: %s",
+           url, gnutls_strerror (ret));
+
+  ret = gnutls_privkey_import_pkcs11(key, p11key, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "gnutls_privkey_import_pkcs11: %s",
+           gnutls_strerror (ret));
+  
+  return key;
+}
+
+static gnutls_pubkey_t _load_pkcs11_pubkey(const char* url)
+{
+int ret;
+gnutls_pkcs11_obj_t obj;
+gnutls_x509_crt_t xcrt;
+gnutls_pubkey_t pubkey;
+unsigned int obj_flags = 0;
+
+  ret = gnutls_pubkey_init (&pubkey);
+  if (ret < 0)
+    {
+      fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+               gnutls_strerror (ret));
+      exit (1);
+    }
+
+  ret = gnutls_pkcs11_obj_init (&obj);
+  if (ret < 0)
+    {
+      fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+               gnutls_strerror (ret));
+      exit (1);
+    }
+
+  ret = gnutls_pkcs11_obj_import_url (obj, url, obj_flags);
+  if (ret < 0)
+    {
+      fprintf (stderr, "Error in %s:%d: %s: %s\n", __func__, __LINE__,
+               gnutls_strerror (ret), url);
+      exit (1);
+    }
+
+  switch (gnutls_pkcs11_obj_get_type (obj))
+    {
+    case GNUTLS_PKCS11_OBJ_X509_CRT:
+      ret = gnutls_x509_crt_init (&xcrt);
+      if (ret < 0)
+        {
+          fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+                   gnutls_strerror (ret));
+          exit (1);
+        }
+
+      ret = gnutls_x509_crt_import_pkcs11 (xcrt, obj);
+      if (ret < 0)
+        {
+          fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+                   gnutls_strerror (ret));
+          exit (1);
+        }
+
+      ret = gnutls_pubkey_import_x509 (pubkey, xcrt, 0);
+      if (ret < 0)
+        {
+          fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+                   gnutls_strerror (ret));
+          exit (1);
+        }
+
+      gnutls_x509_crt_deinit (xcrt);
+      break;
+    case GNUTLS_PKCS11_OBJ_PUBKEY:
+
+      ret = gnutls_pubkey_import_pkcs11 (pubkey, obj, 0);
+      if (ret < 0)
+        {
+          fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+                   gnutls_strerror (ret));
+          exit (1);
+        }
+
+      break;
+    default:
+      {
+        fprintf(stderr, "Unsupported PKCS #11 object\n");
+        exit (1);
+        break;
+      }
+    }
+  
+  gnutls_pkcs11_obj_deinit (obj);
+  return pubkey;
+}
+
+
+/* Load the private key.
+ * @mand should be non zero if it is required to read a private key.
+ */
+gnutls_privkey_t
+load_private_key (int mand, common_info_st * info)
+{
+  gnutls_privkey_t key;
+  gnutls_datum_t dat;
+  size_t size;
+
+  if (!info->privkey && !mand)
+    return NULL;
+
+  if (info->privkey == NULL)
+    error (EXIT_FAILURE, 0, "missing --load-privkey");
+
+  if (strncmp(info->privkey, "pkcs11:", 7) == 0)
+    return _load_pkcs11_privkey(info->privkey);
+
+  dat.data = read_binary_file (info->privkey, &size);
+  dat.size = size;
+
+  if (!dat.data)
+    error (EXIT_FAILURE, errno, "reading --load-privkey: %s", info->privkey);
+
+  key = _load_privkey(&dat, info);
+
+  free (dat.data);
+
+  return key;
+}
+
 /* Load the private key.
  * @mand should be non zero if it is required to read a private key.
  */
 gnutls_x509_privkey_t
-load_private_key (int mand, common_info_st * info)
+load_x509_private_key (int mand, common_info_st * info)
 {
   gnutls_x509_privkey_t key;
   int ret;
@@ -283,20 +470,18 @@ load_request (common_info_st * info)
 
 /* Load the CA's private key.
  */
-gnutls_x509_privkey_t
+gnutls_privkey_t
 load_ca_private_key (common_info_st * info)
 {
-  gnutls_x509_privkey_t key;
-  int ret;
+  gnutls_privkey_t key;
   gnutls_datum_t dat;
   size_t size;
 
   if (info->ca_privkey == NULL)
     error (EXIT_FAILURE, 0, "missing --load-ca-privkey");
 
-  ret = gnutls_x509_privkey_init (&key);
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
+  if (strncmp(info->ca_privkey, "pkcs11:", 7) == 0)
+    return _load_pkcs11_privkey(info->ca_privkey);
 
   dat.data = read_binary_file (info->ca_privkey, &size);
   dat.size = size;
@@ -305,19 +490,9 @@ load_ca_private_key (common_info_st * info)
     error (EXIT_FAILURE, errno, "reading --load-ca-privkey: %s",
            info->ca_privkey);
 
-  if (info->pkcs8)
-    {
-      const char *pass = get_pass ();
-      ret =
-        gnutls_x509_privkey_import_pkcs8 (key, &dat, info->incert_format,
-                                          pass, 0);
-    }
-  else
-    ret = gnutls_x509_privkey_import (key, &dat, info->incert_format);
+  key = _load_privkey(&dat, info);
+
   free (dat.data);
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "importing --load-ca-privkey: %s: %s",
-           info->ca_privkey, gnutls_strerror (ret));
 
   return key;
 }
@@ -372,6 +547,9 @@ load_pubkey (int mand, common_info_st * info)
   if (info->pubkey == NULL)
     error (EXIT_FAILURE, 0, "missing --load-pubkey");
 
+  if (strncmp(info->privkey, "pkcs11:", 7) == 0)
+    return _load_pkcs11_pubkey(info->pubkey);
+
   ret = gnutls_pubkey_init (&key);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
@@ -399,3 +577,24 @@ load_pubkey (int mand, common_info_st * info)
 
   return key;
 }
+
+gnutls_pubkey_t load_public_key_or_import(int mand, gnutls_privkey_t privkey, common_info_st * info)
+{
+gnutls_pubkey_t pubkey;
+int ret;
+
+  ret = gnutls_pubkey_init(&pubkey);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "gnutls_pubkey_init: %s",
+           gnutls_strerror (ret));
+
+  ret = gnutls_pubkey_import_privkey(pubkey, privkey, 0, 0);
+  if (ret < 0) /* could not get (e.g. on PKCS #11 */
+    {
+      gnutls_pubkey_deinit(pubkey);
+      return load_pubkey(mand, info);
+    }
+
+  return pubkey;
+}
+

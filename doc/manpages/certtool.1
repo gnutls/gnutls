@@ -42,11 +42,13 @@ Generate PKCS #3 encoded Diffie-Hellman parameters.
 .IP "\-\-load\-ca\-certificate FILE"
 Certificate authority's certificate file to use.
 .IP "\-\-load\-ca\-privkey FILE"
-Certificate authority's private key file to use.
+Certificate authority's private key file or PKCS #11 URL to use.
 .IP "\-\-load\-certificate FILE"
 Certificate file to use.
 .IP "\-\-load\-privkey FILE"
-Private key file to use.
+Private key file  or PKCS #11 URL to use.
+.IP "\-\-load\-pubkey FILE"
+Public key file  or PKCS #11 URL to use.
 .IP "\-\-load\-request FILE"
 Certificate request file to use.
 .IP "\-p, \-\-generate\-privkey"
@@ -111,6 +113,16 @@ another party), run:
 .nf
 $ certtool \-\-generate\-request \-\-load\-privkey key.pem \\
    \-\-outfile request.pem
+.fi
+.RE
+
+To create a certificate request using a key stored in a PKCS #11
+token, run:
+
+.RS
+.nf
+$ ./certtool \-\-generate-request \-\-load-privkey "pkcs11:..." \\
+  \-\-load-pubkey "pkcs11:..." \-\-outfile request.pem
 .fi
 .RE
 

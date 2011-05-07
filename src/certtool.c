@@ -46,8 +46,11 @@
 #include <version-etc.h>
 
 #include <certtool-cfg.h>
+#include <p11common.h>
 #include "certtool-gaa.h"
 #include "certtool-common.h"
+
+#define SIGN_HASH GNUTLS_DIG_SHA1
 
 static void print_crl_info (gnutls_x509_crl_t crl, FILE * out);
 void pkcs7_info (void);
@@ -360,12 +363,13 @@ generate_private_key (void)
 
 
 static gnutls_x509_crt_t
-generate_certificate (gnutls_x509_privkey_t * ret_key,
+generate_certificate (gnutls_privkey_t * ret_key,
                       gnutls_x509_crt_t ca_crt, int proxy,
                       common_info_st * cinfo)
 {
   gnutls_x509_crt_t crt;
-  gnutls_x509_privkey_t key = NULL;
+  gnutls_privkey_t key = NULL;
+  gnutls_pubkey_t pubkey;
   size_t size;
   int ret;
   int client;
@@ -384,6 +388,8 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
     {
 
       key = load_private_key (1, cinfo);
+      
+      pubkey = load_public_key_or_import (1, key, cinfo);
 
       if (!batch)
         fprintf (stderr,
@@ -420,7 +426,7 @@ generate_certificate (gnutls_x509_privkey_t * ret_key,
           get_pkcs9_email_crt_set (crt);
         }
 
-      result = gnutls_x509_crt_set_key (crt, key);
+      result = gnutls_x509_crt_set_pubkey (crt, pubkey);
       if (result < 0)
         error (EXIT_FAILURE, 0, "set_key: %s", gnutls_strerror (result));
     }
@@ -801,7 +807,7 @@ void
 generate_self_signed (common_info_st * cinfo)
 {
   gnutls_x509_crt_t crt;
-  gnutls_x509_privkey_t key;
+  gnutls_privkey_t key;
   size_t size;
   int result;
   const char *uri;
@@ -828,7 +834,7 @@ generate_self_signed (common_info_st * cinfo)
 
   fprintf (stderr, "\n\nSigning certificate...\n");
 
-  result = gnutls_x509_crt_sign2 (crt, crt, key, get_dig (crt), 0);
+  result = gnutls_x509_crt_privkey_sign (crt, crt, key, get_dig (crt), 0);
   if (result < 0)
     error (EXIT_FAILURE, 0, "crt_sign: %s", gnutls_strerror (result));
 
@@ -840,17 +846,17 @@ generate_self_signed (common_info_st * cinfo)
   fwrite (buffer, 1, size, outfile);
 
   gnutls_x509_crt_deinit (crt);
-  gnutls_x509_privkey_deinit (key);
+  gnutls_privkey_deinit (key);
 }
 
 static void
 generate_signed_certificate (common_info_st * cinfo)
 {
   gnutls_x509_crt_t crt;
-  gnutls_x509_privkey_t key;
+  gnutls_privkey_t key;
   size_t size;
   int result;
-  gnutls_x509_privkey_t ca_key;
+  gnutls_privkey_t ca_key;
   gnutls_x509_crt_t ca_crt;
 
   fprintf (stderr, "Generating a signed certificate...\n");
@@ -870,7 +876,7 @@ generate_signed_certificate (common_info_st * cinfo)
 
   fprintf (stderr, "\n\nSigning certificate...\n");
 
-  result = gnutls_x509_crt_sign2 (crt, ca_crt, ca_key, get_dig (ca_crt), 0);
+  result = gnutls_x509_crt_privkey_sign (crt, ca_crt, ca_key, get_dig (ca_crt), 0);
   if (result < 0)
     error (EXIT_FAILURE, 0, "crt_sign: %s", gnutls_strerror (result));
 
@@ -882,14 +888,15 @@ generate_signed_certificate (common_info_st * cinfo)
   fwrite (buffer, 1, size, outfile);
 
   gnutls_x509_crt_deinit (crt);
-  gnutls_x509_privkey_deinit (key);
+  gnutls_privkey_deinit (key);
+  gnutls_privkey_deinit(ca_key);
 }
 
 static void
 generate_proxy_certificate (common_info_st * cinfo)
 {
   gnutls_x509_crt_t crt, eecrt;
-  gnutls_x509_privkey_t key, eekey;
+  gnutls_privkey_t key, eekey;
   size_t size;
   int result;
 
@@ -904,7 +911,7 @@ generate_proxy_certificate (common_info_st * cinfo)
 
   fprintf (stderr, "\n\nSigning certificate...\n");
 
-  result = gnutls_x509_crt_sign2 (crt, eecrt, eekey, get_dig (eecrt), 0);
+  result = gnutls_x509_crt_privkey_sign (crt, eecrt, eekey, get_dig (eecrt), 0);
   if (result < 0)
     error (EXIT_FAILURE, 0, "crt_sign: %s", gnutls_strerror (result));
 
@@ -915,8 +922,10 @@ generate_proxy_certificate (common_info_st * cinfo)
 
   fwrite (buffer, 1, size, outfile);
 
+  gnutls_x509_crt_deinit (eecrt);
   gnutls_x509_crt_deinit (crt);
-  gnutls_x509_privkey_deinit (key);
+  gnutls_privkey_deinit (key);
+  gnutls_privkey_deinit (eekey);
 }
 
 static void
@@ -924,8 +933,7 @@ generate_signed_crl (common_info_st * cinfo)
 {
   gnutls_x509_crl_t crl;
   int result;
-  gnutls_x509_privkey_t ca_key;
-  gnutls_privkey_t ca_pkey;
+  gnutls_privkey_t ca_key;
   gnutls_x509_crt_t ca_crt;
 
   fprintf (stderr, "Generating a signed CRL...\n");
@@ -934,23 +942,14 @@ generate_signed_crl (common_info_st * cinfo)
   ca_crt = load_ca_cert (cinfo);
   crl = generate_crl (ca_crt, cinfo);
 
-  result = gnutls_privkey_init(&ca_pkey);
-  if (result < 0)
-    error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (result));
-
-  result = gnutls_privkey_import_x509(ca_pkey, ca_key, 0);
-  if (result < 0)
-    error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (result));
-
   fprintf (stderr, "\n");
-
-  result = gnutls_x509_crl_privkey_sign(crl, ca_crt, ca_pkey, GNUTLS_DIG_SHA1, 0);
+  result = gnutls_x509_crl_privkey_sign(crl, ca_crt, ca_key, SIGN_HASH, 0);
   if (result < 0)
     error (EXIT_FAILURE, 0, "crl_privkey_sign: %s", gnutls_strerror (result));
 
   print_crl_info (crl, stderr);
 
-  gnutls_privkey_deinit( ca_pkey);
+  gnutls_privkey_deinit( ca_key);
   gnutls_x509_crl_deinit (crl);
 }
 
@@ -960,7 +959,7 @@ update_signed_certificate (common_info_st * cinfo)
   gnutls_x509_crt_t crt;
   size_t size;
   int result;
-  gnutls_x509_privkey_t ca_key;
+  gnutls_privkey_t ca_key;
   gnutls_x509_crt_t ca_crt;
   int days;
   time_t tim = time (NULL);
@@ -983,7 +982,7 @@ update_signed_certificate (common_info_st * cinfo)
 
   fprintf (stderr, "\n\nSigning certificate...\n");
 
-  result = gnutls_x509_crt_sign2 (crt, ca_crt, ca_key, get_dig (ca_crt), 0);
+  result = gnutls_x509_crt_privkey_sign (crt, ca_crt, ca_key, get_dig (ca_crt), 0);
   if (result < 0)
     error (EXIT_FAILURE, 0, "crt_sign: %s", gnutls_strerror (result));
 
@@ -1077,6 +1076,8 @@ gaa_parser (int argc, char **argv)
 
   if ((ret = gnutls_global_init ()) < 0)
     error (EXIT_FAILURE, 0, "global_init: %s", gnutls_strerror (ret));
+    
+  pkcs11_common();
 
   memset (&cinfo, 0, sizeof (cinfo));
   cinfo.privkey = info.privkey;
@@ -1759,7 +1760,8 @@ void
 generate_request (common_info_st * cinfo)
 {
   gnutls_x509_crq_t crq;
-  gnutls_x509_privkey_t key;
+  gnutls_x509_privkey_t xkey;
+  gnutls_pubkey_t pubkey;
   gnutls_privkey_t pkey;
   int ret, ca_status, path_len;
   const char *pass;
@@ -1777,17 +1779,19 @@ generate_request (common_info_st * cinfo)
 
   /* Load the private key.
    */
-  key = load_private_key (0, cinfo);
-  if (!key)
+  pkey = load_private_key (0, cinfo);
+  if (!pkey)
     {
-      key = generate_private_key_int ();
+      xkey = generate_private_key_int ();
 
-      print_private_key (key);
+      print_private_key (xkey);
+
+      ret = gnutls_privkey_import_x509(pkey, xkey, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+      if (ret < 0)
+        error (EXIT_FAILURE, 0, "privkey_import_x509: %s", gnutls_strerror (ret));
     }
 
-  ret = gnutls_privkey_import_x509(pkey, key, 0);
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "privkey_import_x509: %s", gnutls_strerror (ret));
+  pubkey = load_public_key_or_import (1, pkey, cinfo);
 
   /* Set the DN.
    */
@@ -1906,11 +1910,11 @@ generate_request (common_info_st * cinfo)
         }
     }
 
-  ret = gnutls_x509_crq_set_key (crq, key);
+  ret = gnutls_x509_crq_set_pubkey (crq, pubkey);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "set_key: %s", gnutls_strerror (ret));
 
-  ret = gnutls_x509_crq_privkey_sign (crq, pkey, GNUTLS_DIG_SHA1, 0);
+  ret = gnutls_x509_crq_privkey_sign (crq, pkey, SIGN_HASH, 0);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "sign: %s", gnutls_strerror (ret));
 
@@ -1918,7 +1922,7 @@ generate_request (common_info_st * cinfo)
 
   gnutls_x509_crq_deinit (crq);
   gnutls_privkey_deinit( pkey);
-  gnutls_x509_privkey_deinit (key);
+  gnutls_pubkey_deinit( pubkey);
 
 }
 
@@ -2370,7 +2374,7 @@ generate_pkcs8 (common_info_st * cinfo)
 
   fprintf (stderr, "Generating a PKCS #8 key structure...\n");
 
-  key = load_private_key (1, cinfo);
+  key = load_x509_private_key (1, cinfo);
 
   if (info.pass)
     password = info.pass;
@@ -2422,7 +2426,7 @@ generate_pkcs12 (common_info_st * cinfo)
 
   fprintf (stderr, "Generating a PKCS #12 structure...\n");
 
-  key = load_private_key (0, cinfo);
+  key = load_x509_private_key (0, cinfo);
   crts = load_cert_list (0, &ncrts, cinfo);
 
   name = get_pkcs12_key_name ();

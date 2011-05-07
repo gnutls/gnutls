@@ -55,9 +55,11 @@ typedef struct common_info
   const char *ca_privkey;
 } common_info_st;
 
-gnutls_x509_privkey_t load_private_key (int mand, common_info_st * info);
+gnutls_pubkey_t load_public_key_or_import(int mand, gnutls_privkey_t privkey, common_info_st * info);
+gnutls_privkey_t load_private_key (int mand, common_info_st * info);
+gnutls_x509_privkey_t load_x509_private_key (int mand, common_info_st * info);
 gnutls_x509_crq_t load_request (common_info_st * info);
-gnutls_x509_privkey_t load_ca_private_key (common_info_st * info);
+gnutls_privkey_t load_ca_private_key (common_info_st * info);
 gnutls_x509_crt_t load_ca_cert (common_info_st * info);
 gnutls_x509_crt_t load_cert (int mand, common_info_st * info);
 gnutls_datum *load_secret_key (int mand, common_info_st * info);
