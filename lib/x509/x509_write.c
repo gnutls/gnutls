@@ -268,6 +268,10 @@ gnutls_x509_crt_set_crq (gnutls_x509_crt_t crt, gnutls_x509_crq_t crq)
       return GNUTLS_E_INVALID_REQUEST;
     }
 
+  result = gnutls_x509_crq_verify(crq, 0);
+  if (result < 0)
+    return gnutls_assert_val(result);
+
   result = asn1_copy_node (crt->cert, "tbsCertificate.subject",
                            crq->crq, "certificationRequestInfo.subject");
   if (result != ASN1_SUCCESS)

@@ -11,8 +11,16 @@ via URLs.
 ** libgnutls: gnutls_pkcs11_privkey_import_url() will now correctly read
 the public key algorithm of the key.
 
+** libgnutls: Added gnutls_x509_crq_verify() to allow
+verification of the self signature in a certificate request.
+This allows verifying whether the owner of the private key
+is the generator of the request.
+
+** libgnutls: gnutls_x509_crt_set_crq() implicitly verifies
+the self signature of the request.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_crq_verify: ADDED
 
 
 * Version 2.12.4 (released 2011-05-06)

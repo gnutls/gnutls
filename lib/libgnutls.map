@@ -690,7 +690,42 @@ GNUTLS_2_12
 	gnutls_pubkey_import_privkey;
 	gnutls_pubkey_verify_data;
 	gnutls_certificate_get_issuer;
+	gnutls_x509_crq_verify;
 } GNUTLS_2_10;
+
+GNUTLS_3_0_0 {
+  global:
+	gnutls_x509_trust_list_verify_crt;
+	gnutls_x509_trust_list_add_crls;
+	gnutls_x509_trust_list_add_cas;
+	gnutls_x509_trust_list_init;
+	gnutls_x509_trust_list_deinit;
+	gnutls_x509_crl_list_import;
+	gnutls_x509_crl_list_import2;
+	gnutls_x509_crt_list_import2;
+	gnutls_cipher_tag;
+	gnutls_cipher_add_auth;
+	gnutls_dtls_set_timeouts;
+	gnutls_transport_set_pull_timeout_function;
+	gnutls_dtls_get_mtu;
+	gnutls_dtls_set_mtu;
+        gnutls_record_recv_seq;
+	gnutls_key_generate;
+	gnutls_dtls_cookie_verify;
+	gnutls_dtls_cookie_send;
+	gnutls_dtls_prestate_set;
+	gnutls_dtls_get_data_mtu;
+	gnutls_cipher_set_iv;
+	gnutls_pcert_deinit;
+	gnutls_pcert_import_x509;
+	gnutls_pcert_import_x509_raw;
+	gnutls_pcert_import_openpgp;
+	gnutls_pcert_import_openpgp_raw;
+	gnutls_pubkey_get_openpgp_key_id;
+	gnutls_certificate_set_retrieve_function2;
+	gnutls_x509_trust_list_get_issuer;
+} GNUTLS_2_12;
+>>>>>>> 91e62ff... Added gnutls_x509_crq_verify().
 
 GNUTLS_PRIVATE {
   global:

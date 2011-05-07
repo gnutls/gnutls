@@ -137,9 +137,15 @@ doit (void)
         }
 
       ret = gnutls_x509_crq_privkey_sign (crq, abs_pkey, GNUTLS_DIG_SHA1, 0);
-      if (ret)
+      if (ret < 0)
         {
           fail ("gnutls_x509_crq_sign: %d\n", ret);
+        }
+
+      ret = gnutls_x509_crq_verify (crq, 0);
+      if (ret < 0)
+        {
+          fail ("gnutls_x509_crq_verify: %d\n", ret);
         }
 
       crq_key_id_len = 0;

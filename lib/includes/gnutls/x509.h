@@ -707,6 +707,8 @@ extern "C"
                              gnutls_certificate_print_formats_t format,
                              gnutls_datum_t * out);
 
+  int gnutls_x509_crq_verify (gnutls_x509_crq_t crq, unsigned int flags);
+
   int gnutls_x509_crq_init (gnutls_x509_crq_t * crq);
   void gnutls_x509_crq_deinit (gnutls_x509_crq_t crq);
   int gnutls_x509_crq_import (gnutls_x509_crq_t crq,
