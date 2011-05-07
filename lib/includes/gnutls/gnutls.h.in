@@ -1119,7 +1119,9 @@ extern "C"
   extern char *(*gnutls_strdup) (const char *);
 
   typedef void (*gnutls_log_func) (int, const char *);
+  typedef void (*gnutls_audit_log_func) (gnutls_session_t, const char *);
   void gnutls_global_set_log_function (gnutls_log_func log_func);
+  void gnutls_global_set_audit_log_function (gnutls_audit_log_func log_func);
   void gnutls_global_set_log_level (int level);
 
 /* Diffie-Hellman parameter handling.

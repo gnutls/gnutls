@@ -814,7 +814,7 @@ _gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
    */
   if ((ret = check_g_n (data_g, _n_g, data_n, _n_n)) < 0)
     {
-      _gnutls_audit_log ("SRP group parameters are not in the white list. Checking validity.\n");
+      _gnutls_audit_log (session, "SRP group parameters are not in the white list. Checking validity.\n");
       if ((ret = group_check_g_n (session, G, N)) < 0)
         {
           gnutls_assert ();

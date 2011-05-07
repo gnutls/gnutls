@@ -712,6 +712,7 @@ GNUTLS_3_0_0 {
 	gnutls_pubkey_get_openpgp_key_id;
 	gnutls_certificate_set_retrieve_function2;
 	gnutls_x509_trust_list_get_issuer;
+	gnutls_global_set_audit_log_function;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

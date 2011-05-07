@@ -1071,7 +1071,7 @@ parse_record_buffered_msgs (gnutls_session_t session,
               if (ret < 0)
                 {
                   gnutls_assert();
-                  _gnutls_audit_log("Invalid handshake packet headers. Discarding.\n");
+                  _gnutls_audit_log(session, "Invalid handshake packet headers. Discarding.\n");
                   break;
                 }
 
@@ -1111,7 +1111,7 @@ next:
       while(session->internals.handshake_recv_buffer_size > 0 &&
         recv_buf[LAST_ELEMENT].sequence < session->internals.dtls.hsk_read_seq)
         {
-          _gnutls_audit_log("Discarded replayed handshake packet with sequence %d\n", recv_buf[LAST_ELEMENT].sequence);
+          _gnutls_audit_log(session, "Discarded replayed handshake packet with sequence %d\n", recv_buf[LAST_ELEMENT].sequence);
           _gnutls_handshake_buffer_clear(&recv_buf[LAST_ELEMENT]);
           session->internals.handshake_recv_buffer_size--;
         }

@@ -184,7 +184,7 @@ register_x86_crypto (void)
 
   if (check_optimized_aes ())
     {
-      fprintf (stderr, "Intel AES accelerator was detected\n");
+      _gnutls_debug_log ("Intel AES accelerator was detected\n");
       ret =
         gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_128_CBC, 80,
                                               &cipher_struct);

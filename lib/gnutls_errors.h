@@ -50,6 +50,14 @@ _gnutls_log (int, const char *fmt, ...)
  ;
 #endif
 
+void
+_gnutls_audit_log (gnutls_session_t, const char *fmt, ...)
+#ifdef __GNUC__
+  __attribute__ ((format (printf, 2, 3)));
+#else
+ ;
+#endif
+
 void _gnutls_mpi_log (const char *prefix, bigint_t a);
 
 #ifdef C99_MACROS
@@ -68,7 +76,6 @@ void _gnutls_mpi_log (const char *prefix, bigint_t a);
 #define _gnutls_dtls_log(...) LEVEL(6, __VA_ARGS__)
 #define _gnutls_read_log(...) LEVEL_EQ(7, __VA_ARGS__)
 #define _gnutls_write_log(...) LEVEL_EQ(7, __VA_ARGS__)
-#define _gnutls_audit_log(...) LEVEL(1, __VA_ARGS__)
 #else
 #define _gnutls_debug_log _gnutls_null_log
 #define _gnutls_handshake_log _gnutls_null_log
@@ -79,7 +86,6 @@ void _gnutls_mpi_log (const char *prefix, bigint_t a);
 #define _gnutls_dtls_log _gnutls_null_log
 #define _gnutls_read_log _gnutls_null_log
 #define _gnutls_write_log _gnutls_null_log
-#define _gnutls_audit_log _gnutls_null_log
 
 void _gnutls_null_log (void *, ...);
 

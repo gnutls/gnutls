@@ -720,6 +720,9 @@ main (int argc, char **argv)
 
   set_program_name (argv[0]);
 
+  gnutls_global_set_log_function (tls_log_func);
+  gnutls_global_set_log_level (info.debug);
+
   if ((ret = gnutls_global_init ()) < 0)
     {
       fprintf (stderr, "global_init: %s\n", gnutls_strerror (ret));
@@ -733,9 +736,6 @@ main (int argc, char **argv)
       fprintf (stderr, "No hostname given\n");
       exit (1);
     }
-
-  gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (info.debug);
 
   sockets_init ();
 

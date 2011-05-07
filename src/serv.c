@@ -881,6 +881,12 @@ tls_log_func (int level, const char *str)
   fprintf (stderr, "|<%d>| %s", level, str);
 }
 
+static void
+tls_audit_log_func (gnutls_session_t session, const char *str)
+{
+  fprintf (stderr, "|<%p>| %s", session, str);
+}
+
 static void gaa_parser (int argc, char **argv);
 
 int
@@ -915,6 +921,10 @@ main (int argc, char **argv)
       strcpy (name, "Echo Server");
     }
 
+  gnutls_global_set_log_function (tls_log_func);
+  gnutls_global_set_audit_log_function (tls_audit_log_func);
+  gnutls_global_set_log_level (debug);
+
   if ((ret = gnutls_global_init ()) < 0)
     {
       fprintf (stderr, "global_init: %s\n", gnutls_strerror (ret));
@@ -928,8 +938,6 @@ main (int argc, char **argv)
     }
 
   pkcs11_common ();
-  gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (debug);
 
   /* Note that servers must generate parameters for
    * Diffie-Hellman. See gnutls_dh_params_generate(), and

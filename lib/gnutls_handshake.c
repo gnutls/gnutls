@@ -1336,7 +1336,7 @@ _gnutls_recv_handshake (gnutls_session_t session,
         }
 
        if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET)
-        _gnutls_audit_log("Received unexpected handshake message '%s' (%d). Expected '%s' (%d)\n",
+        _gnutls_audit_log(session, "Received unexpected handshake message '%s' (%d). Expected '%s' (%d)\n",
          _gnutls_handshake2str(hsk.htype), (int)hsk.htype, _gnutls_handshake2str(type), (int)type);
 
       return gnutls_assert_val_fatal(ret);

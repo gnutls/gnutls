@@ -652,7 +652,7 @@ uint8_t digest[C_HASH_SIZE];
   cookie.data = &msg[pos];
   if (cookie.size != COOKIE_SIZE)
     {
-      if (cookie.size > 0) _gnutls_audit_log("Received cookie with illegal size %d. Expected %d\n", (int)cookie.size, COOKIE_SIZE);
+      if (cookie.size > 0) _gnutls_audit_log(NULL, "Received cookie with illegal size %d. Expected %d\n", (int)cookie.size, COOKIE_SIZE);
       return gnutls_assert_val(GNUTLS_E_BAD_COOKIE);
     }
 

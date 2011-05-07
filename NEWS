@@ -8,6 +8,10 @@ See the end for copying conditions.
 ** certtool: Can now load private keys and public keys from PKCS #11 tokens
 via URLs.
 
+** libgnutls: Added gnutls_global_set_audit_log_function() that allows
+to get important auditing information including the corresponding session.
+That might be useful to block DoS or other attacker from specific IPs.
+
 ** libgnutls: gnutls_pkcs11_privkey_import_url() will now correctly read
 the public key algorithm of the key.
 
@@ -27,7 +31,7 @@ the self signature of the request.
 gnutls_certificate_get_issuer: ADDED
 gnutls_x509_trust_list_get_issuer: ADDED
 gnutls_x509_crq_verify: ADDED
-
+gnutls_global_set_audit_log_function: ADDED
 
 * Version 2.99.1 (released 2011-04-23)
 

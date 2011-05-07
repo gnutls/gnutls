@@ -500,7 +500,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 }
 
 inline static int
-check_recv_type (content_type_t recv_type)
+check_recv_type (gnutls_session_t session, content_type_t recv_type)
 {
   switch (recv_type)
     {
@@ -511,7 +511,7 @@ check_recv_type (content_type_t recv_type)
       return 0;
     default:
       gnutls_assert ();
-      _gnutls_audit_log("Received record packet of unknown type %u\n", (unsigned int)recv_type);
+      _gnutls_audit_log(session, "Received record packet of unknown type %u\n", (unsigned int)recv_type);
       return GNUTLS_E_UNEXPECTED_PACKET;
     }
 
@@ -876,7 +876,7 @@ gnutls_datum_t raw; /* raw headers */
     {
       if (_gnutls_epoch_is_valid(session, record->epoch) == 0)
         {
-          _gnutls_audit_log("Discarded message[%u] with invalid epoch 0x%.2x%.2x.\n",
+          _gnutls_audit_log(session, "Discarded message[%u] with invalid epoch 0x%.2x%.2x.\n",
             (unsigned int)_gnutls_uint64touint32 (&record->sequence), (int)record->sequence.i[0], 
             (int)record->sequence.i[1]);
           gnutls_assert();
@@ -888,7 +888,7 @@ gnutls_datum_t raw; /* raw headers */
   /* Here we check if the Type of the received packet is
    * ok. 
    */
-  if ((ret = check_recv_type (record->type)) < 0)
+  if ((ret = check_recv_type (session, record->type)) < 0)
     return gnutls_assert_val(ret);
 
   /* Here we check if the advertized version is the one we
@@ -900,7 +900,7 @@ gnutls_datum_t raw; /* raw headers */
   if (record->length > MAX_RECV_SIZE(session))
     {
       _gnutls_audit_log
-        ("Received packet with illegal length: %u\n", (unsigned int)record->length);
+        (session, "Received packet with illegal length: %u\n", (unsigned int)record->length);
       return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
     }
 
@@ -1030,7 +1030,7 @@ begin:
       ret = _dtls_record_check(session, packet_sequence);
       if (ret < 0)
         {
-          _gnutls_audit_log("Discarded duplicate message[%u]\n",
+          _gnutls_audit_log(session, "Discarded duplicate message[%u]\n",
             (unsigned int) _gnutls_uint64touint32 (packet_sequence));
           goto sanity_check_error;
         }
@@ -1096,7 +1096,7 @@ discard:
 sanity_check_error:
   if (IS_DTLS(session))
     {
-      _gnutls_audit_log("Discarded message[%u] due to invalid decryption\n", 
+      _gnutls_audit_log(session, "Discarded message[%u] due to invalid decryption\n", 
             (unsigned int)_gnutls_uint64touint32 (packet_sequence));
       ret = gnutls_assert_val(GNUTLS_E_AGAIN);
       goto cleanup;

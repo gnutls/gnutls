@@ -574,6 +574,30 @@ _gnutls_log (int level, const char *fmt, ...)
     }
 }
 
+void
+_gnutls_audit_log (gnutls_session_t session, const char *fmt, ...)
+{
+  va_list args;
+  char *str;
+  int ret;
+
+  if (_gnutls_audit_log_func == NULL && _gnutls_log_func == NULL)
+    return;
+
+  va_start (args, fmt);
+  ret = vasprintf (&str, fmt, args);
+  va_end (args);
+
+  if (ret >= 0)
+    {
+      if (_gnutls_audit_log_func)
+        _gnutls_audit_log_func (session, str);
+      else
+        _gnutls_log_func(1, str);
+      free (str);
+    }
+}
+
 #ifndef DEBUG
 #ifndef C99_MACROS
 
