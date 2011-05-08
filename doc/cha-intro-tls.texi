@@ -349,6 +349,16 @@ To set whether client certificate is required or not.
 To initiate the handshake.
 @end table
 
+@menu
+* TLS Cipher Suites::           TLS session parameters.
+* Priority Strings::            Defining how parameters are negotiated.
+* Client Authentication::       Requesting a certificate from the client.
+* Resuming Sessions::           Reusing previously established keys.
+* Resuming Internals::          More information on reusing previously established keys.
+* Compatibility Issues::        Issues on compatibility with other implementations.
+@end menu
+
+@node TLS Cipher Suites
 @subsection TLS Cipher Suites
 
 The Handshake Protocol of @acronym{TLS} negotiates cipher suites of
@@ -376,8 +386,9 @@ that you consider weak.
 
 All the supported ciphersuites are shown in @ref{ciphersuites}.
 
-@subsection Priority strings
-@node Priority strings
+@node Priority Strings
+@subsection Priority Strings
+
 In order to specify cipher suite preferences, the
 previously shown priority functions accept a string
 that specifies the algorithms to be enabled in a TLS handshake.
@@ -525,6 +536,7 @@ will allow V1 CAs in chains.
 
 @end table
 
+@node Client Authentication
 @subsection Client Authentication
 @cindex Client Certificate authentication
 
@@ -546,6 +558,7 @@ Sending of the names of the CAs can be controlled using
 @ref{gnutls_certificate_send_x509_rdn_sequence}. The client, then, may
 send a certificate, signed by one of the server's acceptable signers.
 
+@node Resuming Sessions
 @subsection Resuming Sessions
 @anchor{resume}
 @cindex Resuming sessions
@@ -564,6 +577,7 @@ reasons, thus it may be normal for a server not to resume a session
 even if you requested that.  Also note that you must enable, using the
 priority functions, at least the algorithms used in the last session.
 
+@node Resuming Internals
 @subsection Resuming Internals
 
 The resuming capability, mostly in the server side, is one of the
@@ -603,7 +617,9 @@ It might also be useful to be able to check for expired sessions in
 order to remove them, and save space. The function
 @ref{gnutls_db_check_entry} is provided for that reason.
 
-@subsection Compatibility issues
+@node Compatibility Issues
+@subsection Compatibility Issues
+
 The @acronym{TLS} handshake is a complex procedure that negotiates all
 required parameters for a secure session. @acronym{GnuTLS} supports
 several @acronym{TLS} extensions, as well as the latest known published
@@ -617,7 +633,7 @@ Because there is no way to handle maximum compatibility with such broken peers
 without sacrificing security, @acronym{GnuTLS} ignores such peers by default. 
 This might not be acceptable in several cases
 thus we allow enabling maximum compatibility with such peers using
-priority strings (see @ref{Priority strings}). An example priority string that will
+priority strings (see @ref{Priority Strings}). An example priority string that will
 disable all supported  @acronym{TLS} protocol versions except for
 the widely supported @acronym{SSL} 3.0 and @acronym{TLS} 1.0
 is shown below:
