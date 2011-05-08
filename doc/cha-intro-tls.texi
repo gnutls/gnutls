@@ -375,6 +375,8 @@ To initiate the handshake.
 * Priority Strings::            Defining how parameters are negotiated.
 * Client Authentication::       Requesting a certificate from the client.
 * Resuming Sessions::           Reusing previously established keys.
+* Resuming Internals::          More information on reusing previously established keys.
+* Compatibility Issues::        Issues on compatibility with other implementations.
 @end menu
 
 @node TLS Cipher Suites
@@ -407,6 +409,7 @@ All the supported ciphersuites are shown in @ref{ciphersuites}.
 
 @node Priority Strings
 @subsection Priority Strings
+
 In order to specify cipher suite preferences, the
 previously shown priority functions accept a string
 that specifies the algorithms to be enabled in a TLS handshake.
@@ -596,6 +599,7 @@ reasons, thus it may be normal for a server not to resume a session
 even if you requested that.  Also note that you must enable, using the
 priority functions, at least the algorithms used in the last session.
 
+@node Resuming Internals
 @subsection Resuming Internals
 
 The resuming capability, mostly in the server side, is one of the
@@ -635,7 +639,9 @@ It might also be useful to be able to check for expired sessions in
 order to remove them, and save space. The function
 @ref{gnutls_db_check_entry} is provided for that reason.
 
-@subsection Compatibility issues
+@node Compatibility Issues
+@subsection Compatibility Issues
+
 The @acronym{TLS} handshake is a complex procedure that negotiates all
 required parameters for a secure session. @acronym{GnuTLS} supports
 several @acronym{TLS} extensions, as well as the latest known published
