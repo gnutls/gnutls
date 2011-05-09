@@ -651,10 +651,10 @@ they do not support and understand. The @acronym{TLS} protocol allows for
 graceful downgrade to the commonly supported options, but practice shows that 
 it is not always implemented correctly. 
 
-Because there is no way to handle maximum compatibility with such broken peers
+Because there is no way to handle maximum compatibility with broken peers
 without sacrificing security, @acronym{GnuTLS} ignores such peers by default. 
-This might not be acceptable in several cases
-thus we allow enabling maximum compatibility with such peers using
+This might not be acceptable in several cases, where maximum compatibility
+is required, thus we allow enabling compatibility with broken peers using
 priority strings (see @ref{Priority Strings}). An example priority string that will
 disable all supported  @acronym{TLS} protocol versions except for
 the widely supported @acronym{SSL} 3.0 and @acronym{TLS} 1.0
@@ -662,9 +662,8 @@ is shown below:
 @example
 NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:%COMPAT
 @end example
-This priority string provides wider compatibility to broken peers. 
-We suggest however to use the normal defaults and only switch to such compatibility
-modes only when compatibility issues occur.
+This priority string provides the wider possible compatibility with broken peers. 
+We suggest however only to use that compatibility mode if such issues occur.
 
 @node TLS Extensions
 @section TLS Extensions
