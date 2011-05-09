@@ -355,7 +355,7 @@ static int init = 0;
 
 /**
  * gnutls_pkcs11_init:
- * @flags: GNUTLS_PKCS11_FLAG_MANUAL or GNUTLS_PKCS11_FLAG_AUTO
+ * @flags: %GNUTLS_PKCS11_FLAG_MANUAL or %GNUTLS_PKCS11_FLAG_AUTO
  * @configfile: either NULL or the location of a configuration file
  *
  * This function will initialize the PKCS 11 subsystem in gnutls. It will
@@ -364,7 +364,8 @@ static int init = 0;
  * if %GNUTLS_PKCS11_FLAG_MANUAL is specified.
  *
  * Normally you don't need to call this function since it is being called
- * by gnutls_global_init(). Otherwise you must call it before it.
+ * by gnutls_global_init() using the %GNUTLS_PKCS11_FLAG_AUTO. If other option
+ * is required then it must be called before it.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
  *   negative error value.
