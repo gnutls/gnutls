@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.99.2 (unreleased)
 
+** libgnutls: PKCS #11 URLs conform to the latest draft
+being http://tools.ietf.org/html/draft-pechanec-pkcs11uri-04.
+
 ** certtool: Can now load private keys and public keys from PKCS #11 tokens
 via URLs.
 
