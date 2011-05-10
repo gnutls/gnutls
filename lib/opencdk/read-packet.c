@@ -35,6 +35,8 @@
 #include "packet.h"
 #include "types.h"
 #include <gnutls_algorithms.h>
+#include <gnutls_str.h>
+#include <minmax.h>
 
 /* The version of the MDC packet considering the lastest OpenPGP draft. */
 #define MDC_PKT_VER 1
@@ -472,9 +474,10 @@ read_secret_subkey (cdk_stream_t inp, size_t pktlen, cdk_pkt_seckey_t sk)
   return rc;
 }
 
+#define ATTRIBUTE "[attribute]"
 
 static cdk_error_t
-read_attribute (cdk_stream_t inp, size_t pktlen, cdk_pkt_userid_t attr)
+read_attribute (cdk_stream_t inp, size_t pktlen, cdk_pkt_userid_t attr, int name_size)
 {
   const byte *p;
   byte *buf;
@@ -487,8 +490,9 @@ read_attribute (cdk_stream_t inp, size_t pktlen, cdk_pkt_userid_t attr)
   if (DEBUG_PKT)
     _gnutls_write_log ("read_attribute: %d octets\n", (int) pktlen);
 
-  strcpy (attr->name, "[attribute]");
-  attr->len = strlen (attr->name);
+  _gnutls_str_cpy (attr->name, name_size, ATTRIBUTE);
+  attr->len = MIN(name_size, sizeof(ATTRIBUTE)-1);
+
   buf = cdk_calloc (1, pktlen);
   if (!buf)
     return CDK_Out_Of_Core;
@@ -996,14 +1000,15 @@ cdk_pkt_read (cdk_stream_t inp, cdk_packet_t pkt)
   switch (pkt->pkttype)
     {
     case CDK_PKT_ATTRIBUTE:
+#define NAME_SIZE (pkt->pktlen + 16 + 1)
       pkt->pkt.user_id = cdk_calloc (1, sizeof *pkt->pkt.user_id
-                                     + pkt->pktlen + 16 + 1);
+                                     + NAME_SIZE);
       if (!pkt->pkt.user_id)
         return CDK_Out_Of_Core;
       pkt->pkt.user_id->name =
         (char *) pkt->pkt.user_id + sizeof (*pkt->pkt.user_id);
 
-      rc = read_attribute (inp, pktlen, pkt->pkt.user_id);
+      rc = read_attribute (inp, pktlen, pkt->pkt.user_id, NAME_SIZE);
       pkt->pkttype = CDK_PKT_ATTRIBUTE;
       break;
 

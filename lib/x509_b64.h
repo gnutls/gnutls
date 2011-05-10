@@ -37,10 +37,6 @@ int _gnutls_fbase64_decode (const char *header, const uint8_t * data,
 /* The size for B64 encoding + newlines plus header
  */
 
-#define HEADSIZE( hsize) \
-	sizeof("-----BEGIN ")-1+sizeof("-----")-1+ \
-	sizeof("\n-----END ")-1+sizeof("-----\n")-1+hsize+hsize
-
 #define B64FSIZE( hsize, dsize) \
-	(B64SIZE(dsize) + HEADSIZE(hsize) + /*newlines*/ \
+	(B64SIZE(dsize) + (hsize) + /*newlines*/ \
 	B64SIZE(dsize)/64 + (((B64SIZE(dsize) % 64) > 0) ? 1 : 0))

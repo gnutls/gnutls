@@ -30,7 +30,8 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include "egd.h"
-
+#include <gnutls_int.h>
+#include <gnutls_str.h>
 #include <gnutls_errors.h>
 
 #ifndef offsetof
@@ -142,7 +143,7 @@ _rndegd_connect_socket (void)
 
   memset (&addr, 0, sizeof addr);
   addr.sun_family = AF_LOCAL;
-  strcpy (addr.sun_path, name);
+  _gnutls_str_cpy (addr.sun_path, sizeof(addr.sun_path), name);
   addr_len = (offsetof (struct sockaddr_un, sun_path)
               + strlen (addr.sun_path));
 

@@ -194,29 +194,25 @@ _gnutls_fbase64_encode (const char *msg, const uint8_t * data,
   uint8_t top[80];
   uint8_t bottom[80];
   int pos, bytes, top_len, bottom_len;
-  size_t msglen = strlen (msg);
 
-  if (msglen > 50)
+  if (strlen(msg) > 50)
     {
       gnutls_assert ();
       return GNUTLS_E_BASE64_ENCODING_ERROR;
     }
 
-  memset (bottom, 0, sizeof (bottom));
-  memset (top, 0, sizeof (top));
+  _gnutls_str_cpy (top, sizeof(top), "-----BEGIN ");
+  _gnutls_str_cat (top, sizeof(top), msg);
+  _gnutls_str_cat (top, sizeof(top), "-----");
 
-  strcat (top, "-----BEGIN ");  /* Flawfinder: ignore */
-  strcat (top, msg);            /* Flawfinder: ignore */
-  strcat (top, "-----");        /* Flawfinder: ignore */
-
-  strcat (bottom, "\n-----END ");       /* Flawfinder: ignore */
-  strcat (bottom, msg);         /* Flawfinder: ignore */
-  strcat (bottom, "-----\n");   /* Flawfinder: ignore */
+  _gnutls_str_cpy (bottom, sizeof(bottom), "\n-----END ");
+  _gnutls_str_cat (bottom, sizeof(bottom), msg);
+  _gnutls_str_cat (bottom, sizeof(bottom), "-----\n");
 
   top_len = strlen (top);
   bottom_len = strlen (bottom);
 
-  ret = B64FSIZE (msglen, data_size);
+  ret = B64FSIZE (top_len+bottom_len, data_size);
 
   (*result) = gnutls_calloc (1, ret + 1);
   if ((*result) == NULL)
@@ -229,7 +225,7 @@ _gnutls_fbase64_encode (const char *msg, const uint8_t * data,
   INCR (bytes, top_len);
   pos = top_len;
 
-  strcpy (*result, top);        /* Flawfinder: ignore */
+  memcpy (*result, top, top_len);
 
   for (i = j = 0; i < data_size; i += 3, j += 4)
     {

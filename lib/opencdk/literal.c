@@ -27,10 +27,11 @@
 #endif
 #include <stdio.h>
 #include <time.h>
-
-#include "opencdk.h"
-#include "main.h"
-#include "filters.h"
+#include <opencdk.h>
+#include <main.h>
+#include <filters.h>
+#include <gnutls_int.h>
+#include <gnutls_str.h>
 
 
 /* Duplicate the string @s but strip of possible
@@ -267,7 +268,7 @@ text_encode (void *data, FILE * in, FILE * out)
       if (!s)
         break;
       _cdk_trim_string (buf);
-      strcat (buf, "\r\n");
+      _gnutls_str_cat (buf, sizeof(buf), "\r\n");
       fwrite (buf, 1, strlen (buf), out);
     }
 

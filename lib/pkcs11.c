@@ -343,7 +343,7 @@ pkcs11_get_info (struct pkcs11_url_info *info,
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
-  strcpy (output, str);
+  memcpy (output, str, len + 1);
 
   *output_size = len;
 
@@ -1334,7 +1334,7 @@ pkcs11_obj_import (unsigned int class, gnutls_pkcs11_obj_t obj,
     }
 
   if (obj->type != GNUTLS_PKCS11_OBJ_UNKNOWN)
-    strcpy (obj->info.type, pkcs11_obj_type_to_str (obj->type));
+    _gnutls_str_cpy (obj->info.type, sizeof(obj->info.type), pkcs11_obj_type_to_str (obj->type));
 
   if (data && data->data)
     {
@@ -1857,13 +1857,13 @@ find_token_num (pakchois_session_t * pks,
 
   if (find_data->current == find_data->seq)
     {
-      strcpy (find_data->info.manufacturer, tinfo->tinfo.manufacturer_id);
-      strcpy (find_data->info.token, tinfo->tinfo.label);
-      strcpy (find_data->info.model, tinfo->tinfo.model);
-      strcpy (find_data->info.serial, tinfo->tinfo.serial_number);
+      _gnutls_str_cpy (find_data->info.manufacturer, sizeof(find_data->info.manufacturer), tinfo->tinfo.manufacturer_id);
+      _gnutls_str_cpy (find_data->info.token, sizeof(find_data->info.token), tinfo->tinfo.label);
+      _gnutls_str_cpy (find_data->info.model, sizeof(find_data->info.model), tinfo->tinfo.model);
+      _gnutls_str_cpy (find_data->info.serial, sizeof(find_data->info.serial), tinfo->tinfo.serial_number);
 
-      strcpy (find_data->info.lib_manufacturer, lib_info->manufacturer_id);
-      strcpy (find_data->info.lib_desc, lib_info->library_description);
+      _gnutls_str_cpy (find_data->info.lib_manufacturer, sizeof(find_data->info.lib_manufacturer), lib_info->manufacturer_id);
+      _gnutls_str_cpy (find_data->info.lib_desc, sizeof(find_data->info.lib_desc), lib_info->library_description);
       snprintf (find_data->info.lib_version,
                 sizeof (find_data->info.lib_version), "%u.%u",
                 (unsigned int) lib_info->library_version.major,
@@ -1976,7 +1976,7 @@ gnutls_pkcs11_token_get_info (const char *url,
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
-  strcpy (output, str);
+  memcpy (output, str, len+1);
 
   *output_size = len;
 
@@ -2049,10 +2049,10 @@ pkcs11_login (pakchois_session_t * pks, const struct token_info *info, int so)
     }
 
   memset (&uinfo, 0, sizeof (uinfo));
-  strcpy (uinfo.manufacturer, info->tinfo.manufacturer_id);
-  strcpy (uinfo.token, info->tinfo.label);
-  strcpy (uinfo.model, info->tinfo.model);
-  strcpy (uinfo.serial, info->tinfo.serial_number);
+  _gnutls_str_cpy (uinfo.manufacturer, sizeof(uinfo.manufacturer), info->tinfo.manufacturer_id);
+  _gnutls_str_cpy (uinfo.token, sizeof(uinfo.token), info->tinfo.label);
+  _gnutls_str_cpy (uinfo.model, sizeof(uinfo.model), info->tinfo.model);
+  _gnutls_str_cpy (uinfo.serial, sizeof(uinfo.serial), info->tinfo.serial_number);
   ret = pkcs11_info_to_url (&uinfo, 1, &token_url);
   if (ret < 0)
     {

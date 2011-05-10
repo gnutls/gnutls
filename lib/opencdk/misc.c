@@ -30,10 +30,11 @@
 #include <ctype.h>
 #include <sys/stat.h>
 #include <c-ctype.h>
-
-#include "opencdk.h"
-#include "main.h"
-#include "../random.h"
+#include <opencdk.h>
+#include <main.h>
+#include <random.h>
+#include <gnutls_int.h>
+#include <gnutls_str.h>
 
 
 u32
@@ -92,15 +93,16 @@ cdk_strlist_t
 cdk_strlist_add (cdk_strlist_t * list, const char *string)
 {
   cdk_strlist_t sl;
+  int string_size = strlen(string);
 
   if (!string)
     return NULL;
 
-  sl = cdk_calloc (1, sizeof *sl + strlen (string) + 2);
+  sl = cdk_calloc (1, sizeof *sl + string_size + 2);
   if (!sl)
     return NULL;
   sl->d = (char *) sl + sizeof (*sl);
-  strcpy (sl->d, string);
+  memcpy (sl->d, string, string_size+1);
   sl->next = *list;
   *list = sl;
   return sl;
@@ -195,8 +197,8 @@ _cdk_tmpfile (void)
   rnd[DIM (rnd) - 1] = 0;
   if (!GetTempPath (464, buf))
     return NULL;
-  strcat (buf, "_cdk_");
-  strcat (buf, rnd);
+  _gnutls_str_cat (buf, sizeof(buf), "_cdk_");
+  _gnutls_str_cat (buf, sizeof(buf), rnd);
 
   /* We need to make sure the file will be deleted when it is closed. */
   fd = _open (buf, _O_CREAT | _O_EXCL | _O_TEMPORARY |

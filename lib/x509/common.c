@@ -392,8 +392,8 @@ _gnutls_x509_data2hex (const opaque * data, size_t data_size,
 
   if (out)
     {
-      strcpy (out, "#");
-      strcat (out, res);
+      out[0] = '#';
+      _gnutls_str_cat (out, *sizeof_out, res);
     }
 
   return 0;
