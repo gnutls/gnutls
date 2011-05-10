@@ -8,6 +8,9 @@ See the end for copying conditions.
 ** certtool: Can now load private keys and public keys from PKCS #11 tokens
 via URLs.
 
+** libgnutls: PKCS #11 URLs conform to the latest draft
+being http://tools.ietf.org/html/draft-pechanec-pkcs11uri-04.
+
 ** libgnutls: gnutls_pkcs11_privkey_import_url() will now correctly read
 the public key algorithm of the key.
 
