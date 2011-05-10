@@ -677,7 +677,7 @@ pkcs11_url_to_info (const char *url, struct pkcs11_url_info *info)
   if ((p1 = strstr (url, "objecttype=")) != NULL)
     {
       p1 += sizeof ("objecttype=") - 1;
-      l = sizeof (info->model);
+      l = sizeof (info->type);
 
       ret = unescape_string (info->type, p1, &l, ';');
       if (ret < 0)
@@ -690,33 +690,21 @@ pkcs11_url_to_info (const char *url, struct pkcs11_url_info *info)
       || ((p1 = strstr (url, ":id=")) != NULL))
     {
       p1 += sizeof (";id=") - 1;
+      l = sizeof (info->certid_raw);
 
-      if ((p2 = strchr (p1, ';')) == NULL)
-        {
-          l = strlen (p1);
-        }
-      else
-        {
-          l = p2 - p1;
-        }
-
-      if (l > sizeof (info->id) - 1)
-        {
-          gnutls_assert ();
-          ret = GNUTLS_E_PARSING_ERROR;
-        }
-
-      memcpy (info->id, p1, l);
-      info->id[l] = 0;
-
-      /* convert to raw */
-      info->certid_raw_size = sizeof (info->certid_raw);
-      ret =
-        _gnutls_hex2bin (info->id, strlen (info->id),
-                         info->certid_raw, &info->certid_raw_size);
+      ret = unescape_string (info->certid_raw, p1, &l, ';');
       if (ret < 0)
         {
-          gnutls_assert ();
+          goto cleanup;
+        }
+      /* not null terminated */
+      info->certid_raw_size = l-1;
+
+      p2 = _gnutls_bin2hex(info->certid_raw, info->certid_raw_size,
+                           info->id, sizeof(info->id), ":");
+      if (p2 == NULL)
+        {
+          ret = GNUTLS_E_PARSING_ERROR;
           goto cleanup;
         }
     }
@@ -731,21 +719,24 @@ cleanup:
 
 #define INVALID_CHARS       "\\/\"'%&#@!?$* <>{}[]()`|:;,.+-"
 
+/* Appends @tname to @dest under the name @p11name.
+ * init indicates whether it is the initial addition to buffer.
+ */
 static int
-append (gnutls_buffer_st * dest, const char *tname,
-        const char *p11name, int init)
+append (gnutls_buffer_st * dest, const void *tname, int tname_size,
+        const char *p11name, int all, int init)
 {
   gnutls_buffer_st tmpstr;
   int ret;
 
   _gnutls_buffer_init (&tmpstr);
-  if ((ret = _gnutls_buffer_append_str (&tmpstr, tname)) < 0)
+  if ((ret = _gnutls_buffer_append_data (&tmpstr, tname, tname_size)) < 0)
     {
       gnutls_assert ();
       goto cleanup;
     }
 
-  ret = _gnutls_buffer_escape (&tmpstr, INVALID_CHARS);
+  ret = _gnutls_buffer_escape (&tmpstr, all, INVALID_CHARS);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -791,7 +782,7 @@ pkcs11_info_to_url (const struct pkcs11_url_info *info,
 
   if (info->token[0])
     {
-      ret = append (&str, info->token, "token", init);
+      ret = append (&str, info->token, strlen(info->token), "token", 0, init);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -802,7 +793,7 @@ pkcs11_info_to_url (const struct pkcs11_url_info *info,
 
   if (info->serial[0])
     {
-      ret = append (&str, info->serial, "serial", init);
+      ret = append (&str, info->serial, strlen(info->serial), "serial", 0, init);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -813,7 +804,7 @@ pkcs11_info_to_url (const struct pkcs11_url_info *info,
 
   if (info->model[0])
     {
-      ret = append (&str, info->model, "model", init);
+      ret = append (&str, info->model, strlen(info->model), "model", 0, init);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -825,7 +816,7 @@ pkcs11_info_to_url (const struct pkcs11_url_info *info,
 
   if (info->manufacturer[0])
     {
-      ret = append (&str, info->manufacturer, "manufacturer", init);
+      ret = append (&str, info->manufacturer, strlen(info->manufacturer), "manufacturer", 0, init);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -836,7 +827,7 @@ pkcs11_info_to_url (const struct pkcs11_url_info *info,
 
   if (info->label[0])
     {
-      ret = append (&str, info->label, "object", init);
+      ret = append (&str, info->label, strlen(info->label), "object", 0, init);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -847,7 +838,7 @@ pkcs11_info_to_url (const struct pkcs11_url_info *info,
 
   if (info->type[0])
     {
-      ret = append (&str, info->type, "objecttype", init);
+      ret = append (&str, info->type, strlen(info->type), "objecttype", 0, init);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -861,8 +852,8 @@ pkcs11_info_to_url (const struct pkcs11_url_info *info,
       if (info->lib_manufacturer[0])
         {
           ret =
-            append (&str, info->lib_manufacturer, "library-manufacturer",
-                    init);
+            append (&str, info->lib_manufacturer, strlen(info->lib_manufacturer), "library-manufacturer",
+                    0, init);
           if (ret < 0)
             {
               gnutls_assert ();
@@ -873,7 +864,7 @@ pkcs11_info_to_url (const struct pkcs11_url_info *info,
 
       if (info->lib_desc[0])
         {
-          ret = append (&str, info->lib_desc, "library-description", init);
+          ret = append (&str, info->lib_desc, strlen(info->lib_desc), "library-description", 0, init);
           if (ret < 0)
             {
               gnutls_assert ();
@@ -887,7 +878,7 @@ pkcs11_info_to_url (const struct pkcs11_url_info *info,
     {
       if (info->lib_version[0])
         {
-          ret = append (&str, info->lib_version, "library-version", init);
+          ret = append (&str, info->lib_version, strlen(info->lib_version), "library-version", 0, init);
           if (ret < 0)
             {
               gnutls_assert ();
@@ -897,9 +888,9 @@ pkcs11_info_to_url (const struct pkcs11_url_info *info,
         }
     }
 
-  if (info->id[0] != 0)
+  if (info->certid_raw_size > 0)
     {
-      ret = _gnutls_buffer_append_printf (&str, ";id=%s", info->id);
+      ret = append (&str, info->certid_raw, info->certid_raw_size, "id", 1, init);
       if (ret < 0)
         {
           gnutls_assert ();
