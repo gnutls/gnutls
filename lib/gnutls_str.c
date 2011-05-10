@@ -353,7 +353,7 @@ _gnutls_buffer_delete_data (gnutls_buffer_st * dest, int pos, size_t str_size)
 
 
 int
-_gnutls_buffer_escape (gnutls_buffer_st * dest,
+_gnutls_buffer_escape (gnutls_buffer_st * dest, int all,
                        const char *const invalid_chars)
 {
   int rv = -1;
@@ -363,8 +363,8 @@ _gnutls_buffer_escape (gnutls_buffer_st * dest,
   while (pos < dest->length)
     {
 
-      if (dest->data[pos] == '\\' || strchr (invalid_chars, dest->data[pos])
-          || !isgraph (dest->data[pos]))
+      if (all != 0 || (dest->data[pos] == '\\' || strchr (invalid_chars, dest->data[pos])
+          || !c_isgraph (dest->data[pos])))
         {
 
           snprintf (t, sizeof (t), "%%%.2X", (unsigned int) dest->data[pos]);
@@ -376,9 +376,10 @@ _gnutls_buffer_escape (gnutls_buffer_st * dest,
               rv = -1;
               goto cleanup;
             }
-
+          pos+=3;
         }
-      pos++;
+      else
+        pos++;
     }
 
   rv = 0;
