@@ -192,7 +192,14 @@ DES algorithm.  Has 128 bits block size and is used in CBC mode.
 @item AES_GCM
 This is the AES algorithm in the authenticated encryption GCM mode.
 This mode combines message authentication and encryption.
+
+@item CAMELLIA_CBC
+CAMELLIA is an 128-bit block cipher developed by Mitsubish and NTT. It
+is one of the approved ciphers of the European NESSIE and Japanese
+CRYPTREC projects.
+
 @end table
+
 
 Supported MAC algorithms:
 
@@ -204,6 +211,14 @@ MD5 is a cryptographic hash algorithm designed by Ron Rivest. Outputs
 @item MAC_SHA
 SHA is a cryptographic hash algorithm designed by NSA. Outputs 160
 bits of data.
+
+@item MAC_SHA256
+SHA256 is a cryptographic hash algorithm designed by NSA. Outputs 256
+bits of data.
+
+@item MAC_AEAD
+This indicates that an authenticated encryption algorithm, such as
+GCM, is in use.
 
 @end table
 
@@ -234,6 +249,9 @@ The supported compression algorithms are:
 @table @code
 @item DEFLATE
 Zlib compression, using the deflate algorithm.
+
+@item NULL
+No compression.
 
 @end table
 
