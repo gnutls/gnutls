@@ -390,7 +390,7 @@ wrap_nettle_mpi_mul_ui (bigint_t w, const bigint_t a, unsigned long b)
 
 }
 
-#define PRIME_CHECK_PARAM 18
+#define PRIME_CHECK_PARAM 8
 static int
 wrap_nettle_prime_check (bigint_t pp)
 {
