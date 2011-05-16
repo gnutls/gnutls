@@ -968,7 +968,7 @@ begin:
   ret = recv_headers(session, type, htype, &record);
   if (ret < 0)
     {
-      gnutls_assert_val_fatal(ret);
+      ret = gnutls_assert_val_fatal(ret);
       goto recv_error;
     }
 
