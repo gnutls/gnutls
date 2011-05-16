@@ -41,7 +41,17 @@ pin_callback (void *user, int attempt, const char *token_url,
   static char *cached_url = NULL;
   static char cached_pin[32] = "";
 
-
+  if (flags & GNUTLS_PKCS11_PIN_FINAL_TRY)
+    {
+      cache = 0;
+      printf ("*** This is the final try before locking!\n");
+    }
+  if (flags & GNUTLS_PKCS11_PIN_COUNT_LOW)
+    {
+      cache = 0;
+      printf ("*** Only few tries left before locking!\n");
+    }
+    
   if (cache == 1 && cached_url != NULL)
     {
       if (strcmp (cached_url, token_url) == 0)
@@ -59,16 +69,6 @@ pin_callback (void *user, int attempt, const char *token_url,
 
   printf ("PIN required for token '%s' with URL '%s'\n", token_label,
           token_url);
-  if (flags & GNUTLS_PKCS11_PIN_FINAL_TRY)
-    {
-      cache = 0;
-      printf ("*** This is the final try before locking!\n");
-    }
-  if (flags & GNUTLS_PKCS11_PIN_COUNT_LOW)
-    {
-      cache = 0;
-      printf ("*** Only few tries left before locking!\n");
-    }
 
   password = getpass ("Enter pin: ");
   if (password == NULL || password[0] == 0)
