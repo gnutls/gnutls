@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2010
- * Free Software Foundation, Inc.
+ * Copyright (C) 2010 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -42,8 +41,12 @@
 #include <nettle/rsa.h>
 #include <random.h>
 #include <gnutls/crypto.h>
+#include "rnd.h"
+#include "ecc.h"
 
 #define TOMPZ(x) (*((mpz_t*)(x)))
+
+static inline int is_supported_curve(int curve);
 
 static void
 rnd_func (void *_ctx, unsigned length, uint8_t * data)
@@ -81,6 +84,69 @@ _rsa_params_to_privkey (const gnutls_pk_params_st * pk_params,
 
 }
 
+static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t * out,
+                                  const gnutls_pk_params_st * priv,
+                                  const gnutls_pk_params_st * pub)
+{
+  int ret;
+
+  switch (algo)
+    {
+    case GNUTLS_PK_ECDH:
+      {
+        ecc_key ecc_pub, ecc_priv;
+        int curve = priv->flags;
+        unsigned long sz;
+
+        if (is_supported_curve(curve) == 0)
+          return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
+
+        ecc_pub.type = PK_PUBLIC;
+        memcpy(&ecc_pub.prime, pub->params[0], sizeof(mpz_t));
+        memcpy(&ecc_pub.order, pub->params[1], sizeof(mpz_t));
+        memcpy(&ecc_pub.Gx, pub->params[2], sizeof(mpz_t));
+        memcpy(&ecc_pub.Gy, pub->params[3], sizeof(mpz_t));
+        memcpy(&ecc_pub.pubkey.x, pub->params[4], sizeof(mpz_t));
+        memcpy(&ecc_pub.pubkey.y, pub->params[5], sizeof(mpz_t));
+        memcpy(&ecc_pub.pubkey.z, pub->params[6], sizeof(mpz_t));
+
+        ecc_priv.type = PK_PRIVATE;
+        memcpy(&ecc_priv.prime, priv->params[0], sizeof(mpz_t));
+        memcpy(&ecc_priv.order, priv->params[1], sizeof(mpz_t));
+        memcpy(&ecc_priv.Gx, priv->params[2], sizeof(mpz_t));
+        memcpy(&ecc_priv.Gy, priv->params[3], sizeof(mpz_t));
+        memcpy(&ecc_priv.pubkey.x, priv->params[4], sizeof(mpz_t));
+        memcpy(&ecc_priv.pubkey.y, priv->params[5], sizeof(mpz_t));
+        memcpy(&ecc_priv.pubkey.z, priv->params[6], sizeof(mpz_t));
+        memcpy(&ecc_priv.k, priv->params[7], sizeof(mpz_t));
+
+        sz = ECC_BUF_SIZE;
+        out->data = gnutls_malloc(sz);
+        if (out->data == NULL)
+          return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+        ret = ecc_shared_secret(&ecc_priv, &ecc_pub, out->data, &sz);
+        if (ret != 0)
+          {
+            gnutls_free(out->data);
+            return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+          }
+        out->size = sz;
+        break;
+      }
+    default:
+      gnutls_assert ();
+      ret = GNUTLS_E_INTERNAL_ERROR;
+      goto cleanup;
+    }
+
+  ret = 0;
+
+cleanup:
+
+  return ret;
+}
+
 static int
 _wrap_nettle_pk_encrypt (gnutls_pk_algorithm_t algo,
                          gnutls_datum_t * ciphertext,
@@ -89,7 +155,6 @@ _wrap_nettle_pk_encrypt (gnutls_pk_algorithm_t algo,
 {
   int ret;
 
-  /* make a sexp from pkey */
   switch (algo)
     {
     case GNUTLS_PK_RSA:
@@ -486,6 +551,15 @@ cleanup:
   return ret;
 }
 
+static inline int is_supported_curve(int curve)
+{
+  if (_gnutls_ecc_curve_get_name(curve) != NULL)
+    return 1;
+  else
+    return 0;
+}
+
+
 static int
 wrap_nettle_pk_generate_params (gnutls_pk_algorithm_t algo,
                                 unsigned int level /*bits */ ,
@@ -605,6 +679,56 @@ rsa_fail:
 
         break;
       }
+    case GNUTLS_PK_ECDH:
+      {
+        ecc_key key;
+        ltc_ecc_set_type tls_ecc_set;
+        const gnutls_ecc_curve_entry_st *st;
+
+        st = _gnutls_ecc_curve_get_params(level);
+        if (st == NULL)
+          return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
+        
+        tls_ecc_set.size = st->size;
+        tls_ecc_set.prime = st->prime;
+        tls_ecc_set.order = st->order;
+        tls_ecc_set.Gx = st->Gx;
+        tls_ecc_set.Gy = st->Gy;
+
+        ret = ecc_make_key(NULL, _int_random_func, &key, &tls_ecc_set);
+        if (ret != 0)
+          return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+        params->params_nr = 0;
+        for (i = 0; i < ECDH_PRIVATE_PARAMS; i++)
+          {
+            params->params[i] = _gnutls_mpi_alloc_like(&key.prime);
+            if (params->params[i] == NULL)
+              {
+                ret = GNUTLS_E_MEMORY_ERROR;
+                goto ecc_fail;
+              }
+            params->params_nr++;
+          }
+        params->flags = level;
+
+        mpz_set(TOMPZ(params->params[0]), key.prime);
+        mpz_set(TOMPZ(params->params[1]), key.order);
+        mpz_set(TOMPZ(params->params[2]), key.Gx);
+        mpz_set(TOMPZ(params->params[3]), key.Gy);
+        mpz_set(TOMPZ(params->params[4]), key.pubkey.x);
+        mpz_set(TOMPZ(params->params[5]), key.pubkey.y);
+        mpz_set(TOMPZ(params->params[6]), key.pubkey.z);
+        mpz_set(TOMPZ(params->params[7]), key.k);
+        
+ecc_fail:
+        ecc_free(&key);
+        
+        if (ret < 0)
+          goto fail;
+
+        break;
+      }
     default:
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -666,4 +790,5 @@ gnutls_crypto_pk_st _gnutls_pk_ops = {
   .verify = _wrap_nettle_pk_verify,
   .generate = wrap_nettle_pk_generate_params,
   .pk_fixup_private_params = wrap_nettle_pk_fixup,
+  .derive = _wrap_nettle_pk_derive,
 };

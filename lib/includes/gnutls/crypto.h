@@ -278,6 +278,16 @@ extern "C"
  *  [2] is g
  *  [3] is y (public key)
  *  [4] is x (private key only)
+ *
+ * ECDH:
+ *  [0] is prime
+ *  [1] is order
+ *  [2] is Gx
+ *  [3] is Gy
+ *  [4] is x
+ *  [5] is y
+ *  [6] is z
+ *  [7] is k (private key)
  */
 
 /**
@@ -311,7 +321,6 @@ extern "C"
     int (*verify) (gnutls_pk_algorithm_t, const gnutls_datum_t * data,
                    const gnutls_datum_t * signature,
                    const gnutls_pk_params_st * pub);
-
     int (*generate) (gnutls_pk_algorithm_t, unsigned int nbits,
                      gnutls_pk_params_st *);
     /* this function should convert params to ones suitable
@@ -319,6 +328,10 @@ extern "C"
      */
     int (*pk_fixup_private_params) (gnutls_pk_algorithm_t, gnutls_direction_t,
                                     gnutls_pk_params_st *);
+    int (*derive) (gnutls_pk_algorithm_t, gnutls_datum_t * out,
+                   const gnutls_pk_params_st * priv,
+                   const gnutls_pk_params_st * pub);
+
 
   } gnutls_crypto_pk_st;
 

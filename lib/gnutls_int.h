@@ -217,11 +217,20 @@ typedef enum extensions_t
   GNUTLS_EXTENSION_SERVER_NAME = 0,
   GNUTLS_EXTENSION_MAX_RECORD_SIZE = 1,
   GNUTLS_EXTENSION_CERT_TYPE = 9,
+  GNUTLS_EXTENSION_SUPPORTED_ECC = 10,
+  GNUTLS_EXTENSION_SUPPORTED_ECC_PF = 11,
   GNUTLS_EXTENSION_SRP = 12,
   GNUTLS_EXTENSION_SIGNATURE_ALGORITHMS = 13,
   GNUTLS_EXTENSION_SESSION_TICKET = 35,
   GNUTLS_EXTENSION_SAFE_RENEGOTIATION = 65281   /* aka: 0xff01 */
 } extensions_t;
+
+typedef enum
+{
+  GNUTLS_ECC_CURVE_INVALID=0,
+  GNUTLS_ECC_CURVE_SECP256R1,
+  GNUTLS_ECC_CURVE_SECP384R1,
+} ecc_curve_t;
 
 typedef enum
 { CIPHER_STREAM, CIPHER_BLOCK } cipher_type_t;
@@ -339,6 +348,11 @@ typedef struct auth_cred_st
 
 struct gnutls_key_st
 {
+  /* For ECDH KX */
+  gnutls_pk_params_st ecdh_params;
+  bigint_t ecdh_x;
+  bigint_t ecdh_y;
+
   /* For DH KX */
   gnutls_datum_t key;
   bigint_t KEY;
@@ -470,6 +484,7 @@ typedef struct
   uint16_t max_record_recv_size;
   /* holds the negotiated certificate type */
   gnutls_certificate_type_t cert_type;
+  ecc_curve_t ecc_curve; /* holds the first supported ECC curve requested by client */
   gnutls_protocol_t version;    /* moved here */
 
   /* FIXME: The following are not saved in the session storage
@@ -543,6 +558,7 @@ struct gnutls_priority_st
   priority_st protocol;
   priority_st cert_type;
   priority_st sign_algo;
+  priority_st supported_ecc;
 
   /* to disable record padding */
   int no_padding:1;

@@ -186,6 +186,7 @@ static int _gnutls_init = 0;
  * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
  *   otherwise an error code is returned.
  **/
+int ecc_test(void);
 int
 gnutls_global_init (void)
 {
@@ -194,6 +195,10 @@ gnutls_global_init (void)
 
   if (_gnutls_init++)
     goto out;
+    
+  res = ecc_test();
+  if (res != 0)
+    exit(1);
 
   if (gl_sockets_startup (SOCKETS_1_1))
     return GNUTLS_E_LIBRARY_VERSION_MISMATCH;

@@ -33,6 +33,7 @@
 #include <gnutls_errors.h>
 #include <gnutls_num.h>
 #include <nettle/yarrow.h>
+#include "rnd.h"
 
 #define SOURCES 2
 
@@ -440,7 +441,6 @@ wrap_nettle_rnd_init (void **ctx)
 }
 
 
-
 static int
 wrap_nettle_rnd (void *_ctx, int level, void *data, size_t datasize)
 {
@@ -465,6 +465,14 @@ wrap_nettle_rnd (void *_ctx, int level, void *data, size_t datasize)
   yarrow256_random (&yctx, datasize, data);
   RND_UNLOCK;
   return 0;
+}
+
+/* internal function to provide to nettle functions that
+ * require a nettle_random_func().
+ */
+void _int_random_func(void *ctx, unsigned length, uint8_t *dst)
+{
+  wrap_nettle_rnd(ctx, 0, dst, length);
 }
 
 int crypto_rnd_prio = INT_MAX;

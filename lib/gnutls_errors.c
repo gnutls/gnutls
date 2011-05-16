@@ -328,6 +328,8 @@ static const gnutls_error_entry error_algorithms[] = {
                GNUTLS_E_TIMEDOUT, 1),
   ERROR_ENTRY (N_("The operation was cancelled due to user error"),
                GNUTLS_E_USER_ERROR, 1),
+  ERROR_ENTRY (N_("No supported ECC curves were found"),
+               GNUTLS_E_ECC_NO_SUPPORTED_CURVES, 1),
   {NULL, NULL, 0, 0}
 };
 

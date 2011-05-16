@@ -39,6 +39,7 @@
 #include <ext/safe_renegotiation.h>
 #include <ext/signature.h>
 #include <ext/safe_renegotiation.h>
+#include <ext/ecc.h>
 #include <gnutls_num.h>
 
 
@@ -331,6 +332,14 @@ _gnutls_ext_init (void)
 #endif
 
   ret = _gnutls_ext_register (&ext_mod_session_ticket);
+  if (ret != GNUTLS_E_SUCCESS)
+    return ret;
+
+  ret = _gnutls_ext_register (&ext_mod_supported_ecc);
+  if (ret != GNUTLS_E_SUCCESS)
+    return ret;
+
+  ret = _gnutls_ext_register (&ext_mod_supported_ecc_pf);
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
 

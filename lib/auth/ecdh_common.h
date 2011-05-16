@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2010 Free Software
- * Foundation, Inc.
+ * Copyright (C) 2011 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -23,28 +22,20 @@
  *
  */
 
-/* this is not to be included by gnutls_anon.c */
+#ifndef AUTH_ECDH_COMMON
+#define AUTH_ECDH_COMMON
+
 #include <gnutls_auth.h>
-#include <auth/dh_common.h>
 
-typedef struct gnutls_anon_server_credentials_st
-{
-  gnutls_dh_params_t dh_params;
-  /* this callback is used to retrieve the DH or RSA
-   * parameters.
-   */
-  gnutls_params_function *params_func;
-} anon_server_credentials_st;
+int _gnutls_gen_ecdh_common_client_kx (gnutls_session_t, gnutls_buffer_st*);
+int _gnutls_proc_ecdh_common_client_kx (gnutls_session_t session,
+                                      opaque * data, size_t _data_size,
+                                      ecc_curve_t curve);
+int _gnutls_ecdh_common_print_server_kx (gnutls_session_t, gnutls_buffer_st* data,
+                                         ecc_curve_t curve);
+int _gnutls_proc_ecdh_common_server_kx (gnutls_session_t session, opaque * data,
+                                      size_t _data_size);
 
-typedef struct gnutls_anon_client_credentials_st
-{
-  int dummy;
-} anon_client_credentials_st;
 
-typedef struct anon_auth_info_st
-{
-  dh_info_st dh;
-  ecc_curve_t curve;
-} *anon_auth_info_t;
 
-typedef struct anon_auth_info_st anon_auth_info_st;
+#endif

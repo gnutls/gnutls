@@ -34,4 +34,9 @@ endif
 
 noinst_LTLIBRARIES = libcrypto.la
 
-libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c egd.c egd.h
+libcrypto_la_SOURCES = pk.c mpi.c mac.c cipher.c rnd.c init.c egd.c egd.h \
+	multi.c ecc_free.c ecc.h ecc_make_key.c ecc_shared_secret.c \
+	ecc_test.c ltc_ecc_map.c \
+	ltc_ecc_mulmod.c ltc_ecc_points.c \
+	ltc_ecc_projective_add_point.c ltc_ecc_projective_dbl_point.c \
+	mp_unsigned_bin.c ecc_sign_hash.c ecc_verify_hash.c 

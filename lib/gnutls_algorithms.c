@@ -70,6 +70,7 @@ typedef struct
 
 static const gnutls_cred_map cred_mappings[] = {
   {GNUTLS_KX_ANON_DH, GNUTLS_CRD_ANON, GNUTLS_CRD_ANON},
+  {GNUTLS_KX_ANON_ECDH, GNUTLS_CRD_ANON, GNUTLS_CRD_ANON},
   {GNUTLS_KX_RSA, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_RSA_EXPORT, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_DHE_DSS, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
@@ -260,6 +261,7 @@ extern mod_auth_st rsa_export_auth_struct;
 extern mod_auth_st dhe_rsa_auth_struct;
 extern mod_auth_st dhe_dss_auth_struct;
 extern mod_auth_st anon_auth_struct;
+extern mod_auth_st anon_ecdh_auth_struct;
 extern mod_auth_st srp_auth_struct;
 extern mod_auth_st psk_auth_struct;
 extern mod_auth_st dhe_psk_auth_struct;
@@ -279,6 +281,7 @@ typedef struct gnutls_kx_algo_entry gnutls_kx_algo_entry;
 static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
 #ifdef ENABLE_ANON
   {"ANON-DH", GNUTLS_KX_ANON_DH, &anon_auth_struct, 1, 0},
+  {"ANON-ECDH", GNUTLS_KX_ANON_ECDH, &anon_ecdh_auth_struct, 0, 0},
 #endif
   {"RSA", GNUTLS_KX_RSA, &rsa_auth_struct, 0, 0},
   {"RSA-EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct, 0,
@@ -463,7 +466,11 @@ typedef struct
 #define GNUTLS_PSK_NULL_SHA256 { 0x00, 0xB0 }
 #define GNUTLS_DHE_PSK_NULL_SHA256 { 0x00, 0xB4 }
 
-/* Safe renegotiation */
+/* ECC */
+#define GNUTLS_ECDH_ANON_3DES_EDE_CBC_SHA { 0xC0, 0x17 }
+#define GNUTLS_ECDH_ANON_AES_128_CBC_SHA { 0xC0, 0x18 }
+#define GNUTLS_ECDH_ANON_AES_256_CBC_SHA { 0xC0, 0x19 }
+
 
 #define CIPHER_SUITES_COUNT sizeof(cs_algorithms)/sizeof(gnutls_cipher_suite_entry)-1
 
@@ -760,6 +767,19 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DH_ANON_AES_128_GCM_SHA256,
                              GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_ANON_DH,
                              GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
+                             GNUTLS_VERSION_MAX, 1),
+/* ECC-ANON */
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDH_ANON_3DES_EDE_CBC_SHA,
+                             GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_ANON_ECDH,
+                             GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDH_ANON_AES_128_CBC_SHA,
+                             GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_ANON_ECDH,
+                             GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDH_ANON_AES_256_CBC_SHA,
+                             GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_ANON_ECDH,
+                             GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
                              GNUTLS_VERSION_MAX, 1),
 
   {0, {{0, 0}}, 0, 0, 0, 0, 0, 0}
@@ -2174,6 +2194,109 @@ _gnutls_sign_to_tls_aid (gnutls_sign_algorithm_t sign)
   return ret;
 }
 
+/* ECC curves;
+ */
+
+static const gnutls_ecc_curve_entry_st ecc_curves[] = {
+  {
+    .name = "SECP256R1", 
+    .id = GNUTLS_ECC_CURVE_SECP256R1,
+    .size = 32,
+    .prime = "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF",
+    .B = "5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B",
+    .order = "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551",
+    .Gx = "6B17D1F2E12C4247F8BCE6E563A440F277037D812DEB33A0F4A13945D898C296",
+    .Gy = "4FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5",
+  },
+  {
+    .name = "SECP384R1",
+    .id = GNUTLS_ECC_CURVE_SECP384R1,
+    .size = 48,
+    .prime = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF",
+    .B = "B3312FA7E23EE7E4988E056BE3F82D19181D9C6EFE8141120314088F5013875AC656398D8A2ED19D2A85C8EDD3EC2AEF",
+    .order = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC7634D81F4372DDF581A0DB248B0A77AECEC196ACCC52973",
+    .Gx = "AA87CA22BE8B05378EB1C71EF320AD746E1D3B628BA79B9859F741E082542A385502F25DBF55296C3A545E3872760AB7",
+    .Gy = "3617DE4A96262C6F5D9E98BF9292DC29F8F41DBD289A147CE9DA3113B5F0B8C00A60B1CE1D7E819D7A431D7C90EA0E5F"
+  },
+  {0, 0, 0}
+};
+
+#define GNUTLS_ECC_CURVE_LOOP(b) \
+	{ const gnutls_ecc_curve_entry_st *p; \
+                for(p = ecc_curves; p->name != NULL; p++) { b ; } }
+
+/*-
+ * _gnutls_ecc_curve_get_name:
+ * @curve: is an ECC curve
+ *
+ * Convert a #ecc_curve_t value to a string.
+ *
+ * Returns: a string that contains the name of the specified
+ *   curve or %NULL.
+ -*/
+const char *
+_gnutls_ecc_curve_get_name (ecc_curve_t curve)
+{
+  const char *ret = NULL;
+
+  GNUTLS_ECC_CURVE_LOOP(
+    if (p->id == curve)
+      {
+        ret = p->name;
+        break;
+      }
+  );
+
+  return ret;
+}
+
+/*-
+ * _gnutls_ecc_curve_get_params:
+ * @curve: is an ECC curve
+ *
+ * Returns the information on a curve.
+ *
+ * Returns: a pointer to #gnutls_ecc_curve_entry_st or %NULL.
+ -*/
+const gnutls_ecc_curve_entry_st *
+_gnutls_ecc_curve_get_params (ecc_curve_t curve)
+{
+  const gnutls_ecc_curve_entry_st *ret = NULL;
+
+  GNUTLS_ECC_CURVE_LOOP(
+    if (p->id == curve)
+      {
+        ret = p;
+        break;
+      }
+  );
+
+  return ret;
+}
+
+/*-
+ * _gnutls_ecc_curve_get_size:
+ * @curve: is an ECC curve
+ *
+ * Returns the size in bytes of the curve.
+ *
+ * Returns: a the size or zero.
+ -*/
+int _gnutls_ecc_curve_get_size (ecc_curve_t curve)
+{
+  int ret = 0;
+
+  GNUTLS_ECC_CURVE_LOOP(
+    if (p->id == curve)
+      {
+        ret = p->size;
+        break;
+      }
+  );
+
+  return ret;
+}
+
 
 
 /* pk algorithms;
@@ -2197,6 +2320,7 @@ static const gnutls_pk_entry pk_algorithms[] = {
   {"DSA", PK_DSA_OID, GNUTLS_PK_DSA},
   {"GOST R 34.10-2001", PK_GOST_R3410_2001_OID, GNUTLS_PK_UNKNOWN},
   {"GOST R 34.10-94", PK_GOST_R3410_94_OID, GNUTLS_PK_UNKNOWN},
+  {"ECDH", "1.2.840.10045.2.1", GNUTLS_PK_ECDH},
   {0, 0, 0}
 };
 

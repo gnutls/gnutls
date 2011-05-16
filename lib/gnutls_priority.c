@@ -215,6 +215,12 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
 #endif
 }
 
+static const int supported_ecc_default[] = {
+  GNUTLS_ECC_CURVE_SECP256R1,
+  GNUTLS_ECC_CURVE_SECP384R1,
+  0
+};
+
 static const int protocol_priority[] = {
   GNUTLS_TLS1_2,
   GNUTLS_TLS1_1,
@@ -570,10 +576,12 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
       _set_priority (&(*priority_cache)->compression, comp_priority);
       _set_priority (&(*priority_cache)->cert_type, cert_type_priority);
       _set_priority (&(*priority_cache)->sign_algo, sign_priority_default);
+      _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_default);
       i = 0;
     }
   else
     {
+      _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_default);
       i = 1;
     }
 

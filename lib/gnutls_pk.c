@@ -531,7 +531,7 @@ _generate_params (int algo, bigint_t * resarr, unsigned int *resarr_len,
   int ret;
   unsigned int i;
 
-  ret = _gnutls_pk_ops.generate (algo, bits, &params);
+  ret = _gnutls_pk_generate (algo, bits, &params);
 
   if (ret < 0)
     {

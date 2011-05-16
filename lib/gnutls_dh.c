@@ -147,3 +147,4 @@ _gnutls_get_dh_params (gnutls_dh_params_t dh_params,
 
   return session->internals.params.dh_params;
 }
+

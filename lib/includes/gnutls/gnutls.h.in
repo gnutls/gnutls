@@ -129,6 +129,7 @@ extern "C"
    * @GNUTLS_KX_DHE_DSS: DHE-DSS key-exchange algorithm.
    * @GNUTLS_KX_DHE_RSA: DHE-RSA key-exchange algorithm.
    * @GNUTLS_KX_ANON_DH: Anon-DH key-exchange algorithm.
+   * @GNUTLS_KX_ANON_ECDH: Anon-ECDH key-exchange algorithm.
    * @GNUTLS_KX_SRP: SRP key-exchange algorithm.
    * @GNUTLS_KX_RSA_EXPORT: RSA-EXPORT key-exchange algorithm.
    * @GNUTLS_KX_SRP_RSA: SRP-RSA key-exchange algorithm.
@@ -150,7 +151,8 @@ extern "C"
     GNUTLS_KX_SRP_RSA = 7,
     GNUTLS_KX_SRP_DSS = 8,
     GNUTLS_KX_PSK = 9,
-    GNUTLS_KX_DHE_PSK = 10
+    GNUTLS_KX_DHE_PSK = 10,
+    GNUTLS_KX_ANON_ECDH = 11,
   } gnutls_kx_algorithm_t;
 
   /**
@@ -163,7 +165,8 @@ extern "C"
   typedef enum
   {
     GNUTLS_PARAMS_RSA_EXPORT = 1,
-    GNUTLS_PARAMS_DH = 2
+    GNUTLS_PARAMS_DH = 2,
+    GNUTLS_PARAMS_ECDH = 3,
   } gnutls_params_type_t;
 
   /**
@@ -554,6 +557,7 @@ extern "C"
    * @GNUTLS_PK_RSA: RSA public-key algorithm.
    * @GNUTLS_PK_DSA: DSA public-key algorithm.
    * @GNUTLS_PK_DH: Diffie-Hellman algorithm. Used to generate parameters.
+   * @GNUTLS_PK_ECDH: Elliptic curve Diffie-Hellman algorithm. Used to generate parameters.
    *
    * Enumeration of different public-key algorithms.
    */
@@ -562,7 +566,8 @@ extern "C"
     GNUTLS_PK_UNKNOWN = 0,
     GNUTLS_PK_RSA = 1,
     GNUTLS_PK_DSA = 2,
-    GNUTLS_PK_DH = 3
+    GNUTLS_PK_DH = 3,
+    GNUTLS_PK_ECDH = 4,
   } gnutls_pk_algorithm_t;
 
   const char *gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm);
@@ -647,6 +652,9 @@ extern "C"
   struct gnutls_dh_params_int;
   typedef struct gnutls_dh_params_int *gnutls_dh_params_t;
 
+  struct gnutls_ecdh_params_int;
+  typedef struct gnutls_ecdh_params_int *gnutls_ecdh_params_t;
+
   /* XXX ugly. */
   struct gnutls_x509_privkey_int;
   typedef struct gnutls_x509_privkey_int *gnutls_rsa_params_t;
@@ -667,6 +675,7 @@ extern "C"
     union params
     {
       gnutls_dh_params_t dh;
+      gnutls_ecdh_params_t ecdh;
       gnutls_rsa_params_t rsa_export;
     } params;
     int deinit;
@@ -1750,6 +1759,7 @@ extern "C"
 #define GNUTLS_E_CRYPTO_INIT_FAILED -318
 #define GNUTLS_E_TIMEDOUT -319
 #define GNUTLS_E_USER_ERROR -320
+#define GNUTLS_E_ECC_NO_SUPPORTED_CURVES -321
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 

@@ -65,6 +65,14 @@ _gnutls_session_cert_type_set (gnutls_session_t session,
   session->security_parameters.cert_type = ct;
 }
 
+void
+_gnutls_session_ecc_curve_set (gnutls_session_t session,
+                               ecc_curve_t c)
+{
+  _gnutls_handshake_log("HSK[%p]: Selected ECC curve (%d)\n", session, c);
+  session->security_parameters.ecc_curve = c;
+}
+
 /**
  * gnutls_cipher_get:
  * @session: is a #gnutls_session_t structure.
@@ -443,6 +451,10 @@ gnutls_deinit (gnutls_session_t session)
 
   if (session->key != NULL)
     {
+      gnutls_pk_params_release(&session->key->ecdh_params);
+      _gnutls_mpi_release (&session->key->ecdh_x);
+      _gnutls_mpi_release (&session->key->ecdh_y);
+
       _gnutls_mpi_release (&session->key->KEY);
       _gnutls_mpi_release (&session->key->client_Y);
       _gnutls_mpi_release (&session->key->client_p);

@@ -125,4 +125,28 @@ int _gnutls_kx_priority (gnutls_session_t session,
 
 unsigned int _gnutls_pk_bits_to_subgroup_bits (unsigned int pk_bits);
 
+/* ECC */
+struct gnutls_ecc_curve_entry_st
+{
+  const char *name;
+  ecc_curve_t id;
+  int size; /* the size in bytes */
+
+  /** The prime that defines the field the curve is in (encoded in hex) */
+  const char *prime;
+  /** The fields B param (hex) */
+  const char *B;
+  /** The order of the curve (hex) */
+  const char *order;
+  /** The x co-ordinate of the base point on the curve (hex) */
+  const char *Gx;
+  /** The y co-ordinate of the base point on the curve (hex) */
+  const char *Gy;
+};
+typedef struct gnutls_ecc_curve_entry_st gnutls_ecc_curve_entry_st;
+
+const char * _gnutls_ecc_curve_get_name (ecc_curve_t curve);
+const gnutls_ecc_curve_entry_st * _gnutls_ecc_curve_get_params (ecc_curve_t curve);
+int _gnutls_ecc_curve_get_size (ecc_curve_t curve);
+
 #endif
