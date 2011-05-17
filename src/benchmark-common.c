@@ -8,13 +8,7 @@
 
 int benchmark_must_finish = 0;
 
-#if !defined(_WIN32)
-static void
-alarm_handler (int signo)
-{
-  benchmark_must_finish = 1;
-}
-#else
+#if defined(_WIN32)
 #include <windows.h>
 DWORD WINAPI
 alarm_handler (LPVOID lpParameter)
@@ -24,34 +18,12 @@ alarm_handler (LPVOID lpParameter)
   benchmark_must_finish = 1;
   return 0;
 }
-
-#define W32_ALARM_VARIABLES HANDLE wtimer = NULL, wthread = NULL; \
-  LARGE_INTEGER alarm_timeout = { 0 , 0 }
-#define W32_ALARM_TRIGGER(timeout, leave) { \
-  st->wtimer = CreateWaitableTimer (NULL, TRUE, NULL); \
-  if (st->wtimer == NULL) \
-    { \
-      fprintf (stderr, "error: CreateWaitableTimer %u\n", GetLastError ()); \
-      leave; \
-    } \
-  st->wthread = CreateThread (NULL, 0, alarm_handler, &st->wtimer, 0, NULL); \
-  if (st->wthread == NULL) \
-    { \
-      fprintf (stderr, "error: CreateThread %u\n", GetLastError ()); \
-      leave; \
-    } \
-  alarm_timeout.QuadPart = timeout * 10000000; \
-  if (SetWaitableTimer (st->wtimer, &alarm_timeout, 0, NULL, NULL, FALSE) == 0) \
-    { \
-      fprintf (stderr, "error: SetWaitableTimer %u\n", GetLastError ()); \
-      leave; \
-    } \
-  }
-#define W32_ALARM_CLEANUP { \
-  if (st->wtimer != NULL) \
-    CloseHandle (st->wtimer); \
-  if (st->wthread != NULL) \
-    CloseHandle (st->wthread);}
+#else
+static void
+alarm_handler (int signo)
+{
+  benchmark_must_finish = 1;
+}
 #endif
 
 static void
@@ -90,17 +62,33 @@ value2human (unsigned long bytes, double time, double *data, double *speed,
 
 void start_benchmark(struct benchmark_st * st)
 {
+  memset(st, 0, sizeof(st));
   st->old_handler = signal (SIGALRM, alarm_handler);
-
-  benchmark_must_finish = 0;
-  st->size = 0;
-
-#if !defined(_WIN32)
-  alarm (5);
-#else
-  W32_ALARM_TRIGGER(5, goto leave);
-#endif
   gettime (&st->start);
+
+#if defined(_WIN32)
+  st->wtimer = CreateWaitableTimer (NULL, TRUE, NULL);
+  if (st->wtimer == NULL)
+    {
+      fprintf (stderr, "error: CreateWaitableTimer %u\n", GetLastError ());
+      exit(1);
+    }
+  st->wthread = CreateThread (NULL, 0, alarm_handler, &st->wtimer, 0, NULL);
+  if (st->wthread == NULL)
+    {
+      fprintf (stderr, "error: CreateThread %u\n", GetLastError ());
+      exit(1);
+    }
+  alarm_timeout.QuadPart = (5) * 10000000;
+  if (SetWaitableTimer (st->wtimer, &alarm_timeout, 0, NULL, NULL, FALSE) == 0)
+    {
+      fprintf (stderr, "error: SetWaitableTimer %u\n", GetLastError ());
+      exit(1);
+    }
+  }
+#else
+  alarm (5);
+#endif
   
 }
 
@@ -113,8 +101,10 @@ double stop_benchmark(struct benchmark_st * st)
   char metric[16];
 
 #if defined(_WIN32)
-leave:
-  W32_ALARM_CLEANUP;
+  if (st->wtimer != NULL)
+    CloseHandle (st->wtimer);
+  if (st->wthread != NULL)
+    CloseHandle (st->wthread);
 #else
   signal(SIGALRM, st->old_handler);
 #endif

@@ -11,7 +11,9 @@ struct benchmark_st
   unsigned long size;
   sighandler_t old_handler;
 #if defined(_WIN32)
-  W32_ALARM_VARIABLES;
+  HANDLE wtimer;
+  HANDLE wthread;
+  LARGE_INTEGER alarm_timeout;
 #endif
 };
 
