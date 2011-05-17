@@ -28,30 +28,30 @@ alarm_handler (LPVOID lpParameter)
 #define W32_ALARM_VARIABLES HANDLE wtimer = NULL, wthread = NULL; \
   LARGE_INTEGER alarm_timeout = { 0 , 0 }
 #define W32_ALARM_TRIGGER(timeout, leave) { \
-  wtimer = CreateWaitableTimer (NULL, TRUE, NULL); \
-  if (wtimer == NULL) \
+  st->wtimer = CreateWaitableTimer (NULL, TRUE, NULL); \
+  if (st->wtimer == NULL) \
     { \
       fprintf (stderr, "error: CreateWaitableTimer %u\n", GetLastError ()); \
       leave; \
     } \
-  wthread = CreateThread (NULL, 0, alarm_handler, &wtimer, 0, NULL); \
-  if (wthread == NULL) \
+  st->wthread = CreateThread (NULL, 0, alarm_handler, &st->wtimer, 0, NULL); \
+  if (st->wthread == NULL) \
     { \
       fprintf (stderr, "error: CreateThread %u\n", GetLastError ()); \
       leave; \
     } \
   alarm_timeout.QuadPart = timeout * 10000000; \
-  if (SetWaitableTimer (wtimer, &alarm_timeout, 0, NULL, NULL, FALSE) == 0) \
+  if (SetWaitableTimer (st->wtimer, &alarm_timeout, 0, NULL, NULL, FALSE) == 0) \
     { \
       fprintf (stderr, "error: SetWaitableTimer %u\n", GetLastError ()); \
       leave; \
     } \
   }
 #define W32_ALARM_CLEANUP { \
-  if (wtimer != NULL) \
-    CloseHandle (wtimer); \
-  if (wthread != NULL) \
-    CloseHandle (wthread);}
+  if (st->wtimer != NULL) \
+    CloseHandle (st->wtimer); \
+  if (st->wthread != NULL) \
+    CloseHandle (st->wthread);}
 #endif
 
 static void
