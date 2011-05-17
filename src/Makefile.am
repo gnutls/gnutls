@@ -28,7 +28,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../libextra/includes	\
 	-I$(srcdir)/cfg
 
-noinst_PROGRAMS = benchmark
+noinst_PROGRAMS = benchmark benchmark-tls
 bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug
 if ENABLE_PKI
 bin_PROGRAMS += certtool p11tool
@@ -65,8 +65,11 @@ noinst_LTLIBRARIES += libcmd-psk.la
 libcmd_psk_la_CFLAGS =
 libcmd_psk_la_SOURCES = psk.gaa psk-gaa.h psk-gaa.c
 
-benchmark_SOURCES = benchmark.c
+benchmark_SOURCES = benchmark.c benchmark-common.c benchmark.h
 benchmark_LDADD = ../lib/libgnutls.la ../gl/libgnu.la $(LIB_CLOCK_GETTIME)
+
+benchmark_tls_SOURCES = benchmark-tls.c benchmark-common.c benchmark.h
+benchmark_tls_LDADD = ../lib/libgnutls.la ../gl/libgnu.la $(LIB_CLOCK_GETTIME)
 
 gnutls_cli_SOURCES = cli.c common.h common.c p11common.c p11common.h
 gnutls_cli_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la

@@ -30,95 +30,15 @@
 #include <time.h>
 #include <signal.h>
 #include "timespec.h"           /* gnulib gettime */
+#include "benchmark.h"
 
 static unsigned char data[64 * 1024];
 
-static int must_finish = 0;
-
-#if !defined(_WIN32)
-static void
-alarm_handler (int signo)
-{
-  must_finish = 1;
-}
-#else
-#include <windows.h>
-DWORD WINAPI
-alarm_handler (LPVOID lpParameter)
-{
-  HANDLE wtimer = *((HANDLE *) lpParameter);
-  WaitForSingleObject (wtimer, INFINITE);
-  must_finish = 1;
-  return 0;
-}
-
-#define W32_ALARM_VARIABLES HANDLE wtimer = NULL, wthread = NULL; \
-  LARGE_INTEGER alarm_timeout = { 0 , 0 }
-#define W32_ALARM_TRIGGER(timeout, leave) { \
-  wtimer = CreateWaitableTimer (NULL, TRUE, NULL); \
-  if (wtimer == NULL) \
-    { \
-      fprintf (stderr, "error: CreateWaitableTimer %u\n", GetLastError ()); \
-      leave; \
-    } \
-  wthread = CreateThread (NULL, 0, alarm_handler, &wtimer, 0, NULL); \
-  if (wthread == NULL) \
-    { \
-      fprintf (stderr, "error: CreateThread %u\n", GetLastError ()); \
-      leave; \
-    } \
-  alarm_timeout.QuadPart = timeout * 10000000; \
-  if (SetWaitableTimer (wtimer, &alarm_timeout, 0, NULL, NULL, FALSE) == 0) \
-    { \
-      fprintf (stderr, "error: SetWaitableTimer %u\n", GetLastError ()); \
-      leave; \
-    } \
-  }
-#define W32_ALARM_CLEANUP { \
-  if (wtimer != NULL) \
-    CloseHandle (wtimer); \
-  if (wthread != NULL) \
-    CloseHandle (wthread);}
-#endif
 
 static void
 tls_log_func (int level, const char *str)
 {
   fprintf (stderr, "|<%d>| %s", level, str);
-}
-
-static void
-value2human (double bytes, double time, double *data, double *speed,
-             char *metric)
-{
-  if (bytes > 1000 && bytes < 1000 * 1000)
-    {
-      *data = ((double) bytes) / 1000;
-      *speed = *data / time;
-      strcpy (metric, "Kb");
-      return;
-    }
-  else if (bytes >= 1000 * 1000 && bytes < 1000 * 1000 * 1000)
-    {
-      *data = ((double) bytes) / (1000 * 1000);
-      *speed = *data / time;
-      strcpy (metric, "Mb");
-      return;
-    }
-  else if (bytes >= 1000 * 1000 * 1000)
-    {
-      *data = ((double) bytes) / (1000 * 1000 * 1000);
-      *speed = *data / time;
-      strcpy (metric, "Gb");
-      return;
-    }
-  else
-    {
-      *data = (double) bytes;
-      *speed = *data / time;
-      strcpy (metric, "bytes");
-      return;
-    }
 }
 
 static void
@@ -129,17 +49,10 @@ cipher_mac_bench (int algo, int mac_algo, int size)
   gnutls_hmac_hd_t mac_ctx;
   void *_key, *_iv;
   gnutls_datum_t key, iv;
-  struct timespec start, stop;
-  double secs;
-  double data_size = 0;
-  double dspeed, ddata;
   int blocksize = gnutls_cipher_get_block_size (algo);
   int keysize = gnutls_cipher_get_key_size (algo);
-  char metric[16];
   int step = size*1024;
-#if defined(_WIN32)
-  W32_ALARM_VARIABLES;
-#endif
+  struct benchmark_st st;
 
   _key = malloc (keysize);
   if (_key == NULL)
@@ -161,14 +74,7 @@ cipher_mac_bench (int algo, int mac_algo, int size)
       gnutls_mac_get_name(mac_algo), size);
   fflush (stdout);
 
-  must_finish = 0;
-#if !defined(_WIN32)
-  alarm (5);
-#else
-  W32_ALARM_TRIGGER(5, goto leave);
-#endif
-
-  gettime (&start);
+  start_benchmark(&st);
 
   ret = gnutls_hmac_init(&mac_ctx, mac_algo, key.data, key.size);
   if (ret < 0)
@@ -190,22 +96,14 @@ cipher_mac_bench (int algo, int mac_algo, int size)
     {
       gnutls_hmac(mac_ctx, data, step);
       gnutls_cipher_encrypt (ctx, data, step);
-      data_size += step;
+      st.size += step;
     }
-  while (must_finish == 0);
+  while (benchmark_must_finish == 0);
 
   gnutls_cipher_deinit (ctx);
   gnutls_hmac_deinit(mac_ctx, NULL);
 
-  gettime (&stop);
-
-  secs = (stop.tv_sec * 1000 + stop.tv_nsec / (1000 * 1000) -
-          (start.tv_sec * 1000 + start.tv_nsec / (1000 * 1000)));
-  secs /= 1000;
-
-  value2human (data_size, secs, &ddata, &dspeed, metric);
-  printf ("Encrypted and hashed %.2f %s in %.2f secs: ", ddata, metric, secs);
-  printf ("%.2f %s/sec\n", dspeed, metric);
+  stop_benchmark (&st);
 
 leave:
   free (_key);
@@ -221,17 +119,10 @@ cipher_bench (int algo, int size, int aead)
   gnutls_cipher_hd_t ctx;
   void *_key, *_iv;
   gnutls_datum_t key, iv;
-  struct timespec start, stop;
-  double secs;
-  double data_size = 0;
-  double dspeed, ddata;
   int blocksize = gnutls_cipher_get_block_size (algo);
   int keysize = gnutls_cipher_get_key_size (algo);
-  char metric[16];
   int step = size*1024;
-#if defined(_WIN32)
-  W32_ALARM_VARIABLES;
-#endif
+  struct benchmark_st st;
 
   _key = malloc (keysize);
   if (_key == NULL)
@@ -254,10 +145,7 @@ cipher_bench (int algo, int size, int aead)
           size);
   fflush (stdout);
 
-  must_finish = 0;
-  alarm (5);
-
-  gettime (&start);
+  start_benchmark(&st);
 
   ret = gnutls_cipher_init (&ctx, algo, &key, &iv);
   if (ret < 0)
@@ -272,42 +160,27 @@ cipher_bench (int algo, int size, int aead)
   do
     {
       gnutls_cipher_encrypt (ctx, data, step);
-      data_size += step;
+      st.size += step;
     }
-  while (must_finish == 0);
+  while (benchmark_must_finish == 0);
 
   gnutls_cipher_deinit (ctx);
 
-  gettime (&stop);
-
-  secs = (stop.tv_sec * 1000 + stop.tv_nsec / (1000 * 1000) -
-          (start.tv_sec * 1000 + start.tv_nsec / (1000 * 1000)));
-  secs /= 1000;
-
-  value2human (data_size, secs, &ddata, &dspeed, metric);
-  printf ("Encrypted %.2f %s in %.2f secs: ", ddata, metric, secs);
-  printf ("%.2f %s/sec\n", dspeed, metric);
+  stop_benchmark(&st);
 
 leave:
   free (_key);
   free (_iv);
-#if defined(_WIN32)
-  W32_ALARM_CLEANUP;
-#endif
 }
 
 static void
 mac_bench (int algo, int size)
 {
   void *_key;
-  struct timespec start, stop;
-  double secs;
-  double data_size = 0;
-  double ddata, dspeed;
   int blocksize = gnutls_hmac_get_len (algo);
-  char metric[16];
   int step = size*1024;
-
+  struct benchmark_st st;
+  
   _key = malloc (blocksize);
   if (_key == NULL)
     return;
@@ -316,37 +189,17 @@ mac_bench (int algo, int size)
   printf ("Checking %s (%dkb payload)... ", gnutls_mac_get_name (algo), size);
   fflush (stdout);
 
-  must_finish = 0;
-#if !defined(_WIN32)
-  alarm (5);
-#else
-  W32_ALARM_TRIGGER(5, goto leave);
-#endif
-
-  gettime (&start);
+  start_benchmark(&st);
 
   do
     {
       gnutls_hmac_fast (algo, _key, blocksize, data, step, _key);
-      data_size += step;
+      st.size += step;
     }
-  while (must_finish == 0);
+  while (benchmark_must_finish == 0);
 
-  gettime (&stop);
+  stop_benchmark(&st);
 
-  secs =
-    (stop.tv_sec * 1000 + stop.tv_nsec / (1000 * 1000) -
-     (start.tv_sec * 1000 + start.tv_nsec / (1000 * 1000)));
-  secs /= 1000;
-
-  value2human (data_size, secs, &ddata, &dspeed, metric);
-
-  printf ("Hashed %.2f %s in %.2f secs: ", ddata, metric, secs);
-  printf ("%.2f %s/sec\n", dspeed, metric);
-#if defined(_WIN32)
-leave:
-  W32_ALARM_CLEANUP;
-#endif
   free (_key);
 }
 
@@ -357,10 +210,6 @@ main (int argc, char **argv)
 
   if (argc > 1)
     debug_level = 2;
-
-#if !defined(_WIN32)
-  signal (SIGALRM, alarm_handler);
-#endif
 
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (debug_level);

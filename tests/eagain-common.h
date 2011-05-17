@@ -88,7 +88,6 @@
     } \
   while (transferred < 70000)
 
-
 static char to_server[64*1024];
 static size_t to_server_len = 0;
 
@@ -228,4 +227,10 @@ int ret;
 #endif
 
   return ret;
+}
+
+static void reset_buffers(void)
+{
+  to_server_len = 0;
+  to_client_len = 0;
 }
