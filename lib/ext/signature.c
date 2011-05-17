@@ -105,7 +105,7 @@ _gnutls_sign_algorithm_write_params (gnutls_session_t session, opaque * data,
       if (aid == NULL)
         continue;
         
-       _gnutls_debug_log ("EXT[%p]: sent signature algo (%d.%d) %s\n", session, aid->hash_algorithm, 
+       _gnutls_handshake_log ("EXT[%p]: sent signature algo (%d.%d) %s\n", session, aid->hash_algorithm, 
          aid->sign_algorithm, gnutls_sign_get_name(session->internals.priorities.sign_algo.priority[j]));
       *p = aid->hash_algorithm;
       p++;
@@ -146,7 +146,7 @@ _gnutls_sign_algorithm_parse_data (gnutls_session_t session,
 
       sig = _gnutls_tls_aid_to_sign (&aid);
 
-       _gnutls_debug_log ("EXT[%p]: rcvd signature algo (%d.%d) %s\n", session, aid.hash_algorithm, 
+       _gnutls_handshake_log ("EXT[%p]: rcvd signature algo (%d.%d) %s\n", session, aid.hash_algorithm, 
          aid.sign_algorithm, gnutls_sign_get_name(sig));
 
       if (sig != GNUTLS_SIGN_UNKNOWN)

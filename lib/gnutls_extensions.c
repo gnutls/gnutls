@@ -153,7 +153,7 @@ _gnutls_parse_extensions (gnutls_session_t session,
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     for (i = 0; i < session->internals.extensions_sent_size; i++)
       {
-        _gnutls_debug_log ("EXT[%d]: expecting extension '%s'\n",
+        _gnutls_handshake_log ("EXT[%d]: expecting extension '%s'\n",
                            session,
                            _gnutls_extension_get_name
                            (session->internals.extensions_sent[i]));
@@ -173,7 +173,7 @@ _gnutls_parse_extensions (gnutls_session_t session,
       pos += 2;
 
 #if 0
-      _gnutls_debug_log ("EXT[%p]: Found extension '%s/%d'\n", session,
+      _gnutls_handshake_log ("EXT[%p]: Found extension '%s/%d'\n", session,
                          _gnutls_extension_get_name (type), type);
 #endif
 
@@ -195,7 +195,7 @@ _gnutls_parse_extensions (gnutls_session_t session,
       if (ext_recv == NULL)
         continue;
 
-      _gnutls_debug_log ("EXT[%p]: Parsing extension '%s/%d' (%d bytes)\n",
+      _gnutls_handshake_log ("EXT[%p]: Parsing extension '%s/%d' (%d bytes)\n",
                          session, _gnutls_extension_get_name (type), type,
                          size);
 
@@ -230,7 +230,7 @@ _gnutls_extension_list_add (gnutls_session_t session, uint16_t type)
         }
       else
         {
-          _gnutls_debug_log ("extensions: Increase MAX_EXT_TYPES\n");
+          _gnutls_handshake_log ("extensions: Increase MAX_EXT_TYPES\n");
         }
     }
 }
@@ -281,7 +281,7 @@ _gnutls_gen_extensions (gnutls_session_t session, gnutls_buffer_st * extdata,
            */
           _gnutls_extension_list_add (session, p->type);
 
-          _gnutls_debug_log ("EXT[%p]: Sending extension %s (%d bytes)\n",
+          _gnutls_handshake_log ("EXT[%p]: Sending extension %s (%d bytes)\n",
                              session, p->name, size);
         }
       else if (size < 0)
