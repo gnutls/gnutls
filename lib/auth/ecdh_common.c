@@ -52,17 +52,18 @@ int ret;
   pub.params[1] = session->key->ecdh_params.params[1];
   pub.params[2] = session->key->ecdh_params.params[2];
   pub.params[3] = session->key->ecdh_params.params[3];
-  pub.params[4] = session->key->ecdh_x;
-  pub.params[5] = session->key->ecdh_y;
-  pub.params[6] = _gnutls_mpi_new(1);
-  if (pub.params[6] == NULL)
+  pub.params[4] = session->key->ecdh_params.params[4];
+  pub.params[5] = session->key->ecdh_x;
+  pub.params[6] = session->key->ecdh_y;
+  pub.params[7] = _gnutls_mpi_new(1);
+  if (pub.params[7] == NULL)
     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
   
-  _gnutls_mpi_set_ui(pub.params[6], 1);
+  _gnutls_mpi_set_ui(pub.params[7], 1);
   
   ret = _gnutls_pk_derive(GNUTLS_PK_ECDH, &session->key->key, &session->key->ecdh_params, &pub);
   
-  _gnutls_mpi_release(&pub.params[6]);
+  _gnutls_mpi_release(&pub.params[7]);
   
   if (ret < 0)
     return gnutls_assert_val(ret);
@@ -109,8 +110,8 @@ _gnutls_gen_ecdh_common_client_kx (gnutls_session_t session, gnutls_buffer_st* d
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  ret = _gnutls_ecc_ansi_x963_export(curve, session->key->ecdh_params.params[4] /* x */,
-    session->key->ecdh_params.params[5] /* y */, &out);
+  ret = _gnutls_ecc_ansi_x963_export(curve, session->key->ecdh_params.params[5] /* x */,
+    session->key->ecdh_params.params[6] /* y */, &out);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -187,8 +188,8 @@ int _gnutls_ecdh_common_print_server_kx (gnutls_session_t session, gnutls_buffer
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  ret = _gnutls_ecc_ansi_x963_export(curve, session->key->ecdh_params.params[4] /* x */,
-    session->key->ecdh_params.params[5] /* y */, &out);
+  ret = _gnutls_ecc_ansi_x963_export(curve, session->key->ecdh_params.params[5] /* x */,
+    session->key->ecdh_params.params[6] /* y */, &out);
   if (ret < 0)
     return gnutls_assert_val(ret);
 

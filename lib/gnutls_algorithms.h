@@ -134,6 +134,8 @@ struct gnutls_ecc_curve_entry_st
 
   /** The prime that defines the field the curve is in (encoded in hex) */
   const char *prime;
+  /** The fields A param (hex) */
+  const char *A;
   /** The fields B param (hex) */
   const char *B;
   /** The order of the curve (hex) */

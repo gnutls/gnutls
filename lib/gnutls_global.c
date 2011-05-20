@@ -155,6 +155,7 @@ gnutls_global_set_mem_functions (gnutls_alloc_function alloc_func,
 }
 
 static int _gnutls_init = 0;
+int ecc_test(void);
 
 
 /**
@@ -194,6 +195,9 @@ gnutls_global_init (void)
 
   if (_gnutls_init++)
     goto out;
+
+res = ecc_test();
+if (res != 0) exit(1);
     
   if (gl_sockets_startup (SOCKETS_1_1))
     return GNUTLS_E_LIBRARY_VERSION_MISMATCH;

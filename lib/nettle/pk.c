@@ -104,21 +104,23 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t * o
         ecc_pub.type = PK_PUBLIC;
         memcpy(&ecc_pub.prime, pub->params[0], sizeof(mpz_t));
         memcpy(&ecc_pub.order, pub->params[1], sizeof(mpz_t));
-        memcpy(&ecc_pub.Gx, pub->params[2], sizeof(mpz_t));
-        memcpy(&ecc_pub.Gy, pub->params[3], sizeof(mpz_t));
-        memcpy(&ecc_pub.pubkey.x, pub->params[4], sizeof(mpz_t));
-        memcpy(&ecc_pub.pubkey.y, pub->params[5], sizeof(mpz_t));
-        memcpy(&ecc_pub.pubkey.z, pub->params[6], sizeof(mpz_t));
+        memcpy(&ecc_pub.A, pub->params[2], sizeof(mpz_t));
+        memcpy(&ecc_pub.Gx, pub->params[3], sizeof(mpz_t));
+        memcpy(&ecc_pub.Gy, pub->params[4], sizeof(mpz_t));
+        memcpy(&ecc_pub.pubkey.x, pub->params[5], sizeof(mpz_t));
+        memcpy(&ecc_pub.pubkey.y, pub->params[6], sizeof(mpz_t));
+        memcpy(&ecc_pub.pubkey.z, pub->params[7], sizeof(mpz_t));
 
         ecc_priv.type = PK_PRIVATE;
         memcpy(&ecc_priv.prime, priv->params[0], sizeof(mpz_t));
         memcpy(&ecc_priv.order, priv->params[1], sizeof(mpz_t));
-        memcpy(&ecc_priv.Gx, priv->params[2], sizeof(mpz_t));
-        memcpy(&ecc_priv.Gy, priv->params[3], sizeof(mpz_t));
-        memcpy(&ecc_priv.pubkey.x, priv->params[4], sizeof(mpz_t));
-        memcpy(&ecc_priv.pubkey.y, priv->params[5], sizeof(mpz_t));
-        memcpy(&ecc_priv.pubkey.z, priv->params[6], sizeof(mpz_t));
-        memcpy(&ecc_priv.k, priv->params[7], sizeof(mpz_t));
+        memcpy(&ecc_priv.A, priv->params[2], sizeof(mpz_t));
+        memcpy(&ecc_priv.Gx, priv->params[3], sizeof(mpz_t));
+        memcpy(&ecc_priv.Gy, priv->params[4], sizeof(mpz_t));
+        memcpy(&ecc_priv.pubkey.x, priv->params[5], sizeof(mpz_t));
+        memcpy(&ecc_priv.pubkey.y, priv->params[6], sizeof(mpz_t));
+        memcpy(&ecc_priv.pubkey.z, priv->params[7], sizeof(mpz_t));
+        memcpy(&ecc_priv.k, priv->params[8], sizeof(mpz_t));
 
         sz = ECC_BUF_SIZE;
         out->data = gnutls_malloc(sz);
@@ -694,6 +696,7 @@ rsa_fail:
         tls_ecc_set.order = st->order;
         tls_ecc_set.Gx = st->Gx;
         tls_ecc_set.Gy = st->Gy;
+        tls_ecc_set.A = st->A;
 
         ret = ecc_make_key(NULL, _int_random_func, &key, &tls_ecc_set);
         if (ret != 0)
@@ -714,12 +717,13 @@ rsa_fail:
 
         mpz_set(TOMPZ(params->params[0]), key.prime);
         mpz_set(TOMPZ(params->params[1]), key.order);
-        mpz_set(TOMPZ(params->params[2]), key.Gx);
-        mpz_set(TOMPZ(params->params[3]), key.Gy);
-        mpz_set(TOMPZ(params->params[4]), key.pubkey.x);
-        mpz_set(TOMPZ(params->params[5]), key.pubkey.y);
-        mpz_set(TOMPZ(params->params[6]), key.pubkey.z);
-        mpz_set(TOMPZ(params->params[7]), key.k);
+        mpz_set(TOMPZ(params->params[2]), key.A);
+        mpz_set(TOMPZ(params->params[3]), key.Gx);
+        mpz_set(TOMPZ(params->params[4]), key.Gy);
+        mpz_set(TOMPZ(params->params[5]), key.pubkey.x);
+        mpz_set(TOMPZ(params->params[6]), key.pubkey.y);
+        mpz_set(TOMPZ(params->params[7]), key.pubkey.z);
+        mpz_set(TOMPZ(params->params[8]), key.k);
         
 ecc_fail:
         ecc_free(&key);

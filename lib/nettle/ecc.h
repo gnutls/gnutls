@@ -30,6 +30,9 @@ typedef struct {
    /** The prime that defines the field the curve is in (encoded in hex) */
    const char *prime;
 
+   /** The fields A param (hex) */
+   const char *A;
+
    /** The fields B param (hex) */
    const char *B;
 
@@ -62,6 +65,7 @@ typedef struct {
 
     mpz_t prime;
     mpz_t order;
+    mpz_t A;
     mpz_t Gx;
     mpz_t Gy;
 
@@ -80,7 +84,7 @@ void ecc_sizes(int *low, int *high);
 int  ecc_get_size(ecc_key *key);
 
 int ecc_make_key(void *random_ctx, nettle_random_func random, ecc_key *key, const ltc_ecc_set_type *dp);
-int ecc_make_key_ex(void *random_ctx, nettle_random_func random, ecc_key *key, mpz_t prime, mpz_t order, mpz_t Gx, mpz_t Gy);
+int ecc_make_key_ex(void *random_ctx, nettle_random_func random, ecc_key *key, mpz_t prime, mpz_t order, mpz_t A, mpz_t Gx, mpz_t Gy);
 void ecc_free(ecc_key *key);
 
 int  ecc_shared_secret(ecc_key *private_key, ecc_key *public_key, 
@@ -101,13 +105,13 @@ int        ltc_ecc_is_valid_idx(int n);
 
 /* point ops (mp == montgomery digit) */
 /* R = 2P */
-int ltc_ecc_projective_dbl_point(ecc_point *P, ecc_point *R, mpz_t modulus);
+int ltc_ecc_projective_dbl_point(ecc_point *P, ecc_point *R, mpz_t a,  mpz_t modulus);
 
 /* R = P + Q */
-int ltc_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, mpz_t modulus);
+int ltc_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, mpz_t A, mpz_t modulus);
 
 /* R = kG */
-int ltc_ecc_mulmod(mpz_t k, ecc_point *G, ecc_point *R, mpz_t modulus, int map);
+int ltc_ecc_mulmod(mpz_t k, ecc_point *G, ecc_point *R, mpz_t a, mpz_t modulus, int map);
 
 /* map P to affine from projective */
 int ltc_ecc_map(ecc_point *P, mpz_t modulus);

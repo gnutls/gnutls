@@ -282,12 +282,13 @@ extern "C"
  * ECDH:
  *  [0] is prime
  *  [1] is order
- *  [2] is Gx
- *  [3] is Gy
- *  [4] is x
- *  [5] is y
- *  [6] is z
- *  [7] is k (private key)
+ *  [2] is A
+ *  [3] is Gx
+ *  [4] is Gy
+ *  [5] is x
+ *  [6] is y
+ *  [7] is z
+ *  [8] is k (private key)
  */
 
 /**

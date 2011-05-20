@@ -9,7 +9,7 @@
  * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 - 3x + b
+/* Implements ECC over Z/pZ for curve y^2 = x^3 - ax + b
  *
  * All curves taken from NIST recommendation paper of July 1999
  * Available at http://csrc.nist.gov/cryptval/dss.htm
@@ -19,7 +19,7 @@
 /**
   @file ltc_ecc_points.c
   ECC Crypto, Tom St Denis
-*/  
+*/
 
 #ifdef LTC_MECC
 
@@ -27,34 +27,38 @@
    Allocate a new ECC point
    @return A newly allocated point or NULL on error 
 */
-ecc_point *ltc_ecc_new_point(void)
+ecc_point *
+ltc_ecc_new_point (void)
 {
-   ecc_point *p;
-   p = calloc(1, sizeof(*p));
-   if (p == NULL) {
+  ecc_point *p;
+  p = calloc (1, sizeof (*p));
+  if (p == NULL)
+    {
       return NULL;
-   }
-   if (mp_init_multi(&p->x, &p->y, &p->z, NULL) != 0) {
-      free(p);
+    }
+  if (mp_init_multi (&p->x, &p->y, &p->z, NULL) != 0)
+    {
+      free (p);
       return NULL;
-   }
-   return p;
+    }
+  return p;
 }
 
 /** Free an ECC point from memory
   @param p   The point to free
 */
-void ltc_ecc_del_point(ecc_point *p)
+void
+ltc_ecc_del_point (ecc_point * p)
 {
-   /* prevents free'ing null arguments */
-   if (p != NULL) {
-      mp_clear_multi(&p->x, &p->y, &p->z, NULL); /* note: p->z may be NULL but that's ok with this function anyways */
-      free(p);
-   }
+  /* prevents free'ing null arguments */
+  if (p != NULL)
+    {
+      mp_clear_multi (&p->x, &p->y, &p->z, NULL);       /* note: p->z may be NULL but that's ok with this function anyways */
+      free (p);
+    }
 }
 
 #endif
 /* $Source: /cvs/libtom/libtomcrypt/src/pk/ecc/ltc_ecc_points.c,v $ */
 /* $Revision: 1.7 $ */
 /* $Date: 2007/05/12 14:32:35 $ */
-

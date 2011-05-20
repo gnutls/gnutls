@@ -78,7 +78,7 @@ typedef struct gnutls_pkcs7_int
 /* parameters should not be larger than this limit */
 #define DSA_PUBLIC_PARAMS 4
 #define RSA_PUBLIC_PARAMS 2
-#define ECDH_PUBLIC_PARAMS 7
+#define ECDH_PUBLIC_PARAMS 8
 
 
 #define MAX_PRIV_PARAMS_SIZE GNUTLS_MAX_PK_PARAMS       /* ok for RSA and DSA */
@@ -86,7 +86,7 @@ typedef struct gnutls_pkcs7_int
 /* parameters should not be larger than this limit */
 #define DSA_PRIVATE_PARAMS 5
 #define RSA_PRIVATE_PARAMS 8
-#define ECDH_PRIVATE_PARAMS 8
+#define ECDH_PRIVATE_PARAMS 9
 
 #if MAX_PRIV_PARAMS_SIZE - RSA_PRIVATE_PARAMS < 0
 #error INCREASE MAX_PRIV_PARAMS
