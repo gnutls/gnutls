@@ -52,7 +52,7 @@ ecc_test (void)
       return -1;
     }
 
-  for (i = 1; i <= 2; i++)
+  for (i = 1; i <= 3; i++)
     {
       const gnutls_ecc_curve_entry_st *st = _gnutls_ecc_curve_get_params (i);
 

@@ -218,6 +218,7 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
 static const int supported_ecc_default[] = {
   GNUTLS_ECC_CURVE_SECP256R1,
   GNUTLS_ECC_CURVE_SECP384R1,
+  GNUTLS_ECC_CURVE_SECP521R1,
   0
 };
 
