@@ -151,6 +151,8 @@ _gnutls_proc_ecdh_common_server_kx (gnutls_session_t session,
   if (ret < 0)
     return gnutls_assert_val(ret);
 
+  _gnutls_session_ecc_curve_set(session, curve);
+
   DECR_LEN (data_size, 1);
   point_size = data[i];
   i+=1;

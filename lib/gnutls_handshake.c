@@ -3344,6 +3344,15 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
           if (server)
             delete = check_server_params (session, kx, alg, alg_size);
         }
+       
+      /* If we have not agreed to a common curve with the peer don't bother
+       * negotiating ECDH.
+       */
+      if (session->security_parameters.entity == GNUTLS_SERVER && (kx == GNUTLS_KX_ANON_ECDH))
+        {
+          if (_gnutls_session_ecc_curve_get(session) == GNUTLS_ECC_CURVE_INVALID)
+            delete = 1;
+        }
 
       /* These two SRP kx's are marked to require a CRD_CERTIFICATE,
          (see cred_mappings in gnutls_algorithms.c), but it also

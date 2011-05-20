@@ -410,7 +410,8 @@ print_info (gnutls_session_t session, const char *hostname, int insecure)
     {
 #ifdef ENABLE_ANON
     case GNUTLS_CRD_ANON:
-      print_dh_info (session, "Anonymous ");
+      if (kx != GNUTLS_KX_ANON_ECDH)
+        print_dh_info (session, "Anonymous ");
       break;
 #endif
 #ifdef ENABLE_SRP
