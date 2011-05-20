@@ -26,6 +26,7 @@ AC_DEFUN([gl_EARLY],
   m4_pattern_allow([^gl_LIBOBJS$])dnl a variable
   m4_pattern_allow([^gl_LTLIBOBJS$])dnl a variable
   AC_REQUIRE([AC_PROG_RANLIB])
+  AC_REQUIRE([AM_PROG_CC_C_O])
   # Code from module alignof:
   # Code from module alloca:
   # Code from module alloca-opt:
@@ -39,17 +40,18 @@ AC_DEFUN([gl_EARLY],
   # Code from module c-ctype:
   # Code from module c-ctype-tests:
   # Code from module clock-time:
-  # Code from module close-hook:
   # Code from module crypto/hmac-md5:
   # Code from module crypto/hmac-md5-tests:
   # Code from module crypto/md5:
   # Code from module crypto/md5-tests:
   # Code from module errno:
   # Code from module errno-tests:
+  # Code from module error:
   # Code from module extensions:
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
   # Code from module fcntl-h:
   # Code from module fcntl-h-tests:
+  # Code from module fd-hook:
   # Code from module float:
   # Code from module fseeko:
   AC_REQUIRE([AC_FUNC_FSEEKO])
@@ -73,8 +75,14 @@ AC_DEFUN([gl_EARLY],
   # Code from module havelib:
   # Code from module include_next:
   # Code from module intprops:
+  # Code from module intprops-tests:
+  # Code from module inttypes:
+  # Code from module inttypes-incomplete:
+  # Code from module inttypes-tests:
   # Code from module lib-msvc-compat:
   # Code from module lib-symbol-versions:
+  # Code from module lock:
+  # Code from module lock-tests:
   # Code from module lseek:
   # Code from module malloc-posix:
   # Code from module manywarnings:
@@ -117,6 +125,10 @@ AC_DEFUN([gl_EARLY],
   # Code from module stdlib-tests:
   # Code from module strcase:
   # Code from module strdup-posix:
+  # Code from module strerror:
+  # Code from module strerror-tests:
+  # Code from module strerror_r-posix:
+  # Code from module strerror_r-posix-tests:
   # Code from module string:
   # Code from module string-tests:
   # Code from module strings:
@@ -129,6 +141,11 @@ AC_DEFUN([gl_EARLY],
   # Code from module sys_stat-tests:
   # Code from module sys_time:
   # Code from module sys_time-tests:
+  # Code from module sys_uio:
+  # Code from module sys_uio-tests:
+  # Code from module thread:
+  # Code from module threadlib:
+  gl_THREADLIB_EARLY
   # Code from module time:
   # Code from module time-tests:
   # Code from module time_r:
@@ -154,6 +171,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module wchar:
   # Code from module wchar-tests:
   # Code from module xsize:
+  # Code from module yield:
 ])
 
 # This macro should be invoked from ./configure.ac, in the section
@@ -170,176 +188,112 @@ AC_DEFUN([gl_INIT],
   m4_pushdef([gl_LIBSOURCES_DIR], [])
   gl_COMMON
   gl_source_base='gl'
-  # Code from module alignof:
-  # Code from module alloca:
 changequote(,)dnl
 LTALLOCA=`echo "$ALLOCA" | sed -e 's/\.[^.]* /.lo /g;s/\.[^.]*$/.lo/'`
 changequote([, ])dnl
 AC_SUBST([LTALLOCA])
-  # Code from module alloca-opt:
-  gl_FUNC_ALLOCA
-  # Code from module arg-nonnull:
-  # Code from module byteswap:
-  gl_BYTESWAP
-  # Code from module c++defs:
-  # Code from module c-ctype:
-  # Code from module clock-time:
-  gl_CLOCK_TIME
-  # Code from module close-hook:
-  # Code from module crypto/hmac-md5:
-  gl_HMAC_MD5
-  # Code from module crypto/md5:
-  gl_MD5
-  # Code from module errno:
-  gl_HEADER_ERRNO_H
-  # Code from module extensions:
-  # Code from module float:
-  gl_FLOAT_H
-  # Code from module fseeko:
-  gl_FUNC_FSEEKO
-  gl_STDIO_MODULE_INDICATOR([fseeko])
-  # Code from module ftello:
-  gl_FUNC_FTELLO
-  gl_STDIO_MODULE_INDICATOR([ftello])
-  # Code from module func:
-  gl_FUNC
-  # Code from module getdelim:
-  gl_FUNC_GETDELIM
-  gl_STDIO_MODULE_INDICATOR([getdelim])
-  # Code from module getline:
-  gl_FUNC_GETLINE
-  gl_STDIO_MODULE_INDICATOR([getline])
-  # Code from module getpass:
-  gl_FUNC_GETPASS
-  # Code from module gettext:
-  dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
-  AM_GNU_GETTEXT_VERSION([0.18.1])
-  # Code from module gettext-h:
-  AC_SUBST([LIBINTL])
-  AC_SUBST([LTLIBINTL])
-  # Code from module gettime:
-  gl_GETTIME
-  # Code from module gettimeofday:
-  gl_FUNC_GETTIMEOFDAY
-  gl_SYS_TIME_MODULE_INDICATOR([gettimeofday])
-  # Code from module havelib:
-  # Code from module include_next:
-  # Code from module lib-msvc-compat:
-  gl_LD_OUTPUT_DEF
-  # Code from module lib-symbol-versions:
-  gl_LD_VERSION_SCRIPT
-  # Code from module lseek:
-  gl_FUNC_LSEEK
-  gl_UNISTD_MODULE_INDICATOR([lseek])
-  # Code from module malloc-posix:
-  gl_FUNC_MALLOC_POSIX
-  gl_STDLIB_MODULE_INDICATOR([malloc-posix])
-  # Code from module manywarnings:
-  # Code from module memchr:
-  gl_FUNC_MEMCHR
-  gl_STRING_MODULE_INDICATOR([memchr])
-  # Code from module memmem-simple:
-  gl_FUNC_MEMMEM_SIMPLE
-  gl_STRING_MODULE_INDICATOR([memmem])
-  # Code from module memxor:
-  gl_MEMXOR
-  # Code from module minmax:
-  gl_MINMAX
-  # Code from module multiarch:
-  gl_MULTIARCH
-  # Code from module netdb:
-  gl_HEADER_NETDB
-  # Code from module netinet_in:
-  gl_HEADER_NETINET_IN
-  AC_PROG_MKDIR_P
-  # Code from module progname:
-  AC_CHECK_DECLS([program_invocation_name], [], [], [#include <errno.h>])
-  AC_CHECK_DECLS([program_invocation_short_name], [], [], [#include <errno.h>])
-  # Code from module read-file:
-  gl_FUNC_READ_FILE
-  # Code from module realloc-posix:
-  gl_FUNC_REALLOC_POSIX
-  gl_STDLIB_MODULE_INDICATOR([realloc-posix])
-  # Code from module size_max:
-  gl_SIZE_MAX
-  # Code from module snprintf:
-  gl_FUNC_SNPRINTF
-  gl_STDIO_MODULE_INDICATOR([snprintf])
-  gl_MODULE_INDICATOR([snprintf])
-  # Code from module socketlib:
-  gl_SOCKETLIB
-  # Code from module sockets:
-  gl_SOCKETS
-  # Code from module socklen:
-  gl_TYPE_SOCKLEN_T
-  # Code from module stdarg:
-  gl_STDARG_H
-  # Code from module stdbool:
-  AM_STDBOOL_H
-  # Code from module stddef:
-  gl_STDDEF_H
-  # Code from module stdint:
-  gl_STDINT_H
-  # Code from module stdio:
-  gl_STDIO_H
-  # Code from module stdlib:
-  gl_STDLIB_H
-  # Code from module strcase:
-  gl_STRCASE
-  # Code from module strdup-posix:
-  gl_FUNC_STRDUP_POSIX
-  gl_STRING_MODULE_INDICATOR([strdup])
-  # Code from module string:
-  gl_HEADER_STRING_H
-  # Code from module strings:
-  gl_HEADER_STRINGS_H
-  # Code from module strverscmp:
-  gl_FUNC_STRVERSCMP
-  gl_STRING_MODULE_INDICATOR([strverscmp])
-  # Code from module sys_socket:
-  gl_HEADER_SYS_SOCKET
-  AC_PROG_MKDIR_P
-  # Code from module sys_stat:
-  gl_HEADER_SYS_STAT_H
-  AC_PROG_MKDIR_P
-  # Code from module sys_time:
-  gl_HEADER_SYS_TIME_H
-  AC_PROG_MKDIR_P
-  # Code from module time:
-  gl_HEADER_TIME_H
-  # Code from module time_r:
-  gl_TIME_R
-  gl_TIME_MODULE_INDICATOR([time_r])
-  # Code from module timespec:
-  gl_TIMESPEC
-  # Code from module u64:
-  AC_REQUIRE([AC_C_INLINE])
-  # Code from module unistd:
-  gl_UNISTD_H
-  # Code from module valgrind-tests:
-  gl_VALGRIND_TESTS
-  # Code from module vasnprintf:
-  gl_FUNC_VASNPRINTF
-  # Code from module vasprintf:
-  gl_FUNC_VASPRINTF
-  gl_STDIO_MODULE_INDICATOR([vasprintf])
-  m4_ifdef([AM_XGETTEXT_OPTION],
-    [AM_][XGETTEXT_OPTION([--flag=asprintf:2:c-format])
-     AM_][XGETTEXT_OPTION([--flag=vasprintf:2:c-format])])
-  # Code from module verify:
-  # Code from module version-etc:
-  gl_VERSION_ETC
-  # Code from module version-etc-fsf:
-  # Code from module vsnprintf:
-  gl_FUNC_VSNPRINTF
-  gl_STDIO_MODULE_INDICATOR([vsnprintf])
-  # Code from module warn-on-use:
-  # Code from module warnings:
-  AC_SUBST([WARN_CFLAGS])
-  # Code from module wchar:
-  gl_WCHAR_H
-  # Code from module xsize:
-  gl_XSIZE
+gl_FUNC_ALLOCA
+gl_BYTESWAP
+gl_CLOCK_TIME
+gl_HMAC_MD5
+gl_MD5
+gl_HEADER_ERRNO_H
+gl_ERROR
+m4_ifdef([AM_XGETTEXT_OPTION],
+  [AM_][XGETTEXT_OPTION([--flag=error:3:c-format])
+   AM_][XGETTEXT_OPTION([--flag=error_at_line:5:c-format])])
+gl_FLOAT_H
+gl_FUNC_FSEEKO
+gl_STDIO_MODULE_INDICATOR([fseeko])
+gl_FUNC_FTELLO
+gl_STDIO_MODULE_INDICATOR([ftello])
+gl_FUNC
+gl_FUNC_GETDELIM
+gl_STDIO_MODULE_INDICATOR([getdelim])
+gl_FUNC_GETLINE
+gl_STDIO_MODULE_INDICATOR([getline])
+gl_FUNC_GETPASS
+dnl you must add AM_GNU_GETTEXT([external]) or similar to configure.ac.
+AM_GNU_GETTEXT_VERSION([0.18.1])
+AC_SUBST([LIBINTL])
+AC_SUBST([LTLIBINTL])
+gl_GETTIME
+gl_FUNC_GETTIMEOFDAY
+gl_SYS_TIME_MODULE_INDICATOR([gettimeofday])
+gl_LD_OUTPUT_DEF
+gl_LD_VERSION_SCRIPT
+gl_LOCK
+gl_FUNC_LSEEK
+gl_UNISTD_MODULE_INDICATOR([lseek])
+gl_FUNC_MALLOC_POSIX
+gl_STDLIB_MODULE_INDICATOR([malloc-posix])
+gl_FUNC_MEMCHR
+gl_STRING_MODULE_INDICATOR([memchr])
+gl_FUNC_MEMMEM_SIMPLE
+gl_STRING_MODULE_INDICATOR([memmem])
+gl_MEMXOR
+gl_MINMAX
+gl_MULTIARCH
+gl_HEADER_NETDB
+gl_HEADER_NETINET_IN
+AC_PROG_MKDIR_P
+AC_CHECK_DECLS([program_invocation_name], [], [], [#include <errno.h>])
+AC_CHECK_DECLS([program_invocation_short_name], [], [], [#include <errno.h>])
+gl_FUNC_READ_FILE
+gl_FUNC_REALLOC_POSIX
+gl_STDLIB_MODULE_INDICATOR([realloc-posix])
+gl_SIZE_MAX
+gl_FUNC_SNPRINTF
+gl_STDIO_MODULE_INDICATOR([snprintf])
+gl_MODULE_INDICATOR([snprintf])
+gl_SOCKETLIB
+gl_SOCKETS
+gl_TYPE_SOCKLEN_T
+gl_STDARG_H
+AM_STDBOOL_H
+gl_STDDEF_H
+gl_STDINT_H
+gl_STDIO_H
+gl_STDLIB_H
+gl_STRCASE
+gl_FUNC_STRDUP_POSIX
+gl_STRING_MODULE_INDICATOR([strdup])
+gl_FUNC_STRERROR
+gl_STRING_MODULE_INDICATOR([strerror])
+gl_FUNC_STRERROR_R
+gl_STRING_MODULE_INDICATOR([strerror_r])
+gl_HEADER_STRING_H
+gl_HEADER_STRINGS_H
+gl_FUNC_STRVERSCMP
+gl_STRING_MODULE_INDICATOR([strverscmp])
+gl_HEADER_SYS_SOCKET
+AC_PROG_MKDIR_P
+gl_HEADER_SYS_STAT_H
+AC_PROG_MKDIR_P
+gl_HEADER_SYS_TIME_H
+AC_PROG_MKDIR_P
+gl_HEADER_SYS_UIO
+AC_PROG_MKDIR_P
+gl_THREADLIB
+gl_HEADER_TIME_H
+gl_TIME_R
+gl_TIME_MODULE_INDICATOR([time_r])
+gl_TIMESPEC
+AC_REQUIRE([AC_C_INLINE])
+gl_UNISTD_H
+gl_VALGRIND_TESTS
+gl_FUNC_VASNPRINTF
+gl_FUNC_VASPRINTF
+gl_STDIO_MODULE_INDICATOR([vasprintf])
+m4_ifdef([AM_XGETTEXT_OPTION],
+  [AM_][XGETTEXT_OPTION([--flag=asprintf:2:c-format])
+   AM_][XGETTEXT_OPTION([--flag=vasprintf:2:c-format])])
+gl_VERSION_ETC
+gl_FUNC_VSNPRINTF
+gl_STDIO_MODULE_INDICATOR([vsnprintf])
+AC_SUBST([WARN_CFLAGS])
+gl_WCHAR_H
+gl_XSIZE
   # End of code from modules
   m4_ifval(gl_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([gl_LIBSOURCES_DIR])[ ||
@@ -386,19 +340,23 @@ changequote([, ])dnl
   AC_SUBST([gltests_WITNESS])
   gl_module_indicator_condition=$gltests_WITNESS
   m4_pushdef([gl_MODULE_INDICATOR_CONDITION], [$gl_module_indicator_condition])
-  gl_FCNTL_H
-  gl_FUNC_UNGETC_WORKS
-  gl_FUNC_UNGETC_WORKS
-  gl_FUNC_GETPAGESIZE
-  gl_UNISTD_MODULE_INDICATOR([getpagesize])
-  dnl Check for prerequisites for memory fence checks.
-  gl_FUNC_MMAP_ANON
-  AC_CHECK_HEADERS_ONCE([sys/mman.h])
-  AC_CHECK_FUNCS_ONCE([mprotect])
-  gt_TYPE_WCHAR_T
-  gt_TYPE_WINT_T
-  AC_CHECK_FUNCS_ONCE([shutdown])
-  gl_VALGRIND_TESTS
+gl_FCNTL_H
+gl_FUNC_UNGETC_WORKS
+gl_FUNC_UNGETC_WORKS
+gl_FUNC_GETPAGESIZE
+gl_UNISTD_MODULE_INDICATOR([getpagesize])
+gl_INTTYPES_H
+gl_INTTYPES_INCOMPLETE
+dnl Check for prerequisites for memory fence checks.
+gl_FUNC_MMAP_ANON
+AC_CHECK_HEADERS_ONCE([sys/mman.h])
+AC_CHECK_FUNCS_ONCE([mprotect])
+gt_TYPE_WCHAR_T
+gt_TYPE_WINT_T
+AC_CHECK_FUNCS_ONCE([shutdown])
+gl_THREAD
+gl_VALGRIND_TESTS
+gl_YIELD
   m4_popdef([gl_MODULE_INDICATOR_CONDITION])
   m4_ifval(gltests_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([gltests_LIBSOURCES_DIR])[ ||
@@ -503,9 +461,11 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/byteswap.in.h
   lib/c-ctype.c
   lib/c-ctype.h
-  lib/close-hook.c
-  lib/close-hook.h
   lib/errno.in.h
+  lib/error.c
+  lib/error.h
+  lib/fd-hook.c
+  lib/fd-hook.h
   lib/float+.h
   lib/float.in.h
   lib/fseeko.c
@@ -517,8 +477,12 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/gettext.h
   lib/gettime.c
   lib/gettimeofday.c
+  lib/glthread/lock.c
+  lib/glthread/lock.h
+  lib/glthread/threadlib.c
   lib/hmac-md5.c
   lib/hmac.h
+  lib/intprops.h
   lib/lseek.c
   lib/malloc.c
   lib/md5.c
@@ -554,6 +518,9 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/str-two-way.h
   lib/strcasecmp.c
   lib/strdup.c
+  lib/strerror-impl.h
+  lib/strerror.c
+  lib/strerror_r.c
   lib/string.in.h
   lib/strings.in.h
   lib/strncasecmp.c
@@ -561,6 +528,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/sys_socket.in.h
   lib/sys_stat.in.h
   lib/sys_time.in.h
+  lib/sys_uio.in.h
   lib/time.in.h
   lib/time_r.c
   lib/timespec.h
@@ -583,6 +551,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/clock_time.m4
   m4/codeset.m4
   m4/errno_h.m4
+  m4/error.m4
   m4/extensions.m4
   m4/fcntl-o.m4
   m4/fcntl_h.m4
@@ -610,6 +579,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/intmax.m4
   m4/intmax_t.m4
   m4/inttypes-pri.m4
+  m4/inttypes.m4
   m4/inttypes_h.m4
   m4/lcmessage.m4
   m4/ld-output-def.m4
@@ -653,12 +623,16 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/stdlib_h.m4
   m4/strcase.m4
   m4/strdup.m4
+  m4/strerror.m4
+  m4/strerror_r.m4
   m4/string_h.m4
   m4/strings_h.m4
   m4/strverscmp.m4
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
   m4/sys_time_h.m4
+  m4/sys_uio_h.m4
+  m4/thread.m4
   m4/threadlib.m4
   m4/time_h.m4
   m4/time_r.m4
@@ -678,6 +652,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
+  m4/yield.m4
   tests/init.sh
   tests/macros.h
   tests/signature.h
@@ -700,6 +675,9 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-getline.c
   tests/test-gettimeofday.c
   tests/test-hmac-md5.c
+  tests/test-intprops.c
+  tests/test-inttypes.c
+  tests/test-lock.c
   tests/test-md5.c
   tests/test-memchr.c
   tests/test-netdb.c
@@ -712,12 +690,15 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-stdint.c
   tests/test-stdio.c
   tests/test-stdlib.c
+  tests/test-strerror.c
+  tests/test-strerror_r.c
   tests/test-string.c
   tests/test-strings.c
   tests/test-strverscmp.c
   tests/test-sys_socket.c
   tests/test-sys_stat.c
   tests/test-sys_time.c
+  tests/test-sys_uio.c
   tests/test-sys_wait.h
   tests/test-time.c
   tests/test-u64.c
@@ -732,8 +713,10 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-wchar.c
   tests/zerosize-ptr.h
   tests=lib/binary-io.h
-  tests=lib/dummy.c
   tests=lib/fcntl.in.h
   tests=lib/getpagesize.c
-  tests=lib/intprops.h
+  tests=lib/glthread/thread.c
+  tests=lib/glthread/thread.h
+  tests=lib/glthread/yield.h
+  tests=lib/inttypes.in.h
 ])
