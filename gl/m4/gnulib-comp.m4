@@ -26,7 +26,6 @@ AC_DEFUN([gl_EARLY],
   m4_pattern_allow([^gl_LIBOBJS$])dnl a variable
   m4_pattern_allow([^gl_LTLIBOBJS$])dnl a variable
   AC_REQUIRE([AC_PROG_RANLIB])
-  AC_REQUIRE([AM_PROG_CC_C_O])
   # Code from module alignof:
   # Code from module alloca:
   # Code from module alloca-opt:
@@ -81,8 +80,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module inttypes-tests:
   # Code from module lib-msvc-compat:
   # Code from module lib-symbol-versions:
-  # Code from module lock:
-  # Code from module lock-tests:
   # Code from module lseek:
   # Code from module malloc-posix:
   # Code from module manywarnings:
@@ -127,8 +124,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module strdup-posix:
   # Code from module strerror:
   # Code from module strerror-tests:
-  # Code from module strerror_r-posix:
-  # Code from module strerror_r-posix-tests:
   # Code from module string:
   # Code from module string-tests:
   # Code from module strings:
@@ -143,9 +138,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module sys_time-tests:
   # Code from module sys_uio:
   # Code from module sys_uio-tests:
-  # Code from module thread:
-  # Code from module threadlib:
-  gl_THREADLIB_EARLY
   # Code from module time:
   # Code from module time-tests:
   # Code from module time_r:
@@ -171,7 +163,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module wchar:
   # Code from module wchar-tests:
   # Code from module xsize:
-  # Code from module yield:
 ])
 
 # This macro should be invoked from ./configure.ac, in the section
@@ -222,7 +213,6 @@ gl_FUNC_GETTIMEOFDAY
 gl_SYS_TIME_MODULE_INDICATOR([gettimeofday])
 gl_LD_OUTPUT_DEF
 gl_LD_VERSION_SCRIPT
-gl_LOCK
 gl_FUNC_LSEEK
 gl_UNISTD_MODULE_INDICATOR([lseek])
 gl_FUNC_MALLOC_POSIX
@@ -260,8 +250,6 @@ gl_FUNC_STRDUP_POSIX
 gl_STRING_MODULE_INDICATOR([strdup])
 gl_FUNC_STRERROR
 gl_STRING_MODULE_INDICATOR([strerror])
-gl_FUNC_STRERROR_R
-gl_STRING_MODULE_INDICATOR([strerror_r])
 gl_HEADER_STRING_H
 gl_HEADER_STRINGS_H
 gl_FUNC_STRVERSCMP
@@ -274,7 +262,6 @@ gl_HEADER_SYS_TIME_H
 AC_PROG_MKDIR_P
 gl_HEADER_SYS_UIO
 AC_PROG_MKDIR_P
-gl_THREADLIB
 gl_HEADER_TIME_H
 gl_TIME_R
 gl_TIME_MODULE_INDICATOR([time_r])
@@ -354,9 +341,7 @@ AC_CHECK_FUNCS_ONCE([mprotect])
 gt_TYPE_WCHAR_T
 gt_TYPE_WINT_T
 AC_CHECK_FUNCS_ONCE([shutdown])
-gl_THREAD
 gl_VALGRIND_TESTS
-gl_YIELD
   m4_popdef([gl_MODULE_INDICATOR_CONDITION])
   m4_ifval(gltests_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([gltests_LIBSOURCES_DIR])[ ||
@@ -477,9 +462,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/gettext.h
   lib/gettime.c
   lib/gettimeofday.c
-  lib/glthread/lock.c
-  lib/glthread/lock.h
-  lib/glthread/threadlib.c
   lib/hmac-md5.c
   lib/hmac.h
   lib/intprops.h
@@ -518,9 +500,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/str-two-way.h
   lib/strcasecmp.c
   lib/strdup.c
-  lib/strerror-impl.h
   lib/strerror.c
-  lib/strerror_r.c
   lib/string.in.h
   lib/strings.in.h
   lib/strncasecmp.c
@@ -624,7 +604,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/strcase.m4
   m4/strdup.m4
   m4/strerror.m4
-  m4/strerror_r.m4
   m4/string_h.m4
   m4/strings_h.m4
   m4/strverscmp.m4
@@ -632,7 +611,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/sys_stat_h.m4
   m4/sys_time_h.m4
   m4/sys_uio_h.m4
-  m4/thread.m4
   m4/threadlib.m4
   m4/time_h.m4
   m4/time_r.m4
@@ -652,7 +630,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
-  m4/yield.m4
   tests/init.sh
   tests/macros.h
   tests/signature.h
@@ -677,7 +654,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-hmac-md5.c
   tests/test-intprops.c
   tests/test-inttypes.c
-  tests/test-lock.c
   tests/test-md5.c
   tests/test-memchr.c
   tests/test-netdb.c
@@ -691,7 +667,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-stdio.c
   tests/test-stdlib.c
   tests/test-strerror.c
-  tests/test-strerror_r.c
   tests/test-string.c
   tests/test-strings.c
   tests/test-strverscmp.c
@@ -713,10 +688,8 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-wchar.c
   tests/zerosize-ptr.h
   tests=lib/binary-io.h
+  tests=lib/dummy.c
   tests=lib/fcntl.in.h
   tests=lib/getpagesize.c
-  tests=lib/glthread/thread.c
-  tests=lib/glthread/thread.h
-  tests=lib/glthread/yield.h
   tests=lib/inttypes.in.h
 ])

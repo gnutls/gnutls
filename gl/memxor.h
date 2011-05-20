@@ -26,6 +26,6 @@
 /* Compute binary exclusive OR of memory areas DEST and SRC, putting
    the result in DEST, of length N bytes.  Returns a pointer to
    DEST. */
-void *gl_memxor (void *restrict dest, const void *restrict src, size_t n);
+void *memxor (void *restrict dest, const void *restrict src, size_t n);
 
 #endif /* MEMXOR_H */
