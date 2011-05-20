@@ -69,7 +69,7 @@ glimport:
 	--import crypto/hmac-md5 crypto/md5 extensions havelib lib-msvc-compat lib-symbol-versions \
 	byteswap c-ctype func gettext lib-msvc-compat lib-symbol-versions memmem-simple minmax \
 	netdb read-file snprintf sockets socklen stdint strcase strverscmp sys_socket sys_stat time_r unistd \
-	vasprintf vsnprintf manywarnings warnings netinet_in alloca getpass u64
+	vasprintf vsnprintf manywarnings warnings netinet_in alloca getpass u64 error
 	gnulib-tool --m4-base gl/m4 --tests-base=gl/tests --libtool \
 	--dir=. --local-dir=gl/override --lib=libgnu --source-base=gl \
 	--aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lseek-tests \
