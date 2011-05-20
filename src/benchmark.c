@@ -1,235 +1,123 @@
-/*
- * Copyright (C) 2009, 2010  Free Software Foundation, Inc.
- *
- * This file is part of GnuTLS.
- *
- * GnuTLS is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * GnuTLS is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see
- * <http://www.gnu.org/licenses/>.
- *
- * Written by Nikos Mavrogiannopoulos <nmav@gnutls.org>.
- */
-
-#include <config.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <gnutls/gnutls.h>
-#include <gnutls/crypto.h>
-#include <time.h>
 #include <signal.h>
-#include "timespec.h"           /* gnulib gettime */
+#include <sys/time.h>
+#include <time.h>
+#include <unistd.h>
 #include "benchmark.h"
 
-static unsigned char data[64 * 1024];
+int benchmark_must_finish = 0;
 
-
-static void
-tls_log_func (int level, const char *str)
+#if defined(_WIN32)
+#include <windows.h>
+DWORD WINAPI
+alarm_handler (LPVOID lpParameter)
 {
-  fprintf (stderr, "|<%d>| %s", level, str);
-}
-
-static void
-cipher_mac_bench (int algo, int mac_algo, int size)
-{
-  int ret;
-  gnutls_cipher_hd_t ctx;
-  gnutls_hmac_hd_t mac_ctx;
-  void *_key, *_iv;
-  gnutls_datum_t key, iv;
-  int blocksize = gnutls_cipher_get_block_size (algo);
-  int keysize = gnutls_cipher_get_key_size (algo);
-  int step = size*1024;
-  struct benchmark_st st;
-
-  _key = malloc (keysize);
-  if (_key == NULL)
-    return;
-  memset (_key, 0xf0, keysize);
-
-  _iv = malloc (blocksize);
-  if (_iv == NULL)
-    return;
-  memset (_iv, 0xf0, blocksize);
-
-  iv.data = _iv;
-  iv.size = blocksize;
-
-  key.data = _key;
-  key.size = keysize;
-
-  printf ("Checking %s with %s (%dkb payload)... ", gnutls_cipher_get_name (algo),
-      gnutls_mac_get_name(mac_algo), size);
-  fflush (stdout);
-
-  start_benchmark(&st);
-
-  ret = gnutls_hmac_init(&mac_ctx, mac_algo, key.data, key.size);
-  if (ret < 0)
-    {
-      fprintf (stderr, "error: %s\n", gnutls_strerror (ret));
-      goto leave;
-    }
-
-  ret = gnutls_cipher_init (&ctx, algo, &key, &iv);
-  if (ret < 0)
-    {
-      fprintf (stderr, "error: %s\n", gnutls_strerror (ret));
-      goto leave;
-    }
-
-  gnutls_hmac(mac_ctx, data, 1024);
-
-  do
-    {
-      gnutls_hmac(mac_ctx, data, step);
-      gnutls_cipher_encrypt (ctx, data, step);
-      st.size += step;
-    }
-  while (benchmark_must_finish == 0);
-
-  gnutls_cipher_deinit (ctx);
-  gnutls_hmac_deinit(mac_ctx, NULL);
-
-  stop_benchmark (&st);
-
-leave:
-  free (_key);
-  free (_iv);
-
-}
-
-
-static void
-cipher_bench (int algo, int size, int aead)
-{
-  int ret;
-  gnutls_cipher_hd_t ctx;
-  void *_key, *_iv;
-  gnutls_datum_t key, iv;
-  int blocksize = gnutls_cipher_get_block_size (algo);
-  int keysize = gnutls_cipher_get_key_size (algo);
-  int step = size*1024;
-  struct benchmark_st st;
-
-  _key = malloc (keysize);
-  if (_key == NULL)
-    return;
-  memset (_key, 0xf0, keysize);
-
-  _iv = malloc (blocksize);
-  if (_iv == NULL)
-    return;
-  memset (_iv, 0xf0, blocksize);
-
-  iv.data = _iv;
-  if (aead) iv.size = 12;
-  else iv.size = blocksize;
-
-  key.data = _key;
-  key.size = keysize;
-
-  printf ("Checking %s (%dkb payload)... ", gnutls_cipher_get_name (algo),
-          size);
-  fflush (stdout);
-
-  start_benchmark(&st);
-
-  ret = gnutls_cipher_init (&ctx, algo, &key, &iv);
-  if (ret < 0)
-    {
-      fprintf (stderr, "error: %s\n", gnutls_strerror (ret));
-      goto leave;
-    }
-
-  if (aead)
-    gnutls_cipher_add_auth (ctx, data, 1024);
-
-  do
-    {
-      gnutls_cipher_encrypt (ctx, data, step);
-      st.size += step;
-    }
-  while (benchmark_must_finish == 0);
-
-  gnutls_cipher_deinit (ctx);
-
-  stop_benchmark(&st);
-
-leave:
-  free (_key);
-  free (_iv);
-}
-
-static void
-mac_bench (int algo, int size)
-{
-  void *_key;
-  int blocksize = gnutls_hmac_get_len (algo);
-  int step = size*1024;
-  struct benchmark_st st;
-  
-  _key = malloc (blocksize);
-  if (_key == NULL)
-    return;
-  memset (_key, 0xf0, blocksize);
-
-  printf ("Checking %s (%dkb payload)... ", gnutls_mac_get_name (algo), size);
-  fflush (stdout);
-
-  start_benchmark(&st);
-
-  do
-    {
-      gnutls_hmac_fast (algo, _key, blocksize, data, step, _key);
-      st.size += step;
-    }
-  while (benchmark_must_finish == 0);
-
-  stop_benchmark(&st);
-
-  free (_key);
-}
-
-int
-main (int argc, char **argv)
-{
-  int debug_level = 0;
-
-  if (argc > 1)
-    debug_level = 2;
-
-  gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (debug_level);
-  gnutls_global_init ();
-
-  gnutls_rnd( GNUTLS_RND_NONCE, data, sizeof(data));
-
-  cipher_bench ( GNUTLS_CIPHER_AES_128_GCM, 16, 1);
-  cipher_mac_bench ( GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA256, 16);
-  cipher_mac_bench ( GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA1, 16);
-
-  mac_bench (GNUTLS_MAC_SHA1, 16);
-
-  mac_bench (GNUTLS_MAC_SHA256, 16);
-
-  cipher_bench (GNUTLS_CIPHER_3DES_CBC, 16, 0);
-
-  cipher_bench (GNUTLS_CIPHER_AES_128_CBC, 16, 0);
-
-  cipher_bench (GNUTLS_CIPHER_ARCFOUR, 16, 0);
-
+  HANDLE wtimer = *((HANDLE *) lpParameter);
+  WaitForSingleObject (wtimer, INFINITE);
+  benchmark_must_finish = 1;
   return 0;
+}
+#else
+static void
+alarm_handler (int signo)
+{
+  benchmark_must_finish = 1;
+}
+#endif
+
+static void
+value2human (unsigned long bytes, double time, double *data, double *speed,
+             char *metric)
+{
+  if (bytes > 1000 && bytes < 1000 * 1000)
+    {
+      *data = ((double) bytes) / 1000;
+      *speed = *data / time;
+      strcpy (metric, "Kb");
+      return;
+    }
+  else if (bytes >= 1000 * 1000 && bytes < 1000 * 1000 * 1000)
+    {
+      *data = ((double) bytes) / (1000 * 1000);
+      *speed = *data / time;
+      strcpy (metric, "Mb");
+      return;
+    }
+  else if (bytes >= 1000 * 1000 * 1000)
+    {
+      *data = ((double) bytes) / (1000 * 1000 * 1000);
+      *speed = *data / time;
+      strcpy (metric, "Gb");
+      return;
+    }
+  else
+    {
+      *data = (double) bytes;
+      *speed = *data / time;
+      strcpy (metric, "bytes");
+      return;
+    }
+}
+
+void start_benchmark(struct benchmark_st * st)
+{
+  memset(st, 0, sizeof(st));
+  st->old_handler = signal (SIGALRM, alarm_handler);
+  gettime (&st->start);
+
+#if defined(_WIN32)
+  st->wtimer = CreateWaitableTimer (NULL, TRUE, NULL);
+  if (st->wtimer == NULL)
+    {
+      fprintf (stderr, "error: CreateWaitableTimer %u\n", GetLastError ());
+      exit(1);
+    }
+  st->wthread = CreateThread (NULL, 0, alarm_handler, &st->wtimer, 0, NULL);
+  if (st->wthread == NULL)
+    {
+      fprintf (stderr, "error: CreateThread %u\n", GetLastError ());
+      exit(1);
+    }
+  alarm_timeout.QuadPart = (5) * 10000000;
+  if (SetWaitableTimer (st->wtimer, &alarm_timeout, 0, NULL, NULL, FALSE) == 0)
+    {
+      fprintf (stderr, "error: SetWaitableTimer %u\n", GetLastError ());
+      exit(1);
+    }
+  }
+#else
+  alarm (5);
+#endif
+  
+}
+
+/* returns the elapsed time */
+double stop_benchmark(struct benchmark_st * st)
+{
+  double secs;
+  struct timespec stop;
+  double dspeed, ddata;
+  char metric[16];
+
+#if defined(_WIN32)
+  if (st->wtimer != NULL)
+    CloseHandle (st->wtimer);
+  if (st->wthread != NULL)
+    CloseHandle (st->wthread);
+#else
+  signal(SIGALRM, st->old_handler);
+#endif
+
+  gettime (&stop);
+
+  secs = (stop.tv_sec * 1000 + stop.tv_nsec / (1000 * 1000) -
+          (st->start.tv_sec * 1000 + st->start.tv_nsec / (1000 * 1000)));
+  secs /= 1000;
+
+  value2human (st->size, secs, &ddata, &dspeed, metric);
+  printf ("Processed %.2f %s in %.2f secs: ", ddata, metric, secs);
+  printf ("%.2f %s/sec\n", dspeed, metric);
+
+  return secs;
 }
