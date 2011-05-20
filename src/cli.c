@@ -719,6 +719,7 @@ main (int argc, char **argv)
   ssize_t bytes;
 
   set_program_name (argv[0]);
+  gaa_parser (argc, argv);
 
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (info.debug);
@@ -730,7 +731,6 @@ main (int argc, char **argv)
     }
 
   pkcs11_common ();
-  gaa_parser (argc, argv);
   if (hostname == NULL)
     {
       fprintf (stderr, "No hostname given\n");
