@@ -270,9 +270,11 @@ main (int argc, char **argv)
     }
   gnutls_global_init ();
 
+  printf("Testing key exchanges:\n");
   test_ciphersuite_kx (PRIO_DH);
   test_ciphersuite_kx (PRIO_ECDH);
 
+  printf("\nTesting throughput in cipher/MAC combinations:\n");
   test_ciphersuite (PRIO_AES_CBC_SHA1, 1024);
   test_ciphersuite (PRIO_AES_CBC_SHA1, 4096);
   test_ciphersuite (PRIO_AES_CBC_SHA1, 8*1024);
