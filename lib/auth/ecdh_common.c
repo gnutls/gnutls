@@ -39,7 +39,7 @@
 #include <auth/ecdh_common.h>
 #include <gnutls_ecc.h>
 #include <ext/ecc.h>
-#include <gnutls_algorithms.h>
+#include <algorithms.h>
 #include <auth/psk.h>
 #include <gnutls_pk.h>
 

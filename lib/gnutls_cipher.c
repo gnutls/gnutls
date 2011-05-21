@@ -31,7 +31,7 @@
 #include "gnutls_errors.h"
 #include "gnutls_compress.h"
 #include "gnutls_cipher.h"
-#include "gnutls_algorithms.h"
+#include "algorithms.h"
 #include "gnutls_hash_int.h"
 #include "gnutls_cipher_int.h"
 #include "debug.h"

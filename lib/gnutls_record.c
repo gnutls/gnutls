@@ -36,7 +36,7 @@
 #include "gnutls_handshake.h"
 #include "gnutls_hash_int.h"
 #include "gnutls_cipher_int.h"
-#include "gnutls_algorithms.h"
+#include "algorithms.h"
 #include "gnutls_db.h"
 #include "gnutls_auth.h"
 #include "gnutls_num.h"

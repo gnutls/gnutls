@@ -37,7 +37,7 @@
 #include "gnutls_datum.h"
 #include "ext/signature.h"
 #include <gnutls_pk.h>
-#include <gnutls_algorithms.h>
+#include <algorithms.h>
 #include <gnutls_global.h>
 #include <gnutls_record.h>
 #include <gnutls_sig.h>

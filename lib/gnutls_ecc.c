@@ -28,7 +28,7 @@
 #include <gnutls_int.h>
 #include <gnutls_mpi.h>
 #include <gnutls_ecc.h>
-#include <gnutls_algorithms.h>
+#include <algorithms.h>
 #include <gnutls_errors.h>
 
 int _gnutls_ecc_ansi_x963_export(ecc_curve_t curve, bigint_t x, bigint_t y, gnutls_datum_t * out)

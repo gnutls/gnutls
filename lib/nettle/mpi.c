@@ -28,7 +28,7 @@
 
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
-#include <gnutls_algorithms.h>
+#include <algorithms.h>
 #include <gnutls_num.h>
 #include <gnutls_mpi.h>
 #include <gmp.h>

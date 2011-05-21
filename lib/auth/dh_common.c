@@ -38,7 +38,7 @@
 #include <gnutls_x509.h>
 #include <gnutls_state.h>
 #include <auth/dh_common.h>
-#include <gnutls_algorithms.h>
+#include <algorithms.h>
 #include <auth/psk.h>
 
 /* Frees the dh_info_st structure.

@@ -31,7 +31,7 @@
 #include "gnutls_compress.h"
 #include "gnutls_errors.h"
 #include "gnutls_constate.h"
-#include <gnutls_algorithms.h>
+#include <algorithms.h>
 #include <gnutls/gnutls.h>
 
 /* These functions allocate the return value internally

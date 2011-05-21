@@ -28,7 +28,7 @@
 #include <gnutls_datum.h>
 #include <gnutls/crypto.h>
 #include <crypto.h>
-#include <gnutls_algorithms.h>
+#include <algorithms.h>
 
 #define SR(x, cleanup) if ( (x)<0 ) { \
   gnutls_assert(); \

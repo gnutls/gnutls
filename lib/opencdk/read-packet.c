@@ -34,7 +34,7 @@
 #include "main.h"
 #include "packet.h"
 #include "types.h"
-#include <gnutls_algorithms.h>
+#include <algorithms.h>
 #include <gnutls_str.h>
 #include <minmax.h>
 

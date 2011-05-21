@@ -44,7 +44,7 @@
 #include <auth/cert.h>
 #include <auth/anon.h>
 #include <auth/psk.h>
-#include <gnutls_algorithms.h>
+#include <algorithms.h>
 #include <gnutls_rsa_export.h>
 #include <gnutls_extensions.h>
 #include <system.h>

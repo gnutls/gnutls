@@ -32,7 +32,7 @@
 #include "gnutls_kx.h"
 #include "gnutls_dh.h"
 #include "gnutls_errors.h"
-#include "gnutls_algorithms.h"
+#include "algorithms.h"
 #include "debug.h"
 #include "gnutls_mpi.h"
 #include <gnutls_state.h>

@@ -35,7 +35,7 @@
 #include <gnutls_x509.h>
 #include <x509_b64.h>
 #include "x509_int.h"
-#include <gnutls_algorithms.h>
+#include <algorithms.h>
 #include <gnutls_num.h>
 #include <random.h>
 #include <pbkdf2-sha1.h>

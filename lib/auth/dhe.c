@@ -35,7 +35,7 @@
 #include "gnutls_num.h"
 #include "gnutls_sig.h"
 #include <gnutls_datum.h>
-#include <gnutls_algorithms.h>
+#include <algorithms.h>
 #include <auth/cert.h>
 #include <gnutls_x509.h>
 #include <gnutls_state.h>

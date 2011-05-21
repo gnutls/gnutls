@@ -33,7 +33,7 @@
 #include <gnutls_datum.h>
 #include <gnutls_mpi.h>
 #include <gnutls_global.h>
-#include <gnutls_algorithms.h>
+#include <algorithms.h>
 #include <gnutls_dh.h>
 #include <gnutls_str.h>
 #include <gnutls_state.h>

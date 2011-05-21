@@ -17,7 +17,7 @@
 #include "ecc.h"
 #include "gnettle.h"
 #include <gnutls_int.h>
-#include <gnutls_algorithms.h>
+#include <algorithms.h>
 
 /**
   @file ecc_test.c

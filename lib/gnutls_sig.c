@@ -27,7 +27,7 @@
 #include <gnutls_errors.h>
 #include <x509_b64.h>
 #include <auth/cert.h>
-#include <gnutls_algorithms.h>
+#include <algorithms.h>
 #include <gnutls_datum.h>
 #include <gnutls_mpi.h>
 #include <gnutls_global.h>

@@ -411,6 +411,7 @@ AC_CONFIG_FILES([
   lib/accelerated/Makefile
   lib/accelerated/intel/Makefile
   lib/ext/Makefile
+  lib/algorithms/Makefile
   lib/auth/Makefile
 ])
 

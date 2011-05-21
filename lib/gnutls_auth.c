@@ -27,7 +27,7 @@
 #include "gnutls_errors.h"
 #include "gnutls_auth.h"
 #include "gnutls_auth.h"
-#include "gnutls_algorithms.h"
+#include "algorithms.h"
 #include <auth/cert.h>
 #include <auth/psk.h>
 #include <auth/anon.h>

@@ -24,7 +24,7 @@
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
 EXTRA_DIST = pakchois/README
-SUBDIRS = includes x509 accelerated auth ext
+SUBDIRS = includes x509 accelerated auth ext algorithms
 if ENABLE_MINITASN1
 SUBDIRS += minitasn1
 endif
@@ -61,7 +61,7 @@ PSK_COBJECTS = gnutls_psk.c
 
 COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_mbuffers.c gnutls_buffers.c gnutls_handshake.c gnutls_num.c \
-	gnutls_errors.c gnutls_algorithms.c gnutls_dh.c gnutls_kx.c	\
+	gnutls_errors.c gnutls_dh.c gnutls_kx.c	\
 	gnutls_priority.c gnutls_hash_int.c gnutls_cipher_int.c		\
 	gnutls_session.c gnutls_db.c x509_b64.c 		\
 	gnutls_extensions.c gnutls_auth.c gnutls_v2_compat.c		\
@@ -112,7 +112,7 @@ libgnutls_la_LDFLAGS = -no-undefined \
 
 libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	accelerated/libaccelerated.la ext/libgnutls_ext.la \
-	auth/libgnutls_auth.la \
+	auth/libgnutls_auth.la algorithms/libgnutls_alg.la \
 	$(LTLIBZ)  $(LTLIBINTL) $(LIBSOCKET) $(LTLIBDL) \
 	$(LTLIBPTHREAD)
 
