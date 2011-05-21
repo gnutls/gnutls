@@ -37,7 +37,7 @@
    @return 0 on success
 */
 int
-ltc_ecc_projective_dbl_point (ecc_point * P, ecc_point * R, mpz_t a,
+ecc_projective_dbl_point (ecc_point * P, ecc_point * R, mpz_t a,
                               mpz_t modulus)
 {
   mpz_t t1, m, s;

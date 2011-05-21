@@ -17,7 +17,7 @@
 #include "ecc.h"
 
 /**
-  @file ltc_ecc_map.c
+  @file ecc_map.c
   ECC Crypto, Tom St Denis
 */
 
@@ -29,7 +29,7 @@
   @return 0 on success
 */
 int
-ltc_ecc_map (ecc_point * P, mpz_t modulus)
+ecc_map (ecc_point * P, mpz_t modulus)
 {
   mpz_t t1, t2;
   int err;
@@ -65,6 +65,6 @@ ltc_ecc_map (ecc_point * P, mpz_t modulus)
   return err;
 }
 
-/* $Source: /cvs/libtom/libtomcrypt/src/pk/ecc/ltc_ecc_map.c,v $ */
+/* $Source: /cvs/libtom/libtomcrypt/src/pk/ecc/ecc_map.c,v $ */
 /* $Revision: 1.7 $ */
 /* $Date: 2007/05/12 14:32:35 $ */

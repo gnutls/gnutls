@@ -684,7 +684,7 @@ rsa_fail:
     case GNUTLS_PK_ECDH:
       {
         ecc_key key;
-        ltc_ecc_set_type tls_ecc_set;
+        ecc_set_type tls_ecc_set;
         const gnutls_ecc_curve_entry_st *st;
 
         st = _gnutls_ecc_curve_get_params(level);

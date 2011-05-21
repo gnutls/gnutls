@@ -17,7 +17,7 @@
 #include "ecc.h"
 
 /**
-  @file ltc_ecc_points.c
+  @file ecc_points.c
   ECC Crypto, Tom St Denis
 */
 
@@ -26,7 +26,7 @@
    @return A newly allocated point or NULL on error 
 */
 ecc_point *
-ltc_ecc_new_point (void)
+ecc_new_point (void)
 {
   ecc_point *p;
   p = calloc (1, sizeof (*p));
@@ -46,7 +46,7 @@ ltc_ecc_new_point (void)
   @param p   The point to free
 */
 void
-ltc_ecc_del_point (ecc_point * p)
+ecc_del_point (ecc_point * p)
 {
   /* prevents free'ing null arguments */
   if (p != NULL)
@@ -56,6 +56,6 @@ ltc_ecc_del_point (ecc_point * p)
     }
 }
 
-/* $Source: /cvs/libtom/libtomcrypt/src/pk/ecc/ltc_ecc_points.c,v $ */
+/* $Source: /cvs/libtom/libtomcrypt/src/pk/ecc/ecc_points.c,v $ */
 /* $Revision: 1.7 $ */
 /* $Date: 2007/05/12 14:32:35 $ */

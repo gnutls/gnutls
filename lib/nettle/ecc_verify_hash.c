@@ -64,8 +64,8 @@ ecc_verify_hash (struct dsa_signature *signature,
     }
 
   /* allocate points */
-  mG = ltc_ecc_new_point ();
-  mQ = ltc_ecc_new_point ();
+  mG = ecc_new_point ();
+  mQ = ecc_new_point ();
   if (mQ == NULL || mG == NULL)
     {
       err = -1;
@@ -109,24 +109,24 @@ ecc_verify_hash (struct dsa_signature *signature,
   mpz_set (mQ->z, key->pubkey.z);
 
   /* compute u1*mG + u2*mQ = mG */
-  if ((err = ltc_ecc_mulmod (u1, mG, mG, key->A, key->prime, 0)) != 0)
+  if ((err = ecc_mulmod (u1, mG, mG, key->A, key->prime, 0)) != 0)
     {
       goto error;
     }
-  if ((err = ltc_ecc_mulmod (u2, mQ, mQ, key->A, key->prime, 0)) != 0)
+  if ((err = ecc_mulmod (u2, mQ, mQ, key->A, key->prime, 0)) != 0)
     {
       goto error;
     }
 
   /* add them */
   if ((err =
-       ltc_ecc_projective_add_point (mQ, mG, mG, key->A, key->prime)) != 0)
+       ecc_projective_add_point (mQ, mG, mG, key->A, key->prime)) != 0)
     {
       goto error;
     }
 
   /* reduce */
-  if ((err = ltc_ecc_map (mG, key->prime)) != 0)
+  if ((err = ecc_map (mG, key->prime)) != 0)
     {
       goto error;
     }
@@ -143,8 +143,8 @@ ecc_verify_hash (struct dsa_signature *signature,
   /* clear up and return */
   err = 0;
 error:
-  ltc_ecc_del_point (mG);
-  ltc_ecc_del_point (mQ);
+  ecc_del_point (mG);
+  ecc_del_point (mQ);
   mp_clear_multi (&v, &w, &u1, &u2, &e, NULL);
   return err;
 }

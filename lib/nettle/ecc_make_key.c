@@ -66,7 +66,7 @@ ecc_make_key_ex (void *random_ctx, nettle_random_func random, ecc_key * key,
     {
       goto ERR_BUF;
     }
-  base = ltc_ecc_new_point ();
+  base = ecc_new_point ();
   if (base == NULL)
     {
       err = -1;
@@ -96,7 +96,7 @@ ecc_make_key_ex (void *random_ctx, nettle_random_func random, ecc_key * key,
     }
   /* make the public key */
   if ((err =
-       ltc_ecc_mulmod (key->k, base, &key->pubkey, key->A, key->prime,
+       ecc_mulmod (key->k, base, &key->pubkey, key->A, key->prime,
                        1)) != 0)
     {
       goto errkey;
@@ -111,7 +111,7 @@ errkey:
                   &key->order, &key->prime, &key->Gx, &key->Gy, &key->A,
                   NULL);
 cleanup:
-  ltc_ecc_del_point (base);
+  ecc_del_point (base);
 ERR_BUF:
   free (buf);
   return err;
@@ -119,7 +119,7 @@ ERR_BUF:
 
 int
 ecc_make_key (void *random_ctx, nettle_random_func random, ecc_key * key,
-              const ltc_ecc_set_type * dp)
+              const ecc_set_type * dp)
 {
   mpz_t prime, order, Gx, Gy, A;
   int err;

@@ -9,7 +9,8 @@
 /* assume y^2 = x^3 - 3x + b
  * instead of the generic y^2 = x^3 + ax + b
  *
- * (XXX: the generic case has not been tested)
+ * (XXX: the generic case has been tested only
+ *  with the SECG curves.)
  */
 #define ECC_SECP_CURVES_ONLY
 
@@ -48,7 +49,7 @@ typedef struct {
  
    /** The y co-ordinate of the base point on the curve (hex) */
    const char *Gy;
-} ltc_ecc_set_type;
+} ecc_set_type;
 
 /** A point on a ECC curve, stored in Jacbobian format such that (x,y,z) => (x/z^2, y/z^3, 1) when interpretted as affine */
 typedef struct {
@@ -80,14 +81,11 @@ typedef struct {
     mpz_t k;
 } ecc_key;
 
-/** the ECC params provided */
-extern const ltc_ecc_set_type ltc_ecc_sets[];
-
 int  ecc_test(void);
 void ecc_sizes(int *low, int *high);
 int  ecc_get_size(ecc_key *key);
 
-int ecc_make_key(void *random_ctx, nettle_random_func random, ecc_key *key, const ltc_ecc_set_type *dp);
+int ecc_make_key(void *random_ctx, nettle_random_func random, ecc_key *key, const ecc_set_type *dp);
 int ecc_make_key_ex(void *random_ctx, nettle_random_func random, ecc_key *key, mpz_t prime, mpz_t order, mpz_t A, mpz_t Gx, mpz_t Gy);
 void ecc_free(ecc_key *key);
 
@@ -103,22 +101,22 @@ int  ecc_verify_hash(struct dsa_signature * signature,
                      int *stat, ecc_key *key);
 
 /* low level functions */
-ecc_point *ltc_ecc_new_point(void);
-void       ltc_ecc_del_point(ecc_point *p);
-int        ltc_ecc_is_valid_idx(int n);
+ecc_point *ecc_new_point(void);
+void       ecc_del_point(ecc_point *p);
+int        ecc_is_valid_idx(int n);
 
 /* point ops (mp == montgomery digit) */
 /* R = 2P */
-int ltc_ecc_projective_dbl_point(ecc_point *P, ecc_point *R, mpz_t a,  mpz_t modulus);
+int ecc_projective_dbl_point(ecc_point *P, ecc_point *R, mpz_t a,  mpz_t modulus);
 
 /* R = P + Q */
-int ltc_ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, mpz_t A, mpz_t modulus);
+int ecc_projective_add_point(ecc_point *P, ecc_point *Q, ecc_point *R, mpz_t A, mpz_t modulus);
 
 /* R = kG */
-int ltc_ecc_mulmod(mpz_t k, ecc_point *G, ecc_point *R, mpz_t a, mpz_t modulus, int map);
+int ecc_mulmod(mpz_t k, ecc_point *G, ecc_point *R, mpz_t a, mpz_t modulus, int map);
 
 /* map P to affine from projective */
-int ltc_ecc_map(ecc_point *P, mpz_t modulus);
+int ecc_map(ecc_point *P, mpz_t modulus);
 
 /* helper functions */
 int mp_init_multi(mpz_t *a, ...);

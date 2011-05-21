@@ -40,13 +40,13 @@ ecc_test (void)
       return err;
     }
 
-  G = ltc_ecc_new_point ();
-  GG = ltc_ecc_new_point ();
+  G = ecc_new_point ();
+  GG = ecc_new_point ();
   if (G == NULL || GG == NULL)
     {
       mp_clear_multi (&modulus, &order, NULL);
-      ltc_ecc_del_point (G);
-      ltc_ecc_del_point (GG);
+      ecc_del_point (G);
+      ecc_del_point (GG);
       return -1;
     }
 
@@ -109,7 +109,7 @@ ecc_test (void)
 
       /* then we should have G == (order + 1)G */
       mpz_add_ui (order, order, 1);
-      if ((err = ltc_ecc_mulmod (order, G, GG, A, modulus, 1)) != 0)
+      if ((err = ecc_mulmod (order, G, GG, A, modulus, 1)) != 0)
         {
           goto done;
         }
@@ -131,8 +131,8 @@ ecc_test (void)
     }
   err = 0;
 done:
-  ltc_ecc_del_point (GG);
-  ltc_ecc_del_point (G);
+  ecc_del_point (GG);
+  ecc_del_point (G);
   mp_clear_multi (&order, &modulus, &A, NULL);
   return err;
 }

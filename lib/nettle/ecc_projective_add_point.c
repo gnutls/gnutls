@@ -17,7 +17,7 @@
 #include "ecc.h"
 
 /**
-  @file ltc_ecc_projective_add_point.c
+  @file ecc_projective_add_point.c
   ECC Crypto, Tom St Denis
 */
 
@@ -31,7 +31,7 @@
    @return 0 on success
 */
 int
-ltc_ecc_projective_add_point (ecc_point * P, ecc_point * Q, ecc_point * R,
+ecc_projective_add_point (ecc_point * P, ecc_point * Q, ecc_point * R,
                               mpz_t A, mpz_t modulus)
 {
   mpz_t t1, t2, x, y, z;
@@ -55,7 +55,7 @@ ltc_ecc_projective_add_point (ecc_point * P, ecc_point * Q, ecc_point * R,
       (mpz_cmp (P->y, Q->y) == 0 || mpz_cmp (P->y, t1) == 0))
     {
       mp_clear_multi (&t1, &t2, &x, &y, &z, NULL);
-      return ltc_ecc_projective_dbl_point (P, R, A, modulus);
+      return ecc_projective_dbl_point (P, R, A, modulus);
     }
 
   mpz_set (x, P->x);
@@ -202,6 +202,6 @@ ltc_ecc_projective_add_point (ecc_point * P, ecc_point * Q, ecc_point * R,
   return err;
 }
 
-/* $Source: /cvs/libtom/libtomcrypt/src/pk/ecc/ltc_ecc_projective_add_point.c,v $ */
+/* $Source: /cvs/libtom/libtomcrypt/src/pk/ecc/ecc_projective_add_point.c,v $ */
 /* $Revision: 1.16 $ */
 /* $Date: 2007/05/12 14:32:35 $ */

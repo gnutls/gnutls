@@ -50,14 +50,14 @@ ecc_shared_secret (ecc_key * private_key, ecc_key * public_key,
     }
 
   /* make new point */
-  result = ltc_ecc_new_point ();
+  result = ecc_new_point ();
   if (result == NULL)
     {
       return -1;
     }
 
   if ((err =
-       ltc_ecc_mulmod (private_key->k, &public_key->pubkey, result,
+       ecc_mulmod (private_key->k, &public_key->pubkey, result,
                        private_key->A, private_key->prime, 1)) != 0)
     {
       goto done;
@@ -82,7 +82,7 @@ ecc_shared_secret (ecc_key * private_key, ecc_key * public_key,
   err = 0;
   *outlen = x;
 done:
-  ltc_ecc_del_point (result);
+  ecc_del_point (result);
   return err;
 }
 

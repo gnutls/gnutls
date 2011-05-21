@@ -17,7 +17,7 @@
 #include "ecc.h"
 
 /**
-  @file ltc_ecc_mulmod_timing.c
+  @file ecc_mulmod_timing.c
   ECC Crypto, Tom St Denis
 */
 
@@ -32,7 +32,7 @@
    @return 0 on success
 */
 int
-ltc_ecc_mulmod (mpz_t k, ecc_point * G, ecc_point * R, mpz_t a, mpz_t modulus,
+ecc_mulmod (mpz_t k, ecc_point * G, ecc_point * R, mpz_t a, mpz_t modulus,
                 int map)
 {
   ecc_point *tG, *M[3];
@@ -48,19 +48,19 @@ ltc_ecc_mulmod (mpz_t k, ecc_point * G, ecc_point * R, mpz_t a, mpz_t modulus,
   /* alloc ram for window temps */
   for (i = 0; i < 3; i++)
     {
-      M[i] = ltc_ecc_new_point ();
+      M[i] = ecc_new_point ();
       if (M[i] == NULL)
         {
           for (j = 0; j < i; j++)
             {
-              ltc_ecc_del_point (M[j]);
+              ecc_del_point (M[j]);
             }
           return -1;
         }
     }
 
   /* make a copy of G incase R==G */
-  tG = ltc_ecc_new_point ();
+  tG = ecc_new_point ();
   if (tG == NULL)
     {
       err = -1;
@@ -78,7 +78,7 @@ ltc_ecc_mulmod (mpz_t k, ecc_point * G, ecc_point * R, mpz_t a, mpz_t modulus,
   mpz_set (M[0]->y, tG->y);
   mpz_set (M[0]->z, tG->z);
   /* M[1] == 2G */
-  if ((err = ltc_ecc_projective_dbl_point (tG, M[1], a, modulus)) != 0)
+  if ((err = ecc_projective_dbl_point (tG, M[1], a, modulus)) != 0)
     {
       goto done;
     }
@@ -114,13 +114,13 @@ ltc_ecc_mulmod (mpz_t k, ecc_point * G, ecc_point * R, mpz_t a, mpz_t modulus,
         {
           /* dummy operations */
           if ((err =
-               ltc_ecc_projective_add_point (M[0], M[1], M[2], a,
+               ecc_projective_add_point (M[0], M[1], M[2], a,
                                              modulus)) != 0)
             {
               goto done;
             }
           if ((err =
-               ltc_ecc_projective_dbl_point (M[1], M[2], a, modulus)) != 0)
+               ecc_projective_dbl_point (M[1], M[2], a, modulus)) != 0)
             {
               goto done;
             }
@@ -132,13 +132,13 @@ ltc_ecc_mulmod (mpz_t k, ecc_point * G, ecc_point * R, mpz_t a, mpz_t modulus,
           mode = 1;
           /* dummy operations */
           if ((err =
-               ltc_ecc_projective_add_point (M[0], M[1], M[2], a,
+               ecc_projective_add_point (M[0], M[1], M[2], a,
                                              modulus)) != 0)
             {
               goto done;
             }
           if ((err =
-               ltc_ecc_projective_dbl_point (M[1], M[2], a, modulus)) != 0)
+               ecc_projective_dbl_point (M[1], M[2], a, modulus)) != 0)
             {
               goto done;
             }
@@ -146,12 +146,12 @@ ltc_ecc_mulmod (mpz_t k, ecc_point * G, ecc_point * R, mpz_t a, mpz_t modulus,
         }
 
       if ((err =
-           ltc_ecc_projective_add_point (M[0], M[1], M[i ^ 1], a,
+           ecc_projective_add_point (M[0], M[1], M[i ^ 1], a,
                                          modulus)) != 0)
         {
           goto done;
         }
-      if ((err = ltc_ecc_projective_dbl_point (M[i], M[i], a, modulus)) != 0)
+      if ((err = ecc_projective_dbl_point (M[i], M[i], a, modulus)) != 0)
         {
           goto done;
         }
@@ -165,21 +165,21 @@ ltc_ecc_mulmod (mpz_t k, ecc_point * G, ecc_point * R, mpz_t a, mpz_t modulus,
   /* map R back from projective space */
   if (map)
     {
-      err = ltc_ecc_map (R, modulus);
+      err = ecc_map (R, modulus);
     }
   else
     {
       err = 0;
     }
 done:
-  ltc_ecc_del_point (tG);
+  ecc_del_point (tG);
   for (i = 0; i < 3; i++)
     {
-      ltc_ecc_del_point (M[i]);
+      ecc_del_point (M[i]);
     }
   return err;
 }
 
-/* $Source: /cvs/libtom/libtomcrypt/src/pk/ecc/ltc_ecc_mulmod_timing.c,v $ */
+/* $Source: /cvs/libtom/libtomcrypt/src/pk/ecc/ecc_mulmod_timing.c,v $ */
 /* $Revision: 1.13 $ */
 /* $Date: 2007/05/12 14:32:35 $ */
