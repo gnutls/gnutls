@@ -186,7 +186,7 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
       ctx->encrypt = _gcm_encrypt;
       ctx->decrypt = _gcm_decrypt;
       ctx->i_encrypt = (nettle_crypt_func*) aes_bidi_encrypt;
-      ctx->auth = (auth_func)gcm_aes_auth;
+      ctx->auth = (auth_func)gcm_aes_update;
       ctx->tag = (tag_func)gcm_aes_digest;
       ctx->ctx_ptr = &ctx->ctx.aes_gcm;
       ctx->block_size = AES_BLOCK_SIZE;
