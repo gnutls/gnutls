@@ -1,0 +1,11 @@
+--- memxor.c.orig	2011-05-21 09:38:04.328055463 +0200
++++ memxor.c	2011-05-21 09:38:14.369054337 +0200
+@@ -23,7 +23,7 @@
+ #include "memxor.h"
+ 
+ void *
+-memxor (void *restrict dest, const void *restrict src, size_t n)
++gl_memxor (void *restrict dest, const void *restrict src, size_t n)
+ {
+   char const *s = src;
+   char *d = dest;

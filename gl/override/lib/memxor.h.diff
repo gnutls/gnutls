@@ -1,0 +1,10 @@
+--- memxor.h.orig	2011-05-21 09:38:26.471555934 +0200
++++ memxor.h	2011-05-21 09:38:30.668058152 +0200
+@@ -26,6 +26,6 @@
+ /* Compute binary exclusive OR of memory areas DEST and SRC, putting
+    the result in DEST, of length N bytes.  Returns a pointer to
+    DEST. */
+-void *memxor (void *restrict dest, const void *restrict src, size_t n);
++void *gl_memxor (void *restrict dest, const void *restrict src, size_t n);
+ 
+ #endif /* MEMXOR_H */
