@@ -81,6 +81,9 @@ _gnutls_proc_ecdh_common_client_kx (gnutls_session_t session,
   int ret, i = 0;
   int point_size;
 
+  if (curve == GNUTLS_ECC_CURVE_INVALID)
+    return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
+
   DECR_LEN (data_size, 1);
   point_size = data[i];
   i+=1;
@@ -130,6 +133,7 @@ _gnutls_gen_ecdh_common_client_kx (gnutls_session_t session, gnutls_buffer_st* d
   return data->length;
 }
 
+/* Returns the bytes parsed */
 int
 _gnutls_proc_ecdh_common_server_kx (gnutls_session_t session,
                                   opaque * data, size_t _data_size)
@@ -155,14 +159,16 @@ _gnutls_proc_ecdh_common_server_kx (gnutls_session_t session,
 
   DECR_LEN (data_size, 1);
   point_size = data[i];
-  i+=1;
+  i++;
 
   DECR_LEN (data_size, point_size);
   ret = _gnutls_ecc_ansi_x963_import(curve, &data[i], point_size, &session->key->ecdh_x, &session->key->ecdh_y);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  return ret;
+  i+=point_size;
+
+  return i;
 }
 
 /* If the psk flag is set, then an empty psk_identity_hint will
@@ -173,6 +179,9 @@ int _gnutls_ecdh_common_print_server_kx (gnutls_session_t session, gnutls_buffer
   opaque p;
   int ret;
   gnutls_datum_t out;
+
+  if (curve == GNUTLS_ECC_CURVE_INVALID)
+    return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
 
   /* curve type */
   p = 3;

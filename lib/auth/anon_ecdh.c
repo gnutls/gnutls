@@ -66,7 +66,6 @@ const mod_auth_st anon_ecdh_auth_struct = {
 static int
 gen_anon_ecdh_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
-  ecc_curve_t curve;
   int ret;
   gnutls_anon_server_credentials_t cred;
 
@@ -78,10 +77,6 @@ gen_anon_ecdh_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  curve = _gnutls_session_ecc_curve_get(session);
-  if (curve == GNUTLS_ECC_CURVE_INVALID)
-    return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
-  
   if ((ret =
        _gnutls_auth_info_set (session, GNUTLS_CRD_ANON,
                               sizeof (anon_auth_info_st), 1)) < 0)
@@ -90,7 +85,7 @@ gen_anon_ecdh_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
       return ret;
     }
 
-  ret = _gnutls_ecdh_common_print_server_kx (session, data, curve);
+  ret = _gnutls_ecdh_common_print_server_kx (session, data, _gnutls_session_ecc_curve_get(session));
   if (ret < 0)
     {
       gnutls_assert ();
@@ -105,7 +100,6 @@ proc_anon_ecdh_client_kx (gnutls_session_t session, opaque * data,
                      size_t _data_size)
 {
   gnutls_anon_server_credentials_t cred;
-  ecc_curve_t curve;
 
   cred = (gnutls_anon_server_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_ANON, NULL);
@@ -115,11 +109,7 @@ proc_anon_ecdh_client_kx (gnutls_session_t session, opaque * data,
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  curve = _gnutls_session_ecc_curve_get(session);
-  if (curve == GNUTLS_ECC_CURVE_INVALID)
-    return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
-
-  return _gnutls_proc_ecdh_common_client_kx (session, data, _data_size, curve);
+  return _gnutls_proc_ecdh_common_client_kx (session, data, _data_size, _gnutls_session_ecc_curve_get(session));
 }
 
 int

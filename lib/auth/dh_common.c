@@ -202,6 +202,7 @@ error:
   return ret;
 }
 
+/* Returns the bytes parsed */
 int
 _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
                                   opaque * data, size_t _data_size, int psk)

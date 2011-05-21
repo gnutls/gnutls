@@ -73,6 +73,7 @@ static const gnutls_cred_map cred_mappings[] = {
   {GNUTLS_KX_ANON_ECDH, GNUTLS_CRD_ANON, GNUTLS_CRD_ANON},
   {GNUTLS_KX_RSA, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_RSA_EXPORT, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
+  {GNUTLS_KX_ECDHE_RSA, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_DHE_DSS, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_DHE_RSA, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_PSK, GNUTLS_CRD_PSK, GNUTLS_CRD_PSK},
@@ -114,6 +115,7 @@ static const gnutls_pk_map pk_mappings[] = {
   {GNUTLS_KX_RSA_EXPORT, GNUTLS_PK_RSA, CIPHER_SIGN},
   {GNUTLS_KX_DHE_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
   {GNUTLS_KX_SRP_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
+  {GNUTLS_KX_ECDHE_RSA, GNUTLS_PK_RSA, CIPHER_SIGN},
   {GNUTLS_KX_DHE_DSS, GNUTLS_PK_DSA, CIPHER_SIGN},
   {GNUTLS_KX_SRP_DSS, GNUTLS_PK_DSA, CIPHER_SIGN},
   {0, 0, 0}
@@ -259,6 +261,7 @@ static const gnutls_hash_entry hash_algorithms[] = {
 extern mod_auth_st rsa_auth_struct;
 extern mod_auth_st rsa_export_auth_struct;
 extern mod_auth_st dhe_rsa_auth_struct;
+extern mod_auth_st ecdhe_rsa_auth_struct;
 extern mod_auth_st dhe_dss_auth_struct;
 extern mod_auth_st anon_auth_struct;
 extern mod_auth_st anon_ecdh_auth_struct;
@@ -287,6 +290,7 @@ static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
   {"RSA-EXPORT", GNUTLS_KX_RSA_EXPORT, &rsa_export_auth_struct, 0,
    1 /* needs RSA params */ },
   {"DHE-RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1, 0},
+  {"ECDHE-RSA", GNUTLS_KX_ECDHE_RSA, &ecdhe_rsa_auth_struct, 1, 0},
   {"DHE-DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, 0},
 
 #ifdef ENABLE_SRP
@@ -467,9 +471,16 @@ typedef struct
 #define GNUTLS_DHE_PSK_NULL_SHA256 { 0x00, 0xB4 }
 
 /* ECC */
+#define GNUTLS_ECDH_ANON_NULL_SHA { 0xC0, 0x15 }
 #define GNUTLS_ECDH_ANON_3DES_EDE_CBC_SHA { 0xC0, 0x17 }
 #define GNUTLS_ECDH_ANON_AES_128_CBC_SHA { 0xC0, 0x18 }
 #define GNUTLS_ECDH_ANON_AES_256_CBC_SHA { 0xC0, 0x19 }
+
+/* ECC-RSA */
+#define GNUTLS_ECDHE_RSA_NULL_SHA { 0xC0, 0x10 }
+#define GNUTLS_ECDHE_RSA_3DES_EDE_CBC_SHA { 0xC0, 0x12 }
+#define GNUTLS_ECDHE_RSA_AES_128_CBC_SHA { 0xC0, 0x13 }
+#define GNUTLS_ECDHE_RSA_AES_256_CBC_SHA { 0xC0, 0x14 }
 
 
 #define CIPHER_SUITES_COUNT sizeof(cs_algorithms)/sizeof(gnutls_cipher_suite_entry)-1
@@ -769,6 +780,10 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
                              GNUTLS_VERSION_MAX, 1),
 /* ECC-ANON */
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDH_ANON_NULL_SHA,
+                             GNUTLS_CIPHER_NULL, GNUTLS_KX_ANON_ECDH,
+                             GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDH_ANON_3DES_EDE_CBC_SHA,
                              GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_ANON_ECDH,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
@@ -781,7 +796,23 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_ANON_ECDH,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
                              GNUTLS_VERSION_MAX, 1),
-
+/* ECC-RSA */
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_RSA_NULL_SHA,
+                             GNUTLS_CIPHER_NULL, GNUTLS_KX_ECDHE_RSA,
+                             GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_RSA_3DES_EDE_CBC_SHA,
+                             GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_ECDHE_RSA,
+                             GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_RSA_AES_128_CBC_SHA,
+                             GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_ECDHE_RSA,
+                             GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_RSA_AES_256_CBC_SHA,
+                             GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_ECDHE_RSA,
+                             GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
   {0, {{0, 0}}, 0, 0, 0, 0, 0, 0}
 };
 

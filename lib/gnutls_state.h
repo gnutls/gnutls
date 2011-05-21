@@ -36,6 +36,8 @@ inline static ecc_curve_t _gnutls_session_ecc_curve_get(gnutls_session_t session
   return session->security_parameters.ecc_curve;
 }
 
+int _gnutls_session_is_ecc (gnutls_session_t session);
+
 void
 _gnutls_session_ecc_curve_set (gnutls_session_t session,
                                ecc_curve_t c);

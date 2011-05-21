@@ -40,10 +40,28 @@
 #include <gnutls_x509.h>
 #include <gnutls_state.h>
 #include <auth/dh_common.h>
+#include <auth/ecdh_common.h>
 
 static int gen_dhe_server_kx (gnutls_session_t, gnutls_buffer_st*);
 static int proc_dhe_server_kx (gnutls_session_t, opaque *, size_t);
 static int proc_dhe_client_kx (gnutls_session_t, opaque *, size_t);
+
+const mod_auth_st ecdhe_rsa_auth_struct = {
+  "ECDHE_RSA",
+  _gnutls_gen_cert_server_certificate,
+  _gnutls_gen_cert_client_certificate,
+  gen_dhe_server_kx,
+  _gnutls_gen_ecdh_common_client_kx,   /* This is the only different */
+  _gnutls_gen_cert_client_cert_vrfy,
+  _gnutls_gen_cert_server_cert_req,
+
+  _gnutls_proc_cert_server_certificate,
+  _gnutls_proc_cert_client_certificate,
+  proc_dhe_server_kx,
+  proc_dhe_client_kx,
+  _gnutls_proc_cert_client_cert_vrfy,
+  _gnutls_proc_cert_cert_req
+};
 
 const mod_auth_st dhe_rsa_auth_struct = {
   "DHE_RSA",
@@ -112,18 +130,6 @@ gen_dhe_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
       return ret;
     }
 
-  dh_params =
-    _gnutls_get_dh_params (cred->dh_params, cred->params_func, session);
-  mpis = _gnutls_dh_params_to_mpi (dh_params);
-  if (mpis == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
-    }
-
-  p = mpis[0];
-  g = mpis[1];
-
   if ((ret = _gnutls_auth_info_set (session, GNUTLS_CRD_CERTIFICATE,
                                     sizeof (cert_auth_info_st), 0)) < 0)
     {
@@ -131,9 +137,29 @@ gen_dhe_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
       return ret;
     }
 
-  _gnutls_dh_set_group (session, g, p);
+  if (!_gnutls_session_is_ecc (session))
+    {
+      dh_params =
+        _gnutls_get_dh_params (cred->dh_params, cred->params_func, session);
+      mpis = _gnutls_dh_params_to_mpi (dh_params);
+      if (mpis == NULL)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
+        }
 
-  ret = _gnutls_dh_common_print_server_kx (session, g, p, data, 0);
+      p = mpis[0];
+      g = mpis[1];
+
+      _gnutls_dh_set_group (session, g, p);
+
+      ret = _gnutls_dh_common_print_server_kx (session, g, p, data, 0);
+    }
+  else
+    {
+      ret = _gnutls_ecdh_common_print_server_kx (session, data, _gnutls_session_ecc_curve_get(session));
+    }
+
   if (ret < 0)
     {
       gnutls_assert ();
@@ -229,7 +255,11 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  ret = _gnutls_proc_dh_common_server_kx (session, data, _data_size, 0);
+  if (!_gnutls_session_is_ecc (session))
+    ret = _gnutls_proc_dh_common_server_kx (session, data, _data_size, 0);
+  else
+    ret = _gnutls_proc_ecdh_common_server_kx (session, data, _data_size);
+
   if (ret < 0)
     {
       gnutls_assert ();
@@ -309,19 +339,21 @@ proc_dhe_client_kx (gnutls_session_t session, opaque * data,
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  dh_params =
-    _gnutls_get_dh_params (cred->dh_params, cred->params_func, session);
-  mpis = _gnutls_dh_params_to_mpi (dh_params);
-  if (mpis == NULL)
+  if (!_gnutls_session_is_ecc (session))
     {
-      gnutls_assert ();
-      return GNUTLS_E_NO_TEMPORARY_DH_PARAMS;
+      dh_params =
+        _gnutls_get_dh_params (cred->dh_params, cred->params_func, session);
+      mpis = _gnutls_dh_params_to_mpi (dh_params);
+      if (mpis == NULL)
+        return gnutls_assert_val(GNUTLS_E_NO_TEMPORARY_DH_PARAMS);
+
+      p = mpis[0];
+      g = mpis[1];
+
+      ret = _gnutls_proc_dh_common_client_kx (session, data, _data_size, g, p);
     }
-
-  p = mpis[0];
-  g = mpis[1];
-
-  ret = _gnutls_proc_dh_common_client_kx (session, data, _data_size, g, p);
+  else
+    ret = _gnutls_proc_ecdh_common_client_kx (session, data, _data_size, _gnutls_session_ecc_curve_get(session));
 
   return ret;
 
