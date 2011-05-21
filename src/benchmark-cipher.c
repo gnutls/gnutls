@@ -103,7 +103,7 @@ cipher_mac_bench (int algo, int mac_algo, int size)
   gnutls_cipher_deinit (ctx);
   gnutls_hmac_deinit(mac_ctx, NULL);
 
-  stop_benchmark (&st);
+  stop_benchmark (&st, NULL);
 
 leave:
   free (_key);
@@ -166,7 +166,7 @@ cipher_bench (int algo, int size, int aead)
 
   gnutls_cipher_deinit (ctx);
 
-  stop_benchmark(&st);
+  stop_benchmark(&st, NULL);
 
 leave:
   free (_key);
@@ -198,7 +198,7 @@ mac_bench (int algo, int size)
     }
   while (benchmark_must_finish == 0);
 
-  stop_benchmark(&st);
+  stop_benchmark(&st, NULL);
 
   free (_key);
 }
