@@ -103,7 +103,6 @@ int  ecc_verify_hash(struct dsa_signature * signature,
 /* low level functions */
 ecc_point *ecc_new_point(void);
 void       ecc_del_point(ecc_point *p);
-int        ecc_is_valid_idx(int n);
 
 /* point ops (mp == montgomery digit) */
 /* R = 2P */
