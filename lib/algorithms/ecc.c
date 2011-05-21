@@ -35,6 +35,7 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
   {
     .name = "SECP224R1", 
     .id = GNUTLS_ECC_CURVE_SECP224R1,
+    .tls_id = 21,
     .size = 28,
     .prime = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF000000000000000000000001",
     .A = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFE",
@@ -46,6 +47,7 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
   {
     .name = "SECP256R1", 
     .id = GNUTLS_ECC_CURVE_SECP256R1,
+    .tls_id = 23,
     .size = 32,
     .prime = "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF",
     .A = "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFC",
@@ -57,6 +59,7 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
   {
     .name = "SECP384R1",
     .id = GNUTLS_ECC_CURVE_SECP384R1,
+    .tls_id = 24,
     .size = 48,
     .prime = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFF",
     .A = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFFFF0000000000000000FFFFFFFC",
@@ -68,6 +71,7 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
   {
     .name = "SECP521R1",
     .id = GNUTLS_ECC_CURVE_SECP521R1,
+    .tls_id = 25,
     .size = 66,
     .prime = "01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
     .A = "01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC",
@@ -82,6 +86,46 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 #define GNUTLS_ECC_CURVE_LOOP(b) \
 	{ const gnutls_ecc_curve_entry_st *p; \
                 for(p = ecc_curves; p->name != NULL; p++) { b ; } }
+
+
+/* Returns the TLS id of the given curve
+ */
+int
+_gnutls_tls_id_to_ecc_curve (int num)
+{
+  ecc_curve_t ret = GNUTLS_ECC_CURVE_INVALID;
+
+  GNUTLS_ECC_CURVE_LOOP (
+  if (p->tls_id == num) 
+    {
+      ret = p->id;
+      break;
+    }
+  );
+  
+  return ret;
+}
+
+/* Maps numbers to TLS NamedCurve IDs (RFC4492).
+ * Returns a negative number on error.
+ */
+int
+_gnutls_ecc_curve_get_tls_id (ecc_curve_t supported_ecc)
+{
+  int ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
+
+  GNUTLS_ECC_CURVE_LOOP (
+  if (p->id == supported_ecc) 
+    {
+      ret = p->tls_id;
+      break;
+    }
+  );
+  
+  return ret;
+}
+
+
 /*-
  * _gnutls_ecc_curve_get_id:
  * @name: is a MAC algorithm name

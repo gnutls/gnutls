@@ -130,6 +130,7 @@ struct gnutls_ecc_curve_entry_st
 {
   const char *name;
   ecc_curve_t id;
+  int tls_id; /* The RFC4492 namedCurve ID */
   int size; /* the size in bytes */
 
   /** The prime that defines the field the curve is in (encoded in hex) */
@@ -151,5 +152,7 @@ const char * _gnutls_ecc_curve_get_name (ecc_curve_t curve);
 const gnutls_ecc_curve_entry_st * _gnutls_ecc_curve_get_params (ecc_curve_t curve);
 int _gnutls_ecc_curve_get_size (ecc_curve_t curve);
 ecc_curve_t _gnutls_ecc_curve_get_id (const char *name);
+int _gnutls_tls_id_to_ecc_curve (int num);
+int _gnutls_ecc_curve_get_tls_id (ecc_curve_t supported_ecc);
 
 #endif

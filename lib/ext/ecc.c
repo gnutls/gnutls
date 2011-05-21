@@ -33,6 +33,7 @@
 #include <ext/ecc.h>
 #include <gnutls_state.h>
 #include <gnutls_num.h>
+#include <algorithms.h>
 
 /* Maps record size to numbers according to the
  * extensions draft.
@@ -110,7 +111,7 @@ _gnutls_supported_ecc_recv_params (gnutls_session_t session,
 
       for (i = 0; i < len; i+=2)
         {
-          new_type = _gnutls_num_to_ecc (_gnutls_read_uint16(&p[i]));
+          new_type = _gnutls_tls_id_to_ecc_curve (_gnutls_read_uint16(&p[i]));
           if (new_type < 0)
             continue;
 
@@ -177,7 +178,7 @@ _gnutls_supported_ecc_send_params (gnutls_session_t session, gnutls_buffer_st* e
           for (i = 0; i < len; i++)
             {
               p =
-                _gnutls_ecc_to_num (session->internals.priorities.
+                _gnutls_ecc_curve_get_tls_id (session->internals.priorities.
                                        supported_ecc.priority[i]);
               ret = _gnutls_buffer_append_prefix(extdata, 16, p);
               if (ret < 0)
@@ -246,40 +247,6 @@ _gnutls_supported_ecc_pf_send_params (gnutls_session_t session, gnutls_buffer_st
   return 2;
 }
 
-/* Maps numbers to record sizes according to the
- * extensions draft.
- */
-int
-_gnutls_num_to_ecc (int num)
-{
-  switch (num)
-    {
-    case 23:
-      /* sec256r1 */
-      return GNUTLS_ECC_CURVE_SECP256R1;
-    case 24:
-      return GNUTLS_ECC_CURVE_SECP384R1;
-    default:
-      return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-    }
-}
-
-/* Maps record size to numbers according to the
- * extensions draft.
- */
-int
-_gnutls_ecc_to_num (ecc_curve_t supported_ecc)
-{
-  switch (supported_ecc)
-    {
-    case GNUTLS_ECC_CURVE_SECP256R1:
-      return 23;
-    case GNUTLS_ECC_CURVE_SECP384R1:
-      return 24;
-    default:
-      return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
-    }
-}
 
 /* Returns 0 if the given ECC curve is allowed in the current
  * session. A negative error value is returned otherwise.

@@ -148,7 +148,7 @@ _gnutls_proc_ecdh_common_server_kx (gnutls_session_t session,
     return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
   
   DECR_LEN (data_size, 2);
-  curve = _gnutls_num_to_ecc(_gnutls_read_uint16 (&data[i]));
+  curve = _gnutls_tls_id_to_ecc_curve(_gnutls_read_uint16 (&data[i]));
   i += 2;
 
   ret = _gnutls_session_supports_ecc_curve(session, curve);
@@ -190,7 +190,7 @@ int _gnutls_ecdh_common_print_server_kx (gnutls_session_t session, gnutls_buffer
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  ret = _gnutls_buffer_append_prefix(data, 16, _gnutls_ecc_to_num(curve));
+  ret = _gnutls_buffer_append_prefix(data, 16, _gnutls_ecc_curve_get_tls_id(curve));
   if (ret < 0)
     return gnutls_assert_val(ret);
 
