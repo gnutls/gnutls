@@ -9,7 +9,7 @@
  * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 - ax + b
+/* Implements ECC over Z/pZ for curve y^2 = x^3 + ax + b
  *
  * All curves taken from NIST recommendation paper of July 1999
  * Available at http://csrc.nist.gov/cryptval/dss.htm
@@ -20,8 +20,6 @@
   @file ecc_free.c
   ECC Crypto, Tom St Denis
 */
-
-#ifdef LTC_MECC
 
 /**
   Free an ECC key from memory
@@ -35,7 +33,6 @@ ecc_free (ecc_key * key)
                   &key->prime, &key->order, &key->Gx, &key->Gy, NULL);
 }
 
-#endif
 /* $Source: /cvs/libtom/libtomcrypt/src/pk/ecc/ecc_free.c,v $ */
 /* $Revision: 1.6 $ */
 /* $Date: 2007/05/12 14:32:35 $ */

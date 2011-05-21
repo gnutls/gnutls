@@ -1,27 +1,32 @@
-/* LibTomCrypt, modular cryptographic library -- Tom St Denis
+/*
+ * Copyright (C) 2011 Free Software Foundation, Inc.
  *
- * LibTomCrypt is a library that provides various cryptographic
- * algorithms in a highly modular and flexible manner.
+ * Author: Nikos Mavrogiannopoulos
  *
- * The library is free for all purposes without any express
- * guarantee it works.
+ * This file is part of GNUTLS.
  *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
+ * The GNUTLS library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+ * USA
+ *
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 - ax + b
- *
- * All curves taken from NIST recommendation paper of July 1999
- * Available at http://csrc.nist.gov/cryptval/dss.htm
+/* Implements ECC point doubling over Z/pZ for curve y^2 = x^3 + ax + b
  */
 #include "ecc.h"
 
-/**
-  @file ltc_ecc_projective_dbl_point.c
-  ECC Crypto, Tom St Denis
-*/
-
-#if defined(LTC_MECC) && (!defined(LTC_MECC_ACCEL) || defined(LTM_LTC_DESC))
+#ifndef ECC_SECP_CURVES_ONLY
 
 /**
    Double an ECC point
@@ -42,6 +47,30 @@ ltc_ecc_projective_dbl_point (ecc_point * P, ecc_point * R, mpz_t a,
   assert (R != NULL);
   assert (modulus != NULL);
 
+  /*
+    algorithm used:
+     if (Y == 0)
+       return POINT_AT_INFINITY
+     S = 4*X*Y^2
+     M = 3*X^2 + a*Z^4
+     X' = M^2 - 2*S
+     Y' = M*(S - X') - 8*Y^4
+     Z' = 2*Y*Z
+     return (X', Y', Z')
+   */
+
+  if (mpz_cmp_ui(P->y, 0) == 0)
+    {
+      /* point at infinity 
+       * under jacobian coordinates
+       */
+      mpz_set(R->x, 1);
+      mpz_set(R->y, 1);
+      mpz_set(R->z, 0);
+      
+      return 0;
+    }
+
   if ((err = mp_init_multi (&t1, &m, &s, NULL)) != 0)
     {
       return err;
@@ -54,16 +83,6 @@ ltc_ecc_projective_dbl_point (ecc_point * P, ecc_point * R, mpz_t a,
       mpz_set (R->z, P->z);
     }
 
-  /*
-     if (Y == 0)
-     return POINT_AT_INFINITY
-     S = 4*X*Y^2
-     M = 3*X^2 + a*Z^4
-     X' = M^2 - 2*S
-     Y' = M*(S - X') - 8*Y^4
-     Z' = 2*Y*Z
-     return (X', Y', Z')
-   */
 
   /* m = Z * Z */
   mpz_mul (m, R->z, R->z);
@@ -187,7 +206,5 @@ ltc_ecc_projective_dbl_point (ecc_point * P, ecc_point * R, mpz_t a,
   mp_clear_multi (&t1, &m, &s, NULL);
   return err;
 }
+
 #endif
-/* $Source: /cvs/libtom/libtomcrypt/src/pk/ecc/ltc_ecc_projective_dbl_point.c,v $ */
-/* $Revision: 1.11 $ */
-/* $Date: 2007/05/12 14:32:35 $ */

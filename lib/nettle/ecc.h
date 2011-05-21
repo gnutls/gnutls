@@ -6,8 +6,12 @@
 #include <string.h>
 #include <assert.h>
 
-#define LTC_MECC
-#define ECC256
+/* assume y^2 = x^3 - 3x + b
+ * instead of the generic y^2 = x^3 + ax + b
+ *
+ * (XXX: the generic case has not been tested)
+ */
+#define ECC_SECP_CURVES_ONLY
 
 #define PK_PRIVATE 1
 #define PK_PUBLIC 2

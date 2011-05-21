@@ -9,7 +9,7 @@
  * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 - ax + b
+/* Implements ECC over Z/pZ for curve y^2 = x^3 + ax + b
  *
  * All curves taken from NIST recommendation paper of July 1999
  * Available at http://csrc.nist.gov/cryptval/dss.htm
@@ -20,8 +20,6 @@
   @file ltc_ecc_projective_add_point.c
   ECC Crypto, Tom St Denis
 */
-
-#if defined(LTC_MECC) && (!defined(LTC_MECC_ACCEL) || defined(LTM_LTC_DESC))
 
 /**
    Add two ECC points
@@ -203,8 +201,6 @@ ltc_ecc_projective_add_point (ecc_point * P, ecc_point * Q, ecc_point * R,
   mp_clear_multi (&t1, &t2, &x, &y, &z, NULL);
   return err;
 }
-
-#endif
 
 /* $Source: /cvs/libtom/libtomcrypt/src/pk/ecc/ltc_ecc_projective_add_point.c,v $ */
 /* $Revision: 1.16 $ */

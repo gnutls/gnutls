@@ -9,7 +9,7 @@
  * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 - ax + b
+/* Implements ECC over Z/pZ for curve y^2 = x^3 + ax + b
  *
  * All curves taken from NIST recommendation paper of July 1999
  * Available at http://csrc.nist.gov/cryptval/dss.htm
@@ -20,8 +20,6 @@
   @file ltc_ecc_map.c
   ECC Crypto, Tom St Denis
 */
-
-#ifdef LTC_MECC
 
 /**
   Map a projective jacobian point back to affine space
@@ -66,8 +64,6 @@ ltc_ecc_map (ecc_point * P, mpz_t modulus)
   mp_clear_multi (&t1, &t2, NULL);
   return err;
 }
-
-#endif
 
 /* $Source: /cvs/libtom/libtomcrypt/src/pk/ecc/ltc_ecc_map.c,v $ */
 /* $Revision: 1.7 $ */

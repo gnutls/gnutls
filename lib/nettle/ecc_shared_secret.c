@@ -9,7 +9,7 @@
  * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 - ax + b
+/* Implements ECC over Z/pZ for curve y^2 = x^3 + ax + b
  *
  * All curves taken from NIST recommendation paper of July 1999
  * Available at http://csrc.nist.gov/cryptval/dss.htm
@@ -21,8 +21,6 @@
   @file ecc_shared_secret.c
   ECC Crypto, Tom St Denis
 */
-
-#ifdef LTC_MECC
 
 /**
   Create an ECC shared secret between two keys
@@ -88,7 +86,6 @@ done:
   return err;
 }
 
-#endif
 /* $Source: /cvs/libtom/libtomcrypt/src/pk/ecc/ecc_shared_secret.c,v $ */
 /* $Revision: 1.10 $ */
 /* $Date: 2007/05/12 14:32:35 $ */
