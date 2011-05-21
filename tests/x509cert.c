@@ -182,6 +182,8 @@ doit (void)
     fail("gnutls_certificate_get_isser");
   
   fprintf(stderr, "Issuer's DN: %s\n", dn);
+  gnutls_x509_crt_deinit(crt);
+  gnutls_certificate_free_credentials(x509_cred);
   
   success("success");
 }
