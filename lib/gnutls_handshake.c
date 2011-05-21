@@ -3348,8 +3348,7 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
       /* If we have not agreed to a common curve with the peer don't bother
        * negotiating ECDH.
        */
-      if (session->security_parameters.entity == GNUTLS_SERVER && (kx == GNUTLS_KX_ANON_ECDH ||
-          kx == GNUTLS_KX_ECDHE_RSA))
+      if (session->security_parameters.entity == GNUTLS_SERVER && _gnutls_session_is_ecc(session))
         {
           if (_gnutls_session_ecc_curve_get(session) == GNUTLS_ECC_CURVE_INVALID)
             delete = 1;
