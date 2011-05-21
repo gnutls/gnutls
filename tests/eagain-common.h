@@ -229,7 +229,7 @@ int ret;
   return ret;
 }
 
-static void reset_buffers(void)
+inline static void reset_buffers(void)
 {
   to_server_len = 0;
   to_client_len = 0;
