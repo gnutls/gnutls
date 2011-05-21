@@ -92,7 +92,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t * o
 
   switch (algo)
     {
-    case GNUTLS_PK_ECDH:
+    case GNUTLS_PK_ECC:
       {
         ecc_key ecc_pub, ecc_priv;
         int curve = priv->flags;
@@ -681,7 +681,7 @@ rsa_fail:
 
         break;
       }
-    case GNUTLS_PK_ECDH:
+    case GNUTLS_PK_ECC:
       {
         ecc_key key;
         ecc_set_type tls_ecc_set;

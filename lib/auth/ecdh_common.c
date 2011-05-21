@@ -61,7 +61,7 @@ int ret;
   
   _gnutls_mpi_set_ui(pub.params[7], 1);
   
-  ret = _gnutls_pk_derive(GNUTLS_PK_ECDH, &session->key->key, &session->key->ecdh_params, &pub);
+  ret = _gnutls_pk_derive(GNUTLS_PK_ECC, &session->key->key, &session->key->ecdh_params, &pub);
   
   _gnutls_mpi_release(&pub.params[7]);
   
@@ -109,7 +109,7 @@ _gnutls_gen_ecdh_common_client_kx (gnutls_session_t session, gnutls_buffer_st* d
   int curve = _gnutls_session_ecc_curve_get(session);
 
   /* generate temporal key */
-  ret = _gnutls_pk_generate(GNUTLS_PK_ECDH, curve, &session->key->ecdh_params);
+  ret = _gnutls_pk_generate(GNUTLS_PK_ECC, curve, &session->key->ecdh_params);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -195,7 +195,7 @@ int _gnutls_ecdh_common_print_server_kx (gnutls_session_t session, gnutls_buffer
     return gnutls_assert_val(ret);
 
   /* generate temporal key */
-  ret = _gnutls_pk_generate(GNUTLS_PK_ECDH, curve, &session->key->ecdh_params);
+  ret = _gnutls_pk_generate(GNUTLS_PK_ECC, curve, &session->key->ecdh_params);
   if (ret < 0)
     return gnutls_assert_val(ret);
 

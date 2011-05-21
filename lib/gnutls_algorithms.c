@@ -2067,6 +2067,11 @@ static const gnutls_sign_entry sign_algorithms[] = {
    GNUTLS_MAC_MD5, {1, 1}},
   {"RSA-MD2", SIG_RSA_MD2_OID, GNUTLS_SIGN_RSA_MD2, GNUTLS_PK_RSA,
    GNUTLS_MAC_MD2, TLS_SIGN_AID_UNKNOWN},
+  {"ECDSA-SHA1", "1.2.840.10045.4.1", GNUTLS_SIGN_ECDSA_SHA1, GNUTLS_PK_ECC, GNUTLS_MAC_SHA1, {2, 3}},
+  {"ECDSA-SHA224", "1.2.840.10045.4.3.1", GNUTLS_SIGN_ECDSA_SHA224, GNUTLS_PK_ECC, GNUTLS_MAC_SHA224, {3, 3}},
+  {"ECDSA-SHA256", "1.2.840.10045.4.3.2", GNUTLS_SIGN_ECDSA_SHA256, GNUTLS_PK_ECC, GNUTLS_MAC_SHA256, {4, 3}},
+  {"ECDSA-SHA384", "1.2.840.10045.4.3.3", GNUTLS_SIGN_ECDSA_SHA384, GNUTLS_PK_ECC, GNUTLS_MAC_SHA384, {5, 3}},
+  {"ECDSA-SHA512", "1.2.840.10045.4.3.4", GNUTLS_SIGN_ECDSA_SHA512, GNUTLS_PK_ECC, GNUTLS_MAC_SHA512, {6, 3}},
   {"GOST R 34.10-2001", SIG_GOST_R3410_2001_OID, 0, 0, 0,
    TLS_SIGN_AID_UNKNOWN},
   {"GOST R 34.10-94", SIG_GOST_R3410_94_OID, 0, 0, 0, TLS_SIGN_AID_UNKNOWN},
@@ -2160,7 +2165,9 @@ _gnutls_x509_oid2sign_algorithm (const char *oid)
 
   GNUTLS_SIGN_LOOP (if (p->oid && strcmp (oid, p->oid) == 0)
                     {
-                    ret = p->id; break;}
+                      ret = p->id; 
+                      break;
+                    }
   );
 
   if (ret == 0)
@@ -2429,7 +2436,7 @@ static const gnutls_pk_entry pk_algorithms[] = {
   {"DSA", PK_DSA_OID, GNUTLS_PK_DSA},
   {"GOST R 34.10-2001", PK_GOST_R3410_2001_OID, GNUTLS_PK_UNKNOWN},
   {"GOST R 34.10-94", PK_GOST_R3410_94_OID, GNUTLS_PK_UNKNOWN},
-  {"ECDH", "1.2.840.10045.2.1", GNUTLS_PK_ECDH},
+  {"ECC", "1.2.840.10045.2.1", GNUTLS_PK_ECC},
   {0, 0, 0}
 };
 

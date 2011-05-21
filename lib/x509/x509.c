@@ -881,6 +881,9 @@ gnutls_x509_crt_get_pk_algorithm (gnutls_x509_crt_t cert, unsigned int *bits)
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
+  
+  if (bits)
+    *bits = 0;
 
   result =
     _gnutls_x509_get_pk_algorithm (cert->cert,

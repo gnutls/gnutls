@@ -559,7 +559,7 @@ extern "C"
    * @GNUTLS_PK_RSA: RSA public-key algorithm.
    * @GNUTLS_PK_DSA: DSA public-key algorithm.
    * @GNUTLS_PK_DH: Diffie-Hellman algorithm. Used to generate parameters.
-   * @GNUTLS_PK_ECDH: Elliptic curve Diffie-Hellman algorithm. Used to generate parameters.
+   * @GNUTLS_PK_ECC: Elliptic curve algorithm. Used to generate parameters.
    *
    * Enumeration of different public-key algorithms.
    */
@@ -569,7 +569,7 @@ extern "C"
     GNUTLS_PK_RSA = 1,
     GNUTLS_PK_DSA = 2,
     GNUTLS_PK_DH = 3,
-    GNUTLS_PK_ECDH = 4,
+    GNUTLS_PK_ECC = 4,
   } gnutls_pk_algorithm_t;
 
   const char *gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm);
@@ -590,6 +590,11 @@ extern "C"
    * @GNUTLS_SIGN_RSA_SHA384: Digital signature algorithm RSA with SHA-384.
    * @GNUTLS_SIGN_RSA_SHA512: Digital signature algorithm RSA with SHA-512.
    * @GNUTLS_SIGN_RSA_SHA224: Digital signature algorithm RSA with SHA-224.
+   * @GNUTLS_SIGN_ECDSA_SHA1: ECDSA with SHA1.
+   * @GNUTLS_SIGN_ECDSA_SHA256: Digital signature algorithm ECDSA with SHA-256.
+   * @GNUTLS_SIGN_ECDSA_SHA384: Digital signature algorithm ECDSA with SHA-384.
+   * @GNUTLS_SIGN_ECDSA_SHA512: Digital signature algorithm ECDSA with SHA-512.
+   * @GNUTLS_SIGN_ECDSA_SHA224: Digital signature algorithm ECDSA with SHA-224.
    *
    * Enumeration of different digital signature algorithms.
    */
@@ -608,7 +613,12 @@ extern "C"
     GNUTLS_SIGN_RSA_SHA512 = 8,
     GNUTLS_SIGN_RSA_SHA224 = 9,
     GNUTLS_SIGN_DSA_SHA224 = 10,
-    GNUTLS_SIGN_DSA_SHA256 = 11
+    GNUTLS_SIGN_DSA_SHA256 = 11,
+    GNUTLS_SIGN_ECDSA_SHA1 = 12,
+    GNUTLS_SIGN_ECDSA_SHA224 = 13,
+    GNUTLS_SIGN_ECDSA_SHA256 = 14,
+    GNUTLS_SIGN_ECDSA_SHA384 = 15,
+    GNUTLS_SIGN_ECDSA_SHA512 = 16,
   } gnutls_sign_algorithm_t;
 
   /**
