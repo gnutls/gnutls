@@ -875,7 +875,13 @@ gnutls_mac_get_id (const char *name)
 {
   gnutls_mac_algorithm_t ret = GNUTLS_MAC_UNKNOWN;
 
-  GNUTLS_HASH_LOOP (if (strcasecmp (p->name, name) == 0) ret = p->id);
+  GNUTLS_HASH_LOOP (
+    if (strcasecmp (p->name, name) == 0) 
+      {
+        ret = p->id;
+        break;
+      }
+  );
 
   return ret;
 }
@@ -1094,7 +1100,13 @@ gnutls_cipher_get_id (const char *name)
 {
   gnutls_cipher_algorithm_t ret = GNUTLS_CIPHER_UNKNOWN;
 
-  GNUTLS_CIPHER_LOOP (if (strcasecmp (p->name, name) == 0) ret = p->id);
+  GNUTLS_CIPHER_LOOP (
+    if (strcasecmp (p->name, name) == 0) 
+      {
+        ret = p->id;
+        break;
+      }
+  );
 
   return ret;
 }
@@ -1200,7 +1212,13 @@ gnutls_kx_get_id (const char *name)
 {
   gnutls_cipher_algorithm_t ret = GNUTLS_KX_UNKNOWN;
 
-  GNUTLS_KX_LOOP (if (strcasecmp (p->name, name) == 0) ret = p->algorithm);
+  GNUTLS_KX_LOOP (
+    if (strcasecmp (p->name, name) == 0) 
+      {
+        ret = p->algorithm;
+        break;
+      }
+  );
 
   return ret;
 }
@@ -1348,7 +1366,13 @@ gnutls_protocol_get_id (const char *name)
 {
   gnutls_protocol_t ret = GNUTLS_VERSION_UNKNOWN;
 
-  GNUTLS_VERSION_LOOP (if (strcasecmp (p->name, name) == 0) ret = p->id);
+  GNUTLS_VERSION_LOOP (
+    if (strcasecmp (p->name, name) == 0) 
+      {
+        ret = p->id;
+        break;
+      }
+  );
 
   return ret;
 }
@@ -2117,7 +2141,13 @@ gnutls_sign_get_id (const char *name)
 {
   gnutls_sign_algorithm_t ret = GNUTLS_SIGN_UNKNOWN;
 
-  GNUTLS_SIGN_LOOP (if (strcasecmp (p->name, name) == 0) ret = p->id);
+  GNUTLS_SIGN_LOOP (
+    if (strcasecmp (p->name, name) == 0) 
+      {
+        ret = p->id;
+        break;
+      }
+  );
 
   return ret;
 
@@ -2279,6 +2309,30 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 #define GNUTLS_ECC_CURVE_LOOP(b) \
 	{ const gnutls_ecc_curve_entry_st *p; \
                 for(p = ecc_curves; p->name != NULL; p++) { b ; } }
+/*-
+ * _gnutls_ecc_curve_get_id:
+ * @name: is a MAC algorithm name
+ *
+ * The names are compared in a case insensitive way.
+ *
+ * Returns: return a #ecc_curve_t value corresponding to
+ *   the specified cipher, or %GNUTLS_ECC_CURVE_INVALID on error.
+ -*/
+ecc_curve_t
+_gnutls_ecc_curve_get_id (const char *name)
+{
+  ecc_curve_t ret = GNUTLS_ECC_CURVE_INVALID;
+
+  GNUTLS_ECC_CURVE_LOOP (
+  if (strcasecmp (p->name, name) == 0) 
+    {
+      ret = p->id;
+      break;
+    }
+  );
+
+  return ret;
+}
 
 /*-
  * _gnutls_ecc_curve_get_name:
@@ -2550,14 +2604,16 @@ gnutls_sec_param_to_pk_bits (gnutls_pk_algorithm_t algo,
     {
       GNUTLS_SEC_PARAM_LOOP (if (p->sec_param == param)
                              {
-                             ret = p->dsa_bits; break;}
+                               ret = p->dsa_bits; break;
+                             }
       );
       return ret;
     }
 
   GNUTLS_SEC_PARAM_LOOP (if (p->sec_param == param)
                          {
-                         ret = p->pk_bits; break;}
+                           ret = p->pk_bits; break;
+                         }
   );
 
   return ret;
@@ -2573,7 +2629,8 @@ _gnutls_pk_bits_to_subgroup_bits (unsigned int pk_bits)
 
   GNUTLS_SEC_PARAM_LOOP (if (p->pk_bits >= pk_bits)
                          {
-                         ret = p->subgroup_bits; break;}
+                           ret = p->subgroup_bits; break;
+                         }
   );
 
   return ret;
@@ -2596,7 +2653,8 @@ gnutls_sec_param_get_name (gnutls_sec_param_t param)
 
   GNUTLS_SEC_PARAM_LOOP (if (p->sec_param == param)
                          {
-                         ret = p->name; break;}
+                           ret = p->name; break;
+                         }
   );
 
   return ret;
@@ -2621,7 +2679,8 @@ gnutls_pk_bits_to_sec_param (gnutls_pk_algorithm_t algo, unsigned int bits)
 
   GNUTLS_SEC_PARAM_LOOP (if (p->pk_bits > bits)
                          {
-                         break;}
+                           break;
+                         }
                          ret = p->sec_param;);
 
   return ret;

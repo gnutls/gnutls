@@ -150,5 +150,6 @@ typedef struct gnutls_ecc_curve_entry_st gnutls_ecc_curve_entry_st;
 const char * _gnutls_ecc_curve_get_name (ecc_curve_t curve);
 const gnutls_ecc_curve_entry_st * _gnutls_ecc_curve_get_params (ecc_curve_t curve);
 int _gnutls_ecc_curve_get_size (ecc_curve_t curve);
+ecc_curve_t _gnutls_ecc_curve_get_id (const char *name);
 
 #endif

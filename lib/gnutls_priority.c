@@ -215,9 +215,22 @@ gnutls_certificate_type_set_priority (gnutls_session_t session,
 #endif
 }
 
-static const int supported_ecc_default[] = {
+static const int supported_ecc_normal[] = {
+  GNUTLS_ECC_CURVE_SECP224R1,
   GNUTLS_ECC_CURVE_SECP256R1,
   GNUTLS_ECC_CURVE_SECP384R1,
+  GNUTLS_ECC_CURVE_SECP521R1,
+  0
+};
+
+static const int supported_ecc_secure128[] = {
+  GNUTLS_ECC_CURVE_SECP256R1,
+  GNUTLS_ECC_CURVE_SECP384R1,
+  GNUTLS_ECC_CURVE_SECP521R1,
+  0
+};
+
+static const int supported_ecc_secure256[] = {
   GNUTLS_ECC_CURVE_SECP521R1,
   0
 };
@@ -528,6 +541,8 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  *
  * "NONE:+VERS-TLS-ALL:+AES-128-CBC:+RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1", 
  *
+ * "NONE:+VERS-TLS-ALL:+AES-128-CBC:+ECDHE-RSA:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1:+CURVE-SECP256R1", 
+ *
  * "NORMAL:%COMPAT" is the most compatible mode.
  *
  * Returns: On syntax error %GNUTLS_E_INVALID_REQUEST is returned,
@@ -577,12 +592,11 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
       _set_priority (&(*priority_cache)->compression, comp_priority);
       _set_priority (&(*priority_cache)->cert_type, cert_type_priority);
       _set_priority (&(*priority_cache)->sign_algo, sign_priority_default);
-      _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_default);
+      _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_normal);
       i = 0;
     }
   else
     {
-      _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_default);
       i = 1;
     }
 
@@ -596,6 +610,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
           _set_priority (&(*priority_cache)->mac, mac_priority_normal);
           _set_priority (&(*priority_cache)->sign_algo,
                          sign_priority_default);
+          _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_normal);
         }
       else if (strcasecmp (broken_list[i], "NORMAL") == 0)
         {
@@ -604,6 +619,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
           _set_priority (&(*priority_cache)->mac, mac_priority_normal);
           _set_priority (&(*priority_cache)->sign_algo,
                          sign_priority_default);
+          _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_normal);
         }
       else if (strcasecmp (broken_list[i], "SECURE256") == 0
                || strcasecmp (broken_list[i], "SECURE") == 0)
@@ -614,6 +630,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
           _set_priority (&(*priority_cache)->mac, mac_priority_secure);
           _set_priority (&(*priority_cache)->sign_algo,
                          sign_priority_secure256);
+          _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_secure256);
         }
       else if (strcasecmp (broken_list[i], "SECURE128") == 0)
         {
@@ -623,6 +640,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
           _set_priority (&(*priority_cache)->mac, mac_priority_secure);
           _set_priority (&(*priority_cache)->sign_algo,
                          sign_priority_secure128);
+          _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_secure128);
         }
       else if (strcasecmp (broken_list[i], "EXPORT") == 0)
         {
@@ -631,6 +649,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
           _set_priority (&(*priority_cache)->mac, mac_priority_secure);
           _set_priority (&(*priority_cache)->sign_algo,
                          sign_priority_default);
+          _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_normal);
         }                       /* now check if the element is something like -ALGO */
       else if (broken_list[i][0] == '!' || broken_list[i][0] == '+'
                || broken_list[i][0] == '-')
@@ -690,6 +709,23 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
                     goto error;
                 }
             }                   /* now check if the element is something like -ALGO */
+          else if (strncasecmp (&broken_list[i][1], "CURVE-", 6) == 0)
+            {
+              if (strncasecmp (&broken_list[i][1], "CURVE-ALL", 9) == 0)
+                {
+                  bulk_fn (&(*priority_cache)->supported_ecc,
+                                 supported_ecc_normal);
+                }
+              else
+                {
+                  if ((algo =
+                       _gnutls_ecc_curve_get_id (&broken_list[i][7])) !=
+                      GNUTLS_ECC_CURVE_INVALID)
+                    fn (&(*priority_cache)->supported_ecc, algo);
+                  else
+                    goto error;
+                }
+            }                   /* now check if the element is something like -ALGO */
           else if (strncasecmp (&broken_list[i][1], "CTYPE-", 6) == 0)
             {
               if (strncasecmp (&broken_list[i][1], "CTYPE-ALL", 9) == 0)
@@ -729,10 +765,15 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
                   bulk_fn (&(*priority_cache)->mac,
                                 mac_priority_secure);
             }
-          else if (strncasecmp (&broken_list[i][1], "CIPHER-ALL", 7) == 0)
+          else if (strncasecmp (&broken_list[i][1], "CIPHER-ALL", 10) == 0)
             {
                   bulk_fn (&(*priority_cache)->cipher,
                                 cipher_priority_normal);
+            }
+          else if (strncasecmp (&broken_list[i][1], "KX-ALL", 6) == 0)
+            {
+                  bulk_fn (&(*priority_cache)->kx,
+                                kx_priority_secure);
             }
           else
             goto error;
