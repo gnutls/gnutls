@@ -144,6 +144,21 @@ print_dsa_pkey (gnutls_datum_t * x, gnutls_datum_t * y, gnutls_datum_t * p,
 }
 
 static void
+print_ecc_pkey (gnutls_ecc_curve_t curve, gnutls_datum_t* k, gnutls_datum_t * x, gnutls_datum_t * y)
+{
+  if (k)
+    {
+      fprintf (outfile, "private key:");
+      print_hex_datum (k);
+    }
+  fprintf (outfile, "curve:\t%s\n", gnutls_ecc_curve_get_name(curve));
+  fprintf (outfile, "x:");
+  print_hex_datum (x);
+  fprintf (outfile, "y:");
+  print_hex_datum (y);
+}
+
+static void
 print_rsa_pkey (gnutls_datum_t * m, gnutls_datum_t * e, gnutls_datum_t * d,
                 gnutls_datum_t * p, gnutls_datum_t * q, gnutls_datum_t * u,
                 gnutls_datum_t * exp1, gnutls_datum_t * exp2)
@@ -2931,6 +2946,22 @@ pubkey_info (gnutls_x509_crt_t crt, common_info_st * cinfo)
           gnutls_free (p.data);
           gnutls_free (q.data);
           gnutls_free (g.data);
+        }
+    }
+  else if (ret == GNUTLS_PK_ECC)
+    {
+      gnutls_datum_t x, y;
+      gnutls_ecc_curve_t curve;
+
+      ret = gnutls_pubkey_get_pk_ecc_raw (pubkey, &curve, &x, &y);
+      if (ret < 0)
+        fprintf (stderr, "Error in key ECC data export: %s\n",
+                 gnutls_strerror (ret));
+      else
+        {
+          print_ecc_pkey (curve, NULL, &y, &x);
+          gnutls_free (y.data);
+          gnutls_free (x.data);
         }
     }
 
