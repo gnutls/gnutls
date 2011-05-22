@@ -52,6 +52,7 @@
 
 #define SIGN_HASH GNUTLS_DIG_SHA1
 
+static void privkey_info_int (gnutls_x509_privkey_t key);
 static void print_crl_info (gnutls_x509_crl_t crl, FILE * out);
 void pkcs7_info (void);
 void crq_info (void);
@@ -146,12 +147,12 @@ print_dsa_pkey (gnutls_datum_t * x, gnutls_datum_t * y, gnutls_datum_t * p,
 static void
 print_ecc_pkey (gnutls_ecc_curve_t curve, gnutls_datum_t* k, gnutls_datum_t * x, gnutls_datum_t * y)
 {
+  fprintf (outfile, "curve:\t%s\n", gnutls_ecc_curve_get_name(curve));
   if (k)
     {
       fprintf (outfile, "private key:");
       print_hex_datum (k);
     }
-  fprintf (outfile, "curve:\t%s\n", gnutls_ecc_curve_get_name(curve));
   fprintf (outfile, "x:");
   print_hex_datum (x);
   fprintf (outfile, "y:");
@@ -331,6 +332,8 @@ print_private_key (gnutls_x509_privkey_t key)
 
   if (!key)
     return;
+
+  privkey_info_int(key);
 
   if (!info.pkcs8)
     {
@@ -1652,40 +1655,11 @@ crq_info (void)
   gnutls_x509_crq_deinit (crq);
 }
 
-void
-privkey_info (void)
+static void privkey_info_int (gnutls_x509_privkey_t key)
 {
-  gnutls_x509_privkey_t key;
-  size_t size;
-  int ret;
-  gnutls_datum_t pem;
-  const char *cprint;
-  const char *pass;
-
-  size = fread (buffer, 1, buffer_size - 1, infile);
-  buffer[size] = 0;
-
-  gnutls_x509_privkey_init (&key);
-
-  pem.data = buffer;
-  pem.size = size;
-
-  ret = 0;
-  if (!info.pkcs8)
-    ret = gnutls_x509_privkey_import (key, &pem, info.incert_format);
-
-  /* If we failed to import the certificate previously try PKCS #8 */
-  if (info.pkcs8 || ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
-    {
-      if (info.pass)
-        pass = info.pass;
-      else
-        pass = get_pass ();
-      ret = gnutls_x509_privkey_import_pkcs8 (key, &pem,
-                                              info.incert_format, pass, 0);
-    }
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));
+int ret;
+size_t size;
+const char *cprint;
 
   /* Public key algorithm
    */
@@ -1695,7 +1669,7 @@ privkey_info (void)
 
   cprint = gnutls_pk_algorithm_get_name (ret);
   fprintf (outfile, "%s\n", cprint ? cprint : "Unknown");
-  fprintf (outfile, "\tKey Security Level: %s\n",
+  fprintf (outfile, "\tKey Security Level: %s\n\n",
            gnutls_sec_param_get_name (gnutls_x509_privkey_sec_param (key)));
 
   /* Print the raw public and private keys
@@ -1741,6 +1715,23 @@ privkey_info (void)
           gnutls_free (g.data);
         }
     }
+  else if (ret == GNUTLS_PK_ECC)
+    {
+      gnutls_datum_t y, x, k;
+      gnutls_ecc_curve_t curve;
+
+      ret = gnutls_x509_privkey_export_ecc_raw (key, &curve, &x, &y, &k);
+      if (ret < 0)
+        fprintf (stderr, "Error in key ECC data export: %s\n",
+                 gnutls_strerror (ret));
+      else
+        {
+          print_ecc_pkey (curve, &k, &x, &y);
+          gnutls_free (x.data);
+          gnutls_free (y.data);
+          gnutls_free (k.data);
+        }
+    }
 
   fprintf (outfile, "\n");
 
@@ -1754,6 +1745,46 @@ privkey_info (void)
     {
       fprintf (outfile, "Public Key ID: %s\n", raw_to_string (buffer, size));
     }
+  fprintf (outfile, "\n");
+
+}
+
+void
+privkey_info (void)
+{
+  gnutls_x509_privkey_t key;
+  size_t size;
+  int ret;
+  gnutls_datum_t pem;
+  const char *pass;
+
+  size = fread (buffer, 1, buffer_size - 1, infile);
+  buffer[size] = 0;
+
+  gnutls_x509_privkey_init (&key);
+
+  pem.data = buffer;
+  pem.size = size;
+
+  ret = 0;
+  if (!info.pkcs8)
+    ret = gnutls_x509_privkey_import (key, &pem, info.incert_format);
+
+  /* If we failed to import the certificate previously try PKCS #8 */
+  if (info.pkcs8 || ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
+    {
+      if (info.pass)
+        pass = info.pass;
+      else
+        pass = get_pass ();
+      ret = gnutls_x509_privkey_import_pkcs8 (key, &pem,
+                                              info.incert_format, pass, 0);
+    }
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));
+
+
+  privkey_info_int (key);
 
   if (info.fix_key != 0)
     {
