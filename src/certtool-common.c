@@ -547,7 +547,7 @@ load_pubkey (int mand, common_info_st * info)
   if (info->pubkey == NULL)
     error (EXIT_FAILURE, 0, "missing --load-pubkey");
 
-  if (strncmp(info->privkey, "pkcs11:", 7) == 0)
+  if (strncmp(info->pubkey, "pkcs11:", 7) == 0)
     return _load_pkcs11_pubkey(info->pubkey);
 
   ret = gnutls_pubkey_init (&key);
