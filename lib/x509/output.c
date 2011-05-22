@@ -1147,7 +1147,7 @@ print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
 
   /* SubjectPublicKeyInfo. */
   {
-    int err;
+    int err, pk;
     unsigned int bits;
 
     err = gnutls_x509_crt_get_pk_algorithm (cert, &bits);
@@ -1155,23 +1155,39 @@ print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
       addf (str, "error: get_pk_algorithm: %s\n", gnutls_strerror (err));
     else
       {
+        gnutls_pubkey_t pubkey;
         const char *name = gnutls_pk_algorithm_get_name (err);
         if (name == NULL)
           name = _("unknown");
+          
+        pk = err;
 
         addf (str, _("\tSubject Public Key Algorithm: %s\n"), name);
         addf (str, _("\tCertificate Security Level: %s\n"),
               gnutls_sec_param_get_name (gnutls_pk_bits_to_sec_param
                                          (err, bits)));
-
 #ifdef ENABLE_PKI
-        switch (err)
+        err = gnutls_pubkey_init(&pubkey);
+        if (err < 0)
+         {
+            addf (str, "error: gnutls_pubkey_init: %s\n", gnutls_strerror (err));
+            return;
+          }
+
+        err = gnutls_pubkey_import_x509(pubkey, cert, 0);
+        if (err < 0)
+          {
+            addf (str, "error: gnutls_pubkey_import_x509: %s\n", gnutls_strerror (err));
+            return;
+          }
+
+        switch (pk)
           {
           case GNUTLS_PK_RSA:
             {
               gnutls_datum_t m, e;
 
-              err = gnutls_x509_crt_get_pk_rsa_raw (cert, &m, &e);
+              err = gnutls_pubkey_get_pk_rsa_raw (pubkey, &m, &e);
               if (err < 0)
                 addf (str, "error: get_pk_rsa_raw: %s\n",
                       gnutls_strerror (err));
@@ -1189,11 +1205,34 @@ print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
             }
             break;
 
+          case GNUTLS_PK_ECC:
+            {
+              gnutls_datum_t x, y;
+              gnutls_ecc_curve_t curve;
+
+              err = gnutls_pubkey_get_pk_ecc_raw (pubkey, &curve, &x, &y);
+              if (err < 0)
+                addf (str, "error: get_pk_ecc_raw: %s\n",
+                      gnutls_strerror (err));
+              else
+                {
+                  addf (str, _("\t\tCurve:\t%s\n"), gnutls_ecc_curve_get_name(curve));
+                  addf (str, _("\t\tX:\n"));
+                  hexdump (str, x.data, x.size, "\t\t\t");
+                  adds (str, _("\t\tY:\n"));
+                  hexdump (str, y.data, y.size, "\t\t\t");
+
+                  gnutls_free (x.data);
+                  gnutls_free (y.data);
+
+                }
+            }
+            break;
           case GNUTLS_PK_DSA:
             {
               gnutls_datum_t p, q, g, y;
 
-              err = gnutls_x509_crt_get_pk_dsa_raw (cert, &p, &q, &g, &y);
+              err = gnutls_pubkey_get_pk_dsa_raw (pubkey, &p, &q, &g, &y);
               if (err < 0)
                 addf (str, "error: get_pk_dsa_raw: %s\n",
                       gnutls_strerror (err));
@@ -1220,6 +1259,8 @@ print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
           default:
             break;
           }
+        
+        gnutls_pubkey_deinit(pubkey);
 #endif
       }
   }

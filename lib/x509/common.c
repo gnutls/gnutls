@@ -1259,7 +1259,6 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
                                unsigned int *bits)
 {
   int result;
-  opaque *str = NULL;
   int algo;
   char oid[64];
   int len;
@@ -1292,52 +1291,13 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
 
   /* Now read the parameters' bits 
    */
-  _asnstr_append_name (name, sizeof (name), src_name, ".subjectPublicKey");
-
-  len = 0;
-  result = asn1_read_value (src, name, NULL, &len);
-  if (result != ASN1_MEM_ERROR)
-    {
-      gnutls_assert ();
-      return _gnutls_asn2err (result);
-    }
-
-  if (len % 8 != 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_CERTIFICATE_ERROR;
-    }
-
-  len /= 8;
-
-  str = gnutls_malloc (len);
-  if (str == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  _asnstr_append_name (name, sizeof (name), src_name, ".subjectPublicKey");
-
-  result = asn1_read_value (src, name, str, &len);
-
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      gnutls_free (str);
-      return _gnutls_asn2err (result);
-    }
-
-  len /= 8;
-
-  result = _gnutls_x509_read_pubkey (algo, str, len, &params);
+  result = _gnutls_get_asn_mpis(src, src_name, &params);
   if (result < 0)
     return gnutls_assert_val(result);
- 
+
   bits[0] = pubkey_to_bits(algo, &params);
 
   gnutls_pk_params_release(&params);
-  gnutls_free (str);
   return algo;
 }
 

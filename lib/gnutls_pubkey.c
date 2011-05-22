@@ -673,6 +673,59 @@ gnutls_pubkey_get_pk_dsa_raw (gnutls_pubkey_t key,
 }
 
 /**
+ * gnutls_pubkey_get_pk_ecc_raw:
+ * @key: Holds the public key
+ * @curve: will hold the curve
+ * @x: will hold x
+ * @y: will hold y
+ *
+ * This function will export the ECC public key's parameters found in
+ * the given certificate.  The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ **/
+int
+gnutls_pubkey_get_pk_ecc_raw (gnutls_pubkey_t key, gnutls_ecc_curve_t *curve,
+                              gnutls_datum_t * x, gnutls_datum_t * y)
+{
+  int ret;
+
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  if (key->pk_algorithm != GNUTLS_PK_ECC)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  *curve = key->params.flags;
+
+  /* X */
+  ret = _gnutls_mpi_dprint (key->params.params[5], x);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  /* Y */
+  ret = _gnutls_mpi_dprint (key->params.params[6], y);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      _gnutls_free_datum (x);
+      return ret;
+    }
+
+  return 0;
+}
+
+/**
  * gnutls_pubkey_import:
  * @key: The structure to store the parsed public key. 
  * @data: The DER or PEM encoded certificate. 

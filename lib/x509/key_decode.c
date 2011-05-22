@@ -104,23 +104,43 @@ _gnutls_x509_read_rsa_pubkey (opaque * der, int dersize, gnutls_pk_params_st * p
 int
 _gnutls_x509_read_ecc_pubkey (opaque * der, int dersize, gnutls_pk_params_st * params)
 {
-  uint8_t* octet;
+#if 0  
   int ret;
-  size_t octet_size = dersize;
-  
-  octet = gnutls_malloc(octet_size);
-  if (octet == NULL)
-    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-    
-  ret  = _gnutls_x509_decode_octet_string (NULL, der, dersize, octet, &octet_size);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
+  ASN1_TYPE spk = ASN1_TYPE_EMPTY;
+  gnutls_datum_t octet;
 
-  ret = _gnutls_ecc_ansi_x963_import (octet, octet_size, &params->params[5],
+  if ((ret = asn1_create_element
+       (_gnutls_get_gnutls_asn (), "GNUTLS.ECPoint", &spk))
+      != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (ret);
+    }
+
+  ret = asn1_der_decoding (&spk, der, dersize, NULL);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&spk);
+      return _gnutls_asn2err (ret);
+    }
+
+
+  if ((ret = _gnutls_x509_read_value (spk, "", &octet, 0)) < 0)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&spk);
+      return GNUTLS_E_ASN1_GENERIC_ERROR;
+    }
+
+  ret = _gnutls_ecc_ansi_x963_import (octet.data, octet.size, &params->params[5],
                                      &params->params[6]);
-  gnutls_free(octet);
+  _gnutls_free_datum(&octet);
   
   return ret;
+#endif
+  return _gnutls_ecc_ansi_x963_import (der, dersize, &params->params[5],
+                                     &params->params[6]);
 }
 
 
@@ -237,7 +257,7 @@ _gnutls_x509_read_ecc_params (opaque * der, int dersize, gnutls_pk_params_st * p
       ret = GNUTLS_E_ECC_UNSUPPORTED_CURVE;
       goto cleanup;
     }
-    
+
   ret = _gnutls_ecc_curve_fill_params(params->flags, params);
   if (ret < 0)
     {
@@ -258,17 +278,27 @@ cleanup:
 int _gnutls_x509_read_pubkey (gnutls_pk_algorithm_t algo, opaque * der, int dersize,
                                   gnutls_pk_params_st * params)
 {
+int ret;
+
   switch(algo)
     {
       case GNUTLS_PK_RSA:
-        return _gnutls_x509_read_rsa_pubkey(der, dersize, params);
+        ret = _gnutls_x509_read_rsa_pubkey(der, dersize, params);
+        if (ret >= 0) params->params_nr = RSA_PUBLIC_PARAMS;
+        break;
       case GNUTLS_PK_DSA:
-        return _gnutls_x509_read_dsa_pubkey(der, dersize, params);
+        ret = _gnutls_x509_read_dsa_pubkey(der, dersize, params);
+        if (ret >= 0) params->params_nr = DSA_PUBLIC_PARAMS;
+        break;
       case GNUTLS_PK_ECC:
-        return _gnutls_x509_read_ecc_pubkey(der, dersize, params);
+        ret = _gnutls_x509_read_ecc_pubkey(der, dersize, params);
+        if (ret >= 0) params->params_nr = ECC_PUBLIC_PARAMS;
+        break;
       default:
-        return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+        ret = gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
+        break;
     }
+  return ret;
 }
 
 int _gnutls_x509_read_pubkey_params (gnutls_pk_algorithm_t algo, opaque * der, int dersize,

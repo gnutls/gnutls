@@ -40,6 +40,8 @@ int gnutls_pubkey_get_pk_rsa_raw (gnutls_pubkey_t key,
 int gnutls_pubkey_get_pk_dsa_raw (gnutls_pubkey_t key,
                                   gnutls_datum_t * p, gnutls_datum_t * q,
                                   gnutls_datum_t * g, gnutls_datum_t * y);
+int gnutls_pubkey_get_pk_ecc_raw (gnutls_pubkey_t key, gnutls_ecc_curve_t *curve,
+                              gnutls_datum_t * x, gnutls_datum_t * y);
 
 int gnutls_pubkey_export (gnutls_pubkey_t key,
                           gnutls_x509_crt_fmt_t format,

@@ -123,24 +123,27 @@ _gnutls_get_asn_mpis (ASN1_TYPE asn, const char *root,
  
   _asnstr_append_name (name, sizeof (name), root,
                        ".algorithm.parameters");
-  result = _gnutls_x509_read_value (asn, name, &tmp, 0);
 
   /* FIXME: If the parameters are not included in the certificate
    * then the issuer's parameters should be used. This is not
    * done yet.
    */
 
-  if (result < 0 && pk_algorithm != GNUTLS_PK_RSA) /* RSA doesn't use parameters */
+  if (pk_algorithm != GNUTLS_PK_RSA) /* RSA doesn't use parameters */
     {
-      gnutls_assert ();
-      goto error;
-    }
+      result = _gnutls_x509_read_value (asn, name, &tmp, 0);
+      if (result < 0) 
+        {
+          gnutls_assert ();
+          goto error;
+        }
 
-  if ((result =
-       _gnutls_x509_read_pubkey_params (pk_algorithm, tmp.data, tmp.size, params)) < 0)
-    {
-      gnutls_assert ();
-      goto error;
+      if ((result =
+           _gnutls_x509_read_pubkey_params (pk_algorithm, tmp.data, tmp.size, params)) < 0)
+        {
+          gnutls_assert ();
+          goto error;
+        }
     }
 
   result = 0;

@@ -715,6 +715,7 @@ GNUTLS_3_0_0 {
 	gnutls_global_set_audit_log_function;
 	gnutls_ecc_curve_get_name;
 	gnutls_ecc_curve_get_size;
+	gnutls_pubkey_get_pk_ecc_raw;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

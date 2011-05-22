@@ -83,14 +83,25 @@ gnutls_sec_param_to_pk_bits (gnutls_pk_algorithm_t algo,
       );
       return ret;
     }
-
-  GNUTLS_SEC_PARAM_LOOP (if (p->sec_param == param)
+  else if (algo == GNUTLS_PK_ECC)
+    {
+      GNUTLS_SEC_PARAM_LOOP (if (p->sec_param == param)
+                             {
+                               ret = p->ecc_bits; break;
+                             }
+      );
+      return ret;
+    }
+  else
+    {
+      GNUTLS_SEC_PARAM_LOOP (if (p->sec_param == param)
                          {
                            ret = p->pk_bits; break;
                          }
-  );
+      );
 
-  return ret;
+      return ret;
+    }
 }
 
 /* Returns the corresponding size for subgroup bits (q),
@@ -149,13 +160,24 @@ gnutls_sec_param_get_name (gnutls_sec_param_t param)
 gnutls_sec_param_t
 gnutls_pk_bits_to_sec_param (gnutls_pk_algorithm_t algo, unsigned int bits)
 {
-  gnutls_sec_param_t ret = GNUTLS_SEC_PARAM_WEAK;
+  gnutls_sec_param_t ret = GNUTLS_SEC_PARAM_UNKNOWN;
 
-  GNUTLS_SEC_PARAM_LOOP (if (p->pk_bits > bits)
+  if (algo == GNUTLS_PK_ECC)
+    {
+      GNUTLS_SEC_PARAM_LOOP (if (p->ecc_bits > bits)
                          {
                            break;
                          }
                          ret = p->sec_param;);
+    }
+  else
+    {
+      GNUTLS_SEC_PARAM_LOOP (if (p->pk_bits > bits)
+                         {
+                           break;
+                         }
+                         ret = p->sec_param;);
+    }
 
   return ret;
 }
