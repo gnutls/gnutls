@@ -1163,9 +1163,9 @@ print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
         pk = err;
 
         addf (str, _("\tSubject Public Key Algorithm: %s\n"), name);
-        addf (str, _("\tCertificate Security Level: %s\n"),
+        addf (str, _("\tCertificate Security Level: %s (%d bits)\n"),
               gnutls_sec_param_get_name (gnutls_pk_bits_to_sec_param
-                                         (err, bits)));
+                                         (err, bits)), bits);
 #ifdef ENABLE_PKI
         err = gnutls_pubkey_init(&pubkey);
         if (err < 0)
