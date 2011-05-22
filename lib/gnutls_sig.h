@@ -52,14 +52,14 @@ int _gnutls_handshake_verify_data (gnutls_session_t session,
                                    gnutls_sign_algorithm_t algo);
 
 int _gnutls_soft_sign (gnutls_pk_algorithm_t algo,
-                       bigint_t * params, int params_size,
+                       gnutls_pk_params_st* params,
                        const gnutls_datum_t * data,
                        gnutls_datum_t * signature);
 
 int pk_prepare_hash (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash,
                      gnutls_datum_t * output);
 int pk_hash_data (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash,
-                  bigint_t * params, const gnutls_datum_t * data,
+                  gnutls_pk_params_st * params, const gnutls_datum_t * data,
                   gnutls_datum_t * digest);
 
 int

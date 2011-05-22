@@ -78,7 +78,7 @@ typedef struct gnutls_pkcs7_int
 /* parameters should not be larger than this limit */
 #define DSA_PUBLIC_PARAMS 4
 #define RSA_PUBLIC_PARAMS 2
-#define ECDH_PUBLIC_PARAMS 8
+#define ECC_PUBLIC_PARAMS 8
 
 
 #define MAX_PRIV_PARAMS_SIZE GNUTLS_MAX_PK_PARAMS       /* ok for RSA and DSA */
@@ -86,9 +86,13 @@ typedef struct gnutls_pkcs7_int
 /* parameters should not be larger than this limit */
 #define DSA_PRIVATE_PARAMS 5
 #define RSA_PRIVATE_PARAMS 8
-#define ECDH_PRIVATE_PARAMS 9
+#define ECC_PRIVATE_PARAMS 9
 
 #if MAX_PRIV_PARAMS_SIZE - RSA_PRIVATE_PARAMS < 0
+#error INCREASE MAX_PRIV_PARAMS
+#endif
+
+#if MAX_PRIV_PARAMS_SIZE - ECC_PRIVATE_PARAMS < 0
 #error INCREASE MAX_PRIV_PARAMS
 #endif
 
@@ -101,29 +105,7 @@ typedef struct gnutls_x509_privkey_int
   /* the size of params depends on the public
    * key algorithm
    */
-  bigint_t params[MAX_PRIV_PARAMS_SIZE];
-
-  /*
-   * RSA: [0] is modulus
-   *      [1] is public exponent
-   *      [2] is private exponent
-   *      [3] is prime1 (p)
-   *      [4] is prime2 (q)
-   *      [5] is coefficient (u == inverse of p mod q)
-   *          note that other packages used inverse of q mod p,
-   *          so we need to perform conversions on import/export
-   *          using fixup.
-   *      The following two are also not always available thus fixup
-   *      will generate them.
-   *      [6] e1 == d mod (p-1)
-   *      [7] e2 == d mod (q-1)
-   * DSA: [0] is p
-   *      [1] is q
-   *      [2] is g
-   *      [3] is y (public key)
-   *      [4] is x (private key)
-   */
-  int params_size;              /* holds the number of params */
+  gnutls_pk_params_st params;
 
   gnutls_pk_algorithm_t pk_algorithm;
 
@@ -198,8 +180,7 @@ int
 _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
                                const gnutls_datum_t * signature,
                                gnutls_pk_algorithm_t pk,
-                               bigint_t * issuer_params,
-                               unsigned int issuer_params_size);
+                               gnutls_pk_params_st * issuer_params);
 
 int _gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
                                    const gnutls_datum_t * hash,
@@ -213,7 +194,10 @@ int _gnutls_x509_privkey_verify_signature (const gnutls_datum_t * tbs,
 ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t *
                                                 raw_key,
                                                 gnutls_x509_privkey_t pkey);
-int _gnutls_asn1_encode_dsa (ASN1_TYPE * c2, bigint_t * params);
+ASN1_TYPE _gnutls_privkey_decode_ecc_key (const gnutls_datum_t *
+                                                raw_key,
+                                                gnutls_x509_privkey_t pkey);
+int _gnutls_asn1_encode_privkey (gnutls_pk_algorithm_t pk, ASN1_TYPE * c2, gnutls_pk_params_st * params);
 
 /* extensions.c */
 int _gnutls_x509_crl_get_extension (gnutls_x509_crl_t crl,
@@ -288,22 +272,22 @@ int _gnutls_x509_ext_gen_proxyCertInfo (int pathLenConstraint,
 
 /* mpi.c */
 int _gnutls_x509_crq_get_mpis (gnutls_x509_crq_t cert,
-                               bigint_t * params, int *params_size);
+                               gnutls_pk_params_st*);
 
 int _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
-                               bigint_t * params, int *params_size);
-int _gnutls_x509_read_rsa_params (opaque * der, int dersize,
-                                  bigint_t * params);
-int _gnutls_x509_read_dsa_pubkey (opaque * der, int dersize,
-                                  bigint_t * params);
-int _gnutls_x509_read_dsa_params (opaque * der, int dersize,
-                                  bigint_t * params);
+                               gnutls_pk_params_st * params);
 
-int _gnutls_x509_write_rsa_params (bigint_t * params, int params_size,
+int _gnutls_x509_read_pubkey_params (gnutls_pk_algorithm_t, opaque * der, int dersize,
+                                  gnutls_pk_params_st * params);
+
+int _gnutls_x509_read_pubkey (gnutls_pk_algorithm_t, opaque * der, int dersize,
+                                  gnutls_pk_params_st * params);
+
+int
+_gnutls_x509_write_pubkey_params (gnutls_pk_algorithm_t algo,
+                                   gnutls_pk_params_st* params,
                                    gnutls_datum_t * der);
-int _gnutls_x509_write_dsa_params (bigint_t * params, int params_size,
-                                   gnutls_datum_t * der);
-int _gnutls_x509_write_dsa_public_key (bigint_t * params, int params_size,
+int _gnutls_x509_write_pubkey (gnutls_pk_algorithm_t, gnutls_pk_params_st * params,
                                        gnutls_datum_t * der);
 
 int _gnutls_x509_read_uint (ASN1_TYPE node, const char *value,

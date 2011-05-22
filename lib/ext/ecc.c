@@ -265,5 +265,5 @@ _gnutls_session_supports_ecc_curve (gnutls_session_t session, int ecc_type)
         }
     }
 
-  return GNUTLS_E_ECC_NO_SUPPORTED_CURVES;
+  return GNUTLS_E_ECC_UNSUPPORTED_CURVE;
 }

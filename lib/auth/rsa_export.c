@@ -72,7 +72,7 @@ const mod_auth_st rsa_export_auth_struct = {
  */
 static int
 _gnutls_get_private_rsa_params (gnutls_session_t session,
-                                bigint_t ** params, int *params_size)
+                                gnutls_pk_params_st** params)
 {
   int ret;
   gnutls_certificate_credentials_t cred;
@@ -116,8 +116,7 @@ _gnutls_get_private_rsa_params (gnutls_session_t session,
    * of 512 bits size. The params in the certificate are
    * used to sign this temporary stuff.
    */
-  *params_size = RSA_PRIVATE_PARAMS;
-  *params = rsa_params->params;
+  *params = &rsa_params->params;
 
   return 0;
 }
@@ -129,8 +128,7 @@ proc_rsa_export_client_kx (gnutls_session_t session, opaque * data,
   gnutls_datum_t plaintext;
   gnutls_datum_t ciphertext;
   int ret, dsize;
-  bigint_t *params;
-  int params_len;
+  gnutls_pk_params_st *params;
   int randomize_key = 0;
   ssize_t data_size = _data_size;
 
@@ -157,14 +155,14 @@ proc_rsa_export_client_kx (gnutls_session_t session, opaque * data,
       ciphertext.size = dsize;
     }
 
-  ret = _gnutls_get_private_rsa_params (session, &params, &params_len);
+  ret = _gnutls_get_private_rsa_params (session, &params);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = _gnutls_pkcs1_rsa_decrypt (&plaintext, &ciphertext, params, params_len, 2);     /* btype==2 */
+  ret = _gnutls_pkcs1_rsa_decrypt (&plaintext, &ciphertext, params, 2);     /* btype==2 */
 
   if (ret < 0 || plaintext.size != GNUTLS_MASTER_SIZE)
     {
@@ -236,7 +234,7 @@ static int
 gen_rsa_export_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
   gnutls_rsa_params_t rsa_params;
-  const bigint_t *rsa_mpis;
+  const gnutls_pk_params_st *rsa_mpis;
   int ret = 0;
   gnutls_pcert_st *apr_cert_list;
   gnutls_privkey_t apr_pkey;
@@ -290,13 +288,13 @@ gen_rsa_export_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
       return ret;
     }
 
-  _gnutls_rsa_export_set_pubkey (session, rsa_mpis[1], rsa_mpis[0]);
+  _gnutls_rsa_export_set_pubkey (session, rsa_mpis->params[1], rsa_mpis->params[0]);
 
-  ret = _gnutls_buffer_append_mpi( data, 16, rsa_mpis[0], 0);
+  ret = _gnutls_buffer_append_mpi( data, 16, rsa_mpis->params[0], 0);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  ret = _gnutls_buffer_append_mpi( data, 16, rsa_mpis[1], 0);
+  ret = _gnutls_buffer_append_mpi( data, 16, rsa_mpis->params[1], 0);
   if (ret < 0)
     return gnutls_assert_val(ret);
 

@@ -555,7 +555,7 @@ cleanup:
 
 static inline int is_supported_curve(int curve)
 {
-  if (_gnutls_ecc_curve_get_name(curve) != NULL)
+  if (gnutls_ecc_curve_get_name(curve) != NULL)
     return 1;
   else
     return 0;
@@ -703,7 +703,7 @@ rsa_fail:
           return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
         params->params_nr = 0;
-        for (i = 0; i < ECDH_PRIVATE_PARAMS; i++)
+        for (i = 0; i < ECC_PRIVATE_PARAMS; i++)
           {
             params->params[i] = _gnutls_mpi_alloc_like(&key.prime);
             if (params->params[i] == NULL)
@@ -773,7 +773,7 @@ wrap_nettle_pk_fixup (gnutls_pk_algorithm_t algo,
       _gnutls_mpi_release (&params->params[6]);
       _gnutls_mpi_release (&params->params[7]);
 
-      result = _gnutls_calc_rsa_exp (params->params, RSA_PRIVATE_PARAMS - 2);
+      result = _gnutls_calc_rsa_exp (params);
       if (result < 0)
         {
           gnutls_assert ();

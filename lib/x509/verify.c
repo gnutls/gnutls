@@ -752,8 +752,8 @@ decode_ber_digest_info (const gnutls_datum_t * info,
 static int
 _pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
                        const gnutls_datum_t * prehash,
-                       const gnutls_datum_t * signature, bigint_t * params,
-                       int params_len)
+                       const gnutls_datum_t * signature, 
+                       gnutls_pk_params_st * params)
 {
   gnutls_mac_algorithm_t hash = GNUTLS_MAC_UNKNOWN;
   int ret;
@@ -763,7 +763,7 @@ _pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
   gnutls_datum_t decrypted;
 
   ret =
-    _gnutls_pkcs1_rsa_decrypt (&decrypted, signature, params, params_len, 1);
+    _gnutls_pkcs1_rsa_decrypt (&decrypted, signature, params, 1);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -829,8 +829,8 @@ _pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
 static int
 dsa_verify_sig (const gnutls_datum_t * text,
                 const gnutls_datum_t * hash,
-                const gnutls_datum_t * signature, bigint_t * params,
-                int params_len)
+                const gnutls_datum_t * signature,
+                gnutls_pk_params_st* params)
 {
   int ret;
   opaque _digest[MAX_HASH_SIZE];
@@ -838,7 +838,7 @@ dsa_verify_sig (const gnutls_datum_t * text,
   digest_hd_st hd;
   gnutls_digest_algorithm_t algo;
 
-  algo = _gnutls_dsa_q_to_hash (params[1]);
+  algo = _gnutls_dsa_q_to_hash (params->params[1]);
   if (hash)
     {
       /* SHA1 or better allowed */
@@ -867,7 +867,7 @@ dsa_verify_sig (const gnutls_datum_t * text,
       digest.size = _gnutls_hash_get_algo_len(algo);
     }
 
-  ret = _gnutls_dsa_verify (&digest, signature, params, params_len);
+  ret = _gnutls_dsa_verify (&digest, signature, params);
 
   return ret;
 }
@@ -879,8 +879,8 @@ int
 pubkey_verify_sig (const gnutls_datum_t * tbs,
                    const gnutls_datum_t * hash,
                    const gnutls_datum_t * signature,
-                   gnutls_pk_algorithm_t pk, bigint_t * issuer_params,
-                   int issuer_params_size)
+                   gnutls_pk_algorithm_t pk,
+                   gnutls_pk_params_st * issuer_params)
 {
 
   switch (pk)
@@ -888,7 +888,7 @@ pubkey_verify_sig (const gnutls_datum_t * tbs,
     case GNUTLS_PK_RSA:
 
       if (_pkcs1_rsa_verify_sig
-          (tbs, hash, signature, issuer_params, issuer_params_size) != 0)
+          (tbs, hash, signature, issuer_params) != 0)
         {
           gnutls_assert ();
           return GNUTLS_E_PK_SIG_VERIFY_FAILED;
@@ -899,7 +899,7 @@ pubkey_verify_sig (const gnutls_datum_t * tbs,
 
     case GNUTLS_PK_DSA:
       if (dsa_verify_sig
-          (tbs, hash, signature, issuer_params, issuer_params_size) != 0)
+          (tbs, hash, signature, issuer_params) != 0)
         {
           gnutls_assert ();
           return GNUTLS_E_PK_SIG_VERIFY_FAILED;
@@ -941,8 +941,7 @@ int
 _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
                                const gnutls_datum_t * signature,
                                gnutls_pk_algorithm_t pk,
-                               bigint_t * issuer_params,
-                               unsigned int issuer_params_size)
+                               gnutls_pk_params_st * issuer_params)
 {
   opaque digest[MAX_HASH_SIZE];
   gnutls_datum_t decrypted;
@@ -954,7 +953,7 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
     case GNUTLS_PK_DSA:
 
       if (hash)
-        *hash = _gnutls_dsa_q_to_hash (issuer_params[1]);
+        *hash = _gnutls_dsa_q_to_hash (issuer_params->params[1]);
 
       ret = 0;
       break;
@@ -968,7 +967,7 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
 
       ret =
         _gnutls_pkcs1_rsa_decrypt (&decrypted, signature,
-                                   issuer_params, issuer_params_size, 1);
+                                   issuer_params, 1);
 
 
       if (ret < 0)
@@ -1021,14 +1020,13 @@ _gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
                                const gnutls_datum_t * signature,
                                gnutls_x509_crt_t issuer)
 {
-  bigint_t issuer_params[MAX_PUBLIC_PARAMS_SIZE];
-  int ret, issuer_params_size, i;
+  gnutls_pk_params_st issuer_params;
+  int ret;
 
   /* Read the MPI parameters from the issuer's certificate.
    */
-  issuer_params_size = MAX_PUBLIC_PARAMS_SIZE;
   ret =
-    _gnutls_x509_crt_get_mpis (issuer, issuer_params, &issuer_params_size);
+    _gnutls_x509_crt_get_mpis (issuer, &issuer_params);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1038,7 +1036,7 @@ _gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
   ret =
     pubkey_verify_sig (tbs, hash, signature,
                        gnutls_x509_crt_get_pk_algorithm (issuer, NULL),
-                       issuer_params, issuer_params_size);
+                       &issuer_params);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1046,10 +1044,7 @@ _gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
 
   /* release all allocated MPIs
    */
-  for (i = 0; i < issuer_params_size; i++)
-    {
-      _gnutls_mpi_release (&issuer_params[i]);
-    }
+  gnutls_pk_params_release(&issuer_params);
 
   return ret;
 }
@@ -1068,7 +1063,7 @@ _gnutls_x509_privkey_verify_signature (const gnutls_datum_t * tbs,
   int ret;
 
   ret = pubkey_verify_sig (tbs, NULL, signature, issuer->pk_algorithm,
-                           issuer->params, issuer->params_size);
+                           &issuer->params);
   if (ret < 0)
     {
       gnutls_assert ();

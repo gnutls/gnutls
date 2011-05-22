@@ -1187,7 +1187,7 @@ _gnutls_read_pgp_mpi (cdk_packet_t pkt, unsigned int priv, size_t idx,
 int
 _gnutls_openpgp_crt_get_mpis (gnutls_openpgp_crt_t cert,
                               uint32_t * keyid /* [2] */ ,
-                              bigint_t * params, int *params_size)
+                              gnutls_pk_params_st * params)
 {
   int result, i;
   int pk_algorithm, local_params;
@@ -1219,32 +1219,23 @@ _gnutls_openpgp_crt_get_mpis (gnutls_openpgp_crt_t cert,
       return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
     }
 
-  if (*params_size < local_params)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  *params_size = local_params;
+  gnutls_pk_params_init(params);
 
   for (i = 0; i < local_params; i++)
     {
-      result = _gnutls_read_pgp_mpi (pkt, 0, i, &params[i]);
+      result = _gnutls_read_pgp_mpi (pkt, 0, i, &params->params[i]);
       if (result < 0)
         {
           gnutls_assert ();
           goto error;
         }
+      params->params_nr++;
     }
 
   return 0;
 
 error:
-  {
-    int j;
-    for (j = 0; j < i; j++)
-      _gnutls_mpi_release (&params[j]);
-  }
+  gnutls_pk_params_release(params);
 
   return result;
 }
@@ -1255,11 +1246,12 @@ static int
 _get_pk_rsa_raw (gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid,
                  gnutls_datum_t * m, gnutls_datum_t * e)
 {
-  int pk_algorithm, ret, i;
+  int pk_algorithm, ret;
   cdk_packet_t pkt;
   uint32_t kid32[2];
-  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
-  int params_size = MAX_PUBLIC_PARAMS_SIZE;
+  gnutls_pk_params_st params;
+
+  gnutls_pk_params_init(&params);
 
   if (crt == NULL)
     {
@@ -1284,21 +1276,21 @@ _get_pk_rsa_raw (gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = _gnutls_openpgp_crt_get_mpis (crt, kid32, params, &params_size);
+  ret = _gnutls_openpgp_crt_get_mpis (crt, kid32, &params);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = _gnutls_mpi_dprint (params[0], m);
+  ret = _gnutls_mpi_dprint (params.params[0], m);
   if (ret < 0)
     {
       gnutls_assert ();
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_dprint (params[1], e);
+  ret = _gnutls_mpi_dprint (params.params[1], e);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1309,10 +1301,7 @@ _get_pk_rsa_raw (gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid,
   ret = 0;
 
 cleanup:
-  for (i = 0; i < params_size; i++)
-    {
-      _gnutls_mpi_release (&params[i]);
-    }
+  gnutls_pk_params_release(&params);
   return ret;
 }
 
@@ -1321,11 +1310,12 @@ _get_pk_dsa_raw (gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid,
                  gnutls_datum_t * p, gnutls_datum_t * q,
                  gnutls_datum_t * g, gnutls_datum_t * y)
 {
-  int pk_algorithm, ret, i;
+  int pk_algorithm, ret;
   cdk_packet_t pkt;
   uint32_t kid32[2];
-  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
-  int params_size = MAX_PUBLIC_PARAMS_SIZE;
+  gnutls_pk_params_st params;
+  
+  gnutls_pk_params_init(&params);
 
   if (crt == NULL)
     {
@@ -1350,7 +1340,7 @@ _get_pk_dsa_raw (gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = _gnutls_openpgp_crt_get_mpis (crt, kid32, params, &params_size);
+  ret = _gnutls_openpgp_crt_get_mpis (crt, kid32, &params);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1358,7 +1348,7 @@ _get_pk_dsa_raw (gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid,
     }
 
   /* P */
-  ret = _gnutls_mpi_dprint (params[0], p);
+  ret = _gnutls_mpi_dprint (params.params[0], p);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1366,7 +1356,7 @@ _get_pk_dsa_raw (gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid,
     }
 
   /* Q */
-  ret = _gnutls_mpi_dprint (params[1], q);
+  ret = _gnutls_mpi_dprint (params.params[1], q);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1376,7 +1366,7 @@ _get_pk_dsa_raw (gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid,
 
 
   /* G */
-  ret = _gnutls_mpi_dprint (params[2], g);
+  ret = _gnutls_mpi_dprint (params.params[2], g);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1387,7 +1377,7 @@ _get_pk_dsa_raw (gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid,
 
 
   /* Y */
-  ret = _gnutls_mpi_dprint (params[3], y);
+  ret = _gnutls_mpi_dprint (params.params[3], y);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1400,10 +1390,7 @@ _get_pk_dsa_raw (gnutls_openpgp_crt_t crt, gnutls_openpgp_keyid_t keyid,
   ret = 0;
 
 cleanup:
-  for (i = 0; i < params_size; i++)
-    {
-      _gnutls_mpi_release (&params[i]);
-    }
+  gnutls_pk_params_release(&params);
   return ret;
 }
 

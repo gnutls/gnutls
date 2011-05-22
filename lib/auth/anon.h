@@ -44,7 +44,7 @@ typedef struct gnutls_anon_client_credentials_st
 typedef struct anon_auth_info_st
 {
   dh_info_st dh;
-  ecc_curve_t curve;
+  gnutls_ecc_curve_t curve;
 } *anon_auth_info_t;
 
 typedef struct anon_auth_info_st anon_auth_info_st;

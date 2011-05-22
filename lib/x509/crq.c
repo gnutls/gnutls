@@ -792,7 +792,7 @@ gnutls_x509_crq_set_key (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
   result = _gnutls_x509_encode_and_copy_PKI_params
     (crq->crq,
      "certificationRequestInfo.subjectPKInfo",
-     key->pk_algorithm, key->params, key->params_size);
+     key->pk_algorithm, &key->params);
 
   if (result < 0)
     {
@@ -823,9 +823,9 @@ gnutls_x509_crq_get_key_rsa_raw (gnutls_x509_crq_t crq,
                                  gnutls_datum_t * m, gnutls_datum_t * e)
 {
   int ret;
-  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
-  int params_size = MAX_PUBLIC_PARAMS_SIZE;
-  int i;
+  gnutls_pk_params_st params;
+
+  gnutls_pk_params_init(&params);
 
   if (crq == NULL)
     {
@@ -840,21 +840,21 @@ gnutls_x509_crq_get_key_rsa_raw (gnutls_x509_crq_t crq,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = _gnutls_x509_crq_get_mpis (crq, params, &params_size);
+  ret = _gnutls_x509_crq_get_mpis (crq, &params);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = _gnutls_mpi_dprint (params[0], m);
+  ret = _gnutls_mpi_dprint (params.params[0], m);
   if (ret < 0)
     {
       gnutls_assert ();
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_dprint (params[1], e);
+  ret = _gnutls_mpi_dprint (params.params[1], e);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -865,10 +865,7 @@ gnutls_x509_crq_get_key_rsa_raw (gnutls_x509_crq_t crq,
   ret = 0;
 
 cleanup:
-  for (i = 0; i < params_size; i++)
-    {
-      _gnutls_mpi_release (&params[i]);
-    }
+  gnutls_pk_params_release(&params);
   return ret;
 }
 
@@ -893,7 +890,9 @@ gnutls_x509_crq_set_key_rsa_raw (gnutls_x509_crq_t crq,
 {
   int result, ret;
   size_t siz = 0;
-  bigint_t temp_params[RSA_PUBLIC_PARAMS];
+  gnutls_pk_params_st temp_params;
+
+  gnutls_pk_params_init(&temp_params);
 
   if (crq == NULL)
     {
@@ -901,10 +900,10 @@ gnutls_x509_crq_set_key_rsa_raw (gnutls_x509_crq_t crq,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  memset (temp_params, 0, sizeof (temp_params));
+  memset (&temp_params, 0, sizeof (temp_params));
 
   siz = m->size;
-  if (_gnutls_mpi_scan_nz (&temp_params[0], m->data, siz))
+  if (_gnutls_mpi_scan_nz (&temp_params.params[0], m->data, siz))
     {
       gnutls_assert ();
       ret = GNUTLS_E_MPI_SCAN_FAILED;
@@ -912,17 +911,19 @@ gnutls_x509_crq_set_key_rsa_raw (gnutls_x509_crq_t crq,
     }
 
   siz = e->size;
-  if (_gnutls_mpi_scan_nz (&temp_params[1], e->data, siz))
+  if (_gnutls_mpi_scan_nz (&temp_params.params[1], e->data, siz))
     {
       gnutls_assert ();
       ret = GNUTLS_E_MPI_SCAN_FAILED;
       goto error;
     }
 
+  temp_params.params_nr = RSA_PUBLIC_PARAMS;
+
   result = _gnutls_x509_encode_and_copy_PKI_params
     (crq->crq,
      "certificationRequestInfo.subjectPKInfo",
-     GNUTLS_PK_RSA, temp_params, RSA_PUBLIC_PARAMS);
+     GNUTLS_PK_RSA, &temp_params);
 
   if (result < 0)
     {
@@ -934,8 +935,7 @@ gnutls_x509_crq_set_key_rsa_raw (gnutls_x509_crq_t crq,
   ret = 0;
 
 error:
-  _gnutls_mpi_release (&temp_params[0]);
-  _gnutls_mpi_release (&temp_params[1]);
+  gnutls_pk_params_release(&temp_params);
   return ret;
 }
 
@@ -2271,39 +2271,26 @@ static int
 rsadsa_crq_get_key_id (gnutls_x509_crq_t crq, int pk,
                        unsigned char *output_data, size_t * output_data_size)
 {
-  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
-  int params_size = MAX_PUBLIC_PARAMS_SIZE;
-  int i, result = 0;
+  gnutls_pk_params_st params;
+  int result = 0;
   gnutls_datum_t der = { NULL, 0 };
   digest_hd_st hd;
 
-  result = _gnutls_x509_crq_get_mpis (crq, params, &params_size);
+  gnutls_pk_params_init(&params);
+
+  result = _gnutls_x509_crq_get_mpis (crq, &params);
   if (result < 0)
     {
       gnutls_assert ();
       return result;
     }
 
-  if (pk == GNUTLS_PK_RSA)
+  result = _gnutls_x509_write_pubkey( pk, &params, &der);
+  if (result < 0)
     {
-      result = _gnutls_x509_write_rsa_params (params, params_size, &der);
-      if (result < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
+      gnutls_assert ();
+      goto cleanup;
     }
-  else if (pk == GNUTLS_PK_DSA)
-    {
-      result = _gnutls_x509_write_dsa_public_key (params, params_size, &der);
-      if (result < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
-    }
-  else
-    return GNUTLS_E_INTERNAL_ERROR;
 
   result = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1);
   if (result < 0)
@@ -2325,10 +2312,7 @@ cleanup:
 
   /* release all allocated MPIs
    */
-  for (i = 0; i < params_size; i++)
-    {
-      _gnutls_mpi_release (&params[i]);
-    }
+  gnutls_pk_params_release(&params);
   return result;
 }
 
@@ -2538,8 +2522,10 @@ gnutls_x509_crq_verify (gnutls_x509_crq_t crq,
 {
 gnutls_datum data = { NULL, 0 };
 gnutls_datum signature = { NULL, 0 };
-bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
-int ret, params_size = 0, i;
+gnutls_pk_params_st params;
+int ret;
+
+  gnutls_pk_params_init(&params);
 
   ret =
     _gnutls_x509_get_signed_data (crq->crq, "certificationRequestInfo", &data);
@@ -2556,9 +2542,8 @@ int ret, params_size = 0, i;
       goto cleanup;
     }
 
-  params_size = MAX_PUBLIC_PARAMS_SIZE;
   ret =
-    _gnutls_x509_crq_get_mpis(crq, params, &params_size);
+    _gnutls_x509_crq_get_mpis(crq, &params);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -2567,7 +2552,7 @@ int ret, params_size = 0, i;
 
   ret = pubkey_verify_sig(&data, NULL, &signature,
                           gnutls_x509_crq_get_pk_algorithm (crq, NULL),
-                          params, params_size);
+                          &params);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -2579,11 +2564,7 @@ int ret, params_size = 0, i;
 cleanup:
   _gnutls_free_datum (&data);
   _gnutls_free_datum (&signature);
-
-  for (i = 0; i < params_size; i++)
-    {
-      _gnutls_mpi_release (&params[i]);
-    }
+  gnutls_pk_params_release(&params);
 
   return ret;
 }

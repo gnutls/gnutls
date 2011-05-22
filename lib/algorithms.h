@@ -129,7 +129,8 @@ unsigned int _gnutls_pk_bits_to_subgroup_bits (unsigned int pk_bits);
 struct gnutls_ecc_curve_entry_st
 {
   const char *name;
-  ecc_curve_t id;
+  const char* oid;
+  gnutls_ecc_curve_t id;
   int tls_id; /* The RFC4492 namedCurve ID */
   int size; /* the size in bytes */
 
@@ -148,11 +149,13 @@ struct gnutls_ecc_curve_entry_st
 };
 typedef struct gnutls_ecc_curve_entry_st gnutls_ecc_curve_entry_st;
 
-const char * _gnutls_ecc_curve_get_name (ecc_curve_t curve);
-const gnutls_ecc_curve_entry_st * _gnutls_ecc_curve_get_params (ecc_curve_t curve);
-int _gnutls_ecc_curve_get_size (ecc_curve_t curve);
-ecc_curve_t _gnutls_ecc_curve_get_id (const char *name);
+const gnutls_ecc_curve_entry_st * _gnutls_ecc_curve_get_params (gnutls_ecc_curve_t curve);
+gnutls_ecc_curve_t _gnutls_ecc_curve_get_id (const char *name);
 int _gnutls_tls_id_to_ecc_curve (int num);
-int _gnutls_ecc_curve_get_tls_id (ecc_curve_t supported_ecc);
+int _gnutls_ecc_curve_get_tls_id (gnutls_ecc_curve_t supported_ecc);
+const char * _gnutls_ecc_curve_get_oid (gnutls_ecc_curve_t curve);
+gnutls_ecc_curve_t _gnutls_oid_to_ecc_curve (const char* oid);
+
+#define MAX_ECC_CURVE_SIZE 66
 
 #endif

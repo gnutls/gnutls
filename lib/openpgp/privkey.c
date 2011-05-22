@@ -712,14 +712,13 @@ gnutls_openpgp_privkey_get_subkey_fingerprint (gnutls_openpgp_privkey_t key,
 int
 _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
                                   uint32_t * keyid /*[2] */ ,
-                                  bigint_t * params, int *params_size)
+                                  gnutls_pk_params_st * params)
 {
   int result, i;
   int pk_algorithm;
-  gnutls_pk_params_st pk_params;
   cdk_packet_t pkt;
 
-  memset (&pk_params, 0, sizeof (pk_params));
+  gnutls_pk_params_init(params);
 
   if (keyid == NULL)
     pkt = cdk_kbnode_find_packet (pkey->knode, CDK_PKT_SECRET_KEY);
@@ -740,19 +739,19 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
     case GNUTLS_PK_RSA:
       /* openpgp does not hold all parameters as in PKCS #1
        */
-      pk_params.params_nr = RSA_PRIVATE_PARAMS - 2;
+      params->params_nr = RSA_PRIVATE_PARAMS - 2;
       break;
     case GNUTLS_PK_DSA:
-      pk_params.params_nr = DSA_PRIVATE_PARAMS;
+      params->params_nr = DSA_PRIVATE_PARAMS;
       break;
     default:
       gnutls_assert ();
       return GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE;
     }
 
-  for (i = 0; i < pk_params.params_nr; i++)
+  for (i = 0; i < params->params_nr; i++)
     {
-      result = _gnutls_read_pgp_mpi (pkt, 1, i, &pk_params.params[i]);
+      result = _gnutls_read_pgp_mpi (pkt, 1, i, &params->params[i]);
       if (result < 0)
         {
           gnutls_assert ();
@@ -763,31 +762,17 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
   /* fixup will generate exp1 and exp2 that are not
    * available here.
    */
-  result = _gnutls_pk_fixup (pk_algorithm, GNUTLS_IMPORT, &pk_params);
+  result = _gnutls_pk_fixup (pk_algorithm, GNUTLS_IMPORT, params);
   if (result < 0)
     {
       gnutls_assert ();
       goto error;
     }
 
-  if (*params_size < pk_params.params_nr)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  *params_size = pk_params.params_nr;
-  for (i = 0; i < pk_params.params_nr; i++)
-    params[i] = pk_params.params[i];
-
   return 0;
 
 error:
-  {
-    int j;
-    for (j = 0; j < i; j++)
-      _gnutls_mpi_release (&pk_params.params[j]);
-  }
+  gnutls_pk_params_release(params);
 
   return result;
 }
@@ -800,11 +785,10 @@ _get_sk_rsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
                  gnutls_datum_t * d, gnutls_datum_t * p,
                  gnutls_datum_t * q, gnutls_datum_t * u)
 {
-  int pk_algorithm, ret, i;
+  int pk_algorithm, ret;
   cdk_packet_t pkt;
   uint32_t kid32[2];
-  bigint_t params[MAX_PRIV_PARAMS_SIZE];
-  int params_size = MAX_PRIV_PARAMS_SIZE;
+  gnutls_pk_params_st params;
 
   if (pkey == NULL)
     {
@@ -830,21 +814,21 @@ _get_sk_rsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = _gnutls_openpgp_privkey_get_mpis (pkey, kid32, params, &params_size);
+  ret = _gnutls_openpgp_privkey_get_mpis (pkey, kid32, &params);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = _gnutls_mpi_dprint (params[0], m);
+  ret = _gnutls_mpi_dprint (params.params[0], m);
   if (ret < 0)
     {
       gnutls_assert ();
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_dprint (params[1], e);
+  ret = _gnutls_mpi_dprint (params.params[1], e);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -852,7 +836,7 @@ _get_sk_rsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_dprint (params[2], d);
+  ret = _gnutls_mpi_dprint (params.params[2], d);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -861,7 +845,7 @@ _get_sk_rsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_dprint (params[3], p);
+  ret = _gnutls_mpi_dprint (params.params[3], p);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -871,7 +855,7 @@ _get_sk_rsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_dprint (params[4], q);
+  ret = _gnutls_mpi_dprint (params.params[4], q);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -882,7 +866,7 @@ _get_sk_rsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_dprint (params[5], u);
+  ret = _gnutls_mpi_dprint (params.params[5], u);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -897,10 +881,7 @@ _get_sk_rsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
   ret = 0;
 
 cleanup:
-  for (i = 0; i < params_size; i++)
-    {
-      _gnutls_mpi_release (&params[i]);
-    }
+  gnutls_pk_params_release(&params);
   return ret;
 }
 
@@ -909,11 +890,10 @@ _get_sk_dsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
                  gnutls_datum_t * p, gnutls_datum_t * q,
                  gnutls_datum_t * g, gnutls_datum_t * y, gnutls_datum_t * x)
 {
-  int pk_algorithm, ret, i;
+  int pk_algorithm, ret;
   cdk_packet_t pkt;
   uint32_t kid32[2];
-  bigint_t params[MAX_PRIV_PARAMS_SIZE];
-  int params_size = MAX_PRIV_PARAMS_SIZE;
+  gnutls_pk_params_st params;
 
   if (pkey == NULL)
     {
@@ -939,7 +919,7 @@ _get_sk_dsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = _gnutls_openpgp_privkey_get_mpis (pkey, kid32, params, &params_size);
+  ret = _gnutls_openpgp_privkey_get_mpis (pkey, kid32, &params);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -947,7 +927,7 @@ _get_sk_dsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
     }
 
   /* P */
-  ret = _gnutls_mpi_dprint (params[0], p);
+  ret = _gnutls_mpi_dprint (params.params[0], p);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -955,7 +935,7 @@ _get_sk_dsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
     }
 
   /* Q */
-  ret = _gnutls_mpi_dprint (params[1], q);
+  ret = _gnutls_mpi_dprint (params.params[1], q);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -965,7 +945,7 @@ _get_sk_dsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
 
 
   /* G */
-  ret = _gnutls_mpi_dprint (params[2], g);
+  ret = _gnutls_mpi_dprint (params.params[2], g);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -976,7 +956,7 @@ _get_sk_dsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
 
 
   /* Y */
-  ret = _gnutls_mpi_dprint (params[3], y);
+  ret = _gnutls_mpi_dprint (params.params[3], y);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -986,7 +966,7 @@ _get_sk_dsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_dprint (params[4], x);
+  ret = _gnutls_mpi_dprint (params.params[4], x);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1000,10 +980,7 @@ _get_sk_dsa_raw (gnutls_openpgp_privkey_t pkey, gnutls_openpgp_keyid_t keyid,
   ret = 0;
 
 cleanup:
-  for (i = 0; i < params_size; i++)
-    {
-      _gnutls_mpi_release (&params[i]);
-    }
+  gnutls_pk_params_release(&params);
   return ret;
 }
 
@@ -1249,9 +1226,8 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
                                    const gnutls_datum_t * hash,
                                    gnutls_datum_t * signature)
 {
-  int result, i;
-  bigint_t params[MAX_PRIV_PARAMS_SIZE];
-  int params_size = MAX_PRIV_PARAMS_SIZE;
+  int result;
+  gnutls_pk_params_st params;
   int pk_algorithm;
   uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
@@ -1273,13 +1249,12 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
       pk_algorithm =
         gnutls_openpgp_privkey_get_subkey_pk_algorithm (key, idx, NULL);
       result =
-        _gnutls_openpgp_privkey_get_mpis (key, kid, params, &params_size);
+        _gnutls_openpgp_privkey_get_mpis (key, kid, &params);
     }
   else
     {
       pk_algorithm = gnutls_openpgp_privkey_get_pk_algorithm (key, NULL);
-      result = _gnutls_openpgp_privkey_get_mpis (key, NULL,
-                                                 params, &params_size);
+      result = _gnutls_openpgp_privkey_get_mpis (key, NULL, &params);
     }
 
   if (result < 0)
@@ -1290,10 +1265,9 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
 
 
   result =
-    _gnutls_soft_sign (pk_algorithm, params, params_size, hash, signature);
+    _gnutls_soft_sign (pk_algorithm, &params, hash, signature);
 
-  for (i = 0; i < params_size; i++)
-    _gnutls_mpi_release (&params[i]);
+  gnutls_pk_params_release(&params);
 
   if (result < 0)
     {
@@ -1325,8 +1299,7 @@ _gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
                                      gnutls_datum_t * plaintext)
 {
   int result, i;
-  bigint_t params[MAX_PRIV_PARAMS_SIZE];
-  int params_size = MAX_PRIV_PARAMS_SIZE;
+  gnutls_pk_params_st params;
   int pk_algorithm;
   uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
@@ -1342,8 +1315,7 @@ _gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
       uint32_t kid[2];
 
       KEYID_IMPORT (kid, keyid);
-      result = _gnutls_openpgp_privkey_get_mpis (key, kid,
-                                                 params, &params_size);
+      result = _gnutls_openpgp_privkey_get_mpis (key, kid, &params);
 
       i = gnutls_openpgp_privkey_get_subkey_idx (key, keyid);
 
@@ -1353,8 +1325,7 @@ _gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
     {
       pk_algorithm = gnutls_openpgp_privkey_get_pk_algorithm (key, NULL);
 
-      result = _gnutls_openpgp_privkey_get_mpis (key, NULL,
-                                                 params, &params_size);
+      result = _gnutls_openpgp_privkey_get_mpis (key, NULL, &params);
 
     }
 
@@ -1371,10 +1342,9 @@ _gnutls_openpgp_privkey_decrypt_data (gnutls_openpgp_privkey_t key,
     }
 
   result =
-    _gnutls_pkcs1_rsa_decrypt (plaintext, ciphertext, params, params_size, 2);
+    _gnutls_pkcs1_rsa_decrypt (plaintext, ciphertext, &params, 2);
 
-  for (i = 0; i < params_size; i++)
-    _gnutls_mpi_release (&params[i]);
+  gnutls_pk_params_release(&params);
 
   if (result < 0)
     {

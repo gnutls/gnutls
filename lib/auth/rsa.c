@@ -68,14 +68,11 @@ const mod_auth_st rsa_auth_struct = {
  */
 static int
 _gnutls_get_public_rsa_params (gnutls_session_t session,
-                               bigint_t params[MAX_PUBLIC_PARAMS_SIZE],
-                               int *params_len)
+                               gnutls_pk_params_st * params)
 {
   int ret;
   cert_auth_info_t info;
   gnutls_pcert_st peer_cert;
-  bigint_t tmp_params[RSA_PUBLIC_PARAMS];
-  int tmp_params_size;
   int i;
 
   /* normal non export case */
@@ -99,13 +96,8 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
       return ret;
     }
 
-  if (*params_len < RSA_PUBLIC_PARAMS)
-    {
-      gnutls_assert ();
-      ret = GNUTLS_E_INTERNAL_ERROR;
-      goto cleanup;
-    }
-  *params_len = RSA_PUBLIC_PARAMS;
+  gnutls_pk_params_init(params);
+  params->params_nr = RSA_PUBLIC_PARAMS;
 
   /* EXPORT case: */
   if (_gnutls_cipher_suite_get_kx_algo
@@ -120,29 +112,22 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
           goto cleanup;
         }
 
-      for (i = 0; i < *params_len; i++)
+      for (i = 0; i < params->params_nr; i++)
         {
-          params[i] = _gnutls_mpi_copy (session->key->rsa[i]);
+          params->params[i] = _gnutls_mpi_copy (session->key->rsa[i]);
         }
 
       ret = 0;
       goto cleanup;
     }
 
-  tmp_params_size = RSA_PUBLIC_PARAMS;
-  ret = _gnutls_pubkey_get_mpis(peer_cert.pubkey, tmp_params, &tmp_params_size);
+  ret = _gnutls_pubkey_get_mpis(peer_cert.pubkey, params);
   if (ret < 0)
     {
       ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
       goto cleanup;
     }
 
-  /* end of export case */
-  for (i = 0; i < *params_len; i++)
-    {
-      params[i] = _gnutls_mpi_copy (tmp_params[i]);
-    }
-    
   ret = 0;
   
 cleanup:
@@ -263,9 +248,8 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
   cert_auth_info_t auth = session->key->auth_info;
   gnutls_datum_t sdata;         /* data to send */
-  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
-  int params_len = MAX_PUBLIC_PARAMS_SIZE;
-  int ret, i;
+  gnutls_pk_params_st params;
+  int ret;
   gnutls_protocol_t ver;
 
   if (auth == NULL)
@@ -310,22 +294,21 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
   /* move RSA parameters to key (session).
    */
   if ((ret =
-       _gnutls_get_public_rsa_params (session, params, &params_len)) < 0)
+       _gnutls_get_public_rsa_params (session, &params)) < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  if ((ret =
+  ret =
        _gnutls_pkcs1_rsa_encrypt (&sdata, &session->key->key,
-                                  params, params_len, 2)) < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+                                  &params, 2);
 
-  for (i = 0; i < params_len; i++)
-    _gnutls_mpi_release (&params[i]);
+  gnutls_pk_params_release(&params);
+
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
 
   if (gnutls_protocol_get_version (session) == GNUTLS_SSL3)
     {

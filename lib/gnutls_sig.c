@@ -166,8 +166,8 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_pcert_st* cert,
  * given data. The output will be allocated and be put in signature.
  */
 int
-_gnutls_soft_sign (gnutls_pk_algorithm_t algo, bigint_t * params,
-                   int params_size, const gnutls_datum_t * data,
+_gnutls_soft_sign (gnutls_pk_algorithm_t algo, gnutls_pk_params_st * params,
+                   const gnutls_datum_t * data,
                    gnutls_datum_t * signature)
 {
   int ret;
@@ -176,8 +176,7 @@ _gnutls_soft_sign (gnutls_pk_algorithm_t algo, bigint_t * params,
     {
     case GNUTLS_PK_RSA:
       /* encrypt */
-      if ((ret = _gnutls_pkcs1_rsa_encrypt (signature, data, params,
-                                            params_size, 1)) < 0)
+      if ((ret = _gnutls_pkcs1_rsa_encrypt (signature, data, params, 1)) < 0)
         {
           gnutls_assert ();
           return ret;
@@ -186,7 +185,7 @@ _gnutls_soft_sign (gnutls_pk_algorithm_t algo, bigint_t * params,
       break;
     case GNUTLS_PK_DSA:
       /* sign */
-      if ((ret = _gnutls_dsa_sign (signature, data, params, params_size)) < 0)
+      if ((ret = _gnutls_dsa_sign (signature, data, params)) < 0)
         {
           gnutls_assert ();
           return ret;
@@ -747,7 +746,7 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
 
 int
 pk_hash_data (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash,
-              bigint_t * params,
+              gnutls_pk_params_st* params,
               const gnutls_datum_t * data, gnutls_datum_t * digest)
 {
   int ret;
@@ -757,7 +756,7 @@ pk_hash_data (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash,
     case GNUTLS_PK_RSA:
       break;
     case GNUTLS_PK_DSA:
-      if (params && hash != _gnutls_dsa_q_to_hash (params[1]))
+      if (params && hash != _gnutls_dsa_q_to_hash (params->params[1]))
         {
           gnutls_assert ();
           return GNUTLS_E_INVALID_REQUEST;

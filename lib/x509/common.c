@@ -1183,8 +1183,7 @@ int
 _gnutls_x509_encode_and_copy_PKI_params (ASN1_TYPE dst,
                                          const char *dst_name,
                                          gnutls_pk_algorithm_t
-                                         pk_algorithm, bigint_t * params,
-                                         int params_size)
+                                         pk_algorithm, gnutls_pk_params_st * params)
 {
   const char *pk;
   gnutls_datum_t der = { NULL, 0 };
@@ -1209,87 +1208,45 @@ _gnutls_x509_encode_and_copy_PKI_params (ASN1_TYPE dst,
       return _gnutls_asn2err (result);
     }
 
-  if (pk_algorithm == GNUTLS_PK_RSA)
+  result = _gnutls_x509_write_pubkey_params (pk_algorithm, params, &der);
+  if (result < 0)
     {
-      /* disable parameters, which are not used in RSA.
-       */
-      _asnstr_append_name (name, sizeof (name), dst_name,
-                           ".algorithm.parameters");
-
-      result = asn1_write_value (dst, name, ASN1_NULL, ASN1_NULL_SIZE);
-      if (result != ASN1_SUCCESS)
-        {
-          gnutls_assert ();
-          return _gnutls_asn2err (result);
-        }
-
-      result = _gnutls_x509_write_rsa_params (params, params_size, &der);
-      if (result < 0)
-        {
-          gnutls_assert ();
-          return result;
-        }
-
-      /* Write the DER parameters. (in bits)
-       */
-      _asnstr_append_name (name, sizeof (name), dst_name,
-                           ".subjectPublicKey");
-      result = asn1_write_value (dst, name, der.data, der.size * 8);
-
-      _gnutls_free_datum (&der);
-
-      if (result != ASN1_SUCCESS)
-        {
-          gnutls_assert ();
-          return _gnutls_asn2err (result);
-        }
+      gnutls_assert ();
+      return result;
     }
-  else if (pk_algorithm == GNUTLS_PK_DSA)
+
+  _asnstr_append_name (name, sizeof (name), dst_name,
+                       ".algorithm.parameters");
+
+  result = asn1_write_value (dst, name, der.data, der.size);
+
+  _gnutls_free_datum (&der);
+
+  if (result != ASN1_SUCCESS)
     {
-
-      result = _gnutls_x509_write_dsa_params (params, params_size, &der);
-      if (result < 0)
-        {
-          gnutls_assert ();
-          return result;
-        }
-
-      /* Write the DER parameters.
-       */
-      _asnstr_append_name (name, sizeof (name), dst_name,
-                           ".algorithm.parameters");
-      result = asn1_write_value (dst, name, der.data, der.size);
-
-      _gnutls_free_datum (&der);
-
-      if (result != ASN1_SUCCESS)
-        {
-          gnutls_assert ();
-          return _gnutls_asn2err (result);
-        }
-
-      result = _gnutls_x509_write_dsa_public_key (params, params_size, &der);
-      if (result < 0)
-        {
-          gnutls_assert ();
-          return result;
-        }
-
-      _asnstr_append_name (name, sizeof (name), dst_name,
-                           ".subjectPublicKey");
-      result = asn1_write_value (dst, name, der.data, der.size * 8);
-
-      _gnutls_free_datum (&der);
-
-      if (result != ASN1_SUCCESS)
-        {
-          gnutls_assert ();
-          return _gnutls_asn2err (result);
-        }
-
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
     }
-  else
-    return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+
+  result = _gnutls_x509_write_pubkey (pk_algorithm, params, &der);
+  if (result < 0)
+    {
+      gnutls_assert ();
+      return result;
+    }
+
+  /* Write the DER parameters. (in bits)
+   */
+  _asnstr_append_name (name, sizeof (name), dst_name,
+                       ".subjectPublicKey");
+  result = asn1_write_value (dst, name, der.data, der.size * 8);
+  _gnutls_free_datum (&der);
+
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
 
   return 0;
 }
@@ -1306,9 +1263,10 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
   int algo;
   char oid[64];
   int len;
-  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
+  gnutls_pk_params_st params;
   char name[128];
 
+  gnutls_pk_params_init(&params);
 
   _asnstr_append_name (name, sizeof (name), src_name, ".algorithm.algorithm");
   len = sizeof (oid);
@@ -1372,38 +1330,13 @@ _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
 
   len /= 8;
 
-  switch (algo)
-    {
-    case GNUTLS_PK_RSA:
-      {
-        if ((result = _gnutls_x509_read_rsa_params (str, len, params)) < 0)
-          {
-            gnutls_assert ();
-            return result;
-          }
+  result = _gnutls_x509_read_pubkey (algo, str, len, &params);
+  if (result < 0)
+    return gnutls_assert_val(result);
+ 
+  bits[0] = pubkey_to_bits(algo, &params);
 
-        bits[0] = _gnutls_mpi_get_nbits (params[0]);
-
-        _gnutls_mpi_release (&params[0]);
-        _gnutls_mpi_release (&params[1]);
-      }
-      break;
-    case GNUTLS_PK_DSA:
-      {
-
-        if ((result = _gnutls_x509_read_dsa_pubkey (str, len, params)) < 0)
-          {
-            gnutls_assert ();
-            return result;
-          }
-
-        bits[0] = _gnutls_mpi_get_nbits (params[3]);
-
-        _gnutls_mpi_release (&params[3]);
-      }
-      break;
-    }
-
+  gnutls_pk_params_release(&params);
   gnutls_free (str);
   return algo;
 }

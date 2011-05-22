@@ -35,8 +35,7 @@
 #include <x509_int.h>
 #include <gnutls_pk.h>
 #include <gnutls_mpi.h>
-
-static int _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params);
+#include <gnutls_ecc.h>
 
 /**
  * gnutls_x509_privkey_init:
@@ -71,16 +70,10 @@ gnutls_x509_privkey_init (gnutls_x509_privkey_t * key)
 void
 gnutls_x509_privkey_deinit (gnutls_x509_privkey_t key)
 {
-  int i;
-
   if (!key)
     return;
 
-  for (i = 0; i < key->params_size; i++)
-    {
-      _gnutls_mpi_release (&key->params[i]);
-    }
-
+  gnutls_pk_params_release(&key->params);
   asn1_delete_structure (&key->key);
   gnutls_free (key);
 }
@@ -104,40 +97,26 @@ gnutls_x509_privkey_cpy (gnutls_x509_privkey_t dst, gnutls_x509_privkey_t src)
   if (!src || !dst)
     return GNUTLS_E_INVALID_REQUEST;
 
-  for (i = 0; i < src->params_size; i++)
+  for (i = 0; i < src->params.params_nr; i++)
     {
-      dst->params[i] = _gnutls_mpi_copy (src->params[i]);
-      if (dst->params[i] == NULL)
+      dst->params.params[i] = _gnutls_mpi_copy (src->params.params[i]);
+      if (dst->params.params[i] == NULL)
         return GNUTLS_E_MEMORY_ERROR;
     }
 
-  dst->params_size = src->params_size;
+  dst->params.params_nr = src->params.params_nr;
+  dst->params.flags = src->params.flags;
+
   dst->pk_algorithm = src->pk_algorithm;
   dst->crippled = src->crippled;
 
   if (!src->crippled)
     {
-      switch (dst->pk_algorithm)
+      ret = _gnutls_asn1_encode_privkey (dst->pk_algorithm, &dst->key, &dst->params);
+      if (ret < 0)
         {
-        case GNUTLS_PK_DSA:
-          ret = _gnutls_asn1_encode_dsa (&dst->key, dst->params);
-          if (ret < 0)
-            {
-              gnutls_assert ();
-              return ret;
-            }
-          break;
-        case GNUTLS_PK_RSA:
-          ret = _gnutls_asn1_encode_rsa (&dst->key, dst->params);
-          if (ret < 0)
-            {
-              gnutls_assert ();
-              return ret;
-            }
-          break;
-        default:
           gnutls_assert ();
-          return GNUTLS_E_INVALID_REQUEST;
+          return ret;
         }
     }
 
@@ -153,10 +132,9 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
 {
   int result;
   ASN1_TYPE pkey_asn;
-  gnutls_pk_params_st pk_params;
 
-  memset (&pk_params, 0, sizeof (pk_params));
-  pk_params.params_nr = RSA_PRIVATE_PARAMS;
+  gnutls_pk_params_init(&pkey->params);
+
 
   if ((result =
        asn1_create_element (_gnutls_get_gnutls_asn (),
@@ -175,7 +153,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
     }
 
   if ((result = _gnutls_x509_read_int (pkey_asn, "modulus",
-                                       &pk_params.params[0])) < 0)
+                                       &pkey->params.params[0])) < 0)
     {
       gnutls_assert ();
       goto error;
@@ -183,7 +161,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
 
   if ((result =
        _gnutls_x509_read_int (pkey_asn, "publicExponent",
-                              &pk_params.params[1])) < 0)
+                              &pkey->params.params[1])) < 0)
     {
       gnutls_assert ();
       goto error;
@@ -191,73 +169,173 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
 
   if ((result =
        _gnutls_x509_read_int (pkey_asn, "privateExponent",
-                              &pk_params.params[2])) < 0)
+                              &pkey->params.params[2])) < 0)
     {
       gnutls_assert ();
       goto error;
     }
 
   if ((result = _gnutls_x509_read_int (pkey_asn, "prime1",
-                                       &pk_params.params[3])) < 0)
+                                       &pkey->params.params[3])) < 0)
     {
       gnutls_assert ();
       goto error;
     }
 
   if ((result = _gnutls_x509_read_int (pkey_asn, "prime2",
-                                       &pk_params.params[4])) < 0)
+                                       &pkey->params.params[4])) < 0)
     {
       gnutls_assert ();
       goto error;
     }
 
   if ((result = _gnutls_x509_read_int (pkey_asn, "coefficient",
-                                       &pk_params.params[5])) < 0)
+                                       &pkey->params.params[5])) < 0)
     {
       gnutls_assert ();
       goto error;
     }
 
   if ((result = _gnutls_x509_read_int (pkey_asn, "exponent1",
-                                       &pk_params.params[6])) < 0)
+                                       &pkey->params.params[6])) < 0)
     {
       gnutls_assert ();
       goto error;
     }
 
   if ((result = _gnutls_x509_read_int (pkey_asn, "exponent2",
-                                       &pk_params.params[7])) < 0)
+                                       &pkey->params.params[7])) < 0)
     {
       gnutls_assert ();
       goto error;
     }
 
 
-  result = _gnutls_pk_fixup (GNUTLS_PK_RSA, GNUTLS_IMPORT, &pk_params);
+  result = _gnutls_pk_fixup (GNUTLS_PK_RSA, GNUTLS_IMPORT, &pkey->params);
   if (result < 0)
     {
       gnutls_assert ();
       goto error;
     }
 
-  pkey->params[0] = pk_params.params[0];
-  pkey->params[1] = pk_params.params[1];
-  pkey->params[2] = pk_params.params[2];
-  pkey->params[3] = pk_params.params[3];
-  pkey->params[4] = pk_params.params[4];
-  pkey->params[5] = pk_params.params[5];
-  pkey->params[6] = pk_params.params[6];
-  pkey->params[7] = pk_params.params[7];
-  pkey->params_size = pk_params.params_nr;
+  pkey->params.params_nr = RSA_PRIVATE_PARAMS;
 
   return pkey_asn;
 
 error:
   asn1_delete_structure (&pkey_asn);
-  gnutls_pk_params_release (&pk_params);
+  gnutls_pk_params_release (&pkey->params);
   return NULL;
 
 }
+
+/* Converts an ECC key to
+ * an internal structure (gnutls_private_key)
+ */
+ASN1_TYPE
+_gnutls_privkey_decode_ecc_key (const gnutls_datum_t * raw_key,
+                                      gnutls_x509_privkey_t pkey)
+{
+  int ret;
+  ASN1_TYPE pkey_asn;
+  unsigned int version;
+  char oid[MAX_OID_SIZE];
+  unsigned int oid_size;
+  gnutls_datum out;
+
+  gnutls_pk_params_init(&pkey->params);
+
+  if ((ret =
+       asn1_create_element (_gnutls_get_gnutls_asn (),
+                            "GNUTLS.ECPrivateKey",
+                            &pkey_asn)) != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return NULL;
+    }
+
+  ret = asn1_der_decoding (&pkey_asn, raw_key->data, raw_key->size, NULL);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      goto error;
+    }
+
+  ret = _gnutls_x509_read_uint (pkey_asn, "Version", &version);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto error;
+    }
+
+  if (version != 1)
+    {
+      _gnutls_debug_log("ECC private key version %u is not supported\n", version);
+      gnutls_assert();
+      goto error;
+    }
+
+  /* read the curve */
+  oid_size = sizeof(oid);
+  ret = asn1_read_value(pkey_asn, "parameters.namedCurve", oid, &oid_size);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      goto error;
+    }
+    
+  pkey->params.flags = _gnutls_oid_to_ecc_curve(oid);
+  if (pkey->params.flags == GNUTLS_ECC_CURVE_INVALID)
+    {
+      _gnutls_debug_log("Curve %s is not supported\n", oid);
+      gnutls_assert();
+      goto error;
+    }
+    
+  ret = _gnutls_ecc_curve_fill_params(pkey->params.flags, &pkey->params);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto error;
+    }
+
+  /* read the public key */
+  ret = _gnutls_x509_read_value(pkey_asn, "publicKey", &out, 2);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto error;
+    }
+
+  ret = _gnutls_ecc_ansi_x963_import (out.data, out.size, &pkey->params.params[5],
+                                         &pkey->params.params[6]);
+  
+  _gnutls_free_datum(&out);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto error;
+    }
+  pkey->params.params_nr += 2;
+
+  /* read the private key */
+  ret = _gnutls_x509_read_int (pkey_asn, "privateKey", &pkey->params.params[7]);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto error;
+    }
+  pkey->params.params_nr ++;
+
+  return pkey_asn;
+
+error:
+  asn1_delete_structure (&pkey_asn);
+  gnutls_pk_params_release (&pkey->params);
+  return NULL;
+
+}
+
 
 static ASN1_TYPE
 decode_dsa_key (const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
@@ -274,54 +352,57 @@ decode_dsa_key (const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
       return NULL;
     }
 
+  pkey->params.params_nr = 0;
+
   result = asn1_der_decoding (&dsa_asn, raw_key->data, raw_key->size, NULL);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
       goto error;
     }
+  pkey->params.params_nr++;
 
-  if ((result = _gnutls_x509_read_int (dsa_asn, "p", &pkey->params[0])) < 0)
+  if ((result = _gnutls_x509_read_int (dsa_asn, "p", &pkey->params.params[0])) < 0)
     {
       gnutls_assert ();
       goto error;
     }
+  pkey->params.params_nr++;
 
-  if ((result = _gnutls_x509_read_int (dsa_asn, "q", &pkey->params[1])) < 0)
+  if ((result = _gnutls_x509_read_int (dsa_asn, "q", &pkey->params.params[1])) < 0)
     {
       gnutls_assert ();
       goto error;
     }
+  pkey->params.params_nr++;
 
-  if ((result = _gnutls_x509_read_int (dsa_asn, "g", &pkey->params[2])) < 0)
+  if ((result = _gnutls_x509_read_int (dsa_asn, "g", &pkey->params.params[2])) < 0)
     {
       gnutls_assert ();
       goto error;
     }
+  pkey->params.params_nr++;
 
-  if ((result = _gnutls_x509_read_int (dsa_asn, "Y", &pkey->params[3])) < 0)
+  if ((result = _gnutls_x509_read_int (dsa_asn, "Y", &pkey->params.params[3])) < 0)
     {
       gnutls_assert ();
       goto error;
     }
+  pkey->params.params_nr++;
 
   if ((result = _gnutls_x509_read_int (dsa_asn, "priv",
-                                       &pkey->params[4])) < 0)
+                                       &pkey->params.params[4])) < 0)
     {
       gnutls_assert ();
       goto error;
     }
-  pkey->params_size = 5;
+  pkey->params.params_nr++;
 
   return dsa_asn;
 
 error:
   asn1_delete_structure (&dsa_asn);
-  _gnutls_mpi_release (&pkey->params[0]);
-  _gnutls_mpi_release (&pkey->params[1]);
-  _gnutls_mpi_release (&pkey->params[2]);
-  _gnutls_mpi_release (&pkey->params[3]);
-  _gnutls_mpi_release (&pkey->params[4]);
+  gnutls_pk_params_release(&pkey->params);
   return NULL;
 
 }
@@ -414,6 +495,12 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
       if (key->key == NULL)
         gnutls_assert ();
     }
+  else if (key->pk_algorithm == GNUTLS_PK_ECC)
+    {
+      key->key = _gnutls_privkey_decode_ecc_key (&_data, key);
+      if (key->key == NULL)
+        gnutls_assert ();
+    }
   else
     {
       /* Try decoding with both, and accept the one that
@@ -462,11 +549,6 @@ failover:
 
   return result;
 }
-
-#define FREE_RSA_PRIVATE_PARAMS for (i=0;i<RSA_PRIVATE_PARAMS;i++) \
-		_gnutls_mpi_release(&key->params[i])
-#define FREE_DSA_PRIVATE_PARAMS for (i=0;i<DSA_PRIVATE_PARAMS;i++) \
-		_gnutls_mpi_release(&key->params[i])
 
 /**
  * gnutls_x509_privkey_import_rsa_raw:
@@ -528,11 +610,10 @@ gnutls_x509_privkey_import_rsa_raw2 (gnutls_x509_privkey_t key,
                                      const gnutls_datum_t * e1,
                                      const gnutls_datum_t * e2)
 {
-  int i = 0, ret;
+  int ret;
   size_t siz = 0;
-  gnutls_pk_params_st pk_params;
 
-  memset (&pk_params, 0, sizeof (pk_params));
+  gnutls_pk_params_init(&key->params);
 
   if (key == NULL)
     {
@@ -540,119 +621,108 @@ gnutls_x509_privkey_import_rsa_raw2 (gnutls_x509_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  key->params_size = 0;
+  key->params.params_nr = 0;
 
   siz = m->size;
-  if (_gnutls_mpi_scan_nz (&key->params[0], m->data, siz))
+  if (_gnutls_mpi_scan_nz (&key->params.params[0], m->data, siz))
     {
       gnutls_assert ();
-      FREE_RSA_PRIVATE_PARAMS;
-      return GNUTLS_E_MPI_SCAN_FAILED;
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
     }
-  key->params_size++;
+  key->params.params_nr++;
 
   siz = e->size;
-  if (_gnutls_mpi_scan_nz (&key->params[1], e->data, siz))
+  if (_gnutls_mpi_scan_nz (&key->params.params[1], e->data, siz))
     {
       gnutls_assert ();
-      FREE_RSA_PRIVATE_PARAMS;
-      return GNUTLS_E_MPI_SCAN_FAILED;
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
     }
-  key->params_size++;
+  key->params.params_nr++;
 
   siz = d->size;
-  if (_gnutls_mpi_scan_nz (&key->params[2], d->data, siz))
+  if (_gnutls_mpi_scan_nz (&key->params.params[2], d->data, siz))
     {
       gnutls_assert ();
-      FREE_RSA_PRIVATE_PARAMS;
-      return GNUTLS_E_MPI_SCAN_FAILED;
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
     }
-  key->params_size++;
+  key->params.params_nr++;
 
   siz = p->size;
-  if (_gnutls_mpi_scan_nz (&key->params[3], p->data, siz))
+  if (_gnutls_mpi_scan_nz (&key->params.params[3], p->data, siz))
     {
       gnutls_assert ();
-      FREE_RSA_PRIVATE_PARAMS;
-      return GNUTLS_E_MPI_SCAN_FAILED;
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
     }
-  key->params_size++;
+  key->params.params_nr++;
 
   siz = q->size;
-  if (_gnutls_mpi_scan_nz (&key->params[4], q->data, siz))
+  if (_gnutls_mpi_scan_nz (&key->params.params[4], q->data, siz))
     {
       gnutls_assert ();
-      FREE_RSA_PRIVATE_PARAMS;
-      return GNUTLS_E_MPI_SCAN_FAILED;
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
     }
-  key->params_size++;
+  key->params.params_nr++;
 
   siz = u->size;
-  if (_gnutls_mpi_scan_nz (&key->params[5], u->data, siz))
+  if (_gnutls_mpi_scan_nz (&key->params.params[5], u->data, siz))
     {
       gnutls_assert ();
-      FREE_RSA_PRIVATE_PARAMS;
-      return GNUTLS_E_MPI_SCAN_FAILED;
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
     }
-  key->params_size++;
+  key->params.params_nr++;
 
   if (e1 && e2)
     {
       siz = e1->size;
-      if (_gnutls_mpi_scan_nz (&key->params[6], e1->data, siz))
+      if (_gnutls_mpi_scan_nz (&key->params.params[6], e1->data, siz))
         {
           gnutls_assert ();
-          FREE_RSA_PRIVATE_PARAMS;
-          return GNUTLS_E_MPI_SCAN_FAILED;
+          ret = GNUTLS_E_MPI_SCAN_FAILED;
+          goto cleanup;
         }
-      key->params_size++;
+      key->params.params_nr++;
 
       siz = e2->size;
-      if (_gnutls_mpi_scan_nz (&key->params[7], e2->data, siz))
+      if (_gnutls_mpi_scan_nz (&key->params.params[7], e2->data, siz))
         {
           gnutls_assert ();
-          FREE_RSA_PRIVATE_PARAMS;
-          return GNUTLS_E_MPI_SCAN_FAILED;
+          ret = GNUTLS_E_MPI_SCAN_FAILED;
+          goto cleanup;
         }
-      key->params_size++;
+      key->params.params_nr++;
     }
 
-  for (i = 0; i < key->params_size; i++)
-    {
-      pk_params.params[i] = key->params[i];
-    }
-
-  pk_params.params_nr = key->params_size;
-
-  ret = _gnutls_pk_fixup (GNUTLS_PK_RSA, GNUTLS_IMPORT, &pk_params);
+  ret = _gnutls_pk_fixup (GNUTLS_PK_RSA, GNUTLS_IMPORT, &key->params);
   if (ret < 0)
     {
       gnutls_assert ();
-      FREE_RSA_PRIVATE_PARAMS;
-      return ret;
+      goto cleanup;
     }
-
-  for (i = 0; i < pk_params.params_nr; i++)
-    {
-      key->params[i] = pk_params.params[i];
-    }
-  key->params_size = pk_params.params_nr;
 
   if (!key->crippled)
     {
-      ret = _gnutls_asn1_encode_rsa (&key->key, key->params);
+      ret = _gnutls_asn1_encode_privkey (GNUTLS_PK_RSA, &key->key, &key->params);
       if (ret < 0)
         {
           gnutls_assert ();
-          FREE_RSA_PRIVATE_PARAMS;
-          return ret;
+          goto cleanup;
         }
     }
 
-  key->params_size = RSA_PRIVATE_PARAMS;
+  key->params.params_nr = RSA_PRIVATE_PARAMS;
   key->pk_algorithm = GNUTLS_PK_RSA;
 
   return 0;
+
+cleanup:
+  gnutls_pk_params_release(&key->params);
+  return ret;
 
 }
 
@@ -680,7 +750,7 @@ gnutls_x509_privkey_import_dsa_raw (gnutls_x509_privkey_t key,
                                     const gnutls_datum_t * y,
                                     const gnutls_datum_t * x)
 {
-  int i = 0, ret;
+  int ret;
   size_t siz = 0;
 
   if (key == NULL)
@@ -690,60 +760,63 @@ gnutls_x509_privkey_import_dsa_raw (gnutls_x509_privkey_t key,
     }
 
   siz = p->size;
-  if (_gnutls_mpi_scan_nz (&key->params[0], p->data, siz))
+  if (_gnutls_mpi_scan_nz (&key->params.params[0], p->data, siz))
     {
       gnutls_assert ();
-      FREE_DSA_PRIVATE_PARAMS;
-      return GNUTLS_E_MPI_SCAN_FAILED;
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
     }
 
   siz = q->size;
-  if (_gnutls_mpi_scan_nz (&key->params[1], q->data, siz))
+  if (_gnutls_mpi_scan_nz (&key->params.params[1], q->data, siz))
     {
       gnutls_assert ();
-      FREE_DSA_PRIVATE_PARAMS;
-      return GNUTLS_E_MPI_SCAN_FAILED;
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
     }
 
   siz = g->size;
-  if (_gnutls_mpi_scan_nz (&key->params[2], g->data, siz))
+  if (_gnutls_mpi_scan_nz (&key->params.params[2], g->data, siz))
     {
       gnutls_assert ();
-      FREE_DSA_PRIVATE_PARAMS;
-      return GNUTLS_E_MPI_SCAN_FAILED;
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
     }
 
   siz = y->size;
-  if (_gnutls_mpi_scan_nz (&key->params[3], y->data, siz))
+  if (_gnutls_mpi_scan_nz (&key->params.params[3], y->data, siz))
     {
       gnutls_assert ();
-      FREE_DSA_PRIVATE_PARAMS;
-      return GNUTLS_E_MPI_SCAN_FAILED;
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
     }
 
   siz = x->size;
-  if (_gnutls_mpi_scan_nz (&key->params[4], x->data, siz))
+  if (_gnutls_mpi_scan_nz (&key->params.params[4], x->data, siz))
     {
       gnutls_assert ();
-      FREE_DSA_PRIVATE_PARAMS;
-      return GNUTLS_E_MPI_SCAN_FAILED;
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
     }
 
   if (!key->crippled)
     {
-      ret = _gnutls_asn1_encode_dsa (&key->key, key->params);
+      ret = _gnutls_asn1_encode_privkey (GNUTLS_PK_DSA, &key->key, &key->params);
       if (ret < 0)
         {
           gnutls_assert ();
-          FREE_DSA_PRIVATE_PARAMS;
-          return ret;
+          goto cleanup;
         }
     }
 
-  key->params_size = DSA_PRIVATE_PARAMS;
+  key->params.params_nr = DSA_PRIVATE_PARAMS;
   key->pk_algorithm = GNUTLS_PK_DSA;
 
   return 0;
+
+cleanup:
+  gnutls_pk_params_release(&key->params);
+  return ret;
 
 }
 
@@ -814,29 +887,12 @@ gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
     msg = NULL;
 
   if (key->crippled)
-    {                           /* encode the parameters on the fly.
-                                 */
-      switch (key->pk_algorithm)
+    {                           /* encode the parameters on the fly. */
+      ret = _gnutls_asn1_encode_privkey (key->pk_algorithm, &key->key, &key->params);
+      if (ret < 0)
         {
-        case GNUTLS_PK_DSA:
-          ret = _gnutls_asn1_encode_dsa (&key->key, key->params);
-          if (ret < 0)
-            {
-              gnutls_assert ();
-              return ret;
-            }
-          break;
-        case GNUTLS_PK_RSA:
-          ret = _gnutls_asn1_encode_rsa (&key->key, key->params);
-          if (ret < 0)
-            {
-              gnutls_assert ();
-              return ret;
-            }
-          break;
-        default:
           gnutls_assert ();
-          return GNUTLS_E_INVALID_REQUEST;
+          return ret;
         }
     }
 
@@ -857,23 +913,13 @@ gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
 gnutls_sec_param_t
 gnutls_x509_privkey_sec_param (gnutls_x509_privkey_t key)
 {
-  int ret;
+  int bits;
 
-  switch (key->pk_algorithm)
-    {
-    case GNUTLS_PK_RSA:
-      ret = gnutls_pk_bits_to_sec_param (GNUTLS_PK_RSA, _gnutls_mpi_get_nbits (key->params[0]   /*m */
-                                         ));
-      break;
-    case GNUTLS_PK_DSA:
-      ret = gnutls_pk_bits_to_sec_param (GNUTLS_PK_DSA, _gnutls_mpi_get_nbits (key->params[0]   /*p */
-                                         ));
-      break;
-    default:
-      ret = GNUTLS_SEC_PARAM_UNKNOWN;
-    }
-
-  return ret;
+  bits = pubkey_to_bits(key->pk_algorithm, &key->params);
+  if (bits <= 0)
+    return GNUTLS_SEC_PARAM_UNKNOWN;
+  
+  return gnutls_pk_bits_to_sec_param(key->pk_algorithm, bits);
 }
 
 /**
@@ -932,8 +978,8 @@ gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
 {
   int ret;
   gnutls_pk_params_st pk_params;
-
-  memset (&pk_params, 0, sizeof (pk_params));
+  
+  gnutls_pk_params_init(&pk_params);
 
   if (key == NULL)
     {
@@ -944,7 +990,7 @@ gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
   m->data = e->data = d->data = p->data = q->data = u->data = NULL;
   m->size = e->size = d->size = p->size = q->size = u->size = 0;
 
-  ret = _gnutls_pk_params_copy (&pk_params, key->params, RSA_PRIVATE_PARAMS);
+  ret = _gnutls_pk_params_copy (&pk_params, &key->params);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -998,7 +1044,7 @@ gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
     }
 
   /* U */
-  ret = _gnutls_mpi_dprint_lz (key->params[5], u);
+  ret = _gnutls_mpi_dprint_lz (key->params.params[5], u);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1008,7 +1054,7 @@ gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
   /* E1 */
   if (e1)
     {
-      ret = _gnutls_mpi_dprint_lz (key->params[6], e1);
+      ret = _gnutls_mpi_dprint_lz (key->params.params[6], e1);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -1019,7 +1065,7 @@ gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,
   /* E2 */
   if (e2)
     {
-      ret = _gnutls_mpi_dprint_lz (key->params[7], e2);
+      ret = _gnutls_mpi_dprint_lz (key->params.params[7], e2);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -1073,7 +1119,7 @@ gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
     }
 
   /* P */
-  ret = _gnutls_mpi_dprint_lz (key->params[0], p);
+  ret = _gnutls_mpi_dprint_lz (key->params.params[0], p);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1081,7 +1127,7 @@ gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
     }
 
   /* Q */
-  ret = _gnutls_mpi_dprint_lz (key->params[1], q);
+  ret = _gnutls_mpi_dprint_lz (key->params.params[1], q);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1091,7 +1137,7 @@ gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
 
 
   /* G */
-  ret = _gnutls_mpi_dprint_lz (key->params[2], g);
+  ret = _gnutls_mpi_dprint_lz (key->params.params[2], g);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1102,7 +1148,7 @@ gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
 
 
   /* Y */
-  ret = _gnutls_mpi_dprint_lz (key->params[3], y);
+  ret = _gnutls_mpi_dprint_lz (key->params.params[3], y);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1113,7 +1159,7 @@ gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
     }
 
   /* X */
-  ret = _gnutls_mpi_dprint_lz (key->params[4], x);
+  ret = _gnutls_mpi_dprint_lz (key->params.params[4], x);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1127,343 +1173,6 @@ gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
   return 0;
 }
 
-
-/* Encodes the RSA parameters into an ASN.1 RSA private key structure.
- */
-static int
-_gnutls_asn1_encode_rsa (ASN1_TYPE * c2, bigint_t * params)
-{
-  int result;
-  opaque null = '\0';
-  gnutls_pk_params_st pk_params;
-  gnutls_datum_t m, e, d, p, q, u, exp1, exp2;
-
-  memset (&pk_params, 0, sizeof (pk_params));
-
-  memset (&m, 0, sizeof (m));
-  memset (&p, 0, sizeof (p));
-  memset (&q, 0, sizeof (q));
-  memset (&p, 0, sizeof (p));
-  memset (&u, 0, sizeof (u));
-  memset (&e, 0, sizeof (e));
-  memset (&d, 0, sizeof (d));
-  memset (&exp1, 0, sizeof (exp1));
-  memset (&exp2, 0, sizeof (exp2));
-
-  result = _gnutls_pk_params_copy (&pk_params, params, RSA_PRIVATE_PARAMS);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      return result;
-    }
-
-  result = _gnutls_pk_fixup (GNUTLS_PK_RSA, GNUTLS_EXPORT, &pk_params);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  /* retrieve as data */
-
-  result = _gnutls_mpi_dprint_lz (pk_params.params[0], &m);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = _gnutls_mpi_dprint_lz (pk_params.params[1], &e);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = _gnutls_mpi_dprint_lz (pk_params.params[2], &d);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = _gnutls_mpi_dprint_lz (pk_params.params[3], &p);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = _gnutls_mpi_dprint_lz (pk_params.params[4], &q);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = _gnutls_mpi_dprint_lz (pk_params.params[5], &u);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = _gnutls_mpi_dprint_lz (pk_params.params[6], &exp1);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = _gnutls_mpi_dprint_lz (pk_params.params[7], &exp2);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  /* Ok. Now we have the data. Create the asn1 structures
-   */
-
-  /* first make sure that no previously allocated data are leaked */
-  if (*c2 != ASN1_TYPE_EMPTY)
-    {
-      asn1_delete_structure (c2);
-      *c2 = ASN1_TYPE_EMPTY;
-    }
-
-  if ((result = asn1_create_element
-       (_gnutls_get_gnutls_asn (), "GNUTLS.RSAPrivateKey", c2))
-      != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  /* Write PRIME 
-   */
-  if ((result = asn1_write_value (*c2, "modulus",
-                                  m.data, m.size)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  if ((result = asn1_write_value (*c2, "publicExponent",
-                                  e.data, e.size)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  if ((result = asn1_write_value (*c2, "privateExponent",
-                                  d.data, d.size)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  if ((result = asn1_write_value (*c2, "prime1",
-                                  p.data, p.size)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  if ((result = asn1_write_value (*c2, "prime2",
-                                  q.data, q.size)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  if ((result = asn1_write_value (*c2, "coefficient",
-                                  u.data, u.size)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-
-      goto cleanup;
-    }
-
-  if ((result = asn1_write_value (*c2, "exponent1",
-                                  exp1.data, exp1.size)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  if ((result = asn1_write_value (*c2, "exponent2",
-                                  exp2.data, exp2.size)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  if ((result = asn1_write_value (*c2, "otherPrimeInfos",
-                                  NULL, 0)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  if ((result = asn1_write_value (*c2, "version", &null, 1)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  result = 0;
-
-cleanup:
-  if (result != 0)
-    asn1_delete_structure (c2);
-
-  gnutls_pk_params_release (&pk_params);
-
-  _gnutls_free_datum (&m);
-  _gnutls_free_datum (&d);
-  _gnutls_free_datum (&e);
-  _gnutls_free_datum (&p);
-  _gnutls_free_datum (&q);
-  _gnutls_free_datum (&u);
-  _gnutls_free_datum (&exp1);
-  _gnutls_free_datum (&exp2);
-
-  return result;
-}
-
-/* Encodes the DSA parameters into an ASN.1 DSAPrivateKey structure.
- */
-int
-_gnutls_asn1_encode_dsa (ASN1_TYPE * c2, bigint_t * params)
-{
-  int result, i;
-  size_t size[DSA_PRIVATE_PARAMS], total;
-  opaque *p_data, *q_data, *g_data, *x_data, *y_data;
-  opaque *all_data = NULL, *p;
-  opaque null = '\0';
-
-  /* Read all the sizes */
-  total = 0;
-  for (i = 0; i < DSA_PRIVATE_PARAMS; i++)
-    {
-      _gnutls_mpi_print_lz (params[i], NULL, &size[i]);
-      total += size[i];
-    }
-
-  /* Encoding phase.
-   * allocate data enough to hold everything
-   */
-  all_data = gnutls_secure_malloc (total);
-  if (all_data == NULL)
-    {
-      gnutls_assert ();
-      result = GNUTLS_E_MEMORY_ERROR;
-      goto cleanup;
-    }
-
-  p = all_data;
-  p_data = p;
-  p += size[0];
-  q_data = p;
-  p += size[1];
-  g_data = p;
-  p += size[2];
-  y_data = p;
-  p += size[3];
-  x_data = p;
-
-  _gnutls_mpi_print_lz (params[0], p_data, &size[0]);
-  _gnutls_mpi_print_lz (params[1], q_data, &size[1]);
-  _gnutls_mpi_print_lz (params[2], g_data, &size[2]);
-  _gnutls_mpi_print_lz (params[3], y_data, &size[3]);
-  _gnutls_mpi_print_lz (params[4], x_data, &size[4]);
-
-  /* Ok. Now we have the data. Create the asn1 structures
-   */
-
-  /* first make sure that no previously allocated data are leaked */
-  if (*c2 != ASN1_TYPE_EMPTY)
-    {
-      asn1_delete_structure (c2);
-      *c2 = ASN1_TYPE_EMPTY;
-    }
-
-  if ((result = asn1_create_element
-       (_gnutls_get_gnutls_asn (), "GNUTLS.DSAPrivateKey", c2))
-      != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  /* Write PRIME 
-   */
-  if ((result = asn1_write_value (*c2, "p", p_data, size[0])) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  if ((result = asn1_write_value (*c2, "q", q_data, size[1])) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  if ((result = asn1_write_value (*c2, "g", g_data, size[2])) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  if ((result = asn1_write_value (*c2, "Y", y_data, size[3])) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  if ((result = asn1_write_value (*c2, "priv",
-                                  x_data, size[4])) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  gnutls_free (all_data);
-
-  if ((result = asn1_write_value (*c2, "version", &null, 1)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  return 0;
-
-cleanup:
-  asn1_delete_structure (c2);
-  gnutls_free (all_data);
-
-  return result;
-}
 
 
 /**
@@ -1487,8 +1196,6 @@ gnutls_x509_privkey_generate (gnutls_x509_privkey_t key,
                               unsigned int flags)
 {
   int ret;
-  unsigned int params_len = MAX_PRIV_PARAMS_SIZE;
-  unsigned int i;
 
   if (key == NULL)
     {
@@ -1496,74 +1203,31 @@ gnutls_x509_privkey_generate (gnutls_x509_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  switch (algo)
+  gnutls_pk_params_init(&key->params);
+
+  ret = _gnutls_pk_generate (algo, bits, &key->params);
+  if (ret < 0)
     {
-    case GNUTLS_PK_DSA:
-      ret = _gnutls_dsa_generate_params (key->params, &params_len, bits);
-      if (params_len != DSA_PRIVATE_PARAMS)
-        {
-          gnutls_assert ();
-          ret = GNUTLS_E_INTERNAL_ERROR;
-        }
-
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-
-      if (!key->crippled)
-        {
-          ret = _gnutls_asn1_encode_dsa (&key->key, key->params);
-          if (ret < 0)
-            {
-              gnutls_assert ();
-              goto cleanup;
-            }
-        }
-      key->params_size = params_len;
-      key->pk_algorithm = GNUTLS_PK_DSA;
-
-      break;
-    case GNUTLS_PK_RSA:
-      ret = _gnutls_rsa_generate_params (key->params, &params_len, bits);
-      if (params_len != RSA_PRIVATE_PARAMS)
-        {
-          gnutls_assert ();
-          ret = GNUTLS_E_INTERNAL_ERROR;
-        }
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-
-      if (!key->crippled)
-        {
-          ret = _gnutls_asn1_encode_rsa (&key->key, key->params);
-          if (ret < 0)
-            {
-              gnutls_assert ();
-              goto cleanup;
-            }
-        }
-
-      key->params_size = params_len;
-      key->pk_algorithm = GNUTLS_PK_RSA;
-
-      break;
-    default:
       gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
+      return ret;
     }
+
+  if (!key->crippled)
+    {
+      ret = _gnutls_asn1_encode_privkey (algo, &key->key, &key->params);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          goto cleanup;
+        }
+    }
+  key->pk_algorithm = algo;
 
   return 0;
 
 cleanup:
   key->pk_algorithm = GNUTLS_PK_UNKNOWN;
-  key->params_size = 0;
-  for (i = 0; i < params_len; i++)
-    _gnutls_mpi_release (&key->params[i]);
+  gnutls_pk_params_release(&key->params);
 
   return ret;
 }
@@ -1611,29 +1275,12 @@ gnutls_x509_privkey_get_key_id (gnutls_x509_privkey_t key,
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
-  if (key->pk_algorithm == GNUTLS_PK_RSA)
+  result = _gnutls_x509_write_pubkey(key->pk_algorithm, &key->params, &der);
+  if (result < 0)
     {
-      result =
-        _gnutls_x509_write_rsa_params (key->params, key->params_size, &der);
-      if (result < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
+      gnutls_assert ();
+      goto cleanup;
     }
-  else if (key->pk_algorithm == GNUTLS_PK_DSA)
-    {
-      result =
-        _gnutls_x509_write_dsa_public_key (key->params,
-                                           key->params_size, &der);
-      if (result < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
-    }
-  else
-    return GNUTLS_E_INTERNAL_ERROR;
 
   result = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1);
   if (result < 0)
@@ -1705,8 +1352,8 @@ _gnutls_x509_privkey_sign_hash2 (gnutls_x509_privkey_t signer,
       goto cleanup;
     }
 
-  ret = _gnutls_soft_sign (signer->pk_algorithm, signer->params,
-                           signer->params_size, &digest, signature);
+  ret = _gnutls_soft_sign (signer->pk_algorithm, &signer->params,
+                           &digest, signature);
 
   if (ret < 0)
     {
@@ -1750,8 +1397,8 @@ gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  result = _gnutls_soft_sign (key->pk_algorithm, key->params,
-                              key->params_size, hash, signature);
+  result = _gnutls_soft_sign (key->pk_algorithm, &key->params,
+                              hash, signature);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1806,7 +1453,7 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
     }
 
   result =
-    pk_hash_data (key->pk_algorithm, digest, key->params, data, &hash);
+    pk_hash_data (key->pk_algorithm, digest, &key->params, data, &hash);
   if (result < 0)
     {
       gnutls_assert ();
@@ -1902,27 +1549,12 @@ gnutls_x509_privkey_fix (gnutls_x509_privkey_t key)
 
   if (!key->crippled)
     asn1_delete_structure (&key->key);
-  switch (key->pk_algorithm)
+
+  ret = _gnutls_asn1_encode_privkey (key->pk_algorithm, &key->key, &key->params);
+  if (ret < 0)
     {
-    case GNUTLS_PK_DSA:
-      ret = _gnutls_asn1_encode_dsa (&key->key, key->params);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-      break;
-    case GNUTLS_PK_RSA:
-      ret = _gnutls_asn1_encode_rsa (&key->key, key->params);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-      break;
-    default:
       gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
+      return ret;
     }
 
   return 0;

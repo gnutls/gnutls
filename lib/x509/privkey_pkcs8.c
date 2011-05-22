@@ -40,6 +40,8 @@
 #include <random.h>
 #include <pbkdf2-sha1.h>
 
+static int _decode_pkcs8_ecc_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey);
+
 #define PBES2_OID "1.2.840.113549.1.5.13"
 #define PBKDF2_OID "1.2.840.113549.1.5.12"
 #define DES_EDE3_CBC_OID "1.2.840.113549.3.7"
@@ -140,6 +142,7 @@ _encode_privkey (gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
   switch (pkey->pk_algorithm)
     {
     case GNUTLS_PK_RSA:
+    case GNUTLS_PK_ECC:
       ret =
         gnutls_x509_privkey_export (pkey, GNUTLS_X509_FMT_DER, NULL, &size);
       if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
@@ -178,7 +181,7 @@ _encode_privkey (gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
           return _gnutls_asn2err (ret);
         }
 
-      ret = _gnutls_x509_write_int (spk, "", pkey->params[4], 1);
+      ret = _gnutls_x509_write_int (spk, "", pkey->params.params[4], 1);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -223,30 +226,19 @@ encode_to_private_key_info (gnutls_x509_privkey_t pkey,
   gnutls_datum_t algo_params = { NULL, 0 };
   gnutls_datum_t algo_privkey = { NULL, 0 };
 
-  if (pkey->pk_algorithm != GNUTLS_PK_RSA
-      && pkey->pk_algorithm != GNUTLS_PK_DSA)
+  oid = _gnutls_x509_pk_to_oid(pkey->pk_algorithm);
+  if (oid == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_UNIMPLEMENTED_FEATURE;
     }
 
-  if (pkey->pk_algorithm == GNUTLS_PK_RSA)
+  result =
+      _gnutls_x509_write_pubkey_params (pkey->pk_algorithm, &pkey->params, &algo_params);
+  if (result < 0)
     {
-      oid = PK_PKIX1_RSA_OID;
-      /* parameters are null 
-       */
-    }
-  else
-    {
-      oid = PK_DSA_OID;
-      result =
-        _gnutls_x509_write_dsa_params (pkey->params, pkey->params_size,
-                                       &algo_params);
-      if (result < 0)
-        {
-          gnutls_assert ();
-          return result;
-        }
+      gnutls_assert ();
+      return result;
     }
 
   if ((result =
@@ -986,6 +978,36 @@ error:
   return ret;
 }
 
+/* Decodes an ECC privateKey from a PKCS8 structure.
+ */
+static int
+_decode_pkcs8_ecc_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
+{
+  int ret;
+  gnutls_datum_t tmp;
+
+  ret = _gnutls_x509_read_value (pkcs8_asn, "privateKey", &tmp, 0);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto error;
+    }
+
+  pkey->key = _gnutls_privkey_decode_ecc_key (&tmp, pkey);
+  _gnutls_free_datum (&tmp);
+  if (pkey->key == NULL)
+    {
+      gnutls_assert ();
+      goto error;
+    }
+
+  return 0;
+
+error:
+  gnutls_x509_privkey_deinit (pkey);
+  return ret;
+}
+
 /* Decodes an DSA privateKey and params from a PKCS8 structure.
  */
 static int
@@ -1001,7 +1023,7 @@ _decode_pkcs8_dsa_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
       goto error;
     }
 
-  ret = _gnutls_x509_read_der_int (tmp.data, tmp.size, &pkey->params[4]);
+  ret = _gnutls_x509_read_der_int (tmp.data, tmp.size, &pkey->params.params[4]);
   _gnutls_free_datum (&tmp);
 
   if (ret < 0)
@@ -1019,7 +1041,7 @@ _decode_pkcs8_dsa_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
       goto error;
     }
 
-  ret = _gnutls_x509_read_dsa_params (tmp.data, tmp.size, pkey->params);
+  ret = _gnutls_x509_read_pubkey_params (GNUTLS_PK_DSA, tmp.data, tmp.size, &pkey->params);
   _gnutls_free_datum (&tmp);
   if (ret < 0)
     {
@@ -1028,19 +1050,19 @@ _decode_pkcs8_dsa_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
     }
 
   /* the public key can be generated as g^x mod p */
-  pkey->params[3] = _gnutls_mpi_alloc_like (pkey->params[0]);
-  if (pkey->params[3] == NULL)
+  pkey->params.params[3] = _gnutls_mpi_alloc_like (pkey->params.params[0]);
+  if (pkey->params.params[3] == NULL)
     {
       gnutls_assert ();
       goto error;
     }
 
-  _gnutls_mpi_powm (pkey->params[3], pkey->params[2], pkey->params[4],
-                    pkey->params[0]);
+  _gnutls_mpi_powm (pkey->params.params[3], pkey->params.params[2], pkey->params.params[4],
+                    pkey->params.params[0]);
 
   if (!pkey->crippled)
     {
-      ret = _gnutls_asn1_encode_dsa (&pkey->key, pkey->params);
+      ret = _gnutls_asn1_encode_privkey (GNUTLS_PK_DSA, &pkey->key, &pkey->params);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -1048,7 +1070,7 @@ _decode_pkcs8_dsa_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
         }
     }
 
-  pkey->params_size = DSA_PRIVATE_PARAMS;
+  pkey->params.params_nr = DSA_PRIVATE_PARAMS;
 
   return 0;
 
@@ -1099,11 +1121,9 @@ decode_private_key_info (const gnutls_datum_t * der,
 
   /* we only support RSA and DSA private keys.
    */
-  if (strcmp (oid, PK_PKIX1_RSA_OID) == 0)
-    pkey->pk_algorithm = GNUTLS_PK_RSA;
-  else if (strcmp (oid, PK_DSA_OID) == 0)
-    pkey->pk_algorithm = GNUTLS_PK_DSA;
-  else
+
+  pkey->pk_algorithm = _gnutls_x509_oid2pk_algorithm(oid);
+  if (pkey->pk_algorithm == GNUTLS_PK_UNKNOWN)
     {
       gnutls_assert ();
       _gnutls_debug_log
@@ -1119,6 +1139,9 @@ decode_private_key_info (const gnutls_datum_t * der,
     result = _decode_pkcs8_rsa_key (pkcs8_asn, pkey);
   else if (pkey->pk_algorithm == GNUTLS_PK_DSA)
     result = _decode_pkcs8_dsa_key (pkcs8_asn, pkey);
+  else if (pkey->pk_algorithm == GNUTLS_PK_ECC)
+    result = _decode_pkcs8_ecc_key (pkcs8_asn, pkey);
+  else return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 
   if (result < 0)
     {

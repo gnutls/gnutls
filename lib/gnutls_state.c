@@ -67,7 +67,7 @@ _gnutls_session_cert_type_set (gnutls_session_t session,
 
 void
 _gnutls_session_ecc_curve_set (gnutls_session_t session,
-                               ecc_curve_t c)
+                               gnutls_ecc_curve_t c)
 {
   _gnutls_handshake_log("HSK[%p]: Selected ECC curve (%d)\n", session, c);
   session->security_parameters.ecc_curve = c;
@@ -1188,6 +1188,9 @@ _gnutls_session_is_ecc (gnutls_session_t session)
 {
   gnutls_kx_algorithm_t kx;
 
+  /* We get the key exchange algorithm through the ciphersuite because
+   * the negotiated key exchange might not have been set yet.
+   */
   kx =
     _gnutls_cipher_suite_get_kx_algo (&session->
                                       security_parameters.current_cipher_suite);

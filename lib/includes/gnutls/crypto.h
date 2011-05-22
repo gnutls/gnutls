@@ -279,7 +279,7 @@ extern "C"
  *  [3] is y (public key)
  *  [4] is x (private key only)
  *
- * ECDH:
+ * ECC:
  *  [0] is prime
  *  [1] is order
  *  [2] is A

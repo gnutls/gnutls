@@ -75,7 +75,7 @@ int ret;
 int
 _gnutls_proc_ecdh_common_client_kx (gnutls_session_t session,
                                   opaque * data, size_t _data_size,
-                                  ecc_curve_t curve)
+                                  gnutls_ecc_curve_t curve)
 {
   ssize_t data_size = _data_size;
   int ret, i = 0;
@@ -89,7 +89,7 @@ _gnutls_proc_ecdh_common_client_kx (gnutls_session_t session,
   i+=1;
 
   DECR_LEN (data_size, point_size);
-  ret = _gnutls_ecc_ansi_x963_import(curve, &data[i], point_size, &session->key->ecdh_x, &session->key->ecdh_y);
+  ret = _gnutls_ecc_ansi_x963_import(&data[i], point_size, &session->key->ecdh_x, &session->key->ecdh_y);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -139,7 +139,7 @@ _gnutls_proc_ecdh_common_server_kx (gnutls_session_t session,
                                   opaque * data, size_t _data_size)
 {
   int i, ret, point_size;
-  ecc_curve_t curve;
+  gnutls_ecc_curve_t curve;
   ssize_t data_size = _data_size;
 
   i = 0;
@@ -162,7 +162,7 @@ _gnutls_proc_ecdh_common_server_kx (gnutls_session_t session,
   i++;
 
   DECR_LEN (data_size, point_size);
-  ret = _gnutls_ecc_ansi_x963_import(curve, &data[i], point_size, &session->key->ecdh_x, &session->key->ecdh_y);
+  ret = _gnutls_ecc_ansi_x963_import(&data[i], point_size, &session->key->ecdh_x, &session->key->ecdh_y);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -174,7 +174,7 @@ _gnutls_proc_ecdh_common_server_kx (gnutls_session_t session,
 /* If the psk flag is set, then an empty psk_identity_hint will
  * be inserted */
 int _gnutls_ecdh_common_print_server_kx (gnutls_session_t session, gnutls_buffer_st* data,
-                                         ecc_curve_t curve)
+                                         gnutls_ecc_curve_t curve)
 {
   opaque p;
   int ret;

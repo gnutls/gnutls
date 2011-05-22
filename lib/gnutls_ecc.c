@@ -31,71 +31,176 @@
 #include <algorithms.h>
 #include <gnutls_errors.h>
 
-int _gnutls_ecc_ansi_x963_export(ecc_curve_t curve, bigint_t x, bigint_t y, gnutls_datum_t * out)
+int
+_gnutls_ecc_ansi_x963_export (gnutls_ecc_curve_t curve, bigint_t x, bigint_t y,
+                              gnutls_datum_t * out)
 {
-   int numlen = _gnutls_ecc_curve_get_size(curve);
-   int byte_size, ret;
-   size_t size;
-   
-   if (numlen == 0)
-     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-   
-   out->size = 1 + 2*numlen;
-   
-   out->data = gnutls_malloc(out->size);
-   if (out->data == NULL)
-     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+  int numlen = gnutls_ecc_curve_get_size (curve);
+  int byte_size, ret;
+  size_t size;
 
-   memset(out->data, 0, out->size);
+  if (numlen == 0)
+    return gnutls_assert_val (GNUTLS_E_INVALID_REQUEST);
 
-   /* store byte 0x04 */
-   out->data[0] = 0x04;
+  out->size = 1 + 2 * numlen;
 
-   /* pad and store x */
-   byte_size = (_gnutls_mpi_get_nbits(x)+7)/8;
-   size = out->size - (1+(numlen-byte_size));
-   ret = _gnutls_mpi_print(x, &out->data[1+(numlen-byte_size)], &size);
-   if (ret < 0)
-     return gnutls_assert_val(ret);
-   
-   byte_size = (_gnutls_mpi_get_nbits(y)+7)/8;
-   size = out->size - (1+(numlen+numlen-byte_size));
-   ret = _gnutls_mpi_print(y, &out->data[1+numlen+numlen-byte_size], &size);
-   if (ret < 0)
-     return gnutls_assert_val(ret);
+  out->data = gnutls_malloc (out->size);
+  if (out->data == NULL)
+    return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
-   /* pad and store y */
-   return 0;
+  memset (out->data, 0, out->size);
+
+  /* store byte 0x04 */
+  out->data[0] = 0x04;
+
+  /* pad and store x */
+  byte_size = (_gnutls_mpi_get_nbits (x) + 7) / 8;
+  size = out->size - (1 + (numlen - byte_size));
+  ret = _gnutls_mpi_print (x, &out->data[1 + (numlen - byte_size)], &size);
+  if (ret < 0)
+    return gnutls_assert_val (ret);
+
+  byte_size = (_gnutls_mpi_get_nbits (y) + 7) / 8;
+  size = out->size - (1 + (numlen + numlen - byte_size));
+  ret =
+    _gnutls_mpi_print (y, &out->data[1 + numlen + numlen - byte_size], &size);
+  if (ret < 0)
+    return gnutls_assert_val (ret);
+
+  /* pad and store y */
+  return 0;
 }
 
 
-int _gnutls_ecc_ansi_x963_import(ecc_curve_t curve, const opaque *in, unsigned long inlen, bigint_t* x, bigint_t* y)
+int
+_gnutls_ecc_ansi_x963_import (const opaque * in,
+                              unsigned long inlen, bigint_t * x, bigint_t * y)
 {
-   int ret;
-   int numlen = _gnutls_ecc_curve_get_size(curve);
- 
-   /* must be odd */
-   if ((inlen & 1) == 0 || numlen == 0) 
-     {
-       return GNUTLS_E_INVALID_REQUEST;
-     }
+  int ret;
 
-   /* check for 4, 6 or 7 */
-   if (in[0] != 4 && in[0] != 6 && in[0] != 7) {
-      return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-   }
+  /* must be odd */
+  if ((inlen & 1) == 0)
+    {
+      return GNUTLS_E_INVALID_REQUEST;
+    }
 
-   /* read data */
-   ret = _gnutls_mpi_scan(x, in+1, (inlen-1)>>1);
-   if (ret < 0)
-     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+  /* check for 4  */
+  if (in[0] != 4)
+    {
+      return gnutls_assert_val (GNUTLS_E_PARSING_ERROR);
+    }
 
-   ret = _gnutls_mpi_scan(y, in+1+((inlen-1)>>1), (inlen-1)>>1);
-   if (ret < 0)
-     {
-       _gnutls_mpi_release(x);
-       return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-     }
+  /* read data */
+  ret = _gnutls_mpi_scan (x, in + 1, (inlen - 1) >> 1);
+  if (ret < 0)
+    return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
-   return 0;
+  ret = _gnutls_mpi_scan (y, in + 1 + ((inlen - 1) >> 1), (inlen - 1) >> 1);
+  if (ret < 0)
+    {
+      _gnutls_mpi_release (x);
+      return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
+    }
+
+  return 0;
+}
+
+int _gnutls_ecc_curve_fill_params(gnutls_ecc_curve_t curve, gnutls_pk_params_st* params)
+{
+const gnutls_ecc_curve_entry_st *st;
+uint8_t val[MAX_ECC_CURVE_SIZE];
+size_t val_size;
+int ret;
+
+  st = _gnutls_ecc_curve_get_params(curve);
+  if (st == NULL)
+    return gnutls_assert_val(GNUTLS_E_ECC_UNSUPPORTED_CURVE);
+
+  val_size = sizeof(val);
+  ret = _gnutls_hex2bin(st->prime, strlen(st->prime), val, &val_size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  ret = _gnutls_mpi_scan_nz(&params->params[0], val, val_size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+  params->params_nr++;
+  
+  val_size = sizeof(val);
+  ret = _gnutls_hex2bin(st->order, strlen(st->order), val, &val_size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  ret = _gnutls_mpi_scan_nz(&params->params[1], val, val_size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+  params->params_nr++;
+  
+  val_size = sizeof(val);
+  ret = _gnutls_hex2bin(st->A, strlen(st->A), val, &val_size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  ret = _gnutls_mpi_scan_nz(&params->params[2], val, val_size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+  params->params_nr++;
+  
+  val_size = sizeof(val);
+  ret = _gnutls_hex2bin(st->Gx, strlen(st->Gx), val, &val_size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  ret = _gnutls_mpi_scan_nz(&params->params[3], val, val_size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+  params->params_nr++;
+  
+  val_size = sizeof(val);
+  ret = _gnutls_hex2bin(st->Gy, strlen(st->Gy), val, &val_size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  ret = _gnutls_mpi_scan_nz(&params->params[4], val, val_size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+  params->params_nr++;
+  
+
+  return 0;
+
+cleanup:
+  gnutls_pk_params_release(params);
+  return ret;
+
 }

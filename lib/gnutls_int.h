@@ -226,15 +226,6 @@ typedef enum extensions_t
 } extensions_t;
 
 typedef enum
-{
-  GNUTLS_ECC_CURVE_INVALID=0,
-  GNUTLS_ECC_CURVE_SECP224R1,
-  GNUTLS_ECC_CURVE_SECP256R1,
-  GNUTLS_ECC_CURVE_SECP384R1,
-  GNUTLS_ECC_CURVE_SECP521R1,
-} ecc_curve_t;
-
-typedef enum
 { CIPHER_STREAM, CIPHER_BLOCK } cipher_type_t;
 
 #define RESUME_TRUE 0
@@ -486,7 +477,7 @@ typedef struct
   uint16_t max_record_recv_size;
   /* holds the negotiated certificate type */
   gnutls_certificate_type_t cert_type;
-  ecc_curve_t ecc_curve; /* holds the first supported ECC curve requested by client */
+  gnutls_ecc_curve_t ecc_curve; /* holds the first supported ECC curve requested by client */
   gnutls_protocol_t version;    /* moved here */
 
   /* FIXME: The following are not saved in the session storage

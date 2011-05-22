@@ -2190,8 +2190,8 @@ gnutls_x509_crt_export (gnutls_x509_crt_t cert,
 }
 
 int
-_gnutls_get_key_id (gnutls_pk_algorithm_t pk, bigint_t * params,
-                    int params_size, unsigned char *output_data,
+_gnutls_get_key_id (gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params,
+                    unsigned char *output_data,
                     size_t * output_data_size)
 {
   int result = 0;
@@ -2205,26 +2205,12 @@ _gnutls_get_key_id (gnutls_pk_algorithm_t pk, bigint_t * params,
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
-  if (pk == GNUTLS_PK_RSA)
+  result = _gnutls_x509_write_pubkey(pk, params, &der);
+  if (result < 0)
     {
-      result = _gnutls_x509_write_rsa_params (params, params_size, &der);
-      if (result < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
+      gnutls_assert ();
+      goto cleanup;
     }
-  else if (pk == GNUTLS_PK_DSA)
-    {
-      result = _gnutls_x509_write_dsa_public_key (params, params_size, &der);
-      if (result < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
-    }
-  else
-    return GNUTLS_E_INTERNAL_ERROR;
 
   result = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1);
   if (result < 0)
@@ -2251,11 +2237,10 @@ static int
 rsadsa_get_key_id (gnutls_x509_crt_t crt, int pk,
                    unsigned char *output_data, size_t * output_data_size)
 {
-  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
-  int params_size = MAX_PUBLIC_PARAMS_SIZE;
-  int i, result = 0;
+  gnutls_pk_params_st params;
+  int result = 0;
 
-  result = _gnutls_x509_crt_get_mpis (crt, params, &params_size);
+  result = _gnutls_x509_crt_get_mpis (crt, &params);
   if (result < 0)
     {
       gnutls_assert ();
@@ -2263,7 +2248,7 @@ rsadsa_get_key_id (gnutls_x509_crt_t crt, int pk,
     }
 
   result =
-    _gnutls_get_key_id (pk, params, params_size, output_data,
+    _gnutls_get_key_id (pk, &params, output_data,
                         output_data_size);
   if (result < 0)
     {
@@ -2277,10 +2262,7 @@ cleanup:
 
   /* release all allocated MPIs
    */
-  for (i = 0; i < params_size; i++)
-    {
-      _gnutls_mpi_release (&params[i]);
-    }
+  gnutls_pk_params_release(&params);
   return result;
 }
 
@@ -2524,9 +2506,8 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
                                       const gnutls_datum_t * signature,
                                       gnutls_digest_algorithm_t * hash)
 {
-  bigint_t issuer_params[MAX_PUBLIC_PARAMS_SIZE];
-  int issuer_params_size;
-  int ret, i;
+  gnutls_pk_params_st issuer_params;
+  int ret;
 
   if (crt == NULL)
     {
@@ -2534,8 +2515,7 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  issuer_params_size = MAX_PUBLIC_PARAMS_SIZE;
-  ret = _gnutls_x509_crt_get_mpis (crt, issuer_params, &issuer_params_size);
+  ret = _gnutls_x509_crt_get_mpis (crt, &issuer_params);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -2546,13 +2526,10 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
                                        signature,
                                        gnutls_x509_crt_get_pk_algorithm (crt,
                                                                          NULL),
-                                       issuer_params, issuer_params_size);
+                                       &issuer_params);
 
   /* release allocated mpis */
-  for (i = 0; i < issuer_params_size; i++)
-    {
-      _gnutls_mpi_release (&issuer_params[i]);
-    }
+  gnutls_pk_params_release(&issuer_params);
 
   return ret;
 }
@@ -2581,9 +2558,8 @@ gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
                                               gnutls_digest_algorithm_t *
                                               hash, unsigned int *mand)
 {
-  bigint_t issuer_params[MAX_PUBLIC_PARAMS_SIZE];
-  int issuer_params_size;
-  int ret, i;
+  gnutls_pk_params_st issuer_params;
+  int ret;
 
   if (crt == NULL)
     {
@@ -2591,8 +2567,7 @@ gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  issuer_params_size = MAX_PUBLIC_PARAMS_SIZE;
-  ret = _gnutls_x509_crt_get_mpis (crt, issuer_params, &issuer_params_size);
+  ret = _gnutls_x509_crt_get_mpis (crt, &issuer_params);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -2601,14 +2576,11 @@ gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
 
   ret =
     _gnutls_pk_get_hash_algorithm (gnutls_x509_crt_get_pk_algorithm
-                                   (crt, NULL), issuer_params,
-                                   issuer_params_size, hash, mand);
+                                   (crt, NULL), &issuer_params,
+                                   hash, mand);
 
   /* release allocated mpis */
-  for (i = 0; i < issuer_params_size; i++)
-    {
-      _gnutls_mpi_release (&issuer_params[i]);
-    }
+  gnutls_pk_params_release(&issuer_params);
 
   return ret;
 }
@@ -2936,9 +2908,7 @@ gnutls_x509_crt_get_pk_rsa_raw (gnutls_x509_crt_t crt,
                                 gnutls_datum_t * m, gnutls_datum_t * e)
 {
   int ret;
-  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
-  int params_size = MAX_PUBLIC_PARAMS_SIZE;
-  int i;
+  gnutls_pk_params_st params;
 
   if (crt == NULL)
     {
@@ -2953,21 +2923,21 @@ gnutls_x509_crt_get_pk_rsa_raw (gnutls_x509_crt_t crt,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = _gnutls_x509_crt_get_mpis (crt, params, &params_size);
+  ret = _gnutls_x509_crt_get_mpis (crt, &params);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = _gnutls_mpi_dprint_lz (params[0], m);
+  ret = _gnutls_mpi_dprint_lz (params.params[0], m);
   if (ret < 0)
     {
       gnutls_assert ();
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_dprint_lz (params[1], e);
+  ret = _gnutls_mpi_dprint_lz (params.params[1], e);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -2978,10 +2948,7 @@ gnutls_x509_crt_get_pk_rsa_raw (gnutls_x509_crt_t crt,
   ret = 0;
 
 cleanup:
-  for (i = 0; i < params_size; i++)
-    {
-      _gnutls_mpi_release (&params[i]);
-    }
+  gnutls_pk_params_release(&params);
   return ret;
 }
 
@@ -3005,9 +2972,7 @@ gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
                                 gnutls_datum_t * g, gnutls_datum_t * y)
 {
   int ret;
-  bigint_t params[MAX_PUBLIC_PARAMS_SIZE];
-  int params_size = MAX_PUBLIC_PARAMS_SIZE;
-  int i;
+  gnutls_pk_params_st params;
 
   if (crt == NULL)
     {
@@ -3022,7 +2987,7 @@ gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = _gnutls_x509_crt_get_mpis (crt, params, &params_size);
+  ret = _gnutls_x509_crt_get_mpis (crt, &params);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -3031,7 +2996,7 @@ gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
 
 
   /* P */
-  ret = _gnutls_mpi_dprint_lz (params[0], p);
+  ret = _gnutls_mpi_dprint_lz (params.params[0], p);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -3039,7 +3004,7 @@ gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
     }
 
   /* Q */
-  ret = _gnutls_mpi_dprint_lz (params[1], q);
+  ret = _gnutls_mpi_dprint_lz (params.params[1], q);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -3049,7 +3014,7 @@ gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
 
 
   /* G */
-  ret = _gnutls_mpi_dprint_lz (params[2], g);
+  ret = _gnutls_mpi_dprint_lz (params.params[2], g);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -3060,7 +3025,7 @@ gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
 
 
   /* Y */
-  ret = _gnutls_mpi_dprint_lz (params[3], y);
+  ret = _gnutls_mpi_dprint_lz (params.params[3], y);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -3073,10 +3038,7 @@ gnutls_x509_crt_get_pk_dsa_raw (gnutls_x509_crt_t crt,
   ret = 0;
 
 cleanup:
-  for (i = 0; i < params_size; i++)
-    {
-      _gnutls_mpi_release (&params[i]);
-    }
+  gnutls_pk_params_release(&params);
   return ret;
 
 }

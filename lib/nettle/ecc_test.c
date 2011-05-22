@@ -54,7 +54,7 @@ ecc_test (void)
     {
       const gnutls_ecc_curve_entry_st *st = _gnutls_ecc_curve_get_params (i);
 
-      printf ("Testing %s (%d)\n", _gnutls_ecc_curve_get_name (i), i);
+      printf ("Testing %s (%d)\n", gnutls_ecc_curve_get_name (i), i);
 
       if (mpz_set_str (A, (char *) st->A, 16) != 0)
         {

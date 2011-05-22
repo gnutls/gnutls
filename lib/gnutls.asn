@@ -89,5 +89,18 @@ DHParameter ::= SEQUENCE {
   privateValueLength  INTEGER OPTIONAL 
 }
 
+-- ECC from RFC5480
+ECPoint ::= OCTET STRING
+
+ECParameters ::= CHOICE {
+  namedCurve         OBJECT IDENTIFIER
+}
+
+ECPrivateKey ::= SEQUENCE {
+   Version       INTEGER, -- { ecPrivkeyVer1(1) }
+   privateKey    OCTET STRING,
+   parameters    [0] ECParameters OPTIONAL,
+   publicKey     [1] BIT STRING OPTIONAL
+}
 
 END

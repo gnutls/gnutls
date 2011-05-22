@@ -30,9 +30,9 @@
 int _gnutls_gen_ecdh_common_client_kx (gnutls_session_t, gnutls_buffer_st*);
 int _gnutls_proc_ecdh_common_client_kx (gnutls_session_t session,
                                       opaque * data, size_t _data_size,
-                                      ecc_curve_t curve);
+                                      gnutls_ecc_curve_t curve);
 int _gnutls_ecdh_common_print_server_kx (gnutls_session_t, gnutls_buffer_st* data,
-                                         ecc_curve_t curve);
+                                         gnutls_ecc_curve_t curve);
 int _gnutls_proc_ecdh_common_server_kx (gnutls_session_t session, opaque * data,
                                       size_t _data_size);
 

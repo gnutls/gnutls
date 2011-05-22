@@ -31,7 +31,7 @@
 void _gnutls_session_cert_type_set (gnutls_session_t session,
                                     gnutls_certificate_type_t);
 
-inline static ecc_curve_t _gnutls_session_ecc_curve_get(gnutls_session_t session)
+inline static gnutls_ecc_curve_t _gnutls_session_ecc_curve_get(gnutls_session_t session)
 {
   return session->security_parameters.ecc_curve;
 }
@@ -40,7 +40,7 @@ int _gnutls_session_is_ecc (gnutls_session_t session);
 
 void
 _gnutls_session_ecc_curve_set (gnutls_session_t session,
-                               ecc_curve_t c);
+                               gnutls_ecc_curve_t c);
 
 void
 _gnutls_record_set_default_version (gnutls_session_t session,

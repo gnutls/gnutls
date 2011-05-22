@@ -34,6 +34,7 @@
 static const gnutls_ecc_curve_entry_st ecc_curves[] = {
   {
     .name = "SECP224R1", 
+    .oid = "1.3.132.0.33",
     .id = GNUTLS_ECC_CURVE_SECP224R1,
     .tls_id = 21,
     .size = 28,
@@ -46,6 +47,7 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
   },
   {
     .name = "SECP256R1", 
+    .oid = "1.2.840.10045.3.1.7",
     .id = GNUTLS_ECC_CURVE_SECP256R1,
     .tls_id = 23,
     .size = 32,
@@ -58,6 +60,7 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
   },
   {
     .name = "SECP384R1",
+    .oid = "1.3.132.0.34",
     .id = GNUTLS_ECC_CURVE_SECP384R1,
     .tls_id = 24,
     .size = 48,
@@ -70,6 +73,7 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
   },
   {
     .name = "SECP521R1",
+    .oid = "1.3.132.0.35",
     .id = GNUTLS_ECC_CURVE_SECP521R1,
     .tls_id = 25,
     .size = 66,
@@ -93,7 +97,7 @@ static const gnutls_ecc_curve_entry_st ecc_curves[] = {
 int
 _gnutls_tls_id_to_ecc_curve (int num)
 {
-  ecc_curve_t ret = GNUTLS_ECC_CURVE_INVALID;
+  gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_INVALID;
 
   GNUTLS_ECC_CURVE_LOOP (
   if (p->tls_id == num) 
@@ -110,7 +114,7 @@ _gnutls_tls_id_to_ecc_curve (int num)
  * Returns a negative number on error.
  */
 int
-_gnutls_ecc_curve_get_tls_id (ecc_curve_t supported_ecc)
+_gnutls_ecc_curve_get_tls_id (gnutls_ecc_curve_t supported_ecc)
 {
   int ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
 
@@ -125,6 +129,27 @@ _gnutls_ecc_curve_get_tls_id (ecc_curve_t supported_ecc)
   return ret;
 }
 
+/*-
+ * _gnutls_oid_to_ecc_curve:
+ * @oid: is a curve's OID
+ *
+ * Returns: return a #gnutls_ecc_curve_t value corresponding to
+ *   the specified OID, or %GNUTLS_ECC_CURVE_INVALID on error.
+ -*/
+gnutls_ecc_curve_t _gnutls_oid_to_ecc_curve (const char* oid)
+{
+  gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_INVALID;
+
+  GNUTLS_ECC_CURVE_LOOP (
+  if (strcasecmp (p->oid, oid) == 0) 
+    {
+      ret = p->id;
+      break;
+    }
+  );
+
+  return ret;
+}
 
 /*-
  * _gnutls_ecc_curve_get_id:
@@ -132,13 +157,13 @@ _gnutls_ecc_curve_get_tls_id (ecc_curve_t supported_ecc)
  *
  * The names are compared in a case insensitive way.
  *
- * Returns: return a #ecc_curve_t value corresponding to
- *   the specified cipher, or %GNUTLS_ECC_CURVE_INVALID on error.
+ * Returns: return a #gnutls_ecc_curve_t value corresponding to
+ *   the specified curve, or %GNUTLS_ECC_CURVE_INVALID on error.
  -*/
-ecc_curve_t
+gnutls_ecc_curve_t
 _gnutls_ecc_curve_get_id (const char *name)
 {
-  ecc_curve_t ret = GNUTLS_ECC_CURVE_INVALID;
+  gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_INVALID;
 
   GNUTLS_ECC_CURVE_LOOP (
   if (strcasecmp (p->name, name) == 0) 
@@ -151,17 +176,17 @@ _gnutls_ecc_curve_get_id (const char *name)
   return ret;
 }
 
-/*-
- * _gnutls_ecc_curve_get_name:
+/**
+ * gnutls_ecc_curve_get_name:
  * @curve: is an ECC curve
  *
- * Convert a #ecc_curve_t value to a string.
+ * Convert a #gnutls_ecc_curve_t value to a string.
  *
  * Returns: a string that contains the name of the specified
  *   curve or %NULL.
- -*/
+ **/
 const char *
-_gnutls_ecc_curve_get_name (ecc_curve_t curve)
+gnutls_ecc_curve_get_name (gnutls_ecc_curve_t curve)
 {
   const char *ret = NULL;
 
@@ -169,6 +194,31 @@ _gnutls_ecc_curve_get_name (ecc_curve_t curve)
     if (p->id == curve)
       {
         ret = p->name;
+        break;
+      }
+  );
+
+  return ret;
+}
+
+/*-
+ * _gnutls_ecc_curve_get_oid:
+ * @curve: is an ECC curve
+ *
+ * Convert a #gnutls_ecc_curve_t value to a string.
+ *
+ * Returns: a string that contains the name of the specified
+ *   curve or %NULL.
+ -*/
+const char *
+_gnutls_ecc_curve_get_oid (gnutls_ecc_curve_t curve)
+{
+  const char *ret = NULL;
+
+  GNUTLS_ECC_CURVE_LOOP(
+    if (p->id == curve)
+      {
+        ret = p->oid;
         break;
       }
   );
@@ -185,7 +235,7 @@ _gnutls_ecc_curve_get_name (ecc_curve_t curve)
  * Returns: a pointer to #gnutls_ecc_curve_entry_st or %NULL.
  -*/
 const gnutls_ecc_curve_entry_st *
-_gnutls_ecc_curve_get_params (ecc_curve_t curve)
+_gnutls_ecc_curve_get_params (gnutls_ecc_curve_t curve)
 {
   const gnutls_ecc_curve_entry_st *ret = NULL;
 
@@ -200,15 +250,15 @@ _gnutls_ecc_curve_get_params (ecc_curve_t curve)
   return ret;
 }
 
-/*-
- * _gnutls_ecc_curve_get_size:
+/**
+ * gnutls_ecc_curve_get_size:
  * @curve: is an ECC curve
  *
  * Returns the size in bytes of the curve.
  *
  * Returns: a the size or zero.
- -*/
-int _gnutls_ecc_curve_get_size (ecc_curve_t curve)
+ **/
+int gnutls_ecc_curve_get_size (gnutls_ecc_curve_t curve)
 {
   int ret = 0;
 

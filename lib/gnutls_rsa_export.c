@@ -37,7 +37,7 @@
 /* returns e and m, depends on the requested bits.
  * We only support limited key sizes.
  */
-const bigint_t *
+const gnutls_pk_params_st*
 _gnutls_rsa_params_to_mpi (gnutls_rsa_params_t rsa_params)
 {
   if (rsa_params == NULL)
@@ -45,7 +45,7 @@ _gnutls_rsa_params_to_mpi (gnutls_rsa_params_t rsa_params)
       return NULL;
     }
 
-  return rsa_params->params;
+  return &rsa_params->params;
 }
 
 /**
@@ -201,7 +201,7 @@ gnutls_rsa_params_export_pkcs1 (gnutls_rsa_params_t params,
 
 /**
  * gnutls_rsa_params_export_raw:
- * @params: a structure that holds the rsa parameters
+ * @rsa: a structure that holds the rsa parameters
  * @m: will hold the modulus
  * @e: will hold the public exponent
  * @d: will hold the private exponent
@@ -217,7 +217,7 @@ gnutls_rsa_params_export_pkcs1 (gnutls_rsa_params_t params,
  * Returns: %GNUTLS_E_SUCCESS on success, or an negative error code.
  **/
 int
-gnutls_rsa_params_export_raw (gnutls_rsa_params_t params,
+gnutls_rsa_params_export_raw (gnutls_rsa_params_t rsa,
                               gnutls_datum_t * m, gnutls_datum_t * e,
                               gnutls_datum_t * d, gnutls_datum_t * p,
                               gnutls_datum_t * q, gnutls_datum_t * u,
@@ -225,7 +225,7 @@ gnutls_rsa_params_export_raw (gnutls_rsa_params_t params,
 {
   int ret;
 
-  ret = gnutls_x509_privkey_export_rsa_raw (params, m, e, d, p, q, u);
+  ret = gnutls_x509_privkey_export_rsa_raw (rsa, m, e, d, p, q, u);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -233,7 +233,7 @@ gnutls_rsa_params_export_raw (gnutls_rsa_params_t params,
     }
 
   if (bits)
-    *bits = _gnutls_mpi_get_nbits (params->params[3]);
+    *bits = _gnutls_mpi_get_nbits (rsa->params.params[3]);
 
   return 0;
 }

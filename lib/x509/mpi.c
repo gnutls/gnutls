@@ -31,125 +31,8 @@
 #include "common.h"
 #include "x509_int.h"
 #include <gnutls_num.h>
+#include <gnutls_ecc.h>
 
-/*
- * some x509 certificate parsing functions that relate to MPI parameter
- * extraction. This reads the BIT STRING subjectPublicKey.
- * Returns 2 parameters (m,e).
- */
-int
-_gnutls_x509_read_rsa_params (opaque * der, int dersize, bigint_t * params)
-{
-  int result;
-  ASN1_TYPE spk = ASN1_TYPE_EMPTY;
-
-  if ((result = asn1_create_element
-       (_gnutls_get_gnutls_asn (), "GNUTLS.RSAPublicKey", &spk))
-      != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      return _gnutls_asn2err (result);
-    }
-
-  result = asn1_der_decoding (&spk, der, dersize, NULL);
-
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&spk);
-      return _gnutls_asn2err (result);
-    }
-
-
-  if ((result = _gnutls_x509_read_int (spk, "modulus", &params[0])) < 0)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&spk);
-      return GNUTLS_E_ASN1_GENERIC_ERROR;
-    }
-
-  if ((result = _gnutls_x509_read_int (spk, "publicExponent",
-                                       &params[1])) < 0)
-    {
-      gnutls_assert ();
-      _gnutls_mpi_release (&params[0]);
-      asn1_delete_structure (&spk);
-      return GNUTLS_E_ASN1_GENERIC_ERROR;
-    }
-
-  asn1_delete_structure (&spk);
-
-  return 0;
-
-}
-
-
-/* reads p,q and g 
- * from the certificate (subjectPublicKey BIT STRING).
- * params[0-2]
- */
-int
-_gnutls_x509_read_dsa_params (opaque * der, int dersize, bigint_t * params)
-{
-  int result;
-  ASN1_TYPE spk = ASN1_TYPE_EMPTY;
-
-  if ((result = asn1_create_element
-       (_gnutls_get_pkix (), "PKIX1.Dss-Parms", &spk)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      return _gnutls_asn2err (result);
-    }
-
-  result = asn1_der_decoding (&spk, der, dersize, NULL);
-
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&spk);
-      return _gnutls_asn2err (result);
-    }
-
-  /* FIXME: If the parameters are not included in the certificate
-   * then the issuer's parameters should be used. This is not
-   * done yet.
-   */
-
-  /* Read p */
-
-  if ((result = _gnutls_x509_read_int (spk, "p", &params[0])) < 0)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&spk);
-      return GNUTLS_E_ASN1_GENERIC_ERROR;
-    }
-
-  /* Read q */
-
-  if ((result = _gnutls_x509_read_int (spk, "q", &params[1])) < 0)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&spk);
-      _gnutls_mpi_release (&params[0]);
-      return GNUTLS_E_ASN1_GENERIC_ERROR;
-    }
-
-  /* Read g */
-
-  if ((result = _gnutls_x509_read_int (spk, "g", &params[2])) < 0)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&spk);
-      _gnutls_mpi_release (&params[0]);
-      _gnutls_mpi_release (&params[1]);
-      return GNUTLS_E_ASN1_GENERIC_ERROR;
-    }
-
-  asn1_delete_structure (&spk);
-
-  return 0;
-
-}
 
 /* Reads an Integer from the DER encoded data
  */
@@ -193,27 +76,19 @@ _gnutls_x509_read_der_int (opaque * der, int dersize, bigint_t * out)
 
 }
 
-/* reads DSA's Y
- * from the certificate 
- * only sets params[3]
- */
-int
-_gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, bigint_t * params)
-{
-  return _gnutls_x509_read_der_int (der, dersize, &params[3]);
-}
-
 
 /* Extracts DSA and RSA parameters from a certificate.
  */
 int
 _gnutls_get_asn_mpis (ASN1_TYPE asn, const char *root,
-                      bigint_t * params, int *params_size)
+                      gnutls_pk_params_st * params)
 {
   int result;
   char name[256];
   gnutls_datum_t tmp = { NULL, 0 };
   gnutls_pk_algorithm_t pk_algorithm;
+
+  gnutls_pk_params_init(params);
 
   result = _gnutls_x509_get_pk_algorithm (asn, root, NULL);
   if (result < 0)
@@ -235,86 +110,36 @@ _gnutls_get_asn_mpis (ASN1_TYPE asn, const char *root,
       return result;
     }
 
-  switch (pk_algorithm)
+  if ((result =
+       _gnutls_x509_read_pubkey (pk_algorithm, tmp.data, tmp.size, params)) < 0)
     {
-    case GNUTLS_PK_RSA:
-      /* params[0] is the modulus,
-       * params[1] is the exponent
-       */
-      if (*params_size < RSA_PUBLIC_PARAMS)
-        {
-          gnutls_assert ();
-          /* internal error. Increase the bigint_ts in params */
-          result = GNUTLS_E_INTERNAL_ERROR;
-          goto error;
-        }
-
-      if ((result =
-           _gnutls_x509_read_rsa_params (tmp.data, tmp.size, params)) < 0)
-        {
-          gnutls_assert ();
-          goto error;
-        }
-      *params_size = RSA_PUBLIC_PARAMS;
-
-      break;
-    case GNUTLS_PK_DSA:
-      /* params[0] is p,
-       * params[1] is q,
-       * params[2] is q,
-       * params[3] is pub.
-       */
-
-      if (*params_size < DSA_PUBLIC_PARAMS)
-        {
-          gnutls_assert ();
-          /* internal error. Increase the bigint_ts in params */
-          result = GNUTLS_E_INTERNAL_ERROR;
-          goto error;
-        }
-
-      if ((result =
-           _gnutls_x509_read_dsa_pubkey (tmp.data, tmp.size, params)) < 0)
-        {
-          gnutls_assert ();
-          goto error;
-        }
-
-      /* Now read the parameters
-       */
-      _gnutls_free_datum (&tmp);
-
-      _asnstr_append_name (name, sizeof (name), root,
-                           ".algorithm.parameters");
-      result = _gnutls_x509_read_value (asn, name, &tmp, 0);
-
-      /* FIXME: If the parameters are not included in the certificate
-       * then the issuer's parameters should be used. This is not
-       * done yet.
-       */
-
-      if (result < 0)
-        {
-          gnutls_assert ();
-          goto error;
-        }
-
-      if ((result =
-           _gnutls_x509_read_dsa_params (tmp.data, tmp.size, params)) < 0)
-        {
-          gnutls_assert ();
-          goto error;
-        }
-      *params_size = DSA_PUBLIC_PARAMS;
-
-      break;
-
-    default:
-      /* other types like DH
-       * currently not supported
-       */
       gnutls_assert ();
-      result = GNUTLS_E_X509_CERTIFICATE_ERROR;
+      goto error;
+    }
+
+  /* Now read the parameters
+   */
+  _gnutls_free_datum (&tmp);
+ 
+  _asnstr_append_name (name, sizeof (name), root,
+                       ".algorithm.parameters");
+  result = _gnutls_x509_read_value (asn, name, &tmp, 0);
+
+  /* FIXME: If the parameters are not included in the certificate
+   * then the issuer's parameters should be used. This is not
+   * done yet.
+   */
+
+  if (result < 0 && pk_algorithm != GNUTLS_PK_RSA) /* RSA doesn't use parameters */
+    {
+      gnutls_assert ();
+      goto error;
+    }
+
+  if ((result =
+       _gnutls_x509_read_pubkey_params (pk_algorithm, tmp.data, tmp.size, params)) < 0)
+    {
+      gnutls_assert ();
       goto error;
     }
 
@@ -329,13 +154,12 @@ error:
  */
 int
 _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
-                           bigint_t * params, int *params_size)
+                           gnutls_pk_params_st * params)
 {
   /* Read the algorithm's OID
    */
   return _gnutls_get_asn_mpis (cert->cert,
-                               "tbsCertificate.subjectPublicKeyInfo", params,
-                               params_size);
+                               "tbsCertificate.subjectPublicKeyInfo", params);
 }
 
 #ifdef ENABLE_PKI
@@ -344,78 +168,17 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
  */
 int
 _gnutls_x509_crq_get_mpis (gnutls_x509_crq_t cert,
-                           bigint_t * params, int *params_size)
+                           gnutls_pk_params_st* params)
 {
   /* Read the algorithm's OID
    */
   return _gnutls_get_asn_mpis (cert->crq,
                                "certificationRequestInfo.subjectPKInfo",
-                               params, params_size);
+                               params);
 }
 
 #endif
 
-/*
- * some x509 certificate functions that relate to MPI parameter
- * setting. This writes the BIT STRING subjectPublicKey.
- * Needs 2 parameters (m,e).
- *
- * Allocates the space used to store the DER data.
- */
-int
-_gnutls_x509_write_rsa_params (bigint_t * params, int params_size,
-                               gnutls_datum_t * der)
-{
-  int result;
-  ASN1_TYPE spk = ASN1_TYPE_EMPTY;
-
-  der->data = NULL;
-  der->size = 0;
-
-  if (params_size < 2)
-    {
-      gnutls_assert ();
-      result = GNUTLS_E_INVALID_REQUEST;
-      goto cleanup;
-    }
-
-  if ((result = asn1_create_element
-       (_gnutls_get_gnutls_asn (), "GNUTLS.RSAPublicKey", &spk))
-      != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      return _gnutls_asn2err (result);
-    }
-
-  result = _gnutls_x509_write_int (spk, "modulus", params[0], 1);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = _gnutls_x509_write_int (spk, "publicExponent", params[1], 1);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = _gnutls_x509_der_encode (spk, "", der, 0);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  asn1_delete_structure (&spk);
-  return 0;
-
-cleanup:
-  asn1_delete_structure (&spk);
-
-  return result;
-}
 
 /*
  * This function writes and encodes the parameters for DSS or RSA keys.
@@ -473,123 +236,7 @@ _gnutls_x509_write_sig_params (ASN1_TYPE dst, const char *dst_name,
   return 0;
 }
 
-/*
- * This function writes the parameters for DSS keys.
- * Needs 3 parameters (p,q,g).
- *
- * Allocates the space used to store the DER data.
- */
-int
-_gnutls_x509_write_dsa_params (bigint_t * params, int params_size,
-                               gnutls_datum_t * der)
-{
-  int result;
-  ASN1_TYPE spk = ASN1_TYPE_EMPTY;
 
-  der->data = NULL;
-  der->size = 0;
-
-  if (params_size < 3)
-    {
-      gnutls_assert ();
-      result = GNUTLS_E_INVALID_REQUEST;
-      goto cleanup;
-    }
-
-  if ((result = asn1_create_element
-       (_gnutls_get_gnutls_asn (), "GNUTLS.DSAParameters", &spk))
-      != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      return _gnutls_asn2err (result);
-    }
-
-  result = _gnutls_x509_write_int (spk, "p", params[0], 1);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = _gnutls_x509_write_int (spk, "q", params[1], 1);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = _gnutls_x509_write_int (spk, "g", params[2], 1);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = _gnutls_x509_der_encode (spk, "", der, 0);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = 0;
-
-cleanup:
-  asn1_delete_structure (&spk);
-  return result;
-}
-
-/*
- * This function writes the public parameters for DSS keys.
- * Needs 1 parameter (y).
- *
- * Allocates the space used to store the DER data.
- */
-int
-_gnutls_x509_write_dsa_public_key (bigint_t * params, int params_size,
-                                   gnutls_datum_t * der)
-{
-  int result;
-  ASN1_TYPE spk = ASN1_TYPE_EMPTY;
-
-  der->data = NULL;
-  der->size = 0;
-
-  if (params_size < 3)
-    {
-      gnutls_assert ();
-      result = GNUTLS_E_INVALID_REQUEST;
-      goto cleanup;
-    }
-
-  if ((result = asn1_create_element
-       (_gnutls_get_gnutls_asn (), "GNUTLS.DSAPublicKey", &spk))
-      != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      return _gnutls_asn2err (result);
-    }
-
-  result = _gnutls_x509_write_int (spk, "", params[3], 1);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = _gnutls_x509_der_encode (spk, "", der, 0);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = 0;
-
-cleanup:
-  asn1_delete_structure (&spk);
-  return result;
-}
 
 
 /* this function reads a (small) unsigned integer
