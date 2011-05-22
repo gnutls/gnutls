@@ -24,7 +24,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <gnutls_extensions.h>
-#include <gnutls_algorithms.h>
+#include <algorithms.h>
 #include <gnutls/extra.h>
 
 #ifdef HAVE_GCRYPT
