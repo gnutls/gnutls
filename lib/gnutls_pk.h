@@ -62,9 +62,6 @@ int _gnutls_rsa_verify (const gnutls_datum_t * vdata,
                         const gnutls_datum_t * ciphertext, 
                         gnutls_pk_params_st*,
                         int btype);
-int _gnutls_dsa_verify (const gnutls_datum_t * vdata,
-                        const gnutls_datum_t * sig_value,
-                        gnutls_pk_params_st* params);
 
 int
 _gnutls_encode_ber_rs (gnutls_datum_t * sig_value, bigint_t r, bigint_t s);

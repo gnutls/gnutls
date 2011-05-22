@@ -1417,7 +1417,7 @@ _gnutls_proc_cert_server_certificate (gnutls_session_t session,
 
 #define MAX_SIGN_ALGOS 2
 typedef enum CertificateSigType
-{ RSA_SIGN = 1, DSA_SIGN
+{ RSA_SIGN = 1, DSA_SIGN=2, ECDSA_SIGN=64
 } CertificateSigType;
 
 /* Checks if we support the given signature algorithm 
@@ -1433,6 +1433,8 @@ _gnutls_check_supported_sign_algo (CertificateSigType algo)
       return GNUTLS_PK_RSA;
     case DSA_SIGN:
       return GNUTLS_PK_DSA;
+    case ECDSA_SIGN:
+      return GNUTLS_PK_ECC;
     }
 
   return -1;
@@ -1701,7 +1703,7 @@ _gnutls_proc_cert_client_cert_vrfy (gnutls_session_t session,
   return 0;
 }
 
-#define CERTTYPE_SIZE 3
+#define CERTTYPE_SIZE 4
 int
 _gnutls_gen_cert_server_cert_req (gnutls_session_t session, gnutls_buffer_st * data)
 {
@@ -1737,7 +1739,8 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session, gnutls_buffer_st * d
 
   tmp_data[0] = CERTTYPE_SIZE - 1;
   tmp_data[1] = RSA_SIGN;
-  tmp_data[2] = DSA_SIGN;          /* only these for now */
+  tmp_data[2] = DSA_SIGN;
+  tmp_data[3] = ECDSA_SIGN;          /* only these for now */
 
   ret = _gnutls_buffer_append_data( data, tmp_data, CERTTYPE_SIZE);
   if (ret < 0)

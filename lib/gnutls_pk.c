@@ -474,34 +474,6 @@ _gnutls_decode_ber_rs (const gnutls_datum_t * sig_value, bigint_t * r,
   return 0;
 }
 
-/* params is p, q, g, y in that order
- */
-int
-_gnutls_dsa_verify (const gnutls_datum_t * vdata,
-                    const gnutls_datum_t * sig_value,
-                    gnutls_pk_params_st* params)
-{
-
-  int ret;
-
-  if (vdata->size < 20)
-    { /* SHA1 or better only */
-      gnutls_assert ();
-      return GNUTLS_E_PK_SIG_VERIFY_FAILED;
-    }
-
-  /* decrypt signature */
-  ret = _gnutls_pk_verify (GNUTLS_PK_DSA, vdata, sig_value, params);
-
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  return 0;                     /* ok */
-}
-
 /* some generic pk functions */
 
 int _gnutls_pk_params_copy (gnutls_pk_params_st * dst, const gnutls_pk_params_st * src)

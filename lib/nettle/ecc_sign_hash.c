@@ -26,7 +26,7 @@
   Sign a message digest
   @param in        The message digest to sign
   @param inlen     The length of the digest
-  @param signature The destination for the signature
+  @param sign      The destination for the signature
   @param prng      An active PRNG state
   @param wprng     The index of the PRNG you wish to use
   @param key       A private ECC key
@@ -34,15 +34,15 @@
 */
 int
 ecc_sign_hash (const unsigned char *in, unsigned long inlen,
-               struct dsa_signature *signature,
+               struct dsa_signature *sig,
                void *random_ctx, nettle_random_func random, ecc_key * key)
 {
   ecc_key pubkey;
-  mpz_t r, s, e;
+  mpz_t e;
   int err;
 
   assert (in != NULL);
-  assert (signature != NULL);
+  assert (sig != NULL);
   assert (key != NULL);
 
   /* is this a private key? */
@@ -53,7 +53,7 @@ ecc_sign_hash (const unsigned char *in, unsigned long inlen,
 
   /* get the hash and load it as a bignum into 'e' */
   /* init the bignums */
-  if ((err = mp_init_multi (&r, &s, &e, NULL)) != 0)
+  if ((err = mp_init_multi (&e, NULL)) != 0)
     {
       return err;
     }
@@ -74,9 +74,9 @@ ecc_sign_hash (const unsigned char *in, unsigned long inlen,
         }
 
       /* find r = x1 mod n */
-      mpz_mod (r, pubkey.pubkey.x, pubkey.order);
+      mpz_mod (sig->r, pubkey.pubkey.x, pubkey.order);
 
-      if (mpz_cmp_ui (r, 0) == 0)
+      if (mpz_cmp_ui (sig->r, 0) == 0)
         {
           ecc_free (&pubkey);
         }
@@ -86,23 +86,20 @@ ecc_sign_hash (const unsigned char *in, unsigned long inlen,
           mpz_invert (pubkey.k, pubkey.k, pubkey.order);
 
           /* mulmod */
-          mpz_mul (s, key->k, r);
-          mpz_mod (s, s, pubkey.order);
-          mpz_add (s, e, s);
-          mpz_mod (s, s, pubkey.order);
+          mpz_mul (sig->s, key->k, sig->r);
+          mpz_mod (sig->s, sig->s, pubkey.order);
+          mpz_add (sig->s, e, sig->s);
+          mpz_mod (sig->s, sig->s, pubkey.order);
 
-          mpz_mul (s, s, pubkey.k);
-          mpz_mod (s, s, pubkey.order);
+          mpz_mul (sig->s, sig->s, pubkey.k);
+          mpz_mod (sig->s, sig->s, pubkey.order);
           ecc_free (&pubkey);
-          if (mpz_cmp_ui (s, 0) != 0)
+          if (mpz_cmp_ui (sig->s, 0) != 0)
             {
               break;
             }
         }
     }
-
-  memcpy (&signature->r, &r, sizeof (signature->r));
-  memcpy (&signature->s, &s, sizeof (signature->s));
 
 errnokey:
   mp_clear_multi (&e, NULL);

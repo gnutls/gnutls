@@ -1197,9 +1197,9 @@ gnutls_pubkey_get_verify_algorithm (gnutls_pubkey_t key,
 int _gnutls_pubkey_compatible_with_sig(gnutls_pubkey_t pubkey, gnutls_protocol_t ver, 
   gnutls_sign_algorithm_t sign)
 {
-  if (pubkey->pk_algorithm == GNUTLS_PK_DSA)
+  if (pubkey->pk_algorithm == GNUTLS_PK_DSA || pubkey->pk_algorithm == GNUTLS_PK_ECC)
     { /* override */
-      int hash_algo = _gnutls_dsa_q_to_hash (pubkey->params.params[1]);
+      int hash_algo = _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params);
 
       /* DSA keys over 1024 bits cannot be used with TLS 1.x, x<2 */
       if (!_gnutls_version_has_selectable_sighash (ver))

@@ -32,6 +32,7 @@ extern mod_auth_st rsa_auth_struct;
 extern mod_auth_st rsa_export_auth_struct;
 extern mod_auth_st dhe_rsa_auth_struct;
 extern mod_auth_st ecdhe_rsa_auth_struct;
+extern mod_auth_st ecdhe_ecdsa_auth_struct;
 extern mod_auth_st dhe_dss_auth_struct;
 extern mod_auth_st anon_auth_struct;
 extern mod_auth_st anon_ecdh_auth_struct;
@@ -60,6 +61,7 @@ static const gnutls_cred_map cred_mappings[] = {
   {GNUTLS_KX_RSA, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_RSA_EXPORT, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_ECDHE_RSA, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
+  {GNUTLS_KX_ECDHE_ECDSA, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_DHE_DSS, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_DHE_RSA, GNUTLS_CRD_CERTIFICATE, GNUTLS_CRD_CERTIFICATE},
   {GNUTLS_KX_PSK, GNUTLS_CRD_PSK, GNUTLS_CRD_PSK},
@@ -97,6 +99,7 @@ static const gnutls_kx_algo_entry _gnutls_kx_algorithms[] = {
    1 /* needs RSA params */ },
   {"DHE-RSA", GNUTLS_KX_DHE_RSA, &dhe_rsa_auth_struct, 1, 0},
   {"ECDHE-RSA", GNUTLS_KX_ECDHE_RSA, &ecdhe_rsa_auth_struct, 1, 0},
+  {"ECDHE-ECDSA", GNUTLS_KX_ECDHE_ECDSA, &ecdhe_ecdsa_auth_struct, 1, 0},
   {"DHE-DSS", GNUTLS_KX_DHE_DSS, &dhe_dss_auth_struct, 1, 0},
 
 #ifdef ENABLE_SRP

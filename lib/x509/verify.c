@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free
- * Software Foundation, Inc.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
+ * Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -824,12 +824,13 @@ _pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
   return 0;
 }
 
-/* Hashes input data and verifies a DSA signature.
+/* Hashes input data and verifies a signature.
  */
 static int
-dsa_verify_sig (const gnutls_datum_t * text,
+verify_sig (const gnutls_datum_t * text,
                 const gnutls_datum_t * hash,
                 const gnutls_datum_t * signature,
+                gnutls_pk_algorithm_t pk,
                 gnutls_pk_params_st* params)
 {
   int ret;
@@ -838,21 +839,24 @@ dsa_verify_sig (const gnutls_datum_t * text,
   digest_hd_st hd;
   gnutls_digest_algorithm_t algo;
 
-  algo = _gnutls_dsa_q_to_hash (params->params[1]);
+  algo = _gnutls_dsa_q_to_hash (pk, params);
   if (hash)
     {
       /* SHA1 or better allowed */
       if (!hash->data || hash->size != _gnutls_hash_get_algo_len(algo))
         {
           gnutls_assert();
-          _gnutls_debug_log("Hash size (%d) does not correspond to hash %s", (int)hash->size, gnutls_mac_get_name(algo));
-          return GNUTLS_E_INVALID_REQUEST;
+          _gnutls_debug_log("Hash size (%d) does not correspond to hash %s. Assuming SHA-1.\n", (int)hash->size, gnutls_mac_get_name(algo));
+          algo = GNUTLS_DIG_SHA1;
+          
+          if (hash->size != 20)
+            return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
         }
+
       digest = *hash;
     }
   else
     {
-
       ret = _gnutls_hash_init (&hd, algo);
       if (ret < 0)
         {
@@ -867,7 +871,7 @@ dsa_verify_sig (const gnutls_datum_t * text,
       digest.size = _gnutls_hash_get_algo_len(algo);
     }
 
-  ret = _gnutls_dsa_verify (&digest, signature, params);
+  ret = _gnutls_pk_verify (pk, &digest, signature, params);
 
   return ret;
 }
@@ -897,9 +901,9 @@ pubkey_verify_sig (const gnutls_datum_t * tbs,
       return 1;
       break;
 
+    case GNUTLS_PK_ECC:
     case GNUTLS_PK_DSA:
-      if (dsa_verify_sig
-          (tbs, hash, signature, issuer_params) != 0)
+      if (verify_sig(tbs, hash, signature, pk, issuer_params) != 0)
         {
           gnutls_assert ();
           return GNUTLS_E_PK_SIG_VERIFY_FAILED;
@@ -915,9 +919,14 @@ pubkey_verify_sig (const gnutls_datum_t * tbs,
 }
 
 gnutls_digest_algorithm_t
-_gnutls_dsa_q_to_hash (bigint_t q)
+_gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* params)
 {
-  int bits = _gnutls_mpi_get_nbits (q);
+  int bits = 0;
+  
+  if (algo == GNUTLS_PK_DSA)
+    bits = _gnutls_mpi_get_nbits (params->params[1]);
+  else if (algo == GNUTLS_PK_ECC)
+    bits = gnutls_ecc_curve_get_size(params->flags)*8;
 
   if (bits <= 160)
     {
@@ -953,7 +962,7 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
     case GNUTLS_PK_DSA:
 
       if (hash)
-        *hash = _gnutls_dsa_q_to_hash (issuer_params->params[1]);
+        *hash = _gnutls_dsa_q_to_hash (GNUTLS_PK_DSA, issuer_params);
 
       ret = 0;
       break;

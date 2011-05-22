@@ -41,7 +41,6 @@
 #include <nettle/rsa.h>
 #include <random.h>
 #include <gnutls/crypto.h>
-#include "rnd.h"
 #include "ecc.h"
 
 #define TOMPZ(x) (*((mpz_t*)(x)))
@@ -84,6 +83,37 @@ _rsa_params_to_privkey (const gnutls_pk_params_st * pk_params,
 
 }
 
+static void 
+_ecc_params_to_privkey(const gnutls_pk_params_st * pk_params,
+                       ecc_key * priv)
+{
+        priv->type = PK_PRIVATE;
+        memcpy(&priv->prime, pk_params->params[0], sizeof(mpz_t));
+        memcpy(&priv->order, pk_params->params[1], sizeof(mpz_t));
+        memcpy(&priv->A, pk_params->params[2], sizeof(mpz_t));
+        memcpy(&priv->Gx, pk_params->params[3], sizeof(mpz_t));
+        memcpy(&priv->Gy, pk_params->params[4], sizeof(mpz_t));
+        memcpy(&priv->pubkey.x, pk_params->params[5], sizeof(mpz_t));
+        memcpy(&priv->pubkey.y, pk_params->params[6], sizeof(mpz_t));
+        memcpy(&priv->k, pk_params->params[7], sizeof(mpz_t));
+        mpz_init_set_ui(priv->pubkey.z, 1);
+}
+
+static void 
+_ecc_params_to_pubkey(const gnutls_pk_params_st * pk_params,
+                       ecc_key * pub)
+{
+        pub->type = PK_PUBLIC;
+        memcpy(&pub->prime, pk_params->params[0], sizeof(mpz_t));
+        memcpy(&pub->order, pk_params->params[1], sizeof(mpz_t));
+        memcpy(&pub->A, pk_params->params[2], sizeof(mpz_t));
+        memcpy(&pub->Gx, pk_params->params[3], sizeof(mpz_t));
+        memcpy(&pub->Gy, pk_params->params[4], sizeof(mpz_t));
+        memcpy(&pub->pubkey.x, pk_params->params[5], sizeof(mpz_t));
+        memcpy(&pub->pubkey.y, pk_params->params[6], sizeof(mpz_t));
+        mpz_init_set_ui(pub->pubkey.z, 1);
+}
+
 static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t * out,
                                   const gnutls_pk_params_st * priv,
                                   const gnutls_pk_params_st * pub)
@@ -101,26 +131,8 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t * o
         if (is_supported_curve(curve) == 0)
           return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
 
-        ecc_pub.type = PK_PUBLIC;
-        memcpy(&ecc_pub.prime, pub->params[0], sizeof(mpz_t));
-        memcpy(&ecc_pub.order, pub->params[1], sizeof(mpz_t));
-        memcpy(&ecc_pub.A, pub->params[2], sizeof(mpz_t));
-        memcpy(&ecc_pub.Gx, pub->params[3], sizeof(mpz_t));
-        memcpy(&ecc_pub.Gy, pub->params[4], sizeof(mpz_t));
-        memcpy(&ecc_pub.pubkey.x, pub->params[5], sizeof(mpz_t));
-        memcpy(&ecc_pub.pubkey.y, pub->params[6], sizeof(mpz_t));
-        mpz_init_set_ui(ecc_pub.pubkey.z, 1);
-
-        ecc_priv.type = PK_PRIVATE;
-        memcpy(&ecc_priv.prime, priv->params[0], sizeof(mpz_t));
-        memcpy(&ecc_priv.order, priv->params[1], sizeof(mpz_t));
-        memcpy(&ecc_priv.A, priv->params[2], sizeof(mpz_t));
-        memcpy(&ecc_priv.Gx, priv->params[3], sizeof(mpz_t));
-        memcpy(&ecc_priv.Gy, priv->params[4], sizeof(mpz_t));
-        memcpy(&ecc_priv.pubkey.x, priv->params[5], sizeof(mpz_t));
-        memcpy(&ecc_priv.pubkey.y, priv->params[6], sizeof(mpz_t));
-        memcpy(&ecc_priv.k, priv->params[7], sizeof(mpz_t));
-        mpz_init_set_ui(ecc_pub.pubkey.z, 1);
+        _ecc_params_to_pubkey(pub, &ecc_pub);
+        _ecc_params_to_privkey(priv, &ecc_priv);
 
         sz = ECC_BUF_SIZE;
         out->data = gnutls_malloc(sz);
@@ -337,7 +349,47 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
 
   switch (algo)
     {
+    case GNUTLS_PK_ECC: /* we do ECDSA */
+      {
+        ecc_key priv;
+        struct dsa_signature sig;
+        int hash_len;
 
+        _ecc_params_to_privkey(pk_params, &priv);
+
+        dsa_signature_init (&sig);
+
+        hash = _gnutls_dsa_q_to_hash (algo, pk_params);
+        hash_len = _gnutls_hash_get_algo_len (hash);
+        if (hash_len > vdata->size)
+          {
+            gnutls_assert ();
+            _gnutls_debug_log("Asked to sign %d bytes with hash %s\n", vdata->size, gnutls_mac_get_name(hash));
+            ret = GNUTLS_E_PK_SIGN_FAILED;
+            goto ecdsa_fail;
+          }
+
+        ret = ecc_sign_hash(vdata->data, vdata->size, 
+                            &sig, NULL, rnd_func, &priv);
+        if (ret != 0)
+          {
+            gnutls_assert ();
+            ret = GNUTLS_E_PK_SIGN_FAILED;
+            goto ecdsa_fail;
+          }
+
+        ret = _gnutls_encode_ber_rs (signature, &sig.r, &sig.s);
+
+      ecdsa_fail:
+        dsa_signature_clear (&sig);
+
+        if (ret < 0)
+          {
+            gnutls_assert ();
+            goto cleanup;
+          }
+        break;
+      }
     case GNUTLS_PK_DSA:
       {
         struct dsa_public_key pub;
@@ -352,7 +404,7 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
 
         dsa_signature_init (&sig);
 
-        hash = _gnutls_dsa_q_to_hash (pub.q);
+        hash = _gnutls_dsa_q_to_hash (algo, pk_params);
         hash_len = _gnutls_hash_get_algo_len (hash);
         if (hash_len > vdata->size)
           {
@@ -481,6 +533,50 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
 
   switch (algo)
     {
+    case GNUTLS_PK_ECC: /* ECDSA */
+      {
+        ecc_key pub;
+        struct dsa_signature sig;
+        int stat;
+
+        ret = _gnutls_decode_ber_rs (signature, &tmp[0], &tmp[1]);
+        if (ret < 0)
+          {
+            gnutls_assert ();
+            goto cleanup;
+          }
+
+        _ecc_params_to_pubkey(pk_params, &pub);
+        memcpy (&sig.r, tmp[0], sizeof (sig.r));
+        memcpy (&sig.s, tmp[1], sizeof (sig.s));
+
+        hash = _gnutls_dsa_q_to_hash (algo, pk_params);
+        if (vdata->size != _gnutls_hash_get_algo_len (hash))
+          {
+            gnutls_assert ();
+            
+            if (vdata->size != 20)
+              {
+                ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
+                goto ecdsa_fail;
+              }
+            else hash = GNUTLS_DIG_SHA1;
+          }
+
+        ret = ecc_verify_hash(&sig, vdata->data, vdata->size, &stat, &pub);
+        if (ret != 0 || stat != 1)
+          {
+            gnutls_assert();
+            ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
+          }
+        else
+          ret = 0;
+
+      ecdsa_fail:
+        _gnutls_mpi_release (&tmp[0]);
+        _gnutls_mpi_release (&tmp[1]);
+        break;
+      }
     case GNUTLS_PK_DSA:
       {
         struct dsa_public_key pub;
@@ -497,13 +593,17 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         memcpy (&sig.r, tmp[0], sizeof (sig.r));
         memcpy (&sig.s, tmp[1], sizeof (sig.s));
 
-        hash = _gnutls_dsa_q_to_hash (pub.q);
-
+        hash = _gnutls_dsa_q_to_hash (algo, pk_params);
         if (vdata->size != _gnutls_hash_get_algo_len (hash))
           {
             gnutls_assert ();
-            ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
-            goto dsa_fail;
+            
+            if (vdata->size != 20)
+              {
+                ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
+                goto dsa_fail;
+              }
+            else hash = GNUTLS_DIG_SHA1;
           }
 
         ret = _dsa_verify (&pub, vdata->size, vdata->data, &sig);
@@ -698,7 +798,7 @@ rsa_fail:
         tls_ecc_set.Gy = st->Gy;
         tls_ecc_set.A = st->A;
 
-        ret = ecc_make_key(NULL, _int_random_func, &key, &tls_ecc_set);
+        ret = ecc_make_key(NULL, rnd_func, &key, &tls_ecc_set);
         if (ret != 0)
           return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 

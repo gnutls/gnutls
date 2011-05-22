@@ -202,8 +202,13 @@ typedef struct
 #define GNUTLS_ECDHE_RSA_AES_128_CBC_SHA { 0xC0, 0x13 }
 #define GNUTLS_ECDHE_RSA_AES_256_CBC_SHA { 0xC0, 0x14 }
 
+/* ECC-ECDSA */
+#define GNUTLS_ECDHE_ECDSA_NULL_SHA           { 0xC0, 0x06 }
+#define GNUTLS_ECDHE_ECDSA_3DES_EDE_CBC_SHA   { 0xC0, 0x08 }
+#define GNUTLS_ECDHE_ECDSA_AES_128_CBC_SHA    { 0xC0, 0x09 }
+#define GNUTLS_ECDHE_ECDSA_AES_256_CBC_SHA    { 0xC0, 0x0A }
 
-#define CIPHER_SUITES_COUNT sizeof(cs_algorithms)/sizeof(gnutls_cipher_suite_entry)-1
+#define CIPHER_SUITES_COUNT (sizeof(cs_algorithms)/sizeof(gnutls_cipher_suite_entry)-1)
 
 /* FIXME: what we don't handle here is TLS 1.2 requirement
  * that each ciphersuite has it's own PRF algorithm. Now we
@@ -533,7 +538,23 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_ECDHE_RSA,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
                              GNUTLS_VERSION_MAX, 1),
-  {0, {{0, 0}}, 0, 0, 0, 0, 0, 0}
+  /* ECDHE-ECDSA */
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_ECDSA_NULL_SHA,
+                             GNUTLS_CIPHER_NULL, GNUTLS_KX_ECDHE_ECDSA,
+                             GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_ECDSA_3DES_EDE_CBC_SHA,
+                             GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_ECDHE_ECDSA,
+                             GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_ECDSA_AES_128_CBC_SHA,
+                             GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_ECDHE_ECDSA,
+                             GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_ECDSA_AES_256_CBC_SHA,
+                             GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_ECDHE_ECDSA,
+                             GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
 };
 
 #define GNUTLS_CIPHER_SUITE_LOOP(b) \

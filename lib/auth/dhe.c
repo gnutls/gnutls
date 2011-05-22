@@ -46,6 +46,23 @@ static int gen_dhe_server_kx (gnutls_session_t, gnutls_buffer_st*);
 static int proc_dhe_server_kx (gnutls_session_t, opaque *, size_t);
 static int proc_dhe_client_kx (gnutls_session_t, opaque *, size_t);
 
+const mod_auth_st ecdhe_ecdsa_auth_struct = {
+  "ECDHE_ECDSA",
+  _gnutls_gen_cert_server_certificate,
+  _gnutls_gen_cert_client_certificate,
+  gen_dhe_server_kx,
+  _gnutls_gen_ecdh_common_client_kx,   /* This is the only different */
+  _gnutls_gen_cert_client_cert_vrfy,
+  _gnutls_gen_cert_server_cert_req,
+
+  _gnutls_proc_cert_server_certificate,
+  _gnutls_proc_cert_client_certificate,
+  proc_dhe_server_kx,
+  proc_dhe_client_kx,
+  _gnutls_proc_cert_client_cert_vrfy,
+  _gnutls_proc_cert_cert_req
+};
+
 const mod_auth_st ecdhe_rsa_auth_struct = {
   "ECDHE_RSA",
   _gnutls_gen_cert_server_certificate,

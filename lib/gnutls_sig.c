@@ -289,6 +289,7 @@ verify_tls_hash (gnutls_protocol_t ver, gnutls_pcert_st* cert,
 
       break;
     case GNUTLS_PK_DSA:
+    case GNUTLS_PK_ECC:
 
       vdata.data = &hash_concat->data[sha1pos];
       vdata.size = hash_concat->size - sha1pos;
@@ -756,7 +757,7 @@ pk_hash_data (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash,
     case GNUTLS_PK_RSA:
       break;
     case GNUTLS_PK_DSA:
-      if (params && hash != _gnutls_dsa_q_to_hash (params->params[1]))
+      if (params && hash != _gnutls_dsa_q_to_hash (pk, params))
         {
           gnutls_assert ();
           return GNUTLS_E_INVALID_REQUEST;
