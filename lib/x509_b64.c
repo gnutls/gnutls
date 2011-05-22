@@ -195,7 +195,7 @@ _gnutls_fbase64_encode (const char *msg, const uint8_t * data,
   uint8_t bottom[80];
   int pos, bytes, top_len, bottom_len;
 
-  if (strlen(msg) > 50)
+  if (msg == NULL || strlen(msg) > 50)
     {
       gnutls_assert ();
       return GNUTLS_E_BASE64_ENCODING_ERROR;
