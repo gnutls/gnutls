@@ -971,10 +971,9 @@ _decode_pkcs8_rsa_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
       goto error;
     }
 
-  return 0;
+  ret = 0;
 
 error:
-  gnutls_x509_privkey_deinit (pkey);
   return ret;
 }
 
@@ -1001,10 +1000,9 @@ _decode_pkcs8_ecc_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
       goto error;
     }
 
-  return 0;
+  ret = 0;
 
 error:
-  gnutls_x509_privkey_deinit (pkey);
   return ret;
 }
 
@@ -1072,10 +1070,9 @@ _decode_pkcs8_dsa_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
 
   pkey->params.params_nr = DSA_PRIVATE_PARAMS;
 
-  return 0;
+  ret = 0;
 
 error:
-  gnutls_x509_privkey_deinit (pkey);
   return ret;
 }
 

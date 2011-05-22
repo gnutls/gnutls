@@ -135,7 +135,6 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
 
   gnutls_pk_params_init(&pkey->params);
 
-
   if ((result =
        asn1_create_element (_gnutls_get_gnutls_asn (),
                             "GNUTLS.RSAPrivateKey",
@@ -158,6 +157,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
       gnutls_assert ();
       goto error;
     }
+  pkey->params.params_nr++;
 
   if ((result =
        _gnutls_x509_read_int (pkey_asn, "publicExponent",
@@ -166,6 +166,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
       gnutls_assert ();
       goto error;
     }
+  pkey->params.params_nr++;
 
   if ((result =
        _gnutls_x509_read_int (pkey_asn, "privateExponent",
@@ -174,6 +175,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
       gnutls_assert ();
       goto error;
     }
+  pkey->params.params_nr++;
 
   if ((result = _gnutls_x509_read_int (pkey_asn, "prime1",
                                        &pkey->params.params[3])) < 0)
@@ -181,6 +183,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
       gnutls_assert ();
       goto error;
     }
+  pkey->params.params_nr++;
 
   if ((result = _gnutls_x509_read_int (pkey_asn, "prime2",
                                        &pkey->params.params[4])) < 0)
@@ -188,6 +191,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
       gnutls_assert ();
       goto error;
     }
+  pkey->params.params_nr++;
 
   if ((result = _gnutls_x509_read_int (pkey_asn, "coefficient",
                                        &pkey->params.params[5])) < 0)
@@ -195,6 +199,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
       gnutls_assert ();
       goto error;
     }
+  pkey->params.params_nr++;
 
   if ((result = _gnutls_x509_read_int (pkey_asn, "exponent1",
                                        &pkey->params.params[6])) < 0)
@@ -202,6 +207,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
       gnutls_assert ();
       goto error;
     }
+  pkey->params.params_nr++;
 
   if ((result = _gnutls_x509_read_int (pkey_asn, "exponent2",
                                        &pkey->params.params[7])) < 0)
@@ -209,7 +215,7 @@ _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t * raw_key,
       gnutls_assert ();
       goto error;
     }
-
+  pkey->params.params_nr++;
 
   result = _gnutls_pk_fixup (GNUTLS_PK_RSA, GNUTLS_IMPORT, &pkey->params);
   if (result < 0)
