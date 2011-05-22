@@ -104,41 +104,9 @@ _gnutls_x509_read_rsa_pubkey (opaque * der, int dersize, gnutls_pk_params_st * p
 int
 _gnutls_x509_read_ecc_pubkey (opaque * der, int dersize, gnutls_pk_params_st * params)
 {
-#if 0  
-  int ret;
-  ASN1_TYPE spk = ASN1_TYPE_EMPTY;
-  gnutls_datum_t octet;
-
-  if ((ret = asn1_create_element
-       (_gnutls_get_gnutls_asn (), "GNUTLS.ECPoint", &spk))
-      != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      return _gnutls_asn2err (ret);
-    }
-
-  ret = asn1_der_decoding (&spk, der, dersize, NULL);
-  if (ret != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&spk);
-      return _gnutls_asn2err (ret);
-    }
-
-
-  if ((ret = _gnutls_x509_read_value (spk, "", &octet, 0)) < 0)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&spk);
-      return GNUTLS_E_ASN1_GENERIC_ERROR;
-    }
-
-  ret = _gnutls_ecc_ansi_x963_import (octet.data, octet.size, &params->params[5],
-                                     &params->params[6]);
-  _gnutls_free_datum(&octet);
-  
-  return ret;
-#endif
+/* Eventhough RFC5480 defines the public key to be an ECPoint (i.e. OCTET STRING),
+ * it is actually copied in raw there. Why do they use ASN.1 anyway?
+ */
   return _gnutls_ecc_ansi_x963_import (der, dersize, &params->params[5],
                                      &params->params[6]);
 }

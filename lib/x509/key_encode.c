@@ -120,7 +120,6 @@ _gnutls_x509_write_ecc_pubkey (gnutls_pk_params_st * params,
 {
   int result;
   ASN1_TYPE spk = ASN1_TYPE_EMPTY;
-  gnutls_datum_t out;
 
   der->data = NULL;
   der->size = 0;
@@ -132,38 +131,13 @@ _gnutls_x509_write_ecc_pubkey (gnutls_pk_params_st * params,
       goto cleanup;
     }
 
-  result = _gnutls_ecc_ansi_x963_export(params->flags, params->params[5], params->params[6], &out);
+  result = _gnutls_ecc_ansi_x963_export(params->flags, params->params[5], params->params[6], /*&out*/der);
   if (result < 0)
     return gnutls_assert_val(result);
-
-  if ((result = asn1_create_element
-       (_gnutls_get_gnutls_asn (), "GNUTLS.ECPoint", &spk))
-      != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-
-  result = asn1_write_value (spk, "", out.data, out.size);
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      result = _gnutls_asn2err (result);
-      goto cleanup;
-    }
-  
-  result = _gnutls_x509_der_encode (spk, "", der, 0);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
 
   result = 0;
 
 cleanup:
-  _gnutls_free_datum(&out);
   asn1_delete_structure (&spk);
 
   return result;
@@ -314,14 +288,14 @@ _gnutls_x509_write_ecc_params (gnutls_pk_params_st* params,
       return _gnutls_asn2err (result);
     }
 
-  if ((result = asn1_write_value (spk, "parameters", "namedCurve", 1)) != ASN1_SUCCESS)
+  if ((result = asn1_write_value (spk, "", "namedCurve", 1)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       result = _gnutls_asn2err (result);
       goto cleanup;
     }
   
-  if ((result = asn1_write_value (spk, "parameters.namedCurve", oid, 1)) != ASN1_SUCCESS)
+  if ((result = asn1_write_value (spk, "namedCurve", oid, 1)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       result = _gnutls_asn2err (result);
