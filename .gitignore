@@ -453,3 +453,5 @@ lib/auth/libgnutls_auth.la
 tests/cipher-test
 tests/suite/x509paths/X509tests
 tests/x509cert
+src/benchmark-cipher
+src/benchmark-tls
