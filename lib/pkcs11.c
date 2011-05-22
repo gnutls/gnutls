@@ -427,6 +427,7 @@ gnutls_pkcs11_init (unsigned int flags, const char *configfile)
                 }
             }
         }
+      fclose(fp);
     }
 
   return 0;
