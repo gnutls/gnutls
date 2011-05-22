@@ -621,9 +621,7 @@ _gnutls_asn1_encode_ecc (ASN1_TYPE * c2, gnutls_pk_params_st * params)
       goto cleanup;
     }
 
-  /* Write PRIME 
-   */
-  if ((ret = asn1_write_value (*c2, "version", &one, 1)) != ASN1_SUCCESS)
+  if ((ret = asn1_write_value (*c2, "Version", &one, 1)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       ret = _gnutls_asn2err (ret);
@@ -637,7 +635,7 @@ _gnutls_asn1_encode_ecc (ASN1_TYPE * c2, gnutls_pk_params_st * params)
       goto cleanup;
     }
 
-  if ((ret = asn1_write_value (*c2, "publibKey", pubkey.data, pubkey.size)) != ASN1_SUCCESS)
+  if ((ret = asn1_write_value (*c2, "publicKey", pubkey.data, pubkey.size*8)) != ASN1_SUCCESS)
     {
       gnutls_assert ();
       ret = _gnutls_asn2err (ret);

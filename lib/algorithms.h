@@ -155,7 +155,7 @@ int _gnutls_tls_id_to_ecc_curve (int num);
 int _gnutls_ecc_curve_get_tls_id (gnutls_ecc_curve_t supported_ecc);
 const char * _gnutls_ecc_curve_get_oid (gnutls_ecc_curve_t curve);
 gnutls_ecc_curve_t _gnutls_oid_to_ecc_curve (const char* oid);
-
+gnutls_ecc_curve_t _gnutls_ecc_bits_to_curve (int bits);
 #define MAX_ECC_CURVE_SIZE 66
 
 #endif

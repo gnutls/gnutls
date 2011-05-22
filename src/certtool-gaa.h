@@ -8,30 +8,32 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 142 "certtool.gaa"
+#line 145 "certtool.gaa"
 	int debug;
-#line 139 "certtool.gaa"
+#line 142 "certtool.gaa"
 	char *pkcs_cipher;
-#line 136 "certtool.gaa"
+#line 139 "certtool.gaa"
 	char *template;
-#line 133 "certtool.gaa"
+#line 136 "certtool.gaa"
 	char *infile;
-#line 130 "certtool.gaa"
+#line 133 "certtool.gaa"
 	char *outfile;
-#line 127 "certtool.gaa"
+#line 130 "certtool.gaa"
 	int quick_random;
-#line 124 "certtool.gaa"
+#line 127 "certtool.gaa"
 	char* sec_param;
-#line 121 "certtool.gaa"
+#line 124 "certtool.gaa"
 	int bits;
-#line 117 "certtool.gaa"
+#line 120 "certtool.gaa"
 	int outcert_format;
-#line 113 "certtool.gaa"
+#line 116 "certtool.gaa"
 	int incert_format;
-#line 110 "certtool.gaa"
+#line 113 "certtool.gaa"
 	int export;
-#line 107 "certtool.gaa"
+#line 110 "certtool.gaa"
 	char *hash;
+#line 107 "certtool.gaa"
+	int ecc;
 #line 104 "certtool.gaa"
 	int dsa;
 #line 101 "certtool.gaa"

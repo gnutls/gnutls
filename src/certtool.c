@@ -255,9 +255,9 @@ generate_private_key_int (void)
   int ret, key_type, bits;
 
   if (info.dsa)
-    {
-      key_type = GNUTLS_PK_DSA;
-    }
+    key_type = GNUTLS_PK_DSA;
+  else if (info.ecc)
+    key_type = GNUTLS_PK_ECC;
   else
     key_type = GNUTLS_PK_RSA;
 
@@ -279,7 +279,7 @@ generate_private_key_int (void)
     fprintf (stderr,
              "Note that DSA keys with size over 1024 can only be used with TLS 1.2 or later.\n\n");
 
-  ret = gnutls_x509_privkey_generate (key, key_type,bits, 0);
+  ret = gnutls_x509_privkey_generate (key, key_type, bits, 0);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "privkey_generate: %s", gnutls_strerror (ret));
 

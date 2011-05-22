@@ -153,7 +153,7 @@ gnutls_ecc_curve_t _gnutls_oid_to_ecc_curve (const char* oid)
 
 /*-
  * _gnutls_ecc_curve_get_id:
- * @name: is a MAC algorithm name
+ * @name: is a curve name
  *
  * The names are compared in a case insensitive way.
  *
@@ -171,6 +171,27 @@ _gnutls_ecc_curve_get_id (const char *name)
       ret = p->id;
       break;
     }
+  );
+
+  return ret;
+}
+
+/*-
+ * _gnutls_ecc_bits_to_curve:
+ * @bits: is a security parameter in bits
+ *
+ * Returns: return a #gnutls_ecc_curve_t value corresponding to
+ *   the specified bit length, or %GNUTLS_ECC_CURVE_INVALID on error.
+ -*/
+gnutls_ecc_curve_t
+_gnutls_ecc_bits_to_curve (int bits)
+{
+  gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_SECP224R1;
+
+  GNUTLS_ECC_CURVE_LOOP (
+    if (8*p->size > bits)
+      break;
+    ret = p->id;
   );
 
   return ret;

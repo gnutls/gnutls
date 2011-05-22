@@ -104,6 +104,9 @@ option (8, pkcs8) { $pkcs8=1 } "Use PKCS #8 format for private keys."
 #int dsa;
 option (dsa) { $dsa=1 } "Use DSA keys."
 
+#int ecc;
+option (ecc) { $ecc=1 } "Use ECC (ECDSA) keys."
+
 #char *hash;
 option (hash) STR "STR" { $hash = $1 } "Hash algorithm to use for signing (MD5,SHA1,RMD160,SHA256,SHA384,SHA512)."
 
@@ -150,4 +153,4 @@ init { $bits = 0; $pkcs8 = 0; $privkey = NULL; $ca=NULL; $ca_privkey = NULL;
 	$debug=1; $request = NULL; $infile = NULL; $outfile = NULL; $cert = NULL; 
 	$incert_format = 0; $outcert_format = 0; $action=-1; $pass = NULL; $v1_cert = 0;
 	$export = 0; $template = NULL; $hash=NULL; $fix_key = 0; $quick_random=1; 
-	$privkey_op = 0; $pkcs_cipher = "aes-128"; $crq_extensions=1; }
+	$privkey_op = 0; $pkcs_cipher = "aes-128"; $crq_extensions=1; $ecc=0; }

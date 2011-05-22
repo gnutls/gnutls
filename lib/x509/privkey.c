@@ -416,6 +416,7 @@ error:
 
 #define PEM_KEY_DSA "DSA PRIVATE KEY"
 #define PEM_KEY_RSA "RSA PRIVATE KEY"
+#define PEM_KEY_ECC "EC PRIVATE KEY"
 
 /**
  * gnutls_x509_privkey_import:
@@ -889,8 +890,10 @@ gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
     msg = PEM_KEY_RSA;
   else if (key->pk_algorithm == GNUTLS_PK_DSA)
     msg = PEM_KEY_DSA;
+  else if (key->pk_algorithm == GNUTLS_PK_ECC)
+    msg = PEM_KEY_ECC;
   else
-    msg = NULL;
+    msg = "UNKNOWN";
 
   if (key->crippled)
     {                           /* encode the parameters on the fly. */
@@ -1210,6 +1213,9 @@ gnutls_x509_privkey_generate (gnutls_x509_privkey_t key,
     }
 
   gnutls_pk_params_init(&key->params);
+  
+  if (algo == GNUTLS_PK_ECC)
+    bits = _gnutls_ecc_bits_to_curve(bits);
 
   ret = _gnutls_pk_generate (algo, bits, &key->params);
   if (ret < 0)
