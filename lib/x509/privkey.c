@@ -472,16 +472,25 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
           result =
             _gnutls_fbase64_decode (PEM_KEY_DSA, data->data, data->size,
                                     &out);
-          if (result <= 0)
+
+          if (result >= 0)
+            key->pk_algorithm = GNUTLS_PK_DSA;
+
+          if (result == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
             {
-              if (result == 0)
-                result = GNUTLS_E_INTERNAL_ERROR;
-              gnutls_assert ();
+              /* try for the second header */
+              result =
+                _gnutls_fbase64_decode (PEM_KEY_ECC, data->data, data->size,
+                                    &out);
+              if (result >= 0)
+                key->pk_algorithm = GNUTLS_PK_ECC;
+             }
+        }
 
-              goto failover;
-            }
-
-          key->pk_algorithm = GNUTLS_PK_DSA;
+      if (result < 0)
+        {
+          gnutls_assert ();
+          goto failover;
         }
 
       _data.data = out;
