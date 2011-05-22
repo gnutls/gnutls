@@ -32,6 +32,11 @@ fi
 . ../scripts/common.sh
 
 echo "Compatibility checks using "`openssl version`
+openssl version|grep -e 1\.0 >/dev/null 2>&1
+SV=$?
+if test $SV != 0;then
+  echo "OpenSSL 1.0.0 is required for ECDH and DTLS tests"
+fi
 
 DSA_CERT=$srcdir/../dsa/cert.dsa.1024.pem
 DSA_KEY=$srcdir/../dsa/dsa.1024.pem
@@ -76,6 +81,7 @@ $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL
 kill $PID
 wait
 
+#-cipher RSA-AES128-SHA:DHE-DSS-AES128-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-AES128-SHA 
 launch_bare_server $$ s_server -quiet -www -accept $PORT -keyform pem -certform pem -tls1 -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -dkey $DSA_KEY -dcert $DSA_CERT -Verify 1 -CAfile $CA_CERT &
 PID=$!
 wait_server $PID
@@ -90,6 +96,15 @@ echo "Checking TLS 1.0 with DHE-RSA..."
 $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
   fail "Failed"
 
+if test $SV = 0;then
+
+# Test TLS 1.0 with DHE-RSA ciphersuite
+echo "Checking TLS 1.0 with ECDHE-RSA..." 
+$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-RSA:+CURVE-ALL" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+  fail "Failed"
+
+fi
+
 # Test TLS 1.0 with DHE-DSS ciphersuite
 echo "Checking TLS 1.0 with DHE-DSS..." 
 $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-DSS" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
@@ -102,11 +117,7 @@ launch_bare_server $$ s_server -quiet -accept $PORT -keyform pem -certform pem -
 PID=$!
 wait_server $PID
 
-openssl version|grep -e 1\.0 >/dev/null 2>&1
-if test $? != 0;then
-  echo "OpenSSL 1.0.0 is required for DTLS tests"
-  exit 77
-fi
+if test $SV = 0;then
 
 # Test DTLS 1.0 with RSA ciphersuite
 echo "Checking DTLS 1.0 with RSA..." 
@@ -137,8 +148,12 @@ echo "Checking DTLS 1.0 with DHE-DSS..."
 $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-DTLS1.0:+DHE-DSS" --udp --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
   fail "Failed"
 
+fi
+
 kill $PID
 wait
+
+
 
 echo "Client mode tests were successfully completed"
 echo ""
@@ -213,6 +228,18 @@ $CLI s_client  -host localhost -tls1 -port $PORT -cert $CLI_CERT -key $CLI_KEY -
 kill $PID
 wait
 
+if test $SV = 0;then
+
+echo "Check TLS 1.0 with ECDHE-RSA ciphersuite"
+launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+ECDHE-RSA:+CURVE-ALL" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
+wait_server $PID
+
+#-cipher ECDHE-RSA-AES128-SHA 
+$CLI s_client  -host localhost -tls1 -port $PORT -cert $CLI_CERT -key $CLI_KEY -CAfile $CA_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail "Failed"
+
+kill $PID
+wait
 
 # DTLS
 echo "Check DTLS 1.0 with RSA ciphersuite"
@@ -245,6 +272,7 @@ $CLI s_client  -host localhost -port $PORT -dtls1 -cert $CLI_CERT -key $CLI_KEY 
 kill $PID
 wait
 
+fi
 
 
 exit 0
