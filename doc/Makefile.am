@@ -106,7 +106,7 @@ gnutls_TEXINFOS += gnutls-api.texi extra-api.texi \
 MAINTAINERCLEANFILES += gnutls-api.texi extra-api.texi \
 	x509-api.texi pgp-api.texi
 
-gnutls-api.texi: $(srcdir)/../lib/*.c $(srcdir)/../lib/ext/*.c $(srcdir)/../lib/auth/*.c
+gnutls-api.texi: $(srcdir)/../lib/*.c $(srcdir)/../lib/ext/*.c $(srcdir)/../lib/auth/*.c $(srcdir)/../lib/algorithms/*.c
 	echo "" > $@-tmp
 	for i in $^; do \
 		echo -n "Creating documentation for file $$i... " && \
