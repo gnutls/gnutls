@@ -281,13 +281,14 @@ main (void)
       ret = gnutls_x509_privkey_import_pkcs8 (key, &tmp,
                                               GNUTLS_X509_FMT_PEM,
                                               keys[i].password, 0);
+      gnutls_x509_privkey_deinit (key);
+
       if (ret != keys[i].expected_result)
         {
           printf ("fail[%d]: %d: %s\n", (int) i, ret, gnutls_strerror (ret));
           return 1;
         }
 
-      gnutls_x509_privkey_deinit (key);
     }
 
   gnutls_global_deinit ();
