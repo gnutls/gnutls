@@ -3,6 +3,15 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010, 2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 2.12.5 (unreleased)
+
+** libgnutls: gnutls_pubkey_get_pk_dsa_raw() and gnutls_pubkey_get_pk_rsa_raw
+add leading zeros to the exported values.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 2.12.5 (released 2011-05-14)
 
 ** certtool: Can now load private keys and public keys from PKCS #11 tokens

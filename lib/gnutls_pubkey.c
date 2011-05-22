@@ -558,14 +558,14 @@ gnutls_pubkey_get_pk_rsa_raw (gnutls_pubkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = _gnutls_mpi_dprint (key->params[0], m);
+  ret = _gnutls_mpi_dprint_lz (key->params[0], m);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = _gnutls_mpi_dprint (key->params[1], e);
+  ret = _gnutls_mpi_dprint_lz (key->params[1], e);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -610,7 +610,7 @@ gnutls_pubkey_get_pk_dsa_raw (gnutls_pubkey_t key,
     }
 
   /* P */
-  ret = _gnutls_mpi_dprint (key->params[0], p);
+  ret = _gnutls_mpi_dprint_lz (key->params[0], p);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -618,7 +618,7 @@ gnutls_pubkey_get_pk_dsa_raw (gnutls_pubkey_t key,
     }
 
   /* Q */
-  ret = _gnutls_mpi_dprint (key->params[1], q);
+  ret = _gnutls_mpi_dprint_lz (key->params[1], q);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -628,7 +628,7 @@ gnutls_pubkey_get_pk_dsa_raw (gnutls_pubkey_t key,
 
 
   /* G */
-  ret = _gnutls_mpi_dprint (key->params[2], g);
+  ret = _gnutls_mpi_dprint_lz (key->params[2], g);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -639,7 +639,7 @@ gnutls_pubkey_get_pk_dsa_raw (gnutls_pubkey_t key,
 
 
   /* Y */
-  ret = _gnutls_mpi_dprint (key->params[3], y);
+  ret = _gnutls_mpi_dprint_lz (key->params[3], y);
   if (ret < 0)
     {
       gnutls_assert ();
