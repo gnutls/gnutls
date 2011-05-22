@@ -189,9 +189,11 @@ _gnutls_ecc_bits_to_curve (int bits)
   gnutls_ecc_curve_t ret = GNUTLS_ECC_CURVE_SECP224R1;
 
   GNUTLS_ECC_CURVE_LOOP (
-    if (8*p->size > bits)
-      break;
-    ret = p->id;
+    if (8*p->size >= bits)
+      {
+        ret = p->id;
+        break;
+      }
   );
 
   return ret;

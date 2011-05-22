@@ -102,6 +102,13 @@ int gnutls_privkey_init (gnutls_privkey_t * key);
 void gnutls_privkey_deinit (gnutls_privkey_t key);
 int gnutls_privkey_get_pk_algorithm (gnutls_privkey_t key,
                                      unsigned int *bits);
+int gnutls_privkey_get_dsa_raw (gnutls_x509_privkey_t key,
+                                          gnutls_datum_t * p,
+                                          gnutls_datum_t * q,
+                                          gnutls_datum_t * g,
+                                          gnutls_datum_t * y,
+                                          gnutls_datum_t * x);
+
 
 int
 gnutls_privkey_get_preferred_hash_algorithm (gnutls_privkey_t key,

@@ -836,6 +836,76 @@ cleanup:
 
 }
 
+/**
+ * gnutls_x509_privkey_import_ecc_raw:
+ * @key: The structure to store the parsed key
+ * @curve: holds the curve
+ * @x: holds the x
+ * @y: holds the y
+ * @k: holds the k
+ *
+ * This function will convert the given DSA raw parameters to the
+ * native #gnutls_x509_privkey_t format.  The output will be stored
+ * in @key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_privkey_import_ecc_raw (gnutls_x509_privkey_t key,
+                                    gnutls_ecc_curve_t curve,
+                                    const gnutls_datum_t * x,
+                                    const gnutls_datum_t * y,
+                                    const gnutls_datum_t * k)
+{
+  int ret;
+
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  key->params.flags = curve;
+
+  ret = _gnutls_ecc_curve_fill_params(curve, &key->params);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  if (_gnutls_mpi_scan_nz (&key->params.params[5], x->data, x->size))
+    {
+      gnutls_assert ();
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
+    }
+  key->params.params_nr++;
+
+  if (_gnutls_mpi_scan_nz (&key->params.params[6], y->data, y->size))
+    {
+      gnutls_assert ();
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
+    }
+  key->params.params_nr++;
+
+  if (_gnutls_mpi_scan_nz (&key->params.params[7], k->data, k->size))
+    {
+      gnutls_assert ();
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
+    }
+  key->params.params_nr++;
+
+  key->pk_algorithm = GNUTLS_PK_ECC;
+
+  return 0;
+
+cleanup:
+  gnutls_pk_params_release(&key->params);
+  return ret;
+
+}
+
 
 /**
  * gnutls_x509_privkey_get_pk_algorithm:
@@ -938,6 +1008,68 @@ gnutls_x509_privkey_sec_param (gnutls_x509_privkey_t key)
     return GNUTLS_SEC_PARAM_UNKNOWN;
   
   return gnutls_pk_bits_to_sec_param(key->pk_algorithm, bits);
+}
+
+/**
+ * gnutls_x509_privkey_export_ecc_raw:
+ * @key: a structure that holds the rsa parameters
+ * @curve: will hold the curve
+ * @x: will hold the x coordinate
+ * @y: will hold the y coordinate
+ * @k: will hold the private key
+ *
+ * This function will export the ECC private key's parameters found
+ * in the given structure. The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ *   negative error value.
+ **/
+int gnutls_x509_privkey_export_ecc_raw (gnutls_x509_privkey_t key, 
+                                        gnutls_ecc_curve_t *curve,  
+                                        gnutls_datum_t * x, gnutls_datum_t * y,
+                                        gnutls_datum_t* k)
+{
+  int ret;
+
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  *curve = key->params.flags;
+
+  /* X */
+  ret = _gnutls_mpi_dprint_lz (key->params.params[5], x);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  /* Y */
+  ret = _gnutls_mpi_dprint_lz (key->params.params[6], y);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      _gnutls_free_datum (x);
+      return ret;
+    }
+
+
+  /* K */
+  ret = _gnutls_mpi_dprint_lz (key->params.params[7], k);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      _gnutls_free_datum (x);
+      _gnutls_free_datum (y);
+      return ret;
+    }
+
+  return 0;
+
 }
 
 /**

@@ -716,6 +716,8 @@ GNUTLS_3_0_0 {
 	gnutls_ecc_curve_get_name;
 	gnutls_ecc_curve_get_size;
 	gnutls_pubkey_get_pk_ecc_raw;
+	gnutls_x509_privkey_export_ecc_raw;
+	gnutls_x509_privkey_import_ecc_raw;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

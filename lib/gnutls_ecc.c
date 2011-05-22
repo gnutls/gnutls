@@ -196,7 +196,6 @@ int ret;
     }
   params->params_nr++;
   
-
   return 0;
 
 cleanup:
