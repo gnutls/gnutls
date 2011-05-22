@@ -160,7 +160,10 @@ gnutls_sec_param_get_name (gnutls_sec_param_t param)
 gnutls_sec_param_t
 gnutls_pk_bits_to_sec_param (gnutls_pk_algorithm_t algo, unsigned int bits)
 {
-  gnutls_sec_param_t ret = GNUTLS_SEC_PARAM_UNKNOWN;
+  gnutls_sec_param_t ret = GNUTLS_SEC_PARAM_WEAK;
+
+  if (bits == 0)
+    return GNUTLS_SEC_PARAM_UNKNOWN;
 
   if (algo == GNUTLS_PK_ECC)
     {
