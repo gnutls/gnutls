@@ -242,6 +242,9 @@ _gnutls_supported_ecc_pf_send_params (gnutls_session_t session, gnutls_buffer_st
 {
   const opaque p[2] = {0x01, 0x00}; /* only support uncompressed point format */
   
+  if (session->security_parameters.entity == GNUTLS_SERVER && !_gnutls_session_is_ecc(session))
+    return 0;
+  
   /* this extension is only being sent on client and server side */
   _gnutls_buffer_append_data(extdata, p, 2);
   return 2;
