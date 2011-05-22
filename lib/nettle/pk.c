@@ -109,7 +109,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t * o
         memcpy(&ecc_pub.Gy, pub->params[4], sizeof(mpz_t));
         memcpy(&ecc_pub.pubkey.x, pub->params[5], sizeof(mpz_t));
         memcpy(&ecc_pub.pubkey.y, pub->params[6], sizeof(mpz_t));
-        memcpy(&ecc_pub.pubkey.z, pub->params[7], sizeof(mpz_t));
+        mpz_init_set_ui(ecc_pub.pubkey.z, 1);
 
         ecc_priv.type = PK_PRIVATE;
         memcpy(&ecc_priv.prime, priv->params[0], sizeof(mpz_t));
@@ -119,8 +119,8 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t * o
         memcpy(&ecc_priv.Gy, priv->params[4], sizeof(mpz_t));
         memcpy(&ecc_priv.pubkey.x, priv->params[5], sizeof(mpz_t));
         memcpy(&ecc_priv.pubkey.y, priv->params[6], sizeof(mpz_t));
-        memcpy(&ecc_priv.pubkey.z, priv->params[7], sizeof(mpz_t));
-        memcpy(&ecc_priv.k, priv->params[8], sizeof(mpz_t));
+        memcpy(&ecc_priv.k, priv->params[7], sizeof(mpz_t));
+        mpz_init_set_ui(ecc_pub.pubkey.z, 1);
 
         sz = ECC_BUF_SIZE;
         out->data = gnutls_malloc(sz);
@@ -722,8 +722,7 @@ rsa_fail:
         mpz_set(TOMPZ(params->params[4]), key.Gy);
         mpz_set(TOMPZ(params->params[5]), key.pubkey.x);
         mpz_set(TOMPZ(params->params[6]), key.pubkey.y);
-        mpz_set(TOMPZ(params->params[7]), key.pubkey.z);
-        mpz_set(TOMPZ(params->params[8]), key.k);
+        mpz_set(TOMPZ(params->params[7]), key.k);
         
 ecc_fail:
         ecc_free(&key);

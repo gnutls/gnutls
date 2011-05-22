@@ -656,7 +656,7 @@ _gnutls_asn1_encode_ecc (ASN1_TYPE * c2, gnutls_pk_params_st * params)
       goto cleanup;
     }
 
-  ret = _gnutls_x509_write_int (*c2, "privateKey", params->params[8], 1);
+  ret = _gnutls_x509_write_int (*c2, "privateKey", params->params[7], 1);
   if (ret < 0)
     {
       gnutls_assert ();

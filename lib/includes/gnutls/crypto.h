@@ -287,8 +287,7 @@ extern "C"
  *  [4] is Gy
  *  [5] is x
  *  [6] is y
- *  [7] is z
- *  [8] is k (private key)
+ *  [7] is k (private key)
  */
 
 /**
