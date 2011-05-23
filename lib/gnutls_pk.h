@@ -52,8 +52,6 @@ int _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
                                const gnutls_datum_t * plaintext,
                                gnutls_pk_params_st * params,
                                unsigned btype);
-int _gnutls_dsa_sign (gnutls_datum_t * signature,
-                      const gnutls_datum_t * plaintext, gnutls_pk_params_st*);
 int _gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
                                const gnutls_datum_t * ciphertext,
                                gnutls_pk_params_st* params,

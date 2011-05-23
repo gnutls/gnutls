@@ -183,17 +183,13 @@ _gnutls_soft_sign (gnutls_pk_algorithm_t algo, gnutls_pk_params_st * params,
         }
 
       break;
-    case GNUTLS_PK_DSA:
-      /* sign */
-      if ((ret = _gnutls_dsa_sign (signature, data, params)) < 0)
+    default:
+      ret = _gnutls_pk_sign( algo, signature, data, params);
+      if (ret < 0)
         {
           gnutls_assert ();
           return ret;
         }
-      break;
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
       break;
     }
 
@@ -752,22 +748,6 @@ pk_hash_data (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash,
 {
   int ret;
 
-  switch (pk)
-    {
-    case GNUTLS_PK_RSA:
-      break;
-    case GNUTLS_PK_DSA:
-      if (params && hash != _gnutls_dsa_q_to_hash (pk, params))
-        {
-          gnutls_assert ();
-          return GNUTLS_E_INVALID_REQUEST;
-        }
-      break;
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
   digest->size = _gnutls_hash_get_algo_len (hash);
   digest->data = gnutls_malloc (digest->size);
   if (digest->data == NULL)
@@ -903,6 +883,7 @@ pk_prepare_hash (gnutls_pk_algorithm_t pk,
       _gnutls_free_datum (&old_digest);
       break;
     case GNUTLS_PK_DSA:
+    case GNUTLS_PK_ECC:
       break;
     default:
       gnutls_assert ();

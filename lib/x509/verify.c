@@ -960,9 +960,10 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
   switch (pk)
     {
     case GNUTLS_PK_DSA:
+    case GNUTLS_PK_ECC:
 
       if (hash)
-        *hash = _gnutls_dsa_q_to_hash (GNUTLS_PK_DSA, issuer_params);
+        *hash = _gnutls_dsa_q_to_hash (pk, issuer_params);
 
       ret = 0;
       break;

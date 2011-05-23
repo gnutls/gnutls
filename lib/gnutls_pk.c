@@ -397,35 +397,6 @@ _gnutls_encode_ber_rs (gnutls_datum_t * sig_value, bigint_t r, bigint_t s)
 }
 
 
-/* Do DSA signature calculation. params is p, q, g, y, x in that order.
- */
-int
-_gnutls_dsa_sign (gnutls_datum_t * signature,
-                  const gnutls_datum_t * hash, 
-                  gnutls_pk_params_st * params)
-{
-  int ret;
-  size_t k;
-
-  k = hash->size;
-  if (k < 20)
-    { /* SHA1 or better only */
-      gnutls_assert ();
-      return GNUTLS_E_PK_SIGN_FAILED;
-    }
-
-  ret = _gnutls_pk_sign (GNUTLS_PK_DSA, signature, hash, params);
-  /* rs[0], rs[1] now hold r,s */
-
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  return 0;
-}
-
 /* decodes the Dss-Sig-Value structure
  */
 int
