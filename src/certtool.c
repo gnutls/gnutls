@@ -50,7 +50,7 @@
 #include "certtool-gaa.h"
 #include "certtool-common.h"
 
-#define SIGN_HASH GNUTLS_DIG_SHA1
+#define SIGN_HASH GNUTLS_DIG_SHA256
 
 static void privkey_info_int (gnutls_x509_privkey_t key);
 static void print_crl_info (gnutls_x509_crl_t crl, FILE * out);
