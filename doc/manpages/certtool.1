@@ -1,4 +1,4 @@
-.TH certtool 1 "May 23rd 2005"
+.TH certtool 1 "May 23rd 2011"
 .SH NAME
 certtool \- Manipulate certificates and keys.
 .SH SYNOPSIS
@@ -68,6 +68,11 @@ The cipher to use when doing pkcs encryption. Valid options are
 3des,aes-128,aes-192,aes-256,rc2-40
 .IP "\-\-dsa"
 Generate a DSA key.
+.IP "\-\-ecc"
+Generate an ECC (ECDSA) key.
+.IP "\-\-sec\-param [low|normal|high|ultra]"
+Specify a security parameter for the generate key. It is recommended
+to use this option instead of \-\-bits.
 .IP "\-\-bits BITS"
 Specify the number of bits for key generation.
 .IP "\-\-export\-ciphers"
