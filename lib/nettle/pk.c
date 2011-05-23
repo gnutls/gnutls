@@ -364,9 +364,7 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
         if (hash_len > vdata->size)
           {
             gnutls_assert ();
-            _gnutls_debug_log("Asked to sign %d bytes with hash %s\n", vdata->size, gnutls_mac_get_name(hash));
-            ret = GNUTLS_E_PK_SIGN_FAILED;
-            goto ecdsa_fail;
+            _gnutls_debug_log("Security level of algorithm requires hash %s or better\n", gnutls_mac_get_name(hash));
           }
 
         ret = ecc_sign_hash(vdata->data, vdata->size, 
@@ -409,9 +407,7 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
         if (hash_len > vdata->size)
           {
             gnutls_assert ();
-            _gnutls_debug_log("Asked to sign %d bytes with hash %s\n", vdata->size, gnutls_mac_get_name(hash));
-            ret = GNUTLS_E_PK_SIGN_FAILED;
-            goto dsa_fail;
+            _gnutls_debug_log("Security level of algorithm requires hash %s or better\n", gnutls_mac_get_name(hash));
           }
 
         ret =
