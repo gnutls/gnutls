@@ -144,7 +144,7 @@ client (void)
 
   gnutls_global_set_log_function (tls_log_func);
   if (debug)
-    gnutls_global_set_log_level (5);
+    gnutls_global_set_log_level (9);
 
   gnutls_certificate_allocate_credentials (&xcred);
 
