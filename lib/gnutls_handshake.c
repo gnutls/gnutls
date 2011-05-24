@@ -104,7 +104,7 @@ _gnutls_handshake_hash_buffers_clear (gnutls_session_t session)
   session->security_parameters.handshake_mac_handle_type = 0;
   session->internals.handshake_mac_handle_init = 0;
 
-  _gnutls_handshake_hash_buffer_clear (session);
+  _gnutls_buffer_clear(&session->internals.handshake_hash_buffer);
 }
 
 /* this will copy the required values for resuming to

@@ -52,9 +52,6 @@ int _gnutls_handshake_hash_buffer_put (gnutls_session_t session, opaque * data,
 int _gnutls_handshake_hash_buffer_get_ptr (gnutls_session_t session,
                                       opaque ** data_ptr, size_t * length);
 
-#define _gnutls_handshake_hash_buffer_clear(session) _gnutls_buffer_clear(&session->internals.handshake_hash_buffer)
-
-
 /* Does not free the buffer
  */
 static inline void
