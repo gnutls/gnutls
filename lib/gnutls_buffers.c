@@ -719,6 +719,12 @@ _gnutls_io_write_flush (gnutls_session_t session)
         }
     }
 
+  if (tosend == 0)
+    {
+      gnutls_assert();
+      return 0;
+    }
+
   ret = _gnutls_writev (session, iovec, i);
   if (ret >= 0)
     {
