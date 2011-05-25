@@ -404,7 +404,7 @@ To connect to a server using PSK authentication, you may use something
 like:
 
 @smallexample
-$ gnutls-cli -p 5556 test.gnutls.org --pskusername jas --pskkey 9e32cf7786321a828ef7668f09fb35db --priority NORMAL:+PSK:-RSA:-DHE-RSA -d 4711
+$ gnutls-cli -p 5556 test.gnutls.org --pskusername jas --pskkey 9e32cf7786321a828ef7668f09fb35db --priority NORMAL:+DHE-PSK:+PSK:-RSA:-DHE-RSA -d 4711
 @end smallexample
 
 @menu
@@ -422,10 +422,10 @@ should be as simple as connecting to the server:
 $ ./gnutls-cli -p 5556 localhost
 Resolving 'localhost'...
 Connecting to '127.0.0.1:5556'...
-- PSK client callback. PSK hint 'psk_identity_hint'
+- PSK client callback.
 Enter PSK identity: psk_identity
 Enter password: 
-- PSK authentication. PSK hint 'psk_identity_hint'
+- PSK authentication.
 - Version: TLS1.1
 - Key Exchange: PSK
 - Cipher: AES-128-CBC
@@ -446,10 +446,10 @@ password, you can also give the PSK username and key directly on the
 command line:
 
 @smallexample
-$ ./gnutls-cli -p 5556 localhost --pskusername psk_identity --pskkey 88f3824b3e5659f52d00e959bacab954b6540344 
+$ ./gnutls-cli -p 5556 localhost --pskusername psk_identity --pskkey 88f3824b3e5659f52d00e959bacab954b6540344  --priority NORMAL:+DHE-PSK:+PSK
 Resolving 'localhost'...
 Connecting to '127.0.0.1:5556'...
-- PSK authentication. PSK hint 'psk_identity_hint'
+- PSK authentication.
 - Version: TLS1.1
 - Key Exchange: PSK
 - Cipher: AES-128-CBC
