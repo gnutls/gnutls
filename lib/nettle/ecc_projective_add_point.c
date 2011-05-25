@@ -26,13 +26,13 @@
    @param P        The point to add
    @param Q        The point to add
    @param R        [out] The destination of the double
+   @param a        Curve's a value
    @param modulus  The modulus of the field the ECC curve is in
-   @param mp       The "b" value from montgomery_setup()
    @return 0 on success
 */
 int
 ecc_projective_add_point (ecc_point * P, ecc_point * Q, ecc_point * R,
-                              mpz_t A, mpz_t modulus)
+                              mpz_t a, mpz_t modulus)
 {
   mpz_t t1, t2, x, y, z;
   int err;
@@ -47,16 +47,31 @@ ecc_projective_add_point (ecc_point * P, ecc_point * Q, ecc_point * R,
       return err;
     }
 
-  /* should we dbl instead? */
-  mpz_sub (t1, modulus, Q->y);
-
+  /* Check if P == Q and do doubling in that case 
+   * If Q == -P then P+Q=point at infinity
+   */
   if ((mpz_cmp (P->x, Q->x) == 0) &&
-      (Q->z != NULL && mpz_cmp (P->z, Q->z) == 0) &&
-      (mpz_cmp (P->y, Q->y) == 0 || mpz_cmp (P->y, t1) == 0))
+      (mpz_cmp (P->z, Q->z) == 0))
     {
-      mp_clear_multi (&t1, &t2, &x, &y, &z, NULL);
-      return ecc_projective_dbl_point (P, R, A, modulus);
+      /* x and z coordinates match. Check if P->y = Q->y, or P->y = -Q->y
+       */
+      if (mpz_cmp (P->y, Q->y) == 0)
+        {
+          mp_clear_multi (&t1, &t2, &x, &y, &z, NULL);
+          return ecc_projective_dbl_point (P, R, a, modulus);
+        }
+      
+      mpz_sub (t1, modulus, Q->y);
+      if (mpz_cmp (P->y, t1) == 0)
+        {
+          mp_clear_multi (&t1, &t2, &x, &y, &z, NULL);
+          mpz_set_ui(R->x, 1);
+          mpz_set_ui(R->y, 1);
+          mpz_set_ui(R->z, 0);
+          return 0;
+        }
     }
+
 
   mpz_set (x, P->x);
   mpz_set (y, P->y);
