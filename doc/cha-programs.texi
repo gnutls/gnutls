@@ -760,7 +760,7 @@ password file (@pxref{Invoking psktool}).  In the example below, I
 type @code{password} at the prompt.
 
 @smallexample
-$ ./psktool -u psk_identity -p psks.txt -n psk_identity_hint
+$ ./psktool -u psk_identity -p psks.txt
 Enter password:
 Key stored to psks.txt
 $ cat psks.txt
