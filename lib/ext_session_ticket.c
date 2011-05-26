@@ -35,6 +35,7 @@
 #include <gnutls_mbuffers.h>
 #include <gnutls_extensions.h>
 #include <gnutls_constate.h>
+#include <system.h>
 
 #ifdef ENABLE_SESSION_TICKET
 
@@ -128,7 +129,7 @@ decrypt_ticket (gnutls_session_t session, session_ticket_ext_st * priv,
   cipher_hd_st cipher_hd;
   gnutls_datum_t key, IV, mac_secret, state;
   opaque final[MAC_SECRET_SIZE];
-  time_t timestamp = time (0);
+  time_t timestamp = gnutls_time (0);
   int ret;
 
   /* Check the integrity of ticket using HMAC-SHA-256. */

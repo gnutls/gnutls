@@ -34,7 +34,6 @@
 #include <x509_b64.h>
 #include "x509_int.h"
 #include <common.h>
-#include <time.h>
 
 struct oid2string
 {

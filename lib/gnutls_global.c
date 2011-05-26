@@ -33,6 +33,7 @@
 #include <gnutls_extensions.h>  /* for _gnutls_ext_init */
 #include <gnutls_cryptodev.h>
 #include <locks.h>
+#include <system.h>
 
 #include "sockets.h"
 #include "gettext.h"
@@ -66,6 +67,22 @@ void
 gnutls_global_set_log_function (gnutls_log_func log_func)
 {
   _gnutls_log_func = log_func;
+}
+
+/**
+ * gnutls_global_set_time_function:
+ * @time_func: it's the system time function
+ *
+ * This is the function where you can override the default system
+ * time function.
+ *
+ * gnutls_time_func is of the form,
+ * time_t (*gnutls_time_func)( time*);
+ **/
+void
+gnutls_global_set_time_function (gnutls_time_func time_func)
+{
+  gnutls_time = time_func;
 }
 
 /**

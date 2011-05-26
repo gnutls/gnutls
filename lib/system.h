@@ -33,5 +33,6 @@ ssize_t system_read_peek (gnutls_transport_ptr ptr, void *data,
 
 int _gnutls_atfork (void (*prepare) (void), void (*parent) (void),
                     void (*child) (void));
+extern gnutls_time_func gnutls_time;
 
 #endif /* SYSTEM_H */

@@ -226,7 +226,7 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
   _gnutls_tls_create_random (rnd);
   _gnutls_set_server_random (session, rnd);
 
-  session->security_parameters.timestamp = time (NULL);
+  session->security_parameters.timestamp = gnutls_time (NULL);
 
 
   /* RESUME SESSION */

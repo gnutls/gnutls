@@ -691,6 +691,7 @@ GNUTLS_2_12
 	gnutls_pubkey_verify_data;
 	gnutls_certificate_get_issuer;
 	gnutls_x509_crq_verify;
+	gnutls_global_set_time_function;
 } GNUTLS_2_10;
 
 GNUTLS_PRIVATE {

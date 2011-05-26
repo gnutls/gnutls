@@ -35,7 +35,6 @@
 #include <gnutls_str.h>
 #include <gnutls_sig.h>
 #include <stdio.h>
-#include <time.h>
 #include <sys/stat.h>
 
 #define datum_append(x, y, z) _gnutls_datum_append_m (x, y, z, gnutls_realloc)
