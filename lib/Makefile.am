@@ -85,7 +85,7 @@ endif
 
 HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
 	gnutls_buffers.h gnutls_errors.h gnutls_int.h gnutls_dtls.h	\
-	gnutls_handshake.h gnutls_num.h gnutls_algorithms.h		\
+	gnutls_handshake.h gnutls_num.h algorithms.h		\
 	gnutls_dh.h gnutls_kx.h gnutls_hash_int.h gnutls_cipher_int.h	\
 	gnutls_db.h gnutls_auth.h gnutls_extensions.h	\
 	x509_b64.h gnutls_v2_compat.h gnutls_datum.h \
@@ -96,7 +96,7 @@ HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
 	gnutls_rsa_export.h gnutls_srp.h auth/srp.h auth/srp_passwd.h	\
 	gnutls_helper.h gnutls_supplemental.h crypto.h random.h system.h\
 	locks.h gnutls_mbuffers.h pkcs11_int.h \
-	hash.h
+	hash.h gnutls_ecc.h
 
 COBJECTS+=pakchois/pakchois.c pakchois/errors.c pakchois/dlopen.c
 HFILES+=pakchois/pakchois.h pakchois/pakchois11.h pakchois/dlopen.h
