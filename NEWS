@@ -3,7 +3,14 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 2.99.2 (unreleased)
+* Version 2.99.2 (released 2011-05-26)
+
+** libgnutls: Added Elliptic curve support. This is not
+enabled by default. Requires priority strings:
++CURVE-ALL: to add all supported curves
++ECDHE-RSA: to add ephemeral ECDHE with an RSA-signed certificate
++ECDHE-ECDSA: to add ephemeral ECDHE with an ECDSA-signed certificate
++ANON-ECDHE: to add anonymous ECDH
 
 ** libgnutls: PKCS #11 URLs conform to the latest draft
 being http://tools.ietf.org/html/draft-pechanec-pkcs11uri-04.
