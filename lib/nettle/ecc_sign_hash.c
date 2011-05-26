@@ -57,11 +57,8 @@ ecc_sign_hash (const unsigned char *in, unsigned long inlen,
     {
       return err;
     }
-  if ((err =
-       mp_read_unsigned_bin (e, (unsigned char *) in, (int) inlen)) != 0)
-    {
-      goto errnokey;
-    }
+
+  nettle_mpz_set_str_256_u (e, inlen, in);
 
   /* make up a key and export the public copy */
   for (;;)

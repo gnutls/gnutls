@@ -82,11 +82,7 @@ ecc_verify_hash (struct dsa_signature *signature,
     }
 
   /* read hash */
-  if ((err =
-       mp_read_unsigned_bin (e, (unsigned char *) hash, (int) hashlen)) != 0)
-    {
-      goto error;
-    }
+  nettle_mpz_set_str_256_u (e, hashlen, hash);
 
   /*  w  = s^-1 mod n */
   mpz_invert (w, signature->s, key->order);

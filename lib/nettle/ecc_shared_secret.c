@@ -63,7 +63,7 @@ ecc_shared_secret (ecc_key * private_key, ecc_key * public_key,
       goto done;
     }
 
-  x = (unsigned long) mp_unsigned_bin_size (private_key->prime);
+  x = nettle_mpz_sizeinbase_256_u (private_key->prime);
   if (*outlen < x)
     {
       *outlen = x;
@@ -71,13 +71,7 @@ ecc_shared_secret (ecc_key * private_key, ecc_key * public_key,
       goto done;
     }
   memset (out, 0, x);
-  if ((err =
-       mp_to_unsigned_bin (result->x,
-                           out + (x - mp_unsigned_bin_size (result->x)))) !=
-      0)
-    {
-      goto done;
-    }
+  nettle_mpz_get_str_256(x, out + (x - nettle_mpz_sizeinbase_256_u (result->x)), result->x);
 
   err = 0;
   *outlen = x;

@@ -45,7 +45,7 @@ ecc_make_key_ex (void *random_ctx, nettle_random_func random, ecc_key * key,
   assert (key != NULL);
   assert (random != NULL);
 
-  keysize = mp_unsigned_bin_size (order);
+  keysize = nettle_mpz_sizeinbase_256_u (order);
 
   /* allocate ram */
   base = NULL;
@@ -83,11 +83,8 @@ ecc_make_key_ex (void *random_ctx, nettle_random_func random, ecc_key * key,
   mpz_set (base->x, key->Gx);
   mpz_set (base->y, key->Gy);
   mpz_set_ui (base->z, 1);
-  if ((err =
-       mp_read_unsigned_bin (key->k, (unsigned char *) buf, keysize)) != 0)
-    {
-      goto errkey;
-    }
+  
+  nettle_mpz_set_str_256_u (key->k, keysize, buf);
 
   /* the key should be smaller than the order of base point */
   if (mpz_cmp (key->k, key->order) >= 0)

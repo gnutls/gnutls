@@ -1,6 +1,7 @@
 #include <gmp.h>
 #include <nettle/nettle-types.h>
 #include <nettle/dsa.h>
+#include <nettle/bignum.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
@@ -120,9 +121,6 @@ int ecc_map(ecc_point *P, mpz_t modulus);
 /* helper functions */
 int mp_init_multi(mpz_t *a, ...);
 void mp_clear_multi(mpz_t *a, ...);
-unsigned long mp_unsigned_bin_size(mpz_t a);
-int mp_to_unsigned_bin(mpz_t a, unsigned char *b);
-int mp_read_unsigned_bin(mpz_t a, unsigned char *b, unsigned long len);
 #define mp_isodd(a)                  (mpz_size(a) > 0 ? (mpz_getlimbn(a, 0) & 1 ? 1 : 0) : 0)
 
 #define MP_DIGIT_BIT (sizeof(mp_limb_t) * 8 - GMP_NAIL_BITS)
