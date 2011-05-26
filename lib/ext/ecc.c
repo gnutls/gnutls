@@ -119,7 +119,6 @@ _gnutls_supported_ecc_recv_params (gnutls_session_t session,
           if ((ret =
                _gnutls_session_supports_ecc_curve (session, new_type)) < 0)
             {
-              gnutls_assert ();
               continue;
             }
           else
