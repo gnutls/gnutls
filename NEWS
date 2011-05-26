@@ -35,6 +35,29 @@ gnutls_certificate_get_issuer: ADDED
 gnutls_x509_trust_list_get_issuer: ADDED
 gnutls_x509_crq_verify: ADDED
 gnutls_global_set_audit_log_function: ADDED
+gnutls_ecc_curve_get_name: ADDED
+gnutls_ecc_curve_get_size: ADDED
+gnutls_x509_privkey_import_ecc_raw: ADDED
+gnutls_x509_privkey_export_ecc_raw: ADDED
+gnutls_global_set_time_function: ADDED
+
+GNUTLS_E_ECC_NO_SUPPORTED_CURVES: New error code
+GNUTLS_E_ECC_UNSUPPORTED_CURVE: New error code
+GNUTLS_KX_ECDHE_RSA: New key exchange method
+GNUTLS_KX_ECDHE_ECDSA: New key exchange method
+GNUTLS_KX_ANON_ECDH: New key exchange method
+GNUTLS_PK_ECC: New public key algorithm
+GNUTLS_SIGN_ECDSA_SHA1: New signature algorithm
+GNUTLS_SIGN_ECDSA_SHA256: New signature algorithm
+GNUTLS_SIGN_ECDSA_SHA384: New signature algorithm
+GNUTLS_SIGN_ECDSA_SHA512: New signature algorithm 
+GNUTLS_SIGN_ECDSA_SHA224: New signature algorithm
+GNUTLS_ECC_CURVE_INVALID: New curve definition
+GNUTLS_ECC_CURVE_SECP224R1: New curve definition
+GNUTLS_ECC_CURVE_SECP256R1: New curve definition
+GNUTLS_ECC_CURVE_SECP384R1: New curve definition
+GNUTLS_ECC_CURVE_SECP521R1: New curve definition
+
 
 * Version 2.99.1 (released 2011-04-23)
 
