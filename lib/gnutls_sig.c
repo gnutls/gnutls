@@ -133,6 +133,7 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_pcert_st* cert,
         }
       break;
     case GNUTLS_PK_DSA:
+    case GNUTLS_PK_ECC:
       _gnutls_hash_deinit (&td_sha, concat);
 
       if ((hash_algo != GNUTLS_DIG_SHA1) && (hash_algo != GNUTLS_DIG_SHA224)
