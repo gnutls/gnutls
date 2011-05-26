@@ -724,6 +724,7 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
       dconcat.size = 36;
       break;
     case GNUTLS_PK_DSA:
+    case GNUTLS_PK_ECC:
 
       dconcat.data = &concat[16];
       dconcat.size = 20;
