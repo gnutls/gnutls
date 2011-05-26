@@ -1134,6 +1134,7 @@ int gnutls_ecc_curve_get_size (gnutls_ecc_curve_t curve);
   int gnutls_global_init (void);
   void gnutls_global_deinit (void);
 
+  typedef time_t (*gnutls_time_func) (time_t *t);
   typedef int (*mutex_init_func) (void **mutex);
   typedef int (*mutex_lock_func) (void **mutex);
   typedef int (*mutex_unlock_func) (void **mutex);
@@ -1154,6 +1155,8 @@ int gnutls_ecc_curve_get_size (gnutls_ecc_curve_t curve);
                                      gnutls_is_secure_function is_secure_func,
                                      gnutls_realloc_function realloc_func,
                                      gnutls_free_function free_func);
+
+  void gnutls_global_set_time_function (gnutls_time_func);
 
 /* For use in callbacks */
   extern gnutls_alloc_function gnutls_malloc;

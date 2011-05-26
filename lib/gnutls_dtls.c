@@ -143,7 +143,7 @@ static int drop_usage_count(gnutls_session_t session, mbuffer_head_st *const sen
  */
 int _dtls_retransmit(gnutls_session_t session)
 {
-time_t now = time(0);
+time_t now = gnutls_time (0);
 
   if (now - session->internals.dtls.last_retransmit > RETRANSMIT_WINDOW)
     {
@@ -175,7 +175,7 @@ int ret;
     &session->internals.handshake_send_buffer;
   mbuffer_st *cur;
   gnutls_handshake_description_t last_type = 0;
-  time_t now = time(0);
+  time_t now = gnutls_time (0);
 
   /* If we have already sent a flight and we are operating in a 
    * non blocking way, check if it is time to retransmit or just
@@ -277,7 +277,7 @@ int ret;
         }
 
       UPDATE_TIMER;
-      now = time(0);
+      now = gnutls_time (0);
     } while(ret == GNUTLS_E_TIMEDOUT);
 
   if (ret < 0)

@@ -26,7 +26,6 @@
 #include <config.h>
 #endif
 #include <stdio.h>
-#include <time.h>
 #include <assert.h>
 
 #include "opencdk.h"
@@ -236,7 +235,7 @@ _cdk_sig_check (cdk_pubkey_t pk, cdk_pkt_signature_t sig,
 {
   cdk_error_t rc;
   byte md[MAX_DIGEST_LEN];
-  time_t cur_time = (u32) time (NULL);
+  time_t cur_time = (u32) gnutls_time (NULL);
 
   if (!pk || !sig || !digest)
     {

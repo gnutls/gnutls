@@ -29,7 +29,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include <ctype.h>
 
 #include "opencdk.h"
@@ -1677,7 +1676,7 @@ keydb_merge_selfsig (cdk_kbnode_t key, u32 * keyid)
       if (key_expire)
         {
           pk->expiredate = pk->timestamp + key_expire;
-          pk->has_expired = pk->expiredate > (u32) time (NULL) ? 0 : 1;
+          pk->has_expired = pk->expiredate > (u32) gnutls_time (NULL) ? 0 : 1;
         }
 
       pk->is_invalid = 0;
@@ -1694,7 +1693,7 @@ keydb_parse_allsigs (cdk_kbnode_t knode, cdk_keydb_hd_t hd, int check)
   cdk_pkt_signature_t sig;
   cdk_pkt_pubkey_t pk;
   cdk_subpkt_t s = NULL;
-  u32 expiredate = 0, curtime = (u32) time (NULL);
+  u32 expiredate = 0, curtime = (u32) gnutls_time (NULL);
   u32 keyid[2];
 
   if (!knode)

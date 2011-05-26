@@ -306,7 +306,7 @@ gnutls_x509_crt_t issuer = NULL;
             }
           else
             {
-              time_t now = time(0);
+              time_t now = gnutls_time(0);
 
               if (now < gnutls_x509_crt_get_expiration_time(trusted_cas[i]) && 
                 now >= gnutls_x509_crt_get_activation_time(trusted_cas[i]))
@@ -549,7 +549,7 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
 {
   int i = 0, ret;
   unsigned int status = 0, output;
-  time_t now = time (0);
+  time_t now = gnutls_time (0);
   gnutls_x509_crt_t issuer = NULL;
 
   if (clist_size > 1)

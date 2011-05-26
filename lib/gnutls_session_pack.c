@@ -803,7 +803,7 @@ unpack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
 {
   size_t pack_size;
   int ret;
-  time_t timestamp = time (0);
+  time_t timestamp = gnutls_time (0);
 
   BUFFER_POP_NUM (ps, pack_size);
 

@@ -26,7 +26,6 @@
 #include <config.h>
 #endif
 #include <stdio.h>
-#include <time.h>
 #include <opencdk.h>
 #include <main.h>
 #include <filters.h>
@@ -212,7 +211,7 @@ literal_encode (void *data, FILE * in, FILE * out)
   memcpy (pt->name, pfx->filename, filelen);
   pt->namelen = filelen;
   pt->name[pt->namelen] = '\0';
-  pt->timestamp = (u32) time (NULL);
+  pt->timestamp = (u32) gnutls_time (NULL);
   pt->mode = intmode_to_char (pfx->mode);
   pt->len = cdk_stream_get_length (si);
   pt->buf = si;

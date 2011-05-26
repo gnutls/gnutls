@@ -153,7 +153,7 @@ gnutls_db_check_entry (gnutls_session_t session, gnutls_datum_t session_entry)
 {
   time_t timestamp;
 
-  timestamp = time (0);
+  timestamp = gnutls_time (0);
 
   if (session_entry.data != NULL)
     if (timestamp -

@@ -60,6 +60,7 @@ typedef struct
 
 #include <gnutls/gnutls.h>
 #include <gnutls/abstract.h>
+#include <system.h>
 
 /*
  * They are not needed any more. You can simply enable

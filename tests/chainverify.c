@@ -38,8 +38,7 @@
    verifying certificates.  To avoid a time bomb, we hard code the
    current time.  This should work fine on systems where the library
    call to time is resolved at run-time.  */
-time_t
-time (time_t * t)
+static time_t mytime (time_t * t)
 {
   time_t then = 1256803113;
 
@@ -814,6 +813,7 @@ doit (void)
       exit (EXIT_FAILURE);
     }
 
+  gnutls_global_set_time_function (mytime);
   gnutls_global_set_log_function (tls_log_func);
   if (debug)
     gnutls_global_set_log_level (4711);

@@ -292,6 +292,7 @@ _gnutls_atfork (void (*prepare) (void), void (*parent) (void),
 
 #endif /* NO_LOCKS */
 
+gnutls_time_func gnutls_time = time;
 mutex_init_func gnutls_mutex_init = gnutls_system_mutex_init;
 mutex_deinit_func gnutls_mutex_deinit = gnutls_system_mutex_deinit;
 mutex_lock_func gnutls_mutex_lock = gnutls_system_mutex_lock;
