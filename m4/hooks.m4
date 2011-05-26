@@ -41,7 +41,7 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   # Interfaces added:                             AGE++
   # Interfaces removed:                           AGE=0
   AC_SUBST(LT_CURRENT, 27)
-  AC_SUBST(LT_REVISION, 0)
+  AC_SUBST(LT_REVISION, 1)
   AC_SUBST(LT_AGE, 0)
 
   AC_SUBST(LT_SSL_CURRENT, 27)
@@ -58,24 +58,24 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
 
   cryptolib="nettle"
 
-  AC_ARG_WITH(libgcrypt,
-    AS_HELP_STRING([--with-libgcrypt], [use libgcrypt as crypto library]),
-      libgcrypt=$withval,
-      libgcrypt=no)
-    if test "$libgcrypt" = "yes"; then
-        cryptolib=libgcrypt
-        AC_DEFINE([HAVE_GCRYPT], 1, [whether the gcrypt library is in use])
-	AC_LIB_HAVE_LINKFLAGS([gcrypt], [gpg-error], [#include <gcrypt.h>],
-                      [enum gcry_cipher_algos i = GCRY_CIPHER_CAMELLIA128])
-      if test "$ac_cv_libgcrypt" != yes; then
-        AC_MSG_ERROR([[
-***  
-*** Libgcrypt v1.4.0 or later was not found. You may want to get it from
-*** ftp://ftp.gnupg.org/gcrypt/libgcrypt/
-***
-    ]])
-      fi
-    fi
+dnl  AC_ARG_WITH(libgcrypt,
+dnl    AS_HELP_STRING([--with-libgcrypt], [use libgcrypt as crypto library]),
+dnl      libgcrypt=$withval,
+dnl      libgcrypt=no)
+dnl    if test "$libgcrypt" = "yes"; then
+dnl        cryptolib=libgcrypt
+dnl        AC_DEFINE([HAVE_GCRYPT], 1, [whether the gcrypt library is in use])
+dnl	AC_LIB_HAVE_LINKFLAGS([gcrypt], [gpg-error], [#include <gcrypt.h>],
+dnl                      [enum gcry_cipher_algos i = GCRY_CIPHER_CAMELLIA128])
+dnl      if test "$ac_cv_libgcrypt" != yes; then
+dnl        AC_MSG_ERROR([[
+dnl***  
+dnl*** Libgcrypt v1.4.0 or later was not found. You may want to get it from
+dnl*** ftp://ftp.gnupg.org/gcrypt/libgcrypt/
+dnl***
+dnl    ]])
+dnl      fi
+dnl    fi
 
   AC_MSG_CHECKING([whether to use nettle])
 if test "$cryptolib" = "nettle";then
