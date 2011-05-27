@@ -263,6 +263,8 @@ _gnutls_proc_psk_client_kx (gnutls_session_t session, opaque * data,
   ret = 0;
 
 error:
+  _gnutls_free_datum(&psk_key);
+
   return ret;
 }
 

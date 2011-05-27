@@ -282,8 +282,12 @@ proc_psk_client_kx (gnutls_session_t session, opaque * data,
   if (ret < 0) 
     return gnutls_assert_val(ret);
 
-  return _gnutls_proc_dh_common_client_kx (session, data, data_size, 
+  ret = _gnutls_proc_dh_common_client_kx (session, data, data_size, 
                                           g, p, &psk_key);
+
+  _gnutls_free_datum(&psk_key);
+  
+  return ret;
 
 }
 
@@ -344,9 +348,12 @@ proc_ecdhe_psk_client_kx (gnutls_session_t session, opaque * data,
   if (ret < 0) 
     return gnutls_assert_val(ret);
 
-  return _gnutls_proc_ecdh_common_client_kx(session, data, data_size, 
+  ret = _gnutls_proc_ecdh_common_client_kx(session, data, data_size, 
     _gnutls_session_ecc_curve_get(session), &psk_key);
 
+  _gnutls_free_datum(&psk_key);
+  
+  return ret;
 }
 
 int
