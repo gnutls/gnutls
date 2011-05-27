@@ -101,7 +101,7 @@ gen_anon_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 
   _gnutls_dh_set_group (session, g, p);
 
-  ret = _gnutls_dh_common_print_server_kx (session, g, p, data, 0);
+  ret = _gnutls_dh_common_print_server_kx (session, g, p, data);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -141,7 +141,7 @@ proc_anon_client_kx (gnutls_session_t session, opaque * data,
   p = mpis[0];
   g = mpis[1];
 
-  ret = _gnutls_proc_dh_common_client_kx (session, data, _data_size, g, p);
+  ret = _gnutls_proc_dh_common_client_kx (session, data, _data_size, g, p, NULL);
 
   return ret;
 
@@ -163,7 +163,7 @@ proc_anon_server_kx (gnutls_session_t session, opaque * data,
       return ret;
     }
 
-  ret = _gnutls_proc_dh_common_server_kx (session, data, _data_size, 0);
+  ret = _gnutls_proc_dh_common_server_kx (session, data, _data_size);
   if (ret < 0)
     {
       gnutls_assert ();

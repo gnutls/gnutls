@@ -1194,7 +1194,8 @@ _gnutls_session_is_ecc (gnutls_session_t session)
   kx =
     _gnutls_cipher_suite_get_kx_algo (&session->
                                       security_parameters.current_cipher_suite);
-  if (kx == GNUTLS_KX_ECDHE_RSA || kx == GNUTLS_KX_ECDHE_ECDSA || kx == GNUTLS_KX_ANON_ECDH)
+  if (kx == GNUTLS_KX_ECDHE_RSA || kx == GNUTLS_KX_ECDHE_ECDSA  ||
+    kx == GNUTLS_KX_ANON_ECDH || kx == GNUTLS_KX_ECDHE_PSK)
     return 1;
 
   return 0;

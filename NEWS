@@ -3,6 +3,14 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 2.99.3 (unreleased)
+
+** libgnutls: Added ECDHE-PSK ciphersuites for TLS (RFC 5489).
+
+** API and ABI modifications:
+GNUTLS_KX_ECDHE_PSK: New key exchange method
+
+
 * Version 2.99.2 (released 2011-05-26)
 
 ** libgnutls: Added Elliptic curve support. This is not

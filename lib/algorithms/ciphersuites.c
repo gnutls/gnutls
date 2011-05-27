@@ -216,6 +216,15 @@ typedef struct
 #define GNUTLS_ECDHE_ECDSA_AES_128_GCM_SHA256   {0xC0,0x2B}
 #define GNUTLS_ECDHE_RSA_AES_128_GCM_SHA256     {0xC0,0x2F}
 
+/* ECC with PSK */
+#define GNUTLS_ECDHE_PSK_3DES_EDE_CBC_SHA { 0xC0, 0x34 }
+#define GNUTLS_ECDHE_PSK_AES_128_CBC_SHA { 0xC0, 0x35 }
+#define GNUTLS_ECDHE_PSK_AES_256_CBC_SHA { 0xC0, 0x36 }
+#define GNUTLS_ECDHE_PSK_AES_128_CBC_SHA256 { 0xC0, 0x37 }
+#define GNUTLS_ECDHE_PSK_AES_256_CBC_SHA384 { 0xC0, 0x38 }
+#define GNUTLS_ECDHE_PSK_NULL_SHA256 { 0xC0, 0x3A }
+#define GNUTLS_ECDHE_PSK_NULL_SHA384 { 0xC0, 0x3B }
+
 #define CIPHER_SUITES_COUNT (sizeof(cs_algorithms)/sizeof(gnutls_cipher_suite_entry)-1)
 
 /* FIXME: what we don't handle here is TLS 1.2 requirement
@@ -580,6 +589,35 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_RSA_AES_128_GCM_SHA256,
                              GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_ECDHE_RSA,
                              GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
+                             GNUTLS_VERSION_MAX, 1),
+  /* ECC - PSK */
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_PSK_3DES_EDE_CBC_SHA,
+                             GNUTLS_CIPHER_3DES_CBC, GNUTLS_KX_ECDHE_PSK,
+                             GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_PSK_AES_128_CBC_SHA,
+                             GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_ECDHE_PSK,
+                             GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_PSK_AES_256_CBC_SHA,
+                             GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_ECDHE_PSK,
+                             GNUTLS_MAC_SHA1, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_PSK_AES_128_CBC_SHA256,
+                             GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_ECDHE_PSK,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_PSK_AES_256_CBC_SHA384,
+                             GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_ECDHE_PSK,
+                             GNUTLS_MAC_SHA384, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_PSK_NULL_SHA256,
+                             GNUTLS_CIPHER_NULL, GNUTLS_KX_ECDHE_PSK,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1_0,
+                             GNUTLS_VERSION_MAX, 1),
+  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_PSK_NULL_SHA384,
+                             GNUTLS_CIPHER_NULL, GNUTLS_KX_ECDHE_PSK,
+                             GNUTLS_MAC_SHA384, GNUTLS_TLS1_0,
                              GNUTLS_VERSION_MAX, 1),
   {0, {{0, 0}}, 0, 0, 0, 0, 0, 0}
 };

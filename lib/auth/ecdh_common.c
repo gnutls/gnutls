@@ -43,7 +43,7 @@
 #include <auth/psk.h>
 #include <gnutls_pk.h>
 
-static int calc_ecdh_key( gnutls_session_t session)
+static int calc_ecdh_key( gnutls_session_t session, gnutls_datum_t * psk_key)
 {
 gnutls_pk_params_st pub;
 int ret;
@@ -61,21 +61,43 @@ int ret;
   
   _gnutls_mpi_set_ui(pub.params[7], 1);
   
-  ret = _gnutls_pk_derive(GNUTLS_PK_ECC, &session->key->key, &session->key->ecdh_params, &pub);
-  
-  _gnutls_mpi_release(&pub.params[7]);
+  if (psk_key == NULL)
+    ret = _gnutls_pk_derive(GNUTLS_PK_ECC, &session->key->key, &session->key->ecdh_params, &pub);
+  else
+    {
+      gnutls_datum_t tmp_dh_key;
+
+      ret = _gnutls_pk_derive(GNUTLS_PK_ECC, &tmp_dh_key, &session->key->ecdh_params, &pub);
+      if (ret < 0)
+        {
+          ret = gnutls_assert_val(ret);
+          goto cleanup;
+        }
+
+      ret = _gnutls_set_psk_session_key (session, psk_key, &tmp_dh_key);
+      _gnutls_free_datum (&tmp_dh_key);
+    }
   
   if (ret < 0)
-    return gnutls_assert_val(ret);
+    {
+      ret = gnutls_assert_val(ret);
+      goto cleanup;
+    }
     
-  return 0;
+  ret = 0;
+
+cleanup:
+  _gnutls_mpi_release(&pub.params[7]);
+  return ret;
+
 }
 
 
 int
 _gnutls_proc_ecdh_common_client_kx (gnutls_session_t session,
-                                  opaque * data, size_t _data_size,
-                                  gnutls_ecc_curve_t curve)
+                                    opaque * data, size_t _data_size,
+                                    gnutls_ecc_curve_t curve,
+                                    gnutls_datum_t *psk_key)
 {
   ssize_t data_size = _data_size;
   int ret, i = 0;
@@ -94,7 +116,7 @@ _gnutls_proc_ecdh_common_client_kx (gnutls_session_t session,
     return gnutls_assert_val(ret);
 
   /* generate pre-shared key */
-  ret = calc_ecdh_key(session);
+  ret = calc_ecdh_key(session, psk_key);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -102,7 +124,16 @@ _gnutls_proc_ecdh_common_client_kx (gnutls_session_t session,
 }
 
 int
-_gnutls_gen_ecdh_common_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
+_gnutls_gen_ecdh_common_client_kx (gnutls_session_t session, 
+                                   gnutls_buffer_st* data)
+{
+  return _gnutls_gen_ecdh_common_client_kx_int(session, data, NULL);
+}
+
+int
+_gnutls_gen_ecdh_common_client_kx_int (gnutls_session_t session, 
+                                   gnutls_buffer_st* data, 
+                                   gnutls_datum_t * psk_key)
 {
   int ret;
   gnutls_datum_t out;
@@ -124,9 +155,9 @@ _gnutls_gen_ecdh_common_client_kx (gnutls_session_t session, gnutls_buffer_st* d
   
   if (ret < 0)
     return gnutls_assert_val(ret);
-    
+
   /* generate pre-shared key */
-  ret = calc_ecdh_key(session);
+  ret = calc_ecdh_key(session, psk_key);
   if (ret < 0)
     return gnutls_assert_val(ret);
 

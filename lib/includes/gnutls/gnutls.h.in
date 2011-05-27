@@ -138,6 +138,7 @@ extern "C"
    * @GNUTLS_KX_SRP_DSS: SRP-DSS key-exchange algorithm.
    * @GNUTLS_KX_PSK: PSK key-exchange algorithm.
    * @GNUTLS_KX_DHE_PSK: DHE-PSK key-exchange algorithm.
+   * @GNUTLS_KX_ECDHE_PSK: ECDHE-PSK key-exchange algorithm.
    *
    * Enumeration of different key exchange algorithms.
    */
@@ -157,6 +158,7 @@ extern "C"
     GNUTLS_KX_ANON_ECDH = 11,
     GNUTLS_KX_ECDHE_RSA = 12,
     GNUTLS_KX_ECDHE_ECDSA = 13,
+    GNUTLS_KX_ECDHE_PSK = 14,
   } gnutls_kx_algorithm_t;
 
   /**

@@ -170,7 +170,7 @@ gen_dhe_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 
       _gnutls_dh_set_group (session, g, p);
 
-      ret = _gnutls_dh_common_print_server_kx (session, g, p, data, 0);
+      ret = _gnutls_dh_common_print_server_kx (session, g, p, data);
     }
   else
     {
@@ -273,7 +273,7 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
     }
 
   if (!_gnutls_session_is_ecc (session))
-    ret = _gnutls_proc_dh_common_server_kx (session, data, _data_size, 0);
+    ret = _gnutls_proc_dh_common_server_kx (session, data, _data_size);
   else
     ret = _gnutls_proc_ecdh_common_server_kx (session, data, _data_size);
 
@@ -367,10 +367,11 @@ proc_dhe_client_kx (gnutls_session_t session, opaque * data,
       p = mpis[0];
       g = mpis[1];
 
-      ret = _gnutls_proc_dh_common_client_kx (session, data, _data_size, g, p);
+      ret = _gnutls_proc_dh_common_client_kx (session, data, _data_size, g, p, NULL);
     }
   else
-    ret = _gnutls_proc_ecdh_common_client_kx (session, data, _data_size, _gnutls_session_ecc_curve_get(session));
+    ret = _gnutls_proc_ecdh_common_client_kx (session, data, _data_size, 
+                                              _gnutls_session_ecc_curve_get(session), NULL);
 
   return ret;
 

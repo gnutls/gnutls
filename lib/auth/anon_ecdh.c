@@ -109,7 +109,8 @@ proc_anon_ecdh_client_kx (gnutls_session_t session, opaque * data,
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  return _gnutls_proc_ecdh_common_client_kx (session, data, _data_size, _gnutls_session_ecc_curve_get(session));
+  return _gnutls_proc_ecdh_common_client_kx (session, data, _data_size, 
+                                             _gnutls_session_ecc_curve_get(session), NULL);
 }
 
 int

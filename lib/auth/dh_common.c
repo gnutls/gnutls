@@ -55,7 +55,8 @@ _gnutls_free_dh_info (dh_info_st * dh)
 int
 _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
                                   opaque * data, size_t _data_size,
-                                  bigint_t g, bigint_t p)
+                                  bigint_t g, bigint_t p,
+                                  gnutls_datum_t* psk_key)
 {
   uint16_t n_Y;
   size_t _n_Y;
@@ -89,9 +90,7 @@ _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
   _gnutls_mpi_release (&session->key->dh_secret);
 
 
-  if (_gnutls_cipher_suite_get_kx_algo
-      (&session->security_parameters.current_cipher_suite)
-      != GNUTLS_KX_DHE_PSK)
+  if (psk_key == NULL)
     {
       ret = _gnutls_mpi_dprint (session->key->KEY, &session->key->key);
     }
@@ -105,7 +104,7 @@ _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
           return ret;
         }
 
-      ret = _gnutls_set_psk_session_key (session, NULL, &tmp_dh_key);
+      ret = _gnutls_set_psk_session_key (session, psk_key, &tmp_dh_key);
       _gnutls_free_datum (&tmp_dh_key);
 
     }
@@ -205,25 +204,17 @@ error:
 /* Returns the bytes parsed */
 int
 _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
-                                  opaque * data, size_t _data_size, int psk)
+                                  opaque * data, size_t _data_size)
 {
   uint16_t n_Y, n_g, n_p;
   size_t _n_Y, _n_g, _n_p;
   uint8_t *data_p;
   uint8_t *data_g;
   uint8_t *data_Y;
-  int i, bits, psk_size, ret;
+  int i, bits, ret;
   ssize_t data_size = _data_size;
 
   i = 0;
-
-  if (psk != 0)
-    {
-      DECR_LEN (data_size, 2);
-      psk_size = _gnutls_read_uint16 (&data[i]);
-      DECR_LEN (data_size, psk_size);
-      i += 2 + psk_size;
-    }
 
   DECR_LEN (data_size, 2);
   n_p = _gnutls_read_uint16 (&data[i]);
@@ -290,8 +281,6 @@ _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
   _gnutls_dh_set_peer_public (session, session->key->client_Y);
 
   ret = n_Y + n_p + n_g + 6;
-  if (psk != 0)
-    ret += 2;
 
   return ret;
 }
@@ -300,8 +289,7 @@ _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
  * be inserted */
 int
 _gnutls_dh_common_print_server_kx (gnutls_session_t session,
-                                   bigint_t g, bigint_t p, gnutls_buffer_st* data,
-                                   int psk)
+                                   bigint_t g, bigint_t p, gnutls_buffer_st* data)
 {
   bigint_t x, X;
   int ret;
@@ -315,16 +303,6 @@ _gnutls_dh_common_print_server_kx (gnutls_session_t session,
 
   session->key->dh_secret = x;
   _gnutls_dh_set_secret_bits (session, _gnutls_mpi_get_nbits (x));
-
-  if (psk != 0)
-    {
-      ret = _gnutls_buffer_append_prefix(data, 16, 0);
-      if (ret < 0)
-        {
-          ret = gnutls_assert_val(ret);
-          goto cleanup;
-        }
-    }
 
   ret = _gnutls_buffer_append_mpi(data, 16, p, 0);
   if (ret < 0)
