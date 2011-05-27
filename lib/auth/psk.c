@@ -72,24 +72,6 @@ _gnutls_set_psk_session_key (gnutls_session_t session,
   size_t dh_secret_size;
   int ret;
 
-  if (session->security_parameters.entity == GNUTLS_SERVER)
-    {                           /* SERVER side */
-      psk_auth_info_t info;
-
-      info = _gnutls_get_auth_info (session);
-
-      /* find the key of this username
-       */
-      ret = _gnutls_psk_pwd_find_entry (session, info->username, &pwd_psk);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-      ppsk = &pwd_psk;
-    }
-
-
   if (dh_secret == NULL)
     dh_secret_size = ppsk->size;
   else
@@ -225,7 +207,7 @@ _gnutls_proc_psk_client_kx (gnutls_session_t session, opaque * data,
 {
   ssize_t data_size = _data_size;
   int ret;
-  gnutls_datum_t username;
+  gnutls_datum_t username, psk_key;
   gnutls_psk_server_credentials_t cred;
   psk_auth_info_t info;
 
@@ -267,7 +249,11 @@ _gnutls_proc_psk_client_kx (gnutls_session_t session, opaque * data,
   memcpy (info->username, username.data, username.size);
   info->username[username.size] = 0;
 
-  ret = _gnutls_set_psk_session_key (session, NULL, NULL);
+  ret = _gnutls_psk_pwd_find_entry(session, info->username, &psk_key);
+  if (ret < 0) 
+    return gnutls_assert_val(ret);
+
+  ret = _gnutls_set_psk_session_key (session, &psk_key, NULL);
   if (ret < 0)
     {
       gnutls_assert ();
