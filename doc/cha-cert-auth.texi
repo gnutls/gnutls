@@ -7,7 +7,7 @@
 * The X.509 trust model::
 * The OpenPGP trust model::
 * PKCS #11 tokens::
-* Abstract data types::
+* Abstract key types::
 * Digital signatures::
 @end menu
 
@@ -555,8 +555,8 @@ certificates.
 @end itemize
 
 
-@node Abstract data types
-@section Abstract data types
+@node Abstract key types
+@section Abstract key types
 @anchor{sec:abstract}
 @cindex Abstract types
 
