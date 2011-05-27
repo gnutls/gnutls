@@ -1,5 +1,5 @@
-@node All the supported ciphersuites in GnuTLS
-@chapter All the Supported Ciphersuites in @acronym{GnuTLS}
+@node Supported ciphersuites in GnuTLS
+@appendix Supported Ciphersuites in @acronym{GnuTLS}
 @anchor{ciphersuites}
 @cindex Ciphersuites
 
@@ -13,8 +13,11 @@ RSA is public key cryptosystem designed by Ronald Rivest, Adi Shamir
 and Leonard Adleman.  It can be used with any hash functions.
 
 @item DSA
-DSA is the USA's Digital Signature Standard.  It uses only the SHA-1
-hash algorithm.
+DSA is the USA's Digital Signature Standard.  It may use the SHA
+family of hash algorithms.
+
+@item ECDSA
+ECDSA is the elliptic curve counter-part of DSA. 
 
 @item MD2
 MD2 is a cryptographic hash algorithm designed by Ron Rivest.  It is
@@ -36,8 +39,3 @@ the EU project RIPE.  Outputs 160 bits of data.
 
 @end table
 
-@c
-@c Guile Bindings
-@c
-
-@include guile.texi

@@ -21,14 +21,15 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 EXTRA_DIST = TODO certtool.cfg gnutls.ps gnutls.pdf gnutls.html	\
-	doxygen/Doxyfile.in doxygen/Doxyfile.orig texinfo.css
+	doxygen/Doxyfile.in doxygen/Doxyfile.orig texinfo.css \
+	gnutls-guile.pdf gnutls-guile.html
 
 SUBDIRS = examples cyclo scripts manpages credentials
 if ENABLE_GTK_DOC
 SUBDIRS += reference
 endif
 
-info_TEXINFOS = gnutls.texi
+info_TEXINFOS = gnutls.texi gnutls-guile.texi
 gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi lgpl-2.1.texi gpl-3.0.texi	\
 	cha-auth.texi cha-bib.texi cha-cert-auth.texi			\
 	cha-ciphersuites.texi cha-copying.texi cha-functions.texi	\
@@ -177,11 +178,11 @@ algorithms.texi: $(srcdir)/printlist.c
 
 # Guile texinfos.
 
-guile_texi           = core.c.texi extra.c.texi
-gnutls_TEXINFOS      += guile.texi $(guile_texi)
+guile_texi = core.c.texi extra.c.texi
 BUILT_SOURCES        = $(guile_texi)
 MAINTAINERCLEANFILES += $(guile_texi)
 EXTRA_DIST           += $(guile_texi) extract-guile-c-doc.scm
+guile_TEXINFOS       = gnutls-guile.texi $(guile_texi)
 
 if HAVE_GUILE
 

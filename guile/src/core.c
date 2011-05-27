@@ -539,8 +539,8 @@ SCM_DEFINE (scm_gnutls_set_session_priorities_x,
 	    (SCM session, SCM priorities),
 	    "Have @var{session} use the given @var{priorities} for "
 	    "the ciphers, key exchange methods, MACs and compression "
-	    "methods.  @var{priorities} must be a string (@pxref{"
-	    "Priority Strings}).  When @var{priorities} cannot be "
+	    "methods.  @var{priorities} must be a string (see "
+	    "Priority Strings).  When @var{priorities} cannot be "
 	    "parsed, an @code{error/invalid-request} error is raised, "
 	    "with an extra argument indication the position of the "
 	    "error.\n")

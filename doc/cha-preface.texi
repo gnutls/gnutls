@@ -137,9 +137,6 @@ parsing OpenPGP packets.  It is included GnuTLS.  Use parameter
 functionality in GnuTLS.  Unfortunately, we didn't have resources to
 maintain the code in a separate library.
 
-Regarding the Guile bindings, there are additional installation
-considerations, see @xref{Guile Preparations}.
-
 A few @code{configure} options may be relevant, summarized in the
 table.
 

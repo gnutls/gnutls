@@ -1,5 +1,5 @@
 @node Function reference
-@chapter Function Reference
+@appendix Function Reference
 @cindex Function reference
 
 @menu
