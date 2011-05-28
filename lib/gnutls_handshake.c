@@ -1052,9 +1052,9 @@ _gnutls_server_select_comp_method (gnutls_session_t session,
                                    opaque * data, int datalen)
 {
   int x, i, j;
-  uint8_t *comps;
+  uint8_t comps[MAX_ALGOS];
 
-  x = _gnutls_supported_compression_methods (session, &comps);
+  x = _gnutls_supported_compression_methods (session, comps, MAX_ALGOS);
   if (x < 0)
     {
       gnutls_assert ();
@@ -1069,8 +1069,6 @@ _gnutls_server_select_comp_method (gnutls_session_t session,
             {
               gnutls_compression_method_t method =
                 _gnutls_compression_get_id (comps[i]);
-
-              gnutls_free (comps);
 
               _gnutls_epoch_set_compression (session, EPOCH_NEXT, method);
               session->security_parameters.compression_method = method;
@@ -1088,7 +1086,6 @@ _gnutls_server_select_comp_method (gnutls_session_t session,
   /* we were not able to find a compatible compression
    * algorithm
    */
-  gnutls_free (comps);
   gnutls_assert ();
   return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
 
@@ -1538,7 +1535,7 @@ static int
 _gnutls_client_set_comp_method (gnutls_session_t session, opaque comp_method)
 {
   int comp_methods_num;
-  uint8_t *compression_methods;
+  uint8_t compression_methods[MAX_ALGOS];
   int id = _gnutls_compression_get_id(comp_method);
   int i;
 
@@ -1546,7 +1543,7 @@ _gnutls_client_set_comp_method (gnutls_session_t session, opaque comp_method)
                          gnutls_compression_get_name(id), (int)comp_method);
 
   comp_methods_num = _gnutls_supported_compression_methods (session,
-                                                            &compression_methods);
+                                                            compression_methods, MAX_ALGOS);
   if (comp_methods_num < 0)
     {
       gnutls_assert ();
@@ -1561,8 +1558,6 @@ _gnutls_client_set_comp_method (gnutls_session_t session, opaque comp_method)
           break;
         }
     }
-
-  gnutls_free (compression_methods);
 
   if (comp_methods_num != 0)
     {
@@ -1849,41 +1844,26 @@ static int
 _gnutls_copy_comp_methods (gnutls_session_t session,
                            gnutls_buffer_st * cdata)
 {
-  int ret, i;
-  uint8_t *compression_methods, comp_num;
+  int ret;
+  uint8_t compression_methods[MAX_ALGOS], comp_num;
   size_t init_length = cdata->length;
 
-  ret = _gnutls_supported_compression_methods (session, &compression_methods);
+  ret = _gnutls_supported_compression_methods (session, compression_methods, MAX_ALGOS);
   if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+    return gnutls_assert_val(ret);
 
   comp_num = ret;
 
   /* put the number of compression methods */
   ret = _gnutls_buffer_append_prefix(cdata, 8, comp_num);
   if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
+    return gnutls_assert_val(ret);
 
-  for (i = 0; i < comp_num; i++)
-    {
-      ret = _gnutls_buffer_append_data(cdata, &compression_methods[i], 1);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto cleanup;
-        }
-    }
+  ret = _gnutls_buffer_append_data(cdata, compression_methods, comp_num);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   ret = cdata->length - init_length;
-
-cleanup:
-  gnutls_free (compression_methods);
 
   return ret;
 }

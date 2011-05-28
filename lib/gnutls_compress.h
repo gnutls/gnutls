@@ -36,7 +36,7 @@ int _gnutls_m_compressed2plaintext (gnutls_session_t session,
 
 /* Algorithm handling. */
 int _gnutls_supported_compression_methods (gnutls_session_t session,
-                                           uint8_t ** comp);
+                                           uint8_t * comp, size_t max_comp);
 int _gnutls_compression_is_ok (gnutls_compression_method_t algorithm);
 int _gnutls_compression_get_num (gnutls_compression_method_t algorithm);
 gnutls_compression_method_t _gnutls_compression_get_id (int num);

@@ -256,13 +256,12 @@ _gnutls_compression_is_ok (gnutls_compression_method_t algorithm)
 #define SUPPORTED_COMPRESSION_METHODS session->internals.priorities.compression.algorithms
 int
 _gnutls_supported_compression_methods (gnutls_session_t session,
-                                       uint8_t ** comp)
+                                       uint8_t * comp, size_t comp_size)
 {
   unsigned int i, j;
 
-  *comp = gnutls_malloc (sizeof (uint8_t) * SUPPORTED_COMPRESSION_METHODS);
-  if (*comp == NULL)
-    return GNUTLS_E_MEMORY_ERROR;
+  if (comp_size < SUPPORTED_COMPRESSION_METHODS)
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   for (i = j = 0; i < SUPPORTED_COMPRESSION_METHODS; i++)
     {
@@ -279,15 +278,13 @@ _gnutls_supported_compression_methods (gnutls_session_t session,
           continue;
         }
 
-      (*comp)[j] = (uint8_t) tmp;
+      comp[j] = (uint8_t) tmp;
       j++;
     }
 
   if (j == 0)
     {
       gnutls_assert ();
-      gnutls_free (*comp);
-      *comp = NULL;
       return GNUTLS_E_NO_COMPRESSION_ALGORITHMS;
     }
   return j;
