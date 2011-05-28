@@ -123,6 +123,7 @@ resume_copy_required_values (gnutls_session_t session)
   memcpy (session->security_parameters.current_cipher_suite.suite,
           session->internals.resumed_security_parameters.current_cipher_suite.
           suite, 2);
+  session->internals.compression_method = session->internals.resumed_compression_method;
 
   _gnutls_epoch_set_cipher_suite (session, EPOCH_NEXT,
                                   &session->
