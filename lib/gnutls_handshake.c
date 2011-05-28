@@ -859,6 +859,7 @@ server_find_pk_algos_in_ciphersuites (const opaque *
   gnutls_pk_algorithm_t algo = GNUTLS_PK_NONE, prev_algo = 0;
   gnutls_kx_algorithm_t kx;
   cipher_suite_st cs;
+  int found = 0;
 
   if (datalen % 2 != 0)
     {
@@ -870,16 +871,18 @@ server_find_pk_algos_in_ciphersuites (const opaque *
     {
       memcpy (&cs.suite, &data[j], 2);
       kx = _gnutls_cipher_suite_get_kx_algo (&cs);
-
       if (_gnutls_map_kx_get_cred (kx, 1) == GNUTLS_CRD_CERTIFICATE)
         {
           algo = _gnutls_map_pk_get_pk (kx);
 
           if (algo != prev_algo && prev_algo != 0)
-            return GNUTLS_PK_ANY;
+            found++;
           prev_algo = algo;
         }
     }
+
+  if (found == GNUTLS_DISTINCT_PK_ALGORITHMS)
+    algo = GNUTLS_PK_ANY;
 
   return algo;
 }
@@ -3348,10 +3351,12 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
       /* If we have not agreed to a common curve with the peer don't bother
        * negotiating ECDH.
        */
-      if (session->security_parameters.entity == GNUTLS_SERVER && _gnutls_session_is_ecc(session))
+      if (server != 0 && _gnutls_kx_is_ecc(kx))
         {
           if (_gnutls_session_ecc_curve_get(session) == GNUTLS_ECC_CURVE_INVALID)
-            delete = 1;
+            {
+              delete = 1;
+            }
         }
 
       /* These two SRP kx's are marked to require a CRD_CERTIFICATE,
@@ -3361,7 +3366,9 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
       if (kx == GNUTLS_KX_SRP_RSA || kx == GNUTLS_KX_SRP_DSS)
         {
           if (!_gnutls_get_cred (session->key, GNUTLS_CRD_SRP, NULL))
-            delete = 1;
+            {
+              delete = 1;
+            }
         }
 
       memcpy (&cs.suite, &(*cipherSuites)[i].suite, 2);

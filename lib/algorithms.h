@@ -92,6 +92,9 @@ gnutls_credentials_type_t _gnutls_map_kx_get_cred (gnutls_kx_algorithm_t
                                                    algorithm, int server);
 
 /* KX to PK mapping. */
+
+/* DSA + RSA + ECC */
+#define GNUTLS_DISTINCT_PK_ALGORITHMS 3
 gnutls_pk_algorithm_t _gnutls_map_pk_get_pk (gnutls_kx_algorithm_t
                                              kx_algorithm);
 gnutls_pk_algorithm_t _gnutls_x509_oid2pk_algorithm (const char *oid);
@@ -157,5 +160,14 @@ const char * _gnutls_ecc_curve_get_oid (gnutls_ecc_curve_t curve);
 gnutls_ecc_curve_t _gnutls_oid_to_ecc_curve (const char* oid);
 gnutls_ecc_curve_t _gnutls_ecc_bits_to_curve (int bits);
 #define MAX_ECC_CURVE_SIZE 66
+
+static inline int _gnutls_kx_is_ecc(gnutls_kx_algorithm_t kx)
+{
+  if (kx == GNUTLS_KX_ECDHE_RSA || kx == GNUTLS_KX_ECDHE_ECDSA  ||
+    kx == GNUTLS_KX_ANON_ECDH || kx == GNUTLS_KX_ECDHE_PSK)
+    return 1;
+
+  return 0;
+}
 
 #endif
