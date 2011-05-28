@@ -246,6 +246,8 @@ static const int protocol_priority[] = {
 
 static const int kx_priority_performance[] = {
   GNUTLS_KX_RSA,
+  GNUTLS_KX_ECDHE_ECDSA,
+  GNUTLS_KX_ECDHE_RSA,
   GNUTLS_KX_DHE_RSA,
   GNUTLS_KX_DHE_DSS,
   /* GNUTLS_KX_ANON_DH: Man-in-the-middle prone, don't add!
@@ -256,6 +258,8 @@ static const int kx_priority_performance[] = {
 
 static const int kx_priority_export[] = {
   GNUTLS_KX_RSA,
+  GNUTLS_KX_ECDHE_ECDSA,
+  GNUTLS_KX_ECDHE_RSA,
   GNUTLS_KX_DHE_RSA,
   GNUTLS_KX_DHE_DSS,
   GNUTLS_KX_RSA_EXPORT,
@@ -268,6 +272,8 @@ static const int kx_priority_secure[] = {
    */
   GNUTLS_KX_DHE_RSA,
   GNUTLS_KX_DHE_DSS,
+  GNUTLS_KX_ECDHE_ECDSA,
+  GNUTLS_KX_ECDHE_RSA,
   GNUTLS_KX_RSA,
   /* GNUTLS_KX_ANON_DH: Man-in-the-middle prone, don't add!
    * GNUTLS_KX_RSA_EXPORT: Deprecated, don't add!
@@ -360,26 +366,36 @@ static const int comp_priority[] = {
 };
 
 static const int sign_priority_default[] = {
-  GNUTLS_SIGN_DSA_SHA224,
-  GNUTLS_SIGN_DSA_SHA256,
   GNUTLS_SIGN_RSA_SHA256,
+  GNUTLS_SIGN_DSA_SHA256,
+  GNUTLS_SIGN_ECDSA_SHA256,
+
   GNUTLS_SIGN_RSA_SHA384,
+  GNUTLS_SIGN_ECDSA_SHA384,
+
   GNUTLS_SIGN_RSA_SHA512,
+  GNUTLS_SIGN_ECDSA_SHA512,
+
+  GNUTLS_SIGN_RSA_SHA224,
+  GNUTLS_SIGN_DSA_SHA224,
+  GNUTLS_SIGN_ECDSA_SHA224,
+
   GNUTLS_SIGN_RSA_SHA1,
   GNUTLS_SIGN_DSA_SHA1,
+  GNUTLS_SIGN_ECDSA_SHA1,
   0
 };
 
 static const int sign_priority_secure128[] = {
   GNUTLS_SIGN_RSA_SHA256,
-  GNUTLS_SIGN_RSA_SHA384,
-  GNUTLS_SIGN_RSA_SHA512,
-  GNUTLS_SIGN_DSA_SHA1,
+  GNUTLS_SIGN_DSA_SHA256,
+  GNUTLS_SIGN_ECDSA_SHA256,
   0
 };
 
 static const int sign_priority_secure256[] = {
   GNUTLS_SIGN_RSA_SHA512,
+  GNUTLS_SIGN_ECDSA_SHA512,
   0
 };
 
