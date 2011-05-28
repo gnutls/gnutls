@@ -5,11 +5,17 @@ See the end for copying conditions.
 
 * Version 2.12.5 (unreleased)
 
+** libgnutls: Correctly set compression method when resuming sessions.
+Reported by Dash Shendy.
+
 ** libgnutls: gnutls_pubkey_get_pk_dsa_raw() and gnutls_pubkey_get_pk_rsa_raw
 add leading zeros to the exported values.
 
+** libgnutls: Added gnutls_global_set_time_function() to allow overriding the
+default system time() function.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_global_set_time_function: ADDED
 
 
 * Version 2.12.5 (released 2011-05-14)
