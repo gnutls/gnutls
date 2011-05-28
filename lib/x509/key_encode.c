@@ -690,7 +690,7 @@ _gnutls_asn1_encode_dsa (ASN1_TYPE * c2, gnutls_pk_params_st * params)
   /* Encoding phase.
    * allocate data enough to hold everything
    */
-  all_data = gnutls_secure_malloc (total);
+  all_data = gnutls_malloc (total);
   if (all_data == NULL)
     {
       gnutls_assert ();

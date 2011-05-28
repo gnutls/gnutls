@@ -262,7 +262,7 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
     }
 
   session->key->key.size = GNUTLS_MASTER_SIZE;
-  session->key->key.data = gnutls_secure_malloc (session->key->key.size);
+  session->key->key.data = gnutls_malloc (session->key->key.size);
 
   if (session->key->key.data == NULL)
     {

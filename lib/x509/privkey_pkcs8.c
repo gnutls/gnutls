@@ -1961,7 +1961,7 @@ generate_key (schema_id schema,
     gnutls_cipher_get_key_size (enc_params->cipher);
 
   enc_params->iv_size = _gnutls_cipher_get_iv_size (enc_params->cipher);
-  key->data = gnutls_secure_malloc (key->size);
+  key->data = gnutls_malloc (key->size);
   if (key->data == NULL)
     {
       gnutls_assert ();
