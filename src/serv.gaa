@@ -73,6 +73,12 @@ option (x509dsakeyfile) STR "FILE" { $x509_dsakeyfile = $1 } "Alternative X.509 
 #char *x509_dsacertfile;
 option (x509dsacertfile) STR "FILE" { $x509_dsacertfile = $1 } "Alternative X.509 certificate file to use."
 
+#char *x509_ecckeyfile;
+option (x509ecckeyfile) STR "FILE" { $x509_ecckeyfile = $1 } "Alternative X.509 key file to use."
+
+#char *x509_ecccertfile;
+option (x509ecccertfile) STR "FILE" { $x509_ecccertfile = $1 } "Alternative X.509 certificate file to use."
+
 #int require_cert;
 option (r, require-cert) { $require_cert = 1 } "Require a valid certificate."
 
@@ -105,6 +111,7 @@ init { $generate=0; $port=5556; $http=0; $nodb = 0; $noticket = 0;
 	$x509_cafile = NULL; $pgp_keyfile=NULL; $pgp_certfile=NULL;
 	$x509_keyfile=NULL; $x509_certfile=NULL; $x509_crlfile = NULL;
 	$x509_dsakeyfile=NULL; $x509_dsacertfile=NULL; 
+	$x509_ecckeyfile=NULL; $x509_ecccertfile=NULL; 
 	$srp_passwd=NULL; $srp_passwd_conf=NULL; $quiet = 0;
 	$pgp_keyring=NULL; $fmtder = 0;
 	$disable_client_cert = 0; $priorities = NULL;

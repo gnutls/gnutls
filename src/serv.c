@@ -76,6 +76,8 @@ char *x509_keyfile;
 char *x509_certfile;
 char *x509_dsakeyfile;
 char *x509_dsacertfile;
+char *x509_ecckeyfile;
+char *x509_ecccertfile;
 char *x509_cafile;
 char *dh_params_file;
 char *x509_crlfile = NULL;
@@ -1047,6 +1049,16 @@ main (int argc, char **argv)
         exit (1);
       }
 
+  if (x509_ecccertfile != NULL)
+    if ((ret = gnutls_certificate_set_x509_key_file
+         (cert_cred, x509_ecccertfile, x509_ecckeyfile, x509ctype)) < 0)
+      {
+        fprintf (stderr, "Error reading '%s' or '%s'\n",
+                 x509_ecccertfile, x509_ecckeyfile);
+        GERR (ret);
+        exit (1);
+      }
+
   gnutls_certificate_set_params_function (cert_cred, get_params);
 /*     gnutls_certificate_set_dh_params(cert_cred, dh_params);
  *     gnutls_certificate_set_rsa_export_params(cert_cred, rsa_params);
@@ -1549,6 +1561,8 @@ gaa_parser (int argc, char **argv)
   x509_keyfile = info.x509_keyfile;
   x509_dsacertfile = info.x509_dsacertfile;
   x509_dsakeyfile = info.x509_dsakeyfile;
+  x509_ecccertfile = info.x509_ecccertfile;
+  x509_ecckeyfile = info.x509_ecckeyfile;
   x509_cafile = info.x509_cafile;
   x509_crlfile = info.x509_crlfile;
   pgp_certfile = info.pgp_certfile;

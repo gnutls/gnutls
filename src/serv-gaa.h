@@ -8,20 +8,24 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 94 "serv.gaa"
+#line 100 "serv.gaa"
 	char *priorities;
-#line 91 "serv.gaa"
+#line 97 "serv.gaa"
 	char *srp_passwd_conf;
-#line 88 "serv.gaa"
+#line 94 "serv.gaa"
 	char *srp_passwd;
-#line 85 "serv.gaa"
+#line 91 "serv.gaa"
 	char *psk_hint;
-#line 82 "serv.gaa"
+#line 88 "serv.gaa"
 	char *psk_passwd;
-#line 79 "serv.gaa"
+#line 85 "serv.gaa"
 	int disable_client_cert;
-#line 76 "serv.gaa"
+#line 82 "serv.gaa"
 	int require_cert;
+#line 79 "serv.gaa"
+	char *x509_ecccertfile;
+#line 76 "serv.gaa"
+	char *x509_ecckeyfile;
 #line 73 "serv.gaa"
 	char *x509_dsacertfile;
 #line 70 "serv.gaa"
