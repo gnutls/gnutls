@@ -34,12 +34,3 @@ EXTRA_DIST += psk-passwd.txt
 EXTRA_DIST += openpgp-server.bin openpgp-server-key.bin	\
 	openpgp-server-key.txt openpgp-server.txt
 
-EXTRA_DIST += x509-client.p12
-
-EXTRA_DIST += x509-ca.pem x509-client.pem x509-proxy-key.pem	\
-	x509-server-dsa.pem x509-server-key.pem x509-trust.pem	\
-	x509-ca-key.pem x509-client-key.pem x509-other-ca.pem	\
-	x509-proxy.pem x509-server-key-dsa.pem x509-server.pem
-
-EXTRA_DIST += x509-ca.crt x509-client.crt x509-proxy.crt	\
-	x509-server.crt x509-server-dsa.crt
