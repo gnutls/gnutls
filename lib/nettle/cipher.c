@@ -144,9 +144,9 @@ struct nettle_cipher_ctx
   tag_func tag;
 };
 
+#ifdef NETTLE_GCM
 #define GCM_DEFAULT_NONCE_SIZE 12
 
-#ifdef NETTLE_GCM
 static void _gcm_encrypt(void *_ctx, nettle_crypt_func f,  
             unsigned block_size, uint8_t *iv,
             unsigned length, uint8_t *dst,
