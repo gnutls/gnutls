@@ -459,6 +459,7 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
 	memcpy( dst->session_id, src->session_id, TLS_MAX_SESSION_ID_SIZE); \
 	dst->session_id_size = src->session_id_size; \
 	dst->cert_type = src->cert_type; \
+	dst->compression_method = src->compression_method; \
 	dst->timestamp = src->timestamp; \
 	dst->max_record_recv_size = src->max_record_recv_size; \
 	dst->max_record_send_size = src->max_record_send_size; \

@@ -134,13 +134,14 @@ resume_copy_required_values (gnutls_session_t session)
   memcpy (session->security_parameters.current_cipher_suite.suite,
           session->internals.resumed_security_parameters.current_cipher_suite.
           suite, 2);
+  session->security_parameters.compression_method = session->internals.resumed_security_parameters.compression_method;
 
   _gnutls_epoch_set_cipher_suite (session, EPOCH_NEXT,
                                   &session->
                                   internals.resumed_security_parameters.current_cipher_suite);
   _gnutls_epoch_set_compression (session, EPOCH_NEXT,
                                  session->
-                                 internals.resumed_compression_method);
+                                 internals.resumed_security_parameters.compression_method);
 
   /* or write_compression_algorithm
    * they are the same
@@ -1072,6 +1073,7 @@ _gnutls_server_select_comp_method (gnutls_session_t session,
               gnutls_free (comps);
 
               _gnutls_epoch_set_compression (session, EPOCH_NEXT, method);
+              session->security_parameters.compression_method = method;
 
               _gnutls_handshake_log
                 ("HSK[%p]: Selected Compression Method: %s\n", session,
@@ -1537,7 +1539,11 @@ _gnutls_client_set_comp_method (gnutls_session_t session, opaque comp_method)
 {
   int comp_methods_num;
   uint8_t *compression_methods;
+  int id = _gnutls_compression_get_id(comp_method);
   int i;
+
+  _gnutls_handshake_log ("HSK[%p]: Selected compression method: %s (%d)\n", session,
+                         gnutls_compression_get_name(id), (int)comp_method);
 
   comp_methods_num = _gnutls_supported_compression_methods (session,
                                                             &compression_methods);
@@ -1564,7 +1570,8 @@ _gnutls_client_set_comp_method (gnutls_session_t session, opaque comp_method)
       return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
     }
 
-  _gnutls_epoch_set_compression (session, EPOCH_NEXT, _gnutls_compression_get_id(comp_method));
+  session->security_parameters.compression_method = id;
+  _gnutls_epoch_set_compression (session, EPOCH_NEXT, id);
 
   return 0;
 }
@@ -1604,7 +1611,7 @@ _gnutls_client_check_if_resuming (gnutls_session_t session,
          resumed_security_parameters.current_cipher_suite);
       _gnutls_epoch_set_compression (session, EPOCH_NEXT,
                                      session->
-                                     internals.resumed_compression_method);
+                                     internals.resumed_security_parameters.compression_method);
 
       session->internals.resumed = RESUME_TRUE; /* we are resuming */
 
@@ -2152,9 +2159,7 @@ _gnutls_send_server_hello (gnutls_session_t session, int again)
               session->security_parameters.current_cipher_suite.suite, 2);
       pos += 2;
 
-      comp =
-        (uint8_t) _gnutls_compression_get_num ( 
-         _gnutls_epoch_get_compression (session, session->security_parameters.epoch_next));
+      comp = _gnutls_compression_get_num ( session->security_parameters.compression_method);
       data[pos++] = comp;
 
       if (extdata.length > 0)

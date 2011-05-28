@@ -464,6 +464,7 @@ typedef struct
    * on resume;
    */
   cipher_suite_st current_cipher_suite;
+  gnutls_compression_method_t compression_method;
   opaque master_secret[GNUTLS_MASTER_SIZE];
   opaque client_random[GNUTLS_RANDOM_SIZE];
   opaque server_random[GNUTLS_RANDOM_SIZE];
@@ -682,7 +683,6 @@ typedef struct
   /* resumed session */
   int resumed:1;                /* RESUME_TRUE or FALSE - if we are resuming a session */
   security_parameters_st resumed_security_parameters;
-  gnutls_compression_method_t resumed_compression_method;
 
   /* These buffers are used in the handshake
    * protocol only. freed using _gnutls_handshake_io_buffer_clear();

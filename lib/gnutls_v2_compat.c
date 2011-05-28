@@ -251,6 +251,7 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
     }
 
   _gnutls_epoch_set_compression (session, EPOCH_NEXT, GNUTLS_COMP_NULL);
+  session->security_parameters.compression_method = GNUTLS_COMP_NULL;
 
   return 0;
 }
