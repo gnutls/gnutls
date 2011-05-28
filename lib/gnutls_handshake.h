@@ -45,10 +45,7 @@ int _gnutls_handshake_server (gnutls_session_t session);
 void _gnutls_set_server_random (gnutls_session_t session, uint8_t * rnd);
 void _gnutls_set_client_random (gnutls_session_t session, uint8_t * rnd);
 int _gnutls_tls_create_random (opaque * dst);
-int _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
-                                          cipher_suite_st ** cipherSuites,
-                                          int numCipherSuites,
-                                          gnutls_pk_algorithm_t);
+
 int _gnutls_find_pk_algos_in_ciphersuites (opaque * data, int datalen);
 int _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
                                  int datalen);

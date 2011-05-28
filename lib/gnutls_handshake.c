@@ -70,6 +70,13 @@ static int _gnutls_handshake_hash_init (gnutls_session_t session);
 static int _gnutls_server_select_comp_method (gnutls_session_t session,
                                               opaque * data, int datalen);
 static int
+_gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
+                                      cipher_suite_st ** cipherSuites,
+                                      int numCipherSuites,
+                                      gnutls_pk_algorithm_t *pk_algos,
+                                      size_t pk_algos_size);
+
+static int
 _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
                                   gnutls_handshake_description_t recv_type,
                                   opaque * header, uint16_t header_size,
@@ -853,13 +860,14 @@ cleanup:
  */
 static int
 server_find_pk_algos_in_ciphersuites (const opaque *
-                                              data, unsigned int datalen)
+                                              data, unsigned int datalen,
+                                              gnutls_pk_algorithm_t * algos,
+                                              size_t* algos_size)
 {
   unsigned int j;
-  gnutls_pk_algorithm_t algo = GNUTLS_PK_NONE, prev_algo = 0;
   gnutls_kx_algorithm_t kx;
   cipher_suite_st cs;
-  int found = 0;
+  int max = *algos_size;
 
   if (datalen % 2 != 0)
     {
@@ -867,24 +875,21 @@ server_find_pk_algos_in_ciphersuites (const opaque *
       return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
     }
 
+  *algos_size = 0;
   for (j = 0; j < datalen; j += 2)
     {
       memcpy (&cs.suite, &data[j], 2);
       kx = _gnutls_cipher_suite_get_kx_algo (&cs);
       if (_gnutls_map_kx_get_cred (kx, 1) == GNUTLS_CRD_CERTIFICATE)
         {
-          algo = _gnutls_map_pk_get_pk (kx);
-
-          if (algo != prev_algo && prev_algo != 0)
-            found++;
-          prev_algo = algo;
+          algos[(*algos_size)++] = _gnutls_map_pk_get_pk (kx);
+          
+          if ((*algos_size) >= max)
+            return 0;
         }
     }
 
-  if (found == GNUTLS_DISTINCT_PK_ALGORITHMS)
-    algo = GNUTLS_PK_ANY;
-
-  return algo;
+  return 0;
 }
 
 /* This selects the best supported ciphersuite from the given ones. Then
@@ -894,10 +899,11 @@ int
 _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
                              int datalen)
 {
-  int x, i, j;
+  int x, i, j, ret;
+  size_t pk_algos_size;
   cipher_suite_st *ciphers, cs;
   int retval, err;
-  gnutls_pk_algorithm_t pk_algo;        /* will hold the pk algorithms
+  gnutls_pk_algorithm_t pk_algos[MAX_ALGOS];        /* will hold the pk algorithms
                                          * supported by the peer.
                                          */
 
@@ -926,29 +932,33 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
         }
     }
 
-  pk_algo = server_find_pk_algos_in_ciphersuites (data, datalen);
+  pk_algos_size = MAX_ALGOS;
+  ret = server_find_pk_algos_in_ciphersuites (data, datalen, pk_algos, &pk_algos_size);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
-  x = _gnutls_supported_ciphersuites (session, &ciphers);
-  if (x < 0)
-    {                           /* the case x==0 is handled within the function. */
-      gnutls_assert ();
-      return x;
-    }
+  ret = _gnutls_supported_ciphersuites (session, &ciphers);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+    
+  x = ret;
 
   /* Here we remove any ciphersuite that does not conform
    * the certificate requested, or to the
    * authentication requested (e.g. SRP).
    */
-  x = _gnutls_remove_unwanted_ciphersuites (session, &ciphers, x, pk_algo);
-  if (x <= 0)
+  ret = _gnutls_remove_unwanted_ciphersuites (session, &ciphers, x, pk_algos, pk_algos_size);
+  if (ret <= 0)
     {
       gnutls_assert ();
       gnutls_free (ciphers);
-      if (x < 0)
-        return x;
+      if (ret < 0)
+        return ret;
       else
         return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
     }
+    
+  x = ret;
 
   /* Data length should be zero mod 2 since
    * every ciphersuite is 2 bytes. (this check is needed
@@ -1752,7 +1762,7 @@ _gnutls_copy_ciphersuites (gnutls_session_t session,
    * authentication requested (eg SRP).
    */
   ret =
-    _gnutls_remove_unwanted_ciphersuites (session, &cipher_suites, ret, -1);
+    _gnutls_remove_unwanted_ciphersuites (session, &cipher_suites, ret, NULL, 0);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -3262,11 +3272,12 @@ check_server_params (gnutls_session_t session,
  * This does a more high level check than  gnutls_supported_ciphersuites(),
  * by checking certificates etc.
  */
-int
+static int
 _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
                                       cipher_suite_st ** cipherSuites,
                                       int numCipherSuites,
-                                      gnutls_pk_algorithm_t requested_pk_algo)
+                                      gnutls_pk_algorithm_t *pk_algos,
+                                      size_t pk_algos_size)
 {
 
   int ret = 0;
@@ -3293,15 +3304,14 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
    * or disable them;
    */
   if (session->security_parameters.entity == GNUTLS_SERVER
-      && cert_cred != NULL)
+      && cert_cred != NULL && pk_algos_size > 0)
     {
-      ret = _gnutls_server_select_cert (session, requested_pk_algo);
+      ret = _gnutls_server_select_cert (session, pk_algos, pk_algos_size);
       if (ret < 0)
         {
           gnutls_assert ();
           _gnutls_debug_log ("Could not find an appropriate certificate: %s\n",
-                            gnutls_strerror (ret));
-          cert_cred = NULL;
+                             gnutls_strerror (ret));
         }
     }
 

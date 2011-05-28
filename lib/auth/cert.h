@@ -142,7 +142,7 @@ int _gnutls_get_selected_cert (gnutls_session_t session,
                                gnutls_privkey_t * apr_pkey);
 
 int _gnutls_server_select_cert (struct gnutls_session_int *,
-                                gnutls_pk_algorithm_t);
+                                gnutls_pk_algorithm_t*, size_t);
 void _gnutls_selected_certs_deinit (gnutls_session_t session);
 void _gnutls_selected_certs_set (gnutls_session_t session,
                                  gnutls_pcert_st * certs, int ncerts,
