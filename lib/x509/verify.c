@@ -846,10 +846,9 @@ verify_sig (const gnutls_datum_t * text,
       if (!hash->data || hash->size != _gnutls_hash_get_algo_len(algo))
         {
           gnutls_assert();
-          _gnutls_debug_log("Hash size (%d) does not correspond to hash %s. Assuming SHA-1.\n", (int)hash->size, gnutls_mac_get_name(algo));
-          algo = GNUTLS_DIG_SHA1;
+          _gnutls_debug_log("Hash size (%d) does not correspond to hash %s.\n", (int)hash->size, gnutls_mac_get_name(algo));
           
-          if (hash->size != 20)
+          if (hash->size < 20)
             return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
         }
 

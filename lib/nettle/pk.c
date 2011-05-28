@@ -551,12 +551,11 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
           {
             gnutls_assert ();
             
-            if (vdata->size != 20)
+            if (vdata->size < 20)
               {
                 ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
                 goto ecdsa_fail;
               }
-            else hash = GNUTLS_DIG_SHA1;
           }
 
         ret = ecc_verify_hash(&sig, vdata->data, vdata->size, &stat, &pub);
@@ -594,12 +593,11 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
           {
             gnutls_assert ();
             
-            if (vdata->size != 20)
+            if (vdata->size < 20)
               {
                 ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
                 goto dsa_fail;
               }
-            else hash = GNUTLS_DIG_SHA1;
           }
 
         ret = _dsa_verify (&pub, vdata->size, vdata->data, &sig);
