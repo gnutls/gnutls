@@ -32,7 +32,7 @@
 #include <gnutls_errors.h>
 
 static int
-digest_length (gnutls_digest_algorithm_t algo)
+digest_length (int algo)
 {
   switch (algo)
     {
