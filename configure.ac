@@ -81,6 +81,7 @@ case $host_cpu in
   i?86 | x86_64 | amd64)
 dnl    GCC_FLAG_ADD([-maes -mpclmul],[X86])
 dnl    if test "x$X86" = "xyes";then
+      AC_CHECK_HEADERS(cpuid.h)
       if test "$host_cpu" = "x86_64" -o "$host_cpu" = "amd64";then
         hw_accel="x86-64"
       else
