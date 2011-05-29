@@ -1,19 +1,29 @@
-/* LibTomCrypt, modular cryptographic library -- Tom St Denis
+/*
+ * Copyright (C) 2011 Free Software Foundation, Inc.
  *
- * LibTomCrypt is a library that provides various cryptographic
- * algorithms in a highly modular and flexible manner.
+ * This file is part of GNUTLS.
  *
- * The library is free for all purposes without any express
- * guarantee it works.
+ * The GNUTLS library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+ * USA
+ *
  */
 
-/* Implements ECC over Z/pZ for curve y^2 = x^3 + ax + b
- *
- * All curves taken from NIST recommendation paper of July 1999
- * Available at http://csrc.nist.gov/cryptval/dss.htm
+/* Based on public domain code of LibTomCrypt by Tom St Denis.
+ * Adapted to gmp and nettle by Nikos Mavrogiannopoulos.
  */
+
 #include "ecc.h"
 
 /**
