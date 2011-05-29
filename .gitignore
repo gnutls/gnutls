@@ -455,3 +455,8 @@ tests/suite/x509paths/X509tests
 tests/x509cert
 src/benchmark-cipher
 src/benchmark-tls
+doc/gnutls-guile.html
+doc/version-guile.texi
+build-aux/compile
+doc/stamp-1
+lib/algorithms/libgnutls_alg.la
