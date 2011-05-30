@@ -169,7 +169,7 @@ load_keys (void)
 {
   unsigned int crt_num;
   int ret, i;
-  gnutls_datum_t data;
+  gnutls_datum_t data = { NULL, 0 };
   gnutls_x509_crt_t crt_list[MAX_CRT];
   gnutls_pkcs11_privkey_t pkcs11_key;
   gnutls_x509_privkey_t tmp_key;
