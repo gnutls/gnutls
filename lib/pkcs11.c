@@ -2057,8 +2057,8 @@ pkcs11_login (pakchois_session_t * pks, const struct token_info *info, int so)
    * required. */
   if (info->tinfo.flags & CKF_PROTECTED_AUTHENTICATION_PATH)
     {
-      if (pakchois_login (pks, (so == 0) ? CKU_USER : CKU_SO, NULL, 0) ==
-          CKR_OK)
+      rv = pakchois_login (pks, (so == 0) ? CKU_USER : CKU_SO, NULL, 0);
+      if (rv == CKR_OK || rv == CKR_USER_ALREADY_LOGGED_IN)
         {
           return 0;
         }
