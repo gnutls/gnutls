@@ -170,7 +170,7 @@ load_keys (void)
 {
   unsigned int crt_num;
   int ret;
-  gnutls_datum_t data;
+  gnutls_datum_t data = { NULL, 0 };
 
   if (x509_certfile != NULL && x509_keyfile != NULL)
     {
