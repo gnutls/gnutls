@@ -355,7 +355,7 @@ To initiate the handshake.
 * Client Authentication::       Requesting a certificate from the client.
 * Resuming Sessions::           Reusing previously established keys.
 * Resuming Internals::          More information on reusing previously established keys.
-* Compatibility Issues::        Issues on compatibility with other implementations.
+* Interoperability Issues::     Interoperability issues with other implementations.
 @end menu
 
 @node TLS Cipher Suites
@@ -617,31 +617,32 @@ It might also be useful to be able to check for expired sessions in
 order to remove them, and save space. The function
 @ref{gnutls_db_check_entry} is provided for that reason.
 
-@node Compatibility Issues
-@subsection Compatibility Issues
+@node Interoperability Issues
+@subsection Interoperability Issues
 
 The @acronym{TLS} handshake is a complex procedure that negotiates all
 required parameters for a secure session. @acronym{GnuTLS} supports
-several @acronym{TLS} extensions, as well as the latest known published
-version being @acronym{TLS} 1.2. However few implementations are not able to
+several @acronym{TLS} extensions, as well as the latest @acronym{TLS} protocol 
+version 1.2. However few implementations are not able to
 properly interoperate once faced with extensions or version protocols
-they do not support and understand. The @acronym{TLS} protocol allows for 
-graceful downgrade to the commonly supported options, but practice shows that 
+they do not support and understand. The @acronym{TLS} protocol allows for a
+graceful downgrade to the commonly supported options, but practice shows 
 it is not always implemented correctly. 
 
-Because there is no way to handle maximum compatibility with broken peers
+Because there is no way to achieve maximum interoperability with broken peers
 without sacrificing security, @acronym{GnuTLS} ignores such peers by default. 
-This might not be acceptable in several cases, where maximum compatibility
-is required, thus we allow enabling compatibility with broken peers using
-priority strings (see @ref{Priority Strings}). An example priority string that will
-disable all supported  @acronym{TLS} protocol versions except for
-the widely supported @acronym{SSL} 3.0 and @acronym{TLS} 1.0
+This might not be acceptable in cases where maximum compatibility
+is required. Thus we allow enabling compatibility with broken peers using
+priority strings (see @ref{Priority Strings}). An example priority string that
+is known to provide wide compatibility even with broken peers
 is shown below:
 @example
 NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:%COMPAT
 @end example
-This priority string provides the wider possible compatibility with broken peers. 
-We suggest however only to use that compatibility mode if such issues occur.
+This priority string will only enable SSL 3.0 and TLS 1.0 as protocols and
+will disable, via the @code{%COMPAT} keyword, several @acronym{TLS} protocol
+options that are known to cause compatibility problems.
+We suggest however only to use this mode if compatibility issues occur.
 
 @node TLS Extensions
 @section TLS Extensions
