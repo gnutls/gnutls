@@ -394,7 +394,7 @@ To initiate the handshake.
 * Client Authentication::       Requesting a certificate from the client.
 * Resuming Sessions::           Reusing previously established keys.
 * Resuming Internals::          More information on reusing previously established keys.
-* Interoperability Issues::     Interoperability issues with other implementations.
+* Interoperability::            About interoperability with other implementations.
 @end menu
 
 @node TLS Cipher Suites
@@ -661,8 +661,8 @@ It might also be useful to be able to check for expired sessions in
 order to remove them, and save space. The function
 @ref{gnutls_db_check_entry} is provided for that reason.
 
-@node Interoperability Issues
-@subsection Interoperability Issues
+@node Interoperability
+@subsection Interoperability
 
 The @acronym{TLS} handshake is a complex procedure that negotiates all
 required parameters for a secure session. @acronym{GnuTLS} supports
