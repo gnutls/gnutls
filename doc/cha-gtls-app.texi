@@ -9,9 +9,10 @@
 * Client examples::
 * Server examples::
 * Miscellaneous examples::
-* Compatibility with the OpenSSL library::
+* Parameter generation::
 * Keying Material Exporters::
 * Channel Bindings::
+* Compatibility with the OpenSSL library::
 @end menu
 
 @node Preparation
@@ -394,28 +395,49 @@ structure.
 
 @verbatiminclude examples/ex-pkcs12.c
 
-@node Compatibility with the OpenSSL library
-@section Compatibility with the OpenSSL Library
-@cindex OpenSSL
+@node Parameter generation
+@section Parameter generation
+@cindex parameter generation
+@cindex generating parameters
 
-To ease @acronym{GnuTLS}' integration with existing applications, a
-compatibility layer with the widely used OpenSSL library is included
-in the @code{gnutls-openssl} library. This compatibility layer is not
-complete and it is not intended to completely reimplement the OpenSSL
-API with @acronym{GnuTLS}.  It only provides source-level
-compatibility. There is currently no attempt to make it
-binary-compatible with OpenSSL.
+Several TLS ciphersuites require additional parameters that
+need to be generated or provided by the application. The
+Diffie-Hellman based ciphersuites (ANON-DH or DHE), require
+the group information to be provided. This information can be either
+be generated on the fly using @ref{gnutls_dh_params_generate2}
+or imported from some pregenerated value using @ref{gnutls_dh_params_import_pkcs3}.
+The parameters can be used in a session by calling
+@ref{gnutls_certificate_set_dh_params} or
+@ref{gnutls_anon_set_server_dh_params} for anonymous sessions.
 
-The prototypes for the compatibility functions are in the
-@file{gnutls/openssl.h} header file.
+Due to the time-consuming calculations required for the generation
+of Diffie-Hellman parameters we suggest against performing generation
+of them within an application. The @code{certtool} tool can be used to 
+generate or export known safe values that can be stored in code
+or in a configuration file to provide the ability to replace. We also
+recommend the usage of @ref{gnutls_sec_param_to_pk_bits} to determine
+the bit size of the parameters to be generated.
 
-Current limitations imposed by the compatibility layer include:
+The ciphersuites that involve the RSA-EXPORT key exchange require
+additional parameters. Those ciphersuites are rarely used today
+because they are by design insecure, thus if you have no requirement
+for them, this section should be skipped. The RSA-EXPORT key exchange
+requires 512-bit RSA keys to be generated. It is recommended those
+parameters to be refreshed (regenerated) in short intervals. The
+following functions can be used for these parameters.
 
 @itemize
 
-@item Error handling is not thread safe.
+@item @ref{gnutls_rsa_params_generate2}
+
+@item @ref{gnutls_certificate_set_rsa_export_params}
+
+@item @ref{gnutls_rsa_params_import_pkcs1}
+
+@item @ref{gnutls_rsa_params_export_pkcs1}
 
 @end itemize
+
 
 @node Keying Material Exporters
 @section Keying Material Exporters
@@ -484,3 +506,27 @@ Note that it must be run after a successful TLS handshake.
     @}
 @}
 @end smallexample
+
+@node Compatibility with the OpenSSL library
+@section Compatibility with the OpenSSL Library
+@cindex OpenSSL
+
+To ease @acronym{GnuTLS}' integration with existing applications, a
+compatibility layer with the widely used OpenSSL library is included
+in the @code{gnutls-openssl} library. This compatibility layer is not
+complete and it is not intended to completely reimplement the OpenSSL
+API with @acronym{GnuTLS}.  It only provides source-level
+compatibility. There is currently no attempt to make it
+binary-compatible with OpenSSL.
+
+The prototypes for the compatibility functions are in the
+@file{gnutls/openssl.h} header file.
+
+Current limitations imposed by the compatibility layer include:
+
+@itemize
+
+@item Error handling is not thread safe.
+
+@end itemize
+
