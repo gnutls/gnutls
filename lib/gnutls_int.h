@@ -54,7 +54,7 @@ typedef int ssize_t;
 # include <nettle/memxor.h>
 #else
 # include <gl/memxor.h>
-# define gl_memxor memxor
+# define memxor gl_memxor
 #endif
 
 /* some systems had problems with long long int, thus,
