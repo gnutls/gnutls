@@ -62,7 +62,7 @@ value2human (unsigned long bytes, double time, double *data, double *speed,
 
 void start_benchmark(struct benchmark_st * st)
 {
-  memset(st, 0, sizeof(st));
+  memset(st, 0, sizeof(*st));
   st->old_handler = signal (SIGALRM, alarm_handler);
   gettime (&st->start);
   benchmark_must_finish = 0;
