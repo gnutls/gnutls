@@ -104,8 +104,7 @@ aes_decrypt (void *_ctx, const void *src, size_t src_size,
 {
   struct aes_ctx *ctx = _ctx;
 
-  aesni_cbc_encrypt (src, dst, src_size,
-                     &ctx->expanded_key_dec, ctx->iv, 0);
+  aesni_cbc_encrypt (src, dst, src_size, &ctx->expanded_key_dec, ctx->iv, 0);
 
   return 0;
 }
@@ -149,12 +148,11 @@ check_intel_or_amd (void)
   unsigned int a, b, c, d;
   cpuid (0, a, b, c, d);
 
-  if ((memcmp(&b, "Genu", 4) == 0 &&
-		memcmp(&d, "ineI", 4) == 0 &&
-		memcmp(&c, "ntel", 4) == 0) ||
-     (memcmp(&b, "Auth", 4) == 0 &&
-		memcmp(&d, "enti", 4) == 0 &&
-		memcmp(&c, "cAMD", 4) == 0))
+  if ((memcmp (&b, "Genu", 4) == 0 &&
+       memcmp (&d, "ineI", 4) == 0 &&
+       memcmp (&c, "ntel", 4) == 0) ||
+      (memcmp (&b, "Auth", 4) == 0 &&
+       memcmp (&d, "enti", 4) == 0 && memcmp (&c, "cAMD", 4) == 0))
     {
       return 1;
     }
@@ -167,7 +165,7 @@ register_x86_crypto (void)
 {
   int ret;
 
-  if (check_intel_or_amd() == 0)
+  if (check_intel_or_amd () == 0)
     return;
 
   if (check_optimized_aes ())
@@ -197,12 +195,12 @@ register_x86_crypto (void)
           gnutls_assert ();
         }
 
-      if (check_pclmul())
+      if (check_pclmul ())
         {
           /* register GCM ciphers */
           ret =
-            gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_128_GCM, 80,
-                                                  &aes_gcm_struct);
+            gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_128_GCM,
+                                                  80, &aes_gcm_struct);
           if (ret < 0)
             {
               gnutls_assert ();
