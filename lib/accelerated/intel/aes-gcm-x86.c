@@ -142,7 +142,9 @@ static void gcm_ghash(struct aes_gcm_ctx* ctx, const uint8_t *src, size_t src_si
   size_t rest = src_size % GCM_BLOCK_SIZE;
   size_t aligned_size = src_size - rest;
 
-  gcm_ghash_clmul(ctx->gcm.Xi.u, ctx->gcm.Htable, src, aligned_size);
+  if (aligned_size > 0)
+    gcm_ghash_clmul(ctx->gcm.Xi.u, ctx->gcm.Htable, src, aligned_size);
+
   if (rest > 0)
     {
       memxor (ctx->gcm.Xi.c, src + aligned_size, rest);
@@ -150,15 +152,44 @@ static void gcm_ghash(struct aes_gcm_ctx* ctx, const uint8_t *src, size_t src_si
     }
 }
 
+static inline void ctr_encrypt_last(struct aes_gcm_ctx *ctx, const uint8_t* src, 
+                                    uint8_t * dst, size_t pos, size_t length)
+{
+      uint8_t tmp[GCM_BLOCK_SIZE];
+      uint8_t out[GCM_BLOCK_SIZE];
+
+      memcpy(tmp, &src[pos], length);
+      aesni_ctr32_encrypt_blocks(tmp, out,
+                        1, &ctx->expanded_key,
+                        ctx->gcm.Yi.c);
+
+      memcpy(&dst[pos], out, length);
+
+}
+
 static int
 aes_gcm_encrypt (void *_ctx, const void *src, size_t src_size,
                  void *dst, size_t length)
 {
   struct aes_gcm_ctx *ctx = _ctx;
+  int blocks = src_size / GCM_BLOCK_SIZE;
+  int exp_blocks = blocks*GCM_BLOCK_SIZE;
+  int rest = src_size - (exp_blocks);
+  uint32_t counter;
 
-  aesni_ctr32_encrypt_blocks(src, dst,
-                        src_size%GCM_BLOCK_SIZE, &ctx->expanded_key,
+  if (blocks > 0)
+    {
+      aesni_ctr32_encrypt_blocks(src, dst,
+                        blocks, &ctx->expanded_key,
                         ctx->gcm.Yi.c);
+
+      counter = _gnutls_read_uint32(ctx->gcm.Yi.c + 12);
+      counter += blocks;
+      _gnutls_write_uint32(counter, ctx->gcm.Yi.c + 12);
+    }
+
+  if (rest > 0) /* last incomplete block */
+    ctr_encrypt_last(ctx, src, dst, exp_blocks, rest);
 
   gcm_ghash(ctx, dst, src_size);
   ctx->gcm.len.u[1] += src_size;
@@ -171,13 +202,27 @@ aes_gcm_decrypt (void *_ctx, const void *src, size_t src_size,
                  void *dst, size_t dst_size)
 {
   struct aes_gcm_ctx *ctx = _ctx;
+  int blocks = src_size / GCM_BLOCK_SIZE;
+  int exp_blocks = blocks*GCM_BLOCK_SIZE;
+  int rest = src_size - (exp_blocks);
+  uint32_t counter;
 
   gcm_ghash(ctx, src, src_size);
   ctx->gcm.len.u[1] += src_size;
 
-  aesni_ctr32_encrypt_blocks(src, dst,
-                        src_size%GCM_BLOCK_SIZE, &ctx->expanded_key,
+  if (blocks > 0)
+    {
+      aesni_ctr32_encrypt_blocks(src, dst,
+                        blocks, &ctx->expanded_key,
                         ctx->gcm.Yi.c);
+
+      counter = _gnutls_read_uint32(ctx->gcm.Yi.c + 12);
+      counter += blocks;
+      _gnutls_write_uint32(counter, ctx->gcm.Yi.c + 12);
+    }
+
+  if (rest > 0) /* last incomplete block */
+    ctr_encrypt_last(ctx, src, dst, exp_blocks, rest);
 
   return 0;
 }
@@ -186,7 +231,7 @@ static int
 aes_gcm_auth (void *_ctx, const void *src, size_t src_size)
 {
   struct aes_gcm_ctx *ctx = _ctx;
-  
+
   gcm_ghash(ctx, src, src_size);
   ctx->gcm.len.u[0] += src_size;
 
