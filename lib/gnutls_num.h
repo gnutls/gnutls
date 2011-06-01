@@ -38,6 +38,7 @@ uint16_t _gnutls_read_uint16 (const opaque * data);
 uint32_t _gnutls_conv_uint32 (uint32_t data);
 uint16_t _gnutls_conv_uint16 (uint16_t data);
 uint32_t _gnutls_read_uint24 (const opaque * data);
+void _gnutls_write_uint64 (uint64_t num, opaque * data);
 void _gnutls_write_uint24 (uint32_t num, opaque * data);
 void _gnutls_write_uint32 (uint32_t num, opaque * data);
 void _gnutls_write_uint16 (uint16_t num, opaque * data);

@@ -133,6 +133,15 @@ _gnutls_read_uint24 (const opaque * data)
 }
 
 void
+_gnutls_write_uint64 (uint64_t num, opaque * data)
+{
+#ifndef WORDS_BIGENDIAN
+  num = bswap_64 (num);
+#endif
+  memcpy(data, &num, 8);
+}
+
+void
 _gnutls_write_uint24 (uint32_t num, opaque * data)
 {
   uint24 tmp;

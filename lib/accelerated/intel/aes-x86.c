@@ -32,27 +32,6 @@
 #include <aes-x86.h>
 #include <x86.h>
 
-#ifdef __GNUC__
-# define ALIGN16 __attribute__ ((aligned (16)))
-#else
-# define ALIGN16
-#endif
-
-#define AES_MAXNR 14
-typedef struct
-{
-  uint32_t ALIGN16 rd_key[4 * (AES_MAXNR + 1)];
-  int rounds;
-} AES_KEY;
-
-void aesni_cbc_encrypt (const unsigned char *in, unsigned char *out,
-                        size_t len, const AES_KEY * key,
-                        unsigned char *ivec, const int enc);
-int aesni_set_decrypt_key (const unsigned char *userKey, const int bits,
-                           AES_KEY * key);
-int aesni_set_encrypt_key (const unsigned char *userKey, const int bits,
-                           AES_KEY * key);
-
 struct aes_ctx
 {
   AES_KEY expanded_key;
@@ -110,22 +89,22 @@ aes_setiv (void *_ctx, const void *iv, size_t iv_size)
 }
 
 static int
-aes_encrypt (void *_ctx, const void *plain, size_t plainsize,
-             void *encr, size_t length)
+aes_encrypt (void *_ctx, const void *src, size_t src_size,
+             void *dst, size_t dst_size)
 {
   struct aes_ctx *ctx = _ctx;
 
-  aesni_cbc_encrypt (plain, encr, plainsize, &ctx->expanded_key, ctx->iv, 1);
+  aesni_cbc_encrypt (src, dst, src_size, &ctx->expanded_key, ctx->iv, 1);
   return 0;
 }
 
 static int
-aes_decrypt (void *_ctx, const void *encr, size_t encrsize,
-             void *plain, size_t length)
+aes_decrypt (void *_ctx, const void *src, size_t src_size,
+             void *dst, size_t dst_size)
 {
   struct aes_ctx *ctx = _ctx;
 
-  aesni_cbc_encrypt (encr, plain, encrsize,
+  aesni_cbc_encrypt (src, dst, src_size,
                      &ctx->expanded_key_dec, ctx->iv, 0);
 
   return 0;
@@ -153,6 +132,15 @@ check_optimized_aes (void)
   cpuid (1, a, b, c, d);
 
   return (c & 0x2000000);
+}
+
+static unsigned
+check_pclmul (void)
+{
+  unsigned int a, b, c, d;
+  cpuid (1, a, b, c, d);
+
+  return (c & 0x2);
 }
 
 static unsigned
@@ -207,6 +195,18 @@ register_x86_crypto (void)
       if (ret < 0)
         {
           gnutls_assert ();
+        }
+
+      if (check_pclmul())
+        {
+          /* register GCM ciphers */
+          ret =
+            gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_128_GCM, 80,
+                                                  &aes_gcm_struct);
+          if (ret < 0)
+            {
+              gnutls_assert ();
+            }
         }
     }
 

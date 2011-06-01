@@ -1,0 +1,228 @@
+/*
+ * Copyright (C) 2011, Free Software Foundation
+ *
+ * Author: Nikos Mavrogiannopoulos
+ *
+ * This file is part of GnuTLS.
+ *
+ * The GnuTLS is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+ * USA
+ *
+ * The following code is an implementation of the AES-128-CBC cipher
+ * using intel's AES instruction set. It is based on Intel reference
+ * code.
+ */
+
+#include <gnutls_errors.h>
+#include <gnutls_int.h>
+#include <gnutls/crypto.h>
+#include <gnutls_errors.h>
+#include <aes-x86.h>
+#include <x86.h>
+#include <byteswap.h>
+#include <nettle/memxor.h>
+
+#define GCM_BLOCK_SIZE 16
+
+/* GCM mode */
+
+typedef struct
+{
+  uint64_t hi, lo;
+} u128;
+
+/* This is the gcm128 structure used in openssl. It
+ * is compatible with the included assembly code.
+ */
+struct gcm128_context
+{
+  union
+  {
+    uint64_t u[2];
+    uint32_t d[4];
+    uint8_t c[16];
+  } Yi, EKi, EK0, len, Xi, H;
+  u128 Htable[16];
+};
+
+struct aes_gcm_ctx
+{
+  AES_KEY expanded_key;
+  struct gcm128_context gcm;
+};
+
+void gcm_init_clmul(u128 Htable[16],const u64 Xi[2]);
+void gcm_ghash_clmul(uint64_t Xi[2],const u128 Htable[16],const uint8_t *inp, size_t len);
+void gcm_gmult_clmul(u64 Xi[2],const u128 Htable[16]);
+
+static void
+aes_gcm_deinit (void *_ctx)
+{
+  gnutls_free (_ctx);
+}
+
+static int
+aes_gcm_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx)
+{
+  struct aes_gcm_ctx *ctx;
+
+  /* we use key size to distinguish */
+  if (algorithm != GNUTLS_CIPHER_AES_128_GCM)
+    return GNUTLS_E_INVALID_REQUEST;
+
+  *_ctx = gnutls_calloc (1, sizeof (struct aes_gcm_ctx));
+  if (*_ctx == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  ctx = *_ctx;
+
+  return 0;
+}
+
+static int
+aes_gcm_cipher_setkey (void *_ctx, const void *userkey, size_t keysize)
+{
+  struct aes_gcm_ctx *ctx = _ctx;
+  int ret;
+
+  ret = aesni_set_encrypt_key (userkey, keysize * 8, &ctx->expanded_key);
+  if (ret != 0)
+    return gnutls_assert_val (GNUTLS_E_ENCRYPTION_FAILED);
+
+  aesni_ecb_encrypt (ctx->gcm.H.c, ctx->gcm.H.c,
+                        GCM_BLOCK_SIZE, &ctx->expanded_key, 1);
+
+  ctx->gcm.H.u[0] = bswap_64(ctx->gcm.H.u[0]);
+  ctx->gcm.H.u[1] = bswap_64(ctx->gcm.H.u[1]);
+
+  gcm_init_clmul(ctx->gcm.Htable, ctx->gcm.H.u);
+
+  return 0;
+}
+
+static int
+aes_gcm_setiv (void *_ctx, const void *iv, size_t iv_size)
+{
+  struct aes_gcm_ctx *ctx = _ctx;
+
+  if (iv_size != GCM_BLOCK_SIZE-4)
+    return GNUTLS_E_INVALID_REQUEST;
+
+  memset(ctx->gcm.Xi.c, 0, sizeof(ctx->gcm.Xi.c));
+  memset(ctx->gcm.len.c, 0, sizeof(ctx->gcm.len.c));
+
+  memcpy(ctx->gcm.Yi.c, iv, GCM_BLOCK_SIZE-4);
+  ctx->gcm.Yi.c[GCM_BLOCK_SIZE-4] = 0;
+  ctx->gcm.Yi.c[GCM_BLOCK_SIZE-3] = 0;
+  ctx->gcm.Yi.c[GCM_BLOCK_SIZE-2] = 0;
+  ctx->gcm.Yi.c[GCM_BLOCK_SIZE-1] = 1;
+
+  aesni_ecb_encrypt (ctx->gcm.Yi.c, ctx->gcm.EK0.c,
+                        GCM_BLOCK_SIZE, &ctx->expanded_key, 1);
+  ctx->gcm.Yi.c[GCM_BLOCK_SIZE-1] = 2;
+  return 0;
+}
+
+static void gcm_ghash(struct aes_gcm_ctx* ctx, const uint8_t *src, size_t src_size)
+{
+  size_t rest = src_size % GCM_BLOCK_SIZE;
+  size_t aligned_size = src_size - rest;
+
+  gcm_ghash_clmul(ctx->gcm.Xi.u, ctx->gcm.Htable, src, aligned_size);
+  if (rest > 0)
+    {
+      memxor (ctx->gcm.Xi.c, src + aligned_size, rest);
+      gcm_gmult_clmul (ctx->gcm.Xi.u, ctx->gcm.Htable);
+    }
+}
+
+static int
+aes_gcm_encrypt (void *_ctx, const void *src, size_t src_size,
+                 void *dst, size_t length)
+{
+  struct aes_gcm_ctx *ctx = _ctx;
+
+  aesni_ctr32_encrypt_blocks(src, dst,
+                        src_size%GCM_BLOCK_SIZE, &ctx->expanded_key,
+                        ctx->gcm.Yi.c);
+
+  gcm_ghash(ctx, dst, src_size);
+  ctx->gcm.len.u[1] += src_size;
+
+  return 0;
+}
+
+static int
+aes_gcm_decrypt (void *_ctx, const void *src, size_t src_size,
+                 void *dst, size_t dst_size)
+{
+  struct aes_gcm_ctx *ctx = _ctx;
+
+  gcm_ghash(ctx, src, src_size);
+  ctx->gcm.len.u[1] += src_size;
+
+  aesni_ctr32_encrypt_blocks(src, dst,
+                        src_size%GCM_BLOCK_SIZE, &ctx->expanded_key,
+                        ctx->gcm.Yi.c);
+
+  return 0;
+}
+
+static int
+aes_gcm_auth (void *_ctx, const void *src, size_t src_size)
+{
+  struct aes_gcm_ctx *ctx = _ctx;
+  
+  gcm_ghash(ctx, src, src_size);
+  ctx->gcm.len.u[0] += src_size;
+
+  return 0;
+}
+
+
+static void
+aes_gcm_tag (void *_ctx, void *tag, size_t tagsize)
+{
+  struct aes_gcm_ctx *ctx = _ctx;
+  uint8_t buffer[GCM_BLOCK_SIZE];
+  uint64_t alen, clen;
+
+  alen = ctx->gcm.len.u[0] * 8;
+  clen = ctx->gcm.len.u[1] * 8;
+
+  _gnutls_write_uint64(alen, buffer);
+  _gnutls_write_uint64(clen, &buffer[8]);
+
+  gcm_ghash_clmul(ctx->gcm.Xi.u, ctx->gcm.Htable, buffer, GCM_BLOCK_SIZE);
+
+  ctx->gcm.Xi.u[0] ^= ctx->gcm.EK0.u[0];
+  ctx->gcm.Xi.u[1] ^= ctx->gcm.EK0.u[1];
+
+  memcpy(tag, ctx->gcm.Xi.c, MIN(GCM_BLOCK_SIZE, tagsize));
+}
+
+const gnutls_crypto_cipher_st aes_gcm_struct = {
+  .init = aes_gcm_cipher_init,
+  .setkey = aes_gcm_cipher_setkey,
+  .setiv = aes_gcm_setiv,
+  .encrypt = aes_gcm_encrypt,
+  .decrypt = aes_gcm_decrypt,
+  .deinit = aes_gcm_deinit,
+  .tag = aes_gcm_tag,
+  .auth = aes_gcm_auth,
+};

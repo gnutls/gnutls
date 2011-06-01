@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.99.3 (unreleased)
 
+** libgnutls: Added AES-GCM optimizations using the PCLMULQDQ
+instruction. Uses Andy Polyakov's assembly code.
+
 ** libgnutls: Added ECDHE-PSK ciphersuites for TLS (RFC 5489).
 
 ** API and ABI modifications:
