@@ -95,8 +95,8 @@ gnutls_cipher_tag (gnutls_cipher_hd_t handle, void *tag, size_t tag_size)
  *
  * This function operates on authenticated encryption with
  * associated data (AEAD) ciphers and authenticate the
- * input data. This function can only be called before
- * encryption operations.
+ * input data. This function can only be called once
+ * and before any encryption operations.
  *
  * Returns: Zero or a negative value on error.
  *
