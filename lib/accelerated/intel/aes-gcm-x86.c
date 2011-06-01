@@ -32,7 +32,6 @@
 #include <aes-x86.h>
 #include <x86.h>
 #include <byteswap.h>
-#include <nettle/memxor.h>
 
 #define GCM_BLOCK_SIZE 16
 

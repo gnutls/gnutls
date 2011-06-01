@@ -50,6 +50,13 @@ typedef int ssize_t;
 #include <time.h>
 #include <u64.h> /* gnulib for uint64_t */
 
+#ifdef HAVE_LIBNETTLE
+# include <nettle/memxor.h>
+#else
+# include <gl/memxor.h>
+# define gl_memxor memxor
+#endif
+
 /* some systems had problems with long long int, thus,
  * it is not used.
  */

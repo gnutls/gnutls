@@ -891,20 +891,6 @@ _gnutls_P_hash (gnutls_mac_algorithm_t algorithm,
   return 0;
 }
 
-/* Xor's two buffers and puts the output in the first one.
- */
-inline static void
-_gnutls_xor (opaque * o1, opaque * o2, int length)
-{
-  int i;
-  for (i = 0; i < length; i++)
-    {
-      o1[i] ^= o2[i];
-    }
-}
-
-
-
 #define MAX_PRF_BYTES 200
 
 /* The PRF function expands a given secret 
@@ -982,7 +968,7 @@ _gnutls_PRF (gnutls_session_t session,
           return result;
         }
 
-      _gnutls_xor (o1, o2, total_bytes);
+      memxor (o1, o2, total_bytes);
 
       memcpy (ret, o1, total_bytes);
     }
