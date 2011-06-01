@@ -44,6 +44,8 @@
 #define PRIO_ECDH "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-ECDH:+CURVE-SECP224R1"
 
 #define PRIO_AES_CBC_SHA1 "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-DH"
+#define PRIO_ARCFOUR_128_MD5 "NONE:+VERS-TLS1.0:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+ANON-DH"
+#define PRIO_AES_GCM "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ANON-DH"
 #define PRIO_CAMELLIA_CBC_SHA1 "NONE:+VERS-TLS1.0:+CAMELLIA-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-DH"
 
 /* DH of 2432 bits that is pretty equivalent to 224 bits of ECDH.
@@ -270,11 +272,17 @@ main (int argc, char **argv)
     }
   gnutls_global_init ();
 
-  printf("Testing key exchanges:\n");
-  test_ciphersuite_kx (PRIO_DH);
-  test_ciphersuite_kx (PRIO_ECDH);
+  printf("Testing throughput in cipher/MAC combinations:\n");
+  test_ciphersuite (PRIO_ARCFOUR_128_MD5, 1024);
+  test_ciphersuite (PRIO_ARCFOUR_128_MD5, 4096);
+  test_ciphersuite (PRIO_ARCFOUR_128_MD5, 8*1024);
+  test_ciphersuite (PRIO_ARCFOUR_128_MD5, 15*1024);
 
-  printf("\nTesting throughput in cipher/MAC combinations:\n");
+  test_ciphersuite (PRIO_AES_GCM, 1024);
+  test_ciphersuite (PRIO_AES_GCM, 4096);
+  test_ciphersuite (PRIO_AES_GCM, 8*1024);
+  test_ciphersuite (PRIO_AES_GCM, 15*1024);
+
   test_ciphersuite (PRIO_AES_CBC_SHA1, 1024);
   test_ciphersuite (PRIO_AES_CBC_SHA1, 4096);
   test_ciphersuite (PRIO_AES_CBC_SHA1, 8*1024);
@@ -284,6 +292,10 @@ main (int argc, char **argv)
   test_ciphersuite (PRIO_CAMELLIA_CBC_SHA1, 4096);
   test_ciphersuite (PRIO_CAMELLIA_CBC_SHA1, 8*1024);
   test_ciphersuite (PRIO_CAMELLIA_CBC_SHA1, 15*1024);
+
+  printf("\nTesting key exchanges:\n");
+  test_ciphersuite_kx (PRIO_DH);
+  test_ciphersuite_kx (PRIO_ECDH);
 
 
   gnutls_global_deinit ();
