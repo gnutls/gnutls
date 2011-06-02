@@ -406,7 +406,7 @@ _randomize_pwd_entry (SRP_PWD_ENTRY * entry)
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  ret = _gnutls_rnd (GNUTLS_RND_NONCE, &rnd, 1);
+  ret = gnutls_rnd (GNUTLS_RND_NONCE, &rnd, 1);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -423,7 +423,7 @@ _randomize_pwd_entry (SRP_PWD_ENTRY * entry)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  ret = _gnutls_rnd (GNUTLS_RND_RANDOM, entry->v.data, 20);
+  ret = gnutls_rnd (GNUTLS_RND_RANDOM, entry->v.data, 20);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -437,7 +437,7 @@ _randomize_pwd_entry (SRP_PWD_ENTRY * entry)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  ret = _gnutls_rnd (GNUTLS_RND_NONCE, entry->salt.data, entry->salt.size);
+  ret = gnutls_rnd (GNUTLS_RND_NONCE, entry->salt.data, entry->salt.size);
   if (ret < 0)
     {
       gnutls_assert ();

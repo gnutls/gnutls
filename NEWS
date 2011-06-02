@@ -11,6 +11,15 @@ instruction. Uses Andy Polyakov's assembly code.
 ** libgnutls: Added ECDHE-PSK ciphersuites for TLS (RFC 5489).
 
 ** API and ABI modifications:
+gnutls_crypto_bigint_register: REMOVED
+gnutls_crypto_cipher_register: REMOVED
+gnutls_crypto_digest_register: REMOVED
+gnutls_crypto_mac_register: REMOVED
+gnutls_crypto_pk_register: REMOVED
+gnutls_crypto_rnd_register: REMOVED
+gnutls_crypto_single_cipher_register: REMOVED
+gnutls_crypto_single_digest_register: REMOVED
+gnutls_crypto_single_mac_register: REMOVED
 GNUTLS_KX_ECDHE_PSK: New key exchange method
 
 

@@ -34,7 +34,6 @@
 #include "utils.h"
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
-#include "../lib/random.h"
 
 #if !defined(_WIN32)
 static void dump(const char* name, unsigned char* buf, int buf_size)
@@ -65,7 +64,7 @@ doit (void)
       if (fp == NULL)
         fail("cannot open file");
       
-      _gnutls_rnd (GNUTLS_RND_RANDOM, buf1, sizeof (buf1));
+      gnutls_rnd (GNUTLS_RND_RANDOM, buf1, sizeof (buf1));
       if (debug) dump("buf1", buf1, sizeof(buf1));
       
       fwrite(buf1, 1, sizeof(buf1), fp);
@@ -74,7 +73,7 @@ doit (void)
   else
     {
       /* daddy */
-      _gnutls_rnd (GNUTLS_RND_RANDOM, buf2, sizeof (buf2));
+      gnutls_rnd (GNUTLS_RND_RANDOM, buf2, sizeof (buf2));
       if (debug) dump("buf2", buf2, sizeof(buf2));
       waitpid(pid, NULL, 0);
       

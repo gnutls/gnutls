@@ -232,7 +232,7 @@ calc_enc_length (gnutls_session_t session, int data_size,
 
       break;
     case CIPHER_BLOCK:
-      ret = _gnutls_rnd (GNUTLS_RND_NONCE, &rnd, 1);
+      ret = gnutls_rnd (GNUTLS_RND_NONCE, &rnd, 1);
       if (ret < 0)
         return gnutls_assert_val(ret);
 
@@ -369,7 +369,7 @@ _gnutls_compressed2ciphertext (gnutls_session_t session,
         {
           /* copy the random IV.
            */
-          ret = _gnutls_rnd (GNUTLS_RND_NONCE, data_ptr, blocksize);
+          ret = gnutls_rnd (GNUTLS_RND_NONCE, data_ptr, blocksize);
           if (ret < 0)
             return gnutls_assert_val(ret);
 

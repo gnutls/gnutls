@@ -557,7 +557,7 @@ gnutls_session_ticket_enable_server (gnutls_session_t session,
     }
   epriv.ptr = priv;
 
-  ret = _gnutls_rnd (GNUTLS_RND_NONCE, priv->session_ticket_IV, IV_SIZE);
+  ret = gnutls_rnd (GNUTLS_RND_NONCE, priv->session_ticket_IV, IV_SIZE);
   if (ret < 0)
     {
       gnutls_assert ();

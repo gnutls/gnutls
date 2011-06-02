@@ -806,14 +806,14 @@ RAND_seed (const void *buf, int num)
 int
 RAND_bytes (unsigned char *buf, int num)
 {
-  _gnutls_rnd (GNUTLS_RND_RANDOM, buf, num);
+  gnutls_rnd (GNUTLS_RND_RANDOM, buf, num);
   return 1;
 }
 
 int
 RAND_pseudo_bytes (unsigned char *buf, int num)
 {
-  _gnutls_rnd (GNUTLS_RND_NONCE, buf, num);
+  gnutls_rnd (GNUTLS_RND_NONCE, buf, num);
   return 1;
 }
 

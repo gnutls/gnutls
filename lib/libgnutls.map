@@ -102,15 +102,6 @@ GNUTLS_1_4
     gnutls_compression_set_priority;
     gnutls_credentials_clear;
     gnutls_credentials_set;
-    gnutls_crypto_bigint_register2;
-    gnutls_crypto_cipher_register2;
-    gnutls_crypto_digest_register2;
-    gnutls_crypto_mac_register2;
-    gnutls_crypto_pk_register2;
-    gnutls_crypto_rnd_register2;
-    gnutls_crypto_single_cipher_register2;
-    gnutls_crypto_single_digest_register2;
-    gnutls_crypto_single_mac_register2;
     gnutls_db_check_entry;
     gnutls_db_get_ptr;
     gnutls_db_remove_session;
@@ -724,6 +715,8 @@ GNUTLS_3_0_0 {
 GNUTLS_PRIVATE {
   global:
     # Internal symbols needed by libgnutls-extra:
+    gnutls_crypto_single_mac_register;
+    gnutls_crypto_single_digest_register;
     _gnutls_log_level;
     _gnutls_write_uint24;
     _gnutls_log;

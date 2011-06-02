@@ -27,7 +27,7 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/extra.h>
 #include <srptool-gaa.h>
-#include "../lib/random.h"      /* for random */
+#include <gnutls/crypto.h>      /* for random */
 
 #include <sys/types.h>
 #include <sys/stat.h>

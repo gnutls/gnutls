@@ -215,7 +215,7 @@ proc_rsa_client_kx (gnutls_session_t session, opaque * data,
 
       /* we do not need strong random numbers here.
        */
-      ret = _gnutls_rnd (GNUTLS_RND_NONCE, session->key->key.data,
+      ret = gnutls_rnd (GNUTLS_RND_NONCE, session->key->key.data,
                          session->key->key.size);
       if (ret < 0)
         {
@@ -270,7 +270,7 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  ret = _gnutls_rnd (GNUTLS_RND_RANDOM, session->key->key.data,
+  ret = gnutls_rnd (GNUTLS_RND_RANDOM, session->key->key.data,
                      session->key->key.size);
   if (ret < 0)
     {

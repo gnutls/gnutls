@@ -880,7 +880,7 @@ gnutls_pkcs12_generate_mac (gnutls_pkcs12_t pkcs12, const char *pass)
 
   /* Generate the salt.
    */
-  result = _gnutls_rnd (GNUTLS_RND_NONCE, salt, sizeof (salt));
+  result = gnutls_rnd (GNUTLS_RND_NONCE, salt, sizeof (salt));
   if (result < 0)
     {
       gnutls_assert ();

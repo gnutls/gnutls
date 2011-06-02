@@ -68,7 +68,7 @@ _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
     }
 
 
-  ret = _gnutls_rnd (level, buf, size);
+  ret = gnutls_rnd (level, buf, size);
   if (ret < 0)
     {
       gnutls_assert ();

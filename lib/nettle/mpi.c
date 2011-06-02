@@ -461,7 +461,7 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
    */
   for (;;)
     {
-      ret = _gnutls_rnd (GNUTLS_RND_RANDOM, buffer, q_bytes);
+      ret = gnutls_rnd (GNUTLS_RND_RANDOM, buffer, q_bytes);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -493,7 +493,7 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
 
   for (;;)
     {
-      ret = _gnutls_rnd (GNUTLS_RND_RANDOM, buffer, w_bytes);
+      ret = gnutls_rnd (GNUTLS_RND_RANDOM, buffer, w_bytes);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -541,7 +541,7 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
 
   for (;;)
     {
-      ret = _gnutls_rnd (GNUTLS_RND_RANDOM, buffer, r_bytes);
+      ret = gnutls_rnd (GNUTLS_RND_RANDOM, buffer, r_bytes);
       if (ret < 0)
         {
           gnutls_assert ();
