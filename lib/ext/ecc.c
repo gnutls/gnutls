@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2010 Free Software Foundation,
- * Inc.
+ * Copyright (C) 2011 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -215,8 +214,8 @@ int data_size = _data_size;
       len = data[0];
       DECR_LEN (data_size, len+1);
 
-      for (i=0;i<len;i++)
-        if (data[1+i] == 0) /* uncompressed */
+      for (i=1;i<=len;i++)
+        if (data[i] == 0) /* uncompressed */
           uncompressed = 1;
       
       if (uncompressed == 0)
@@ -244,9 +243,12 @@ _gnutls_supported_ecc_pf_send_params (gnutls_session_t session, gnutls_buffer_st
   if (session->security_parameters.entity == GNUTLS_SERVER && !_gnutls_session_is_ecc(session))
     return 0;
   
-  /* this extension is only being sent on client and server side */
-  _gnutls_buffer_append_data(extdata, p, 2);
-  return 2;
+  if (session->internals.priorities.supported_ecc.algorithms > 0)
+    {
+      _gnutls_buffer_append_data(extdata, p, 2);
+      return 2;
+    }
+  return 0;
 }
 
 
