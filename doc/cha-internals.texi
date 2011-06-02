@@ -377,10 +377,10 @@ following functions can be used to register those algorithms.
 
 @itemize
 
-@item @ref{gnutls_crypto_single_cipher_register2}
+@item @refint{gnutls_crypto_single_cipher_register}
 To register a cipher algorithm.
 
-@ref{gnutls_crypto_single_digest_register2}
+@refint{gnutls_crypto_single_digest_register}
 To register a hash (digest) or MAC algorithm.
 
 @end itemize
@@ -395,19 +395,19 @@ them. For this reason the following functions are provided.
 
 @itemize
 
-@item @ref{gnutls_crypto_cipher_register2}
+@item @refint{gnutls_crypto_cipher_register}
 To override the cryptographic algorithms backend.
 
-@item @ref{gnutls_crypto_digest_register2}
+@item @refint{gnutls_crypto_digest_register}
 To override the digest algorithms backend.
 
-@item @ref{gnutls_crypto_rnd_register2}
+@item @refint{gnutls_crypto_rnd_register}
 To override the random number generator backend.
 
-@item @ref{gnutls_crypto_bigint_register2}
+@item @refint{gnutls_crypto_bigint_register}
 To override the big number number operations backend.
 
-@item @ref{gnutls_crypto_pk_register2}
+@item @refint{gnutls_crypto_pk_register}
 To override the public key encryption backend. This is tight to the
 big number operations so either both of them should be updated or care
 must be taken to use the same format.

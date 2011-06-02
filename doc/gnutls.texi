@@ -57,6 +57,11 @@ Documentation License''.
 @insertcopying
 @end titlepage
 
+@c reference to an internal function.
+@macro refint {func}
+@code{\func\}
+@end macro
+
 @macro xcite{ref}
 [\ref\] (@pxref{Bibliography})
 @end macro
