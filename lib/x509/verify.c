@@ -934,6 +934,11 @@ _gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* pa
       if (hash_len) *hash_len = 20;
       return GNUTLS_DIG_SHA1;
     }
+  else if (bits <= 192)
+    {
+      if (hash_len) *hash_len = 24;
+      return GNUTLS_DIG_SHA256;
+    }
   else if (bits <= 224)
     {
       if (hash_len) *hash_len = 28;
