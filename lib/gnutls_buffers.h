@@ -46,25 +46,6 @@ int _gnutls_io_clear_peeked_data (gnutls_session_t session);
 ssize_t _gnutls_io_write_buffered (gnutls_session_t session,
                                    mbuffer_st * bufel, unsigned int mflag);
 
-int _gnutls_handshake_hash_buffer_get_size (gnutls_session_t session);
-int _gnutls_handshake_hash_buffer_put (gnutls_session_t session, opaque * data,
-                                  size_t length);
-int _gnutls_handshake_hash_buffer_get_ptr (gnutls_session_t session,
-                                      opaque ** data_ptr, size_t * length);
-
-/* Does not free the buffer
- */
-static inline void
-_gnutls_handshake_hash_buffer_empty (gnutls_session_t session)
-{
-
-  _gnutls_buffers_log ("BUF[HSK]: Emptied buffer\n");
-
-  session->internals.handshake_hash_buffer.length = 0;
-  return;
-}
-
-
 int _gnutls_handshake_io_cache_int (gnutls_session_t,
                                      gnutls_handshake_description_t,
                                      mbuffer_st * bufel);

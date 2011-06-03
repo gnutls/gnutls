@@ -328,12 +328,6 @@ typedef struct mbuffer_head_st
   size_t byte_length;
 } mbuffer_head_st;
 
-typedef enum
-{
-  HANDSHAKE_MAC_TYPE_10 = 1,    /* TLS 1.0 style */
-  HANDSHAKE_MAC_TYPE_12         /* TLS 1.2 style */
-} handshake_mac_type_t;
-
 /* Store & Retrieve functions defines: 
  */
 
@@ -454,7 +448,6 @@ typedef struct
 {
   int entity; /* GNUTLS_SERVER or GNUTLS_CLIENT */
   gnutls_kx_algorithm_t kx_algorithm;
-  handshake_mac_type_t handshake_mac_handle_type;       /* one of HANDSHAKE_TYPE_10 and HANDSHAKE_TYPE_12 */
 
   /* The epoch used to read and write */
   uint16_t epoch_read;
@@ -645,23 +638,10 @@ typedef struct
   /* holds all the data received by the record layer */
   mbuffer_head_st record_buffer; 
 
+  int handshake_hash_buffer_prev_len;           /* keeps the length of handshake_hash_buffer, excluding
+                                                 * the last received message */
   gnutls_buffer_st handshake_hash_buffer;       /* used to keep the last received handshake 
                                                  * message */
-  union
-  {
-    struct
-    {
-      digest_hd_st sha;         /* hash of the handshake messages */
-      digest_hd_st md5;         /* hash of the handshake messages */
-    } tls10;
-    struct
-    {
-      digest_hd_st sha1;        /* hash of the handshake messages for TLS 1.2+ */
-      digest_hd_st sha256;      /* hash of the handshake messages for TLS 1.2+ */
-    } tls12;
-  } handshake_mac_handle;
-  int handshake_mac_handle_init;        /* 1 when the previous union and type were initialized */
-
   int resumable:1;              /* TRUE or FALSE - if we can resume that session */
   handshake_state_t handshake_state;    /* holds
                                          * a number which indicates where

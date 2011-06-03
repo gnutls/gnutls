@@ -37,7 +37,11 @@ _gnutls_qsort (gnutls_session_t session, void *_base, size_t nmemb,
 
 /* Cipher SUITES */
 #define GNUTLS_CIPHER_SUITE_ENTRY( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, max_version, dtls ) \
-	{ #name, {name}, block_algorithm, kx_algorithm, mac_algorithm, min_version, max_version, dtls}
+	{ #name, {name}, block_algorithm, kx_algorithm, mac_algorithm, min_version, max_version, dtls, GNUTLS_MAC_SHA256}
+#if 0
+#define GNUTLS_CIPHER_SUITE_ENTRY_PRF( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, max_version, dtls, prf ) \
+	{ #name, {name}, block_algorithm, kx_algorithm, mac_algorithm, min_version, max_version, dtls, prf}
+#endif
 
 typedef struct
 {
@@ -51,6 +55,7 @@ typedef struct
                                          */
   gnutls_protocol_t max_version;        /* this cipher suite is not supported after that */
   int dtls:1; /* whether this ciphersuite is valid in DTLS */
+  gnutls_mac_algorithm_t prf;
 } gnutls_cipher_suite_entry;
 
 /* RSA with NULL cipher and MD5 MAC
@@ -245,7 +250,7 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ANON_DH_AES_128_CBC_SHA1,
                              GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_ANON_DH,
                              GNUTLS_MAC_SHA1, GNUTLS_SSL3,
-                             GNUTLS_VERSION_MAX, ),
+                             GNUTLS_VERSION_MAX, 1),
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ANON_DH_AES_256_CBC_SHA1,
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_ANON_DH,
                              GNUTLS_MAC_SHA1, GNUTLS_SSL3,
@@ -657,6 +662,16 @@ _gnutls_cipher_suite_get_kx_algo (const cipher_suite_st * suite)
   int ret = 0;
 
   GNUTLS_CIPHER_SUITE_ALG_LOOP (ret = p->kx_algorithm);
+  return ret;
+
+}
+
+gnutls_mac_algorithm_t
+_gnutls_cipher_suite_get_prf (const cipher_suite_st * suite)
+{
+  int ret = 0;
+
+  GNUTLS_CIPHER_SUITE_ALG_LOOP (ret = p->prf);
   return ret;
 
 }

@@ -74,7 +74,7 @@ _gnutls_sign_algorithm_write_params (gnutls_session_t session, opaque * data,
                                      size_t max_data_size)
 {
   opaque *p = data, *len_p;
-  int len, i, j, hash;
+  int len, i, j;
   const sign_algorithm_st *aid;
 
   if (max_data_size < (session->internals.priorities.sign_algo.algorithms*2) + 2)
@@ -90,13 +90,6 @@ _gnutls_sign_algorithm_write_params (gnutls_session_t session, opaque * data,
 
   for (i = j = 0; j < session->internals.priorities.sign_algo.algorithms; i += 2, j++)
     {
-      /* In gnutls we keep a state of SHA1 and SHA256 and thus cannot
-       * use anything else.
-       */
-      hash = _gnutls_sign_get_hash_algorithm(session->internals.priorities.sign_algo.priority[j]);
-      if (hash != GNUTLS_DIG_SHA1 && hash != GNUTLS_DIG_SHA256)
-        continue;
-      
       aid =
         _gnutls_sign_to_tls_aid (session->internals.priorities.
                                  sign_algo.priority[j]);

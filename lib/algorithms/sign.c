@@ -35,7 +35,7 @@ struct gnutls_sign_entry
   const char *oid;
   gnutls_sign_algorithm_t id;
   gnutls_pk_algorithm_t pk;
-  gnutls_mac_algorithm_t mac;
+  gnutls_digest_algorithm_t mac;
   /* See RFC 5246 HashAlgorithm and SignatureAlgorithm
      for values to use in aid struct. */
   const sign_algorithm_st aid;
@@ -180,7 +180,7 @@ _gnutls_x509_oid2sign_algorithm (const char *oid)
 }
 
 gnutls_sign_algorithm_t
-_gnutls_x509_pk_to_sign (gnutls_pk_algorithm_t pk, gnutls_mac_algorithm_t mac)
+_gnutls_x509_pk_to_sign (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t mac)
 {
   gnutls_sign_algorithm_t ret = 0;
 
@@ -196,7 +196,7 @@ _gnutls_x509_pk_to_sign (gnutls_pk_algorithm_t pk, gnutls_mac_algorithm_t mac)
 
 const char *
 _gnutls_x509_sign_to_oid (gnutls_pk_algorithm_t pk,
-                          gnutls_mac_algorithm_t mac)
+                          gnutls_digest_algorithm_t mac)
 {
   gnutls_sign_algorithm_t sign;
   const char *ret = NULL;
@@ -209,10 +209,10 @@ _gnutls_x509_sign_to_oid (gnutls_pk_algorithm_t pk,
   return ret;
 }
 
-gnutls_mac_algorithm_t
+gnutls_digest_algorithm_t
 _gnutls_sign_get_hash_algorithm (gnutls_sign_algorithm_t sign)
 {
-  gnutls_mac_algorithm_t ret = GNUTLS_DIG_UNKNOWN;
+  gnutls_digest_algorithm_t ret = GNUTLS_DIG_UNKNOWN;
 
   GNUTLS_SIGN_ALG_LOOP (ret = p->mac);
 

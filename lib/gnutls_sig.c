@@ -416,39 +416,24 @@ _gnutls_handshake_verify_cert_vrfy12 (gnutls_session_t session,
                                       gnutls_sign_algorithm_t sign_algo)
 {
   int ret;
-  opaque concat[MAX_SIG_SIZE];
+  opaque concat[MAX_HASH_SIZE];
   digest_hd_st td;
   gnutls_datum_t dconcat;
-  gnutls_sign_algorithm_t _sign_algo;
   gnutls_digest_algorithm_t hash_algo;
-  digest_hd_st *handshake_td;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
   gnutls_pk_algorithm_t pk = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
 
-  handshake_td = &session->internals.handshake_mac_handle.tls12.sha1;
-  hash_algo = handshake_td->algorithm;
-  _sign_algo =
-    _gnutls_x509_pk_to_sign (pk, hash_algo);
-
-  if (_sign_algo != sign_algo)
-    {
-      handshake_td = &session->internals.handshake_mac_handle.tls12.sha256;
-      hash_algo = handshake_td->algorithm;
-      _sign_algo =
-        _gnutls_x509_pk_to_sign (pk, hash_algo);
-      if (sign_algo != _sign_algo)
-        {
-          gnutls_assert ();
-          return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
-        }
-    }
-
-  ret = _gnutls_hash_copy (&td, handshake_td);
+  ret = _gnutls_session_sign_algo_enabled(session, sign_algo);
   if (ret < 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_HASH_FAILED;
-    }
+    return gnutls_assert_val(ret);
+  
+  hash_algo = _gnutls_sign_get_hash_algorithm(sign_algo);
+  
+  ret = _gnutls_hash_init(&td, hash_algo); 
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  _gnutls_hash(&td, session->internals.handshake_hash_buffer.data, session->internals.handshake_hash_buffer_prev_len);
 
   _gnutls_hash_deinit (&td, concat);
 
@@ -486,22 +471,13 @@ _gnutls_handshake_verify_cert_vrfy (gnutls_session_t session,
   _gnutls_handshake_log ("HSK[%p]: verify cert vrfy: using %s\n",
                     session, gnutls_sign_algorithm_get_name (sign_algo));
 
-  if (session->security_parameters.handshake_mac_handle_type ==
-      HANDSHAKE_MAC_TYPE_12)
-    {
-      return _gnutls_handshake_verify_cert_vrfy12 (session, cert, signature,
-                                                   sign_algo);
-    }
-  else if (session->security_parameters.handshake_mac_handle_type !=
-           HANDSHAKE_MAC_TYPE_10)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
+
+  if (_gnutls_version_has_selectable_sighash(ver))
+    return _gnutls_handshake_verify_cert_vrfy12 (session, cert, signature,
+                                                 sign_algo);
 
   ret =
-    _gnutls_hash_copy (&td_md5,
-                       &session->internals.handshake_mac_handle.tls10.md5);
+    _gnutls_hash_init (&td_md5, GNUTLS_DIG_MD5);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -509,14 +485,16 @@ _gnutls_handshake_verify_cert_vrfy (gnutls_session_t session,
     }
 
   ret =
-    _gnutls_hash_copy (&td_sha,
-                       &session->internals.handshake_mac_handle.tls10.sha);
+    _gnutls_hash_init (&td_sha, GNUTLS_DIG_SHA1);
   if (ret < 0)
     {
       gnutls_assert ();
       _gnutls_hash_deinit (&td_md5, NULL);
       return GNUTLS_E_HASH_FAILED;
     }
+
+  _gnutls_hash(&td_sha, session->internals.handshake_hash_buffer.data, session->internals.handshake_hash_buffer_prev_len);
+  _gnutls_hash(&td_md5, session->internals.handshake_hash_buffer.data, session->internals.handshake_hash_buffer_prev_len);
 
   if (ver == GNUTLS_SSL3)
     {
@@ -582,7 +560,6 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
   digest_hd_st td;
   gnutls_sign_algorithm_t sign_algo;
   gnutls_digest_algorithm_t hash_algo;
-  digest_hd_st *handshake_td;
 
   sign_algo =
     _gnutls_session_get_sign_algo (session, cert);
@@ -598,19 +575,14 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
                     gnutls_sign_algorithm_get_name (sign_algo),
                     gnutls_mac_get_name (hash_algo));
 
-  if ((gnutls_mac_algorithm_t)hash_algo == session->internals.handshake_mac_handle.tls12.sha1.algorithm)
-    handshake_td = &session->internals.handshake_mac_handle.tls12.sha1;
-  else if ((gnutls_mac_algorithm_t)hash_algo == session->internals.handshake_mac_handle.tls12.sha256.algorithm)
-    handshake_td = &session->internals.handshake_mac_handle.tls12.sha256;
-  else
-    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR); /* too bad we only support SHA1 and SHA256 */
-
-  ret = _gnutls_hash_copy (&td, handshake_td);
+  ret = _gnutls_hash_init (&td, hash_algo);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
+
+  _gnutls_hash(&td, session->internals.handshake_hash_buffer.data, session->internals.handshake_hash_buffer.length);
 
   _gnutls_hash_deinit (&td, concat);
 
@@ -649,27 +621,19 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
   gnutls_pk_algorithm_t pk = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
 
-  if (session->security_parameters.handshake_mac_handle_type ==
-      HANDSHAKE_MAC_TYPE_12)
-    {
-      return _gnutls_handshake_sign_cert_vrfy12 (session, cert, pkey,
+  if (_gnutls_version_has_selectable_sighash(ver))
+    return _gnutls_handshake_sign_cert_vrfy12 (session, cert, pkey,
                                                  signature);
-    }
-  else if (session->security_parameters.handshake_mac_handle_type !=
-           HANDSHAKE_MAC_TYPE_10)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
 
   ret =
-    _gnutls_hash_copy (&td_sha,
-                       &session->internals.handshake_mac_handle.tls10.sha);
+    _gnutls_hash_init (&td_sha, GNUTLS_DIG_SHA1);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
+
+  _gnutls_hash(&td_sha, session->internals.handshake_hash_buffer.data, session->internals.handshake_hash_buffer.length);
 
   if (ver == GNUTLS_SSL3)
     {
@@ -700,14 +664,11 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
     {
     case GNUTLS_PK_RSA:
       ret =
-        _gnutls_hash_copy (&td_md5,
-                           &session->internals.handshake_mac_handle.tls10.
-                           md5);
+        _gnutls_hash_init (&td_md5, GNUTLS_DIG_MD5);
       if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
+        return gnutls_assert_val(ret);
+
+      _gnutls_hash(&td_md5, session->internals.handshake_hash_buffer.data, session->internals.handshake_hash_buffer.length);
 
       if (ver == GNUTLS_SSL3)
         {
