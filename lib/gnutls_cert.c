@@ -247,19 +247,17 @@ int ret;
  */
 int
 _gnutls_selected_cert_supported_kx (gnutls_session_t session,
-                                    gnutls_kx_algorithm_t ** alg,
+                                    gnutls_kx_algorithm_t * alg,
                                     int *alg_size)
 {
   gnutls_kx_algorithm_t kx;
   gnutls_pk_algorithm_t pk, cert_pk;
-  gnutls_kx_algorithm_t kxlist[MAX_ALGOS];
   gnutls_pcert_st *cert;
   int i;
 
   if (session->internals.selected_cert_list_length == 0)
     {
       *alg_size = 0;
-      *alg = NULL;
       return 0;
     }
 
@@ -275,8 +273,11 @@ _gnutls_selected_cert_supported_kx (gnutls_session_t session,
           /* then check key usage */
           if (_gnutls_check_key_usage (cert, kx) == 0)
             {
-              kxlist[i] = kx;
+              alg[i] = kx;
               i++;
+              
+              if (i > *alg_size)
+                return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
             }
         }
     }
@@ -287,13 +288,7 @@ _gnutls_selected_cert_supported_kx (gnutls_session_t session,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  *alg = gnutls_calloc (i, sizeof (gnutls_kx_algorithm_t));
-  if (*alg == NULL)
-    return GNUTLS_E_MEMORY_ERROR;
-
   *alg_size = i;
-
-  memcpy (*alg, kxlist, i * sizeof (gnutls_kx_algorithm_t));
 
   return 0;
 }

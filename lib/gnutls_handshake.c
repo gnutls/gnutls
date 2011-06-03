@@ -3073,8 +3073,8 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
   gnutls_certificate_credentials_t cert_cred;
   gnutls_kx_algorithm_t kx;
   int server = session->security_parameters.entity == GNUTLS_SERVER ? 1 : 0;
-  gnutls_kx_algorithm_t *alg = NULL;
-  int alg_size = 0;
+  gnutls_kx_algorithm_t alg[MAX_ALGOS];
+  int alg_size = MAX_ALGOS;
 
   /* if we should use a specific certificate, 
    * we should remove all algorithms that are not supported
@@ -3106,7 +3106,7 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
    * supported by the X509 certificate parameters.
    */
   if ((ret =
-       _gnutls_selected_cert_supported_kx (session, &alg, &alg_size)) < 0)
+       _gnutls_selected_cert_supported_kx (session, alg, &alg_size)) < 0)
     {
       gnutls_assert ();
       return ret;
@@ -3116,7 +3116,6 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
   if (newSuite == NULL)
     {
       gnutls_assert ();
-      gnutls_free (alg);
       return GNUTLS_E_MEMORY_ERROR;
     }
 
@@ -3189,7 +3188,6 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
         }
     }
 
-  gnutls_free (alg);
   gnutls_free (*cipherSuites);
   *cipherSuites = newSuite;
 

@@ -166,7 +166,7 @@ int certificate_credentials_append_pkey (gnutls_certificate_credentials_t res,
                                          gnutls_privkey_t pkey);
 
 int _gnutls_selected_cert_supported_kx (struct gnutls_session_int *session,
-                                        gnutls_kx_algorithm_t ** alg,
+                                        gnutls_kx_algorithm_t * alg,
                                         int *alg_size);
 
 #endif
