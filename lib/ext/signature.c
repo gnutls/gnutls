@@ -34,7 +34,6 @@
 #include <gnutls_state.h>
 #include <gnutls_num.h>
 #include <algorithms.h>
-#include <x509/common.h> /* dsa_q_to_hash */
 #include <abstract_int.h>
 
 static int _gnutls_signature_algorithm_recv_params (gnutls_session_t session,

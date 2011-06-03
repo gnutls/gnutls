@@ -1197,9 +1197,12 @@ gnutls_pubkey_get_verify_algorithm (gnutls_pubkey_t key,
 int _gnutls_pubkey_compatible_with_sig(gnutls_pubkey_t pubkey, gnutls_protocol_t ver, 
   gnutls_sign_algorithm_t sign)
 {
+int hash_size;
+int hash_algo;
+
   if (pubkey->pk_algorithm == GNUTLS_PK_DSA)
-    { /* override */
-      int hash_algo = _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params);
+    {
+      hash_algo = _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params, &hash_size);
 
       /* DSA keys over 1024 bits cannot be used with TLS 1.x, x<2 */
       if (!_gnutls_version_has_selectable_sighash (ver))
@@ -1209,7 +1212,18 @@ int _gnutls_pubkey_compatible_with_sig(gnutls_pubkey_t pubkey, gnutls_protocol_t
         }
       else if (sign != GNUTLS_SIGN_UNKNOWN)
         {
-          if (_gnutls_sign_get_hash_algorithm(sign) != hash_algo)
+          if (_gnutls_hash_get_algo_len(_gnutls_sign_get_hash_algorithm(sign)) != hash_size)
+            return GNUTLS_E_UNWANTED_ALGORITHM;
+        }
+        
+    }
+  else if (pubkey->pk_algorithm == GNUTLS_PK_ECC)
+    {
+      hash_algo = _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params, &hash_size);
+
+      if (_gnutls_version_has_selectable_sighash (ver) && sign != GNUTLS_SIGN_UNKNOWN)
+        {
+          if (_gnutls_hash_get_algo_len(_gnutls_sign_get_hash_algorithm(sign)) != hash_size)
             return GNUTLS_E_UNWANTED_ALGORITHM;
         }
         

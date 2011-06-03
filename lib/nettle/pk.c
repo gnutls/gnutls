@@ -359,15 +359,14 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
 
         dsa_signature_init (&sig);
 
-        hash = _gnutls_dsa_q_to_hash (algo, pk_params);
-        hash_len = _gnutls_hash_get_algo_len (hash);
+        hash = _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
         if (hash_len > vdata->size)
           {
             gnutls_assert ();
             _gnutls_debug_log("Security level of algorithm requires hash %s or better\n", gnutls_mac_get_name(hash));
           }
 
-        ret = ecc_sign_hash(vdata->data, vdata->size, 
+        ret = ecc_sign_hash(vdata->data, hash_len, 
                             &sig, NULL, rnd_func, &priv);
         if (ret != 0)
           {
@@ -402,8 +401,7 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
 
         dsa_signature_init (&sig);
 
-        hash = _gnutls_dsa_q_to_hash (algo, pk_params);
-        hash_len = _gnutls_hash_get_algo_len (hash);
+        hash = _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
         if (hash_len > vdata->size)
           {
             gnutls_assert ();
@@ -533,7 +531,7 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
       {
         ecc_key pub;
         struct dsa_signature sig;
-        int stat;
+        int stat, hash_len;
 
         ret = _gnutls_decode_ber_rs (signature, &tmp[0], &tmp[1]);
         if (ret < 0)
@@ -546,19 +544,15 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         memcpy (&sig.r, tmp[0], sizeof (sig.r));
         memcpy (&sig.s, tmp[1], sizeof (sig.s));
 
-        hash = _gnutls_dsa_q_to_hash (algo, pk_params);
-        if (vdata->size != _gnutls_hash_get_algo_len (hash))
+        hash = _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
+        if (vdata->size < hash_len)
           {
             gnutls_assert ();
-            
-            if (vdata->size < 20)
-              {
-                ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
-                goto ecdsa_fail;
-              }
+            ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
+            goto ecdsa_fail;
           }
 
-        ret = ecc_verify_hash(&sig, vdata->data, vdata->size, &stat, &pub);
+        ret = ecc_verify_hash(&sig, vdata->data, hash_len, &stat, &pub);
         if (ret != 0 || stat != 1)
           {
             gnutls_assert();
@@ -576,6 +570,7 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
       {
         struct dsa_public_key pub;
         struct dsa_signature sig;
+        int hash_len;
 
         ret = _gnutls_decode_ber_rs (signature, &tmp[0], &tmp[1]);
         if (ret < 0)
@@ -588,19 +583,15 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         memcpy (&sig.r, tmp[0], sizeof (sig.r));
         memcpy (&sig.s, tmp[1], sizeof (sig.s));
 
-        hash = _gnutls_dsa_q_to_hash (algo, pk_params);
-        if (vdata->size != _gnutls_hash_get_algo_len (hash))
+        hash = _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
+        if (vdata->size < hash_len)
           {
             gnutls_assert ();
-            
-            if (vdata->size < 20)
-              {
-                ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
-                goto dsa_fail;
-              }
+            ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
+            goto dsa_fail;
           }
 
-        ret = _dsa_verify (&pub, vdata->size, vdata->data, &sig);
+        ret = _dsa_verify (&pub, hash_len, vdata->data, &sig);
         if (ret == 0)
           {
             gnutls_assert();

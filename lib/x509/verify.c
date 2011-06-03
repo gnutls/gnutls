@@ -827,7 +827,7 @@ _pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
 /* Hashes input data and verifies a signature.
  */
 static int
-verify_sig (const gnutls_datum_t * text,
+dsa_verify_sig (const gnutls_datum_t * text,
                 const gnutls_datum_t * hash,
                 const gnutls_datum_t * signature,
                 gnutls_pk_algorithm_t pk,
@@ -838,18 +838,17 @@ verify_sig (const gnutls_datum_t * text,
   gnutls_datum_t digest;
   digest_hd_st hd;
   gnutls_digest_algorithm_t algo;
+  int hash_len;
 
-  algo = _gnutls_dsa_q_to_hash (pk, params);
+  algo = _gnutls_dsa_q_to_hash (pk, params, &hash_len);
   if (hash)
     {
       /* SHA1 or better allowed */
-      if (!hash->data || hash->size != _gnutls_hash_get_algo_len(algo))
+      if (!hash->data || hash->size < hash_len)
         {
           gnutls_assert();
-          _gnutls_debug_log("Hash size (%d) does not correspond to hash %s.\n", (int)hash->size, gnutls_mac_get_name(algo));
-          
-          if (hash->size < 20)
-            return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+          _gnutls_debug_log("Hash size (%d) does not correspond to hash %s or better.\n", (int)hash->size, gnutls_mac_get_name(algo));
+          return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
         }
 
       digest = *hash;
@@ -902,7 +901,7 @@ pubkey_verify_sig (const gnutls_datum_t * tbs,
 
     case GNUTLS_PK_ECC:
     case GNUTLS_PK_DSA:
-      if (verify_sig(tbs, hash, signature, pk, issuer_params) != 0)
+      if (dsa_verify_sig(tbs, hash, signature, pk, issuer_params) != 0)
         {
           gnutls_assert ();
           return GNUTLS_E_PK_SIG_VERIFY_FAILED;
@@ -918,7 +917,7 @@ pubkey_verify_sig (const gnutls_datum_t * tbs,
 }
 
 gnutls_digest_algorithm_t
-_gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* params)
+_gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* params, int* hash_len)
 {
   int bits = 0;
   
@@ -929,15 +928,28 @@ _gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* pa
 
   if (bits <= 160)
     {
+      if (hash_len) *hash_len = 20;
       return GNUTLS_DIG_SHA1;
     }
   else if (bits <= 224)
     {
-      return GNUTLS_DIG_SHA224;
+      if (hash_len) *hash_len = 28;
+      return GNUTLS_DIG_SHA256;
+    }
+  else if (bits <= 256)
+    {
+      if (hash_len) *hash_len = 32;
+      return GNUTLS_DIG_SHA256;
+    }
+  else if (bits <= 384)
+    {
+      if (hash_len) *hash_len = 48;
+      return GNUTLS_DIG_SHA384;
     }
   else
     {
-      return GNUTLS_DIG_SHA256;
+      if (hash_len) *hash_len = 64;
+      return GNUTLS_DIG_SHA512;
     }
 }
 
@@ -962,7 +974,7 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
     case GNUTLS_PK_ECC:
 
       if (hash)
-        *hash = _gnutls_dsa_q_to_hash (pk, issuer_params);
+        *hash = _gnutls_dsa_q_to_hash (pk, issuer_params, NULL);
 
       ret = 0;
       break;
