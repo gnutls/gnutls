@@ -847,11 +847,14 @@ dsa_verify_sig (const gnutls_datum_t * text,
       if (!hash->data || hash->size < hash_len)
         {
           gnutls_assert();
-          _gnutls_debug_log("Hash size (%d) does not correspond to hash %s or better.\n", (int)hash->size, gnutls_mac_get_name(algo));
-          return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+          _gnutls_debug_log("Hash size (%d) does not correspond to hash %s(%d) or better.\n", (int)hash->size, gnutls_mac_get_name(algo), hash_len);
+          
+          if (hash->size != 20) /* SHA1 is allowed */
+            return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
         }
 
-      digest = *hash;
+      digest.data = hash->data;
+      digest.size = hash->size;
     }
   else
     {

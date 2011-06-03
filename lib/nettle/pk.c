@@ -364,9 +364,10 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
           {
             gnutls_assert ();
             _gnutls_debug_log("Security level of algorithm requires hash %s(%d) or better\n", gnutls_mac_get_name(hash), hash_len);
+            hash_len = vdata->size;
           }
 
-        ret = ecc_sign_hash(vdata->data, vdata->size, 
+        ret = ecc_sign_hash(vdata->data, hash_len, 
                             &sig, NULL, rnd_func, &priv);
         if (ret != 0)
           {
@@ -405,12 +406,13 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
         if (hash_len > vdata->size)
           {
             gnutls_assert ();
-            _gnutls_debug_log("Security level of algorithm requires hash %s or better\n", gnutls_mac_get_name(hash));
+            _gnutls_debug_log("Security level of algorithm requires hash %s(%d) or better\n", gnutls_mac_get_name(hash), hash_len);
+            hash_len = vdata->size;
           }
 
         ret =
           _dsa_sign (&pub, &priv, NULL, rnd_func,
-                     vdata->size, vdata->data, &sig);
+                     hash_len, vdata->data, &sig);
         if (ret == 0)
           {
             gnutls_assert ();
@@ -523,6 +525,7 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
                         const gnutls_pk_params_st * pk_params)
 {
   int ret;
+  int hash_len;
   bigint_t tmp[2] = { NULL, NULL };
 
   switch (algo)
@@ -544,7 +547,11 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         memcpy (&sig.r, tmp[0], sizeof (sig.r));
         memcpy (&sig.s, tmp[1], sizeof (sig.s));
 
-        ret = ecc_verify_hash(&sig, vdata->data, vdata->size, &stat, &pub);
+        _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
+        if (hash_len > vdata->size)
+          hash_len = vdata->size;
+
+        ret = ecc_verify_hash(&sig, vdata->data, hash_len, &stat, &pub);
         if (ret != 0 || stat != 1)
           {
             gnutls_assert();
@@ -573,7 +580,11 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         memcpy (&sig.r, tmp[0], sizeof (sig.r));
         memcpy (&sig.s, tmp[1], sizeof (sig.s));
 
-        ret = _dsa_verify (&pub, vdata->size, vdata->data, &sig);
+        _gnutls_dsa_q_to_hash (algo, pk_params, &hash_len);
+        if (hash_len > vdata->size)
+          hash_len = vdata->size;
+
+        ret = _dsa_verify (&pub, hash_len, vdata->data, &sig);
         if (ret == 0)
           {
             gnutls_assert();
