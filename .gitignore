@@ -444,8 +444,12 @@ gl/tests/test-strverscmp
 gl/tests/test-u64
 gl/tests/test-vasprintf
 gl/tests/test-vsnprintf
-lib/accelerated/libaccelerated.la
+gl/tests/test-intprops 
+gl/tests/test-inttypes 
+gl/tests/test-sys_uio
+gl/tests/inttypes.h 
 gl/time.h
+lib/accelerated/libaccelerated.la
 lib/accelerated/intel/libintel.la
 doc/cyclo/cyclo-gnutls.html
 lib/ext/libgnutls_ext.la
