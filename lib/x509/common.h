@@ -128,6 +128,9 @@ int _gnutls_x509_decode_and_read_attribute (ASN1_TYPE asn1_struct,
 int _gnutls_x509_get_pk_algorithm (ASN1_TYPE src, const char *src_name,
                                    unsigned int *bits);
 
+int
+_gnutls_x509_get_signature_algorithm (ASN1_TYPE src, const char *src_name);
+
 int _gnutls_x509_encode_and_copy_PKI_params (ASN1_TYPE dst,
                                              const char *dst_name,
                                              gnutls_pk_algorithm_t
@@ -140,8 +143,6 @@ int _gnutls_x509_get_signed_data (ASN1_TYPE src, const char *src_name,
 int _gnutls_x509_get_signature (ASN1_TYPE src, const char *src_name,
                                 gnutls_datum_t * signature);
 
-gnutls_digest_algorithm_t _gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, 
-  const gnutls_pk_params_st* params, int* hash_len);
 
 int _gnutls_get_asn_mpis (ASN1_TYPE asn, const char *root,
                           gnutls_pk_params_st * params);
@@ -152,12 +153,6 @@ int _gnutls_get_key_id (gnutls_pk_algorithm_t pk, gnutls_pk_params_st*,
 
 void _asnstr_append_name (char *name, size_t name_size, const char *part1,
                           const char *part2);
-
-int pubkey_verify_sig (const gnutls_datum_t * tbs,
-                       const gnutls_datum_t * hash,
-                       const gnutls_datum_t * signature,
-                       gnutls_pk_algorithm_t pk, 
-                       gnutls_pk_params_st * issuer_params);
 
 int
 check_if_same_cert (gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2);

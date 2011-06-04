@@ -1641,45 +1641,6 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
 
 
 /**
- * gnutls_x509_privkey_verify_data:
- * @key: Holds the key
- * @flags: should be 0 for now
- * @data: holds the data to be signed
- * @signature: contains the signature
- *
- * This function will verify the given signed data, using the
- * parameters in the private key.
- *
- * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
- * is returned, and a positive code on success.
- *
- * Deprecated: Use gnutls_pubkey_verify_data().
- */
-int
-gnutls_x509_privkey_verify_data (gnutls_x509_privkey_t key,
-                                 unsigned int flags,
-                                 const gnutls_datum_t * data,
-                                 const gnutls_datum_t * signature)
-{
-  int result;
-
-  if (key == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  result = _gnutls_x509_privkey_verify_signature (data, signature, key);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      return result;
-    }
-
-  return result;
-}
-
-/**
  * gnutls_x509_privkey_fix:
  * @key: Holds the key
  *

@@ -2523,6 +2523,7 @@ gnutls_x509_crq_verify (gnutls_x509_crq_t crq,
 gnutls_datum data = { NULL, 0 };
 gnutls_datum signature = { NULL, 0 };
 gnutls_pk_params_st params;
+gnutls_digest_algorithm_t algo;
 int ret;
 
   gnutls_pk_params_init(&params);
@@ -2534,6 +2535,15 @@ int ret;
       gnutls_assert ();
       return ret;
     }
+    
+  ret = _gnutls_x509_get_signature_algorithm(crq->crq, "signatureAlgorithm.algorithm");
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+  
+  algo = _gnutls_sign_get_hash_algorithm(ret);
 
   ret = _gnutls_x509_get_signature (crq->crq, "signature", &signature);
   if (ret < 0)
@@ -2550,9 +2560,8 @@ int ret;
       goto cleanup;
     }
 
-  ret = pubkey_verify_sig(&data, NULL, &signature,
-                          gnutls_x509_crq_get_pk_algorithm (crq, NULL),
-                          &params);
+  ret = pubkey_verify_data(gnutls_x509_crq_get_pk_algorithm (crq, NULL), algo,
+                           &data, &signature, &params);
   if (ret < 0)
     {
       gnutls_assert ();

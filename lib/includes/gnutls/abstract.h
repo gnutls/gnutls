@@ -95,6 +95,12 @@ int gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey,
                                    unsigned int flags,
                                    const gnutls_datum_t * data,
                                    const gnutls_datum_t * signature);
+int
+gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey, 
+                           gnutls_sign_algorithm_t algo,
+                           unsigned int flags,
+			   const gnutls_datum_t * data,
+			   const gnutls_datum_t * signature);
 
 /* Private key operations */
 

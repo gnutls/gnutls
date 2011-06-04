@@ -48,6 +48,11 @@ sign_tls_hash (gnutls_session_t session, gnutls_digest_algorithm_t hash_algo,
                   const gnutls_datum_t * hash_concat,
                   gnutls_datum_t * signature);
 
+static int
+encode_ber_digest_info (gnutls_digest_algorithm_t hash,
+                        const gnutls_datum_t * digest,
+                        gnutls_datum_t * output);
+
 /* While this is currently equal to the length of RSA/SHA512
  * signature, it should also be sufficient for DSS signature and any
  * other RSA signatures including one with the old MD5/SHA1-combined
@@ -732,6 +737,120 @@ cleanup:
   return ret;
 }
 
+
+/* 
+ * This function will do RSA PKCS #1 1.5 encoding
+ * on the given digest. The given digest must be allocated
+ * and will be freed if replacement is required.
+ */
+int
+pk_prepare_hash (gnutls_pk_algorithm_t pk,
+                 gnutls_digest_algorithm_t hash, gnutls_datum_t * digest)
+{
+  int ret;
+  gnutls_datum_t old_digest = { digest->data, digest->size };
+
+  switch (pk)
+    {
+    case GNUTLS_PK_RSA:
+      /* Encode the digest as a DigestInfo
+       */
+      if ((ret = encode_ber_digest_info (hash, &old_digest, digest)) != 0)
+        {
+          gnutls_assert ();
+          return ret;
+        }
+
+      _gnutls_free_datum (&old_digest);
+      break;
+    case GNUTLS_PK_DSA:
+    case GNUTLS_PK_ECC:
+      break;
+    default:
+      gnutls_assert ();
+      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+    }
+
+  return 0;
+}
+
+/* Reads the digest information.
+ * we use DER here, although we should use BER. It works fine
+ * anyway.
+ */
+int
+decode_ber_digest_info (const gnutls_datum_t * info,
+                        gnutls_mac_algorithm_t * hash,
+                        opaque * digest, int *digest_size)
+{
+  ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
+  int result;
+  char str[1024];
+  int len;
+
+  if ((result = asn1_create_element (_gnutls_get_gnutls_asn (),
+                                     "GNUTLS.DigestInfo",
+                                     &dinfo)) != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  result = asn1_der_decoding (&dinfo, info->data, info->size, NULL);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return _gnutls_asn2err (result);
+    }
+
+  len = sizeof (str) - 1;
+  result = asn1_read_value (dinfo, "digestAlgorithm.algorithm", str, &len);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return _gnutls_asn2err (result);
+    }
+
+  *hash = _gnutls_x509_oid2mac_algorithm (str);
+
+  if (*hash == GNUTLS_MAC_UNKNOWN)
+    {
+
+      _gnutls_debug_log ("verify.c: HASH OID: %s\n", str);
+
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return GNUTLS_E_UNKNOWN_ALGORITHM;
+    }
+
+  len = sizeof (str) - 1;
+  result = asn1_read_value (dinfo, "digestAlgorithm.parameters", str, &len);
+  /* To avoid permitting garbage in the parameters field, either the
+     parameters field is not present, or it contains 0x05 0x00. */
+  if (!(result == ASN1_ELEMENT_NOT_FOUND ||
+        (result == ASN1_SUCCESS && len == ASN1_NULL_SIZE &&
+         memcmp (str, ASN1_NULL, ASN1_NULL_SIZE) == 0)))
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return GNUTLS_E_ASN1_GENERIC_ERROR;
+    }
+
+  result = asn1_read_value (dinfo, "digest", digest, digest_size);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return _gnutls_asn2err (result);
+    }
+
+  asn1_delete_structure (&dinfo);
+
+  return 0;
+}
+
 /* Writes the digest information and the digest in a DER encoded
  * structure. The digest info is allocated and stored into the info structure.
  */
@@ -815,42 +934,6 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
 
   output->size = tmp_output_size;
   output->data = tmp_output;
-
-  return 0;
-}
-
-/* 
- * This function will do RSA PKCS #1 1.5 encoding
- * on the given digest. The given digest must be allocated
- * and will be freed if replacement is required.
- */
-int
-pk_prepare_hash (gnutls_pk_algorithm_t pk,
-                 gnutls_digest_algorithm_t hash, gnutls_datum_t * digest)
-{
-  int ret;
-  gnutls_datum_t old_digest = { digest->data, digest->size };
-
-  switch (pk)
-    {
-    case GNUTLS_PK_RSA:
-      /* Encode the digest as a DigestInfo
-       */
-      if ((ret = encode_ber_digest_info (hash, &old_digest, digest)) != 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-
-      _gnutls_free_datum (&old_digest);
-      break;
-    case GNUTLS_PK_DSA:
-    case GNUTLS_PK_ECC:
-      break;
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_UNIMPLEMENTED_FEATURE;
-    }
 
   return 0;
 }

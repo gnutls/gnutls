@@ -475,33 +475,7 @@ gnutls_x509_crt_get_dn_oid (gnutls_x509_crt_t cert,
 int
 gnutls_x509_crt_get_signature_algorithm (gnutls_x509_crt_t cert)
 {
-  int result;
-  gnutls_datum_t sa;
-
-  if (cert == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  /* Read the signature algorithm. Note that parameters are not
-   * read. They will be read from the issuer's certificate if needed.
-   */
-  result =
-    _gnutls_x509_read_value (cert->cert, "signatureAlgorithm.algorithm",
-                             &sa, 0);
-
-  if (result < 0)
-    {
-      gnutls_assert ();
-      return result;
-    }
-
-  result = _gnutls_x509_oid2sign_algorithm (sa.data);
-
-  _gnutls_free_datum (&sa);
-
-  return result;
+  return _gnutls_x509_get_signature_algorithm(cert->cert, "signatureAlgorithm.algorithm");
 }
 
 /**
@@ -2613,7 +2587,7 @@ gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  result = _gnutls_x509_verify_signature (data, NULL, signature, crt);
+  result = _gnutls_x509_verify_data (GNUTLS_DIG_UNKNOWN, data, signature, crt);
   if (result < 0)
     {
       gnutls_assert ();
@@ -2651,7 +2625,7 @@ gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  result = _gnutls_x509_verify_signature (NULL, hash, signature, crt);
+  result = _gnutls_x509_verify_hashed_data (hash, signature, crt);
   if (result < 0)
     {
       gnutls_assert ();

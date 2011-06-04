@@ -30,6 +30,7 @@
 #include <gnutls_datum.h>
 #include <pkcs11_int.h>
 #include <gnutls/abstract.h>
+#include <gnutls_sig.h>
 #include <gnutls_pk.h>
 #include <x509_int.h>
 #include <openpgp/openpgp_int.h>
@@ -1119,7 +1120,49 @@ gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey, unsigned int flags,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = pubkey_verify_sig( data, NULL, signature, pubkey->pk_algorithm, 
+  ret = pubkey_verify_data( pubkey->pk_algorithm, GNUTLS_DIG_UNKNOWN, data, signature,
+    &pubkey->params);
+  if (ret < 0)
+    {
+      gnutls_assert();
+    }
+
+  return ret;
+}
+
+/**
+ * gnutls_pubkey_verify_data2:
+ * @pubkey: Holds the public key
+ * @algo: The signature algorithm used
+ * @flags: should be 0 for now
+ * @data: holds the signed data
+ * @signature: contains the signature
+ *
+ * This function will verify the given signed data, using the
+ * parameters from the certificate.
+ *
+ * Returns: In case of a verification failure
+ *   %GNUTLS_E_PK_SIG_VERIFY_FAILED is returned, and a positive code
+ *   on success.
+ *
+ * Since: 2.12.0
+ **/
+int
+gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey, 
+                           gnutls_sign_algorithm_t algo,
+                           unsigned int flags,
+			   const gnutls_datum_t * data,
+			   const gnutls_datum_t * signature)
+{
+  int ret;
+
+  if (pubkey == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  ret = pubkey_verify_data( pubkey->pk_algorithm, _gnutls_sign_get_hash_algorithm(algo), data, signature,
     &pubkey->params);
   if (ret < 0)
     {
@@ -1158,7 +1201,7 @@ gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
     return _gnutls_rsa_verify (hash, signature, &key->params, 1);
   else
     {
-      return pubkey_verify_sig (NULL, hash, signature, key->pk_algorithm,
+      return pubkey_verify_hashed_data (key->pk_algorithm, hash, signature,
                        &key->params);
     }
 }
@@ -1249,4 +1292,267 @@ _gnutls_pubkey_get_mpis (gnutls_pubkey_t key,
                                  gnutls_pk_params_st * params)
 {
   return _gnutls_pk_params_copy(params, &key->params);
+}
+
+/* if hash==MD5 then we do RSA-MD5
+ * if hash==SHA then we do RSA-SHA
+ * params[0] is modulus
+ * params[1] is public key
+ */
+static int
+_pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
+                       const gnutls_datum_t * prehash,
+                       const gnutls_datum_t * signature, 
+                       gnutls_pk_params_st * params)
+{
+  gnutls_mac_algorithm_t hash = GNUTLS_MAC_UNKNOWN;
+  int ret;
+  opaque digest[MAX_HASH_SIZE], md[MAX_HASH_SIZE], *cmp;
+  int digest_size;
+  digest_hd_st hd;
+  gnutls_datum_t decrypted;
+
+  ret =
+    _gnutls_pkcs1_rsa_decrypt (&decrypted, signature, params, 1);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  /* decrypted is a BER encoded data of type DigestInfo
+   */
+
+  digest_size = sizeof (digest);
+  if ((ret =
+       decode_ber_digest_info (&decrypted, &hash, digest, &digest_size)) != 0)
+    {
+      gnutls_assert ();
+      _gnutls_free_datum (&decrypted);
+      return ret;
+    }
+
+  _gnutls_free_datum (&decrypted);
+
+  if (digest_size != _gnutls_hash_get_algo_len (hash))
+    {
+      gnutls_assert ();
+      return GNUTLS_E_ASN1_GENERIC_ERROR;
+    }
+
+  if (prehash && prehash->data && prehash->size == digest_size)
+    {
+      cmp = prehash->data;
+    }
+  else
+    {
+      if (!text)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_INVALID_REQUEST;
+        }
+
+      ret = _gnutls_hash_init (&hd, hash);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+          return ret;
+        }
+
+      _gnutls_hash (&hd, text->data, text->size);
+      _gnutls_hash_deinit (&hd, md);
+
+      cmp = md;
+    }
+
+  if (memcmp (cmp, digest, digest_size) != 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_PK_SIG_VERIFY_FAILED;
+    }
+
+  return 0;
+}
+
+/* Hashes input data and verifies a signature.
+ */
+static int
+dsa_verify_hashed_data (const gnutls_datum_t * hash,
+                const gnutls_datum_t * signature,
+                gnutls_pk_algorithm_t pk,
+                gnutls_pk_params_st* params)
+{
+  gnutls_datum_t digest;
+  gnutls_digest_algorithm_t algo;
+  int hash_len;
+
+  algo = _gnutls_dsa_q_to_hash (pk, params, &hash_len);
+
+  /* SHA1 or better allowed */
+  if (!hash->data || hash->size < hash_len)
+    {
+      gnutls_assert();
+      _gnutls_debug_log("Hash size (%d) does not correspond to hash %s(%d) or better.\n", (int)hash->size, gnutls_mac_get_name(algo), hash_len);
+          
+      if (hash->size != 20) /* SHA1 is allowed */
+        return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
+    }
+
+  digest.data = hash->data;
+  digest.size = hash->size;
+
+  return _gnutls_pk_verify (pk, &digest, signature, params);
+}
+
+static int
+dsa_verify_data (gnutls_pk_algorithm_t pk,
+                 gnutls_digest_algorithm_t algo,
+                 const gnutls_datum_t * data,
+                 const gnutls_datum_t * signature,
+                 gnutls_pk_params_st* params)
+{
+  int ret;
+  opaque _digest[MAX_HASH_SIZE];
+  gnutls_datum_t digest;
+  digest_hd_st hd;
+
+  if (algo == GNUTLS_DIG_UNKNOWN)
+    algo = _gnutls_dsa_q_to_hash (pk, params, NULL);
+
+  ret = _gnutls_hash_init (&hd, algo);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  _gnutls_hash (&hd, data->data, data->size);
+  _gnutls_hash_deinit (&hd, _digest);
+
+  digest.data = _digest;
+  digest.size = _gnutls_hash_get_algo_len(algo);
+
+  return _gnutls_pk_verify (pk, &digest, signature, params);
+}
+
+/* Verifies the signature data, and returns GNUTLS_E_PK_SIG_VERIFY_FAILED if 
+ * not verified, or 1 otherwise.
+ */
+int
+pubkey_verify_hashed_data (gnutls_pk_algorithm_t pk,
+                   const gnutls_datum_t * hash,
+                   const gnutls_datum_t * signature,
+                   gnutls_pk_params_st * issuer_params)
+{
+
+  switch (pk)
+    {
+    case GNUTLS_PK_RSA:
+
+      if (_pkcs1_rsa_verify_sig
+          (NULL, hash, signature, issuer_params) != 0)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_PK_SIG_VERIFY_FAILED;
+        }
+
+      return 1;
+      break;
+
+    case GNUTLS_PK_ECC:
+    case GNUTLS_PK_DSA:
+      if (dsa_verify_hashed_data(hash, signature, pk, issuer_params) != 0)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_PK_SIG_VERIFY_FAILED;
+        }
+
+      return 1;
+      break;
+    default:
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
+
+    }
+}
+
+/* Verifies the signature data, and returns GNUTLS_E_PK_SIG_VERIFY_FAILED if 
+ * not verified, or 1 otherwise.
+ */
+int
+pubkey_verify_data (gnutls_pk_algorithm_t pk,
+                    gnutls_digest_algorithm_t algo,
+                    const gnutls_datum_t * data,
+                    const gnutls_datum_t * signature,
+                    gnutls_pk_params_st * issuer_params)
+{
+
+  switch (pk)
+    {
+    case GNUTLS_PK_RSA:
+
+      if (_pkcs1_rsa_verify_sig
+          (data, NULL, signature, issuer_params) != 0)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_PK_SIG_VERIFY_FAILED;
+        }
+
+      return 1;
+      break;
+
+    case GNUTLS_PK_ECC:
+    case GNUTLS_PK_DSA:
+      if (dsa_verify_data(pk, algo, data, signature, issuer_params) != 0)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_PK_SIG_VERIFY_FAILED;
+        }
+
+      return 1;
+      break;
+    default:
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
+
+    }
+}
+
+gnutls_digest_algorithm_t
+_gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* params, int* hash_len)
+{
+  int bits = 0;
+  
+  if (algo == GNUTLS_PK_DSA)
+    bits = _gnutls_mpi_get_nbits (params->params[1]);
+  else if (algo == GNUTLS_PK_ECC)
+    bits = gnutls_ecc_curve_get_size(params->flags)*8;
+
+  if (bits <= 160)
+    {
+      if (hash_len) *hash_len = 20;
+      return GNUTLS_DIG_SHA1;
+    }
+  else if (bits <= 192)
+    {
+      if (hash_len) *hash_len = 24;
+      return GNUTLS_DIG_SHA256;
+    }
+  else if (bits <= 224)
+    {
+      if (hash_len) *hash_len = 28;
+      return GNUTLS_DIG_SHA256;
+    }
+  else if (bits <= 256)
+    {
+      if (hash_len) *hash_len = 32;
+      return GNUTLS_DIG_SHA256;
+    }
+  else if (bits <= 384)
+    {
+      if (hash_len) *hash_len = 48;
+      return GNUTLS_DIG_SHA384;
+    }
+  else
+    {
+      if (hash_len) *hash_len = 64;
+      return GNUTLS_DIG_SHA512;
+    }
 }

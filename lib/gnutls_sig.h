@@ -67,4 +67,9 @@ _gnutls_privkey_sign_hash (gnutls_privkey_t key,
                            const gnutls_datum_t * hash,
                            gnutls_datum_t * signature);
 
+int
+decode_ber_digest_info (const gnutls_datum_t * info,
+                        gnutls_mac_algorithm_t * hash,
+                        opaque * digest, int *digest_size);
+
 #endif

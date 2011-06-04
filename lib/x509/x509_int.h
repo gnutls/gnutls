@@ -182,13 +182,14 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
                                gnutls_pk_algorithm_t pk,
                                gnutls_pk_params_st * issuer_params);
 
-int _gnutls_x509_verify_signature (const gnutls_datum_t * tbs,
-                                   const gnutls_datum_t * hash,
-                                   const gnutls_datum_t * signature,
-                                   gnutls_x509_crt_t issuer);
-int _gnutls_x509_privkey_verify_signature (const gnutls_datum_t * tbs,
-                                           const gnutls_datum_t * signature,
-                                           gnutls_x509_privkey_t issuer);
+int _gnutls_x509_verify_data (gnutls_digest_algorithm_t algo,
+                              const gnutls_datum_t * data,
+                              const gnutls_datum_t * signature,
+                              gnutls_x509_crt_t issuer);
+
+int _gnutls_x509_verify_hashed_data (const gnutls_datum_t * hash,
+                                     const gnutls_datum_t * signature,
+                                     gnutls_x509_crt_t issuer);
 
 /* privkey.h */
 ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t *

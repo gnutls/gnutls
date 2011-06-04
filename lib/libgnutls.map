@@ -508,7 +508,6 @@ GNUTLS_1_4
     gnutls_x509_privkey_init;
     gnutls_x509_privkey_sign_data;
     gnutls_x509_privkey_sign_hash;
-    gnutls_x509_privkey_verify_data;
     gnutls_x509_rdn_get;
     gnutls_x509_rdn_get_by_oid;
     gnutls_x509_rdn_get_oid;
@@ -710,6 +709,7 @@ GNUTLS_3_0_0 {
 	gnutls_pubkey_get_pk_ecc_raw;
 	gnutls_x509_privkey_export_ecc_raw;
 	gnutls_x509_privkey_import_ecc_raw;
+	gnutls_pubkey_verify_data2;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {
