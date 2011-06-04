@@ -173,4 +173,13 @@ int _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle, void *digest,
 
 int _gnutls_hash_copy (digest_hd_st * dst_handle, digest_hd_st * src_handle);
 
+inline static int IS_SHA(gnutls_digest_algorithm_t algo)
+{
+  if (algo == GNUTLS_DIG_SHA1 || algo == GNUTLS_DIG_SHA224 ||
+      algo == GNUTLS_DIG_SHA256 || algo == GNUTLS_DIG_SHA384 ||
+      algo == GNUTLS_DIG_SHA512)
+      return 1;
+  return 0;
+}
+
 #endif /* GNUTLS_HASH_INT_H */

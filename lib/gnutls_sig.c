@@ -136,8 +136,7 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_pcert_st* cert,
     case GNUTLS_PK_ECC:
       _gnutls_hash_deinit (&td_sha, concat);
 
-      if ((hash_algo != GNUTLS_DIG_SHA1) && (hash_algo != GNUTLS_DIG_SHA224)
-          && (hash_algo != GNUTLS_DIG_SHA256))
+      if (!IS_SHA(hash_algo))
         {
           gnutls_assert ();
           return GNUTLS_E_INTERNAL_ERROR;
