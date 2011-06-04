@@ -815,7 +815,7 @@ _gnutls_cal_PRF_A (gnutls_mac_algorithm_t algorithm,
  * (used in the PRF function)
  */
 static int
-_gnutls_P_hash (gnutls_mac_algorithm_t algorithm,
+P_hash (gnutls_mac_algorithm_t algorithm,
                 const opaque * secret, int secret_size,
                 const opaque * seed, int seed_size,
                 int total_bytes, opaque * ret)
@@ -930,7 +930,8 @@ _gnutls_PRF (gnutls_session_t session,
   if (_gnutls_version_has_selectable_prf (ver))
     {
       result =
-        _gnutls_P_hash (GNUTLS_MAC_SHA256, secret, secret_size,
+        P_hash (_gnutls_cipher_suite_get_prf(&session->security_parameters.current_cipher_suite), 
+                        secret, secret_size,
                         s_seed, s_seed_size, total_bytes, ret);
       if (result < 0)
         {
@@ -951,7 +952,7 @@ _gnutls_PRF (gnutls_session_t session,
         }
 
       result =
-        _gnutls_P_hash (GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size,
+        P_hash (GNUTLS_MAC_MD5, s1, l_s, s_seed, s_seed_size,
                         total_bytes, o1);
       if (result < 0)
         {
@@ -960,7 +961,7 @@ _gnutls_PRF (gnutls_session_t session,
         }
 
       result =
-        _gnutls_P_hash (GNUTLS_MAC_SHA1, s2, l_s, s_seed, s_seed_size,
+        P_hash (GNUTLS_MAC_SHA1, s2, l_s, s_seed, s_seed_size,
                         total_bytes, o2);
       if (result < 0)
         {
@@ -1386,4 +1387,19 @@ int total = 0, ret, iv_size;
   total += RECORD_HEADER_SIZE(session);
   
   return total;
+}
+
+/**
+ * gnutls_ecc_curve_get:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Returns the currently used elliptic curve. Only valid
+ * when using an elliptic curve ciphersuite.
+ *
+ * Returns: the currently used curve, a #gnutls_ecc_curve_t
+ *   type.
+ **/
+gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session)
+{
+  return _gnutls_session_ecc_curve_get(session);
 }
