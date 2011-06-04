@@ -711,6 +711,8 @@ GNUTLS_3_0_0 {
 	gnutls_x509_privkey_export_ecc_raw;
 	gnutls_x509_privkey_import_ecc_raw;
 	gnutls_pubkey_verify_data2;
+	gnutls_x509_trust_list_verify_named_crt;
+	gnutls_x509_trust_list_add_named_crt;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

@@ -117,7 +117,7 @@ int
 gnutls_certificate_get_issuer (gnutls_certificate_credentials_t sc,
   gnutls_x509_crt_t cert, gnutls_x509_crt_t* issuer, unsigned int flags)
 {
-  return gnutls_trust_list_get_issuer(sc->tlist, cert, issuer, flags);
+  return gnutls_x509_trust_list_get_issuer(sc->tlist, cert, issuer, flags);
 }
 
 /**

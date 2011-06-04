@@ -541,6 +541,8 @@ extern "C"
  * @GNUTLS_VERIFY_DISABLE_TIME_CHECKS: Disable checking of activation
  *   and expiration validity periods of certificate chains. Don't set
  *   this unless you understand the security implications.
+ * @GNUTLS_VERIFY_DISABLE_CRL_CHECKS: Disable checking for validity
+ *   using certificate revocation lists.
  *
  * Enumeration of different certificate verify flags.
  */
@@ -554,7 +556,8 @@ extern "C"
     GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5 = 32,
     GNUTLS_VERIFY_DISABLE_TIME_CHECKS = 64,
     GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS = 128,
-    GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT = 256
+    GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT = 256,
+    GNUTLS_VERIFY_DISABLE_CRL_CHECKS = 512,
   } gnutls_certificate_verify_flags;
 
   int gnutls_x509_crt_check_issuer (gnutls_x509_crt_t cert,
@@ -847,12 +850,15 @@ extern "C"
   void
   gnutls_x509_trust_list_deinit (gnutls_x509_trust_list_t list, unsigned int all);
 
-  int gnutls_trust_list_get_issuer(gnutls_x509_trust_list_t list,
+  int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
     gnutls_x509_crt_t cert, gnutls_x509_crt_t* issuer, unsigned int flags);
 
   int
   gnutls_x509_trust_list_add_cas (gnutls_x509_trust_list_t list, 
     const gnutls_x509_crt_t * clist, int clist_size, unsigned int flags);
+
+  int gnutls_x509_trust_list_add_named_crt (gnutls_x509_trust_list_t list, 
+      gnutls_x509_crt_t cert, const void* name, size_t name_size, unsigned int flags);
 
 #define GNUTLS_TL_VERIFY_CRL 1
   int
@@ -869,6 +875,14 @@ extern "C"
      * if any. Might be null. 
      */
     unsigned int verification_output);
+
+  int gnutls_x509_trust_list_verify_named_crt (
+      gnutls_x509_trust_list_t list,
+      gnutls_x509_crt_t cert,
+      const void * name, size_t name_size,
+      unsigned int flags,
+      unsigned int *verify,
+      gnutls_verify_output_function func);
 
   int
   gnutls_x509_trust_list_verify_crt (

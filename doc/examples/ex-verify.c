@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
@@ -60,8 +61,16 @@ verify_certificate_chain (const char *hostname,
       gnutls_x509_crt_import (cert[i], &cert_chain[i], GNUTLS_X509_FMT_DER);
     }
 
-  gnutls_x509_trust_list_verify_crt(tlist, cert, cert_chain_length, 0, 
-    &output, print_details_func);
+  gnutls_x509_trust_list_verify_named_crt(tlist, cert[0], hostname, strlen(hostname), 
+    GNUTLS_VERIFY_DISABLE_CRL_CHECKS, &output, print_details_func);
+
+  /* if this certificate is not explicitly trusted verify against CAs 
+   */
+  if (output != 0)
+    {
+      gnutls_x509_trust_list_verify_crt(tlist, cert, cert_chain_length, 0, 
+        &output, print_details_func);
+    }
 
   if (output & GNUTLS_CERT_INVALID)
     {

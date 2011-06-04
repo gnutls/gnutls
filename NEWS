@@ -20,11 +20,18 @@ simplifies code.
 ** libgnutls: Added AES-GCM optimizations using the PCLMULQDQ
 instruction. Uses Andy Polyakov's assembly code.
 
+** libgnutls: Added gnutls_x509_trust_list_add_named_crt() and
+gnutls_x509_trust_list_verify_named_crt() that allow having a
+list of certificates in the trusted list that will be associated
+with a name (e.g. server name) and will not be used as CAs.
+
 ** libgnutls: Added ECDHE-PSK ciphersuites for TLS (RFC 5489).
 
 ** API and ABI modifications:
 gnutls_pubkey_verify_data2: ADDED
 gnutls_ecc_curve_get: ADDED
+gnutls_x509_trust_list_add_named_crt: ADDED
+gnutls_x509_trust_list_verify_named_crt: ADDED
 gnutls_x509_privkey_verify_data: REMOVED
 gnutls_crypto_bigint_register: REMOVED
 gnutls_crypto_cipher_register: REMOVED
@@ -36,7 +43,7 @@ gnutls_crypto_single_cipher_register: REMOVED
 gnutls_crypto_single_digest_register: REMOVED
 gnutls_crypto_single_mac_register: REMOVED
 GNUTLS_KX_ECDHE_PSK: New key exchange method
-
+GNUTLS_VERIFY_DISABLE_CRL_CHECKS: New certificate verification flag.
 
 * Version 2.99.2 (released 2011-05-26)
 

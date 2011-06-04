@@ -147,6 +147,10 @@ Deinitializes the list.
 @item @ref{gnutls_x509_trust_list_add_cas}:
 Adds certificate authorities to the list.
 
+@item @ref{gnutls_x509_trust_list_add_named_crt}:
+Adds trusted certificates for an entity identified
+by a name.
+
 @item @ref{gnutls_x509_trust_list_add_crls}:
 Adds certificate revocation lists.
 
@@ -155,14 +159,23 @@ Verifies a certificate chain using the previously setup trusted
 list. A callback can be specified that will provide information
 about the verification procedure (and detailed reasons of failure).
 
+@item @ref{gnutls_x509_trust_list_verify_named_crt}:
+Does verification of the certificate by looking for a matching one
+in the named certificates. A callback can be specified that will provide information
+about the verification procedure (and detailed reasons of failure).
+
 @end table
 
 The verification function will verify a given certificate chain against a list of certificate
 authorities and certificate revocation lists, and output
 a bitwise OR of elements of the @code{gnutls_certificate_status_t} 
-enumeration.  A detailed description of these elements can be found 
-in figure below.  An example of these functions in use can be found
+enumeration. It is also possible to have a set of certificates that
+are trusted for a particular server but not to authorize other certificates.
+This purpose is served by the functions @ref{gnutls_x509_trust_list_add_named_crt} and @ref{gnutls_x509_trust_list_verify_named_crt}.
+A detailed description of these elements can be found 
+in figure below. An example of these functions in use can be found
 in @ref{ex:verify2}.
+
 
 When operating in the context of a TLS session, the trusted certificate
 authority list has been set via the
@@ -217,7 +230,11 @@ flag should normaly be disabled, unless you know what this means.
 Allow only trusted CA certificates that have version 1.  This is
 safer than GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT, and should be
 used instead. That way only signers in your trusted list will be
-allowed to have certificates of version 1.
+allowed to have certificates of version 1. This is the default.
+
+@item GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT:
+Do not allow trusted version 1 CA certificates.  This option is to be used
+in order consider all V1 certificates as deprecated.
 
 @item GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT:
 Allow CA certificates that have version 1 (both root and
@@ -234,6 +251,14 @@ Allow certificates to be signed using the old MD2 algorithm.
 
 @item GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5:
 Allow certificates to be signed using the broken MD5 algorithm.
+
+@item GNUTLS_VERIFY_DISABLE_TIME_CHECKS:
+Disable checking of activation
+and expiration validity periods of certificate chains. Don't set
+this unless you understand the security implications.
+
+@item GNUTLS_VERIFY_DISABLE_CRL_CHECKS:
+Disables checking for validity using certificate revocation lists.
 @end table
 
 Although the verification of a certificate path indicates that the
