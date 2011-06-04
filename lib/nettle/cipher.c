@@ -183,6 +183,7 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
     {
 #ifdef NETTLE_GCM
     case GNUTLS_CIPHER_AES_128_GCM:
+    case GNUTLS_CIPHER_AES_256_GCM:
       ctx->encrypt = _gcm_encrypt;
       ctx->decrypt = _gcm_decrypt;
       ctx->i_encrypt = (nettle_crypt_func*) aes_bidi_encrypt;
@@ -264,6 +265,7 @@ wrap_nettle_cipher_setkey (void *_ctx, const void *key, size_t keysize)
     {
 #ifdef NETTLE_GCM
     case GNUTLS_CIPHER_AES_128_GCM:
+    case GNUTLS_CIPHER_AES_256_GCM:
       gcm_aes_set_key(&ctx->ctx.aes_gcm, keysize, key);
       break;
 #endif
@@ -331,6 +333,7 @@ struct nettle_cipher_ctx *ctx = _ctx;
     {
 #ifdef NETTLE_GCM
     case GNUTLS_CIPHER_AES_128_GCM:
+    case GNUTLS_CIPHER_AES_256_GCM:
       if (ivsize != GCM_DEFAULT_NONCE_SIZE)
         {
           gnutls_assert ();

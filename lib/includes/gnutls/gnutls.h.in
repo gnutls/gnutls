@@ -81,6 +81,7 @@ extern "C"
    * @GNUTLS_CIPHER_RC2_40_CBC: RC2 in CBC mode with 40-bit keys.
    * @GNUTLS_CIPHER_DES_CBC: DES in CBC mode (56-bit keys).
    * @GNUTLS_CIPHER_AES_128_GCM: AES in GCM mode with 128-bit keys.
+   * @GNUTLS_CIPHER_AES_256_GCM: AES in GCM mode with 256-bit keys.
    * @GNUTLS_CIPHER_IDEA_PGP_CFB: IDEA in CFB mode.
    * @GNUTLS_CIPHER_3DES_PGP_CFB: 3DES in CFB mode.
    * @GNUTLS_CIPHER_CAST5_PGP_CFB: CAST5 in CFB mode.
@@ -108,6 +109,7 @@ extern "C"
     GNUTLS_CIPHER_DES_CBC = 91,
     GNUTLS_CIPHER_AES_192_CBC = 92,
     GNUTLS_CIPHER_AES_128_GCM = 93,
+    GNUTLS_CIPHER_AES_256_GCM = 94,
 
     /* used only for PGP internals. Ignored in TLS/SSL
      */

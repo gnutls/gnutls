@@ -38,10 +38,8 @@ _gnutls_qsort (gnutls_session_t session, void *_base, size_t nmemb,
 /* Cipher SUITES */
 #define GNUTLS_CIPHER_SUITE_ENTRY( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, max_version, dtls ) \
 	{ #name, {name}, block_algorithm, kx_algorithm, mac_algorithm, min_version, max_version, dtls, GNUTLS_MAC_SHA256}
-#if 0
 #define GNUTLS_CIPHER_SUITE_ENTRY_PRF( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, max_version, dtls, prf ) \
 	{ #name, {name}, block_algorithm, kx_algorithm, mac_algorithm, min_version, max_version, dtls, prf}
-#endif
 
 typedef struct
 {
@@ -220,6 +218,12 @@ typedef struct
 /* ECC with AES-GCM */
 #define GNUTLS_ECDHE_ECDSA_AES_128_GCM_SHA256   {0xC0,0x2B}
 #define GNUTLS_ECDHE_RSA_AES_128_GCM_SHA256     {0xC0,0x2F}
+#define GNUTLS_ECDHE_RSA_AES_256_GCM_SHA384     {0xC0,0x30}
+
+/* SuiteB */
+#define GNUTLS_ECDHE_ECDSA_AES_256_GCM_SHA384   {0xC0,0x2E}
+#define GNUTLS_ECDHE_ECDSA_AES_256_CBC_SHA384   {0xC0,0x24}
+
 
 /* ECC with PSK */
 #define GNUTLS_ECDHE_PSK_3DES_EDE_CBC_SHA { 0xC0, 0x34 }
@@ -612,18 +616,31 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_ECDHE_PSK,
                              GNUTLS_MAC_SHA256, GNUTLS_TLS1_0,
                              GNUTLS_VERSION_MAX, 1),
-  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_PSK_AES_256_CBC_SHA384,
+  GNUTLS_CIPHER_SUITE_ENTRY_PRF (GNUTLS_ECDHE_PSK_AES_256_CBC_SHA384,
                              GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_ECDHE_PSK,
                              GNUTLS_MAC_SHA384, GNUTLS_TLS1_0,
-                             GNUTLS_VERSION_MAX, 1),
+                             GNUTLS_VERSION_MAX, 1, GNUTLS_MAC_SHA384),
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_PSK_NULL_SHA256,
                              GNUTLS_CIPHER_NULL, GNUTLS_KX_ECDHE_PSK,
                              GNUTLS_MAC_SHA256, GNUTLS_TLS1_0,
                              GNUTLS_VERSION_MAX, 1),
-  GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_PSK_NULL_SHA384,
+  GNUTLS_CIPHER_SUITE_ENTRY_PRF (GNUTLS_ECDHE_PSK_NULL_SHA384,
                              GNUTLS_CIPHER_NULL, GNUTLS_KX_ECDHE_PSK,
                              GNUTLS_MAC_SHA384, GNUTLS_TLS1_0,
-                             GNUTLS_VERSION_MAX, 1),
+                             GNUTLS_VERSION_MAX, 1, GNUTLS_MAC_SHA384),
+  GNUTLS_CIPHER_SUITE_ENTRY_PRF(GNUTLS_ECDHE_ECDSA_AES_256_GCM_SHA384,
+                                GNUTLS_CIPHER_AES_256_GCM, GNUTLS_KX_ECDHE_ECDSA,
+                                GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
+                                GNUTLS_VERSION_MAX, 1, GNUTLS_DIG_SHA384),
+  GNUTLS_CIPHER_SUITE_ENTRY_PRF(GNUTLS_ECDHE_RSA_AES_256_GCM_SHA384,
+                                GNUTLS_CIPHER_AES_256_GCM, GNUTLS_KX_ECDHE_RSA,
+                                GNUTLS_MAC_AEAD, GNUTLS_TLS1_2,
+                                GNUTLS_VERSION_MAX, 1, GNUTLS_DIG_SHA384),
+  GNUTLS_CIPHER_SUITE_ENTRY_PRF(GNUTLS_ECDHE_ECDSA_AES_256_CBC_SHA384,
+                                GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_ECDHE_ECDSA,
+                                GNUTLS_MAC_SHA384, GNUTLS_TLS1_2,
+                                GNUTLS_VERSION_MAX, 1, GNUTLS_DIG_SHA384),
+
   {0, {{0, 0}}, 0, 0, 0, 0, 0, 0}
 };
 

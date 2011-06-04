@@ -445,12 +445,20 @@ included as a fallback only.  The ciphers are sorted by security
 margin.
 
 @item SECURE128: 
-Means all "secure" ciphersuites with ciphers up to 128
-bits, sorted by security margin.
+Means all "secure" ciphersuites of security level 128-bit
+or more.
 
-@item SECURE256:
-Means all "secure" ciphersuites including the 256 bit
-ciphers, sorted by security margin.
+@item SECURE192:
+Means all "secure" ciphersuites of security level 192-bit
+or more.
+
+@item SUITEB128: 
+Means all the NSA Suite B cryptography (RFC5430) ciphersuites
+with an 128 bit security level.
+
+@item SUITEB192:
+Means all the NSA Suite B cryptography (RFC5430) ciphersuites
+with an 192 bit security level.
 
 @item EXPORT:
 Means all ciphersuites are enabled, including the

@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.99.3 (unreleased)
 
+** libgnutls: Added SUITEB128 and SUITEB192 priority
+strings to enable the NSA SuiteB cryptography ciphersuites.
+
 ** libgnutls: Added gnutls_pubkey_verify_data2() that will
 verify data provided the signature algorithm.
 

@@ -230,7 +230,17 @@ static const int supported_ecc_secure128[] = {
   0
 };
 
-static const int supported_ecc_secure256[] = {
+static const int supported_ecc_suiteb128[] = {
+  GNUTLS_ECC_CURVE_SECP256R1,
+  0
+};
+
+static const int supported_ecc_suiteb192[] = {
+  GNUTLS_ECC_CURVE_SECP384R1,
+  0
+};
+
+static const int supported_ecc_secure192[] = {
   GNUTLS_ECC_CURVE_SECP521R1,
   0
 };
@@ -244,15 +254,22 @@ static const int protocol_priority[] = {
   0
 };
 
+static const int protocol_priority_suiteb[] = {
+  GNUTLS_TLS1_2,
+  0
+};
+
 static const int kx_priority_performance[] = {
   GNUTLS_KX_RSA,
   GNUTLS_KX_ECDHE_ECDSA,
   GNUTLS_KX_ECDHE_RSA,
   GNUTLS_KX_DHE_RSA,
   GNUTLS_KX_DHE_DSS,
-  /* GNUTLS_KX_ANON_DH: Man-in-the-middle prone, don't add!
-   * GNUTLS_KX_RSA_EXPORT: Deprecated, don't add!
-   */
+  0
+};
+
+static const int kx_priority_suiteb[] = {
+  GNUTLS_KX_ECDHE_ECDSA,
   0
 };
 
@@ -283,33 +300,34 @@ static const int kx_priority_secure[] = {
 
 static const int cipher_priority_performance[] = {
   GNUTLS_CIPHER_ARCFOUR_128,
-#ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_128_CBC,
-#endif
   GNUTLS_CIPHER_AES_128_CBC,
   GNUTLS_CIPHER_3DES_CBC,
   GNUTLS_CIPHER_AES_256_CBC,
-#ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_256_CBC,
-#endif
-#ifdef NETTLE_GCM
   GNUTLS_CIPHER_AES_128_GCM,
-#endif
+  GNUTLS_CIPHER_AES_256_GCM,
+  0
+};
+
+static const int cipher_priority_suiteb128[] = {
+  GNUTLS_CIPHER_AES_128_GCM,
+  GNUTLS_CIPHER_AES_128_CBC,
+  0
+};
+
+static const int cipher_priority_suiteb192[] = {
+  GNUTLS_CIPHER_AES_256_GCM,
+  GNUTLS_CIPHER_AES_256_CBC,
   0
 };
 
 static const int cipher_priority_normal[] = {
   GNUTLS_CIPHER_AES_128_CBC,
-#ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_128_CBC,
-#endif
   GNUTLS_CIPHER_AES_256_CBC,
-#ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_256_CBC,
-#endif
-#ifdef NETTLE_GCM
   GNUTLS_CIPHER_AES_128_GCM,
-#endif
   GNUTLS_CIPHER_3DES_CBC,
   GNUTLS_CIPHER_ARCFOUR_128,
   0
@@ -317,29 +335,20 @@ static const int cipher_priority_normal[] = {
 
 static const int cipher_priority_secure128[] = {
   GNUTLS_CIPHER_AES_128_CBC,
-#ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_128_CBC,
-#endif
-#ifdef NETTLE_GCM
   GNUTLS_CIPHER_AES_128_GCM,
-#endif
   GNUTLS_CIPHER_3DES_CBC,
   0
 };
 
 
-static const int cipher_priority_secure256[] = {
+static const int cipher_priority_secure192[] = {
   GNUTLS_CIPHER_AES_256_CBC,
-#ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_256_CBC,
-#endif
   GNUTLS_CIPHER_AES_128_CBC,
-#ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_128_CBC,
-#endif
-#ifdef NETTLE_GCM
   GNUTLS_CIPHER_AES_128_GCM,
-#endif
+  GNUTLS_CIPHER_AES_256_GCM,
   GNUTLS_CIPHER_3DES_CBC,
   0
 };
@@ -348,10 +357,8 @@ static const int cipher_priority_secure256[] = {
 static const int cipher_priority_export[] = {
   GNUTLS_CIPHER_AES_128_CBC,
   GNUTLS_CIPHER_AES_256_CBC,
-#ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_CAMELLIA_128_CBC,
   GNUTLS_CIPHER_CAMELLIA_256_CBC,
-#endif
   GNUTLS_CIPHER_AES_128_GCM,
   GNUTLS_CIPHER_3DES_CBC,
   GNUTLS_CIPHER_ARCFOUR_128,
@@ -386,14 +393,28 @@ static const int sign_priority_default[] = {
   0
 };
 
-static const int sign_priority_secure128[] = {
-  GNUTLS_SIGN_RSA_SHA256,
-  GNUTLS_SIGN_DSA_SHA256,
+static const int sign_priority_suiteb128[] = {
   GNUTLS_SIGN_ECDSA_SHA256,
   0
 };
 
-static const int sign_priority_secure256[] = {
+static const int sign_priority_suiteb192[] = {
+  GNUTLS_SIGN_ECDSA_SHA384,
+  0
+};
+
+static const int sign_priority_secure128[] = {
+  GNUTLS_SIGN_RSA_SHA256,
+  GNUTLS_SIGN_DSA_SHA256,
+  GNUTLS_SIGN_ECDSA_SHA256,
+  GNUTLS_SIGN_RSA_SHA384,
+  GNUTLS_SIGN_ECDSA_SHA384,
+  GNUTLS_SIGN_RSA_SHA512,
+  GNUTLS_SIGN_ECDSA_SHA512,
+  0
+};
+
+static const int sign_priority_secure192[] = {
   GNUTLS_SIGN_RSA_SHA512,
   GNUTLS_SIGN_ECDSA_SHA512,
   0
@@ -402,16 +423,35 @@ static const int sign_priority_secure256[] = {
 static const int mac_priority_normal[] = {
   GNUTLS_MAC_SHA1,
   GNUTLS_MAC_SHA256,
+  GNUTLS_MAC_SHA384,
   GNUTLS_MAC_AEAD,
   GNUTLS_MAC_MD5,
   0
 };
 
-
-static const int mac_priority_secure[] = {
+static const int mac_priority_suiteb128[] = {
   GNUTLS_MAC_SHA256,
+  GNUTLS_MAC_SHA384,
   GNUTLS_MAC_AEAD,
-  GNUTLS_MAC_SHA1,
+  0
+};
+
+static const int mac_priority_suiteb192[] = {
+  GNUTLS_MAC_SHA384,
+  GNUTLS_MAC_AEAD,
+  0
+};
+
+static const int mac_priority_secure128[] = {
+  GNUTLS_MAC_SHA256,
+  GNUTLS_MAC_SHA384,
+  GNUTLS_MAC_AEAD,
+  0
+};
+
+static const int mac_priority_secure192[] = {
+  GNUTLS_MAC_SHA384,
+  GNUTLS_MAC_AEAD,
   0
 };
 
@@ -526,11 +566,17 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  * included as a fallback only.  The ciphers are sorted by security
  * margin.
  *
- * "SECURE128" means all "secure" ciphersuites with ciphers up to 128
- * bits, sorted by security margin.
+ * "SECURE128" means all "secure" ciphersuites of security level 128-bit
+ * or more.
  *
- * "SECURE256" means all "secure" ciphersuites including the 256 bit
- * ciphers, sorted by security margin.
+ * "SECURE192" means all "secure" ciphersuites of security level 192-bit
+ * or more.
+ *
+ * "SUITEB128" means all the NSA SuiteB ciphersuites with security level
+ * of 128.
+ *
+ * "SUITEB192" means all the NSA SuiteB ciphersuites with security level
+ * of 192.
  *
  * "EXPORT" means all ciphersuites are enabled, including the
  * low-security 40 bit ciphers.
@@ -638,31 +684,54 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
           _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_normal);
         }
       else if (strcasecmp (broken_list[i], "SECURE256") == 0
-               || strcasecmp (broken_list[i], "SECURE") == 0)
+               || strcasecmp (broken_list[i], "SECURE192") == 0)
         {
           _set_priority (&(*priority_cache)->cipher,
-                         cipher_priority_secure256);
+                         cipher_priority_secure192);
           _set_priority (&(*priority_cache)->kx, kx_priority_secure);
-          _set_priority (&(*priority_cache)->mac, mac_priority_secure);
+          _set_priority (&(*priority_cache)->mac, mac_priority_secure192);
           _set_priority (&(*priority_cache)->sign_algo,
-                         sign_priority_secure256);
-          _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_secure256);
+                         sign_priority_secure192);
+          _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_secure192);
         }
-      else if (strcasecmp (broken_list[i], "SECURE128") == 0)
+      else if (strcasecmp (broken_list[i], "SECURE128") == 0
+               || strcasecmp (broken_list[i], "SECURE") == 0)
         {
           _set_priority (&(*priority_cache)->cipher,
                          cipher_priority_secure128);
           _set_priority (&(*priority_cache)->kx, kx_priority_secure);
-          _set_priority (&(*priority_cache)->mac, mac_priority_secure);
+          _set_priority (&(*priority_cache)->mac, mac_priority_secure128);
           _set_priority (&(*priority_cache)->sign_algo,
                          sign_priority_secure128);
           _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_secure128);
+        }
+      else if (strcasecmp (broken_list[i], "SUITEB128") == 0)
+        {
+          _set_priority (&(*priority_cache)->protocol, protocol_priority_suiteb);
+          _set_priority (&(*priority_cache)->cipher,
+                         cipher_priority_suiteb128);
+          _set_priority (&(*priority_cache)->kx, kx_priority_suiteb);
+          _set_priority (&(*priority_cache)->mac, mac_priority_suiteb128);
+          _set_priority (&(*priority_cache)->sign_algo,
+                         sign_priority_suiteb128);
+          _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_suiteb128);
+        }
+      else if (strcasecmp (broken_list[i], "SUITEB192") == 0)
+        {
+          _set_priority (&(*priority_cache)->protocol, protocol_priority_suiteb);
+          _set_priority (&(*priority_cache)->cipher,
+                         cipher_priority_suiteb192);
+          _set_priority (&(*priority_cache)->kx, kx_priority_suiteb);
+          _set_priority (&(*priority_cache)->mac, mac_priority_suiteb192);
+          _set_priority (&(*priority_cache)->sign_algo,
+                         sign_priority_suiteb192);
+          _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_suiteb192);
         }
       else if (strcasecmp (broken_list[i], "EXPORT") == 0)
         {
           _set_priority (&(*priority_cache)->cipher, cipher_priority_export);
           _set_priority (&(*priority_cache)->kx, kx_priority_export);
-          _set_priority (&(*priority_cache)->mac, mac_priority_secure);
+          _set_priority (&(*priority_cache)->mac, mac_priority_secure128);
           _set_priority (&(*priority_cache)->sign_algo,
                          sign_priority_default);
           _set_priority (&(*priority_cache)->supported_ecc, supported_ecc_normal);
@@ -779,7 +848,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
           else if (strncasecmp (&broken_list[i][1], "MAC-ALL", 7) == 0)
             {
                   bulk_fn (&(*priority_cache)->mac,
-                                mac_priority_secure);
+                                mac_priority_secure128);
             }
           else if (strncasecmp (&broken_list[i][1], "CIPHER-ALL", 10) == 0)
             {

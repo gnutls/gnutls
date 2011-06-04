@@ -205,6 +205,14 @@ register_x86_crypto (void)
             {
               gnutls_assert ();
             }
+
+          ret =
+            gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_256_GCM,
+                                                  80, &aes_gcm_struct);
+          if (ret < 0)
+            {
+              gnutls_assert ();
+            }
         }
     }
 
