@@ -3,7 +3,13 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010, 2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 2.12.5 (unreleased)
+* Version 2.12.6 (released 2011-06-4)
+
+** libgnutls: Allow usage of DSA signatures with truncated hash.
+Following: http://tools.ietf.org/html/draft-mavrogiannopoulos-tls-dss-00
+
+** libgnutls: Prevent the usage of write() and friends when no data
+are to be sent.
 
 ** libgnutls: Correctly set compression method when resuming sessions.
 Reported by Dash Shendy.
