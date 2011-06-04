@@ -5,12 +5,24 @@ See the end for copying conditions.
 
 * Version 2.99.3 (unreleased)
 
+** libgnutls: Added gnutls_pubkey_verify_data2() that will
+verify data provided the signature algorithm.
+
+** libgnutls: Simplified the handling of handshake messages to 
+be hashed. Instead of hashing during the handshake process we now 
+keep the data until handshake is over and hash them on request. 
+This uses more memory but eliminates issues with TLS 1.2 and 
+simplifies code.
+
 ** libgnutls: Added AES-GCM optimizations using the PCLMULQDQ
 instruction. Uses Andy Polyakov's assembly code.
 
 ** libgnutls: Added ECDHE-PSK ciphersuites for TLS (RFC 5489).
 
 ** API and ABI modifications:
+gnutls_pubkey_verify_data2: ADDED
+gnutls_ecc_curve_get: ADDED
+gnutls_x509_privkey_verify_data: REMOVED
 gnutls_crypto_bigint_register: REMOVED
 gnutls_crypto_cipher_register: REMOVED
 gnutls_crypto_digest_register: REMOVED

@@ -747,6 +747,7 @@ typedef enum
 /* Elliptic curves */
 const char * gnutls_ecc_curve_get_name (gnutls_ecc_curve_t curve);
 int gnutls_ecc_curve_get_size (gnutls_ecc_curve_t curve);
+gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 
 /* get information on the current session */
   gnutls_cipher_algorithm_t gnutls_cipher_get (gnutls_session_t session);
