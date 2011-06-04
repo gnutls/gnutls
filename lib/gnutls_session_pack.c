@@ -732,8 +732,9 @@ error:
  *      x bytes the session ID (32 bytes max)
  *
  *      4 bytes a timestamp
+ *      4 bytes the ECC curve
  *            -------------------
- *                MAX: 165 bytes
+ *                MAX: 169 bytes
  *
  */
 static int
@@ -792,6 +793,7 @@ pack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
   BUFFER_APPEND_NUM (ps, session->security_parameters.max_record_send_size);
   BUFFER_APPEND_NUM (ps, session->security_parameters.max_record_recv_size);
   BUFFER_APPEND_NUM (ps, session->security_parameters.timestamp);
+  BUFFER_APPEND_NUM (ps, session->security_parameters.ecc_curve);
 
   _gnutls_write_uint32 (ps->length - cur_size, ps->data + size_offset);
 
@@ -851,6 +853,9 @@ unpack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
                   resumed_security_parameters.max_record_recv_size);
   BUFFER_POP_NUM (ps,
                   session->internals.resumed_security_parameters.timestamp);
+
+  BUFFER_POP_NUM (ps,
+                  session->internals.resumed_security_parameters.ecc_curve);
 
   if (timestamp - session->internals.resumed_security_parameters.timestamp >
       session->internals.expire_time
