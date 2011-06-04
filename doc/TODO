@@ -3,23 +3,15 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
-+ Allow setting a list of trusted plain certificates (not CAs) in the
-  gnutls_x509_trust_list_t, to verify against.
-* Allow override of the system time() function.
 * Allow setting a PKCS #11 module to gnutls_x509_trust_list_t, to verify 
   against, similarly to NSS way.
 * Support replacing individual algorithms via a PKCS #11 module -
   maybe use p11-kit for that.
 * Support PKCS#8 AES and DES-MD5 (tests/enc3pkcs8.pem) encrypted keys.
-* Implement Datagram-TLS (DTLS).
 * Implement TLS-PSK with PKCS #11.
-* Verify added CRLs (is it really needed?)
 * Add support for generating empty CRLs
 * Document the format for the supported DN attributes.
 * Audit the code
-- Allow verifying of certificates on their reception.
-- Add gnutls_certificate_set_openpgp_keyring()
-  function, similar to gnutls_certificate_set_openpgp_key().
 - Add function to extract the signers of an openpgp key. Should
   be similar to gnutls_x509_crt_get_dn_oid().
 - Add function to verify an openpgp key against a plain key.
@@ -34,8 +26,6 @@ Current list:
 - RFC 3280 compliant certificate path validation.
 - Add progress handler gnutls_{dh,rsa}_params_generate2, to allow
   application to give progress feedback to user.
-- Support non-blocking gnutls_{dh,rsa}_params_generate2 for when there
-  is not enough entropy available. 
 - Chain verifications.
   - Check path length constraints.
   - Check keyCertSign key usages.
