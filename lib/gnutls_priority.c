@@ -848,7 +848,7 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
           else if (strncasecmp (&broken_list[i][1], "MAC-ALL", 7) == 0)
             {
                   bulk_fn (&(*priority_cache)->mac,
-                                mac_priority_secure128);
+                                mac_priority_normal);
             }
           else if (strncasecmp (&broken_list[i][1], "CIPHER-ALL", 10) == 0)
             {
