@@ -393,6 +393,20 @@ print_dh_info (gnutls_session_t session, const char *str)
     }
 }
 
+static void
+print_ecdh_info (gnutls_session_t session, const char *str)
+{
+int curve;
+
+  printf ("- %sEC Diffie-Hellman parameters\n", str);
+  
+  curve = gnutls_ecc_curve_get(session);
+  
+  printf (" - Using curve: %s\n", gnutls_ecc_curve_get_name (curve));
+  printf (" - Curve size: %d bits\n", gnutls_ecc_curve_get_size(curve)*8);
+
+}
+
 int
 print_info (gnutls_session_t session, const char *hostname, int insecure)
 {
@@ -410,7 +424,9 @@ print_info (gnutls_session_t session, const char *hostname, int insecure)
     {
 #ifdef ENABLE_ANON
     case GNUTLS_CRD_ANON:
-      if (kx != GNUTLS_KX_ANON_ECDH)
+      if (kx == GNUTLS_KX_ANON_ECDH)
+        print_ecdh_info(session, "Anonymous ");
+      else
         print_dh_info (session, "Anonymous ");
       break;
 #endif
@@ -438,6 +454,8 @@ print_info (gnutls_session_t session, const char *hostname, int insecure)
                 gnutls_psk_server_get_username (session));
       if (kx == GNUTLS_KX_DHE_PSK)
         print_dh_info (session, "Ephemeral ");
+      if (kx == GNUTLS_KX_ECDHE_PSK)
+        print_ecdh_info(session, "Ephemeral ");
       break;
 #endif
     case GNUTLS_CRD_IA:
@@ -458,6 +476,8 @@ print_info (gnutls_session_t session, const char *hostname, int insecure)
 
       if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS)
         print_dh_info (session, "Ephemeral ");
+      else if (kx == GNUTLS_KX_ECDHE_RSA || kx == GNUTLS_KX_ECDHE_ECDSA)
+        print_ecdh_info(session, "Ephemeral ");
 
       print_cert_info (session, hostname, insecure);
 
