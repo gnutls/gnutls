@@ -249,9 +249,11 @@ _gnutls_signature_algorithm_send_params (gnutls_session_t session,
 int cert_compatible_with_sig(gnutls_cert* cert, gnutls_protocol_t ver, 
   gnutls_sign_algorithm_t sign)
 {
+unsigned int hash_len;
+
   if (cert->subject_pk_algorithm == GNUTLS_PK_DSA)
     { /* override */
-      int hash_algo = _gnutls_dsa_q_to_hash (cert->params[1]);
+      int hash_algo = _gnutls_dsa_q_to_hash (cert->params[1], &hash_len);
 
       /* DSA keys over 1024 bits cannot be used with TLS 1.x, x<2 */
       if (!_gnutls_version_has_selectable_sighash (ver))
@@ -261,7 +263,7 @@ int cert_compatible_with_sig(gnutls_cert* cert, gnutls_protocol_t ver,
         }
       else
         {
-          if (_gnutls_sign_get_hash_algorithm(sign) != hash_algo)
+          if (_gnutls_hash_get_algo_len(_gnutls_sign_get_hash_algorithm(sign)) < hash_len)
             return GNUTLS_E_UNWANTED_ALGORITHM;
         }
         

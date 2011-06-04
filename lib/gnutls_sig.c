@@ -711,7 +711,7 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
       break;
     case GNUTLS_PK_DSA:
       /* ensure 1024 bit DSA keys are used */
-      hash_algo = _gnutls_dsa_q_to_hash (cert->params[1]);
+      hash_algo = _gnutls_dsa_q_to_hash (cert->params[1], NULL);
       if (!_gnutls_version_has_selectable_sighash (ver) && hash_algo != GNUTLS_DIG_SHA1)
         return gnutls_assert_val(GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL);
 
@@ -737,22 +737,6 @@ pk_hash_data (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash,
               const gnutls_datum_t * data, gnutls_datum_t * digest)
 {
   int ret;
-
-  switch (pk)
-    {
-    case GNUTLS_PK_RSA:
-      break;
-    case GNUTLS_PK_DSA:
-      if (params && hash != _gnutls_dsa_q_to_hash (params[1]))
-        {
-          gnutls_assert ();
-          return GNUTLS_E_INVALID_REQUEST;
-        }
-      break;
-    default:
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
 
   digest->size = _gnutls_hash_get_algo_len (hash);
   digest->data = gnutls_malloc (digest->size);

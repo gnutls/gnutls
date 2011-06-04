@@ -276,7 +276,7 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
         struct dsa_public_key pub;
         struct dsa_private_key priv;
         struct dsa_signature sig;
-        int hash_len;
+        unsigned int hash_len;
 
         memset(&priv, 0, sizeof(priv));
         memset(&pub, 0, sizeof(pub));
@@ -285,13 +285,12 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
 
         dsa_signature_init (&sig);
 
-        hash = _gnutls_dsa_q_to_hash (pub.q);
-        hash_len = _gnutls_hash_get_algo_len (hash);
+        hash = _gnutls_dsa_q_to_hash (pub.q, &hash_len);
         if (hash_len > vdata->size)
           {
             gnutls_assert ();
-            ret = GNUTLS_E_PK_SIGN_FAILED;
-            goto dsa_fail;
+            _gnutls_debug_log("Security level of algorithm requires hash %s(%d) or better\n", gnutls_mac_get_name(hash), hash_len);
+            hash_len = vdata->size;
           }
 
         ret =
@@ -417,6 +416,7 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
       {
         struct dsa_public_key pub;
         struct dsa_signature sig;
+        unsigned int hash_len;
 
         ret = _gnutls_decode_ber_rs (signature, &tmp[0], &tmp[1]);
         if (ret < 0)
@@ -429,16 +429,16 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         memcpy (&sig.r, tmp[0], sizeof (sig.r));
         memcpy (&sig.s, tmp[1], sizeof (sig.s));
 
-        hash = _gnutls_dsa_q_to_hash (pub.q);
+        hash = _gnutls_dsa_q_to_hash (pub.q, &hash_len);
 
-        if (vdata->size != _gnutls_hash_get_algo_len (hash))
+        if (hash_len > vdata->size)
           {
             gnutls_assert ();
-            ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
-            goto dsa_fail;
+            _gnutls_debug_log("Security level of algorithm requires hash %s(%d) or better\n", gnutls_mac_get_name(hash), hash_len);
+            hash_len = vdata->size;
           }
 
-        ret = _dsa_verify (&pub, vdata->size, vdata->data, &sig);
+        ret = _dsa_verify (&pub, hash_len, vdata->data, &sig);
         if (ret == 0)
           {
             gnutls_assert();
@@ -447,7 +447,6 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
         else
           ret = 0;
 
-      dsa_fail:
         _gnutls_mpi_release (&tmp[0]);
         _gnutls_mpi_release (&tmp[1]);
         break;
