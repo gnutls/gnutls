@@ -3,6 +3,11 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
+* Add certificate image support (see RFC3709, RFC6170)
+* Perform signature calculation in PKCS #11 using not plain
+  RSA but rather the combination of RSA-SHA256, RSA-SHA1 etc.
+  That will allow the usage of more secure tokens that do not
+  allow plain RSA.
 * Allow setting a PKCS #11 module to gnutls_x509_trust_list_t, to verify 
   against, similarly to NSS way.
 * Support replacing individual algorithms via a PKCS #11 module -
