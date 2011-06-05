@@ -236,11 +236,6 @@ typedef struct
 
 #define CIPHER_SUITES_COUNT (sizeof(cs_algorithms)/sizeof(gnutls_cipher_suite_entry)-1)
 
-/* FIXME: what we don't handle here is TLS 1.2 requirement
- * that each ciphersuite has it's own PRF algorithm. Now we
- * assume that each one uses the SHA-256 PRF in TLS 1.2.
- */
-
 static const gnutls_cipher_suite_entry cs_algorithms[] = {
   /* ANON_DH */
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ANON_DH_ARCFOUR_MD5,
@@ -805,107 +800,64 @@ _gnutls_cipher_suite_is_ok (cipher_suite_st * suite)
 
 int
 _gnutls_supported_ciphersuites_sorted (gnutls_session_t session,
-                                       cipher_suite_st ** ciphers)
+                                       uint8_t* cipher_suites, int max_cipher_suites_size)
 {
 
   int count;
 
-  count = _gnutls_supported_ciphersuites (session, ciphers);
-  if (count <= 0)
-    {
-      gnutls_assert ();
-      return count;
-    }
+  count = _gnutls_supported_ciphersuites (session, cipher_suites, max_cipher_suites_size);
+  if (count < 0)
+    return gnutls_assert_val(count);
 
-  _gnutls_qsort (session, *ciphers, count,
-                 sizeof (cipher_suite_st), compare_algo);
+  _gnutls_qsort (session, cipher_suites, count/2,
+                 2, compare_algo);
 
   return count;
 }
 
 int
 _gnutls_supported_ciphersuites (gnutls_session_t session,
-                                cipher_suite_st ** _ciphers)
+                                uint8_t *cipher_suites, int max_cipher_suite_size)
 {
 
   unsigned int i, ret_count, j;
-  unsigned int count = CIPHER_SUITES_COUNT;
-  cipher_suite_st *tmp_ciphers;
-  cipher_suite_st *ciphers;
 
-  if (count == 0)
-    {
-      return 0;
-    }
+  if (max_cipher_suite_size < (CIPHER_SUITES_COUNT)*2)
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-  tmp_ciphers = gnutls_malloc (count * sizeof (cipher_suite_st));
-  if (tmp_ciphers == NULL)
-    return GNUTLS_E_MEMORY_ERROR;
-
-  ciphers = gnutls_malloc (count * sizeof (cipher_suite_st));
-  if (ciphers == NULL)
-    {
-      gnutls_free (tmp_ciphers);
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  for (i = 0; i < count; i++)
-    {
-      memcpy (&tmp_ciphers[i], &cs_algorithms[i].id,
-              sizeof (cipher_suite_st));
-    }
-
-  for (i = j = 0; i < count; i++)
+  for (i = j = 0; i < CIPHER_SUITES_COUNT; i++)
     {
       /* remove private cipher suites, if requested.
        */
-      if (tmp_ciphers[i].suite[0] == 0xFF &&
+      if (cs_algorithms[i].id.suite[0] == 0xFF &&
           session->internals.enable_private == 0)
         continue;
 
       /* remove cipher suites which do not support the
        * protocol version used.
        */
-      if (_gnutls_cipher_suite_is_version_supported (session, &tmp_ciphers[i])
+      if (_gnutls_cipher_suite_is_version_supported (session, &cs_algorithms[i].id)
           == 0)
         continue;
 
       if (_gnutls_kx_priority
-          (session, _gnutls_cipher_suite_get_kx_algo (&tmp_ciphers[i])) < 0)
+          (session, _gnutls_cipher_suite_get_kx_algo (&cs_algorithms[i].id)) < 0)
         continue;
 
       if (_gnutls_mac_priority
-          (session, _gnutls_cipher_suite_get_mac_algo (&tmp_ciphers[i])) < 0)
+          (session, _gnutls_cipher_suite_get_mac_algo (&cs_algorithms[i].id)) < 0)
         continue;
 
       if (_gnutls_cipher_priority
           (session,
-           _gnutls_cipher_suite_get_cipher_algo (&tmp_ciphers[i])) < 0)
+           _gnutls_cipher_suite_get_cipher_algo (&cs_algorithms[i].id)) < 0)
         continue;
 
-      memcpy (&ciphers[j], &tmp_ciphers[i], sizeof (cipher_suite_st));
-      j++;
+      memcpy (&cipher_suites[j], &cs_algorithms[i].id.suite, 2);
+      j+=2;
     }
 
   ret_count = j;
-
-#if 0                           /* expensive */
-  if (ret_count > 0 && ret_count != count)
-    {
-      ciphers =
-        gnutls_realloc_fast (ciphers, ret_count * sizeof (cipher_suite_st));
-    }
-  else
-    {
-      if (ret_count != count)
-        {
-          gnutls_free (ciphers);
-          ciphers = NULL;
-        }
-    }
-#endif
-
-  gnutls_free (tmp_ciphers);
 
   /* This function can no longer return 0 cipher suites.
    * It returns an error code instead.
@@ -913,10 +865,8 @@ _gnutls_supported_ciphersuites (gnutls_session_t session,
   if (ret_count == 0)
     {
       gnutls_assert ();
-      gnutls_free (ciphers);
       return GNUTLS_E_NO_CIPHER_SUITES;
     }
-  *_ciphers = ciphers;
   return ret_count;
 }
 
@@ -1007,23 +957,28 @@ static int
 compare_algo (gnutls_session_t session, const void *i_A1,
                       const void *i_A2)
 {
-  gnutls_kx_algorithm_t kA1 =
-    _gnutls_cipher_suite_get_kx_algo ((const cipher_suite_st *) i_A1);
-  gnutls_kx_algorithm_t kA2 =
-    _gnutls_cipher_suite_get_kx_algo ((const cipher_suite_st *) i_A2);
-  gnutls_cipher_algorithm_t cA1 =
-    _gnutls_cipher_suite_get_cipher_algo ((const cipher_suite_st *) i_A1);
-  gnutls_cipher_algorithm_t cA2 =
-    _gnutls_cipher_suite_get_cipher_algo ((const cipher_suite_st *) i_A2);
-  gnutls_mac_algorithm_t mA1 =
-    _gnutls_cipher_suite_get_mac_algo ((const cipher_suite_st *) i_A1);
-  gnutls_mac_algorithm_t mA2 =
-    _gnutls_cipher_suite_get_mac_algo ((const cipher_suite_st *) i_A2);
+  cipher_suite_st A1, A2;
+  gnutls_kx_algorithm_t kA1, kA2;
+  gnutls_cipher_algorithm_t cA1, cA2;
+  gnutls_mac_algorithm_t mA1, mA2;
+  int p1, p2;
+  
+  memcpy(A1.suite, i_A1, 2);
+  memcpy(A2.suite, i_A2, 2);
 
-  int p1 = (_gnutls_kx_priority (session, kA1) + 1) * 64;
-  int p2 = (_gnutls_kx_priority (session, kA2) + 1) * 64;
-  p1 += (_gnutls_cipher_priority (session, cA1) + 1) * 8;
-  p2 += (_gnutls_cipher_priority (session, cA2) + 1) * 8;
+  kA1 = _gnutls_cipher_suite_get_kx_algo (&A1);
+  kA2 = _gnutls_cipher_suite_get_kx_algo (&A2);
+  
+  cA1 = _gnutls_cipher_suite_get_cipher_algo (&A1);
+  cA2 = _gnutls_cipher_suite_get_cipher_algo (&A2);
+  
+  mA1 = _gnutls_cipher_suite_get_mac_algo (&A1);
+  mA2 = _gnutls_cipher_suite_get_mac_algo (&A2);
+
+  p1 = (_gnutls_kx_priority (session, kA1) + 1) * 256;
+  p2 = (_gnutls_kx_priority (session, kA2) + 1) * 256;
+  p1 += (_gnutls_cipher_priority (session, cA1) + 1) * 16;
+  p2 += (_gnutls_cipher_priority (session, cA2) + 1) * 16;
   p1 += _gnutls_mac_priority (session, mA1);
   p2 += _gnutls_mac_priority (session, mA2);
 

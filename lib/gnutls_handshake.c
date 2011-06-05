@@ -70,8 +70,8 @@ static int _gnutls_server_select_comp_method (gnutls_session_t session,
                                               opaque * data, int datalen);
 static int
 _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
-                                      cipher_suite_st ** cipherSuites,
-                                      int numCipherSuites,
+                                      uint8_t * cipher_suites,
+                                      int cipher_suites_size,
                                       gnutls_pk_algorithm_t *pk_algos,
                                       size_t pk_algos_size);
 
@@ -818,9 +818,10 @@ int
 _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
                              int datalen)
 {
-  int x, i, j, ret;
+  int i, j, ret, cipher_suites_size;
   size_t pk_algos_size;
-  cipher_suite_st *ciphers, cs;
+  cipher_suite_st cs;
+  uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE];
   int retval, err;
   gnutls_pk_algorithm_t pk_algos[MAX_ALGOS];        /* will hold the pk algorithms
                                          * supported by the peer.
@@ -856,28 +857,27 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  ret = _gnutls_supported_ciphersuites (session, &ciphers);
+  ret = _gnutls_supported_ciphersuites (session, cipher_suites, sizeof(cipher_suites));
   if (ret < 0)
     return gnutls_assert_val(ret);
     
-  x = ret;
+  cipher_suites_size = ret;
 
   /* Here we remove any ciphersuite that does not conform
    * the certificate requested, or to the
    * authentication requested (e.g. SRP).
    */
-  ret = _gnutls_remove_unwanted_ciphersuites (session, &ciphers, x, pk_algos, pk_algos_size);
+  ret = _gnutls_remove_unwanted_ciphersuites (session, cipher_suites, cipher_suites_size, pk_algos, pk_algos_size);
   if (ret <= 0)
     {
       gnutls_assert ();
-      gnutls_free (ciphers);
       if (ret < 0)
         return ret;
       else
         return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
     }
     
-  x = ret;
+  cipher_suites_size = ret;
 
   /* Data length should be zero mod 2 since
    * every ciphersuite is 2 bytes. (this check is needed
@@ -898,15 +898,15 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
     {
       memcpy (&cs.suite, &data[j], 2);
       _gnutls_handshake_log ("\t0x%.2x, 0x%.2x %s\n", data[j], data[j+1], _gnutls_cipher_suite_get_name (&cs));
-      for (i = 0; i < x; i++)
+      for (i = 0; i < cipher_suites_size; i+=2)
         {
-          if (memcmp (ciphers[i].suite, &data[j], 2) == 0)
+          if (memcmp (&cipher_suites[i], &data[j], 2) == 0)
             {
               _gnutls_handshake_log
                 ("HSK[%p]: Selected cipher suite: %s\n", session,
                  _gnutls_cipher_suite_get_name (&cs));
               memcpy (session->security_parameters.current_cipher_suite.suite,
-                      ciphers[i].suite, 2);
+                      &cipher_suites[i], 2);
               _gnutls_epoch_set_cipher_suite (session, EPOCH_NEXT,
                                               &session->
                                               security_parameters.current_cipher_suite);
@@ -919,7 +919,6 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
     }
 
 finish:
-  gnutls_free (ciphers);
 
   if (retval != 0)
     {
@@ -1330,19 +1329,19 @@ static int
 _gnutls_client_set_ciphersuite (gnutls_session_t session, opaque suite[2])
 {
   uint8_t z;
-  cipher_suite_st *cipher_suites;
-  int cipher_suite_num;
+  uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE];
+  int cipher_suite_size;
   int i, err;
 
   z = 1;
-  cipher_suite_num = _gnutls_supported_ciphersuites (session, &cipher_suites);
-  if (cipher_suite_num < 0)
+  cipher_suite_size = _gnutls_supported_ciphersuites (session, cipher_suites, sizeof(cipher_suites));
+  if (cipher_suite_size < 0)
     {
       gnutls_assert ();
-      return cipher_suite_num;
+      return cipher_suite_size;
     }
 
-  for (i = 0; i < cipher_suite_num; i++)
+  for (i = 0; i < cipher_suite_size; i+=2)
     {
       if (memcmp (&cipher_suites[i], suite, 2) == 0)
         {
@@ -1350,8 +1349,6 @@ _gnutls_client_set_ciphersuite (gnutls_session_t session, opaque suite[2])
           break;
         }
     }
-
-  gnutls_free (cipher_suites);
 
   if (z != 0)
     {
@@ -1624,92 +1621,46 @@ _gnutls_copy_ciphersuites (gnutls_session_t session,
                            gnutls_buffer_st * cdata, 
                            int add_scsv)
 {
-  int ret, i;
-  cipher_suite_st *cipher_suites;
-  uint16_t cipher_num;
-  uint16_t loop_max;
+  int ret;
+  uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE+2];
+  int cipher_suites_size;
   size_t init_length = cdata->length;
 
-  ret = _gnutls_supported_ciphersuites_sorted (session, &cipher_suites);
+  ret = _gnutls_supported_ciphersuites_sorted (session, cipher_suites, sizeof(cipher_suites)-2);
   if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+    return gnutls_assert_val(ret);
 
   /* Here we remove any ciphersuite that does not conform
    * the certificate requested, or to the
    * authentication requested (eg SRP).
    */
   ret =
-    _gnutls_remove_unwanted_ciphersuites (session, &cipher_suites, ret, NULL, 0);
+    _gnutls_remove_unwanted_ciphersuites (session, cipher_suites, ret, NULL, 0);
   if (ret < 0)
-    {
-      gnutls_assert ();
-      gnutls_free (cipher_suites);
-      return ret;
-    }
+    return gnutls_assert_val(ret);
 
   /* If no cipher suites were enabled.
    */
   if (ret == 0)
-    {
-      gnutls_assert ();
-      gnutls_free (cipher_suites);
-      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
-    }
+    return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
-  if (add_scsv)
-    ++ret;
-
-  cipher_num = ret;
-
-  cipher_num *= sizeof (uint16_t);      /* in order to get bytes */
-
-  ret = _gnutls_buffer_append_prefix(cdata, 16, cipher_num);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
-
-
-  loop_max = add_scsv ? cipher_num - 2 : cipher_num;
-  for (i = 0; i < (loop_max / 2); i++)
-    {
-      ret = _gnutls_buffer_append_data( cdata, cipher_suites[i].suite, 2);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto cleanup;
-        }
-    }
-
+  cipher_suites_size = ret;
   if (add_scsv)
     {
-      uint8_t p[2];
-      /* Safe renegotiation signalling CS value is { 0x00, 0xff } */
-      p[0] = 0x00;
-      p[1] = 0xff;
-      ret = _gnutls_buffer_append_data( cdata, p, 2);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto cleanup;
-        }
+      cipher_suites[cipher_suites_size] = 0x00;
+      cipher_suites[cipher_suites_size+1] = 0xff;
+      cipher_suites_size += 2;
 
       ret = _gnutls_ext_sr_send_cs (session);
       if (ret < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
+        return gnutls_assert_val(ret);
     }
 
-  ret = cdata->length - init_length;
+  ret = _gnutls_buffer_append_data_prefix(cdata, 16, cipher_suites, cipher_suites_size);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
-cleanup:
-  gnutls_free (cipher_suites);
+  ret = cdata->length - init_length;
 
   return ret;
 }
@@ -3061,15 +3012,15 @@ check_server_params (gnutls_session_t session,
  */
 static int
 _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
-                                      cipher_suite_st ** cipherSuites,
-                                      int numCipherSuites,
+                                      uint8_t * cipher_suites,
+                                      int cipher_suites_size,
                                       gnutls_pk_algorithm_t *pk_algos,
                                       size_t pk_algos_size)
 {
 
   int ret = 0;
-  cipher_suite_st *newSuite, cs;
-  int newSuiteSize = 0, i;
+  cipher_suite_st cs;
+  int i, new_suites_size;
   gnutls_certificate_credentials_t cert_cred;
   gnutls_kx_algorithm_t kx;
   int server = session->security_parameters.entity == GNUTLS_SERVER ? 1 : 0;
@@ -3112,23 +3063,20 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
       return ret;
     }
 
-  newSuite = gnutls_malloc (numCipherSuites * sizeof (cipher_suite_st));
-  if (newSuite == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
+  new_suites_size = 0;
 
   /* now removes ciphersuites based on the KX algorithm
    */
-  for (i = 0; i < numCipherSuites; i++)
+  for (i = 0; i < cipher_suites_size; i+=2)
     {
       int delete = 0;
 
       /* finds the key exchange algorithm in
        * the ciphersuite
        */
-      kx = _gnutls_cipher_suite_get_kx_algo (&(*cipherSuites)[i]);
+      cs.suite[0] = cipher_suites[i];
+      cs.suite[1] = cipher_suites[i+1];
+      kx = _gnutls_cipher_suite_get_kx_algo (&cs);
 
       /* if it is defined but had no credentials 
        */
@@ -3167,8 +3115,6 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
             }
         }
 
-      memcpy (&cs.suite, &(*cipherSuites)[i].suite, 2);
-
       if (delete == 0)
         {
 
@@ -3176,8 +3122,9 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
                                  session,
                                  _gnutls_cipher_suite_get_name (&cs));
 
-          memcpy (newSuite[newSuiteSize].suite, (*cipherSuites)[i].suite, 2);
-          newSuiteSize++;
+          if (i != new_suites_size)
+            memmove( &cipher_suites[new_suites_size], &cipher_suites[i], 2);
+          new_suites_size+=2;
         }
       else
         {
@@ -3188,10 +3135,7 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
         }
     }
 
-  gnutls_free (*cipherSuites);
-  *cipherSuites = newSuite;
-
-  ret = newSuiteSize;
+  ret = new_suites_size;
 
   return ret;
 

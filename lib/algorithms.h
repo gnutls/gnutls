@@ -31,6 +31,9 @@
 #define GNUTLS_RENEGO_PROTECTION_REQUEST_MAJOR 0x00
 #define GNUTLS_RENEGO_PROTECTION_REQUEST_MINOR 0xFF
 
+/* would allow for 256 ciphersuites */
+#define MAX_CIPHERSUITE_SIZE 512
+
 /* Functions for version handling. */
 gnutls_protocol_t _gnutls_version_lowest (gnutls_session_t session);
 gnutls_protocol_t _gnutls_version_max (gnutls_session_t session);
@@ -55,9 +58,9 @@ const char *_gnutls_x509_mac_to_oid (gnutls_mac_algorithm_t mac);
 
 /* Functions for cipher suites. */
 int _gnutls_supported_ciphersuites (gnutls_session_t session,
-                                    cipher_suite_st ** ciphers);
+                                    uint8_t* cipher_suites, int max_cipher_suite_size);
 int _gnutls_supported_ciphersuites_sorted (gnutls_session_t session,
-                                           cipher_suite_st ** ciphers);
+                                           uint8_t* cipher_suites, int max_cipher_suite_size);
 const char *_gnutls_cipher_suite_get_name (cipher_suite_st * algorithm);
 gnutls_mac_algorithm_t _gnutls_cipher_suite_get_prf (const cipher_suite_st * suite);
 gnutls_cipher_algorithm_t _gnutls_cipher_suite_get_cipher_algo (const
