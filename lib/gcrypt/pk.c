@@ -27,6 +27,8 @@
  * encryption and signatures. 
  */
 
+#error NO ECC SUPPORT
+
 #include <gnutls_int.h>
 #include <gnutls_mpi.h>
 #include <gnutls_pk.h>

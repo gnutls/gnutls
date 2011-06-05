@@ -34,6 +34,8 @@
 /* Functions that refer to the libgcrypt library.
  */
 
+#error GCM is missing
+
 static int
 wrap_gcry_cipher_init (gnutls_cipher_algorithm_t algo, void **ctx)
 {
