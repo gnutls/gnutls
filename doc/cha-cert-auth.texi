@@ -21,7 +21,7 @@ entities.  Usually more than one certification authorities exist, and
 certification authorities may certify other authorities to issue
 certificates as well, following a hierarchical model.
 
-@image{gnutls-x509,7cm,9.5cm}
+@center @image{gnutls-x509,7cm}
 
 One needs to trust one or more CAs for his secure communications. In
 that case only the certificates issued by the trusted authorities are
@@ -313,7 +313,7 @@ key. When Alice signs Bob's key, she is introducing Bob's key to
 anyone who trusts Alice. If someone trusts Alice to introduce keys,
 then Alice is a trusted introducer in the mind of that observer.
 
-@image{gnutls-pgp,11cm,9cm}
+@center @image{gnutls-pgp,8cm}
 
 For example: If David trusts Alice to be an introducer, and Alice
 signed Bob's key, Dave also trusts Bob's key to be the real one.
@@ -395,7 +395,7 @@ and signing without accessing the key itself.
 Moreover it can be used to allow all applications in the same operating system to access
 shared cryptographic keys and certificates in a uniform way, as in the following picture.
 
-@image{pkcs11-vision}
+@center @image{pkcs11-vision,8cm}
 
 @subsection Initialization
 To allow all the  @acronym{GnuTLS} applications to access @acronym{PKCS #11} tokens

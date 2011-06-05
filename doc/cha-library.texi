@@ -73,7 +73,7 @@ A brief description of how @acronym{GnuTLS} works internally is shown
 at the figure below. This section may be easier to understand after
 having seen the examples (@pxref{examples}).
 
-@image{gnutls-internals,12cm,8cm}
+@center @image{gnutls-internals,12cm}
 
 As shown in the figure, there is a read-only global state that is
 initialized once by the global initialization function.  This global
@@ -188,7 +188,8 @@ int main()
 
 int main()
 @{
-   gnutls_global_mutex_set (mutex_init, mutex_deinit, mutex_lock, mutex_unlock);
+   gnutls_global_mutex_set (mutex_init, mutex_deinit, 
+                            mutex_lock, mutex_unlock);
    gnutls_global_init();
 @}
 @end example

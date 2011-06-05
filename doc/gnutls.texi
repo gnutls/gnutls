@@ -63,7 +63,8 @@ Documentation License''.
 @end macro
 
 @macro xcite{ref}
-[\ref\] (@pxref{Bibliography})
+[@cite{\ref\}]
+@c (@pxref{Bibliography})
 @end macro
 
 @contents

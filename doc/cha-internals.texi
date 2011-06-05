@@ -21,13 +21,13 @@ happens inside the black box.
 The main needs for the TLS protocol to be used are
 shown in the image below.
 
-@image{gnutls-client-server-use-case,9cm}
+@center @image{gnutls-client-server-use-case,9cm}
 
 This is being accomplished by the following object diagram.
 Note that since @acronym{GnuTLS} is being developed in C
 object are just structures with attributes. The operations listed
 are functions that require the first parameter to be that object.
-@image{gnutls-objects,15cm}
+@center @image{gnutls-objects,12cm}
 
 @node TLS Handshake Protocol
 @section TLS Handshake Protocol
@@ -36,7 +36,7 @@ machine that waits for input or returns immediately when the non-blocking
 transport layer functions are used. The main idea is shown in the following
 figure.
 
-@image{gnutls-handshake-state,9cm}
+@center @image{gnutls-handshake-state,9cm}
 
 Also the way the input is processed varies per ciphersuite. Several 
 implementations of the internal handlers are available and 
@@ -45,7 +45,7 @@ handler. For example a @acronym{PSK} ciphersuite has a different
 implementation of the @code{process_client_key_exchange} than a
 certificate ciphersuite.
 
-@image{gnutls-handshake-sequence,12cm}
+@center @image{gnutls-handshake-sequence,12cm}
 
 @node TLS Authentication Methods
 @section TLS Authentication Methods
@@ -55,7 +55,7 @@ affect only the handshake protocol, a simple interface is used. An
 authentication method needs only to implement the functions as seen in
 the figure below.
 
-@image{gnutls-mod_auth_st,12cm}
+@center @image{gnutls-mod_auth_st,12cm}
 
 The functions that need to be implemented are the ones responsible for
 interpreting the handshake protocol messages. It is common for such
@@ -75,7 +75,7 @@ its pointers has to be registered in @code{gnutls_algorithms.c} in the
 As with authentication methods, the TLS extensions handlers can be
 implemented using the following interface.
 
-@image{gnutls-extensions_st,12cm}
+@center @image{gnutls-extensions_st,12cm}
 
 Here there are two functions, one for receiving the extension data
 and one for sending. These functions have to check internally whether
@@ -313,7 +313,7 @@ API was introduced in.
 What is provided by the certificate handling functions
 is summarized in the following diagram.
 
-@image{gnutls-certificate-user-use-case,12cm}
+@center @image{gnutls-certificate-user-use-case,12cm}
 
 @node Cryptographic Backend
 @section Cryptographic Backend
@@ -326,7 +326,7 @@ on take no advantage of these properties. For this reason GnuTLS handles
 this internally by following a layered approach to accessing
 cryptographic operations as in the following figure. 
 
-@image{gnutls-crypto-layers,12cm}
+@center @image{gnutls-crypto-layers,12cm}
 
 The TLS layer uses a cryptographic provider layer, that will in turn either 
 use the default crypto provider - a crypto library, or use an external

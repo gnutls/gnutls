@@ -210,7 +210,8 @@ To create a CRL that contains some revoked certificates, place the
 certificates in a file and use @code{--load-certificate} as follows:
 
 @example
-$ certtool --generate-crl --load-ca-privkey x509-ca-key.pem --load-ca-certificate x509-ca.pem --load-certificate revoked-certs.pem
+$ certtool --generate-crl --load-ca-privkey x509-ca-key.pem \
+  --load-ca-certificate x509-ca.pem --load-certificate revoked-certs.pem
 @end example
 
 @item
@@ -404,7 +405,9 @@ To connect to a server using PSK authentication, you may use something
 like:
 
 @smallexample
-$ gnutls-cli -p 5556 test.gnutls.org --pskusername jas --pskkey 9e32cf7786321a828ef7668f09fb35db --priority NORMAL:+DHE-PSK:+PSK:-RSA:-DHE-RSA -d 4711
+$ gnutls-cli -p 5556 test.gnutls.org --pskusername jas \
+  --pskkey 9e32cf7786321a828ef7668f09fb35db \
+  --priority NORMAL:+DHE-PSK:+PSK:-RSA:-DHE-RSA
 @end smallexample
 
 @menu
@@ -446,7 +449,9 @@ password, you can also give the PSK username and key directly on the
 command line:
 
 @smallexample
-$ ./gnutls-cli -p 5556 localhost --pskusername psk_identity --pskkey 88f3824b3e5659f52d00e959bacab954b6540344  --priority NORMAL:+DHE-PSK:+PSK
+$ ./gnutls-cli -p 5556 localhost --pskusername psk_identity \
+  --pskkey 88f3824b3e5659f52d00e959bacab954b6540344 \
+  --priority NORMAL:+DHE-PSK:+PSK
 Resolving 'localhost'...
 Connecting to '127.0.0.1:5556'...
 - PSK authentication.
@@ -589,11 +594,11 @@ refuse to use.
 The next step is to add support for X.509.  First we generate a CA:
 
 @example
-certtool --generate-privkey > x509-ca-key.pem
-echo 'cn = GnuTLS test CA' > ca.tmpl
-echo 'ca' >> ca.tmpl
-echo 'cert_signing_key' >> ca.tmpl
-certtool --generate-self-signed --load-privkey x509-ca-key.pem \
+$ certtool --generate-privkey > x509-ca-key.pem
+$ echo 'cn = GnuTLS test CA' > ca.tmpl
+$ echo 'ca' >> ca.tmpl
+$ echo 'cert_signing_key' >> ca.tmpl
+$ certtool --generate-self-signed --load-privkey x509-ca-key.pem \
   --template ca.tmpl --outfile x509-ca.pem
 ...
 @end example
@@ -603,14 +608,14 @@ value to the name of your server host, or skip that command to avoid
 the field.
 
 @example
-certtool --generate-privkey > x509-server-key.pem
-echo 'organization = GnuTLS test server' > server.tmpl
-echo 'cn = test.gnutls.org' >> server.tmpl
-echo 'tls_www_server' >> server.tmpl
-echo 'encryption_key' >> server.tmpl
-echo 'signing_key' >> server.tmpl
-echo 'dns_name = test.gnutls.org' >> server.tmpl
-certtool --generate-certificate --load-privkey x509-server-key.pem \
+$ certtool --generate-privkey > x509-server-key.pem
+$ echo 'organization = GnuTLS test server' > server.tmpl
+$ echo 'cn = test.gnutls.org' >> server.tmpl
+$ echo 'tls_www_server' >> server.tmpl
+$ echo 'encryption_key' >> server.tmpl
+$ echo 'signing_key' >> server.tmpl
+$ echo 'dns_name = test.gnutls.org' >> server.tmpl
+$ certtool --generate-certificate --load-privkey x509-server-key.pem \
   --load-ca-certificate x509-ca.pem --load-ca-privkey x509-ca-key.pem \
   --template server.tmpl --outfile x509-server.pem
 ...
@@ -620,12 +625,12 @@ For use in the client, you may want to generate a client certificate
 as well.
 
 @example
-certtool --generate-privkey > x509-client-key.pem
-echo 'cn = GnuTLS test client' > client.tmpl
-echo 'tls_www_client' >> client.tmpl
-echo 'encryption_key' >> client.tmpl
-echo 'signing_key' >> client.tmpl
-certtool --generate-certificate --load-privkey x509-client-key.pem \
+$ certtool --generate-privkey > x509-client-key.pem
+$ echo 'cn = GnuTLS test client' > client.tmpl
+$ echo 'tls_www_client' >> client.tmpl
+$ echo 'encryption_key' >> client.tmpl
+$ echo 'signing_key' >> client.tmpl
+$ certtool --generate-certificate --load-privkey x509-client-key.pem \
   --load-ca-certificate x509-ca.pem --load-ca-privkey x509-ca-key.pem \
   --template client.tmpl --outfile x509-client.pem
 ...
@@ -636,15 +641,17 @@ applications, you will need to convert them into a PKCS#12 structure.
 This also encrypts the security sensitive key with a password.
 
 @example
-certtool --to-p12 --load-ca-certificate x509-ca.pem --load-privkey x509-client-key.pem --load-certificate x509-client.pem --outder --outfile x509-client.p12
+$ certtool --to-p12 --load-ca-certificate x509-ca.pem \
+  --load-privkey x509-client-key.pem --load-certificate x509-client.pem \
+  --outder --outfile x509-client.p12
 @end example
 
 For icing, we'll create a proxy certificate for the client too.
 
 @example
-certtool --generate-privkey > x509-proxy-key.pem
-echo 'cn = GnuTLS test client proxy' > proxy.tmpl
-certtool --generate-proxy --load-privkey x509-proxy-key.pem \
+$ certtool --generate-privkey > x509-proxy-key.pem
+$ echo 'cn = GnuTLS test client proxy' > proxy.tmpl
+$ certtool --generate-proxy --load-privkey x509-proxy-key.pem \
   --load-ca-certificate x509-client.pem --load-ca-privkey x509-client-key.pem \
   --load-certificate x509-client.pem --template proxy.tmpl \
   --outfile x509-proxy.pem
@@ -654,7 +661,7 @@ certtool --generate-proxy --load-privkey x509-proxy-key.pem \
 Then start the server again:
 
 @example
-gnutls-serv --http \
+$ gnutls-serv --http \
             --x509cafile x509-ca.pem \
             --x509keyfile x509-server-key.pem \
             --x509certfile x509-server.pem
@@ -668,8 +675,8 @@ create a DSA key and certificate for the server.  These credentials
 will be used in the final example below.
 
 @example
-certtool --generate-privkey --dsa > x509-server-key-dsa.pem
-certtool --generate-certificate --load-privkey x509-server-key-dsa.pem \
+$ certtool --generate-privkey --dsa > x509-server-key-dsa.pem
+$ certtool --generate-certificate --load-privkey x509-server-key-dsa.pem \
   --load-ca-certificate x509-ca.pem --load-ca-privkey x509-ca-key.pem \
   --template server.tmpl --outfile x509-server-dsa.pem
 ...
@@ -772,7 +779,8 @@ After this, start the server pointing to the password file.  We
 disable DHE-PSK.
 
 @smallexample
-$ ./gnutls-serv --pskpasswd psks.txt  --pskhint psk_identity_hint --priority NORMAL:-DHE-PSK
+$ ./gnutls-serv --pskpasswd psks.txt  --pskhint psk_identity_hint \
+  --priority NORMAL:-DHE-PSK
 Set static Diffie-Hellman parameters, consider --dhparams.
 Echo Server ready. Listening to port '5556'.
 @end smallexample
@@ -927,7 +935,8 @@ $ p11tool --login --export pkcs11:(OBJECT URL)
 
 @item To copy an object to a token
 @example 
-$ p11tool --login --write pkcs11:(TOKEN URL) --load-certificate (certificate file) --label "my_cert"
+$ p11tool --login --write pkcs11:(TOKEN URL) \
+  --load-certificate cert.pem --label "my_cert"
 @end example
 
 @end itemize

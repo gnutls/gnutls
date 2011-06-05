@@ -55,7 +55,7 @@ negotiation, the initial key exchange and authentication.  @xref{The
 Handshake Protocol}, for more information about the handshake
 protocol.  The protocol layering in TLS is shown in the figure below.
 
-@image{gnutls-layers,12cm,8cm}
+@center @image{gnutls-layers,12cm}
 
 @node The transport layer
 @section The Transport Layer
@@ -191,7 +191,8 @@ DES algorithm.  Has 128 bits block size and is used in CBC mode.
 
 @item AES_GCM
 This is the AES algorithm in the authenticated encryption GCM mode.
-This mode combines message authentication and encryption.
+This mode combines message authentication and encryption and can
+be extremely fast on CPUs that support hardware acceleration.
 
 @item CAMELLIA_CBC
 CAMELLIA is an 128-bit block cipher developed by Mitsubish and NTT. It

@@ -49,40 +49,35 @@ gnutls_TEXINFOS += examples/ex-client1.c examples/ex-client2.c		\
 
 # Images.  Make sure there are eps + png + pdf of each, plus the source dia.
 gnutls_TEXINFOS += gnutls-internals.dia gnutls-internals.eps		\
-                   gnutls-internals.png gnutls-internals.pdf
+                   gnutls-internals.png
 gnutls_TEXINFOS += gnutls-layers.dia gnutls-layers.eps			\
-                   gnutls-layers.png gnutls-layers.pdf
+                   gnutls-layers.png
 gnutls_TEXINFOS += gnutls-crypto-layers.dia gnutls-crypto-layers.eps	\
-                   gnutls-crypto-layers.png gnutls-crypto-layers.pdf
-gnutls_TEXINFOS += gnutls-pgp.dia gnutls-pgp.eps gnutls-pgp.png		\
-                   gnutls-pgp.pdf
-gnutls_TEXINFOS += gnutls-x509.dia gnutls-x509.eps gnutls-x509.png	\
-                   gnutls-x509.pdf
-gnutls_TEXINFOS += gnutls-logo.eps gnutls-logo.png gnutls-logo.pdf
-gnutls_TEXINFOS += pkcs11-vision.dia pkcs11-vision.eps	\
-                   pkcs11-vision.png pkcs11-vision.pdf
+                   gnutls-crypto-layers.png
+gnutls_TEXINFOS += gnutls-pgp.dia gnutls-pgp.eps gnutls-pgp.png
+gnutls_TEXINFOS += gnutls-x509.dia gnutls-x509.eps gnutls-x509.png
+gnutls_TEXINFOS += gnutls-logo.eps gnutls-logo.png
+gnutls_TEXINFOS += pkcs11-vision.dia pkcs11-vision.eps
 
 # Images.  Make sure there are eps + png + pdf of each, plus the source dia.
 gnutls_TEXINFOS += gnutls-certificate-user-use-case.dia	\
 	gnutls-certificate-user-use-case.eps		\
-	gnutls-certificate-user-use-case.pdf		\
 	gnutls-certificate-user-use-case.png
 gnutls_TEXINFOS += gnutls-client-server-use-case.dia	\
 	gnutls-client-server-use-case.eps		\
-	gnutls-client-server-use-case.pdf		\
 	gnutls-client-server-use-case.png
 gnutls_TEXINFOS += gnutls-extensions_st.dia gnutls-extensions_st.eps	\
-	gnutls-extensions_st.pdf gnutls-extensions_st.png
+	gnutls-extensions_st.png
 gnutls_TEXINFOS += gnutls-handshake-sequence.dia			\
-	gnutls-handshake-sequence.eps gnutls-handshake-sequence.pdf	\
+	gnutls-handshake-sequence.eps 	\
 	gnutls-handshake-sequence.png
 gnutls_TEXINFOS += gnutls-handshake-state.dia			\
-	gnutls-handshake-state.eps gnutls-handshake-state.pdf	\
+	gnutls-handshake-state.eps	\
 	gnutls-handshake-state.png
 gnutls_TEXINFOS += gnutls-mod_auth_st.dia gnutls-mod_auth_st.eps	\
-	gnutls-mod_auth_st.pdf gnutls-mod_auth_st.png
+	gnutls-mod_auth_st.png
 gnutls_TEXINFOS += gnutls-objects.dia gnutls-objects.eps	\
-	gnutls-objects.pdf gnutls-objects.png
+	gnutls-objects.png
 
 imagesdir = $(infodir)
 images_DATA = gnutls-certificate-user-use-case.png		\

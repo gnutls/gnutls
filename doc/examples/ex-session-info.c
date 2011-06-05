@@ -20,6 +20,9 @@ print_info (gnutls_session_t session)
   const char *tmp;
   gnutls_credentials_type_t cred;
   gnutls_kx_algorithm_t kx;
+  int dhe, ecdh;
+
+  dhe = ecdh = 0;
 
   /* print the key exchange's algorithm name
    */
@@ -56,12 +59,20 @@ print_info (gnutls_session_t session)
       if (gnutls_psk_server_get_username (session) != NULL)
         printf ("- PSK authentication. Connected as '%s'\n",
                 gnutls_psk_server_get_username (session));
+
+      if (kx == GNUTLS_KX_ECDHE_PSK)
+        ecdh = 1;
+      else if (kx == GNUTLS_KX_DHE_PSK)
+        dhe = 1;
       break;
 
     case GNUTLS_CRD_ANON:      /* anonymous authentication */
 
-      printf ("- Anonymous DH using prime of %d bits\n",
-              gnutls_dh_get_prime_bits (session));
+      printf("- Anonymous authentication.\n");
+      if (kx == GNUTLS_KX_ANON_ECDH)
+        ecdh = 1;
+      else if (kx == GNUTLS_KX_ANON_DH)
+        dhe = 1;
       break;
 
     case GNUTLS_CRD_CERTIFICATE:       /* certificate authentication */
@@ -69,10 +80,9 @@ print_info (gnutls_session_t session)
       /* Check if we have been using ephemeral Diffie-Hellman.
        */
       if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS)
-        {
-          printf ("\n- Ephemeral DH using prime of %d bits\n",
-                  gnutls_dh_get_prime_bits (session));
-        }
+        dhe = 1;
+      else if (kx == GNUTLS_KX_ECDHE_RSA || kx == GNUTLS_KX_ECDHE_ECDSA)
+        ecdh = 1;
 
       /* if the certificate list is available, then
        * print some information about it.
@@ -80,6 +90,13 @@ print_info (gnutls_session_t session)
       print_x509_certificate_info (session);
 
     }                           /* switch */
+
+  if (ecdh != 0)
+    printf("- Ephemeral ECDH using curve %s\n", 
+           gnutls_ecc_curve_get_name(gnutls_ecc_curve_get(session)));
+  else if (dhe != 0)
+    printf ("- Ephemeral DH using prime of %d bits\n",
+            gnutls_dh_get_prime_bits (session));
 
   /* print the protocol's name (ie TLS 1.0) 
    */
