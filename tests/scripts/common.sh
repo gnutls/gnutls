@@ -19,6 +19,8 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 fail() {
+   PID=$1
+   shift;
    echo "Failure: $1" >&2
    kill $PID
    exit 1

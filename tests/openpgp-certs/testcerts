@@ -47,10 +47,10 @@ wait_server $PID
 #  fail "Connection to verified IP address should have succeeded! (error code $?)" $?
 
 $CLI $DEBUG -p $PORT 127.0.0.2 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null 2>&1 && \
-  fail "Connection to unrecognized IP address should have failed!"
+  fail $PID "Connection to unrecognized IP address should have failed!"
 
 $CLI $DEBUG -p $PORT localhost --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null 2>&1 && \
-  fail "Connection to unverified (but present) 'localhost' should have failed!"
+  fail $PID "Connection to unverified (but present) 'localhost' should have failed!"
 
 kill $PID
 wait
@@ -59,14 +59,14 @@ launch_server $$ --pgpcertfile $srcdir/srv-public-localhost-signed.gpg --pgpkeyf
 wait_server $PID
 
 echo | $CLI $DEBUG -p $PORT 127.0.0.1 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null 2>&1 && \
-  fail "Connection to unverified IP address should have failed! (error code $?)" $?
+  fail $PID "Connection to unverified IP address should have failed! (error code $?)" $?
 
 $CLI $DEBUG -p $PORT 127.0.0.2 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null 2>&1 && \
-  fail "Connection to unrecognized IP address should have failed!"
+  fail $PID "Connection to unrecognized IP address should have failed!"
 
 #see reason above
 #$CLI -p $PORT localhost --pgpkeyring ca-public.gpg </dev/null >/dev/null || \
-#  fail "Connection to verified 'localhost' should have succeded! (error code $?)" $?
+#  fail $PID "Connection to verified 'localhost' should have succeded! (error code $?)" $?
 
 kill $PID
 wait
@@ -76,10 +76,10 @@ wait_server $PID
 
 # give the server a chance to initialize
 echo | $CLI $DEBUG -p $PORT 127.0.0.1 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null || \
-  fail "Connection to signed PGP certificate should have succeeded! (error code $?)" $?
+  fail $PID "Connection to signed PGP certificate should have succeeded! (error code $?)" $?
 
 $CLI $DEBUG -p $PORT 127.0.0.2 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null && \
-  fail "Connection to unrecognized IP address should have failed!"
+  fail $PID "Connection to unrecognized IP address should have failed!"
 
 kill $PID
 wait
