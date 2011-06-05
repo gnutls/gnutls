@@ -265,35 +265,48 @@ test_ciphersuite_kx (const char* cipher_prio)
 int
 main (int argc, char **argv)
 {
+int ciphers = 1;
+
   if (argc > 1)
     {
-      gnutls_global_set_log_function (tls_log_func);
-      gnutls_global_set_log_level (2);
+      if (strcmp(argv[1], "--kx")==0) 
+        {
+          ciphers = 0;
+        }
+      else if (strcmp(argv[1], "-v")==0) 
+        {
+          gnutls_global_set_log_function (tls_log_func);
+          gnutls_global_set_log_level (2);
+        }
     }
   gnutls_global_init ();
 
-  printf("Testing throughput in cipher/MAC combinations:\n");
-  test_ciphersuite (PRIO_ARCFOUR_128_MD5, 1024);
-  test_ciphersuite (PRIO_ARCFOUR_128_MD5, 4096);
-  test_ciphersuite (PRIO_ARCFOUR_128_MD5, 8*1024);
-  test_ciphersuite (PRIO_ARCFOUR_128_MD5, 15*1024);
+  if (ciphers != 0)
+    {
+      printf("Testing throughput in cipher/MAC combinations:\n");
+      test_ciphersuite (PRIO_ARCFOUR_128_MD5, 1024);
+      test_ciphersuite (PRIO_ARCFOUR_128_MD5, 4096);
+      test_ciphersuite (PRIO_ARCFOUR_128_MD5, 8*1024);
+      test_ciphersuite (PRIO_ARCFOUR_128_MD5, 15*1024);
 
-  test_ciphersuite (PRIO_AES_GCM, 1024);
-  test_ciphersuite (PRIO_AES_GCM, 4096);
-  test_ciphersuite (PRIO_AES_GCM, 8*1024);
-  test_ciphersuite (PRIO_AES_GCM, 15*1024);
+      test_ciphersuite (PRIO_AES_GCM, 1024);
+      test_ciphersuite (PRIO_AES_GCM, 4096);
+      test_ciphersuite (PRIO_AES_GCM, 8*1024);
+      test_ciphersuite (PRIO_AES_GCM, 15*1024);
 
-  test_ciphersuite (PRIO_AES_CBC_SHA1, 1024);
-  test_ciphersuite (PRIO_AES_CBC_SHA1, 4096);
-  test_ciphersuite (PRIO_AES_CBC_SHA1, 8*1024);
-  test_ciphersuite (PRIO_AES_CBC_SHA1, 15*1024);
+      test_ciphersuite (PRIO_AES_CBC_SHA1, 1024);
+      test_ciphersuite (PRIO_AES_CBC_SHA1, 4096);
+      test_ciphersuite (PRIO_AES_CBC_SHA1, 8*1024);
+      test_ciphersuite (PRIO_AES_CBC_SHA1, 15*1024);
 
-  test_ciphersuite (PRIO_CAMELLIA_CBC_SHA1, 1024);
-  test_ciphersuite (PRIO_CAMELLIA_CBC_SHA1, 4096);
-  test_ciphersuite (PRIO_CAMELLIA_CBC_SHA1, 8*1024);
-  test_ciphersuite (PRIO_CAMELLIA_CBC_SHA1, 15*1024);
+      test_ciphersuite (PRIO_CAMELLIA_CBC_SHA1, 1024);
+      test_ciphersuite (PRIO_CAMELLIA_CBC_SHA1, 4096);
+      test_ciphersuite (PRIO_CAMELLIA_CBC_SHA1, 8*1024);
+      test_ciphersuite (PRIO_CAMELLIA_CBC_SHA1, 15*1024);
+      printf("\n");
+    }
 
-  printf("\nTesting key exchanges:\n");
+  printf("Testing key exchanges:\n");
   test_ciphersuite_kx (PRIO_DH);
   test_ciphersuite_kx (PRIO_ECDH);
 
