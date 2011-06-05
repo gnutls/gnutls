@@ -198,6 +198,7 @@ register_x86_crypto (void)
       if (check_pclmul ())
         {
           /* register GCM ciphers */
+          _gnutls_debug_log ("Intel GCM accelerator was detected\n");
           ret =
             gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_128_GCM,
                                                   80, &aes_gcm_struct);
