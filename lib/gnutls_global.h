@@ -45,5 +45,6 @@ extern gnutls_log_func _gnutls_log_func;
 extern gnutls_audit_log_func _gnutls_audit_log_func;
 extern int _gnutls_log_level;
 extern int gnutls_crypto_init (void);
+void _gnutls_priority_prefer_aes_gcm(void);
 
 #endif
