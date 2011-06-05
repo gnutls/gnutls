@@ -150,7 +150,7 @@ trap "kill $PID" 1 15 2
 sleep 2
 
 $CLI $DEBUG -p $PORT 127.0.0.1 --insecure </dev/null >/dev/null 2>&1 && \
-  fail "Succeeded connection to a server with DSA 2048 key and TLS 1.0. Should have failed!"
+  fail "Succeeded connection to a server with DSA 3072 key and TLS 1.0. Should have failed!"
 
 kill $PID
 wait
