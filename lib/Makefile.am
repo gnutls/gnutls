@@ -135,7 +135,7 @@ libgnutls_la_LDFLAGS += $(LTLIBTASN1)
 endif
 
 if ENABLE_NETTLE
-libgnutls_la_LDFLAGS += $(LTLIBNETTLE) $(NETTLE_LIBS)
+libgnutls_la_LDFLAGS += $(LTLIBNETTLE)
 libgnutls_la_LIBADD += nettle/libcrypto.la
 else
 libgnutls_la_LDFLAGS += $(LTLIBGCRYPT)

@@ -80,28 +80,17 @@ dnl    fi
   AC_MSG_CHECKING([whether to use nettle])
 if test "$cryptolib" = "nettle";then
   AC_MSG_RESULT(yes)
-    AC_LIB_HAVE_LINKFLAGS([nettle],, [#include <nettle/aes.h>],
-                          [nettle_aes_invert_key (0, 0)])
+    AC_LIB_HAVE_LINKFLAGS([nettle], [hogweed gmp], [#include <nettle/gcm.h>],
+                          [gcm_set_iv (0, 0, 0, 0)])
     if test "$ac_cv_libnettle" != yes; then
       AC_MSG_ERROR([[
   *** 
-  *** Libnettle 2.1 was not found. 
+  *** Libnettle 2.2 was not found. 
   ]])
     fi
-    AC_TRY_COMPILE(,
-  [
-    #include <nettle/gcm.h> 
-    gcm_set_nonce(0, 0, 0);
-    return 0;
-  ], [
-    AC_DEFINE([NETTLE_GCM], 1, [Nettle supports GCM])
-  ], [
-  ])
-    NETTLE_LIBS="-lgmp -lhogweed"
 else
   AC_MSG_RESULT(no)
 fi
-    AC_SUBST(NETTLE_LIBS)
   AM_CONDITIONAL(ENABLE_NETTLE, test "$cryptolib" = "nettle")
 
   AC_ARG_WITH(included-libtasn1,
@@ -183,23 +172,6 @@ fi
    AC_MSG_RESULT(yes)
   fi
   AM_CONDITIONAL(ENABLE_ANON, test "$ac_enable_anon" != "no")
-  
-  # Allow disabling Camellia
-  if test "$nettle" != "yes";then
-  AC_ARG_ENABLE(camellia,
-    AS_HELP_STRING([--disable-camellia], [disable Camellia cipher]),
-    enable_camellia=$enableval, enable_camellia=yes)
-  else
-    enable_camellia=no
-  fi
-
-  AC_MSG_CHECKING([whether to disable Camellia cipher])
-  if test "$enable_camellia" != "no"; then
-   AC_MSG_RESULT([no])
-   AC_DEFINE([ENABLE_CAMELLIA], 1, [enable camellia block cipher])
-  else
-   AC_MSG_RESULT([yes])
-  fi
   
   AC_MSG_CHECKING([whether to disable extra PKI stuff])
   AC_ARG_ENABLE(extra-pki,

@@ -74,10 +74,8 @@ typedef struct
 #define GNUTLS_ANON_DH_AES_256_CBC_SHA1 { 0x00, 0x3A }
 
 /* rfc4132 */
-#ifdef	ENABLE_CAMELLIA
 #define GNUTLS_ANON_DH_CAMELLIA_128_CBC_SHA1 { 0x00,0x46 }
 #define GNUTLS_ANON_DH_CAMELLIA_256_CBC_SHA1 { 0x00,0x89 }
-#endif
 
 #define GNUTLS_ANON_DH_AES_128_CBC_SHA256 { 0x00, 0x6C }
 #define GNUTLS_ANON_DH_AES_256_CBC_SHA256 { 0x00, 0x6D }
@@ -124,10 +122,8 @@ typedef struct
 #define GNUTLS_RSA_AES_256_CBC_SHA1 { 0x00, 0x35 }
 
 /* rfc4132 */
-#ifdef	ENABLE_CAMELLIA
 #define GNUTLS_RSA_CAMELLIA_128_CBC_SHA1 { 0x00,0x41 }
 #define GNUTLS_RSA_CAMELLIA_256_CBC_SHA1 { 0x00,0x84 }
-#endif
 
 #define GNUTLS_RSA_AES_128_CBC_SHA256 { 0x00, 0x3C }
 #define GNUTLS_RSA_AES_256_CBC_SHA256 { 0x00, 0x3D }
@@ -149,10 +145,8 @@ typedef struct
 #define GNUTLS_DHE_DSS_AES_128_CBC_SHA1 { 0x00, 0x32 }
 
 /* rfc4132 */
-#ifdef	ENABLE_CAMELLIA
 #define GNUTLS_DHE_DSS_CAMELLIA_128_CBC_SHA1 { 0x00,0x44 }
 #define GNUTLS_DHE_DSS_CAMELLIA_256_CBC_SHA1 { 0x00,0x87 }
-#endif
 
 #define GNUTLS_DHE_DSS_AES_128_CBC_SHA256 { 0x00, 0x40 }
 #define GNUTLS_DHE_DSS_AES_256_CBC_SHA256 { 0x00, 0x6A }
@@ -167,10 +161,8 @@ typedef struct
 #define GNUTLS_DHE_RSA_AES_256_CBC_SHA1 { 0x00, 0x39 }
 
 /* rfc4132 */
-#ifdef	ENABLE_CAMELLIA
 #define GNUTLS_DHE_RSA_CAMELLIA_128_CBC_SHA1 { 0x00,0x45 }
 #define GNUTLS_DHE_RSA_CAMELLIA_256_CBC_SHA1 { 0x00,0x88 }
-#endif
 
 #define GNUTLS_DHE_RSA_AES_128_CBC_SHA256 { 0x00, 0x67 }
 #define GNUTLS_DHE_RSA_AES_256_CBC_SHA256 { 0x00, 0x6B }
@@ -254,7 +246,6 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_ANON_DH,
                              GNUTLS_MAC_SHA1, GNUTLS_SSL3,
                              GNUTLS_VERSION_MAX, 1),
-#ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ANON_DH_CAMELLIA_128_CBC_SHA1,
                              GNUTLS_CIPHER_CAMELLIA_128_CBC,
                              GNUTLS_KX_ANON_DH,
@@ -265,7 +256,6 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_KX_ANON_DH,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX, 1),
-#endif
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ANON_DH_AES_128_CBC_SHA256,
                              GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_ANON_DH,
                              GNUTLS_MAC_SHA256, GNUTLS_TLS1_2,
@@ -396,7 +386,6 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_DHE_DSS,
                              GNUTLS_MAC_SHA1, GNUTLS_SSL3,
                              GNUTLS_VERSION_MAX, 1),
-#ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_DSS_CAMELLIA_128_CBC_SHA1,
                              GNUTLS_CIPHER_CAMELLIA_128_CBC,
                              GNUTLS_KX_DHE_DSS,
@@ -407,7 +396,6 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_KX_DHE_DSS,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX, 1),
-#endif
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_DSS_AES_128_CBC_SHA256,
                              GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_DHE_DSS,
                              GNUTLS_MAC_SHA256, GNUTLS_TLS1_2,
@@ -429,7 +417,6 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_DHE_RSA,
                              GNUTLS_MAC_SHA1, GNUTLS_SSL3,
                              GNUTLS_VERSION_MAX, 1),
-#ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_RSA_CAMELLIA_128_CBC_SHA1,
                              GNUTLS_CIPHER_CAMELLIA_128_CBC,
                              GNUTLS_KX_DHE_RSA,
@@ -440,7 +427,6 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_KX_DHE_RSA,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX, 1),
-#endif
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_DHE_RSA_AES_128_CBC_SHA256,
                              GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_DHE_RSA,
                              GNUTLS_MAC_SHA256, GNUTLS_TLS1_2,
@@ -490,7 +476,6 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_RSA,
                              GNUTLS_MAC_SHA1, GNUTLS_SSL3,
                              GNUTLS_VERSION_MAX, 1),
-#ifdef	ENABLE_CAMELLIA
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_RSA_CAMELLIA_128_CBC_SHA1,
                              GNUTLS_CIPHER_CAMELLIA_128_CBC, GNUTLS_KX_RSA,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
@@ -499,7 +484,6 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_CIPHER_CAMELLIA_256_CBC, GNUTLS_KX_RSA,
                              GNUTLS_MAC_SHA1, GNUTLS_TLS1,
                              GNUTLS_VERSION_MAX, 1),
-#endif
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_RSA_AES_128_CBC_SHA256,
                              GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_RSA,
                              GNUTLS_MAC_SHA256, GNUTLS_TLS1_2,

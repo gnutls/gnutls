@@ -84,7 +84,6 @@ wrap_gcry_cipher_init (gnutls_cipher_algorithm_t algo, void **ctx)
                           GCRY_CIPHER_MODE_CBC, 0);
       break;
 
-#ifdef	ENABLE_CAMELLIA
     case GNUTLS_CIPHER_CAMELLIA_128_CBC:
       err =
         gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_CAMELLIA128,
@@ -96,7 +95,6 @@ wrap_gcry_cipher_init (gnutls_cipher_algorithm_t algo, void **ctx)
         gcry_cipher_open ((gcry_cipher_hd_t *) ctx, GCRY_CIPHER_CAMELLIA256,
                           GCRY_CIPHER_MODE_CBC, 0);
       break;
-#endif
     default:
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;

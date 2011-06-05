@@ -35,9 +35,7 @@
 #include <nettle/des.h>
 #include <nettle/nettle-meta.h>
 #include <nettle/cbc.h>
-# ifdef NETTLE_GCM
 #include <nettle/gcm.h>
-# endif
 
 /* Functions that refer to the libgcrypt library.
  */
@@ -128,9 +126,7 @@ struct nettle_cipher_ctx
     struct arctwo_ctx arctwo;
     struct des3_ctx des3;
     struct des_ctx des;
-#ifdef NETTLE_GCM
     struct gcm_aes_ctx aes_gcm;
-#endif
   } ctx;
   void *ctx_ptr;
   uint8_t iv[MAX_BLOCK_SIZE];
@@ -144,7 +140,6 @@ struct nettle_cipher_ctx
   tag_func tag;
 };
 
-#ifdef NETTLE_GCM
 #define GCM_DEFAULT_NONCE_SIZE 12
 
 static void _gcm_encrypt(void *_ctx, nettle_crypt_func f,  
@@ -163,8 +158,6 @@ static void _gcm_decrypt(void *_ctx, nettle_crypt_func f,
   return gcm_aes_decrypt(_ctx, length, dst, src);
 }
 
-#endif
-
 static int
 wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
 {
@@ -181,7 +174,6 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
 
   switch (algo)
     {
-#ifdef NETTLE_GCM
     case GNUTLS_CIPHER_AES_128_GCM:
     case GNUTLS_CIPHER_AES_256_GCM:
       ctx->encrypt = _gcm_encrypt;
@@ -192,7 +184,6 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
       ctx->ctx_ptr = &ctx->ctx.aes_gcm;
       ctx->block_size = AES_BLOCK_SIZE;
       break;
-#endif
     case GNUTLS_CIPHER_CAMELLIA_128_CBC:
     case GNUTLS_CIPHER_CAMELLIA_256_CBC:
       ctx->encrypt = cbc_encrypt;
@@ -263,12 +254,10 @@ wrap_nettle_cipher_setkey (void *_ctx, const void *key, size_t keysize)
 
   switch (ctx->algo)
     {
-#ifdef NETTLE_GCM
     case GNUTLS_CIPHER_AES_128_GCM:
     case GNUTLS_CIPHER_AES_256_GCM:
       gcm_aes_set_key(&ctx->ctx.aes_gcm, keysize, key);
       break;
-#endif
     case GNUTLS_CIPHER_AES_128_CBC:
     case GNUTLS_CIPHER_AES_192_CBC:
     case GNUTLS_CIPHER_AES_256_CBC:
@@ -331,7 +320,6 @@ struct nettle_cipher_ctx *ctx = _ctx;
 
   switch (ctx->algo)
     {
-#ifdef NETTLE_GCM
     case GNUTLS_CIPHER_AES_128_GCM:
     case GNUTLS_CIPHER_AES_256_GCM:
       if (ivsize != GCM_DEFAULT_NONCE_SIZE)
@@ -342,7 +330,6 @@ struct nettle_cipher_ctx *ctx = _ctx;
 
       gcm_aes_set_iv(&ctx->ctx.aes_gcm, GCM_DEFAULT_NONCE_SIZE, iv);
       break;
-#endif
     default:
       if (ivsize > ctx->block_size)
         {
