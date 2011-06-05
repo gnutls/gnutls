@@ -1344,9 +1344,10 @@ cleanup:
   return result;
 }
 
-/**
- * gnutls_x509_crt_get_signature_algorithm:
- * @cert: should contain a #gnutls_x509_crt_t structure
+/*-
+ * gnutls_x509_get_signature_algorithm:
+ * @src: should contain an ASN1_TYPE structure
+ * @src_name: the description of the signature field
  *
  * This function will return a value of the #gnutls_sign_algorithm_t
  * enumeration that is the signature algorithm that has been used to
@@ -1354,7 +1355,7 @@ cleanup:
  *
  * Returns: a #gnutls_sign_algorithm_t value, or a negative value on
  *   error.
- **/
+ -*/
 int
 _gnutls_x509_get_signature_algorithm (ASN1_TYPE src, const char *src_name)
 {
