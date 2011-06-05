@@ -133,6 +133,7 @@ check_optimized_aes (void)
   return (c & 0x2000000);
 }
 
+#ifdef ASM_X86_64
 static unsigned
 check_pclmul (void)
 {
@@ -141,6 +142,7 @@ check_pclmul (void)
 
   return (c & 0x2);
 }
+#endif
 
 static unsigned
 check_intel_or_amd (void)
@@ -195,6 +197,7 @@ register_x86_crypto (void)
           gnutls_assert ();
         }
 
+#ifdef ASM_X86_64
       if (check_pclmul ())
         {
           /* register GCM ciphers */
@@ -218,6 +221,7 @@ register_x86_crypto (void)
           if (ret >= 0)
             _gnutls_priority_prefer_aes_gcm();
         }
+#endif
     }
 
   return;

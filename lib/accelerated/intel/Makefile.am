@@ -37,12 +37,12 @@ EXTRA_DIST = aes-x86.h README license.txt
 
 noinst_LTLIBRARIES = libintel.la
 
-libintel_la_SOURCES = aes-x86.c aes-gcm-x86.c
-libintel_la_LIBADD =
+libintel_la_SOURCES = aes-x86.c
 
 if ASM_X86_64
-libintel_la_SOURCES += asm/appro-aes-x86-64.s asm/appro-aes-gcm-x86-64.s
+AM_CPPFLAGS += -DASM_X86_64
+libintel_la_SOURCES += asm/appro-aes-x86-64.s asm/appro-aes-gcm-x86-64.s aes-gcm-x86.c
 else
-libintel_la_SOURCES += asm/appro-aes-x86.s asm/appro-aes-gcm-x86.s
+libintel_la_SOURCES += asm/appro-aes-x86.s
 endif
 
