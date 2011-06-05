@@ -455,10 +455,20 @@ test_hash (void)
 
 }
 
+static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "<%d>| %s", level, str);
+}
+
 
 int
 main (int argc, char **argv)
 {
+  gnutls_global_set_log_function (tls_log_func);
+  if (argc > 1)
+    gnutls_global_set_log_level (4711);
+
   gnutls_global_init ();
 
   if (test_aes ())
