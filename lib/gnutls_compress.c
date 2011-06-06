@@ -378,12 +378,10 @@ _gnutls_comp_deinit (comp_hd_t handle, int d)
 #ifdef HAVE_LIBZ
         case GNUTLS_COMP_DEFLATE:
           {
-            int err;
-
             if (d)
-              err = inflateEnd (handle->handle);
+              inflateEnd (handle->handle);
             else
-              err = deflateEnd (handle->handle);
+              deflateEnd (handle->handle);
             break;
           }
 #endif

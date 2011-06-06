@@ -48,7 +48,7 @@ ecc_mulmod (mpz_t k, ecc_point * G, ecc_point * R, mpz_t a, mpz_t modulus,
   ecc_point *tG, *M[3];
   int i, j, err;
   unsigned long buf;
-  int first, bitbuf, bitcpy, bitcnt, mode, digidx;
+  int bitcnt, mode, digidx;
 
   assert (k != NULL);
   assert (G != NULL);
@@ -98,8 +98,6 @@ ecc_mulmod (mpz_t k, ecc_point * G, ecc_point * R, mpz_t a, mpz_t modulus,
   bitcnt = 1;
   buf = 0;
   digidx = mpz_size (k) - 1;
-  bitcpy = bitbuf = 0;
-  first = 1;
 
   /* perform ops */
   for (;;)

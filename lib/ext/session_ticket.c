@@ -671,7 +671,6 @@ _gnutls_recv_new_session_ticket (gnutls_session_t session)
   uint8_t *p;
   int data_size;
   gnutls_buffer_st buf;
-  uint32_t lifetime_hint;
   uint16_t ticket_len;
   int ret;
   session_ticket_ext_st *priv = NULL;
@@ -700,7 +699,7 @@ _gnutls_recv_new_session_ticket (gnutls_session_t session)
   data_size = buf.length;
 
   DECR_LENGTH_COM (data_size, 4, ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH; goto error);
-  lifetime_hint = _gnutls_read_uint32 (p);
+  /* skip over lifetime hint */
   p += 4;
 
   DECR_LENGTH_COM (data_size, 2, ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH; goto error);

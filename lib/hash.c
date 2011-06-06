@@ -183,12 +183,9 @@ uint32_t _gnutls_bhash( const void *key, size_t length, uint32_t initval)
 {
   uint32_t a,b,c;                                          /* internal state */
   const uint8_t *k;
-  union { const void *ptr; size_t i; } u;     /* needed for Mac Powerbook G4 */
 
   /* Set up the internal state */
   a = b = c = 0xdeadbeef + ((uint32_t)length) + initval;
-
-  u.ptr = key;
 
   k = (const uint8_t *)key;
 

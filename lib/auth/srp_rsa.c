@@ -82,7 +82,7 @@ const mod_auth_st srp_dss_auth_struct = {
 static int
 gen_srp_cert_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 {
-  ssize_t ret, data_size;
+  ssize_t ret;
   gnutls_datum_t signature, ddata;
   gnutls_certificate_credentials_t cred;
   gnutls_pcert_st *apr_cert_list;
@@ -95,7 +95,6 @@ gen_srp_cert_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
   if (ret < 0)
     return ret;
 
-  data_size = ret;
   ddata.data = data->data;
   ddata.size = data->length;
 
