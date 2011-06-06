@@ -300,7 +300,7 @@ do_device_source_egd (int init)
       if (device_fd < 0)
         {
           _gnutls_debug_log ("Cannot open egd socket!\n");
-          return GNUTLS_E_FILE_ERROR;
+          return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
         }
 
       device_last_read = now;
@@ -331,7 +331,7 @@ do_device_source_egd (int init)
                   _gnutls_debug_log ("Failed to read egd: end of file\n");
                 }
 
-              return GNUTLS_E_INTERNAL_ERROR;
+              return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
             }
           done += res;
         }
