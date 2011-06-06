@@ -67,7 +67,7 @@ nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c ecore/src/lib/ecore_app.
 	ecore/src/lib/eina_stringshare.c ecore/src/lib/eina_tiler.c ecore/src/lib/eina_unicode.c \
 	ecore/src/lib/eina_ustrbuf.c ecore/src/lib/eina_ustringshare.c ecore/src/lib/eina_value.c
 
-eagain_cli_LDADD = $(LDADD) libecore.la -lrt -lm
+eagain_cli_LDADD = $(LDADD) libecore.la -lrt -lm -ldl -lpthread
 nodist_eagain_cli_SOURCES = mini-eagain2.c
 
 noinst_PROGRAMS = eagain-cli
