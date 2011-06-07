@@ -399,12 +399,11 @@ shared cryptographic keys and certificates in a uniform way, as in the following
 
 @subsection Initialization
 To allow all the  @acronym{GnuTLS} applications to access @acronym{PKCS #11} tokens
-it is adviceable to use @code{/etc/gnutls/pkcs11.conf}. This file has the following
+it is adviceable to use @code{/etc/pkcs11/modules/mymodule.conf}. This file has the following
 format:
 
 @verbatim
-load=/usr/lib/opensc-pkcs11.so
-load=/usr/lib/gnome-keyring/gnome-keyring-pkcs11.so
+module: /usr/lib/opensc-pkcs11.so
 @end verbatim
 
 If you use this file, then there is no need for other initialization in
@@ -426,9 +425,9 @@ the user to insert the token. All the initialization functions are below.
 
 @end itemize
 
-Note that due to limitations of @acronym{PKCS #11} there might be issues when multiple libraries 
-are sharing a module. If this is the case we suggest to use p11-kit@footnote{http://p11-glue.freedesktop.org/}
-that provides an intermediate module to control access to resources over the
+Note that due to limitations of @acronym{PKCS #11} there are issues when multiple libraries 
+are sharing a module. To avoid this problem GnuTLS uses p11-kit@footnote{http://p11-glue.freedesktop.org/}
+that provides a middleware to control access to resources over the
 multiple users.
 
 @subsection Reading Objects
