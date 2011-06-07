@@ -121,7 +121,7 @@ gnutls_pkcs11_privkey_get_info (gnutls_pkcs11_privkey_t pkey,
 		int rret; \
 		ret = pkcs11_find_object (&pks, &obj, &key->info, \
 			SESSION_LOGIN); \
-		if (ret < 0) { \
+		if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) { \
 			if (token_func) \
 			  { \
 			    rret = token_func(token_data, key->info.token, retries++); \
