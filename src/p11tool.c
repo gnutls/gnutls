@@ -161,6 +161,8 @@ gaa_parser (int argc, char **argv)
     }
   fclose (outfile);
 
+#ifdef ENABLE_PKCS11
   gnutls_pkcs11_deinit ();
+#endif
   gnutls_global_deinit ();
 }

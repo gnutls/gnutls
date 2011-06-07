@@ -43,7 +43,6 @@ CXX_LDADD = $(LDADD) \
 
 noinst_PROGRAMS = ex-client2 ex-client-resume ex-client-udp
 noinst_PROGRAMS += ex-cert-select ex-rfc2818
-noinst_PROGRAMS += ex-cert-select-pkcs11
 
 if ENABLE_PKI
 noinst_PROGRAMS += ex-crq ex-serv1
@@ -61,6 +60,10 @@ endif
 
 if ENABLE_OPENPGP
 noinst_PROGRAMS += ex-serv-pgp
+endif
+
+if ENABLE_PKCS11
+noinst_PROGRAMS += ex-cert-select-pkcs11
 endif
 
 if ENABLE_PSK

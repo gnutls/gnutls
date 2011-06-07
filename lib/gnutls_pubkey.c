@@ -21,7 +21,6 @@
 */
 
 #include <gnutls_int.h>
-#include <pakchois/pakchois.h>
 #include <gnutls/pkcs11.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -34,7 +33,6 @@
 #include <gnutls_pk.h>
 #include <x509_int.h>
 #include <openpgp/openpgp_int.h>
-#include <pkcs11_int.h>
 #include <gnutls_num.h>
 #include <x509/common.h>
 #include <x509_b64.h>
@@ -252,6 +250,7 @@ gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
   return ret;
 }
 
+#ifdef ENABLE_PKCS11
 
 /**
  * gnutls_pubkey_import_pkcs11: Imports a public key from a pkcs11 key
@@ -304,6 +303,8 @@ gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t key,
 
   return 0;
 }
+
+#endif /* ENABLE_PKCS11 */
 
 #ifdef ENABLE_OPENPGP
 /**
@@ -919,6 +920,8 @@ gnutls_pubkey_set_key_usage (gnutls_pubkey_t key, unsigned int usage)
   return 0;
 }
 
+#ifdef ENABLE_PKCS11
+
 /**
  * gnutls_pubkey_import_pkcs11_url:
  * @key: A key of type #gnutls_pubkey_t
@@ -967,6 +970,8 @@ cleanup:
 
   return ret;
 }
+
+#endif /* ENABLE_PKCS11 */
 
 /**
  * gnutls_pubkey_import_rsa_raw:

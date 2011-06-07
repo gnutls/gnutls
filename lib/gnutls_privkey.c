@@ -21,7 +21,6 @@
 */
 
 #include <gnutls_int.h>
-#include <pakchois/pakchois.h>
 #include <gnutls/pkcs11.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -45,7 +44,9 @@ struct gnutls_privkey_st
   union
   {
     gnutls_x509_privkey_t x509;
+#ifdef ENABLE_PKCS11
     gnutls_pkcs11_privkey_t pkcs11;
+#endif
 #ifdef ENABLE_OPENPGP
     gnutls_openpgp_privkey_t openpgp;
 #endif
@@ -91,8 +92,10 @@ gnutls_privkey_get_pk_algorithm (gnutls_privkey_t key, unsigned int *bits)
     case GNUTLS_PRIVKEY_OPENPGP:
       return gnutls_openpgp_privkey_get_pk_algorithm (key->key.openpgp, bits);
 #endif
+#ifdef ENABLE_PKCS11
     case GNUTLS_PRIVKEY_PKCS11:
       return gnutls_pkcs11_privkey_get_pk_algorithm (key->key.pkcs11, bits);
+#endif
     case GNUTLS_PRIVKEY_X509:
       if (bits)
         *bits = _gnutls_mpi_get_nbits (key->key.x509->params.params[0]);
@@ -277,9 +280,11 @@ gnutls_privkey_deinit (gnutls_privkey_t key)
         gnutls_openpgp_privkey_deinit (key->key.openpgp);
         break;
 #endif
+#ifdef ENABLE_PKCS11
       case GNUTLS_PRIVKEY_PKCS11:
         gnutls_pkcs11_privkey_deinit (key->key.pkcs11);
         break;
+#endif
       case GNUTLS_PRIVKEY_X509:
         gnutls_x509_privkey_deinit (key->key.x509);
         break;
@@ -296,6 +301,8 @@ static int check_if_clean(gnutls_privkey_t key)
 
   return 0;
 }
+
+#ifdef ENABLE_PKCS11
 
 /**
  * gnutls_privkey_import_pkcs11:
@@ -332,6 +339,8 @@ int ret;
 
   return 0;
 }
+
+#endif /* ENABLE_PKCS11 */
 
 /**
  * gnutls_privkey_import_x509:
@@ -571,9 +580,11 @@ _gnutls_privkey_sign_hash (gnutls_privkey_t key,
       return gnutls_openpgp_privkey_sign_hash (key->key.openpgp,
                                                 hash, signature);
 #endif
+#ifdef ENABLE_PKCS11
     case GNUTLS_PRIVKEY_PKCS11:
       return _gnutls_pkcs11_privkey_sign_hash (key->key.pkcs11,
                                                hash, signature);
+#endif
     case GNUTLS_PRIVKEY_X509:
       return _gnutls_soft_sign (key->key.x509->pk_algorithm,
                                 &key->key.x509->params,
@@ -620,10 +631,12 @@ gnutls_privkey_decrypt_data (gnutls_privkey_t key,
       return _gnutls_pkcs1_rsa_decrypt (plaintext, ciphertext,
                                         &key->key.x509->params,
                                         2);
+#ifdef ENABLE_PKCS11
     case GNUTLS_PRIVKEY_PKCS11:
       return _gnutls_pkcs11_privkey_decrypt_data (key->key.pkcs11,
                                                  flags,
                                                  ciphertext, plaintext);
+#endif
     default:
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;

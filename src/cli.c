@@ -177,6 +177,7 @@ load_keys (void)
 
   if (x509_certfile != NULL && x509_keyfile != NULL)
     {
+#ifdef ENABLE_PKCS11
       if (strncmp (x509_certfile, "pkcs11:", 7) == 0)
         {
           crt_num = 1;
@@ -198,6 +199,7 @@ load_keys (void)
           x509_crt_size = 1;
         }
       else
+#endif /* ENABLE_PKCS11 */
         {
 
           data = load_file (x509_certfile);
@@ -254,6 +256,7 @@ load_keys (void)
            exit (1);
          }
 
+#ifdef ENABLE_PKCS11
       if (strncmp (x509_keyfile, "pkcs11:", 7) == 0)
         {
           gnutls_pkcs11_privkey_init (&pkcs11_key);
@@ -276,6 +279,7 @@ load_keys (void)
             }
         }
       else
+#endif /* ENABLE_PKCS11 */
         {
           data = load_file (x509_keyfile);
           if (data.data == NULL)
@@ -350,6 +354,7 @@ load_keys (void)
            exit (1);
          }
 
+#ifdef ENABLE_PKCS11
       if (strncmp (pgp_keyfile, "pkcs11:", 7) == 0)
         {
           gnutls_pkcs11_privkey_init (&pkcs11_key);
@@ -371,6 +376,7 @@ load_keys (void)
             }
         }
       else
+#endif /* ENABLE_PKCS11 */
         {
           gnutls_openpgp_privkey_t tmp_pgp_key;
 
@@ -730,7 +736,10 @@ main (int argc, char **argv)
       exit (1);
     }
 
+#ifdef ENABLE_PKCS11
   pkcs11_common ();
+#endif
+
   if (hostname == NULL)
     {
       fprintf (stderr, "No hostname given\n");

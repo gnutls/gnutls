@@ -475,6 +475,8 @@ read_key_mem (gnutls_certificate_credentials_t res,
   return 0;
 }
 
+#ifdef ENABLE_PKCS11
+
 /* Reads a private key from a token.
  */
 static int
@@ -672,6 +674,8 @@ read_cert_url (gnutls_certificate_credentials_t res, const char *url)
 
 }
 
+#endif /* ENABLE_PKCS11 */
+
 /* Reads a certificate file
  */
 static int
@@ -682,10 +686,12 @@ read_cert_file (gnutls_certificate_credentials_t res,
   size_t size;
   char *data;
 
+#ifdef ENABLE_PKCS11
   if (strncmp (certfile, "pkcs11:", 7) == 0)
     {
       return read_cert_url (res, certfile);
     }
+#endif /* ENABLE_PKCS11 */
 
   data = read_binary_file (certfile, &size);
 
@@ -715,10 +721,12 @@ read_key_file (gnutls_certificate_credentials_t res,
   size_t size;
   char *data;
 
+#ifdef ENABLE_PKCS11
   if (strncmp (keyfile, "pkcs11:", 7) == 0)
     {
       return read_key_url (res, keyfile);
     }
+#endif /* ENABLE_PKCS11 */
 
   data = read_binary_file (keyfile, &size);
 
@@ -1312,10 +1320,12 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t res,
   size_t size;
   char *data;
 
+#ifdef ENABLE_PKCS11
   if (strncmp (cafile, "pkcs11:", 7) == 0)
     {
       return read_cas_url (res, cafile);
     }
+#endif
 
   data = read_binary_file (cafile, &size);
   if (data == NULL)

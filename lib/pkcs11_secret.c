@@ -50,8 +50,9 @@ gnutls_pkcs11_copy_secret_key (const char *token_url, gnutls_datum_t * key,
                                /* GNUTLS_PKCS11_OBJ_FLAG_* */ )
 {
   int ret;
-  pakchois_session_t *pks;
-  struct pkcs11_url_info info;
+  struct ck_function_list *module;
+  ck_session_handle_t pks;
+  struct p11_kit_uri *info = NULL;
   ck_rv_t rv;
   struct ck_attribute a[12];
   ck_object_class_t class = CKO_SECRET_KEY;
@@ -77,8 +78,10 @@ gnutls_pkcs11_copy_secret_key (const char *token_url, gnutls_datum_t * key,
     }
 
   ret =
-    pkcs11_open_session (&pks, &info,
+    pkcs11_open_session (&module, &pks, info,
                          SESSION_WRITE | pkcs11_obj_flags_to_int (flags));
+  p11_kit_uri_free (info);
+
   if (ret < 0)
     {
       gnutls_assert ();
@@ -126,11 +129,11 @@ gnutls_pkcs11_copy_secret_key (const char *token_url, gnutls_datum_t * key,
   a[a_val].value_len = sizeof (tval);
   a_val++;
 
-  rv = pakchois_create_object (pks, a, a_val, &obj);
+  rv = pkcs11_create_object (module, pks, a, a_val, &obj);
   if (rv != CKR_OK)
     {
       gnutls_assert ();
-      _gnutls_debug_log ("pkcs11: %s\n", pakchois_error (rv));
+      _gnutls_debug_log ("pkcs11: %s\n", pkcs11_strerror (rv));
       ret = pkcs11_rv_to_err (rv);
       goto cleanup;
     }
@@ -141,7 +144,7 @@ gnutls_pkcs11_copy_secret_key (const char *token_url, gnutls_datum_t * key,
   ret = 0;
 
 cleanup:
-  pakchois_close_session (pks);
+  pkcs11_close_session (module, pks);
 
   return ret;
 

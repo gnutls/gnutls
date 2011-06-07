@@ -119,8 +119,19 @@ AC_CHECK_FUNCS(fork,,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 AC_CHECK_FUNCS(getrusage,,)
 AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
-dnl for pakchois
-AC_LIB_HAVE_LINKFLAGS(dl,, [#include <dlfcn.h>], [dlclose (0);])
+
+dnl Check for p11-kit
+AC_ARG_WITH(p11-kit,
+	AS_HELP_STRING([--without-p11-kit],
+		[Build without p11-kit and PKCS#11 support]))
+AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
+if test "$with_p11_kit" != "no"; then
+	PKG_CHECK_MODULES(P11_KIT, [p11-kit-1])
+	AC_DEFINE(ENABLE_PKCS11, 1, [Build PKCS#11 support])
+	CFLAGS="$CFLAGS $P11_KIT_CFLAGS"
+	LIBS="$LIBS $P11_KIT_LIBS"
+	with_p11_kit=yes
+fi
 
 dnl Check for libcfg+
 SAVED_LIBS=$LIBS
@@ -434,4 +445,5 @@ AC_MSG_NOTICE([summary of build options:
   /dev/crypto:      $enable_cryptodev
   Hardware accel:   $hw_accel
   Crypto library:   $cryptolib
+  PKCS#11 support:  $with_p11_kit
 ])

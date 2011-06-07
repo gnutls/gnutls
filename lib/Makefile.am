@@ -23,7 +23,6 @@
 
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
-EXTRA_DIST = pakchois/README
 SUBDIRS = includes x509 accelerated auth ext algorithms
 if ENABLE_MINITASN1
 SUBDIRS += minitasn1
@@ -72,11 +71,13 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_dh_primes.c gnutls_alert.c system.c		\
 	gnutls_str.c gnutls_state.c gnutls_x509.c gnutls_rsa_export.c  	\
 	gnutls_helper.c gnutls_supplemental.c random.c  \
-	crypto-api.c gnutls_privkey.c gnutls_pcert.c \
-	pkcs11.c pkcs11_privkey.c gnutls_pubkey.c pkcs11_write.c locks.c \
-	pkcs11_secret.c hash.c gnutls_dtls.c system_override.c \
+	crypto-api.c gnutls_privkey.c gnutls_pcert.c  gnutls_pubkey.c \
+	locks.c hash.c gnutls_dtls.c system_override.c \
 	crypto-backend.c
 
+if ENABLE_PKCS11
+COBJECTS += pkcs11.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c
+endif
 
 if ENABLE_NETTLE
 SUBDIRS += nettle
@@ -96,11 +97,11 @@ HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
 	gnutls_state.h gnutls_x509.h crypto-backend.h			\
 	gnutls_rsa_export.h gnutls_srp.h auth/srp.h auth/srp_passwd.h	\
 	gnutls_helper.h gnutls_supplemental.h crypto.h random.h system.h\
-	locks.h gnutls_mbuffers.h pkcs11_int.h \
-	hash.h gnutls_ecc.h
+	locks.h gnutls_mbuffers.h hash.h gnutls_ecc.h
 
-COBJECTS+=pakchois/pakchois.c pakchois/errors.c pakchois/dlopen.c
-HFILES+=pakchois/pakchois.h pakchois/pakchois11.h pakchois/dlopen.h
+if ENABLE_PKCS11
+HFILES += pkcs11_int.h pkcs11_spec.h
+endif
 
 # Separate so we can create the documentation
 
