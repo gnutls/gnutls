@@ -248,7 +248,9 @@ gnutls_global_init (void)
       goto out;
     }
 
+#ifdef ENABLE_PKCS11
   gnutls_pkcs11_init (GNUTLS_PKCS11_FLAG_AUTO, NULL);
+#endif
 
   _gnutls_cryptodev_init ();
 
@@ -277,7 +279,9 @@ gnutls_global_deinit (void)
       asn1_delete_structure (&_gnutls_pkix1_asn);
       _gnutls_crypto_deregister ();
       _gnutls_cryptodev_deinit ();
+#ifdef ENABLE_PKCS11
       gnutls_pkcs11_deinit ();
+#endif
     }
   _gnutls_init--;
 }

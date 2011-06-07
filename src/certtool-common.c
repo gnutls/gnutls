@@ -146,6 +146,8 @@ gnutls_x509_privkey_t xkey;
   return key;
 }
 
+#ifdef ENABLE_PKCS11
+
 static gnutls_privkey_t _load_pkcs11_privkey(const char* url)
 {
 int ret;
@@ -257,6 +259,7 @@ unsigned int obj_flags = 0;
   return pubkey;
 }
 
+#endif /* ENABLE_PKCS11 */
 
 /* Load the private key.
  * @mand should be non zero if it is required to read a private key.
@@ -274,8 +277,10 @@ load_private_key (int mand, common_info_st * info)
   if (info->privkey == NULL)
     error (EXIT_FAILURE, 0, "missing --load-privkey");
 
+#ifdef ENABLE_PKCS11
   if (strncmp(info->privkey, "pkcs11:", 7) == 0)
     return _load_pkcs11_privkey(info->privkey);
+#endif
 
   dat.data = read_binary_file (info->privkey, &size);
   dat.size = size;
@@ -480,8 +485,10 @@ load_ca_private_key (common_info_st * info)
   if (info->ca_privkey == NULL)
     error (EXIT_FAILURE, 0, "missing --load-ca-privkey");
 
+#ifdef ENABLE_PKCS11
   if (strncmp(info->ca_privkey, "pkcs11:", 7) == 0)
     return _load_pkcs11_privkey(info->ca_privkey);
+#endif
 
   dat.data = read_binary_file (info->ca_privkey, &size);
   dat.size = size;
@@ -547,8 +554,10 @@ load_pubkey (int mand, common_info_st * info)
   if (info->pubkey == NULL)
     error (EXIT_FAILURE, 0, "missing --load-pubkey");
 
+#ifdef ENABLE_PKCS11
   if (strncmp(info->pubkey, "pkcs11:", 7) == 0)
     return _load_pkcs11_pubkey(info->pubkey);
+#endif
 
   ret = gnutls_pubkey_init (&key);
   if (ret < 0)

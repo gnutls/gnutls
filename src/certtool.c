@@ -1076,8 +1076,10 @@ gaa_parser (int argc, char **argv)
 
   if ((ret = gnutls_global_init ()) < 0)
     error (EXIT_FAILURE, 0, "global_init: %s", gnutls_strerror (ret));
-    
+
+#ifdef ENABLE_PKCS11
   pkcs11_common();
+#endif
 
   memset (&cinfo, 0, sizeof (cinfo));
   cinfo.privkey = info.privkey;
@@ -1174,7 +1176,9 @@ gaa_parser (int argc, char **argv)
     }
   fclose (outfile);
 
+#ifdef ENABLE_PKCS11
   gnutls_pkcs11_deinit ();
+#endif
   gnutls_global_deinit ();
 }
 

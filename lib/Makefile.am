@@ -80,9 +80,11 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	auth_dh_common.c gnutls_helper.c gnutls_supplemental.c		\
 	crypto.c random.c  ext_signature.c cryptodev.c system.c \
 	crypto-api.c ext_safe_renegotiation.c gnutls_privkey.c \
-	pkcs11.c pkcs11_privkey.c gnutls_pubkey.c pkcs11_write.c locks.c \
-	pkcs11_secret.c
+	gnutls_pubkey.c locks.c
 
+if ENABLE_PKCS11
+COBJECTS += pkcs11.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c
+endif
 
 if ENABLE_NETTLE
 SUBDIRS += nettle
@@ -105,11 +107,11 @@ HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
 	gnutls_helper.h auth_psk.h auth_psk_passwd.h			\
 	gnutls_supplemental.h crypto.h random.h system.h		\
 	ext_session_ticket.h ext_signature.h gnutls_cryptodev.h		\
-	ext_safe_renegotiation.h locks.h gnutls_mbuffers.h		\
-	pkcs11_int.h
+	ext_safe_renegotiation.h locks.h gnutls_mbuffers.h
 
-COBJECTS+=pakchois/pakchois.c pakchois/errors.c pakchois/dlopen.c
-HFILES+=pakchois/pakchois.h pakchois/pakchois11.h pakchois/dlopen.h
+if ENABLE_PKCS11
+HFILES += pkcs11_int.h pkcs11_spec.h
+endif
 
 # Separate so we can create the documentation
 

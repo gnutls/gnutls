@@ -79,6 +79,19 @@ AC_DEFINE([HAVE_ERRNO_H], 1, [Hard-code for src/cfg/.])
 AC_CHECK_FUNCS(fork,,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 
+dnl Check for p11-kit
+AC_ARG_WITH(p11-kit,
+	AS_HELP_STRING([--without-p11-kit],
+		[Build without p11-kit and PKCS#11 support]))
+AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
+if test "$with_p11_kit" != "no"; then
+	PKG_CHECK_MODULES(P11_KIT, [p11-kit-1])
+	AC_DEFINE(ENABLE_PKCS11, 1, [Build PKCS#11 support])
+	CFLAGS="$CFLAGS $P11_KIT_CFLAGS"
+	LIBS="$LIBS $P11_KIT_LIBS"
+	with_p11_kit=yes
+fi
+
 AC_CHECK_TYPES(uint,,, [
 # include <sys/types.h>
 ])
@@ -312,4 +325,5 @@ AC_MSG_NOTICE([summary of build options:
   OpenSSL library:  $enable_openssl
   /dev/crypto:      $enable_cryptodev
   Crypto library:   $cryptolib
+  PKCS#11 support:  $with_p11_kit
 ])

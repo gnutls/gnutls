@@ -62,9 +62,10 @@ static gnutls_cert *alloc_and_load_x509_certs (gnutls_x509_crt_t * certs,
 static gnutls_privkey_t alloc_and_load_x509_key (gnutls_x509_privkey_t key,
                                                  int deinit);
 
+#ifdef ENABLE_PKCS11
 static gnutls_privkey_t alloc_and_load_pkcs11_key (gnutls_pkcs11_privkey_t
                                                    key, int deinit);
-
+#endif
 
 /* Copies data from a internal certificate struct (gnutls_cert) to 
  * exported certificate struct (cert_auth_info_t)
@@ -569,6 +570,7 @@ call_get_cert_callback (gnutls_session_t session,
         }
       break;
 #endif
+#ifdef ENABLE_PKCS11
     case GNUTLS_PRIVKEY_PKCS11:
       if (st2.key.pkcs11 != NULL)
         {
@@ -582,6 +584,7 @@ call_get_cert_callback (gnutls_session_t session,
             }
         }
       break;
+#endif
     case GNUTLS_PRIVKEY_X509:
       if (st2.key.x509 != NULL)
         {
@@ -1970,6 +1973,8 @@ alloc_and_load_pgp_key (gnutls_openpgp_privkey_t key, int deinit)
 }
 #endif
 
+#ifdef ENABLE_PKCS11
+
 /* converts the given raw key to gnutls_privkey* and allocates
  * space for it.
  */
@@ -2002,6 +2007,8 @@ alloc_and_load_pkcs11_key (gnutls_pkcs11_privkey_t key, int deinit)
 
   return local_key;
 }
+
+#endif
 
 void
 _gnutls_selected_certs_deinit (gnutls_session_t session)

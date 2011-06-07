@@ -869,7 +869,9 @@ main (int argc, char **argv)
       exit (1);
     }
 
+#ifdef ENABLE_PKCS11
   pkcs11_common ();
+#endif
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (debug);
 

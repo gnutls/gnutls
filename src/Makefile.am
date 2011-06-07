@@ -32,15 +32,22 @@ AM_CPPFLAGS = \
 noinst_PROGRAMS = benchmark
 bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug
 if ENABLE_PKI
-bin_PROGRAMS += certtool p11tool
+bin_PROGRAMS += certtool
 endif
 if ENABLE_SRP
 bin_PROGRAMS += srptool
 endif
 
+if ENABLE_PKCS11
+bin_PROGRAMS += p11tool
+PKCS11_SRCS = p11common.c p11common.h
+else
+PKCS11_SRCS =
+endif
+
 noinst_LTLIBRARIES =
 
-gnutls_serv_SOURCES = list.h serv.c common.h common.c certtool-common.h p11common.c p11common.h
+gnutls_serv_SOURCES = list.h serv.c common.h common.c certtool-common.h $(PKCS11_SRCS)
 
 gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
 gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la
@@ -66,7 +73,7 @@ libcmd_psk_la_SOURCES = psk.gaa psk-gaa.h psk-gaa.c
 benchmark_SOURCES = benchmark.c
 benchmark_LDADD = ../lib/libgnutls.la ../gl/libgnu.la $(LIB_CLOCK_GETTIME)
 
-gnutls_cli_SOURCES = cli.c common.h common.c p11common.c p11common.h
+gnutls_cli_SOURCES = cli.c common.h common.c $(PKCS11_SRCS)
 gnutls_cli_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
 gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la
 gnutls_cli_LDADD += $(LTLIBGCRYPT) $(LIBSOCKET) $(GETADDRINFO_LIB)
@@ -74,7 +81,7 @@ noinst_LTLIBRARIES += libcmd-cli.la
 libcmd_cli_la_CFLAGS =
 libcmd_cli_la_SOURCES = cli.gaa cli-gaa.h cli-gaa.c
 
-gnutls_cli_debug_SOURCES = tls_test.c tests.h tests.c common.h common.c p11common.c p11common.h
+gnutls_cli_debug_SOURCES = tls_test.c tests.h tests.c common.h common.c $(PKCS11_SRCS)
 gnutls_cli_debug_LDADD = ../lib/libgnutls.la libcmd-cli-debug.la
 gnutls_cli_debug_LDADD += ../gl/libgnu.la $(LIBSOCKET) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-cli-debug.la
@@ -83,7 +90,7 @@ libcmd_cli_debug_la_SOURCES = tls_test.gaa tls_test-gaa.h tls_test-gaa.c
 
 #certtool
 
-certtool_SOURCES = certtool.c prime.c certtool-common.c p11common.c p11common.h
+certtool_SOURCES = certtool.c prime.c certtool-common.c $(PKCS11_SRCS)
 certtool_LDADD = ../lib/libgnutls.la 
 certtool_LDADD += libcmd-certtool.la ../gl/libgnu.la
 certtool_LDADD += $(LTLIBGCRYPT)
@@ -107,6 +114,8 @@ libcmd_certtool_la_LIBADD += ../lib/libgnutls.la
 libcmd_certtool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
 
 # p11 tool
+if ENABLE_PKCS11
+
 p11tool_gaa_CFLAGS =
 p11tool_SOURCES = p11tool.gaa p11tool.c pkcs11.c certtool-common.c p11tool.h p11common.c
 p11tool_LDADD = ../lib/libgnutls.la 
@@ -118,6 +127,7 @@ p11tool_LDADD += -lcfg+
 else
 p11tool_LDADD += libcfg.la
 endif
+
 noinst_LTLIBRARIES += libcmd-p11tool.la
 libcmd_p11tool_la_CFLAGS =
 libcmd_p11tool_la_SOURCES = p11tool-gaa.c p11tool.gaa p11tool-gaa.h	\
@@ -126,14 +136,17 @@ libcmd_p11tool_la_LIBADD = ../gl/libgnu.la $(LTLIBREADLINE)
 libcmd_p11tool_la_LIBADD += ../lib/libgnutls.la
 libcmd_p11tool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
 
+endif # ENABLE_PKCS11
 
 
 psk-gaa.c: $(srcdir)/psk.gaa
 	-$(GAA) $< -o psk-gaa.c -i psk-gaa.h
 crypt-gaa.c: $(srcdir)/crypt.gaa
 	-$(GAA) $< -o crypt-gaa.c -i crypt-gaa.h
+if ENABLE_PKCS11
 p11tool-gaa.c: $(srcdir)/p11tool.gaa
 	-$(GAA) $< -o p11tool-gaa.c -i p11tool-gaa.h
+endif
 certtool-gaa.c: $(srcdir)/certtool.gaa
 	-$(GAA) $< -o certtool-gaa.c -i certtool-gaa.h
 cli-gaa.c: $(srcdir)/cli.gaa
