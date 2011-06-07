@@ -1060,9 +1060,9 @@ pkcs11_find_object (pakchois_session_t ** _pks,
       *_pks = pks;
       pakchois_find_objects_final (pks);
       return 0;
-
     }
 
+  ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
   pakchois_find_objects_final (pks);
 fail:
   pakchois_close_session (pks);
