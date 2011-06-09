@@ -4,7 +4,7 @@
 #ifdef ENABLE_PKCS11
 
 #define CRYPTOKI_GNU
-#include "pkcs11_spec.h"
+#include <p11-kit/pkcs11.h>
 #include <gnutls/pkcs11.h>
 #include <x509/x509_int.h>
 
