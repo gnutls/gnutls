@@ -308,8 +308,8 @@ pkcs11_get_info (struct p11_kit_uri *info,
   size_t str_max = 0;
   int terminate = 0;
   int hexify = 0;
-  size_t length;
-  const char *data;
+  size_t length = 0;
+  const char *data = NULL;
   char buf[32];
 
   /*
@@ -381,8 +381,6 @@ pkcs11_get_info (struct p11_kit_uri *info,
                          (int)version->minor);
       terminate = 1;
     }
-  else
-    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST); /* data and len are uninitialized */
 
   if (hexify)
     {
