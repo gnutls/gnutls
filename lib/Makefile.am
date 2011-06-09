@@ -110,7 +110,7 @@ HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
 	ext_safe_renegotiation.h locks.h gnutls_mbuffers.h
 
 if ENABLE_PKCS11
-HFILES += pkcs11_int.h pkcs11_spec.h
+HFILES += pkcs11_int.h
 endif
 
 # Separate so we can create the documentation

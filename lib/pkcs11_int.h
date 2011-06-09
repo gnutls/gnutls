@@ -11,6 +11,7 @@
 
 #define P11_KIT_API_SUBJECT_TO_CHANGE 1
 #include <p11-kit/uri.h>
+#include <p11-kit/pkcs11.h>
 
 typedef unsigned char ck_bool_t;
 
