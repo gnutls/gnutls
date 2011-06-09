@@ -799,12 +799,8 @@ pkcs11_mechanism_list (FILE * outfile, const char *url, unsigned int login,
 {
   int ret;
   int idx;
-  unsigned int obj_flags = 0;
   unsigned long mechanism;
   const char *str;
-
-  if (login)
-    obj_flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
 
   pkcs11_common ();
 

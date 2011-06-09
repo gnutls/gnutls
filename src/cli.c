@@ -1168,11 +1168,10 @@ psk_callback (gnutls_session_t session, char **username, gnutls_datum_t * key)
     {
       char *tmp = NULL;
       size_t n;
-      ssize_t len;
 
       printf ("Enter PSK identity: ");
       fflush (stdout);
-      len = getline (&tmp, &n, stdin);
+      getline (&tmp, &n, stdin);
 
       if (tmp == NULL)
         {

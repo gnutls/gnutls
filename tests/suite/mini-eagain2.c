@@ -21,11 +21,13 @@
 
 static int done = 0;
 
+#if 0
 static void
 tls_log_func (int level, const char *str)
 {
   fprintf(stderr, "|<%d>| %s", level, str);
 }
+#endif
 
 static const char*
 SSL_GNUTLS_PRINT_HANDSHAKE_STATUS(gnutls_handshake_description_t status)
