@@ -260,6 +260,14 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
   a[a_val].value_len = sizeof (tval);
   a_val++;
 
+  if (label)
+    {
+      a[a_val].type = CKA_LABEL;
+      a[a_val].value = (void *) label;
+      a[a_val].value_len = strlen (label);
+      a_val++;
+    }
+
   if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE)
     tval = 1;
   else
