@@ -145,7 +145,12 @@ pkcs11_list (FILE * outfile, const char *url, int type, unsigned int login,
   unsigned int obj_flags = 0;
 
   if (login)
-    obj_flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
+    {
+      if (type == PKCS11_TYPE_TRUSTED)
+        obj_flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO;
+      else
+        obj_flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
+    }
 
   pkcs11_common ();
 
