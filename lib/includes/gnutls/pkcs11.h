@@ -68,6 +68,7 @@ int gnutls_pkcs11_obj_init (gnutls_pkcs11_obj_t * obj);
 #define GNUTLS_PKCS11_OBJ_FLAG_LOGIN (1<<0)     /* force login in the token for the operation */
 #define GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED (1<<1)      /* object marked as trusted */
 #define GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE (1<<2)    /* object marked as sensitive (unexportable) */
+#define GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO (1<<3)     /* force login as a security officer in the token for the operation */
 
   /**
    * gnutls_pkcs11_url_type_t:
