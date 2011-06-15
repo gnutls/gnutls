@@ -23,7 +23,6 @@
 #include <gnutls_int.h>
 #include <gnutls/pkcs11.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include <string.h>
 #include <gnutls_errors.h>
 #include <gnutls_datum.h>

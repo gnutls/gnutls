@@ -58,7 +58,7 @@ gnutls_pkcs11_copy_secret_key (const char *token_url, gnutls_datum_t * key,
   ck_object_class_t class = CKO_SECRET_KEY;
   ck_object_handle_t obj;
   ck_key_type_t keytype = CKK_GENERIC_SECRET;
-  unsigned int tval = 1;
+  ck_bool_t tval = 1;
   int a_val;
   opaque id[16];
 
