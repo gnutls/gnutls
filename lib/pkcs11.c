@@ -1399,7 +1399,7 @@ pkcs11_obj_import_pubkey (pakchois_session_t * pks,
   opaque tmp1[2048];
   opaque tmp2[2048];
   int ret;
-  unsigned int tval;
+  ck_bool_t tval;
 
   a[0].type = CKA_KEY_TYPE;
   a[0].value = &key_type;

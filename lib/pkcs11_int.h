@@ -7,6 +7,8 @@
 #define PKCS11_ID_SIZE 128
 #define PKCS11_LABEL_SIZE 128
 
+typedef unsigned char ck_bool_t;
+
 struct token_info
 {
   struct ck_token_info tinfo;

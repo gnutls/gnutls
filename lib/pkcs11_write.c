@@ -57,7 +57,7 @@ gnutls_pkcs11_copy_x509_crt (const char *token_url,
   ck_object_class_t class = CKO_CERTIFICATE;
   ck_certificate_type_t type = CKC_X_509;
   ck_object_handle_t obj;
-  unsigned int tval = 1;
+  ck_bool_t tval = 1;
   int a_val;
 
   ret = pkcs11_url_to_info (token_url, &info);
@@ -195,7 +195,7 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
   ck_object_class_t class = CKO_PRIVATE_KEY;
   ck_object_handle_t obj;
   ck_key_type_t type;
-  unsigned int tval = 1;
+  ck_bool_t tval = 1;
   int a_val;
   gnutls_pk_algorithm_t pk;
   gnutls_datum_t p, q, g, y, x;
