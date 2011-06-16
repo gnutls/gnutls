@@ -1396,7 +1396,7 @@ pkcs11_obj_flags_to_int (unsigned int flags)
 
   if (flags & GNUTLS_PKCS11_OBJ_FLAG_LOGIN)
     ret_flags |= SESSION_LOGIN;
-  else if (flags & GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO)
+  if (flags & GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO)
     ret_flags |= SESSION_LOGIN|SESSION_SO;
 
   return ret_flags;
