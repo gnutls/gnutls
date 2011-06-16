@@ -408,8 +408,6 @@ cdk_keydb_new (cdk_keydb_hd_t * r_hd, int type, void *data, size_t count)
       gnutls_assert ();
       return CDK_Inv_Mode;
     }
-  gnutls_assert ();
-  return CDK_Inv_Mode;
 }
 
 
