@@ -629,15 +629,13 @@ gnutls_x509_privkey_import_rsa_raw2 (gnutls_x509_privkey_t key,
   int ret;
   size_t siz = 0;
 
-  gnutls_pk_params_init(&key->params);
-
   if (key == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  key->params.params_nr = 0;
+  gnutls_pk_params_init(&key->params);
 
   siz = m->size;
   if (_gnutls_mpi_scan_nz (&key->params.params[0], m->data, siz))

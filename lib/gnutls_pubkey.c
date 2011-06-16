@@ -1045,13 +1045,13 @@ gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
 {
   size_t siz = 0;
 
-  gnutls_pk_params_init(&key->params);
-
   if (key == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
+
+  gnutls_pk_params_init(&key->params);
 
   siz = p->size;
   if (_gnutls_mpi_scan_nz (&key->params.params[0], p->data, siz))
