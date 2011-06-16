@@ -123,7 +123,7 @@ libcmd_certtool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
 if ENABLE_PKCS11
 
 p11tool_gaa_CFLAGS =
-p11tool_SOURCES = p11tool.gaa p11tool.c pkcs11.c certtool-common.c p11tool.h
+p11tool_SOURCES = p11tool.gaa p11tool.c pkcs11.c certtool-common.c p11tool.h $(PKCS11_SRCS)
 p11tool_LDADD = ../lib/libgnutls.la 
 p11tool_LDADD += libcmd-p11tool.la ../gl/libgnu.la
 p11tool_LDADD += $(LTLIBGCRYPT)

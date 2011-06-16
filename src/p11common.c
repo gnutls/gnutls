@@ -36,10 +36,16 @@ pin_callback (void *user, int attempt, const char *token_url,
               size_t pin_max)
 {
   const char *password;
+  const char * desc;
   int len, cache = 1;
 /* allow caching of PIN */
   static char *cached_url = NULL;
   static char cached_pin[32] = "";
+
+  if (flags & GNUTLS_PKCS11_PIN_SO)
+    desc = "security officer";
+  else
+    desc = "user";
 
   if (flags & GNUTLS_PKCS11_PIN_FINAL_TRY)
     {
@@ -67,10 +73,10 @@ pin_callback (void *user, int attempt, const char *token_url,
         }
     }
 
-  printf ("PIN required for token '%s' with URL '%s'\n", token_label,
-          token_url);
+  printf ("Token '%s' with URL '%s' ", token_label, token_url);
+  printf ("requires %s PIN\n", desc);
 
-  password = getpass ("Enter pin: ");
+  password = getpass ("Enter PIN: ");
   if (password == NULL || password[0] == 0)
     {
       fprintf (stderr, "No password given\n");

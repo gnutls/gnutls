@@ -32,68 +32,7 @@
 #include "certtool-common.h"
 #include <unistd.h>
 #include <string.h>
-
-#define MIN(x,y) ((x)<(y))?(x):(y)
-
-static int
-pin_callback (void *user, int attempt, const char *token_url,
-              const char *token_label, unsigned int flags, char *pin,
-              size_t pin_max)
-{
-  const char *password;
-  int len;
-/* allow caching of PIN */
-  static char *cached_url = NULL;
-  static char cached_pin[32] = "";
-
-  printf ("PIN required for token '%s' with URL '%s'\n", token_label,
-          token_url);
-  if (flags & GNUTLS_PKCS11_PIN_FINAL_TRY)
-    printf ("*** This is the final try before locking!\n");
-  if (flags & GNUTLS_PKCS11_PIN_COUNT_LOW)
-    printf ("*** Only few tries left before locking!\n");
-
-  if (flags == 0 && cached_url != NULL)
-    {
-      if (strcmp (cached_url, token_url) == 0)
-        {
-          strcpy (pin, cached_pin);
-          return 0;
-        }
-    }
-
-  password = getpass ("Enter PIN: ");
-  if (password == NULL || password[0] == 0)
-    {
-      fprintf (stderr, "No PIN given\n");
-      exit (1);
-    }
-
-  len = MIN (pin_max, strlen (password));
-  memcpy (pin, password, len);
-  pin[len] = 0;
-
-  /* cache */
-  if (strlen(pin) >= sizeof(cached_pin))
-    {
-      fprintf (stderr, "Too long PIN given\n");
-      exit (1);
-    }
-
-  strcpy (cached_pin, pin);
-  free (cached_url);
-  cached_url = strdup (token_url);
-
-  return 0;
-}
-
-static void
-pkcs11_common (void)
-{
-
-  gnutls_pkcs11_set_pin_function (pin_callback, NULL);
-
-}
+#include <p11common.h>
 
 void
 pkcs11_delete (FILE * outfile, const char *url, int batch, unsigned int login,
@@ -567,7 +506,8 @@ pkcs11_write (FILE * outfile, const char *url, const char *label, int trusted,
   if (xcrt != NULL)
     {
       if (trusted)
-        flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED;
+        flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED|GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO;
+
       ret = gnutls_pkcs11_copy_x509_crt (url, xcrt, label, flags);
       if (ret < 0)
         {
