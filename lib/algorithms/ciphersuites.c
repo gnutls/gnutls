@@ -52,7 +52,7 @@ typedef struct
                                          * from 'version' and above;
                                          */
   gnutls_protocol_t max_version;        /* this cipher suite is not supported after that */
-  int dtls:1; /* whether this ciphersuite is valid in DTLS */
+  unsigned int dtls:1; /* whether this ciphersuite is valid in DTLS */
   gnutls_mac_algorithm_t prf;
 } gnutls_cipher_suite_entry;
 

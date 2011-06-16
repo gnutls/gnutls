@@ -36,9 +36,9 @@ typedef struct
   uint8_t ri_extension_data[MAX_VERIFY_DATA_SIZE * 2];  /* max signal is 72 bytes in s->c sslv3 */
   size_t ri_extension_data_len;
 
-  int safe_renegotiation_received:1;
-  int initial_negotiation_completed:1;
-  int connection_using_safe_renegotiation:1;
+  unsigned int safe_renegotiation_received:1;
+  unsigned int initial_negotiation_completed:1;
+  unsigned int connection_using_safe_renegotiation:1;
 } sr_ext_st;
 
 extern extension_entry_st ext_mod_sr;
