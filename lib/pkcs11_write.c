@@ -53,12 +53,13 @@ gnutls_pkcs11_copy_x509_crt (const char *token_url,
   size_t der_size, id_size;
   opaque *der = NULL;
   opaque id[20];
-  struct ck_attribute a[8];
+  struct ck_attribute a[10];
   ck_object_class_t class = CKO_CERTIFICATE;
   ck_certificate_type_t type = CKC_X_509;
   ck_object_handle_t obj;
   ck_bool_t tval = 1;
   int a_val;
+  gnutls_datum_t subject = { NULL, 0 };
 
   ret = pkcs11_url_to_info (token_url, &info);
   if (ret < 0)
@@ -105,6 +106,13 @@ gnutls_pkcs11_copy_x509_crt (const char *token_url,
       gnutls_assert ();
       goto cleanup;
     }
+  
+  ret = gnutls_x509_crt_get_raw_dn (crt, &subject);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
 
   /* FIXME: copy key usage flags */
 
@@ -125,6 +133,11 @@ gnutls_pkcs11_copy_x509_crt (const char *token_url,
   a[4].value_len = sizeof (type);
 
   a_val = 5;
+
+  a[a_val].type = CKA_SUBJECT;
+  a[a_val].value = subject.data;
+  a[a_val].value_len = subject.size;
+  a_val++;
 
   if (label)
     {
@@ -158,6 +171,7 @@ gnutls_pkcs11_copy_x509_crt (const char *token_url,
 
 cleanup:
   gnutls_free (der);
+  _gnutls_free_datum(&subject);
   pakchois_close_session (pks);
 
   return ret;
