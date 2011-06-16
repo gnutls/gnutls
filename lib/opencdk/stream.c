@@ -1376,7 +1376,7 @@ stream_cache_flush (cdk_stream_t s, FILE * fp)
         }
       s->cache.size = 0;
       s->cache.on = 0;
-      wipemem (s->cache.buf, s->cache.alloced);
+      memset (s->cache.buf, 0, s->cache.alloced);
     }
   return 0;
 }
@@ -1416,7 +1416,7 @@ cdk_stream_kick_off (cdk_stream_t inp, cdk_stream_t out)
         }
     }
 
-  wipemem (buf, sizeof (buf));
+  memset (buf, 0, sizeof (buf));
   return rc;
 }
 

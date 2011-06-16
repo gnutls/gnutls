@@ -77,17 +77,6 @@ cdk_error_t map_gnutls_error (int err);
 #define KEY_CAN_SIGN(a)    ((_cdk_pk_algo_usage ((a))) & CDK_KEY_USG_SIGN)
 #define KEY_CAN_AUTH(a)    ((_cdk_pk_algo_usage ((a))) & CDK_KEY_USG_AUTH)
 
-/* Helper macro to make sure the buffer is overwritten. */
-#define wipemem(_ptr,_len) do { \
-  volatile char *_vptr = (volatile char *)(_ptr); \
-  size_t _vlen = (_len); \
-  while (_vlen) \
-    { \
-      *_vptr = 0; \
-      _vptr++; \
-      _vlen--; \
-    } } while (0)
-
 /*-- armor.c --*/
 const char *_cdk_armor_get_lineend (void);
 

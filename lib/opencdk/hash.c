@@ -68,7 +68,7 @@ hash_encode (void *data, FILE * in, FILE * out)
       _gnutls_hash (&mfx->md, buf, nread);
     }
 
-  wipemem (buf, sizeof (buf));
+  memset (buf, 0, sizeof (buf));
   return 0;
 }
 

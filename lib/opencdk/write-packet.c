@@ -683,7 +683,7 @@ write_literal (cdk_stream_t out, cdk_pkt_literal_t pt, int old_ctb)
         rc = stream_write (out, buf, size);
     }
 
-  wipemem (buf, sizeof (buf));
+  memset (buf, 0, sizeof (buf));
   return rc;
 }
 
