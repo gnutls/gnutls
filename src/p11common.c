@@ -30,6 +30,7 @@
 
 #define MIN(x,y) ((x)<(y))?(x):(y)
 
+#define MAX_CACHE_TRIES 5
 static int
 pin_callback (void *user, int attempt, const char *token_url,
               const char *token_label, unsigned int flags, char *pin,
@@ -37,7 +38,7 @@ pin_callback (void *user, int attempt, const char *token_url,
 {
   const char *password;
   const char * desc;
-  int len, cache = 1;
+  int len, cache = MAX_CACHE_TRIES;
 /* allow caching of PIN */
   static char *cached_url = NULL;
   static char cached_pin[32] = "";
@@ -58,7 +59,7 @@ pin_callback (void *user, int attempt, const char *token_url,
       printf ("*** Only few tries left before locking!\n");
     }
     
-  if (cache == 1 && cached_url != NULL)
+  if (cache > 0 && cached_url != NULL)
     {
       if (strcmp (cached_url, token_url) == 0)
         {
@@ -69,6 +70,7 @@ pin_callback (void *user, int attempt, const char *token_url,
             }
 
           strcpy (pin, cached_pin);
+          cache--;
           return 0;
         }
     }
@@ -91,6 +93,7 @@ pin_callback (void *user, int attempt, const char *token_url,
   strcpy (cached_pin, pin);
   free (cached_url);
   cached_url = strdup (token_url);
+  cache = MAX_CACHE_TRIES;
 
   return 0;
 }
