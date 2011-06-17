@@ -54,11 +54,12 @@ gnutls_pkcs11_copy_x509_crt (const char *token_url,
   size_t der_size, id_size;
   opaque *der = NULL;
   opaque id[20];
-  struct ck_attribute a[10];
+  struct ck_attribute a[16];
   ck_object_class_t class = CKO_CERTIFICATE;
   ck_certificate_type_t type = CKC_X_509;
   ck_object_handle_t obj;
   ck_bool_t tval = 1;
+  ck_bool_t fval = 0;
   int a_val;
   gnutls_datum_t subject = { NULL, 0 };
 
@@ -142,6 +143,7 @@ gnutls_pkcs11_copy_x509_crt (const char *token_url,
   a[a_val].value_len = subject.size;
   a_val++;
 
+
   if (label)
     {
       a[a_val].type = CKA_LABEL;
@@ -155,6 +157,11 @@ gnutls_pkcs11_copy_x509_crt (const char *token_url,
       a[a_val].type = CKA_TRUSTED;
       a[a_val].value = &tval;
       a[a_val].value_len = sizeof (tval);
+      a_val++;
+
+      a[a_val].type = CKA_PRIVATE;
+      a[a_val].value = &fval;
+      a[a_val].value_len = sizeof(fval);
       a_val++;
     }
 
