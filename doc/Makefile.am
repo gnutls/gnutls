@@ -57,7 +57,7 @@ gnutls_TEXINFOS += gnutls-crypto-layers.dia gnutls-crypto-layers.eps	\
 gnutls_TEXINFOS += gnutls-pgp.dia gnutls-pgp.eps gnutls-pgp.png
 gnutls_TEXINFOS += gnutls-x509.dia gnutls-x509.eps gnutls-x509.png
 gnutls_TEXINFOS += gnutls-logo.eps gnutls-logo.png
-gnutls_TEXINFOS += pkcs11-vision.dia pkcs11-vision.eps
+gnutls_TEXINFOS += pkcs11-vision.dia pkcs11-vision.eps pkcs11-vision.png
 
 # Images.  Make sure there are eps + png + pdf of each, plus the source dia.
 gnutls_TEXINFOS += gnutls-certificate-user-use-case.dia	\
