@@ -28,6 +28,9 @@
 #include <gnutls_datum.h>
 #include <pkcs11_int.h>
 
+static const ck_bool_t tval = 1;
+static const ck_bool_t fval = 0;
+
 /**
  * gnutls_pkcs11_copy_x509_crt:
  * @token_url: A PKCS #11 URL specifying a token
@@ -58,8 +61,6 @@ gnutls_pkcs11_copy_x509_crt (const char *token_url,
   ck_object_class_t class = CKO_CERTIFICATE;
   ck_certificate_type_t type = CKC_X_509;
   ck_object_handle_t obj;
-  ck_bool_t tval = 1;
-  ck_bool_t fval = 0;
   int a_val;
   gnutls_datum_t subject = { NULL, 0 };
 
@@ -130,7 +131,7 @@ gnutls_pkcs11_copy_x509_crt (const char *token_url,
   a[2].value = der;
   a[2].value_len = der_size;
   a[3].type = CKA_TOKEN;
-  a[3].value = &tval;
+  a[3].value = (void*)&tval;
   a[3].value_len = sizeof (tval);
   a[4].type = CKA_CERTIFICATE_TYPE;
   a[4].value = &type;
@@ -143,7 +144,6 @@ gnutls_pkcs11_copy_x509_crt (const char *token_url,
   a[a_val].value_len = subject.size;
   a_val++;
 
-
   if (label)
     {
       a[a_val].type = CKA_LABEL;
@@ -155,14 +155,31 @@ gnutls_pkcs11_copy_x509_crt (const char *token_url,
   if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED)
     {
       a[a_val].type = CKA_TRUSTED;
-      a[a_val].value = &tval;
+      a[a_val].value = (void*)&tval;
       a[a_val].value_len = sizeof (tval);
       a_val++;
 
       a[a_val].type = CKA_PRIVATE;
-      a[a_val].value = &fval;
+      a[a_val].value = (void*)&fval;
       a[a_val].value_len = sizeof(fval);
       a_val++;
+    }
+  else
+    {
+      if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE)
+        {
+          a[a_val].type = CKA_PRIVATE;
+          a[a_val].value = (void*)&tval;
+          a[a_val].value_len = sizeof(tval);
+          a_val++;
+        }
+      else if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE)
+        {
+          a[a_val].type = CKA_PRIVATE;
+          a[a_val].value = (void*)&fval;
+          a[a_val].value_len = sizeof(fval);
+          a_val++;
+        }
     }
 
   rv = pkcs11_create_object (module, pks, a, a_val, &obj);
@@ -219,7 +236,6 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
   ck_object_class_t class = CKO_PRIVATE_KEY;
   ck_object_handle_t obj;
   ck_key_type_t type;
-  ck_bool_t tval = 1;
   int a_val;
   gnutls_pk_algorithm_t pk;
   gnutls_datum_t p, q, g, y, x;
@@ -271,14 +287,27 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
   a_val++;
 
   a[a_val].type = CKA_TOKEN;
-  a[a_val].value = &tval;
+  a[a_val].value = (void*)&tval;
   a[a_val].value_len = sizeof (tval);
   a_val++;
 
-  a[a_val].type = CKA_PRIVATE;
-  a[a_val].value = &tval;
-  a[a_val].value_len = sizeof (tval);
-  a_val++;
+  /* a private key is set always as private unless
+   * requested otherwise
+   */
+  if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE)
+    {
+      a[a_val].type = CKA_PRIVATE;
+      a[a_val].value = (void*)&fval;
+      a[a_val].value_len = sizeof(fval);
+      a_val++;
+    }
+  else
+    {
+      a[a_val].type = CKA_PRIVATE;
+      a[a_val].value = (void*)&tval;
+      a[a_val].value_len = sizeof (tval);
+      a_val++;
+    }
 
   if (label)
     {
@@ -289,14 +318,19 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
     }
 
   if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE)
-    tval = 1;
+    {
+      a[a_val].type = CKA_SENSITIVE;
+      a[a_val].value = (void*)&tval;
+      a[a_val].value_len = sizeof (tval);
+      a_val++;
+    }
   else
-    tval = 0;
-
-  a[a_val].type = CKA_SENSITIVE;
-  a[a_val].value = &tval;
-  a[a_val].value_len = sizeof (tval);
-  a_val++;
+    {
+      a[a_val].type = CKA_SENSITIVE;
+      a[a_val].value = (void*)&fval;
+      a[a_val].value_len = sizeof (fval);
+      a_val++;
+    }
 
   pk = gnutls_x509_privkey_get_pk_algorithm (key);
   switch (pk)

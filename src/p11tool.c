@@ -147,7 +147,7 @@ gaa_parser (int argc, char **argv)
       break;
     case ACTION_PKCS11_WRITE_URL:
       pkcs11_write (outfile, info.pkcs11_url, info.pkcs11_label,
-                    info.pkcs11_trusted, info.pkcs11_login, &cinfo);
+                    info.pkcs11_trusted, info.pkcs11_private, info.pkcs11_login, &cinfo);
       break;
     case ACTION_PKCS11_TOKEN_INIT:
       pkcs11_init (outfile, info.pkcs11_url, info.pkcs11_label, &cinfo);

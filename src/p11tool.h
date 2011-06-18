@@ -13,7 +13,7 @@ void pkcs11_export (FILE * outfile, const char *pkcs11_url,
 void pkcs11_token_list (FILE * outfile, unsigned int detailed,
                         common_info_st *);
 void pkcs11_write (FILE * outfile, const char *pkcs11_url, const char *label,
-                   int trusted, unsigned int login, common_info_st *);
+                   int trusted, int private, unsigned int login, common_info_st *);
 void pkcs11_delete (FILE * outfile, const char *pkcs11_url, int batch,
                     unsigned int login, common_info_st *);
 void pkcs11_init (FILE * outfile, const char *pkcs11_url, const char *label,

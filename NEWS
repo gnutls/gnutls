@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.99.3 (unreleased)
 
+** libgnutls: Added new PKCS #11 flags to force an object being private or
+not. (GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE and GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE)
+
 ** libgnutls: Added SUITEB128 and SUITEB192 priority
 strings to enable the NSA SuiteB cryptography ciphersuites.
 
@@ -44,6 +47,9 @@ gnutls_crypto_single_digest_register: REMOVED
 gnutls_crypto_single_mac_register: REMOVED
 GNUTLS_KX_ECDHE_PSK: New key exchange method
 GNUTLS_VERIFY_DISABLE_CRL_CHECKS: New certificate verification flag.
+GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE: New PKCS#11 object flag.
+GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE: New PKCS#11 object flag.
+
 
 * Version 2.99.2 (released 2011-05-26)
 

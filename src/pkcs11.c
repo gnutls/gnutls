@@ -464,7 +464,8 @@ pkcs11_token_list (FILE * outfile, unsigned int detailed,
 }
 
 void
-pkcs11_write (FILE * outfile, const char *url, const char *label, int trusted,
+pkcs11_write (FILE * outfile, const char *url, const char *label, 
+              int trusted, int private,
               unsigned int login, common_info_st * info)
 {
   gnutls_x509_crt_t xcrt;
@@ -496,6 +497,11 @@ pkcs11_write (FILE * outfile, const char *url, const char *label, int trusted,
           exit (1);
         }
     }
+
+  if (private == 1)
+    flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE;
+  else if (private == 0)
+    flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE;
 
   xcrt = load_cert (0, info);
   if (xcrt != NULL)

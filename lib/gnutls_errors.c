@@ -332,6 +332,8 @@ static const gnutls_error_entry error_algorithms[] = {
                GNUTLS_E_ECC_NO_SUPPORTED_CURVES, 1),
   ERROR_ENTRY (N_("The curve is unsupported"),
                GNUTLS_E_ECC_UNSUPPORTED_CURVE, 1),
+  ERROR_ENTRY (N_("The requested PKCS #11 object is not available"),
+               GNUTLS_E_PKCS11_REQUESTED_OBJECT_NOT_AVAILBLE, 1),
   {NULL, NULL, 0, 0}
 };
 

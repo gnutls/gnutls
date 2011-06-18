@@ -814,7 +814,7 @@ pkcs11_find_slot (struct ck_function_list ** module, ck_slot_id_t * slot,
     }
 
   gnutls_assert ();
-  return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+  return GNUTLS_E_PKCS11_REQUESTED_OBJECT_NOT_AVAILBLE;
 }
 
 int
