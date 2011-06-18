@@ -3,7 +3,7 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 2.99.3 (unreleased)
+* Version 2.99.3 (released 2011-06-18)
 
 ** libgnutls: Added new PKCS #11 flags to force an object being private or
 not. (GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE and GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE)
@@ -27,6 +27,10 @@ instruction. Uses Andy Polyakov's assembly code.
 gnutls_x509_trust_list_verify_named_crt() that allow having a
 list of certificates in the trusted list that will be associated
 with a name (e.g. server name) and will not be used as CAs.
+
+** libgnutls: PKCS #11 back-end rewritten to use p11-kit
+http://p11-glue.freedesktop.org/p11-kit.html. Rewrite by
+Stef Walter.
 
 ** libgnutls: Added ECDHE-PSK ciphersuites for TLS (RFC 5489).
 

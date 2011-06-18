@@ -1806,6 +1806,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 #define GNUTLS_E_USER_ERROR -320
 #define GNUTLS_E_ECC_NO_SUPPORTED_CURVES -321
 #define GNUTLS_E_ECC_UNSUPPORTED_CURVE -322
+#define GNUTLS_E_PKCS11_REQUESTED_OBJECT_NOT_AVAILBLE -323
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 

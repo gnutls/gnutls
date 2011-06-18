@@ -34,7 +34,7 @@ Ivo Timmermans <ivo@o2w.nl>
 Man pages, OpenCDK, fixes.
 
 Stefan Walter <stef@memberwebs.com>
-PKCS8 fix.
+PKCS8 fix, PKCS #11 backend move to p11-kit.
 
 Yoshisato YANAGISAWA <yanagisawa@csg.is.titech.ac.jp>
 Camellia support.
