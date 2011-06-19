@@ -1831,13 +1831,13 @@ gnutls_x509_crq_get_extension_by_oid (gnutls_x509_crq_t crq,
  * This function will set the subject alternative name certificate
  * extension.  It can set the following types:
  *
- * &GNUTLS_SAN_DNSNAME: as a text string
+ * %GNUTLS_SAN_DNSNAME: as a text string
  *
- * &GNUTLS_SAN_RFC822NAME: as a text string
+ * %GNUTLS_SAN_RFC822NAME: as a text string
  *
- * &GNUTLS_SAN_URI: as a text string
+ * %GNUTLS_SAN_URI: as a text string
  *
- * &GNUTLS_SAN_IPADDRESS: as a binary IP address (4 or 16 bytes)
+ * %GNUTLS_SAN_IPADDRESS: as a binary IP address (4 or 16 bytes)
  *
  * Other values can be set as binary values with the proper DER encoding.
  *

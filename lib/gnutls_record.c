@@ -1198,7 +1198,7 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
  * MSG_DONTWAIT flag if blocking is a problem.
  *
  * If the EINTR is returned by the internal push function (the
- * default is send()} then %GNUTLS_E_INTERRUPTED will be returned. If
+ * default is send()) then %GNUTLS_E_INTERRUPTED will be returned. If
  * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN is returned, you must
  * call this function again, with the same parameters; alternatively
  * you could provide a %NULL pointer for data, and 0 for

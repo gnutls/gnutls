@@ -2658,8 +2658,8 @@ gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,
  * %GNUTLS_CRL_REASON_PRIVILEGE_WITHDRAWN,
  * %GNUTLS_CRL_REASON_AA_COMPROMISE, or zero for all possible reasons.
  *
- * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER and updates &@ret_size if
- *   &@ret_size is not enough to hold the distribution point, or the
+ * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER and updates @ret_size if
+ *   @ret_size is not enough to hold the distribution point, or the
  *   type of the distribution point if everything was ok. The type is
  *   one of the enumerated %gnutls_x509_subject_alt_name_t.  If the
  *   certificate does not have an Alternative name with the specified
