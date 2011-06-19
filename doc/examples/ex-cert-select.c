@@ -35,8 +35,8 @@ static int
 cert_callback (gnutls_session_t session,
                const gnutls_datum_t * req_ca_rdn, int nreqs,
                const gnutls_pk_algorithm_t * sign_algos,
-               int sign_algos_length, gnutls_pcert_st** pcert,
-               unsigned int *pcert_length, gnutls_privkey_t* pkey);
+               int sign_algos_length, gnutls_pcert_st ** pcert,
+               unsigned int *pcert_length, gnutls_privkey_t * pkey);
 
 gnutls_pcert_st crt;
 gnutls_privkey_t key;
@@ -88,8 +88,8 @@ load_keys (void)
       fprintf (stderr, "*** Error loading certificate file.\n");
       exit (1);
     }
-  
-  ret = gnutls_pcert_import_x509_raw(&crt, &data, GNUTLS_X509_FMT_PEM, 0);
+
+  ret = gnutls_pcert_import_x509_raw (&crt, &data, GNUTLS_X509_FMT_PEM, 0);
   if (ret < 0)
     {
       fprintf (stderr, "*** Error loading certificate file: %s\n",
@@ -118,10 +118,12 @@ load_keys (void)
 
   gnutls_privkey_init (&key);
 
-  ret = gnutls_privkey_import_x509(key, x509_key, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+  ret =
+    gnutls_privkey_import_x509 (key, x509_key,
+                                GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
   if (ret < 0)
     {
-      fprintf (stderr, "*** Error importing key: %s\n", 
+      fprintf (stderr, "*** Error importing key: %s\n",
                gnutls_strerror (ret));
       exit (1);
     }
@@ -237,8 +239,8 @@ static int
 cert_callback (gnutls_session_t session,
                const gnutls_datum_t * req_ca_rdn, int nreqs,
                const gnutls_pk_algorithm_t * sign_algos,
-               int sign_algos_length, gnutls_pcert_st** pcert,
-               unsigned int *pcert_length, gnutls_privkey_t* pkey)
+               int sign_algos_length, gnutls_pcert_st ** pcert,
+               unsigned int *pcert_length, gnutls_privkey_t * pkey)
 {
   char issuer_dn[256];
   int i, ret;

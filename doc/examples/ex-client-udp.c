@@ -42,7 +42,7 @@ main (void)
   gnutls_certificate_set_x509_trust_file (xcred, CAFILE, GNUTLS_X509_FMT_PEM);
 
   /* Initialize TLS session */
-  gnutls_init (&session, GNUTLS_CLIENT|GNUTLS_DATAGRAM);
+  gnutls_init (&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
 
   /* Use default priorities */
   ret = gnutls_priority_set_direct (session, "NORMAL", &err);
@@ -62,7 +62,7 @@ main (void)
   sd = udp_connect ();
 
   gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
-  
+
   /* set the connection MTU */
   gnutls_dtls_set_mtu (session, 1000);
 

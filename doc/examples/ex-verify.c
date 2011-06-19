@@ -22,9 +22,10 @@ int crl_list_size;
 gnutls_x509_crt_t *ca_list;
 int ca_list_size;
 
-static int print_details_func(gnutls_x509_crt_t cert,
-    gnutls_x509_crt_t issuer, gnutls_x509_crl_t crl, 
-    unsigned int verification_output);
+static int print_details_func (gnutls_x509_crt_t cert,
+                               gnutls_x509_crt_t issuer,
+                               gnutls_x509_crl_t crl,
+                               unsigned int verification_output);
 
 /* This function will try to verify the peer's certificate chain, and
  * also check if the hostname matches.
@@ -37,18 +38,18 @@ verify_certificate_chain (const char *hostname,
   int i;
   gnutls_x509_trust_list_t tlist;
   gnutls_x509_crt_t *cert;
-  
+
   unsigned int output;
 
   /* Initialize the trusted certificate list. This should be done
    * once on initialization. gnutls_x509_crt_list_import2() and
    * gnutls_x509_crl_list_import2() can be used to load them.
    */
-  gnutls_x509_trust_list_init(&tlist, 0);
+  gnutls_x509_trust_list_init (&tlist, 0);
 
-  gnutls_x509_trust_list_add_cas(tlist, ca_list, ca_list_size, 0);
-  gnutls_x509_trust_list_add_crls(tlist, crl_list, crl_list_size, 
-    GNUTLS_TL_VERIFY_CRL, 0);
+  gnutls_x509_trust_list_add_cas (tlist, ca_list, ca_list_size, 0);
+  gnutls_x509_trust_list_add_crls (tlist, crl_list, crl_list_size,
+                                   GNUTLS_TL_VERIFY_CRL, 0);
 
   cert = malloc (sizeof (*cert) * cert_chain_length);
 
@@ -61,15 +62,17 @@ verify_certificate_chain (const char *hostname,
       gnutls_x509_crt_import (cert[i], &cert_chain[i], GNUTLS_X509_FMT_DER);
     }
 
-  gnutls_x509_trust_list_verify_named_crt(tlist, cert[0], hostname, strlen(hostname), 
-    GNUTLS_VERIFY_DISABLE_CRL_CHECKS, &output, print_details_func);
+  gnutls_x509_trust_list_verify_named_crt (tlist, cert[0], hostname,
+                                           strlen (hostname),
+                                           GNUTLS_VERIFY_DISABLE_CRL_CHECKS,
+                                           &output, print_details_func);
 
   /* if this certificate is not explicitly trusted verify against CAs 
    */
   if (output != 0)
     {
-      gnutls_x509_trust_list_verify_crt(tlist, cert, cert_chain_length, 0, 
-        &output, print_details_func);
+      gnutls_x509_trust_list_verify_crt (tlist, cert, cert_chain_length, 0,
+                                         &output, print_details_func);
     }
 
   if (output & GNUTLS_CERT_INVALID)
@@ -98,14 +101,15 @@ verify_certificate_chain (const char *hostname,
               hostname);
     }
 
-  gnutls_x509_trust_list_deinit(tlist, 1);
+  gnutls_x509_trust_list_deinit (tlist, 1);
 
   return;
 }
 
-static int print_details_func(gnutls_x509_crt_t cert,
-    gnutls_x509_crt_t issuer, gnutls_x509_crl_t crl, 
-    unsigned int verification_output)
+static int
+print_details_func (gnutls_x509_crt_t cert,
+                    gnutls_x509_crt_t issuer, gnutls_x509_crl_t crl,
+                    unsigned int verification_output)
 {
   char name[512];
   char issuer_name[512];

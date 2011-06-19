@@ -81,4 +81,4 @@ noinst_LTLIBRARIES = libexamples.la
 
 libexamples_la_SOURCES = examples.h ex-alert.c ex-pkcs12.c		\
 	ex-session-info.c ex-x509-info.c ex-verify.c	\
-	tcp.c udp.c
+	tcp.c udp.c ex-pkcs11-list.c
