@@ -40,7 +40,7 @@ figure.
 
 Also the way the input is processed varies per ciphersuite. Several 
 implementations of the internal handlers are available and 
-@ref{gnutls_handshake} only multiplexes the input to the appropriate 
+@funcref{gnutls_handshake} only multiplexes the input to the appropriate 
 handler. For example a @acronym{PSK} ciphersuite has a different 
 implementation of the @code{process_client_key_exchange} than a
 certificate ciphersuite.

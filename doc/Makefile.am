@@ -24,7 +24,7 @@ EXTRA_DIST = TODO certtool.cfg gnutls.ps gnutls.pdf gnutls.html	\
 	doxygen/Doxyfile.in doxygen/Doxyfile.orig texinfo.css \
 	gnutls-guile.pdf gnutls-guile.html
 
-SUBDIRS = examples cyclo scripts manpages credentials
+SUBDIRS = examples cyclo scripts manpages credentials latex
 if ENABLE_GTK_DOC
 SUBDIRS += reference
 endif
@@ -35,7 +35,7 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi lgpl-2.1.texi gpl-3.0.texi	\
 	cha-ciphersuites.texi cha-copying.texi cha-functions.texi	\
 	cha-gtls-app.texi cha-internals.texi cha-intro-tls.texi		\
 	cha-library.texi cha-preface.texi cha-programs.texi		\
-	cha-tls-app.texi
+	cha-tls-app.texi cha-errors.texi cha-support.texi
 
 # Examples.
 gnutls_TEXINFOS += examples/ex-client1.c examples/ex-client2.c		\

@@ -35,7 +35,7 @@ initialize_tls_session (void)
 
   gnutls_init (&session, GNUTLS_SERVER);
 
-  gnutls_priority_set_direct (session, "NORMAL:+ANON-DH", NULL);
+  gnutls_priority_set_direct (session, "NORMAL:+ANON-ECDH:+ANON-DH", NULL);
 
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
 

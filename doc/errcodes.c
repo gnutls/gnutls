@@ -28,6 +28,11 @@
 #include <string.h>
 #include <gnutls/gnutls.h>
 
+static void main_latex(void);
+static int main_texinfo (void);
+
+#define MAX_CODES 600
+
 typedef struct
 {
   char name[128];
@@ -43,19 +48,48 @@ compar (const void *_n1, const void *_n2)
   return strcmp (n1->name, n2->name);
 }
 
+static const char headers[] = "\\tablefirsthead{%\n"
+	"\\hline\n"
+	"\\multicolumn{1}{|c}{Error code} &\n"
+	"\\multicolumn{1}{c|}{Description} \\\\\n"
+	"\\hline}\n"
+	"\\tablehead{%\n"
+	"\\hline\n"
+	"\\multicolumn{2}{|l|}{\\small\\sl continued from previous page}\\\\\n"
+	"\\hline\n"
+	"\\multicolumn{1}{|c}{Error code} &\n"
+	"\\multicolumn{1}{c|}{Description} \\\\\n"
+	"\\hline}\n"
+	"\\tabletail{%\n"
+	"\\hline\n"
+	"\\multicolumn{2}{|r|}{\\small\\sl continued on next page}\\\\\n"
+	"\\hline}\n"
+	"\\tablelasttail{\\hline}\n"
+	"\\bottomcaption{The error codes table}\n\n";
+
 int
 main (int argc, char *argv[])
+{
+  if (argc > 1)
+    main_latex();
+  else
+    main_texinfo();
+    
+  return 0;
+}
+
+static int main_texinfo (void)
 {
   int i, j;
   const char *desc;
   const char *_name;
-  error_name names_to_sort[400];        /* up to 400 names  */
+  error_name names_to_sort[MAX_CODES];        /* up to MAX_CODES names  */
 
   printf ("@table @code\n");
 
   memset (names_to_sort, 0, sizeof (names_to_sort));
   j = 0;
-  for (i = 0; i > -400; i--)
+  for (i = 0; i > -MAX_CODES; i--)
     {
       _name = gnutls_strerror_name (i);
       if (_name == NULL)
@@ -81,4 +115,71 @@ main (int argc, char *argv[])
   printf ("@end table\n");
 
   return 0;
+}
+
+static char* escape_string( const char* str, char* buffer, int buffer_size)
+{
+int i = 0, j = 0;
+
+
+while( str[i] != 0 && j <buffer_size - 1) {
+   if (str[i]=='_') {
+      buffer[j++] = '\\';
+      buffer[j++] = '_';
+   } else if (str[i]=='#') {
+      buffer[j++] = '\\';
+      buffer[j++] = '#';
+   } else {
+      buffer[j++] = str[i];
+   }
+   i++;
+};
+
+buffer[j] = 0;
+
+return buffer;
+
+}
+
+static void main_latex(void)
+{
+int i, j;
+static char buffer1[500];
+static char buffer2[500];
+const char* desc;
+const char* _name;
+error_name names_to_sort[MAX_CODES]; /* up to MAX_CODES names  */
+
+puts( headers);
+
+printf("\\begin{supertabular}{|l|p{6.3cm}|}\n");
+
+memset( names_to_sort, 0, sizeof(names_to_sort));
+j=0;
+for (i=0;i>-MAX_CODES;i--)
+{
+   _name = gnutls_strerror_name(i);
+   if ( _name == NULL) continue;
+
+   strcpy( names_to_sort[j].name, _name);
+   names_to_sort[j].error_index = i;
+   j++;
+}
+
+qsort( names_to_sort, j, sizeof(error_name), compar);
+
+for (i=0;i<j;i++)
+{
+   _name = names_to_sort[i].name;
+   desc = gnutls_strerror( names_to_sort[i].error_index);
+   if (desc == NULL || _name == NULL) continue;
+
+   printf( "{\\tiny{%s}} & %s", escape_string(_name, buffer1, sizeof(buffer1)), escape_string(desc, buffer2, sizeof(buffer2)));
+   printf( "\\\\\n");
+}
+
+printf("\\end{supertabular}\n\n");
+
+return;
+
 }

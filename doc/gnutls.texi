@@ -67,6 +67,10 @@ Documentation License''.
 @c (@pxref{Bibliography})
 @end macro
 
+@macro funcref{ref}
+@ref{\ref\}
+@end macro
+
 @contents
 
 @ifnottex
@@ -86,6 +90,8 @@ Documentation License''.
 * How to use TLS in application protocols::
 * Included programs::
 * Internal architecture of GnuTLS::
+* Support::
+* Error codes::
 * Function reference::
 * Supported ciphersuites in GnuTLS::
 * Copying Information::
@@ -114,6 +120,10 @@ Documentation License''.
 @include cha-internals.texi
 
 @c appendices
+
+@include cha-support.texi
+
+@include cha-errors.texi
 
 @include cha-functions.texi
 

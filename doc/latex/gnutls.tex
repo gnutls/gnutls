@@ -1,0 +1,79 @@
+\documentclass{book}
+\bibliographystyle{plain}
+
+\usepackage{html}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{makeidx}
+\usepackage{supertabular}
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage{fancyvrb}
+\usepackage{eurosans}
+\usepackage{parskip}
+\usepackage{hyperref}
+
+\hypersetup{
+    colorlinks,%
+    citecolor=blue,%
+    filecolor=blue,%
+    linkcolor=blue,%
+    urlcolor=blue
+}
+
+\input{macros}
+
+\makeindex
+
+\begin{document}
+
+\frontmatter
+
+\input{cover}
+
+\setcounter{tocdepth}{1}
+\tableofcontents
+
+\pagestyle{fancy}
+\fancyhead[RE]{\slshape \rightmark}
+\fancyhead[LO]{\slshape \leftmark}
+\fancyhead[RO,LE]{\empty}
+\fancyfoot[C]{\thepage}
+
+\input{cha-preface}
+
+\mainmatter
+\input{cha-library}
+
+\input{cha-intro-tls}
+
+\input{cha-auth}
+
+\input{cha-cert-auth}
+
+\input{cha-gtls-app}
+
+\input{cha-tls-app}
+
+\input{cha-programs}
+
+\appendix
+
+\input{cha-support}
+
+\input{cha-ciphersuites}
+
+\input{cha-errors}
+
+%\input{cha-functions}
+
+%\input{fdl}
+
+\backmatter
+
+\printindex
+
+\bibliography{gnutls}
+
+\end{document}
+

@@ -8,21 +8,18 @@ by @acronym{IETF}@footnote{IETF, or Internet Engineering Task Force,
 is a large open international community of network designers,
 operators, vendors, and researchers concerned with the evolution of
 the Internet architecture and the smooth operation of the Internet.
-It is open to any interested individual.}, described in @acronym{RFC}
-4346 and also in @xcite{RESCORLA}.  The protocol provides
+It is open to any interested individual.}, described in @xcite{RFC5246}.  
+The protocol provides
 confidentiality, and authentication layers over any reliable transport
 layer.  The description, below, refers to @acronym{TLS} 1.0 but also
-applies to @acronym{TLS} 1.2 @xcite{RFC4346} and @acronym{SSL} 3.0,
+applies to @acronym{TLS} 1.2 @xcite{RFC5246} and @acronym{SSL} 3.0,
 since the differences of these protocols are not major.  
 
-The @acronym{DTLS} protocol, or ``Datagram @acronym{TLS}'' is a
+The @acronym{DTLS} protocol, or ``Datagram @acronym{TLS}'' @xcite{RFC4347} is a
 protocol with identical goals as @acronym{TLS}, but can operate
 under unreliable transport layers, such as @acronym{UDP}. The
 discussions below apply to this protocol as well, except when
 noted otherwise.
-
-Older protocols such as @acronym{SSL} 2.0 are not discussed nor implemented in
-@acronym{GnuTLS} since they are not considered secure today.  
 
 @menu
 * TLS layers::
@@ -44,15 +41,14 @@ Protocol, the Handshake Protocol and the Alert Protocol. The Record
 Protocol is to serve all other protocols and is above the transport
 layer.  The Record protocol offers symmetric encryption, data
 authenticity, and optionally compression.
-
 The Alert protocol offers some signaling to the other protocols. It
 can help informing the peer for the cause of failures and other error
 conditions.  @xref{The Alert Protocol}, for more information.  The
 alert protocol is above the record protocol.
 
 The Handshake protocol is responsible for the security parameters'
-negotiation, the initial key exchange and authentication.  @xref{The
-Handshake Protocol}, for more information about the handshake
+negotiation, the initial key exchange and authentication.  
+@xref{The Handshake Protocol}, for more information about the handshake
 protocol.  The protocol layering in TLS is shown in the figure below.
 
 @center @image{gnutls-layers,12cm}
@@ -67,12 +63,12 @@ functions is provided and their purpose is to load to @acronym{GnuTLS} the
 required callbacks to access the transport layer.
 
 @itemize
-@item @ref{gnutls_transport_set_push_function}
-@item @ref{gnutls_transport_set_vec_push_function}
-@item @ref{gnutls_transport_set_pull_timeout_function} (for @acronym{DTLS} only)
-@item @ref{gnutls_transport_set_pull_function}
-@item @ref{gnutls_transport_set_ptr}
-@item @ref{gnutls_transport_set_errno}
+@item @funcref{gnutls_transport_set_push_function}
+@item @funcref{gnutls_transport_set_vec_push_function}
+@item @funcref{gnutls_transport_set_pull_timeout_function} (for @acronym{DTLS} only)
+@item @funcref{gnutls_transport_set_pull_function}
+@item @funcref{gnutls_transport_set_ptr}
+@item @funcref{gnutls_transport_set_errno}
 @end itemize
 
 These functions accept a callback function as a parameter.  The
@@ -98,7 +94,7 @@ since signals do not interrupt @acronym{GnuTLS}' functions.
 timers and waiting for peer's messages during the handshake process,
 @acronym{GnuTLS} will block and might be interrupted by signals. The
 blocking operation of @acronym{GnuTLS} during @acronym{DTLS} handshake
-can be changed using the appropriate flags in @ref{gnutls_init}.
+can be changed using the appropriate flags in @funcref{gnutls_init}.
 
 By default, if the transport functions are not set, @acronym{GnuTLS}
 will use the Berkeley Sockets functions. 
@@ -113,18 +109,18 @@ The following functions are available:
 
 @table @asis
 
-@item @ref{gnutls_record_send}:
+@item @funcref{gnutls_record_send}:
 To send a record packet with application data.
 
-@item @ref{gnutls_record_recv}:
+@item @funcref{gnutls_record_recv}:
 To receive a record packet with application data.
 
-@item @ref{gnutls_record_recv_seq}:
+@item @funcref{gnutls_record_recv_seq}:
 To receive a record packet with application data as well
 as the sequence number of that. This is useful in @acronym{DTLS}
 where packets might be lost or received out of order.
 
-@item @ref{gnutls_record_get_direction}:
+@item @funcref{gnutls_record_get_direction}:
 To get the direction of the last interrupted function call.
 @end table
 
@@ -134,7 +130,7 @@ or send data. In @acronym{DTLS} however, due to re-transmission
 timers used in the handshake out-of-order handshake data might
 be received for some time (maximum 60 seconds) after the handshake
 process is finished. For this reason programs using @acronym{DTLS}
-should call @ref{gnutls_record_recv} or @ref{gnutls_record_recv_seq}
+should call @funcref{gnutls_record_recv} or @funcref{gnutls_record_recv_seq}
 for every packet received by the peer, even if no data were
 expected. 
 
@@ -174,28 +170,28 @@ data size.
 Supported cipher algorithms:
 
 @table @code
-@item 3DES_CBC
-@code{3DES_CBC} is the DES block cipher algorithm used with triple
+@item 3DES_CBC:
+This is the DES block cipher algorithm used with triple
 encryption (EDE). Has 64 bits block size and is used in CBC mode.
 
-@item ARCFOUR_128
-ARCFOUR is a fast stream cipher.
+@item ARCFOUR_128:
+A fast stream cipher.
 
-@item ARCFOUR_40
-This is the ARCFOUR cipher that is fed with a 40 bit key,
+@item ARCFOUR_40:
+This is the ARCFOUR cipher fed with a 40 bit key,
 which is considered weak.
 
-@item AES_CBC
+@item AES_CBC:
 AES or RIJNDAEL is the block cipher algorithm that replaces the old
 DES algorithm.  Has 128 bits block size and is used in CBC mode.
 
-@item AES_GCM
+@item AES_GCM:
 This is the AES algorithm in the authenticated encryption GCM mode.
 This mode combines message authentication and encryption and can
 be extremely fast on CPUs that support hardware acceleration.
 
-@item CAMELLIA_CBC
-CAMELLIA is an 128-bit block cipher developed by Mitsubish and NTT. It
+@item CAMELLIA_CBC:
+This is an 128-bit block cipher developed by Mitsubish and NTT. It
 is one of the approved ciphers of the European NESSIE and Japanese
 CRYPTREC projects.
 
@@ -205,19 +201,19 @@ CRYPTREC projects.
 Supported MAC algorithms:
 
 @table @code
-@item MAC_MD5
-MD5 is a cryptographic hash algorithm designed by Ron Rivest. Outputs
+@item MAC_MD5:
+This is a cryptographic hash algorithm designed by Ron Rivest. Outputs
 128 bits of data.
 
-@item MAC_SHA
-SHA is a cryptographic hash algorithm designed by NSA. Outputs 160
+@item MAC_SHA1:
+A cryptographic hash algorithm designed by NSA. Outputs 160
 bits of data.
 
-@item MAC_SHA256
-SHA256 is a cryptographic hash algorithm designed by NSA. Outputs 256
+@item MAC_SHA256:
+A cryptographic hash algorithm designed by NSA. Outputs 256
 bits of data.
 
-@item MAC_AEAD
+@item MAC_AEAD:
 This indicates that an authenticated encryption algorithm, such as
 GCM, is in use.
 
@@ -229,29 +225,21 @@ GCM, is in use.
 
 The TLS record layer also supports compression.  The algorithms
 implemented in @acronym{GnuTLS} can be found in the table below.
-All the algorithms except for DEFLATE which is
-referenced in @xcite{RFC3749}, should be considered as
-@acronym{GnuTLS}' extensions@footnote{You should use
-@ref{gnutls_handshake_set_private_extensions} to enable private
-extensions.}, and should be advertised only when the peer is known to
-have a compliant client, to avoid interoperability problems.
-
 The included algorithms perform really good when text, or other
 compressible data are to be transfered, but offer nothing on already
 compressed data, such as compressed images, zipped archives etc.
 These compression algorithms, may be useful in high bandwidth TLS
-tunnels, and in cases where network usage has to be minimized. As a
-drawback, compression increases latency.
+tunnels, and in cases where network usage has to be minimized. It
+should be noted however that compression increases latency.
 
 The record layer compression in @acronym{GnuTLS} is implemented based
-on the proposal @xcite{RFC3749}.
-The supported compression algorithms are:
+on the proposal @xcite{RFC3749}. The supported algorithms are:
 
 @table @code
-@item DEFLATE
+@item DEFLATE:
 Zlib compression, using the deflate algorithm.
 
-@item NULL
+@item NULL:
 No compression.
 
 @end table
@@ -290,7 +278,7 @@ see the archives of the TLS Working Group mailing list and the paper
 @cindex Bad record MAC
 
 The TLS protocol allows for random padding of records, to make it more
-difficult to perform analysis on the length of exchanged messages (RFC 5246 6.2.3.2).  
+difficult to perform analysis on the length of exchanged messages (see @xcite{RFC5246} section 6.2.3.2).  
 GnuTLS appears to be one of few implementation that take advantage of this text, 
 and pad records by a random length.
 
@@ -305,19 +293,19 @@ record MAC', or both, on the GnuTLS server side.
 
 GnuTLS implements a work around for this problem.  However, it has to
 be enabled specifically.  It can be enabled by using
-@ref{gnutls_record_disable_padding}, or @ref{gnutls_priority_set} with
+@funcref{gnutls_record_disable_padding}, or @funcref{gnutls_priority_set} with
 the @code{%COMPAT} priority string.
 
 If you implement an application that have a configuration file, we
 recommend that you make it possible for users or administrators to
 specify a GnuTLS protocol priority string, which is used by your
-application via @ref{gnutls_priority_set}.  To allow the best
+application via @funcref{gnutls_priority_set}.  To allow the best
 flexibility, make it possible to have a different priority string for
 different incoming IP addresses.
 
-To enable the workaround in the @code{gnutls-cli} client or the
-@code{gnutls-serv} server, for testing of other implementations, use
-the following parameter: @code{--priority "NORMAL:%COMPAT"}.
+To enable the workaround in the @command{gnutls-cli} client or the
+@command{gnutls-serv} server, for testing of other implementations, use
+the following parameter: @option{--priority "NORMAL:%COMPAT"}.
 
 
 @node The TLS Alert Protocol
@@ -329,8 +317,8 @@ The Alert protocol is there to allow signals to be sent between peers.
 These signals are mostly used to inform the peer about the cause of a
 protocol failure. Some of these signals are used internally by the
 protocol and the application protocol does not have to cope with them
-(see @code{GNUTLS_A_CLOSE_NOTIFY}), and others refer to the
-application protocol solely (see @code{GNUTLS_A_USER_CANCELLED}).  An
+(e.g. @code{GNUTLS_A_CLOSE_NOTIFY}), and others refer to the
+application protocol solely (e.g. @code{GNUTLS_A_USER_CANCELLED}).  An
 alert signal includes a level indication which may be either fatal or
 warning. Fatal alerts always terminate the current connection, and
 prevent future renegotiations using the current session ID.
@@ -341,16 +329,16 @@ for the alert information not to leak to a possible attacker, via
 public log files etc.
 
 @table @asis
-@item @ref{gnutls_alert_send}:
+@item @funcref{gnutls_alert_send}:
 To send an alert signal.
 
-@item @ref{gnutls_error_to_alert}:
+@item @funcref{gnutls_error_to_alert}:
 To map a gnutls error number to an alert signal.
 
-@item @ref{gnutls_alert_get}:
+@item @funcref{gnutls_alert_get}:
 Returns the last received alert.
 
-@item @ref{gnutls_alert_get_name}:
+@item @funcref{gnutls_alert_get_name}:
 Returns the name, in a character array, of the given alert.
 
 @end table
@@ -367,25 +355,25 @@ has to set up the required parameters. Available functions to control
 the handshake protocol include:
 
 @table @asis
-@item @ref{gnutls_priority_init}:
+@item @funcref{gnutls_priority_init}:
 To initialize a priority set of ciphers.
 
-@item @ref{gnutls_priority_deinit}:
+@item @funcref{gnutls_priority_deinit}:
 To deinitialize a priority set of ciphers.
 
-@item @ref{gnutls_priority_set}:
+@item @funcref{gnutls_priority_set}:
 To associate a priority set with a @acronym{TLS} session.
 
-@item @ref{gnutls_priority_set_direct}:
+@item @funcref{gnutls_priority_set_direct}:
 To directly associate a session with a given priority string.
 
-@item @ref{gnutls_credentials_set}:
+@item @funcref{gnutls_credentials_set}:
 To set the appropriate credentials structures.
 
-@item @ref{gnutls_certificate_server_set_request}:
+@item @funcref{gnutls_certificate_server_set_request}:
 To set whether client certificate is required or not.
 
-@item @ref{gnutls_handshake}:
+@item @funcref{gnutls_handshake}:
 To initiate the handshake.
 @end table
 
@@ -596,19 +584,19 @@ will allow V1 CAs in chains.
 In the case of ciphersuites that use certificate authentication, the
 authentication of the client is optional in @acronym{TLS}.  A server
 may request a certificate from the client --- using the
-@ref{gnutls_certificate_server_set_request} function. If a certificate
+@funcref{gnutls_certificate_server_set_request} function. If a certificate
 is to be requested from the client during the handshake, the server
 will send a certificate request message that contains a list of
 acceptable certificate signers. In @acronym{GnuTLS} the certificate
 signers list is constructed using the trusted Certificate Authorities
 by the server. That is the ones set using
 @itemize
-@item @ref{gnutls_certificate_set_x509_trust_file}
-@item @ref{gnutls_certificate_set_x509_trust_mem}
+@item @funcref{gnutls_certificate_set_x509_trust_file}
+@item @funcref{gnutls_certificate_set_x509_trust_mem}
 @end itemize
 
-Sending of the names of the CAs can be controlled using
-@ref{gnutls_certificate_send_x509_rdn_sequence}. The client, then, may
+Sending of the names of the certificate authorities can be controlled using the function
+@funcref{gnutls_certificate_send_x509_rdn_sequence}. The client, then, may
 send a certificate, signed by one of the server's acceptable signers.
 
 @node Resuming Sessions
@@ -616,14 +604,14 @@ send a certificate, signed by one of the server's acceptable signers.
 @anchor{resume}
 @cindex Resuming sessions
 
-The @ref{gnutls_handshake} function, is expensive since a lot of
+The @funcref{gnutls_handshake} function, is expensive since a lot of
 calculations are performed. In order to support many fast connections
 to the same server a client may use session resuming. @strong{Session
 resuming} is a feature of the @acronym{TLS} protocol which allows a
 client to connect to a server, after a successful handshake, without
 the expensive calculations.  This is achieved by using the previously
 established keys. @acronym{GnuTLS} supports this feature, and the
-example (@pxref{ex:resume-client}) illustrates a typical use of it.
+example in @ref{ex:resume-client} illustrates a typical use of it.
 
 Keep in mind that sessions are expired after some time, for security
 reasons, thus it may be normal for a server not to resume a session
@@ -637,16 +625,16 @@ The resuming capability, mostly in the server side, is one of the
 problems of a thread-safe TLS implementations. The problem is that all
 threads must share information in order to be able to resume
 sessions. The gnutls approach is, in case of a client, to leave all
-the burden of resuming to the client. I.e., copy and keep the
+the burden of resuming to the client. That is, copy and keep the
 necessary parameters. See the functions:
 
 @itemize
 
-@item @ref{gnutls_session_get_data}
+@item @funcref{gnutls_session_get_data}
 
-@item @ref{gnutls_session_get_id}
+@item @funcref{gnutls_session_get_id}
 
-@item @ref{gnutls_session_set_data}
+@item @funcref{gnutls_session_set_data}
 
 @end itemize
 
@@ -656,19 +644,19 @@ registered with:
 
 @itemize
 
-@item @ref{gnutls_db_set_remove_function}
+@item @funcref{gnutls_db_set_remove_function}
 
-@item @ref{gnutls_db_set_store_function}
+@item @funcref{gnutls_db_set_store_function}
 
-@item @ref{gnutls_db_set_retrieve_function}
+@item @funcref{gnutls_db_set_retrieve_function}
 
-@item @ref{gnutls_db_set_ptr}
+@item @funcref{gnutls_db_set_ptr}
 
 @end itemize
 
 It might also be useful to be able to check for expired sessions in
 order to remove them, and save space. The function
-@ref{gnutls_db_check_entry} is provided for that reason.
+@funcref{gnutls_db_check_entry} is provided for that reason.
 
 @node Interoperability
 @subsection Interoperability
@@ -689,9 +677,9 @@ is required. Thus we allow enabling compatibility with broken peers using
 priority strings (see @ref{Priority Strings}). An example priority string that
 is known to provide wide compatibility even with broken peers
 is shown below:
-@example
+@verbatim
 NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:%COMPAT
-@end example
+@end verbatim
 This priority string will only enable SSL 3.0 and TLS 1.0 as protocols and
 will disable, via the @code{%COMPAT} keyword, several @acronym{TLS} protocol
 options that are known to cause compatibility problems.
@@ -720,9 +708,11 @@ and they will be discussed in the subsections that follow.
 
 This extension allows a @acronym{TLS} implementation to negotiate a
 smaller value for record packet maximum length. This extension may be
-useful to clients with constrained capabilities. See the
-@ref{gnutls_record_set_max_size} and the
-@ref{gnutls_record_get_max_size} functions.
+useful to clients with constrained capabilities. See the functions:
+@itemize
+@item @funcref{gnutls_record_set_max_size}
+@item @funcref{gnutls_record_get_max_size}
+@end itemize
 
 @subsection Server Name Indication
 @anchor{serverind}
@@ -737,7 +727,7 @@ connects to, when the handshake procedure begins. For that reason the
 This extension solves that problem within the @acronym{TLS} protocol,
 and allows a client to send the HTTP hostname before the handshake
 begins within the first handshake packet.  The functions
-@ref{gnutls_server_name_set} and @ref{gnutls_server_name_get} can be
+@funcref{gnutls_server_name_set} and @funcref{gnutls_server_name_get} can be
 used to enable this extension, or to retrieve the name sent by a
 client.
 
@@ -753,9 +743,9 @@ extension implements this idea, and it is documented in
 RFC 5077 @xcite{TLSTKT}.
 
 Clients can enable support for TLS tickets with
-@ref{gnutls_session_ticket_enable_client} and servers use
-@ref{gnutls_session_ticket_key_generate} to generate a key and
-@ref{gnutls_session_ticket_enable_server} to enable the extension.
+@funcref{gnutls_session_ticket_enable_client} and servers use
+@funcref{gnutls_session_ticket_key_generate} to generate a key and
+@funcref{gnutls_session_ticket_enable_server} to enable the extension.
 Clients resume sessions using the ticket using the normal session
 resume functions, @ref{resume}.
 
@@ -824,7 +814,7 @@ renegotiation extension from servers (see below on the
 
 To modify the default behaviour, we have introduced some new priority
 strings.  The priority strings can be used by applications
-(@pxref{gnutls_priority_set}) and end users (e.g., @code{--priority}
+(@funcref{gnutls_priority_set}) and end users (e.g., @code{--priority}
 parameter to @code{gnutls-cli} and @code{gnutls-serv}).
 
 The @code{%UNSAFE_RENEGOTIATION} priority string permits
@@ -856,7 +846,7 @@ The default values if the flags above are not specified are:
 @end table
 
 For applications we have introduced a new API related to safe
-renegotiation.  The @ref{gnutls_safe_renegotiation_status} function is
+renegotiation.  The @funcref{gnutls_safe_renegotiation_status} function is
 used to check if the extension has been negotiated on a session, and
 can be used both by clients and servers.
 
@@ -877,7 +867,7 @@ authentication.
 @item Security bits
 @tab RSA, DH and SRP parameter size
 @tab ECC key size
-@tab @code{gnutls_sec_param_t}
+@tab Security parameter
 @tab Description
 
 @item 64
@@ -938,9 +928,9 @@ key algorithm is required, use of the following functions is
 recommended:
 @itemize
 
-@item @ref{gnutls_pk_bits_to_sec_param}
+@item @funcref{gnutls_pk_bits_to_sec_param}
 
-@item @ref{gnutls_sec_param_to_pk_bits}
+@item @funcref{gnutls_sec_param_to_pk_bits}
 
 @end itemize
 Those functions will convert a human understandable security parameter

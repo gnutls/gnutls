@@ -378,6 +378,8 @@ AC_CONFIG_FILES([
   doc/credentials/srp/Makefile
   doc/credentials/x509/Makefile
   doc/cyclo/Makefile
+  doc/latex/Makefile
+  doc/latex/cover.tex
   doc/doxygen/Doxyfile
   doc/examples/Makefile
   doc/manpages/Makefile

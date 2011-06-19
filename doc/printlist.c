@@ -26,8 +26,21 @@
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
 
+static void main_texinfo (void);
+static void main_latex(void);
+
 int
-main (void)
+main (int argc, char *argv[])
+{
+  if (argc > 1)
+    main_latex();
+  else
+    main_texinfo();
+    
+  return 0;
+}
+
+static void main_texinfo (void)
 {
   {
     size_t i;
@@ -39,16 +52,18 @@ main (void)
     gnutls_protocol_t version;
 
     printf ("Available cipher suites:\n");
+    
     printf ("@multitable @columnfractions .60 .20 .20\n");
     for (i = 0; (name = gnutls_cipher_suite_info
                  (i, id, &kx, &cipher, &mac, &version)); i++)
       {
-        printf ("@item %s\n@tab 0x%02x 0x%02x\n@tab %s\n",
+        printf ("@item %s\n@tab 0x%02X 0x%02X\n@tab %s\n",
                 name,
                 (unsigned char) id[0], (unsigned char) id[1],
                 gnutls_protocol_get_name (version));
       }
     printf ("@end multitable\n");
+
   }
 
   {
@@ -138,4 +153,79 @@ main (void)
       }
     printf ("@end itemize\n");
   }
+}
+
+static const char headers[] = "\\tablefirsthead{%\n"
+	"\\hline\n"
+	"Ciphersuite name & TLS ID & since\\\\\n"
+	"\\hline}\n"
+	"\\tablehead{%\n"
+	"\\hline\n"
+	"\\multicolumn{3}{|l|}{\\small\\sl continued from previous page}\\\\\n"
+	"\\hline\n"
+	"Ciphersuite name & TLS ID & since\\\\\n"
+	"\\hline}\n"
+	"\\tabletail{%\n"
+	"\\hline\n"
+	"\\multicolumn{3}{|r|}{\\small\\sl continued on next page}\\\\\n"
+	"\\hline}\n"
+	"\\tablelasttail{\\hline}\n"
+	"\\bottomcaption{The ciphersuites table}\n\n";
+
+static char* escape_string( const char* str)
+{
+static char buffer[500];
+int i = 0, j = 0;
+
+
+while( str[i] != 0 && j < sizeof(buffer) - 1) {
+   if (str[i]=='_') {
+      buffer[j++] = '\\';
+      buffer[j++] = '_';
+   } else {
+      buffer[j++] = str[i];
+   }
+   i++;
+};
+
+buffer[j] = 0;
+
+return buffer;
+
+}
+
+static void main_latex(void)
+{
+int i, j;
+const char* desc;
+const char* _name;
+
+puts( headers);
+
+printf("\\begin{supertabular}{|l|p{1.8cm}|p{1.6cm}|}\n");
+
+  {
+    size_t i;
+    const char *name;
+    char id[2];
+    gnutls_kx_algorithm_t kx;
+    gnutls_cipher_algorithm_t cipher;
+    gnutls_mac_algorithm_t mac;
+    gnutls_protocol_t version;
+
+    for (i = 0; (name = gnutls_cipher_suite_info
+                 (i, id, &kx, &cipher, &mac, &version)); i++)
+      {
+        printf ("{\\small{%s}} & \\code{0x%02X 0x%02X} & %s",
+                escape_string(name),
+                (unsigned char) id[0], (unsigned char) id[1],
+                gnutls_protocol_get_name (version));
+        printf( "\\\\\n");
+      }
+    printf("\\end{supertabular}\n\n");
+
+  }
+
+return;
+
 }

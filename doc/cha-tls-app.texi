@@ -3,7 +3,7 @@
 
 This chapter is intended to provide some hints on how to use the
 @acronym{TLS} over simple custom made application protocols.  The
-discussion below mainly refers to the @emph{TCP/IP} transport layer
+discussion below mainly refers to the @acronym{TCP/IP} transport layer
 but may be extended to other ones too.
 
 @menu

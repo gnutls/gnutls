@@ -31,6 +31,14 @@ January 1999, Available from
 Tim Dierks and Eric Rescorla, "The TLS Protocol Version 1.1", Match
 2006, Available from @url{http://www.ietf.org/rfc/rfc4346.txt}.
 
+@item @anchor{RFC4347}[RFC4347]
+Eric Rescorla and Nagendra Modadugu, "Datagram Transport Layer Security", April
+2006, Available from @url{http://www.ietf.org/rfc/rfc4347.txt}.
+
+@item @anchor{RFC5246}[RFC5246]
+Tim Dierks and Eric Rescorla, "The TLS Protocol Version 1.2", August
+2008, Available from @url{http://www.ietf.org/rfc/rfc5246.txt}.
+
 @item @anchor{RFC2440}[RFC2440]
 Jon Callas, Lutz Donnerhacke, Hal Finney and Rodney Thayer, "OpenPGP
 Message Format", November 1998, Available from

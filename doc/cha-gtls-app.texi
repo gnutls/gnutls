@@ -42,13 +42,13 @@ programs.
 @subsection Initialization
 
 GnuTLS must be initialized before it can be used.  The library is
-initialized by calling @ref{gnutls_global_init}.  The resources
+initialized by calling @funcref{gnutls_global_init}.  The resources
 allocated by the initialization process can be released if the
 application no longer has a need to call GnuTLS functions, this is
-done by calling @ref{gnutls_global_deinit}.
+done by calling @funcref{gnutls_global_deinit}.
 
 The extra functionality of the @acronym{GnuTLS-extra} library is
-available after calling @ref{gnutls_global_init_extra}.
+available after calling @funcref{gnutls_global_init_extra}.
 
 In order to take advantage of the internationalisation features in
 GnuTLS, such as translated error messages, the application must set
@@ -62,21 +62,21 @@ indeed one which fits all requirements.  Even with binary
 compatibility new features may have been introduced but due to problem
 with the dynamic linker an old version is actually used.  So you may
 want to check that the version is okay right after program startup.
-See the function @ref{gnutls_check_version}.
+See the function @funcref{gnutls_check_version}.
 
 @node Debugging and auditing
 @subsection Debugging and auditing
 
 In many cases things may not go as expected and further information,
 to assist debugging, from @acronym{GnuTLS} is desired. 
-Those are the cases where the @ref{gnutls_global_set_log_level} and
-@ref{gnutls_global_set_log_function} are to be used. Those will print
+Those are the cases where the @funcref{gnutls_global_set_log_level} and
+@funcref{gnutls_global_set_log_function} are to be used. Those will print
 verbose information on the @acronym{GnuTLS} functions internal flow.
 
 
 When debugging is not required, important issues, such as detected
 attacks on the protocol still need to be logged. This is provided
-by @ref{gnutls_global_set_audit_log_function}, that uses a logging
+by @funcref{gnutls_global_set_audit_log_function}, that uses a logging
 function that accepts the detected error message and the corresponding
 TLS session. The session information might be used to derive IP addresses
 or other information about the peer involved.
@@ -99,9 +99,9 @@ to be added to the compiler invocation at compile time are output by
 the @option{--cflags} option to @command{pkg-config gnutls}.  The
 following example shows how it can be used at the command line:
 
-@example
+@smallexample
 gcc -c foo.c `pkg-config gnutls --cflags`
-@end example
+@end smallexample
 
 Adding the output of @samp{pkg-config gnutls --cflags} to the
 compilers command line will ensure that the compiler can find the
@@ -117,16 +117,16 @@ required to link the program with the libarary (for instance, the
 @samp{-ltasn1} option).  The example shows how to link @file{foo.o}
 with the library to a program @command{foo}.
 
-@example
+@smallexample
 gcc -o foo foo.o `pkg-config gnutls --libs`
-@end example
+@end smallexample
 
 Of course you can also combine both examples to a single command by
 specifying both options to @command{pkg-config}:
 
-@example
+@smallexample
 gcc -o foo foo.c `pkg-config gnutls --cflags --libs`
-@end example
+@end smallexample
 
 
 @node Client examples
@@ -145,7 +145,7 @@ implemented by another example.
 * Verifying peer's certificate::
 * Using a callback to select the certificate to use::
 * Verifying a certificate::
-* Client using a PKCS #11 token with TLS::
+* Client using a PKCS 11 token with TLS::
 * Client with Resume capability example::
 * Simple client example with SRP authentication::
 * Simple client example in C++::
@@ -192,7 +192,7 @@ Most of the times it is desirable to know the security properties of
 the current established session.  This includes the underlying ciphers
 and the protocols involved.  That is the purpose of the following
 function.  Note that this function will print meaningful values only
-if called after a successful @ref{gnutls_handshake}.
+if called after a successful @funcref{gnutls_handshake}.
 
 @verbatiminclude examples/ex-session-info.c
 
@@ -228,7 +228,7 @@ functions to verify a given certificate list.
 
 @verbatiminclude examples/ex-verify.c
 
-@node Client using a PKCS #11 token with TLS
+@node Client using a PKCS 11 token with TLS
 @subsection Using a @acronym{PKCS #11} token with TLS
 @anchor{ex:pkcs11-client}
 
@@ -302,7 +302,7 @@ This example is a very simple echo server which supports
 @cindex @acronym{OpenPGP} Server
 
 The following example is an echo server which supports
-@acronym{@acronym{OpenPGP}} key authentication. You can easily combine
+@acronym{OpenPGP} key authentication. You can easily combine
 this functionality ---that is have a server that supports both
 @acronym{X.509} and @acronym{OpenPGP} certificates--- but we separated
 them to keep these examples as simple as possible.
@@ -333,7 +333,7 @@ used to serve the example client for anonymous authentication.
 * Checking for an alert::
 * X.509 certificate parsing example::
 * Certificate request generation::
-* PKCS #12 structure generation::
+* PKCS 12 structure generation::
 @end menu
 
 @node Checking for an alert
@@ -364,7 +364,7 @@ which should return a signed certificate.
 
 @verbatiminclude examples/ex-crq.c
 
-@node PKCS #12 structure generation
+@node PKCS 12 structure generation
 @subsection @acronym{PKCS} #12 Structure Generation
 @anchor{ex:pkcs12}
 
@@ -393,18 +393,18 @@ Several TLS ciphersuites require additional parameters that
 need to be generated or provided by the application. The
 Diffie-Hellman based ciphersuites (ANON-DH or DHE), require
 the group information to be provided. This information can be either
-be generated on the fly using @ref{gnutls_dh_params_generate2}
-or imported from some pregenerated value using @ref{gnutls_dh_params_import_pkcs3}.
+be generated on the fly using @funcref{gnutls_dh_params_generate2}
+or imported from some pregenerated value using @funcref{gnutls_dh_params_import_pkcs3}.
 The parameters can be used in a session by calling
-@ref{gnutls_certificate_set_dh_params} or
-@ref{gnutls_anon_set_server_dh_params} for anonymous sessions.
+@funcref{gnutls_certificate_set_dh_params} or
+@funcref{gnutls_anon_set_server_dh_params} for anonymous sessions.
 
 Due to the time-consuming calculations required for the generation
 of Diffie-Hellman parameters we suggest against performing generation
 of them within an application. The @code{certtool} tool can be used to 
 generate or export known safe values that can be stored in code
 or in a configuration file to provide the ability to replace. We also
-recommend the usage of @ref{gnutls_sec_param_to_pk_bits} to determine
+recommend the usage of @funcref{gnutls_sec_param_to_pk_bits} to determine
 the bit size of the parameters to be generated.
 
 The ciphersuites that involve the RSA-EXPORT key exchange require
@@ -417,13 +417,13 @@ following functions can be used for these parameters.
 
 @itemize
 
-@item @ref{gnutls_rsa_params_generate2}
+@item @funcref{gnutls_rsa_params_generate2}
 
-@item @ref{gnutls_certificate_set_rsa_export_params}
+@item @funcref{gnutls_certificate_set_rsa_export_params}
 
-@item @ref{gnutls_rsa_params_import_pkcs1}
+@item @funcref{gnutls_rsa_params_import_pkcs1}
 
-@item @ref{gnutls_rsa_params_export_pkcs1}
+@item @funcref{gnutls_rsa_params_export_pkcs1}
 
 @end itemize
 
@@ -434,14 +434,14 @@ following functions can be used for these parameters.
 @cindex Exporting Keying Material
 
 The TLS PRF can be used by other protocols to derive data.  The API to
-use is @ref{gnutls_prf}.  The function needs to be provided with the
+use is @funcref{gnutls_prf}.  The function needs to be provided with the
 label in the parameter @code{label}, and the extra data to mix in the
 @code{extra} parameter.  Depending on whether you want to mix in the
 client or server random data first, you can set the
 @code{server_random_first} parameter.
 
 For example, after establishing a TLS session using
-@ref{gnutls_handshake}, you can invoke the TLS PRF with this call:
+@funcref{gnutls_handshake}, you can invoke the TLS PRF with this call:
 
 @smallexample
 #define MYLABEL "EXPORTER-FOO"
@@ -452,7 +452,7 @@ rc = gnutls_prf (session, strlen (MYLABEL), MYLABEL, 0,
 @end smallexample
 
 If you don't want to mix in the client/server random, there is a more
-low-level TLS PRF interface called @ref{gnutls_prf_raw}.
+low-level TLS PRF interface called @funcref{gnutls_prf_raw}.
 
 @node Channel Bindings
 @subsection Channel Bindings
@@ -466,7 +466,7 @@ situations.  The unique strings is a ``channel bindings''.  For
 background and more discussion see @xcite{RFC5056}.
 
 You can extract a channel bindings using the
-@ref{gnutls_session_channel_binding} function.  Currently only the
+@funcref{gnutls_session_channel_binding} function.  Currently only the
 @code{GNUTLS_CB_TLS_UNIQUE} type is supported, which corresponds to
 the @code{tls-unique} channel bindings for TLS defined in
 @xcite{RFC5929}.
@@ -476,7 +476,7 @@ Note that it must be run after a successful TLS handshake.
 
 @smallexample
 @{
-  gnutls_datum cb;
+  gnutls_datum_t cb;
   int rc;
 
   rc = gnutls_session_channel_binding (session,

@@ -1,0 +1,263 @@
+#!/usr/bin/perl
+
+use constant NORMAL => 0;
+use constant SKIP => 1;
+use constant ITEMIZE => 2;
+use constant VERBATIM => 3;
+use constant ENUMERATE => 4;
+use constant TABLE_ITEMIZE => 5;
+use constant MULTITABLE => 6;
+use constant EXAMPLE => 7;
+use constant SMALL_EXAMPLE => 8;
+use constant QUOTE => 9;
+
+sub unescape()
+{
+my $prefix=$_[0];
+my $suffix=$_[1];
+	$suffix =~ s/\\//g;
+	return "$prefix\{$suffix\}";
+}
+
+sub funcref()
+{
+my $prefix = $_[0];
+my $suffix=$_[0];
+	$suffix =~ s/\\//g;
+	return "\\funcref\{$prefix\}\{$suffix\}";
+}
+
+my $punescape = \&unescape;
+my $pfuncref = \&funcref;
+my $mode;
+my $num_args = $#ARGV + 1;
+
+if ($num_args != 1 || $ARGV[0] eq "-h" || $ARGV[0] eq "--help") {
+        print "Usage: " . "texi2latex infile\n";
+        exit 0;
+}
+open (FILE, "< $ARGV[0]") or die "Cannot open $ARGV[0]";
+
+my $match = "[\\w\\d-\\.\\/\\@\\:\_\\\\\#]";
+my $spacematch = "[\\s\\w\\d-\\.\\/\\@\\#\\:]";
+my $mathmatch = "[\\s\\w\\d-\\.\\/\\:\\(\\)\\+\\/\\^\\'\\=\{\}\\\\\\,]";
+my $underscorematch = "[\\s\\w\\d-\\.\\/\\@\\_\\\\\:\\~]";
+my $codematch = "[\\s\\w\\d-\\.\\/\\@\\_\\\\\:\\-\\\"\+\\%]";
+my ($line, $prev_mode);
+my ($verbatim, $label);
+while ($line = <FILE>) {
+	$verbatim = 0;
+
+        if ($mode == SKIP) {
+#print "%menu: $line";
+                if ($line =~ m/\@end /) {
+                        $mode = NORMAL;
+                }
+		$prev_mode = $mode;
+                next;
+        } elsif ($mode == ITEMIZE) {
+#print "%itemize: $line";
+                if ($line =~ s/\@end itemize/\\end{itemize}/g) {
+                        $mode = NORMAL;
+                }
+                $line =~ s/\@item (.+)/\\item $1/g;
+		$prev_mode = $mode;
+        } elsif ($mode == ENUMERATE) {
+                if ($line =~ s/\@end itemize/\\end{enumerate}/g) {
+                        $mode = NORMAL;
+                }
+                if ($line =~ s/\@end enumerate/\\end{enumerate}/g) {
+                        $mode = NORMAL;
+                }
+                $line =~ s/\@item(.*)/\\item $1/g;
+		$prev_mode = $mode;
+        } elsif ($mode == TABLE_ITEMIZE) {
+                if ($line =~ s/\@end table/\n\\end{itemize}/g) {
+                        $mode = NORMAL;
+                }
+		chomp $line;
+		if ($line eq "") {
+			next;
+		}
+		$line .= "\n";
+
+		$line =~ s/\@item (.+)/\\item $1 /g;
+		$line =~ s/\@itemx (.+)/\\item $1 /g;
+
+		$prev_mode = $mode;
+        } elsif ($mode == MULTITABLE) {
+                if ($line =~ s/\@end multitable/\\\\\n\\hline\n\\end{tabular}/g) {
+                        $mode = NORMAL;
+                } else {
+			chomp $line;
+			if ($line eq "") {
+				next;
+			}
+			$line .= "\n";
+			$line =~ s/\@tab/\&/g;
+			if ($line =~ m/\@headitem/) {
+				$line =~ s/\@headitem (.+)/$1\\\\\n\\hline\n\\hline/g;
+			} else {
+				if ($prev_mode != $mode) {
+					$line =~ s/\@item (.+)/$1/g;
+					$line =~ s/\@itemx (.+)/$1/g;
+				} else {
+					$line =~ s/\@item (.+)/\\\\\n\\hline\n$1/g;
+					$line =~ s/\@itemx (.+)/\\\\\n\\hline\n$1/g;
+				}
+			}
+		}
+		$prev_mode = $mode;
+        } elsif ($mode == VERBATIM) {
+                if ($line =~ s/\@end verbatim/\\end{verbatim}/g) {
+                        $mode = NORMAL;
+                }
+		$verbatim = 1;
+		$prev_mode = $mode;
+        } elsif ($mode == QUOTE) {
+                if ($line =~ s/\@end quotation/\\end{quote}/g) {
+                        $mode = NORMAL;
+                }
+		$prev_mode = $mode;
+        } elsif ($mode == EXAMPLE) {
+                if ($line =~ s/\@end example/\\end{example}/g) {
+                        $mode = NORMAL;
+                }
+		$line =~ s/\@{/{/g;
+		$line =~ s/\@}/}/g;
+		$verbatim = 1;
+
+		$prev_mode = $mode;
+        } elsif ($mode == SMALL_EXAMPLE) {
+                if ($line =~ s/\@end smallexample/\\end{smallexample}/g) {
+                        $mode = NORMAL;
+                }
+		$line =~ s/\@{/\{/g;
+		$line =~ s/\@}/\}/g;
+		$verbatim = 1;
+
+		$prev_mode = $mode;
+        } else {
+		$prev_mode = $mode;
+
+		$line =~ s/\@iftex/% /g;
+		$line =~ s/\@end iftex/% /g;
+                $line =~ s/\@anchor (.+)/\\label{$1}/g;
+		$line =~ s/\@anchor\{($spacematch+)\}/\\label{$1}/g;
+		if ($line =~ s/\@subsection (.+)/\\subsection{$1}/g) {
+			if ($label ne '') {
+				$line .= "\\label{$label}\n";
+			}
+		}
+
+                if ($line =~ s/\@section (.+)/\\section{$1}/g) {
+			if ($label ne '') {
+				$line .= "\\label{$label}\n";
+			}
+		}
+
+                if ($line =~ s/\@chapter (.+)/\\chapter{$1}/g) {
+			if ($label ne '') {
+				$line .= "\\label{$label}\n";
+			}
+		}
+		if ($line =~ s/\@appendix (.+)/\\chapter{$1}/g) {
+			if ($label ne '') {
+				$line .= "\\label{$label}\n";
+			}
+		}
+
+                if ($line =~ m/\@node (.+)/) {
+			$label = $1;
+			next;
+		} else {
+			$label = '';
+		}
+
+                if ($line =~ s/\@menu//g) {
+                        $mode = SKIP;
+			next;
+                }
+                if ($line =~ s/\@ifnottex//g) {
+                        $mode = SKIP;
+			next;
+                }
+                if ($line =~ s/\@itemize \@bullet/\\begin{itemize}/g) {
+                        $mode = ITEMIZE;
+                }
+                if ($line =~ s/\@itemize/\\begin{itemize}/g) {
+                        $mode = ITEMIZE;
+                }
+                if ($line =~ s/\@enumerate/\\begin{enumerate}/g) {
+                        $mode = ENUMERATE;
+                }
+                if ($line =~ s/\@table .*/\n\\begin{itemize}/g) {
+                        $mode = TABLE_ITEMIZE;
+                }
+                if ($line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{3.3cm}|p{3.3cm}|p{4.3cm}|}\n\\hline\n/g) {
+                        $mode = MULTITABLE;
+                }
+                if ($line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{3cm}|}\n\\hline\n/g) {
+                        $mode = MULTITABLE;
+                }
+                if ($line =~ s/\@example/\\begin{example}/g) {
+                        $mode = EXAMPLE;
+                }
+                if ($line =~ s/\@smallexample/\\begin{smallexample}/g) {
+                        $mode = SMALL_EXAMPLE;
+                }
+                if ($line =~ s/\@verbatim$/\\begin{verbatim}/g) {
+                        $mode = VERBATIM;
+                }
+                if ($line =~ s/\@quotation$/\\begin{quote}/g) {
+                        $mode = QUOTE;
+                }
+        }
+
+	if ($verbatim == 0) {
+		$line =~ s/\_/\\_/g;
+		$line =~ s/\~/\\~/g;
+		$line =~ s/\%/\\%/g;
+		$line =~ s/\#/\\\#/g;
+                $line =~ s/\@verbatiminclude (.*)/\\examplefile{\.\.\/$1}/g;
+		$line =~ s/\@image\{($match+)\,($match+)\}/\\includegraphics\[width\=$2\]\{\.\.\/$1\}/g;
+		$line =~ s/\@samp\{($spacematch+)\}/$1/g;
+		$line =~ s/\@strong\{/\{\\bf /g;
+		$line =~ s/\@c (.*)/\% $1/g;
+		$line =~ s/\@math\{($mathmatch+)\}/\$$1\$/g;
+		$line =~ s/\@acronym\{($spacematch+)\}/\\acronym{$1}/g;
+		$line =~ s/\s*\@xcite\{($match+)\}/~\\cite{$1}/g;
+		$line =~ s/\@footnote\{/\\footnote{/g;
+		$line =~ s/\@tindex (.+)/\\index{$1}/g;
+		if ($line =~ s/\@include (.+)/\\input{$1}/g) {
+			$line =~ s/\.texi/\.tex/g;
+			$line =~ s/(\\input)\{($underscorematch+)\}/$punescape->($1,$2)/ge;
+		}
+		$line =~ s/\@cindex (.+)/\\index{$1}/g;
+		$line =~ s/\@url\{($underscorematch+)\}/\\url{$1}/g;
+		#$line =~ s/\@euro/\\euro/g;
+		$line =~ s/\@euro\{\}/euro/g;
+		$line =~ s/\@file\{($spacematch+)\}/\\file{$1}/g;
+		$line =~ s/\@code\{($codematch+)\}/\\code{$1}/g;
+		$line =~ s/\@option\{($codematch+)\}/\\command{$1}/g;
+		$line =~ s/\@command\{($codematch+)\}/\\command{$1}/g;
+		$line =~ s/\@ref\{/\\myref\{/g;
+		$line =~ s/\@emph\{($spacematch+)\}/\\emph{$1}/g;
+		$line =~ s/\@xref\{/\\myref\{/g;
+		$line =~ s/\@funcref\{($codematch+)\}/$pfuncref->($1)/ge;
+		$line =~ s/\@pxref\{/\\myref\{/g;
+		$line =~ s/\@center (.*)/\\begin{center}\n$1\n\\end{center}/g;
+		if ($line =~ m/\@email/) {
+			$line =~ s/\@email\{(.+)\}/$1/g;
+		}
+		$line =~ s/\@\@/@/g;
+
+		#when a myref{} contains underscores remove them
+		$line =~ s/(\\myref)\{($underscorematch+)\}/$punescape->($1,$2)/ge;
+	}
+
+        print $line;
+}
+close (FILE);
+
+exit 0;
