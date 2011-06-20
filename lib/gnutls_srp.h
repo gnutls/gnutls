@@ -25,8 +25,6 @@
 
 #ifdef ENABLE_SRP
 
-int _gnutls_srp_gx (opaque * text, size_t textsize, opaque ** result,
-                    bigint_t g, bigint_t prime, gnutls_alloc_function);
 bigint_t _gnutls_calc_srp_B (bigint_t * ret_b, bigint_t g, bigint_t n,
                              bigint_t v);
 bigint_t _gnutls_calc_srp_u (bigint_t A, bigint_t B, bigint_t N);

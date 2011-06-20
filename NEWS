@@ -3,6 +3,15 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version (unreleased)
+
+** libgnutls: gnutls_srp_verifier() returns data allocated with gnutls_malloc()
+for consistency.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 2.99.3 (released 2011-06-18)
 
 ** libgnutls: Added new PKCS #11 flags to force an object being private or

@@ -42,9 +42,9 @@
 /* Here functions for SRP (like g^x mod n) are defined 
  */
 
-int
+static int
 _gnutls_srp_gx (opaque * text, size_t textsize, opaque ** result,
-                bigint_t g, bigint_t prime, gnutls_alloc_function galloc_func)
+                bigint_t g, bigint_t prime)
 {
   bigint_t x, e;
   size_t result_size;
@@ -71,7 +71,7 @@ _gnutls_srp_gx (opaque * text, size_t textsize, opaque ** result,
   ret = _gnutls_mpi_print (e, NULL, &result_size);
   if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
-      *result = galloc_func (result_size);
+      *result = gnutls_malloc (result_size);
       if ((*result) == NULL)
         return GNUTLS_E_MEMORY_ERROR;
 
@@ -680,7 +680,7 @@ gnutls_srp_server_get_username (gnutls_session_t session)
  * libgcrypt functions gcry_prime_generate() and
  * gcry_prime_group_generator().
  *
- * The verifier will be allocated with @malloc and will be stored in
+ * The verifier will be allocated with @gnutls_malloc() and will be stored in
  * @res using binary format.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
@@ -719,7 +719,7 @@ gnutls_srp_verifier (const char *username, const char *password,
       return GNUTLS_E_MPI_SCAN_FAILED;
     }
 
-  ret = _gnutls_srp_gx (digest, 20, &res->data, _g, _n, malloc);
+  ret = _gnutls_srp_gx (digest, 20, &res->data, _g, _n);
   if (ret < 0)
     {
       gnutls_assert ();
