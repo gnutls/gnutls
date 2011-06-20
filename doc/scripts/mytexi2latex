@@ -11,6 +11,8 @@ use constant EXAMPLE => 7;
 use constant SMALL_EXAMPLE => 8;
 use constant QUOTE => 9;
 use constant FLOAT => 10;
+use constant FLOAT_TABLE => 11;
+use constant MULTITABLE_INIT => 12;
 
 sub unescape()
 {
@@ -46,42 +48,55 @@ my $underscorematch = "[\\s\\w\\d-\\.\\/\\@\\_\\\\\:\\~]";
 my $codematch = "[\\s\\w\\d-\\.\\/\\@\\_\\\\\:\\-\\\"\+\\%]";
 my ($line, $prev_mode);
 my ($verbatim, $label);
+my @stack = ();
+
 while ($line = <FILE>) {
 	$verbatim = 0;
 
         if ($mode == SKIP) {
 #print "%menu: $line";
                 if ($line =~ m/\@end /) {
-                        $mode = NORMAL;
+                        $mode = pop(@stack);
                 }
 		$prev_mode = $mode;
                 next;
         } elsif ($mode == ITEMIZE) {
 #print "%itemize: $line";
                 if ($line =~ s/\@end itemize/\\end{itemize}/g) {
-                        $mode = NORMAL;
+                        $mode = pop(@stack);
                 }
                 $line =~ s/\@item (.+)/\\item $1/g;
 		$prev_mode = $mode;
         } elsif ($mode == ENUMERATE) {
                 if ($line =~ s/\@end itemize/\\end{enumerate}/g) {
-                        $mode = NORMAL;
+                        $mode = pop(@stack);
                 }
                 if ($line =~ s/\@end enumerate/\\end{enumerate}/g) {
-                        $mode = NORMAL;
+                        $mode = pop(@stack);
                 }
                 $line =~ s/\@item(.*)/\\item $1/g;
 		$prev_mode = $mode;
         } elsif ($mode == FLOAT) {
                 if ($line =~ s/\@end float/\\label\{$label\}\n\\end{figure}/g) {
-                        $mode = NORMAL;
+                        $mode = pop(@stack);
                 }
                 $line =~ s/\@image\{(\w)\,($spacematch)\}/\\includegraphics\[width=$2\]\{$1\}/g;
 		$line =~ s/\@caption\{/\\caption\{/g;
 		$prev_mode = $mode;
+        } elsif ($mode == FLOAT_TABLE) {
+                if ($line =~ s/\@end float/\\label\{$label\}\n\\end{table}/g) {
+                        $mode = pop(@stack);
+                } else {
+			$line =~ s/\@caption\{/\\caption\{/g;
+			$line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{3.3cm}|p{3.3cm}|p{4.3cm}|}\n\\hline\n/g;
+			$line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{3cm}|}\n\\hline\n/g;
+			push(@stack, FLOAT_TABLE);
+			goto multitable;
+		}
+		$prev_mode = $mode;
         } elsif ($mode == TABLE_ITEMIZE) {
                 if ($line =~ s/\@end table/\n\\end{itemize}/g) {
-                        $mode = NORMAL;
+                        $mode = pop(@stack);
                 }
 		chomp $line;
 		if ($line eq "") {
@@ -94,8 +109,9 @@ while ($line = <FILE>) {
 
 		$prev_mode = $mode;
         } elsif ($mode == MULTITABLE) {
+multitable:
                 if ($line =~ s/\@end multitable/\\\\\n\\hline\n\\end{tabular}/g) {
-                        $mode = NORMAL;
+                        $mode = pop(@stack);
                 } else {
 			chomp $line;
 			if ($line eq "") {
@@ -105,31 +121,33 @@ while ($line = <FILE>) {
 			$line =~ s/\@tab/\&/g;
 			if ($line =~ m/\@headitem/) {
 				$line =~ s/\@headitem (.+)/$1\\\\\n\\hline\n\\hline/g;
+				$prev_mode = MULTITABLE_INIT;
 			} else {
-				if ($prev_mode != $mode) {
+				if ($prev_mode == MULTITABLE_INIT) {
 					$line =~ s/\@item (.+)/$1/g;
 					$line =~ s/\@itemx (.+)/$1/g;
-				} else {
+					$prev_mode = MULTITABLE;
+				} elsif ($prev_mode == MULTITABLE) {
 					$line =~ s/\@item (.+)/\\\\\n\\hline\n$1/g;
 					$line =~ s/\@itemx (.+)/\\\\\n\\hline\n$1/g;
 				}
 			}
 		}
-		$prev_mode = $mode;
+
         } elsif ($mode == VERBATIM) {
                 if ($line =~ s/\@end verbatim/\\end{verbatim}/g) {
-                        $mode = NORMAL;
+                        $mode = pop(@stack);
                 }
 		$verbatim = 1;
 		$prev_mode = $mode;
         } elsif ($mode == QUOTE) {
                 if ($line =~ s/\@end quotation/\\end{quote}/g) {
-                        $mode = NORMAL;
+                        $mode = pop(@stack);
                 }
 		$prev_mode = $mode;
         } elsif ($mode == EXAMPLE) {
                 if ($line =~ s/\@end example/\\end{example}/g) {
-                        $mode = NORMAL;
+                        $mode = pop(@stack);
                 }
 		$line =~ s/\@{/{/g;
 		$line =~ s/\@}/}/g;
@@ -138,7 +156,7 @@ while ($line = <FILE>) {
 		$prev_mode = $mode;
         } elsif ($mode == SMALL_EXAMPLE) {
                 if ($line =~ s/\@end smallexample/\\end{smallexample}/g) {
-                        $mode = NORMAL;
+                        $mode = pop(@stack);
                 }
 		$line =~ s/\@{/\{/g;
 		$line =~ s/\@}/\}/g;
@@ -181,47 +199,64 @@ while ($line = <FILE>) {
 		} else {
 			$label = '';
 		}
-
                 if ($line =~ s/\@menu//g) {
                         $mode = SKIP;
+                        push(@stack, NORMAL);
 			next;
                 }
                 if ($line =~ s/\@ifnottex//g) {
                         $mode = SKIP;
+                        push(@stack, NORMAL);
 			next;
                 }
                 if ($line =~ s/\@itemize \@bullet/\\begin{itemize}/g) {
                         $mode = ITEMIZE;
+                        push(@stack, NORMAL);
                 }
                 if ($line =~ s/\@itemize/\\begin{itemize}/g) {
                         $mode = ITEMIZE;
+                        push(@stack, NORMAL);
                 }
-                if ($line =~ s/\@float Figure\,(.*)/\\begin{figure}[htp]/g) {
+                if ($line =~ s/\@float Figure\,(.*)/\\begin{figure}[htp]\n\\centering/g) {
 			$label = $1;
+                        push(@stack, NORMAL);
                         $mode = FLOAT;
                 }
+                if ($line =~ s/\@float Table\,(.*)/\\begin{table}[htp]\n\\centering/g) {
+			$label = $1;
+                        push(@stack, NORMAL);
+                        $mode = FLOAT_TABLE;
+                }
                 if ($line =~ s/\@enumerate/\\begin{enumerate}/g) {
+                        push(@stack, NORMAL);
                         $mode = ENUMERATE;
                 }
                 if ($line =~ s/\@table .*/\n\\begin{itemize}/g) {
+                        push(@stack, NORMAL);
                         $mode = TABLE_ITEMIZE;
                 }
                 if ($line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{3.3cm}|p{3.3cm}|p{4.3cm}|}\n\\hline\n/g) {
+                        push(@stack, NORMAL);
                         $mode = MULTITABLE;
                 }
                 if ($line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{3cm}|}\n\\hline\n/g) {
+                        push(@stack, NORMAL);
                         $mode = MULTITABLE;
                 }
                 if ($line =~ s/\@example/\\begin{example}/g) {
+                        push(@stack, NORMAL);
                         $mode = EXAMPLE;
                 }
                 if ($line =~ s/\@smallexample/\\begin{smallexample}/g) {
+                        push(@stack, NORMAL);
                         $mode = SMALL_EXAMPLE;
                 }
                 if ($line =~ s/\@verbatim$/\\begin{verbatim}/g) {
+                        push(@stack, NORMAL);
                         $mode = VERBATIM;
                 }
                 if ($line =~ s/\@quotation$/\\begin{quote}/g) {
+                        push(@stack, NORMAL);
                         $mode = QUOTE;
                 }
         }

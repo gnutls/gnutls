@@ -348,10 +348,9 @@ maintain @acronym{PSK} keys.
 In @acronym{GnuTLS} every key exchange method is associated with a
 credentials type. So in order to enable to enable a specific method,
 the corresponding credentials type should be initialized and set using
-@funcref{gnutls_credentials_set}.  A mapping is shown below.
+@funcref{gnutls_credentials_set}.  A mapping is shown in @ref{tab:key-exchange-cred}.
 
-Key exchange algorithms and the corresponding credential types:
-
+@float Table,tab:key-exchange-cred
 @multitable @columnfractions .4 .25 .25
 
 @headitem Key exchange @tab Client credentials @tab Server credentials
@@ -384,6 +383,8 @@ Key exchange algorithms and the corresponding credential types:
 @tab @code{CRD_PSK}
 
 @end multitable
+@caption{Key exchange algorithms and the corresponding credential types.}
+@end float
 
 @node Parameters stored in credentials
 @section Parameters Stored in Credentials

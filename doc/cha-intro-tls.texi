@@ -858,20 +858,17 @@ can be used both by clients and servers.
 @cindex key sizes
 
 In TLS, since a lot of algorithms are involved, it is not easy to set
-a consistent security level.  For this reason this section will
+a consistent security level.  For this reason in @ref{tab:key-sizes} we
 present some correspondance between key sizes of symmetric algorithms
-and public key algorithms based on the ``ECRYPT II Yearly Report on Algorithms and Keysizes (2009-2010)''
-in @xcite{ECRYPT}.  Those can be used to generate certificates with
-appropriate key sizes as well as parameters for Diffie-Hellman and SRP
+and public key algorithms based on @xcite{ECRYPT}. 
+Those can be used to generate certificates with
+appropriate key sizes as well as select parameters for Diffie-Hellman and SRP
 authentication.
 
+@float Table,tab:key-sizes
 @multitable @columnfractions .10 .15 .10 .20 .35
 
-@item Security bits
-@tab RSA, DH and SRP parameter size
-@tab ECC key size
-@tab Security parameter
-@tab Description
+@headitem Security bits @tab RSA, DH and SRP parameter size @tab ECC key size @tab Security parameter @tab Description
 
 @item 64
 @tab 816
@@ -904,8 +901,10 @@ authentication.
 @tab Foreseeable future
 
 @end multitable
+@caption{Key sizes and security parameters.}
+@end float
 
-The first column provides a security parameter in a number of bits. This
+The first column  provides a security parameter in a number of bits. This
 gives an indication of the number of combinations to be tried by an adversary
 to brute force a key. For example to test all possible keys in a 112 bit security parameter
 @math{2^{112}} combinations have to be tried. For today's technology this is infeasible.
