@@ -61,11 +61,8 @@ smaller library, with the required features, can be generated.
 @section General Idea
 
 A brief description of how @acronym{GnuTLS} works internally is shown
-at the figure below. This section may be easier to understand after
+at @ref{fig:gnutls-design}. This section may be easier to understand after
 having seen the examples at @ref{examples}.
-
-@center @image{gnutls-internals,12cm}
-
 As shown in the figure, there is a read-only global state that is
 initialized once by the global initialization function.  This global
 structure, among others, contains the memory allocation functions
@@ -74,6 +71,11 @@ structure is never modified by any @acronym{GnuTLS} function, except
 for the deinitialization function which frees all memory allocated in
 the global structure and is called after the program has permanently
 finished using @acronym{GnuTLS}.
+
+@float Figure,fig:gnutls-design
+@image{gnutls-internals,12cm}
+@caption{High level design of GnuTLS.}
+@end float
 
 The credentials structure is used by some authentication methods, such
 as certificate authentication.  A
@@ -88,7 +90,7 @@ using the appropriate functions, and put its trusted certificates in
 this structure. The next step is to associate the credentials
 structure with each @acronym{TLS} session.
 
-A @acronym{GnuTLS} session contains all the required stuff for a
+A @acronym{GnuTLS} session contains all the required information for a
 session to handle one secure connection. This session calls directly
 to the transport layer functions, in order to communicate with the
 peer.  Every session has a unique session ID shared with the peer.

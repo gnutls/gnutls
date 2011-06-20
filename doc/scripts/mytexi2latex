@@ -10,6 +10,7 @@ use constant MULTITABLE => 6;
 use constant EXAMPLE => 7;
 use constant SMALL_EXAMPLE => 8;
 use constant QUOTE => 9;
+use constant FLOAT => 10;
 
 sub unescape()
 {
@@ -70,6 +71,13 @@ while ($line = <FILE>) {
                         $mode = NORMAL;
                 }
                 $line =~ s/\@item(.*)/\\item $1/g;
+		$prev_mode = $mode;
+        } elsif ($mode == FLOAT) {
+                if ($line =~ s/\@end float/\\label\{$label\}\n\\end{figure}/g) {
+                        $mode = NORMAL;
+                }
+                $line =~ s/\@image\{(\w)\,($spacematch)\}/\\includegraphics\[width=$2\]\{$1\}/g;
+		$line =~ s/\@caption\{/\\caption\{/g;
 		$prev_mode = $mode;
         } elsif ($mode == TABLE_ITEMIZE) {
                 if ($line =~ s/\@end table/\n\\end{itemize}/g) {
@@ -187,6 +195,10 @@ while ($line = <FILE>) {
                 }
                 if ($line =~ s/\@itemize/\\begin{itemize}/g) {
                         $mode = ITEMIZE;
+                }
+                if ($line =~ s/\@float Figure\,(.*)/\\begin{figure}[htp]/g) {
+			$label = $1;
+                        $mode = FLOAT;
                 }
                 if ($line =~ s/\@enumerate/\\begin{enumerate}/g) {
                         $mode = ENUMERATE;

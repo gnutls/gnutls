@@ -20,12 +20,15 @@ entities.  Usually more than one certification authorities exist, and
 certification authorities may certify other authorities to issue
 certificates as well, following a hierarchical model.
 
-@center @image{gnutls-x509,7cm}
+@float Figure,fig:x509
+@image{gnutls-x509,7cm}
+@caption{The X.509 hierarchical trust model.}
+@end float
 
 One needs to trust one or more CAs for his secure communications. In
 that case only the certificates issued by the trusted authorities are
-acceptable.  The framework is illustrated on the figure above.
-Detailed examples are listed below.
+acceptable.  The framework is illustrated on @ref{fig:x509}.
+Detailed examples involving X.509 certificates are listed below.
 
 @menu
 * X.509 certificates::
@@ -308,11 +311,13 @@ CA. @acronym{OpenPGP} allows anyone to sign anyone's else public
 key. When Alice signs Bob's key, she is introducing Bob's key to
 anyone who trusts Alice. If someone trusts Alice to introduce keys,
 then Alice is a trusted introducer in the mind of that observer.
+For example in @ref{fig:openpgp}, David trusts Alice to be an introducer and Alice
+signed Bob's key thus Dave trusts Bob's key to be the real one.
 
-@center @image{gnutls-pgp,8cm}
-
-For example: If David trusts Alice to be an introducer, and Alice
-signed Bob's key, Dave also trusts Bob's key to be the real one.
+@float Figure,fig:openpgp
+@image{gnutls-pgp,8cm}
+@caption{The OpenPGP trust model.}
+@end float
 
 There are some key points that are important in that model. In the
 example Alice has to sign Bob's key, only if she is sure that the key
@@ -390,9 +395,12 @@ main advantage is that it allows operations on private key objects such as decry
 and signing without accessing the key itself.
 
 Moreover it can be used to allow all applications in the same operating system to access
-shared cryptographic keys and certificates in a uniform way, as in the following picture.
+shared cryptographic keys and certificates in a uniform way, as in @ref{fig:pkcs11-vision}.
 
-@center @image{pkcs11-vision,8cm}
+@float Figure,fig:pkcs11-vision
+@image{pkcs11-vision,8cm}
+@caption{PKCS #11 module usage.}
+@end float
 
 @subsection Initialization
 To allow all the  @acronym{GnuTLS} applications to access @acronym{PKCS} #11 tokens
