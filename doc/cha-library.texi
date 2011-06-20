@@ -115,7 +115,7 @@ negative number indicates failure, or a situation that some action has
 to be taken. Thus negative error codes may be fatal or not.
 
 Fatal errors terminate the connection immediately and further sends
-and receives will be disallowed. An example of a fatal error code is
+and receives will be disallowed.  Such an example is
 @code{GNUTLS_E_DECRYPTION_FAILED}. Non-fatal errors may warn about
 something, i.e., a warning alert was received, or indicate the some
 action has to be taken. This is the case with the error code
@@ -206,10 +206,10 @@ data to the transport layer.
 
 @end itemize
 
-Other callback functions such as the one set by
-@funcref{gnutls_srp_set_server_credentials_function}, may require more
-complicated input, including data to be allocated.  These callbacks
-should allocate and free memory using the functions shown below.
+Other callback functions may require more complicated input and data
+to be allocated. Such an example is 
+@funcref{gnutls_srp_set_server_credentials_function}.
+All callbacks should allocate and free memory using the functions shown below.
 
 @itemize
 

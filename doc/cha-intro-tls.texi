@@ -85,9 +85,12 @@ you, call @code{gnutls_transport_set_errno} with the intended errno
 value instead of setting @code{errno} directly.
 
 @acronym{GnuTLS} currently only interprets the EINTR and EAGAIN errno
-values and returns the corresponding @acronym{GnuTLS} error codes
-@code{GNUTLS_E_INTERRUPTED} and @code{GNUTLS_E_AGAIN}.  These values
-are usually returned by interrupted system calls, or when non blocking
+values and returns the corresponding @acronym{GnuTLS} error codes:
+@itemize
+@item @code{GNUTLS_E_INTERRUPTED} 
+@item @code{GNUTLS_E_AGAIN}
+@end itemize
+These values are usually returned by interrupted system calls, or when non blocking
 IO is used.  All @acronym{GnuTLS} functions can be resumed (called
 again), if any of these error codes is returned.  The error codes
 above refer to the system call, not the @acronym{GnuTLS} function,
@@ -158,69 +161,75 @@ just after the handshake protocol has finished.
 @cindex Symmetric encryption algorithms
 
 Confidentiality in the record layer is achieved by using symmetric
-block encryption algorithms like @code{3DES}, @code{AES}@footnote{AES,
-or Advanced Encryption Standard, is actually the RIJNDAEL algorithm.
-This is the algorithm that replaced DES.}, or stream algorithms like
-@code{ARCFOUR_128}@footnote{@code{ARCFOUR_128} is a compatible
-algorithm with RSA's RC4 algorithm, which is considered to be a trade
-secret.}. Ciphers are encryption algorithms that use a single, secret,
+block encryption algorithms like @code{3DES}, @code{AES}
+or stream algorithms like @code{ARCFOUR_128}.
+ Ciphers are encryption algorithms that use a single, secret,
 key to encrypt and decrypt data. Block algorithms in TLS also provide
 protection against statistical analysis of the data.  Thus, if you're
 using the @acronym{TLS} protocol, a random number of blocks will be
 appended to data, to prevent eavesdroppers from guessing the actual
 data size.
 
-Supported cipher algorithms:
+The supported in @acronym{GnuTLS} ciphers and MAC algorithms are shown in @ref{tab:ciphers} and
+@ref{tab:macs}.
 
-@table @code
-@item 3DES_CBC:
+@float Table,tab:ciphers
+@multitable @columnfractions .30 .70
+@headitem Algorithm @tab Description
+@item 3DES_CBC @tab
 This is the DES block cipher algorithm used with triple
 encryption (EDE). Has 64 bits block size and is used in CBC mode.
 
-@item ARCFOUR_128:
-A fast stream cipher.
+@item ARCFOUR_128 @tab
+ARCFOUR_128 is a compatible algorithm with RSA's RC4 algorithm, which is considered to be a trade
+secret. It is a fast cipher but considered weak today.
 
-@item ARCFOUR_40:
+@item ARCFOUR_40 @tab
 This is the ARCFOUR cipher fed with a 40 bit key,
 which is considered weak.
 
-@item AES_CBC:
+@item AES_CBC @tab
 AES or RIJNDAEL is the block cipher algorithm that replaces the old
 DES algorithm.  Has 128 bits block size and is used in CBC mode.
 
-@item AES_GCM:
+@item AES_GCM @tab
 This is the AES algorithm in the authenticated encryption GCM mode.
 This mode combines message authentication and encryption and can
 be extremely fast on CPUs that support hardware acceleration.
 
-@item CAMELLIA_CBC:
+@item CAMELLIA_CBC @tab
 This is an 128-bit block cipher developed by Mitsubish and NTT. It
 is one of the approved ciphers of the European NESSIE and Japanese
 CRYPTREC projects.
 
-@end table
+@end multitable
+@caption{Supported ciphers.}
+@end float
 
 
-Supported MAC algorithms:
-
-@table @code
-@item MAC_MD5:
+@float Table,tab:macs
+@multitable @columnfractions .30 .70
+@headitem Algorithm @tab Description
+@item MAC_MD5 @tab
 This is a cryptographic hash algorithm designed by Ron Rivest. Outputs
 128 bits of data.
 
-@item MAC_SHA1:
+@item MAC_SHA1 @tab
 A cryptographic hash algorithm designed by NSA. Outputs 160
 bits of data.
 
-@item MAC_SHA256:
+@item MAC_SHA256 @tab
 A cryptographic hash algorithm designed by NSA. Outputs 256
 bits of data.
 
-@item MAC_AEAD:
+@item MAC_AEAD @tab
 This indicates that an authenticated encryption algorithm, such as
 GCM, is in use.
 
-@end table
+@end multitable
+@caption{Supported MAC algorithms.}
+@end float
+
 
 @node Compression algorithms used in the record layer
 @subsection Compression Algorithms Used in the Record Layer
@@ -307,7 +316,7 @@ different incoming IP addresses.
 
 To enable the workaround in the @command{gnutls-cli} client or the
 @command{gnutls-serv} server, for testing of other implementations, use
-the following parameter: @option{--priority "NORMAL:%COMPAT"}.
+the parameter: @option{--priority "NORMAL:%COMPAT"}.
 
 
 @node The TLS Alert Protocol
@@ -392,8 +401,8 @@ To initiate the handshake.
 @subsection TLS Cipher Suites
 
 The Handshake Protocol of @acronym{TLS} negotiates cipher suites of
-the form @code{TLS_DHE_RSA_WITH_3DES_CBC_SHA}.  The usual cipher
-suites contain these parameters:
+a special form illustrated by the @code{TLS_DHE_RSA_WITH_3DES_CBC_SHA} cipher suite name.  A typical cipher
+suite contains these parameters:
 
 @itemize
 
@@ -422,45 +431,50 @@ All the supported ciphersuites are shown in @ref{ciphersuites}.
 In order to specify cipher suite preferences, the
 previously shown priority functions accept a string
 that specifies the algorithms to be enabled in a TLS handshake.
-That string may contain some high level keyword such as:
+That string may contain some high level keyword such as
+the keywords in @ref{tab:prio-keywords}.
 
-@table @asis
-@item PERFORMANCE:
+@float Table,tab:prio-keywords
+@multitable @columnfractions .30 .70
+@headitem Keyword @tab Description
+@item PERFORMANCE @tab
 All the "secure" ciphersuites are enabled,
 limited to 128 bit ciphers and sorted by terms of speed
 performance.
 
-@item NORMAL:
+@item NORMAL @tab
 Means all "secure" ciphersuites. The 256-bit ciphers are
 included as a fallback only.  The ciphers are sorted by security
 margin.
 
-@item SECURE128: 
+@item SECURE128 @tab
 Means all "secure" ciphersuites of security level 128-bit
 or more.
 
-@item SECURE192:
+@item SECURE192 @tab
 Means all "secure" ciphersuites of security level 192-bit
 or more.
 
-@item SUITEB128: 
+@item SUITEB128 @tab
 Means all the NSA Suite B cryptography (RFC5430) ciphersuites
 with an 128 bit security level.
 
-@item SUITEB192:
+@item SUITEB192 @tab
 Means all the NSA Suite B cryptography (RFC5430) ciphersuites
 with an 192 bit security level.
 
-@item EXPORT:
+@item EXPORT @tab
 Means all ciphersuites are enabled, including the
 low-security 40 bit ciphers.
 
-@item NONE:
+@item NONE @tab
 Means nothing is enabled.  This disables even protocols and
 compression methods. It should be followed by the
 algorithms to be enabled.
 
-@end table
+@end multitable
+@caption{Supported priority string keywords.}
+@end float
 
 or it might contain special keywords, that will be explained
 later on.
@@ -481,7 +495,9 @@ this string you have to prefix it with "COMP-", protocol versions
 with "VERS-", signature algorithms with "SIGN-" and certificate types with "CTYPE-". All other
 algorithms don't need a prefix.}. The order with which every algorithm
 is specified is significant. Similar algorithms specified before others
-will take precedence.
+will take precedence. The individual algorithms are shown in @ref{tab:prio-algorithms}
+and special keywords are in @ref{tab:prio-special}.
+
 
 Keywords prepended to individual algorithms:
 @table @asis
@@ -494,57 +510,63 @@ appended with an algorithm will add this algorithm.
 
 @end table
 
-Individual algorithms:
-@table @asis
-@item Ciphers: 
+
+@float Table,tab:prio-algorithms
+@multitable @columnfractions .30 .70
+@headitem Type @tab Keywords
+@item Ciphers @tab
 AES-128-CBC, AES-256-CBC, AES-128-GCM, CAMELLIA-128-CBC,
 CAMELLIA-256-CBC, ARCFOUR-128, 3DES-CBC ARCFOUR-40. Catch all
 name is CIPHER-ALL which will add all the algorithms from NORMAL
 priority.
 
-@item Key exchange: 
+@item Key exchange @tab
 RSA, DHE-RSA, DHE-DSS, SRP, SRP-RSA, SRP-DSS,
 PSK, DHE-PSK, ECDHE-RSA, ANON-ECDH, ANON-DH, RSA-EXPORT. The
 Catch all name is KX-ALL which will add all the algorithms from NORMAL
 priority.
 
-@item MAC: 
+@item MAC @tab
 MD5, SHA1, SHA256, AEAD (used with
 GCM ciphers only). All algorithms from NORMAL priority can be accessed with MAC-ALL.
 
-@item Compression algorithms: 
+@item Compression algorithms @tab
 COMP-NULL, COMP-DEFLATE. Catch all is COMP-ALL.
 
-@item TLS versions: 
+@item TLS versions @tab
 VERS-SSL3.0, VERS-TLS1.0, VERS-TLS1.1,
 VERS-TLS1.2. Catch all is VERS-TLS-ALL.
 
-@item Signature algorithms: 
+@item Signature algorithms @tab
 SIGN-RSA-SHA1, SIGN-RSA-SHA224, 
 SIGN-RSA-SHA256, SIGN-RSA-SHA384, SIGN-RSA-SHA512, SIGN-DSA-SHA1, 
 SIGN-DSA-SHA224, SIGN-DSA-SHA256, SIGN-RSA-MD5. Catch all
 is SIGN-ALL. This is only valid for TLS 1.2 and later.
 
-@item Elliptic curves:
+@item Elliptic curves @tab
 CURVE-SECP224R1, CURVE-SECP256R1, CURVE-SECP384R1, CURVE-SECP521R1. Catch all is CURVE-ALL.
 
-@end table
+@end multitable
+@caption{The supported priority strings.}
+@end float
 
 
-Special keywords:
-@table @asis
 
-@item %COMPAT:
+@float Table,tab:prio-special
+@multitable @columnfractions .50 .50
+@headitem Keyword @tab Description
+
+@item %COMPAT @tab
 will enable compatibility mode. It might mean that violations
 of the protocols are allowed as long as maximum compatibility with
 problematic clients and servers is achieved.
 
-@item %DISABLE_SAFE_RENEGOTIATION:
+@item %DISABLE_SAFE_RENEGOTIATION @tab
 will disable safe renegotiation
 completely.  Do not use unless you know what you are doing.
 Testing purposes only.
 
-@item %UNSAFE_RENEGOTIATION:
+@item %UNSAFE_RENEGOTIATION @tab
 will allow handshakes and rehandshakes
 without the safe renegotiation extension.  Note that for clients
 this mode is insecure (you may be under attack), and for servers it
@@ -552,32 +574,34 @@ will allow insecure clients to connect (which could be fooled by an
 attacker).  Do not use unless you know what you are doing and want
 maximum compatibility.
 
-@item %PARTIAL_RENEGOTIATION:
+@item %PARTIAL_RENEGOTIATION @tab
 will allow initial handshakes to proceed,
 but not rehandshakes.  This leaves the client vulnerable to attack,
 and servers will be compatible with non-upgraded clients for
 initial handshakes.  This is currently the default for clients and
 servers, for compatibility reasons.
 
-@item %SAFE_RENEGOTIATION:
+@item %SAFE_RENEGOTIATION @tab
 will enforce safe renegotiation.  Clients and
 servers will refuse to talk to an insecure peer.  Currently this
 causes operability problems, but is required for full protection.
 
-@item %SSL3_RECORD_VERSION:
+@item %SSL3_RECORD_VERSION @tab
 will use SSL3.0 record version in client hello.
 This is the default.
 
-@item %LATEST_RECORD_VERSION:
+@item %LATEST_RECORD_VERSION @tab
 will use the latest TLS version record version in client hello.
 
-@item %VERIFY_ALLOW_SIGN_RSA_MD5:
+@item %VERIFY_ALLOW_SIGN_RSA_MD5 @tab
 will allow RSA-MD5 signatures in certificate chains.
 
-@item %VERIFY_ALLOW_X509_V1_CA_CRT:
+@item %VERIFY_ALLOW_X509_V1_CA_CRT @tab
 will allow V1 CAs in chains.
 
-@end table
+@end multitable
+@caption{Special priority string keywords.}
+@end float
 
 @node Client Authentication
 @subsection Client Authentication

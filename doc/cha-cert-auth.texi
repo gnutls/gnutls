@@ -42,29 +42,34 @@ Detailed examples involving X.509 certificates are listed below.
 
 An @acronym{X.509} certificate usually contains information about the
 certificate holder, the signer, a unique serial number, expiration
-dates and some other fields @xcite{PKIX} as shown in the table below.
+dates and some other fields @xcite{PKIX} as shown in @ref{tab:x509}.
 
-@table @code
+@float Table,tab:x509
+@multitable @columnfractions .3 .7
 
-@item version:
+@headitem Field @tab Description
+
+@item version @tab
 The field that indicates the version of the certificate.
 
-@item serialNumber:
+@item serialNumber @tab
 This field holds a unique serial number per certificate.
 
-@item issuer:
+@item issuer @tab
 Holds the issuer's distinguished name.
 
-@item validity:
+@item validity @tab
 The activation and expiration dates.
 
-@item subject:
+@item subject @tab
 The subject's distinguished name of the certificate.
 
-@item extensions:
+@item extensions @tab
 The extensions are fields only present in version 3 certificates.
 
-@end table
+@end multitable
+@caption{X.509 certificate fields.}
+@end float
 
 The certificate's @emph{subject or issuer name} is not just a single
 string.  It is a Distinguished name and in the @acronym{ASN.1}
@@ -85,40 +90,45 @@ Certificate @emph{extensions} are there to include information about
 the certificate's subject that did not fit in the typical certificate
 fields. Those may be e-mail addresses, flags that indicate whether the
 belongs to a CA etc.  All the supported @acronym{X.509} version 3
-extensions are shown in the table below.
+extensions are shown in @ref{tab:x509-ext}.
 
-@table @code
+@float Table,tab:x509-ext
+@multitable @columnfractions .3 .2 .5
 
-@item subject key id (2.5.29.14):
+@headitem Extension @tab OID @tab Description
+
+@item Subject key id @tab 2.5.29.14 @tab
 An identifier of the key of the subject.
 
-@item authority key id (2.5.29.35):
+@item Authority key id @tab 2.5.29.35 @tab
 An identifier of the authority's key used to sign the certificate.
 
-@item subject alternative name (2.5.29.17):
+@item Subject alternative name @tab 2.5.29.17 @tab
 Alternative names to subject's distinguished name.
 
-@item key usage (2.5.29.15):
+@item Key usage @tab 2.5.29.15 @tab
 Constraints the key's usage of the certificate.
 
-@item extended key usage (2.5.29.37):
+@item Extended key usage @tab 2.5.29.37 @tab
 Constraints the purpose of the certificate.
 
-@item basic constraints (2.5.29.19):
+@item Basic constraints @tab 2.5.29.19 @tab
 Indicates whether this is a CA certificate or not, and specify the
 maximum path lengths of certificate chains.
 
-@item CRL distribution points (2.5.29.31):
+@item CRL distribution points @tab 2.5.29.31 @tab
 This extension is set by the CA, in order to inform about the issued
 CRLs.
 
-@item Proxy Certification Information (1.3.6.1.5.5.7.1.14):
+@item Proxy Certification Information @tab 1.3.6.1.5.5.7.1.14 @tab
 Proxy Certificates includes this extension that contains the OID of
 the proxy policy language used, and can specify limits on the maximum
 lengths of proxy chains.  Proxy Certificates are specified in
 @xcite{RFC3820}.
 
-@end table
+@end multitable
+@caption{X.509 certificate extensions.}
+@end float
 
 In @acronym{GnuTLS} the @acronym{X.509} certificate structures are
 handled using the @code{gnutls_x509_crt_t} type and the corresponding
@@ -185,31 +195,37 @@ authority list has been set via the
 thus it is not required to setup a trusted list as above.
 Convenience functions such as @funcref{gnutls_certificate_verify_peers2} 
 are equivalent and will verify the peer's certificate chain
-in a TLS session.
+in a TLS session. The certificate verification functions output
+codes as in @ref{tab:cert-verify}.
 
-@table @code
+@float Table,tab:cert-verify
+@multitable @columnfractions .55 .45
 
-@item GNUTLS_CERT_INVALID:
+@headitem Flag @tab Description
+
+@item GNUTLS_CERT_INVALID @tab
 The certificate is not signed by one of the known authorities, or
 the signature is invalid.
 
-@item GNUTLS_CERT_REVOKED:
+@item GNUTLS_CERT_REVOKED @tab
 The certificate has been revoked by its CA.
 
-@item GNUTLS_CERT_SIGNER_NOT_FOUND:
+@item GNUTLS_CERT_SIGNER_NOT_FOUND @tab
 The certificate's issuer is not known. This is the case when the
 issuer is not in the trusted certificates list.
 
-@item GNUTLS_CERT_SIGNER_NOT_CA:
+@item GNUTLS_CERT_SIGNER_NOT_CA @tab
 The certificate's signer was not a CA. This may happen if
 this was a version 1 certificate, which is common with some CAs, or
 a version 3 certificate without the basic constrains extension.
 
-@item GNUTLS_CERT_INSECURE_ALGORITHM:
+@item GNUTLS_CERT_INSECURE_ALGORITHM @tab
 The certificate was signed using an insecure algorithm such as MD2 or
 MD5.  These algorithms have been broken and should not be trusted.
 
-@end table
+@end multitable
+@caption{Certificate verification output flags.}
+@end float
 
 There is also to possibility to pass some input to the verification
 functions in the form of flags. For @funcref{gnutls_x509_trust_list_verify_crt} the
@@ -217,48 +233,53 @@ flags are passed straightforward, but
 @funcref{gnutls_certificate_verify_peers2} depends on the flags set by
 calling @funcref{gnutls_certificate_set_verify_flags}.  All the available
 flags are part of the enumeration
-@code{gnutls_certificate_verify_flags} and are explained in the table
-below.
+@code{gnutls_certificate_verify_flags} and are explained in @ref{tab:cert-flags}.
 
-@table @code
-@item GNUTLS_VERIFY_DISABLE_CA_SIGN:
+@float Table,tab:cert-flags
+@multitable @columnfractions .5 .5
+
+@headitem Flag @tab Description
+@item GNUTLS_VERIFY_\-DISABLE_CA_SIGN @tab
 If set a signer does not have to be a certificate authority. This
 flag should normaly be disabled, unless you know what this means.
 
-@item GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT:
+@item GNUTLS_VERIFY_\-ALLOW_X509_V1_CA_CRT @tab
 Allow only trusted CA certificates that have version 1.  This is
-safer than GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT, and should be
+safer than GNUTLS_VERIFY_\-ALLOW_ANY_X509_V1_CA_CRT, and should be
 used instead. That way only signers in your trusted list will be
 allowed to have certificates of version 1. This is the default.
 
-@item GNUTLS_VERIFY_DO_NOT_ALLOW_X509_V1_CA_CRT:
+@item GNUTLS_VERIFY_\-DO_NOT_ALLOW_X509_V1_CA_CRT @tab
 Do not allow trusted version 1 CA certificates.  This option is to be used
 in order consider all V1 certificates as deprecated.
 
-@item GNUTLS_VERIFY_ALLOW_ANY_X509_V1_CA_CRT:
+@item GNUTLS_VERIFY_\-ALLOW_ANY_X509_V1_CA_CRT @tab
 Allow CA certificates that have version 1 (both root and
 intermediate). This is dangerous since those haven't the
 basicConstraints extension. Must be used in combination with
-GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT.
+GNUTLS_VERIFY_\-ALLOW_X509_V1_CA_CRT.
 
-@item GNUTLS_VERIFY_DO_NOT_ALLOW_SAME:
+@item GNUTLS_VERIFY_\-DO_NOT_ALLOW_SAME @tab
 If a certificate is not signed by anyone trusted but exists in
 the trusted CA list do not treat it as trusted.
 
-@item GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2:
+@item GNUTLS_VERIFY_\-ALLOW_SIGN_RSA_MD2 @tab
 Allow certificates to be signed using the old MD2 algorithm.
 
-@item GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5:
+@item GNUTLS_VERIFY_\-ALLOW_SIGN_RSA_MD5 @tab
 Allow certificates to be signed using the broken MD5 algorithm.
 
-@item GNUTLS_VERIFY_DISABLE_TIME_CHECKS:
+@item GNUTLS_VERIFY_\-DISABLE_TIME_CHECKS @tab
 Disable checking of activation
 and expiration validity periods of certificate chains. Don't set
 this unless you understand the security implications.
 
-@item GNUTLS_VERIFY_DISABLE_CRL_CHECKS:
+@item GNUTLS_VERIFY_\-DISABLE_CRL_CHECKS @tab
 Disables checking for validity using certificate revocation lists.
-@end table
+
+@end multitable
+@caption{Certificate verification flags.}
+@end float
 
 Although the verification of a certificate path indicates that the
 certificate is signed by trusted authority, does not reveal anything
@@ -431,7 +452,7 @@ the user to insert the token. All the initialization functions are below.
 @end itemize
 
 Note that due to limitations of @acronym{PKCS} #11 there are issues when multiple libraries 
-are sharing a module. To avoid this problem GnuTLS uses p11-kit@footnote{http://p11-glue.freedesktop.org/}
+are sharing a module. To avoid this problem GnuTLS uses p11-kit@footnote{@url{http://p11-glue.freedesktop.org/}}
 that provides a middleware to control access to resources over the
 multiple users.
 
@@ -444,7 +465,7 @@ key on a smart card may be referenced as:
 @example
 pkcs11:token=Nikos;serial=307521161601031;model=PKCS%2315; \
 manufacturer=EnterSafe;object=test1;objecttype=public;\
-id=32:f1:53:f3:e3:79:90:b0:86:24:14:10:77:ca:5d:ec:2d:15:fa:ed
+id=32f153f3e37990b08624141077ca5dec2d15faed
 @end example
 
 while the smart card itself can be referenced as:
@@ -680,9 +701,12 @@ signature (2nd preimage resistance).
 
 If you are using @funcref{gnutls_certificate_verify_peers2} to verify the
 certificate chain, you can call
-@funcref{gnutls_certificate_set_verify_flags} with the
-@code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2} or
-@code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5} flag, as in:
+@funcref{gnutls_certificate_set_verify_flags} with the flags:
+@itemize
+@item @code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD2}
+@item @code{GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5}
+@end itemize
+as in the following example:
 
 @smallexample
   gnutls_certificate_set_verify_flags (x509cred,

@@ -114,28 +114,29 @@ certificate authentication.
 
 Note that the DHE key exchange methods are generally
 slower@footnote{It really depends on the group used.  Primes with
-lesser bits are always faster, but also easier to break.  Values less
-than 1024 should not be used today} than plain RSA and require Diffie
+lesser bits are always faster, but also easier to break.  See @ref{Selecting cryptographic key sizes}
+for the acceptable security levels.} than plain RSA and require Diffie
 Hellman parameters to be generated and associated with a credentials
 structure, by the server. For more information check the @ref{Parameter generation}
-section.
+section. The key exchange algorithms for @acronym{OpenPGP} and @acronym{X.509}
+certificates are shown in @ref{tab:key-exchange}.
 
-Key exchange algorithms for @acronym{OpenPGP} and @acronym{X.509}
-certificates:
+@float Table,tab:key-exchange
+@multitable @columnfractions .3 .7
 
-@table @code
+@headitem Key exchange @tab Description
 
-@item RSA:
+@item RSA @tab
 The RSA algorithm is used to encrypt a key and send it to the peer.
 The certificate must allow the key to be used for encryption.
 
-@item RSA_EXPORT:
+@item RSA_EXPORT @tab
 The RSA algorithm is used to encrypt a key and send it to the peer.
 In the EXPORT algorithm, the server signs temporary RSA parameters of
 512 bits --- which are considered weak --- and sends them to the
 client.
 
-@item DHE_RSA:
+@item DHE_RSA @tab
 The RSA algorithm is used to sign ephemeral Diffie-Hellman parameters
 which are sent to the peer. The key in the certificate must allow the
 key to be used for signing. Note that key exchange algorithms which
@@ -143,26 +144,28 @@ use ephemeral Diffie-Hellman parameters, offer perfect forward
 secrecy. That means that even if the private key used for signing is
 compromised, it cannot be used to reveal past session data.
 
-@item ECDHE_RSA:
+@item ECDHE_RSA @tab
 The RSA algorithm is used to sign ephemeral elliptic curve Diffie-Hellman 
 parameters which are sent to the peer. The key in the certificate must allow 
 the key to be used for signing. It also offers perfect forward
 secrecy. That means that even if the private key used for signing is
 compromised, it cannot be used to reveal past session data.
 
-@item DHE_DSS:
+@item DHE_DSS @tab
 The DSA algorithm is used to sign ephemeral Diffie-Hellman parameters
 which are sent to the peer. The certificate must contain DSA
 parameters to use this key exchange algorithm. DSA is the algorithm
 of the Digital Signature Standard (DSS).
 
-@item ECDHE_ECDSA:
+@item ECDHE_ECDSA @tab
 The Elliptic curve DSA algorithm is used to sign ephemeral elliptic
 curve Diffie-Hellman parameters which are sent to the peer. The 
 certificate must contain ECDSA parameters to use this key exchange 
 algorithm. 
 
-@end table
+@end multitable
+@caption{Supported key exchange algorithms.}
+@end float
 
 @node Anonymous authentication
 @section Anonymous Authentication
@@ -241,28 +244,20 @@ authenticated using a certificate with RSA parameters.
 @end table
 
 If clients supporting @acronym{SRP} know the username and password
-before the connection, should initialize the client credentials and
-call the function @funcref{gnutls_srp_set_client_credentials}.
-Alternatively they could specify a callback function by using the
-function @funcref{gnutls_srp_set_client_credentials_function}.  This has
-the advantage that allows probing the server for @acronym{SRP}
-support.  In that case the callback function will be called twice per
-handshake.  The first time is before the ciphersuite is negotiated,
-and if the callback returns a negative error code, the callback will
-be called again if @acronym{SRP} has been negotiated.  This uses a
-special @acronym{TLS}-@acronym{SRP} handshake idiom in order to avoid,
-in interactive applications, to ask the user for @acronym{SRP}
-password and username if the server does not negotiate an
-@acronym{SRP} ciphersuite.
+before the connection, should initialize client credentials and
+call @funcref{gnutls_srp_set_client_credentials}.
+Alternatively @funcref{gnutls_srp_set_client_credentials_function}
+may be used to specify a callback function.
+The callback will be called once during the @acronym{TLS} handshake.
 
 In server side the default behaviour of @acronym{GnuTLS} is to read
 the usernames and @acronym{SRP} verifiers from password files. These
 password files are the ones used by the @emph{Stanford srp libraries}
-and can be specified using the
-@funcref{gnutls_srp_set_server_credentials_file}.  If a different
-password file format is to be used, then the function
-@funcref{gnutls_srp_set_server_credentials_function}, should be called,
-in order to set an appropriate callback.
+and @funcref{gnutls_srp_set_server_credentials_file} can be used to
+specify them. If a different
+password file format is to be used, then 
+@funcref{gnutls_srp_set_server_credentials_function} should be called,
+to set an appropriate callback.
 
 Some helper functions such as
 
@@ -306,10 +301,10 @@ exchange.  This method offers perfect forward secrecy.
 @end table
 
 Clients supporting @acronym{PSK} should supply the username and key
-before the connection to the client credentials by calling the
-function @funcref{gnutls_psk_set_client_credentials}.  Alternatively they
-could specify a callback function by using the function
-@funcref{gnutls_psk_set_client_credentials_function}.  This has the
+before the TLS session is established by calling 
+@funcref{gnutls_psk_set_client_credentials}.  Alternatively 
+@funcref{gnutls_psk_set_client_credentials_function} can be used to
+specify a callback function. This has the
 advantage that the callback will be called only if @acronym{PSK} has
 been negotiated.
 
@@ -318,12 +313,13 @@ the usernames and @acronym{PSK} keys from a password file. The
 password file should contain usernames and keys in hexadecimal
 format. The name of the password file can be stored to the credentials
 structure by calling @funcref{gnutls_psk_set_server_credentials_file}.  If
-a different password file format is to be used, then the function
-@funcref{gnutls_psk_set_server_credentials_function}, should be used
-instead.
+a different password file format is to be used, then
+a callback should be set instead by @funcref{gnutls_psk_set_server_credentials_function}.
 
 The server can help the client chose a suitable username and password,
-by sending a hint.  In the server, specify the hint by calling
+by sending a hint. Note that there is no common profile for the PSK hint and applications
+are discouraged to use it.
+A server, may specify the hint by calling
 @funcref{gnutls_psk_set_server_credentials_hint}.  The client can retrieve
 the hint, for example in the callback function, using
 @funcref{gnutls_psk_client_get_hint}.

@@ -76,8 +76,9 @@ verbose information on the @acronym{GnuTLS} functions internal flow.
 
 When debugging is not required, important issues, such as detected
 attacks on the protocol still need to be logged. This is provided
-by @funcref{gnutls_global_set_audit_log_function}, that uses a logging
-function that accepts the detected error message and the corresponding
+by the logging function set by
+@funcref{gnutls_global_set_audit_log_function}. The set function
+accepts the detected error message and the corresponding
 TLS session. The session information might be used to derive IP addresses
 or other information about the peer involved.
 

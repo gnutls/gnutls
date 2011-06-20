@@ -88,9 +88,14 @@ while ($line = <FILE>) {
                         $mode = pop(@stack);
                 } else {
 			$line =~ s/\@caption\{/\\caption\{/g;
-			$line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{3.3cm}|p{3.3cm}|p{4.3cm}|}\n\\hline\n/g;
-			$line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{3cm}|}\n\\hline\n/g;
-			push(@stack, FLOAT_TABLE);
+
+			if ($line =~ m/\@multitable/) {
+				push(@stack, FLOAT_TABLE);
+				$line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{$1\\linewidth}|p{$2\\linewidth}|}\n\\hline\n/g;
+				$line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{$1\\linewidth}|p{$2\\linewidth}|p{$3\\linewidth}|}\n\\hline\n/g;
+				$line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{$1\\linewidth}|p{$2\\linewidth}|p{$3\\linewidth}|p{$4\\linewidth}|p{$5\\linewidth}|}\n\\hline\n/g;
+			}
+			
 			goto multitable;
 		}
 		$prev_mode = $mode;
@@ -166,8 +171,8 @@ multitable:
         } else {
 		$prev_mode = $mode;
 
-		$line =~ s/\@iftex/% /g;
-		$line =~ s/\@end iftex/% /g;
+		$line =~ s/\@iftex/%c /g;
+		$line =~ s/\@end iftex/%c /g;
                 $line =~ s/\@anchor (.+)/\\label{$1}/g;
 		$line =~ s/\@anchor\{($spacematch+)\}/\\label{$1}/g;
 		if ($line =~ s/\@subsection (.+)/\\subsection{$1}/g) {
@@ -235,11 +240,15 @@ multitable:
                         push(@stack, NORMAL);
                         $mode = TABLE_ITEMIZE;
                 }
-                if ($line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{3.3cm}|p{3.3cm}|p{4.3cm}|}\n\\hline\n/g) {
+                if ($line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{$1\\linewidth}|p{$2\\linewidth}|}\n\\hline\n/g) {
                         push(@stack, NORMAL);
                         $mode = MULTITABLE;
                 }
-                if ($line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{3cm}|}\n\\hline\n/g) {
+                if ($line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{$1\\linewidth}|p{$2\\linewidth}|p{$3\\linewidth}|}\n\\hline\n/g) {
+                        push(@stack, NORMAL);
+                        $mode = MULTITABLE;
+                }
+                if ($line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{$1\\linewidth}|p{$2\\linewidth}|p{$3\\linewidth}|p{$4\\linewidth}|p{$5\\linewidth}|}\n\\hline\n/g) {
                         push(@stack, NORMAL);
                         $mode = MULTITABLE;
                 }
@@ -264,7 +273,7 @@ multitable:
 	if ($verbatim == 0) {
 		$line =~ s/\_/\\_/g;
 		$line =~ s/\~/\\~/g;
-		$line =~ s/\%/\\%/g;
+		$line =~ s/\%(?!c)/\\%/g;
 		$line =~ s/\#/\\\#/g;
                 $line =~ s/\@verbatiminclude (.*)/\\examplefile{\.\.\/$1}/g;
 		$line =~ s/\@image\{($match+)\,($match+)\}/\\includegraphics\[width\=$2\]\{\.\.\/$1\.pdf\}/g;

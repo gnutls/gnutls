@@ -417,7 +417,7 @@ like:
 @smallexample
 $ gnutls-cli -p 5556 test.gnutls.org --pskusername jas \
   --pskkey 9e32cf7786321a828ef7668f09fb35db \
-  --priority NORMAL:+DHE-PSK:+PSK:-RSA:-DHE-RSA
+  --priority NORMAL:-KX-ALL:+ECDHE-PSK:DHE-PSK:+PSK
 @end smallexample
 
 @menu
@@ -450,13 +450,13 @@ Enter password:
 @end smallexample
 
 If the server supports several cipher suites, you may need to force it
-to chose PSK by using a cipher priority parameter such as
-@option{--priority NORMAL:+PSK:-RSA:-DHE-RSA:-DHE-PSK}.
+to chose PSK by using a cipher priority parameter such as in the
+example below:
 
 @smallexample
 $ ./gnutls-cli -p 5556 localhost --pskusername psk_identity \
   --pskkey 88f3824b3e5659f52d00e959bacab954b6540344 \
-  --priority NORMAL:+DHE-PSK:+PSK
+  --priority NORMAL:-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK
 Resolving 'localhost'...
 Connecting to '127.0.0.1:5556'...
 - PSK authentication.
