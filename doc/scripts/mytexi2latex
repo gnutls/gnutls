@@ -220,7 +220,7 @@ while ($line = <FILE>) {
 		$line =~ s/\%/\\%/g;
 		$line =~ s/\#/\\\#/g;
                 $line =~ s/\@verbatiminclude (.*)/\\examplefile{\.\.\/$1}/g;
-		$line =~ s/\@image\{($match+)\,($match+)\}/\\includegraphics\[width\=$2\]\{\.\.\/$1\}/g;
+		$line =~ s/\@image\{($match+)\,($match+)\}/\\includegraphics\[width\=$2\]\{\.\.\/$1\.pdf\}/g;
 		$line =~ s/\@samp\{($spacematch+)\}/$1/g;
 		$line =~ s/\@strong\{/\{\\bf /g;
 		$line =~ s/\@c (.*)/\% $1/g;
