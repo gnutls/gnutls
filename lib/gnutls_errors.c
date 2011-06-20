@@ -275,8 +275,7 @@ static const gnutls_error_entry error_algorithms[] = {
   ERROR_ENTRY (N_("The specified algorithm or protocol is unknown."),
                GNUTLS_E_UNKNOWN_ALGORITHM, 1),
 
-  ERROR_ENTRY (N_("The handshake data size is too large (DoS?), "
-                  "check gnutls_handshake_set_max_packet_length()."),
+  ERROR_ENTRY (N_("The handshake data size is too large."),
                GNUTLS_E_HANDSHAKE_TOO_LARGE, 1),
 
   ERROR_ENTRY (N_("Error opening /dev/crypto"),
