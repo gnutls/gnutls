@@ -272,8 +272,7 @@ encrypted packet.
 
 Those weaknesses were solved in @acronym{TLS} 1.1 @xcite{RFC4346}
 which is implemented in @acronym{GnuTLS}. For a detailed discussion
-see the archives of the TLS Working Group mailing list and the paper
-@xcite{CBCATT}.
+see the archives of the TLS Working Group mailing list and @xcite{CBCATT}.
 
 @node On Record Padding
 @subsection On Record Padding
