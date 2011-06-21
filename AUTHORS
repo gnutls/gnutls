@@ -6,68 +6,71 @@ See the end for copying conditions.
 The copyright holder for GnuTLS is Free Software Foundation, Inc., 51
 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-Simon Josefsson <simon@josefsson.org>
+Simon Josefsson <simon [at] josefsson.org>
 Current maintainer; draft TLS 1.2 support.
 
-Nikos Mavrogiannopoulos <nmav@gnutls.org>
+Nikos Mavrogiannopoulos <nmav [at] gnutls.org>
 Original author and maintainer of GnuTLS.
 
-Fabio Fiorina <Fabio.Fiorina@alcatel.it>
+Fabio Fiorina <Fabio.Fiorina [at] alcatel.it>
 ASN.1 structures parser library (libtasn1).
 
-Timo Schulz <twoaday@freakmail.de>
+Timo Schulz <twoaday [at] freakmail.de>
 OpenPGP support (OpenCDK library).
 
-Andrew McDonald <andrew@mcdonald.org.uk>
+Andrew McDonald <andrew [at] mcdonald.org.uk>
 OpenSSL compatible interface.
 
-Ludovic Courtes <ludo@gnu.org>
+Ludovic Courtes <ludo [at] gnu.org>
 Guile bindings, OpenPGP bug fixes.
 
-Mario Lenz <m@riolenz.de>
+Mario Lenz <m [at] riolenz.de>
 Fixes to OpenCDK.
 
-Howard Chu <hyc@symas.com>
+Howard Chu <hyc [at] symas.com>
 APIs to extract X.500 DN's from Certificates.
 
-Ivo Timmermans <ivo@o2w.nl>
+Ivo Timmermans <ivo [at] o2w.nl>
 Man pages, OpenCDK, fixes.
 
-Stefan Walter <stef@memberwebs.com>
+Stefan Walter <stef [at] memberwebs.com>
 PKCS8 fix, PKCS #11 backend move to p11-kit.
 
-Yoshisato YANAGISAWA <yanagisawa@csg.is.titech.ac.jp>
+Yoshisato YANAGISAWA <yanagisawa [at] csg.is.titech.ac.jp>
 Camellia support.
 
-Emile Van Bergen <emile@e-advies.nl>
+Emile Van Bergen <emile [at] e-advies.nl>
 TLS/IA fixes.
 
-Joe Orton <jorton@redhat.com>
+Joe Orton <jorton [at] redhat.com>
 Certificate name import/export, build fixes, test vectors.
 
-Daniel Kahn Gillmor <dkg-debian.org@fifthhorseman.net>
+Daniel Kahn Gillmor <dkg-debian.org [at] fifthhorseman.net>
 OpenPGP discussion and improvements.
 
-David Marín Carreño <davefx@gmail.com>
+David Marín Carreño <davefx [at] gmail.com>
 Added gnutls_x509_crq_get_key_id.
 
-Daiki Ueno <ueno@unixuser.org>
+Daiki Ueno <ueno [at] unixuser.org>
 Added TLS Session Ticket (RFC 5077) support,
 finished client-side TLS 1.2 support.
 
-Brad Hards <bradh@frogmouth.net>
+Brad Hards <bradh [at] frogmouth.net>
 Add X.509 Issuer Alternative Name functions.
 
-Boyan Kasarov <bkasarov@gmail.com>
+Boyan Kasarov <bkasarov [at] gmail.com>
 C++ fixes.
 
-Steve Dispensa <dispensa@phonefactor.com>
+Steve Dispensa <dispensa [at] phonefactor.com>
 Initial TLS safe renegotiation patch.
 
-Jonathan Bastien-Filiatrault <joe@x2a.org>
+Jonathan Bastien-Filiatrault <joe [at] x2a.org>
 Fix TLS-version checks.
 Redesign and implementation of the buffering layer.
 Initial DTLS implementation.
+
+Ruslan Ijbulatov (LRN) <lrn1986 [at] gmail.com>
+Win32 patches.
 
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 URL: http://josefsson.org/key.txt (always latest version)
