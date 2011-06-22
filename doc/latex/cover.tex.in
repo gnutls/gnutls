@@ -1,49 +1,6 @@
-\begin{latexonly}
-
 \thispagestyle{empty}
-
-\HRule
-\vspace{.3cm}
-\\
-\begin{tabular}{l@{\extracolsep{3cm}}p{7cm}}
-{\bf{\Large{GnuTLS}}}
-&
-\vspace{-.6cm}
-\begin{flushright}
-a Transport Layer Security Library\\
-This document applies to GnuTLS @VERSION@
-\end{flushright}
-\end{tabular}
-
-\vspace*{\stretch{2}}
-\begin{center}
-\includegraphics{../gnutls-logo.pdf}
-\end{center}
 \vspace*{\stretch{2}}
 
-\begin{flushright}
-by Nikos Mavrogiannopoulos\\
-and Simon Josefsson
-\end{flushright}
-\vspace{-0.5cm}
-\HRule
-
-\end{latexonly}
-
-\begin{htmlonly}
-
-{\Large{GNUTLS}}
-\begin{flushright}
-a Transport Layer Security Library\\
-This document applies to GnuTLS @VERSION@
-\end{flushright}
-
-\end{htmlonly}
- 
-\newpage
-
-
-\vspace*{\stretch{2}}
 
 \begin{quotation}
 Copyright \copyright{} 2011 Free Software Foundation, Inc.
@@ -57,3 +14,13 @@ Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
 copy of the license is included in the section entitled ``GNU Free
 Documentation License''.
 \end{flushleft}
+
+\newpage
+\thispagestyle{empty}
+
+\vspace*{\stretch{2}}
+\begin{center}
+\includegraphics[width=6cm]{../gnutls-logo.pdf}
+\end{center}
+
+\vspace*{\stretch{2}}
