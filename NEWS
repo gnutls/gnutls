@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 * Version (unreleased)
 
+** libgnutls: license upgraded to LGPLv3
+
 ** libgnutls: gnutls_srp_verifier() returns data allocated with gnutls_malloc()
 for consistency.
 
