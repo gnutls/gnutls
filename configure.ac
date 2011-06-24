@@ -186,14 +186,21 @@ else
  AC_MSG_RESULT(no)
 fi
 
+PKG_CHECK_EXISTS(zlib, ZLIB_HAS_PKGCONFIG=y, ZLIB_HAS_PKGCONFIG=n)
+
 if test x$ac_zlib != xno; then
-  if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
-    GNUTLS_REQUIRES_PRIVATE="Requires.private: zlib"
+  if test "$ZLIB_HAS_PKGCONFIG" = "y" ; then
+    if test x$GNUTLS_REQUIRES_PRIVATE = x; then
+      GNUTLS_REQUIRES_PRIVATE="Requires.private: zlib"
+    else
+      GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE , zlib"
+    fi
   else
-    GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE , zlib"
+    GNUTLS_ZLIB_LIBS_PRIVATE="$LTLIBZ"
   fi
 fi
 AC_SUBST(GNUTLS_REQUIRES_PRIVATE)
+AC_SUBST(GNUTLS_ZLIB_LIBS_PRIVATE)
 
 
 gl_INIT
