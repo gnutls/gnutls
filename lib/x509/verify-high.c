@@ -63,11 +63,11 @@ struct gnutls_x509_trust_list_st {
 /**
  * gnutls_x509_trust_list_init:
  * @list: The structure to be initialized
- * @size: The size of the internal hash table. Use zero for default size.
+ * @size: The size of the internal hash table. Use (0) for default size.
  *
  * This function will initialize an X.509 trust list structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -97,7 +97,7 @@ gnutls_x509_trust_list_init (gnutls_x509_trust_list_t * list, unsigned int size)
 /**
  * gnutls_x509_trust_list_deinit:
  * @list: The structure to be deinitialized
- * @all: if non-zero it will deinitialize all the certificates and CRLs contained in the structure.
+ * @all: if non-(0) it will deinitialize all the certificates and CRLs contained in the structure.
  *
  * This function will deinitialize a trust list.
  **/
@@ -200,7 +200,7 @@ uint32_t hash;
  * The certificate must not be deinitialized during the lifetime
  * of the trusted list.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  **/
@@ -387,12 +387,12 @@ gnutls_datum_t dn;
  * @list: The structure of the list
  * @cert: is the certificate to find issuer for
  * @issuer: Will hold the issuer if any. Should be treated as constant.
- * @flags: Use zero.
+ * @flags: Use (0).
  *
  * This function will attempt to find the issuer of the
  * given certificate.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
@@ -439,7 +439,7 @@ uint32_t hash;
  * This function will try to verify the given certificate and return
  * its status.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -535,7 +535,7 @@ uint32_t hash;
  * match is found the certificate is considered valid. In addition to that
  * this function will also check CRLs.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int

@@ -714,7 +714,7 @@ _gnutls_x509_ext_extract_basicConstraints (int *CA,
 
 /* generate the basicConstraints in a DER encoded extension
  * Use 0 or 1 (TRUE) for CA.
- * Use negative values for pathLenConstraint to indicate that the field
+ * Use negative error codes for pathLenConstraint to indicate that the field
  * should not be present, >= 0 to indicate set values.
  */
 int

@@ -237,7 +237,7 @@ gnutls_cipher_get_id (const char *name)
  *
  * This function is not thread safe.
  *
- * Returns: a zero-terminated list of #gnutls_cipher_algorithm_t
+ * Returns: a (0)-terminated list of #gnutls_cipher_algorithm_t
  *   integers indicating the available ciphers.
  *
  **/

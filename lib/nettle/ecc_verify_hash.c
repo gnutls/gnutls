@@ -80,7 +80,7 @@ ecc_verify_hash (struct dsa_signature *signature,
       goto error;
     }
 
-  /* check for zero */
+  /* check for (0) */
   if (mpz_cmp_ui (signature->r, 0) == 0 || mpz_cmp_ui (signature->s, 0) == 0
       || mpz_cmp (signature->r, key->order) >= 0
       || mpz_cmp (signature->s, key->order) >= 0)

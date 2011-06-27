@@ -214,7 +214,7 @@ error:
  * This function will return the number of OpenPGP certificates
  * present in the given keyring.
  *
- * Returns: the number of subkeys, or a negative value on error.
+ * Returns: the number of subkeys, or a negative error code on error.
  **/
 int
 gnutls_openpgp_keyring_get_crt_count (gnutls_openpgp_keyring_t ring)

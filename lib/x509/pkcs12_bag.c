@@ -42,7 +42,7 @@
  * usually contain private keys, lists of X.509 Certificates and X.509
  * Certificate revocation lists.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -145,7 +145,7 @@ gnutls_pkcs12_bag_get_count (gnutls_pkcs12_bag_t bag)
  * that is stored into the bag.  Should not be accessed after the bag
  * is deleted.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -497,7 +497,7 @@ gnutls_pkcs12_bag_set_crt (gnutls_pkcs12_bag_t bag, gnutls_x509_crt_t crt)
  * This function will insert the given CRL into the
  * bag. This is just a wrapper over gnutls_pkcs12_bag_set_data().
  *
- * Returns: the index of the added bag on success, or a negative value
+ * Returns: the index of the added bag on success, or a negative error code
  * on failure.
  **/
 int
@@ -538,8 +538,8 @@ gnutls_pkcs12_bag_set_crl (gnutls_pkcs12_bag_t bag, gnutls_x509_crl_t crl)
  * identifier' bag attribute, which is usually used to distinguish
  * the local private key and the certificate pair.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value. or a negative value on error.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. or a negative error code on error.
  **/
 int
 gnutls_pkcs12_bag_set_key_id (gnutls_pkcs12_bag_t bag, int indx,
@@ -582,8 +582,8 @@ gnutls_pkcs12_bag_set_key_id (gnutls_pkcs12_bag_t bag, int indx,
  * The key ID is usually used to distinguish the local private key and
  * the certificate pair.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value. or a negative value on error.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. or a negative error code on error.
  **/
 int
 gnutls_pkcs12_bag_get_key_id (gnutls_pkcs12_bag_t bag, int indx,
@@ -617,8 +617,8 @@ gnutls_pkcs12_bag_get_key_id (gnutls_pkcs12_bag_t bag, int indx,
  * element.  The key ID is usually used to distinguish the local
  * private key and the certificate pair.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value. or a negative value on error.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. or a negative error code on error.
  **/
 int
 gnutls_pkcs12_bag_get_friendly_name (gnutls_pkcs12_bag_t bag, int indx,
@@ -653,8 +653,8 @@ gnutls_pkcs12_bag_get_friendly_name (gnutls_pkcs12_bag_t bag, int indx,
  * a 'Friendly name' bag attribute, which is usually used to set a
  * user name to the local private key and the certificate pair.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value. or a negative value on error.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. or a negative error code on error.
  **/
 int
 gnutls_pkcs12_bag_set_friendly_name (gnutls_pkcs12_bag_t bag, int indx,
@@ -692,8 +692,8 @@ gnutls_pkcs12_bag_set_friendly_name (gnutls_pkcs12_bag_t bag, int indx,
  * This function will decrypt the given encrypted bag and return 0 on
  * success.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 int
 gnutls_pkcs12_bag_decrypt (gnutls_pkcs12_bag_t bag, const char *pass)
@@ -748,8 +748,8 @@ gnutls_pkcs12_bag_decrypt (gnutls_pkcs12_bag_t bag, const char *pass)
  *
  * This function will encrypt the given bag.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 int
 gnutls_pkcs12_bag_encrypt (gnutls_pkcs12_bag_t bag, const char *pass,

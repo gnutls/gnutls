@@ -113,7 +113,7 @@ gnutls_sign_get_name (gnutls_sign_algorithm_t sign)
  *
  * Get a list of supported public key signature algorithms.
  *
- * Returns: a zero-terminated list of #gnutls_sign_algorithm_t
+ * Returns: a (0)-terminated list of #gnutls_sign_algorithm_t
  *   integers indicating the available ciphers.
  *
  **/

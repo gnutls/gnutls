@@ -1199,7 +1199,7 @@ cleanup:
  * a certificate request is sent. This can be disabled using
  * gnutls_certificate_send_x509_rdn_sequence().
  *
- * Returns: the number of certificates processed or a negative value
+ * Returns: the number of certificates processed or a negative error code
  * on error.
  **/
 int
@@ -1306,7 +1306,7 @@ cleanup:
  * This function can also accept PKCS #11 URLs. In that case it
  * will import all certificates that are marked as trusted.
  *
- * Returns: number of certificates processed, or a negative value on
+ * Returns: number of certificates processed, or a negative error code on
  * error.
  **/
 int
@@ -1459,7 +1459,7 @@ read_crl_mem (gnutls_certificate_credentials_t res, const void *crl,
  * gnutls_certificate_verify_peers2().  This function may be called
  * multiple times.
  *
- * Returns: number of CRLs processed, or a negative value on error.
+ * Returns: number of CRLs processed, or a negative error code on error.
  **/
 int
 gnutls_certificate_set_x509_crl_mem (gnutls_certificate_credentials_t res,
@@ -1538,7 +1538,7 @@ cleanup:
  * gnutls_certificate_verify_peers2().
  * This function may be called multiple times.
  *
- * Returns: number of CRLs processed or a negative value on error.
+ * Returns: number of CRLs processed or a negative error code on error.
  **/
 int
 gnutls_certificate_set_x509_crl_file (gnutls_certificate_credentials_t res,

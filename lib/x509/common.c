@@ -1092,7 +1092,7 @@ _gnutls_x509_der_encode_and_copy (ASN1_TYPE src, const char *src_name,
 }
 
 /* Writes the value of the datum in the given ASN1_TYPE. If str is non
- * zero it encodes it as OCTET STRING.
+ * (0) it encodes it as OCTET STRING.
  */
 int
 _gnutls_x509_write_value (ASN1_TYPE c, const char *root,
@@ -1348,7 +1348,7 @@ cleanup:
  * enumeration that is the signature algorithm that has been used to
  * sign this certificate.
  *
- * Returns: a #gnutls_sign_algorithm_t value, or a negative value on
+ * Returns: a #gnutls_sign_algorithm_t value, or a negative error code on
  *   error.
  -*/
 int

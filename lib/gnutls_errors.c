@@ -336,9 +336,9 @@ static const gnutls_error_entry error_algorithms[] = {
 
 /**
  * gnutls_error_is_fatal:
- * @error: is a GnuTLS error code, a negative value
+ * @error: is a GnuTLS error code, a negative error code
  *
- * If a GnuTLS function returns a negative value you may feed that
+ * If a GnuTLS function returns a negative error code you may feed that
  * value to this function to see if the error condition is fatal.
  *
  * Note that you may want to check the error code manually, since some
@@ -375,7 +375,7 @@ gnutls_error_is_fatal (int error)
 
 /**
  * gnutls_perror:
- * @error: is a GnuTLS error code, a negative value
+ * @error: is a GnuTLS error code, a negative error code
  *
  * This function is like perror(). The only difference is that it
  * accepts an error number returned by a gnutls function.
@@ -389,13 +389,13 @@ gnutls_perror (int error)
 
 /**
  * gnutls_strerror:
- * @error: is a GnuTLS error code, a negative value
+ * @error: is a GnuTLS error code, a negative error code
  *
  * This function is similar to strerror.  The difference is that it
  * accepts an error number returned by a gnutls function; In case of
  * an unknown error a descriptive string is sent instead of %NULL.
  *
- * Error codes are always a negative value.
+ * Error codes are always a negative error code.
  *
  * Returns: A string explaining the GnuTLS error message.
  **/

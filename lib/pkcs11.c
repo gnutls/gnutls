@@ -239,7 +239,7 @@ fail:
  * list used in gnutls. After this function is called the module will
  * be used for PKCS 11 operations.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -285,7 +285,7 @@ gnutls_pkcs11_add_provider (const char *name, const char *params)
  * output is text it returns null terminated string although %output_size contains
  * the size of the actual data only.
  *
- * Returns: zero on success or a negative value on error.
+ * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
  **/
 int
 gnutls_pkcs11_obj_get_info (gnutls_pkcs11_obj_t crt,
@@ -429,7 +429,7 @@ static int init = 0;
  * by gnutls_global_init() using the %GNUTLS_PKCS11_FLAG_AUTO. If other option
  * is required then it must be called before it.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -536,7 +536,7 @@ gnutls_pkcs11_deinit (void)
  * first such invocation, the 'attempt' counter will have value zero;
  * it will increase by one for each subsequent attempt.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 void
@@ -555,7 +555,7 @@ gnutls_pkcs11_set_pin_function (gnutls_pkcs11_pin_callback_t fn,
  * This function will set a callback function to be used when a token
  * needs to be inserted to continue PKCS 11 operations.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 void
@@ -636,7 +636,7 @@ pkcs11_info_to_url (struct p11_kit_uri *info,
  *
  * This function will initialize a pkcs11 certificate structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -692,8 +692,8 @@ gnutls_pkcs11_obj_deinit (gnutls_pkcs11_obj_t obj)
  * If the structure is PEM encoded, it will have a header
  * of "BEGIN CERTIFICATE".
  *
- * Return value: In case of failure a negative value will be
- *   returned, and 0 on success.
+ * Returns: In case of failure a negative error code will be
+ *   returned, and %GNUTLS_E_SUCCESS (0) on success.
  **/
 int
 gnutls_pkcs11_obj_export (gnutls_pkcs11_obj_t obj,
@@ -1411,7 +1411,7 @@ pkcs11_obj_flags_to_int (unsigned int flags)
  * parsing (such as X.509 or OpenPGP) since the #gnutls_pkcs11_obj_t is
  * format agnostic. Only data are transferred.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -1488,7 +1488,7 @@ find_token_num (struct ck_function_list *module,
  * This function will return the URL for each token available
  * in system. The url has to be released using gnutls_free()
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  * if the sequence number exceeds the available tokens, otherwise a negative error value.
  **/
 
@@ -1534,7 +1534,7 @@ gnutls_pkcs11_token_get_url (unsigned int seq,
  * This function will return information about the PKCS 11 token such
  * as the label, id as well as token information where the key is stored.
  *
- * Returns: zero on success or a negative value on error.
+ * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
  **/
 int
 gnutls_pkcs11_token_get_info (const char *url,
@@ -1603,7 +1603,7 @@ gnutls_pkcs11_token_get_info (const char *url,
  *
  * This function will export a URL identifying the given certificate.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -2191,7 +2191,7 @@ fail:
  * This function will initialize and set values to an object list
  * by using all objects identified by a PKCS 11 URL.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -2248,7 +2248,7 @@ gnutls_pkcs11_obj_list_import_url (gnutls_pkcs11_obj_t * p_list,
  * without involving the #gnutls_pkcs11_obj_t structure. This function will
  * fail if the certificate stored is not of X.509 type.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -2296,7 +2296,7 @@ cleanup:
  * This function will import a PKCS 11 certificate to a #gnutls_x509_crt_t
  * structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -2316,7 +2316,7 @@ gnutls_x509_crt_import_pkcs11 (gnutls_x509_crt_t crt,
  * This function will import a PKCS 11 certificate list to a list of 
  * #gnutls_x509_crt_t structure. These must not be initialized.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -2391,7 +2391,7 @@ find_flags (struct ck_function_list * module, ck_session_handle_t pks,
  *
  * This function will return information about the PKCS 11 token flags.
  *
- * Returns: zero on success or a negative value on error.
+ * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
  **/
 int
 gnutls_pkcs11_token_get_flags (const char *url, unsigned int *flags)
@@ -2435,7 +2435,7 @@ gnutls_pkcs11_token_get_flags (const char *url, unsigned int *flags)
  * by the token. It should be called with an increasing index until
  * it return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
  *
- * Returns: zero on success or a negative value on error.
+ * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
  **/
 int
 gnutls_pkcs11_token_get_mechanism (const char *url, int idx,

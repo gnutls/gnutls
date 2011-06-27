@@ -87,7 +87,7 @@ int pubkey_to_bits(gnutls_pk_algorithm_t pk, gnutls_pk_params_st* params)
  * the security parameter of the key.
  *
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
- *   success, or a negative value on error.
+ *   success, or a negative error code on error.
  **/
 int
 gnutls_pubkey_get_pk_algorithm (gnutls_pubkey_t key, unsigned int *bits)
@@ -105,7 +105,7 @@ gnutls_pubkey_get_pk_algorithm (gnutls_pubkey_t key, unsigned int *bits)
  *
  * This function will return the key usage of the public key.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -123,7 +123,7 @@ gnutls_pubkey_get_key_usage (gnutls_pubkey_t key, unsigned int *usage)
  *
  * This function will initialize an public key structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -161,7 +161,7 @@ gnutls_pubkey_deinit (gnutls_pubkey_t key)
  * This function will import the given public key to the abstract
  * #gnutls_pubkey_t structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -196,7 +196,7 @@ gnutls_pubkey_import_x509 (gnutls_pubkey_t key, gnutls_x509_crt_t crt,
  * This function will import the given public key to the abstract
  * #gnutls_pubkey_t structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 2.12.0
@@ -222,7 +222,7 @@ gnutls_pubkey_import_privkey (gnutls_pubkey_t key, gnutls_privkey_t pkey,
  * algorithm to use for signing with this certificate. Some certificates (i.e.
  * DSA might not be able to sign without the preferred algorithm).
  *
- * Returns: the 0 if the hash algorithm is found. A negative value is
+ * Returns: the 0 if the hash algorithm is found. A negative error code is
  * returned on error.
  *
  * Since: 2.11.0
@@ -258,7 +258,7 @@ gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
  * This function will import the given public key to the abstract
  * #gnutls_pubkey_t structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -314,7 +314,7 @@ gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t key,
  * #gnutls_pubkey_t structure. The subkey set as preferred will be
  * imported or the master key otherwise.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -394,7 +394,7 @@ gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
  * be returned.  The output will normally be a SHA-1 hash output,
  * which is 20 bytes.
  *
- * Return value: In case of failure a negative value will be
+ * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
  **/
 int
@@ -449,7 +449,7 @@ gnutls_pubkey_get_openpgp_key_id (gnutls_pubkey_t key, unsigned int flags,
  * If the structure is PEM encoded, it will have a header
  * of "BEGIN CERTIFICATE".
  *
- * Return value: In case of failure a negative value will be
+ * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
  **/
 int
@@ -519,7 +519,7 @@ cleanup:
  * be returned.  The output will normally be a SHA-1 hash output,
  * which is 20 bytes.
  *
- * Return value: In case of failure a negative value will be
+ * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
  **/
 int
@@ -557,7 +557,7 @@ gnutls_pubkey_get_key_id (gnutls_pubkey_t key, unsigned int flags,
  * the given structure.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  **/
 int
 gnutls_pubkey_get_pk_rsa_raw (gnutls_pubkey_t key,
@@ -607,7 +607,7 @@ gnutls_pubkey_get_pk_rsa_raw (gnutls_pubkey_t key,
  * the given certificate.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  **/
 int
 gnutls_pubkey_get_pk_dsa_raw (gnutls_pubkey_t key,
@@ -682,7 +682,7 @@ gnutls_pubkey_get_pk_dsa_raw (gnutls_pubkey_t key,
  * the given certificate.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  **/
 int
 gnutls_pubkey_get_pk_ecc_raw (gnutls_pubkey_t key, gnutls_ecc_curve_t *curve,
@@ -734,7 +734,7 @@ gnutls_pubkey_get_pk_ecc_raw (gnutls_pubkey_t key, gnutls_ecc_curve_t *curve,
  * to the native gnutls_pubkey_t format.The output will be stored * in @ key. 
  * If the Certificate is PEM encoded it should have a header of "PUBLIC KEY". 
  * 
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  * negative error value.
  **/
 int
@@ -827,7 +827,7 @@ cleanup:
  * This function will set the public parameters from the given public
  * key to the request.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -866,7 +866,7 @@ gnutls_x509_crt_set_pubkey (gnutls_x509_crt_t crt, gnutls_pubkey_t key)
  * This function will set the public parameters from the given public
  * key to the request.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -906,7 +906,7 @@ gnutls_x509_crq_set_pubkey (gnutls_x509_crq_t crq, gnutls_pubkey_t key)
  * is only useful if the key is to be exported to a certificate or
  * certificate request.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -928,7 +928,7 @@ gnutls_pubkey_set_key_usage (gnutls_pubkey_t key, unsigned int usage)
  * This function will import a PKCS 11 certificate to a #gnutls_pubkey_t
  * structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 
@@ -1031,7 +1031,7 @@ gnutls_pubkey_import_rsa_raw (gnutls_pubkey_t key,
  * native #gnutls_pubkey_t format.  The output will be stored
  * in @key.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -1217,7 +1217,7 @@ gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
  * This function will read the certifcate and the signed data to
  * determine the hash algorithm used to generate the signature.
  *
- * Returns: the 0 if the hash algorithm is found. A negative value is
+ * Returns: the 0 if the hash algorithm is found. A negative error code is
  * returned on error.
  **/
 int

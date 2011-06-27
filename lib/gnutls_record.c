@@ -1188,13 +1188,11 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
  * This function has the similar semantics with send().  The only
  * difference is that it accepts a GnuTLS session, and uses different
  * error codes.
- *
  * Note that if the send buffer is full, send() will block this
  * function.  See the send() documentation for full information.  You
  * can replace the default push function by using
  * gnutls_transport_set_ptr2() with a call to send() with a
  * MSG_DONTWAIT flag if blocking is a problem.
- *
  * If the EINTR is returned by the internal push function (the
  * default is send()) then %GNUTLS_E_INTERRUPTED will be returned. If
  * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN is returned, you must
@@ -1225,19 +1223,16 @@ gnutls_record_send (gnutls_session_t session, const void *data,
  * This function has the similar semantics with recv().  The only
  * difference is that it accepts a GnuTLS session, and uses different
  * error codes.
- *
  * In the special case that a server requests a renegotiation, the
  * client may receive an error code of %GNUTLS_E_REHANDSHAKE.  This
  * message may be simply ignored, replied with an alert
  * %GNUTLS_A_NO_RENEGOTIATION, or replied with a new handshake,
  * depending on the client's will.
- *
  * If %EINTR is returned by the internal push function (the default
  * is recv()) then %GNUTLS_E_INTERRUPTED will be returned.  If
  * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN is returned, you must
  * call this function again to get the data.  See also
  * gnutls_record_get_direction().
- *
  * A server may also receive %GNUTLS_E_REHANDSHAKE when a client has
  * initiated a handshake. In that case the server can only initiate a
  * handshake or terminate the connection.
@@ -1264,7 +1259,6 @@ gnutls_record_recv (gnutls_session_t session, void *data, size_t data_size)
  * it returns in addition to data, the sequence number of the data.
  * This is useful in DTLS where record packets might be received
  * out-of-order.
- *
  * In DTLS the least significant 48-bits are a unique sequence
  * number, per handshake. If your application is using TLS re-handshakes
  * then the full 64-bits should be used as a unique sequence.

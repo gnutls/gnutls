@@ -45,7 +45,7 @@
  * This function will initialize a PKCS#10 certificate request
  * structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -105,7 +105,7 @@ gnutls_x509_crq_deinit (gnutls_x509_crq_t crq)
  * If the Certificate is PEM encoded it should have a header of "NEW
  * CERTIFICATE REQUEST".
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -205,8 +205,8 @@ gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf, size_t * sizeof_buf)
  * @crq: should contain a gnutls_x509_crq_t structure
  * @oid: holds an Object Identified in null terminated string
  * @indx: In case multiple same OIDs exist in the RDN, this specifies
- *   which to send. Use zero to get the first one.
- * @raw_flag: If non zero returns the raw DER data of the DN part.
+ *   which to send. Use (0) to get the first one.
+ * @raw_flag: If non (0) returns the raw DER data of the DN part.
  * @buf: a pointer to a structure to hold the name (may be %NULL)
  * @sizeof_buf: initially holds the size of @buf
  *
@@ -216,7 +216,7 @@ gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf, size_t * sizeof_buf)
  * or UTF-8 encoded, depending on the certificate data.
  *
  * Some helper macros with popular OIDs can be found in gnutls/x509.h
- * If raw flag is zero, this function will only return known OIDs as
+ * If raw flag is (0), this function will only return known OIDs as
  * text. Other OIDs will be DER encoded, as described in RFC2253 --
  * in hex format with a '\#' prefix.  You can check about known OIDs
  * using gnutls_x509_dn_oid_known().
@@ -245,7 +245,7 @@ gnutls_x509_crq_get_dn_by_oid (gnutls_x509_crq_t crq, const char *oid,
 /**
  * gnutls_x509_crq_get_dn_oid:
  * @crq: should contain a gnutls_x509_crq_t structure
- * @indx: Specifies which DN OID to send. Use zero to get the first one.
+ * @indx: Specifies which DN OID to send. Use (0) to get the first one.
  * @oid: a pointer to a structure to hold the name (may be %NULL)
  * @sizeof_oid: initially holds the size of @oid
  *
@@ -409,14 +409,14 @@ cleanup:
 /**
  * gnutls_x509_crq_get_challenge_password:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @pass: will hold a zero-terminated password string
+ * @pass: will hold a (0)-terminated password string
  * @sizeof_pass: Initially holds the size of @pass.
  *
  * This function will return the challenge password in the request.
  * The challenge password is intended to be used for requesting a
  * revocation of the certificate.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -593,7 +593,7 @@ set_attribute (ASN1_TYPE asn, const char *root,
 /**
  * gnutls_x509_crq_set_attribute_by_oid:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @oid: holds an Object Identified in zero-terminated string
+ * @oid: holds an Object Identified in (0)-terminated string
  * @buf: a pointer to a structure that holds the attribute data
  * @sizeof_buf: holds the size of @buf
  *
@@ -601,7 +601,7 @@ set_attribute (ASN1_TYPE asn, const char *root,
  * specified by the given Object ID.  The attribute must be be DER
  * encoded.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -627,9 +627,9 @@ gnutls_x509_crq_set_attribute_by_oid (gnutls_x509_crq_t crq,
 /**
  * gnutls_x509_crq_get_attribute_by_oid:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @oid: holds an Object Identified in zero-terminated string
+ * @oid: holds an Object Identified in (0)-terminated string
  * @indx: In case multiple same OIDs exist in the attribute list, this
- *   specifies which to send, use zero to get the first one
+ *   specifies which to send, use (0) to get the first one
  * @buf: a pointer to a structure to hold the attribute data (may be %NULL)
  * @sizeof_buf: initially holds the size of @buf
  *
@@ -637,7 +637,7 @@ gnutls_x509_crq_set_attribute_by_oid (gnutls_x509_crq_t crq,
  * specified by the given Object ID.  The attribute will be DER
  * encoded.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -658,7 +658,7 @@ gnutls_x509_crq_get_attribute_by_oid (gnutls_x509_crq_t crq,
 /**
  * gnutls_x509_crq_set_dn_by_oid:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @oid: holds an Object Identifier in a zero-terminated string
+ * @oid: holds an Object Identifier in a (0)-terminated string
  * @raw_flag: must be 0, or 1 if the data are DER encoded
  * @data: a pointer to the input data
  * @sizeof_data: holds the size of @data
@@ -673,7 +673,7 @@ gnutls_x509_crq_get_attribute_by_oid (gnutls_x509_crq_t crq,
  * not known (by gnutls) you should properly DER encode your data, and
  * call this function with raw_flag set.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -699,7 +699,7 @@ gnutls_x509_crq_set_dn_by_oid (gnutls_x509_crq_t crq, const char *oid,
  * This function will set the version of the certificate request.  For
  * version 1 requests this must be one.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -735,7 +735,7 @@ gnutls_x509_crq_set_version (gnutls_x509_crq_t crq, unsigned int version)
  * This function will return the version of the specified Certificate
  * request.
  *
- * Returns: version of certificate request, or a negative value on
+ * Returns: version of certificate request, or a negative error code on
  *   error.
  **/
 int
@@ -773,7 +773,7 @@ gnutls_x509_crq_get_version (gnutls_x509_crq_t crq)
  * This function will set the public parameters from the given private
  * key to the request.  Only RSA keys are currently supported.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -811,7 +811,7 @@ gnutls_x509_crq_set_key (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
  * the given structure.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 2.8.0
@@ -876,7 +876,7 @@ cleanup:
  * This function will set the public parameters from the given private
  * key to the request. Only RSA keys are currently supported.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 2.6.0
@@ -940,12 +940,12 @@ error:
 /**
  * gnutls_x509_crq_set_challenge_password:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @pass: holds a zero-terminated password
+ * @pass: holds a (0)-terminated password
  *
  * This function will set a challenge password to be used when
  * revoking the request.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -997,7 +997,7 @@ gnutls_x509_crq_set_challenge_password (gnutls_x509_crq_t crq,
  * This must be the last step in a certificate request generation
  * since all the previously set parameters are now signed.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *   %GNUTLS_E_ASN1_VALUE_NOT_FOUND is returned if you didn't set all
  *   information in the certificate request (e.g., the version using
  *   gnutls_x509_crq_set_version()).
@@ -1054,7 +1054,7 @@ fail:
  * This function is the same a gnutls_x509_crq_sign2() with no flags,
  * and SHA1 as the hash algorithm.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Deprecated: Use gnutls_x509_crq_privkey_sign() instead.
@@ -1083,7 +1083,7 @@ gnutls_x509_crq_sign (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
  * If the structure is PEM encoded, it will have a header of "BEGIN
  * NEW CERTIFICATE REQUEST".
  *
- * Return value: In case of failure a negative value will be
+ * Return value: In case of failure a negative error code will be
  *   returned, and 0 on success.
  **/
 int
@@ -1114,7 +1114,7 @@ gnutls_x509_crq_export (gnutls_x509_crq_t crq,
  * For DSA the bits returned are of the public exponent.
  *
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
- *   success, or a negative value on error.
+ *   success, or a negative error code on error.
  **/
 int
 gnutls_x509_crq_get_pk_algorithm (gnutls_x509_crq_t crq, unsigned int *bits)
@@ -1140,7 +1140,7 @@ gnutls_x509_crq_get_pk_algorithm (gnutls_x509_crq_t crq, unsigned int *bits)
 /**
  * gnutls_x509_crq_get_attribute_info:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @indx: Specifies which attribute OID to send. Use zero to get the first one.
+ * @indx: Specifies which attribute OID to send. Use (0) to get the first one.
  * @oid: a pointer to a structure to hold the OID
  * @sizeof_oid: initially holds the maximum size of @oid, on return
  *   holds actual size of @oid.
@@ -1154,8 +1154,8 @@ gnutls_x509_crq_get_pk_algorithm (gnutls_x509_crq_t crq, unsigned int *bits)
  * *@sizeof_oid is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will be
  * returned.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative value in case of an error.  If your have reached the
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error code in case of an error.  If your have reached the
  *   last extension available %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  *   will be returned.
  *
@@ -1197,7 +1197,7 @@ gnutls_x509_crq_get_attribute_info (gnutls_x509_crq_t crq, int indx,
 /**
  * gnutls_x509_crq_get_attribute_data:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @indx: Specifies which attribute OID to send. Use zero to get the first one.
+ * @indx: Specifies which attribute OID to send. Use (0) to get the first one.
  * @data: a pointer to a structure to hold the data (may be null)
  * @sizeof_data: initially holds the size of @oid
  *
@@ -1210,8 +1210,8 @@ gnutls_x509_crq_get_attribute_info (gnutls_x509_crq_t crq, int indx,
  * if you want to get data indexed by the attribute OID rather than
  * sequence.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative value in case of an error.  If your have reached the
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error code in case of an error.  If your have reached the
  *   last extension available %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  *   will be returned.
  *
@@ -1251,7 +1251,7 @@ gnutls_x509_crq_get_attribute_data (gnutls_x509_crq_t crq, int indx,
 /**
  * gnutls_x509_crq_get_extension_info:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @indx: Specifies which extension OID to send. Use zero to get the first one.
+ * @indx: Specifies which extension OID to send. Use (0) to get the first one.
  * @oid: a pointer to a structure to hold the OID
  * @sizeof_oid: initially holds the maximum size of @oid, on return
  *   holds actual size of @oid.
@@ -1266,8 +1266,8 @@ gnutls_x509_crq_get_attribute_data (gnutls_x509_crq_t crq, int indx,
  * *@sizeof_oid is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will be
  * returned.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative value in case of an error.  If your have reached the
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error code in case of an error.  If your have reached the
  *   last extension available %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  *   will be returned.
  *
@@ -1383,7 +1383,7 @@ out:
 /**
  * gnutls_x509_crq_get_extension_data:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @indx: Specifies which extension OID to send. Use zero to get the first one.
+ * @indx: Specifies which extension OID to send. Use (0) to get the first one.
  * @data: a pointer to a structure to hold the data (may be null)
  * @sizeof_data: initially holds the size of @oid
  *
@@ -1396,8 +1396,8 @@ out:
  * if you want to get data indexed by the extension OID rather than
  * sequence.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative value in case of an error.  If your have reached the
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error code in case of an error.  If your have reached the
  *   last extension available %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  *   will be returned.
  *
@@ -1486,7 +1486,7 @@ gnutls_x509_crq_get_extension_data (gnutls_x509_crq_t crq, int indx,
  * gnutls_x509_crq_get_key_usage:
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @key_usage: where the key usage bits will be stored
- * @critical: will be non zero if the extension is marked as critical
+ * @critical: will be non (0) if the extension is marked as critical
  *
  * This function will return certificate's key usage, by reading the
  * keyUsage X.509 extension (2.5.29.15).  The key usage value will
@@ -1496,7 +1496,7 @@ gnutls_x509_crq_get_extension_data (gnutls_x509_crq_t crq, int indx,
  * %GNUTLS_KEY_KEY_CERT_SIGN, %GNUTLS_KEY_CRL_SIGN,
  * %GNUTLS_KEY_ENCIPHER_ONLY, %GNUTLS_KEY_DECIPHER_ONLY.
  *
- * Returns: the certificate key usage, or a negative value in case of
+ * Returns: the certificate key usage, or a negative error code in case of
  *   parsing error.  If the certificate does not contain the keyUsage
  *   extension %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be
  *   returned.
@@ -1543,11 +1543,11 @@ gnutls_x509_crq_get_key_usage (gnutls_x509_crq_t crq,
 /**
  * gnutls_x509_crq_get_basic_constraints:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @critical: will be non zero if the extension is marked as critical
+ * @critical: will be non (0) if the extension is marked as critical
  * @ca: pointer to output integer indicating CA status, may be NULL,
  *   value is 1 if the certificate CA flag is set, 0 otherwise.
  * @pathlen: pointer to output integer indicating path length (may be
- *   NULL), non-negative values indicate a present pathLenConstraint
+ *   NULL), non-negative error codes indicate a present pathLenConstraint
  *   field and the actual value, -1 indicate that the field is absent.
  *
  * This function will read the certificate's basic constraints, and
@@ -1555,8 +1555,8 @@ gnutls_x509_crq_get_key_usage (gnutls_x509_crq_t crq,
  * X.509 extension (2.5.29.19).
  *
  * Return value: If the certificate is a CA a positive value will be
- *   returned, or zero if the certificate does not have CA flag set.
- *   A negative value may be returned in case of errors.  If the
+ *   returned, or (0) if the certificate does not have CA flag set.
+ *   A negative error code may be returned in case of errors.  If the
  *   certificate does not contain the basicConstraints extension
  *   %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
  *
@@ -1691,7 +1691,7 @@ get_subject_alt_name (gnutls_x509_crq_t crq,
  * @ret: is the place where the alternative name will be copied to
  * @ret_size: holds the size of ret.
  * @ret_type: holds the #gnutls_x509_subject_alt_name_t name type
- * @critical: will be non zero if the extension is marked as critical
+ * @critical: will be non (0) if the extension is marked as critical
  *   (may be null)
  *
  * This function will return the alternative names, contained in the
@@ -1763,17 +1763,17 @@ gnutls_x509_crq_get_subject_alt_othername_oid (gnutls_x509_crq_t crq,
  * @crq: should contain a #gnutls_x509_crq_t structure
  * @oid: holds an Object Identified in null terminated string
  * @indx: In case multiple same OIDs exist in the extensions, this
- *   specifies which to send. Use zero to get the first one.
+ *   specifies which to send. Use (0) to get the first one.
  * @buf: a pointer to a structure to hold the name (may be null)
  * @sizeof_buf: initially holds the size of @buf
- * @critical: will be non zero if the extension is marked as critical
+ * @critical: will be non (0) if the extension is marked as critical
  *
  * This function will return the extension specified by the OID in
  * the certificate.  The extensions will be returned as binary data
  * DER encoded, in the provided buffer.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative value in case of an error.  If the certificate does not
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error code in case of an error.  If the certificate does not
  *   contain the specified extension
  *   %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
  *
@@ -1839,7 +1839,7 @@ gnutls_x509_crq_get_extension_by_oid (gnutls_x509_crq_t crq,
  *
  * Other values can be set as binary values with the proper DER encoding.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 2.8.0
@@ -1936,13 +1936,13 @@ finish:
  * gnutls_x509_crq_set_basic_constraints:
  * @crq: a certificate request of type #gnutls_x509_crq_t
  * @ca: true(1) or false(0) depending on the Certificate authority status.
- * @pathLenConstraint: non-negative values indicate maximum length of path,
- *   and negative values indicate that the pathLenConstraints field should
+ * @pathLenConstraint: non-negative error codes indicate maximum length of path,
+ *   and negative error codes indicate that the pathLenConstraints field should
  *   not be present.
  *
  * This function will set the basicConstraints certificate extension.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 2.8.0
@@ -1990,7 +1990,7 @@ gnutls_x509_crq_set_basic_constraints (gnutls_x509_crq_t crq,
  *
  * This function will set the keyUsage certificate extension.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 2.8.0
@@ -2032,7 +2032,7 @@ gnutls_x509_crq_set_key_usage (gnutls_x509_crq_t crq, unsigned int usage)
 /**
  * gnutls_x509_crq_get_key_purpose_oid:
  * @crq: should contain a #gnutls_x509_crq_t structure
- * @indx: This specifies which OID to return, use zero to get the first one
+ * @indx: This specifies which OID to return, use (0) to get the first one
  * @oid: a pointer to a buffer to hold the OID (may be %NULL)
  * @sizeof_oid: initially holds the size of @oid
  * @critical: output variable with critical flag, may be %NULL.
@@ -2140,7 +2140,7 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t crq,
 /**
  * gnutls_x509_crq_set_key_purpose_oid:
  * @crq: a certificate of type #gnutls_x509_crq_t
- * @oid: a pointer to a zero-terminated string that holds the OID
+ * @oid: a pointer to a (0)-terminated string that holds the OID
  * @critical: Whether this extension will be critical or not
  *
  * This function will set the key purpose OIDs of the Certificate.
@@ -2149,7 +2149,7 @@ gnutls_x509_crq_get_key_purpose_oid (gnutls_x509_crq_t crq,
  *
  * Subsequent calls to this function will append OIDs to the OID list.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 2.8.0
@@ -2331,7 +2331,7 @@ cleanup:
  * be returned.  The output will normally be a SHA-1 hash output,
  * which is 20 bytes.
  *
- * Return value: In case of failure a negative value will be
+ * Return value: In case of failure a negative error code will be
  *   returned, and 0 on success.
  *
  * Since: 2.8.0
@@ -2423,7 +2423,7 @@ gnutls_x509_crq_get_key_id (gnutls_x509_crq_t crq, unsigned int flags,
  * This must be the last step in a certificate request generation
  * since all the previously set parameters are now signed.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *   %GNUTLS_E_ASN1_VALUE_NOT_FOUND is returned if you didn't set all
  *   information in the certificate request (e.g., the version using
  *   gnutls_x509_crq_set_version()).
@@ -2511,7 +2511,7 @@ gnutls_x509_crq_privkey_sign (gnutls_x509_crq_t crq, gnutls_privkey_t key,
  * This function will verify self signature in the certificate
  * request and return its status.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, %GNUTLS_E_PK_SIG_VERIFY_FAILED
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_PK_SIG_VERIFY_FAILED
  * if verification failed, otherwise a negative error value.
  **/
 int

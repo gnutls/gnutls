@@ -147,7 +147,7 @@ gnutls_mac_get_key_size (gnutls_mac_algorithm_t algorithm)
  *
  * This function is not thread safe.
  *
- * Returns: Return a zero-terminated list of #gnutls_mac_algorithm_t
+ * Returns: Return a (0)-terminated list of #gnutls_mac_algorithm_t
  *   integers indicating the available MACs.
  **/
 const gnutls_mac_algorithm_t *

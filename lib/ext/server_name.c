@@ -107,7 +107,7 @@ _gnutls_server_name_recv_params (gnutls_session_t session,
             }
           else
             _gnutls_handshake_log
-              ("HSK[%p]: Received zero size server name (under attack?)\n",
+              ("HSK[%p]: Received (0) size server name (under attack?)\n",
                session);
 
         }
@@ -274,8 +274,8 @@ _gnutls_server_name_send_params (gnutls_session_t session,
  * and so on.  If no name with the given index exists
  * GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 int
 gnutls_server_name_get (gnutls_session_t session, void *data,
@@ -343,12 +343,12 @@ gnutls_server_name_get (gnutls_session_t session, void *data,
  * virtual hosting.
  *
  * The value of @name depends on the @type type.  In case of
- * %GNUTLS_NAME_DNS, an ASCII zero-terminated domain name string,
+ * %GNUTLS_NAME_DNS, an ASCII (0)-terminated domain name string,
  * without the trailing dot, is expected.  IPv4 or IPv6 addresses are
  * not permitted.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 int
 gnutls_server_name_set (gnutls_session_t session,

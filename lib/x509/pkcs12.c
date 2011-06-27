@@ -131,7 +131,7 @@ cleanup:
  * usually contain lists of X.509 Certificates and X.509 Certificate
  * revocation lists.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -185,7 +185,7 @@ gnutls_pkcs12_deinit (gnutls_pkcs12_t pkcs12)
  *
  * If the PKCS12 is PEM encoded it should have a header of "PKCS12".
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -268,7 +268,7 @@ cleanup:
  * If the structure is PEM encoded, it will have a header
  * of "BEGIN PKCS12".
  *
- * Return value: In case of failure a negative value will be
+ * Return value: In case of failure a negative error code will be
  *   returned, and 0 on success.
  **/
 int
@@ -580,7 +580,7 @@ cleanup:
  * After the last Bag has been read
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -725,7 +725,7 @@ cleanup:
  *
  * This function will insert a Bag into the PKCS12 structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -857,7 +857,7 @@ cleanup:
  *
  * This function will generate a MAC for the PKCS12 structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -990,7 +990,7 @@ cleanup:
  *
  * This function will verify the MAC for the PKCS12 structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -1206,7 +1206,7 @@ write_attributes (gnutls_pkcs12_bag_t bag, int elem,
 
 
 /* Encodes the bag into a SafeContents structure, and puts the output in
- * the given datum. Enc is set to non zero if the data are encrypted;
+ * the given datum. Enc is set to non (0) if the data are encrypted;
  */
 int
 _pkcs12_encode_safe_contents (gnutls_pkcs12_bag_t bag, ASN1_TYPE * contents,

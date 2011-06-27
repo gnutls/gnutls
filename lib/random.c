@@ -64,7 +64,7 @@ _gnutls_rnd_deinit (void)
  * This function will generate random data and store it
  * to output buffer.
  *
- * Returns: Zero or a negative value on error.
+ * Returns: Zero or a negative error code on error.
  *
  **/
 

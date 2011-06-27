@@ -39,7 +39,7 @@
  * #gnutls_pcert_st structure. The structure must be deinitialized
  * afterwards using gnutls_pcert_deinit();
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int gnutls_pcert_import_x509 (gnutls_pcert_st* pcert,
@@ -110,7 +110,7 @@ cleanup:
  * #gnutls_pcert_st structure. The structure must be deinitialized
  * afterwards using gnutls_pcert_deinit();
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int gnutls_pcert_import_x509_raw (gnutls_pcert_st *pcert,
@@ -158,7 +158,7 @@ cleanup:
  * #gnutls_pcert_st structure. The structure must be deinitialized
  * afterwards using gnutls_pcert_deinit();
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int gnutls_pcert_import_openpgp (gnutls_pcert_st* pcert,
@@ -230,7 +230,7 @@ cleanup:
  * #gnutls_pcert_st structure. The structure must be deinitialized
  * afterwards using gnutls_pcert_deinit();
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int gnutls_pcert_import_openpgp_raw (gnutls_pcert_st *pcert,

@@ -112,7 +112,7 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
         {
           *p++ = 0;
           *p++ = pw[j];
-          if (++j > pwlen)      /* Note, that we include the trailing zero */
+          if (++j > pwlen)      /* Note, that we include the trailing (0) */
             j = 0;
         }
     }

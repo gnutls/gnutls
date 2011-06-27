@@ -47,7 +47,7 @@ _format_conv (gnutls_bigint_format_t format)
     return GCRYMPI_FMT_PGP;
 }
 
-/* returns zero on success
+/* returns (0) on success
  */
 static bigint_t
 wrap_gcry_mpi_scan (const void *buffer, size_t nbytes,
@@ -82,7 +82,7 @@ wrap_gcry_mpi_print (const bigint_t a, void *buffer, size_t * nbytes,
         {
 
           /* in STD format we may want to include
-           * an extra byte for zero. Sometimes the gcry_
+           * an extra byte for (0). Sometimes the gcry_
            * function doesn't add it.
            */
           if (format == GNUTLS_MPI_FORMAT_STD)

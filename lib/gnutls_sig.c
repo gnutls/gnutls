@@ -608,7 +608,7 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
  * 20091031: works for TLS 1.2 too!
  *
  * For TLS1.x, x<2 returns negative for failure and zero or unspecified for success.
- * For TLS1.2 returns the signature algorithm used on success, or a negative value;
+ * For TLS1.2 returns the signature algorithm used on success, or a negative error code;
  */
 int
 _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,

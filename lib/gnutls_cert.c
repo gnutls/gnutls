@@ -108,7 +108,7 @@ gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc)
  *
  * This function will return the issuer of a given certificate.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -642,7 +642,7 @@ _gnutls_openpgp_crt_verify_peers (gnutls_session_t session,
  * This function uses gnutls_x509_crt_list_verify() with the CAs in
  * the credentials as trusted CAs.
  *
- * Returns: a negative error code on error and zero on success.
+ * Returns: a negative error code on error and %GNUTLS_E_SUCCESS (0) on success.
  **/
 int
 gnutls_certificate_verify_peers2 (gnutls_session_t session,

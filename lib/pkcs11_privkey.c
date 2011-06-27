@@ -41,7 +41,7 @@ struct gnutls_pkcs11_privkey_st
  *
  * This function will initialize an private key structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -87,7 +87,7 @@ gnutls_pkcs11_privkey_deinit (gnutls_pkcs11_privkey_t key)
  * key.
  *
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
- *   success, or a negative value on error.
+ *   success, or a negative error code on error.
  **/
 int
 gnutls_pkcs11_privkey_get_pk_algorithm (gnutls_pkcs11_privkey_t key,
@@ -110,7 +110,7 @@ gnutls_pkcs11_privkey_get_pk_algorithm (gnutls_pkcs11_privkey_t key,
  * output is text it returns null terminated string although #output_size contains
  * the size of the actual data only.
  *
- * Returns: zero on success or a negative value on error.
+ * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
  **/
 int
 gnutls_pkcs11_privkey_get_info (gnutls_pkcs11_privkey_t pkey,
@@ -148,7 +148,7 @@ gnutls_pkcs11_privkey_get_info (gnutls_pkcs11_privkey_t pkey,
  * supported by the private key. It is assumed that the given data
  * are the output of a hash function.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  -*/
 int
@@ -223,7 +223,7 @@ cleanup:
  * in most cases keys cannot be exported, the private key structure
  * is being associated with the available operations on the token.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -302,7 +302,7 @@ cleanup:
  * This function will decrypt the given data using the public key algorithm
  * supported by the private key. 
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  -*/
 int
@@ -377,7 +377,7 @@ cleanup:
  *
  * This function will export a URL identifying the given key.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int

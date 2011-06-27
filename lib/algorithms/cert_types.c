@@ -84,7 +84,7 @@ static const gnutls_certificate_type_t supported_certificate_types[] = {
  * OpenPGP certificates, you must link to libgnutls-extra and call
  * gnutls_global_init_extra().
  *
- * Returns: a zero-terminated list of #gnutls_certificate_type_t
+ * Returns: a (0)-terminated list of #gnutls_certificate_type_t
  *   integers indicating the available certificate types.
  **/
 const gnutls_certificate_type_t *

@@ -162,7 +162,7 @@ _gnutls_crypto_deregister (void)
  * For simplicity you can use the convenience
  * gnutls_crypto_single_cipher_register() macro.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.6.0
  -*/
@@ -196,7 +196,7 @@ _gnutls_get_crypto_cipher (gnutls_cipher_algorithm_t algo)
  * For simplicity you can use the convenience
  * gnutls_crypto_rnd_register() macro.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.6.0
  -*/
@@ -231,7 +231,7 @@ gnutls_crypto_rnd_register (int priority,
  * For simplicity you can use the convenience
  * gnutls_crypto_single_mac_register() macro.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.6.0
  -*/
@@ -266,7 +266,7 @@ _gnutls_get_crypto_mac (gnutls_mac_algorithm_t algo)
  * For simplicity you can use the convenience
  * gnutls_crypto_single_digest_register() macro.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.6.0
  -*/
@@ -303,7 +303,7 @@ _gnutls_get_crypto_digest (gnutls_digest_algorithm_t algo)
  * For simplicity you can use the convenience gnutls_crypto_bigint_register()
  * macro.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.6.0
  -*/
@@ -340,7 +340,7 @@ gnutls_crypto_bigint_register (int priority,
  * For simplicity you can use the convenience gnutls_crypto_pk_register()
  * macro.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.6.0
  -*/
@@ -374,7 +374,7 @@ gnutls_crypto_pk_register (int priority,
  * For simplicity you can use the convenience
  * gnutls_crypto_cipher_register() macro.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.6.0
  -*/
@@ -408,7 +408,7 @@ gnutls_crypto_cipher_register (int priority,
  * For simplicity you can use the convenience
  * gnutls_crypto_digest_register() macro.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.6.0
  -*/
@@ -442,7 +442,7 @@ gnutls_crypto_mac_register (int priority,
  * For simplicity you can use the convenience
  * gnutls_crypto_digest_register() macro.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.6.0
  -*/

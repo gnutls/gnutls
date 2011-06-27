@@ -38,7 +38,7 @@
  * This function will copy a raw secret (symmetric) key into a PKCS #11 
  * token specified by a URL. The key can be marked as sensitive or not.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int

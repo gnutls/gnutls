@@ -350,7 +350,7 @@ session_ticket_recv_params (gnutls_session_t session,
   return 0;
 }
 
-/* returns a positive number if we send the extension data, zero if we
+/* returns a positive number if we send the extension data, (0) if we
    do not want to send it, and a negative number on failure.
  */
 static int

@@ -298,8 +298,8 @@ gnutls_record_get_max_size (gnutls_session_t session)
  * This function uses a TLS extension called 'max record size'.  Not
  * all TLS implementations use or even understand this extension.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 ssize_t
 gnutls_record_set_max_size (gnutls_session_t session, size_t size)

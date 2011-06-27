@@ -279,7 +279,7 @@ _gnutls_ecc_curve_get_params (gnutls_ecc_curve_t curve)
  *
  * Returns the size in bytes of the curve.
  *
- * Returns: a the size or zero.
+ * Returns: a the size or (0).
  **/
 int gnutls_ecc_curve_get_size (gnutls_ecc_curve_t curve)
 {

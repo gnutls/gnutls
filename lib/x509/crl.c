@@ -44,7 +44,7 @@
  * Authority. The revocation lists are always signed with the
  * authority's private key.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -97,7 +97,7 @@ gnutls_x509_crl_deinit (gnutls_x509_crl_t crl)
  *
  * If the CRL is PEM encoded it should have a header of "X509 CRL".
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -197,8 +197,8 @@ gnutls_x509_crl_get_issuer_dn (const gnutls_x509_crl_t crl, char *buf,
  * gnutls_x509_crl_get_issuer_dn_by_oid:
  * @crl: should contain a gnutls_x509_crl_t structure
  * @oid: holds an Object Identified in null terminated string
- * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use zero to get the first one.
- * @raw_flag: If non zero returns the raw DER data of the DN part.
+ * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use (0) to get the first one.
+ * @raw_flag: If non (0) returns the raw DER data of the DN part.
  * @buf: a pointer to a structure to hold the peer's name (may be null)
  * @sizeof_buf: initially holds the size of @buf
  *
@@ -208,7 +208,7 @@ gnutls_x509_crl_get_issuer_dn (const gnutls_x509_crl_t crl, char *buf,
  * depending on the certificate data.
  *
  * Some helper macros with popular OIDs can be found in gnutls/x509.h
- * If raw flag is zero, this function will only return known OIDs as
+ * If raw flag is (0), this function will only return known OIDs as
  * text. Other OIDs will be DER encoded, as described in RFC2253 -- in
  * hex format with a '\#' prefix.  You can check about known OIDs
  * using gnutls_x509_dn_oid_known().
@@ -239,7 +239,7 @@ gnutls_x509_crl_get_issuer_dn_by_oid (gnutls_x509_crl_t crl,
 /**
  * gnutls_x509_crl_get_dn_oid:
  * @crl: should contain a gnutls_x509_crl_t structure
- * @indx: Specifies which DN OID to send. Use zero to get the first one.
+ * @indx: Specifies which DN OID to send. Use (0) to get the first one.
  * @oid: a pointer to a structure to hold the name (may be null)
  * @sizeof_oid: initially holds the size of 'oid'
  *
@@ -275,7 +275,7 @@ gnutls_x509_crl_get_dn_oid (gnutls_x509_crl_t crl,
  * This function will return a value of the #gnutls_sign_algorithm_t
  * enumeration that is the signature algorithm.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -319,8 +319,8 @@ gnutls_x509_crl_get_signature_algorithm (gnutls_x509_crl_t crl)
  *
  * This function will extract the signature field of a CRL.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value. and a negative value on error.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. and a negative error code on error.
  **/
 int
 gnutls_x509_crl_get_signature (gnutls_x509_crl_t crl,
@@ -374,7 +374,7 @@ gnutls_x509_crl_get_signature (gnutls_x509_crl_t crl,
  *
  * This function will return the version of the specified CRL.
  *
- * Returns: The version number, or a negative value on error.
+ * Returns: The version number, or a negative error code on error.
  **/
 int
 gnutls_x509_crl_get_version (gnutls_x509_crl_t crl)
@@ -449,7 +449,7 @@ gnutls_x509_crl_get_next_update (gnutls_x509_crl_t crl)
  * This function will return the number of revoked certificates in the
  * given CRL.
  *
- * Returns: number of certificates, a negative value on failure.
+ * Returns: number of certificates, a negative error code on failure.
  **/
 int
 gnutls_x509_crl_get_crt_count (gnutls_x509_crl_t crl)
@@ -487,8 +487,8 @@ gnutls_x509_crl_get_crt_count (gnutls_x509_crl_t crl)
  * This function will retrieve the serial number of the specified, by
  * the index, revoked certificate.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value. and a negative value on error.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. and a negative error code on error.
  **/
 int
 gnutls_x509_crl_get_crt_serial (gnutls_x509_crl_t crl, int indx,
@@ -539,7 +539,7 @@ gnutls_x509_crl_get_crt_serial (gnutls_x509_crl_t crl, int indx,
  * This function will return a pointer to the DER encoded DN structure
  * and the length.
  *
- * Returns: a negative value on error, and zero on success.
+ * Returns: a negative error code on error, and (0) on success.
  *
  * Since: 2.12.0
  **/
@@ -627,8 +627,8 @@ cleanup:
  * If the structure is PEM encoded, it will have a header
  * of "BEGIN X509 CRL".
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative error value. and a negative value on failure.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value. and a negative error code on failure.
  **/
 int
 gnutls_x509_crl_export (gnutls_x509_crl_t crl,
@@ -652,7 +652,7 @@ gnutls_x509_crl_export (gnutls_x509_crl_t crl,
  *
  * This function will copy an X.509 certificate structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  -*/
 int
@@ -706,7 +706,7 @@ _gnutls_x509_crl_cpy (gnutls_x509_crl_t dest, gnutls_x509_crl_t src)
  * @crl: should contain a #gnutls_x509_crl_t structure
  * @ret: The place where the identifier will be copied
  * @ret_size: Holds the size of the result field.
- * @critical: will be non zero if the extension is marked as critical
+ * @critical: will be non (0) if the extension is marked as critical
  *   (may be null)
  *
  * This function will return the CRL authority's key identifier.  This
@@ -714,8 +714,8 @@ _gnutls_x509_crl_cpy (gnutls_x509_crl_t dest, gnutls_x509_crl_t src)
  * (2.5.29.35).  Note that this function only returns the
  * keyIdentifier field of the extension.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative value in case of an error.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error code in case of an error.
  *
  * Since: 2.8.0
  **/
@@ -797,14 +797,14 @@ gnutls_x509_crl_get_authority_key_id (gnutls_x509_crl_t crl, void *ret,
  * @crl: should contain a #gnutls_x509_crl_t structure
  * @ret: The place where the number will be copied
  * @ret_size: Holds the size of the result field.
- * @critical: will be non zero if the extension is marked as critical
+ * @critical: will be non (0) if the extension is marked as critical
  *   (may be null)
  *
  * This function will return the CRL number extension.  This is
  * obtained by the CRL Number extension field (2.5.29.20).
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative value in case of an error.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error code in case of an error.
  *
  * Since: 2.8.0
  **/
@@ -856,7 +856,7 @@ gnutls_x509_crl_get_number (gnutls_x509_crl_t crl, void *ret,
 /**
  * gnutls_x509_crl_get_extension_oid:
  * @crl: should contain a #gnutls_x509_crl_t structure
- * @indx: Specifies which extension OID to send, use zero to get the first one.
+ * @indx: Specifies which extension OID to send, use (0) to get the first one.
  * @oid: a pointer to a structure to hold the OID (may be null)
  * @sizeof_oid: initially holds the size of @oid
  *
@@ -864,8 +864,8 @@ gnutls_x509_crl_get_number (gnutls_x509_crl_t crl, void *ret,
  * The extension OID will be stored as a string in the provided
  * buffer.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative value in case of an error.  If your have reached the
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error code in case of an error.  If your have reached the
  *   last extension available %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  *   will be returned.
  *
@@ -896,7 +896,7 @@ gnutls_x509_crl_get_extension_oid (gnutls_x509_crl_t crl, int indx,
 /**
  * gnutls_x509_crl_get_extension_info:
  * @crl: should contain a #gnutls_x509_crl_t structure
- * @indx: Specifies which extension OID to send, use zero to get the first one.
+ * @indx: Specifies which extension OID to send, use (0) to get the first one.
  * @oid: a pointer to a structure to hold the OID
  * @sizeof_oid: initially holds the maximum size of @oid, on return
  *   holds actual size of @oid.
@@ -911,8 +911,8 @@ gnutls_x509_crl_get_extension_oid (gnutls_x509_crl_t crl, int indx,
  * *@sizeof_oid is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will be
  * returned.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative value in case of an error.  If your have reached the
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error code in case of an error.  If your have reached the
  *   last extension available %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  *   will be returned.
  *
@@ -974,7 +974,7 @@ gnutls_x509_crl_get_extension_info (gnutls_x509_crl_t crl, int indx,
 /**
  * gnutls_x509_crl_get_extension_data:
  * @crl: should contain a #gnutls_x509_crl_t structure
- * @indx: Specifies which extension OID to send. Use zero to get the first one.
+ * @indx: Specifies which extension OID to send. Use (0) to get the first one.
  * @data: a pointer to a structure to hold the data (may be null)
  * @sizeof_data: initially holds the size of @oid
  *
@@ -987,8 +987,8 @@ gnutls_x509_crl_get_extension_info (gnutls_x509_crl_t crl, int indx,
  * if you want to get data indexed by the extension OID rather than
  * sequence.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
- *   negative value in case of an error.  If your have reached the
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error code in case of an error.  If your have reached the
  *   last extension available %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
  *   will be returned.
  *
@@ -1031,7 +1031,7 @@ gnutls_x509_crl_get_extension_data (gnutls_x509_crl_t crl, int indx,
  * @size: It will contain the size of the list.
  * @data: The PEM encoded CRL.
  * @format: One of DER or PEM.
- * @flags: must be zero or an OR'd sequence of gnutls_certificate_import_flags.
+ * @flags: must be (0) or an OR'd sequence of gnutls_certificate_import_flags.
  *
  * This function will convert the given PEM encoded CRL list
  * to the native gnutls_x509_crl_t format. The output will be stored
@@ -1088,7 +1088,7 @@ int ret;
  * @crl_max: Initially must hold the maximum number of crls. It will be updated with the number of crls available.
  * @data: The PEM encoded CRLs
  * @format: One of DER or PEM.
- * @flags: must be zero or an OR'd sequence of gnutls_certificate_import_flags.
+ * @flags: must be (0) or an OR'd sequence of gnutls_certificate_import_flags.
  *
  * This function will convert the given PEM encoded CRL list
  * to the native gnutls_x509_crl_t format. The output will be stored

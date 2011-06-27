@@ -662,7 +662,7 @@ cleanup:
 
 /* Finds the appropriate certificate depending on the cA Distinguished name
  * advertized by the server. If none matches then returns 0 and -1 as index.
- * In case of an error a negative value, is returned.
+ * In case of an error a negative error code, is returned.
  *
  * 20020128: added ability to select a certificate depending on the SIGN
  * algorithm (only in automatic mode).
@@ -1811,7 +1811,7 @@ _gnutls_gen_cert_server_cert_req (gnutls_session_t session,
 
 /* This function will return the appropriate certificate to use. 
  * Fills in the apr_cert_list, apr_cert_list_length and apr_pkey.
- * The return value is a negative value on error.
+ * The return value is a negative error code on error.
  *
  * It is normal to return 0 with no certificates in client side.
  *
@@ -2080,7 +2080,7 @@ _gnutls_selected_certs_set (gnutls_session_t session,
  * requested_algo holds the parameters required by the peer (RSA, DSA
  * or -1 for any).
  *
- * Returns 0 on success and a negative value on error. The
+ * Returns 0 on success and a negative error code on error. The
  * selected certificate will be in session->internals.selected_*.
  *
  */

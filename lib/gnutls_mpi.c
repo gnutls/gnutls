@@ -124,7 +124,7 @@ _gnutls_mpi_release (bigint_t * x)
   *x = NULL;
 }
 
-/* returns zero on success
+/* returns %GNUTLS_E_SUCCESS (0) on success
  */
 int
 _gnutls_mpi_scan (bigint_t * ret_mpi, const void *buffer, size_t nbytes)
@@ -140,7 +140,7 @@ _gnutls_mpi_scan (bigint_t * ret_mpi, const void *buffer, size_t nbytes)
   return 0;
 }
 
-/* returns zero on success. Fails if the number is zero.
+/* returns %GNUTLS_E_SUCCESS (0) on success. Fails if the number is zero.
  */
 int
 _gnutls_mpi_scan_nz (bigint_t * ret_mpi, const void *buffer, size_t nbytes)

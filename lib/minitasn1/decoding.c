@@ -168,7 +168,7 @@ asn1_get_tag_der (const unsigned char *der, int der_len,
  * asn1_get_length_der() is that this function will return a length
  * even if the value has indefinite encoding.
  *
- * Returns: Return the decoded length value, or negative value when
+ * Returns: Return the decoded length value, or negative error code when
  *   the value was too big.
  *
  * Since: 2.0

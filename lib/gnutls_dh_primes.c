@@ -58,8 +58,8 @@ _gnutls_dh_params_to_mpi (gnutls_dh_params_t dh_primes)
  * in the Diffie-Hellman key exchange.  The new parameters should be
  * stored in the appropriate gnutls_datum.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 int
 gnutls_dh_params_import_raw (gnutls_dh_params_t dh_params,
@@ -99,8 +99,8 @@ gnutls_dh_params_import_raw (gnutls_dh_params_t dh_params,
  *
  * This function will initialize the DH parameters structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 int
 gnutls_dh_params_init (gnutls_dh_params_t * dh_params)
@@ -144,8 +144,8 @@ gnutls_dh_params_deinit (gnutls_dh_params_t dh_params)
  * This function will copy the DH parameters structure from source
  * to destination.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 int
 gnutls_dh_params_cpy (gnutls_dh_params_t dst, gnutls_dh_params_t src)
@@ -179,8 +179,8 @@ gnutls_dh_params_cpy (gnutls_dh_params_t dst, gnutls_dh_params_t src)
  * Since clients use the parameters sent by the server, it's of
  * no use to call this in client side.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 int
 gnutls_dh_params_generate2 (gnutls_dh_params_t params, unsigned int bits)
@@ -213,8 +213,8 @@ gnutls_dh_params_generate2 (gnutls_dh_params_t params, unsigned int bits)
  * If the structure is PEM encoded, it should have a header
  * of "BEGIN DH PARAMETERS".
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 int
 gnutls_dh_params_import_pkcs3 (gnutls_dh_params_t params,
@@ -325,8 +325,8 @@ gnutls_dh_params_import_pkcs3 (gnutls_dh_params_t params,
  * If the structure is PEM encoded, it will have a header
  * of "BEGIN DH PARAMETERS".
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 int
 gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
@@ -499,8 +499,8 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
  * allocated using gnutls_malloc() and will be stored in the
  * appropriate datum.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 int
 gnutls_dh_params_export_raw (gnutls_dh_params_t params,

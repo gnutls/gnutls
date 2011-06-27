@@ -496,7 +496,7 @@ cdk_kbnode_write_to_mem_alloc (cdk_kbnode_t node,
  * @r_nbytes: the new length of the buffer.
  *
  * Tries to write the contents of the key node to the buffer @buf and
- * return the length of it in @r_nbytes. If buf is zero, only the
+ * return the length of it in @r_nbytes. If buf is (0), only the
  * length of the node is calculated and returned in @r_nbytes.
  * Whenever it is possible, the cdk_kbnode_write_to_mem_alloc should be used.
  **/
@@ -568,7 +568,7 @@ cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte * buf, size_t * r_nbytes)
  * @node: the key node
  * @hashctx: opaque pointer to the hash context
  * @is_v4: OpenPGP signature (yes=1, no=0)
- * @pkttype: packet type to hash (if zero use the packet type from the node)
+ * @pkttype: packet type to hash (if (0) use the packet type from the node)
  * @flags: flags which depend on the operation
  *
  * Hashes the key node contents. Two modes are supported. If the packet

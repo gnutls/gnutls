@@ -635,7 +635,7 @@ cleanup:
 }
 
 /* This will encode and write the AttributeTypeAndValue field.
- * 'multi' must be zero if writing an AttributeTypeAndValue, and 1 if Attribute.
+ * 'multi' must be (0) if writing an AttributeTypeAndValue, and 1 if Attribute.
  * In all cases only one value is written.
  */
 int
@@ -764,7 +764,7 @@ error:
 }
 
 /* This will write the AttributeTypeAndValue field. The data must be already DER encoded.
- * 'multi' must be zero if writing an AttributeTypeAndValue, and 1 if Attribute.
+ * 'multi' must be (0) if writing an AttributeTypeAndValue, and 1 if Attribute.
  * In all cases only one value is written.
  */
 static int
@@ -807,7 +807,7 @@ _gnutls_x509_write_attribute (const char *given_oid,
 /* Decodes an X.509 Attribute (if multi==1) or an AttributeTypeAndValue
  * otherwise.
  *
- * octet_string should be non zero if we are to decode octet strings after
+ * octet_string should be non (0) if we are to decode octet strings after
  * decoding.
  *
  * The output is allocated and stored in value.
@@ -949,7 +949,7 @@ _gnutls_x509_set_dn_oid (ASN1_TYPE asn1_struct,
  * The object returned must be deallocated using
  * gnutls_x509_dn_deinit().
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 2.4.0
@@ -983,7 +983,7 @@ gnutls_x509_dn_init (gnutls_x509_dn_t * dn)
  * with gnutls_x509_dn_init(). You may use gnutls_x509_dn_get_rdn_ava() to
  * decode the DN.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 2.4.0
@@ -1032,7 +1032,7 @@ gnutls_x509_dn_deinit (gnutls_x509_dn_t dn)
  * name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in
  * RFC2253.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, or
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or
  * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@sizeof_buf is
  * updated if the provided buffer is not long enough, otherwise a
  * negative error value.
@@ -1084,7 +1084,7 @@ gnutls_x509_rdn_get (const gnutls_datum_t * idn,
  * @oid: an Object Identifier
  * @indx: In case multiple same OIDs exist in the RDN indicates which
  *   to send. Use 0 for the first one.
- * @raw_flag: If non zero then the raw DER data are returned.
+ * @raw_flag: If non (0) then the raw DER data are returned.
  * @buf: a pointer to a structure to hold the peer's name
  * @sizeof_buf: holds the size of @buf
  *
@@ -1092,7 +1092,7 @@ gnutls_x509_rdn_get (const gnutls_datum_t * idn,
  * of the RDN sequence.  The name will be encoded using the rules
  * from RFC2253.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, or
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or
  * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@sizeof_buf is
  * updated if the provided buffer is not long enough, otherwise a
  * negative error value.
@@ -1146,7 +1146,7 @@ gnutls_x509_rdn_get_by_oid (const gnutls_datum_t * idn, const char *oid,
  * This function will return the specified Object identifier, of the
  * RDN sequence.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, or
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or
  * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@sizeof_buf is
  * updated if the provided buffer is not long enough, otherwise a
  * negative error value.
@@ -1194,8 +1194,8 @@ gnutls_x509_rdn_get_oid (const gnutls_datum_t * idn,
  *
  * FIXME: use a real DN comparison algorithm.
  *
- * Returns 1 if the DN's match and zero if they don't match. Otherwise
- * a negative value is returned to indicate error.
+ * Returns 1 if the DN's match and (0) if they don't match. Otherwise
+ * a negative error code is returned to indicate error.
  */
 int
 _gnutls_x509_compare_raw_dn (const gnutls_datum_t * dn1,
@@ -1232,7 +1232,7 @@ _gnutls_x509_compare_raw_dn (const gnutls_datum_t * dn1,
  * If the structure is PEM encoded, it will have a header
  * of "BEGIN NAME".
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int

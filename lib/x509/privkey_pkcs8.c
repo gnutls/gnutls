@@ -595,7 +595,7 @@ error:
  * of "BEGIN ENCRYPTED PRIVATE KEY" or "BEGIN PRIVATE KEY" if
  * encryption is not used.
  *
- * Return value: In case of failure a negative value will be
+ * Return value: In case of failure a negative error code will be
  *   returned, and 0 on success.
  **/
 int
@@ -1175,7 +1175,7 @@ error:
  * specify the flags if the key is DER encoded, since in that case
  * the encryption status cannot be auto-detected.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int

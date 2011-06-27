@@ -41,7 +41,7 @@
  *
  * This function will initialize an private key structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -84,7 +84,7 @@ gnutls_x509_privkey_deinit (gnutls_x509_privkey_t key)
  * This function will copy a private key from source to destination
  * key. Destination has to be initialized.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -429,7 +429,7 @@ error:
  * If the key is PEM encoded it should have a header of "RSA PRIVATE
  * KEY", or "DSA PRIVATE KEY".
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -578,7 +578,7 @@ failover:
  * native #gnutls_x509_privkey_t format.  The output will be stored in
  * @key.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -610,7 +610,7 @@ gnutls_x509_privkey_import_rsa_raw (gnutls_x509_privkey_t key,
  * native #gnutls_x509_privkey_t format.  The output will be stored in
  * @key.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -751,7 +751,7 @@ cleanup:
  * native #gnutls_x509_privkey_t format.  The output will be stored
  * in @key.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -844,7 +844,7 @@ cleanup:
  * native #gnutls_x509_privkey_t format.  The output will be stored
  * in @key.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -911,7 +911,7 @@ cleanup:
  * key.
  *
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
- *   success, or a negative value on error.
+ *   success, or a negative error code on error.
  **/
 int
 gnutls_x509_privkey_get_pk_algorithm (gnutls_x509_privkey_t key)
@@ -944,7 +944,7 @@ gnutls_x509_privkey_get_pk_algorithm (gnutls_x509_privkey_t key)
  * If the structure is PEM encoded, it will have a header
  * of "BEGIN RSA PRIVATE KEY".
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -1018,7 +1018,7 @@ gnutls_x509_privkey_sec_param (gnutls_x509_privkey_t key)
  * in the given structure. The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int gnutls_x509_privkey_export_ecc_raw (gnutls_x509_privkey_t key, 
@@ -1082,7 +1082,7 @@ int gnutls_x509_privkey_export_ecc_raw (gnutls_x509_privkey_t key,
  * in the given structure. The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -1112,7 +1112,7 @@ gnutls_x509_privkey_export_rsa_raw (gnutls_x509_privkey_t key,
  * in the given structure. The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -1247,7 +1247,7 @@ error:
  * in the given structure. The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -1333,7 +1333,7 @@ gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
  *
  * Do not set the number of bits directly, use gnutls_sec_param_to_pk_bits().
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -1398,7 +1398,7 @@ cleanup:
  * be returned.  The output will normally be a SHA-1 hash output,
  * which is 20 bytes.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -1459,7 +1459,7 @@ cleanup:
  * @hash_algo: The hash algorithm used
  * @hash_data: holds the data to be signed
  * @signature: will contain newly allocated signature
- * @flags: zero for now
+ * @flags: (0) for now
  *
  * This function will sign the given hashed data using a signature algorithm
  * supported by the private key. Signature algorithms are always used
@@ -1472,7 +1472,7 @@ cleanup:
  *
  * The RSA algorithm is used in PKCS #1 v1.5 mode.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  -*/
 static int
@@ -1528,7 +1528,7 @@ cleanup:
  * requires the data to be hashed and stored in special formats 
  * (e.g. BER Digest-Info for RSA).
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Deprecated in: 2.12.0
@@ -1579,7 +1579,7 @@ gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
  * Use gnutls_x509_crt_get_preferred_hash_algorithm() to determine
  * the hash algorithm.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Deprecated: Use gnutls_privkey_sign_data().
@@ -1643,7 +1643,7 @@ gnutls_x509_privkey_sign_data (gnutls_x509_privkey_t key,
  * This function will recalculate the secondary parameters in a key.
  * In RSA keys, this can be the coefficient and exponent1,2.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int

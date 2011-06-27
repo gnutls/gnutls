@@ -327,7 +327,7 @@ gen_rsa_export_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
   return data->length;
 }
 
-/* if the peer's certificate is of 512 bits or less, returns non zero.
+/* if the peer's certificate is of 512 bits or less, returns non (0).
  */
 int
 _gnutls_peers_cert_less_512 (gnutls_session_t session)

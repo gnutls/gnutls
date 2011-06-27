@@ -36,7 +36,7 @@
  * described in RFC2818 (HTTPS), which takes into account wildcards,
  * and the DNSName/IPAddress subject alternative name PKIX extension.
  *
- * Returns: non zero for a successful match, and zero on failure.
+ * Returns: non (0) for a successful match, and (0) on failure.
  **/
 int
 gnutls_x509_crt_check_hostname (gnutls_x509_crt_t cert, const char *hostname)

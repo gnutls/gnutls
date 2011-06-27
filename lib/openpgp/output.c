@@ -499,12 +499,12 @@ print_oneline (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
  * gnutls_openpgp_crt_print:
  * @cert: The structure to be printed
  * @format: Indicate the format to use
- * @out: Newly allocated datum with zero terminated string.
+ * @out: Newly allocated datum with (0) terminated string.
  *
  * This function will pretty print an OpenPGP certificate, suitable
  * for display to a human.
  *
- * The format should be zero for future compatibility.
+ * The format should be (0) for future compatibility.
  *
  * The output @out needs to be deallocate using gnutls_free().
  *

@@ -107,7 +107,7 @@ gnutls_openpgp_privkey_sec_param (gnutls_openpgp_privkey_t key)
  * @data: The RAW or BASE64 encoded key.
  * @format: One of #gnutls_openpgp_crt_fmt_t elements.
  * @password: not used for now
- * @flags: should be zero
+ * @flags: should be (0)
  *
  * This function will convert the given RAW or Base64 encoded key to
  * the native gnutls_openpgp_privkey_t format.  The output will be
@@ -190,7 +190,7 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
  * @key: Holds the key.
  * @format: One of gnutls_openpgp_crt_fmt_t elements.
  * @password: the password that will be used to encrypt the key. (unused for now)
- * @flags: zero for future compatibility
+ * @flags: (0) for future compatibility
  * @output_data: will contain the key base64 encoded or raw
  * @output_data_size: holds the size of output_data (and will be
  *   replaced by the actual size of parameters)
@@ -228,7 +228,7 @@ gnutls_openpgp_privkey_export (gnutls_openpgp_privkey_t key,
  * For DSA the bits returned are of the public exponent.
  *
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
- *   success, or a negative value on error.
+ *   success, or a negative error code on error.
  *
  * Since: 2.4.0
  **/
@@ -282,7 +282,7 @@ _gnutls_openpgp_get_algo (int cdk_algo)
  * Get revocation status of key.
  *
  * Returns: true (1) if the key has been revoked, or false (0) if it
- *   has not, or a negative value indicates an error.
+ *   has not, or a negative error code indicates an error.
  *
  * Since: 2.4.0
  **/
@@ -395,7 +395,7 @@ gnutls_openpgp_privkey_get_key_id (gnutls_openpgp_privkey_t key,
  * This function will return the number of subkeys present in the
  * given OpenPGP certificate.
  *
- * Returns: the number of subkeys, or a negative value on error.
+ * Returns: the number of subkeys, or a negative error code on error.
  *
  * Since: 2.4.0
  **/
@@ -452,7 +452,7 @@ _get_secret_subkey (gnutls_openpgp_privkey_t key, unsigned int indx)
  * Get revocation status of key.
  *
  * Returns: true (1) if the key has been revoked, or false (0) if it
- *   has not, or a negative value indicates an error.
+ *   has not, or a negative error code indicates an error.
  *
  * Since: 2.4.0
  **/
@@ -491,7 +491,7 @@ gnutls_openpgp_privkey_get_subkey_revoked_status (gnutls_openpgp_privkey_t
  * For DSA the bits returned are of the public exponent.
  *
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
- *   success, or a negative value on error.
+ *   success, or a negative error code on error.
  *
  * Since: 2.4.0
  **/
@@ -999,7 +999,7 @@ cleanup:
  * the given structure.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.4.0
  **/
@@ -1035,7 +1035,7 @@ gnutls_openpgp_privkey_export_rsa_raw (gnutls_openpgp_privkey_t pkey,
  * the given certificate.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.4.0
  **/
@@ -1073,7 +1073,7 @@ gnutls_openpgp_privkey_export_dsa_raw (gnutls_openpgp_privkey_t pkey,
  * the given structure.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.4.0
  **/
@@ -1114,7 +1114,7 @@ gnutls_openpgp_privkey_export_subkey_rsa_raw (gnutls_openpgp_privkey_t pkey,
  * in the given certificate.  The new parameters will be allocated
  * using gnutls_malloc() and will be stored in the appropriate datum.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.4.0
  **/
@@ -1216,7 +1216,7 @@ gnutls_openpgp_privkey_set_preferred_key_id (gnutls_openpgp_privkey_t key,
  * should use gnutls_openpgp_privkey_set_preferred_key_id() before
  * calling this function to set the subkey to use.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Deprecated: Use gnutls_privkey_sign_hash() instead.
@@ -1281,7 +1281,7 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
 /*-
  * _gnutls_openpgp_privkey_decrypt_data:
  * @key: Holds the key
- * @flags: zero for now
+ * @flags: (0) for now
  * @ciphertext: holds the data to be decrypted
  * @plaintext: will contain newly allocated plaintext
  *
@@ -1289,7 +1289,7 @@ gnutls_openpgp_privkey_sign_hash (gnutls_openpgp_privkey_t key,
  * should use gnutls_openpgp_privkey_set_preferred_key_id() before
  * calling this function to set the subkey to use.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  -*/
 int

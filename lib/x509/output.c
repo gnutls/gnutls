@@ -1549,7 +1549,7 @@ print_oneline (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
  * gnutls_x509_crt_print:
  * @cert: The structure to be printed
  * @format: Indicate the format to use
- * @out: Newly allocated datum with zero terminated string.
+ * @out: Newly allocated datum with (0) terminated string.
  *
  * This function will pretty print a X.509 certificate, suitable for
  * display to a human.
@@ -1561,7 +1561,7 @@ print_oneline (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
  *
  * The output @out needs to be deallocate using gnutls_free().
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -1910,14 +1910,14 @@ print_crl (gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
  * gnutls_x509_crl_print:
  * @crl: The structure to be printed
  * @format: Indicate the format to use
- * @out: Newly allocated datum with zero terminated string.
+ * @out: Newly allocated datum with (0) terminated string.
  *
  * This function will pretty print a X.509 certificate revocation
  * list, suitable for display to a human.
  *
  * The output @out needs to be deallocate using gnutls_free().
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -2222,14 +2222,14 @@ print_crq_other (gnutls_buffer_st * str, gnutls_x509_crq_t crq)
  * gnutls_x509_crq_print:
  * @crq: The structure to be printed
  * @format: Indicate the format to use
- * @out: Newly allocated datum with zero terminated string.
+ * @out: Newly allocated datum with (0) terminated string.
  *
  * This function will pretty print a certificate request, suitable for
  * display to a human.
  *
  * The output @out needs to be deallocate using gnutls_free().
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 2.8.0

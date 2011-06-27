@@ -286,7 +286,7 @@ _gnutls_handshake_internal_state_clear (gnutls_session_t session)
  * This function initializes the current session to null. Every
  * session must be initialized before use, so internal structures can
  * be allocated.  This function allocates structures which can only
- * be free'd by calling gnutls_deinit().  Returns zero on success.
+ * be free'd by calling gnutls_deinit().  Returns %GNUTLS_E_SUCCESS (0) on success.
  *
  * @flags can be one of %GNUTLS_CLIENT and %GNUTLS_SERVER. For a DTLS
  * entity, the flags %GNUTLS_DATAGRAM and  %GNUTLS_NONBLOCK are
@@ -1343,7 +1343,7 @@ gnutls_session_channel_binding (gnutls_session_t session,
 /* returns overhead imposed by the record layer (encryption/compression)
  * etc. It does include the record layer headers.
  *
- * It may return a negative value on error.
+ * It may return a negative error code on error.
  */
 int _gnutls_record_overhead_rt(gnutls_session_t session)
 {

@@ -420,7 +420,7 @@ gnutls_openpgp_crt_get_pk_algorithm (gnutls_openpgp_crt_t key,
  *
  * Extract the version of the OpenPGP key.
  *
- * Returns: the version number is returned, or a negative value on errors.
+ * Returns: the version number is returned, or a negative error code on errors.
  **/
 int
 gnutls_openpgp_crt_get_version (gnutls_openpgp_crt_t key)
@@ -590,7 +590,7 @@ gnutls_openpgp_crt_check_hostname (gnutls_openpgp_crt_t key,
       if (ret == 0)
         {
           /* Length returned by gnutls_openpgp_crt_get_name includes
-             the terminating zero. */
+             the terminating (0). */
           dnsnamesize--;
 
           if (_gnutls_hostname_compare (dnsname, dnsnamesize, hostname, 0))
@@ -660,7 +660,7 @@ gnutls_openpgp_crt_get_key_usage (gnutls_openpgp_crt_t key,
  * This function will return the number of subkeys present in the
  * given OpenPGP certificate.
  *
- * Returns: the number of subkeys, or a negative value on error.
+ * Returns: the number of subkeys, or a negative error code on error.
  *
  * Since: 2.4.0
  **/
@@ -806,7 +806,7 @@ _gnutls_openpgp_find_subkey_idx (cdk_kbnode_t knode, uint32_t keyid[2],
  * @key: the structure that contains the OpenPGP public key.
  * @idx: is the subkey index
  *
- * Get subkey revocation status.  A negative value indicates an error.
+ * Get subkey revocation status.  A negative error code indicates an error.
  *
  * Returns: true (1) if the key has been revoked, or false (0) if it
  *   has not.
@@ -1066,7 +1066,7 @@ gnutls_openpgp_crt_get_subkey_idx (gnutls_openpgp_crt_t key,
  * key algorithm.  The key usage value will ORed values of
  * %GNUTLS_KEY_DIGITAL_SIGNATURE or %GNUTLS_KEY_KEY_ENCIPHERMENT.
  *
- * A negative value may be returned in case of parsing error.
+ * A negative error code may be returned in case of parsing error.
  *
  * Returns: key usage value.
  *
@@ -1403,7 +1403,7 @@ cleanup:
  * the given structure.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.4.0
  **/
@@ -1436,7 +1436,7 @@ gnutls_openpgp_crt_get_pk_rsa_raw (gnutls_openpgp_crt_t crt,
  * the given certificate.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.4.0
  **/
@@ -1469,7 +1469,7 @@ gnutls_openpgp_crt_get_pk_dsa_raw (gnutls_openpgp_crt_t crt,
  * the given structure.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.4.0
  **/
@@ -1505,7 +1505,7 @@ gnutls_openpgp_crt_get_subkey_pk_rsa_raw (gnutls_openpgp_crt_t crt,
  * the given certificate.  The new parameters will be allocated using
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
  * Since: 2.4.0
  **/
@@ -1566,8 +1566,8 @@ gnutls_openpgp_crt_get_preferred_key_id (gnutls_openpgp_crt_t key,
  * This allows setting a preferred key id for the given certificate.
  * This key will be used by functions that involve key handling.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 int
 gnutls_openpgp_crt_set_preferred_key_id (gnutls_openpgp_crt_t key,
@@ -1600,14 +1600,14 @@ gnutls_openpgp_crt_set_preferred_key_id (gnutls_openpgp_crt_t key,
  * gnutls_openpgp_crt_get_auth_subkey:
  * @crt: the structure that contains the OpenPGP public key.
  * @keyid: the struct to save the keyid.
- * @flag: Non zero indicates that a valid subkey is always returned.
+ * @flag: Non (0) indicates that a valid subkey is always returned.
  *
  * Returns the 64-bit keyID of the first valid OpenPGP subkey marked
- * for authentication.  If flag is non zero and no authentication
+ * for authentication.  If flag is non (0) and no authentication
  * subkey exists, then a valid subkey will be returned even if it is
  * not marked for authentication.
  * Returns the 64-bit keyID of the first valid OpenPGP subkey marked
- * for authentication.  If flag is non zero and no authentication
+ * for authentication.  If flag is non (0) and no authentication
  * subkey exists, then a valid subkey will be returned even if it is
  * not marked for authentication.
  *

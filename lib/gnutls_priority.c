@@ -45,7 +45,7 @@ break_comma_list (char *etag,
  * set on the client. The server does not use the algorithm's
  * priority except for disabling algorithms that were not specified.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  **/
 int
 gnutls_cipher_set_priority (gnutls_session_t session, const int *list)
@@ -585,8 +585,7 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  *
  * The #priorities option allows you to specify a colon
  * separated list of the cipher priorities to enable.
- *
- * Common keywords: Some keywords are defined to provide quick access
+ * Some keywords are defined to provide quick access
  * to common preferences.
  *
  * "PERFORMANCE" means all the "secure" ciphersuites are enabled,
@@ -615,9 +614,8 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
  * "NONE" means nothing is enabled.  This disables even protocols and
  * compression methods.
  *
- * Special keywords:
+ * Special keywords are "!", "-" and "+".
  * "!" or "-" appended with an algorithm will remove this algorithm.
- *
  * "+" appended with an algorithm will add this algorithm.
  *
  * Check the GnuTLS manual section "Priority strings" for detailed

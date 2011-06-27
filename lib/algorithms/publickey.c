@@ -140,7 +140,7 @@ gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm)
  *
  * This function is not thread safe.
  *
- * Returns: a zero-terminated list of #gnutls_pk_algorithm_t integers
+ * Returns: a (0)-terminated list of #gnutls_pk_algorithm_t integers
  *   indicating the available ciphers.
  *
  * Since: 2.6.0

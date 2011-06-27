@@ -88,7 +88,7 @@ _gnutls_set_psk_session_key (gnutls_session_t session,
 
   /* format of the premaster secret:
    * (uint16_t) psk_size
-   * psk_size bytes of zeros
+   * psk_size bytes of (0)s
    * (uint16_t) psk_size
    * the psk
    */
@@ -107,7 +107,7 @@ error:
 }
 
 /* returns the username and they key for the PSK session.
- * Free is non zero if they have to be freed.
+ * Free is non (0) if they have to be freed.
  */
 int _gnutls_find_psk_key( gnutls_session_t session, gnutls_psk_client_credentials_t cred, 
   gnutls_datum_t * username, gnutls_datum_t* key, int* free)

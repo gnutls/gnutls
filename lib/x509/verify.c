@@ -213,8 +213,8 @@ cleanup:
  * This does a straight (DER) compare of the issuer/subject fields in
  * the given certificates.
  *
- * Returns 1 if they match and zero if they don't match. Otherwise
- * a negative value is returned to indicate error.
+ * Returns 1 if they match and (0) if they don't match. Otherwise
+ * a negative error code is returned to indicate error.
  */
 static int
 is_issuer (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer_cert)
@@ -248,8 +248,8 @@ cleanup:
 }
 
 /* Checks if the DN of two certificates is the same.
- * Returns 1 if they match and zero if they don't match. Otherwise
- * a negative value is returned to indicate error.
+ * Returns 1 if they match and (0) if they don't match. Otherwise
+ * a negative error code is returned to indicate error.
  */
 int
 _gnutls_is_same_dn (gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2)
@@ -529,7 +529,7 @@ cleanup:
  * given issuer.
  *
  * Returns: It will return true (1) if the given certificate is issued
- *   by the given issuer, and false (0) if not.  A negative value is
+ *   by the given issuer, and false (0) if not.  A negative error code is
  *   returned in case of an error.
  **/
 int
@@ -847,11 +847,7 @@ _gnutls_x509_verify_hashed_data (const gnutls_datum_t * hash,
  * elements bitwise or'd.  For a more detailed verification status use
  * gnutls_x509_crt_verify() per list element.
  *
- * GNUTLS_CERT_INVALID: the certificate chain is not valid.
- *
- * GNUTLS_CERT_REVOKED: a certificate in the chain has been revoked.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -904,7 +900,7 @@ int i, ret;
  * This function will try to verify the given certificate and return
  * its status.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -935,7 +931,7 @@ gnutls_x509_crt_verify (gnutls_x509_crt_t cert,
  * issuer certificate.  It will return true (1) if the given CRL was
  * issued by the given issuer, and false (0) if not.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -957,7 +953,7 @@ gnutls_x509_crl_check_issuer (gnutls_x509_crl_t crl,
  * See gnutls_x509_crt_list_verify() for a detailed description of
  * return values.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int

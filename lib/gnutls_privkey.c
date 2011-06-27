@@ -60,7 +60,7 @@ struct gnutls_privkey_st
  * actually the type of the subsystem used to set this private key.
  *
  * Returns: a member of the #gnutls_privkey_type_t enumeration on
- *   success, or a negative value on error.
+ *   success, or a negative error code on error.
  **/
 gnutls_privkey_type_t
 gnutls_privkey_get_type (gnutls_privkey_t key)
@@ -78,7 +78,7 @@ gnutls_privkey_get_type (gnutls_privkey_t key)
  * the security parameter of the key.
  *
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
- *   success, or a negative value on error.
+ *   success, or a negative error code on error.
  **/
 int
 gnutls_privkey_get_pk_algorithm (gnutls_privkey_t key, unsigned int *bits)
@@ -244,7 +244,7 @@ _gnutls_privkey_get_public_mpis (gnutls_privkey_t key,
  *
  * This function will initialize an private key structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -313,7 +313,7 @@ static int check_if_clean(gnutls_privkey_t key)
  * The #gnutls_pkcs11_privkey_t object must not be deallocated
  * during the lifetime of this structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -351,7 +351,7 @@ int ret;
  * The #gnutls_x509_privkey_t object must not be deallocated
  * during the lifetime of this structure.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -389,7 +389,7 @@ int ret;
  * during the lifetime of this structure. The subkey set as
  * preferred will be used, or the master key otherwise.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -447,7 +447,7 @@ uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
  * Use gnutls_pubkey_get_preferred_hash_algorithm() to determine
  * the hash algorithm.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  * negative error value.
  *
  * Since: 2.12.0
@@ -508,7 +508,7 @@ cleanup:
  * Use gnutls_pubkey_get_preferred_hash_algorithm() to determine
  * the hash algorithm.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 2.12.0
@@ -562,7 +562,7 @@ cleanup:
  * This function will sign the given data using a signature algorithm
  * supported by the private key.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  * negative error value.
  -*/
 int
@@ -602,7 +602,7 @@ _gnutls_privkey_sign_hash (gnutls_privkey_t key,
  * This function will decrypt the given data using the algorithm
  * supported by the private key.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  * negative error value.
  **/
 int

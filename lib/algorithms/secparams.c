@@ -64,7 +64,7 @@ static const gnutls_sec_params_entry sec_params[] = {
  * will convert a human understandable security parameter to an
  * appropriate size for the specific algorithm.
  *
- * Returns: The number of bits, or zero.
+ * Returns: The number of bits, or (0).
  *
  **/
 unsigned int

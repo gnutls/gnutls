@@ -162,7 +162,7 @@ gnutls_protocol_get_id (const char *name)
  *
  * This function is not threat safe.
  *
- * Returns: a zero-terminated list of #gnutls_protocol_t integers
+ * Returns: a (0)-terminated list of #gnutls_protocol_t integers
  * indicating the available protocols.
  *
  **/

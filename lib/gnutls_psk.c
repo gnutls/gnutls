@@ -443,7 +443,7 @@ gnutls_psk_set_server_dh_params (gnutls_psk_server_credentials_t res,
  *
  * This function will set a callback in order for the server to get
  * the Diffie-Hellman parameters for PSK authentication.  The callback
- * should return zero on success.
+ * should return %GNUTLS_E_SUCCESS (0) on success.
  **/
 void
 gnutls_psk_set_server_params_function (gnutls_psk_server_credentials_t res,

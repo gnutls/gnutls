@@ -310,7 +310,7 @@ gnutls_alert_send_appropriate (gnutls_session_t session, int err)
  *
  * If no alert has been received the returned value is undefined.
  *
- * Returns: returns the last alert received, a
+ * Returns: the last alert received, a
  *   #gnutls_alert_description_t value.
  **/
 gnutls_alert_description_t

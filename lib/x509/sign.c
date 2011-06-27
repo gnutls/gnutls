@@ -86,7 +86,7 @@ _gnutls_x509_get_tbs (ASN1_TYPE cert, const char *tbs_name,
  * This function will sign a CRL or a certificate with the issuer's private key, and
  * will copy the issuer's information into the CRL or certificate.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  -*/
 int

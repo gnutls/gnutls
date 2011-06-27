@@ -315,7 +315,7 @@ static void rot_window(gnutls_session_t session, int places)
 
 #define MOVE_SIZE 20
 /* Checks if a sequence number is not replayed. If replayed
- * returns a negative value, otherwise zero.
+ * returns a negative error code, otherwise zero.
  */
 int _dtls_record_check(gnutls_session_t session, uint64 * _seq)
 {
@@ -608,7 +608,7 @@ uint8_t digest[C_HASH_SIZE];
  * it should be associated with the session using
  * gnutls_dtls_prestate_set();
  *
- * Returns: zero on success, or a negative error code.  
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.  
  *
  **/
 int gnutls_dtls_cookie_verify(gnutls_datum_t* key, 
@@ -677,7 +677,7 @@ uint8_t digest[C_HASH_SIZE];
  * the cookie authentication with the client, with the newly 
  * established session.
  *
- * Returns: zero on success, or a negative error code.  
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.  
  *
  **/
 void gnutls_dtls_prestate_set(gnutls_session_t session, gnutls_dtls_prestate_st* prestate)

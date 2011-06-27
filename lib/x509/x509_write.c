@@ -57,7 +57,7 @@ static void disable_optional_stuff (gnutls_x509_crt_t cert);
  * not known (by gnutls) you should properly DER encode your data,
  * and call this function with @raw_flag set.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -96,7 +96,7 @@ gnutls_x509_crt_set_dn_by_oid (gnutls_x509_crt_t crt, const char *oid,
  * operation will copy the signer's name as the issuer of the
  * certificate.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -129,7 +129,7 @@ gnutls_x509_crt_set_issuer_dn_by_oid (gnutls_x509_crt_t crt,
  * certificate naming style.  Note that if @name is %NULL, you MUST
  * set it later by using gnutls_x509_crt_set_dn_by_oid() or similar.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -176,7 +176,7 @@ gnutls_x509_crt_set_proxy_dn (gnutls_x509_crt_t crt, gnutls_x509_crt_t eecrt,
  * functions such as gnutls_x509_crt_set_subject_alt_name()
  * or gnutls_x509_crt_set_key_usage().
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -213,7 +213,7 @@ gnutls_x509_crt_set_version (gnutls_x509_crt_t crt, unsigned int version)
  * private key to the certificate. Only RSA keys are currently
  * supported.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  **/
@@ -251,7 +251,7 @@ gnutls_x509_crt_set_key (gnutls_x509_crt_t crt, gnutls_x509_privkey_t key)
  * the extensions from the given certificate request to the certificate. 
  * Only RSA keys are currently supported.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -297,7 +297,7 @@ gnutls_x509_crt_set_crq (gnutls_x509_crt_t crt, gnutls_x509_crq_t crq)
  * This function will set extensions from the given request to the
  * certificate.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 2.8.0
@@ -385,13 +385,13 @@ gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt,
  * @oid: holds an Object Identified in null terminated string
  * @buf: a pointer to a DER encoded data
  * @sizeof_buf: holds the size of @buf
- * @critical: should be non zero if the extension is to be marked as critical
+ * @critical: should be non (0) if the extension is to be marked as critical
  *
  * This function will set an the extension, by the specified OID, in
  * the certificate.  The extension data should be binary data DER
  * encoded.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -429,13 +429,13 @@ gnutls_x509_crt_set_extension_by_oid (gnutls_x509_crt_t crt,
  * gnutls_x509_crt_set_basic_constraints:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @ca: true(1) or false(0). Depending on the Certificate authority status.
- * @pathLenConstraint: non-negative values indicate maximum length of path,
- *   and negative values indicate that the pathLenConstraints field should
+ * @pathLenConstraint: non-negative error codes indicate maximum length of path,
+ *   and negative error codes indicate that the pathLenConstraints field should
  *   not be present.
  *
  * This function will set the basicConstraints certificate extension.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -485,7 +485,7 @@ gnutls_x509_crt_set_basic_constraints (gnutls_x509_crt_t crt,
  * Use gnutls_x509_crt_set_basic_constraints() if you want to control
  * the pathLenConstraint field too.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -501,7 +501,7 @@ gnutls_x509_crt_set_ca_status (gnutls_x509_crt_t crt, unsigned int ca)
  *
  * This function will set the keyUsage certificate extension.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -544,7 +544,7 @@ gnutls_x509_crt_set_key_usage (gnutls_x509_crt_t crt, unsigned int usage)
  * gnutls_x509_crt_set_subject_alternative_name:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @type: is one of the gnutls_x509_subject_alt_name_t enumerations
- * @data_string: The data to be set, a zero terminated string
+ * @data_string: The data to be set, a (0) terminated string
  *
  * This function will set the subject alternative name certificate
  * extension. This function assumes that data can be expressed as a null
@@ -553,7 +553,7 @@ gnutls_x509_crt_set_key_usage (gnutls_x509_crt_t crt, unsigned int usage)
  * The name of the function is unfortunate since it is incosistent with
  * gnutls_x509_crt_get_subject_alt_name().
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -601,7 +601,7 @@ gnutls_x509_crt_set_subject_alternative_name (gnutls_x509_crt_t crt,
  * 
  * Other values can be set as binary values with the proper DER encoding.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 2.6.0
@@ -675,8 +675,8 @@ finish:
 /**
  * gnutls_x509_crt_set_proxy:
  * @crt: a certificate of type #gnutls_x509_crt_t
- * @pathLenConstraint: non-negative values indicate maximum length of path,
- *   and negative values indicate that the pathLenConstraints field should
+ * @pathLenConstraint: non-negative error codes indicate maximum length of path,
+ *   and negative error codes indicate that the pathLenConstraints field should
  *   not be present.
  * @policyLanguage: OID describing the language of @policy.
  * @policy: opaque byte array with policy language, can be %NULL
@@ -684,7 +684,7 @@ finish:
  *
  * This function will set the proxyCertInfo extension.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -744,7 +744,7 @@ gnutls_x509_crt_set_proxy (gnutls_x509_crt_t crt,
  * This must be the last step in a certificate generation since all
  * the previously set parameters are now signed.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -799,7 +799,7 @@ fail:
  * This function is the same a gnutls_x509_crt_sign2() with no flags,
  * and SHA1 as the hash algorithm.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -817,7 +817,7 @@ gnutls_x509_crt_sign (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
  * This function will set the time this Certificate was or will be
  * activated.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -841,7 +841,7 @@ gnutls_x509_crt_set_activation_time (gnutls_x509_crt_t cert, time_t act_time)
  *
  * This function will set the time this Certificate will expire.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -867,7 +867,7 @@ gnutls_x509_crt_set_expiration_time (gnutls_x509_crt_t cert, time_t exp_time)
  * serial numbers, thus it may be wise to handle it as something
  * opaque.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -924,7 +924,7 @@ disable_optional_stuff (gnutls_x509_crt_t cert)
  *
  * This function will set the CRL distribution points certificate extension.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -948,7 +948,7 @@ gnutls_x509_crt_set_crl_dist_points (gnutls_x509_crt_t crt,
  *
  * This function will set the CRL distribution points certificate extension.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 2.6.0
@@ -1020,7 +1020,7 @@ gnutls_x509_crt_set_crl_dist_points2 (gnutls_x509_crt_t crt,
  * extension, from the source to the destination certificate.
  * This may be useful to copy from a CA certificate to issued ones.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -1072,7 +1072,7 @@ gnutls_x509_crt_cpy_crl_dist_points (gnutls_x509_crt_t dst,
  * This function will set the X.509 certificate's subject key ID
  * extension.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -1135,7 +1135,7 @@ gnutls_x509_crt_set_subject_key_id (gnutls_x509_crt_t cert,
  * This function will set the X.509 certificate's authority key ID extension.
  * Only the keyIdentifier field can be set with this function.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -1201,8 +1201,8 @@ gnutls_x509_crt_set_authority_key_id (gnutls_x509_crt_t cert,
  *
  * Subsequent calls to this function will append OIDs to the OID list.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 int
 gnutls_x509_crt_set_key_purpose_oid (gnutls_x509_crt_t cert,
@@ -1309,7 +1309,7 @@ gnutls_x509_crt_set_key_purpose_oid (gnutls_x509_crt_t cert,
  * This must be the last step in a certificate generation since all
  * the previously set parameters are now signed.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int

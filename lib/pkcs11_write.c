@@ -39,7 +39,7 @@ static const ck_bool_t fval = 0;
  * This function will copy a certificate into a PKCS #11 token specified by
  * a URL. The certificate can be marked as trusted or not.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -214,7 +214,7 @@ cleanup:
  * a URL. It is highly recommended flags to contain %GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE
  * unless there is a strong reason not to.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -650,7 +650,7 @@ gnutls_pkcs11_delete_url (const char *object_url, unsigned int flags)
  * at a factory defaults state the security officer's PIN given will be
  * set to be the default. Otherwise it should match the officer's PIN.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -710,7 +710,7 @@ gnutls_pkcs11_token_init (const char *token_url,
  * If it is called to set a user pin for first time the oldpin must
  * be NULL.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int

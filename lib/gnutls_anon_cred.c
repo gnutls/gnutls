@@ -125,7 +125,7 @@ gnutls_anon_set_server_dh_params (gnutls_anon_server_credentials_t res,
  *
  * This function will set a callback in order for the server to get
  * the Diffie-Hellman parameters for anonymous authentication.  The
- * callback should return zero on success.
+ * callback should return %GNUTLS_E_SUCCESS (0) on success.
  **/
 void
 gnutls_anon_set_server_params_function (gnutls_anon_server_credentials_t res,

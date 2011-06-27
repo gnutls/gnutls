@@ -595,7 +595,7 @@ _gnutls_io_write_flush (gnutls_session_t session)
  * a timeframe.
  *
  * Returns 0 if data were received, GNUTLS_E_TIMEDOUT
- * on timeout and a negative value on error.
+ * on timeout and a negative error code on error.
  */
 int
 _gnutls_io_check_recv (gnutls_session_t session, unsigned int ms)

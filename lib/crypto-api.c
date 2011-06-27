@@ -41,7 +41,7 @@
  * current crypto backend in use by gnutls or the cryptographic
  * accelerator in use.
  *
- * Returns: Zero or a negative value on error.
+ * Returns: Zero or a negative error code on error.
  *
  * Since: 2.10.0
  **/
@@ -70,7 +70,7 @@ gnutls_cipher_init (gnutls_cipher_hd_t * handle,
  * associated data (AEAD) ciphers and will return the
  * output tag.
  *
- * Returns: Zero or a negative value on error.
+ * Returns: Zero or a negative error code on error.
  *
  * Since: 2.99.0
  **/
@@ -96,7 +96,7 @@ gnutls_cipher_tag (gnutls_cipher_hd_t handle, void *tag, size_t tag_size)
  * input data. This function can only be called once
  * and before any encryption operations.
  *
- * Returns: Zero or a negative value on error.
+ * Returns: Zero or a negative error code on error.
  *
  * Since: 2.99.0
  **/
@@ -137,7 +137,7 @@ gnutls_cipher_set_iv (gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
  * This function will encrypt the given data using the algorithm
  * specified by the context.
  *
- * Returns: Zero or a negative value on error.
+ * Returns: Zero or a negative error code on error.
  *
  * Since: 2.10.0
  **/
@@ -156,7 +156,7 @@ gnutls_cipher_encrypt (gnutls_cipher_hd_t handle, void *text, size_t textlen)
  * This function will decrypt the given data using the algorithm
  * specified by the context.
  *
- * Returns: Zero or a negative value on error.
+ * Returns: Zero or a negative error code on error.
  *
  * Since: 2.10.0
  **/
@@ -179,7 +179,7 @@ gnutls_cipher_decrypt (gnutls_cipher_hd_t handle, void *ciphertext,
  * This function will encrypt the given data using the algorithm
  * specified by the context.
  *
- * Returns: Zero or a negative value on error.
+ * Returns: Zero or a negative error code on error.
  *
  * Since: 2.10.0
  **/
@@ -202,7 +202,7 @@ gnutls_cipher_encrypt2 (gnutls_cipher_hd_t handle, const void *text, size_t text
  * This function will decrypt the given data using the algorithm
  * specified by the context.
  *
- * Returns: Zero or a negative value on error.
+ * Returns: Zero or a negative error code on error.
  *
  * Since: 2.10.0
  **/
@@ -245,7 +245,7 @@ gnutls_cipher_deinit (gnutls_cipher_hd_t handle)
  * effectively use the current crypto backend in use by gnutls or the
  * cryptographic accelerator in use.
  *
- * Returns: Zero or a negative value on error.
+ * Returns: Zero or a negative error code on error.
  *
  * Since: 2.10.0
  **/
@@ -273,7 +273,7 @@ gnutls_hmac_init (gnutls_hmac_hd_t * dig,
  * This function will hash the given data using the algorithm
  * specified by the context.
  *
- * Returns: Zero or a negative value on error.
+ * Returns: Zero or a negative error code on error.
  *
  * Since: 2.10.0
  **/
@@ -344,7 +344,7 @@ gnutls_hmac_get_len (gnutls_mac_algorithm_t algorithm)
  * This convenience function will hash the given data and return output
  * on a single call.
  *
- * Returns: Zero or a negative value on error.
+ * Returns: Zero or a negative error code on error.
  *
  * Since: 2.10.0
  **/
@@ -368,7 +368,7 @@ gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm,
  * current crypto backend in use by gnutls or the cryptographic
  * accelerator in use.
  *
- * Returns: Zero or a negative value on error.
+ * Returns: Zero or a negative error code on error.
  *
  * Since: 2.10.0
  **/
@@ -394,7 +394,7 @@ gnutls_hash_init (gnutls_hash_hd_t * dig, gnutls_digest_algorithm_t algorithm)
  * This function will hash the given data using the algorithm
  * specified by the context.
  *
- * Returns: Zero or a negative value on error.
+ * Returns: Zero or a negative error code on error.
  *
  * Since: 2.10.0
  **/
@@ -463,7 +463,7 @@ gnutls_hash_get_len (gnutls_digest_algorithm_t algorithm)
  * This convenience function will hash the given data and return output
  * on a single call.
  *
- * Returns: Zero or a negative value on error.
+ * Returns: Zero or a negative error code on error.
  *
  * Since: 2.10.0
  **/

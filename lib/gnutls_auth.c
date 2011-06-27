@@ -90,8 +90,8 @@ gnutls_credentials_clear (gnutls_session_t session)
  * For %GNUTLS_CRD_CERTIFICATE, @cred should be
  * #gnutls_certificate_credentials_t.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 int
 gnutls_credentials_set (gnutls_session_t session,

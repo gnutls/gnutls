@@ -373,7 +373,7 @@ gnutls_dh_get_prime_bits (gnutls_session_t session)
  * Get the export RSA parameter's modulus size.
  *
  * Returns: the bits used in the last RSA-EXPORT key exchange with the
- *   peer, or a negative value in case of error.
+ *   peer, or a negative error code in case of error.
  **/
 int
 gnutls_rsa_export_get_modulus_bits (gnutls_session_t session)
@@ -395,7 +395,7 @@ gnutls_rsa_export_get_modulus_bits (gnutls_session_t session)
  * anonymous and ephemeral Diffie-Hellman.
  *
  * Returns: the public key bit size used in the last Diffie-Hellman
- *   key exchange with the peer, or a negative value in case of error.
+ *   key exchange with the peer, or a negative error code in case of error.
  **/
 int
 gnutls_dh_get_peers_public_bits (gnutls_session_t session)
@@ -522,7 +522,7 @@ gnutls_certificate_get_peers (gnutls_session_t
  * Get whether client certificate is requested or not.
  *
  * Returns: 0 if the peer (server) did not request client
- *   authentication or 1 otherwise, or a negative value in case of
+ *   authentication or 1 otherwise, or a negative error code in case of
  *   error.
  **/
 int
@@ -611,7 +611,7 @@ gnutls_certificate_set_dh_params (gnutls_certificate_credentials_t res,
  *
  * This function will set a callback in order for the server to get
  * the Diffie-Hellman or RSA parameters for certificate
- * authentication.  The callback should return zero on success.
+ * authentication.  The callback should return %GNUTLS_E_SUCCESS (0) on success.
  **/
 void
 gnutls_certificate_set_params_function (gnutls_certificate_credentials_t res,
@@ -681,7 +681,7 @@ gnutls_certificate_set_rsa_export_params (gnutls_certificate_credentials_t
  *
  * This function will set a callback in order for the server to get
  * the Diffie-Hellman or RSA parameters for PSK authentication.  The
- * callback should return zero on success.
+ * callback should return %GNUTLS_E_SUCCESS (0) on success.
  **/
 void
 gnutls_psk_set_params_function (gnutls_psk_server_credentials_t res,
@@ -697,7 +697,7 @@ gnutls_psk_set_params_function (gnutls_psk_server_credentials_t res,
  *
  * This function will set a callback in order for the server to get
  * the Diffie-Hellman or RSA parameters for anonymous authentication.
- * The callback should return zero on success.
+ * The callback should return %GNUTLS_E_SUCCESS (0) on success.
  **/
 void
 gnutls_anon_set_params_function (gnutls_anon_server_credentials_t res,

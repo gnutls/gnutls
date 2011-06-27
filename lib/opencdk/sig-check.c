@@ -455,9 +455,9 @@ uid_list_free (struct verify_uid *list)
     }
 }
 
-/* returns non zero if all UIDs in the list have at least one
+/* returns non (0) if all UIDs in the list have at least one
  * signature. If the list is empty or no signatures are present
- * a zero value is returned.
+ * a (0) value is returned.
  */
 static int
 uid_list_all_signed (struct verify_uid *list)
@@ -487,7 +487,7 @@ uid_list_all_signed (struct verify_uid *list)
  *
  * Check all signatures. When no key is available for checking, the
  * sigstat is marked as 'NOKEY'. The @r_status contains the key flags
- * which are or-ed or zero when there are no flags.
+ * which are or-ed or (0) when there are no flags.
  **/
 cdk_error_t
 cdk_pk_check_sigs (cdk_kbnode_t key, cdk_keydb_hd_t keydb, int *r_status)

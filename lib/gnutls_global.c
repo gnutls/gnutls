@@ -197,8 +197,8 @@ static int _gnutls_init = 0;
  * function after aquiring a thread mutex.  To ignore the potential
  * memory leak is also an option.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 int
 gnutls_global_init (void)
@@ -318,7 +318,7 @@ gnutls_global_deinit (void)
  *
  * See %GNUTLS_VERSION for a suitable @req_version string.
  *
- * Return value: Check that the version of the library is at
+ * Returns: Check that the version of the library is at
  *   minimum the one given as a string in @req_version and return the
  *   actual version string of the library; return %NULL if the
  *   condition is not met.  If %NULL is passed to this function no

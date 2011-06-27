@@ -144,7 +144,7 @@ cleanup:
  * usually contain lists of X.509 Certificates and X.509 Certificate
  * revocation lists.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -198,7 +198,7 @@ gnutls_pkcs7_deinit (gnutls_pkcs7_t pkcs7)
  *
  * If the PKCS7 is PEM encoded it should have a header of "PKCS7".
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -271,7 +271,7 @@ cleanup:
  * After the last certificate has been read
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.  If the provided buffer is not long enough,
  *   then @certificate_size is updated and
  *   %GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
@@ -373,7 +373,7 @@ cleanup:
  * This function will return the number of certifcates in the PKCS7
  * or RFC2630 certificate set.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -427,7 +427,7 @@ gnutls_pkcs7_get_crt_count (gnutls_pkcs7_t pkcs7)
  * If the structure is PEM encoded, it will have a header
  * of "BEGIN PKCS7".
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
   **/
 int
@@ -529,7 +529,7 @@ cleanup:
  * This function will add a certificate to the PKCS7 or RFC2630
  * certificate set.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -624,7 +624,7 @@ cleanup:
  * RFC2630 certificate set.  This is a wrapper function over
  * gnutls_pkcs7_set_crt_raw() .
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -665,7 +665,7 @@ gnutls_pkcs7_set_crt (gnutls_pkcs7_t pkcs7, gnutls_x509_crt_t crt)
  * This function will delete a certificate from a PKCS7 or RFC2630
  * certificate set.  Index starts from 0. Returns 0 on success.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -732,7 +732,7 @@ cleanup:
  *
  * This function will return a crl of the PKCS7 or RFC2630 crl set.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.  If the provided buffer is not long enough,
  *   then @crl_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER is
  *   returned.  After the last crl has been read
@@ -807,7 +807,7 @@ cleanup:
  * This function will return the number of certifcates in the PKCS7
  * or RFC2630 crl set.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -851,7 +851,7 @@ gnutls_pkcs7_get_crl_count (gnutls_pkcs7_t pkcs7)
  *
  * This function will add a crl to the PKCS7 or RFC2630 crl set.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -935,7 +935,7 @@ cleanup:
  * This function will add a parsed CRL to the PKCS7 or RFC2630 crl
  * set.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -975,7 +975,7 @@ gnutls_pkcs7_set_crl (gnutls_pkcs7_t pkcs7, gnutls_x509_crl_t crl)
  * This function will delete a crl from a PKCS7 or RFC2630 crl set.
  * Index starts from 0. Returns 0 on success.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int

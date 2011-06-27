@@ -446,7 +446,7 @@ _gnutls_sr_deinit_data (extension_priv_data_t priv)
  * Can be used to check whether safe renegotiation is being used
  * in the current session.
  *
- * Returns: 0 when safe renegotiation is not used and non zero when
+ * Returns: 0 when safe renegotiation is not used and non (0) when
  *   safe renegotiation is used.
  *
  * Since: 2.10.0

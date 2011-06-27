@@ -79,8 +79,8 @@ _gnutls_map_cdk_rc (int rc)
  * been set and be used. See gnutls_openpgp_crt_set_preferred_key_id().
  * Otherwise the master key will be used.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (zero) is returned,
- *   otherwise an error code is returned.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ *   otherwise a negative error code is returned.
  **/
 int
 gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
@@ -231,7 +231,7 @@ leave:
  * This funtion is used to load OpenPGP keys into the GnuTLS credential 
  * structure. The datum should contain at least one valid non encrypted subkey.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -254,7 +254,7 @@ gnutls_certificate_set_openpgp_key_mem (gnutls_certificate_credentials_t res,
  * This funtion is used to load OpenPGP keys into the GnuTLS
  * credentials structure. The file should contain at least one valid non encrypted subkey.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -303,7 +303,7 @@ get_keyid (gnutls_openpgp_keyid_t keyid, const char *str)
  * case the gnutls_openpgp_crt_get_auth_subkey() will be used to
  * retrieve the subkey.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 2.4.0
@@ -400,7 +400,7 @@ gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t res,
  * case the gnutls_openpgp_crt_get_auth_subkey() will be used to
  * retrieve the subkey.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
  * Since: 2.4.0
@@ -508,7 +508,7 @@ gnutls_openpgp_count_key_names (const gnutls_datum_t * cert)
  * is needed for an operations. The keyring will also be used at the
  * verification functions.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int
@@ -555,7 +555,7 @@ gnutls_certificate_set_openpgp_keyring_file (gnutls_certificate_credentials_t
  * is needed for an operations. The keyring will also be used at the
  * verification functions.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS is returned, otherwise a
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  **/
 int

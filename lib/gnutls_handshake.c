@@ -334,7 +334,7 @@ _gnutls_tls_create_random (opaque * dst)
   return 0;
 }
 
-/* returns the 0 on success or a negative value.
+/* returns the 0 on success or a negative error code.
  */
 int
 _gnutls_negotiate_version (gnutls_session_t session,
@@ -2162,7 +2162,7 @@ _gnutls_recv_hello_verify_request (gnutls_session_t session,
  * %GNUTLS_A_NO_RENEGOTIATION.  A client may also choose to ignore
  * this message.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  **/
 int
 gnutls_rehandshake (gnutls_session_t session)
@@ -2297,7 +2297,7 @@ cleanup:
  * in the case of %GNUTLS_E_GOT_APPLICATION_DATA it might also mean that
  * some data were pending.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, otherwise an error.
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  **/
 int
 gnutls_handshake (gnutls_session_t session)
