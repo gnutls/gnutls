@@ -739,6 +739,7 @@ typedef enum
                          gnutls_alert_description_t desc);
   int gnutls_alert_send_appropriate (gnutls_session_t session, int err);
   const char *gnutls_alert_get_name (gnutls_alert_description_t alert);
+  const char * gnutls_alert_get_strname (gnutls_alert_description_t alert);
 
   gnutls_sec_param_t gnutls_pk_bits_to_sec_param (gnutls_pk_algorithm_t algo,
                                                   unsigned int bits);

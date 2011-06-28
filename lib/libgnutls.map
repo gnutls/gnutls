@@ -713,6 +713,7 @@ GNUTLS_3_0_0 {
 	gnutls_pubkey_verify_data2;
 	gnutls_x509_trust_list_verify_named_crt;
 	gnutls_x509_trust_list_add_named_crt;
+	gnutls_alert_get_strname;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

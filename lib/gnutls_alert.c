@@ -34,47 +34,51 @@
 typedef struct
 {
   gnutls_alert_description_t alert;
+  const char *name;
   const char *desc;
 } gnutls_alert_entry;
 
+#define ALERT_ENTRY(x,y) \
+  {x, #x, y}
+
 static const gnutls_alert_entry sup_alerts[] = {
-  {GNUTLS_A_CLOSE_NOTIFY, N_("Close notify")},
-  {GNUTLS_A_UNEXPECTED_MESSAGE, N_("Unexpected message")},
-  {GNUTLS_A_BAD_RECORD_MAC, N_("Bad record MAC")},
-  {GNUTLS_A_DECRYPTION_FAILED, N_("Decryption failed")},
-  {GNUTLS_A_RECORD_OVERFLOW, N_("Record overflow")},
-  {GNUTLS_A_DECOMPRESSION_FAILURE, N_("Decompression failed")},
-  {GNUTLS_A_HANDSHAKE_FAILURE, N_("Handshake failed")},
-  {GNUTLS_A_BAD_CERTIFICATE, N_("Certificate is bad")},
-  {GNUTLS_A_UNSUPPORTED_CERTIFICATE, N_("Certificate is not supported")},
-  {GNUTLS_A_CERTIFICATE_REVOKED, N_("Certificate was revoked")},
-  {GNUTLS_A_CERTIFICATE_EXPIRED, N_("Certificate is expired")},
-  {GNUTLS_A_CERTIFICATE_UNKNOWN, N_("Unknown certificate")},
-  {GNUTLS_A_ILLEGAL_PARAMETER, N_("Illegal parameter")},
-  {GNUTLS_A_UNKNOWN_CA, N_("CA is unknown")},
-  {GNUTLS_A_ACCESS_DENIED, N_("Access was denied")},
-  {GNUTLS_A_DECODE_ERROR, N_("Decode error")},
-  {GNUTLS_A_DECRYPT_ERROR, N_("Decrypt error")},
-  {GNUTLS_A_EXPORT_RESTRICTION, N_("Export restriction")},
-  {GNUTLS_A_PROTOCOL_VERSION, N_("Error in protocol version")},
-  {GNUTLS_A_INSUFFICIENT_SECURITY, N_("Insufficient security")},
-  {GNUTLS_A_USER_CANCELED, N_("User canceled")},
-  {GNUTLS_A_SSL3_NO_CERTIFICATE, N_("No certificate (SSL 3.0)")},
-  {GNUTLS_A_INTERNAL_ERROR, N_("Internal error")},
-  {GNUTLS_A_NO_RENEGOTIATION, N_("No renegotiation is allowed")},
-  {GNUTLS_A_CERTIFICATE_UNOBTAINABLE,
-   N_("Could not retrieve the specified certificate")},
-  {GNUTLS_A_UNSUPPORTED_EXTENSION, N_("An unsupported extension was sent")},
-  {GNUTLS_A_UNRECOGNIZED_NAME,
-   N_("The server name sent was not recognized")},
-  {GNUTLS_A_UNKNOWN_PSK_IDENTITY,
-   N_("The SRP/PSK username is missing or not known")},
-  {0, NULL}
+  ALERT_ENTRY(GNUTLS_A_CLOSE_NOTIFY, N_("Close notify")),
+  ALERT_ENTRY(GNUTLS_A_UNEXPECTED_MESSAGE, N_("Unexpected message")),
+  ALERT_ENTRY(GNUTLS_A_BAD_RECORD_MAC, N_("Bad record MAC")),
+  ALERT_ENTRY(GNUTLS_A_DECRYPTION_FAILED, N_("Decryption failed")),
+  ALERT_ENTRY(GNUTLS_A_RECORD_OVERFLOW, N_("Record overflow")),
+  ALERT_ENTRY(GNUTLS_A_DECOMPRESSION_FAILURE, N_("Decompression failed")),
+  ALERT_ENTRY(GNUTLS_A_HANDSHAKE_FAILURE, N_("Handshake failed")),
+  ALERT_ENTRY(GNUTLS_A_BAD_CERTIFICATE, N_("Certificate is bad")),
+  ALERT_ENTRY(GNUTLS_A_UNSUPPORTED_CERTIFICATE, N_("Certificate is not supported")),
+  ALERT_ENTRY(GNUTLS_A_CERTIFICATE_REVOKED, N_("Certificate was revoked")),
+  ALERT_ENTRY(GNUTLS_A_CERTIFICATE_EXPIRED, N_("Certificate is expired")),
+  ALERT_ENTRY(GNUTLS_A_CERTIFICATE_UNKNOWN, N_("Unknown certificate")),
+  ALERT_ENTRY(GNUTLS_A_ILLEGAL_PARAMETER, N_("Illegal parameter")),
+  ALERT_ENTRY(GNUTLS_A_UNKNOWN_CA, N_("CA is unknown")),
+  ALERT_ENTRY(GNUTLS_A_ACCESS_DENIED, N_("Access was denied")),
+  ALERT_ENTRY(GNUTLS_A_DECODE_ERROR, N_("Decode error")),
+  ALERT_ENTRY(GNUTLS_A_DECRYPT_ERROR, N_("Decrypt error")),
+  ALERT_ENTRY(GNUTLS_A_EXPORT_RESTRICTION, N_("Export restriction")),
+  ALERT_ENTRY(GNUTLS_A_PROTOCOL_VERSION, N_("Error in protocol version")),
+  ALERT_ENTRY(GNUTLS_A_INSUFFICIENT_SECURITY, N_("Insufficient security")),
+  ALERT_ENTRY(GNUTLS_A_USER_CANCELED, N_("User canceled")),
+  ALERT_ENTRY(GNUTLS_A_SSL3_NO_CERTIFICATE, N_("No certificate (SSL 3.0)")),
+  ALERT_ENTRY(GNUTLS_A_INTERNAL_ERROR, N_("Internal error")),
+  ALERT_ENTRY(GNUTLS_A_NO_RENEGOTIATION, N_("No renegotiation is allowed")),
+  ALERT_ENTRY(GNUTLS_A_CERTIFICATE_UNOBTAINABLE,
+   N_("Could not retrieve the specified certificate")),
+  ALERT_ENTRY(GNUTLS_A_UNSUPPORTED_EXTENSION, N_("An unsupported extension was sent")),
+  ALERT_ENTRY(GNUTLS_A_UNRECOGNIZED_NAME,
+   N_("The server name sent was not recognized")),
+  ALERT_ENTRY(GNUTLS_A_UNKNOWN_PSK_IDENTITY,
+   N_("The SRP/PSK username is missing or not known")),
+  {0, NULL, NULL}
 };
 
 /**
  * gnutls_alert_get_name:
- * @alert: is an alert number #gnutls_session_t structure.
+ * @alert: is an alert number.
  *
  * This function will return a string that describes the given alert
  * number, or %NULL.  See gnutls_alert_get().
@@ -89,6 +93,26 @@ gnutls_alert_get_name (gnutls_alert_description_t alert)
   for (p = sup_alerts; p->desc != NULL; p++)
     if (p->alert == alert)
       return _(p->desc);
+
+  return NULL;
+}
+
+/**
+ * gnutls_alert_get_strname:
+ * @alert: is an alert number.
+ *
+ * This function will return a string of the name of the alert.
+ *
+ * Returns: string corresponding to #gnutls_alert_description_t value.
+ **/
+const char *
+gnutls_alert_get_strname (gnutls_alert_description_t alert)
+{
+  const gnutls_alert_entry *p;
+
+  for (p = sup_alerts; p->name != NULL; p++)
+    if (p->alert == alert)
+      return p->name;
 
   return NULL;
 }
@@ -303,11 +327,9 @@ gnutls_alert_send_appropriate (gnutls_session_t session, int err)
  * @session: is a #gnutls_session_t structure.
  *
  * This function will return the last alert number received.  This
- * function should be called if %GNUTLS_E_WARNING_ALERT_RECEIVED or
- * %GNUTLS_E_FATAL_ALERT_RECEIVED has been returned by a gnutls
- * function.  The peer may send alerts if he thinks some things were
- * not right. Check gnutls.h for the available alert descriptions.
- *
+ * function should be called when %GNUTLS_E_WARNING_ALERT_RECEIVED or
+ * %GNUTLS_E_FATAL_ALERT_RECEIVED errors are returned by a gnutls
+ * function.  The peer may send alerts if he encounters an error.
  * If no alert has been received the returned value is undefined.
  *
  * Returns: the last alert received, a
