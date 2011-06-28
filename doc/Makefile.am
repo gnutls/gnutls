@@ -148,12 +148,12 @@ extra-api.texi: $(srcdir)/../libextra/gnutls_extra.c
 
 # Generated texinfos.
 
-gnutls_TEXINFOS += error_codes.texi algorithms.texi
+gnutls_TEXINFOS += error_codes.texi algorithms.texi alerts.texi
 MAINTAINERCLEANFILES += error_codes.texi algorithms.texi
 
 AM_CPPFLAGS = -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes
 
-noinst_PROGRAMS = errcodes printlist
+noinst_PROGRAMS = errcodes printlist alert-printlist
 
 errcodes_SOURCES = errcodes.c
 errcodes_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
@@ -161,14 +161,20 @@ errcodes_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 printlist_SOURCES = printlist.c
 printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 
+alert_printlist_SOURCES = alert-printlist.c
+alert_printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
+
 error_codes.texi: $(top_srcdir)/lib/gnutls_errors.c $(srcdir)/errcodes.c
 	make $(builddir)/errcodes
 	$(builddir)/errcodes > $@-tmp
 	mv -f $@-tmp $@
 
-algorithms.texi: $(srcdir)/printlist.c
-	make $(builddir)/printlist
+algorithms.texi: printlist
 	$(builddir)/printlist > $@-tmp
+	mv -f $@-tmp $@
+
+alerts.texi: alert-printlist
+	$(builddir)/alert-printlist > $@-tmp
 	mv -f $@-tmp $@
 
 # Guile texinfos.

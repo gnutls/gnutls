@@ -43,3 +43,145 @@
 	%\hyperref[#2]{#1()}%
 	\code{#1}%
 }
+
+\newcommand{\showfunc}[1]{%
+ \let\Oldfd\functionDescription
+ \let\Oldendfd\endfunctionDescription
+ \let\functionDescription=\comment
+ \let\endfunctionDescription=\endcomment 
+ \let\Oldfr\functionReturns
+ \let\Oldendfr\endfunctionReturns
+ \let\functionReturns=\comment
+ \let\endfunctionReturns=\endcomment 
+\texttt{
+ \input{functions/#1}
+}
+ \let\functionDescription=\Oldfd
+ \let\endfunctionDescription=\Oldendfd
+ \let\functionReturns=\Oldfr
+ \let\endfunctionReturns=\Oldendfr
+}
+
+\newcommand{\showfuncdesc}[1]{%
+%\fcolorbox{black}{light-gray}{
+ \begin{minipage}[l]{\linewidth}
+ \begin{framed}
+  \texttt{
+   \input{functions/#1}
+  }
+% }
+ \end{framed}
+ \vspace{0.15cm}
+ \end{minipage}
+}
+
+\newcommand{\showfuncA}[1]{%
+% \fcolorbox{black}{light-gray}{
+ \begin{samepage}
+ \begin{framed}
+  \texttt{
+   \showfunc{#1}
+  }
+% }
+ \end{framed}
+ \end{samepage}
+}
+
+\newcommand{\showfuncB}[2]{%
+% \fcolorbox{black}{light-gray}{
+ \begin{samepage}
+ \begin{framed}
+  \texttt{
+    \showfunc{#1}
+    \showfunc{#2}
+  }
+% }
+ \end{framed}
+ \end{samepage}
+}
+
+\newcommand{\showfuncC}[3]{%
+% \fcolorbox{black}{light-gray}{
+ \begin{samepage}
+ \begin{framed}
+  \texttt{
+  \showfunc{#1}
+  \showfunc{#2}
+  \showfunc{#3}
+  }
+% }
+ \end{framed}
+ \end{samepage}
+}
+
+\newcommand{\showfuncD}[4]{%
+% \fcolorbox{black}{light-gray}{
+ \begin{samepage}
+ \begin{framed}
+  \texttt{
+  \showfunc{#1}
+  \showfunc{#2}
+  \showfunc{#3}
+  \showfunc{#4}
+  }
+% }
+ \end{framed}
+ \end{samepage}
+}
+
+\newcommand{\showfuncE}[5]{%
+% \fcolorbox{black}{light-gray}{
+ \begin{samepage}
+ \begin{framed}
+  \texttt{
+  \showfunc{#1}
+  \showfunc{#2}
+  \showfunc{#3}
+  \showfunc{#4}
+  \showfunc{#5}
+  }
+% }
+ \end{framed}
+ \end{samepage}
+}
+
+\newcommand{\showfuncF}[6]{%
+% \fcolorbox{black}{light-gray}{
+ \begin{samepage}
+ \begin{framed}
+  \texttt{
+  \showfunc{#1}
+  \showfunc{#2}
+  \showfunc{#3}
+  \showfunc{#4}
+  \showfunc{#5}
+  \showfunc{#6}
+  }
+% }
+ \end{framed}
+ \end{samepage}
+}
+
+\newenvironment{function}%
+ {\begin{minipage}[l]{1\linewidth}}%
+ {\end{minipage}}
+
+\let\functionArguments=\comment
+\let\endfunctionArguments=\endcomment 
+
+\let\functionExamples=\comment
+\let\endfunctionExamples=\endcomment 
+
+\newenvironment{functionDescription}%
+{\vspace{0.5cm}{\bf Description:}\footnotesize}
+{}
+
+\newcommand{\functionTitle}[1]{}
+
+\newenvironment{functionReturns}%
+{\vspace{0.5cm}{\bf Returns:}\footnotesize}
+{}
+
+\let\functionSince=\comment
+\let\endfunctionSince=\endcomment 
+

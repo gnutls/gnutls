@@ -230,7 +230,7 @@ functions to verify a given certificate list.
 @verbatiminclude examples/ex-verify.c
 
 @node Client using a PKCS 11 token with TLS
-@subsection Using a @acronym{PKCS #11} token with TLS
+@subsection Using a @acronym{PKCS} #11 token with TLS
 @anchor{ex:pkcs11-client}
 
 This example will demonstrate how to load keys and certificates
@@ -333,8 +333,6 @@ used to serve the example client for anonymous authentication.
 @menu
 * Checking for an alert::
 * X.509 certificate parsing example::
-* Certificate request generation::
-* PKCS 12 structure generation::
 @end menu
 
 @node Checking for an alert
@@ -354,25 +352,6 @@ listed below.  That program reads the peer's certificate, and prints
 information about it.
 
 @verbatiminclude examples/ex-x509-info.c
-
-@node Certificate request generation
-@subsection Certificate Request Generation
-@anchor{ex:crq}
-
-The following example is about generating a certificate request, and a
-private key. A certificate request can be later be processed by a CA,
-which should return a signed certificate.
-
-@verbatiminclude examples/ex-crq.c
-
-@node PKCS 12 structure generation
-@subsection @acronym{PKCS} #12 Structure Generation
-@anchor{ex:pkcs12}
-
-The following example is about generating a @acronym{PKCS} #12
-structure.
-
-@verbatiminclude examples/ex-pkcs12.c
 
 @node Advanced and other topics
 @section Advanced and other topics
@@ -400,12 +379,14 @@ The parameters can be used in a session by calling
 @funcref{gnutls_certificate_set_dh_params} or
 @funcref{gnutls_anon_set_server_dh_params} for anonymous sessions.
 
+@showfuncD{gnutls_dh_params_generate2,gnutls_dh_params_import_pkcs3,gnutls_certificate_set_dh_params,gnutls_anon_set_server_dh_params}
+
 Due to the time-consuming calculations required for the generation
 of Diffie-Hellman parameters we suggest against performing generation
 of them within an application. The @code{certtool} tool can be used to 
 generate or export known safe values that can be stored in code
 or in a configuration file to provide the ability to replace. We also
-recommend the usage of @funcref{gnutls_sec_param_to_pk_bits} to determine
+recommend the usage of @funcref{gnutls_sec_param_to_pk_bits} (see @ref{Selecting cryptographic key sizes}) to determine
 the bit size of the parameters to be generated.
 
 The ciphersuites that involve the RSA-EXPORT key exchange require
@@ -416,17 +397,7 @@ requires 512-bit RSA keys to be generated. It is recommended those
 parameters to be refreshed (regenerated) in short intervals. The
 following functions can be used for these parameters.
 
-@itemize
-
-@item @funcref{gnutls_rsa_params_generate2}
-
-@item @funcref{gnutls_certificate_set_rsa_export_params}
-
-@item @funcref{gnutls_rsa_params_import_pkcs1}
-
-@item @funcref{gnutls_rsa_params_export_pkcs1}
-
-@end itemize
+@showfuncD{gnutls_rsa_params_generate2,gnutls_certificate_set_rsa_export_params,gnutls_rsa_params_import_pkcs1,gnutls_rsa_params_export_pkcs1}
 
 
 @node Keying Material Exporters

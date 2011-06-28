@@ -26,3 +26,7 @@ guile.toc
 guile.tp
 guile.vr
 guile.vrs
+alerts.texi
+alert-printlist
+latex/alerts.tex
+latex/functions

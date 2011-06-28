@@ -749,14 +749,8 @@ read_key_file (gnutls_certificate_credentials_t res,
  *
  * This function sets a certificate/private key pair in the
  * gnutls_certificate_credentials_t structure. This function may be called
- * more than once (in case multiple keys/certificates exist for the
- * server).
- *
- * Currently are supported: RSA PKCS-1 encoded private keys,
- * DSA private keys.
- *
- * DSA private keys are encoded the OpenSSL way, which is an ASN.1
- * DER sequence of 6 INTEGERs - version, p, q, g, pub, priv.
+ * more than once, in case multiple keys/certificates exist for the
+ * server.
  *
  * Note that the keyUsage (2.5.29.15) PKIX extension in X.509 certificates
  * is supported. This means that certificates intended for signing cannot
@@ -768,7 +762,7 @@ read_key_file (gnutls_certificate_credentials_t res,
  * The @key may be %NULL if you are using a sign callback, see
  * gnutls_sign_callback_set().
  *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  **/
 int
 gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t res,
@@ -854,14 +848,14 @@ certificate_credentials_append_pkey (gnutls_certificate_credentials_t res,
  *
  * This function sets a certificate/private key pair in the
  * gnutls_certificate_credentials_t structure.  This function may be
- * called more than once (in case multiple keys/certificates exist for
- * the server).  For clients that wants to send more than its own end
+ * called more than once, in case multiple keys/certificates exist for
+ * the server.  For clients that wants to send more than its own end
  * entity certificate (e.g., also an intermediate CA cert) then put
  * the certificate chain in @cert_list.
  *
  * 
  *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  *
  * Since: 2.4.0
  **/
@@ -944,18 +938,15 @@ gnutls_certificate_set_x509_key (gnutls_certificate_credentials_t res,
  *
  * This function sets a certificate/private key pair in the
  * gnutls_certificate_credentials_t structure.  This function may be
- * called more than once (in case multiple keys/certificates exist for
- * the server).  For clients that wants to send more than its own end
- * entity certificate (e.g., also an intermediate CA cert) then put
- * the certificate chain in @certfile.
+ * called more than once, in case multiple keys/certificates exist for
+ * the server.  For clients that need to send more than its own end
+ * entity certificate, e.g., also an intermediate CA cert, then the
+ * @certfile must contain the ordered certificate chain.
  *
- * Currently only PKCS-1 encoded RSA and DSA private keys are accepted by
- * this function.
+ * This function can also accept PKCS #11 URLs at @keyfile and @certfile. In that case it
+ * will import the private key and certificate indicated by the URLs.
  *
- * This function can also accept PKCS #11 URLs. In that case it
- * will import the private key and certificate indicated by the urls.
- *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  **/
 int
 gnutls_certificate_set_x509_key_file (gnutls_certificate_credentials_t res,
@@ -1235,7 +1226,7 @@ gnutls_certificate_set_x509_trust_mem (gnutls_certificate_credentials_t res,
  * a certificate request is sent. This can be disabled using
  * gnutls_certificate_send_x509_rdn_sequence().
  *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  *
  * Since: 2.4.0
  **/
@@ -1481,7 +1472,7 @@ gnutls_certificate_set_x509_crl_mem (gnutls_certificate_credentials_t res,
  * gnutls_certificate_verify_peers2().  This function may be called
  * multiple times.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  *
  * Since: 2.4.0
  **/
@@ -1891,9 +1882,6 @@ done:
  * only password based security, and the same password for all
  * operations, are supported.
  *
- * The private keys may be RSA PKCS#1 or DSA private keys encoded in
- * the OpenSSL way.
- *
  * PKCS#12 file may contain many keys and/or certificates, and there
  * is no way to identify which key/certificate pair you want.  You
  * should make sure the PKCS#12 file only contain one key/certificate
@@ -1904,7 +1892,7 @@ done:
  * complexity that would make it harder to use this functionality at
  * all.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  **/
 int
   gnutls_certificate_set_x509_simple_pkcs12_file
@@ -1948,9 +1936,6 @@ int
  * only password based security, and the same password for all
  * operations, are supported.
  *
- * The private keys may be RSA PKCS#1 or DSA private keys encoded in
- * the OpenSSL way.
- *
  * PKCS#12 file may contain many keys and/or certificates, and there
  * is no way to identify which key/certificate pair you want.  You
  * should make sure the PKCS#12 file only contain one key/certificate
@@ -1961,7 +1946,7 @@ int
  * complexity that would make it harder to use this functionality at
  * all.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  *
  * Since: 2.8.0
  **/

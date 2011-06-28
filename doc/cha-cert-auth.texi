@@ -136,7 +136,7 @@ private keys with the @code{gnutls_x509_privkey_t} type.  All the
 available functions for @acronym{X.509} certificate handling have
 their prototypes in @file{gnutls/x509.h}. An example program to
 demonstrate the @acronym{X.509} parsing capabilities can be found at
-section @ref{ex:x509-info}.
+@ref{ex:x509-info}.
 
 @node Verifying X.509 certificate paths
 @subsection Verifying @acronym{X.509} Certificate Paths
@@ -147,36 +147,13 @@ Verifying certificate paths is important in @acronym{X.509}
 authentication. For this purpose the following functions are
 provided.
 
-@table @code
-
-@item @funcref{gnutls_x509_trust_list_init}:
-A function to initialize a list that will hold trusted
-certificate authorities and certificate revocation lists.
-
-@item @funcref{gnutls_x509_trust_list_deinit}:
-Deinitializes the list.
-
-@item @funcref{gnutls_x509_trust_list_add_cas}:
-Adds certificate authorities to the list.
-
-@item @funcref{gnutls_x509_trust_list_add_named_crt}:
-Adds trusted certificates for an entity identified
-by a name.
-
-@item @funcref{gnutls_x509_trust_list_add_crls}:
-Adds certificate revocation lists.
-
-@item @funcref{gnutls_x509_trust_list_verify_crt}:
-Verifies a certificate chain using the previously setup trusted
-list. A callback can be specified that will provide information
-about the verification procedure (and detailed reasons of failure).
-
-@item @funcref{gnutls_x509_trust_list_verify_named_crt}:
-Does verification of the certificate by looking for a matching one
-in the named certificates. A callback can be specified that will provide information
-about the verification procedure (and detailed reasons of failure).
-
-@end table
+@showfuncdesc{gnutls_x509_trust_list_init}
+@showfuncdesc{gnutls_x509_trust_list_deinit}
+@showfuncdesc{gnutls_x509_trust_list_add_cas}
+@showfuncdesc{gnutls_x509_trust_list_add_named_crt}
+@showfuncdesc{gnutls_x509_trust_list_add_crls}
+@showfuncdesc{gnutls_x509_trust_list_verify_crt}
+@showfuncdesc{gnutls_x509_trust_list_verify_named_crt}
 
 The verification function will verify a given certificate chain against a list of certificate
 authorities and certificate revocation lists, and output
@@ -185,9 +162,7 @@ enumeration. It is also possible to have a set of certificates that
 are trusted for a particular server but not to authorize other certificates.
 This purpose is served by the functions @funcref{gnutls_x509_trust_list_add_named_crt} and @funcref{gnutls_x509_trust_list_verify_named_crt}.
 A detailed description of these elements can be found 
-in figure below. An example of these functions in use can be found
-in @ref{ex:verify2}.
-
+in @ref{tab:cert-verify}. An example of certificate verification is shown in @ref{ex:verify2}.
 
 When operating in the context of a TLS session, the trusted certificate
 authority list has been set via the
@@ -195,8 +170,7 @@ authority list has been set via the
 thus it is not required to setup a trusted list as above.
 Convenience functions such as @funcref{gnutls_certificate_verify_peers2} 
 are equivalent and will verify the peer's certificate chain
-in a TLS session. The certificate verification functions output
-codes as in @ref{tab:cert-verify}.
+in a TLS session. 
 
 @float Table,tab:cert-verify
 @multitable @columnfractions .55 .45
@@ -299,9 +273,12 @@ password. @acronym{GnuTLS} supports the requests defined in
 @acronym{PKCS} #10 @xcite{RFC2986}. Other certificate request's format
 are not currently supported.
 
-In @acronym{GnuTLS} the @acronym{PKCS} #10 structures are handled
-using the @code{gnutls_x509_crq_t} type.  An example of a certificate
-request generation can be found at section @ref{ex:crq}.
+The following example is about generating a certificate request, and a
+private key. A certificate request can be later be processed by a CA,
+which should return a signed certificate.
+
+@anchor{ex:crq}
+@verbatiminclude examples/ex-crq.c
 
 @node PKCS 12 structures
 @subsection @acronym{PKCS} #12 Structures
@@ -319,7 +296,9 @@ keys or encrypted data.  An Bag of type encrypted should be decrypted
 in order for its data to be accessed.
 
 An example of a @acronym{PKCS} #12 structure generation can be found
-at section @ref{ex:pkcs12}.
+below.
+
+@verbatiminclude examples/ex-pkcs12.c
 
 @node The OpenPGP trust model
 @section The @acronym{OpenPGP} Trust Model
@@ -367,7 +346,7 @@ The verification functions of @acronym{OpenPGP} keys, included in
 @acronym{GnuTLS}, are simple ones, and do not use the features of the
 ``web of trust''.  For that reason, if the verification needs are
 complex, the assistance of external tools like @acronym{GnuPG} and
-GPGME (@url{http://www.gnupg.org/related_software/gpgme/}) is
+GPGME@footnote{@url{http://www.gnupg.org/related_software/gpgme/}} is
 recommended.
 
 There is one verification function in @acronym{GnuTLS}, the
@@ -419,7 +398,7 @@ Moreover it can be used to allow all applications in the same operating system t
 shared cryptographic keys and certificates in a uniform way, as in @ref{fig:pkcs11-vision}.
 
 @float Figure,fig:pkcs11-vision
-@image{pkcs11-vision,8cm}
+@image{pkcs11-vision,9cm}
 @caption{PKCS #11 module usage.}
 @end float
 
@@ -428,28 +407,20 @@ To allow all the  @acronym{GnuTLS} applications to access @acronym{PKCS} #11 tok
 it is adviceable to use @code{/etc/pkcs11/modules/mymodule.conf}. This file has the following
 format:
 
-@verbatim
+@smallexample
 module: /usr/lib/opensc-pkcs11.so
-@end verbatim
+@end smallexample
 
 If you use this file, then there is no need for other initialization in
 @acronym{GnuTLS}, except for the PIN and token functions. Those allow retrieving a PIN
 when accessing a protected object, such as a private key, as well as probe
 the user to insert the token. All the initialization functions are below.
 
-@itemize
-
-@item @funcref{gnutls_pkcs11_init}: Global initialization
-
-@item @funcref{gnutls_pkcs11_deinit}: Global deinitialization
-
-@item @funcref{gnutls_pkcs11_set_token_function}: Sets the token insertion function
-
-@item @funcref{gnutls_pkcs11_set_pin_function}: Sets the PIN request function
-
-@item @funcref{gnutls_pkcs11_add_provider}: Adds an additional @acronym{PKCS} #11 provider
-
-@end itemize
+@showfuncdesc{gnutls_pkcs11_init}
+@showfuncdesc{gnutls_pkcs11_deinit}
+@showfuncdesc{gnutls_pkcs11_set_token_function}
+@showfuncdesc{gnutls_pkcs11_set_pin_function}
+@showfuncdesc{gnutls_pkcs11_add_provider}
 
 Note that due to limitations of @acronym{PKCS} #11 there are issues when multiple libraries 
 are sharing a module. To avoid this problem GnuTLS uses p11-kit@footnote{@url{http://p11-glue.freedesktop.org/}}
@@ -474,48 +445,31 @@ pkcs11:token=Nikos;serial=307521161601031;model=PKCS%2315;manufacturer=EnterSafe
 @end example
 
 
-Objects can be accessed with the following functions
-@itemize
+@acronym{PKCS} #11 objects can be accessed with the functions shown below.
 
-@item @funcref{gnutls_pkcs11_obj_init}: Initializes an object
+@showfuncB{gnutls_pkcs11_obj_init,gnutls_pkcs11_obj_deinit}
 
-@item @funcref{gnutls_pkcs11_obj_import_url}: To import an object from a url
+@showfuncdesc{gnutls_pkcs11_obj_import_url}
 
-@item @funcref{gnutls_pkcs11_obj_export_url}: To export the URL of the object
+@showfuncdesc{gnutls_pkcs11_obj_export_url}
 
-@item @funcref{gnutls_pkcs11_obj_deinit}: To deinitialize an object
+@showfuncdesc{gnutls_pkcs11_obj_export}
 
-@item @funcref{gnutls_pkcs11_obj_export}: To export data associated with object
+@showfuncdesc{gnutls_pkcs11_obj_get_info}
 
-@item @funcref{gnutls_pkcs11_obj_get_info}: To obtain information about an object
+@showfuncdesc{gnutls_pkcs11_obj_list_import_url}
 
-@item @funcref{gnutls_pkcs11_obj_list_import_url}: To mass load of objects
+@showfuncC{gnutls_x509_crt_import_pkcs11,gnutls_x509_crt_import_pkcs11_url,gnutls_x509_crt_list_import_pkcs11}
 
-@item @funcref{gnutls_x509_crt_import_pkcs11}: Import a certificate object
+Functions that relate to token handling are shown below.
 
-@item @funcref{gnutls_x509_crt_import_pkcs11_url}: Helper function to directly import a URL into a certificate
+@showfuncdesc{gnutls_pkcs11_token_init}
+@showfuncdesc{gnutls_pkcs11_token_set_pin}
+@showfuncdesc{gnutls_pkcs11_token_get_url}
+@showfuncdesc{gnutls_pkcs11_token_get_info}
+@showfuncdesc{gnutls_pkcs11_token_get_flags}
 
-@item @funcref{gnutls_x509_crt_list_import_pkcs11}: Mass import of certificates
-
-@end itemize
-
-
-Functions that relate to token handling are shown below
-@itemize
-
-@item @funcref{gnutls_pkcs11_token_init}: Initializes a token
-
-@item @funcref{gnutls_pkcs11_token_set_pin}: Sets the token user's PIN
-
-@item @funcref{gnutls_pkcs11_token_get_url}: Returns the URL of a token
-
-@item @funcref{gnutls_pkcs11_token_get_info}: Obtain information about a token
-
-@item @funcref{gnutls_pkcs11_token_get_flags}: Returns flags about a token (i.e. hardware or software)
-
-@end itemize
-
-The following example will list all tokens.
+The following example will list all available PKCS #11 tokens in a system.
 @example
 int i;
 char* url;
@@ -538,8 +492,8 @@ gnutls_global_deinit();
 @end example
 
 
-The next one will list all certificates in a token, that have a corresponding
-private key:
+That example will only list all certificates in a token that have a corresponding
+private key.
 @verbatiminclude examples/ex-pkcs11-list.c
 
 @subsection Writing Objects
@@ -547,15 +501,9 @@ private key:
 With @acronym{GnuTLS} you can copy existing private keys and certificates
 to a token. This can be achieved with the following functions
 
-@itemize
-
-@item @funcref{gnutls_pkcs11_delete_url}: To delete an object
-
-@item @funcref{gnutls_pkcs11_copy_x509_privkey}: To copy a private key to a token
-
-@item @funcref{gnutls_pkcs11_copy_x509_crt}: To copy a certificate to a token
-
-@end itemize
+@showfuncdesc{gnutls_pkcs11_delete_url}
+@showfuncdesc{gnutls_pkcs11_copy_x509_privkey}
+@showfuncdesc{gnutls_pkcs11_copy_x509_crt}
 
 
 @subsection Using a @acronym{PKCS} #11 token with TLS
@@ -565,13 +513,7 @@ session, as shown in @ref{ex:pkcs11-client}. In addition
 the following functions can be used to load PKCS #11 key and
 certificates.
 
-@itemize
-
-@item @funcref{gnutls_certificate_set_x509_trust_file}: If given a PKCS #11 URL will load the trusted certificates from it.
-
-@item @funcref{gnutls_certificate_set_x509_key_file}: Will also load PKCS #11 URLs for keys and certificates.
-
-@end itemize
+@showfuncB{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_key_file}
 
 
 @node Abstract key types

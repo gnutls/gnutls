@@ -18,6 +18,14 @@ are:
 
 @end itemize
 
+The rule for each method is to allocate a credentials
+structure containing data required for authentication and
+associate that structure with the session using
+@funcref{gnutls_credentials_set}. In the next paragraphs
+we elaborate on supported authentication methods.
+
+@showfuncA{gnutls_credentials_set}
+
 @menu
 * Certificate authentication::
 * Anonymous authentication::
@@ -70,22 +78,21 @@ certificate certifies the one before it. The trusted authority's
 certificate need not to be included, since the peer should possess it
 already.
 
+@showfuncE{gnutls_certificate_set_x509_key,gnutls_certificate_set_x509_key_mem,gnutls_certificate_set_openpgp_key,gnutls_certificate_set_openpgp_key_file,gnutls_certificate_set_openpgp_key_mem}
+
+@showfuncdesc{gnutls_certificate_set_x509_key_file}
+
+@showfuncdesc{gnutls_certificate_set_retrieve_function}
+
 As an alternative, a callback may be used so the server or the client
-specify the certificate and the key at the handshake time.  That
-callback can be set using the functions:
-
-@itemize
-
-@item @funcref{gnutls_certificate_server_set_retrieve_function}
-
-@item @funcref{gnutls_certificate_client_set_retrieve_function}
-
-@end itemize
-
-Clients and servers that will select certificates using callback
-functions should select a certificate according the peer's signature
+specifies the certificate and the key at the handshake time
+using @funcref{gnutls_certificate_set_retrieve_function}. 
+In that case a certificate should be selected according the peer's signature
 algorithm preferences. To get those preferences use
 @funcref{gnutls_sign_algorithm_get_requested}.
+
+@showfuncA{gnutls_sign_algorithm_get_requested}
+
 
 Certificate verification is possible by loading the trusted
 authorities into the credentials structure by using
@@ -93,11 +100,14 @@ authorities into the credentials structure by using
 @funcref{gnutls_certificate_set_openpgp_keyring_file} for openpgp
 keys. Note however that the peer's certificate is not automatically
 verified, you should call @funcref{gnutls_certificate_verify_peers2},
-after a successful handshake, to verify the signatures of the
-certificate.  An alternative way, which reports a more detailed
+after a successful handshake or during if @funcref{nutls_certificate_set_verify_function}
+has been used, to verify the certificate's signature.
+An alternative way, which reports a more detailed
 verification output, is to use @funcref{gnutls_certificate_get_peers} to
 obtain the raw certificate of the peer and verify it using the
 functions discussed in @ref{The X.509 trust model}.
+
+@showfuncdesc{gnutls_certificate_verify_peers2}
 
 In a handshake, the negotiated cipher suite depends on the
 certificate's parameters, so not all key exchange methods will be
@@ -111,6 +121,8 @@ signing and encryption. If possible use the same key for the
 and a different key for the plain RSA ciphersuites, which use
 encryption.  All the key exchange methods shown below are available in
 certificate authentication.
+
+@showfuncdesc{gnutls_certificate_set_verify_function}
 
 Note that the DHE key exchange methods are generally
 slower@footnote{It really depends on the group used.  Primes with
@@ -250,6 +262,8 @@ Alternatively @funcref{gnutls_srp_set_client_credentials_function}
 may be used to specify a callback function.
 The callback will be called once during the @acronym{TLS} handshake.
 
+@showfuncB{gnutls_srp_set_client_credentials,gnutls_srp_set_client_credentials_function}
+
 In server side the default behaviour of @acronym{GnuTLS} is to read
 the usernames and @acronym{SRP} verifiers from password files. These
 password files are the ones used by the @emph{Stanford srp libraries}
@@ -259,22 +273,18 @@ password file format is to be used, then
 @funcref{gnutls_srp_set_server_credentials_function} should be called,
 to set an appropriate callback.
 
-Some helper functions such as
+@showfuncdesc{gnutls_srp_set_server_credentials_file}
 
-@itemize
+@showfuncdesc{gnutls_srp_set_server_credentials_function}
 
-@item @funcref{gnutls_srp_verifier}
-
-@item @funcref{gnutls_srp_base64_encode}
-
-@item @funcref{gnutls_srp_base64_decode}
-
-@end itemize
-
-are included in @acronym{GnuTLS}, and can be used to generate and
+Helper functions are included in @acronym{GnuTLS}, and can be used to generate and
 maintain @acronym{SRP} verifiers and password files.  A program to
 manipulate the required parameters for @acronym{SRP} authentication is
 also included.  See @ref{srptool}, for more information.
+
+@showfuncdesc{gnutls_srp_verifier}
+
+@showfuncB{gnutls_srp_base64_encode,gnutls_srp_base64_decode}
 
 
 @node Authentication using PSK
@@ -298,6 +308,10 @@ Authentication using the @acronym{PSK} protocol.
 Authentication using the @acronym{PSK} protocol and Diffie-Hellman key
 exchange.  This method offers perfect forward secrecy.
 
+@item ECDHE-PSK:
+Authentication using the @acronym{PSK} protocol and Elliptic curve Diffie-Hellman key
+exchange.  This method offers perfect forward secrecy.
+
 @end table
 
 Clients supporting @acronym{PSK} should supply the username and key
@@ -307,6 +321,8 @@ before the TLS session is established by calling
 specify a callback function. This has the
 advantage that the callback will be called only if @acronym{PSK} has
 been negotiated.
+
+@showfuncB{gnutls_psk_set_client_credentials,gnutls_psk_set_client_credentials_function}
 
 In server side the default behaviour of @acronym{GnuTLS} is to read
 the usernames and @acronym{PSK} keys from a password file. The
@@ -324,18 +340,16 @@ A server, may specify the hint by calling
 the hint, for example in the callback function, using
 @funcref{gnutls_psk_client_get_hint}.
 
-Some helper functions such as:
+@showfuncdesc{gnutls_psk_set_server_credentials_file}
 
-@itemize
+@showfuncC{gnutls_psk_set_server_credentials_function,gnutls_psk_set_server_credentials_hint,gnutls_psk_client_get_hint}
 
-@item @funcref{gnutls_hex_encode}
-
-@item @funcref{gnutls_hex_decode}
-
-@end itemize
-
-are included in @acronym{GnuTLS}, and may be used to generate and
+Helper functions are included in @acronym{GnuTLS}, and may be used to generate and
 maintain @acronym{PSK} keys.
+
+@showfuncdesc{gnutls_hex_encode}
+
+@showfuncdesc{gnutls_hex_decode}
 
 
 @node Authentication and credentials

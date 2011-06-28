@@ -428,7 +428,8 @@ sub output_tex {
 
     $func =~ s/_/\\_/g;
 
-    print "\n\n\\subsection{". $func . "}\n\\label{" . $args{'function'} . "}\n";
+    print "\n\n\\begin{function}\n";
+    print "\\functionTitle{". $func . "}\n";
 
     $type = $args{'functiontype'};
     $type =~ s/_/\\_/g;
@@ -451,9 +452,8 @@ sub output_tex {
     }
     print ")\n";
 
-    print "\n{\\large{Arguments}}\n";
+    print "\n\\begin{functionArguments}\n";
 
-    print "\\begin{itemize}\n";
     $check=0;
     foreach $parameter (@{$args{'parameterlist'}}) {
         $param1 = $args{'parametertypes'}{$parameter};
@@ -462,11 +462,12 @@ sub output_tex {
 	$param2 =~ s/_/\\_/g;
 
 	$check = 1;
-	print "\\item {\\it ".$param1."} {\\bf ".$param2."}: \n";
+	print "\\functionArgument {\\it ".$param1."} {\\bf ".$param2."}: \n";
 #	print "\n";
 
 	$param3 = $args{'parameters'}{$parameter};
-	$param3 =~ s/#([a-zA-Z\_]+)/{\\it \1}/g;
+	$param3 =~ s/\#([a-zA-Z\_]+)/{\\it $1}/g;
+	$param3 =~ s/\%([a-zA-Z\_]+)/{\\bf $1}/g;
 
 	$out = just_highlight($param3);
 	$out =~ s/_/\\_/g;
@@ -475,29 +476,30 @@ sub output_tex {
     if ($check==0) {
 	print "\\item void\n";
     }
-    print "\\end{itemize}\n";
+    print "\\end{functionArguments}\n";
 
     foreach $section (@{$args{'sectionlist'}}) {
 	$sec = $section;
 	$sec =~ s/_/\\_/g;
 	$sec =~ s/#([a-zA-Z\_]+)/{\\it \1}/g;
 
-	print "\n{\\large{$sec}}\\\\\n";
-	print "\\begin{rmfamily}\n";
+	print "\n\\begin{function$sec}\n";
+	$out = $args{'sections'}{$section};
 
-	$sec = $args{'sections'}{$section};
-	$sec =~ s/\\:/:/g;
-	$sec =~ s/#([a-zA-Z\_]+)/{\\it \1}/g;
-	$sec =~ s/->/\$\\rightarrow\$/g;
-	$sec =~ s/([0-9]+)\^([0-9]+)/\$\{\1\}\^\{\2\}\$/g;
-
-	$out = just_highlight($sec);
+	$out =~ s/\#([a-zA-Z\_]+)/{\\it $1}/g;
+	$out =~ s/\%([a-zA-Z\_]+)/{\\bf $1}/g;
+	$out =~ s/\@([a-zA-Z\_]+)/{\\bf $1}/g;
 	$out =~ s/_/\\_/g;
+	$out =~ s/#/\\#/g;
+	$out =~ s/\n\n/\n/g;
+	$out =~ s/\\:/:/g;
+	$out =~ s/\-\>/\$\\rightarrow\$/g;
+	$out =~ s/([0-9]+)\^([0-9]+)/\$\{\1\}\^\{\2\}\$/g;
 
 	print $out;
-	print "\\end{rmfamily}\n";
+	print "\\end{function$sec}\n";
     }
-    print "\n";
+    print "\\end{function}\n\n";
 }
 
 

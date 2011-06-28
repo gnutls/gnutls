@@ -27,11 +27,30 @@ sub funcref()
 my $prefix = $_[0];
 my $suffix=$_[0];
 	$suffix =~ s/\\//g;
+	$prefix =~ s/\\_/\\_\\-/g;
 	return "\\funcref\{$prefix\}\{$suffix\}";
+}
+
+sub showfunc()
+{
+my $prefix = $_[0];
+my $suffix = $_[1];
+	$suffix =~ s/\\//g;
+	$suffix =~ s/\,/\}\{/g;
+	return "\\showfunc$prefix\{$suffix\}";
+}
+
+sub showfuncdesc()
+{
+my $suffix = $_[0];
+	$suffix =~ s/\\//g;
+	return "\\showfuncdesc\{$suffix\}";
 }
 
 my $punescape = \&unescape;
 my $pfuncref = \&funcref;
+my $pshowfunc = \&showfunc;
+my $pshowfuncdesc = \&showfuncdesc;
 my $mode;
 my $num_args = $#ARGV + 1;
 
@@ -45,7 +64,7 @@ my $match = "[\\w\\d-\\.\\/\\@\\:\_\\\\\#]";
 my $spacematch = "[\\s\\w\\d-\\.\\/\\@\\#\\:]";
 my $mathmatch = "[\\s\\w\\d-\\.\\/\\:\\(\\)\\+\\/\\^\\'\\=\{\}\\\\\\,]";
 my $underscorematch = "[\\s\\w\\d-\\.\\/\\@\\_\\\\\:\\~]";
-my $codematch = "[\\s\\w\\d-\\.\\/\\@\\_\\\\\:\\-\\\"\+\\%]";
+my $codematch = "[\\s\\w\\d-\\.\\/\\@\\_\\\\\:\\-\\\"\+\\%\\,]";
 my ($line, $prev_mode);
 my ($verbatim, $label);
 my @stack = ();
@@ -292,7 +311,8 @@ multitable:
 		$line =~ s/\@cindex (.+)/\\index{$1}/g;
 		$line =~ s/\@url\{($underscorematch+)\}/\\url{$1}/g;
 		#$line =~ s/\@euro/\\euro/g;
-		$line =~ s/\@euro\{\}/euro/g;
+		$line =~ s/\s*\@euro\{\}/\~\\textgreek\{\\euro\}/g;
+		$line =~ s/\@page/\\newpage/g;
 		$line =~ s/\@file\{($spacematch+)\}/\\file{$1}/g;
 		$line =~ s/\@code\{($codematch+)\}/\\code{$1}/g;
 		$line =~ s/\@option\{($codematch+)\}/\\command{$1}/g;
@@ -301,6 +321,8 @@ multitable:
 		$line =~ s/\@emph\{($spacematch+)\}/\\emph{$1}/g;
 		$line =~ s/\@xref\{/\\myref\{/g;
 		$line =~ s/\@funcref\{($codematch+)\}/$pfuncref->($1)/ge;
+		$line =~ s/\@showfunc([A-Z])\{($codematch+)\}/$pshowfunc->($1,$2)/ge;
+		$line =~ s/\@showfuncdesc\{($codematch+)\}/$pshowfuncdesc->($1)/ge;
 		$line =~ s/\@pxref\{/\\myref\{/g;
 		$line =~ s/\@center (.*)/\\begin{center}\n$1\n\\end{center}/g;
 		if ($line =~ m/\@email/) {

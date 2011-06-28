@@ -159,15 +159,15 @@ operating system provided locks (i.e. @code{pthreads} on GNU/Linux and
 the function @funcref{gnutls_global_set_mutex} before calling @funcref{gnutls_global_init}. 
 Setting manually mutexes is recommended
 only to applications that have full control of the underlying libraries. If this
-is not the case, the use of the operating system defaults is suggested.
+is not the case, the use of the operating system defaults is recommended. Examples
+are shown below.
 
 
-There are helper macros to help you properly initialize the libraries.
-Examples are shown in the following paragraphs.
-
-@subsection Native threads
 @example
 #include <gnutls.h>
+
+/* Native threads
+ */
 
 int main()
 @{
@@ -175,8 +175,11 @@ int main()
 @}
 @end example
 
-@subsection Other thread packages
 @example
+#include <gnutls.h>
+
+/* Other thread packages
+ */
 
 int main()
 @{
@@ -198,23 +201,12 @@ An example of this type of functions are the push and pull callbacks
 which are used to specify the functions that will retrieve and send
 data to the transport layer.
 
-@itemize
-
-@item @funcref{gnutls_transport_set_push_function}
-
-@item @funcref{gnutls_transport_set_pull_function}
-
-@end itemize
+@showfuncB{gnutls_transport_set_push_function,gnutls_transport_set_pull_function}
 
 Other callback functions may require more complicated input and data
 to be allocated. Such an example is 
 @funcref{gnutls_srp_set_server_credentials_function}.
 All callbacks should allocate and free memory using the functions shown below.
 
-@itemize
+@showfuncB{gnutls_malloc,gnutls_free}
 
-@item @funcref{gnutls_malloc}
-
-@item @funcref{gnutls_free}
-
-@end itemize
