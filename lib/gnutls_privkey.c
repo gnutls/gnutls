@@ -266,6 +266,8 @@ gnutls_privkey_init (gnutls_privkey_t * key)
 void
 gnutls_privkey_deinit (gnutls_privkey_t key)
 {
+  if (key == NULL) return;
+
   if (key->flags & GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE)
     switch (key->type)
       {
