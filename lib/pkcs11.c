@@ -33,6 +33,7 @@
 #include <gnutls_datum.h>
 #include <pkcs11_int.h>
 #include <p11-kit/p11-kit.h>
+#include <p11-kit/pin.h>
 #include <errno.h>
 
 #define MAX_PROVIDERS 16
@@ -919,7 +920,7 @@ pkcs11_open_session (struct ck_function_list ** _module, ck_session_handle_t * _
 
   if (flags & SESSION_LOGIN)
     {
-      ret = pkcs11_login (module, pks, &tinfo, (flags & SESSION_SO) ? 1 : 0);
+      ret = pkcs11_login (module, pks, &tinfo, info, (flags & SESSION_SO) ? 1 : 0);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -937,7 +938,7 @@ pkcs11_open_session (struct ck_function_list ** _module, ck_session_handle_t * _
 
 int
 _pkcs11_traverse_tokens (find_func_t find_func, void *input,
-                         unsigned int flags)
+                         struct p11_kit_uri *info, unsigned int flags)
 {
   ck_rv_t rv;
   int found = 0, x, z, ret;
@@ -949,20 +950,20 @@ _pkcs11_traverse_tokens (find_func_t find_func, void *input,
       module = providers[x].module;
       for (z = 0; z < providers[x].nslots; z++)
         {
-          struct token_info info;
+          struct token_info tinfo;
 
           ret = GNUTLS_E_PKCS11_ERROR;
 
           if (pkcs11_get_token_info (module, providers[x].slots[z],
-               &info.tinfo) != CKR_OK)
+               &tinfo.tinfo) != CKR_OK)
             {
               continue;
             }
-          info.sid = providers[x].slots[z];
-          info.prov = &providers[x];
+          tinfo.sid = providers[x].slots[z];
+          tinfo.prov = &providers[x];
 
           if (pkcs11_get_slot_info (module, providers[x].slots[z],
-               &info.sinfo) != CKR_OK)
+               &tinfo.sinfo) != CKR_OK)
             {
               continue;
             }
@@ -978,7 +979,7 @@ _pkcs11_traverse_tokens (find_func_t find_func, void *input,
 
           if (flags & SESSION_LOGIN)
             {
-              ret = pkcs11_login (module, pks, &info, (flags & SESSION_SO) ? 1 : 0);
+              ret = pkcs11_login (module, pks, &tinfo, info, (flags & SESSION_SO) ? 1 : 0);
               if (ret < 0)
                 {
                   gnutls_assert ();
@@ -986,7 +987,7 @@ _pkcs11_traverse_tokens (find_func_t find_func, void *input,
                 }
             }
 
-          ret = find_func (module, pks, &info, &providers[x].info, input);
+          ret = find_func (module, pks, &tinfo, &providers[x].info, input);
 
           if (ret == 0)
             {
@@ -1507,7 +1508,7 @@ gnutls_pkcs11_obj_import_url (gnutls_pkcs11_obj_t cert, const char *url,
     }
 
   ret =
-    _pkcs11_traverse_tokens (find_obj_url, &find_data,
+    _pkcs11_traverse_tokens (find_obj_url, &find_data, cert->info,
                              pkcs11_obj_flags_to_int (flags));
 
   if (ret < 0)
@@ -1578,7 +1579,7 @@ gnutls_pkcs11_token_get_url (unsigned int seq,
   tn.seq = seq;
   tn.info = p11_kit_uri_new ();
 
-  ret = _pkcs11_traverse_tokens (find_token_num, &tn, 0);
+  ret = _pkcs11_traverse_tokens (find_token_num, &tn, NULL, 0);
   if (ret < 0)
     {
       p11_kit_uri_free (tn.info);
@@ -1718,39 +1719,193 @@ struct pkey_list
   size_t key_ids_size;
 };
 
-int
-pkcs11_login (struct ck_function_list * module, ck_session_handle_t pks,
-              const struct token_info *info, int so)
+
+static int
+retrieve_pin_for_pinfile (const char *pinfile, struct ck_token_info *token_info,
+                          int attempts, ck_user_type_t user_type, struct p11_kit_pin **pin)
 {
-  int attempt = 0, ret;
-  ck_rv_t rv;
-  char *token_url;
-  int pin_len;
-  struct p11_kit_uri *uinfo;
+  unsigned int flags = 0;
+  struct p11_kit_uri *token_uri;
+  struct p11_kit_pin *result;
   char *label;
 
-  if (so == 0 && (info->tinfo.flags & CKF_LOGIN_REQUIRED) == 0)
+  label = p11_kit_space_strdup (token_info->label, sizeof (token_info->label));
+  if (label == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  token_uri = p11_kit_uri_new ();
+  if (token_uri == NULL)
+    {
+      free (label);
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  memcpy (p11_kit_uri_get_token_info (token_uri), token_info,
+          sizeof (struct ck_token_info));
+
+  if (attempts)
+    flags |= P11_KIT_PIN_FLAGS_RETRY;
+  if (user_type == CKU_USER)
+    {
+      flags |= P11_KIT_PIN_FLAGS_USER_LOGIN;
+      if (token_info->flags & CKF_USER_PIN_COUNT_LOW)
+        flags |= P11_KIT_PIN_FLAGS_MANY_TRIES;
+      if (token_info->flags & CKF_USER_PIN_FINAL_TRY)
+        flags |= P11_KIT_PIN_FLAGS_FINAL_TRY;
+    }
+  else if (user_type == CKU_SO)
+    {
+      flags |= P11_KIT_PIN_FLAGS_SO_LOGIN;
+      if (token_info->flags & CKF_SO_PIN_COUNT_LOW)
+        flags |= P11_KIT_PIN_FLAGS_MANY_TRIES;
+      if (token_info->flags & CKF_SO_PIN_FINAL_TRY)
+        flags |= P11_KIT_PIN_FLAGS_FINAL_TRY;
+    }
+  else if (user_type == CKU_CONTEXT_SPECIFIC)
+    {
+      flags |= P11_KIT_PIN_FLAGS_CONTEXT_LOGIN;
+    }
+
+  result = p11_kit_pin_request (pinfile, token_uri, label, flags);
+  p11_kit_uri_free (token_uri);
+  free (label);
+
+  if (result == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_PKCS11_PIN_ERROR;
+    }
+
+  *pin = result;
+  return 0;
+}
+
+static int
+retrieve_pin_for_callback (struct ck_token_info *token_info, int attempts,
+                           ck_user_type_t user_type, struct p11_kit_pin **pin)
+{
+  char pin_value[GNUTLS_PKCS11_MAX_PIN_LEN];
+  unsigned int flags = 0;
+  char *token_str;
+  char *label;
+  struct p11_kit_uri *token_uri;
+  int ret = 0;
+
+  label = p11_kit_space_strdup (token_info->label, sizeof (token_info->label));
+  if (label == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  token_uri = p11_kit_uri_new ();
+  if (token_uri == NULL)
+    {
+      free (label);
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  memcpy (p11_kit_uri_get_token_info (token_uri), token_info,
+          sizeof (struct ck_token_info));
+  ret = pkcs11_info_to_url (token_uri, 1, &token_str);
+  p11_kit_uri_free (token_uri);
+
+  if (ret < 0)
+    {
+      free (label);
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  if (user_type == CKU_USER)
+    {
+      flags |= GNUTLS_PKCS11_PIN_USER;
+      if (token_info->flags & CKF_USER_PIN_COUNT_LOW)
+        flags |= GNUTLS_PKCS11_PIN_COUNT_LOW;
+      if (token_info->flags & CKF_USER_PIN_FINAL_TRY)
+        flags |= GNUTLS_PKCS11_PIN_FINAL_TRY;
+    }
+  else if (user_type == CKU_SO)
+    {
+      flags |= GNUTLS_PKCS11_PIN_SO;
+      if (token_info->flags & CKF_SO_PIN_COUNT_LOW)
+        flags |= GNUTLS_PKCS11_PIN_COUNT_LOW;
+      if (token_info->flags & CKF_SO_PIN_FINAL_TRY)
+        flags |= GNUTLS_PKCS11_PIN_FINAL_TRY;
+    }
+
+  ret = pin_func (pin_data, attempts, (char*)token_str, label,
+                  flags, pin_value, GNUTLS_PKCS11_MAX_PIN_LEN);
+  free (token_str);
+  free (label);
+
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_PKCS11_PIN_ERROR;
+    }
+
+  *pin = p11_kit_pin_new_for_string (pin_value);
+
+  /* Try to scrub the pin off the stack.  Clever compilers will
+   * probably optimize this away, oh well. */
+  memset (pin, 0, sizeof pin);
+
+  return 0;
+}
+
+static int
+retrieve_pin (struct p11_kit_uri *info, struct ck_token_info *token_info,
+              int attempts, ck_user_type_t user_type, struct p11_kit_pin **pin)
+{
+  const char *pinfile;
+
+  *pin = NULL;
+
+  /* Check if a pinfile is specified, and use that if possible */
+  pinfile = p11_kit_uri_get_pinfile (info);
+  if (pinfile != NULL)
+    return retrieve_pin_for_pinfile (pinfile, token_info, attempts, user_type, pin);
+
+  /* The global gnutls pin callback */
+  else if (pin_func)
+    return retrieve_pin_for_callback (token_info, attempts, user_type, pin);
+
+  /* Otherwise, PIN entry is necessary for login, so fail if there's
+   * no callback. */
+  else
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("pk11: No pin callback but login required.\n");
+      return GNUTLS_E_PKCS11_ERROR;
+    }
+}
+
+int
+pkcs11_login (struct ck_function_list * module, ck_session_handle_t pks,
+              const struct token_info *tokinfo, struct p11_kit_uri *info, int so)
+{
+  int attempt = 0, ret;
+  ck_user_type_t user_type;
+  ck_rv_t rv;
+
+  user_type = (so == 0) ? CKU_USER : CKU_SO;
+  if (so == 0 && (tokinfo->tinfo.flags & CKF_LOGIN_REQUIRED) == 0)
     {
       gnutls_assert ();
       _gnutls_debug_log ("pk11: No login required.\n");
       return 0;
     }
 
-  uinfo = p11_kit_uri_new ();
-  memcpy (p11_kit_uri_get_token_info (uinfo), &info->tinfo, sizeof (struct ck_token_info));
-  ret = pkcs11_info_to_url (uinfo, 1, &token_url);
-  p11_kit_uri_free (uinfo);
-
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
   /* For a token with a "protected" (out-of-band) authentication
    * path, calling login with a NULL username is all that is
    * required. */
-  if (info->tinfo.flags & CKF_PROTECTED_AUTHENTICATION_PATH)
+  if (tokinfo->tinfo.flags & CKF_PROTECTED_AUTHENTICATION_PATH)
     {
       rv = (module)->C_Login (pks, (so == 0) ? CKU_USER : CKU_SO, NULL, 0);
       if (rv == CKR_OK || rv == CKR_USER_ALREADY_LOGGED_IN)
@@ -1766,30 +1921,19 @@ pkcs11_login (struct ck_function_list * module, ck_session_handle_t pks,
         }
     }
 
-  /* Otherwise, PIN entry is necessary for login, so fail if there's
-   * no callback. */
-  if (!pin_func)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("pk11: No pin callback but login required.\n");
-      ret = GNUTLS_E_PKCS11_ERROR;
-      goto cleanup;
-    }
-
   do
     {
+      struct p11_kit_pin *pin;
       struct ck_token_info tinfo;
-      char pin[GNUTLS_PKCS11_MAX_PIN_LEN];
-      unsigned int flags;
 
-      memcpy(&tinfo, &info->tinfo, sizeof(tinfo));
+      memcpy (&tinfo, &tokinfo->tinfo, sizeof(tinfo));
 
       /* If login has been attempted once already, check the token
        * status again, the flags might change. */
       if (attempt)
         {
           if (pkcs11_get_token_info
-              (info->prov->module, info->sid, &tinfo) != CKR_OK)
+              (tokinfo->prov->module, tokinfo->sid, &tinfo) != CKR_OK)
             {
               gnutls_assert ();
               _gnutls_debug_log ("pk11: GetTokenInfo failed\n");
@@ -1798,43 +1942,18 @@ pkcs11_login (struct ck_function_list * module, ck_session_handle_t pks,
             }
         }
 
-      flags = 0;
-      if (so == 0)
-        {
-          flags |= GNUTLS_PKCS11_PIN_USER;
-          if (tinfo.flags & CKF_USER_PIN_COUNT_LOW)
-            flags |= GNUTLS_PKCS11_PIN_COUNT_LOW;
-          if (tinfo.flags & CKF_USER_PIN_FINAL_TRY)
-            flags |= GNUTLS_PKCS11_PIN_FINAL_TRY;
-        }
-      else
-        {
-          flags |= GNUTLS_PKCS11_PIN_SO;
-          if (tinfo.flags & CKF_SO_PIN_COUNT_LOW)
-            flags |= GNUTLS_PKCS11_PIN_COUNT_LOW;
-          if (tinfo.flags & CKF_SO_PIN_FINAL_TRY)
-            flags |= GNUTLS_PKCS11_PIN_FINAL_TRY;
-        }
-
-      label = p11_kit_space_strdup (info->tinfo.label, sizeof (info->tinfo.label));
-      ret = pin_func (pin_data, attempt++,
-                      (char *) token_url, label, flags, pin, sizeof (pin));
-      free (label);
-
+      ret = retrieve_pin (info, &tinfo, attempt, user_type, &pin);
       if (ret < 0)
         {
           gnutls_assert ();
-          ret = GNUTLS_E_PKCS11_PIN_ERROR;
           goto cleanup;
         }
-      pin_len = strlen (pin);
 
-      rv = (module)->C_Login (pks, (so == 0) ? CKU_USER : CKU_SO,
-                           (unsigned char *) pin, pin_len);
+      rv = (module)->C_Login (pks, user_type,
+                              (unsigned char *)p11_kit_pin_get_value (pin, NULL),
+                              p11_kit_pin_get_length (pin));
 
-      /* Try to scrub the pin off the stack.  Clever compilers will
-       * probably optimize this away, oh well. */
-      memset (pin, 0, sizeof pin);
+      p11_kit_pin_unref (pin);
     }
   while (rv == CKR_PIN_INCORRECT);
 
@@ -1845,7 +1964,6 @@ pkcs11_login (struct ck_function_list * module, ck_session_handle_t pks,
          || rv == CKR_USER_ALREADY_LOGGED_IN) ? 0 : pkcs11_rv_to_err (rv);
 
 cleanup:
-  gnutls_free (token_url);
   return ret;
 }
 
@@ -2300,7 +2418,7 @@ gnutls_pkcs11_obj_list_import_url (gnutls_pkcs11_obj_t * p_list,
     }
 
   ret =
-    _pkcs11_traverse_tokens (find_objs, &find_data,
+    _pkcs11_traverse_tokens (find_objs, &find_data, find_data.info,
                              pkcs11_obj_flags_to_int (flags));
   p11_kit_uri_free (find_data.info);
 
@@ -2482,7 +2600,7 @@ gnutls_pkcs11_token_get_flags (const char *url, unsigned int *flags)
       return ret;
     }
 
-  ret = _pkcs11_traverse_tokens (find_flags, &find_data, 0);
+  ret = _pkcs11_traverse_tokens (find_flags, &find_data, find_data.info, 0);
   p11_kit_uri_free (find_data.info);
 
   if (ret < 0)
