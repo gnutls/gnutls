@@ -53,7 +53,7 @@ int pkcs11_get_info (struct p11_kit_uri *info,
                      gnutls_pkcs11_obj_info_t itype, void *output,
                      size_t * output_size);
 int pkcs11_login (struct ck_function_list * module, ck_session_handle_t pks,
-                  const struct token_info *info, int admin);
+                  const struct token_info *tinfo, struct p11_kit_uri *info, int admin);
 
 int pkcs11_call_token_func (struct p11_kit_uri *info, const unsigned retry);
 
@@ -70,7 +70,7 @@ int pkcs11_info_to_url (struct p11_kit_uri *info,
 int pkcs11_open_session (struct ck_function_list **_module, ck_session_handle_t * _pks,
                          struct p11_kit_uri *info, unsigned int flags);
 int _pkcs11_traverse_tokens (find_func_t find_func, void *input,
-                             unsigned int flags);
+                             struct p11_kit_uri *info, unsigned int flags);
 ck_object_class_t pkcs11_strtype_to_class (const char *type);
 
 int pkcs11_token_matches_info (struct p11_kit_uri *info,

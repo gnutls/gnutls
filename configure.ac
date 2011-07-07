@@ -126,7 +126,7 @@ AC_ARG_WITH(p11-kit,
 		[Build without p11-kit and PKCS#11 support]))
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 if test "$with_p11_kit" != "no"; then
-	PKG_CHECK_MODULES(P11_KIT, [p11-kit-1])
+	PKG_CHECK_MODULES(P11_KIT, [p11-kit-1 >= 0.2])
 	AC_DEFINE(ENABLE_PKCS11, 1, [Build PKCS#11 support])
 	CFLAGS="$CFLAGS $P11_KIT_CFLAGS"
 	LIBS="$LIBS $P11_KIT_LIBS"
