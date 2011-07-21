@@ -46,12 +46,9 @@ different approach to enable the secure layer.  They use something
 called the ``TLS upgrade'' method. This method is quite tricky but it
 is more flexible. The idea is to extend the application protocol to
 have a ``STARTTLS'' request, whose purpose it to start the TLS
-protocols just after the client requests it.  This is a really neat
-idea and does not require an extra port.
-
-This method is used by almost all modern protocols and there is even
-the @xcite{RFC2817} paper which proposes extensions to HTTP to support
-it.
+protocols just after the client requests it.  This approach
+does not require an extra port and is used by almost all modern protocols.
+There is even an extension to HTTP protocol to support that method @xcite{RFC2817}.
 
 The tricky part, in this method, is that the ``STARTTLS'' request is
 sent in the clear, thus is vulnerable to modifications.  A typical
