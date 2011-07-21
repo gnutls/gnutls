@@ -1,5 +1,5 @@
 @node Included programs
-@chapter Included Programs
+@chapter Included programs
 
 Included with @acronym{GnuTLS} are also a few command line tools that
 let you use the library for common tasks without writing an
@@ -217,7 +217,7 @@ $ certtool --generate-proxy --load-ca-privkey key.pem \
   --outfile proxy-cert.pem
 @end smallexample
 
-@subsection Certificate Revocation List generation
+@subsection Certificate revocation list generation
 To create an empty Certificate Revocation List (CRL) do:
 
 @smallexample
@@ -578,7 +578,7 @@ Usage: gnutls-serv [options]
      -v, --version            prints the program's version number
 @end example
 
-@subsection Setting Up a Test HTTPS Server
+@subsection Setting up a test HTTPS server
 @cindex HTTPS server
 @cindex debug server
 

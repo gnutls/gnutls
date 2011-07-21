@@ -1,5 +1,5 @@
 @node How to use GnuTLS in applications
-@chapter How To Use @acronym{GnuTLS} in Applications
+@chapter How to use @acronym{GnuTLS} in applications
 @anchor{examples}
 @cindex Example programs
 
@@ -55,7 +55,7 @@ GnuTLS, such as translated error messages, the application must set
 the current locale using @code{setlocale} before initializing GnuTLS.
 
 @node Version check
-@subsection Version Check
+@subsection Version check
 
 It is often desirable to check that the version of `gnutls' used is
 indeed one which fits all requirements.  Even with binary
@@ -83,7 +83,7 @@ TLS session. The session information might be used to derive IP addresses
 or other information about the peer involved.
 
 @node Building the source
-@subsection Building the Source
+@subsection Building the source
 
 If you want to compile a source file including the
 @file{gnutls/gnutls.h} header file, you must make sure that the
@@ -131,7 +131,7 @@ gcc -o foo foo.c `pkg-config gnutls --cflags --libs`
 
 
 @node Client examples
-@section Client Examples
+@section Client examples
 
 This section contains examples of @acronym{TLS} and @acronym{SSL}
 clients, using @acronym{GnuTLS}.  Note that these examples contain
@@ -154,7 +154,7 @@ implemented by another example.
 @end menu
 
 @node Simple client example with anonymous authentication
-@subsection Simple Client Example with Anonymous Authentication
+@subsection Simple client example with anonymous authentication
 
 The simplest client using TLS is the one that doesn't do any
 authentication.  This means no external certificates or passwords are
@@ -165,7 +165,7 @@ However, the data is integrity and privacy protected.
 @verbatiminclude examples/ex-client1.c
 
 @node Simple client example with X.509 certificate support
-@subsection Simple Client Example with @acronym{X.509} Certificate Support
+@subsection Simple client example with @acronym{X.509} certificate support
 
 Let's assume now that we want to create a TCP client which
 communicates with servers that use @acronym{X.509} or
@@ -178,7 +178,7 @@ redefining them.
 @verbatiminclude examples/ex-client2.c
 
 @node Simple Datagram TLS client example
-@subsection Simple Datagram @acronym{TLS} client example
+@subsection Simple datagram @acronym{TLS} client example
 
 This is a client that uses @acronym{UDP} to connect to a
 server. This is the @acronym{DTLS} equivalent to 
@@ -187,7 +187,7 @@ server. This is the @acronym{DTLS} equivalent to
 @verbatiminclude examples/ex-client-udp.c
 
 @node Obtaining session information
-@subsection Obtaining Session Information
+@subsection Obtaining session information
 
 Most of the times it is desirable to know the security properties of
 the current established session.  This includes the underlying ciphers
@@ -198,7 +198,7 @@ if called after a successful @funcref{gnutls_handshake}.
 @verbatiminclude examples/ex-session-info.c
 
 @node Verifying peer's certificate
-@subsection Verifying Peer's Certificate
+@subsection Verifying peer's certificate
 @anchor{ex:verify}
 
 A @acronym{TLS} session is not secure just after the handshake
@@ -211,7 +211,7 @@ treat the connection as being a secure one.
 @verbatiminclude examples/ex-rfc2818.c
 
 @node Using a callback to select the certificate to use
-@subsection Using a Callback to Select the Certificate to Use
+@subsection Using a callback to select the certificate to use
 
 There are cases where a client holds several certificate and key
 pairs, and may not want to load all of them in the credentials
@@ -221,7 +221,7 @@ certificate selection callback.
 @verbatiminclude examples/ex-cert-select.c
 
 @node Verifying a certificate
-@subsection Verifying a Certificate
+@subsection Verifying a certificate
 @anchor{ex:verify2}
 
 An example is listed below which uses the high level verification
@@ -240,7 +240,7 @@ from a @acronym{PKCS} #11 token, and use it with a TLS connection.
 
 
 @node Client with Resume capability example
-@subsection Client with Resume Capability Example
+@subsection Client with resume capability example
 @anchor{ex:resume-client}
 
 This is a modification of the simple client example. Here we
@@ -252,7 +252,7 @@ establish a new connection using the previously negotiated data.
 
 
 @node Simple client example with SRP authentication
-@subsection Simple Client Example with @acronym{SRP} Authentication
+@subsection Simple client example with @acronym{SRP} authentication
 
 The following client is a very simple @acronym{SRP} @acronym{TLS}
 client which connects to a server and authenticates using a
@@ -262,7 +262,7 @@ itself using a certificate, and in that case it has to be verified.
 @verbatiminclude examples/ex-client-srp.c
 
 @node Simple client example in C++
-@subsection Simple Client Example using the C++ API
+@subsection Simple client example using the C++ API
 
 The following client is a simple example of a client client utilizing
 the GnuTLS C++ API.
@@ -270,7 +270,7 @@ the GnuTLS C++ API.
 @verbatiminclude examples/ex-cxx.cpp
 
 @node Helper function for TCP connections
-@subsection Helper Function for TCP Connections
+@subsection Helper function for TCP connections
 
 This helper function abstracts away TCP connection handling from the
 other examples.  It is required to build some examples.
@@ -278,7 +278,7 @@ other examples.  It is required to build some examples.
 @verbatiminclude examples/tcp.c
 
 @node Server examples
-@section Server Examples
+@section Server examples
 
 This section contains examples of @acronym{TLS} and @acronym{SSL}
 servers, using @acronym{GnuTLS}.
@@ -291,7 +291,7 @@ servers, using @acronym{GnuTLS}.
 @end menu
 
 @node Echo Server with X.509 authentication
-@subsection Echo Server with @acronym{X.509} Authentication
+@subsection Echo server with @acronym{X.509} authentication
 
 This example is a very simple echo server which supports
 @acronym{X.509} authentication, using the RSA ciphersuites.
@@ -299,8 +299,8 @@ This example is a very simple echo server which supports
 @verbatiminclude examples/ex-serv1.c
 
 @node Echo Server with OpenPGP authentication
-@subsection Echo Server with @acronym{OpenPGP} Authentication
-@cindex @acronym{OpenPGP} Server
+@subsection Echo server with @acronym{OpenPGP} authentication
+@cindex @acronym{OpenPGP} server
 
 The following example is an echo server which supports
 @acronym{OpenPGP} key authentication. You can easily combine
@@ -311,7 +311,7 @@ them to keep these examples as simple as possible.
 @verbatiminclude examples/ex-serv-pgp.c
 
 @node Echo Server with SRP authentication
-@subsection Echo Server with @acronym{SRP} Authentication
+@subsection Echo server with @acronym{SRP} authentication
 
 This is a server which supports @acronym{SRP} authentication. It is
 also possible to combine this functionality with a certificate
@@ -320,7 +320,7 @@ server. Here it is separate for simplicity.
 @verbatiminclude examples/ex-serv-srp.c
 
 @node Echo Server with anonymous authentication
-@subsection Echo Server with Anonymous Authentication
+@subsection Echo Server with anonymous authentication
 
 This example server support anonymous authentication, and could be
 used to serve the example client for anonymous authentication.
@@ -328,7 +328,7 @@ used to serve the example client for anonymous authentication.
 @verbatiminclude examples/ex-serv-anon.c
 
 @node Miscellaneous examples
-@section Miscellaneous Examples
+@section Miscellaneous examples
 
 @menu
 * Checking for an alert::
@@ -336,7 +336,7 @@ used to serve the example client for anonymous authentication.
 @end menu
 
 @node Checking for an alert
-@subsection Checking for an Alert
+@subsection Checking for an alert
 
 This is a function that checks if an alert has been received in the
 current session.
@@ -344,7 +344,7 @@ current session.
 @verbatiminclude examples/ex-alert.c
 
 @node X.509 certificate parsing example
-@subsection @acronym{X.509} Certificate Parsing Example
+@subsection @acronym{X.509} certificate parsing example
 @anchor{ex:x509-info}
 
 To demonstrate the @acronym{X.509} parsing capabilities an example program is
@@ -366,8 +366,8 @@ information about it.
 
 @node Parameter generation
 @subsection Parameter generation
-@cindex parameter generation
-@cindex generating parameters
+@cindex Parameter generation
+@cindex Generating parameters
 
 Several TLS ciphersuites require additional parameters that
 need to be generated or provided by the application. The
@@ -401,9 +401,9 @@ following functions can be used for these parameters.
 
 
 @node Keying Material Exporters
-@subsection Keying Material Exporters
-@cindex Keying Material Exporters
-@cindex Exporting Keying Material
+@subsection Keying material exporters
+@cindex Keying material exporters
+@cindex Exporting keying material
 
 The TLS PRF can be used by other protocols to derive data.  The API to
 use is @funcref{gnutls_prf}.  The function needs to be provided with the
@@ -427,8 +427,8 @@ If you don't want to mix in the client/server random, there is a more
 low-level TLS PRF interface called @funcref{gnutls_prf_raw}.
 
 @node Channel Bindings
-@subsection Channel Bindings
-@cindex Channel Bindings
+@subsection Channel bindings
+@cindex Channel bindings
 
 In user authentication protocols (e.g., EAP or SASL mechanisms) it is
 useful to have a unique string that identifies the secure channel that
@@ -469,7 +469,7 @@ Note that it must be run after a successful TLS handshake.
 @end smallexample
 
 @node Compatibility with the OpenSSL library
-@subsection Compatibility with the OpenSSL Library
+@subsection Compatibility with the OpenSSL library
 @cindex OpenSSL
 
 To ease @acronym{GnuTLS}' integration with existing applications, a

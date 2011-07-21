@@ -33,8 +33,8 @@ noted otherwise.
 @end menu
 
 @node TLS layers
-@section TLS Layers
-@cindex TLS Layers
+@section TLS layers
+@cindex TLS layers
 
 @acronym{TLS} is a layered protocol, and consists of the record
 protocol, the handshake protocol and the alert protocol. The record
@@ -57,8 +57,9 @@ protocol.  The protocol layering in TLS is shown in @ref{fig:tls-layers}.
 @end float
 
 @node The transport layer
-@section The Transport Layer
+@section The transport layer
 @cindex Transport protocol
+@cindex Transport layer
 
 @acronym{TLS} is not limited to any transport layer and can be used
 above any transport layer, as long as it is a reliable one.  @acronym{DTLS}
@@ -106,7 +107,7 @@ By default, if the transport functions are not set, @acronym{GnuTLS}
 will use the Berkeley sockets. 
 
 @node The TLS record protocol
-@section The TLS Record Protocol
+@section The TLS record protocol
 @cindex Record protocol
 
 The record protocol is the secure communications provider. Its purpose
@@ -146,7 +147,7 @@ just after the handshake protocol has finished.
 @end menu
 
 @node Encryption algorithms used in the record layer
-@subsection Encryption Algorithms Used in the record layer
+@subsection Encryption algorithms used in the record layer
 @cindex Symmetric encryption algorithms
 
 Confidentiality in the record layer is achieved by using symmetric
@@ -221,7 +222,7 @@ GCM, is in use.
 
 
 @node Compression algorithms used in the record layer
-@subsection Compression Algorithms Used in the record layer
+@subsection Compression algorithms used in the record layer
 @cindex Compression algorithms
 
 The TLS record layer also supports compression.  The algorithms
@@ -246,7 +247,7 @@ No compression.
 @end table
 
 @node Weaknesses and countermeasures
-@subsection Weaknesses and Countermeasures
+@subsection Weaknesses and countermeasures
 
 Some weaknesses that may affect the security of the record layer have
 been found in @acronym{TLS} 1.0 protocol. These weaknesses can be
@@ -273,7 +274,7 @@ which is implemented in @acronym{GnuTLS}. For a detailed discussion
 see the archives of the TLS Working Group mailing list and @xcite{CBCATT}.
 
 @node On Record Padding
-@subsection On Record Padding
+@subsection On record padding
 @cindex Record padding
 @cindex Bad record MAC
 
@@ -305,7 +306,7 @@ different incoming IP addresses.
 
 
 @node The TLS Alert Protocol
-@section The TLS Alert Protocol
+@section The TLS alert protocol
 @anchor{The Alert Protocol}
 @cindex Alert protocol
 
@@ -337,7 +338,7 @@ protocol are shown below.
 
 
 @node The TLS Handshake Protocol
-@section The TLS Handshake Protocol
+@section The TLS handshake protocol
 @anchor{The Handshake Protocol}
 @cindex Handshake protocol
 
@@ -360,7 +361,7 @@ controlling of the handshake protocol, i.e., the ciphersuite negotiation.
 @end menu
 
 @node TLS Cipher Suites
-@subsection TLS Cipher Suites
+@subsection TLS ciphersuites
 
 The handshake protocol of @acronym{TLS} negotiates cipher suites of
 a special form illustrated by the @code{TLS_DHE_RSA_WITH_3DES_CBC_SHA} cipher suite name.  A typical cipher
@@ -388,7 +389,7 @@ that you consider weak.
 All the supported ciphersuites are listed in @ref{ciphersuites}.
 
 @node Priority Strings
-@subsection Priority Strings
+@subsection Priority strings
 
 In order to specify cipher suite preferences on client or server side, the
 previously shown priority functions accept a string
@@ -561,7 +562,7 @@ will allow V1 CAs in chains.
 @end float
 
 @node Client Authentication
-@subsection Client Authentication
+@subsection Client authentication
 @cindex Client Certificate authentication
 
 In the case of ciphersuites that use certificate authentication, the
@@ -587,7 +588,7 @@ signed by server's acceptable signers.
 @showfuncdesc{gnutls_certificate_send_x509_rdn_sequence}
 
 @node Resuming Sessions
-@subsection Resuming Sessions
+@subsection Resuming sessions
 @anchor{resume}
 @cindex Resuming sessions
 
@@ -664,8 +665,8 @@ We suggest however only to use this mode if compatibility is preferred over
 security.
 
 @node TLS Extensions
-@section TLS Extensions
-@cindex TLS Extensions
+@section TLS extensions
+@cindex TLS extensions
 
 A number of extensions to the @acronym{TLS} protocol have been
 proposed mainly in @xcite{TLSEXT}. The extensions supported
@@ -680,8 +681,8 @@ in @acronym{GnuTLS} are:
 
 and they will be discussed in the subsections that follow.
 
-@subsection Maximum Fragment Length Negotiation
-@cindex TLS Extensions
+@subsection Maximum fragment length negotiation
+@cindex TLS extensions
 @cindex Maximum fragment length
 
 This extension allows a @acronym{TLS} implementation to negotiate a
@@ -693,9 +694,9 @@ below can be used to control this extension.
 
 @showfuncdesc{gnutls_record_set_max_size}
 
-@subsection Server Name Indication
+@subsection Server name indication
 @anchor{serverind}
-@cindex TLS Extensions
+@cindex TLS extensions
 @cindex Server name indication
 
 A common problem in @acronym{HTTPS} servers is the fact that the
@@ -714,9 +715,9 @@ client.
 
 @showfuncdesc{gnutls_server_name_get}
 
-@subsection Session Tickets
-@cindex TLS Extensions
-@cindex Session Tickets
+@subsection Session tickets
+@cindex TLS extensions
+@cindex Session tickets
 @cindex Ticket
 
 To resume a TLS session the server normally store some state.  This
@@ -738,7 +739,7 @@ resume functions, @ref{resume}.
 
 @showfuncdesc{gnutls_session_ticket_enable_client}
 
-@subsection Safe Renegotiation
+@subsection Safe renegotiation
 @cindex renegotiation
 
 TLS gives the option to two communicating parties to renegotiate
@@ -840,7 +841,7 @@ used to check if the extension has been negotiated on a session, and
 can be used both by clients and servers.
 
 @node Selecting cryptographic key sizes
-@section Selecting Cryptographic Key Sizes
+@section Selecting cryptographic key sizes
 @cindex key sizes
 
 In TLS, since a lot of algorithms are involved, it is not easy to set
@@ -923,7 +924,7 @@ of @code{gnutls_sec_param_t} type, to a number of bits suitable for a public
 key algorithm.
 
 @node On SSL 2 and older protocols
-@section On SSL 2 and Older Protocols
+@section On SSL 2 and older protocols
 @cindex SSL 2
 
 One of the initial decisions in the @acronym{GnuTLS} development was

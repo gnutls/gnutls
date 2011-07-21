@@ -50,15 +50,15 @@ In order to ease integration in embedded systems, parts of the
 smaller library, with the required features, can be generated.
 
 @menu
-* General Idea::
+* General idea::
 * Error handling::
 * Memory handling::
 * Thread safety::
 * Callback functions::
 @end menu
 
-@node General Idea
-@section General Idea
+@node General idea
+@section General idea
 
 A brief description of how @acronym{GnuTLS} works internally is shown
 at @ref{fig:gnutls-design}. This section may be easier to understand after
@@ -107,7 +107,7 @@ the stored session will be retrieved, and the new session will be a
 resumed one, and will share the same session ID with the previous one.
 
 @node Error handling
-@section Error Handling
+@section Error handling
 
 In @acronym{GnuTLS} most functions return an integer type as a result.
 In almost all cases a zero or a positive number means success, and a
@@ -131,7 +131,7 @@ reference.  See @ref{Error codes}, for a description of the available
 error codes.
 
 @node Memory handling
-@section Memory Handling
+@section Memory handling
 
 @acronym{GnuTLS} internally handles heap allocated objects
 differently, depending on the sensitivity of the data they
@@ -184,7 +184,7 @@ int main()
 @end example
 
 @node Callback functions
-@section Callback Functions
+@section Callback functions
 @cindex Callback functions
 
 There are several cases where @acronym{GnuTLS} may need some out of

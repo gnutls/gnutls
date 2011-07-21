@@ -1,5 +1,5 @@
 @node Authentication methods
-@chapter Authentication Methods
+@chapter Authentication methods
 
 The @acronym{TLS} protocol provides confidentiality and encryption,
 but also offers authentication, which is a prerequisite for a secure
@@ -36,9 +36,9 @@ we elaborate on supported authentication methods.
 @end menu
 
 @node Certificate authentication
-@section Certificate Authentication
+@section Certificate authentication
 
-@subsection Authentication Using @acronym{X.509} Certificates
+@subsection Authentication using @acronym{X.509} certificates
 @cindex @acronym{X.509} certificates
 
 @acronym{X.509} certificates contain the public parameters, of a
@@ -46,8 +46,8 @@ public key algorithm, and an authority's signature, which proves the
 authenticity of the parameters.  See @ref{The X.509 trust model}, for
 more information on @acronym{X.509} protocols.
 
-@subsection Authentication Using @acronym{OpenPGP} Keys
-@cindex @acronym{OpenPGP} Keys
+@subsection Authentication using @acronym{OpenPGP} keys
+@cindex @acronym{OpenPGP} keys
 
 @acronym{OpenPGP} keys also contain public parameters of a public key
 algorithm, and signatures from several other parties. Depending on
@@ -58,7 +58,7 @@ based on the @xcite{TLSPGP} proposal.
 More information on the @acronym{OpenPGP} trusted model is provided in @ref{The OpenPGP trust model}.
 For a more detailed introduction to @acronym{OpenPGP} and @acronym{GnuPG} see @xcite{GPGH}.
 
-@subsection Using Certificate Authentication
+@subsection Using certificate authentication
 
 In @acronym{GnuTLS} both the @acronym{OpenPGP} and @acronym{X.509}
 certificates are part of the certificate authentication and thus are
@@ -100,7 +100,7 @@ authorities into the credentials structure by using
 @funcref{gnutls_certificate_set_openpgp_keyring_file} for openpgp
 keys. Note however that the peer's certificate is not automatically
 verified, you should call @funcref{gnutls_certificate_verify_peers2},
-after a successful handshake or during if @funcref{nutls_certificate_set_verify_function}
+after a successful handshake or during if @funcref{gnutls_certificate_set_verify_function}
 has been used, to verify the certificate's signature.
 An alternative way, which reports a more detailed
 verification output, is to use @funcref{gnutls_certificate_get_peers} to
@@ -180,7 +180,7 @@ algorithm.
 @end float
 
 @node Anonymous authentication
-@section Anonymous Authentication
+@section Anonymous authentication
 @cindex Anonymous authentication
 
 The anonymous key exchange performs encryption but there is no
@@ -264,7 +264,7 @@ The callback will be called once during the @acronym{TLS} handshake.
 
 @showfuncB{gnutls_srp_set_client_credentials,gnutls_srp_set_client_credentials_function}
 
-In server side the default behaviour of @acronym{GnuTLS} is to read
+In server side the default behavior of @acronym{GnuTLS} is to read
 the usernames and @acronym{SRP} verifiers from password files. These
 password files are the ones used by the @emph{Stanford srp libraries}
 and @funcref{gnutls_srp_set_server_credentials_file} can be used to
@@ -324,7 +324,7 @@ been negotiated.
 
 @showfuncB{gnutls_psk_set_client_credentials,gnutls_psk_set_client_credentials_function}
 
-In server side the default behaviour of @acronym{GnuTLS} is to read
+In server side the default behavior of @acronym{GnuTLS} is to read
 the usernames and @acronym{PSK} keys from a password file. The
 password file should contain usernames and keys in hexadecimal
 format. The name of the password file can be stored to the credentials
@@ -353,7 +353,7 @@ maintain @acronym{PSK} keys.
 
 
 @node Authentication and credentials
-@section Authentication and Credentials
+@section Authentication and credentials
 
 In @acronym{GnuTLS} every key exchange method is associated with a
 credentials type. So in order to enable to enable a specific method,
@@ -397,7 +397,7 @@ the corresponding credentials type should be initialized and set using
 @end float
 
 @node Parameters stored in credentials
-@section Parameters Stored in Credentials
+@section Parameters stored in credentials
 
 Several parameters such as the ones used for Diffie-Hellman
 authentication are stored within the credentials structures, so all
