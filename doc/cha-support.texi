@@ -72,14 +72,9 @@ development release.  For example, GnuTLS 1.6.3 denote a stable
 release since 6 is even, and GnuTLS 1.7.11 denote a development
 release since 7 is odd.
 
-GnuTLS depends on Libgcrypt,
-and you will need to install Libgcrypt
-before installing GnuTLS.  Libgcrypt is available from
-@url{ftp://ftp.gnupg.org/gcrypt/libgcrypt}.  Libgcrypt needs another
-library, libgpg-error, and you need to install libgpg-error before
-installing Libgcrypt.  Libgpg-error is available from
-@url{ftp://ftp.gnupg.org/gcrypt/libgpg-error}.
-
+GnuTLS depends on Libnettle, and you will need to install it
+before installing GnuTLS.  Libnettle is available from
+@url{http://www.lysator.liu.se/~nisse/nettle/}.  
 Don't forget to verify the cryptographic signature after downloading
 source code packages.
 
@@ -98,8 +93,6 @@ called libtasn1.  A copy of libtasn1 is included in GnuTLS.  If you
 want to install it separately (e.g., to make it possibly to use
 libtasn1 in other programs), you can get it from
 @url{http://www.gnu.org/software/gnutls/download.html}.
-The OpenPGP part of GnuTLS uses a stripped down version of OpenCDK for
-parsing OpenPGP packets.
 
 A few @code{configure} options may be relevant, summarized below.
 They disable or enable particular features. 

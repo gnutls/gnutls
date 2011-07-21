@@ -674,9 +674,7 @@ gnutls_srp_server_get_username (gnutls_session_t session)
  *
  * This function will create an SRP verifier, as specified in
  * RFC2945.  The @prime and @generator should be one of the static
- * parameters defined in gnutls/extra.h or may be generated using the
- * libgcrypt functions gcry_prime_generate() and
- * gcry_prime_group_generator().
+ * parameters defined in gnutls/extra.h or may be generated.
  *
  * The verifier will be allocated with @gnutls_malloc() and will be stored in
  * @res using binary format.

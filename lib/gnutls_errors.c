@@ -209,7 +209,7 @@ static const gnutls_error_entry error_algorithms[] = {
   ERROR_ENTRY (N_
                ("The GnuTLS library version does not match the GnuTLS-extra library version."),
                GNUTLS_E_LIBRARY_VERSION_MISMATCH, 1),
-  ERROR_ENTRY (N_("The gcrypt library version is too old."),
+  ERROR_ENTRY (N_("The crypto library version is too old."),
                GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY, 1),
 
   ERROR_ENTRY (N_("The tasn1 library version is too old."),

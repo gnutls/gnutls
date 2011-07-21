@@ -40,7 +40,7 @@ implementation, and is entirely implemented within the
 @acronym{GnuTLS} library.  The `Certificate part' consists of the
 certificate parsing, and verification functions which is partially
 implemented in the @acronym{GnuTLS} library.  The
-libtasn1@footnote{@url{ftp://ftp.gnupg.org/gcrypt/alpha/gnutls/libtasn1/}},
+libtasn1@footnote{@url{http://www.gnu.org/software/libtasn1/}},
 a library which offers @acronym{ASN.1} parsing capabilities, is used
 for the @acronym{X.509} certificate parsing functions.  
 The ``Cryptographic back-end'' is provided by nettle@footnote{@url{http://www.lysator.liu.se/~nisse/nettle/}}
@@ -141,12 +141,6 @@ from being written to the swap.  In order to change the default
 behavior the @funcref{gnutls_global_set_mem_functions} function is
 available which can be used to set other memory handlers than the
 defaults.
-
-The @acronym{Libgcrypt} library on which @acronym{GnuTLS} depends, has
-such secure memory allocation functions available. These should be
-used in cases where even the system's swap memory is not considered
-secure. See the documentation of @acronym{Libgcrypt} for more
-information.
 
 @node Thread safety
 @section Thread safety
