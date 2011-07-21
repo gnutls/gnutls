@@ -35,7 +35,7 @@ include:
 
 @acronym{GnuTLS} consists of three independent parts, namely the ``TLS
 protocol part'', the ``Certificate part'', and the ``Cryptographic
-backend'' part.  The `TLS protocol part' is the actual protocol
+back-end'' part.  The `TLS protocol part' is the actual protocol
 implementation, and is entirely implemented within the
 @acronym{GnuTLS} library.  The `Certificate part' consists of the
 certificate parsing, and verification functions which is partially
@@ -43,7 +43,7 @@ implemented in the @acronym{GnuTLS} library.  The
 libtasn1@footnote{@url{ftp://ftp.gnupg.org/gcrypt/alpha/gnutls/libtasn1/}},
 a library which offers @acronym{ASN.1} parsing capabilities, is used
 for the @acronym{X.509} certificate parsing functions.  
-The ``Cryptographic backend'' is provided by nettle@footnote{@url{http://www.lysator.liu.se/~nisse/nettle/}}
+The ``Cryptographic back-end'' is provided by nettle@footnote{@url{http://www.lysator.liu.se/~nisse/nettle/}}
 library.
 In order to ease integration in embedded systems, parts of the
 @acronym{GnuTLS} library can be disabled at compile time. That way a
@@ -96,9 +96,9 @@ to the transport layer functions, in order to communicate with the
 peer.  Every session has a unique session ID shared with the peer.
 
 Since TLS sessions can be resumed, servers would probably need a
-database backend to hold the session's parameters.  Every
+database back-end to hold the session's parameters.  Every
 @acronym{GnuTLS} session after a successful handshake calls the
-appropriate backend function (see @ref{resume}, for information on
+appropriate back-end function (see @ref{resume}, for information on
 initialization) to store the newly negotiated session. The session
 database is examined by the server just after having received the
 client hello@footnote{The first message in a @acronym{TLS} handshake},
@@ -152,10 +152,10 @@ information.
 @section Thread safety
 
 Although the @acronym{GnuTLS} library is thread safe by design, some
-parts of the cryptographic backend, such as the random generator, are not.
+parts of the cryptographic back-end, such as the random generator, are not.
 Applications can either call @funcref{gnutls_global_init} which will use the default
 operating system provided locks (i.e. @code{pthreads} on GNU/Linux and
-@code{CriticalSection} on Windows), or specify manualy the locking system using 
+@code{CriticalSection} on Windows), or specify manually the locking system using 
 the function @funcref{gnutls_global_set_mutex} before calling @funcref{gnutls_global_init}. 
 Setting manually mutexes is recommended
 only to applications that have full control of the underlying libraries. If this

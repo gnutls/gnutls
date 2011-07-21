@@ -157,7 +157,7 @@ provided.
 
 The verification function will verify a given certificate chain against a list of certificate
 authorities and certificate revocation lists, and output
-a bitwise OR of elements of the @code{gnutls_certificate_status_t} 
+a bit-wise OR of elements of the @code{gnutls_certificate_status_t} 
 enumeration. It is also possible to have a set of certificates that
 are trusted for a particular server but not to authorize other certificates.
 This purpose is served by the functions @funcref{gnutls_x509_trust_list_add_named_crt} and @funcref{gnutls_x509_trust_list_verify_named_crt}.
@@ -215,7 +215,7 @@ flags are part of the enumeration
 @headitem Flag @tab Description
 @item GNUTLS_VERIFY_\-DISABLE_CA_SIGN @tab
 If set a signer does not have to be a certificate authority. This
-flag should normaly be disabled, unless you know what this means.
+flag should normally be disabled, unless you know what this means.
 
 @item GNUTLS_VERIFY_\-ALLOW_X509_V1_CA_CRT @tab
 Allow only trusted CA certificates that have version 1.  This is
@@ -307,7 +307,7 @@ below.
 The @acronym{OpenPGP} key authentication relies on a distributed trust
 model, called the ``web of trust''. The ``web of trust'' uses a
 decentralized system of trusted introducers, which are the same as a
-CA. @acronym{OpenPGP} allows anyone to sign anyone's else public
+CA. @acronym{OpenPGP} allows anyone to sign anyone else's public
 key. When Alice signs Bob's key, she is introducing Bob's key to
 anyone who trusts Alice. If someone trusts Alice to introduce keys,
 then Alice is a trusted introducer in the mind of that observer.
@@ -404,7 +404,7 @@ shared cryptographic keys and certificates in a uniform way, as in @ref{fig:pkcs
 
 @subsection Initialization
 To allow all the  @acronym{GnuTLS} applications to access @acronym{PKCS} #11 tokens
-it is adviceable to use @code{/etc/pkcs11/modules/mymodule.conf}. This file has the following
+it is advisable to use @code{/etc/pkcs11/modules/mymodule.conf}. This file has the following
 format:
 
 @smallexample

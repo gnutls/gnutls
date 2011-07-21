@@ -187,7 +187,7 @@ This mode combines message authentication and encryption and can
 be extremely fast on CPUs that support hardware acceleration.
 
 @item CAMELLIA_CBC @tab
-This is an 128-bit block cipher developed by Mitsubish and NTT. It
+This is an 128-bit block cipher developed by Mitsubishi and NTT. It
 is one of the approved ciphers of the European NESSIE and Japanese
 CRYPTREC projects.
 
@@ -227,7 +227,7 @@ GCM, is in use.
 The TLS record layer also supports compression.  The algorithms
 implemented in @acronym{GnuTLS} can be found in the table below.
 The included algorithms perform really good when text, or other
-compressible data are to be transfered, but offer nothing on already
+compressible data are to be transferred, but offer nothing on already
 compressed data, such as compressed images, zipped archives etc.
 These compression algorithms, may be useful in high bandwidth TLS
 tunnels, and in cases where network usage has to be minimized. It
@@ -317,7 +317,7 @@ protocol and the application protocol does not have to cope with them
 application protocol solely (e.g. @code{GNUTLS_A_USER_CANCELLED}).  An
 alert signal includes a level indication which may be either fatal or
 warning. Fatal alerts always terminate the current connection, and
-prevent future renegotiations using the current session ID. All alert
+prevent future re-negotiations using the current session ID. All alert
 messages are summarized in @ref{tab:alerts}.
 
 
@@ -524,7 +524,7 @@ completely.  Do not use unless you know what you are doing.
 Testing purposes only.
 
 @item %UNSAFE_RENEGOTIATION @tab
-will allow handshakes and rehandshakes
+will allow handshakes and re-handshakes
 without the safe renegotiation extension.  Note that for clients
 this mode is insecure (you may be under attack), and for servers it
 will allow insecure clients to connect (which could be fooled by an
@@ -533,7 +533,7 @@ maximum compatibility.
 
 @item %PARTIAL_RENEGOTIATION @tab
 will allow initial handshakes to proceed,
-but not rehandshakes.  This leaves the client vulnerable to attack,
+but not re-handshakes.  This leaves the client vulnerable to attack,
 and servers will be compatible with non-upgraded clients for
 initial handshakes.  This is currently the default for clients and
 servers, for compatibility reasons.
@@ -541,7 +541,7 @@ servers, for compatibility reasons.
 @item %SAFE_RENEGOTIATION @tab
 will enforce safe renegotiation.  Clients and
 servers will refuse to talk to an insecure peer.  Currently this
-causes operability problems, but is required for full protection.
+causes interoperability problems, but is required for full protection.
 
 @item %SSL3_RECORD_VERSION @tab
 will use SSL3.0 record version in client hello.
@@ -579,7 +579,7 @@ by the server. That is the ones set using the following functions.
 @showfuncdesc{gnutls_certificate_server_set_request}
 
 In cases where the server supports a large number of certificate authorities
-it makes sense not to advertize all of the names to save bandwidth. That can
+it makes sense not to advertise all of the names to save bandwidth. That can
 be controlled using the function @funcref{gnutls_certificate_send_x509_rdn_sequence}. 
 This however will have the side-effect of not restricting the client to certificates
 signed by server's acceptable signers.
@@ -744,7 +744,7 @@ resume functions, @ref{resume}.
 TLS gives the option to two communicating parties to renegotiate
 and update their security parameters. One useful example of this feature
 was for a client to initially connect using anonymous negotiation to a
-server, and the renegotiate using some authenticated ciphersuite. This occured
+server, and the renegotiate using some authenticated ciphersuite. This occurred
 to avoid having the client sending its credentials in the clear.
 
 However this renegotiation, as initially designed would not ensure that
@@ -794,14 +794,14 @@ negotiated.
 
 Note that permitting clients to connect to servers when the safe
 renegotiation extension is not enabled, is open up for attacks.
-Changing this default behaviour would prevent interoperability against
+Changing this default behavior would prevent interoperability against
 the majority of deployed servers out there.  We will reconsider this
-default behaviour in the future when more servers have been upgraded.
+default behavior in the future when more servers have been upgraded.
 Note that it is easy to configure clients to always require the safe
 renegotiation extension from servers (see below on the
 @code{%SAFE_RENEGOTIATION} priority string).
 
-To modify the default behaviour, we have introduced some new priority
+To modify the default behavior, we have introduced some new priority
 strings.  The priority strings can be used by applications
 (@funcref{gnutls_priority_set}) and end users (e.g., @code{--priority}
 parameter to @code{gnutls-cli} and @code{gnutls-serv}).
@@ -811,7 +811,7 @@ The @code{%UNSAFE_RENEGOTIATION} priority string permits
 negotiated. The default behavior is @code{%PARTIAL_RENEGOTIATION} that will
 prevent renegotiation with clients and servers not supporting the
 extension. This is secure for servers but leaves clients vulnerable
-to some attacks, but this is a tradeoff between security and compatibility
+to some attacks, but this is a trade-off between security and compatibility
 with old servers. The @code{%SAFE_RENEGOTIATION} priority string makes
 clients and servers require the extension for every handshake. The latter
 is the most secure option for clients, at the cost of not being able
@@ -845,7 +845,7 @@ can be used both by clients and servers.
 
 In TLS, since a lot of algorithms are involved, it is not easy to set
 a consistent security level.  For this reason in @ref{tab:key-sizes} we
-present some correspondance between key sizes of symmetric algorithms
+present some correspondence between key sizes of symmetric algorithms
 and public key algorithms based on @xcite{ECRYPT}. 
 Those can be used to generate certificates with
 appropriate key sizes as well as select parameters for Diffie-Hellman and SRP
@@ -900,7 +900,7 @@ A mapping to @code{gnutls_sec_param_t} value is given for each security paramete
 the next column, and finally a brief description of the level.
 
 Note however that the values suggested here are nothing more than an
-educated guess that is valid today. There are no guarrantees that an
+educated guess that is valid today. There are no guarantees that an
 algorithm will remain unbreakable or that these values will remain
 constant in time. There could be scientific breakthroughs that cannot
 be predicted or total failure of the current public key systems by

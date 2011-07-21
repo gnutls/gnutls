@@ -50,7 +50,7 @@ done by calling @funcref{gnutls_global_deinit}.
 The extra functionality of the @acronym{GnuTLS-extra} library is
 available after calling @funcref{gnutls_global_init_extra}.
 
-In order to take advantage of the internationalisation features in
+In order to take advantage of the internationalization features in
 GnuTLS, such as translated error messages, the application must set
 the current locale using @code{setlocale} before initializing GnuTLS.
 
@@ -61,7 +61,7 @@ It is often desirable to check that the version of `gnutls' used is
 indeed one which fits all requirements.  Even with binary
 compatibility new features may have been introduced but due to problem
 with the dynamic linker an old version is actually used.  So you may
-want to check that the version is okay right after program startup.
+want to check that the version is okay right after program start-up.
 See the function @funcref{gnutls_check_version}.
 
 @node Debugging and auditing
@@ -114,7 +114,7 @@ the path to the library files has to be added to the library search
 path (via the @option{-L} option).  For this, the option
 @option{--libs} to @command{pkg-config gnutls} can be used.  For
 convenience, this option also outputs all other options that are
-required to link the program with the libarary (for instance, the
+required to link the program with the library (for instance, the
 @samp{-ltasn1} option).  The example shows how to link @file{foo.o}
 with the library to a program @command{foo}.
 
@@ -475,7 +475,7 @@ Note that it must be run after a successful TLS handshake.
 To ease @acronym{GnuTLS}' integration with existing applications, a
 compatibility layer with the widely used OpenSSL library is included
 in the @code{gnutls-openssl} library. This compatibility layer is not
-complete and it is not intended to completely reimplement the OpenSSL
+complete and it is not intended to completely re-implement the OpenSSL
 API with @acronym{GnuTLS}.  It only provides limited source-level
 compatibility. There is currently no attempt to make it
 binary-compatible with OpenSSL.
