@@ -414,6 +414,50 @@ pkcs11_get_info (struct p11_kit_uri *info,
 
 static int init = 0;
 
+/* tries to load modules from /etc/gnutls/pkcs11.conf if it exists
+ */
+static void _pkcs11_compat_init(void)
+{
+FILE *fp;
+int ret;
+char line[512];
+const char *library;
+const char* configfile = "/etc/gnutls/pkcs11.conf";
+
+  fp = fopen (configfile, "r");
+  if (fp == NULL)
+    {
+       gnutls_assert ();
+       return;
+    }
+ 
+  while (fgets (line, sizeof (line), fp) != NULL)
+    {
+      if (strncmp (line, "load", sizeof ("load") - 1) == 0)
+        {
+          char *p;
+          p = strchr (line, '=');
+          if (p == NULL)
+            continue;
+
+          library = ++p;
+          p = strchr (line, '\n');
+          if (p != NULL)
+            *p = 0;
+
+          ret = gnutls_pkcs11_add_provider (library, NULL);
+          if (ret < 0)
+            {
+              gnutls_assert ();
+              _gnutls_debug_log ("Cannot load provider: %s\n", library);
+              continue;
+            }
+        }
+    }
+  fclose(fp);
+
+  return;
+}
 
 /**
  * gnutls_pkcs11_init:
@@ -449,7 +493,7 @@ gnutls_pkcs11_init (unsigned int flags, const char *configfile)
 
   if (flags == GNUTLS_PKCS11_FLAG_MANUAL)
     return 0;
-  else
+  else if (flags == GNUTLS_PKCS11_FLAG_AUTO)
     {
       rv = p11_kit_initialize_registered ();
       if (rv != CKR_OK)
@@ -474,6 +518,8 @@ gnutls_pkcs11_init (unsigned int flags, const char *configfile)
             }
         }
       free (modules);
+
+      _pkcs11_compat_init();
     }
 
   return 0;
