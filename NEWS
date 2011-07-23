@@ -3,7 +3,7 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version (unreleased)
+* Version 2.99.4 (released 2011-07-23)
 
 ** doc: documentation updates.
 
@@ -217,6 +217,8 @@ gnutls_x509_trust_list_*.
 using the --verify option. Combined with --load-ca-certificate
 it can verify a certificate chain against a list of certificates.
 
+** Several files unnecessarily included <gcrypt.h>; this has been fixed.
+
 ** API and ABI modifications:
 gnutls_dtls_set_timeouts: ADDED
 gnutls_dtls_get_mtu: ADDED
@@ -262,8 +264,6 @@ gnutls_ia_set_client_avp_ptr: REMOVED
 gnutls_ia_set_server_avp_function: REMOVED
 gnutls_ia_set_server_avp_ptr: REMOVED
 gnutls_ia_verify_endphase: REMOVED
-
-** Several files unnecessarily included <gcrypt.h>; this has been fixed.
 
 
 * Version 2.12.2 (released 2011-04-08)
