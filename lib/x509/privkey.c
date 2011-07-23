@@ -106,16 +106,12 @@ gnutls_x509_privkey_cpy (gnutls_x509_privkey_t dst, gnutls_x509_privkey_t src)
   dst->params.flags = src->params.flags;
 
   dst->pk_algorithm = src->pk_algorithm;
-  dst->crippled = src->crippled;
 
-  if (!src->crippled)
+  ret = _gnutls_asn1_encode_privkey (dst->pk_algorithm, &dst->key, &dst->params);
+  if (ret < 0)
     {
-      ret = _gnutls_asn1_encode_privkey (dst->pk_algorithm, &dst->key, &dst->params);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
+      gnutls_assert ();
+      return ret;
     }
 
   return 0;
@@ -717,14 +713,11 @@ gnutls_x509_privkey_import_rsa_raw2 (gnutls_x509_privkey_t key,
       goto cleanup;
     }
 
-  if (!key->crippled)
+  ret = _gnutls_asn1_encode_privkey (GNUTLS_PK_RSA, &key->key, &key->params);
+  if (ret < 0)
     {
-      ret = _gnutls_asn1_encode_privkey (GNUTLS_PK_RSA, &key->key, &key->params);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
+      gnutls_assert ();
+      goto cleanup;
     }
 
   key->params.params_nr = RSA_PRIVATE_PARAMS;
@@ -811,14 +804,11 @@ gnutls_x509_privkey_import_dsa_raw (gnutls_x509_privkey_t key,
       goto cleanup;
     }
 
-  if (!key->crippled)
+  ret = _gnutls_asn1_encode_privkey (GNUTLS_PK_DSA, &key->key, &key->params);
+  if (ret < 0)
     {
-      ret = _gnutls_asn1_encode_privkey (GNUTLS_PK_DSA, &key->key, &key->params);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
+      gnutls_assert ();
+      goto cleanup;
     }
 
   key->params.params_nr = DSA_PRIVATE_PARAMS;
@@ -953,7 +943,6 @@ gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
                             size_t * output_data_size)
 {
   const char *msg;
-  int ret;
 
   if (key == NULL)
     {
@@ -969,16 +958,6 @@ gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
     msg = PEM_KEY_ECC;
   else
     msg = "UNKNOWN";
-
-  if (key->crippled)
-    {                           /* encode the parameters on the fly. */
-      ret = _gnutls_asn1_encode_privkey (key->pk_algorithm, &key->key, &key->params);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-    }
 
   return _gnutls_x509_export_int (key->key, format, msg,
                                   output_data, output_data_size);
@@ -1361,14 +1340,11 @@ gnutls_x509_privkey_generate (gnutls_x509_privkey_t key,
       return ret;
     }
 
-  if (!key->crippled)
+  ret = _gnutls_asn1_encode_privkey (algo, &key->key, &key->params);
+  if (ret < 0)
     {
-      ret = _gnutls_asn1_encode_privkey (algo, &key->key, &key->params);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
+      gnutls_assert ();
+      goto cleanup;
     }
   key->pk_algorithm = algo;
 
@@ -1411,7 +1387,7 @@ gnutls_x509_privkey_get_key_id (gnutls_x509_privkey_t key,
   digest_hd_st hd;
   gnutls_datum_t der = { NULL, 0 };
 
-  if (key == NULL || key->crippled)
+  if (key == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -1657,8 +1633,7 @@ gnutls_x509_privkey_fix (gnutls_x509_privkey_t key)
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  if (!key->crippled)
-    asn1_delete_structure (&key->key);
+  asn1_delete_structure (&key->key);
 
   ret = _gnutls_asn1_encode_privkey (key->pk_algorithm, &key->key, &key->params);
   if (ret < 0)

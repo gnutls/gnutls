@@ -94,8 +94,6 @@ gnutls_rsa_params_init (gnutls_rsa_params_t * rsa_params)
       return ret;
     }
 
-  (*rsa_params)->crippled = 1;
-
   return 0;
 }
 
