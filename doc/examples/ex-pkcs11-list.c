@@ -6,7 +6,7 @@
 #define URL "pkcs11:URL"
 
 int
-main ()
+main (int argc, char** argv)
 {
   gnutls_pkcs11_obj_t *obj_list;
   gnutls_x509_crt_t xcrt;
