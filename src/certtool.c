@@ -1827,15 +1827,16 @@ generate_request (common_info_st * cinfo)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crq_init: %s", gnutls_strerror (ret));
 
-  ret = gnutls_privkey_init (&pkey);
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
 
   /* Load the private key.
    */
   pkey = load_private_key (0, cinfo);
   if (!pkey)
     {
+      ret = gnutls_privkey_init (&pkey);
+      if (ret < 0)
+        error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
+
       xkey = generate_private_key_int ();
 
       print_private_key (xkey);
