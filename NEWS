@@ -5,6 +5,13 @@ See the end for copying conditions.
 
 * Version (unreleased)
 
+** doc: documentation updates.
+
+** libgnutls: gnutls_rsa_params_t is now identical to gnutls_x509_privkey_t
+to avoid thread-safety issues. Reported by Sam Varshavchik.
+
+** libgnutls: Added compatibility mode with /etc/gnutls/pkcs11.conf
+
 ** libgnutls: license upgraded to LGPLv3
 
 ** libgnutls: gnutls_srp_verifier() returns data allocated with gnutls_malloc()
