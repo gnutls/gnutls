@@ -1038,14 +1038,11 @@ _decode_pkcs8_dsa_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
   _gnutls_mpi_powm (pkey->params[3], pkey->params[2], pkey->params[4],
                     pkey->params[0]);
 
-  if (!pkey->crippled)
+  ret = _gnutls_asn1_encode_dsa (&pkey->key, pkey->params);
+  if (ret < 0)
     {
-      ret = _gnutls_asn1_encode_dsa (&pkey->key, pkey->params);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          goto error;
-        }
+      gnutls_assert ();
+      goto error;
     }
 
   pkey->params_size = DSA_PRIVATE_PARAMS;
