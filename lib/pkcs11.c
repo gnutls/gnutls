@@ -432,6 +432,7 @@ const char* configfile = "/etc/gnutls/pkcs11.conf";
        return;
     }
  
+  _gnutls_debug_log ("Loading PKCS #11 libraries from %s\n", configfile);
   while (fgets (line, sizeof (line), fp) != NULL)
     {
       if (strncmp (line, "load", sizeof ("load") - 1) == 0)
