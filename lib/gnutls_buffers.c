@@ -393,6 +393,9 @@ _gnutls_writev_emu (gnutls_session_t session, const giovec_t * giovec,
         break;
 
       total += ret;
+
+      if (ret != giovec[j].iov_len)
+        break;
     }
 
   if (total > 0)
