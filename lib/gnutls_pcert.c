@@ -100,6 +100,70 @@ cleanup:
 }
 
 /**
+ * gnutls_pcert_list_import_x509_raw:
+ * @pcerts: The structures to store the parsed certificate. Must not be initialized.
+ * @pcert_max: Initially must hold the maximum number of certs. It will be updated with the number of certs available.
+ * @data: The certificates.
+ * @format: One of DER or PEM.
+ * @flags: must be (0) or an OR'd sequence of gnutls_certificate_import_flags.
+ *
+ * This function will convert the given PEM encoded certificate list
+ * to the native gnutls_x509_crt_t format. The output will be stored
+ * in @certs.  They will be automatically initialized.
+ *
+ * If the Certificate is PEM encoded it should have a header of "X509
+ * CERTIFICATE", or "CERTIFICATE".
+ *
+ * Returns: the number of certificates read or a negative error value.
+ **/
+int
+gnutls_pcert_list_import_x509_raw (gnutls_pcert_st * pcerts,
+                             unsigned int *pcert_max,
+                             const gnutls_datum_t * data,
+                             gnutls_x509_crt_fmt_t format, unsigned int flags)
+{
+int ret, i = 0, j;
+gnutls_x509_crt_t *crt;
+
+  crt = gnutls_malloc((*pcert_max) * sizeof(gnutls_x509_crt_t));
+
+  if (crt == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+  ret = gnutls_x509_crt_list_import( crt, pcert_max, data, format, flags);
+  if (ret < 0)
+    {
+      ret = gnutls_assert_val(ret);
+      goto cleanup;
+    }
+  
+  for (i=0;i<*pcert_max;i++)
+    {
+      ret = gnutls_pcert_import_x509(&pcerts[i], crt[i], flags);
+      if (ret < 0)
+        {
+          ret = gnutls_assert_val(ret);
+          goto cleanup_pcert;
+        }
+    }
+
+  ret = 0;
+  goto cleanup;
+
+cleanup_pcert:
+  for (j=0;j<i;j++)
+    gnutls_pcert_deinit(&pcerts[j]);
+
+cleanup:
+  for (i=0;i<*pcert_max;i++)
+    gnutls_x509_crt_deinit(crt[i]);
+
+  gnutls_free(crt);
+  return ret;
+
+}
+
+/**
  * gnutls_pcert_import_x509_raw:
  * @pcert: The pcert structure
  * @cert: The raw certificate to be imported

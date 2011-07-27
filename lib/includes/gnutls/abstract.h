@@ -182,6 +182,12 @@ typedef struct gnutls_pcert_st {
 int gnutls_pcert_import_x509 (gnutls_pcert_st* pcert,
 	gnutls_x509_crt_t crt, unsigned int flags);
 
+int
+gnutls_pcert_list_import_x509_raw (gnutls_pcert_st * pcerts,
+                             unsigned int *pcert_max,
+                             const gnutls_datum_t * data,
+                             gnutls_x509_crt_fmt_t format, unsigned int flags);
+
 int gnutls_pcert_import_x509_raw (gnutls_pcert_st* pcert,
 	const gnutls_datum_t* cert, 
 	gnutls_x509_crt_fmt_t format, unsigned int flags);

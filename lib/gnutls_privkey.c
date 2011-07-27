@@ -307,7 +307,7 @@ static int check_if_clean(gnutls_privkey_t key)
  * gnutls_privkey_import_pkcs11:
  * @pkey: The private key
  * @key: The private key to be imported
- * @flags: should be zero
+ * @flags: should be zero or %GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE
  *
  * This function will import the given private key to the abstract
  * #gnutls_privkey_t structure.
@@ -345,7 +345,7 @@ int ret;
  * gnutls_privkey_import_x509:
  * @pkey: The private key
  * @key: The private key to be imported
- * @flags: should be zero
+ * @flags: should be zero or %GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE
  *
  * This function will import the given private key to the abstract
  * #gnutls_privkey_t structure.
@@ -382,7 +382,7 @@ int ret;
  * gnutls_privkey_import_openpgp:
  * @pkey: The private key
  * @key: The private key to be imported
- * @flags: should be zero
+ * @flags: should be zero or %GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE
  *
  * This function will import the given private key to the abstract
  * #gnutls_privkey_t structure.
