@@ -5,10 +5,17 @@ See the end for copying conditions.
 
 * Version 3.0.0 (unreleased)
 
-** libgnutls: writev_emu: stop on the first incomplete write
+** libgnutls: writev_emu: stop on the first incomplete write. Patch by
+Sjoerd Simons.
+
+** libgnutls: Fix zlib handling in gnutls.pc. Patch by Andreas
+Metzler.
+
+** certtool: bug fixes in certificate request generation. Patch
+by Petr Písař.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pcert_list_import_x509_raw: ADDED
 
 
 * Version 2.99.4 (released 2011-07-23)
