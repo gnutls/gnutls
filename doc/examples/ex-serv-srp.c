@@ -72,10 +72,7 @@ main (void)
 
   strcpy (name, "Echo Server");
 
-  /* these must be called once in the program
-   */
   gnutls_global_init ();
-  gnutls_global_init_extra ();  /* for SRP */
 
   /* SRP_PASSWD a password file (created with the included srptool utility) 
    */

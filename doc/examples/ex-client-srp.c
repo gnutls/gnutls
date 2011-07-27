@@ -34,11 +34,6 @@ main (void)
 
   gnutls_global_init ();
 
-  /* now enable the gnutls-extra library which contains the
-   * SRP stuff.
-   */
-  gnutls_global_init_extra ();
-
   gnutls_srp_allocate_client_credentials (&srp_cred);
   gnutls_certificate_allocate_credentials (&cert_cred);
 
