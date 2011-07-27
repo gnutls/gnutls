@@ -8,7 +8,14 @@ See the end for copying conditions.
 ** libgnutls: gcrypt: replaced occurences of gcry_sexp_nth_mpi (..., 0)
 with gcry_sexp_nth_mpi (..., GCRYMPI_FMT_USG) to fix errors with 1.5.0.
 
-** libgnutls: writev_emu: stop on the first incomplete write
+** libgnutls: writev_emu: stop on the first incomplete write. Patch by
+Sjoerd Simons.
+
+** libgnutls: Fix zlib handling in gnutls.pc. Patch by Andreas
+Metzler.
+
+** certtool: bug fixes in certificate request generation. Patch
+by Petr Písař.
 
 ** API and ABI modifications:
 No changes since last version.
