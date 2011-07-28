@@ -42,7 +42,7 @@ option (get-dh-params) { $action=ACTION_GET_DH; } "Get the included PKCS #3 enco
 option (load-privkey) STR "FILE" { $privkey = $1 } "Private key file to use."
 
 #char *pubkey;
-option (load-pubkey) STR "FILE" { $pubkey = $1 } "Private key file to use."
+option (load-pubkey) STR "FILE" { $pubkey = $1 } "Public key file to use."
 
 #char *request;
 option (load-request) STR "FILE" { $request = $1 } "Certificate request file to use."

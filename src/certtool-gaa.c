@@ -142,7 +142,7 @@ void gaa_help(void)
 	__gaa_helpsingle(0, "generate-dh-params", "", "Generate PKCS #3 encoded Diffie-Hellman parameters.");
 	__gaa_helpsingle(0, "get-dh-params", "", "Get the included PKCS #3 encoded Diffie-Hellman parameters.");
 	__gaa_helpsingle(0, "load-privkey", "FILE ", "Private key file to use.");
-	__gaa_helpsingle(0, "load-pubkey", "FILE ", "Private key file to use.");
+	__gaa_helpsingle(0, "load-pubkey", "FILE ", "Public key file to use.");
 	__gaa_helpsingle(0, "load-request", "FILE ", "Certificate request file to use.");
 	__gaa_helpsingle(0, "load-certificate", "FILE ", "Certificate file to use.");
 	__gaa_helpsingle(0, "load-ca-privkey", "FILE ", "Certificate authority's private key file to use.");
