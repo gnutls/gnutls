@@ -1,3 +1,73 @@
+2011-07-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: released 3.0.0
+
+2011-07-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* configure.ac: updated version
+
+2011-07-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/certtool-gaa.c, src/certtool.gaa: Corrected typo.
+
+2011-07-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: documented updates.
+
+2011-07-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* THANKS: Added Petr.
+
+2011-07-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_pcert.c, lib/gnutls_privkey.c,
+	lib/includes/gnutls/abstract.h, lib/libgnutls.map: Added
+	gnutls_pcert_list_import_x509_raw() and few doc fixes.
+
+2011-07-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls.pc.in: corrected for libnettle.
+
+2011-06-24  Andreas Metzler <ametzler@downhill.at.eu.org>
+
+	* configure.ac: fix zlib handling in gnutls.pc Only add zlib to gnutls.pc's Requies.private if zlib ships a
+	pkg-config file. Ancient (<< 1.2.3.1) versions don't. Otherwise add
+	-lz to Libs.private.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2011-07-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/examples/ex-client-srp.c, doc/examples/ex-serv-srp.c: 
+	gnutls_global_init_extra() is not needed for SRP.
+
+2011-07-25  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: documented changes.
+
+2011-07-25  Sjoerd Simons <sjoerd.simons@collabora.co.uk>
+
+	* lib/gnutls_buffers.c: writev_emu: stop on the first incomplete
+	write Just like standard writev, we should only move on to the next block
+	if all the previous ones have been successfully written out.
+	Otherwise there is a potential for data loss and/or confusing push
+	functions.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2011-07-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/latex/fdl.tex: increased size of fdl.
+
+2011-07-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/pkcs11.c: Added debug message to indicate usage of
+	compatibility mode for /etc/gnutls/pkcs11.conf
+
+2011-07-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* AUTHORS: removed pgp key from authors file.
+
+2011-07-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* ChangeLog: updated changelog.
+
 2011-07-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, configure.ac, doc/announce.txt, m4/hooks.m4: released 2.99.4
