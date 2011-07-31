@@ -788,7 +788,6 @@ gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
                             size_t * output_data_size)
 {
   const char *msg;
-  int ret;
 
   if (key == NULL)
     {
