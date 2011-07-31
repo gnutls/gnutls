@@ -9,8 +9,12 @@ See the end for copying conditions.
 using gnutls_certificate_set_x509_key*(), is sorted
 according to TLS specification (from subject to issuer).
 
+** libgnutls: Added GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED flag for
+gnutls_x509_crt_list_import. It checks whether the list to be 
+imported is properly sorted.
+
 ** API and ABI modifications:
-No changes since last version.
+GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED: New element in gnutls_certificate_import_flags
 
 
 * Version 3.0.0 (released 2011-07-29)

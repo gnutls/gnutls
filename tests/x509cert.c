@@ -80,7 +80,19 @@ static unsigned char cert_pem[] =
   "+62SbuYGpFYsouHAUyfI8pUwCwYJKoZIhvcNAQEFA4GBALujmBJVZnvaTXr9cFRJ\n"
   "jpfc/3X7sLUsMvumcDE01ls/cG5mIatmiyEU9qI3jbgUf82z23ON/acwJf875D3/\n"
   "U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
-  "dc8Siq5JojruiMizAf0pA7in\n" "-----END CERTIFICATE-----\n";
+  "dc8Siq5JojruiMizAf0pA7in\n" "-----END CERTIFICATE-----\n"
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIIB5zCCAVKgAwIBAgIERiYdJzALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
+  "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTExWhcNMDgwNDE3MTMyOTExWjAZMRcw\n"
+  "FQYDVQQDEw5HbnVUTFMgdGVzdCBDQTCBnDALBgkqhkiG9w0BAQEDgYwAMIGIAoGA\n"
+  "vuyYeh1vfmslnuggeEKgZAVmQ5ltSdUY7H25WGSygKMUYZ0KT74v8C780qtcNt9T\n"
+  "7EPH/N6RvB4BprdssgcQLsthR3XKA84jbjjxNCcaGs33lvOz8A1nf8p3hD+cKfRi\n"
+  "kfYSW2JazLrtCC4yRCas/SPOUxu78of+3HiTfFm/oXUCAwEAAaNDMEEwDwYDVR0T\n"
+  "AQH/BAUwAwEB/zAPBgNVHQ8BAf8EBQMDBwQAMB0GA1UdDgQWBBTpPBz7rZJu5gak\n"
+  "Viyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAiaIRqGfp1jPpNeVhABK60SU0KIAy\n"
+  "njuu7kHq5peUgYn8Jd9zNzExBOEp1VOipGsf6G66oQAhDFp2o8zkz7ZH71zR4HEW\n"
+  "KoX6n5Emn6DvcEH/9pAhnGxNHJAoS7czTKv/JDZJhkqHxyrE1fuLsg5Qv25DTw7+\n"
+  "PfqUpIhz5Bbm7J4=\n" "-----END CERTIFICATE-----\n";
 const gnutls_datum_t cert = { cert_pem, sizeof (cert_pem) };
 
 static unsigned char key_pem[] =
@@ -142,15 +154,17 @@ const gnutls_datum_t server_key = { server_key_pem,
   sizeof (server_key_pem)
 };
 
-
+#define LIST_SIZE 3
 void
 doit (void)
 {
   gnutls_certificate_credentials_t x509_cred;
-  int ret;
-  gnutls_x509_crt_t crt, issuer;
+  int ret, i;
+  gnutls_x509_crt_t issuer;
+  gnutls_x509_crt_t list[LIST_SIZE];
   char dn[128];
   size_t dn_size;
+  unsigned int list_size;
 
   /* this must be called once in the program
    */
@@ -167,12 +181,13 @@ doit (void)
                                        GNUTLS_X509_FMT_PEM);
 
   /* test for gnutls_certificate_get_issuer() */
-  gnutls_x509_crt_init(&crt);
-  ret = gnutls_x509_crt_import(crt, &cert, GNUTLS_X509_FMT_PEM);
-  if (ret < 0)
-    fail("gnutls_x509_crt_import");
   
-  ret = gnutls_certificate_get_issuer(x509_cred, crt, &issuer, 0);
+  list_size = LIST_SIZE;
+  ret = gnutls_x509_crt_list_import(list, &list_size, &cert, GNUTLS_X509_FMT_PEM, GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED);
+  if (ret < 0)
+    fail("gnutls_x509_crt_list_import");
+
+  ret = gnutls_certificate_get_issuer(x509_cred, list[0], &issuer, 0);
   if (ret < 0)
     fail("gnutls_certificate_get_isser");
 
@@ -182,7 +197,8 @@ doit (void)
     fail("gnutls_certificate_get_isser");
   
   fprintf(stderr, "Issuer's DN: %s\n", dn);
-  gnutls_x509_crt_deinit(crt);
+  for (i=0;i<list_size;i++)
+    gnutls_x509_crt_deinit(list[i]);
   gnutls_certificate_free_credentials(x509_cred);
   
   success("success");
