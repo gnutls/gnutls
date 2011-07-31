@@ -792,10 +792,77 @@ gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t res,
   return 0;
 }
 
+static int check_if_sorted(gnutls_pcert_st * crt, int nr)
+{
+gnutls_x509_crt_t x509;
+char prev_dn[MAX_CN];
+char dn[MAX_CN];
+size_t prev_dn_size, dn_size;
+int i, ret;
+
+  /* check if the X.509 list is ordered */
+  if (nr > 1 && crt[0].type == GNUTLS_CRT_X509)
+    {
+
+      for (i=0;i<nr;i++)
+        {
+          ret = gnutls_x509_crt_init(&x509);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+          
+          ret = gnutls_x509_crt_import(x509, &crt[i].cert, GNUTLS_X509_FMT_DER);
+          if (ret < 0)
+            {
+              ret = gnutls_assert_val(ret);
+              goto cleanup;
+            }
+          
+          if (i>0)
+            {
+              dn_size = sizeof(dn);
+              ret = gnutls_x509_crt_get_dn(x509, dn, &dn_size);
+              if (ret < 0)
+                {
+                  ret = gnutls_assert_val(ret);
+                  goto cleanup;
+                }
+              
+              if (dn_size != prev_dn_size || memcmp(dn, prev_dn, dn_size) != 0)
+                {
+                  ret = gnutls_assert_val(GNUTLS_E_CERTIFICATE_LIST_UNSORTED);
+                  goto cleanup;
+                }
+            }
+
+          prev_dn_size = sizeof(prev_dn);
+          ret = gnutls_x509_crt_get_issuer_dn(x509, prev_dn, &prev_dn_size);
+          if (ret < 0)
+            {
+              ret = gnutls_assert_val(ret);
+              goto cleanup;
+            }
+
+          gnutls_x509_crt_deinit(x509);
+        }
+    }
+
+  return 0;
+
+cleanup:
+  gnutls_x509_crt_deinit(x509);
+  return ret;
+}
+
 int
 certificate_credential_append_crt_list (gnutls_certificate_credentials_t res,
                                         gnutls_pcert_st * crt, int nr)
 {
+int ret;
+
+  ret = check_if_sorted(crt, nr);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
   res->cert_list = gnutls_realloc_fast (res->cert_list,
                                         (1 +
                                          res->ncerts) *
