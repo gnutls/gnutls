@@ -811,8 +811,8 @@ gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t res,
 static int check_if_sorted(gnutls_cert * crt, int nr)
 {
 gnutls_x509_crt_t x509;
-char prev_dn[MAX_CN];
-char dn[MAX_CN];
+char prev_dn[MAX_DN];
+char dn[MAX_DN];
 size_t prev_dn_size, dn_size;
 int i, ret;
 

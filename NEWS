@@ -12,8 +12,9 @@ with gcry_sexp_nth_mpi (..., GCRYMPI_FMT_USG) to fix errors with 1.5.0.
 using gnutls_certificate_set_x509_key*(), is sorted
 according to TLS specification (from subject to issuer).
 
-** API and ABI modifications:
-No changes since last version.
+** libgnutls: Added GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED flag for
+gnutls_x509_crt_list_import. It checks whether the list to be 
+imported is properly sorted.
 
 ** libgnutls: writev_emu: stop on the first incomplete write. Patch by
 Sjoerd Simons.
@@ -25,7 +26,7 @@ Metzler.
 by Petr Písař.
 
 ** API and ABI modifications:
-No changes since last version.
+GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED: New element in gnutls_certificate_import_flags
 
 
 * Version 2.12.7 (released 2011-06-18)
