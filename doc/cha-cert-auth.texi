@@ -392,7 +392,7 @@ such as @acronym{Gnome Keyring}. The objects residing on such token can be
 certificates, public keys, private keys or even plain data or  secret keys. Of those
 certificates and public/private key pairs can be used with @acronym{GnuTLS}. Its
 main advantage is that it allows operations on private key objects such as decryption
-and signing without accessing the key itself.
+and signing without exposing the key.
 
 Moreover it can be used to allow all applications in the same operating system to access
 shared cryptographic keys and certificates in a uniform way, as in @ref{fig:pkcs11-vision}.
@@ -404,8 +404,8 @@ shared cryptographic keys and certificates in a uniform way, as in @ref{fig:pkcs
 
 @subsection Initialization
 To allow all the  @acronym{GnuTLS} applications to access @acronym{PKCS} #11 tokens
-it is advisable to use @code{/etc/pkcs11/modules/mymodule.conf}. This file has the following
-format:
+you can use a configuration per module, such as @code{/etc/pkcs11/modules/mymodule.conf}. 
+This file has the following format:
 
 @smallexample
 module: /usr/lib/opensc-pkcs11.so
