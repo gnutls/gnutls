@@ -97,6 +97,7 @@ int _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
 int _gnutls_hostname_compare (const char *certname, size_t certnamesize,
                               const char *hostname, int level);
 #define MAX_CN 256
+#define MAX_DN 1024
 
 #define BUFFER_APPEND(b, x, s) { \
         ret = _gnutls_buffer_append_data(b, x, s); \

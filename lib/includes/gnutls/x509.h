@@ -92,12 +92,16 @@ extern "C"
  * @GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED: Fail if the
  *   certificates in the buffer are more than the space allocated for
  *   certificates. The error code will be %GNUTLS_E_SHORT_MEMORY_BUFFER.
+ * @GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED: Fail if the certificates
+ *   in the buffer are not ordered starting from subject to issuer.
+ *   The error code will be %GNUTLS_E_CERTIFICATE_LIST_UNSORTED.
  *
  * Enumeration of different certificate import flags.
  */
   typedef enum gnutls_certificate_import_flags
   {
-    GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED = 1
+    GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED = 1,
+    GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED = 2
   } gnutls_certificate_import_flags;
 
   int gnutls_x509_crt_init (gnutls_x509_crt_t * cert);
