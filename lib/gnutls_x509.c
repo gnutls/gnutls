@@ -808,7 +808,7 @@ gnutls_certificate_set_x509_key_mem (gnutls_certificate_credentials_t res,
   return 0;
 }
 
-static int check_if_sorted(gnutls_pcert_st * crt, int nr)
+static int check_if_sorted(gnutls_cert * crt, int nr)
 {
 gnutls_x509_crt_t x509;
 char prev_dn[MAX_CN];
@@ -817,7 +817,7 @@ size_t prev_dn_size, dn_size;
 int i, ret;
 
   /* check if the X.509 list is ordered */
-  if (nr > 1 && crt[0].type == GNUTLS_CRT_X509)
+  if (nr > 1 && crt[0].cert_type == GNUTLS_CRT_X509)
     {
 
       for (i=0;i<nr;i++)
@@ -826,7 +826,7 @@ int i, ret;
           if (ret < 0)
             return gnutls_assert_val(ret);
           
-          ret = gnutls_x509_crt_import(x509, &crt[i].cert, GNUTLS_X509_FMT_DER);
+          ret = gnutls_x509_crt_import(x509, &crt[i].raw, GNUTLS_X509_FMT_DER);
           if (ret < 0)
             {
               ret = gnutls_assert_val(ret);
