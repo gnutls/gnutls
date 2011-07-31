@@ -321,6 +321,8 @@ static const gnutls_error_entry error_algorithms[] = {
                GNUTLS_E_PKCS11_TOKEN_ERROR, 1),
   ERROR_ENTRY (N_("PKCS #11 user error"),
                GNUTLS_E_PKCS11_USER_ERROR, 1),
+  ERROR_ENTRY (N_("The provided X.509 certificate list is not sorted (in subject to issuer order)"),
+               GNUTLS_E_CERTIFICATE_LIST_UNSORTED, 1),
   {NULL, NULL, 0, 0}
 };
 
