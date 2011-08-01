@@ -137,8 +137,10 @@ gnutls_pkcs11_privkey_get_info (gnutls_pkcs11_privkey_t pkey,
                           } \
 			gnutls_assert(); \
 			return ret; \
-		} \
-	} while (ret < 0);
+		} else if (ret < 0) { \
+                        return ret; \
+                } \
+	} while (0);
 
 /*-
  * _gnutls_pkcs11_privkey_sign_hash:
