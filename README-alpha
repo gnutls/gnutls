@@ -26,6 +26,7 @@ We require several tools to build the software, including:
 - Guile <http://www.gnu.org/software/guile/>
 - Gaa <http://gaa.sf.net> (optional)
 - libtasn1 <http://josefsson.org/libtasn1/> (optional)
+- p11-kit <http://p11-glue.freedesktop.org/p11-kit.html>
 - datefudge <packages.debian.org/datefudge> (optional)
 
 The required software is typically distributed with your operating

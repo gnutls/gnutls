@@ -34,16 +34,18 @@ and libgnutls-extra.a), the shared object (libgnutls.so  and
 libgnutls-extra.so), and additional binaries such as certtool and
 gnutls-cli.
 
-The library depends on libnettle OR libgcrypt (but never both).  GnuTLS
-currently uses libnettle as the default cryptographic library.  Versions
-2.10.3 and prior used libgcrypt as the default cryptographic library.
-Nettle can be found at http://www.gnu.org/software/nettle/, while
-libgcrypt can be found at <ftp://ftp.gnupg.org/pub/gcrypt/libgcrypt/>.
+The library depends on libnettle OR libgcrypt (but never both), as well
+as p11-kit.  GnuTLS currently uses libnettle as the default cryptographic 
+library.  Versions 2.10.3 and prior used libgcrypt as the default 
+cryptographic library. Nettle can be found at http://www.gnu.org/software/nettle/, 
+while libgcrypt can be found at <ftp://ftp.gnupg.org/pub/gcrypt/libgcrypt/>.
+p11-kit can be found at <http://p11-glue.freedesktop.org/p11-kit.html>.
+
 
 To configure libnettle for installation and use by GnuTLS, a typical
 command sequence would be:
 
-    cd nettle-2.1
+    cd nettle-2.2
     ./configure --prefix=/usr --disable-openssl --enable-shared
     make
     sudo make install
