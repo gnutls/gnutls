@@ -102,6 +102,7 @@ static int
 token_callback (void *user, const char *label, const unsigned retry)
 {
   char buf[32];
+  char *p;
 
   if (retry > 0)
     {
@@ -109,7 +110,8 @@ token_callback (void *user, const char *label, const unsigned retry)
       return -1;
     }
   printf ("Please insert token '%s' in slot and press enter\n", label);
-  fgets (buf, sizeof (buf), stdin);
+  p = fgets (buf, sizeof (buf), stdin);
+  if (p==NULL) return -1;
 
   return 0;
 }
