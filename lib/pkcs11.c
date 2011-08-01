@@ -464,10 +464,10 @@ const char* configfile = "/etc/gnutls/pkcs11.conf";
 /**
  * gnutls_pkcs11_init:
  * @flags: %GNUTLS_PKCS11_FLAG_MANUAL or %GNUTLS_PKCS11_FLAG_AUTO
- * @configfile: either NULL or the location of a configuration file
+ * @unused: unused, set to NULL
  *
  * This function will initialize the PKCS 11 subsystem in gnutls. It will
- * read a configuration file if %GNUTLS_PKCS11_FLAG_AUTO is used or allow
+ * read configuration files if %GNUTLS_PKCS11_FLAG_AUTO is used or allow
  * you to independently load PKCS 11 modules using gnutls_pkcs11_add_provider()
  * if %GNUTLS_PKCS11_FLAG_MANUAL is specified.
  *
@@ -479,7 +479,7 @@ const char* configfile = "/etc/gnutls/pkcs11.conf";
  *   negative error value.
  **/
 int
-gnutls_pkcs11_init (unsigned int flags, const char *configfile)
+gnutls_pkcs11_init (unsigned int flags, void *unused)
 {
   struct ck_function_list **modules;
   const char *name;
