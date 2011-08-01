@@ -1890,6 +1890,7 @@ int
 pkcs11_login (struct ck_function_list * module, ck_session_handle_t pks,
               const struct token_info *tokinfo, struct p11_kit_uri *info, int so)
 {
+  struct ck_session_info session_info;
   int attempt = 0, ret;
   ck_user_type_t user_type;
   ck_rv_t rv;
@@ -1927,6 +1928,15 @@ pkcs11_login (struct ck_function_list * module, ck_session_handle_t pks,
       struct ck_token_info tinfo;
 
       memcpy (&tinfo, &tokinfo->tinfo, sizeof(tinfo));
+
+      /* Check whether the session is already logged in, and if so, just skip */
+      rv = (module)->C_GetSessionInfo (pks, &session_info);
+      if (rv == CKR_OK && (session_info.state == CKS_RO_USER_FUNCTIONS ||
+                           session_info.state == CKS_RW_USER_FUNCTIONS))
+        {
+          ret = 0;
+          goto cleanup;
+        }
 
       /* If login has been attempted once already, check the token
        * status again, the flags might change. */
