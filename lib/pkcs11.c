@@ -529,7 +529,7 @@ initialize_automatic_legacy (const char *configfile)
 int
 gnutls_pkcs11_init (unsigned int flags, const char *deprecated_config_file)
 {
-  int ret;
+  int ret = 0;
 
   if (init != 0)
     {
@@ -538,11 +538,7 @@ gnutls_pkcs11_init (unsigned int flags, const char *deprecated_config_file)
     }
   init++;
 
-  if (flags == GNUTLS_PKCS11_FLAG_MANUAL)
-    {
-      ret = 0;
-    }
-  else
+  if (flags == GNUTLS_PKCS11_FLAG_AUTO)
     {
       if (deprecated_config_file == NULL)
         ret = initialize_automatic_p11_kit ();
