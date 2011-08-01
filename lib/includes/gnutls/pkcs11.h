@@ -57,7 +57,7 @@ typedef struct gnutls_pkcs11_obj_st *gnutls_pkcs11_obj_t;
  * load = /lib/yyy-pkcs11.so
  */
 
-int gnutls_pkcs11_init (unsigned int flags, void *unused);
+int gnutls_pkcs11_init (unsigned int flags, const char *deprecated_config_file);
 void gnutls_pkcs11_deinit (void);
 void gnutls_pkcs11_set_token_function (gnutls_pkcs11_token_callback_t fn,
                                        void *userdata);

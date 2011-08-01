@@ -418,13 +418,15 @@ static int init = 0;
 
 /* tries to load modules from /etc/gnutls/pkcs11.conf if it exists
  */
-static void _pkcs11_compat_init(void)
+static void _pkcs11_compat_init(const char* configfile)
 {
 FILE *fp;
 int ret;
 char line[512];
 const char *library;
-const char* configfile = "/etc/gnutls/pkcs11.conf";
+
+  if (configfile == NULL)
+    configfile = "/etc/gnutls/pkcs11.conf";
 
   fp = fopen (configfile, "r");
   if (fp == NULL)
@@ -462,10 +464,46 @@ const char* configfile = "/etc/gnutls/pkcs11.conf";
   return;
 }
 
+static int
+initialize_automatic_p11_kit (void)
+{
+  struct ck_function_list **modules;
+  const char *name;
+  ck_rv_t rv;
+  int i, ret;
+
+  rv = p11_kit_initialize_registered ();
+  if (rv != CKR_OK)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("Cannot initialize registered module: %s\n",
+                         p11_kit_strerror (rv));
+      return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+  initialized_registered = 1;
+
+  modules = p11_kit_registered_modules ();
+  for (i = 0; modules[i] != NULL; i++)
+    {
+      name = p11_kit_registered_module_to_name (modules[i]);
+      ret = pkcs11_add_module (name, modules[i]);
+      if (ret != 0)
+        {
+          gnutls_assert ();
+          _gnutls_debug_log ("Cannot add registered module: %s\n", name);
+        }
+    }
+
+  free (modules);
+  return 0;
+}
+
 /**
  * gnutls_pkcs11_init:
  * @flags: %GNUTLS_PKCS11_FLAG_MANUAL or %GNUTLS_PKCS11_FLAG_AUTO
- * @unused: unused must be set to NULL
+ * @deprecated_config_file: either NULL or the location of a deprecated
+ *     configuration file
  *
  * This function will initialize the PKCS 11 subsystem in gnutls. It will
  * read configuration files if %GNUTLS_PKCS11_FLAG_AUTO is used or allow
@@ -480,12 +518,9 @@ const char* configfile = "/etc/gnutls/pkcs11.conf";
  *   negative error value.
  **/
 int
-gnutls_pkcs11_init (unsigned int flags, void *unused)
+gnutls_pkcs11_init (unsigned int flags, const char *deprecated_config_file)
 {
-  struct ck_function_list **modules;
-  const char *name;
-  ck_rv_t rv;
-  int i, ret;
+  int ret = 0;
 
   if (init != 0)
     {
@@ -498,33 +533,14 @@ gnutls_pkcs11_init (unsigned int flags, void *unused)
     return 0;
   else if (flags == GNUTLS_PKCS11_FLAG_AUTO)
     {
-      rv = p11_kit_initialize_registered ();
-      if (rv != CKR_OK)
-        {
-          gnutls_assert ();
-          _gnutls_debug_log ("Cannot initialize registered module: %s\n",
-                             p11_kit_strerror (rv));
-          return GNUTLS_E_INTERNAL_ERROR;
-        }
+      if (deprecated_config_file == NULL)
+        ret = initialize_automatic_p11_kit ();
 
-      initialized_registered = 1;
+      _pkcs11_compat_init(deprecated_config_file);
 
-      modules = p11_kit_registered_modules ();
-      for (i = 0; modules[i] != NULL; i++)
-        {
-          name = p11_kit_registered_module_to_name (modules[i]);
-          ret = pkcs11_add_module (name, modules[i]);
-          if (ret != 0)
-            {
-              gnutls_assert ();
-              _gnutls_debug_log ("Cannot add registered module: %s\n", name);
-            }
-        }
-      free (modules);
-
-      _pkcs11_compat_init();
+      return ret;
     }
-
+  
   return 0;
 }
 
