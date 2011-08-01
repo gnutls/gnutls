@@ -135,10 +135,9 @@ gnutls_pkcs11_privkey_get_info (gnutls_pkcs11_privkey_t pkey,
 			    rret = pkcs11_call_token_func (key->info, retries++); \
   			    if (rret == 0) continue; \
                           } \
-			gnutls_assert(); \
-			return ret; \
+			return gnutls_assert_val(ret); \
 		} else if (ret < 0) { \
-                        return ret; \
+                        return gnutls_assert_val(ret); \
                 } \
 	} while (0);
 
