@@ -465,7 +465,7 @@ const char* configfile = "/etc/gnutls/pkcs11.conf";
 /**
  * gnutls_pkcs11_init:
  * @flags: %GNUTLS_PKCS11_FLAG_MANUAL or %GNUTLS_PKCS11_FLAG_AUTO
- * @unused: unused, set to NULL
+ * @unused: unused must be set to NULL
  *
  * This function will initialize the PKCS 11 subsystem in gnutls. It will
  * read configuration files if %GNUTLS_PKCS11_FLAG_AUTO is used or allow
