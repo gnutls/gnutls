@@ -1108,7 +1108,7 @@ cleanup:
   return ret;
 
 recv_error:
-  if (gnutls_error_is_fatal (ret) == 0)
+  if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
     return ret;
 
   if (IS_DTLS(session))
