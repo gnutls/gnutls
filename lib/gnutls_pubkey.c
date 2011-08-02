@@ -88,6 +88,8 @@ int pubkey_to_bits(gnutls_pk_algorithm_t pk, gnutls_pk_params_st* params)
  *
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
  *   success, or a negative error code on error.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_get_pk_algorithm (gnutls_pubkey_t key, unsigned int *bits)
@@ -107,6 +109,8 @@ gnutls_pubkey_get_pk_algorithm (gnutls_pubkey_t key, unsigned int *bits)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_get_key_usage (gnutls_pubkey_t key, unsigned int *usage)
@@ -125,6 +129,8 @@ gnutls_pubkey_get_key_usage (gnutls_pubkey_t key, unsigned int *usage)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_init (gnutls_pubkey_t * key)
@@ -144,6 +150,8 @@ gnutls_pubkey_init (gnutls_pubkey_t * key)
  * @key: The structure to be deinitialized
  *
  * This function will deinitialize a public key structure.
+ *
+ * Since: 2.12.0
  **/
 void
 gnutls_pubkey_deinit (gnutls_pubkey_t key)
@@ -163,6 +171,8 @@ gnutls_pubkey_deinit (gnutls_pubkey_t key)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_import_x509 (gnutls_pubkey_t key, gnutls_x509_crt_t crt,
@@ -225,7 +235,7 @@ gnutls_pubkey_import_privkey (gnutls_pubkey_t key, gnutls_privkey_t pkey,
  * Returns: the 0 if the hash algorithm is found. A negative error code is
  * returned on error.
  *
- * Since: 2.11.0
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
@@ -260,6 +270,8 @@ gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t key,
@@ -318,6 +330,8 @@ gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t key,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
@@ -455,6 +469,8 @@ gnutls_pubkey_get_openpgp_key_id (gnutls_pubkey_t key, unsigned int flags,
  *
  * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_export (gnutls_pubkey_t key,
@@ -525,6 +541,8 @@ cleanup:
  *
  * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_get_key_id (gnutls_pubkey_t key, unsigned int flags,
@@ -562,6 +580,8 @@ gnutls_pubkey_get_key_id (gnutls_pubkey_t key, unsigned int flags,
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_get_pk_rsa_raw (gnutls_pubkey_t key,
@@ -612,6 +632,8 @@ gnutls_pubkey_get_pk_rsa_raw (gnutls_pubkey_t key,
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_get_pk_dsa_raw (gnutls_pubkey_t key,
@@ -742,6 +764,8 @@ gnutls_pubkey_get_pk_ecc_raw (gnutls_pubkey_t key, gnutls_ecc_curve_t *curve,
  * 
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  * negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_import (gnutls_pubkey_t key,
@@ -835,6 +859,8 @@ cleanup:
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_x509_crt_set_pubkey (gnutls_x509_crt_t crt, gnutls_pubkey_t key)
@@ -874,6 +900,8 @@ gnutls_x509_crt_set_pubkey (gnutls_x509_crt_t crt, gnutls_pubkey_t key)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_x509_crq_set_pubkey (gnutls_x509_crq_t crq, gnutls_pubkey_t key)
@@ -914,6 +942,8 @@ gnutls_x509_crq_set_pubkey (gnutls_x509_crq_t crq, gnutls_pubkey_t key)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_set_key_usage (gnutls_pubkey_t key, unsigned int usage)
@@ -936,8 +966,9 @@ gnutls_pubkey_set_key_usage (gnutls_pubkey_t key, unsigned int usage)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
-
 int
 gnutls_pubkey_import_pkcs11_url (gnutls_pubkey_t key, const char *url,
                                  unsigned int flags)
@@ -987,6 +1018,8 @@ cleanup:
  * gnutls_datum.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an negative error code.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_import_rsa_raw (gnutls_pubkey_t key,
@@ -1039,6 +1072,8 @@ gnutls_pubkey_import_rsa_raw (gnutls_pubkey_t key,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
@@ -1193,6 +1228,8 @@ gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey,
  *
  * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
  * is returned, and a positive code on success.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
@@ -1225,6 +1262,8 @@ gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
  *
  * Returns: the 0 if the hash algorithm is found. A negative error code is
  * returned on error.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pubkey_get_verify_algorithm (gnutls_pubkey_t key,

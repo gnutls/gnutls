@@ -2523,7 +2523,7 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
  * Returns: the 0 if the hash algorithm is found. A negative error code is
  * returned on error.
  *
- * Since: 2.11.0
+ * Since: 2.12.0
  **/
 int
 gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
@@ -3339,6 +3339,8 @@ gnutls_x509_crt_get_subject_unique_id (gnutls_x509_crt_t crt, char *buf,
  * returned, and sizeof_buf will be set to the actual length.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_x509_crt_get_issuer_unique_id (gnutls_x509_crt_t crt, char *buf,

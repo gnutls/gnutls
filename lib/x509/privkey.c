@@ -974,6 +974,8 @@ gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
  *
  * Returns: On success, a valid security parameter is returned otherwise
  * %GNUTLS_SEC_PARAM_UNKNOWN is returned.
+ *
+ * Since: 2.12.0
  **/
 gnutls_sec_param_t
 gnutls_x509_privkey_sec_param (gnutls_x509_privkey_t key)
@@ -1097,6 +1099,8 @@ gnutls_x509_privkey_export_rsa_raw (gnutls_x509_privkey_t key,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_x509_privkey_export_rsa_raw2 (gnutls_x509_privkey_t key,

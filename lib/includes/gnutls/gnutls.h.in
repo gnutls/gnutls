@@ -1143,7 +1143,17 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   int gnutls_global_init (void);
   void gnutls_global_deinit (void);
 
+  /**
+   * gnutls_time_func:
+   * @t: where to store time.
+   *
+   * Function prototype for time()-like function.  Set with
+   * gnutls_global_set_time_function().
+   *
+   * Returns: Number of seconds since the epoch, or (time_t)-1 on errors.
+   */
   typedef time_t (*gnutls_time_func) (time_t *t);
+
   typedef int (*mutex_init_func) (void **mutex);
   typedef int (*mutex_lock_func) (void **mutex);
   typedef int (*mutex_unlock_func) (void **mutex);
@@ -1485,12 +1495,20 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   struct gnutls_pkcs11_privkey_st;
   typedef struct gnutls_pkcs11_privkey_st *gnutls_pkcs11_privkey_t;
 
+  /**
+   * gnutls_privkey_type_t:
+   * @GNUTLS_PRIVKEY_X509: X.509 private key, #gnutls_x509_privkey_t.
+   * @GNUTLS_PRIVKEY_OPENPGP: OpenPGP private key, #gnutls_openpgp_privkey_t.
+   * @GNUTLS_PRIVKEY_PKCS11: PKCS11 private key, #gnutls_pkcs11_privkey_t.
+   *
+   * Enumeration of different private key types.
+   */
   typedef enum
-  {
-    GNUTLS_PRIVKEY_X509,        /* gnutls_x509_privkey_t */
-    GNUTLS_PRIVKEY_OPENPGP,     /* gnutls_openpgp_privkey_t */
-    GNUTLS_PRIVKEY_PKCS11       /* gnutls_pkcs11_privkey_t */
-  } gnutls_privkey_type_t;
+    {
+      GNUTLS_PRIVKEY_X509,
+      GNUTLS_PRIVKEY_OPENPGP,
+      GNUTLS_PRIVKEY_PKCS11
+    } gnutls_privkey_type_t;
 
   typedef struct gnutls_retr2_st
   {

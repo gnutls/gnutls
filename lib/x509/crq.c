@@ -2428,6 +2428,7 @@ gnutls_x509_crq_get_key_id (gnutls_x509_crq_t crq, unsigned int flags,
  *   information in the certificate request (e.g., the version using
  *   gnutls_x509_crq_set_version()).
  *
+ * Since: 2.12.0
  **/
 int
 gnutls_x509_crq_privkey_sign (gnutls_x509_crq_t crq, gnutls_privkey_t key,
@@ -2511,8 +2512,11 @@ gnutls_x509_crq_privkey_sign (gnutls_x509_crq_t crq, gnutls_privkey_t key,
  * This function will verify self signature in the certificate
  * request and return its status.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_PK_SIG_VERIFY_FAILED
- * if verification failed, otherwise a negative error value.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ * %GNUTLS_E_PK_SIG_VERIFY_FAILED if verification failed, otherwise a
+ * negative error value.
+ *
+ * Since 2.12.0
  **/
 int
 gnutls_x509_crq_verify (gnutls_x509_crq_t crq,

@@ -295,6 +295,7 @@ APIMANS += gnutls_x509_crt_import_pkcs11.3
 APIMANS += gnutls_x509_crt_list_import_pkcs11.3
 APIMANS += gnutls_pkcs11_token_get_flags.3
 APIMANS += gnutls_pkcs11_token_get_mechanism.3
+APIMANS += gnutls_pkcs11_type_get_name.3
 APIMANS += gnutls_pkcs11_privkey_init.3
 APIMANS += gnutls_pkcs11_privkey_deinit.3
 APIMANS += gnutls_pkcs11_privkey_get_pk_algorithm.3

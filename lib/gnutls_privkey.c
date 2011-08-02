@@ -1,6 +1,6 @@
 /*
  * GnuTLS PKCS#11 support
- * Copyright (C) 2010 Free Software Foundation
+ * Copyright (C) 2010, 2011 Free Software Foundation
  * 
  * Author: Nikos Mavrogiannopoulos
  *
@@ -61,6 +61,8 @@ struct gnutls_privkey_st
  *
  * Returns: a member of the #gnutls_privkey_type_t enumeration on
  *   success, or a negative error code on error.
+ *
+ * Since: 2.12.0
  **/
 gnutls_privkey_type_t
 gnutls_privkey_get_type (gnutls_privkey_t key)
@@ -79,6 +81,8 @@ gnutls_privkey_get_type (gnutls_privkey_t key)
  *
  * Returns: a member of the #gnutls_pk_algorithm_t enumeration on
  *   success, or a negative error code on error.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_privkey_get_pk_algorithm (gnutls_privkey_t key, unsigned int *bits)
@@ -246,6 +250,8 @@ _gnutls_privkey_get_public_mpis (gnutls_privkey_t key,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_privkey_init (gnutls_privkey_t * key)
@@ -265,6 +271,8 @@ gnutls_privkey_init (gnutls_privkey_t * key)
  * @key: The structure to be deinitialized
  *
  * This function will deinitialize a private key structure.
+ *
+ * Since: 2.12.0
  **/
 void
 gnutls_privkey_deinit (gnutls_privkey_t key)
@@ -317,6 +325,8 @@ static int check_if_clean(gnutls_privkey_t key)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_privkey_import_pkcs11 (gnutls_privkey_t pkey,
@@ -355,6 +365,8 @@ int ret;
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_privkey_import_x509 (gnutls_privkey_t pkey,
@@ -393,6 +405,8 @@ int ret;
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_privkey_import_openpgp (gnutls_privkey_t pkey,
@@ -606,6 +620,8 @@ _gnutls_privkey_sign_hash (gnutls_privkey_t key,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  * negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_privkey_decrypt_data (gnutls_privkey_t key,

@@ -150,6 +150,7 @@ gnutls_transport_set_push_function (gnutls_session_t session,
  * vec_func is of the form,
  * ssize_t (*gnutls_vec_push_func) (gnutls_transport_ptr_t, const giovec_t * iov, int iovcnt);
  *
+ * Since: 2.12.0
  **/
 void
 gnutls_transport_set_vec_push_function (gnutls_session_t session,
@@ -170,6 +171,8 @@ gnutls_transport_set_vec_push_function (gnutls_session_t session,
  * errno_func is of the form,
  * int (*gnutls_errno_func)(gnutls_transport_ptr_t);
  * and should return the errno.
+ *
+ * Since: 2.12.0
  **/
 void
 gnutls_transport_set_errno_function (gnutls_session_t session,

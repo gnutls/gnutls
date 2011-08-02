@@ -242,6 +242,8 @@ fail:
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pkcs11_add_provider (const char *name, const char *params)
@@ -281,13 +283,14 @@ gnutls_pkcs11_add_provider (const char *name, const char *params)
  * @output: where output will be stored
  * @output_size: contains the maximum size of the output and will be overwritten with actual
  *
- * This function will return information about the PKCS 11
- * certificatesuch as the label, id as well as token information where
- * the key is stored. When output is text it returns null terminated
- * string although @output_size contains the size of the actual data
- * only.
+ * This function will return information about the PKCS11 certificate
+ * such as the label, id as well as token information where the key is
+ * stored. When output is text it returns null terminated string
+ * although @output_size contains the size of the actual data only.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pkcs11_obj_get_info (gnutls_pkcs11_obj_t crt,
@@ -516,6 +519,8 @@ initialize_automatic_p11_kit (void)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pkcs11_init (unsigned int flags, const char *deprecated_config_file)
@@ -549,6 +554,7 @@ gnutls_pkcs11_init (unsigned int flags, const char *deprecated_config_file)
  *
  * This function will deinitialize the PKCS 11 subsystem in gnutls.
  *
+ * Since: 2.12.0
  **/
 void
 gnutls_pkcs11_deinit (void)
@@ -578,28 +584,14 @@ gnutls_pkcs11_deinit (void)
 
 /**
  * gnutls_pkcs11_set_pin_function:
- * @fn: The PIN callback
+ * @fn: The PIN callback, a gnutls_pkcs11_pin_callback_t() function.
  * @userdata: data to be supplied to callback
  *
- * This function will set a callback function to be used when a PIN
- * is required for PKCS 11 operations.
+ * This function will set a callback function to be used when a PIN is
+ * required for PKCS 11 operations.  See
+ * gnutls_pkcs11_pin_callback_t() on how the callback should behave.
  *
- * Callback for PKCS#11 PIN entry.  The callback provides the PIN code
- * to unlock the token with label 'token_label', specified by the URL 
- * 'token_url'.
- *
- * The PIN code, as a NUL-terminated ASCII string, should be copied
- * into the 'pin' buffer (of maximum size pin_max), and
- * return 0 to indicate success. Alternatively, the callback may
- * return a negative gnutls error code to indicate failure and cancel
- * PIN entry (in which case, the contents of the 'pin' parameter are ignored).
- *
- * When a PIN is required, the callback will be invoked repeatedly
- * (and indefinitely) until either the returned PIN code is correct,
- * the callback returns failure, or the token refuses login (e.g. when
- * the token is locked due to too many incorrect PINs!).  For the
- * first such invocation, the 'attempt' counter will have value zero;
- * it will increase by one for each subsequent attempt.
+ * Since: 2.12.0
  **/
 void
 gnutls_pkcs11_set_pin_function (gnutls_pkcs11_pin_callback_t fn,
@@ -616,6 +608,8 @@ gnutls_pkcs11_set_pin_function (gnutls_pkcs11_pin_callback_t fn,
  *
  * This function will set a callback function to be used when a token
  * needs to be inserted to continue PKCS 11 operations.
+ *
+ * Since: 2.12.0
  **/
 void
 gnutls_pkcs11_set_token_function (gnutls_pkcs11_token_callback_t fn,
@@ -697,6 +691,8 @@ pkcs11_info_to_url (struct p11_kit_uri *info,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pkcs11_obj_init (gnutls_pkcs11_obj_t * obj)
@@ -724,6 +720,8 @@ gnutls_pkcs11_obj_init (gnutls_pkcs11_obj_t * obj)
  * @obj: The structure to be initialized
  *
  * This function will deinitialize a certificate structure.
+ *
+ * Since: 2.12.0
  **/
 void
 gnutls_pkcs11_obj_deinit (gnutls_pkcs11_obj_t obj)
@@ -740,8 +738,8 @@ gnutls_pkcs11_obj_deinit (gnutls_pkcs11_obj_t obj)
  * @output_data_size: holds the size of output_data (and will be
  *   replaced by the actual size of parameters)
  *
- * This function will export the pkcs11 object data. It is normal
- * for PKCS #11 data to be inaccesible and in that case %GNUTLS_E_INVALID_REQUEST
+ * This function will export the PKCS11 object data.  It is normal for
+ * data to be inaccesible and in that case %GNUTLS_E_INVALID_REQUEST
  * will be returned.
  *
  * If the buffer provided is not long enough to hold the output, then
@@ -753,6 +751,8 @@ gnutls_pkcs11_obj_deinit (gnutls_pkcs11_obj_t obj)
  *
  * Returns: In case of failure a negative error code will be
  *   returned, and %GNUTLS_E_SUCCESS (0) on success.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pkcs11_obj_export (gnutls_pkcs11_obj_t obj,
@@ -1460,7 +1460,7 @@ pkcs11_obj_flags_to_int (unsigned int flags)
 }
 
 /**
- * gnutls_pkcs11_privkey_import_url:
+ * gnutls_pkcs11_obj_import_url:
  * @cert: The structure to store the parsed certificate
  * @url: a PKCS 11 url identifying the key
  * @flags: One of GNUTLS_PKCS11_OBJ_* flags
@@ -1472,6 +1472,8 @@ pkcs11_obj_flags_to_int (unsigned int flags)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pkcs11_obj_import_url (gnutls_pkcs11_obj_t cert, const char *url,
@@ -1547,10 +1549,12 @@ find_token_num (struct ck_function_list *module,
  * This function will return the URL for each token available
  * in system. The url has to be released using gnutls_free()
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
- * if the sequence number exceeds the available tokens, otherwise a negative error value.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE if the sequence number
+ * exceeds the available tokens, otherwise a negative error value.
+ *
+ * Since: 2.12.0
  **/
-
 int
 gnutls_pkcs11_token_get_url (unsigned int seq,
                              gnutls_pkcs11_url_type_t detailed, char **url)
@@ -1593,7 +1597,10 @@ gnutls_pkcs11_token_get_url (unsigned int seq,
  * This function will return information about the PKCS 11 token such
  * as the label, id as well as token information where the key is stored.
  *
- * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
+ * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code
+ * on error.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pkcs11_token_get_info (const char *url,
@@ -1664,6 +1671,8 @@ gnutls_pkcs11_token_get_info (const char *url,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pkcs11_obj_export_url (gnutls_pkcs11_obj_t obj,
@@ -1689,6 +1698,8 @@ gnutls_pkcs11_obj_export_url (gnutls_pkcs11_obj_t obj,
  * stored in the structure.
  *
  * Returns: The type of the certificate.
+ *
+ * Since: 2.12.0
  **/
 gnutls_pkcs11_obj_type_t
 gnutls_pkcs11_obj_get_type (gnutls_pkcs11_obj_t obj)
@@ -2379,6 +2390,8 @@ fail:
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pkcs11_obj_list_import_url (gnutls_pkcs11_obj_t * p_list,
@@ -2436,6 +2449,8 @@ gnutls_pkcs11_obj_list_import_url (gnutls_pkcs11_obj_t * p_list,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_x509_crt_import_pkcs11_url (gnutls_x509_crt_t crt,
@@ -2484,6 +2499,8 @@ cleanup:
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_x509_crt_import_pkcs11 (gnutls_x509_crt_t crt,
@@ -2504,6 +2521,8 @@ gnutls_x509_crt_import_pkcs11 (gnutls_x509_crt_t crt,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_x509_crt_list_import_pkcs11 (gnutls_x509_crt_t * certs,
@@ -2578,6 +2597,8 @@ find_flags (struct ck_function_list * module, ck_session_handle_t pks,
  * This function will return information about the PKCS 11 token flags.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pkcs11_token_get_flags (const char *url, unsigned int *flags)
@@ -2610,7 +2631,6 @@ gnutls_pkcs11_token_get_flags (const char *url, unsigned int *flags)
 
 }
 
-
 /**
  * gnutls_pkcs11_token_get_mechanism:
  * @url: should contain a PKCS 11 URL
@@ -2622,6 +2642,8 @@ gnutls_pkcs11_token_get_flags (const char *url, unsigned int *flags)
  * it return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pkcs11_token_get_mechanism (const char *url, int idx,
@@ -2673,7 +2695,19 @@ gnutls_pkcs11_token_get_mechanism (const char *url, int idx,
 
 }
 
-
+/**
+ * gnutls_pkcs11_type_get_name:
+ * @type: Holds the PKCS 11 object type, a #gnutls_pkcs11_obj_type_t.
+ *
+ * This function will return a human readable description of the
+ * PKCS11 object type @obj.  It will return "Unknown" for unknown
+ * types.
+ *
+ * Returns: human readable string labeling the PKCS11 object type
+ * @type.
+ *
+ * Since: 2.12.0
+ **/
 const char *
 gnutls_pkcs11_type_get_name (gnutls_pkcs11_obj_type_t type)
 {

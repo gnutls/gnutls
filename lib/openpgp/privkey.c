@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free
  * Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
@@ -84,6 +84,8 @@ gnutls_openpgp_privkey_deinit (gnutls_openpgp_privkey_t key)
  *
  * Returns: On success, a valid security parameter is returned otherwise
  * %GNUTLS_SEC_PARAM_UNKNOWN is returned.
+ *
+ * Since: 2.12.0
  **/
 gnutls_sec_param_t
 gnutls_openpgp_privkey_sec_param (gnutls_openpgp_privkey_t key)
