@@ -207,6 +207,8 @@ _gnutls_ecc_bits_to_curve (int bits)
  *
  * Returns: a string that contains the name of the specified
  *   curve or %NULL.
+ *
+ * Since: 3.0.0
  **/
 const char *
 gnutls_ecc_curve_get_name (gnutls_ecc_curve_t curve)
@@ -280,6 +282,8 @@ _gnutls_ecc_curve_get_params (gnutls_ecc_curve_t curve)
  * Returns the size in bytes of the curve.
  *
  * Returns: a the size or (0).
+ *
+ * Since: 3.0.0
  **/
 int gnutls_ecc_curve_get_size (gnutls_ecc_curve_t curve)
 {

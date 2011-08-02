@@ -102,6 +102,7 @@ gnutls_transport_set_pull_function (gnutls_session_t session,
  * gnutls_pull_timeout_func is of the form,
  * ssize_t (*gnutls_pull_timeout_func)(gnutls_transport_ptr_t, void*data, size_t size, unsigned int ms);
  *
+ * Since: 3.0.0
  **/
 void
 gnutls_transport_set_pull_timeout_function (gnutls_session_t session,

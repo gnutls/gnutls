@@ -1266,6 +1266,8 @@ gnutls_record_recv (gnutls_session_t session, void *data, size_t data_size)
  * Returns: the number of bytes received and zero on EOF.  A negative
  *   error code is returned in case of an error.  The number of bytes
  *   received might be less than @data_size.
+ *
+ * Since: 3.0.0
  **/
 ssize_t
 gnutls_record_recv_seq (gnutls_session_t session, void *data, size_t data_size,

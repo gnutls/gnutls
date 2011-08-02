@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009, 2010 Free Software
+ * Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009, 2010, 2011 Free Software
  * Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
@@ -836,6 +836,8 @@ cleanup:
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.0.0
  **/
 int
 gnutls_x509_privkey_import_ecc_raw (gnutls_x509_privkey_t key,
@@ -999,6 +1001,8 @@ gnutls_x509_privkey_sec_param (gnutls_x509_privkey_t key)
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.0.0
  **/
 int gnutls_x509_privkey_export_ecc_raw (gnutls_x509_privkey_t key, 
                                         gnutls_ecc_curve_t *curve,  
