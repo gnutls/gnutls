@@ -1,676 +1,674 @@
-# Dutch translations for libgnutls.
-# Copyright (C) 2011 Free Software Foundation, Inc.
+# Finnish messages for libgnutls.
+# Copyright © 2011 Free Software Foundation, Inc.
 # This file is distributed under the same license as the libgnutls package.
+# Jorma Karvonen <karvonen.jorma@gmail.com>, 2011.
 #
-# Benno Schulenberg <benno@vertaalt.nl>, 2007, 2008, 2010, 2011.
-# Erwin Poeze <erwin.poeze@gmail.com>, 2009, 2010.
 msgid ""
 msgstr ""
-"Project-Id-Version: libgnutls-2.12.7\n"
+"Project-Id-Version: libgnutls 2.12.7\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
 "POT-Creation-Date: 2011-06-18 21:08+0200\n"
-"PO-Revision-Date: 2011-07-17 21:34+0200\n"
-"Last-Translator: Benno Schulenberg <benno@vertaalt.nl>\n"
-"Language-Team: Dutch <vertaling@vrijschrift.org>\n"
-"Language: nl\n"
+"PO-Revision-Date: 2011-07-12 15:32+0200\n"
+"Last-Translator: Jorma Karvonen <karvonen.jorma@gmail.com>\n"
+"Language-Team: Finnish <translation-team-fi@lists.sourceforge.net>\n"
+"Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 1.0\n"
 
 #: gnutls_errors.c:54
 msgid "Success."
-msgstr "Gelukt."
+msgstr "Onnistui."
 
 #: gnutls_errors.c:55
 msgid "Could not negotiate a supported cipher suite."
-msgstr "Kan geen gemeenschappelijke coderingsmethode overeenkomen."
+msgstr "Ei voitu neuvotella tuetusta salakirjoitusmenetelmästä."
 
 #: gnutls_errors.c:57
 msgid "The cipher type is unsupported."
-msgstr "De coderingsmethode wordt niet ondersteund."
+msgstr "Salakirjoitusmenetelmätyyppiä ei tueta."
 
 #: gnutls_errors.c:59
 msgid "The certificate and the given key do not match."
-msgstr "Het certificaat en de gegeven sleutel passen niet bij elkaar."
+msgstr "Varmenne ja annettu avain eivät täsmää."
 
 #: gnutls_errors.c:61
 msgid "Could not negotiate a supported compression method."
-msgstr "Kan geen gemeenschappelijke compressiemethode overeenkomen."
+msgstr "Ei voitu neuvotella tuetusta pakkaamismenetelmästä."
 
 #: gnutls_errors.c:63
 msgid "An unknown public key algorithm was encountered."
-msgstr "Onbekend versleutelingsalgoritme gevonden."
+msgstr "Kohdattiin tuntematon julkinen avainalgoritmi."
 
 #: gnutls_errors.c:66
 msgid "An algorithm that is not enabled was negotiated."
-msgstr "Er werd een uitgeschakeld algoritme overeengekomen."
+msgstr "Neuvoteltiin algoritmista, jota ei ole otettu käyttöön."
 
 #: gnutls_errors.c:68
 msgid "A large TLS record packet was received."
-msgstr "Er werd een groot TLS-datapakket ontvangen."
+msgstr "Vastaanotettiin suuri TLS-tietuepaketti."
 
 #: gnutls_errors.c:70
 msgid "A record packet with illegal version was received."
-msgstr "Er werd een datapakket met een ongedige versie ontvangen."
+msgstr "Vastaanotettiin tietuepaketti, jonka versio oli virheellinen."
 
 #: gnutls_errors.c:73
 msgid "The Diffie-Hellman prime sent by the server is not acceptable (not long enough)."
-msgstr "Het door de server toegezonden Diffie-Hellman-priemgetal is niet acceptabel (niet lang genoeg)."
+msgstr "Palvelimen lähettämä Diffie-Hellman -perusavain ei ollut hyväksyttävä (ei riittävän pitkä)."
 
 #: gnutls_errors.c:75
 msgid "A TLS packet with unexpected length was received."
-msgstr "Er werd een TLS-pakket met een onverwachte lengte ontvangen."
+msgstr "Vastaanotettiin odottamattoman pituinen TLS-paketti."
 
 #: gnutls_errors.c:78
 msgid "The specified session has been invalidated for some reason."
-msgstr "De aangegeven sessie is om een of andere reden ongeldig geworden."
+msgstr "Määritelty istunto on jostain syystä virheellinen."
 
 #: gnutls_errors.c:81
 msgid "GnuTLS internal error."
-msgstr "**Interne fout** in GnuTLS."
+msgstr "Sisäinen GnuTLS-virhe."
 
 #: gnutls_errors.c:82
 msgid "An illegal TLS extension was received."
-msgstr "Er werd een ongeldige TLS-uitbreiding ontvangen."
+msgstr "Vastaanotettiin virheellinen TLS-laajennus."
 
 #: gnutls_errors.c:84
 msgid "A TLS fatal alert has been received."
-msgstr "Er werd een ernstig TLS-alarm ontvangen."
+msgstr "Vastaanotettiin kohtalokas TLS-hälytys."
 
 #: gnutls_errors.c:86
 msgid "An unexpected TLS packet was received."
-msgstr "Er werd een onverwacht TLS-pakket ontvangen."
+msgstr "Vastaanotettiin odottamaton TLS-paketti."
 
 #: gnutls_errors.c:88
 msgid "A TLS warning alert has been received."
-msgstr "Er is een TLS-waarschuwing ontvangen."
+msgstr "Vastaanotettiin TLS-varoitushälytys."
 
 #: gnutls_errors.c:91
 msgid "An error was encountered at the TLS Finished packet calculation."
-msgstr "Er is een fout opgetreden tijdens de TLS-pakketeinde-berekening."
+msgstr "Kohdattiin virhe ”TLS Finished”-paketin laskennassa."
 
 #: gnutls_errors.c:93
 msgid "The peer did not send any certificate."
-msgstr "De andere computer heeft geen certificaat gestuurd."
+msgstr "Vastapuoli ei lähettänyt mitään varmennetta."
 
 #: gnutls_errors.c:95
 msgid "The given DSA key is incompatible with the selected TLS protocol."
-msgstr "De gegeven DSA-sleutel is incompatibel met het geselecteerde TLS-protocol."
+msgstr "Annettu DSA-avain on yhteensopimaton valitun TLS-yhteyskäytännön kanssa."
 
 #: gnutls_errors.c:98
 msgid "There is already a crypto algorithm with lower priority."
-msgstr "Er is al een encryptie-algoritme met een lagere prioriteit."
+msgstr "Salausalgoritmi alemmalla prioriteetilla on jo olemassa."
 
 #: gnutls_errors.c:101
 msgid "No temporary RSA parameters were found."
-msgstr "Er zijn geen tijdelijke RSA-parameters gevonden."
+msgstr "Ei löytynyt tilapäisiä RSA-parametreja."
 
 #: gnutls_errors.c:103
 msgid "No temporary DH parameters were found."
-msgstr "Er zijn geen tijdelijke DH-parameters gevonden."
+msgstr "Ei löytynyt tilapäisiä DH-parametreja."
 
 #: gnutls_errors.c:105
 msgid "An unexpected TLS handshake packet was received."
-msgstr "Er werd een onverwacht TLS-handshake-pakket ontvangen."
+msgstr "Vastaanotettiin odottamaton TLS-kättelypaketti."
 
 #: gnutls_errors.c:107
 msgid "The scanning of a large integer has failed."
-msgstr "Het lezen van een groot geheel getal is mislukt."
+msgstr "Suurikokoisen kokonaisluvun etsintä epäonnistui."
 
 #: gnutls_errors.c:109
 msgid "Could not export a large integer."
-msgstr "Het exporteren van een groot geheel getal is mislukt."
+msgstr "Suurta kokonaislukua ei voitu viedä."
 
 #: gnutls_errors.c:111
 msgid "Decryption has failed."
-msgstr "Ontsleuteling is mislukt."
+msgstr "Salauksen purku epäonnistui."
 
 #: gnutls_errors.c:112
 msgid "Encryption has failed."
-msgstr "Versleuteling is mislukt."
+msgstr "Salaus epäonnistui."
 
 #: gnutls_errors.c:113
 msgid "Public key decryption has failed."
-msgstr "Ontsleuteling met publieke sleutel is mislukt."
+msgstr "Salauksen purku julkisella avaimella epäonnistui."
 
 #: gnutls_errors.c:115
 msgid "Public key encryption has failed."
-msgstr "Versleuteling met publieke sleutel is mislukt."
+msgstr "Salaus julkisella avaimella epäonnistui."
 
 #: gnutls_errors.c:117
 msgid "Public key signing has failed."
-msgstr "Ondertekenen met publieke sleutel is mislukt."
+msgstr "Allekirjoitus julkisella avaimella epäonnistui."
 
 #: gnutls_errors.c:119
 msgid "Public key signature verification has failed."
-msgstr "Controle van ondertekening met publieke sleutel is mislukt."
+msgstr "Allekirjoituksen todennus julkisella avaimella epäonnistui."
 
 #: gnutls_errors.c:121
 msgid "Decompression of the TLS record packet has failed."
-msgstr "Decompressie van het TLS-datapakket is mislukt."
+msgstr "TLS-tietuepaketin pakkaamisen purkaminen epäonnistui."
 
 #: gnutls_errors.c:123
 msgid "Compression of the TLS record packet has failed."
-msgstr "Compressie van het TLS-datapakket is mislukt."
+msgstr "TLS-tietuepaketin pakkaaminen epäonnistui."
 
 #: gnutls_errors.c:126
 msgid "Internal error in memory allocation."
-msgstr "**Interne fout** bij reserveren van geheugen."
+msgstr "Sisäinen virhe muistivarauksessa."
 
 #: gnutls_errors.c:128
 msgid "An unimplemented or disabled feature has been requested."
-msgstr "Er werd een uitgeschakelde of ongeïmplementeerde functie gevraagd."
+msgstr "Pyydettiin toteuttamatonta tai käytöstä pois otettua ominaisuutta."
 
 #: gnutls_errors.c:130
 msgid "Insufficient credentials for that request."
-msgstr "Onvoldoende rechten voor dat verzoek."
+msgstr "Riittämättömästi valtuustietoja tuolle pyynnölle."
 
 #: gnutls_errors.c:132
 msgid "Error in password file."
-msgstr "Fout in wachtwoordenbestand."
+msgstr "Virhe salasanatiedostossa."
 
 #: gnutls_errors.c:133
 msgid "Wrong padding in PKCS1 packet."
-msgstr "Onjuiste opvulbytes in PKCS1-pakket."
+msgstr "Väärä täyte PKCS1-paketissa."
 
 #: gnutls_errors.c:135
 msgid "The requested session has expired."
-msgstr "De gevraagde sessie is verlopen."
+msgstr "Vaadittu istunto on vanhentunut."
 
 #: gnutls_errors.c:136
 msgid "Hashing has failed."
-msgstr "Hashen is mislukt."
+msgstr "Tiivisteen laskeminen epäonnistui."
 
 #: gnutls_errors.c:137
 msgid "Base64 decoding error."
-msgstr "Base64-decoderingsfout."
+msgstr "Base64-dekoodausvirhe."
 
 #: gnutls_errors.c:139
 msgid "Base64 unexpected header error."
-msgstr "Onverwachte fout in base64-kopregel."
+msgstr "Base64 odottamaton otsakevirhe."
 
 #: gnutls_errors.c:142
 msgid "Base64 encoding error."
-msgstr "Base64-coderingsfout."
+msgstr "Base64-koodausvirhe."
 
 #: gnutls_errors.c:144
 msgid "Parsing error in password file."
-msgstr "Fout in de indeling van wachtwoordenbestand."
+msgstr "Jäsennysvirhe salasanatiedostossa."
 
 #: gnutls_errors.c:146
 msgid "The requested data were not available."
-msgstr "De gevraagde gegevens zijn niet beschikbaar."
+msgstr "Pyydetyt tiedot eivät olleet saatavilla."
 
 #: gnutls_errors.c:148
 msgid "Error in the pull function."
-msgstr "Fout in de 'pull'-functie."
+msgstr "Virhe pull-toiminnossa."
 
 #: gnutls_errors.c:149
 msgid "Error in the push function."
-msgstr "Fout in de 'push'-functie."
+msgstr "Virhe push-toiminnossa."
 
 #: gnutls_errors.c:151
 msgid "The upper limit of record packet sequence numbers has been reached. Wow!"
-msgstr "Het hoogste volgnummer voor datapakketten is bereikt.  Wauw!"
+msgstr "Tietuepakettijärjestysnumeroiden yläraja on saavutettu. Wow!"
 
 #: gnutls_errors.c:153
 msgid "Error in the certificate."
-msgstr "Fout in het certificaat."
+msgstr "Virhe varmenteessa."
 
 #: gnutls_errors.c:155
 msgid "Unknown Subject Alternative name in X.509 certificate."
-msgstr "Onbekende naam van toegevoegd onderwerp in X.509-certificaat."
+msgstr "Tuntematon aihevaihtoehtonimi X.509-varmenteessa."
 
 #: gnutls_errors.c:158
 msgid "Unsupported critical extension in X.509 certificate."
-msgstr "Niet-ondersteunde kritieke uitbreiding in X.509-certificaat."
+msgstr "Tukematon kriittinen laajennus X.509-varmenteessa."
 
 #: gnutls_errors.c:160
 msgid "Key usage violation in certificate has been detected."
-msgstr "Er is een overtreding van het sleutelgebruik in het certificaat geconstateerd."
+msgstr "Havaittiin avainkäytön rikkomus varmenteessa."
 
 #: gnutls_errors.c:162
 msgid "Resource temporarily unavailable, try again."
-msgstr "Bron is tijdelijk niet beschikbaar; probeer het later nogmaals."
+msgstr "Resurssi on tilapäisesti tavoittamattomissa, yritä uudelleen."
 
 #: gnutls_errors.c:164
 msgid "Function was interrupted."
-msgstr "Functie werd onderbroken."
+msgstr "Funktio keskeytettiin."
 
 #: gnutls_errors.c:165
 msgid "Rehandshake was requested by the peer."
-msgstr "De andere computer heeft om een hernieuwde handshake gevraagd."
+msgstr "Vastapuoli vaati uudelleenkättelyn."
 
 #: gnutls_errors.c:168
 msgid "TLS Application data were received, while expecting handshake data."
-msgstr "Er werd TLS-toepassingsdata ontvangen, terwijl handshake-gegevens verwacht werden."
+msgstr "Vastaanotettiin TLS-sovelluksen tietoja, vaikka odotettiin kättelytietoja."
 
 #: gnutls_errors.c:170
 msgid "Error in Database backend."
-msgstr "Fout in databank-backend."
+msgstr "Virhe tietokantatallennusmoduulissa."
 
 #: gnutls_errors.c:171
 msgid "The certificate type is not supported."
-msgstr "Het certificaattype wordt niet ondersteund."
+msgstr "Varmenteen tyyppiä ei tueta."
 
 #: gnutls_errors.c:173
 msgid "The given memory buffer is too short to hold parameters."
-msgstr "Beschikbare buffer is te klein voor de gegeven parameters."
+msgstr "Annettu muistipuskuri on liian lyhyt parametrien säilyttämiseen."
 
 #: gnutls_errors.c:175
 msgid "The request is invalid."
-msgstr "Het verzoek is ongeldig."
+msgstr "Pyyntö on virheellinen."
 
 #: gnutls_errors.c:176
 msgid "An illegal parameter has been received."
-msgstr "Er werd een ongeoorloofde parameter ontvangen."
+msgstr "Vastaanotettiin virheellinen parametri."
 
 #: gnutls_errors.c:178
 msgid "Error while reading file."
-msgstr "Fout tijdens lezen van bestand."
+msgstr "Virhe luettaessa tiedostoa."
 
 #: gnutls_errors.c:180
 msgid "ASN1 parser: Element was not found."
-msgstr "ASN1-parser: Element niet gevonden."
+msgstr "ASN1-jäsennin: Elementtiä ei löytynyt."
 
 #: gnutls_errors.c:182
 msgid "ASN1 parser: Identifier was not found"
-msgstr "ASN1-parser: Naam niet gevonden."
+msgstr "ASN1-jäsennin: Tunnistetta ei löytynyt"
 
 #: gnutls_errors.c:184
 msgid "ASN1 parser: Error in DER parsing."
-msgstr "ASN1-parser: Fout in ontleden van DER."
+msgstr "ASN1-jäsennin: Virhe DER-jäsennyksessä."
 
 #: gnutls_errors.c:186
 msgid "ASN1 parser: Value was not found."
-msgstr "ASN1-parser: Waarde niet gevonden."
+msgstr "ASN1-jäsennin: Arvoa ei löytynyt."
 
 #: gnutls_errors.c:188
 msgid "ASN1 parser: Generic parsing error."
-msgstr "ASN1-parser: Algemene ontledingsfout."
+msgstr "ASN1-jäsennin: Yleinen jäsennysvirhe."
 
 #: gnutls_errors.c:190
 msgid "ASN1 parser: Value is not valid."
-msgstr "ASN1-parser: Waarde is ongeldig."
+msgstr "ASN1-jäsennin: Arvo on virheellinen."
 
 #: gnutls_errors.c:192
 msgid "ASN1 parser: Error in TAG."
-msgstr "ASN1-parser: Fout in TAG."
+msgstr "ASN1-jäsennin: Virhe TUNNUKSESSA."
 
 #: gnutls_errors.c:193
 msgid "ASN1 parser: error in implicit tag"
-msgstr "ASN1-parser: Fout in impliete tag."
+msgstr "ASN1-jäsennin: virhe implisiittisessä tunnuksessa"
 
 #: gnutls_errors.c:195
 msgid "ASN1 parser: Error in type 'ANY'."
-msgstr "ASN1-parser: Fout in type 'ANY'."
+msgstr "ASN1-jäsennin: Virhe tyypissä ’ANY’."
 
 #: gnutls_errors.c:197
 msgid "ASN1 parser: Syntax error."
-msgstr "ASN1-parser: Syntaxfout."
+msgstr "ASN1-jäsennin: Syntaksivirhe."
 
 #: gnutls_errors.c:199
 msgid "ASN1 parser: Overflow in DER parsing."
-msgstr "ASN1-parser: Overloop in DER-ontleding."
+msgstr "ASN1-jäsennin: Ylivuoto DER-jäsennyksessä."
 
 #: gnutls_errors.c:202
 msgid "Too many empty record packets have been received."
-msgstr "Er zijn te veel lege datapakketten ontvangen."
+msgstr "Vastaanotettiin liian monta tyhjää tietuepakettia."
 
 #: gnutls_errors.c:204
 msgid "The initialization of GnuTLS-extra has failed."
-msgstr "Het initialiseren van GnuTLS-extra is mislukt."
+msgstr "GnuTLS-extra -alustus epäonnistui."
 
 #: gnutls_errors.c:207
 msgid "The GnuTLS library version does not match the GnuTLS-extra library version."
-msgstr "De versies van de GnuTLS- en GnuTLS-extra-bibliotheken komen niet overeen."
+msgstr "GnuTLS-kirjastoversio ei täsmää GnuTLS-extra -kirjastoversion kanssa."
 
 #: gnutls_errors.c:209
 msgid "The gcrypt library version is too old."
-msgstr "De versie van de gcrypt-bibliotheek is te oud."
+msgstr "Kirjaston grypt versio on liian vanha."
 
 #: gnutls_errors.c:212
 msgid "The tasn1 library version is too old."
-msgstr "De versie van de tasn1-bibliotheek is te oud."
+msgstr "Kirjaston tasn1 versio on liian vanha."
 
 #: gnutls_errors.c:214
 msgid "The OpenPGP User ID is revoked."
-msgstr "Het OpenPGP-gebruikers-ID is ingetrokken."
+msgstr "Kumottiin OpenPGP-käyttäjätunniste."
 
 #: gnutls_errors.c:216
 msgid "The OpenPGP key has not a preferred key set."
-msgstr "De OpenPGP-sleutel heeft geen voorkeurssleutelset."
+msgstr "OpenPGP-avaimella ei ole ensisijaista avainjoukkoa."
 
 #: gnutls_errors.c:218
 msgid "Error loading the keyring."
-msgstr "Fout tijdens laden van de sleutelring."
+msgstr "Virhe ladattaessa avainrengasta."
 
 #: gnutls_errors.c:220
 msgid "The initialization of crypto backend has failed."
-msgstr "Het initialiseren van de cryptografische routines is mislukt."
+msgstr "Salaustaustaohjelman alustus epäonnistui."
 
 #: gnutls_errors.c:222
 msgid "The initialization of LZO has failed."
-msgstr "Het initialiseren van LZO is mislukt."
+msgstr "LZO-alustus epäonnistui."
 
 #: gnutls_errors.c:224
 msgid "No supported compression algorithms have been found."
-msgstr "Er is geen ondersteund compressie-algoritme gevonden."
+msgstr "Ei ole löytynyt yhtään tuettua pakkausalgoritmia."
 
 #: gnutls_errors.c:226
 msgid "No supported cipher suites have been found."
-msgstr "Er is geen ondersteund encryptie-algoritme gevonden."
+msgstr "Ei ole löytynyt yhtään tuettua salakirjoitusmenetelmää."
 
 #: gnutls_errors.c:228
 msgid "Could not get OpenPGP key."
-msgstr "Kan OpenPGP-sleutel niet verkrijgen."
+msgstr "Ei voitu vastaanottaa OpenPGP-avainta."
 
 #: gnutls_errors.c:230
 msgid "Could not find OpenPGP subkey."
-msgstr "Kan OpenPGP-subsleutel niet vinden."
+msgstr "Ei voitu löytää OpenPGP-aliavainta."
 
 #: gnutls_errors.c:232
 msgid "Safe renegotiation failed."
-msgstr "Beveiligde heronderhandeling is mislukt."
+msgstr "Turvallinen uudelleenneuvottelu epäonnistui."
 
 #: gnutls_errors.c:234
 msgid "Unsafe renegotiation denied."
-msgstr "Onbeveiligde heronderhandeling is geweigerd."
+msgstr "Turvaton uudelleenneuvottelu kielletty."
 
 #: gnutls_errors.c:237
 msgid "The SRP username supplied is illegal."
-msgstr "De gegeven SRP-gebruikersnaam is ongeldig."
+msgstr "Tarjottu SRP-käyttäjänimi on virheellinen."
 
 #: gnutls_errors.c:239
 msgid "The SRP username supplied is unknown."
-msgstr "De gegeven SRP-gebruikersnaam is onbekend."
+msgstr "Tarjottu SRP-käyttäjänimi on tuntematon."
 
 #: gnutls_errors.c:242
 msgid "The OpenPGP fingerprint is not supported."
-msgstr "De OpenPGP-vingerafdruk wordt niet ondersteund."
+msgstr "OpenPGP-sormenjälkeä ei tueta."
 
 #: gnutls_errors.c:244
 msgid "The signature algorithm is not supported."
-msgstr "Het ondertekeningsalgoritme wordt niet ondersteund."
+msgstr "Allekirjoitusalgoritmia ei tueta."
 
 #: gnutls_errors.c:246
 msgid "The certificate has unsupported attributes."
-msgstr "Het certificaat heeft niet-ondersteunde eigenschappen."
+msgstr "Varmenteessa on tukemattomia attribuutteja."
 
 #: gnutls_errors.c:248
 msgid "The OID is not supported."
-msgstr "Het OID wordt niet ondersteund."
+msgstr "OID on tukematon."
 
 #: gnutls_errors.c:250
 msgid "The hash algorithm is unknown."
-msgstr "Onbekend hash-algoritme."
+msgstr "Tiivistealgoritmi on tuntematon."
 
 #: gnutls_errors.c:252
 msgid "The PKCS structure's content type is unknown."
-msgstr "Onbekend inhoudstype van PKCS-structuur."
+msgstr "PKCS-rakenteen sisältötyyppi on tuntematon."
 
 #: gnutls_errors.c:254
 msgid "The PKCS structure's bag type is unknown."
-msgstr "Onbekend buideltype van PKCS-structuur."
+msgstr "PKCS-rakenteen bag-tyyppi on tuntematon."
 
 #: gnutls_errors.c:256
 msgid "The given password contains invalid characters."
-msgstr "Het opgegeven wachtwoord bevat ongeldige tekens."
+msgstr "Annettu salasana sisältää virheellisiä merkkejä."
 
 #: gnutls_errors.c:258
 msgid "The Message Authentication Code verification failed."
-msgstr "Verificatie van berichtauthenticatiecode is mislukt."
+msgstr "MAC-todennus epäonnistui."
 
 #: gnutls_errors.c:260
 msgid "Some constraint limits were reached."
-msgstr "Sommige beperkingsgrenzen werden bereikt."
+msgstr "Tavoitettiin joitakin rajoiterajoja."
 
 #: gnutls_errors.c:262
 msgid "Failed to acquire random data."
-msgstr "Kan geen willekeurige bits verkrijgen."
+msgstr "Satunnaisten tietojen hankkiminen epäonnistui."
 
 #: gnutls_errors.c:265
 msgid "Received a TLS/IA Intermediate Phase Finished message"
-msgstr "TLS/IA-tussenfasebeëindigingsbericht ontvangen"
+msgstr "Vastaanotettiin ”TLS/IA Intermediate Phase Finished”-viesti"
 
 #: gnutls_errors.c:267
 msgid "Received a TLS/IA Final Phase Finished message"
-msgstr "TLS/IA-eindfasebeëindigingsbericht ontvangen"
+msgstr "Vastaanotettiin ”TLS/IA Final Phase Finished”-viesti"
 
 #: gnutls_errors.c:269
 msgid "Verifying TLS/IA phase checksum failed"
-msgstr "Verificatie van TLS/IA-fasecontrolesom is mislukt"
+msgstr "TLS/IA-vaiheen tarkistussumman todentaminen epäonnistui"
 
 #: gnutls_errors.c:272
 msgid "The specified algorithm or protocol is unknown."
-msgstr "Het opgegeven algoritme of protocol is onbekend."
+msgstr "Määritelty algoritmi tai yhteyskäytäntö on tuntematon."
 
 #: gnutls_errors.c:275
 msgid "The handshake data size is too large (DoS?), check gnutls_handshake_set_max_packet_length()."
-msgstr "De gegevensgrootte van de handshake is te groot (DoS-aanval?); controleer gnutls_handshake_set_max_packet_length()."
+msgstr "Kättelytietojen koko on liian suuri (DoS?), tarkista gnutls_handshake_set_max_packet_length()."
 
 #: gnutls_errors.c:279
 msgid "Error opening /dev/crypto"
-msgstr "Fout bij openen van /dev/crypto"
+msgstr "Virhe avattaessa /dev/crypto"
 
 #: gnutls_errors.c:282
 msgid "Error interfacing with /dev/crypto"
-msgstr "Fout bij interactie met /dev/crypto"
+msgstr "Virhe rajapintaliitännässä /dev/crypto"
 
 #: gnutls_errors.c:285
 msgid "Channel binding data not available"
-msgstr "Kanaalbindingsgegevens zijn niet beschikbaar."
+msgstr "Kanavan sitomistiedot eivät ole saatavilla."
 
 #: gnutls_errors.c:288
 msgid "PKCS #11 error."
-msgstr "PKCS #11 -- fout."
+msgstr "PKCS #11 -virhe."
 
 #: gnutls_errors.c:290
 msgid "PKCS #11 initialization error."
-msgstr "PKCS #11 -- initialisatiefout."
+msgstr "PKCS #11 -alustusvirhe."
 
 #: gnutls_errors.c:292
 msgid "Error in parsing."
-msgstr "Fout bij ontleden."
+msgstr "Virhe jäsennettäessä."
 
 #: gnutls_errors.c:294
 msgid "PKCS #11 error in PIN."
-msgstr "PKCS #11 -- fout in PIN."
+msgstr "PKCS #11 virhe PIN-luvussa."
 
 #: gnutls_errors.c:296
 msgid "PKCS #11 PIN should be saved."
-msgstr "PKCS #11 -- PIN moet opgeslagen worden."
+msgstr "PKCS #11 PIN-luku pitäisi tallentaa."
 
 #: gnutls_errors.c:298
 msgid "PKCS #11 error in slot"
-msgstr "PKCS #11 -- fout in plaats"
+msgstr "PKCS #11 -virhe välissä"
 
 #: gnutls_errors.c:300
 msgid "Thread locking error"
-msgstr "Thread-vergrendelingsfout"
+msgstr "Säikeen lukitusvirhe"
 
 #: gnutls_errors.c:302
 msgid "PKCS #11 error in attribute"
-msgstr "PKCS #11 -- fout in eigenschap"
+msgstr "PKCS #11 -virhe attribuutissa"
 
 #: gnutls_errors.c:304
 msgid "PKCS #11 error in device"
-msgstr "PKCS #11 -- fout in apparaat"
+msgstr "PKCS #11 -virhe laitteessa"
 
 #: gnutls_errors.c:306
 msgid "PKCS #11 error in data"
-msgstr "PKCS #11 -- fout in gegevens"
+msgstr "PKCS #11 -virhe tiedoissa"
 
 #: gnutls_errors.c:308
 msgid "PKCS #11 unsupported feature"
-msgstr "PKCS #11 -- niet-ondersteunde functie"
+msgstr "PKCS #11 tukematon ominaisuus"
 
 #: gnutls_errors.c:310
 msgid "PKCS #11 error in key"
-msgstr "PKCS #11 -- fout in sleutel"
+msgstr "PKCS #11 -vireh avaimessa"
 
 #: gnutls_errors.c:312
 msgid "PKCS #11 PIN expired"
-msgstr "PKCS #11 -- PIN is verlopen"
+msgstr "PKCS #11 PIN vanhentunut"
 
 #: gnutls_errors.c:314
 msgid "PKCS #11 PIN locked"
-msgstr "PKCS #11 -- PIN is vergrendeld"
+msgstr "PKCS #11 PIN lukittu"
 
 #: gnutls_errors.c:316
 msgid "PKCS #11 error in session"
-msgstr "PKCS #11 -- fout in sessie"
+msgstr "PKCS #11 -virhe istunnossa"
 
 #: gnutls_errors.c:318
 msgid "PKCS #11 error in signature"
-msgstr "PKCS #11 -- fout in ondertekening"
+msgstr "PKCS #11 -virhe allekirjoituksessa"
 
 #: gnutls_errors.c:320
 msgid "PKCS #11 error in token"
-msgstr "PKCS #11 -- fout in token"
+msgstr "PKCS #11 -virhe merkkijonossa"
 
 #: gnutls_errors.c:322
 msgid "PKCS #11 user error"
-msgstr "PKCS #11 -- gebruikersfout"
+msgstr "PKCS #11 -käyttäjävirhe"
 
 #: gnutls_errors.c:409
 msgid "(unknown error code)"
-msgstr "(onbekende foutcode)"
+msgstr "(tuntematon virhekoodi)"
 
 #: gnutls_alert.c:43
 msgid "Close notify"
-msgstr "Afsluitingsbericht"
+msgstr "Sulkemisilmoitus"
 
 #: gnutls_alert.c:44
 msgid "Unexpected message"
-msgstr "Onverwacht bericht"
+msgstr "Odottamaton viesti"
 
 #: gnutls_alert.c:45
 msgid "Bad record MAC"
-msgstr "Record met ongeldige MAC"
+msgstr "Väärä tietue MAC"
 
 #: gnutls_alert.c:46
 msgid "Decryption failed"
-msgstr "Ontsleuteling is mislukt"
+msgstr "Salauksen purku epäonnistui"
 
 #: gnutls_alert.c:47
 msgid "Record overflow"
-msgstr "Recordoverloop"
+msgstr "Tietueylivuoto"
 
 #: gnutls_alert.c:48
 msgid "Decompression failed"
-msgstr "Decompressie is mislukt"
+msgstr "Pakkauksen purkaminen epäonnistui"
 
 #: gnutls_alert.c:49
 msgid "Handshake failed"
-msgstr "Handshake is mislukt"
+msgstr "Kättely epäonnistui"
 
 #: gnutls_alert.c:50
 msgid "Certificate is bad"
-msgstr "Certificaat is ongeldig"
+msgstr "Varmenne on väärä"
 
 #: gnutls_alert.c:51
 msgid "Certificate is not supported"
-msgstr "Certificaat wordt niet ondersteund"
+msgstr "Varmennetta ei tueta"
 
 #: gnutls_alert.c:52
 msgid "Certificate was revoked"
-msgstr "Certificaat is ingetrokken"
+msgstr "Varmenne kumottiin"
 
 #: gnutls_alert.c:53
 msgid "Certificate is expired"
-msgstr "Certificaat is verlopen"
+msgstr "Varmenne on vanhentunut"
 
 #: gnutls_alert.c:54
 msgid "Unknown certificate"
-msgstr "Onbekend certificaat"
+msgstr "Tuntematon varmenne"
 
 #: gnutls_alert.c:55
 msgid "Illegal parameter"
-msgstr "Ongeldige parameter"
+msgstr "Virheellinen parametri"
 
 #: gnutls_alert.c:56
 msgid "CA is unknown"
-msgstr "CA is onbekend"
+msgstr "Varmenneviranomainen on tuntematon"
 
 #: gnutls_alert.c:57
 msgid "Access was denied"
-msgstr "Toegang werd geweigerd"
+msgstr "Pääsy kielletty"
 
 #: gnutls_alert.c:58
 msgid "Decode error"
-msgstr "Decoderingsfout"
+msgstr "Dekoodausvirhe"
 
 #: gnutls_alert.c:59
 msgid "Decrypt error"
-msgstr "Ontsleutelingsfout"
+msgstr "Salauksen purkuvirhe"
 
 #: gnutls_alert.c:60
 msgid "Export restriction"
-msgstr "Exportbeperking"
+msgstr "Vientirajoite"
 
 #: gnutls_alert.c:61
 msgid "Error in protocol version"
-msgstr "Fout in protocolversie"
+msgstr "Virhe yhteyskäytäntöversiossa"
 
 #: gnutls_alert.c:62
 msgid "Insufficient security"
-msgstr "Onvoldoende veiligheid"
+msgstr "Riittämättömästi turvallisuutta"
 
 #: gnutls_alert.c:63
 msgid "User canceled"
-msgstr "Door gebruiker geannuleerd"
+msgstr "Käyttäjä perui"
 
 #: gnutls_alert.c:64
 msgid "Internal error"
-msgstr "**Interne fout**"
+msgstr "Sisäinen virhe"
 
 #: gnutls_alert.c:65
 msgid "No renegotiation is allowed"
-msgstr "Heronderhandeling is niet toegestaan"
+msgstr "Uudelleenneuvottelua ei sallita"
 
 #: gnutls_alert.c:67
 msgid "Could not retrieve the specified certificate"
-msgstr "Kan het opgegeven certificaat niet ophalen"
+msgstr "Ei voitu noutaa määriteltyä varmennetta"
 
 #: gnutls_alert.c:68
 msgid "An unsupported extension was sent"
-msgstr "Een niet-ondersteunde uitbreiding werd toegezonden"
+msgstr "Lähetettiin tukematon laajennus"
 
 #: gnutls_alert.c:70
 msgid "The server name sent was not recognized"
-msgstr "De toegezonden servernaam werd niet herkend"
+msgstr "Ei tunnistettu lähetettyä palvelinnimeä"
 
 #: gnutls_alert.c:72
 msgid "The SRP/PSK username is missing or not known"
-msgstr "De SRP/PSK-gebruikersnaam ontbreekt of is onbekend"
+msgstr "SRP-/PSK-käyttäjänimi puuttuu tai on tuntematon"
 
 #: gnutls_alert.c:74
 msgid "Inner application negotiation failed"
-msgstr "Inwendige programmaonderhandeling is mislukt"
+msgstr "Sisäinen sopimusneuvottelu epäonnistui"
 
 #: gnutls_alert.c:76
 msgid "Inner application verification failed"
-msgstr "Inwendige programmaverificatie is mislukt"
+msgstr "Sisäinen sovellustodentaminen epäonnistui"
 
 #: x509/output.c:157
 #, c-format
 msgid "\t\t\tPath Length Constraint: %d\n"
-msgstr "\t\t\tPadlengtebeperking: %d\n"
+msgstr "\t\t\tPolkupituusrajoite: %d\n"
 
 #: x509/output.c:158
 #, c-format
 msgid "\t\t\tPolicy Language: %s"
-msgstr "\t\t\tBeleidstaal: %s"
+msgstr "\t\t\tMenettelytapakieli: %s"
 
 #: x509/output.c:167
 msgid ""
 "\t\t\tPolicy:\n"
 "\t\t\t\tASCII: "
 msgstr ""
-"\t\t\tBeleid:\n"
+"\t\t\tMenettelytapa:\n"
 "\t\t\t\tASCII: "
 
 #: x509/output.c:169
@@ -679,86 +677,86 @@ msgid ""
 "\t\t\t\tHexdump: "
 msgstr ""
 "\n"
-"\t\t\t\tHexdump: "
+"\t\t\t\tHeksadesimaalivedos: "
 
 #: x509/output.c:302
 #, c-format
 msgid "%s\t\t\tDigital signature.\n"
-msgstr "%s\t\t\tDigitale ondertekening.\n"
+msgstr "%s\t\t\tDigitaalinen allekirjoitus.\n"
 
 #: x509/output.c:304
 #, c-format
 msgid "%s\t\t\tNon repudiation.\n"
-msgstr "%s\t\t\tNiet-herroeping.\n"
+msgstr "%s\t\t\tKiistämättömyys.\n"
 
 #: x509/output.c:306
 #, c-format
 msgid "%s\t\t\tKey encipherment.\n"
-msgstr "%s\t\t\tSleutel-encryptie.\n"
+msgstr "%s\t\t\tAvainsalaus.\n"
 
 #: x509/output.c:308
 #, c-format
 msgid "%s\t\t\tData encipherment.\n"
-msgstr "%s\t\t\tData-encryptie.\n"
+msgstr "%s\t\t\tTietosalaus.\n"
 
 #: x509/output.c:310
 #, c-format
 msgid "%s\t\t\tKey agreement.\n"
-msgstr "%s\t\t\tSleutelovereenstemming.\n"
+msgstr "%s\t\t\tAvainsopimus.\n"
 
 #: x509/output.c:312
 #, c-format
 msgid "%s\t\t\tCertificate signing.\n"
-msgstr "%s\t\t\tCertificaatondertekening.\n"
+msgstr "%s\t\t\tVarmenneallekirjoitus.\n"
 
 #: x509/output.c:314
 #, c-format
 msgid "%s\t\t\tCRL signing.\n"
-msgstr "%s\t\t\tCRL-ondertekening.\n"
+msgstr "%s\t\t\tCRL-allekirjoittaminen.\n"
 
 #: x509/output.c:316
 #, c-format
 msgid "%s\t\t\tKey encipher only.\n"
-msgstr "%s\t\t\tAlleen sleutel-encryptie.\n"
+msgstr "%s\t\t\tVain avainsalaaja.\n"
 
 #: x509/output.c:318
 #, c-format
 msgid "%s\t\t\tKey decipher only.\n"
-msgstr "%s\t\t\tAlleen sleutel-decryptie.\n"
+msgstr "%s\t\t\tVain avaimen salauspurkaja.\n"
 
 #: x509/output.c:369
 msgid "warning: distributionPoint contains an embedded NUL, replacing with '!'\n"
-msgstr "Waarschuwing: distributiepunt bevat een NUL-waarde, wordt vervangen door '!'\n"
+msgstr "varoitus: distributionPoint sisältää upotettuja NUL-merkkejä, korvataan merkillä ’!’\n"
 
 #: x509/output.c:462
 #, c-format
 msgid "%s\t\t\tTLS WWW Server.\n"
-msgstr "%s\t\t\tTLS WWW-server.\n"
+msgstr "%s\t\t\tTLS-webpalvelin.\n"
 
 #: x509/output.c:464
 #, c-format
 msgid "%s\t\t\tTLS WWW Client.\n"
-msgstr "%s\t\t\tTLS WWW-cliënt.\n"
+msgstr "%s\t\t\tTLS-webasiakas.\n"
 
 #: x509/output.c:466
 #, c-format
 msgid "%s\t\t\tCode signing.\n"
-msgstr "%s\t\t\tCode-ondertekening.\n"
+msgstr "%s\t\t\tKoodin allekirjoittaminen.\n"
 
 #: x509/output.c:468
 #, c-format
 msgid "%s\t\t\tEmail protection.\n"
-msgstr "%s\t\t\tE-mailbescherming.\n"
+msgstr "%s\t\t\tSähköpostisuojaus.\n"
 
 #: x509/output.c:470
 #, c-format
 msgid "%s\t\t\tTime stamping.\n"
-msgstr "%s\t\t\tTijdsstempels.\n"
+msgstr "%s\t\t\tAikaleimaus.\n"
 
 #: x509/output.c:472
 #, c-format
 msgid "%s\t\t\tOCSP signing.\n"
-msgstr "%s\t\t\tOCSP-ondertekening.\n"
+msgstr "%s\t\t\tOCSP-allekirjoittaminen.\n"
 
 #: x509/output.c:474
 #, c-format
@@ -768,41 +766,41 @@ msgstr "%s\t\t\tIpsec IKE.\n"
 #: x509/output.c:476
 #, c-format
 msgid "%s\t\t\tAny purpose.\n"
-msgstr "%s\t\t\tElk doel.\n"
+msgstr "%s\t\t\tMikä tahansa tarkoitus.\n"
 
 #: x509/output.c:509
 #, c-format
 msgid "%s\t\t\tCertificate Authority (CA): FALSE\n"
-msgstr "%s\t\t\tCertificaatautoriteit (CA): ONWAAR\n"
+msgstr "%s\t\t\tVarmennusviranomainen (CA): EPÄTOSI\n"
 
 #: x509/output.c:511
 #, c-format
 msgid "%s\t\t\tCertificate Authority (CA): TRUE\n"
-msgstr "%s\t\t\tCertificaatautoriteit (CA): WAAR\n"
+msgstr "%s\t\t\tVarmenneviranomainen (CA): TOSI\n"
 
 #: x509/output.c:514
 #, c-format
 msgid "%s\t\t\tPath Length Constraint: %d\n"
-msgstr "%s\t\t\tPadlengtebeperking: %d\n"
+msgstr "%s\t\t\tPolkupituusrajoite: %d\n"
 
 #: x509/output.c:588 x509/output.c:678
 msgid "warning: altname contains an embedded NUL, replacing with '!'\n"
-msgstr "Waarschuwing: alternatieve naam bevat een NUL-waarde, wordt vervangen door '!'\n"
+msgstr "varoitus: altname sisältää upotettuja NUL-merkkejä, korvataan merkillä ’!’\n"
 
 #: x509/output.c:684
 #, c-format
 msgid "%s\t\t\tXMPP Address: %.*s\n"
-msgstr "%s\t\t\tXMPP-adres: %.*s\n"
+msgstr "%s\t\t\tXMPP-osoite: %.*s\n"
 
 #: x509/output.c:689
 #, c-format
 msgid "%s\t\t\totherName OID: %.*s\n"
-msgstr "%s\t\t\tAndere naam (OID): %.*s\n"
+msgstr "%s\t\t\t”otherName OID”-tunniste: %.*s\n"
 
 #: x509/output.c:691
 #, c-format
 msgid "%s\t\t\totherName DER: "
-msgstr "%s\t\t\tAndere naam (DER): "
+msgstr "%s\t\t\totherName DER: "
 
 #: x509/output.c:693
 #, c-format
@@ -811,76 +809,76 @@ msgid ""
 "%s\t\t\totherName ASCII: "
 msgstr ""
 "\n"
-"%s\t\t\tAndere naam (ASCII): "
+"%s\t\t\totherName ASCII: "
 
 #: x509/output.c:817
 #, c-format
 msgid "%s\tExtensions:\n"
-msgstr "%s\tUitbreidingen:\n"
+msgstr "%s\tLaajennukset:\n"
 
 #: x509/output.c:827
 #, c-format
 msgid "%s\t\tBasic Constraints (%s):\n"
-msgstr "%s\t\tFundamentele beperkingen (%s):\n"
+msgstr "%s\t\tPerusrajoitteet (%s):\n"
 
 #: x509/output.c:828 x509/output.c:843 x509/output.c:860 x509/output.c:876
 #: x509/output.c:891 x509/output.c:908 x509/output.c:923 x509/output.c:938
 #: x509/output.c:956 x509/output.c:969 x509/output.c:1696 x509/output.c:1719
 #: x509/output.c:1732
 msgid "critical"
-msgstr "kritiek"
+msgstr "kriittinen"
 
 #: x509/output.c:828 x509/output.c:843 x509/output.c:860 x509/output.c:876
 #: x509/output.c:891 x509/output.c:908 x509/output.c:923 x509/output.c:938
 #: x509/output.c:956 x509/output.c:969 x509/output.c:1696 x509/output.c:1719
 #: x509/output.c:1732
 msgid "not critical"
-msgstr "niet kritiek"
+msgstr "ei-kriittinen"
 
 #: x509/output.c:842
 #, c-format
 msgid "%s\t\tSubject Key Identifier (%s):\n"
-msgstr "%s\t\tOnderwerps-ID van sleutel (%s):\n"
+msgstr "%s\t\tAihepääavain (%s):\n"
 
 #: x509/output.c:859
 #, c-format
 msgid "%s\t\tAuthority Key Identifier (%s):\n"
-msgstr "%s\t\tAutoriteits-ID van sleutel (%s):\n"
+msgstr "%s\t\tViranomaispääavain (%s):\n"
 
 #: x509/output.c:875
 #, c-format
 msgid "%s\t\tKey Usage (%s):\n"
-msgstr "%s\t\tGebruik van sleutel (%s):\n"
+msgstr "%s\t\tAvainkäyttö (%s):\n"
 
 #: x509/output.c:890
 #, c-format
 msgid "%s\t\tKey Purpose (%s):\n"
-msgstr "%s\t\tDoel van sleutel (%s):\n"
+msgstr "%s\t\tAvaintarkoitus (%s):\n"
 
 #: x509/output.c:907
 #, c-format
 msgid "%s\t\tSubject Alternative Name (%s):\n"
-msgstr "%s\t\tToegevoegde onderwerpen (%s):\n"
+msgstr "%s\t\tAiheen vaihtoehtoinen nimi (%s):\n"
 
 #: x509/output.c:922
 #, c-format
 msgid "%s\t\tIssuer Alternative Name (%s):\n"
-msgstr "%s\t\tAlternatieve uitgevernaam (%s):\n"
+msgstr "%s\t\tJulkaisijan vaihtoehtoinen nimi (%s):\n"
 
 #: x509/output.c:937
 #, c-format
 msgid "%s\t\tCRL Distribution points (%s):\n"
-msgstr "%s\t\tCRL-distributiepunten (%s):\n"
+msgstr "%s\t\tCRL-jakelupisteitä (%s):\n"
 
 #: x509/output.c:955
 #, c-format
 msgid "%s\t\tProxy Certificate Information (%s):\n"
-msgstr "%s\t\tInformatie over proxy-certificaat (%s):\n"
+msgstr "%s\t\tVälityspalvelimen varmennetietoja (%s):\n"
 
 #: x509/output.c:968
 #, c-format
 msgid "%s\t\tUnknown extension %s (%s):\n"
-msgstr "%s\t\tOnbekende uitbreiding %s (%s):\n"
+msgstr "%s\t\tTuntematon laajennus %s (%s):\n"
 
 #: x509/output.c:1015
 #, c-format
@@ -890,71 +888,71 @@ msgstr "%s\t\t\tASCII: "
 #: x509/output.c:1019
 #, c-format
 msgid "%s\t\t\tHexdump: "
-msgstr "%s\t\t\tHexdump: "
+msgstr "%s\t\t\tHeksadesimaalivedos: "
 
 #: x509/output.c:1037 x509/output.c:1584 x509/output.c:1914
 #: openpgp/output.c:326
 #, c-format
 msgid "\tVersion: %d\n"
-msgstr "\tVersie: %d\n"
+msgstr "\tVersio: %d\n"
 
 #: x509/output.c:1051
 msgid "\tSerial Number (hex): "
-msgstr "\tSerienummer (hex): "
+msgstr "\tSarjanumero (heksadesimaali): "
 
 #: x509/output.c:1080 x509/output.c:1610
 #, c-format
 msgid "\tIssuer: %s\n"
-msgstr "\tUitgever: %s\n"
+msgstr "\tJulkaisija: %s\n"
 
 #: x509/output.c:1090
 msgid "\tValidity:\n"
-msgstr "\tGeldigheid:\n"
+msgstr "\tKelpoisuus:\n"
 
 #: x509/output.c:1103
 #, c-format
 msgid "\t\tNot Before: %s\n"
-msgstr "\t\tNiet vóór: %s\n"
+msgstr "\t\tEi ennen: %s\n"
 
 #: x509/output.c:1117
 #, c-format
 msgid "\t\tNot After: %s\n"
-msgstr "\t\tNiet na: %s\n"
+msgstr "\t\tEi jälkeen: %s\n"
 
 #: x509/output.c:1142 x509/output.c:1938
 #, c-format
 msgid "\tSubject: %s\n"
-msgstr "\tOnderwerp: %s\n"
+msgstr "\tAihe: %s\n"
 
 #: x509/output.c:1160 x509/output.c:1253 x509/output.c:1423 x509/output.c:1831
 #: x509/output.c:1956 openpgp/output.c:238
 msgid "unknown"
-msgstr "onbekend"
+msgstr "tuntematon"
 
 #: x509/output.c:1162 x509/output.c:1958
 #, c-format
 msgid "\tSubject Public Key Algorithm: %s\n"
-msgstr "\tAlgoritme van publieke sleutel: %s\n"
+msgstr "\tAiheen julkinen avainalgoritmi: %s\n"
 
 #: x509/output.c:1163
 #, c-format
 msgid "\tCertificate Security Level: %s\n"
-msgstr "\tCertificaatveiligheidsniveau: %s\n"
+msgstr "\tVarmenteen turvataso: %s\n"
 
 #: x509/output.c:1180 x509/output.c:1971 openpgp/output.c:262
 #, c-format
 msgid "\t\tModulus (bits %d):\n"
-msgstr "\t\tModulus (bits %d):\n"
+msgstr "\t\tModulo (bitit %d):\n"
 
 #: x509/output.c:1182
 #, c-format
 msgid "\t\tExponent (bits %d):\n"
-msgstr "\t\tExponent (bits %d):\n"
+msgstr "\t\tEksponentti (bitit %d):\n"
 
 #: x509/output.c:1202 x509/output.c:1993 openpgp/output.c:289
 #, c-format
 msgid "\t\tPublic key (bits %d):\n"
-msgstr "\t\tPublieke sleutel (bits %d):\n"
+msgstr "\t\tJulkinen avain (bitit %d):\n"
 
 #: x509/output.c:1204 x509/output.c:1995 openpgp/output.c:291
 msgid "\t\tP:\n"
@@ -971,22 +969,22 @@ msgstr "\t\tG:\n"
 #: x509/output.c:1254 x509/output.c:1832
 #, c-format
 msgid "\tSignature Algorithm: %s\n"
-msgstr "\tOndertekeningsalgoritme: %s\n"
+msgstr "\tAllekirjoitusalgoritmi: %s\n"
 
 #: x509/output.c:1258 x509/output.c:1836
 msgid "warning: signed using a broken signature algorithm that can be forged.\n"
-msgstr "Waarschuwing: ondertekend met een algoritme dat vervalst kan worden.\n"
+msgstr "varoitus: allekirjoitettu käyttäen murrettua allekirjoitusalgoritmia, joka voi olla väärennetty.\n"
 
 #: x509/output.c:1285 x509/output.c:1863
 msgid "\tSignature:\n"
-msgstr "\tOndertekening:\n"
+msgstr "\tAllekirjoitus:\n"
 
 #: x509/output.c:1308
 msgid ""
 "\tMD5 fingerprint:\n"
 "\t\t"
 msgstr ""
-"\tMD5-vingerafdruk:\n"
+"\tMD5-sormenjälki:\n"
 "\t\t"
 
 #: x509/output.c:1310
@@ -994,7 +992,7 @@ msgid ""
 "\tSHA-1 fingerprint:\n"
 "\t\t"
 msgstr ""
-"\tSHA-1-vingerafdruk:\n"
+"\tSHA-1-sormenjälki:\n"
 "\t\t"
 
 #: x509/output.c:1329 x509/output.c:2175
@@ -1002,63 +1000,63 @@ msgid ""
 "\tPublic Key Id:\n"
 "\t\t"
 msgstr ""
-"\tID van publieke sleutel:\n"
+"\tJulkisen avaimen tunniste:\n"
 "\t\t"
 
 #: x509/output.c:1425
 #, c-format
 msgid "signed using %s (broken!), "
-msgstr "ondertekend met %s (beschadigd!), "
+msgstr "allekirjoitettu käyttäen %s (rikki!), "
 
 #: x509/output.c:1427
 #, c-format
 msgid "signed using %s, "
-msgstr "ondertekend met %s, "
+msgstr "allekirjoitettu käyttäen %s, "
 
 #: x509/output.c:1540
 msgid "X.509 Certificate Information:\n"
-msgstr "Informatie over X.509-certificaten:\n"
+msgstr "X.509 -varmennetiedot:\n"
 
 #: x509/output.c:1544 x509/output.c:2212
 msgid "Other Information:\n"
-msgstr "Andere informatie:\n"
+msgstr "Muuta tietoa:\n"
 
 #: x509/output.c:1580
 msgid "\tVersion: 1 (default)\n"
-msgstr "\tVersie: 1 (standaard)\n"
+msgstr "\tVersio: 1 (oletus)\n"
 
 #: x509/output.c:1620
 msgid "\tUpdate dates:\n"
-msgstr "\tBijwerkingsdata:\n"
+msgstr "\tPäivityspäivämäärät:\n"
 
 #: x509/output.c:1633
 #, c-format
 msgid "\t\tIssued: %s\n"
-msgstr "\t\tUitgegeven: %s\n"
+msgstr "\t\tJulkaistu: %s\n"
 
 #: x509/output.c:1649
 #, c-format
 msgid "\t\tNext at: %s\n"
-msgstr "\t\tVolgende op: %s\n"
+msgstr "\t\tSeuraava osoitteessa: %s\n"
 
 #: x509/output.c:1680
 msgid "\tExtensions:\n"
-msgstr "\tUitbreidingen:\n"
+msgstr "\tLaajennukset:\n"
 
 #: x509/output.c:1695
 #, c-format
 msgid "\t\tCRL Number (%s): "
-msgstr "\t\tCRL-nummer (%s): "
+msgstr "\t\tCRL-numero (%s): "
 
 #: x509/output.c:1718
 #, c-format
 msgid "\t\tAuthority Key Identifier (%s):\n"
-msgstr "\t\tAutoriteits-ID van sleutel (%s):\n"
+msgstr "\t\tViranomaispääavain (%s):\n"
 
 #: x509/output.c:1731
 #, c-format
 msgid "\t\tUnknown extension %s (%s):\n"
-msgstr "\t\tOnbekende uitbreiding %s (%s):\n"
+msgstr "\t\tTuntematon laajennus %s (%s):\n"
 
 #: x509/output.c:1761 x509/output.c:2131
 msgid "\t\t\tASCII: "
@@ -1066,134 +1064,134 @@ msgstr "\t\t\tASCII: "
 
 #: x509/output.c:1765 x509/output.c:2135
 msgid "\t\t\tHexdump: "
-msgstr "\t\t\tHexdump: "
+msgstr "\t\t\tHeksadesimaalivedos: "
 
 #: x509/output.c:1781
 #, c-format
 msgid "\tRevoked certificates (%d):\n"
-msgstr "\tIngetrokken certificaten (%d):\n"
+msgstr "\tKumotut varmenteet (%d):\n"
 
 #: x509/output.c:1783
 msgid "\tNo revoked certificates.\n"
-msgstr "\tGeen ingetrokken certificaten.\n"
+msgstr "\tEi kumottuja varmenteita.\n"
 
 #: x509/output.c:1802
 msgid "\t\tSerial Number (hex): "
-msgstr "\t\tSerienummer (hex): "
+msgstr "\t\tSarjanumero (heksaluku): "
 
 #: x509/output.c:1811
 #, c-format
 msgid "\t\tRevoked at: %s\n"
-msgstr "\t\tIngetrokken op: %s\n"
+msgstr "\t\tKumottu osoitteessa: %s\n"
 
 #: x509/output.c:1894
 msgid "X.509 Certificate Revocation List Information:\n"
-msgstr "Informatie over ingetrokken X.509-certificaten:\n"
+msgstr "X.509-varmennekumoamisluettelotiedot:\n"
 
 #: x509/output.c:1973 openpgp/output.c:264
 msgid "\t\tExponent:\n"
-msgstr "\t\tExponent:\n"
+msgstr "\t\tEksponentti:\n"
 
 #: x509/output.c:2040
 msgid "\tAttributes:\n"
-msgstr "\tEigenschappen:\n"
+msgstr "\tAttribuutit:\n"
 
 #: x509/output.c:2092
 #, c-format
 msgid "\t\tChallenge password: %s\n"
-msgstr "\t\tTest-wachtwoord: %s\n"
+msgstr "\t\tHaastesalasana: %s\n"
 
 #: x509/output.c:2103
 #, c-format
 msgid "\t\tUnknown attribute %s:\n"
-msgstr "\t\tOnbekende eigenschap %s:\n"
+msgstr "\t\tTuntematon attribuutti %s:\n"
 
 #: x509/output.c:2208
 msgid "PKCS #10 Certificate Request Information:\n"
-msgstr "Informatie over PKCS #10-certificaatverzoek:\n"
+msgstr "PKCS #10 -varmennepyyntötiedot:\n"
 
 #: openpgp/output.c:85
 msgid "\t\tKey Usage:\n"
-msgstr "\t\tGebruik van sleutel:\n"
+msgstr "\t\tAvainkäyttö:\n"
 
 #: openpgp/output.c:94
 #, c-format
 msgid "error: get_key_usage: %s\n"
-msgstr "fout in get_key_usage(): %s\n"
+msgstr "virhe: get_key_usage: %s\n"
 
 #: openpgp/output.c:99
 msgid "\t\t\tDigital signatures.\n"
-msgstr "\t\t\tDigitale ondertekeningen.\n"
+msgstr "\t\t\tDigitaaliset allekirjoitukset.\n"
 
 #: openpgp/output.c:101
 msgid "\t\t\tCommunications encipherment.\n"
-msgstr "\t\t\tEncryptie van communicatie.\n"
+msgstr "\t\t\tViestintäsalaus.\n"
 
 #: openpgp/output.c:103
 msgid "\t\t\tStorage data encipherment.\n"
-msgstr "\t\t\tEncryptie van opgeslagen data.\n"
+msgstr "\t\t\tTallennustietosalaus.\n"
 
 #: openpgp/output.c:105
 msgid "\t\t\tAuthentication.\n"
-msgstr "\t\t\tAuthenticatie.\n"
+msgstr "\t\t\tTodennus.\n"
 
 #: openpgp/output.c:107
 msgid "\t\t\tCertificate signing.\n"
-msgstr "\t\t\tCertificaatondertekening.\n"
+msgstr "\t\t\tVarmenneallekirjoitus.\n"
 
 #: openpgp/output.c:128
 msgid "\tID (hex): "
-msgstr "\tID (hex): "
+msgstr "\tID (heksadesimaali): "
 
 #: openpgp/output.c:149
 msgid "\tFingerprint (hex): "
-msgstr "\tVingerafdruk (hex): "
+msgstr "\tSormenjälki (heksadesimaali): "
 
 #: openpgp/output.c:166
 msgid "\tRevoked: True\n"
-msgstr "\tIngetrokken: Ja\n"
+msgstr "\tKumottu: Tosi\n"
 
 #: openpgp/output.c:168
 msgid "\tRevoked: False\n"
-msgstr "\tIngetrokken: Nee\n"
+msgstr "\tKumottu: Epätosi\n"
 
 #: openpgp/output.c:176
 msgid "\tTime stamps:\n"
-msgstr "\tTijdsstempels:\n"
+msgstr "\tAikaleimat:\n"
 
 #: openpgp/output.c:193
 #, c-format
 msgid "\t\tCreation: %s\n"
-msgstr "\t\tAangemaakt op: %s\n"
+msgstr "\t\tLuonti: %s\n"
 
 #: openpgp/output.c:207
 msgid "\t\tExpiration: Never\n"
-msgstr "\t\tVervaldatum: Nooit\n"
+msgstr "\t\tVanheneminen: Ei koskaan\n"
 
 #: openpgp/output.c:216
 #, c-format
 msgid "\t\tExpiration: %s\n"
-msgstr "\t\tVervaldatum: %s\n"
+msgstr "\t\tVanheneminen: %s\n"
 
 #: openpgp/output.c:240
 #, c-format
 msgid "\tPublic Key Algorithm: %s\n"
-msgstr "\tAlgoritme van publieke sleutel: %s\n"
+msgstr "\tJulkisen avaimen algoritmi: %s\n"
 
 #: openpgp/output.c:241
 #, c-format
 msgid "\tKey Security Level: %s\n"
-msgstr "\tSleutelveiligheidsniveau: %s\n"
+msgstr "\tAvaimen turvataso: %s\n"
 
 #: openpgp/output.c:359
 #, c-format
 msgid "\tName[%d]: %s\n"
-msgstr "\tNaam[%d]: %s\n"
+msgstr "\tNimi[%d]: %s\n"
 
 #: openpgp/output.c:361
 #, c-format
 msgid "\tRevoked Name[%d]: %s\n"
-msgstr "\tIngetrokken naam[%d]: %s\n"
+msgstr "\tKumottu nimi[%d]: %s\n"
 
 #: openpgp/output.c:382
 #, c-format
@@ -1202,46 +1200,46 @@ msgid ""
 "\tSubkey[%d]:\n"
 msgstr ""
 "\n"
-"\tSubsleutel[%d]:\n"
+"\tAliavain[%d]:\n"
 
 #: openpgp/output.c:422
 #, c-format
 msgid "name[%d]: %s, "
-msgstr "naam[%d]: %s, "
+msgstr "nimi[%d]: %s, "
 
 #: openpgp/output.c:424
 #, c-format
 msgid "revoked name[%d]: %s, "
-msgstr "ingetrokken naam[%d]: %s, "
+msgstr "kumottu nimi[%d]: %s, "
 
 #: openpgp/output.c:444
 msgid "fingerprint: "
-msgstr "vingerafdruk: "
+msgstr "sormenjälki: "
 
 #: openpgp/output.c:464
 #, c-format
 msgid "created: %s, "
-msgstr "aangemaakt: %s, "
+msgstr "luotu: %s, "
 
 #: openpgp/output.c:474
 msgid "never expires, "
-msgstr "verloopt nooit, "
+msgstr "ei vanhene koskaan, "
 
 #: openpgp/output.c:482
 #, c-format
 msgid "expires: %s, "
-msgstr "verloopt: %s, "
+msgstr "vanhenee: %s, "
 
 #: openpgp/output.c:494
 #, c-format
 msgid "key algorithm %s (%d bits)"
-msgstr "versleutelingsalgoritme %s (%d bits)"
+msgstr "avainalgoritmi %s (%d bittiä)"
 
 #: openpgp/output.c:496
 #, c-format
 msgid "unknown key algorithm (%d)"
-msgstr "onbekend versleutelingsalgoritme (%d)"
+msgstr "tuntematon avainalgoritmi (%d)"
 
 #: openpgp/output.c:529
 msgid "OpenPGP Certificate Information:\n"
-msgstr "Informatie over OpenPGP-certificaten:\n"
+msgstr "OpenPGP-varmennetiedot:\n"
