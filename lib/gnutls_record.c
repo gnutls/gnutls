@@ -1204,7 +1204,7 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
  *   number of bytes sent might be less than @data_size.  The maximum
  *   number of bytes this function can send in a single call depends
  *   on the negotiated maximum record size.
-  **/
+ **/
 ssize_t
 gnutls_record_send (gnutls_session_t session, const void *data,
                     size_t data_size)

@@ -24,7 +24,7 @@
 
 #include "ecc.h"
 
-/**
+/*
   @file ecc_verify_hash.c
   ECC Crypto, Tom St Denis
 */
@@ -39,7 +39,7 @@
  * accept if v == r
  */
 
-/**
+/*
    Verify an ECC signature
    @param signature         The signature to verify
    @param hash        The hash (message digest) that was signed

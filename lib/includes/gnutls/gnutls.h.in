@@ -1,6 +1,6 @@
 /* -*- c -*-
  * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
- * 2009, 2010 Free Software Foundation, Inc.
+ * 2009, 2010, 2011 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavroyanopoulos
  *
@@ -167,6 +167,7 @@ extern "C"
    * gnutls_params_type_t:
    * @GNUTLS_PARAMS_RSA_EXPORT: Session RSA-EXPORT parameters.
    * @GNUTLS_PARAMS_DH: Session Diffie-Hellman parameters.
+   * @GNUTLS_PARAMS_ECDH: Session Elliptic-Curve Diffie-Hellman parameters.
    *
    * Enumeration of different TLS session parameter types.
    */
@@ -211,6 +212,7 @@ extern "C"
    * @GNUTLS_MAC_SHA384: HMAC-SHA-384 algorithm.
    * @GNUTLS_MAC_SHA512: HMAC-SHA-512 algorithm.
    * @GNUTLS_MAC_SHA224: HMAC-SHA-224 algorithm.
+   * @GNUTLS_MAC_AEAD: MAC implicit through AEAD cipher.
    *
    * Enumeration of different Message Authentication Code (MAC)
    * algorithms.
@@ -285,7 +287,7 @@ extern "C"
     GNUTLS_COMP_ZLIB = GNUTLS_COMP_DEFLATE,
   } gnutls_compression_method_t;
 
-  /**
+  /*
    * Flags for gnutls_init()
    *
    * @GNUTLS_SERVER: Connection end is a server.
@@ -397,7 +399,8 @@ extern "C"
    * @GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE: Client key exchange.
    * @GNUTLS_HANDSHAKE_FINISHED: Finished.
    * @GNUTLS_HANDSHAKE_SUPPLEMENTAL: Supplemental.
-   * @GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC: Change Cipher Spec
+   * @GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC: Change Cipher Spe.ec
+   * @GNUTLS_HANDSHAKE_CLIENT_HELLO_V2: SSLv2 Client Hello.
    *
    * Enumeration of different TLS handshake packets.
    */
@@ -802,7 +805,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                         gnutls_kx_algorithm_t * kx,
                                         gnutls_cipher_algorithm_t * cipher,
                                         gnutls_mac_algorithm_t * mac,
-                                        gnutls_protocol_t * version);
+                                        gnutls_protocol_t * min_version);
 
   /* error functions */
   int gnutls_error_is_fatal (int error);
@@ -824,9 +827,9 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 /* Record layer functions.
  */
   ssize_t gnutls_record_send (gnutls_session_t session, const void *data,
-                              size_t sizeofdata);
+                              size_t data_size);
   ssize_t gnutls_record_recv (gnutls_session_t session, void *data,
-                              size_t sizeofdata);
+                              size_t data_size);
 #define gnutls_read gnutls_record_recv
 #define gnutls_write gnutls_record_send
   ssize_t gnutls_record_recv_seq (gnutls_session_t session, void *data, size_t data_size,
@@ -1162,7 +1165,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                      gnutls_realloc_function realloc_func,
                                      gnutls_free_function free_func);
 
-  void gnutls_global_set_time_function (gnutls_time_func);
+  void gnutls_global_set_time_function (gnutls_time_func time_func);
 
 /* For use in callbacks */
   extern gnutls_alloc_function gnutls_malloc;
@@ -1217,7 +1220,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                     const gnutls_datum_t * u);
   int gnutls_rsa_params_generate2 (gnutls_rsa_params_t params,
                                    unsigned int bits);
-  int gnutls_rsa_params_export_raw (gnutls_rsa_params_t params,
+  int gnutls_rsa_params_export_raw (gnutls_rsa_params_t rsa,
                                     gnutls_datum_t * m, gnutls_datum_t * e,
                                     gnutls_datum_t * d, gnutls_datum_t * p,
                                     gnutls_datum_t * q, gnutls_datum_t * u,
@@ -1399,7 +1402,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   int gnutls_psk_set_client_credentials (gnutls_psk_client_credentials_t res,
                                          const char *username,
                                          const gnutls_datum_t * key,
-                                         gnutls_psk_key_flags format);
+                                         gnutls_psk_key_flags flags);
 
   void
     gnutls_psk_free_server_credentials (gnutls_psk_server_credentials_t sc);

@@ -24,12 +24,12 @@
 
 #include "ecc.h"
 
-/**
+/*
   @file ecc_make_key.c
   ECC Crypto, Tom St Denis
 */
 
-/**
+/*
   Make a new ECC key 
   @param prng         An active PRNG state
   @param wprng        The index of the PRNG you wish to use

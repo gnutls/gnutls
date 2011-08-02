@@ -24,12 +24,12 @@
 
 #include "ecc.h"
 
-/**
+/*
   @file ecc_mulmod_timing.c
   ECC Crypto, Tom St Denis
 */
 
-/**
+/*
    Perform a point multiplication  (timing resistant)
    @param k    The scalar to multiply by
    @param G    The base point

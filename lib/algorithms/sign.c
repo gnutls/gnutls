@@ -90,7 +90,7 @@ static const gnutls_sign_entry sign_algorithms[] = {
 
 /**
  * gnutls_sign_get_name:
- * @sign: is a sign algorithm
+ * @algorithm: is a sign algorithm
  *
  * Convert a #gnutls_sign_algorithm_t value to a string.
  *
@@ -98,8 +98,9 @@ static const gnutls_sign_entry sign_algorithms[] = {
  *   algorithm, or %NULL.
  **/
 const char *
-gnutls_sign_get_name (gnutls_sign_algorithm_t sign)
+gnutls_sign_get_name (gnutls_sign_algorithm_t algorithm)
 {
+  gnutls_sign_algorithm_t sign = algorithm;
   const char *ret = NULL;
 
   /* avoid prefix */

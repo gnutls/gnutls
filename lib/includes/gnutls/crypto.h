@@ -50,7 +50,7 @@ extern "C"
   void gnutls_cipher_set_iv (gnutls_cipher_hd_t handle, void *iv, size_t ivlen);
 
   int gnutls_cipher_tag( gnutls_cipher_hd_t handle, void* tag, size_t tag_size);
-  int gnutls_cipher_add_auth( gnutls_cipher_hd_t handle, const void* test, size_t textlen);
+  int gnutls_cipher_add_auth( gnutls_cipher_hd_t handle, const void* text, size_t text_size);
 
   void gnutls_cipher_deinit (gnutls_cipher_hd_t handle);
   int gnutls_cipher_get_block_size (gnutls_cipher_algorithm_t algorithm);

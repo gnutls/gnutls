@@ -1,6 +1,6 @@
 /*
  * GnuTLS PKCS#11 support
- * Copyright (C) 2010 Free Software Foundation
+ * Copyright (C) 2010, 2011 Free Software Foundation
  * Copyright (C) 2008, Joe Orton <joe@manyfish.co.uk>
  * 
  * Author: Nikos Mavrogiannopoulos
@@ -281,10 +281,11 @@ gnutls_pkcs11_add_provider (const char *name, const char *params)
  * @output: where output will be stored
  * @output_size: contains the maximum size of the output and will be overwritten with actual
  *
- * This function will return information about the PKCS 11 certificatesuch
- * as the label, id as well as token information where the key is stored. When
- * output is text it returns null terminated string although %output_size contains
- * the size of the actual data only.
+ * This function will return information about the PKCS 11
+ * certificatesuch as the label, id as well as token information where
+ * the key is stored. When output is text it returns null terminated
+ * string although @output_size contains the size of the actual data
+ * only.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
  **/
@@ -599,9 +600,6 @@ gnutls_pkcs11_deinit (void)
  * the token is locked due to too many incorrect PINs!).  For the
  * first such invocation, the 'attempt' counter will have value zero;
  * it will increase by one for each subsequent attempt.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
  **/
 void
 gnutls_pkcs11_set_pin_function (gnutls_pkcs11_pin_callback_t fn,
@@ -618,9 +616,6 @@ gnutls_pkcs11_set_pin_function (gnutls_pkcs11_pin_callback_t fn,
  *
  * This function will set a callback function to be used when a token
  * needs to be inserted to continue PKCS 11 operations.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
  **/
 void
 gnutls_pkcs11_set_token_function (gnutls_pkcs11_token_callback_t fn,

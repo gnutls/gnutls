@@ -26,7 +26,7 @@
 
 #ifndef ECC_SECP_CURVES_ONLY
 
-/**
+/*
    Double an ECC point
    @param P   The point to double
    @param R   [out] The destination of the double

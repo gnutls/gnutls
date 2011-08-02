@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free
  * Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
@@ -318,8 +318,8 @@ extern "C"
 
 /* certificate authentication stuff.
  */
-  int gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t
-                                          res, gnutls_openpgp_crt_t key,
+  int gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
+					  gnutls_openpgp_crt_t crt,
                                           gnutls_openpgp_privkey_t pkey);
 
   int
