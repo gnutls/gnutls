@@ -242,8 +242,7 @@ int gnutls_x509_crt_import_pkcs11_url (gnutls_x509_crt_t crt, const char *url,
                                        unsigned int flags
                                        /* GNUTLS_PKCS11_OBJ_FLAG_* */ );
 
-gnutls_pkcs11_obj_type_t gnutls_pkcs11_obj_get_type (gnutls_pkcs11_obj_t
-                                                     certificate);
+gnutls_pkcs11_obj_type_t gnutls_pkcs11_obj_get_type (gnutls_pkcs11_obj_t obj);
 const char *gnutls_pkcs11_type_get_name (gnutls_pkcs11_obj_type_t);
 
 int gnutls_x509_crt_list_import_pkcs11 (gnutls_x509_crt_t * certs, unsigned int cert_max, 

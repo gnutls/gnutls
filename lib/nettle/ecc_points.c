@@ -24,12 +24,12 @@
 
 #include "ecc.h"
 
-/**
+/*
   @file ecc_points.c
   ECC Crypto, Tom St Denis
 */
 
-/**
+/*
    Allocate a new ECC point
    @return A newly allocated point or NULL on error 
 */
@@ -50,7 +50,7 @@ ecc_new_point (void)
   return p;
 }
 
-/** Free an ECC point from memory
+/* Free an ECC point from memory
   @param p   The point to free
 */
 void

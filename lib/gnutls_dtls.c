@@ -683,8 +683,6 @@ uint8_t digest[C_HASH_SIZE];
  * the cookie authentication with the client, with the newly 
  * established session.
  *
- * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.  
- *
  * Since: 3.0.0
  **/
 void gnutls_dtls_prestate_set(gnutls_session_t session, gnutls_dtls_prestate_st* prestate)

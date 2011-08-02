@@ -25,12 +25,12 @@
 #include "ecc.h"
 #include <nettle/dsa.h>
 
-/**
+/*
   @file ecc_sign_hash.c
   ECC Crypto, Tom St Denis
 */
 
-/**
+/*
   Sign a message digest
   @param in        The message digest to sign
   @param inlen     The length of the digest

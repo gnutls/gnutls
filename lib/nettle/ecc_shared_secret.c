@@ -25,12 +25,12 @@
 #include "ecc.h"
 #include <string.h>
 
-/**
+/*
   @file ecc_shared_secret.c
   ECC Crypto, Tom St Denis
 */
 
-/**
+/*
   Create an ECC shared secret between two keys
   @param private_key      The private ECC key
   @param public_key       The public key

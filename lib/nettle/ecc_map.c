@@ -24,12 +24,12 @@
 
 #include "ecc.h"
 
-/**
+/*
   @file ecc_map.c
   ECC Crypto, Tom St Denis
 */
 
-/**
+/*
   Map a projective jacobian point back to affine space
   @param P        [in/out] The point to map
   @param modulus  The modulus of the field the ECC curve is in

@@ -1,3 +1,27 @@
+/*
+ * Copyright (C) 2010-2011 Free Software Foundation, Inc.
+ *
+ * Author: Nikos Mavrogiannopoulos
+ *
+ * This file is part of GnuTLS.
+ *
+ * The GnuTLS is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * USA
+ *
+ */
+
 #ifndef __GNUTLS_ABSTRACT_H
 #define __GNUTLS_ABSTRACT_H
 
@@ -21,9 +45,9 @@ int gnutls_pubkey_get_pk_algorithm (gnutls_pubkey_t key, unsigned int *bits);
 
 int gnutls_pubkey_import_x509 (gnutls_pubkey_t key, gnutls_x509_crt_t crt,
                                unsigned int flags);
-int gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t pkey,
-                                 gnutls_pkcs11_obj_t crt, unsigned int flags);
-int gnutls_pubkey_import_openpgp (gnutls_pubkey_t pkey,
+int gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t key,
+                                 gnutls_pkcs11_obj_t obj, unsigned int flags);
+int gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
                                   gnutls_openpgp_crt_t crt,
                                   unsigned int flags);
 int

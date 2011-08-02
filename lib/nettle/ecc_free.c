@@ -24,12 +24,12 @@
 
 #include "ecc.h"
 
-/**
+/*
   @file ecc_free.c
   ECC Crypto, Tom St Denis
 */
 
-/**
+/*
   Free an ECC key from memory
   @param key   The key you wish to free
 */

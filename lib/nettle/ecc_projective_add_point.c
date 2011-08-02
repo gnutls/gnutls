@@ -24,12 +24,12 @@
 
 #include "ecc.h"
 
-/**
+/*
   @file ecc_projective_add_point.c
   ECC Crypto, Tom St Denis
 */
 
-/**
+/*
    Add two ECC points
    @param P        The point to add
    @param Q        The point to add

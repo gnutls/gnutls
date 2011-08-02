@@ -187,14 +187,14 @@ gnutls_pubkey_import_x509 (gnutls_pubkey_t key, gnutls_x509_crt_t crt,
 }
 
 /**
- * gnutls_pubkey_import_privkey: Imports the public key from a private
+ * gnutls_pubkey_import_privkey:
  * @key: The public key
  * @pkey: The private key
  * @usage: GNUTLS_KEY_* key usage flags.
  * @flags: should be zero
  *
- * This function will import the given public key to the abstract
- * #gnutls_pubkey_t structure.
+ * Imports the public key from a private.  This function will import
+ * the given public key to the abstract #gnutls_pubkey_t structure.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -250,13 +250,13 @@ gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
 #ifdef ENABLE_PKCS11
 
 /**
- * gnutls_pubkey_import_pkcs11: Imports a public key from a pkcs11 key
+ * gnutls_pubkey_import_pkcs11:
  * @key: The public key
  * @obj: The parameters to be imported
  * @flags: should be zero
  *
- * This function will import the given public key to the abstract
- * #gnutls_pubkey_t structure.
+ * Imports a public key from a pkcs11 key. This function will import
+ * the given public key to the abstract #gnutls_pubkey_t structure.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -304,15 +304,17 @@ gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t key,
 #endif /* ENABLE_PKCS11 */
 
 #ifdef ENABLE_OPENPGP
+
 /**
- * gnutls_pubkey_import_openpgp: Imports a public key from an openpgp key
+ * gnutls_pubkey_import_openpgp:
  * @key: The public key
  * @crt: The certificate to be imported
  * @flags: should be zero
  *
- * This function will import the given public key to the abstract
- * #gnutls_pubkey_t structure. The subkey set as preferred will be
- * imported or the master key otherwise.
+ * Imports a public key from an openpgp key. This function will import
+ * the given public key to the abstract #gnutls_pubkey_t
+ * structure. The subkey set as preferred will be imported or the
+ * master key otherwise.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
