@@ -1,5 +1,4 @@
-# Copyright (C) 2006, 2007, 2008, 2009, 2010 Free Software Foundation,
-# Inc.
+# Copyright (C) 2006-2011 Free Software Foundation, Inc.
 #
 # Author: Simon Josefsson
 #
@@ -33,13 +32,25 @@ endif
 PODIR := po
 PO_DOMAIN := libgnutls
 
-local-checks-to-skip = sc_prohibit_strcmp sc_prohibit_atoi_atof		\
-	sc_error_message_uppercase sc_prohibit_have_config_h		\
-	sc_require_config_h sc_require_config_h_first			\
-	sc_trailing_blank sc_unmarked_diagnostics sc_immutable_NEWS \
-	sc_prohibit_magic_number_exit sc_texinfo_acronym
-VC_LIST_ALWAYS_EXCLUDE_REGEX = \
-	^(((lib/|libextra/)?(gl|build-aux))|tests/suite)/.*
+local-checks-to-skip = sc_GPL_version sc_bindtextdomain			\
+	sc_immutable_NEWS sc_program_name sc_prohibit_atoi_atof		\
+	sc_prohibit_empty_lines_at_EOF sc_prohibit_hash_without_use	\
+	sc_prohibit_have_config_h sc_prohibit_magic_number_exit		\
+	sc_prohibit_strcmp sc_require_config_h				\
+	sc_require_config_h_first sc_texinfo_acronym sc_trailing_blank	\
+	sc_unmarked_diagnostics sc_useless_cpp_parens
+
+VC_LIST_ALWAYS_EXCLUDE_REGEX = ^maint.mk|(build-aux/|gl/|src/cfg/|tests/suite/ecore/|doc/protocol/).*
+
+# Explicit syntax-check exceptions.
+exclude_file_name_regexp--sc_cast_of_alloca_return_value = ^guile/
+exclude_file_name_regexp--sc_error_message_uppercase = ^doc/examples/ex-cxx.cpp|guile/src/extra.c|src/certtool.c|tests/pkcs12_encode.c
+exclude_file_name_regexp--sc_file_system = ^doc/doxygen/Doxyfile
+exclude_file_name_regexp--sc_prohibit_cvs_keyword = ^lib/nettle/
+exclude_file_name_regexp--sc_prohibit_doubled_word = ^tests/rsa-md5-collision/README$$
+exclude_file_name_regexp--sc_prohibit_undesirable_word_seq = ^tests/nist-pkits/gnutls-nist-tests.html
+exclude_file_name_regexp--sc_space_tab = ^doc/.*.(pdf|png)|tests/nist-pkits/|tests/suite/x509paths/
+exclude_file_name_regexp--sc_two_space_separator_in_usage = ^doc/cha-programs.texi|tests/sha2/sha2|tests/sha2/sha2-dsa$$
 
 autoreconf:
 	for f in $(PODIR)/*.po.in; do \
@@ -60,20 +71,8 @@ update-po: refresh-po
 bootstrap: autoreconf
 	./configure $(CFGFLAGS)
 
-#Two runs the first should add the LGPL components and the
-#second the components used by src/ files.
 glimport:
-	gnulib-tool --m4-base gl/m4 --tests-base=gl/tests --libtool \
-	--dir=. --local-dir=gl/override --lib=libgnu --source-base=gl \
-	--aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lseek-tests \
-	--import crypto/hmac-md5 crypto/md5 extensions havelib lib-msvc-compat lib-symbol-versions \
-	byteswap c-ctype func gettext lib-msvc-compat lib-symbol-versions memmem-simple minmax \
-	netdb read-file snprintf sockets socklen stdint strcase strverscmp sys_socket sys_stat time_r unistd \
-	vasprintf vsnprintf manywarnings warnings netinet_in alloca getpass u64 error
-	gnulib-tool --m4-base gl/m4 --tests-base=gl/tests --libtool \
-	--dir=. --local-dir=gl/override --lib=libgnu --source-base=gl \
-	--aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lseek-tests \
-	--add-import progname version-etc timespec version-etc-fsf gettime valgrind-tests
+	gnulib-tool --add-import
 
 # Code Coverage
 
@@ -88,15 +87,6 @@ upload-web-coverage:
 	cd $(htmldir) && \
 		cvs commit -m "Update." coverage
 
-# Mingw32
-
-W32ROOT ?= $(HOME)/gnutls4win/inst
-
-mingw32: autoreconf 
-	./configure $(CFGFLAGS) --host=i586-mingw32msvc --build=`build-aux/config.guess` --with-libtasn1-prefix=$(W32ROOT) --with-libgcrypt-prefix=$(W32ROOT) --prefix $(W32ROOT)
-
-.PHONY: bootstrap autoreconf mingw32
-
 # Release
 
 ChangeLog:
@@ -106,7 +96,7 @@ ChangeLog:
 tag = $(PACKAGE)_`echo $(VERSION) | sed 's/\./_/g'`
 htmldir = ../www-$(PACKAGE)
 
-release: prepare upload web upload-web
+release: syntax-check prepare upload web upload-web
 
 prepare:
 	! git tag -l $(tag) | grep $(PACKAGE) > /dev/null

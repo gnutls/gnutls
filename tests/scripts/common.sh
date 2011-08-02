@@ -34,7 +34,7 @@ launch_server() {
        trap "[ ! -z \"${LOCALPID}\" ] && kill ${LOCALPID};" 15
        wait "${LOCALPID}"
        LOCALRET="$?"
-       if [ "${LOCALRET}" != "0" -a "${LOCALRET}" != "143" ] ; then
+       if [ "${LOCALRET}" != "0" ] && [ "${LOCALRET}" != "143" ] ; then
                # Houston, we'v got a problem...
                echo "Failed to launch a gnutls-serv server !"
                kill -10 ${PARENT}
@@ -49,7 +49,7 @@ launch_bare_server() {
        trap "[ ! -z \"${LOCALPID}\" ] && kill ${LOCALPID};" 15
        wait "${LOCALPID}"
        LOCALRET="$?"
-       if [ "${LOCALRET}" != "0" -a "${LOCALRET}" != "143" ] ; then
+       if [ "${LOCALRET}" != "0" ] && [ "${LOCALRET}" != "143" ] ; then
                # Houston, we'v got a problem...
                echo "Failed to launch server !"
                kill -10 ${PARENT}

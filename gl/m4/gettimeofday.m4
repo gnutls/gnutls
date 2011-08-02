@@ -1,4 +1,4 @@
-# serial 15
+# serial 17
 
 # Copyright (C) 2001-2003, 2005, 2007, 2009-2011 Free Software Foundation, Inc.
 # This file is free software; the Free Software Foundation
@@ -17,8 +17,6 @@ AC_DEFUN([gl_FUNC_GETTIMEOFDAY],
   gl_gettimeofday_timezone=void
   if test $ac_cv_func_gettimeofday != yes; then
     HAVE_GETTIMEOFDAY=0
-    AC_LIBOBJ([gettimeofday])
-    gl_PREREQ_GETTIMEOFDAY
   else
     gl_FUNC_GETTIMEOFDAY_CLOBBER
     AC_CACHE_CHECK([for gettimeofday with POSIX signature],
@@ -51,9 +49,18 @@ int gettimeofday (struct timeval *restrict, struct timezone *restrict);
       gl_gettimeofday_timezone='struct timezone'
     elif test $gl_cv_func_gettimeofday_posix_signature != yes; then
       REPLACE_GETTIMEOFDAY=1
-      AC_LIBOBJ([gettimeofday])
-      gl_PREREQ_GETTIMEOFDAY
     fi
+    m4_ifdef([gl_FUNC_TZSET_CLOBBER], [
+      gl_FUNC_TZSET_CLOBBER
+      if test $gl_cv_func_tzset_clobber = yes; then
+        REPLACE_GETTIMEOFDAY=1
+        gl_GETTIMEOFDAY_REPLACE_LOCALTIME
+        AC_DEFINE([tzset], [rpl_tzset],
+          [Define to rpl_tzset if the wrapper function should be used.])
+        AC_DEFINE([TZSET_CLOBBERS_LOCALTIME], [1],
+          [Define if tzset clobbers localtime's static buffer.])
+      fi
+    ])
   fi
   AC_DEFINE_UNQUOTED([GETTIMEOFDAY_TIMEZONE], [$gl_gettimeofday_timezone],
     [Define this to 'void' or 'struct timezone' to match the system's
@@ -105,8 +112,6 @@ AC_DEFUN([gl_FUNC_GETTIMEOFDAY_CLOBBER],
 ])
 
 AC_DEFUN([gl_GETTIMEOFDAY_REPLACE_LOCALTIME], [
-  AC_LIBOBJ([gettimeofday])
-  gl_PREREQ_GETTIMEOFDAY
   AC_DEFINE([gmtime], [rpl_gmtime],
     [Define to rpl_gmtime if the replacement function should be used.])
   AC_DEFINE([localtime], [rpl_localtime],

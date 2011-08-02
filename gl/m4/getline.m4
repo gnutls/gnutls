@@ -1,4 +1,4 @@
-# getline.m4 serial 23
+# getline.m4 serial 25
 
 dnl Copyright (C) 1998-2003, 2005-2007, 2009-2011 Free Software Foundation,
 dnl Inc.
@@ -84,14 +84,11 @@ AC_DEFUN([gl_FUNC_GETLINE],
     dnl getline function among $LIBS, it may exist in libinet and the
     dnl executable may be linked with -linet.
     REPLACE_GETLINE=1
-    AC_LIBOBJ([getline])
-
-    gl_PREREQ_GETLINE
   fi
 ])
 
 # Prerequisites of lib/getline.c.
 AC_DEFUN([gl_PREREQ_GETLINE],
 [
-  gl_FUNC_GETDELIM
+  :
 ])

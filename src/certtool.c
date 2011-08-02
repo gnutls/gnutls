@@ -319,7 +319,7 @@ cipher_to_flags (const char *cipher)
       return GNUTLS_PKCS_USE_PKCS12_RC2_40;
     }
 
-  error (EXIT_FAILURE, 0, "Unknown cipher %s\n", cipher);
+  error (EXIT_FAILURE, 0, "unknown cipher %s\n", cipher);
   return -1;
 }
 

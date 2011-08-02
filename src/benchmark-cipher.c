@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, 2010  Free Software Foundation, Inc.
+ * Copyright (C) 2009-2011  Free Software Foundation, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -28,7 +28,6 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
 #include <time.h>
-#include <signal.h>
 #include "timespec.h"           /* gnulib gettime */
 #include "benchmark.h"
 

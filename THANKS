@@ -1,5 +1,5 @@
 GnuTLS THANKS -- Acknowledgements.
-Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010  Free Software Foundation, Inc.
+Copyright (C) 2005-2011  Free Software Foundation, Inc.
 Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
@@ -112,7 +112,7 @@ Micah Anderson			<micah [at] riseup.net>
 Michael Rommel			<rommel [at] layer-7.net>
 Mark Brand			<mabrand [at] mabrand.nl>
 Vitaly Kruglikov		<vitaly.kruglikov [at] palm.com>
-Kalle Olavi Niemitalo 		<kon [at] iki.fi>
+Kalle Olavi Niemitalo		<kon [at] iki.fi>
 Dash Shendy                     <admin [at] dash.za.net>
 Rickard Bellgrim                <rickard [at] opendnssec.org>
 Petr Písař                      <petr.pisar [at] atlas.cz>
