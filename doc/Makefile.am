@@ -69,11 +69,9 @@ gnutls_TEXINFOS += gnutls-client-server-use-case.dia	\
 gnutls_TEXINFOS += gnutls-extensions_st.dia gnutls-extensions_st.eps	\
 	gnutls-extensions_st.png
 gnutls_TEXINFOS += gnutls-handshake-sequence.dia			\
-	gnutls-handshake-sequence.eps 	\
-	gnutls-handshake-sequence.png
+	gnutls-handshake-sequence.eps gnutls-handshake-sequence.png
 gnutls_TEXINFOS += gnutls-handshake-state.dia			\
-	gnutls-handshake-state.eps	\
-	gnutls-handshake-state.png
+	gnutls-handshake-state.eps gnutls-handshake-state.png
 gnutls_TEXINFOS += gnutls-mod_auth_st.dia gnutls-mod_auth_st.eps	\
 	gnutls-mod_auth_st.png
 gnutls_TEXINFOS += gnutls-objects.dia gnutls-objects.eps	\

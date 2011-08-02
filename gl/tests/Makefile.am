@@ -55,30 +55,6 @@ EXTRA_DIST += test-alloca-opt.c
 
 ## end   gnulib module alloca-opt-tests
 
-## begin gnulib module arg-nonnull
-
-# The BUILT_SOURCES created by this Makefile snippet are not used via #include
-# statements but through direct file reference. Therefore this snippet must be
-# present in all Makefile.am that need it. This is ensured by the applicability
-# 'all' defined above.
-
-BUILT_SOURCES += arg-nonnull.h
-# The arg-nonnull.h that gets inserted into generated .h files is the same as
-# build-aux/arg-nonnull.h, except that it has the copyright header cut off.
-arg-nonnull.h: $(top_srcdir)/build-aux/arg-nonnull.h
-	$(AM_V_GEN)rm -f $@-t $@ && \
-	sed -n -e '/GL_ARG_NONNULL/,$$p' \
-	  < $(top_srcdir)/build-aux/arg-nonnull.h \
-	  > $@-t && \
-	mv $@-t $@
-MOSTLYCLEANFILES += arg-nonnull.h arg-nonnull.h-t
-
-ARG_NONNULL_H=arg-nonnull.h
-
-EXTRA_DIST += $(top_srcdir)/build-aux/arg-nonnull.h
-
-## end   gnulib module arg-nonnull
-
 ## begin gnulib module binary-io
 
 libtests_a_SOURCES += binary-io.h
@@ -101,30 +77,6 @@ check_PROGRAMS += test-byteswap
 EXTRA_DIST += test-byteswap.c macros.h
 
 ## end   gnulib module byteswap-tests
-
-## begin gnulib module c++defs
-
-# The BUILT_SOURCES created by this Makefile snippet are not used via #include
-# statements but through direct file reference. Therefore this snippet must be
-# present in all Makefile.am that need it. This is ensured by the applicability
-# 'all' defined above.
-
-BUILT_SOURCES += c++defs.h
-# The c++defs.h that gets inserted into generated .h files is the same as
-# build-aux/c++defs.h, except that it has the copyright header cut off.
-c++defs.h: $(top_srcdir)/build-aux/c++defs.h
-	$(AM_V_GEN)rm -f $@-t $@ && \
-	sed -n -e '/_GL_CXXDEFS/,$$p' \
-	  < $(top_srcdir)/build-aux/c++defs.h \
-	  > $@-t && \
-	mv $@-t $@
-MOSTLYCLEANFILES += c++defs.h c++defs.h-t
-
-CXXDEFS_H=c++defs.h
-
-EXTRA_DIST += $(top_srcdir)/build-aux/c++defs.h
-
-## end   gnulib module c++defs
 
 ## begin gnulib module c-ctype-tests
 
@@ -169,14 +121,15 @@ BUILT_SOURCES += fcntl.h
 fcntl.h: fcntl.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(WARN_ON_USE_H)
 	$(AM_V_GEN)rm -f $@-t $@ && \
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
-	  sed -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	  sed -e 's|@''GUARD_PREFIX''@|GL|g' \
+	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
 	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
 	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
 	      -e 's|@''NEXT_FCNTL_H''@|$(NEXT_FCNTL_H)|g' \
-	      -e 's|@''GNULIB_FCNTL''@|$(GNULIB_FCNTL)|g' \
-	      -e 's|@''GNULIB_NONBLOCKING''@|$(GNULIB_NONBLOCKING)|g' \
-	      -e 's|@''GNULIB_OPEN''@|$(GNULIB_OPEN)|g' \
-	      -e 's|@''GNULIB_OPENAT''@|$(GNULIB_OPENAT)|g' \
+	      -e 's/@''GNULIB_FCNTL''@/$(GNULIB_FCNTL)/g' \
+	      -e 's/@''GNULIB_NONBLOCKING''@/$(GNULIB_NONBLOCKING)/g' \
+	      -e 's/@''GNULIB_OPEN''@/$(GNULIB_OPEN)/g' \
+	      -e 's/@''GNULIB_OPENAT''@/$(GNULIB_OPENAT)/g' \
 	      -e 's|@''HAVE_FCNTL''@|$(HAVE_FCNTL)|g' \
 	      -e 's|@''HAVE_OPENAT''@|$(HAVE_OPENAT)|g' \
 	      -e 's|@''REPLACE_FCNTL''@|$(REPLACE_FCNTL)|g' \
@@ -202,6 +155,29 @@ EXTRA_DIST += test-fcntl-h.c
 
 ## end   gnulib module fcntl-h-tests
 
+## begin gnulib module float-tests
+
+TESTS += test-float
+check_PROGRAMS += test-float
+EXTRA_DIST += test-float.c macros.h
+
+## end   gnulib module float-tests
+
+## begin gnulib module fpucw
+
+
+EXTRA_DIST += fpucw.h
+
+## end   gnulib module fpucw
+
+## begin gnulib module fseek-tests
+
+TESTS += test-fseek.sh test-fseek2.sh
+check_PROGRAMS += test-fseek
+EXTRA_DIST += test-fseek.c test-fseek.sh test-fseek2.sh signature.h macros.h
+
+## end   gnulib module fseek-tests
+
 ## begin gnulib module fseeko-tests
 
 TESTS += test-fseeko.sh test-fseeko2.sh
@@ -209,6 +185,15 @@ check_PROGRAMS += test-fseeko
 EXTRA_DIST += test-fseeko.c test-fseeko.sh test-fseeko2.sh signature.h macros.h
 
 ## end   gnulib module fseeko-tests
+
+## begin gnulib module ftell-tests
+
+TESTS += test-ftell.sh test-ftell2.sh test-ftell3
+check_PROGRAMS += test-ftell test-ftell3
+MOSTLYCLEANFILES += t-ftell3.tmp
+EXTRA_DIST += test-ftell.c test-ftell.sh test-ftell2.sh test-ftell3.c signature.h macros.h
+
+## end   gnulib module ftell-tests
 
 ## begin gnulib module ftello-tests
 
@@ -267,7 +252,7 @@ EXTRA_DIST += signature.h test-gettimeofday.c
 
 TESTS += test-intprops
 check_PROGRAMS += test-intprops
-EXTRA_DIST += test-intprops.c
+EXTRA_DIST += test-intprops.c macros.h
 
 ## end   gnulib module intprops-tests
 
@@ -352,6 +337,87 @@ check_PROGRAMS += test-read-file
 EXTRA_DIST += test-read-file.c
 
 ## end   gnulib module read-file-tests
+
+## begin gnulib module snippet/_Noreturn
+
+# Because this Makefile snippet defines a variable used by other
+# gnulib Makefile snippets, it must be present in all Makefile.am that
+# need it. This is ensured by the applicability 'all' defined above.
+
+_NORETURN_H=$(top_srcdir)/build-aux/snippet/_Noreturn.h
+
+EXTRA_DIST += $(top_srcdir)/build-aux/snippet/_Noreturn.h
+
+## end   gnulib module snippet/_Noreturn
+
+## begin gnulib module snippet/arg-nonnull
+
+# The BUILT_SOURCES created by this Makefile snippet are not used via #include
+# statements but through direct file reference. Therefore this snippet must be
+# present in all Makefile.am that need it. This is ensured by the applicability
+# 'all' defined above.
+
+BUILT_SOURCES += arg-nonnull.h
+# The arg-nonnull.h that gets inserted into generated .h files is the same as
+# build-aux/snippet/arg-nonnull.h, except that it has the copyright header cut
+# off.
+arg-nonnull.h: $(top_srcdir)/build-aux/snippet/arg-nonnull.h
+	$(AM_V_GEN)rm -f $@-t $@ && \
+	sed -n -e '/GL_ARG_NONNULL/,$$p' \
+	  < $(top_srcdir)/build-aux/snippet/arg-nonnull.h \
+	  > $@-t && \
+	mv $@-t $@
+MOSTLYCLEANFILES += arg-nonnull.h arg-nonnull.h-t
+
+ARG_NONNULL_H=arg-nonnull.h
+
+EXTRA_DIST += $(top_srcdir)/build-aux/snippet/arg-nonnull.h
+
+## end   gnulib module snippet/arg-nonnull
+
+## begin gnulib module snippet/c++defs
+
+# The BUILT_SOURCES created by this Makefile snippet are not used via #include
+# statements but through direct file reference. Therefore this snippet must be
+# present in all Makefile.am that need it. This is ensured by the applicability
+# 'all' defined above.
+
+BUILT_SOURCES += c++defs.h
+# The c++defs.h that gets inserted into generated .h files is the same as
+# build-aux/snippet/c++defs.h, except that it has the copyright header cut off.
+c++defs.h: $(top_srcdir)/build-aux/snippet/c++defs.h
+	$(AM_V_GEN)rm -f $@-t $@ && \
+	sed -n -e '/_GL_CXXDEFS/,$$p' \
+	  < $(top_srcdir)/build-aux/snippet/c++defs.h \
+	  > $@-t && \
+	mv $@-t $@
+MOSTLYCLEANFILES += c++defs.h c++defs.h-t
+
+CXXDEFS_H=c++defs.h
+
+EXTRA_DIST += $(top_srcdir)/build-aux/snippet/c++defs.h
+
+## end   gnulib module snippet/c++defs
+
+## begin gnulib module snippet/warn-on-use
+
+BUILT_SOURCES += warn-on-use.h
+# The warn-on-use.h that gets inserted into generated .h files is the same as
+# build-aux/snippet/warn-on-use.h, except that it has the copyright header cut
+# off.
+warn-on-use.h: $(top_srcdir)/build-aux/snippet/warn-on-use.h
+	$(AM_V_GEN)rm -f $@-t $@ && \
+	sed -n -e '/^.ifndef/,$$p' \
+	  < $(top_srcdir)/build-aux/snippet/warn-on-use.h \
+	  > $@-t && \
+	mv $@-t $@
+MOSTLYCLEANFILES += warn-on-use.h warn-on-use.h-t
+
+WARN_ON_USE_H=warn-on-use.h
+
+EXTRA_DIST += $(top_srcdir)/build-aux/snippet/warn-on-use.h
+
+## end   gnulib module snippet/warn-on-use
 
 ## begin gnulib module snprintf-tests
 
@@ -517,6 +583,15 @@ EXTRA_DIST += test-vasprintf.c signature.h macros.h
 
 ## end   gnulib module vasprintf-tests
 
+## begin gnulib module vc-list-files-tests
+
+TESTS += test-vc-list-files-git.sh
+TESTS += test-vc-list-files-cvs.sh
+TESTS_ENVIRONMENT += abs_aux_dir='$(abs_aux_dir)'
+EXTRA_DIST += test-vc-list-files-git.sh test-vc-list-files-cvs.sh init.sh
+
+## end   gnulib module vc-list-files-tests
+
 ## begin gnulib module verify-tests
 
 TESTS_ENVIRONMENT += MAKE='$(MAKE)'
@@ -543,25 +618,6 @@ check_PROGRAMS += test-vsnprintf
 EXTRA_DIST += test-vsnprintf.c signature.h macros.h
 
 ## end   gnulib module vsnprintf-tests
-
-## begin gnulib module warn-on-use
-
-BUILT_SOURCES += warn-on-use.h
-# The warn-on-use.h that gets inserted into generated .h files is the same as
-# build-aux/warn-on-use.h, except that it has the copyright header cut off.
-warn-on-use.h: $(top_srcdir)/build-aux/warn-on-use.h
-	$(AM_V_GEN)rm -f $@-t $@ && \
-	sed -n -e '/^.ifndef/,$$p' \
-	  < $(top_srcdir)/build-aux/warn-on-use.h \
-	  > $@-t && \
-	mv $@-t $@
-MOSTLYCLEANFILES += warn-on-use.h warn-on-use.h-t
-
-WARN_ON_USE_H=warn-on-use.h
-
-EXTRA_DIST += $(top_srcdir)/build-aux/warn-on-use.h
-
-## end   gnulib module warn-on-use
 
 ## begin gnulib module wchar-tests
 

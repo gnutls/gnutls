@@ -1,4 +1,4 @@
-# getpass.m4 serial 12
+# getpass.m4 serial 13
 dnl Copyright (C) 2002-2003, 2005-2006, 2009-2011 Free Software Foundation,
 dnl Inc.
 dnl This file is free software; the Free Software Foundation
@@ -11,10 +11,12 @@ AC_DEFUN([gl_FUNC_GETPASS],
   dnl Persuade Solaris <unistd.h> and <stdlib.h> to declare getpass().
   AC_REQUIRE([gl_USE_SYSTEM_EXTENSIONS])
 
-  AC_REPLACE_FUNCS([getpass])
+  AC_CHECK_FUNCS([getpass])
   AC_CHECK_DECLS_ONCE([getpass])
-  if test $ac_cv_func_getpass = no; then
-    gl_PREREQ_GETPASS
+  if test $ac_cv_func_getpass = yes; then
+    HAVE_GETPASS=1
+  else
+    HAVE_GETPASS=0
   fi
 ])
 
@@ -27,13 +29,15 @@ AC_DEFUN([gl_FUNC_GETPASS_GNU],
 
   AC_CHECK_DECLS_ONCE([getpass])
   dnl TODO: Detect when GNU getpass() is already found in glibc.
-  AC_LIBOBJ([getpass])
-  gl_PREREQ_GETPASS
-  dnl We must choose a different name for our function, since on ELF systems
-  dnl an unusable getpass() in libc.so would override our getpass() if it is
-  dnl compiled into a shared library.
-  AC_DEFINE([getpass], [gnu_getpass],
-    [Define to a replacement function name for getpass().])
+  REPLACE_GETPASS=1
+
+  if test $REPLACE_GETPASS = 1; then
+    dnl We must choose a different name for our function, since on ELF systems
+    dnl an unusable getpass() in libc.so would override our getpass() if it is
+    dnl compiled into a shared library.
+    AC_DEFINE([getpass], [gnu_getpass],
+      [Define to a replacement function name for getpass().])
+  fi
 ])
 
 # Prerequisites of lib/getpass.c.

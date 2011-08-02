@@ -1,6 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-# Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-# 2009, 2010 Free Software Foundation, Inc.
+# Copyright (C) 2000-2011 Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos, Simon Josefsson
 #
@@ -82,7 +81,7 @@ case $host_cpu in
 dnl    GCC_FLAG_ADD([-maes -mpclmul],[X86])
 dnl    if test "x$X86" = "xyes";then
       AC_CHECK_HEADERS(cpuid.h)
-      if test "$host_cpu" = "x86_64" -o "$host_cpu" = "amd64";then
+      if test "$host_cpu" = "x86_64" || test "$host_cpu" = "amd64"; then
         hw_accel="x86-64"
       else
         hw_accel="x86"
@@ -95,7 +94,7 @@ esac
 
 fi
 
-AM_CONDITIONAL(TRY_X86_OPTIMIZATIONS, test x"$hw_accel" = x"x86" -o x"$hw_accel" = x"x86-64")
+AM_CONDITIONAL(TRY_X86_OPTIMIZATIONS, test x"$hw_accel" = x"x86" || test x"$hw_accel" = x"x86-64")
 AM_CONDITIONAL(ASM_X86_64, test x"$hw_accel" = x"x86-64")
 AM_CONDITIONAL(HAVE_GCC_GNU89_INLINE_OPTION, test "$gnu89_inline" = "yes"])
 AM_CONDITIONAL(HAVE_GCC, test "$GCC" = "yes")
@@ -127,7 +126,7 @@ AC_ARG_WITH(p11-kit,
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 if test "$with_p11_kit" != "no"; then
 	PKG_CHECK_MODULES(P11_KIT, [p11-kit-1 >= 0.2])
-	AC_DEFINE(ENABLE_PKCS11, 1, [Build PKCS#11 support])
+	AC_DEFINE([ENABLE_PKCS11], 1, [Build PKCS#11 support])
 	CFLAGS="$CFLAGS $P11_KIT_CFLAGS"
 	LIBS="$LIBS $P11_KIT_LIBS"
 	with_p11_kit=yes
@@ -159,7 +158,7 @@ AC_CHECK_TYPE(ssize_t,
     DEFINE_SSIZE_T="#include <sys/types.h>"
     AC_SUBST(DEFINE_SSIZE_T)
   ], [
-    AC_DEFINE(NO_SSIZE_T, 1, [no ssize_t type was found])
+    AC_DEFINE([NO_SSIZE_T], 1, [no ssize_t type was found])
     DEFINE_SSIZE_T="typedef int ssize_t;"
     AC_SUBST(DEFINE_SSIZE_T)
   ], [
