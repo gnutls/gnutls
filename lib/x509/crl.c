@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010 Free Software
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011 Free Software
  * Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
@@ -1041,6 +1041,8 @@ gnutls_x509_crl_get_extension_data (gnutls_x509_crl_t crl, int indx,
  * CRL".
  *
  * Returns: the number of certificates read or a negative error value.
+ *
+ * Since: 3.0.0
  **/
 int
 gnutls_x509_crl_list_import2 (gnutls_x509_crl_t ** crls,
@@ -1097,6 +1099,8 @@ int ret;
  * If the Certificate is PEM encoded it should have a header of "X509 CRL".
  *
  * Returns: the number of certificates read or a negative error value.
+ *
+ * Since: 3.0.0
  **/
 int
 gnutls_x509_crl_list_import (gnutls_x509_crl_t * crls,

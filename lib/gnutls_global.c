@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010, 2011
  * Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
@@ -80,6 +80,8 @@ gnutls_global_set_log_function (gnutls_log_func log_func)
  *
  * gnutls_audit_log_func is of the form,
  * void (*gnutls_audit_log_func)( gnutls_session_t, int level, const char*);
+ *
+ * Since: 3.0.0
  **/
 void
 gnutls_global_set_audit_log_function (gnutls_audit_log_func log_func)

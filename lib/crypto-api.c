@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2004, 2005, 2008, 2010 Free Software Foundation,
+ * Copyright (C) 2000, 2004, 2005, 2008, 2010, 2011 Free Software Foundation,
  * Inc.
  *
  * Author: Nikos Mavrogiannopoulos
@@ -72,7 +72,7 @@ gnutls_cipher_init (gnutls_cipher_hd_t * handle,
  *
  * Returns: Zero or a negative error code on error.
  *
- * Since: 2.99.0
+ * Since: 3.0.0
  **/
 int
 gnutls_cipher_tag (gnutls_cipher_hd_t handle, void *tag, size_t tag_size)
@@ -98,7 +98,7 @@ gnutls_cipher_tag (gnutls_cipher_hd_t handle, void *tag, size_t tag_size)
  *
  * Returns: Zero or a negative error code on error.
  *
- * Since: 2.99.0
+ * Since: 3.0.0
  **/
 int
 gnutls_cipher_add_auth (gnutls_cipher_hd_t handle, const void *text, size_t text_size)
@@ -120,7 +120,7 @@ gnutls_cipher_add_auth (gnutls_cipher_hd_t handle, const void *text, size_t text
  * This function will set the IV to be used for the next
  * encryption block.
  *
- * Since: 2.99.0
+ * Since: 3.0.0
  **/
 void
 gnutls_cipher_set_iv (gnutls_cipher_hd_t handle, void *iv, size_t ivlen)

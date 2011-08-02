@@ -41,6 +41,8 @@
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.0.0
  **/
 int gnutls_pcert_import_x509 (gnutls_pcert_st* pcert,
 	gnutls_x509_crt_t crt, unsigned int flags)
@@ -115,6 +117,8 @@ cleanup:
  * CERTIFICATE", or "CERTIFICATE".
  *
  * Returns: the number of certificates read or a negative error value.
+ *
+ * Since: 3.0.0
  **/
 int
 gnutls_pcert_list_import_x509_raw (gnutls_pcert_st * pcerts,
@@ -176,6 +180,8 @@ cleanup:
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.0.0
  **/
 int gnutls_pcert_import_x509_raw (gnutls_pcert_st *pcert,
 	const gnutls_datum_t* cert, 
@@ -224,6 +230,8 @@ cleanup:
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.0.0
  **/
 int gnutls_pcert_import_openpgp (gnutls_pcert_st* pcert,
 	gnutls_openpgp_crt_t crt, unsigned int flags)
@@ -296,6 +304,8 @@ cleanup:
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.0.0
  **/
 int gnutls_pcert_import_openpgp_raw (gnutls_pcert_st *pcert,
 	const gnutls_datum_t* cert, 
@@ -350,6 +360,8 @@ cleanup:
  * @pcert: The structure to be deinitialized
  *
  * This function will deinitialize a pcert structure.
+ *
+ * Since: 3.0.0
  **/
 void
 gnutls_pcert_deinit (gnutls_pcert_st *pcert)

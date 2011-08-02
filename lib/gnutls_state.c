@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011
  * Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
@@ -1396,6 +1396,8 @@ int total = 0, ret, iv_size;
  *
  * Returns: the currently used curve, a #gnutls_ecc_curve_t
  *   type.
+ *
+ * Since: 3.0.0
  **/
 gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session)
 {

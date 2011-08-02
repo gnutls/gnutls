@@ -69,6 +69,8 @@ struct gnutls_x509_trust_list_st {
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.0.0
  **/
 int
 gnutls_x509_trust_list_init (gnutls_x509_trust_list_t * list, unsigned int size)
@@ -100,6 +102,8 @@ gnutls_x509_trust_list_init (gnutls_x509_trust_list_t * list, unsigned int size)
  * @all: if non-(0) it will deinitialize all the certificates and CRLs contained in the structure.
  *
  * This function will deinitialize a trust list.
+ *
+ * Since: 3.0.0
  **/
 void
 gnutls_x509_trust_list_deinit (gnutls_x509_trust_list_t list, unsigned int all)
@@ -143,6 +147,7 @@ int i, j;
  *
  * Returns: The number of added elements is returned.
  *
+ * Since: 3.0.0
  **/
 int
 gnutls_x509_trust_list_add_cas (gnutls_x509_trust_list_t list, 
@@ -203,6 +208,7 @@ uint32_t hash;
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
+ * Since: 3.0.0
  **/
 int
 gnutls_x509_trust_list_add_named_crt (gnutls_x509_trust_list_t list, 
@@ -257,8 +263,8 @@ uint32_t hash;
  *
  * Returns: The number of added elements is returned.
  *
+ * Since: 3.0.0
  **/
-
 int
 gnutls_x509_trust_list_add_crls (gnutls_x509_trust_list_t list, 
   const gnutls_x509_crl_t * crl_list, int crl_size, unsigned int flags,
@@ -394,6 +400,8 @@ gnutls_datum_t dn;
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.0.0
  **/
 int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
   gnutls_x509_crt_t cert, gnutls_x509_crt_t* issuer, unsigned int flags)
@@ -441,6 +449,8 @@ uint32_t hash;
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.0.0
  **/
 int
 gnutls_x509_trust_list_verify_crt (
@@ -537,6 +547,8 @@ uint32_t hash;
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.0.0
  **/
 int
 gnutls_x509_trust_list_verify_named_crt (

@@ -418,6 +418,7 @@ int i, offset = 0;
  * If the retransmission timeout is zero then the handshake will operate
  * in a non-blocking way, i.e., return %GNUTLS_E_AGAIN.
  *
+ * Since: 3.0.0
  **/
 void gnutls_dtls_set_timeouts (gnutls_session_t session, unsigned int retrans_timeout,
   unsigned int total_timeout)
@@ -434,6 +435,7 @@ void gnutls_dtls_set_timeouts (gnutls_session_t session, unsigned int retrans_ti
  * This function will set the maximum transfer unit of the interface
  * that DTLS packets are expected to leave from.
  *
+ * Since: 3.0.0
  **/
 void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu)
 {
@@ -450,6 +452,7 @@ void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu)
  *
  * Returns: the maximum allowed transfer unit.
  *
+ * Since: 3.0.0
  **/
 unsigned int gnutls_dtls_get_data_mtu (gnutls_session_t session)
 {
@@ -473,6 +476,7 @@ int ret;
  *
  * Returns: the set maximum transfer unit.
  *
+ * Since: 3.0.0
  **/
 unsigned int gnutls_dtls_get_mtu (gnutls_session_t session)
 {
@@ -509,6 +513,7 @@ unsigned int gnutls_dtls_get_mtu (gnutls_session_t session)
  *
  * Returns: the number of bytes sent, or a negative error code.  
  *
+ * Since: 3.0.0
  **/
 int gnutls_dtls_cookie_send(gnutls_datum_t* key, void* client_data, size_t client_data_size, 
   gnutls_dtls_prestate_st* prestate,
@@ -610,6 +615,7 @@ uint8_t digest[C_HASH_SIZE];
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.  
  *
+ * Since: 3.0.0
  **/
 int gnutls_dtls_cookie_verify(gnutls_datum_t* key, 
   void* client_data, size_t client_data_size, 
@@ -679,6 +685,7 @@ uint8_t digest[C_HASH_SIZE];
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.  
  *
+ * Since: 3.0.0
  **/
 void gnutls_dtls_prestate_set(gnutls_session_t session, gnutls_dtls_prestate_st* prestate)
 {

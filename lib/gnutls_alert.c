@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2010 Free
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2010, 2011 Free
  * Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
@@ -104,6 +104,8 @@ gnutls_alert_get_name (gnutls_alert_description_t alert)
  * This function will return a string of the name of the alert.
  *
  * Returns: string corresponding to #gnutls_alert_description_t value.
+ *
+ * Since: 3.0.0
  **/
 const char *
 gnutls_alert_get_strname (gnutls_alert_description_t alert)

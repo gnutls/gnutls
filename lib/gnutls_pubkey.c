@@ -396,6 +396,8 @@ gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
  *
  * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
+ *
+ * Since: 3.0.0
  **/
 int
 gnutls_pubkey_get_openpgp_key_id (gnutls_pubkey_t key, unsigned int flags,
@@ -683,6 +685,8 @@ gnutls_pubkey_get_pk_dsa_raw (gnutls_pubkey_t key,
  * gnutls_malloc() and will be stored in the appropriate datum.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.0.0
  **/
 int
 gnutls_pubkey_get_pk_ecc_raw (gnutls_pubkey_t key, gnutls_ecc_curve_t *curve,
@@ -1147,7 +1151,7 @@ gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey, unsigned int flags,
  *   %GNUTLS_E_PK_SIG_VERIFY_FAILED is returned, and a positive code
  *   on success.
  *
- * Since: 2.12.0
+ * Since: 3.0.0
  **/
 int
 gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey, 
