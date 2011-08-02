@@ -91,13 +91,13 @@ gnutls_global_set_audit_log_function (gnutls_audit_log_func log_func)
 
 /**
  * gnutls_global_set_time_function:
- * @time_func: it's the system time function
+ * @time_func: it's the system time function, a gnutls_time_func() callback.
  *
- * This is the function where you can override the default system
- * time function.
+ * This is the function where you can override the default system time
+ * function.  The application provided function should behave the same
+ * as the standard function.
  *
- * gnutls_time_func is of the form,
- * time_t (*gnutls_time_func)( time*);
+ * Since: 2.12.0
  **/
 void
 gnutls_global_set_time_function (gnutls_time_func time_func)

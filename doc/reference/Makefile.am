@@ -68,7 +68,7 @@ EXTRA_HFILES=
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
 IGNORE_HFILES=
 
-# find lib -name \*.h -exec basename {} \; | grep -v -e abstract.h -e dtls.h -e gnutls.h -e openpgp.h -e pkcs11.h -e pkcs12.h -e x509.h | sort | uniq | sed -e 's/^/\t/' -e 's/$/ \\/'
+# find lib -name \*.h -exec basename {} \; | grep -v -e ^abstract.h$ -e ^crypto.h$ -e ^dtls.h$ -e ^gnutls.h$ -e ^openpgp.h$ -e ^pkcs11.h$ -e ^pkcs12.h$ -e ^x509.h$ | sort | uniq | sed -e 's/^/\t/' -e 's/$/ \\/'
 IGNORE_HFILES += \
 	abstract_int.h \
 	accelerated.h \
@@ -84,7 +84,6 @@ IGNORE_HFILES += \
 	context.h \
 	crypto-backend.h \
 	cryptodev.h \
-	crypto.h \
 	debug.h \
 	dh_common.h \
 	ecc.h \
@@ -102,16 +101,21 @@ IGNORE_HFILES += \
 	gnutls_datum.h \
 	gnutls_db.h \
 	gnutls_dh.h \
+	gnutls_dtls.h \
 	gnutls_ecc.h \
 	gnutls_errors.h \
 	gnutls_extensions.h \
 	gnutls_global.h \
+	gnutls_handshake.h \
+	gnutls_hash_int.h \
+	gnutls_helper.h \
 	gnutls_int.h \
 	gnutls_kx.h \
 	gnutls_mbuffers.h \
 	gnutls_mem.h \
 	gnutls_mpi.h \
 	gnutls_num.h \
+	gnutls_openpgp.h \
 	gnutls_pk.h \
 	gnutls_record.h \
 	gnutls_rsa_export.h \
@@ -122,6 +126,7 @@ IGNORE_HFILES += \
 	gnutls_str.h \
 	gnutls_supplemental.h \
 	gnutls_v2_compat.h \
+	gnutls_x509.h \
 	gnutlsxx.h \
 	gstr.h \
 	hash.h \

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Free Software Foundation, Inc.
+ * Copyright (C) 2010, 2011 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -44,6 +44,7 @@
  * 
  * This function must be called before gnutls_global_init().
  *
+ * Since: 2.12.0
  **/
 void
 gnutls_global_set_mutex (mutex_init_func init, mutex_deinit_func deinit,

@@ -66,6 +66,7 @@ static const gnutls_sec_params_entry sec_params[] = {
  *
  * Returns: The number of bits, or (0).
  *
+ * Since: 2.12.0
  **/
 unsigned int
 gnutls_sec_param_to_pk_bits (gnutls_pk_algorithm_t algo,
@@ -130,6 +131,7 @@ _gnutls_pk_bits_to_subgroup_bits (unsigned int pk_bits)
  * Returns: a pointer to a string that contains the name of the
  *   specified public key algorithm, or %NULL.
  *
+ * Since: 2.12.0
  **/
 const char *
 gnutls_sec_param_get_name (gnutls_sec_param_t param)
@@ -156,6 +158,7 @@ gnutls_sec_param_get_name (gnutls_sec_param_t param)
  *
  * Returns: The security parameter.
  *
+ * Since: 2.12.0
  **/
 gnutls_sec_param_t
 gnutls_pk_bits_to_sec_param (gnutls_pk_algorithm_t algo, unsigned int bits)

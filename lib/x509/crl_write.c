@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2008, 2010 Free Software Foundation,
+ * Copyright (C) 2003, 2004, 2005, 2008, 2010, 2011 Free Software Foundation,
  * Inc.
  *
  * Author: Nikos Mavrogiannopoulos
@@ -474,6 +474,8 @@ gnutls_x509_crl_set_number (gnutls_x509_crl_t crl,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since 2.12.0
  **/
 int
 gnutls_x509_crl_privkey_sign (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,

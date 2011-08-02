@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000, 2002, 2003, 2004, 2005, 2008, 2010 Free Software
+ * Copyright (C) 2000, 2002, 2003, 2004, 2005, 2008, 2010, 2011 Free Software
  * Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
@@ -81,7 +81,7 @@ gnutls_db_set_remove_function (gnutls_session_t session,
  * Sets the function that will be used to store data from the resumed
  * sessions database. This function must remove 0 on success.
  *
- * The first argument to store_func() will be null unless
+ * The first argument to @store_func will be null unless
  * gnutls_db_set_ptr() has been called.
  **/
 void

@@ -21,12 +21,14 @@
     </para>
 
     <xi:include href="xml/gnutls.xml"/>
+    <xi:include href="xml/abstract.xml"/>
     <xi:include href="xml/extra.xml"/>
     <xi:include href="xml/x509.xml"/>
     <xi:include href="xml/pkcs11.xml"/>
     <xi:include href="xml/pkcs12.xml"/>
     <xi:include href="xml/openpgp.xml"/>
     <xi:include href="xml/crypto.xml"/>
+    <xi:include href="xml/dtls.xml"/>
     <xi:include href="xml/openssl.xml"/>
   </chapter>
 

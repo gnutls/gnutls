@@ -181,7 +181,7 @@ gnutls_cipher_decrypt (gnutls_cipher_hd_t handle, void *ciphertext,
  *
  * Returns: Zero or a negative error code on error.
  *
- * Since: 2.10.0
+ * Since: 2.12.0
  **/
 int
 gnutls_cipher_encrypt2 (gnutls_cipher_hd_t handle, const void *text, size_t textlen,
@@ -204,7 +204,7 @@ gnutls_cipher_encrypt2 (gnutls_cipher_hd_t handle, const void *text, size_t text
  *
  * Returns: Zero or a negative error code on error.
  *
- * Since: 2.10.0
+ * Since: 2.12.0
  **/
 int
 gnutls_cipher_decrypt2 (gnutls_cipher_hd_t handle, const void *ciphertext,

@@ -1,6 +1,6 @@
 /*
  * GnuTLS PKCS#11 support
- * Copyright (C) 2010 Free Software Foundation
+ * Copyright (C) 2010, 2011 Free Software Foundation
  * 
  * Author: Nikos Mavrogiannopoulos
  *
@@ -41,6 +41,8 @@ static const ck_bool_t fval = 0;
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pkcs11_copy_x509_crt (const char *token_url,
@@ -216,6 +218,8 @@ cleanup:
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pkcs11_copy_x509_privkey (const char *token_url,
@@ -609,6 +613,8 @@ cleanup:
  *
  * Returns: On success, the number of objects deleted is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pkcs11_delete_url (const char *object_url, unsigned int flags)
@@ -704,7 +710,7 @@ gnutls_pkcs11_token_init (const char *token_url,
  * @token_url: A PKCS #11 URL specifying a token
  * @oldpin: old user's PIN
  * @newpin: new user's PIN
- * @flags: one of gnutls_pkcs11_pin_flag_t
+ * @flags: one of #gnutls_pkcs11_pin_flag_t.
  *
  * This function will modify or set a user's PIN for the given token. 
  * If it is called to set a user pin for first time the oldpin must

@@ -1,6 +1,6 @@
 /*
  * GnuTLS PKCS#11 support
- * Copyright (C) 2010 Free Software Foundation
+ * Copyright (C) 2010, 2011 Free Software Foundation
  * 
  * Author: Nikos Mavrogiannopoulos
  *
@@ -40,6 +40,8 @@
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 2.12.0
  **/
 int
 gnutls_pkcs11_copy_secret_key (const char *token_url, gnutls_datum_t * key,
