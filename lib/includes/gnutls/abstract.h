@@ -180,11 +180,19 @@ int gnutls_x509_crq_privkey_sign (gnutls_x509_crq_t crq,
                                   gnutls_digest_algorithm_t dig,
                                   unsigned int flags);
 
-/* pcert */
-typedef struct gnutls_pcert_st {
-	gnutls_pubkey_t pubkey;
-	gnutls_datum_t cert;
-	gnutls_certificate_type_t type;    /* type of the certificate */
+/**
+ * gnutls_pcert_st:
+ * @pubkey: public key of parsed certificate.
+ * @cert: certificate itself of parsed certificate
+ * @type: type of certificate, a #gnutls_certificate_type_t type.
+ *
+ * A parsed certificate.
+ */
+typedef struct gnutls_pcert_st
+{
+  gnutls_pubkey_t pubkey;
+  gnutls_datum_t cert;
+  gnutls_certificate_type_t type;
 } gnutls_pcert_st;
 
 /* Do not initialize the "cert" element of
