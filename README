@@ -102,11 +102,13 @@ deserve our help) an advantage over non-free projects (which do not
 deserve our help, since they refuse to share with us).  For information, see
 http://www.gnu.org/philosophy/why-not-lgpl.html.
 
-The GNU LPGL applies to the main gnutls library, while
-the gnutls-extra library is under the GPL.  The gnutls-extra library
-contains the code for "GnuTLS Inner Application" support and the
-OpenSSL compatibility layer.  The gnutls library is located in the
-lib/ directory, while the gnutls-extra library is at libextra/.
+The GNU LGPL applies to the main GnuTLS library, while the
+gnutls-extra and gnutls-openssl libraries are under the GPL.  The
+gnutls library is located in the lib/ directory, while the
+gnutls-extra and gnutls-openssl library is at libextra/.
+
+For the GnuTLS version 3.0.0 release we upgraded the license of the
+core library to LGPL version 3 or later.
 
 For any copyright year range specified as YYYY-ZZZZ in this package
 note that the range specifies every single year in that closed interval.
