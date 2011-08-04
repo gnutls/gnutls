@@ -66,21 +66,21 @@ gnutls_TEXINFOS += gnutls-certificate-user-use-case.dia	\
 gnutls_TEXINFOS += gnutls-client-server-use-case.dia	\
 	gnutls-client-server-use-case.eps		\
 	gnutls-client-server-use-case.png
-gnutls_TEXINFOS += gnutls-extensions_st.dia gnutls-extensions_st.eps	\
-	gnutls-extensions_st.png
+gnutls_TEXINFOS += gnutls-extensions.dia gnutls-extensions.eps	\
+	gnutls-extensions.png
 gnutls_TEXINFOS += gnutls-handshake-sequence.dia			\
 	gnutls-handshake-sequence.eps gnutls-handshake-sequence.png
 gnutls_TEXINFOS += gnutls-handshake-state.dia			\
 	gnutls-handshake-state.eps gnutls-handshake-state.png
-gnutls_TEXINFOS += gnutls-mod_auth_st.dia gnutls-mod_auth_st.eps	\
-	gnutls-mod_auth_st.png
+gnutls_TEXINFOS += gnutls-modauth.dia gnutls-modauth.eps	\
+	gnutls-modauth.png
 gnutls_TEXINFOS += gnutls-objects.dia gnutls-objects.eps	\
 	gnutls-objects.png
 
 imagesdir = $(infodir)
 images_DATA = gnutls-certificate-user-use-case.png		\
-	gnutls-extensions_st.png gnutls-handshake-state.png	\
-	gnutls-layers.png gnutls-mod_auth_st.png gnutls-pgp.png	\
+	gnutls-extensions.png gnutls-handshake-state.png	\
+	gnutls-layers.png gnutls-modauth.png gnutls-pgp.png	\
 	gnutls-client-server-use-case.png			\
 	gnutls-handshake-sequence.png gnutls-internals.png	\
 	gnutls-logo.png gnutls-objects.png gnutls-x509.png	\

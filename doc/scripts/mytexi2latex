@@ -200,6 +200,12 @@ multitable:
 			}
 		}
 
+		if ($line =~ s/\@subsubsection (.+)/\\subsubsection{$1}/g) {
+			if ($label ne '') {
+				$line .= "\\label{$label}\n";
+			}
+		}
+
                 if ($line =~ s/\@section (.+)/\\section{$1}/g) {
 			if ($label ne '') {
 				$line .= "\\label{$label}\n";

@@ -3,7 +3,7 @@ TEX_OBJECTS = gnutls.tex macros.tex fdl.tex cover.tex gnutls.bib
 GEN_TEX_OBJECTS = cha-preface.tex cha-library.tex cha-intro-tls.tex cha-auth.tex \
   cha-cert-auth.tex cha-gtls-app.tex cha-tls-app.tex cha-programs.tex cha-support.tex \
   cha-functions.tex error_codes.tex cha-ciphersuites.tex algorithms.tex \
-  cha-errors.tex alerts.tex
+  cha-errors.tex alerts.tex cha-internals.tex
 
 cha-preface.tex: ../cha-preface.texi
 	../scripts/mytexi2latex $< > $@
@@ -33,6 +33,9 @@ cha-support.tex: ../cha-support.texi
 	../scripts/mytexi2latex $< > $@
 
 cha-functions.tex: ../cha-functions.texi
+	../scripts/mytexi2latex $< > $@
+
+cha-internals.tex: ../cha-internals.texi
 	../scripts/mytexi2latex $< > $@
 
 cha-errors.tex: ../cha-errors.texi
