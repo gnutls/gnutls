@@ -77,7 +77,7 @@ structures@footnote{such as the
 such as certificates, usernames etc. to @code{auth_info_t} structures.
 
 @float Figure,fig:gnutls-mod-auth
-@image{gnutls-mod_auth_st,12cm}
+@image{gnutls-modauth,12cm}
 @caption{GnuTLS authentication method structure.}
 @end float
 
@@ -93,7 +93,7 @@ As with authentication methods, the TLS extensions handlers can be
 implemented using the interface shown in @ref{fig:gnutls-ext}.
 
 @float Figure,fig:gnutls-ext
-@image{gnutls-extensions_st,12cm}
+@image{gnutls-extensions,12cm}
 @caption{GnuTLS extensions structure.}
 @end float
 
@@ -114,9 +114,7 @@ follow if you wish to do this yourself.  For sake of discussion, let's
 consider adding support for the hypothetical TLS extension
 @code{foobar}.
 
-@enumerate
-
-@item Add @code{configure} option like @code{--enable-foobar} or @code{--disable-foobar}.
+@subsubsection Add @code{configure} option like @code{--enable-foobar} or @code{--disable-foobar}.
 
 This step is useful when the extension code is large and it might be desirable
 to disable the extension under some circumstances. Otherwise it can be safely
@@ -144,7 +142,7 @@ AM_CONDITIONAL(ENABLE_FOOBAR, test "$ac_enable_foobar" != "no")
 
 These lines should go in @code{lib/m4/hooks.m4}.
 
-@item Add IANA extension value to @code{extensions_t} in @code{gnutls_int.h}.
+@subsubsection Add IANA extension value to @code{extensions_t} in @code{gnutls_int.h}.
 
 A good name for the value would be GNUTLS_EXTENSION_FOOBAR.  Check
 with @url{http://www.iana.org/assignments/tls-extensiontype-values}
@@ -154,7 +152,7 @@ version since it will lead to interoperability problems in the future
 when the IANA allocates that number to someone else, or when the
 foobar protocol is allocated another number.
 
-@item Add an entry to @code{_gnutls_extensions} in @code{gnutls_extensions.c}.
+@subsubsection Add an entry to @code{_gnutls_extensions} in @code{gnutls_extensions.c}.
 
 A typical entry would be:
 
@@ -198,7 +196,7 @@ will be called to deinitialize the extension's private parameters, if any.
 Note that the conditional @code{ENABLE_FOOBAR} definition should only be 
 used if step 1 with the @code{configure} options has taken place.
 
-@item Add new files @code{ext_foobar.c} and @code{ext_foobar.h} that implement the extension.
+@subsubsection Add new files @code{ext_foobar.c} and @code{ext_foobar.h} that implement the extension.
 
 The functions you are responsible to add are those mentioned in the
 previous step.  As a starter, you could add this:
@@ -247,15 +245,15 @@ The @code{_foobar_unpack} function is responsible for
 restoring session data from the session storage.
 
 If you receive length fields that doesn't match, return
-@code{GNUTLS_E_UNEXPECTED_PACKET_LENGTH}.  If you receive invalid
-data, return @code{GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER}.  You can use
+@code{GNUTLS_E_\-UNEXPECTED_\-PACKET_\-LENGTH}.  If you receive invalid
+data, return @code{GNUTLS_E_\-RECEIVED_\-ILLEGAL_\-PARAMETER}.  You can use
 other error codes too.  Return 0 on success.
 
 The function could store some information in the @code{session}
 variable for later usage. That can be done using the functions 
-@code{_gnutls_ext_set_session_data} and
-@code{_gnutls_ext_get_session_data}. You can check simple examples
-at @code{ext_max_record.c} and @code{ext_server_name.c} extensions.
+@code{_gnutls_ext_\-set_session_\-data} and
+@code{_gnutls_ext_\-get_session_\-data}. You can check simple examples
+at @code{ext_\-max_\-record.c} and @code{ext_\-server_\-name.c} extensions.
 
 Recall that both the client and server both send and receives
 parameters, and your code most likely will need to do different things
@@ -299,7 +297,7 @@ HFILES += ext_foobar.h
 endif
 @end example
 
-@item Add API functions to enable/disable the extension.
+@subsubsection Add API functions to enable/disable the extension.
 
 Normally the client will have one API to request use of the extension,
 and setting some extension specific data.  The server will have one
@@ -307,26 +305,25 @@ API to let the library know that it is willing to accept the
 extension, often this is implemented through a callback but it doesn't
 have to.
 
-The APIs need to be added to @code{includes/gnutls/gnutls.h} or
-@code{includes/gnutls/extra.h} as appropriate.  It is recommended that
-if you don't have a requirement to use the LGPLv2.1+ license for your
+The APIs need to be added to @code{includes/\-gnutls/\-gnutls.h} or
+@code{includes/\-gnutls/\-extra.h} as appropriate.  It is recommended that
+if you don't have a requirement to use the LGPLv3+ license for your
 extension, that you place your work under the GPLv3+ license and thus
 in the libgnutls-extra library.
 
 You can implement the API function in the @code{ext_foobar.c} file, or
 if that file ends up becoming rather larger, add a
-@code{gnutls_foobar.c} file.
+@code{gnutls_\-foobar.c} file.
 
 To make the API available in the shared library you need to add the
-symbol in @code{lib/libgnutls.map} or
-@code{libextra/libgnutls-extra.map} as appropriate, so that the symbol
+symbol in @code{lib/\-libgnutls.map} or
+@code{libextra/\-libgnutls-\-extra.map} as appropriate, so that the symbol
 is exported properly.
 
 When writing GTK-DOC style documentation for your new APIs, don't
 forget to add @code{Since:} tags to indicate the GnuTLS version the
 API was introduced in.
 
-@end enumerate
 
 @node Certificate Handling
 @section Certificate Handling
@@ -358,17 +355,10 @@ The TLS layer uses a cryptographic provider layer, that will in turn either
 use the default crypto provider - a crypto library, or use an external
 crypto provider, if available.
 
-@subsection Cryptographic Library layer
-The Cryptographic Library layer, can  currently be used either with
-libgcrypt or libnettle, each of one has its advantages and some 
-disadvantages. Libgcrypt is a self-contained library, pretty broad 
-in scope that supports many algorithms. In some processors like VIA, 
-it will also use the available crypto instruction set hence providing
-performance benefit comparing to plain software implementation.
-Libnettle provides only software implementation
-of the basic algorithms required in TLS, and is on average 30% faster
-that libgcrypt on almost all algorithms. For
-this reason libnettle is library used by default in GnuTLS.
+@subsection Cryptographic library layer
+The Cryptographic library layer, currently supports only
+libnettle. Other cryptographic libraries might be supported
+in the future.
 
 @subsection External cryptography provider
 Systems that include a cryptographic co-processor, typically come with
@@ -403,10 +393,10 @@ following functions can be used to register those algorithms.
 
 @itemize
 
-@item @refint{gnutls_crypto_single_cipher_register}
+@item @code{gnutls_crypto_single_cipher_register}
 To register a cipher algorithm.
 
-@refint{gnutls_crypto_single_digest_register}
+@item @code{gnutls_crypto_single_digest_register}
 To register a hash (digest) or MAC algorithm.
 
 @end itemize
@@ -421,23 +411,22 @@ them. For this reason the following functions are provided.
 
 @itemize
 
-@item @refint{gnutls_crypto_cipher_register}
+@item @code{gnutls_crypto_cipher_register}
 To override the cryptographic algorithms backend.
 
-@item @refint{gnutls_crypto_digest_register}
+@item @code{gnutls_crypto_digest_register}
 To override the digest algorithms backend.
 
-@item @refint{gnutls_crypto_rnd_register}
+@item @code{gnutls_crypto_rnd_register}
 To override the random number generator backend.
 
-@item @refint{gnutls_crypto_bigint_register}
+@item @code{gnutls_crypto_bigint_register}
 To override the big number number operations backend.
 
-@item @refint{gnutls_crypto_pk_register}
+@item @code{gnutls_crypto_pk_register}
 To override the public key encryption backend. This is tight to the
 big number operations so either both of them should be updated or care
 must be taken to use the same format.
 
 @end itemize
 
-If all of them are used then GnuTLS will no longer use libgcrypt.

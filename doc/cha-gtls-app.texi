@@ -9,6 +9,7 @@
 * Server examples::
 * Miscellaneous examples::
 * Advanced and other topics::
+* Using the cryptographic library::
 @end menu
 
 @node Preparation
@@ -491,3 +492,56 @@ Current limitations imposed by the compatibility layer include:
 
 @end itemize
 
+@node Using the cryptographic library
+@section Using the cryptographic library
+
+@acronym{GnuTLS} is not a low-level cryptographic library, i.e., 
+it does not provide access to basic cryptographic primitives. However
+it abstracts the internal cryptographic backend (see @ref{Cryptographic Backend}),
+providing symmetric crypto, hash and HMAC algorithms, as well access
+to the random number generation.
+
+@menu
+* Symmetric cryptography::
+* Hash and HMAC functions::
+* Random number generation::
+@end menu
+
+@node Symmetric cryptography
+@subsection Symmetric cryptography
+@cindex Symmetric cryptography
+
+The available functions to access symmetric crypto algorithms operations
+are shown below. The supported algorithms are the algorithms required by the TLS protocol.
+They are listed in @ref{tab:ciphers}.
+
+@showfuncE{gnutls_cipher_init,gnutls_cipher_encrypt2,gnutls_cipher_decrypt2,gnutls_cipher_set_iv,gnutls_cipher_deinit}
+
+In order to support authenticated encryption with associated data (AEAD) algoritms the following
+functions are provided to set the associated data and retrieve the authentication tag.
+
+@showfuncB{gnutls_cipher_add_auth,gnutls_cipher_tag}
+
+@node Hash and HMAC functions
+@subsection Hash and HMAC functions
+@cindex Hash functions
+@cindex HMAC functions
+
+The available operations to access hash functions and hash-MAC (HMAC) algorithms
+are shown below. HMAC algorithms provided keyed hash functionality. They supported HMAC algorithms are listed in @ref{tab:macs}.
+
+@showfuncF{gnutls_hmac_init,gnutls_hmac,gnutls_hmac_output,gnutls_hmac_deinit,gnutls_hmac_get_len,gnutls_hmac_fast}
+
+The available functions to access hash functions are shown below. The supported hash functions
+are the same as the HMAC algorithms.
+
+@showfuncF{gnutls_hash_init,gnutls_hash,gnutls_hash_output,gnutls_hash_deinit,gnutls_hash_get_len,gnutls_hash_fast}
+
+@node Random number generation
+@subsection Random number generation
+@cindex Random numbers
+
+Access to the random number generator is provided using the @funcref{gnutls_rnd}
+function.
+
+@showfuncdesc{gnutls_rnd}
