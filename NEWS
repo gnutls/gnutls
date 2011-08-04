@@ -5,12 +5,13 @@ See the end for copying conditions.
 
 * Version 2.12.8 (unreleased)
 
-** libgnutls: PKCS #11 back-end rewritten to use p11-kit
-http://p11-glue.freedesktop.org/p11-kit.html. Rewrite by
-Stef Walter.
+** libgnutls: PKCS #11 back-end was replaced by p11-kit
+http://p11-glue.freedesktop.org/p11-kit.html. This backports
+the 3.0.0 PKCS #11 back-end. Rewrite by Stef Walter.
 
 ** libgnutls: gcrypt: replaced occurences of gcry_sexp_nth_mpi (..., 0)
 with gcry_sexp_nth_mpi (..., GCRYMPI_FMT_USG) to fix errors with 1.5.0.
+Patch by Andreas Metzler.
 
 ** libgnutls: Verify that a certificate liste specified
 using gnutls_certificate_set_x509_key*(), is sorted
