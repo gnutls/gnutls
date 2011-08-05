@@ -592,10 +592,10 @@ call_get_cert_callback (gnutls_session_t session,
               goto cleanup;
             }
         }
-      break;
 #endif
-#ifdef ENABLE_PKCS11
+      break;
     case GNUTLS_PRIVKEY_PKCS11:
+#ifdef ENABLE_PKCS11
       if (st2.key.pkcs11 != NULL)
         {
           local_key =
@@ -607,8 +607,8 @@ call_get_cert_callback (gnutls_session_t session,
               goto cleanup;
             }
         }
-      break;
 #endif
+      break;
     case GNUTLS_PRIVKEY_X509:
       if (st2.key.x509 != NULL)
         {
