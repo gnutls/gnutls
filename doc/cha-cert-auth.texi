@@ -341,14 +341,13 @@ shared cryptographic keys and certificates in a uniform way, as in the following
 @image{pkcs11-vision}
 
 @subsection Initialization
-To allow all the  @acronym{GnuTLS} applications to access @acronym{PKCS #11} tokens
-it is adviceable to use @code{/etc/gnutls/pkcs11.conf}. This file has the following
-format:
+To allow all the  @acronym{GnuTLS} applications to access @acronym{PKCS} #11 tokens
+you can use a configuration per module, such as @code{/etc/pkcs11/modules/mymodule.conf}. 
+This file has the following format:
 
-@verbatim
-load=/usr/lib/opensc-pkcs11.so
-load=/usr/lib/gnome-keyring/gnome-keyring-pkcs11.so
-@end verbatim
+@smallexample
+module: /usr/lib/opensc-pkcs11.so
+@end smallexample
 
 If you use this file, then there is no need for other initialization in
 @acronym{GnuTLS}, except for the PIN and token functions. Those allow retrieving a PIN
