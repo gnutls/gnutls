@@ -178,10 +178,26 @@ pkcs11_rescan_slots (void)
 static int
 pkcs11_add_module (const char *name, struct ck_function_list *module)
 {
+  struct ck_info info;
+  int i;
+
   if (active_providers >= MAX_PROVIDERS)
     {
       gnutls_assert ();
       return GNUTLS_E_CONSTRAINT_ERROR;
+    }
+
+  /* initially check if this module is a duplicate */
+  memset(&info, 0, sizeof(info));
+  pkcs11_get_module_info (module, &info);
+  for (i=0;i<active_providers;i++)
+    {
+      /* already loaded, skip the rest */
+      if (memcmp(&info, &providers[i].info, sizeof(info)) == 0)
+        {
+          _gnutls_debug_log("%s is already loaded.\n", name);
+          return 0;
+        }
     }
 
   active_providers++;
@@ -215,10 +231,7 @@ pkcs11_add_module (const char *name, struct ck_function_list *module)
       goto fail;
     }
 
-  memset (&providers[active_providers - 1].info, 0,
-          sizeof (providers[active_providers - 1].info));
-  pkcs11_get_module_info (providers[active_providers - 1].module,
-                          &providers[active_providers - 1].info);
+  memcpy (&providers[active_providers - 1].info, &info, sizeof(info));
 
   _gnutls_debug_log ("p11: loaded provider '%s' with %d slots\n",
                      name, (int) providers[active_providers - 1].nslots);
