@@ -7,7 +7,6 @@ x509/        -> Implementation of GnuTLS X.509 certificate support (and more)
 openpgp/     -> Implementation of GnuTLS openpgp support
 opencdk/     -> Implementation of low level openpgp packet parsing
 minitasn1    -> ASN.1 structure parsing library
-pakchois/    -> PKCS #11 wrapper library
 
 Crypto backends:
 nettle/ ->   -> The nettle crypto back-end
