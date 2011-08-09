@@ -7,7 +7,7 @@ See the end for copying conditions.
 ** libgnutls: The config file at gnutls_pkcs11_init()
 is being read if provided.
 
-** libgnutls: Verify that a certificate liste specified
+** libgnutls: Verify that a certificate list specified
 using gnutls_certificate_set_x509_key*(), is sorted
 according to TLS specification (from subject to issuer).
 
