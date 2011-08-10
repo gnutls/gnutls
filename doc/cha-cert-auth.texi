@@ -28,11 +28,11 @@ certificates as well, following a hierarchical model.
 One needs to trust one or more CAs for his secure communications. In
 that case only the certificates issued by the trusted authorities are
 acceptable.  The framework is illustrated on @ref{fig:x509}.
-Detailed examples involving X.509 certificates are listed below.
 
 @menu
 * X.509 certificates::
 * Verifying X.509 certificate paths::
+* Verifying a certificate in the context of TLS session::
 * Certificate requests::
 * PKCS 12 structures::
 @end menu
@@ -141,7 +141,6 @@ demonstrate the @acronym{X.509} parsing capabilities can be found at
 @node Verifying X.509 certificate paths
 @subsection Verifying @acronym{X.509} certificate paths
 @cindex Verifying certificate paths
-@tindex gnutls_certificate_verify_flags
 
 Verifying certificate paths is important in @acronym{X.509}
 authentication. For this purpose the following functions are
@@ -158,11 +157,17 @@ provided.
 The verification function will verify a given certificate chain against a list of certificate
 authorities and certificate revocation lists, and output
 a bit-wise OR of elements of the @code{gnutls_certificate_status_t} 
-enumeration. It is also possible to have a set of certificates that
-are trusted for a particular server but not to authorize other certificates.
-This purpose is served by the functions @funcref{gnutls_x509_trust_list_add_named_crt} and @funcref{gnutls_x509_trust_list_verify_named_crt}.
+enumeration. 
 A detailed description of these elements can be found 
 in @ref{tab:cert-verify}. An example of certificate verification is shown in @ref{ex:verify2}.
+It is also possible to have a set of certificates that
+are trusted for a particular server but not to authorize other certificates.
+This purpose is served by the functions @funcref{gnutls_x509_trust_list_add_named_crt} and @funcref{gnutls_x509_trust_list_verify_named_crt}.
+
+@node Verifying a certificate in the context of TLS session
+@subsection Verifying a certificate in the context of TLS session
+@cindex Verifying certificate paths
+@tindex gnutls_certificate_verify_flags
 
 When operating in the context of a TLS session, the trusted certificate
 authority list has been set via the
@@ -201,7 +206,7 @@ MD5.  These algorithms have been broken and should not be trusted.
 @caption{Certificate verification output flags.}
 @end float
 
-There is also to possibility to pass some input to the verification
+There is also the possibility to pass some input to the verification
 functions in the form of flags. For @funcref{gnutls_x509_trust_list_verify_crt} the
 flags are passed straightforward, but
 @funcref{gnutls_certificate_verify_peers2} depends on the flags set by
@@ -270,7 +275,7 @@ A certificate request is a structure, which contain information about
 an applicant of a certificate service.  It usually contains a private
 key, a distinguished name and secondary data such as a challenge
 password. @acronym{GnuTLS} supports the requests defined in
-@acronym{PKCS} #10 @xcite{RFC2986}. Other certificate request's format
+@acronym{PKCS} #10 @xcite{RFC2986}. Other formats of certificate requests
 are not currently supported.
 
 The following example is about generating a certificate request, and a
@@ -290,9 +295,9 @@ export and import the user's identities.
 
 In @acronym{GnuTLS} the @acronym{PKCS} #12 structures are handled
 using the @code{gnutls_pkcs12_t} type. This is an abstract type that
-may hold several @code{gnutls_pkcs12_bag_t} types.  The Bag types are
+may hold several @code{gnutls_pkcs12_bag_t} types.  The bag types are
 the holders of the actual data, which may be certificates, private
-keys or encrypted data.  An Bag of type encrypted should be decrypted
+keys or encrypted data.  A bag of type encrypted should be decrypted
 in order for its data to be accessed.
 
 An example of a @acronym{PKCS} #12 structure generation can be found
@@ -340,7 +345,7 @@ and the corresponding private keys with the
 @code{gnutls_openpgp_privkey_t} type. All the prototypes for the key
 handling functions can be found at @file{gnutls/openpgp.h}.
 
-@subsection Verifying an @acronym{OpenPGP} key
+@subsection Verifying an @acronym{OpenPGP} certificate
 
 The verification functions of @acronym{OpenPGP} keys, included in
 @acronym{GnuTLS}, are simple ones, and do not use the features of the
@@ -349,14 +354,18 @@ complex, the assistance of external tools like @acronym{GnuPG} and
 GPGME@footnote{@url{http://www.gnupg.org/related_software/gpgme/}} is
 recommended.
 
-There is one verification function in @acronym{GnuTLS}, the
-@funcref{gnutls_openpgp_crt_verify_ring}.  This checks an
+In GnuTLS there is a verification function for OpenPGP certificates,
+the @funcref{gnutls_openpgp_crt_verify_ring}.  This checks an
 @acronym{OpenPGP} key against a given set of public keys (keyring) and
 returns the key status. The key verification status is the same as in
 @acronym{X.509} certificates, although the meaning and interpretation
 are different. For example an @acronym{OpenPGP} key may be valid, if
 the self signature is ok, even if no signers were found.  The meaning
 of verification status is shown in the figure below.
+
+@showfuncdesc{gnutls_openpgp_crt_verify_ring}
+
+@showfuncdesc{gnutls_openpgp_crt_verify_self}
 
 @table @code
 
@@ -375,6 +384,15 @@ The certificate was signed using an insecure algorithm such as MD2 or
 MD5.  These algorithms have been broken and should not be trusted.
 
 @end table
+
+@subsection Verifying a certificate in the context of a TLS session
+
+Similarly with X.509 certificates, one needs to specify
+the OpenPGP keyring file in the credentials structure. The certificates
+in this file will be  used by @funcref{gnutls_certificate_verify_peers2}
+to verify the signatures in the certificate sent by the peer.
+
+@showfuncdesc{gnutls_certificate_set_openpgp_keyring_file}
 
 
 @node Hardware tokens
@@ -433,16 +451,16 @@ All @acronym{PKCS} #11 objects are referenced by @acronym{GnuTLS} functions by
 URLs as described in @code{draft-pechanec-pkcs11uri-03}. For example a public
 key on a smart card may be referenced as:
 
-@example
+@smallexample
 pkcs11:token=Nikos;serial=307521161601031;model=PKCS%2315; \
 manufacturer=EnterSafe;object=test1;objecttype=public;\
 id=32f153f3e37990b08624141077ca5dec2d15faed
-@end example
+@end smallexample
 
 while the smart card itself can be referenced as:
-@example
+@smallexample
 pkcs11:token=Nikos;serial=307521161601031;model=PKCS%2315;manufacturer=EnterSafe
-@end example
+@end smallexample
 
 
 @acronym{PKCS} #11 objects can be accessed with the functions shown below.
@@ -511,7 +529,7 @@ to a token. This can be achieved with the following functions
 It is possible to use a @acronym{PKCS} #11 token to a TLS
 session, as shown in @ref{ex:pkcs11-client}. In addition
 the following functions can be used to load PKCS #11 key and
-certificates.
+certificates, by specifying a PKCS #11 URL instead of a filename.
 
 @showfuncB{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_key_file}
 
