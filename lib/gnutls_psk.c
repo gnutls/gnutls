@@ -58,7 +58,8 @@ gnutls_psk_free_client_credentials (gnutls_psk_client_credentials_t sc)
  * This structure is complex enough to manipulate directly thus this
  * helper function is provided in order to allocate it.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
  **/
 int
 gnutls_psk_allocate_client_credentials (gnutls_psk_client_credentials_t * sc)
@@ -86,7 +87,8 @@ gnutls_psk_allocate_client_credentials (gnutls_psk_client_credentials_t * sc)
  * key can be either in raw byte format or in Hex format (without the
  * 0x prefix).
  *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
  **/
 int
 gnutls_psk_set_client_credentials (gnutls_psk_client_credentials_t res,
@@ -166,7 +168,8 @@ gnutls_psk_free_server_credentials (gnutls_psk_server_credentials_t sc)
  * This structure is complex enough to manipulate directly thus this
  * helper function is provided in order to allocate it.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
  **/
 int
 gnutls_psk_allocate_server_credentials (gnutls_psk_server_credentials_t * sc)
@@ -189,7 +192,8 @@ gnutls_psk_allocate_server_credentials (gnutls_psk_server_credentials_t * sc)
  * %gnutls_psk_server_credentials_t structure.  This password file
  * holds usernames and keys and will be used for PSK authentication.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
  **/
 int
 gnutls_psk_set_server_credentials_file (gnutls_psk_server_credentials_t
@@ -229,7 +233,8 @@ gnutls_psk_set_server_credentials_file (gnutls_psk_server_credentials_t
  * the client to help it chose a good PSK credential (i.e., username
  * and password).
  *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
  *
  * Since: 2.4.0
  **/

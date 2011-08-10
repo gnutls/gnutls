@@ -21,10 +21,13 @@ are:
 The rule for each method is to allocate a credentials
 structure containing data required for authentication and
 associate that structure with the session using
-@funcref{gnutls_credentials_set}. In the next paragraphs
+@funcref{gnutls_credentials_set}. Various authentication methods might
+require additional data to be stored in the credential structures,
+such as ephemeral Diffie-Hellman parameters etc.
+In the next paragraphs
 we elaborate on supported authentication methods.
 
-@showfuncA{gnutls_credentials_set}
+@showfuncdesc{gnutls_credentials_set}
 
 @menu
 * Certificate authentication::
@@ -32,7 +35,6 @@ we elaborate on supported authentication methods.
 * Authentication using SRP::
 * Authentication using PSK::
 * Authentication and credentials::
-* Parameters stored in credentials::
 @end menu
 
 @node Certificate authentication
@@ -63,15 +65,18 @@ For a more detailed introduction to @acronym{OpenPGP} and @acronym{GnuPG} see @x
 In @acronym{GnuTLS} both the @acronym{OpenPGP} and @acronym{X.509}
 certificates are part of the certificate authentication and thus are
 handled using a common API.
-
 When using certificates the server is required to have at least one
 certificate and private key pair. A client may or may not have such a
-pair. The certificate and key pair should be loaded, before any
-@acronym{TLS} session is initialized, in a certificate credentials
-structure. This should be done by using
-@funcref{gnutls_certificate_set_x509_key_file} or
-@funcref{gnutls_certificate_set_openpgp_key_file} depending on the
-certificate type.  In the @acronym{X.509} case, the functions will
+pair. 
+
+@showfuncB{gnutls_certificate_allocate_credentials,gnutls_certificate_free_credentials}
+
+After the credentials structures are initialized using the functions
+above, the certificate and key pair should be loaded. This should
+occur before any @acronym{TLS} session is initialized.
+Depending on the certificate type different loading functions
+are available, and are shown below.
+In the @acronym{X.509} case, the functions will
 also accept and use a certificate list that leads to a trusted
 authority. The certificate list must be ordered in such way that every
 certificate certifies the one before it. The trusted authority's
@@ -82,23 +87,24 @@ already.
 
 @showfuncdesc{gnutls_certificate_set_x509_key_file}
 
-@showfuncdesc{gnutls_certificate_set_retrieve_function}
-
-As an alternative, a callback may be used so the server or the client
-specifies the certificate and the key at the handshake time
-using @funcref{gnutls_certificate_set_retrieve_function}. 
+As an alternative to loading from files, a callback may be used so that the 
+server or the client can specify the certificate and the key at the handshake time.
 In that case a certificate should be selected according the peer's signature
 algorithm preferences. To get those preferences use
-@funcref{gnutls_sign_algorithm_get_requested}.
+@funcref{gnutls_sign_algorithm_get_requested}. Both functions are shown below.
 
-@showfuncA{gnutls_sign_algorithm_get_requested}
+@showfuncdesc{gnutls_certificate_set_retrieve_function}
+
+@showfuncdesc{gnutls_sign_algorithm_get_requested}
 
 
 Certificate verification is possible by loading the trusted
 authorities into the credentials structure by using
-@funcref{gnutls_certificate_set_x509_trust_file} or
-@funcref{gnutls_certificate_set_openpgp_keyring_file} for openpgp
-keys. Note however that the peer's certificate is not automatically
+the following functions, applicable to X.509 and OpenPGP certificates.
+
+@showfuncB{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_openpgp_keyring_file}
+
+Note however that the peer's certificate is not automatically
 verified, you should call @funcref{gnutls_certificate_verify_peers2},
 after a successful handshake or during if @funcref{gnutls_certificate_set_verify_function}
 has been used, to verify the certificate's signature.
@@ -109,29 +115,26 @@ functions discussed in @ref{The X.509 trust model}.
 
 @showfuncdesc{gnutls_certificate_verify_peers2}
 
-In a handshake, the negotiated cipher suite depends on the
-certificate's parameters, so not all key exchange methods will be
+In a handshake, the negotiated cipher suite also depends on the
+certificate's parameters, so some key exchange methods might not be
 available with some certificates. @acronym{GnuTLS} will disable
 ciphersuites that are not compatible with the key, or the enabled
 authentication methods.  For example keys marked as sign-only, will
-not be able to access the plain RSA ciphersuites, but only the
-@code{DHE_RSA} ones. It is recommended not to use RSA keys for both
-signing and encryption. If possible use the same key for the
-@code{DHE_RSA} and @code{RSA_EXPORT} ciphersuites, which use signing,
-and a different key for the plain RSA ciphersuites, which use
-encryption.  All the key exchange methods shown below are available in
-certificate authentication.
+not be able to access the plain RSA ciphersuites, that require
+decryption. It is not recommended to use RSA keys for both
+signing and encryption. If possible use a different key for the
+@code{DHE_RSA} which uses signing and @code{RSA} that requires decryption.
+All the key exchange methods shown in @ref{tab:key-exchange} are
+available in certificate authentication.
 
 @showfuncdesc{gnutls_certificate_set_verify_function}
 
 Note that the DHE key exchange methods are generally
 slower@footnote{It really depends on the group used.  Primes with
 lesser bits are always faster, but also easier to break.  See @ref{Selecting cryptographic key sizes}
-for the acceptable security levels.} than plain RSA and require Diffie
-Hellman parameters to be generated and associated with a credentials
-structure, by the server. For more information check the @ref{Parameter generation}
-section. The key exchange algorithms for @acronym{OpenPGP} and @acronym{X.509}
-certificates are shown in @ref{tab:key-exchange}.
+for the acceptable security levels.} 
+and require Diffie-Hellman parameters to be generated and associated with a credentials
+structure, by the server (see @ref{Parameter generation}).
 
 @float Table,tab:key-exchange
 @multitable @columnfractions .3 .7
@@ -196,7 +199,12 @@ require Diffie-Hellman parameters to be generated by the server and
 associated with an anonymous credentials structure. Check
 @ref{Parameter generation} for more information.
 
-Supported anonymous key exchange algorithms:
+The initialization functions for the credentials are shown below.
+
+@showfuncD{gnutls_anon_allocate_server_credentials,gnutls_anon_allocate_client_credentials,gnutls_anon_free_server_credentials,gnutls_anon_free_client_credentials}
+
+
+The supported anonymous key exchange algorithms are:
 
 @table @code
 
@@ -214,7 +222,7 @@ efficient than ANON_DH on equivalent security levels.
 @cindex @acronym{SRP} authentication
 
 Authentication via the Secure Remote Password protocol,
-@acronym{SRP}@footnote{@acronym{SRP} is described in @xcite{RFC2945}},
+@acronym{SRP} (see @xcite{RFC2945} for a description of SRP),
 is supported.  The @acronym{SRP} key exchange is an extension to the
 @acronym{TLS} protocol, and it is a password based authentication
 (unlike @acronym{X.509} or @acronym{OpenPGP} that use certificates).
@@ -237,8 +245,8 @@ the system's users passwords with the @acronym{SRP} password
 files. That way @acronym{SRP} authentication could be used for all the
 system's users.
 
-The implementation in @acronym{GnuTLS} is based on @xcite{TLSSRP}.  
-The supported @acronym{SRP} key exchange methods are:
+The implementation in @acronym{GnuTLS} is based on @xcite{TLSSRP} and
+the supported @acronym{SRP} key exchange methods are:
 
 @table @code
 
@@ -255,29 +263,34 @@ authenticated using a certificate with RSA parameters.
 
 @end table
 
-If clients supporting @acronym{SRP} know the username and password
-before the connection, should initialize client credentials and
-call @funcref{gnutls_srp_set_client_credentials}.
-Alternatively @funcref{gnutls_srp_set_client_credentials_function}
-may be used to specify a callback function.
-The callback will be called once during the @acronym{TLS} handshake.
+The initialization functions in SRP credentials differ between
+client and server.
 
-@showfuncB{gnutls_srp_set_client_credentials,gnutls_srp_set_client_credentials_function}
+@showfuncD{gnutls_srp_allocate_server_credentials,gnutls_srp_allocate_client_credentials,gnutls_srp_free_server_credentials,gnutls_srp_free_client_credentials}
+
+Clients supporting @acronym{SRP} should set the username and password
+prior to connection, to the credentials structure.
+Alternatively @funcref{gnutls_srp_set_client_credentials_function}
+may be used instead, to specify a callback function that should return the
+SRP username and password.
+The callback is called once during the @acronym{TLS} handshake.
+
+@showfuncA{gnutls_srp_set_client_credentials}
+
+@showfuncdesc{gnutls_srp_set_client_credentials_function}
 
 In server side the default behavior of @acronym{GnuTLS} is to read
 the usernames and @acronym{SRP} verifiers from password files. These
-password files are the ones used by the @emph{Stanford srp libraries}
-and @funcref{gnutls_srp_set_server_credentials_file} can be used to
-specify them. If a different
-password file format is to be used, then 
+password file format is compatible the with the @emph{Stanford srp libraries}
+format.  If a different password file format is to be used, then 
 @funcref{gnutls_srp_set_server_credentials_function} should be called,
-to set an appropriate callback.
+to set an appropriate callback. 
 
 @showfuncdesc{gnutls_srp_set_server_credentials_file}
 
 @showfuncdesc{gnutls_srp_set_server_credentials_function}
 
-Helper functions are included in @acronym{GnuTLS}, and can be used to generate and
+Other helper functions are included in @acronym{GnuTLS}, used to generate and
 maintain @acronym{SRP} verifiers and password files.  A program to
 manipulate the required parameters for @acronym{SRP} authentication is
 also included.  See @ref{srptool}, for more information.
@@ -314,15 +327,21 @@ exchange.  This method offers perfect forward secrecy.
 
 @end table
 
+The initialization functions in PSK credentials differ between
+client and server.
+
+@showfuncD{gnutls_psk_allocate_server_credentials,gnutls_psk_allocate_client_credentials,gnutls_psk_free_server_credentials,gnutls_psk_free_client_credentials}
+
 Clients supporting @acronym{PSK} should supply the username and key
-before the TLS session is established by calling 
-@funcref{gnutls_psk_set_client_credentials}.  Alternatively 
+before a TLS session is established.  Alternatively 
 @funcref{gnutls_psk_set_client_credentials_function} can be used to
 specify a callback function. This has the
 advantage that the callback will be called only if @acronym{PSK} has
 been negotiated.
 
-@showfuncB{gnutls_psk_set_client_credentials,gnutls_psk_set_client_credentials_function}
+@showfuncA{gnutls_psk_set_client_credentials}
+
+@showfuncdesc{gnutls_psk_set_client_credentials_function}
 
 In server side the default behavior of @acronym{GnuTLS} is to read
 the usernames and @acronym{PSK} keys from a password file. The
@@ -356,9 +375,11 @@ maintain @acronym{PSK} keys.
 @section Authentication and credentials
 
 In @acronym{GnuTLS} every key exchange method is associated with a
-credentials type. So in order to enable to enable a specific method,
+credentials type. For a key exchange method to be available it
+must be listed as a priority string (see @ref{Priority Strings}) and
 the corresponding credentials type should be initialized and set using
-@funcref{gnutls_credentials_set}.  A mapping is shown in @ref{tab:key-exchange-cred}.
+@funcref{gnutls_credentials_set}.  A mapping of the key exchange methods
+with the credential types is shown in @ref{tab:key-exchange-cred}.
 
 @float Table,tab:key-exchange-cred
 @multitable @columnfractions .4 .25 .25
@@ -396,61 +417,3 @@ the corresponding credentials type should be initialized and set using
 @caption{Key exchange algorithms and the corresponding credential types.}
 @end float
 
-@node Parameters stored in credentials
-@section Parameters stored in credentials
-
-Several parameters such as the ones used for Diffie-Hellman
-authentication are stored within the credentials structures, so all
-sessions can access them. Those parameters are stored in structures
-such as @code{gnutls_dh_params_t} and @code{gnutls_rsa_params_t}, and
-functions like @funcref{gnutls_certificate_set_dh_params} and
-@funcref{gnutls_certificate_set_rsa_export_params} can be used to
-associate those parameters with the given credentials structure.
-
-Since those parameters need to be renewed from time to time and a
-global structure such as the credentials, may not be easy to modify
-since it is accessible by all sessions, an alternative interface is
-available using a callback function.  This can be set using the
-@funcref{gnutls_certificate_set_params_function}.  An example is shown
-below.
-
-@example
-#include <gnutls.h>
-
-gnutls_rsa_params_t rsa_params;
-gnutls_dh_params_t dh_params;
-
-/* This function will be called once a session requests DH
- * or RSA parameters. The parameters returned (if any) will
- * be used for the first handshake only.
- */
-static int get_params( gnutls_session_t session,
-        gnutls_params_type_t type,
-        gnutls_params_st *st)
-@{
-   if (type == GNUTLS_PARAMS_RSA_EXPORT)
-      st->params.rsa_export = rsa_params;
-   else if (type == GNUTLS_PARAMS_DH)
-      st->params.dh = dh_params;
-   else return -1;
-
-   st->type = type;
-   /* do not deinitialize those parameters.
-    */
-   st->deinit = 0;
-
-   return 0;
-@}
-
-int main()
-@{
-   gnutls_certificate_credentials_t cert_cred;
-
-   initialize_params();
-
-   /* ...
-    */
-
-   gnutls_certificate_set_params_function( cert_cred, get_params);
-@}
-@end example
