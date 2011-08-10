@@ -1347,7 +1347,7 @@ cleanup:
 
 /**
  * gnutls_certificate_set_x509_trust_file:
- * @res: is a #gnutls_certificate_credentials_t structure.
+ * @cred: is a #gnutls_certificate_credentials_t structure.
  * @cafile: is a file containing the list of trusted CAs (DER or PEM list)
  * @type: is PEM or DER
  *
@@ -1368,7 +1368,7 @@ cleanup:
  * error.
  **/
 int
-gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t res,
+gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t cred,
                                         const char *cafile,
                                         gnutls_x509_crt_fmt_t type)
 {
@@ -1379,7 +1379,7 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t res,
 #ifdef ENABLE_PKCS11
   if (strncmp (cafile, "pkcs11:", 7) == 0)
     {
-      return read_cas_url (res, cafile);
+      return read_cas_url (cred, cafile);
     }
 #endif
 
@@ -1391,9 +1391,9 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t res,
     }
 
   if (type == GNUTLS_X509_FMT_DER)
-    ret = parse_der_ca_mem (res, data, size);
+    ret = parse_der_ca_mem (cred, data, size);
   else
-    ret = parse_pem_ca_mem (res, data, size);
+    ret = parse_pem_ca_mem (cred, data, size);
 
   free (data);
 

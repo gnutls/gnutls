@@ -499,7 +499,7 @@ gnutls_openpgp_count_key_names (const gnutls_datum_t * cert)
 
 /**
  * gnutls_certificate_set_openpgp_keyring_file:
- * @c: A certificate credentials structure
+ * @cred: A certificate credentials structure
  * @file: filename of the keyring.
  * @format: format of keyring.
  *
@@ -513,14 +513,14 @@ gnutls_openpgp_count_key_names (const gnutls_datum_t * cert)
  **/
 int
 gnutls_certificate_set_openpgp_keyring_file (gnutls_certificate_credentials_t
-                                             c, const char *file,
+                                             cred, const char *file,
                                              gnutls_openpgp_crt_fmt_t format)
 {
   gnutls_datum_t ring;
   size_t size;
   int rc;
 
-  if (!c || !file)
+  if (!cred || !file)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -535,7 +535,7 @@ gnutls_certificate_set_openpgp_keyring_file (gnutls_certificate_credentials_t
     }
 
   rc =
-    gnutls_certificate_set_openpgp_keyring_mem (c, ring.data, ring.size,
+    gnutls_certificate_set_openpgp_keyring_mem (cred, ring.data, ring.size,
                                                 format);
 
   free (ring.data);
