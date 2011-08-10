@@ -2608,6 +2608,7 @@ find_flags (struct ck_function_list * module, ck_session_handle_t pks,
  * @flags: The output flags (GNUTLS_PKCS11_TOKEN_*)
  *
  * This function will return information about the PKCS 11 token flags.
+ * The flags from the %gnutls_pkcs11_token_info_t enumeration.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
  *
