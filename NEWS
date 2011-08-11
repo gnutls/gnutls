@@ -4,6 +4,8 @@ See the end for copying conditions.
 
 * Version 3.0.1 (unreleased)
 
+** libgnutls: fixed alignment issue in AES-NI code.
+
 ** libgnutls: The config file at gnutls_pkcs11_init()
 is being read if provided.
 
