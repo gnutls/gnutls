@@ -40,6 +40,9 @@ struct aes_ctx
   uint8_t iv[16];
 };
 
+#define ALIGN16(x) \
+        ((void *)(((unsigned long)(x)+0x0f)&~(0x0f)))
+
 static int
 aes_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx)
 {
@@ -69,11 +72,11 @@ aes_cipher_setkey (void *_ctx, const void *userkey, size_t keysize)
   struct aes_ctx *ctx = _ctx;
   int ret;
 
-  ret = aesni_set_encrypt_key (userkey, keysize * 8, &ctx->expanded_key);
+  ret = aesni_set_encrypt_key (userkey, keysize * 8, ALIGN16(&ctx->expanded_key));
   if (ret != 0)
     return gnutls_assert_val (GNUTLS_E_ENCRYPTION_FAILED);
 
-  ret = aesni_set_decrypt_key (userkey, keysize * 8, &ctx->expanded_key_dec);
+  ret = aesni_set_decrypt_key (userkey, keysize * 8, ALIGN16(&ctx->expanded_key_dec));
   if (ret != 0)
     return gnutls_assert_val (GNUTLS_E_ENCRYPTION_FAILED);
 
@@ -95,7 +98,7 @@ aes_encrypt (void *_ctx, const void *src, size_t src_size,
 {
   struct aes_ctx *ctx = _ctx;
 
-  aesni_cbc_encrypt (src, dst, src_size, &ctx->expanded_key, ctx->iv, 1);
+  aesni_cbc_encrypt (src, dst, src_size, ALIGN16(&ctx->expanded_key), ctx->iv, 1);
   return 0;
 }
 
@@ -105,7 +108,7 @@ aes_decrypt (void *_ctx, const void *src, size_t src_size,
 {
   struct aes_ctx *ctx = _ctx;
 
-  aesni_cbc_encrypt (src, dst, src_size, &ctx->expanded_key_dec, ctx->iv, 0);
+  aesni_cbc_encrypt (src, dst, src_size, ALIGN16(&ctx->expanded_key_dec), ctx->iv, 0);
 
   return 0;
 }
