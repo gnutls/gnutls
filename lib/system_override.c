@@ -70,11 +70,11 @@ gnutls_transport_set_errno (gnutls_session_t session, int err)
  *
  * This is the function where you set a function for gnutls to receive
  * data.  Normally, if you use berkeley style sockets, do not need to
- * use this function since the default (recv(2)) will probably be ok.
+ * use this function since the default recv(2) will probably be ok.
  * The callback should return 0 on connection termination, a positive
  * number indicating the number of bytes received, and -1 on error.
  *
- * gnutls_pull_func is of the form,
+ * @gnutls_pull_func is of the form,
  * ssize_t (*gnutls_pull_func)(gnutls_transport_ptr_t, void*, size_t);
  **/
 void
@@ -99,7 +99,7 @@ gnutls_transport_set_pull_function (gnutls_session_t session,
  *
  * The callback function is used in DTLS only.
  *
- * gnutls_pull_timeout_func is of the form,
+ * @gnutls_pull_timeout_func is of the form,
  * ssize_t (*gnutls_pull_timeout_func)(gnutls_transport_ptr_t, void*data, size_t size, unsigned int ms);
  *
  * Since: 3.0.0
@@ -119,12 +119,12 @@ gnutls_transport_set_pull_timeout_function (gnutls_session_t session,
  * This is the function where you set a push function for gnutls to
  * use in order to send data.  If you are going to use berkeley style
  * sockets, you do not need to use this function since the default
- * (send(2)) will probably be ok.  Otherwise you should specify this
+ * send(2) will probably be ok.  Otherwise you should specify this
  * function for gnutls to be able to send data.
  * The callback should return a positive number indicating the
  * bytes sent, and -1 on error.
  *
- * push_func is of the form,
+ * @push_func is of the form,
  * ssize_t (*gnutls_push_func)(gnutls_transport_ptr_t, const void*, size_t);
  *
  **/
@@ -141,13 +141,12 @@ gnutls_transport_set_push_function (gnutls_session_t session,
  * @session: is a #gnutls_session_t structure.
  * @vec_func: a callback function similar to writev()
  *
- * This is the function where you set a push function for gnutls to
- * use in order to send data.  If you are going to use berkeley style
- * sockets, you do not need to use this function since the default
- * (send(2)) will probably be ok.  Otherwise you should specify this
- * function for gnutls to be able to send data.
+ * Using this function you can override the default writev(2)
+ * function for gnutls to send data. Setting this callback 
+ * instead of gnutls_transport_set_push_function() is recommended
+ * since it introduces less overhead in the TLS handshake process.
  *
- * vec_func is of the form,
+ * @vec_func is of the form,
  * ssize_t (*gnutls_vec_push_func) (gnutls_transport_ptr_t, const giovec_t * iov, int iovcnt);
  *
  * Since: 2.12.0
@@ -168,7 +167,7 @@ gnutls_transport_set_vec_push_function (gnutls_session_t session,
  * This is the function where you set a function to retrieve errno
  * after a failed push or pull operation.
  *
- * errno_func is of the form,
+ * @errno_func is of the form,
  * int (*gnutls_errno_func)(gnutls_transport_ptr_t);
  * and should return the errno.
  *

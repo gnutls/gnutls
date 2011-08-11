@@ -5,6 +5,8 @@
 
 @menu
 * Preparation::
+* Session initialization::
+* Priority Strings::
 * Client examples::
 * Server examples::
 * Miscellaneous examples::
@@ -23,7 +25,6 @@ the following subsections.
 * Headers::
 * Initialization::
 * Version check::
-* Debugging and auditing::
 * Building the source::
 @end menu
 
@@ -64,24 +65,6 @@ compatibility new features may have been introduced but due to problem
 with the dynamic linker an old version is actually used.  So you may
 want to check that the version is okay right after program start-up.
 See the function @funcref{gnutls_check_version}.
-
-@node Debugging and auditing
-@subsection Debugging and auditing
-
-In many cases things may not go as expected and further information,
-to assist debugging, from @acronym{GnuTLS} is desired. 
-Those are the cases where the @funcref{gnutls_global_set_log_level} and
-@funcref{gnutls_global_set_log_function} are to be used. Those will print
-verbose information on the @acronym{GnuTLS} functions internal flow.
-
-
-When debugging is not required, important issues, such as detected
-attacks on the protocol still need to be logged. This is provided
-by the logging function set by
-@funcref{gnutls_global_set_audit_log_function}. The set function
-accepts the detected error message and the corresponding
-TLS session. The session information might be used to derive IP addresses
-or other information about the peer involved.
 
 @node Building the source
 @subsection Building the source
@@ -129,6 +112,224 @@ specifying both options to @command{pkg-config}:
 @smallexample
 gcc -o foo foo.c `pkg-config gnutls --cflags --libs`
 @end smallexample
+
+@node Session initialization
+@section Session initialization
+
+In the previous sections we have discussed the global initialization
+required for GnuTLS as well as the initialization required for each
+authentication method's credentials (see @ref{Authentication methods}).
+In this section we elaborate on the TLS or DTLS session initiation.
+Each session is initialized using @funcref{gnutls_init} which among
+others is used to specify the type of the connection (server or client), 
+and the underlying protocol type, i.e., datagram (UDP) or reliable (TCP).
+
+@showfuncdesc{gnutls_init}
+
+After the session initialization details on the allowed ciphersuites
+and protocol versions should be set using the priority functions
+such as @funcref{gnutls_priority_set_direct}. We elaborate on them
+in @ref{Priority Strings}.
+The credentials used for the key exchange method, such as certificates 
+or usernames and passwords should also be associated with the session
+current session using @funcref{gnutls_credentials_set} (see @ref{Authentication methods}). 
+
+The next step is to setup the underlying transport layer details. The
+Berkeley sockets for TCP are implicitly used by default in GnuTLS, thus a
+call to @funcref{gnutls_transport_set_ptr} would be sufficient to
+specify the socket descriptor.
+
+@showfuncdesc{gnutls_transport_set_ptr}
+
+If however another transport layer than TCP is selected, then
+the following functions have to be specified.
+
+@showfuncdesc{gnutls_transport_set_push_function}
+@showfuncdesc{gnutls_transport_set_vec_push_function}
+@showfuncdesc{gnutls_transport_set_pull_function}
+
+In the case of DTLS it is also desirable to override the
+functions above with functions that emulate the operation
+of @code{recvfrom} and @code{sendto}. In addition
+the following function must also be called to specify a 
+callback that will receive data from within a specified
+time limit.
+
+@showfuncdesc{gnutls_transport_set_pull_timeout_function}
+
+
+@node Priority Strings
+@section Priority strings
+
+In order to specify cipher suite preferences on client or server side, the
+previously mentioned priority functions accept a string
+that specifies the enabled for the handshake algorithms.
+That string may contain some high level keyword such as
+the keywords in @ref{tab:prio-keywords}
+or it might contain special keywords, to be explained
+later on.
+
+@showfuncD{gnutls_priority_set_direct,gnutls_priority_init,gnutls_priority_deinit,gnutls_priority_set}
+
+@float Table,tab:prio-keywords
+@multitable @columnfractions .30 .70
+@headitem Keyword @tab Description
+@item PERFORMANCE @tab
+All the "secure" ciphersuites are enabled,
+limited to 128 bit ciphers and sorted by terms of speed
+performance.
+
+@item NORMAL @tab
+Means all "secure" ciphersuites. The 256-bit ciphers are
+included as a fallback only.  The ciphers are sorted by security
+margin.
+
+@item SECURE128 @tab
+Means all "secure" ciphersuites of security level 128-bit
+or more.
+
+@item SECURE192 @tab
+Means all "secure" ciphersuites of security level 192-bit
+or more.
+
+@item SUITEB128 @tab
+Means all the NSA Suite B cryptography (RFC5430) ciphersuites
+with an 128 bit security level.
+
+@item SUITEB192 @tab
+Means all the NSA Suite B cryptography (RFC5430) ciphersuites
+with an 192 bit security level.
+
+@item EXPORT @tab
+Means all ciphersuites are enabled, including the
+low-security 40 bit ciphers.
+
+@item NONE @tab
+Means nothing is enabled.  This disables even protocols and
+compression methods. It should be followed by the
+algorithms to be enabled.
+
+@end multitable
+@caption{Supported priority string keywords.}
+@end float
+
+Unless the first keyword is "NONE" the defaults (in preference
+order) are for TLS protocols TLS 1.2, TLS1.1, TLS1.0, SSL3.0; for
+compression NULL; for certificate types X.509, OpenPGP.
+For key exchange algorithms when in NORMAL or SECURE levels the
+perfect forward secrecy algorithms take precedence of the other
+protocols.  In all cases all the supported key exchange algorithms
+ are enabled (except for the RSA-EXPORT which is only enabled in
+EXPORT level).
+
+The NONE keyword must followed by the algorithms to be enabled,
+and is used to provide the exact list of requested algorithms@footnote{To avoid collisions in order to specify a compression algorithm in
+this string you have to prefix it with "COMP-", protocol versions
+with "VERS-", signature algorithms with "SIGN-" and certificate types with "CTYPE-". All other
+algorithms don't need a prefix.}. The order with which every algorithm
+is specified is significant. Similar algorithms specified before others
+will take precedence. The individual algorithms are shown in @ref{tab:prio-algorithms}
+and special keywords are in @ref{tab:prio-special}.
+The prefixes for individual algorithms are:
+@table @asis
+@item '!' or '-' 
+appended with an algorithm will remove this algorithm.
+@item "+" 
+appended with an algorithm will add this algorithm.
+@end table
+
+
+@float Table,tab:prio-algorithms
+@multitable @columnfractions .30 .70
+@headitem Type @tab Keywords
+@item Ciphers @tab
+AES-128-CBC, AES-256-CBC, AES-128-GCM, CAMELLIA-128-CBC,
+CAMELLIA-256-CBC, ARCFOUR-128, 3DES-CBC ARCFOUR-40. Catch all
+name is CIPHER-ALL which will add all the algorithms from NORMAL
+priority.
+
+@item Key exchange @tab
+RSA, DHE-RSA, DHE-DSS, SRP, SRP-RSA, SRP-DSS,
+PSK, DHE-PSK, ECDHE-RSA, ANON-ECDH, ANON-DH, RSA-EXPORT. The
+Catch all name is KX-ALL which will add all the algorithms from NORMAL
+priority.
+
+@item MAC @tab
+MD5, SHA1, SHA256, AEAD (used with
+GCM ciphers only). All algorithms from NORMAL priority can be accessed with MAC-ALL.
+
+@item Compression algorithms @tab
+COMP-NULL, COMP-DEFLATE. Catch all is COMP-ALL.
+
+@item TLS versions @tab
+VERS-SSL3.0, VERS-TLS1.0, VERS-TLS1.1,
+VERS-TLS1.2. Catch all is VERS-TLS-ALL.
+
+@item Signature algorithms @tab
+SIGN-RSA-SHA1, SIGN-RSA-SHA224, 
+SIGN-RSA-SHA256, SIGN-RSA-SHA384, SIGN-RSA-SHA512, SIGN-DSA-SHA1, 
+SIGN-DSA-SHA224, SIGN-DSA-SHA256, SIGN-RSA-MD5. Catch all
+is SIGN-ALL. This is only valid for TLS 1.2 and later.
+
+@item Elliptic curves @tab
+CURVE-SECP224R1, CURVE-SECP256R1, CURVE-SECP384R1, CURVE-SECP521R1. Catch all is CURVE-ALL.
+
+@end multitable
+@caption{The supported priority strings.}
+@end float
+
+
+
+@float Table,tab:prio-special
+@multitable @columnfractions .50 .50
+@headitem Keyword @tab Description
+
+@item %COMPAT @tab
+will enable compatibility mode. It might mean that violations
+of the protocols are allowed as long as maximum compatibility with
+problematic clients and servers is achieved.
+
+@item %DISABLE_SAFE_RENEGOTIATION @tab
+will disable safe renegotiation
+completely.  Do not use unless you know what you are doing.
+Testing purposes only.
+
+@item %UNSAFE_RENEGOTIATION @tab
+will allow handshakes and re-handshakes
+without the safe renegotiation extension.  Note that for clients
+this mode is insecure (you may be under attack), and for servers it
+will allow insecure clients to connect (which could be fooled by an
+attacker).  Do not use unless you know what you are doing and want
+maximum compatibility.
+
+@item %PARTIAL_RENEGOTIATION @tab
+will allow initial handshakes to proceed,
+but not re-handshakes.  This leaves the client vulnerable to attack,
+and servers will be compatible with non-upgraded clients for
+initial handshakes.  This is currently the default for clients and
+servers, for compatibility reasons.
+
+@item %SAFE_RENEGOTIATION @tab
+will enforce safe renegotiation.  Clients and
+servers will refuse to talk to an insecure peer.  Currently this
+causes interoperability problems, but is required for full protection.
+
+@item %SSL3_RECORD_VERSION @tab
+will use SSL3.0 record version in client hello.
+This is the default.
+
+@item %LATEST_RECORD_VERSION @tab
+will use the latest TLS version record version in client hello.
+
+@item %VERIFY_ALLOW_SIGN_RSA_MD5 @tab
+will allow RSA-MD5 signatures in certificate chains.
+
+@item %VERIFY_ALLOW_X509_V1_CA_CRT @tab
+will allow V1 CAs in chains.
+
+@end multitable
+@caption{Special priority string keywords.}
+@end float
 
 
 @node Client examples
