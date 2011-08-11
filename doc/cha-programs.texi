@@ -817,8 +817,8 @@ Normally the file will generate random keys for the indicated username.
 @cindex srptool
 
 The @file{srptool} is a very simple program that emulates the programs
-in the @emph{Stanford SRP libraries}, see
-@url{http://srp.stanford.edu/}.  It is intended for use in places
+in the @emph{Stanford SRP libraries}@footnote{See
+@url{http://srp.stanford.edu/}.}.  It is intended for use in places
 where you don't expect @acronym{SRP} authentication to be the used for
 system users.
 
