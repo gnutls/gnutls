@@ -5,7 +5,7 @@
 
 @menu
 * Preparation::
-* Session initialization::
+* TLS and DTLS sessions::
 * Priority Strings::
 * Client examples::
 * Server examples::
@@ -113,8 +113,9 @@ specifying both options to @command{pkg-config}:
 gcc -o foo foo.c `pkg-config gnutls --cflags --libs`
 @end smallexample
 
-@node Session initialization
-@section Session initialization
+@node TLS and DTLS sessions
+@section TLS and DTLS sessions
+@subsection Session initialization
 
 In the previous sections we have discussed the global initialization
 required for GnuTLS as well as the initialization required for each
@@ -157,6 +158,35 @@ time limit.
 
 @showfuncdesc{gnutls_transport_set_pull_timeout_function}
 
+@subsection Handshake
+Once a session has been initialized and a network
+connection has been set up, TLS and DTLS protocols
+perform a handshake. The handshake is the actual key
+exchange.
+
+@showfuncdesc{gnutls_handshake}
+
+The handshake process doesn't ensure the verification
+of the peer's identity. When certificates are in use,
+this can be done, either after the handshake is complete, or during 
+the handshake if @funcref{gnutls_certificate_set_verify_function}
+has been used. In both cases the following function can be
+used to verify the peer's certificate (see @ref{Certificate authentication}
+for more information).
+
+@showfuncA{gnutls_certificate_verify_peers2} 
+
+Once a TLS or DTLS session is no longer needed, it is
+recommended to use @funcref{gnutls_bye} to terminate the
+session. That way the peer is notified securely about the
+intention of termination, which allows distinguishing it
+from a malicious connection termination.
+
+@showfuncdesc{gnutls_bye}
+
+A session can be deinitialized using the following function.
+
+@showfuncdesc{gnutls_deinit}
 
 @node Priority Strings
 @section Priority strings
