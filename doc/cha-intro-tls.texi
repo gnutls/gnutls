@@ -100,7 +100,7 @@ timers and waiting for peer's messages during the handshake process,
 @acronym{GnuTLS} will block and might be interrupted by signals. The
 blocking operation of @acronym{GnuTLS} during @acronym{DTLS} handshake
 can be changed using the appropriate flags in @funcref{gnutls_init} (see
-@ref{Session initialization}).
+@ref{TLS and DTLS sessions}).
 By default, if the transport functions are not set, @acronym{GnuTLS}
 will use the Berkeley sockets. 
 
@@ -347,7 +347,7 @@ has to set up the required parameters. The main handshake function
 is @funcref{gnutls_handshake}. In the next paragraphs we elaborate on 
 controlling of the handshake protocol, i.e., the ciphersuite negotiation.
 
-@showfuncdesc{gnutls_handshake}
+@showfuncA{gnutls_handshake}
 
 
 @menu
