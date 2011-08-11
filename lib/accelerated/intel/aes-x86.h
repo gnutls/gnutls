@@ -5,17 +5,12 @@
 
 void register_x86_crypto (void);
 
-#ifdef __GNUC__
-# define ALIGN16 __attribute__ ((aligned (16)))
-#else
-# define ALIGN16
-#endif
-
+#define AES_KEY_ALIGN_SIZE 4
 #define AES_MAXNR 14
 typedef struct
 {
-  uint32_t ALIGN16 rd_key[4 * (AES_MAXNR + 1)];
-  int rounds;
+  uint32_t rd_key[4 * (AES_MAXNR + 1)+AES_KEY_ALIGN_SIZE];
+  int rounds; /* unused... */
 } AES_KEY;
 
 void aesni_ecb_encrypt (const unsigned char *in, unsigned char *out,
