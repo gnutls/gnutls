@@ -35,9 +35,9 @@ include:
 
 @acronym{GnuTLS} consists of three independent parts, namely the ``TLS
 protocol part'', the ``Certificate part'', and the ``Cryptographic
-back-end'' part.  The `TLS protocol part' is the actual protocol
+back-end'' part.  The ``TLS protocol part'' is the actual protocol
 implementation, and is entirely implemented within the
-@acronym{GnuTLS} library.  The `Certificate part' consists of the
+@acronym{GnuTLS} library.  The ``Certificate part'' consists of the
 certificate parsing, and verification functions which is partially
 implemented in the @acronym{GnuTLS} library.  The
 libtasn1@footnote{@url{http://www.gnu.org/software/libtasn1/}},
@@ -116,10 +116,10 @@ to be taken. Thus negative error codes may be fatal or not.
 
 Fatal errors terminate the connection immediately and further sends
 and receives will be disallowed.  Such an example is
-@code{GNUTLS_E_DECRYPTION_FAILED}. Non-fatal errors may warn about
+@code{GNUTLS_\-E_\-DECRYPTION_\-FAILED}. Non-fatal errors may warn about
 something, i.e., a warning alert was received, or indicate the some
 action has to be taken. This is the case with the error code
-@code{GNUTLS_E_REHANDSHAKE} returned by @funcref{gnutls_record_recv}.
+@code{GNUTLS_\-E_\-REHANDSHAKE} returned by @funcref{gnutls_record_recv}.
 This error code indicates that the server requests a re-handshake. The
 client may ignore this request, or may reply with an alert.  You can
 test if an error code is a fatal one by using the

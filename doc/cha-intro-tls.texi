@@ -312,8 +312,8 @@ The alert protocol is there to allow signals to be sent between peers.
 These signals are mostly used to inform the peer about the cause of a
 protocol failure. Some of these signals are used internally by the
 protocol and the application protocol does not have to cope with them
-(e.g. @code{GNUTLS_A_CLOSE_NOTIFY}), and others refer to the
-application protocol solely (e.g. @code{GNUTLS_A_USER_CANCELLED}).  An
+(e.g. @code{GNUTLS_\-A_\-CLOSE_\-NOTIFY}), and others refer to the
+application protocol solely (e.g. @code{GNUTLS_\-A_\-USER_\-CANCELLED}).  An
 alert signal includes a level indication which may be either fatal or
 warning. Fatal alerts always terminate the current connection, and
 prevent future re-negotiations using the current session ID. All alert
@@ -333,7 +333,6 @@ protocol are shown below.
 @showfuncB{gnutls_error_to_alert,gnutls_alert_get_name}
 
 @include alerts.texi
-
 
 @node The TLS Handshake Protocol
 @section The TLS handshake protocol

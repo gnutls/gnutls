@@ -110,7 +110,7 @@ const char* _name;
 
 puts( headers);
 
-printf("\\begin{supertabular}{|l|p{1cm}|p{3.5cm}|}\n\\label{tab:alerts}\n");
+printf("\\begin{supertabular}{|p{.50\\linewidth}|p{.07\\linewidth}|p{.34\\linewidth}|}\n\\label{tab:alerts}\n");
 
   {
     size_t i;

@@ -149,7 +149,7 @@ error_name names_to_sort[MAX_CODES]; /* up to MAX_CODES names  */
 
 puts( headers);
 
-printf("\\begin{supertabular}{|l|p{6.3cm}|}\n");
+printf("\\begin{supertabular}{|p{.52\\linewidth}|p{.40\\linewidth}|}\n");
 
 memset( names_to_sort, 0, sizeof(names_to_sort));
 j=0;
@@ -171,7 +171,7 @@ for (i=0;i<j;i++)
    desc = gnutls_strerror( names_to_sort[i].error_index);
    if (desc == NULL || _name == NULL) continue;
 
-   printf( "{\\tiny{%s}} & %s", escape_string(_name, buffer1, sizeof(buffer1)), escape_string(desc, buffer2, sizeof(buffer2)));
+   printf( "{\\scriptsize{%s}} & %s", escape_string(_name, buffer1, sizeof(buffer1)), escape_string(desc, buffer2, sizeof(buffer2)));
    printf( "\\\\\n");
 }
 
