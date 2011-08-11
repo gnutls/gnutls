@@ -60,7 +60,7 @@ int _gnutls_log_level = 0;      /* default log level */
  * Normally you may not use this function since it is only used for
  * debugging purposes.
  *
- * gnutls_log_func is of the form,
+ * @gnutls_log_func is of the form,
  * void (*gnutls_log_func)( int level, const char*);
  **/
 void
@@ -78,7 +78,7 @@ gnutls_global_set_log_function (gnutls_log_func log_func)
  * because it will report the session of the event if any. Note that
  * that session might be null if there is no corresponding TLS session.
  *
- * gnutls_audit_log_func is of the form,
+ * @gnutls_audit_log_func is of the form,
  * void (*gnutls_audit_log_func)( gnutls_session_t, int level, const char*);
  *
  * Since: 3.0.0
