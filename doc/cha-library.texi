@@ -130,6 +130,26 @@ a function, these error codes will be documented in the function's
 reference.  See @ref{Error codes}, for a description of the available 
 error codes.
 
+@subsection Debugging and auditing
+
+In many cases things may not go as expected and further information,
+to assist debugging, from @acronym{GnuTLS} is desired. 
+Those are the cases where the @funcref{gnutls_global_set_log_level} and
+@funcref{gnutls_global_set_log_function} are to be used. Those will print
+verbose information on the @acronym{GnuTLS} functions internal flow.
+
+@showfuncB{gnutls_global_set_log_level,gnutls_global_set_log_function}
+
+When debugging is not required, important issues, such as detected
+attacks on the protocol still need to be logged. This is provided
+by the logging function set by
+@funcref{gnutls_global_set_audit_log_function}. The set function
+accepts the detected error message and the corresponding
+TLS session. The session information might be used to derive IP addresses
+or other information about the peer involved.
+
+@showfuncdesc{gnutls_global_set_audit_log_function}
+
 @node Memory handling
 @section Memory handling
 
