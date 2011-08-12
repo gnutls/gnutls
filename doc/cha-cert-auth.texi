@@ -278,7 +278,7 @@ password. @acronym{GnuTLS} supports the requests defined in
 @acronym{PKCS} #10 @xcite{RFC2986}. Other formats of certificate requests
 are not currently supported.
 
-@showfuncB{gnutls_x509_crq_init, gnutls_x509_crq_deinit}
+@showfuncB{gnutls_x509_crq_init,gnutls_x509_crq_deinit}
 
 @showfuncdesc{gnutls_x509_crq_import}
 @showfuncdesc{gnutls_x509_crq_export}
@@ -323,7 +323,7 @@ the holders of the actual data, which may be certificates, private
 keys or encrypted data.  A bag of type encrypted should be decrypted
 in order for its data to be accessed.
 
-@showfuncB{gnutls_pkcs12_init, gnutls_pkcs12_deinit}
+@showfuncB{gnutls_pkcs12_init,gnutls_pkcs12_deinit}
 
 The following functions are available to read a @acronym{PKCS} #12
 structure.
@@ -661,7 +661,8 @@ but unlike public keys it cannot be exported. That is
 to allow abstraction over @acronym{PKCS} #11 keys that
 are not extractable.
 
-@showfuncdesc{gnutls_privkey_init,gnutls_privkey_deinit}
+@showfuncB{gnutls_privkey_init,gnutls_privkey_deinit}
+
 @showfuncdesc{gnutls_privkey_import_x509}
 @showfuncdesc{gnutls_privkey_import_openpgp}
 @showfuncdesc{gnutls_privkey_import_pkcs11}

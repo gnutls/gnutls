@@ -268,7 +268,7 @@ cleanup:
  * If the structure is PEM encoded, it will have a header
  * of "BEGIN PKCS12".
  *
- * Return value: In case of failure a negative error code will be
+ * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
  **/
 int

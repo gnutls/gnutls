@@ -1394,7 +1394,7 @@ gnutls_x509_crt_get_issuer_alt_othername_oid (gnutls_x509_crt_t cert,
  * return the certificates CA status.  It reads the basicConstraints
  * X.509 extension (2.5.29.19).
  *
- * Return value: If the certificate is a CA a positive value will be
+ * Returns: If the certificate is a CA a positive value will be
  * returned, or (0) if the certificate does not have CA flag set.  A
  * negative error code may be returned in case of errors.  If the
  * certificate does not contain the basicConstraints extension
@@ -2143,7 +2143,7 @@ gnutls_x509_crt_get_fingerprint (gnutls_x509_crt_t cert,
  * If the structure is PEM encoded, it will have a header
  * of "BEGIN CERTIFICATE".
  *
- * Return value: In case of failure a negative error code will be
+ * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
  **/
 int
@@ -2255,7 +2255,7 @@ cleanup:
  * be returned.  The output will normally be a SHA-1 hash output,
  * which is 20 bytes.
  *
- * Return value: In case of failure a negative error code will be
+ * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
  **/
 int
