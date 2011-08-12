@@ -188,6 +188,35 @@ A session can be deinitialized using the following function.
 
 @showfuncdesc{gnutls_deinit}
 
+@subsection DTLS sessions
+
+Because datagram TLS can operate over connections where the peer
+of a server cannot be reliably verified, functionality is available to prevent
+denial of server attacks. @acronym{GnuTLS} requires a server
+to generate a secret key that is used to sign a cookie@footnote{A key of 128 bits or 16 bytes should be sufficient for this purpose.}. 
+That cookie is sent to the client using @funcref{gnutls_dtls_cookie_send}, and 
+the client must reply using the correct cookie. The server side
+should verify the initial message sent by client using @funcref{gnutls_dtls_cookie_verify},
+if successful associate a session with the cookie using @funcref{gnutls_dtls_prestate_set}
+and proceed to a proper handshake.
+
+@showfuncdesc{gnutls_key_generate}
+
+@showfuncdesc{gnutls_dtls_cookie_send}
+
+@showfuncdesc{gnutls_dtls_cookie_verify}
+
+@showfuncdesc{gnutls_dtls_prestate_set}
+
+
+All the above apply to server side only. The client side cookie handling
+is done in @funcref{gnutls_handshake}. However both client and server
+side should set the correct maximum transfer unit for
+the layer underneath @acronym{GnuTLS}. This would allow proper fragmentation
+of DTLS messages.
+
+@showfuncdesc{gnutls_dtls_set_mtu}
+
 @node Priority Strings
 @section Priority strings
 
@@ -732,7 +761,7 @@ imposed by the compatibility layer include:
 
 @acronym{GnuTLS} is not a low-level cryptographic library, i.e., 
 it does not provide access to basic cryptographic primitives. However
-it abstracts the internal cryptographic backend (see @ref{Cryptographic Backend}),
+it abstracts the internal cryptographic back-end (see @ref{Cryptographic Backend}),
 providing symmetric crypto, hash and HMAC algorithms, as well access
 to the random number generation.
 
@@ -752,7 +781,7 @@ They are listed in @ref{tab:ciphers}.
 
 @showfuncE{gnutls_cipher_init,gnutls_cipher_encrypt2,gnutls_cipher_decrypt2,gnutls_cipher_set_iv,gnutls_cipher_deinit}
 
-In order to support authenticated encryption with associated data (AEAD) algoritms the following
+In order to support authenticated encryption with associated data (AEAD) algorithms the following
 functions are provided to set the associated data and retrieve the authentication tag.
 
 @showfuncB{gnutls_cipher_add_auth,gnutls_cipher_tag}
