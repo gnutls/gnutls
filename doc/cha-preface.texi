@@ -19,7 +19,8 @@ some of them.
 Although this document tries to be self contained, basic network
 programming and public key infrastructure (PKI) knowledge is assumed 
 in most of it. A good introduction to networking can be found 
-in @xcite{STEVENS} and for public key infrastructure in @xcite{GUTPKI}.
+in @xcite{STEVENS}, to public key infrastructure in @xcite{GUTPKI}
+and to security engineering in @xcite{ANDERSON}.
 
 Updated versions of the @acronym{GnuTLS} software and this document
 will be available from @url{http://www.gnutls.org/} and
