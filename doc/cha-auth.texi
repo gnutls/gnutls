@@ -45,7 +45,7 @@ we elaborate on supported authentication methods.
 
 @acronym{X.509} certificates contain the public parameters, of a
 public key algorithm, and an authority's signature, which proves the
-authenticity of the parameters.  See @ref{The X.509 trust model}, for
+authenticity of the parameters.  See @ref{X.509 certificates}, for
 more information on @acronym{X.509} protocols.
 
 @subsection Authentication using @acronym{OpenPGP} keys
@@ -57,7 +57,7 @@ whether a signer is trusted the key is considered trusted or not.
 @acronym{GnuTLS}'s @acronym{OpenPGP} authentication implementation is
 based on the @xcite{TLSPGP} proposal.
 
-More information on the @acronym{OpenPGP} trusted model is provided in @ref{The OpenPGP trust model}.
+More information on the @acronym{OpenPGP} trusted model is provided in @ref{OpenPGP certificates}.
 For a more detailed introduction to @acronym{OpenPGP} and @acronym{GnuPG} see @xcite{GPGH}.
 
 @subsection Using certificate authentication
@@ -111,7 +111,7 @@ has been used, to verify the certificate's signature.
 An alternative way, which reports a more detailed
 verification output, is to use @funcref{gnutls_certificate_get_peers} to
 obtain the raw certificate of the peer and verify it using the
-functions discussed in @ref{The X.509 trust model}.
+functions discussed in @ref{X.509 certificates}.
 
 @showfuncdesc{gnutls_certificate_verify_peers2}
 

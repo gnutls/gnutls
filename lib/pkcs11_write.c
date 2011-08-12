@@ -610,6 +610,7 @@ cleanup:
  * @flags: One of GNUTLS_PKCS11_OBJ_* flags
  * 
  * This function will delete objects matching the given URL.
+ * Note that not all tokens support the delete operation.
  *
  * Returns: On success, the number of objects deleted is returned, otherwise a
  *   negative error value.

@@ -759,7 +759,8 @@ gnutls_pubkey_get_pk_ecc_raw (gnutls_pubkey_t key, gnutls_ecc_curve_t *curve,
  * @format: One of DER or PEM 
  * 
  * This function will convert the given DER or PEM encoded Public key 
- * to the native gnutls_pubkey_t format.The output will be stored * in @ key. 
+ * to the native gnutls_pubkey_t format.The output will be stored 
+ * in @key. 
  * If the Certificate is PEM encoded it should have a header of "PUBLIC KEY". 
  * 
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
