@@ -711,17 +711,15 @@ Note that it must be run after a successful TLS handshake.
 @cindex OpenSSL
 
 To ease @acronym{GnuTLS}' integration with existing applications, a
-compatibility layer with the widely used OpenSSL library is included
+compatibility layer with the OpenSSL library is included
 in the @code{gnutls-openssl} library. This compatibility layer is not
 complete and it is not intended to completely re-implement the OpenSSL
 API with @acronym{GnuTLS}.  It only provides limited source-level
-compatibility. There is currently no attempt to make it
-binary-compatible with OpenSSL.
+compatibility. 
 
 The prototypes for the compatibility functions are in the
-@file{gnutls/openssl.h} header file.
-
-Current limitations imposed by the compatibility layer include:
+@file{gnutls/openssl.h} header file. The limitations 
+imposed by the compatibility layer include:
 
 @itemize
 
