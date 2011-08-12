@@ -411,15 +411,6 @@ Usage:  gnutls-cli [options] hostname
      -v, --version            prints the program's version number
 @end example
 
-To connect to a server using PSK authentication, you may use something
-like:
-
-@smallexample
-$ gnutls-cli -p 5556 test.gnutls.org --pskusername jas \
-  --pskkey 9e32cf7786321a828ef7668f09fb35db \
-  --priority NORMAL:-KX-ALL:+ECDHE-PSK:DHE-PSK:+PSK
-@end smallexample
-
 @menu
 * Example client PSK connection::
 @end menu
@@ -427,6 +418,15 @@ $ gnutls-cli -p 5556 test.gnutls.org --pskusername jas \
 @node Example client PSK connection
 @subsection Example client PSK connection
 @cindex PSK client
+
+To connect to a server using PSK authentication, you may use something
+like:
+
+@smallexample
+$ gnutls-cli -p 5556 test.gnutls.org --pskusername jas \
+  --pskkey 9e32cf7786321a828ef7668f09fb35db \
+  --priority NORMAL:-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK
+@end smallexample
 
 If your server only supports the PSK ciphersuite, connecting to it
 should be as simple as connecting to the server:
@@ -482,7 +482,7 @@ This program was created to assist in debugging @acronym{GnuTLS}, but
 it might be useful to extract a @acronym{TLS} server's capabilities.
 It's purpose is to connect onto a @acronym{TLS} server, perform some
 tests and print the server's capabilities. If called with the `-v'
-parameter a more checks will be performed. An example output is:
+parameter more checks will be performed. An example output is:
 
 @example
 crystal:/cvs/gnutls/src$ ./gnutls-cli-debug localhost -p 5556

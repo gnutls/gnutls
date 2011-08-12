@@ -43,12 +43,13 @@ soon obsoleted.
 
 Other application protocols@footnote{See LDAP, IMAP etc.}  use a
 different approach to enable the secure layer.  They use something
-called the ``TLS upgrade'' method. This method is quite tricky but it
+often called as the ``TLS upgrade'' method. This method is quite tricky but it
 is more flexible. The idea is to extend the application protocol to
 have a ``STARTTLS'' request, whose purpose it to start the TLS
 protocols just after the client requests it.  This approach
-does not require an extra port and is used by almost all modern protocols.
-There is even an extension to HTTP protocol to support that method @xcite{RFC2817}.
+does not require any extra port to be reserved.
+There is even an extension to HTTP protocol to support 
+that method @xcite{RFC2817}.
 
 The tricky part, in this method, is that the ``STARTTLS'' request is
 sent in the clear, thus is vulnerable to modifications.  A typical
@@ -94,7 +95,7 @@ CLIENT: HERE ARE SOME CONFIDENTIAL DATA
 As you can see above the client was fooled, and was dummy enough to
 send the confidential data in the clear.
 
-How to avoid the above attack? As you may have already thought this
+How to avoid the above attack? As you may have already noticed this
 one is easy to avoid. The client has to ask the user before it
 connects whether the user requests @acronym{TLS} or not. If the user
 answered that he certainly wants the secure layer the last
@@ -123,5 +124,4 @@ traditional method, and the security properties remain the same, since
 only denial of service is possible. The benefit is that the server may
 request additional data before the @acronym{TLS} Handshake protocol
 starts, in order to send the correct certificate, use the correct
-password file@footnote{in @acronym{SRP} authentication}, or anything
-else!
+password file, or anything else!

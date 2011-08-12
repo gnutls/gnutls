@@ -672,13 +672,13 @@ In user authentication protocols (e.g., EAP or SASL mechanisms) it is
 useful to have a unique string that identifies the secure channel that
 is used, to bind together the user authentication with the secure
 channel.  This can protect against man-in-the-middle attacks in some
-situations.  The unique strings is a ``channel bindings''.  For
-background and more discussion see @xcite{RFC5056}.
+situations.  That unique string is called a ``channel binding''.  For
+background and discussion see @xcite{RFC5056}.
 
-You can extract a channel bindings using the
+In @acronym{GnuTLS} you can extract a channel binding using the
 @funcref{gnutls_session_channel_binding} function.  Currently only the
-@code{GNUTLS_CB_TLS_UNIQUE} type is supported, which corresponds to
-the @code{tls-unique} channel bindings for TLS defined in
+type @code{GNUTLS_CB_TLS_UNIQUE} is supported, which corresponds to
+the @code{tls-unique} channel binding for TLS defined in
 @xcite{RFC5929}.
 
 The following example describes how to print the channel binding data.
@@ -711,17 +711,15 @@ Note that it must be run after a successful TLS handshake.
 @cindex OpenSSL
 
 To ease @acronym{GnuTLS}' integration with existing applications, a
-compatibility layer with the widely used OpenSSL library is included
+compatibility layer with the OpenSSL library is included
 in the @code{gnutls-openssl} library. This compatibility layer is not
 complete and it is not intended to completely re-implement the OpenSSL
 API with @acronym{GnuTLS}.  It only provides limited source-level
-compatibility. There is currently no attempt to make it
-binary-compatible with OpenSSL.
+compatibility. 
 
 The prototypes for the compatibility functions are in the
-@file{gnutls/openssl.h} header file.
-
-Current limitations imposed by the compatibility layer include:
+@file{gnutls/openssl.h} header file. The limitations 
+imposed by the compatibility layer include:
 
 @itemize
 
