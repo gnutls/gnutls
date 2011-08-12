@@ -344,9 +344,7 @@ the initial key exchange, and the authentication of the two peers.
 This is fully controlled by the application layer, thus your program
 has to set up the required parameters. The main handshake function
 is @funcref{gnutls_handshake}. In the next paragraphs we elaborate on 
-controlling of the handshake protocol, i.e., the ciphersuite negotiation.
-
-@showfuncA{gnutls_handshake}
+the handshake protocol, i.e., the ciphersuite negotiation.
 
 
 @menu
