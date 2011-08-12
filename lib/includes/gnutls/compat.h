@@ -263,11 +263,6 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
                                                     _GNUTLS_GCC_ATTR_DEPRECATED;
 
   /* gnutls_x509_crq_privkey_sign() */
-  int gnutls_x509_crq_sign2 (gnutls_x509_crq_t crq,
-                             gnutls_x509_privkey_t key,
-                             gnutls_digest_algorithm_t dig,
-                             unsigned int flags)
-                             _GNUTLS_GCC_ATTR_DEPRECATED;
   int gnutls_x509_crq_sign (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
                               _GNUTLS_GCC_ATTR_DEPRECATED;
 
@@ -278,12 +273,6 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
                             gnutls_x509_crt_t issuer,
                             gnutls_x509_privkey_t issuer_key)
                             _GNUTLS_GCC_ATTR_DEPRECATED;
-  int gnutls_x509_crl_sign2 (gnutls_x509_crl_t crl,
-                             gnutls_x509_crt_t issuer,
-                             gnutls_x509_privkey_t issuer_key,
-                             gnutls_digest_algorithm_t dig,
-                             unsigned int flags)
-                             _GNUTLS_GCC_ATTR_DEPRECATED;
 
   /* functions to set priority of cipher suites
    */

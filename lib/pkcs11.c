@@ -1608,7 +1608,7 @@ gnutls_pkcs11_token_get_url (unsigned int seq,
  * @output_size: contains the maximum size of the output and will be overwritten with actual
  *
  * This function will return information about the PKCS 11 token such
- * as the label, id as well as token information where the key is stored.
+ * as the label, id, etc.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code
  * on error.

@@ -190,6 +190,12 @@ extern "C"
   int gnutls_x509_crt_cpy_crl_dist_points (gnutls_x509_crt_t dst,
                                            gnutls_x509_crt_t src);
 
+  int gnutls_x509_crl_sign2 (gnutls_x509_crl_t crl,
+                             gnutls_x509_crt_t issuer,
+                             gnutls_x509_privkey_t issuer_key,
+                             gnutls_digest_algorithm_t dig,
+                             unsigned int flags);
+
   time_t gnutls_x509_crt_get_activation_time (gnutls_x509_crt_t cert);
   time_t gnutls_x509_crt_get_expiration_time (gnutls_x509_crt_t cert);
   int gnutls_x509_crt_get_serial (gnutls_x509_crt_t cert, void *result,
@@ -729,6 +735,11 @@ extern "C"
                                           gnutls_datum_t* k);
 /* Certificate request stuff.
  */
+
+  int gnutls_x509_crq_sign2 (gnutls_x509_crq_t crq,
+                             gnutls_x509_privkey_t key,
+                             gnutls_digest_algorithm_t dig,
+                             unsigned int flags);
 
   int gnutls_x509_crq_print (gnutls_x509_crq_t crq,
                              gnutls_certificate_print_formats_t format,

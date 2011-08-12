@@ -771,7 +771,7 @@ gnutls_x509_crq_get_version (gnutls_x509_crq_t crq)
  * @key: holds a private key
  *
  * This function will set the public parameters from the given private
- * key to the request.  Only RSA keys are currently supported.
+ * key to the request.  
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

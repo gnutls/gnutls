@@ -21,7 +21,6 @@ main (void)
 {
   gnutls_x509_crq_t crq;
   gnutls_x509_privkey_t key;
-  gnutls_privkey_t pkey;        /* object used for signing */
   unsigned char buffer[10 * 1024];
   size_t buffer_size = sizeof (buffer);
   unsigned int bits;
@@ -34,7 +33,6 @@ main (void)
   gnutls_x509_crq_init (&crq);
 
   gnutls_x509_privkey_init (&key);
-  gnutls_privkey_init (&pkey);
 
   /* Generate an RSA key of moderate security.
    */
@@ -63,8 +61,7 @@ main (void)
 
   /* Self sign the certificate request.
    */
-  gnutls_privkey_import_x509 (pkey, key, 0);
-  gnutls_x509_crq_privkey_sign (crq, pkey, GNUTLS_DIG_SHA1, 0);
+  gnutls_x509_crq_sign2 (crq, key, GNUTLS_DIG_SHA1, 0);
 
   /* Export the PEM encoded certificate request, and
    * display it.
