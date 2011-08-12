@@ -56,7 +56,7 @@ E-mail: simon@josefsson.org
 @end verbatim
 
 If your company provides support related to GnuTLS and would like to
-be mentioned here, contact the authors using the address at @ref{Bug Reports}.
+be mentioned here, contact the authors.
 
 @node Downloading and Installing
 @section Downloading and Installing
@@ -155,7 +155,7 @@ Send your bug report to:
 @cindex Contributing
 @cindex Hacking
 
-If you want to submit a patch for inclusion -- from solve a typo you
+If you want to submit a patch for inclusion -- from solving a typo you
 discovered, up to adding support for a new feature -- you should
 submit it as a bug report, using the process in @ref{Bug Reports}.  There are some
 things that you can do to increase the chances for it to be included
@@ -168,8 +168,7 @@ already signed papers, we will send you the necessary information when
 you submit your contribution.
 
 For contributions that doesn't consist of actual programming code, the
-only guidelines are common sense.  Use it.
-
+only guidelines are common sense.  
 For code contributions, a number of style guides will help you:
 
 @itemize @bullet
