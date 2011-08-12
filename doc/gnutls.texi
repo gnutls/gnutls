@@ -71,6 +71,10 @@ Documentation License''.
 @ref{\ref\}
 @end macro
 
+@macro funcintref{ref}
+@code{\ref\}
+@end macro
+
 @macro showfuncA{ref}
 @itemize
 @item @ref{\ref\}

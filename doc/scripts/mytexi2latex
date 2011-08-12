@@ -327,6 +327,7 @@ multitable:
 		$line =~ s/\@emph\{($spacematch+)\}/\\emph{$1}/g;
 		$line =~ s/\@xref\{/\\myref\{/g;
 		$line =~ s/\@funcref\{($codematch+)\}/$pfuncref->($1)/ge;
+		$line =~ s/\@funcintref\{($codematch+)\}/$pfuncref->($1)/ge;
 		$line =~ s/\@showfunc([A-Z])\{($codematch+)\}/$pshowfunc->($1,$2)/ge;
 		$line =~ s/\@showfuncdesc\{($codematch+)\}/$pshowfuncdesc->($1)/ge;
 		$line =~ s/\@pxref\{/\\myref\{/g;

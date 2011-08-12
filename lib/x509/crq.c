@@ -1002,7 +1002,6 @@ gnutls_x509_crq_set_challenge_password (gnutls_x509_crq_t crq,
  *   information in the certificate request (e.g., the version using
  *   gnutls_x509_crq_set_version()).
  *
- * Deprecated: Use gnutls_x509_crq_privkey_sign() instead.
  **/
 int
 gnutls_x509_crq_sign2 (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key,
@@ -1083,8 +1082,8 @@ gnutls_x509_crq_sign (gnutls_x509_crq_t crq, gnutls_x509_privkey_t key)
  * If the structure is PEM encoded, it will have a header of "BEGIN
  * NEW CERTIFICATE REQUEST".
  *
- * Return value: In case of failure a negative error code will be
- *   returned, and 0 on success.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
  **/
 int
 gnutls_x509_crq_export (gnutls_x509_crq_t crq,
@@ -1554,7 +1553,7 @@ gnutls_x509_crq_get_key_usage (gnutls_x509_crq_t crq,
  * return the certificates CA status.  It reads the basicConstraints
  * X.509 extension (2.5.29.19).
  *
- * Return value: If the certificate is a CA a positive value will be
+ * Returns: If the certificate is a CA a positive value will be
  *   returned, or (0) if the certificate does not have CA flag set.
  *   A negative error code may be returned in case of errors.  If the
  *   certificate does not contain the basicConstraints extension
@@ -2331,7 +2330,7 @@ cleanup:
  * be returned.  The output will normally be a SHA-1 hash output,
  * which is 20 bytes.
  *
- * Return value: In case of failure a negative error code will be
+ * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
  *
  * Since: 2.8.0

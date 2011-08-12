@@ -93,7 +93,6 @@ gnutls_x509_crl_set_version (gnutls_x509_crl_t crl, unsigned int version)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Deprecated: Use gnutls_x509_crl_privkey_sign() instead.
  **/
 int
 gnutls_x509_crl_sign2 (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
