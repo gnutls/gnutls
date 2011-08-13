@@ -169,7 +169,7 @@ gnutls_rsa_params_t rsa_params = NULL;
 static int
 generate_dh_primes (void)
 {
-  int prime_bits = 768;
+  int prime_bits = gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, GNUTLS_SEC_PARAM_NORMAL);
 
   if (gnutls_dh_params_init (&dh_params) < 0)
     {
