@@ -472,3 +472,6 @@ doc/stamp-1
 lib/algorithms/libgnutls_alg.la
 gl/tests/inttypes.h
 src/crywrap/crywrap
+gl/dirent.h
+gl/getopt.h
+gl/math.h
