@@ -111,7 +111,7 @@ will use the Berkeley sockets.
 The record protocol is the secure communications provider. Its purpose
 is to encrypt, authenticate and ---optionally--- compress packets.
 
-@showfuncdesc{gnutls_record_send}
+@showfuncA{gnutls_record_send}
 
 The record layer functions can be called at any time after
 the handshake process is finished, when there is need to receive
@@ -132,10 +132,7 @@ The record protocol initially starts with NULL parameters, which means
 no encryption, and no MAC is used. Encryption and authentication begin
 just after the handshake protocol has finished.
 
-@showfuncdesc{gnutls_record_recv}
-@showfuncdesc{gnutls_record_recv_seq}
-@showfuncdesc{gnutls_record_check_pending}
-@c @showfuncdesc{gnutls_record_get_direction}
+@showfuncD{gnutls_record_recv,gnutls_record_recv_seq,gnutls_record_check_pending,gnutls_record_get_direction}
 
 @menu
 * Encryption algorithms used in the record layer::

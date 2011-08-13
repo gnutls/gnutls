@@ -195,7 +195,7 @@ int main()
 @section Callback functions
 @cindex Callback functions
 
-There are several cases where @acronym{GnuTLS} may need some out of
+There are several cases where @acronym{GnuTLS} may need out of
 band input from your program. This is now implemented using some
 callback functions, which your program is expected to register.
 

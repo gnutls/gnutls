@@ -137,10 +137,12 @@ current session using @funcref{gnutls_credentials_set} (see @ref{Authentication 
 
 The next step is to setup the underlying transport layer details. The
 Berkeley sockets for TCP are implicitly used by default in GnuTLS, thus a
-call to @funcref{gnutls_transport_set_ptr} would be sufficient to
+call to @funcref{gnutls_transport_set_ptr2} would be sufficient to
 specify the socket descriptor.
 
-@showfuncdesc{gnutls_transport_set_ptr}
+@showfuncdesc{gnutls_transport_set_ptr2}
+
+@showfuncA{gnutls_transport_set_ptr}
 
 If however another transport layer than TCP is selected, then
 the following functions have to be specified.
@@ -174,7 +176,31 @@ has been used. In both cases the following function can be
 used to verify the peer's certificate (see @ref{Certificate authentication}
 for more information).
 
-@showfuncA{gnutls_certificate_verify_peers2} 
+@showfuncA{gnutls_certificate_verify_peers2}
+
+
+@subsection Data transfer and termination
+Once the handshake is complete and peer's identity
+has been verified data can be exchanged. The available
+functions resemble the POSIX @code{recv} and @code{send}
+functions.
+
+@showfuncdesc{gnutls_record_send}
+@showfuncdesc{gnutls_record_recv}
+
+In DTLS it is adviceable to use the extended receive
+function shown below, because it allows the extraction
+of the sequence number. This is required in DTLS because
+messages may arrive out of order.
+
+@showfuncdesc{gnutls_record_recv_seq}
+
+A helper function is available to check whether data
+to be read are pending in a @acronym{GnuTLS} session.
+This is the equivalent in POSIX systems to using @code{select} 
+for data waiting to be read by @code{recv}.
+
+@showfuncdesc{gnutls_record_check_pending}
 
 Once a TLS or DTLS session is no longer needed, it is
 recommended to use @funcref{gnutls_bye} to terminate the
@@ -209,8 +235,8 @@ and proceed to a proper handshake.
 @showfuncdesc{gnutls_dtls_prestate_set}
 
 
-All the above apply to server side only. The client side cookie handling
-is done in @funcref{gnutls_handshake}. However both client and server
+Note that the above apply to server side only. The client side cookie handling
+is part of @funcref{gnutls_handshake}. However both client and server
 side should set the correct maximum transfer unit for
 the layer underneath @acronym{GnuTLS}. This would allow proper fragmentation
 of DTLS messages.
