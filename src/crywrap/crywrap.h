@@ -76,6 +76,7 @@ typedef struct
     struct sockaddr_storage *addr;
   } dest;
 
+  gnutls_priority_t priority; /**< GnuTLS priority string. */
   const char *pidfile; /**< File to store our PID in. */
   uid_t uid; /**< User ID to run as. */
   int inetd; /**< InetD-mode toggle. */

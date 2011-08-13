@@ -99,11 +99,11 @@ static pid_t crywrap_children[_CRYWRAP_MAXCONN + 2];
 static pid_t main_pid = -1; /**< Pid of the main process */
 static const char *pidfile = _CRYWRAP_PIDFILE; /**< File to log our PID
 					    into. */
+
 /** GNUTLS server credentials.
  */
 static gnutls_certificate_server_credentials cred;
 static gnutls_dh_params dh_params; /**< GNUTLS DH parameters. */
-static const int dh_bits = 1024; /**< GNUTLS DH bits. */
 
 /** Bugreport address.
  * Used by the argp suite.
@@ -114,23 +114,31 @@ const char *argp_program_bug_address = "<bugs-gnutls@gnu.org>";
  */
 const char *argp_program_version = __CRYWRAP__ " " _CRYWRAP_VERSION;
 
+/* The certificate and key files */
+static char *pem_cert = NULL;
+static char *pem_key = NULL;
+
+
 /** The options CryWrap takes.
  * Used by the argp suite.
  */
 static const struct argp_option _crywrap_options[] = {
   {NULL, 0, NULL, 0, "Mandatory options:", 1},
   {"destination", 'd', "IP/PORT", 0, "IP and port to connect to", 1},
+  {"listen", 'l', "IP/PORT", 0, "IP and port to listen on", 1},
   {NULL, 0, NULL, 0, "TLS certificates:", 2},
-  {"pem", 'p', "TYPE=PATH", 0, "Server key and certificate", 2},
-  {"anon", 'a', NULL, 0, "Enable Anon-DH (don't use a certificate)", 2},
+  {"key", 'k', "FILE", 0, "Server key", 2},
+  {"cert", 'c', "FILE", 0, "Server certificate", 2},
+  {"ca", 'z', "FILE", 0, "CA certificate", 2},
+  {"anon", 'a', NULL, 0, "Enable anonymous authentication (don't use a certificate)", 2},
   {"verify", 'v', "LEVEL", OPTION_ARG_OPTIONAL,
-   "Verify clients certificate", 2},
+   "Verify clients certificate (1: verify if exists, 2: require)", 2},
   {NULL, 0, NULL, 0, "Other options:", 3},
   {"user", 'u', "UID", 0, "User ID to run as", 3},
   {"pidfile", 'P', "PATH", 0, "File to log the PID into", 3},
+  {"priority", 'p', "STRING", 0, "GnuTLS ciphersuite priority string", 3},
   {"inetd", 'i', NULL, 0, "Enable inetd mode", 3},
-  {"listen", 'l', "IP/PORT", 0, "IP and port to listen on", 3},
-  {"debug", 'D', NULL, 0, "Do not fork", 2},
+  {"debug", 'D', NULL, 0, "Do not fork", 3},
   {0, 0, 0, 0, NULL, 0}
 };
 
@@ -144,27 +152,6 @@ static const struct argp _crywrap_argp =
    "The --destination option is mandatory, as is --listen if --inetd "
    "was not used.",
    NULL, NULL, NULL};
-
-#ifndef __DOXYGEN__
-enum
-{
-  CRYWRAP_P_SUBOPT_CERT,
-  CRYWRAP_P_SUBOPT_KEY,
-  CRYWRAP_P_SUBOPT_END
-};
-#endif
-
-/** Helper structure for parsing --pem subopts.
- */
-static char * const _crywrap_p_subopts[] = {
-  [CRYWRAP_P_SUBOPT_CERT] = (char*)"cert",
-  [CRYWRAP_P_SUBOPT_KEY] = (char*)"key",
-  [CRYWRAP_P_SUBOPT_END] = NULL
-};
-
-/** Helper variable to set if a certificate was explictly set.
- */
-static int cert_seen = 0;
 
 /** @} */
 
@@ -351,7 +338,7 @@ static error_t
 _crywrap_config_parse_opt (int key, char *arg, struct argp_state *state)
 {
   crywrap_config_t *cfg = (crywrap_config_t *)state->input;
-  char *pem_cert, *pem_key, *subopts, *value;
+  int ret;
 
   switch (key)
     {
@@ -380,41 +367,48 @@ _crywrap_config_parse_opt (int key, char *arg, struct argp_state *state)
 	cfg->pidfile = NULL;
       break;
     case 'p':
-      subopts = optarg;
-      pem_cert = NULL;
-      pem_key = NULL;
-      while (*subopts != '\0')
-	switch (getsubopt (&subopts, _crywrap_p_subopts, &value))
-	  {
-	  case CRYWRAP_P_SUBOPT_CERT:
-	    pem_cert = strdup (value);
-	    break;
-	  case CRYWRAP_P_SUBOPT_KEY:
-	    pem_key = strdup (value);
-	    break;
-	  default:
-	    pem_cert = strdup (value);
-	    break;
-	  }
-      if (!pem_key)
-	pem_key = strdup (pem_cert);
-      if (!pem_cert)
-	pem_cert = strdup (pem_key);
-      if (gnutls_certificate_set_x509_key_file (cred, pem_cert, pem_key,
-						GNUTLS_X509_FMT_PEM) < 0)
-	argp_error (state, "error reading X.509 key or certificate file.");
-      cert_seen = 1;
+      if (arg && *arg)
+        {
+          const char* pos;
+          ret = gnutls_priority_init(&cfg->priority, arg, &pos);
+          if (ret < 0)
+  	    argp_error (state, "error in priority string at: %s.", pos);
+        }
+      break;
+    case 'c':
+      if (arg && *arg)
+	pem_cert = strdup (arg);
+      break;
+    case 'k':
+      if (arg && *arg)
+	pem_key = strdup (arg);
+      break;
+
       break;
     case 'i':
       cfg->inetd = 1;
       break;
     case 'a':
-      cfg->anon = 1;
+      if (arg && *arg)
+        {
+          const char* pos;
+          ret = gnutls_priority_init(&cfg->priority, "NORMAL:+ANON-ECDH:+ANON-DH", &pos);
+          if (ret < 0)
+  	    argp_error (state, "error in priority string at: %s.", pos);
+        }
       cfg->verify = 0;
+      cfg->anon = 1;
       break;
     case 'v':
       cfg->verify = (arg) ? atoi (arg) : 1;
       break;
+    case 'z':
+      ret = gnutls_certificate_set_x509_trust_file (cred, arg,
+						GNUTLS_X509_FMT_PEM);
+      if (ret < 0)
+	argp_error (state, "error reading X.509 CA file: %s.", gnutls_strerror(ret));
+      break;
+
     case ARGP_KEY_END:
       if (!cfg->inetd)
 	{
@@ -426,18 +420,23 @@ _crywrap_config_parse_opt (int key, char *arg, struct argp_state *state)
       else
 	if (!cfg->dest.addr)
 	  argp_error (state, "a destination address must be set!");
-      if (cert_seen)
-	break;
       if (cfg->anon)
 	break;
-      if (gnutls_certificate_set_x509_key_file (cred, _CRYWRAP_PEMFILE,
+      if (pem_cert == NULL || pem_key == NULL)
+        ret = gnutls_certificate_set_x509_key_file (cred, _CRYWRAP_PEMFILE,
 						_CRYWRAP_PEMFILE,
-						GNUTLS_X509_FMT_PEM) < 0)
-	argp_error (state, "error reading X.509 key or certificate file.");
+						GNUTLS_X509_FMT_PEM);
+      else
+        ret = gnutls_certificate_set_x509_key_file (cred, pem_cert, pem_key,
+  						GNUTLS_X509_FMT_PEM);
+
+      if (ret < 0)
+	argp_error (state, "Error reading X.509 key or certificate file: %s", gnutls_strerror(ret));
       break;
     default:
       return ARGP_ERR_UNKNOWN;
     }
+
   return 0;
 }
 
@@ -457,14 +456,17 @@ _crywrap_config_parse (int argc, char **argv)
   config->listen.addr = NULL;
   config->dest.port = 0;
   config->dest.addr = NULL;
-
+  config->priority = NULL;
   config->uid = _CRYWRAP_UID;
   config->pidfile = _CRYWRAP_PIDFILE;
   config->inetd = 0;
   config->anon = 0;
-  config->verify = 1;
+  config->verify = 0;
 
   argp_parse (&_crywrap_argp, argc, argv, 0, 0, config);
+
+  if (config->priority == NULL)
+    gnutls_priority_init(&config->priority, "NORMAL", NULL);
 
   return config;
 }
@@ -483,25 +485,28 @@ _crywrap_config_parse (int argc, char **argv)
 static gnutls_session
 _crywrap_tls_session_create (const crywrap_config_t *config)
 {
-  gnutls_session session;
+  gnutls_session_t session;
+  int ret;
 
   gnutls_init (&session, GNUTLS_SERVER);
 
-
   if (config->anon) {
-    gnutls_priority_set_direct(session, "NORMAL:+ANON-ECDH:+ANON-DH", NULL);
     gnutls_credentials_set (session, GNUTLS_CRD_ANON, cred);
   } else {
-    gnutls_priority_set_direct(session, "NORMAL", NULL);
     gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, cred);
   }
 
-  gnutls_dh_set_prime_bits (session, dh_bits);
+  ret = gnutls_priority_set(session, config->priority);
+  if (ret < 0)
+    {
+      cry_error ("Error setting priority %s: ", gnutls_strerror(ret));
+      exit (4);
+    }
 
-  gnutls_handshake_set_private_extensions (session, 1);
-
-  if (config->verify)
+  if (config->verify==1)
     gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
+  else if (config->verify==2)
+    gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUIRE);
 
   return session;
 }
@@ -518,7 +523,7 @@ _crywrap_dh_params_generate (void)
       exit (3);
     }
 
-  if (gnutls_dh_params_generate2 (dh_params, dh_bits) < 0)
+  if (gnutls_dh_params_generate2 (dh_params, gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, GNUTLS_SEC_PARAM_NORMAL)) < 0)
     {
       cry_error ("%s", "Error in prime generation.");
       exit (3);
@@ -879,21 +884,17 @@ _crywrap_do_one (const crywrap_config_t *config, int insock, int outsock)
       if (ret < 0)
 	cry_log ("Error getting certificate from client: %s",
 		 gnutls_strerror (ret));
-      
-      if (ret == 0 && status != 0)
-	switch (ret)
-	  {
-	  case GNUTLS_CERT_INVALID:
-	    cry_log ("%s", "Client certificate not trusted or invalid");
-	    break;
-	  default:
-	    cry_log ("%s", "Unknown error while getting the certificate");
-	    break;
-	  }
 
-      if (config->verify > 1 && (ret < 0 || status != 0)) 
+      if (ret == 0 && status != 0)
+        {
+	  if (status & GNUTLS_CERT_INVALID)
+            cry_log ("%s", "Client certificate not trusted or invalid");
+        }
+
+      if (config->verify > 0 && status != 0)
         {
           ret = -1;
+          gnutls_alert_send( session, GNUTLS_AL_FATAL, GNUTLS_A_INSUFFICIENT_SECURITY);
           goto error;
         }
     }

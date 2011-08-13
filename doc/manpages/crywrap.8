@@ -42,18 +42,17 @@ client, and only anonymous sessions will be enabled.
 .br
 Default is \fBoff\fR.
 .TP
-.BI "\-\-pem (\-p) " cert = PATH , key = PATH
+.BI "\-\-cert (\-c) " PATH
 .TP
-.BI "\-\-pem (\-p) " PATH
+.BI "\-\-key (\-k) " PATH
 .br
 The public certificate to send to clients, and the private server key.
-If one of \fIcert\fR or \fIkey\fR is omitted, the value of the other
-will be used for the missing one too.
-If no \fIcert=\fR or \fIkey=\fR tag is given, \fIPATH\fR will be used
-for both.
 .br
-Default is \fB/usr/local/etc/crywrap/server.pem\fR, unless \fB--anon\fR is also
+Default is \fB/etc/crywrap/server.pem\fR, unless \fB--anon\fR is also
 specified, in which case no certificate will be used.
+.BI "\-\-ca (\-z) " PATH
+.br
+A Certificate Authority certificate to be used for verification of client certificates.
 .TP
 .BI "\-\-verify (\-v) [" LEVEL ]
 Set the level of client certificate verification. Level one simply
