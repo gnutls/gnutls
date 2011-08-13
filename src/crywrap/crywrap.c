@@ -156,7 +156,7 @@ static const struct argp_option _crywrap_options[] = {
   {"verify", 'v', "LEVEL", OPTION_ARG_OPTIONAL,
    "Verify clients certificate (1: verify if exists, 2: require)", 2},
   {NULL, 0, NULL, 0, "Other options:", 3},
-  {"dhparams", 'h', "FILE", 0, "Diffie Hellman (PKCS #3) parameters file", 3},
+  {"dhparams", 'r', "FILE", 0, "Diffie Hellman (PKCS #3) parameters file", 3},
   {"user", 'u', "UID", 0, "User ID to run as", 3},
   {"pidfile", 'P', "PATH", 0, "File to log the PID into", 3},
   {"priority", 'p', "STRING", 0, "GnuTLS ciphersuite priority string", 3},
@@ -392,7 +392,7 @@ _crywrap_config_parse_opt (int key, char *arg, struct argp_state *state)
       else
 	cfg->pidfile = NULL;
       break;
-    case 'h':
+    case 'r':
       if (arg && *arg)
         {
 	  dh_file = load_file(arg);
