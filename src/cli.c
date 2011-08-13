@@ -126,9 +126,9 @@ load_file (const char *file)
 }
 
 static void
-unload_file (gnutls_datum_t data)
+unload_file (gnutls_datum_t* data)
 {
-  free (data.data);
+  free (data->data);
 }
 
 #define MAX_CRT 6
@@ -244,7 +244,7 @@ load_keys (void)
           gnutls_x509_crt_deinit(crt_list[i]);
         }
 
-      unload_file (data);
+      unload_file (&data);
 
       ret = gnutls_privkey_init(&x509_key);
       if (ret < 0)
@@ -305,7 +305,7 @@ load_keys (void)
               exit (1);
             }
 
-          unload_file (data);
+          unload_file (&data);
         }
 
       fprintf (stdout, "Processed %d client X.509 certificates...\n",
@@ -342,7 +342,7 @@ load_keys (void)
           exit (1);
         }
  
-      unload_file (data);
+      unload_file (&data);
 
       ret = gnutls_privkey_init(&pgp_key);
       if (ret < 0)
@@ -420,7 +420,7 @@ load_keys (void)
               exit (1);
             }
 
-          unload_file (data);
+          unload_file (&data);
         }
 
 
