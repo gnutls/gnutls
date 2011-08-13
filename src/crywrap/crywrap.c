@@ -54,6 +54,7 @@
 /* Gnulib portability files. */
 #include "progname.h"
 #include "argp.h"
+#include <read-file.h>
 
 #include "crywrap.h"
 #include "primes.h"
@@ -88,14 +89,11 @@ static cry_log_func cry_error = system_log_error;
 /** @defgroup globals Global variables.
  * @{
  */
-/** Status flag to toggle on SIGCHLD.
- */
-static sig_atomic_t sigchld = 0;
+
 /** An array of pids.
  * This array holds the PIDs of all of our children, indexed by the
  * socket the associated client connected to us.
  */
-static pid_t crywrap_children[_CRYWRAP_MAXCONN + 2];
 static pid_t main_pid = -1; /**< Pid of the main process */
 static const char *pidfile = _CRYWRAP_PIDFILE; /**< File to log our PID
 					    into. */
@@ -104,6 +102,7 @@ static const char *pidfile = _CRYWRAP_PIDFILE; /**< File to log our PID
  */
 static gnutls_certificate_server_credentials cred;
 static gnutls_dh_params dh_params; /**< GNUTLS DH parameters. */
+static gnutls_datum dh_file = { _crywrap_prime_dh_1024, sizeof(_crywrap_prime_dh_1024) }; /**< Diffie Hellman parameters */
 
 /** Bugreport address.
  * Used by the argp suite.
@@ -134,6 +133,7 @@ static const struct argp_option _crywrap_options[] = {
   {"verify", 'v', "LEVEL", OPTION_ARG_OPTIONAL,
    "Verify clients certificate (1: verify if exists, 2: require)", 2},
   {NULL, 0, NULL, 0, "Other options:", 3},
+  {"dhparams", 'h', "FILE", 0, "Diffie Hellman (PKCS #3) parameters file", 3},
   {"user", 'u', "UID", 0, "User ID to run as", 3},
   {"pidfile", 'P', "PATH", 0, "File to log the PID into", 3},
   {"priority", 'p', "STRING", 0, "GnuTLS ciphersuite priority string", 3},
@@ -155,9 +155,6 @@ static const struct argp _crywrap_argp =
 
 /** @} */
 
-/* Forward declaration */
-static int _crywrap_dh_params_generate (void);
-
 /** @defgroup signal Signal handlers & co.
  * @{
  */
@@ -167,21 +164,27 @@ static int _crywrap_dh_params_generate (void);
 static void
 _crywrap_sigchld_handler (int sig)
 {
-  sigchld = 1;
+pid_t child;
+unsigned int status;
+
+  while ((child = waitpid (-1, &status, WNOHANG)) > (pid_t) 0)
   signal (sig, _crywrap_sigchld_handler);
 }
 
-/** SIGHUP handler.
- * Regenerates DH and RSA paramaters. Takes a bit long...
+/* Helper functions to load a certificate and key
+ * files into memory.
  */
-static void
-_crywrap_sighup_handler (int sig)
+static gnutls_datum_t
+load_file (const char *file)
 {
-  _crywrap_dh_params_generate ();
+  gnutls_datum_t loaded_file = { NULL, 0 };
+  size_t length;
 
-  gnutls_certificate_set_dh_params (cred, dh_params);
+  loaded_file.data = read_binary_file (file, &length);
+  if (loaded_file.data)
+    loaded_file.size = (unsigned int) length;
 
-  signal (sig, _crywrap_sighup_handler);
+  return loaded_file;
 }
 
 /** Generic signal handler.
@@ -366,6 +369,14 @@ _crywrap_config_parse_opt (int key, char *arg, struct argp_state *state)
       else
 	cfg->pidfile = NULL;
       break;
+    case 'h':
+      if (arg && *arg)
+        {
+	  dh_file = load_file(arg);
+	  if (dh_file.data == NULL)
+  	    argp_error (state, "error loading Diffie Hellman parameters file: %s.", arg);
+        }
+      break;
     case 'p':
       if (arg && *arg)
         {
@@ -389,7 +400,6 @@ _crywrap_config_parse_opt (int key, char *arg, struct argp_state *state)
       cfg->inetd = 1;
       break;
     case 'a':
-      if (arg && *arg)
         {
           const char* pos;
           ret = gnutls_priority_init(&cfg->priority, "NORMAL:+ANON-ECDH:+ANON-DH", &pos);
@@ -511,39 +521,15 @@ _crywrap_tls_session_create (const crywrap_config_t *config)
   return session;
 }
 
-/** (Re)Initialise Diffie Hellman parameters.
- * @returns Zero.
- */
-static int
-_crywrap_dh_params_generate (void)
-{
-  if (gnutls_dh_params_init (&dh_params) < 0)
-    {
-      cry_error ("%s", "Error in dh parameter initialisation.");
-      exit (3);
-    }
-
-  if (gnutls_dh_params_generate2 (dh_params, gnutls_sec_param_to_pk_bits(GNUTLS_PK_DH, GNUTLS_SEC_PARAM_NORMAL)) < 0)
-    {
-      cry_error ("%s", "Error in prime generation.");
-      exit (3);
-    }
-
-  gnutls_certificate_set_dh_params (cred, dh_params);
-
-  return 0;
-}
-
 /** Generate initial DH and RSA params.
  * Loads the pre-generated DH primes.
  */
 static void
 _crywrap_tls_init (void)
 {
-  gnutls_datum dh = { _crywrap_prime_dh_1024, sizeof(_crywrap_prime_dh_1024) };
 
   gnutls_dh_params_init (&dh_params);
-  gnutls_dh_params_import_pkcs3 (dh_params, &dh, GNUTLS_X509_FMT_PEM);
+  gnutls_dh_params_import_pkcs3 (dh_params, &dh_file, GNUTLS_X509_FMT_PEM);
 
   gnutls_certificate_set_dh_params (cred, dh_params);
 }
@@ -796,32 +782,6 @@ _crywrap_setup_pidfile (const crywrap_config_t *config)
   pidfile = config->pidfile;
 }
 
-/** Child cleanup routine.
- * Called after a SIGCHLD is received. Walks through #crywrap_children
- * and closes the socket of the one that exited.
- */
-static void
-_crywrap_reap_children (void)
-{
-  pid_t child;
-  int status, i;
-
-  while ((child = waitpid (-1, &status, WNOHANG)) > (pid_t) 0)
-    {
-      for (i = 0; i < _CRYWRAP_MAXCONN; i++)
-	{
-	  if (!crywrap_children[i])
-	    continue;
-	  if (child == crywrap_children[i])
-	    {
-	      shutdown (i, SHUT_RDWR);
-	      close (i);
-	      crywrap_children[i] = 0;
-	    }
-	}
-    }
-  sigchld = 0;
-}
 
 /** Handles one client.
  * This one connects to the remote server, and proxies every traffic
@@ -965,7 +925,7 @@ _crywrap_do_one (const crywrap_config_t *config, int insock, int outsock)
 		} while (r > 0 && ret > o);
 
 	      if (r < 0)
-		cry_log ("Received corrupted data: %s", gnutls_strerror (r));
+		cry_log ("Received corrupt data: %s", gnutls_strerror (r));
 	    }
 	}
     }
@@ -1015,14 +975,12 @@ main (int argc, char **argv, char **envp)
       exit (_crywrap_do_one (config, 0, 1));
     }
 
-#if CRYWRAP_OPTION_FORK
   if (!config->debug)
     if (daemon (0, 0))
       {
         cry_error ("daemon: %s", strerror (errno));
         exit (1);
       }
-#endif
 
   cry_log ("%s", "Crywrap starting...");
 
@@ -1037,28 +995,21 @@ main (int argc, char **argv, char **envp)
   signal (SIGQUIT, _crywrap_sighandler);
   signal (SIGSEGV, _crywrap_sighandler);
   signal (SIGPIPE, SIG_IGN);
-  signal (SIGHUP, _crywrap_sighup_handler);
+  signal (SIGHUP, SIG_IGN);
+  signal (SIGCHLD, _crywrap_sigchld_handler);
 
   cry_log ("%s", "Accepting connections");
 
-  memset (crywrap_children, 0, sizeof (crywrap_children));
-  signal (SIGCHLD, _crywrap_sigchld_handler);
 
   for (;;)
     {
       int csock;
-#if !BHC_OPTION_DEBUG
       int child;
-#endif
-
-      if (sigchld)
-	_crywrap_reap_children ();
 
       csock = accept (server_socket, NULL, NULL);
       if (csock < 0)
 	continue;
 
-#if !BHC_OPTION_DEBUG
       child = fork ();
       switch (child)
 	{
@@ -1069,13 +1020,7 @@ main (int argc, char **argv, char **envp)
 	  cry_error ("%s", "Forking error.");
 	  exit (1);
 	  break;
-	default:
-	  crywrap_children[csock] = child;
-	  break;
 	}
-#else
-      _crywrap_do_one (config, csock, csock);
-#endif
       close(csock);
     }
 

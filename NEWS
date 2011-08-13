@@ -4,6 +4,8 @@ See the end for copying conditions.
 
 * Version 3.0.1 (unreleased)
 
+** crywrap: Added to the distribution
+
 ** libgnutls: Do not allow second instances of PKCS #11
 modules.
 
