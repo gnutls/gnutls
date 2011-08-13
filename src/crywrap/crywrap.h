@@ -85,22 +85,7 @@ typedef struct
   int debug;
 } crywrap_config_t;
 
-/** @defgroup options Options.
- * These are the compile-time options.
- * @{
- */
-/** If this option is set, CryWrap will fork into the background.
- */
-#ifndef CRYWRAP_OPTION_FORK
-#define CRYWRAP_OPTION_FORK 1
-#endif
-
-#if CRYWRAP_OPTION_NOFORK
-#undef CRYWRAP_OPTION_FORK
-#endif
-
 /** @} *//* End of the Options group */
 
 #endif /* !_CRYWRAP_H */
 
-/* arch-tag: ebfe1550-0fec-4c0d-8833-23e48292e75d */

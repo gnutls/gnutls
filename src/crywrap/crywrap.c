@@ -129,7 +129,7 @@ static const struct argp_option _crywrap_options[] = {
   {"key", 'k', "FILE", 0, "Server key", 2},
   {"cert", 'c', "FILE", 0, "Server certificate", 2},
   {"ca", 'z', "FILE", 0, "CA certificate", 2},
-  {"anon", 'a', NULL, 0, "Enable anonymous authentication (don't use a certificate)", 2},
+  {"anon", 'a', NULL, 0, "Enable anonymous authentication (no certificates)", 2},
   {"verify", 'v', "LEVEL", OPTION_ARG_OPTIONAL,
    "Verify clients certificate (1: verify if exists, 2: require)", 2},
   {NULL, 0, NULL, 0, "Other options:", 3},
@@ -138,7 +138,7 @@ static const struct argp_option _crywrap_options[] = {
   {"pidfile", 'P', "PATH", 0, "File to log the PID into", 3},
   {"priority", 'p', "STRING", 0, "GnuTLS ciphersuite priority string", 3},
   {"inetd", 'i', NULL, 0, "Enable inetd mode", 3},
-  {"debug", 'D', NULL, 0, "Do not fork", 3},
+  {"debug", 'D', NULL, 0, "Run the server into foreground", 3},
   {0, 0, 0, 0, NULL, 0}
 };
 
