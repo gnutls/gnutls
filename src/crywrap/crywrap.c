@@ -86,6 +86,29 @@ typedef int (*cry_log_func)(const char *format, ...)
 static cry_log_func cry_log = system_log;
 static cry_log_func cry_error = system_log_error;
 
+static void
+tls_audit_log_func (gnutls_session_t session, const char *str)
+{
+  char peer_name[NI_MAXHOST] = "Unknown";
+  gnutls_transport_ptr_t r, s;
+  struct sockaddr_storage faddr;
+  socklen_t socklen = sizeof (struct sockaddr_storage);
+  
+  if (session != NULL)
+    {
+      gnutls_transport_get_ptr2(session, &r, &s);
+      
+      /* Log the connection */
+      if (getpeername ((int)(long)r, (struct sockaddr *)&faddr, &socklen) != 0)
+        cry_error ("getpeername(): %s", strerror (errno));
+
+      cry_log ("Peer %s: %s", peer_name, str);
+    }
+  else
+    cry_log ("%s", str);
+
+}
+
 /** @defgroup globals Global variables.
  * @{
  */
@@ -492,7 +515,7 @@ _crywrap_config_parse (int argc, char **argv)
  *
  * @returns The newly created TLS session.
  */
-static gnutls_session
+static gnutls_session_t
 _crywrap_tls_session_create (const crywrap_config_t *config)
 {
   gnutls_session_t session;
@@ -797,7 +820,7 @@ static int
 _crywrap_do_one (const crywrap_config_t *config, int insock, int outsock)
 {
   int sock, ret, tls_pending;
-  gnutls_session session;
+  gnutls_session_t session;
   char buffer[_CRYWRAP_MAXBUF + 2];
   fd_set fdset;
   unsigned int status = 0;
@@ -823,7 +846,7 @@ _crywrap_do_one (const crywrap_config_t *config, int insock, int outsock)
   gnutls_transport_set_ptr2 (session,
 			     (gnutls_transport_ptr_t)insock,
 			     (gnutls_transport_ptr_t)outsock);
-  
+
   do 
     {
       ret = gnutls_handshake(session);
@@ -950,6 +973,8 @@ main (int argc, char **argv, char **envp)
   int server_socket;
 
   openlog (__CRYWRAP__, LOG_PID, LOG_DAEMON);
+
+  gnutls_global_set_audit_log_function (tls_audit_log_func);
 
   if (gnutls_global_init () < 0)
     {
