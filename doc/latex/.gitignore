@@ -28,3 +28,9 @@ algorithms.tex
 x509-api.tex
 pgp-api.tex
 cha-errors.tex
+cha-internals.tex
+gnutls.4ct
+gnutls.4tc
+gnutls.dvi
+gnutls.tmp
+gnutls.xref
