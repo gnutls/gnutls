@@ -184,7 +184,7 @@ algorithm.
 
 @node Anonymous authentication
 @section Anonymous authentication
-@cindex Anonymous authentication
+@cindex anonymous authentication
 
 The anonymous key exchange performs encryption but there is no
 indication of the identity of the peer.  This kind of authentication

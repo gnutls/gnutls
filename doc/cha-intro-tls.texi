@@ -58,8 +58,8 @@ protocol.  The protocol layering in TLS is shown in @ref{fig:tls-layers}.
 
 @node The transport layer
 @section The transport layer
-@cindex Transport protocol
-@cindex Transport layer
+@cindex transport protocol
+@cindex transport layer
 
 @acronym{TLS} is not limited to any transport layer and can be used
 above any transport layer, as long as it is a reliable one.  @acronym{DTLS}
@@ -106,7 +106,7 @@ will use the Berkeley sockets.
 
 @node The TLS record protocol
 @section The TLS record protocol
-@cindex Record protocol
+@cindex record protocol
 
 The record protocol is the secure communications provider. Its purpose
 is to encrypt, authenticate and ---optionally--- compress packets.
@@ -143,7 +143,7 @@ just after the handshake protocol has finished.
 
 @node Encryption algorithms used in the record layer
 @subsection Encryption algorithms used in the record layer
-@cindex Symmetric encryption algorithms
+@cindex symmetric encryption algorithms
 
 Confidentiality in the record layer is achieved by using symmetric
 block encryption algorithms like @code{3DES}, @code{AES}
@@ -218,7 +218,7 @@ GCM, is in use.
 
 @node Compression algorithms used in the record layer
 @subsection Compression algorithms used in the record layer
-@cindex Compression algorithms
+@cindex compression algorithms
 
 The TLS record layer also supports compression.  The algorithms
 implemented in @acronym{GnuTLS} can be found in the table below.
@@ -270,8 +270,8 @@ see the archives of the TLS Working Group mailing list and @xcite{CBCATT}.
 
 @node On Record Padding
 @subsection On record padding
-@cindex Record padding
-@cindex Bad record MAC
+@cindex record padding
+@cindex bad_record_mac
 
 The TLS protocol allows for random padding of records, to prevent
 statistical analysis based on the length of exchanged messages (see @xcite{RFC5246} section 6.2.3.2).  
@@ -303,7 +303,7 @@ different incoming IP addresses.
 @node The TLS Alert Protocol
 @section The TLS alert protocol
 @anchor{The Alert Protocol}
-@cindex Alert protocol
+@cindex alert protocol
 
 The alert protocol is there to allow signals to be sent between peers.
 These signals are mostly used to inform the peer about the cause of a
@@ -334,7 +334,7 @@ protocol are shown below.
 @node The TLS Handshake Protocol
 @section The TLS handshake protocol
 @anchor{The Handshake Protocol}
-@cindex Handshake protocol
+@cindex handshake protocol
 
 The handshake protocol is responsible for the ciphersuite negotiation,
 the initial key exchange, and the authentication of the two peers.
@@ -381,7 +381,7 @@ All the supported ciphersuites are listed in @ref{ciphersuites}.
 
 @node Client Authentication
 @subsection Client authentication
-@cindex Client Certificate authentication
+@cindex client certificate authentication
 
 In the case of ciphersuites that use certificate authentication, the
 authentication of the client is optional in @acronym{TLS}.  A server
@@ -408,7 +408,8 @@ signed by server's acceptable signers.
 @node Resuming Sessions
 @subsection Resuming sessions
 @anchor{resume}
-@cindex Resuming sessions
+@cindex resuming sessions
+@cindex session resuming
 
 The @funcref{gnutls_handshake} function, is expensive since a lot of
 calculations are performed. In order to support many fast connections
@@ -501,7 +502,7 @@ and they will be discussed in the subsections that follow.
 
 @subsection Maximum fragment length negotiation
 @cindex TLS extensions
-@cindex Maximum fragment length
+@cindex maximum fragment length
 
 This extension allows a @acronym{TLS} implementation to negotiate a
 smaller value for record packet maximum length. This extension may be
@@ -515,7 +516,7 @@ below can be used to control this extension.
 @subsection Server name indication
 @anchor{serverind}
 @cindex TLS extensions
-@cindex Server name indication
+@cindex server name indication
 
 A common problem in @acronym{HTTPS} servers is the fact that the
 @acronym{TLS} protocol is not aware of the hostname that a client
@@ -535,8 +536,8 @@ client.
 
 @subsection Session tickets
 @cindex TLS extensions
-@cindex Session tickets
-@cindex Ticket
+@cindex session tickets
+@cindex tickets
 
 To resume a TLS session the server normally store some state.  This
 complicates deployment, and typical situations the client can cache

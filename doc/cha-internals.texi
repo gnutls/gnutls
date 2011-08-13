@@ -1,6 +1,6 @@
 @node Internal architecture of GnuTLS
 @chapter Internal Architecture of GnuTLS
-@cindex Internal architecture
+@cindex internal architecture
 
 This chapter is to give a brief description of the
 way @acronym{GnuTLS} works. The focus is to give an idea

@@ -1,6 +1,6 @@
 @node Error codes
 @appendix Error Codes and Descriptions
-@cindex Error codes
+@cindex error codes
 
 The error codes used throughout the library are described below.  The
 return code @code{GNUTLS_E_SUCCESS} indicate successful operation, and

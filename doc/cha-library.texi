@@ -193,7 +193,7 @@ int main()
 
 @node Callback functions
 @section Callback functions
-@cindex Callback functions
+@cindex callback functions
 
 There are several cases where @acronym{GnuTLS} may need out of
 band input from your program. This is now implemented using some

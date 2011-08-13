@@ -60,8 +60,8 @@ be mentioned here, contact the authors.
 
 @node Downloading and Installing
 @section Downloading and Installing
-@cindex Installation
-@cindex Download
+@cindex installation
+@cindex download
 
 GnuTLS is available for download at:
 @url{http://www.gnutls.org/download.html}
@@ -111,7 +111,7 @@ For the complete list, refer to the output from @code{configure --help}.
 
 @node Bug Reports
 @section Bug Reports
-@cindex Reporting Bugs
+@cindex reporting bugs
 
 If you think you have found a bug in GnuTLS, please investigate it and
 report it.
@@ -152,8 +152,8 @@ Send your bug report to:
 
 @node Contributing
 @section Contributing
-@cindex Contributing
-@cindex Hacking
+@cindex contributing
+@cindex hacking
 
 If you want to submit a patch for inclusion -- from solving a typo you
 discovered, up to adding support for a new feature -- you should
