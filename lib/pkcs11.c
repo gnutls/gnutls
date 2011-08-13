@@ -196,7 +196,7 @@ pkcs11_add_module (const char *name, struct ck_function_list *module)
       if (memcmp(&info, &providers[i].info, sizeof(info)) == 0)
         {
           _gnutls_debug_log("%s is already loaded.\n", name);
-          return 0;
+          return GNUTLS_E_INT_RET_0;
         }
     }
 
@@ -281,6 +281,7 @@ gnutls_pkcs11_add_provider (const char *name, const char *params)
     }
   else
     {
+      if (ret == GNUTLS_E_INT_RET_0) ret = 0;
       p11_kit_finalize_module (module);
       gnutls_assert ();
     }
@@ -504,7 +505,7 @@ initialize_automatic_p11_kit (void)
     {
       name = p11_kit_registered_module_to_name (modules[i]);
       ret = pkcs11_add_module (name, modules[i]);
-      if (ret != 0)
+      if (ret != 0 && ret != GNUTLS_E_INT_RET_0)
         {
           gnutls_assert ();
           _gnutls_debug_log ("Cannot add registered module: %s\n", name);
