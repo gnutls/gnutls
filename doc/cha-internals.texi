@@ -71,7 +71,7 @@ authentication method needs to implement the functions shown below.
 @verbatim
 typedef struct 
 {
-  const char *name;             /* null terminated */
+  const char *name;
   int (*gnutls_generate_server_certificate) (gnutls_session_t, gnutls_buffer_st*);
   int (*gnutls_generate_client_certificate) (gnutls_session_t, gnutls_buffer_st*);
   int (*gnutls_generate_server_kx) (gnutls_session_t, gnutls_buffer_st*);
@@ -101,10 +101,10 @@ such as certificates, usernames etc. to @code{auth_info_t} structures.
 
 
 Simple examples of existing authentication methods can be seen in
-@code{auth_psk.c} for PSK ciphersuites and @code{auth_srp.c} for SRP
+@code{auth/\-psk.c} for PSK ciphersuites and @code{auth/\-srp.c} for SRP
 ciphersuites. After implementing these functions the structure holding
-its pointers has to be registered in @code{gnutls_algorithms.c} in the
-@code{_gnutls_kx_algorithms} structure.
+its pointers has to be registered in @code{gnutls_\-algorithms.c} in the
+@code{_gnutls_\-kx_\-algorithms} structure.
 
 @node TLS Extension Handling
 @section TLS Extension Handling
@@ -391,10 +391,10 @@ be used to register those algorithms.
 
 @itemize
 
-@item @code{gnutls_crypto_single_cipher_register}
+@item @code{gnutls_crypto_single_cipher_register}:
 To register a cipher algorithm.
 
-@item @code{gnutls_crypto_single_digest_register}
+@item @code{gnutls_crypto_single_digest_register}:
 To register a hash (digest) or MAC algorithm.
 
 @end itemize
@@ -409,22 +409,21 @@ them. For this reason the following functions are provided.
 
 @itemize
 
-@item @code{gnutls_crypto_cipher_register}
+@item @code{gnutls_crypto_cipher_register}:
 To override the cryptographic algorithms backend.
 
-@item @code{gnutls_crypto_digest_register}
+@item @code{gnutls_crypto_digest_register}:
 To override the digest algorithms backend.
 
-@item @code{gnutls_crypto_rnd_register}
+@item @code{gnutls_crypto_rnd_register}:
 To override the random number generator backend.
 
-@item @code{gnutls_crypto_bigint_register}
+@item @code{gnutls_crypto_bigint_register}:
 To override the big number number operations backend.
 
-@item @code{gnutls_crypto_pk_register}
-To override the public key encryption backend. This is tight to the
-big number operations so either both of them should be updated or care
-must be taken to use the same format.
+@item @code{gnutls_crypto_pk_register}:
+To override the public key encryption backend. This is tied to the
+big number operations so either none or both of them should be overriden.
 
 @end itemize
 
