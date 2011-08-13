@@ -471,3 +471,4 @@ build-aux/compile
 doc/stamp-1
 lib/algorithms/libgnutls_alg.la
 gl/tests/inttypes.h
+src/crywrap/crywrap

@@ -375,6 +375,37 @@ AC_SUBST(LIBGNUTLS_CFLAGS)
 AC_DEFINE([GNUTLS_COMPAT_H], 1, [Make sure we don't use old features in code.])
 AC_DEFINE([GNUTLS_INTERNAL_BUILD], 1, [We allow temporarily usage of deprecated functions - until they are removed.])
 
+dnl Crywrap dependencies
+   AC_MSG_RESULT([***
+*** Checking dependencies for crywrap...
+])
+
+AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/select.h sys/types.h sys/wait.h])
+
+dnl **********************
+dnl * Typedefs & co
+dnl **********************
+AC_CACHE_CHECK([return type of signal handlers],[ac_cv_type_signal],[AC_COMPILE_IFELSE(
+[AC_LANG_PROGRAM([#include <sys/types.h>
+#include <signal.h>
+],
+		 [return *(signal (0, 0)) (0) == 1;])],
+		   [ac_cv_type_signal=int],
+		   [ac_cv_type_signal=void])])
+AC_DEFINE_UNQUOTED([RETSIGTYPE],[$ac_cv_type_signal],[Define as the return type of signal handlers
+		    (`int' or `void').])
+
+AC_FUNC_SELECT_ARGTYPES
+AC_CHECK_FUNCS([alarm atexit dup2 epoll_create kqueue memchr memset munmap \
+		putenv regcomp scandir select socket strcasecmp strchr \
+		strdup strerror strncasecmp strrchr strstr strtoul uname])
+
+PKG_CHECK_MODULES(LIBIDN, libidn >= 0.0.0, [libidn=yes], [libidn=no])
+
+AM_CONDITIONAL(ENABLE_CRYWRAP, test "x$libidn" != "xno")
+
+dnl end of crywrap requirements
+
 AC_CONFIG_FILES([guile/pre-inst-guile], [chmod +x guile/pre-inst-guile])
 AC_CONFIG_FILES([
   Makefile
@@ -398,6 +429,7 @@ AC_CONFIG_FILES([
   guile/src/Makefile
   guile/tests/Makefile
   src/Makefile
+  src/crywrap/Makefile
   src/cfg/Makefile
   src/cfg/platon/Makefile
   src/cfg/platon/str/Makefile
@@ -450,9 +482,10 @@ AC_MSG_NOTICE([summary of build options:
   Valgrind:         $opt_valgrind_tests ${VALGRIND}
   Guile wrappers:   $opt_guile_bindings
   C++ library:      $use_cxx
-  OpenSSL library:  $enable_openssl
+  OpenSSL compat:   $enable_openssl
   /dev/crypto:      $enable_cryptodev
   Hardware accel:   $hw_accel
   Crypto library:   $cryptolib
   PKCS#11 support:  $with_p11_kit
+  crywrap app:      $libidn
 ])

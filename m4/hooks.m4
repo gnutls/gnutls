@@ -52,6 +52,8 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   AC_SUBST(CXX_LT_REVISION, 0)
   AC_SUBST(CXX_LT_AGE, 0)
 
+  AC_SUBST(CRYWRAP_PATCHLEVEL, 3)
+
   # Used when creating the Windows libgnutls-XX.def files.
   DLL_VERSION=`expr ${LT_CURRENT} - ${LT_AGE}`
   AC_SUBST(DLL_VERSION)
