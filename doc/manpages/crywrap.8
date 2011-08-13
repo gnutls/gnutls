@@ -1,0 +1,121 @@
+.\" -*- nroff -*-
+.\" This manual is for CRYWrap
+.\" 
+.\" Copyright (C) 2003 Gergely Nagy <algernon@@bonehunter.rulez.org>
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one.
+.\"
+.\" Permission is granted to copy and distribute translations of this
+.\" manual into another language, under the above conditions for modified
+.\" versions, except that this permission notice may be stated in a
+.\" translation approved by the Author.
+.TH CRYWRAP 8 "03 May 2003" "CryWrap" "CryWrap"
+.SH "NAME"
+CryWrap \- Simple TCP/IP service encryption using TLS/SSL
+.SH "SYNOPSIS"
+.BI "crywrap \-\-listen " HOST / PORT " \-\-destination " HOST / PORT
+.BI [ options ]
+.SH "DESCRIPTION"
+.B CryWrap
+is a simple wrapper that waits for TLS/SSL connections, and proxies
+them to an unencrypted location.
+.SH "OPTIONS"
+.B CryWrap
+takes the following options:
+.SS "Required options"
+.TP
+.BI "\-\-destionation (\-d) " HOST / PORT
+The destionation host and address, where CryWrap should connect
+to. Both arguments are required.
+.SS "TLS options"
+.TP
+.B \-\-anon (\-a)
+Enables Anon-DH mode. If enabled, no certificate will be sent to the
+client, and only anonymous sessions will be enabled.
+.br
+Default is \fBoff\fR.
+.TP
+.BI "\-\-cert (\-c) " PATH
+.TP
+.BI "\-\-key (\-k) " PATH
+.br
+The public certificate to send to clients, and the private server key.
+.br
+Default is \fB/etc/crywrap/server.pem\fR, unless \fB--anon\fR is also
+specified, in which case no certificate will be used.
+.BI "\-\-ca (\-z) " PATH
+.br
+A Certificate Authority certificate to be used for verification of client certificates.
+.TP
+.BI "\-\-verify (\-v) [" LEVEL ]
+Set the level of client certificate verification. Level one simply
+logs the result, level two and above abort if the certificate could
+not be verified.
+.br
+Default is \fB0\fR.
+.SS "Miscellaneous options"
+.TP
+.B \-\-inetd (\-i)
+Enable inetd-mode. Use this if you want to run CryWrap from inetd. If
+this option is not enabled, then \fB\-\-listen\fR is a required
+option.
+.br
+Default is \fBoff\fR.
+.TP
+.BI "\-\-listen (\-l) " HOST / PORT
+The host and port CryWrap should listen on. \fIHOST\fR can be an IPv4
+or IPv6 address, or a hostname, and is optional \- if unspecified,
+CryWrap will listen on all available addresses. \fIPORT\fR is
+mandatory.
+.br
+This option is required, unless CryWrap was put into inetd mode.
+.TP
+.BI "\-\-pidfile (\-P) " PIDFILE
+Write the pid thy runs with to
+.IR PIDFILE .
+.br
+Default is
+.BR /var/run/crywrap.pid .
+.TP
+.BI "\-\-user (\-u) " UID
+.I UID
+is the numerical user id of the user thy should run as.
+.br
+Default is
+.BR 65534 .
+.TP
+.B \-\-version (\-V)
+Print the version number and exit.
+.TP
+.B \-\-help (\-?)
+Print a verbose help screen and exit.
+.TP
+.B \-\-usage
+Print a short summary of options.
+.SH "EXAMPLES"
+.SS "Setting up pop3s"
+.nf
+crywrap \-\-listen /995 \-\-destination localhost/110
+.fi
+.SS "Setting up imaps with a different certificate"
+.nf
+crywrap \-\-listen /993 \-\-destination localhost/143 \\
+	\-\-pem /etc/ssl/certs/imap.pem
+.fi
+.SH "FILES"
+.TP
+.I /etc/crywrap/
+.RS
+This directory contains the default server key and certificate.
+.RE
+.SH "BUGS"
+Probably many.
+.SH "AUTHOR"
+Gergely Nagy <algernon@bonehunter.rulez.org>

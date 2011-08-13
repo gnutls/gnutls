@@ -65,7 +65,7 @@ struct tls_record_st {
  *
  * Get TLS version, a #gnutls_protocol_t value.
  *
- * Returns: the version of the currently used protocol.
+ * Returns: The version of the currently used protocol.
  **/
 gnutls_protocol_t
 gnutls_protocol_get_version (gnutls_session_t session)
@@ -143,7 +143,7 @@ gnutls_transport_set_ptr2 (gnutls_session_t session,
  * PUSH and PULL).  This must have been set using
  * gnutls_transport_set_ptr().
  *
- * Returns: first argument of the transport function.
+ * Returns: The first argument of the transport function.
  **/
 gnutls_transport_ptr_t
 gnutls_transport_get_ptr (gnutls_session_t session)
@@ -1200,7 +1200,7 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
  * you could provide a %NULL pointer for data, and 0 for
  * size. cf. gnutls_record_get_direction().
  *
- * Returns: the number of bytes sent, or a negative error code.  The
+ * Returns: The number of bytes sent, or a negative error code.  The
  *   number of bytes sent might be less than @data_size.  The maximum
  *   number of bytes this function can send in a single call depends
  *   on the negotiated maximum record size.
@@ -1237,7 +1237,7 @@ gnutls_record_send (gnutls_session_t session, const void *data,
  * initiated a handshake. In that case the server can only initiate a
  * handshake or terminate the connection.
  *
- * Returns: the number of bytes received and zero on EOF (for stream
+ * Returns: The number of bytes received and zero on EOF (for stream
  * connections).  A negative error code is returned in case of an error.  
  * The number of bytes received might be less than the requested @data_size.
  **/
@@ -1258,12 +1258,10 @@ gnutls_record_recv (gnutls_session_t session, void *data, size_t data_size)
  * This function is the same as gnutls_record_recv(), except that
  * it returns in addition to data, the sequence number of the data.
  * This is useful in DTLS where record packets might be received
- * out-of-order.
- * In DTLS the least significant 48-bits are a unique sequence
- * number, per handshake. If your application is using TLS re-handshakes
- * then the full 64-bits should be used as a unique sequence.
+ * out-of-order. The returned 8-byte sequence number should be
+ * treated as a unique message identification.
  *
- * Returns: the number of bytes received and zero on EOF.  A negative
+ * Returns: The number of bytes received and zero on EOF.  A negative
  *   error code is returned in case of an error.  The number of bytes
  *   received might be less than @data_size.
  *

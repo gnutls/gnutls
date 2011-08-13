@@ -87,7 +87,7 @@ _gnutls_record_buffer_put (gnutls_session_t session,
  * This function checks if there are any data to receive in the gnutls
  * buffers.
  *
- * Returns: the size of that data or 0.
+ * Returns: The size of that data or 0.
  **/
 size_t
 gnutls_record_check_pending (gnutls_session_t session)

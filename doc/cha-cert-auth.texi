@@ -1,6 +1,6 @@
 @node More on certificate authentication
 @chapter More on certificate authentication
-@cindex Certificate authentication
+@cindex certificate authentication
 
 @menu
 * X.509 certificates::
@@ -140,7 +140,7 @@ demonstrate the @acronym{X.509} parsing capabilities can be found at
 
 @node Verifying X.509 certificate paths
 @subsection Verifying @acronym{X.509} certificate paths
-@cindex Verifying certificate paths
+@cindex verifying certificate paths
 
 Verifying certificate paths is important in @acronym{X.509}
 authentication. For this purpose the following functions are
@@ -166,7 +166,7 @@ This purpose is served by the functions @funcref{gnutls_x509_trust_list_add_name
 
 @node Verifying a certificate in the context of TLS session
 @subsection Verifying a certificate in the context of TLS session
-@cindex Verifying certificate paths
+@cindex verifying certificate paths
 @tindex gnutls_certificate_verify_flags
 
 When operating in the context of a TLS session, the trusted certificate
@@ -268,7 +268,7 @@ consult @xcite{RFC2818} and section @ref{ex:verify} for an example.
 
 @node Certificate requests
 @subsection @acronym{PKCS} #10 certificate requests
-@cindex Certificate requests
+@cindex certificate requests
 @cindex @acronym{PKCS} #10
 
 A certificate request is a structure, which contain information about
@@ -445,7 +445,8 @@ to verify the signatures in the certificate sent by the peer.
 @node Hardware tokens
 @section Hardware tokens
 @cindex PKCS #11 tokens
-@cindex Hardware tokens
+@cindex hardware tokens
+@cindex smart cards
 
 @subsection Introduction
 This section copes with hardware token support in @acronym{GnuTLS} using 
@@ -595,7 +596,7 @@ certificates by specifying a PKCS #11 URL instead of a filename.
 
 @node Abstract key types
 @section Abstract key types
-@cindex Abstract types
+@cindex abstract types
 
 Since there are many forms of a public or private keys supported by @acronym{GnuTLS} such as
 @acronym{X.509}, @acronym{OpenPGP}, or @acronym{PKCS} #11 it is desirable to allow common operations
@@ -697,7 +698,7 @@ key abstractions.
 
 @node Digital signatures
 @section Digital signatures
-@cindex Digital signatures
+@cindex digital signatures
 
 In this section we will provide some information about digital
 signatures, how they work, and give the rationale for disabling some

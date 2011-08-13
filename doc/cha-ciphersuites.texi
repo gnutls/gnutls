@@ -1,7 +1,7 @@
 @node Supported ciphersuites in GnuTLS
 @appendix Supported Ciphersuites in @acronym{GnuTLS}
 @anchor{ciphersuites}
-@cindex Ciphersuites
+@cindex ciphersuites
 
 @include algorithms.texi
 

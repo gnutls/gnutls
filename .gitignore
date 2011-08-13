@@ -185,6 +185,12 @@ gl/tests/test-verify
 gl/tests/test-version-etc
 gl/tests/test-wchar
 gl/tests/warn-on-use.h
+gl/tests/test-float
+gl/tests/test-fseek
+gl/tests/test-ftell
+gl/tests/test-ftell3
+gl/tests/test-intprops
+gl/tests/test-inttypes
 gl/time.h
 gl/unistd.h
 gl/warn-on-use.h
@@ -465,3 +471,7 @@ build-aux/compile
 doc/stamp-1
 lib/algorithms/libgnutls_alg.la
 gl/tests/inttypes.h
+src/crywrap/crywrap
+gl/dirent.h
+gl/getopt.h
+gl/math.h

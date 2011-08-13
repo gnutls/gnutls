@@ -1,6 +1,6 @@
 @node Function reference
 @appendix Function Reference
-@cindex Function reference
+@cindex function reference
 
 @menu
 * Core functions::

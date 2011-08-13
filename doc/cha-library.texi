@@ -52,7 +52,6 @@ smaller library, with the required features, can be generated.
 @menu
 * General idea::
 * Error handling::
-* Memory handling::
 * Thread safety::
 * Callback functions::
 @end menu
@@ -108,6 +107,7 @@ resumed one, and will share the same session ID with the previous one.
 
 @node Error handling
 @section Error handling
+@subsection Conventions
 
 In @acronym{GnuTLS} most functions return an integer type as a result.
 In almost all cases a zero or a positive number means success, and a
@@ -149,18 +149,6 @@ TLS session. The session information might be used to derive IP addresses
 or other information about the peer involved.
 
 @showfuncdesc{gnutls_global_set_audit_log_function}
-
-@node Memory handling
-@section Memory handling
-
-@acronym{GnuTLS} internally handles heap allocated objects
-differently, depending on the sensitivity of the data they
-contain. However for performance reasons, the default memory functions
-do not overwrite sensitive data from memory, nor protect such objects
-from being written to the swap.  In order to change the default
-behavior the @funcref{gnutls_global_set_mem_functions} function is
-available which can be used to set other memory handlers than the
-defaults.
 
 @node Thread safety
 @section Thread safety
@@ -205,9 +193,9 @@ int main()
 
 @node Callback functions
 @section Callback functions
-@cindex Callback functions
+@cindex callback functions
 
-There are several cases where @acronym{GnuTLS} may need some out of
+There are several cases where @acronym{GnuTLS} may need out of
 band input from your program. This is now implemented using some
 callback functions, which your program is expected to register.
 
