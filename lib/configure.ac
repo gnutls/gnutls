@@ -84,7 +84,7 @@ PKG_CHECK_EXISTS(zlib, ZLIB_HAS_PKGCONFIG=y, ZLIB_HAS_PKGCONFIG=n)
 
 if test x$ac_zlib != xno; then
   if test "$ZLIB_HAS_PKGCONFIG" = "y" ; then
-    if test x$GNUTLS_REQUIRES_PRIVATE = x; then
+    if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
       GNUTLS_REQUIRES_PRIVATE="Requires.private: zlib"
     else
       GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE , zlib"
