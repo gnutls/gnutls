@@ -58,6 +58,12 @@ pin_callback (void *user, int attempt, const char *token_url,
       cache = 0;
       printf ("*** Only few tries left before locking!\n");
     }
+
+  if (flags & GNUTLS_PKCS11_PIN_WRONG)
+    {
+      cache = 0;
+      printf ("*** Wrong PIN has been provided!\n");
+    }
     
   if (cache > 0 && cached_url != NULL)
     {
@@ -69,6 +75,7 @@ pin_callback (void *user, int attempt, const char *token_url,
               exit (1);
             }
 
+          fprintf(stderr, "Re-using cached PIN for token '%s'\n", token_label);
           strcpy (pin, cached_pin);
           cache--;
           return 0;

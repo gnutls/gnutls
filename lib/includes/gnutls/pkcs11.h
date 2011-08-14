@@ -19,25 +19,60 @@ typedef int (*gnutls_pkcs11_token_callback_t) (void *const global_data,
                                                const char *const label,
                                                const unsigned retry);
 
-  /**
-   * gnutls_pkcs11_pin_flag_t:
-   * @GNUTLS_PKCS11_PIN_USER: The PIN for the user.
-   * @GNUTLS_PKCS11_PIN_SO: The PIN for the security officer.
-   * @GNUTLS_PKCS11_PIN_CONTEXT_SPECIFIC: The PIN is for a specific action and key like signing.
-   * @GNUTLS_PKCS11_PIN_FINAL_TRY: This is the final try before blocking.
-   * @GNUTLS_PKCS11_PIN_COUNT_LOW: Few tries remain before token blocks.
-   *
-   * Enumeration of different PIN flags.
-   */
+/**
+ * gnutls_pkcs11_pin_flag_t:
+ * @GNUTLS_PKCS11_PIN_USER: The PIN for the user.
+ * @GNUTLS_PKCS11_PIN_SO: The PIN for the security officer.
+ * @GNUTLS_PKCS11_PIN_CONTEXT_SPECIFIC: The PIN is for a specific action and key like signing.
+ * @GNUTLS_PKCS11_PIN_FINAL_TRY: This is the final try before blocking.
+ * @GNUTLS_PKCS11_PIN_COUNT_LOW: Few tries remain before token blocks.
+ * @GNUTLS_PKCS11_PIN_WRONG: Last given PIN was not correct.
+ *
+ * Enumeration of different PIN flags.
+ */
 typedef enum
-{
-  GNUTLS_PKCS11_PIN_USER = (1 << 0),
-  GNUTLS_PKCS11_PIN_SO = (1 << 1),
-  GNUTLS_PKCS11_PIN_CONTEXT_SPECIFIC = (1 << 4),
-  GNUTLS_PKCS11_PIN_FINAL_TRY = (1 << 2),
-  GNUTLS_PKCS11_PIN_COUNT_LOW = (1 << 3),
-} gnutls_pkcs11_pin_flag_t;
+  {
+    GNUTLS_PKCS11_PIN_USER = (1 << 0),
+    GNUTLS_PKCS11_PIN_SO = (1 << 1),
+    GNUTLS_PKCS11_PIN_FINAL_TRY = (1 << 2),
+    GNUTLS_PKCS11_PIN_COUNT_LOW = (1 << 3),
+    GNUTLS_PKCS11_PIN_CONTEXT_SPECIFIC = (1 << 4),
+    GNUTLS_PKCS11_PIN_WRONG = (1 << 5),
+  } gnutls_pkcs11_pin_flag_t;
 
+/**
+ * gnutls_pkcs11_pin_callback_t:
+ * @userdata: user-controlled data from gnutls_pkcs11_set_pin_function().
+ * @attempt: pin-attempt counter, initially 0.
+ * @token_url: PKCS11 URL.
+ * @token_label: label of PKCS11 token.
+ * @flags: a #gnutls_pkcs11_pin_flag_t flag.
+ * @pin: buffer to hold PIN, of size @pin_max.
+ * @pin_max: size of @pin buffer.
+ *
+ * Callback function type for PKCS#11 PIN entry.  It is set by
+ * gnutls_pkcs11_set_pin_function().
+ *
+ * The callback should provides the PIN code to unlock the token with
+ * label @token_label, specified by the URL @token_url.
+ *
+ * The PIN code, as a NUL-terminated ASCII string, should be copied
+ * into the @pin buffer (of maximum size @pin_max), and return 0 to
+ * indicate success.  Alternatively, the callback may return a
+ * negative gnutls error code to indicate failure and cancel PIN entry
+ * (in which case, the contents of the @pin parameter are ignored).
+ *
+ * When a PIN is required, the callback will be invoked repeatedly
+ * (and indefinitely) until either the returned PIN code is correct,
+ * the callback returns failure, or the token refuses login (e.g. when
+ * the token is locked due to too many incorrect PINs!).  For the
+ * first such invocation, the @attempt counter will have value zero;
+ * it will increase by one for each subsequent attempt.
+ *
+ * Returns: %GNUTLS_E_SUCCESS (0) on success or a negative error code on error.
+ *
+ * Since: 2.12.0
+ **/
 typedef int (*gnutls_pkcs11_pin_callback_t) (void *userdata, int attempt,
                                              const char *token_url,
                                              const char *token_label,
