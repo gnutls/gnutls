@@ -48,7 +48,7 @@ Usage: certtool [options]
      --get-dh-params          Get the included PKCS #3 encoded 
                               Diffie-Hellman parameters.
      --load-privkey FILE      Private key file to use.
-     --load-pubkey FILE       Private key file to use.
+     --load-pubkey FILE       Public key file to use.
      --load-request FILE      Certificate request file to use.
      --load-certificate FILE  
                               Certificate file to use.
@@ -146,11 +146,8 @@ To create a private key (RSA by default), run:
 $ certtool --generate-privkey --outfile key.pem
 @end smallexample
 
-To create a DSA private key, run:
-
-@smallexample
-$ certtool --dsa --generate-privkey --outfile key-dsa.pem
-@end smallexample
+To create a DSA or elliptic curves (ECDSA) private key use the
+above command combined with @code{--dsa} or @code{--ecc} options.
 
 @subsection Certificate generation
 To generate a certificate using the private key, use the command:
@@ -167,6 +164,15 @@ when the certificate will be signed by a third party authority.
 @smallexample
 $ certtool --generate-request --load-privkey key.pem \
   --outfile request.pem
+@end smallexample
+
+If the private key is stored in a smart card you can generate
+a request by specifying the private key object URL (see @ref{Invoking p11tool}
+on how to obtain the URL).
+
+@smallexample
+$ certtool --generate-request --load-privkey pkcs11:(PRIVKEY URL) \
+  --load-pubkey pkcs11:(PUBKEY URL) --outfile request.pem
 @end smallexample
 
 To generate a certificate using the previous request, use the command:
@@ -866,6 +872,9 @@ file for PKCS #11 as in @ref{Hardware tokens}.
 @example
 p11tool help
 Usage: p11tool [options]
+Usage: p11tool --list-tokens
+Usage: p11tool --list-all
+Usage: p11tool --export 'pkcs11:...'
 
      --export URL             Export an object specified by a pkcs11 
                               URL
@@ -886,8 +895,12 @@ Usage: p11tool [options]
                               secret keys to a PKCS11 token.
      --delete URL             Deletes objects matching the URL.
      --label label            Sets a label for the write operation.
-     --trusted                Marks the certificate to be imported as 
+     --trusted                Marks the certificate to be written as 
                               trusted.
+     --private                Marks the object to be written as 
+                              private (requires PIN).
+     --no-private             Marks the object to be written as not 
+                              private.
      --login                  Force login to token
      --detailed-url           Export detailed URLs.
      --no-detailed-url        Export less detailed URLs.
@@ -919,18 +932,23 @@ $ p11tool --list-tokens
 @end smallexample
 
 @subsection List all objects
+The following command will list all objects in a token. The @code{--login}
+is required to show objects marked as private.
 @smallexample
 $ p11tool --login --list-all
 @end smallexample
 
 @subsection Exporting an object
+To retrieve an object stored in the card use the following command.
+Note however that objects marked as sensitive (typically PKCS #11 private keys) 
+are not allowed to be extracted from the token.
 @smallexample 
 $ p11tool --login --export pkcs11:(OBJECT URL)
 @end smallexample
-Note however that typically PKCS #11 private key objects are not allowed
-to be extracted from the token.
 
 @subsection Copy an object to a token
+To copy an object, such as a certificate or private key to a token
+use the following command.
 @smallexample 
 $ p11tool --login --write pkcs11:(TOKEN URL) \
   --load-certificate cert.pem --label "my_cert"
