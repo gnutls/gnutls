@@ -1854,16 +1854,12 @@ retrieve_pin_for_callback (struct ck_token_info *token_info, int attempts,
   free (label);
 
   if (ret < 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_PKCS11_PIN_ERROR;
-    }
+    return gnutls_assert_val(GNUTLS_E_PKCS11_PIN_ERROR);
 
   *pin = p11_kit_pin_new_for_string (pin_value);
-
-  /* Try to scrub the pin off the stack.  Clever compilers will
-   * probably optimize this away, oh well. */
-  memset (pin, 0, sizeof pin);
+  
+  if (*pin == NULL)
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
   return 0;
 }
@@ -1879,7 +1875,10 @@ retrieve_pin (struct p11_kit_uri *info, struct ck_token_info *token_info,
   /* Check if a pinfile is specified, and use that if possible */
   pinfile = p11_kit_uri_get_pinfile (info);
   if (pinfile != NULL)
-    return retrieve_pin_for_pinfile (pinfile, token_info, attempts, user_type, pin);
+    {
+      _gnutls_debug_log("pk11: Using pinfile to retrieve PIN\n");
+      return retrieve_pin_for_pinfile (pinfile, token_info, attempts, user_type, pin);
+    }
 
   /* The global gnutls pin callback */
   else if (pin_func)
@@ -1961,7 +1960,7 @@ pkcs11_login (struct ck_function_list * module, ck_session_handle_t pks,
             }
         }
 
-      ret = retrieve_pin (info, &tinfo, attempt, user_type, &pin);
+      ret = retrieve_pin (info, &tinfo, attempt++, user_type, &pin);
       if (ret < 0)
         {
           gnutls_assert ();
