@@ -32,6 +32,7 @@ imported is properly sorted.
 
 ** API and ABI modifications:
 GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED: New element in gnutls_certificate_import_flags
+GNUTLS_PKCS11_PIN_WRONG: New flag for PIN callback
 
 
 * Version 3.0.0 (released 2011-07-29)
