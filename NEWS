@@ -10,7 +10,7 @@ flags in the callback were not being updated to reflect
 for PIN low count or final try.
 
 ** API and ABI modifications:
-No changes since last version.
+GNUTLS_PKCS11_PIN_WRONG: New flag for PIN callback
 
 
 * Version 2.12.8 (released 2011-08-08)
