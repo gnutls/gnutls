@@ -3,6 +3,16 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010, 2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 2.12.9 (unreleased)
+
+** libgnutls: When asking for a PIN multiple times, the
+flags in the callback were not being updated to reflect
+for PIN low count or final try.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 2.12.8 (released 2011-08-08)
 
 ** libgnutls: PKCS #11 back-end was replaced by p11-kit
@@ -13,7 +23,7 @@ the 3.0.0 PKCS #11 back-end. Rewrite by Stef Walter.
 with gcry_sexp_nth_mpi (..., GCRYMPI_FMT_USG) to fix errors with 1.5.0.
 Patch by Andreas Metzler.
 
-** libgnutls: Verify that a certificate liste specified
+** libgnutls: Verify that a certificate list specified
 using gnutls_certificate_set_x509_key*(), is sorted
 according to TLS specification (from subject to issuer).
 
