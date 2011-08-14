@@ -59,6 +59,7 @@ typedef int (*gnutls_pkcs11_token_callback_t) (void *const userdata,
  * @GNUTLS_PKCS11_PIN_CONTEXT_SPECIFIC: The PIN is for a specific action and key like signing.
  * @GNUTLS_PKCS11_PIN_FINAL_TRY: This is the final try before blocking.
  * @GNUTLS_PKCS11_PIN_COUNT_LOW: Few tries remain before token blocks.
+ * @GNUTLS_PKCS11_PIN_WRONG: Last given PIN was not correct.
  *
  * Enumeration of different PIN flags.
  */
@@ -66,9 +67,10 @@ typedef enum
   {
     GNUTLS_PKCS11_PIN_USER = (1 << 0),
     GNUTLS_PKCS11_PIN_SO = (1 << 1),
-    GNUTLS_PKCS11_PIN_CONTEXT_SPECIFIC = (1 << 4),
     GNUTLS_PKCS11_PIN_FINAL_TRY = (1 << 2),
     GNUTLS_PKCS11_PIN_COUNT_LOW = (1 << 3),
+    GNUTLS_PKCS11_PIN_CONTEXT_SPECIFIC = (1 << 4),
+    GNUTLS_PKCS11_PIN_WRONG = (1 << 5),
   } gnutls_pkcs11_pin_flag_t;
 
 /**

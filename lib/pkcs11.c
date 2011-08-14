@@ -1847,6 +1847,9 @@ retrieve_pin_for_callback (struct ck_token_info *token_info, int attempts,
         flags |= GNUTLS_PKCS11_PIN_FINAL_TRY;
     }
 
+  if (attempts > 0)
+    flags |= GNUTLS_PKCS11_PIN_WRONG;
+
   ret = pin_func (pin_data, attempts, (char*)token_str, label,
                   flags, pin_value, GNUTLS_PKCS11_MAX_PIN_LEN);
   free (token_str);
