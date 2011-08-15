@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.0.1 (unreleased)
 
+** libgnutls: Added AES-256-GCM which was left out from
+the previous release. Reported by Benjamin Hof.
+
 ** libgnutls: When asking for a PIN multiple times, the
 flags in the callback were not being updated to reflect
 for PIN low count or final try.
