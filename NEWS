@@ -5,6 +5,10 @@ See the end for copying conditions.
 
 * Version 2.12.9 (unreleased)
 
+** libgnutls-extra: Replaced enumeration with unsigned
+int, in openssl.h to make it identical to the 3.0.0 version.
+This shouldn't introduce binary incompatibility.
+
 ** libgnutls: When asking for a PIN multiple times, the
 flags in the callback were not being updated to reflect
 for PIN low count or final try.

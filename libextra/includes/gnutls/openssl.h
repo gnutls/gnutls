@@ -100,7 +100,7 @@ extern "C"
   typedef struct
   {
     char priority_string[256];
-    gnutls_connection_end_t connend;
+    unsigned int connend;
   } SSL_METHOD;
 
   typedef struct
