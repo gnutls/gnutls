@@ -33,7 +33,8 @@ according to TLS specification (from subject to issuer).
 gnutls_x509_crt_list_import. It checks whether the list to be 
 imported is properly sorted.
 
-** crywrap: Added to the distribution
+** crywrap: Added to the distribution. It is an application
+that proxies TLS session to a port using a plaintext service.
 
 ** doc: Many GTK-DOC improvements.
 
