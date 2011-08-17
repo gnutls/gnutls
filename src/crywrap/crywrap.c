@@ -397,7 +397,7 @@ _crywrap_config_parse_opt (int key, char *arg, struct argp_state *state)
         {
 	  dh_file = load_file(arg);
 	  if (dh_file.data == NULL)
-  	    argp_error (state, "error loading Diffie Hellman parameters file: %s.", arg);
+	    argp_error (state, "error loading Diffie Hellman parameters file: %s.", arg);
         }
       break;
     case 'p':
@@ -406,7 +406,7 @@ _crywrap_config_parse_opt (int key, char *arg, struct argp_state *state)
           const char* pos;
           ret = gnutls_priority_init(&cfg->priority, arg, &pos);
           if (ret < 0)
-  	    argp_error (state, "error in priority string at: %s.", pos);
+	    argp_error (state, "error in priority string at: %s.", pos);
         }
       break;
     case 'c':
@@ -427,7 +427,7 @@ _crywrap_config_parse_opt (int key, char *arg, struct argp_state *state)
           const char* pos;
           ret = gnutls_priority_init(&cfg->priority, "NORMAL:+ANON-ECDH:+ANON-DH", &pos);
           if (ret < 0)
-  	    argp_error (state, "error in priority string at: %s.", pos);
+	    argp_error (state, "error in priority string at: %s.", pos);
         }
       cfg->verify = 0;
       cfg->anon = 1;
@@ -461,7 +461,7 @@ _crywrap_config_parse_opt (int key, char *arg, struct argp_state *state)
 						GNUTLS_X509_FMT_PEM);
       else
         ret = gnutls_certificate_set_x509_key_file (cred, pem_cert, pem_key,
-  						GNUTLS_X509_FMT_PEM);
+						    GNUTLS_X509_FMT_PEM);
 
       if (ret < 0)
 	argp_error (state, "Error reading X.509 key or certificate file: %s", gnutls_strerror(ret));
