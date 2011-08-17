@@ -252,22 +252,24 @@ cleanup:
  * gnutls_x509_crt_get_issuer_dn:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @buf: a pointer to a structure to hold the name (may be null)
- * @sizeof_buf: initially holds the size of @buf
+ * @buf_size: initially holds the size of @buf
  *
  * This function will copy the name of the Certificate issuer in the
  * provided buffer. The name will be in the form
  * "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output string
  * will be ASCII or UTF-8 encoded, depending on the certificate data.
  *
- * If @buf is null then only the size will be filled.
+ * If @buf is null then only the size will be filled. If the @raw_flag
+ * is not specified the output is always null terminated, although the
+ * @buf_size will not include the null character.
  *
  * Returns: GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
- * long enough, and in that case the *sizeof_buf will be updated with
+ * long enough, and in that case the @buf_size will be updated with
  * the required size.  On success 0 is returned.
  **/
 int
 gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert, char *buf,
-                               size_t * sizeof_buf)
+                               size_t * buf_size)
 {
   if (cert == NULL)
     {
@@ -277,7 +279,7 @@ gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert, char *buf,
 
   return _gnutls_x509_parse_dn (cert->cert,
                                 "tbsCertificate.issuer.rdnSequence", buf,
-                                sizeof_buf);
+                                buf_size);
 }
 
 /**
@@ -287,7 +289,7 @@ gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert, char *buf,
  * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use (0) to get the first one.
  * @raw_flag: If non (0) returns the raw DER data of the DN part.
  * @buf: a pointer to a structure to hold the name (may be null)
- * @sizeof_buf: initially holds the size of @buf
+ * @buf_size: initially holds the size of @buf
  *
  * This function will extract the part of the name of the Certificate
  * issuer specified by the given OID. The output, if the raw flag is not
@@ -300,17 +302,19 @@ gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert, char *buf,
  * in hex format with a '\#' prefix.  You can check about known OIDs
  * using gnutls_x509_dn_oid_known().
  *
- * If @buf is null then only the size will be filled.
+ * If @buf is null then only the size will be filled. If the @raw_flag
+ * is not specified the output is always null terminated, although the
+ * @buf_size will not include the null character.
  *
  * Returns: GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
- *   long enough, and in that case the *sizeof_buf will be updated
+ *   long enough, and in that case the @buf_size will be updated
  *   with the required size.  On success 0 is returned.
  **/
 int
 gnutls_x509_crt_get_issuer_dn_by_oid (gnutls_x509_crt_t cert,
                                       const char *oid, int indx,
                                       unsigned int raw_flag, void *buf,
-                                      size_t * sizeof_buf)
+                                      size_t * buf_size)
 {
   if (cert == NULL)
     {
@@ -320,7 +324,7 @@ gnutls_x509_crt_get_issuer_dn_by_oid (gnutls_x509_crt_t cert,
 
   return _gnutls_x509_parse_dn_oid (cert->cert,
                                     "tbsCertificate.issuer.rdnSequence",
-                                    oid, indx, raw_flag, buf, sizeof_buf);
+                                    oid, indx, raw_flag, buf, buf_size);
 }
 
 /**
@@ -328,20 +332,22 @@ gnutls_x509_crt_get_issuer_dn_by_oid (gnutls_x509_crt_t cert,
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @indx: This specifies which OID to return. Use (0) to get the first one.
  * @oid: a pointer to a buffer to hold the OID (may be null)
- * @sizeof_oid: initially holds the size of @oid
+ * @oid_size: initially holds the size of @oid
  *
  * This function will extract the OIDs of the name of the Certificate
  * issuer specified by the given index.
  *
- * If @oid is null then only the size will be filled.
+ * If @oid is null then only the size will be filled. If the @raw_flag
+ * is not specified the output is always null terminated, although the
+ * @oid_size will not include the null character.
  *
  * Returns: GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
- *   long enough, and in that case the *sizeof_oid will be updated
+ *   long enough, and in that case the @oid_size will be updated
  *   with the required size.  On success 0 is returned.
  **/
 int
 gnutls_x509_crt_get_issuer_dn_oid (gnutls_x509_crt_t cert,
-                                   int indx, void *oid, size_t * sizeof_oid)
+                                   int indx, void *oid, size_t * oid_size)
 {
   if (cert == NULL)
     {
@@ -351,29 +357,31 @@ gnutls_x509_crt_get_issuer_dn_oid (gnutls_x509_crt_t cert,
 
   return _gnutls_x509_get_dn_oid (cert->cert,
                                   "tbsCertificate.issuer.rdnSequence",
-                                  indx, oid, sizeof_oid);
+                                  indx, oid, oid_size);
 }
 
 /**
  * gnutls_x509_crt_get_dn:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @buf: a pointer to a structure to hold the name (may be null)
- * @sizeof_buf: initially holds the size of @buf
+ * @buf_size: initially holds the size of @buf
  *
  * This function will copy the name of the Certificate in the provided
  * buffer. The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
  * described in RFC2253. The output string will be ASCII or UTF-8
  * encoded, depending on the certificate data.
  *
- * If @buf is null then only the size will be filled.
+ * If @buf is null then only the size will be filled. If the @raw_flag
+ * is not specified the output is always null terminated, although the
+ * @buf_size will not include the null character.
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
- *   long enough, and in that case the *sizeof_buf will be updated
+ *   long enough, and in that case the @buf_size will be updated
  *   with the required size.  On success 0 is returned.
  **/
 int
 gnutls_x509_crt_get_dn (gnutls_x509_crt_t cert, char *buf,
-                        size_t * sizeof_buf)
+                        size_t * buf_size)
 {
   if (cert == NULL)
     {
@@ -383,7 +391,7 @@ gnutls_x509_crt_get_dn (gnutls_x509_crt_t cert, char *buf,
 
   return _gnutls_x509_parse_dn (cert->cert,
                                 "tbsCertificate.subject.rdnSequence", buf,
-                                sizeof_buf);
+                                buf_size);
 }
 
 /**
@@ -393,7 +401,7 @@ gnutls_x509_crt_get_dn (gnutls_x509_crt_t cert, char *buf,
  * @indx: In case multiple same OIDs exist in the RDN, this specifies which to send. Use (0) to get the first one.
  * @raw_flag: If non (0) returns the raw DER data of the DN part.
  * @buf: a pointer where the DN part will be copied (may be null).
- * @sizeof_buf: initially holds the size of @buf
+ * @buf_size: initially holds the size of @buf
  *
  * This function will extract the part of the name of the Certificate
  * subject specified by the given OID. The output, if the raw flag is
@@ -406,16 +414,18 @@ gnutls_x509_crt_get_dn (gnutls_x509_crt_t cert, char *buf,
  * in hex format with a '\#' prefix.  You can check about known OIDs
  * using gnutls_x509_dn_oid_known().
  *
- * If @buf is null then only the size will be filled.
+ * If @buf is null then only the size will be filled. If the @raw_flag
+ * is not specified the output is always null terminated, although the
+ * @buf_size will not include the null character.
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
- *   not long enough, and in that case the *sizeof_buf will be updated
+ *   not long enough, and in that case the *buf_size will be updated
  *   with the required size.  On success 0 is returned.
  **/
 int
 gnutls_x509_crt_get_dn_by_oid (gnutls_x509_crt_t cert, const char *oid,
                                int indx, unsigned int raw_flag,
-                               void *buf, size_t * sizeof_buf)
+                               void *buf, size_t * buf_size)
 {
   if (cert == NULL)
     {
@@ -425,7 +435,7 @@ gnutls_x509_crt_get_dn_by_oid (gnutls_x509_crt_t cert, const char *oid,
 
   return _gnutls_x509_parse_dn_oid (cert->cert,
                                     "tbsCertificate.subject.rdnSequence",
-                                    oid, indx, raw_flag, buf, sizeof_buf);
+                                    oid, indx, raw_flag, buf, buf_size);
 }
 
 /**
@@ -433,20 +443,22 @@ gnutls_x509_crt_get_dn_by_oid (gnutls_x509_crt_t cert, const char *oid,
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @indx: This specifies which OID to return. Use (0) to get the first one.
  * @oid: a pointer to a buffer to hold the OID (may be null)
- * @sizeof_oid: initially holds the size of @oid
+ * @oid_size: initially holds the size of @oid
  *
  * This function will extract the OIDs of the name of the Certificate
  * subject specified by the given index.
  *
- * If oid is null then only the size will be filled.
+ * If @oid is null then only the size will be filled. If the @raw_flag
+ * is not specified the output is always null terminated, although the
+ * @oid_size will not include the null character.
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
- *   not long enough, and in that case the *sizeof_oid will be updated
+ *   not long enough, and in that case the @oid_size will be updated
  *   with the required size.  On success 0 is returned.
  **/
 int
 gnutls_x509_crt_get_dn_oid (gnutls_x509_crt_t cert,
-                            int indx, void *oid, size_t * sizeof_oid)
+                            int indx, void *oid, size_t * oid_size)
 {
   if (cert == NULL)
     {
@@ -456,7 +468,7 @@ gnutls_x509_crt_get_dn_oid (gnutls_x509_crt_t cert,
 
   return _gnutls_x509_get_dn_oid (cert->cert,
                                   "tbsCertificate.subject.rdnSequence",
-                                  indx, oid, sizeof_oid);
+                                  indx, oid, oid_size);
 }
 
 /**
@@ -1314,8 +1326,8 @@ gnutls_x509_crt_get_issuer_alt_name2 (gnutls_x509_crt_t cert,
  * gnutls_x509_crt_get_subject_alt_othername_oid:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
- * @ret: is the place where the otherName OID will be copied to
- * @ret_size: holds the size of ret.
+ * @oid: is the place where the otherName OID will be copied to
+ * @oid_size: holds the size of ret.
  *
  * This function will extract the type OID of an otherName Subject
  * Alternative Name, contained in the given certificate, and return
@@ -1324,6 +1336,10 @@ gnutls_x509_crt_get_issuer_alt_name2 (gnutls_x509_crt_t cert,
  * This function is only useful if
  * gnutls_x509_crt_get_subject_alt_name() returned
  * %GNUTLS_SAN_OTHERNAME.
+ *
+ * If @oid is null then only the size will be filled. If the @raw_flag
+ * is not specified the output is always null terminated, although the
+ * @oid_size will not include the null character.
  *
  * Returns: the alternative subject name type on success, one of the
  * enumerated gnutls_x509_subject_alt_name_t.  For supported OIDs, it
@@ -1339,9 +1355,9 @@ gnutls_x509_crt_get_issuer_alt_name2 (gnutls_x509_crt_t cert,
 int
 gnutls_x509_crt_get_subject_alt_othername_oid (gnutls_x509_crt_t cert,
                                                unsigned int seq,
-                                               void *ret, size_t * ret_size)
+                                               void *oid, size_t * oid_size)
 {
-  return get_alt_name (cert, "2.5.29.17", seq, ret, ret_size, NULL, NULL, 1);
+  return get_alt_name (cert, "2.5.29.17", seq, oid, oid_size, NULL, NULL, 1);
 }
 
 /**
@@ -1354,6 +1370,10 @@ gnutls_x509_crt_get_subject_alt_othername_oid (gnutls_x509_crt_t cert,
  * This function will extract the type OID of an otherName Subject
  * Alternative Name, contained in the given certificate, and return
  * the type as an enumerated element.
+ *
+ * If @oid is null then only the size will be filled. If the @raw_flag
+ * is not specified the output is always null terminated, although the
+ * @oid_size will not include the null character.
  *
  * This function is only useful if
  * gnutls_x509_crt_get_issuer_alt_name() returned
@@ -1601,7 +1621,7 @@ gnutls_x509_crt_get_proxy (gnutls_x509_crt_t cert,
  * @oid: holds an Object Identified in null terminated string
  * @indx: In case multiple same OIDs exist in the extensions, this specifies which to send. Use (0) to get the first one.
  * @buf: a pointer to a structure to hold the name (may be null)
- * @sizeof_buf: initially holds the size of @buf
+ * @buf_size: initially holds the size of @buf
  * @critical: will be non (0) if the extension is marked as critical
  *
  * This function will return the extension specified by the OID in the
@@ -1616,7 +1636,7 @@ gnutls_x509_crt_get_proxy (gnutls_x509_crt_t cert,
 int
 gnutls_x509_crt_get_extension_by_oid (gnutls_x509_crt_t cert,
                                       const char *oid, int indx,
-                                      void *buf, size_t * sizeof_buf,
+                                      void *buf, size_t * buf_size,
                                       unsigned int *critical)
 {
   int result;
@@ -1642,14 +1662,14 @@ gnutls_x509_crt_get_extension_by_oid (gnutls_x509_crt_t cert,
       return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
     }
 
-  if (output.size > (unsigned int) *sizeof_buf)
+  if (output.size > (unsigned int) *buf_size)
     {
-      *sizeof_buf = output.size;
+      *buf_size = output.size;
       _gnutls_free_datum (&output);
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
-  *sizeof_buf = output.size;
+  *buf_size = output.size;
 
   if (buf)
     memcpy (buf, output.data, output.size);
@@ -1665,7 +1685,7 @@ gnutls_x509_crt_get_extension_by_oid (gnutls_x509_crt_t cert,
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @indx: Specifies which extension OID to send. Use (0) to get the first one.
  * @oid: a pointer to a structure to hold the OID (may be null)
- * @sizeof_oid: initially holds the size of @oid
+ * @oid_size: initially holds the size of @oid
  *
  * This function will return the requested extension OID in the certificate.
  * The extension OID will be stored as a string in the provided buffer.
@@ -1677,7 +1697,7 @@ gnutls_x509_crt_get_extension_by_oid (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
-                                   void *oid, size_t * sizeof_oid)
+                                   void *oid, size_t * oid_size)
 {
   int result;
 
@@ -1687,7 +1707,7 @@ gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  result = _gnutls_x509_crt_get_extension_oid (cert, indx, oid, sizeof_oid);
+  result = _gnutls_x509_crt_get_extension_oid (cert, indx, oid, oid_size);
   if (result < 0)
     {
       return result;
@@ -1702,7 +1722,7 @@ gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @indx: Specifies which extension OID to send. Use (0) to get the first one.
  * @oid: a pointer to a structure to hold the OID
- * @sizeof_oid: initially holds the maximum size of @oid, on return
+ * @oid_size: initially holds the maximum size of @oid, on return
  *   holds actual size of @oid.
  * @critical: output variable with critical flag, may be NULL.
  *
@@ -1712,7 +1732,7 @@ gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
  * gnutls_x509_crt_get_extension_data() to extract the data.
  *
  * If the buffer provided is not long enough to hold the output, then
- * *@sizeof_oid is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will be
+ * *@oid_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will be
  * returned.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
@@ -1722,7 +1742,7 @@ gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
  **/
 int
 gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
-                                    void *oid, size_t * sizeof_oid,
+                                    void *oid, size_t * oid_size,
                                     int *critical)
 {
   int result;
@@ -1739,9 +1759,9 @@ gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
   snprintf (name, sizeof (name), "tbsCertificate.extensions.?%u.extnID",
             indx + 1);
 
-  len = *sizeof_oid;
+  len = *oid_size;
   result = asn1_read_value (cert->cert, name, oid, &len);
-  *sizeof_oid = len;
+  *oid_size = len;
 
   if (result == ASN1_ELEMENT_NOT_FOUND)
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
@@ -2072,7 +2092,7 @@ gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn,
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @algo: is a digest algorithm
  * @buf: a pointer to a structure to hold the fingerprint (may be null)
- * @sizeof_buf: initially holds the size of @buf
+ * @buf_size: initially holds the size of @buf
  *
  * This function will calculate and copy the certificate's fingerprint
  * in the provided buffer.
@@ -2080,20 +2100,20 @@ gnutls_x509_dn_get_rdn_ava (gnutls_x509_dn_t dn,
  * If the buffer is null then only the size will be filled.
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
- *   not long enough, and in that case the *sizeof_buf will be updated
+ *   not long enough, and in that case the *buf_size will be updated
  *   with the required size.  On success 0 is returned.
  **/
 int
 gnutls_x509_crt_get_fingerprint (gnutls_x509_crt_t cert,
                                  gnutls_digest_algorithm_t algo,
-                                 void *buf, size_t * sizeof_buf)
+                                 void *buf, size_t * buf_size)
 {
   opaque *cert_buf;
   int cert_buf_size;
   int result;
   gnutls_datum_t tmp;
 
-  if (sizeof_buf == 0 || cert == NULL)
+  if (buf_size == 0 || cert == NULL)
     {
       return GNUTLS_E_INVALID_REQUEST;
     }
@@ -2120,7 +2140,7 @@ gnutls_x509_crt_get_fingerprint (gnutls_x509_crt_t cert,
   tmp.data = cert_buf;
   tmp.size = cert_buf_size;
 
-  result = gnutls_fingerprint (algo, &tmp, buf, sizeof_buf);
+  result = gnutls_fingerprint (algo, &tmp, buf, buf_size);
   gnutls_free (cert_buf);
 
   return result;
@@ -2770,7 +2790,7 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @indx: This specifies which OID to return. Use (0) to get the first one.
  * @oid: a pointer to a buffer to hold the OID (may be null)
- * @sizeof_oid: initially holds the size of @oid
+ * @oid_size: initially holds the size of @oid
  * @critical: output flag to indicate criticality of extension
  *
  * This function will extract the key purpose OIDs of the Certificate
@@ -2778,15 +2798,17 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
  * Usage extension (2.5.29.37) See the GNUTLS_KP_* definitions for
  * human readable names.
  *
- * If @oid is null then only the size will be filled.
+ * If @oid is null then only the size will be filled. If the @raw_flag
+ * is not specified the output is always null terminated, although the
+ * @oid_size will not include the null character.
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
- *   not long enough, and in that case the *sizeof_oid will be updated
+ *   not long enough, and in that case the *oid_size will be updated
  *   with the required size.  On success 0 is returned.
  **/
 int
 gnutls_x509_crt_get_key_purpose_oid (gnutls_x509_crt_t cert,
-                                     int indx, void *oid, size_t * sizeof_oid,
+                                     int indx, void *oid, size_t * oid_size,
                                      unsigned int *critical)
 {
   char tmpstr[ASN1_MAX_NAME_SIZE];
@@ -2801,9 +2823,9 @@ gnutls_x509_crt_get_key_purpose_oid (gnutls_x509_crt_t cert,
     }
 
   if (oid)
-    memset (oid, 0, *sizeof_oid);
+    memset (oid, 0, *oid_size);
   else
-    *sizeof_oid = 0;
+    *oid_size = 0;
 
   if ((result =
        _gnutls_x509_crt_get_extension (cert, "2.5.29.37", 0, &id,
@@ -2842,10 +2864,10 @@ gnutls_x509_crt_get_key_purpose_oid (gnutls_x509_crt_t cert,
    */
   snprintf (tmpstr, sizeof (tmpstr), "?%u", indx);
 
-  len = *sizeof_oid;
+  len = *oid_size;
   result = asn1_read_value (c2, tmpstr, oid, &len);
 
-  *sizeof_oid = len;
+  *oid_size = len;
   asn1_delete_structure (&c2);
 
   if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND)
@@ -3284,7 +3306,7 @@ error:
  * gnutls_x509_crt_get_subject_unique_id:
  * @crt: Holds the certificate
  * @buf: user allocated memory buffer, will hold the unique id
- * @sizeof_buf: size of user allocated memory buffer (on input), will hold
+ * @buf_size: size of user allocated memory buffer (on input), will hold
  * actual size of the unique ID on return.
  *
  * This function will extract the subjectUniqueID value (if present) for
@@ -3292,13 +3314,13 @@ error:
  *
  * If the user allocated memory buffer is not large enough to hold the
  * full subjectUniqueID, then a GNUTLS_E_SHORT_MEMORY_BUFFER error will be
- * returned, and sizeof_buf will be set to the actual length.
+ * returned, and buf_size will be set to the actual length.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  **/
 int
 gnutls_x509_crt_get_subject_unique_id (gnutls_x509_crt_t crt, char *buf,
-                                       size_t * sizeof_buf)
+                                       size_t * buf_size)
 {
   int result;
   gnutls_datum_t datum = { NULL, 0 };
@@ -3307,15 +3329,15 @@ gnutls_x509_crt_get_subject_unique_id (gnutls_x509_crt_t crt, char *buf,
     _gnutls_x509_read_value (crt->cert, "tbsCertificate.subjectUniqueID",
                              &datum, 2);
 
-  if (datum.size > *sizeof_buf)
+  if (datum.size > *buf_size)
     {                           /* then we're not going to fit */
-      *sizeof_buf = datum.size;
+      *buf_size = datum.size;
       buf[0] = '\0';
       result = GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
   else
     {
-      *sizeof_buf = datum.size;
+      *buf_size = datum.size;
       memcpy (buf, datum.data, datum.size);
     }
 
@@ -3328,7 +3350,7 @@ gnutls_x509_crt_get_subject_unique_id (gnutls_x509_crt_t crt, char *buf,
  * gnutls_x509_crt_get_issuer_unique_id:
  * @crt: Holds the certificate
  * @buf: user allocated memory buffer, will hold the unique id
- * @sizeof_buf: size of user allocated memory buffer (on input), will hold
+ * @buf_size: size of user allocated memory buffer (on input), will hold
  * actual size of the unique ID on return.
  *
  * This function will extract the issuerUniqueID value (if present) for
@@ -3336,7 +3358,7 @@ gnutls_x509_crt_get_subject_unique_id (gnutls_x509_crt_t crt, char *buf,
  *
  * If the user allocated memory buffer is not large enough to hold the
  * full subjectUniqueID, then a GNUTLS_E_SHORT_MEMORY_BUFFER error will be
- * returned, and sizeof_buf will be set to the actual length.
+ * returned, and buf_size will be set to the actual length.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
@@ -3344,7 +3366,7 @@ gnutls_x509_crt_get_subject_unique_id (gnutls_x509_crt_t crt, char *buf,
  **/
 int
 gnutls_x509_crt_get_issuer_unique_id (gnutls_x509_crt_t crt, char *buf,
-                                      size_t * sizeof_buf)
+                                      size_t * buf_size)
 {
   int result;
   gnutls_datum_t datum = { NULL, 0 };
@@ -3353,15 +3375,15 @@ gnutls_x509_crt_get_issuer_unique_id (gnutls_x509_crt_t crt, char *buf,
     _gnutls_x509_read_value (crt->cert, "tbsCertificate.issuerUniqueID",
                              &datum, 2);
 
-  if (datum.size > *sizeof_buf)
+  if (datum.size > *buf_size)
     {                           /* then we're not going to fit */
-      *sizeof_buf = datum.size;
+      *buf_size = datum.size;
       buf[0] = '\0';
       result = GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
   else
     {
-      *sizeof_buf = datum.size;
+      *buf_size = datum.size;
       memcpy (buf, datum.data, datum.size);
     }
 

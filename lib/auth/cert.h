@@ -29,6 +29,12 @@
 #include <gnutls/abstract.h>
 #include <gnutls/compat.h>
 
+typedef struct {
+  gnutls_pcert_st * cert_list; /* a certificate chain */
+  unsigned int cert_list_length; /* its length */
+  char* name; /* the name of the first certificate - only 1 allowed*/
+} certs_st;
+
 /* This structure may be complex, but it's the only way to
  * support a server that has multiple certificates
  */
@@ -41,19 +47,8 @@ typedef struct gnutls_certificate_credentials_st
    */
   gnutls_params_function *params_func;
 
-  gnutls_pcert_st **cert_list;
-  /* contains a list of a list of certificates.
-   * eg (X509): [0] certificate1, certificate11, certificate111 
-   * (if more than one, one certificate certifies the one before)
-   *       [1] certificate2, certificate22, ...
-   */
-  unsigned *cert_list_length;
-  /* contains the number of the certificates in a
-   * row (should be 1 for OpenPGP keys).
-   */
-  unsigned ncerts;              /* contains the number of columns in cert_list.
-                                 * This is the same with the number of pkeys.
-                                 */
+  certs_st *certs;
+  unsigned ncerts; /* the number of certs */
 
   gnutls_privkey_t *pkey;
   /* private keys. It contains ncerts private
@@ -158,7 +153,7 @@ int _gnutls_get_auth_info_pcert (gnutls_pcert_st* gcert,
                                  cert_auth_info_t info);
 
 int certificate_credential_append_crt_list (gnutls_certificate_credentials_t
-                                            res, gnutls_pcert_st* crt, int nr);
+                                            res, const char* name, gnutls_pcert_st* crt, int nr);
 int certificate_credentials_append_pkey (gnutls_certificate_credentials_t res,
                                          gnutls_privkey_t pkey);
 

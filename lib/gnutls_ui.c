@@ -468,7 +468,7 @@ gnutls_certificate_get_ours (gnutls_session_t session)
 
   cred = (gnutls_certificate_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
-  if (cred == NULL || cred->cert_list == NULL)
+  if (cred == NULL || cred->certs == NULL)
     {
       gnutls_assert ();
       return NULL;

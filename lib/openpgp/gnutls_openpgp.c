@@ -90,6 +90,8 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
   int ret;
   gnutls_privkey_t privkey;
   gnutls_pcert_st *ccert;
+  char name[MAX_CN];
+  size_t name_size = sizeof(name);
 
   /* this should be first */
 
@@ -110,6 +112,9 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
       return ret;
     }
 
+  ret = gnutls_openpgp_crt_get_name(crt, 0, name, &name_size);
+  if (ret < 0)
+    name[0] = 0;
 
   ccert = gnutls_calloc (1, sizeof (gnutls_pcert_st));
   if (ccert == NULL)
@@ -130,7 +135,7 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
 
   ret = certificate_credentials_append_pkey (res, privkey);
   if (ret >= 0)
-    ret = certificate_credential_append_crt_list (res, ccert, 1);
+    ret = certificate_credential_append_crt_list (res, name, ccert, 1);
 
   if (ret < 0)
     {

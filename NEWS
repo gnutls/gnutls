@@ -4,14 +4,18 @@ See the end for copying conditions.
 
 * Version 3.0.1 (unreleased)
 
+** libgnutls: gnutls_certificate_set_x509_key_file() and 
+friends support server name indication. If multiple 
+certificates are set using these functions the proper one 
+will be selected during a handshake, with the limitation 
+of a single name per certificate.
+
 ** libgnutls: Added AES-256-GCM which was left out from
 the previous release. Reported by Benjamin Hof.
 
-** libgnutls: When asking for a PIN multiple times, the
-flags in the callback were not being updated to reflect
-for PIN low count or final try.
-
-** crywrap: Added to the distribution
+** libgnutls: When asking for a PKCS# 11 PIN multiple 
+times, the flags in the callback were not being updated 
+to reflect for PIN low count or final try.
 
 ** libgnutls: Do not allow second instances of PKCS #11
 modules.
@@ -28,6 +32,8 @@ according to TLS specification (from subject to issuer).
 ** libgnutls: Added GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED flag for
 gnutls_x509_crt_list_import. It checks whether the list to be 
 imported is properly sorted.
+
+** crywrap: Added to the distribution
 
 ** doc: Many GTK-DOC improvements.
 
