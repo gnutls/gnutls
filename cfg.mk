@@ -51,6 +51,8 @@ exclude_file_name_regexp--sc_prohibit_doubled_word = ^tests/rsa-md5-collision/RE
 exclude_file_name_regexp--sc_prohibit_undesirable_word_seq = ^tests/nist-pkits/gnutls-nist-tests.html
 exclude_file_name_regexp--sc_space_tab = ^doc/.*.(pdf|png)|tests/nist-pkits/|tests/suite/x509paths/
 exclude_file_name_regexp--sc_two_space_separator_in_usage = ^doc/cha-programs.texi|tests/sha2/sha2|tests/sha2/sha2-dsa$$
+exclude_file_name_regexp--sc_error_message_period = ^src/crywrap/crywrap.c$$
+exclude_file_name_regexp--sc_error_message_uppercase = ^doc/examples/ex-cxx.cpp|guile/src/extra.c|src/certtool.c|src/crywrap/crywrap.c|tests/pkcs12_encode.c$$
 
 autoreconf:
 	for f in $(PODIR)/*.po.in; do \
