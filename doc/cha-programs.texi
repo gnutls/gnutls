@@ -803,6 +803,8 @@ client PSK connection}.
 @cindex psktool
 
 This is a program to manage @acronym{PSK} username and keys.
+It will generate random keys for the indicated username, 
+using a simple password file format.
 
 @smallexample
 PSKtool help
@@ -814,8 +816,6 @@ Usage : psktool [options]
      -v, --version            prints the program's version number
      -h, --help               shows this help text
 @end smallexample
-
-Normally the file will generate random keys for the indicated username.
 
 @node Invoking srptool
 @section Invoking srptool
