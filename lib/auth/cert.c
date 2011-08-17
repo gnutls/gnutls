@@ -238,10 +238,10 @@ _find_x509_cert (const gnutls_certificate_credentials_t cred,
 
       for (i = 0; i < cred->ncerts; i++)
         {
-          for (j = 0; j < cred->cert_list_length[i]; j++)
+          for (j = 0; j < cred->certs[i].cert_list_length; j++)
             {
               if ((result =
-                   _gnutls_cert_get_issuer_dn (&cred->cert_list[i][j],
+                   _gnutls_cert_get_issuer_dn (&cred->certs[i].cert_list[j],
                                                &odn)) < 0)
                 {
                   gnutls_assert ();
@@ -256,7 +256,7 @@ _find_x509_cert (const gnutls_certificate_credentials_t cred,
                * the cert is our cert!
                */
               cert_pk =
-                gnutls_pubkey_get_pk_algorithm (cred->cert_list[i][0].pubkey,
+                gnutls_pubkey_get_pk_algorithm (cred->certs[i].cert_list[0].pubkey,
                                                 NULL);
 
               if ((memcmp (odn.data, data, size) == 0) &&
@@ -298,7 +298,7 @@ _find_openpgp_cert (const gnutls_certificate_credentials_t cred,
 
   for (i = 0; i < cred->ncerts; i++)
     {
-      for (j = 0; j < cred->cert_list_length[i]; j++)
+      for (j = 0; j < cred->certs[i].cert_list_length; j++)
         {
 
           /* If the *_SIGN algorithm matches
@@ -306,9 +306,9 @@ _find_openpgp_cert (const gnutls_certificate_credentials_t cred,
            */
           if ((_gnutls_check_pk_algo_in_list
                (pk_algos, pk_algos_length,
-                gnutls_pubkey_get_pk_algorithm (cred->cert_list[i][0].pubkey,
+                gnutls_pubkey_get_pk_algorithm (cred->certs[i].cert_list[0].pubkey,
                                                 NULL)) == 0)
-              && (cred->cert_list[i][0].type == GNUTLS_CRT_OPENPGP))
+              && (cred->certs[i].cert_list[0].type == GNUTLS_CRT_OPENPGP))
             {
               *indx = i;
               break;
@@ -757,8 +757,8 @@ _select_client_cert (gnutls_session_t session,
       if (indx >= 0)
         {
           _gnutls_selected_certs_set (session,
-                                      &cred->cert_list[indx][0],
-                                      cred->cert_list_length[indx],
+                                      &cred->certs[indx].cert_list[0],
+                                      cred->certs[indx].cert_list_length,
                                       cred->pkey[indx], 0);
         }
       else
@@ -2073,6 +2073,25 @@ _gnutls_selected_certs_set (gnutls_session_t session,
 
 }
 
+static void get_server_name(gnutls_session_t session, uint8_t* name, size_t max_name_size)
+{
+int ret, i;
+size_t max_name;
+unsigned int type;
+
+  ret = 0;
+  for (i=0; !(ret<0);i++)
+    {
+      max_name = max_name_size;
+      ret = gnutls_server_name_get (session, name, &max_name, &type, i);
+      if (ret >= 0 && type == GNUTLS_NAME_DNS)
+        return;
+    }
+
+  name[0] = 0;
+
+  return;
+}
 
 /* finds the most appropriate certificate in the cert list.
  * The 'appropriate' is defined by the user.
@@ -2092,6 +2111,7 @@ _gnutls_server_select_cert (gnutls_session_t session,
   unsigned i, j;
   int idx, ret;
   gnutls_certificate_credentials_t cred;
+  char server_name[MAX_CN];
 
   cred = (gnutls_certificate_credentials_t)
     _gnutls_get_cred (session->key, GNUTLS_CRD_CERTIFICATE, NULL);
@@ -2114,8 +2134,42 @@ _gnutls_server_select_cert (gnutls_session_t session,
     }
 
   /* Otherwise... */
+  
+  get_server_name(session, server_name, sizeof(server_name));
 
   idx = -1;                     /* default is use no certificate */
+
+  /* find certificates that match the requested server_name
+   */
+  
+  if (server_name[0] != 0)
+    {
+      for (i = 0; i < cred->ncerts; i++)
+        {
+fprintf(stderr, "\n*** name[i]: %s, req: %s\n\n", cred->certs[i].name, server_name);
+          if (cred->certs[i].name != NULL && strcasecmp(cred->certs[i].name, server_name) == 0)
+            {
+              /* if requested algorithms are also compatible select it */
+              gnutls_pk_algorithm pk =
+                gnutls_pubkey_get_pk_algorithm (cred->certs[i].cert_list[0].pubkey,
+                                            NULL);
+
+              _gnutls_handshake_log("HSK[%p]: Requested server name: '%s', ctype: %s (%d)", session, server_name,
+                    gnutls_certificate_type_get_name (session->security_parameters.cert_type), 
+                    session->security_parameters.cert_type);
+
+              if (session->security_parameters.cert_type == cred->certs[i].cert_list[0].type)
+                {
+                  for (j = 0; j < pk_algos_size; j++)
+                  if (pk_algos[j] == pk)
+                    {
+  	              idx = i;
+	              goto finished;
+	            }
+                }
+            }
+        }
+    }
 
   for (j = 0; j < pk_algos_size; j++)
     {
@@ -2129,42 +2183,40 @@ _gnutls_server_select_cert (gnutls_session_t session,
       for (i = 0; i < cred->ncerts; i++)
         {
           gnutls_pk_algorithm pk =
-            gnutls_pubkey_get_pk_algorithm (cred->cert_list[i][0].pubkey,
+            gnutls_pubkey_get_pk_algorithm (cred->certs[i].cert_list[0].pubkey,
                                             NULL);
           /* find one compatible certificate
            */
           _gnutls_handshake_log
             ("HSK[%p]: certificate[%d] PK algorithm: %s (%d) - ctype: %s (%d)\n",
              session, i, gnutls_pk_get_name (pk), pk,
-             gnutls_certificate_type_get_name (cred->cert_list[i][0].type),
-             cred->cert_list[i][0].type);
+             gnutls_certificate_type_get_name (cred->certs[i].cert_list[0].type),
+             cred->certs[i].cert_list[0].type);
 
           if (pk_algos[j] == pk)
             {
               /* if cert type matches
                */
 	  /* *INDENT-OFF* */
-	  if (session->security_parameters.cert_type == cred->cert_list[i][0].type)
+	  if (session->security_parameters.cert_type == cred->certs[i].cert_list[0].type)
 	    {
 	      idx = i;
-	      break;
+	      goto finished;
 	    }
 	  /* *INDENT-ON* */
             }
         }
-
-      if (idx != -1)
-        break;
     }
 
   /* store the certificate pointer for future use, in the handshake.
    * (This will allow not calling this callback again.)
    */
+finished:
   if (idx >= 0)
     {
       _gnutls_selected_certs_set (session,
-                                  &cred->cert_list[idx][0],
-                                  cred->cert_list_length[idx],
+                                  &cred->certs[idx].cert_list[0],
+                                  cred->certs[idx].cert_list_length,
                                   cred->pkey[idx], 0);
     }
   else

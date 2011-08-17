@@ -58,18 +58,16 @@ gnutls_certificate_free_keys (gnutls_certificate_credentials_t sc)
 
   for (i = 0; i < sc->ncerts; i++)
     {
-      for (j = 0; j < sc->cert_list_length[i]; j++)
+      for (j = 0; j < sc->certs[i].cert_list_length; j++)
         {
-          gnutls_pcert_deinit (&sc->cert_list[i][j]);
+          gnutls_pcert_deinit (&sc->certs[i].cert_list[j]);
         }
-      gnutls_free (sc->cert_list[i]);
+      gnutls_free (sc->certs[i].cert_list);
+      gnutls_free (sc->certs[i].name);
     }
 
-  gnutls_free (sc->cert_list_length);
-  sc->cert_list_length = NULL;
-
-  gnutls_free (sc->cert_list);
-  sc->cert_list = NULL;
+  gnutls_free (sc->certs);
+  sc->certs = NULL;
 
   for (i = 0; i < sc->ncerts; i++)
     {
@@ -80,7 +78,6 @@ gnutls_certificate_free_keys (gnutls_certificate_credentials_t sc)
   sc->pkey = NULL;
 
   sc->ncerts = 0;
-
 }
 
 /**
