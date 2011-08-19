@@ -2146,8 +2146,7 @@ _gnutls_server_select_cert (gnutls_session_t session,
     {
       for (i = 0; i < cred->ncerts; i++)
         {
-fprintf(stderr, "\n*** name[i]: %s, req: %s\n\n", cred->certs[i].name, server_name);
-          if (cred->certs[i].name != NULL && strcasecmp(cred->certs[i].name, server_name) == 0)
+          if (cred->certs[i].names != NULL && _gnutls_str_array_match(cred->certs[i].names, server_name) != 0)
             {
               /* if requested algorithms are also compatible select it */
               gnutls_pk_algorithm pk =

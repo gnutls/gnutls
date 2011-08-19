@@ -87,12 +87,15 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
                                     gnutls_openpgp_crt_t crt,
                                     gnutls_openpgp_privkey_t pkey)
 {
-  int ret;
+  int ret, ret2, i;
   gnutls_privkey_t privkey;
-  gnutls_pcert_st *ccert;
+  gnutls_pcert_st *ccert = NULL;
   char name[MAX_CN];
-  size_t name_size = sizeof(name);
+  size_t max_size;
+  gnutls_str_array_t names;
 
+  _gnutls_str_array_init(&names);
+  
   /* this should be first */
 
   ret = gnutls_privkey_init (&privkey);
@@ -107,42 +110,50 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
                                    GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
   if (ret < 0)
     {
-      gnutls_privkey_deinit (privkey);
       gnutls_assert ();
-      return ret;
+      goto cleanup;
     }
-
-  ret = gnutls_openpgp_crt_get_name(crt, 0, name, &name_size);
-  if (ret < 0)
-    name[0] = 0;
 
   ccert = gnutls_calloc (1, sizeof (gnutls_pcert_st));
   if (ccert == NULL)
     {
       gnutls_assert ();
-      gnutls_privkey_deinit (privkey);
-      return GNUTLS_E_MEMORY_ERROR;
+      ret = GNUTLS_E_MEMORY_ERROR;
+      goto cleanup;
+    }
+
+  max_size = sizeof(name);
+  ret = 0;
+  for (i = 0; !(ret < 0); i++)
+    {
+      ret = gnutls_openpgp_crt_get_name(crt, i, name, &max_size);
+      if (ret >= 0)
+        {
+          ret2 = _gnutls_str_array_append(&names, name, max_size);
+          if (ret2 < 0)
+            {
+              gnutls_assert();
+              ret = ret2;
+              goto cleanup;
+            }
+        }
     }
 
   ret = gnutls_pcert_import_openpgp (ccert, crt, 0);
   if (ret < 0)
     {
       gnutls_assert ();
-      gnutls_free (ccert);
-      gnutls_privkey_deinit (privkey);
-      return ret;
+      goto cleanup;
     }
 
   ret = certificate_credentials_append_pkey (res, privkey);
   if (ret >= 0)
-    ret = certificate_credential_append_crt_list (res, name, ccert, 1);
+    ret = certificate_credential_append_crt_list (res, names, ccert, 1);
 
   if (ret < 0)
     {
       gnutls_assert ();
-      gnutls_free (ccert);
-      gnutls_privkey_deinit (privkey);
-      return ret;
+      goto cleanup;
     }
 
   res->ncerts++;
@@ -150,6 +161,12 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
   /* FIXME: Check if the keys match. */
 
   return 0;
+
+cleanup:
+  gnutls_privkey_deinit (privkey);
+  gnutls_free (ccert);
+  _gnutls_str_array_clear(&names);
+  return ret;
 }
 
 /*-
