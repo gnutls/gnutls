@@ -65,18 +65,16 @@ pid_t child;
 
 struct params_res resume_tests[] = {
   {"try to resume from db", 50, 0, 0, 1},
-#ifdef ENABLE_SESSION_TICKET
   {"try to resume from session ticket", 0, 1, 1, 1},
   {"try to resume from session ticket (server only)", 0, 1, 0, 0},
   {"try to resume from session ticket (client only)", 0, 0, 1, 0},
-#endif
   {NULL, -1}
 };
 
 /* A very basic TLS client, with anonymous authentication.
  */
 
-#define MAX_BUF 1024
+#define MAX_BUF 5*1024
 #define MSG "Hello TLS"
 
 static void
@@ -119,16 +117,14 @@ client (struct params_res *params)
       gnutls_init (&session, GNUTLS_CLIENT);
 
       /* Use default priorities */
-  gnutls_priority_set_direct (session, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
+      gnutls_priority_set_direct (session, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+ANON-DH", NULL);
 
       /* put the anonymous credentials to the current session
        */
       gnutls_credentials_set (session, GNUTLS_CRD_ANON, anoncred);
 
-#ifdef ENABLE_SESSION_TICKET
       if (params->enable_session_ticket_client)
         gnutls_session_ticket_enable_client (session);
-#endif
 
       if (t > 0)
         {
@@ -180,7 +176,9 @@ client (struct params_res *params)
           else
             {
               if (params->expect_resume)
-                fail ("*** Previous session was NOT resumed\n");
+                {
+                  fail ("*** Previous session was NOT resumed\n");
+                }
               else
                 {
                   if (debug)
@@ -205,7 +203,7 @@ client (struct params_res *params)
           goto end;
         }
 
-      if (debug)
+      if (debug )
         {
           printf ("- Received %d bytes: ", ret);
           for (ii = 0; ii < ret; ii++)
@@ -231,13 +229,12 @@ end:
  */
 
 #define SA struct sockaddr
-#define MAX_BUF 1024
 #define PORT 5556               /* listen to 5556 port */
 #define DH_BITS 1024
 
 /* These are global */
 gnutls_anon_server_credentials_t anoncred;
-gnutls_datum_t session_ticket_key = { NULL, 0 };
+static gnutls_datum_t session_ticket_key = { NULL, 0 };
 
 static gnutls_session_t
 initialize_tls_session (struct params_res *params)
@@ -262,10 +259,9 @@ initialize_tls_session (struct params_res *params)
       gnutls_db_set_store_function (session, wrap_db_store);
       gnutls_db_set_ptr (session, NULL);
     }
-#ifdef ENABLE_SESSION_TICKET
+
   if (params->enable_session_ticket_server)
     gnutls_session_ticket_enable_server (session, &session_ticket_key);
-#endif
 
   return session;
 }
@@ -378,10 +374,9 @@ server (struct params_res *params)
     {
       wrap_db_init ();
     }
-#ifdef ENABLE_SESSION_TICKET
+
   if (params->enable_session_ticket_server)
     gnutls_session_ticket_key_generate (&session_ticket_key);
-#endif
 
   for (t = 0; t < 2; t++)
     {
@@ -466,8 +461,7 @@ doit (void)
 
   for (i = 0; resume_tests[i].desc; i++)
     {
-      if (debug)
-        printf ("%s\n", resume_tests[i].desc);
+      printf ("%s\n", resume_tests[i].desc);
 
       global_start ();
       if (error_count)
@@ -487,12 +481,16 @@ doit (void)
           /* parent */
           server (&resume_tests[i]);
           wait (&status);
+          if (WEXITSTATUS(status) > 0)
+            error_count++;
           global_stop ();
         }
       else
         {
           client (&resume_tests[i]);
           gnutls_global_deinit ();
+          if (error_count)
+            exit(1);
           exit (0);
         }
     }
@@ -504,7 +502,7 @@ doit (void)
  */
 
 #define MAX_SESSION_ID_SIZE 32
-#define MAX_SESSION_DATA_SIZE 512
+#define MAX_SESSION_DATA_SIZE 1024
 
 typedef struct
 {
@@ -566,6 +564,7 @@ wrap_db_store (void *dbf, gnutls_datum_t key, gnutls_datum_t data)
 
   if (key.size > MAX_SESSION_ID_SIZE)
     return -1;
+
   if (data.size > MAX_SESSION_DATA_SIZE)
     return -1;
 
@@ -637,6 +636,9 @@ wrap_db_fetch (void *dbf, gnutls_datum_t key)
           return res;
         }
     }
+
+  if (debug)
+    success ("resume db fetch... NOT FOUND\n");
   return res;
 }
 
