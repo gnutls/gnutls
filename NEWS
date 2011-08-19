@@ -7,8 +7,7 @@ See the end for copying conditions.
 ** libgnutls: gnutls_certificate_set_x509_key_file() and 
 friends support server name indication. If multiple 
 certificates are set using these functions the proper one 
-will be selected during a handshake, with the limitation 
-of a single name per certificate.
+will be selected during a handshake. 
 
 ** libgnutls: Added AES-256-GCM which was left out from
 the previous release. Reported by Benjamin Hof.

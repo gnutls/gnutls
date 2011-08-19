@@ -28,11 +28,12 @@
 #include "openpgp/openpgp_int.h"
 #include <gnutls/abstract.h>
 #include <gnutls/compat.h>
+#include <gnutls_str_array.h>
 
 typedef struct {
   gnutls_pcert_st * cert_list; /* a certificate chain */
   unsigned int cert_list_length; /* its length */
-  char* name; /* the name of the first certificate - only 1 allowed*/
+  gnutls_str_array_t names; /* the names in the first certificate */
 } certs_st;
 
 /* This structure may be complex, but it's the only way to
@@ -153,7 +154,8 @@ int _gnutls_get_auth_info_pcert (gnutls_pcert_st* gcert,
                                  cert_auth_info_t info);
 
 int certificate_credential_append_crt_list (gnutls_certificate_credentials_t
-                                            res, const char* name, gnutls_pcert_st* crt, int nr);
+                                            res, gnutls_str_array_t names, 
+                                            gnutls_pcert_st* crt, int nr);
 int certificate_credentials_append_pkey (gnutls_certificate_credentials_t res,
                                          gnutls_privkey_t pkey);
 

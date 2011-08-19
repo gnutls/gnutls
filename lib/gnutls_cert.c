@@ -37,6 +37,7 @@
 #include <gnutls_state.h>
 #include <gnutls_auth.h>
 #include <gnutls_x509.h>
+#include <gnutls_str_array.h>
 #include "x509/x509_int.h"
 #ifdef ENABLE_OPENPGP
 #include "openpgp/gnutls_openpgp.h"
@@ -63,7 +64,7 @@ gnutls_certificate_free_keys (gnutls_certificate_credentials_t sc)
           gnutls_pcert_deinit (&sc->certs[i].cert_list[j]);
         }
       gnutls_free (sc->certs[i].cert_list);
-      gnutls_free (sc->certs[i].name);
+      _gnutls_str_array_clear (&sc->certs[i].names);
     }
 
   gnutls_free (sc->certs);

@@ -15,7 +15,7 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lseek-tests --no-conditional-dependencies --libtool --macro-prefix=gl --no-vc-files alloca alphasort argp byteswap c-ctype crypto/hmac-md5 crypto/md5 error extensions func getpass getsubopt gettext gettime havelib lib-msvc-compat lib-symbol-versions maintainer-makefile manywarnings memmem-simple minmax netdb netinet_in progname read-file scandir snprintf sockets socklen stdint strcase strverscmp sys_socket sys_stat time_r timespec u64 unistd valgrind-tests vasprintf version-etc version-etc-fsf vprintf-posix vsnprintf warnings
+#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lseek-tests --no-conditional-dependencies --libtool --macro-prefix=gl --no-vc-files alloca alphasort argp byteswap c-ctype crypto/hmac-md5 crypto/md5 error extensions func getpass getsubopt gettext gettime havelib lib-msvc-compat lib-symbol-versions maintainer-makefile manywarnings memmem-simple minmax netdb netinet_in progname read-file scandir snprintf sockets socklen stdint strcase strverscmp sys_socket sys_stat time_r timespec u64 unistd valgrind-tests vasprintf version-etc version-etc-fsf vfprintf-posix vprintf-posix vsnprintf warnings
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([gl/override])
@@ -62,6 +62,7 @@ gl_MODULES([
   vasprintf
   version-etc
   version-etc-fsf
+  vfprintf-posix
   vprintf-posix
   vsnprintf
   warnings
