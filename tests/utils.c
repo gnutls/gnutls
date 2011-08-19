@@ -22,7 +22,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -44,11 +44,13 @@ const char *pkcs3 =
 void
 fail (const char *format, ...)
 {
+  char str[1024];
   va_list arg_ptr;
 
   va_start (arg_ptr, format);
-  vfprintf (stderr, format, arg_ptr);
+  vsnprintf ( str, sizeof(str), format, arg_ptr);
   va_end (arg_ptr);
+  fputs(str, stderr);
   error_count++;
   if (break_on_error)
     exit (1);
@@ -57,11 +59,13 @@ fail (const char *format, ...)
 void
 success (const char *format, ...)
 {
+  char str[1024];
   va_list arg_ptr;
 
   va_start (arg_ptr, format);
-  vfprintf (stderr, format, arg_ptr);
+  vsnprintf ( str, sizeof(str), format, arg_ptr);
   va_end (arg_ptr);
+  fputs(str, stderr);
 }
 
 void
