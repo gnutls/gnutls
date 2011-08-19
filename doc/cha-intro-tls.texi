@@ -64,45 +64,10 @@ protocol.  The protocol layering in TLS is shown in @ref{fig:tls-layers}.
 @acronym{TLS} is not limited to any transport layer and can be used
 above any transport layer, as long as it is a reliable one.  @acronym{DTLS}
 can be used over reliable and unreliable transport layers.
-A set of functions is provided and their purpose is to load to @acronym{GnuTLS} the
-required callbacks to access the transport layer.
-
-@showfuncE{gnutls_transport_set_push_function,gnutls_transport_set_vec_push_function,gnutls_transport_set_pull_timeout_function,gnutls_transport_set_pull_function,gnutls_transport_set_ptr}
-
-The function @funcref{gnutls_transport_set_pull_timeout_function} is only applicable
-to @acronym{DTLS} sessions.
-All those functions accept a callback function as a parameter.  The
-callback functions should return the number of bytes written, or -1 on
-error and should set @code{errno} appropriately.
-
-In some environments, setting @code{errno} is unreliable, for example
-Windows have several errno variables in different CRTs, or it may be
-that errno is not a thread-local variable.  If this is a concern to
-you, call @funcref{gnutls_transport_set_errno} with the intended errno
-value instead of setting @code{errno} directly.
-
-@showfuncA{gnutls_transport_set_errno}
-
-@acronym{GnuTLS} currently only interprets the EINTR and EAGAIN errno
-values and returns the corresponding @acronym{GnuTLS} error codes:
-@itemize
-@item @code{GNUTLS_E_INTERRUPTED} 
-@item @code{GNUTLS_E_AGAIN}
-@end itemize
-These values are usually returned by interrupted system calls, or when non blocking
-IO is used.  All @acronym{GnuTLS} functions can be resumed (called
-again), if any of these error codes is returned.  The error codes
-above refer to the system call, not the @acronym{GnuTLS} function,
-since signals do not interrupt @acronym{GnuTLS}' functions.
-
-@acronym{DTLS} however deviates from this rule. Because it requires
-timers and waiting for peer's messages during the handshake process,
-@acronym{GnuTLS} will block and might be interrupted by signals. The
-blocking operation of @acronym{GnuTLS} during @acronym{DTLS} handshake
-can be changed using the appropriate flags in @funcref{gnutls_init} (see
-@ref{TLS and DTLS sessions}).
-By default, if the transport functions are not set, @acronym{GnuTLS}
-will use the Berkeley sockets. 
+@acronym{GnuTLS} supports TCP and UDP layers transparently using
+the Berkeley sockets API. However, any transport layer can be used
+by providing callbacks for @acronym{GnuTLS} to access the transport layer 
+(for details see @ref{TLS and DTLS sessions}).
 
 @node The TLS record protocol
 @section The TLS record protocol
