@@ -49,10 +49,10 @@
  * for @err is EAGAIN and EINTR, other values are treated will be
  * treated as real errors in the push/pull function.
  *
- * This function is useful in replacement push/pull functions set by
- * gnutls_transport_set_push_function and
- * gnutls_transport_set_pullpush_function under Windows, where the
- * replacement push/pull may not have access to the same @errno
+ * This function is useful in replacement push and pull functions set by
+ * gnutls_transport_set_push_function() and
+ * gnutls_transport_set_pull_function() under Windows, where the
+ * replacements may not have access to the same @errno
  * variable that is used by GnuTLS (e.g., the application is linked to
  * msvcr71.dll and gnutls is linked to msvcrt.dll).
  *

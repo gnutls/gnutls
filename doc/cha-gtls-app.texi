@@ -136,8 +136,10 @@ The credentials used for the key exchange method, such as certificates
 or usernames and passwords should also be associated with the session
 current session using @funcref{gnutls_credentials_set} (see @ref{Authentication methods}). 
 
+@subsection Setting up the transport layer
+
 The next step is to setup the underlying transport layer details. The
-Berkeley sockets for TCP are implicitly used by default in GnuTLS, thus a
+Berkeley sockets are implicitly used by GnuTLS, thus a
 call to @funcref{gnutls_transport_set_ptr2} would be sufficient to
 specify the socket descriptor.
 
@@ -152,14 +154,39 @@ the following functions have to be specified.
 @showfuncdesc{gnutls_transport_set_vec_push_function}
 @showfuncdesc{gnutls_transport_set_pull_function}
 
-In the case of DTLS it is also desirable to override the
-functions above with functions that emulate the operation
+The functions above accept a callback function which
+should return the number of bytes written, or -1 on
+error and should set @code{errno} appropriately.
+In some environments, setting @code{errno} is unreliable. For example
+Windows have several errno variables in different CRTs, or in other
+systems it may be a non thread-local variable.  If this is a concern to
+you, call @funcref{gnutls_transport_set_errno} with the intended errno
+value instead of setting @code{errno} directly.
+
+@showfuncdesc{gnutls_transport_set_errno}
+
+@acronym{GnuTLS} currently only interprets the EINTR and EAGAIN errno
+values and returns the corresponding @acronym{GnuTLS} error codes:
+@itemize
+@item @code{GNUTLS_E_INTERRUPTED} 
+@item @code{GNUTLS_E_AGAIN}
+@end itemize
+The EINTR and EAGAIN values are returned by interrupted system calls, 
+or when non blocking IO is used.  All @acronym{GnuTLS} functions can be 
+resumed (called again), if any of the above error codes is returned.  
+
+In the case of DTLS it is also desirable to override the generic 
+transport functions with functions that emulate the operation
 of @code{recvfrom} and @code{sendto}. In addition
-the following function must also be called to specify a 
-callback that will receive data from within a specified
-time limit.
+@acronym{DTLS} requires timers during the receive of a handshake
+message. This requires the following function to be used.
 
 @showfuncdesc{gnutls_transport_set_pull_timeout_function}
+
+To avoid @acronym{GnuTLS} from blocking in a DTLS handshake on
+a timer, the @funcref{gnutls_init} can be called with the
+@code{GNUTLS_NONBLOCK} flag (see @ref{TLS and DTLS sessions}).
+
 
 @subsection Handshake
 Once a session has been initialized and a network

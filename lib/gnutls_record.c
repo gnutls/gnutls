@@ -103,9 +103,9 @@ gnutls_record_disable_padding (gnutls_session_t session)
  * @session: is a #gnutls_session_t structure.
  * @ptr: is the value.
  *
- * Used to set the first argument of the transport function (like PUSH
- * and PULL).  In berkeley style sockets this function will set the
- * connection handle.
+ * Used to set the first argument of the transport function (for push
+ * and pull callbacks). In berkeley style sockets this function will set the
+ * connection descriptor.
  **/
 void
 gnutls_transport_set_ptr (gnutls_session_t session,
@@ -121,9 +121,9 @@ gnutls_transport_set_ptr (gnutls_session_t session,
  * @recv_ptr: is the value for the pull function
  * @send_ptr: is the value for the push function
  *
- * Used to set the first argument of the transport function (like PUSH
- * and PULL). In berkeley style sockets this function will set the
- * connection handle.  With this function you can use two different
+ * Used to set the first argument of the transport function (for push
+ * and pull callbacks). In berkeley style sockets this function will set the
+ * connection descriptor.  With this function you can use two different
  * pointers for receiving and sending.
  **/
 void
