@@ -372,7 +372,7 @@ gnutls_dh_get_prime_bits (gnutls_session_t session)
  *
  * Get the export RSA parameter's modulus size.
  *
- * Returns: the bits used in the last RSA-EXPORT key exchange with the
+ * Returns: The bits used in the last RSA-EXPORT key exchange with the
  *   peer, or a negative error code in case of error.
  **/
 int
@@ -394,7 +394,7 @@ gnutls_rsa_export_get_modulus_bits (gnutls_session_t session)
  * Get the Diffie-Hellman public key bit size.  Can be used for both
  * anonymous and ephemeral Diffie-Hellman.
  *
- * Returns: the public key bit size used in the last Diffie-Hellman
+ * Returns: The public key bit size used in the last Diffie-Hellman
  *   key exchange with the peer, or a negative error code in case of error.
  **/
 int
@@ -451,11 +451,11 @@ gnutls_dh_get_peers_public_bits (gnutls_session_t session)
  * gnutls_certificate_get_ours:
  * @session: is a gnutls session
  *
- * Get the certificate as sent to the peer, in the last handshake.
- * These certificates are in raw format.  In X.509 this is a
- * certificate list. In OpenPGP this is a single certificate.
+ * Gets the certificate as sent to the peer in the last handshake.
+ * The certificate is in raw (DER) format.  No certificate
+ * list is being returned. Only the first certificate.
  *
- * Returns: return a pointer to a #gnutls_datum_t containing our
+ * Returns: a pointer to a #gnutls_datum_t containing our
  *   certificates, or %NULL in case of an error or if no certificate
  *   was used.
  **/
@@ -494,7 +494,7 @@ gnutls_certificate_get_ours (gnutls_session_t session)
  * In case of OpenPGP keys a single key will be returned in raw
  * format.
  *
- * Returns: return a pointer to a #gnutls_datum_t containing our
+ * Returns: a pointer to a #gnutls_datum_t containing our
  *   certificates, or %NULL in case of an error or if no certificate
  *   was used.
  **/
