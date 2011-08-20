@@ -89,7 +89,7 @@ HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
 	x509_b64.h gnutls_v2_compat.h gnutls_datum.h \
 	gnutls_mpi.h gnutls_pk.h gnutls_record.h		\
 	gnutls_constate.h gnutls_global.h gnutls_sig.h gnutls_mem.h	\
-	gnutls_session_pack.h gnutls_str.h gnutls_str_arrary.h		\
+	gnutls_session_pack.h gnutls_str.h gnutls_str_array.h		\
 	gnutls_state.h gnutls_x509.h crypto-backend.h			\
 	gnutls_rsa_export.h gnutls_srp.h auth/srp.h auth/srp_passwd.h	\
 	gnutls_helper.h gnutls_supplemental.h crypto.h random.h system.h\
