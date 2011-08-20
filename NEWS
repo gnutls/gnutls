@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.0.1 (unreleased)
+* Version 3.0.1 (released 2011-08-20)
 
 ** libgnutls: gnutls_certificate_set_x509_key_file() and 
 friends support server name indication. If multiple 
@@ -24,9 +24,9 @@ modules.
 ** libgnutls: The config file at gnutls_pkcs11_init()
 is being read if provided.
 
-** libgnutls: Verify that a certificate list specified
-using gnutls_certificate_set_x509_key*(), is sorted
-according to TLS specification (from subject to issuer).
+** libgnutls: Ensure that a certificate list specified
+using gnutls_certificate_set_x509_key() and friends, is 
+sorted according to TLS specification (from subject to issuer).
 
 ** libgnutls: Added GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED flag for
 gnutls_x509_crt_list_import. It checks whether the list to be 
