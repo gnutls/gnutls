@@ -137,11 +137,17 @@ reset_errno (gnutls_session_t session)
 inline static int
 get_errno (gnutls_session_t session)
 {
+int ret;
+
   if (session->internals.errnum != 0)
-    return session->internals.errnum;
+    ret = session->internals.errnum;
   else
-    return session->internals.errno_func (session->
+    ret = session->internals.errno_func (session->
                                           internals.transport_recv_ptr);
+#if defined(_AIX) || defined(AIX)
+  if (ret == 0) ret = EAGAIN;
+#endif
+  return ret;
 }
 
 

@@ -6,10 +6,10 @@
 # Yuri Chornoivan <yurchor@ukr.net>, 2011.
 msgid ""
 msgstr ""
-"Project-Id-Version: libgnutls 2.12.7\n"
+"Project-Id-Version: libgnutls 3.0.0\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2011-06-18 21:08+0200\n"
-"PO-Revision-Date: 2011-07-13 12:56+0300\n"
+"POT-Creation-Date: 2011-07-29 21:37+0200\n"
+"PO-Revision-Date: 2011-08-03 10:05+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <translation-team-uk@lists.sourceforge.net>\n"
 "Language: uk\n"
@@ -19,653 +19,677 @@ msgstr ""
 "X-Generator: Lokalize 1.2\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: gnutls_errors.c:54
+#: lib/gnutls_errors.c:52
 msgid "Success."
 msgstr "Успіх."
 
-#: gnutls_errors.c:55
+#: lib/gnutls_errors.c:53
 msgid "Could not negotiate a supported cipher suite."
 msgstr "Не вдалося узгодити підтримуваний комплекс шифрування."
 
-#: gnutls_errors.c:57
+#: lib/gnutls_errors.c:55
 msgid "The cipher type is unsupported."
 msgstr "Тип шифрування не підтримується."
 
-#: gnutls_errors.c:59
+#: lib/gnutls_errors.c:57
 msgid "The certificate and the given key do not match."
 msgstr "Сертифікат і вказаний ключ не відповідають один одному."
 
-#: gnutls_errors.c:61
+#: lib/gnutls_errors.c:59
 msgid "Could not negotiate a supported compression method."
 msgstr "Не вдалося узгодити підтримуваний спосіб стискання."
 
-#: gnutls_errors.c:63
+#: lib/gnutls_errors.c:61
 msgid "An unknown public key algorithm was encountered."
 msgstr "Виявлено невідомий алгоритм роботи з відкритим ключем."
 
-#: gnutls_errors.c:66
+#: lib/gnutls_errors.c:64
 msgid "An algorithm that is not enabled was negotiated."
 msgstr "Узгоджено алгоритм, який не було увімкнено."
 
-#: gnutls_errors.c:68
+#: lib/gnutls_errors.c:66
 msgid "A large TLS record packet was received."
 msgstr "Отримано великий пакет записів TLS."
 
-#: gnutls_errors.c:70
+#: lib/gnutls_errors.c:68
 msgid "A record packet with illegal version was received."
 msgstr "Отримано пакет записів з некоректною версією."
 
-#: gnutls_errors.c:73
+#: lib/gnutls_errors.c:71
 msgid "The Diffie-Hellman prime sent by the server is not acceptable (not long enough)."
 msgstr "Надіслане сервером просте число Діффі-Гелмана є неприйнятним (занадто коротким)."
 
-#: gnutls_errors.c:75
+#: lib/gnutls_errors.c:73
 msgid "A TLS packet with unexpected length was received."
 msgstr "Було отримано пакет TLS з неочікуваною довжиною."
 
-#: gnutls_errors.c:78
+#: lib/gnutls_errors.c:75
+msgid "The TLS connection was non-properly terminated."
+msgstr "З’єднання TLS було розірвано неналежним чином."
+
+#: lib/gnutls_errors.c:78
 msgid "The specified session has been invalidated for some reason."
 msgstr "Вказаний сеанс з якихось причин втратив чинність."
 
-#: gnutls_errors.c:81
+#: lib/gnutls_errors.c:81
 msgid "GnuTLS internal error."
 msgstr "Внутрішня помилка GnuTLS."
 
-#: gnutls_errors.c:82
+#: lib/gnutls_errors.c:82
 msgid "An illegal TLS extension was received."
 msgstr "Отримано некоректне розширення TLS."
 
-#: gnutls_errors.c:84
+#: lib/gnutls_errors.c:84
 msgid "A TLS fatal alert has been received."
 msgstr "Отримано критичне попередження TLS."
 
-#: gnutls_errors.c:86
+#: lib/gnutls_errors.c:86
 msgid "An unexpected TLS packet was received."
 msgstr "Було отримано неочікуваний пакет TLS"
 
-#: gnutls_errors.c:88
+#: lib/gnutls_errors.c:88
 msgid "A TLS warning alert has been received."
 msgstr "Отримано попередження TLS."
 
-#: gnutls_errors.c:91
+#: lib/gnutls_errors.c:91
 msgid "An error was encountered at the TLS Finished packet calculation."
 msgstr "Під час спроби обчислення остаточного пакета TLS сталася помилка."
 
-#: gnutls_errors.c:93
+#: lib/gnutls_errors.c:93
 msgid "The peer did not send any certificate."
 msgstr "Вузлом не було надіслано жодного сертифіката."
 
-#: gnutls_errors.c:95
+#: lib/gnutls_errors.c:95
 msgid "The given DSA key is incompatible with the selected TLS protocol."
 msgstr "Вказаний ключ DSA key є несумісним з вибраним протоколом TLS."
 
-#: gnutls_errors.c:98
+#: lib/gnutls_errors.c:98
 msgid "There is already a crypto algorithm with lower priority."
 msgstr "Алгоритм шифрування з нижчим пріоритетом вже існує."
 
-#: gnutls_errors.c:101
+#: lib/gnutls_errors.c:101
 msgid "No temporary RSA parameters were found."
 msgstr "Не було виявлено тимчасових параметрів RSA."
 
-#: gnutls_errors.c:103
+#: lib/gnutls_errors.c:103
 msgid "No temporary DH parameters were found."
 msgstr "Не було виявлено тимчасових параметрів DH."
 
-#: gnutls_errors.c:105
+#: lib/gnutls_errors.c:105
 msgid "An unexpected TLS handshake packet was received."
 msgstr "Було отримано неочікуваний пакет даних підтвердження з’єднання TLS."
 
-#: gnutls_errors.c:107
+#: lib/gnutls_errors.c:107
 msgid "The scanning of a large integer has failed."
 msgstr "Спроба сканування великого цілого числа зазнала невдачі."
 
-#: gnutls_errors.c:109
+#: lib/gnutls_errors.c:109
 msgid "Could not export a large integer."
 msgstr "Не вдалося експортувати велике ціле число."
 
-#: gnutls_errors.c:111
+#: lib/gnutls_errors.c:111
 msgid "Decryption has failed."
 msgstr "Спроба розшифрування була невдалою."
 
-#: gnutls_errors.c:112
+#: lib/gnutls_errors.c:112
 msgid "Encryption has failed."
 msgstr "Спроба шифрування зазнала невдачі."
 
-#: gnutls_errors.c:113
+#: lib/gnutls_errors.c:113
 msgid "Public key decryption has failed."
 msgstr "Не вдалося дешифрувати відкритим ключем."
 
-#: gnutls_errors.c:115
+#: lib/gnutls_errors.c:115
 msgid "Public key encryption has failed."
 msgstr "Не вдалося зашифрувати відкритим ключем."
 
-#: gnutls_errors.c:117
+#: lib/gnutls_errors.c:117
 msgid "Public key signing has failed."
 msgstr "Не вдалося підписати відкритим ключем."
 
-#: gnutls_errors.c:119
+#: lib/gnutls_errors.c:119
 msgid "Public key signature verification has failed."
 msgstr "Не вдалося перевірити підпис відкритим ключем."
 
-#: gnutls_errors.c:121
+#: lib/gnutls_errors.c:121
 msgid "Decompression of the TLS record packet has failed."
 msgstr "Не вдалося розпакувати пакет записів TLS."
 
-#: gnutls_errors.c:123
+#: lib/gnutls_errors.c:123
 msgid "Compression of the TLS record packet has failed."
 msgstr "Не вдалося запакувати пакет записів TLS."
 
-#: gnutls_errors.c:126
+#: lib/gnutls_errors.c:126
 msgid "Internal error in memory allocation."
 msgstr "Внутрішня помилка під час розподілу пам’яті."
 
-#: gnutls_errors.c:128
+#: lib/gnutls_errors.c:128
 msgid "An unimplemented or disabled feature has been requested."
 msgstr "Надійшов запит щодо нереалізованої або вимкненої можливості."
 
-#: gnutls_errors.c:130
+#: lib/gnutls_errors.c:130
 msgid "Insufficient credentials for that request."
 msgstr "Недостатні реєстраційні дані для цього запиту."
 
-#: gnutls_errors.c:132
+#: lib/gnutls_errors.c:132
 msgid "Error in password file."
 msgstr "Помилка у файлі паролів."
 
-#: gnutls_errors.c:133
+#: lib/gnutls_errors.c:133
 msgid "Wrong padding in PKCS1 packet."
 msgstr "Помилкове доповнення у пакеті PKCS1."
 
-#: gnutls_errors.c:135
+#: lib/gnutls_errors.c:135
 msgid "The requested session has expired."
 msgstr "Строк дії запитаного сеансу завершено."
 
-#: gnutls_errors.c:136
+#: lib/gnutls_errors.c:136
 msgid "Hashing has failed."
 msgstr "Помилка хешування."
 
-#: gnutls_errors.c:137
+#: lib/gnutls_errors.c:137
 msgid "Base64 decoding error."
 msgstr "Помилка декодування даних Base64."
 
-#: gnutls_errors.c:139
+#: lib/gnutls_errors.c:139
 msgid "Base64 unexpected header error."
 msgstr "Неочікуваний заголовок даних Base64."
 
-#: gnutls_errors.c:142
+#: lib/gnutls_errors.c:142
 msgid "Base64 encoding error."
 msgstr "Помилка кодування даних Base64."
 
-#: gnutls_errors.c:144
+#: lib/gnutls_errors.c:144
 msgid "Parsing error in password file."
 msgstr "Помилка під час спроби обробки даних файла паролів."
 
-#: gnutls_errors.c:146
+#: lib/gnutls_errors.c:146
 msgid "The requested data were not available."
 msgstr "Запитані дані недоступні."
 
-#: gnutls_errors.c:148
+#: lib/gnutls_errors.c:148
 msgid "Error in the pull function."
 msgstr "Помилка у функції pull."
 
-#: gnutls_errors.c:149
+#: lib/gnutls_errors.c:149
 msgid "Error in the push function."
 msgstr "Помилка у функції push."
 
-#: gnutls_errors.c:151
+#: lib/gnutls_errors.c:151
 msgid "The upper limit of record packet sequence numbers has been reached. Wow!"
 msgstr "Досягнуто верхньої межі послідовності чисел пакета записів. Ого!"
 
-#: gnutls_errors.c:153
+#: lib/gnutls_errors.c:153
 msgid "Error in the certificate."
 msgstr "Помилка у сертифікаті."
 
-#: gnutls_errors.c:155
+#: lib/gnutls_errors.c:155
 msgid "Unknown Subject Alternative name in X.509 certificate."
 msgstr "Невідомий запис альтернативного призначення (Subject Alternative) у сертифікаті X.509."
 
-#: gnutls_errors.c:158
+#: lib/gnutls_errors.c:158
 msgid "Unsupported critical extension in X.509 certificate."
 msgstr "Непідтримуване важливе розширення у сертифікаті X.509."
 
-#: gnutls_errors.c:160
+#: lib/gnutls_errors.c:160
 msgid "Key usage violation in certificate has been detected."
 msgstr "Виявлено порушення правил використання ключів сертифіката."
 
-#: gnutls_errors.c:162
+#: lib/gnutls_errors.c:162
 msgid "Resource temporarily unavailable, try again."
 msgstr "Ресурс тимчасово недоступний, повторіть спробу."
 
-#: gnutls_errors.c:164
+#: lib/gnutls_errors.c:164
 msgid "Function was interrupted."
 msgstr "Роботу функції було перервано."
 
-#: gnutls_errors.c:165
+#: lib/gnutls_errors.c:165
 msgid "Rehandshake was requested by the peer."
 msgstr "Вузол надіслав запит на повторне надсилання даних підтвердження з’єднання."
 
-#: gnutls_errors.c:168
+#: lib/gnutls_errors.c:168
 msgid "TLS Application data were received, while expecting handshake data."
 msgstr "Було отримано дані застосування TLS, слід було отримати дані підтвердження з’єднання."
 
-#: gnutls_errors.c:170
+#: lib/gnutls_errors.c:170
 msgid "Error in Database backend."
 msgstr "Помилка у сервері бази даних."
 
-#: gnutls_errors.c:171
+#: lib/gnutls_errors.c:171
 msgid "The certificate type is not supported."
 msgstr "Підтримки сертифікатів такого типу не передбачено."
 
-#: gnutls_errors.c:173
+#: lib/gnutls_errors.c:173
 msgid "The given memory buffer is too short to hold parameters."
 msgstr "Вказаний буфер пам’яті є занадто малим для зберігання параметрів."
 
-#: gnutls_errors.c:175
+#: lib/gnutls_errors.c:175
 msgid "The request is invalid."
 msgstr "Некоректний запит."
 
-#: gnutls_errors.c:176
+#: lib/gnutls_errors.c:176
+msgid "The cookie was bad."
+msgstr "Помилкова кука."
+
+#: lib/gnutls_errors.c:177
 msgid "An illegal parameter has been received."
 msgstr "Отримано некоректний параметр."
 
-#: gnutls_errors.c:178
+#: lib/gnutls_errors.c:179
 msgid "Error while reading file."
 msgstr "Помилка читання файла."
 
-#: gnutls_errors.c:180
+#: lib/gnutls_errors.c:181
 msgid "ASN1 parser: Element was not found."
 msgstr "Обробка ASN1: елемент не знайдено."
 
-#: gnutls_errors.c:182
+#: lib/gnutls_errors.c:183
 msgid "ASN1 parser: Identifier was not found"
 msgstr "Обробка ASN1: ідентифікатор не знайдено"
 
-#: gnutls_errors.c:184
+#: lib/gnutls_errors.c:185
 msgid "ASN1 parser: Error in DER parsing."
 msgstr "Обробка ASN1: помилка під час обробки DER."
 
-#: gnutls_errors.c:186
+#: lib/gnutls_errors.c:187
 msgid "ASN1 parser: Value was not found."
 msgstr "Обробка ASN1: значення не знайдено."
 
-#: gnutls_errors.c:188
+#: lib/gnutls_errors.c:189
 msgid "ASN1 parser: Generic parsing error."
 msgstr "Обробка ASN1: загальна помилка обробки."
 
-#: gnutls_errors.c:190
+#: lib/gnutls_errors.c:191
 msgid "ASN1 parser: Value is not valid."
 msgstr "Обробка ASN1: некоректне значення."
 
-#: gnutls_errors.c:192
+#: lib/gnutls_errors.c:193
 msgid "ASN1 parser: Error in TAG."
 msgstr "Обробка ASN1: помилка у тезі (TAG)."
 
-#: gnutls_errors.c:193
+#: lib/gnutls_errors.c:194
 msgid "ASN1 parser: error in implicit tag"
 msgstr "Обробка ASN1: помилка у неявному тезі"
 
-#: gnutls_errors.c:195
+#: lib/gnutls_errors.c:196
 msgid "ASN1 parser: Error in type 'ANY'."
 msgstr "Обробка ASN1: помилка у типі 'ANY'."
 
-#: gnutls_errors.c:197
+#: lib/gnutls_errors.c:198
 msgid "ASN1 parser: Syntax error."
 msgstr "Обробка ASN1: синтаксична помилка."
 
-#: gnutls_errors.c:199
+#: lib/gnutls_errors.c:200
 msgid "ASN1 parser: Overflow in DER parsing."
 msgstr "Обробка ASN1: переповнення під час обробки DER."
 
-#: gnutls_errors.c:202
+#: lib/gnutls_errors.c:203
 msgid "Too many empty record packets have been received."
 msgstr "Було отримано занадто багато порожніх пакетів записів."
 
-#: gnutls_errors.c:204
+#: lib/gnutls_errors.c:205
+msgid "Too many handshake packets have been received."
+msgstr "Було отримано занадто багато пакетів встановлення з’єднання."
+
+#: lib/gnutls_errors.c:207
 msgid "The initialization of GnuTLS-extra has failed."
 msgstr "Не вдалося ініціалізувати GnuTLS-extra."
 
-#: gnutls_errors.c:207
+#: lib/gnutls_errors.c:210
 msgid "The GnuTLS library version does not match the GnuTLS-extra library version."
 msgstr "Версія бібліотеки GnuTLS є невідповідною до версії бібліотеки GnuTLS-extra."
 
-#: gnutls_errors.c:209
-msgid "The gcrypt library version is too old."
-msgstr "У вас встановлено занадто стару версію бібліотеки gcrypt."
+#: lib/gnutls_errors.c:212
+msgid "The crypto library version is too old."
+msgstr "Бібліотека шифрування є занадто старою."
 
-#: gnutls_errors.c:212
+#: lib/gnutls_errors.c:215
 msgid "The tasn1 library version is too old."
 msgstr "У вас встановлено занадто стару версію бібліотеки tasn1."
 
-#: gnutls_errors.c:214
+#: lib/gnutls_errors.c:217
 msgid "The OpenPGP User ID is revoked."
 msgstr "Ідентифікатор користувача OpenPGP відкликано."
 
-#: gnutls_errors.c:216
+#: lib/gnutls_errors.c:219
 msgid "The OpenPGP key has not a preferred key set."
 msgstr "Ключ OpenPGP не пов’язано з основним набором ключів."
 
-#: gnutls_errors.c:218
+#: lib/gnutls_errors.c:221
 msgid "Error loading the keyring."
 msgstr "Помилка під час спроби завантаження даних сховища ключів."
 
-#: gnutls_errors.c:220
+#: lib/gnutls_errors.c:223
 msgid "The initialization of crypto backend has failed."
 msgstr "Не вдалося ініціалізувати сервер шифрування."
 
-#: gnutls_errors.c:222
-msgid "The initialization of LZO has failed."
-msgstr "Не вдалося ініціалізувати LZO."
-
-#: gnutls_errors.c:224
+#: lib/gnutls_errors.c:225
 msgid "No supported compression algorithms have been found."
 msgstr "Не виявлено підтримуваних алгоритмів стискання."
 
-#: gnutls_errors.c:226
+#: lib/gnutls_errors.c:227
 msgid "No supported cipher suites have been found."
 msgstr "Не виявлено підтримуваних комплексів програм для шифрування."
 
-#: gnutls_errors.c:228
+#: lib/gnutls_errors.c:229
 msgid "Could not get OpenPGP key."
 msgstr "Не вдалося отримати ключ OpenPGP."
 
-#: gnutls_errors.c:230
+#: lib/gnutls_errors.c:231
 msgid "Could not find OpenPGP subkey."
 msgstr "Не вдалося знайти підключ OpenPGP."
 
-#: gnutls_errors.c:232
+#: lib/gnutls_errors.c:233
 msgid "Safe renegotiation failed."
 msgstr "Спроба захищеного повторного узгодження зазнала невдачі."
 
-#: gnutls_errors.c:234
+#: lib/gnutls_errors.c:235
 msgid "Unsafe renegotiation denied."
 msgstr "Незахищене повторне узгодження заборонено."
 
-#: gnutls_errors.c:237
+#: lib/gnutls_errors.c:238
 msgid "The SRP username supplied is illegal."
 msgstr "Вказане ім’я користувача SRP є некоректним."
 
-#: gnutls_errors.c:239
+#: lib/gnutls_errors.c:240
 msgid "The SRP username supplied is unknown."
 msgstr "Вказане ім’я користувача SRP є невідомим."
 
-#: gnutls_errors.c:242
+#: lib/gnutls_errors.c:243
 msgid "The OpenPGP fingerprint is not supported."
 msgstr "Підтримки такого відбитка OpenPGP не передбачено."
 
-#: gnutls_errors.c:244
+#: lib/gnutls_errors.c:245
 msgid "The signature algorithm is not supported."
 msgstr "Підтримки цього алгоритму підписування не передбачено."
 
-#: gnutls_errors.c:246
+#: lib/gnutls_errors.c:247
 msgid "The certificate has unsupported attributes."
 msgstr "Цей сертифікат має непідтримувані атрибути."
 
-#: gnutls_errors.c:248
+#: lib/gnutls_errors.c:249
 msgid "The OID is not supported."
 msgstr "Підтримки цього OID не передбачено."
 
-#: gnutls_errors.c:250
+#: lib/gnutls_errors.c:251
 msgid "The hash algorithm is unknown."
 msgstr "Невідомий алгоритм хешування."
 
-#: gnutls_errors.c:252
+#: lib/gnutls_errors.c:253
 msgid "The PKCS structure's content type is unknown."
 msgstr "Невідомий тип вмісту структури PKCS."
 
-#: gnutls_errors.c:254
+#: lib/gnutls_errors.c:255
 msgid "The PKCS structure's bag type is unknown."
 msgstr "Невідомий тип мультимножини структури PKCS."
 
-#: gnutls_errors.c:256
+#: lib/gnutls_errors.c:257
 msgid "The given password contains invalid characters."
 msgstr "У вказаному паролі містяться некоректні символи."
 
-#: gnutls_errors.c:258
+#: lib/gnutls_errors.c:259
 msgid "The Message Authentication Code verification failed."
 msgstr "Спроба перевірки коду розпізнавання повідомлення була невдалою."
 
-#: gnutls_errors.c:260
+#: lib/gnutls_errors.c:261
 msgid "Some constraint limits were reached."
 msgstr "Досягнуто деяких граничних обмежень."
 
-#: gnutls_errors.c:262
+#: lib/gnutls_errors.c:263
 msgid "Failed to acquire random data."
 msgstr "Не вдалося отримати випадкові дані."
 
-#: gnutls_errors.c:265
+#: lib/gnutls_errors.c:266
 msgid "Received a TLS/IA Intermediate Phase Finished message"
 msgstr "Отримано повідомлення щодо завершення проміжної фази TLS/IA"
 
-#: gnutls_errors.c:267
+#: lib/gnutls_errors.c:268
 msgid "Received a TLS/IA Final Phase Finished message"
 msgstr "Отримано повідомлення щодо завершення остаточної фази TLS/IA"
 
-#: gnutls_errors.c:269
+#: lib/gnutls_errors.c:270
 msgid "Verifying TLS/IA phase checksum failed"
 msgstr "Помилка під час перевірки контрольної суми фази TLS/IA"
 
-#: gnutls_errors.c:272
+#: lib/gnutls_errors.c:273
 msgid "The specified algorithm or protocol is unknown."
 msgstr "Вказано невідомий алгоритм або протокол."
 
-#: gnutls_errors.c:275
-msgid "The handshake data size is too large (DoS?), check gnutls_handshake_set_max_packet_length()."
-msgstr "Розмір даних встановлення з’єднання є занадто великим (спроба атаки?), перевірте значення gnutls_handshake_set_max_packet_length()."
+#: lib/gnutls_errors.c:276
+msgid "The handshake data size is too large."
+msgstr "Розмір даних щодо встановлення з’єднання є занадто великим."
 
-#: gnutls_errors.c:279
+#: lib/gnutls_errors.c:279
 msgid "Error opening /dev/crypto"
 msgstr "Не вдалося відкрити /dev/crypto"
 
-#: gnutls_errors.c:282
+#: lib/gnutls_errors.c:282
 msgid "Error interfacing with /dev/crypto"
 msgstr "Не вдалося розпочати взаємодію з /dev/crypto"
 
-#: gnutls_errors.c:285
+#: lib/gnutls_errors.c:285
 msgid "Channel binding data not available"
 msgstr "Дані прив’язки каналів недоступні"
 
-#: gnutls_errors.c:288
+#: lib/gnutls_errors.c:288
 msgid "PKCS #11 error."
 msgstr "Помилка PKCS #11."
 
-#: gnutls_errors.c:290
+#: lib/gnutls_errors.c:290
 msgid "PKCS #11 initialization error."
 msgstr "Помилка ініціалізації PKCS #11."
 
-#: gnutls_errors.c:292
+#: lib/gnutls_errors.c:292
 msgid "Error in parsing."
 msgstr "Помилка під час обробки."
 
-#: gnutls_errors.c:294
+#: lib/gnutls_errors.c:294
 msgid "PKCS #11 error in PIN."
 msgstr "Помилка у пін-коді PKCS #11."
 
-#: gnutls_errors.c:296
+#: lib/gnutls_errors.c:296
 msgid "PKCS #11 PIN should be saved."
 msgstr "Пін-код PKCS #11 має бути збережено."
 
-#: gnutls_errors.c:298
+#: lib/gnutls_errors.c:298
 msgid "PKCS #11 error in slot"
 msgstr "Помилка у слоті PKCS #11"
 
-#: gnutls_errors.c:300
+#: lib/gnutls_errors.c:300
 msgid "Thread locking error"
 msgstr "Помилка блокування потоку виконання"
 
-#: gnutls_errors.c:302
+#: lib/gnutls_errors.c:302
 msgid "PKCS #11 error in attribute"
 msgstr "Помилка у атрибуті PKCS #11"
 
-#: gnutls_errors.c:304
+#: lib/gnutls_errors.c:304
 msgid "PKCS #11 error in device"
 msgstr "Помилка у пристрої PKCS #11"
 
-#: gnutls_errors.c:306
+#: lib/gnutls_errors.c:306
 msgid "PKCS #11 error in data"
 msgstr "Помилка у даних PKCS #11"
 
-#: gnutls_errors.c:308
+#: lib/gnutls_errors.c:308
 msgid "PKCS #11 unsupported feature"
 msgstr "Непідтримувана можливість PKCS #11"
 
-#: gnutls_errors.c:310
+#: lib/gnutls_errors.c:310
 msgid "PKCS #11 error in key"
 msgstr "Помилка у ключі PKCS #11"
 
-#: gnutls_errors.c:312
+#: lib/gnutls_errors.c:312
 msgid "PKCS #11 PIN expired"
 msgstr "Пін-код PKCS #11 втратив чинність"
 
-#: gnutls_errors.c:314
+#: lib/gnutls_errors.c:314
 msgid "PKCS #11 PIN locked"
 msgstr "Пін-код PKCS #11 заблоковано"
 
-#: gnutls_errors.c:316
+#: lib/gnutls_errors.c:316
 msgid "PKCS #11 error in session"
 msgstr "Помилка у сеансі PKCS #11"
 
-#: gnutls_errors.c:318
+#: lib/gnutls_errors.c:318
 msgid "PKCS #11 error in signature"
 msgstr "Помилка у підписі PKCS #11"
 
-#: gnutls_errors.c:320
+#: lib/gnutls_errors.c:320
 msgid "PKCS #11 error in token"
 msgstr "Помилка у лексемі PKCS #11"
 
-#: gnutls_errors.c:322
+#: lib/gnutls_errors.c:322
 msgid "PKCS #11 user error"
 msgstr "Помилка користувача PKCS #11"
 
-#: gnutls_errors.c:409
+#: lib/gnutls_errors.c:324
+msgid "The operation timed out"
+msgstr "Перевищено час очікування завершення дії"
+
+#: lib/gnutls_errors.c:326
+msgid "The operation was cancelled due to user error"
+msgstr "Дію було скасовано через помилку користувача"
+
+#: lib/gnutls_errors.c:328
+msgid "No supported ECC curves were found"
+msgstr "Не виявлено підтримуваних кривих ECC"
+
+#: lib/gnutls_errors.c:330
+msgid "The curve is unsupported"
+msgstr "Підтримки цієї кривої не передбачено"
+
+#: lib/gnutls_errors.c:332
+msgid "The requested PKCS #11 object is not available"
+msgstr "Запитаний об’єкт PKCS #11 недоступний"
+
+#: lib/gnutls_errors.c:419
 msgid "(unknown error code)"
 msgstr "(невідомий код помилки)"
 
-#: gnutls_alert.c:43
+#: lib/gnutls_alert.c:45
 msgid "Close notify"
 msgstr "Закрити сповіщення"
 
-#: gnutls_alert.c:44
+#: lib/gnutls_alert.c:46
 msgid "Unexpected message"
 msgstr "Неочікуване повідомлення"
 
-#: gnutls_alert.c:45
+#: lib/gnutls_alert.c:47
 msgid "Bad record MAC"
 msgstr "Помилковий запис MAC"
 
-#: gnutls_alert.c:46
+#: lib/gnutls_alert.c:48
 msgid "Decryption failed"
 msgstr "Спроба розшифрування зазнала невдачі"
 
-#: gnutls_alert.c:47
+#: lib/gnutls_alert.c:49
 msgid "Record overflow"
 msgstr "Переповнення запису"
 
-#: gnutls_alert.c:48
+#: lib/gnutls_alert.c:50
 msgid "Decompression failed"
 msgstr "Помилка під час спроби видобування"
 
-#: gnutls_alert.c:49
+#: lib/gnutls_alert.c:51
 msgid "Handshake failed"
 msgstr "Помилка під час спроби встановлення з’єднання"
 
-#: gnutls_alert.c:50
+#: lib/gnutls_alert.c:52
 msgid "Certificate is bad"
 msgstr "Помилковий сертифікат"
 
-#: gnutls_alert.c:51
+#: lib/gnutls_alert.c:53
 msgid "Certificate is not supported"
 msgstr "Підтримки сертифіката не передбачено"
 
-#: gnutls_alert.c:52
+#: lib/gnutls_alert.c:54
 msgid "Certificate was revoked"
 msgstr "Сертифікат відкликано"
 
-#: gnutls_alert.c:53
+#: lib/gnutls_alert.c:55
 msgid "Certificate is expired"
 msgstr "Сертифікат втратив чинність"
 
-#: gnutls_alert.c:54
+#: lib/gnutls_alert.c:56
 msgid "Unknown certificate"
 msgstr "Невідомий сертифікат"
 
-#: gnutls_alert.c:55
+#: lib/gnutls_alert.c:57
 msgid "Illegal parameter"
 msgstr "Некоректний параметр"
 
-#: gnutls_alert.c:56
+#: lib/gnutls_alert.c:58
 msgid "CA is unknown"
 msgstr "Невідома служба сертифікації (CA)"
 
-#: gnutls_alert.c:57
+#: lib/gnutls_alert.c:59
 msgid "Access was denied"
 msgstr "Доступ заборонено"
 
-#: gnutls_alert.c:58
+#: lib/gnutls_alert.c:60
 msgid "Decode error"
 msgstr "Помилка декодування"
 
-#: gnutls_alert.c:59
+#: lib/gnutls_alert.c:61
 msgid "Decrypt error"
 msgstr "Помилка дешифрування"
 
-#: gnutls_alert.c:60
+#: lib/gnutls_alert.c:62
 msgid "Export restriction"
 msgstr "Обмеження експортування"
 
-#: gnutls_alert.c:61
+#: lib/gnutls_alert.c:63
 msgid "Error in protocol version"
 msgstr "Помилка у версії протоколу"
 
-#: gnutls_alert.c:62
+#: lib/gnutls_alert.c:64
 msgid "Insufficient security"
 msgstr "Недостатній захист"
 
-#: gnutls_alert.c:63
+#: lib/gnutls_alert.c:65
 msgid "User canceled"
 msgstr "Скасовано користувачем"
 
-#: gnutls_alert.c:64
+#: lib/gnutls_alert.c:66
+msgid "No certificate (SSL 3.0)"
+msgstr "Немає сертифіката (SSL 3.0)"
+
+#: lib/gnutls_alert.c:67
 msgid "Internal error"
 msgstr "Внутрішня помилка"
 
-#: gnutls_alert.c:65
+#: lib/gnutls_alert.c:68
 msgid "No renegotiation is allowed"
 msgstr "Повторне узгодження заборонено"
 
-#: gnutls_alert.c:67
+#: lib/gnutls_alert.c:70
 msgid "Could not retrieve the specified certificate"
 msgstr "Не вдалося отримати вказаний сертифікат"
 
-#: gnutls_alert.c:68
+#: lib/gnutls_alert.c:71
 msgid "An unsupported extension was sent"
 msgstr "Надіслано непідтримуване розширення"
 
-#: gnutls_alert.c:70
+#: lib/gnutls_alert.c:73
 msgid "The server name sent was not recognized"
 msgstr "Не вдалося розпізнати назву сервера"
 
-#: gnutls_alert.c:72
+#: lib/gnutls_alert.c:75
 msgid "The SRP/PSK username is missing or not known"
 msgstr "Не вказано імені користувача SRP/PSK або вказано невідоме ім’я"
 
-#: gnutls_alert.c:74
-msgid "Inner application negotiation failed"
-msgstr "Помилка під час спроби встановлення зв’язку з внутрішньою програмою"
-
-#: gnutls_alert.c:76
-msgid "Inner application verification failed"
-msgstr "Спроба перевірки внутрішньої програми зазнала невдачі"
-
-#: x509/output.c:157
+#: lib/x509/output.c:155
 #, c-format
 msgid "\t\t\tPath Length Constraint: %d\n"
 msgstr "\t\t\tОбмеження довжини шляху: %d\n"
 
-#: x509/output.c:158
+#: lib/x509/output.c:156
 #, c-format
 msgid "\t\t\tPolicy Language: %s"
 msgstr "\t\t\tМова правил: %s"
 
-#: x509/output.c:167
+#: lib/x509/output.c:165
 msgid ""
 "\t\t\tPolicy:\n"
 "\t\t\t\tASCII: "
@@ -673,7 +697,7 @@ msgstr ""
 "\t\t\tПравила:\n"
 "\t\t\t\tASCII: "
 
-#: x509/output.c:169
+#: lib/x509/output.c:167
 msgid ""
 "\n"
 "\t\t\t\tHexdump: "
@@ -681,130 +705,130 @@ msgstr ""
 "\n"
 "\t\t\t\tШіст. дамп: "
 
-#: x509/output.c:302
+#: lib/x509/output.c:300
 #, c-format
 msgid "%s\t\t\tDigital signature.\n"
 msgstr "%s\t\t\tЦифровий підпис.\n"
 
-#: x509/output.c:304
+#: lib/x509/output.c:302
 #, c-format
 msgid "%s\t\t\tNon repudiation.\n"
 msgstr "%s\t\t\tБез анулювання.\n"
 
-#: x509/output.c:306
+#: lib/x509/output.c:304
 #, c-format
 msgid "%s\t\t\tKey encipherment.\n"
 msgstr "%s\t\t\tШифрування ключа.\n"
 
-#: x509/output.c:308
+#: lib/x509/output.c:306
 #, c-format
 msgid "%s\t\t\tData encipherment.\n"
 msgstr "%s\t\t\tШифрування даних.\n"
 
-#: x509/output.c:310
+#: lib/x509/output.c:308
 #, c-format
 msgid "%s\t\t\tKey agreement.\n"
 msgstr "%s\t\t\tУзгодження ключів.\n"
 
-#: x509/output.c:312
+#: lib/x509/output.c:310
 #, c-format
 msgid "%s\t\t\tCertificate signing.\n"
 msgstr "%s\t\t\tПідписування сертифікатом.\n"
 
-#: x509/output.c:314
+#: lib/x509/output.c:312
 #, c-format
 msgid "%s\t\t\tCRL signing.\n"
 msgstr "%s\t\t\tПідписування CRL.\n"
 
-#: x509/output.c:316
+#: lib/x509/output.c:314
 #, c-format
 msgid "%s\t\t\tKey encipher only.\n"
 msgstr "%s\t\t\tЛише шифрування ключа.\n"
 
-#: x509/output.c:318
+#: lib/x509/output.c:316
 #, c-format
 msgid "%s\t\t\tKey decipher only.\n"
 msgstr "%s\t\t\tЛише розшифрування ключа.\n"
 
-#: x509/output.c:369
+#: lib/x509/output.c:367
 msgid "warning: distributionPoint contains an embedded NUL, replacing with '!'\n"
 msgstr "попередження: distributionPoint містить вбудоване порожнє значення, замінюємо на '!'\n"
 
-#: x509/output.c:462
+#: lib/x509/output.c:460
 #, c-format
 msgid "%s\t\t\tTLS WWW Server.\n"
 msgstr "%s\t\t\tІнтернет-сервер TLS.\n"
 
-#: x509/output.c:464
+#: lib/x509/output.c:462
 #, c-format
 msgid "%s\t\t\tTLS WWW Client.\n"
 msgstr "%s\t\t\tІнтернет-клієнт TLS.\n"
 
-#: x509/output.c:466
+#: lib/x509/output.c:464
 #, c-format
 msgid "%s\t\t\tCode signing.\n"
 msgstr "%s\t\t\tПідписування коду.\n"
 
-#: x509/output.c:468
+#: lib/x509/output.c:466
 #, c-format
 msgid "%s\t\t\tEmail protection.\n"
 msgstr "%s\t\t\tЗахист електронної пошти.\n"
 
-#: x509/output.c:470
+#: lib/x509/output.c:468
 #, c-format
 msgid "%s\t\t\tTime stamping.\n"
 msgstr "%s\t\t\tЧасова позначка.\n"
 
-#: x509/output.c:472
+#: lib/x509/output.c:470
 #, c-format
 msgid "%s\t\t\tOCSP signing.\n"
 msgstr "%s\t\t\tПідписування OCSP.\n"
 
-#: x509/output.c:474
+#: lib/x509/output.c:472
 #, c-format
 msgid "%s\t\t\tIpsec IKE.\n"
 msgstr "%s\t\t\tIpsec IKE.\n"
 
-#: x509/output.c:476
+#: lib/x509/output.c:474
 #, c-format
 msgid "%s\t\t\tAny purpose.\n"
 msgstr "%s\t\t\tДовільне призначення.\n"
 
-#: x509/output.c:509
+#: lib/x509/output.c:507
 #, c-format
 msgid "%s\t\t\tCertificate Authority (CA): FALSE\n"
 msgstr "%s\t\t\tСлужба сертифікації (CA): НІ\n"
 
-#: x509/output.c:511
+#: lib/x509/output.c:509
 #, c-format
 msgid "%s\t\t\tCertificate Authority (CA): TRUE\n"
 msgstr "%s\t\t\tСлужба сертифікації (CA): ТАК\n"
 
-#: x509/output.c:514
+#: lib/x509/output.c:512
 #, c-format
 msgid "%s\t\t\tPath Length Constraint: %d\n"
 msgstr "%s\t\t\tОбмеження довжини шляху: %d\n"
 
-#: x509/output.c:588 x509/output.c:678
+#: lib/x509/output.c:586 lib/x509/output.c:676
 msgid "warning: altname contains an embedded NUL, replacing with '!'\n"
 msgstr "попередження: altname містить вбудоване порожнє значення, замінюємо на '!'\n"
 
-#: x509/output.c:684
+#: lib/x509/output.c:682
 #, c-format
 msgid "%s\t\t\tXMPP Address: %.*s\n"
 msgstr "%s\t\t\tАдреса XMPP: %.*s\n"
 
-#: x509/output.c:689
+#: lib/x509/output.c:687
 #, c-format
 msgid "%s\t\t\totherName OID: %.*s\n"
 msgstr "%s\t\t\tOID іншого імені: %.*s\n"
 
-#: x509/output.c:691
+#: lib/x509/output.c:689
 #, c-format
 msgid "%s\t\t\totherName DER: "
 msgstr "%s\t\t\tінше ім’я, DER: "
 
-#: x509/output.c:693
+#: lib/x509/output.c:691
 #, c-format
 msgid ""
 "\n"
@@ -813,175 +837,190 @@ msgstr ""
 "\n"
 "%s\t\t\tінше ім’я, ASCII: "
 
-#: x509/output.c:817
+#: lib/x509/output.c:815
 #, c-format
 msgid "%s\tExtensions:\n"
 msgstr "%s\tРозширення:\n"
 
-#: x509/output.c:827
+#: lib/x509/output.c:825
 #, c-format
 msgid "%s\t\tBasic Constraints (%s):\n"
 msgstr "%s\t\tОсновні обмеження (%s):\n"
 
-#: x509/output.c:828 x509/output.c:843 x509/output.c:860 x509/output.c:876
-#: x509/output.c:891 x509/output.c:908 x509/output.c:923 x509/output.c:938
-#: x509/output.c:956 x509/output.c:969 x509/output.c:1696 x509/output.c:1719
-#: x509/output.c:1732
+#: lib/x509/output.c:826 lib/x509/output.c:841 lib/x509/output.c:858
+#: lib/x509/output.c:874 lib/x509/output.c:889 lib/x509/output.c:906
+#: lib/x509/output.c:921 lib/x509/output.c:936 lib/x509/output.c:954
+#: lib/x509/output.c:967 lib/x509/output.c:1735 lib/x509/output.c:1758
+#: lib/x509/output.c:1771
 msgid "critical"
 msgstr "критична"
 
-#: x509/output.c:828 x509/output.c:843 x509/output.c:860 x509/output.c:876
-#: x509/output.c:891 x509/output.c:908 x509/output.c:923 x509/output.c:938
-#: x509/output.c:956 x509/output.c:969 x509/output.c:1696 x509/output.c:1719
-#: x509/output.c:1732
+#: lib/x509/output.c:826 lib/x509/output.c:841 lib/x509/output.c:858
+#: lib/x509/output.c:874 lib/x509/output.c:889 lib/x509/output.c:906
+#: lib/x509/output.c:921 lib/x509/output.c:936 lib/x509/output.c:954
+#: lib/x509/output.c:967 lib/x509/output.c:1735 lib/x509/output.c:1758
+#: lib/x509/output.c:1771
 msgid "not critical"
 msgstr "не критична"
 
-#: x509/output.c:842
+#: lib/x509/output.c:840
 #, c-format
 msgid "%s\t\tSubject Key Identifier (%s):\n"
 msgstr "%s\t\tІдентифікатор ключа призначення (%s):\n"
 
-#: x509/output.c:859
+#: lib/x509/output.c:857
 #, c-format
 msgid "%s\t\tAuthority Key Identifier (%s):\n"
 msgstr "%s\t\tІдентифікатор ключа служби (%s):\n"
 
-#: x509/output.c:875
+#: lib/x509/output.c:873
 #, c-format
 msgid "%s\t\tKey Usage (%s):\n"
 msgstr "%s\t\tВикористання ключа (%s):\n"
 
-#: x509/output.c:890
+#: lib/x509/output.c:888
 #, c-format
 msgid "%s\t\tKey Purpose (%s):\n"
 msgstr "%s\t\tПризначення ключа (%s):\n"
 
-#: x509/output.c:907
+#: lib/x509/output.c:905
 #, c-format
 msgid "%s\t\tSubject Alternative Name (%s):\n"
 msgstr "%s\t\tІнше ім’я (назва) призначення (%s):\n"
 
-#: x509/output.c:922
+#: lib/x509/output.c:920
 #, c-format
 msgid "%s\t\tIssuer Alternative Name (%s):\n"
 msgstr "%s\t\tІнше ім’я (назва) видавця (%s):\n"
 
-#: x509/output.c:937
+#: lib/x509/output.c:935
 #, c-format
 msgid "%s\t\tCRL Distribution points (%s):\n"
 msgstr "%s\t\tТочки розповсюдження CRL (%s):\n"
 
-#: x509/output.c:955
+#: lib/x509/output.c:953
 #, c-format
 msgid "%s\t\tProxy Certificate Information (%s):\n"
 msgstr "%s\t\tДані щодо проміжних сертифікатів (%s):\n"
 
-#: x509/output.c:968
+#: lib/x509/output.c:966
 #, c-format
 msgid "%s\t\tUnknown extension %s (%s):\n"
 msgstr "%s\t\tНевідоме розширення %s (%s):\n"
 
-#: x509/output.c:1015
+#: lib/x509/output.c:1013
 #, c-format
 msgid "%s\t\t\tASCII: "
 msgstr "%s\t\t\tASCII: "
 
-#: x509/output.c:1019
+#: lib/x509/output.c:1017
 #, c-format
 msgid "%s\t\t\tHexdump: "
 msgstr "%s\t\t\tШіст. дамп: "
 
-#: x509/output.c:1037 x509/output.c:1584 x509/output.c:1914
-#: openpgp/output.c:326
+#: lib/x509/output.c:1035 lib/x509/output.c:1623 lib/x509/output.c:1953
+#: lib/openpgp/output.c:324
 #, c-format
 msgid "\tVersion: %d\n"
 msgstr "\tВерсія: %d\n"
 
-#: x509/output.c:1051
+#: lib/x509/output.c:1049
 msgid "\tSerial Number (hex): "
 msgstr "\tСерійний номер (шіст.): "
 
-#: x509/output.c:1080 x509/output.c:1610
+#: lib/x509/output.c:1078 lib/x509/output.c:1649
 #, c-format
 msgid "\tIssuer: %s\n"
 msgstr "\tВидавець: %s\n"
 
-#: x509/output.c:1090
+#: lib/x509/output.c:1088
 msgid "\tValidity:\n"
 msgstr "\tЧинність:\n"
 
-#: x509/output.c:1103
+#: lib/x509/output.c:1101
 #, c-format
 msgid "\t\tNot Before: %s\n"
 msgstr "\t\tНе раніше: %s\n"
 
-#: x509/output.c:1117
+#: lib/x509/output.c:1115
 #, c-format
 msgid "\t\tNot After: %s\n"
 msgstr "\t\tНе пізніше: %s\n"
 
-#: x509/output.c:1142 x509/output.c:1938
+#: lib/x509/output.c:1140 lib/x509/output.c:1977
 #, c-format
 msgid "\tSubject: %s\n"
 msgstr "\tПризначення: %s\n"
 
-#: x509/output.c:1160 x509/output.c:1253 x509/output.c:1423 x509/output.c:1831
-#: x509/output.c:1956 openpgp/output.c:238
+#: lib/x509/output.c:1159 lib/x509/output.c:1292 lib/x509/output.c:1462
+#: lib/x509/output.c:1870 lib/x509/output.c:1995 lib/openpgp/output.c:236
 msgid "unknown"
 msgstr "невідомий"
 
-#: x509/output.c:1162 x509/output.c:1958
+#: lib/x509/output.c:1163 lib/x509/output.c:1997
 #, c-format
 msgid "\tSubject Public Key Algorithm: %s\n"
 msgstr "\tАлгоритм відкритого ключа призначення: %s\n"
 
-#: x509/output.c:1163
+#: lib/x509/output.c:1164
 #, c-format
-msgid "\tCertificate Security Level: %s\n"
-msgstr "\tРівень захисту сертифіката: %s\n"
+msgid "\tCertificate Security Level: %s (%d bits)\n"
+msgstr "\tРівень захисту сертифіката: %s (%d-бітовий)\n"
 
-#: x509/output.c:1180 x509/output.c:1971 openpgp/output.c:262
+#: lib/x509/output.c:1194 lib/x509/output.c:2010 lib/openpgp/output.c:260
 #, c-format
 msgid "\t\tModulus (bits %d):\n"
 msgstr "\t\tОснова (%d-бітова):\n"
 
-#: x509/output.c:1182
+#: lib/x509/output.c:1196
 #, c-format
 msgid "\t\tExponent (bits %d):\n"
 msgstr "\t\tПоказник (%d-бітовий):\n"
 
-#: x509/output.c:1202 x509/output.c:1993 openpgp/output.c:289
+#: lib/x509/output.c:1217
+#, c-format
+msgid "\t\tCurve:\t%s\n"
+msgstr "\t\tКрива:\t%s\n"
+
+#: lib/x509/output.c:1218
+msgid "\t\tX:\n"
+msgstr "\t\tX:\n"
+
+#: lib/x509/output.c:1220
+msgid "\t\tY:\n"
+msgstr "\t\tY:\n"
+
+#: lib/x509/output.c:1239 lib/x509/output.c:2032 lib/openpgp/output.c:287
 #, c-format
 msgid "\t\tPublic key (bits %d):\n"
 msgstr "\t\tВідкритий ключ (%d-бітовий):\n"
 
-#: x509/output.c:1204 x509/output.c:1995 openpgp/output.c:291
+#: lib/x509/output.c:1241 lib/x509/output.c:2034 lib/openpgp/output.c:289
 msgid "\t\tP:\n"
 msgstr "\t\tP:\n"
 
-#: x509/output.c:1206 x509/output.c:1997 openpgp/output.c:293
+#: lib/x509/output.c:1243 lib/x509/output.c:2036 lib/openpgp/output.c:291
 msgid "\t\tQ:\n"
 msgstr "\t\tQ:\n"
 
-#: x509/output.c:1208 x509/output.c:1999 openpgp/output.c:295
+#: lib/x509/output.c:1245 lib/x509/output.c:2038 lib/openpgp/output.c:293
 msgid "\t\tG:\n"
 msgstr "\t\tG:\n"
 
-#: x509/output.c:1254 x509/output.c:1832
+#: lib/x509/output.c:1293 lib/x509/output.c:1871
 #, c-format
 msgid "\tSignature Algorithm: %s\n"
 msgstr "\tАлгоритм підписування: %s\n"
 
-#: x509/output.c:1258 x509/output.c:1836
+#: lib/x509/output.c:1297 lib/x509/output.c:1875
 msgid "warning: signed using a broken signature algorithm that can be forged.\n"
 msgstr "попередження: signed використовує слабкий алгоритм підписування, який можна зламати.\n"
 
-#: x509/output.c:1285 x509/output.c:1863
+#: lib/x509/output.c:1324 lib/x509/output.c:1902
 msgid "\tSignature:\n"
 msgstr "\tПідпис:\n"
 
-#: x509/output.c:1308
+#: lib/x509/output.c:1347
 msgid ""
 "\tMD5 fingerprint:\n"
 "\t\t"
@@ -989,7 +1028,7 @@ msgstr ""
 "\tКонтрольна сума MD5:\n"
 "\t\t"
 
-#: x509/output.c:1310
+#: lib/x509/output.c:1349
 msgid ""
 "\tSHA-1 fingerprint:\n"
 "\t\t"
@@ -997,7 +1036,7 @@ msgstr ""
 "\tКонтрольна сума SHA-1:\n"
 "\t\t"
 
-#: x509/output.c:1329 x509/output.c:2175
+#: lib/x509/output.c:1368 lib/x509/output.c:2214
 msgid ""
 "\tPublic Key Id:\n"
 "\t\t"
@@ -1005,197 +1044,197 @@ msgstr ""
 "\tІдент. відкритого ключа:\n"
 "\t\t"
 
-#: x509/output.c:1425
+#: lib/x509/output.c:1464
 #, c-format
 msgid "signed using %s (broken!), "
 msgstr "підписано за допомогою %s (слабкий!), "
 
-#: x509/output.c:1427
+#: lib/x509/output.c:1466
 #, c-format
 msgid "signed using %s, "
 msgstr "підписано за допомогою %s, "
 
-#: x509/output.c:1540
+#: lib/x509/output.c:1579
 msgid "X.509 Certificate Information:\n"
 msgstr "Дані щодо сертифікації X.509:\n"
 
-#: x509/output.c:1544 x509/output.c:2212
+#: lib/x509/output.c:1583 lib/x509/output.c:2251
 msgid "Other Information:\n"
 msgstr "Інші дані:\n"
 
-#: x509/output.c:1580
+#: lib/x509/output.c:1619
 msgid "\tVersion: 1 (default)\n"
 msgstr "\tВерсія: 1 (типова)\n"
 
-#: x509/output.c:1620
+#: lib/x509/output.c:1659
 msgid "\tUpdate dates:\n"
 msgstr "\tДати оновлення:\n"
 
-#: x509/output.c:1633
+#: lib/x509/output.c:1672
 #, c-format
 msgid "\t\tIssued: %s\n"
 msgstr "\t\tВидано: %s\n"
 
-#: x509/output.c:1649
+#: lib/x509/output.c:1688
 #, c-format
 msgid "\t\tNext at: %s\n"
 msgstr "\t\tНаступна: %s\n"
 
-#: x509/output.c:1680
+#: lib/x509/output.c:1719
 msgid "\tExtensions:\n"
 msgstr "\tРозширення:\n"
 
-#: x509/output.c:1695
+#: lib/x509/output.c:1734
 #, c-format
 msgid "\t\tCRL Number (%s): "
 msgstr "\t\tНомер CRL (%s): "
 
-#: x509/output.c:1718
+#: lib/x509/output.c:1757
 #, c-format
 msgid "\t\tAuthority Key Identifier (%s):\n"
 msgstr "\t\tІдентифікатор ключа служби (%s):\n"
 
-#: x509/output.c:1731
+#: lib/x509/output.c:1770
 #, c-format
 msgid "\t\tUnknown extension %s (%s):\n"
 msgstr "\t\tНевідоме розширення %s (%s):\n"
 
-#: x509/output.c:1761 x509/output.c:2131
+#: lib/x509/output.c:1800 lib/x509/output.c:2170
 msgid "\t\t\tASCII: "
 msgstr "\t\t\tASCII: "
 
-#: x509/output.c:1765 x509/output.c:2135
+#: lib/x509/output.c:1804 lib/x509/output.c:2174
 msgid "\t\t\tHexdump: "
 msgstr "\t\t\tШіст. дамп: "
 
-#: x509/output.c:1781
+#: lib/x509/output.c:1820
 #, c-format
 msgid "\tRevoked certificates (%d):\n"
 msgstr "\tВідкликані сертифікати (%d):\n"
 
-#: x509/output.c:1783
+#: lib/x509/output.c:1822
 msgid "\tNo revoked certificates.\n"
 msgstr "\tНемає відкликаних сертифікатів.\n"
 
-#: x509/output.c:1802
+#: lib/x509/output.c:1841
 msgid "\t\tSerial Number (hex): "
 msgstr "\t\tСерійний номер (шіст.): "
 
-#: x509/output.c:1811
+#: lib/x509/output.c:1850
 #, c-format
 msgid "\t\tRevoked at: %s\n"
 msgstr "\t\tВідкликано: %s\n"
 
-#: x509/output.c:1894
+#: lib/x509/output.c:1933
 msgid "X.509 Certificate Revocation List Information:\n"
 msgstr "Дані щодо списку відкликань сертифікатів X.509:\n"
 
-#: x509/output.c:1973 openpgp/output.c:264
+#: lib/x509/output.c:2012 lib/openpgp/output.c:262
 msgid "\t\tExponent:\n"
 msgstr "\t\tПоказник:\n"
 
-#: x509/output.c:2040
+#: lib/x509/output.c:2079
 msgid "\tAttributes:\n"
 msgstr "\tАтрибути:\n"
 
-#: x509/output.c:2092
+#: lib/x509/output.c:2131
 #, c-format
 msgid "\t\tChallenge password: %s\n"
 msgstr "\t\tПароль виклику: %s\n"
 
-#: x509/output.c:2103
+#: lib/x509/output.c:2142
 #, c-format
 msgid "\t\tUnknown attribute %s:\n"
 msgstr "\t\tНевідомий атрибут %s:\n"
 
-#: x509/output.c:2208
+#: lib/x509/output.c:2247
 msgid "PKCS #10 Certificate Request Information:\n"
 msgstr "Дані щодо запиту сертифіката PKCS #10:\n"
 
-#: openpgp/output.c:85
+#: lib/openpgp/output.c:83
 msgid "\t\tKey Usage:\n"
 msgstr "\t\tВикористання ключа:\n"
 
-#: openpgp/output.c:94
+#: lib/openpgp/output.c:92
 #, c-format
 msgid "error: get_key_usage: %s\n"
 msgstr "помилка: get_key_usage: %s\n"
 
-#: openpgp/output.c:99
+#: lib/openpgp/output.c:97
 msgid "\t\t\tDigital signatures.\n"
 msgstr "\t\t\tЦифрові підписи.\n"
 
-#: openpgp/output.c:101
+#: lib/openpgp/output.c:99
 msgid "\t\t\tCommunications encipherment.\n"
 msgstr "\t\t\tШифрування обміну даними.\n"
 
-#: openpgp/output.c:103
+#: lib/openpgp/output.c:101
 msgid "\t\t\tStorage data encipherment.\n"
 msgstr "\t\t\tШифрування даних у сховищах.\n"
 
-#: openpgp/output.c:105
+#: lib/openpgp/output.c:103
 msgid "\t\t\tAuthentication.\n"
 msgstr "\t\t\tРозпізнавання.\n"
 
-#: openpgp/output.c:107
+#: lib/openpgp/output.c:105
 msgid "\t\t\tCertificate signing.\n"
 msgstr "\t\t\tПідписування сертифікатів.\n"
 
-#: openpgp/output.c:128
+#: lib/openpgp/output.c:126
 msgid "\tID (hex): "
 msgstr "\tІд. (шіст.): "
 
-#: openpgp/output.c:149
+#: lib/openpgp/output.c:147
 msgid "\tFingerprint (hex): "
 msgstr "\tВідбиток (шіст.): "
 
-#: openpgp/output.c:166
+#: lib/openpgp/output.c:164
 msgid "\tRevoked: True\n"
 msgstr "\tВідкликано: так\n"
 
-#: openpgp/output.c:168
+#: lib/openpgp/output.c:166
 msgid "\tRevoked: False\n"
 msgstr "\tВідкликано: ні\n"
 
-#: openpgp/output.c:176
+#: lib/openpgp/output.c:174
 msgid "\tTime stamps:\n"
 msgstr "\tЧасові позначки:\n"
 
-#: openpgp/output.c:193
+#: lib/openpgp/output.c:191
 #, c-format
 msgid "\t\tCreation: %s\n"
 msgstr "\t\tСтворення: %s\n"
 
-#: openpgp/output.c:207
+#: lib/openpgp/output.c:205
 msgid "\t\tExpiration: Never\n"
 msgstr "\t\tСтрок дії: не обмежено\n"
 
-#: openpgp/output.c:216
+#: lib/openpgp/output.c:214
 #, c-format
 msgid "\t\tExpiration: %s\n"
 msgstr "\t\tСтрок дії: до %s\n"
 
-#: openpgp/output.c:240
+#: lib/openpgp/output.c:238
 #, c-format
 msgid "\tPublic Key Algorithm: %s\n"
 msgstr "\tАлгоритм відкритого ключа: %s\n"
 
-#: openpgp/output.c:241
+#: lib/openpgp/output.c:239
 #, c-format
 msgid "\tKey Security Level: %s\n"
 msgstr "\tРівень захисту ключа: %s\n"
 
-#: openpgp/output.c:359
+#: lib/openpgp/output.c:357
 #, c-format
 msgid "\tName[%d]: %s\n"
 msgstr "\tІм’я[%d]: %s\n"
 
-#: openpgp/output.c:361
+#: lib/openpgp/output.c:359
 #, c-format
 msgid "\tRevoked Name[%d]: %s\n"
 msgstr "\tВідкликане ім’я[%d]: %s\n"
 
-#: openpgp/output.c:382
+#: lib/openpgp/output.c:380
 #, c-format
 msgid ""
 "\n"
@@ -1204,44 +1243,56 @@ msgstr ""
 "\n"
 "\tПідключ[%d]:\n"
 
-#: openpgp/output.c:422
+#: lib/openpgp/output.c:420
 #, c-format
 msgid "name[%d]: %s, "
 msgstr "ім’я[%d]: %s, "
 
-#: openpgp/output.c:424
+#: lib/openpgp/output.c:422
 #, c-format
 msgid "revoked name[%d]: %s, "
 msgstr "відкликане ім’я[%d]: %s, "
 
-#: openpgp/output.c:444
+#: lib/openpgp/output.c:442
 msgid "fingerprint: "
 msgstr "відбиток: "
 
-#: openpgp/output.c:464
+#: lib/openpgp/output.c:462
 #, c-format
 msgid "created: %s, "
 msgstr "створено: %s, "
 
-#: openpgp/output.c:474
+#: lib/openpgp/output.c:472
 msgid "never expires, "
 msgstr "строк дії не обмежено, "
 
-#: openpgp/output.c:482
+#: lib/openpgp/output.c:480
 #, c-format
 msgid "expires: %s, "
 msgstr "строк дії: до %s, "
 
-#: openpgp/output.c:494
+#: lib/openpgp/output.c:492
 #, c-format
 msgid "key algorithm %s (%d bits)"
 msgstr "алгоритм ключа %s (%d-бітовий)"
 
-#: openpgp/output.c:496
+#: lib/openpgp/output.c:494
 #, c-format
 msgid "unknown key algorithm (%d)"
 msgstr "невідомий алгоритм ключа (%d)"
 
-#: openpgp/output.c:529
+#: lib/openpgp/output.c:527
 msgid "OpenPGP Certificate Information:\n"
 msgstr "Дані щодо сертифіката OpenPGP:\n"
+
+#~ msgid "The initialization of LZO has failed."
+#~ msgstr "Не вдалося ініціалізувати LZO."
+
+#~ msgid "The handshake data size is too large (DoS?), check gnutls_handshake_set_max_packet_length()."
+#~ msgstr "Розмір даних встановлення з’єднання є занадто великим (спроба атаки?), перевірте значення gnutls_handshake_set_max_packet_length()."
+
+#~ msgid "Inner application negotiation failed"
+#~ msgstr "Помилка під час спроби встановлення зв’язку з внутрішньою програмою"
+
+#~ msgid "Inner application verification failed"
+#~ msgstr "Спроба перевірки внутрішньої програми зазнала невдачі"

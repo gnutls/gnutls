@@ -25,5 +25,5 @@ AM_CPPFLAGS = \
 
 bin_PROGRAMS = crywrap
 
-crywrap_SOURCES = crywrap.c primes.h
+crywrap_SOURCES = crywrap.c primes.h crywrap.h
 crywrap_LDADD = ../../lib/libgnutls.la ../../gl/libgnu.la -lidn
