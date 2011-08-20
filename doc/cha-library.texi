@@ -116,10 +116,10 @@ to be taken. Thus negative error codes may be fatal or not.
 
 Fatal errors terminate the connection immediately and further sends
 and receives will be disallowed.  Such an example is
-@code{GNUTLS_\-E_\-DECRYPTION_\-FAILED}. Non-fatal errors may warn about
+@code{GNUTLS_@-E_@-DECRYPTION_@-FAILED}. Non-fatal errors may warn about
 something, i.e., a warning alert was received, or indicate the some
 action has to be taken. This is the case with the error code
-@code{GNUTLS_\-E_\-REHANDSHAKE} returned by @funcref{gnutls_record_recv}.
+@code{GNUTLS_@-E_@-REHANDSHAKE} returned by @funcref{gnutls_record_recv}.
 This error code indicates that the server requests a re-handshake. The
 client may ignore this request, or may reply with an alert.  You can
 test if an error code is a fatal one by using the
