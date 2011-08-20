@@ -101,10 +101,10 @@ such as certificates, usernames etc. to @code{auth_info_t} structures.
 
 
 Simple examples of existing authentication methods can be seen in
-@code{auth/\-psk.c} for PSK ciphersuites and @code{auth/\-srp.c} for SRP
+@code{auth/@-psk.c} for PSK ciphersuites and @code{auth/@-srp.c} for SRP
 ciphersuites. After implementing these functions the structure holding
-its pointers has to be registered in @code{gnutls_\-algorithms.c} in the
-@code{_gnutls_\-kx_\-algorithms} structure.
+its pointers has to be registered in @code{gnutls_@-algorithms.c} in the
+@code{_gnutls_@-kx_@-algorithms} structure.
 
 @node TLS Extension Handling
 @section TLS Extension Handling
@@ -123,7 +123,7 @@ and one for sending. These functions have to check internally whether
 they operate in client or server side. 
 
 A simple example of an extension handler can be seen in
-@code{ext/\-srp.c} in GnuTLS' source code. After implementing these functions, 
+@code{ext/@-srp.c} in GnuTLS' source code. After implementing these functions, 
 together with the extension number they handle, they have to be registered 
 using @funcintref{_gnutls_ext_register} in
 @code{gnutls_extensions.c} typically within @funcintref{_gnutls_ext_init}.
@@ -192,7 +192,7 @@ A typical entry would be:
 #endif
 @end example
 
-Most likely you'll need to add an @code{#include "ext/\-foobar.h"}, that
+Most likely you'll need to add an @code{#include "ext/@-foobar.h"}, that
 will contain something like
 like:
 @example
@@ -218,10 +218,12 @@ will be called to deinitialize the extension's private parameters, if any.
 Note that the conditional @code{ENABLE_FOOBAR} definition should only be 
 used if step 1 with the @code{configure} options has taken place.
 
-@subsubsection Add new files @code{ext/\-foobar.c} and @code{ext/\-foobar.h} that implement the extension.
+@subsubsection Add new files  that implement the extension.
 
 The functions you are responsible to add are those mentioned in the
-previous step.  As a starter, you could add this:
+previous step.  They should be added in a file such as @code{ext/@-foobar.c} 
+and headers should be placed in @code{ext/@-foobar.h}.
+As a starter, you could add this:
 
 @example
 int
@@ -259,15 +261,15 @@ The @funcintref{_foobar_send_params} function is responsible for
 sending extension data (both in the client and server).
 
 If you receive length fields that doesn't match, return
-@code{GNUTLS_E_\-UNEXPECTED_\-PACKET_\-LENGTH}.  If you receive invalid
-data, return @code{GNUTLS_E_\-RECEIVED_\-ILLEGAL_\-PARAMETER}.  You can use
+@code{GNUTLS_E_@-UNEXPECTED_@-PACKET_@-LENGTH}.  If you receive invalid
+data, return @code{GNUTLS_E_@-RECEIVED_@-ILLEGAL_@-PARAMETER}.  You can use
 other error codes from the list in @ref{Error codes}.  Return 0 on success.
 
 An extension typically stores private information in the @code{session}
 data for later usage. That can be done using the functions 
 @funcintref{_gnutls_ext_set_session_data} and
 @funcintref{_gnutls_ext_get_session_data}. You can check simple examples
-at @code{ext/\-max_\-record.c} and @code{ext/\-server_\-name.c} extensions.
+at @code{ext/@-max_@-record.c} and @code{ext/@-server_@-name.c} extensions.
 That private information can be saved and restored across session 
 resumption if the following functions are set:
 
@@ -308,7 +310,7 @@ _gnutls_foobar_send_params (gnutls_session_t session,
 
 The functions used would be declared as @code{static} functions, of
 the appropriate prototype, in the same file.
-When adding the files, you'll need to add them to @code{ext/\-Makefile.am}
+When adding the files, you'll need to add them to @code{ext/@-Makefile.am}
 as well, for example:
 
 @example
@@ -322,13 +324,13 @@ endif
 It might be desirable to allow users of the extension to
 request use of the extension, or set extension specific data.  
 This can be implemented by adding extension specific function calls
-that can be added to @code{includes/\-gnutls/\-gnutls.h},
+that can be added to @code{includes/@-gnutls/@-gnutls.h},
 as long as the LGPLv3+ applies.
-The implementation of the function should lie in the @code{ext/\-foobar.c} file.
+The implementation of the function should lie in the @code{ext/@-foobar.c} file.
 
 To make the API available in the shared library you need to add the
-symbol in @code{lib/\-libgnutls.map} or
-@code{libextra/\-libgnutls-\-extra.map} as appropriate, so that the symbol
+symbol in @code{lib/@-libgnutls.map} or
+@code{libextra/@-libgnutls-@-extra.map} as appropriate, so that the symbol
 is exported properly.
 
 When writing GTK-DOC style documentation for your new APIs, don't

@@ -156,7 +156,7 @@ provided.
 
 The verification function will verify a given certificate chain against a list of certificate
 authorities and certificate revocation lists, and output
-a bit-wise OR of elements of the @code{gnutls_\-certificate_\-status_t} 
+a bit-wise OR of elements of the @code{gnutls_@-certificate_@-status_t} 
 enumeration. 
 A detailed description of these elements can be found 
 in @ref{tab:cert-verify}. An example of certificate verification is shown in @ref{ex:verify2}.
@@ -218,42 +218,42 @@ flags are part of the enumeration
 @multitable @columnfractions .5 .5
 
 @headitem Flag @tab Description
-@item GNUTLS_VERIFY_\-DISABLE_CA_SIGN @tab
+@item GNUTLS_VERIFY_@-DISABLE_CA_SIGN @tab
 If set a signer does not have to be a certificate authority. This
 flag should normally be disabled, unless you know what this means.
 
-@item GNUTLS_VERIFY_\-ALLOW_X509_V1_CA_CRT @tab
+@item GNUTLS_VERIFY_@-ALLOW_X509_V1_CA_CRT @tab
 Allow only trusted CA certificates that have version 1.  This is
-safer than GNUTLS_VERIFY_\-ALLOW_ANY_X509_V1_CA_CRT, and should be
+safer than GNUTLS_VERIFY_@-ALLOW_ANY_X509_V1_CA_CRT, and should be
 used instead. That way only signers in your trusted list will be
 allowed to have certificates of version 1. This is the default.
 
-@item GNUTLS_VERIFY_\-DO_NOT_ALLOW_X509_V1_CA_CRT @tab
+@item GNUTLS_VERIFY_@-DO_NOT_ALLOW_X509_V1_CA_CRT @tab
 Do not allow trusted version 1 CA certificates.  This option is to be used
 in order consider all V1 certificates as deprecated.
 
-@item GNUTLS_VERIFY_\-ALLOW_ANY_X509_V1_CA_CRT @tab
+@item GNUTLS_VERIFY_@-ALLOW_ANY_X509_V1_CA_CRT @tab
 Allow CA certificates that have version 1 (both root and
 intermediate). This is dangerous since those haven't the
 basicConstraints extension. Must be used in combination with
-GNUTLS_VERIFY_\-ALLOW_X509_V1_CA_CRT.
+GNUTLS_VERIFY_@-ALLOW_X509_V1_CA_CRT.
 
-@item GNUTLS_VERIFY_\-DO_NOT_ALLOW_SAME @tab
+@item GNUTLS_VERIFY_@-DO_NOT_ALLOW_SAME @tab
 If a certificate is not signed by anyone trusted but exists in
 the trusted CA list do not treat it as trusted.
 
-@item GNUTLS_VERIFY_\-ALLOW_SIGN_RSA_MD2 @tab
+@item GNUTLS_VERIFY_@-ALLOW_SIGN_RSA_MD2 @tab
 Allow certificates to be signed using the old MD2 algorithm.
 
-@item GNUTLS_VERIFY_\-ALLOW_SIGN_RSA_MD5 @tab
+@item GNUTLS_VERIFY_@-ALLOW_SIGN_RSA_MD5 @tab
 Allow certificates to be signed using the broken MD5 algorithm.
 
-@item GNUTLS_VERIFY_\-DISABLE_TIME_CHECKS @tab
+@item GNUTLS_VERIFY_@-DISABLE_TIME_CHECKS @tab
 Disable checking of activation
 and expiration validity periods of certificate chains. Don't set
 this unless you understand the security implications.
 
-@item GNUTLS_VERIFY_\-DISABLE_CRL_CHECKS @tab
+@item GNUTLS_VERIFY_@-DISABLE_CRL_CHECKS @tab
 Disables checking for validity using certificate revocation lists.
 
 @end multitable
@@ -574,9 +574,9 @@ private key.
 
 With @acronym{GnuTLS} you can copy existing private keys and certificates
 to a token. Note that when copying private keys it is recommended to mark
-them as sensitive using the @code{GNUTLS_\-PKCS11_OBJ_\-FLAG_\-MARK_\-SENSITIVE}
+them as sensitive using the @code{GNUTLS_@-PKCS11_OBJ_@-FLAG_@-MARK_@-SENSITIVE}
 to prevent its extraction. An object can be marked as private using the flag 
-@code{GNUTLS_\-PKCS11_OBJ_\-FLAG_\-MARK_\-PRIVATE}, to require PIN to be
+@code{GNUTLS_@-PKCS11_OBJ_@-FLAG_@-MARK_@-PRIVATE}, to require PIN to be
 entered before accessing the object (for operations or otherwise).
 
 @showfuncdesc{gnutls_pkcs11_delete_url}
