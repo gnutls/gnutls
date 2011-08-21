@@ -23,6 +23,7 @@ AM_CPPFLAGS = \
 	-DSYSCONFDIR=\"${sysconfdir}\" \
 	-DCRYWRAP_PATCHLEVEL=\"${CRYWRAP_PATCHLEVEL}\"
 
+EXTRA_DIST = README
 bin_PROGRAMS = crywrap
 
 crywrap_SOURCES = crywrap.c primes.h crywrap.h
