@@ -280,6 +280,11 @@ _crywrap_addr_get (const char *hostname, struct sockaddr_storage **addr)
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_protocol = IPPROTO_IP;
   *addr = calloc (1, sizeof (struct sockaddr_storage));
+  if (*addr == NULL)
+    {
+      free(lz);
+      return -1;
+    }
 
   if (getaddrinfo (lz, NULL, &hints, &res) != 0)
     {
@@ -485,6 +490,9 @@ _crywrap_config_parse (int argc, char **argv)
   crywrap_config_t *config =
     (crywrap_config_t *)malloc (sizeof (crywrap_config_t));
 
+  if (config == NULL)
+    return NULL;
+
   config->listen.port = 0;
   config->listen.addr = NULL;
   config->dest.port = 0;
@@ -641,6 +649,9 @@ _crywrap_listen (const crywrap_config_t *config)
   int ret;
 
   cur = calloc (1, sizeof (struct addrinfo));
+  if (cur == NULL)
+    return -1;
+  
   cur->ai_family = config->listen.addr->ss_family;
 
   switch (cur->ai_family)
@@ -654,6 +665,9 @@ _crywrap_listen (const crywrap_config_t *config)
     }
 
   cur->ai_addr = malloc (cur->ai_addrlen);
+  if (cur->ai_addr == NULL)
+    return -1;
+  
   memcpy (cur->ai_addr, config->listen.addr, cur->ai_addrlen);
 
   ret = _crywrap_bind (cur, htons (config->listen.port));
@@ -679,6 +693,9 @@ _crywrap_remote_connect (const struct sockaddr_storage *addr, int port)
   int sock;
 
   cur = calloc (1, sizeof (struct addrinfo));
+  if (cur == NULL)
+    return -1;
+
   cur->ai_family = addr->ss_family;
 
   switch (cur->ai_family)
@@ -692,6 +709,9 @@ _crywrap_remote_connect (const struct sockaddr_storage *addr, int port)
     }
 
   cur->ai_addr = malloc (cur->ai_addrlen);
+  if (cur->ai_addr == NULL)
+    return -1;
+
   memcpy (cur->ai_addr, addr, cur->ai_addrlen);
 
   switch (cur->ai_family)
