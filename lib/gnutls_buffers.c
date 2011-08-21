@@ -144,12 +144,8 @@ int ret;
   else
     ret = session->internals.errno_func (session->
                                           internals.transport_recv_ptr);
-#if defined(_AIX) || defined(AIX)
-  if (ret == 0) ret = EAGAIN;
-#endif
   return ret;
 }
-
 
 static ssize_t
 _gnutls_dgram_read (gnutls_session_t session, mbuffer_st **bufel,

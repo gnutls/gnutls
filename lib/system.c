@@ -81,6 +81,10 @@ system_write (gnutls_transport_ptr ptr, const void *data, size_t data_size)
 int
 system_errno (gnutls_transport_ptr_t ptr)
 {
+#if defined(_AIX) || defined(AIX)
+  if (errno == 0) errno = EAGAIN;
+#endif
+
   return errno;
 }
 
