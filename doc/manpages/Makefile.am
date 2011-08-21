@@ -21,7 +21,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 dist_man_MANS = gnutls-cli.1 gnutls-cli-debug.1 gnutls-serv.1	\
-	certtool.1 psktool.1 p11tool.1 crywrap.8
+	certtool.1 psktool.1 p11tool.1
 
 if ENABLE_SRP
 dist_man_MANS += srptool.1
