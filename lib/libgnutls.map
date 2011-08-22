@@ -232,6 +232,7 @@ GNUTLS_1_4
     gnutls_openpgp_privkey_import;
     gnutls_openpgp_privkey_init;
     gnutls_openpgp_privkey_set_preferred_key_id;
+    gnutls_openpgp_privkey_sign_hash;
     gnutls_openpgp_send_cert;
     gnutls_openpgp_set_recv_key_function;
     gnutls_oprfi_enable_client;
