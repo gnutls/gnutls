@@ -115,9 +115,8 @@ Arjen Lenstra and Eric Verheul, "Selecting Cryptographic Key Sizes",
 2003, available from @url{http://www.win.tue.nl/~klenstra/key.pdf}.
 
 @item @anchor{SSL3}[SSL3]
-Alan Freier, Philip Karlton and Paul Kocher, "The SSL Protocol Version
-3.0", November 1996, Available from
-@url{http://wp.netscape.com/eng/ssl3/draft302.txt}.
+Alan Freier, Philip Karlton and Paul Kocher, "The Secure Sockets Layer (SSL) Protocol Version 3.0",
+August 2011, Available from @url{http://www.ietf.org/rfc/rfc6101.txt}.
 
 @item @anchor{STEVENS}[STEVENS]
 Richard Stevens, "UNIX Network Programming, Volume 1", Prentice Hall
