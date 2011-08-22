@@ -24,6 +24,8 @@
 ;;;
 
 (use-modules (gnutls)
+             (gnutls build tests)
+             (srfi srfi-1)
              (srfi srfi-26))
 
 (define %valid-priority-strings
@@ -41,10 +43,7 @@
     ("NONE:+VERS-TLS-ALL:+AES-128-CBC:"
      . "+FAIL-HERE:+SHA1:+COMP-NULL:+SIGN-RSA-SHA1")))
 
-(dynamic-wind
-
-    (lambda ()
-      #t)
+(run-test
 
     (lambda ()
       (let ((s (make-session connection-end/client)))
@@ -52,25 +51,20 @@
         (for-each (cut set-session-priorities! s <>)
                   %valid-priority-strings)
 
-        (for-each (lambda (prefix+suffix)
-                    (let* ((prefix (car prefix+suffix))
-                           (suffix (cdr prefix+suffix))
-                           (pos    (string-length prefix))
-                           (string (string-append prefix suffix)))
-                      (catch 'gnutls-error
-                        (lambda ()
-                          (let ((s (make-session connection-end/client)))
-                            (set-session-priorities! s string)))
-                        (lambda (key err function error-location . unused)
-                          (or (and (eq? key 'gnutls-error)
-                                   (eq? err error/invalid-request)
-                                   (eq? function 'set-session-priorities!)
-                                   (= error-location pos))
-                              (exit 1))))))
-                  %invalid-priority-strings)
-
-        (exit 0)))
-
-    (lambda ()
-      ;; failure
-      (exit 1)))
+        (every (lambda (prefix+suffix)
+                 (let* ((prefix (car prefix+suffix))
+                        (suffix (cdr prefix+suffix))
+                        (pos    (string-length prefix))
+                        (string (string-append prefix suffix)))
+                   (catch 'gnutls-error
+                     (lambda ()
+                       (let ((s (make-session connection-end/client)))
+                         ;; The following call should raise an exception.
+                         (set-session-priorities! s string)
+                         #f))
+                     (lambda (key err function error-location . unused)
+                       (and (eq? key 'gnutls-error)
+                            (eq? err error/invalid-request)
+                            (eq? function 'set-session-priorities!)
+                            (= error-location pos))))))
+               %invalid-priority-strings))))
