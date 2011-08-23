@@ -137,7 +137,7 @@ and require Diffie-Hellman parameters to be generated and associated with a cred
 structure, by the server (see @ref{Parameter generation}).
 
 @float Table,tab:key-exchange
-@multitable @columnfractions .3 .7
+@multitable @columnfractions .2 .7
 
 @headitem Key exchange @tab Description
 

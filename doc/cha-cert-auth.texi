@@ -45,7 +45,7 @@ certificate holder, the signer, a unique serial number, expiration
 dates and some other fields @xcite{PKIX} as shown in @ref{tab:x509}.
 
 @float Table,tab:x509
-@multitable @columnfractions .3 .7
+@multitable @columnfractions .2 .7
 
 @headitem Field @tab Description
 
@@ -93,7 +93,7 @@ belongs to a CA etc.  All the supported @acronym{X.509} version 3
 extensions are shown in @ref{tab:x509-ext}.
 
 @float Table,tab:x509-ext
-@multitable @columnfractions .3 .2 .5
+@multitable @columnfractions .3 .2 .4
 
 @headitem Extension @tab OID @tab Description
 
@@ -178,7 +178,7 @@ are equivalent and will verify the peer's certificate chain
 in a TLS session. 
 
 @float Table,tab:cert-verify
-@multitable @columnfractions .55 .45
+@multitable @columnfractions .46 .44
 
 @headitem Flag @tab Description
 
@@ -215,7 +215,7 @@ flags are part of the enumeration
 @code{gnutls_certificate_verify_flags} and are explained in @ref{tab:cert-flags}.
 
 @float Table,tab:cert-flags
-@multitable @columnfractions .5 .5
+@multitable @columnfractions .5 .4
 
 @headitem Flag @tab Description
 @item GNUTLS_VERIFY_@-DISABLE_CA_SIGN @tab
@@ -485,10 +485,11 @@ when accessing a protected object, such as a private key, as well as probe
 the user to insert the token. All the initialization functions are below.
 
 @showfuncdesc{gnutls_pkcs11_init}
+@showfuncA{gnutls_pkcs11_deinit}
+
 @showfuncdesc{gnutls_pkcs11_set_token_function}
 @showfuncdesc{gnutls_pkcs11_set_pin_function}
 @showfuncdesc{gnutls_pkcs11_add_provider}
-@showfuncA{gnutls_pkcs11_deinit}
 
 Note that due to limitations of @acronym{PKCS} #11 there are issues when multiple libraries 
 are sharing a module. To avoid this problem GnuTLS uses @acronym{p11-kit}
@@ -498,7 +499,7 @@ multiple users.
 @subsection Reading objects
 
 All @acronym{PKCS} #11 objects are referenced by @acronym{GnuTLS} functions by
-URLs as described in @code{draft-pechanec-pkcs11uri-05}. 
+URLs as described in @xcite{PKCS11URI}. 
 This allows for a consistent naming of objects across systems and applications
 in the same system. For example a public
 key on a smart card may be referenced as:
@@ -579,9 +580,10 @@ to prevent its extraction. An object can be marked as private using the flag
 @code{GNUTLS_@-PKCS11_OBJ_@-FLAG_@-MARK_@-PRIVATE}, to require PIN to be
 entered before accessing the object (for operations or otherwise).
 
-@showfuncdesc{gnutls_pkcs11_delete_url}
 @showfuncdesc{gnutls_pkcs11_copy_x509_privkey}
+
 @showfuncdesc{gnutls_pkcs11_copy_x509_crt}
+@showfuncdesc{gnutls_pkcs11_delete_url}
 
 
 @subsection Using a @acronym{PKCS} #11 token with TLS
@@ -642,6 +644,7 @@ sequence.
 @showfuncB{gnutls_pubkey_init,gnutls_pubkey_deinit}
 
 @showfuncdesc{gnutls_pubkey_import_x509}
+
 @showfuncdesc{gnutls_pubkey_import_openpgp}
 @showfuncdesc{gnutls_pubkey_import_pkcs11}
 @showfuncdesc{gnutls_pubkey_import_pkcs11_url}
@@ -653,6 +656,7 @@ Additional functions are available that will return
 information over a public key.
 
 @showfuncdesc{gnutls_pubkey_get_pk_algorithm}
+
 @showfuncdesc{gnutls_pubkey_get_preferred_hash_algorithm}
 @showfuncdesc{gnutls_pubkey_get_key_id}
 
@@ -667,6 +671,7 @@ are not extractable.
 @showfuncB{gnutls_privkey_init,gnutls_privkey_deinit}
 
 @showfuncdesc{gnutls_privkey_import_x509}
+
 @showfuncdesc{gnutls_privkey_import_openpgp}
 @showfuncdesc{gnutls_privkey_import_pkcs11}
 
@@ -681,6 +686,7 @@ The abstract key types can be used to access signing and
 signature verification operations with the underlying keys.
 
 @showfuncdesc{gnutls_pubkey_verify_data2}
+
 @showfuncdesc{gnutls_pubkey_verify_hash}
 @showfuncdesc{gnutls_privkey_sign_data}
 @showfuncdesc{gnutls_privkey_sign_hash}
@@ -691,6 +697,7 @@ keys with structures is also possible using the
 key abstractions.
 
 @showfuncdesc{gnutls_x509_crq_set_pubkey}
+
 @showfuncdesc{gnutls_x509_crt_set_pubkey}
 @showfuncdesc{gnutls_x509_crt_privkey_sign}
 @showfuncdesc{gnutls_x509_crl_privkey_sign}

@@ -164,6 +164,10 @@ November 2007, available from @url{http://www.ietf.org/rfc/rfc5056}.
 J. Altman, N. Williams, L. Zhu, "Channel Bindings for TLS", July 2010,
 available from @url{http://www.ietf.org/rfc/rfc5929}.
 
+@item @anchor{PKCS11URI}[PKCS11URI]
+J. Pechanec, D. Moffat, "The PKCS#11 URI Scheme", August 2011,
+Work in progress, available from @url{http://tools.ietf.org/html/draft-pechanec-pkcs11uri-05}.
+
 @item @anchor{ANDERSON}[ANDERSON]
 R. J. Anderson, "Security Engineering: A Guide to Building Dependable Distributed Systems", 
 John Wiley \& Sons, Inc., 2001.

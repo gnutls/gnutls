@@ -285,7 +285,7 @@ later on.
 @showfuncD{gnutls_priority_set_direct,gnutls_priority_init,gnutls_priority_deinit,gnutls_priority_set}
 
 @float Table,tab:prio-keywords
-@multitable @columnfractions .30 .70
+@multitable @columnfractions .20 .70
 @headitem Keyword @tab Description
 @item PERFORMANCE @tab
 All the "secure" ciphersuites are enabled,
@@ -353,7 +353,7 @@ appended with an algorithm will add this algorithm.
 
 
 @float Table,tab:prio-algorithms
-@multitable @columnfractions .30 .70
+@multitable @columnfractions .20 .70
 @headitem Type @tab Keywords
 @item Ciphers @tab
 AES-128-CBC, AES-256-CBC, AES-128-GCM, CAMELLIA-128-CBC,
@@ -394,7 +394,7 @@ CURVE-SECP224R1, CURVE-SECP256R1, CURVE-SECP384R1, CURVE-SECP521R1. Catch all is
 
 
 @float Table,tab:prio-special
-@multitable @columnfractions .50 .50
+@multitable @columnfractions .45 .45
 @headitem Keyword @tab Description
 
 @item %COMPAT @tab

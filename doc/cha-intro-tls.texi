@@ -124,7 +124,7 @@ The supported in @acronym{GnuTLS} ciphers and MAC algorithms are shown in @ref{t
 @ref{tab:macs}.
 
 @float Table,tab:ciphers
-@multitable @columnfractions .30 .70
+@multitable @columnfractions .20 .70
 @headitem Algorithm @tab Description
 @item 3DES_CBC @tab
 This is the DES block cipher algorithm used with triple
@@ -158,7 +158,7 @@ CRYPTREC projects.
 
 
 @float Table,tab:macs
-@multitable @columnfractions .30 .70
+@multitable @columnfractions .20 .70
 @headitem Algorithm @tab Description
 @item MAC_MD5 @tab
 This is a cryptographic hash algorithm designed by Ron Rivest. Outputs
@@ -524,7 +524,8 @@ resume functions, @ref{resume}.
 @showfuncdesc{gnutls_session_ticket_enable_client}
 
 @subsection Safe renegotiation
-@cindex renegotiation
+@cindex Renegotiation
+@cindex Safe renegotiation
 
 TLS gives the option to two communicating parties to renegotiate
 and update their security parameters. One useful example of this feature
@@ -626,7 +627,7 @@ can be used both by clients and servers.
 
 @node Selecting cryptographic key sizes
 @section Selecting cryptographic key sizes
-@cindex key sizes
+@cindex Key sizes
 
 In TLS, since a lot of algorithms are involved, it is not easy to set
 a consistent security level.  For this reason in @ref{tab:key-sizes} we
