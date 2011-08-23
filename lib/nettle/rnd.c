@@ -448,6 +448,7 @@ wrap_nettle_rnd (void *_ctx, int level, void *data, size_t datasize)
   ret = do_trivia_source (0);
   if (ret < 0)
     {
+      RND_UNLOCK;
       gnutls_assert ();
       return ret;
     }
@@ -455,6 +456,7 @@ wrap_nettle_rnd (void *_ctx, int level, void *data, size_t datasize)
   ret = do_device_source (0);
   if (ret < 0)
     {
+      RND_UNLOCK;
       gnutls_assert ();
       return ret;
     }
