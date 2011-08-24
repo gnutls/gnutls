@@ -180,23 +180,22 @@ gnutls_transport_get_ptr2 (gnutls_session_t session,
  * have been initiated using gnutls_handshake().  @how should be one
  * of %GNUTLS_SHUT_RDWR, %GNUTLS_SHUT_WR.
  *
- * In case of %GNUTLS_SHUT_RDWR then the TLS connection gets
+ * In case of %GNUTLS_SHUT_RDWR the TLS session gets
  * terminated and further receives and sends will be disallowed.  If
- * the return value is zero you may continue using the connection.
- * %GNUTLS_SHUT_RDWR actually sends an alert containing a close
+ * the return value is zero you may continue using the underlying
+ * transport layer. %GNUTLS_SHUT_RDWR sends an alert containing a close
  * request and waits for the peer to reply with the same message.
  *
- * In case of %GNUTLS_SHUT_WR then the TLS connection gets terminated
+ * In case of %GNUTLS_SHUT_WR the TLS session gets terminated
  * and further sends will be disallowed. In order to reuse the
  * connection you should wait for an EOF from the peer.
  * %GNUTLS_SHUT_WR sends an alert containing a close request.
  *
  * Note that not all implementations will properly terminate a TLS
  * connection.  Some of them, usually for performance reasons, will
- * terminate only the underlying transport layer, thus causing a
- * transmission error to the peer.  This error cannot be
- * distinguished from a malicious party prematurely terminating the
- * session, thus this behavior is not recommended.
+ * terminate only the underlying transport layer, and thus not
+ * distinguishing between a malicious party prematurely terminating 
+ * the connection and normal termination. 
  *
  * This function may also return %GNUTLS_E_AGAIN or
  * %GNUTLS_E_INTERRUPTED; cf.  gnutls_record_get_direction().

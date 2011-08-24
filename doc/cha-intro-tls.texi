@@ -584,14 +584,10 @@ Changing this default behavior would prevent interoperability against
 the majority of deployed servers out there.  We will reconsider this
 default behavior in the future when more servers have been upgraded.
 Note that it is easy to configure clients to always require the safe
-renegotiation extension from servers (see below on the
-@code{%SAFE_RENEGOTIATION} priority string).
+renegotiation extension from servers.
 
 To modify the default behavior, we have introduced some new priority
-strings.  The priority strings can be used by applications
-(@funcref{gnutls_priority_set}) and end users (e.g., @code{--priority}
-parameter to @code{gnutls-cli} and @code{gnutls-serv}).
-
+strings (see @ref{Priority Strings}).  
 The @code{%UNSAFE_RENEGOTIATION} priority string permits
 (re-)handshakes even when the safe renegotiation extension was not
 negotiated. The default behavior is @code{%PARTIAL_RENEGOTIATION} that will
@@ -629,7 +625,7 @@ can be used both by clients and servers.
 @section Selecting cryptographic key sizes
 @cindex Key sizes
 
-In TLS, since a lot of algorithms are involved, it is not easy to set
+Because many algorithms are involved in TLS, it is not easy to set
 a consistent security level.  For this reason in @ref{tab:key-sizes} we
 present some correspondence between key sizes of symmetric algorithms
 and public key algorithms based on @xcite{ECRYPT}. 
@@ -685,7 +681,7 @@ parameter with actual bit sizes of parameters for DH, RSA, SRP and ECC algorithm
 A mapping to @code{gnutls_sec_param_t} value is given for each security parameter, on
 the next column, and finally a brief description of the level.
 
-Note however that the values suggested here are nothing more than an
+Note, however, that the values suggested here are nothing more than an
 educated guess that is valid today. There are no guarantees that an
 algorithm will remain unbreakable or that these values will remain
 constant in time. There could be scientific breakthroughs that cannot

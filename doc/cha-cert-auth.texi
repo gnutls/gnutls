@@ -775,19 +775,17 @@ certificate chain, and get a @code{GNUTLS_CERT_INSECURE_ALGORITHM}
 validation error (see @ref{Verifying X.509 certificate paths}), it means
 that somewhere in the certificate chain there is a certificate signed
 using @code{RSA-MD2} or @code{RSA-MD5}.  These two digital signature
-algorithms are considered broken, so GnuTLS fail when attempting to
-verify the certificate.  In some situations, it may be useful to be
+algorithms are considered broken, so GnuTLS fails verifying
+the certificate.  In some situations, it may be useful to be
 able to verify the certificate chain anyway, assuming an attacker did
 not utilize the fact that these signatures algorithms are broken.
 This section will give help on how to achieve that.
 
-First, it is important to know that you do not have to enable any of
+It is important to know that you do not have to enable any of
 the flags discussed here to be able to use trusted root CA
-certificates signed using @code{RSA-MD2} or @code{RSA-MD5}.  The only
-attack today is that it is possible to generate certificates with
-colliding signatures (collision resistance); you cannot generate a
-certificate that has the same signature as an already existing
-signature (2nd preimage resistance).
+certificates self-signed using @code{RSA-MD2} or @code{RSA-MD5}. The
+certificates in the trusted list are considered trusted irrespective
+of the signature.
 
 If you are using @funcref{gnutls_certificate_verify_peers2} to verify the
 certificate chain, you can call
@@ -816,9 +814,8 @@ user when verification failure occur for this reason.  The simplest is
 to not use the flags by default, and only fall back to using them
 after warning the user.  If you wish to inspect the certificate chain
 yourself, you can use @funcref{gnutls_certificate_get_peers} to extract
-the raw server's certificate chain, then use
-@funcref{gnutls_x509_crt_import} to parse each of the certificates, and
-then use @funcref{gnutls_x509_crt_get_signature_algorithm} to find out the
+the raw server's certificate chain, @funcref{gnutls_x509_crt_list_import} to parse each of the certificates, and
+then @funcref{gnutls_x509_crt_get_signature_algorithm} to find out the
 signing algorithm used for each certificate.  If any of the
 intermediary certificates are using @code{GNUTLS_SIGN_RSA_MD2} or
 @code{GNUTLS_SIGN_RSA_MD5}, you could present a warning.

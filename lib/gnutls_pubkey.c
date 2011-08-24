@@ -406,7 +406,7 @@ gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
  * certificate corresponds to the given public key.
  *
  * If the buffer provided is not long enough to hold the output, then
- * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
+ * *output_data_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will
  * be returned.  The output will normally be a SHA-1 hash output,
  * which is 20 bytes.
  *
@@ -461,7 +461,7 @@ gnutls_pubkey_get_openpgp_key_id (gnutls_pubkey_t key, unsigned int flags,
  * This function will export the certificate to DER or PEM format.
  *
  * If the buffer provided is not long enough to hold the output, then
- * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
+ * *output_data_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will
  * be returned.
  *
  * If the structure is PEM encoded, it will have a header
@@ -535,7 +535,7 @@ cleanup:
  * certificate corresponds to the given public key.
  *
  * If the buffer provided is not long enough to hold the output, then
- * *output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
+ * *output_data_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will
  * be returned.  The output will normally be a SHA-1 hash output,
  * which is 20 bytes.
  *
@@ -1145,9 +1145,8 @@ gnutls_pubkey_import_dsa_raw (gnutls_pubkey_t key,
  * This function will verify the given signed data, using the
  * parameters from the certificate.
  *
- * Returns: In case of a verification failure
- *   %GNUTLS_E_PK_SIG_VERIFY_FAILED is returned, and a positive code
- *   on success.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value (%GNUTLS_E_PK_SIG_VERIFY_FAILED in verification failure).
  *
  * Since: 2.12.0
  **/
@@ -1185,9 +1184,8 @@ gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey, unsigned int flags,
  * This function will verify the given signed data, using the
  * parameters from the certificate.
  *
- * Returns: In case of a verification failure
- *   %GNUTLS_E_PK_SIG_VERIFY_FAILED is returned, and a positive code
- *   on success.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value (%GNUTLS_E_PK_SIG_VERIFY_FAILED in verification failure).
  *
  * Since: 3.0.0
  **/
@@ -1227,8 +1225,8 @@ gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey,
  * This function will verify the given signed digest, using the
  * parameters from the certificate.
  *
- * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
- * is returned, and a positive code on success.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value (%GNUTLS_E_PK_SIG_VERIFY_FAILED in verification failure).
  *
  * Since: 2.12.0
  **/
@@ -1261,8 +1259,8 @@ gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
  * This function will read the certifcate and the signed data to
  * determine the hash algorithm used to generate the signature.
  *
- * Returns: the 0 if the hash algorithm is found. A negative error code is
- * returned on error.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
  *
  * Since: 2.12.0
  **/

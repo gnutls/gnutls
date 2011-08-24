@@ -397,7 +397,7 @@ with the credential types is shown in @ref{tab:key-exchange-cred}.
 
 @item @code{KX_SRP_RSA}, @code{KX_SRP_DSS}
 @tab @code{CRD_SRP}
-@tab @code{CRD_CERTIFICATE}
+@tab @code{CRD_CERTIFICATE}, @code{CRD_SRP}
 
 @item @code{KX_SRP}
 @tab @code{CRD_SRP}
