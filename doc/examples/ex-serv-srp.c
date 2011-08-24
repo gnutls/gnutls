@@ -14,7 +14,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <gnutls/gnutls.h>
-#include <gnutls/extra.h>
 
 #define SRP_PASSWD "tpasswd"
 #define SRP_PASSWD_CONF "tpasswd.conf"
