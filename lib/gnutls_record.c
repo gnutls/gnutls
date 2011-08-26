@@ -657,13 +657,12 @@ record_add_to_buffers (gnutls_session_t session,
           break;
 
         case GNUTLS_CHANGE_CIPHER_SPEC:
-          /* this packet is now handled in the recv_int()
-           * function
-           */
-          gnutls_assert ();
+          if (!(IS_DTLS(session)))
+            return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+            
+          _gnutls_record_buffer_put (session, type, seq, bufel);
 
-          return GNUTLS_E_UNEXPECTED_PACKET;
-
+          break;
         case GNUTLS_APPLICATION_DATA:
           if (session->internals.initial_negotiation_completed == 0)
             {
