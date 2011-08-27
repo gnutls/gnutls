@@ -5,6 +5,9 @@
 
 typedef void (*sighandler_t)(int);
 
+void benchmark_cipher (int debug_level);
+void benchmark_tls (int debug_level);
+
 struct benchmark_st
 {
   struct timespec start;

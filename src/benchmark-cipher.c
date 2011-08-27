@@ -202,14 +202,8 @@ mac_bench (int algo, int size)
   free (_key);
 }
 
-int
-main (int argc, char **argv)
+void benchmark_cipher (int debug_level)
 {
-  int debug_level = 0;
-
-  if (argc > 1)
-    debug_level = 2;
-
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (debug_level);
   gnutls_global_init ();
@@ -230,5 +224,5 @@ main (int argc, char **argv)
 
   cipher_bench (GNUTLS_CIPHER_ARCFOUR, 16, 0);
 
-  return 0;
+  gnutls_global_deinit();
 }

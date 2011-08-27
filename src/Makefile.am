@@ -32,7 +32,6 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../libextra/includes	\
 	-I$(srcdir)/cfg
 
-noinst_PROGRAMS = benchmark-cipher benchmark-tls
 bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug
 if ENABLE_PKI
 bin_PROGRAMS += certtool
@@ -77,16 +76,12 @@ noinst_LTLIBRARIES += libcmd-psk.la
 libcmd_psk_la_CFLAGS =
 libcmd_psk_la_SOURCES = psk.gaa psk-gaa.h psk-gaa.c
 
-benchmark_cipher_SOURCES = benchmark-cipher.c benchmark.c benchmark.h
-benchmark_cipher_LDADD = ../lib/libgnutls.la ../gl/libgnu.la $(LIB_CLOCK_GETTIME)
+BENCHMARK_SRCS = benchmark-cipher.c benchmark.c benchmark.h benchmark-tls.c
 
-benchmark_tls_SOURCES = benchmark-tls.c benchmark.c benchmark.h
-benchmark_tls_LDADD = ../lib/libgnutls.la ../gl/libgnu.la $(LIB_CLOCK_GETTIME)
-
-gnutls_cli_SOURCES = cli.c common.h common.c $(PKCS11_SRCS)
+gnutls_cli_SOURCES = cli.c common.h common.c $(PKCS11_SRCS) $(BENCHMARK_SRCS)
 gnutls_cli_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
 gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la
-gnutls_cli_LDADD += $(LTLIBGCRYPT) $(LIBSOCKET) $(GETADDRINFO_LIB)
+gnutls_cli_LDADD += $(LTLIBGCRYPT) $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIB_CLOCK_GETTIME)
 noinst_LTLIBRARIES += libcmd-cli.la
 libcmd_cli_la_CFLAGS =
 libcmd_cli_la_SOURCES = cli.gaa cli-gaa.h cli-gaa.c
