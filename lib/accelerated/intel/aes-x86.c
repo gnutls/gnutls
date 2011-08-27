@@ -46,8 +46,6 @@ struct aes_ctx
 static int
 aes_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx)
 {
-  struct aes_ctx *ctx;
-
   /* we use key size to distinguish */
   if (algorithm != GNUTLS_CIPHER_AES_128_CBC
       && algorithm != GNUTLS_CIPHER_AES_192_CBC
@@ -60,8 +58,6 @@ aes_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx)
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
-
-  ctx = *_ctx;
 
   return 0;
 }

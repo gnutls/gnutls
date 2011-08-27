@@ -77,8 +77,6 @@ aes_gcm_deinit (void *_ctx)
 static int
 aes_gcm_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx)
 {
-  struct aes_gcm_ctx *ctx;
-
   /* we use key size to distinguish */
   if (algorithm != GNUTLS_CIPHER_AES_128_GCM &&
       algorithm != GNUTLS_CIPHER_AES_256_GCM)
@@ -90,8 +88,6 @@ aes_gcm_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx)
       gnutls_assert ();
       return GNUTLS_E_MEMORY_ERROR;
     }
-
-  ctx = *_ctx;
 
   return 0;
 }
