@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.12.10 (unreleased)
 
+** libgnutls: Corrected parsing of XMPP subject alternative 
+names.
+
 ** libgnutls: gnutls_certificate_set_x509_key() and
 gnutls_certificate_set_openpgp_key() operate as in 2.10.x
 and allow the release of the private key during the
