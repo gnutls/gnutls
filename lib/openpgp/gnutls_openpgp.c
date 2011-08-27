@@ -107,7 +107,7 @@ gnutls_certificate_set_openpgp_key (gnutls_certificate_credentials_t res,
   
   ret =
     gnutls_privkey_import_openpgp (privkey, pkey,
-                                   GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+                                   GNUTLS_PRIVKEY_IMPORT_COPY);
   if (ret < 0)
     {
       gnutls_assert ();

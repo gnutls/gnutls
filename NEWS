@@ -2,6 +2,20 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.0.2 (unreleased)
+
+** libgnutls: Allow for out-of-order ChangeCipherSpec
+message in DTLS.
+
+** libgnutls: gnutls_certificate_set_x509_key() and
+gnutls_certificate_set_openpgp_key() operate as in 2.10.x
+and allow the release of the private key during the
+lifetime of the certificate structure.
+
+** API and ABI modifications:
+GNUTLS_PRIVKEY_IMPORT_COPY: new gnutls_privkey_import() flag
+
+
 * Version 3.0.1 (released 2011-08-20)
 
 ** libgnutls: gnutls_certificate_set_x509_key_file() and 

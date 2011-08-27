@@ -133,7 +133,8 @@ int gnutls_privkey_get_pk_algorithm (gnutls_privkey_t key,
 gnutls_privkey_type_t gnutls_privkey_get_type (gnutls_privkey_t key);
 
 
-#define GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE 1
+#define GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE (1<<0)
+#define GNUTLS_PRIVKEY_IMPORT_COPY (1<<1)
 int gnutls_privkey_import_pkcs11 (gnutls_privkey_t pkey,
                                   gnutls_pkcs11_privkey_t key,
                                   unsigned int flags);

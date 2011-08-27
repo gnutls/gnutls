@@ -122,7 +122,6 @@ _gnutls_x509_crt_cpy (gnutls_x509_crt_t dest, gnutls_x509_crt_t src)
     }
 
   return 0;
-
 }
 
 /**

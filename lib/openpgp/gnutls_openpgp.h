@@ -26,6 +26,9 @@ int gnutls_openpgp_get_key (gnutls_datum_t * key,
 
 /* internal */
 int
+_gnutls_openpgp_privkey_cpy (gnutls_openpgp_privkey_t dest, gnutls_openpgp_privkey_t src);
+
+int
 _gnutls_openpgp_request_key (gnutls_session_t,
                              gnutls_datum_t * ret,
                              const gnutls_certificate_credentials_t cred,

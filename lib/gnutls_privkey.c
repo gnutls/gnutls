@@ -279,7 +279,7 @@ gnutls_privkey_deinit (gnutls_privkey_t key)
 {
   if (key == NULL) return;
 
-  if (key->flags & GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE)
+  if (key->flags & GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE || key->flags & GNUTLS_PRIVKEY_IMPORT_COPY)
     switch (key->type)
       {
 #ifdef ENABLE_OPENPGP
@@ -315,13 +315,16 @@ static int check_if_clean(gnutls_privkey_t key)
  * gnutls_privkey_import_pkcs11:
  * @pkey: The private key
  * @key: The private key to be imported
- * @flags: should be zero or %GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE
+ * @flags: Flags for the import
  *
  * This function will import the given private key to the abstract
  * #gnutls_privkey_t structure.
  *
  * The #gnutls_pkcs11_privkey_t object must not be deallocated
  * during the lifetime of this structure.
+ *
+ * @flags might be zero or one of %GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE
+ * and %GNUTLS_PRIVKEY_IMPORT_COPY.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -341,6 +344,9 @@ int ret;
       return ret;
     }
 
+  if (flags & GNUTLS_PRIVKEY_IMPORT_COPY)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
   pkey->key.pkcs11 = key;
   pkey->type = GNUTLS_PRIVKEY_PKCS11;
   pkey->pk_algorithm = gnutls_pkcs11_privkey_get_pk_algorithm (key, NULL);
@@ -355,13 +361,16 @@ int ret;
  * gnutls_privkey_import_x509:
  * @pkey: The private key
  * @key: The private key to be imported
- * @flags: should be zero or %GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE
+ * @flags: Flags for the import
  *
  * This function will import the given private key to the abstract
  * #gnutls_privkey_t structure.
  *
  * The #gnutls_x509_privkey_t object must not be deallocated
  * during the lifetime of this structure.
+ *
+ * @flags might be zero or one of %GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE
+ * and %GNUTLS_PRIVKEY_IMPORT_COPY.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -381,7 +390,22 @@ int ret;
       return ret;
     }
 
-  pkey->key.x509 = key;
+  if (flags & GNUTLS_PRIVKEY_IMPORT_COPY)
+    {
+      ret = gnutls_x509_privkey_init(&pkey->key.x509);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+      
+      ret = gnutls_x509_privkey_cpy(pkey->key.x509, key);
+      if (ret < 0)
+        {
+          gnutls_x509_privkey_deinit(pkey->key.x509);
+          return gnutls_assert_val(ret);
+        }
+    }
+  else
+    pkey->key.x509 = key;
+
   pkey->type = GNUTLS_PRIVKEY_X509;
   pkey->pk_algorithm = gnutls_x509_privkey_get_pk_algorithm (key);
   pkey->flags = flags;
@@ -394,7 +418,7 @@ int ret;
  * gnutls_privkey_import_openpgp:
  * @pkey: The private key
  * @key: The private key to be imported
- * @flags: should be zero or %GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE
+ * @flags: Flags for the import
  *
  * This function will import the given private key to the abstract
  * #gnutls_privkey_t structure.
@@ -402,6 +426,9 @@ int ret;
  * The #gnutls_openpgp_privkey_t object must not be deallocated
  * during the lifetime of this structure. The subkey set as
  * preferred will be used, or the master key otherwise.
+ *
+ * @flags might be zero or one of %GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE
+ * and %GNUTLS_PRIVKEY_IMPORT_COPY.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -423,7 +450,22 @@ uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
       return ret;
     }
 
-  pkey->key.openpgp = key;
+  if (flags & GNUTLS_PRIVKEY_IMPORT_COPY)
+    {
+      ret = gnutls_openpgp_privkey_init(&pkey->key.openpgp);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+      
+      ret = _gnutls_openpgp_privkey_cpy(pkey->key.openpgp, key);
+      if (ret < 0)
+        {
+          gnutls_openpgp_privkey_deinit(pkey->key.openpgp);
+          return gnutls_assert_val(ret);
+        }
+    }
+  else
+    pkey->key.openpgp = key;
+
   pkey->type = GNUTLS_PRIVKEY_OPENPGP;
   
   ret = gnutls_openpgp_privkey_get_preferred_key_id (key, keyid);
