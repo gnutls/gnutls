@@ -84,7 +84,7 @@ int
 _gnutls_x509_crt_cpy (gnutls_x509_crt_t dest, gnutls_x509_crt_t src)
 {
   int ret;
-  size_t der_size;
+  size_t der_size = 0;
   opaque *der;
   gnutls_datum_t tmp;
 
@@ -123,7 +123,6 @@ _gnutls_x509_crt_cpy (gnutls_x509_crt_t dest, gnutls_x509_crt_t src)
     }
 
   return 0;
-
 }
 
 /**

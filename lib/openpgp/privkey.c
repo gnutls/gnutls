@@ -75,6 +75,55 @@ gnutls_openpgp_privkey_deinit (gnutls_openpgp_privkey_t key)
   gnutls_free (key);
 }
 
+/*-
+ * _gnutls_openpgp_privkey_cpy - This function copies a gnutls_openpgp_privkey_t structure
+ * @dest: The structure where to copy
+ * @src: The structure to be copied
+ *
+ * This function will copy an X.509 certificate structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ -*/
+int
+_gnutls_openpgp_privkey_cpy (gnutls_openpgp_privkey_t dest, gnutls_openpgp_privkey_t src)
+{
+  int ret;
+  size_t der_size=0;
+  opaque *der;
+  gnutls_datum_t tmp;
+
+  ret = gnutls_openpgp_privkey_export (src, GNUTLS_OPENPGP_FMT_RAW, NULL, 0, NULL, &der_size);
+  if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
+    return gnutls_assert_val(ret);
+
+  der = gnutls_malloc (der_size);
+  if (der == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+  ret = gnutls_openpgp_privkey_export (src, GNUTLS_OPENPGP_FMT_RAW, NULL, 0, der, &der_size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      gnutls_free (der);
+      return ret;
+    }
+
+  tmp.data = der;
+  tmp.size = der_size;
+  ret = gnutls_openpgp_privkey_import (dest, &tmp, GNUTLS_OPENPGP_FMT_RAW, NULL, 0);
+
+  gnutls_free (der);
+
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  memcpy(dest->preferred_keyid, src->preferred_keyid, GNUTLS_OPENPGP_KEYID_SIZE);
+  dest->preferred_set = src->preferred_set;
+
+  return 0;
+}
+
 /**
  * gnutls_openpgp_privkey_sec_param:
  * @key: a key structure

@@ -34,6 +34,9 @@ _gnutls_openpgp_raw_privkey_to_gkey (gnutls_privkey_t * pkey,
                                      const gnutls_datum_t * raw_key);
 
 int
+_gnutls_openpgp_privkey_cpy (gnutls_openpgp_privkey_t dest, gnutls_openpgp_privkey_t src);
+
+int
 _gnutls_openpgp_request_key (gnutls_session_t,
                              gnutls_datum_t * ret,
                              const gnutls_certificate_credentials_t cred,

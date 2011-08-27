@@ -271,7 +271,7 @@ gnutls_privkey_deinit (gnutls_privkey_t key)
 {
   if (key == NULL) return;
 
-  if (key->flags & GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE)
+  if (key->flags & GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE || key->flags & GNUTLS_PRIVKEY_IMPORT_COPY)
     switch (key->type)
       {
 #ifdef ENABLE_OPENPGP
@@ -331,6 +331,9 @@ int ret;
       return ret;
     }
 
+  if (flags & GNUTLS_PRIVKEY_IMPORT_COPY)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
   pkey->key.pkcs11 = key;
   pkey->type = GNUTLS_PRIVKEY_PKCS11;
   pkey->pk_algorithm = gnutls_pkcs11_privkey_get_pk_algorithm (key, NULL);
@@ -369,7 +372,22 @@ int ret;
       return ret;
     }
 
-  pkey->key.x509 = key;
+  if (flags & GNUTLS_PRIVKEY_IMPORT_COPY)
+    {
+      ret = gnutls_x509_privkey_init(&pkey->key.x509);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+      
+      ret = gnutls_x509_privkey_cpy(pkey->key.x509, key);
+      if (ret < 0)
+        {
+          gnutls_x509_privkey_deinit(pkey->key.x509);
+          return gnutls_assert_val(ret);
+        }
+    }
+  else
+    pkey->key.x509 = key;
+
   pkey->type = GNUTLS_PRIVKEY_X509;
   pkey->pk_algorithm = gnutls_x509_privkey_get_pk_algorithm (key);
   pkey->flags = flags;
@@ -409,7 +427,22 @@ uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
       return ret;
     }
 
-  pkey->key.openpgp = key;
+  if (flags & GNUTLS_PRIVKEY_IMPORT_COPY)
+    {
+      ret = gnutls_openpgp_privkey_init(&pkey->key.openpgp);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+      
+      ret = _gnutls_openpgp_privkey_cpy(pkey->key.openpgp, key);
+      if (ret < 0)
+        {
+          gnutls_openpgp_privkey_deinit(pkey->key.openpgp);
+          return gnutls_assert_val(ret);
+        }
+    }
+  else
+    pkey->key.openpgp = key;
+
   pkey->type = GNUTLS_PRIVKEY_OPENPGP;
   
   ret = gnutls_openpgp_privkey_get_preferred_key_id (key, keyid);

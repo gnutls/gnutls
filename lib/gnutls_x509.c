@@ -969,7 +969,7 @@ gnutls_certificate_set_x509_key (gnutls_certificate_credentials_t res,
       return ret;
     }
 
-  ret = gnutls_privkey_import_x509 (pkey, key, 0);
+  ret = gnutls_privkey_import_x509 (pkey, key, GNUTLS_PRIVKEY_IMPORT_COPY);
   if (ret < 0)
     {
       gnutls_assert ();
