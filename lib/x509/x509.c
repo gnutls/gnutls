@@ -990,7 +990,7 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
               size_t orig_name_size = *name_size;
 
               result = asn1_create_element
-                (_gnutls_get_pkix (), "PKIX1.XmppAddr", &c2);
+                (_gnutls_get_pkix (), "PKIX1.UTF8String", &c2);
               if (result != ASN1_SUCCESS)
                 {
                   gnutls_assert ();

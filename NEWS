@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.0.2 (unreleased)
 
+** libgnutls: Corrected parsing of XMPP subject
+alternative names.
+
 ** libgnutls: Allow for out-of-order ChangeCipherSpec
 message in DTLS.
 
