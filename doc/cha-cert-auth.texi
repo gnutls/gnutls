@@ -22,7 +22,7 @@ certificates as well, following a hierarchical model.
 
 @float Figure,fig:x509
 @image{gnutls-x509,7cm}
-@caption{The X.509 hierarchical trust model.}
+@caption{An example of the X.509 hierarchical trust model.}
 @end float
 
 One needs to trust one or more CAs for his secure communications. In
@@ -368,7 +368,7 @@ signed Bob's key thus Dave trusts Bob's key to be the real one.
 
 @float Figure,fig:openpgp
 @image{gnutls-pgp,8cm}
-@caption{The OpenPGP trust model.}
+@caption{An example of the OpenPGP trust model.}
 @end float
 
 There are some key points that are important in that model. In the
