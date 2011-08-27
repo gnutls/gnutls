@@ -86,25 +86,19 @@ int
 _gnutls_openpgp_privkey_cpy (gnutls_openpgp_privkey_t dest, gnutls_openpgp_privkey_t src)
 {
   int ret;
-  size_t der_size;
+  size_t raw_size=0;
   opaque *der;
   gnutls_datum_t tmp;
 
-  ret = gnutls_openpgp_privkey_export (src, GNUTLS_OPENPGP_FMT_RAW, NULL, 0, NULL, &der_size);
+  ret = gnutls_openpgp_privkey_export (src, GNUTLS_OPENPGP_FMT_RAW, NULL, 0, NULL, &raw_size);
   if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+    return gnutls_assert_val(ret);
 
-  der = gnutls_malloc (der_size);
+  der = gnutls_malloc (raw_size);
   if (der == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-  ret = gnutls_openpgp_privkey_export (src, GNUTLS_OPENPGP_FMT_RAW, NULL, 0, der, &der_size);
+  ret = gnutls_openpgp_privkey_export (src, GNUTLS_OPENPGP_FMT_RAW, NULL, 0, der, &raw_size);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -113,16 +107,16 @@ _gnutls_openpgp_privkey_cpy (gnutls_openpgp_privkey_t dest, gnutls_openpgp_privk
     }
 
   tmp.data = der;
-  tmp.size = der_size;
+  tmp.size = raw_size;
   ret = gnutls_openpgp_privkey_import (dest, &tmp, GNUTLS_OPENPGP_FMT_RAW, NULL, 0);
 
   gnutls_free (der);
 
   if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
+    return gnutls_assert_val(ret);
+
+  memcpy(dest->preferred_keyid, src->preferred_keyid, GNUTLS_OPENPGP_KEYID_SIZE);
+  dest->preferred_set = src->preferred_set;
 
   return 0;
 }

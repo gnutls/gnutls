@@ -403,6 +403,7 @@ gnutls_certificate_set_openpgp_key_mem2 (gnutls_certificate_credentials_t res,
   ret = gnutls_certificate_set_openpgp_key (res, crt, pkey);
 
   gnutls_openpgp_crt_deinit (crt);
+  gnutls_openpgp_privkey_deinit (pkey);
 
   return ret;
 }
