@@ -40,7 +40,7 @@
 #else
 /* Normal invocation convention.  */
 
-#ifndef _GL_SYS_SOCKET_H
+#ifndef _@GUARD_PREFIX@_SYS_SOCKET_H
 
 #if @HAVE_SYS_SOCKET_H@
 
@@ -50,6 +50,10 @@
    <sys/types.h>.  */
 # include <sys/types.h>
 
+/* On FreeBSD 6.4, <sys/socket.h> defines some macros that assume that NULL
+   is defined.  */
+# include <stddef.h>
+
 /* The include_next requires a split double-inclusion guard.  */
 # @INCLUDE_NEXT@ @NEXT_SYS_SOCKET_H@
 
@@ -57,8 +61,8 @@
 
 #endif
 
-#ifndef _GL_SYS_SOCKET_H
-#define _GL_SYS_SOCKET_H
+#ifndef _@GUARD_PREFIX@_SYS_SOCKET_H
+#define _@GUARD_PREFIX@_SYS_SOCKET_H
 
 /* The definitions of _GL_FUNCDECL_RPL etc. are copied here.  */
 
@@ -104,6 +108,12 @@ struct sockaddr_storage
 
 #endif
 
+/* Get struct iovec.  */
+/* But avoid namespace pollution on glibc systems.  */
+#if ! defined __GLIBC__
+# include <sys/uio.h>
+#endif
+
 #if @HAVE_SYS_SOCKET_H@
 
 /* A platform that has <sys/socket.h>.  */
@@ -142,7 +152,6 @@ struct sockaddr_storage
    suggests that getaddrinfo should be available on all Windows
    releases. */
 
-
 # if @HAVE_WINSOCK2_H@
 #  include <winsock2.h>
 # endif
@@ -173,7 +182,19 @@ typedef int socklen_t;
 
 # endif
 
+/* Rudimentary 'struct msghdr'; this works as long as you don't try to
+   access msg_control or msg_controllen.  */
+struct msghdr {
+  void *msg_name;
+  socklen_t msg_namelen;
+  struct iovec *msg_iov;
+  int msg_iovlen;
+  int msg_flags;
+};
+
 #endif
+
+/* Fix some definitions from <winsock2.h>.  */
 
 #if @HAVE_WINSOCK2_H@
 
@@ -203,27 +224,37 @@ rpl_fd_isset (SOCKET fd, fd_set * set)
 
 #endif
 
+/* Hide some function declarations from <winsock2.h>.  */
+
+#if @HAVE_WINSOCK2_H@
+# if !defined _@GUARD_PREFIX@_UNISTD_H
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef close
+#   define close close_used_without_including_unistd_h
+#  else
+    _GL_WARN_ON_USE (close,
+                     "close() used without including <unistd.h>");
+#  endif
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef gethostname
+#   define gethostname gethostname_used_without_including_unistd_h
+#  else
+    _GL_WARN_ON_USE (gethostname,
+                     "gethostname() used without including <unistd.h>");
+#  endif
+# endif
+# if !defined _@GUARD_PREFIX@_SYS_SELECT_H
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef select
+#   define select select_used_without_including_sys_select_h
+#  else
+    _GL_WARN_ON_USE (select,
+                     "select() used without including <sys/select.h>");
+#  endif
+# endif
+#endif
+
 /* Wrap everything else to use libc file descriptors for sockets.  */
-
-#if @HAVE_WINSOCK2_H@ && !defined _GL_UNISTD_H
-# if !(defined __cplusplus && defined GNULIB_NAMESPACE)
-#  undef close
-#  define close close_used_without_including_unistd_h
-# else
-   _GL_WARN_ON_USE (close,
-                    "close() used without including <unistd.h>");
-# endif
-#endif
-
-#if @HAVE_WINSOCK2_H@ && !defined _GL_UNISTD_H
-# if !(defined __cplusplus && defined GNULIB_NAMESPACE)
-#  undef gethostname
-#  define gethostname gethostname_used_without_including_unistd_h
-# else
-   _GL_WARN_ON_USE (gethostname,
-                    "gethostname() used without including <unistd.h>");
-# endif
-#endif
 
 #if @GNULIB_SOCKET@
 # if @HAVE_WINSOCK2_H@
@@ -614,16 +645,6 @@ _GL_WARN_ON_USE (shutdown, "shutdown is not always POSIX compliant - "
 # endif
 #endif
 
-#if @HAVE_WINSOCK2_H@
-# if !(defined __cplusplus && defined GNULIB_NAMESPACE)
-#  undef select
-#  define select select_used_without_including_sys_select_h
-# else
-   _GL_WARN_ON_USE (select,
-                    "select() used without including <sys/select.h>");
-# endif
-#endif
-
 #if @GNULIB_ACCEPT4@
 /* Accept a connection on a socket, with specific opening flags.
    The flags are a bitmask, possibly including O_CLOEXEC (defined in <fcntl.h>)
@@ -657,6 +678,6 @@ _GL_WARN_ON_USE (accept4, "accept4 is unportable - "
 # endif
 #endif
 
-#endif /* _GL_SYS_SOCKET_H */
-#endif /* _GL_SYS_SOCKET_H */
+#endif /* _@GUARD_PREFIX@_SYS_SOCKET_H */
+#endif /* _@GUARD_PREFIX@_SYS_SOCKET_H */
 #endif

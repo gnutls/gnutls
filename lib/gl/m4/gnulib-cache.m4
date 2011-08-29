@@ -15,7 +15,7 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=liblgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lseek-tests --lgpl=2 --libtool --macro-prefix=lgl --no-vc-files byteswap c-ctype fseeko func gettext lib-msvc-compat lib-symbol-versions memmem-simple minmax netdb read-file snprintf sockets socklen stdint strcase strverscmp sys_socket sys_stat time_r unistd vasprintf vsnprintf
+#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=liblgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lseek-tests --lgpl=2 --no-conditional-dependencies --libtool --macro-prefix=lgl --no-vc-files byteswap c-ctype fseeko func gettext lib-msvc-compat lib-symbol-versions memmem-simple minmax netdb read-file snprintf sockets socklen stdint strcase strverscmp sys_socket sys_stat time_r unistd vasprintf vsnprintf
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([gl/override])
@@ -57,4 +57,5 @@ gl_MAKEFILE_NAME([])
 gl_LIBTOOL
 gl_MACRO_PREFIX([lgl])
 gl_PO_DOMAIN([])
+gl_WITNESS_C_DOMAIN([])
 gl_VC_FILES([false])
