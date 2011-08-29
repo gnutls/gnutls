@@ -21,6 +21,12 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 if ! test -x /usr/bin/openssl;then
+  echo "You need openssl to run this test"
+  exit 77
+fi
+
+if ! test -x /usr/bin/datefudge;then
+  echo "You need datefudge to run this test"
   exit 77
 fi
 
