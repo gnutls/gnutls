@@ -4,7 +4,6 @@
 #include <gnutls/gnutls.h>
 
 #include <sys/socket.h>
-#include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
 #include <netinet/in.h>

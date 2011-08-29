@@ -803,10 +803,6 @@ get_tls_server_status (void)
     }
 }
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-
 /* convert a printable IP to binary */
 static int
 string_to_ip (unsigned char *ip, const char *str)
