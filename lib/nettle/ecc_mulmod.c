@@ -48,10 +48,8 @@ ecc_mulmod (mpz_t k, ecc_point * G, ecc_point * R, mpz_t a, mpz_t modulus,
   unsigned long buf;
   int bitcnt, mode, digidx;
 
-  assert (k != NULL);
-  assert (G != NULL);
-  assert (R != NULL);
-  assert (modulus != NULL);
+  if (k == NULL || G == NULL || R == NULL || modulus == NULL)
+    return -1;
 
   /* alloc ram for window temps */
   for (i = 0; i < 3; i++)

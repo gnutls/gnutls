@@ -2,10 +2,7 @@
 #include <nettle/nettle-types.h>
 #include <nettle/dsa.h>
 #include <nettle/bignum.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
-#include <assert.h>
+#include <gnutls_int.h>
 
 /* assume y^2 = x^3 - 3x + b
  * instead of the generic y^2 = x^3 + ax + b

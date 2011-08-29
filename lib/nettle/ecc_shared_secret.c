@@ -46,10 +46,8 @@ ecc_shared_secret (ecc_key * private_key, ecc_key * public_key,
   ecc_point *result;
   int err;
 
-  assert (private_key != NULL);
-  assert (public_key != NULL);
-  assert (out != NULL);
-  assert (outlen != NULL);
+  if (private_key == NULL || public_key == NULL || out == NULL || outlen == NULL)
+    return -1;
 
   /* type valid? */
   if (private_key->type != PK_PRIVATE)

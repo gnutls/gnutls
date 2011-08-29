@@ -50,8 +50,8 @@ ecc_make_key_ex (void *random_ctx, nettle_random_func random, ecc_key * key,
   unsigned char *buf;
   int keysize;
 
-  assert (key != NULL);
-  assert (random != NULL);
+  if (key == NULL || random == NULL)
+    return -1;
 
   keysize = nettle_mpz_sizeinbase_256_u (order);
 
@@ -59,9 +59,7 @@ ecc_make_key_ex (void *random_ctx, nettle_random_func random, ecc_key * key,
   base = NULL;
   buf = malloc (keysize);
   if (buf == NULL)
-    {
-      return -1;
-    }
+    return -1;
 
   /* make up random string */
   random (random_ctx, keysize, buf);

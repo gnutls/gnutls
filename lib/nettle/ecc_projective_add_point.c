@@ -45,10 +45,8 @@ ecc_projective_add_point (ecc_point * P, ecc_point * Q, ecc_point * R,
   mpz_t t1, t2, x, y, z;
   int err;
 
-  assert (P != NULL);
-  assert (Q != NULL);
-  assert (R != NULL);
-  assert (modulus != NULL);
+  if (P == NULL || Q == NULL || R == NULL || modulus == NULL)
+    return -1;
 
   if ((err = mp_init_multi (&t1, &t2, &x, &y, &z, NULL)) != 0)
     {

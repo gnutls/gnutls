@@ -36,7 +36,6 @@
 void
 ecc_free (ecc_key * key)
 {
-  assert (key != NULL);
   mp_clear_multi (&key->pubkey.x, &key->pubkey.y, &key->pubkey.z, &key->k,
                   &key->prime, &key->order, &key->Gx, &key->Gy, NULL);
 }

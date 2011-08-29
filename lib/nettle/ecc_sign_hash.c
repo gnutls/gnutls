@@ -49,9 +49,8 @@ ecc_sign_hash (const unsigned char *in, unsigned long inlen,
   mpz_t e;
   int err;
 
-  assert (in != NULL);
-  assert (sig != NULL);
-  assert (key != NULL);
+  if (in == NULL || sig == NULL || key == NULL)
+    return -1;
 
   /* is this a private key? */
   if (key->type != PK_PRIVATE)

@@ -41,9 +41,8 @@ ecc_projective_dbl_point (ecc_point * P, ecc_point * R, mpz_t a,
   mpz_t t1, m, s;
   int err;
 
-  assert (P != NULL);
-  assert (R != NULL);
-  assert (modulus != NULL);
+   if (P == NULL || R == NULL || modulus == NULL)
+     return -1;
 
   /*
     algorithm used:

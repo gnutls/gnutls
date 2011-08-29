@@ -57,10 +57,8 @@ ecc_verify_hash (struct dsa_signature *signature,
   mpz_t v, w, u1, u2, e;
   int err;
 
-  assert (signature != NULL);
-  assert (hash != NULL);
-  assert (stat != NULL);
-  assert (key != NULL);
+  if (signature == NULL || hash == NULL || stat == NULL || key == NULL)
+    return -1;
 
   /* default to invalid signature */
   *stat = 0;

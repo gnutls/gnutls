@@ -42,7 +42,8 @@ ecc_map (ecc_point * P, mpz_t modulus)
   mpz_t t1, t2;
   int err;
 
-  assert (P != NULL);
+  if (P == NULL)
+    return -1;
 
   if ((err = mp_init_multi (&t1, &t2, NULL)) != 0)
     {

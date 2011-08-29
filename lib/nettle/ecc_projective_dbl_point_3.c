@@ -46,9 +46,8 @@ ecc_projective_dbl_point (ecc_point * P, ecc_point * R, mpz_t a /* a is -3 */,
    mpz_t t1, t2;
    int   err;
 
-   assert(P       != NULL);
-   assert(R       != NULL);
-   assert(modulus != NULL);
+   if (P == NULL || R == NULL || modulus == NULL)
+     return -1;
 
    if ((err = mp_init_multi(&t1, &t2, NULL)) != 0) {
       return err;
