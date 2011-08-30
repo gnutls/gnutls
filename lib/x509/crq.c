@@ -1275,7 +1275,7 @@ gnutls_x509_crq_get_attribute_data (gnutls_x509_crq_t crq, int indx,
 int
 gnutls_x509_crq_get_extension_info (gnutls_x509_crq_t crq, int indx,
                                     void *oid, size_t * sizeof_oid,
-                                    int *critical)
+                                    unsigned int *critical)
 {
   int result;
   char str_critical[10];
@@ -1564,10 +1564,10 @@ gnutls_x509_crq_get_key_usage (gnutls_x509_crq_t crq,
 int
 gnutls_x509_crq_get_basic_constraints (gnutls_x509_crq_t crq,
                                        unsigned int *critical,
-                                       int *ca, int *pathlen)
+                                       unsigned int *ca, int *pathlen)
 {
   int result;
-  int tmp_ca;
+  unsigned int tmp_ca;
   opaque buf[256];
   size_t buf_size = sizeof (buf);
 
@@ -2340,7 +2340,7 @@ gnutls_x509_crq_get_key_id (gnutls_x509_crq_t crq, unsigned int flags,
                             unsigned char *output_data,
                             size_t * output_data_size)
 {
-  int pk, result = 0;
+  int pk, result = 0, len;
   gnutls_datum_t pubkey;
 
   if (crq == NULL)
@@ -2375,14 +2375,14 @@ gnutls_x509_crq_get_key_id (gnutls_x509_crq_t crq, unsigned int flags,
   pubkey.size = 0;
   result =
     asn1_der_coding (crq->crq, "certificationRequestInfo.subjectPKInfo", NULL,
-                     &pubkey.size, NULL);
+                     &len, NULL);
   if (result != ASN1_MEM_ERROR)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
     }
 
-  pubkey.data = gnutls_malloc (pubkey.size);
+  pubkey.data = gnutls_malloc (len);
   if (pubkey.data == NULL)
     {
       gnutls_assert ();
@@ -2391,13 +2391,15 @@ gnutls_x509_crq_get_key_id (gnutls_x509_crq_t crq, unsigned int flags,
 
   result =
     asn1_der_coding (crq->crq, "certificationRequestInfo.subjectPKInfo",
-                     pubkey.data, &pubkey.size, NULL);
+                     pubkey.data, &len, NULL);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
       gnutls_free (pubkey.data);
       return _gnutls_asn2err (result);
     }
+
+  pubkey.size = len;
 
   result = gnutls_fingerprint (GNUTLS_DIG_SHA1, &pubkey,
                                output_data, output_data_size);

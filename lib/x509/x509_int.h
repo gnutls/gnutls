@@ -215,7 +215,7 @@ int _gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert,
                                         size_t * ret_size);
 int _gnutls_x509_ext_extract_keyUsage (uint16_t * keyUsage,
                                        opaque * extnValue, int extnValueLen);
-int _gnutls_x509_ext_extract_basicConstraints (int *CA,
+int _gnutls_x509_ext_extract_basicConstraints (unsigned int *CA,
                                                int *pathLenConstraint,
                                                opaque * extnValue,
                                                int extnValueLen);

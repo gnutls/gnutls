@@ -785,7 +785,7 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
     {
       char oid[MAX_OID_SIZE] = "";
       size_t sizeof_oid = sizeof (oid);
-      int critical;
+      unsigned int critical;
 
       if (type == TYPE_CRT)
         err = gnutls_x509_crt_get_extension_info (cert.crt, i,
@@ -1440,7 +1440,7 @@ print_oneline (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 
   /* Key algorithm and size. */
   {
-    int bits;
+    unsigned int bits;
     const char *name = gnutls_pk_algorithm_get_name
       (gnutls_x509_crt_get_pk_algorithm (cert, &bits));
     if (name == NULL)
@@ -1701,7 +1701,7 @@ print_crl (gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
         {
           char oid[MAX_OID_SIZE] = "";
           size_t sizeof_oid = sizeof (oid);
-          int critical;
+          unsigned int critical;
 
           err = gnutls_x509_crl_get_extension_info (crl, i,
                                                     oid, &sizeof_oid,

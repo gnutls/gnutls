@@ -328,7 +328,7 @@ gnutls_x509_crl_get_signature (gnutls_x509_crl_t crl,
 {
   int result;
   int bits;
-  unsigned int len;
+  int len;
 
   if (crl == NULL)
     {

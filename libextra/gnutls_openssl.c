@@ -344,7 +344,7 @@ const X509 *
 SSL_get_peer_certificate (SSL * ssl)
 {
   const gnutls_datum_t *cert_list;
-  int cert_list_size = 0;
+  unsigned int cert_list_size = 0;
 
   cert_list = gnutls_certificate_get_peers (ssl->gnutls_state,
                                             &cert_list_size);
@@ -358,7 +358,7 @@ int
 SSL_connect (SSL * ssl)
 {
   X509_STORE_CTX *store;
-  int cert_list_size = 0;
+  unsigned int cert_list_size = 0;
   int err;
   char x_priority[256];
   /* take options into account before connecting */
@@ -407,7 +407,7 @@ int
 SSL_accept (SSL * ssl)
 {
   X509_STORE_CTX *store;
-  int cert_list_size = 0;
+  unsigned int cert_list_size = 0;
   int err;
   char x_priority[256];
   /* take options into account before connecting */

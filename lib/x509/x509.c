@@ -903,7 +903,7 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
                             int seq, void *name, size_t * name_size,
                             unsigned int *ret_type, int othername_oid)
 {
-  unsigned int len;
+  int len;
   char nptr[ASN1_MAX_NAME_SIZE];
   int result;
   opaque choice_type[128];
@@ -1422,11 +1422,11 @@ gnutls_x509_crt_get_issuer_alt_othername_oid (gnutls_x509_crt_t cert,
 int
 gnutls_x509_crt_get_basic_constraints (gnutls_x509_crt_t cert,
                                        unsigned int *critical,
-                                       int *ca, int *pathlen)
+                                       unsigned int *ca, int *pathlen)
 {
   int result;
   gnutls_datum_t basicConstraints;
-  int tmp_ca;
+  unsigned int tmp_ca;
 
   if (cert == NULL)
     {
@@ -1485,7 +1485,8 @@ gnutls_x509_crt_get_basic_constraints (gnutls_x509_crt_t cert,
 int
 gnutls_x509_crt_get_ca_status (gnutls_x509_crt_t cert, unsigned int *critical)
 {
-  int ca, pathlen;
+  int pathlen;
+  unsigned int ca;
   return gnutls_x509_crt_get_basic_constraints (cert, critical, &ca,
                                                 &pathlen);
 }
@@ -1742,7 +1743,7 @@ gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
 int
 gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
                                     void *oid, size_t * oid_size,
-                                    int *critical)
+                                    unsigned int *critical)
 {
   int result;
   char str_critical[10];
@@ -2282,7 +2283,7 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
                             unsigned char *output_data,
                             size_t * output_data_size)
 {
-  int pk, result = 0;
+  int pk, result = 0, len;
   gnutls_datum_t pubkey;
 
   if (crt == NULL)
@@ -2320,14 +2321,14 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
    */
   pubkey.size = 0;
   result = asn1_der_coding (crt->cert, "tbsCertificate.subjectPublicKeyInfo",
-                            NULL, &pubkey.size, NULL);
+                            NULL, &len, NULL);
   if (result != ASN1_MEM_ERROR)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
     }
 
-  pubkey.data = gnutls_malloc (pubkey.size);
+  pubkey.data = gnutls_malloc (len);
   if (pubkey.data == NULL)
     {
       gnutls_assert ();
@@ -2335,7 +2336,7 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
     }
 
   result = asn1_der_coding (crt->cert, "tbsCertificate.subjectPublicKeyInfo",
-                            pubkey.data, &pubkey.size, NULL);
+                            pubkey.data, &len, NULL);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
@@ -2343,6 +2344,7 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
       return _gnutls_asn2err (result);
     }
 
+  pubkey.size = len;
   result = gnutls_fingerprint (GNUTLS_DIG_SHA1, &pubkey,
                                output_data, output_data_size);
 

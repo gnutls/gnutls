@@ -660,7 +660,7 @@ _gnutls_x509_ext_extract_keyUsage (uint16_t * keyUsage,
 /* extract the basicConstraints from the DER encoded extension
  */
 int
-_gnutls_x509_ext_extract_basicConstraints (int *CA,
+_gnutls_x509_ext_extract_basicConstraints (unsigned int *CA,
                                            int *pathLenConstraint,
                                            opaque * extnValue,
                                            int extnValueLen)
@@ -687,7 +687,7 @@ _gnutls_x509_ext_extract_basicConstraints (int *CA,
   if (pathLenConstraint)
     {
       result = _gnutls_x509_read_uint (ext, "pathLenConstraint",
-                                       pathLenConstraint);
+                                       (unsigned int*)pathLenConstraint);
       if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
         *pathLenConstraint = -1;
       else if (result != GNUTLS_E_SUCCESS)
@@ -1247,7 +1247,7 @@ _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
   if (pathLenConstraint)
     {
       result = _gnutls_x509_read_uint (ext, "pCPathLenConstraint",
-                                       pathLenConstraint);
+                                       (unsigned int*)pathLenConstraint);
       if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
         *pathLenConstraint = -1;
       else if (result != GNUTLS_E_SUCCESS)

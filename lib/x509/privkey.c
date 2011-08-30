@@ -240,7 +240,7 @@ _gnutls_privkey_decode_ecc_key (const gnutls_datum_t * raw_key,
   ASN1_TYPE pkey_asn;
   unsigned int version;
   char oid[MAX_OID_SIZE];
-  unsigned int oid_size;
+  int oid_size;
   gnutls_datum out;
 
   gnutls_pk_params_init(&pkey->params);

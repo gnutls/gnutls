@@ -188,7 +188,7 @@ static void
 _crywrap_sigchld_handler (int sig)
 {
 pid_t child;
-unsigned int status;
+int status;
 
   while ((child = waitpid (-1, &status, WNOHANG)) > (pid_t) 0)
   signal (sig, _crywrap_sigchld_handler);

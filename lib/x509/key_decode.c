@@ -186,7 +186,7 @@ _gnutls_x509_read_ecc_params (opaque * der, int dersize, gnutls_pk_params_st * p
   int ret;
   ASN1_TYPE spk = ASN1_TYPE_EMPTY;
   char oid[MAX_OID_SIZE];
-  unsigned int oid_size;
+  int oid_size;
   
   if ((ret = asn1_create_element
        (_gnutls_get_gnutls_asn (), "GNUTLS.ECParameters", &spk)) != ASN1_SUCCESS)

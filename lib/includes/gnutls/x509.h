@@ -244,7 +244,7 @@ extern "C"
                                      unsigned int *critical);
   int gnutls_x509_crt_get_basic_constraints (gnutls_x509_crt_t cert,
                                              unsigned int *critical,
-                                             int *ca, int *pathlen);
+                                             unsigned int *ca, int *pathlen);
 
 /* The key_usage flags are defined in gnutls.h. They are the
  * GNUTLS_KEY_* definitions.
@@ -275,7 +275,7 @@ extern "C"
   /* Read extensions by sequence number. */
   int gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
                                           void *oid, size_t * sizeof_oid,
-                                          int *critical);
+                                          unsigned int *critical);
   int gnutls_x509_crt_get_extension_data (gnutls_x509_crt_t cert, int indx,
                                           void *data, size_t * sizeof_data);
 
@@ -818,7 +818,7 @@ extern "C"
                                           void *data, size_t * sizeof_data);
   int gnutls_x509_crq_get_extension_info (gnutls_x509_crq_t crq, int indx,
                                           void *oid, size_t * sizeof_oid,
-                                          int *critical);
+                                          unsigned int *critical);
   int gnutls_x509_crq_get_attribute_data (gnutls_x509_crq_t crq, int indx,
                                           void *data, size_t * sizeof_data);
   int gnutls_x509_crq_get_attribute_info (gnutls_x509_crq_t crq, int indx,
@@ -838,7 +838,7 @@ extern "C"
                                      unsigned int *critical);
   int gnutls_x509_crq_get_basic_constraints (gnutls_x509_crq_t crq,
                                              unsigned int *critical,
-                                             int *ca, int *pathlen);
+                                             unsigned int *ca, int *pathlen);
   int gnutls_x509_crq_get_subject_alt_name (gnutls_x509_crq_t crq,
                                             unsigned int seq, void *ret,
                                             size_t * ret_size,
