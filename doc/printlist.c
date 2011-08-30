@@ -200,7 +200,7 @@ const char* _name;
 
 puts( headers);
 
-printf("\\begin{supertabular}{|p{.60\\linewidth}|p{.15\\linewidth}|p{.10\\linewidth}|}\n");
+printf("\\begin{supertabular}{|p{.64\\linewidth}|p{.12\\linewidth}|p{.09\\linewidth}|}\n");
 
   {
     size_t i;
