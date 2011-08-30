@@ -348,7 +348,7 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
                   size_t data_size, unsigned int mflags)
 {
   mbuffer_st *bufel;
-  size_t cipher_size;
+  ssize_t cipher_size;
   int retval, ret;
   int data2send_size;
   uint8_t headers[MAX_RECORD_HEADER_SIZE];
