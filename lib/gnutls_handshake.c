@@ -1841,7 +1841,8 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
        */
       if (!session->internals.initial_negotiation_completed &&
           session->security_parameters.entity == GNUTLS_CLIENT &&
-          gnutls_protocol_get_version (session) == GNUTLS_SSL3)
+          (gnutls_protocol_get_version (session) == GNUTLS_SSL3 || 
+          session->internals.priorities.no_extensions != 0))
         {
           ret =
             _gnutls_copy_ciphersuites (session, &extdata, TRUE);
@@ -1868,21 +1869,25 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
 
       /* Generate and copy TLS extensions.
        */
-      if (_gnutls_version_has_extensions (hver))
-        type = GNUTLS_EXT_ANY;
-      else
+      if (session->internals.priorities.no_extensions == 0)
         {
-          if (session->internals.initial_negotiation_completed != 0)
-            type = GNUTLS_EXT_MANDATORY;
+          if (_gnutls_version_has_extensions (hver))
+            type = GNUTLS_EXT_ANY;
           else
-            type = GNUTLS_EXT_NONE;
-        }
+            {
+              if (session->internals.initial_negotiation_completed != 0)
+                type = GNUTLS_EXT_MANDATORY;
+              else
+                type = GNUTLS_EXT_NONE;
+            }
 
-      ret = _gnutls_gen_extensions (session, &extdata, type);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto cleanup;
+          ret = _gnutls_gen_extensions (session, &extdata, type);
+          if (ret < 0)
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
+
         }
 
       ret = _mbuffer_append_data (bufel, extdata.data, extdata.length);

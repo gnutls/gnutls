@@ -402,6 +402,11 @@ will enable compatibility mode. It might mean that violations
 of the protocols are allowed as long as maximum compatibility with
 problematic clients and servers is achieved.
 
+@item %NO_EXTENSIONS @tab
+will prevent the sending of any TLS extensions in client side. Note
+that TLS 1.2 requires extensions to be used, thus this option must
+be used with care.
+
 @item %DISABLE_SAFE_RENEGOTIATION @tab
 will disable safe renegotiation
 completely.  Do not use unless you know what you are doing.

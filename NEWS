@@ -4,6 +4,11 @@ See the end for copying conditions.
 
 * Version 3.0.2 (unreleased)
 
+** libgnutls: Added %NO_EXTENSIONS priority string.
+
+** libgnutls: Corrected issue in gnutls_record_recv()
+triggered on encryption or compression error.
+
 ** libgnutls: Compatibility fixes in CPU ID detection 
 for i386 and old GCC.
 

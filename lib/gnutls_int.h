@@ -553,11 +553,12 @@ struct gnutls_priority_st
   priority_st supported_ecc;
 
   /* to disable record padding */
-  int no_padding:1;
-  int allow_large_records:1;
+  unsigned int no_extensions:1;
+  unsigned int no_padding:1;
+  unsigned int allow_large_records:1;
   safe_renegotiation_t sr;
-  int ssl3_record_version:1;
-  int additional_verify_flags;
+  unsigned int ssl3_record_version:1;
+  unsigned int additional_verify_flags;
 };
 
 
