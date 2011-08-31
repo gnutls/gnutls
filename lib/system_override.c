@@ -90,17 +90,15 @@ gnutls_transport_set_pull_function (gnutls_session_t session,
  * @func: a callback function
  *
  * This is the function where you set a function for gnutls to know
- * whether data are ready to be received within a time limit in
- * milliseconds. The callback should return 0 on timeout, a positive
- * number if data can be received, and -1 on error.
- * If the #data_size is non-zero that function should copy that
- * amount of data received in peek mode (i.e., if any other
- * function is called to receive data, it should return them again).
- *
+ * whether data are ready to be received. It should wait for data a
+ * given time frame in milliseconds. The callback should return 0 on 
+ * timeout, a positive number if data can be received, and -1 on error.
+ * You'll need to override this function if select() is not suitable
+ * for the provided transport calls. 
  * The callback function is used in DTLS only.
  *
  * @gnutls_pull_timeout_func is of the form,
- * ssize_t (*gnutls_pull_timeout_func)(gnutls_transport_ptr_t, void*data, size_t size, unsigned int ms);
+ * ssize_t (*gnutls_pull_timeout_func)(gnutls_transport_ptr_t, unsigned int ms);
  *
  * Since: 3.0.0
  **/

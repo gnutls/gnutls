@@ -183,10 +183,6 @@ message. This requires the following function to be used.
 
 @showfuncdesc{gnutls_transport_set_pull_timeout_function}
 
-To avoid @acronym{GnuTLS} from blocking in a DTLS handshake on
-a timer, the @funcref{gnutls_init} can be called with the
-@code{GNUTLS_NONBLOCK} flag (see @ref{TLS and DTLS sessions}).
-
 
 @subsection Handshake
 Once a session has been initialized and a network
@@ -242,11 +238,40 @@ A session can be deinitialized using the following function.
 
 @showfuncdesc{gnutls_deinit}
 
+@subsection Asynchronous operation
+@acronym{GnuTLS} can be used with asynchronous socket or event-driven programming.
+During a TLS protocol session @acronym{GnuTLS} does not block for anything except
+calculations. The only blocking operations are due to the transport layer (sockets) functions.
+Those, however, in an asynchronous scenario are typically set to
+non-blocking mode, which forces them to return @code{EAGAIN} error code instead of blocking. 
+In that case @acronym{GnuTLS} functions
+will return the @code{GNUTLS_E_AGAIN} error code and can be resumed the
+same way as a system call would. The only exception is @funcref{gnutls_record_send},
+which if interrupted subsequent calls need not to include the data to be
+sent (can be called with NULL argument).
+
+The @code{select()} system call can also be used in combination with the
+@acronym{GnuTLS} functions. @code{select()} allows monitoring of sockets
+and notifies on them being ready for reading or writing data. Note however
+that this system call cannot notify on data present in @acronym{GnuTLS}
+read buffers, it is only applicable to the kernel sockets API. Thus if
+you are using it for reading from a @acronym{GnuTLS} session, make sure
+the session is read completely. That can be achieved by checking there 
+are no data waiting to be read (using @funcref{gnutls_record_check_pending}), 
+either before the @code{select()} system call, or after a call to
+@funcref{gnutls_record_recv}. @acronym{GnuTLS} does not keep a write buffer,
+thus when writing @code{select()} need only to be consulted.
+
+In the DTLS, however, @acronym{GnuTLS} might block due to timers
+required by the protocol. To prevent those timers from blocking a DTLS handshake,
+the @funcref{gnutls_init} should be called with the
+@code{GNUTLS_NONBLOCK} flag (see @ref{TLS and DTLS sessions}).
+
 @subsection DTLS sessions
 
 Because datagram TLS can operate over connections where the peer
 of a server cannot be reliably verified, functionality is available to prevent
-denial of server attacks. @acronym{GnuTLS} requires a server
+denial of service attacks. @acronym{GnuTLS} requires a server
 to generate a secret key that is used to sign a cookie@footnote{A key of 128 bits or 16 bytes should be sufficient for this purpose.}. 
 That cookie is sent to the client using @funcref{gnutls_dtls_cookie_send}, and 
 the client must reply using the correct cookie. The server side
