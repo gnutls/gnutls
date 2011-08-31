@@ -125,11 +125,18 @@ AC_ARG_WITH(p11-kit,
 		[Build without p11-kit and PKCS#11 support]))
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 if test "$with_p11_kit" != "no"; then
-	PKG_CHECK_MODULES(P11_KIT, [p11-kit-1 >= 0.4])
-	AC_DEFINE([ENABLE_PKCS11], 1, [Build PKCS#11 support])
-	CFLAGS="$CFLAGS $P11_KIT_CFLAGS"
-	LIBS="$LIBS $P11_KIT_LIBS"
-	with_p11_kit=yes
+	PKG_CHECK_MODULES(P11_KIT, [p11-kit-1 >= 0.4], [with_p11_kit=yes], [with_p11_kit=no])
+	if test "$with_p11_kit" != "no";then
+		AC_DEFINE([ENABLE_PKCS11], 1, [Build PKCS#11 support])
+		CFLAGS="$CFLAGS $P11_KIT_CFLAGS"
+		LIBS="$LIBS $P11_KIT_LIBS"
+	else
+	        AC_MSG_WARN([[
+*** 
+*** p11-kit was not found. PKCS #11 support will be disabled.
+*** You may get it from http://p11-glue.freedesktop.org/p11-kit.html
+*** ]])
+	fi
 fi
 
 dnl Check for libcfg+
