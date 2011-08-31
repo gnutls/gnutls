@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 * Version 2.12.10 (unreleased)
 
+** libgnutls: OpenPGP certificate type is not enabled
+by default.
+
 ** libgnutls: Corrected issue in gnutls_record_recv()
 triggered on encryption or compression error.
 
