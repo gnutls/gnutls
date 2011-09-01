@@ -22,7 +22,7 @@ dnl Process this file with autoconf to produce a configure script.
 # 02110-1301, USA.
 
 AC_PREREQ(2.61)
-AC_INIT([libgnutls-extra], [2.12.9], [bug-gnutls@gnu.org])
+AC_INIT([libgnutls-extra], [2.12.10], [bug-gnutls@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
