@@ -172,4 +172,8 @@ Work in progress, available from @url{http://tools.ietf.org/html/draft-pechanec-
 R. J. Anderson, "Security Engineering: A Guide to Building Dependable Distributed Systems", 
 John Wiley \& Sons, Inc., 2001.
 
+@item @anchor{RFC4821}[RFC4821]
+M. Mathis, J. Heffner, "Packetization Layer Path MTU Discovery", March 2007,
+available from @url{http://www.ietf.org/rfc/rfc4821.txt}.
+
 @end table

@@ -250,17 +250,17 @@ same way as a system call would. The only exception is @funcref{gnutls_record_se
 which if interrupted subsequent calls need not to include the data to be
 sent (can be called with NULL argument).
 
-The @code{select()} system call can also be used in combination with the
-@acronym{GnuTLS} functions. @code{select()} allows monitoring of sockets
+The @funcintref{select} system call can also be used in combination with the
+@acronym{GnuTLS} functions. @funcintref{select} allows monitoring of sockets
 and notifies on them being ready for reading or writing data. Note however
 that this system call cannot notify on data present in @acronym{GnuTLS}
 read buffers, it is only applicable to the kernel sockets API. Thus if
 you are using it for reading from a @acronym{GnuTLS} session, make sure
 the session is read completely. That can be achieved by checking there 
 are no data waiting to be read (using @funcref{gnutls_record_check_pending}), 
-either before the @code{select()} system call, or after a call to
+either before the @funcintref{select} system call, or after a call to
 @funcref{gnutls_record_recv}. @acronym{GnuTLS} does not keep a write buffer,
-thus when writing @code{select()} need only to be consulted.
+thus when writing @funcintref{select} need only to be consulted.
 
 In the DTLS, however, @acronym{GnuTLS} might block due to timers
 required by the protocol. To prevent those timers from blocking a DTLS handshake,
@@ -288,13 +288,21 @@ and proceed to a proper handshake.
 @showfuncdesc{gnutls_dtls_prestate_set}
 
 
-Note that the above apply to server side only. The client side cookie handling
-is part of @funcref{gnutls_handshake}. However both client and server
-side should set the correct maximum transfer unit for
+Note that the above apply to server side only and they are not mandatory to be
+used. Not using them, however, allows denial of service attacks.
+The client side cookie handling is part of @funcref{gnutls_handshake}. 
+
+Datagrams are typically restricted by a maximum transfer unit (MTU). For that
+both client and server side should set the correct maximum transfer unit for
 the layer underneath @acronym{GnuTLS}. This would allow proper fragmentation
-of DTLS messages.
+of DTLS messages and prevent messages from being silently discarded by the
+transport layer. The ``correct'' maximum transfer unit can be obtained through
+a path MTU discovery mechanism @xcite{RFC4821}.
 
 @showfuncdesc{gnutls_dtls_set_mtu}
+
+@showfuncdesc{gnutls_dtls_get_mtu}
+@showfuncdesc{gnutls_dtls_get_data_mtu}
 
 @node Priority Strings
 @section Priority strings
