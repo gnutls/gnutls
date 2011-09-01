@@ -56,7 +56,7 @@ initialize_tls_session (void)
 
   gnutls_init (&session, GNUTLS_SERVER);
 
-  gnutls_priority_set_direct (session, "NORMAL", NULL);
+  gnutls_priority_set_direct (session, "NORMAL:+CTYPE-OPENPGP", NULL);
 
   /* request client certificate if any.
    */
