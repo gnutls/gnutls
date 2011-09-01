@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.0.2 (unreleased)
+* Version 3.0.2 (released 2011-09-01)
 
 ** libgnutls: OpenPGP certificate type is not enabled
 by default.
