@@ -170,7 +170,7 @@ client (void)
       gnutls_init (&session, GNUTLS_CLIENT);
 
       /* Use default priorities */
-      gnutls_priority_set_direct (session, "NORMAL", NULL);
+      gnutls_priority_set_direct (session, "NORMAL:+CTYPE-OPENPGP", NULL);
 
       /* put the x509 credentials to the current session
        */
@@ -270,7 +270,7 @@ initialize_tls_session (void)
   /* avoid calling all the priority functions, since the defaults
    * are adequate.
    */
-  gnutls_priority_set_direct (session, "NORMAL", NULL);
+  gnutls_priority_set_direct (session, "NORMAL:+CTYPE-OPENPGP", NULL);
 
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, pgp_cred);
 
