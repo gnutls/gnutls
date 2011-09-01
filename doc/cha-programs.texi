@@ -425,39 +425,9 @@ Usage:  gnutls-cli [options] hostname
 @subsection Example client PSK connection
 @cindex PSK client
 
-To connect to a server using PSK authentication, you may use something
-like:
-
-@smallexample
-$ gnutls-cli -p 5556 test.gnutls.org --pskusername jas \
-  --pskkey 9e32cf7786321a828ef7668f09fb35db \
-  --priority NORMAL:-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK
-@end smallexample
-
-If your server only supports the PSK ciphersuite, connecting to it
-should be as simple as connecting to the server:
-
-@smallexample
-$ ./gnutls-cli -p 5556 localhost
-Resolving 'localhost'...
-Connecting to '127.0.0.1:5556'...
-- PSK client callback.
-Enter PSK identity: psk_identity
-Enter password: 
-- PSK authentication.
-- Version: TLS1.1
-- Key Exchange: PSK
-- Cipher: AES-128-CBC
-- MAC: SHA1
-- Compression: NULL
-- Handshake was completed
-
-- Simple Client Mode:
-@end smallexample
-
-If the server supports several cipher suites, you may need to force it
-to chose PSK by using a cipher priority parameter such as in the
-example below:
+To connect to a server using PSK authentication, you need to enable
+the choice of PSK by using a cipher priority parameter such as in the
+example below.
 
 @smallexample
 $ ./gnutls-cli -p 5556 localhost --pskusername psk_identity \
@@ -718,15 +688,9 @@ gnutls-serv --http \
             --pgpcertfile openpgp-server.txt
 @end smallexample
 
-The next step is to add support for SRP authentication.
-
-@smallexample
-srptool --create-conf srp-tpasswd.conf
-srptool --passwd-conf srp-tpasswd.conf --username jas --passwd srp-passwd.txt
-Enter password: [TYPE "foo"]
-@end smallexample
-
-Start the server with SRP support:
+The next step is to add support for SRP authentication. This requires
+an SRP password file (see @ref{Invoking srptool}).
+To start the server with SRP support:
 
 @smallexample
 gnutls-serv --http \
@@ -734,13 +698,8 @@ gnutls-serv --http \
             --srppasswd srp-passwd.txt
 @end smallexample
 
-Let's also add support for PSK.
-
-@smallexample
-$ psktool --passwd psk-passwd.txt
-@end smallexample
-
-Start the server with PSK support:
+Let's also start a server with support for PSK. This would require
+a password file created with @code{psktool} (see @ref{Invoking psktool}).
 
 @smallexample
 gnutls-serv --http \
@@ -764,40 +723,6 @@ gnutls-serv --http \
             --pskpasswd psk-passwd.txt
 @end smallexample
 
-@menu
-* Example server PSK connection::
-@end menu
-
-@node Example server PSK connection
-@subsection Example server PSK connection
-@cindex PSK server
-
-To set up a PSK server with @code{gnutls-serv} you need to create PSK
-password file. This is illustrated in the example below, where a password
-is provided at the prompt.
-
-@smallexample
-$ ./psktool -u psk_identity -p psks.txt
-Enter password:
-Key stored to psks.txt
-$ cat psks.txt
-psk_identity:88f3824b3e5659f52d00e959bacab954b6540344
-$
-@end smallexample
-
-After this, start the server pointing to the password file.  We
-disable DHE-PSK.
-
-@smallexample
-$ ./gnutls-serv --pskpasswd psks.txt  --pskhint psk_identity_hint \
-  --priority NORMAL:-DHE-PSK
-Set static Diffie-Hellman parameters, consider --dhparams.
-Echo Server ready. Listening to port '5556'.
-@end smallexample
-
-You can now connect to the server using a PSK client as in @ref{Example
-client PSK connection}.
-
 @node Invoking psktool
 @section Invoking psktool
 @cindex psktool
@@ -815,6 +740,18 @@ Usage : psktool [options]
      -s, --keysize SIZE       specify the key size in bytes.
      -v, --version            prints the program's version number
      -h, --help               shows this help text
+@end smallexample
+
+The generation of a PSK password file is illustrated in the example below. 
+The password is provided in the prompt.
+
+@smallexample
+$ ./psktool -u psk_identity -p psks.txt
+Enter password:
+Key stored to psks.txt
+$ cat psks.txt
+psk_identity:88f3824b3e5659f52d00e959bacab954b6540344
+$
 @end smallexample
 
 @node Invoking srptool
