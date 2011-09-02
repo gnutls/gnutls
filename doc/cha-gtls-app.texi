@@ -653,7 +653,7 @@ This example is a very simple echo server which supports
 
 @node Echo Server with OpenPGP authentication
 @subsection Echo server with @acronym{OpenPGP} authentication
-@cindex @acronym{OpenPGP} server
+@cindex OpenPGP server
 
 The following example is an echo server which supports
 @acronym{OpenPGP} key authentication. You can easily combine

@@ -19,7 +19,7 @@ The prototypes for the following functions lie in
 
 @node X509 certificate functions
 @section @acronym{X.509} Certificate Functions
-@cindex @acronym{X.509} Functions
+@cindex X.509 Functions
 
 The following functions are to be used for @acronym{X.509} certificate handling.
 Their prototypes lie in @file{gnutls/x509.h}.
@@ -28,7 +28,7 @@ Their prototypes lie in @file{gnutls/x509.h}.
 
 @node GnuTLS-extra functions
 @section @acronym{GnuTLS-extra} Functions
-@cindex @acronym{GnuTLS-extra} functions
+@cindex GnuTLS-extra functions
 
 These functions are only available in the GPLv3+ version of the
 library called @code{gnutls-extra}. The prototypes for this library
@@ -38,7 +38,7 @@ lie in @file{gnutls/extra.h}.
 
 @node OpenPGP functions
 @section @acronym{OpenPGP} Functions
-@cindex @acronym{OpenPGP} functions
+@cindex OpenPGP functions
 
 The following functions are to be used for @acronym{OpenPGP}
 certificate handling.  Their prototypes lie in

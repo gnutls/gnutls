@@ -12,7 +12,7 @@
 
 @node X.509 certificates
 @section @acronym{X.509} certificates
-@cindex @acronym{X.509} certificates
+@cindex X.509 certificates
 
 The @acronym{X.509} protocols rely on a hierarchical trust model. In
 this trust model Certification Authorities (CAs) are used to certify
@@ -269,7 +269,7 @@ consult @xcite{RFC2818} and section @ref{ex:verify} for an example.
 @node Certificate requests
 @subsection @acronym{PKCS} #10 certificate requests
 @cindex certificate requests
-@cindex @acronym{PKCS} #10
+@cindex PKCS #10
 
 A certificate request is a structure, which contain information about
 an applicant of a certificate service.  It usually contains a private
@@ -312,7 +312,7 @@ which should return a signed certificate.
 
 @node PKCS 12 structures
 @subsection @acronym{PKCS} #12 structures
-@cindex @acronym{PKCS} #12
+@cindex PKCS #12
 
 A @acronym{PKCS} #12 structure @xcite{PKCS12} usually contains a user's
 private keys and certificates. It is commonly used in browsers to
@@ -354,7 +354,7 @@ below.
 
 @node OpenPGP certificates
 @section @acronym{OpenPGP} certificates
-@cindex @acronym{OpenPGP} certificates
+@cindex OpenPGP certificates
 
 The @acronym{OpenPGP} key authentication relies on a distributed trust
 model, called the ``web of trust''. The ``web of trust'' uses a

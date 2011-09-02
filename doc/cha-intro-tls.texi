@@ -524,8 +524,8 @@ resume functions, @ref{resume}.
 @showfuncdesc{gnutls_session_ticket_enable_client}
 
 @subsection Safe renegotiation
-@cindex Renegotiation
-@cindex Safe renegotiation
+@cindex renegotiation
+@cindex safe renegotiation
 
 TLS gives the option to two communicating parties to renegotiate
 and update their security parameters. One useful example of this feature
@@ -623,7 +623,7 @@ can be used both by clients and servers.
 
 @node Selecting cryptographic key sizes
 @section Selecting cryptographic key sizes
-@cindex Key sizes
+@cindex key sizes
 
 Because many algorithms are involved in TLS, it is not easy to set
 a consistent security level.  For this reason in @ref{tab:key-sizes} we

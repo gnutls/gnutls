@@ -41,7 +41,7 @@ we elaborate on supported authentication methods.
 @section Certificate authentication
 
 @subsection Authentication using @acronym{X.509} certificates
-@cindex @acronym{X.509} certificates
+@cindex X.509 certificates
 
 @acronym{X.509} certificates contain the public parameters, of a
 public key algorithm, and an authority's signature, which proves the
@@ -49,7 +49,7 @@ authenticity of the parameters.  See @ref{X.509 certificates}, for
 more information on @acronym{X.509} protocols.
 
 @subsection Authentication using @acronym{OpenPGP} keys
-@cindex @acronym{OpenPGP} keys
+@cindex OpenPGP keys
 
 @acronym{OpenPGP} keys also contain public parameters of a public key
 algorithm, and signatures from several other parties. Depending on
@@ -219,7 +219,7 @@ efficient than ANON_DH on equivalent security levels.
 
 @node Authentication using SRP
 @section Authentication using @acronym{SRP}
-@cindex @acronym{SRP} authentication
+@cindex SRP authentication
 
 Authentication via the Secure Remote Password protocol,
 @acronym{SRP} (see @xcite{RFC2945} for a description of SRP),
@@ -302,7 +302,7 @@ also included.  See @ref{srptool}, for more information.
 
 @node Authentication using PSK
 @section Authentication using @acronym{PSK}
-@cindex @acronym{PSK} authentication
+@cindex PSK authentication
 
 Authentication using Pre-shared keys is a method to authenticate using
 usernames and binary keys. This protocol avoids making use of public
