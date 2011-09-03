@@ -418,7 +418,7 @@ namespace gnutls
 
   void session::set_transport_lowat (size_t num)
   {
-    gnutls_transport_set_lowat (s, num);
+    throw (exception (GNUTLS_E_UNIMPLEMENTED_FEATURE));
   }
 
   void session::set_transport_push_function (gnutls_push_func push_func)
@@ -892,7 +892,7 @@ psk_server_credentials::psk_server_credentials ():credentials
     if (ret < 0)
       {
 	delete dst;
-	throw (ret);
+        throw (exception (ret));
       }
 
     return *dst;
@@ -944,7 +944,7 @@ psk_server_credentials::psk_server_credentials ():credentials
     if (ret < 0)
       {
 	delete dst;
-	throw (ret);
+        throw (exception (ret));
       }
 
     return *dst;
