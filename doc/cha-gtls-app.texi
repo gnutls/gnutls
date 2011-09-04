@@ -275,9 +275,9 @@ denial of service attacks. @acronym{GnuTLS} requires a server
 to generate a secret key that is used to sign a cookie@footnote{A key of 128 bits or 16 bytes should be sufficient for this purpose.}. 
 That cookie is sent to the client using @funcref{gnutls_dtls_cookie_send}, and 
 the client must reply using the correct cookie. The server side
-should verify the initial message sent by client using @funcref{gnutls_dtls_cookie_verify},
-if successful associate a session with the cookie using @funcref{gnutls_dtls_prestate_set}
-and proceed to a proper handshake.
+should verify the initial message sent by client using @funcref{gnutls_dtls_cookie_verify}.
+If successful a the session should be initialization and associated with
+the cookie using @funcref{gnutls_dtls_prestate_set}.
 
 @showfuncdesc{gnutls_key_generate}
 
@@ -294,7 +294,7 @@ The client side cookie handling is part of @funcref{gnutls_handshake}.
 
 Datagrams are typically restricted by a maximum transfer unit (MTU). For that
 both client and server side should set the correct maximum transfer unit for
-the layer underneath @acronym{GnuTLS}. This would allow proper fragmentation
+the layer underneath @acronym{GnuTLS}. This will allow proper fragmentation
 of DTLS messages and prevent messages from being silently discarded by the
 transport layer. The ``correct'' maximum transfer unit can be obtained through
 a path MTU discovery mechanism @xcite{RFC4821}.
@@ -307,13 +307,12 @@ a path MTU discovery mechanism @xcite{RFC4821}.
 @node Priority Strings
 @section Priority strings
 
-In order to specify cipher suite preferences on client or server side, the
-previously mentioned priority functions accept a string
-that specifies the enabled for the handshake algorithms.
-That string may contain some high level keyword such as
-the keywords in @ref{tab:prio-keywords}
-or it might contain special keywords, to be explained
-later on.
+In order to specify cipher suite preferences on a TLS session
+there are priority functions that accept a string
+specifying the enabled for the handshake algorithms.
+That string may contain a high level keyword such as
+in @ref{tab:prio-keywords} or combination of a high level
+keyword, additional algorithm keywords and special keywords.
 
 @showfuncD{gnutls_priority_set_direct,gnutls_priority_init,gnutls_priority_deinit,gnutls_priority_set}
 
@@ -361,14 +360,13 @@ algorithms to be enabled.
 
 Unless the first keyword is "NONE" the defaults (in preference
 order) are for TLS protocols TLS 1.2, TLS1.1, TLS1.0, SSL3.0; for
-compression NULL; for certificate types X.509, OpenPGP.
-For key exchange algorithms when in NORMAL or SECURE levels the
+compression NULL; for certificate types X.509.
+In key exchange algorithms when in NORMAL or SECURE levels the
 perfect forward secrecy algorithms take precedence of the other
 protocols.  In all cases all the supported key exchange algorithms
  are enabled (except for the RSA-EXPORT which is only enabled in
 EXPORT level).
-
-The NONE keyword must followed by the algorithms to be enabled,
+The NONE keyword, if used, must followed by the algorithms to be enabled,
 and is used to provide the exact list of requested algorithms@footnote{To avoid collisions in order to specify a compression algorithm in
 this string you have to prefix it with "COMP-", protocol versions
 with "VERS-", signature algorithms with "SIGN-" and certificate types with "CTYPE-". All other
@@ -421,7 +419,7 @@ is SIGN-ALL. This is only valid for TLS 1.2 and later.
 CURVE-SECP224R1, CURVE-SECP256R1, CURVE-SECP384R1, CURVE-SECP521R1. Catch all is CURVE-ALL.
 
 @end multitable
-@caption{The supported priority strings.}
+@caption{The supported algorithm keywords in priority strings.}
 @end float
 
 
