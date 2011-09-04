@@ -9,6 +9,9 @@ void register_x86_crypto (void);
 #define AES_MAXNR 14
 typedef struct
 {
+  /* We add few more integers to allow alignment 
+   * on a 16-byte boundary.
+   */
   uint32_t rd_key[4 * (AES_MAXNR + 1)+AES_KEY_ALIGN_SIZE];
 } AES_KEY;
 
