@@ -89,26 +89,14 @@ commits.  Please see http://www.gnu.org/software/gnutls/lists.html.
 
 LICENSING
 ---------
-Since version 0.4.2, the GnuTLS library has been released under the GNU
-Lesser General Public License (LGPL).  Previous versions were licensed
-under the GNU General Public License (GPL).
-
-We changed the license for most of the GnuTLS components because other
-free libraries exist and offer similar functionality with lax licenses.
-We want GnuTLS to be usable in the same places as those other libraries.
-We kept some parts of GnuTLS under the GPL because they are unique, and
-the terms of the license under GPL provides free software projects (which
-deserve our help) an advantage over non-free projects (which do not
-deserve our help, since they refuse to share with us).  For information, see
-http://www.gnu.org/philosophy/why-not-lgpl.html.
+Since GnuTLS version 3.0.0, the core library has been released under
+the GNU Lesser General Public License (LGPL) version 3 or later.
 
 The GNU LGPL applies to the main GnuTLS library, while the
-gnutls-extra and gnutls-openssl libraries are under the GPL.  The
-gnutls library is located in the lib/ directory, while the
-gnutls-extra and gnutls-openssl library is at libextra/.
-
-For the GnuTLS version 3.0.0 release we upgraded the license of the
-core library to LGPL version 3 or later.
+included applications as well as gnutls-extra and gnutls-openssl 
+libraries are under the GNU GPL version 3.  The gnutls library is 
+located in the lib/ directory, while the applications in src/ and
+gnutls-extra and gnutls-openssl library are at libextra/.
 
 For any copyright year range specified as YYYY-ZZZZ in this package
 note that the range specifies every single year in that closed interval.
@@ -116,10 +104,10 @@ note that the range specifies every single year in that closed interval.
 
 BUGS
 ----
-Currently GnuTLS needs testing.  Thorough testing is very important and
-expensive.  Often times, the developers do not have access to a particular
-piece of hardware or configuration to reproduce a scenario.  Notifying
-the developers about a possible bug will greatly help the project.  
+Thorough testing is very important and expensive.  Often, the 
+developers do not have access to a particular piece of hardware or 
+configuration to reproduce a scenario.  Notifying the developers about a 
+possible bug will greatly help the project.  
 
 If you believe you have found a bug, please report it to bug-gnutls@gnu.org
 together with any applicable information.  A web interface for the system
@@ -127,25 +115,22 @@ is available at http://savannah.gnu.org/support/?group=gnutls.
 
 Applicable information would include why the issue is a GnuTLS bug (if
 not readily apparent), output from 'uname -a', the version of the library or
-tool being used, a stack trace if available ('bt full' if under gdb), and
-perhaps a network trace.  Vague queries or piecemeal messages are difficult
-to act upon and don't help the development effort.
+tool being used, a stack trace if available ('bt full' if under gdb or
+valgrind output), and perhaps a network trace.  Vague queries or piecemeal 
+messages are difficult to act upon and don't help the development effort.
 
-Additional information can be found at the project's Bug Report page at
-http://www.gnu.org/software/gnutls/manual/html_node/Bug-Reports.html.
+Additional information can be found at the project's manual at:
+http://www.gnu.org/software/gnutls/documentation.html.
 
 
 PATCHES
 -------
-Patches are welcome and encouraged.  Details of contributing can be found
-at http://www.gnu.org/software/gnutls/manual/html_node/Contributing.html.
-
-Patches are submitted through the bug tracking system or to the
-mailing list.  When submitting patches, please be sure to use sources
-from the git repository, and preferrably from the master branch.  To
-create a patch for the project from a local git repository, please use
-the following commands.  'gnutls' should be the local directory of a
-previous git clone.
+Patches are welcome and encouraged. Patches can be submitted through the 
+bug tracking system or the mailing list.  When submitting patches, please 
+be sure to use sources from the git repository, and preferrably from the 
+master branch.  To create a patch for the project from a local git repository, 
+please use the following commands. 'gnutls' should be the local directory 
+of a previous git clone.
 
     cd gnutls
     git add the-file-you-modified.c another-file.c
