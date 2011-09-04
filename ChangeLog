@@ -1,3 +1,969 @@
+2011-09-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* README, README-alpha: simplified README
+
+2011-09-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/accelerated/intel/aes-x86.h: documented extra alignment
+
+2011-09-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_record.c: cleaned-up code
+
+2011-09-04  Andreas Metzler <ametzler@downhill.at.eu.org>
+
+	* configure.ac: Add p11-kit-1 to gnutls.pc Requires.private.  If building with PKCS#11 support append p11-kit-1 to gnutls.pc
+	Requires.private.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2011-09-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitignore: more files to ignore
+
+2011-09-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-gtls-app.texi: documentation updates
+
+2011-09-03  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutlsxx.cpp: updated for lowat
+
+2011-09-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-auth.texi, doc/cha-cert-auth.texi,
+	doc/cha-functions.texi, doc/cha-gtls-app.texi,
+	doc/cha-intro-tls.texi: documentation updates. @acronym was removed
+	from the cindex.
+
+2011-09-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/includes/gnutls/compat.h: set_lowat was removed as a macro.
+
+2011-09-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-programs.texi: simplified examples
+
+2011-09-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/examples/ex-serv-pgp.c, tests/openpgp-certs/testcerts: 
+	explicitly enable openpgp certtype in tests.
+
+2011-09-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: updated
+
+2011-09-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* configure.ac, m4/hooks.m4: bumped version
+
+2011-09-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-bib.texi, doc/cha-gtls-app.texi, doc/latex/gnutls.bib: 
+	more doc on MTU.
+
+2011-09-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/openpgpself.c: explicitly enable openpgp certtype in tests.
+
+2011-09-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-gtls-app.texi, lib/system_override.c: Added documentation
+	on asynchronous operation.
+
+2011-08-31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* configure.ac: do not exit configure if p11-kit is not found.
+
+2011-08-31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_priority.c: OpenPGP certificate type priority is
+	not enabled by default.
+
+2011-08-31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, doc/cha-gtls-app.texi, lib/gnutls_handshake.c,
+	lib/gnutls_int.h, lib/gnutls_priority.c: Added %NO_EXTENSIONS
+	priority string.
+
+2011-08-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/printlist.c: doc fixes
+
+2011-08-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/suite/testcompat-main: disabled test
+
+2011-08-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* libextra/openssl_compat.c, libextra/openssl_compat.h: removed old
+	and unused compatibility functions.
+
+2011-08-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/includes/gnutls/x509.h, lib/x509/crl.c, lib/x509/crq.c,
+	lib/x509/extensions.c, lib/x509/key_decode.c, lib/x509/output.c,
+	lib/x509/privkey.c, lib/x509/x509.c, lib/x509/x509_int.h,
+	libextra/gnutls_openssl.c, src/crywrap/crywrap.c: corrected sign
+	type errors for integers.
+
+2011-08-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_record.c: Corrected error checking in
+	_gnutls_send_int().
+
+2011-08-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-gtls-app.texi: doc updates
+
+2011-08-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, src/certtool-cfg.c, src/common.h: removed unneeded header.
+	Documented updates.
+
+2011-08-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/nettle/ecc.h, lib/nettle/ecc_free.c,
+	lib/nettle/ecc_make_key.c, lib/nettle/ecc_map.c,
+	lib/nettle/ecc_mulmod.c, lib/nettle/ecc_projective_add_point.c,
+	lib/nettle/ecc_projective_dbl_point.c,
+	lib/nettle/ecc_projective_dbl_point_3.c,
+	lib/nettle/ecc_shared_secret.c, lib/nettle/ecc_sign_hash.c,
+	lib/nettle/ecc_verify_hash.c: Avoid assert() and do not include
+	needless headers.
+
+2011-08-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/suite/testcompat: skip if datefudge is not available
+
+2011-08-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/accelerated/x86.h: Modified cpuid for 32-bit x86 to avoid a
+	gcc issue (not finding a register).
+
+2011-08-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, src/Makefile.am, src/benchmark-cipher.c,
+	src/benchmark-tls.c, src/benchmark.h, src/cli-gaa.c, src/cli-gaa.h,
+	src/cli.gaa: Benchmark applications were incorporated to gnutls-cli
+
+2011-08-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/algorithms/ciphersuites.c: Corrected DH-ANON ciphersuite
+	names.
+
+2011-08-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-cert-auth.texi, doc/gnutls-pgp.eps, doc/gnutls-x509.eps: 
+	updated figures.
+
+2011-08-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/x509/x509.c: XmppAddr -> UTF8String
+
+2011-08-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/openpgp/gnutls_openpgp.c, lib/openpgp/privkey.c,
+	lib/x509/x509.c: more updates in private key copy.
+
+2011-08-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/accelerated/intel/aes-x86.h: removed unused variable.
+
+2011-08-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_privkey.c, lib/gnutls_x509.c,
+	lib/includes/gnutls/abstract.h, lib/openpgp/gnutls_openpgp.c,
+	lib/openpgp/gnutls_openpgp.h, lib/openpgp/privkey.c,
+	lib/x509/x509.c: gnutls_certificate_set_x509_key() and
+	gnutls_certificate_set_openpgp_key() operate as in gnutls 2.10.x and
+	do not require to hold the structures.
+
+2011-08-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/accelerated/intel/aes-gcm-x86.c,
+	lib/accelerated/intel/aes-x86.c: removed unused variables.
+
+2011-08-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_record.c: Allow out-of-order change_cipher_spec in
+	DTLS.
+
+2011-08-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-auth.texi, doc/cha-cert-auth.texi, doc/cha-gtls-app.texi,
+	doc/cha-intro-tls.texi, doc/examples/ex-cert-select-pkcs11.c,
+	lib/gnutls_buffers.c, lib/gnutls_pubkey.c, lib/gnutls_record.c: 
+	documentation changes.
+
+2011-08-24  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/examples/ex-client-srp.c, doc/examples/ex-serv-srp.c: 
+	gnutls/extra.h is not required for SRP.
+
+2011-08-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/latex/gnutls.tex: leave an empty page
+
+2011-08-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-auth.texi, doc/cha-bib.texi, doc/cha-cert-auth.texi,
+	doc/cha-gtls-app.texi, doc/cha-intro-tls.texi,
+	doc/latex/gnutls.bib, doc/latex/gnutls.tex: documentation updates
+
+2011-08-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/nettle/rnd.c: unlock rnd mutex on error.
+
+2011-08-23  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-bib.texi, doc/latex/gnutls.bib: bibliography updated
+
+2011-08-22  Andreas Metzler <ametzler@debian.org>
+
+	* lib/libgnutls.map: Export export_gnutls_openpgp_privkey_sign_hash.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2011-08-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_buffers.c, lib/system.c: AIX check moved to system.c.
+
+2011-08-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/crywrap/crywrap.c: Handle memory allocation errors.
+
+2011-08-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/manpages/Makefile.am, doc/manpages/crywrap.8: The crywrap
+	manpage was removed due to license reasons.
+
+2011-08-22  Ludovic Courtès <ludo@gnu.org>
+
+	* guile/tests/priorities.scm: guile: Fix `priorities' test to use
+	`run-test'.  This is a followup to commit
+	cd7b8102316cd4151356c4b2b7909c7435593890 ("guile: Fix tests to match
+	the `exit' behavior introduced in Guile 2.0.1.").
+
+2011-08-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/crywrap/Makefile.am: include README to distribution.
+
+2011-08-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_ui.c: documentation fixes.
+
+2011-08-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-cert-auth.texi, doc/cha-internals.texi,
+	doc/cha-intro-tls.texi, doc/cha-library.texi,
+	doc/scripts/mytexi2latex: Use texinfo's word break.
+
+2011-08-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, m4/hooks.m4: updated for release
+
+2011-08-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/crywrap/Makefile.am: Added missing file
+
+2011-08-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* po/cs.po.in, po/fi.po.in, po/nl.po.in, po/pl.po.in, po/sv.po.in,
+	po/uk.po.in: Sync with TP.
+
+2011-08-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/Makefile.am: corrected typo
+
+2011-08-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_buffers.c: Added hack for AIX systems that may not set
+	errno property on EAGAIN.
+
+2011-08-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/examples/ex-cert-select-pkcs11.c: simplified PKCS #11 token
+	example.
+
+2011-08-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-gtls-app.texi, doc/cha-intro-tls.texi,
+	lib/gnutls_record.c, lib/system_override.c: documentation updates
+
+2011-08-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitignore: updated ignored files.
+
+2011-08-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/resume.c: Corrected session resumption test.
+
+2011-08-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/utils.c: Avoid using vfprintf() and use a combination of
+	vsnprintf and fputs instead. My gnulib has issues with them.
+
+2011-08-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* gl/Makefile.am, gl/m4/gnulib-cache.m4: added vfprintf-posix
+	(needed by tests)
+
+2011-08-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* configure.ac: depend on p11-kit 0.4+.
+
+2011-08-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/Makefile.am, lib/auth/cert.c, lib/auth/cert.h,
+	lib/gnutls_cert.c, lib/gnutls_str_array.h, lib/gnutls_x509.c,
+	lib/openpgp/gnutls_openpgp.c: Removed the limitation of one name per
+	certificate.
+
+2011-08-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-auth.texi: rephrased text on anonymous authentication.
+
+2011-08-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-programs.texi: small update in psktool
+
+2011-08-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: updated crywrap
+
+2011-08-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: documented changes
+
+2011-08-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/auth/cert.c, lib/auth/cert.h, lib/gnutls_cert.c,
+	lib/gnutls_state.c, lib/gnutls_ui.c, lib/gnutls_x509.c,
+	lib/openpgp/gnutls_openpgp.c: gnutls_certificate_set_x509_key_file()
+	and friends support server name indication.  If multiple
+	certificates are set using this function the proper one will be
+	selected during a handshake, with the limitation of a single name
+	per certificate.
+
+2011-08-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/x509/x509.c: Documentation fixes.
+
+2011-08-17  Simon Josefsson <simon@josefsson.org>
+
+	* cfg.mk, src/crywrap/crywrap.c: Fix syntax-check nits.
+
+2011-08-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/algorithms/ciphers.c: Added AES-256-GCM. Reported by
+	Benjamin Hof.
+
+2011-08-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: documented fix
+
+2011-08-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/includes/gnutls/pkcs11.h, lib/pkcs11.c, src/p11common.c: 
+	Introduced GNUTLS_PKCS11_PIN_WRONG flag to indicate the previously
+	given PIN is wrong.
+
+2011-08-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: documented fix
+
+2011-08-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-programs.texi: some discussion on tokens.
+
+2011-08-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/pkcs11.c: Corrected issue when asking multiple times for PIN.
+
+2011-08-14  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* configure.ac: corrected configure test
+
+2011-08-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/crywrap/crywrap.c: dhparams have now the 'r' option.
+
+2011-08-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/crywrap/crywrap.c: use audit_log
+
+2011-08-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/crywrap/crywrap.c, src/crywrap/crywrap.h: removed unneeded
+	defintions.
+
+2011-08-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/cli.c: unload_file was modified to accept a pointer.
+
+2011-08-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, src/crywrap/Makefile.am, src/crywrap/crywrap.c: corrected
+	child process cleanup and added option to specify diffie hellman
+	parameters file.
+
+2011-08-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitignore: more files to ignore
+
+2011-08-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/manpages/crywrap.8, src/crywrap/crywrap.c,
+	src/crywrap/crywrap.h: Corrected crywrap's verification procedure.
+
+2011-08-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/serv.c: use gnutls_sec_param_to_pk_bits() for DH parameter
+	generation.
+
+2011-08-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitignore, configure.ac, doc/manpages/Makefile.am,
+	doc/manpages/crywrap.8, gl/Makefile.am, gl/alphasort.c,
+	gl/argp-ba.c, gl/argp-eexst.c, gl/argp-fmtstream.c,
+	gl/argp-fmtstream.h, gl/argp-fs-xinl.c, gl/argp-help.c,
+	gl/argp-namefrob.h, gl/argp-parse.c, gl/argp-pin.c, gl/argp-pv.c,
+	gl/argp-pvh.c, gl/argp-xinl.c, gl/argp.h, gl/basename-lgpl.c,
+	gl/dirent.in.h, gl/dirname-lgpl.c, gl/dirname.h, gl/dosname.h,
+	gl/fpucw.h, gl/frexp.c, gl/frexpl.c, gl/fseeko.c, gl/fseterr.c,
+	gl/fseterr.h, gl/getopt.c, gl/getopt.in.h, gl/getopt1.c,
+	gl/getopt_int.h, gl/getsubopt.c, gl/isnan.c, gl/isnand-nolibm.h,
+	gl/isnand.c, gl/isnanf-nolibm.h, gl/isnanf.c, gl/isnanl-nolibm.h,
+	gl/isnanl.c, gl/m4/alphasort.m4, gl/m4/argp.m4, gl/m4/dirent_h.m4,
+	gl/m4/dirname.m4, gl/m4/double-slash-root.m4, gl/m4/dup2.m4,
+	gl/m4/eealloc.m4, gl/m4/environ.m4, gl/m4/exponentd.m4,
+	gl/m4/exponentf.m4, gl/m4/exponentl.m4, gl/m4/frexp.m4,
+	gl/m4/frexpl.m4, gl/m4/getcwd.m4, gl/m4/getopt.m4,
+	gl/m4/getsubopt.m4, gl/m4/gnulib-cache.m4, gl/m4/gnulib-comp.m4,
+	gl/m4/isnand.m4, gl/m4/isnanf.m4, gl/m4/isnanl.m4, gl/m4/ldexpl.m4,
+	gl/m4/lstat.m4, gl/m4/malloca.m4, gl/m4/math_h.m4,
+	gl/m4/mempcpy.m4, gl/m4/mode_t.m4, gl/m4/nocrash.m4, gl/m4/open.m4,
+	gl/m4/printf-frexp.m4, gl/m4/printf-frexpl.m4, gl/m4/putenv.m4,
+	gl/m4/rawmemchr.m4, gl/m4/scandir.m4, gl/m4/setenv.m4,
+	gl/m4/signbit.m4, gl/m4/sleep.m4, gl/m4/stat.m4,
+	gl/m4/strchrnul.m4, gl/m4/strndup.m4, gl/m4/strnlen.m4,
+	gl/m4/symlink.m4, gl/m4/sysexits.m4, gl/m4/vfprintf-posix.m4,
+	gl/m4/vprintf-posix.m4, gl/math.in.h, gl/mempcpy.c,
+	gl/printf-frexp.c, gl/printf-frexp.h, gl/printf-frexpl.c,
+	gl/printf-frexpl.h, gl/rawmemchr.c, gl/rawmemchr.valgrind,
+	gl/scandir.c, gl/signbitd.c, gl/signbitf.c, gl/signbitl.c,
+	gl/sleep.c, gl/strchrnul.c, gl/strchrnul.valgrind, gl/stripslash.c,
+	gl/strndup.c, gl/strnlen.c, gl/sysexits.in.h, gl/tests/Makefile.am,
+	gl/tests/dummy.c, gl/tests/dup2.c, gl/tests/fpucw.h,
+	gl/tests/getcwd-lgpl.c, gl/tests/ignore-value.h, gl/tests/lstat.c,
+	gl/tests/malloca.c, gl/tests/malloca.h, gl/tests/malloca.valgrind,
+	gl/tests/minus-zero.h, gl/tests/nan.h, gl/tests/open.c,
+	gl/tests/putenv.c, gl/tests/same-inode.h, gl/tests/setenv.c,
+	gl/tests/stat.c, gl/tests/symlink.c, gl/tests/test-argp-2.sh,
+	gl/tests/test-argp.c, gl/tests/test-dirent.c, gl/tests/test-dup2.c,
+	gl/tests/test-environ.c, gl/tests/test-fprintf-posix.h,
+	gl/tests/test-frexp.c, gl/tests/test-frexpl.c,
+	gl/tests/test-fseeko3.c, gl/tests/test-fseeko3.sh,
+	gl/tests/test-fseterr.c, gl/tests/test-getcwd-lgpl.c,
+	gl/tests/test-getopt.c, gl/tests/test-getopt.h,
+	gl/tests/test-getopt_long.h, gl/tests/test-ignore-value.c,
+	gl/tests/test-isnand-nolibm.c, gl/tests/test-isnand.h,
+	gl/tests/test-isnanf-nolibm.c, gl/tests/test-isnanf.h,
+	gl/tests/test-isnanl-nolibm.c, gl/tests/test-isnanl.h,
+	gl/tests/test-lstat.c, gl/tests/test-lstat.h,
+	gl/tests/test-malloc-gnu.c, gl/tests/test-malloca.c,
+	gl/tests/test-math.c, gl/tests/test-open.c, gl/tests/test-open.h,
+	gl/tests/test-printf-frexp.c, gl/tests/test-printf-frexpl.c,
+	gl/tests/test-printf-posix.h, gl/tests/test-printf-posix.output,
+	gl/tests/test-rawmemchr.c, gl/tests/test-setenv.c,
+	gl/tests/test-signbit.c, gl/tests/test-sleep.c,
+	gl/tests/test-stat.c, gl/tests/test-stat.h,
+	gl/tests/test-strchrnul.c, gl/tests/test-strnlen.c,
+	gl/tests/test-symlink.c, gl/tests/test-symlink.h,
+	gl/tests/test-sysexits.c, gl/tests/test-unsetenv.c,
+	gl/tests/test-vfprintf-posix.c, gl/tests/test-vfprintf-posix.sh,
+	gl/tests/test-vprintf-posix.c, gl/tests/test-vprintf-posix.sh,
+	gl/tests/unsetenv.c, gl/vfprintf.c, gl/vprintf.c, m4/hooks.m4,
+	src/Makefile.am, src/crywrap/Makefile.am, src/crywrap/README,
+	src/crywrap/crywrap.c, src/crywrap/crywrap.h, src/crywrap/primes.h: 
+	Added crywrap to the distributed programs.
+
+2011-08-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/accelerated/intel/.gitignore: files to ignore
+
+2011-08-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-internals.texi: doc updates
+
+2011-08-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-auth.texi, doc/cha-cert-auth.texi,
+	doc/cha-ciphersuites.texi, doc/cha-errors.texi,
+	doc/cha-functions.texi, doc/cha-gtls-app.texi,
+	doc/cha-internals.texi, doc/cha-intro-tls.texi,
+	doc/cha-library.texi, doc/cha-support.texi: do not use capitals in
+	index names.
+
+2011-08-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitignore, doc/latex/.gitignore: more files to ignore.
+
+2011-08-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/pkcs11.c: If a module is dlopened twice, then
+	deinitialize the second load.
+
+2011-08-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-gtls-app.texi, doc/cha-intro-tls.texi,
+	doc/cha-library.texi, lib/gnutls_buffers.c, lib/gnutls_record.c: 
+	documentation updates
+
+2011-08-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-library.texi: memory handling section is no longer
+	applicable
+
+2011-08-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-gtls-app.texi: Added discussion on DTLS functionality
+
+2011-08-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-programs.texi, doc/cha-support.texi, doc/cha-tls-app.texi: 
+	corrected typos
+
+2011-08-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-gtls-app.texi: updated openssl text
+
+2011-08-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-gtls-app.texi: correct typos
+
+2011-08-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/manpages/gnutls-cli.1: do not escape \#
+
+2011-08-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-cert-auth.texi, doc/cha-intro-tls.texi: more updates
+
+2011-08-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-bib.texi, doc/cha-preface.texi, doc/latex/gnutls.bib: 
+	Added reference to anderson's book
+
+2011-08-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/Makefile.am, doc/cha-cert-auth.texi, doc/cha-internals.texi,
+	doc/gnutls-certificate-user-use-case.eps,
+	doc/gnutls-extensions.eps, doc/gnutls.texi,
+	doc/scripts/mytexi2latex, lib/x509/crl_write.c, lib/x509/crq.c,
+	lib/x509/pkcs12.c, lib/x509/privkey_pkcs8.c, lib/x509/x509.c: 
+	Internals section updated.
+
+2011-08-12  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-auth.texi, doc/cha-cert-auth.texi, doc/examples/ex-crq.c,
+	lib/gnutls_pubkey.c, lib/includes/gnutls/compat.h,
+	lib/includes/gnutls/x509.h, lib/pkcs11.c, lib/pkcs11_write.c,
+	lib/x509/crq.c: Documentation updates. gnutls_x509_crq_sign2() and
+	gnutls_x509_crl_sign2() were removed from the deprecate list to ease
+	generation of crl and crq structures.
+
+2011-08-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/alert-printlist.c, doc/cha-intro-tls.texi,
+	doc/cha-library.texi, doc/cha-programs.texi, doc/errcodes.c,
+	doc/printlist.c: updates
+
+2011-08-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/latex/gnutls.tex: changed paper size.
+
+2011-08-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_global.c: doc update
+
+2011-08-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/alert-printlist.c, doc/errcodes.c, doc/printlist.c: reduced
+	space taken by descriptions.
+
+2011-08-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-gtls-app.texi, doc/cha-intro-tls.texi: more updates.
+
+2011-08-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: documented fixes
+
+2011-08-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/accelerated/intel/aes-x86.c, lib/accelerated/intel/aes-x86.h: 
+	Force alignment for AES-NI to the runtime rather than on the
+	structures.  Corrects issue on some systems (reported by Andreas
+	Radke).
+
+2011-08-11  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-gtls-app.texi, doc/cha-intro-tls.texi,
+	doc/cha-library.texi, lib/system_override.c: Added session
+	initialization discussion
+
+2011-08-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-cert-auth.texi: more updates
+
+2011-08-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-auth.texi, doc/cha-gtls-app.texi, lib/gnutls_psk.c,
+	lib/gnutls_x509.c, lib/openpgp/gnutls_openpgp.c: updated
+	documentation
+
+2011-08-10  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/pkcs11.c: document flags
+
+2011-08-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: corrected typo
+
+2011-08-09  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/README: removed reference to pakchois
+
+2011-08-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/pkcs11.c: Prevent from loading twice the same module.
+
+2011-08-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/accelerated/intel/asm/appro-aes-gcm-x86-64.s,
+	lib/accelerated/intel/asm/appro-aes-x86-64.s,
+	lib/accelerated/intel/asm/appro-aes-x86.s: Added note.GNU-stack to
+	prevent marking the library as using an executable stack. Reported
+	by Andreas Metzler.
+
+2011-08-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* configure.ac: bumped version
+
+2011-08-08  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/accelerated/intel/asm/appro-aes-x86-64.s,
+	lib/accelerated/intel/asm/appro-aes-x86.s: Included appro's updates
+	to AES-NI.
+
+2011-08-05  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/auth/cert.c: better placement of ifdefs.
+
+2011-08-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/Makefile.am, doc/cha-gtls-app.texi, doc/cha-internals.texi,
+	doc/gnutls-extensions.eps, doc/gnutls-extensions_st.eps,
+	doc/gnutls-mod_auth_st.eps, doc/gnutls-modauth.eps,
+	doc/latex/Makefile.am, doc/latex/gnutls.tex,
+	doc/scripts/mytexi2latex: Added discussion of the provided
+	cryptographic functions. Internals is now included in the latex
+	document (needs rewrite though)
+
+2011-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/Makefile.am, lib/accelerated/Makefile.am,
+	lib/accelerated/accelerated.c, lib/accelerated/cryptodev.c,
+	lib/accelerated/intel/Makefile.am,
+	lib/accelerated/intel/aes-gcm-x86.c,
+	lib/accelerated/intel/aes-x86.c, lib/algorithms.h,
+	lib/algorithms/Makefile.am, lib/algorithms/cert_types.c,
+	lib/algorithms/ciphers.c, lib/algorithms/ciphersuites.c,
+	lib/algorithms/ecc.c, lib/algorithms/kx.c, lib/algorithms/mac.c,
+	lib/algorithms/protocols.c, lib/algorithms/publickey.c,
+	lib/algorithms/secparams.c, lib/algorithms/sign.c,
+	lib/auth/Makefile.am, lib/auth/anon.c, lib/auth/anon.h,
+	lib/auth/anon_ecdh.c, lib/auth/cert.c, lib/auth/cert.h,
+	lib/auth/dh_common.c, lib/auth/dh_common.h, lib/auth/dhe.c,
+	lib/auth/dhe_psk.c, lib/auth/ecdh_common.c, lib/auth/ecdh_common.h,
+	lib/auth/psk.c, lib/auth/psk.h, lib/auth/psk_passwd.c,
+	lib/auth/psk_passwd.h, lib/auth/rsa.c, lib/auth/rsa_export.c,
+	lib/auth/srp.c, lib/auth/srp.h, lib/auth/srp_passwd.c,
+	lib/auth/srp_passwd.h, lib/auth/srp_rsa.c, lib/auth/srp_sb64.c,
+	lib/crypto-api.c, lib/crypto-backend.c, lib/crypto-backend.h,
+	lib/crypto.h, lib/debug.c, lib/debug.h, lib/ext/Makefile.am,
+	lib/ext/cert_type.c, lib/ext/cert_type.h, lib/ext/ecc.c,
+	lib/ext/ecc.h, lib/ext/max_record.c, lib/ext/max_record.h,
+	lib/ext/safe_renegotiation.c, lib/ext/safe_renegotiation.h,
+	lib/ext/server_name.c, lib/ext/server_name.h,
+	lib/ext/session_ticket.c, lib/ext/session_ticket.h,
+	lib/ext/signature.c, lib/ext/signature.h, lib/ext/srp.c,
+	lib/ext/srp.h, lib/gcrypt/Makefile.am, lib/gcrypt/cipher.c,
+	lib/gcrypt/init.c, lib/gcrypt/mac.c, lib/gcrypt/mpi.c,
+	lib/gcrypt/pk.c, lib/gcrypt/rnd.c, lib/gnutls_alert.c,
+	lib/gnutls_anon_cred.c, lib/gnutls_auth.c, lib/gnutls_auth.h,
+	lib/gnutls_buffers.c, lib/gnutls_buffers.h, lib/gnutls_cert.c,
+	lib/gnutls_cipher.c, lib/gnutls_cipher.h, lib/gnutls_cipher_int.c,
+	lib/gnutls_cipher_int.h, lib/gnutls_compress.c,
+	lib/gnutls_compress.h, lib/gnutls_constate.c,
+	lib/gnutls_constate.h, lib/gnutls_datum.c, lib/gnutls_datum.h,
+	lib/gnutls_db.c, lib/gnutls_db.h, lib/gnutls_dh.c, lib/gnutls_dh.h,
+	lib/gnutls_dh_primes.c, lib/gnutls_dtls.c, lib/gnutls_dtls.h,
+	lib/gnutls_ecc.c, lib/gnutls_errors.c, lib/gnutls_errors.h,
+	lib/gnutls_extensions.c, lib/gnutls_extensions.h,
+	lib/gnutls_global.c, lib/gnutls_global.h, lib/gnutls_handshake.c,
+	lib/gnutls_handshake.h, lib/gnutls_hash_int.c,
+	lib/gnutls_hash_int.h, lib/gnutls_helper.c, lib/gnutls_int.h,
+	lib/gnutls_kx.c, lib/gnutls_kx.h, lib/gnutls_mbuffers.c,
+	lib/gnutls_mbuffers.h, lib/gnutls_mem.c, lib/gnutls_mem.h,
+	lib/gnutls_mpi.c, lib/gnutls_mpi.h, lib/gnutls_num.c,
+	lib/gnutls_num.h, lib/gnutls_pcert.c, lib/gnutls_pk.c,
+	lib/gnutls_pk.h, lib/gnutls_priority.c, lib/gnutls_privkey.c,
+	lib/gnutls_psk.c, lib/gnutls_pubkey.c, lib/gnutls_record.c,
+	lib/gnutls_record.h, lib/gnutls_rsa_export.c,
+	lib/gnutls_rsa_export.h, lib/gnutls_session.c,
+	lib/gnutls_session_pack.c, lib/gnutls_session_pack.h,
+	lib/gnutls_sig.c, lib/gnutls_sig.h, lib/gnutls_srp.c,
+	lib/gnutls_srp.h, lib/gnutls_state.c, lib/gnutls_state.h,
+	lib/gnutls_str.c, lib/gnutls_str.h, lib/gnutls_supplemental.c,
+	lib/gnutls_supplemental.h, lib/gnutls_ui.c, lib/gnutls_v2_compat.c,
+	lib/gnutls_v2_compat.h, lib/gnutls_x509.c, lib/gnutls_x509.h,
+	lib/hash.c, lib/includes/Makefile.am,
+	lib/includes/gnutls/abstract.h, lib/includes/gnutls/compat.h,
+	lib/includes/gnutls/crypto.h, lib/includes/gnutls/dtls.h,
+	lib/includes/gnutls/gnutls.h.in, lib/includes/gnutls/gnutlsxx.h,
+	lib/includes/gnutls/openpgp.h, lib/includes/gnutls/pkcs11.h,
+	lib/includes/gnutls/pkcs12.h, lib/includes/gnutls/x509.h,
+	lib/libgnutls.map, lib/libgnutlsxx.map, lib/locks.c,
+	lib/nettle/Makefile.am, lib/nettle/cipher.c, lib/nettle/ecc_free.c,
+	lib/nettle/ecc_make_key.c, lib/nettle/ecc_map.c,
+	lib/nettle/ecc_mulmod.c, lib/nettle/ecc_points.c,
+	lib/nettle/ecc_projective_add_point.c,
+	lib/nettle/ecc_projective_dbl_point.c,
+	lib/nettle/ecc_projective_dbl_point_3.c,
+	lib/nettle/ecc_shared_secret.c, lib/nettle/ecc_sign_hash.c,
+	lib/nettle/ecc_verify_hash.c, lib/nettle/egd.c, lib/nettle/init.c,
+	lib/nettle/mac.c, lib/nettle/mpi.c, lib/nettle/pk.c,
+	lib/nettle/rnd.c, lib/opencdk/Makefile.am, lib/opencdk/armor.c,
+	lib/opencdk/context.h, lib/opencdk/filters.h, lib/opencdk/hash.c,
+	lib/opencdk/kbnode.c, lib/opencdk/keydb.c, lib/opencdk/literal.c,
+	lib/opencdk/main.c, lib/opencdk/main.h, lib/opencdk/misc.c,
+	lib/opencdk/new-packet.c, lib/opencdk/opencdk.h,
+	lib/opencdk/packet.h, lib/opencdk/pubkey.c,
+	lib/opencdk/read-packet.c, lib/opencdk/seskey.c,
+	lib/opencdk/sig-check.c, lib/opencdk/stream.c,
+	lib/opencdk/stream.h, lib/opencdk/types.h,
+	lib/opencdk/write-packet.c, lib/openpgp/Makefile.am,
+	lib/openpgp/compat.c, lib/openpgp/extras.c,
+	lib/openpgp/gnutls_openpgp.c, lib/openpgp/output.c,
+	lib/openpgp/pgp.c, lib/openpgp/pgpverify.c, lib/openpgp/privkey.c,
+	lib/pkcs11.c, lib/pkcs11_privkey.c, lib/pkcs11_secret.c,
+	lib/pkcs11_write.c, lib/random.c, lib/random.h, lib/system.c,
+	lib/system_override.c, lib/x509/Makefile.am, lib/x509/common.c,
+	lib/x509/common.h, lib/x509/crl.c, lib/x509/crl_write.c,
+	lib/x509/crq.c, lib/x509/dn.c, lib/x509/extensions.c,
+	lib/x509/key_decode.c, lib/x509/key_encode.c, lib/x509/mpi.c,
+	lib/x509/output.c, lib/x509/pbkdf2-sha1.c, lib/x509/pkcs12.c,
+	lib/x509/pkcs12_bag.c, lib/x509/pkcs12_encr.c, lib/x509/pkcs7.c,
+	lib/x509/privkey.c, lib/x509/privkey_pkcs8.c,
+	lib/x509/rfc2818_hostname.c, lib/x509/sign.c,
+	lib/x509/verify-high.c, lib/x509/verify.c, lib/x509/x509.c,
+	lib/x509/x509_int.h, lib/x509/x509_write.c, lib/x509_b64.c,
+	lib/x509_b64.h: Clarify license and copyright.
+
+2011-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* README: Clarify licensing.
+
+2011-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/AUTHORS, lib/ChangeLog, lib/NEWS, lib/autogen.sh,
+	lib/build-aux/arg-nonnull.h, lib/build-aux/c++defs.h,
+	lib/build-aux/config.rpath, lib/build-aux/warn-on-use.h,
+	libextra/AUTHORS, libextra/COPYING, libextra/ChangeLog,
+	libextra/NEWS, libextra/README, libextra/build-aux/config.rpath: 
+	Remove unused files.
+
+2011-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* libextra/includes/gnutls/extra.h: Finish removal of inner
+	application extension support.
+
+2011-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* lib/includes/gnutls/abstract.h, lib/includes/gnutls/dtls.h: More
+	GTK-DOC fixes.
+
+2011-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* .x-sc_GPL_version, .x-sc_avoid_if_before_free,
+	.x-sc_bindtextdomain, .x-sc_cast_of_alloca_return_value,
+	.x-sc_cast_of_argument_to_free, .x-sc_file_system,
+	.x-sc_m4_quote_check, .x-sc_makefile_check, .x-sc_program_name,
+	.x-sc_prohibit_HAVE_MBRTOWC, .x-sc_prohibit_S_IS_definition,
+	.x-sc_prohibit_empty_lines_at_EOF,
+	.x-sc_prohibit_strings_without_use, .x-sc_space_tab, .x-sc_the_the,
+	.x-sc_two_space_separator_in_usage, .x-sc_useless_cpp_parens,
+	GNUmakefile, THANKS, build-aux/arg-nonnull.h, build-aux/c++defs.h,
+	build-aux/config.rpath, build-aux/snippet/_Noreturn.h,
+	build-aux/snippet/arg-nonnull.h, build-aux/snippet/c++defs.h,
+	build-aux/snippet/warn-on-use.h, build-aux/useless-if-before-free,
+	build-aux/vc-list-files, build-aux/warn-on-use.h, cfg.mk,
+	configure.ac, doc/Makefile.am, gl/Makefile.am, gl/alignof.h,
+	gl/alloca.c, gl/errno.in.h, gl/error.c, gl/float.c, gl/float.in.h,
+	gl/fseek.c, gl/fseeko.c, gl/ftell.c, gl/intprops.h,
+	gl/m4/alloca.m4, gl/m4/errno_h.m4, gl/m4/error.m4,
+	gl/m4/extensions.m4, gl/m4/float_h.m4, gl/m4/fpieee.m4,
+	gl/m4/fseek.m4, gl/m4/fseeko.m4, gl/m4/ftell.m4, gl/m4/ftello.m4,
+	gl/m4/getdelim.m4, gl/m4/getline.m4, gl/m4/getpagesize.m4,
+	gl/m4/getpass.m4, gl/m4/gettime.m4, gl/m4/gettimeofday.m4,
+	gl/m4/gnulib-cache.m4, gl/m4/gnulib-common.m4,
+	gl/m4/gnulib-comp.m4, gl/m4/hmac-md5.m4, gl/m4/include_next.m4,
+	gl/m4/largefile.m4, gl/m4/lseek.m4, gl/m4/malloc.m4, gl/m4/md5.m4,
+	gl/m4/memchr.m4, gl/m4/memmem.m4, gl/m4/memxor.m4,
+	gl/m4/mmap-anon.m4, gl/m4/po.m4, gl/m4/printf.m4,
+	gl/m4/read-file.m4, gl/m4/realloc.m4, gl/m4/snprintf.m4,
+	gl/m4/strcase.m4, gl/m4/strdup.m4, gl/m4/strerror.m4,
+	gl/m4/string_h.m4, gl/m4/strings_h.m4, gl/m4/strverscmp.m4,
+	gl/m4/time_r.m4, gl/m4/vsnprintf.m4, gl/m4/warn-on-use.m4,
+	gl/m4/warnings.m4, gl/netdb.in.h, gl/netinet_in.in.h,
+	gl/stdarg.in.h, gl/stddef.in.h, gl/stdint.in.h, gl/stdio.in.h,
+	gl/stdlib.in.h, gl/strerror-override.c, gl/strerror-override.h,
+	gl/strerror.c, gl/string.in.h, gl/strings.in.h, gl/sys_socket.in.h,
+	gl/sys_stat.in.h, gl/sys_time.in.h, gl/sys_uio.in.h,
+	gl/tests/Makefile.am, gl/tests/fcntl.in.h, gl/tests/fpucw.h,
+	gl/tests/init.sh, gl/tests/macros.h, gl/tests/test-float.c,
+	gl/tests/test-fseek.c, gl/tests/test-fseek.sh,
+	gl/tests/test-fseek2.sh, gl/tests/test-ftell.c,
+	gl/tests/test-ftell.sh, gl/tests/test-ftell2.sh,
+	gl/tests/test-ftell3.c, gl/tests/test-intprops.c,
+	gl/tests/test-snprintf.c, gl/tests/test-strerror.c,
+	gl/tests/test-vc-list-files-cvs.sh,
+	gl/tests/test-vc-list-files-git.sh, gl/tests/test-verify.c,
+	gl/tests/test-vsnprintf.c, gl/time.in.h, gl/timespec.h,
+	gl/unistd.in.h, gl/verify.h, gl/wchar.in.h, lib/Makefile.am,
+	lib/hash.c, lib/pkcs11_privkey.c, maint.mk, src/benchmark-cipher.c,
+	src/certtool.c, src/cli.c, src/serv.c, tests/Makefile.am,
+	tests/scripts/common.sh: Update gnulib files.  Fix syntax-check
+	usage.
+
+2011-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* NEWS, README: Add NEWS entries.  Use copyright ranges (now
+	permitted).
+
+2011-08-03  Simon Josefsson <simon@josefsson.org>
+
+	* po/LINGUAS, po/cs.po.in, po/fi.po.in, po/nl.po.in, po/pl.po.in,
+	po/sv.po.in, po/uk.po.in: Sync with TP.
+
+2011-08-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am, doc/reference/Makefile.am,
+	doc/reference/gnutls-docs.sgml, lib/algorithms/secparams.c,
+	lib/crypto-api.c, lib/gnutls_cert.c, lib/gnutls_db.c,
+	lib/gnutls_global.c, lib/gnutls_privkey.c, lib/gnutls_pubkey.c,
+	lib/includes/gnutls/abstract.h, lib/includes/gnutls/gnutls.h.in,
+	lib/includes/gnutls/pkcs11.h, lib/locks.c, lib/openpgp/privkey.c,
+	lib/pkcs11.c, lib/pkcs11_secret.c, lib/pkcs11_write.c,
+	lib/random.c, lib/system_override.c, lib/x509/crl_write.c,
+	lib/x509/crq.c, lib/x509/privkey.c, lib/x509/x509.c: More GTK-DOC
+	improvements.
+
+2011-08-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/reference/Makefile.am: Simplify GTK-DOC makefile
+	IGNORE_HFILES.
+
+2011-08-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/includes/gnutls/gnutls.h.in: updated
+
+2011-08-02  Simon Josefsson <simon@josefsson.org>
+
+	* lib/algorithms/sign.c, lib/gnutls_dtls.c, lib/gnutls_pubkey.c,
+	lib/gnutls_record.c, lib/includes/gnutls/abstract.h,
+	lib/includes/gnutls/crypto.h, lib/includes/gnutls/dtls.h,
+	lib/includes/gnutls/gnutls.h.in, lib/includes/gnutls/openpgp.h,
+	lib/includes/gnutls/pkcs11.h, lib/nettle/ecc_free.c,
+	lib/nettle/ecc_make_key.c, lib/nettle/ecc_map.c,
+	lib/nettle/ecc_mulmod.c, lib/nettle/ecc_points.c,
+	lib/nettle/ecc_projective_add_point.c,
+	lib/nettle/ecc_projective_dbl_point.c,
+	lib/nettle/ecc_projective_dbl_point_3.c,
+	lib/nettle/ecc_shared_secret.c, lib/nettle/ecc_sign_hash.c,
+	lib/nettle/ecc_verify_hash.c, lib/pkcs11.c: Fix GTK-DOC manual.
+
+2011-08-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_record.c: detect premature termination of connection
+
+2011-08-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/includes/gnutls/pkcs11.h, lib/pkcs11.c: the
+	deprecated_config_file from 2.12.x was incorporated.
+
+2011-08-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/pkcs11.c: documentation update
+
+2011-08-02  Simon Josefsson <simon@josefsson.org>
+
+	* doc/manpages/Makefile.am, doc/reference/gnutls-docs.sgml,
+	lib/algorithms/ecc.c, lib/crypto-api.c, lib/gnutls_alert.c,
+	lib/gnutls_cert.c, lib/gnutls_dtls.c, lib/gnutls_global.c,
+	lib/gnutls_pcert.c, lib/gnutls_pubkey.c, lib/gnutls_record.c,
+	lib/gnutls_state.c, lib/system_override.c, lib/x509/crl.c,
+	lib/x509/privkey.c, lib/x509/verify-high.c, lib/x509/x509.c: Add
+	GTK-DOC Since: tags for 3.0.0 additions.
+
+2011-08-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/pkcs11_privkey.c: added asserts.
+
+2011-08-01  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* README, README-alpha: Refer to nettle alone and p11-kit.
+
+2011-08-01  Stef Walter <stefw@collabora.co.uk>
+
+	* lib/pkcs11.c: Don't try to do PKCS#11 login if session is already
+	logged in.   * It is possible for new PKCS#11 sessions to be logged in if    another logged in session already exists.   * In these cases, don't log in, but detect the condition and    return success.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2011-08-01  Stef Walter <stefw@collabora.co.uk>
+
+	* lib/pkcs11_privkey.c: When finding private keys fail, return error
+	code.   * Previously this would result in an endless loop.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2011-08-01  Stef Walter <stefw@collabora.co.uk>
+
+	* lib/includes/gnutls/pkcs11.h, lib/pkcs11.c: Mark the config
+	argument of gnutls_pkcs11_init() as unused  * Since its no longer used.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2011-07-31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_str.h, lib/gnutls_x509.c,
+	lib/includes/gnutls/x509.h, lib/x509/x509.c, tests/x509cert.c: Added
+	GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED flag for
+	gnutls_x509_crt_list_import.  It checks whether the list to be
+	imported is properly sorted.
+
+2011-07-31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_errors.c, lib/gnutls_x509.c,
+	lib/includes/gnutls/gnutls.h.in: Added
+	GNUTLS_E_CERTIFICATE_LIST_UNSORTED.  If a certificate list is loaded
+	then verify that it is sorted with order to starts with the subject
+	and finished with the trusted root. That way we make sure we don't
+	send data that violate the TLS protocol.
+
+2011-07-31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-cert-auth.texi, doc/latex/macros.tex: documentation
+	updates.
+
+2011-07-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* ChangeLog: updated changelog
+
 2011-07-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS: released 3.0.0
