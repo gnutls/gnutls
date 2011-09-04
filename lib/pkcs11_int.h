@@ -96,6 +96,37 @@ _gnutls_pkcs11_privkey_decrypt_data (gnutls_pkcs11_privkey_t key,
                                     const gnutls_datum_t * ciphertext,
                                     gnutls_datum_t * plaintext);
 
+static inline int pk_to_mech(gnutls_pk_algorithm_t pk)
+{
+  if (pk == GNUTLS_PK_DSA)
+    return CKM_DSA;
+  else if (pk == GNUTLS_PK_ECC)
+    return CKM_ECDSA;
+  else 
+    return CKM_RSA_PKCS;
+}
+
+static inline int pk_to_genmech(gnutls_pk_algorithm_t pk)
+{
+  if (pk == GNUTLS_PK_DSA)
+    return CKM_DSA_KEY_PAIR_GEN;
+  else if (pk == GNUTLS_PK_ECC)
+    return CKM_ECDSA_KEY_PAIR_GEN;
+  else 
+    return CKM_RSA_PKCS_KEY_PAIR_GEN;
+}
+
+ck_rv_t
+pkcs11_generate_key_pair (struct ck_function_list *module,
+             ck_session_handle_t sess,
+             struct ck_mechanism *mechanism,
+             struct ck_attribute *pub_templ,
+             unsigned long pub_templ_count,
+             struct ck_attribute *priv_templ,
+             unsigned long priv_templ_count,
+             ck_object_handle_t *pub,
+             ck_object_handle_t *priv);
+
 ck_rv_t
 pkcs11_get_slot_list (struct ck_function_list * module,
                       unsigned char token_present,

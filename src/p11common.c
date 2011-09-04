@@ -129,3 +129,4 @@ pkcs11_common (void)
   gnutls_pkcs11_set_token_function (token_callback, NULL);
 
 }
+

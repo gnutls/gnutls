@@ -2849,6 +2849,21 @@ pkcs11_sign (struct ck_function_list *module,
 }
 
 ck_rv_t
+pkcs11_generate_key_pair (struct ck_function_list *module,
+             ck_session_handle_t sess,
+             struct ck_mechanism *mechanism,
+             struct ck_attribute *pub_templ,
+             unsigned long pub_templ_count,
+             struct ck_attribute *priv_templ,
+             unsigned long priv_templ_count,
+             ck_object_handle_t *pub,
+             ck_object_handle_t *priv)
+{
+	return (module)->C_GenerateKeyPair (sess, mechanism, pub_templ, pub_templ_count,
+	                                    priv_templ, priv_templ_count, pub, priv);
+}
+
+ck_rv_t
 pkcs11_decrypt_init (struct ck_function_list *module,
                      ck_session_handle_t sess,
                      struct ck_mechanism *mechanism,

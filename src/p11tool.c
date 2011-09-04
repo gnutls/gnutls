@@ -155,6 +155,11 @@ gaa_parser (int argc, char **argv)
     case ACTION_PKCS11_DELETE_URL:
       pkcs11_delete (outfile, info.pkcs11_url, 0, info.pkcs11_login, &cinfo);
       break;
+    case ACTION_PKCS11_GENERATE:
+      pkcs11_generate (outfile, info.pkcs11_url, info.key_type, get_bits(info.key_type, info.bits, info.sec_param), 
+                       info.pkcs11_label, info.pkcs11_private, info.pkcs11_detailed_url, info.pkcs11_login, 
+                       &cinfo);
+      break;
     default:
       gaa_help ();
       exit (0);

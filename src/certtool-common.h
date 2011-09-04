@@ -67,9 +67,8 @@ gnutls_datum_t *load_secret_key (int mand, common_info_st * info);
 gnutls_pubkey_t load_pubkey (int mand, common_info_st * info);
 gnutls_x509_crt_t *load_cert_list (int mand, size_t * size,
                                    common_info_st * info);
-
-/* returns the bits specified in cmd */
-int get_bits (gnutls_pk_algorithm_t);
+int get_bits (gnutls_pk_algorithm_t key_type, int info_bits, const char* info_sec_param);
+gnutls_sec_param_t str_to_sec_param (const char *str);
 
 /* prime.c */
 int generate_prime (int how);

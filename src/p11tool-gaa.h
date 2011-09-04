@@ -8,34 +8,40 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 84 "p11tool.gaa"
+#line 94 "p11tool.gaa"
 	int debug;
-#line 79 "p11tool.gaa"
+#line 89 "p11tool.gaa"
 	char *outfile;
-#line 76 "p11tool.gaa"
+#line 86 "p11tool.gaa"
 	int action;
-#line 75 "p11tool.gaa"
+#line 85 "p11tool.gaa"
 	char* pkcs11_provider;
-#line 71 "p11tool.gaa"
+#line 81 "p11tool.gaa"
 	int incert_format;
-#line 68 "p11tool.gaa"
+#line 78 "p11tool.gaa"
+	char* sec_param;
+#line 75 "p11tool.gaa"
+	int bits;
+#line 72 "p11tool.gaa"
 	int pkcs8;
-#line 65 "p11tool.gaa"
+#line 69 "p11tool.gaa"
 	char *cert;
-#line 62 "p11tool.gaa"
+#line 66 "p11tool.gaa"
 	char *pubkey;
-#line 59 "p11tool.gaa"
+#line 63 "p11tool.gaa"
 	char *privkey;
-#line 56 "p11tool.gaa"
+#line 60 "p11tool.gaa"
 	char* secret_key;
-#line 52 "p11tool.gaa"
+#line 56 "p11tool.gaa"
 	int pkcs11_detailed_url;
-#line 49 "p11tool.gaa"
+#line 53 "p11tool.gaa"
 	int pkcs11_login;
-#line 45 "p11tool.gaa"
+#line 49 "p11tool.gaa"
 	int pkcs11_private;
-#line 42 "p11tool.gaa"
+#line 46 "p11tool.gaa"
 	int pkcs11_trusted;
+#line 40 "p11tool.gaa"
+	int key_type;
 #line 35 "p11tool.gaa"
 	char* pkcs11_label;
 #line 24 "p11tool.gaa"

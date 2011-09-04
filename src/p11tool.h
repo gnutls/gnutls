@@ -18,6 +18,11 @@ void pkcs11_delete (FILE * outfile, const char *pkcs11_url, int batch,
                     unsigned int login, common_info_st *);
 void pkcs11_init (FILE * outfile, const char *pkcs11_url, const char *label,
                   common_info_st *);
+void
+pkcs11_generate (FILE * outfile, const char *url, gnutls_pk_algorithm_t type,
+              unsigned int bits,
+              const char *label, int private, int detailed,
+              unsigned int login, common_info_st * info);
 
 #define PKCS11_TYPE_CRT_ALL 1
 #define PKCS11_TYPE_TRUSTED 2
@@ -35,6 +40,7 @@ enum
   ACTION_PKCS11_DELETE_URL,
   ACTION_PKCS11_TOKEN_INIT,
   ACTION_PKCS11_MECHANISMS,
+  ACTION_PKCS11_GENERATE,
 };
 
 #endif

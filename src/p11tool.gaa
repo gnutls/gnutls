@@ -37,6 +37,10 @@ option (initialize) STR "URL" { $action = ACTION_PKCS11_TOKEN_INIT; $pkcs11_url 
 option (write) STR "URL" { $action = ACTION_PKCS11_WRITE_URL; $pkcs11_url = $1; } "Writes loaded certificates, private or secret keys to a PKCS11 token."
 option (delete) STR "URL" { $action = ACTION_PKCS11_DELETE_URL; $pkcs11_url = $1; } "Deletes objects matching the URL."
 
+#int key_type;
+option (generate-rsa) STR "URL" { $action = ACTION_PKCS11_GENERATE; $key_type = GNUTLS_PK_RSA; $pkcs11_url = $1; } "Generates an RSA private key on the specified token."
+option (generate-dsa) STR "URL" { $action = ACTION_PKCS11_GENERATE; $key_type = GNUTLS_PK_DSA; $pkcs11_url = $1; } "Generates a DSA private key on the specified token."
+option (generate-ecc) STR "URL" { $action = ACTION_PKCS11_GENERATE; $key_type = GNUTLS_PK_ECC; $pkcs11_url = $1; } "Generates an ECDSA private key on the specified token."
 
 option (label) STR "label" { $pkcs11_label = $1; } "Sets a label for the write operation."
 #int pkcs11_trusted;
@@ -68,6 +72,12 @@ option (load-certificate) STR "FILE" { $cert = $1 } "Certificate file to use."
 #int pkcs8;
 option (8, pkcs8) { $pkcs8=1 } "Use PKCS #8 format for private keys."
 
+#int bits;
+option (bits) INT "BITS" { $bits = $1 } "specify the number of bits for key generation."
+
+#char* sec_param;
+option (sec-param) STR "PARAM" { $sec_param = $1 } "specify the security level [low|normal|high|ultra]."
+
 #int incert_format;
 option (inder) { $incert_format=GNUTLS_X509_FMT_DER } "Use DER format for input certificates and private keys."
 option (inraw) { $incert_format=GNUTLS_X509_FMT_DER } "Use RAW/DER format for input certificates and private keys."
@@ -89,5 +99,6 @@ option (h, help) { gaa_help(); exit(0); } "shows this help text"
 init {
 	$action = -1; $pkcs11_provider= NULL; $outfile = NULL; $pubkey = NULL; $privkey = NULL;
 	$pkcs11_url = NULL; $pkcs11_type = PKCS11_TYPE_PK; $pubkey=NULL; $pkcs11_label = NULL; 
-	$pkcs11_trusted=0; $pkcs11_login = 0; $pkcs11_detailed_url = GNUTLS_PKCS11_URL_LIB; 
-	$secret_key = NULL; $cert = NULL; $incert_format = GNUTLS_X509_FMT_PEM; $pkcs11_private = -1; }
+	$pkcs11_trusted=0; $pkcs11_login = 0; $pkcs11_detailed_url = 0; 
+	$secret_key = NULL; $cert = NULL; $incert_format = GNUTLS_X509_FMT_PEM; $pkcs11_private = -1; 
+	$key_type = 0; $bits = 0; $sec_param = NULL; }

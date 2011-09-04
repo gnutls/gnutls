@@ -169,8 +169,7 @@ _gnutls_pkcs11_privkey_sign_hash (gnutls_pkcs11_privkey_t key,
 
   FIND_OBJECT (module, pks, obj, key);
 
-  mech.mechanism =
-    key->pk_algorithm == GNUTLS_PK_DSA ? CKM_DSA : CKM_RSA_PKCS;
+  mech.mechanism = pk_to_mech(key->pk_algorithm);
   mech.parameter = NULL;
   mech.parameter_len = 0;
 
@@ -324,8 +323,10 @@ _gnutls_pkcs11_privkey_decrypt_data (gnutls_pkcs11_privkey_t key,
 
   FIND_OBJECT (module, pks, obj, key);
 
-  mech.mechanism =
-    key->pk_algorithm == GNUTLS_PK_DSA ? CKM_DSA : CKM_RSA_PKCS;
+  if (key->pk_algorithm != GNUTLS_PK_RSA)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  mech.mechanism = CKM_RSA_PKCS;
   mech.parameter = NULL;
   mech.parameter_len = 0;
 
@@ -398,4 +399,198 @@ gnutls_pkcs11_privkey_export_url (gnutls_pkcs11_privkey_t key,
     }
 
   return 0;
+}
+
+
+/**
+ * gnutls_pkcs11_privkey_generate:
+ * @url: a token URL
+ * @pk: the public key algorithm
+ * @bits: the security bits
+ * @label: a label
+ * @flags: should be zero
+ *
+ * This function will generate a private key in the specified
+ * by the @url token. The pivate key will be generate within
+ * the token and will not be exportable.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_pkcs11_privkey_generate (const char* url, 
+  gnutls_pk_algorithm_t pk, unsigned int bits, 
+  const char* label, unsigned int flags)
+{
+  int ret;
+  const ck_bool_t tval = 1;
+  const ck_bool_t fval = 0;
+  struct ck_function_list *module;
+  ck_session_handle_t pks = 0;
+  struct p11_kit_uri *info = NULL;
+  ck_rv_t rv;
+  size_t id_size;
+  opaque id[20];
+  struct ck_attribute a[10], p[10];
+  ck_object_handle_t pub, priv;
+  unsigned long _bits = bits;
+  int a_val, p_val;
+  struct ck_mechanism mech;
+
+  ret = pkcs11_url_to_info (url, &info);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  ret =
+    pkcs11_open_session (&module, &pks, info,
+                         SESSION_WRITE | pkcs11_obj_flags_to_int (flags));
+  p11_kit_uri_free (info);
+
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  /* a holds the public key template
+   * and p the private key */
+  a_val = p_val = 0;
+  mech.parameter = NULL;
+  mech.parameter_len = 0;
+  mech.mechanism = pk_to_genmech(pk);
+
+  switch(pk)
+    {
+      case GNUTLS_PK_RSA:
+        p[p_val].type = CKA_DECRYPT;
+        p[p_val].value = (void*)&tval;
+        p[p_val].value_len = sizeof (tval);
+        p_val++;
+
+        p[p_val].type = CKA_SIGN;
+        p[p_val].value = (void*)&tval;
+        p[p_val].value_len = sizeof (tval);
+        p_val++;
+
+        a[a_val].type = CKA_ENCRYPT;
+        a[a_val].value = (void*)&tval;
+        a[a_val].value_len = sizeof (tval);
+        a_val++;
+
+        a[a_val].type = CKA_VERIFY;
+        a[a_val].value = (void*)&tval;
+        a[a_val].value_len = sizeof (tval);
+        a_val++;
+
+        a[a_val].type = CKA_MODULUS_BITS;
+        a[a_val].value = &_bits;
+        a[a_val].value_len = sizeof (_bits);
+        a_val++;
+        break;
+      case GNUTLS_PK_DSA:
+        p[p_val].type = CKA_SIGN;
+        p[p_val].value = (void*)&tval;
+        p[p_val].value_len = sizeof (tval);
+        p_val++;
+
+        a[a_val].type = CKA_VERIFY;
+        a[a_val].value = (void*)&tval;
+        a[a_val].value_len = sizeof (tval);
+        a_val++;
+
+        a[a_val].type = CKA_MODULUS_BITS;
+        a[a_val].value = &_bits;
+        a[a_val].value_len = sizeof (_bits);
+        a_val++;
+        break;
+      case GNUTLS_PK_ECC:
+        p[p_val].type = CKA_SIGN;
+        p[p_val].value = (void*)&tval;
+        p[p_val].value_len = sizeof (tval);
+        p_val++;
+
+        a[a_val].type = CKA_VERIFY;
+        a[a_val].value = (void*)&tval;
+        a[a_val].value_len = sizeof (tval);
+        a_val++;
+
+        a[a_val].type = CKA_MODULUS_BITS;
+        a[a_val].value = &_bits;
+        a[a_val].value_len = sizeof (_bits);
+        a_val++;
+        break;
+      default:
+        ret = gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+        goto cleanup;
+    }
+
+  /* a private key is set always as private unless
+   * requested otherwise
+   */
+  if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE)
+    {
+      p[p_val].type = CKA_PRIVATE;
+      p[p_val].value = (void*)&fval;
+      p[p_val].value_len = sizeof(fval);
+      p_val++;
+    }
+  else
+    {
+      p[p_val].type = CKA_PRIVATE;
+      p[p_val].value = (void*)&tval;
+      p[p_val].value_len = sizeof (tval);
+      p_val++;
+    }
+
+  p[p_val].type = CKA_TOKEN;
+  p[p_val].value = (void *)&tval;
+  p[p_val].value_len = sizeof (tval);
+  p_val++;
+
+  if (label)
+    {
+      p[p_val].type = CKA_LABEL;
+      p[p_val].value = (void*)label;
+      p[p_val].value_len = strlen (label);
+      p_val++;
+
+      a[a_val].type = CKA_LABEL;
+      a[a_val].value = (void*)label;
+      a[a_val].value_len = strlen (label);
+      a_val++;
+    }
+
+  if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE)
+    {
+      p[p_val].type = CKA_SENSITIVE;
+      p[p_val].value = (void*)&tval;
+      p[p_val].value_len = sizeof (tval);
+      p_val++;
+    }
+  else
+    {
+      p[p_val].type = CKA_SENSITIVE;
+      p[p_val].value = (void*)&fval;
+      p[p_val].value_len = sizeof (fval);
+      p_val++;
+    }
+
+  rv = pkcs11_generate_key_pair( module, pks, &mech, a, a_val, p, p_val, &pub, &priv);
+  if (rv != CKR_OK)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("pkcs11: %s\n", pkcs11_strerror (rv));
+      ret = pkcs11_rv_to_err (rv);
+      goto cleanup;
+    }
+    
+
+cleanup:
+  if (pks != 0)
+    pkcs11_close_session (module, pks);
+
+  return ret;
 }

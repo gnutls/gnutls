@@ -546,6 +546,39 @@ pkcs11_write (FILE * outfile, const char *url, const char *label,
 }
 
 void
+pkcs11_generate (FILE * outfile, const char *url, gnutls_pk_algorithm_t pk,
+              unsigned int bits,
+              const char *label, int private, int detailed,
+              unsigned int login, common_info_st * info)
+{
+  int ret;
+  unsigned int flags = 0;
+
+  if (login)
+    flags = GNUTLS_PKCS11_OBJ_FLAG_LOGIN;
+
+  pkcs11_common ();
+
+  if (url == NULL)
+    url = "pkcs11:";
+
+  if (private == 1)
+    flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE;
+  else if (private == 0)
+    flags |= GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE;
+
+  ret = gnutls_pkcs11_privkey_generate(url, pk, bits, label, flags);
+  if (ret < 0)
+    {
+      fprintf (stderr, "Error in %s:%d: %s\n", __func__, __LINE__,
+               gnutls_strerror (ret));
+      exit(1);
+    }
+
+  return;
+}
+
+void
 pkcs11_init (FILE * outfile, const char *url, const char *label,
              common_info_st * info)
 {

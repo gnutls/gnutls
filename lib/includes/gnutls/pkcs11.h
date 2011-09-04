@@ -338,4 +338,9 @@ int gnutls_pkcs11_privkey_export_url (gnutls_pkcs11_privkey_t key,
                                       gnutls_pkcs11_url_type_t detailed,
                                       char **url);
 
+int
+gnutls_pkcs11_privkey_generate (const char* url, 
+  gnutls_pk_algorithm_t pk, unsigned int bits, 
+  const char* label, unsigned int flags);
+
 #endif

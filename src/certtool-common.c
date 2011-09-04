@@ -607,3 +607,61 @@ int ret;
   return pubkey;
 }
 
+int
+get_bits (gnutls_pk_algorithm_t key_type, int info_bits, const char* info_sec_param)
+{
+  int bits;
+
+  if (info_bits != 0)
+    {
+      static int warned = 0;
+
+      if (warned == 0)
+        {
+          warned = 1;
+          fprintf (stderr,
+                   "** Note: Please use the --sec-param instead of --bits\n");
+        }
+      bits = info_bits;
+    }
+  else
+    {
+      if (info_sec_param)
+        {
+          bits =
+            gnutls_sec_param_to_pk_bits (key_type,
+                                         str_to_sec_param (info_sec_param));
+        }
+      else
+        bits =
+          gnutls_sec_param_to_pk_bits (key_type, GNUTLS_SEC_PARAM_NORMAL);
+    }
+
+  return bits;
+}
+
+gnutls_sec_param_t str_to_sec_param (const char *str)
+{
+  if (strcasecmp (str, "low") == 0)
+    {
+      return GNUTLS_SEC_PARAM_LOW;
+    }
+  else if (strcasecmp (str, "normal") == 0)
+    {
+      return GNUTLS_SEC_PARAM_NORMAL;
+    }
+  else if (strcasecmp (str, "high") == 0)
+    {
+      return GNUTLS_SEC_PARAM_HIGH;
+    }
+  else if (strcasecmp (str, "ultra") == 0)
+    {
+      return GNUTLS_SEC_PARAM_ULTRA;
+    }
+  else
+    {
+      fprintf (stderr, "Unknown security parameter string: %s\n", str);
+      exit (1);
+    }
+
+}

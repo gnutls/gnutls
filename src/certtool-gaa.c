@@ -1289,7 +1289,8 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
 	gaaval->debug=1; gaaval->request = NULL; gaaval->infile = NULL; gaaval->outfile = NULL; gaaval->cert = NULL; 
 	gaaval->incert_format = 0; gaaval->outcert_format = 0; gaaval->action=-1; gaaval->pass = NULL; gaaval->v1_cert = 0;
 	gaaval->export = 0; gaaval->template = NULL; gaaval->hash=NULL; gaaval->fix_key = 0; gaaval->quick_random=1; 
-	gaaval->privkey_op = 0; gaaval->pkcs_cipher = "aes-128"; gaaval->crq_extensions=1; gaaval->ecc=0; ;};
+	gaaval->privkey_op = 0; gaaval->pkcs_cipher = "aes-128"; gaaval->crq_extensions=1; gaaval->ecc=0; 
+	gaaval->sec_param = NULL; ;};
 
     }
     inited = 1;
@@ -1437,7 +1438,7 @@ static int gaa_internal_get_next_str(FILE *file, gaa_str_node *tmp_str, int argc
 
         len++;
         a = fgetc( file);
-        if(a==EOF) return 0; //a = ' ';
+        if(a==EOF) return 0;
     }
 
     len += 1;
