@@ -130,6 +130,11 @@ if test "$with_p11_kit" != "no"; then
 		AC_DEFINE([ENABLE_PKCS11], 1, [Build PKCS#11 support])
 		CFLAGS="$CFLAGS $P11_KIT_CFLAGS"
 		LIBS="$LIBS $P11_KIT_LIBS"
+		if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
+			GNUTLS_REQUIRES_PRIVATE="Requires.private: p11-kit-1"
+		else
+		  	GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, p11-kit-1"
+		fi
 	else
 	        AC_MSG_WARN([[
 *** 
