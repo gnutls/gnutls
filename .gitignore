@@ -508,3 +508,5 @@ src/crywrap/crywrap
 gl/dirent.h
 gl/getopt.h
 gl/math.h
+doc/doxygen/latex/
+doc/doxygen/html/
