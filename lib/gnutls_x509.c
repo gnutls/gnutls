@@ -1378,6 +1378,9 @@ gnutls_certificate_set_x509_trust_mem (gnutls_certificate_credentials_t res,
     ret = parse_pem_ca_mem (res,
                             ca->data, ca->size);
 
+  if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
+    return 0;
+
   return ret;
 }
 
