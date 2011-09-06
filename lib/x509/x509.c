@@ -3183,7 +3183,9 @@ gnutls_x509_crt_list_import (gnutls_x509_crt_t * certs,
   if (ptr == NULL)
     {
       gnutls_assert ();
-      return GNUTLS_E_BASE64_DECODING_ERROR;
+      *cert_max = 0;
+      /* no certificate found, likely empty file or garbage input */
+      return 0;
     }
 
   count = 0;

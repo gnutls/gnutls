@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, 2010 Free Software Foundation, Inc.
+ * Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
  *
  * Author: Simon Josefsson
  *
@@ -70,6 +70,13 @@ doit (void)
 
   rc = gnutls_certificate_set_x509_trust_mem (cred, &ca, GNUTLS_X509_FMT_PEM);
   if (rc != 2)
+    fail ("import ca failed: %d\n", rc);
+
+  ca.data = (unsigned char*) "";
+  ca.size = 0;
+
+  rc = gnutls_certificate_set_x509_trust_mem (cred, &ca, GNUTLS_X509_FMT_PEM);
+  if (rc != 0)
     fail ("import ca failed: %d\n", rc);
 
   gnutls_certificate_free_credentials (cred);
