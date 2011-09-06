@@ -1480,8 +1480,8 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t cred,
                                         gnutls_x509_crt_fmt_t type)
 {
   int ret;
+  gnutls_datum_t cas;
   size_t size;
-  char *data;
 
 #ifdef ENABLE_PKCS11
   if (strncmp (cafile, "pkcs11:", 7) == 0)
@@ -1490,19 +1490,18 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t cred,
     }
 #endif
 
-  data = read_binary_file (cafile, &size);
-  if (data == NULL)
+  cas.data = read_binary_file (cafile, &size);
+  if (cas.data == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_FILE_ERROR;
     }
 
-  if (type == GNUTLS_X509_FMT_DER)
-    ret = parse_der_ca_mem (cred, data, size);
-  else
-    ret = parse_pem_ca_mem (cred, data, size);
+  cas.size = size;
 
-  free (data);
+  ret = gnutls_certificate_set_x509_trust_mem(cred, &cas, type);
+
+  free (cas.data);
 
   if (ret < 0)
     {
