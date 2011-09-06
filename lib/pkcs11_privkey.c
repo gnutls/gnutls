@@ -271,15 +271,9 @@ gnutls_pkcs11_privkey_import_url (gnutls_pkcs11_privkey_t pkey,
 
   if (pkcs11_get_attribute_value (module, pks, obj, a, 1) == CKR_OK)
     {
-      switch (key_type)
+      pkey->pk_algorithm = mech_to_pk(key_type);
+      if (pkey->pk_algorithm == GNUTLS_PK_UNKNOWN)
         {
-        case CKK_RSA:
-          pkey->pk_algorithm = GNUTLS_PK_RSA;
-          break;
-        case CKK_DSA:
-          pkey->pk_algorithm = GNUTLS_PK_DSA;
-          break;
-        default:
           _gnutls_debug_log("Cannot determine PKCS #11 key algorithm\n");
           ret = GNUTLS_E_UNKNOWN_ALGORITHM;
           goto cleanup;

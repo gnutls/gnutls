@@ -40,9 +40,6 @@ static int _gnutls_x509_read_ecc_pubkey (opaque * der, int dersize,
 static int
 _gnutls_x509_read_dsa_params (opaque * der, int dersize, gnutls_pk_params_st * params);
 
-static int
-_gnutls_x509_read_ecc_params (opaque * der, int dersize, gnutls_pk_params_st * params);
-
 /*
  * some x509 certificate parsing functions that relate to MPI parameter
  * extraction. This reads the BIT STRING subjectPublicKey.
@@ -180,7 +177,7 @@ _gnutls_x509_read_dsa_params (opaque * der, int dersize, gnutls_pk_params_st * p
 /* reads the curve from the certificate.
  * params[0-4]. It does NOT set params_nr.
  */
-static int
+int
 _gnutls_x509_read_ecc_params (opaque * der, int dersize, gnutls_pk_params_st * params)
 {
   int ret;

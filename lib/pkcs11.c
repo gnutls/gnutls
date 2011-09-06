@@ -1109,30 +1109,15 @@ pkcs11_obj_import (ck_object_class_t class, gnutls_pkcs11_obj_t obj,
   return 0;
 }
 
-static int
-pkcs11_obj_import_pubkey (struct ck_function_list *module,
-                          ck_session_handle_t pks,
-                          ck_object_handle_t obj,
-                          gnutls_pkcs11_obj_t crt,
-                          const gnutls_datum_t * id,
-                          const gnutls_datum_t * label,
-                          struct ck_token_info *tinfo,
-                          struct ck_info *lib_info)
+static int read_pkcs11_pubkey(struct ck_function_list *module,
+                              ck_session_handle_t pks, ck_object_handle_t obj,
+                              ck_key_type_t key_type, gnutls_datum_t * pubkey)
 {
-
   struct ck_attribute a[4];
-  ck_key_type_t key_type;
   opaque tmp1[2048];
   opaque tmp2[2048];
   int ret;
-  ck_bool_t tval;
 
-  a[0].type = CKA_KEY_TYPE;
-  a[0].value = &key_type;
-  a[0].value_len = sizeof (key_type);
-
-  if (pkcs11_get_attribute_value (module, pks, obj, a, 1) == CKR_OK)
-    {
       switch (key_type)
         {
         case CKK_RSA:
@@ -1147,19 +1132,19 @@ pkcs11_obj_import_pubkey (struct ck_function_list *module,
             {
 
               ret =
-                _gnutls_set_datum (&crt->pubkey[0],
+                _gnutls_set_datum (&pubkey[0],
                                    a[0].value, a[0].value_len);
 
               if (ret >= 0)
                 ret =
-                  _gnutls_set_datum (&crt->pubkey
+                  _gnutls_set_datum (&pubkey
                                      [1], a[1].value, a[1].value_len);
 
               if (ret < 0)
                 {
                   gnutls_assert ();
-                  _gnutls_free_datum (&crt->pubkey[1]);
-                  _gnutls_free_datum (&crt->pubkey[0]);
+                  _gnutls_free_datum (&pubkey[1]);
+                  _gnutls_free_datum (&pubkey[0]);
                   return GNUTLS_E_MEMORY_ERROR;
                 }
             }
@@ -1168,7 +1153,6 @@ pkcs11_obj_import_pubkey (struct ck_function_list *module,
               gnutls_assert ();
               return GNUTLS_E_PKCS11_ERROR;
             }
-          crt->pk_algorithm = GNUTLS_PK_RSA;
           break;
         case CKK_DSA:
           a[0].type = CKA_PRIME;
@@ -1181,19 +1165,19 @@ pkcs11_obj_import_pubkey (struct ck_function_list *module,
           if (pkcs11_get_attribute_value (module, pks, obj, a, 2) == CKR_OK)
             {
               ret =
-                _gnutls_set_datum (&crt->pubkey[0],
+                _gnutls_set_datum (&pubkey[0],
                                    a[0].value, a[0].value_len);
 
               if (ret >= 0)
                 ret =
-                  _gnutls_set_datum (&crt->pubkey
+                  _gnutls_set_datum (&pubkey
                                      [1], a[1].value, a[1].value_len);
 
               if (ret < 0)
                 {
                   gnutls_assert ();
-                  _gnutls_free_datum (&crt->pubkey[1]);
-                  _gnutls_free_datum (&crt->pubkey[0]);
+                  _gnutls_free_datum (&pubkey[1]);
+                  _gnutls_free_datum (&pubkey[0]);
                   return GNUTLS_E_MEMORY_ERROR;
                 }
             }
@@ -1213,21 +1197,21 @@ pkcs11_obj_import_pubkey (struct ck_function_list *module,
           if (pkcs11_get_attribute_value (module, pks, obj, a, 2) == CKR_OK)
             {
               ret =
-                _gnutls_set_datum (&crt->pubkey[2],
+                _gnutls_set_datum (&pubkey[2],
                                    a[0].value, a[0].value_len);
 
               if (ret >= 0)
                 ret =
-                  _gnutls_set_datum (&crt->pubkey
+                  _gnutls_set_datum (&pubkey
                                      [3], a[1].value, a[1].value_len);
 
               if (ret < 0)
                 {
                   gnutls_assert ();
-                  _gnutls_free_datum (&crt->pubkey[0]);
-                  _gnutls_free_datum (&crt->pubkey[1]);
-                  _gnutls_free_datum (&crt->pubkey[2]);
-                  _gnutls_free_datum (&crt->pubkey[3]);
+                  _gnutls_free_datum (&pubkey[0]);
+                  _gnutls_free_datum (&pubkey[1]);
+                  _gnutls_free_datum (&pubkey[2]);
+                  _gnutls_free_datum (&pubkey[3]);
                   return GNUTLS_E_MEMORY_ERROR;
                 }
             }
@@ -1236,12 +1220,74 @@ pkcs11_obj_import_pubkey (struct ck_function_list *module,
               gnutls_assert ();
               return GNUTLS_E_PKCS11_ERROR;
             }
-          crt->pk_algorithm = GNUTLS_PK_RSA;
+          break;
+        case CKK_ECDSA:
+          a[0].type = CKA_EC_PARAMS;
+          a[0].value = tmp1;
+          a[0].value_len = sizeof (tmp1);
+          a[1].type = CKA_EC_POINT;
+          a[1].value = tmp2;
+          a[1].value_len = sizeof (tmp2);
+
+          if (pkcs11_get_attribute_value (module, pks, obj, a, 2) == CKR_OK)
+            {
+              ret =
+                _gnutls_set_datum (&pubkey[0],
+                                   a[0].value, a[0].value_len);
+
+              if (ret >= 0)
+                ret =
+                  _gnutls_set_datum (&pubkey
+                                     [1], a[1].value, a[1].value_len);
+
+              if (ret < 0)
+                {
+                  gnutls_assert ();
+                  _gnutls_free_datum (&pubkey[1]);
+                  _gnutls_free_datum (&pubkey[0]);
+                  return GNUTLS_E_MEMORY_ERROR;
+                }
+            }
+          else
+            {
+              gnutls_assert ();
+              return GNUTLS_E_PKCS11_ERROR;
+            }
+
           break;
         default:
-          gnutls_assert ();
-          return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+          return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
         }
+
+  return 0;
+}
+
+static int
+pkcs11_obj_import_pubkey (struct ck_function_list *module,
+                          ck_session_handle_t pks,
+                          ck_object_handle_t obj,
+                          gnutls_pkcs11_obj_t crt,
+                          const gnutls_datum_t * id,
+                          const gnutls_datum_t * label,
+                          struct ck_token_info *tinfo,
+                          struct ck_info *lib_info)
+{
+  struct ck_attribute a[4];
+  ck_key_type_t key_type;
+  int ret;
+  ck_bool_t tval;
+
+  a[0].type = CKA_KEY_TYPE;
+  a[0].value = &key_type;
+  a[0].value_len = sizeof (key_type);
+
+  if (pkcs11_get_attribute_value (module, pks, obj, a, 1) == CKR_OK)
+    {
+      crt->pk_algorithm = mech_to_pk(key_type);
+
+      ret = read_pkcs11_pubkey(module, pks, obj, key_type, crt->pubkey);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
 
   /* read key usage flags */

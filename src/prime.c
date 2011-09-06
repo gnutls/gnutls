@@ -37,22 +37,28 @@
 extern FILE *outfile;
 extern FILE *infile;
 
-static int cparams = 0;
+const static int cparams = 0;
 
 /* If how is zero then the included parameters are used.
  */
 int
-generate_prime (int how)
+generate_prime (int how, common_info_st * info)
 {
   unsigned int i;
   int ret;
   gnutls_dh_params_t dh_params;
   gnutls_datum_t p, g;
-  int bits = get_bits (GNUTLS_PK_DH);
+  int bits = get_bits (GNUTLS_PK_DH, info->bits, info->sec_param);
 
   gnutls_dh_params_init (&dh_params);
 
-  fprintf (stderr, "Generating DH parameters...");
+  if (how != 0)
+    {
+      fprintf (stderr, "Generating DH parameters (%d bits)...\n", bits);
+      fprintf (stderr, "(might take long time)\n");
+    }
+  else
+    fprintf (stderr, "Retrieving DH parameters...\n", bits);
 
   if (how != 0)
     {
@@ -79,16 +85,19 @@ generate_prime (int how)
         {
           p = gnutls_srp_1024_group_prime;
           g = gnutls_srp_1024_group_generator;
+          bits = 1024;
         }
       else if (bits <= 1536)
         {
           p = gnutls_srp_1536_group_prime;
           g = gnutls_srp_1536_group_generator;
+          bits = 1536;
         }
       else
         {
           p = gnutls_srp_2048_group_prime;
           g = gnutls_srp_2048_group_generator;
+          bits = 2048;
         }
 
       ret = gnutls_dh_params_import_raw (dh_params, &p, &g);
@@ -99,7 +108,8 @@ generate_prime (int how)
           exit (1);
         }
 #else
-      fprintf (stderr, "Parameters unavailable as SRP disabled.\n");
+      fprintf (stderr, "Parameters unavailable as SRP is disabled.\n");
+      exit(1);
 #endif
     }
 
@@ -157,11 +167,11 @@ generate_prime (int how)
     }
   else
     {
-      fprintf (outfile, "Prime: ");
+      fprintf (outfile, "Prime (%d bits):", bits);
 
       for (i = 0; i < p.size; i++)
         {
-          if (i != 0 && i % 12 == 0)
+          if (i % 12 == 0)
             fprintf (outfile, "\n\t");
           else if (i != 0 && i != p.size)
             fprintf (outfile, ":");

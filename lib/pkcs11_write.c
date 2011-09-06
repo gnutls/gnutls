@@ -243,6 +243,17 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
   gnutls_datum_t p, q, g, y, x;
   gnutls_datum_t m, e, d, u, exp1, exp2;
 
+  memset(&p, 0, sizeof(p));
+  memset(&q, 0, sizeof(q));
+  memset(&g, 0, sizeof(g));
+  memset(&y, 0, sizeof(y));
+  memset(&x, 0, sizeof(x));
+  memset(&m, 0, sizeof(m));
+  memset(&e, 0, sizeof(e));
+  memset(&d, 0, sizeof(d));
+  memset(&u, 0, sizeof(u));
+  memset(&exp1, 0, sizeof(exp1));
+  memset(&exp2, 0, sizeof(exp2));
 
   ret = pkcs11_url_to_info (token_url, &info);
   if (ret < 0)
@@ -427,6 +438,36 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
 
         break;
       }
+    case GNUTLS_PK_ECC:
+      {
+        ret = _gnutls_x509_write_ecc_params(&key->params, &p);
+        if (ret < 0)
+          {
+            gnutls_assert ();
+            goto cleanup;
+          }
+
+        ret = _gnutls_mpi_dprint_lz(&key->params.params[7], &x);
+        if (ret < 0)
+          {
+            gnutls_assert ();
+            goto cleanup;
+          }
+
+        type = CKK_ECDSA;
+
+        a[a_val].type = CKA_EC_PARAMS;
+        a[a_val].value = p.data;
+        a[a_val].value_len = p.size;
+        a_val++;
+
+        a[a_val].type = CKA_VALUE;
+        a[a_val].value = x.data;
+        a[a_val].value_len = x.size;
+        a_val++;
+
+        break;
+      }
     default:
       gnutls_assert ();
       ret = GNUTLS_E_INVALID_REQUEST;
@@ -442,9 +483,9 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
       goto cleanup;
     }
 
-  /* generated! 
-   */
+  ret = 0;
 
+cleanup:
   switch (pk)
     {
     case GNUTLS_PK_RSA:
@@ -468,15 +509,18 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
         gnutls_free (x.data);
         break;
       }
+    case GNUTLS_PK_ECC:
+      {
+        gnutls_free (p.data);
+        gnutls_free (x.data);
+        break;
+      }
     default:
       gnutls_assert ();
       ret = GNUTLS_E_INVALID_REQUEST;
       goto cleanup;
     }
 
-  ret = 0;
-
-cleanup:
   if (pks != 0)
     pkcs11_close_session (module, pks);
 

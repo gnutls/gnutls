@@ -8,6 +8,9 @@ See the end for copying conditions.
 Reported by Jonathan Nieder <jrnieder@gmail.com> in
 <http://bugs.debian.org/640639>.
 
+** libgnutls: Added support for elliptic curves in
+PKCS #11.
+
 ** libgnutls: Added gnutls_pkcs11_privkey_generate()
 to allow generating a key in a token.
 
@@ -16,6 +19,9 @@ generate-ecc options.
 
 ** API and ABI modifications:
 gnutls_pkcs11_privkey_generate: Added
+gnutls_pubkey_import_ecc_raw: Added
+gnutls_pubkey_import_ecc_x962: Added
+gnutls_pubkey_get_pk_ecc_x962: Added
 
 
 * Version 3.0.2 (released 2011-09-01)

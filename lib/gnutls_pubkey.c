@@ -34,6 +34,7 @@
 #include <x509/common.h>
 #include <x509_b64.h>
 #include <abstract_int.h>
+#include <gnutls_ecc.h>
 
 #define PK_PEM_HEADER "PUBLIC KEY"
 
@@ -298,6 +299,10 @@ gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t key,
       ret = gnutls_pubkey_import_dsa_raw (key, &obj->pubkey[0],
                                           &obj->pubkey[1],
                                           &obj->pubkey[2], &obj->pubkey[3]);
+      break;
+    case GNUTLS_PK_ECC:
+      ret = gnutls_pubkey_import_ecc_x962 (key, &obj->pubkey[0],
+                                          &obj->pubkey[1]);
       break;
     default:
       gnutls_assert ();
@@ -753,6 +758,42 @@ gnutls_pubkey_get_pk_ecc_raw (gnutls_pubkey_t key, gnutls_ecc_curve_t *curve,
 }
 
 /**
+ * gnutls_pubkey_get_pk_ecc_x962:
+ * @key: Holds the public key
+ * @parameters: DER encoding of an ANSI X9.62 parameters
+ * @ecpoint: DER encoding of ANSI X9.62 ECPoint
+ *
+ * This function will export the ECC public key's parameters found in
+ * the given certificate.  The new parameters will be allocated using
+ * gnutls_malloc() and will be stored in the appropriate datum.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
+ *
+ * Since: 3.0.0
+ **/
+int gnutls_pubkey_get_pk_ecc_x962 (gnutls_pubkey_t key, gnutls_datum_t* parameters,
+                                   gnutls_datum_t * ecpoint)
+{
+  int ret;
+
+  if (key == NULL || key->pk_algorithm != GNUTLS_PK_ECC)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  ret = _gnutls_x509_write_ecc_pubkey(&key->params, ecpoint);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+    
+  ret = _gnutls_x509_write_ecc_params(&key->params, parameters);
+  if (ret < 0)
+    {
+      _gnutls_free_datum(ecpoint);
+      return gnutls_assert_val(ret);
+    }
+  
+  return 0;
+}
+
+/**
  * gnutls_pubkey_import:
  * @key: The structure to store the parsed public key. 
  * @data: The DER or PEM encoded certificate. 
@@ -1057,6 +1098,119 @@ gnutls_pubkey_import_rsa_raw (gnutls_pubkey_t key,
   key->bits = pubkey_to_bits(GNUTLS_PK_RSA, &key->params);
 
   return 0;
+}
+
+/**
+ * gnutls_pubkey_import_ecc_raw:
+ * @key: The structure to store the parsed key
+ * @curve: holds the curve
+ * @x: holds the x
+ * @y: holds the y
+ *
+ * This function will convert the given elliptic curve parameters to a
+ * #gnutls_pubkey_t.  The output will be stored in @key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.0.0
+ **/
+int
+gnutls_pubkey_import_ecc_raw (gnutls_pubkey_t key,
+                              gnutls_ecc_curve_t curve,
+                              const gnutls_datum_t * x,
+                              const gnutls_datum_t * y)
+{
+  int ret;
+
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  key->params.flags = curve;
+
+  ret = _gnutls_ecc_curve_fill_params(curve, &key->params);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  if (_gnutls_mpi_scan_nz (&key->params.params[5], x->data, x->size))
+    {
+      gnutls_assert ();
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
+    }
+  key->params.params_nr++;
+
+  if (_gnutls_mpi_scan_nz (&key->params.params[6], y->data, y->size))
+    {
+      gnutls_assert ();
+      ret = GNUTLS_E_MPI_SCAN_FAILED;
+      goto cleanup;
+    }
+  key->params.params_nr++;
+  key->pk_algorithm = GNUTLS_PK_ECC;
+
+  return 0;
+
+cleanup:
+  gnutls_pk_params_release(&key->params);
+  return ret;
+}
+
+/**
+ * gnutls_pubkey_import_ecc_x962:
+ * @key: The structure to store the parsed key
+ * @parameters: DER encoding of an ANSI X9.62 parameters
+ * @ecpoint: DER encoding of ANSI X9.62 ECPoint
+ *
+ * This function will convert the given elliptic curve parameters to a
+ * #gnutls_pubkey_t.  The output will be stored in @key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.0.0
+ **/
+int
+gnutls_pubkey_import_ecc_x962 (gnutls_pubkey_t key,
+                               const gnutls_datum_t * parameters,
+                               const gnutls_datum_t * ecpoint)
+{
+  int ret;
+
+  if (key == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  key->params.params_nr = 0;
+
+  ret = _gnutls_x509_read_ecc_params(parameters->data, parameters->size,
+                                     &key->params);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  ret = _gnutls_ecc_ansi_x963_import(ecpoint->data, ecpoint->size,
+         &key->params.params[5], &key->params.params[6]);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+  key->params.params_nr+=2;
+  key->pk_algorithm = GNUTLS_PK_ECC;
+
+  return 0;
+
+cleanup:
+  gnutls_pk_params_release(&key->params);
+  return ret;
 }
 
 /**

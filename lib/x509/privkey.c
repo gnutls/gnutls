@@ -830,7 +830,7 @@ cleanup:
  * @y: holds the y
  * @k: holds the k
  *
- * This function will convert the given DSA raw parameters to the
+ * This function will convert the given elliptic curve parameters to the
  * native #gnutls_x509_privkey_t format.  The output will be stored
  * in @key.
  *

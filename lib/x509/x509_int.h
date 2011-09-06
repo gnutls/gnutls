@@ -189,6 +189,10 @@ ASN1_TYPE _gnutls_privkey_decode_pkcs1_rsa_key (const gnutls_datum_t *
 ASN1_TYPE _gnutls_privkey_decode_ecc_key (const gnutls_datum_t *
                                                 raw_key,
                                                 gnutls_x509_privkey_t pkey);
+
+int
+_gnutls_x509_read_ecc_params (opaque * der, int dersize, gnutls_pk_params_st * params);
+
 int _gnutls_asn1_encode_privkey (gnutls_pk_algorithm_t pk, ASN1_TYPE * c2, gnutls_pk_params_st * params);
 
 /* extensions.c */
@@ -274,6 +278,11 @@ int _gnutls_x509_read_pubkey_params (gnutls_pk_algorithm_t, opaque * der, int de
 
 int _gnutls_x509_read_pubkey (gnutls_pk_algorithm_t, opaque * der, int dersize,
                                   gnutls_pk_params_st * params);
+
+int _gnutls_x509_write_ecc_params (gnutls_pk_params_st * params,
+                                   gnutls_datum_t * der);
+int _gnutls_x509_write_ecc_pubkey (gnutls_pk_params_st * params,
+                                       gnutls_datum_t * der);
 
 int
 _gnutls_x509_write_pubkey_params (gnutls_pk_algorithm_t algo,

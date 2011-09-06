@@ -1048,6 +1048,8 @@ gaa_parser (int argc, char **argv)
   cinfo.request = info.request;
   cinfo.ca = info.ca;
   cinfo.ca_privkey = info.ca_privkey;
+  cinfo.bits = info.bits;
+  cinfo.sec_param = info.sec_param;
 
   switch (info.action)
     {
@@ -1091,10 +1093,10 @@ gaa_parser (int argc, char **argv)
       pkcs12_info ();
       break;
     case ACTION_GENERATE_DH:
-      generate_prime (1);
+      generate_prime (1, &cinfo);
       break;
     case ACTION_GET_DH:
-      generate_prime (0);
+      generate_prime (0, &cinfo);
       break;
     case ACTION_CRL_INFO:
       crl_info ();

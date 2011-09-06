@@ -54,6 +54,8 @@ typedef struct common_info
   const char *request;
   const char *ca;
   const char *ca_privkey;
+  int bits;
+  const char* sec_param;
 } common_info_st;
 
 gnutls_pubkey_t load_public_key_or_import(int mand, gnutls_privkey_t privkey, common_info_st * info);
@@ -71,7 +73,7 @@ int get_bits (gnutls_pk_algorithm_t key_type, int info_bits, const char* info_se
 gnutls_sec_param_t str_to_sec_param (const char *str);
 
 /* prime.c */
-int generate_prime (int how);
+int generate_prime (int how, common_info_st * info);
 
 FILE *safe_open_rw (const char *file, int privkey_op);
 

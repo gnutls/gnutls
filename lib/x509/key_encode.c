@@ -39,12 +39,6 @@ static int _gnutls_x509_write_dsa_params (gnutls_pk_params_st * params,
 static int _gnutls_x509_write_dsa_pubkey (gnutls_pk_params_st * params,
                                        gnutls_datum_t * der);
 
-static int _gnutls_x509_write_ecc_params (gnutls_pk_params_st * params,
-                                   gnutls_datum_t * der);
-static int _gnutls_x509_write_ecc_pubkey (gnutls_pk_params_st * params,
-                                       gnutls_datum_t * der);
-
-
 /*
  * some x509 certificate functions that relate to MPI parameter
  * setting. This writes the BIT STRING subjectPublicKey.
@@ -112,33 +106,23 @@ cleanup:
  *
  * Allocates the space used to store the DER data.
  */
-static int
+int
 _gnutls_x509_write_ecc_pubkey (gnutls_pk_params_st * params,
                                gnutls_datum_t * der)
 {
   int result;
-  ASN1_TYPE spk = ASN1_TYPE_EMPTY;
 
   der->data = NULL;
   der->size = 0;
 
   if (params->params_nr < ECC_PUBLIC_PARAMS)
-    {
-      gnutls_assert ();
-      result = GNUTLS_E_INVALID_REQUEST;
-      goto cleanup;
-    }
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
   result = _gnutls_ecc_ansi_x963_export(params->flags, params->params[5], params->params[6], /*&out*/der);
   if (result < 0)
     return gnutls_assert_val(result);
 
-  result = 0;
-
-cleanup:
-  asn1_delete_structure (&spk);
-
-  return result;
+  return 0;
 }
 
 int
@@ -255,7 +239,7 @@ cleanup:
  *
  * Allocates the space used to store the DER data.
  */
-static int
+int
 _gnutls_x509_write_ecc_params (gnutls_pk_params_st* params,
                                gnutls_datum_t * der)
 {
