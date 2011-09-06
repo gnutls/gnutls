@@ -3181,12 +3181,7 @@ gnutls_x509_crt_list_import (gnutls_x509_crt_t * certs,
                   PEM_CERT_SEP2, sizeof (PEM_CERT_SEP2) - 1);
 
   if (ptr == NULL)
-    {
-      gnutls_assert ();
-      *cert_max = 0;
-      /* no certificate found, likely empty file or garbage input */
-      return 0;
-    }
+    return gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_FOUND);
 
   count = 0;
 

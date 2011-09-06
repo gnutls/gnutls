@@ -1201,10 +1201,8 @@ parse_pem_ca_mem (gnutls_x509_crt_t ** cert_list, unsigned *ncerts,
                   PEM_CERT_SEP2, sizeof (PEM_CERT_SEP2) - 1);
 
   if (ptr == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_BASE64_DECODING_ERROR;
-    }
+    return gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_FOUND);
+
   size = input_cert_size - (ptr - input_cert);
 
   i = *ncerts + 1;
@@ -1357,6 +1355,9 @@ gnutls_certificate_set_x509_trust_mem (gnutls_certificate_credentials_t res,
     ret = parse_pem_ca_mem (&res->x509_ca_list, &res->x509_ncas,
                             ca->data, ca->size);
 
+  if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
+    return 0;
+
   if ((ret2 = add_new_crt_to_rdn_seq (res, ret)) < 0)
     return ret2;
 
@@ -1455,7 +1456,7 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t res,
 {
   int ret, ret2;
   size_t size;
-  char *data;
+  gnutls_datum_t cas;
 
 #ifdef ENABLE_PKCS11
   if (strncmp (cafile, "pkcs11:", 7) == 0)
@@ -1464,19 +1465,17 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t res,
     }
 #endif
 
-  data = read_binary_file (cafile, &size);
-  if (data == NULL)
+  cas.data = read_binary_file (cafile, &size);
+  if (cas.data == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_FILE_ERROR;
     }
 
-  if (type == GNUTLS_X509_FMT_DER)
-    ret = parse_der_ca_mem (&res->x509_ca_list, &res->x509_ncas, data, size);
-  else
-    ret = parse_pem_ca_mem (&res->x509_ca_list, &res->x509_ncas, data, size);
+  cas.size = size;
+  ret = gnutls_certificate_set_x509_trust_mem (res, &cas, type);
 
-  free (data);
+  free (cas.data);
 
   if (ret < 0)
     {
