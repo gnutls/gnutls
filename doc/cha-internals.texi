@@ -181,11 +181,7 @@ A typical entry would be:
 @example
   int ret;
 
-  /* ...
-   */
-
 #if ENABLE_FOOBAR
-
   ret = _gnutls_ext_register (&foobar_ext);
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
