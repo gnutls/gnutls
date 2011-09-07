@@ -5,6 +5,9 @@
 
 void register_x86_crypto (void);
 
+#define ALIGN16(x) \
+        ((void *)(((unsigned long)(x)+0x0f)&~(0x0f)))
+
 #define AES_KEY_ALIGN_SIZE 4
 #define AES_MAXNR 14
 typedef struct
@@ -13,6 +16,7 @@ typedef struct
    * on a 16-byte boundary.
    */
   uint32_t rd_key[4 * (AES_MAXNR + 1)+AES_KEY_ALIGN_SIZE];
+  uint32_t rounds;
 } AES_KEY;
 
 void aesni_ecb_encrypt (const unsigned char *in, unsigned char *out,

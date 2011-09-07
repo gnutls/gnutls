@@ -40,9 +40,6 @@ struct aes_ctx
   uint8_t iv[16];
 };
 
-#define ALIGN16(x) \
-        ((void *)(((unsigned long)(x)+0x0f)&~(0x0f)))
-
 static int
 aes_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx)
 {
