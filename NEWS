@@ -4,6 +4,10 @@ See the end for copying conditions.
 
 * Version 3.0.3 (unreleased)
 
+** libgnutls: Do not send an empty extension structure in server 
+hello. This affected old implementations that do not support extensions. 
+Reported by J. Cameijo Cerdeira.
+
 ** libgnutls: Allow CA importing of 0 certificates to succeed.
 Reported by Jonathan Nieder <jrnieder@gmail.com> in
 <http://bugs.debian.org/640639>.
