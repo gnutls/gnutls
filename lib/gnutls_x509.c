@@ -1400,7 +1400,8 @@ gnutls_certificate_set_x509_trust_mem (gnutls_certificate_credentials_t res,
  * a certificate request is sent. This can be disabled using
  * gnutls_certificate_send_x509_rdn_sequence().
  *
- * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ * Returns: the number of certificates processed or a negative error code
+ * on error.
  *
  * Since: 2.4.0
  **/
