@@ -22,8 +22,7 @@
 
 /*
  * The following code is an implementation of the AES-128-CBC cipher
- * using intel's AES instruction set. It is based on Intel reference
- * code.
+ * using intel's AES instruction set. 
  */
 
 #include <gnutls_errors.h>

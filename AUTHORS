@@ -72,6 +72,9 @@ Initial DTLS implementation.
 Ruslan Ijbulatov (LRN) <lrn1986 [at] gmail.com>
 Win32 patches.
 
+Andy Polyakov <appro [at] openssl.org>
+AES-NI and Padlock assembler code (at lib/accelerated/intel/asm/)
+
 ----------------------------------------------------------------------
 Copying and distribution of this file, with or without modification,
 are permitted in any medium without royalty provided the copyright

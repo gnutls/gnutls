@@ -4,6 +4,7 @@
 #include <gnutls_int.h>
 
 void register_x86_crypto (void);
+void register_padlock_crypto(void);
 
 #define ALIGN16(x) \
         ((void *)(((unsigned long)(x)+0x0f)&~(0x0f)))

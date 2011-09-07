@@ -98,12 +98,12 @@ aes_gcm_cipher_setkey (void *_ctx, const void *userkey, size_t keysize)
   struct aes_gcm_ctx *ctx = _ctx;
   int ret;
 
-  ret = aesni_set_encrypt_key (userkey, keysize * 8, &ctx->expanded_key);
+  ret = aesni_set_encrypt_key (userkey, keysize * 8, ALIGN16(&ctx->expanded_key));
   if (ret != 0)
     return gnutls_assert_val (GNUTLS_E_ENCRYPTION_FAILED);
 
   aesni_ecb_encrypt (ctx->gcm.H.c, ctx->gcm.H.c,
-                     GCM_BLOCK_SIZE, &ctx->expanded_key, 1);
+                     GCM_BLOCK_SIZE, ALIGN16(&ctx->expanded_key), 1);
 
   ctx->gcm.H.u[0] = bswap_64 (ctx->gcm.H.u[0]);
   ctx->gcm.H.u[1] = bswap_64 (ctx->gcm.H.u[1]);
@@ -131,7 +131,7 @@ aes_gcm_setiv (void *_ctx, const void *iv, size_t iv_size)
   ctx->gcm.Yi.c[GCM_BLOCK_SIZE - 1] = 1;
 
   aesni_ecb_encrypt (ctx->gcm.Yi.c, ctx->gcm.EK0.c,
-                     GCM_BLOCK_SIZE, &ctx->expanded_key, 1);
+                     GCM_BLOCK_SIZE, ALIGN16(&ctx->expanded_key), 1);
   ctx->gcm.Yi.c[GCM_BLOCK_SIZE - 1] = 2;
   return 0;
 }
@@ -160,7 +160,7 @@ ctr_encrypt_last (struct aes_gcm_ctx *ctx, const uint8_t * src,
   uint8_t out[GCM_BLOCK_SIZE];
 
   memcpy (tmp, &src[pos], length);
-  aesni_ctr32_encrypt_blocks (tmp, out, 1, &ctx->expanded_key, ctx->gcm.Yi.c);
+  aesni_ctr32_encrypt_blocks (tmp, out, 1, ALIGN16(&ctx->expanded_key), ctx->gcm.Yi.c);
 
   memcpy (&dst[pos], out, length);
 
@@ -179,7 +179,8 @@ aes_gcm_encrypt (void *_ctx, const void *src, size_t src_size,
   if (blocks > 0)
     {
       aesni_ctr32_encrypt_blocks (src, dst,
-                                  blocks, &ctx->expanded_key, ctx->gcm.Yi.c);
+                                  blocks, ALIGN16(&ctx->expanded_key), 
+                                  ctx->gcm.Yi.c);
 
       counter = _gnutls_read_uint32 (ctx->gcm.Yi.c + 12);
       counter += blocks;
@@ -211,7 +212,8 @@ aes_gcm_decrypt (void *_ctx, const void *src, size_t src_size,
   if (blocks > 0)
     {
       aesni_ctr32_encrypt_blocks (src, dst,
-                                  blocks, &ctx->expanded_key, ctx->gcm.Yi.c);
+                                  blocks, ALIGN16(&ctx->expanded_key), 
+                                  ctx->gcm.Yi.c);
 
       counter = _gnutls_read_uint32 (ctx->gcm.Yi.c + 12);
       counter += blocks;

@@ -34,12 +34,12 @@ EXTRA_DIST = aes-x86.h README license.txt
 
 noinst_LTLIBRARIES = libintel.la
 
-libintel_la_SOURCES = aes-x86.c
+libintel_la_SOURCES = aes-x86.c padlock.c
 
 if ASM_X86_64
 AM_CPPFLAGS += -DASM_X86_64
-libintel_la_SOURCES += asm/appro-aes-x86-64.s asm/appro-aes-gcm-x86-64.s aes-gcm-x86.c
+libintel_la_SOURCES += asm/appro-aes-x86-64.s asm/appro-aes-gcm-x86-64.s aes-gcm-x86.c asm/padlock-x86-64.s
 else
-libintel_la_SOURCES += asm/appro-aes-x86.s
+libintel_la_SOURCES += asm/appro-aes-x86.s asm/padlock-x86.s
 endif
 
