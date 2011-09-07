@@ -56,7 +56,7 @@ typedef struct
 
 int _gnutls_cipher_init (cipher_hd_st *, gnutls_cipher_algorithm_t cipher,
                          const gnutls_datum_t * key,
-                         const gnutls_datum_t * iv);
+                         const gnutls_datum_t * iv, int enc);
 
 inline static void _gnutls_cipher_setiv (const cipher_hd_st * handle, 
     const void *iv, int ivlen)
@@ -151,7 +151,7 @@ int _gnutls_auth_cipher_init (auth_cipher_hd_st * handle,
   const gnutls_datum_t * cipher_key,
   const gnutls_datum_t * iv,
   gnutls_mac_algorithm_t mac,
-  const gnutls_datum_t * mac_key, int ssl_hmac);
+  const gnutls_datum_t * mac_key, int ssl_hmac, int enc);
 
 int _gnutls_auth_cipher_add_auth (auth_cipher_hd_st * handle, const void *text,
                              int textlen);

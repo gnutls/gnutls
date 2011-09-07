@@ -35,12 +35,12 @@
 struct aes_ctx
 {
   AES_KEY expanded_key;
-  AES_KEY expanded_key_dec;
   uint8_t iv[16];
+  int enc;
 };
 
 static int
-aes_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx)
+aes_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 {
   /* we use key size to distinguish */
   if (algorithm != GNUTLS_CIPHER_AES_128_CBC
@@ -55,6 +55,8 @@ aes_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
+  ((struct aes_ctx*)(*_ctx))->enc = enc;
+
   return 0;
 }
 
@@ -64,11 +66,11 @@ aes_cipher_setkey (void *_ctx, const void *userkey, size_t keysize)
   struct aes_ctx *ctx = _ctx;
   int ret;
 
-  ret = aesni_set_encrypt_key (userkey, keysize * 8, ALIGN16(&ctx->expanded_key));
-  if (ret != 0)
-    return gnutls_assert_val (GNUTLS_E_ENCRYPTION_FAILED);
+  if (ctx->enc)
+    ret = aesni_set_encrypt_key (userkey, keysize * 8, ALIGN16(&ctx->expanded_key));
+  else
+    ret = aesni_set_decrypt_key (userkey, keysize * 8, ALIGN16(&ctx->expanded_key));
 
-  ret = aesni_set_decrypt_key (userkey, keysize * 8, ALIGN16(&ctx->expanded_key_dec));
   if (ret != 0)
     return gnutls_assert_val (GNUTLS_E_ENCRYPTION_FAILED);
 
@@ -100,7 +102,7 @@ aes_decrypt (void *_ctx, const void *src, size_t src_size,
 {
   struct aes_ctx *ctx = _ctx;
 
-  aesni_cbc_encrypt (src, dst, src_size, ALIGN16(&ctx->expanded_key_dec), ctx->iv, 0);
+  aesni_cbc_encrypt (src, dst, src_size, ALIGN16(&ctx->expanded_key), ctx->iv, 0);
 
   return 0;
 }

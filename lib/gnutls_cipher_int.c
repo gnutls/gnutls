@@ -36,7 +36,7 @@
 
 int
 _gnutls_cipher_init (cipher_hd_st * handle, gnutls_cipher_algorithm_t cipher,
-                     const gnutls_datum_t * key, const gnutls_datum_t * iv)
+                     const gnutls_datum_t * key, const gnutls_datum_t * iv, int enc)
 {
   int ret = GNUTLS_E_INTERNAL_ERROR;
   const gnutls_crypto_cipher_st *cc = NULL;
@@ -57,7 +57,7 @@ _gnutls_cipher_init (cipher_hd_st * handle, gnutls_cipher_algorithm_t cipher,
       handle->tag = cc->tag;
       handle->setiv = cc->setiv;
 
-      SR (cc->init (cipher, &handle->handle), cc_cleanup);
+      SR (cc->init (cipher, &handle->handle, enc), cc_cleanup);
       SR (cc->setkey( handle->handle, key->data, key->size), cc_cleanup);
       if (iv)
         {
@@ -76,7 +76,7 @@ _gnutls_cipher_init (cipher_hd_st * handle, gnutls_cipher_algorithm_t cipher,
 
   /* otherwise use generic cipher interface
    */
-  ret = _gnutls_cipher_ops.init (cipher, &handle->handle);
+  ret = _gnutls_cipher_ops.init (cipher, &handle->handle, enc);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -118,13 +118,13 @@ int _gnutls_auth_cipher_init (auth_cipher_hd_st * handle,
   const gnutls_datum_t * iv,
   gnutls_mac_algorithm_t mac,
   const gnutls_datum_t * mac_key,
-  int ssl_hmac)
+  int ssl_hmac, int enc)
 {
 int ret;
 
   memset(handle, 0, sizeof(*handle));
 
-  ret = _gnutls_cipher_init(&handle->cipher, cipher, cipher_key, iv);
+  ret = _gnutls_cipher_init(&handle->cipher, cipher, cipher_key, iv, enc);
   if (ret < 0)
     {
       gnutls_assert();

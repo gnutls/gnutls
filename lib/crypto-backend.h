@@ -31,7 +31,7 @@
 
   typedef struct
   {
-    int (*init) (gnutls_cipher_algorithm_t, void **ctx);
+    int (*init) (gnutls_cipher_algorithm_t, void **ctx, int enc);
     int (*setkey) (void *ctx, const void *key, size_t keysize);
     int (*setiv) (void *ctx, const void *iv, size_t ivsize);
     int (*encrypt) (void *ctx, const void *plain, size_t plainsize,

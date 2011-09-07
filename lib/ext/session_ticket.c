@@ -147,7 +147,7 @@ decrypt_ticket (gnutls_session_t session, session_ticket_ext_st * priv,
   IV.data = ticket->IV;
   IV.size = IV_SIZE;
   ret =
-    _gnutls_cipher_init (&cipher_hd, GNUTLS_CIPHER_AES_128_CBC, &key, &IV);
+    _gnutls_cipher_init (&cipher_hd, GNUTLS_CIPHER_AES_128_CBC, &key, &IV, 0);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -222,7 +222,7 @@ encrypt_ticket (gnutls_session_t session, session_ticket_ext_st * priv,
   IV.data = priv->session_ticket_IV;
   IV.size = IV_SIZE;
   ret =
-    _gnutls_cipher_init (&cipher_hd, GNUTLS_CIPHER_AES_128_CBC, &key, &IV);
+    _gnutls_cipher_init (&cipher_hd, GNUTLS_CIPHER_AES_128_CBC, &key, &IV, 1);
   if (ret < 0)
     {
       gnutls_assert ();

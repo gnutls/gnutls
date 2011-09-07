@@ -28,7 +28,7 @@ extern "C"
 {
 #endif
 
-  typedef struct cipher_hd_st *gnutls_cipher_hd_t;
+  typedef struct api_cipher_hd_st *gnutls_cipher_hd_t;
 
   int gnutls_cipher_init (gnutls_cipher_hd_t * handle,
                           gnutls_cipher_algorithm_t cipher,

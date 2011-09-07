@@ -58,68 +58,12 @@ stream_encrypt (void *ctx, nettle_crypt_func func, unsigned block_size,
   func (ctx, length, dst, src);
 }
 
-struct aes_bidi_ctx
-{
-  struct aes_ctx encrypt;
-  struct aes_ctx decrypt;
-};
-
-static void
-aes_bidi_setkey (struct aes_bidi_ctx *ctx, unsigned length,
-                 const uint8_t * key)
-{
-  aes_set_encrypt_key (&ctx->encrypt, length, key);
-  aes_invert_key (&ctx->decrypt, &ctx->encrypt);
-}
-
-static void
-aes_bidi_encrypt (struct aes_bidi_ctx *ctx,
-                  unsigned length, uint8_t * dst, const uint8_t * src)
-{
-  aes_encrypt (&ctx->encrypt, length, dst, src);
-}
-
-static void
-aes_bidi_decrypt (struct aes_bidi_ctx *ctx,
-                  unsigned length, uint8_t * dst, const uint8_t * src)
-{
-  aes_decrypt (&ctx->decrypt, length, dst, src);
-}
-
-struct camellia_bidi_ctx
-{
-  struct camellia_ctx encrypt;
-  struct camellia_ctx decrypt;
-};
-
-static void
-camellia_bidi_setkey (struct camellia_bidi_ctx *ctx, unsigned length,
-                      const uint8_t * key)
-{
-  camellia_set_encrypt_key (&ctx->encrypt, length, key);
-  camellia_invert_key (&ctx->decrypt, &ctx->encrypt);
-}
-
-static void
-camellia_bidi_encrypt (struct camellia_bidi_ctx *ctx,
-                       unsigned length, uint8_t * dst, const uint8_t * src)
-{
-  camellia_crypt (&ctx->encrypt, length, dst, src);
-}
-
-static void
-camellia_bidi_decrypt (struct camellia_bidi_ctx *ctx,
-                       unsigned length, uint8_t * dst, const uint8_t * src)
-{
-  camellia_crypt (&ctx->decrypt, length, dst, src);
-}
-
 struct nettle_cipher_ctx
 {
   union
   {
-    struct aes_bidi_ctx aes_bidi;
-    struct camellia_bidi_ctx camellia_bidi;
+    struct aes_ctx aes;
+    struct camellia_ctx camellia;
     struct arcfour_ctx arcfour;
     struct arctwo_ctx arctwo;
     struct des3_ctx des3;
@@ -136,6 +80,7 @@ struct nettle_cipher_ctx
   decrypt_func decrypt;
   auth_func auth;
   tag_func tag;
+  int enc;
 };
 
 #define GCM_DEFAULT_NONCE_SIZE 12
@@ -157,7 +102,7 @@ static void _gcm_decrypt(void *_ctx, nettle_crypt_func f,
 }
 
 static int
-wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
+wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx, int enc)
 {
   struct nettle_cipher_ctx *ctx;
 
@@ -169,6 +114,7 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
     }
 
   ctx->algo = algo;
+  ctx->enc = enc;
 
   switch (algo)
     {
@@ -176,7 +122,7 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
     case GNUTLS_CIPHER_AES_256_GCM:
       ctx->encrypt = _gcm_encrypt;
       ctx->decrypt = _gcm_decrypt;
-      ctx->i_encrypt = (nettle_crypt_func*) aes_bidi_encrypt;
+      ctx->i_encrypt = (nettle_crypt_func*) aes_encrypt;
       ctx->auth = (auth_func)gcm_aes_update;
       ctx->tag = (tag_func)gcm_aes_digest;
       ctx->ctx_ptr = &ctx->ctx.aes_gcm;
@@ -186,9 +132,9 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
     case GNUTLS_CIPHER_CAMELLIA_256_CBC:
       ctx->encrypt = cbc_encrypt;
       ctx->decrypt = cbc_decrypt;
-      ctx->i_encrypt = (nettle_crypt_func *) camellia_bidi_encrypt;
-      ctx->i_decrypt = (nettle_crypt_func *) camellia_bidi_decrypt;
-      ctx->ctx_ptr = &ctx->ctx.camellia_bidi;
+      ctx->i_encrypt = (nettle_crypt_func*)camellia_crypt;
+      ctx->i_decrypt = (nettle_crypt_func*)camellia_crypt;
+      ctx->ctx_ptr = &ctx->ctx.camellia;
       ctx->block_size = CAMELLIA_BLOCK_SIZE;
       break;
     case GNUTLS_CIPHER_AES_128_CBC:
@@ -196,9 +142,9 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx)
     case GNUTLS_CIPHER_AES_256_CBC:
       ctx->encrypt = cbc_encrypt;
       ctx->decrypt = cbc_decrypt;
-      ctx->i_encrypt = (nettle_crypt_func *) aes_bidi_encrypt;
-      ctx->i_decrypt = (nettle_crypt_func *) aes_bidi_decrypt;
-      ctx->ctx_ptr = &ctx->ctx.aes_bidi;
+      ctx->i_encrypt = (nettle_crypt_func*)aes_encrypt;
+      ctx->i_decrypt = (nettle_crypt_func*)aes_decrypt;
+      ctx->ctx_ptr = &ctx->ctx.aes;
       ctx->block_size = AES_BLOCK_SIZE;
       break;
     case GNUTLS_CIPHER_3DES_CBC:
@@ -259,11 +205,17 @@ wrap_nettle_cipher_setkey (void *_ctx, const void *key, size_t keysize)
     case GNUTLS_CIPHER_AES_128_CBC:
     case GNUTLS_CIPHER_AES_192_CBC:
     case GNUTLS_CIPHER_AES_256_CBC:
-      aes_bidi_setkey (ctx->ctx_ptr, keysize, key);
+      if (ctx->enc)
+        aes_set_encrypt_key (ctx->ctx_ptr, keysize, key);
+      else
+        aes_set_decrypt_key (ctx->ctx_ptr, keysize, key);
       break;
     case GNUTLS_CIPHER_CAMELLIA_128_CBC:
     case GNUTLS_CIPHER_CAMELLIA_256_CBC:
-      camellia_bidi_setkey (ctx->ctx_ptr, keysize, key);
+      if (ctx->enc)
+        camellia_set_encrypt_key (ctx->ctx_ptr, keysize, key);
+      else
+        camellia_set_decrypt_key (ctx->ctx_ptr, keysize, key);
       break;
     case GNUTLS_CIPHER_3DES_CBC:
       if (keysize != DES3_KEY_SIZE)

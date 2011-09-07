@@ -55,7 +55,7 @@ struct padlock_cipher_data {
 
 struct padlock_ctx {
     struct padlock_cipher_data expanded_key;
-    struct padlock_cipher_data expanded_key_dec;
+    int enc;
 };
 
 unsigned int padlock_capability();
@@ -77,7 +77,7 @@ void padlock_sha256(void *ctx, const void *inp, size_t len);
 
 
 static int
-aes_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx)
+aes_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 {
     /* we use key size to distinguish */
     if (algorithm != GNUTLS_CIPHER_AES_128_CBC
@@ -91,6 +91,7 @@ aes_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx)
         return GNUTLS_E_MEMORY_ERROR;
     }
 
+    ((struct padlock_ctx*)(*_ctx))->enc = enc;
     return 0;
 }
 
@@ -98,7 +99,7 @@ static int
 aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 {
     struct padlock_ctx *ctx = _ctx;
-    struct padlock_cipher_data *pce, *pcd;
+    struct padlock_cipher_data *pce;
 #ifdef HAVE_LIBNETTLE
     struct aes_ctx nc;
 #endif
@@ -107,36 +108,35 @@ aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
     memset(_ctx, 0, sizeof(struct padlock_cipher_data));
 
     pce = ALIGN16(&ctx->expanded_key);
-    pcd = ALIGN16(&ctx->expanded_key_dec);
 
-    pce->cword.b.encdec = 0;
-    pcd->cword.b.encdec = 1;
+    pce->cword.b.encdec = (ctx->enc == 0);
 
     switch (keysize) {
     case 16:
-        pce->cword.b.ksize = pcd->cword.b.ksize = 0;
-        pce->cword.b.rounds = pcd->cword.b.rounds = 10;
+        pce->cword.b.ksize = 0;
+        pce->cword.b.rounds = 10;
         memcpy(pce->ks.rd_key, userkey, 16);
-        memcpy(pcd->ks.rd_key, userkey, 16);
-        pce->cword.b.keygen = pcd->cword.b.keygen = 0;
+        pce->cword.b.keygen = 0;
         break;
 #ifdef HAVE_LIBNETTLE
     case 24:
-        pce->cword.b.ksize = pcd->cword.b.ksize = 1;
-        pce->cword.b.rounds = pcd->cword.b.rounds = 12;
+        pce->cword.b.ksize = 1;
+        pce->cword.b.rounds = 12;
         goto common_24_32;
     case 32:
-        pce->cword.b.ksize = pcd->cword.b.ksize = 2;
-        pce->cword.b.rounds = pcd->cword.b.rounds = 14;
+        pce->cword.b.ksize = 2;
+        pce->cword.b.rounds = 14;
 common_24_32:
         /* expand key using nettle */
-        aes_set_encrypt_key(&nc, keysize, userkey);
-        memcpy(pce->ks.rd_key, nc.keys, sizeof(nc.keys));
-        pce->ks.rounds = pcd->ks.rounds = nc.nrounds;
-        aes_invert_key(&nc, &nc);
-        memcpy(pcd->ks.rd_key, nc.keys, sizeof(nc.keys));
+        if (ctx->enc)
+          aes_set_encrypt_key(&nc, keysize, userkey);
+        else
+          aes_set_decrypt_key(&nc, keysize, userkey);
 
-        pce->cword.b.keygen = pcd->cword.b.keygen = 1;
+        memcpy(pce->ks.rd_key, nc.keys, sizeof(nc.keys));
+        pce->ks.rounds = nc.nrounds;
+
+        pce->cword.b.keygen = 1;
         break;
 #endif
     default:
@@ -151,13 +151,11 @@ common_24_32:
 static int aes_setiv(void *_ctx, const void *iv, size_t iv_size)
 {
     struct padlock_ctx *ctx = _ctx;
-    struct padlock_cipher_data *pce, *pcd;
+    struct padlock_cipher_data *pce;
 
     pce = ALIGN16(&ctx->expanded_key);
-    pcd = ALIGN16(&ctx->expanded_key_dec);
 
     memcpy(pce->iv, iv, 16);
-    memcpy(pcd->iv, iv, 16);
     return 0;
 }
 
@@ -182,7 +180,7 @@ padlock_aes_decrypt(void *_ctx, const void *src, size_t src_size,
     struct padlock_ctx *ctx = _ctx;
     struct padlock_cipher_data *pcd;
 
-    pcd = ALIGN16(&ctx->expanded_key_dec);
+    pcd = ALIGN16(&ctx->expanded_key);
 
     padlock_cbc_encrypt(dst, src, pcd, src_size);
 
