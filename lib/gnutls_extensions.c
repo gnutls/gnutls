@@ -297,7 +297,7 @@ _gnutls_gen_extensions (gnutls_session_t session, gnutls_buffer_st * extdata,
   
   if ( size > 0)
     _gnutls_write_uint16(size, &extdata->data[pos]);
-  else if (size == 0) extdata->length = 0;
+  else if (size == 0) extdata->length -= 2; /* the length bytes */
 
   return size;
 }
