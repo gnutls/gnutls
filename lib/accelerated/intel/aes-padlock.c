@@ -32,49 +32,9 @@
 #include <aes-x86.h>
 #include <x86.h>
 #ifdef HAVE_LIBNETTLE
-# include <nettle/aes.h>         /* for key generation in 192 and 256 bits */
+#include <nettle/aes.h>         /* for key generation in 192 and 256 bits */
 #endif
-
-struct padlock_cipher_data {
-    unsigned char iv[16];       /* Initialization vector */
-    union {
-        unsigned int pad[4];
-        struct {
-            int rounds:4;
-            int dgst:1;         /* n/a in C3 */
-            int align:1;        /* n/a in C3 */
-            int ciphr:1;        /* n/a in C3 */
-            unsigned int keygen:1;
-            int interm:1;
-            unsigned int encdec:1;
-            int ksize:2;
-        } b;
-    } cword;                    /* Control word */
-    AES_KEY ks;                 /* Encryption key */
-};
-
-struct padlock_ctx {
-    struct padlock_cipher_data expanded_key;
-    int enc;
-};
-
-unsigned int padlock_capability();
-void padlock_key_bswap(AES_KEY * key);
-void padlock_verify_context(struct padlock_cipher_data *ctx);
-void padlock_reload_key();
-void padlock_aes_block(void *out, const void *inp,
-                       struct padlock_cipher_data *ctx);
-int padlock_ecb_encrypt(void *out, const void *inp,
-                        struct padlock_cipher_data *ctx, size_t len);
-int padlock_cbc_encrypt(void *out, const void *inp,
-                        struct padlock_cipher_data *ctx, size_t len);
-int padlock_ctr32_encrypt(void *out, const void *inp,
-                          struct padlock_cipher_data *ctx, size_t len);
-void padlock_sha1_oneshot(void *ctx, const void *inp, size_t len);
-void padlock_sha1(void *ctx, const void *inp, size_t len);
-void padlock_sha256_oneshot(void *ctx, const void *inp, size_t len);
-void padlock_sha256(void *ctx, const void *inp, size_t len);
-
+#include <aes-padlock.h>
 
 static int
 aes_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
@@ -91,12 +51,11 @@ aes_cipher_init(gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
         return GNUTLS_E_MEMORY_ERROR;
     }
 
-    ((struct padlock_ctx*)(*_ctx))->enc = enc;
+    ((struct padlock_ctx *) (*_ctx))->enc = enc;
     return 0;
 }
 
-static int
-aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
+int padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 {
     struct padlock_ctx *ctx = _ctx;
     struct padlock_cipher_data *pce;
@@ -126,12 +85,12 @@ aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
     case 32:
         pce->cword.b.ksize = 2;
         pce->cword.b.rounds = 14;
-common_24_32:
+      common_24_32:
         /* expand key using nettle */
         if (ctx->enc)
-          aes_set_encrypt_key(&nc, keysize, userkey);
+            aes_set_encrypt_key(&nc, keysize, userkey);
         else
-          aes_set_decrypt_key(&nc, keysize, userkey);
+            aes_set_decrypt_key(&nc, keysize, userkey);
 
         memcpy(pce->ks.rd_key, nc.keys, sizeof(nc.keys));
         pce->ks.rounds = nc.nrounds;
@@ -142,8 +101,8 @@ common_24_32:
     default:
         return gnutls_assert_val(GNUTLS_E_ENCRYPTION_FAILED);
     }
-    
-    padlock_reload_key ();
+
+    padlock_reload_key();
 
     return 0;
 }
@@ -161,7 +120,7 @@ static int aes_setiv(void *_ctx, const void *iv, size_t iv_size)
 
 static int
 padlock_aes_encrypt(void *_ctx, const void *src, size_t src_size,
-            void *dst, size_t dst_size)
+                    void *dst, size_t dst_size)
 {
     struct padlock_ctx *ctx = _ctx;
     struct padlock_cipher_data *pce;
@@ -173,9 +132,23 @@ padlock_aes_encrypt(void *_ctx, const void *src, size_t src_size,
     return 0;
 }
 
+int
+padlock_aes_ecb_encrypt(void *_ctx, const void *src, size_t src_size,
+                        void *dst, size_t dst_size)
+{
+    struct padlock_ctx *ctx = _ctx;
+    struct padlock_cipher_data *pce;
+
+    pce = ALIGN16(&ctx->expanded_key);
+
+    padlock_ecb_encrypt(dst, src, pce, src_size);
+
+    return 0;
+}
+
 static int
 padlock_aes_decrypt(void *_ctx, const void *src, size_t src_size,
-            void *dst, size_t dst_size)
+                    void *dst, size_t dst_size)
 {
     struct padlock_ctx *ctx = _ctx;
     struct padlock_cipher_data *pcd;
@@ -192,9 +165,9 @@ static void aes_deinit(void *_ctx)
     gnutls_free(_ctx);
 }
 
-static const gnutls_crypto_cipher_st cipher_struct = {
+static const gnutls_crypto_cipher_st aes_padlock_struct = {
     .init = aes_cipher_init,
-    .setkey = aes_cipher_setkey,
+    .setkey = padlock_aes_cipher_setkey,
     .setiv = aes_setiv,
     .encrypt = padlock_aes_encrypt,
     .decrypt = padlock_aes_decrypt,
@@ -232,27 +205,46 @@ void register_padlock_crypto(void)
         _gnutls_debug_log("Padlock AES accelerator was detected\n");
         ret =
             gnutls_crypto_single_cipher_register(GNUTLS_CIPHER_AES_128_CBC,
-                                                 80, &cipher_struct);
+                                                 80, &aes_padlock_struct);
         if (ret < 0) {
             gnutls_assert();
         }
 
-#ifdef HAVE_LIBNETTLE
+        /* register GCM ciphers */
         ret =
-            gnutls_crypto_single_cipher_register(GNUTLS_CIPHER_AES_192_CBC,
-                                                 80, &cipher_struct);
+            gnutls_crypto_single_cipher_register(GNUTLS_CIPHER_AES_128_GCM,
+                                                 80,
+                                                 &aes_gcm_padlock_struct);
         if (ret < 0) {
             gnutls_assert();
         }
 
-        ret =
-            gnutls_crypto_single_cipher_register(GNUTLS_CIPHER_AES_256_CBC,
-                                                 80, &cipher_struct);
-        if (ret < 0) {
-            gnutls_assert();
-        }
-#endif
+
+        if (ret >= 0)
+            _gnutls_priority_prefer_aes_gcm();
     }
+#ifdef HAVE_LIBNETTLE
+    ret =
+        gnutls_crypto_single_cipher_register(GNUTLS_CIPHER_AES_192_CBC,
+                                             80, &aes_padlock_struct);
+    if (ret < 0) {
+        gnutls_assert();
+    }
+
+    ret =
+        gnutls_crypto_single_cipher_register(GNUTLS_CIPHER_AES_256_CBC,
+                                             80, &aes_padlock_struct);
+    if (ret < 0) {
+        gnutls_assert();
+    }
+
+    ret =
+        gnutls_crypto_single_cipher_register(GNUTLS_CIPHER_AES_256_GCM,
+                                             80, &aes_gcm_padlock_struct);
+    if (ret < 0) {
+        gnutls_assert();
+    }
+#endif
 
     return;
 }

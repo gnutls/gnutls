@@ -39,6 +39,6 @@ void aesni_ctr32_encrypt_blocks(const unsigned char *in,
                            const unsigned char *ivec);
 
 
-const gnutls_crypto_cipher_st aes_gcm_struct;
+extern const gnutls_crypto_cipher_st aes_gcm_struct;
 
 #endif
