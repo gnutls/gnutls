@@ -29,8 +29,6 @@ struct padlock_ctx {
 extern const gnutls_crypto_cipher_st aes_gcm_padlock_struct;
 
 int padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize);
-int padlock_aes_ecb_encrypt(void *_ctx, const void *src, size_t src_size,
-                    void *dst, size_t dst_size);
 
 /* asm */
 unsigned int padlock_capability(void);

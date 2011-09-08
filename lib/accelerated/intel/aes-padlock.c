@@ -131,19 +131,6 @@ padlock_aes_encrypt(void *_ctx, const void *src, size_t src_size,
     return 0;
 }
 
-int
-padlock_aes_ecb_encrypt(void *_ctx, const void *src, size_t src_size,
-                        void *dst, size_t dst_size)
-{
-    struct padlock_ctx *ctx = _ctx;
-    struct padlock_cipher_data *pce;
-
-    pce = ALIGN16(&ctx->expanded_key);
-
-    padlock_ecb_encrypt(dst, src, pce, src_size);
-
-    return 0;
-}
 
 static int
 padlock_aes_decrypt(void *_ctx, const void *src, size_t src_size,

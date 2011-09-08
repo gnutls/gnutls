@@ -52,7 +52,12 @@ static void padlock_aes_encrypt(void *_ctx,
                                 unsigned length, uint8_t *dst,
                                 const uint8_t *src)
 {
-  padlock_aes_ecb_encrypt(_ctx, src, length, dst, length);
+    struct padlock_ctx *ctx = _ctx;
+    struct padlock_cipher_data *pce;
+
+    pce = ALIGN16(&ctx->expanded_key);
+
+    padlock_ecb_encrypt(dst, src, pce, length);
 }
 
 static void padlock_aes_set_encrypt_key(struct padlock_ctx *_ctx,
