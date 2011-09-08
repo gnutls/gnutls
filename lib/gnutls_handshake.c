@@ -250,10 +250,8 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret, int sending)
 {
   const int siz = TLS_MSG_LEN;
   opaque concat[MAX_HASH_SIZE + 16 /*MD5 */ ];
-  size_t hash_len = 20 + 16;
+  size_t hash_len;
   const char *mesg;
-  digest_hd_st td_md5;
-  digest_hd_st td_sha;
   int rc, len;
 
   if (sending)
@@ -263,33 +261,24 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret, int sending)
 
   if (!_gnutls_version_has_selectable_prf (gnutls_protocol_get_version(session)))
     {
-      rc = _gnutls_hash_init (&td_sha, GNUTLS_DIG_SHA1);
+      rc = _gnutls_hash_fast( GNUTLS_DIG_SHA1, session->internals.handshake_hash_buffer.data, len, &concat[16]);
       if (rc < 0)
         return gnutls_assert_val(rc);
 
-      rc = _gnutls_hash_init (&td_md5, GNUTLS_DIG_MD5);
+      rc = _gnutls_hash_fast( GNUTLS_DIG_MD5, session->internals.handshake_hash_buffer.data, len, concat);
       if (rc < 0)
-        {
-          _gnutls_hash_deinit (&td_sha, NULL);
-          return gnutls_assert_val(rc);
-        }
-      _gnutls_hash(&td_sha, session->internals.handshake_hash_buffer.data, len);
-      _gnutls_hash(&td_md5, session->internals.handshake_hash_buffer.data, len);
-
-      _gnutls_hash_deinit (&td_md5, concat);
-      _gnutls_hash_deinit (&td_sha, &concat[16]);
+        return gnutls_assert_val(rc);
+       
+      hash_len = 20 + 16;
     }
   else 
     {
       int algorithm = _gnutls_cipher_suite_get_prf(&session->security_parameters.current_cipher_suite);
 
-      rc = _gnutls_hash_init (&td_sha, algorithm);
+      rc = _gnutls_hash_fast( algorithm, session->internals.handshake_hash_buffer.data, len, concat);
       if (rc < 0)
         return gnutls_assert_val(rc);
 
-      _gnutls_hash(&td_sha, session->internals.handshake_hash_buffer.data, len);
-
-      _gnutls_hash_deinit (&td_sha, concat);
       hash_len = _gnutls_hash_get_algo_len (algorithm);
     }
 

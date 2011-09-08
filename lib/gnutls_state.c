@@ -794,15 +794,9 @@ _gnutls_cal_PRF_A (gnutls_mac_algorithm_t algorithm,
   digest_hd_st td1;
   int ret;
 
-  ret = _gnutls_hmac_init (&td1, algorithm, secret, secret_size);
+  ret = _gnutls_hmac_fast (algorithm, secret, secret_size, seed, seed_size, result);
   if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  _gnutls_hmac (&td1, seed, seed_size);
-  _gnutls_hmac_deinit (&td1, result);
+    return gnutls_assert_val(ret);
 
   return 0;
 }

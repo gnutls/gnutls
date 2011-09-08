@@ -431,13 +431,11 @@ _gnutls_handshake_verify_cert_vrfy12 (gnutls_session_t session,
   
   hash_algo = _gnutls_sign_get_hash_algorithm(sign_algo);
   
-  ret = _gnutls_hash_init(&td, hash_algo); 
+  ret = _gnutls_hash_fast(hash_algo, session->internals.handshake_hash_buffer.data, 
+                          session->internals.handshake_hash_buffer_prev_len,
+                          concat);
   if (ret < 0)
     return gnutls_assert_val(ret);
-
-  _gnutls_hash(&td, session->internals.handshake_hash_buffer.data, session->internals.handshake_hash_buffer_prev_len);
-
-  _gnutls_hash_deinit (&td, concat);
 
   dconcat.data = concat;
   dconcat.size = _gnutls_hash_get_algo_len (hash_algo);
@@ -559,7 +557,6 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
   gnutls_datum_t dconcat;
   int ret;
   opaque concat[MAX_SIG_SIZE];
-  digest_hd_st td;
   gnutls_sign_algorithm_t sign_algo;
   gnutls_digest_algorithm_t hash_algo;
 
@@ -577,16 +574,11 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
                     gnutls_sign_algorithm_get_name (sign_algo),
                     gnutls_mac_get_name (hash_algo));
 
-  ret = _gnutls_hash_init (&td, hash_algo);
+  ret = _gnutls_hash_fast (hash_algo, session->internals.handshake_hash_buffer.data, 
+                           session->internals.handshake_hash_buffer.length,
+                           concat);
   if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  _gnutls_hash(&td, session->internals.handshake_hash_buffer.data, session->internals.handshake_hash_buffer.length);
-
-  _gnutls_hash_deinit (&td, concat);
+    return gnutls_assert_val(ret);
 
   dconcat.data = concat;
   dconcat.size = _gnutls_hash_get_algo_len (hash_algo);

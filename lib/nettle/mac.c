@@ -74,7 +74,7 @@ struct nettle_hmac_ctx
   digest_func digest;
   set_key_func setkey;
 
-/* FIXME: Nettle doesn't have a reset function for
+/* Note: Nettle doesn't have a reset function for
  * hmac so we need to manually reset a context, by
  * calling set_key(). For that reason we need to
  * store the hmac key here.

@@ -557,6 +557,7 @@ gnutls_fingerprint (gnutls_digest_algorithm_t algo,
                     size_t * result_size)
 {
   digest_hd_st td;
+  int ret;
   int hash_len = _gnutls_hash_get_algo_len (HASH2MAC (algo));
 
   if (hash_len < 0 || (unsigned) hash_len > *result_size || result == NULL)
@@ -568,16 +569,9 @@ gnutls_fingerprint (gnutls_digest_algorithm_t algo,
 
   if (result)
     {
-      int ret = _gnutls_hash_init (&td, HASH2MAC (algo));
+      ret = _gnutls_hash_fast( algo, data->data, data->size, result);
       if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-
-      _gnutls_hash (&td, data->data, data->size);
-
-      _gnutls_hash_deinit (&td, result);
+        return gnutls_assert_val(ret);
     }
 
   return 0;

@@ -172,7 +172,6 @@ _gnutls_calc_srp_u (bigint_t A, bigint_t B, bigint_t n)
   size_t b_size, a_size;
   opaque *holder, hd[MAX_HASH_SIZE];
   size_t holder_size, hash_size, n_size;
-  digest_hd_st td;
   int ret;
   bigint_t res;
 
@@ -197,15 +196,13 @@ _gnutls_calc_srp_u (bigint_t A, bigint_t B, bigint_t n)
   _gnutls_mpi_print (A, &holder[n_size - a_size], &a_size);
   _gnutls_mpi_print (B, &holder[n_size + n_size - b_size], &b_size);
 
-  ret = _gnutls_hash_init (&td, GNUTLS_MAC_SHA1);
+  ret = _gnutls_hash_fast (GNUTLS_MAC_SHA1, holder, holder_size, hd);
   if (ret < 0)
     {
       gnutls_free (holder);
       gnutls_assert ();
       return NULL;
     }
-  _gnutls_hash (&td, holder, holder_size);
-  _gnutls_hash_deinit (&td, hd);
 
   /* convert the bytes of hd to integer
    */
