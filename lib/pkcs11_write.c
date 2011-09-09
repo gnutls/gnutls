@@ -268,7 +268,7 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
     {
       p11_kit_uri_free (info);
       gnutls_assert ();
-      goto cleanup;
+      return ret;
     }
 
   ret =
@@ -518,7 +518,7 @@ cleanup:
     default:
       gnutls_assert ();
       ret = GNUTLS_E_INVALID_REQUEST;
-      goto cleanup;
+      break;
     }
 
   if (pks != 0)
