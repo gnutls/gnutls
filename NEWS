@@ -4,6 +4,8 @@ See the end for copying conditions.
 
 * Version 3.0.3 (unreleased)
 
+** libgnutls: Memory leak fixes in ECC ciphersuites.
+
 ** libgnutls: Do not send an empty extension structure in server 
 hello. This affected old implementations that do not support extensions. 
 Reported by J. Cameijo Cerdeira.
@@ -19,7 +21,8 @@ PKCS #11.
 to allow generating a key in a token.
 
 ** p11tool: Added generate-rsa, generate-dsa and 
-generate-ecc options.
+generate-ecc options to allow generating private
+keys in the token.
 
 ** API and ABI modifications:
 gnutls_pkcs11_privkey_generate: Added

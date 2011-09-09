@@ -97,6 +97,11 @@ _ecc_params_to_privkey(const gnutls_pk_params_st * pk_params,
         mpz_init_set_ui(priv->pubkey.z, 1);
 }
 
+static void _ecc_params_clear(ecc_key * key)
+{
+  mpz_clear(key->pubkey.z);
+}
+
 static void 
 _ecc_params_to_pubkey(const gnutls_pk_params_st * pk_params,
                        ecc_key * pub)
@@ -126,6 +131,8 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t * o
         int curve = priv->flags;
         unsigned long sz;
 
+        out->data = NULL;
+
         if (is_supported_curve(curve) == 0)
           return gnutls_assert_val(GNUTLS_E_ECC_NO_SUPPORTED_CURVES);
 
@@ -135,14 +142,25 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t * o
         sz = ECC_BUF_SIZE;
         out->data = gnutls_malloc(sz);
         if (out->data == NULL)
-          return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+          {
+            ret = gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+            goto ecc_cleanup;
+          }
 
         ret = ecc_shared_secret(&ecc_priv, &ecc_pub, out->data, &sz);
         if (ret != 0)
+          ret = gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+ecc_cleanup:
+        _ecc_params_clear(&ecc_pub);
+        _ecc_params_clear(&ecc_priv);
+
+        if (ret < 0)
           {
             gnutls_free(out->data);
-            return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+            return ret;
           }
+
         out->size = sz;
         break;
       }
@@ -378,6 +396,7 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
 
       ecdsa_fail:
         dsa_signature_clear (&sig);
+        _ecc_params_clear( &priv);
 
         if (ret < 0)
           {
@@ -560,6 +579,7 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
 
         _gnutls_mpi_release (&tmp[0]);
         _gnutls_mpi_release (&tmp[1]);
+        _ecc_params_clear( &pub);
         break;
       }
     case GNUTLS_PK_DSA:

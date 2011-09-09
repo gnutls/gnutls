@@ -201,5 +201,7 @@ doit (void)
     gnutls_x509_crt_deinit(list[i]);
   gnutls_certificate_free_credentials(x509_cred);
   
+  gnutls_global_deinit();
+
   success("success");
 }

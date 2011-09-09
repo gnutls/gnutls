@@ -75,6 +75,7 @@ int ret;
       ret = _gnutls_set_psk_session_key (session, psk_key, &tmp_dh_key);
       _gnutls_free_datum (&tmp_dh_key);
     }
+
   
   if (ret < 0)
     {
@@ -86,6 +87,11 @@ int ret;
 
 cleanup:
   _gnutls_mpi_release(&pub.params[7]);
+  
+  /* no longer needed */
+  _gnutls_mpi_release (&session->key->ecdh_x);
+  _gnutls_mpi_release (&session->key->ecdh_y);
+  gnutls_pk_params_release( &session->key->ecdh_params);
   return ret;
 
 }

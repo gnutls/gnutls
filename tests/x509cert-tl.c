@@ -205,5 +205,7 @@ doit (void)
   gnutls_x509_crt_deinit(server_crt);
   gnutls_x509_trust_list_deinit(tl, 0);
   
+  gnutls_global_deinit();
+  
   success("success");
 }
