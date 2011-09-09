@@ -791,7 +791,6 @@ _gnutls_cal_PRF_A (gnutls_mac_algorithm_t algorithm,
                    const void *secret, int secret_size,
                    const void *seed, int seed_size, void *result)
 {
-  digest_hd_st td1;
   int ret;
 
   ret = _gnutls_hmac_fast (algorithm, secret, secret_size, seed, seed_size, result);

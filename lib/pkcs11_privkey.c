@@ -423,8 +423,6 @@ gnutls_pkcs11_privkey_generate (const char* url,
   ck_session_handle_t pks = 0;
   struct p11_kit_uri *info = NULL;
   ck_rv_t rv;
-  size_t id_size;
-  opaque id[20];
   struct ck_attribute a[10], p[10];
   ck_object_handle_t pub, priv;
   unsigned long _bits = bits;

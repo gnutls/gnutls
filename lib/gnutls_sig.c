@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free
+ * Copyright (C) 2001, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Free
  * Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
@@ -419,7 +419,6 @@ _gnutls_handshake_verify_cert_vrfy12 (gnutls_session_t session,
 {
   int ret;
   opaque concat[MAX_HASH_SIZE];
-  digest_hd_st td;
   gnutls_datum_t dconcat;
   gnutls_digest_algorithm_t hash_algo;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);

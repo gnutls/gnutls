@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008, 2009, 2010 Free
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2008, 2009, 2010, 2011 Free
  * Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
@@ -556,7 +556,6 @@ gnutls_fingerprint (gnutls_digest_algorithm_t algo,
                     const gnutls_datum_t * data, void *result,
                     size_t * result_size)
 {
-  digest_hd_st td;
   int ret;
   int hash_len = _gnutls_hash_get_algo_len (HASH2MAC (algo));
 

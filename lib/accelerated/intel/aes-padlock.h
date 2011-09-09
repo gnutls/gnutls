@@ -33,8 +33,8 @@ int padlock_aes_ecb_encrypt(void *_ctx, const void *src, size_t src_size,
                     void *dst, size_t dst_size);
 
 /* asm */
-unsigned int padlock_capability();
-void padlock_reload_key();
+unsigned int padlock_capability(void);
+void padlock_reload_key(void);
 int padlock_ecb_encrypt(void *out, const void *inp,
                         struct padlock_cipher_data *ctx, size_t len);
 int padlock_cbc_encrypt(void *out, const void *inp,

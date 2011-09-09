@@ -89,7 +89,6 @@ static int
 aes_gcm_cipher_setkey (void *_ctx, const void *userkey, size_t keysize)
 {
   struct gcm_padlock_aes_ctx *ctx = _ctx;
-  int ret;
 
   GCM_SET_KEY(ctx, padlock_aes_set_encrypt_key, padlock_aes_encrypt, keysize, userkey);
 

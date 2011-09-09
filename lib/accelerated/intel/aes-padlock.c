@@ -62,7 +62,6 @@ int padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
 #ifdef HAVE_LIBNETTLE
     struct aes_ctx nc;
 #endif
-    int ret;
 
     memset(_ctx, 0, sizeof(struct padlock_cipher_data));
 

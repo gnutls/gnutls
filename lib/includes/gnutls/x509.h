@@ -119,21 +119,21 @@ extern "C"
                               gnutls_x509_crt_fmt_t format,
                               void *output_data, size_t * output_data_size);
   int gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert, char *buf,
-                                     size_t * sizeof_buf);
+                                     size_t * buf_size);
   int gnutls_x509_crt_get_issuer_dn_oid (gnutls_x509_crt_t cert, int indx,
-                                         void *oid, size_t * sizeof_oid);
+                                         void *oid, size_t * oid_size);
   int gnutls_x509_crt_get_issuer_dn_by_oid (gnutls_x509_crt_t cert,
                                             const char *oid, int indx,
                                             unsigned int raw_flag,
-                                            void *buf, size_t * sizeof_buf);
+                                            void *buf, size_t * buf_size);
   int gnutls_x509_crt_get_dn (gnutls_x509_crt_t cert, char *buf,
-                              size_t * sizeof_buf);
+                              size_t * buf_size);
   int gnutls_x509_crt_get_dn_oid (gnutls_x509_crt_t cert, int indx,
-                                  void *oid, size_t * sizeof_oid);
+                                  void *oid, size_t * oid_size);
   int gnutls_x509_crt_get_dn_by_oid (gnutls_x509_crt_t cert,
                                      const char *oid, int indx,
                                      unsigned int raw_flag, void *buf,
-                                     size_t * sizeof_buf);
+                                     size_t * buf_size);
   int gnutls_x509_crt_check_hostname (gnutls_x509_crt_t cert,
                                       const char *hostname);
 
@@ -157,10 +157,10 @@ extern "C"
                                           unsigned int *critical);
 
   int gnutls_x509_crt_get_subject_unique_id (gnutls_x509_crt_t crt, char *buf,
-                                             size_t * sizeof_buf);
+                                             size_t * buf_size);
 
   int gnutls_x509_crt_get_issuer_unique_id (gnutls_x509_crt_t crt, char *buf,
-                                            size_t * sizeof_buf);
+                                            size_t * buf_size);
 
 #define GNUTLS_CRL_REASON_UNUSED 128
 #define GNUTLS_CRL_REASON_KEY_COMPROMISE 64
@@ -222,8 +222,8 @@ extern "C"
 
   int gnutls_x509_crt_get_subject_alt_othername_oid (gnutls_x509_crt_t cert,
                                                      unsigned int seq,
-                                                     void *ret,
-                                                     size_t * ret_size);
+                                                     void *oid,
+                                                     size_t * oid_size);
 
   int gnutls_x509_crt_get_issuer_alt_name (gnutls_x509_crt_t cert,
                                            unsigned int seq, void *ret,
@@ -265,16 +265,15 @@ extern "C"
 
   /* Read extensions by OID. */
   int gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
-                                         void *oid, size_t * sizeof_oid);
+                                         void *oid, size_t * oid_size);
   int gnutls_x509_crt_get_extension_by_oid (gnutls_x509_crt_t cert,
                                             const char *oid, int indx,
-                                            void *buf,
-                                            size_t * sizeof_buf,
+                                            void *buf, size_t * buf_size,
                                             unsigned int *critical);
 
   /* Read extensions by sequence number. */
   int gnutls_x509_crt_get_extension_info (gnutls_x509_crt_t cert, int indx,
-                                          void *oid, size_t * sizeof_oid,
+                                          void *oid, size_t * oid_size,
                                           unsigned int *critical);
   int gnutls_x509_crt_get_extension_data (gnutls_x509_crt_t cert, int indx,
                                           void *data, size_t * sizeof_data);
@@ -593,11 +592,11 @@ extern "C"
 
   int gnutls_x509_crt_get_fingerprint (gnutls_x509_crt_t cert,
                                        gnutls_digest_algorithm_t algo,
-                                       void *buf, size_t * sizeof_buf);
+                                       void *buf, size_t * buf_size);
 
   int gnutls_x509_crt_get_key_purpose_oid (gnutls_x509_crt_t cert,
                                            int indx, void *oid,
-                                           size_t * sizeof_oid,
+                                           size_t * oid_size,
                                            unsigned int *critical);
   int gnutls_x509_crt_set_key_purpose_oid (gnutls_x509_crt_t cert,
                                            const void *oid,
