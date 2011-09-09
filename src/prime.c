@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
- * 2010  Free Software Foundation, Inc.
+ * Copyright (C) 2001-2011  Free Software Foundation, Inc.
  *
  * This file is part of GnuTLS.
  *
@@ -37,7 +36,7 @@
 extern FILE *outfile;
 extern FILE *infile;
 
-const static int cparams = 0;
+static const int cparams = 0;
 
 /* If how is zero then the included parameters are used.
  */
@@ -58,7 +57,7 @@ generate_prime (int how, common_info_st * info)
       fprintf (stderr, "(might take long time)\n");
     }
   else
-    fprintf (stderr, "Retrieving DH parameters...\n", bits);
+    fprintf (stderr, "Retrieving DH parameters...\n");
 
   if (how != 0)
     {
