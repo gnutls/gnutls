@@ -364,13 +364,14 @@ actually harm performance.
 In systems that include cryptographic instructions with the CPU's
 instructions set, using the kernel interface will introduce an
 unneeded layer. For this reason GnuTLS includes such optimizations
-found in popular processors such as the AES-NI instruction set.
-This is achieved using a mechanism that
-overrides parts of crypto backend at runtime, once the cryptographic
-instructions are detected.
-The next section discusses the runtime possibility. 
+found in popular processors such as the AES-NI or VIA PADLOCK instruction sets.
+This is achieved using a mechanism that detects CPU capabilities and
+overrides parts of crypto backend at runtime.
+The next section discusses the registration of a detected algorithm
+optimization. For more information please consult the @acronym{GnuTLS}
+source code in @code{lib/accelerated/}.
 
-@subsubsection Override specific algorithms
+@subsubsection Overriding specific algorithms
 When an optimized implementation of a single algorithm is available,
 say a hardware assisted version of @acronym{AES-CBC} then the
 following (internal) functions, from @code{crypto-backend.h}, can 
@@ -389,10 +390,10 @@ To register a hash (digest) or MAC algorithm.
 Those registration functions will only replace the specified algorithm
 and leave the rest of subsystem intact.
 
-@subsubsection Override parts of the backend
-In some systems, such as embedded ones, it might be desirable to
-override big parts of the cryptographic backend, or even all of
-them. For this reason the following functions are provided.
+@subsubsection Overriding the cryptographic library
+In some systems, that might contain a broad acceleration engine, it 
+might be desirable to override big parts of the cryptographic backend, 
+or even all of them. T following functions are provided for this reason.
 
 @itemize
 
