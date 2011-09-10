@@ -289,6 +289,45 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
                                             const int *list)
                                             _GNUTLS_GCC_ATTR_DEPRECATED;
 
+/* RSA params 
+ */
+  int gnutls_rsa_params_init (gnutls_rsa_params_t * rsa_params) _GNUTLS_GCC_ATTR_DEPRECATED;
+  void gnutls_rsa_params_deinit (gnutls_rsa_params_t rsa_params) _GNUTLS_GCC_ATTR_DEPRECATED;
+  int gnutls_rsa_params_cpy (gnutls_rsa_params_t dst,
+                             gnutls_rsa_params_t src) _GNUTLS_GCC_ATTR_DEPRECATED;
+  int gnutls_rsa_params_import_raw (gnutls_rsa_params_t rsa_params,
+                                    const gnutls_datum_t * m,
+                                    const gnutls_datum_t * e,
+                                    const gnutls_datum_t * d,
+                                    const gnutls_datum_t * p,
+                                    const gnutls_datum_t * q,
+                                    const gnutls_datum_t * u);
+  int gnutls_rsa_params_generate2 (gnutls_rsa_params_t params,
+                                   unsigned int bits) _GNUTLS_GCC_ATTR_DEPRECATED;
+  int gnutls_rsa_params_export_raw (gnutls_rsa_params_t rsa,
+                                    gnutls_datum_t * m, gnutls_datum_t * e,
+                                    gnutls_datum_t * d, gnutls_datum_t * p,
+                                    gnutls_datum_t * q, gnutls_datum_t * u,
+                                    unsigned int *bits) _GNUTLS_GCC_ATTR_DEPRECATED;
+  int gnutls_rsa_params_export_pkcs1 (gnutls_rsa_params_t params,
+                                      gnutls_x509_crt_fmt_t format,
+                                      unsigned char *params_data,
+                                      size_t * params_data_size) _GNUTLS_GCC_ATTR_DEPRECATED;
+  int gnutls_rsa_params_import_pkcs1 (gnutls_rsa_params_t params,
+                                      const gnutls_datum_t * pkcs1_params,
+                                      gnutls_x509_crt_fmt_t format) _GNUTLS_GCC_ATTR_DEPRECATED;
+
+  int gnutls_rsa_export_get_pubkey (gnutls_session_t session,
+                                    gnutls_datum_t * exponent,
+                                    gnutls_datum_t * modulus) _GNUTLS_GCC_ATTR_DEPRECATED;
+  int gnutls_rsa_export_get_modulus_bits (gnutls_session_t session) _GNUTLS_GCC_ATTR_DEPRECATED;
+  int gnutls_set_default_export_priority (gnutls_session_t session) _GNUTLS_GCC_ATTR_DEPRECATED;
+
+  void
+    gnutls_certificate_set_rsa_export_params (gnutls_certificate_credentials_t
+                                              res,
+                                              gnutls_rsa_params_t rsa_params) _GNUTLS_GCC_ATTR_DEPRECATED;
+
 #ifdef __cplusplus
 }
 #endif
