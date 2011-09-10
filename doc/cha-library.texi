@@ -210,9 +210,8 @@ operating system provided locks (i.e. @code{pthreads} on GNU/Linux and
 the function @funcref{gnutls_global_set_mutex} before calling @funcref{gnutls_global_init}. 
 Setting manually mutexes is recommended
 only to applications that have full control of the underlying libraries. If this
-is not the case, the use of the operating system defaults is recommended. Examples
-are shown below.
-
+is not the case, the use of the operating system defaults is recommended. An of 
+native thread usage is shown below.
 
 @example
 #include <gnutls.h>
@@ -226,6 +225,7 @@ int main()
 @}
 @end example
 
+When other thread packages are required the following example is applicable.
 @example
 #include <gnutls.h>
 
@@ -234,11 +234,13 @@ int main()
 
 int main()
 @{
-   gnutls_global_mutex_set (mutex_init, mutex_deinit, 
+   gnutls_global_set_mutex (mutex_init, mutex_deinit, 
                             mutex_lock, mutex_unlock);
    gnutls_global_init();
 @}
 @end example
+
+@showfuncdesc{gnutls_global_set_mutex}
 
 @node Callback functions
 @section Callback functions
