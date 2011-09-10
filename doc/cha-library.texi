@@ -44,17 +44,66 @@ libtasn1@footnote{@url{http://www.gnu.org/software/libtasn1/}},
 a library which offers @acronym{ASN.1} parsing capabilities, is used
 for the @acronym{X.509} certificate parsing functions.  
 The ``Cryptographic back-end'' is provided by nettle@footnote{@url{http://www.lysator.liu.se/~nisse/nettle/}}
-library.
-In order to ease integration in embedded systems, parts of the
-@acronym{GnuTLS} library can be disabled at compile time. That way a
-smaller library, with the required features, can be generated.
-
+library. 
 @menu
+* Downloading and installing::
 * General idea::
 * Error handling::
 * Thread safety::
 * Callback functions::
 @end menu
+
+@node Downloading and installing
+@section Downloading and installing
+@cindex installation
+@cindex download
+
+GnuTLS is available for download at:
+@url{http://www.gnutls.org/download.html}
+
+GnuTLS uses a development cycle where even minor version numbers
+indicate a stable release and a odd minor version number indicate a
+development release.  For example, GnuTLS 1.6.3 denote a stable
+release since 6 is even, and GnuTLS 1.7.11 denote a development
+release since 7 is odd.
+
+GnuTLS depends on Libnettle, and you will need to install it
+before installing GnuTLS.  Libnettle is available from
+@url{http://www.lysator.liu.se/~nisse/nettle/}.  
+Don't forget to verify the cryptographic signature after downloading
+source code packages.
+
+The package is then extracted, configured and built like many other
+packages that use Autoconf.  For detailed information on configuring
+and building it, refer to the @file{INSTALL} file that is part of the
+distribution archive.  Typically you invoke @code{./configure} and
+then @code{make check install}.  There are a number of compile-time
+parameters, as discussed below.
+
+The compression library, libz, as well as p11-kit are a optional dependencies.
+You can get libz from @url{http://www.zlib.net/} and p11-kit from @url{http://p11-glue.freedesktop.org/}.
+
+The X.509 part of GnuTLS needs ASN.1 functionality, from a library
+called libtasn1.  A copy of libtasn1 is included in GnuTLS.  If you
+want to install it separately (e.g., to make it possibly to use
+libtasn1 in other programs), you can get it from
+@url{http://www.gnu.org/software/gnutls/download.html}.
+
+A few @code{configure} options may be relevant, summarized below.
+They disable or enable particular features,
+to create a smaller library with only the required features.
+
+@verbatim
+--disable-srp-authentication
+--disable-psk-authentication
+--disable-anon-authentication
+--disable-extra-pki
+--disable-openpgp-authentication
+--disable-openssl-compatibility
+--without-p11-kit
+@end verbatim
+
+For the complete list, refer to the output from @code{configure --help}.
 
 @node General idea
 @section General idea
