@@ -207,11 +207,15 @@ for more information).
 Once the handshake is complete and peer's identity
 has been verified data can be exchanged. The available
 functions resemble the POSIX @code{recv} and @code{send}
-functions.
+functions. It is suggested to use @funcref{gnutls_error_is_fatal}
+to check whether the error codes returned by these functions are
+fatal for the protocol or can be ignored.
 
 @showfuncdesc{gnutls_record_send}
 
 @showfuncdesc{gnutls_record_recv}
+
+@showfuncdesc{gnutls_error_is_fatal}
 
 In DTLS it is adviceable to use the extended receive
 function shown below, because it allows the extraction

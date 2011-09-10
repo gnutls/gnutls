@@ -341,10 +341,10 @@ static const gnutls_error_entry error_algorithms[] = {
  * @error: is a GnuTLS error code, a negative error code
  *
  * If a GnuTLS function returns a negative error code you may feed that
- * value to this function to see if the error condition is fatal.
- *
- * Note that you may want to check the error code manually, since some
- * non-fatal errors to the protocol may be fatal for you program.
+ * value to this function to see if the error condition is fatal. 
+ * Note that you may also want to check the error code manually, since some
+ * non-fatal errors to the protocol (such as a warning alert or
+ * a rehandshake request) may be fatal for your program.
  *
  * This function is only useful if you are dealing with errors from
  * the record layer or the handshake layer.
