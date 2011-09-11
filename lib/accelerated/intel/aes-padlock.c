@@ -207,10 +207,6 @@ void register_padlock_crypto(void)
         if (ret < 0) {
             gnutls_assert();
         }
-
-
-        if (ret >= 0)
-            _gnutls_priority_prefer_aes_gcm();
     }
 #ifdef HAVE_LIBNETTLE
     ret =
