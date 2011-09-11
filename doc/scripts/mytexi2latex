@@ -49,9 +49,10 @@ my $suffix = $_[0];
 
 sub showenumdesc()
 {
-my $suffix = $_[0];
-	$suffix =~ s/\\//g;
-	return "\\showenumdesc\{$suffix\}";
+my $prefix = $_[0];
+my $suffix = $_[1];
+	$prefix =~ s/\\//g;
+	return "\\showenumdesc\{$prefix\}\{$suffix\}";
 }
 
 my $punescape = \&unescape;
@@ -73,6 +74,7 @@ my $spacematch = "[\\s\\w\\d-\\.\\/\\@\\#\\:]";
 my $mathmatch = "[\\s\\w\\d-\\.\\/\\:\\(\\)\\+\\/\\^\\'\\=\{\}\\\\\\,]";
 my $underscorematch = "[\\s\\w\\d-\\.\\/\\@\\_\\\\\:\\~]";
 my $codematch = "[\\s\\w\\d-\\.\\/\\@\\_\\\\\:\\-\\\"\+\\%\\,]";
+my $extcodematch = "[\\s\\w\\d-\\.\\/\\@\\_\\\\\:\\-\\\"\+\\%\\,\\{\\}]";
 my ($line, $prev_mode);
 my ($verbatim, $label);
 my @stack = ();
@@ -339,7 +341,7 @@ multitable:
 		$line =~ s/\@funcintref\{($codematch+)\}/$pfuncref->($1)/ge;
 		$line =~ s/\@showfunc([A-Z])\{($codematch+)\}/$pshowfunc->($1,$2)/ge;
 		$line =~ s/\@showfuncdesc\{($codematch+)\}/$pshowfuncdesc->($1)/ge;
-		$line =~ s/\@showenumdesc\{($codematch+)\}/$pshowenumdesc->($1)/ge;
+		$line =~ s/\@showenumdesc\{($codematch+),($extcodematch+)\}/$pshowenumdesc->($1,$2)/ge;
 		$line =~ s/\@pxref\{/\\myref\{/g;
 		$line =~ s/\@center (.*)/\\begin{center}\n$1\n\\end{center}/g;
 		if ($line =~ m/\@email/) {
