@@ -68,6 +68,16 @@ gnutls-api.tex: $(srcdir)/../../lib/*.c $(srcdir)/../../lib/ext/*.c $(srcdir)/..
 	rm -f $@-tmp
 	mv -f $@-tmp2 $@
 
+gnutls-enums.tex: $(srcdir)/../../lib/includes/gnutls/*.h
+	echo "" > $@-tmp
+	for i in $^; do \
+		echo -n "Creating documentation for file $$i... " && \
+		$(srcdir)/../scripts/gdoc -tex $$i >> $@-tmp && \
+		echo "ok"; \
+	done
+	$(srcdir)/../scripts/split.pl enums enum < $@-tmp
+	mv -f $@-tmp $@
+
 x509-api.tex: $(srcdir)/../../lib/x509/*.c
 	echo "" > $@-tmp
 	for i in $^; do \
@@ -104,9 +114,9 @@ extra-api.tex: $(srcdir)/../../libextra/gnutls_extra.c
 	rm -f $@-tmp
 	mv -f $@-tmp2 $@
 
-SOURCE_GEN_FILES =  extra-api.tex pgp-api.tex x509-api.tex gnutls-api.tex
+SOURCE_GEN_FILES =  extra-api.tex pgp-api.tex x509-api.tex gnutls-api.tex gnutls-enums.tex
 
-gnutls.pdf: $(TEX_OBJECTS) $(GEN_TEX_OBJECTS) $(SOURCE_GEN_FILES)
+gnutls.pdf: $(SOURCE_GEN_FILES) $(TEX_OBJECTS) $(GEN_TEX_OBJECTS)
 	-pdflatex gnutls.tex
 	-bibtex gnutls
 	-makeindex gnutls.idx
@@ -114,5 +124,5 @@ gnutls.pdf: $(TEX_OBJECTS) $(GEN_TEX_OBJECTS) $(SOURCE_GEN_FILES)
 
 clean-am:
 	rm -f $(GEN_TEX_OBJECTS) $(SOURCE_GEN_FILES) gnutls.aux gnutls.bbl gnutls.blg gnutls.idx gnutls.ilg gnutls.ind gnutls.log gnutls.out gnutls.toc
-	rm -rf functions
+	rm -rf functions enums
 

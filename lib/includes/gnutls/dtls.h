@@ -45,17 +45,17 @@ unsigned int gnutls_dtls_get_data_mtu (gnutls_session_t session);
 
   void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu);
 
-  /**
-   * gnutls_dtls_prestate_st:
-   * @record_seq: record sequence number
-   * @hsk_read_seq: handshake read sequence number
-   * @hsk_write_seq: handshake write sequence number
-   *
-   * DTLS cookie prestate struct.  This is usually never modified by
-   * the application, it is used to carry the cookie data between
-   * gnutls_dtls_cookie_send(), gnutls_dtls_cookie_verify() and
-   * gnutls_dtls_prestate_set().
-   */
+/**
+ * gnutls_dtls_prestate_st:
+ * @record_seq: record sequence number
+ * @hsk_read_seq: handshake read sequence number
+ * @hsk_write_seq: handshake write sequence number
+ *
+ * DTLS cookie prestate struct.  This is usually never modified by
+ * the application, it is used to carry the cookie data between
+ * gnutls_dtls_cookie_send(), gnutls_dtls_cookie_verify() and
+ * gnutls_dtls_prestate_set().
+ */
   typedef struct
   {
     unsigned int record_seq;

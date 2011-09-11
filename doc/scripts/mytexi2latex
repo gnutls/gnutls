@@ -47,10 +47,18 @@ my $suffix = $_[0];
 	return "\\showfuncdesc\{$suffix\}";
 }
 
+sub showenumdesc()
+{
+my $suffix = $_[0];
+	$suffix =~ s/\\//g;
+	return "\\showenumdesc\{$suffix\}";
+}
+
 my $punescape = \&unescape;
 my $pfuncref = \&funcref;
 my $pshowfunc = \&showfunc;
 my $pshowfuncdesc = \&showfuncdesc;
+my $pshowenumdesc = \&showenumdesc;
 my $mode;
 my $num_args = $#ARGV + 1;
 
@@ -331,6 +339,7 @@ multitable:
 		$line =~ s/\@funcintref\{($codematch+)\}/$pfuncref->($1)/ge;
 		$line =~ s/\@showfunc([A-Z])\{($codematch+)\}/$pshowfunc->($1,$2)/ge;
 		$line =~ s/\@showfuncdesc\{($codematch+)\}/$pshowfuncdesc->($1)/ge;
+		$line =~ s/\@showenumdesc\{($codematch+)\}/$pshowenumdesc->($1)/ge;
 		$line =~ s/\@pxref\{/\\myref\{/g;
 		$line =~ s/\@center (.*)/\\begin{center}\n$1\n\\end{center}/g;
 		if ($line =~ m/\@email/) {

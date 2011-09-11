@@ -132,6 +132,14 @@ Documentation License''.
 @end itemize
 @end macro
 
+@macro showenumdesc{ref}
+@float Table,\ref\
+@itemize
+@item @code{\ref\}
+@end itemize
+@end float
+@end macro
+
 @contents
 
 @ifnottex

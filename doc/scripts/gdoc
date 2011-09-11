@@ -502,6 +502,46 @@ sub output_tex {
     print "\\end{function}\n\n";
 }
 
+sub output_enum_tex {
+    my %args = %{$_[0]};
+    my ($parameter, $section);
+    my $count;
+    my $name = $args{'enum'};
+    my $param;
+    my $param2;
+    my $sec;
+    my $check;
+    my $type;
+
+    $func =~ s/_/\\_/g;
+
+    print "\n\n\\begin{enum}\n";
+    $name =~ s/_/\\_/g;
+    print "\\enumTitle{". $name . "}\n";
+
+    print "\n\\begin{enumList}\n";
+
+    $check=0;
+    foreach $parameter (@{$args{'parameterlist'}}) {
+        $param1 = $parameter;
+	$param1 =~ s/_/\\_\\-/g;
+
+	$check = 1;
+	print "\\enumElement{".$param1."}{";
+#	print "\n";
+
+        $param2 = $args{'parameters'}{$parameter};
+	$param2 =~ s/\#([a-zA-Z\_]+)/{\\it $1}/g;
+	$param2 =~ s/\%([a-zA-Z\_]+)/{\\bf $1}/g;
+	$out = just_highlight($param2);
+	$out =~ s/_/\\_/g;
+	chomp $out;
+	print $out . "}\n";
+    }
+    print "\\end{enumList}\n";
+
+    print "\\end{enum}\n\n";
+}
 
 # output in sgml DocBook
 sub output_sgml {
@@ -707,6 +747,10 @@ sub output_function {
     eval "output_".$output_mode."(\@_);";
 }
 
+sub output_enum {
+    eval "output_enum_".$output_mode."(\@_);";
+}
+
 
 ##
 # takes a function prototype and spits out all the details
@@ -783,6 +827,56 @@ sub dump_function {
     }
 }
 
+sub dump_enum {
+    my $prototype = shift @_;
+
+    if (($prototype =~ m/^\s*typedef\s+enum\s*[a-zA-Z0-9_~:]*\s*\{([a-zA-Z0-9_~=,:\s]+)\s*\}\s*([a-zA-Z0-9_]+);.*/)) {
+#        || $prototype =~ m/^\s*enum\s+([a-zA-Z0-9_~:]+).*/) {
+        $args = $1;
+	$name = $2;
+
+	foreach $arg (split ',', $args) {
+	    # strip leading/trailing spaces
+	    $arg =~ s/^\s*//;
+	    $arg =~ s/\s*$//;
+	    $arg =~ s/([A-Za-z0-9_]+)\s*=.*/$1/g;
+#	    print STDERR "SCAN ARG: '$arg'\n";
+
+            next if $arg eq '';
+	    if ((!defined($parameters{$arg}) || $parameters{$arg} eq "")) {
+		$parameters{$arg} = "-- undescribed --";
+		print STDERR "warning: $lineno: Enumeration parameter '$arg' not described in '$name'\n";
+	    }
+
+	    push @parameterlist, $arg;
+
+#	    print STDERR "param = '$arg'\n";
+	}
+    } else {
+#	print STDERR "warning: $lineno: Cannot understand enumeration: '$prototype'\n";
+	return;
+    }
+
+    output_enum({'enum' => $name,
+			 'module' => $modulename,
+			 'sourceversion' => $sourceversion,
+			 'include' => $include,
+			 'includefuncprefix' => $includefuncprefix,
+			 'bugsto' => $bugsto,
+			 'pkgname' => $pkgname,
+			 'copyright' => $copyright,
+			 'verbatimcopying' => $verbatimcopying,
+			 'seeinfo' => $seeinfo,
+			 'functiontype' => $return_type,
+			 'parameterlist' => \@parameterlist,
+			 'parameters' => \%parameters,
+			 'parametertypes' => \%parametertypes,
+			 'sectionlist' => \@sectionlist,
+			 'sections' => \%sections,
+			 'purpose' => $function_purpose
+			 });
+}
+
 ######################################################################
 # main
 # states
@@ -811,6 +905,7 @@ $doc_content = $doc_com."(.*)";
 $contents = "";
 $section_default = "Description";	# default section
 $section = $section_default;
+$enum = 0;
 
 $lineno = 0;
 foreach $file (@ARGV) {
@@ -818,18 +913,21 @@ foreach $file (@ARGV) {
 	print STDERR "Error: Cannot open file $file\n";
 	next;
     }
-    while (<IN>) {
+    while ($line = <IN>) {
 	$lineno++;
 
 	if ($state == 0) {
-	    if (/$doc_start/o) {
+	    if ($line =~ /$doc_start/o) {
 		$state = 1;		# next line is always the function name
+#	    print STDERR "XXX: start of doc comment\n";
 	    }
 	} elsif ($state == 1) {	# this line is the function name (always)
-	    if (/$doc_func/o) {
+	    if ($line =~ /$doc_func/o) {
 		$function = $1;
 		$state = 2;
-		if (/-\s*(.*)/) {
+#	    print STDERR "XXX: start of doc comment, looking for prototype\n";
+
+		if ($line =~ /-\s*(.*)/) {
 		    $function_purpose = $1;
 		} else {
 		    $function_purpose = "";
@@ -843,7 +941,7 @@ foreach $file (@ARGV) {
 		$state = 0;
 	    }
 	} elsif ($state == 2) {	# look for head: lines, and include content
-	    if (/$doc_sect/o) {
+	    if ($line =~ /$doc_sect/o) {
 		$newsection = $1;
 		$newcontents = $2;
 
@@ -857,7 +955,7 @@ foreach $file (@ARGV) {
 		    $contents .= "\n";
 		}
 		$section = $newsection;
-	    } elsif (/$doc_end/) {
+	    } elsif ($line =~ /$doc_end/) {
 
 		if ($contents ne "") {
 		    dump_section($section, $contents);
@@ -865,10 +963,9 @@ foreach $file (@ARGV) {
 		    $contents = "";
 		}
 
-#	    print STDERR "end of doc comment, looking for prototype\n";
 		$prototype = "";
 		$state = 3;
-	    } elsif (/$doc_content/) {
+	    } elsif ($line =~ /$doc_content/) {
 		# miguel-style comment kludge, look for blank lines after
 		# @parameter line to signify start of description
 		if ($1 eq "" && $section =~ m/^@/) {
@@ -883,17 +980,20 @@ foreach $file (@ARGV) {
 		print STDERR "warning: $lineno: Bad line: $_";
 	    }
 	} elsif ($state == 3) {	# scanning for function { (end of prototype)
-	    if (m#\s*/\*\s+MACDOC\s*#io) {
+	    if ($line =~ m#\s*/\*\s+MACDOC\s*#io) {
 	      # do nothing
 	    }
-	    elsif (/([^\{]*)/) {
+	    elsif ($enum == 1 && $line =~ /(^\s*\{).*/) {
+		$prototype .= "{";
+	    }
+	    elsif ($line =~ /([^\{]*)/) {
 		$prototype .= $1;
 	    }
-	    if (/\{/) {
+	    if ($enum == 0 && $line =~ /\{/) {
 		$prototype =~ s@/\*.*?\*/@@gos;	# strip comments.
 		$prototype =~ s@[\r\n]+@ @gos; # strip newlines/cr's.
 		$prototype =~ s@^ +@@gos; # strip leading spaces
-		dump_function($prototype);
+ 	        dump_function($prototype);
 
 		$function = "";
 		%constants = ();
@@ -903,9 +1003,32 @@ foreach $file (@ARGV) {
 		%sections = ();
 		@sectionlist = ();
 		$prototype = "";
+		$enum = 0;
 
 		$state = 0;
 	    }
+	    elsif ($enum == 1 && $line =~ /\}/) {
+		$prototype =~ s@/\*.*?\*/@@gos;	# strip comments.
+		$prototype =~ s@[\r\n]+@ @gos; # strip newlines/cr's.
+		$prototype =~ s@^ +@@gos; # strip leading spaces
+		dump_enum($prototype);
+
+		$function = "";
+		%constants = ();
+		%parameters = ();
+		%parametertypes = ();
+		@parameterlist = ();
+		%sections = ();
+		@sectionlist = ();
+		$prototype = "";
+		$enum = 0;
+
+		$state = 0;
+	    }
+	    elsif ($line =~ /([a-zA-Z\s]+)enum(.*)$/) {
+	        $enum = 1;
+	    }
+    
 	}
     }
 }

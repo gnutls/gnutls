@@ -58,19 +58,19 @@ extern "C"
   int gnutls_pkcs12_bag_encrypt (gnutls_pkcs12_bag_t bag, const char *pass,
                                  unsigned int flags);
 
-  /**
-   * gnutls_pkcs12_bag_type_t:
-   * @GNUTLS_BAG_EMPTY: Empty PKCS-12 bag.
-   * @GNUTLS_BAG_PKCS8_ENCRYPTED_KEY: PKCS-12 bag with PKCS-8 encrypted key.
-   * @GNUTLS_BAG_PKCS8_KEY: PKCS-12 bag with PKCS-8 key.
-   * @GNUTLS_BAG_CERTIFICATE: PKCS-12 bag with certificate.
-   * @GNUTLS_BAG_CRL: PKCS-12 bag with CRL.
-   * @GNUTLS_BAG_SECRET: PKCS-12 bag with secret PKCS-9 keys.
-   * @GNUTLS_BAG_ENCRYPTED: Encrypted PKCS-12 bag.
-   * @GNUTLS_BAG_UNKNOWN: Unknown PKCS-12 bag.
-   *
-   * Enumeration of different PKCS 12 bag types.
-   */
+/**
+ * gnutls_pkcs12_bag_type_t:
+ * @GNUTLS_BAG_EMPTY: Empty PKCS-12 bag.
+ * @GNUTLS_BAG_PKCS8_ENCRYPTED_KEY: PKCS-12 bag with PKCS-8 encrypted key.
+ * @GNUTLS_BAG_PKCS8_KEY: PKCS-12 bag with PKCS-8 key.
+ * @GNUTLS_BAG_CERTIFICATE: PKCS-12 bag with certificate.
+ * @GNUTLS_BAG_CRL: PKCS-12 bag with CRL.
+ * @GNUTLS_BAG_SECRET: PKCS-12 bag with secret PKCS-9 keys.
+ * @GNUTLS_BAG_ENCRYPTED: Encrypted PKCS-12 bag.
+ * @GNUTLS_BAG_UNKNOWN: Unknown PKCS-12 bag.
+ *
+ * Enumeration of different PKCS 12 bag types.
+ */
   typedef enum gnutls_pkcs12_bag_type_t
   {
     GNUTLS_BAG_EMPTY = 0,

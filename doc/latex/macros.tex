@@ -69,8 +69,24 @@
    \input{functions/#1}
   }
  \end{framed}
+ \vspace{0.10cm}
+ \end{minipage}
+ \par
+}
+
+\newcommand{\showenumdesc}[2]{%
+ \begin{table}[h]
+ \begin{minipage}[l]{\linewidth}
+ \begin{framed}
+  \texttt{
+   \input{enums/#1}
+  }
+ \end{framed}
  \vspace{0.15cm}
  \end{minipage}
+ \caption{#2}
+ \label{#1}
+ \end{table}
 }
 
 \newcommand{\showfuncA}[1]{%
@@ -162,7 +178,20 @@
 {\vspace{0.5cm}{\bf Description:}\footnotesize}
 {}
 
+\newenvironment{enum}%
+{}%
+{}
+
+\newcommand{\enumElement}[2]{%
+{\scriptsize {\bf #1}} & {\scriptsize #2}\\%
+}
+
+\newenvironment{enumList}%
+{\begin{tabular}{p{.43\linewidth}p{.53\linewidth}}}%
+{\end{tabular}}
+
 \newcommand{\functionTitle}[1]{}
+\newcommand{\enumTitle}[1]{enum {\bf #1}:}
 
 \newenvironment{functionReturns}%
 {\vspace{0.5cm}{\bf Returns:}\footnotesize}

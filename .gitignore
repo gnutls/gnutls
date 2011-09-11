@@ -510,3 +510,7 @@ gl/getopt.h
 gl/math.h
 doc/doxygen/latex/
 doc/doxygen/html/
+doc/latex/gnutls-enums.tex
+doc/latex/enums
+doc/latex/gnutls.lof
+doc/latex/gnutls.lot

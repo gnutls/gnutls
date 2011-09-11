@@ -63,34 +63,34 @@ extern "C"
 #define GNUTLS_CIPHER_RIJNDAEL_CBC GNUTLS_CIPHER_AES_128_CBC
 #define GNUTLS_CIPHER_ARCFOUR GNUTLS_CIPHER_ARCFOUR_128
 
-  /**
-   * gnutls_cipher_algorithm_t:
-   * @GNUTLS_CIPHER_UNKNOWN: Unknown algorithm.
-   * @GNUTLS_CIPHER_NULL: NULL algorithm.
-   * @GNUTLS_CIPHER_ARCFOUR_128: ARCFOUR stream cipher with 128-bit keys.
-   * @GNUTLS_CIPHER_3DES_CBC: 3DES in CBC mode.
-   * @GNUTLS_CIPHER_AES_128_CBC: AES in CBC mode with 128-bit keys.
-   * @GNUTLS_CIPHER_AES_192_CBC: AES in CBC mode with 192-bit keys.
-   * @GNUTLS_CIPHER_AES_256_CBC: AES in CBC mode with 256-bit keys.
-   * @GNUTLS_CIPHER_ARCFOUR_40: ARCFOUR stream cipher with 40-bit keys.
-   * @GNUTLS_CIPHER_CAMELLIA_128_CBC: Camellia in CBC mode with 128-bit keys.
-   * @GNUTLS_CIPHER_CAMELLIA_256_CBC: Camellia in CBC mode with 256-bit keys.
-   * @GNUTLS_CIPHER_RC2_40_CBC: RC2 in CBC mode with 40-bit keys.
-   * @GNUTLS_CIPHER_DES_CBC: DES in CBC mode (56-bit keys).
-   * @GNUTLS_CIPHER_AES_128_GCM: AES in GCM mode with 128-bit keys.
-   * @GNUTLS_CIPHER_AES_256_GCM: AES in GCM mode with 256-bit keys.
-   * @GNUTLS_CIPHER_IDEA_PGP_CFB: IDEA in CFB mode.
-   * @GNUTLS_CIPHER_3DES_PGP_CFB: 3DES in CFB mode.
-   * @GNUTLS_CIPHER_CAST5_PGP_CFB: CAST5 in CFB mode.
-   * @GNUTLS_CIPHER_BLOWFISH_PGP_CFB: Blowfish in CFB mode.
-   * @GNUTLS_CIPHER_SAFER_SK128_PGP_CFB: Safer-SK in CFB mode with 128-bit keys.
-   * @GNUTLS_CIPHER_AES128_PGP_CFB: AES in CFB mode with 128-bit keys.
-   * @GNUTLS_CIPHER_AES192_PGP_CFB: AES in CFB mode with 192-bit keys.
-   * @GNUTLS_CIPHER_AES256_PGP_CFB: AES in CFB mode with 256-bit keys.
-   * @GNUTLS_CIPHER_TWOFISH_PGP_CFB: Twofish in CFB mode.
-   *
-   * Enumeration of different symmetric encryption algorithms.
-   */
+/**
+ * gnutls_cipher_algorithm_t:
+ * @GNUTLS_CIPHER_UNKNOWN: Unknown algorithm.
+ * @GNUTLS_CIPHER_NULL: NULL algorithm.
+ * @GNUTLS_CIPHER_ARCFOUR_128: ARCFOUR stream cipher with 128-bit keys.
+ * @GNUTLS_CIPHER_3DES_CBC: 3DES in CBC mode.
+ * @GNUTLS_CIPHER_AES_128_CBC: AES in CBC mode with 128-bit keys.
+ * @GNUTLS_CIPHER_AES_192_CBC: AES in CBC mode with 192-bit keys.
+ * @GNUTLS_CIPHER_AES_256_CBC: AES in CBC mode with 256-bit keys.
+ * @GNUTLS_CIPHER_ARCFOUR_40: ARCFOUR stream cipher with 40-bit keys.
+ * @GNUTLS_CIPHER_CAMELLIA_128_CBC: Camellia in CBC mode with 128-bit keys.
+ * @GNUTLS_CIPHER_CAMELLIA_256_CBC: Camellia in CBC mode with 256-bit keys.
+ * @GNUTLS_CIPHER_RC2_40_CBC: RC2 in CBC mode with 40-bit keys.
+ * @GNUTLS_CIPHER_DES_CBC: DES in CBC mode (56-bit keys).
+ * @GNUTLS_CIPHER_AES_128_GCM: AES in GCM mode with 128-bit keys.
+ * @GNUTLS_CIPHER_AES_256_GCM: AES in GCM mode with 256-bit keys.
+ * @GNUTLS_CIPHER_IDEA_PGP_CFB: IDEA in CFB mode.
+ * @GNUTLS_CIPHER_3DES_PGP_CFB: 3DES in CFB mode.
+ * @GNUTLS_CIPHER_CAST5_PGP_CFB: CAST5 in CFB mode.
+ * @GNUTLS_CIPHER_BLOWFISH_PGP_CFB: Blowfish in CFB mode.
+ * @GNUTLS_CIPHER_SAFER_SK128_PGP_CFB: Safer-SK in CFB mode with 128-bit keys.
+ * @GNUTLS_CIPHER_AES128_PGP_CFB: AES in CFB mode with 128-bit keys.
+ * @GNUTLS_CIPHER_AES192_PGP_CFB: AES in CFB mode with 192-bit keys.
+ * @GNUTLS_CIPHER_AES256_PGP_CFB: AES in CFB mode with 256-bit keys.
+ * @GNUTLS_CIPHER_TWOFISH_PGP_CFB: Twofish in CFB mode.
+ *
+ * Enumeration of different symmetric encryption algorithms.
+ */
   typedef enum gnutls_cipher_algorithm
   {
     GNUTLS_CIPHER_UNKNOWN = 0,
@@ -121,26 +121,26 @@ extern "C"
     GNUTLS_CIPHER_TWOFISH_PGP_CFB = 208
   } gnutls_cipher_algorithm_t;
 
-  /**
-   * gnutls_kx_algorithm_t:
-   * @GNUTLS_KX_UNKNOWN: Unknown key-exchange algorithm.
-   * @GNUTLS_KX_RSA: RSA key-exchange algorithm.
-   * @GNUTLS_KX_DHE_DSS: DHE-DSS key-exchange algorithm.
-   * @GNUTLS_KX_DHE_RSA: DHE-RSA key-exchange algorithm.
-   * @GNUTLS_KX_ECDHE_RSA: ECDHE-RSA key-exchange algorithm.
-   * @GNUTLS_KX_ECDHE_ECDSA: ECDHE-ECDSA key-exchange algorithm.
-   * @GNUTLS_KX_ANON_DH: Anon-DH key-exchange algorithm.
-   * @GNUTLS_KX_ANON_ECDH: Anon-ECDH key-exchange algorithm.
-   * @GNUTLS_KX_SRP: SRP key-exchange algorithm.
-   * @GNUTLS_KX_RSA_EXPORT: RSA-EXPORT key-exchange algorithm.
-   * @GNUTLS_KX_SRP_RSA: SRP-RSA key-exchange algorithm.
-   * @GNUTLS_KX_SRP_DSS: SRP-DSS key-exchange algorithm.
-   * @GNUTLS_KX_PSK: PSK key-exchange algorithm.
-   * @GNUTLS_KX_DHE_PSK: DHE-PSK key-exchange algorithm.
-   * @GNUTLS_KX_ECDHE_PSK: ECDHE-PSK key-exchange algorithm.
-   *
-   * Enumeration of different key exchange algorithms.
-   */
+/**
+ * gnutls_kx_algorithm_t:
+ * @GNUTLS_KX_UNKNOWN: Unknown key-exchange algorithm.
+ * @GNUTLS_KX_RSA: RSA key-exchange algorithm.
+ * @GNUTLS_KX_DHE_DSS: DHE-DSS key-exchange algorithm.
+ * @GNUTLS_KX_DHE_RSA: DHE-RSA key-exchange algorithm.
+ * @GNUTLS_KX_ECDHE_RSA: ECDHE-RSA key-exchange algorithm.
+ * @GNUTLS_KX_ECDHE_ECDSA: ECDHE-ECDSA key-exchange algorithm.
+ * @GNUTLS_KX_ANON_DH: Anon-DH key-exchange algorithm.
+ * @GNUTLS_KX_ANON_ECDH: Anon-ECDH key-exchange algorithm.
+ * @GNUTLS_KX_SRP: SRP key-exchange algorithm.
+ * @GNUTLS_KX_RSA_EXPORT: RSA-EXPORT key-exchange algorithm.
+ * @GNUTLS_KX_SRP_RSA: SRP-RSA key-exchange algorithm.
+ * @GNUTLS_KX_SRP_DSS: SRP-DSS key-exchange algorithm.
+ * @GNUTLS_KX_PSK: PSK key-exchange algorithm.
+ * @GNUTLS_KX_DHE_PSK: DHE-PSK key-exchange algorithm.
+ * @GNUTLS_KX_ECDHE_PSK: ECDHE-PSK key-exchange algorithm.
+ *
+ * Enumeration of different key exchange algorithms.
+ */
   typedef enum
   {
     GNUTLS_KX_UNKNOWN = 0,
@@ -160,14 +160,14 @@ extern "C"
     GNUTLS_KX_ECDHE_PSK = 14,
   } gnutls_kx_algorithm_t;
 
-  /**
-   * gnutls_params_type_t:
-   * @GNUTLS_PARAMS_RSA_EXPORT: Session RSA-EXPORT parameters.
-   * @GNUTLS_PARAMS_DH: Session Diffie-Hellman parameters.
-   * @GNUTLS_PARAMS_ECDH: Session Elliptic-Curve Diffie-Hellman parameters.
-   *
-   * Enumeration of different TLS session parameter types.
-   */
+/**
+ * gnutls_params_type_t:
+ * @GNUTLS_PARAMS_RSA_EXPORT: Session RSA-EXPORT parameters.
+ * @GNUTLS_PARAMS_DH: Session Diffie-Hellman parameters.
+ * @GNUTLS_PARAMS_ECDH: Session Elliptic-Curve Diffie-Hellman parameters.
+ *
+ * Enumeration of different TLS session parameter types.
+ */
   typedef enum
   {
     GNUTLS_PARAMS_RSA_EXPORT = 1,
@@ -175,16 +175,16 @@ extern "C"
     GNUTLS_PARAMS_ECDH = 3,
   } gnutls_params_type_t;
 
-  /**
-   * gnutls_credentials_type_t:
-   * @GNUTLS_CRD_CERTIFICATE: Certificate credential.
-   * @GNUTLS_CRD_ANON: Anonymous credential.
-   * @GNUTLS_CRD_SRP: SRP credential.
-   * @GNUTLS_CRD_PSK: PSK credential.
-   * @GNUTLS_CRD_IA: IA credential.
-   *
-   * Enumeration of different credential types.
-   */
+/**
+ * gnutls_credentials_type_t:
+ * @GNUTLS_CRD_CERTIFICATE: Certificate credential.
+ * @GNUTLS_CRD_ANON: Anonymous credential.
+ * @GNUTLS_CRD_SRP: SRP credential.
+ * @GNUTLS_CRD_PSK: PSK credential.
+ * @GNUTLS_CRD_IA: IA credential.
+ *
+ * Enumeration of different credential types.
+ */
   typedef enum
   {
     GNUTLS_CRD_CERTIFICATE = 1,
@@ -197,23 +197,23 @@ extern "C"
 #define GNUTLS_MAC_SHA GNUTLS_MAC_SHA1
 #define GNUTLS_DIG_SHA GNUTLS_DIG_SHA1
 
-  /**
-   * gnutls_mac_algorithm_t:
-   * @GNUTLS_MAC_UNKNOWN: Unknown MAC algorithm.
-   * @GNUTLS_MAC_NULL: NULL MAC algorithm (empty output).
-   * @GNUTLS_MAC_MD5: HMAC-MD5 algorithm.
-   * @GNUTLS_MAC_SHA1: HMAC-SHA-1 algorithm.
-   * @GNUTLS_MAC_RMD160: HMAC-RMD160 algorithm.
-   * @GNUTLS_MAC_MD2: HMAC-MD2 algorithm.
-   * @GNUTLS_MAC_SHA256: HMAC-SHA-256 algorithm.
-   * @GNUTLS_MAC_SHA384: HMAC-SHA-384 algorithm.
-   * @GNUTLS_MAC_SHA512: HMAC-SHA-512 algorithm.
-   * @GNUTLS_MAC_SHA224: HMAC-SHA-224 algorithm.
-   * @GNUTLS_MAC_AEAD: MAC implicit through AEAD cipher.
-   *
-   * Enumeration of different Message Authentication Code (MAC)
-   * algorithms.
-   */
+/**
+ * gnutls_mac_algorithm_t:
+ * @GNUTLS_MAC_UNKNOWN: Unknown MAC algorithm.
+ * @GNUTLS_MAC_NULL: NULL MAC algorithm (empty output).
+ * @GNUTLS_MAC_MD5: HMAC-MD5 algorithm.
+ * @GNUTLS_MAC_SHA1: HMAC-SHA-1 algorithm.
+ * @GNUTLS_MAC_RMD160: HMAC-RMD160 algorithm.
+ * @GNUTLS_MAC_MD2: HMAC-MD2 algorithm.
+ * @GNUTLS_MAC_SHA256: HMAC-SHA-256 algorithm.
+ * @GNUTLS_MAC_SHA384: HMAC-SHA-384 algorithm.
+ * @GNUTLS_MAC_SHA512: HMAC-SHA-512 algorithm.
+ * @GNUTLS_MAC_SHA224: HMAC-SHA-224 algorithm.
+ * @GNUTLS_MAC_AEAD: MAC implicit through AEAD cipher.
+ *
+ * Enumeration of different Message Authentication Code (MAC)
+ * algorithms.
+ */
   typedef enum
   {
     GNUTLS_MAC_UNKNOWN = 0,
@@ -231,21 +231,21 @@ extern "C"
     GNUTLS_MAC_AEAD = 200 /* indicates that MAC is on the cipher */
   } gnutls_mac_algorithm_t;
 
-  /**
-   * gnutls_digest_algorithm_t:
-   * @GNUTLS_DIG_UNKNOWN: Unknown hash algorithm.
-   * @GNUTLS_DIG_NULL: NULL hash algorithm (empty output).
-   * @GNUTLS_DIG_MD5: MD5 algorithm.
-   * @GNUTLS_DIG_SHA1: SHA-1 algorithm.
-   * @GNUTLS_DIG_RMD160: RMD160 algorithm.
-   * @GNUTLS_DIG_MD2: MD2 algorithm.
-   * @GNUTLS_DIG_SHA256: SHA-256 algorithm.
-   * @GNUTLS_DIG_SHA384: SHA-384 algorithm.
-   * @GNUTLS_DIG_SHA512: SHA-512 algorithm.
-   * @GNUTLS_DIG_SHA224: SHA-224 algorithm.
-   *
-   * Enumeration of different digest (hash) algorithms.
-   */
+/**
+ * gnutls_digest_algorithm_t:
+ * @GNUTLS_DIG_UNKNOWN: Unknown hash algorithm.
+ * @GNUTLS_DIG_NULL: NULL hash algorithm (empty output).
+ * @GNUTLS_DIG_MD5: MD5 algorithm.
+ * @GNUTLS_DIG_SHA1: SHA-1 algorithm.
+ * @GNUTLS_DIG_RMD160: RMD160 algorithm.
+ * @GNUTLS_DIG_MD2: MD2 algorithm.
+ * @GNUTLS_DIG_SHA256: SHA-256 algorithm.
+ * @GNUTLS_DIG_SHA384: SHA-384 algorithm.
+ * @GNUTLS_DIG_SHA512: SHA-512 algorithm.
+ * @GNUTLS_DIG_SHA224: SHA-224 algorithm.
+ *
+ * Enumeration of different digest (hash) algorithms.
+ */
   typedef enum
   {
     GNUTLS_DIG_UNKNOWN = GNUTLS_MAC_UNKNOWN,
@@ -267,15 +267,15 @@ extern "C"
    */
 #define GNUTLS_MAX_ALGORITHM_NUM 32
 
-  /**
-   * gnutls_compression_method_t:
-   * @GNUTLS_COMP_UNKNOWN: Unknown compression method.
-   * @GNUTLS_COMP_NULL: The NULL compression method (uncompressed).
-   * @GNUTLS_COMP_DEFLATE: The deflate/zlib compression method.
-   * @GNUTLS_COMP_ZLIB: Same as %GNUTLS_COMP_DEFLATE.
-   *
-   * Enumeration of different TLS compression methods.
-   */
+/**
+ * gnutls_compression_method_t:
+ * @GNUTLS_COMP_UNKNOWN: Unknown compression method.
+ * @GNUTLS_COMP_NULL: The NULL compression method (uncompressed).
+ * @GNUTLS_COMP_DEFLATE: The deflate/zlib compression method.
+ * @GNUTLS_COMP_ZLIB: Same as %GNUTLS_COMP_DEFLATE.
+ *
+ * Enumeration of different TLS compression methods.
+ */
   typedef enum
   {
     GNUTLS_COMP_UNKNOWN = 0,
@@ -299,56 +299,56 @@ extern "C"
 #define GNUTLS_DATAGRAM (1<<2)
 #define GNUTLS_NONBLOCK (1<<3)
 
-  /**
-   * gnutls_alert_level_t:
-   * @GNUTLS_AL_WARNING: Alert of warning severity.
-   * @GNUTLS_AL_FATAL: Alert of fatal severity.
-   *
-   * Enumeration of different TLS alert severities.
-   */
+/**
+ * gnutls_alert_level_t:
+ * @GNUTLS_AL_WARNING: Alert of warning severity.
+ * @GNUTLS_AL_FATAL: Alert of fatal severity.
+ *
+ * Enumeration of different TLS alert severities.
+ */
   typedef enum
   {
     GNUTLS_AL_WARNING = 1,
     GNUTLS_AL_FATAL
   } gnutls_alert_level_t;
 
-  /**
-   * gnutls_alert_description_t:
-   * @GNUTLS_A_CLOSE_NOTIFY: Close notify.
-   * @GNUTLS_A_UNEXPECTED_MESSAGE: Unexpected message.
-   * @GNUTLS_A_BAD_RECORD_MAC: Bad record MAC.
-   * @GNUTLS_A_DECRYPTION_FAILED: Decryption failed.
-   * @GNUTLS_A_RECORD_OVERFLOW: Record overflow.
-   * @GNUTLS_A_DECOMPRESSION_FAILURE: Decompression failed.
-   * @GNUTLS_A_HANDSHAKE_FAILURE: Handshake failed.
-   * @GNUTLS_A_SSL3_NO_CERTIFICATE: No certificate.
-   * @GNUTLS_A_BAD_CERTIFICATE: Certificate is bad.
-   * @GNUTLS_A_UNSUPPORTED_CERTIFICATE: Certificate is not supported.
-   * @GNUTLS_A_CERTIFICATE_REVOKED: Certificate was revoked.
-   * @GNUTLS_A_CERTIFICATE_EXPIRED: Certificate is expired.
-   * @GNUTLS_A_CERTIFICATE_UNKNOWN: Unknown certificate.
-   * @GNUTLS_A_ILLEGAL_PARAMETER: Illegal parameter.
-   * @GNUTLS_A_UNKNOWN_CA: CA is unknown.
-   * @GNUTLS_A_ACCESS_DENIED: Access was denied.
-   * @GNUTLS_A_DECODE_ERROR: Decode error.
-   * @GNUTLS_A_DECRYPT_ERROR: Decrypt error.
-   * @GNUTLS_A_EXPORT_RESTRICTION: Export restriction.
-   * @GNUTLS_A_PROTOCOL_VERSION: Error in protocol version.
-   * @GNUTLS_A_INSUFFICIENT_SECURITY: Insufficient security.
-   * @GNUTLS_A_USER_CANCELED: User canceled.
-   * @GNUTLS_A_INTERNAL_ERROR: Internal error.
-   * @GNUTLS_A_NO_RENEGOTIATION: No renegotiation is allowed.
-   * @GNUTLS_A_CERTIFICATE_UNOBTAINABLE: Could not retrieve the
-   *   specified certificate.
-   * @GNUTLS_A_UNSUPPORTED_EXTENSION: An unsupported extension was
-   *   sent.
-   * @GNUTLS_A_UNRECOGNIZED_NAME: The server name sent was not
-   *   recognized.
-   * @GNUTLS_A_UNKNOWN_PSK_IDENTITY: The SRP/PSK username is missing
-   *   or not known.
-   *
-   * Enumeration of different TLS alerts.
-   */
+/**
+ * gnutls_alert_description_t:
+ * @GNUTLS_A_CLOSE_NOTIFY: Close notify.
+ * @GNUTLS_A_UNEXPECTED_MESSAGE: Unexpected message.
+ * @GNUTLS_A_BAD_RECORD_MAC: Bad record MAC.
+ * @GNUTLS_A_DECRYPTION_FAILED: Decryption failed.
+ * @GNUTLS_A_RECORD_OVERFLOW: Record overflow.
+ * @GNUTLS_A_DECOMPRESSION_FAILURE: Decompression failed.
+ * @GNUTLS_A_HANDSHAKE_FAILURE: Handshake failed.
+ * @GNUTLS_A_SSL3_NO_CERTIFICATE: No certificate.
+ * @GNUTLS_A_BAD_CERTIFICATE: Certificate is bad.
+ * @GNUTLS_A_UNSUPPORTED_CERTIFICATE: Certificate is not supported.
+ * @GNUTLS_A_CERTIFICATE_REVOKED: Certificate was revoked.
+ * @GNUTLS_A_CERTIFICATE_EXPIRED: Certificate is expired.
+ * @GNUTLS_A_CERTIFICATE_UNKNOWN: Unknown certificate.
+ * @GNUTLS_A_ILLEGAL_PARAMETER: Illegal parameter.
+ * @GNUTLS_A_UNKNOWN_CA: CA is unknown.
+ * @GNUTLS_A_ACCESS_DENIED: Access was denied.
+ * @GNUTLS_A_DECODE_ERROR: Decode error.
+ * @GNUTLS_A_DECRYPT_ERROR: Decrypt error.
+ * @GNUTLS_A_EXPORT_RESTRICTION: Export restriction.
+ * @GNUTLS_A_PROTOCOL_VERSION: Error in protocol version.
+ * @GNUTLS_A_INSUFFICIENT_SECURITY: Insufficient security.
+ * @GNUTLS_A_USER_CANCELED: User canceled.
+ * @GNUTLS_A_INTERNAL_ERROR: Internal error.
+ * @GNUTLS_A_NO_RENEGOTIATION: No renegotiation is allowed.
+ * @GNUTLS_A_CERTIFICATE_UNOBTAINABLE: Could not retrieve the
+ *   specified certificate.
+ * @GNUTLS_A_UNSUPPORTED_EXTENSION: An unsupported extension was
+ *   sent.
+ * @GNUTLS_A_UNRECOGNIZED_NAME: The server name sent was not
+ *   recognized.
+ * @GNUTLS_A_UNKNOWN_PSK_IDENTITY: The SRP/PSK username is missing
+ *   or not known.
+ *
+ * Enumeration of different TLS alerts.
+ */
   typedef enum
   {
     GNUTLS_A_CLOSE_NOTIFY,
@@ -381,26 +381,26 @@ extern "C"
     GNUTLS_A_UNKNOWN_PSK_IDENTITY = 115,
   } gnutls_alert_description_t;
 
-  /**
-   * gnutls_handshake_description_t:
-   * @GNUTLS_HANDSHAKE_HELLO_REQUEST: Hello request.
-   * @GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST: DTLS Hello verify request.
-   * @GNUTLS_HANDSHAKE_CLIENT_HELLO: Client hello.
-   * @GNUTLS_HANDSHAKE_SERVER_HELLO: Server hello.
-   * @GNUTLS_HANDSHAKE_NEW_SESSION_TICKET: New session ticket.
-   * @GNUTLS_HANDSHAKE_CERTIFICATE_PKT: Certificate packet.
-   * @GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE: Server key exchange.
-   * @GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST: Certificate request.
-   * @GNUTLS_HANDSHAKE_SERVER_HELLO_DONE: Server hello done.
-   * @GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY: Certificate verify.
-   * @GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE: Client key exchange.
-   * @GNUTLS_HANDSHAKE_FINISHED: Finished.
-   * @GNUTLS_HANDSHAKE_SUPPLEMENTAL: Supplemental.
-   * @GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC: Change Cipher Spec
-   * @GNUTLS_HANDSHAKE_CLIENT_HELLO_V2: SSLv2 Client Hello.
-   *
-   * Enumeration of different TLS handshake packets.
-   */
+/**
+ * gnutls_handshake_description_t:
+ * @GNUTLS_HANDSHAKE_HELLO_REQUEST: Hello request.
+ * @GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST: DTLS Hello verify request.
+ * @GNUTLS_HANDSHAKE_CLIENT_HELLO: Client hello.
+ * @GNUTLS_HANDSHAKE_SERVER_HELLO: Server hello.
+ * @GNUTLS_HANDSHAKE_NEW_SESSION_TICKET: New session ticket.
+ * @GNUTLS_HANDSHAKE_CERTIFICATE_PKT: Certificate packet.
+ * @GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE: Server key exchange.
+ * @GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST: Certificate request.
+ * @GNUTLS_HANDSHAKE_SERVER_HELLO_DONE: Server hello done.
+ * @GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY: Certificate verify.
+ * @GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE: Client key exchange.
+ * @GNUTLS_HANDSHAKE_FINISHED: Finished.
+ * @GNUTLS_HANDSHAKE_SUPPLEMENTAL: Supplemental.
+ * @GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC: Change Cipher Spec
+ * @GNUTLS_HANDSHAKE_CLIENT_HELLO_V2: SSLv2 Client Hello.
+ *
+ * Enumeration of different TLS handshake packets.
+ */
   typedef enum
   {
     GNUTLS_HANDSHAKE_HELLO_REQUEST = 0,
@@ -420,25 +420,28 @@ extern "C"
     GNUTLS_HANDSHAKE_CLIENT_HELLO_V2 = 1024,
   } gnutls_handshake_description_t;
 
-  /**
-   * gnutls_certificate_status_t:
-   * @GNUTLS_CERT_INVALID: Will be set if the certificate was not
-   *   verified.
-   * @GNUTLS_CERT_REVOKED: Certificate revoked.  In X.509 this will be
-   *   set only if CRLs are checked.
-   * @GNUTLS_CERT_SIGNER_NOT_FOUND: Certificate not verified.  Signer
-   *   not found.
-   * @GNUTLS_CERT_SIGNER_NOT_CA: Certificate not verified.  Signer
-   *   not a CA certificate.
-   * @GNUTLS_CERT_INSECURE_ALGORITHM: Certificate not verified,
-   *   insecure algorithm.
-   * @GNUTLS_CERT_NOT_ACTIVATED: Certificate not yet activated.
-   * @GNUTLS_CERT_EXPIRED: Certificate expired.
-   *
-   * Enumeration of certificate status codes.  Note that the status
-   * bits have different meanings in OpenPGP keys and X.509
-   * certificate verification.
-   */
+/**
+ * gnutls_certificate_status_t:
+ * @GNUTLS_CERT_INVALID: The certificate is not signed by one of the
+ *   known authorities or the signature is invalid.
+ * @GNUTLS_CERT_REVOKED: Certificate is revoked by its authority.  In X.509 this will be
+ *   set only if CRLs are checked.
+ * @GNUTLS_CERT_SIGNER_NOT_FOUND: The certificate's issuer is not known. 
+ *   This is the case if the issue is not included in the trusted certificate list.
+ *   not found.
+ * @GNUTLS_CERT_SIGNER_NOT_CA: The certiﬁcate’s signer was not a CA. This
+ *   may happen if this was a version 1 certiﬁcate, which is common with 
+ *   some CAs, or a version 3 certiﬁcate without the basic constrains extension.
+ * @GNUTLS_CERT_INSECURE_ALGORITHM:  The certiﬁcate was signed using an in-
+ *   secure algorithm such as MD2 or MD5. These algorithms have been broken and
+ *   should not be trusted.
+ * @GNUTLS_CERT_NOT_ACTIVATED: The certificate is not yet activated.
+ * @GNUTLS_CERT_EXPIRED: The certificate has expired.
+ *
+ * Enumeration of certificate status codes.  Note that the status
+ * bits have different meanings in OpenPGP keys and X.509
+ * certificate verification.
+ */
   typedef enum
   {
     GNUTLS_CERT_INVALID = 2,
@@ -450,14 +453,14 @@ extern "C"
     GNUTLS_CERT_EXPIRED = 1024
   } gnutls_certificate_status_t;
 
-  /**
-   * gnutls_certificate_request_t:
-   * @GNUTLS_CERT_IGNORE: Ignore certificate.
-   * @GNUTLS_CERT_REQUEST: Request certificate.
-   * @GNUTLS_CERT_REQUIRE: Require certificate.
-   *
-   * Enumeration of certificate request types.
-   */
+/**
+ * gnutls_certificate_request_t:
+ * @GNUTLS_CERT_IGNORE: Ignore certificate.
+ * @GNUTLS_CERT_REQUEST: Request certificate.
+ * @GNUTLS_CERT_REQUIRE: Require certificate.
+ *
+ * Enumeration of certificate request types.
+ */
   typedef enum
   {
     GNUTLS_CERT_IGNORE = 0,
@@ -465,45 +468,45 @@ extern "C"
     GNUTLS_CERT_REQUIRE = 2
   } gnutls_certificate_request_t;
 
-  /**
-   * gnutls_openpgp_crt_status_t:
-   * @GNUTLS_OPENPGP_CERT: Send entire certificate.
-   * @GNUTLS_OPENPGP_CERT_FINGERPRINT: Send only certificate fingerprint.
-   *
-   * Enumeration of ways to send OpenPGP certificate.
-   */
+/**
+ * gnutls_openpgp_crt_status_t:
+ * @GNUTLS_OPENPGP_CERT: Send entire certificate.
+ * @GNUTLS_OPENPGP_CERT_FINGERPRINT: Send only certificate fingerprint.
+ *
+ * Enumeration of ways to send OpenPGP certificate.
+ */
   typedef enum
   {
     GNUTLS_OPENPGP_CERT = 0,
     GNUTLS_OPENPGP_CERT_FINGERPRINT = 1
   } gnutls_openpgp_crt_status_t;
 
-  /**
-   * gnutls_close_request_t:
-   * @GNUTLS_SHUT_RDWR: Disallow further receives/sends.
-   * @GNUTLS_SHUT_WR: Disallow further sends.
-   *
-   * Enumeration of how TLS session should be terminated.  See gnutls_bye().
-   */
+/**
+ * gnutls_close_request_t:
+ * @GNUTLS_SHUT_RDWR: Disallow further receives/sends.
+ * @GNUTLS_SHUT_WR: Disallow further sends.
+ *
+ * Enumeration of how TLS session should be terminated.  See gnutls_bye().
+ */
   typedef enum
   {
     GNUTLS_SHUT_RDWR = 0,
     GNUTLS_SHUT_WR = 1
   } gnutls_close_request_t;
 
-  /**
-   * gnutls_protocol_t:
-   * @GNUTLS_SSL3: SSL version 3.0.
-   * @GNUTLS_TLS1_0: TLS version 1.0.
-   * @GNUTLS_TLS1: Same as %GNUTLS_TLS1_0.
-   * @GNUTLS_TLS1_1: TLS version 1.1.
-   * @GNUTLS_TLS1_2: TLS version 1.2.
-   * @GNUTLS_DTLS1_0: DTLS version 1.0.
-   * @GNUTLS_VERSION_MAX: Maps to the highest supported TLS version.
-   * @GNUTLS_VERSION_UNKNOWN: Unknown SSL/TLS version.
-   *
-   * Enumeration of different SSL/TLS protocol versions.
-   */
+/**
+ * gnutls_protocol_t:
+ * @GNUTLS_SSL3: SSL version 3.0.
+ * @GNUTLS_TLS1_0: TLS version 1.0.
+ * @GNUTLS_TLS1: Same as %GNUTLS_TLS1_0.
+ * @GNUTLS_TLS1_1: TLS version 1.1.
+ * @GNUTLS_TLS1_2: TLS version 1.2.
+ * @GNUTLS_DTLS1_0: DTLS version 1.0.
+ * @GNUTLS_VERSION_MAX: Maps to the highest supported TLS version.
+ * @GNUTLS_VERSION_UNKNOWN: Unknown SSL/TLS version.
+ *
+ * Enumeration of different SSL/TLS protocol versions.
+ */
   typedef enum
   {
     GNUTLS_SSL3 = 1,
@@ -516,14 +519,14 @@ extern "C"
     GNUTLS_VERSION_UNKNOWN = 0xff
   } gnutls_protocol_t;
 
-  /**
-   * gnutls_certificate_type_t:
-   * @GNUTLS_CRT_UNKNOWN: Unknown certificate type.
-   * @GNUTLS_CRT_X509: X.509 Certificate.
-   * @GNUTLS_CRT_OPENPGP: OpenPGP certificate.
-   *
-   * Enumeration of different certificate types.
-   */
+/**
+ * gnutls_certificate_type_t:
+ * @GNUTLS_CRT_UNKNOWN: Unknown certificate type.
+ * @GNUTLS_CRT_X509: X.509 Certificate.
+ * @GNUTLS_CRT_OPENPGP: OpenPGP certificate.
+ *
+ * Enumeration of different certificate types.
+ */
   typedef enum
   {
     GNUTLS_CRT_UNKNOWN = 0,
@@ -531,27 +534,27 @@ extern "C"
     GNUTLS_CRT_OPENPGP = 2
   } gnutls_certificate_type_t;
 
-  /**
-   * gnutls_x509_crt_fmt_t:
-   * @GNUTLS_X509_FMT_DER: X.509 certificate in DER format (binary).
-   * @GNUTLS_X509_FMT_PEM: X.509 certificate in PEM format (text).
-   *
-   * Enumeration of different certificate encoding formats.
-   */
+/**
+ * gnutls_x509_crt_fmt_t:
+ * @GNUTLS_X509_FMT_DER: X.509 certificate in DER format (binary).
+ * @GNUTLS_X509_FMT_PEM: X.509 certificate in PEM format (text).
+ *
+ * Enumeration of different certificate encoding formats.
+ */
   typedef enum
   {
     GNUTLS_X509_FMT_DER = 0,
     GNUTLS_X509_FMT_PEM = 1
   } gnutls_x509_crt_fmt_t;
 
-  /**
-   * gnutls_certificate_print_formats_t:
-   * @GNUTLS_CRT_PRINT_FULL: Full information about certificate.
-   * @GNUTLS_CRT_PRINT_ONELINE: Information about certificate in one line.
-   * @GNUTLS_CRT_PRINT_UNSIGNED_FULL: All info for an unsigned certificate.
-   *
-   * Enumeration of different certificate printing variants.
-   */
+/**
+ * gnutls_certificate_print_formats_t:
+ * @GNUTLS_CRT_PRINT_FULL: Full information about certificate.
+ * @GNUTLS_CRT_PRINT_ONELINE: Information about certificate in one line.
+ * @GNUTLS_CRT_PRINT_UNSIGNED_FULL: All info for an unsigned certificate.
+ *
+ * Enumeration of different certificate printing variants.
+ */
   typedef enum gnutls_certificate_print_formats
   {
     GNUTLS_CRT_PRINT_FULL = 0,
@@ -559,16 +562,16 @@ extern "C"
     GNUTLS_CRT_PRINT_UNSIGNED_FULL = 2
   } gnutls_certificate_print_formats_t;
 
-  /**
-   * gnutls_pk_algorithm_t:
-   * @GNUTLS_PK_UNKNOWN: Unknown public-key algorithm.
-   * @GNUTLS_PK_RSA: RSA public-key algorithm.
-   * @GNUTLS_PK_DSA: DSA public-key algorithm.
-   * @GNUTLS_PK_DH: Diffie-Hellman algorithm. Used to generate parameters.
-   * @GNUTLS_PK_ECC: Elliptic curve algorithm. Used to generate parameters.
-   *
-   * Enumeration of different public-key algorithms.
-   */
+/**
+ * gnutls_pk_algorithm_t:
+ * @GNUTLS_PK_UNKNOWN: Unknown public-key algorithm.
+ * @GNUTLS_PK_RSA: RSA public-key algorithm.
+ * @GNUTLS_PK_DSA: DSA public-key algorithm.
+ * @GNUTLS_PK_DH: Diffie-Hellman algorithm. Used to generate parameters.
+ * @GNUTLS_PK_ECC: Elliptic curve algorithm. Used to generate parameters.
+ *
+ * Enumeration of different public-key algorithms.
+ */
   typedef enum
   {
     GNUTLS_PK_UNKNOWN = 0,
@@ -580,30 +583,30 @@ extern "C"
 
   const char *gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm);
 
-  /**
-   * gnutls_sign_algorithm_t:
-   * @GNUTLS_SIGN_UNKNOWN: Unknown signature algorithm.
-   * @GNUTLS_SIGN_RSA_SHA1: Digital signature algorithm RSA with SHA-1
-   * @GNUTLS_SIGN_RSA_SHA: Same as %GNUTLS_SIGN_RSA_SHA1.
-   * @GNUTLS_SIGN_DSA_SHA1: Digital signature algorithm DSA with SHA-1
-   * @GNUTLS_SIGN_DSA_SHA224: Digital signature algorithm DSA with SHA-224
-   * @GNUTLS_SIGN_DSA_SHA256: Digital signature algorithm DSA with SHA-256
-   * @GNUTLS_SIGN_DSA_SHA: Same as %GNUTLS_SIGN_DSA_SHA1.
-   * @GNUTLS_SIGN_RSA_MD5: Digital signature algorithm RSA with MD5.
-   * @GNUTLS_SIGN_RSA_MD2: Digital signature algorithm RSA with MD2.
-   * @GNUTLS_SIGN_RSA_RMD160: Digital signature algorithm RSA with RMD-160.
-   * @GNUTLS_SIGN_RSA_SHA256: Digital signature algorithm RSA with SHA-256.
-   * @GNUTLS_SIGN_RSA_SHA384: Digital signature algorithm RSA with SHA-384.
-   * @GNUTLS_SIGN_RSA_SHA512: Digital signature algorithm RSA with SHA-512.
-   * @GNUTLS_SIGN_RSA_SHA224: Digital signature algorithm RSA with SHA-224.
-   * @GNUTLS_SIGN_ECDSA_SHA1: ECDSA with SHA1.
-   * @GNUTLS_SIGN_ECDSA_SHA256: Digital signature algorithm ECDSA with SHA-256.
-   * @GNUTLS_SIGN_ECDSA_SHA384: Digital signature algorithm ECDSA with SHA-384.
-   * @GNUTLS_SIGN_ECDSA_SHA512: Digital signature algorithm ECDSA with SHA-512.
-   * @GNUTLS_SIGN_ECDSA_SHA224: Digital signature algorithm ECDSA with SHA-224.
-   *
-   * Enumeration of different digital signature algorithms.
-   */
+/**
+ * gnutls_sign_algorithm_t:
+ * @GNUTLS_SIGN_UNKNOWN: Unknown signature algorithm.
+ * @GNUTLS_SIGN_RSA_SHA1: Digital signature algorithm RSA with SHA-1
+ * @GNUTLS_SIGN_RSA_SHA: Same as %GNUTLS_SIGN_RSA_SHA1.
+ * @GNUTLS_SIGN_DSA_SHA1: Digital signature algorithm DSA with SHA-1
+ * @GNUTLS_SIGN_DSA_SHA224: Digital signature algorithm DSA with SHA-224
+ * @GNUTLS_SIGN_DSA_SHA256: Digital signature algorithm DSA with SHA-256
+ * @GNUTLS_SIGN_DSA_SHA: Same as %GNUTLS_SIGN_DSA_SHA1.
+ * @GNUTLS_SIGN_RSA_MD5: Digital signature algorithm RSA with MD5.
+ * @GNUTLS_SIGN_RSA_MD2: Digital signature algorithm RSA with MD2.
+ * @GNUTLS_SIGN_RSA_RMD160: Digital signature algorithm RSA with RMD-160.
+ * @GNUTLS_SIGN_RSA_SHA256: Digital signature algorithm RSA with SHA-256.
+ * @GNUTLS_SIGN_RSA_SHA384: Digital signature algorithm RSA with SHA-384.
+ * @GNUTLS_SIGN_RSA_SHA512: Digital signature algorithm RSA with SHA-512.
+ * @GNUTLS_SIGN_RSA_SHA224: Digital signature algorithm RSA with SHA-224.
+ * @GNUTLS_SIGN_ECDSA_SHA1: ECDSA with SHA1.
+ * @GNUTLS_SIGN_ECDSA_SHA256: Digital signature algorithm ECDSA with SHA-256.
+ * @GNUTLS_SIGN_ECDSA_SHA384: Digital signature algorithm ECDSA with SHA-384.
+ * @GNUTLS_SIGN_ECDSA_SHA512: Digital signature algorithm ECDSA with SHA-512.
+ * @GNUTLS_SIGN_ECDSA_SHA224: Digital signature algorithm ECDSA with SHA-224.
+ *
+ * Enumeration of different digital signature algorithms.
+ */
   typedef enum
   {
     GNUTLS_SIGN_UNKNOWN = 0,
@@ -627,16 +630,16 @@ extern "C"
     GNUTLS_SIGN_ECDSA_SHA512 = 16,
   } gnutls_sign_algorithm_t;
 
-  /**
-   * gnutls_ecc_curve_t:
-   * @GNUTLS_ECC_CURVE_INVALID: Cannot be known
-   * @GNUTLS_ECC_CURVE_SECP224R1: the SECP224R1 curve
-   * @GNUTLS_ECC_CURVE_SECP256R1: the SECP256R1 curve
-   * @GNUTLS_ECC_CURVE_SECP384R1: the SECP384R1 curve
-   * @GNUTLS_ECC_CURVE_SECP521R1: the SECP521R1 curve
-   *
-   * Enumeration of ECC curves.
-   */
+/**
+ * gnutls_ecc_curve_t:
+ * @GNUTLS_ECC_CURVE_INVALID: Cannot be known
+ * @GNUTLS_ECC_CURVE_SECP224R1: the SECP224R1 curve
+ * @GNUTLS_ECC_CURVE_SECP256R1: the SECP256R1 curve
+ * @GNUTLS_ECC_CURVE_SECP384R1: the SECP384R1 curve
+ * @GNUTLS_ECC_CURVE_SECP521R1: the SECP521R1 curve
+ *
+ * Enumeration of ECC curves.
+ */
 typedef enum
 {
   GNUTLS_ECC_CURVE_INVALID=0,
@@ -646,17 +649,17 @@ typedef enum
   GNUTLS_ECC_CURVE_SECP521R1,
 } gnutls_ecc_curve_t;
 
-  /**
-   * gnutls_sec_param_t:
-   * @GNUTLS_SEC_PARAM_UNKNOWN: Cannot be known
-   * @GNUTLS_SEC_PARAM_WEAK: 50 or less bits of security
-   * @GNUTLS_SEC_PARAM_LOW: 80 bits of security
-   * @GNUTLS_SEC_PARAM_NORMAL: 112 bits of security
-   * @GNUTLS_SEC_PARAM_HIGH: 128 bits of security
-   * @GNUTLS_SEC_PARAM_ULTRA: 192 bits of security
-   *
-   * Enumeration of security parameters for passive attacks
-   */
+/**
+ * gnutls_sec_param_t:
+ * @GNUTLS_SEC_PARAM_UNKNOWN: Cannot be known
+ * @GNUTLS_SEC_PARAM_WEAK: 50 or less bits of security
+ * @GNUTLS_SEC_PARAM_LOW: 80 bits of security
+ * @GNUTLS_SEC_PARAM_NORMAL: 112 bits of security
+ * @GNUTLS_SEC_PARAM_HIGH: 128 bits of security
+ * @GNUTLS_SEC_PARAM_ULTRA: 192 bits of security
+ *
+ * Enumeration of security parameters for passive attacks
+ */
   typedef enum
   {
     GNUTLS_SEC_PARAM_UNKNOWN,
@@ -667,12 +670,12 @@ typedef enum
     GNUTLS_SEC_PARAM_ULTRA
   } gnutls_sec_param_t;
 
-  /**
-   * gnutls_channel_binding_t:
-   * @GNUTLS_CB_TLS_UNIQUE: "tls-unique" (RFC 5929) channel binding
-   *
-   * Enumeration of support channel binding types.
-   */
+/**
+ * gnutls_channel_binding_t:
+ * @GNUTLS_CB_TLS_UNIQUE: "tls-unique" (RFC 5929) channel binding
+ *
+ * Enumeration of support channel binding types.
+ */
   typedef enum
   {
     GNUTLS_CB_TLS_UNIQUE
@@ -854,12 +857,12 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                       size_t seed_size, const char *seed,
                       size_t outsize, char *out);
 
-  /**
-   * gnutls_server_name_type_t:
-   * @GNUTLS_NAME_DNS: Domain Name System name type.
-   *
-   * Enumeration of different server name types.
-   */
+/**
+ * gnutls_server_name_type_t:
+ * @GNUTLS_NAME_DNS: Domain Name System name type.
+ *
+ * Enumeration of different server name types.
+ */
   typedef enum
   {
     GNUTLS_NAME_DNS = 1
@@ -876,12 +879,12 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   /* Safe renegotiation */
   int gnutls_safe_renegotiation_status (gnutls_session_t session);
 
-  /**
-   * gnutls_supplemental_data_format_type_t:
-   * @GNUTLS_SUPPLEMENTAL_USER_MAPPING_DATA: Supplemental user mapping data.
-   *
-   * Enumeration of different supplemental data types (RFC 4680).
-   */
+/**
+ * gnutls_supplemental_data_format_type_t:
+ * @GNUTLS_SUPPLEMENTAL_USER_MAPPING_DATA: Supplemental user mapping data.
+ *
+ * Enumeration of different supplemental data types (RFC 4680).
+ */
   typedef enum
   {
     GNUTLS_SUPPLEMENTAL_USER_MAPPING_DATA = 0
@@ -1388,13 +1391,13 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   typedef struct gnutls_psk_client_credentials_st
     *gnutls_psk_client_credentials_t;
 
-  /**
-   * gnutls_psk_key_flags:
-   * @GNUTLS_PSK_KEY_RAW: PSK-key in raw format.
-   * @GNUTLS_PSK_KEY_HEX: PSK-key in hex format.
-   *
-   * Enumeration of different PSK key flags.
-   */
+/**
+ * gnutls_psk_key_flags:
+ * @GNUTLS_PSK_KEY_RAW: PSK-key in raw format.
+ * @GNUTLS_PSK_KEY_HEX: PSK-key in hex format.
+ *
+ * Enumeration of different PSK key flags.
+ */
   typedef enum gnutls_psk_key_flags
   {
     GNUTLS_PSK_KEY_RAW = 0,
@@ -1456,19 +1459,19 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                            res,
                                            gnutls_params_function * func);
 
-  /**
-   * gnutls_x509_subject_alt_name_t:
-   * @GNUTLS_SAN_DNSNAME: DNS-name SAN.
-   * @GNUTLS_SAN_RFC822NAME: E-mail address SAN.
-   * @GNUTLS_SAN_URI: URI SAN.
-   * @GNUTLS_SAN_IPADDRESS: IP address SAN.
-   * @GNUTLS_SAN_OTHERNAME: OtherName SAN.
-   * @GNUTLS_SAN_DN: DN SAN.
-   * @GNUTLS_SAN_OTHERNAME_XMPP: Virtual SAN, used by
-   *   gnutls_x509_crt_get_subject_alt_othername_oid().
-   *
-   * Enumeration of different subject alternative names types.
-   */
+/**
+ * gnutls_x509_subject_alt_name_t:
+ * @GNUTLS_SAN_DNSNAME: DNS-name SAN.
+ * @GNUTLS_SAN_RFC822NAME: E-mail address SAN.
+ * @GNUTLS_SAN_URI: URI SAN.
+ * @GNUTLS_SAN_IPADDRESS: IP address SAN.
+ * @GNUTLS_SAN_OTHERNAME: OtherName SAN.
+ * @GNUTLS_SAN_DN: DN SAN.
+ * @GNUTLS_SAN_OTHERNAME_XMPP: Virtual SAN, used by
+ *   gnutls_x509_crt_get_subject_alt_othername_oid().
+ *
+ * Enumeration of different subject alternative names types.
+ */
   typedef enum gnutls_x509_subject_alt_name_t
   {
     GNUTLS_SAN_DNSNAME = 1,
@@ -1492,14 +1495,14 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   struct gnutls_pkcs11_privkey_st;
   typedef struct gnutls_pkcs11_privkey_st *gnutls_pkcs11_privkey_t;
 
-  /**
-   * gnutls_privkey_type_t:
-   * @GNUTLS_PRIVKEY_X509: X.509 private key, #gnutls_x509_privkey_t.
-   * @GNUTLS_PRIVKEY_OPENPGP: OpenPGP private key, #gnutls_openpgp_privkey_t.
-   * @GNUTLS_PRIVKEY_PKCS11: PKCS11 private key, #gnutls_pkcs11_privkey_t.
-   *
-   * Enumeration of different private key types.
-   */
+/**
+ * gnutls_privkey_type_t:
+ * @GNUTLS_PRIVKEY_X509: X.509 private key, #gnutls_x509_privkey_t.
+ * @GNUTLS_PRIVKEY_OPENPGP: OpenPGP private key, #gnutls_openpgp_privkey_t.
+ * @GNUTLS_PRIVKEY_PKCS11: PKCS11 private key, #gnutls_pkcs11_privkey_t.
+ *
+ * Enumeration of different private key types.
+ */
   typedef enum
     {
       GNUTLS_PRIVKEY_X509,

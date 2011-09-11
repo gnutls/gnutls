@@ -681,6 +681,8 @@ parameter with actual bit sizes of parameters for DH, RSA, SRP and ECC algorithm
 A mapping to @code{gnutls_sec_param_t} value is given for each security parameter, on
 the next column, and finally a brief description of the level.
 
+@c @showenumdesc{gnutls_sec_param_t,The @code{gnutls_sec_@-param_t} enumeration.}
+
 Note, however, that the values suggested here are nothing more than an
 educated guess that is valid today. There are no guarantees that an
 algorithm will remain unbreakable or that these values will remain
