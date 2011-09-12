@@ -22,7 +22,7 @@ inline static void g_cpuid(uint32_t func, unsigned int *ax, unsigned int *bx, un
                   "cpuid\n" 
                   "movl %%ebx, %1\n"
                   "popl %%ebx\n"
-                  :"=a" (*ax), "=r"(*bx), "=c"(*cx), "=d"(*cx)
+                  :"=a" (*ax), "=r"(*bx), "=c"(*cx), "=d"(*dx)
                   :"a"(func)
                   :"cc");
 }
