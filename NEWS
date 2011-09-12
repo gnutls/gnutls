@@ -14,6 +14,8 @@ Reported by J. Cameijo Cerdeira.
 Reported by Jonathan Nieder <jrnieder@gmail.com> in
 <http://bugs.debian.org/640639>.
 
+** libgnutls: Added support for VIA padlock AES optimizations.
+
 ** libgnutls: Added support for elliptic curves in
 PKCS #11.
 

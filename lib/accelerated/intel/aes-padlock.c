@@ -184,7 +184,10 @@ void register_padlock_crypto(void)
 {
     int ret;
 
-    if (check_via() == 0)
+    /* Only enable the 32-bit padlock variant, until
+     * the 64-bit code is tested.
+     */
+    if (sizeof(unsigned int) != 4 || check_via() == 0)
         return;
 
     if (check_padlock()) {
