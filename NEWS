@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.0.3 (unreleased)
 
+** libgnutls: All functions related to RSA-EXPORT were deprecated.
+Support for RSA-EXPORT ciphersuites will be ceased in future versions.
+
 ** libgnutls: Memory leak fixes in ECC ciphersuites.
 
 ** libgnutls: Do not send an empty extension structure in server 

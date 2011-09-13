@@ -179,7 +179,7 @@ In the case of DTLS it is also desirable to override the generic
 transport functions with functions that emulate the operation
 of @code{recvfrom} and @code{sendto}. In addition
 @acronym{DTLS} requires timers during the receive of a handshake
-message. This requires the following function to be used.
+message. This requires the @funcref{gnutls_transport_set_pull_timeout_function} function to be used.
 
 @showfuncdesc{gnutls_transport_set_pull_timeout_function}
 
@@ -196,7 +196,7 @@ The handshake process doesn't ensure the verification
 of the peer's identity. When certificates are in use,
 this can be done, either after the handshake is complete, or during 
 the handshake if @funcref{gnutls_certificate_set_verify_function}
-has been used. In both cases the following function can be
+has been used. In both cases the @funcref{gnutls_certificate_verify_peers2} function can be
 used to verify the peer's certificate (see @ref{Certificate authentication}
 for more information).
 
@@ -231,11 +231,9 @@ recommended to use @funcref{gnutls_bye} to terminate the
 session. That way the peer is notified securely about the
 intention of termination, which allows distinguishing it
 from a malicious connection termination.
+A session can be deinitialized with the @funcref{gnutls_deinit} function.
 
 @showfuncdesc{gnutls_bye}
-
-A session can be deinitialized using the following function.
-
 @showfuncdesc{gnutls_deinit}
 
 @subsection Asynchronous operation
@@ -279,14 +277,7 @@ should verify the initial message sent by client using @funcref{gnutls_dtls_cook
 If successful a the session should be initialization and associated with
 the cookie using @funcref{gnutls_dtls_prestate_set}.
 
-@showfuncdesc{gnutls_key_generate}
-
-@showfuncdesc{gnutls_dtls_cookie_send}
-
-@showfuncdesc{gnutls_dtls_cookie_verify}
-
-@showfuncdesc{gnutls_dtls_prestate_set}
-
+@showfuncD{gnutls_key_generate,gnutls_dtls_cookie_send,gnutls_dtls_cookie_verify,gnutls_dtls_prestate_set}
 
 Note that the above apply to server side only and they are not mandatory to be
 used. Not using them, however, allows denial of service attacks.
@@ -299,10 +290,7 @@ of DTLS messages and prevent messages from being silently discarded by the
 transport layer. The ``correct'' maximum transfer unit can be obtained through
 a path MTU discovery mechanism @xcite{RFC4821}.
 
-@showfuncdesc{gnutls_dtls_set_mtu}
-
-@showfuncdesc{gnutls_dtls_get_mtu}
-@showfuncdesc{gnutls_dtls_get_data_mtu}
+@showfuncC{gnutls_dtls_set_mtu,gnutls_dtls_get_mtu,gnutls_dtls_get_data_mtu}
 
 @node Priority Strings
 @section Priority strings

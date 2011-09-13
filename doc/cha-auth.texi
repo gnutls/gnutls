@@ -130,11 +130,12 @@ available in certificate authentication.
 @showfuncdesc{gnutls_certificate_set_verify_function}
 
 Note that the DHE key exchange methods are generally
-slower@footnote{It really depends on the group used.  Primes with
+slower@footnote{It depends on the group used.  Primes with
 lesser bits are always faster, but also easier to break.  See @ref{Selecting cryptographic key sizes}
-for the acceptable security levels.} 
-and require Diffie-Hellman parameters to be generated and associated with a credentials
-structure, by the server (see @ref{Parameter generation}).
+for the acceptable security levels.} than the elliptic curves counterpart
+(ECDHE). Moreover the plain Diffie-Hellman key exchange
+requires parameters to be generated and associated with a credentials
+structure by the server (see @ref{Parameter generation}). 
 
 @float Table,tab:key-exchange
 @multitable @columnfractions .2 .7
@@ -363,12 +364,10 @@ the hint, for example in the callback function, using
 
 @showfuncC{gnutls_psk_set_server_credentials_function,gnutls_psk_set_server_credentials_hint,gnutls_psk_client_get_hint}
 
-Helper functions are included in @acronym{GnuTLS}, and may be used to generate and
-maintain @acronym{PSK} keys.
+Helper functions to generate and maintain @acronym{PSK} keys are also included
+in @acronym{GnuTLS}.
 
-@showfuncdesc{gnutls_hex_encode}
-
-@showfuncdesc{gnutls_hex_decode}
+@showfuncC{gnutls_key_generate,gnutls_hex_encode,gnutls_hex_decode}
 
 
 @node Authentication and credentials

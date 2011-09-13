@@ -44,6 +44,8 @@
 	\code{#1}%
 }
 
+\definecolor{light-gray}{gray}{0.95}
+
 \newcommand{\showfunc}[1]{%
  \let\Oldfd\functionDescription
  \let\Oldendfd\endfunctionDescription
@@ -63,15 +65,15 @@
 }
 
 \newcommand{\showfuncdesc}[1]{%
+ \begin{figure}[htbp]
  \begin{minipage}[l]{\linewidth}
  \begin{framed}
   \texttt{
    \input{functions/#1}
   }
  \end{framed}
- \vspace{0.10cm}
  \end{minipage}
- \par
+ \end{figure}
 }
 
 \newcommand{\showenumdesc}[2]{%
@@ -90,78 +92,93 @@
 }
 
 \newcommand{\showfuncA}[1]{%
-% \fcolorbox{black}{light-gray}{
+ \begin{figure}[H]
  \begin{samepage}
  \begin{framed}
    \showfunc{#1}
-% }
  \end{framed}
  \end{samepage}
+ \end{figure}
 }
 
 \newcommand{\showfuncB}[2]{%
-% \fcolorbox{black}{light-gray}{
+ \begin{figure}[H]
  \begin{samepage}
  \begin{framed}
     \showfunc{#1}
+ \vspace{0.2cm}
     \showfunc{#2}
-% }
  \end{framed}
  \end{samepage}
+ \end{figure}
 }
 
 \newcommand{\showfuncC}[3]{%
-% \fcolorbox{black}{light-gray}{
+ \begin{figure}[H]
  \begin{samepage}
  \begin{framed}
   \showfunc{#1}
+ \vspace{0.2cm}
   \showfunc{#2}
+ \vspace{0.2cm}
   \showfunc{#3}
-% }
  \end{framed}
  \end{samepage}
+ \end{figure}
 }
 
 \newcommand{\showfuncD}[4]{%
-% \fcolorbox{black}{light-gray}{
+ \begin{figure}[H]
  \begin{samepage}
  \begin{framed}
   \showfunc{#1}
+ \vspace{0.2cm}
   \showfunc{#2}
+ \vspace{0.2cm}
   \showfunc{#3}
+ \vspace{0.2cm}
   \showfunc{#4}
-% }
  \end{framed}
  \end{samepage}
+ \end{figure}
 }
 
 \newcommand{\showfuncE}[5]{%
-% \fcolorbox{black}{light-gray}{
+ \begin{figure}[H]
  \begin{samepage}
  \begin{framed}
   \showfunc{#1}
+ \vspace{0.2cm}
   \showfunc{#2}
+ \vspace{0.2cm}
   \showfunc{#3}
+ \vspace{0.2cm}
   \showfunc{#4}
+ \vspace{0.2cm}
   \showfunc{#5}
-% }
  \end{framed}
  \end{samepage}
+ \end{figure}
 }
 
 \newcommand{\showfuncF}[6]{%
-% \fcolorbox{black}{light-gray}{
+ \begin{figure}[H]
  \begin{samepage}
  \begin{framed}
   \showfunc{#1}
+ \vspace{0.2cm}
   \showfunc{#2}
+ \vspace{0.2cm}
   \showfunc{#3}
+ \vspace{0.2cm}
   \showfunc{#4}
+ \vspace{0.2cm}
   \showfunc{#5}
+ \vspace{0.2cm}
   \showfunc{#6}
-% }
  \end{framed}
  \end{samepage}
+ \end{figure}
 }
 
 \newenvironment{function}%

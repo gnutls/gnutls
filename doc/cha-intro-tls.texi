@@ -75,9 +75,6 @@ by providing callbacks for @acronym{GnuTLS} to access the transport layer
 
 The record protocol is the secure communications provider. Its purpose
 is to encrypt, authenticate and ---optionally--- compress packets.
-
-@showfuncA{gnutls_record_send}
-
 The record layer functions can be called at any time after
 the handshake process is finished, when there is need to receive
 or send data. In @acronym{DTLS} however, due to re-transmission
@@ -92,12 +89,12 @@ As you may have already noticed, the functions which access the record
 protocol, are quite limited, given the importance of this protocol in
 @acronym{TLS}.  This is because the record protocol's parameters are
 all set by the handshake protocol.
-
 The record protocol initially starts with NULL parameters, which means
 no encryption, and no MAC is used. Encryption and authentication begin
 just after the handshake protocol has finished.
 
-@showfuncD{gnutls_record_recv,gnutls_record_recv_seq,gnutls_record_check_pending,gnutls_record_get_direction}
+@showfuncC{gnutls_record_send,gnutls_record_recv,gnutls_record_recv_seq}
+@showfuncB{gnutls_record_check_pending,gnutls_record_get_direction}
 
 @menu
 * Encryption algorithms used in the record layer::
@@ -195,16 +192,10 @@ tunnels, and in cases where network usage has to be minimized. It
 should be noted however that compression increases latency.
 
 The record layer compression in @acronym{GnuTLS} is implemented based
-on the proposal @xcite{RFC3749}. The supported algorithms are:
+on the proposal @xcite{RFC3749}. The supported algorithms are shown in
+@ref{gnutls_compression_method_t}.
 
-@table @code
-@item DEFLATE:
-Zlib compression, using the deflate algorithm.
-
-@item NULL:
-No compression.
-
-@end table
+@showenumdesc{gnutls_compression_method_t,Supported compression algorithms}
 
 @node Weaknesses and countermeasures
 @subsection Weaknesses and countermeasures

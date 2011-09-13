@@ -270,8 +270,8 @@ extern "C"
 /**
  * gnutls_compression_method_t:
  * @GNUTLS_COMP_UNKNOWN: Unknown compression method.
- * @GNUTLS_COMP_NULL: The NULL compression method (uncompressed).
- * @GNUTLS_COMP_DEFLATE: The deflate/zlib compression method.
+ * @GNUTLS_COMP_NULL: The NULL compression method (no compression).
+ * @GNUTLS_COMP_DEFLATE: The DEFLATE compression method from zlib.
  * @GNUTLS_COMP_ZLIB: Same as %GNUTLS_COMP_DEFLATE.
  *
  * Enumeration of different TLS compression methods.
