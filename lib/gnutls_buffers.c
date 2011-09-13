@@ -21,9 +21,8 @@
  *
  */
 
-/* This is the only file that uses the berkeley sockets API.
- * 
- * Also holds all the buffering code used in gnutls.
+/* 
+ * This file holds all the buffering code used in gnutls.
  * The buffering code works as:
  *
  * RECORD LAYER: 
