@@ -888,6 +888,7 @@ are the same as the HMAC algorithms.
 @cindex random numbers
 
 Access to the random number generator is provided using the @funcref{gnutls_rnd}
-function.
+function. It allows obtaining random data of various levels.
 
+@showenumdesc{gnutls_rnd_level_t,The random number levels.}
 @showfuncdesc{gnutls_rnd}

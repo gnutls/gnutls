@@ -27,17 +27,6 @@ negotiation with the peer and be able to exchange data.
 @caption{TLS protocol use case.}
 @end float
 
-This in @acronym{GnuTLS} is being accomplished by an object-oriented architecture 
-as shown in @ref{fig:gnutls-objects}.
-Note that since @acronym{GnuTLS} is being developed in C
-object are just structures with attributes. The operations listed
-are functions that require the first parameter to be that object.
-
-@float Figure,fig:gnutls-objects
-@image{gnutls-objects,12cm}
-@caption{GnuTLS objects.}
-@end float
-
 @node TLS Handshake Protocol
 @section TLS Handshake Protocol
 The @acronym{GnuTLS} handshake protocol is implemented as a state

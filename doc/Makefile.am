@@ -69,8 +69,6 @@ gnutls_TEXINFOS += gnutls-handshake-state.dia			\
 	gnutls-handshake-state.eps gnutls-handshake-state.png
 gnutls_TEXINFOS += gnutls-modauth.dia gnutls-modauth.eps	\
 	gnutls-modauth.png
-gnutls_TEXINFOS += gnutls-objects.dia gnutls-objects.eps	\
-	gnutls-objects.png
 
 imagesdir = $(infodir)
 images_DATA = \
@@ -78,7 +76,7 @@ images_DATA = \
 	gnutls-layers.png gnutls-modauth.png gnutls-pgp.png	\
 	gnutls-client-server-use-case.png			\
 	gnutls-handshake-sequence.png gnutls-internals.png	\
-	gnutls-logo.png gnutls-objects.png gnutls-x509.png	\
+	gnutls-logo.png gnutls-x509.png	\
 	pkcs11-vision.png
 
 AM_MAKEINFOFLAGS = -I $(top_srcdir)/doc
