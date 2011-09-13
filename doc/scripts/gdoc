@@ -430,6 +430,7 @@ sub output_tex {
 
     print "\n\n\\begin{function}\n";
     print "\\functionTitle{". $func . "}\n";
+    print "\\index{". $func . "}\n";
 
     $type = $args{'functiontype'};
     $type =~ s/_/\\_/g;
@@ -518,6 +519,7 @@ sub output_enum_tex {
     print "\n\n\\begin{enum}\n";
     $name =~ s/_/\\_/g;
     print "\\enumTitle{". $name . "}\n";
+    print "\\index{". $name . "}\n";
 
     print "\n\\begin{enumList}\n";
 
