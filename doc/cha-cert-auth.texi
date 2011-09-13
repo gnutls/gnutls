@@ -362,15 +362,24 @@ This section copes with hardware token support in @acronym{GnuTLS} using
 @acronym{PKCS} #11 @xcite{PKCS11}.
 @acronym{PKCS} #11 is plugin API allowing applications to access cryptographic
 operations on a token, as well as to objects residing on the token. A token can 
-be a real hardware token such as a smart card, or it can be a software component
-such as @acronym{Gnome Keyring}. The objects residing on such token can be
+be a real hardware token such as a smart card and a trusted platform module (TPM), 
+or it can be a software component such as @acronym{Gnome Keyring}. The objects residing
+on such token can be
 certificates, public keys, private keys or even plain data or  secret keys. Of those
 certificates and public/private key pairs can be used with @acronym{GnuTLS}. Its
 main advantage is that it allows operations on private key objects such as decryption
 and signing without exposing the key.
 
-Moreover it can be used to allow all applications in the same operating system to access
+A @acronym{PKCS} #11 module to access smart cards is provided by the 
+Opensc@footnote{@url{http://www.opensc-project.org}} project, and a 
+module to access the TPM chip on a PC is available from the Trousers@footnote{@url{http://trousers.sourceforge.net/}}
+project.
+
+Moreover @acronym{PKCS} #11 can be (ab)used to allow all applications in the same operating system to access
 shared cryptographic keys and certificates in a uniform way, as in @ref{fig:pkcs11-vision}.
+That way applications could load their trusted certificate list, as well as user
+certificates from a common PKCS #11 module. Such a provider exists in the @acronym{Gnome} 
+system, being the @acronym{Gnome Keyring}.
 
 @float Figure,fig:pkcs11-vision
 @image{pkcs11-vision,9cm}
