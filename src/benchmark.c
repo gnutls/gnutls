@@ -34,21 +34,21 @@ value2human (unsigned long bytes, double time, double *data, double *speed,
     {
       *data = ((double) bytes) / 1000;
       *speed = *data / time;
-      strcpy (metric, "Kb");
+      strcpy (metric, "KB");
       return;
     }
   else if (bytes >= 1000 * 1000 && bytes < 1000 * 1000 * 1000)
     {
       *data = ((double) bytes) / (1000 * 1000);
       *speed = *data / time;
-      strcpy (metric, "Mb");
+      strcpy (metric, "MB");
       return;
     }
   else if (bytes >= 1000 * 1000 * 1000)
     {
       *data = ((double) bytes) / (1000 * 1000 * 1000);
       *speed = *data / time;
-      strcpy (metric, "Gb");
+      strcpy (metric, "GB");
       return;
     }
   else
