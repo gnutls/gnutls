@@ -8,13 +8,13 @@ are:
 
 @itemize
 
-@item Certificate authentication
+@item Certificate authentication: Authenticated key exchange using public key infrastructure and certificates (X.509 or OpenPGP).
 
-@item Anonymous authentication
+@item @acronym{SRP} authentication: Authenticated key exchange using a password.
 
-@item @acronym{SRP} authentication
+@item @acronym{PSK} authentication: Authenticated key exchange using a pre-shared key.
 
-@item @acronym{PSK} authentication
+@item Anonymous authentication: Key exchange without peer authentication.
 
 @end itemize
 
@@ -222,32 +222,31 @@ efficient than ANON_DH on equivalent security levels.
 @section Authentication using @acronym{SRP}
 @cindex SRP authentication
 
-Authentication via the Secure Remote Password protocol,
-@acronym{SRP} (see @xcite{RFC2945} for a description of SRP),
-is supported.  The @acronym{SRP} key exchange is an extension to the
-@acronym{TLS} protocol, and it is a password based authentication
-(unlike @acronym{X.509} or @acronym{OpenPGP} that use certificates).
-The two peers can be identified using a single password, or there can
-be combinations where the client is authenticated using @acronym{SRP}
+@acronym{GnuTLS} supported authentication via the Secure Remote Password 
+or @acronym{SRP} protocol (see @xcite{RFC2945,TOMSRP} for a description).
+The @acronym{SRP} key exchange is an extension to the
+@acronym{TLS} protocol, and it provided an authenticated with a 
+password key exchange. The peers can be identified using a single password, 
+or there can be combinations where the client is authenticated using @acronym{SRP}
 and the server using a certificate.
 
 The advantage of @acronym{SRP} authentication, over other proposed
-secure password authentication schemes, is that @acronym{SRP} does not
-require the server to hold the user's password.  This kind of
-protection is similar to the one used traditionally in the @acronym{UNIX}
+secure password authentication schemes, is that @acronym{SRP} is not
+susceptible to off-line dictionary attacks.
+Moreover, SRP does not require the server to hold the user's password.
+This kind of protection is similar to the one used traditionally in the @acronym{UNIX}
 @file{/etc/passwd} file, where the contents of this file did not cause
 harm to the system security if they were revealed.  The @acronym{SRP}
 needs instead of the plain password something called a verifier, which
 is calculated using the user's password, and if stolen cannot be used
-to impersonate the user. Check @xcite{TOMSRP} for a detailed
-description of the @acronym{SRP} protocol and the Stanford
-@acronym{SRP} libraries, which includes a PAM module that synchronizes
+to impersonate the user. 
+The Stanford @acronym{SRP} libraries, include a PAM module that synchronizes
 the system's users passwords with the @acronym{SRP} password
-files. That way @acronym{SRP} authentication could be used for all the
-system's users.
+files. That way @acronym{SRP} authentication could be used for all users
+of a system.
 
-The implementation in @acronym{GnuTLS} is based on @xcite{TLSSRP} and
-the supported @acronym{SRP} key exchange methods are:
+The implementation in @acronym{GnuTLS} is based on @xcite{TLSSRP}. The
+supported key exchange methods are shown below.
 
 @table @code
 
