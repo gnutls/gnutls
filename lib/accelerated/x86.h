@@ -22,19 +22,25 @@
 
 #include <config.h>
 
-#ifdef HAVE_CPUID_H
-# include <cpuid.h>
-# define cpuid __cpuid
+#ifdef ASM_X86_64
 
-#else
+# ifdef HAVE_CPUID_H
+#  include <cpuid.h>
+#  define cpuid __cpuid
+# else
 
-# ifdef ASM_X86_64
-
-#  define cpuid(func,ax,bx,cx,dx)\
+#define cpuid(func,ax,bx,cx,dx)\
   __asm__ __volatile__ ("cpuid":\
   "=a" (ax), "=b" (bx), "=c" (cx), "=d" (dx) : "a" (func));
 
-# else
+# endif
+
+# define have_cpuid() 1
+
+#endif /* ASM_X86_64 */
+
+
+#ifdef ASM_X86_32
 /* some GCC versions complain on the version above */
 #  define cpuid(func, a, b, c, d) g_cpuid(func, &a, &b, &c, &d)
 
@@ -48,6 +54,23 @@ inline static void g_cpuid(uint32_t func, unsigned int *ax, unsigned int *bx, un
                   :"a"(func)
                   :"cc");
 }
-# endif
 
-#endif
+inline static unsigned int have_cpuid(void)
+{
+  unsigned int have_id;
+  asm volatile(
+    "pushfl\t\n"
+    "pop %0\t\n"
+    "orl $0x200000, %0\t\n"
+    "push %0\t\n"
+    "popfl\t\n"
+    "pushfl\t\n"
+    "pop %0\t\n"
+    "andl $0x200000, %0\t\n"
+    :"=r" (have_id)
+    ::
+  );
+  
+  return have_id;
+}
+#endif /* ASM_X86_32 */

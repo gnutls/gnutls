@@ -36,8 +36,14 @@ EXTRA_DIST = x86.h accelerated.h cryptodev.h
 libaccelerated_la_SOURCES = accelerated.c cryptodev.c
 libaccelerated_la_LIBADD =
 
-if TRY_X86_OPTIMIZATIONS
+if ASM_X86_64
 SUBDIRS += intel
-AM_CFLAGS += -DTRY_X86_OPTIMIZATIONS
+AM_CFLAGS += -DASM_X86_64
+libaccelerated_la_LIBADD += intel/libintel.la
+endif
+
+if ASM_X86_32
+SUBDIRS += intel
+AM_CFLAGS += -DASM_X86_32
 libaccelerated_la_LIBADD += intel/libintel.la
 endif

@@ -94,8 +94,8 @@ esac
 
 fi
 
-AM_CONDITIONAL(TRY_X86_OPTIMIZATIONS, test x"$hw_accel" = x"x86" || test x"$hw_accel" = x"x86-64")
 AM_CONDITIONAL(ASM_X86_64, test x"$hw_accel" = x"x86-64")
+AM_CONDITIONAL(ASM_X86_32, test x"$hw_accel" = x"x86")
 AM_CONDITIONAL(HAVE_GCC_GNU89_INLINE_OPTION, test "$gnu89_inline" = "yes"])
 AM_CONDITIONAL(HAVE_GCC, test "$GCC" = "yes")
 
