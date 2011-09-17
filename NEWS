@@ -10,6 +10,9 @@ number of discarded records in a DTLS session.
 ** libgnutls: All functions related to RSA-EXPORT were deprecated.
 Support for RSA-EXPORT ciphersuites will be ceased in future versions.
 
+** libgnutls: Memory leak fixes in credentials private key 
+deinitialization. Reported by Dan Winship.
+
 ** libgnutls: Memory leak fixes in ECC ciphersuites.
 
 ** libgnutls: Do not send an empty extension structure in server 
