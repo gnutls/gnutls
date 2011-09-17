@@ -170,7 +170,7 @@ static int check_padlock(void)
 static unsigned check_via(void)
 {
     unsigned int a, b, c, d;
-    cpuid(0, a, b, c, d);
+    _gnutls_cpuid(0, &a, &b, &c, &d);
 
     if ((memcmp(&b, "VIA ", 4) == 0 &&
          memcmp(&d, "VIA ", 4) == 0 && memcmp(&c, "VIA ", 4) == 0)) {
