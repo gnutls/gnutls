@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 Version 2.12.11 (unreleased)
 
+** libgnutls: Memory leak fixes in credentials private key 
+deinitialization. Reported by Dan Winship.
+
 ** libgnutls: Allow CA importing of 0 certificates to succeed.
 Reported by Jonathan Nieder <jrnieder@gmail.com> in
 <http://bugs.debian.org/640639>.

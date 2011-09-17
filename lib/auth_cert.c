@@ -615,6 +615,7 @@ cleanup:
             {
               gnutls_x509_crt_deinit (st2.cert.x509[i]);
             }
+          gnutls_free(st2.cert.x509);
         }
     }
   else
@@ -2025,6 +2026,7 @@ _gnutls_selected_certs_deinit (gnutls_session_t session)
       session->internals.selected_cert_list = NULL;
       session->internals.selected_cert_list_length = 0;
 
+      gnutls_privkey_deinit(session->internals.selected_key);
       session->internals.selected_key = NULL;
     }
 
