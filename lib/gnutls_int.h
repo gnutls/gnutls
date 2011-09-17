@@ -622,6 +622,7 @@ typedef struct
   
   /* last retransmission triggered by record layer */
   time_t last_retransmit;
+  unsigned int packets_dropped;
 } dtls_st;
 
 

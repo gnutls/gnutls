@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.0.3 (unreleased)
 
+** libgnutls: Added gnutls_record_get_discarded() to return the
+number of discarded records in a DTLS session.
+
 ** libgnutls: All functions related to RSA-EXPORT were deprecated.
 Support for RSA-EXPORT ciphersuites will be ceased in future versions.
 
@@ -34,6 +37,7 @@ gnutls_pkcs11_privkey_generate: Added
 gnutls_pubkey_import_ecc_raw: Added
 gnutls_pubkey_import_ecc_x962: Added
 gnutls_pubkey_get_pk_ecc_x962: Added
+gnutls_record_get_discarded: Added
 
 
 * Version 3.0.2 (released 2011-09-01)

@@ -1075,6 +1075,8 @@ begin:
   return ret;
 
 discard:
+  session->internals.dtls.packets_dropped++;
+
   /* discard the whole received fragment. */
   bufel = _mbuffer_head_pop_first(&session->internals.record_recv_buffer);
   _mbuffer_xfree(&bufel);

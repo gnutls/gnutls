@@ -716,6 +716,7 @@ GNUTLS_3_0_0 {
 	gnutls_pkcs11_privkey_generate;
 	gnutls_pubkey_import_ecc_raw;
 	gnutls_pubkey_import_ecc_raw2;
+	gnutls_record_get_discarded;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

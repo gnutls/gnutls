@@ -77,6 +77,7 @@ unsigned int gnutls_dtls_get_data_mtu (gnutls_session_t session);
   void gnutls_dtls_prestate_set (gnutls_session_t session,
 				 gnutls_dtls_prestate_st* prestate);
 
+  unsigned int gnutls_record_get_discarded (gnutls_session_t session);
 #ifdef __cplusplus
 }
 #endif

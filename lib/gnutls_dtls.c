@@ -705,3 +705,18 @@ void gnutls_dtls_prestate_set(gnutls_session_t session, gnutls_dtls_prestate_st*
   session->internals.dtls.hsk_read_seq = prestate->hsk_read_seq;
   session->internals.dtls.hsk_write_seq = prestate->hsk_write_seq + 1;
 }
+
+/**
+ * gnutls_record_get_discarded:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Returns the number of discarded packets in a
+ * DTLS connection.
+ *
+ * Returns: The number of discarded packets.
+ **/
+unsigned int gnutls_record_get_discarded (gnutls_session_t session)
+{
+  return session->internals.dtls.packets_dropped;
+}
+
