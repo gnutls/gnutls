@@ -44,15 +44,18 @@ cha-errors.tex: ../cha-errors.texi
 cha-ciphersuites.tex: ../cha-ciphersuites.texi
 	../scripts/mytexi2latex $< > $@
 
-error_codes.tex: $(top_srcdir)/lib/gnutls_errors.c $(srcdir)/../errcodes
+error_codes.tex: $(top_srcdir)/lib/gnutls_errors.c
+	$(MAKE) -C .. errcodes printlist alert-printlist
 	$(builddir)/../errcodes --latex > $@-tmp
 	mv -f $@-tmp $@
 
-algorithms.tex: ../printlist
+algorithms.tex:
+	$(MAKE) -C .. errcodes printlist alert-printlist
 	$(builddir)/../printlist --latex > $@-tmp
 	mv -f $@-tmp $@
 
-alerts.tex: ../alert-printlist
+alerts.tex:
+	$(MAKE) -C .. errcodes printlist alert-printlist
 	$(builddir)/../alert-printlist --latex > $@-tmp
 	mv -f $@-tmp $@
 
@@ -117,6 +120,7 @@ extra-api.tex: $(srcdir)/../../libextra/gnutls_extra.c
 SOURCE_GEN_FILES =  extra-api.tex pgp-api.tex x509-api.tex gnutls-api.tex gnutls-enums.tex
 
 gnutls.pdf: $(SOURCE_GEN_FILES) $(TEX_OBJECTS) $(GEN_TEX_OBJECTS)
+	$(MAKE) -C .. errcodes printlist alert-printlist
 	-pdflatex gnutls.tex
 	-bibtex gnutls
 	-makeindex gnutls.idx
