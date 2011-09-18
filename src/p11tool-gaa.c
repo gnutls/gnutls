@@ -1092,7 +1092,7 @@ static int gaa_internal_get_next_str(FILE *file, gaa_str_node *tmp_str, int argc
 
         len++;
         a = fgetc( file);
-        if(a==EOF) return 0; //a = ' ';
+        if(a==EOF) return 0;
     }
 
     len += 1;
