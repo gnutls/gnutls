@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.0.3 (unreleased)
+* Version 3.0.3 (released 2011-09-18)
 
 ** libgnutls: Added gnutls_record_get_discarded() to return the
 number of discarded records in a DTLS session.
