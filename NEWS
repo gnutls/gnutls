@@ -24,6 +24,7 @@ Reported by Jonathan Nieder <jrnieder@gmail.com> in
 <http://bugs.debian.org/640639>.
 
 ** libgnutls: Added support for VIA padlock AES optimizations.
+(disabled by default)
 
 ** libgnutls: Added support for elliptic curves in
 PKCS #11.
@@ -34,6 +35,9 @@ to allow generating a key in a token.
 ** p11tool: Added generate-rsa, generate-dsa and 
 generate-ecc options to allow generating private
 keys in the token.
+
+** libgnutls: gnutls_transport_set_lowat dummy macro was 
+removed.
 
 ** API and ABI modifications:
 gnutls_pkcs11_privkey_generate: Added

@@ -187,8 +187,12 @@ void register_padlock_crypto(void)
     /* Only enable the 32-bit padlock variant, until
      * the 64-bit code is tested.
      */
-    if (sizeof(unsigned int) != 4 || check_via() == 0)
+#ifndef ENABLE_VIA
+    return;
+#else
+    if (check_via() == 0)
         return;
+#endif
 
     if (check_padlock()) {
         _gnutls_debug_log("Padlock AES accelerator was detected\n");
