@@ -30,11 +30,11 @@ if ENABLE_MINITASN1
 AM_CPPFLAGS += -I$(srcdir)/../../minitasn1
 endif
 
-EXTRA_DIST = aes-x86.h README license.txt
+EXTRA_DIST = README license.txt
 
 noinst_LTLIBRARIES = libintel.la
 
-libintel_la_SOURCES = aes-x86.c aes-padlock.c aes-gcm-padlock.c
+libintel_la_SOURCES = aes-x86.c aes-padlock.c aes-gcm-padlock.c aes-padlock.h aes-x86.h
 
 if ASM_X86_64
 AM_CPPFLAGS += -DASM_X86_64
