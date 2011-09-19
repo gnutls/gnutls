@@ -133,12 +133,7 @@ Documentation License''.
 @end macro
 
 @macro showenumdesc{ref,cap}
-@float Table,\ref\
-@itemize
-@item @code{\ref\}
-@end itemize
-@caption{\cap\}
-@end float
+@include enums/\ref\
 @end macro
 
 @contents

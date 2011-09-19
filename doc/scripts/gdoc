@@ -377,6 +377,39 @@ sub output_texinfo {
     print "\@end deftypefun\n\n";
 }
 
+sub output_enum_texinfo {
+    my %args = %{$_[0]};
+    my ($parameter, $section);
+    my $count;
+    my $name = $args{'enum'};
+    my $param;
+    my $param2;
+    my $sec;
+    my $check;
+    my $type;
+
+    print "\n\n\@float Table,$name\n";
+
+    print "\n\@itemize\n";
+
+    $check=0;
+    foreach $parameter (@{$args{'parameterlist'}}) {
+        $param1 = $parameter;
+	$param1 =~ s/_/_\@-/g;
+
+	$check = 1;
+	print "\@item ".$param1."\n";
+#	print "\n";
+
+        $param2 = $args{'parameters'}{$parameter};
+	$out = just_highlight($param2);
+	chomp $out;
+	print $out . "\n";
+    }
+    print "\@end itemize\n";
+    print "\@end float\n";
+}
+
 # output in html
 sub output_html {
     my %args = %{$_[0]};

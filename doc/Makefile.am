@@ -139,8 +139,8 @@ extra-api.texi: $(srcdir)/../libextra/gnutls_extra.c
 
 # Generated texinfos.
 
-gnutls_TEXINFOS += error_codes.texi algorithms.texi alerts.texi
-MAINTAINERCLEANFILES += error_codes.texi algorithms.texi
+gnutls_TEXINFOS += error_codes.texi algorithms.texi alerts.texi  enums.texi
+MAINTAINERCLEANFILES += error_codes.texi algorithms.texi enums.texi
 
 AM_CPPFLAGS = -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes
 
@@ -166,6 +166,16 @@ algorithms.texi: printlist
 
 alerts.texi: alert-printlist
 	$(builddir)/alert-printlist > $@-tmp
+	mv -f $@-tmp $@
+
+enums.texi: $(srcdir)/../lib/includes/gnutls/*.h
+	echo "" > $@-tmp
+	for i in $^; do \
+		echo -n "Creating documentation for file $$i... " && \
+		$(srcdir)/scripts/gdoc -texinfo $$i >> $@-tmp && \
+		echo "ok"; \
+	done
+	$(srcdir)/scripts/split-texi.pl enums enum < $@-tmp
 	mv -f $@-tmp $@
 
 # Guile texinfos.
@@ -213,3 +223,7 @@ extra.c.texi:
 
 
 endif !HAVE_GUILE
+
+clean-am:
+	rm -rf enums gnutls.info gnutls.html gnutls.pdf enums.texi
+
