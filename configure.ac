@@ -123,7 +123,6 @@ dnl Check for p11-kit
 AC_ARG_WITH(p11-kit,
 	AS_HELP_STRING([--without-p11-kit],
 		[Build without p11-kit and PKCS#11 support]))
-AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 if test "$with_p11_kit" != "no"; then
 	PKG_CHECK_MODULES(P11_KIT, [p11-kit-1 >= 0.4], [with_p11_kit=yes], [with_p11_kit=no])
 	if test "$with_p11_kit" != "no";then
@@ -143,6 +142,8 @@ if test "$with_p11_kit" != "no"; then
 *** ]])
 	fi
 fi
+
+AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 
 dnl Check for libcfg+
 SAVED_LIBS=$LIBS

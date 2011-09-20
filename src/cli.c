@@ -169,7 +169,9 @@ load_keys (void)
   int ret, i;
   gnutls_datum_t data = { NULL, 0 };
   gnutls_x509_crt_t crt_list[MAX_CRT];
+#ifdef ENABLE_PKCS11
   gnutls_pkcs11_privkey_t pkcs11_key;
+#endif
   gnutls_x509_privkey_t tmp_key;
   uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 

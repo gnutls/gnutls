@@ -295,6 +295,8 @@ gnutls_privkey_deinit (gnutls_privkey_t key)
       case GNUTLS_PRIVKEY_X509:
         gnutls_x509_privkey_deinit (key->key.x509);
         break;
+      default:
+        break;
       }
   gnutls_free (key);
 }
