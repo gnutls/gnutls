@@ -702,6 +702,10 @@ listen_socket (const char *name, int listen_port, int socktype)
 
   for (ptr = res; ptr != NULL; ptr = ptr->ai_next)
     {
+#ifndef HAVE_IPV6
+      if (ptr->ai_family != AF_INET) continue;
+#endif
+
       /* Print what we are doing. */
       {
         char topbuf[512];
