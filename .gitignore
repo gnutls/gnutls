@@ -514,3 +514,6 @@ doc/latex/gnutls-enums.tex
 doc/latex/enums
 doc/latex/gnutls.lof
 doc/latex/gnutls.lot
+tests/x509cert-tl
+doc/enums.texi
+doc/enums/
