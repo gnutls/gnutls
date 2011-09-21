@@ -531,6 +531,7 @@ APIMANS += gnutls_x509_crt_list_import2.3
 APIMANS += gnutls_x509_crt_list_import.3
 APIMANS += gnutls_x509_crt_get_subject_unique_id.3
 APIMANS += gnutls_x509_crt_get_issuer_unique_id.3
+APIMANS += gnutls_x509_crt_get_authority_info_access.3
 APIMANS += gnutls_x509_crt_set_dn_by_oid.3
 APIMANS += gnutls_x509_crt_set_issuer_dn_by_oid.3
 APIMANS += gnutls_x509_crt_set_proxy_dn.3

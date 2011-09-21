@@ -717,6 +717,7 @@ GNUTLS_3_0_0 {
 	gnutls_pubkey_import_ecc_raw;
 	gnutls_pubkey_import_ecc_raw2;
 	gnutls_record_get_discarded;
+	gnutls_x509_crt_get_authority_info_access;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

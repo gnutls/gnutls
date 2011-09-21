@@ -78,6 +78,9 @@ extern "C"
 #define GNUTLS_KP_IPSEC_IKE			"1.3.6.1.5.5.7.3.17"
 #define GNUTLS_KP_ANY				"2.5.29.37.0"
 
+#define GNUTLS_OID_AIA				"1.3.6.1.5.5.7.1.1"
+#define GNUTLS_OID_AD_OCSP			"1.3.6.1.5.5.7.48.1"
+
 #define GNUTLS_FSAN_SET 0
 #define GNUTLS_FSAN_APPEND 1
 
@@ -161,6 +164,31 @@ extern "C"
 
   int gnutls_x509_crt_get_issuer_unique_id (gnutls_x509_crt_t crt, char *buf,
                                             size_t * buf_size);
+
+  /**
+   * gnutls_info_access_what_t:
+   *
+   * Enumeration of types for the @what parameter of
+   * gnutls_x509_crt_get_authority_info_access().
+   */
+  typedef enum gnutls_info_access_what_t
+    {
+      /* get accessMethod OID */
+      GNUTLS_IA_ACCESSMETHOD_OID = 1,
+      /* get accessLocation name type */
+      GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE = 2,
+      /* use 100-108 for the generalName types, populate as needed */
+      /* get accessLocation URI value */
+      GNUTLS_IA_URI = 106,
+      /* quick-access variants that match both OID and name type. */
+      GNUTLS_IA_OCSP_URI = 10006
+    } gnutls_info_access_what_t;
+
+  int gnutls_x509_crt_get_authority_info_access (gnutls_x509_crt_t crt,
+						 unsigned int seq,
+						 int what,
+						 gnutls_datum_t * data,
+						 int *critical);
 
 #define GNUTLS_CRL_REASON_UNUSED 128
 #define GNUTLS_CRL_REASON_KEY_COMPROMISE 64

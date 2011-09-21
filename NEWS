@@ -2,6 +2,17 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.0.4 (unreleased)
+
+** libgnutls: Added gnutls_x509_crt_get_authority_info_access.
+Used to get the PKIX Authority Information Access field.
+
+** API and ABI modifications:
+gnutls_x509_crt_get_authority_info_access (x509.h): Added function.
+gnutls_info_access_what_t (x509.h): Added enum.
+GNUTLS_OID_AIA (x509.h): Added symbol.
+GNUTLS_OID_AD_OCSP (x509.h): Added symbol.
+
 * Version 3.0.3 (released 2011-09-18)
 
 ** libgnutls: Added gnutls_record_get_discarded() to return the

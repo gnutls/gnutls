@@ -101,6 +101,15 @@ ExtKeyUsageSyntax ::= SEQUENCE SIZE (1..MAX) OF KeyPurposeId
 
 KeyPurposeId ::= OBJECT IDENTIFIER
 
+-- authority info access
+
+AuthorityInfoAccessSyntax  ::=
+        SEQUENCE SIZE (1..MAX) OF AccessDescription
+
+AccessDescription  ::=  SEQUENCE {
+        accessMethod          OBJECT IDENTIFIER,
+        accessLocation        GeneralName  }
+
 -- CRL number extension OID and syntax
 
 CRLNumber ::= INTEGER (0..MAX)

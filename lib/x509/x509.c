@@ -3389,3 +3389,209 @@ gnutls_x509_crt_get_issuer_unique_id (gnutls_x509_crt_t crt, char *buf,
 
   return result;
 }
+
+static int
+_gnutls_parse_aia (ASN1_TYPE src,
+		   unsigned int seq,
+		   int what,
+		   gnutls_datum_t * data)
+{
+  int len;
+  char nptr[ASN1_MAX_NAME_SIZE];
+  int result;
+  gnutls_datum_t d;
+
+  seq++;                        /* 0->1, 1->2 etc */
+  switch (what)
+    {
+    case GNUTLS_IA_ACCESSMETHOD_OID:
+      snprintf (nptr, sizeof (nptr), "?%u.accessMethod", seq);
+      break;
+
+    case GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE:
+      snprintf (nptr, sizeof (nptr), "?%u.accessLocation", seq);
+      break;
+
+    case GNUTLS_IA_OCSP_URI:
+      {
+	char *tmpoid[20];
+	snprintf (nptr, sizeof (nptr), "?%u.accessMethod", seq);
+	len = sizeof (tmpoid);
+	result = asn1_read_value (src, nptr, tmpoid, &len);
+	if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND)
+	  return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	if (result != ASN1_SUCCESS)
+	  {
+	    gnutls_assert ();
+	    return _gnutls_asn2err (result);
+	  }
+	if (len != sizeof (GNUTLS_OID_AD_OCSP) ||
+	    memcmp (tmpoid, GNUTLS_OID_AD_OCSP, len) != 0)
+	  return GNUTLS_E_UNKNOWN_ALGORITHM;
+      }
+      /* fall through */
+
+      case GNUTLS_IA_URI:
+	snprintf (nptr, sizeof (nptr),
+		  "?%u.accessLocation.uniformResourceIdentifier", seq);
+	break;
+
+    default:
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  len = 0;
+  result = asn1_read_value (src, nptr, NULL, &len);
+  if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND)
+    return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+  if (result != ASN1_MEM_ERROR)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+  d.size = len;
+  d.data = gnutls_malloc (d.size);
+  if (d.data == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+  result = asn1_read_value (src, nptr, d.data, &len);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      gnutls_free (d.data);
+      return _gnutls_asn2err (result);
+    }
+
+  if (data)
+    {
+      data->data = d.data;
+      data->size = d.size;
+    }
+  else
+    gnutls_free (d.data);
+
+  return GNUTLS_E_SUCCESS;
+}
+
+/**
+ * gnutls_x509_crt_get_authority_info_access:
+ * @crt: Holds the certificate
+ * @seq: specifies the sequence number of the access descriptor (0 for the first one, 1 for the second etc.)
+ * @what: what data to get, a #gnutls_info_access_what_t type.
+ * @data: output data to be freed with gnutls_free().
+ * @critical: pointer to output integer that is set to non-0 if the extension is marked as critical (may be %NULL)
+ *
+ * This function extracts the Authority Information Access (AIA)
+ * extension, see RFC 5280 section 4.2.2.1 for more information.  The
+ * AIA extension holds a sequence of AccessDescription (AD) data:
+ *
+ * <informalexample><programlisting>
+ * AuthorityInfoAccessSyntax  ::=
+ *         SEQUENCE SIZE (1..MAX) OF AccessDescription
+ *
+ * AccessDescription  ::=  SEQUENCE {
+ *         accessMethod          OBJECT IDENTIFIER,
+ *         accessLocation        GeneralName  }
+ * </programlisting></informalexample>
+ *
+ * The @seq input parameter is used to indicate which member of the
+ * sequence the caller is interested in.  The first member is 0, the
+ * second member 1 and so on.  When the @seq value is out of bounds,
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
+ *
+ * The type of data returned in @data is specified via @what which
+ * should be #gnutls_info_access_what_t values.
+ *
+ * If @what is %GNUTLS_IA_ACCESSMETHOD_OID then @data will hold the
+ * accessMethod OID (e.g., "1.3.6.1.5.5.7.48.1" for id-ad-ocsp meaning
+ * OCSP).
+ *
+ * If @what is %GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE, @data will
+ * hold the accessLocation GeneralName type (e.g.,
+ * "uniformResourceIdentifier").
+ *
+ * If @what is %GNUTLS_IA_URI, @data will hold the accessLocation URI
+ * data.  Requesting this @what value leads to an error if the
+ * accessLocation is not of the "uniformResourceIdentifier" type.
+ *
+ * If @what is %GNUTLS_IA_OCSP_URI, @data will hold the OCSP URI.
+ * Requesting this @what value leads to an error if the accessMethod
+ * is not OSCP or accessLocation is not of the
+ * "uniformResourceIdentifier" type.
+ *
+ * More @what values may be allocated in the future as needed.
+ *
+ * If @data is NULL, the function does the same without storing the
+ * output data, that is, it will set @critical and do error checking
+ * as usual.
+ *
+ * The value of the critical flag is returned in *@critical.  Supply a
+ * NULL @critical if you want the function to make sure the extension
+ * is non-critical, as required by RFC 5280.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, %GNUTLS_E_INVALID_REQUEST on
+ * invalid @crt, %GNUTLS_E_CONSTRAINT_ERROR if the extension is
+ * incorrectly marked as critical (use a non-NULL @critical to
+ * override), %GNUTLS_E_UNKNOWN_ALGORITHM if the requested OID does
+ * not match (e.g., when using %GNUTLS_IA_OCSP_URI), otherwise a
+ * negative error code.
+ **/
+int
+gnutls_x509_crt_get_authority_info_access (gnutls_x509_crt_t crt,
+					   unsigned int seq,
+					   int what,
+					   gnutls_datum_t * data,
+					   int *critical)
+{
+  int ret;
+  gnutls_datum_t aia;
+  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+  if (crt == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  if ((ret = _gnutls_x509_crt_get_extension (crt, GNUTLS_OID_AIA, 0, &aia,
+					     critical)) < 0)
+    return ret;
+
+  if (aia.size == 0 || aia.data == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    }
+
+  if (critical && *critical)
+    return GNUTLS_E_CONSTRAINT_ERROR;
+
+  ret = asn1_create_element (_gnutls_get_pkix (),
+			     "PKIX1.AuthorityInfoAccessSyntax", &c2);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      _gnutls_free_datum (&aia);
+      return _gnutls_asn2err (ret);
+    }
+
+  ret = asn1_der_decoding (&c2, aia.data, aia.size, NULL);
+  /* asn1_print_structure (stdout, c2, "", ASN1_PRINT_ALL); */
+  _gnutls_free_datum (&aia);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&c2);
+      return _gnutls_asn2err (ret);
+    }
+
+  ret = _gnutls_parse_aia (c2, seq, what, data);
+  asn1_delete_structure (&c2);
+  if (ret < 0)
+    gnutls_assert ();
+
+  return ret;
+}
