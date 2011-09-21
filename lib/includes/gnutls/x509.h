@@ -167,18 +167,19 @@ extern "C"
 
   /**
    * gnutls_info_access_what_t:
+   * @GNUTLS_IA_ACCESSMETHOD_OID: Get accessMethod OID.
+   * @GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE: Get accessLocation name type.
+   * @GNUTLS_IA_URI: Get accessLocation URI value.
+   * @GNUTLS_IA_OCSP_URI: get accessLocation URI value for OCSP.
    *
    * Enumeration of types for the @what parameter of
    * gnutls_x509_crt_get_authority_info_access().
    */
   typedef enum gnutls_info_access_what_t
     {
-      /* get accessMethod OID */
       GNUTLS_IA_ACCESSMETHOD_OID = 1,
-      /* get accessLocation name type */
       GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE = 2,
       /* use 100-108 for the generalName types, populate as needed */
-      /* get accessLocation URI value */
       GNUTLS_IA_URI = 106,
       /* quick-access variants that match both OID and name type. */
       GNUTLS_IA_OCSP_URI = 10006
