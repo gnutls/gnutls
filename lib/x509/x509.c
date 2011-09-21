@@ -3400,6 +3400,7 @@ _gnutls_parse_aia (ASN1_TYPE src,
   char nptr[ASN1_MAX_NAME_SIZE];
   int result;
   gnutls_datum_t d;
+  const char *oid = NULL;
 
   seq++;                        /* 0->1, 1->2 etc */
   switch (what)
@@ -3412,7 +3413,13 @@ _gnutls_parse_aia (ASN1_TYPE src,
       snprintf (nptr, sizeof (nptr), "?%u.accessLocation", seq);
       break;
 
+    case GNUTLS_IA_CAISSUERS_URI:
+      oid = GNUTLS_OID_AD_CAISSUERS;
+      /* fall through */
+
     case GNUTLS_IA_OCSP_URI:
+      if (oid == NULL)
+	oid = GNUTLS_OID_AD_OCSP;
       {
 	char *tmpoid[20];
 	snprintf (nptr, sizeof (nptr), "?%u.accessMethod", seq);
@@ -3425,8 +3432,7 @@ _gnutls_parse_aia (ASN1_TYPE src,
 	    gnutls_assert ();
 	    return _gnutls_asn2err (result);
 	  }
-	if (len != sizeof (GNUTLS_OID_AD_OCSP) ||
-	    memcmp (tmpoid, GNUTLS_OID_AD_OCSP, len) != 0)
+	if (len != strlen (oid) + 1 || memcmp (tmpoid, oid, len) != 0)
 	  return GNUTLS_E_UNKNOWN_ALGORITHM;
       }
       /* fall through */
@@ -3506,8 +3512,7 @@ _gnutls_parse_aia (ASN1_TYPE src,
  * should be #gnutls_info_access_what_t values.
  *
  * If @what is %GNUTLS_IA_ACCESSMETHOD_OID then @data will hold the
- * accessMethod OID (e.g., "1.3.6.1.5.5.7.48.1" for id-ad-ocsp meaning
- * OCSP).
+ * accessMethod OID (e.g., "1.3.6.1.5.5.7.48.1").
  *
  * If @what is %GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE, @data will
  * hold the accessLocation GeneralName type (e.g.,
@@ -3519,8 +3524,13 @@ _gnutls_parse_aia (ASN1_TYPE src,
  *
  * If @what is %GNUTLS_IA_OCSP_URI, @data will hold the OCSP URI.
  * Requesting this @what value leads to an error if the accessMethod
- * is not OSCP or accessLocation is not of the
- * "uniformResourceIdentifier" type.
+ * is not 1.3.6.1.5.5.7.48.1 aka OSCP, or if accessLocation is not of
+ * the "uniformResourceIdentifier" type.
+ *
+ * If @what is %GNUTLS_IA_CAISSUERS_URI, @data will hold the caIssuers
+ * URI.  Requesting this @what value leads to an error if the
+ * accessMethod is not 1.3.6.1.5.5.7.48.2 aka caIssuers, or if
+ * accessLocation is not of the "uniformResourceIdentifier" type.
  *
  * More @what values may be allocated in the future as needed.
  *

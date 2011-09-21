@@ -218,7 +218,6 @@ doit (void)
   /* even more specific query */
   ret = gnutls_x509_crt_get_authority_info_access
     (crt, 0, GNUTLS_IA_OCSP_URI, &data, NULL);
-  printf ("ret %d\n", ret);
   if (ret < 0)
     {
       fail ("gnutls_x509_crt_get_authority_info_access GNUTLS_IA_OCSP_URI\n");

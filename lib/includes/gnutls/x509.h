@@ -80,6 +80,7 @@ extern "C"
 
 #define GNUTLS_OID_AIA				"1.3.6.1.5.5.7.1.1"
 #define GNUTLS_OID_AD_OCSP			"1.3.6.1.5.5.7.48.1"
+#define GNUTLS_OID_AD_CAISSUERS			"1.3.6.1.5.5.7.48.2"
 
 #define GNUTLS_FSAN_SET 0
 #define GNUTLS_FSAN_APPEND 1
@@ -171,6 +172,7 @@ extern "C"
    * @GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE: Get accessLocation name type.
    * @GNUTLS_IA_URI: Get accessLocation URI value.
    * @GNUTLS_IA_OCSP_URI: get accessLocation URI value for OCSP.
+   * @GNUTLS_IA_CAISSUERS_URI: get accessLocation URI value for caIssuers.
    *
    * Enumeration of types for the @what parameter of
    * gnutls_x509_crt_get_authority_info_access().
@@ -182,7 +184,8 @@ extern "C"
       /* use 100-108 for the generalName types, populate as needed */
       GNUTLS_IA_URI = 106,
       /* quick-access variants that match both OID and name type. */
-      GNUTLS_IA_OCSP_URI = 10006
+      GNUTLS_IA_OCSP_URI = 10006,
+      GNUTLS_IA_CAISSUERS_URI = 10106
     } gnutls_info_access_what_t;
 
   int gnutls_x509_crt_get_authority_info_access (gnutls_x509_crt_t crt,

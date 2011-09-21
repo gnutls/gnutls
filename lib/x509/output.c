@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+ * Copyright (C) 2007-2011 Free Software Foundation, Inc.
  *
  * Author: Simon Josefsson
  *
@@ -167,6 +167,63 @@ print_proxy (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
       adds (str, _("\n\t\t\t\tHexdump: "));
       hexprint (str, policy, npolicy);
       adds (str, "\n");
+    }
+}
+
+static void
+print_aia (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
+{
+  int err;
+  int seq = 0;
+  gnutls_datum_t data;
+
+  for (;;)
+    {
+      err = gnutls_x509_crt_get_authority_info_access
+	(cert, seq, GNUTLS_IA_ACCESSMETHOD_OID, &data, NULL);
+      if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+	return;
+      if (err < 0)
+	{
+	  addf (str, "error: get_aia: %s\n", gnutls_strerror (err));
+	  return;
+	}
+
+      addf (str, _("\t\t\tAccess Method: %.*s"), data.size, data.data);
+      if (data.size == sizeof (GNUTLS_OID_AD_OCSP) &&
+	  memcmp (data.data, GNUTLS_OID_AD_OCSP, data.size) == 0)
+	adds (str, " (id-ad-ocsp)\n");
+      else if (data.size == sizeof (GNUTLS_OID_AD_CAISSUERS) &&
+	       memcmp (data.data, GNUTLS_OID_AD_CAISSUERS, data.size) == 0)
+	adds (str, " (id-ad-caIssuers)\n");
+      else
+	adds (str, " (UNKNOWN)\n");
+
+      err = gnutls_x509_crt_get_authority_info_access
+	(cert, seq, GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE, &data, NULL);
+      if (err < 0)
+	{
+	  addf (str, "error: get_aia type: %s\n", gnutls_strerror (err));
+	  return;
+	}
+
+      if (data.size == sizeof ("uniformResourceIdentifier") &&
+	  memcmp (data.data, "uniformResourceIdentifier", data.size) == 0)
+	{
+	  adds (str, "\t\t\tAccess Location URI: ");
+	  err = gnutls_x509_crt_get_authority_info_access
+	    (cert, seq, GNUTLS_IA_URI, &data, NULL);
+	  if (err < 0)
+	    {
+	      addf (str, "error: get_aia uri: %s\n", gnutls_strerror (err));
+	      return;
+	    }
+	  addf (str, "%.*s\n", data.size, data.data);
+	}
+      else
+	adds (str, "\t\t\tUnsupported accessLocation type\n");
+
+      seq++;
     }
 }
 
@@ -957,6 +1014,15 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
             print_proxy (str, cert.crt);
 
           proxy_idx++;
+        }
+      else if (strcmp (oid, "1.3.6.1.5.5.7.1.1") == 0)
+        {
+          addf (str, _("%s\t\tAuthority Information "
+		       "Access Information (%s):\n"), prefix,
+                critical ? _("critical") : _("not critical"));
+
+          if (type == TYPE_CRT)
+            print_aia (str, cert.crt);
         }
       else
         {

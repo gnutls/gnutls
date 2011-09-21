@@ -517,3 +517,4 @@ doc/latex/gnutls.lot
 tests/x509cert-tl
 doc/enums.texi
 doc/enums/
+tests/infoaccess
