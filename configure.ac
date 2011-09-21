@@ -132,7 +132,7 @@ if test "$with_p11_kit" != "no"; then
 		if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
 			GNUTLS_REQUIRES_PRIVATE="Requires.private: p11-kit-1"
 		else
-		  	GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, p11-kit-1"
+			GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, p11-kit-1"
 		fi
 	else
 	        AC_MSG_WARN([[

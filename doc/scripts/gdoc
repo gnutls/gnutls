@@ -1028,7 +1028,7 @@ foreach $file (@ARGV) {
 		$prototype =~ s@/\*.*?\*/@@gos;	# strip comments.
 		$prototype =~ s@[\r\n]+@ @gos; # strip newlines/cr's.
 		$prototype =~ s@^ +@@gos; # strip leading spaces
- 	        dump_function($prototype);
+		dump_function($prototype);
 
 		$function = "";
 		%constants = ();
