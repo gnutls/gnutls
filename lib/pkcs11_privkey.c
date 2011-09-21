@@ -410,6 +410,8 @@ gnutls_pkcs11_privkey_export_url (gnutls_pkcs11_privkey_t key,
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
+ *
+ * Since: 3.0.0
  **/
 int
 gnutls_pkcs11_privkey_generate (const char* url, 

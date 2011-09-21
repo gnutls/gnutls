@@ -3538,6 +3538,8 @@ _gnutls_parse_aia (ASN1_TYPE src,
  * override), %GNUTLS_E_UNKNOWN_ALGORITHM if the requested OID does
  * not match (e.g., when using %GNUTLS_IA_OCSP_URI), otherwise a
  * negative error code.
+ *
+ * Since: 3.0.0
  **/
 int
 gnutls_x509_crt_get_authority_info_access (gnutls_x509_crt_t crt,

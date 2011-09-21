@@ -714,6 +714,8 @@ void gnutls_dtls_prestate_set(gnutls_session_t session, gnutls_dtls_prestate_st*
  * DTLS connection.
  *
  * Returns: The number of discarded packets.
+ *
+ * Since: 3.0.0
  **/
 unsigned int gnutls_record_get_discarded (gnutls_session_t session)
 {
