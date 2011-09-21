@@ -75,8 +75,9 @@ _GL_WARN_ON_USE (rpl_ ## func ## l, #func " is unportable - "       \
 #if !defined NAN || @REPLACE_NAN@
 # if !GNULIB_defined_NAN
 #  undef NAN
-  /* The Compaq (ex-DEC) C 6.4 compiler chokes on the expression 0.0 / 0.0.  */
-#  ifdef __DECC
+  /* The Compaq (ex-DEC) C 6.4 compiler and the Microsoft MSVC 9 compiler
+     choke on the expression 0.0 / 0.0.  */
+#  if defined __DECC || defined _MSC_VER
 static float
 _NaN ()
 {
@@ -186,6 +187,7 @@ _GL_WARN_ON_USE (atanl, "atanl is unportable - "
 #if @GNULIB_CEILF@
 # if @REPLACE_CEILF@
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef ceilf
 #   define ceilf rpl_ceilf
 #  endif
 _GL_FUNCDECL_RPL (ceilf, float, (float x));
@@ -221,6 +223,7 @@ _GL_CXXALIASWARN (ceil);
 #if @GNULIB_CEILL@
 # if @REPLACE_CEILL@
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef ceill
 #   define ceill rpl_ceill
 #  endif
 _GL_FUNCDECL_RPL (ceill, long double, (long double x));
@@ -274,6 +277,7 @@ _GL_WARN_ON_USE (expl, "expl is unportable - "
 #if @GNULIB_FLOORF@
 # if @REPLACE_FLOORF@
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef floorf
 #   define floorf rpl_floorf
 #  endif
 _GL_FUNCDECL_RPL (floorf, float, (float x));
@@ -309,6 +313,7 @@ _GL_CXXALIASWARN (floor);
 #if @GNULIB_FLOORL@
 # if @REPLACE_FLOORL@
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef floorl
 #   define floorl rpl_floorl
 #  endif
 _GL_FUNCDECL_RPL (floorl, long double, (long double x));
@@ -338,6 +343,7 @@ _GL_WARN_ON_USE (floorl, "floorl is unportable - "
    Store exp in *EXPPTR and return mantissa.  */
 #if @GNULIB_FREXPL@ && @REPLACE_FREXPL@
 # if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#  undef frexpl
 #  define frexpl rpl_frexpl
 # endif
 _GL_FUNCDECL_RPL (frexpl, long double,
@@ -367,6 +373,7 @@ _GL_WARN_ON_USE (frexpl, "frexpl is unportable - "
 /* Return x * 2^exp.  */
 #if @GNULIB_LDEXPL@ && @REPLACE_LDEXPL@
 # if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#  undef ldexpl
 #  define ldexpl rpl_ldexpl
 # endif
 _GL_FUNCDECL_RPL (ldexpl, long double, (long double x, int exp));

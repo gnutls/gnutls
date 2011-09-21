@@ -198,6 +198,22 @@ EXTRA_DIST += test-fcntl-h.c
 
 ## end   gnulib module fcntl-h-tests
 
+## begin gnulib module fdopen-tests
+
+TESTS += test-fdopen
+check_PROGRAMS += test-fdopen
+EXTRA_DIST += test-fdopen.c signature.h macros.h
+
+## end   gnulib module fdopen-tests
+
+## begin gnulib module fgetc-tests
+
+TESTS += test-fgetc
+check_PROGRAMS += test-fgetc
+EXTRA_DIST += test-fgetc.c signature.h macros.h
+
+## end   gnulib module fgetc-tests
+
 ## begin gnulib module float-tests
 
 TESTS += test-float
@@ -211,7 +227,7 @@ EXTRA_DIST += test-float.c macros.h
 TESTS += test-frexp-nolibm
 check_PROGRAMS += test-frexp-nolibm
 test_frexp_nolibm_SOURCES = test-frexp.c
-EXTRA_DIST += test-frexp.c minus-zero.h nan.h signature.h macros.h
+EXTRA_DIST += test-frexp.c minus-zero.h infinity.h nan.h signature.h macros.h
 
 ## end   gnulib module frexp-nolibm-tests
 
@@ -220,7 +236,7 @@ EXTRA_DIST += test-frexp.c minus-zero.h nan.h signature.h macros.h
 TESTS += test-frexpl-nolibm
 check_PROGRAMS += test-frexpl-nolibm
 test_frexpl_nolibm_SOURCES = test-frexpl.c
-EXTRA_DIST += test-frexpl.c minus-zero.h nan.h signature.h macros.h
+EXTRA_DIST += test-frexpl.c minus-zero.h infinity.h nan.h signature.h macros.h
 
 ## end   gnulib module frexpl-nolibm-tests
 
@@ -234,9 +250,9 @@ EXTRA_DIST += test-fseek.c test-fseek.sh test-fseek2.sh signature.h macros.h
 
 ## begin gnulib module fseeko-tests
 
-TESTS += test-fseeko.sh test-fseeko2.sh test-fseeko3.sh
-check_PROGRAMS += test-fseeko test-fseeko3
-EXTRA_DIST += test-fseeko.c test-fseeko.sh test-fseeko2.sh test-fseeko3.c test-fseeko3.sh signature.h macros.h
+TESTS += test-fseeko.sh test-fseeko2.sh test-fseeko3.sh test-fseeko4.sh
+check_PROGRAMS += test-fseeko test-fseeko3 test-fseeko4
+EXTRA_DIST += test-fseeko.c test-fseeko.sh test-fseeko2.sh test-fseeko3.c test-fseeko3.sh test-fseeko4.c test-fseeko4.sh signature.h macros.h
 
 ## end   gnulib module fseeko-tests
 
@@ -249,6 +265,14 @@ EXTRA_DIST += test-fseterr.c
 
 ## end   gnulib module fseterr-tests
 
+## begin gnulib module fstat-tests
+
+TESTS += test-fstat
+check_PROGRAMS += test-fstat
+EXTRA_DIST += test-fstat.c signature.h macros.h
+
+## end   gnulib module fstat-tests
+
 ## begin gnulib module ftell-tests
 
 TESTS += test-ftell.sh test-ftell2.sh test-ftell3
@@ -260,10 +284,10 @@ EXTRA_DIST += test-ftell.c test-ftell.sh test-ftell2.sh test-ftell3.c signature.
 
 ## begin gnulib module ftello-tests
 
-TESTS += test-ftello.sh test-ftello2.sh test-ftello3
-check_PROGRAMS += test-ftello test-ftello3
+TESTS += test-ftello.sh test-ftello2.sh test-ftello3 test-ftello4.sh
+check_PROGRAMS += test-ftello test-ftello3 test-ftello4
 MOSTLYCLEANFILES += t-ftello3.tmp
-EXTRA_DIST += test-ftello.c test-ftello.sh test-ftello2.sh test-ftello3.c signature.h macros.h
+EXTRA_DIST += test-ftello.c test-ftello.sh test-ftello2.sh test-ftello3.c test-ftello4.c test-ftello4.sh signature.h macros.h
 
 ## end   gnulib module ftello-tests
 
@@ -415,7 +439,7 @@ EXTRA_DIST += test-inttypes.c
 TESTS += test-isnand-nolibm
 check_PROGRAMS += test-isnand-nolibm
 
-EXTRA_DIST += test-isnand-nolibm.c test-isnand.h minus-zero.h nan.h macros.h
+EXTRA_DIST += test-isnand-nolibm.c test-isnand.h minus-zero.h infinity.h nan.h macros.h
 
 ## end   gnulib module isnand-nolibm-tests
 
@@ -424,7 +448,7 @@ EXTRA_DIST += test-isnand-nolibm.c test-isnand.h minus-zero.h nan.h macros.h
 TESTS += test-isnanf-nolibm
 check_PROGRAMS += test-isnanf-nolibm
 
-EXTRA_DIST += test-isnanf-nolibm.c test-isnanf.h minus-zero.h nan.h macros.h
+EXTRA_DIST += test-isnanf-nolibm.c test-isnanf.h minus-zero.h infinity.h nan.h macros.h
 
 ## end   gnulib module isnanf-nolibm-tests
 
@@ -433,7 +457,7 @@ EXTRA_DIST += test-isnanf-nolibm.c test-isnanf.h minus-zero.h nan.h macros.h
 TESTS += test-isnanl-nolibm
 check_PROGRAMS += test-isnanl-nolibm
 
-EXTRA_DIST += test-isnanl-nolibm.c test-isnanl.h minus-zero.h nan.h macros.h
+EXTRA_DIST += test-isnanl-nolibm.c test-isnanl.h minus-zero.h infinity.h nan.h macros.h
 
 ## end   gnulib module isnanl-nolibm-tests
 
@@ -495,6 +519,15 @@ EXTRA_DIST += test-memchr.c zerosize-ptr.h signature.h macros.h
 
 ## end   gnulib module memchr-tests
 
+## begin gnulib module msvc-inval
+
+
+EXTRA_DIST += msvc-inval.c msvc-inval.h
+
+EXTRA_libtests_a_SOURCES += msvc-inval.c
+
+## end   gnulib module msvc-inval
+
 ## begin gnulib module netdb-tests
 
 TESTS += test-netdb
@@ -527,6 +560,21 @@ check_PROGRAMS += test-open
 EXTRA_DIST += test-open.h test-open.c signature.h macros.h
 
 ## end   gnulib module open-tests
+
+## begin gnulib module pathmax
+
+
+EXTRA_DIST += pathmax.h
+
+## end   gnulib module pathmax
+
+## begin gnulib module pathmax-tests
+
+TESTS += test-pathmax
+check_PROGRAMS += test-pathmax
+EXTRA_DIST += test-pathmax.c
+
+## end   gnulib module pathmax-tests
 
 ## begin gnulib module printf-frexp-tests
 
@@ -598,7 +646,7 @@ EXTRA_DIST += test-setenv.c signature.h macros.h
 TESTS += test-signbit
 check_PROGRAMS += test-signbit
 
-EXTRA_DIST += test-signbit.c minus-zero.h macros.h
+EXTRA_DIST += test-signbit.c minus-zero.h infinity.h macros.h
 
 ## end   gnulib module signbit-tests
 
@@ -855,6 +903,14 @@ EXTRA_DIST += test-sys_time.c
 
 ## end   gnulib module sys_time-tests
 
+## begin gnulib module sys_types-tests
+
+TESTS += test-sys_types
+check_PROGRAMS += test-sys_types
+EXTRA_DIST += test-sys_types.c
+
+## end   gnulib module sys_types-tests
+
 ## begin gnulib module sys_uio-tests
 
 TESTS += test-sys_uio
@@ -961,7 +1017,7 @@ EXTRA_DIST += test-version-etc.c test-version-etc.sh
 
 TESTS += test-vfprintf-posix.sh
 check_PROGRAMS += test-vfprintf-posix
-EXTRA_DIST += test-vfprintf-posix.sh test-vfprintf-posix.c test-fprintf-posix.h test-printf-posix.output signature.h macros.h
+EXTRA_DIST += test-vfprintf-posix.sh test-vfprintf-posix.c test-fprintf-posix.h test-printf-posix.output infinity.h signature.h macros.h
 
 ## end   gnulib module vfprintf-posix-tests
 
@@ -969,7 +1025,7 @@ EXTRA_DIST += test-vfprintf-posix.sh test-vfprintf-posix.c test-fprintf-posix.h 
 
 TESTS += test-vprintf-posix.sh
 check_PROGRAMS += test-vprintf-posix
-EXTRA_DIST += test-vprintf-posix.sh test-vprintf-posix.c test-printf-posix.h test-printf-posix.output signature.h macros.h
+EXTRA_DIST += test-vprintf-posix.sh test-vprintf-posix.c test-printf-posix.h test-printf-posix.output infinity.h signature.h macros.h
 
 ## end   gnulib module vprintf-posix-tests
 

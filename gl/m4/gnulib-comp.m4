@@ -40,6 +40,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module c-ctype:
   # Code from module c-ctype-tests:
   # Code from module clock-time:
+  # Code from module closedir:
   # Code from module crypto/hmac-md5:
   # Code from module crypto/hmac-md5-tests:
   # Code from module crypto/md5:
@@ -61,6 +62,9 @@ AC_DEFUN([gl_EARLY],
   # Code from module fcntl-h:
   # Code from module fcntl-h-tests:
   # Code from module fd-hook:
+  # Code from module fdopen-tests:
+  # Code from module fgetc-tests:
+  # Code from module filename:
   # Code from module float:
   # Code from module float-tests:
   # Code from module fpieee:
@@ -77,6 +81,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module fseeko-tests:
   # Code from module fseterr:
   # Code from module fseterr-tests:
+  # Code from module fstat-tests:
   # Code from module ftell:
   # Code from module ftell-tests:
   # Code from module ftello:
@@ -139,6 +144,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module mempcpy:
   # Code from module memxor:
   # Code from module minmax:
+  # Code from module msvc-inval:
   # Code from module multiarch:
   # Code from module netdb:
   # Code from module netdb-tests:
@@ -147,6 +153,9 @@ AC_DEFUN([gl_EARLY],
   # Code from module nocrash:
   # Code from module open:
   # Code from module open-tests:
+  # Code from module opendir:
+  # Code from module pathmax:
+  # Code from module pathmax-tests:
   # Code from module printf-frexp:
   # Code from module printf-frexp-tests:
   # Code from module printf-frexpl:
@@ -158,6 +167,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module rawmemchr-tests:
   # Code from module read-file:
   # Code from module read-file-tests:
+  # Code from module readdir:
   # Code from module realloc-posix:
   # Code from module same-inode:
   # Code from module scandir:
@@ -178,6 +188,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module sockets:
   # Code from module sockets-tests:
   # Code from module socklen:
+  # Code from module ssize_t:
   # Code from module stat:
   # Code from module stat-tests:
   # Code from module stdarg:
@@ -220,6 +231,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module sys_stat-tests:
   # Code from module sys_time:
   # Code from module sys_time-tests:
+  # Code from module sys_types:
+  # Code from module sys_types-tests:
   # Code from module sys_uio:
   # Code from module sys_uio-tests:
   # Code from module sysexits:
@@ -290,6 +303,11 @@ m4_ifdef([AM_XGETTEXT_OPTION],
    AM_][XGETTEXT_OPTION([--flag=argp_failure:4:c-format])])
 gl_BYTESWAP
 gl_CLOCK_TIME
+gl_FUNC_CLOSEDIR
+if test $HAVE_CLOSEDIR = 0 || test $REPLACE_CLOSEDIR = 1; then
+  AC_LIBOBJ([closedir])
+fi
+gl_DIRENT_MODULE_INDICATOR([closedir])
 gl_MD5
 gl_DIRENT_H
 gl_DIRNAME_LGPL
@@ -453,6 +471,11 @@ gl_MULTIARCH
 gl_HEADER_NETDB
 gl_HEADER_NETINET_IN
 AC_PROG_MKDIR_P
+gl_FUNC_OPENDIR
+if test $HAVE_OPENDIR = 0 || test $REPLACE_OPENDIR = 1; then
+  AC_LIBOBJ([opendir])
+fi
+gl_DIRENT_MODULE_INDICATOR([opendir])
 gl_FUNC_PRINTF_FREXP
 gl_FUNC_PRINTF_FREXPL
 m4_divert_text([INIT_PREPARE], [gl_printf_safe=yes])
@@ -465,6 +488,11 @@ if test $HAVE_RAWMEMCHR = 0; then
 fi
 gl_STRING_MODULE_INDICATOR([rawmemchr])
 gl_PREREQ_READ_FILE
+gl_FUNC_READDIR
+if test $HAVE_READDIR = 0; then
+  AC_LIBOBJ([readdir])
+fi
+gl_DIRENT_MODULE_INDICATOR([readdir])
 gl_FUNC_REALLOC_POSIX
 if test $REPLACE_REALLOC = 1; then
   AC_LIBOBJ([realloc])
@@ -495,6 +523,7 @@ gl_MODULE_INDICATOR([snprintf])
 gl_SOCKETLIB
 gl_SOCKETS
 gl_TYPE_SOCKLEN_T
+gt_TYPE_SSIZE_T
 gl_STDARG_H
 AM_STDBOOL_H
 gl_STDDEF_H
@@ -558,6 +587,8 @@ AC_PROG_MKDIR_P
 gl_HEADER_SYS_STAT_H
 AC_PROG_MKDIR_P
 gl_HEADER_SYS_TIME_H
+AC_PROG_MKDIR_P
+gl_SYS_TYPES_H
 AC_PROG_MKDIR_P
 gl_HEADER_SYS_UIO
 AC_PROG_MKDIR_P
@@ -674,12 +705,17 @@ dnl Check for prerequisites for memory fence checks.
 gl_FUNC_MMAP_ANON
 AC_CHECK_HEADERS_ONCE([sys/mman.h])
 AC_CHECK_FUNCS_ONCE([mprotect])
+gl_MSVC_INVAL
+if test $HAVE_MSVC_INVALID_PARAMETER_HANDLER = 1; then
+  AC_LIBOBJ([msvc-inval])
+fi
 gl_FUNC_OPEN
 if test $REPLACE_OPEN = 1; then
   AC_LIBOBJ([open])
   gl_PREREQ_OPEN
 fi
 gl_FCNTL_MODULE_INDICATOR([open])
+gl_PATHMAX
 gl_FUNC_PUTENV
 if test $REPLACE_PUTENV = 1; then
   AC_LIBOBJ([putenv])
@@ -847,6 +883,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/byteswap.in.h
   lib/c-ctype.c
   lib/c-ctype.h
+  lib/closedir.c
+  lib/dirent-private.h
   lib/dirent.in.h
   lib/dirname-lgpl.c
   lib/dirname.h
@@ -856,6 +894,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/error.h
   lib/fd-hook.c
   lib/fd-hook.h
+  lib/filename.h
   lib/float+.h
   lib/float.c
   lib/float.in.h
@@ -904,6 +943,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/minmax.h
   lib/netdb.in.h
   lib/netinet_in.in.h
+  lib/opendir.c
   lib/printf-args.c
   lib/printf-args.h
   lib/printf-frexp.c
@@ -918,6 +958,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/rawmemchr.valgrind
   lib/read-file.c
   lib/read-file.h
+  lib/readdir.c
   lib/realloc.c
   lib/scandir.c
   lib/signbitd.c
@@ -953,6 +994,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/sys_socket.in.h
   lib/sys_stat.in.h
   lib/sys_time.in.h
+  lib/sys_types.in.h
   lib/sys_uio.in.h
   lib/sysexits.in.h
   lib/time.in.h
@@ -979,6 +1021,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/argp.m4
   m4/byteswap.m4
   m4/clock_time.m4
+  m4/closedir.m4
   m4/codeset.m4
   m4/dirent_h.m4
   m4/dirname.m4
@@ -1054,12 +1097,15 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/minmax.m4
   m4/mmap-anon.m4
   m4/mode_t.m4
+  m4/msvc-inval.m4
   m4/multiarch.m4
   m4/netdb_h.m4
   m4/netinet_in_h.m4
   m4/nls.m4
   m4/nocrash.m4
   m4/open.m4
+  m4/opendir.m4
+  m4/pathmax.m4
   m4/po.m4
   m4/printf-frexp.m4
   m4/printf-frexpl.m4
@@ -1069,6 +1115,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/putenv.m4
   m4/rawmemchr.m4
   m4/read-file.m4
+  m4/readdir.m4
   m4/realloc.m4
   m4/scandir.m4
   m4/setenv.m4
@@ -1080,6 +1127,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/sockets.m4
   m4/socklen.m4
   m4/sockpfaf.m4
+  m4/ssize_t.m4
   m4/stat.m4
   m4/stdarg.m4
   m4/stdbool.m4
@@ -1101,6 +1149,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
   m4/sys_time_h.m4
+  m4/sys_types_h.m4
   m4/sys_uio_h.m4
   m4/sysexits.m4
   m4/threadlib.m4
@@ -1124,6 +1173,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
+  tests/infinity.h
   tests/init.sh
   tests/macros.h
   tests/minus-zero.h
@@ -1141,6 +1191,8 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-environ.c
   tests/test-errno.c
   tests/test-fcntl-h.c
+  tests/test-fdopen.c
+  tests/test-fgetc.c
   tests/test-float.c
   tests/test-fprintf-posix.h
   tests/test-frexp.c
@@ -1153,7 +1205,10 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-fseeko2.sh
   tests/test-fseeko3.c
   tests/test-fseeko3.sh
+  tests/test-fseeko4.c
+  tests/test-fseeko4.sh
   tests/test-fseterr.c
+  tests/test-fstat.c
   tests/test-ftell.c
   tests/test-ftell.sh
   tests/test-ftell2.sh
@@ -1162,6 +1217,8 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-ftello.sh
   tests/test-ftello2.sh
   tests/test-ftello3.c
+  tests/test-ftello4.c
+  tests/test-ftello4.sh
   tests/test-func.c
   tests/test-getcwd-lgpl.c
   tests/test-getdelim.c
@@ -1191,6 +1248,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-netinet_in.c
   tests/test-open.c
   tests/test-open.h
+  tests/test-pathmax.c
   tests/test-printf-frexp.c
   tests/test-printf-frexpl.c
   tests/test-printf-posix.h
@@ -1220,6 +1278,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-sys_socket.c
   tests/test-sys_stat.c
   tests/test-sys_time.c
+  tests/test-sys_types.c
   tests/test-sys_uio.c
   tests/test-sys_wait.h
   tests/test-sysexits.c
@@ -1253,7 +1312,10 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/malloca.c
   tests=lib/malloca.h
   tests=lib/malloca.valgrind
+  tests=lib/msvc-inval.c
+  tests=lib/msvc-inval.h
   tests=lib/open.c
+  tests=lib/pathmax.h
   tests=lib/putenv.c
   tests=lib/same-inode.h
   tests=lib/setenv.c
