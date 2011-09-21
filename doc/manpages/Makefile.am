@@ -111,6 +111,7 @@ APIMANS += gnutls_dtls_get_mtu.3
 APIMANS += gnutls_dtls_cookie_send.3
 APIMANS += gnutls_dtls_cookie_verify.3
 APIMANS += gnutls_dtls_prestate_set.3
+APIMANS += gnutls_record_get_discarded.3
 APIMANS += gnutls_error_is_fatal.3
 APIMANS += gnutls_perror.3
 APIMANS += gnutls_strerror.3
