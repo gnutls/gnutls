@@ -167,6 +167,7 @@ static int check_padlock(void)
     return ((edx & (0x3 << 6)) == (0x3 << 6));
 }
 
+#ifdef ENABLE_VIA
 static unsigned check_via(void)
 {
     unsigned int a, b, c, d;
@@ -179,6 +180,7 @@ static unsigned check_via(void)
 
     return 0;
 }
+#endif
 
 void register_padlock_crypto(void)
 {
