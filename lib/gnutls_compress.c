@@ -364,7 +364,6 @@ _gnutls_compress (comp_hd_t handle, const opaque * plain,
 #ifdef HAVE_LIBZ
     case GNUTLS_COMP_DEFLATE:
       {
-        uLongf size;
         z_stream *zhandle;
         int err;
 
@@ -426,7 +425,6 @@ _gnutls_decompress (comp_hd_t handle, opaque * compressed,
 #ifdef HAVE_LIBZ
     case GNUTLS_COMP_DEFLATE:
       {
-        uLongf out_size;
         z_stream *zhandle;
         int err;
 
