@@ -28,6 +28,7 @@ my $prefix = $_[0];
 my $suffix=$_[0];
 	$suffix =~ s/\\//g;
 	$prefix =~ s/\\_/\\_\\-/g;
+
 	return "\\funcref\{$prefix\}\{$suffix\}";
 }
 
@@ -37,6 +38,7 @@ my $prefix = $_[0];
 my $suffix = $_[1];
 	$suffix =~ s/\\//g;
 	$suffix =~ s/\,/\}\{/g;
+
 	return "\\showfunc$prefix\{$suffix\}";
 }
 
@@ -44,6 +46,7 @@ sub showfuncdesc()
 {
 my $suffix = $_[0];
 	$suffix =~ s/\\//g;
+
 	return "\\showfuncdesc\{$suffix\}";
 }
 
@@ -312,7 +315,7 @@ multitable:
 		$line =~ s/\#/\\\#/g;
 		$line =~ s/\@-/\\-/g;
                 $line =~ s/\@verbatiminclude (.*)/\\examplefile{\.\.\/$1}/g;
-		$line =~ s/\@image\{($match+)\,($match+)\}/\\includegraphics\[width\=$2\]\{\.\.\/$1\.pdf\}/g;
+		$line =~ s/\@image\{($match+)\,($match+)\}/\\includegraphics\[width\=$2\]\{\.\.\/$1\}/g;
 		$line =~ s/\@samp\{($spacematch+)\}/$1/g;
 		$line =~ s/\@strong\{/\{\\bf /g;
 		$line =~ s/\@c (.*)/\% $1/g;
