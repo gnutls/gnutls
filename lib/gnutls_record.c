@@ -986,7 +986,10 @@ begin:
   if (bufel == NULL)
     return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-  decrypted = _mbuffer_alloc(record.length+EXTRA_COMP_SIZE, record.length+EXTRA_COMP_SIZE);
+  /* We allocate the maximum possible to allow few compressed bytes to expand to a
+   * full record.
+   */
+  decrypted = _mbuffer_alloc(MAX_RECORD_RECV_SIZE(session), MAX_RECORD_RECV_SIZE(session));
   if (decrypted == NULL)
     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 

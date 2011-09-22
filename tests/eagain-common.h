@@ -32,6 +32,9 @@
       ret = gnutls_record_send (c, msg, msglen); \
     } \
   while(ret == GNUTLS_E_AGAIN); \
+  \
+  if (ret < 0) fail ("client send error: %s\n", gnutls_strerror (ret)); \
+  \
   do \
     { \
       do \
@@ -54,6 +57,7 @@
           ns = gnutls_record_send (server, msg, msglen); \
         } \
       while (ns == GNUTLS_E_AGAIN); \
+      if (ns < 0) fail ("server send error: %s\n", gnutls_strerror (ret)); \
       do \
         { \
           ret = gnutls_record_recv (client, buf, buflen); \
@@ -81,6 +85,7 @@
               ns = gnutls_record_send (client, buf, msglen); \
             } \
           while (ns == GNUTLS_E_AGAIN); \
+          if (ns < 0) fail ("client send error: %s\n", gnutls_strerror (ret)); \
           transferred += ret; \
           if (debug) \
             fputs (".", stdout); \

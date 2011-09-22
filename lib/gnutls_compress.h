@@ -22,15 +22,6 @@
 #ifndef GNUTLS_COMPRESS_H
 #define GNUTLS_COMPRESS_H
 
-int _gnutls_m_plaintext2compressed (gnutls_session_t session,
-                                    gnutls_datum_t * compressed,
-                                    const gnutls_datum_t * plaintext,
-                                    const record_parameters_st * params);
-int _gnutls_m_compressed2plaintext (gnutls_session_t session,
-                                    gnutls_datum_t * plain,
-                                    const gnutls_datum_t * compressed,
-                                    const record_parameters_st * params);
-
 /* Algorithm handling. */
 int _gnutls_supported_compression_methods (gnutls_session_t session,
                                            uint8_t * comp, size_t max_comp);
@@ -54,10 +45,10 @@ comp_hd_t _gnutls_comp_init (gnutls_compression_method_t, int d);
 void _gnutls_comp_deinit (comp_hd_t handle, int d);
 
 int _gnutls_decompress (comp_hd_t handle, opaque * compressed,
-                        size_t compressed_size, opaque ** plain,
-                        size_t max_record_size);
+                        size_t compressed_size, opaque * plain,
+                        size_t max_plain_size);
 int _gnutls_compress (comp_hd_t, const opaque * plain, size_t plain_size,
-                      opaque ** compressed, size_t max_comp_size);
+                      opaque * compressed, size_t max_comp_size);
 
 struct gnutls_compression_entry
 {

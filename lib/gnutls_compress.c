@@ -32,57 +32,6 @@
 #include <algorithms.h>
 #include <gnutls/gnutls.h>
 
-/* These functions allocate the return value internally
- */
-int
-_gnutls_m_plaintext2compressed (gnutls_session_t session,
-                                gnutls_datum_t * compressed,
-                                const gnutls_datum_t * plaintext,
-                                const record_parameters_st * params)
-{
-  int size;
-  opaque *data;
-
-  size =
-    _gnutls_compress (params->write.compression_state,
-                      plaintext->data, plaintext->size, &data,
-                      MAX_RECORD_SEND_SIZE(session) + EXTRA_COMP_SIZE);
-  if (size < 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_COMPRESSION_FAILED;
-    }
-  compressed->data = data;
-  compressed->size = size;
-
-  return 0;
-}
-
-int
-_gnutls_m_compressed2plaintext (gnutls_session_t session,
-                                gnutls_datum_t * plain,
-                                const gnutls_datum_t * compressed,
-                                const record_parameters_st * params)
-{
-  int size;
-  opaque *data;
-
-  size =
-    _gnutls_decompress (params->read.compression_state,
-                        compressed->data, compressed->size, &data,
-                        MAX_RECORD_RECV_SIZE(session));
-  if (size < 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_DECOMPRESSION_FAILED;
-    }
-  plain->data = data;
-  plain->size = size;
-
-  return 0;
-}
-
-
 /* Compression Section */
 #define GNUTLS_COMPRESSION_ENTRY(name, id, wb, ml, cl)	\
   { #name, name, id, wb, ml, cl}
@@ -397,7 +346,7 @@ _gnutls_comp_deinit (comp_hd_t handle, int d)
 
 int
 _gnutls_compress (comp_hd_t handle, const opaque * plain,
-                  size_t plain_size, opaque ** compressed,
+                  size_t plain_size, opaque * compressed,
                   size_t max_comp_size)
 {
   int compressed_size = GNUTLS_E_COMPRESSION_FAILED;
@@ -419,32 +368,19 @@ _gnutls_compress (comp_hd_t handle, const opaque * plain,
         z_stream *zhandle;
         int err;
 
-        size = (plain_size + plain_size) + 10;
-        *compressed = gnutls_malloc (size);
-        if (*compressed == NULL)
-          {
-            gnutls_assert ();
-            return GNUTLS_E_MEMORY_ERROR;
-          }
-
         zhandle = handle->handle;
 
         zhandle->next_in = (Bytef *) plain;
         zhandle->avail_in = plain_size;
-        zhandle->next_out = (Bytef *) * compressed;
-        zhandle->avail_out = size;
+        zhandle->next_out = (Bytef *) compressed;
+        zhandle->avail_out = max_comp_size;
 
         err = deflate (zhandle, Z_SYNC_FLUSH);
-
         if (err != Z_OK || zhandle->avail_in != 0)
-          {
-            gnutls_assert ();
-            gnutls_free (*compressed);
-            *compressed = NULL;
-            return GNUTLS_E_COMPRESSION_FAILED;
-          }
+          return gnutls_assert_val(GNUTLS_E_COMPRESSION_FAILED);
 
-        compressed_size = size - zhandle->avail_out;
+
+        compressed_size = max_comp_size - zhandle->avail_out;
         break;
       }
 #endif
@@ -458,13 +394,6 @@ _gnutls_compress (comp_hd_t handle, const opaque * plain,
                      (float) ((float) compressed_size / (float) plain_size));
 #endif
 
-  if ((size_t) compressed_size > max_comp_size)
-    {
-      gnutls_free (*compressed);
-      *compressed = NULL;
-      return GNUTLS_E_COMPRESSION_FAILED;
-    }
-
   return compressed_size;
 }
 
@@ -472,12 +401,12 @@ _gnutls_compress (comp_hd_t handle, const opaque * plain,
 
 int
 _gnutls_decompress (comp_hd_t handle, opaque * compressed,
-                    size_t compressed_size, opaque ** plain,
-                    size_t max_record_size)
+                    size_t compressed_size, opaque * plain,
+                    size_t max_plain_size)
 {
   int plain_size = GNUTLS_E_DECOMPRESSION_FAILED;
 
-  if (compressed_size > max_record_size + EXTRA_COMP_SIZE)
+  if (compressed_size > max_plain_size + EXTRA_COMP_SIZE)
     {
       gnutls_assert ();
       return GNUTLS_E_DECOMPRESSION_FAILED;
@@ -499,51 +428,21 @@ _gnutls_decompress (comp_hd_t handle, opaque * compressed,
       {
         uLongf out_size;
         z_stream *zhandle;
-        int cur_pos;
         int err;
-
-        *plain = NULL;
-        out_size = compressed_size + compressed_size;
-        plain_size = 0;
 
         zhandle = handle->handle;
 
         zhandle->next_in = (Bytef *) compressed;
         zhandle->avail_in = compressed_size;
 
-        cur_pos = 0;
-
-        do
-          {
-            out_size += 512;
-            *plain = gnutls_realloc_fast (*plain, out_size);
-            if (*plain == NULL)
-              {
-                gnutls_assert ();
-                return GNUTLS_E_MEMORY_ERROR;
-              }
-
-            zhandle->next_out = (Bytef *) (*plain + cur_pos);
-            zhandle->avail_out = out_size - cur_pos;
-
-            err = inflate (zhandle, Z_SYNC_FLUSH);
-
-            cur_pos = out_size - zhandle->avail_out;
-
-          }
-        while ((err == Z_BUF_ERROR && zhandle->avail_out == 0
-                && out_size < max_record_size)
-               || (err == Z_OK && zhandle->avail_in != 0));
+        zhandle->next_out = (Bytef *) plain;
+        zhandle->avail_out = max_plain_size;
+        err = inflate (zhandle, Z_SYNC_FLUSH);
 
         if (err != Z_OK)
-          {
-            gnutls_assert ();
-            gnutls_free (*plain);
-            *plain = NULL;
-            return GNUTLS_E_DECOMPRESSION_FAILED;
-          }
+          return gnutls_assert_val(GNUTLS_E_DECOMPRESSION_FAILED);
 
-        plain_size = out_size - zhandle->avail_out;
+        plain_size = max_plain_size - zhandle->avail_out;
         break;
       }
 #endif
@@ -551,14 +450,6 @@ _gnutls_decompress (comp_hd_t handle, opaque * compressed,
       gnutls_assert ();
       return GNUTLS_E_INTERNAL_ERROR;
     }                           /* switch */
-
-  if ((size_t) plain_size > max_record_size)
-    {
-      gnutls_assert ();
-      gnutls_free (*plain);
-      *plain = NULL;
-      return GNUTLS_E_DECOMPRESSION_FAILED;
-    }
 
   return plain_size;
 }
