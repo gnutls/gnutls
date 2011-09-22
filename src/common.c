@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
- * 2009, 2010 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2011 Free Software Foundation, Inc.
  * Author: Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
@@ -413,7 +412,12 @@ print_info (gnutls_session_t session, const char *hostname, int insecure)
   const char *tmp;
   gnutls_credentials_type_t cred;
   gnutls_kx_algorithm_t kx;
+  unsigned char session_id[33];
+  size_t session_id_size = sizeof(session_id);
 
+  /* print session ID */
+  gnutls_session_get_id (session, session_id, &session_id_size);
+  printf("- Session ID: %s\n", raw_to_string(session_id, session_id_size));
 
   /* print the key exchange's algorithm name
    */
