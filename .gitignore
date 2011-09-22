@@ -518,3 +518,11 @@ tests/x509cert-tl
 doc/enums.texi
 doc/enums/
 tests/infoaccess
+gl/tests/test-fdopen
+gl/tests/test-fgetc
+gl/tests/test-fseeko4
+gl/tests/test-fstat
+gl/tests/test-ftello4
+gl/tests/test-pathmax
+gl/tests/test-sys_types
+tests/mini-deflate
