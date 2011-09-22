@@ -1,0 +1,215 @@
+\newcommand{\gnutls}{{\emph{GnuTLS}}} 
+\newcommand{\gnutlse}{{\emph{GnuTLS-extra}}} 
+\newcommand{\tlsI}{{\emph{TLS 1.0}}} 
+\newcommand{\tlsII}{{\emph{TLS 1.1}}} 
+\newcommand{\tls}{{\emph{TLS}}} 
+\newcommand{\sslIII}{{\emph{SSL 3.0}}} 
+\newcommand{\sslII}{{\emph{SSL 2.0}}} 
+\newcommand{\ssl}{{\emph{SSL}}} 
+\newcommand{\HRule}{\rule{\linewidth}{0.4mm}}
+
+\newcommand{\code}[1]{%
+	{\tt{#1}}%
+}
+
+\newcommand{\command}[1]{%
+	``{\tt{#1}}''%
+}
+
+\newcommand{\myref}[1]{%
+	\autoref{#1}%
+}
+
+\newcommand{\file}[1]{%
+	``{\tt{#1}}''%
+}
+
+\newcommand{\acronym}[1]{%
+	{#1}%
+}
+
+\newcommand{\examplefile}[1]{%
+	{\VerbatimInput[frame=single,numbers=left,numbersep=3pt,fontsize=\footnotesize]{#1}}%
+}
+
+\DefineVerbatimEnvironment{example}{Verbatim}%
+{numbers=left,frame=single,numbersep=3pt,fontsize=\footnotesize}
+
+\DefineVerbatimEnvironment{smallexample}{Verbatim}%
+{frame=single,numbersep=3pt,fontsize=\footnotesize}
+
+
+\newcommand{\funcref}[2]{%
+	%\hyperref[#2]{#1()}%
+	\code{#1}%
+}
+
+\newcommand{\showfunc}[1]{%
+ \let\Oldfd\functionDescription
+ \let\Oldendfd\endfunctionDescription
+ \let\functionDescription=\comment
+ \let\endfunctionDescription=\endcomment 
+ \let\Oldfr\functionReturns
+ \let\Oldendfr\endfunctionReturns
+ \let\functionReturns=\comment
+ \let\endfunctionReturns=\endcomment 
+\texttt{
+ \input{functions/#1}
+}
+ \let\functionDescription=\Oldfd
+ \let\endfunctionDescription=\Oldendfd
+ \let\functionReturns=\Oldfr
+ \let\endfunctionReturns=\Oldendfr
+}
+
+\newcommand{\showfuncdesc}[1]{%
+ \begin{figure}[htbp]
+ \begin{minipage}[l]{\linewidth}
+% \begin{framed}
+  \texttt{
+   \input{functions/#1}
+  }
+% \end{framed}
+ \end{minipage}
+ \end{figure}
+}
+
+\newcommand{\showenumdesc}[2]{%
+ \begin{table}[h]
+ \begin{minipage}[l]{\linewidth}
+% \begin{framed}
+  \texttt{
+   \input{enums/#1}
+  }
+% \end{framed}
+ \vspace{0.15cm}
+ \end{minipage}
+ \caption{#2}
+ \label{#1}
+ \end{table}
+}
+
+\newcommand{\showfuncA}[1]{%
+ \begin{figure}[H]
+ \begin{samepage}
+% \begin{framed}
+   \showfunc{#1}
+% \end{framed}
+ \end{samepage}
+ \end{figure}
+}
+
+\newcommand{\showfuncB}[2]{%
+ \begin{figure}[H]
+ \begin{samepage}
+% \begin{framed}
+    \showfunc{#1}
+ \vspace{0.2cm}
+    \showfunc{#2}
+% \end{framed}
+ \end{samepage}
+ \end{figure}
+}
+
+\newcommand{\showfuncC}[3]{%
+ \begin{figure}[H]
+ \begin{samepage}
+% \begin{framed}
+  \showfunc{#1}
+ \vspace{0.2cm}
+  \showfunc{#2}
+ \vspace{0.2cm}
+  \showfunc{#3}
+% \end{framed}
+ \end{samepage}
+ \end{figure}
+}
+
+\newcommand{\showfuncD}[4]{%
+ \begin{figure}[H]
+ \begin{samepage}
+% \begin{framed}
+  \showfunc{#1}
+ \vspace{0.2cm}
+  \showfunc{#2}
+ \vspace{0.2cm}
+  \showfunc{#3}
+ \vspace{0.2cm}
+  \showfunc{#4}
+% \end{framed}
+ \end{samepage}
+ \end{figure}
+}
+
+\newcommand{\showfuncE}[5]{%
+ \begin{figure}[H]
+ \begin{samepage}
+% \begin{framed}
+  \showfunc{#1}
+ \vspace{0.2cm}
+  \showfunc{#2}
+ \vspace{0.2cm}
+  \showfunc{#3}
+ \vspace{0.2cm}
+  \showfunc{#4}
+ \vspace{0.2cm}
+  \showfunc{#5}
+% \end{framed}
+ \end{samepage}
+ \end{figure}
+}
+
+\newcommand{\showfuncF}[6]{%
+ \begin{figure}[H]
+ \begin{samepage}
+  \showfunc{#1}
+ \vspace{0.2cm}
+  \showfunc{#2}
+ \vspace{0.2cm}
+  \showfunc{#3}
+ \vspace{0.2cm}
+  \showfunc{#4}
+ \vspace{0.2cm}
+  \showfunc{#5}
+ \vspace{0.2cm}
+  \showfunc{#6}
+ \end{samepage}
+ \end{figure}
+}
+
+\newenvironment{function}%
+ {\begin{minipage}[l]{1\linewidth}}%
+ {\end{minipage}}
+
+\let\functionArguments=\comment
+\let\endfunctionArguments=\endcomment 
+
+\let\functionExamples=\comment
+\let\endfunctionExamples=\endcomment 
+
+\newenvironment{functionDescription}%
+{\vspace{0.5cm}{\bf Description:}\footnotesize}
+{}
+
+\newenvironment{enum}%
+{}%
+{}
+
+\newcommand{\enumElement}[2]{%
+{\scriptsize {\bf #1}} & {\scriptsize #2}\\%
+}
+
+\newenvironment{enumList}%
+{\begin{tabular}{p{.43\linewidth}p{.53\linewidth}}}%
+{\end{tabular}}
+
+\newcommand{\functionTitle}[1]{}
+\newcommand{\enumTitle}[1]{enum {\bf #1}:}
+
+\newenvironment{functionReturns}%
+{\vspace{0.5cm}{\bf Returns:}\footnotesize}
+{}
+
+\let\functionSince=\comment
+\let\endfunctionSince=\endcomment 
+

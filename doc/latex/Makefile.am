@@ -1,4 +1,5 @@
-TEX_OBJECTS = gnutls.tex macros.tex fdl.tex cover.tex gnutls.bib
+TEX_OBJECTS = gnutls.tex macros.tex macros-epub.tex fdl.tex cover.tex gnutls.bib \
+	cover-epub.tex
 
 GEN_TEX_OBJECTS = cha-preface.tex cha-library.tex cha-intro-tls.tex cha-auth.tex \
   cha-cert-auth.tex cha-gtls-app.tex cha-tls-app.tex cha-programs.tex cha-support.tex \
@@ -119,14 +120,41 @@ extra-api.tex: $(srcdir)/../../libextra/gnutls_extra.c
 
 SOURCE_GEN_FILES =  extra-api.tex pgp-api.tex x509-api.tex gnutls-api.tex gnutls-enums.tex
 
+PDF_FILES = gnutls-client-server-use-case.pdf gnutls-crypto-layers.pdf \
+	gnutls-handshake-sequence.pdf gnutls-handshake-state.pdf \
+	gnutls-internals.pdf gnutls-layers.pdf gnutls-logo.pdf \
+	gnutls-modauth.pdf gnutls-pgp.pdf gnutls-x509.pdf pkcs11-vision.pdf
+
 gnutls.pdf: $(SOURCE_GEN_FILES) $(TEX_OBJECTS) $(GEN_TEX_OBJECTS)
 	$(MAKE) -C .. errcodes printlist alert-printlist
-	-pdflatex gnutls.tex
-	-bibtex gnutls
-	-makeindex gnutls.idx
-	-pdflatex gnutls.tex && pdflatex gnutls.tex
+#	for i in $(PDF_FILES);do cp ../$$i .;done
+	pdflatex gnutls.tex
+	bibtex gnutls
+	makeindex gnutls.idx
+	pdflatex gnutls.tex && pdflatex gnutls.tex
+#	for i in $(PDF_FILES);do rm -f $$i;done
+
+PNG_FILES = gnutls-client-server-use-case.png gnutls-crypto-layers.png \
+	gnutls-handshake-sequence.png gnutls-handshake-state.png \
+	gnutls-internals.png gnutls-layers.png gnutls-logo.png \
+	gnutls-modauth.png gnutls-pgp.png gnutls-x509.png pkcs11-vision.png
+
+epub.html: $(SOURCE_GEN_FILES) $(TEX_OBJECTS) $(GEN_TEX_OBJECTS)
+	$(MAKE) -C .. errcodes printlist alert-printlist
+	mkdir -p epub
+	for i in $(PNG_FILES);do cp ../$$i epub;done
+	htlatex epub.tex "xhtml,pmathml" " -cunihtf -utf8 -cvalidate'"
+	bibtex epub
+	makeindex epub.idx
+	htlatex epub.tex "xhtml,pmathml" " -cunihtf -utf8 -cvalidate'"
+	cp epub*.html epub
+	sed -i 's/\.\.\//\.\//g' epub/epub.html
+	cd epub && zip gnutls-epub.zip *
+#	for i in $(PNG_FILES);do rm -f $$i;done
 
 clean-am:
-	rm -f $(GEN_TEX_OBJECTS) $(SOURCE_GEN_FILES) gnutls.aux gnutls.bbl gnutls.blg gnutls.idx gnutls.ilg gnutls.ind gnutls.log gnutls.out gnutls.toc
-	rm -rf functions enums
-
+	rm -f $(GEN_TEX_OBJECTS) $(SOURCE_GEN_FILES) gnutls.aux gnutls.bbl gnutls.blg gnutls.idx \
+	gnutls.ilg gnutls.ind gnutls.log gnutls.out gnutls.toc epub.4ct epub.4tc epub.aux epub.bbl \
+	epub.blg epub.css epub.dvi epub*.html epub.idv epub.idx epub.ilg epub.ind epub.lg epub.lof \
+	epub.log epub.lot epub.out epub.xref epub.toc epub.tmp
+	rm -rf functions enums epub $(PNG_FILES) $(PDF_FILES)
