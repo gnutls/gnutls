@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010 Free Software
- * Foundation, Inc.
+ * Copyright (C) 2004-2011 Free Software Foundation, Inc.
  *
  * Author: Simon Josefsson
  *
@@ -152,7 +151,8 @@ main (int argc, char *argv[])
 
   doit ();
 
-  printf ("Self test `%s' finished with %d errors\n", argv[0], error_count);
+  if (debug || error_count > 0)
+    printf ("Self test `%s' finished with %d errors\n", argv[0], error_count);
 
   return error_count ? 1 : 0;
 }
