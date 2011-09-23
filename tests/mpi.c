@@ -83,5 +83,5 @@ doit (void)
   _gnutls_mpi_release (&n3);
   _gnutls_mpi_release (&n4);
 
-  success ("mpi ops ok\n");
+  if (debug) success ("mpi ops ok\n");
 }

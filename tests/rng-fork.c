@@ -97,8 +97,8 @@ doit (void)
           fail("error in the random generator. Produces same valus after fork()");
           return;
         }
-      
-      success("success");
+      if(debug)
+        success("success\n");
     }
 }
 #else

@@ -207,5 +207,5 @@ doit (void)
   
   gnutls_global_deinit();
   
-  success("success");
+  if (debug) success("success");
 }
