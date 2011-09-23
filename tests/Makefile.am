@@ -30,7 +30,7 @@ if WANT_TEST_SUITE
 SUBDIRS += suite
 endif
 
-EXTRA_DIST = libgcrypt.supp eagain-common.h
+EXTRA_DIST = suppressions.valgrind eagain-common.h
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
@@ -57,16 +57,15 @@ endif
 noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c
 
-ctests = simple gc set_pkcs12_cred certder certuniqueid mpi		\
+ctests = mini-deflate simple gc set_pkcs12_cred certder certuniqueid mpi		\
 	certificate_set_x509_crl dn parse_ca moredn mini 	\
 	hostname-check cve-2008-4989 pkcs12_s2k chainverify crq_key_id	\
 	x509sign-verify cve-2009-1415 cve-2009-1416 crq_apis		\
 	init_roundtrip pkcs12_s2k_pem dn2 mini-eagain			\
 	nul-in-x509-names x509_altname pkcs12_encode mini-x509		\
 	mini-x509-rehandshake rng-fork mini-eagain-dtls cipher-test	\
-	x509cert x509cert-tl infoaccess #gendh mini-deflate
-#gendh is out because it is too slow in valgrind and
-#mini-deflate is out because zlib has warnings in valgrind
+	x509cert x509cert-tl infoaccess #gendh
+#gendh is out because it is too slow in valgrind
 
 if ENABLE_OPENSSL
 ctests +=  openssl

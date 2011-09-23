@@ -306,11 +306,11 @@ _gnutls_init_record_state (record_parameters_st * params, gnutls_protocol_t ver,
   if (ret < 0 && params->cipher_algorithm != GNUTLS_CIPHER_NULL)
     return gnutls_assert_val (ret);
 
-  state->compression_state =
-    _gnutls_comp_init (params->compression_algorithm, read/*1==decompress*/);
+  ret =
+    _gnutls_comp_init (&state->compression_state, params->compression_algorithm, read/*1==decompress*/);
 
-  if (state->compression_state == GNUTLS_COMP_FAILED)
-    return gnutls_assert_val (GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM);
+  if (ret < 0)
+    return gnutls_assert_val (ret);
 
   return 0;
 }
@@ -815,8 +815,8 @@ free_record_state (record_state_st * state, int d)
 
   _gnutls_auth_cipher_deinit (&state->cipher_state);
 
-  if (state->compression_state != NULL)
-    _gnutls_comp_deinit (state->compression_state, d);
+  if (state->compression_state.handle != NULL)
+    _gnutls_comp_deinit (&state->compression_state, d);
 }
 
 void

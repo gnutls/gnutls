@@ -105,7 +105,7 @@ _gnutls_encrypt (gnutls_session_t session, const opaque * headers,
       if (comp.data == NULL)
         return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
       
-      ret = _gnutls_compress( params->write.compression_state, data, data_size, comp.data, comp.size);
+      ret = _gnutls_compress( &params->write.compression_state, data, data_size, comp.data, comp.size);
       if (ret < 0)
         {
           gnutls_free(comp.data);
@@ -182,7 +182,7 @@ _gnutls_decrypt (gnutls_session_t session, opaque * ciphertext,
         
       if (ret != 0)
         {
-          ret = _gnutls_decompress(params->read.compression_state, tmp_data, data_size, data, max_data_size);
+          ret = _gnutls_decompress( &params->read.compression_state, tmp_data, data_size, data, max_data_size);
           if (ret < 0)
             goto leave;
         }

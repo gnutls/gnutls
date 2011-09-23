@@ -1,10 +1,26 @@
-# libgcrypt.supp -- Valgrind suppresion file for libgcrypt
+# suppressions -- Valgrind suppresion file for libgcrypt
 
-# Copyright (C) 2008, 2009, 2010  Free Software Foundation, Inc.
+# Copyright (C) 2008-2011  Free Software Foundation, Inc.
 
 # Copying and distribution of this file, with or without modification,
 # are permitted in any medium without royalty provided the copyright
 # notice and this notice are preserved.
+
+{
+   zlib inflateInit
+   Memcheck:Cond
+   fun:inflateReset2
+   fun:inflateInit2_
+   fun:_gnutls_comp_init
+   fun:_gnutls_init_record_state
+   fun:_gnutls_epoch_set_keys
+   fun:_gnutls_write_connection_state_init
+   fun:_gnutls_send_handshake_final
+   fun:_gnutls_handshake_common
+   fun:gnutls_handshake
+   fun:doit
+   fun:main
+}
 
 {
    libgcrypt1

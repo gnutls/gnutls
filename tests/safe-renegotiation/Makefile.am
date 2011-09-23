@@ -32,4 +32,4 @@ check_PROGRAMS = $(ctests)
 TESTS = $(ctests)
 TESTS_ENVIRONMENT = $(VALGRIND)
 
-EXTRA_DIST = README
+EXTRA_DIST = README suppressions.valgrind

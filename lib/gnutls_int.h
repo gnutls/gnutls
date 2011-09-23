@@ -495,7 +495,7 @@ struct record_state_st
   gnutls_datum_t IV;
   gnutls_datum_t key;
   auth_cipher_hd_st cipher_state;
-  comp_hd_t compression_state;
+  comp_hd_st compression_state;
   uint64 sequence_number;
 };
 

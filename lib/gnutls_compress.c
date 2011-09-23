@@ -241,20 +241,10 @@ _gnutls_supported_compression_methods (gnutls_session_t session,
 /* The flag d is the direction (compress, decompress). Non zero is
  * decompress.
  */
-comp_hd_t
-_gnutls_comp_init (gnutls_compression_method_t method, int d)
+int _gnutls_comp_init (comp_hd_st* handle, gnutls_compression_method_t method, int d)
 {
-  comp_hd_t ret;
-
-  ret = gnutls_malloc (sizeof (struct comp_hd_t_STRUCT));
-  if (ret == NULL)
-    {
-      gnutls_assert ();
-      return NULL;
-    }
-
-  ret->algo = method;
-  ret->handle = NULL;
+  handle->algo = method;
+  handle->handle = NULL;
 
   switch (method)
     {
@@ -270,14 +260,11 @@ _gnutls_comp_init (gnutls_compression_method_t method, int d)
         mem_level = get_mem_level (method);
         comp_level = get_comp_level (method);
 
-        ret->handle = gnutls_malloc (sizeof (z_stream));
-        if (ret->handle == NULL)
-          {
-            gnutls_assert ();
-            goto cleanup_ret;
-          }
+        handle->handle = gnutls_malloc (sizeof (z_stream));
+        if (handle->handle == NULL)
+          return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-        zhandle = ret->handle;
+        zhandle = handle->handle;
 
         zhandle->zalloc = (alloc_func) 0;
         zhandle->zfree = (free_func) 0;
@@ -294,8 +281,8 @@ _gnutls_comp_init (gnutls_compression_method_t method, int d)
         if (err != Z_OK)
           {
             gnutls_assert ();
-            gnutls_free (ret->handle);
-            goto cleanup_ret;
+            gnutls_free (handle->handle);
+            return GNUTLS_E_COMPRESSION_FAILED;
           }
       }
       break;
@@ -303,20 +290,18 @@ _gnutls_comp_init (gnutls_compression_method_t method, int d)
     case GNUTLS_COMP_NULL:
     case GNUTLS_COMP_UNKNOWN:
       break;
+    default:
+      return GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM;
     }
 
-  return ret;
-
-cleanup_ret:
-  gnutls_free (ret);
-  return NULL;
+  return 0;
 }
 
 /* The flag d is the direction (compress, decompress). Non zero is
  * decompress.
  */
 void
-_gnutls_comp_deinit (comp_hd_t handle, int d)
+_gnutls_comp_deinit (comp_hd_st* handle, int d)
 {
   if (handle != NULL)
     {
@@ -336,8 +321,7 @@ _gnutls_comp_deinit (comp_hd_t handle, int d)
           break;
         }
       gnutls_free (handle->handle);
-      gnutls_free (handle);
-
+      handle->handle = NULL;
     }
 }
 
@@ -345,7 +329,7 @@ _gnutls_comp_deinit (comp_hd_t handle, int d)
  */
 
 int
-_gnutls_compress (comp_hd_t handle, const opaque * plain,
+_gnutls_compress (comp_hd_st *handle, const opaque * plain,
                   size_t plain_size, opaque * compressed,
                   size_t max_comp_size)
 {
@@ -399,7 +383,7 @@ _gnutls_compress (comp_hd_t handle, const opaque * plain,
 
 
 int
-_gnutls_decompress (comp_hd_t handle, opaque * compressed,
+_gnutls_decompress (comp_hd_st *handle, opaque * compressed,
                     size_t compressed_size, opaque * plain,
                     size_t max_plain_size)
 {

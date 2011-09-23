@@ -4,6 +4,8 @@ See the end for copying conditions.
 
 * Version 3.0.4 (unreleased)
 
+** libgnutls: Fixed the deflate compression code.
+
 ** libgnutls: Added gnutls_x509_crt_get_authority_info_access.
 Used to get the PKIX Authority Information Access (AIA) field.
 
