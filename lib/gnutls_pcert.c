@@ -218,6 +218,8 @@ cleanup:
   return ret;
 }
 
+#ifdef ENABLE_OPENPGP
+
 /**
  * gnutls_pcert_import_openpgp:
  * @pcert: The pcert structure
@@ -354,6 +356,8 @@ cleanup:
 
   return ret;
 }
+
+#endif
 
 /**
  * gnutls_pcert_deinit:
