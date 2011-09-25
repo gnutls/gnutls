@@ -136,7 +136,7 @@ wait
 
 fi
 
-launch_bare_server $$ s_server -quiet -accept $PORT -keyform pem -certform pem -dtls1 -mtu 1000 -timeout -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -dkey $DSA_KEY -dcert $DSA_CERT -Verify 1 -CAfile $CA_CERT &
+launch_bare_server $$ s_server -quiet -accept $PORT -keyform pem -certform pem -dtls1 -timeout -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -dkey $DSA_KEY -dcert $DSA_CERT -Verify 1 -CAfile $CA_CERT &
 PID=$!
 wait_server $PID
 
@@ -150,7 +150,7 @@ $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL
 kill $PID
 wait
 
-launch_bare_server $$ s_server -quiet -accept $PORT -keyform pem -certform pem -dtls1 -mtu 1000 -timeout -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -dkey $DSA_KEY -dcert $DSA_CERT -Verify 1 -CAfile $CA_CERT &
+launch_bare_server $$ s_server -quiet -accept $PORT -keyform pem -certform pem -dtls1 -timeout -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -dkey $DSA_KEY -dcert $DSA_CERT -Verify 1 -CAfile $CA_CERT &
 PID=$!
 wait_server $PID
 
@@ -162,7 +162,7 @@ $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL
 kill $PID
 wait
 
-launch_bare_server $$ s_server -quiet -accept $PORT -keyform pem -certform pem -dtls1 -mtu 1000 -timeout -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -dkey $DSA_KEY -dcert $DSA_CERT -Verify 1 -CAfile $CA_CERT &
+launch_bare_server $$ s_server -quiet -accept $PORT -keyform pem -certform pem -dtls1 -timeout -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -dkey $DSA_KEY -dcert $DSA_CERT -Verify 1 -CAfile $CA_CERT &
 PID=$!
 wait_server $PID
 
