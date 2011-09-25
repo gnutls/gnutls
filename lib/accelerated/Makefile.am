@@ -32,18 +32,12 @@ endif
 
 noinst_LTLIBRARIES = libaccelerated.la
 
-EXTRA_DIST = x86.h accelerated.h cryptodev.h
+EXTRA_DIST = accelerated.h cryptodev.h
 libaccelerated_la_SOURCES = accelerated.c cryptodev.c
 libaccelerated_la_LIBADD =
 
-if ASM_X86_64
+if ASM_X86
 SUBDIRS += intel
-AM_CFLAGS += -DASM_X86_64
-libaccelerated_la_LIBADD += intel/libintel.la
-endif
-
-if ASM_X86_32
-SUBDIRS += intel
-AM_CFLAGS += -DASM_X86_32
+AM_CFLAGS += -DASM_X86
 libaccelerated_la_LIBADD += intel/libintel.la
 endif
