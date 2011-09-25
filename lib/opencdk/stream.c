@@ -1477,7 +1477,7 @@ cdk_stream_mmap_part (cdk_stream_t s, off_t off, size_t len,
     len = cdk_stream_get_length (s);
   if (!len)
     {
-      _gnutls_read_log ("cdk_stream_mmap_part: invalid file size %lu\n", len);
+      _gnutls_read_log ("cdk_stream_mmap_part: invalid file size %lu\n", (unsigned long)len);
       gnutls_assert ();
       return s->error;
     }

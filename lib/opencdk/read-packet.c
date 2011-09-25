@@ -556,7 +556,7 @@ read_user_id (cdk_stream_t inp, size_t pktlen, cdk_pkt_userid_t user_id)
     return CDK_Inv_Packet;
 
   if (DEBUG_PKT)
-    _gnutls_write_log ("read_user_id: %lu octets\n", pktlen);
+    _gnutls_write_log ("read_user_id: %lu octets\n", (unsigned long)pktlen);
 
   user_id->len = pktlen;
   rc = stream_read (inp, user_id->name, pktlen, &nread);
