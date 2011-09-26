@@ -1,3 +1,4 @@
+#include <config.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/pkcs11.h>
 #include <stdio.h>
