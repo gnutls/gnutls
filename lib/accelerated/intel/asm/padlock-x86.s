@@ -35,7 +35,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.file	"e_padlock-x86.s"
+.file	"padlock-x86.s"
 .text
 .globl	padlock_capability
 .type	padlock_capability,@function
@@ -160,6 +160,117 @@ padlock_aes_block:
 	popl	%edi
 	ret
 .size	padlock_aes_block,.-.L_padlock_aes_block_begin
+.globl	padlock_ecb_encrypt
+.type	padlock_ecb_encrypt,@function
+.align	16
+padlock_ecb_encrypt:
+.L_padlock_ecb_encrypt_begin:
+	pushl	%ebp
+	pushl	%ebx
+	pushl	%esi
+	pushl	%edi
+	movl	20(%esp),%edi
+	movl	24(%esp),%esi
+	movl	28(%esp),%edx
+	movl	32(%esp),%ecx
+	testl	$15,%edx
+	jnz	.L004ecb_abort
+	testl	$15,%ecx
+	jnz	.L004ecb_abort
+	leal	.Lpadlock_saved_context-.L005ecb_pic_point,%eax
+	pushfl
+	cld
+	call	_padlock_verify_ctx
+.L005ecb_pic_point:
+	leal	16(%edx),%edx
+	xorl	%eax,%eax
+	xorl	%ebx,%ebx
+	testl	$32,(%edx)
+	jnz	.L006ecb_aligned
+	testl	$15,%edi
+	setz	%al
+	testl	$15,%esi
+	setz	%bl
+	testl	%ebx,%eax
+	jnz	.L006ecb_aligned
+	negl	%eax
+	movl	$512,%ebx
+	notl	%eax
+	leal	-24(%esp),%ebp
+	cmpl	%ebx,%ecx
+	cmovcl	%ecx,%ebx
+	andl	%ebx,%eax
+	movl	%ecx,%ebx
+	negl	%eax
+	andl	$511,%ebx
+	leal	(%eax,%ebp,1),%esp
+	andl	$-16,%esp
+	jmp	.L007ecb_loop
+.align	16
+.L007ecb_loop:
+	movl	%edi,(%ebp)
+	movl	%esi,4(%ebp)
+	movl	%ecx,8(%ebp)
+	movl	%ebx,%ecx
+	movl	%ebx,12(%ebp)
+	testl	$15,%edi
+	cmovnzl	%esp,%edi
+	testl	$15,%esi
+	jz	.L008ecb_inp_aligned
+	shrl	$2,%ecx
+.byte	243,165
+	subl	%ebx,%edi
+	movl	%ebx,%ecx
+	movl	%edi,%esi
+.L008ecb_inp_aligned:
+	leal	-16(%edx),%eax
+	leal	16(%edx),%ebx
+	shrl	$4,%ecx
+.byte	243,15,167,200
+	movl	(%ebp),%edi
+	movl	12(%ebp),%ebx
+	testl	$15,%edi
+	jz	.L009ecb_out_aligned
+	movl	%ebx,%ecx
+	shrl	$2,%ecx
+	leal	(%esp),%esi
+.byte	243,165
+	subl	%ebx,%edi
+.L009ecb_out_aligned:
+	movl	4(%ebp),%esi
+	movl	8(%ebp),%ecx
+	addl	%ebx,%edi
+	addl	%ebx,%esi
+	subl	%ebx,%ecx
+	movl	$512,%ebx
+	jnz	.L007ecb_loop
+	testl	$15,%edi
+	jz	.L010ecb_done
+	movl	%ebp,%ecx
+	movl	%esp,%edi
+	subl	%esp,%ecx
+	xorl	%eax,%eax
+	shrl	$2,%ecx
+.byte	243,171
+.L010ecb_done:
+	leal	24(%ebp),%esp
+	jmp	.L011ecb_exit
+.align	16
+.L006ecb_aligned:
+	leal	-16(%edx),%eax
+	leal	16(%edx),%ebx
+	shrl	$4,%ecx
+.byte	243,15,167,200
+.L011ecb_exit:
+	movl	$1,%eax
+	leal	4(%esp),%esp
+.L004ecb_abort:
+	popl	%edi
+	popl	%esi
+	popl	%ebx
+	popl	%ebp
+	ret
+.size	padlock_ecb_encrypt,.-.L_padlock_ecb_encrypt_begin
 .globl	padlock_cbc_encrypt
 .type	padlock_cbc_encrypt,@function
 .align	16
@@ -294,10 +405,10 @@ _win32_segv_handler:
 	movl	4(%esp),%edx
 	movl	12(%esp),%ecx
 	cmpl	$3221225477,(%edx)
-	jne	.L042ret
+	jne	.L020ret
 	addl	$4,184(%ecx)
 	movl	$0,%eax
-.L042ret:
+.L020ret:
 	ret
 .size	_win32_segv_handler,.-_win32_segv_handler
 .globl	padlock_sha1_oneshot
@@ -377,4 +488,3 @@ padlock_sha256:
 #if defined(__linux__) && defined(__ELF__)
 .section .note.GNU-stack,"",%progbits
 #endif
-
