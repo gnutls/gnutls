@@ -158,6 +158,7 @@ void gaa_help(void)
 	__gaa_helpsingle('p', "port", "PORT ", "The port to connect to.");
 	__gaa_helpsingle(0, "insecure", "", "Don't abort program if server certificate can't be validated.");
 	__gaa_helpsingle(0, "benchmark-ciphers", "", "Benchmark individual ciphers.");
+	__gaa_helpsingle(0, "benchmark-soft-ciphers", "", "Benchmark individual software ciphers.");
 	__gaa_helpsingle(0, "benchmark-tls", "", "Benchmark ciphers and key exchange methods in TLS.");
 	__gaa_helpsingle('l', "list", "", "Print a list of the supported algorithms and modes.");
 	__gaa_helpsingle('h', "help", "", "prints this help");
@@ -176,7 +177,7 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 110 "cli.gaa"
+#line 111 "cli.gaa"
 	char *rest_args;
 #line 99 "cli.gaa"
 	int insecure;
@@ -290,41 +291,42 @@ static int gaa_error = 0;
 #define GAA_MULTIPLE_OPTION     3
 
 #define GAA_REST                0
-#define GAA_NB_OPTION           34
+#define GAA_NB_OPTION           35
 #define GAAOPTID_version	1
 #define GAAOPTID_help	2
 #define GAAOPTID_list	3
 #define GAAOPTID_benchmark_tls	4
-#define GAAOPTID_benchmark_ciphers	5
-#define GAAOPTID_insecure	6
-#define GAAOPTID_port	7
-#define GAAOPTID_pskkey	8
-#define GAAOPTID_pskusername	9
-#define GAAOPTID_srppasswd	10
-#define GAAOPTID_srpusername	11
-#define GAAOPTID_x509certfile	12
-#define GAAOPTID_x509keyfile	13
-#define GAAOPTID_pgpsubkey	14
-#define GAAOPTID_pgpcertfile	15
-#define GAAOPTID_pgpkeyring	16
-#define GAAOPTID_pgpkeyfile	17
-#define GAAOPTID_x509crlfile	18
-#define GAAOPTID_x509cafile	19
-#define GAAOPTID_priority	20
-#define GAAOPTID_verbose	21
-#define GAAOPTID_recordsize	22
-#define GAAOPTID_print_cert	23
-#define GAAOPTID_disable_extensions	24
-#define GAAOPTID_fingerprint	25
-#define GAAOPTID_x509fmtder	26
-#define GAAOPTID_crlf	27
-#define GAAOPTID_mtu	28
-#define GAAOPTID_udp	29
-#define GAAOPTID_starttls	30
-#define GAAOPTID_noticket	31
-#define GAAOPTID_rehandshake	32
-#define GAAOPTID_resume	33
-#define GAAOPTID_debug	34
+#define GAAOPTID_benchmark_soft_ciphers	5
+#define GAAOPTID_benchmark_ciphers	6
+#define GAAOPTID_insecure	7
+#define GAAOPTID_port	8
+#define GAAOPTID_pskkey	9
+#define GAAOPTID_pskusername	10
+#define GAAOPTID_srppasswd	11
+#define GAAOPTID_srpusername	12
+#define GAAOPTID_x509certfile	13
+#define GAAOPTID_x509keyfile	14
+#define GAAOPTID_pgpsubkey	15
+#define GAAOPTID_pgpcertfile	16
+#define GAAOPTID_pgpkeyring	17
+#define GAAOPTID_pgpkeyfile	18
+#define GAAOPTID_x509crlfile	19
+#define GAAOPTID_x509cafile	20
+#define GAAOPTID_priority	21
+#define GAAOPTID_verbose	22
+#define GAAOPTID_recordsize	23
+#define GAAOPTID_print_cert	24
+#define GAAOPTID_disable_extensions	25
+#define GAAOPTID_fingerprint	26
+#define GAAOPTID_x509fmtder	27
+#define GAAOPTID_crlf	28
+#define GAAOPTID_mtu	29
+#define GAAOPTID_udp	30
+#define GAAOPTID_starttls	31
+#define GAAOPTID_noticket	32
+#define GAAOPTID_rehandshake	33
+#define GAAOPTID_resume	34
+#define GAAOPTID_debug	35
 
 #line 168 "gaa.skel"
 
@@ -672,6 +674,7 @@ static int gaa_get_option_num(char *str, int status)
 			GAA_CHECK1STR("h", GAAOPTID_help);
 			GAA_CHECK1STR("l", GAAOPTID_list);
 			GAA_CHECK1STR("", GAAOPTID_benchmark_tls);
+			GAA_CHECK1STR("", GAAOPTID_benchmark_soft_ciphers);
 			GAA_CHECK1STR("", GAAOPTID_benchmark_ciphers);
 			GAA_CHECK1STR("", GAAOPTID_insecure);
 			GAA_CHECK1STR("V", GAAOPTID_verbose);
@@ -693,6 +696,7 @@ static int gaa_get_option_num(char *str, int status)
 			GAA_CHECKSTR("help", GAAOPTID_help);
 			GAA_CHECKSTR("list", GAAOPTID_list);
 			GAA_CHECKSTR("benchmark-tls", GAAOPTID_benchmark_tls);
+			GAA_CHECKSTR("benchmark-soft-ciphers", GAAOPTID_benchmark_soft_ciphers);
 			GAA_CHECKSTR("benchmark-ciphers", GAAOPTID_benchmark_ciphers);
 			GAA_CHECKSTR("insecure", GAAOPTID_insecure);
 			GAA_CHECKSTR("port", GAAOPTID_port);
@@ -774,36 +778,43 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
     {
 	case GAAOPTID_version:
 	OK = 0;
-#line 108 "cli.gaa"
+#line 109 "cli.gaa"
 { cli_version(); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_help:
 	OK = 0;
-#line 106 "cli.gaa"
+#line 107 "cli.gaa"
 { gaa_help(); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_list:
 	OK = 0;
-#line 105 "cli.gaa"
+#line 106 "cli.gaa"
 { print_list(gaaval->verbose); exit(0); ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_benchmark_tls:
 	OK = 0;
-#line 103 "cli.gaa"
+#line 104 "cli.gaa"
 { benchmark_tls(gaaval->debug); exit(0) ;};
+
+		return GAA_OK;
+		break;
+	case GAAOPTID_benchmark_soft_ciphers:
+	OK = 0;
+#line 103 "cli.gaa"
+{ benchmark_cipher(0, gaaval->debug); exit(0) ;};
 
 		return GAA_OK;
 		break;
 	case GAAOPTID_benchmark_ciphers:
 	OK = 0;
 #line 102 "cli.gaa"
-{ benchmark_cipher(gaaval->debug); exit(0) ;};
+{ benchmark_cipher(1, gaaval->debug); exit(0) ;};
 
 		return GAA_OK;
 		break;
@@ -1065,7 +1076,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_TESTMOREARGS;
 		GAA_FILL(GAAREST_tmp.arg1, gaa_getstr, GAAREST_tmp.size1);
 		gaa_index++;
-#line 111 "cli.gaa"
+#line 112 "cli.gaa"
 { gaaval->rest_args = GAAREST_tmp.arg1; ;};
 
 		return GAA_OK;
@@ -1094,7 +1105,7 @@ int gaa(int argc, char **argv, gaainfo *gaaval)
     if(inited == 0)
     {
 
-#line 113 "cli.gaa"
+#line 114 "cli.gaa"
 { gaaval->resume=0; gaaval->noticket=0; gaaval->port="443"; gaaval->rest_args=NULL; 
 	gaaval->record_size=0; 
 	gaaval->fingerprint=0; gaaval->pgp_keyring=NULL; gaaval->x509_crlfile = NULL;

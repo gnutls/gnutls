@@ -202,13 +202,15 @@ mac_bench (int algo, int size)
   free (_key);
 }
 
-void benchmark_cipher (int debug_level)
+void benchmark_cipher (int init, int debug_level)
 {
   gnutls_global_set_log_function (tls_log_func);
   gnutls_global_set_log_level (debug_level);
-  gnutls_global_init ();
-
-  gnutls_rnd( GNUTLS_RND_NONCE, data, sizeof(data));
+  if (init)
+    {
+      gnutls_global_init ();
+      gnutls_rnd( GNUTLS_RND_NONCE, data, sizeof(data));
+    }
 
   cipher_bench ( GNUTLS_CIPHER_AES_128_GCM, 16, 1);
   cipher_mac_bench ( GNUTLS_CIPHER_AES_128_CBC, GNUTLS_MAC_SHA256, 16);

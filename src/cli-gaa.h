@@ -8,7 +8,7 @@ typedef struct _gaainfo gaainfo;
 
 struct _gaainfo
 {
-#line 110 "cli.gaa"
+#line 111 "cli.gaa"
 	char *rest_args;
 #line 99 "cli.gaa"
 	int insecure;

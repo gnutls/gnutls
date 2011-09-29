@@ -99,7 +99,8 @@ option (p, port) STR "PORT" { $port = $1 } "The port to connect to."
 #int insecure;
 option (insecure) { $insecure = 1 } "Don't abort program if server certificate can't be validated."
 
-option ( benchmark-ciphers) { benchmark_cipher($debug); exit(0) } "Benchmark individual ciphers."
+option ( benchmark-ciphers) { benchmark_cipher(1, $debug); exit(0) } "Benchmark individual ciphers."
+option ( benchmark-soft-ciphers) { benchmark_cipher(0, $debug); exit(0) } "Benchmark individual software ciphers."
 option ( benchmark-tls) { benchmark_tls($debug); exit(0) } "Benchmark ciphers and key exchange methods in TLS."
 
 option (l, list) { print_list($verbose); exit(0); } "Print a list of the supported algorithms and modes."
