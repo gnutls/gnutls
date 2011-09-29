@@ -88,7 +88,7 @@ int padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize)
         /* expand key using nettle */
         if (ctx->enc)
             aes_set_encrypt_key(&nc, keysize, userkey);
-        else
+        else 
             aes_set_decrypt_key(&nc, keysize, userkey);
 
         memcpy(pce->ks.rd_key, nc.keys, sizeof(nc.keys));
@@ -118,7 +118,7 @@ static int aes_setiv(void *_ctx, const void *iv, size_t iv_size)
 }
 
 static int
-padlock_aes_encrypt(void *_ctx, const void *src, size_t src_size,
+padlock_aes_cbc_encrypt(void *_ctx, const void *src, size_t src_size,
                     void *dst, size_t dst_size)
 {
     struct padlock_ctx *ctx = _ctx;
@@ -128,20 +128,24 @@ padlock_aes_encrypt(void *_ctx, const void *src, size_t src_size,
 
     padlock_cbc_encrypt(dst, src, pce, src_size);
 
+    memcpy(pce->iv, ((unsigned char*)dst)+(src_size-16), 16);
     return 0;
 }
 
 
 static int
-padlock_aes_decrypt(void *_ctx, const void *src, size_t src_size,
+padlock_aes_cbc_decrypt(void *_ctx, const void *src, size_t src_size,
                     void *dst, size_t dst_size)
 {
     struct padlock_ctx *ctx = _ctx;
     struct padlock_cipher_data *pcd;
+    unsigned char siv[16];
 
     pcd = ALIGN16(&ctx->expanded_key);
 
+    memcpy(siv, ((unsigned char*)src)+(src_size-16), 16);
     padlock_cbc_encrypt(dst, src, pcd, src_size);
+    memcpy(pcd->iv, siv, 16);
 
     return 0;
 }
@@ -155,8 +159,8 @@ static const gnutls_crypto_cipher_st aes_padlock_struct = {
     .init = aes_cipher_init,
     .setkey = padlock_aes_cipher_setkey,
     .setiv = aes_setiv,
-    .encrypt = padlock_aes_encrypt,
-    .decrypt = padlock_aes_decrypt,
+    .encrypt = padlock_aes_cbc_encrypt,
+    .decrypt = padlock_aes_cbc_decrypt,
     .deinit = aes_deinit,
 };
 
