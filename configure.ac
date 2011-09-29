@@ -136,6 +136,7 @@ if test "$with_p11_kit" != "no"; then
 			GNUTLS_REQUIRES_PRIVATE="${GNUTLS_REQUIRES_PRIVATE}, p11-kit-1"
 		fi
 	else
+	        with_p11_kit=no
 	        AC_MSG_WARN([[
 *** 
 *** p11-kit was not found. PKCS #11 support will be disabled.

@@ -28,6 +28,8 @@
 #include <gnutls/pkcs11.h>
 #include <p11common.h>
 
+#ifdef ENABLE_PKCS11
+
 #define MIN(x,y) ((x)<(y))?(x):(y)
 
 #define MAX_CACHE_TRIES 5
@@ -130,3 +132,4 @@ pkcs11_common (void)
 
 }
 
+#endif
