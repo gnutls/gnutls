@@ -117,6 +117,7 @@ void start_benchmark(struct benchmark_st * st)
 double stop_benchmark(struct benchmark_st * st, const char* metric)
 {
   double secs;
+  unsigned long lsecs;
   struct timespec stop;
   double dspeed, ddata;
   char imetric[16];
@@ -132,8 +133,9 @@ double stop_benchmark(struct benchmark_st * st, const char* metric)
 
   gettime (&stop);
 
-  secs = (stop.tv_sec * 1000 + stop.tv_nsec / (1000 * 1000) -
+  lsecs = (stop.tv_sec * 1000 + stop.tv_nsec / (1000 * 1000) -
           (st->start.tv_sec * 1000 + st->start.tv_nsec / (1000 * 1000)));
+  secs = lsecs;
   secs /= 1000;
 
   if (metric == NULL)
