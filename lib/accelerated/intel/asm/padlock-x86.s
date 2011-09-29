@@ -338,8 +338,8 @@ padlock_cbc_encrypt:
 	leal	16(%edx),%ebx
 	shrl	$4,%ecx
 .byte	243,15,167,208
-	movdqa	(%eax),%xmm0
-	movdqa	%xmm0,-16(%edx)
+	movaps	(%eax),%xmm0
+	movaps	%xmm0,-16(%edx)
 	movl	(%ebp),%edi
 	movl	12(%ebp),%ebx
 	testl	$15,%edi
@@ -374,8 +374,8 @@ padlock_cbc_encrypt:
 	leal	16(%edx),%ebx
 	shrl	$4,%ecx
 .byte	243,15,167,208
-	movdqa	(%eax),%xmm0
-	movdqa	%xmm0,-16(%edx)
+	movaps	(%eax),%xmm0
+	movaps	%xmm0,-16(%edx)
 .L019cbc_exit:
 	movl	$1,%eax
 	leal	4(%esp),%esp

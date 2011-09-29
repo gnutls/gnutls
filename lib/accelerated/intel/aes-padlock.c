@@ -114,6 +114,7 @@ static int aes_setiv(void *_ctx, const void *iv, size_t iv_size)
     pce = ALIGN16(&ctx->expanded_key);
 
     memcpy(pce->iv, iv, 16);
+
     return 0;
 }
 
@@ -128,7 +129,6 @@ padlock_aes_cbc_encrypt(void *_ctx, const void *src, size_t src_size,
 
     padlock_cbc_encrypt(dst, src, pce, src_size);
 
-    memcpy(pce->iv, ((unsigned char*)dst)+(src_size-16), 16);
     return 0;
 }
 
@@ -139,13 +139,10 @@ padlock_aes_cbc_decrypt(void *_ctx, const void *src, size_t src_size,
 {
     struct padlock_ctx *ctx = _ctx;
     struct padlock_cipher_data *pcd;
-    unsigned char siv[16];
 
     pcd = ALIGN16(&ctx->expanded_key);
 
-    memcpy(siv, ((unsigned char*)src)+(src_size-16), 16);
     padlock_cbc_encrypt(dst, src, pcd, src_size);
-    memcpy(pcd->iv, siv, 16);
 
     return 0;
 }
