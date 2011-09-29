@@ -167,20 +167,18 @@ static int check_padlock(void)
     return ((edx & (0x3 << 6)) == (0x3 << 6));
 }
 
-#ifdef ENABLE_VIA
 static unsigned check_via(void)
 {
     unsigned int a, b, c, d;
     _gnutls_cpuid(0, &a, &b, &c, &d);
 
-    if ((memcmp(&b, "VIA ", 4) == 0 &&
-         memcmp(&d, "VIA ", 4) == 0 && memcmp(&c, "VIA ", 4) == 0)) {
+    if ((memcmp(&b, "Cent", 4) == 0 &&
+         memcmp(&d, "aurH", 4) == 0 && memcmp(&c, "auls", 4) == 0)) {
         return 1;
     }
 
     return 0;
 }
-#endif
 
 void register_padlock_crypto(void)
 {
@@ -189,12 +187,8 @@ void register_padlock_crypto(void)
     /* Only enable the 32-bit padlock variant, until
      * the 64-bit code is tested.
      */
-#ifndef ENABLE_VIA
-    return;
-#else
     if (check_via() == 0)
         return;
-#endif
 
     if (check_padlock()) {
         _gnutls_debug_log("Padlock AES accelerator was detected\n");
