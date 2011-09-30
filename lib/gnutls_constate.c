@@ -71,13 +71,17 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
                    2 * MAX_CIPHER_BLOCK_SIZE];
   record_state_st *client_write, *server_write;
 
-  client_write =
-    session->security_parameters.entity ==
-    GNUTLS_CLIENT ? &params->write : &params->read;
-  server_write =
-    session->security_parameters.entity ==
-    GNUTLS_SERVER ? &params->write : &params->read;
-
+  if (session->security_parameters.entity == GNUTLS_CLIENT)
+    {
+      client_write = &params->write;
+      server_write = &params->read;
+    }
+  else
+    {
+      client_write = &params->read;
+      server_write = &params->write;
+    }
+      
   block_size = 2 * hash_size + 2 * key_size;
   if (export_flag == 0)
     block_size += 2 * IV_size;
