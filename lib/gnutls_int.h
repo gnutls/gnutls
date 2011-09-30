@@ -233,8 +233,8 @@ typedef enum extensions_t
 typedef enum
 { CIPHER_STREAM, CIPHER_BLOCK } cipher_type_t;
 
-#define RESUME_TRUE 0
-#define RESUME_FALSE -1
+#define RESUME_TRUE 1
+#define RESUME_FALSE 0
 
 /* Record Protocol */
 typedef enum content_type_t
@@ -641,7 +641,7 @@ typedef struct
                                                  * the last received message */
   gnutls_buffer_st handshake_hash_buffer;       /* used to keep the last received handshake 
                                                  * message */
-  int resumable:1;              /* TRUE or FALSE - if we can resume that session */
+  unsigned int resumable:1;              /* TRUE or FALSE - if we can resume that session */
   handshake_state_t handshake_state;    /* holds
                                          * a number which indicates where
                                          * the handshake procedure has been
@@ -667,7 +667,7 @@ typedef struct
   struct gnutls_priority_st priorities;
 
   /* resumed session */
-  int resumed:1;                /* RESUME_TRUE or FALSE - if we are resuming a session */
+  unsigned int resumed:1;                /* RESUME_TRUE or FALSE - if we are resuming a session */
   security_parameters_st resumed_security_parameters;
 
   /* These buffers are used in the handshake

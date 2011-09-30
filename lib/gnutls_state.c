@@ -1105,7 +1105,7 @@ gnutls_session_is_resumed (gnutls_session_t session)
     }
   else
     {
-      if (session->internals.resumed == RESUME_TRUE)
+      if (session->internals.resumed != RESUME_FALSE)
         return 1;
     }
 

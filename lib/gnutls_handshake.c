@@ -552,7 +552,7 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
     }
 
   /* resumed by session_ticket extension */
-  if (session->internals.resumed == RESUME_TRUE)
+  if (session->internals.resumed != RESUME_FALSE)
     {
       /* to indicate the client that the current session is resumed */
       memcpy (session->internals.resumed_security_parameters.session_id,
@@ -643,7 +643,7 @@ _gnutls_send_finished (gnutls_session_t session, int again)
 
       if ((session->internals.resumed == RESUME_FALSE
            && session->security_parameters.entity == GNUTLS_CLIENT)
-          || (session->internals.resumed == RESUME_TRUE
+          || (session->internals.resumed != RESUME_FALSE
               && session->security_parameters.entity == GNUTLS_SERVER))
         {
           /* if we are a client not resuming - or we are a server resuming */
@@ -740,7 +740,7 @@ _gnutls_recv_finished (gnutls_session_t session)
       goto cleanup;
     }
 
-  if ((session->internals.resumed == RESUME_TRUE
+  if ((session->internals.resumed != RESUME_FALSE
        && session->security_parameters.entity == GNUTLS_CLIENT)
       || (session->internals.resumed == RESUME_FALSE
           && session->security_parameters.entity == GNUTLS_SERVER))
@@ -2778,7 +2778,7 @@ _gnutls_handshake_common (gnutls_session_t session)
   int ret = 0;
 
   /* send and recv the change cipher spec and finished messages */
-  if ((session->internals.resumed == RESUME_TRUE
+  if ((session->internals.resumed != RESUME_FALSE
        && session->security_parameters.entity == GNUTLS_CLIENT)
       || (session->internals.resumed == RESUME_FALSE
           && session->security_parameters.entity == GNUTLS_SERVER))
