@@ -28,7 +28,7 @@
 #include <crypto-backend.h>
 
 extern int crypto_bigint_prio;
-extern gnutls_crypto_bigint_st _gnutls_mpi_ops;
+extern const gnutls_crypto_bigint_st _gnutls_mpi_ops;
 
 bigint_t _gnutls_mpi_randomize (bigint_t, unsigned int bits,
                                 gnutls_rnd_level_t level);

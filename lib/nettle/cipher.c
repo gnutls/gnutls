@@ -342,7 +342,7 @@ wrap_nettle_cipher_close (void *h)
   gnutls_free (h);
 }
 
-gnutls_crypto_cipher_st _gnutls_cipher_ops = {
+const gnutls_crypto_cipher_st _gnutls_cipher_ops = {
   .init = wrap_nettle_cipher_init,
   .setiv = wrap_nettle_cipher_setiv,
   .setkey = wrap_nettle_cipher_setkey,

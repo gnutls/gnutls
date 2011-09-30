@@ -881,7 +881,7 @@ wrap_nettle_pk_fixup (gnutls_pk_algorithm_t algo,
 
 int crypto_pk_prio = INT_MAX;
 
-gnutls_crypto_pk_st _gnutls_pk_ops = {
+const gnutls_crypto_pk_st _gnutls_pk_ops = {
   .encrypt = _wrap_nettle_pk_encrypt,
   .decrypt = _wrap_nettle_pk_decrypt,
   .sign = _wrap_nettle_pk_sign,

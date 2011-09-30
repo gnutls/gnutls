@@ -34,7 +34,7 @@ extern int crypto_mac_prio;
 extern gnutls_crypto_mac_st _gnutls_mac_ops;
 
 extern int crypto_digest_prio;
-extern gnutls_crypto_digest_st _gnutls_digest_ops;
+extern const gnutls_crypto_digest_st _gnutls_digest_ops;
 
 typedef int (*hash_func) (void *handle, const void *text, size_t size);
 typedef int (*copy_func) (void **dst_ctx, void *src_ctx);

@@ -618,7 +618,7 @@ wrap_nettle_generate_group (gnutls_group_st * group, unsigned int bits)
 
 int crypto_bigint_prio = INT_MAX;
 
-gnutls_crypto_bigint_st _gnutls_mpi_ops = {
+const gnutls_crypto_bigint_st _gnutls_mpi_ops = {
   .bigint_new = wrap_nettle_mpi_new,
   .bigint_cmp = wrap_nettle_mpi_cmp,
   .bigint_cmp_ui = wrap_nettle_mpi_cmp_ui,

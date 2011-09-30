@@ -376,7 +376,7 @@ gnutls_crypto_mac_st _gnutls_mac_ops = {
   .deinit = wrap_nettle_hmac_deinit,
 };
 
-gnutls_crypto_digest_st _gnutls_digest_ops = {
+const gnutls_crypto_digest_st _gnutls_digest_ops = {
   .init = wrap_nettle_hash_init,
   .hash = wrap_nettle_hash_update,
   .reset = wrap_nettle_hash_reset,
