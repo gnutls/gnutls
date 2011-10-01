@@ -4,6 +4,15 @@ See the end for copying conditions.
 
 * Version 3.0.4 (unreleased)
 
+** gnutls-cli: Added --benchmark-soft-ciphers to benchmark
+the software version of the ciphers instead of hw accelerated 
+(where available)
+
+** libgnutls: Corrected VIA padlock code for C3. Benchmarks show
+a 50% increase in AES speed.
+
+** libgnutls: Compilation fixed when p11-kit is not detected.
+
 ** libgnutls: Fixed the deflate compression code.
 
 ** libgnutls: Added gnutls_x509_crt_get_authority_info_access.
