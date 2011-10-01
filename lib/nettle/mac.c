@@ -50,7 +50,7 @@ struct nettle_hash_ctx
     struct sha1_ctx sha1;
   } ctx;
   void *ctx_ptr;
-  gnutls_mac_algorithm_t algo;
+  gnutls_digest_algorithm_t algo;
   size_t length;
   update_func update;
   digest_func digest;
@@ -67,20 +67,25 @@ struct nettle_hmac_ctx
     struct hmac_sha512_ctx sha512;
     struct hmac_sha1_ctx sha1;
   } ctx;
+  
+  /* this is the context just after
+   * the set_key. Used in reset().
+   */
+  union
+  {
+    struct hmac_md5_ctx md5;
+    struct hmac_sha224_ctx sha224;
+    struct hmac_sha256_ctx sha256;
+    struct hmac_sha384_ctx sha384;
+    struct hmac_sha512_ctx sha512;
+    struct hmac_sha1_ctx sha1;
+  } init_ctx;
   void *ctx_ptr;
   gnutls_mac_algorithm_t algo;
   size_t length;
   update_func update;
   digest_func digest;
   set_key_func setkey;
-
-/* Note: Nettle doesn't have a reset function for
- * hmac so we need to manually reset a context, by
- * calling set_key(). For that reason we need to
- * store the hmac key here.
- */
-  opaque *key;
-  size_t key_size;
 };
 
 static int _hmac_ctx_init(gnutls_mac_algorithm_t algo, struct nettle_hmac_ctx *ctx)
@@ -184,17 +189,9 @@ wrap_nettle_hmac_setkey (void *_ctx, const void *key, size_t keylen)
 {
   struct nettle_hmac_ctx *ctx = _ctx;
 
-  if (ctx->key)
-    gnutls_free(ctx->key);
-
-  ctx->key = gnutls_malloc(keylen);
-  if (ctx->key == NULL)
-    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-
-  memcpy(ctx->key, key, keylen);
-  ctx->key_size = keylen;
-
   ctx->setkey (ctx->ctx_ptr, keylen, key);
+  
+  memcpy(&ctx->init_ctx, &ctx->ctx, sizeof(ctx->ctx));
 
   return GNUTLS_E_SUCCESS;
 }
@@ -204,7 +201,7 @@ wrap_nettle_hmac_reset (void *_ctx)
 {
   struct nettle_hmac_ctx *ctx = _ctx;
 
-  ctx->setkey (ctx->ctx_ptr, ctx->key_size, ctx->key);
+  memcpy(&ctx->ctx, &ctx->init_ctx, sizeof(ctx->ctx));
 }
 
 static int
@@ -220,9 +217,6 @@ wrap_nettle_hmac_update (void *_ctx, const void *text, size_t textsize)
 static void
 wrap_nettle_hmac_deinit (void *hd)
 {
-  struct nettle_hmac_ctx *ctx = hd;
-
-  gnutls_free (ctx->key);
   gnutls_free (hd);
 }
 
