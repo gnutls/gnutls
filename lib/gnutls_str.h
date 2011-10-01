@@ -41,6 +41,12 @@ typedef struct
 
 void _gnutls_buffer_init (gnutls_buffer_st *);
 void _gnutls_buffer_clear (gnutls_buffer_st *);
+inline static void _gnutls_buffer_reset (gnutls_buffer_st * buf)
+{
+  buf->data = buf->allocd;
+  buf->length = 0;
+}
+
 int _gnutls_buffer_resize (gnutls_buffer_st *, size_t new_size);
 
 int _gnutls_buffer_append_str (gnutls_buffer_st *, const char *str);

@@ -34,7 +34,7 @@ EXTRA_DIST = README license.txt
 
 noinst_LTLIBRARIES = libintel.la
 
-libintel_la_SOURCES = aes-x86.c aes-padlock.c aes-gcm-padlock.c aes-padlock.h aes-x86.h x86.h
+libintel_la_SOURCES = sha-padlock.c aes-x86.c aes-padlock.c aes-gcm-padlock.c aes-padlock.h aes-x86.h x86.h
 
 if ASM_X86_64
 AM_CPPFLAGS += -DASM_X86_64

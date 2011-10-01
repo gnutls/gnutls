@@ -2,6 +2,7 @@
 # define AES_PADLOCK_H
 
 #include <gnutls_int.h>
+#include <aes-x86.h>
 
 struct padlock_cipher_data {
     unsigned char iv[16];       /* Initialization vector */
@@ -27,6 +28,8 @@ struct padlock_ctx {
 };
 
 extern const gnutls_crypto_cipher_st aes_gcm_padlock_struct;
+extern const gnutls_crypto_mac_st hmac_sha_padlock_struct;
+extern const gnutls_crypto_digest_st sha_padlock_struct;
 
 int padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize);
 
