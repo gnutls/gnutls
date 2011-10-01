@@ -66,23 +66,6 @@ gnutls_global_init_extra (void)
   if (_gnutls_init_extra != 1)
     return 0;
 
-#ifdef HAVE_GCRYPT
-#ifdef gcry_fips_mode_active
-  /* Libgcrypt manual says that gcry_version_check must be called
-     before calling gcry_fips_mode_active. */
-  gcry_check_version (NULL);
-  if (gcry_fips_mode_active ())
-    {
-      int ret;
-
-      ret = gnutls_register_md5_handler ();
-      if (ret)
-        fprintf (stderr, "gnutls_register_md5_handler: %s\n",
-                 gnutls_strerror (ret));
-    }
-#endif
-#endif
-
   return 0;
 }
 

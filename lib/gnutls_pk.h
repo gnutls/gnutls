@@ -24,7 +24,7 @@
 #define GNUTLS_PK_H
 
 extern int crypto_pk_prio;
-extern const gnutls_crypto_pk_st _gnutls_pk_ops;
+extern gnutls_crypto_pk_st _gnutls_pk_ops;
 
 #define _gnutls_pk_encrypt( algo, ciphertext, plaintext, params) _gnutls_pk_ops.encrypt( algo, ciphertext, plaintext, params)
 #define _gnutls_pk_decrypt( algo, ciphertext, plaintext, params) _gnutls_pk_ops.decrypt( algo, ciphertext, plaintext, params)

@@ -145,25 +145,30 @@ int
 _gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,
                    const void *text, size_t textlen, void *digest)
 {
-  digest_hd_st dig;
   int ret;
+  const gnutls_crypto_digest_st *cc = NULL;
 
-  ret = _gnutls_hash_init (&dig, algorithm);
+  /* check if a digest has been registered 
+   */
+  cc = _gnutls_get_crypto_digest (algorithm);
+  if (cc != NULL)
+    {
+      if (cc->fast (algorithm, text, textlen, digest) < 0)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_HASH_FAILED;
+        }
+
+      return 0;
+    }
+
+  ret = _gnutls_digest_ops.fast (algorithm, text, textlen, digest);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = _gnutls_hash (&dig, text, textlen);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      _gnutls_hash_deinit (&dig, NULL);
-      return ret;
-    }
-
-  _gnutls_hash_deinit (&dig, digest);
   return 0;
 }
 
@@ -174,26 +179,32 @@ int
 _gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
                    int keylen, const void *text, size_t textlen, void *digest)
 {
-  digest_hd_st dig;
   int ret;
+  const gnutls_crypto_mac_st *cc = NULL;
 
-  ret = _gnutls_hmac_init (&dig, algorithm, key, keylen);
+  /* check if a digest has been registered 
+   */
+  cc = _gnutls_get_crypto_mac (algorithm);
+  if (cc != NULL)
+    {
+      if (cc->fast (algorithm, key, keylen, text, textlen, digest) < 0)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_HASH_FAILED;
+        }
+
+      return 0;
+    }
+
+  ret = _gnutls_mac_ops.fast (algorithm, key, keylen, text, textlen, digest);
   if (ret < 0)
     {
       gnutls_assert ();
       return ret;
     }
 
-  ret = _gnutls_hmac (&dig, text, textlen);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      _gnutls_hmac_deinit (&dig, NULL);
-      return ret;
-    }
-
-  _gnutls_hmac_deinit (&dig, digest);
   return 0;
+
 }
 
 int
@@ -210,7 +221,7 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
   /* check if a digest has been registered 
    */
   cc = _gnutls_get_crypto_mac (algorithm);
-  if (cc != NULL)
+  if (cc != NULL && cc->init != NULL)
     {
       if (cc->init (algorithm, &dig->handle) < 0)
         {

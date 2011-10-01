@@ -47,7 +47,7 @@ defexec_DATA =
 
 lib_LTLIBRARIES = libgnutls-extra.la
 
-libgnutls_extra_la_SOURCES = libgnutls-extra.map gnutls_extra.c fipsmd5.c
+libgnutls_extra_la_SOURCES = libgnutls-extra.map gnutls_extra.c
 
 libgnutls_openssl_la_LDFLAGS = -no-undefined
 

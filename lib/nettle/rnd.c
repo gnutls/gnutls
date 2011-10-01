@@ -468,7 +468,7 @@ wrap_nettle_rnd (void *_ctx, int level, void *data, size_t datasize)
 
 int crypto_rnd_prio = INT_MAX;
 
-const gnutls_crypto_rnd_st _gnutls_rnd_ops = {
+gnutls_crypto_rnd_st _gnutls_rnd_ops = {
   .init = wrap_nettle_rnd_init,
   .deinit = wrap_nettle_rnd_deinit,
   .rnd = wrap_nettle_rnd,

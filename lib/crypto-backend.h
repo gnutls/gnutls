@@ -51,16 +51,18 @@
     int (*hash) (void *ctx, const void *text, size_t textsize);
     int (*output) (void *src_ctx, void *digest, size_t digestsize);
     void (*deinit) (void *ctx);
+    int (*fast)(gnutls_mac_algorithm_t, const void *key, size_t keysize, const void *text, size_t textsize, void *digest);
   } gnutls_crypto_mac_st;
 
   typedef struct
   {
-    int (*init) (gnutls_mac_algorithm_t, void **ctx);
+    int (*init) (gnutls_digest_algorithm_t, void **ctx);
     void (*reset) (void *ctx);
-    int (*hash) (void *ctx, const void *text, size_t textsize);
+    int (*hash) (void *ctx, const void *src, size_t srcsize);
     int (*copy) (void **dst_ctx, void *src_ctx);
     int (*output) (void *src_ctx, void *digest, size_t digestsize);
     void (*deinit) (void *ctx);
+    int (*fast)(gnutls_digest_algorithm_t, const void *src, size_t srcsize, void *digest);
   } gnutls_crypto_digest_st;
 
   typedef struct gnutls_crypto_rnd
