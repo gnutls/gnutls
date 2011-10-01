@@ -125,29 +125,23 @@ finished using @acronym{GnuTLS}.
 @caption{High level design of GnuTLS.}
 @end float
 
-The credentials structure is used by some authentication methods, such
-as certificate authentication.  A
-credentials structure may contain certificates, private keys,
-temporary parameters for Diffie-Hellman or RSA key exchange, and other
-stuff that may be shared between several TLS sessions.
+The credentials structures are used by the authentication methods, such
+as certificate authentication. They store certificates, privates keys,
+and other information that is needed to prove the identity to the peer,
+and/or verify the indentity of the peer. The information stored in
+the credentials structures is initialized once and then can be 
+shared by many @acronym{TLS} sessions.
 
-This structure should be initialized using the appropriate
-initialization functions. For example an application which uses
-certificate authentication would probably initialize the credentials,
-using the appropriate functions, and put its trusted certificates in
-this structure. The next step is to associate the credentials
-structure with each @acronym{TLS} session.
+A @acronym{GnuTLS} session contains all the required information
+to handle one secure connection. The session communicates with the
+peers using the provided functions of the transport layer.
+Every session has a unique session ID shared with the peer.
 
-A @acronym{GnuTLS} session contains all the required information for a
-session to handle one secure connection. This session calls directly
-to the transport layer functions, in order to communicate with the
-peer.  Every session has a unique session ID shared with the peer.
-
-Since TLS sessions can be resumed, servers would probably need a
+Since TLS sessions can be resumed, servers need a
 database back-end to hold the session's parameters.  Every
 @acronym{GnuTLS} session after a successful handshake calls the
-appropriate back-end function (see @ref{resume}, for information on
-initialization) to store the newly negotiated session. The session
+appropriate back-end function (see @ref{resume})
+to store the newly negotiated session. The session
 database is examined by the server just after having received the
 client hello@footnote{The first message in a @acronym{TLS} handshake},
 and if the session ID sent by the client, matches a stored session,
@@ -202,15 +196,23 @@ or other information about the peer involved.
 @node Thread safety
 @section Thread safety
 
-Although the @acronym{GnuTLS} library is thread safe by design, some
-parts of the cryptographic back-end, such as the random generator, are not.
-Applications can either call @funcref{gnutls_global_init} which will use the default
+The @acronym{GnuTLS} library is thread safe by design, meaning that
+objects of the library such as TLS sessions, can be safely divided across
+threads as long as a single thread accesses a single object. This is
+sufficient to support a server which handles several sessions per thread.
+If, however, an object needs to be shared across threads then access must be 
+protected with a mutex. Read-only access to objects, for example the
+credentials holding structures (see @ref{Authentication methods}), is also thread-safe. 
+
+The random generator of the cryptographic back-end, is not thread safe and requires
+mutex locks which are setup by @acronym{GnuTLS}.
+Applications can either call @funcref{gnutls_global_init} which will initialize the default
 operating system provided locks (i.e. @code{pthreads} on GNU/Linux and
 @code{CriticalSection} on Windows), or specify manually the locking system using 
 the function @funcref{gnutls_global_set_mutex} before calling @funcref{gnutls_global_init}. 
 Setting manually mutexes is recommended
 only to applications that have full control of the underlying libraries. If this
-is not the case, the use of the operating system defaults is recommended. An of 
+is not the case, the use of the operating system defaults is recommended. An example of 
 native thread usage is shown below.
 
 @example
