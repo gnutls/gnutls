@@ -31,7 +31,7 @@ if WANT_TEST_SUITE
 SUBDIRS += suite
 endif
 
-EXTRA_DIST = libgcrypt.supp eagain-common.h
+EXTRA_DIST = suppressions.valgrind eagain-common.h
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \

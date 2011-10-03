@@ -1,0 +1,11 @@
+--- valgrind-tests.m4.orig	2011-05-21 09:37:17.415555504 +0200
++++ valgrind-tests.m4	2011-05-21 09:37:34.600259721 +0200
+@@ -23,7 +23,7 @@
+ 
+   if test -n "$VALGRIND" && $VALGRIND -q true > /dev/null 2>&1; then
+     opt_valgrind_tests=yes
+-    VALGRIND="$VALGRIND -q --error-exitcode=1 --leak-check=full"
++    VALGRIND="$VALGRIND -q --error-exitcode=1 --suppressions=suppressions.valgrind"
+   else
+     opt_valgrind_tests=no
+     VALGRIND=
