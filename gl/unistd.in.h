@@ -83,11 +83,13 @@
 # include <stdlib.h>
 #endif
 
-/* mingw declares getcwd in <io.h>, not in <unistd.h>.  */
-#if ((@GNULIB_GETCWD@ || defined GNULIB_POSIXCHECK) \
+/* Native Windows platforms declare chdir, getcwd, rmdir in
+   <io.h> and/or <direct.h>, not in <unistd.h>.  */
+#if ((@GNULIB_CHDIR@ || @GNULIB_GETCWD@ || @GNULIB_RMDIR@ \
+      || defined GNULIB_POSIXCHECK) \
      && ((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__))
 # include <io.h>     /* mingw32, mingw64 */
-# include <direct.h> /* mingw64 */
+# include <direct.h> /* mingw64, MSVC 9 */
 #endif
 
 /* AIX and OSF/1 5.1 declare getdomainname in <netdb.h>, not in <unistd.h>.
@@ -231,6 +233,18 @@ _GL_WARN_ON_USE (access, "the access function is a security risk - "
 #endif
 
 
+#if @GNULIB_CHDIR@
+_GL_CXXALIAS_SYS (chdir, int, (const char *file) _GL_ARG_NONNULL ((1)));
+_GL_CXXALIASWARN (chdir);
+#elif defined GNULIB_POSIXCHECK
+# undef chdir
+# if HAVE_RAW_DECL_CHDIR
+_GL_WARN_ON_USE (chown, "chdir is not always in <unistd.h> - "
+                 "use gnulib module chdir for portability");
+# endif
+#endif
+
+
 #if @GNULIB_CHOWN@
 /* Change the owner of FILE to UID (if UID is not -1) and the group of FILE
    to GID (if GID is not -1).  Follow symbolic links.
@@ -287,16 +301,24 @@ _GL_WARN_ON_USE (close, "close does not portably work on sockets - "
 #endif
 
 
-#if @REPLACE_DUP@
-# if !(defined __cplusplus && defined GNULIB_NAMESPACE)
-#  define dup rpl_dup
-# endif
+#if @GNULIB_DUP@
+# if @REPLACE_DUP@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   define dup rpl_dup
+#  endif
 _GL_FUNCDECL_RPL (dup, int, (int oldfd));
 _GL_CXXALIAS_RPL (dup, int, (int oldfd));
-#else
+# else
 _GL_CXXALIAS_SYS (dup, int, (int oldfd));
-#endif
+# endif
 _GL_CXXALIASWARN (dup);
+#elif defined GNULIB_POSIXCHECK
+# undef dup
+# if HAVE_RAW_DECL_DUP
+_GL_WARN_ON_USE (dup, "dup is unportable - "
+                 "use gnulib module dup for portability");
+# endif
+#endif
 
 
 #if @GNULIB_DUP2@
@@ -1155,7 +1177,7 @@ _GL_WARN_ON_USE (pwrite, "pwrite is unportable - "
 /* Read up to COUNT bytes from file descriptor FD into the buffer starting
    at BUF.  See the POSIX:2008 specification
    <http://pubs.opengroup.org/onlinepubs/9699919799/functions/read.html>.  */
-# if @REPLACE_READ@ && @GNULIB_UNISTD_H_NONBLOCKING@
+# if @REPLACE_READ@
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
 #   undef read
 #   define read rpl_read
@@ -1427,7 +1449,7 @@ _GL_WARN_ON_USE (usleep, "usleep is unportable - "
 /* Write up to COUNT bytes starting at BUF to file descriptor FD.
    See the POSIX:2008 specification
    <http://pubs.opengroup.org/onlinepubs/9699919799/functions/write.html>.  */
-# if @REPLACE_WRITE@ && (@GNULIB_UNISTD_H_NONBLOCKING@ || @GNULIB_UNISTD_H_SIGPIPE@)
+# if @REPLACE_WRITE@
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
 #   undef write
 #   define write rpl_write

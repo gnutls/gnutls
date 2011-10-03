@@ -1,6 +1,5 @@
-/* Auxiliary definitions for <float.h>.
+/* Open a stream with a given file descriptor.
    Copyright (C) 2011 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2011.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,16 +17,53 @@
 #include <config.h>
 
 /* Specification.  */
-#include <float.h>
+#include <stdio.h>
 
-#if (defined _ARCH_PPC || defined _POWER) && (defined _AIX || defined __linux__) && (LDBL_MANT_DIG == 106) && defined __GNUC__
-const union gl_long_double_union gl_LDBL_MAX =
-  { { DBL_MAX, DBL_MAX / (double)134217728UL / (double)134217728UL } };
-#elif defined __i386__
-const union gl_long_double_union gl_LDBL_MAX =
-  { { 0xFFFFFFFF, 0xFFFFFFFF, 32766 } };
-#else
-/* This declaration is solely to ensure that after preprocessing
-   this file is never empty.  */
-typedef int dummy;
+#include <errno.h>
+
+#if HAVE_MSVC_INVALID_PARAMETER_HANDLER
+# include "msvc-inval.h"
 #endif
+
+#undef fdopen
+
+#if HAVE_MSVC_INVALID_PARAMETER_HANDLER
+static FILE *
+fdopen_nothrow (int fd, const char *mode)
+{
+  FILE *result;
+
+  TRY_MSVC_INVAL
+    {
+      result = fdopen (fd, mode);
+    }
+  CATCH_MSVC_INVAL
+    {
+      result = NULL;
+    }
+  DONE_MSVC_INVAL;
+
+  return result;
+}
+#else
+# define fdopen_nothrow fdopen
+#endif
+
+FILE *
+rpl_fdopen (int fd, const char *mode)
+{
+  int saved_errno = errno;
+  FILE *fp;
+
+  errno = 0;
+  fp = fdopen_nothrow (fd, mode);
+  if (fp == NULL)
+    {
+      if (errno == 0)
+        errno = EBADF;
+    }
+  else
+    errno = saved_errno;
+
+  return fp;
+}

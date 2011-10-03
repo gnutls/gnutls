@@ -526,3 +526,7 @@ gl/tests/test-ftello4
 gl/tests/test-pathmax
 gl/tests/test-sys_types
 tests/mini-deflate
+gl/tests/test-close
+gl/tests/test-fputc
+gl/tests/test-fwrite
+gl/tests/test-fread
