@@ -229,7 +229,7 @@ sign_tls_hash (gnutls_session_t session, gnutls_digest_algorithm_t hash_algo,
       if (!pkey)
         {
           if (!session->internals.sign_func)
-            return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+            return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
           return (*session->internals.sign_func)
             (session, session->internals.sign_func_userdata,
