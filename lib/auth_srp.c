@@ -728,7 +728,7 @@ _gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
 {
   uint8_t n_s;
   uint16_t n_g, n_n, n_b;
-  size_t _n_s, _n_g, _n_n, _n_b;
+  size_t _n_g, _n_n, _n_b;
   const uint8_t *data_n;
   const uint8_t *data_g;
   const uint8_t *data_s;
@@ -817,7 +817,6 @@ _gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
   data_b = &data[i];
   i += n_b;
 
-  _n_s = n_s;
   _n_g = n_g;
   _n_n = n_n;
   _n_b = n_b;

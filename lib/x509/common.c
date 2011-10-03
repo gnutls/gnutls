@@ -1101,11 +1101,8 @@ _gnutls_x509_write_value (ASN1_TYPE c, const char *root,
                           const gnutls_datum_t * data, int str)
 {
   int result;
-  int asize;
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
   gnutls_datum_t val = { NULL, 0 };
-
-  asize = data->size + 16;
 
   if (str)
     {

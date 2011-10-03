@@ -697,7 +697,6 @@ _gnutls_recv_new_session_ticket (gnutls_session_t session)
 {
   uint8_t *data = NULL, *p;
   int data_size;
-  uint32_t lifetime_hint;
   uint16_t ticket_len;
   int ret;
   session_ticket_ext_st *priv = NULL;
@@ -727,7 +726,7 @@ _gnutls_recv_new_session_ticket (gnutls_session_t session)
 
   p = data;
   DECR_LENGTH_COM (data_size, 4, goto error);
-  lifetime_hint = _gnutls_read_uint32 (p);
+  _gnutls_read_uint32 (p);
   p += 4;
 
   DECR_LENGTH_COM (data_size, 2, goto error);
