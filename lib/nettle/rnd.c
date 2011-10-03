@@ -55,6 +55,7 @@ static void *rnd_mutex;
 #ifdef _WIN32
 
 #include <windows.h>
+#include <wincrypt.h>
 
 #define DEVICE_READ_SIZE 16
 #define DEVICE_READ_SIZE_MAX 32

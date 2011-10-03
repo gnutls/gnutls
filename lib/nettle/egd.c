@@ -19,6 +19,9 @@
  */
 
 #include <config.h>
+
+#ifndef _WIN32
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -268,3 +271,5 @@ restart:
 
   return _length;               /* success */
 }
+
+#endif
