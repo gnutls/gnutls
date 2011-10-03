@@ -278,8 +278,9 @@ to generate a secret key that is used to sign a cookie@footnote{A key of 128 bit
 That cookie is sent to the client using @funcref{gnutls_dtls_cookie_send}, and 
 the client must reply using the correct cookie. The server side
 should verify the initial message sent by client using @funcref{gnutls_dtls_cookie_verify}.
-If successful a the session should be initialization and associated with
-the cookie using @funcref{gnutls_dtls_prestate_set}.
+If successful the session should be initialized and associated with
+the cookie using @funcref{gnutls_dtls_prestate_set}, before proceeding to
+the handshake.
 
 @showfuncD{gnutls_key_generate,gnutls_dtls_cookie_send,gnutls_dtls_cookie_verify,gnutls_dtls_prestate_set}
 
