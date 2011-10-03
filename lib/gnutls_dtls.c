@@ -45,7 +45,7 @@ transmit_message (gnutls_session_t session,
   opaque *data, *mtu_data;
   int ret = 0;
   unsigned int offset, frag_len, data_size;
-  const uint mtu = gnutls_dtls_get_data_mtu(session) - DTLS_HANDSHAKE_HEADER_SIZE;
+  const unsigned int mtu = gnutls_dtls_get_data_mtu(session) - DTLS_HANDSHAKE_HEADER_SIZE;
 
   if (bufel->type == GNUTLS_CHANGE_CIPHER_SPEC)
     {
