@@ -109,7 +109,8 @@ extern const union gl_long_double_union gl_LDBL_MAX;
 #endif
 
 /* On AIX 7.1 with gcc 4.2, the values of LDBL_MIN_EXP, LDBL_MIN, LDBL_MAX are
-   wrong.  */
+   wrong.
+   On Linux/PowerPC with gcc 4.4, the value of LDBL_MAX is wrong.  */
 #if (defined _ARCH_PPC || defined _POWER) && defined _AIX && (LDBL_MANT_DIG == 106) && defined __GNUC__
 # undef LDBL_MIN_EXP
 # define LDBL_MIN_EXP DBL_MIN_EXP
@@ -117,6 +118,8 @@ extern const union gl_long_double_union gl_LDBL_MAX;
 # define LDBL_MIN_10_EXP DBL_MIN_10_EXP
 # undef LDBL_MIN
 # define LDBL_MIN 2.22507385850720138309023271733240406422e-308L /* DBL_MIN = 2^-1022 */
+#endif
+#if (defined _ARCH_PPC || defined _POWER) && (defined _AIX || defined __linux__) && (LDBL_MANT_DIG == 106) && defined __GNUC__
 # undef LDBL_MAX
 /* LDBL_MAX is represented as { 0x7FEFFFFF, 0xFFFFFFFF, 0x7C8FFFFF, 0xFFFFFFFF }.
    It is not easy to define:
@@ -168,6 +171,17 @@ extern const union gl_long_double_union gl_LDBL_MAX;
 #  undef LDBL_EPSILON
 #  define LDBL_EPSILON 2.46519032881566189191165176650870696773e-32L /* 2^-105 */
 # endif
+#endif
+
+#if @REPLACE_ITOLD@
+/* Pull in a function that fixes the 'int' to 'long double' conversion
+   of glibc 2.7.  */
+extern
+# ifdef __cplusplus
+"C"
+# endif
+void _Qp_itoq (long double *, int);
+static void (*_gl_float_fix_itold) (long double *, int) = _Qp_itoq;
 #endif
 
 #endif /* _@GUARD_PREFIX@_FLOAT_H */

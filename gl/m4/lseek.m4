@@ -1,4 +1,4 @@
-# lseek.m4 serial 6
+# lseek.m4 serial 8
 dnl Copyright (C) 2007, 2009-2011 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -8,12 +8,18 @@ AC_DEFUN([gl_FUNC_LSEEK],
 [
   AC_REQUIRE([gl_UNISTD_H_DEFAULTS])
   AC_REQUIRE([AC_PROG_CC])
+  AC_CHECK_HEADERS_ONCE([unistd.h])
   AC_CACHE_CHECK([whether lseek detects pipes], [gl_cv_func_lseek_pipe],
     [if test $cross_compiling = no; then
        AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <sys/types.h> /* for off_t */
 #include <stdio.h> /* for SEEK_CUR */
-#include <unistd.h>]], [[
+#if HAVE_UNISTD_H
+# include <unistd.h>
+#else /* on Windows with MSVC */
+# include <io.h>
+#endif
+]], [[
   /* Exit with success only if stdin is seekable.  */
   return lseek (0, (off_t)0, SEEK_CUR) < 0;
 ]])],
@@ -35,15 +41,8 @@ AC_DEFUN([gl_FUNC_LSEEK],
          [gl_cv_func_lseek_pipe=yes], [gl_cv_func_lseek_pipe=no])
      fi])
   if test $gl_cv_func_lseek_pipe = no; then
-    gl_REPLACE_LSEEK
+    REPLACE_LSEEK=1
+    AC_DEFINE([LSEEK_PIPE_BROKEN], [1],
+      [Define to 1 if lseek does not detect pipes.])
   fi
-])
-
-AC_DEFUN([gl_REPLACE_LSEEK],
-[
-  AC_LIBOBJ([lseek])
-  AC_REQUIRE([gl_UNISTD_H_DEFAULTS])
-  REPLACE_LSEEK=1
-  AC_DEFINE([LSEEK_PIPE_BROKEN], [1],
-            [Define to 1 if lseek does not detect pipes.])
 ])

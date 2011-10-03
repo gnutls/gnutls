@@ -63,17 +63,9 @@ bootstrap: autoreconf
 #Two runs the first should add the LGPL components and the
 #second the components used by src/ files.
 glimport:
-	gnulib-tool --m4-base gl/m4 --tests-base=gl/tests --libtool \
-	--dir=. --local-dir=gl/override --lib=libgnu --source-base=gl \
-	--aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lseek-tests \
-	--import crypto/hmac-md5 crypto/md5 extensions havelib lib-msvc-compat lib-symbol-versions \
-	byteswap c-ctype func gettext lib-msvc-compat lib-symbol-versions memmem-simple minmax \
-	netdb read-file snprintf sockets socklen stdint strcase strverscmp sys_socket sys_stat time_r unistd \
-	vasprintf vsnprintf manywarnings warnings netinet_in alloca getpass u64
-	gnulib-tool --m4-base gl/m4 --tests-base=gl/tests --libtool \
-	--dir=. --local-dir=gl/override --lib=libgnu --source-base=gl \
-	--aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lseek-tests \
-	--add-import progname version-etc timespec version-etc-fsf gettime valgrind-tests
+	gnulib-tool --m4-base gl/m4 --add-import
+	cd lib && gnulib-tool --m4-base gl/m4 --add-import
+	cd libextra && gnulib-tool --m4-base gl/m4 --add-import
 
 # Code Coverage
 

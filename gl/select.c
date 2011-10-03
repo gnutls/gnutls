@@ -27,7 +27,6 @@
 /* Native Win32.  */
 
 #include <sys/types.h>
-#include <stdbool.h>
 #include <errno.h>
 #include <limits.h>
 
@@ -37,6 +36,8 @@
 #include <stdio.h>
 #include <conio.h>
 #include <time.h>
+
+#include "msvc-nothrow.h"
 
 struct bitset {
   unsigned char in[FD_SETSIZE / CHAR_BIT];

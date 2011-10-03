@@ -1,4 +1,4 @@
-# sys_select_h.m4 serial 16
+# sys_select_h.m4 serial 20
 dnl Copyright (C) 2006-2011 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -6,7 +6,7 @@ dnl with or without modifications, as long as this notice is preserved.
 
 AC_DEFUN([gl_HEADER_SYS_SELECT],
 [
-  AC_REQUIRE([gl_HEADER_SYS_SOCKET])
+  AC_REQUIRE([AC_C_RESTRICT])
   AC_REQUIRE([gl_SYS_SELECT_H_DEFAULTS])
   AC_CACHE_CHECK([whether <sys/select.h> is self-contained],
     [gl_cv_header_sys_select_h_selfcontained],
@@ -32,10 +32,18 @@ AC_DEFUN([gl_HEADER_SYS_SELECT],
              [AC_LANG_PROGRAM([[#include <sys/select.h>]], [[
                   #undef memset
                   #define memset nonexistent_memset
-                  extern void *memset (void *, int, unsigned long);
+                  extern
+                  #ifdef __cplusplus
+                  "C"
+                  #endif
+                  void *memset (void *, int, unsigned long);
                   #undef bzero
                   #define bzero nonexistent_bzero
-                  extern void bzero (void *, unsigned long);
+                  extern
+                  #ifdef __cplusplus
+                  "C"
+                  #endif
+                  void bzero (void *, unsigned long);
                   fd_set fds;
                   FD_ZERO (&fds);
                 ]])
@@ -64,7 +72,7 @@ AC_DEFUN([gl_HEADER_SYS_SELECT],
 # include <sys/time.h>
 #endif
 #include <sys/select.h>
-    ]], [select])
+    ]], [pselect select])
 ])
 
 AC_DEFUN([gl_SYS_SELECT_MODULE_INDICATOR],
@@ -78,7 +86,10 @@ AC_DEFUN([gl_SYS_SELECT_MODULE_INDICATOR],
 
 AC_DEFUN([gl_SYS_SELECT_H_DEFAULTS],
 [
+  GNULIB_PSELECT=0; AC_SUBST([GNULIB_PSELECT])
   GNULIB_SELECT=0; AC_SUBST([GNULIB_SELECT])
   dnl Assume proper GNU behavior unless another module says otherwise.
+  HAVE_PSELECT=1; AC_SUBST([HAVE_PSELECT])
+  REPLACE_PSELECT=0; AC_SUBST([REPLACE_PSELECT])
   REPLACE_SELECT=0; AC_SUBST([REPLACE_SELECT])
 ])

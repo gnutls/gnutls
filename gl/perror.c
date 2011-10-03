@@ -21,15 +21,29 @@
 #include <stdio.h>
 
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
+
+#include "strerror-override.h"
+
+/* Use the system functions, not the gnulib overrides in this file.  */
+#undef fprintf
 
 void
 perror (const char *string)
 {
-  const char *errno_description = strerror (errno);
+  char stackbuf[STACKBUF_LEN];
+  int ret;
+
+  /* Our implementation guarantees that this will be a non-empty
+     string, even if it returns EINVAL; and stackbuf should be sized
+     large enough to avoid ERANGE.  */
+  ret = strerror_r (errno, stackbuf, sizeof stackbuf);
+  if (ret == ERANGE)
+    abort ();
 
   if (string != NULL && *string != '\0')
-    fprintf (stderr, "%s: %s\n", string, errno_description);
+    fprintf (stderr, "%s: %s\n", string, stackbuf);
   else
-    fprintf (stderr, "%s\n", errno_description);
+    fprintf (stderr, "%s\n", stackbuf);
 }

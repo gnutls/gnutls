@@ -30,10 +30,17 @@
 #endif
 
 /* The include_next requires a split double-inclusion guard.  */
-#@INCLUDE_NEXT@ @NEXT_STRINGS_H@
+#if @HAVE_STRINGS_H@
+# @INCLUDE_NEXT@ @NEXT_STRINGS_H@
+#endif
 
 #ifndef _@GUARD_PREFIX@_STRINGS_H
 #define _@GUARD_PREFIX@_STRINGS_H
+
+#if ! @HAVE_DECL_STRNCASECMP@
+/* Get size_t.  */
+# include <stddef.h>
+#endif
 
 
 /* The definitions of _GL_FUNCDECL_RPL etc. are copied here.  */

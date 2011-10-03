@@ -31,6 +31,11 @@ int sk[] = { SEEK_CUR, SEEK_END, SEEK_SET };
 /* Check that the FD_* macros are defined.  */
 int i = FD_CLOEXEC;
 
+/* Check that the types are all defined.  */
+pid_t t1;
+off_t t2;
+mode_t t3;
+
 int
 main (void)
 {

@@ -58,7 +58,7 @@ hmac_md5 (const void *key, size_t keylen,
   md5_init_ctx (&inner);
 
   memset (block, IPAD, sizeof (block));
-  gl_memxor (block, key, keylen);
+  memxor (block, key, keylen);
 
   md5_process_block (block, 64, &inner);
   md5_process_bytes (in, inlen, &inner);
@@ -70,7 +70,7 @@ hmac_md5 (const void *key, size_t keylen,
   md5_init_ctx (&outer);
 
   memset (block, OPAD, sizeof (block));
-  gl_memxor (block, key, keylen);
+  memxor (block, key, keylen);
 
   md5_process_block (block, 64, &outer);
   md5_process_bytes (innerhash, 16, &outer);

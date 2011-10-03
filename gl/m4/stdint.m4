@@ -1,4 +1,4 @@
-# stdint.m4 serial 39
+# stdint.m4 serial 41
 dnl Copyright (C) 2001-2011 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -7,7 +7,7 @@ dnl with or without modifications, as long as this notice is preserved.
 dnl From Paul Eggert and Bruno Haible.
 dnl Test whether <stdint.h> is supported or must be substituted.
 
-AC_DEFUN([gl_STDINT_H],
+AC_DEFUN_ONCE([gl_STDINT_H],
 [
   AC_PREREQ([2.59])dnl
 
@@ -305,6 +305,7 @@ static const char *macro_values[] =
     STDINT_H=stdint.h
   fi
   AC_SUBST([STDINT_H])
+  AM_CONDITIONAL([GL_GENERATE_STDINT_H], [test -n "$STDINT_H"])
 ])
 
 dnl gl_STDINT_BITSIZEOF(TYPES, INCLUDES)
@@ -465,6 +466,14 @@ AC_DEFUN([gl_STDINT_TYPE_PROPERTIES],
   fi
   gl_INTEGER_TYPE_SUFFIX([sig_atomic_t wchar_t wint_t],
     [gl_STDINT_INCLUDES])
+
+  dnl If wint_t is smaller than 'int', it cannot satisfy the ISO C 99
+  dnl requirement that wint_t is "unchanged by default argument promotions".
+  dnl In this case gnulib's <wchar.h> and <wctype.h> override wint_t.
+  dnl Set the variable BITSIZEOF_WINT_T accordingly.
+  if test $BITSIZEOF_WINT_T -lt 32; then
+    BITSIZEOF_WINT_T=32
+  fi
 ])
 
 dnl Autoconf >= 2.61 has AC_COMPUTE_INT built-in.

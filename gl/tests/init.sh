@@ -68,15 +68,29 @@ Exit () { set +e; (exit $1); exit $1; }
 
 # Print warnings (e.g., about skipped and failed tests) to this file number.
 # Override by defining to say, 9, in init.cfg, and putting say,
-# "export ...ENVVAR_SETTINGS...; exec 9>&2; $(SHELL)" in the definition
-# of TESTS_ENVIRONMENT in your tests/Makefile.am file.
+#   export ...ENVVAR_SETTINGS...; $(SHELL) 9>&2
+# in the definition of TESTS_ENVIRONMENT in your tests/Makefile.am file.
 # This is useful when using automake's parallel tests mode, to print
 # the reason for skip/failure to console, rather than to the .log files.
 : ${stderr_fileno_=2}
 
-warn_ () { echo "$@" 1>&$stderr_fileno_; }
+# Note that correct expansion of "$*" depends on IFS starting with ' '.
+# Always write the full diagnostic to stderr.
+# When stderr_fileno_ is not 2, also emit the first line of the
+# diagnostic to that file descriptor.
+warn_ ()
+{
+  # If IFS does not start with ' ', set it and emit the warning in a subshell.
+  case $IFS in
+    ' '*) printf '%s\n' "$*" >&2
+          test $stderr_fileno_ = 2 \
+            || { printf '%s\n' "$*" | sed 1q >&$stderr_fileno_ ; } ;;
+    *) (IFS=' '; warn_ "$@");;
+  esac
+}
 fail_ () { warn_ "$ME_: failed test: $@"; Exit 1; }
 skip_ () { warn_ "$ME_: skipped test: $@"; Exit 77; }
+fatal_ () { warn_ "$ME_: hard error: $@"; Exit 99; }
 framework_failure_ () { warn_ "$ME_: set-up failure: $@"; Exit 99; }
 
 # Sanitize this shell to POSIX mode, if possible.
@@ -167,7 +181,10 @@ else
     st_=$?
 
     # $re_shell_ works just fine.  Use it.
-    test $st_ = 10 && break
+    if test $st_ = 10; then
+      gl_set_x_corrupts_stderr_=false
+      break
+    fi
 
     # If this is our first marginally acceptable shell, remember it.
     if test "$st_:$marginal_" = 9: ; then
@@ -204,8 +221,10 @@ export MALLOC_PERTURB_
 # a partition, or to undo any other global state changes.
 cleanup_ () { :; }
 
-if ( diff --version < /dev/null 2>&1 | grep GNU ) > /dev/null 2>&1; then
+if ( diff -u "$0" "$0" < /dev/null ) > /dev/null 2>&1; then
   compare () { diff -u "$@"; }
+elif ( diff -c "$0" "$0" < /dev/null ) > /dev/null 2>&1; then
+  compare () { diff -c "$@"; }
 elif ( cmp --version < /dev/null 2>&1 | grep GNU ) > /dev/null 2>&1; then
   compare () { cmp -s "$@"; }
 else
@@ -400,7 +419,7 @@ mktempd_ ()
 {
   case $# in
   2);;
-  *) fail_ "Usage: $ME DIR TEMPLATE";;
+  *) fail_ "Usage: mktempd_ DIR TEMPLATE";;
   esac
 
   destdir_=$1

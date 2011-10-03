@@ -1,4 +1,4 @@
-# gnulib-common.m4 serial 29
+# gnulib-common.m4 serial 31
 dnl Copyright (C) 2007-2011 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -211,8 +211,33 @@ m4_ifndef([AS_VAR_IF],
 [m4_define([AS_VAR_IF],
 [AS_IF([test x"AS_VAR_GET([$1])" = x""$2], [$3], [$4])])])
 
+# gl_PROG_CC_C99
+# Modifies the value of the shell variable CC in an attempt to make $CC
+# understand ISO C99 source code.
+# This is like AC_PROG_CC_C99, except that
+# - AC_PROG_CC_C99 did not exist in Autoconf versions < 2.60,
+# - AC_PROG_CC_C99 does not mix well with AC_PROG_CC_STDC
+#   <http://lists.gnu.org/archive/html/bug-gnulib/2011-09/msg00367.html>,
+#   but many more packages use AC_PROG_CC_STDC than AC_PROG_CC_C99
+#   <http://lists.gnu.org/archive/html/bug-gnulib/2011-09/msg00441.html>.
+# Remaining problems:
+# - When AC_PROG_CC_STDC is invoked twice, it adds the C99 enabling options
+#   to CC twice
+#   <http://lists.gnu.org/archive/html/bug-gnulib/2011-09/msg00431.html>.
+# - AC_PROG_CC_STDC is likely to change when C1X is an ISO standard.
+AC_DEFUN([gl_PROG_CC_C99],
+[
+  dnl Change that version number to the minimum Autoconf version that supports
+  dnl mixing AC_PROG_CC_C99 calls with AC_PROG_CC_STDC calls.
+  m4_version_prereq([9.0],
+    [AC_REQUIRE([AC_PROG_CC_C99])],
+    [AC_REQUIRE([AC_PROG_CC_STDC])])
+])
+
 # gl_PROG_AR_RANLIB
 # Determines the values for AR, ARFLAGS, RANLIB that fit with the compiler.
+# The user can set the variables AR, ARFLAGS, RANLIB if he wants to override
+# the values.
 AC_DEFUN([gl_PROG_AR_RANLIB],
 [
   dnl Minix 3 comes with two toolchains: The Amsterdam Compiler Kit compiler
@@ -220,24 +245,47 @@ AC_DEFUN([gl_PROG_AR_RANLIB],
   dnl library formats. In particular, the GNU binutils programs ar, ranlib
   dnl produce libraries that work only with gcc, not with cc.
   AC_REQUIRE([AC_PROG_CC])
-  AC_EGREP_CPP([Amsterdam],
+  AC_CACHE_CHECK([for Minix Amsterdam compiler], [gl_cv_c_amsterdam_compiler],
     [
+      AC_EGREP_CPP([Amsterdam],
+        [
 #ifdef __ACK__
 Amsterdam
 #endif
-    ],
-    [AR='cc -c.a'
-     ARFLAGS='-o'
-     RANLIB=':'
-    ],
-    [dnl Use the Automake-documented default values for AR and ARFLAGS.
-     AR='ar'
-     ARFLAGS='cru'
-     dnl Use the ranlib program if it is available.
-     AC_PROG_RANLIB
+        ],
+        [gl_cv_c_amsterdam_compiler=yes],
+        [gl_cv_c_amsterdam_compiler=no])
     ])
+  if test -z "$AR"; then
+    if test $gl_cv_c_amsterdam_compiler = yes; then
+      AR='cc -c.a'
+      if test -z "$ARFLAGS"; then
+        ARFLAGS='-o'
+      fi
+    else
+      dnl Use the Automake-documented default values for AR and ARFLAGS,
+      dnl but prefer ${host}-ar over ar (useful for cross-compiling).
+      AC_CHECK_TOOL([AR], [ar], [ar])
+      if test -z "$ARFLAGS"; then
+        ARFLAGS='cru'
+      fi
+    fi
+  else
+    if test -z "$ARFLAGS"; then
+      ARFLAGS='cru'
+    fi
+  fi
   AC_SUBST([AR])
   AC_SUBST([ARFLAGS])
+  if test -z "$RANLIB"; then
+    if test $gl_cv_c_amsterdam_compiler = yes; then
+      RANLIB=':'
+    else
+      dnl Use the ranlib program if it is available.
+      AC_PROG_RANLIB
+    fi
+  fi
+  AC_SUBST([RANLIB])
 ])
 
 # AC_PROG_MKDIR_P

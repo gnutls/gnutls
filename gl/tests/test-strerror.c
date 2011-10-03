@@ -33,25 +33,44 @@ main (void)
 {
   char *str;
 
+  errno = 0;
   str = strerror (EACCES);
   ASSERT (str);
   ASSERT (*str);
+  ASSERT (errno == 0);
 
+  errno = 0;
   str = strerror (ETIMEDOUT);
   ASSERT (str);
   ASSERT (*str);
+  ASSERT (errno == 0);
 
+  errno = 0;
   str = strerror (EOVERFLOW);
   ASSERT (str);
   ASSERT (*str);
+  ASSERT (errno == 0);
 
+  /* POSIX requires strerror (0) to succeed.  Reject use of "Unknown
+     error", but allow "Success", "No error", or even Solaris' "Error
+     0" which are distinct patterns from true out-of-range strings.
+     http://austingroupbugs.net/view.php?id=382  */
+  errno = 0;
   str = strerror (0);
   ASSERT (str);
   ASSERT (*str);
+  ASSERT (errno == 0);
+  ASSERT (strstr (str, "nknown") == NULL);
+  ASSERT (strstr (str, "ndefined") == NULL);
 
+  /* POSIX requires strerror to produce a non-NULL result for all
+     inputs; as an extension, we also guarantee a non-empty reseult.
+     Reporting EINVAL is optional.  */
+  errno = 0;
   str = strerror (-3);
   ASSERT (str);
   ASSERT (*str);
+  ASSERT (errno == 0 || errno == EINVAL);
 
   return 0;
 }
