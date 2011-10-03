@@ -9,7 +9,7 @@ the software version of the ciphers instead of hw accelerated
 (where available)
 
 ** libgnutls: Corrected VIA padlock code for C3. Benchmarks show
-a 50% increase in AES speed.
+a 2x increase in AES speed.
 
 ** libgnutls: Compilation fixed when p11-kit is not detected.
 
