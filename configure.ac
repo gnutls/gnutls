@@ -476,7 +476,7 @@ AC_CONFIG_FILES([
   lib/nettle/Makefile
   tests/suite/Makefile
   lib/accelerated/Makefile
-  lib/accelerated/intel/Makefile
+  lib/accelerated/x86/Makefile
   lib/ext/Makefile
   lib/algorithms/Makefile
   lib/auth/Makefile
