@@ -37,7 +37,7 @@ libaccelerated_la_SOURCES = accelerated.c cryptodev.c
 libaccelerated_la_LIBADD =
 
 if ASM_X86
-SUBDIRS += intel
+SUBDIRS += x86
 AM_CFLAGS += -DASM_X86
-libaccelerated_la_LIBADD += intel/libintel.la
+libaccelerated_la_LIBADD += x86/libx86.la
 endif
