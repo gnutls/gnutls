@@ -29,6 +29,7 @@
 
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
+#include <locks.h>
 #include <gnutls_num.h>
 #include <nettle/yarrow.h>
 

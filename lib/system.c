@@ -39,6 +39,7 @@
    Windows interfaces. */
 #undef recv
 #undef send
+#undef select
 
 /* System specific function wrappers.
  */

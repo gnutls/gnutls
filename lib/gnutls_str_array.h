@@ -24,6 +24,7 @@
 #define GNUTLS_STR_ARRAY_H
 
 #include <gnutls_int.h>
+#include <gnutls_errors.h>
 
 /* Functionality to allow an array of strings. Strings
  * are allowed to be added to the list and matched against it.
