@@ -149,15 +149,15 @@ padlock_sha1_oneshot:
 	.byte	0xf3,0xc3
 .size	padlock_sha1_oneshot,.-padlock_sha1_oneshot
 
-.globl	padlock_sha1
-.type	padlock_sha1,@function
+.globl	padlock_sha1_blocks
+.type	padlock_sha1_blocks,@function
 .align	16
-padlock_sha1:
+padlock_sha1_blocks:
 	movq	$-1,%rax
 	movq	%rdx,%rcx
 .byte	0xf3,0x0f,0xa6,0xc8	
 	.byte	0xf3,0xc3
-.size	padlock_sha1,.-padlock_sha1
+.size	padlock_sha1_blocks,.-padlock_sha1_blocks
 
 .globl	padlock_sha256_oneshot
 .type	padlock_sha256_oneshot,@function
@@ -169,15 +169,24 @@ padlock_sha256_oneshot:
 	.byte	0xf3,0xc3
 .size	padlock_sha256_oneshot,.-padlock_sha256_oneshot
 
-.globl	padlock_sha256
-.type	padlock_sha256,@function
+.globl	padlock_sha256_blocks
+.type	padlock_sha256_blocks,@function
 .align	16
-padlock_sha256:
+padlock_sha256_blocks:
 	movq	$-1,%rax
 	movq	%rdx,%rcx
 .byte	0xf3,0x0f,0xa6,0xd0	
 	.byte	0xf3,0xc3
-.size	padlock_sha256,.-padlock_sha256
+.size	padlock_sha256_blocks,.-padlock_sha256_blocks
+
+.globl	padlock_sha512_blocks
+.type	padlock_sha512_blocks,@function
+.align	16
+padlock_sha512_blocks:
+	movq	%rdx,%rcx
+.byte	0xf3,0x0f,0xa6,0xe0	
+	.byte	0xf3,0xc3
+.size	padlock_sha512_blocks,.-padlock_sha512_blocks
 .globl	padlock_ecb_encrypt
 .type	padlock_ecb_encrypt,@function
 .align	16
@@ -198,6 +207,7 @@ padlock_ecb_encrypt:
 	xorl	%eax,%eax
 	xorl	%ebx,%ebx
 	testl	$32,(%rdx)
+	jnz	.Lecb_aligned
 	testq	$15,%rdi
 	setz	%al
 	testq	$15,%rsi
@@ -302,6 +312,7 @@ padlock_cbc_encrypt:
 	xorl	%eax,%eax
 	xorl	%ebx,%ebx
 	testl	$32,(%rdx)
+	jnz	.Lcbc_aligned
 	testq	$15,%rdi
 	setz	%al
 	testq	$15,%rsi
@@ -400,4 +411,3 @@ padlock_cbc_encrypt:
 #if defined(__linux__) && defined(__ELF__)
 .section .note.GNU-stack,"",%progbits
 #endif
-

@@ -427,11 +427,11 @@ padlock_sha1_oneshot:
 	popl	%edi
 	ret
 .size	padlock_sha1_oneshot,.-.L_padlock_sha1_oneshot_begin
-.globl	padlock_sha1
-.type	padlock_sha1,@function
+.globl	padlock_sha1_blocks
+.type	padlock_sha1_blocks,@function
 .align	16
-padlock_sha1:
-.L_padlock_sha1_begin:
+padlock_sha1_blocks:
+.L_padlock_sha1_blocks_begin:
 	pushl	%edi
 	pushl	%esi
 	movl	$-1,%eax
@@ -442,7 +442,7 @@ padlock_sha1:
 	popl	%esi
 	popl	%edi
 	ret
-.size	padlock_sha1,.-.L_padlock_sha1_begin
+.size	padlock_sha1_blocks,.-.L_padlock_sha1_blocks_begin
 .globl	padlock_sha256_oneshot
 .type	padlock_sha256_oneshot,@function
 .align	16
@@ -459,11 +459,11 @@ padlock_sha256_oneshot:
 	popl	%edi
 	ret
 .size	padlock_sha256_oneshot,.-.L_padlock_sha256_oneshot_begin
-.globl	padlock_sha256
-.type	padlock_sha256,@function
+.globl	padlock_sha256_blocks
+.type	padlock_sha256_blocks,@function
 .align	16
-padlock_sha256:
-.L_padlock_sha256_begin:
+padlock_sha256_blocks:
+.L_padlock_sha256_blocks_begin:
 	pushl	%edi
 	pushl	%esi
 	movl	$-1,%eax
@@ -474,7 +474,22 @@ padlock_sha256:
 	popl	%esi
 	popl	%edi
 	ret
-.size	padlock_sha256,.-.L_padlock_sha256_begin
+.size	padlock_sha256_blocks,.-.L_padlock_sha256_blocks_begin
+.globl	padlock_sha512_blocks
+.type	padlock_sha512_blocks,@function
+.align	16
+padlock_sha512_blocks:
+.L_padlock_sha512_blocks_begin:
+	pushl	%edi
+	pushl	%esi
+	movl	12(%esp),%edi
+	movl	16(%esp),%esi
+	movl	20(%esp),%ecx
+.byte	243,15,166,224
+	popl	%esi
+	popl	%edi
+	ret
+.size	padlock_sha512_blocks,.-.L_padlock_sha512_blocks_begin
 .byte	86,73,65,32,80,97,100,108,111,99,107,32,120,56,54,32
 .byte	109,111,100,117,108,101,44,32,67,82,89,80,84,79,71,65
 .byte	77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101
