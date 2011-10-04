@@ -55,7 +55,7 @@ gnutls_serv_SOURCES =				\
   common.h common.c				\
   certtool-common.h \
   $(PKCS11_SRCS)
-gnutls_serv_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
+gnutls_serv_LDADD = ../lib/libgnutls.la
 gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la
 gnutls_serv_LDADD += $(LTLIBGCRYPT) $(LIBSOCKET) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-serv.la
@@ -79,7 +79,7 @@ libcmd_psk_la_SOURCES = psk.gaa psk-gaa.h psk-gaa.c
 BENCHMARK_SRCS = benchmark-cipher.c benchmark.c benchmark.h benchmark-tls.c
 
 gnutls_cli_SOURCES = cli.c common.h common.c $(PKCS11_SRCS) $(BENCHMARK_SRCS)
-gnutls_cli_LDADD = ../lib/libgnutls.la ../libextra/libgnutls-extra.la
+gnutls_cli_LDADD = ../lib/libgnutls.la
 gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la
 gnutls_cli_LDADD += $(LTLIBGCRYPT) $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIB_CLOCK_GETTIME)
 noinst_LTLIBRARIES += libcmd-cli.la
