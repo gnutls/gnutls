@@ -2316,10 +2316,7 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
       return rsadsa_get_key_id (crt, pk, output_data, output_data_size);
     }
 
-  /* FIXME: what does this code do here? Isn't identical to the code
-   * in rsadsa_get_key_id?
-   */
-  pubkey.size = 0;
+  len = 0;
   result = asn1_der_coding (crt->cert, "tbsCertificate.subjectPublicKeyInfo",
                             NULL, &len, NULL);
   if (result != ASN1_MEM_ERROR)
