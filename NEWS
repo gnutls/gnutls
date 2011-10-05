@@ -8,6 +8,9 @@ See the end for copying conditions.
 the software version of the ciphers instead of hw accelerated 
 (where available)
 
+** libgnutls: Fixed crash when printing ECDSA certificate key 
+ID. Reported by Erik Jensen.
+
 ** libgnutls: Corrected VIA padlock code for C3. In C3 benchmarks show
 a 2x increase in AES speed and a 14x increase in C7. Added support for
 hashes and HMACs.
