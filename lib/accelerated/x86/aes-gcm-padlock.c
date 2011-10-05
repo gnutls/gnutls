@@ -45,7 +45,6 @@
  * Actually padlock doesn't include GCM mode. We just use
  * the ECB part of padlock and nettle for everything else.
  */
-
 struct gcm_padlock_aes_ctx GCM_CTX(struct padlock_ctx);
 
 static void padlock_aes_encrypt(void *_ctx,
@@ -63,6 +62,9 @@ static void padlock_aes_encrypt(void *_ctx,
 static void padlock_aes_set_encrypt_key(struct padlock_ctx *_ctx,
                                         unsigned length, const uint8_t *key)
 {
+  struct padlock_ctx *ctx = _ctx;
+  ctx->enc = 1;
+  
   padlock_aes_cipher_setkey(_ctx, key, length);
 }
 
@@ -106,7 +108,7 @@ aes_gcm_setiv (void *_ctx, const void *iv, size_t iv_size)
   struct gcm_padlock_aes_ctx *ctx = _ctx;
 
   if (iv_size != GCM_BLOCK_SIZE - 4)
-    return GNUTLS_E_INVALID_REQUEST;
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
   
   GCM_SET_IV(ctx, iv_size, iv);
 
