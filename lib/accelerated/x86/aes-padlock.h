@@ -31,6 +31,9 @@ extern const gnutls_crypto_cipher_st aes_gcm_padlock_struct;
 extern const gnutls_crypto_mac_st hmac_sha_padlock_struct;
 extern const gnutls_crypto_digest_st sha_padlock_struct;
 
+extern const gnutls_crypto_mac_st hmac_sha_padlock_nano_struct;
+extern const gnutls_crypto_digest_st sha_padlock_nano_struct;
+
 int padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize);
 
 /* asm */
@@ -40,7 +43,4 @@ int padlock_ecb_encrypt(void *out, const void *inp,
                         struct padlock_cipher_data *ctx, size_t len);
 int padlock_cbc_encrypt(void *out, const void *inp,
                         struct padlock_cipher_data *ctx, size_t len);
-void padlock_sha1_oneshot(void *ctx, const void *inp, size_t len);
-void padlock_sha256_oneshot(void *ctx, const void *inp, size_t len);
-
 #endif

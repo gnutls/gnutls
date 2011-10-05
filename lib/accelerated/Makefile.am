@@ -41,3 +41,11 @@ SUBDIRS += x86
 AM_CFLAGS += -DASM_X86
 libaccelerated_la_LIBADD += x86/libx86.la
 endif
+
+if ASM_X86_32
+AM_CFLAGS += -DASM_X86_32
+endif
+
+if ASM_X86_64
+AM_CFLAGS += -DASM_X86_64
+endif

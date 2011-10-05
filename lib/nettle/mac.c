@@ -214,6 +214,23 @@ wrap_nettle_hmac_update (void *_ctx, const void *text, size_t textsize)
   return GNUTLS_E_SUCCESS;
 }
 
+static int
+wrap_nettle_hmac_output (void *src_ctx, void *digest, size_t digestsize)
+{
+  struct nettle_hmac_ctx *ctx;
+  ctx = src_ctx;
+
+  if (digestsize < ctx->length)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_SHORT_MEMORY_BUFFER;
+    }
+
+  ctx->digest (ctx->ctx_ptr, digestsize, digest);
+
+  return 0;
+}
+
 static void
 wrap_nettle_hmac_deinit (void *hd)
 {
@@ -389,22 +406,6 @@ wrap_nettle_hash_reset (void *src_ctx)
   _ctx_init(ctx->algo, ctx->ctx_ptr);
 }
 
-static int
-wrap_nettle_hmac_output (void *src_ctx, void *digest, size_t digestsize)
-{
-  struct nettle_hmac_ctx *ctx;
-  ctx = src_ctx;
-
-  if (digestsize < ctx->length)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_SHORT_MEMORY_BUFFER;
-    }
-
-  ctx->digest (ctx->ctx_ptr, digestsize, digest);
-
-  return 0;
-}
 
 gnutls_crypto_mac_st _gnutls_mac_ops = {
   .init = wrap_nettle_hmac_init,

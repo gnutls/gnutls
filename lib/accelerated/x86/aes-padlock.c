@@ -182,6 +182,15 @@ check_phe (void)
   return ((edx & (0x3 << 10)) == (0x3 << 10));
 }
 
+/* We are actually checking for SHA512 */
+static int
+check_phe_block (void)
+{
+  unsigned int edx = padlock_capability ();
+
+  return ((edx & (0x3 << 25)) == (0x3 << 25));
+}
+
 static unsigned
 check_via (void)
 {
@@ -202,12 +211,8 @@ register_padlock_crypto (void)
 {
   int ret;
 
-  /* Only enable the 32-bit padlock variant, until
-   * the 64-bit code is tested.
-   */
   if (check_via () == 0)
     return;
-
   if (check_padlock ())
     {
       _gnutls_debug_log ("Padlock AES accelerator was detected\n");
@@ -256,7 +261,82 @@ register_padlock_crypto (void)
 #endif
     }
 
-  if (check_phe())
+  if (check_phe_block())
+    {
+      ret =
+          gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA1,
+                                             80, &sha_padlock_nano_struct);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+        }
+
+      ret =
+          gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA256,
+                                             80, &sha_padlock_nano_struct);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+        }
+
+      ret =
+          gnutls_crypto_single_mac_register (GNUTLS_MAC_SHA1,
+                                             80, &hmac_sha_padlock_nano_struct);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+        }
+
+      ret =
+          gnutls_crypto_single_mac_register (GNUTLS_MAC_SHA256,
+                                             80, &hmac_sha_padlock_nano_struct);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+        }
+
+      ret =
+          gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA224,
+                                             80, &sha_padlock_nano_struct);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+        }
+
+      ret =
+          gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA384,
+                                             80, &sha_padlock_nano_struct);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+        }
+
+      ret =
+          gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA512,
+                                             80, &sha_padlock_nano_struct);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+        }
+
+      ret =
+          gnutls_crypto_single_mac_register (GNUTLS_MAC_SHA384,
+                                             80, &hmac_sha_padlock_nano_struct);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+        }
+
+      ret =
+          gnutls_crypto_single_mac_register (GNUTLS_MAC_SHA512,
+                                             80, &hmac_sha_padlock_nano_struct);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+        }
+
+    }
+  else if (check_phe())
     {
       ret =
           gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA1,
@@ -290,6 +370,7 @@ register_padlock_crypto (void)
           gnutls_assert ();
         }
     }
+
 
   return;
 }

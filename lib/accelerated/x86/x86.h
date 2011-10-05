@@ -22,7 +22,7 @@
 
 #include <config.h>
 
-#if defined(ASM_X86_32) || defined(ASM_X86_64)
+#if defined(ASM_X86)
 
 void _gnutls_cpuid(unsigned int func, unsigned int *ax, unsigned int *bx, unsigned int *cx, unsigned int* dx);
 
