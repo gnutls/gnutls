@@ -31,7 +31,7 @@
 #include <assert.h>
 #include <sha-padlock.h>
 
-#ifdef ENABLE_NETTLE
+#ifdef HAVE_LIBNETTLE
 
 typedef void (*update_func) (void *, unsigned, const uint8_t *);
 typedef void (*digest_func) (void *, unsigned, uint8_t *);
@@ -412,4 +412,4 @@ const gnutls_crypto_digest_st sha_padlock_nano_struct = {
   .fast = wrap_padlock_hash_fast,
 };
 
-#endif /* ENABLE_NETTLE */
+#endif /* HAVE_LIBNETTLE */

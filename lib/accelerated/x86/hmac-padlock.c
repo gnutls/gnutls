@@ -33,7 +33,7 @@
 #include <assert.h>
 #include <sha-padlock.h>
 
-#ifdef ENABLE_NETTLE
+#ifdef HAVE_LIBNETTLE
 
 #define IPAD 0x36
 #define OPAD 0x5c
@@ -370,4 +370,4 @@ const gnutls_crypto_mac_st hmac_sha_padlock_nano_struct = {
     .fast = wrap_padlock_hmac_fast,
 };
 
-#endif /* ENABLE_NETTLE */
+#endif /* HAVE_LIBNETTLE */

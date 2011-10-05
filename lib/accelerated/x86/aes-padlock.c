@@ -184,7 +184,7 @@ check_phe (void)
 
 /* We are actually checking for SHA512 */
 static int
-check_phe_block (void)
+check_phe_sha512 (void)
 {
   unsigned int edx = padlock_capability ();
 
@@ -209,7 +209,7 @@ check_via (void)
 void
 register_padlock_crypto (void)
 {
-  int ret;
+  int ret, phe;
 
   if (check_via () == 0)
     return;
@@ -217,8 +217,8 @@ register_padlock_crypto (void)
     {
       _gnutls_debug_log ("Padlock AES accelerator was detected\n");
       ret =
-          gnutls_crypto_single_cipher_register
-          (GNUTLS_CIPHER_AES_128_CBC, 80, &aes_padlock_struct);
+        gnutls_crypto_single_cipher_register
+        (GNUTLS_CIPHER_AES_128_CBC, 80, &aes_padlock_struct);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -226,33 +226,32 @@ register_padlock_crypto (void)
 
       /* register GCM ciphers */
       ret =
-          gnutls_crypto_single_cipher_register
-          (GNUTLS_CIPHER_AES_128_GCM, 80, &aes_gcm_padlock_struct);
+        gnutls_crypto_single_cipher_register
+        (GNUTLS_CIPHER_AES_128_GCM, 80, &aes_gcm_padlock_struct);
       if (ret < 0)
         {
           gnutls_assert ();
         }
 #ifdef HAVE_LIBNETTLE
       ret =
-          gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_192_CBC,
-                                                80, &aes_padlock_struct);
+        gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_192_CBC,
+                                              80, &aes_padlock_struct);
       if (ret < 0)
         {
           gnutls_assert ();
         }
 
       ret =
-          gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_256_CBC,
-                                                80, &aes_padlock_struct);
+        gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_256_CBC,
+                                              80, &aes_padlock_struct);
       if (ret < 0)
         {
           gnutls_assert ();
         }
 
       ret =
-          gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_256_GCM,
-                                                80,
-                                                &aes_gcm_padlock_struct);
+        gnutls_crypto_single_cipher_register (GNUTLS_CIPHER_AES_256_GCM,
+                                              80, &aes_gcm_padlock_struct);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -261,116 +260,129 @@ register_padlock_crypto (void)
 #endif
     }
 
-  if (check_phe_block())
+#ifdef HAVE_LIBNETTLE
+  phe = check_phe ();
+
+  if (is_padlock_nano () && phe)
     {
+      if (check_phe_sha512 ())
+        {
+          ret =
+            gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA384,
+                                                  80,
+                                                  &sha_padlock_nano_struct);
+          if (ret < 0)
+            {
+              gnutls_assert ();
+            }
+
+          ret =
+            gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA512,
+                                                  80,
+                                                  &sha_padlock_nano_struct);
+          if (ret < 0)
+            {
+              gnutls_assert ();
+            }
+
+          ret =
+            gnutls_crypto_single_mac_register (GNUTLS_MAC_SHA384,
+                                               80,
+                                               &hmac_sha_padlock_nano_struct);
+          if (ret < 0)
+            {
+              gnutls_assert ();
+            }
+
+          ret =
+            gnutls_crypto_single_mac_register (GNUTLS_MAC_SHA512,
+                                               80,
+                                               &hmac_sha_padlock_nano_struct);
+          if (ret < 0)
+            {
+              gnutls_assert ();
+            }
+        }
+
       ret =
-          gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA1,
-                                             80, &sha_padlock_nano_struct);
+        gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA1,
+                                              80, &sha_padlock_nano_struct);
       if (ret < 0)
         {
           gnutls_assert ();
         }
 
       ret =
-          gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA256,
-                                             80, &sha_padlock_nano_struct);
+        gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA224,
+                                              80, &sha_padlock_nano_struct);
       if (ret < 0)
         {
           gnutls_assert ();
         }
 
       ret =
-          gnutls_crypto_single_mac_register (GNUTLS_MAC_SHA1,
-                                             80, &hmac_sha_padlock_nano_struct);
+        gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA256,
+                                              80, &sha_padlock_nano_struct);
       if (ret < 0)
         {
           gnutls_assert ();
         }
 
       ret =
-          gnutls_crypto_single_mac_register (GNUTLS_MAC_SHA256,
-                                             80, &hmac_sha_padlock_nano_struct);
+        gnutls_crypto_single_mac_register (GNUTLS_MAC_SHA1,
+                                           80, &hmac_sha_padlock_nano_struct);
       if (ret < 0)
         {
           gnutls_assert ();
         }
 
-      ret =
-          gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA224,
-                                             80, &sha_padlock_nano_struct);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-        }
+      /* we don't register MAC_SHA224 because it is not used by TLS */
 
       ret =
-          gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA384,
-                                             80, &sha_padlock_nano_struct);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-        }
-
-      ret =
-          gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA512,
-                                             80, &sha_padlock_nano_struct);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-        }
-
-      ret =
-          gnutls_crypto_single_mac_register (GNUTLS_MAC_SHA384,
-                                             80, &hmac_sha_padlock_nano_struct);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-        }
-
-      ret =
-          gnutls_crypto_single_mac_register (GNUTLS_MAC_SHA512,
-                                             80, &hmac_sha_padlock_nano_struct);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-        }
-
-    }
-  else if (check_phe())
-    {
-      ret =
-          gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA1,
-                                             80, &sha_padlock_struct);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-        }
-
-      ret =
-          gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA256,
-                                             80, &sha_padlock_struct);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-        }
-
-      ret =
-          gnutls_crypto_single_mac_register (GNUTLS_MAC_SHA1,
-                                             80, &hmac_sha_padlock_struct);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-        }
-
-      ret =
-          gnutls_crypto_single_mac_register (GNUTLS_MAC_SHA256,
-                                             80, &hmac_sha_padlock_struct);
+        gnutls_crypto_single_mac_register (GNUTLS_MAC_SHA256,
+                                           80, &hmac_sha_padlock_nano_struct);
       if (ret < 0)
         {
           gnutls_assert ();
         }
     }
+  else if (phe)
+    {
+      /* Original padlock PHE. Does not support incremental operations.
+       */
+      ret =
+        gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA1,
+                                              80, &sha_padlock_struct);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+        }
 
+      ret =
+        gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA256,
+                                              80, &sha_padlock_struct);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+        }
+
+      ret =
+        gnutls_crypto_single_mac_register (GNUTLS_MAC_SHA1,
+                                           80, &hmac_sha_padlock_struct);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+        }
+
+      ret =
+        gnutls_crypto_single_mac_register (GNUTLS_MAC_SHA256,
+                                           80, &hmac_sha_padlock_struct);
+      if (ret < 0)
+        {
+          gnutls_assert ();
+        }
+    }
+#endif
 
   return;
 }
