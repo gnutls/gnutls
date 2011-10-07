@@ -790,7 +790,7 @@ gnutls_certificate_activation_time_peers (gnutls_session_t session)
  * can be used to store application-specific data needed in the
  * callback function.  See also gnutls_sign_callback_get().
  *
- * Deprecated: Use the PKCS 11 interfaces instead.
+ * Deprecated: Use the PKCS 11 or #gnutls_privkey_t interfacess instead.
  */
 void
 gnutls_sign_callback_set (gnutls_session_t session,

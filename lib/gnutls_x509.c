@@ -1100,6 +1100,83 @@ cleanup:
 }
 
 /**
+ * gnutls_certificate_set_key:
+ * @res: is a #gnutls_certificate_credentials_t structure.
+ * @name: is the DNS name of the certificate (NULL if none)
+ * @pcert_list: contains a certificate list (path) for the specified private key
+ * @pcert_list_size: holds the size of the certificate list
+ * @key: is a gnutls_x509_privkey_t key
+ *
+ * This function sets a certificate/private key pair in the
+ * gnutls_certificate_credentials_t structure.  This function may be
+ * called more than once, in case multiple keys/certificates exist for
+ * the server.  For clients that wants to send more than its own end
+ * entity certificate (e.g., also an intermediate CA cert) then put
+ * the certificate chain in @pcert_list. The @pcert_list and @key will
+ * become part of the credentials structure and must not
+ * be deallocated. They will be automatically deallocated when
+ * @res is deinitialized.
+ *
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ *
+ * Since: 3.0.0
+ **/
+int
+gnutls_certificate_set_key (gnutls_certificate_credentials_t res,
+                            const char** names,
+                            int names_size,
+                            gnutls_pcert_st * pcert_list,
+                            int pcert_list_size,
+                            gnutls_privkey_t key)
+{
+  int ret, i;
+  gnutls_str_array_t str_names;
+  
+  _gnutls_str_array_init(&str_names);
+
+  if (names != NULL && names_size > 0)
+    {
+      for (i=0;i<names_size;i++)
+        {
+          ret = _gnutls_str_array_append(&str_names, names[i], strlen(names[i]));
+          if (ret < 0)
+            {
+              ret = gnutls_assert_val(ret);
+              goto cleanup;
+            }
+        }
+    }
+
+  ret = certificate_credentials_append_pkey (res, key);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  ret = certificate_credential_append_crt_list (res, str_names, pcert_list, pcert_list_size);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  res->ncerts++;
+
+  if ((ret = _gnutls_check_key_cert_match (res)) < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  return 0;
+  
+cleanup:
+  _gnutls_str_array_clear(&str_names);
+  return ret;
+}
+
+/**
  * gnutls_certificate_set_x509_key_file:
  * @res: is a #gnutls_certificate_credentials_t structure.
  * @certfile: is a file that containing the certificate list (path) for

@@ -47,6 +47,11 @@ struct gnutls_privkey_st
 #ifdef ENABLE_OPENPGP
     gnutls_openpgp_privkey_t openpgp;
 #endif
+    struct {
+      gnutls_privkey_sign_func sign_func;
+      gnutls_privkey_decrypt_func decrypt_func;
+      void* userdata;
+    } ext;
   } key;
 
   unsigned int flags;
@@ -101,6 +106,10 @@ gnutls_privkey_get_pk_algorithm (gnutls_privkey_t key, unsigned int *bits)
       if (bits)
         *bits = _gnutls_mpi_get_nbits (key->key.x509->params.params[0]);
       return gnutls_x509_privkey_get_pk_algorithm (key->key.x509);
+    case GNUTLS_PRIVKEY_EXT:
+      if (bits)
+        *bits = 0;
+      return key->pk_algorithm;
     default:
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -358,6 +367,54 @@ int ret;
 }
 
 #endif /* ENABLE_PKCS11 */
+
+/**
+ * gnutls_privkey_import_ext:
+ * @pkey: The private key
+ * @pk: The public key algorithm
+ * @userdata: private data to be provided to the callbacks
+ * @sign_func: callback for signature operations
+ * @decrypt_func: callback for decryption operations
+ * @flags: Flags for the import
+ *
+ * This function will associate the given callbacks with the
+ * #gnutls_privkey_t structure. At least one of the two callbacks
+ * must be non-null.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.0.0
+ **/
+int
+gnutls_privkey_import_ext (gnutls_privkey_t pkey,
+                           gnutls_pk_algorithm_t pk,
+                           void* userdata,
+                           gnutls_privkey_sign_func sign_func,
+                           gnutls_privkey_decrypt_func decrypt_func,
+                           unsigned int flags)
+{
+int ret;
+
+  ret = check_if_clean(pkey);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+  
+  if (sign_func == NULL && decrypt_func == NULL)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  pkey->key.ext.sign_func = sign_func;
+  pkey->key.ext.decrypt_func = decrypt_func;
+  pkey->key.ext.userdata = userdata;
+  pkey->type = GNUTLS_PRIVKEY_EXT;
+  pkey->pk_algorithm = pk;
+  pkey->flags = flags;
+
+  return 0;
+}
 
 /**
  * gnutls_privkey_import_x509:
@@ -646,6 +703,10 @@ _gnutls_privkey_sign_hash (gnutls_privkey_t key,
       return _gnutls_soft_sign (key->key.x509->pk_algorithm,
                                 &key->key.x509->params,
                                 hash, signature);
+    case GNUTLS_PRIVKEY_EXT:
+      if (key->key.ext.sign_func == NULL)
+        return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+      return key->key.ext.sign_func(key, key->key.ext.userdata, hash, signature);
     default:
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -696,6 +757,11 @@ gnutls_privkey_decrypt_data (gnutls_privkey_t key,
                                                  flags,
                                                  ciphertext, plaintext);
 #endif
+    case GNUTLS_PRIVKEY_EXT:
+      if (key->key.ext.decrypt_func == NULL)
+        return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+      return key->key.ext.decrypt_func(key, key->key.ext.userdata, ciphertext, plaintext);
     default:
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;

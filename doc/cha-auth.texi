@@ -83,7 +83,8 @@ certificate certifies the one before it. The trusted authority's
 certificate need not to be included, since the peer should possess it
 already.
 
-@showfuncE{gnutls_certificate_set_x509_key,gnutls_certificate_set_x509_key_mem,gnutls_certificate_set_openpgp_key,gnutls_certificate_set_openpgp_key_file,gnutls_certificate_set_openpgp_key_mem}
+@showfuncD{gnutls_certificate_set_x509_key_mem,gnutls_certificate_set_openpgp_key,gnutls_certificate_set_openpgp_key_file,gnutls_certificate_set_openpgp_key_mem}
+@showfuncB{gnutls_certificate_set_x509_key,gnutls_certificate_set_key}
 
 @showfuncdesc{gnutls_certificate_set_x509_key_file}
 

@@ -37,6 +37,15 @@ typedef struct gnutls_pubkey_st *gnutls_pubkey_t;
 struct gnutls_privkey_st;
 typedef struct gnutls_privkey_st *gnutls_privkey_t;
 
+typedef int (*gnutls_privkey_sign_func) (gnutls_privkey_t key,
+                                         void *userdata,
+                                         const gnutls_datum_t * raw_data,
+                                         gnutls_datum_t * signature);
+typedef int (*gnutls_privkey_decrypt_func) (gnutls_privkey_t key,
+                                            void *userdata,
+                                            const gnutls_datum_t * ciphertext,
+                                            gnutls_datum_t * plaintext);
+
 int gnutls_pubkey_init (gnutls_pubkey_t * key);
 void gnutls_pubkey_deinit (gnutls_pubkey_t key);
 int gnutls_pubkey_get_pk_algorithm (gnutls_pubkey_t key, unsigned int *bits);
@@ -157,6 +166,13 @@ int gnutls_privkey_import_x509 (gnutls_privkey_t pkey,
 int gnutls_privkey_import_openpgp (gnutls_privkey_t pkey,
                                    gnutls_openpgp_privkey_t key,
                                    unsigned int flags);
+int
+gnutls_privkey_import_ext (gnutls_privkey_t pkey,
+                           gnutls_pk_algorithm_t pk,
+                           void* userdata,
+                           gnutls_privkey_sign_func sign_func,
+                           gnutls_privkey_decrypt_func decrypt_func,
+                           unsigned int flags);
 
 int gnutls_privkey_sign_data (gnutls_privkey_t signer,
                               gnutls_digest_algorithm_t hash,
@@ -252,9 +268,16 @@ void gnutls_pcert_deinit (gnutls_pcert_st* pcert);
                                                     gnutls_privkey_t *privkey);
 
 
-  void gnutls_certificate_set_retrieve_function2
-    (gnutls_certificate_credentials_t cred,
-     gnutls_certificate_retrieve_function2 * func);
+void gnutls_certificate_set_retrieve_function2
+  (gnutls_certificate_credentials_t cred,
+   gnutls_certificate_retrieve_function2 * func);
 
+int
+gnutls_certificate_set_key (gnutls_certificate_credentials_t res,
+                            const char** name,
+                            int name_size,
+                            gnutls_pcert_st * pcert_list,
+                            int pcert_list_size,
+                            gnutls_privkey_t key);
 
 #endif

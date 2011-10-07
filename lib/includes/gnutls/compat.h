@@ -192,7 +192,7 @@ void
    func) _GNUTLS_GCC_ATTR_DEPRECATED;
 
   /* External signing callback.  No longer supported because it
-   * was deprecated by the PKCS #11 API. */
+   * was deprecated by the PKCS #11 API and gnutls_privkey_t. */
 typedef int (*gnutls_sign_func) (gnutls_session_t session,
                                  void *userdata,
                                  gnutls_certificate_type_t cert_type,

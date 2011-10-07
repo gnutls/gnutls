@@ -620,6 +620,10 @@ call_get_cert_callback (gnutls_session_t session,
             }
         }
       break;
+    default:
+      gnutls_assert();
+      ret = GNUTLS_E_INVALID_REQUEST;
+      goto cleanup;
     }
 
   _gnutls_selected_certs_set (session, local_certs,

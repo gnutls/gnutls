@@ -24,8 +24,13 @@ Used to get the PKIX Authority Information Access (AIA) field.
 
 ** libgnutls: gnutls_x509_crt_print supports printing AIA fields.
 
+** libgnutls: Added ability to gnutls_privkey_t to operate with
+signing callback function.
+
 ** API and ABI modifications:
 gnutls_x509_crt_get_authority_info_access (x509.h): Added function.
+gnutls_privkey_import_ext: Added function.
+gnutls_certificate_set_key: Added function.
 gnutls_info_access_what_t (x509.h): Added enum.
 GNUTLS_OID_AIA (x509.h): Added symbol.
 GNUTLS_OID_AD_OCSP (x509.h): Added symbol.

@@ -1468,6 +1468,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
  * @GNUTLS_PRIVKEY_X509: X.509 private key, #gnutls_x509_privkey_t.
  * @GNUTLS_PRIVKEY_OPENPGP: OpenPGP private key, #gnutls_openpgp_privkey_t.
  * @GNUTLS_PRIVKEY_PKCS11: PKCS11 private key, #gnutls_pkcs11_privkey_t.
+ * @GNUTLS_PRIVKEY_EXT: External private key, operating using callbacks.
  *
  * Enumeration of different private key types.
  */
@@ -1475,7 +1476,8 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
     {
       GNUTLS_PRIVKEY_X509,
       GNUTLS_PRIVKEY_OPENPGP,
-      GNUTLS_PRIVKEY_PKCS11
+      GNUTLS_PRIVKEY_PKCS11,
+      GNUTLS_PRIVKEY_EXT
     } gnutls_privkey_type_t;
 
   typedef struct gnutls_retr2_st
