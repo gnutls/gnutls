@@ -225,15 +225,41 @@ sign_tls_hash (gnutls_session_t session, gnutls_digest_algorithm_t hash_algo,
             return GNUTLS_E_KEY_USAGE_VIOLATION;
           }
 
-      /* External signing. */
+      /* External signing. Deprecated. To be removed. */
       if (!pkey)
         {
+          int ret;
+
           if (!session->internals.sign_func)
             return gnutls_assert_val(GNUTLS_E_INSUFFICIENT_CREDENTIALS);
 
-          return (*session->internals.sign_func)
-            (session, session->internals.sign_func_userdata,
-             cert->type, &cert->cert, hash_concat, signature);
+          if (!_gnutls_version_has_selectable_sighash (ver))
+            return (*session->internals.sign_func)
+              (session, session->internals.sign_func_userdata,
+               cert->type, &cert->cert, hash_concat, signature);
+          else
+            {
+              gnutls_datum_t digest;
+
+              ret = _gnutls_set_datum(&digest, hash_concat->data, hash_concat->size);
+              if (ret < 0)
+                return gnutls_assert_val(ret);
+              
+              ret = pk_prepare_hash (gnutls_privkey_get_pk_algorithm(pkey, NULL), hash_algo, &digest);
+              if (ret < 0)
+                {
+                  gnutls_assert ();
+                  goto es_cleanup;
+                }
+
+              ret = (*session->internals.sign_func)
+                (session, session->internals.sign_func_userdata,
+                 cert->type, &cert->cert, &digest, signature);
+es_cleanup:
+              gnutls_free(digest.data);
+              
+              return ret;
+            }
         }
     }
 

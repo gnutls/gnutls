@@ -8,6 +8,9 @@ See the end for copying conditions.
 the software version of the ciphers instead of hw accelerated 
 (where available)
 
+** libgnutls: Fixes to enable external signing callback to
+operate with TLS 1.2. 
+
 ** libgnutls: Fixed crash when printing ECDSA certificate key 
 ID. Reported by Erik Jensen.
 
