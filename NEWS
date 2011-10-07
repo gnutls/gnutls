@@ -7,6 +7,9 @@ Version 2.12.12 (unreleased)
 
 ** gnulib: updated
 
+** libgnutls: Fixes to enable external signing callback to
+operate with TLS 1.2. 
+
 ** API and ABI modifications:
 No changes since last version.
 
