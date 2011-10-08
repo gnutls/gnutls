@@ -360,8 +360,23 @@ struct hash_vectors_st
       .output =
             (uint8_t *)
             "\x8f\x82\x03\x94\xf9\x53\x35\x18\x20\x45\xda\x24\xf3\x4d\xe5\x2b\xf8\xbc\x34\x32",
-      .output_size = 20,}
-    ,
+      .output_size = 20,
+    },
+    {
+      .name = "SHA1",
+      .algorithm = GNUTLS_MAC_SHA1,
+      .key = NULL,
+      .plaintext =
+            (uint8_t *)
+            "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqabcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqabcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
+      .plaintext_size = sizeof
+            ("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqabcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqabcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq")
+            - 1,
+      .output =
+            (uint8_t *)
+            "\xbe\xae\xd1\x6d\x65\x8e\xc7\x92\x9e\xdf\xd6\x2b\xfa\xfe\xac\x29\x9f\x0d\x74\x4d",
+      .output_size = 20,
+    },
     {
       .name = "SHA256",
       .algorithm = GNUTLS_MAC_SHA256,
@@ -375,6 +390,21 @@ struct hash_vectors_st
       .output =
             (uint8_t *)
             "\x24\x8d\x6a\x61\xd2\x06\x38\xb8\xe5\xc0\x26\x93\x0c\x3e\x60\x39\xa3\x3c\xe4\x59\x64\xff\x21\x67\xf6\xec\xed\xd4\x19\xdb\x06\xc1",
+      .output_size = 32,
+    },
+    {
+      .name = "SHA256",
+      .algorithm = GNUTLS_MAC_SHA256,
+      .key = NULL,
+      .plaintext =
+            (uint8_t *)
+            "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqabcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqabcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
+      .plaintext_size = sizeof
+            ("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqabcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopqabcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq")
+            - 1,
+      .output =
+            (uint8_t *)
+            "\x50\xea\x82\x5d\x96\x84\xf4\x22\x9c\xa2\x9f\x1f\xec\x51\x15\x93\xe2\x81\xe4\x6a\x14\x0d\x81\xe0\x00\x5f\x8f\x68\x86\x69\xa0\x6c",
       .output_size = 32,
     },
     {
@@ -462,13 +492,34 @@ test_hash (void)
           /* import key */
           if (hash_vectors[i].key != NULL)
             {
+                gnutls_hmac_hd_t hd;
+                ret = gnutls_hmac_init( &hd, hash_vectors[i].algorithm, hash_vectors[i].key, hash_vectors[i].key_size);
+                if (ret < 0)
+                  {
+                      fprintf (stderr, "Error: %s:%d\n", __func__,
+                               __LINE__);
+                      return 1;
+                  }
 
-                ret = gnutls_hmac_fast (hash_vectors[i].algorithm,
-                                        hash_vectors[i].key,
-                                        hash_vectors[i].key_size,
-                                        hash_vectors[i].plaintext,
-                                        hash_vectors[i].plaintext_size,
-                                        data);
+                ret = gnutls_hmac(hd, hash_vectors[i].plaintext, hash_vectors[i].plaintext_size-1);
+                if (ret < 0)
+                  {
+                      fprintf (stderr, "Error: %s:%d\n", __func__,
+                               __LINE__);
+                      return 1;
+                  }
+
+                ret = gnutls_hmac(hd, &hash_vectors[i].plaintext[hash_vectors[i].plaintext_size-1], 1);
+                if (ret < 0)
+                  {
+                      fprintf (stderr, "Error: %s:%d\n", __func__,
+                               __LINE__);
+                      return 1;
+                  }
+
+                gnutls_hmac_output(hd, data);
+                gnutls_hmac_deinit(hd, NULL);
+
                 data_size =
                     gnutls_hmac_get_len (hash_vectors[i].algorithm);
                 if (ret < 0)
@@ -480,10 +531,38 @@ test_hash (void)
             }
           else
             {
-                ret = gnutls_hash_fast (hash_vectors[i].algorithm,
+                gnutls_hash_hd_t hd;
+                ret = gnutls_hash_init( &hd, hash_vectors[i].algorithm);
+                if (ret < 0)
+                  {
+                      fprintf (stderr, "Error: %s:%d\n", __func__,
+                               __LINE__);
+                      return 1;
+                  }
+                
+                ret = gnutls_hash (hd,
                                         hash_vectors[i].plaintext,
-                                        hash_vectors[i].plaintext_size,
-                                        data);
+                                        1);
+                if (ret < 0)
+                  {
+                      fprintf (stderr, "Error: %s:%d\n", __func__,
+                               __LINE__);
+                      return 1;
+                  }
+
+                ret = gnutls_hash (hd,
+                                        &hash_vectors[i].plaintext[1],
+                                        hash_vectors[i].plaintext_size-1);
+                if (ret < 0)
+                  {
+                      fprintf (stderr, "Error: %s:%d\n", __func__,
+                               __LINE__);
+                      return 1;
+                  }
+
+                gnutls_hash_output(hd, data);
+                gnutls_hash_deinit(hd, NULL);
+                
                 data_size =
                     gnutls_hash_get_len (hash_vectors[i].algorithm);
                 if (ret < 0)
