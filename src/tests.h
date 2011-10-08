@@ -42,3 +42,8 @@ test_code_t test_version_oob (gnutls_session_t session);
 test_code_t test_zlib (gnutls_session_t session);
 int _test_srp_username_callback (gnutls_session_t session,
                                  char **username, char **password);
+
+test_code_t test_ecdhe_curve (gnutls_session_t session);
+test_code_t test_ecdhe (gnutls_session_t session);
+test_code_t test_aes_gcm (gnutls_session_t session);
+test_code_t test_sha256 (gnutls_session_t session);
