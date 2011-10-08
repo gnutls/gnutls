@@ -12,9 +12,7 @@ test_code_t test_dhe (gnutls_session_t state);
 test_code_t test_dhe_group (gnutls_session_t state);
 test_code_t test_ssl3 (gnutls_session_t state);
 test_code_t test_aes (gnutls_session_t state);
-#ifdef	ENABLE_CAMELLIA
 test_code_t test_camellia (gnutls_session_t state);
-#endif
 test_code_t test_md5 (gnutls_session_t state);
 test_code_t test_sha (gnutls_session_t state);
 test_code_t test_3des (gnutls_session_t state);

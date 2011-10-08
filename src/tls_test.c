@@ -138,10 +138,8 @@ static const TLS_TEST tls_tests[] = {
    "dunno"},
   {"for AES-CBC cipher support", test_aes, "yes", "no",
    "dunno"},
-#ifdef	ENABLE_CAMELLIA
   {"for CAMELLIA cipher support", test_camellia, "yes", "no",
    "dunno"},
-#endif
   {"for 3DES-CBC cipher support", test_3des, "yes", "no", "dunno"},
   {"for ARCFOUR 128 cipher support", test_arcfour, "yes", "no", "dunno"},
   {"for ARCFOUR 40 cipher support", test_arcfour_40, "yes", "no",

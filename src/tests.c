@@ -504,7 +504,6 @@ test_code_t test_aes_gcm (gnutls_session_t session)
   return ret;
 }
 
-#ifdef	ENABLE_CAMELLIA
 test_code_t
 test_camellia (gnutls_session_t session)
 {
@@ -520,7 +519,6 @@ test_camellia (gnutls_session_t session)
   ret = do_handshake (session);
   return ret;
 }
-#endif
 
 test_code_t
 test_openpgp1 (gnutls_session_t session)
@@ -549,18 +547,10 @@ test_unknown_ciphersuites (gnutls_session_t session)
 {
   int ret;
 
-
-#ifdef	ENABLE_CAMELLIA
-  sprintf (prio_str,
-           INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
-           ":" ALL_KX ":%s", protocol_str, rest);
-  _gnutls_priority_set_direct (session, prio_str);
-#else
   sprintf (prio_str,
            INIT_STR "+AES-128-CBC:" ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES
            ":%s:" ALL_MACS ":" ALL_KX ":%s", protocol_str, rest);
   _gnutls_priority_set_direct (session, prio_str);
-#endif
 
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
 
