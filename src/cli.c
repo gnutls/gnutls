@@ -342,7 +342,7 @@ load_keys (void)
 
       if (info.pgp_subkey != NULL)
         {
-          uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
+          unsigned char keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
           if (strcasecmp (info.pgp_subkey, "auto") == 0)
             {
