@@ -107,16 +107,16 @@ do_handshake (gnutls_session_t session)
 
 char protocol_str[] = "+VERS-TLS1.0:+VERS-SSL3.0";
 char protocol_all_str[] = "+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0";
-char prio_str[256] = "";
+char prio_str[512] = "";
 
 #define ALL_CIPHERS "+3DES-CBC:+ARCFOUR-128:+ARCFOUR-40"
 #define BLOCK_CIPHERS "+3DES-CBC:+AES-128-CBC"
 #define ALL_COMP "+COMP-NULL"
 #define ALL_MACS "+SHA1:+MD5"
 #define ALL_CERTTYPES "+CTYPE-X509"
-#define ALL_KX "+RSA:+DHE-RSA:+DHE-DSS:+ANON-DH:+RSA-EXPORT:+ECDHE-RSA:+ECDHE-ECDSA:+ANON-ECDH:+CURVE-ALL"
+#define ALL_KX "+RSA:+DHE-RSA:+DHE-DSS:+ANON-DH:+RSA-EXPORT:+ECDHE-RSA:+ECDHE-ECDSA:+ANON-ECDH"
 #define INIT_STR "NONE:"
-char rest[128] = "%UNSAFE_RENEGOTIATION";
+char rest[128] = "%UNSAFE_RENEGOTIATION:+SIGN-ALL:+CURVE-ALL";
 
 static inline void
 _gnutls_priority_set_direct (gnutls_session_t session, const char *str)
@@ -384,7 +384,7 @@ test_ecdhe_curve (gnutls_session_t session)
   if (curve == GNUTLS_ECC_CURVE_INVALID)
     return TEST_IGNORE;
 
-  printf ("\n Curve %s\n", gnutls_ecc_curve_get_name(curve));
+  printf ("\n Curve %s", gnutls_ecc_curve_get_name(curve));
 
   return TEST_SUCCEED;
 }
@@ -494,7 +494,7 @@ test_code_t test_aes_gcm (gnutls_session_t session)
   int ret;
 
   sprintf (prio_str, INIT_STR
-           "+AES-128-GCM:+AES-256-GCM:" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
+           "+AES-128-GCM:+AES-256-GCM:+AEAD:" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
            ":" ALL_KX ":%s", protocol_all_str, rest);
   _gnutls_priority_set_direct (session, prio_str);
 
