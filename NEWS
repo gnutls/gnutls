@@ -4,9 +4,20 @@ See the end for copying conditions.
 
 * Version 3.0.4 (unreleased)
 
+** gnutls-cli-debug: Added more tests including AES-GCM,
+SHA256 and elliptic curves.
+
 ** gnutls-cli: Added --benchmark-soft-ciphers to benchmark
 the software version of the ciphers instead of hw accelerated 
 (where available)
+
+** libgnutls: gnutls_privkey_t allows setting external callback
+to perform signing or decryption. Can be set using
+gnutls_privkey_import_ext()
+
+** libgnutls: A certificate credentials structure can be
+used with a gnutls_privkey_t and a gnutls_pcert_st
+structures using gnutls_certificate_set_key().
 
 ** libgnutls: Fixes to enable external signing callback to
 operate with TLS 1.2. 
@@ -14,9 +25,9 @@ operate with TLS 1.2.
 ** libgnutls: Fixed crash when printing ECDSA certificate key 
 ID. Reported by Erik Jensen.
 
-** libgnutls: Corrected VIA padlock code for C3. In C3 benchmarks show
-a 2x increase in AES speed and a 14x increase in C7. Added support for
-hashes and HMACs.
+** libgnutls: Corrected VIA padlock code for C3. In C3 benchmarks 
+show a 2x increase in AES speed and a 14x increase in VIA nano. Added 
+support for hashes and HMACs.
 
 ** libgnutls: Compilation fixed when p11-kit is not detected.
 

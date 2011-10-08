@@ -505,8 +505,7 @@ Clients can enable support for TLS tickets with
 @funcref{gnutls_session_ticket_enable_client} and servers use
 @funcref{gnutls_session_ticket_key_generate} to generate a key and
 @funcref{gnutls_session_ticket_enable_server} to enable the extension.
-Clients resume sessions using the ticket using the normal session
-resume functions, @ref{resume}.
+Clients resume sessions using the normal session resumption procedure (see @ref{resume}).
 
 @showfuncdesc{gnutls_session_ticket_key_generate}
 
