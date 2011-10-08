@@ -23,27 +23,23 @@ include:
 
 @item Support for handling and verification of certificates.
 
-@item Support for @acronym{SRP} for TLS authentication.
+@item Support for password authentication using @acronym{TLS-SRP}.
 
-@item Support for @acronym{PSK} for TLS authentication.
+@item Support for keyed authentication using @acronym{TLS-PSK}.
 
-@item Support for TLS safe renegotiation.
-
-@item Support for @acronym{PKCS} #11 tokens.
+@item Support for @acronym{PKCS} #11 tokens and smart-cards.
 
 @end itemize
 
-@acronym{GnuTLS} consists of three independent parts, namely the ``TLS
+The @acronym{GnuTLS} library consists of three independent parts, namely the ``TLS
 protocol part'', the ``Certificate part'', and the ``Cryptographic
 back-end'' part.  The ``TLS protocol part'' is the actual protocol
 implementation, and is entirely implemented within the
 @acronym{GnuTLS} library.  The ``Certificate part'' consists of the
-certificate parsing, and verification functions which is partially
-implemented in the @acronym{GnuTLS} library.  The
-libtasn1@footnote{@url{http://www.gnu.org/software/libtasn1/}},
-a library which offers @acronym{ASN.1} parsing capabilities, is used
-for the @acronym{X.509} certificate parsing functions.  
-The ``Cryptographic back-end'' is provided by nettle@footnote{@url{http://www.lysator.liu.se/~nisse/nettle/}}
+certificate parsing, and verification functions and it uses
+functionality from the
+libtasn1@footnote{@url{http://www.gnu.org/software/libtasn1/}} library.
+The ``Cryptographic back-end'' is provided by the nettle@footnote{@url{http://www.lysator.liu.se/~nisse/nettle/}}
 library. 
 @menu
 * Downloading and installing::
@@ -114,10 +110,10 @@ having seen the examples at @ref{examples}.
 As shown in the figure, there is a read-only global state that is
 initialized once by the global initialization function.  This global
 structure, among others, contains the memory allocation functions
-used, and some structures needed for the @acronym{ASN.1} parser.  This
+used, and structures needed for the @acronym{ASN.1} parser.  This
 structure is never modified by any @acronym{GnuTLS} function, except
-for the deinitialization function which frees all memory allocated in
-the global structure and is called after the program has permanently
+for the deinitialization function which frees all allocated memory
+and is called after the program has permanently
 finished using @acronym{GnuTLS}.
 
 @float Figure,fig:gnutls-design
@@ -186,8 +182,8 @@ verbose information on the @acronym{GnuTLS} functions internal flow.
 When debugging is not required, important issues, such as detected
 attacks on the protocol still need to be logged. This is provided
 by the logging function set by
-@funcref{gnutls_global_set_audit_log_function}. The set function
-accepts the detected error message and the corresponding
+@funcref{gnutls_global_set_audit_log_function}. The provided function
+will receive an message and the corresponding
 TLS session. The session information might be used to derive IP addresses
 or other information about the peer involved.
 
@@ -213,21 +209,8 @@ the function @funcref{gnutls_global_set_mutex} before calling @funcref{gnutls_gl
 Setting manually mutexes is recommended
 only to applications that have full control of the underlying libraries. If this
 is not the case, the use of the operating system defaults is recommended. An example of 
-native thread usage is shown below.
+non-native thread usage is shown below.
 
-@example
-#include <gnutls.h>
-
-/* Native threads
- */
-
-int main()
-@{
-   gnutls_global_init();
-@}
-@end example
-
-When other thread packages are required the following example is applicable.
 @example
 #include <gnutls.h>
 
