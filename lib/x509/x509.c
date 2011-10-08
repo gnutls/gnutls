@@ -2186,76 +2186,36 @@ _gnutls_get_key_id (gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params,
                     unsigned char *output_data,
                     size_t * output_data_size)
 {
-  int result = 0;
+  int ret = 0;
   gnutls_datum_t der = { NULL, 0 };
-  digest_hd_st hd;
+  const gnutls_digest_algorithm_t hash = GNUTLS_DIG_SHA1;
+  int digest_len = _gnutls_hash_get_algo_len(hash);
 
-  if (output_data == NULL || *output_data_size < 20)
+  if (output_data == NULL || *output_data_size < digest_len)
     {
       gnutls_assert ();
-      *output_data_size = 20;
+      *output_data_size = digest_len;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
-  result = _gnutls_x509_write_pubkey(pk, params, &der);
-  if (result < 0)
+  ret = _gnutls_x509_encode_PKI_params(&der, pk, params);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  ret = _gnutls_hash_fast(hash, der.data, der.size, output_data);
+  if (ret < 0)
     {
       gnutls_assert ();
       goto cleanup;
     }
+  *output_data_size = digest_len;
 
-  result = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  _gnutls_hash (&hd, der.data, der.size);
-
-  _gnutls_hash_deinit (&hd, output_data);
-  *output_data_size = 20;
-
-  result = 0;
+  ret = 0;
 
 cleanup:
 
   _gnutls_free_datum (&der);
-  return result;
-}
-
-
-static int
-rsadsa_get_key_id (gnutls_x509_crt_t crt, int pk,
-                   unsigned char *output_data, size_t * output_data_size)
-{
-  gnutls_pk_params_st params;
-  int result = 0;
-
-  result = _gnutls_x509_crt_get_mpis (crt, &params);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      return result;
-    }
-
-  result =
-    _gnutls_get_key_id (pk, &params, output_data,
-                        output_data_size);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = 0;
-
-cleanup:
-
-  /* release all allocated MPIs
-   */
-  gnutls_pk_params_release(&params);
-  return result;
+  return ret;
 }
 
 /**
@@ -2283,20 +2243,13 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
                             unsigned char *output_data,
                             size_t * output_data_size)
 {
-  int pk, result = 0, len;
-  gnutls_datum_t pubkey;
+  int pk, ret = 0;
+  gnutls_pk_params_st params;
 
   if (crt == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  if (*output_data_size < 20)
-    {
-      gnutls_assert ();
-      *output_data_size = 20;
-      return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
   pk = gnutls_x509_crt_get_pk_algorithm (crt, NULL);
@@ -2306,48 +2259,18 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
       return pk;
     }
 
-  if (pk == GNUTLS_PK_RSA || pk == GNUTLS_PK_DSA)
-    {
-      /* This is for compatibility with what GnuTLS has printed for
-         RSA/DSA before the code below was added.  The code below is
-         applicable to all types, and it would probably be a better
-         idea to use it for RSA/DSA too, but doing so would break
-         backwards compatibility.  */
-      return rsadsa_get_key_id (crt, pk, output_data, output_data_size);
-    }
-
-  len = 0;
-  result = asn1_der_coding (crt->cert, "tbsCertificate.subjectPublicKeyInfo",
-                            NULL, &len, NULL);
-  if (result != ASN1_MEM_ERROR)
+  ret = _gnutls_x509_crt_get_mpis (crt, &params);
+  if (ret < 0)
     {
       gnutls_assert ();
-      return _gnutls_asn2err (result);
+      return ret;
     }
+  
+  ret = _gnutls_get_key_id(pk, &params, output_data, output_data_size);
 
-  pubkey.data = gnutls_malloc (len);
-  if (pubkey.data == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
+  gnutls_pk_params_release(&params);
 
-  result = asn1_der_coding (crt->cert, "tbsCertificate.subjectPublicKeyInfo",
-                            pubkey.data, &len, NULL);
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      gnutls_free (pubkey.data);
-      return _gnutls_asn2err (result);
-    }
-
-  pubkey.size = len;
-  result = gnutls_fingerprint (GNUTLS_DIG_SHA1, &pubkey,
-                               output_data, output_data_size);
-
-  gnutls_free (pubkey.data);
-
-  return result;
+  return ret;
 }
 
 

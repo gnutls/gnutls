@@ -2348,7 +2348,7 @@ generate_pkcs12 (common_info_st * cinfo)
   const char *name;
   unsigned int flags, i;
   gnutls_datum_t key_id;
-  unsigned char _key_id[20];
+  unsigned char _key_id[32];
   int indx;
   size_t ncrts;
 

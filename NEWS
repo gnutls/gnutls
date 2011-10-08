@@ -11,6 +11,9 @@ SHA256 and elliptic curves.
 the software version of the ciphers instead of hw accelerated 
 (where available)
 
+** libgnutls: Public key ID calculation is consistent among
+all structures. It uses a SHA-1 hash of the subjectPublicKeyInfo.
+
 ** libgnutls: gnutls_privkey_t allows setting external callback
 to perform signing or decryption. Can be set using
 gnutls_privkey_import_ext()

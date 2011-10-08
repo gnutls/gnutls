@@ -1421,8 +1421,8 @@ static void
 print_keyid (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
   int err;
-  char buffer[20];
-  size_t size = 20;
+  char buffer[32];
+  size_t size = sizeof(buffer);
 
   err = gnutls_x509_crt_get_key_id (cert, 0, buffer, &size);
   if (err < 0)

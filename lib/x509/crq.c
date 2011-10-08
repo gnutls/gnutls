@@ -2264,55 +2264,6 @@ gnutls_x509_crq_set_key_purpose_oid (gnutls_x509_crq_t crq,
   return 0;
 }
 
-static int
-rsadsa_crq_get_key_id (gnutls_x509_crq_t crq, int pk,
-                       unsigned char *output_data, size_t * output_data_size)
-{
-  gnutls_pk_params_st params;
-  int result = 0;
-  gnutls_datum_t der = { NULL, 0 };
-  digest_hd_st hd;
-
-  gnutls_pk_params_init(&params);
-
-  result = _gnutls_x509_crq_get_mpis (crq, &params);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      return result;
-    }
-
-  result = _gnutls_x509_write_pubkey( pk, &params, &der);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  _gnutls_hash (&hd, der.data, der.size);
-
-  _gnutls_hash_deinit (&hd, output_data);
-  *output_data_size = 20;
-
-  result = 0;
-
-cleanup:
-
-  _gnutls_free_datum (&der);
-
-  /* release all allocated MPIs
-   */
-  gnutls_pk_params_release(&params);
-  return result;
-}
-
 /**
  * gnutls_x509_crq_get_key_id:
  * @crq: a certificate of type #gnutls_x509_crq_t
@@ -2340,19 +2291,13 @@ gnutls_x509_crq_get_key_id (gnutls_x509_crq_t crq, unsigned int flags,
                             unsigned char *output_data,
                             size_t * output_data_size)
 {
-  int pk, result = 0, len;
-  gnutls_datum_t pubkey;
+  int pk, ret = 0;
+  gnutls_pk_params_st params;
 
   if (crq == NULL)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
-    }
-
-  if (*output_data_size < 20)
-    {
-      *output_data_size = 20;
-      return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
   pk = gnutls_x509_crq_get_pk_algorithm (crq, NULL);
@@ -2362,51 +2307,18 @@ gnutls_x509_crq_get_key_id (gnutls_x509_crq_t crq, unsigned int flags,
       return pk;
     }
 
-  if (pk == GNUTLS_PK_RSA || pk == GNUTLS_PK_DSA)
-    {
-      /* This is for compatibility with what GnuTLS has printed for
-         RSA/DSA before the code below was added.  The code below is
-         applicable to all types, and it would probably be a better
-         idea to use it for RSA/DSA too, but doing so would break
-         backwards compatibility.  */
-      return rsadsa_crq_get_key_id (crq, pk, output_data, output_data_size);
-    }
-
-  pubkey.size = 0;
-  result =
-    asn1_der_coding (crq->crq, "certificationRequestInfo.subjectPKInfo", NULL,
-                     &len, NULL);
-  if (result != ASN1_MEM_ERROR)
+  ret = _gnutls_x509_crq_get_mpis (crq, &params);
+  if (ret < 0)
     {
       gnutls_assert ();
-      return _gnutls_asn2err (result);
+      return ret;
     }
+  
+  ret = _gnutls_get_key_id(pk, &params, output_data, output_data_size);
 
-  pubkey.data = gnutls_malloc (len);
-  if (pubkey.data == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
+  gnutls_pk_params_release(&params);
 
-  result =
-    asn1_der_coding (crq->crq, "certificationRequestInfo.subjectPKInfo",
-                     pubkey.data, &len, NULL);
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      gnutls_free (pubkey.data);
-      return _gnutls_asn2err (result);
-    }
-
-  pubkey.size = len;
-
-  result = gnutls_fingerprint (GNUTLS_DIG_SHA1, &pubkey,
-                               output_data, output_data_size);
-
-  gnutls_free (pubkey.data);
-
-  return result;
+  return ret;
 }
 
 /**

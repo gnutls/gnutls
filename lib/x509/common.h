@@ -132,6 +132,8 @@ int _gnutls_x509_encode_and_copy_PKI_params (ASN1_TYPE dst,
                                              const char *dst_name,
                                              gnutls_pk_algorithm_t
                                              pk_algorithm, gnutls_pk_params_st * params);
+int _gnutls_x509_encode_PKI_params(gnutls_datum_t* der,
+                                   gnutls_pk_algorithm_t, gnutls_pk_params_st* params);
 int _gnutls_asn1_copy_node (ASN1_TYPE * dst, const char *dst_name,
                             ASN1_TYPE src, const char *src_name);
 
