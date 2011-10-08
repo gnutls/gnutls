@@ -37,23 +37,6 @@
 
 .file	"padlock-x86.s"
 .text
-.globl	is_padlock_nano
-.type	is_padlock_nano,@function
-.align	16
-is_padlock_nano:
-	xorl	%eax,%eax
-	cpuid
-	movl    $1,%eax
-	cpuid
-	or      $0x000f,%eax
-        cmp     $0x06ff,%eax
-	jne     .Lno_nano
-	mov     $1,%eax
-        ret
-.Lno_nano:
-	xorl	%eax,%eax
-        ret
-.size	is_padlock_nano,.-is_padlock_nano
 
 .globl	padlock_capability
 .type	padlock_capability,@function
