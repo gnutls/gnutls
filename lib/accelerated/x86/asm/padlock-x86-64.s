@@ -143,9 +143,21 @@ padlock_xstore:
 .type	padlock_sha1_oneshot,@function
 .align	16
 padlock_sha1_oneshot:
-	xorq	%rax,%rax
 	movq	%rdx,%rcx
+	movq	%rdi,%rdx
+	movups	(%rdi),%xmm0
+	subq	$128+8,%rsp
+	movl	16(%rdi),%eax
+	movaps	%xmm0,(%rsp)
+	movq	%rsp,%rdi
+	movl	%eax,16(%rsp)
+	xorq	%rax,%rax
 .byte	0xf3,0x0f,0xa6,0xc8	
+	movaps	(%rsp),%xmm0
+	movl	16(%rsp),%eax
+	addq	$128+8,%rsp
+	movups	%xmm0,(%rdx)
+	movl	%eax,16(%rdx)
 	.byte	0xf3,0xc3
 .size	padlock_sha1_oneshot,.-padlock_sha1_oneshot
 
@@ -153,9 +165,21 @@ padlock_sha1_oneshot:
 .type	padlock_sha1_blocks,@function
 .align	16
 padlock_sha1_blocks:
-	movq	$-1,%rax
 	movq	%rdx,%rcx
+	movq	%rdi,%rdx
+	movups	(%rdi),%xmm0
+	subq	$128+8,%rsp
+	movl	16(%rdi),%eax
+	movaps	%xmm0,(%rsp)
+	movq	%rsp,%rdi
+	movl	%eax,16(%rsp)
+	movq	$-1,%rax
 .byte	0xf3,0x0f,0xa6,0xc8	
+	movaps	(%rsp),%xmm0
+	movl	16(%rsp),%eax
+	addq	$128+8,%rsp
+	movups	%xmm0,(%rdx)
+	movl	%eax,16(%rdx)
 	.byte	0xf3,0xc3
 .size	padlock_sha1_blocks,.-padlock_sha1_blocks
 
@@ -163,9 +187,21 @@ padlock_sha1_blocks:
 .type	padlock_sha256_oneshot,@function
 .align	16
 padlock_sha256_oneshot:
-	xorq	%rax,%rax
 	movq	%rdx,%rcx
+	movq	%rdi,%rdx
+	movups	(%rdi),%xmm0
+	subq	$128+8,%rsp
+	movups	16(%rdi),%xmm1
+	movaps	%xmm0,(%rsp)
+	movq	%rsp,%rdi
+	movaps	%xmm1,16(%rsp)
+	xorq	%rax,%rax
 .byte	0xf3,0x0f,0xa6,0xd0	
+	movaps	(%rsp),%xmm0
+	movaps	16(%rsp),%xmm1
+	addq	$128+8,%rsp
+	movups	%xmm0,(%rdx)
+	movups	%xmm1,16(%rdx)
 	.byte	0xf3,0xc3
 .size	padlock_sha256_oneshot,.-padlock_sha256_oneshot
 
@@ -173,9 +209,21 @@ padlock_sha256_oneshot:
 .type	padlock_sha256_blocks,@function
 .align	16
 padlock_sha256_blocks:
-	movq	$-1,%rax
 	movq	%rdx,%rcx
+	movq	%rdi,%rdx
+	movups	(%rdi),%xmm0
+	subq	$128+8,%rsp
+	movups	16(%rdi),%xmm1
+	movaps	%xmm0,(%rsp)
+	movq	%rsp,%rdi
+	movaps	%xmm1,16(%rsp)
+	movq	$-1,%rax
 .byte	0xf3,0x0f,0xa6,0xd0	
+	movaps	(%rsp),%xmm0
+	movaps	16(%rsp),%xmm1
+	addq	$128+8,%rsp
+	movups	%xmm0,(%rdx)
+	movups	%xmm1,16(%rdx)
 	.byte	0xf3,0xc3
 .size	padlock_sha256_blocks,.-padlock_sha256_blocks
 
@@ -184,7 +232,27 @@ padlock_sha256_blocks:
 .align	16
 padlock_sha512_blocks:
 	movq	%rdx,%rcx
+	movq	%rdi,%rdx
+	movups	(%rdi),%xmm0
+	subq	$128+8,%rsp
+	movups	16(%rdi),%xmm1
+	movups	32(%rdi),%xmm2
+	movups	48(%rdi),%xmm3
+	movaps	%xmm0,(%rsp)
+	movq	%rsp,%rdi
+	movaps	%xmm1,16(%rsp)
+	movaps	%xmm2,32(%rsp)
+	movaps	%xmm3,48(%rsp)
 .byte	0xf3,0x0f,0xa6,0xe0	
+	movaps	(%rsp),%xmm0
+	movaps	16(%rsp),%xmm1
+	movaps	32(%rsp),%xmm2
+	movaps	48(%rsp),%xmm3
+	addq	$128+8,%rsp
+	movups	%xmm0,(%rdx)
+	movups	%xmm1,16(%rdx)
+	movups	%xmm2,32(%rdx)
+	movups	%xmm3,48(%rdx)
 	.byte	0xf3,0xc3
 .size	padlock_sha512_blocks,.-padlock_sha512_blocks
 .globl	padlock_ecb_encrypt
@@ -228,6 +296,8 @@ padlock_ecb_encrypt:
 	jmp	.Lecb_loop
 .align	16
 .Lecb_loop:
+	cmpq	%rcx,%rbx
+	cmovaq	%rcx,%rbx
 	movq	%rdi,%r8
 	movq	%rsi,%r9
 	movq	%rcx,%r10
@@ -333,6 +403,8 @@ padlock_cbc_encrypt:
 	jmp	.Lcbc_loop
 .align	16
 .Lcbc_loop:
+	cmpq	%rcx,%rbx
+	cmovaq	%rcx,%rbx
 	movq	%rdi,%r8
 	movq	%rsi,%r9
 	movq	%rcx,%r10

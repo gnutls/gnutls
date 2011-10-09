@@ -37,7 +37,6 @@
 
 .file	"padlock-x86.s"
 .text
-
 .globl	padlock_capability
 .type	padlock_capability,@function
 .align	16
@@ -423,7 +422,22 @@ padlock_sha1_oneshot:
 	movl	12(%esp),%edi
 	movl	16(%esp),%esi
 	movl	20(%esp),%ecx
+	movl	%esp,%edx
+	addl	$-128,%esp
+	movups	(%edi),%xmm0
+	andl	$-16,%esp
+	movl	16(%edi),%eax
+	movaps	%xmm0,(%esp)
+	movl	%esp,%edi
+	movl	%eax,16(%esp)
+	xorl	%eax,%eax
 .byte	243,15,166,200
+	movaps	(%esp),%xmm0
+	movl	16(%esp),%eax
+	movl	%edx,%esp
+	movl	12(%esp),%edi
+	movups	%xmm0,(%edi)
+	movl	%eax,16(%edi)
 	popl	%esi
 	popl	%edi
 	ret
@@ -435,11 +449,25 @@ padlock_sha1_blocks:
 .L_padlock_sha1_blocks_begin:
 	pushl	%edi
 	pushl	%esi
-	movl	$-1,%eax
 	movl	12(%esp),%edi
 	movl	16(%esp),%esi
+	movl	%esp,%edx
 	movl	20(%esp),%ecx
+	addl	$-128,%esp
+	movups	(%edi),%xmm0
+	andl	$-16,%esp
+	movl	16(%edi),%eax
+	movaps	%xmm0,(%esp)
+	movl	%esp,%edi
+	movl	%eax,16(%esp)
+	movl	$-1,%eax
 .byte	243,15,166,200
+	movaps	(%esp),%xmm0
+	movl	16(%esp),%eax
+	movl	%edx,%esp
+	movl	12(%esp),%edi
+	movups	%xmm0,(%edi)
+	movl	%eax,16(%edi)
 	popl	%esi
 	popl	%edi
 	ret
@@ -455,7 +483,22 @@ padlock_sha256_oneshot:
 	movl	12(%esp),%edi
 	movl	16(%esp),%esi
 	movl	20(%esp),%ecx
+	movl	%esp,%edx
+	addl	$-128,%esp
+	movups	(%edi),%xmm0
+	andl	$-16,%esp
+	movups	16(%edi),%xmm1
+	movaps	%xmm0,(%esp)
+	movl	%esp,%edi
+	movaps	%xmm1,16(%esp)
+	xorl	%eax,%eax
 .byte	243,15,166,208
+	movaps	(%esp),%xmm0
+	movaps	16(%esp),%xmm1
+	movl	%edx,%esp
+	movl	12(%esp),%edi
+	movups	%xmm0,(%edi)
+	movups	%xmm1,16(%edi)
 	popl	%esi
 	popl	%edi
 	ret
@@ -467,11 +510,25 @@ padlock_sha256_blocks:
 .L_padlock_sha256_blocks_begin:
 	pushl	%edi
 	pushl	%esi
-	movl	$-1,%eax
 	movl	12(%esp),%edi
 	movl	16(%esp),%esi
 	movl	20(%esp),%ecx
+	movl	%esp,%edx
+	addl	$-128,%esp
+	movups	(%edi),%xmm0
+	andl	$-16,%esp
+	movups	16(%edi),%xmm1
+	movaps	%xmm0,(%esp)
+	movl	%esp,%edi
+	movaps	%xmm1,16(%esp)
+	movl	$-1,%eax
 .byte	243,15,166,208
+	movaps	(%esp),%xmm0
+	movaps	16(%esp),%xmm1
+	movl	%edx,%esp
+	movl	12(%esp),%edi
+	movups	%xmm0,(%edi)
+	movups	%xmm1,16(%edi)
 	popl	%esi
 	popl	%edi
 	ret
@@ -486,7 +543,29 @@ padlock_sha512_blocks:
 	movl	12(%esp),%edi
 	movl	16(%esp),%esi
 	movl	20(%esp),%ecx
+	movl	%esp,%edx
+	addl	$-128,%esp
+	movups	(%edi),%xmm0
+	andl	$-16,%esp
+	movups	16(%edi),%xmm1
+	movups	32(%edi),%xmm2
+	movups	48(%edi),%xmm3
+	movaps	%xmm0,(%esp)
+	movl	%esp,%edi
+	movaps	%xmm1,16(%esp)
+	movaps	%xmm2,32(%esp)
+	movaps	%xmm3,48(%esp)
 .byte	243,15,166,224
+	movaps	(%esp),%xmm0
+	movaps	16(%esp),%xmm1
+	movaps	32(%esp),%xmm2
+	movaps	48(%esp),%xmm3
+	movl	%edx,%esp
+	movl	12(%esp),%edi
+	movups	%xmm0,(%edi)
+	movups	%xmm1,16(%edi)
+	movups	%xmm2,32(%edi)
+	movups	%xmm3,48(%edi)
 	popl	%esi
 	popl	%edi
 	ret
