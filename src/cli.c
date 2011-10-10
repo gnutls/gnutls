@@ -29,6 +29,7 @@
 #include <sys/socket.h>
 #include <sys/select.h>
 #include <unistd.h>
+#include <stdint.h>
 #include <fcntl.h>
 
 #include <gnutls/gnutls.h>
