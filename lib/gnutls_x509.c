@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011
  * Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
@@ -1102,7 +1102,8 @@ cleanup:
 /**
  * gnutls_certificate_set_key:
  * @res: is a #gnutls_certificate_credentials_t structure.
- * @name: is the DNS name of the certificate (NULL if none)
+ * @names: is an array of DNS name of the certificate (NULL if none)
+ * @names_size: holds the size of the names list
  * @pcert_list: contains a certificate list (path) for the specified private key
  * @pcert_list_size: holds the size of the certificate list
  * @key: is a gnutls_x509_privkey_t key
