@@ -274,8 +274,8 @@ void gnutls_certificate_set_retrieve_function2
 
 int
 gnutls_certificate_set_key (gnutls_certificate_credentials_t res,
-                            const char** name,
-                            int name_size,
+                            const char** names,
+                            int names_size,
                             gnutls_pcert_st * pcert_list,
                             int pcert_list_size,
                             gnutls_privkey_t key);
