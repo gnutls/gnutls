@@ -174,7 +174,7 @@ load_keys (void)
   gnutls_pkcs11_privkey_t pkcs11_key;
 #endif
   gnutls_x509_privkey_t tmp_key;
-  uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
+  gnutls_openpgp_keyid_t keyid;
 
   if (x509_certfile != NULL && x509_keyfile != NULL)
     {
