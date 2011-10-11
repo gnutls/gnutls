@@ -20,7 +20,7 @@ gnutls_privkey_import_ext()
 
 ** libgnutls: A certificate credentials structure can be
 used with a gnutls_privkey_t and a gnutls_pcert_st
-structures using gnutls_certificate_set_key().
+structure using gnutls_certificate_set_key().
 
 ** libgnutls: Fixes to enable external signing callback to
 operate with TLS 1.2. 
