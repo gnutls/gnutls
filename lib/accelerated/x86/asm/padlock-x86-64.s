@@ -274,6 +274,8 @@ padlock_ecb_encrypt:
 	leaq	16(%rdx),%rdx
 	xorl	%eax,%eax
 	xorl	%ebx,%ebx
+	cmpq	$128,%rcx
+	jbe	.Lecb_short
 	testl	$32,(%rdx)
 	jnz	.Lecb_aligned
 	testq	$15,%rdi
@@ -335,19 +337,34 @@ padlock_ecb_encrypt:
 	movq	$512,%rbx
 	jnz	.Lecb_loop
 
-	testq	$15,%rdi
-	jz	.Lecb_done
+	cmpq	%rsp,%rbp
+	je	.Lecb_done
 
-	movq	%rbp,%rcx
-	movq	%rsp,%rdi
-	subq	%rsp,%rcx
-	xorq	%rax,%rax
-	shrq	$3,%rcx
-.byte	0xf3,0x48,0xab		
+	pxor	%xmm0,%xmm0
+	leaq	(%rsp),%rax
+.Lecb_bzero:
+	movaps	%xmm0,(%rax)
+	leaq	16(%rax),%rax
+	cmpq	%rax,%rbp
+	ja	.Lecb_bzero
+
 .Lecb_done:
 	leaq	(%rbp),%rsp
 	jmp	.Lecb_exit
-
+.align	16
+.Lecb_short:
+	movq	%rsp,%rbp
+	subq	%rcx,%rsp
+	xorq	%rbx,%rbx
+.Lecb_short_copy:
+	movups	(%rsi,%rbx,1),%xmm0
+	leaq	16(%rbx),%rbx
+	cmpq	%rbx,%rcx
+	movaps	%xmm0,-16(%rsp,%rbx,1)
+	ja	.Lecb_short_copy
+	movq	%rsp,%rsi
+	movq	%rcx,%rbx
+	jmp	.Lecb_loop
 .align	16
 .Lecb_aligned:
 	leaq	-16(%rdx),%rax
@@ -381,6 +398,8 @@ padlock_cbc_encrypt:
 	leaq	16(%rdx),%rdx
 	xorl	%eax,%eax
 	xorl	%ebx,%ebx
+	cmpq	$64,%rcx
+	jbe	.Lcbc_short
 	testl	$32,(%rdx)
 	jnz	.Lcbc_aligned
 	testq	$15,%rdi
@@ -444,19 +463,34 @@ padlock_cbc_encrypt:
 	movq	$512,%rbx
 	jnz	.Lcbc_loop
 
-	testq	$15,%rdi
-	jz	.Lcbc_done
+	cmpq	%rsp,%rbp
+	je	.Lcbc_done
 
-	movq	%rbp,%rcx
-	movq	%rsp,%rdi
-	subq	%rsp,%rcx
-	xorq	%rax,%rax
-	shrq	$3,%rcx
-.byte	0xf3,0x48,0xab		
+	pxor	%xmm0,%xmm0
+	leaq	(%rsp),%rax
+.Lcbc_bzero:
+	movaps	%xmm0,(%rax)
+	leaq	16(%rax),%rax
+	cmpq	%rax,%rbp
+	ja	.Lcbc_bzero
+
 .Lcbc_done:
 	leaq	(%rbp),%rsp
 	jmp	.Lcbc_exit
-
+.align	16
+.Lcbc_short:
+	movq	%rsp,%rbp
+	subq	%rcx,%rsp
+	xorq	%rbx,%rbx
+.Lcbc_short_copy:
+	movups	(%rsi,%rbx,1),%xmm0
+	leaq	16(%rbx),%rbx
+	cmpq	%rbx,%rcx
+	movaps	%xmm0,-16(%rsp,%rbx,1)
+	ja	.Lcbc_short_copy
+	movq	%rsp,%rsi
+	movq	%rcx,%rbx
+	jmp	.Lcbc_loop
 .align	16
 .Lcbc_aligned:
 	leaq	-16(%rdx),%rax
