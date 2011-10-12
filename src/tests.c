@@ -867,6 +867,22 @@ test_hello_extension (gnutls_session_t session)
            ":" ALL_KX ":%s", protocol_str, rest);
   _gnutls_priority_set_direct (session, prio_str);
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
+  gnutls_record_set_max_size (session, 4096);
+
+  ret = do_handshake (session);
+  return ret;
+}
+
+test_code_t
+test_small_records (gnutls_session_t session)
+{
+  int ret;
+
+  sprintf (prio_str,
+           INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
+           ":" ALL_KX ":%s", protocol_str, rest);
+  _gnutls_priority_set_direct (session, prio_str);
+  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
   gnutls_record_set_max_size (session, 512);
 
   ret = do_handshake (session);

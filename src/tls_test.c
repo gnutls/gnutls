@@ -106,6 +106,8 @@ static const TLS_TEST tls_tests[] = {
    test_rsa_pms_version_check, "yes", "no", "dunno"},
   {"whether the server can accept Hello Extensions",
    test_hello_extension, "yes", "no", "dunno"},
+  {"whether the server can accept small records (512 bytes)",
+   test_small_records, "yes", "no", "dunno"},
   {"whether the server can accept cipher suites not in SSL 3.0 spec",
    test_unknown_ciphersuites, "yes", "no", "dunno"},
   {"whether the server can accept a bogus TLS record version in the client hello", test_version_oob, "yes", "no", "dunno"},
