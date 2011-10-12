@@ -594,6 +594,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/longlong.m4
   m4/lseek.m4
   m4/malloc.m4
+  m4/math_h.m4
   m4/memchr.m4
   m4/memmem.m4
   m4/minmax.m4

@@ -364,6 +364,7 @@ EXTRA_libtests_a_SOURCES += getcwd-lgpl.c
 
 TESTS += test-getcwd-lgpl
 check_PROGRAMS += test-getcwd-lgpl
+test_getcwd_lgpl_LDADD = $(LDADD) $(LIBINTL)
 EXTRA_DIST += test-getcwd-lgpl.c signature.h macros.h
 
 ## end   gnulib module getcwd-lgpl-tests
@@ -819,6 +820,7 @@ EXTRA_libtests_a_SOURCES += stat.c
 
 TESTS += test-stat
 check_PROGRAMS += test-stat
+test_stat_LDADD = $(LDADD) $(LIBINTL)
 EXTRA_DIST += test-stat.h test-stat.c signature.h macros.h
 
 ## end   gnulib module stat-tests

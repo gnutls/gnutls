@@ -957,6 +957,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/lstat.m4
   m4/malloc.m4
   m4/manywarnings.m4
+  m4/math_h.m4
   m4/memchr.m4
   m4/minmax.m4
   m4/mmap-anon.m4
