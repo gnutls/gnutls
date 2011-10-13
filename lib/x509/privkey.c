@@ -1391,9 +1391,7 @@ gnutls_x509_privkey_get_key_id (gnutls_x509_privkey_t key,
                                 unsigned char *output_data,
                                 size_t * output_data_size)
 {
-  int result;
-  digest_hd_st hd;
-  gnutls_datum_t der = { NULL, 0 };
+  int ret;
 
   if (key == NULL)
     {
@@ -1401,38 +1399,13 @@ gnutls_x509_privkey_get_key_id (gnutls_x509_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  if (*output_data_size < 20)
+  ret = _gnutls_get_key_id(key->pk_algorithm, &key->params, output_data, output_data_size);
+  if (ret < 0)
     {
       gnutls_assert ();
-      *output_data_size = 20;
-      return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 
-  result = _gnutls_x509_write_pubkey(key->pk_algorithm, &key->params, &der);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  result = _gnutls_hash_init (&hd, GNUTLS_MAC_SHA1);
-  if (result < 0)
-    {
-      gnutls_assert ();
-      goto cleanup;
-    }
-
-  _gnutls_hash (&hd, der.data, der.size);
-
-  _gnutls_hash_deinit (&hd, output_data);
-  *output_data_size = 20;
-
-  result = 0;
-
-cleanup:
-
-  _gnutls_free_datum (&der);
-  return result;
+  return ret;
 }
 
 
