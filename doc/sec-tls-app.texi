@@ -1,5 +1,5 @@
 @node How to use TLS in application protocols
-@chapter How to use @acronym{TLS} in application protocols
+@section How to use @acronym{TLS} in application protocols
 
 This chapter is intended to provide some hints on how to use the
 @acronym{TLS} over simple custom made application protocols.  The
@@ -12,7 +12,7 @@ but may be extended to other ones too.
 @end menu
 
 @node Separate ports
-@section Separate ports
+@subsection Separate ports
 
 Traditionally @acronym{SSL} was used in application protocols by
 assigning a new port number for the secure services. That way two
@@ -39,7 +39,7 @@ is a limitation on the available privileged ports, this approach was
 soon obsoleted.
 
 @node Upward negotiation
-@section Upward negotiation
+@subsection Upward negotiation
 
 Other application protocols@footnote{See LDAP, IMAP etc.}  use a
 different approach to enable the secure layer.  They use something

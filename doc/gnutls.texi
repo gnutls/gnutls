@@ -152,7 +152,6 @@ Documentation License''.
 * Authentication methods::
 * More on certificate authentication::
 * How to use GnuTLS in applications::
-* How to use TLS in application protocols::
 * Included programs::
 * Internal architecture of GnuTLS::
 * Support::
@@ -177,8 +176,6 @@ Documentation License''.
 @include cha-cert-auth.texi
 
 @include cha-gtls-app.texi
-
-@include cha-tls-app.texi
 
 @include cha-programs.texi
 

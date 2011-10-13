@@ -29,6 +29,7 @@ noted otherwise.
 * The TLS Handshake Protocol::
 * TLS Extensions::
 * Selecting cryptographic key sizes::
+* How to use TLS in application protocols::
 * On SSL 2 and older protocols::
 @end menu
 
@@ -695,6 +696,8 @@ recommended:
 Those functions will convert a human understandable security parameter
 of @code{gnutls_sec_param_t} type, to a number of bits suitable for a public 
 key algorithm.
+
+@include sec-tls-app.texi
 
 @node On SSL 2 and older protocols
 @section On SSL 2 and older protocols

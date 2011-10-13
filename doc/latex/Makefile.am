@@ -2,7 +2,7 @@ TEX_OBJECTS = gnutls.tex macros.tex macros-epub.tex fdl.tex cover.tex gnutls.bib
 	cover-epub.tex
 
 GEN_TEX_OBJECTS = cha-preface.tex cha-library.tex cha-intro-tls.tex cha-auth.tex \
-  cha-cert-auth.tex cha-gtls-app.tex cha-tls-app.tex cha-programs.tex cha-support.tex \
+  cha-cert-auth.tex cha-gtls-app.tex sec-tls-app.tex cha-programs.tex cha-support.tex \
   cha-functions.tex error_codes.tex cha-ciphersuites.tex algorithms.tex \
   cha-errors.tex alerts.tex cha-internals.tex
 
@@ -24,7 +24,7 @@ cha-cert-auth.tex: ../cha-cert-auth.texi
 cha-gtls-app.tex: ../cha-gtls-app.texi
 	../scripts/mytexi2latex $< > $@
 
-cha-tls-app.tex: ../cha-tls-app.texi
+sec-tls-app.tex: ../sec-tls-app.texi
 	../scripts/mytexi2latex $< > $@
 
 cha-programs.tex: ../cha-programs.texi

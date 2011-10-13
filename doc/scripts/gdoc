@@ -1,4 +1,6 @@
-#!/usr/bin/perl
+eval '(exit $?0)' && eval 'exec perl "$0" ${1+"$@"}'
+  & eval 'exec perl "$0" $argv:q'
+    if 0;
 
 ## Copyright (c) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Simon Josefsson
 ##                    added -texinfo, -listfunc, -pkg-name
@@ -314,7 +316,7 @@ sub repstr {
 
 #    print "pattern $pattern matched 1=$match1 2=$match2 3=$match3 4=$match4 replace $repl yielded $output interpolated $return\n";
 
-    $return;
+    return;
 }
 
 sub just_highlight {
@@ -371,7 +373,7 @@ sub output_texinfo {
     }
     foreach $section (@{$args{'sectionlist'}}) {
 	print "\n\@strong{$section:} " if $section ne $section_default;
-	$args{'sections'}{$section} =~ s:([{}]):\@\1:gs;
+	$args{'sections'}{$section} =~ s:([{}]):\@$1:gs;
 	output_highlight($args{'sections'}{$section});
     }
     print "\@end deftypefun\n\n";
@@ -515,7 +517,7 @@ sub output_tex {
     foreach $section (@{$args{'sectionlist'}}) {
 	$sec = $section;
 	$sec =~ s/_/\\_/g;
-	$sec =~ s/#([a-zA-Z\_]+)/{\\it \1}/g;
+	$sec =~ s/#([a-zA-Z\_]+)/{\\it $1}/g;
 
 	print "\n\\begin{function$sec}\n";
 	$out = $args{'sections'}{$section};
@@ -528,7 +530,7 @@ sub output_tex {
 	$out =~ s/\n\n/\n/g;
 	$out =~ s/\\:/:/g;
 	$out =~ s/\-\>/\$\\rightarrow\$/g;
-	$out =~ s/([0-9]+)\^([0-9]+)/\$\{\1\}\^\{\2\}\$/g;
+	$out =~ s/([0-9]+)\^([0-9]+)/\$\{$1\}\^\{$2\}\$/g;
 
 	print $out;
 	print "\\end{function$sec}\n";
@@ -546,8 +548,6 @@ sub output_enum_tex {
     my $sec;
     my $check;
     my $type;
-
-    $func =~ s/_/\\_/g;
 
     print "\n\n\\begin{enum}\n";
     $name =~ s/_/\\_/g;

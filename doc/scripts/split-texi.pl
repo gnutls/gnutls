@@ -1,4 +1,6 @@
-#!/usr/bin/perl
+eval '(exit $?0)' && eval 'exec perl -wS "$0" ${1+"$@"}'
+  & eval 'exec perl -wS "$0" $argv:q'
+    if 0;
 
 $dir = shift;
 $param2 = shift;
@@ -19,9 +21,9 @@ sub key_of_record {
   my ($key) = $lines[$i]; 
 
   if ($enum == 1) {
-    while( !($key =~ m/^$\@float Table,(.*)$/) && ($i < 5)) { $i=$i+1; $key = $lines[$i]; }
+    while( !($key =~ m/^\@float Table,(.*)$/) && ($i < 5)) { $i=$i+1; $key = $lines[$i]; }
   } else {
-    while( !($key =~ m/^$\\functionTitle\{(.*)\}/) && ($i < 5)) { $i=$i+1; $key = $lines[$i]; }
+    while( !($key =~ m/^\\functionTitle\{(.*)\}/) && ($i < 5)) { $i=$i+1; $key = $lines[$i]; }
   }
 
   return $key;

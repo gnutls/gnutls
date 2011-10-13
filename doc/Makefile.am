@@ -35,7 +35,7 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi lgpl-2.1.texi gpl-3.0.texi	\
 	cha-ciphersuites.texi cha-copying.texi cha-functions.texi	\
 	cha-gtls-app.texi cha-internals.texi cha-intro-tls.texi		\
 	cha-library.texi cha-preface.texi cha-programs.texi		\
-	cha-tls-app.texi cha-errors.texi cha-support.texi
+	sec-tls-app.texi cha-errors.texi cha-support.texi
 
 # Examples.
 gnutls_TEXINFOS += examples/ex-client1.c examples/ex-client2.c		\
