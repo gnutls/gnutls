@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.0.4 (unreleased)
+* Version 3.0.4 (released 2011-10-15)
 
 ** gnutls-cli-debug: Added more tests including AES-GCM,
 SHA256 and elliptic curves.

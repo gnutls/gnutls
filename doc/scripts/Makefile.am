@@ -1,1 +1,1 @@
-EXTRA_DIST = gdoc sort2.pl
+EXTRA_DIST = gdoc sort2.pl split-texi.pl
