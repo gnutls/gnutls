@@ -26,7 +26,6 @@ GNUTLS_1_4
   global:
     gnutls_extra_check_version;
     gnutls_global_init_extra;
-    gnutls_register_md5_handler;
 
   local:
     *;

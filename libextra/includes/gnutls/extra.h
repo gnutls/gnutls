@@ -40,10 +40,6 @@ extern "C"
 
   int gnutls_global_init_extra (void);
 
-  /* Use internal (HMAC-)MD5 code, typically for use if libgcrypt is
-     in FIPS mode. */
-  int gnutls_register_md5_handler (void);
-
 /* returns libgnutls-extra version (call it with a NULL argument) 
  */
   const char *gnutls_extra_check_version (const char *req_version);
