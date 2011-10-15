@@ -38,3 +38,7 @@ is_padlock_nano:
 	xorl	%eax,%eax
         ret
 .size	is_padlock_nano,.-is_padlock_nano
+
+#if defined(__linux__) && defined(__ELF__)
+.section .note.GNU-stack,"",%progbits
+#endif
