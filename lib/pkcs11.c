@@ -3,7 +3,7 @@
  * Copyright (C) 2010, 2011 Free Software Foundation
  * Copyright (C) 2008, Joe Orton <joe@manyfish.co.uk>
  * 
- * Author: Nikos Mavrogiannopoulos
+ * Authors: Nikos Mavrogiannopoulos, Stef Walter
  *
  * Inspired and some parts (pkcs11_login) based on neon PKCS #11 support 
  * by Joe Orton. More ideas came from the pkcs11-helper library by 

@@ -2,7 +2,7 @@
  * GnuTLS PKCS#11 support
  * Copyright (C) 2010, 2011 Free Software Foundation
  * 
- * Author: Nikos Mavrogiannopoulos
+ * Author: Nikos Mavrogiannopoulos, Stef Walter
  *
  * The GnuTLS is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
