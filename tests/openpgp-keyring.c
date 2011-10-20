@@ -26,7 +26,6 @@
 #include <stdio.h>
 
 #include <gnutls/gnutls.h>
-#include <gnutls/extra.h>
 #include <gnutls/openpgp.h>
 
 #include "utils.h"
@@ -201,10 +200,6 @@ doit (void)
   gnutls_global_set_log_function (tls_log_func);
   if (debug)
     gnutls_global_set_log_level (2);
-
-  ret = gnutls_global_init_extra ();
-  if (ret < 0)
-    fail ("extra-init %d\n", ret);
 
   ret = gnutls_openpgp_keyring_init (&keyring);
   if (ret < 0)

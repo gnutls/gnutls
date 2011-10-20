@@ -37,7 +37,6 @@ lib_LTLIBRARIES = libguile-gnutls-v-1.la libguile-gnutls-extra-v-1.la
 
 # Linking against GnuTLS.
 GNUTLS_CORE_LIBS  = $(top_builddir)/lib/libgnutls.la
-GNUTLS_EXTRA_LIBS = $(top_builddir)/libextra/libgnutls-extra.la
 
 # Linking against Gnulib modules.
 GNULIB_LIBS    = $(top_builddir)/gl/libgnu.la
@@ -55,14 +54,14 @@ libguile_gnutls_extra_v_1_la_SOURCES = extra.c
 libguile_gnutls_extra_v_1_la_CFLAGS =		\
   $(AM_CFLAGS) $(GNULIB_CFLAGS) $(GUILE_CFLAGS)
 libguile_gnutls_extra_v_1_la_LIBADD =		\
-  $(GNUTLS_CORE_LIBS) $(GNUTLS_EXTRA_LIBS)	\
+  $(GNUTLS_CORE_LIBS) \
   $(builddir)/libguile-gnutls-v-1.la		\
   $(GNULIB_LIBS) $(GUILE_LDFLAGS)
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/lib/includes \
 	-I$(top_builddir)/lib/includes	\
-	-I$(top_srcdir)/libextra/includes \
+	-I$(top_srcdir)/extra/includes \
 	-I$(top_builddir) \
 	-I$(builddir)
 

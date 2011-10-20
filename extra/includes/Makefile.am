@@ -21,7 +21,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-nobase_include_HEADERS = gnutls/extra.h
+nobase_include_HEADERS = 
 
 if ENABLE_OPENSSL
 nobase_include_HEADERS += gnutls/openssl.h

@@ -23,7 +23,7 @@
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes	\
-	-I$(top_srcdir)/libextra/includes \
+	-I$(top_srcdir)/extra/includes \
 	-I$(top_srcdir)/gl
 
 # Gnulib warns and suggests use of fseeko instead of fseek, which is
@@ -34,7 +34,6 @@ AM_CPPFLAGS += -D_GL_NO_LARGE_FILES
 AM_LDFLAGS = -no-install
 LDADD = libexamples.la				\
 	../../lib/libgnutls.la			\
-	../../libextra/libgnutls-extra.la	\
 	../../gl/libgnu.la			\
 	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB)
 

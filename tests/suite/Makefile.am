@@ -26,8 +26,8 @@ AM_CPPFLAGS = \
 	-I$(top_builddir)/gl			\
 	-I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes		\
-	-I$(top_srcdir)/libextra/includes	\
-	-I$(top_builddir)/libextra/includes	\
+	-I$(top_srcdir)/extra/includes	\
+	-I$(top_builddir)/extra/includes	\
 	-I$(top_srcdir)/lib			\
 	-I$(top_srcdir)/doc/examples	\
 	-I$(top_srcdir)/tests/suite/ecore/src/include \

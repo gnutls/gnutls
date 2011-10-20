@@ -375,12 +375,6 @@ if test "$opt_guile_bindings" = "yes"; then
 fi
 AM_CONDITIONAL(HAVE_GUILE, test "$opt_guile_bindings" = "yes")
 
-
-LIBGNUTLS_EXTRA_LIBS="-L${libdir} -lgnutls-extra $LIBGNUTLS_LIBS"
-LIBGNUTLS_EXTRA_CFLAGS="-I${includedir}"
-AC_SUBST(LIBGNUTLS_EXTRA_LIBS)
-AC_SUBST(LIBGNUTLS_EXTRA_CFLAGS)
-
 LIBGNUTLS_LIBS="-L${libdir} -lgnutls $LIBS"
 LIBGNUTLS_CFLAGS="-I${includedir}"
 AC_SUBST(LIBGNUTLS_LIBS)
@@ -460,9 +454,8 @@ AC_CONFIG_FILES([
   tests/rsa-md5-collision/Makefile
   tests/sha2/Makefile
   tests/userid/Makefile
-  libextra/Makefile
-  libextra/gnutls-extra.pc
-  libextra/includes/Makefile
+  extra/Makefile
+  extra/includes/Makefile
   lib/Makefile
   lib/gnutls.pc
   lib/includes/Makefile

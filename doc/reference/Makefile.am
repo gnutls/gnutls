@@ -22,7 +22,7 @@ DOC_MAIN_SGML_FILE=$(DOC_MODULE)-docs.sgml
 # gtk-doc will search all .c and .h files beneath these paths
 # for inline comments documenting functions and macros.
 # e.g. DOC_SOURCE_DIR=../../../gtk ../../../gdk
-DOC_SOURCE_DIR=../../lib ../../libextra
+DOC_SOURCE_DIR=../../lib
 
 # Extra options to pass to gtkdoc-scangobj. Not normally needed.
 SCANGOBJ_OPTIONS=
@@ -52,13 +52,11 @@ FIXXREF_OPTIONS=
 # e.g. CFILE_GLOB=$(top_srcdir)/gtk/*.c
 HFILE_GLOB=$(top_srcdir)/lib/includes/gnutls/*.h \
 	$(top_builddir)/lib/includes/gnutls/*.h \
-	$(top_srcdir)/libextra/includes/gnutls/*.h
+	$(top_srcdir)/extra/includes/gnutls/*.h
 CFILE_GLOB=$(top_srcdir)/lib/*.c \
 	$(top_srcdir)/lib/x509/*.c \
 	$(top_srcdir)/lib/openpgp/*.c \
-	$(top_srcdir)/libextra/*.c \
-	$(top_srcdir)/lib/minitasn1/*.c \
-	$(top_srcdir)/libextra/*.c
+	$(top_srcdir)/lib/minitasn1/*.c
 
 # Extra header to include when scanning, which are not under DOC_SOURCE_DIR
 # e.g. EXTRA_HFILES=$(top_srcdir}/contrib/extra.h

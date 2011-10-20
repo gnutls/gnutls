@@ -88,9 +88,9 @@ MAINTAINERCLEANFILES =
 
 # Generated texinfos.
 
-gnutls_TEXINFOS += gnutls-api.texi extra-api.texi \
+gnutls_TEXINFOS += gnutls-api.texi \
 	x509-api.texi pgp-api.texi
-MAINTAINERCLEANFILES += gnutls-api.texi extra-api.texi \
+MAINTAINERCLEANFILES += gnutls-api.texi \
 	x509-api.texi pgp-api.texi
 
 gnutls-api.texi: $(srcdir)/../lib/*.c $(srcdir)/../lib/ext/*.c $(srcdir)/../lib/auth/*.c $(srcdir)/../lib/algorithms/*.c
@@ -116,17 +116,6 @@ x509-api.texi: $(srcdir)/../lib/x509/*.c
 	mv -f $@-tmp2 $@
 
 pgp-api.texi: $(srcdir)/../lib/openpgp/*.c
-	echo "" > $@-tmp
-	for i in $^; do \
-		echo -n "Creating documentation for file $$i... " && \
-		$(srcdir)/scripts/gdoc -texinfo $$i >> $@-tmp && \
-		echo "ok"; \
-	done
-	$(srcdir)/scripts/sort2.pl < $@-tmp > $@-tmp2
-	rm -f $@-tmp
-	mv -f $@-tmp2 $@
-
-extra-api.texi: $(srcdir)/../libextra/gnutls_extra.c
 	echo "" > $@-tmp
 	for i in $^; do \
 		echo -n "Creating documentation for file $$i... " && \
@@ -194,7 +183,7 @@ GUILE_FOR_BUILD =				\
 
 SNARF_CPPFLAGS = -I$(top_srcdir) -I$(top_builddir)			\
 	 -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes	\
-	 -I$(top_srcdir)/libextra/includes				\
+	 -I$(top_srcdir)/extra/includes				\
          -I$(top_srcdir)/guile/src -I$(top_builddir)/guile/src		\
 	 $(GUILE_CFLAGS)
 

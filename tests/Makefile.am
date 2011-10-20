@@ -38,8 +38,8 @@ AM_CPPFLAGS = \
 	-I$(top_builddir)/gl			\
 	-I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes		\
-	-I$(top_srcdir)/libextra/includes	\
-	-I$(top_builddir)/libextra/includes	\
+	-I$(top_srcdir)/extra/includes	\
+	-I$(top_builddir)/extra/includes	\
 	-I$(top_srcdir)/lib			\
 	-I$(top_srcdir)/doc/examples
 
@@ -69,12 +69,11 @@ ctests = mini-deflate simple gc set_pkcs12_cred certder certuniqueid mpi		\
 
 if ENABLE_OPENSSL
 ctests +=  openssl
-openssl_LDADD = $(LDADD) ../libextra/libgnutls-openssl.la
+openssl_LDADD = $(LDADD) ../extra/libgnutls-openssl.la
 endif
 
 if ENABLE_OPENPGP
 ctests += openpgp-auth openpgp-auth2 openpgp-keyring pgps2kgnu
-openpgp_keyring_LDADD = $(LDADD) ../libextra/libgnutls-extra.la
 endif
 
 if HAVE_FORK

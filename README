@@ -28,10 +28,9 @@ by running './configure --help'.
     make
     sudo make install
 
-The commands above build and install the static archives (libgnutls.a
-and libgnutls-extra.a), the shared object (libgnutls.so  and
-libgnutls-extra.so), and additional binaries such as certtool and
-gnutls-cli.
+The commands above build and install the static archive (libgnutls.a),
+the shared object (libgnutls.so), and additional binaries such as certtool 
+and gnutls-cli.
 
 The library depends on libnettle and p11-kit. Versions
 2.10.3 and prior used libgcrypt as the default cryptographic library.
@@ -93,10 +92,10 @@ Since GnuTLS version 3.0.0, the core library has been released under
 the GNU Lesser General Public License (LGPL) version 3 or later.
 
 The GNU LGPL applies to the main GnuTLS library, while the
-included applications as well as gnutls-extra and gnutls-openssl 
-libraries are under the GNU GPL version 3.  The gnutls library is 
+included applications as well as gnutls-openssl 
+library are under the GNU GPL version 3.  The gnutls library is 
 located in the lib/ directory, while the applications in src/ and
-gnutls-extra and gnutls-openssl library are at libextra/.
+gnutls-openssl library is at extra/.
 
 For any copyright year range specified as YYYY-ZZZZ in this package
 note that the range specifies every single year in that closed interval.

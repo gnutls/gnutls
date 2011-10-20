@@ -37,24 +37,16 @@ endif
 
 SUBDIRS = includes
 
-# Pkg-config script.
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = gnutls-extra.pc
-DISTCLEANFILES = $(pkgconfig_DATA)
-
 defexecdir = $(bindir)
 defexec_DATA = 
 
-lib_LTLIBRARIES = libgnutls-extra.la
-
-libgnutls_extra_la_SOURCES = libgnutls-extra.map gnutls_extra.c
-
-libgnutls_openssl_la_LDFLAGS = -no-undefined
 
 # OpenSSL
 
+libgnutls_openssl_la_LDFLAGS = -no-undefined
+
 if ENABLE_OPENSSL
-lib_LTLIBRARIES += libgnutls-openssl.la
+lib_LTLIBRARIES = libgnutls-openssl.la
 
 libgnutls_openssl_la_SOURCES = gnutls_openssl.c openssl_compat.h	\
 	openssl_compat.c
@@ -77,34 +69,4 @@ defexec_DATA += libgnutls-openssl-$(DLL_VERSION).def
 endif
 endif
 
-# OpenPGP
-
-libgnutls_extra_la_LIBADD = $(LIBSOCKET)
-libgnutls_extra_la_LDFLAGS = -no-undefined
-
-if !ENABLE_NETTLE
-libgnutls_extra_la_LIBADD += $(LTLIBGCRYPT)
-endif
-
-# Rest
-
-if HAVE_LD_OUTPUT_DEF
-libgnutls_extra_la_LDFLAGS += \
-	-Wl,--output-def,libgnutls-extra-$(DLL_VERSION).def
-defexec_DATA += libgnutls-extra-$(DLL_VERSION).def
-endif
-
-DISTCLEANFILES += $(defexec_DATA)
-
-libgnutls_extra_la_LDFLAGS += \
-	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
-
-libgnutls_extra_la_LIBADD += ../gl/libgnu.la \
-	../lib/libgnutls.la
-
-if HAVE_LD_VERSION_SCRIPT
-libgnutls_extra_la_LDFLAGS += \
-	-Wl,--version-script=$(srcdir)/libgnutls-extra.map
-else
-libgnutls_extra_la_LDFLAGS += -export-symbols-regex '^(gnutls_).*'
-endif
+DISTCLEANFILES = $(defexec_DATA)

@@ -4,8 +4,10 @@ See the end for copying conditions.
 
 * Version 3.0.5 (unreleased)
 
-** libgnutls: Corrected bug in gnutls_x509_data2hex. Report and fix by
-Vincent Untz.
+** libgnutls-extra: is no more
+
+** libgnutls: Corrected bug in gnutls_x509_data2hex. Report and fix 
+by Vincent Untz.
 
 ** API and ABI modifications:
 No changes since last version.

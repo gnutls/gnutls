@@ -314,8 +314,7 @@ as long as the LGPLv3+ applies.
 The implementation of the function should lie in the @code{ext/@-foobar.c} file.
 
 To make the API available in the shared library you need to add the
-symbol in @code{lib/@-libgnutls.map} or
-@code{libextra/@-libgnutls-@-extra.map} as appropriate, so that the symbol
+symbol in @code{lib/@-libgnutls.map}, so that the symbol
 is exported properly.
 
 When writing GTK-DOC style documentation for your new APIs, don't
