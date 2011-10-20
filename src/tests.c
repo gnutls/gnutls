@@ -21,7 +21,6 @@
 
 #include <config.h>
 #include <gnutls/gnutls.h>
-#include <gnutls/extra.h>
 #include <gnutls/x509.h>
 
 #ifndef _WIN32

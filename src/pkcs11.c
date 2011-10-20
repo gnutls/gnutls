@@ -22,7 +22,6 @@
 #include <getpass.h>
 
 #include <gnutls/gnutls.h>
-#include <gnutls/extra.h>
 #include <gnutls/pkcs11.h>
 #include <gnutls/abstract.h>
 #include <stdio.h>

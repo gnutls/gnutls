@@ -41,7 +41,6 @@ main (int argc, char **argv)
 #include <string.h>
 #include <stdlib.h>
 #include <gnutls/gnutls.h>
-#include <gnutls/extra.h>
 #include <psk-gaa.h>
 
 #include <gnutls/crypto.h>      /* for random */

@@ -26,7 +26,6 @@
 #include <sys/types.h>
 #include <string.h>
 #include <gnutls/gnutls.h>
-#include <gnutls/extra.h>
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <tests.h>
