@@ -579,7 +579,7 @@ gnutls_srp_set_server_credentials_file (gnutls_srp_server_credentials_t res,
  * @username contains the actual username.
  * The @salt, @verifier, @generator and @prime must be filled
  * in using the gnutls_malloc(). For convenience @prime and @generator
- * may also be one of the static parameters defined in extra.h.
+ * may also be one of the static parameters defined in gnutls.h.
  *
  * In case the callback returned a negative number then gnutls will
  * assume that the username does not exist.
@@ -671,7 +671,7 @@ gnutls_srp_server_get_username (gnutls_session_t session)
  *
  * This function will create an SRP verifier, as specified in
  * RFC2945.  The @prime and @generator should be one of the static
- * parameters defined in gnutls/extra.h or may be generated.
+ * parameters defined in gnutls/gnutls.h or may be generated.
  *
  * The verifier will be allocated with @gnutls_malloc() and will be stored in
  * @res using binary format.

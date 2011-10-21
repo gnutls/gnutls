@@ -446,7 +446,7 @@ _randomize_pwd_entry (SRP_PWD_ENTRY * entry)
 }
 
 /* Free all the entry parameters, except if g and n are
- * the static ones defined in extra.h
+ * the static ones defined in gnutls.h
  */
 void
 _gnutls_srp_entry_free (SRP_PWD_ENTRY * entry)

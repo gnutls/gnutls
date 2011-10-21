@@ -43,7 +43,7 @@ operate with TLS 1.2.
 ID. Reported by Erik Jensen.
 
 ** libgnutls: Corrected VIA padlock code for C3. In C3 benchmarks 
-show a 2x increase in AES speed and a 14x increase in VIA nano. Added 
+show a 50x increase in AES speed and a 14x increase in VIA nano. Added 
 support for hashes and HMACs.
 
 ** libgnutls: Compilation fixed when p11-kit is not detected.

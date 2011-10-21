@@ -26,7 +26,6 @@
 
 #include <stdio.h>
 #include <gnutls/gnutls.h>
-#include <gnutls/extra.h>
 #include <gnutls/openpgp.h>
 #include <libguile.h>
 
