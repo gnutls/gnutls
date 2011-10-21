@@ -32,6 +32,8 @@ AM_CPPFLAGS = \
 	-DLOCALEDIR=\"$(localedir)\"		\
 	-I$(srcdir)/../gl			\
 	-I$(builddir)/../gl			\
+	-I$(builddir)/includes			\
+	-I$(builddir)/x509			\
 	-I$(srcdir)/includes			\
 	-I$(srcdir)/x509
 
