@@ -22,6 +22,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../../gl		\
 	-I$(srcdir)/../includes		\
 	-I$(builddir)/../includes	\
+	-I$(builddir)/../../gl          \
 	-I$(srcdir)/..
 
 if ENABLE_MINITASN1

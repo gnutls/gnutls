@@ -23,6 +23,7 @@ SUBDIRS =
 AM_CPPFLAGS = \
 	-I$(srcdir)/../../gl		\
 	-I$(srcdir)/../includes		\
+	-I$(builddir)/../../gl		\
 	-I$(builddir)/../includes	\
 	-I$(srcdir)/..
 

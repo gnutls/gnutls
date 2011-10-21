@@ -23,6 +23,7 @@
 
 AM_CPPFLAGS = -DASN1_BUILDING		\
 	-I$(srcdir)/../../gl		\
+	-I$(builddir)/../../gl          \
 	-I$(srcdir)/..
 
 noinst_LTLIBRARIES = libminitasn1.la
