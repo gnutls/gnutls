@@ -39,6 +39,7 @@
 #include <fcntl.h>
 #include <list.h>
 #include <netdb.h>
+#include <unistd.h>
 
 /* Gnulib portability files. */
 #include "progname.h"
