@@ -1,4 +1,4 @@
-/* Split a 'long double' into fraction and mantissa, for hexadecimal printf.
+/* Test of <arpa/inet.h> substitute.
    Copyright (C) 2007, 2009-2011 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -14,24 +14,14 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
+/* Written by Bruno Haible <bruno@clisp.org>, 2007.  */
+
 #include <config.h>
 
-#if HAVE_SAME_LONG_DOUBLE_AS_DOUBLE
+#include <arpa/inet.h>
 
-/* Specification.  */
-# include "printf-frexpl.h"
-
-# include "printf-frexp.h"
-
-long double
-printf_frexpl (long double x, int *expptr)
+int
+main (void)
 {
-  return printf_frexp (x, expptr);
+  return 0;
 }
-
-#else
-
-# define USE_LONG_DOUBLE
-# include "printf-frexp.c"
-
-#endif

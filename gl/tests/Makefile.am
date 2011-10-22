@@ -58,6 +58,15 @@ AM_LIBTOOLFLAGS = --preserve-dup-deps
 
 TESTS_ENVIRONMENT += EXEEXT='@EXEEXT@' srcdir='$(srcdir)'
 
+## begin gnulib module accept-tests
+
+TESTS += test-accept
+check_PROGRAMS += test-accept
+test_accept_LDADD = $(LDADD) @LIBSOCKET@
+EXTRA_DIST += test-accept.c signature.h macros.h
+
+## end   gnulib module accept-tests
+
 ## begin gnulib module alloca-opt-tests
 
 TESTS += test-alloca-opt
@@ -76,6 +85,50 @@ EXTRA_DIST += test-argp.c test-argp-2.sh
 
 ## end   gnulib module argp-tests
 
+## begin gnulib module arpa_inet
+
+BUILT_SOURCES += arpa/inet.h
+
+# We need the following in order to create <arpa/inet.h> when the system
+# doesn't have one.
+arpa/inet.h: arpa_inet.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(WARN_ON_USE_H) $(ARG_NONNULL_H)
+	$(AM_V_at)$(MKDIR_P) arpa
+	$(AM_V_GEN)rm -f $@-t $@ && \
+	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
+	  sed -e 's|@''GUARD_PREFIX''@|GL|g' \
+	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+	      -e 's|@''PRAGMA_SYSTEM_HEADER''@|@PRAGMA_SYSTEM_HEADER@|g' \
+	      -e 's|@''PRAGMA_COLUMNS''@|@PRAGMA_COLUMNS@|g' \
+	      -e 's|@''HAVE_FEATURES_H''@|$(HAVE_FEATURES_H)|g' \
+	      -e 's|@''NEXT_ARPA_INET_H''@|$(NEXT_ARPA_INET_H)|g' \
+	      -e 's|@''HAVE_ARPA_INET_H''@|$(HAVE_ARPA_INET_H)|g' \
+	      -e 's/@''GNULIB_INET_NTOP''@/$(GNULIB_INET_NTOP)/g' \
+	      -e 's/@''GNULIB_INET_PTON''@/$(GNULIB_INET_PTON)/g' \
+	      -e 's|@''HAVE_DECL_INET_NTOP''@|$(HAVE_DECL_INET_NTOP)|g' \
+	      -e 's|@''HAVE_DECL_INET_PTON''@|$(HAVE_DECL_INET_PTON)|g' \
+	      -e 's|@''REPLACE_INET_NTOP''@|$(REPLACE_INET_NTOP)|g' \
+	      -e 's|@''REPLACE_INET_PTON''@|$(REPLACE_INET_PTON)|g' \
+	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
+	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
+	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
+	      < $(srcdir)/arpa_inet.in.h; \
+	} > $@-t && \
+	mv $@-t $@
+MOSTLYCLEANFILES += arpa/inet.h arpa/inet.h-t
+MOSTLYCLEANDIRS += arpa
+
+EXTRA_DIST += arpa_inet.in.h
+
+## end   gnulib module arpa_inet
+
+## begin gnulib module arpa_inet-tests
+
+TESTS += test-arpa_inet
+check_PROGRAMS += test-arpa_inet
+EXTRA_DIST += test-arpa_inet.c
+
+## end   gnulib module arpa_inet-tests
+
 ## begin gnulib module binary-io
 
 libtests_a_SOURCES += binary-io.h
@@ -90,6 +143,15 @@ check_PROGRAMS += test-binary-io
 EXTRA_DIST += test-binary-io.sh test-binary-io.c macros.h
 
 ## end   gnulib module binary-io-tests
+
+## begin gnulib module bind-tests
+
+TESTS += test-bind
+check_PROGRAMS += test-bind
+test_bind_LDADD = $(LDADD) @LIBSOCKET@ $(INET_PTON_LIB)
+EXTRA_DIST += test-bind.c signature.h macros.h
+
+## end   gnulib module bind-tests
 
 ## begin gnulib module byteswap-tests
 
@@ -374,6 +436,7 @@ EXTRA_libtests_a_SOURCES += getcwd-lgpl.c
 
 TESTS += test-getcwd-lgpl
 check_PROGRAMS += test-getcwd-lgpl
+test_getcwd_lgpl_LDADD = $(LDADD) $(LIBINTL)
 EXTRA_DIST += test-getcwd-lgpl.c signature.h macros.h
 
 ## end   gnulib module getcwd-lgpl-tests
@@ -414,6 +477,15 @@ EXTRA_libtests_a_SOURCES += getpagesize.c
 
 ## end   gnulib module getpagesize
 
+## begin gnulib module getpeername-tests
+
+TESTS += test-getpeername
+check_PROGRAMS += test-getpeername
+test_getpeername_LDADD = $(LDADD) @LIBSOCKET@
+EXTRA_DIST += test-getpeername.c signature.h macros.h
+
+## end   gnulib module getpeername-tests
+
 ## begin gnulib module gettimeofday-tests
 
 TESTS += test-gettimeofday
@@ -437,6 +509,24 @@ check_PROGRAMS += test-ignore-value
 EXTRA_DIST += test-ignore-value.c
 
 ## end   gnulib module ignore-value-tests
+
+## begin gnulib module inet_pton
+
+
+EXTRA_DIST += inet_pton.c
+
+EXTRA_libtests_a_SOURCES += inet_pton.c
+
+## end   gnulib module inet_pton
+
+## begin gnulib module inet_pton-tests
+
+TESTS += test-inet_pton
+check_PROGRAMS += test-inet_pton
+test_inet_pton_LDADD = $(LDADD) @INET_PTON_LIB@
+EXTRA_DIST += test-inet_pton.c signature.h macros.h
+
+## end   gnulib module inet_pton-tests
 
 ## begin gnulib module intprops-tests
 
@@ -522,6 +612,15 @@ check_PROGRAMS += test-isnanl-nolibm
 EXTRA_DIST += test-isnanl-nolibm.c test-isnanl.h minus-zero.h infinity.h nan.h macros.h
 
 ## end   gnulib module isnanl-nolibm-tests
+
+## begin gnulib module listen-tests
+
+TESTS += test-listen
+check_PROGRAMS += test-listen
+test_listen_LDADD = $(LDADD) @LIBSOCKET@
+EXTRA_DIST += test-listen.c signature.h macros.h
+
+## end   gnulib module listen-tests
 
 ## begin gnulib module lstat
 
@@ -670,12 +769,30 @@ EXTRA_DIST += test-read-file.c
 
 ## end   gnulib module read-file-tests
 
+## begin gnulib module recvfrom-tests
+
+TESTS += test-recvfrom
+check_PROGRAMS += test-recvfrom
+test_recvfrom_LDADD = $(LDADD) @LIBSOCKET@
+EXTRA_DIST += test-recvfrom.c signature.h macros.h
+
+## end   gnulib module recvfrom-tests
+
 ## begin gnulib module same-inode
 
 
 EXTRA_DIST += same-inode.h
 
 ## end   gnulib module same-inode
+
+## begin gnulib module sendto-tests
+
+TESTS += test-sendto
+check_PROGRAMS += test-sendto
+test_sendto_LDADD = $(LDADD) @LIBSOCKET@ $(INET_PTON_LIB)
+EXTRA_DIST += test-sendto.c signature.h macros.h
+
+## end   gnulib module sendto-tests
 
 ## begin gnulib module setenv
 
@@ -693,6 +810,24 @@ check_PROGRAMS += test-setenv
 EXTRA_DIST += test-setenv.c signature.h macros.h
 
 ## end   gnulib module setenv-tests
+
+## begin gnulib module setsockopt-tests
+
+TESTS += test-setsockopt
+check_PROGRAMS += test-setsockopt
+test_setsockopt_LDADD = $(LDADD) @LIBSOCKET@
+EXTRA_DIST += test-setsockopt.c signature.h macros.h
+
+## end   gnulib module setsockopt-tests
+
+## begin gnulib module shutdown-tests
+
+TESTS += test-shutdown
+check_PROGRAMS += test-shutdown
+test_shutdown_LDADD = $(LDADD) @LIBSOCKET@
+EXTRA_DIST += test-shutdown.c signature.h macros.h
+
+## end   gnulib module shutdown-tests
 
 ## begin gnulib module signbit-tests
 
@@ -823,6 +958,7 @@ EXTRA_libtests_a_SOURCES += stat.c
 
 TESTS += test-stat
 check_PROGRAMS += test-stat
+test_stat_LDADD = $(LDADD) $(LIBINTL)
 EXTRA_DIST += test-stat.h test-stat.c signature.h macros.h
 
 ## end   gnulib module stat-tests

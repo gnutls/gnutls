@@ -1,5 +1,6 @@
-/* Split a 'long double' into fraction and mantissa, for hexadecimal printf.
-   Copyright (C) 2007, 2009-2011 Free Software Foundation, Inc.
+/* listen.c --- wrappers for Windows listen function
+
+   Copyright (C) 2008-2011 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,24 +15,35 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
+/* Written by Paolo Bonzini */
+
 #include <config.h>
 
-#if HAVE_SAME_LONG_DOUBLE_AS_DOUBLE
+#define WIN32_LEAN_AND_MEAN
+/* Get winsock2.h. */
+#include <sys/socket.h>
 
-/* Specification.  */
-# include "printf-frexpl.h"
+/* Get set_winsock_errno, FD_TO_SOCKET etc. */
+#include "w32sock.h"
 
-# include "printf-frexp.h"
+#undef listen
 
-long double
-printf_frexpl (long double x, int *expptr)
+int
+rpl_listen (int fd, int backlog)
 {
-  return printf_frexp (x, expptr);
+  SOCKET sock = FD_TO_SOCKET (fd);
+
+  if (sock == INVALID_SOCKET)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  else
+    {
+      int r = listen (sock, backlog);
+      if (r < 0)
+        set_winsock_errno ();
+
+      return r;
+    }
 }
-
-#else
-
-# define USE_LONG_DOUBLE
-# include "printf-frexp.c"
-
-#endif

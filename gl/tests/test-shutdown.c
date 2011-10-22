@@ -1,5 +1,5 @@
-/* Split a 'long double' into fraction and mantissa, for hexadecimal printf.
-   Copyright (C) 2007, 2009-2011 Free Software Foundation, Inc.
+/* Test the shutdown() function.
+   Copyright (C) 2011 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,22 +16,32 @@
 
 #include <config.h>
 
-#if HAVE_SAME_LONG_DOUBLE_AS_DOUBLE
+#include <sys/socket.h>
 
-/* Specification.  */
-# include "printf-frexpl.h"
+#include "signature.h"
+SIGNATURE_CHECK (shutdown, int, (int, int));
 
-# include "printf-frexp.h"
+#include <errno.h>
 
-long double
-printf_frexpl (long double x, int *expptr)
+#include "sockets.h"
+#include "macros.h"
+
+int
+main (void)
 {
-  return printf_frexp (x, expptr);
+  gl_sockets_startup (SOCKETS_1_1);
+
+  /* Test behaviour for invalid file descriptors.  */
+  {
+    errno = 0;
+    ASSERT (shutdown (-1, SHUT_RD) == -1);
+    ASSERT (errno == EBADF);
+  }
+  {
+    errno = 0;
+    ASSERT (shutdown (99, SHUT_RD) == -1);
+    ASSERT (errno == EBADF);
+  }
+
+  return 0;
 }
-
-#else
-
-# define USE_LONG_DOUBLE
-# include "printf-frexp.c"
-
-#endif

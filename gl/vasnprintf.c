@@ -553,32 +553,61 @@ divide (mpn_t a, mpn_t b, mpn_t *q)
       size_t s;
       {
         mp_limb_t msd = b_ptr[b_len - 1]; /* = b[n-1], > 0 */
-        s = 31;
-        if (msd >= 0x10000)
+        /* Determine s = GMP_LIMB_BITS - integer_length (msd).
+           Code copied from gnulib's integer_length.c.  */
+# if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4)
+        s = __builtin_clz (msd);
+# else
+#  if defined DBL_EXPBIT0_WORD && defined DBL_EXPBIT0_BIT
+        if (GMP_LIMB_BITS <= DBL_MANT_BIT)
           {
-            msd = msd >> 16;
-            s -= 16;
+            /* Use 'double' operations.
+               Assumes an IEEE 754 'double' implementation.  */
+#   define DBL_EXP_MASK ((DBL_MAX_EXP - DBL_MIN_EXP) | 7)
+#   define DBL_EXP_BIAS (DBL_EXP_MASK / 2 - 1)
+#   define NWORDS \
+     ((sizeof (double) + sizeof (unsigned int) - 1) / sizeof (unsigned int))
+            union { double value; unsigned int word[NWORDS]; } m;
+
+            /* Use a single integer to floating-point conversion.  */
+            m.value = msd;
+
+            s = GMP_LIMB_BITS
+                - (((m.word[DBL_EXPBIT0_WORD] >> DBL_EXPBIT0_BIT) & DBL_EXP_MASK)
+                   - DBL_EXP_BIAS);
           }
-        if (msd >= 0x100)
+        else
+#   undef NWORDS
+#  endif
           {
-            msd = msd >> 8;
-            s -= 8;
+            s = 31;
+            if (msd >= 0x10000)
+              {
+                msd = msd >> 16;
+                s -= 16;
+              }
+            if (msd >= 0x100)
+              {
+                msd = msd >> 8;
+                s -= 8;
+              }
+            if (msd >= 0x10)
+              {
+                msd = msd >> 4;
+                s -= 4;
+              }
+            if (msd >= 0x4)
+              {
+                msd = msd >> 2;
+                s -= 2;
+              }
+            if (msd >= 0x2)
+              {
+                msd = msd >> 1;
+                s -= 1;
+              }
           }
-        if (msd >= 0x10)
-          {
-            msd = msd >> 4;
-            s -= 4;
-          }
-        if (msd >= 0x4)
-          {
-            msd = msd >> 2;
-            s -= 2;
-          }
-        if (msd >= 0x2)
-          {
-            msd = msd >> 1;
-            s -= 1;
-          }
+# endif
       }
       /* 0 <= s < GMP_LIMB_BITS.
          Copy b, shifting it left by s bits.  */
@@ -885,9 +914,9 @@ decode_long_double (long double x, int *ep, mpn_t *mp)
   y = frexpl (x, &exp);
   if (!(y >= 0.0L && y < 1.0L))
     abort ();
-  /* x = 2^exp * y = 2^(exp - LDBL_MANT_BIT) * (y * LDBL_MANT_BIT), and the
+  /* x = 2^exp * y = 2^(exp - LDBL_MANT_BIT) * (y * 2^LDBL_MANT_BIT), and the
      latter is an integer.  */
-  /* Convert the mantissa (y * LDBL_MANT_BIT) to a sequence of limbs.
+  /* Convert the mantissa (y * 2^LDBL_MANT_BIT) to a sequence of limbs.
      I'm not sure whether it's safe to cast a 'long double' value between
      2^31 and 2^32 to 'unsigned int', therefore play safe and cast only
      'long double' values between 0 and 2^16 (to 'unsigned int' or 'int',
@@ -973,9 +1002,9 @@ decode_double (double x, int *ep, mpn_t *mp)
   y = frexp (x, &exp);
   if (!(y >= 0.0 && y < 1.0))
     abort ();
-  /* x = 2^exp * y = 2^(exp - DBL_MANT_BIT) * (y * DBL_MANT_BIT), and the
+  /* x = 2^exp * y = 2^(exp - DBL_MANT_BIT) * (y * 2^DBL_MANT_BIT), and the
      latter is an integer.  */
-  /* Convert the mantissa (y * DBL_MANT_BIT) to a sequence of limbs.
+  /* Convert the mantissa (y * 2^DBL_MANT_BIT) to a sequence of limbs.
      I'm not sure whether it's safe to cast a 'double' value between
      2^31 and 2^32 to 'unsigned int', therefore play safe and cast only
      'double' values between 0 and 2^16 (to 'unsigned int' or 'int',
