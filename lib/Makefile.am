@@ -35,6 +35,7 @@ AM_CPPFLAGS = \
 	-I$(builddir)/includes			\
 	-I$(builddir)/x509			\
 	-I$(srcdir)/includes			\
+	-I$(builddir)/includes			\
 	-I$(srcdir)/x509
 
 if ENABLE_OPENPGP
@@ -154,7 +155,9 @@ endif
 if ENABLE_CXX
 libgnutlsxx_la_CPPFLAGS = -I$(top_srcdir)/includes -I$(top_builddir)/includes -I$(srcdir)/includes
 
-AM_CXXFLAGS = -I$(srcdir)/includes
+AM_CXXFLAGS = \
+	-I$(srcdir)/includes	\
+	-I$(builddir)/includes	
 
 lib_LTLIBRARIES += libgnutlsxx.la
 
