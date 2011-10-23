@@ -204,11 +204,6 @@ static const gnutls_error_entry error_algorithms[] = {
                GNUTLS_E_TOO_MANY_EMPTY_PACKETS, 1),
   ERROR_ENTRY (N_("Too many handshake packets have been received."),
                GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS, 1),
-  ERROR_ENTRY (N_("The initialization of GnuTLS-extra has failed."),
-               GNUTLS_E_INIT_LIBEXTRA, 1),
-  ERROR_ENTRY (N_
-               ("The GnuTLS library version does not match the GnuTLS-extra library version."),
-               GNUTLS_E_LIBRARY_VERSION_MISMATCH, 1),
   ERROR_ENTRY (N_("The crypto library version is too old."),
                GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY, 1),
 
