@@ -48,7 +48,6 @@
 
     (if extra?
         (begin
-          (format port "#include <gnutls/extra.h>~%")
           (format port "#include <gnutls/openpgp.h>~%")))
 
     (for-each (lambda (enum)

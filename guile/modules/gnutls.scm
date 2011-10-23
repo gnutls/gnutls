@@ -312,8 +312,6 @@
            error/file-error
            error/too-many-empty-packets
            error/unknown-pk-algorithm
-           error/init-libextra
-           error/library-version-mismatch
            error/no-temporary-rsa-params
            error/lzo-init-failed
            error/no-compression-algorithms
