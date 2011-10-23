@@ -43,5 +43,5 @@ AM_CFLAGS += -DASM_X86_64 -DASM_X86
 libx86_la_SOURCES += asm/appro-aes-x86-64.s asm/appro-aes-gcm-x86-64.s aes-gcm-x86.c asm/padlock-x86-64.s asm/cpuid-x86-64.s asm/padlock-common.s
 else
 AM_CFLAGS += -DASM_X86_32 -DASM_X86
-libx86_la_SOURCES += asm/appro-aes-x86.s asm/padlock-x86.s asm/cpuid-x86.s asm/padlock-common.s
+libx86_la_SOURCES += asm/appro-aes-x86.s asm/padlock-x86.s asm/cpuid-x86.s
 endif

@@ -25,20 +25,26 @@
 .type	is_padlock_nano,@function
 .align	16
 is_padlock_nano:
-	pusha
-	xorl	%eax,%eax
+	pushq	%rbp
+	movq	%rsp, %rbp
+	pushq	%rbx
+	xorq	%rax,%rax
 	cpuid
-	movl    $1,%eax
+	movq    $1,%rax
 	cpuid
-	or      $0x000f,%eax
-        cmp     $0x06ff,%eax
+	or      $0x000f,%rax
+        cmp     $0x06ff,%rax
 	jne     .Lno_nano
-	popa
-	mov     $1,%eax
+	popq    %rbx
+	mov     $1,%rax
+	popq	%rbx
+	leave
         ret
 .Lno_nano:
-	popa
-	xorl	%eax,%eax
+	popq	%rbx
+	xorq	%rax,%rax
+	popq	%rbx
+	leave
         ret
 .size	is_padlock_nano,.-is_padlock_nano
 
