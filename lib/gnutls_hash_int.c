@@ -68,7 +68,7 @@ _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
   /* check if a digest has been registered 
    */
   cc = _gnutls_get_crypto_digest (algorithm);
-  if (cc != NULL)
+  if (cc != NULL && cc->init)
     {
       if (cc->init (algorithm, &dig->handle) < 0)
         {
