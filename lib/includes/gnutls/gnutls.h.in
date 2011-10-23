@@ -1681,13 +1681,6 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 #define GNUTLS_E_UNKNOWN_PK_ALGORITHM -80
 #define GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS -81
 
-  /* returned if libextra functionality was requested but
-   * gnutls_global_init_extra() was not called.
-   */
-#define GNUTLS_E_INIT_LIBEXTRA -82
-#define GNUTLS_E_LIBRARY_VERSION_MISMATCH -83
-
-
   /* returned if you need to generate temporary RSA
    * parameters. These are needed for export cipher suites.
    */
