@@ -25,6 +25,7 @@
 .type	is_padlock_nano,@function
 .align	16
 is_padlock_nano:
+	pusha
 	xorl	%eax,%eax
 	cpuid
 	movl    $1,%eax
@@ -32,9 +33,11 @@ is_padlock_nano:
 	or      $0x000f,%eax
         cmp     $0x06ff,%eax
 	jne     .Lno_nano
+	popa
 	mov     $1,%eax
         ret
 .Lno_nano:
+	popa
 	xorl	%eax,%eax
         ret
 .size	is_padlock_nano,.-is_padlock_nano
