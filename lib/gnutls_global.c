@@ -212,7 +212,7 @@ gnutls_global_init (void)
     goto out;
 
   if (gl_sockets_startup (SOCKETS_1_1))
-    return GNUTLS_E_LIBRARY_VERSION_MISMATCH;
+    return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
 
   bindtextdomain (PACKAGE, LOCALEDIR);
 
