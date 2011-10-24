@@ -199,12 +199,12 @@ check_phe_partial (void)
   uint32_t iv[5] = { 0x67452301UL, 0xEFCDAB89UL,
        0x98BADCFEUL, 0x10325476UL, 0xC3D2E1F0UL };
 
-  padlock_sha1_oneshot (iv, text, sizeof(text)-1);
-  padlock_sha1_oneshot (iv, text, sizeof(text)-1);
+  padlock_sha1_blocks (iv, text, sizeof(text)-1);
+  padlock_sha1_blocks (iv, text, sizeof(text)-1);
 
-  if (iv[0] == 0xdccd6d7eUL && iv[1] == 0xe09319bbUL &&
-      iv[2] == 0x3a23a450UL && iv[3] == 0x4aa6c66cUL &&
-      iv[4] == 0x86715f12UL)
+  if (iv[0] == 0x9096E2D8UL && iv[1] == 0xA33074EEUL &&
+      iv[2] == 0xCDBEE447UL && iv[3] == 0xEC7979D2UL &&
+      iv[4] == 0x9D3FF5CFUL)
       return 1;
   else
     return 0;
