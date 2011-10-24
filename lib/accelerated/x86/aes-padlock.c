@@ -33,6 +33,7 @@
 #include <x86.h>
 #ifdef HAVE_LIBNETTLE
 #include <nettle/aes.h>         /* for key generation in 192 and 256 bits */
+#include <sha-padlock.h>
 #endif
 #include <aes-padlock.h>
 
@@ -191,6 +192,24 @@ check_phe_sha512 (void)
   return ((edx & (0x3 << 25)) == (0x3 << 25));
 }
 
+static int
+check_phe_partial (void)
+{
+  const char* text = "test and test";
+  uint32_t iv[5] = { 0x67452301UL, 0xEFCDAB89UL,
+       0x98BADCFEUL, 0x10325476UL, 0xC3D2E1F0UL };
+
+  padlock_sha1_oneshot (iv, text, sizeof(text)-1);
+  padlock_sha1_oneshot (iv, text, sizeof(text)-1);
+
+  if (iv[0] == 0xdccd6d7eUL && iv[1] == 0xe09319bbUL &&
+      iv[2] == 0x3a23a450UL && iv[3] == 0x4aa6c66cUL &&
+      iv[4] == 0x86715f12UL)
+      return 1;
+  else
+    return 0;
+}
+
 static unsigned
 check_via (void)
 {
@@ -263,10 +282,12 @@ register_padlock_crypto (void)
 #ifdef HAVE_LIBNETTLE
   phe = check_phe ();
 
-  if (is_padlock_nano () && phe)
+  if (check_phe_partial () && phe)
     {
+      _gnutls_debug_log ("Padlock SHA1 and SHA256 (partial) accelerator was detected\n");
       if (check_phe_sha512 ())
         {
+          _gnutls_debug_log ("Padlock SHA512 (partial) accelerator was detected\n");
           ret =
             gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA384,
                                                   80,
@@ -350,6 +371,7 @@ register_padlock_crypto (void)
     {
       /* Original padlock PHE. Does not support incremental operations.
        */
+      _gnutls_debug_log ("Padlock SHA1 and SHA256 accelerator was detected\n");
       ret =
         gnutls_crypto_single_digest_register (GNUTLS_DIG_SHA1,
                                               80, &sha_padlock_struct);

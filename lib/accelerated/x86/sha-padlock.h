@@ -1,6 +1,8 @@
 #ifndef SHA_PADLOCK_H
 # define SHA_PADLOCK_H
 
+#include <nettle/sha.h>
+
 void padlock_sha1_oneshot(void *ctx, const void *inp, size_t len);
 void padlock_sha256_oneshot(void *ctx, const void *inp, size_t len);
 

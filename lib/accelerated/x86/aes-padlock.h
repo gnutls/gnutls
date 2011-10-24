@@ -38,11 +38,6 @@ int padlock_aes_cipher_setkey(void *_ctx, const void *userkey, size_t keysize);
 
 /* asm */
 unsigned int padlock_capability(void);
-#ifdef ASM_X86_64
-unsigned int is_padlock_nano(void);
-#else
-# define is_padlock_nano() 0
-#endif
 void padlock_reload_key(void);
 int padlock_ecb_encrypt(void *out, const void *inp,
                         struct padlock_cipher_data *ctx, size_t len);
