@@ -6,6 +6,9 @@ See the end for copying conditions.
 
 ** libgnutls-extra: is no more
 
+** libgnutls: Corrections in VIA padlock code for VIA C5 processor
+and new detection of PHE with support for partial hashing.
+
 ** libgnutls: Corrected bug in gnutls_x509_data2hex. Report and fix 
 by Vincent Untz.
 
