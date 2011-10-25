@@ -47,7 +47,7 @@ else
 
 AM_CFLAGS += -DASM_X86_32 -DASM_X86
 if WIN32
-libx86_la_SOURCES += coff/appro-aes-x86-coff.s coff/padlock-x86-coff.s asm/cpuid-x86.s
+libx86_la_SOURCES += asm-coff/appro-aes-x86-coff.s asm-coff/padlock-x86-coff.s asm-coff/cpuid-x86-coff.s
 else
 libx86_la_SOURCES += asm/appro-aes-x86.s asm/padlock-x86.s asm/cpuid-x86.s
 endif
