@@ -70,7 +70,7 @@ AM_CONDITIONAL(WANT_TEST_SUITE, [test -f tests/suite/mini-eagain2.c])
 
 dnl Detect windows build
 case "$host" in
-  *-*-mingw32* | *-*-mingw64*)
+  *mingw32* | *mingw64*)
     have_win=yes
   ;;
   *)
