@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006, 2008, 2009, 2010
- * Free Software Foundation, Inc.
+ * Copyright (C) 2000, 2001, 2002, 2003, 2004, 2006, 2008, 2009, 2010,
+ * 2011 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -264,13 +264,9 @@ _asn1_append_sequence_set (ASN1_TYPE node)
  *           result=asn1_write_value(cert,
  *           "tbsCertificate.subject.rdnSequence.?LAST", "NEW", 1);
  *
- * Returns:
- *
- *   %ASN1_SUCCESS: Set value OK.
- *
- *   %ASN1_ELEMENT_NOT_FOUND: NAME is not a valid element.
- *
- *   %ASN1_VALUE_NOT_VALID: VALUE has a wrong format.
+ * Returns: %ASN1_SUCCESS if the value was set,
+ *   %ASN1_ELEMENT_NOT_FOUND if @name is not a valid element, and
+ *   %ASN1_VALUE_NOT_VALID if @ivalue has a wrong format.
  **/
 asn1_retCode
 asn1_write_value (ASN1_TYPE node_root, const char *name,
@@ -697,16 +693,12 @@ asn1_write_value (ASN1_TYPE node_root, const char *name,
  * ANY: If NAME indicates an any type, VALUE will indicate the DER
  *   encoding of the structure actually used.
  *
- * Returns:
- *
- *   %ASN1_SUCCESS: Set value OK.
- *
- *   %ASN1_ELEMENT_NOT_FOUND: NAME is not a valid element.
- *
- *   %ASN1_VALUE_NOT_FOUND: There isn't any value for the element selected.
- *
- *   %ASN1_MEM_ERROR: The value vector isn't big enough to store the result.
- *   In this case LEN will contain the number of bytes needed.
+ * Returns: %ASN1_SUCCESS if value is returned,
+ *   %ASN1_ELEMENT_NOT_FOUND if @name is not a valid element,
+ *   %ASN1_VALUE_NOT_FOUND if there isn't any value for the element
+ *   selected, and %ASN1_MEM_ERROR if The value vector isn't big enough
+ *   to store the result, and in this case @len will contain the number of
+ *   bytes needed.
  **/
 asn1_retCode
 asn1_read_value (ASN1_TYPE root, const char *name, void *ivalue, int *len)
@@ -883,11 +875,8 @@ asn1_read_value (ASN1_TYPE root, const char *name, void *ivalue, int *len)
  * %ASN1_CLASS_UNIVERSAL, %ASN1_CLASS_PRIVATE or
  * %ASN1_CLASS_CONTEXT_SPECIFIC.
  *
- * Returns:
- *
- *   %ASN1_SUCCESS: Set value OK.
- *
- *   %ASN1_ELEMENT_NOT_FOUND: NAME is not a valid element.
+ * Returns: %ASN1_SUCCESS if successful, %ASN1_ELEMENT_NOT_FOUND if
+ *   @name is not a valid element.
  **/
 asn1_retCode
 asn1_read_tag (ASN1_TYPE root, const char *name, int *tagValue,
@@ -986,7 +975,5 @@ asn1_read_tag (ASN1_TYPE root, const char *name, int *tagValue,
 	}
     }
 
-
   return ASN1_SUCCESS;
-
 }

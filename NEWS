@@ -12,6 +12,8 @@ and new detection of PHE with support for partial hashing.
 ** libgnutls: Corrected bug in gnutls_x509_data2hex. Report and fix 
 by Vincent Untz.
 
+** minitasn1: Upgraded to libtasn1 version 2.10.
+
 ** API and ABI modifications:
 No changes since last version.
 

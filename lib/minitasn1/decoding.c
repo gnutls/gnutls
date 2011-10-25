@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2004, 2006, 2008, 2009, 2010 Free Software
+ * Copyright (C) 2002, 2004, 2006, 2008, 2009, 2010, 2011 Free Software
  * Foundation, Inc.
  *
  * This file is part of LIBTASN1.
@@ -168,7 +168,7 @@ asn1_get_tag_der (const unsigned char *der, int der_len,
  * asn1_get_length_der() is that this function will return a length
  * even if the value has indefinite encoding.
  *
- * Returns: Return the decoded length value, or negative error code when
+ * Returns: Return the decoded length value, or negative value when
  *   the value was too big.
  *
  * Since: 2.0
@@ -1367,7 +1367,7 @@ asn1_der_decoding_element (ASN1_TYPE * structure, const char *elementName,
   char temp[128], currentName[ASN1_MAX_NAME_SIZE * 10], *dot_p, *char_p;
   int nameLen = ASN1_MAX_NAME_SIZE * 10 - 1, state;
   int counter, len2, len3, len4, move, ris, tlen;
-  unsigned char class, *temp2;
+  unsigned char class;
   unsigned long tag;
   int indefinite, result;
   const unsigned char *der = ider;
@@ -1921,7 +1921,6 @@ asn1_der_decoding_element (ASN1_TYPE * structure, const char *elementName,
 		  if (state == FOUND)
 		    {
 		      _asn1_set_value_octet (p, der + counter, len2 + len3);
-		      temp2 = NULL;
 
 		      if (p == nodeFound)
 			state = EXIT;

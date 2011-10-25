@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2005, 2006, 2008, 2009, 2010 Free Software
+ * Copyright (C) 2002, 2005, 2006, 2008, 2009, 2010, 2011 Free Software
  * Foundation, Inc.
  *
  * This file is part of LIBTASN1.
@@ -85,7 +85,7 @@ asn1_perror (asn1_retCode error)
  *
  * This function replaces libtasn1_strerror() in older libtasn1.
  *
- * Returns: Pointer to static (0)-terminated string describing error
+ * Returns: Pointer to static zero-terminated string describing error
  *   code.
  *
  * Since: 1.6
@@ -130,7 +130,7 @@ libtasn1_perror (asn1_retCode error)
  * similar to strerror.  The only difference is that it accepts an
  * error (number) returned by a libtasn1 function.
  *
- * Returns: Pointer to static (0)-terminated string describing error
+ * Returns: Pointer to static zero-terminated string describing error
  *   code.
  *
  * Deprecated: Use asn1_strerror() instead.

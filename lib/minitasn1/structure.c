@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2004, 2006, 2007, 2008, 2009, 2010 Free
+ * Copyright (C) 2002, 2004, 2006, 2007, 2008, 2009, 2010, 2011 Free
  * Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
@@ -168,16 +168,11 @@ _asn1_create_static_structure (ASN1_TYPE pointer, char *output_file_name,
  * Creates the structures needed to manage the ASN.1 definitions.
  * @array is a vector created by asn1_parser2array().
  *
- * Returns:
- *
- * %ASN1_SUCCESS: Structure created correctly.
- *
- * %ASN1_ELEMENT_NOT_EMPTY: *@definitions not ASN1_TYPE_EMPTY.
- *
- * %ASN1_IDENTIFIER_NOT_FOUND: In the file there is an identifier that
- *   is not defined (see @errorDescription for more information).
- *
- * %ASN1_ARRAY_ERROR: The array pointed by @array is wrong.
+ * Returns: %ASN1_SUCCESS if structure was created correctly,
+ *   %ASN1_ELEMENT_NOT_EMPTY if *@definitions not ASN1_TYPE_EMPTY,
+ *   %ASN1_IDENTIFIER_NOT_FOUND if in the file there is an identifier
+ *   that is not defined (see @errorDescription for more information),
+ *   %ASN1_ARRAY_ERROR if the array pointed by @array is wrong.
  **/
 asn1_retCode
 asn1_array2tree (const ASN1_ARRAY_TYPE * array, ASN1_TYPE * definitions,
@@ -284,11 +279,8 @@ asn1_array2tree (const ASN1_ARRAY_TYPE * array, ASN1_TYPE * definitions,
  * Deletes the structure *@structure.  At the end, *@structure is set
  * to ASN1_TYPE_EMPTY.
  *
- * Returns:
- *
- * %ASN1_SUCCESS: Everything OK.
- *
- * %ASN1_ELEMENT_NOT_FOUND: *@structure was ASN1_TYPE_EMPTY.
+ * Returns: %ASN1_SUCCESS if successful, %ASN1_ELEMENT_NOT_FOUND if
+ *   *@structure was ASN1_TYPE_EMPTY.
  **/
 asn1_retCode
 asn1_delete_structure (ASN1_TYPE * structure)
@@ -351,11 +343,8 @@ asn1_delete_structure (ASN1_TYPE * structure)
  *
  * Deletes the element named *@element_name inside *@structure.
  *
- * Returns:
- *
- * %ASN1_SUCCESS: Everything OK.
- *
- * %ASN1_ELEMENT_NOT_FOUND: The name element was not found.
+ * Returns: %ASN1_SUCCESS if successful, %ASN1_ELEMENT_NOT_FOUND if
+ *   the @element_name was not found.
  **/
 asn1_retCode
 asn1_delete_element (ASN1_TYPE structure, const char *element_name)
@@ -670,11 +659,8 @@ _asn1_expand_identifier (ASN1_TYPE * node, ASN1_TYPE root)
  *
  * rc = asn1_create_element(cert_def, "PKIX1.Certificate", certptr);
  *
- * Returns:
- *
- * %ASN1_SUCCESS: Creation OK.
- *
- * %ASN1_ELEMENT_NOT_FOUND: SOURCE_NAME isn't known
+ * Returns: %ASN1_SUCCESS if creation OK, %ASN1_ELEMENT_NOT_FOUND if
+ *   @source_name is not known.
  **/
 asn1_retCode
 asn1_create_element (ASN1_TYPE definitions, const char *source_name,
@@ -1072,13 +1058,8 @@ asn1_print_structure (FILE * out, ASN1_TYPE structure, const char *name,
  * Counts the number of elements of a sub-structure called NAME with
  * names equal to "?1","?2", ...
  *
- * Returns:
- *
- *  %ASN1_SUCCESS: Creation OK.
- *
- *  %ASN1_ELEMENT_NOT_FOUND: NAME isn't known.
- *
- *  %ASN1_GENERIC_ERROR: Pointer num equal to NULL.
+ * Returns: %ASN1_SUCCESS if successful, %ASN1_ELEMENT_NOT_FOUND if
+ *   @name is not known, %ASN1_GENERIC_ERROR if pointer @num is %NULL.
  **/
 asn1_retCode
 asn1_number_of_elements (ASN1_TYPE element, const char *name, int *num)
@@ -1171,7 +1152,7 @@ asn1_find_structure_from_oid (ASN1_TYPE definitions, const char *oidValue)
  *
  * Create a deep copy of a ASN1_TYPE variable.
  *
- * Return value: Return %ASN1_SUCCESS on success.
+ * Returns: Return %ASN1_SUCCESS on success.
  **/
 asn1_retCode
 asn1_copy_node (ASN1_TYPE dst, const char *dst_name,
