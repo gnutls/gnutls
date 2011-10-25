@@ -22,10 +22,10 @@
 	.file "cpuid.asm"
         
 	.text
-.globl _gnutls_cpuid
-.def	_gnutls_cpuid;	.scl 2;	.type 32;	.endef
+.globl __gnutls_cpuid
+.def	__gnutls_cpuid;	.scl 2;	.type 32;	.endef
 .p2align 4
-_gnutls_cpuid:
+__gnutls_cpuid:
 	pushq	%rbp
 	movq	%rsp, %rbp
 	pushq	%rbx

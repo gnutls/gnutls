@@ -22,10 +22,10 @@
 	.file "cpuid.asm"
         
 	.text
-.globl _gnutls_cpuid
-.def   _gnutls_cpuid;	.scl	2;	.type	32;	.endef
+.globl __gnutls_cpuid
+.def   __gnutls_cpuid;	.scl	2;	.type	32;	.endef
 .align 16
-_gnutls_cpuid:
+__gnutls_cpuid:
 	pushl	%ebp
 	movl	%esp, %ebp
 	subl	$12, %esp
@@ -53,10 +53,10 @@ _gnutls_cpuid:
 	popl	%ebp
 	ret
 
-.globl	_gnutls_have_cpuid
-.def	_gnutls_have_cpuid;	.scl	2;	.type	32;	.endef
+.globl	__gnutls_have_cpuid
+.def	__gnutls_have_cpuid;	.scl	2;	.type	32;	.endef
 .align	16
-_gnutls_have_cpuid:
+__gnutls_have_cpuid:
 	pushfl	
 	pop %eax	
 	orl $0x200000, %eax	
