@@ -532,3 +532,12 @@ tests/x509paths/
 tests/x509self
 tests/x509sign-verify
 tests/x509signself
+gl/tests/arpa/
+gl/tests/test-accept
+gl/tests/test-bind
+gl/tests/test-getpeername
+gl/tests/test-listen
+gl/tests/test-recvfrom
+gl/tests/test-sendto
+gl/tests/test-setsockopt
+gl/tests/test-shutdown
