@@ -70,14 +70,14 @@ AM_CONDITIONAL(WANT_TEST_SUITE, [test -f tests/suite/mini-eagain2.c])
 
 dnl Detect windows build
 case "$host" in
-  *-*-mingw32*)
-    have_win32=yes
+  *-*-mingw32* | *-*-mingw64*)
+    have_win=yes
   ;;
   *)
   ;;
 esac
 
-AM_CONDITIONAL(WIN32, test "$have_win32" = yes)
+AM_CONDITIONAL(WINDOWS, test "$have_win" = yes)
 
 dnl Hardware Acceleration
 AC_ARG_ENABLE(hardware-acceleration,
