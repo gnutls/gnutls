@@ -68,12 +68,23 @@ fi
 AM_CONDITIONAL(ENABLE_CXX, test "$use_cxx" != "no")
 AM_CONDITIONAL(WANT_TEST_SUITE, [test -f tests/suite/mini-eagain2.c])
 
+dnl Detect windows build
+case "$host" in
+  *-*-mingw32*)
+    have_win32=yes
+  ;;
+  *)
+  ;;
+esac
+
+AM_CONDITIONAL(WIN32, test "$have_win32" = yes)
 
 dnl Hardware Acceleration
 AC_ARG_ENABLE(hardware-acceleration,
   AS_HELP_STRING([--disable-hardware-acceleration], [unconditionally disable hardware acceleration]),
     use_accel=$enableval, use_accel=yes)
 hw_accel=none
+
 
 if test "$use_accel" != "no"; then
 case $host_cpu in

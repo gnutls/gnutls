@@ -39,9 +39,17 @@ noinst_LTLIBRARIES = libx86.la
 libx86_la_SOURCES = sha-padlock.c hmac-padlock.c aes-x86.c aes-padlock.c aes-gcm-padlock.c aes-padlock.h aes-x86.h x86.h sha-padlock.h
 
 if ASM_X86_64
+
 AM_CFLAGS += -DASM_X86_64 -DASM_X86
 libx86_la_SOURCES += asm/appro-aes-x86-64.s asm/appro-aes-gcm-x86-64.s aes-gcm-x86.c asm/padlock-x86-64.s asm/cpuid-x86-64.s
+
 else
+
 AM_CFLAGS += -DASM_X86_32 -DASM_X86
+if WIN32
+libx86_la_SOURCES += coff/appro-aes-x86-coff.s coff/padlock-x86-coff.s asm/cpuid-x86.s
+else
 libx86_la_SOURCES += asm/appro-aes-x86.s asm/padlock-x86.s asm/cpuid-x86.s
+endif
+
 endif
