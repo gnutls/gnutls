@@ -618,7 +618,7 @@ _stddef_syms_re = NULL|offsetof|ptrdiff_t|size_t|wchar_t
 # Prohibit the inclusion of stddef.h without an actual use.
 sc_prohibit_stddef_without_use:
 	@h='stddef.h'							\
-	re='\<($(_stddef_syms_re)) *\('					\
+	re='\<($(_stddef_syms_re))\>'					\
 	  $(_sc_header_without_use)
 
 # Prohibit the inclusion of verify.h without an actual use.
@@ -749,10 +749,12 @@ gl_other_headers_ ?= \
 
 # Perl -lne code to extract "significant" cpp-defined symbols from a
 # gnulib header file, eliminating a few common false-positives.
+# The exempted names below are defined only conditionally in gnulib,
+# and hence sometimes must/may be defined in application code.
 gl_extract_significant_defines_ = \
   /^\# *define ([^_ (][^ (]*)(\s*\(|\s+\w+)/\
     && $$2 !~ /(?:rpl_|_used_without_)/\
-    && $$1 !~ /^(?:NSIG)$$/\
+    && $$1 !~ /^(?:NSIG|ENODATA)$$/\
     && $$1 !~ /^(?:SA_RESETHAND|SA_RESTART)$$/\
     and print $$1
 
