@@ -37,10 +37,6 @@ defined in the header file @file{gnutls/gnutls.h}.  This must be
 included in all programs that make use of the @acronym{GnuTLS}
 library.
 
-The extra functionality of the @acronym{GnuTLS-extra} library is
-available by including the header file @file{gnutls/extra.h} in your
-programs.
-
 @node Initialization
 @subsection Initialization
 
@@ -49,9 +45,6 @@ initialized by calling @funcref{gnutls_global_init}.  The resources
 allocated by the initialization process can be released if the
 application no longer has a need to call GnuTLS functions, this is
 done by calling @funcref{gnutls_global_deinit}.
-
-The extra functionality of the @acronym{GnuTLS-extra} library is
-available after calling @funcref{gnutls_global_init_extra}.
 
 In order to take advantage of the internationalization features in
 GnuTLS, such as translated error messages, the application must set
