@@ -20,7 +20,11 @@
 #include <config.h>
 
 #include <stdio.h>
-#include <sys/socket.h>
+#if HAVE_SYS_SOCKET_H
+# include <sys/socket.h>
+#elif HAVE_WS2TCPIP_H
+# include <ws2tcpip.h>
+#endif
 #include <arpa/inet.h>
 #ifndef _WIN32
 # include <netinet/in.h>

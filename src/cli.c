@@ -26,7 +26,11 @@
 #include <string.h>
 #include <sys/time.h>
 #include <sys/stat.h>
-#include <sys/socket.h>
+#if HAVE_SYS_SOCKET_H
+# include <sys/socket.h>
+#elif HAVE_WS2TCPIP_H
+# include <ws2tcpip.h>
+#endif
 #include <sys/select.h>
 #include <unistd.h>
 #include <stdint.h>
