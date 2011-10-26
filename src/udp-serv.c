@@ -22,7 +22,9 @@
 #include <stdio.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <netinet/in.h>
+#ifndef _WIN32
+# include <netinet/in.h>
+#endif
 #include <sys/select.h>
 #include <stdlib.h>
 #include <string.h>
