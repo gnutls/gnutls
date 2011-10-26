@@ -541,3 +541,4 @@ gl/tests/test-recvfrom
 gl/tests/test-sendto
 gl/tests/test-setsockopt
 gl/tests/test-shutdown
+gl/signal.h
