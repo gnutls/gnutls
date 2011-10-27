@@ -142,6 +142,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module ignore-value:
   # Code from module ignore-value-tests:
   # Code from module include_next:
+  # Code from module inet_ntop:
+  # Code from module inet_ntop-tests:
   # Code from module inet_pton:
   # Code from module inet_pton-tests:
   # Code from module intprops:
@@ -213,12 +215,16 @@ AC_DEFUN([gl_EARLY],
   # Code from module read-file-tests:
   # Code from module readdir:
   # Code from module realloc-posix:
+  # Code from module recv:
+  # Code from module recv-tests:
   # Code from module recvfrom:
   # Code from module recvfrom-tests:
   # Code from module same-inode:
   # Code from module scandir:
   # Code from module select:
   # Code from module select-tests:
+  # Code from module send:
+  # Code from module send-tests:
   # Code from module sendto:
   # Code from module sendto-tests:
   # Code from module setenv:
@@ -393,6 +399,11 @@ if test $HAVE_CLOSEDIR = 0 || test $REPLACE_CLOSEDIR = 1; then
   AC_LIBOBJ([closedir])
 fi
 gl_DIRENT_MODULE_INDICATOR([closedir])
+AC_REQUIRE([gl_HEADER_SYS_SOCKET])
+if test "$ac_cv_header_winsock2_h" = yes; then
+  AC_LIBOBJ([connect])
+fi
+gl_SYS_SOCKET_MODULE_INDICATOR([connect])
 gl_MD5
 gl_DIRENT_H
 gl_DIRNAME_LGPL
@@ -512,6 +523,12 @@ m4_if(m4_version_compare([2.61a.100],
         m4_defn([m4_PACKAGE_VERSION])), [1], [],
       [AC_CONFIG_LINKS([$GNUmakefile:$GNUmakefile], [],
         [GNUmakefile=$GNUmakefile])])
+gl_FUNC_INET_NTOP
+if test $HAVE_INET_NTOP = 0 || test $REPLACE_INET_NTOP = 1; then
+  AC_LIBOBJ([inet_ntop])
+  gl_PREREQ_INET_NTOP
+fi
+gl_ARPA_INET_MODULE_INDICATOR([inet_ntop])
 gl_FUNC_INET_PTON
 if test $HAVE_INET_PTON = 0 || test $REPLACE_INET_NTOP = 1; then
   AC_LIBOBJ([inet_pton])
@@ -618,6 +635,11 @@ fi
 gl_STDLIB_MODULE_INDICATOR([realloc-posix])
 AC_REQUIRE([gl_HEADER_SYS_SOCKET])
 if test "$ac_cv_header_winsock2_h" = yes; then
+  AC_LIBOBJ([recv])
+fi
+gl_SYS_SOCKET_MODULE_INDICATOR([recv])
+AC_REQUIRE([gl_HEADER_SYS_SOCKET])
+if test "$ac_cv_header_winsock2_h" = yes; then
   AC_LIBOBJ([recvfrom])
 fi
 gl_SYS_SOCKET_MODULE_INDICATOR([recvfrom])
@@ -632,6 +654,11 @@ if test $REPLACE_SELECT = 1; then
   AC_LIBOBJ([select])
 fi
 gl_SYS_SELECT_MODULE_INDICATOR([select])
+AC_REQUIRE([gl_HEADER_SYS_SOCKET])
+if test "$ac_cv_header_winsock2_h" = yes; then
+  AC_LIBOBJ([send])
+fi
+gl_SYS_SOCKET_MODULE_INDICATOR([send])
 AC_REQUIRE([gl_HEADER_SYS_SOCKET])
 if test "$ac_cv_header_winsock2_h" = yes; then
   AC_LIBOBJ([sendto])
@@ -826,11 +853,6 @@ changequote([, ])dnl
   AC_SUBST([gltests_WITNESS])
   gl_module_indicator_condition=$gltests_WITNESS
   m4_pushdef([gl_MODULE_INDICATOR_CONDITION], [$gl_module_indicator_condition])
-AC_REQUIRE([gl_HEADER_SYS_SOCKET])
-if test "$ac_cv_header_winsock2_h" = yes; then
-  AC_LIBOBJ([connect])
-fi
-gl_SYS_SOCKET_MODULE_INDICATOR([connect])
 gl_FUNC_DUP2
 if test $HAVE_DUP2 = 0 || test $REPLACE_DUP2 = 1; then
   AC_LIBOBJ([dup2])
@@ -867,6 +889,7 @@ if test $REPLACE_GETPAGESIZE = 1; then
 fi
 gl_UNISTD_MODULE_INDICATOR([getpagesize])
 AC_REQUIRE([AC_C_INLINE])
+AC_C_BIGENDIAN
 AC_C_BIGENDIAN
 gl_INTTYPES_H
 gl_INTTYPES_INCOMPLETE
@@ -1092,6 +1115,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/c-ctype.h
   lib/close.c
   lib/closedir.c
+  lib/connect.c
   lib/dirent-private.h
   lib/dirent.in.h
   lib/dirname-lgpl.c
@@ -1131,6 +1155,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/gettimeofday.c
   lib/hmac-md5.c
   lib/hmac.h
+  lib/inet_ntop.c
   lib/inet_pton.c
   lib/intprops.h
   lib/isnan.c
@@ -1177,9 +1202,11 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/read-file.h
   lib/readdir.c
   lib/realloc.c
+  lib/recv.c
   lib/recvfrom.c
   lib/scandir.c
   lib/select.c
+  lib/send.c
   lib/sendto.c
   lib/setsockopt.c
   lib/shutdown.c
@@ -1291,6 +1318,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/gnulib-common.m4
   m4/iconv.m4
   m4/include_next.m4
+  m4/inet_ntop.m4
   m4/inet_pton.m4
   m4/intdiv0.m4
   m4/intl.m4
@@ -1482,6 +1510,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-gettimeofday.c
   tests/test-hmac-md5.c
   tests/test-ignore-value.c
+  tests/test-inet_ntop.c
   tests/test-inet_pton.c
   tests/test-intprops.c
   tests/test-inttypes.c
@@ -1516,6 +1545,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-printf-posix.output
   tests/test-rawmemchr.c
   tests/test-read-file.c
+  tests/test-recv.c
   tests/test-recvfrom.c
   tests/test-select-fd.c
   tests/test-select-in.sh
@@ -1523,6 +1553,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-select-stdin.c
   tests/test-select.c
   tests/test-select.h
+  tests/test-send.c
   tests/test-sendto.c
   tests/test-setenv.c
   tests/test-setsockopt.c
@@ -1579,7 +1610,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-wchar.c
   tests/zerosize-ptr.h
   tests=lib/binary-io.h
-  tests=lib/connect.c
   tests=lib/dup2.c
   tests=lib/fcntl.in.h
   tests=lib/fdopen.c

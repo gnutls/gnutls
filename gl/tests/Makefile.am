@@ -142,15 +142,6 @@ EXTRA_DIST += test-close.c signature.h macros.h
 
 ## end   gnulib module close-tests
 
-## begin gnulib module connect
-
-
-EXTRA_DIST += connect.c w32sock.h
-
-EXTRA_libtests_a_SOURCES += connect.c
-
-## end   gnulib module connect
-
 ## begin gnulib module connect-tests
 
 TESTS += test-connect
@@ -500,6 +491,15 @@ EXTRA_DIST += test-ignore-value.c
 
 ## end   gnulib module ignore-value-tests
 
+## begin gnulib module inet_ntop-tests
+
+TESTS += test-inet_ntop
+check_PROGRAMS += test-inet_ntop
+test_inet_ntop_LDADD = $(LDADD) @INET_NTOP_LIB@
+EXTRA_DIST += test-inet_ntop.c signature.h macros.h
+
+## end   gnulib module inet_ntop-tests
+
 ## begin gnulib module inet_pton-tests
 
 TESTS += test-inet_pton
@@ -816,6 +816,15 @@ EXTRA_DIST += test-read-file.c
 
 ## end   gnulib module read-file-tests
 
+## begin gnulib module recv-tests
+
+TESTS += test-recv
+check_PROGRAMS += test-recv
+test_recv_LDADD = $(LDADD) @LIBSOCKET@
+EXTRA_DIST += test-recv.c signature.h macros.h
+
+## end   gnulib module recv-tests
+
 ## begin gnulib module recvfrom-tests
 
 TESTS += test-recvfrom
@@ -843,6 +852,15 @@ test_select_stdin_LDADD = $(LDADD) @LIB_SELECT@
 EXTRA_DIST += macros.h signature.h test-select.c test-select.h test-select-fd.c test-select-in.sh test-select-out.sh test-select-stdin.c
 
 ## end   gnulib module select-tests
+
+## begin gnulib module send-tests
+
+TESTS += test-send
+check_PROGRAMS += test-send
+test_send_LDADD = $(LDADD) @LIBSOCKET@
+EXTRA_DIST += test-send.c signature.h macros.h
+
+## end   gnulib module send-tests
 
 ## begin gnulib module sendto-tests
 
