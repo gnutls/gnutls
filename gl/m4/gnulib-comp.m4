@@ -383,6 +383,11 @@ fi
 gl_SYS_SOCKET_MODULE_INDICATOR([bind])
 gl_BYTESWAP
 gl_CLOCK_TIME
+gl_FUNC_CLOSE
+if test $REPLACE_CLOSE = 1; then
+  AC_LIBOBJ([close])
+fi
+gl_UNISTD_MODULE_INDICATOR([close])
 gl_FUNC_CLOSEDIR
 if test $HAVE_CLOSEDIR = 0 || test $REPLACE_CLOSEDIR = 1; then
   AC_LIBOBJ([closedir])
@@ -821,11 +826,6 @@ changequote([, ])dnl
   AC_SUBST([gltests_WITNESS])
   gl_module_indicator_condition=$gltests_WITNESS
   m4_pushdef([gl_MODULE_INDICATOR_CONDITION], [$gl_module_indicator_condition])
-gl_FUNC_CLOSE
-if test $REPLACE_CLOSE = 1; then
-  AC_LIBOBJ([close])
-fi
-gl_UNISTD_MODULE_INDICATOR([close])
 AC_REQUIRE([gl_HEADER_SYS_SOCKET])
 if test "$ac_cv_header_winsock2_h" = yes; then
   AC_LIBOBJ([connect])
@@ -1090,6 +1090,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/byteswap.in.h
   lib/c-ctype.c
   lib/c-ctype.h
+  lib/close.c
   lib/closedir.c
   lib/dirent-private.h
   lib/dirent.in.h
@@ -1578,7 +1579,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-wchar.c
   tests/zerosize-ptr.h
   tests=lib/binary-io.h
-  tests=lib/close.c
   tests=lib/connect.c
   tests=lib/dup2.c
   tests=lib/fcntl.in.h

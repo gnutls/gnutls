@@ -134,15 +134,6 @@ EXTRA_DIST += test-c-ctype.c macros.h
 
 ## end   gnulib module c-ctype-tests
 
-## begin gnulib module close
-
-
-EXTRA_DIST += close.c
-
-EXTRA_libtests_a_SOURCES += close.c
-
-## end   gnulib module close
-
 ## begin gnulib module close-tests
 
 TESTS += test-close
