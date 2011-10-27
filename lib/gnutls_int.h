@@ -43,7 +43,11 @@ typedef int ssize_t;
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#include <sys/socket.h>
+#if HAVE_SYS_SOCKET_H
+# include <sys/socket.h>
+#elif HAVE_WS2TCPIP_H
+# include <ws2tcpip.h>
+#endif
 #include <time.h>
 #include <u64.h> /* gnulib for uint64_t */
 

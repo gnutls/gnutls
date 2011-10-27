@@ -24,9 +24,10 @@
 #ifndef OPENCDK_H
 #define OPENCDK_H
 
+#include <config.h>
+#include <gnutls_int.h>
 #include <stddef.h>             /* for size_t */
 #include <stdarg.h>
-#include <gnutls_int.h>
 #include <gnutls_mem.h>
 #include <gnutls/gnutls.h>
 #include <gnutls_errors.h>
