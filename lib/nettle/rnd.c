@@ -61,7 +61,7 @@ static void *rnd_mutex;
 #define DEVICE_READ_SIZE 16
 #define DEVICE_READ_SIZE_MAX 32
 
-static HCRYPTPROV device_fd = NULL;
+static HCRYPTPROV device_fd = 0;
 
 static int
 do_trivia_source (int init)
@@ -112,7 +112,7 @@ do_device_source (int init)
       read_size = DEVICE_READ_SIZE_MAX; /* initially read more data */
     }
 
-  if ((device_fd != NULL)
+  if ((device_fd != 0)
       && (init || ((now - device_last_read) > DEVICE_READ_INTERVAL)))
     {
 
