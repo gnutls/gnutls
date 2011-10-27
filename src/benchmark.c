@@ -83,7 +83,9 @@ value2human (unsigned long bytes, double time, double *data, double *speed,
 void start_benchmark(struct benchmark_st * st)
 {
   memset(st, 0, sizeof(*st));
+#ifndef _WIN32
   st->old_handler = signal (SIGALRM, alarm_handler);
+#endif
   gettime (&st->start);
   benchmark_must_finish = 0;
 
@@ -100,13 +102,12 @@ void start_benchmark(struct benchmark_st * st)
       fprintf (stderr, "error: CreateThread %u\n", GetLastError ());
       exit(1);
     }
-  alarm_timeout.QuadPart = (5) * 10000000;
-  if (SetWaitableTimer (st->wtimer, &alarm_timeout, 0, NULL, NULL, FALSE) == 0)
+  st->alarm_timeout.QuadPart = (5) * 10000000;
+  if (SetWaitableTimer (st->wtimer, &st->alarm_timeout, 0, NULL, NULL, FALSE) == 0)
     {
       fprintf (stderr, "error: SetWaitableTimer %u\n", GetLastError ());
       exit(1);
     }
-  }
 #else
   alarm (5);
 #endif

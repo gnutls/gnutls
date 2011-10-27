@@ -1,6 +1,9 @@
 #include <sys/time.h>
 #include <time.h>
 #include <signal.h>
+#if defined(_WIN32)
+# include <windows.h>
+#endif
 #include "timespec.h"           /* gnulib gettime */
 
 typedef void (*sighandler_t)(int);
