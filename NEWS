@@ -2,9 +2,11 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.0.5 (unreleased)
+* Version 3.0.5 (released 2011-10-27)
 
 ** libgnutls-extra: is no more
+
+** libgnutls: Corrections in order to compile with mingw32.
 
 ** libgnutls: Corrections in VIA padlock code for VIA C5 processor
 and new detection of PHE with support for partial hashing.
