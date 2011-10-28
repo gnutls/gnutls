@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2007, 2010 Free Software Foundation, Inc.
+# Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,5 +25,4 @@ export GUILE_LOAD_PATH
 
 exec @abs_top_builddir@/libtool --mode=execute		                    \
        -dlopen "@abs_top_builddir@/guile/src/libguile-gnutls-v-1.la"        \
-       -dlopen "@abs_top_builddir@/guile/src/libguile-gnutls-extra-v-1.la"  \
        @GUILE@ "$@"
