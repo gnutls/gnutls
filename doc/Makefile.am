@@ -131,9 +131,10 @@ pgp-api.texi: $(srcdir)/../lib/openpgp/*.c
 gnutls_TEXINFOS += error_codes.texi algorithms.texi alerts.texi  enums.texi
 MAINTAINERCLEANFILES += error_codes.texi algorithms.texi enums.texi
 
-AM_CPPFLAGS = -I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes
+AM_CPPFLAGS = \
+	-I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes
 
-noinst_PROGRAMS = errcodes printlist alert-printlist
+EXTRA_PROGRAMS = errcodes printlist alert-printlist
 
 errcodes_SOURCES = errcodes.c
 errcodes_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
