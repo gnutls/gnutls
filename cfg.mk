@@ -60,7 +60,6 @@ autoreconf:
 	done
 	mv build-aux/config.rpath build-aux/config.rpath-
 	test -f ./configure || autoreconf --install
-	test `hostname` = "gaggia" && cp gl/m4/size_max.m4 m4/ || true
 	mv build-aux/config.rpath- build-aux/config.rpath
 
 update-po: refresh-po
