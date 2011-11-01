@@ -92,7 +92,7 @@ generate_create_conf (char *tpasswd_conf)
       return -1;
     }
 
-  for (index = 1; index <= 3; index++)
+  for (index = 1; index <= 5; index++)
     {
 
       if (index == 1)
