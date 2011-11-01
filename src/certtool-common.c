@@ -281,7 +281,7 @@ load_private_key (int mand, common_info_st * info)
     return _load_pkcs11_privkey(info->privkey);
 #endif
 
-  dat.data = read_binary_file (info->privkey, &size);
+  dat.data = gl_read_binary_file (info->privkey, &size);
   dat.size = size;
 
   if (!dat.data)
@@ -315,7 +315,7 @@ load_x509_private_key (int mand, common_info_st * info)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
 
-  dat.data = read_binary_file (info->privkey, &size);
+  dat.data = gl_read_binary_file (info->privkey, &size);
   dat.size = size;
 
   if (!dat.data)
@@ -451,7 +451,7 @@ load_request (common_info_st * info)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crq_init: %s", gnutls_strerror (ret));
 
-  dat.data = read_binary_file (info->request, &size);
+  dat.data = gl_read_binary_file (info->request, &size);
   dat.size = size;
 
   if (!dat.data)
@@ -489,7 +489,7 @@ load_ca_private_key (common_info_st * info)
     return _load_pkcs11_privkey(info->ca_privkey);
 #endif
 
-  dat.data = read_binary_file (info->ca_privkey, &size);
+  dat.data = gl_read_binary_file (info->ca_privkey, &size);
   dat.size = size;
 
   if (!dat.data)
@@ -520,7 +520,7 @@ load_ca_cert (common_info_st * info)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crt_init: %s", gnutls_strerror (ret));
 
-  dat.data = read_binary_file (info->ca, &size);
+  dat.data = gl_read_binary_file (info->ca, &size);
   dat.size = size;
 
   if (!dat.data)
@@ -562,7 +562,7 @@ load_pubkey (int mand, common_info_st * info)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
 
-  dat.data = read_binary_file (info->pubkey, &size);
+  dat.data = gl_read_binary_file (info->pubkey, &size);
   dat.size = size;
 
   if (!dat.data)
