@@ -92,11 +92,23 @@ generate_prime (int how, common_info_st * info)
           g = gnutls_srp_1536_group_generator;
           bits = 1536;
         }
-      else
+      else if (bits <= 2048)
         {
           p = gnutls_srp_2048_group_prime;
           g = gnutls_srp_2048_group_generator;
           bits = 2048;
+        }
+      else if (bits <=3072)
+        {
+          p = gnutls_srp_3072_group_prime;
+          g = gnutls_srp_3072_group_generator;
+          bits = 3072;
+        }
+      else
+        {
+          p = gnutls_srp_4096_group_prime;
+          g = gnutls_srp_4096_group_generator;
+          bits = 4096;
         }
 
       ret = gnutls_dh_params_import_raw (dh_params, &p, &g);

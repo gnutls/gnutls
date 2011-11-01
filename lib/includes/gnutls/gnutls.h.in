@@ -1314,6 +1314,12 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 /* The static parameters defined in draft-ietf-tls-srp-05
  * Those should be used as input to gnutls_srp_verifier().
  */
+  extern const gnutls_datum_t gnutls_srp_4096_group_prime;
+  extern const gnutls_datum_t gnutls_srp_4096_group_generator;
+
+  extern const gnutls_datum_t gnutls_srp_3072_group_prime;
+  extern const gnutls_datum_t gnutls_srp_3072_group_generator;
+
   extern const gnutls_datum_t gnutls_srp_2048_group_prime;
   extern const gnutls_datum_t gnutls_srp_2048_group_generator;
 
