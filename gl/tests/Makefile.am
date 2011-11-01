@@ -151,22 +151,6 @@ EXTRA_DIST += test-connect.c signature.h macros.h
 
 ## end   gnulib module connect-tests
 
-## begin gnulib module crypto/hmac-md5-tests
-
-TESTS += test-hmac-md5
-check_PROGRAMS += test-hmac-md5
-EXTRA_DIST += test-hmac-md5.c
-
-## end   gnulib module crypto/hmac-md5-tests
-
-## begin gnulib module crypto/md5-tests
-
-TESTS += test-md5
-check_PROGRAMS += test-md5
-EXTRA_DIST += test-md5.c
-
-## end   gnulib module crypto/md5-tests
-
 ## begin gnulib module dirent-tests
 
 TESTS += test-dirent

@@ -63,10 +63,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module closedir:
   # Code from module connect:
   # Code from module connect-tests:
-  # Code from module crypto/hmac-md5:
-  # Code from module crypto/hmac-md5-tests:
-  # Code from module crypto/md5:
-  # Code from module crypto/md5-tests:
   # Code from module dirent:
   # Code from module dirent-tests:
   # Code from module dirname-lgpl:
@@ -183,7 +179,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module memchr-tests:
   # Code from module memmem-simple:
   # Code from module mempcpy:
-  # Code from module memxor:
   # Code from module minmax:
   # Code from module msvc-inval:
   # Code from module msvc-nothrow:
@@ -404,7 +399,6 @@ if test "$ac_cv_header_winsock2_h" = yes; then
   AC_LIBOBJ([connect])
 fi
 gl_SYS_SOCKET_MODULE_INDICATOR([connect])
-gl_MD5
 gl_DIRENT_H
 gl_DIRNAME_LGPL
 gl_DOUBLE_SLASH_ROOT
@@ -592,7 +586,6 @@ if test $HAVE_MEMPCPY = 0; then
   gl_PREREQ_MEMPCPY
 fi
 gl_STRING_MODULE_INDICATOR([mempcpy])
-gl_MEMXOR
 gl_MINMAX
 gl_MSVC_INVAL
 if test $HAVE_MSVC_INVALID_PARAMETER_HANDLER = 1; then
@@ -1153,8 +1146,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/gettext.h
   lib/gettime.c
   lib/gettimeofday.c
-  lib/hmac-md5.c
-  lib/hmac.h
   lib/inet_ntop.c
   lib/inet_pton.c
   lib/intprops.h
@@ -1170,14 +1161,10 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/lseek.c
   lib/malloc.c
   lib/math.in.h
-  lib/md5.c
-  lib/md5.h
   lib/memchr.c
   lib/memchr.valgrind
   lib/memmem.c
   lib/mempcpy.c
-  lib/memxor.c
-  lib/memxor.h
   lib/minmax.h
   lib/msvc-inval.c
   lib/msvc-inval.h
@@ -1349,11 +1336,9 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/malloca.m4
   m4/manywarnings.m4
   m4/math_h.m4
-  m4/md5.m4
   m4/memchr.m4
   m4/memmem.m4
   m4/mempcpy.m4
-  m4/memxor.m4
   m4/minmax.m4
   m4/mmap-anon.m4
   m4/mode_t.m4
@@ -1508,7 +1493,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-getopt_long.h
   tests/test-getpeername.c
   tests/test-gettimeofday.c
-  tests/test-hmac-md5.c
   tests/test-ignore-value.c
   tests/test-inet_ntop.c
   tests/test-inet_pton.c
@@ -1528,7 +1512,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-malloc-gnu.c
   tests/test-malloca.c
   tests/test-math.c
-  tests/test-md5.c
   tests/test-memchr.c
   tests/test-netdb.c
   tests/test-netinet_in.c
