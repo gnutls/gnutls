@@ -25,10 +25,10 @@
 /* Get FILE.  */
 #include <stdio.h>
 
-extern char *fread_file (FILE * stream, size_t * length);
+extern char *gl_fread_file (FILE * stream, size_t * length);
 
-extern char *read_file (const char *filename, size_t * length);
+extern char *gl_read_file (const char *filename, size_t * length);
 
-extern char *read_binary_file (const char *filename, size_t * length);
+extern char *gl_read_binary_file (const char *filename, size_t * length);
 
 #endif /* READ_FILE_H */
