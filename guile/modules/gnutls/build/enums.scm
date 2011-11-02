@@ -513,8 +513,6 @@ dh-prime-unacceptable
 file-error
 too-many-empty-packets
 unknown-pk-algorithm
-init-libextra
-library-version-mismatch
 no-temporary-rsa-params
 no-compression-algorithms
 no-cipher-suites
