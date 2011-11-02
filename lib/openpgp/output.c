@@ -35,45 +35,6 @@
 #define adds _gnutls_buffer_append_str
 
 static void
-hexdump (gnutls_buffer_st * str, const char *data, size_t len,
-         const char *spc)
-{
-  size_t j;
-
-  if (spc)
-    adds (str, spc);
-  for (j = 0; j < len; j++)
-    {
-      if (((j + 1) % 16) == 0)
-        {
-          addf (str, "%.2x\n", (unsigned char) data[j]);
-          if (spc && j != (len - 1))
-            adds (str, spc);
-        }
-      else if (j == (len - 1))
-        addf (str, "%.2x", (unsigned char) data[j]);
-      else
-        addf (str, "%.2x:", (unsigned char) data[j]);
-    }
-  if ((j % 16) != 0)
-    adds (str, "\n");
-}
-
-static void
-hexprint (gnutls_buffer_st * str, const char *data, size_t len)
-{
-  size_t j;
-
-  if (len == 0)
-    adds (str, "00");
-  else
-    {
-      for (j = 0; j < len; j++)
-        addf (str, "%.2x", (unsigned char) data[j]);
-    }
-}
-
-static void
 print_key_usage (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert,
                  unsigned int idx)
 {
@@ -124,7 +85,7 @@ print_key_id (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert, int idx)
   else
     {
       adds (str, _("\tID (hex): "));
-      hexprint (str, id, sizeof (id));
+      _gnutls_buffer_hexprint (str, id, sizeof (id));
       addf (str, "\n");
     }
 }
@@ -145,7 +106,7 @@ print_key_fingerprint (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
   else
     {
       adds (str, _("\tFingerprint (hex): "));
-      hexprint (str, fpr, fpr_size);
+      _gnutls_buffer_hexprint (str, fpr, fpr_size);
       addf (str, "\n");
     }
 }
@@ -258,9 +219,9 @@ print_key_info (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert, int idx)
             else
               {
                 addf (str, _("\t\tModulus (bits %d):\n"), bits);
-                hexdump (str, m.data, m.size, "\t\t\t");
+                _gnutls_buffer_hexdump (str, m.data, m.size, "\t\t\t");
                 adds (str, _("\t\tExponent:\n"));
-                hexdump (str, e.data, e.size, "\t\t\t");
+                _gnutls_buffer_hexdump (str, e.data, e.size, "\t\t\t");
 
                 gnutls_free (m.data);
                 gnutls_free (e.data);
@@ -285,13 +246,13 @@ print_key_info (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert, int idx)
             else
               {
                 addf (str, _("\t\tPublic key (bits %d):\n"), bits);
-                hexdump (str, y.data, y.size, "\t\t\t");
+                _gnutls_buffer_hexdump (str, y.data, y.size, "\t\t\t");
                 adds (str, _("\t\tP:\n"));
-                hexdump (str, p.data, p.size, "\t\t\t");
+                _gnutls_buffer_hexdump (str, p.data, p.size, "\t\t\t");
                 adds (str, _("\t\tQ:\n"));
-                hexdump (str, q.data, q.size, "\t\t\t");
+                _gnutls_buffer_hexdump (str, q.data, q.size, "\t\t\t");
                 adds (str, _("\t\tG:\n"));
-                hexdump (str, g.data, g.size, "\t\t\t");
+                _gnutls_buffer_hexdump (str, g.data, g.size, "\t\t\t");
 
                 gnutls_free (p.data);
                 gnutls_free (q.data);
@@ -440,7 +401,7 @@ print_oneline (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
     else
       {
         adds (str, _("fingerprint: "));
-        hexprint (str, fpr, fpr_size);
+        _gnutls_buffer_hexprint (str, fpr, fpr_size);
         addf (str, ", ");
       }
   }
