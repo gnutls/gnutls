@@ -1,5 +1,5 @@
 ;;; GnuTLS-extra --- Guile bindings for GnuTLS-EXTRA.
-;;; Copyright (C) 2007, 2010 Free Software Foundation, Inc.
+;;; Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS-extra is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -20,12 +20,9 @@
 
 (define-module (gnutls extra)
 
-;;; Important note: As written above, this part of the code is ditributed
-;;; under the GPL, not the LGPL.
-
   :use-module (gnutls)
 
-  :export (;; OpenPGP keys
+  :re-export (;; OpenPGP keys
            openpgp-certificate? openpgp-private-key?
            import-openpgp-certificate import-openpgp-private-key
            openpgp-certificate-id openpgp-certificate-id!
@@ -49,7 +46,13 @@
            openpgp-certificate-format/base64))
 
 
-(load-extension "libguile-gnutls-extra-v-1" "scm_init_gnutls_extra")
+
+;;;
+;;; This module will be removed in a future version.
+;;;
+
+(issue-deprecation-warning
+ "The (gnutls extra) module is deprecated; use (gnutls) instead")
 
 
 ;;;

@@ -357,7 +357,30 @@
            error/openpgp-keyring-error
            error/x509-unsupported-oid
            error/random-failed
-           error/unimplemented-feature))
+           error/unimplemented-feature
+
+           ;; OpenPGP keys (formerly in GnuTLS-extra)
+           openpgp-certificate? openpgp-private-key?
+           import-openpgp-certificate import-openpgp-private-key
+           openpgp-certificate-id openpgp-certificate-id!
+           openpgp-certificate-fingerprint openpgp-certificate-fingerprint!
+           openpgp-certificate-name openpgp-certificate-names
+           openpgp-certificate-algorithm openpgp-certificate-version
+           openpgp-certificate-usage
+
+           ;; OpenPGP keyrings
+           openpgp-keyring? import-openpgp-keyring
+           openpgp-keyring-contains-key-id?
+
+           ;; certificate credentials
+           set-certificate-credentials-openpgp-keys!
+
+           ;; enum->string functions
+           openpgp-certificate-format->string
+
+           ;; enum values
+           openpgp-certificate-format/raw
+           openpgp-certificate-format/base64))
 
 (load-extension "libguile-gnutls-v-1" "scm_init_gnutls")
 

@@ -1,7 +1,7 @@
 ;;; Help produce Guile wrappers for GnuTLS types.
 ;;;
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007, 2008, 2010 Free Software Foundation, Inc.
+;;; Copyright (C) 2007, 2008, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -28,27 +28,18 @@
 ;;;
 
 (define (main . args)
-  (define extra? (not (null? args)))
-
   (let ((port (current-output-port))
-        (enums (if (not extra?)
-                   %gnutls-enums
-                   %gnutls-extra-enums)))
+        (enums %gnutls-enums))
     (format port "/* Automatically generated, do not edit.  */~%~%")
-    (format port "#ifndef GUILE_GNUTLS_~aENUMS_H~%"
-            (if extra? "EXTRA_" ""))
-    (format port "#define GUILE_GNUTLS_~aENUMS_H~%"
-            (if extra? "EXTRA_" ""))
+    (format port "#ifndef GUILE_GNUTLS_ENUMS_H~%")
+    (format port "#define GUILE_GNUTLS_ENUMS_H~%")
 
     (format port "#ifdef HAVE_CONFIG_H~%")
     (format port "# include <config.h>~%")
     (format port "#endif~%~%")
     (format port "#include <gnutls/gnutls.h>~%")
     (format port "#include <gnutls/x509.h>~%")
-
-    (if extra?
-        (begin
-          (format port "#include <gnutls/openpgp.h>~%")))
+    (format port "#include <gnutls/openpgp.h>~%")
 
     (for-each (lambda (enum)
                 (output-enum-declarations enum port)

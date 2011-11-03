@@ -1,7 +1,7 @@
 ;;; Help produce Guile wrappers for GnuTLS types.
 ;;;
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007, 2010 Free Software Foundation, Inc.
+;;; Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -29,9 +29,7 @@
 
 (define (main . args)
   (let ((port (current-output-port))
-        (enums (if (null? args)
-                   %gnutls-enums
-                   %gnutls-extra-enums)))
+        (enums %gnutls-enums))
     (for-each (lambda (enum)
                 (output-enum-smob-definitions enum port))
               enums)

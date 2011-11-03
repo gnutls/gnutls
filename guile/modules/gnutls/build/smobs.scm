@@ -1,7 +1,7 @@
 ;;; Help produce Guile wrappers for GnuTLS types.
 ;;;
 ;;; GnuTLS --- Guile bindings for GnuTLS.
-;;; Copyright (C) 2007, 2010 Free Software Foundation, Inc.
+;;; Copyright (C) 2007, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;; GnuTLS is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@
            output-smob-type-predicate
            output-c->smob-converter output-smob->c-converter
 
-           %gnutls-smobs %gnutls-extra-smobs))
+           %gnutls-smobs))
 
 
 ;;;
@@ -222,11 +222,9 @@
         %certificate-credentials-smob
         %srp-server-credentials-smob %srp-client-credentials-smob
         %psk-server-credentials-smob %psk-client-credentials-smob
-        %x509-certificate-smob %x509-private-key-smob))
+        %x509-certificate-smob %x509-private-key-smob
 
-(define %gnutls-extra-smobs
-  ;; All SMOB types for GnuTLS-extra (GPL).
-  (list %openpgp-certificate-smob %openpgp-private-key-smob
+        %openpgp-certificate-smob %openpgp-private-key-smob
         %openpgp-keyring-smob))
 
 

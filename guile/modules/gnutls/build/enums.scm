@@ -36,7 +36,7 @@
            %cipher-enum %mac-enum %compression-method-enum %kx-enum
            %protocol-enum %certificate-type-enum
 
-           %gnutls-enums %gnutls-extra-enums))
+           %gnutls-enums))
 
 ;;;
 ;;; This module helps with the creation of bindings for the C enumerate
@@ -579,11 +579,9 @@ unimplemented-feature)
         %x509-certificate-format-enum %x509-subject-alternative-name-enum
         %pk-algorithm-enum %sign-algorithm-enum
         %psk-key-format-enum %key-usage-enum %certificate-verify-enum
-        %error-enum))
+        %error-enum
 
-(define %gnutls-extra-enums
-  ;; All enums for GnuTLS-extra (GPL).
-  (list %openpgp-certificate-format-enum))
+        %openpgp-certificate-format-enum))
 
 ;;; Local Variables:
 ;;; mode: scheme

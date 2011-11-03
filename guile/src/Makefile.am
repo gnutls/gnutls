@@ -1,5 +1,5 @@
 #  GnuTLS --- Guile bindings for GnuTLS.
-#  Copyright (C) 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+#  Copyright (C) 2007, 2008, 2009, 2010, 2011 Free Software Foundation, Inc.
 #
 #  GnuTLS is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -27,13 +27,11 @@ EXTRA_DIST =					\
 
 BUILT_SOURCES = enum-map.i.c smob-types.i.c enums.h smobs.h	\
 		priorities.i.c					\
-		extra-smobs.h extra-enums.h			\
-		extra-enum-map.i.c extra-smob-types.i.c		\
-                core.x errors.x extra.x
+                core.x errors.x
 
 CLEANFILES = $(BUILT_SOURCES)
 
-lib_LTLIBRARIES = libguile-gnutls-v-1.la libguile-gnutls-extra-v-1.la
+lib_LTLIBRARIES = libguile-gnutls-v-1.la
 
 # Linking against GnuTLS.
 GNUTLS_CORE_LIBS  = $(top_builddir)/lib/libgnutls.la
@@ -49,14 +47,6 @@ libguile_gnutls_v_1_la_CFLAGS =			\
 libguile_gnutls_v_1_la_LIBADD = \
 	$(GNUTLS_CORE_LIBS) $(GNULIB_LIBS) \
 	$(GUILE_LDFLAGS)
-
-libguile_gnutls_extra_v_1_la_SOURCES = extra.c
-libguile_gnutls_extra_v_1_la_CFLAGS =		\
-  $(AM_CFLAGS) $(GNULIB_CFLAGS) $(GUILE_CFLAGS)
-libguile_gnutls_extra_v_1_la_LIBADD =		\
-  $(GNUTLS_CORE_LIBS) \
-  $(builddir)/libguile-gnutls-v-1.la		\
-  $(GNULIB_LIBS) $(GUILE_LDFLAGS)
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/lib/includes \
@@ -97,21 +87,6 @@ smob-types.i.c: $(srcdir)/make-smob-types.scm
 
 priorities.i.c: $(srcdir)/make-session-priorities.scm
 	$(GUILE_FOR_BUILD) $^ > $@
-
-
-# GnuTLS-extra
-
-extra-enums.h: $(srcdir)/make-enum-header.scm
-	$(GUILE_FOR_BUILD) $^ extra > $@
-
-extra-enum-map.i.c: $(srcdir)/make-enum-map.scm
-	$(GUILE_FOR_BUILD) $^ extra > $@
-
-extra-smobs.h: $(srcdir)/make-smob-header.scm
-	$(GUILE_FOR_BUILD) $^ extra > $@
-
-extra-smob-types.i.c: $(srcdir)/make-smob-types.scm
-	$(GUILE_FOR_BUILD) $^ extra > $@
 
 
 # C file snarfing.
