@@ -382,7 +382,7 @@
            openpgp-certificate-format/raw
            openpgp-certificate-format/base64))
 
-(load-extension "libguile-gnutls-v-1" "scm_init_gnutls")
+(load-extension "libguile-gnutls-v-2" "scm_init_gnutls")
 
 ;; Renaming.
 (define protocol/ssl-3 protocol/ssl3)

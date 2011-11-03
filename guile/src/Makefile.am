@@ -31,7 +31,7 @@ BUILT_SOURCES = enum-map.i.c smob-types.i.c enums.h smobs.h	\
 
 CLEANFILES = $(BUILT_SOURCES)
 
-lib_LTLIBRARIES = libguile-gnutls-v-1.la
+lib_LTLIBRARIES = libguile-gnutls-v-2.la
 
 # Linking against GnuTLS.
 GNUTLS_CORE_LIBS  = $(top_builddir)/lib/libgnutls.la
@@ -41,10 +41,10 @@ GNULIB_LIBS    = $(top_builddir)/gl/libgnu.la
 GNULIB_CFLAGS  = -I$(top_builddir)/gl -I$(top_srcdir)/gl
 
 
-libguile_gnutls_v_1_la_SOURCES = core.c errors.c utils.c
-libguile_gnutls_v_1_la_CFLAGS =			\
+libguile_gnutls_v_2_la_SOURCES = core.c errors.c utils.c
+libguile_gnutls_v_2_la_CFLAGS =			\
   $(AM_CFLAGS) $(GNULIB_CFLAGS) $(GUILE_CFLAGS)
-libguile_gnutls_v_1_la_LIBADD = \
+libguile_gnutls_v_2_la_LIBADD = \
 	$(GNUTLS_CORE_LIBS) $(GNULIB_LIBS) \
 	$(GUILE_LDFLAGS)
 

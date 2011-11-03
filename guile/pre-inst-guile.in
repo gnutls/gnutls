@@ -24,5 +24,5 @@ GUILE_LOAD_PATH="@abs_top_srcdir@/guile/modules:$GUILE_LOAD_PATH"
 export GUILE_LOAD_PATH
 
 exec @abs_top_builddir@/libtool --mode=execute		                    \
-       -dlopen "@abs_top_builddir@/guile/src/libguile-gnutls-v-1.la"        \
+       -dlopen "@abs_top_builddir@/guile/src/libguile-gnutls-v-2.la"        \
        @GUILE@ "$@"
