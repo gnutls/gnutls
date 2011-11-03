@@ -378,7 +378,7 @@ if test "$opt_guile_bindings" = "yes"; then
 	CFLAGS="$save_CFLAGS"
 	LIBS="$save_LIBS"
 
-	# The place where libguile-gnutls.la will go.
+	# The place where guile-gnutls.la will go.
 	AC_MSG_CHECKING([the Guile effective version])
 	guile_effective_version="`$GUILE -c '(display (effective-version))'`"
 	AC_MSG_RESULT([$guile_effective_version])

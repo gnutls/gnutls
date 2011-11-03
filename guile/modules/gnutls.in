@@ -386,7 +386,7 @@
   (or (getenv "GNUTLS_GUILE_EXTENSION_DIR")
       "@guileextensiondir@"))
 
-(load-extension (string-append %libdir "/libguile-gnutls-v-2")
+(load-extension (string-append %libdir "/guile-gnutls-v-2")
                 "scm_init_gnutls")
 
 ;; Renaming.
