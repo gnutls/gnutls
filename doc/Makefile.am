@@ -170,7 +170,7 @@ enums.texi: $(srcdir)/../lib/includes/gnutls/*.h
 
 # Guile texinfos.
 
-guile_texi = core.c.texi extra.c.texi
+guile_texi = core.c.texi
 BUILT_SOURCES        = $(guile_texi)
 MAINTAINERCLEANFILES += $(guile_texi)
 EXTRA_DIST           += $(guile_texi) extract-guile-c-doc.scm
@@ -195,22 +195,10 @@ core.c.texi: $(top_srcdir)/guile/src/core.c
 	   -- "$^" "$(CPP)" "$(SNARF_CPPFLAGS) $(CPPFLAGS)"		\
 	   > "$@"
 
-extra.c.texi: $(top_srcdir)/guile/src/extra.c
-	$(MAKE) -C ../guile/src built-sources &&			\
-	$(GUILE_FOR_BUILD) -l "$(srcdir)/extract-guile-c-doc.scm"	\
-	   -e '(apply main (cdr (command-line)))'			\
-	   -- "$^" "$(CPP)" "$(SNARF_CPPFLAGS) $(CPPFLAGS)"		\
-	   > "$@"
-
-
 else !HAVE_GUILE
 
 core.c.texi:
 	echo "(Guile not available, documentation not generated.)" > $@
-
-extra.c.texi:
-	echo "(Guile not available, documentation not generated.)" > $@
-
 
 endif !HAVE_GUILE
 

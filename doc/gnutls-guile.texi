@@ -196,7 +196,7 @@ of the wrong type on the Scheme side: such errors are automatically
 detected by type-checking.
 
 The enumerate values are bound to variables exported by the
-@code{(gnutls)} and @code{(gnutls extra)} modules.  These variables
+@code{(gnutls)} module.  These variables
 are named according to the following convention:
 
 @itemize
@@ -532,8 +532,7 @@ This is it!
 @node OpenPGP Authentication Guile Example
 @section OpenPGP Authentication Guile Example
 
-GnuTLS allows users to authenticate using OpenPGP certificates.  The
-relevant procedures are provided by the @code{(gnutls extra)} module.
+GnuTLS allows users to authenticate using OpenPGP certificates.
 Using OpenPGP-based authentication is not more complicated than using
 anonymous authentication.  It requires a bit of extra work, though, to
 import the OpenPGP public and private key of the client/server.  Key
@@ -603,7 +602,8 @@ Similarly, server-side code would be along these lines:
 
 In practice, generating RSA parameters (and Diffie-Hellman parameters)
 can time a long time.  Thus, you may want to generate them once and
-store them in a file for future re-use (@pxref{Core Interface, @code{pkcs1-export-rsa-parameters} and @code{pkcs1-import-rsa-parameters}}).
+store them in a file for future re-use (@pxref{Guile Reference,
+@code{pkcs1-export-rsa-parameters} and @code{pkcs1-import-rsa-parameters}}).
 
 @node Importing OpenPGP Keys Guile Example
 @section Importing OpenPGP Keys Guile Example
@@ -611,14 +611,14 @@ store them in a file for future re-use (@pxref{Core Interface, @code{pkcs1-expor
 The following example provides a simple way of importing
 ``ASCII-armored'' OpenPGP keys from files, using the
 @code{import-openpgp-certificate} and @code{import-openpgp-private-key}
-procedures provided by the @code{(gnutls extra)} module.
+procedures.
 
 @vindex openpgp-certificate-format/base64
 @vindex openpgp-certificate-format/raw
 
 @example
 (use-modules (srfi srfi-4)
-             (gnutls extra))
+             (gnutls))
 
 (define (import-key-from-file import-proc file)
   ;; Import OpenPGP key from FILE using IMPORT-PROC.
@@ -645,45 +645,18 @@ procedures provided by the @code{(gnutls extra)} module.
 The procedures @code{import-public-key-from-file} and
 @code{import-private-key-from-file} can be passed a file name.  They
 return an OpenPGP public key and private key object, respectively
-(@pxref{Extra Interface, OpenPGP key objects}).
+(@pxref{Guile Reference, OpenPGP key objects}).
 
 
 @c *********************************************************************
 @node Guile Reference
 @chapter Guile Reference
 
-This chapter documents GnuTLS Scheme procedures available to Guile
-programmers.
-
-@menu
-* Core Interface::              Bindings for core GnuTLS.
-* Extra Interface::             Bindings for GnuTLS-Extra.
-@end menu
-
-@node Core Interface
-@section Core Interface
-
-This section lists the Scheme procedures exported by the
+This chapter lists the GnuTLS Scheme procedures exported by the
 @code{(gnutls)} module (@pxref{The Guile module system,,, guile, The
-GNU Guile Reference Manual}).  This module is licenced under the GNU
-Lesser General Public Licence, version 2.1 or later.
+GNU Guile Reference Manual}).
 
 @include core.c.texi
-
-@node Extra Interface
-@section Extra Interface
-
-This section lists the Scheme procedures exported by the @code{(gnutls
-extra)} module.  This module is licenced under the GNU General Public
-Licence, version 3 or later.
-
-@include extra.c.texi
-
-
-
-@ignore
-;;; arch-tag: ee5f2081-9153-48fc-b4ee-2024381c65d7
-@end ignore
 
 @c Local Variables:
 @c ispell-local-dictionary: "american"
