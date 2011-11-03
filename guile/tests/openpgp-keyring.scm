@@ -23,7 +23,7 @@
 ;;; Exercise the OpenPGP keyring API part of GnuTLS-extra.
 ;;;
 
-(use-modules (gnutls extra) (gnutls)
+(use-modules (gnutls)
              (gnutls build tests)
              (srfi srfi-1)
              (srfi srfi-4))

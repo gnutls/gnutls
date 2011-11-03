@@ -24,7 +24,6 @@
 ;;;
 
 (use-modules (gnutls)
-             (gnutls extra)
              (gnutls build tests)
              (srfi srfi-4))
 
