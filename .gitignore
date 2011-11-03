@@ -300,6 +300,7 @@ guile/Makefile
 guile/Makefile.in
 guile/modules/Makefile
 guile/modules/Makefile.in
+guile/modules/gnutls.scm
 guile/src/Makefile
 guile/src/Makefile.in
 guile/src/libguile-gnutls-extra-v-1.la

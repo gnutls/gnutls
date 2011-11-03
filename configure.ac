@@ -377,6 +377,13 @@ if test "$opt_guile_bindings" = "yes"; then
 	AC_CHECK_FUNCS([scm_gc_malloc_pointerless])
 	CFLAGS="$save_CFLAGS"
 	LIBS="$save_LIBS"
+
+	# The place where libguile-gnutls.la will go.
+	AC_MSG_CHECKING([the Guile effective version])
+	guile_effective_version="`$GUILE -c '(display (effective-version))'`"
+	AC_MSG_RESULT([$guile_effective_version])
+	guileextensiondir="$libdir/guile/$guile_effective_version"
+	AC_SUBST([guileextensiondir])
       else
         AC_MSG_RESULT([no])
         AC_MSG_WARN([A sufficiently recent GNU Guile not found.  Guile bindings not built.])

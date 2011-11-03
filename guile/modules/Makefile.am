@@ -17,7 +17,8 @@
 
 guilemoduledir = $(GUILE_SITE)
 
-nobase_dist_guilemodule_DATA = gnutls.scm gnutls/extra.scm
+nobase_nodist_guilemodule_DATA = gnutls.scm
+nobase_dist_guilemodule_DATA   = gnutls/extra.scm
 
 documentation_modules = system/documentation/README		\
 		        system/documentation/c-snarf.scm	\
@@ -26,4 +27,12 @@ documentation_modules = system/documentation/README		\
 EXTRA_DIST = gnutls/build/enums.scm gnutls/build/smobs.scm	\
 	     gnutls/build/utils.scm gnutls/build/priorities.scm	\
 	     gnutls/build/tests.scm				\
+	     gnutls.in						\
              $(documentation_modules)
+
+CLEANFILES = gnutls.scm
+
+.in.scm:
+	cat "$^" | $(SED) -e's|[@]guileextensiondir[@]|$(guileextensiondir)|g' \
+	  > "$@.tmp"
+	mv "$@.tmp" "$@"

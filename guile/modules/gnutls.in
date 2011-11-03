@@ -15,7 +15,7 @@
 ;;; License along with GnuTLS; if not, write to the Free Software
 ;;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-;;; Written by Ludovic Courtès <ludo@chbouib.org>
+;;; Written by Ludovic Courtès <ludo@gnu.org>
 
 (define-module (gnutls)
   ;; Note: The export list must be manually kept in sync with the build
@@ -382,7 +382,12 @@
            openpgp-certificate-format/raw
            openpgp-certificate-format/base64))
 
-(load-extension "libguile-gnutls-v-2" "scm_init_gnutls")
+(define %libdir
+  (or (getenv "GNUTLS_GUILE_EXTENSION_DIR")
+      "@guileextensiondir@"))
+
+(load-extension (string-append %libdir "/libguile-gnutls-v-2")
+                "scm_init_gnutls")
 
 ;; Renaming.
 (define protocol/ssl-3 protocol/ssl3)

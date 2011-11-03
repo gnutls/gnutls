@@ -31,7 +31,7 @@ BUILT_SOURCES = enum-map.i.c smob-types.i.c enums.h smobs.h	\
 
 CLEANFILES = $(BUILT_SOURCES)
 
-lib_LTLIBRARIES = libguile-gnutls-v-2.la
+guileextension_LTLIBRARIES = libguile-gnutls-v-2.la
 
 # Linking against GnuTLS.
 GNUTLS_CORE_LIBS  = $(top_builddir)/lib/libgnutls.la
