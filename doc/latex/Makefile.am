@@ -106,19 +106,7 @@ pgp-api.tex: $(srcdir)/../../lib/openpgp/*.c
 	rm -f $@-tmp
 	mv -f $@-tmp2 $@
 
-extra-api.tex: $(srcdir)/../../libextra/gnutls_extra.c
-	echo "" > $@-tmp
-	for i in $^; do \
-		echo -n "Creating documentation for file $$i... " && \
-		$(srcdir)/../scripts/gdoc -tex $$i >> $@-tmp && \
-		echo "ok"; \
-	done
-	$(srcdir)/../scripts/sort1.pl < $@-tmp > $@-tmp2
-	$(srcdir)/../scripts/split.pl functions < $@-tmp 
-	rm -f $@-tmp
-	mv -f $@-tmp2 $@
-
-SOURCE_GEN_FILES =  extra-api.tex pgp-api.tex x509-api.tex gnutls-api.tex gnutls-enums.tex
+SOURCE_GEN_FILES =  pgp-api.tex x509-api.tex gnutls-api.tex gnutls-enums.tex
 
 PDF_FILES = gnutls-client-server-use-case.pdf gnutls-crypto-layers.pdf \
 	gnutls-handshake-sequence.pdf gnutls-handshake-state.pdf \
