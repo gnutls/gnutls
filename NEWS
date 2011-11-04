@@ -6,6 +6,8 @@ See the end for copying conditions.
 
 ** gnutls-guile: Compilation fixes.
 
+** libgnutls: Bug fixes in the ciphersuites with NULL cipher.
+
 ** API and ABI modifications:
 No changes since last version.
 
