@@ -141,8 +141,9 @@ typedef struct
 {
   cipher_hd_st cipher;
   digest_hd_st mac;
-  int is_mac:1;
-  int ssl_hmac:1;
+  unsigned int is_mac:1;
+  unsigned int ssl_hmac:1;
+  unsigned int is_null:1;
   int tag_size;
 } auth_cipher_hd_st;
 

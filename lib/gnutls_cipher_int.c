@@ -41,6 +41,9 @@ _gnutls_cipher_init (cipher_hd_st * handle, gnutls_cipher_algorithm_t cipher,
   int ret = GNUTLS_E_INTERNAL_ERROR;
   const gnutls_crypto_cipher_st *cc = NULL;
 
+  if (cipher == GNUTLS_CIPHER_NULL)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
   handle->is_aead = _gnutls_cipher_algo_is_aead(cipher);
   if (handle->is_aead)
      handle->tag_size = gnutls_cipher_get_block_size(cipher);
@@ -124,12 +127,14 @@ int ret;
 
   memset(handle, 0, sizeof(*handle));
 
-  ret = _gnutls_cipher_init(&handle->cipher, cipher, cipher_key, iv, enc);
-  if (ret < 0)
+  if (cipher != GNUTLS_CIPHER_NULL)
     {
-      gnutls_assert();
-      return ret;
+      ret = _gnutls_cipher_init(&handle->cipher, cipher, cipher_key, iv, enc);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
+  else
+    handle->is_null = 1;
 
   if (mac != GNUTLS_MAC_AEAD)
     {
@@ -153,7 +158,8 @@ int ret;
 
   return 0;
 cleanup:
-  _gnutls_cipher_deinit(&handle->cipher);
+  if (handle->is_null == 0)
+    _gnutls_cipher_deinit(&handle->cipher);
   return ret;
 
 }
@@ -196,9 +202,12 @@ int ret;
       if (ret < 0)
         return gnutls_assert_val(ret);
 
-      ret = _gnutls_cipher_encrypt2(&handle->cipher, text, textlen, ciphertext, ciphertextlen);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
+      if (handle->is_null==0)
+        {
+          ret = _gnutls_cipher_encrypt2(&handle->cipher, text, textlen, ciphertext, ciphertextlen);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+        }
     }
   else if (_gnutls_cipher_is_aead(&handle->cipher))
     {
@@ -220,12 +229,12 @@ int _gnutls_auth_cipher_decrypt2 (auth_cipher_hd_st * handle,
 {
 int ret;
 
-  ret = _gnutls_cipher_decrypt2(&handle->cipher, ciphertext, ciphertextlen, 
-    text, textlen);
-  if (ret < 0)
+  if (handle->is_null==0)
     {
-      gnutls_assert();
-      return ret;
+      ret = _gnutls_cipher_decrypt2(&handle->cipher, ciphertext, ciphertextlen, 
+        text, textlen);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
     }
 
   if (handle->is_mac)
@@ -278,5 +287,6 @@ void _gnutls_auth_cipher_deinit (auth_cipher_hd_st * handle)
       else
         _gnutls_hmac_deinit(&handle->mac, NULL);
     }
-  _gnutls_cipher_deinit(&handle->cipher);
+  if (handle->is_null==0)
+    _gnutls_cipher_deinit(&handle->cipher);
 }
