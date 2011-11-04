@@ -38,7 +38,7 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi lgpl-2.1.texi gpl-3.0.texi	\
 	sec-tls-app.texi cha-errors.texi cha-support.texi
 
 # Examples.
-gnutls_TEXINFOS += examples/ex-client1.c examples/ex-client2.c		\
+gnutls_TEXINFOS += examples/ex-client1.c 		\
 	examples/ex-session-info.c examples/ex-verify.c			\
 	examples/ex-cert-select.c examples/ex-client-resume.c		\
 	examples/ex-client-srp.c examples/ex-rfc2818.c			\

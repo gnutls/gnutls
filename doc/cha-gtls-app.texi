@@ -480,7 +480,6 @@ implemented by another example.
 * Simple client example with X.509 certificate support::
 * Simple Datagram TLS client example::
 * Obtaining session information::
-* Verifying peer's certificate::
 * Using a callback to select the certificate to use::
 * Verifying a certificate::
 * Client using a PKCS 11 token with TLS::
@@ -503,16 +502,17 @@ However, the data is integrity and privacy protected.
 
 @node Simple client example with X.509 certificate support
 @subsection Simple client example with @acronym{X.509} certificate support
+@anchor{ex:verify}
 
 Let's assume now that we want to create a TCP client which
 communicates with servers that use @acronym{X.509} or
 @acronym{OpenPGP} certificate authentication. The following client is
-a very simple @acronym{TLS} client, it does not support session
-resuming, not even certificate verification. The TCP functions defined
-in this example are used in most of the other examples below, without
-redefining them.
+a very simple @acronym{TLS} client, which uses the high level verification
+functions for certificates, but does not support session
+resumption. The TCP functions defined in this example are used 
+in most of the other examples below, without redefining them.
 
-@verbatiminclude examples/ex-client2.c
+@verbatiminclude examples/ex-rfc2818.c
 
 @node Simple Datagram TLS client example
 @subsection Simple datagram @acronym{TLS} client example
@@ -533,19 +533,6 @@ function.  Note that this function will print meaningful values only
 if called after a successful @funcref{gnutls_handshake}.
 
 @verbatiminclude examples/ex-session-info.c
-
-@node Verifying peer's certificate
-@subsection Verifying peer's certificate
-@anchor{ex:verify}
-
-A @acronym{TLS} session is not secure just after the handshake
-procedure has finished.  It must be considered secure, only after the
-peer's certificate and identity have been verified. That is, you have
-to verify the signature in peer's certificate, the hostname in the
-certificate, and expiration dates.  Just after this step you should
-treat the connection as being a secure one.
-
-@verbatiminclude examples/ex-rfc2818.c
 
 @node Using a callback to select the certificate to use
 @subsection Using a callback to select the certificate to use

@@ -23,6 +23,7 @@
 
 extern int udp_connect (void);
 extern void udp_close (int sd);
+extern int verify_certificate_callback (gnutls_session_t session);
 
 int
 main (void)
@@ -40,6 +41,7 @@ main (void)
 
   /* sets the trusted cas file */
   gnutls_certificate_set_x509_trust_file (xcred, CAFILE, GNUTLS_X509_FMT_PEM);
+  gnutls_certificate_set_verify_function (xcred, verify_certificate_callback);
 
   /* Initialize TLS session */
   gnutls_init (&session, GNUTLS_CLIENT | GNUTLS_DATAGRAM);
