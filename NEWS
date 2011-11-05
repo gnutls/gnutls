@@ -7,6 +7,13 @@ See the end for copying conditions.
 ** gnutls-guile: Compilation fixes.
 
 ** libgnutls: Bug fixes in the ciphersuites with NULL cipher.
+Reported by Fabrice Gautier.
+
+** libgnutls: Bug fixes in ECC code for 64-bit MIPS systems. 
+Thanks to Joseph Graham for providing access to such a system.
+
+** libgnutls: Correctly report ECC private key parsing errors.
+Reported by Fabrice Gautier.
 
 ** API and ABI modifications:
 No changes since last version.
