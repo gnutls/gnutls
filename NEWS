@@ -15,6 +15,10 @@ Thanks to Joseph Graham for providing access to such a system.
 ** libgnutls: Correctly report ECC private key parsing errors.
 Reported by Fabrice Gautier.
 
+** libgnutls: In ECDHE verify that the received point lies on
+the selected curve. The ECDHE ciphersuites now take precendence
+to plain DHE.
+
 ** API and ABI modifications:
 No changes since last version.
 
