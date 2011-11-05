@@ -87,6 +87,19 @@ $CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL
 kill $PID
 wait
 
+#-cipher RSA-NULL
+launch_bare_server $$ s_server -cipher NULL -quiet -www -accept $PORT -keyform pem -certform pem -tls1 -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -Verify 1 -CAfile $CA_CERT &
+PID=$!
+wait_server $PID
+
+# Test TLS 1.0 with RSA-NULL ciphersuite
+echo "Checking TLS 1.0 with RSA-NULL..." 
+$CLI $DEBUG -p $PORT 127.0.0.1 --priority "NONE:+NULL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA" --insecure --x509certfile $CLI_CERT --x509keyfile $CLI_KEY </dev/null >/dev/null || \
+  fail $PID "Failed"
+
+kill $PID
+wait
+
 #-cipher RSA-AES128-SHA:DHE-DSS-AES128-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-AES128-SHA 
 launch_bare_server $$ s_server -quiet -www -accept $PORT -keyform pem -certform pem -tls1 -dhparam params.dh -key $RSA_KEY -cert $RSA_CERT -dkey $DSA_KEY -dcert $DSA_CERT -Verify 1 -CAfile $CA_CERT &
 PID=$!
@@ -230,6 +243,16 @@ wait
 #
 #kill $PID
 #wait
+
+echo "Check TLS 1.0 with RSA-NULL ciphersuite"
+launch_server $$  --priority "NONE:+NULL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+RSA:+DHE-RSA" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
+wait_server $PID
+
+$OPENSSL_CLI s_client -cipher NULL-SHA -host localhost -tls1 -port $PORT -cert $CLI_CERT -key $CLI_KEY -CAfile $CA_CERT </dev/null 2>&1 | grep "\:error\:" && \
+  fail $PID "Failed"
+
+kill $PID
+wait
 
 echo "Check TLS 1.0 with DHE-RSA ciphersuite"
 launch_server $$  --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-TLS1.0:+DHE-RSA" --x509certfile $SERV_CERT --x509keyfile $SERV_KEY --x509cafile $CA_CERT --dhparams params.dh  & PID=$!
