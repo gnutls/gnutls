@@ -45,6 +45,7 @@ ecc_mulmod (mpz_t k, ecc_point * G, ecc_point * R, mpz_t a, mpz_t modulus,
 {
   ecc_point *tG, *M[3];
   int i, j, err;
+  int bit_to_read;
   unsigned long buf;
   int bitcnt, mode, digidx;
 
@@ -91,29 +92,16 @@ ecc_mulmod (mpz_t k, ecc_point * G, ecc_point * R, mpz_t a, mpz_t modulus,
 
   /* setup sliding window */
   mode = 0;
-  bitcnt = 1;
-  buf = 0;
-  digidx = mpz_size (k) - 1;
+  bit_to_read = mpz_size (k) * GMP_NUMB_BITS - 1;
 
   /* perform ops */
   for (;;)
     {
       /* grab next digit as required */
-      if (--bitcnt == 0)
-        {
-          if (digidx == -1)
-            {
-              break;
-            }
-          buf = mpz_getlimbn (k, digidx);
-          bitcnt = (int) MP_DIGIT_BIT;
-          --digidx;
-        }
-
-      /* grab the next msb from the ltiplicand */
-      i = (buf >> (MP_DIGIT_BIT - 1)) & 1;
-      buf <<= 1;
-
+      if (bit_to_read == -1)
+        break;
+      i = mpz_tstbit (k, bit_to_read--);
+      
       if (mode == 0 && i == 0)
         {
           /* dummy operations */

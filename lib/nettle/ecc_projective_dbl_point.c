@@ -156,7 +156,7 @@ ecc_projective_dbl_point (ecc_point * P, ecc_point * R, mpz_t a,
   mpz_mod (R->y, R->y, modulus);
 
   /* Y = 8y^4 */
-  if (mp_isodd (R->y))
+  if (mpz_odd_p (R->y))
     {
       mpz_add (R->y, R->y, modulus);
     }

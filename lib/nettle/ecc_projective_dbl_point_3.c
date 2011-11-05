@@ -107,7 +107,7 @@ ecc_projective_dbl_point (ecc_point * P, ecc_point * R, mpz_t a /* a is -3 */,
    mpz_mul(t2, R->y, R->y);
    mpz_mod(t2, t2, modulus);
    /* T2 = T2/2 */
-   if (mp_isodd(t2)) {
+   if (mpz_odd_p(t2)) {
       mpz_add(t2, t2, modulus);
    }
    mpz_divexact_ui(t2, t2, 2);

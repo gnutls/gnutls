@@ -118,6 +118,3 @@ int ecc_map(ecc_point *P, mpz_t modulus);
 /* helper functions */
 int mp_init_multi(mpz_t *a, ...);
 void mp_clear_multi(mpz_t *a, ...);
-#define mp_isodd(a)                  (mpz_size(a) > 0 ? (mpz_getlimbn(a, 0) & 1 ? 1 : 0) : 0)
-
-#define MP_DIGIT_BIT (sizeof(mp_limb_t) * 8 - GMP_NAIL_BITS)

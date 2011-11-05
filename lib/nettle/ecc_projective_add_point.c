@@ -207,7 +207,7 @@ ecc_projective_add_point (ecc_point * P, ecc_point * Q, ecc_point * R,
       mpz_add (y, y, modulus);
     }
   /* Y = Y/2 */
-  if (mp_isodd (y))
+  if (mpz_odd_p (y))
     {
       mpz_add (y, y, modulus);
     }
