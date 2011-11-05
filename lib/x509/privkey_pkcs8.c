@@ -994,6 +994,7 @@ _decode_pkcs8_ecc_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pkey)
   _gnutls_free_datum (&tmp);
   if (pkey->key == NULL)
     {
+      ret = GNUTLS_E_PARSING_ERROR;
       gnutls_assert ();
       goto error;
     }
