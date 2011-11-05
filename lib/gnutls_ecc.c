@@ -161,9 +161,9 @@ int ret;
       goto cleanup;
     }
   params->params_nr++;
-  
+
   val_size = sizeof(val);
-  ret = _gnutls_hex2bin(st->Gx, strlen(st->Gx), val, &val_size);
+  ret = _gnutls_hex2bin(st->B, strlen(st->B), val, &val_size);
   if (ret < 0)
     {
       gnutls_assert();
@@ -179,7 +179,7 @@ int ret;
   params->params_nr++;
   
   val_size = sizeof(val);
-  ret = _gnutls_hex2bin(st->Gy, strlen(st->Gy), val, &val_size);
+  ret = _gnutls_hex2bin(st->Gx, strlen(st->Gx), val, &val_size);
   if (ret < 0)
     {
       gnutls_assert();
@@ -187,6 +187,22 @@ int ret;
     }
 
   ret = _gnutls_mpi_scan_nz(&params->params[4], val, val_size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+  params->params_nr++;
+  
+  val_size = sizeof(val);
+  ret = _gnutls_hex2bin(st->Gy, strlen(st->Gy), val, &val_size);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  ret = _gnutls_mpi_scan_nz(&params->params[5], val, val_size);
   if (ret < 0)
     {
       gnutls_assert();

@@ -43,7 +43,7 @@
 
 int
 ecc_make_key_ex (void *random_ctx, nettle_random_func random, ecc_key * key,
-                 mpz_t prime, mpz_t order, mpz_t A, mpz_t Gx, mpz_t Gy)
+                 mpz_t prime, mpz_t order, mpz_t A, mpz_t B, mpz_t Gx, mpz_t Gy)
 {
   int err;
   ecc_point *base;
@@ -67,7 +67,7 @@ ecc_make_key_ex (void *random_ctx, nettle_random_func random, ecc_key * key,
   /* setup the key variables */
   if ((err =
        mp_init_multi (&key->pubkey.x, &key->pubkey.y, &key->pubkey.z, &key->k,
-                      &key->prime, &key->order, &key->A, &key->Gx, &key->Gy,
+                      &key->prime, &key->order, &key->A, &key->B, &key->Gx, &key->Gy,
                       NULL)) != 0)
     {
       goto ERR_BUF;
@@ -85,6 +85,7 @@ ecc_make_key_ex (void *random_ctx, nettle_random_func random, ecc_key * key,
   mpz_set (key->Gx, Gx);
   mpz_set (key->Gy, Gy);
   mpz_set (key->A, A);
+  mpz_set (key->B, B);
 
   mpz_set (base->x, key->Gx);
   mpz_set (base->y, key->Gy);
@@ -111,7 +112,7 @@ ecc_make_key_ex (void *random_ctx, nettle_random_func random, ecc_key * key,
   goto cleanup;
 errkey:
   mp_clear_multi (&key->pubkey.x, &key->pubkey.y, &key->pubkey.z, &key->k,
-                  &key->order, &key->prime, &key->Gx, &key->Gy, &key->A,
+                  &key->order, &key->prime, &key->Gx, &key->Gy, &key->A, &key->B,
                   NULL);
 cleanup:
   ecc_del_point (base);
@@ -124,11 +125,11 @@ int
 ecc_make_key (void *random_ctx, nettle_random_func random, ecc_key * key,
               const ecc_set_type * dp)
 {
-  mpz_t prime, order, Gx, Gy, A;
+  mpz_t prime, order, Gx, Gy, A, B;
   int err;
 
   /* setup the key variables */
-  if ((err = mp_init_multi (&prime, &order, &A, &Gx, &Gy, NULL)) != 0)
+  if ((err = mp_init_multi (&prime, &order, &A, &B, &Gx, &Gy, NULL)) != 0)
     {
       goto cleanup;
     }
@@ -139,10 +140,11 @@ ecc_make_key (void *random_ctx, nettle_random_func random, ecc_key * key,
   mpz_set_str (Gx, (char *) dp->Gx, 16);
   mpz_set_str (Gy, (char *) dp->Gy, 16);
   mpz_set_str (A, (char *) dp->A, 16);
+  mpz_set_str (B, (char *) dp->B, 16);
 
-  err = ecc_make_key_ex (random_ctx, random, key, prime, order, A, Gx, Gy);
+  err = ecc_make_key_ex (random_ctx, random, key, prime, order, A, B, Gx, Gy);
 
-  mp_clear_multi (&prime, &order, &A, &Gx, &Gy, NULL);
+  mp_clear_multi (&prime, &order, &A, &B, &Gx, &Gy, NULL);
 cleanup:
   return err;
 }

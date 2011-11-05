@@ -69,6 +69,7 @@ typedef struct {
     mpz_t prime;
     mpz_t order;
     mpz_t A;
+    mpz_t B;
     mpz_t Gx;
     mpz_t Gy;
 
@@ -79,12 +80,11 @@ typedef struct {
     mpz_t k;
 } ecc_key;
 
-int  ecc_test(void);
 void ecc_sizes(int *low, int *high);
 int  ecc_get_size(ecc_key *key);
 
 int ecc_make_key(void *random_ctx, nettle_random_func random, ecc_key *key, const ecc_set_type *dp);
-int ecc_make_key_ex(void *random_ctx, nettle_random_func random, ecc_key *key, mpz_t prime, mpz_t order, mpz_t A, mpz_t Gx, mpz_t Gy);
+int ecc_make_key_ex(void *random_ctx, nettle_random_func random, ecc_key *key, mpz_t prime, mpz_t order, mpz_t A, mpz_t B, mpz_t Gx, mpz_t Gy);
 void ecc_free(ecc_key *key);
 
 int  ecc_shared_secret(ecc_key *private_key, ecc_key *public_key, 
@@ -115,6 +115,10 @@ int ecc_mulmod(mpz_t k, ecc_point *G, ecc_point *R, mpz_t a, mpz_t modulus, int 
 /* map P to affine from projective */
 int ecc_map(ecc_point *P, mpz_t modulus);
 
+/* check whether a point lies on the curve */
+int ecc_projective_check_point (ecc_point * P, mpz_t b, mpz_t modulus);
+
 /* helper functions */
 int mp_init_multi(mpz_t *a, ...);
 void mp_clear_multi(mpz_t *a, ...);
+

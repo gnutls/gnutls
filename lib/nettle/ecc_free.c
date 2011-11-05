@@ -37,7 +37,7 @@ void
 ecc_free (ecc_key * key)
 {
   mp_clear_multi (&key->pubkey.x, &key->pubkey.y, &key->pubkey.z, &key->k,
-                  &key->prime, &key->order, &key->Gx, &key->Gy, &key->A, NULL);
+                  &key->prime, &key->order, &key->Gx, &key->Gy, &key->A, &key->B, NULL);
 }
 
 /* $Source: /cvs/libtom/libtomcrypt/src/pk/ecc/ecc_free.c,v $ */

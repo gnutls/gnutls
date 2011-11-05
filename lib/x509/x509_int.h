@@ -70,33 +70,6 @@ typedef struct gnutls_pkcs7_int
   ASN1_TYPE pkcs7;
 } gnutls_pkcs7_int;
 
-#define MAX_PUBLIC_PARAMS_SIZE 4        /* ok for RSA and DSA */
-
-/* parameters should not be larger than this limit */
-#define DSA_PUBLIC_PARAMS 4
-#define RSA_PUBLIC_PARAMS 2
-#define ECC_PUBLIC_PARAMS 7
-
-
-#define MAX_PRIV_PARAMS_SIZE GNUTLS_MAX_PK_PARAMS       /* ok for RSA and DSA */
-
-/* parameters should not be larger than this limit */
-#define DSA_PRIVATE_PARAMS 5
-#define RSA_PRIVATE_PARAMS 8
-#define ECC_PRIVATE_PARAMS 8
-
-#if MAX_PRIV_PARAMS_SIZE - RSA_PRIVATE_PARAMS < 0
-#error INCREASE MAX_PRIV_PARAMS
-#endif
-
-#if MAX_PRIV_PARAMS_SIZE - ECC_PRIVATE_PARAMS < 0
-#error INCREASE MAX_PRIV_PARAMS
-#endif
-
-#if MAX_PRIV_PARAMS_SIZE - DSA_PRIVATE_PARAMS < 0
-#error INCREASE MAX_PRIV_PARAMS
-#endif
-
 typedef struct gnutls_x509_privkey_int
 {
   /* the size of params depends on the public

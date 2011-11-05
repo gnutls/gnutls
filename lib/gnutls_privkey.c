@@ -165,6 +165,7 @@ privkey_to_pubkey (gnutls_pk_algorithm_t pk,
       pub->params[4] = _gnutls_mpi_copy (priv->params[4]);
       pub->params[5] = _gnutls_mpi_copy (priv->params[5]);
       pub->params[6] = _gnutls_mpi_copy (priv->params[6]);
+      pub->params[7] = _gnutls_mpi_copy (priv->params[7]);
 
       pub->params_nr = ECC_PUBLIC_PARAMS;
       pub->flags = priv->flags;
@@ -172,7 +173,7 @@ privkey_to_pubkey (gnutls_pk_algorithm_t pk,
       if (pub->params[0] == NULL || pub->params[1] == NULL ||
           pub->params[2] == NULL || pub->params[3] == NULL ||
           pub->params[4] == NULL || pub->params[5] == NULL ||
-          pub->params[6] == NULL)
+          pub->params[6] == NULL || pub->params[7] == NULL)
         {
           gnutls_assert ();
           ret = GNUTLS_E_MEMORY_ERROR;

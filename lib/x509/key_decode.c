@@ -102,8 +102,8 @@ _gnutls_x509_read_ecc_pubkey (opaque * der, int dersize, gnutls_pk_params_st * p
 /* Eventhough RFC5480 defines the public key to be an ECPoint (i.e. OCTET STRING),
  * it is actually copied in raw there. Why do they use ASN.1 anyway?
  */
-  return _gnutls_ecc_ansi_x963_import (der, dersize, &params->params[5],
-                                     &params->params[6]);
+  return _gnutls_ecc_ansi_x963_import (der, dersize, &params->params[6],
+                                     &params->params[7]);
 }
 
 

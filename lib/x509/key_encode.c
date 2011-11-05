@@ -118,7 +118,7 @@ _gnutls_x509_write_ecc_pubkey (gnutls_pk_params_st * params,
   if (params->params_nr < ECC_PUBLIC_PARAMS)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-  result = _gnutls_ecc_ansi_x963_export(params->flags, params->params[5], params->params[6], /*&out*/der);
+  result = _gnutls_ecc_ansi_x963_export(params->flags, params->params[6], params->params[7], /*&out*/der);
   if (result < 0)
     return gnutls_assert_val(result);
 
@@ -580,7 +580,7 @@ _gnutls_asn1_encode_ecc (ASN1_TYPE * c2, gnutls_pk_params_st * params)
   if (params->params_nr != ECC_PRIVATE_PARAMS || oid == NULL)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-  ret = _gnutls_ecc_ansi_x963_export(params->flags, params->params[5], params->params[6], &pubkey);
+  ret = _gnutls_ecc_ansi_x963_export(params->flags, params->params[6], params->params[7], &pubkey);
   if (ret < 0)
     return gnutls_assert_val(ret);
   

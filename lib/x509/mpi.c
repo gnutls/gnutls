@@ -29,8 +29,6 @@
 #include "common.h"
 #include "x509_int.h"
 #include <gnutls_num.h>
-#include <gnutls_ecc.h>
-
 
 /* Reads an Integer from the DER encoded data
  */
