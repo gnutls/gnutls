@@ -285,10 +285,10 @@ static const int kx_priority_secure[] = {
   /* The ciphersuites that offer forward secrecy take
    * precendance
    */
-  GNUTLS_KX_DHE_RSA,
-  GNUTLS_KX_DHE_DSS,
   GNUTLS_KX_ECDHE_ECDSA,
   GNUTLS_KX_ECDHE_RSA,
+  GNUTLS_KX_DHE_RSA,
+  GNUTLS_KX_DHE_DSS,
   GNUTLS_KX_RSA,
   /* GNUTLS_KX_ANON_DH: Man-in-the-middle prone, don't add!
    * GNUTLS_KX_RSA_EXPORT: Deprecated, don't add!
