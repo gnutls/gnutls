@@ -2,9 +2,12 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.0.6 (unreleased)
+* Version 3.0.6 (released 2011-11-07)
 
 ** gnutls-guile: Compilation fixes.
+
+** libgnutls: Fixed possible buffer overflow in 
+gnutls_session_get_data(). Reported and fix by Alban Crequy.
 
 ** libgnutls: Bug fixes in the ciphersuites with NULL cipher.
 Reported by Fabrice Gautier.
