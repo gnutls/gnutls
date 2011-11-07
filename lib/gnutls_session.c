@@ -63,13 +63,13 @@ gnutls_session_get_data (gnutls_session_t session,
       gnutls_assert ();
       return ret;
     }
-  *session_data_size = psession.size;
 
   if (psession.size > *session_data_size)
     {
       ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
       goto error;
     }
+  *session_data_size = psession.size;
 
   if (session_data != NULL)
     memcpy (session_data, psession.data, psession.size);
