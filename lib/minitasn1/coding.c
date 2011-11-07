@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2004, 2006, 2008, 2009, 2010 Free Software
+ * Copyright (C) 2002, 2004, 2006, 2008, 2009, 2010, 2011 Free Software
  * Foundation, Inc.
  *
  * This file is part of LIBTASN1.
@@ -256,15 +256,17 @@ _asn1_objectid_der (unsigned char *str, unsigned char *der, int *der_len)
   char *temp, *n_end, *n_start;
   unsigned char bit7;
   unsigned long val, val1 = 0;
+  int str_len = strlen(str);
 
   max_len = *der_len;
 
-  temp = (char *) _asn1_malloc (strlen (str) + 2);
+  temp = _asn1_malloc (str_len + 2);
   if (temp == NULL)
     return ASN1_MEM_ALLOC_ERROR;
 
-  strcpy (temp, str);
-  strcat (temp, ".");
+  memcpy (temp, str, str_len);
+  temp[str_len] = '.';
+  temp[str_len+1] = 0;
 
   counter = 0;
   n_start = temp;
@@ -857,16 +859,11 @@ _asn1_ordering_set_of (unsigned char *der, int der_len, ASN1_TYPE node)
  * Creates the DER encoding for the NAME structure (inside *POINTER
  * structure).
  *
- * Returns:
- *
- *   %ASN1_SUCCESS: DER encoding OK.
- *
- *   %ASN1_ELEMENT_NOT_FOUND: NAME is not a valid element.
- *
- *   %ASN1_VALUE_NOT_FOUND: There is an element without a value.
- *
- *   %ASN1_MEM_ERROR: @ider vector isn't big enough. Also in this case
- *     LEN will contain the length needed.
+ * Returns: %ASN1_SUCCESS if DER encoding OK, %ASN1_ELEMENT_NOT_FOUND
+ *   if @name is not a valid element, %ASN1_VALUE_NOT_FOUND if there
+ *   is an element without a value, %ASN1_MEM_ERROR if the @ider
+ *   vector isn't big enough and in this case @len will contain the
+ *   length needed.
  **/
 asn1_retCode
 asn1_der_coding (ASN1_TYPE element, const char *name, void *ider, int *len,
