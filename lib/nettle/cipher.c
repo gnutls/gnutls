@@ -182,6 +182,7 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx, int enc)
       break;
     default:
       gnutls_assert ();
+      gnutls_free(ctx);
       return GNUTLS_E_INVALID_REQUEST;
     }
 

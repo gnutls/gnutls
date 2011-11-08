@@ -177,7 +177,10 @@ wrap_nettle_hmac_init (gnutls_mac_algorithm_t algo, void **_ctx)
 
   ret = _hmac_ctx_init(algo, ctx);
   if (ret < 0)
-    return gnutls_assert_val(ret);
+    {
+      gnutls_free(ctx);
+      return gnutls_assert_val(ret);
+    }
 
   *_ctx = ctx;
 
@@ -372,6 +375,7 @@ wrap_nettle_hash_init (gnutls_digest_algorithm_t algo, void **_ctx)
   if ((ret=_ctx_init( algo, ctx)) < 0)
     {
       gnutls_assert ();
+      gnutls_free(ctx);
       return ret;
     }
 
