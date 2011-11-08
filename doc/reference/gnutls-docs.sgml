@@ -28,7 +28,6 @@
     <xi:include href="xml/openpgp.xml"/>
     <xi:include href="xml/crypto.xml"/>
     <xi:include href="xml/dtls.xml"/>
-    <xi:include href="xml/openssl.xml"/>
   </chapter>
 
   <index id="api-index-full">
