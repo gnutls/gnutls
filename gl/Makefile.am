@@ -67,13 +67,6 @@ EXTRA_libgnu_la_SOURCES += accept.c
 
 ## end   gnulib module accept
 
-## begin gnulib module alignof
-
-
-EXTRA_DIST += alignof.h
-
-## end   gnulib module alignof
-
 ## begin gnulib module alloca
 
 
@@ -713,6 +706,9 @@ math.h: math.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(
 	      -e 's/@''GNULIB_FLOOR''@/$(GNULIB_FLOOR)/g' \
 	      -e 's/@''GNULIB_FLOORF''@/$(GNULIB_FLOORF)/g' \
 	      -e 's/@''GNULIB_FLOORL''@/$(GNULIB_FLOORL)/g' \
+	      -e 's/@''GNULIB_FMA''@/$(GNULIB_FMA)/g' \
+	      -e 's/@''GNULIB_FMAF''@/$(GNULIB_FMAF)/g' \
+	      -e 's/@''GNULIB_FMAL''@/$(GNULIB_FMAL)/g' \
 	      -e 's/@''GNULIB_FMODF''@/$(GNULIB_FMODF)/g' \
 	      -e 's/@''GNULIB_FREXPF''@/$(GNULIB_FREXPF)/g' \
 	      -e 's/@''GNULIB_FREXP''@/$(GNULIB_FREXP)/g' \
@@ -766,6 +762,9 @@ math.h: math.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(
 	      -e 's|@''HAVE_EXPF''@|$(HAVE_EXPF)|g' \
 	      -e 's|@''HAVE_EXPL''@|$(HAVE_EXPL)|g' \
 	      -e 's|@''HAVE_FABSF''@|$(HAVE_FABSF)|g' \
+	      -e 's|@''HAVE_FMA''@|$(HAVE_FMA)|g' \
+	      -e 's|@''HAVE_FMAF''@|$(HAVE_FMAF)|g' \
+	      -e 's|@''HAVE_FMAL''@|$(HAVE_FMAL)|g' \
 	      -e 's|@''HAVE_FMODF''@|$(HAVE_FMODF)|g' \
 	      -e 's|@''HAVE_FREXPF''@|$(HAVE_FREXPF)|g' \
 	      -e 's|@''HAVE_ISNANF''@|$(HAVE_ISNANF)|g' \
@@ -817,6 +816,9 @@ math.h: math.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(
 	      -e 's|@''REPLACE_FLOOR''@|$(REPLACE_FLOOR)|g' \
 	      -e 's|@''REPLACE_FLOORF''@|$(REPLACE_FLOORF)|g' \
 	      -e 's|@''REPLACE_FLOORL''@|$(REPLACE_FLOORL)|g' \
+	      -e 's|@''REPLACE_FMA''@|$(REPLACE_FMA)|g' \
+	      -e 's|@''REPLACE_FMAF''@|$(REPLACE_FMAF)|g' \
+	      -e 's|@''REPLACE_FMAL''@|$(REPLACE_FMAL)|g' \
 	      -e 's|@''REPLACE_FREXPF''@|$(REPLACE_FREXPF)|g' \
 	      -e 's|@''REPLACE_FREXP''@|$(REPLACE_FREXP)|g' \
 	      -e 's|@''REPLACE_FREXPL''@|$(REPLACE_FREXPL)|g' \
@@ -1274,6 +1276,29 @@ libgnu_la_SOURCES += sockets.h sockets.c
 EXTRA_DIST += w32sock.h
 
 ## end   gnulib module sockets
+
+## begin gnulib module stdalign
+
+BUILT_SOURCES += $(STDALIGN_H)
+
+# We need the following in order to create <stdalign.h> when the system
+# doesn't have one that works.
+if GL_GENERATE_STDALIGN_H
+stdalign.h: stdalign.in.h $(top_builddir)/config.status
+	$(AM_V_GEN)rm -f $@-t $@ && \
+	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
+	  cat $(srcdir)/stdalign.in.h; \
+	} > $@-t && \
+	mv $@-t $@
+else
+stdalign.h: $(top_builddir)/config.status
+	rm -f $@
+endif
+MOSTLYCLEANFILES += stdalign.h stdalign.h-t
+
+EXTRA_DIST += stdalign.in.h
+
+## end   gnulib module stdalign
 
 ## begin gnulib module stdarg
 
