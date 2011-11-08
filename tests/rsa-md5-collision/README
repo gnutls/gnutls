@@ -1,5 +1,5 @@
 rsa-md5-collision README -- Information about rsa-md5-collision self tests.
-Copyright (C) 2006, 2007, 2008, 2009, 2010  Free Software Foundation, Inc.
+Copyright (C) 2006-2011  Free Software Foundation, Inc.
 See the end for copying conditions.
 
 This directory contains colliding X.509 certificates for different
@@ -37,7 +37,7 @@ Xref: localhost.localdomain rsa-md5:1
 Great work, thanks!
 
 I'd like to include your certificates in GnuTLS, a TLS implementation
-that supports X.509, as self-tests of the the certificate verification
+that supports X.509, as self-tests of the certificate verification
 logic.  Is this OK with you?
 
 Btw, Gnutls rejected the certificates, we already disable MD5 for
@@ -152,7 +152,7 @@ identities
 Great work, thanks!
 
 I'd like to include your certificates in GnuTLS, a TLS implementation
-that supports X.509, as self-tests of the the certificate verification
+that supports X.509, as self-tests of the certificate verification
 logic.  Is this OK with you?
 
 Btw, Gnutls rejected the certificates, we already disable MD5 for
@@ -254,7 +254,7 @@ Benne also replied.
 > Great work, thanks!
 >
 > I'd like to include your certificates in GnuTLS, a TLS implementation
-> that supports X.509, as self-tests of the the certificate verification
+> that supports X.509, as self-tests of the certificate verification
 > logic.  Is this OK with you?
 >
 > Btw, Gnutls rejected the certificates, we already disable MD5 for
@@ -402,7 +402,7 @@ identities
 >> Great work, thanks!
 >>
 >> I'd like to include your certificates in GnuTLS, a TLS implementation
->> that supports X.509, as self-tests of the the certificate verification
+>> that supports X.509, as self-tests of the certificate verification
 >> logic.  Is this OK with you?
 >>
 >> Btw, Gnutls rejected the certificates, we already disable MD5 for
@@ -565,7 +565,7 @@ www:    http://www.win.tue.nl/~bdeweger
 > >
 > > I'd like to include your certificates in GnuTLS, a TLS=20
 > implementation
-> > that supports X.509, as self-tests of the the certificate=20
+> > that supports X.509, as self-tests of the certificate=20
 > verification
 > > logic.  Is this OK with you?
 > >
