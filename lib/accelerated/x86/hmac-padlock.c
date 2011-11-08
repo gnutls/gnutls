@@ -30,7 +30,6 @@
 #include <nettle/hmac.h>
 #include <nettle/macros.h>
 #include <aes-padlock.h>
-#include <assert.h>
 #include <sha-padlock.h>
 
 #ifdef HAVE_LIBNETTLE
