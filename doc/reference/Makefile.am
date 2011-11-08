@@ -51,8 +51,7 @@ FIXXREF_OPTIONS=
 # e.g. HFILE_GLOB=$(top_srcdir)/gtk/*.h
 # e.g. CFILE_GLOB=$(top_srcdir)/gtk/*.c
 HFILE_GLOB=$(top_srcdir)/lib/includes/gnutls/*.h \
-	$(top_builddir)/lib/includes/gnutls/*.h \
-	$(top_srcdir)/extra/includes/gnutls/*.h
+	$(top_builddir)/lib/includes/gnutls/*.h
 CFILE_GLOB=$(top_srcdir)/lib/*.c \
 	$(top_srcdir)/lib/x509/*.c \
 	$(top_srcdir)/lib/openpgp/*.c \
@@ -157,10 +156,6 @@ IGNORE_HFILES += \
 	x509_b64.h \
 	x509_int.h \
 	x86.h
-
-# find extra -name \*.h -exec basename {} \; | grep -v -e extra.h -e openssl.h | sort | uniq | sed -e 's/^/\t/' -e 's/$/ \\/'
-IGNORE_HFILES += \
-	openssl_compat.h
 
 # Images to copy into HTML directory.
 # e.g. HTML_IMAGES=$(top_srcdir)/gtk/stock-icons/stock_about_24.png
