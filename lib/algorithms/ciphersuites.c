@@ -566,7 +566,7 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_VERSION_MAX, 1),
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_RSA_AES_128_CBC_SHA256,
                              GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_ECDHE_RSA,
-                             GNUTLS_MAC_SHA1, GNUTLS_TLS1_2,
+                             GNUTLS_MAC_SHA256, GNUTLS_TLS1_2,
                              GNUTLS_VERSION_MAX, 1),
   GNUTLS_CIPHER_SUITE_ENTRY (GNUTLS_ECDHE_ECDSA_AES_128_GCM_SHA256,
                              GNUTLS_CIPHER_AES_128_GCM, GNUTLS_KX_ECDHE_ECDSA,
