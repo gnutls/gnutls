@@ -8,6 +8,8 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
+#include "examples.h"
+
 int verify_certificate_callback (gnutls_session_t session)
 {
   unsigned int status;
