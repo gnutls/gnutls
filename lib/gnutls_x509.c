@@ -793,7 +793,7 @@ read_cert_file (gnutls_certificate_credentials_t res,
     }
 #endif /* ENABLE_PKCS11 */
 
-  data = gl_read_binary_file (certfile, &size);
+  data = read_binary_file (certfile, &size);
 
   if (data == NULL)
     {
@@ -828,7 +828,7 @@ read_key_file (gnutls_certificate_credentials_t res,
     }
 #endif /* ENABLE_PKCS11 */
 
-  data = gl_read_binary_file (keyfile, &size);
+  data = read_binary_file (keyfile, &size);
 
   if (data == NULL)
     {
@@ -1569,7 +1569,7 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t cred,
     }
 #endif
 
-  cas.data = gl_read_binary_file (cafile, &size);
+  cas.data = read_binary_file (cafile, &size);
   if (cas.data == NULL)
     {
       gnutls_assert ();
@@ -1790,7 +1790,7 @@ gnutls_certificate_set_x509_crl_file (gnutls_certificate_credentials_t res,
 {
   int ret;
   size_t size;
-  char *data = gl_read_binary_file (crlfile, &size);
+  char *data = read_binary_file (crlfile, &size);
 
   if (data == NULL)
     {
@@ -2155,7 +2155,7 @@ int
   size_t size;
   int ret;
 
-  p12blob.data = gl_read_binary_file (pkcs12file, &size);
+  p12blob.data = read_binary_file (pkcs12file, &size);
   p12blob.size = (unsigned int) size;
   if (p12blob.data == NULL)
     {

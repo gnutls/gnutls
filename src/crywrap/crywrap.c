@@ -203,7 +203,7 @@ load_file (const char *file)
   gnutls_datum_t loaded_file = { NULL, 0 };
   size_t length;
 
-  loaded_file.data = gl_read_binary_file (file, &length);
+  loaded_file.data = read_binary_file (file, &length);
   if (loaded_file.data)
     loaded_file.size = (unsigned int) length;
 

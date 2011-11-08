@@ -41,7 +41,7 @@
    *LENGTH.  On errors, *LENGTH is undefined, errno preserves the
    values set by system functions (if any), and NULL is returned.  */
 char *
-gl_fread_file (FILE *stream, size_t *length)
+fread_file (FILE *stream, size_t *length)
 {
   char *buf = NULL;
   size_t alloc = BUFSIZ;
@@ -145,7 +145,7 @@ internal_read_file (const char *filename, size_t *length, const char *mode)
   if (!stream)
     return NULL;
 
-  out = gl_fread_file (stream, length);
+  out = fread_file (stream, length);
 
   save_errno = errno;
 
@@ -170,7 +170,7 @@ internal_read_file (const char *filename, size_t *length, const char *mode)
    undefined, errno preserves the values set by system functions (if
    any), and NULL is returned.  */
 char *
-gl_read_file (const char *filename, size_t *length)
+read_file (const char *filename, size_t *length)
 {
   return internal_read_file (filename, length, "r");
 }
@@ -183,7 +183,7 @@ gl_read_file (const char *filename, size_t *length)
    preserves the values set by system functions (if any), and NULL is
    returned.  */
 char *
-gl_read_binary_file (const char *filename, size_t *length)
+read_binary_file (const char *filename, size_t *length)
 {
   return internal_read_file (filename, length, "rb");
 }

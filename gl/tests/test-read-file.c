@@ -37,7 +37,7 @@ main (void)
   if (stat (FILE1, &statbuf) >= 0)
     {
       size_t len;
-      char *out = gl_read_file (FILE1, &len);
+      char *out = read_file (FILE1, &len);
 
       if (!out)
         {
@@ -79,7 +79,7 @@ main (void)
   if (stat (FILE2, &statbuf) >= 0)
     {
       size_t len;
-      char *out = gl_read_file (FILE2, &len);
+      char *out = read_file (FILE2, &len);
 
       if (!out)
         {

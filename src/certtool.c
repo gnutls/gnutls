@@ -1155,7 +1155,7 @@ certificate_info (int pubkey, common_info_st * cinfo)
   gnutls_datum_t pem;
   unsigned int crt_num;
 
-  pem.data = gl_fread_file (infile, &size);
+  pem.data = fread_file (infile, &size);
   pem.size = size;
 
   crt_num = MAX_CRTS;
@@ -1218,7 +1218,7 @@ pgp_certificate_info (void)
   gnutls_datum_t pem, out_data;
   unsigned int verify_status;
 
-  pem.data = gl_fread_file (infile, &size);
+  pem.data = fread_file (infile, &size);
   pem.size = size;
 
   ret = gnutls_openpgp_crt_init (&crt);
@@ -1405,7 +1405,7 @@ pgp_ring_info (void)
   int ret, i, count;
   gnutls_datum_t pem;
 
-  pem.data = gl_fread_file (infile, &size);
+  pem.data = fread_file (infile, &size);
   pem.size = size;
 
   ret = gnutls_openpgp_keyring_init (&ring);
@@ -1526,7 +1526,7 @@ crl_info (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crl_init: %s", gnutls_strerror (ret));
 
-  pem.data = gl_fread_file (infile, &size);
+  pem.data = fread_file (infile, &size);
   pem.size = size;
 
   if (!pem.data)
@@ -1582,7 +1582,7 @@ crq_info (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crq_init: %s", gnutls_strerror (ret));
 
-  pem.data = gl_fread_file (infile, &size);
+  pem.data = fread_file (infile, &size);
   pem.size = size;
 
   if (!pem.data)
@@ -2159,7 +2159,7 @@ verify_chain (void)
   char *buf;
   size_t size;
 
-  buf = gl_fread_file (infile, &size);
+  buf = fread_file (infile, &size);
   if (buf == NULL)
     error (EXIT_FAILURE, errno, "reading chain");
 
@@ -2180,13 +2180,13 @@ verify_certificate (common_info_st * cinfo)
   if (ca_file == NULL)
     error (EXIT_FAILURE, errno, "opening CA file");
 
-  cert = gl_fread_file (infile, &cert_size);
+  cert = fread_file (infile, &cert_size);
   if (cert == NULL)
     error (EXIT_FAILURE, errno, "reading certificate chain");
 
   cert[cert_size] = 0;
 
-  cas = gl_fread_file (ca_file, &ca_size);
+  cas = fread_file (ca_file, &ca_size);
   if (cas == NULL)
     error (EXIT_FAILURE, errno, "reading CA list");
 
@@ -2226,7 +2226,7 @@ verify_crl (common_info_st * cinfo)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crl_init: %s", gnutls_strerror (ret));
 
-  pem.data = gl_fread_file (infile, &size);
+  pem.data = fread_file (infile, &size);
   pem.size = size;
 
   ret = gnutls_x509_crl_import (crl, &pem, info.incert_format);
@@ -2601,7 +2601,7 @@ pkcs12_info (void)
   if (result < 0)
     error (EXIT_FAILURE, 0, "p12_init: %s", gnutls_strerror (result));
 
-  data.data = gl_fread_file (infile, &size);
+  data.data = fread_file (infile, &size);
   data.size = size;
 
   result = gnutls_pkcs12_import (pkcs12, &data, info.incert_format, 0);
@@ -2676,7 +2676,7 @@ pkcs7_info (void)
   if (result < 0)
     error (EXIT_FAILURE, 0, "p7_init: %s", gnutls_strerror (result));
 
-  data.data = gl_fread_file (infile, &size);
+  data.data = fread_file (infile, &size);
   data.size = size;
 
   result = gnutls_pkcs7_import (pkcs7, &data, info.incert_format);

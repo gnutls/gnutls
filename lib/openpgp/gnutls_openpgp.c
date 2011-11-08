@@ -452,7 +452,7 @@ gnutls_certificate_set_openpgp_key_file2 (gnutls_certificate_credentials_t
       return GNUTLS_E_FILE_ERROR;
     }
 
-  cert.data = gl_read_binary_file (certfile, &size);
+  cert.data = read_binary_file (certfile, &size);
   cert.size = (unsigned int) size;
   if (cert.data == NULL)
     {
@@ -460,7 +460,7 @@ gnutls_certificate_set_openpgp_key_file2 (gnutls_certificate_credentials_t
       return GNUTLS_E_FILE_ERROR;
     }
 
-  key.data = gl_read_binary_file (keyfile, &size);
+  key.data = read_binary_file (keyfile, &size);
   key.size = (unsigned int) size;
   if (key.data == NULL)
     {
@@ -549,7 +549,7 @@ gnutls_certificate_set_openpgp_keyring_file (gnutls_certificate_credentials_t c,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ring.data = gl_read_binary_file (file, &size);
+  ring.data = read_binary_file (file, &size);
   ring.size = (unsigned int) size;
   if (ring.data == NULL)
     {
