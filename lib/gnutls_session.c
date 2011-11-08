@@ -66,6 +66,7 @@ gnutls_session_get_data (gnutls_session_t session,
 
   if (psession.size > *session_data_size)
     {
+      *session_data_size = psession.size;
       ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
       goto error;
     }
