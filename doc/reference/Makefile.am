@@ -70,11 +70,10 @@ IGNORE_HFILES=
 IGNORE_HFILES += \
 	abstract_int.h \
 	accelerated.h \
+	aes-padlock.h \
 	aes-x86.h \
 	algorithms.h \
 	anon.h \
-	arg-nonnull.h \
-	c++defs.h \
 	cert.h \
 	cert_type.h \
 	common.h \
@@ -121,6 +120,7 @@ IGNORE_HFILES += \
 	gnutls_sig.h \
 	gnutls_srp.h \
 	gnutls_state.h \
+	gnutls_str_array.h \
 	gnutls_str.h \
 	gnutls_supplemental.h \
 	gnutls_v2_compat.h \
@@ -146,6 +146,7 @@ IGNORE_HFILES += \
 	safe_renegotiation.h \
 	server_name.h \
 	session_ticket.h \
+	sha-padlock.h \
 	signature.h \
 	srp.h \
 	srp_passwd.h \
@@ -153,12 +154,11 @@ IGNORE_HFILES += \
 	structure.h \
 	system.h \
 	types.h \
-	warn-on-use.h \
 	x509_b64.h \
 	x509_int.h \
 	x86.h
 
-# find libextra -name \*.h -exec basename {} \; | grep -v -e extra.h -e openssl.h | sort | uniq | sed -e 's/^/\t/' -e 's/$/ \\/'
+# find extra -name \*.h -exec basename {} \; | grep -v -e extra.h -e openssl.h | sort | uniq | sed -e 's/^/\t/' -e 's/$/ \\/'
 IGNORE_HFILES += \
 	openssl_compat.h
 
