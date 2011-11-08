@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2010 Free Software Foundation, Inc.
+# Copyright (C) 2010-2011 Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos
 #
@@ -31,7 +31,7 @@ if test "${WINDIR}" != "";then
   exit 77
 fi 
 
-. ../scripts/common.sh
+. $srcdir/../scripts/common.sh
 
 echo "Checking various DSA key sizes"
 
