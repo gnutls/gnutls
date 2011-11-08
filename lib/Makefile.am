@@ -81,8 +81,6 @@ endif
 
 if ENABLE_NETTLE
 SUBDIRS += nettle
-else
-SUBDIRS += gcrypt
 endif
 
 HFILES = abstract_int.h debug.h gnutls_compress.h gnutls_cipher.h	\
@@ -138,9 +136,6 @@ endif
 if ENABLE_NETTLE
 libgnutls_la_LDFLAGS += $(LTLIBNETTLE)
 libgnutls_la_LIBADD += nettle/libcrypto.la
-else
-libgnutls_la_LDFLAGS += $(LTLIBGCRYPT)
-libgnutls_la_LIBADD += gcrypt/libcrypto.la
 endif
 
 if HAVE_LD_OUTPUT_DEF

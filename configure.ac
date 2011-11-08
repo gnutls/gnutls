@@ -487,7 +487,6 @@ AC_CONFIG_FILES([
   lib/openpgp/Makefile
   po/Makefile.in
   lib/x509/Makefile
-  lib/gcrypt/Makefile
   lib/nettle/Makefile
   tests/suite/Makefile
   lib/accelerated/Makefile
