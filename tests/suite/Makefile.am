@@ -1,8 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free Software
-# Foundation, Inc.
-#
-# Author: Simon Josefsson
+# Copyright (C) 2004-2011 Free Software Foundation, Inc.
 #
 # This file is part of GnuTLS.
 #
@@ -40,32 +37,49 @@ LDADD = ../../lib/libgnutls.la \
 	$(LTLIBGCRYPT)	\
 	$(LIBSOCKET) $(INET_NTOP_LIB) $(INET_PTON_LIB)
 
-noinst_LTLIBRARIES = libecore.la                                                                                                                                                                                                                                  
+noinst_LTLIBRARIES = libecore.la
 
-libecore_la_CPPFLAGS = -I$(top_srcdir)/tests/suite/ecore/ -I$(top_srcdir)/tests/suite/ecore/src/include \
-	-I$(top_srcdir)/tests/suite/ecore/src/lib -DHAVE_CONFIG_H -D__UNUSED__= -DVMAJ=1 \
-	-D VMIC=0 -DVMIN=0 -DVREV=0 -DEFL_HAVE_POSIX_THREADS=1 -DEFL_HAVE_POSIX_THREADS_SPINLOCK=1 \
-	-DEFL_HAVE_THREADS=1 -DEINA_BUILD_CHAINED_POOL=1 -DEINA_STATIC_BUILD_CHAINED_POOL=1 \
-	-DHAVE_CLOCK_GETTIME -DHAVE_GETTIMEOFDAY -DPACKAGE_LIB_DIR=\"/usr/lib\" -DMODULE_ARCH=\"unix\" \
-	-DSHARED_LIB_SUFFIX=\".so\"
+libecore_la_CPPFLAGS = -I$(top_srcdir)/tests/suite/ecore/		\
+	-I$(top_srcdir)/tests/suite/ecore/src/include			\
+	-I$(top_srcdir)/tests/suite/ecore/src/lib -DHAVE_CONFIG_H	\
+	-D__UNUSED__= -DVMAJ=1 -D VMIC=0 -DVMIN=0 -DVREV=0		\
+	-DEFL_HAVE_POSIX_THREADS=1 -DEFL_HAVE_POSIX_THREADS_SPINLOCK=1	\
+	-DEFL_HAVE_THREADS=1 -DEINA_BUILD_CHAINED_POOL=1		\
+	-DEINA_STATIC_BUILD_CHAINED_POOL=1 -DHAVE_CLOCK_GETTIME		\
+	-DHAVE_GETTIMEOFDAY -DPACKAGE_LIB_DIR=\"/usr/lib\"		\
+	-DMODULE_ARCH=\"unix\" -DSHARED_LIB_SUFFIX=\".so\"
+
 libecore_la_CFLAGS = -w
-nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c ecore/src/lib/ecore_app.c \
-	ecore/src/lib/ecore.c ecore/src/lib/ecore_events.c ecore/src/lib/ecore_exe.c \
-	ecore/src/lib/ecore_getopt.c ecore/src/lib/ecore_glib.c ecore/src/lib/ecore_idle_enterer.c \
-	ecore/src/lib/ecore_idle_exiter.c ecore/src/lib/ecore_idler.c ecore/src/lib/ecore_job.c \
-	ecore/src/lib/ecore_main.c ecore/src/lib/ecore_pipe.c ecore/src/lib/ecore_poll.c \
-	ecore/src/lib/ecore_signal.c ecore/src/lib/ecore_thread.c ecore/src/lib/ecore_time.c \
-	ecore/src/lib/ecore_timer.c ecore/src/lib/eina_accessor.c ecore/src/lib/eina_array.c \
-	ecore/src/lib/eina_benchmark.c ecore/src/lib/eina_binshare.c ecore/src/lib/eina_chained_mempool.c \
-	ecore/src/lib/eina_convert.c ecore/src/lib/eina_counter.c ecore/src/lib/eina_cpu.c ecore/src/lib/eina_error.c \
-	ecore/src/lib/eina_file.c ecore/src/lib/eina_fp.c ecore/src/lib/eina_hamster.c ecore/src/lib/eina_hash.c \
-	ecore/src/lib/eina_inlist.c ecore/src/lib/eina_iterator.c ecore/src/lib/eina_lalloc.c ecore/src/lib/eina_list.c \
-	ecore/src/lib/eina_log.c ecore/src/lib/eina_magic.c ecore/src/lib/eina_main.c ecore/src/lib/eina_matrixsparse.c \
-	ecore/src/lib/eina_mempool.c ecore/src/lib/eina_module.c ecore/src/lib/eina_quadtree.c ecore/src/lib/eina_rbtree.c \
-	ecore/src/lib/eina_rectangle.c ecore/src/lib/eina_safety_checks.c ecore/src/lib/eina_sched.c ecore/src/lib/eina_share_common.c \
-	ecore/src/lib/eina_strbuf.c ecore/src/lib/eina_strbuf_common.c ecore/src/lib/eina_str.c \
-	ecore/src/lib/eina_stringshare.c ecore/src/lib/eina_tiler.c ecore/src/lib/eina_unicode.c \
-	ecore/src/lib/eina_ustrbuf.c ecore/src/lib/eina_ustringshare.c ecore/src/lib/eina_value.c
+nodist_libecore_la_SOURCES = ecore/src/lib/ecore_anim.c			\
+	ecore/src/lib/ecore_app.c ecore/src/lib/ecore.c			\
+	ecore/src/lib/ecore_events.c ecore/src/lib/ecore_exe.c		\
+	ecore/src/lib/ecore_getopt.c ecore/src/lib/ecore_glib.c		\
+	ecore/src/lib/ecore_idle_enterer.c				\
+	ecore/src/lib/ecore_idle_exiter.c ecore/src/lib/ecore_idler.c	\
+	ecore/src/lib/ecore_job.c ecore/src/lib/ecore_main.c		\
+	ecore/src/lib/ecore_pipe.c ecore/src/lib/ecore_poll.c		\
+	ecore/src/lib/ecore_signal.c ecore/src/lib/ecore_thread.c	\
+	ecore/src/lib/ecore_time.c ecore/src/lib/ecore_timer.c		\
+	ecore/src/lib/eina_accessor.c ecore/src/lib/eina_array.c	\
+	ecore/src/lib/eina_benchmark.c ecore/src/lib/eina_binshare.c	\
+	ecore/src/lib/eina_chained_mempool.c				\
+	ecore/src/lib/eina_convert.c ecore/src/lib/eina_counter.c	\
+	ecore/src/lib/eina_cpu.c ecore/src/lib/eina_error.c		\
+	ecore/src/lib/eina_file.c ecore/src/lib/eina_fp.c		\
+	ecore/src/lib/eina_hamster.c ecore/src/lib/eina_hash.c		\
+	ecore/src/lib/eina_inlist.c ecore/src/lib/eina_iterator.c	\
+	ecore/src/lib/eina_lalloc.c ecore/src/lib/eina_list.c		\
+	ecore/src/lib/eina_log.c ecore/src/lib/eina_magic.c		\
+	ecore/src/lib/eina_main.c ecore/src/lib/eina_matrixsparse.c	\
+	ecore/src/lib/eina_mempool.c ecore/src/lib/eina_module.c	\
+	ecore/src/lib/eina_quadtree.c ecore/src/lib/eina_rbtree.c	\
+	ecore/src/lib/eina_rectangle.c					\
+	ecore/src/lib/eina_safety_checks.c ecore/src/lib/eina_sched.c	\
+	ecore/src/lib/eina_share_common.c ecore/src/lib/eina_strbuf.c	\
+	ecore/src/lib/eina_strbuf_common.c ecore/src/lib/eina_str.c	\
+	ecore/src/lib/eina_stringshare.c ecore/src/lib/eina_tiler.c	\
+	ecore/src/lib/eina_unicode.c ecore/src/lib/eina_ustrbuf.c	\
+	ecore/src/lib/eina_ustringshare.c ecore/src/lib/eina_value.c
 
 eagain_cli_LDADD = $(LDADD) libecore.la -lrt -lm -ldl -lpthread
 nodist_eagain_cli_SOURCES = mini-eagain2.c
@@ -75,4 +89,3 @@ noinst_PROGRAMS = eagain-cli
 nodist_check_SCRIPTS = eagain testsrn testcompat chain
 
 TESTS = eagain testsrn testcompat chain
-
