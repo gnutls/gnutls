@@ -158,7 +158,7 @@ alerts.texi: alert-printlist
 	$(builddir)/alert-printlist > $@-tmp
 	mv -f $@-tmp $@
 
-enums.texi: $(srcdir)/../lib/includes/gnutls/*.h
+enums.texi: $(srcdir)/../lib/includes/gnutls/*.h $(builddir)/../lib/includes/gnutls/*.h
 	echo "" > $@-tmp
 	for i in $^; do \
 		echo -n "Creating documentation for file $$i... " && \
