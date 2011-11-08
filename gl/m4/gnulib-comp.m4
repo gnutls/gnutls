@@ -196,6 +196,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module perror-tests:
   # Code from module pipe-posix:
   # Code from module pipe-posix-tests:
+  # Code from module pmccabe2html:
   # Code from module printf-frexp:
   # Code from module printf-frexp-tests:
   # Code from module printf-frexpl:
@@ -605,6 +606,7 @@ if test $HAVE_OPENDIR = 0 || test $REPLACE_OPENDIR = 1; then
   AC_LIBOBJ([opendir])
 fi
 gl_DIRENT_MODULE_INDICATOR([opendir])
+AC_PATH_PROG([PMCCABE], [pmccabe], [false])
 gl_FUNC_PRINTF_FREXP
 gl_FUNC_PRINTF_FREXPL
 m4_divert_text([INIT_PREPARE], [gl_printf_safe=yes])
@@ -1076,6 +1078,8 @@ AC_DEFUN([gltests_LIBSOURCES], [
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([gl_FILE_LIST], [
   build-aux/config.rpath
+  build-aux/pmccabe.css
+  build-aux/pmccabe2html
   build-aux/snippet/_Noreturn.h
   build-aux/snippet/arg-nonnull.h
   build-aux/snippet/c++defs.h
