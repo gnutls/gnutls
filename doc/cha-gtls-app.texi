@@ -218,8 +218,7 @@ messages may arrive out of order.
 @showfuncdesc{gnutls_record_recv_seq}
 
 A helper function is available to check whether data
-to be read are pending in a @acronym{GnuTLS} session.
-This is the equivalent of @code{select} in @acronym{POSIX} systems.
+to be read are available in a @acronym{GnuTLS} session buffers.
 
 @showfuncdesc{gnutls_record_check_pending}
 
