@@ -46,8 +46,7 @@ ecc_mulmod (mpz_t k, ecc_point * G, ecc_point * R, mpz_t a, mpz_t modulus,
   ecc_point *tG, *M[3];
   int i, j, err;
   int bit_to_read;
-  unsigned long buf;
-  int bitcnt, mode, digidx;
+  int mode;
 
   if (k == NULL || G == NULL || R == NULL || modulus == NULL)
     return -1;
