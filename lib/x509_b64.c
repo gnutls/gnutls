@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2000, 2001, 2003, 2004, 2005, 2008, 2010 Free Software
- * Foundation, Inc.
+ * Copyright (C) 2000-2011 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -134,38 +133,6 @@ decode (uint8_t * result, const opaque * data)
 
   if (data[3] == '=')
     ret--;
-  return ret;
-}
-
-/* encodes data and puts the result into result (locally allocated)
- * The result_size is the return value
- */
-int
-_gnutls_base64_encode (const uint8_t * data, size_t data_size,
-                       uint8_t ** result)
-{
-  unsigned int i, j;
-  int ret, tmp;
-  char tmpres[4];
-
-  ret = B64SIZE (data_size);
-
-  (*result) = gnutls_malloc (ret + 1);
-  if ((*result) == NULL)
-    return GNUTLS_E_MEMORY_ERROR;
-
-  for (i = j = 0; i < data_size; i += 3, j += 4)
-    {
-      tmp = encode (tmpres, &data[i], data_size - i);
-      if (tmp == -1)
-        {
-          gnutls_free ((*result));
-          return GNUTLS_E_MEMORY_ERROR;
-        }
-      memcpy (&(*result)[j], tmpres, tmp);
-    }
-  (*result)[ret] = 0;           /* null terminated */
-
   return ret;
 }
 
@@ -365,7 +332,7 @@ gnutls_pem_base64_encode_alloc (const char *msg,
 /* decodes data and puts the result into result (locally allocated)
  * The result_size is the return value
  */
-int
+static int
 _gnutls_base64_decode (const uint8_t * data, size_t data_size,
                        uint8_t ** result)
 {
