@@ -36,7 +36,8 @@ AM_CPPFLAGS = \
 	-I$(builddir)/x509			\
 	-I$(srcdir)/includes			\
 	-I$(builddir)/includes			\
-	-I$(srcdir)/x509
+	-I$(srcdir)/x509			\
+	$(P11_KIT_CFLAGS)
 
 if ENABLE_OPENPGP
 SUBDIRS += opencdk
@@ -114,7 +115,7 @@ libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	accelerated/libaccelerated.la ext/libgnutls_ext.la \
 	auth/libgnutls_auth.la algorithms/libgnutls_alg.la \
 	$(LTLIBZ)  $(LTLIBINTL) $(LIBSOCKET) $(LTLIBDL) \
-	$(LTLIBPTHREAD)
+	$(LTLIBPTHREAD) $(P11_KIT_LIBS)
 
 if ENABLE_OPENPGP
 libgnutls_la_LIBADD += openpgp/libgnutls_openpgp.la

@@ -139,8 +139,6 @@ if test "$with_p11_kit" != "no"; then
 	PKG_CHECK_MODULES(P11_KIT, [p11-kit-1 >= 0.4], [with_p11_kit=yes], [with_p11_kit=no])
 	if test "$with_p11_kit" != "no";then
 		AC_DEFINE([ENABLE_PKCS11], 1, [Build PKCS#11 support])
-		CFLAGS="$CFLAGS $P11_KIT_CFLAGS"
-		LIBS="$LIBS $P11_KIT_LIBS"
 		if test "x$GNUTLS_REQUIRES_PRIVATE" = "x"; then
 			GNUTLS_REQUIRES_PRIVATE="Requires.private: p11-kit-1"
 		else
@@ -218,7 +216,7 @@ if test x$ac_zlib != xno; then
     if test "x$GNUTLS_REQUIRES_PRIVATE" = x; then
       GNUTLS_REQUIRES_PRIVATE="Requires.private: zlib"
     else
-      GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE , zlib"
+      GNUTLS_REQUIRES_PRIVATE="$GNUTLS_REQUIRES_PRIVATE, zlib"
     fi
   else
     GNUTLS_ZLIB_LIBS_PRIVATE="$LTLIBZ"
