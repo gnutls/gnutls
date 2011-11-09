@@ -50,7 +50,7 @@
  **/
 typedef int (*gnutls_pkcs11_token_callback_t) (void *const userdata,
                                                const char *const label,
-                                               const unsigned retry);
+                                               unsigned retry);
 
 /**
  * gnutls_pkcs11_pin_flag_t:
