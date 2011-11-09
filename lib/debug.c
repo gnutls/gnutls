@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2001-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009, 2010
+ * Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -25,6 +26,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "debug.h"
+#include <gnutls_mpi.h>
+
+void
+_gnutls_dump_mpi (const char *prefix, bigint_t a)
+{
+  char buf[400];
+  char buf_hex[2 * sizeof (buf)];
+  size_t n = sizeof buf;
+
+  if (_gnutls_mpi_print (a, buf, &n))
+    strcpy (buf, "[can't print value]");        /* Flawfinder: ignore */
+  _gnutls_debug_log ("MPI: length: %d\n\t%s%s\n", (int) n, prefix,
+                     _gnutls_bin2hex (buf, n, buf_hex, sizeof (buf_hex),
+                                      NULL));
+}
+
 
 const char *
 _gnutls_packet2str (content_type_t packet)
@@ -47,6 +64,7 @@ _gnutls_packet2str (content_type_t packet)
 const char *
 _gnutls_handshake2str (gnutls_handshake_description_t handshake)
 {
+
   switch (handshake)
     {
     case GNUTLS_HANDSHAKE_HELLO_REQUEST:
@@ -96,5 +114,6 @@ _gnutls_handshake2str (gnutls_handshake_description_t handshake)
       break;
     default:
       return "Unknown Handshake packet";
+
     }
 }
