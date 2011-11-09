@@ -24,12 +24,8 @@ int _gnutls_server_register_current_session (gnutls_session_t session);
 int _gnutls_server_restore_session (gnutls_session_t session,
                                     uint8_t * session_id,
                                     int session_id_size);
-int _gnutls_db_remove_session (gnutls_session_t session, uint8_t * session_id,
-                               int session_id_size);
 int _gnutls_store_session (gnutls_session_t session,
                            gnutls_datum_t session_id,
                            gnutls_datum_t session_data);
 gnutls_datum_t _gnutls_retrieve_session (gnutls_session_t session,
                                          gnutls_datum_t session_id);
-int _gnutls_remove_session (gnutls_session_t session,
-                            gnutls_datum_t session_id);

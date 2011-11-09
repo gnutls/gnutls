@@ -258,19 +258,6 @@ _gnutls_server_restore_session (gnutls_session_t session,
   return 0;
 }
 
-int
-_gnutls_db_remove_session (gnutls_session_t session, uint8_t * session_id,
-                           int session_id_size)
-{
-  gnutls_datum_t key;
-
-  key.data = session_id;
-  key.size = session_id_size;
-
-  return _gnutls_remove_session (session, key);
-}
-
-
 /* Stores session data to the db backend.
  */
 int
@@ -334,31 +321,6 @@ _gnutls_retrieve_session (gnutls_session_t session, gnutls_datum_t session_id)
 
 }
 
-/* Removes session data from the db backend.
- */
-int
-_gnutls_remove_session (gnutls_session_t session, gnutls_datum_t session_id)
-{
-  int ret = 0;
-
-  if (_gnutls_db_func_is_ok (session) != 0)
-    {
-      return GNUTLS_E_DB_ERROR;
-    }
-
-  if (session_id.data == NULL || session_id.size == 0)
-    return GNUTLS_E_INVALID_SESSION;
-
-  /* if we can't read why bother writing? */
-  if (session->internals.db_remove_func != NULL)
-    ret =
-      session->internals.db_remove_func (session->internals.db_ptr,
-                                         session_id);
-
-  return (ret == 0 ? ret : GNUTLS_E_DB_ERROR);
-
-}
-
 /**
  * gnutls_db_remove_session:
  * @session: is a #gnutls_session_t structure.
@@ -374,7 +336,30 @@ _gnutls_remove_session (gnutls_session_t session, gnutls_datum_t session_id)
 void
 gnutls_db_remove_session (gnutls_session_t session)
 {
-  _gnutls_db_remove_session (session,
-                             session->security_parameters.session_id,
-                             session->security_parameters.session_id_size);
+  gnutls_datum_t session_id;
+  int ret = 0;
+
+  session_id.data = session->security_parameters.session_id;
+  session_id.size = session->security_parameters.session_id_size;
+
+  if (_gnutls_db_func_is_ok (session) != 0)
+    {
+      gnutls_assert ();
+      return /* GNUTLS_E_DB_ERROR */;
+    }
+
+  if (session_id.data == NULL || session_id.size == 0)
+    {
+      gnutls_assert ();
+      return /* GNUTLS_E_INVALID_SESSION */;
+    }
+
+  /* if we can't read why bother writing? */
+  if (session->internals.db_remove_func != NULL)
+    {
+      ret = session->internals.db_remove_func (session->internals.db_ptr,
+					       session_id);
+      if (ret != 0)
+	gnutls_assert ();
+    }
 }
