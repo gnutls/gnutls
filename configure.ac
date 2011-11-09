@@ -449,6 +449,7 @@ AC_CONFIG_FILES([
   doc/examples/Makefile
   doc/manpages/Makefile
   doc/reference/Makefile
+  doc/reference/version.xml
   doc/scripts/Makefile
   gl/Makefile
   gl/tests/Makefile

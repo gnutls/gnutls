@@ -1,9 +1,18 @@
 <?xml version="1.0"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" 
-               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
-<book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd"
+[
+  <!ENTITY % local.common.attrib "xmlns:xi  CDATA  #FIXED 'http://www.w3.org/2003/XInclude'">
+  <!ENTITY version SYSTEM "version.xml">
+]>
+<book id="index">
   <bookinfo>
     <title>GnuTLS API Reference Manual</title>
+    <releaseinfo>
+      for GnuTLS &version;.
+      The latest version of this documentation can be found on-line at
+      <ulink role="online-location" url="https://www.gnu.org/software/gnutls/reference/">https://www.gnu.org/software/gnutls/reference/</ulink>.
+    </releaseinfo>
   </bookinfo>
 
   <chapter id="intro">
@@ -23,15 +32,16 @@
     <xi:include href="xml/gnutls.xml"/>
     <xi:include href="xml/abstract.xml"/>
     <xi:include href="xml/x509.xml"/>
+    <xi:include href="xml/openpgp.xml"/>
+    <xi:include href="xml/dtls.xml"/>
+    <xi:include href="xml/crypto.xml"/>
     <xi:include href="xml/pkcs11.xml"/>
     <xi:include href="xml/pkcs12.xml"/>
-    <xi:include href="xml/openpgp.xml"/>
-    <xi:include href="xml/crypto.xml"/>
-    <xi:include href="xml/dtls.xml"/>
-  </chapter>
 
+  </chapter>
   <index id="api-index-full">
-    <title>Index of all symbols</title>
+    <title>API Index</title>
+    <xi:include href="xml/api-index-full.xml"><xi:fallback /></xi:include>
   </index>
   <index role="deprecated" id="api-index-deprecated">
     <title>Index of deprecated symbols</title>
