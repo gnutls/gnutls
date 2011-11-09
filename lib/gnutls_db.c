@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2000, 2002, 2003, 2004, 2005, 2008, 2010, 2011 Free Software
- * Foundation, Inc.
+ * Copyright (C) 2000-2011 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -28,7 +27,6 @@
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include <gnutls_db.h>
-#include "debug.h"
 #include <gnutls_session_pack.h>
 #include <gnutls_datum.h>
 
@@ -165,9 +163,60 @@ gnutls_db_check_entry (gnutls_session_t session, gnutls_datum_t session_entry)
   return 0;
 }
 
-/* The format of storing data is:
- * (forget it). Check gnutls_session_pack.c
+/* Checks if both db_store and db_retrieve functions have
+ * been set up.
  */
+static int
+db_func_is_ok (gnutls_session_t session)
+{
+  if (session->internals.db_store_func != NULL &&
+      session->internals.db_retrieve_func != NULL &&
+      session->internals.db_remove_func != NULL)
+    return 0;
+  else
+    return GNUTLS_E_DB_ERROR;
+}
+
+/* Stores session data to the db backend.
+ */
+static int
+store_session (gnutls_session_t session,
+	       gnutls_datum_t session_id,
+	       gnutls_datum_t session_data)
+{
+  int ret = 0;
+
+  if (session->internals.resumable == RESUME_FALSE)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_SESSION;
+    }
+
+  if (db_func_is_ok (session) != 0)
+    {
+      return GNUTLS_E_DB_ERROR;
+    }
+
+  if (session_id.data == NULL || session_id.size == 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_SESSION;
+    }
+
+  if (session_data.data == NULL || session_data.size == 0)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_SESSION;
+    }
+
+  /* if we can't read why bother writing? */
+  if (session->internals.db_store_func != NULL)
+    ret = session->internals.db_store_func (session->internals.db_ptr,
+					    session_id, session_data);
+
+  return (ret == 0 ? ret : GNUTLS_E_DB_ERROR);
+}
+
 int
 _gnutls_server_register_current_session (gnutls_session_t session)
 {
@@ -191,7 +240,6 @@ _gnutls_server_register_current_session (gnutls_session_t session)
       return GNUTLS_E_INVALID_SESSION;
     }
 
-/* copy data */
   ret = _gnutls_session_pack (session, &content);
   if (ret < 0)
     {
@@ -199,26 +247,31 @@ _gnutls_server_register_current_session (gnutls_session_t session)
       return ret;
     }
 
-  ret = _gnutls_store_session (session, key, content);
+  ret = store_session (session, key, content);
   _gnutls_free_datum (&content);
 
   return ret;
 }
 
-/* Checks if both db_store and db_retrieve functions have
- * been set up.
+/* Retrieves session data from the db backend.
  */
-static int
-_gnutls_db_func_is_ok (gnutls_session_t session)
+static gnutls_datum_t
+retrieve_session (gnutls_session_t session, gnutls_datum_t session_id)
 {
-  if (session->internals.db_store_func != NULL &&
-      session->internals.db_retrieve_func != NULL &&
-      session->internals.db_remove_func != NULL)
-    return 0;
-  else
-    return GNUTLS_E_DB_ERROR;
-}
+  gnutls_datum_t ret = { NULL, 0 };
 
+  if (session_id.data == NULL || session_id.size == 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  if (session->internals.db_retrieve_func != NULL)
+    ret = session->internals.db_retrieve_func (session->internals.db_ptr,
+					       session_id);
+
+  return ret;
+}
 
 int
 _gnutls_server_restore_session (gnutls_session_t session,
@@ -231,13 +284,13 @@ _gnutls_server_restore_session (gnutls_session_t session,
   key.data = session_id;
   key.size = session_id_size;
 
-  if (_gnutls_db_func_is_ok (session) != 0)
+  if (db_func_is_ok (session) != 0)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_SESSION;
     }
 
-  data = _gnutls_retrieve_session (session, key);
+  data = retrieve_session (session, key);
 
   if (data.data == NULL)
     {
@@ -256,69 +309,6 @@ _gnutls_server_restore_session (gnutls_session_t session,
   gnutls_free (data.data);
 
   return 0;
-}
-
-/* Stores session data to the db backend.
- */
-int
-_gnutls_store_session (gnutls_session_t session,
-                       gnutls_datum_t session_id, gnutls_datum_t session_data)
-{
-  int ret = 0;
-
-  if (session->internals.resumable == RESUME_FALSE)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_SESSION;
-    }
-
-  if (_gnutls_db_func_is_ok (session) != 0)
-    {
-      return GNUTLS_E_DB_ERROR;
-    }
-
-  if (session_id.data == NULL || session_id.size == 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_SESSION;
-    }
-
-  if (session_data.data == NULL || session_data.size == 0)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_SESSION;
-    }
-  /* if we can't read why bother writing? */
-
-  if (session->internals.db_store_func != NULL)
-    ret =
-      session->internals.db_store_func (session->internals.db_ptr,
-                                        session_id, session_data);
-
-  return (ret == 0 ? ret : GNUTLS_E_DB_ERROR);
-
-}
-
-/* Retrieves session data from the db backend.
- */
-gnutls_datum_t
-_gnutls_retrieve_session (gnutls_session_t session, gnutls_datum_t session_id)
-{
-  gnutls_datum_t ret = { NULL, 0 };
-
-  if (session_id.data == NULL || session_id.size == 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  if (session->internals.db_retrieve_func != NULL)
-    ret =
-      session->internals.db_retrieve_func (session->internals.db_ptr,
-                                           session_id);
-
-  return ret;
-
 }
 
 /**
@@ -342,7 +332,7 @@ gnutls_db_remove_session (gnutls_session_t session)
   session_id.data = session->security_parameters.session_id;
   session_id.size = session->security_parameters.session_id_size;
 
-  if (_gnutls_db_func_is_ok (session) != 0)
+  if (db_func_is_ok (session) != 0)
     {
       gnutls_assert ();
       return /* GNUTLS_E_DB_ERROR */;
