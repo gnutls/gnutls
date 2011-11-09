@@ -1,6 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010 Free Software
-# Foundation, Inc.
+# Copyright (C) 2008-2011 Free Software Foundation, Inc.
 #
 # Author: Simon Josefsson
 #
@@ -22,13 +21,17 @@
 
 EXTRA_DIST = cyclo-gnutls.html
 
+vcurl = "http://git.savannah.gnu.org/gitweb/?p=gnutls.git;a=blob;f=lib/%FILENAME%;hb=HEAD"
+
 cyclo-gnutls.html:
-	$(PMCCABE) ${top_srcdir}/lib/*.[ch] ${top_srcdir}/lib/x509/*.[ch] ${top_srcdir}/lib/openpgp/*.[ch] ${top_srcdir}/lib/opencdk/*.[ch] \
+	(cd ${top_srcdir}/lib && \
+		$(PMCCABE) `find . -type f -name \*.[ch] \
+				| grep -v /minitasn1/ | sed 's,^./,,'` \
 		| sort -nr \
-		| $(AWK) -f ${top_srcdir}/build-aux/pmccabe2html \
-			-v lang=html -v name="$(PACKAGE_NAME)" \
-			-v vcurl="http://git.savannah.gnu.org/gitweb/?p=gnutls.git;a=blob;f=%FILENAME%;hb=HEAD" \
+		| LANG=C $(AWK) -f ${abs_top_srcdir}/build-aux/pmccabe2html \
+			-v lang=html -v name="$(PACKAGE_STRING)" \
+			-v vcurl=$(vcurl) \
 			-v url="http://www.gnu.org/software/gnutls/" \
-			-v css=../../build-aux/pmccabe.css \
+			-v css=${abs_top_srcdir}/build-aux/pmccabe.css) \
 			> tmp
 	mv tmp $@
