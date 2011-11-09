@@ -217,8 +217,11 @@ messages may arrive out of order.
 
 @showfuncdesc{gnutls_record_recv_seq}
 
-A helper function is available to check whether data
-to be read are available in a @acronym{GnuTLS} session buffers.
+The @funcref{gnutls_record_check_pending} helper function is available to 
+allow checking whether data are available to be read in a @acronym{GnuTLS} session 
+buffers. Note that this function complements but does not replace @code{select()},
+i.e., @funcref{gnutls_record_check_pending} reports no data to be read, @code{select()}
+should be called to check for data in the network buffers.
 
 @showfuncdesc{gnutls_record_check_pending}
 
