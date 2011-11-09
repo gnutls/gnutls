@@ -1,5 +1,5 @@
 GnuTLS README-alpha -- Information for developers.              -*- outline -*-
-Copyright (C) 2009, 2010  Free Software Foundation, Inc.
+Copyright (C) 2009-2011  Free Software Foundation, Inc.
 See the end for copying conditions.
 
 This file contains instructions for developers and advanced users that
@@ -27,7 +27,8 @@ We require several tools to build the software, including:
 - Gaa <http://gaa.sf.net> (optional)
 - libtasn1 <http://josefsson.org/libtasn1/> (optional)
 - p11-kit <http://p11-glue.freedesktop.org/p11-kit.html>
-- datefudge <packages.debian.org/datefudge> (optional)
+- datefudge <http://packages.debian.org/datefudge> (optional)
+- Libidn <http://www.gnu.org/software/libidn/> (optional, for crywrap)
 
 The required software is typically distributed with your operating
 system, and the instructions for installing them differ.  Here are
@@ -38,7 +39,7 @@ sudo apt-get install git-core autoconf automake libtool gettext autopoint
 sudo apt-get install texinfo texlive texlive-generic-recommended texlive-extra-utils
 sudo apt-get install help2man gtk-doc-tools valgrind
 sudo apt-get install nettle-dev guile-1.8-dev libtasn1-3-dev libp11-kit-dev
-sudo apt-get install datefudge
+sudo apt-get install datefudge libidn11-dev
 
 To download the version controlled sources:
 
