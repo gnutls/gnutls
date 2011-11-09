@@ -78,6 +78,8 @@ glimport:
 # Code Coverage
 
 pre-coverage:
+	./configure --disable-cxx
+	ln -s . gl/tests/glthread/glthread
 	ln -sf /usr/local/share/gaa/gaa.skel src/gaa.skel
 
 web-coverage:
