@@ -28,6 +28,7 @@
 #include "debug.h"
 #include <gnutls_mpi.h>
 
+#ifdef DEBUG
 void
 _gnutls_dump_mpi (const char *prefix, bigint_t a)
 {
@@ -41,7 +42,7 @@ _gnutls_dump_mpi (const char *prefix, bigint_t a)
                      _gnutls_bin2hex (buf, n, buf_hex, sizeof (buf_hex),
                                       NULL));
 }
-
+#endif
 
 const char *
 _gnutls_packet2str (content_type_t packet)
