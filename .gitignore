@@ -1,3 +1,6 @@
+*.gcda
+*.gcno
+*.gcov
 *.lo
 *.o
 *~
@@ -28,6 +31,7 @@ doc/Makefile
 doc/Makefile.in
 doc/algorithms.texi
 doc/core.c.texi
+doc/coverage/
 doc/credentials/Makefile
 doc/credentials/Makefile.in
 doc/credentials/openpgp/Makefile
@@ -166,6 +170,7 @@ gl/tests/arpa/
 gl/tests/c++defs.h
 gl/tests/fcntl.h
 gl/tests/glthread/.dirstamp
+gl/tests/glthread/glthread
 gl/tests/inttypes.h
 gl/tests/inttypes.h 
 gl/tests/libtests.a
@@ -419,6 +424,7 @@ src/cfg/platon/Makefile.in
 src/cfg/platon/str/Makefile
 src/cfg/platon/str/Makefile.in
 src/crywrap/crywrap
+src/gaa.skel
 src/gnutls-cli
 src/gnutls-cli-debug
 src/gnutls-serv
