@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.0.8 (unreleased)
 
+** certtool: Certtool -e returns error code on verification
+failure.
+
 ** libgnutls: Corrected ECC key generation (introduced in 3.0.6)
 
 ** libgnutls: Provide less timing information when decoding
