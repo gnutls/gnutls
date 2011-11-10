@@ -132,6 +132,7 @@ doc/reference/sgml.stamp
 doc/reference/tmpl-build.stamp
 doc/reference/tmpl.stamp
 doc/reference/tmpl/
+doc/reference/version.xml
 doc/reference/xml/
 doc/scripts/Makefile
 doc/scripts/Makefile.in
