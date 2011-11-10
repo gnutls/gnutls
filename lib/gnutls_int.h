@@ -141,9 +141,6 @@ typedef struct
 /* expire time for resuming sessions */
 #define DEFAULT_EXPIRE_TIME 3600
 
-/* printing period of messages */
-#define PRINT_MESSAGE_PERIOD 30
-
 typedef enum transport_t
 {
   GNUTLS_STREAM,
@@ -628,7 +625,6 @@ typedef struct
   /* last retransmission triggered by record layer */
   time_t last_retransmit;
   unsigned int packets_dropped;
-  time_t last_print;
 } dtls_st;
 
 

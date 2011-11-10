@@ -1020,7 +1020,8 @@ begin:
       ret = _dtls_record_check(session, packet_sequence);
       if (ret < 0)
         {
-          gnutls_assert();
+          _gnutls_audit_log(session, "Discarded duplicate message[%u]\n",
+            (unsigned int) _gnutls_uint64touint32 (packet_sequence));
           goto sanity_check_error;
         }
     }
@@ -1087,15 +1088,8 @@ discard:
 sanity_check_error:
   if (IS_DTLS(session))
     {
-      time_t now = time(0);
-      session->internals.dtls.packets_dropped++;
-
-      if (now - session->internals.dtls.last_print < PRINT_MESSAGE_PERIOD)
-        {
-          session->internals.dtls.last_print = now;
-          _gnutls_audit_log(session, "Discarded %u messages (duplicates or invalid decryption)\n", 
-               (unsigned int)session->internals.dtls.packets_dropped);
-        }
+      _gnutls_audit_log(session, "Discarded message[%u] due to invalid decryption\n", 
+            (unsigned int)_gnutls_uint64touint32 (packet_sequence));
       ret = gnutls_assert_val(GNUTLS_E_AGAIN);
       goto cleanup;
     }
