@@ -28,7 +28,7 @@ CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 echo ca > template
 echo cn = "ECDSA SHA 256 CA" >> template
 
-$CERTTOOL --generate-privkey --ecc > key-ca-ecdsa.pem
+$CERTTOOL --generate-privkey --ecc > key-ca-ecdsa.pem 2>/dev/null 
 
 $CERTTOOL -d 2 --generate-self-signed --template template \
     --load-privkey key-ca-ecdsa.pem \
@@ -41,7 +41,7 @@ if [ $? != 0 ];then
 fi
 
 echo ca > template
-$CERTTOOL --generate-privkey --ecc > key-subca-ecdsa.pem
+$CERTTOOL --generate-privkey --ecc > key-subca-ecdsa.pem 2>/dev/null 
 echo cn = "ECDSA SHA 224 Mid CA" >> template
 
 $CERTTOOL -d 2 --generate-certificate --template template \
@@ -58,7 +58,7 @@ fi
 
 echo cn = "End-user" > template
 
-$CERTTOOL --generate-privkey --ecc > key-ecdsa.pem
+$CERTTOOL --generate-privkey --ecc > key-ecdsa.pem 2>/dev/null 
 
 $CERTTOOL -d 2 --generate-certificate --template template \
     --load-ca-privkey key-subca-ecdsa.pem \
