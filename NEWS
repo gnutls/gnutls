@@ -4,6 +4,11 @@ See the end for copying conditions.
 
 * Version 3.0.8 (unreleased)
 
+** libgnutls: Corrected ECC key generation (introduced in 3.0.6)
+
+** libgnutls: Provide less timing information when decoding
+TLS/DTLS record packets.
+
 ** doc: man pages for API functions were removed.
 The reason was that the code that auto-generated the man pages missed
 many APIs and we couldn't fix it (volunteers welcome).  See the info
