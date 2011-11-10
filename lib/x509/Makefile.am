@@ -54,5 +54,6 @@ libgnutls_x509_la_SOURCES =	\
 	verify.c		\
 	x509.c			\
 	x509_int.h		\
-	x509_write.c	\
-	verify-high.c
+	x509_write.c		\
+	verify-high.c		\
+	verify-high.h
