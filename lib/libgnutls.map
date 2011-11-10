@@ -720,10 +720,10 @@ GNUTLS_3_0_0 {
 	gnutls_x509_crt_get_authority_info_access;
 	gnutls_privkey_import_ext;
 	gnutls_certificate_set_key;
-        gnutls_srp_3072_group_generator;
-        gnutls_srp_3072_group_prime;
-        gnutls_srp_4096_group_generator;
-        gnutls_srp_4096_group_prime;
+	gnutls_srp_3072_group_generator;
+	gnutls_srp_3072_group_prime;
+	gnutls_srp_4096_group_generator;
+	gnutls_srp_4096_group_prime;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {
