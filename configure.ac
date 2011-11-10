@@ -474,6 +474,7 @@ AC_CONFIG_FILES([
   tests/pkcs8-decode/Makefile
   tests/rsa-md5-collision/Makefile
   tests/sha2/Makefile
+  tests/ecdsa/Makefile
   tests/userid/Makefile
   extra/Makefile
   extra/includes/Makefile
