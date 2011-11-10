@@ -1561,6 +1561,16 @@ print_crq_info (gnutls_x509_crq_t crq, FILE * out)
 
       gnutls_free (cinfo.data);
     }
+    
+  ret = gnutls_x509_crq_verify(crq, 0);
+  if (ret < 0)
+    {
+      fprintf(out, "Self signature: FAILED\n\n");
+    } 
+  else 
+    {
+      fprintf(out, "Self signature: verified\n\n");
+    }
 
   size = buffer_size;
   ret = gnutls_x509_crq_export (crq, info.outcert_format, buffer, &size);
