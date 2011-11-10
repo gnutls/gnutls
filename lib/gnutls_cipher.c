@@ -544,13 +544,14 @@ ciphertext_to_compressed (gnutls_session_t session,
            * the pad_failed. If zero means success.
            */
           pad_failed = GNUTLS_E_DECRYPTION_FAILED;
+          pad = (int) ciphertext->size - tag_size;
         }
 
       length = ciphertext->size - tag_size - pad;
 
       /* Check the pading bytes (TLS 1.x)
        */
-      if (ver != GNUTLS_SSL3 && pad_failed == 0)
+      if (ver != GNUTLS_SSL3)
         for (i = 2; i < pad; i++)
           {
             if (ciphertext->data[ciphertext->size - i] !=
@@ -582,12 +583,9 @@ ciphertext_to_compressed (gnutls_session_t session,
   /* This one was introduced to avoid a timing attack against the TLS
    * 1.0 protocol.
    */
-  if (pad_failed != 0)
-    return gnutls_assert_val(pad_failed);
-
   /* HMAC was not the same. 
    */
-  if (memcmp (tag, &ciphertext->data[length], tag_size) != 0)
+  if (memcmp (tag, &ciphertext->data[length], tag_size) != 0 || pad_failed != 0)
     return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
   /* copy the decrypted stuff to compress_data.
