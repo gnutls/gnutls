@@ -43,7 +43,7 @@ while test -d X509tests/test$i; do
     find X509tests/test$i -name T*.crt -print0 |sort -r -z|xargs -n1 --null $CERTTOOL --certificate-info --inder --infile >> chains/chain$i.pem 2>/dev/null
     $CERTTOOL -e --infile chains/chain$i.pem > out 2>&1
     rc=$?
-    if test $rc != 0; then
+    if test $rc != 0 -a $rc != 1; then
 	echo "Chain $i FATAL failure."
 	RET=1
     else
