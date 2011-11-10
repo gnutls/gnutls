@@ -533,7 +533,7 @@ ciphertext_to_compressed (gnutls_session_t session,
         return gnutls_assert_val(ret);
 
       pad = ciphertext->data[ciphertext->size - 1] + 1;   /* pad */
-      
+
       if ((int) pad > (int) ciphertext->size - tag_size)
         {
           gnutls_assert ();
@@ -544,7 +544,7 @@ ciphertext_to_compressed (gnutls_session_t session,
            * the pad_failed. If zero means success.
            */
           pad_failed = GNUTLS_E_DECRYPTION_FAILED;
-          pad = (int) ciphertext->size - tag_size;
+          pad %= blocksize;
         }
 
       length = ciphertext->size - tag_size - pad;
