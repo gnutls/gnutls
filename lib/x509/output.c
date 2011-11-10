@@ -29,7 +29,6 @@
 #include <x509_int.h>
 #include <gnutls_num.h>
 #include <gnutls_errors.h>
-#include <c-ctype.h>
 
 /* I18n of error codes. */
 #include "gettext.h"
@@ -39,18 +38,6 @@
 #define adds _gnutls_buffer_append_str
 
 #define ERROR_STR (char*) "(error)"
-
-static void
-asciiprint (gnutls_buffer_st * str, const char *data, size_t len)
-{
-  size_t j;
-
-  for (j = 0; j < len; j++)
-    if (c_isprint (data[j]))
-      addf (str, "%c", (unsigned char) data[j]);
-    else
-      addf (str, ".");
-}
 
 static char *
 ip_to_string (void *_ip, int ip_size, char *string, int string_size)
@@ -123,7 +110,7 @@ print_proxy (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
   if (npolicy)
     {
       adds (str, _("\t\t\tPolicy:\n\t\t\t\tASCII: "));
-      asciiprint (str, policy, npolicy);
+      _gnutls_buffer_asciiprint (str, policy, npolicy);
       adds (str, _("\n\t\t\t\tHexdump: "));
       _gnutls_buffer_hexprint (str, policy, npolicy);
       adds (str, "\n");
@@ -706,7 +693,7 @@ print_altname (gnutls_buffer_st * str, const char *prefix, int altname_type,
                 addf (str, _("%s\t\t\totherName DER: "), prefix);
                 _gnutls_buffer_hexprint (str, buffer, size);
                 addf (str, _("\n%s\t\t\totherName ASCII: "), prefix);
-                asciiprint (str, buffer, size);
+                _gnutls_buffer_asciiprint (str, buffer, size);
                 addf (str, "\n");
               }
             gnutls_free (oid);
@@ -1037,7 +1024,7 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
             }
 
           addf (str, _("%s\t\t\tASCII: "), prefix);
-          asciiprint (str, buffer, extlen);
+          _gnutls_buffer_asciiprint (str, buffer, extlen);
           addf (str, "\n");
 
           addf (str, _("%s\t\t\tHexdump: "), prefix);
@@ -1824,7 +1811,7 @@ print_crl (gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
                 }
 
               adds (str, _("\t\t\tASCII: "));
-              asciiprint (str, buffer, extlen);
+              _gnutls_buffer_asciiprint (str, buffer, extlen);
               adds (str, "\n");
 
               adds (str, _("\t\t\tHexdump: "));
@@ -2194,7 +2181,7 @@ print_crq (gnutls_buffer_st * str, gnutls_x509_crq_t cert)
               }
 
             adds (str, _("\t\t\tASCII: "));
-            asciiprint (str, buffer, extlen);
+            _gnutls_buffer_asciiprint (str, buffer, extlen);
             adds (str, "\n");
 
             adds (str, _("\t\t\tHexdump: "));

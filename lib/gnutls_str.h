@@ -92,9 +92,12 @@ int _gnutls_buffer_append_printf (gnutls_buffer_st * dest, const char *fmt,
                                   ...)
   __attribute__ ((format (printf, 2, 3)));
 
-void _gnutls_buffer_hexprint (gnutls_buffer_st * str, const char *data, size_t len);
-void _gnutls_buffer_hexdump (gnutls_buffer_st * str, const char *data, size_t len,
-         const char *spc);
+void _gnutls_buffer_hexprint (gnutls_buffer_st * str,
+			      const char *data, size_t len);
+void _gnutls_buffer_hexdump (gnutls_buffer_st * str, const char *data,
+			     size_t len, const char *spc);
+void _gnutls_buffer_asciiprint (gnutls_buffer_st * str,
+				const char *data, size_t len);
 
 char *_gnutls_bin2hex (const void *old, size_t oldlen, char *buffer,
                        size_t buffer_size, const char *separator);
