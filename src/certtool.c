@@ -1945,7 +1945,6 @@ static int detailed_verification(gnutls_x509_crt_t cert,
   size_t issuer_name_size;
   int ret;
 
-
   issuer_name_size = sizeof (issuer_name);
   ret =
     gnutls_x509_crt_get_issuer_dn (cert, issuer_name, &issuer_name_size);
@@ -2100,8 +2099,8 @@ _verify_x509_mem (const void *cert, int cert_size, const void* ca, int ca_size)
   gnutls_free(x509_cert_list);
   gnutls_x509_trust_list_deinit(list, 1);
 
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "verification error: %s", gnutls_strerror (ret));
+  if (output != 0)
+    exit(EXIT_FAILURE);
 
   return 0;
 }
