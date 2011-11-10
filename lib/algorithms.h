@@ -53,6 +53,11 @@ int _gnutls_mac_is_ok (gnutls_mac_algorithm_t algorithm);
 gnutls_mac_algorithm_t _gnutls_x509_oid2mac_algorithm (const char *oid);
 const char *_gnutls_x509_mac_to_oid (gnutls_mac_algorithm_t mac);
 
+/* Functions for digests. */
+gnutls_digest_algorithm_t _gnutls_x509_oid2digest_algorithm (const char *oid);
+const char *_gnutls_x509_digest_to_oid (gnutls_digest_algorithm_t algorithm);
+const char *_gnutls_digest_get_name (gnutls_digest_algorithm_t algorithm);
+
 /* Functions for cipher suites. */
 int _gnutls_supported_ciphersuites (gnutls_session_t session,
                                     uint8_t* cipher_suites, int max_cipher_suite_size);

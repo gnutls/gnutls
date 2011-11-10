@@ -190,6 +190,24 @@ _gnutls_x509_oid2mac_algorithm (const char *oid)
   return ret;
 }
 
+const char *
+_gnutls_x509_digest_to_oid (gnutls_digest_algorithm_t algorithm)
+{
+  return _gnutls_x509_mac_to_oid ((gnutls_mac_algorithm_t) algorithm);
+}
+
+gnutls_digest_algorithm_t
+_gnutls_x509_oid2digest_algorithm (const char *oid)
+{
+  return (gnutls_digest_algorithm_t) _gnutls_x509_oid2mac_algorithm (oid);
+}
+
+const char *
+_gnutls_digest_get_name (gnutls_digest_algorithm_t algorithm)
+{
+  return gnutls_mac_get_name ((gnutls_digest_algorithm_t) algorithm);
+}
+
 int
 _gnutls_mac_is_ok (gnutls_mac_algorithm_t algorithm)
 {
