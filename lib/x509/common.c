@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free
- * Software Foundation, Inc.
+ * Copyright (C) 2003-2011 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -599,7 +598,7 @@ _gnutls_x509_gtime2utcTime (time_t gtime, char *str_time, int str_time_size)
  * The given time is expressed as:
  * YEAR(4)|MONTH(2)|DAY(2)|HOUR(2)|MIN(2)|SEC(2)*
  */
-static time_t
+time_t
 _gnutls_x509_generalTime2gtime (const char *ttime)
 {
   char xx[5];

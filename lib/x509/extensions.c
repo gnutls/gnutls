@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2003, 2004, 2005, 2007, 2008, 2009, 2010 Free Software
- * Foundation, Inc.
+ * Copyright (C) 2003-2011 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -32,7 +31,7 @@
 #include <x509_int.h>
 #include <gnutls_datum.h>
 
-static int
+int
 get_extension (ASN1_TYPE asn, const char *root,
                const char *extension_id, int indx,
                gnutls_datum_t * ret, unsigned int *_critical)
@@ -408,7 +407,7 @@ overwrite_extension (ASN1_TYPE asn, const char *root, unsigned int indx,
   return 0;
 }
 
-static int
+int
 set_extension (ASN1_TYPE asn, const char *root,
                const char *ext_id,
                const gnutls_datum_t * ext_data, unsigned int critical)

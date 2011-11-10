@@ -156,4 +156,14 @@ void _asnstr_append_name (char *name, size_t name_size, const char *part1,
 int
 check_if_same_cert (gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2);
 
+time_t _gnutls_x509_generalTime2gtime (const char *ttime);
+
+int get_extension (ASN1_TYPE asn, const char *root,
+		   const char *extension_id, int indx,
+		   gnutls_datum_t * ret, unsigned int *_critical);
+
+int set_extension (ASN1_TYPE asn, const char *root,
+		   const char *ext_id,
+		   const gnutls_datum_t * ext_data, unsigned int critical);
+
 #endif
