@@ -245,6 +245,16 @@
  *  [8] is k (private key)
  */
 
+#define ECC_PRIME 0
+#define ECC_ORDER 1
+#define ECC_A 2
+#define ECC_B 3
+#define ECC_GX 4
+#define ECC_GY 5
+#define ECC_X 6
+#define ECC_Y 7
+#define ECC_K 8
+
 /**
  * gnutls_direction_t:
  * @GNUTLS_IMPORT: Import direction.

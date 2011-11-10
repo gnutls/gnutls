@@ -740,7 +740,7 @@ gnutls_pubkey_get_pk_ecc_raw (gnutls_pubkey_t key, gnutls_ecc_curve_t *curve,
   *curve = key->params.flags;
 
   /* X */
-  ret = _gnutls_mpi_dprint_lz (key->params.params[6], x);
+  ret = _gnutls_mpi_dprint_lz (key->params.params[ECC_X], x);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -748,7 +748,7 @@ gnutls_pubkey_get_pk_ecc_raw (gnutls_pubkey_t key, gnutls_ecc_curve_t *curve,
     }
 
   /* Y */
-  ret = _gnutls_mpi_dprint_lz (key->params.params[7], y);
+  ret = _gnutls_mpi_dprint_lz (key->params.params[ECC_Y], y);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1137,7 +1137,7 @@ gnutls_pubkey_import_ecc_raw (gnutls_pubkey_t key,
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  if (_gnutls_mpi_scan_nz (&key->params.params[6], x->data, x->size))
+  if (_gnutls_mpi_scan_nz (&key->params.params[ECC_X], x->data, x->size))
     {
       gnutls_assert ();
       ret = GNUTLS_E_MPI_SCAN_FAILED;
@@ -1145,7 +1145,7 @@ gnutls_pubkey_import_ecc_raw (gnutls_pubkey_t key,
     }
   key->params.params_nr++;
 
-  if (_gnutls_mpi_scan_nz (&key->params.params[7], y->data, y->size))
+  if (_gnutls_mpi_scan_nz (&key->params.params[ECC_Y], y->data, y->size))
     {
       gnutls_assert ();
       ret = GNUTLS_E_MPI_SCAN_FAILED;
@@ -1199,7 +1199,7 @@ gnutls_pubkey_import_ecc_x962 (gnutls_pubkey_t key,
     }
 
   ret = _gnutls_ecc_ansi_x963_import(ecpoint->data, ecpoint->size,
-         &key->params.params[6], &key->params.params[7]);
+         &key->params.params[ECC_X], &key->params.params[ECC_Y]);
   if (ret < 0)
     {
       gnutls_assert ();

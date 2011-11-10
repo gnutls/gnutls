@@ -86,15 +86,15 @@ _ecc_params_to_privkey(const gnutls_pk_params_st * pk_params,
                        ecc_key * priv)
 {
         priv->type = PK_PRIVATE;
-        memcpy(&priv->prime, pk_params->params[0], sizeof(mpz_t));
-        memcpy(&priv->order, pk_params->params[1], sizeof(mpz_t));
-        memcpy(&priv->A, pk_params->params[2], sizeof(mpz_t));
-        memcpy(&priv->B, pk_params->params[3], sizeof(mpz_t));
-        memcpy(&priv->Gx, pk_params->params[4], sizeof(mpz_t));
-        memcpy(&priv->Gy, pk_params->params[5], sizeof(mpz_t));
-        memcpy(&priv->pubkey.x, pk_params->params[6], sizeof(mpz_t));
-        memcpy(&priv->pubkey.y, pk_params->params[7], sizeof(mpz_t));
-        memcpy(&priv->k, pk_params->params[8], sizeof(mpz_t));
+        memcpy(&priv->prime, pk_params->params[ECC_PRIME], sizeof(mpz_t));
+        memcpy(&priv->order, pk_params->params[ECC_ORDER], sizeof(mpz_t));
+        memcpy(&priv->A, pk_params->params[ECC_A], sizeof(mpz_t));
+        memcpy(&priv->B, pk_params->params[ECC_B], sizeof(mpz_t));
+        memcpy(&priv->Gx, pk_params->params[ECC_GX], sizeof(mpz_t));
+        memcpy(&priv->Gy, pk_params->params[ECC_GY], sizeof(mpz_t));
+        memcpy(&priv->pubkey.x, pk_params->params[ECC_X], sizeof(mpz_t));
+        memcpy(&priv->pubkey.y, pk_params->params[ECC_Y], sizeof(mpz_t));
+        memcpy(&priv->k, pk_params->params[ECC_K], sizeof(mpz_t));
         mpz_init_set_ui(priv->pubkey.z, 1);
 }
 
@@ -108,14 +108,14 @@ _ecc_params_to_pubkey(const gnutls_pk_params_st * pk_params,
                        ecc_key * pub)
 {
         pub->type = PK_PUBLIC;
-        memcpy(&pub->prime, pk_params->params[0], sizeof(mpz_t));
-        memcpy(&pub->order, pk_params->params[1], sizeof(mpz_t));
-        memcpy(&pub->A, pk_params->params[2], sizeof(mpz_t));
-        memcpy(&pub->B, pk_params->params[3], sizeof(mpz_t));
-        memcpy(&pub->Gx, pk_params->params[4], sizeof(mpz_t));
-        memcpy(&pub->Gy, pk_params->params[5], sizeof(mpz_t));
-        memcpy(&pub->pubkey.x, pk_params->params[6], sizeof(mpz_t));
-        memcpy(&pub->pubkey.y, pk_params->params[7], sizeof(mpz_t));
+        memcpy(&pub->prime, pk_params->params[ECC_PRIME], sizeof(mpz_t));
+        memcpy(&pub->order, pk_params->params[ECC_ORDER], sizeof(mpz_t));
+        memcpy(&pub->A, pk_params->params[ECC_A], sizeof(mpz_t));
+        memcpy(&pub->B, pk_params->params[ECC_B], sizeof(mpz_t));
+        memcpy(&pub->Gx, pk_params->params[ECC_GX], sizeof(mpz_t));
+        memcpy(&pub->Gy, pk_params->params[ECC_GY], sizeof(mpz_t));
+        memcpy(&pub->pubkey.x, pk_params->params[ECC_X], sizeof(mpz_t));
+        memcpy(&pub->pubkey.y, pk_params->params[ECC_Y], sizeof(mpz_t));
         mpz_init_set_ui(pub->pubkey.z, 1);
 }
 
@@ -141,7 +141,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t * o
         _ecc_params_to_pubkey(pub, &ecc_pub);
         _ecc_params_to_privkey(priv, &ecc_priv);
         
-        if (ecc_projective_check_point(&ecc_pub.pubkey, pub->params[3], pub->params[0]) != 0)
+        if (ecc_projective_check_point(&ecc_pub.pubkey, pub->params[ECC_B], pub->params[ECC_PRIME]) != 0)
           {
             ret = gnutls_assert_val(GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER);
             goto ecc_cleanup;
@@ -819,15 +819,15 @@ rsa_fail:
           }
         params->flags = level;
 
-        mpz_set(TOMPZ(params->params[0]), key.prime);
-        mpz_set(TOMPZ(params->params[1]), key.order);
-        mpz_set(TOMPZ(params->params[2]), key.A);
-        mpz_set(TOMPZ(params->params[3]), key.B);
-        mpz_set(TOMPZ(params->params[4]), key.Gx);
-        mpz_set(TOMPZ(params->params[5]), key.Gy);
-        mpz_set(TOMPZ(params->params[6]), key.pubkey.x);
-        mpz_set(TOMPZ(params->params[7]), key.pubkey.y);
-        mpz_set(TOMPZ(params->params[8]), key.k);
+        mpz_set(TOMPZ(params->params[ECC_PRIME]), key.prime);
+        mpz_set(TOMPZ(params->params[ECC_ORDER]), key.order);
+        mpz_set(TOMPZ(params->params[ECC_A]), key.A);
+        mpz_set(TOMPZ(params->params[ECC_B]), key.B);
+        mpz_set(TOMPZ(params->params[ECC_GX]), key.Gx);
+        mpz_set(TOMPZ(params->params[ECC_GY]), key.Gy);
+        mpz_set(TOMPZ(params->params[ECC_X]), key.pubkey.x);
+        mpz_set(TOMPZ(params->params[ECC_Y]), key.pubkey.y);
+        mpz_set(TOMPZ(params->params[ECC_K]), key.k);
         
 ecc_fail:
         ecc_free(&key);

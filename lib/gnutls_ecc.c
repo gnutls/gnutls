@@ -122,7 +122,7 @@ int ret;
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_scan_nz(&params->params[0], val, val_size);
+  ret = _gnutls_mpi_scan_nz(&params->params[ECC_PRIME], val, val_size);
   if (ret < 0)
     {
       gnutls_assert();
@@ -138,7 +138,7 @@ int ret;
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_scan_nz(&params->params[1], val, val_size);
+  ret = _gnutls_mpi_scan_nz(&params->params[ECC_ORDER], val, val_size);
   if (ret < 0)
     {
       gnutls_assert();
@@ -154,7 +154,7 @@ int ret;
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_scan_nz(&params->params[2], val, val_size);
+  ret = _gnutls_mpi_scan_nz(&params->params[ECC_A], val, val_size);
   if (ret < 0)
     {
       gnutls_assert();
@@ -170,7 +170,7 @@ int ret;
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_scan_nz(&params->params[3], val, val_size);
+  ret = _gnutls_mpi_scan_nz(&params->params[ECC_B], val, val_size);
   if (ret < 0)
     {
       gnutls_assert();
@@ -186,7 +186,7 @@ int ret;
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_scan_nz(&params->params[4], val, val_size);
+  ret = _gnutls_mpi_scan_nz(&params->params[ECC_GX], val, val_size);
   if (ret < 0)
     {
       gnutls_assert();
@@ -202,7 +202,7 @@ int ret;
       goto cleanup;
     }
 
-  ret = _gnutls_mpi_scan_nz(&params->params[5], val, val_size);
+  ret = _gnutls_mpi_scan_nz(&params->params[ECC_GY], val, val_size);
   if (ret < 0)
     {
       gnutls_assert();

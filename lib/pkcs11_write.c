@@ -447,7 +447,7 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
             goto cleanup;
           }
 
-        ret = _gnutls_mpi_dprint_lz(&key->params.params[8], &x);
+        ret = _gnutls_mpi_dprint_lz(&key->params.params[ECC_K], &x);
         if (ret < 0)
           {
             gnutls_assert ();
