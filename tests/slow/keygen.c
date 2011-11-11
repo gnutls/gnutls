@@ -33,6 +33,10 @@
 
 #include "utils.h"
 
+#define MAX_TRIES 2
+
+static int sec_param[MAX_TRIES] = {GNUTLS_SEC_PARAM_WEAK, GNUTLS_SEC_PARAM_NORMAL};
+
 static void
 tls_log_func (int level, const char *str)
 {
@@ -53,7 +57,7 @@ doit (void)
     if (debug)
         gnutls_global_set_log_level (4711);
 
-    for (i = 0; i < 2; i++)
+    for (i = 0; i < MAX_TRIES; i++)
       {
           for (algorithm = GNUTLS_PK_RSA; algorithm <= GNUTLS_PK_ECC;
                algorithm++)
@@ -71,7 +75,7 @@ doit (void)
                     gnutls_x509_privkey_generate (pkey, algorithm,
                                                   gnutls_sec_param_to_pk_bits
                                                   (algorithm,
-                                                   GNUTLS_SEC_PARAM_NORMAL),
+                                                   sec_param[i]),
                                                   0);
                 if (ret < 0)
                   {
