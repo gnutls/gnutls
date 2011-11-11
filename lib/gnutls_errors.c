@@ -176,6 +176,8 @@ static const gnutls_error_entry error_algorithms[] = {
   ERROR_ENTRY (N_("The cookie was bad."), GNUTLS_E_BAD_COOKIE, 1),
   ERROR_ENTRY (N_("An illegal parameter has been received."),
                GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER, 1),
+  ERROR_ENTRY (N_("An illegal parameter was found."),
+               GNUTLS_E_ILLEGAL_PARAMETER, 1),
   ERROR_ENTRY (N_("Error while reading file."), GNUTLS_E_FILE_ERROR, 1),
 
   ERROR_ENTRY (N_("ASN1 parser: Element was not found."),

@@ -255,6 +255,21 @@
 #define ECC_Y 7
 #define ECC_K 8
 
+#define DSA_P 0
+#define DSA_Q 1
+#define DSA_G 2
+#define DSA_Y 3
+#define DSA_X 4
+
+#define RSA_MODULUS 0
+#define RSA_PUB 1
+#define RSA_PRIV 2
+#define RSA_PRIME1 3
+#define RSA_PRIME2 4
+#define RSA_COEF 5
+#define RSA_E1 6
+#define RSA_E2 7
+
 /**
  * gnutls_direction_t:
  * @GNUTLS_IMPORT: Import direction.
@@ -286,6 +301,8 @@
     int (*verify) (gnutls_pk_algorithm_t, const gnutls_datum_t * data,
                    const gnutls_datum_t * signature,
                    const gnutls_pk_params_st * pub);
+    int (*verify_params) (gnutls_pk_algorithm_t, 
+                          const gnutls_pk_params_st * pub);
     int (*generate) (gnutls_pk_algorithm_t, unsigned int nbits,
                      gnutls_pk_params_st *);
     /* this function should convert params to ones suitable

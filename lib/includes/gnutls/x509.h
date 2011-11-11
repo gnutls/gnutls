@@ -735,6 +735,7 @@ extern "C"
   int gnutls_x509_privkey_generate (gnutls_x509_privkey_t key,
                                     gnutls_pk_algorithm_t algo,
                                     unsigned int bits, unsigned int flags);
+  int gnutls_x509_privkey_verify_params (gnutls_x509_privkey_t key);
 
   int gnutls_x509_privkey_export (gnutls_x509_privkey_t key,
                                   gnutls_x509_crt_fmt_t format,

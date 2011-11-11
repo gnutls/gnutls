@@ -1306,12 +1306,10 @@ gnutls_x509_privkey_export_dsa_raw (gnutls_x509_privkey_t key,
   return 0;
 }
 
-
-
 /**
  * gnutls_x509_privkey_generate:
  * @key: should contain a #gnutls_x509_privkey_t structure
- * @algo: is one of RSA or DSA.
+ * @algo: is one of the algorithms in #gnutls_pk_algorithm_t.
  * @bits: the size of the modulus
  * @flags: unused for now.  Must be 0.
  *
@@ -1363,6 +1361,30 @@ cleanup:
   gnutls_pk_params_release(&key->params);
 
   return ret;
+}
+
+/**
+ * gnutls_x509_privkey_verify_params:
+ * @key: should contain a #gnutls_x509_privkey_t structure
+ *
+ * This function will verify the private key parameters.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_privkey_verify_params (gnutls_x509_privkey_t key)
+{
+  int ret;
+
+  ret = _gnutls_pk_verify_params (key->pk_algorithm, &key->params);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+
+  return 0;
 }
 
 /**

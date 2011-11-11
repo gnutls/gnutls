@@ -489,41 +489,6 @@ gnutls_pk_params_release (gnutls_pk_params_st * p)
 }
 
 int
-_gnutls_calc_rsa_exp (gnutls_pk_params_st* params)
-{
-  bigint_t tmp = _gnutls_mpi_alloc_like (params->params[0]);
-
-  if (params->params_nr < RSA_PRIVATE_PARAMS - 2)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  if (tmp == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  /* [6] = d % p-1, [7] = d % q-1 */
-  _gnutls_mpi_sub_ui (tmp, params->params[3], 1);
-  params->params[6] = _gnutls_mpi_mod (params->params[2] /*d */ , tmp);
-
-  _gnutls_mpi_sub_ui (tmp, params->params[4], 1);
-  params->params[7] = _gnutls_mpi_mod (params->params[2] /*d */ , tmp);
-
-  _gnutls_mpi_release (&tmp);
-
-  if (params->params[7] == NULL || params->params[6] == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  return 0;
-}
-
-int
 _gnutls_pk_get_hash_algorithm (gnutls_pk_algorithm_t pk, 
                                gnutls_pk_params_st* params,
                                gnutls_digest_algorithm_t * dig,

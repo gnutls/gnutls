@@ -30,6 +30,7 @@ extern gnutls_crypto_pk_st _gnutls_pk_ops;
 #define _gnutls_pk_decrypt( algo, ciphertext, plaintext, params) _gnutls_pk_ops.decrypt( algo, ciphertext, plaintext, params)
 #define _gnutls_pk_sign( algo, sig, data, params) _gnutls_pk_ops.sign( algo, sig, data, params)
 #define _gnutls_pk_verify( algo, data, sig, params) _gnutls_pk_ops.verify( algo, data, sig, params)
+#define _gnutls_pk_verify_params( algo, params) _gnutls_pk_ops.verify_params( algo, params)
 #define _gnutls_pk_derive( algo, out, pub, priv) _gnutls_pk_ops.derive( algo, out, pub, priv)
 #define _gnutls_pk_generate( algo, bits, priv) _gnutls_pk_ops.generate( algo, bits, priv)
 
@@ -64,8 +65,6 @@ _gnutls_encode_ber_rs (gnutls_datum_t * sig_value, bigint_t r, bigint_t s);
 int
 _gnutls_decode_ber_rs (const gnutls_datum_t * sig_value, bigint_t * r,
                        bigint_t * s);
-
-int _gnutls_calc_rsa_exp (gnutls_pk_params_st*);
 
 int _gnutls_pk_get_hash_algorithm (gnutls_pk_algorithm_t pk,
                                    gnutls_pk_params_st*,

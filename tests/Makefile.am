@@ -64,7 +64,7 @@ ctests = mini-deflate simple gc set_pkcs12_cred certder certuniqueid	\
 	 crq_apis init_roundtrip pkcs12_s2k_pem dn2 mini-eagain		\
 	 nul-in-x509-names x509_altname pkcs12_encode mini-x509		\
 	 mini-x509-rehandshake rng-fork mini-eagain-dtls cipher-test	\
-	 x509cert x509cert-tl infoaccess #gendh
+	 x509cert x509cert-tl infoaccess keygen #gendh
 #gendh is out because it is too slow in valgrind
 
 if ENABLE_OPENSSL

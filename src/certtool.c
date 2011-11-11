@@ -222,6 +222,10 @@ generate_private_key_int (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "privkey_generate: %s", gnutls_strerror (ret));
 
+  ret = gnutls_x509_privkey_verify_params (key);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "privkey_verify_params: %s", gnutls_strerror (ret));
+
   return key;
 }
 
@@ -1737,8 +1741,11 @@ privkey_info (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));
 
-
   privkey_info_int (key);
+
+  ret = gnutls_x509_privkey_verify_params (key);
+  if (ret < 0)
+    fprintf (outfile, "\n** Private key parameters validation failed **\n\n");
 
   if (info.fix_key != 0)
     {
