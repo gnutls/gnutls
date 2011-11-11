@@ -19,7 +19,7 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = 
+EXTRA_DIST = bad-key.pem
 
 dist_check_SCRIPTS = ecdsa
 
