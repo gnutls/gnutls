@@ -335,7 +335,9 @@ disable_optional_stuff (gnutls_x509_crl_t crl)
  * @id_size: Holds the size of the serial field.
  *
  * This function will set the CRL's authority key ID extension.  Only
- * the keyIdentifier field can be set with this function.
+ * the keyIdentifier field can be set with this function. This may
+ * be used by an authority that holds multiple private keys, to distinguish
+ * the used key.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -399,7 +401,9 @@ gnutls_x509_crl_set_authority_key_id (gnutls_x509_crl_t crl,
  * @nr: The CRL number
  * @nr_size: Holds the size of the nr field.
  *
- * This function will set the CRL's number extension.
+ * This function will set the CRL's number extension. This
+ * is to be used as a unique and monotonic number assigned to
+ * the CRL by the authority.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

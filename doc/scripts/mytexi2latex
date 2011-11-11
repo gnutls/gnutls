@@ -262,12 +262,12 @@ multitable:
                         $mode = ITEMIZE;
                         push(@stack, NORMAL);
                 }
-                if ($line =~ s/\@float Figure\,(.*)/\\begin{figure}[htp]\n\\centering/g) {
+                if ($line =~ s/\@float Figure\,(.*)/\\begin{figure}[htbp]\n\\centering/g) {
 			$label = $1;
                         push(@stack, NORMAL);
                         $mode = FLOAT;
                 }
-                if ($line =~ s/\@float Table\,(.*)/\\begin{table}[thp]\n\\centering/g) {
+                if ($line =~ s/\@float Table\,(.*)/\\begin{table}[htbp]\n\\centering/g) {
 			$label = $1;
                         push(@stack, NORMAL);
                         $mode = FLOAT_TABLE;
