@@ -7,6 +7,8 @@ See the end for copying conditions.
 ** certtool: Certtool -e returns error code on verification
 failure.
 
+** certtool: Verifies parameters of generated keys.
+
 ** libgnutls: Corrected ECC key generation (introduced in 3.0.6)
 
 ** libgnutls: Provide less timing information when decoding
@@ -16,6 +18,10 @@ TLS/DTLS record packets.
 The reason was that the code that auto-generated the man pages missed
 many APIs and we couldn't fix it (volunteers welcome).  See the info
 manual or the GTK-DOC manual instead.
+
+** API and ABI modifications:
+gnutls_x509_privkey_verify_params: Added
+
 
 * Version 3.0.7 (released 2011-11-08)
 
