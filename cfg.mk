@@ -72,6 +72,8 @@ update-po: refresh-po
 bootstrap: autoreconf
 	./configure $(CFGFLAGS)
 
+# The only non-lgpl modules used are: gettime progname timespec. Those
+are not used (and must not be used) in the library)
 glimport:
 	gnulib-tool --add-import
 
