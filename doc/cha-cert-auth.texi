@@ -5,6 +5,7 @@
 @menu
 * X.509 certificates::
 * OpenPGP certificates::
+* The certtool application::
 * Hardware tokens::
 * Abstract key types::
 * Digital signatures::
@@ -353,6 +354,7 @@ of their usage is also shown.
 
 @verbatiminclude examples/ex-pkcs12.c
 
+
 @node OpenPGP certificates
 @section @acronym{OpenPGP} certificates
 @cindex OpenPGP certificates
@@ -426,12 +428,364 @@ to verify the signatures in the certificate sent by the peer.
 @showfuncdesc{gnutls_certificate_set_openpgp_keyring_file}
 
 
+@node The certtool application
+@section The certtool application
+@cindex certtool
+
+This is a program to generate @acronym{X.509} certificates, certificate
+requests, CRLs and private keys.
+
+@example
+Certtool help
+Usage: certtool [options]
+     -s, --generate-self-signed 
+                              Generate a self-signed certificate.
+     -c, --generate-certificate 
+                              Generate a signed certificate.
+     --generate-proxy         Generate a proxy certificate.
+     --generate-crl           Generate a CRL.
+     -u, --update-certificate 
+                              Update a signed certificate.
+     -p, --generate-privkey   Generate a private key.
+     -q, --generate-request   Generate a PKCS #10 certificate 
+                              request.
+     -e, --verify-chain       Verify a PEM encoded certificate chain. 
+                              The last certificate in the chain must 
+                              be a self signed one.
+     --verify                 Verify a PEM encoded certificate chain. 
+                              CA certificates must be loaded with 
+                              --load-ca-certificate.
+     --verify-crl             Verify a CRL.
+     --generate-dh-params     Generate PKCS #3 encoded Diffie-Hellman 
+                              parameters.
+     --get-dh-params          Get the included PKCS #3 encoded 
+                              Diffie-Hellman parameters.
+     --load-privkey FILE      Private key file to use.
+     --load-pubkey FILE       Public key file to use.
+     --load-request FILE      Certificate request file to use.
+     --load-certificate FILE  
+                              Certificate file to use.
+     --load-ca-privkey FILE   Certificate authority's private key 
+                              file to use.
+     --load-ca-certificate FILE  
+                              Certificate authority's certificate 
+                              file to use.
+     --password PASSWORD      Password to use.
+     -i, --certificate-info   Print information on a certificate.
+     --certificate-pubkey     Print certificate public key.
+     --pgp-certificate-info   Print information on a OpenPGP 
+                              certificate.
+     --pgp-ring-info          Print information on a keyring 
+                              structure.
+     -l, --crl-info           Print information on a CRL.
+     --crq-info               Print information on a Certificate 
+                              Request.
+     --no-crq-extensions      Do not use extensions in certificate 
+                              requests.
+     --p12-info               Print information on a PKCS #12 
+                              structure.
+     --p7-info                Print information on a PKCS #7 
+                              structure.
+     --smime-to-p7            Convert S/MIME to PKCS #7 structure.
+     -k, --key-info           Print information on a private key.
+     --pgp-key-info           Print information on a OpenPGP private 
+                              key.
+     --pubkey-info            Print information on a public key.
+     --fix-key                Regenerate the parameters in a private 
+                              key.
+     --v1                     Generate an X.509 version 1 certificate 
+                              (no extensions).
+     --to-p12                 Generate a PKCS #12 structure.
+     --to-p8                  Generate a PKCS #8 key structure.
+     -8, --pkcs8              Use PKCS #8 format for private keys.
+     --dsa                    Use DSA keys.
+     --ecc                    Use ECC (ECDSA) keys.
+     --hash STR               Hash algorithm to use for signing 
+                              (MD5,SHA1,RMD160,SHA256,SHA384,SHA512).
+     --export-ciphers         Use weak encryption algorithms.
+     --inder                  Use DER format for input certificates 
+                              and private keys.
+     --inraw                  Use RAW/DER format for input 
+                              certificates and private keys.
+     --outder                 Use DER format for output certificates 
+                              and private keys.
+     --outraw                 Use RAW/DER format for output 
+                              certificates and private keys.
+     --bits BITS              specify the number of bits for key 
+                              generation.
+     --sec-param PARAM        specify the security level 
+                              [low|normal|high|ultra].
+     --disable-quick-random   Use /dev/random for key generationg, 
+                              thus increasing the quality of 
+                              randomness used.
+     --outfile FILE           Output file.
+     --infile FILE            Input file.
+     --template FILE          Template file to use for non 
+                              interactive operation.
+     --pkcs-cipher CIPHER     Cipher to use for pkcs operations 
+                              (3des,3des-pkcs12,aes-128,aes-192,aes-25
+                              6,rc2-40,arcfour).
+     -d, --debug LEVEL        specify the debug level. Default is 1.
+     -h, --help               shows this help text
+     -v, --version            shows the program's version
+@end example
+
+The program can be used interactively or non interactively by
+specifying the @code{--template} command line option. See below for an
+example of a template file.
+
+@subsection Diffie-Hellman parameter generation
+To generate parameters for Diffie-Hellman key exchange, use the command:
+@smallexample
+$ certtool --generate-dh-params --outfile dh.pem
+@end smallexample
+
+@subsection Self-signed certificate generation
+
+To create a self signed certificate, use the command:
+@smallexample
+$ certtool --generate-privkey --outfile ca-key.pem
+$ certtool --generate-self-signed --load-privkey ca-key.pem \
+   --outfile ca-cert.pem
+@end smallexample
+
+Note that a self-signed certificate usually belongs to a certificate
+authority, that signs other certificates.
+
+@subsection Private key generation
+To create a private key (RSA by default), run:
+
+@smallexample
+$ certtool --generate-privkey --outfile key.pem
+@end smallexample
+
+To create a DSA or elliptic curves (ECDSA) private key use the
+above command combined with @code{--dsa} or @code{--ecc} options.
+
+@subsection Certificate generation
+To generate a certificate using the private key, use the command:
+
+@smallexample
+$ certtool --generate-certificate --load-privkey key.pem \
+   --outfile cert.pem --load-ca-certificate ca-cert.pem \
+   --load-ca-privkey ca-key.pem
+@end smallexample
+
+Alternatively you may create a certificate request, which is needed
+when the certificate will be signed by a third party authority.
+
+@smallexample
+$ certtool --generate-request --load-privkey key.pem \
+  --outfile request.pem
+@end smallexample
+
+If the private key is stored in a smart card you can generate
+a request by specifying the private key object URL (see @ref{Invoking p11tool}
+on how to obtain the URL).
+
+@smallexample
+$ certtool --generate-request --load-privkey pkcs11:(PRIVKEY URL) \
+  --load-pubkey pkcs11:(PUBKEY URL) --outfile request.pem
+@end smallexample
+
+To generate a certificate using the previous request, use the command:
+
+@smallexample
+$ certtool --generate-certificate --load-request request.pem \
+   --outfile cert.pem \
+   --load-ca-certificate ca-cert.pem --load-ca-privkey ca-key.pem
+@end smallexample
+
+@subsection Certificate information
+To view the certificate information, use:
+
+@smallexample
+$ certtool --certificate-info --infile cert.pem
+@end smallexample
+
+@subsection @acronym{PKCS} #12 structure generation
+To generate a @acronym{PKCS} #12 structure using the previous key and
+certificate, use the command:
+
+@smallexample
+$ certtool --load-certificate cert.pem --load-privkey key.pem \
+  --to-p12 --outder --outfile key.p12
+@end smallexample
+
+Some tools (reportedly web browsers) have problems with that file
+because it does not contain the CA certificate for the certificate.
+To work around that problem in the tool, you can use the
+--load-ca-certificate parameter as follows:
+
+@smallexample
+$ certtool --load-ca-certificate ca.pem \
+  --load-certificate cert.pem --load-privkey key.pem \
+  --to-p12 --outder --outfile key.p12
+@end smallexample
+
+@subsection Proxy certificate generation
+Proxy certificate can be used to delegate your credential to a
+temporary, typically short-lived, certificate.  To create one from the
+previously created certificate, first create a temporary key and then
+generate a proxy certificate for it, using the commands:
+
+@smallexample
+$ certtool --generate-privkey > proxy-key.pem
+$ certtool --generate-proxy --load-ca-privkey key.pem \
+  --load-privkey proxy-key.pem --load-certificate cert.pem \
+  --outfile proxy-cert.pem
+@end smallexample
+
+@subsection Certificate revocation list generation
+To create an empty Certificate Revocation List (CRL) do:
+
+@smallexample
+$ certtool --generate-crl --load-ca-privkey x509-ca-key.pem \
+           --load-ca-certificate x509-ca.pem
+@end smallexample
+
+To create a CRL that contains some revoked certificates, place the
+certificates in a file and use @code{--load-certificate} as follows:
+
+@smallexample
+$ certtool --generate-crl --load-ca-privkey x509-ca-key.pem \
+  --load-ca-certificate x509-ca.pem --load-certificate revoked-certs.pem
+@end smallexample
+
+To verify a Certificate Revocation List (CRL) do:
+
+@smallexample
+$ certtool --verify-crl --load-ca-certificate x509-ca.pem < crl.pem
+@end smallexample
+
+
+
+@subsection Certtool's template file format:
+A template file can be used to avoid the interactive questions of
+certtool. Initially create a file named 'cert.cfg' that contains the information
+about the certificate. The template can be used as below:
+
+@smallexample
+$ certtool --generate-certificate cert.pem --load-privkey key.pem  \
+   --template cert.cfg \
+   --load-ca-certificate ca-cert.pem --load-ca-privkey ca-key.pem
+@end smallexample
+
+An example certtool template file:
+
+@example
+# X.509 Certificate options
+#
+# DN options
+
+# The organization of the subject.
+organization = "Koko inc."
+
+# The organizational unit of the subject.
+unit = "sleeping dept."
+
+# The locality of the subject.
+# locality =
+
+# The state of the certificate owner.
+state = "Attiki"
+
+# The country of the subject. Two letter code.
+country = GR
+
+# The common name of the certificate owner.
+cn = "Cindy Lauper"
+
+# A user id of the certificate owner.
+#uid = "clauper"
+
+# If the supported DN OIDs are not adequate you can set
+# any OID here.
+# For example set the X.520 Title and the X.520 Pseudonym
+# by using OID and string pairs.
+#dn_oid = "2.5.4.12" "Dr." "2.5.4.65" "jackal"
+
+# This is deprecated and should not be used in new
+# certificates.
+# pkcs9_email = "none@@none.org"
+
+# The serial number of the certificate
+serial = 007
+
+# In how many days, counting from today, this certificate will expire.
+expiration_days = 700
+
+# X.509 v3 extensions
+
+# A dnsname in case of a WWW server.
+#dns_name = "www.none.org"
+#dns_name = "www.morethanone.org"
+
+# An IP address in case of a server.
+#ip_address = "192.168.1.1"
+
+# An email in case of a person
+email = "none@@none.org"
+
+# An URL that has CRLs (certificate revocation lists)
+# available. Needed in CA certificates.
+#crl_dist_points = "http://www.getcrl.crl/getcrl/"
+
+# Whether this is a CA certificate or not
+#ca
+
+# Whether this certificate will be used for a TLS client
+#tls_www_client
+
+# Whether this certificate will be used for a TLS server
+#tls_www_server
+
+# Whether this certificate will be used to sign data (needed
+# in TLS DHE ciphersuites).
+signing_key
+
+# Whether this certificate will be used to encrypt data (needed
+# in TLS RSA ciphersuites). Note that it is preferred to use different
+# keys for encryption and signing.
+#encryption_key
+
+# Whether this key will be used to sign other certificates.
+#cert_signing_key
+
+# Whether this key will be used to sign CRLs.
+#crl_signing_key
+
+# Whether this key will be used to sign code.
+#code_signing_key
+
+# Whether this key will be used to sign OCSP data.
+#ocsp_signing_key
+
+# Whether this key will be used for time stamping.
+#time_stamping_key
+
+# Whether this key will be used for IPsec IKE operations.
+#ipsec_ike_key
+@end example
+
+
+
 @node Hardware tokens
 @section Hardware tokens
 @cindex PKCS #11 tokens
 @cindex hardware tokens
 @cindex smart cards
 
+@menu
+* Introduction::
+* PKCS11 Initialization::
+* Reading objects::
+* Writing objects::
+* Using a PKCS11 token with TLS::
+* The p11tool application::
+@end menu
+
+@node Introduction
 @subsection Introduction
 This section copes with hardware token support in @acronym{GnuTLS} using 
 @acronym{PKCS} #11 @xcite{PKCS11}.
@@ -461,6 +815,7 @@ system, being the @acronym{Gnome Keyring}.
 @caption{PKCS #11 module usage.}
 @end float
 
+@node PKCS11 Initialization
 @subsection Initialization
 To allow all the  @acronym{GnuTLS} applications to access @acronym{PKCS} #11 tokens
 you can use a configuration per module, stored in @code{/etc/pkcs11/modules/}. 
@@ -489,6 +844,7 @@ are sharing a module. To avoid this problem GnuTLS uses @acronym{p11-kit}
 that provides a middleware to control access to resources over the
 multiple users.
 
+@node Reading objects
 @subsection Reading objects
 
 All @acronym{PKCS} #11 objects are referenced by @acronym{GnuTLS} functions by
@@ -561,6 +917,7 @@ gnutls_global_deinit();
 
 @verbatiminclude examples/ex-pkcs11-list.c
 
+@node Writing objects
 @subsection Writing objects
 
 With @acronym{GnuTLS} you can copy existing private keys and certificates
@@ -576,6 +933,7 @@ entered before accessing the object (for operations or otherwise).
 @showfuncdesc{gnutls_pkcs11_delete_url}
 
 
+@node Using a PKCS11 token with TLS
 @subsection Using a @acronym{PKCS} #11 token with TLS
 
 It is possible to use a @acronym{PKCS} #11 token to a TLS
@@ -584,6 +942,103 @@ the following functions can be used to load PKCS #11 key and
 certificates by specifying a PKCS #11 URL instead of a filename.
 
 @showfuncB{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_key_file}
+
+@node The p11tool application
+@subsection The p11tool application
+@anchor{p11tool}
+@cindex p11tool
+
+p11tool is a program that is used to access tokens
+and security modules that support the PKCS #11 API. It requires
+individual PKCS #11 modules to be loaded either with the
+@code{--provider} option, or by setting up the GnuTLS configuration
+file for PKCS #11 as in @ref{Hardware tokens}.
+
+@example
+p11tool help
+Usage: p11tool [options]
+Usage: p11tool --list-tokens
+Usage: p11tool --list-all
+Usage: p11tool --export 'pkcs11:...'
+
+     --export URL             Export an object specified by a pkcs11 
+                              URL
+     --list-tokens            List all available tokens
+     --list-mechanisms URL    List all available mechanisms in token.
+     --list-all               List all objects specified by a PKCS#11 
+                              URL
+     --list-all-certs         List all certificates specified by a 
+                              PKCS#11 URL
+     --list-certs             List certificates that have a private 
+                              key specified by a PKCS#11 URL
+     --list-privkeys          List private keys specified by a 
+                              PKCS#11 URL
+     --list-trusted           List certificates marked as trusted, 
+                              specified by a PKCS#11 URL
+     --initialize URL         Initializes a PKCS11 token.
+     --write URL              Writes loaded certificates, private or 
+                              secret keys to a PKCS11 token.
+     --delete URL             Deletes objects matching the URL.
+     --label label            Sets a label for the write operation.
+     --trusted                Marks the certificate to be written as 
+                              trusted.
+     --private                Marks the object to be written as 
+                              private (requires PIN).
+     --no-private             Marks the object to be written as not 
+                              private.
+     --login                  Force login to token
+     --detailed-url           Export detailed URLs.
+     --no-detailed-url        Export less detailed URLs.
+     --secret-key HEX_KEY     Provide a hex encoded secret key.
+     --load-privkey FILE      Private key file to use.
+     --load-pubkey FILE       Private key file to use.
+     --load-certificate FILE  
+                              Certificate file to use.
+     -8, --pkcs8              Use PKCS #8 format for private keys.
+     --inder                  Use DER format for input certificates 
+                              and private keys.
+     --inraw                  Use RAW/DER format for input 
+                              certificates and private keys.
+     --provider Library       Specify the pkcs11 provider library
+     --outfile FILE           Output file.
+     -d, --debug LEVEL        specify the debug level. Default is 1.
+     -h, --help               shows this help text
+@end example
+
+After being provided the available PKCS #11 modules, it can list all tokens 
+available in your system, the objects on the tokens, and perform operations
+on them.
+
+Some examples on how to use p11tool are illustrated in the following  paragraphs.
+
+@subsubsection List all tokens
+@smallexample
+$ p11tool --list-tokens
+@end smallexample
+
+@subsubsection List all objects
+The following command will list all objects in a token. The @code{--login}
+is required to show objects marked as private.
+@smallexample
+$ p11tool --login --list-all
+@end smallexample
+
+@subsubsection Exporting an object
+To retrieve an object stored in the card use the following command.
+Note however that objects marked as sensitive (typically PKCS #11 private keys) 
+are not allowed to be extracted from the token.
+@smallexample 
+$ p11tool --login --export [OBJECT URL]
+@end smallexample
+
+@subsubsection Copy an object to a token
+To copy an object, such as a certificate or private key to a token
+use the following command.
+@smallexample 
+$ p11tool --login --write [TOKEN URL] \
+  --load-certificate cert.pem --label "my_cert"
+@end smallexample
+
 
 
 @node Abstract key types

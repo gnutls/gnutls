@@ -32,8 +32,8 @@ we elaborate on supported authentication methods.
 @menu
 * Certificate authentication::
 * Anonymous authentication::
-* Authentication using SRP::
-* Authentication using PSK::
+* SRP authentication::
+* PSK authentication::
 * Authentication and credentials::
 @end menu
 
@@ -219,8 +219,16 @@ efficient than ANON_DH on equivalent security levels.
 
 @end table
 
+@node SRP authentication
+@section SRP authentication
+
+@menu
+* Authentication using SRP::
+* Invoking srptool::
+@end menu
+
 @node Authentication using SRP
-@section Authentication using @acronym{SRP}
+@subsection Authentication using @acronym{SRP}
 @cindex SRP authentication
 
 @acronym{GnuTLS} supported authentication via the Secure Remote Password 
@@ -300,9 +308,51 @@ also included.  See @ref{srptool}, for more information.
 
 @showfuncB{gnutls_srp_base64_encode,gnutls_srp_base64_decode}
 
+@node Invoking srptool
+@subsection Invoking srptool
+@anchor{srptool}
+@cindex srptool
+
+The @file{srptool} is a very simple program that emulates the programs
+in the @emph{Stanford SRP libraries}@footnote{See
+@url{http://srp.stanford.edu/}.}. It requires two files,
+one called @code{tpasswd} which holds usernames and verifiers, 
+and @code{tpasswd.conf} which holds generators and primes.
+
+To create tpasswd.conf which holds the generator and prime values for
+the @acronym{SRP} protocol, run:
+
+@smallexample
+$ srptool --create-conf /etc/tpasswd.conf
+@end smallexample
+
+This command will create /etc/tpasswd and will add user 'test' (you
+will also be prompted for a password).  Verifiers are stored in a way that
+is compatible with libsrp.
+
+@smallexample
+$ srptool --passwd /etc/tpasswd \
+    --passwd-conf /etc/tpasswd.conf -u test
+@end smallexample
+
+This command will check against a password.  If the password matches
+the one in /etc/tpasswd you will get an ok.
+
+@smallexample
+$ srptool --passwd /etc/tpasswd \
+    --passwd-conf /etc/tpasswd.conf --verify -u test
+@end smallexample
+
+@node PSK authentication
+@section PSK authentication
+
+@menu
+* Authentication using PSK::
+* Invoking psktool::
+@end menu
 
 @node Authentication using PSK
-@section Authentication using @acronym{PSK}
+@subsection Authentication using @acronym{PSK}
 @cindex PSK authentication
 
 Authentication using Pre-shared keys is a method to authenticate using
@@ -369,6 +419,36 @@ in @acronym{GnuTLS}.
 
 @showfuncC{gnutls_key_generate,gnutls_hex_encode,gnutls_hex_decode}
 
+@node Invoking psktool
+@subsection Invoking psktool
+@cindex psktool
+
+This is a program to manage @acronym{PSK} username and keys.
+It will generate random keys for the indicated username, 
+using a simple password file format.
+
+@smallexample
+PSKtool help
+Usage : psktool [options]
+     -u, --username username
+                              specify username.
+     -p, --passwd FILE        specify a password file.
+     -s, --keysize SIZE       specify the key size in bytes.
+     -v, --version            prints the program's version number
+     -h, --help               shows this help text
+@end smallexample
+
+The generation of a PSK password file is illustrated in the example below. 
+The password is provided in the prompt.
+
+@smallexample
+$ ./psktool -u psk_identity -p psks.txt
+Generating a random key for user 'psk_identity'
+Key stored to psks.txt
+$ cat psks.txt
+psk_identity:88f3824b3e5659f52d00e959bacab954b6540344
+$
+@end smallexample
 
 @node Authentication and credentials
 @section Authentication and credentials

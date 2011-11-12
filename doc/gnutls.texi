@@ -152,7 +152,7 @@ Documentation License''.
 * Authentication methods::
 * More on certificate authentication::
 * How to use GnuTLS in applications::
-* Included programs::
+* Other included programs::
 * Internal architecture of GnuTLS::
 * Support::
 * Error codes::
