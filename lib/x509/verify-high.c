@@ -20,7 +20,6 @@
  *
  */
 
-
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <libtasn1.h>
@@ -34,6 +33,31 @@
 #include <common.h>
 #include "verify-high.h"
 
+struct named_cert_st {
+  gnutls_x509_crt_t cert;
+  uint8_t name[MAX_NAME_SIZE];
+  unsigned int name_size;
+};
+
+struct node_st {
+  /* The trusted certificates */
+  gnutls_x509_crt_t *trusted_cas;
+  unsigned int trusted_ca_size;
+
+  struct named_cert_st *named_certs;
+  unsigned int named_cert_size;
+
+  /* The trusted CRLs */
+  gnutls_x509_crl_t *crls;
+  unsigned int crl_size;
+};
+
+struct gnutls_x509_trust_list_st {
+  int size;
+  struct node_st *node;
+};
+
+#define INIT_HASH 0x33a1
 #define DEFAULT_SIZE 503
 
 /**
@@ -594,4 +618,40 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
     }
 
     return 0;
+}
+
+int
+_gnutls_trustlist_inlist_p (gnutls_x509_trust_list_t list,
+			    gnutls_x509_crt_t cert)
+{
+  gnutls_datum_t dn;
+  int ret, i;
+  uint32_t hash;
+
+  ret = gnutls_x509_crt_get_raw_dn (cert, &dn);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+
+  hash = _gnutls_bhash(dn.data, dn.size, INIT_HASH);
+  hash %= list->size;
+
+  _gnutls_free_datum (&dn);
+
+  for (i = 0; i < list->node[hash].trusted_ca_size; i++)
+    {
+      ret = check_if_same_cert (cert, list->node[hash].trusted_cas[i]);
+      if (ret < 0)
+	{
+	  gnutls_assert ();
+	  return ret;
+	}
+
+      if (ret == 1)
+	return 1;
+    }
+
+  return 0;
 }

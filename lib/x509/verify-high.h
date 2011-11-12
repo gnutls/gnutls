@@ -1,25 +1,24 @@
-struct named_cert_st {
-  gnutls_x509_crt_t cert;
-  uint8_t name[MAX_NAME_SIZE];
-  unsigned int name_size;
-};
+/*
+ * Copyright (C) 2011 Free Software Foundation, Inc.
+ *
+ * Author: Nikos Mavrogiannopoulos
+ *
+ * This file is part of GnuTLS.
+ *
+ * The GnuTLS is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ *
+ */
 
-struct node_st {
-  /* The trusted certificates */
-  gnutls_x509_crt_t *trusted_cas;
-  unsigned int trusted_ca_size;
-
-  struct named_cert_st *named_certs;
-  unsigned int named_cert_size;
-
-  /* The trusted CRLs */
-  gnutls_x509_crl_t *crls;
-  unsigned int crl_size;
-};
-
-struct gnutls_x509_trust_list_st {
-  int size;
-  struct node_st *node;
-};
-
-#define INIT_HASH 0x33a1
+int _gnutls_trustlist_inlist_p (gnutls_x509_trust_list_t list,
+				gnutls_x509_crt_t cert);
