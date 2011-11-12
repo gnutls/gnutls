@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.0.8 (unreleased)
+* Version 3.0.8 (released 2011-11-12)
 
 ** certtool: Certtool -e returns error code on verification
 failure.
