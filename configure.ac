@@ -444,56 +444,57 @@ AC_CONFIG_FILES([
   doc/credentials/srp/Makefile
   doc/credentials/x509/Makefile
   doc/cyclo/Makefile
-  doc/latex/Makefile
   doc/doxygen/Doxyfile
   doc/examples/Makefile
+  doc/latex/Makefile
   doc/manpages/Makefile
   doc/reference/Makefile
   doc/reference/version.xml
   doc/scripts/Makefile
+  extra/Makefile
+  extra/includes/Makefile
   gl/Makefile
   gl/tests/Makefile
   guile/Makefile
   guile/modules/Makefile
   guile/src/Makefile
   guile/tests/Makefile
+  lib/Makefile
+  lib/accelerated/Makefile
+  lib/accelerated/x86/Makefile
+  lib/algorithms/Makefile
+  lib/auth/Makefile
+  lib/ext/Makefile
+  lib/gnutls.pc
+  lib/includes/Makefile
+  lib/includes/gnutls/gnutls.h
+  lib/minitasn1/Makefile
+  lib/nettle/Makefile
+  lib/opencdk/Makefile
+  lib/openpgp/Makefile
+  lib/x509/Makefile
+  po/Makefile.in
   src/Makefile
-  src/crywrap/Makefile
   src/cfg/Makefile
   src/cfg/platon/Makefile
   src/cfg/platon/str/Makefile
+  src/crywrap/Makefile
   tests/Makefile
-  tests/key-id/Makefile
   tests/dsa/Makefile
-  tests/scripts/Makefile
+  tests/ecdsa/Makefile
+  tests/key-id/Makefile
   tests/openpgp-certs/Makefile
-  tests/safe-renegotiation/Makefile
   tests/pathlen/Makefile
   tests/pkcs1-padding/Makefile
   tests/pkcs12-decode/Makefile
   tests/pkcs8-decode/Makefile
   tests/rsa-md5-collision/Makefile
+  tests/safe-renegotiation/Makefile
+  tests/scripts/Makefile
   tests/sha2/Makefile
-  tests/ecdsa/Makefile
-  tests/userid/Makefile
-  extra/Makefile
-  extra/includes/Makefile
-  lib/Makefile
-  lib/gnutls.pc
-  lib/includes/Makefile
-  lib/includes/gnutls/gnutls.h
-  lib/minitasn1/Makefile
-  lib/opencdk/Makefile
-  lib/openpgp/Makefile
-  po/Makefile.in
-  lib/x509/Makefile
-  lib/nettle/Makefile
+  tests/slow/Makefile
   tests/suite/Makefile
-  lib/accelerated/Makefile
-  lib/accelerated/x86/Makefile
-  lib/ext/Makefile
-  lib/algorithms/Makefile
-  lib/auth/Makefile
+  tests/userid/Makefile
 ])
 
 AC_OUTPUT
