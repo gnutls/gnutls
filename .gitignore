@@ -462,7 +462,6 @@ tests/dn
 tests/dn2
 tests/finished
 tests/gc
-tests/gendh
 tests/hostname-check
 tests/infoaccess
 tests/init_roundtrip
@@ -529,4 +528,6 @@ tests/x509paths/
 tests/x509self
 tests/x509sign-verify
 tests/x509signself
-tests/keygen
+tests/slow/keygen
+tests/slow/gendh
+doc/reference/*.bak
