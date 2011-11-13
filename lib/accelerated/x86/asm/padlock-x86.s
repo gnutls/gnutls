@@ -35,7 +35,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.file	"padlock-x86.s"
+.file	"devel/perlasm/e_padlock-x86.s"
 .text
 .globl	padlock_capability
 .type	padlock_capability,@function
@@ -620,6 +620,4 @@ padlock_sha512_blocks:
 .Lpadlock_saved_context:
 .long	0
 
-#if defined(__ELF__)
 .section .note.GNU-stack,"",%progbits
-#endif

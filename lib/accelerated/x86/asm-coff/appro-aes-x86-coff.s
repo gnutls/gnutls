@@ -35,7 +35,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.file	"aesni-x86.s"
+.file	"devel/perlasm/aesni-x86.s"
 .text
 .globl	_aesni_encrypt
 .def	_aesni_encrypt;	.scl	2;	.type	32;	.endef

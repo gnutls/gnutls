@@ -35,7 +35,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.file	"aesni-x86.s"
+.file	"devel/perlasm/aesni-x86.s"
 .text
 .globl	aesni_encrypt
 .type	aesni_encrypt,@function
@@ -596,9 +596,10 @@ aesni_ccm64_encrypt_blocks:
 	movl	%ebp,28(%esp)
 	shrl	$1,%ecx
 	leal	(%edx),%ebp
+	movdqa	(%esp),%xmm5
 	movdqa	%xmm7,%xmm2
 	movl	%ecx,%ebx
-	movdqa	(%esp),%xmm5
+.byte	102,15,56,0,253
 .L026ccm64_enc_outer:
 	movups	(%ebp),%xmm0
 	movl	%ebx,%ecx
@@ -619,7 +620,6 @@ aesni_ccm64_encrypt_blocks:
 .byte	102,15,56,220,216
 	movups	(%edx),%xmm0
 	jnz	.L027ccm64_enc2_loop
-.byte	102,15,56,0,253
 .byte	102,15,56,220,209
 .byte	102,15,56,220,217
 	paddq	16(%esp),%xmm7
@@ -631,7 +631,7 @@ aesni_ccm64_encrypt_blocks:
 	movdqa	%xmm7,%xmm2
 	movups	%xmm6,(%edi)
 	leal	16(%edi),%edi
-.byte	102,15,56,0,253
+.byte	102,15,56,0,213
 	jnz	.L026ccm64_enc_outer
 	movl	48(%esp),%esp
 	movl	40(%esp),%edi
@@ -692,7 +692,6 @@ aesni_ccm64_decrypt_blocks:
 .byte	102,15,56,221,209
 	movups	(%esi),%xmm6
 	paddq	16(%esp),%xmm7
-.byte	102,15,56,0,253
 	leal	16(%esi),%esi
 	jmp	.L029ccm64_dec_outer
 .align	16
@@ -702,6 +701,7 @@ aesni_ccm64_decrypt_blocks:
 	movl	%ebx,%ecx
 	movups	%xmm6,(%edi)
 	leal	16(%edi),%edi
+.byte	102,15,56,0,213
 	subl	$1,%eax
 	jz	.L030ccm64_dec_break
 	movups	(%ebp),%xmm0
@@ -726,7 +726,6 @@ aesni_ccm64_decrypt_blocks:
 	paddq	16(%esp),%xmm7
 .byte	102,15,56,220,209
 .byte	102,15,56,220,217
-.byte	102,15,56,0,253
 	leal	16(%esi),%esi
 .byte	102,15,56,221,208
 .byte	102,15,56,221,216
@@ -2180,7 +2179,4 @@ aesni_set_decrypt_key:
 .byte	32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115
 .byte	115,108,46,111,114,103,62,0
 
-#if defined(__ELF__)
 .section .note.GNU-stack,"",%progbits
-#endif
-

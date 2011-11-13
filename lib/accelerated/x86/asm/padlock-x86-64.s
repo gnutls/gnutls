@@ -514,6 +514,4 @@ padlock_cbc_encrypt:
 .Lpadlock_saved_context:
 .quad	0
 
-#if defined(__ELF__)
 .section .note.GNU-stack,"",%progbits
-#endif

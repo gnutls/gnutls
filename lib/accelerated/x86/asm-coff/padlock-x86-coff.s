@@ -35,7 +35,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-.file	"./engines/asm/e_padlock-x86.s"
+.file	"devel/perlasm/e_padlock-x86.s"
 .text
 .globl	_padlock_capability
 .def	_padlock_capability;	.scl	2;	.type	32;	.endef

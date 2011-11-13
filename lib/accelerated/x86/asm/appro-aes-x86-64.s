@@ -789,6 +789,7 @@ aesni_ccm64_encrypt_blocks:
 	movdqu	(%r9),%xmm3
 	movdqa	%xmm9,%xmm2
 	movl	%eax,%r10d
+.byte	102,68,15,56,0,207
 	jmp	.Lccm64_enc_outer
 .align	16
 .Lccm64_enc_outer:
@@ -813,7 +814,6 @@ aesni_ccm64_encrypt_blocks:
 .byte	102,15,56,220,216
 	movups	0(%rcx),%xmm0
 	jnz	.Lccm64_enc2_loop
-.byte	102,68,15,56,0,207
 .byte	102,15,56,220,209
 .byte	102,15,56,220,217
 	paddq	%xmm6,%xmm9
@@ -826,7 +826,7 @@ aesni_ccm64_encrypt_blocks:
 	movdqa	%xmm9,%xmm2
 	movups	%xmm8,(%rsi)
 	leaq	16(%rsi),%rsi
-.byte	102,68,15,56,0,207
+.byte	102,15,56,0,215
 	jnz	.Lccm64_enc_outer
 
 	movups	%xmm3,(%r9)
@@ -859,7 +859,6 @@ aesni_ccm64_decrypt_blocks:
 .byte	102,15,56,221,209
 	movups	(%rdi),%xmm8
 	paddq	%xmm6,%xmm9
-.byte	102,68,15,56,0,207
 	leaq	16(%rdi),%rdi
 	jmp	.Lccm64_dec_outer
 .align	16
@@ -869,6 +868,7 @@ aesni_ccm64_decrypt_blocks:
 	movl	%r10d,%eax
 	movups	%xmm8,(%rsi)
 	leaq	16(%rsi),%rsi
+.byte	102,15,56,0,215
 
 	subq	$1,%rdx
 	jz	.Lccm64_dec_break
@@ -896,7 +896,6 @@ aesni_ccm64_decrypt_blocks:
 	paddq	%xmm6,%xmm9
 .byte	102,15,56,220,209
 .byte	102,15,56,220,217
-.byte	102,68,15,56,0,207
 	leaq	16(%rdi),%rdi
 .byte	102,15,56,221,208
 .byte	102,15,56,221,216
@@ -2572,7 +2571,4 @@ __aesni_set_encrypt_key:
 .byte	65,69,83,32,102,111,114,32,73,110,116,101,108,32,65,69,83,45,78,73,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .align	64
 
-#if defined(__ELF__)
 .section .note.GNU-stack,"",%progbits
-#endif
-

@@ -18,51 +18,47 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-
-	.file "cpuid.asm"
-        
-	.text
-.globl __gnutls_cpuid
-.def   __gnutls_cpuid;	.scl	2;	.type	32;	.endef
-.align 16
+.file	"devel/perlasm/cpuid-x86.s"
+.text
+.def	__gnutls_cpuid;	.scl	3;	.type	32;	.endef
+.align	16
 __gnutls_cpuid:
 	pushl	%ebp
-	movl	%esp, %ebp
-	subl	$12, %esp
-	movl	%ebx, (%esp)
-	movl	8(%ebp), %eax
-	movl	%esi, 4(%esp)
-	movl	%edi, 8(%esp)
-	pushl %ebx
-	cpuid
-	movl %ebx, %edi
-	popl %ebx
-	movl	%edx, %esi
-	movl	12(%ebp), %edx
-	movl	%eax, (%edx)
-	movl	16(%ebp), %eax
-	movl	%edi, (%eax)
-	movl	20(%ebp), %eax
-	movl	%ecx, (%eax)
-	movl	24(%ebp), %eax
-	movl	%esi, (%eax)
-	movl	(%esp), %ebx
-	movl	4(%esp), %esi
-	movl	8(%esp), %edi
-	movl	%ebp, %esp
+	movl	%esp,%ebp
+	subl	$12,%esp
+	movl	%ebx,(%esp)
+	movl	8(%ebp),%eax
+	movl	%esi,4(%esp)
+	movl	%edi,8(%esp)
+	pushl	%ebx
+	.byte	0x0f,0xa2
+	movl	%ebx,%edi
+	popl	%ebx
+	movl	%edx,%esi
+	movl	12(%ebp),%edx
+	movl	%eax,(%edx)
+	movl	16(%ebp),%eax
+	movl	%edi,(%eax)
+	movl	20(%ebp),%eax
+	movl	%ecx,(%eax)
+	movl	24(%ebp),%eax
+	movl	%esi,(%eax)
+	movl	(%esp),%ebx
+	movl	4(%esp),%esi
+	movl	8(%esp),%edi
+	movl	%ebp,%esp
 	popl	%ebp
 	ret
-
-.globl	__gnutls_have_cpuid
-.def	__gnutls_have_cpuid;	.scl	2;	.type	32;	.endef
+.def	__gnutls_have_cpuid;	.scl	3;	.type	32;	.endef
 .align	16
 __gnutls_have_cpuid:
-	pushfl	
-	pop %eax	
-	orl $0x200000, %eax	
-	push %eax	
-	popfl	
-	pushfl	
-	pop %eax	
-	andl $0x200000, %eax	
+	pushfl
+	popl	%eax
+	orl	$2097152,%eax
+	pushl	%eax
+	popfl
+	pushfl
+	popl	%eax
+	andl	$2097152,%eax
 	ret
+.byte	67,80,85,73,68,32,102,111,114,32,120,56,54,0
