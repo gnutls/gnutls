@@ -1,5 +1,7 @@
-@node The Library
-@chapter The Library
+@node Introduction to GnuTLS
+@chapter Introduction to GnuTLS
+
+@section Introduction
 
 In brief @acronym{GnuTLS} can be described as a library which offers an API
 to access secure communication protocols. These protocols provide
@@ -19,9 +21,7 @@ include:
 
 @item Support for Datagram TLS 1.0.
 
-@item Support for both @acronym{X.509} and @acronym{OpenPGP} certificates.
-
-@item Support for handling and verification of certificates.
+@item Support for handling and verification of @acronym{X.509} and @acronym{OpenPGP} certificates.
 
 @item Support for password authentication using @acronym{TLS-SRP}.
 
@@ -41,15 +41,7 @@ functionality from the
 libtasn1@footnote{@url{http://www.gnu.org/software/libtasn1/}} library.
 The ``Cryptographic back-end'' is provided by the nettle@footnote{@url{http://www.lysator.liu.se/~nisse/nettle/}}
 library. 
-@menu
-* Downloading and installing::
-* General idea::
-* Error handling::
-* Thread safety::
-* Callback functions::
-@end menu
 
-@node Downloading and installing
 @section Downloading and installing
 @cindex installation
 @cindex download
@@ -101,150 +93,13 @@ to create a smaller library with only the required features.
 
 For the complete list, refer to the output from @code{configure --help}.
 
-@node General idea
-@section General idea
-
-A brief description of how @acronym{GnuTLS} works internally is shown
-at @ref{fig:gnutls-design}. This section may be easier to understand after
-having seen the examples at @ref{examples}.
-As shown in the figure, there is a read-only global state that is
-initialized once by the global initialization function.  This global
-structure, among others, contains the memory allocation functions
-used, and structures needed for the @acronym{ASN.1} parser.  This
-structure is never modified by any @acronym{GnuTLS} function, except
-for the deinitialization function which frees all allocated memory
-and is called after the program has permanently
-finished using @acronym{GnuTLS}.
-
-@float Figure,fig:gnutls-design
-@image{gnutls-internals,12cm}
-@caption{High level design of GnuTLS.}
-@end float
-
-The credentials structures are used by the authentication methods, such
-as certificate authentication. They store certificates, privates keys,
-and other information that is needed to prove the identity to the peer,
-and/or verify the indentity of the peer. The information stored in
-the credentials structures is initialized once and then can be 
-shared by many @acronym{TLS} sessions.
-
-A @acronym{GnuTLS} session contains all the required information
-to handle one secure connection. The session communicates with the
-peers using the provided functions of the transport layer.
-Every session has a unique session ID shared with the peer.
-
-Since TLS sessions can be resumed, servers need a
-database back-end to hold the session's parameters.  Every
-@acronym{GnuTLS} session after a successful handshake calls the
-appropriate back-end function (see @ref{resume})
-to store the newly negotiated session. The session
-database is examined by the server just after having received the
-client hello@footnote{The first message in a @acronym{TLS} handshake},
-and if the session ID sent by the client, matches a stored session,
-the stored session will be retrieved, and the new session will be a
-resumed one, and will share the same session ID with the previous one.
-
-@node Error handling
-@section Error handling
-@subsection Conventions
-
-In @acronym{GnuTLS} most functions return an integer type as a result.
-In almost all cases a zero or a positive number means success, and a
-negative number indicates failure, or a situation that some action has
-to be taken. Thus negative error codes may be fatal or not.
-
-Fatal errors terminate the connection immediately and further sends
-and receives will be disallowed.  Such an example is
-@code{GNUTLS_@-E_@-DECRYPTION_@-FAILED}. Non-fatal errors may warn about
-something, i.e., a warning alert was received, or indicate the some
-action has to be taken. This is the case with the error code
-@code{GNUTLS_@-E_@-REHANDSHAKE} returned by @funcref{gnutls_record_recv}.
-This error code indicates that the server requests a re-handshake. The
-client may ignore this request, or may reply with an alert.  You can
-test if an error code is a fatal one by using the
-@funcref{gnutls_error_is_fatal}.
-
-If any non fatal errors, that require an action, are to be returned by
-a function, these error codes will be documented in the function's
-reference.  See @ref{Error codes}, for a description of the available 
-error codes.
-
-@subsection Debugging and auditing
-
-In many cases things may not go as expected and further information,
-to assist debugging, from @acronym{GnuTLS} is desired. 
-Those are the cases where the @funcref{gnutls_global_set_log_level} and
-@funcref{gnutls_global_set_log_function} are to be used. Those will print
-verbose information on the @acronym{GnuTLS} functions internal flow.
-
-@showfuncB{gnutls_global_set_log_level,gnutls_global_set_log_function}
-
-When debugging is not required, important issues, such as detected
-attacks on the protocol still need to be logged. This is provided
-by the logging function set by
-@funcref{gnutls_global_set_audit_log_function}. The provided function
-will receive an message and the corresponding
-TLS session. The session information might be used to derive IP addresses
-or other information about the peer involved.
-
-@showfuncdesc{gnutls_global_set_audit_log_function}
-
-@node Thread safety
-@section Thread safety
-
-The @acronym{GnuTLS} library is thread safe by design, meaning that
-objects of the library such as TLS sessions, can be safely divided across
-threads as long as a single thread accesses a single object. This is
-sufficient to support a server which handles several sessions per thread.
-If, however, an object needs to be shared across threads then access must be 
-protected with a mutex. Read-only access to objects, for example the
-credentials holding structures (see @ref{Authentication methods}), is also thread-safe. 
-
-The random generator of the cryptographic back-end, is not thread safe and requires
-mutex locks which are setup by @acronym{GnuTLS}.
-Applications can either call @funcref{gnutls_global_init} which will initialize the default
-operating system provided locks (i.e. @code{pthreads} on GNU/Linux and
-@code{CriticalSection} on Windows), or specify manually the locking system using 
-the function @funcref{gnutls_global_set_mutex} before calling @funcref{gnutls_global_init}. 
-Setting manually mutexes is recommended
-only to applications that have full control of the underlying libraries. If this
-is not the case, the use of the operating system defaults is recommended. An example of 
-non-native thread usage is shown below.
-
-@example
-#include <gnutls.h>
-
-/* Other thread packages
- */
-
-int main()
-@{
-   gnutls_global_set_mutex (mutex_init, mutex_deinit, 
-                            mutex_lock, mutex_unlock);
-   gnutls_global_init();
-@}
-@end example
-
-@showfuncdesc{gnutls_global_set_mutex}
-
-@node Callback functions
-@section Callback functions
-@cindex callback functions
-
-There are several cases where @acronym{GnuTLS} may need out of
-band input from your program. This is now implemented using some
-callback functions, which your program is expected to register.
-
-An example of this type of functions are the push and pull callbacks
-which are used to specify the functions that will retrieve and send
-data to the transport layer.
-
-@showfuncB{gnutls_transport_set_push_function,gnutls_transport_set_pull_function}
-
-Other callback functions may require more complicated input and data
-to be allocated. Such an example is 
-@funcref{gnutls_srp_set_server_credentials_function}.
-All callbacks should allocate and free memory using the functions shown below.
-
-@showfuncB{gnutls_malloc,gnutls_free}
-
+@section Overview
+In this document we present an overview of the supported security protocols in @ref{Introduction to TLS}, and 
+continue by providing more information on the certificate authentication in @ref{Certificate authentication},
+and shared-key as well anonymous authentication in @ref{Shared-key and anonymous authentication}. We
+elaborate on certificate authentication by demonstrating advanced usage of the API in @ref{More on certificate authentication}.
+The core of the TLS library is presented in @ref{How to use GnuTLS in applications} and example
+applications are listed in @ref{GnuTLS application examples}.
+In @ref{Other included programs} the usage of few included programs that
+may assist debugging is presented. The last chapter is @ref{Internal architecture of GnuTLS} that
+provides a short introduction to GnuTLS' internal architecture.

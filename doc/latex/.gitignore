@@ -35,3 +35,6 @@ gnutls.dvi
 gnutls.tmp
 gnutls.xref
 sec-tls-app.tex
+cha-cert-auth2.tex
+cha-shared-key.tex
+cha-gtls-examples.tex

@@ -1,0 +1,202 @@
+@node Shared-key and anonymous authentication
+@chapter Shared-key and anonymous authentication
+
+@menu
+* SRP authentication::
+* PSK authentication::
+* Anonymous authentication::
+@end menu
+
+@node SRP authentication
+@section SRP authentication
+
+@menu
+* Authentication using SRP::
+* Invoking srptool::
+@end menu
+
+@node Authentication using SRP
+@subsection Authentication using @acronym{SRP}
+@cindex SRP authentication
+
+@acronym{GnuTLS} supports authentication via the Secure Remote Password 
+or @acronym{SRP} protocol (see @xcite{RFC2945,TOMSRP} for a description).
+The @acronym{SRP} key exchange is an extension to the
+@acronym{TLS} protocol, and it provides an authenticated with a 
+password key exchange. The peers can be identified using a single password, 
+or there can be combinations where the client is authenticated using @acronym{SRP}
+and the server using a certificate.
+
+The advantage of @acronym{SRP} authentication, over other proposed
+secure password authentication schemes, is that @acronym{SRP} is not
+susceptible to off-line dictionary attacks.
+Moreover, SRP does not require the server to hold the user's password.
+This kind of protection is similar to the one used traditionally in the @acronym{UNIX}
+@file{/etc/passwd} file, where the contents of this file did not cause
+harm to the system security if they were revealed.  The @acronym{SRP}
+needs instead of the plain password something called a verifier, which
+is calculated using the user's password, and if stolen cannot be used
+to impersonate the user. 
+The Stanford @acronym{SRP} libraries, include a PAM module that synchronizes
+the system's users passwords with the @acronym{SRP} password
+files. That way @acronym{SRP} authentication could be used for all users
+of a system.
+
+The implementation in @acronym{GnuTLS} is based on @xcite{TLSSRP}. The
+supported key exchange methods are shown below.
+
+@table @code
+
+@item SRP:
+Authentication using the @acronym{SRP} protocol.
+
+@item SRP_DSS:
+Client authentication using the @acronym{SRP} protocol. Server is
+authenticated using a certificate with DSA parameters.
+
+@item SRP_RSA:
+Client authentication using the @acronym{SRP} protocol. Server is
+authenticated using a certificate with RSA parameters.
+
+@end table
+
+Helper functions are included in @acronym{GnuTLS}, used to generate and
+maintain @acronym{SRP} verifiers and password files.  A program to
+manipulate the required parameters for @acronym{SRP} authentication is
+also included.  See @ref{srptool}, for more information.
+
+@showfuncdesc{gnutls_srp_verifier}
+
+@showfuncB{gnutls_srp_base64_encode,gnutls_srp_base64_decode}
+
+@node Invoking srptool
+@subsection Invoking srptool
+@anchor{srptool}
+@cindex srptool
+
+The @file{srptool} is a very simple program that emulates the programs
+in the @emph{Stanford SRP libraries}@footnote{See
+@url{http://srp.stanford.edu/}.}. It requires two files,
+one called @code{tpasswd} which holds usernames and verifiers, 
+and @code{tpasswd.conf} which holds generators and primes.
+
+To create tpasswd.conf which holds the generator and prime values for
+the @acronym{SRP} protocol, run:
+
+@smallexample
+$ srptool --create-conf /etc/tpasswd.conf
+@end smallexample
+
+This command will create /etc/tpasswd and will add user 'test' (you
+will also be prompted for a password).  Verifiers are stored in a way that
+is compatible with libsrp.
+
+@smallexample
+$ srptool --passwd /etc/tpasswd \
+    --passwd-conf /etc/tpasswd.conf -u test
+@end smallexample
+
+This command will check against a password.  If the password matches
+the one in /etc/tpasswd you will get an ok.
+
+@smallexample
+$ srptool --passwd /etc/tpasswd \
+    --passwd-conf /etc/tpasswd.conf --verify -u test
+@end smallexample
+
+@node PSK authentication
+@section PSK authentication
+
+@menu
+* Authentication using PSK::
+* Invoking psktool::
+@end menu
+
+@node Authentication using PSK
+@subsection Authentication using @acronym{PSK}
+@cindex PSK authentication
+
+Authentication using Pre-shared keys is a method to authenticate using
+usernames and binary keys. This protocol avoids making use of public
+key infrastructure and expensive calculations, thus it is suitable for
+constraint clients.
+
+The implementation in @acronym{GnuTLS} is based on @xcite{TLSPSK}.  
+The supported @acronym{PSK} key exchange methods are:
+
+@table @code
+
+@item PSK:
+Authentication using the @acronym{PSK} protocol.
+
+@item DHE-PSK:
+Authentication using the @acronym{PSK} protocol and Diffie-Hellman key
+exchange.  This method offers perfect forward secrecy.
+
+@item ECDHE-PSK:
+Authentication using the @acronym{PSK} protocol and Elliptic curve Diffie-Hellman key
+exchange.  This method offers perfect forward secrecy.
+
+@end table
+
+
+Helper functions to generate and maintain @acronym{PSK} keys are also included
+in @acronym{GnuTLS}.
+
+@showfuncC{gnutls_key_generate,gnutls_hex_encode,gnutls_hex_decode}
+
+@node Invoking psktool
+@subsection Invoking psktool
+@cindex psktool
+
+This is a program to manage @acronym{PSK} username and keys.
+It will generate random keys for the indicated username, 
+using a simple password file format.
+
+@smallexample
+PSKtool help
+Usage : psktool [options]
+     -u, --username username
+                              specify username.
+     -p, --passwd FILE        specify a password file.
+     -s, --keysize SIZE       specify the key size in bytes.
+     -v, --version            prints the program's version number
+     -h, --help               shows this help text
+@end smallexample
+
+The generation of a PSK password file is illustrated in the example below. 
+The password is provided in the prompt.
+
+@smallexample
+$ ./psktool -u psk_identity -p psks.txt
+Generating a random key for user 'psk_identity'
+Key stored to psks.txt
+$ cat psks.txt
+psk_identity:88f3824b3e5659f52d00e959bacab954b6540344
+$
+@end smallexample
+
+@node Anonymous authentication
+@section Anonymous authentication
+@cindex anonymous authentication
+
+The anonymous key exchange offers encryption without any
+indication of the peer's identity.  This kind of authentication
+is vulnerable to a man in the middle attack, but can be
+used even if there is no prior communication or shared trusted parties 
+with the peer. Moreover it is useful when complete anonymity is required. 
+Unless in one of the above cases, do not use anonymous authentication.  
+
+The available key exchange algorithms for anonymous authentication are
+shown below.
+
+@table @code
+
+@item ANON_DH:
+This algorithm exchanges Diffie-Hellman parameters.
+
+@item ANON_ECDH:
+This algorithm exchanges elliptic curve Diffie-Hellman parameters. It is more 
+efficient than ANON_DH on equivalent security levels.
+
+@end table

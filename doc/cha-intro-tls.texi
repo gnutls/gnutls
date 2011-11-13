@@ -11,13 +11,12 @@ the Internet architecture and the smooth operation of the Internet.
 It is open to any interested individual.}, described in @xcite{RFC5246}.  
 The protocol provides
 confidentiality, and authentication layers over any reliable transport
-layer.  The description, below, refers to @acronym{TLS} 1.0 but also
-applies to @acronym{TLS} 1.2 @xcite{RFC5246} and @acronym{SSL} 3.0,
-since the differences of these protocols are not major.  
+layer.  The description, above, refers to @acronym{TLS} 1.0 but applies
+to all other TLS versions as the differences between the protocols are not major.  
 
 The @acronym{DTLS} protocol, or ``Datagram @acronym{TLS}'' @xcite{RFC4347} is a
 protocol with identical goals as @acronym{TLS}, but can operate
-under unreliable transport layers, such as @acronym{UDP}. The
+under unreliable transport layers such as @acronym{UDP}. The
 discussions below apply to this protocol as well, except when
 noted otherwise.
 
@@ -28,7 +27,6 @@ noted otherwise.
 * The TLS Alert Protocol::
 * The TLS Handshake Protocol::
 * TLS Extensions::
-* Selecting cryptographic key sizes::
 * How to use TLS in application protocols::
 * On SSL 2 and older protocols::
 @end menu
@@ -68,7 +66,7 @@ can be used over reliable and unreliable transport layers.
 @acronym{GnuTLS} supports TCP and UDP layers transparently using
 the Berkeley sockets API. However, any transport layer can be used
 by providing callbacks for @acronym{GnuTLS} to access the transport layer 
-(for details see @ref{TLS and DTLS sessions}).
+(for details see @ref{Setting up the transport layer}).
 
 @node The TLS record protocol
 @section The TLS record protocol
@@ -82,20 +80,18 @@ or send data. In @acronym{DTLS} however, due to re-transmission
 timers used in the handshake out-of-order handshake data might
 be received for some time (maximum 60 seconds) after the handshake
 process is finished. For this reason programs using @acronym{DTLS}
-should call @funcref{gnutls_record_recv} or @funcref{gnutls_record_recv_seq}
-for every packet received by the peer, even if no data were
-expected. 
+should call the receive functions for every packet received by 
+the peer, even if no data were expected. 
 
-As you may have already noticed, the functions which access the record
-protocol, are quite limited, given the importance of this protocol in
-@acronym{TLS}.  This is because the record protocol's parameters are
-all set by the handshake protocol.
+The functions to access the record protocol are limited to send
+and receive functions, which might, given 
+the importance of this protocol in @acronym{TLS}, seem awkward.  This is because 
+the record protocol's parameters are all set by the handshake protocol.
 The record protocol initially starts with NULL parameters, which means
 no encryption, and no MAC is used. Encryption and authentication begin
 just after the handshake protocol has finished.
 
 @showfuncC{gnutls_record_send,gnutls_record_recv,gnutls_record_recv_seq}
-@showfuncB{gnutls_record_check_pending,gnutls_record_get_direction}
 
 @menu
 * Encryption algorithms used in the record layer::
@@ -112,7 +108,7 @@ Confidentiality in the record layer is achieved by using symmetric
 block encryption algorithms like @code{3DES}, @code{AES}
 or stream algorithms like @code{ARCFOUR_128}.
  Ciphers are encryption algorithms that use a single, secret,
-key to encrypt and decrypt data. Block algorithms in TLS also provide
+key to encrypt and decrypt data. Block algorithms in CBC mode also provide
 protection against statistical analysis of the data.  Thus, if you're
 using the @acronym{TLS} protocol, a random number of blocks will be
 appended to data, to prevent eavesdroppers from guessing the actual
@@ -193,7 +189,7 @@ tunnels, and in cases where network usage has to be minimized. It
 should be noted however that compression increases latency.
 
 The record layer compression in @acronym{GnuTLS} is implemented based
-on the proposal @xcite{RFC3749}. The supported algorithms are shown in
+on @xcite{RFC3749}. The supported algorithms are shown in
 @ref{gnutls_compression_method_t}.
 
 @showenumdesc{gnutls_compression_method_t,Supported compression algorithms}
@@ -222,15 +218,17 @@ encrypted packet.
 @end enumerate
 
 Those weaknesses were solved in @acronym{TLS} 1.1 @xcite{RFC4346}
-which is implemented in @acronym{GnuTLS}. For a detailed discussion
-see the archives of the TLS Working Group mailing list and @xcite{CBCATT}.
+which is implemented in @acronym{GnuTLS}. For this reason we suggest
+to always negotiate the highest supported TLS version with the peer.
+For a detailed discussion of the issues see the archives of the TLS 
+Working Group mailing list and @xcite{CBCATT}.
 
 @node On Record Padding
 @subsection On record padding
 @cindex record padding
 @cindex bad_record_mac
 
-The TLS protocol allows for random padding of records, to prevent
+The TLS protocol allows for random padding of records in CBC ciphers, to prevent
 statistical analysis based on the length of exchanged messages (see @xcite{RFC5246} section 6.2.3.2).  
 GnuTLS appears to be one of few implementation that take advantage of this text, 
 and pad records by a random length.
@@ -303,10 +301,12 @@ the handshake protocol, i.e., the ciphersuite negotiation.
 
 @menu
 * TLS Cipher Suites::           TLS session parameters.
+* Authentication::              TLS authentication.
 * Client Authentication::       Requesting a certificate from the client.
 * Resuming Sessions::           Reusing previously established keys.
 * Interoperability::            About interoperability with other implementations.
 @end menu
+
 
 @node TLS Cipher Suites
 @subsection TLS ciphersuites
@@ -336,6 +336,117 @@ that you consider weak.
 
 All the supported ciphersuites are listed in @ref{ciphersuites}.
 
+@node Authentication
+@subsection Authentication
+
+The key exchange algorithms of the @acronym{TLS} protocol offer
+authentication, which is a prerequisite for a secure connection. 
+The available authentication methods in @acronym{GnuTLS} follow.
+
+@itemize
+
+@item Certificate authentication: Authenticated key exchange using public key infrastructure and certificates (X.509 or OpenPGP).
+@item @acronym{SRP} authentication: Authenticated key exchange using a password.
+@item @acronym{PSK} authentication: Authenticated key exchange using a pre-shared key.
+@item Anonymous authentication: Key exchange without peer authentication.
+
+@end itemize
+
+@float Table,tab:key-exchange
+@multitable @columnfractions .2 .7
+
+@headitem Key exchange @tab Description
+
+@item RSA @tab
+The RSA algorithm is used to encrypt a key and send it to the peer.
+The certificate must allow the key to be used for encryption.
+
+@item RSA_EXPORT @tab
+The RSA algorithm is used to encrypt a key and send it to the peer.
+In the EXPORT algorithm, the server signs temporary RSA parameters of
+512 bits --- which are considered weak --- and sends them to the
+client.
+
+@item DHE_RSA @tab
+The RSA algorithm is used to sign ephemeral Diffie-Hellman parameters
+which are sent to the peer. The key in the certificate must allow the
+key to be used for signing. Note that key exchange algorithms which
+use ephemeral Diffie-Hellman parameters, offer perfect forward
+secrecy. That means that even if the private key used for signing is
+compromised, it cannot be used to reveal past session data.
+
+@item ECDHE_RSA @tab
+The RSA algorithm is used to sign ephemeral elliptic curve Diffie-Hellman 
+parameters which are sent to the peer. The key in the certificate must allow 
+the key to be used for signing. It also offers perfect forward
+secrecy. That means that even if the private key used for signing is
+compromised, it cannot be used to reveal past session data.
+
+@item DHE_DSS @tab
+The DSA algorithm is used to sign ephemeral Diffie-Hellman parameters
+which are sent to the peer. The certificate must contain DSA
+parameters to use this key exchange algorithm. DSA is the algorithm
+of the Digital Signature Standard (DSS).
+
+@item ECDHE_ECDSA @tab
+The Elliptic curve DSA algorithm is used to sign ephemeral elliptic
+curve Diffie-Hellman parameters which are sent to the peer. The 
+certificate must contain ECDSA parameters to use this key exchange 
+algorithm. 
+
+@end multitable
+@caption{Supported key exchange algorithms.}
+@end float
+
+Each authentication method is associated with a key exchange method, shown
+in @ref{tab:key-exchange}, and a credentials type. 
+The contents of the credentials is method-dependent, e.g. certificates
+for certificate authentication and should be initialized and associated
+with a session (see @funcref{gnutls_credentials_set}).  A mapping of the key exchange methods
+with the credential types is shown in @ref{tab:key-exchange-cred}.
+
+@float Table,tab:key-exchange-cred
+@multitable @columnfractions .25 .25 .2 .2
+
+@headitem Authentication method @tab Key exchange @tab Client credentials @tab Server credentials
+
+@item Certificate
+@tab @code{KX_RSA},
+@code{KX_DHE_RSA},
+@code{KX_DHE_DSS},
+@code{KX_ECDHE_RSA},
+@code{KX_ECDHE_ECDSA},
+@code{KX_RSA_EXPORT}
+@tab @code{CRD_CERTIFICATE}
+@tab @code{CRD_CERTIFICATE}
+
+@item Password and certificate
+@tab @code{KX_SRP_RSA}, @code{KX_SRP_DSS}
+@tab @code{CRD_SRP}
+@tab @code{CRD_CERTIFICATE}, @code{CRD_SRP}
+
+@item Password
+@tab @code{KX_SRP}
+@tab @code{CRD_SRP}
+@tab @code{CRD_SRP}
+
+@item Anonymous
+@tab @code{KX_ANON_DH},
+@code{KX_ANON_ECDH}
+@tab @code{CRD_ANON}
+@tab @code{CRD_ANON}
+
+@item Pre-shared key
+@tab @code{KX_PSK},
+@code{KX_DHE_PSK}, @code{KX_ECDHE_PSK}
+@tab @code{CRD_PSK}
+@tab @code{CRD_PSK}
+
+@end multitable
+@caption{Key exchange algorithms and the corresponding credential types.}
+@end float
+
+
 @node Client Authentication
 @subsection Client authentication
 @cindex client certificate authentication
@@ -347,7 +458,7 @@ may request a certificate from the client using the
 is to be requested from the client during the handshake, the server
 will send a certificate request message that contains a list of
 acceptable certificate signers. In @acronym{GnuTLS} the certificate
-signers list is constructed using the trusted Certificate Authorities
+signers list is constructed using the trusted certificate authorities
 by the server. That is the ones set using the following functions.
 
 @showfuncB{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_trust_mem}
@@ -368,11 +479,11 @@ signed by server's acceptable signers.
 @cindex resuming sessions
 @cindex session resuming
 
-The @funcref{gnutls_handshake} function, is expensive since a lot of
-calculations are performed. In order to support many fast connections
-to the same server a client may use session resuming. Session
-resuming is a feature of the @acronym{TLS} protocol which allows a
-client to connect to a server, after a successful handshake, without
+The TLS handshake process performs expensive calculations
+and a busy server might easily be put under load. To 
+reduce the load, clients may use session resumption. Session
+resumption is a feature of the @acronym{TLS} protocol which allows a
+client to connect to a server after a successful handshake, without
 the expensive calculations.  This is achieved by re-using the previously
 established keys. @acronym{GnuTLS} supports this feature, and the
 example in @ref{ex:resume-client} illustrates a typical use of it.
@@ -387,39 +498,29 @@ The resuming capability, mostly in the server side, is one of the
 problems of a thread-safe TLS implementations. The problem is that all
 threads must share information in order to be able to resume
 sessions. The gnutls approach is, in case of a client, to leave all
-the burden of resuming to the client. That is, copy and keep the
+the burden of resuming to the client, i.e., copy and keep the
 necessary parameters. The relevant functions are listed below.
 
-@showfuncdesc{gnutls_session_get_data}
-
-@showfuncdesc{gnutls_session_get_id}
-
-@showfuncdesc{gnutls_session_set_data}
+@showfuncC{gnutls_session_get_data,gnutls_session_get_id,gnutls_session_set_data}
 
 Server side is different. A server needs to specify callback
 functions which store, retrieve and delete session data. These can be
 registered with the functions shown below.
 
-@showfuncdesc{gnutls_db_set_retrieve_function}
-
-@showfuncdesc{gnutls_db_set_store_function}
-
-@showfuncB{gnutls_db_set_ptr,gnutls_db_set_remove_function}
+@showfuncD{gnutls_db_set_retrieve_function,gnutls_db_set_store_function,gnutls_db_set_ptr,gnutls_db_set_remove_function}
 
 It might also be useful to be able to check for expired sessions in
 order to remove them, and save space. The function
 @funcref{gnutls_db_check_entry} is provided for that reason.
 
-@showfuncdesc{gnutls_db_check_entry}
+@showfuncA{gnutls_db_check_entry}
 
 @node Interoperability
 @subsection Interoperability
 
-The @acronym{TLS} handshake is a complex procedure that negotiates all
-required parameters for a secure session. @acronym{GnuTLS} supports
-several @acronym{TLS} extensions, as well as the latest @acronym{TLS} protocol 
-version 1.2. However few implementations are not able to
-properly interoperate once faced with extensions or version protocols
+The @acronym{TLS} protocols support many ciphersuites, extensions and version
+numbers. As a result, few implementations are 
+not able to properly interoperate once faced with extensions or version protocols
 they do not support and understand. The @acronym{TLS} protocol allows for a
 graceful downgrade to the commonly supported options, but practice shows 
 it is not always implemented correctly. 
@@ -438,7 +539,7 @@ This priority string will only enable SSL 3.0 and TLS 1.0 as protocols and
 will disable, via the @code{%COMPAT} keyword, several @acronym{TLS} protocol
 options that are known to cause compatibility problems. Note however that
 there are known attacks against those protocol versions and
-if mode is used security is traded for compatibility.
+this mode trades security for compatibility.
 
 @node TLS Extensions
 @section TLS extensions
@@ -466,9 +567,7 @@ smaller value for record packet maximum length. This extension may be
 useful to clients with constrained capabilities. The functions shown
 below can be used to control this extension.
 
-@showfuncdesc{gnutls_record_get_max_size}
-
-@showfuncdesc{gnutls_record_set_max_size}
+@showfuncB{gnutls_record_get_max_size,gnutls_record_set_max_size}
 
 @subsection Server name indication
 @anchor{serverind}
@@ -487,9 +586,7 @@ begins within the first handshake packet.  The functions
 used to enable this extension, or to retrieve the name sent by a
 client.
 
-@showfuncdesc{gnutls_server_name_set}
-
-@showfuncdesc{gnutls_server_name_get}
+@showfuncB{gnutls_server_name_set,gnutls_server_name_get}
 
 @subsection Session tickets
 @cindex TLS extensions
@@ -508,11 +605,7 @@ Clients can enable support for TLS tickets with
 @funcref{gnutls_session_ticket_enable_server} to enable the extension.
 Clients resume sessions using the normal session resumption procedure (see @ref{resume}).
 
-@showfuncdesc{gnutls_session_ticket_key_generate}
-
-@showfuncdesc{gnutls_session_ticket_enable_server}
-
-@showfuncdesc{gnutls_session_ticket_enable_client}
+@showfuncC{gnutls_session_ticket_key_generate,gnutls_session_ticket_enable_server,gnutls_session_ticket_enable_client}
 
 @subsection Safe renegotiation
 @cindex renegotiation
@@ -611,91 +704,6 @@ For applications we have introduced a new API related to safe
 renegotiation.  The @funcref{gnutls_safe_renegotiation_status} function is
 used to check if the extension has been negotiated on a session, and
 can be used both by clients and servers.
-
-@node Selecting cryptographic key sizes
-@section Selecting cryptographic key sizes
-@cindex key sizes
-
-Because many algorithms are involved in TLS, it is not easy to set
-a consistent security level.  For this reason in @ref{tab:key-sizes} we
-present some correspondence between key sizes of symmetric algorithms
-and public key algorithms based on @xcite{ECRYPT}. 
-Those can be used to generate certificates with
-appropriate key sizes as well as select parameters for Diffie-Hellman and SRP
-authentication.
-
-@float Table,tab:key-sizes
-@multitable @columnfractions .10 .12 .10 .20 .32
-
-@headitem Security bits @tab RSA, DH and SRP parameter size @tab ECC key size @tab Security parameter @tab Description
-
-@item 64
-@tab 816
-@tab 128
-@tab @code{WEAK}
-@tab Very short term protection against small organizations
-
-@item 80
-@tab 1248
-@tab 160
-@tab @code{LOW}
-@tab Very short term protection against agencies
-
-@item 112
-@tab 2432
-@tab 224
-@tab @code{NORMAL}
-@tab Medium-term protection
-
-@item 128
-@tab 3248
-@tab 256
-@tab @code{HIGH}
-@tab Long term protection
-
-@item 256
-@tab 15424
-@tab 512
-@tab @code{ULTRA}
-@tab Foreseeable future
-
-@end multitable
-@caption{Key sizes and security parameters.}
-@end float
-
-The first column  provides a security parameter in a number of bits. This
-gives an indication of the number of combinations to be tried by an adversary
-to brute force a key. For example to test all possible keys in a 112 bit security parameter
-@math{2^{112}} combinations have to be tried. For today's technology this is infeasible.
-The next two columns correlate the security
-parameter with actual bit sizes of parameters for DH, RSA, SRP and ECC algorithms.
-A mapping to @code{gnutls_sec_param_t} value is given for each security parameter, on
-the next column, and finally a brief description of the level.
-
-@c @showenumdesc{gnutls_sec_param_t,The @code{gnutls_sec_@-param_t} enumeration.}
-
-Note, however, that the values suggested here are nothing more than an
-educated guess that is valid today. There are no guarantees that an
-algorithm will remain unbreakable or that these values will remain
-constant in time. There could be scientific breakthroughs that cannot
-be predicted or total failure of the current public key systems by
-quantum computers. On the other hand though the cryptosystems used in
-TLS are selected in a conservative way and such catastrophic
-breakthroughs or failures are believed to be unlikely.
-The NIST publication SP 800-57 @xcite{NISTSP80057} contains a similar
-table.
-
-When using @acronym{GnuTLS} and a decision on bit sizes for a public
-key algorithm is required, use of the following functions is  
-recommended:
-
-@showfuncdesc{gnutls_sec_param_to_pk_bits}
-
-@showfuncdesc{gnutls_pk_bits_to_sec_param}
-
-Those functions will convert a human understandable security parameter
-of @code{gnutls_sec_param_t} type, to a number of bits suitable for a public 
-key algorithm.
 
 @include sec-tls-app.texi
 

@@ -1,10 +1,10 @@
 TEX_OBJECTS = gnutls.tex macros.tex macros-epub.tex fdl.tex cover.tex gnutls.bib \
 	cover-epub.tex
 
-GEN_TEX_OBJECTS = cha-preface.tex cha-library.tex cha-intro-tls.tex cha-auth.tex \
+GEN_TEX_OBJECTS = cha-preface.tex cha-library.tex cha-intro-tls.tex cha-cert-auth2.tex \
   cha-cert-auth.tex cha-gtls-app.tex sec-tls-app.tex cha-programs.tex cha-support.tex \
-  cha-functions.tex error_codes.tex cha-ciphersuites.tex algorithms.tex \
-  cha-errors.tex alerts.tex cha-internals.tex
+  cha-functions.tex error_codes.tex cha-ciphersuites.tex algorithms.tex cha-shared-key.tex \
+  cha-errors.tex alerts.tex cha-internals.tex cha-gtls-examples.tex
 
 cha-preface.tex: ../cha-preface.texi
 	../scripts/mytexi2latex $< > $@
@@ -15,13 +15,19 @@ cha-library.tex: ../cha-library.texi
 cha-intro-tls.tex: ../cha-intro-tls.texi
 	../scripts/mytexi2latex $< > $@
 
-cha-auth.tex: ../cha-auth.texi
+cha-shared-key.tex: ../cha-shared-key.texi
 	../scripts/mytexi2latex $< > $@
 
 cha-cert-auth.tex: ../cha-cert-auth.texi
 	../scripts/mytexi2latex $< > $@
 
+cha-cert-auth2.tex: ../cha-cert-auth2.texi
+	../scripts/mytexi2latex $< > $@
+
 cha-gtls-app.tex: ../cha-gtls-app.texi
+	../scripts/mytexi2latex $< > $@
+
+cha-gtls-examples.tex: ../cha-gtls-examples.texi
 	../scripts/mytexi2latex $< > $@
 
 sec-tls-app.tex: ../sec-tls-app.texi

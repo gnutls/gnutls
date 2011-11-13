@@ -1,19 +1,178 @@
 @node How to use GnuTLS in applications
 @chapter How to use @acronym{GnuTLS} in applications
-@anchor{examples}
-@cindex example programs
-@cindex examples
 
 @menu
+* Introduction to the library::
 * Preparation::
-* TLS and DTLS sessions::
+* Session initialization::
+* Setting up the transport layer::
+* TLS handshake::
+* Data transfer and termination::
 * Priority Strings::
-* Client examples::
-* Server examples::
-* Miscellaneous examples::
 * Advanced and other topics::
 * Using the cryptographic library::
+* Selecting cryptographic key sizes::
 @end menu
+
+@node Introduction to the library
+@section Introduction
+
+@menu
+* General idea::
+* Error handling::
+* Debugging and auditing::
+* Thread safety::
+* Callback functions::
+@end menu
+
+@node General idea
+@subsection General idea
+
+A brief description of how @acronym{GnuTLS} works internally is shown
+at @ref{fig:gnutls-design}. This section may become more clear after
+having read the rest of this section.
+As shown in the figure, there is a read-only global state that is
+initialized once by the global initialization function.  This global
+structure, among others, contains the memory allocation functions
+used, and structures needed for the @acronym{ASN.1} parser.  This
+structure is never modified by any @acronym{GnuTLS} function, except
+for the deinitialization function which frees all allocated memory
+and is called after the program has permanently
+finished using @acronym{GnuTLS}.
+
+@float Figure,fig:gnutls-design
+@image{gnutls-internals,12cm}
+@caption{High level design of GnuTLS.}
+@end float
+
+The credentials structures are used by the authentication methods, such
+as certificate authentication. They store certificates, privates keys,
+and other information that is needed to prove the identity to the peer,
+and/or verify the indentity of the peer. The information stored in
+the credentials structures is initialized once and then can be 
+shared by many @acronym{TLS} sessions.
+
+A @acronym{GnuTLS} session contains all the required information
+to handle one secure connection. The session communicates with the
+peers using the provided functions of the transport layer.
+Every session has a unique session ID shared with the peer.
+
+Since TLS sessions can be resumed, servers need a
+database back-end to hold the session's parameters.  Every
+@acronym{GnuTLS} session after a successful handshake calls the
+appropriate back-end function (see @ref{resume})
+to store the newly negotiated session. The session
+database is examined by the server just after having received the
+client hello@footnote{The first message in a @acronym{TLS} handshake},
+and if the session ID sent by the client, matches a stored session,
+the stored session will be retrieved, and the new session will be a
+resumed one, and will share the same session ID with the previous one.
+
+@node Error handling
+@subsection Error handling
+
+In @acronym{GnuTLS} most functions return an integer type as a result.
+In almost all cases a zero or a positive number means success, and a
+negative number indicates failure, or a situation that some action has
+to be taken. Thus negative error codes may be fatal or not.
+
+Fatal errors terminate the connection immediately and further sends
+and receives will be disallowed.  Such an example is
+@code{GNUTLS_@-E_@-DECRYPTION_@-FAILED}. Non-fatal errors may warn about
+something, i.e., a warning alert was received, or indicate the some
+action has to be taken. This is the case with the error code
+@code{GNUTLS_@-E_@-REHANDSHAKE} returned by @funcref{gnutls_record_recv}.
+This error code indicates that the server requests a re-handshake. The
+client may ignore this request, or may reply with an alert.  You can
+test if an error code is a fatal one by using the
+@funcref{gnutls_error_is_fatal}.
+
+If any non fatal errors, that require an action, are to be returned by
+a function, these error codes will be documented in the function's
+reference.  See @ref{Error codes}, for a description of the available 
+error codes.
+
+@node Debugging and auditing
+@subsection Debugging and auditing
+
+In many cases things may not go as expected and further information,
+to assist debugging, from @acronym{GnuTLS} is desired. 
+Those are the cases where the @funcref{gnutls_global_set_log_level} and
+@funcref{gnutls_global_set_log_function} are to be used. Those will print
+verbose information on the @acronym{GnuTLS} functions internal flow.
+
+@showfuncB{gnutls_global_set_log_level,gnutls_global_set_log_function}
+
+When debugging is not required, important issues, such as detected
+attacks on the protocol still need to be logged. This is provided
+by the logging function set by
+@funcref{gnutls_global_set_audit_log_function}. The provided function
+will receive an message and the corresponding
+TLS session. The session information might be used to derive IP addresses
+or other information about the peer involved.
+
+@showfuncdesc{gnutls_global_set_audit_log_function}
+
+@node Thread safety
+@subsection Thread safety
+@cindex thread safety
+
+The @acronym{GnuTLS} library is thread safe by design, meaning that
+objects of the library such as TLS sessions, can be safely divided across
+threads as long as a single thread accesses a single object. This is
+sufficient to support a server which handles several sessions per thread.
+If, however, an object needs to be shared across threads then access must be 
+protected with a mutex. Read-only access to objects, for example the
+credentials holding structures (see @ref{Authentication}), is also thread-safe. 
+
+The random generator of the cryptographic back-end, is not thread safe and requires
+mutex locks which are setup by @acronym{GnuTLS}.
+Applications can either call @funcref{gnutls_global_init} which will initialize the default
+operating system provided locks (i.e. @code{pthreads} on GNU/Linux and
+@code{CriticalSection} on Windows), or specify manually the locking system using 
+the function @funcref{gnutls_global_set_mutex} before calling @funcref{gnutls_global_init}. 
+Setting manually mutexes is recommended
+only to applications that have full control of the underlying libraries. If this
+is not the case, the use of the operating system defaults is recommended. An example of 
+non-native thread usage is shown below.
+
+@example
+#include <gnutls.h>
+
+/* Other thread packages
+ */
+
+int main()
+@{
+   gnutls_global_set_mutex (mutex_init, mutex_deinit, 
+                            mutex_lock, mutex_unlock);
+   gnutls_global_init();
+@}
+@end example
+
+@showfuncdesc{gnutls_global_set_mutex}
+
+@node Callback functions
+@subsection Callback functions
+@cindex callback functions
+
+There are several cases where @acronym{GnuTLS} may need out of
+band input from your program. This is now implemented using some
+callback functions, which your program is expected to register.
+
+An example of this type of functions are the push and pull callbacks
+which are used to specify the functions that will retrieve and send
+data to the transport layer.
+
+@showfuncB{gnutls_transport_set_push_function,gnutls_transport_set_pull_function}
+
+Other callback functions may require more complicated input and data
+to be allocated. Such an example is 
+@funcref{gnutls_srp_set_server_credentials_function}.
+All callbacks should allocate and free memory using the functions shown below.
+
+@showfuncB{gnutls_malloc,gnutls_free}
+
 
 @node Preparation
 @section Preparation
@@ -107,13 +266,12 @@ specifying both options to @command{pkg-config}:
 gcc -o foo foo.c `pkg-config gnutls --cflags --libs`
 @end smallexample
 
-@node TLS and DTLS sessions
-@section TLS and DTLS sessions
-@subsection Session initialization
+@node Session initialization
+@section Session initialization
 
 In the previous sections we have discussed the global initialization
 required for GnuTLS as well as the initialization required for each
-authentication method's credentials (see @ref{Authentication methods}).
+authentication method's credentials (see @ref{Authentication}).
 In this section we elaborate on the TLS or DTLS session initiation.
 Each session is initialized using @funcref{gnutls_init} which among
 others is used to specify the type of the connection (server or client), 
@@ -127,9 +285,160 @@ such as @funcref{gnutls_priority_set_direct}. We elaborate on them
 in @ref{Priority Strings}.
 The credentials used for the key exchange method, such as certificates 
 or usernames and passwords should also be associated with the session
-current session using @funcref{gnutls_credentials_set} (see @ref{Authentication methods}). 
+current session using @funcref{gnutls_credentials_set}. 
 
-@subsection Setting up the transport layer
+@showfuncdesc{gnutls_credentials_set}
+
+@subsection Associating the credentials
+@subsubsection Certificates
+
+When using certificates the server is required to have at least one
+certificate and private key pair. A client may or may not have such a
+pair. 
+
+@showfuncB{gnutls_certificate_allocate_credentials,gnutls_certificate_free_credentials}
+
+After the credentials structures are initialized using the functions
+above, the certificate and key pair should be loaded. This should
+occur before any @acronym{TLS} session is initialized.
+Depending on the certificate type different loading functions
+are available, and are shown below.
+In the @acronym{X.509} case, the functions will
+also accept and use a certificate list that leads to a trusted
+authority. The certificate list must be ordered in such way that every
+certificate certifies the one before it. The trusted authority's
+certificate need not to be included, since the peer should possess it
+already.
+
+@showfuncC{gnutls_certificate_set_x509_key_mem,gnutls_certificate_set_x509_key,gnutls_certificate_set_x509_key_file}
+
+@showfuncD{gnutls_certificate_set_openpgp_key_mem,gnutls_certificate_set_openpgp_key,gnutls_certificate_set_openpgp_key_file,gnutls_certificate_set_key}
+
+As an alternative to loading from files, a callback may be used so that the 
+server or the client can specify the certificate and the key at the handshake time.
+In that case a certificate should be selected according the peer's signature
+algorithm preferences. To get those preferences use
+@funcref{gnutls_sign_algorithm_get_requested}. Both functions are shown below.
+
+@showfuncB{gnutls_certificate_set_retrieve_function,gnutls_sign_algorithm_get_requested}
+
+
+Certificate verification is possible by loading the trusted
+authorities into the credentials structure by using
+the following functions, applicable to X.509 and OpenPGP certificates.
+
+@showfuncB{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_openpgp_keyring_file}
+
+Note however that the peer's certificate is not automatically
+verified, you should call @funcref{gnutls_certificate_verify_peers2},
+after a successful handshake or during if @funcref{gnutls_certificate_set_verify_function}
+has been used, to verify the certificate's signature.
+An alternative way, which reports a more detailed
+verification output, is to use @funcref{gnutls_certificate_get_peers} to
+obtain the raw certificate of the peer and verify it using the
+functions discussed in @ref{X.509 certificates}.
+
+@showfuncdesc{gnutls_certificate_verify_peers2}
+
+In a handshake, the negotiated cipher suite also depends on the
+certificate's parameters, so some key exchange methods might not be
+available with some certificates. @acronym{GnuTLS} will disable
+ciphersuites that are not compatible with the key, or the enabled
+authentication methods.  For example keys marked as sign-only, will
+not be able to access the plain RSA ciphersuites, that require
+decryption. It is not recommended to use RSA keys for both
+signing and encryption. If possible use a different key for the
+@code{DHE_RSA} which uses signing and @code{RSA} that requires decryption.
+All the key exchange methods shown in @ref{tab:key-exchange} are
+available in certificate authentication.
+
+@showfuncdesc{gnutls_certificate_set_verify_function}
+
+Note that the DHE key exchange methods are generally
+slower@footnote{It depends on the group used.  Primes with
+lesser bits are always faster, but also easier to break.  See @ref{Selecting cryptographic key sizes}
+for the acceptable security levels.} than the elliptic curves counterpart
+(ECDHE). Moreover the plain Diffie-Hellman key exchange
+requires parameters to be generated and associated with a credentials
+structure by the server (see @ref{Parameter generation}). 
+
+@subsubsection SRP
+
+The initialization functions in SRP credentials differ between
+client and server.
+Clients supporting @acronym{SRP} should set the username and password
+prior to connection, to the credentials structure.
+Alternatively @funcref{gnutls_srp_set_client_credentials_function}
+may be used instead, to specify a callback function that should return the
+SRP username and password.
+The callback is called once during the @acronym{TLS} handshake.
+
+@showfuncE{gnutls_srp_allocate_server_credentials,gnutls_srp_allocate_client_credentials,gnutls_srp_free_server_credentials,gnutls_srp_free_client_credentials,gnutls_srp_set_client_credentials}
+
+@showfuncdesc{gnutls_srp_set_client_credentials_function}
+
+In server side the default behavior of @acronym{GnuTLS} is to read
+the usernames and @acronym{SRP} verifiers from password files. These
+password file format is compatible the with the @emph{Stanford srp libraries}
+format.  If a different password file format is to be used, then 
+@funcref{gnutls_srp_set_server_credentials_function} should be called,
+to set an appropriate callback. 
+
+@showfuncdesc{gnutls_srp_set_server_credentials_file}
+
+@showfuncdesc{gnutls_srp_set_server_credentials_function}
+
+
+@subsubsection PSK
+The initialization functions in PSK credentials differ between
+client and server.
+
+@showfuncD{gnutls_psk_allocate_server_credentials,gnutls_psk_allocate_client_credentials,gnutls_psk_free_server_credentials,gnutls_psk_free_client_credentials}
+
+Clients supporting @acronym{PSK} should supply the username and key
+before a TLS session is established.  Alternatively 
+@funcref{gnutls_psk_set_client_credentials_function} can be used to
+specify a callback function. This has the
+advantage that the callback will be called only if @acronym{PSK} has
+been negotiated.
+
+@showfuncA{gnutls_psk_set_client_credentials}
+
+@showfuncdesc{gnutls_psk_set_client_credentials_function}
+
+In server side the default behavior of @acronym{GnuTLS} is to read
+the usernames and @acronym{PSK} keys from a password file. The
+password file should contain usernames and keys in hexadecimal
+format. The name of the password file can be stored to the credentials
+structure by calling @funcref{gnutls_psk_set_server_credentials_file}.  If
+a different password file format is to be used, then
+a callback should be set instead by @funcref{gnutls_psk_set_server_credentials_function}.
+
+The server can help the client chose a suitable username and password,
+by sending a hint. Note that there is no common profile for the PSK hint and applications
+are discouraged to use it.
+A server, may specify the hint by calling
+@funcref{gnutls_psk_set_server_credentials_hint}.  The client can retrieve
+the hint, for example in the callback function, using
+@funcref{gnutls_psk_client_get_hint}.
+
+@showfuncdesc{gnutls_psk_set_server_credentials_file}
+
+@showfuncC{gnutls_psk_set_server_credentials_function,gnutls_psk_set_server_credentials_hint,gnutls_psk_client_get_hint}
+
+@subsubsection Anonymous
+The initialization functions for the credentials are shown below.
+
+@showfuncD{gnutls_anon_allocate_server_credentials,gnutls_anon_allocate_client_credentials,gnutls_anon_free_server_credentials,gnutls_anon_free_client_credentials}
+
+Note that the key exchange methods for anonymous authentication
+require Diffie-Hellman parameters to be generated by the server and
+associated with an anonymous credentials structure. Check
+@ref{Parameter generation} for more information.
+
+
+@node Setting up the transport layer
+@section Setting up the transport layer
 
 The next step is to setup the underlying transport layer details. The
 Berkeley sockets are implicitly used by GnuTLS, thus a
@@ -176,65 +485,6 @@ message. This requires the @funcref{gnutls_transport_set_pull_timeout_function} 
 
 @showfuncdesc{gnutls_transport_set_pull_timeout_function}
 
-
-@subsection Handshake
-Once a session has been initialized and a network
-connection has been set up, TLS and DTLS protocols
-perform a handshake. The handshake is the actual key
-exchange.
-
-@showfuncdesc{gnutls_handshake}
-
-The handshake process doesn't ensure the verification
-of the peer's identity. When certificates are in use,
-this can be done, either after the handshake is complete, or during 
-the handshake if @funcref{gnutls_certificate_set_verify_function}
-has been used. In both cases the @funcref{gnutls_certificate_verify_peers2} function can be
-used to verify the peer's certificate (see @ref{Certificate authentication}
-for more information).
-
-@showfuncA{gnutls_certificate_verify_peers2}
-
-
-@subsection Data transfer and termination
-Once the handshake is complete and peer's identity
-has been verified data can be exchanged. The available
-functions resemble the POSIX @code{recv} and @code{send}
-functions. It is suggested to use @funcref{gnutls_error_is_fatal}
-to check whether the error codes returned by these functions are
-fatal for the protocol or can be ignored.
-
-@showfuncdesc{gnutls_record_send}
-
-@showfuncdesc{gnutls_record_recv}
-
-@showfuncdesc{gnutls_error_is_fatal}
-
-In DTLS it is adviceable to use the extended receive
-function shown below, because it allows the extraction
-of the sequence number. This is required in DTLS because
-messages may arrive out of order.
-
-@showfuncdesc{gnutls_record_recv_seq}
-
-The @funcref{gnutls_record_check_pending} helper function is available to 
-allow checking whether data are available to be read in a @acronym{GnuTLS} session 
-buffers. Note that this function complements but does not replace @code{select()},
-i.e., @funcref{gnutls_record_check_pending} reports no data to be read, @code{select()}
-should be called to check for data in the network buffers.
-
-@showfuncdesc{gnutls_record_check_pending}
-
-Once a TLS or DTLS session is no longer needed, it is
-recommended to use @funcref{gnutls_bye} to terminate the
-session. That way the peer is notified securely about the
-intention of termination, which allows distinguishing it
-from a malicious connection termination.
-A session can be deinitialized with the @funcref{gnutls_deinit} function.
-
-@showfuncdesc{gnutls_bye}
-@showfuncdesc{gnutls_deinit}
-
 @subsection Asynchronous operation
 @acronym{GnuTLS} can be used with asynchronous socket or event-driven programming.
 During a TLS protocol session @acronym{GnuTLS} does not block for anything except
@@ -262,7 +512,7 @@ thus when writing @funcintref{select} need only to be consulted.
 In the DTLS, however, @acronym{GnuTLS} might block due to timers
 required by the protocol. To prevent those timers from blocking a DTLS handshake,
 the @funcref{gnutls_init} should be called with the
-@code{GNUTLS_NONBLOCK} flag (see @ref{TLS and DTLS sessions}).
+@code{GNUTLS_NONBLOCK} flag (see @ref{Session initialization}).
 
 @subsection DTLS sessions
 
@@ -292,6 +542,68 @@ a path MTU discovery mechanism @xcite{RFC4821}.
 
 @showfuncC{gnutls_dtls_set_mtu,gnutls_dtls_get_mtu,gnutls_dtls_get_data_mtu}
 
+
+@node TLS handshake
+@section TLS handshake
+Once a session has been initialized and a network
+connection has been set up, TLS and DTLS protocols
+perform a handshake. The handshake is the actual key
+exchange.
+
+@showfuncdesc{gnutls_handshake}
+
+The handshake process doesn't ensure the verification
+of the peer's identity. When certificates are in use,
+this can be done, either after the handshake is complete, or during 
+the handshake if @funcref{gnutls_certificate_set_verify_function}
+has been used. In both cases the @funcref{gnutls_certificate_verify_peers2} function can be
+used to verify the peer's certificate (see @ref{Certificate authentication}
+for more information).
+
+@showfuncA{gnutls_certificate_verify_peers2}
+
+@node Data transfer and termination
+@section Data transfer and termination
+Once the handshake is complete and peer's identity
+has been verified data can be exchanged. The available
+functions resemble the POSIX @code{recv} and @code{send}
+functions. It is suggested to use @funcref{gnutls_error_is_fatal}
+to check whether the error codes returned by these functions are
+fatal for the protocol or can be ignored.
+
+@showfuncdesc{gnutls_record_send}
+
+@showfuncdesc{gnutls_record_recv}
+
+@showfuncdesc{gnutls_error_is_fatal}
+
+In DTLS it is adviceable to use the extended receive
+function shown below, because it allows the extraction
+of the sequence number. This is required in DTLS because
+messages may arrive out of order.
+
+@showfuncdesc{gnutls_record_recv_seq}
+
+The @funcref{gnutls_record_check_pending} helper function is available to 
+allow checking whether data are available to be read in a @acronym{GnuTLS} session 
+buffers. Note that this function complements but does not replace @code{select()},
+i.e., @funcref{gnutls_record_check_pending} reports no data to be read, @code{select()}
+should be called to check for data in the network buffers.
+
+@showfuncdesc{gnutls_record_check_pending}
+@showfuncA{gnutls_record_get_direction}
+
+Once a TLS or DTLS session is no longer needed, it is
+recommended to use @funcref{gnutls_bye} to terminate the
+session. That way the peer is notified securely about the
+intention of termination, which allows distinguishing it
+from a malicious connection termination.
+A session can be deinitialized with the @funcref{gnutls_deinit} function.
+
+@showfuncdesc{gnutls_bye}
+@showfuncdesc{gnutls_deinit}
+
+
 @node Priority Strings
 @section Priority strings
 
@@ -302,7 +614,7 @@ That string may contain a high level keyword such as
 in @ref{tab:prio-keywords} or combination of a high level
 keyword, additional algorithm keywords and special keywords.
 
-@showfuncD{gnutls_priority_set_direct,gnutls_priority_init,gnutls_priority_deinit,gnutls_priority_set}
+@showfuncB{gnutls_priority_set_direct,gnutls_priority_set}
 
 @float Table,tab:prio-keywords
 @multitable @columnfractions .20 .70
@@ -469,215 +781,6 @@ will allow V1 CAs in chains.
 @end float
 
 
-@node Client examples
-@section Client examples
-
-This section contains examples of @acronym{TLS} and @acronym{SSL}
-clients, using @acronym{GnuTLS}.  Note that these examples contain
-little or no error checking.  Some of the examples require functions
-implemented by another example.
-
-@menu
-* Simple client example with anonymous authentication::
-* Simple client example with X.509 certificate support::
-* Simple Datagram TLS client example::
-* Obtaining session information::
-* Using a callback to select the certificate to use::
-* Verifying a certificate::
-* Client using a PKCS 11 token with TLS::
-* Client with Resume capability example::
-* Simple client example with SRP authentication::
-* Simple client example in C++::
-* Helper function for TCP connections::
-@end menu
-
-@node Simple client example with anonymous authentication
-@subsection Simple client example with anonymous authentication
-
-The simplest client using TLS is the one that doesn't do any
-authentication.  This means no external certificates or passwords are
-needed to set up the connection.  As could be expected, the connection
-is vulnerable to man-in-the-middle (active or redirection) attacks.
-However, the data is integrity and privacy protected.
-
-@verbatiminclude examples/ex-client1.c
-
-@node Simple client example with X.509 certificate support
-@subsection Simple client example with @acronym{X.509} certificate support
-@anchor{ex:verify}
-
-Let's assume now that we want to create a TCP client which
-communicates with servers that use @acronym{X.509} or
-@acronym{OpenPGP} certificate authentication. The following client is
-a very simple @acronym{TLS} client, which uses the high level verification
-functions for certificates, but does not support session
-resumption. The TCP functions defined in this example are used 
-in most of the other examples below, without redefining them.
-
-@verbatiminclude examples/ex-rfc2818.c
-
-@node Simple Datagram TLS client example
-@subsection Simple datagram @acronym{TLS} client example
-
-This is a client that uses @acronym{UDP} to connect to a
-server. This is the @acronym{DTLS} equivalent to the example
-in @ref{Simple client example with X.509 certificate support}.
-
-@verbatiminclude examples/ex-client-udp.c
-
-@node Obtaining session information
-@subsection Obtaining session information
-
-Most of the times it is desirable to know the security properties of
-the current established session.  This includes the underlying ciphers
-and the protocols involved.  That is the purpose of the following
-function.  Note that this function will print meaningful values only
-if called after a successful @funcref{gnutls_handshake}.
-
-@verbatiminclude examples/ex-session-info.c
-
-@node Using a callback to select the certificate to use
-@subsection Using a callback to select the certificate to use
-
-There are cases where a client holds several certificate and key
-pairs, and may not want to load all of them in the credentials
-structure.  The following example demonstrates the use of the
-certificate selection callback.
-
-@verbatiminclude examples/ex-cert-select.c
-
-@node Verifying a certificate
-@subsection Verifying a certificate
-@anchor{ex:verify2}
-
-An example is listed below which uses the high level verification
-functions to verify a given certificate list.
-
-@verbatiminclude examples/ex-verify.c
-
-@node Client using a PKCS 11 token with TLS
-@subsection Using a @acronym{PKCS} #11 token with TLS
-@anchor{ex:pkcs11-client}
-
-This example will demonstrate how to load keys and certificates
-from a @acronym{PKCS} #11 token, and use it with a TLS connection.
-
-@verbatiminclude examples/ex-cert-select-pkcs11.c
-
-
-@node Client with Resume capability example
-@subsection Client with resume capability example
-@anchor{ex:resume-client}
-
-This is a modification of the simple client example. Here we
-demonstrate the use of session resumption. The client tries to connect
-once using @acronym{TLS}, close the connection and then try to
-establish a new connection using the previously negotiated data.
-
-@verbatiminclude examples/ex-client-resume.c
-
-
-@node Simple client example with SRP authentication
-@subsection Simple client example with @acronym{SRP} authentication
-
-The following client is a very simple @acronym{SRP} @acronym{TLS}
-client which connects to a server and authenticates using a
-@emph{username} and a @emph{password}. The server may authenticate
-itself using a certificate, and in that case it has to be verified.
-
-@verbatiminclude examples/ex-client-srp.c
-
-@node Simple client example in C++
-@subsection Simple client example using the C++ API
-
-The following client is a simple example of a client client utilizing
-the GnuTLS C++ API.
-
-@verbatiminclude examples/ex-cxx.cpp
-
-@node Helper function for TCP connections
-@subsection Helper function for TCP connections
-
-This helper function abstracts away TCP connection handling from the
-other examples.  It is required to build some examples.
-
-@verbatiminclude examples/tcp.c
-
-@node Server examples
-@section Server examples
-
-This section contains examples of @acronym{TLS} and @acronym{SSL}
-servers, using @acronym{GnuTLS}.
-
-@menu
-* Echo Server with X.509 authentication::
-* Echo Server with OpenPGP authentication::
-* Echo Server with SRP authentication::
-* Echo Server with anonymous authentication::
-@end menu
-
-@node Echo Server with X.509 authentication
-@subsection Echo server with @acronym{X.509} authentication
-
-This example is a very simple echo server which supports
-@acronym{X.509} authentication, using the RSA ciphersuites.
-
-@verbatiminclude examples/ex-serv1.c
-
-@node Echo Server with OpenPGP authentication
-@subsection Echo server with @acronym{OpenPGP} authentication
-@cindex OpenPGP server
-
-The following example is an echo server which supports
-@acronym{OpenPGP} key authentication. You can easily combine
-this functionality ---that is have a server that supports both
-@acronym{X.509} and @acronym{OpenPGP} certificates--- but we separated
-them to keep these examples as simple as possible.
-
-@verbatiminclude examples/ex-serv-pgp.c
-
-@node Echo Server with SRP authentication
-@subsection Echo server with @acronym{SRP} authentication
-
-This is a server which supports @acronym{SRP} authentication. It is
-also possible to combine this functionality with a certificate
-server. Here it is separate for simplicity.
-
-@verbatiminclude examples/ex-serv-srp.c
-
-@node Echo Server with anonymous authentication
-@subsection Echo Server with anonymous authentication
-
-This example server support anonymous authentication, and could be
-used to serve the example client for anonymous authentication.
-
-@verbatiminclude examples/ex-serv-anon.c
-
-@node Miscellaneous examples
-@section Miscellaneous examples
-
-@menu
-* Checking for an alert::
-* X.509 certificate parsing example::
-@end menu
-
-@node Checking for an alert
-@subsection Checking for an alert
-
-This is a function that checks if an alert has been received in the
-current session.
-
-@verbatiminclude examples/ex-alert.c
-
-@node X.509 certificate parsing example
-@subsection @acronym{X.509} certificate parsing example
-@anchor{ex:x509-info}
-
-To demonstrate the @acronym{X.509} parsing capabilities an example program is
-listed below.  That program reads the peer's certificate, and prints
-information about it.
-
-@verbatiminclude examples/ex-x509-info.c
 
 @node Advanced and other topics
 @section Advanced and other topics
@@ -688,7 +791,6 @@ information about it.
 * Channel Bindings::
 * Compatibility with the OpenSSL library::
 @end menu
-
 
 @node Parameter generation
 @subsection Parameter generation
@@ -704,8 +806,6 @@ or imported from pregenerated data using @funcref{gnutls_dh_params_import_pkcs3}
 The parameters can be used in a @acronym{TLS} session by calling
 @funcref{gnutls_certificate_set_dh_params} or
 @funcref{gnutls_anon_set_server_dh_params} for anonymous sessions.
-
-@showfuncB{gnutls_dh_params_init,gnutls_dh_params_deinit}
 
 @showfuncD{gnutls_dh_params_generate2,gnutls_dh_params_import_pkcs3,gnutls_certificate_set_dh_params,gnutls_anon_set_server_dh_params}
 
@@ -724,8 +824,6 @@ for them, the rest of this section can be skipped. The RSA-EXPORT key exchange
 requires 512-bit RSA keys to be generated. It is recommended those
 parameters to be refreshed (regenerated) in short intervals. The
 following functions can be used for these parameters.
-
-@showfuncB{gnutls_rsa_params_init,gnutls_rsa_params_deinit}
 
 @showfuncD{gnutls_rsa_params_generate2,gnutls_certificate_set_rsa_export_params,gnutls_rsa_params_import_pkcs1,gnutls_rsa_params_export_pkcs1}
 
@@ -879,3 +977,90 @@ function. It allows obtaining random data of various levels.
 
 @showenumdesc{gnutls_rnd_level_t,The random number levels.}
 @showfuncdesc{gnutls_rnd}
+
+@node Selecting cryptographic key sizes
+@section Selecting cryptographic key sizes
+@cindex key sizes
+
+Because many algorithms are involved in TLS, it is not easy to set
+a consistent security level.  For this reason in @ref{tab:key-sizes} we
+present some correspondence between key sizes of symmetric algorithms
+and public key algorithms based on @xcite{ECRYPT}. 
+Those can be used to generate certificates with
+appropriate key sizes as well as select parameters for Diffie-Hellman and SRP
+authentication.
+
+@float Table,tab:key-sizes
+@multitable @columnfractions .10 .12 .10 .20 .32
+
+@headitem Security bits @tab RSA, DH and SRP parameter size @tab ECC key size @tab Security parameter @tab Description
+
+@item 64
+@tab 816
+@tab 128
+@tab @code{WEAK}
+@tab Very short term protection against small organizations
+
+@item 80
+@tab 1248
+@tab 160
+@tab @code{LOW}
+@tab Very short term protection against agencies
+
+@item 112
+@tab 2432
+@tab 224
+@tab @code{NORMAL}
+@tab Medium-term protection
+
+@item 128
+@tab 3248
+@tab 256
+@tab @code{HIGH}
+@tab Long term protection
+
+@item 256
+@tab 15424
+@tab 512
+@tab @code{ULTRA}
+@tab Foreseeable future
+
+@end multitable
+@caption{Key sizes and security parameters.}
+@end float
+
+The first column  provides a security parameter in a number of bits. This
+gives an indication of the number of combinations to be tried by an adversary
+to brute force a key. For example to test all possible keys in a 112 bit security parameter
+@math{2^{112}} combinations have to be tried. For today's technology this is infeasible.
+The next two columns correlate the security
+parameter with actual bit sizes of parameters for DH, RSA, SRP and ECC algorithms.
+A mapping to @code{gnutls_sec_param_t} value is given for each security parameter, on
+the next column, and finally a brief description of the level.
+
+@c @showenumdesc{gnutls_sec_param_t,The @code{gnutls_sec_@-param_t} enumeration.}
+
+Note, however, that the values suggested here are nothing more than an
+educated guess that is valid today. There are no guarantees that an
+algorithm will remain unbreakable or that these values will remain
+constant in time. There could be scientific breakthroughs that cannot
+be predicted or total failure of the current public key systems by
+quantum computers. On the other hand though the cryptosystems used in
+TLS are selected in a conservative way and such catastrophic
+breakthroughs or failures are believed to be unlikely.
+The NIST publication SP 800-57 @xcite{NISTSP80057} contains a similar
+table.
+
+When using @acronym{GnuTLS} and a decision on bit sizes for a public
+key algorithm is required, use of the following functions is  
+recommended:
+
+@showfuncdesc{gnutls_sec_param_to_pk_bits}
+
+@showfuncdesc{gnutls_pk_bits_to_sec_param}
+
+Those functions will convert a human understandable security parameter
+of @code{gnutls_sec_param_t} type, to a number of bits suitable for a public 
+key algorithm.
+
+

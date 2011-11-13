@@ -127,6 +127,7 @@ while ($line = <FILE>) {
 				push(@stack, FLOAT_TABLE);
 				$line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{$1\\linewidth}|p{$2\\linewidth}|}\n\\hline\n/g;
 				$line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{$1\\linewidth}|p{$2\\linewidth}|p{$3\\linewidth}|}\n\\hline\n/g;
+				$line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{$1\\linewidth}|p{$2\\linewidth}|p{$3\\linewidth}|p{$4\\linewidth}|}\n\\hline\n/g;
 				$line =~ s/\@multitable \@columnfractions ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+) ([\.\d]+)$/\n\\begin{tabular}{|p{$1\\linewidth}|p{$2\\linewidth}|p{$3\\linewidth}|p{$4\\linewidth}|p{$5\\linewidth}|}\n\\hline\n/g;
 			}
 			
