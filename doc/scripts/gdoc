@@ -134,55 +134,57 @@ eval '(exit $?0)' && eval 'exec perl "$0" ${1+"$@"}'
 use POSIX qw(strftime);
 
 # match expressions used to find embedded type information
-$type_constant = "((?<!\")\\\%(\\w+))";
-$type_func = "(\\w+\\(\\))";
-$type_param = "\\\@(\\w+)";
-$type_struct = "\\\#(\\w+)";
-$type_env = "(\\\$\\w+)";
+$type_constant = "\\\%([A-Za-z0-9_]+)";
+$type_func = "([A-Za-z0-9_]+\\(\\))";
+$type_param = "\\s\\\@([A-Za-z0-9_]+)";
+$type_struct = "\\\#([A-Za-z0-9_]+)";
+$type_env = "(\\\$[A-Za-z0-9_]+)";
 
 
 # Output conversion substitutions.
 #  One for each output format
 
 # these work fairly well
-%highlights_html = ( $type_constant, "<i>\$2</i>",
-		     $type_func, "<b>\$1</b>",
-		     $type_struct, "<i>\$1</i>",
-		     $type_param, "<tt><b>\$1</b></tt>" );
+%highlights_html = ( $type_constant, '"<i>$1</i>"',
+		     $type_func, '"<b>$1</b>"',
+		     $type_struct, '"<i>$1</i>"',
+		     $type_param, '" <tt><b>$1</b></tt>"' );
 $blankline_html = "<p>";
 
-%highlights_texinfo = ( $type_constant, "\\\@code{\$2}",
-			$type_func, "\\\@code{\$1}",
-			$type_struct, "\\\@code{\$1}",
-			$type_param, "\\\@code{\$1}" );
+%highlights_texinfo = ( $type_param, '" \@code{$1}"',
+			$type_constant, '"\@code{$1}"',
+			$type_func, '"\@code{$1}"',
+			$type_struct, '"\@code{$1}"',
+			 );
 $blankline_texinfo = "";
 
-%highlights_tex = ( $type_constant, "{\\\\it \$2}",
-		     $type_func, "{\\\\bf \$1}",
-		     $type_struct, "{\\\\it \$1}",
-		     $type_param, "{\\\\bf \$1}" );
+%highlights_tex = ( $type_param, '" {\bf $1}"',
+		$type_constant, '"{\it $1}"',
+		$type_func, '"{\bf $1}"',
+		$type_struct, '"{\it $1}"',
+		      );
 $blankline_tex = "\\\\";
 
 # sgml, docbook format
-%highlights_sgml = ( $type_constant, "<replaceable class=\"option\">\$2</replaceable>",
-		     $type_func, "<function>\$1</function>",
-		     $type_struct, "<structname>\$1</structname>",
-		     $type_env, "<envar>\$1</envar>",
-		     $type_param, "<parameter>\$1</parameter>" );
+%highlights_sgml = ( $type_constant, '"<replaceable class=\"option\">$1</replaceable>"',
+		     $type_func, '"<function>$1</function>"',
+		     $type_struct, '"<structname>$1</structname>"',
+		     $type_env, '"<envar>$1</envar>"',
+		     $type_param, '" <parameter>$1</parameter>"' );
 $blankline_sgml = "</para><para>\n";
 
 # these are pretty rough
-%highlights_man = ( $type_constant, "\\\\fB\$2\\\\fP",
-		    $type_func, "\\\\fB\$1\\\\fP",
-		    $type_struct, "\\\\fB\$1\\\\fP",
-		    $type_param, "\\\\fI\$1\\\\fP" );
+%highlights_man = ( $type_constant, '"\\\fB$1\\\fP"',
+		    $type_func, '"\\\fB$1\\\fP"',
+		    $type_struct, '"\\\fB$1\\\fP"',
+		    $type_param, '" \\\fI$1\\\fP"' );
 $blankline_man = "";
 
 # text-mode
-%highlights_text = ( $type_constant, "\$2",
-		     $type_func, "\$1",
-		     $type_struct, "\$1",
-		     $type_param, "\$1" );
+%highlights_text = ( $type_constant, '"$1"',
+		     $type_func, '"$1"',
+		     $type_struct, '"$1"',
+		     $type_param, '"$1"' );
 $blankline_text = "";
 my $lineprefix = "";
 
@@ -272,6 +274,8 @@ sub dump_section {
     my $name = shift @_;
     my $contents = join "\n", @_;
 
+    $name = " $name";
+
     if ($name =~ m/$type_constant/) {
 	$name = $1;
 #	print STDERR "constant section '$1' = '$contents'\n";
@@ -298,35 +302,15 @@ sub dump_section {
 #  sections => %descriont descriptions
 #  
 
-sub repstr {
-    $pattern = shift;
-    $repl = shift;
-    $match1 = shift;
-    $match2 = shift;
-    $match3 = shift;
-    $match4 = shift;
-
-    $output = $repl;
-    $output =~ s,\$1,$match1,g;
-    $output =~ s,\$2,$match2,g;
-    $output =~ s,\$3,$match3,g;
-    $output =~ s,\$4,$match4,g;
-
-    eval "\$return = qq/$output/";
-
-#    print "pattern $pattern matched 1=$match1 2=$match2 3=$match3 4=$match4 replace $repl yielded $output interpolated $return\n";
-
-    return;
-}
-
 sub just_highlight {
     my $contents = join "\n", @_;
     my $line;
     my $ret = "";
 
     foreach $pattern (keys %highlights) {
-#	print "scanning pattern $pattern ($highlights{$pattern})\n";
-	$contents =~ s:$pattern:repstr($pattern, $highlights{$pattern}, $1, $2, $3, $4):gse;
+	#print "scanning pattern $pattern ($highlights{$pattern})\n";
+	my $replace = $highlights{$pattern}; 
+	$contents =~ s/$pattern/$replace/gees;
     }
     foreach $line (split "\n", $contents) {
 	if ($line eq ""){
@@ -372,6 +356,7 @@ sub output_texinfo {
 	}
     }
     foreach $section (@{$args{'sectionlist'}}) {
+	$section =~ s/\@//g;
 	print "\n\@strong{$section:} " if $section ne $section_default;
 	$args{'sections'}{$section} =~ s:([{}]):\@$1:gs;
 	output_highlight($args{'sections'}{$section});
@@ -980,7 +965,7 @@ foreach $file (@ARGV) {
 		$newsection = $1;
 		$newcontents = $2;
 
-		if ($contents ne "") {
+		if ($contents ne '') {
 		    dump_section($section, $contents);
 		    $section = $section_default;
 		}
@@ -1003,7 +988,7 @@ foreach $file (@ARGV) {
 	    } elsif ($line =~ /$doc_content/) {
 		# miguel-style comment kludge, look for blank lines after
 		# @parameter line to signify start of description
-		if ($1 eq "" && $section =~ m/^@/) {
+		if ($1 eq '' && $section =~ m/^@/) {
 		    dump_section($section, $contents);
 		    $section = $section_default;
 		    $contents = "";
