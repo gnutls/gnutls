@@ -1088,6 +1088,7 @@ discard:
 sanity_check_error:
   if (IS_DTLS(session))
     {
+      session->internals.dtls.packets_dropped++;
       _gnutls_audit_log(session, "Discarded message[%u] due to invalid decryption\n", 
             (unsigned int)_gnutls_uint64touint32 (packet_sequence));
       ret = gnutls_assert_val(GNUTLS_E_AGAIN);
