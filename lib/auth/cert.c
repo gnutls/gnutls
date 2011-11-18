@@ -63,6 +63,12 @@ static gnutls_privkey_t alloc_and_load_pkcs11_key (gnutls_pkcs11_privkey_t
                                                    key, int deinit);
 #endif
 
+#define MAX_CLIENT_SIGN_ALGOS 3
+#define CERTTYPE_SIZE (MAX_CLIENT_SIGN_ALGOS+1)
+typedef enum CertificateSigType
+{ RSA_SIGN = 1, DSA_SIGN = 2, ECDSA_SIGN = 64
+} CertificateSigType;
+
 /* Copies data from a internal certificate struct (gnutls_pcert_st) to 
  * exported certificate struct (cert_auth_info_t)
  */
@@ -1437,10 +1443,6 @@ _gnutls_proc_cert_server_certificate (gnutls_session_t session,
   return ret;
 }
 
-#define MAX_SIGN_ALGOS 2
-typedef enum CertificateSigType
-{ RSA_SIGN = 1, DSA_SIGN = 2, ECDSA_SIGN = 64
-} CertificateSigType;
 
 /* Checks if we support the given signature algorithm 
  * (RSA or DSA). Returns the corresponding gnutls_pk_algorithm_t
@@ -1470,8 +1472,8 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, opaque * data,
   opaque *p;
   gnutls_certificate_credentials_t cred;
   ssize_t dsize;
-  int i, j;
-  gnutls_pk_algorithm_t pk_algos[MAX_SIGN_ALGOS];
+  int i;
+  gnutls_pk_algorithm_t pk_algos[MAX_CLIENT_SIGN_ALGOS];
   int pk_algos_length;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
@@ -1499,16 +1501,15 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, opaque * data,
   p++;
   /* check if the sign algorithm is supported.
    */
-  pk_algos_length = j = 0;
+  pk_algos_length = 0;
   for (i = 0; i < size; i++, p++)
     {
       DECR_LEN (dsize, 1);
       if ((ret = _gnutls_check_supported_sign_algo (*p)) > 0)
         {
-          if (j < MAX_SIGN_ALGOS)
+          if (pk_algos_length < MAX_CLIENT_SIGN_ALGOS)
             {
-              pk_algos[j++] = ret;
-              pk_algos_length++;
+              pk_algos[pk_algos_length++] = ret;
             }
         }
     }
@@ -1728,7 +1729,6 @@ _gnutls_proc_cert_client_cert_vrfy (gnutls_session_t session,
   return 0;
 }
 
-#define CERTTYPE_SIZE 4
 int
 _gnutls_gen_cert_server_cert_req (gnutls_session_t session,
                                   gnutls_buffer_st * data)
