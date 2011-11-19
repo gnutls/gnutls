@@ -24,7 +24,6 @@
    authentication.
  */
 
-
 #define SA struct sockaddr
 #define SOCKET_ERR(err,s) if(err==-1) {perror(s);return(1);}
 #define MAX_BUF 1024
@@ -99,6 +98,7 @@ main (void)
   gnutls_session_t session;
   char buffer[MAX_BUF + 1];
   int optval = 1;
+  int kx;
 
   /* this must be called once in the program
    */
@@ -119,8 +119,7 @@ main (void)
 
   generate_dh_params ();
 
-  gnutls_priority_init (&priority_cache, "NORMAL:PSK", NULL);
-
+  gnutls_priority_init (&priority_cache, "NORMAL:+PSK:+ECDHE-PSK:+DHE-PSK", NULL);
 
   gnutls_certificate_set_dh_params (x509_cred, dh_params);
 
@@ -166,6 +165,13 @@ main (void)
           continue;
         }
       printf ("- Handshake was completed\n");
+      
+      kx = gnutls_kx_get(session);
+      if (kx == GNUTLS_KX_PSK || kx == GNUTLS_KX_DHE_PSK || 
+          kx == GNUTLS_KX_ECDHE_PSK)
+        {
+          printf("- User %s was connected\n", gnutls_psk_server_get_username(session));
+        }
 
       /* see the Getting peer's information example */
       /* print_info(session); */

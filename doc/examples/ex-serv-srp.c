@@ -41,7 +41,7 @@ initialize_tls_session (void)
 
   gnutls_init (&session, GNUTLS_SERVER);
 
-  gnutls_priority_set_direct (session, "NORMAL:+SRP:+SRP-DSS:+SRP-RSA", NULL);
+  gnutls_priority_set_direct (session, "NORMAL:-KX-ALL:+SRP:+SRP-DSS:+SRP-RSA", NULL);
 
   gnutls_credentials_set (session, GNUTLS_CRD_SRP, srp_cred);
   /* for the certificate authenticated ciphersuites.
@@ -127,6 +127,7 @@ main (void)
           continue;
         }
       printf ("- Handshake was completed\n");
+      printf ("- User %s was connected\n", gnutls_srp_server_get_username(session));
 
       /* print_info(session); */
 
