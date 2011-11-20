@@ -465,8 +465,8 @@ _gnutls_bin2hex (const void *_old, size_t oldlen,
  * @hex_data: string with data in hex format
  * @hex_size: size of hex data
  * @bin_data: output array with binary data
- * @bin_size: when calling *@bin_size should hold size of @bin_data,
- *            on return will hold actual size of @bin_data.
+ * @bin_size: when calling should hold maximum size of @bin_data,
+ *            on return will hold actual length of @bin_data.
  *
  * Convert a buffer with hex data to binary data.
  *

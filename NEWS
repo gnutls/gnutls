@@ -2,6 +2,15 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.0.9 (unreleased)
+
+** doc: man pages for API functions generation was fixed and are
+now added again in the distribution.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.0.8 (released 2011-11-12)
 
 ** certtool: Certtool -e returns error code on verification
