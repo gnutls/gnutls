@@ -136,7 +136,7 @@ use POSIX qw(strftime);
 # match expressions used to find embedded type information
 $type_constant = "\\\%([A-Za-z0-9_]+)";
 $type_func = "([A-Za-z0-9_]+\\(\\))";
-$type_param = "\\s\\\@([A-Za-z0-9_]+)";
+$type_param = '\@([A-Za-z0-9_]+)\s*';
 $type_struct = "\\\#([A-Za-z0-9_]+)";
 $type_env = "(\\\$[A-Za-z0-9_]+)";
 

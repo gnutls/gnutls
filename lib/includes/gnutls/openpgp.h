@@ -345,12 +345,12 @@ extern "C"
                                              const char *subkey_id,
                                              gnutls_openpgp_crt_fmt_t format);
 
-  int gnutls_certificate_set_openpgp_keyring_mem
-  (gnutls_certificate_credentials_t c, const unsigned char *data,
+  int gnutls_certificate_set_openpgp_keyring_mem (
+   gnutls_certificate_credentials_t c, const unsigned char *data,
    size_t dlen, gnutls_openpgp_crt_fmt_t format);
 
-  int gnutls_certificate_set_openpgp_keyring_file
-  (gnutls_certificate_credentials_t c, const char *file,
+  int gnutls_certificate_set_openpgp_keyring_file (
+   gnutls_certificate_credentials_t c, const char *file,
    gnutls_openpgp_crt_fmt_t format);
 
 #ifdef __cplusplus

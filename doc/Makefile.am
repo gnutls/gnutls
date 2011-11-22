@@ -90,42 +90,112 @@ MAINTAINERCLEANFILES =
 # Generated texinfos.
 
 gnutls_TEXINFOS += gnutls-api.texi \
-	x509-api.texi pgp-api.texi
+	x509-api.texi pgp-api.texi pkcs12-api.texi pkcs11-api.texi \
+	abstract-api.texi compat-api.texi dtls-api.texi crypto-api.texi
+
 MAINTAINERCLEANFILES += gnutls-api.texi \
-	x509-api.texi pgp-api.texi
+	x509-api.texi pgp-api.texi pkcs12-api.texi pkcs11-api.texi \
+	abstract-api.texi compat-api.texi dtls-api.texi crypto-api.texi
 
-gnutls-api.texi: $(srcdir)/../lib/*.c $(srcdir)/../lib/ext/*.c $(srcdir)/../lib/auth/*.c $(srcdir)/../lib/algorithms/*.c
+gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
 	echo "" > $@-tmp
-	for i in $^; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/gnutls.h.in|sort|uniq`; do \
 		echo -n "Creating documentation for file $$i... " && \
-		$(srcdir)/scripts/gdoc -texinfo $$i >> $@-tmp && \
+		$(srcdir)/scripts/gdoc -texinfo \
+			-function $$i \
+			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
-	$(srcdir)/scripts/sort2.pl < $@-tmp > $@-tmp2
-	rm -f $@-tmp
-	mv -f $@-tmp2 $@
+	mv -f $@-tmp $@
 
-x509-api.texi: $(srcdir)/../lib/x509/*.c
+x509-api.texi: $(top_srcdir)/lib/includes/gnutls/x509.h
 	echo "" > $@-tmp
-	for i in $^; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/x509.h|sort|uniq`; do \
 		echo -n "Creating documentation for file $$i... " && \
-		$(srcdir)/scripts/gdoc -texinfo $$i >> $@-tmp && \
+		$(srcdir)/scripts/gdoc -texinfo \
+			-function $$i \
+			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
-	$(srcdir)/scripts/sort2.pl < $@-tmp > $@-tmp2
-	rm -f $@-tmp
-	mv -f $@-tmp2 $@
+	mv -f $@-tmp $@
 
-pgp-api.texi: $(srcdir)/../lib/openpgp/*.c
+pgp-api.texi: $(top_srcdir)/lib/includes/gnutls/openpgp.h
 	echo "" > $@-tmp
-	for i in $^; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/openpgp.h|sort|uniq`; do \
 		echo -n "Creating documentation for file $$i... " && \
-		$(srcdir)/scripts/gdoc -texinfo $$i >> $@-tmp && \
+		$(srcdir)/scripts/gdoc -texinfo \
+			-function $$i \
+			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
 		echo "ok"; \
 	done
-	$(srcdir)/scripts/sort2.pl < $@-tmp > $@-tmp2
-	rm -f $@-tmp
-	mv -f $@-tmp2 $@
+	mv -f $@-tmp $@
+
+
+pkcs12-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs12.h
+	echo "" > $@-tmp
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/pkcs12.h|sort|uniq`; do \
+		echo -n "Creating documentation for file $$i... " && \
+		$(srcdir)/scripts/gdoc -texinfo \
+			-function $$i \
+			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+		echo "ok"; \
+	done
+	mv -f $@-tmp $@
+
+pkcs11-api.texi: $(top_srcdir)/lib/includes/gnutls/pkcs11.h
+	echo "" > $@-tmp
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/pkcs11.h|sort|uniq`; do \
+		echo -n "Creating documentation for file $$i... " && \
+		$(srcdir)/scripts/gdoc -texinfo \
+			-function $$i \
+			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+		echo "ok"; \
+	done
+	mv -f $@-tmp $@
+
+abstract-api.texi: $(top_srcdir)/lib/includes/gnutls/abstract.h
+	echo "" > $@-tmp
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/abstract.h|sort|uniq`; do \
+		echo -n "Creating documentation for file $$i... " && \
+		$(srcdir)/scripts/gdoc -texinfo \
+			-function $$i \
+			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+		echo "ok"; \
+	done
+	mv -f $@-tmp $@
+
+compat-api.texi: $(top_srcdir)/lib/includes/gnutls/compat.h
+	echo "" > $@-tmp
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/compat.h|sort|uniq`; do \
+		echo -n "Creating documentation for file $$i... " && \
+		$(srcdir)/scripts/gdoc -texinfo \
+			-function $$i \
+			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+		echo "ok"; \
+	done
+	mv -f $@-tmp $@
+
+dtls-api.texi: $(top_srcdir)/lib/includes/gnutls/dtls.h
+	echo "" > $@-tmp
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/dtls.h|sort|uniq`; do \
+		echo -n "Creating documentation for file $$i... " && \
+		$(srcdir)/scripts/gdoc -texinfo \
+			-function $$i \
+			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+		echo "ok"; \
+	done
+	mv -f $@-tmp $@
+
+crypto-api.texi: $(top_srcdir)/lib/includes/gnutls/crypto.h
+	echo "" > $@-tmp
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/crypto.h|sort|uniq`; do \
+		echo -n "Creating documentation for file $$i... " && \
+		$(srcdir)/scripts/gdoc -texinfo \
+			-function $$i \
+			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+		echo "ok"; \
+	done
+	mv -f $@-tmp $@
 
 # Generated texinfos.
 

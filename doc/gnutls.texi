@@ -158,7 +158,7 @@ Documentation License''.
 * Internal architecture of GnuTLS::
 * Support::
 * Error codes::
-* Function reference::
+* API reference::
 * Supported ciphersuites in GnuTLS::
 * Copying Information::
 * Concept Index::

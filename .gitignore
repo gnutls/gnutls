@@ -71,9 +71,14 @@ doc/examples/ex-serv-psk
 doc/examples/ex-serv-srp
 doc/examples/ex-serv1
 doc/examples/libexamples.la
-doc/extra-api.texi
 doc/extra.c.texi
 doc/gnutls-api.texi
+doc/abstract-api.texi
+doc/pkcs11-api.texi
+doc/pkcs12-api.texi
+doc/dtls-api.texi
+doc/crypto-api.texi
+doc/compat-api.texi
 doc/gnutls-extra-api.texi
 doc/gnutls-guile.html
 doc/gnutls.aux

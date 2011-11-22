@@ -1040,7 +1040,7 @@ gnutls_prf_raw (gnutls_session_t session,
  * generated output is strongly connected to some additional data
  * (e.g., a string used in user authentication).
  *
- * The output is placed in *@OUT, which must be pre-allocated.
+ * The output is placed in @out, which must be pre-allocated.
  *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/

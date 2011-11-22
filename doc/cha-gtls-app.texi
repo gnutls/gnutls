@@ -169,9 +169,8 @@ data to the transport layer.
 Other callback functions may require more complicated input and data
 to be allocated. Such an example is 
 @funcref{gnutls_srp_set_server_credentials_function}.
-All callbacks should allocate and free memory using the functions shown below.
-
-@showfuncB{gnutls_malloc,gnutls_free}
+All callbacks should allocate and free memory using 
+@funcintref{gnutls_malloc} and @funcintref{gnutls_free}.
 
 
 @node Preparation
