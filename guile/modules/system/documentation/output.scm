@@ -1,6 +1,6 @@
 ;;; output.scm  --  Output documentation "snarffed" from C files in Texi/GDF.
 ;;;
-;;; Copyright 2006, 2007, 2010 Free Software Foundation, Inc.
+;;; Copyright 2006, 2007, 2010, 2011 Free Software Foundation, Inc.
 ;;;
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify
@@ -163,7 +163,7 @@ function."
   (for-each (lambda (texi-string)
               (display texi-string port))
             (map procedure-texi-documentation
-                 (run-cpp-and-extract-snarfing cpp c-file cflags))))
+                 (run-cpp-and-extract-snarfing c-file cpp cflags))))
 
 
 ;;; output.scm ends here
