@@ -93,10 +93,6 @@ FILE *_cdk_tmpfile (void);
     _cdk_memistr((haystack), strlen (haystack), (needle))
 
 /*-- proc-packet.c --*/
-cdk_error_t _cdk_proc_packets (cdk_ctx_t hd, cdk_stream_t inp,
-                               cdk_stream_t data,
-                               const char *output, cdk_stream_t outstream,
-                               digest_hd_st * md);
 cdk_error_t _cdk_pkt_write2 (cdk_stream_t out, int pkttype, void *pktctx);
 
 /*-- pubkey.c --*/
