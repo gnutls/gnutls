@@ -117,7 +117,12 @@ together with the extension number they handle, they have to be registered
 using @funcintref{_gnutls_ext_register} in
 @code{gnutls_extensions.c} typically within @funcintref{_gnutls_ext_init}.
 
-@subsection Adding a New TLS Extension
+@menu
+* Adding a new TLS extension::
+@end menu
+
+@node Adding a new TLS extension
+@subsection Adding a new TLS extension
 
 Adding support for a new TLS extension is done from time to time, and
 the process to do so is not difficult.  Here are the steps you need to
@@ -125,7 +130,7 @@ follow if you wish to do this yourself.  For sake of discussion, let's
 consider adding support for the hypothetical TLS extension
 @code{foobar}.
 
-@subsubsection Add @code{configure} option like @code{--enable-foobar} or @code{--disable-foobar}.
+@subsubheading Add @code{configure} option like @code{--enable-foobar} or @code{--disable-foobar}.
 
 This step is useful when the extension code is large and it might be desirable
 to disable the extension under some circumstances. Otherwise it can be safely
@@ -153,7 +158,7 @@ AM_CONDITIONAL(ENABLE_FOOBAR, test "$ac_enable_foobar" != "no")
 
 These lines should go in @code{lib/m4/hooks.m4}.
 
-@subsubsection Add IANA extension value to @code{extensions_t} in @code{gnutls_int.h}.
+@subsubheading Add IANA extension value to @code{extensions_t} in @code{gnutls_int.h}.
 
 A good name for the value would be GNUTLS_EXTENSION_FOOBAR.  Check
 with @url{http://www.iana.org/assignments/tls-extensiontype-values}
@@ -163,7 +168,7 @@ version since it will lead to interoperability problems in the future
 when the IANA allocates that number to someone else, or when the
 foobar protocol is allocated another number.
 
-@subsubsection Add an entry to @code{_gnutls_extensions} in @code{gnutls_extensions.c}.
+@subsubheading Add an entry to @code{_gnutls_extensions} in @code{gnutls_extensions.c}.
 
 A typical entry would be:
 
@@ -203,7 +208,7 @@ will be called to deinitialize the extension's private parameters, if any.
 Note that the conditional @code{ENABLE_FOOBAR} definition should only be 
 used if step 1 with the @code{configure} options has taken place.
 
-@subsubsection Add new files  that implement the extension.
+@subsubheading Add new files  that implement the extension.
 
 The functions you are responsible to add are those mentioned in the
 previous step.  They should be added in a file such as @code{ext/@-foobar.c} 
@@ -304,7 +309,7 @@ libgnutls_ext_la_SOURCES += ext/foobar.c ext/foobar.h
 endif
 @end example
 
-@subsubsection Add API functions to enable/disable the extension.
+@subsubheading Add API functions to enable/disable the extension.
 
 It might be desirable to allow users of the extension to
 request use of the extension, or set extension specific data.  
@@ -370,7 +375,7 @@ The next section discusses the registration of a detected algorithm
 optimization. For more information please consult the @acronym{GnuTLS}
 source code in @code{lib/accelerated/}.
 
-@subsubsection Overriding specific algorithms
+@subsubheading Overriding specific algorithms
 When an optimized implementation of a single algorithm is available,
 say a hardware assisted version of @acronym{AES-CBC} then the
 following (internal) functions, from @code{crypto-backend.h}, can 
@@ -389,7 +394,7 @@ To register a hash (digest) or MAC algorithm.
 Those registration functions will only replace the specified algorithm
 and leave the rest of subsystem intact.
 
-@subsubsection Overriding the cryptographic library
+@subsubheading Overriding the cryptographic library
 In some systems, that might contain a broad acceleration engine, it 
 might be desirable to override big parts of the cryptographic backend, 
 or even all of them. T following functions are provided for this reason.

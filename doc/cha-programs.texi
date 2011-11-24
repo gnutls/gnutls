@@ -164,6 +164,11 @@ Usage: gnutls-serv [options]
      -v, --version            prints the program's version number
 @end example
 
+@menu
+* Setting up a test HTTPS server::
+@end menu
+
+@node Setting up a test HTTPS server
 @subsection Setting up a test HTTPS server
 @cindex HTTPS server
 @cindex debug server

@@ -558,6 +558,14 @@ in @acronym{GnuTLS} are:
 
 and they will be discussed in the subsections that follow.
 
+@menu
+* Maximum fragment length negotiation::
+* Server name indication::
+* Session tickets::
+* Safe renegotiation::
+@end menu
+
+@node Maximum fragment length negotiation
 @subsection Maximum fragment length negotiation
 @cindex TLS extensions
 @cindex maximum fragment length
@@ -569,6 +577,7 @@ below can be used to control this extension.
 
 @showfuncB{gnutls_record_get_max_size,gnutls_record_set_max_size}
 
+@node Server name indication
 @subsection Server name indication
 @anchor{serverind}
 @cindex TLS extensions
@@ -588,6 +597,7 @@ client.
 
 @showfuncB{gnutls_server_name_set,gnutls_server_name_get}
 
+@node Session tickets
 @subsection Session tickets
 @cindex TLS extensions
 @cindex session tickets
@@ -607,6 +617,7 @@ Clients resume sessions using the normal session resumption procedure (see @ref{
 
 @showfuncC{gnutls_session_ticket_key_generate,gnutls_session_ticket_enable_server,gnutls_session_ticket_enable_client}
 
+@node Safe renegotiation
 @subsection Safe renegotiation
 @cindex renegotiation
 @cindex safe renegotiation

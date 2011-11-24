@@ -710,19 +710,19 @@ on them.
 
 Some examples on how to use p11tool are illustrated in the following  paragraphs.
 
-@subsubsection List all tokens
+@subsubheading List all tokens
 @smallexample
 $ p11tool --list-tokens
 @end smallexample
 
-@subsubsection List all objects
+@subsubheading List all objects
 The following command will list all objects in a token. The @code{--login}
 is required to show objects marked as private.
 @smallexample
 $ p11tool --login --list-all
 @end smallexample
 
-@subsubsection Exporting an object
+@subsubheading Exporting an object
 To retrieve an object stored in the card use the following command.
 Note however that objects marked as sensitive (typically PKCS #11 private keys) 
 are not allowed to be extracted from the token.
@@ -730,7 +730,7 @@ are not allowed to be extracted from the token.
 $ p11tool --login --export [OBJECT URL]
 @end smallexample
 
-@subsubsection Copy an object to a token
+@subsubheading Copy an object to a token
 To copy an object, such as a certificate or private key to a token
 use the following command.
 @smallexample 
@@ -778,6 +778,13 @@ gnutls_privkey_t abs_key;
 @}
 @end example
 
+@menu
+* Abstract public keys::
+* Abstract private keys::
+@end menu
+
+
+@node Abstract public keys
 @subsection Public keys
 An abstract @code{gnutls_pubkey_t} can be initialized
 using the functions below. It can be imported through
@@ -793,6 +800,7 @@ information over a public key.
 
 @showfuncC{gnutls_pubkey_get_pk_algorithm,gnutls_pubkey_get_preferred_hash_algorithm,gnutls_pubkey_get_key_id}
 
+@node Abstract private keys
 @subsection Private keys
 An abstract @code{gnutls_privkey_t} can be initialized
 using the functions below. It can be imported through

@@ -5,6 +5,7 @@
 * Introduction to the library::
 * Preparation::
 * Session initialization::
+* Associating the credentials::
 * Setting up the transport layer::
 * TLS handshake::
 * Data transfer and termination::
@@ -288,8 +289,18 @@ current session using @funcref{gnutls_credentials_set}.
 
 @showfuncdesc{gnutls_credentials_set}
 
-@subsection Associating the credentials
-@subsubsection Certificates
+@node Associating the credentials
+@section Associating the credentials
+
+@menu
+* Certificate credentials::
+* SRP credentials::
+* PSK credentials::
+* Anonymous credentials::
+@end menu
+
+@node Certificate credentials
+@subsection Certificates
 
 When using certificates the server is required to have at least one
 certificate and private key pair. A client may or may not have such a
@@ -361,7 +372,8 @@ for the acceptable security levels.} than the elliptic curves counterpart
 requires parameters to be generated and associated with a credentials
 structure by the server (see @ref{Parameter generation}). 
 
-@subsubsection SRP
+@node SRP credentials
+@subsection SRP
 
 The initialization functions in SRP credentials differ between
 client and server.
@@ -388,7 +400,8 @@ to set an appropriate callback.
 @showfuncdesc{gnutls_srp_set_server_credentials_function}
 
 
-@subsubsection PSK
+@node PSK credentials
+@subsection PSK
 The initialization functions in PSK credentials differ between
 client and server.
 
@@ -425,7 +438,8 @@ the hint, for example in the callback function, using
 
 @showfuncC{gnutls_psk_set_server_credentials_function,gnutls_psk_set_server_credentials_hint,gnutls_psk_client_get_hint}
 
-@subsubsection Anonymous
+@node Anonymous credentials
+@subsection Anonymous
 The initialization functions for the credentials are shown below.
 
 @showfuncD{gnutls_anon_allocate_server_credentials,gnutls_anon_allocate_client_credentials,gnutls_anon_free_server_credentials,gnutls_anon_free_client_credentials}
@@ -484,6 +498,12 @@ message. This requires the @funcref{gnutls_transport_set_pull_timeout_function} 
 
 @showfuncdesc{gnutls_transport_set_pull_timeout_function}
 
+@menu
+* Asynchronous operation::
+* DTLS sessions::
+@end menu
+
+@node Asynchronous operation
 @subsection Asynchronous operation
 @acronym{GnuTLS} can be used with asynchronous socket or event-driven programming.
 During a TLS protocol session @acronym{GnuTLS} does not block for anything except
@@ -513,6 +533,7 @@ required by the protocol. To prevent those timers from blocking a DTLS handshake
 the @funcref{gnutls_init} should be called with the
 @code{GNUTLS_NONBLOCK} flag (see @ref{Session initialization}).
 
+@node DTLS sessions
 @subsection DTLS sessions
 
 Because datagram TLS can operate over connections where the peer

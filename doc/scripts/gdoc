@@ -158,10 +158,10 @@ $blankline_html = "<p>";
 			 );
 $blankline_texinfo = "";
 
-%highlights_tex = ( $type_param, '" {\bf $1}"',
-		$type_constant, '"{\it $1}"',
-		$type_func, '"{\bf $1}"',
-		$type_struct, '"{\it $1}"',
+%highlights_tex = ( $type_param, '" {\\\bf $1}"',
+		$type_constant, '"{\\\it $1}"',
+		$type_func, '"{\\\bf $1}"',
+		$type_struct, '"{\\\it $1}"',
 		      );
 $blankline_tex = "\\\\";
 
@@ -286,6 +286,7 @@ sub dump_section {
 	$parameters{$name} = $contents;
     } else {
 #	print STDERR "other section '$name' = '$contents'\n";
+	$name =~ tr/ //d;
 	$sections{$name} = $contents;
 	push @sectionlist, $name;
     }
@@ -504,7 +505,7 @@ sub output_tex {
 	$sec =~ s/_/\\_/g;
 	$sec =~ s/#([a-zA-Z\_]+)/{\\it $1}/g;
 
-	print "\n\\begin{function$sec}\n";
+	print "\n\\begin{function${sec}}\n";
 	$out = $args{'sections'}{$section};
 
 	$out =~ s/\#([a-zA-Z\_]+)/{\\it $1}/g;
@@ -518,7 +519,7 @@ sub output_tex {
 	$out =~ s/([0-9]+)\^([0-9]+)/\$\{$1\}\^\{$2\}\$/g;
 
 	print $out;
-	print "\\end{function$sec}\n";
+	print "\\end{function${sec}}\n";
     }
     print "\\end{function}\n\n";
 }

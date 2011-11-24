@@ -1,6 +1,13 @@
 @node Introduction to GnuTLS
 @chapter Introduction to GnuTLS
 
+@menu
+* GnuTLS introduction::
+* Downloading and installing::
+* Document overview::
+@end menu
+
+@node GnuTLS introduction
 @section Introduction
 
 In brief @acronym{GnuTLS} can be described as a library which offers an API
@@ -42,6 +49,7 @@ libtasn1@footnote{@url{http://www.gnu.org/software/libtasn1/}} library.
 The ``Cryptographic back-end'' is provided by the nettle@footnote{@url{http://www.lysator.liu.se/~nisse/nettle/}}
 library. 
 
+@node Downloading and installing
 @section Downloading and installing
 @cindex installation
 @cindex download
@@ -93,6 +101,7 @@ to create a smaller library with only the required features.
 
 For the complete list, refer to the output from @code{configure --help}.
 
+@node Document overview
 @section Overview
 In this document we present an overview of the supported security protocols in @ref{Introduction to TLS}, and 
 continue by providing more information on the certificate authentication in @ref{Certificate authentication},
