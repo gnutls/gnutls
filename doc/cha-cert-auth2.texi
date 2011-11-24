@@ -247,13 +247,13 @@ The program can be used interactively or non interactively by
 specifying the @code{--template} command line option. See below for an
 example of a template file.
 
-@subsection Diffie-Hellman parameter generation
+@subheading Diffie-Hellman parameter generation
 To generate parameters for Diffie-Hellman key exchange, use the command:
 @smallexample
 $ certtool --generate-dh-params --outfile dh.pem
 @end smallexample
 
-@subsection Self-signed certificate generation
+@subheading Self-signed certificate generation
 
 To create a self signed certificate, use the command:
 @smallexample
@@ -265,7 +265,7 @@ $ certtool --generate-self-signed --load-privkey ca-key.pem \
 Note that a self-signed certificate usually belongs to a certificate
 authority, that signs other certificates.
 
-@subsection Private key generation
+@subheading Private key generation
 To create a private key (RSA by default), run:
 
 @smallexample
@@ -275,7 +275,7 @@ $ certtool --generate-privkey --outfile key.pem
 To create a DSA or elliptic curves (ECDSA) private key use the
 above command combined with @code{--dsa} or @code{--ecc} options.
 
-@subsection Certificate generation
+@subheading Certificate generation
 To generate a certificate using the private key, use the command:
 
 @smallexample
@@ -309,14 +309,14 @@ $ certtool --generate-certificate --load-request request.pem \
    --load-ca-certificate ca-cert.pem --load-ca-privkey ca-key.pem
 @end smallexample
 
-@subsection Certificate information
+@subheading Certificate information
 To view the certificate information, use:
 
 @smallexample
 $ certtool --certificate-info --infile cert.pem
 @end smallexample
 
-@subsection @acronym{PKCS} #12 structure generation
+@subheading @acronym{PKCS} #12 structure generation
 To generate a @acronym{PKCS} #12 structure using the previous key and
 certificate, use the command:
 
@@ -336,7 +336,7 @@ $ certtool --load-ca-certificate ca.pem \
   --to-p12 --outder --outfile key.p12
 @end smallexample
 
-@subsection Proxy certificate generation
+@subheading Proxy certificate generation
 Proxy certificate can be used to delegate your credential to a
 temporary, typically short-lived, certificate.  To create one from the
 previously created certificate, first create a temporary key and then
@@ -349,7 +349,7 @@ $ certtool --generate-proxy --load-ca-privkey key.pem \
   --outfile proxy-cert.pem
 @end smallexample
 
-@subsection Certificate revocation list generation
+@subheading Certificate revocation list generation
 To create an empty Certificate Revocation List (CRL) do:
 
 @smallexample
@@ -373,7 +373,7 @@ $ certtool --verify-crl --load-ca-certificate x509-ca.pem < crl.pem
 
 
 
-@subsection Certtool's template file format:
+@subheading Certtool's template file format:
 A template file can be used to avoid the interactive questions of
 certtool. Initially create a file named 'cert.cfg' that contains the information
 about the certificate. The template can be used as below:

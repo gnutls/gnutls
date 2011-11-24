@@ -223,6 +223,7 @@ multitable:
 		}
 
 		$line =~ s/\@subsubheading (.+)/\\paragraph{$1}/g;
+		$line =~ s/\@subheading (.+)/\\subsection{$1}/g;
 
                 if ($line =~ s/\@section (.+)/\\section{$1}/g) {
 			if ($label ne '') {
