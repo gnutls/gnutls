@@ -301,37 +301,39 @@ current session using @funcref{gnutls_credentials_set}.
 
 @node Certificate credentials
 @subsection Certificates
+@subsubheading Server certificate authentication
 
 When using certificates the server is required to have at least one
-certificate and private key pair. A client may or may not have such a
-pair. 
+certificate and private key pair. Clients may not hold such
+a pair, but a server could require it. On this section we discuss
+general issues applying to both client and server certificates. The next
+section will elaborate on issues arising from client authentication only.
 
 @showfuncB{gnutls_certificate_allocate_credentials,gnutls_certificate_free_credentials}
 
-After the credentials structures are initialized using the functions
-above, the certificate and key pair should be loaded. This should
-occur before any @acronym{TLS} session is initialized.
+After the credentials structures are initialized, the certificate 
+and key pair must be loaded. This occurs before any @acronym{TLS} 
+session is initialized, and the same structures are reused for multiple sessions.
 Depending on the certificate type different loading functions
-are available, and are shown below.
-In the @acronym{X.509} case, the functions will
-also accept and use a certificate list that leads to a trusted
-authority. The certificate list must be ordered in such way that every
+are available, as shown below.
+For @acronym{X.509} certificates, the functions will
+accept and use a certificate chain that leads to a trusted
+authority. The certificate chain must be ordered in such way that every
 certificate certifies the one before it. The trusted authority's
-certificate need not to be included, since the peer should possess it
+certificate need not to be included since the peer should possess it
 already.
 
 @showfuncC{gnutls_certificate_set_x509_key_mem,gnutls_certificate_set_x509_key,gnutls_certificate_set_x509_key_file}
 
 @showfuncD{gnutls_certificate_set_openpgp_key_mem,gnutls_certificate_set_openpgp_key,gnutls_certificate_set_openpgp_key_file,gnutls_certificate_set_key}
 
-As an alternative to loading from files, a callback may be used so that the 
-server or the client can specify the certificate and the key at the handshake time.
+As an alternative to loading from files or buffers, a callback may be used for the 
+server or the client to specify the certificate and the key at the handshake time.
 In that case a certificate should be selected according the peer's signature
 algorithm preferences. To get those preferences use
 @funcref{gnutls_sign_algorithm_get_requested}. Both functions are shown below.
 
 @showfuncB{gnutls_certificate_set_retrieve_function,gnutls_sign_algorithm_get_requested}
-
 
 Certificate verification is possible by loading the trusted
 authorities into the credentials structure by using
@@ -371,6 +373,24 @@ for the acceptable security levels.} than the elliptic curves counterpart
 (ECDHE). Moreover the plain Diffie-Hellman key exchange
 requires parameters to be generated and associated with a credentials
 structure by the server (see @ref{Parameter generation}). 
+
+
+@subsubheading Client certificate authentication
+
+If a certificate is to be requested from the client during the handshake, the server
+will send a certificate request message. This behavior is controlled @funcref{gnutls_certificate_server_set_request}.
+The request contains a list of the acceptable by the server certificate signers. This list
+is constructed using the trusted certificate authorities of the server.
+In cases where the server supports a large number of certificate authorities
+it makes sense not to advertise all of the names to save bandwidth. That can
+be controlled using the function @funcref{gnutls_certificate_send_x509_rdn_sequence}. 
+This however will have the side-effect of not restricting the client to certificates
+signed by server's acceptable signers.
+
+@showfuncdesc{gnutls_certificate_server_set_request}
+
+@showfuncdesc{gnutls_certificate_send_x509_rdn_sequence}
+
 
 @node SRP credentials
 @subsection SRP
@@ -606,8 +626,8 @@ messages may arrive out of order.
 
 The @funcref{gnutls_record_check_pending} helper function is available to 
 allow checking whether data are available to be read in a @acronym{GnuTLS} session 
-buffers. Note that this function complements but does not replace @code{select()},
-i.e., @funcref{gnutls_record_check_pending} reports no data to be read, @code{select()}
+buffers. Note that this function complements but does not replace @funcintref{select},
+i.e., @funcref{gnutls_record_check_pending} reports no data to be read, @funcintref{select}
 should be called to check for data in the network buffers.
 
 @showfuncdesc{gnutls_record_check_pending}
@@ -806,11 +826,63 @@ will allow V1 CAs in chains.
 @section Advanced and other topics
 
 @menu
+* Session resumption::
 * Parameter generation::
 * Keying Material Exporters::
 * Channel Bindings::
+* Interoperability::
 * Compatibility with the OpenSSL library::
 @end menu
+
+@node Session resumption
+@subsection Session resumption
+@cindex resuming sessions
+@cindex session resumption
+
+@subsubheading Client side
+
+To reduce time and roundtrips spent in a handshake the client can   
+utilize session resumption. This requires the client to retrieve and store
+the session parameters. On new sessions to the same server the parameters must
+be re-associated with sessions using @funcref{gnutls_session_set_data}.
+
+@showfuncC{gnutls_session_get_data,gnutls_session_get_id,gnutls_session_set_data}
+
+Keep in mind that sessions might be expired after some time, 
+and it may be normal for a server not to resume a session
+even it was requested.  That is to prevent temporal session keys
+from becoming long-term keys. Also note that as a client you must enable, using the
+priority functions, at least the algorithms used in the last session.
+
+It is highly recommended clients to enable the session ticket extension using 
+@funcref{gnutls_session_ticket_enable_client} in order to allow resumption with 
+servers that do not store any state.
+
+@showfuncA{gnutls_session_ticket_enable_client}
+
+
+@subsubheading Server side
+
+In order to support resumption a server might do it either by storing
+the session security parameters in a local database or by using session
+tickets (see @ref{Session tickets}) to delegate storage to the client. Because
+session tickets might not be supported by all clients, servers
+might combine the two methods.
+
+A storing server needs to specify callback functions to store, retrieve and delete session data. These can be
+registered with the functions below. The stored sessions in the database can be checked using @funcref{gnutls_db_check_entry}
+for expiration.
+
+@showfuncD{gnutls_db_set_retrieve_function,gnutls_db_set_store_function,gnutls_db_set_ptr,gnutls_db_set_remove_function}
+@showfuncA{gnutls_db_check_entry}
+
+A server utilizing tickets should use
+@funcref{gnutls_session_ticket_key_generate} to generate a ticket encryption key and
+call @funcref{gnutls_session_ticket_enable_server} to enable the extension.
+
+@showfuncA{gnutls_session_ticket_enable_server}
+@showfuncdesc{gnutls_session_ticket_key_generate}
+
 
 @node Parameter generation
 @subsection Parameter generation
@@ -921,6 +993,32 @@ Note that it must be run after a successful TLS handshake.
     @}
 @}
 @end smallexample
+
+@node Interoperability
+@subsection Interoperability
+
+The @acronym{TLS} protocols support many ciphersuites, extensions and version
+numbers. As a result, few implementations are 
+not able to properly interoperate once faced with extensions or version protocols
+they do not support and understand. The @acronym{TLS} protocol allows for a
+graceful downgrade to the commonly supported options, but practice shows 
+it is not always implemented correctly. 
+
+Because there is no way to achieve maximum interoperability with broken peers
+without sacrificing security, @acronym{GnuTLS} ignores such peers by default. 
+This might not be acceptable in cases where maximum compatibility
+is required. Thus we allow enabling compatibility with broken peers using
+priority strings (see @ref{Priority Strings}). An example priority string that
+is known to provide wide compatibility even with broken peers
+is shown below:
+@verbatim
+NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:%COMPAT
+@end verbatim
+This priority string will only enable SSL 3.0 and TLS 1.0 as protocols and
+will disable, via the @code{%COMPAT} keyword, several @acronym{TLS} protocol
+options that are known to cause compatibility problems. Note however that
+there are known attacks against those protocol versions and
+this mode trades security for compatibility.
 
 @node Compatibility with the OpenSSL library
 @subsection Compatibility with the OpenSSL library

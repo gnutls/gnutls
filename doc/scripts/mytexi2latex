@@ -78,7 +78,7 @@ my $match = "[\\w\\d-\\.\\/\\@\\:\_\\\\\#]";
 my $spacematch = "[\\s\\w\\d-\\.\\/\\@\\#\\:]";
 my $mathmatch = "[\\s\\w\\d-\\.\\/\\:\\(\\)\\+\\/\\^\\'\\=\{\}\\\\\\,]";
 my $underscorematch = "[\\s\\w\\d-\\.\\/\\@\\_\\\\\:\\~]";
-my $codematch = "[\\s\\w\\d-\\.\\/\\@\\_\\\\\:\\-\\\"\+\\%\\,]";
+my $codematch = "[\\s\\w\\d-\\.\\/\\@\\_\\\\\:\\-\\\"\+\\%\\#\\,]";
 my $extcodematch = "[\\s\\w\\d-\\.\\/\\@\\_\\\\\:\\-\\\"\+\\%\\,\\{\\}]";
 my ($line, $prev_mode);
 my ($verbatim, $label);
@@ -222,8 +222,8 @@ multitable:
 			}
 		}
 
-		$line =~ s/\@subsubheading (.+)/\\paragraph{$1}/g;
-		$line =~ s/\@subheading (.+)/\\subsection{$1}/g;
+		$line =~ s/\@subsubheading (.+)/\\subsubsection\*{$1}/g;
+		$line =~ s/\@subheading (.+)/\\subsection\*{$1}/g;
 
                 if ($line =~ s/\@section (.+)/\\section{$1}/g) {
 			if ($label ne '') {

@@ -304,7 +304,6 @@ the handshake protocol, i.e., the ciphersuite negotiation.
 * Authentication::              TLS authentication.
 * Client Authentication::       Requesting a certificate from the client.
 * Resuming Sessions::           Reusing previously established keys.
-* Interoperability::            About interoperability with other implementations.
 @end menu
 
 
@@ -454,92 +453,27 @@ with the credential types is shown in @ref{tab:key-exchange-cred}.
 In the case of ciphersuites that use certificate authentication, the
 authentication of the client is optional in @acronym{TLS}.  A server
 may request a certificate from the client using the
-@funcref{gnutls_certificate_server_set_request} function. If a certificate
-is to be requested from the client during the handshake, the server
-will send a certificate request message that contains a list of
-acceptable certificate signers. In @acronym{GnuTLS} the certificate
-signers list is constructed using the trusted certificate authorities
-by the server. That is the ones set using the following functions.
-
-@showfuncB{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_trust_mem}
-
-@showfuncdesc{gnutls_certificate_server_set_request}
-
-In cases where the server supports a large number of certificate authorities
-it makes sense not to advertise all of the names to save bandwidth. That can
-be controlled using the function @funcref{gnutls_certificate_send_x509_rdn_sequence}. 
-This however will have the side-effect of not restricting the client to certificates
-signed by server's acceptable signers.
-
-@showfuncdesc{gnutls_certificate_send_x509_rdn_sequence}
+@funcref{gnutls_certificate_server_set_request} function. We elaborate 
+in @ref{Certificate credentials}.
 
 @node Resuming Sessions
 @subsection Resuming sessions
 @anchor{resume}
 @cindex resuming sessions
-@cindex session resuming
+@cindex session resumption
 
 The TLS handshake process performs expensive calculations
 and a busy server might easily be put under load. To 
-reduce the load, clients may use session resumption. Session
-resumption is a feature of the @acronym{TLS} protocol which allows a
+reduce the load, session resumption may be used. This
+is a feature of the @acronym{TLS} protocol which allows a
 client to connect to a server after a successful handshake, without
 the expensive calculations.  This is achieved by re-using the previously
-established keys. @acronym{GnuTLS} supports this feature, and the
-example in @ref{ex:resume-client} illustrates a typical use of it.
+established keys, meaning the server needs to store the state of established
+connections (unless session tickets are used -- @ref{Session tickets}).
 
-Keep in mind that sessions might be expired after some time, 
-thus it may be normal for a server not to resume a session
-even if you requested that.  That is to prevent temporal session keys
-from becoming long-term keys. Also note that as a client you must enable, using the
-priority functions, at least the algorithms used in the last session.
-
-The resuming capability, mostly in the server side, is one of the
-problems of a thread-safe TLS implementations. The problem is that all
-threads must share information in order to be able to resume
-sessions. The gnutls approach is, in case of a client, to leave all
-the burden of resuming to the client, i.e., copy and keep the
-necessary parameters. The relevant functions are listed below.
-
-@showfuncC{gnutls_session_get_data,gnutls_session_get_id,gnutls_session_set_data}
-
-Server side is different. A server needs to specify callback
-functions which store, retrieve and delete session data. These can be
-registered with the functions shown below.
-
-@showfuncD{gnutls_db_set_retrieve_function,gnutls_db_set_store_function,gnutls_db_set_ptr,gnutls_db_set_remove_function}
-
-It might also be useful to be able to check for expired sessions in
-order to remove them, and save space. The function
-@funcref{gnutls_db_check_entry} is provided for that reason.
-
-@showfuncA{gnutls_db_check_entry}
-
-@node Interoperability
-@subsection Interoperability
-
-The @acronym{TLS} protocols support many ciphersuites, extensions and version
-numbers. As a result, few implementations are 
-not able to properly interoperate once faced with extensions or version protocols
-they do not support and understand. The @acronym{TLS} protocol allows for a
-graceful downgrade to the commonly supported options, but practice shows 
-it is not always implemented correctly. 
-
-Because there is no way to achieve maximum interoperability with broken peers
-without sacrificing security, @acronym{GnuTLS} ignores such peers by default. 
-This might not be acceptable in cases where maximum compatibility
-is required. Thus we allow enabling compatibility with broken peers using
-priority strings (see @ref{Priority Strings}). An example priority string that
-is known to provide wide compatibility even with broken peers
-is shown below:
-@verbatim
-NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:%COMPAT
-@end verbatim
-This priority string will only enable SSL 3.0 and TLS 1.0 as protocols and
-will disable, via the @code{%COMPAT} keyword, several @acronym{TLS} protocol
-options that are known to cause compatibility problems. Note however that
-there are known attacks against those protocol versions and
-this mode trades security for compatibility.
+Session resumption is an integral part of @acronym{GnuTLS}, and 
+@ref{Session resumption} and @ref{ex:resume-client} illustrate typical 
+uses of it.
 
 @node TLS Extensions
 @section TLS extensions
@@ -603,19 +537,14 @@ client.
 @cindex session tickets
 @cindex tickets
 
-To resume a TLS session the server normally store some state.  This
-complicates deployment, and typical situations the client can cache
-information and send it to the server instead.  The Session Ticket
+To resume a TLS session the server normally store session parameters.  This
+complicates deployment, and could be avoiding by delegating the storage
+to the client. Because session parameters are sensitive they are encrypted
+and authenticated with a key only known to the server and then sent to the
+client. The Session Ticket
 extension implements this idea, and it is documented in
 RFC 5077 @xcite{TLSTKT}.
 
-Clients can enable support for TLS tickets with
-@funcref{gnutls_session_ticket_enable_client} and servers use
-@funcref{gnutls_session_ticket_key_generate} to generate a key and
-@funcref{gnutls_session_ticket_enable_server} to enable the extension.
-Clients resume sessions using the normal session resumption procedure (see @ref{resume}).
-
-@showfuncC{gnutls_session_ticket_key_generate,gnutls_session_ticket_enable_server,gnutls_session_ticket_enable_client}
 
 @node Safe renegotiation
 @subsection Safe renegotiation
