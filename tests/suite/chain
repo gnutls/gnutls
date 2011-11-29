@@ -1,7 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2004, 2005, 2007, 2009, 2010 Free Software Foundation,
-# Inc.
+# Copyright (C) 2004-2011 Free Software Foundation, Inc.
 #
 # Author: Simon Josefsson
 #
@@ -43,7 +42,7 @@ while test -d X509tests/test$i; do
     find X509tests/test$i -name T*.crt -print0 |sort -r -z|xargs -n1 --null $CERTTOOL --certificate-info --inder --infile >> chains/chain$i.pem 2>/dev/null
     $CERTTOOL -e --infile chains/chain$i.pem > out 2>&1
     rc=$?
-    if test $rc != 0 -a $rc != 1; then
+    if test $rc != 0 && test $rc != 1; then
 	echo "Chain $i FATAL failure."
 	RET=1
     else
