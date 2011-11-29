@@ -58,7 +58,7 @@ _gnutls_audit_log (gnutls_session_t, const char *fmt, ...)
 void _gnutls_mpi_log (const char *prefix, bigint_t a);
 
 #ifdef C99_MACROS
-#define LEVEL(l, ...) do { if (unlikely(_gnutls_log_level >= l || _gnutls_log_level > 9)) \
+#define LEVEL(l, ...) do { if (unlikely(_gnutls_log_level >= l)) \
       _gnutls_log( l, __VA_ARGS__); } while(0)
 
 #define LEVEL_EQ(l, ...) do { if (unlikely(_gnutls_log_level == l || _gnutls_log_level > 9)) \
