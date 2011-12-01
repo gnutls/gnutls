@@ -27,7 +27,7 @@ AM_LDFLAGS = -no-install
 LDADD = ../libutils.la \
 	../../lib/libgnutls.la $(LTLIBGCRYPT) $(LIBSOCKET)
 
-ctests = gendh keygen
+ctests = gendh keygen cipher-test
 
 check_PROGRAMS = $(ctests)
 TESTS = $(ctests)

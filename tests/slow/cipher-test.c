@@ -1,15 +1,14 @@
-/*
- * Demo on how to use /dev/ncr device for HMAC.
- *
- * Placed under public domain.
- *
- */
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/crypto.h>
+
+/* This does check the AES and SHA implementation against test vectors.
+ * This should not run under valgrind in order to use the native
+ * cpu instructions (AES-NI or padlock).
+ */
 
 struct aes_vectors_st
 {
