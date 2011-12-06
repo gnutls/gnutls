@@ -11,15 +11,15 @@ while ($line=<STDIN>) {
 
   if ($line !~ m/typedef/ && $line !~ m/Copyright/) {
     $func = '';
-    if ($line =~ m/^\s*\w+[\s\*]+([A-Za-z0-9_]+)\s*\(.*/) {
+    if ($line =~ m/^\s*\w+[\s\*]+([A-Za-z0-9_]+)\s*\([^\)]+/) {
         $func = $1;
     }
 
-    if ($line =~ m/^\s*\w+\s+\w+[\s\*]+([A-Za-z0-9_]+)\s*\(.*/) {
+    if ($line =~ m/^\s*\w+\s+\w+[\s\*]+([A-Za-z0-9_]+)\s*\([^\)]+/) {
         $func = $1;
     }
 
-    if ($line =~ m/^[\s\*]*([A-Za-z0-9_]+)\s*\(.*/) {
+    if ($line =~ m/^[\s\*]*([A-Za-z0-9_]+)\s*\([^\)]+/) {
         $func = $1;
     }
     
