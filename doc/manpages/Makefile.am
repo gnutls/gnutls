@@ -421,6 +421,8 @@ APIMANS += gnutls_certificate_set_openpgp_key_file.3
 APIMANS += gnutls_certificate_set_openpgp_key_mem.3
 APIMANS += gnutls_certificate_set_openpgp_key_file2.3
 APIMANS += gnutls_certificate_set_openpgp_key_mem2.3
+APIMANS += gnutls_certificate_set_openpgp_keyring_mem.3
+APIMANS += gnutls_certificate_set_openpgp_keyring_file.3
 APIMANS += gnutls_pkcs11_set_pin_function.3
 APIMANS += gnutls_pkcs11_init.3
 APIMANS += gnutls_pkcs11_deinit.3
@@ -679,6 +681,8 @@ APIMANS += gnutls_x509_trust_list_add_named_crt.3
 APIMANS += gnutls_x509_trust_list_add_crls.3
 APIMANS += gnutls_x509_trust_list_verify_named_crt.3
 APIMANS += gnutls_x509_trust_list_verify_crt.3
+
+$(APIMANS): manpages-update
 
 dist_man_MANS += $(APIMANS)
 
