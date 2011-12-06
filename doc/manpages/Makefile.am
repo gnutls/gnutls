@@ -688,9 +688,9 @@ APIMANS += gnutls_x509_trust_list_verify_crt.3
 dist_man_MANS += $(APIMANS)
 
 $(APIMANS):
-        make update-makefile
-        make Makefile
-        make doit
+	make update-makefile
+	make Makefile
+	make doit
 
 update-makefile:
 	FUNCS=`cat $(top_srcdir)/lib/includes/gnutls/*.h | $(top_srcdir)/doc/scripts/getfuncs.pl`; \
