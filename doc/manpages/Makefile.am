@@ -309,6 +309,8 @@ APIMANS += gnutls_srp_set_server_credentials_file.3
 APIMANS += gnutls_srp_server_get_username.3
 APIMANS += gnutls_srp_set_prime_bits.3
 APIMANS += gnutls_srp_verifier.3
+APIMANS += gnutls_srp_set_server_credentials_function.3
+APIMANS += gnutls_srp_set_client_credentials_function.3
 APIMANS += gnutls_srp_base64_encode.3
 APIMANS += gnutls_srp_base64_encode_alloc.3
 APIMANS += gnutls_srp_base64_decode.3
@@ -322,12 +324,12 @@ APIMANS += gnutls_psk_set_server_credentials_file.3
 APIMANS += gnutls_psk_set_server_credentials_hint.3
 APIMANS += gnutls_psk_server_get_username.3
 APIMANS += gnutls_psk_client_get_hint.3
+APIMANS += gnutls_psk_set_server_credentials_function.3
+APIMANS += gnutls_psk_set_client_credentials_function.3
 APIMANS += gnutls_hex_encode.3
 APIMANS += gnutls_hex_decode.3
 APIMANS += gnutls_psk_set_server_dh_params.3
 APIMANS += gnutls_psk_set_server_params_function.3
-APIMANS += gnutls_x509_crt_get_subject_alt_othername_oid.3
-APIMANS += gnutls_x509_crt_get_subject_alt_othername_oid.3
 APIMANS += gnutls_auth_get_type.3
 APIMANS += gnutls_auth_server_get_type.3
 APIMANS += gnutls_auth_client_get_type.3
@@ -337,6 +339,7 @@ APIMANS += gnutls_dh_get_peers_public_bits.3
 APIMANS += gnutls_dh_get_prime_bits.3
 APIMANS += gnutls_dh_get_group.3
 APIMANS += gnutls_dh_get_pubkey.3
+APIMANS += gnutls_certificate_set_retrieve_function.3
 APIMANS += gnutls_certificate_set_verify_function.3
 APIMANS += gnutls_certificate_server_set_request.3
 APIMANS += gnutls_certificate_get_peers.3
@@ -682,14 +685,12 @@ APIMANS += gnutls_x509_trust_list_add_crls.3
 APIMANS += gnutls_x509_trust_list_verify_named_crt.3
 APIMANS += gnutls_x509_trust_list_verify_crt.3
 
-$(APIMANS): manpages-update
-
 dist_man_MANS += $(APIMANS)
 
-manpages-update:
-	make update-makefile
-	make Makefile
-	make doit
+$(APIMANS):
+        make update-makefile
+        make Makefile
+        make doit
 
 update-makefile:
 	FUNCS=`cat $(top_srcdir)/lib/includes/gnutls/*.h | $(top_srcdir)/doc/scripts/getfuncs.pl`; \
