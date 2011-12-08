@@ -196,7 +196,8 @@ doit (void)
   if (ret < 0)
     fail("gnutls_certificate_get_isser");
   
-  fprintf(stderr, "Issuer's DN: %s\n", dn);
+  if (debug)
+    fprintf(stderr, "Issuer's DN: %s\n", dn);
   for (i=0;i<list_size;i++)
     gnutls_x509_crt_deinit(list[i]);
   gnutls_certificate_free_credentials(x509_cred);
