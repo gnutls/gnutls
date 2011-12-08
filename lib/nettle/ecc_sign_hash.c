@@ -72,7 +72,7 @@ ecc_sign_hash (const unsigned char *in, unsigned long inlen,
     {
       if ((err =
            ecc_make_key_ex (random_ctx, random, &pubkey, key->prime,
-                            key->order, key->A, key->B, key->Gx, key->Gy)) != 0)
+                            key->order, key->A, key->B, key->Gx, key->Gy, 1)) != 0)
         {
           goto errnokey;
         }

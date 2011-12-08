@@ -38,12 +38,14 @@
   @param A            The "a" parameter of the curve
   @param Gx           The x coordinate of the base point
   @param Gy           The y coordinate of the base point
+  @timing_res         If non zero the function will try to return in constant time.
   @return 0 if successful, upon error all allocated memory will be freed
 */
 
 int
 ecc_make_key_ex (void *random_ctx, nettle_random_func random, ecc_key * key,
-                 mpz_t prime, mpz_t order, mpz_t A, mpz_t B, mpz_t Gx, mpz_t Gy)
+                 mpz_t prime, mpz_t order, mpz_t A, mpz_t B, mpz_t Gx, mpz_t Gy,
+                 int timing_res)
 {
   int err;
   ecc_point *base;
@@ -99,12 +101,14 @@ ecc_make_key_ex (void *random_ctx, nettle_random_func random, ecc_key * key,
       mpz_mod (key->k, key->k, key->order);
     }
   /* make the public key */
-  if ((err =
-       ecc_mulmod (key->k, base, &key->pubkey, key->A, key->prime,
-                       1)) != 0)
-    {
-      goto errkey;
-    }
+  if (timing_res)
+    err = ecc_mulmod_timing (key->k, base, &key->pubkey, key->A, key->prime, 1);
+  else
+    err = ecc_mulmod (key->k, base, &key->pubkey, key->A, key->prime, 1);
+
+  if (err != 0)
+    goto errkey;
+
   key->type = PK_PRIVATE;
 
   /* free up ram */
@@ -142,7 +146,7 @@ ecc_make_key (void *random_ctx, nettle_random_func random, ecc_key * key,
   mpz_set_str (A, (char *) dp->A, 16);
   mpz_set_str (B, (char *) dp->B, 16);
 
-  err = ecc_make_key_ex (random_ctx, random, key, prime, order, A, B, Gx, Gy);
+  err = ecc_make_key_ex (random_ctx, random, key, prime, order, A, B, Gx, Gy, 0);
 
   mp_clear_multi (&prime, &order, &A, &B, &Gx, &Gy, NULL);
 cleanup:
