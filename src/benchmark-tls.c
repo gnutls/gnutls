@@ -42,12 +42,15 @@
 
 #define PRIO_DH "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+DHE-RSA"
 #define PRIO_ECDH "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-SECP224R1"
+#define PRIO_ECDHE_ECDSA "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-SECP224R1"
 #define PRIO_RSA "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+RSA"
 
 #define PRIO_AES_CBC_SHA1 "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-DH"
 #define PRIO_ARCFOUR_128_MD5 "NONE:+VERS-TLS1.0:+ARCFOUR-128:+MD5:+SIGN-ALL:+COMP-NULL:+ANON-DH"
 #define PRIO_AES_GCM "NONE:+VERS-TLS1.2:+AES-128-GCM:+AEAD:+SIGN-ALL:+COMP-NULL:+ANON-DH"
 #define PRIO_CAMELLIA_CBC_SHA1 "NONE:+VERS-TLS1.0:+CAMELLIA-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ANON-DH"
+
+/* #define PARAMS_1024 */
 
 #ifdef PARAMS_1024
 const char *pkcs3 = 
@@ -168,14 +171,46 @@ static unsigned char server_key_pem[] =
   "-----END RSA PRIVATE KEY-----\n";
 #endif
 
+static unsigned char server_ecc_key_pem[] =
+  "-----BEGIN EC PRIVATE KEY-----\n"
+  "MGgCAQEEHHX3xeBOGgIxxtuhhpbwdwZnJztR7+uZTHnYuL+gBwYFK4EEACGhPAM6\n"
+  "AATS8yZ/9bStGhSoHEflSr5z+xHvoSWbJkx7bOPdT09EnSZoqy0Q4eSloNpJTqzY\n"
+  "fKL0vzzBLVlfSA==\n"
+  "-----END EC PRIVATE KEY-----\n";
+
+static unsigned char server_ecc_cert_pem[] =
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIICsDCCAWigAwIBAgIETeC0kjANBgkqhkiG9w0BAQsFADAZMRcwFQYDVQQDEw5H\n"
+  "bnVUTFMgVGVzdCBDQTAeFw0xMTA1MjgwODM4NDNaFw0zODEwMTIwODM4NDZaMDEx\n"
+  "LzAtBgNVBAMTJkdudVRMUyBUZXN0IHNlcnZlciAoRUNEU0EgY2VydGlmaWNhdGUp\n"
+  "ME4wEAYHKoZIzj0CAQYFK4EEACEDOgAE0vMmf/W0rRoUqBxH5Uq+c/sR76ElmyZM\n"
+  "e2zj3U9PRJ0maKstEOHkpaDaSU6s2Hyi9L88wS1ZX0ijgY0wgYowDAYDVR0TAQH/\n"
+  "BAIwADAUBgNVHREEDTALgglsb2NhbGhvc3QwEwYDVR0lBAwwCgYIKwYBBQUHAwEw\n"
+  "DwYDVR0PAQH/BAUDAweAADAdBgNVHQ4EFgQUJ97Q83IFpLgqeOnT1rX/JzCvlTQw\n"
+  "HwYDVR0jBBgwFoAUTVa3agBY8WeS9KZ1VRuOUwED788wDQYJKoZIhvcNAQELBQAD\n"
+  "ggExAErP9z8CCwt7YwA+SHoulNjqcXsngeKAKN9fVgV/XuspG6L2nU1WZvCjjFj6\n"
+  "jggMbJSElyCuLZJKlTC/DihXUgRXyswOzg9qQ7dDv+V/Qi95XH5slXNzYxMQSdoA\n"
+  "IaULVVDZcMFMVSc+TyAchJ6XwUY9umiysz3lSOioMQCch4MA366ZNqqnq5OD4moH\n"
+  "1SUX8CbRjA6SLpvffexLTB2Af+mFi8ReTkXCwB1LGEH1HRp/XzBc+/F9mavy3g/6\n"
+  "Hnjf2E1h2GDYXcJCVfE+ArjNS+R94jJwRMFBvwD/x2hsvpSajDpO0+GIxlGGKdyh\n"
+  "7o4puz/BqHwSzX9h7I7RvFEogDUNUzLgHMdcjq5usnmQpdWNUP8Xs/WqLjML+/PT\n"
+  "+jyCwmll0lPlC2RqAx3pM1XrjjQ=\n"
+  "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t server_cert = { server_cert_pem,
   sizeof (server_cert_pem)
 };
 
-
 const gnutls_datum_t server_key = { server_key_pem,
   sizeof (server_key_pem)
+};
+
+const gnutls_datum_t server_ecc_cert = { server_ecc_cert_pem,
+  sizeof (server_ecc_cert_pem)
+};
+
+const gnutls_datum_t server_ecc_key = { server_ecc_key_pem,
+  sizeof (server_ecc_key_pem)
 };
 
 char buffer[64 * 1024];
@@ -316,6 +351,8 @@ static void test_ciphersuite_kx(const char *cipher_prio)
 
     gnutls_certificate_set_x509_key_mem (s_certcred, &server_cert, &server_key,
                                          GNUTLS_X509_FMT_PEM);
+    gnutls_certificate_set_x509_key_mem (s_certcred, &server_ecc_cert, &server_ecc_key,
+                                         GNUTLS_X509_FMT_PEM);
 
     start_benchmark(&st);
 
@@ -402,13 +439,12 @@ void benchmark_tls(int debug_level)
     test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, 4096);
     test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, 8 * 1024);
     test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, 15 * 1024);
-    printf("\n");
 
-    printf("Testing key exchanges:\n");
+    printf("\nTesting key exchanges:\n");
     test_ciphersuite_kx(PRIO_DH);
     test_ciphersuite_kx(PRIO_ECDH);
+    test_ciphersuite_kx(PRIO_ECDHE_ECDSA);
     test_ciphersuite_kx(PRIO_RSA);
-
 
     gnutls_global_deinit();
     
