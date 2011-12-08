@@ -19,10 +19,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 .text	
-.globl	_gnutls_cpuid
-.def	_gnutls_cpuid;	.scl 2;	.type 32;	.endef
+.globl	gnutls_cpuid
+.def	gnutls_cpuid;	.scl 2;	.type 32;	.endef
 .p2align	4
-_gnutls_cpuid:
+gnutls_cpuid:
 	pushq	%rbp
 	movq	%rsp,%rbp
 	pushq	%rbx

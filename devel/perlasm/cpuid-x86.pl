@@ -12,7 +12,7 @@ require "x86asm.pl";
 
 &asm_init($ARGV[0],$0);
 
-&function_begin_B("_gnutls_cpuid");
+&function_begin_B("gnutls_cpuid");
 	&push	("ebp");
 	&mov    ("ebp", "esp");
 	&sub    ("esp", 12);
@@ -39,9 +39,9 @@ require "x86asm.pl";
 	&mov    ("esp","ebp");
 	&pop	("ebp");
 	&ret    ();
-&function_end_B("_gnutls_cpuid");
+&function_end_B("gnutls_cpuid");
 
-&function_begin_B("_gnutls_have_cpuid");
+&function_begin_B("gnutls_have_cpuid");
 	&pushf	();
 	&pop    ("eax");
 	&or     ("eax",0x200000);
@@ -51,7 +51,7 @@ require "x86asm.pl";
 	&pop    ("eax");
 	&and     ("eax",0x200000);
 	&ret    ();
-&function_end_B("_gnutls_have_cpuid");
+&function_end_B("gnutls_have_cpuid");
 
 &asciz("CPUID for x86");
 &asm_finish();

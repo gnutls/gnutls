@@ -30,7 +30,7 @@
 void _gnutls_register_accel_crypto(void)
 {
 #if defined(ASM_X86)
-  if (_gnutls_have_cpuid() != 0)
+  if (gnutls_have_cpuid() != 0)
     {
       register_x86_crypto ();
       register_padlock_crypto ();

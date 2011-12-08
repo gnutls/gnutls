@@ -214,7 +214,7 @@ static unsigned
 check_via (void)
 {
   unsigned int a, b, c, d;
-  _gnutls_cpuid (0, &a, &b, &c, &d);
+  gnutls_cpuid (0, &a, &b, &c, &d);
 
   if ((memcmp (&b, "Cent", 4) == 0 &&
        memcmp (&d, "aurH", 4) == 0 && memcmp (&c, "auls", 4) == 0))

@@ -26,10 +26,10 @@ $code=".text\n";
 
 
 $code.=<<___;
-.globl _gnutls_cpuid
-.type _gnutls_cpuid,\@abi-omnipotent
+.globl gnutls_cpuid
+.type gnutls_cpuid,\@abi-omnipotent
 .align	16
-_gnutls_cpuid:
+gnutls_cpuid:
 	pushq	%rbp
 	movq	%rsp, %rbp
 	pushq	%rbx
@@ -58,7 +58,7 @@ _gnutls_cpuid:
 	popq	%rbx
 	leave
 	ret
-.size _gnutls_cpuid,.-_gnutls_cpuid
+.size gnutls_cpuid,.-gnutls_cpuid
 ___
 
 $code =~ s/\`([^\`]*)\`/eval($1)/gem;

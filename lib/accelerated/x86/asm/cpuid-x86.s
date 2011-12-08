@@ -20,9 +20,11 @@
 #
 .file	"devel/perlasm/cpuid-x86.s"
 .text
-.type	_gnutls_cpuid,@function
+.globl	gnutls_cpuid
+.type	gnutls_cpuid,@function
 .align	16
-_gnutls_cpuid:
+gnutls_cpuid:
+.L_gnutls_cpuid_begin:
 	pushl	%ebp
 	movl	%esp,%ebp
 	subl	$12,%esp
@@ -49,10 +51,12 @@ _gnutls_cpuid:
 	movl	%ebp,%esp
 	popl	%ebp
 	ret
-.size	_gnutls_cpuid,.-_gnutls_cpuid
-.type	_gnutls_have_cpuid,@function
+.size	gnutls_cpuid,.-.L_gnutls_cpuid_begin
+.globl	gnutls_have_cpuid
+.type	gnutls_have_cpuid,@function
 .align	16
-_gnutls_have_cpuid:
+gnutls_have_cpuid:
+.L_gnutls_have_cpuid_begin:
 	pushfl
 	popl	%eax
 	orl	$2097152,%eax
@@ -62,7 +66,7 @@ _gnutls_have_cpuid:
 	popl	%eax
 	andl	$2097152,%eax
 	ret
-.size	_gnutls_have_cpuid,.-_gnutls_have_cpuid
+.size	gnutls_have_cpuid,.-.L_gnutls_have_cpuid_begin
 .byte	67,80,85,73,68,32,102,111,114,32,120,56,54,0
 
 .section .note.GNU-stack,"",%progbits

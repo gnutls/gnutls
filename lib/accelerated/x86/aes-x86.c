@@ -126,7 +126,7 @@ static unsigned
 check_optimized_aes (void)
 {
   unsigned int a, b, c, d;
-  _gnutls_cpuid (1, &a, &b, &c, &d);
+  gnutls_cpuid (1, &a, &b, &c, &d);
 
   return (c & 0x2000000);
 }
@@ -136,7 +136,7 @@ static unsigned
 check_pclmul (void)
 {
   unsigned int a, b, c, d;
-  _gnutls_cpuid (1, &a, &b, &c, &d);
+  gnutls_cpuid (1, &a, &b, &c, &d);
 
   return (c & 0x2);
 }
@@ -146,7 +146,7 @@ static unsigned
 check_intel_or_amd (void)
 {
   unsigned int a, b, c, d;
-  _gnutls_cpuid (0, &a, &b, &c, &d);
+  gnutls_cpuid (0, &a, &b, &c, &d);
 
   if ((memcmp (&b, "Genu", 4) == 0 &&
        memcmp (&d, "ineI", 4) == 0 &&

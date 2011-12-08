@@ -19,10 +19,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 .text	
-.globl	_gnutls_cpuid
-.type	_gnutls_cpuid,@function
+.globl	gnutls_cpuid
+.type	gnutls_cpuid,@function
 .align	16
-_gnutls_cpuid:
+gnutls_cpuid:
 	pushq	%rbp
 	movq	%rsp,%rbp
 	pushq	%rbx
@@ -51,6 +51,6 @@ _gnutls_cpuid:
 	popq	%rbx
 	leave
 	.byte	0xf3,0xc3
-.size	_gnutls_cpuid,.-_gnutls_cpuid
+.size	gnutls_cpuid,.-gnutls_cpuid
 
 .section .note.GNU-stack,"",%progbits
