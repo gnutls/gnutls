@@ -29,7 +29,7 @@ void gnutls_cpuid(unsigned int func, unsigned int *ax, unsigned int *bx, unsigne
 # ifdef ASM_X86_32
 unsigned int gnutls_have_cpuid(void);
 # else
-#  define _gnutls_have_cpuid() 1
+#  define gnutls_have_cpuid() 1
 # endif /* ASM_X86_32 */
 
 #endif
