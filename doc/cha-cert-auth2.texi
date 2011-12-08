@@ -5,7 +5,7 @@
 @menu
 * PKCS 10 certificate requests::
 * PKIX certificate revocation lists::
-* PKCS 12 structures::
+* Managing encrypted keys::
 * The certtool application::
 * Hardware tokens::
 * Abstract key types::
@@ -111,8 +111,40 @@ CRL number extension and the authority key identifier.
 
 @showfuncB{gnutls_x509_crl_set_number,gnutls_x509_crl_set_authority_key_id}
 
-@node PKCS 12 structures
-@section @acronym{PKCS} #12 structures
+@node Managing encrypted keys
+@section Managing encrypted keys
+@cindex Encrypted keys
+
+Transferring or storing private keys in plain might not be a
+good idea. Any access on the keys becomes a fatal compromise.
+Storing the keys in hardware tokens (see @ref{Hardware tokens})
+could solve the storage problem but it is not always practical
+or efficient enough. This section describes alternative ways
+that involve encryption of the private keys to store and
+transfer.
+
+There are two alternatives to use for key encryption, 
+PKCS #8 and #12 methods of private key encryption. The PKCS #8
+method only allows encryption of the private key, whilst the
+PKCS #12 method allows in addition the bundling of other
+data into the structure. That could be bundling together the
+certificate as well as the trusted CA certificate.
+
+@subheading @acronym{PKCS} #8 structures
+@cindex PKCS #8
+
+PKCS #8 keys can be imported and exported as normal private keys using
+the functions below. An addition to the normal import functions, are
+a password and a flags argument. The flags can be any element of the @code{gnutls_pkcs_encrypt_flags_t}
+enumeration. Note however, that GnuTLS only supports the PKCS #5 PBES2
+encryption scheme. Keys encrypted with the obsolete PBES1 scheme cannot 
+be decrypted.
+
+@showfuncB{gnutls_x509_privkey_import_pkcs8,gnutls_x509_privkey_export_pkcs8}
+
+@showenumdesc{gnutls_pkcs_encrypt_flags_t,Encryption flags}
+
+@subheading @acronym{PKCS} #12 structures
 @cindex PKCS #12
 
 A @acronym{PKCS} #12 structure @xcite{PKCS12} usually contains a user's
