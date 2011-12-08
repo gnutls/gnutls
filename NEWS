@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.0.9 (unreleased)
 
+** libgnutls: Optimizations in the elliptic curve code (timing
+attacks resistant code is only used in ECDSA private key operations).
+
 ** doc: man pages for API functions generation was fixed and are
 now added again in the distribution.
 
