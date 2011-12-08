@@ -515,13 +515,14 @@ signing_key
 
 
 @node Hardware tokens
-@section Hardware tokens
+@section Security modules
 @cindex PKCS #11 tokens
 @cindex hardware tokens
+@cindex hardware security modules
 @cindex smart cards
 
 @menu
-* Introduction on hardware tokens::
+* Introduction on security modules::
 * PKCS11 Initialization::
 * Reading objects::
 * Writing objects::
@@ -529,24 +530,27 @@ signing_key
 * The p11tool application::
 @end menu
 
-@node Introduction on hardware tokens
+@node Introduction on security modules
 @subsection Introduction
-This section copes with hardware token support in @acronym{GnuTLS} using 
-@acronym{PKCS} #11 @xcite{PKCS11}.
-@acronym{PKCS} #11 is plugin API allowing applications to access cryptographic
-operations on a token, as well as to objects residing on the token. A token can 
-be a real hardware token such as a smart card and a trusted platform module (TPM), 
-or it can be a software component such as @acronym{Gnome Keyring}. The objects residing
-on such token can be
-certificates, public keys, private keys or even plain data or  secret keys. Of those
-certificates and public/private key pairs can be used with @acronym{GnuTLS}. Its
-main advantage is that it allows operations on private key objects such as decryption
-and signing without exposing the key.
+In this section we present the smart-card and hardware security module support 
+in @acronym{GnuTLS} using @acronym{PKCS} #11 @xcite{PKCS11}. Hardware security
+modules and smart cards provide a way to store private keys and perform
+operations on them without exposing them. This allows decoupling cryptographic
+keys from the applications that use them providing an additional security layer.
+Since this can also be achieved in software components such as in Gnome keyring,
+we will use the term security module to describe such an isolation interface.
 
-A @acronym{PKCS} #11 module to access smart cards is provided by the 
-Opensc@footnote{@url{http://www.opensc-project.org}} project, and a 
-module to access the TPM chip on a PC is available from the Trousers@footnote{@url{http://trousers.sourceforge.net/}}
-project.
+@acronym{PKCS} #11 is plugin API allowing applications to access cryptographic
+operations on a security module, as well as to objects residing on it. PKCS
+#11 modules exist for hardware tokens such as smart cards@footnote{@url{http://www.opensc-project.org}},
+the trusted 
+platform module (TPM)@footnote{@url{http://trousers.sourceforge.net/}}
+as well as for software modules like @acronym{Gnome Keyring}. 
+The objects residing on a security module may be certificates, public keys, 
+private keys or secret keys. Of those certificates and public/private key 
+pairs can be used with @acronym{GnuTLS}. PKCS #11's main advantage is that 
+it allows operations on private key objects such as decryption
+and signing without exposing the key.
 
 Moreover @acronym{PKCS} #11 can be (ab)used to allow all applications in the same operating system to access
 shared cryptographic keys and certificates in a uniform way, as in @ref{fig:pkcs11-vision}.
