@@ -4,6 +4,8 @@ See the end for copying conditions.
 
 * Version 3.0.9 (unreleased)
 
+** libgnutls: Added the SECP192R1 curve.
+
 ** libgnutls: Optimizations in the elliptic curve code (timing
 attacks resistant code is only used in ECDSA private key operations).
 
