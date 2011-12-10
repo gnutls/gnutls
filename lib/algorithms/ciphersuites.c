@@ -25,14 +25,6 @@
 #include <gnutls_errors.h>
 #include <x509/common.h>
 
-static int
-compare_algo (gnutls_session_t session, const void *i_A1,
-                      const void *i_A2);
-static void
-_gnutls_qsort (gnutls_session_t session, void *_base, size_t nmemb,
-               size_t size, int (*compar) (gnutls_session_t, const void *,
-                                           const void *));
-
 /* Cipher SUITES */
 #define GNUTLS_CIPHER_SUITE_ENTRY( name, block_algorithm, kx_algorithm, mac_algorithm, min_version, max_version, dtls ) \
 	{ #name, {name}, block_algorithm, kx_algorithm, mac_algorithm, min_version, max_version, dtls, GNUTLS_MAC_SHA256}
@@ -42,7 +34,7 @@ _gnutls_qsort (gnutls_session_t session, void *_base, size_t nmemb,
 typedef struct
 {
   const char *name;
-  cipher_suite_st id;
+  const cipher_suite_st id;
   gnutls_cipher_algorithm_t block_algorithm;
   gnutls_kx_algorithm_t kx_algorithm;
   gnutls_mac_algorithm_t mac_algorithm;
@@ -626,7 +618,7 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                 for(p = cs_algorithms; p->name != NULL; p++) { b ; }
 
 #define GNUTLS_CIPHER_SUITE_ALG_LOOP(a) \
-                        GNUTLS_CIPHER_SUITE_LOOP( if( (p->id.suite[0] == suite->suite[0]) && (p->id.suite[1] == suite->suite[1])) { a; break; } )
+        GNUTLS_CIPHER_SUITE_LOOP( if( (p->id.suite[0] == suite->suite[0]) && (p->id.suite[1] == suite->suite[1])) { a; break; } )
 
 
 /* Cipher Suite's functions */
@@ -635,18 +627,6 @@ _gnutls_cipher_suite_get_cipher_algo (const cipher_suite_st * suite)
 {
   int ret = 0;
   GNUTLS_CIPHER_SUITE_ALG_LOOP (ret = p->block_algorithm);
-  return ret;
-}
-
-static int
-_gnutls_cipher_suite_is_version_supported (gnutls_session_t session, const cipher_suite_st * suite)
-{
-  int ret = 0;
-  int version = gnutls_protocol_get_version( session);
-  
-  GNUTLS_CIPHER_SUITE_ALG_LOOP (if (version >= p->min_version
-                                 && version <= p->max_version) ret = 1;
-                                 if (IS_DTLS(session) && p->dtls==0) ret = 0;);
   return ret;
 }
 
@@ -690,6 +670,27 @@ _gnutls_cipher_suite_get_name (cipher_suite_st * suite)
   return ret;
 }
 
+
+static const gnutls_cipher_suite_entry *
+cipher_suite_get (gnutls_kx_algorithm_t kx_algorithm,
+                              gnutls_cipher_algorithm_t cipher_algorithm,
+                              gnutls_mac_algorithm_t mac_algorithm)
+{
+  const gnutls_cipher_suite_entry *ret = NULL;
+
+  GNUTLS_CIPHER_SUITE_LOOP (
+      if (kx_algorithm == p->kx_algorithm &&
+          cipher_algorithm == p->block_algorithm && mac_algorithm == p->mac_algorithm)
+        {
+          ret = p;
+          break;
+        }
+  );
+
+  return ret;
+}
+
+
 /**
  * gnutls_cipher_suite_get_name:
  * @kx_algorithm: is a Key exchange algorithm
@@ -707,18 +708,13 @@ gnutls_cipher_suite_get_name (gnutls_kx_algorithm_t kx_algorithm,
                               gnutls_cipher_algorithm_t cipher_algorithm,
                               gnutls_mac_algorithm_t mac_algorithm)
 {
-  const char *ret = NULL;
+const gnutls_cipher_suite_entry * ce;
 
-  GNUTLS_CIPHER_SUITE_LOOP (
-      if (kx_algorithm == p->kx_algorithm &&
-          cipher_algorithm == p->block_algorithm && mac_algorithm == p->mac_algorithm)
-        {
-          ret = p->name + sizeof ("GNUTLS_") - 1;
-          break;
-        }
-  );
-
-  return ret;
+  ce = cipher_suite_get (kx_algorithm, cipher_algorithm, mac_algorithm);
+  if (ce == NULL)
+    return NULL;
+  else 
+    return ce->name + sizeof ("GNUTLS_") - 1;
 }
 
 /**
@@ -781,65 +777,38 @@ _gnutls_cipher_suite_is_ok (cipher_suite_st * suite)
 }
 
 int
-_gnutls_supported_ciphersuites_sorted (gnutls_session_t session,
-                                       uint8_t* cipher_suites, int max_cipher_suites_size)
-{
-
-  int count;
-
-  count = _gnutls_supported_ciphersuites (session, cipher_suites, max_cipher_suites_size);
-  if (count < 0)
-    return gnutls_assert_val(count);
-
-  _gnutls_qsort (session, cipher_suites, count/2,
-                 2, compare_algo);
-
-  return count;
-}
-
-int
 _gnutls_supported_ciphersuites (gnutls_session_t session,
                                 uint8_t *cipher_suites, int max_cipher_suite_size)
 {
 
-  unsigned int i, ret_count, j;
+  unsigned int i, ret_count, j, z, k=0;
+  const gnutls_cipher_suite_entry * ce;
+  int version = gnutls_protocol_get_version( session);
 
-  if (max_cipher_suite_size < (CIPHER_SUITES_COUNT)*2)
-    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+  for (i = 0; i < session->internals.priorities.kx.algorithms; i++)
+    for (j = 0; j < session->internals.priorities.cipher.algorithms; j++)
+      for (z = 0; z < session->internals.priorities.mac.algorithms; z++) 
+        {
+          ce = cipher_suite_get(session->internals.priorities.kx.priority[i],
+                                   session->internals.priorities.cipher.priority[j],
+                                   session->internals.priorities.mac.priority[z]);
 
-  for (i = j = 0; i < CIPHER_SUITES_COUNT; i++)
-    {
-      /* remove private cipher suites, if requested.
-       */
-      if (cs_algorithms[i].id.suite[0] == 0xFF &&
-          session->internals.enable_private == 0)
-        continue;
+          if (ce == NULL) continue;
 
-      /* remove cipher suites which do not support the
-       * protocol version used.
-       */
-      if (_gnutls_cipher_suite_is_version_supported (session, &cs_algorithms[i].id)
-          == 0)
-        continue;
+          if (!(version >= ce->min_version && version <= ce->max_version)) 
+            continue;
 
-      if (_gnutls_kx_priority
-          (session, _gnutls_cipher_suite_get_kx_algo (&cs_algorithms[i].id)) < 0)
-        continue;
+          if (IS_DTLS(session) && ce->dtls==0) 
+            continue;
 
-      if (_gnutls_mac_priority
-          (session, _gnutls_cipher_suite_get_mac_algo (&cs_algorithms[i].id)) < 0)
-        continue;
+          if (k+2 > max_cipher_suite_size)
+            return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
 
-      if (_gnutls_cipher_priority
-          (session,
-           _gnutls_cipher_suite_get_cipher_algo (&cs_algorithms[i].id)) < 0)
-        continue;
+          memcpy (&cipher_suites[k], ce->id.suite, 2);
+          k+=2;
+        }
 
-      memcpy (&cipher_suites[j], &cs_algorithms[i].id.suite, 2);
-      j+=2;
-    }
-
-  ret_count = j;
+  ret_count = k;
 
   /* This function can no longer return 0 cipher suites.
    * It returns an error code instead.
@@ -852,128 +821,3 @@ _gnutls_supported_ciphersuites (gnutls_session_t session,
   return ret_count;
 }
 
-#define SWAP(x, y) memcpy(tmp,x,size); \
-		   memcpy(x,y,size); \
-		   memcpy(y,tmp,size);
-
-#define MAX_ELEM_SIZE 4
-static inline int
-_gnutls_partition (gnutls_session_t session, void *_base,
-                   size_t nmemb, size_t size,
-                   int (*compar) (gnutls_session_t,
-                                  const void *, const void *))
-{
-  uint8_t *base = _base;
-  uint8_t tmp[MAX_ELEM_SIZE];
-  uint8_t ptmp[MAX_ELEM_SIZE];
-  unsigned int pivot;
-  unsigned int i, j;
-  unsigned int full;
-
-  i = pivot = 0;
-  j = full = (nmemb - 1) * size;
-
-  memcpy (ptmp, &base[0], size);        /* set pivot item */
-
-  while (i < j)
-    {
-      while ((compar (session, &base[i], ptmp) <= 0) && (i < full))
-        {
-          i += size;
-        }
-      while ((compar (session, &base[j], ptmp) >= 0) && (j > 0))
-        j -= size;
-
-      if (i < j)
-        {
-          SWAP (&base[j], &base[i]);
-        }
-    }
-
-  if (j > pivot)
-    {
-      SWAP (&base[pivot], &base[j]);
-      pivot = j;
-    }
-  else if (i < pivot)
-    {
-      SWAP (&base[pivot], &base[i]);
-      pivot = i;
-    }
-  return pivot / size;
-}
-
-static void
-_gnutls_qsort (gnutls_session_t session, void *_base, size_t nmemb,
-               size_t size, int (*compar) (gnutls_session_t, const void *,
-                                           const void *))
-{
-  unsigned int pivot;
-  char *base = _base;
-  size_t snmemb = nmemb;
-
-#ifdef DEBUG
-  if (size > MAX_ELEM_SIZE)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("QSORT BUG\n");
-      exit (1);
-    }
-#endif
-
-  if (snmemb <= 1)
-    return;
-  pivot = _gnutls_partition (session, _base, nmemb, size, compar);
-
-  _gnutls_qsort (session, base, pivot < nmemb ? pivot + 1 : pivot, size,
-                 compar);
-  _gnutls_qsort (session, &base[(pivot + 1) * size], nmemb - pivot - 1,
-                 size, compar);
-}
-
-
-/* a compare function for KX algorithms (using priorities). 
- * For use with qsort 
- */
-static int
-compare_algo (gnutls_session_t session, const void *i_A1,
-                      const void *i_A2)
-{
-  cipher_suite_st A1, A2;
-  gnutls_kx_algorithm_t kA1, kA2;
-  gnutls_cipher_algorithm_t cA1, cA2;
-  gnutls_mac_algorithm_t mA1, mA2;
-  int p1, p2;
-  
-  memcpy(A1.suite, i_A1, 2);
-  memcpy(A2.suite, i_A2, 2);
-
-  kA1 = _gnutls_cipher_suite_get_kx_algo (&A1);
-  kA2 = _gnutls_cipher_suite_get_kx_algo (&A2);
-  
-  cA1 = _gnutls_cipher_suite_get_cipher_algo (&A1);
-  cA2 = _gnutls_cipher_suite_get_cipher_algo (&A2);
-  
-  mA1 = _gnutls_cipher_suite_get_mac_algo (&A1);
-  mA2 = _gnutls_cipher_suite_get_mac_algo (&A2);
-
-  p1 = (_gnutls_kx_priority (session, kA1) + 1) * 256;
-  p2 = (_gnutls_kx_priority (session, kA2) + 1) * 256;
-  p1 += (_gnutls_cipher_priority (session, cA1) + 1) * 16;
-  p2 += (_gnutls_cipher_priority (session, cA2) + 1) * 16;
-  p1 += _gnutls_mac_priority (session, mA1);
-  p2 += _gnutls_mac_priority (session, mA2);
-
-  if (p1 > p2)
-    {
-      return 1;
-    }
-  else
-    {
-      if (p1 == p2)
-        {
-          return 0;
-        }
-      return -1;
-    }
-}

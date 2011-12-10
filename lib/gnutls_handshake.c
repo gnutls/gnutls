@@ -1613,7 +1613,7 @@ _gnutls_copy_ciphersuites (gnutls_session_t session,
   int cipher_suites_size;
   size_t init_length = cdata->length;
 
-  ret = _gnutls_supported_ciphersuites_sorted (session, cipher_suites, sizeof(cipher_suites)-2);
+  ret = _gnutls_supported_ciphersuites (session, cipher_suites, sizeof(cipher_suites)-2);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
