@@ -478,15 +478,14 @@ print_info (gnutls_session_t session, const char *hostname, int insecure)
           }
       }
 
-      if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS)
-        print_dh_info (session, "Ephemeral ");
-      else if (kx == GNUTLS_KX_ECDHE_RSA || kx == GNUTLS_KX_ECDHE_ECDSA)
-        print_ecdh_info(session, "Ephemeral ");
-
       print_cert_info (session, hostname, insecure);
 
       print_cert_vrfy (session);
 
+      if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS)
+        print_dh_info (session, "Ephemeral ");
+      else if (kx == GNUTLS_KX_ECDHE_RSA || kx == GNUTLS_KX_ECDHE_ECDSA)
+        print_ecdh_info(session, "Ephemeral ");
     }
 
   tmp = SU (gnutls_protocol_get_name (gnutls_protocol_get_version (session)));
