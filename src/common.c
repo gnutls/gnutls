@@ -570,16 +570,41 @@ print_cert_info (gnutls_session_t session, const char *hostname, int insecure)
 }
 
 void
-print_list (int verbose)
+print_list (const char* priorities, int verbose)
 {
-  {
     size_t i;
+    int ret;
     const char *name;
-    char id[2];
+    const char *err;
+    unsigned char id[2];
     gnutls_kx_algorithm_t kx;
     gnutls_cipher_algorithm_t cipher;
     gnutls_mac_algorithm_t mac;
     gnutls_protocol_t version;
+    gnutls_priority_t pcache;
+
+    if (priorities != NULL)
+      {
+        printf ("Cipher suites for %s\n", priorities);
+        
+        ret = gnutls_priority_init(&pcache, priorities, &err);
+        if (ret < 0)
+          {
+            fprintf (stderr, "Syntax error at: %s\n", err);
+            exit(1);
+          }
+      
+        for (i=0;;i++)
+          {
+            ret = gnutls_priority_get_cipher_suite(pcache, i, &name, id);
+            if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE) break;
+            if (ret == GNUTLS_E_UNKNOWN_CIPHER_SUITE) continue;
+            
+            printf ("%-50s\t0x%02x, 0x%02x\n", name, id[0], id[1]);
+          }
+          
+        return;
+      }
 
     printf ("Cipher suites:\n");
     for (i = 0; (name = gnutls_cipher_suite_info
@@ -594,7 +619,6 @@ print_list (int verbose)
                   gnutls_kx_get_name (kx),
                   gnutls_cipher_get_name (cipher), gnutls_mac_get_name (mac));
       }
-  }
 
   {
     const gnutls_certificate_type_t *p = gnutls_certificate_type_list ();

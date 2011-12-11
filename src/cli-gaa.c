@@ -160,7 +160,7 @@ void gaa_help(void)
 	__gaa_helpsingle(0, "benchmark-ciphers", "", "Benchmark individual ciphers.");
 	__gaa_helpsingle(0, "benchmark-soft-ciphers", "", "Benchmark individual software ciphers.");
 	__gaa_helpsingle(0, "benchmark-tls", "", "Benchmark ciphers and key exchange methods in TLS.");
-	__gaa_helpsingle('l', "list", "", "Print a list of the supported algorithms and modes.");
+	__gaa_helpsingle('l', "list", "", "Print a list of the supported algorithms and modes. If a priority string is given then only the ciphersuites enabled by the priority are shown.");
 	__gaa_helpsingle('h', "help", "", "prints this help");
 	__gaa_helpsingle('v', "version", "", "prints the program's version number");
 
@@ -793,7 +793,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_list:
 	OK = 0;
 #line 106 "cli.gaa"
-{ print_list(gaaval->verbose); exit(0); ;};
+{ print_list(gaaval->priorities, gaaval->verbose); exit(0); ;};
 
 		return GAA_OK;
 		break;

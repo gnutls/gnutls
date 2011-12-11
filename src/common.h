@@ -33,7 +33,7 @@ extern const char str_unknown[];
 int print_info (gnutls_session_t state, const char *hostname, int insecure);
 void print_cert_info (gnutls_session_t state, const char *hostname,
                       int insecure);
-void print_list (int verbose);
+void print_list (const char* priorities, int verbose);
 
 const char *raw_to_string (const unsigned char *raw, size_t raw_size);
 int service_to_port (const char *service);

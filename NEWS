@@ -4,7 +4,14 @@ See the end for copying conditions.
 
 * Version 3.0.9 (unreleased)
 
+** certtool: -l option was overloaded so if combined with --priority
+it will only list the ciphersuites that are enabled by the given
+priority string.
+
 ** libgnutls: Added the SECP192R1 curve.
+
+** libgnutls: Added gnutls_priority_get_cipher_suite() to
+allow listing the ciphersuites enabled in a priority structure.
 
 ** libgnutls: Optimizations in the elliptic curve code (timing
 attacks resistant code is only used in ECDSA private key operations).
@@ -13,7 +20,7 @@ attacks resistant code is only used in ECDSA private key operations).
 now added again in the distribution.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_priority_get_cipher_suite: Added
 
 
 * Version 3.0.8 (released 2011-11-12)

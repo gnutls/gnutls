@@ -737,7 +737,7 @@ const gnutls_cipher_suite_entry * ce;
  **/
 const char *
 gnutls_cipher_suite_info (size_t idx,
-                          char *cs_id,
+                          unsigned char *cs_id,
                           gnutls_kx_algorithm_t * kx,
                           gnutls_cipher_algorithm_t * cipher,
                           gnutls_mac_algorithm_t * mac,
@@ -819,5 +819,61 @@ _gnutls_supported_ciphersuites (gnutls_session_t session,
       return GNUTLS_E_NO_CIPHER_SUITES;
     }
   return ret_count;
+}
+
+/**
+ * gnutls_priority_get_cipher_suite:
+ * @pcache: is a #gnutls_prioritity_t structure.
+ * @idx: is an index number
+ * @name: Will point to the ciphersuite name
+ * @cs_id: output buffer with room for 2 bytes, indicating cipher suite value
+ *
+ * Provides ciphersuite information. The index provided is an internal
+ * index kept at the priorities structure. It might be that a valid index
+ * does not correspond to a ciphersuite and in that case %GNUTLS_E_UNKNOWN_CIPHER_SUITE
+ * will be returned. Once the last available index is crossed then 
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+ *
+ * Returns: On success it returns %GNUTLS_E_SUCCESS (0), or a negative error value otherwise.
+ **/
+int
+gnutls_priority_get_cipher_suite (gnutls_priority_t pcache, int idx, const char** name, unsigned char cs_id[2])
+{
+int mac_idx, cipher_idx, kx_idx;
+int total = pcache->mac.algorithms * pcache->cipher.algorithms * pcache->kx.algorithms;
+const gnutls_cipher_suite_entry * ce;
+
+  if (idx >= total)
+    return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+
+  mac_idx = idx % pcache->mac.algorithms;
+  
+  idx /= pcache->mac.algorithms;
+  cipher_idx = idx % pcache->cipher.algorithms;
+
+  idx /= pcache->cipher.algorithms;
+  kx_idx = idx % pcache->kx.algorithms;
+
+  ce = cipher_suite_get(pcache->kx.priority[kx_idx], pcache->cipher.priority[cipher_idx],
+                        pcache->mac.priority[mac_idx]);
+  
+  if (ce == NULL) 
+    {
+      *name = NULL;
+      memset(cs_id, 0, 2);
+    }
+  else 
+    {
+      *name = ce->name;
+      memcpy(cs_id, ce->id.suite, 2);
+    }
+
+  if (*name == NULL) 
+    {
+      *name = "(no corresponding ciphersuite)";
+      return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
+    }
+    
+  return 0;
 }
 

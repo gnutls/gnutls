@@ -103,7 +103,7 @@ option ( benchmark-ciphers) { benchmark_cipher(1, $debug); exit(0) } "Benchmark 
 option ( benchmark-soft-ciphers) { benchmark_cipher(0, $debug); exit(0) } "Benchmark individual software ciphers."
 option ( benchmark-tls) { benchmark_tls($debug); exit(0) } "Benchmark ciphers and key exchange methods in TLS."
 
-option (l, list) { print_list($verbose); exit(0); } "Print a list of the supported algorithms and modes."
+option (l, list) { print_list($priorities, $verbose); exit(0); } "Print a list of the supported algorithms and modes. If a priority string is given then only the ciphersuites enabled by the priority are shown."
 option (h, help) { gaa_help(); exit(0); } "prints this help"
 
 option (v, version) { cli_version(); exit(0); } "prints the program's version number"

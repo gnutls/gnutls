@@ -807,7 +807,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 	case GAAOPTID_list:
 	OK = 0;
 #line 103 "serv.gaa"
-{ print_list(0); exit(0); ;};
+{ print_list(gaaval->priorities, 0); exit(0); ;};
 
 		return GAA_OK;
 		break;

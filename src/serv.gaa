@@ -100,7 +100,7 @@ option (srppasswdconf) STR "FILE" { $srp_passwd_conf = $1 } "SRP password conf f
 #char *priorities;
 option (priority) STR "PRIORITY STRING" { $priorities = $1 } "Priorities string."
 
-option (l, list) { print_list(0); exit(0); } "Print a list of the supported algorithms  and modes."
+option (l, list) { print_list($priorities, 0); exit(0); } "Print a list of the supported algorithms  and modes."
 option (h, help) { gaa_help(); exit(0); } "prints this help"
 
 option (v, version) { serv_version(); exit(0); } "prints the program's version number"
