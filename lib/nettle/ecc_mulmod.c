@@ -43,7 +43,7 @@ ecc_mulmod (mpz_t k, ecc_point * G, ecc_point * R, mpz_t a, mpz_t modulus,
 {
    ecc_point *tG, *M[8];
    int        i, j, err, bitidx;
-   int        first, bitbuf, bitcpy, bitcnt, mode;
+   int        first, bitbuf, bitcpy, mode;
 
    if (k == NULL || G == NULL || R == NULL || modulus == NULL)
      return -1;
@@ -92,7 +92,6 @@ ecc_mulmod (mpz_t k, ecc_point * G, ecc_point * R, mpz_t a, mpz_t modulus,
 
    /* setup sliding window */
    mode   = 0;
-   bitcnt = 1;
    bitidx = mpz_size (k) * GMP_NUMB_BITS - 1;
    bitcpy = bitbuf = 0;
    first  = 1;
