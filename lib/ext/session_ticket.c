@@ -658,6 +658,8 @@ _gnutls_send_new_session_ticket (gnutls_session_t session, int again)
       p += MAC_SIZE;
 
       data_size = p - data;
+      
+      session->internals.ticket_sent = 1;
     }
   return _gnutls_send_handshake (session, data_size ? bufel : NULL,
                                 GNUTLS_HANDSHAKE_NEW_SESSION_TICKET);

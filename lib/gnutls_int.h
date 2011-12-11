@@ -659,6 +659,7 @@ typedef struct
   gnutls_buffer_st handshake_hash_buffer;       /* used to keep the last received handshake 
                                                  * message */
   unsigned int resumable:1;              /* TRUE or FALSE - if we can resume that session */
+  unsigned int ticket_sent:1;            /* whether a session ticket was sent */
   handshake_state_t handshake_state;    /* holds
                                          * a number which indicates where
                                          * the handshake procedure has been
