@@ -8,6 +8,9 @@ See the end for copying conditions.
 it will only list the ciphersuites that are enabled by the given
 priority string.
 
+** libgnutls: When session tickets are negotiated and used in a
+session, a server will not store that session data into its cache.
+
 ** libgnutls: Added the SECP192R1 curve.
 
 ** libgnutls: Added gnutls_priority_get_cipher_suite() to
