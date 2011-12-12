@@ -215,6 +215,7 @@ APIMANS += gnutls_session_ticket_enable_server.3
 APIMANS += gnutls_key_generate.3
 APIMANS += gnutls_priority_init.3
 APIMANS += gnutls_priority_deinit.3
+APIMANS += gnutls_priority_get_cipher_suite.3
 APIMANS += gnutls_priority_set.3
 APIMANS += gnutls_priority_set_direct.3
 APIMANS += gnutls_set_default_priority.3

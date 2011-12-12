@@ -909,7 +909,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   int gnutls_priority_init (gnutls_priority_t * priority_cache,
                             const char *priorities, const char **err_pos);
   void gnutls_priority_deinit (gnutls_priority_t priority_cache);
-  int gnutls_priority_get_cipher_suite (gnutls_priority_t pcache, int idx, const char** name, unsigned char cs_id[2]);
+  int gnutls_priority_get_cipher_suite_index (gnutls_priority_t pcache, unsigned int idx, unsigned int *sidx);
 
   int gnutls_priority_set (gnutls_session_t session,
                            gnutls_priority_t priority);

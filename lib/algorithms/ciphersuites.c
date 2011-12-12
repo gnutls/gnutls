@@ -824,24 +824,24 @@ _gnutls_supported_ciphersuites (gnutls_session_t session,
 /**
  * gnutls_priority_get_cipher_suite:
  * @pcache: is a #gnutls_prioritity_t structure.
- * @idx: is an index number
- * @name: Will point to the ciphersuite name
- * @cs_id: output buffer with room for 2 bytes, indicating cipher suite value
+ * @idx: is an index number.
+ * @sidx: internal index of cipher suite to get information about.
  *
- * Provides ciphersuite information. The index provided is an internal
- * index kept at the priorities structure. It might be that a valid index
- * does not correspond to a ciphersuite and in that case %GNUTLS_E_UNKNOWN_CIPHER_SUITE
- * will be returned. Once the last available index is crossed then 
+ * Provides the internal ciphersuite index to be used with
+ * gnutls_cipher_suite_info(). The index @idx provided is an 
+ * index kept at the priorities structure. It might be that a valid
+ * priorities index does not correspond to a ciphersuite and in 
+ * that case %GNUTLS_E_UNKNOWN_CIPHER_SUITE will be returned. 
+ * Once the last available index is crossed then 
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
  *
  * Returns: On success it returns %GNUTLS_E_SUCCESS (0), or a negative error value otherwise.
  **/
 int
-gnutls_priority_get_cipher_suite (gnutls_priority_t pcache, int idx, const char** name, unsigned char cs_id[2])
+gnutls_priority_get_cipher_suite_index (gnutls_priority_t pcache, unsigned int idx, unsigned int *sidx)
 {
-int mac_idx, cipher_idx, kx_idx;
+int mac_idx, cipher_idx, kx_idx, i;
 int total = pcache->mac.algorithms * pcache->cipher.algorithms * pcache->kx.algorithms;
-const gnutls_cipher_suite_entry * ce;
 
   if (idx >= total)
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
@@ -854,26 +854,15 @@ const gnutls_cipher_suite_entry * ce;
   idx /= pcache->cipher.algorithms;
   kx_idx = idx % pcache->kx.algorithms;
 
-  ce = cipher_suite_get(pcache->kx.priority[kx_idx], pcache->cipher.priority[cipher_idx],
-                        pcache->mac.priority[mac_idx]);
-  
-  if (ce == NULL) 
+  for (i=0;i<CIPHER_SUITES_COUNT;i++)
     {
-      *name = NULL;
-      memset(cs_id, 0, 2);
+      if (cs_algorithms[i].kx_algorithm == pcache->kx.priority[kx_idx] &&
+          cs_algorithms[i].block_algorithm == pcache->cipher.priority[cipher_idx] &&
+          cs_algorithms[i].mac_algorithm == pcache->mac.priority[mac_idx])
+        {
+          *sidx = i;
+          return 0;
+        }
     }
-  else 
-    {
-      *name = ce->name;
-      memcpy(cs_id, ce->id.suite, 2);
-    }
-
-  if (*name == NULL) 
-    {
-      *name = "(no corresponding ciphersuite)";
-      return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
-    }
-    
-  return 0;
+  return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 }
-

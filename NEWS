@@ -16,8 +16,9 @@ session, a server will not store that session data into its cache.
 
 ** libgnutls: Added the SECP192R1 curve.
 
-** libgnutls: Added gnutls_priority_get_cipher_suite() to
+** libgnutls: Added gnutls_priority_get_cipher_suite_index() to
 allow listing the ciphersuites enabled in a priority structure.
+It outputs and index to be used in gnutls_get_cipher_suite_info().
 
 ** libgnutls: Optimizations in the elliptic curve code (timing
 attacks resistant code is only used in ECDSA private key operations).
@@ -26,7 +27,7 @@ attacks resistant code is only used in ECDSA private key operations).
 now added again in the distribution.
 
 ** API and ABI modifications:
-gnutls_priority_get_cipher_suite: Added
+gnutls_priority_get_cipher_suite_index: Added
 
 
 * Version 3.0.8 (released 2011-11-12)
