@@ -47,13 +47,16 @@
 /* returns the public value (X), and the secret (ret_x).
  */
 bigint_t
-gnutls_calc_dh_secret (bigint_t * ret_x, bigint_t g, bigint_t prime)
+gnutls_calc_dh_secret (bigint_t * ret_x, bigint_t g, bigint_t prime, 
+                       unsigned int q_bits)
 {
   bigint_t e, x = NULL;
-  int x_size = _gnutls_mpi_get_nbits (prime) - 1;
-  /* The size of the secret key is less than
-   * prime/2
-   */
+  int x_size;
+  
+  if (q_bits == 0)
+    x_size = _gnutls_mpi_get_nbits (prime) - 1;
+  else
+    x_size = q_bits;
 
   if (x_size > MAX_BITS || x_size <= 0)
     {

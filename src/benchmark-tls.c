@@ -55,9 +55,12 @@
 #ifdef PARAMS_1024
 const char *pkcs3 = 
   "-----BEGIN DH PARAMETERS-----\n"
-  "MIGHAoGBAO6vCrmts43WnDP4CvqPxehgcmGHdf88C56iMUycJWV21nTfdJbqgdM4\n"
-  "O0gT1pLG4ODV2OJQuYvkjklcHWCJ2tFdx9e0YVTWts6O9K1psV1JglWbKXvPGIXF\n"
-  "KfVmZg5X7GjtvDwFcmzAL9TL9Jduqpr9UTj+g3ZDW5/GHS/A6wbjAgEC\n"
+  "MIIBCwKBgQCsIrA9BK23OUVIwrC4c65YJ2t8bqoGpJpuISjO07lAbWHWa47Kf9/t\n"
+  "F9ckO2AF6Yj1Y7xS+FSCDeoIZsp0LCq3nAP9Ls25fgHrKSMPQBJt2vd5mUdm90Wr\n"
+  "wCK2YjogQ7YVQlovVHsnJWC6Kf0P+OQ4hrihoBCGSj9sGK3wH57m+wKBgH5xlPNR\n"
+  "pI8E2WBNqB6y4sV3eMGRvygScbbFUFFO1ccmNJl5Y5L/O+fP0ZXtmUJVsSvlY0fp\n"
+  "Kcl6k5WCWMY8h6iHlJ9teHmC4s2jifXtaV759kJXdqrGEjRPEku50y3ANzDLzklW\n"
+  "8R7HcSO397vIdouaUt38FbQESnIWOIZqDtq6AgIAnw==\n"
   "-----END DH PARAMETERS-----\n";
 
 /* RSA key of 1024 bits */
@@ -98,13 +101,13 @@ static unsigned char server_key_pem[] =
  */
 const char *pkcs3 =
   "-----BEGIN DH PARAMETERS-----\n"
-  "MIIBPgKBnBw2c5yglfuVfHxYAmWQmLfO1K2sEqTY4panDGgf/aF4HGuGcTfy511c\n"
-  "d3+/C7SJuMEM9RwKt503qb9pLEHVbZsXLECGVFcX3c5UAkPKKB/zhcmz6facSLn7\n"
-  "o8hLC30DQM9IQ26N7BaOGcEgeya+NGGUk7yC+v+tRiCG2OU/0mQTAx4g7OCVBRAn\n"
-  "piJ6yW5kNzNJkKKGOnLXzcXbzwKBnA/aNsM6bmYOx5N2iybHQ0/Dltp8s/2Sw9YY\n"
-  "oWBZNLJRCHyB1Q+MH1n3GJ7oEqG0/D9i+byA41I/KNvaaZVK+Oai8pvcdDwdrSxW\n"
-  "AMbtukYTxc4eGedtDuwHP55+AlRS+daRZQXbq43aFauPgGiwpm0I+EnMhg25owV2\n"
-  "jgL3Ag174DhfvwcMsgC1EO1G0gsxjCc4BD5NKdqvJDNaxw==\n"
+  "MIIBQwKBnQDgLx3SqWyHOfGn/03r1tRwf3pByo3C4V1YIjjDQUoIzn82tRMPEKsL\n"
+  "vos7WXjKgF1+S+T5Y9A7XqivGv1XJ1ZmDvewXVRByxjGRZbkoqCPw4Zv0Uyl9pjV\n"
+  "WaR/Y/emZrN51K0zkdFJCzCt3lPlO3UprnYYHkySRpxTJ4ab5iXRFXETA5rJ5WH0\n"
+  "itGpoR5xb2fR1Gmg5kXCNutkZ9cCgZwqJUZwqKIHJ9cYtzvZXFpjZNgF+mRWyiFr\n"
+  "AQooJbFbVX3o2seJZl3mMqaetaLHF+L8anZFQipNgxenzQgEWEv8FubHXStaOnX1\n"
+  "cwjwwxmCUK4lpfCQZtJ1K3os2JCcNaTBUyxAfiXFIYJmO/os0hFhR6a4EjIlkcq0\n"
+  "yDDLN1weTNOpBPstp1WGHZCsKdJZzgfVvYL6er4zVBtBS0cCAgCg\n"
   "-----END DH PARAMETERS-----\n";
 
 static unsigned char server_cert_pem[] =

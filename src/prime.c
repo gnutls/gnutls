@@ -48,6 +48,7 @@ generate_prime (int how, common_info_st * info)
   gnutls_dh_params_t dh_params;
   gnutls_datum_t p, g;
   int bits = get_bits (GNUTLS_PK_DH, info->bits, info->sec_param);
+  unsigned int q_bits = 0;
 
   gnutls_dh_params_init (&dh_params);
 
@@ -69,7 +70,7 @@ generate_prime (int how, common_info_st * info)
           exit (1);
         }
 
-      ret = gnutls_dh_params_export_raw (dh_params, &p, &g, NULL);
+      ret = gnutls_dh_params_export_raw (dh_params, &p, &g, &q_bits);
       if (ret < 0)
         {
           fprintf (stderr, "Error exporting parameters: %s\n",
@@ -189,8 +190,9 @@ generate_prime (int how, common_info_st * info)
           fprintf (outfile, "%.2x", p.data[i]);
         }
 
-      fprintf (outfile, "\n\n");
-
+      if (q_bits > 0)
+        fprintf (outfile, "\n\nRecommended key length: %d bits\n", q_bits);
+      fprintf (outfile, "\n");
     }
 
   if (!cparams)

@@ -197,6 +197,7 @@ gnutls_dh_params_generate2 (gnutls_dh_params_t params, unsigned int bits)
 
   params->params[0] = group.p;
   params->params[1] = group.g;
+  params->q_bits = group.q_bits;
 
   return 0;
 }
@@ -223,6 +224,7 @@ gnutls_dh_params_import_pkcs3 (gnutls_dh_params_t params,
 {
   ASN1_TYPE c2;
   int result, need_free = 0;
+  unsigned int q_bits;
   gnutls_datum_t _params;
 
   if (format == GNUTLS_X509_FMT_PEM)
@@ -283,6 +285,16 @@ gnutls_dh_params_import_pkcs3 (gnutls_dh_params_t params,
       asn1_delete_structure (&c2);
       return _gnutls_asn2err (result);
     }
+
+  /* Read q length */
+  result = _gnutls_x509_read_uint (c2, "privateValueLength", &q_bits);
+  if (result < 0) 
+    {
+      gnutls_assert ();
+      params->q_bits = 0;
+    }
+  else
+    params->q_bits = q_bits;
 
   /* Read PRIME 
    */
@@ -380,6 +392,18 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
       return _gnutls_asn2err (result);
     }
 
+  if (params->q_bits > 0)
+    result = _gnutls_x509_write_uint32 (c2, "privateValueLength", params->q_bits);
+  else
+    result = asn1_write_value (c2, "privateValueLength", NULL, 0);
+
+  if (result < 0)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&c2);
+      return _gnutls_asn2err (result);
+    }
+
   /* Write the GENERATOR
    */
   if ((result = asn1_write_value (c2, "base",
@@ -393,13 +417,6 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
 
   gnutls_free (all_data);
 
-  if ((result = asn1_write_value (c2, "privateValueLength",
-                                  NULL, 0)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&c2);
-      return _gnutls_asn2err (result);
-    }
 
   if (format == GNUTLS_X509_FMT_DER)
     {
@@ -492,7 +509,7 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
  * @params: Holds the DH parameters
  * @prime: will hold the new prime
  * @generator: will hold the new generator
- * @bits: if non null will hold is the prime's number of bits
+ * @bits: if non null will hold the secret key's number of bits
  *
  * This function will export the pair of prime and generator for use
  * in the Diffie-Hellman key exchange.  The new parameters will be
@@ -531,7 +548,7 @@ gnutls_dh_params_export_raw (gnutls_dh_params_t params,
     }
 
   if (bits)
-    *bits = _gnutls_mpi_get_nbits (params->params[0]);
+    *bits = params->q_bits;
 
   return 0;
 

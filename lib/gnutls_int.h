@@ -586,6 +586,8 @@ typedef struct gnutls_dh_params_int
   /* [0] is the prime, [1] is the generator.
    */
   bigint_t params[2];
+  int q_bits; /* length of q in bits. If zero then length is unknown.
+              */
 } dh_params_st;
 
 typedef struct

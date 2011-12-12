@@ -177,7 +177,7 @@ gen_psk_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  ret = _gnutls_dh_common_print_server_kx (session, g, p, data);
+  ret = _gnutls_dh_common_print_server_kx (session, g, p, dh_params->q_bits, data);
   if (ret < 0)
     gnutls_assert ();
 

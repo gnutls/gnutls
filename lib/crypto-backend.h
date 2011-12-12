@@ -78,6 +78,7 @@
   {
     bigint_t g;                 /* group generator */
     bigint_t p;                 /* prime */
+    int q_bits;                 /* the number of bits of q */
   } gnutls_group_st;
 
 /**

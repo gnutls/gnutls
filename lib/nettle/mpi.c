@@ -413,7 +413,7 @@ wrap_nettle_prime_check (bigint_t pp)
  *
  */
 inline static int
-gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
+gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits, unsigned int *q_bits)
 {
   mpz_t q, w, r;
   unsigned int p_bytes = nbits / 8;
@@ -520,8 +520,9 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
         }
     }
 
+  *q_bits = wrap_nettle_mpi_get_nbits (&q);
   _gnutls_debug_log ("Found prime q of %u bits. Looking for generator...\n",
-                     wrap_nettle_mpi_get_nbits (&q));
+                     *q_bits);
 
   /* finally a prime! Let calculate generator
    */
@@ -585,6 +586,7 @@ wrap_nettle_generate_group (gnutls_group_st * group, unsigned int bits)
   int ret;
   bigint_t p = wrap_nettle_mpi_new (bits);
   bigint_t g;
+  unsigned int q_bits;
 
   if (p == NULL)
     {
@@ -600,7 +602,7 @@ wrap_nettle_generate_group (gnutls_group_st * group, unsigned int bits)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  ret = gen_group (p, g, bits);
+  ret = gen_group (p, g, bits, &q_bits);
   if (ret < 0)
     {
       _gnutls_mpi_release (&g);
@@ -611,6 +613,7 @@ wrap_nettle_generate_group (gnutls_group_st * group, unsigned int bits)
 
   group->p = p;
   group->g = g;
+  group->q_bits = q_bits;
 
   return 0;
 }

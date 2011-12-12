@@ -99,7 +99,7 @@ gen_anon_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 
   _gnutls_dh_set_group (session, g, p);
 
-  ret = _gnutls_dh_common_print_server_kx (session, g, p, data);
+  ret = _gnutls_dh_common_print_server_kx (session, g, p, dh_params->q_bits, data);
   if (ret < 0)
     {
       gnutls_assert ();

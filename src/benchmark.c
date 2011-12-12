@@ -102,14 +102,14 @@ void start_benchmark(struct benchmark_st * st)
       fprintf (stderr, "error: CreateThread %u\n", GetLastError ());
       exit(1);
     }
-  st->alarm_timeout.QuadPart = (5) * 10000000;
+  st->alarm_timeout.QuadPart = (2) * 10000000;
   if (SetWaitableTimer (st->wtimer, &st->alarm_timeout, 0, NULL, NULL, FALSE) == 0)
     {
       fprintf (stderr, "error: SetWaitableTimer %u\n", GetLastError ());
       exit(1);
     }
 #else
-  alarm (5);
+  alarm (2);
 #endif
   
 }
