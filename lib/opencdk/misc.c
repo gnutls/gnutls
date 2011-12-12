@@ -186,7 +186,7 @@ _cdk_tmpfile (void)
   FILE *fp;
   int fd, i;
 
-  gnutls_rnd (GNUTLS_RND_NONCE, rnd, DIM (rnd));
+  _gnutls_rnd (GNUTLS_RND_NONCE, rnd, DIM (rnd));
   for (i = 0; i < DIM (rnd) - 1; i++)
     {
       char c = letters[(unsigned char) rnd[i] % 26];

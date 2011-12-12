@@ -27,7 +27,18 @@
 #include <crypto-backend.h>
 
 extern int crypto_rnd_prio;
+extern void* gnutls_rnd_ctx;
 extern gnutls_crypto_rnd_st _gnutls_rnd_ops;
+
+inline static int
+_gnutls_rnd (gnutls_rnd_level_t level, void *data, size_t len)
+{
+  if (len > 0)
+    {
+      return _gnutls_rnd_ops.rnd (gnutls_rnd_ctx, level, data, len);
+    }
+  return 0;
+}
 
 void _gnutls_rnd_deinit (void);
 int _gnutls_rnd_init (void);

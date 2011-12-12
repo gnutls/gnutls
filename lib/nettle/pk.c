@@ -48,7 +48,7 @@ static inline int is_supported_curve(int curve);
 static void
 rnd_func (void *_ctx, unsigned length, uint8_t * data)
 {
-  gnutls_rnd (GNUTLS_RND_RANDOM, data, length);
+  _gnutls_rnd (GNUTLS_RND_RANDOM, data, length);
 }
 
 static void

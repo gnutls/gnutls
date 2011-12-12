@@ -1901,7 +1901,7 @@ generate_key (schema_id schema,
   opaque rnd[2];
   int ret;
 
-  ret = gnutls_rnd (GNUTLS_RND_RANDOM, rnd, 2);
+  ret = _gnutls_rnd (GNUTLS_RND_RANDOM, rnd, 2);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -1944,7 +1944,7 @@ generate_key (schema_id schema,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ret = gnutls_rnd (GNUTLS_RND_RANDOM, kdf_params->salt,
+  ret = _gnutls_rnd (GNUTLS_RND_RANDOM, kdf_params->salt,
                      kdf_params->salt_size);
   if (ret < 0)
     {
@@ -1986,7 +1986,7 @@ generate_key (schema_id schema,
 
       if (enc_params->iv_size)
         {
-          ret = gnutls_rnd (GNUTLS_RND_NONCE,
+          ret = _gnutls_rnd (GNUTLS_RND_NONCE,
                              enc_params->iv, enc_params->iv_size);
           if (ret < 0)
             {

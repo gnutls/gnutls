@@ -91,7 +91,7 @@ _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
           return GNUTLS_E_INTERNAL_ERROR;
         }
 
-      ret = gnutls_rnd (GNUTLS_RND_RANDOM, ps, psize);
+      ret = _gnutls_rnd (GNUTLS_RND_RANDOM, ps, psize);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -101,7 +101,7 @@ _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
       for (i = 0; i < psize; i++)
         while (ps[i] == 0)
           {
-            ret = gnutls_rnd (GNUTLS_RND_RANDOM, &ps[i], 1);
+            ret = _gnutls_rnd (GNUTLS_RND_RANDOM, &ps[i], 1);
             if (ret < 0)
               {
                 gnutls_assert ();

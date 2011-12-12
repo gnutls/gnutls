@@ -27,14 +27,14 @@
 #include <gnutls_errors.h>
 #include <random.h>
 
-static void *rnd_ctx;
+void *gnutls_rnd_ctx;
 
 int
 _gnutls_rnd_init (void)
 {
   if (_gnutls_rnd_ops.init != NULL)
     {
-      if (_gnutls_rnd_ops.init (&rnd_ctx) < 0)
+      if (_gnutls_rnd_ops.init (&gnutls_rnd_ctx) < 0)
         {
           gnutls_assert ();
           return GNUTLS_E_RANDOM_FAILED;
@@ -49,7 +49,7 @@ _gnutls_rnd_deinit (void)
 {
   if (_gnutls_rnd_ops.deinit != NULL)
     {
-      _gnutls_rnd_ops.deinit (rnd_ctx);
+      _gnutls_rnd_ops.deinit (gnutls_rnd_ctx);
     }
 
   return;
@@ -71,9 +71,5 @@ _gnutls_rnd_deinit (void)
 int
 gnutls_rnd (gnutls_rnd_level_t level, void *data, size_t len)
 {
-  if (len > 0)
-    {
-      return _gnutls_rnd_ops.rnd (rnd_ctx, level, data, len);
-    }
-  return 0;
+  return _gnutls_rnd(level, data, len);
 }
