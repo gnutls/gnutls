@@ -415,7 +415,7 @@ wrap_nettle_prime_check (bigint_t pp)
 inline static int
 gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
 {
-  mpz_t q, w;
+  mpz_t q, w, r;
   unsigned int p_bytes = nbits / 8;
   opaque *buffer = NULL;
   unsigned int q_bytes, w_bytes, r_bytes, w_bits;
@@ -458,6 +458,7 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
   mpz_init (*generator);
   mpz_init (q);
   mpz_init (w);
+  mpz_init (r);
 
   /* search for a prime. We are not that unlucky so search
    * forever.
@@ -535,7 +536,7 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
 
   mpz_mul_ui (w, w, 2);         /* w = w*2 */
   mpz_fdiv_r (w, w, *prime);
-
+  
   for (;;)
     {
       ret = _gnutls_rnd (GNUTLS_RND_NONCE, buffer, r_bytes);
@@ -545,11 +546,11 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
           return ret;
         }
 
-      nettle_mpz_set_str_256_u (q, r_bytes, buffer);
-      mpz_fdiv_r (q, q, *prime);
+      nettle_mpz_set_str_256_u (r, r_bytes, buffer);
+      mpz_fdiv_r (r, r, *prime);
 
       /* check if r^w mod n != 1 mod n */
-      mpz_powm (*generator, q, w, *prime);
+      mpz_powm (*generator, r, w, *prime);
 
       if (mpz_cmp_ui (*generator, 1) == 0)
         continue;
@@ -559,20 +560,20 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
 
   _gnutls_debug_log ("Found generator g of %u bits\n",
                      wrap_nettle_mpi_get_nbits (generator));
-  _gnutls_debug_log ("Prime n is of %u bits\n",
+  _gnutls_debug_log ("Prime n is %u bits\n",
                      wrap_nettle_mpi_get_nbits (prime));
 
-  mpz_clear (q);
-  mpz_clear (w);
-  gnutls_free (buffer);
-
-  return 0;
+  ret = 0;
+  goto exit;
 
 fail:
-  mpz_clear (q);
-  mpz_clear (w);
   mpz_clear (*prime);
   mpz_clear (*generator);
+
+exit:
+  mpz_clear (q);
+  mpz_clear (w);
+  mpz_clear (r);
   gnutls_free (buffer);
 
   return ret;
