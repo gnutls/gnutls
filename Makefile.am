@@ -30,3 +30,8 @@ endif
 ACLOCAL_AMFLAGS = -I m4 -I gl/m4
 
 EXTRA_DIST = cfg.mk maint.mk .clcopying
+
+dist-hook: 
+	rm -f ChangeLog
+	make ChangeLog
+	make -C doc/manpages doit

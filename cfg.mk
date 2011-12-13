@@ -95,7 +95,7 @@ upload-web-coverage:
 # Release
 
 ChangeLog:
-	git log --pretty --numstat --summary --since="2009 November 07" -- | git2cl > ChangeLog
+	git log --pretty --numstat --summary --since="2010 November 07" -- | git2cl > ChangeLog
 	cat .clcopying >> ChangeLog
 
 tag = $(PACKAGE)_`echo $(VERSION) | sed 's/\./_/g'`
