@@ -240,6 +240,7 @@ static const int supported_ecc_suiteb192[] = {
 };
 
 static const int supported_ecc_secure192[] = {
+  GNUTLS_ECC_CURVE_SECP384R1,
   GNUTLS_ECC_CURVE_SECP521R1,
   0
 };
@@ -377,11 +378,7 @@ static const int cipher_priority_secure128[] = {
 static const int cipher_priority_secure192[] = {
   GNUTLS_CIPHER_AES_256_CBC,
   GNUTLS_CIPHER_CAMELLIA_256_CBC,
-  GNUTLS_CIPHER_AES_128_CBC,
-  GNUTLS_CIPHER_CAMELLIA_128_CBC,
-  GNUTLS_CIPHER_AES_128_GCM,
   GNUTLS_CIPHER_AES_256_GCM,
-  GNUTLS_CIPHER_3DES_CBC,
   0
 };
 
@@ -447,6 +444,8 @@ static const int sign_priority_secure128[] = {
 };
 
 static const int sign_priority_secure192[] = {
+  GNUTLS_SIGN_RSA_SHA384,
+  GNUTLS_SIGN_ECDSA_SHA384,
   GNUTLS_SIGN_RSA_SHA512,
   GNUTLS_SIGN_ECDSA_SHA512,
   0
@@ -482,6 +481,7 @@ static const int mac_priority_secure128[] = {
 };
 
 static const int mac_priority_secure192[] = {
+  GNUTLS_MAC_SHA256,
   GNUTLS_MAC_SHA384,
   GNUTLS_MAC_AEAD,
   0
