@@ -677,6 +677,9 @@ or more.
 Means all "secure" ciphersuites of security level 192-bit
 or more.
 
+@item SECURE256 @tab
+Currently alias for SECURE192.
+
 @item SUITEB128 @tab
 Means all the NSA Suite B cryptography (RFC5430) ciphersuites
 with an 128 bit security level.
@@ -777,6 +780,10 @@ problematic clients and servers is achieved.
 will prevent the sending of any TLS extensions in client side. Note
 that TLS 1.2 requires extensions to be used, as well as safe
 renegotiation thus this option must be used with care.
+
+@item %SERVER_PRECEDENCE @tab
+The ciphersuite will be selected according to server priorities
+and not the client's.
 
 @item %DISABLE_SAFE_RENEGOTIATION @tab
 will disable safe renegotiation
