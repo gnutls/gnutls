@@ -987,24 +987,47 @@ _gnutls_server_select_comp_method (gnutls_session_t session,
       return x;
     }
 
-  for (j = 0; j < datalen; j++)
+  if (session->internals.priorities.server_precedence == 0)
+    {
+      for (j = 0; j < datalen; j++)
+        {
+          for (i = 0; i < x; i++)
+            {
+              if (comps[i] == data[j])
+                {
+                  gnutls_compression_method_t method =
+                    _gnutls_compression_get_id (comps[i]);
+
+                  _gnutls_epoch_set_compression (session, EPOCH_NEXT, method);
+                  session->security_parameters.compression_method = method;
+
+                  _gnutls_handshake_log
+                    ("HSK[%p]: Selected Compression Method: %s\n", session,
+                    gnutls_compression_get_name (method));
+                  return 0;
+                }
+            }
+        }
+    }
+  else
     {
       for (i = 0; i < x; i++)
         {
-          if (comps[i] == data[j])
+          for (j = 0; j < datalen; j++)
             {
-              gnutls_compression_method_t method =
-                _gnutls_compression_get_id (comps[i]);
+              if (comps[i] == data[j])
+                {
+                  gnutls_compression_method_t method =
+                    _gnutls_compression_get_id (comps[i]);
 
-              _gnutls_epoch_set_compression (session, EPOCH_NEXT, method);
-              session->security_parameters.compression_method = method;
+                  _gnutls_epoch_set_compression (session, EPOCH_NEXT, method);
+                  session->security_parameters.compression_method = method;
 
-              _gnutls_handshake_log
-                ("HSK[%p]: Selected Compression Method: %s\n", session,
-                 gnutls_compression_get_name (method));
-
-
-              return 0;
+                  _gnutls_handshake_log
+                    ("HSK[%p]: Selected Compression Method: %s\n", session,
+                    gnutls_compression_get_name (method));
+                  return 0;
+                }
             }
         }
     }
