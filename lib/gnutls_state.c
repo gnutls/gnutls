@@ -921,7 +921,7 @@ _gnutls_PRF (gnutls_session_t session,
   if (_gnutls_version_has_selectable_prf (ver))
     {
       result =
-        P_hash (_gnutls_cipher_suite_get_prf(&session->security_parameters.current_cipher_suite), 
+        P_hash (_gnutls_cipher_suite_get_prf(session->security_parameters.cipher_suite), 
                         secret, secret_size,
                         s_seed, s_seed_size, total_bytes, ret);
       if (result < 0)
@@ -1124,8 +1124,8 @@ _gnutls_session_is_export (gnutls_session_t session)
   gnutls_cipher_algorithm_t cipher;
 
   cipher =
-    _gnutls_cipher_suite_get_cipher_algo (&session->
-                                          security_parameters.current_cipher_suite);
+    _gnutls_cipher_suite_get_cipher_algo (session->
+                                          security_parameters.cipher_suite);
 
   if (_gnutls_cipher_get_export_flag (cipher) != 0)
     return 1;
@@ -1146,8 +1146,8 @@ _gnutls_session_is_psk (gnutls_session_t session)
   gnutls_kx_algorithm_t kx;
 
   kx =
-    _gnutls_cipher_suite_get_kx_algo (&session->
-                                      security_parameters.current_cipher_suite);
+    _gnutls_cipher_suite_get_kx_algo (session->
+                                      security_parameters.cipher_suite);
   if (kx == GNUTLS_KX_PSK || kx == GNUTLS_KX_DHE_PSK)
     return 1;
 
@@ -1170,8 +1170,8 @@ _gnutls_session_is_ecc (gnutls_session_t session)
    * the negotiated key exchange might not have been set yet.
    */
   kx =
-    _gnutls_cipher_suite_get_kx_algo (&session->
-                                      security_parameters.current_cipher_suite);
+    _gnutls_cipher_suite_get_kx_algo (session->
+                                      security_parameters.cipher_suite);
 
   return _gnutls_kx_is_ecc(kx);
 }

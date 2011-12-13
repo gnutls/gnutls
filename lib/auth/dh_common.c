@@ -163,7 +163,7 @@ _gnutls_gen_dh_common_client_kx_int (gnutls_session_t session, gnutls_buffer_st*
   _gnutls_mpi_release (&session->key->client_g);
 
   if (_gnutls_cipher_suite_get_kx_algo
-      (&session->security_parameters.current_cipher_suite)
+      (session->security_parameters.cipher_suite)
       != GNUTLS_KX_DHE_PSK)
     {
       ret = _gnutls_mpi_dprint (session->key->KEY, &session->key->key);

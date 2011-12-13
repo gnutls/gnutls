@@ -175,8 +175,8 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
    */
   if (_gnutls_get_kx_cred
       (session,
-       _gnutls_cipher_suite_get_kx_algo (&session->
-                                         security_parameters.current_cipher_suite),
+       _gnutls_cipher_suite_get_kx_algo (session->
+                                         security_parameters.cipher_suite),
        &err) == NULL && err != 0)
     {
       gnutls_assert ();
@@ -189,8 +189,8 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
    */
   session->internals.auth_struct =
     _gnutls_kx_auth_struct (_gnutls_cipher_suite_get_kx_algo
-                            (&session->
-                             security_parameters.current_cipher_suite));
+                            (session->
+                             security_parameters.cipher_suite));
   if (session->internals.auth_struct == NULL)
     {
 

@@ -421,11 +421,6 @@ typedef struct record_parameters_st record_parameters_st;
 
 typedef struct
 {
-  uint8_t suite[2];
-} cipher_suite_st;
-
-typedef struct
-{
   uint8_t hash_algorithm;
   uint8_t sign_algorithm;       /* pk algorithm actually */
 } sign_algorithm_st;
@@ -477,7 +472,7 @@ typedef struct
    * moved here from internals in order to be restored
    * on resume;
    */
-  cipher_suite_st current_cipher_suite;
+  uint8_t cipher_suite[2];
   gnutls_compression_method_t compression_method;
   opaque master_secret[GNUTLS_MASTER_SIZE];
   opaque client_random[GNUTLS_RANDOM_SIZE];

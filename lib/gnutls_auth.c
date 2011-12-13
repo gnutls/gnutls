@@ -177,8 +177,8 @@ gnutls_auth_get_type (gnutls_session_t session)
 
   return
     _gnutls_map_kx_get_cred (_gnutls_cipher_suite_get_kx_algo
-                             (&session->
-                              security_parameters.current_cipher_suite),
+                             (session->
+                              security_parameters.cipher_suite),
                              server);
 }
 
@@ -198,8 +198,8 @@ gnutls_auth_server_get_type (gnutls_session_t session)
 {
   return
     _gnutls_map_kx_get_cred (_gnutls_cipher_suite_get_kx_algo
-                             (&session->
-                              security_parameters.current_cipher_suite), 1);
+                             (session->
+                              security_parameters.cipher_suite), 1);
 }
 
 /**
@@ -218,8 +218,8 @@ gnutls_auth_client_get_type (gnutls_session_t session)
 {
   return
     _gnutls_map_kx_get_cred (_gnutls_cipher_suite_get_kx_algo
-                             (&session->
-                              security_parameters.current_cipher_suite), 0);
+                             (session->
+                              security_parameters.cipher_suite), 0);
 }
 
 

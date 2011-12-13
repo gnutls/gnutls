@@ -768,11 +768,7 @@ pack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
   BUFFER_APPEND_NUM (ps, session->security_parameters.entity);
   BUFFER_APPEND_NUM (ps, session->security_parameters.kx_algorithm);
   BUFFER_APPEND (ps,
-                 &session->security_parameters.current_cipher_suite.suite[0],
-                 1);
-  BUFFER_APPEND (ps,
-                 &session->security_parameters.current_cipher_suite.suite[1],
-                 1);
+                 session->security_parameters.cipher_suite, 2);
   BUFFER_APPEND_NUM (ps, session->security_parameters.compression_method);
   BUFFER_APPEND_NUM (ps, session->security_parameters.cert_type);
   BUFFER_APPEND_NUM (ps, session->security_parameters.version);
@@ -817,11 +813,8 @@ unpack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
   BUFFER_POP_NUM (ps,
               session->internals.resumed_security_parameters.kx_algorithm);
   BUFFER_POP (ps,
-              &session->internals.
-              resumed_security_parameters.current_cipher_suite.suite[0], 1);
-  BUFFER_POP (ps,
-              &session->internals.resumed_security_parameters.
-              current_cipher_suite.suite[1], 1);
+              session->internals.
+              resumed_security_parameters.cipher_suite, 2);
   BUFFER_POP_NUM (ps, session->internals.resumed_security_parameters.compression_method);
   BUFFER_POP_NUM (ps, session->internals.resumed_security_parameters.cert_type);
   BUFFER_POP_NUM (ps, session->internals.resumed_security_parameters.version);

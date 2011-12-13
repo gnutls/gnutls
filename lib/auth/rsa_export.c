@@ -93,7 +93,7 @@ _gnutls_get_private_rsa_params (gnutls_session_t session,
   ret = _gnutls_pubkey_is_over_rsa_512(session->internals.selected_cert_list[0].pubkey);
 
   if (_gnutls_cipher_suite_get_kx_algo
-      (&session->security_parameters.current_cipher_suite)
+      (session->security_parameters.cipher_suite)
       != GNUTLS_KX_RSA_EXPORT || ret < 0)
     {
       gnutls_assert ();

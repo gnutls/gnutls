@@ -321,7 +321,7 @@ _gnutls_init_record_state (record_parameters_st * params, gnutls_protocol_t ver,
 
 int
 _gnutls_epoch_set_cipher_suite (gnutls_session_t session,
-                                int epoch_rel, cipher_suite_st * suite)
+                                int epoch_rel, const uint8_t suite[2])
 {
   gnutls_cipher_algorithm_t cipher_algo;
   gnutls_mac_algorithm_t mac_algo;
@@ -454,7 +454,7 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
 
 #define CPY_COMMON dst->entity = src->entity; \
 	dst->kx_algorithm = src->kx_algorithm; \
-	memcpy( &dst->current_cipher_suite, &src->current_cipher_suite, sizeof(cipher_suite_st)); \
+	memcpy( dst->cipher_suite, src->cipher_suite, 2); \
 	memcpy( dst->master_secret, src->master_secret, GNUTLS_MASTER_SIZE); \
 	memcpy( dst->client_random, src->client_random, GNUTLS_RANDOM_SIZE); \
 	memcpy( dst->server_random, src->server_random, GNUTLS_RANDOM_SIZE); \
@@ -500,7 +500,7 @@ _gnutls_connection_state_init (gnutls_session_t session)
 
 static int
 _gnutls_check_algos (gnutls_session_t session,
-                     cipher_suite_st * suite,
+                     const uint8_t suite[2],
                      gnutls_compression_method_t comp_algo)
 {
   gnutls_cipher_algorithm_t cipher_algo;
@@ -557,16 +557,16 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
     {
 
       ret = _gnutls_check_algos (session,
-                                 &session->
-                                 security_parameters.current_cipher_suite,
+                                 session->
+                                 security_parameters.cipher_suite,
                                  _gnutls_epoch_get_compression(session, epoch_next));
       if (ret < 0)
         return ret;
 
       ret = _gnutls_set_kx (session,
                             _gnutls_cipher_suite_get_kx_algo
-                            (&session->
-                             security_parameters.current_cipher_suite));
+                            (session->
+                             security_parameters.cipher_suite));
       if (ret < 0)
         return ret;
     }
@@ -580,8 +580,8 @@ _gnutls_read_connection_state_init (gnutls_session_t session)
   _gnutls_handshake_log ("HSK[%p]: Cipher Suite: %s\n",
                          session,
                          _gnutls_cipher_suite_get_name
-                         (&session->
-                          security_parameters.current_cipher_suite));
+                         (session->
+                          security_parameters.cipher_suite));
 
   session->security_parameters.epoch_read = epoch_next;
 
@@ -605,16 +605,16 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
   if (session->internals.resumed == RESUME_FALSE)
     {
       ret = _gnutls_check_algos (session,
-                                 &session->
-                                 security_parameters.current_cipher_suite,
+                                 session->
+                                 security_parameters.cipher_suite,
                                  _gnutls_epoch_get_compression(session, epoch_next));
       if (ret < 0)
         return ret;
 
       ret = _gnutls_set_kx (session,
                             _gnutls_cipher_suite_get_kx_algo
-                            (&session->
-                             security_parameters.current_cipher_suite));
+                            (session->
+                             security_parameters.cipher_suite));
       if (ret < 0)
         return ret;
     }
@@ -627,8 +627,8 @@ _gnutls_write_connection_state_init (gnutls_session_t session)
 
   _gnutls_handshake_log ("HSK[%p]: Cipher Suite: %s\n", session,
                          _gnutls_cipher_suite_get_name
-                         (&session->
-                          security_parameters.current_cipher_suite));
+                         (session->
+                          security_parameters.cipher_suite));
 
   _gnutls_handshake_log
     ("HSK[%p]: Initializing internal [write] cipher sessions\n", session);

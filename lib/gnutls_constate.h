@@ -24,7 +24,7 @@
 #define GNUTLS_CONSTATE_H
 
 int _gnutls_epoch_set_cipher_suite (gnutls_session_t session, int epoch_rel,
-                                    cipher_suite_st * suite);
+                                    const uint8_t suite[2]);
 int _gnutls_epoch_set_compression (gnutls_session_t session, int epoch_rel,
                                    gnutls_compression_method_t comp_algo);
 int _gnutls_epoch_get_compression (gnutls_session_t session, int epoch_rel);
