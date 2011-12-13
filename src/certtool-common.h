@@ -32,6 +32,7 @@ enum
   ACTION_PUBKEY_INFO,
   ACTION_CERT_PUBKEY,
   ACTION_VERIFY,
+  ACTION_DH_INFO,
 };
 
 #define TYPE_CRT 1
@@ -74,6 +75,7 @@ gnutls_sec_param_t str_to_sec_param (const char *str);
 
 /* prime.c */
 int generate_prime (int how, common_info_st * info);
+void dh_info (common_info_st * ci);
 
 FILE *safe_open_rw (const char *file, int privkey_op);
 

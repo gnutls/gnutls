@@ -1065,6 +1065,9 @@ gaa_parser (int argc, char **argv)
     case ACTION_CERT_INFO:
       certificate_info (0, &cinfo);
       break;
+    case ACTION_DH_INFO:
+      dh_info (&cinfo);
+      break;
     case ACTION_CERT_PUBKEY:
       certificate_info (1, &cinfo);
       break;
