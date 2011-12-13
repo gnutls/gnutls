@@ -881,30 +881,58 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
   retval = GNUTLS_E_UNKNOWN_CIPHER_SUITE;
 
   _gnutls_handshake_log ("HSK[%p]: Requested cipher suites[size: %d]: \n", session, (int)datalen);
-  for (j = 0; j < datalen; j += 2)
+
+  if (session->internals.priorities.server_precedence == 0)
     {
-      memcpy (&cs.suite, &data[j], 2);
-      _gnutls_handshake_log ("\t0x%.2x, 0x%.2x %s\n", data[j], data[j+1], _gnutls_cipher_suite_get_name (&cs));
-      for (i = 0; i < cipher_suites_size; i+=2)
+      for (j = 0; j < datalen; j += 2)
         {
-          if (memcmp (&cipher_suites[i], &data[j], 2) == 0)
+          memcpy (&cs.suite, &data[j], 2);
+          _gnutls_handshake_log ("\t0x%.2x, 0x%.2x %s\n", data[j], data[j+1], _gnutls_cipher_suite_get_name (&cs));
+          for (i = 0; i < cipher_suites_size; i+=2)
             {
-              _gnutls_handshake_log
-                ("HSK[%p]: Selected cipher suite: %s\n", session,
-                 _gnutls_cipher_suite_get_name (&cs));
-              memcpy (session->security_parameters.current_cipher_suite.suite,
+              if (memcmp (&cipher_suites[i], &data[j], 2) == 0)
+                {
+                  _gnutls_handshake_log
+                    ("HSK[%p]: Selected cipher suite: %s\n", session,
+                    _gnutls_cipher_suite_get_name (&cs));
+                  memcpy (session->security_parameters.current_cipher_suite.suite,
                       &cipher_suites[i], 2);
-              _gnutls_epoch_set_cipher_suite (session, EPOCH_NEXT,
-                                              &session->
-                                              security_parameters.current_cipher_suite);
+                  _gnutls_epoch_set_cipher_suite (session, EPOCH_NEXT,
+                                                  &session->
+                                                  security_parameters.current_cipher_suite);
 
 
-              retval = 0;
-              goto finish;
+                  retval = 0;
+                  goto finish;
+                }
             }
         }
     }
+  else /* server selects */
+    {
+      for (i = 0; i < cipher_suites_size; i+=2)
+        {
+          for (j = 0; j < datalen; j += 2)
+            {
+              if (memcmp (&cipher_suites[i], &data[j], 2) == 0)
+                {
+                  memcpy (&cs.suite, &data[j], 2);
+                  _gnutls_handshake_log
+                    ("HSK[%p]: Selected cipher suite: %s\n", session,
+                    _gnutls_cipher_suite_get_name (&cs));
+                  memcpy (session->security_parameters.current_cipher_suite.suite,
+                      &cipher_suites[i], 2);
+                  _gnutls_epoch_set_cipher_suite (session, EPOCH_NEXT,
+                                                  &session->
+                                                  security_parameters.current_cipher_suite);
 
+
+                  retval = 0;
+                  goto finish;
+                }
+            }
+        }
+    }
 finish:
 
   if (retval != 0)

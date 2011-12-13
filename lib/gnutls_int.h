@@ -575,6 +575,7 @@ struct gnutls_priority_st
   unsigned int allow_large_records:1;
   safe_renegotiation_t sr;
   unsigned int ssl3_record_version:1;
+  unsigned int server_precedence:1;
   unsigned int additional_verify_flags;
 };
 

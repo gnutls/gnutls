@@ -10,6 +10,10 @@ See the end for copying conditions.
 it will only list the ciphersuites that are enabled by the given
 priority string.
 
+** libgnutls: Added new priority string %SERVER_PRECEDENCE, which
+changes the ciphersuite selection procedure. If specified the server
+priorities will be used for selection instead of the client's.
+
 ** libgnutls: Optimizations in Diffie-Hellman parameters generation
 and key exchange.
 

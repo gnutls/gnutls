@@ -945,6 +945,11 @@ gnutls_priority_init (gnutls_priority_t * priority_cache,
             {
               (*priority_cache)->sr = SR_DISABLED;
             }
+          else if (strcasecmp (&broken_list[i][1],
+                               "SERVER_PRECEDENCE") == 0)
+            {
+              (*priority_cache)->server_precedence = 1;
+            }
           else
             goto error;
         }
