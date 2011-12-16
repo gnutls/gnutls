@@ -474,7 +474,7 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits, unsigned int *q
 
       nettle_mpz_set_str_256_u (w, w_bytes, buffer);
       /* always odd */
-      mpz_setbit (q, 0);
+      mpz_setbit (w, 0);
 
       ret = mpz_probab_prime_p (w, PRIME_CHECK_PARAM);
       if (ret > 0)
@@ -500,7 +500,7 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits, unsigned int *q
 
       nettle_mpz_set_str_256_u (q, q_bytes, buffer);
       /* always odd */
-      mpz_setbit (w, 0);
+      mpz_setbit (q, 0);
 
       ret = mpz_probab_prime_p (q, PRIME_CHECK_PARAM);
       if (ret == 0)
