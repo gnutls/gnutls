@@ -776,6 +776,18 @@ _gnutls_cipher_suite_is_ok (const uint8_t suite[2])
 
 }
 
+/*-
+ * _gnutls_supported_ciphersuites: 
+ * @session: a TLS session
+ * @cipher_suites: Where the ciphersuites will be stored (2bytes each)
+ * @max_cipher_suite_size: the maximum size of the @cipher_suites buffer.
+ *
+ * Returns the supported ciphersuites by this session (based on priorities)
+ * sorted by order of preference.
+ *
+ * Returns the size of the @cipher_suites buffer, or a negative value on error.
+ *
+ -*/
 int
 _gnutls_supported_ciphersuites (gnutls_session_t session,
                                 uint8_t *cipher_suites, int max_cipher_suite_size)
