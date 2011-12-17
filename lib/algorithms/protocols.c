@@ -54,10 +54,10 @@ static const gnutls_version_entry sup_versions[] = {
 #define GNUTLS_VERSION_ALG_LOOP(a) \
 	GNUTLS_VERSION_LOOP( if(p->id == version) { a; break; })
 
-/* Version */
+/* Return the priority of the provided version number */
 int
 _gnutls_version_priority (gnutls_session_t session, gnutls_protocol_t version)
-{                               /* actually returns the priority */
+{
   unsigned int i;
 
   for (i = 0; i < session->internals.priorities.protocol.algorithms; i++)
@@ -68,9 +68,11 @@ _gnutls_version_priority (gnutls_session_t session, gnutls_protocol_t version)
   return -1;
 }
 
+/* Returns the lowest TLS version number in the priorities.
+ */
 gnutls_protocol_t
 _gnutls_version_lowest (gnutls_session_t session)
-{                               /* returns the lowest version supported */
+{
   unsigned int i, min = 0xff;
   gnutls_protocol_t cur_prot;
 
@@ -88,9 +90,11 @@ _gnutls_version_lowest (gnutls_session_t session)
   return min;
 }
 
+/* Returns the maximum version in the priorities 
+ */
 gnutls_protocol_t
 _gnutls_version_max (gnutls_session_t session)
-{                               /* returns the maximum version supported */
+{
   unsigned int i, max = 0x00;
   gnutls_protocol_t cur_prot;
 
@@ -189,6 +193,8 @@ _gnutls_version_get_minor (gnutls_protocol_t version)
   return ret;
 }
 
+/* Returns a version number given the major and minor numbers.
+ */
 gnutls_protocol_t
 _gnutls_version_get (int major, int minor)
 {
