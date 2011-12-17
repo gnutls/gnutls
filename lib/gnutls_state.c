@@ -1396,3 +1396,18 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session)
 {
   return _gnutls_session_ecc_curve_get(session);
 }
+
+#undef gnutls_protocol_get_version
+/**
+ * gnutls_protocol_get_version:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Get TLS version, a #gnutls_protocol_t value.
+ *
+ * Returns: The version of the currently used protocol.
+ **/
+gnutls_protocol_t
+gnutls_protocol_get_version (gnutls_session_t session)
+{
+  return _gnutls_protocol_get_version(session);
+}

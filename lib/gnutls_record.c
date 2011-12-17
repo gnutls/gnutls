@@ -58,28 +58,6 @@ struct tls_record_st {
   /* the data */
 };
 
-
-/**
- * gnutls_protocol_get_version:
- * @session: is a #gnutls_session_t structure.
- *
- * Get TLS version, a #gnutls_protocol_t value.
- *
- * Returns: The version of the currently used protocol.
- **/
-gnutls_protocol_t
-gnutls_protocol_get_version (gnutls_session_t session)
-{
-  return session->security_parameters.version;
-}
-
-void
-_gnutls_set_current_version (gnutls_session_t session,
-                             gnutls_protocol_t version)
-{
-  session->security_parameters.version = version;
-}
-
 /**
  * gnutls_record_disable_padding:
  * @session: is a #gnutls_session_t structure.

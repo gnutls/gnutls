@@ -878,8 +878,6 @@ struct gnutls_session_int
 
 /* functions 
  */
-void _gnutls_set_current_version (gnutls_session_t session,
-                                  gnutls_protocol_t version);
 void _gnutls_free_auth_info (gnutls_session_t session);
 
 /* These two macros return the advertized TLS version of
@@ -899,5 +897,20 @@ void _gnutls_set_adv_version (gnutls_session_t, gnutls_protocol_t);
 gnutls_protocol_t _gnutls_get_adv_version (gnutls_session_t);
 
 int _gnutls_is_secure_mem_null (const void *);
+
+inline static gnutls_protocol_t
+_gnutls_protocol_get_version (gnutls_session_t session)
+{
+  return session->security_parameters.version;
+}
+
+#define gnutls_protocol_get_version _gnutls_protocol_get_version
+
+inline static void
+_gnutls_set_current_version (gnutls_session_t session,
+                             gnutls_protocol_t version)
+{
+  session->security_parameters.version = version;
+}
 
 #endif /* GNUTLS_INT_H */
