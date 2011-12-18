@@ -692,7 +692,7 @@ listen_socket (const char *name, int listen_port, int socktype)
   snprintf (portname, sizeof (portname), "%d", listen_port);
   memset (&hints, 0, sizeof (hints));
   hints.ai_socktype = socktype;
-  hints.ai_flags = AI_PASSIVE;
+  hints.ai_flags = AI_PASSIVE | AI_ADDRCONFIG;
 
   if ((s = getaddrinfo (NULL, portname, &hints, &res)) != 0)
     {
