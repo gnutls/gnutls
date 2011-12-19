@@ -586,7 +586,7 @@ static const gnutls_cipher_suite_entry cs_algorithms[] = {
                              GNUTLS_MAC_SHA256, GNUTLS_TLS1_0,
                              GNUTLS_VERSION_MAX, 1),
   ENTRY_PRF (GNUTLS_ECDHE_PSK_AES_256_CBC_SHA384,
-                             GNUTLS_CIPHER_AES_128_CBC, GNUTLS_KX_ECDHE_PSK,
+                             GNUTLS_CIPHER_AES_256_CBC, GNUTLS_KX_ECDHE_PSK,
                              GNUTLS_MAC_SHA384, GNUTLS_TLS1_0,
                              GNUTLS_VERSION_MAX, 1, GNUTLS_MAC_SHA384),
   ENTRY (GNUTLS_ECDHE_PSK_NULL_SHA256,

@@ -2,6 +2,14 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.0.10 (unreleased)
+
+** libgnutls: Corrected ciphersuite GNUTLS_ECDHE_PSK_AES_256_CBC_SHA384
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.0.9 (released 2011-12-13)
 
 ** certtool: Added new parameter --dh-info.
