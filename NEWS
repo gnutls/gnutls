@@ -6,6 +6,9 @@ See the end for copying conditions.
 
 ** libgnutls: Corrected ciphersuite GNUTLS_ECDHE_PSK_AES_256_CBC_SHA384
 
+** libgnutls: Added ciphersuites: GNUTLS_PSK_WITH_AES_256_GCM_SHA384
+and GNUTLS_DHE_PSK_WITH_AES_256_GCM_SHA384.
+
 ** API and ABI modifications:
 No changes since last version.
 
