@@ -916,13 +916,17 @@ main (int argc, char **argv)
   if (nodb == 0)
     wrap_db_init ();
 
+  if (info.udp != 0)
+    strcpy(name, "UDP ");
+  else name[0] = 0;
+
   if (http == 1)
     {
-      strcpy (name, "HTTP Server");
+      strcat (name, "HTTP Server");
     }
   else
     {
-      strcpy (name, "Echo Server");
+      strcat (name, "Echo Server");
     }
 
   gnutls_global_set_log_function (tls_log_func);
