@@ -45,7 +45,7 @@ noinst_PROGRAMS = ex-client-resume ex-client-udp
 noinst_PROGRAMS += ex-cert-select ex-rfc2818
 
 if ENABLE_PKI
-noinst_PROGRAMS += ex-crq ex-serv1
+noinst_PROGRAMS += ex-crq ex-serv1 ex-serv-dtls
 endif
 
 if ENABLE_CXX

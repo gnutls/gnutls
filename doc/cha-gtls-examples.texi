@@ -150,21 +150,22 @@ This section contains examples of @acronym{TLS} and @acronym{SSL}
 servers, using @acronym{GnuTLS}.
 
 @menu
-* Echo Server with X.509 authentication::
-* Echo Server with OpenPGP authentication::
-* Echo Server with SRP authentication::
-* Echo Server with anonymous authentication::
+* Echo server with X.509 authentication::
+* Echo server with OpenPGP authentication::
+* Echo server with SRP authentication::
+* Echo server with anonymous authentication::
+* Echo DTLS server with X.509 authentication::
 @end menu
 
-@node Echo Server with X.509 authentication
+@node Echo server with X.509 authentication
 @subsection Echo server with @acronym{X.509} authentication
 
 This example is a very simple echo server which supports
-@acronym{X.509} authentication, using the RSA ciphersuites.
+@acronym{X.509} authentication.
 
 @verbatiminclude examples/ex-serv1.c
 
-@node Echo Server with OpenPGP authentication
+@node Echo server with OpenPGP authentication
 @subsection Echo server with @acronym{OpenPGP} authentication
 @cindex OpenPGP server
 
@@ -176,7 +177,7 @@ them to keep these examples as simple as possible.
 
 @verbatiminclude examples/ex-serv-pgp.c
 
-@node Echo Server with SRP authentication
+@node Echo server with SRP authentication
 @subsection Echo server with @acronym{SRP} authentication
 
 This is a server which supports @acronym{SRP} authentication. It is
@@ -185,13 +186,21 @@ server. Here it is separate for simplicity.
 
 @verbatiminclude examples/ex-serv-srp.c
 
-@node Echo Server with anonymous authentication
-@subsection Echo Server with anonymous authentication
+@node Echo server with anonymous authentication
+@subsection Echo server with anonymous authentication
 
 This example server support anonymous authentication, and could be
 used to serve the example client for anonymous authentication.
 
 @verbatiminclude examples/ex-serv-anon.c
+
+@node Echo DTLS server with X.509 authentication
+@subsection Echo DTLS server with @acronym{X.509} authentication
+
+This example is a very simple echo server using Datagram TLS and 
+@acronym{X.509} authentication.
+
+@verbatiminclude examples/ex-serv-dtls.c
 
 @node Miscellaneous examples
 @section Miscellaneous examples

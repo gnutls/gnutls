@@ -28,7 +28,6 @@
 #define SOCKET_ERR(err,s) if(err==-1) {perror(s);return(1);}
 #define MAX_BUF 1024
 #define PORT 5556               /* listen to 5556 port */
-#define DH_BITS 1024
 
 /* These are global */
 gnutls_certificate_credentials_t x509_cred;
@@ -49,11 +48,6 @@ initialize_tls_session (void)
    */
   gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
 
-  /* Set maximum compatibility mode. This is only suggested on public webservers
-   * that need to trade security for compatibility
-   */
-  gnutls_session_enable_compatibility_mode (session);
-
   return session;
 }
 
@@ -62,16 +56,14 @@ static gnutls_dh_params_t dh_params;
 static int
 generate_dh_params (void)
 {
+  int bits = gnutls_sec_param_to_pk_bits (GNUTLS_PK_DH, GNUTLS_SEC_PARAM_LOW);
 
   /* Generate Diffie-Hellman parameters - for use with DHE
    * kx algorithms. When short bit length is used, it might
-   * be wise to regenerate parameters.
-   *
-   * Check the ex-serv-export.c example for using static
-   * parameters.
+   * be wise to regenerate parameters often.
    */
   gnutls_dh_params_init (&dh_params);
-  gnutls_dh_params_generate2 (dh_params, DH_BITS);
+  gnutls_dh_params_generate2 (dh_params, bits);
 
   return 0;
 }
@@ -105,7 +97,7 @@ main (void)
 
   generate_dh_params ();
 
-  gnutls_priority_init (&priority_cache, "NORMAL", NULL);
+  gnutls_priority_init (&priority_cache, "PERFORMANCE:%SERVER_PRECEDENCE", NULL);
 
 
   gnutls_certificate_set_dh_params (x509_cred, dh_params);
