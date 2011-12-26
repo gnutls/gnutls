@@ -138,6 +138,7 @@ int udp_server(const char* name, int port, int mtu)
         if (ret < 0)
           {
             fprintf(stderr, "Error in handshake(): %s\n", gnutls_strerror(ret));
+            gnutls_deinit(session);
             continue;
           }
 
