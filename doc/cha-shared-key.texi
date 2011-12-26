@@ -83,26 +83,26 @@ and @code{tpasswd.conf} which holds generators and primes.
 To create tpasswd.conf which holds the generator and prime values for
 the @acronym{SRP} protocol, run:
 
-@smallexample
+@example
 $ srptool --create-conf /etc/tpasswd.conf
-@end smallexample
+@end example
 
 This command will create /etc/tpasswd and will add user 'test' (you
 will also be prompted for a password).  Verifiers are stored in a way that
 is compatible with libsrp.
 
-@smallexample
+@example
 $ srptool --passwd /etc/tpasswd \
     --passwd-conf /etc/tpasswd.conf -u test
-@end smallexample
+@end example
 
 This command will check against a password.  If the password matches
 the one in /etc/tpasswd you will get an ok.
 
-@smallexample
+@example
 $ srptool --passwd /etc/tpasswd \
     --passwd-conf /etc/tpasswd.conf --verify -u test
-@end smallexample
+@end example
 
 @node PSK authentication
 @section PSK authentication
@@ -153,7 +153,7 @@ This is a program to manage @acronym{PSK} username and keys.
 It will generate random keys for the indicated username, 
 using a simple password file format.
 
-@smallexample
+@example
 PSKtool help
 Usage : psktool [options]
      -u, --username username
@@ -162,19 +162,19 @@ Usage : psktool [options]
      -s, --keysize SIZE       specify the key size in bytes.
      -v, --version            prints the program's version number
      -h, --help               shows this help text
-@end smallexample
+@end example
 
 The generation of a PSK password file is illustrated in the example below. 
 The password is provided in the prompt.
 
-@smallexample
+@example
 $ ./psktool -u psk_identity -p psks.txt
 Generating a random key for user 'psk_identity'
 Key stored to psks.txt
 $ cat psks.txt
 psk_identity:88f3824b3e5659f52d00e959bacab954b6540344
 $
-@end smallexample
+@end example
 
 @node Anonymous authentication
 @section Anonymous authentication

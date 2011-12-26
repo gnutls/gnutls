@@ -281,18 +281,18 @@ example of a template file.
 
 @subheading Diffie-Hellman parameter generation
 To generate parameters for Diffie-Hellman key exchange, use the command:
-@smallexample
+@example
 $ certtool --generate-dh-params --outfile dh.pem
-@end smallexample
+@end example
 
 @subheading Self-signed certificate generation
 
 To create a self signed certificate, use the command:
-@smallexample
+@example
 $ certtool --generate-privkey --outfile ca-key.pem
 $ certtool --generate-self-signed --load-privkey ca-key.pem \
    --outfile ca-cert.pem
-@end smallexample
+@end example
 
 Note that a self-signed certificate usually belongs to a certificate
 authority, that signs other certificates.
@@ -300,9 +300,9 @@ authority, that signs other certificates.
 @subheading Private key generation
 To create a private key (RSA by default), run:
 
-@smallexample
+@example
 $ certtool --generate-privkey --outfile key.pem
-@end smallexample
+@end example
 
 To create a DSA or elliptic curves (ECDSA) private key use the
 above command combined with @code{--dsa} or @code{--ecc} options.
@@ -310,63 +310,63 @@ above command combined with @code{--dsa} or @code{--ecc} options.
 @subheading Certificate generation
 To generate a certificate using the private key, use the command:
 
-@smallexample
+@example
 $ certtool --generate-certificate --load-privkey key.pem \
    --outfile cert.pem --load-ca-certificate ca-cert.pem \
    --load-ca-privkey ca-key.pem
-@end smallexample
+@end example
 
 Alternatively you may create a certificate request, which is needed
 when the certificate will be signed by a third party authority.
 
-@smallexample
+@example
 $ certtool --generate-request --load-privkey key.pem \
   --outfile request.pem
-@end smallexample
+@end example
 
 If the private key is stored in a smart card you can generate
 a request by specifying the private key object URL (see @ref{The p11tool application}
 on how to obtain the URL).
 
-@smallexample
+@example
 $ certtool --generate-request --load-privkey pkcs11:(PRIVKEY URL) \
   --load-pubkey pkcs11:(PUBKEY URL) --outfile request.pem
-@end smallexample
+@end example
 
 To generate a certificate using the previous request, use the command:
 
-@smallexample
+@example
 $ certtool --generate-certificate --load-request request.pem \
    --outfile cert.pem \
    --load-ca-certificate ca-cert.pem --load-ca-privkey ca-key.pem
-@end smallexample
+@end example
 
 @subheading Certificate information
 To view the certificate information, use:
 
-@smallexample
+@example
 $ certtool --certificate-info --infile cert.pem
-@end smallexample
+@end example
 
 @subheading @acronym{PKCS} #12 structure generation
 To generate a @acronym{PKCS} #12 structure using the previous key and
 certificate, use the command:
 
-@smallexample
+@example
 $ certtool --load-certificate cert.pem --load-privkey key.pem \
   --to-p12 --outder --outfile key.p12
-@end smallexample
+@end example
 
 Some tools (reportedly web browsers) have problems with that file
 because it does not contain the CA certificate for the certificate.
 To work around that problem in the tool, you can use the
 --load-ca-certificate parameter as follows:
 
-@smallexample
+@example
 $ certtool --load-ca-certificate ca.pem \
   --load-certificate cert.pem --load-privkey key.pem \
   --to-p12 --outder --outfile key.p12
-@end smallexample
+@end example
 
 @subheading Proxy certificate generation
 Proxy certificate can be used to delegate your credential to a
@@ -374,34 +374,34 @@ temporary, typically short-lived, certificate.  To create one from the
 previously created certificate, first create a temporary key and then
 generate a proxy certificate for it, using the commands:
 
-@smallexample
+@example
 $ certtool --generate-privkey > proxy-key.pem
 $ certtool --generate-proxy --load-ca-privkey key.pem \
   --load-privkey proxy-key.pem --load-certificate cert.pem \
   --outfile proxy-cert.pem
-@end smallexample
+@end example
 
 @subheading Certificate revocation list generation
 To create an empty Certificate Revocation List (CRL) do:
 
-@smallexample
+@example
 $ certtool --generate-crl --load-ca-privkey x509-ca-key.pem \
            --load-ca-certificate x509-ca.pem
-@end smallexample
+@end example
 
 To create a CRL that contains some revoked certificates, place the
 certificates in a file and use @code{--load-certificate} as follows:
 
-@smallexample
+@example
 $ certtool --generate-crl --load-ca-privkey x509-ca-key.pem \
   --load-ca-certificate x509-ca.pem --load-certificate revoked-certs.pem
-@end smallexample
+@end example
 
 To verify a Certificate Revocation List (CRL) do:
 
-@smallexample
+@example
 $ certtool --verify-crl --load-ca-certificate x509-ca.pem < crl.pem
-@end smallexample
+@end example
 
 
 
@@ -410,11 +410,11 @@ A template file can be used to avoid the interactive questions of
 certtool. Initially create a file named 'cert.cfg' that contains the information
 about the certificate. The template can be used as below:
 
-@smallexample
+@example
 $ certtool --generate-certificate cert.pem --load-privkey key.pem  \
    --template cert.cfg \
    --load-ca-certificate ca-cert.pem --load-ca-privkey ca-key.pem
-@end smallexample
+@end example
 
 An example certtool template file:
 
@@ -571,9 +571,9 @@ These are the configuration files of @acronym{p11-kit}@footnote{@url{http://p11-
 For example a file that will load the @acronym{OpenSC} module, could be named
 @code{/etc/pkcs11/modules/opensc} and contain the following:
 
-@smallexample
+@example
 module: /usr/lib/opensc-pkcs11.so
-@end smallexample
+@end example
 
 If you use this file, then there is no need for other initialization in
 @acronym{GnuTLS}, except for the PIN and token functions. Those allow retrieving a PIN
@@ -597,16 +597,16 @@ This allows for a consistent naming of objects across systems and applications
 in the same system. For example a public
 key on a smart card may be referenced as:
 
-@smallexample
+@example
 pkcs11:token=Nikos;serial=307521161601031;model=PKCS%2315; \
 manufacturer=EnterSafe;object=test1;objecttype=public;\
 id=32f153f3e37990b08624141077ca5dec2d15faed
-@end smallexample
+@end example
 
 while the smart card itself can be referenced as:
-@smallexample
+@example
 pkcs11:token=Nikos;serial=307521161601031;model=PKCS%2315;manufacturer=EnterSafe
-@end smallexample
+@end example
 
 Objects stored in a @acronym{PKCS} #11 token can be extracted
 if they are not marked as sensitive. Usually only private keys are marked as
@@ -747,32 +747,32 @@ on them.
 Some examples on how to use p11tool are illustrated in the following  paragraphs.
 
 @subsubheading List all tokens
-@smallexample
+@example
 $ p11tool --list-tokens
-@end smallexample
+@end example
 
 @subsubheading List all objects
 The following command will list all objects in a token. The @code{--login}
 is required to show objects marked as private.
-@smallexample
+@example
 $ p11tool --login --list-all
-@end smallexample
+@end example
 
 @subsubheading Exporting an object
 To retrieve an object stored in the card use the following command.
 Note however that objects marked as sensitive (typically PKCS #11 private keys) 
 are not allowed to be extracted from the token.
-@smallexample 
+@example 
 $ p11tool --login --export [OBJECT URL]
-@end smallexample
+@end example
 
 @subsubheading Copy an object to a token
 To copy an object, such as a certificate or private key to a token
 use the following command.
-@smallexample 
+@example 
 $ p11tool --login --write [TOKEN URL] \
   --load-certificate cert.pem --label "my_cert"
-@end smallexample
+@end example
 
 
 @node Abstract key types

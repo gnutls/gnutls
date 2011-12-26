@@ -237,9 +237,9 @@ to be added to the compiler invocation at compile time are output by
 the @option{--cflags} option to @command{pkg-config gnutls}.  The
 following example shows how it can be used at the command line:
 
-@smallexample
+@example
 gcc -c foo.c `pkg-config gnutls --cflags`
-@end smallexample
+@end example
 
 Adding the output of @samp{pkg-config gnutls --cflags} to the
 compilers command line will ensure that the compiler can find the
@@ -255,16 +255,16 @@ required to link the program with the library (for instance, the
 @samp{-ltasn1} option).  The example shows how to link @file{foo.o}
 with the library to a program @command{foo}.
 
-@smallexample
+@example
 gcc -o foo foo.o `pkg-config gnutls --libs`
-@end smallexample
+@end example
 
 Of course you can also combine both examples to a single command by
 specifying both options to @command{pkg-config}:
 
-@smallexample
+@example
 gcc -o foo foo.c `pkg-config gnutls --cflags --libs`
-@end smallexample
+@end example
 
 @node Session initialization
 @section Session initialization
@@ -948,13 +948,13 @@ client or server random data first, you can set the
 For example, after establishing a TLS session using
 @funcref{gnutls_handshake}, you can invoke the TLS PRF with this call:
 
-@smallexample
+@example
 #define MYLABEL "EXPORTER-FOO"
 #define MYCONTEXT "some context data"
 char out[32];
 rc = gnutls_prf (session, strlen (MYLABEL), MYLABEL, 0,
                  strlen (MYCONTEXT), MYCONTEXT, 32, out);
-@end smallexample
+@end example
 
 If you don't want to mix in the client/server random, there is a more
 low-level TLS PRF interface called @funcref{gnutls_prf_raw}.
@@ -979,7 +979,7 @@ the @code{tls-unique} channel binding for TLS defined in
 The following example describes how to print the channel binding data.
 Note that it must be run after a successful TLS handshake.
 
-@smallexample
+@example
 @{
   gnutls_datum_t cb;
   int rc;
@@ -999,7 +999,7 @@ Note that it must be run after a successful TLS handshake.
       printf ("\n");
     @}
 @}
-@end smallexample
+@end example
 
 @node Interoperability
 @subsection Interoperability

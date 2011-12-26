@@ -372,10 +372,10 @@ certificate chain, you can call
 @end itemize
 as in the following example:
 
-@smallexample
+@example
   gnutls_certificate_set_verify_flags (x509cred,
                                        GNUTLS_VERIFY_ALLOW_SIGN_RSA_MD5);
-@end smallexample
+@end example
 
 This will tell the verifier algorithm to enable @code{RSA-MD5} when
 verifying the certificates.
