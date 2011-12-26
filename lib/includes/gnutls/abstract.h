@@ -29,6 +29,11 @@
 #include <gnutls/pkcs11.h>
 #include <gnutls/openpgp.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 /* Public key operations */
 
 struct gnutls_pubkey_st;
@@ -279,5 +284,9 @@ gnutls_certificate_set_key (gnutls_certificate_credentials_t res,
                             gnutls_pcert_st * pcert_list,
                             int pcert_list_size,
                             gnutls_privkey_t key);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

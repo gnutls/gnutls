@@ -28,6 +28,11 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 #define GNUTLS_PKCS11_MAX_PIN_LEN 32
 
 /**
@@ -342,5 +347,9 @@ int
 gnutls_pkcs11_privkey_generate (const char* url, 
   gnutls_pk_algorithm_t pk, unsigned int bits, 
   const char* label, unsigned int flags);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
