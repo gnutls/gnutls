@@ -70,6 +70,7 @@ doc/examples/ex-serv-pgp
 doc/examples/ex-serv-psk
 doc/examples/ex-serv-srp
 doc/examples/ex-serv1
+doc/examples/ex-serv-dtls
 doc/examples/libexamples.la
 doc/extra.c.texi
 doc/gnutls-api.texi
