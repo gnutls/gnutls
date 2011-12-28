@@ -9,6 +9,7 @@
 * Setting up the transport layer::
 * TLS handshake::
 * Data transfer and termination::
+* Handling alerts::
 * Priority Strings::
 * Advanced and other topics::
 * Using the cryptographic library::
@@ -642,6 +643,24 @@ A session can be deinitialized with the @funcref{gnutls_deinit} function.
 
 @showfuncdesc{gnutls_bye}
 @showfuncdesc{gnutls_deinit}
+
+@node Handling alerts
+@section Handling alerts
+During a TLS connection alert messages may be exchanged by the
+two peers. Those messages may be fatal, meaning the connection
+must be terminated afterwards, or warning when something needs
+to be reported to the peer, but without interrupting the session.
+The error codes @code{GNUTLS_E_WARNING_ALERT_RECEIVED}
+or @code{GNUTLS_E_FATAL_ALERT_RECEIVED} signal those alerts
+when received, and may be returned by all GnuTLS functions that receive 
+data from the peer, being @funcref{gnutls_handshake} and @funcref{gnutls_record_recv}.
+Alerts messages may be sent to the peer using @funcref{gnutls_alert_send}.
+
+@showfuncdesc{gnutls_alert_get}
+
+@showfuncdesc{gnutls_alert_send}
+
+@showfuncB{gnutls_error_to_alert,gnutls_alert_get_name}
 
 
 @node Priority Strings

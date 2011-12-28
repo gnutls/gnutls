@@ -271,18 +271,10 @@ warning. Fatal alerts always terminate the current connection, and
 prevent future re-negotiations using the current session ID. All alert
 messages are summarized in @ref{tab:alerts}.
 
-
 The alert messages are protected by the record protocol, thus the
 information that is included does not leak. You must take extreme care
 for the alert information not to leak to a possible attacker, via
-public log files etc. The available functions to control the alert
-protocol are shown below.
-
-@showfuncdesc{gnutls_alert_get}
-
-@showfuncdesc{gnutls_alert_send}
-
-@showfuncB{gnutls_error_to_alert,gnutls_alert_get_name}
+public log files etc. 
 
 @include alerts.texi
 

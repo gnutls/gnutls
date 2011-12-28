@@ -41,9 +41,10 @@ initialize_tls_session (void)
 
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
-  /* request client certificate if any.
+  /* We don't request any certificate from the client.
+   * If we did we would need to verify it.
    */
-  gnutls_certificate_server_set_request (session, GNUTLS_CERT_REQUEST);
+  gnutls_certificate_server_set_request (session, GNUTLS_CERT_IGNORE);
 
   return session;
 }
@@ -134,7 +135,13 @@ main (void)
                          sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
       gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
-      ret = gnutls_handshake (session);
+
+      do
+        {
+          ret = gnutls_handshake (session);
+        }
+      while (gnutls_error_is_fatal (ret) == 0);
+
       if (ret < 0)
         {
           close (sd);

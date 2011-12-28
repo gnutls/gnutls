@@ -59,6 +59,8 @@ main (void)
 
   /* put the x509 credentials to the current session */
   gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
+  gnutls_server_name_set (session, GNUTLS_NAME_DNS, "my_host_name", 
+                          strlen("my_host_name"));
 
   /* connect to the peer */
   sd = udp_connect ();
@@ -69,7 +71,11 @@ main (void)
   gnutls_dtls_set_mtu (session, 1000);
 
   /* Perform the TLS handshake */
-  ret = gnutls_handshake (session);
+  do
+    {
+      ret = gnutls_handshake (session);
+    }
+  while (gnutls_error_is_fatal (ret) == 0);
 
   if (ret < 0)
     {

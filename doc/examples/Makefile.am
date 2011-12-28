@@ -41,11 +41,11 @@ LDADD = libexamples.la				\
 CXX_LDADD = $(LDADD) \
 	../../lib/libgnutlsxx.la
 
-noinst_PROGRAMS = ex-client-resume ex-client-udp
-noinst_PROGRAMS += ex-cert-select ex-rfc2818
+noinst_PROGRAMS = ex-client-resume ex-client-dtls
+noinst_PROGRAMS += ex-cert-select ex-client-x509
 
 if ENABLE_PKI
-noinst_PROGRAMS += ex-crq ex-serv1 ex-serv-dtls
+noinst_PROGRAMS += ex-crq ex-serv-x509 ex-serv-dtls
 endif
 
 if ENABLE_CXX
@@ -55,7 +55,7 @@ noinst_PROGRAMS += ex-cxx
 endif
 
 if ENABLE_ANON
-noinst_PROGRAMS += ex-client1 ex-serv-anon
+noinst_PROGRAMS += ex-client-anon ex-serv-anon
 endif
 
 if ENABLE_OPENPGP

@@ -39,14 +39,14 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi lgpl-2.1.texi gpl-3.0.texi	\
 	cha-shared-key.texi cha-gtls-examples.texi
 
 # Examples.
-gnutls_TEXINFOS += examples/ex-client1.c				\
+gnutls_TEXINFOS += examples/ex-client-anon.c				\
 	examples/ex-session-info.c examples/ex-verify.c			\
 	examples/ex-cert-select.c examples/ex-client-resume.c		\
-	examples/ex-client-srp.c examples/ex-rfc2818.c			\
-	examples/ex-serv1.c examples/ex-serv-anon.c			\
+	examples/ex-client-srp.c examples/ex-client-x509.c		\
+	examples/ex-serv-x509.c examples/ex-serv-anon.c			\
 	examples/ex-serv-pgp.c examples/ex-serv-srp.c			\
 	examples/ex-alert.c examples/ex-x509-info.c examples/ex-crq.c	\
-	examples/ex-pkcs12.c
+	examples/ex-pkcs12.c examples/ex-client-dtls.c
 
 # Images.  Make sure there are eps + png + pdf of each, plus the source dia.
 gnutls_TEXINFOS += gnutls-internals.dia gnutls-internals.eps		\

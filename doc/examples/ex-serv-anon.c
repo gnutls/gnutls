@@ -116,7 +116,13 @@ main (void)
                          sizeof (topbuf)), ntohs (sa_cli.sin_port));
 
       gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) sd);
-      ret = gnutls_handshake (session);
+
+      do
+        {
+          ret = gnutls_handshake (session);
+        }
+      while (gnutls_error_is_fatal (ret) == 0);
+
       if (ret < 0)
         {
           close (sd);

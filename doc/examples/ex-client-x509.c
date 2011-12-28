@@ -46,6 +46,8 @@ int main (void)
   gnutls_init (&session, GNUTLS_CLIENT);
 
   gnutls_session_set_ptr (session, (void *) "my_host_name");
+  gnutls_server_name_set (session, GNUTLS_NAME_DNS, "my_host_name", 
+                          strlen("my_host_name"));
 
   /* Use default priorities */
   ret = gnutls_priority_set_direct (session, "NORMAL", &err);

@@ -25,7 +25,7 @@ implemented by another example.
 * Obtaining session information::
 * Using a callback to select the certificate to use::
 * Verifying a certificate::
-* Client using a PKCS 11 token with TLS::
+* Client using a smart card with TLS::
 * Client with Resume capability example::
 * Simple client example with SRP authentication::
 * Simple client example in C++::
@@ -40,9 +40,10 @@ The simplest client using TLS is the one that doesn't do any
 authentication.  This means no external certificates or passwords are
 needed to set up the connection.  As could be expected, the connection
 is vulnerable to man-in-the-middle (active or redirection) attacks.
-However, the data is integrity and privacy protected.
+However, the data are integrity protected and encrypted from
+passive eavesdroppers.
 
-@verbatiminclude examples/ex-client1.c
+@verbatiminclude examples/ex-client-anon.c
 
 @node Simple client example with X.509 certificate support
 @subsection Simple client example with @acronym{X.509} certificate support
@@ -55,16 +56,16 @@ a very simple @acronym{TLS} client, which uses the high level verification
 functions for certificates, but does not support session
 resumption. 
 
-@verbatiminclude examples/ex-rfc2818.c
+@verbatiminclude examples/ex-client-x509.c
 
 @node Simple Datagram TLS client example
 @subsection Simple datagram @acronym{TLS} client example
 
 This is a client that uses @acronym{UDP} to connect to a
-server. This is the @acronym{DTLS} equivalent to the example
-in @ref{Simple client example with X.509 certificate support}.
+server. This is the @acronym{DTLS} equivalent to the TLS example
+with X.509 certificates.
 
-@verbatiminclude examples/ex-client-udp.c
+@verbatiminclude examples/ex-client-dtls.c
 
 @node Obtaining session information
 @subsection Obtaining session information
@@ -96,12 +97,14 @@ functions to verify a given certificate list.
 
 @verbatiminclude examples/ex-verify.c
 
-@node Client using a PKCS 11 token with TLS
-@subsection Using a @acronym{PKCS} #11 token with TLS
+@node Client using a smart card with TLS
+@subsection Using a smart card with TLS
 @anchor{ex:pkcs11-client}
+@cindex Smart card example
 
 This example will demonstrate how to load keys and certificates
-from a @acronym{PKCS} #11 token, and use it with a TLS connection.
+from a smart-card or any other @acronym{PKCS} #11 token, and 
+use it in a TLS connection.
 
 @verbatiminclude examples/ex-cert-select-pkcs11.c
 
@@ -163,7 +166,7 @@ servers, using @acronym{GnuTLS}.
 * Echo server with OpenPGP authentication::
 * Echo server with SRP authentication::
 * Echo server with anonymous authentication::
-* Echo DTLS server with X.509 authentication::
+* DTLS echo server with X.509 authentication::
 @end menu
 
 @node Echo server with X.509 authentication
@@ -172,7 +175,7 @@ servers, using @acronym{GnuTLS}.
 This example is a very simple echo server which supports
 @acronym{X.509} authentication.
 
-@verbatiminclude examples/ex-serv1.c
+@verbatiminclude examples/ex-serv-x509.c
 
 @node Echo server with OpenPGP authentication
 @subsection Echo server with @acronym{OpenPGP} authentication
@@ -203,8 +206,8 @@ used to serve the example client for anonymous authentication.
 
 @verbatiminclude examples/ex-serv-anon.c
 
-@node Echo DTLS server with X.509 authentication
-@subsection Echo DTLS server with @acronym{X.509} authentication
+@node DTLS echo server with X.509 authentication
+@subsection DTLS echo server with @acronym{X.509} authentication
 
 This example is a very simple echo server using Datagram TLS and 
 @acronym{X.509} authentication.

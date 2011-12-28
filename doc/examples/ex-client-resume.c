@@ -63,7 +63,11 @@ main (void)
 
       /* Perform the TLS handshake
        */
-      ret = gnutls_handshake (session);
+      do
+        {
+          ret = gnutls_handshake (session);
+        }
+      while (gnutls_error_is_fatal (ret) == 0);
 
       if (ret < 0)
         {
