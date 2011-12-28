@@ -15,6 +15,9 @@ and GNUTLS_DHE_PSK_WITH_AES_256_GCM_SHA384.
 ** libgnutls: Added function gnutls_random_art() to convert 
 fingerprints to images (currently ascii-art).
 
+** libgnutls: Corrected bug in DSA private key parsing, which
+prevented the verification of the key.
+
 ** API and ABI modifications:
 gnutls_random_art: Added
 

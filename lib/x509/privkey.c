@@ -360,7 +360,6 @@ decode_dsa_key (const gnutls_datum_t * raw_key, gnutls_x509_privkey_t pkey)
       gnutls_assert ();
       goto error;
     }
-  pkey->params.params_nr++;
 
   if ((result = _gnutls_x509_read_int (dsa_asn, "p", &pkey->params.params[0])) < 0)
     {
