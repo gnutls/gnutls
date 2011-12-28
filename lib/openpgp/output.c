@@ -123,13 +123,13 @@ print_key_fingerprint (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
   if (name == NULL)
     return;
 
-  p = _gnutls_key_fingerprint_randomart(fpr, fpr_size, name, bits);
+  p = _gnutls_key_fingerprint_randomart(fpr, fpr_size, name, bits, "\t\t");
   if (p == NULL)
     return;
   
   adds (str, _("\tFingerprint's random art:\n"));
   adds (str, p);
-  adds (str, "\n\n");
+  adds (str, "\n");
 
   gnutls_free(p);
 }

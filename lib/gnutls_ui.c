@@ -60,7 +60,7 @@ int gnutls_random_art (gnutls_random_art_t type,
   if (type != GNUTLS_RANDOM_ART_OPENSSH)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-  art->data = _gnutls_key_fingerprint_randomart(fpr, fpr_size, key_type, key_size);
+  art->data = _gnutls_key_fingerprint_randomart(fpr, fpr_size, key_type, key_size, NULL);
   if (art->data == NULL)
     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
   

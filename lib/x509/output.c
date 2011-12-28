@@ -1394,13 +1394,13 @@ print_keyid (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
   if (name == NULL)
     return;
 
-  p = _gnutls_key_fingerprint_randomart(buffer, size, name, bits);
+  p = _gnutls_key_fingerprint_randomart(buffer, size, name, bits, "\t\t");
   if (p == NULL)
     return;
   
   adds (str, _("\tPublic key's random art:\n"));
   adds (str, p);
-  adds (str, "\n\n");
+  adds (str, "\n");
 
   gnutls_free(p);
 }

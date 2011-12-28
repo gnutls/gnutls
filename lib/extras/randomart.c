@@ -63,7 +63,8 @@
 #define	FLDSIZE_X	(FLDBASE * 2 + 1)
 char *
 _gnutls_key_fingerprint_randomart (uint8_t * dgst_raw, u_int dgst_raw_len,
-                                   const char *key_type, unsigned int key_size)
+                                   const char *key_type, unsigned int key_size,
+                                   const char* prefix)
 {
   /*
    * Chars to be used after each other every time the worm
@@ -75,8 +76,12 @@ _gnutls_key_fingerprint_randomart (uint8_t * dgst_raw, u_int dgst_raw_len,
   u_int i, b;
   int x, y;
   const size_t len = sizeof(augmentation_string) - 2;
+  int prefix_len = 0;
+  
+  if (prefix)
+    prefix_len = strlen(prefix);
 
-  retval = gnutls_calloc (1, (FLDSIZE_X + 3) * (FLDSIZE_Y + 2));
+  retval = gnutls_calloc (1, (FLDSIZE_X + 3 + prefix_len) * (FLDSIZE_Y + 2));
   if (retval == NULL)
     {
       gnutls_assert();
@@ -118,14 +123,23 @@ _gnutls_key_fingerprint_randomart (uint8_t * dgst_raw, u_int dgst_raw_len,
   field[x][y] = len;
 
   /* fill in retval */
-  snprintf (retval, FLDSIZE_X, "+--[%4s %4u]", key_type, key_size);
+  if (prefix_len)
+    snprintf (retval, FLDSIZE_X + prefix_len, "%s+--[%4s %4u]", prefix, key_type, key_size);
+  else
+    snprintf (retval, FLDSIZE_X, "+--[%4s %4u]", key_type, key_size);
   p = strchr (retval, '\0');
 
   /* output upper border */
-  for (i = p - retval - 1; i < FLDSIZE_X; i++)
+  for (i = p - retval - 1; i < FLDSIZE_X + prefix_len; i++)
     *p++ = '-';
   *p++ = '+';
   *p++ = '\n';
+  
+  if (prefix_len)
+    {
+      memcpy(p, prefix, prefix_len);
+      p += prefix_len;
+    }
 
   /* output content */
   for (y = 0; y < FLDSIZE_Y; y++)
@@ -135,6 +149,12 @@ _gnutls_key_fingerprint_randomart (uint8_t * dgst_raw, u_int dgst_raw_len,
         *p++ = augmentation_string[MIN (field[x][y], len)];
       *p++ = '|';
       *p++ = '\n';
+
+      if (prefix_len)
+        {
+          memcpy(p, prefix, prefix_len);
+          p += prefix_len;
+        }
     }
 
   /* output lower border */
