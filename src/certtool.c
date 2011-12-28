@@ -1285,7 +1285,7 @@ pgp_privkey_info (void)
   gnutls_openpgp_privkey_t key;
   unsigned char keyid[GNUTLS_OPENPGP_KEYID_SIZE];
   size_t size;
-  int ret, i, subkeys;
+  int ret, i, subkeys, bits = 0;
   gnutls_datum_t pem;
   const char *cprint;
 
@@ -1352,6 +1352,7 @@ pgp_privkey_info (void)
           else
             print_rsa_pkey (&m, &e, &d, &p, &q, &u, NULL, NULL);
 
+          bits = m.size * 8;
         }
       else if (ret == GNUTLS_PK_DSA)
         {
@@ -1369,6 +1370,8 @@ pgp_privkey_info (void)
                      gnutls_strerror (ret));
           else
             print_dsa_pkey (&x, &y, &p, &q, &g);
+            
+          bits = y.size * 8;
         }
 
       fprintf (outfile, "\n");
@@ -1386,9 +1389,17 @@ pgp_privkey_info (void)
         }
       else
         {
-          fprintf (outfile, "Public Key ID: %s\n", raw_to_string (keyid, 8));
-        }
+          gnutls_datum_t art;
 
+          fprintf (outfile, "Public Key ID: %s\n", raw_to_string (keyid, 8));
+
+          ret = gnutls_random_art(GNUTLS_RANDOM_ART_OPENSSH, cprint, bits, keyid, 8, &art);
+          if (ret >= 0)
+            {
+              fprintf (outfile, "public key's randomart:\n%s\n\n", art.data);
+              gnutls_free(art.data);
+            }
+        }
     }
 
   size = buffer_size;
@@ -1694,7 +1705,7 @@ const char *cprint;
       else
         {
           print_ecc_pkey (curve, &k, &x, &y);
-          bits = gnutls_ecc_curve_get_size(curve);
+          bits = gnutls_ecc_curve_get_size(curve) * 8;
 
           gnutls_free (x.data);
           gnutls_free (y.data);
