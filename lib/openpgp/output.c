@@ -123,11 +123,11 @@ print_key_fingerprint (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
   if (name == NULL)
     return;
 
-  p = key_fingerprint_randomart(fpr, fpr_size, name, bits);
+  p = _gnutls_key_fingerprint_randomart(fpr, fpr_size, name, bits);
   if (p == NULL)
     return;
   
-  adds (str, _("\trandomart:\n"));
+  adds (str, _("\tpublic key's randomart:\n"));
   adds (str, p);
   adds (str, "\n");
 

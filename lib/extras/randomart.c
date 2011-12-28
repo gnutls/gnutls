@@ -62,8 +62,8 @@
 #define	FLDSIZE_Y	(FLDBASE + 1)
 #define	FLDSIZE_X	(FLDBASE * 2 + 1)
 char *
-key_fingerprint_randomart (uint8_t * dgst_raw, u_int dgst_raw_len,
-                           const char *key_type, unsigned int key_size)
+_gnutls_key_fingerprint_randomart (uint8_t * dgst_raw, u_int dgst_raw_len,
+                                   const char *key_type, unsigned int key_size)
 {
   /*
    * Chars to be used after each other every time the worm

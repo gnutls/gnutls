@@ -1375,11 +1375,11 @@ print_fingerprint (gnutls_buffer_st * str, gnutls_x509_crt_t cert,
   if (name == NULL)
     return;
 
-  p = key_fingerprint_randomart(buffer, size, name, bits);
+  p = _gnutls_key_fingerprint_randomart(buffer, size, name, bits);
   if (p == NULL)
     return;
   
-  adds (str, _("\trandomart:\n"));
+  adds (str, _("\tpublic key's randomart:\n"));
   adds (str, p);
   adds (str, "\n\n");
 
