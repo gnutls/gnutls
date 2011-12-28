@@ -129,7 +129,7 @@ print_key_fingerprint (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
   
   adds (str, _("\tpublic key's randomart:\n"));
   adds (str, p);
-  adds (str, "\n");
+  adds (str, "\n\n");
 
   gnutls_free(p);
 }

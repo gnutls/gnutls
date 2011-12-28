@@ -1349,9 +1349,6 @@ print_fingerprint (gnutls_buffer_st * str, gnutls_x509_crt_t cert,
   int err;
   char buffer[MAX_HASH_SIZE];
   size_t size = sizeof (buffer);
-  const char* name;
-  char* p;
-  unsigned int bits;
   
   err = gnutls_x509_crt_get_fingerprint (cert, algo, buffer, &size);
   if (err < 0)
@@ -1364,6 +1361,28 @@ print_fingerprint (gnutls_buffer_st * str, gnutls_x509_crt_t cert,
     adds (str, _("\tMD5 fingerprint:\n\t\t"));
   else
     adds (str, _("\tSHA-1 fingerprint:\n\t\t"));
+  _gnutls_buffer_hexprint (str, buffer, size);
+  adds (str, "\n");
+}
+
+static void
+print_keyid (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
+{
+  int err;
+  char buffer[32];
+  size_t size = sizeof(buffer);
+  const char* name;
+  char* p;
+  unsigned int bits;
+
+  err = gnutls_x509_crt_get_key_id (cert, 0, buffer, &size);
+  if (err < 0)
+    {
+      addf (str, "error: get_key_id: %s\n", gnutls_strerror (err));
+      return;
+    }
+
+  adds (str, _("\tPublic Key Id:\n\t\t"));
   _gnutls_buffer_hexprint (str, buffer, size);
   adds (str, "\n");
 
@@ -1384,25 +1403,6 @@ print_fingerprint (gnutls_buffer_st * str, gnutls_x509_crt_t cert,
   adds (str, "\n\n");
 
   gnutls_free(p);
-}
-
-static void
-print_keyid (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
-{
-  int err;
-  char buffer[32];
-  size_t size = sizeof(buffer);
-
-  err = gnutls_x509_crt_get_key_id (cert, 0, buffer, &size);
-  if (err < 0)
-    {
-      addf (str, "error: get_key_id: %s\n", gnutls_strerror (err));
-      return;
-    }
-
-  adds (str, _("\tPublic Key Id:\n\t\t"));
-  _gnutls_buffer_hexprint (str, buffer, size);
-  adds (str, "\n");
 }
 
 static void
