@@ -105,6 +105,8 @@ option (8, pkcs8) { $pkcs8=1 } "Use PKCS #8 format for private keys."
 #int dsa;
 option (dsa) { $dsa=1 } "Use DSA keys."
 
+option (rsa) { } "Use RSA keys."
+
 #int ecc;
 option (ecc) { $ecc=1 } "Use ECC (ECDSA) keys."
 
