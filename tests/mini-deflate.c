@@ -29,9 +29,11 @@
 #include <string.h>
 #include <errno.h>
 #include <gnutls/gnutls.h>
-#include "eagain-common.h"
 
-#include "utils.h"
+#ifdef HAVE_LIBZ
+
+# include "eagain-common.h"
+# include "utils.h"
 
 static void
 tls_log_func (int level, const char *str)
@@ -39,8 +41,8 @@ tls_log_func (int level, const char *str)
   fprintf (stderr, "|<%d>| %s", level, str);
 }
 
-#define MAX_BUF 6*1024
-#define MSG "Hello TLS, and Hello and Hello and Hello"
+# define MAX_BUF 6*1024
+# define MSG "Hello TLS, and Hello and Hello and Hello"
 
 void
 doit (void)
@@ -59,6 +61,7 @@ doit (void)
   char buffer[MAX_BUF + 1];
   ssize_t ns;
   int ret, transferred = 0, msglen;
+  const char * str;
 
   /* General init. */
   gnutls_global_init ();
@@ -72,7 +75,13 @@ doit (void)
   gnutls_dh_params_import_pkcs3 (dh_params, &p3, GNUTLS_X509_FMT_PEM);
   gnutls_anon_set_server_dh_params (s_anoncred, dh_params);
   gnutls_init (&server, GNUTLS_SERVER);
-  gnutls_priority_set_direct (server, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-DEFLATE:+ANON-DH", NULL);
+  ret = gnutls_priority_set_direct (server, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-DEFLATE:+ANON-DH", &str);
+  if (ret < 0) 
+    {
+      fprintf(stderr, "error at: %s\n", str);
+      exit(1);
+    }
+  
   gnutls_credentials_set (server, GNUTLS_CRD_ANON, s_anoncred);
   gnutls_dh_set_prime_bits (server, 1024);
   gnutls_transport_set_push_function (server, server_push);
@@ -82,7 +91,12 @@ doit (void)
   /* Init client */
   gnutls_anon_allocate_client_credentials (&c_anoncred);
   gnutls_init (&client, GNUTLS_CLIENT);
-  gnutls_priority_set_direct (client, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-DEFLATE:+ANON-DH", NULL);
+  ret = gnutls_priority_set_direct (client, "NONE:+VERS-TLS-ALL:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-DEFLATE:+ANON-DH", &str);
+  if (ret < 0) 
+    {
+      fprintf(stderr, "error at: %s\n", str);
+      exit(1);
+    }
   gnutls_credentials_set (client, GNUTLS_CRD_ANON, c_anoncred);
   gnutls_transport_set_push_function (client, client_push);
   gnutls_transport_set_pull_function (client, client_pull);
@@ -111,3 +125,10 @@ doit (void)
 
   gnutls_global_deinit ();
 }
+#else
+
+int main(int argc, char** argv)
+{
+  return 77;
+}
+#endif
