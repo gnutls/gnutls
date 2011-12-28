@@ -334,6 +334,7 @@ lib/accelerated/x86/libx86.la
 lib/algorithms/libgnutls_alg.la
 lib/auth/libgnutls_auth.la
 lib/ext/libgnutls_ext.la
+lib/extras/libgnutls_extras.la
 lib/gcrypt/libcrypto.la
 lib/gnutls-api.texi
 lib/gnutls.pc
