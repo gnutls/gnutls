@@ -90,7 +90,7 @@ static const gnutls_error_entry error_algorithms[] = {
   ERROR_ENTRY (N_
                ("An error was encountered at the TLS Finished packet calculation."),
                GNUTLS_E_ERROR_IN_FINISHED_PACKET, 1),
-  ERROR_ENTRY (N_("The peer did not send any certificate."),
+  ERROR_ENTRY (N_("No certificate was found."),
                GNUTLS_E_NO_CERTIFICATE_FOUND, 1),
   ERROR_ENTRY (N_("The given DSA key is incompatible with the selected TLS protocol."),
                GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL, 1),
