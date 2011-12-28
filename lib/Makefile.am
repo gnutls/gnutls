@@ -20,7 +20,7 @@
 
 ACLOCAL_AMFLAGS = -I ../m4 -I ../gl/m4
 
-SUBDIRS = includes x509 accelerated auth ext algorithms
+SUBDIRS = includes x509 accelerated auth ext algorithms extras
 if ENABLE_MINITASN1
 SUBDIRS += minitasn1
 endif
@@ -114,6 +114,7 @@ libgnutls_la_LDFLAGS = -no-undefined \
 libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	accelerated/libaccelerated.la ext/libgnutls_ext.la \
 	auth/libgnutls_auth.la algorithms/libgnutls_alg.la \
+	extras/libgnutls_extras.la \
 	$(LTLIBZ)  $(LTLIBINTL) $(LIBSOCKET) $(LTLIBDL) \
 	$(LTLIBPTHREAD) $(P11_KIT_LIBS)
 

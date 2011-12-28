@@ -465,6 +465,7 @@ AC_CONFIG_FILES([
   lib/algorithms/Makefile
   lib/auth/Makefile
   lib/ext/Makefile
+  lib/extras/Makefile
   lib/gnutls.pc
   lib/includes/Makefile
   lib/includes/gnutls/gnutls.h

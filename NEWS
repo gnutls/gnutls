@@ -12,8 +12,11 @@ in Linux as well as in BSD.
 ** libgnutls: Added ciphersuites: GNUTLS_PSK_WITH_AES_256_GCM_SHA384
 and GNUTLS_DHE_PSK_WITH_AES_256_GCM_SHA384.
 
+** libgnutls: Added function gnutls_random_art() to convert 
+fingerprints to images (currently ascii-art).
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_random_art: Added
 
 
 * Version 3.0.9 (released 2011-12-13)

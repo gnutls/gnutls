@@ -1268,13 +1268,21 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   void gnutls_openpgp_send_cert (gnutls_session_t session,
                                  gnutls_openpgp_crt_status_t status);
 
-/* fingerprint 
- * Actually this function returns the hash of the given data.
+/* This function returns the hash of the given data.
  */
   int gnutls_fingerprint (gnutls_digest_algorithm_t algo,
                           const gnutls_datum_t * data, void *result,
                           size_t * result_size);
 
+  typedef enum gnutls_random_art
+  {
+    GNUTLS_RANDOM_ART_OPENSSH=1,
+  } gnutls_random_art_t;
+
+  int gnutls_random_art (gnutls_random_art_t type, 
+                         const char* key_name, unsigned int key_size,
+                         void * fpr, size_t fpr_size,
+                         gnutls_datum_t* art);
 
 /* SRP 
  */

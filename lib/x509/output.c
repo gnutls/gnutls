@@ -29,6 +29,7 @@
 #include <x509_int.h>
 #include <gnutls_num.h>
 #include <gnutls_errors.h>
+#include <extras/randomart.h>
 
 /* I18n of error codes. */
 #include "gettext.h"
@@ -1348,7 +1349,10 @@ print_fingerprint (gnutls_buffer_st * str, gnutls_x509_crt_t cert,
   int err;
   char buffer[MAX_HASH_SIZE];
   size_t size = sizeof (buffer);
-
+  const char* name;
+  char* p;
+  unsigned int bits;
+  
   err = gnutls_x509_crt_get_fingerprint (cert, algo, buffer, &size);
   if (err < 0)
     {
@@ -1362,6 +1366,24 @@ print_fingerprint (gnutls_buffer_st * str, gnutls_x509_crt_t cert,
     adds (str, _("\tSHA-1 fingerprint:\n\t\t"));
   _gnutls_buffer_hexprint (str, buffer, size);
   adds (str, "\n");
+
+  err = gnutls_x509_crt_get_pk_algorithm (cert, &bits);
+  if (err < 0)
+    return;
+    
+  name = gnutls_pk_get_name(err);
+  if (name == NULL)
+    return;
+
+  p = key_fingerprint_randomart(buffer, size, name, bits);
+  if (p == NULL)
+    return;
+  
+  adds (str, _("\trandomart:\n"));
+  adds (str, p);
+  adds (str, "\n");
+
+  gnutls_free(p);
 }
 
 static void

@@ -26,6 +26,7 @@
 #include <gnutls_int.h>
 #include <gnutls/openpgp.h>
 #include <gnutls_errors.h>
+#include <extras/randomart.h>
 
 /* I18n of error codes. */
 #include "gettext.h"
@@ -88,6 +89,7 @@ print_key_id (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert, int idx)
       _gnutls_buffer_hexprint (str, id, sizeof (id));
       addf (str, "\n");
     }
+
 }
 
 /* idx == -1 indicates main key
@@ -99,6 +101,9 @@ print_key_fingerprint (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
   char fpr[128];
   size_t fpr_size = sizeof (fpr);
   int err;
+  const char* name;
+  char* p;
+  unsigned int bits;
 
   err = gnutls_openpgp_crt_get_fingerprint (cert, fpr, &fpr_size);
   if (err < 0)
@@ -109,6 +114,24 @@ print_key_fingerprint (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
       _gnutls_buffer_hexprint (str, fpr, fpr_size);
       addf (str, "\n");
     }
+
+  err = gnutls_openpgp_crt_get_pk_algorithm (cert, &bits);
+  if (err < 0)
+    return;
+    
+  name = gnutls_pk_get_name(err);
+  if (name == NULL)
+    return;
+
+  p = key_fingerprint_randomart(fpr, fpr_size, name, bits);
+  if (p == NULL)
+    return;
+  
+  adds (str, _("\trandomart:\n"));
+  adds (str, p);
+  adds (str, "\n");
+
+  gnutls_free(p);
 }
 
 static void
