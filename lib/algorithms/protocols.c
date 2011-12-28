@@ -162,7 +162,7 @@ gnutls_protocol_get_id (const char *name)
  *
  * Get a list of supported protocols, e.g. SSL 3.0, TLS 1.0 etc.
  *
- * This function is not threat safe.
+ * This function is not thread safe.
  *
  * Returns: a (0)-terminated list of #gnutls_protocol_t integers
  * indicating the available protocols.

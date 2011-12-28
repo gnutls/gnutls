@@ -116,7 +116,7 @@ do_device_source (int init)
       && (init || ((now - device_last_read) > DEVICE_READ_INTERVAL)))
     {
 
-      /* More than a minute since we last read the device */
+      /* More than 20 minutes since we last read the device */
       uint8_t buf[DEVICE_READ_SIZE_MAX];
 
       if (!CryptGenRandom (device_fd, (DWORD) read_size, buf))
@@ -250,7 +250,7 @@ do_device_source_urandom (int init)
   if ((device_fd > 0)
       && (init || ((now - device_last_read) > DEVICE_READ_INTERVAL)))
     {
-      /* More than a minute since we last read the device */
+      /* More than 20 minutes since we last read the device */
       uint8_t buf[DEVICE_READ_SIZE_MAX];
       uint32_t done;
 
@@ -312,7 +312,7 @@ do_device_source_egd (int init)
       && (init || ((now - device_last_read) > DEVICE_READ_INTERVAL)))
     {
 
-      /* More than a minute since we last read the device */
+      /* More than 20 minutes since we last read the device */
       uint8_t buf[DEVICE_READ_SIZE_MAX];
       uint32_t done;
 

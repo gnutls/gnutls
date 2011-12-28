@@ -76,8 +76,8 @@ gnutls_db_set_remove_function (gnutls_session_t session,
  * @session: is a #gnutls_session_t structure.
  * @store_func: is the function
  *
- * Sets the function that will be used to store data from the resumed
- * sessions database. This function must remove 0 on success.
+ * Sets the function that will be used to store data in the resumed
+ * sessions database. This function must return 0 on success.
  *
  * The first argument to @store_func will be null unless
  * gnutls_db_set_ptr() has been called.
@@ -124,7 +124,7 @@ gnutls_db_get_ptr (gnutls_session_t session)
  * @seconds: is the number of seconds.
  *
  * Set the expiration time for resumed sessions. The default is 3600
- * (one hour) at the time writing this.
+ * (one hour) at the time of this writing.
  **/
 void
 gnutls_db_set_cache_expiration (gnutls_session_t session, int seconds)
@@ -138,7 +138,7 @@ gnutls_db_set_cache_expiration (gnutls_session_t session, int seconds)
  * @session_entry: is the session data (not key)
  *
  * Check if database entry has expired.  This function is to be used
- * when you want to clear unnesessary session which occupy space in
+ * when you want to clear unnecessary sessions which occupy space in
  * your backend.
  *
  * Returns: Returns %GNUTLS_E_EXPIRED, if the database entry has

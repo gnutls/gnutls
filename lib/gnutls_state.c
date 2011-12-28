@@ -725,9 +725,9 @@ gnutls_openpgp_send_cert (gnutls_session_t session,
  *
  * If status is non zero, this function will order gnutls not to send
  * the rdnSequence in the certificate request message. That is the
- * server will not advertize it's trusted CAs to the peer. If status
+ * server will not advertise its trusted CAs to the peer. If status
  * is zero then the default behaviour will take effect, which is to
- * advertize the server's trusted CAs.
+ * advertise the server's trusted CAs.
  *
  * This function has no effect in clients, and in authentication
  * methods other than certificate with X.509 certificates.

@@ -2324,7 +2324,7 @@ cleanup:
  *
  * The non-fatal errors such as %GNUTLS_E_AGAIN and
  * %GNUTLS_E_INTERRUPTED interrupt the handshake procedure, which
- * should be later be resumed.  Call this function again, until it
+ * should be resumed later.  Call this function again, until it
  * returns 0; cf.  gnutls_record_get_direction() and
  * gnutls_error_is_fatal().
  *

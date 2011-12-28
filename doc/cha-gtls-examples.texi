@@ -201,7 +201,7 @@ server. Here it is separate for simplicity.
 @node Echo server with anonymous authentication
 @subsection Echo server with anonymous authentication
 
-This example server support anonymous authentication, and could be
+This example server supports anonymous authentication, and could be
 used to serve the example client for anonymous authentication.
 
 @verbatiminclude examples/ex-serv-anon.c

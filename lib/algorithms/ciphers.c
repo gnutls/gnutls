@@ -43,7 +43,7 @@ typedef struct gnutls_cipher_entry gnutls_cipher_entry;
  * View first: "The order of encryption and authentication for
  * protecting communications" by Hugo Krawczyk - CRYPTO 2001
  *
- * Make sure to updated MAX_CIPHER_BLOCK_SIZE and MAX_CIPHER_KEY_SIZE as well.
+ * Make sure to update MAX_CIPHER_BLOCK_SIZE and MAX_CIPHER_KEY_SIZE as well.
  */
 static const gnutls_cipher_entry algorithms[] = {
   {"AES-256-CBC", GNUTLS_CIPHER_AES_256_CBC, 16, 32, CIPHER_BLOCK, 16, 0, 0},
@@ -203,7 +203,7 @@ gnutls_cipher_get_name (gnutls_cipher_algorithm_t algorithm)
 
 /**
  * gnutls_cipher_get_id:
- * @name: is a MAC algorithm name
+ * @name: is a cipher algorithm name
  *
  * The names are compared in a case insensitive way.
  *

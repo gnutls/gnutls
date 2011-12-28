@@ -250,7 +250,7 @@ parsing incoming extension data (both in the client and server).
 The @funcintref{_foobar_send_params} function is responsible for
 sending extension data (both in the client and server).
 
-If you receive length fields that doesn't match, return
+If you receive length fields that don't match, return
 @code{GNUTLS_E_@-UNEXPECTED_@-PACKET_@-LENGTH}.  If you receive invalid
 data, return @code{GNUTLS_E_@-RECEIVED_@-ILLEGAL_@-PARAMETER}.  You can use
 other error codes from the list in @ref{Error codes}.  Return 0 on success.

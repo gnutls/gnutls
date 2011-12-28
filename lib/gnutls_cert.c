@@ -129,7 +129,7 @@ gnutls_certificate_get_issuer (gnutls_certificate_credentials_t sc,
  * sending the names of it would just consume bandwidth without providing 
  * information to client.
  *
- * CA names are used by servers to advertize the CAs they support to
+ * CA names are used by servers to advertise the CAs they support to
  * clients.
  **/
 void

@@ -253,7 +253,7 @@ calc_enc_length (gnutls_session_t session, int data_size,
 #define MAX_PREAMBLE_SIZE 16
 
 /* generates the authentication data (data to be hashed only
- * and are not to be send). Returns their size.
+ * and are not to be sent). Returns their size.
  */
 static inline int
 make_preamble (opaque * uint64_data, opaque type, int length,

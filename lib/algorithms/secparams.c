@@ -127,7 +127,7 @@ _gnutls_pk_bits_to_subgroup_bits (unsigned int pk_bits)
  * Convert a #gnutls_sec_param_t value to a string.
  *
  * Returns: a pointer to a string that contains the name of the
- *   specified public key algorithm, or %NULL.
+ *   specified security level, or %NULL.
  *
  * Since: 2.12.0
  **/

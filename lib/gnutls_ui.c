@@ -22,7 +22,7 @@
  */
 
 /* This file contains certificate authentication functions to be exported in the
- * API and did not fit elsewhere.
+ * API which did not fit elsewhere.
  */
 
 #include <gnutls_int.h>
@@ -42,7 +42,7 @@
  * @session: is a #gnutls_session_t structure.
  * @bits: is the number of bits
  *
- * This function sets the number of bits, for use in an Diffie-Hellman
+ * This function sets the number of bits, for use in a Diffie-Hellman
  * key exchange.  This is used both in DH ephemeral and DH anonymous
  * cipher suites.  This will set the minimum size of the prime that
  * will be used for the handshake.
@@ -313,7 +313,7 @@ mpi_buf2bits (gnutls_datum_t * mpi_buf)
  * This function will return the bits of the prime used in the last
  * Diffie-Hellman key exchange with the peer.  Should be used for both
  * anonymous and ephemeral Diffie-Hellman.  Note that some ciphers,
- * like RSA and DSA without DHE, does not use a Diffie-Hellman key
+ * like RSA and DSA without DHE, do not use a Diffie-Hellman key
  * exchange, and then this function will return 0.
  *
  * Returns: The Diffie-Hellman bit strength is returned, or 0 if no

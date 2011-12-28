@@ -131,10 +131,10 @@ The random generator of the cryptographic back-end, is not thread safe and requi
 mutex locks which are setup by @acronym{GnuTLS}.
 Applications can either call @funcref{gnutls_global_init} which will initialize the default
 operating system provided locks (i.e. @code{pthreads} on GNU/Linux and
-@code{CriticalSection} on Windows), or specify manually the locking system using 
+@code{CriticalSection} on Windows), or manually specify the locking system using
 the function @funcref{gnutls_global_set_mutex} before calling @funcref{gnutls_global_init}. 
-Setting manually mutexes is recommended
-only to applications that have full control of the underlying libraries. If this
+Setting mutexes manually is recommended
+only for applications that have full control of the underlying libraries. If this
 is not the case, the use of the operating system defaults is recommended. An example of 
 non-native thread usage is shown below.
 
@@ -306,7 +306,7 @@ current session using @funcref{gnutls_credentials_set}.
 
 When using certificates the server is required to have at least one
 certificate and private key pair. Clients may not hold such
-a pair, but a server could require it. On this section we discuss
+a pair, but a server could require it. In this section we discuss
 general issues applying to both client and server certificates. The next
 section will elaborate on issues arising from client authentication only.
 
@@ -618,7 +618,7 @@ fatal for the protocol or can be ignored.
 
 @showfuncdesc{gnutls_error_is_fatal}
 
-In DTLS it is adviceable to use the extended receive
+In DTLS it is advisable to use the extended receive
 function shown below, because it allows the extraction
 of the sequence number. This is required in DTLS because
 messages may arrive out of order.
@@ -880,7 +880,7 @@ even it was requested.  That is to prevent temporal session keys
 from becoming long-term keys. Also note that as a client you must enable, using the
 priority functions, at least the algorithms used in the last session.
 
-It is highly recommended clients to enable the session ticket extension using 
+It is highly recommended for clients to enable the session ticket extension using
 @funcref{gnutls_session_ticket_enable_client} in order to allow resumption with 
 servers that do not store any state.
 

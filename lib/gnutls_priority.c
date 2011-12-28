@@ -285,7 +285,7 @@ static const int kx_priority_export[] = {
 
 static const int kx_priority_secure[] = {
   /* The ciphersuites that offer forward secrecy take
-   * precendance
+   * precedence
    */
   GNUTLS_KX_ECDHE_ECDSA,
   GNUTLS_KX_ECDHE_RSA,
@@ -396,7 +396,7 @@ static const int cipher_priority_export[] = {
 };
 
 static const int comp_priority[] = {
-  /* compression should be explicitely requested to be enabled */
+  /* compression should be explicitly requested to be enabled */
   GNUTLS_COMP_NULL,
   0
 };
