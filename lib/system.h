@@ -34,8 +34,6 @@ ssize_t system_read_peek (gnutls_transport_ptr_t ptr, void *data,
 #endif
 #endif
 
-int _gnutls_atfork (void (*prepare) (void), void (*parent) (void),
-                    void (*child) (void));
 extern gnutls_time_func gnutls_time;
 
 static inline void millisleep(unsigned int ms)

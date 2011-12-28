@@ -1381,7 +1381,7 @@ print_fingerprint (gnutls_buffer_st * str, gnutls_x509_crt_t cert,
   
   adds (str, _("\trandomart:\n"));
   adds (str, p);
-  adds (str, "\n");
+  adds (str, "\n\n");
 
   gnutls_free(p);
 }
@@ -1410,7 +1410,6 @@ print_other (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
 {
   if (!notsigned)
     {
-      print_fingerprint (str, cert, GNUTLS_DIG_MD5);
       print_fingerprint (str, cert, GNUTLS_DIG_SHA1);
     }
   print_keyid (str, cert);

@@ -74,7 +74,7 @@ key_fingerprint_randomart (uint8_t * dgst_raw, u_int dgst_raw_len,
   uint8_t field[FLDSIZE_X][FLDSIZE_Y];
   u_int i, b;
   int x, y;
-  const size_t len = sizeof(augmentation_string) - 1;
+  const size_t len = sizeof(augmentation_string) - 2;
 
   retval = gnutls_calloc (1, (FLDSIZE_X + 3) * (FLDSIZE_Y + 2));
   if (retval == NULL)

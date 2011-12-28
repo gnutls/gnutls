@@ -185,14 +185,6 @@ gnutls_system_mutex_unlock (void **priv)
   return 0;
 }
 
-int
-_gnutls_atfork (void (*prepare) (void), void (*parent) (void),
-                void (*child) (void))
-{
-  return 0;
-}
-
-
 #endif /* WIN32_LOCKS */
 
 #ifdef HAVE_PTHREAD_LOCKS
@@ -251,13 +243,6 @@ gnutls_system_mutex_unlock (void **priv)
   return 0;
 }
 
-int
-_gnutls_atfork (void (*prepare) (void), void (*parent) (void),
-                void (*child) (void))
-{
-  return pthread_atfork (prepare, parent, child);
-}
-
 #endif /* PTHREAD_LOCKS */
 
 #ifdef HAVE_NO_LOCKS
@@ -282,13 +267,6 @@ gnutls_system_mutex_lock (void **priv)
 
 static int
 gnutls_system_mutex_unlock (void **priv)
-{
-  return 0;
-}
-
-int
-_gnutls_atfork (void (*prepare) (void), void (*parent) (void),
-                void (*child) (void))
 {
   return 0;
 }
