@@ -13,9 +13,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
-#define SA struct sockaddr
-
-/* tcp.c */
+/* udp.c */
 int udp_connect (void);
 void udp_close (int sd);
 
@@ -27,7 +25,7 @@ udp_connect (void)
 {
   const char *PORT = "5557";
   const char *SERVER = "127.0.0.1";
-  int err, sd;
+  int err, sd, optval;
   struct sockaddr_in sa;
 
   /* connects to server
@@ -39,7 +37,17 @@ udp_connect (void)
   sa.sin_port = htons (atoi (PORT));
   inet_pton (AF_INET, SERVER, &sa.sin_addr);
 
-  err = connect (sd, (SA *) & sa, sizeof (sa));
+#if defined(IP_DONTFRAG)
+  optval = 1;
+  setsockopt (sd, IPPROTO_IP, IP_DONTFRAG,
+              (const void *) &optval, sizeof (optval));
+#elif defined(IP_MTU_DISCOVER)
+  optval = IP_PMTUDISC_DO;
+  setsockopt(sd, IPPROTO_IP, IP_MTU_DISCOVER, 
+             (const void*) &optval, sizeof (optval));
+#endif
+
+  err = connect (sd, (struct sockaddr *) & sa, sizeof (sa));
   if (err < 0)
     {
       fprintf (stderr, "Connect error\n");

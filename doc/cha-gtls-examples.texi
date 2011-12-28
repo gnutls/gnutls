@@ -29,7 +29,8 @@ implemented by another example.
 * Client with Resume capability example::
 * Simple client example with SRP authentication::
 * Simple client example in C++::
-* Helper function for TCP connections::
+* Helper functions for TCP connections::
+* Helper functions for UDP connections::
 @end menu
 
 @node Simple client example with anonymous authentication
@@ -135,13 +136,21 @@ the GnuTLS C++ API.
 
 @verbatiminclude examples/ex-cxx.cpp
 
-@node Helper function for TCP connections
-@subsection Helper function for TCP connections
+@node Helper functions for TCP connections
+@subsection Helper functions for TCP connections
 
-This helper function abstracts away TCP connection handling from the
+Those helper function abstract away TCP connection handling from the
 other examples.  It is required to build some examples.
 
 @verbatiminclude examples/tcp.c
+
+@node Helper functions for UDP connections
+@subsection Helper functions for UDP connections
+
+The UDP helper functions abstract away UDP connection handling from the
+other examples.  It is required to build the examples using UDP.
+
+@verbatiminclude examples/udp.c
 
 @node Server examples
 @section Server examples
