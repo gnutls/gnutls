@@ -1460,17 +1460,20 @@ socket_open (socket_st * hd, const char *hostname, const char *service)
       exit (1);
     }
 
-#ifdef IP_DONTFRAG
   if (hints.ai_socktype == SOCK_DGRAM)
     {
+#if defined(IP_DONTFRAG)
       int yes = 1;
       if (setsockopt (sd, IPPROTO_IP, IP_DONTFRAG,
-                          (const void *) &yes, sizeof (yes)) < 0)
-        {
-          perror ("setsockopt(IP_DF) failed");
-        }
-    }
+                      (const void *) &yes, sizeof (yes)) < 0)
+        perror ("setsockopt(IP_DF) failed");
+#elif defined(IP_MTU_DISCOVER)
+      int yes = IP_PMTUDISC_DO;
+      if (setsockopt(sd, IPPROTO_IP, IP_MTU_DISCOVER, 
+                     (const void*) &yes, sizeof (yes)) < 0)
+        perror ("setsockopt(IP_DF) failed");
 #endif
+    }
 
   hd->secure = 0;
   hd->fd = sd;

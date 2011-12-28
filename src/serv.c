@@ -733,18 +733,21 @@ listen_socket (const char *name, int listen_port, int socktype)
               continue;
             }
         }
-#ifdef IP_DONTFRAG
       else
         {
+#if defined(IP_DONTFRAG)
           yes = 1;
           if (setsockopt (s, IPPROTO_IP, IP_DONTFRAG,
                           (const void *) &yes, sizeof (yes)) < 0)
-            {
               perror ("setsockopt(IP_DF) failed");
-            }
-        }
+#elif defined(IP_MTU_DISCOVER)
+          yes = IP_PMTUDISC_DO;
+          if (setsockopt(s, IPPROTO_IP, IP_MTU_DISCOVER, 
+                         (const void*) &yes, sizeof (yes)) < 0)
+              perror ("setsockopt(IP_DF) failed");
 #endif
-      
+        }
+
       if (bind (s, ptr->ai_addr, ptr->ai_addrlen) < 0)
         {
           perror ("bind() failed");

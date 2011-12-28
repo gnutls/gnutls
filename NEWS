@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.0.10 (unreleased)
 
+** gnutls-cli/serv: Set don't fragment bit in DTLS sessions
+in Linux as well as in BSD.
+
 ** libgnutls: Corrected ciphersuite GNUTLS_ECDHE_PSK_AES_256_CBC_SHA384
 
 ** libgnutls: Added ciphersuites: GNUTLS_PSK_WITH_AES_256_GCM_SHA384
