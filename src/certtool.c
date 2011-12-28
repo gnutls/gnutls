@@ -1391,12 +1391,12 @@ pgp_privkey_info (void)
         {
           gnutls_datum_t art;
 
-          fprintf (outfile, "Public Key ID: %s\n", raw_to_string (keyid, 8));
+          fprintf (outfile, "Fingerprint: %s\n", raw_to_string (keyid, 8));
 
           ret = gnutls_random_art(GNUTLS_RANDOM_ART_OPENSSH, cprint, bits, keyid, 8, &art);
           if (ret >= 0)
             {
-              fprintf (outfile, "public key's randomart:\n%s\n\n", art.data);
+              fprintf (outfile, "Fingerprint's random art:\n%s\n\n", art.data);
               gnutls_free(art.data);
             }
         }
@@ -1730,7 +1730,7 @@ const char *cprint;
       ret = gnutls_random_art(GNUTLS_RANDOM_ART_OPENSSH, cprint, bits, buffer, size, &art);
       if (ret >= 0)
         {
-          fprintf (outfile, "public key's randomart:\n%s\n", art.data);
+          fprintf (outfile, "Public key's random art:\n%s\n", art.data);
           gnutls_free(art.data);
         }
     }

@@ -127,7 +127,7 @@ print_key_fingerprint (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
   if (p == NULL)
     return;
   
-  adds (str, _("\tpublic key's randomart:\n"));
+  adds (str, _("\tFingerprint's random art:\n"));
   adds (str, p);
   adds (str, "\n\n");
 

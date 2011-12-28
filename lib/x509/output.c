@@ -1398,7 +1398,7 @@ print_keyid (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
   if (p == NULL)
     return;
   
-  adds (str, _("\tpublic key's randomart:\n"));
+  adds (str, _("\tPublic key's random art:\n"));
   adds (str, p);
   adds (str, "\n\n");
 
