@@ -1389,11 +1389,27 @@ pgp_privkey_info (void)
         }
       else
         {
+          fprintf (outfile, "Public key ID: %s\n", raw_to_string (keyid, 8));
+        }
+
+      size = buffer_size;
+      if (i == -1)
+        ret = gnutls_openpgp_privkey_get_fingerprint (key, buffer, &size);
+      else
+        ret = gnutls_openpgp_privkey_get_subkey_fingerprint (key, i, buffer, &size);
+
+      if (ret < 0)
+        {
+          fprintf (stderr, "Error in fingerprint calculation: %s\n",
+                   gnutls_strerror (ret));
+        }
+      else
+        {
           gnutls_datum_t art;
 
-          fprintf (outfile, "Fingerprint: %s\n", raw_to_string (keyid, 8));
+          fprintf (outfile, "Fingerprint: %s\n", raw_to_string (buffer, size));
 
-          ret = gnutls_random_art(GNUTLS_RANDOM_ART_OPENSSH, cprint, bits, keyid, 8, &art);
+          ret = gnutls_random_art(GNUTLS_RANDOM_ART_OPENSSH, cprint, bits, buffer, size, &art);
           if (ret >= 0)
             {
               fprintf (outfile, "Fingerprint's random art:\n%s\n\n", art.data);
