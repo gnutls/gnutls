@@ -92,6 +92,8 @@ extern "C"
 #define SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER (0x2)
 #define SSL_MODE_AUTO_RETRY (0x4)
 
+#undef X509_NAME
+#undef X509
   typedef gnutls_x509_dn X509_NAME;
   typedef gnutls_datum_t X509;
 
