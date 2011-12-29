@@ -94,7 +94,8 @@ main (void)
   gnutls_certificate_set_dh_params (x509_cred, dh_params);
 
   gnutls_priority_init (&priority_cache,
-                        "NORMAL:-VERS-TLS-ALL:+VERS-DTLS1.0", NULL);
+                        "PERFORMANCE:-VERS-TLS-ALL:+VERS-DTLS1.0:%SERVER_PRECEDENCE", 
+                        NULL);
 
   gnutls_key_generate (&cookie_key, GNUTLS_COOKIE_KEY_SIZE);
 
