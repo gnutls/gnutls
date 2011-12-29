@@ -1,6 +1,10 @@
 @node Shared-key and anonymous authentication
 @chapter Shared-key and anonymous authentication
 
+In addition to certificate authentication, the TLS protocol may be
+used with password, shared-key and anonymous authentication methods.
+The rest of this chapter discusses details of these methods.
+
 @menu
 * SRP authentication::
 * PSK authentication::

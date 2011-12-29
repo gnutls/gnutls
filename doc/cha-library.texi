@@ -1,15 +1,6 @@
 @node Introduction to GnuTLS
 @chapter Introduction to GnuTLS
 
-@menu
-* GnuTLS introduction::
-* Downloading and installing::
-* Document overview::
-@end menu
-
-@node GnuTLS introduction
-@section Introduction
-
 In brief @acronym{GnuTLS} can be described as a library which offers an API
 to access secure communication protocols. These protocols provide
 privacy over insecure lines, and were designed to prevent
@@ -48,6 +39,11 @@ functionality from the
 libtasn1@footnote{@url{http://www.gnu.org/software/libtasn1/}} library.
 The ``Cryptographic back-end'' is provided by the nettle@footnote{@url{http://www.lysator.liu.se/~nisse/nettle/}}
 library. 
+
+@menu
+* Downloading and installing::
+* Document overview::
+@end menu
 
 @node Downloading and installing
 @section Downloading and installing

@@ -125,7 +125,7 @@ threads as long as a single thread accesses a single object. This is
 sufficient to support a server which handles several sessions per thread.
 If, however, an object needs to be shared across threads then access must be 
 protected with a mutex. Read-only access to objects, for example the
-credentials holding structures (see @ref{Authentication}), is also thread-safe. 
+credentials holding structures, is also thread-safe. 
 
 The random generator of the cryptographic back-end, is not thread safe and requires
 mutex locks which are setup by @acronym{GnuTLS}.

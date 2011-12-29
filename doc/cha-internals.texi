@@ -117,12 +117,7 @@ together with the extension number they handle, they have to be registered
 using @funcintref{_gnutls_ext_register} in
 @code{gnutls_extensions.c} typically within @funcintref{_gnutls_ext_init}.
 
-@menu
-* Adding a new TLS extension::
-@end menu
-
-@node Adding a new TLS extension
-@subsection Adding a new TLS extension
+@subheading Adding a new TLS extension
 
 Adding support for a new TLS extension is done from time to time, and
 the process to do so is not difficult.  Here are the steps you need to
@@ -346,12 +341,12 @@ The TLS layer uses a cryptographic provider layer, that will in turn either
 use the default crypto provider -- a software crypto library, or use an external
 crypto provider, if available.
 
-@subsection Cryptographic library layer
+@subheading Cryptographic library layer
 The Cryptographic library layer, currently supports only
 libnettle. Other cryptographic libraries might be supported
 in the future.
 
-@subsection External cryptography provider
+@subheading External cryptography provider
 Systems that include a cryptographic co-processor, typically come with
 kernel drivers to utilize the operations from software. For this reason 
 GnuTLS provides a layer where each individual algorithm used can be replaced

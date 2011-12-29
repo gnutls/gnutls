@@ -158,7 +158,7 @@ Documentation License''.
 * Support::
 * Error codes::
 * API reference::
-* Supported ciphersuites in GnuTLS::
+* Supported ciphersuites::
 * Copying Information::
 * Concept Index::
 * Function and Data Index::

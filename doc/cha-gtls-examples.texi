@@ -4,6 +4,10 @@
 @cindex example programs
 @cindex examples
 
+In this chapter several examples of real-world use cases are listed.
+The examples are simplified to promote readability and contain little or 
+no error checking.  
+
 @menu
 * Client examples::
 * Server examples::
@@ -14,8 +18,7 @@
 @section Client examples
 
 This section contains examples of @acronym{TLS} and @acronym{SSL}
-clients, using @acronym{GnuTLS}.  Note that these examples contain
-little or no error checking.  Some of the examples require functions
+clients, using @acronym{GnuTLS}. Note that some of the examples require functions
 implemented by another example.
 
 @menu

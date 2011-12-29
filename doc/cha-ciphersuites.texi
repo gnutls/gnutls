@@ -1,5 +1,5 @@
-@node Supported ciphersuites in GnuTLS
-@appendix Supported Ciphersuites in @acronym{GnuTLS}
+@node Supported ciphersuites
+@appendix Supported Ciphersuites
 @anchor{ciphersuites}
 @cindex ciphersuites
 
