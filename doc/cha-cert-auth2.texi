@@ -2,12 +2,17 @@
 @chapter More on certificate authentication
 @cindex certificate authentication
 
+Certificates are not the only structures involved in a public key
+infrastructure. Several other structures that are used for certificate
+requests, encrypted private keys, revocation lists, GnuTLS abstract key
+structures, etc., are discussed in this chapter.
+
 @menu
 * PKCS 10 certificate requests::
 * PKIX certificate revocation lists::
 * Managing encrypted keys::
 * The certtool application::
-* Hardware tokens::
+* Smart cards and HSMs::
 * Abstract key types::
 @end menu
 
@@ -117,7 +122,7 @@ CRL number extension and the authority key identifier.
 
 Transferring or storing private keys in plain might not be a
 good idea. Any access on the keys becomes a fatal compromise.
-Storing the keys in hardware tokens (see @ref{Hardware tokens})
+Storing the keys in hardware security modules (see @ref{Smart cards and HSMs})
 could solve the storage problem but it is not always practical
 or efficient enough. This section describes alternative ways
 that involve encryption of the private keys to store and
@@ -514,25 +519,14 @@ signing_key
 @end example
 
 
-@node Hardware tokens
-@section Security modules
+@node Smart cards and HSMs
+@section Smart cards and HSMs
 @cindex PKCS #11 tokens
 @cindex hardware tokens
 @cindex hardware security modules
 @cindex smart cards
 
-@menu
-* Introduction on security modules::
-* PKCS11 Initialization::
-* Reading objects::
-* Writing objects::
-* Using a PKCS11 token with TLS::
-* The p11tool application::
-@end menu
-
-@node Introduction on security modules
-@subsection Introduction
-In this section we present the smart-card and hardware security module support 
+In this section we present the smart-card and hardware security module (HSM) support 
 in @acronym{GnuTLS} using @acronym{PKCS} #11 @xcite{PKCS11}. Hardware security
 modules and smart cards provide a way to store private keys and perform
 operations on them without exposing them. This allows decoupling cryptographic
@@ -562,6 +556,14 @@ system, being the @acronym{Gnome Keyring}.
 @image{pkcs11-vision,9cm}
 @caption{PKCS #11 module usage.}
 @end float
+
+@menu
+* PKCS11 Initialization::
+* Reading objects::
+* Writing objects::
+* Using a PKCS11 token with TLS::
+* The p11tool application::
+@end menu
 
 @node PKCS11 Initialization
 @subsection Initialization
@@ -687,7 +689,7 @@ p11tool is a program that is used to access tokens
 and security modules that support the PKCS #11 API. It requires
 individual PKCS #11 modules to be loaded either with the
 @code{--provider} option, or by setting up the GnuTLS configuration
-file for PKCS #11 as in @ref{Hardware tokens}.
+file for PKCS #11 as in @ref{Smart cards and HSMs}.
 
 @example
 p11tool help

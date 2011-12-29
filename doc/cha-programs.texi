@@ -73,12 +73,7 @@ Usage:  gnutls-cli [options] hostname
      -v, --version            prints the program's version number
 @end example
 
-@menu
-* Example client PSK connection::
-@end menu
-
-@node Example client PSK connection
-@subsection Example client PSK connection
+@subheading Example client PSK connection
 @cindex PSK client
 
 To connect to a server using PSK authentication, you need to enable
@@ -164,12 +159,7 @@ Usage: gnutls-serv [options]
      -v, --version            prints the program's version number
 @end example
 
-@menu
-* Setting up a test HTTPS server::
-@end menu
-
-@node Setting up a test HTTPS server
-@subsection Setting up a test HTTPS server
+@subheading Setting up a test HTTPS server
 @cindex HTTPS server
 @cindex debug server
 
