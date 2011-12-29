@@ -409,6 +409,8 @@ dnl Crywrap dependencies
 *** Checking dependencies for crywrap...
 ])
 
+if test "$have_win" != "yes"; then
+
 AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/select.h sys/types.h sys/wait.h])
 
 dnl **********************
@@ -430,6 +432,8 @@ AC_CHECK_FUNCS([alarm atexit dup2 epoll_create kqueue memchr memset munmap \
 		strdup strerror strncasecmp strrchr strstr strtoul uname])
 
 PKG_CHECK_MODULES(LIBIDN, libidn >= 0.0.0, [libidn=yes], [libidn=no])
+
+fi
 
 AM_CONDITIONAL(ENABLE_CRYWRAP, test "x$libidn" != "xno")
 
