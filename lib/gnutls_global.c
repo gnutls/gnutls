@@ -151,11 +151,6 @@ gnutls_global_set_mem_functions (gnutls_alloc_function alloc_func,
   gnutls_realloc = realloc_func;
   gnutls_free = free_func;
 
-  if (is_secure_func != NULL)
-    _gnutls_is_secure_memory = is_secure_func;
-  else
-    _gnutls_is_secure_memory = _gnutls_is_secure_mem_null;
-
   /* if using the libc's default malloc
    * use libc's calloc as well.
    */

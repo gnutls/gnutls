@@ -34,15 +34,6 @@ gnutls_realloc_function gnutls_realloc = realloc;
 void *(*gnutls_calloc) (size_t, size_t) = calloc;
 char *(*gnutls_strdup) (const char *) = _gnutls_strdup;
 
-int
-_gnutls_is_secure_mem_null (const void *ign)
-{
-  return 0;
-}
-
-int (*_gnutls_is_secure_memory) (const void *) = _gnutls_is_secure_mem_null;
-
-
 void *
 _gnutls_calloc (size_t nmemb, size_t size)
 {
