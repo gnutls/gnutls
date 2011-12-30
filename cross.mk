@@ -2,7 +2,7 @@
 GNUTLS_FILE:=gnutls-3.0.9.tar.xz
 GNUTLS_DIR:=gnutls-3.0.9
 
-GMP_FILE:=gmp-5.0.2.tar.lz
+GMP_FILE:=gmp-5.0.2.tar.bz2
 GMP_DIR:=gmp-5.0.2
 
 P11_KIT_FILE:=p11-kit-0.9.tar.gz
@@ -16,7 +16,10 @@ BIN_DIR:=$(CROSS_DIR)/bin
 LIB_DIR:=$(CROSS_DIR)/lib
 HEADERS_DIR:=$(LIB_DIR)/include
 
-all: gnutls-win32
+all: update-gpg-keys gnutls-win32
+
+update-gpg-keys:
+	gpg --recv-keys 96865171 B565716F D92765AF A8F4C2FD DB899F46
 
 $(GNUTLS_DIR)-win32.zip: $(LIB_DIR) $(BIN_DIR) $(GNUTLS_DIR)/.installed
 	cd $(CROSS_DIR) && zip -r $(PWD)/$@ *
@@ -38,6 +41,8 @@ CONFIG_FLAGS := --host=i686-w64-mingw32 --enable-shared --disable-static --bindi
 
 $(P11_KIT_DIR)/.configured:
 	test -f $(P11_KIT_FILE) || wget http://p11-glue.freedesktop.org/releases/$(P11_KIT_FILE)
+	test -f $(P11_KIT_FILE).sig || wget http://p11-glue.freedesktop.org/releases/$(P11_KIT_FILE).sig
+	gpg --verify $(P11_KIT_FILE).sig
 	test -d $(P11_KIT_DIR) || tar -xf $(P11_KIT_FILE)
 	cd $(P11_KIT_DIR) && ./configure $(CONFIG_FLAGS) && cd ..
 	touch $@
@@ -53,6 +58,8 @@ $(P11_KIT_DIR)/.installed: $(P11_KIT_DIR)/.configured
 
 $(GMP_DIR)/.configured: 
 	test -f $(GMP_FILE) || wget ftp://ftp.gmplib.org/pub/$(GMP_DIR)/$(GMP_FILE)
+	test -f $(GMP_FILE).sig || wget ftp://ftp.gmplib.org/pub/$(GMP_DIR)/$(GMP_FILE).sig
+	gpg --verify $(GMP_FILE).sig
 	test -d $(GMP_DIR) || tar -xf $(GMP_FILE)
 	cd $(GMP_DIR) && ./configure $(CONFIG_FLAGS) --enable-fat --exec-prefix=$(LIB_DIR) --oldincludedir=$(HEADERS_DIR) && cd ..
 	touch $@
@@ -64,6 +71,8 @@ $(GMP_DIR)/.installed: $(GMP_DIR)/.configured
 
 $(NETTLE_DIR)/.configured: $(GMP_DIR)/.installed
 	test -f $(NETTLE_FILE) || wget http://www.lysator.liu.se/~nisse/archive/$(NETTLE_FILE)
+	test -f $(NETTLE_FILE).sig || wget http://www.lysator.liu.se/~nisse/archive/$(NETTLE_FILE).sig
+	gpg --verify $(NETTLE_FILE).sig
 	test -d $(NETTLE_DIR) || tar -xf $(NETTLE_FILE)
 	cd $(NETTLE_DIR) && CFLAGS="-I$(HEADERS_DIR)" CXXFLAGS="-I$(HEADERS_DIR)" ./configure $(CONFIG_FLAGS) --with-lib-path=$(LIB_DIR) && cd ..
 	touch $@
@@ -85,6 +94,8 @@ $(GNUTLS_DIR)/.installed: $(GNUTLS_DIR)/.configured
 
 $(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
 	test -f $(GNUTLS_FILE) || wget ftp://ftp.gnu.org/gnu/gnutls/$(GNUTLS_FILE)
+	test -f $(GNUTLS_FILE).sig || wget ftp://ftp.gnu.org/gnu/gnutls/$(GNUTLS_FILE).sig
+	gpg --verify $(GNUTLS_FILE).sig
 	test -d $(GNUTLS_DIR) || tar -xf $(GNUTLS_FILE)
 	cd $(GNUTLS_DIR) && \
 		P11_KIT_CFLAGS="-I$(HEADERS_DIR)" \
@@ -96,4 +107,7 @@ $(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
 
 clean:
 	rm -rf $(CROSS_DIR) $(GNUTLS_DIR)/.installed $(NETTLE_DIR)/.installed $(GMP_DIR)/.installed $(P11_KIT_DIR)/.installed
+
+dirclean:
+	rm -rf $(CROSS_DIR) $(GNUTLS_DIR) $(NETTLE_DIR) $(GMP_DIR) $(P11_KIT_DIR)
 
