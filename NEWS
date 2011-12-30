@@ -7,6 +7,11 @@ See the end for copying conditions.
 ** gnutls-cli/serv: Set don't fragment bit in DTLS sessions
 in Linux as well as in BSD.
 
+** libgnutls: When GNUTLS_OPENPGP_FMT_BASE64 is specified
+the stream is assumed to be base64 encoded (previously
+the encoding was auto-detected). This avoids a decoding
+issue in windows systems.
+
 ** libgnutls: Corrected ciphersuite GNUTLS_ECDHE_PSK_AES_256_CBC_SHA384
 
 ** libgnutls: Added ciphersuites: GNUTLS_PSK_WITH_AES_256_GCM_SHA384

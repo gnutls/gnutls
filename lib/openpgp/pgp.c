@@ -118,8 +118,7 @@ gnutls_openpgp_crt_import (gnutls_openpgp_crt_t key,
           gnutls_assert ();
           return rc;
         }
-      if (cdk_armor_filter_use (inp))
-        rc = cdk_stream_set_armor_flag (inp, 0);
+      rc = cdk_stream_set_armor_flag (inp, 0);
       if (!rc)
         rc = cdk_keydb_get_keyblock (inp, &key->knode);
       cdk_stream_close (inp);
