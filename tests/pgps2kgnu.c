@@ -68,13 +68,25 @@ static char dummy_key[] =
         http://lists.gnu.org/archive/html/gnutls-devel/2008-08/msg00023.html
 */
 
+static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "|<%d>| %s", level, str);
+}
+
 int
-main (void)
+main (int argc, char** argv)
 {
   int rc;
   gnutls_datum_t keydatum =
     { (unsigned char *) dummy_key, strlen (dummy_key) };
   gnutls_openpgp_privkey_t key;
+
+  if (argc > 1)
+    {
+      gnutls_global_set_log_function (tls_log_func);
+      gnutls_global_set_log_level (9);
+    }
 
   rc = gnutls_global_init ();
   if (rc)
