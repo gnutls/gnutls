@@ -688,12 +688,17 @@ static int check_net_or_keyboard_input(socket_st* hd)
   do
     {
       FD_ZERO (&rset);
-      FD_SET (fileno (stdin), &rset);
       FD_SET (hd->fd, &rset);
 
+#ifndef _WIN32
+      FD_SET (fileno (stdin), &rset);
       maxfd = MAX (fileno (stdin), hd->fd);
+#else
+      maxfd = hd->fd;
+#endif
+
       tv.tv_sec = 0;
-      tv.tv_usec = 500 * 1000;
+      tv.tv_usec = 50 * 1000;
 
       if (hd->secure == 1)
         if (gnutls_record_check_pending(hd->session))
@@ -706,9 +711,18 @@ static int check_net_or_keyboard_input(socket_st* hd)
       if (FD_ISSET (hd->fd, &rset))
         return IN_NET;
 
-
+#ifdef _WIN32
+      {
+        int state;
+        state = WaitForSingleObject(GetStdHandle(STD_INPUT_HANDLE), 200); 
+        
+        if (state == WAIT_OBJECT_0)
+          return IN_KEYBOARD;
+      }
+#else
       if (FD_ISSET (fileno (stdin), &rset))
         return IN_KEYBOARD;
+#endif
     }
   while(err == 0);
   
