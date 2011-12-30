@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
- * Free Software Foundation, Inc.
+ * Copyright (C) 2002-2011 Free Software Foundation, Inc.
  *
  * Author: Timo Schulz, Nikos Mavrogiannopoulos
  *
@@ -89,9 +88,8 @@ gnutls_openpgp_crt_import (gnutls_openpgp_crt_t key,
                            const gnutls_datum_t * data,
                            gnutls_openpgp_crt_fmt_t format)
 {
-  cdk_stream_t inp;
   cdk_packet_t pkt;
-  int rc;
+  int rc, armor;
 
   if (data->data == NULL || data->size == 0)
     {
@@ -99,38 +97,15 @@ gnutls_openpgp_crt_import (gnutls_openpgp_crt_t key,
       return GNUTLS_E_OPENPGP_GETKEY_FAILED;
     }
 
-  if (format == GNUTLS_OPENPGP_FMT_RAW)
+  if (format == GNUTLS_OPENPGP_FMT_RAW) armor = 0;
+  else armor = 1;
+
+  rc = cdk_kbnode_read_from_mem (&key->knode, armor, data->data, data->size);
+  if (rc)
     {
-      rc = cdk_kbnode_read_from_mem (&key->knode, data->data, data->size);
-      if (rc)
-        {
-          rc = _gnutls_map_cdk_rc (rc);
-          gnutls_assert ();
-          return rc;
-        }
-    }
-  else
-    {
-      rc = cdk_stream_tmp_from_mem (data->data, data->size, &inp);
-      if (rc)
-        {
-          rc = _gnutls_map_cdk_rc (rc);
-          gnutls_assert ();
-          return rc;
-        }
-      rc = cdk_stream_set_armor_flag (inp, 0);
-      if (!rc)
-        rc = cdk_keydb_get_keyblock (inp, &key->knode);
-      cdk_stream_close (inp);
-      if (rc)
-        {
-          if (rc == CDK_Inv_Packet)
-            rc = GNUTLS_E_OPENPGP_GETKEY_FAILED;
-          else
-            rc = _gnutls_map_cdk_rc (rc);
-          gnutls_assert ();
-          return rc;
-        }
+      rc = _gnutls_map_cdk_rc (rc);
+      gnutls_assert ();
+      return rc;
     }
 
   /* Test if the import was successful. */

@@ -169,9 +169,8 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
                                gnutls_openpgp_crt_fmt_t format,
                                const char *password, unsigned int flags)
 {
-  cdk_stream_t inp;
   cdk_packet_t pkt;
-  int rc;
+  int rc, armor;
 
   if (data->data == NULL || data->size == 0)
     {
@@ -180,43 +179,15 @@ gnutls_openpgp_privkey_import (gnutls_openpgp_privkey_t key,
     }
 
   if (format == GNUTLS_OPENPGP_FMT_RAW)
+    armor = 0;
+  else armor = 1;
+
+  rc = cdk_kbnode_read_from_mem (&key->knode, armor, data->data, data->size);
+  if (rc != 0)
     {
-      rc = cdk_kbnode_read_from_mem (&key->knode, data->data, data->size);
-      if (rc != 0)
-        {
-          rc = _gnutls_map_cdk_rc (rc);
-          gnutls_assert ();
-          return rc;
-        }
-    }
-  else
-    {
-      rc = cdk_stream_tmp_from_mem (data->data, data->size, &inp);
-      if (rc != 0)
-        {
-          rc = _gnutls_map_cdk_rc (rc);
-          gnutls_assert ();
-          return rc;
-        }
-
-      rc = cdk_stream_set_armor_flag (inp, 0);
-      if (rc != 0)
-        {
-          rc = _gnutls_map_cdk_rc (rc);
-          cdk_stream_close (inp);
-          gnutls_assert ();
-          return rc;
-        }
-
-      rc = cdk_keydb_get_keyblock (inp, &key->knode);
-      cdk_stream_close (inp);
-
-      if (rc != 0)
-        {
-          rc = _gnutls_map_cdk_rc (rc);
-          gnutls_assert ();
-          return rc;
-        }
+       rc = _gnutls_map_cdk_rc (rc);
+       gnutls_assert ();
+       return rc;
     }
 
   /* Test if the import was successful. */

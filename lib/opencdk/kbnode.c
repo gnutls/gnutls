@@ -1,6 +1,5 @@
 /* kbnode.c -  keyblock node utility functions
- * Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2007, 2008, 2010
- * Free Software Foundation, Inc.
+ * Copyright (C) 1998-2003, 2007-2011 Free Software Foundation, Inc.
  *
  * Author: Timo Schulz
  *
@@ -396,6 +395,7 @@ cdk_kbnode_get_packet (cdk_kbnode_t node)
 /**
  * cdk_kbnode_read_from_mem:
  * @ret_node: the new key node
+ * @armor: whether base64 or not
  * @buf: the buffer which stores the key sequence
  * @buflen: the length of the buffer
  *
@@ -403,6 +403,7 @@ cdk_kbnode_get_packet (cdk_kbnode_t node)
  **/
 cdk_error_t
 cdk_kbnode_read_from_mem (cdk_kbnode_t * ret_node,
+                          int armor,
                           const byte * buf, size_t buflen)
 {
   cdk_stream_t inp;
@@ -418,6 +419,10 @@ cdk_kbnode_read_from_mem (cdk_kbnode_t * ret_node,
   rc = cdk_stream_tmp_from_mem (buf, buflen, &inp);
   if (rc)
     return rc;
+  
+  if (armor)
+    cdk_stream_set_armor_flag (inp, 0);
+
   rc = cdk_keydb_get_keyblock (inp, ret_node);
   if (rc)
     gnutls_assert ();

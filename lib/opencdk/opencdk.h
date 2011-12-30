@@ -852,6 +852,7 @@ extern "C"
 
   cdk_kbnode_t cdk_kbnode_new (cdk_packet_t pkt);
   cdk_error_t cdk_kbnode_read_from_mem (cdk_kbnode_t * ret_node,
+                                        int armor,
                                         const unsigned char *buf,
                                         size_t buflen);
   cdk_error_t cdk_kbnode_write_to_mem (cdk_kbnode_t node,

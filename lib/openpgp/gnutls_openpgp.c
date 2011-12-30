@@ -498,7 +498,7 @@ gnutls_openpgp_count_key_names (const gnutls_datum_t * cert)
       return 0;
     }
 
-  if (cdk_kbnode_read_from_mem (&knode, cert->data, cert->size))
+  if (cdk_kbnode_read_from_mem (&knode, 0, cert->data, cert->size))
     {
       gnutls_assert ();
       return 0;
