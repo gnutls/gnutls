@@ -57,6 +57,7 @@ endif
 
 noinst_LTLIBRARIES = libutils.la
 libutils_la_SOURCES = utils.h utils.c
+libutils_la_LIBADD = ../gl/libgnu.la
 
 ctests = mini-deflate simple gc set_pkcs12_cred certder certuniqueid	\
 	 mpi certificate_set_x509_crl dn parse_ca moredn mini		\
