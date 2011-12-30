@@ -198,12 +198,16 @@ crypto-api.texi: $(top_srcdir)/lib/includes/gnutls/crypto.h
 	mv -f $@-tmp $@
 
 # Generated texinfos.
-
+# for some reason it does not work when cross compiling
+if !WINDOWS
 gnutls_TEXINFOS += error_codes.texi algorithms.texi alerts.texi  enums.texi
+endif
+
 MAINTAINERCLEANFILES += error_codes.texi algorithms.texi enums.texi
 
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/lib/includes -I$(top_builddir)/lib/includes
+	-I$(top_builddir)/lib/includes -I$(top_srcdir)/lib/includes \
+	-I$(top_builddir)/
 
 EXTRA_PROGRAMS = errcodes printlist alert-printlist
 
