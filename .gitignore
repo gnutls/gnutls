@@ -539,3 +539,8 @@ tests/slow/keygen
 tests/slow/gendh
 doc/reference/*.bak
 doc/manpages/gnutls_*.3
+doc/examples/ex-client-anon
+doc/examples/ex-client-dtls
+doc/examples/ex-client-x509
+doc/examples/ex-serv-x509
+tests/slow/cipher-test
