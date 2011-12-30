@@ -23,6 +23,8 @@
 #include <config.h>
 #endif
 
+#if !defined(_WIN32)
+
 #include <gnutls/gnutls.h>
 #include <gnutls/openpgp.h>
 
@@ -37,6 +39,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
+
 
 /* This is the same test as openpgp-auth but tests
  * openpgp under the latest TLS protocol (TLSv1.2). In
@@ -247,3 +250,10 @@ doit ()
         fail ("child failed: %d\n", status);
     }
 }
+#else
+void
+doit ()
+{
+  exit (77);
+}
+#endif

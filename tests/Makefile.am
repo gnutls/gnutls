@@ -98,6 +98,9 @@ TESTS_ENVIRONMENT =						\
 	PKCS12FILE_2=$(srcdir)/pkcs12-decode/pkcs12_2certs.p12	\
 	PKCS12PASSWORD_2=""					\
 	EXEEXT=$(EXEEXT)					\
-	srcdir="$(srcdir)"					\
-	$(VALGRIND)
+	srcdir="$(srcdir)"
 
+if !WINDOWS
+TESTS_ENVIRONMENT +=						\
+	$(VALGRIND)
+endif
