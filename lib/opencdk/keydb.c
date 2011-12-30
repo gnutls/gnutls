@@ -279,13 +279,15 @@ keydb_idx_search (cdk_stream_t inp, u32 * keyid, const byte * fpr,
 /**
  * cdk_keydb_new_from_mem:
  * @r_hd: The keydb output handle.
+ * @secret: does the stream contain secret key data
+ * @armor: the stream is base64
  * @data: The raw key data.
  * @datlen: The length of the raw data.
  * 
  * Create a new keyring db handle from the contents of a buffer.
  */
 cdk_error_t
-cdk_keydb_new_from_mem (cdk_keydb_hd_t * r_db, int secret,
+cdk_keydb_new_from_mem (cdk_keydb_hd_t * r_db, int secret, int armor,
                         const void *data, size_t datlen)
 {
   cdk_keydb_hd_t db;
@@ -305,109 +307,14 @@ cdk_keydb_new_from_mem (cdk_keydb_hd_t * r_db, int secret,
       gnutls_assert ();
       return rc;
     }
-  if (cdk_armor_filter_use (db->fp))
+
+  if (armor)
     cdk_stream_set_armor_flag (db->fp, 0);
   db->type = CDK_DBTYPE_DATA;
   db->secret = secret;
   *r_db = db;
   return 0;
 }
-
-
-/**
- * cdk_keydb_new_from_stream:
- * @r_hd: the output keydb handle
- * @secret: does the stream contain secret key data
- * @in: the input stream to use
- * 
- * This function creates a new keydb handle based on the given
- * stream. The stream is not closed in cdk_keydb_free() and it
- * is up to the caller to close it. No decoding is done.
- */
-cdk_error_t
-cdk_keydb_new_from_stream (cdk_keydb_hd_t * r_hd, int secret, cdk_stream_t in)
-{
-  cdk_keydb_hd_t hd;
-
-  if (!r_hd)
-    {
-      gnutls_assert ();
-      return CDK_Inv_Value;
-    }
-  *r_hd = NULL;
-
-  hd = calloc (1, sizeof *hd);
-  hd->fp = in;
-  hd->fp_ref = 1;
-  hd->type = CDK_DBTYPE_STREAM;
-  hd->secret = secret;
-  *r_hd = hd;
-
-  /* We do not push any filters and thus we expect that the format
-     of the stream has the format the user wanted. */
-
-  return 0;
-}
-
-
-cdk_error_t
-cdk_keydb_new_from_file (cdk_keydb_hd_t * r_hd, int secret, const char *fname)
-{
-  cdk_keydb_hd_t hd;
-
-  if (!r_hd)
-    {
-      gnutls_assert ();
-      return CDK_Inv_Value;
-    }
-  *r_hd = NULL;
-  hd = calloc (1, sizeof *hd);
-  hd->name = cdk_strdup (fname);
-  if (!hd->name)
-    {
-      cdk_free (hd);
-      gnutls_assert ();
-      return CDK_Out_Of_Core;
-    }
-  hd->type = secret ? CDK_DBTYPE_SK_KEYRING : CDK_DBTYPE_PK_KEYRING;
-  hd->secret = secret;
-  *r_hd = hd;
-  return 0;
-}
-
-
-
-/**
- * cdk_keydb_new:
- * @r_hd: handle to store the new keydb object
- * @type: type of the keyring
- * @data: data which depends on the keyring type
- * @count: length of the data
- *
- * Create a new keydb object
- **/
-cdk_error_t
-cdk_keydb_new (cdk_keydb_hd_t * r_hd, int type, void *data, size_t count)
-{
-  switch (type)
-    {
-    case CDK_DBTYPE_PK_KEYRING:
-    case CDK_DBTYPE_SK_KEYRING:
-      return cdk_keydb_new_from_file (r_hd, type == CDK_DBTYPE_SK_KEYRING,
-                                      (const char *) data);
-
-    case CDK_DBTYPE_DATA:
-      return cdk_keydb_new_from_mem (r_hd, 0, data, count);
-
-    case CDK_DBTYPE_STREAM:
-      return cdk_keydb_new_from_stream (r_hd, 0, (cdk_stream_t) data);
-
-    default:
-      gnutls_assert ();
-      return CDK_Inv_Mode;
-    }
-}
-
 
 /**
  * cdk_keydb_free:
@@ -453,7 +360,7 @@ _cdk_keydb_open (cdk_keydb_hd_t hd, cdk_stream_t * ret_kr)
     }
 
   rc = 0;
-  if ((hd->type == CDK_DBTYPE_DATA || hd->type == CDK_DBTYPE_STREAM)
+  if ((hd->type == CDK_DBTYPE_DATA)
       && hd->fp)
     {
       kr = hd->fp;
@@ -466,9 +373,6 @@ _cdk_keydb_open (cdk_keydb_hd_t hd, cdk_stream_t * ret_kr)
 
       if (rc)
         goto leave;
-
-      if (cdk_armor_filter_use (kr))
-        cdk_stream_set_armor_flag (kr, 0);
     }
   else
     {

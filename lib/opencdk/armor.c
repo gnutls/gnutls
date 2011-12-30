@@ -463,7 +463,6 @@ search_header (const char *buf, const char **array)
 
   if (strlen (buf) < 5 || strncmp (buf, "-----", 5))
     {
-      gnutls_assert ();
       return -1;
     }
   for (i = 0; (s = array[i]); i++)
@@ -517,7 +516,6 @@ armor_decode (void *data, FILE * in, FILE * out)
 
   if (feof (in) || !pgp_data)
     {
-      gnutls_assert ();
       return CDK_Armor_Error;   /* no data found */
     }
 
@@ -615,114 +613,6 @@ armor_decode (void *data, FILE * in, FILE * out)
 
   return rc;
 }
-
-
-/**
- * cdk_file_armor:
- * @hd: Handle
- * @file: Name of the file to protect.
- * @output: Output filename.
- *
- * Protect a file with ASCII armor.
- **/
-cdk_error_t
-cdk_file_armor (cdk_ctx_t hd, const char *file, const char *output)
-{
-  cdk_stream_t inp, out;
-  cdk_error_t rc;
-
-  rc = _cdk_check_args (hd->opt.overwrite, file, output);
-  if (rc)
-    return rc;
-
-  rc = cdk_stream_open (file, &inp);
-  if (rc)
-    {
-      gnutls_assert ();
-      return rc;
-    }
-
-  rc = cdk_stream_new (output, &out);
-  if (rc)
-    {
-      cdk_stream_close (inp);
-      gnutls_assert ();
-      return rc;
-    }
-
-  cdk_stream_set_armor_flag (out, CDK_ARMOR_MESSAGE);
-  if (hd->opt.compress)
-    rc = cdk_stream_set_compress_flag (out, hd->compress.algo,
-                                       hd->compress.level);
-  if (!rc)
-    rc = cdk_stream_set_literal_flag (out, 0, file);
-  if (!rc)
-    rc = cdk_stream_kick_off (inp, out);
-  if (!rc)
-    rc = _cdk_stream_get_errno (out);
-
-  cdk_stream_close (out);
-  cdk_stream_close (inp);
-  return rc;
-}
-
-
-/**
- * cdk_file_dearmor:
- * @file: Name of the file to unprotect.
- * @output: Output filename.
- *
- * Remove ASCII armor from a file.
- **/
-cdk_error_t
-cdk_file_dearmor (const char *file, const char *output)
-{
-  cdk_stream_t inp, out;
-  cdk_error_t rc;
-  int zipalgo;
-
-  rc = _cdk_check_args (1, file, output);
-  if (rc)
-    {
-      gnutls_assert ();
-      return rc;
-    }
-
-  rc = cdk_stream_open (file, &inp);
-  if (rc)
-    {
-      gnutls_assert ();
-      return rc;
-    }
-
-  rc = cdk_stream_create (output, &out);
-  if (rc)
-    {
-      cdk_stream_close (inp);
-      gnutls_assert ();
-      return rc;
-    }
-
-  if (cdk_armor_filter_use (inp))
-    {
-      rc = cdk_stream_set_literal_flag (inp, 0, NULL);
-      zipalgo = cdk_stream_is_compressed (inp);
-      if (zipalgo)
-        rc = cdk_stream_set_compress_flag (inp, zipalgo, 0);
-      if (!rc)
-        rc = cdk_stream_set_armor_flag (inp, 0);
-      if (!rc)
-        rc = cdk_stream_kick_off (inp, out);
-      if (!rc)
-        rc = _cdk_stream_get_errno (inp);
-    }
-
-  cdk_stream_close (inp);
-  cdk_stream_close (out);
-  gnutls_assert ();
-  return rc;
-}
-
 
 int
 _cdk_filter_armor (void *data, int ctl, FILE * in, FILE * out)

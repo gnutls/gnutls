@@ -147,7 +147,7 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
       size_t written = 0;
 
       err = cdk_stream_tmp_from_mem (data->data, data->size, &input);
-      if (!err)
+      if (err == 0)
         err = cdk_stream_set_armor_flag (input, 0);
       if (err)
         {
@@ -183,7 +183,6 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
       while (written < raw_len && err != EOF && err > 0);
 
       raw_len = written;
-
     }
   else
     {                           /* RAW */
@@ -191,7 +190,7 @@ gnutls_openpgp_keyring_import (gnutls_openpgp_keyring_t keyring,
       raw_data = data->data;
     }
 
-  err = cdk_keydb_new (&keyring->db, CDK_DBTYPE_DATA, raw_data, raw_len);
+  err = cdk_keydb_new_from_mem (&keyring->db, 0, 0, raw_data, raw_len);
   if (err)
     gnutls_assert ();
 

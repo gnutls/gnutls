@@ -258,7 +258,6 @@ extern "C"
     CDK_DBTYPE_PK_KEYRING = 100,        /* A file with one or more public keys */
     CDK_DBTYPE_SK_KEYRING = 101,        /* A file with one or more secret keys */
     CDK_DBTYPE_DATA = 102,      /* A buffer with at least one public key */
-    CDK_DBTYPE_STREAM = 103     /* A stream is used to read keys from */
   };
 
 
@@ -576,56 +575,6 @@ extern "C"
   };
   typedef struct cdk_packet_s *cdk_packet_t;
 
-/* Session handle routines */
-  cdk_error_t cdk_handle_new (cdk_ctx_t * r_ctx);
-  void cdk_handle_free (cdk_ctx_t c);
-
-/* Set the key database handle for the given session handle.
-   The type of the key db handle (public or secret) decides
-   which session key db handle to use. */
-  void cdk_handle_set_keydb (cdk_ctx_t hd, cdk_keydb_hd_t db);
-
-/* Convenient function to avoid to open a key db first.
-   The user can directly use the file name, the rest is
-   done internally. */
-  cdk_error_t cdk_handle_set_keyring (cdk_ctx_t hd, int type,
-                                      const char *kringname);
-
-/* Return keydb handle stored in the session handle. */
-  cdk_keydb_hd_t cdk_handle_get_keydb (cdk_ctx_t hd, int type);
-  int cdk_handle_control (cdk_ctx_t hd, int action, int cmd, ...);
-
-/* Set a passphrase callback for the given session handle. */
-  void cdk_handle_set_passphrase_cb (cdk_ctx_t hd,
-                                     char *(*cb) (void *opa,
-                                                  const char *prompt),
-                                     void *cb_value);
-
-/* shortcuts for some controls */
-
-/* Enable or disable armor output. */
-#define cdk_handle_set_armor(a, val) \
-  cdk_handle_control ((a), CDK_CTLF_SET, CDK_CTL_ARMOR, (val))
-
-/* Set the compression algorithm and level. 0 means disable compression. */
-#define cdk_handle_set_compress(a, algo, level) \
-  cdk_handle_control ((a), CDK_CTLF_SET, CDK_CTL_COMPRESS, (algo), (level))
-
-/* Activate partial bodies for the output. This is needed if the length
-   of the data is not known in advance or for the use with sockets
-   or pipes. */
-#define cdk_handle_set_blockmode(a, val) \
-  cdk_handle_control ((a), CDK_CTLF_SET, CDK_CTL_BLOCKMODE_ON, (val))
-
-/* Set the digest for the PK signing operation. */
-#define cdk_handle_set_digest(a, val) \
-  cdk_handle_control ((a), CDK_CTLF_SET, CDK_CTL_DIGEST, (val))
-
-/* Set the mode and the digest for the S2K operation. */
-#define cdk_handle_set_s2k(a, val1, val2) \
-  cdk_handle_control ((a), CDK_CTLF_SET, CDK_CTL_S2K, (val1), (val2))
-/* Raw packet routines. */
-
 /* Allocate a new packet or a new packet with the given packet type. */
   cdk_error_t cdk_pkt_new (cdk_packet_t * r_pkt);
   cdk_error_t cdk_pkt_alloc (cdk_packet_t * r_pkt, cdk_packet_type_t pkttype);
@@ -750,9 +699,6 @@ extern "C"
                            const unsigned char *salt);
   void cdk_s2k_free (cdk_s2k_t s2k);
 
-  cdk_error_t cdk_file_armor (cdk_ctx_t hd, const char *file,
-                              const char *output);
-  cdk_error_t cdk_file_dearmor (const char *file, const char *output);
   int cdk_armor_filter_use (cdk_stream_t inp);
 
 /* Protect the inbuf with ASCII armor of the specified type.
@@ -833,25 +779,10 @@ extern "C"
    the requested amount of bytes. */
   int cdk_stream_peek (cdk_stream_t inp, unsigned char *buf, size_t buflen);
 
-/* A wrapper around the various new_from_XXX functions. Because
-   the function does not support all combinations, the dedicated
-   functions should be preferred. */
-  cdk_error_t cdk_keydb_new (cdk_keydb_hd_t * r_hd, int type, void *data,
-                             size_t count);
-
 /* Create a new key db handle from a memory buffer. */
   cdk_error_t cdk_keydb_new_from_mem (cdk_keydb_hd_t * r_hd, int secret,
+                                      int armor,
                                       const void *data, size_t datlen);
-
-/* Create a new key db which uses an existing file. */
-  cdk_error_t cdk_keydb_new_from_file (cdk_keydb_hd_t * r_hd, int secret,
-                                       const char *fname);
-
-/* Uses a stream as the key db input. For searching it is important
-   that the seek function is supported on the stream. Furthermore,
-   the stream is not closed in cdk_keydb_free(). The caller must do it. */
-  cdk_error_t cdk_keydb_new_from_stream (cdk_keydb_hd_t * r_hd, int secret,
-                                         cdk_stream_t in);
 
 /* Check that a secret key with the given key ID is available. */
   cdk_error_t cdk_keydb_check_sk (cdk_keydb_hd_t hd, unsigned int *keyid);

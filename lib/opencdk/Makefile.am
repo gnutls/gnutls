@@ -32,7 +32,7 @@ endif
 
 noinst_LTLIBRARIES = libminiopencdk.la
 
-libminiopencdk_la_SOURCES = armor.c filters.h keydb.h main.c types.h	\
+libminiopencdk_la_SOURCES = armor.c filters.h keydb.h types.h	\
 	kbnode.c main.h packet.h sig-check.c hash.c \
 	keydb.c pubkey.c stream.c write-packet.c misc.c	seskey.c \
 	context.h literal.c new-packet.c read-packet.c stream.h opencdk.h
