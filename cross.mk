@@ -54,7 +54,7 @@ $(P11_KIT_DIR)/.installed: $(P11_KIT_DIR)/.configured
 $(GMP_DIR)/.configured: 
 	test -f $(GMP_FILE) || wget ftp://ftp.gmplib.org/pub/$(GMP_DIR)/$(GMP_FILE)
 	test -d $(GMP_DIR) || tar -xf $(GMP_FILE)
-	cd $(GMP_DIR) && ./configure $(CONFIG_FLAGS) --exec-prefix=$(LIB_DIR) --oldincludedir=$(HEADERS_DIR) && cd ..
+	cd $(GMP_DIR) && ./configure $(CONFIG_FLAGS) --enable-fat --exec-prefix=$(LIB_DIR) --oldincludedir=$(HEADERS_DIR) && cd ..
 	touch $@
 
 $(GMP_DIR)/.installed: $(GMP_DIR)/.configured
