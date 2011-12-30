@@ -1454,7 +1454,7 @@ pgp_ring_info (void)
   free (pem.data);
 
   count = gnutls_openpgp_keyring_get_crt_count (ring);
-  if (count > 0)
+  if (count >= 0)
     fprintf (outfile, "Keyring contains %d OpenPGP certificates\n\n", count);
   else
     error (EXIT_FAILURE, 0, "keyring error: %s", gnutls_strerror (count));
