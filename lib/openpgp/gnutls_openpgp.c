@@ -44,6 +44,8 @@ _gnutls_map_cdk_rc (int rc)
     {
     case CDK_Success:
       return 0;
+    case CDK_EOF:
+      return GNUTLS_E_PARSING_ERROR;
     case CDK_Too_Short:
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     case CDK_General_Error:
