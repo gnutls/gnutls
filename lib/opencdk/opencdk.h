@@ -699,8 +699,6 @@ extern "C"
                            const unsigned char *salt);
   void cdk_s2k_free (cdk_s2k_t s2k);
 
-  int cdk_armor_filter_use (cdk_stream_t inp);
-
 /* Protect the inbuf with ASCII armor of the specified type.
    If @outbuf and @outlen are NULL, the function returns the calculated
    size of the base64 encoded data in @nwritten. */

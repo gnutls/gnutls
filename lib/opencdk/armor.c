@@ -426,35 +426,6 @@ armor_encode (void *data, FILE * in, FILE * out)
   return 0;
 }
 
-
-/**
- * cdk_armor_filter_use:
- * @inp: the stream to check
- *
- * Check if the stream contains armored data.
- **/
-int
-cdk_armor_filter_use (cdk_stream_t inp)
-{
-  int c, check;
-  int zipalgo;
-
-  zipalgo = 0;
-  c = cdk_stream_getc (inp);
-  if (c == EOF)
-    return 0;                   /* EOF, doesn't matter whether armored or not */
-  cdk_stream_seek (inp, 0);
-  check = is_armored (c);
-  if (check)
-    {
-      check = check_armor (inp, &zipalgo);
-      if (zipalgo)
-        _cdk_stream_set_compress_algo (inp, zipalgo);
-    }
-  return check;
-}
-
-
 static int
 search_header (const char *buf, const char **array)
 {
