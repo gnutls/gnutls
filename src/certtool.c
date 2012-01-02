@@ -196,7 +196,7 @@ generate_private_key_int (void)
   if (info.dsa)
     key_type = GNUTLS_PK_DSA;
   else if (info.ecc)
-    key_type = GNUTLS_PK_ECC;
+    key_type = GNUTLS_PK_EC;
   else
     key_type = GNUTLS_PK_RSA;
 
@@ -1709,7 +1709,7 @@ const char *cprint;
           gnutls_free (g.data);
         }
     }
-  else if (key_type == GNUTLS_PK_ECC)
+  else if (key_type == GNUTLS_PK_EC)
     {
       gnutls_datum_t y, x, k;
       gnutls_ecc_curve_t curve;
@@ -2987,7 +2987,7 @@ pubkey_info (gnutls_x509_crt_t crt, common_info_st * cinfo)
           gnutls_free (g.data);
         }
     }
-  else if (ret == GNUTLS_PK_ECC)
+  else if (ret == GNUTLS_PK_EC)
     {
       gnutls_datum_t x, y;
       gnutls_ecc_curve_t curve;

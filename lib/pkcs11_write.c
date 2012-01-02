@@ -438,7 +438,7 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
 
         break;
       }
-    case GNUTLS_PK_ECC:
+    case GNUTLS_PK_EC:
       {
         ret = _gnutls_x509_write_ecc_params(&key->params, &p);
         if (ret < 0)
@@ -509,7 +509,7 @@ cleanup:
         gnutls_free (x.data);
         break;
       }
-    case GNUTLS_PK_ECC:
+    case GNUTLS_PK_EC:
       {
         gnutls_free (p.data);
         gnutls_free (x.data);

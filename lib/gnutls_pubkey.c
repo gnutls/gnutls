@@ -71,7 +71,7 @@ int pubkey_to_bits(gnutls_pk_algorithm_t pk, gnutls_pk_params_st* params)
         return _gnutls_mpi_get_nbits(params->params[0]);
       case GNUTLS_PK_DSA:
         return _gnutls_mpi_get_nbits(params->params[3]);
-      case GNUTLS_PK_ECC:
+      case GNUTLS_PK_EC:
         return gnutls_ecc_curve_get_size(params->flags)*8;
       default:
         return 0;
@@ -302,7 +302,7 @@ gnutls_pubkey_import_pkcs11 (gnutls_pubkey_t key,
                                           &obj->pubkey[1],
                                           &obj->pubkey[2], &obj->pubkey[3]);
       break;
-    case GNUTLS_PK_ECC:
+    case GNUTLS_PK_EC:
       ret = gnutls_pubkey_import_ecc_x962 (key, &obj->pubkey[0],
                                           &obj->pubkey[1]);
       break;
@@ -731,7 +731,7 @@ gnutls_pubkey_get_pk_ecc_raw (gnutls_pubkey_t key, gnutls_ecc_curve_t *curve,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  if (key->pk_algorithm != GNUTLS_PK_ECC)
+  if (key->pk_algorithm != GNUTLS_PK_EC)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -778,7 +778,7 @@ int gnutls_pubkey_get_pk_ecc_x962 (gnutls_pubkey_t key, gnutls_datum_t* paramete
 {
   int ret;
 
-  if (key == NULL || key->pk_algorithm != GNUTLS_PK_ECC)
+  if (key == NULL || key->pk_algorithm != GNUTLS_PK_EC)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
   ret = _gnutls_x509_write_ecc_pubkey(&key->params, ecpoint);
@@ -1152,7 +1152,7 @@ gnutls_pubkey_import_ecc_raw (gnutls_pubkey_t key,
       goto cleanup;
     }
   key->params.params_nr++;
-  key->pk_algorithm = GNUTLS_PK_ECC;
+  key->pk_algorithm = GNUTLS_PK_EC;
 
   return 0;
 
@@ -1206,7 +1206,7 @@ gnutls_pubkey_import_ecc_x962 (gnutls_pubkey_t key,
       goto cleanup;
     }
   key->params.params_nr+=2;
-  key->pk_algorithm = GNUTLS_PK_ECC;
+  key->pk_algorithm = GNUTLS_PK_EC;
 
   return 0;
 
@@ -1462,7 +1462,7 @@ int hash_algo;
         }
         
     }
-  else if (pubkey->pk_algorithm == GNUTLS_PK_ECC)
+  else if (pubkey->pk_algorithm == GNUTLS_PK_EC)
     {
       if (_gnutls_version_has_selectable_sighash (ver) && sign != GNUTLS_SIGN_UNKNOWN)
         {
@@ -1658,7 +1658,7 @@ pubkey_verify_hashed_data (gnutls_pk_algorithm_t pk,
       return 1;
       break;
 
-    case GNUTLS_PK_ECC:
+    case GNUTLS_PK_EC:
     case GNUTLS_PK_DSA:
       if (dsa_verify_hashed_data(hash, signature, pk, issuer_params) != 0)
         {
@@ -1700,7 +1700,7 @@ pubkey_verify_data (gnutls_pk_algorithm_t pk,
       return 1;
       break;
 
-    case GNUTLS_PK_ECC:
+    case GNUTLS_PK_EC:
     case GNUTLS_PK_DSA:
       if (dsa_verify_data(pk, algo, data, signature, issuer_params) != 0)
         {
@@ -1724,7 +1724,7 @@ _gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* pa
   
   if (algo == GNUTLS_PK_DSA)
     bits = _gnutls_mpi_get_nbits (params->params[1]);
-  else if (algo == GNUTLS_PK_ECC)
+  else if (algo == GNUTLS_PK_EC)
     bits = gnutls_ecc_curve_get_size(params->flags)*8;
 
   if (bits <= 160)

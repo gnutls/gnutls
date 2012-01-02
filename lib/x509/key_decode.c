@@ -253,7 +253,7 @@ int ret;
         ret = _gnutls_x509_read_dsa_pubkey(der, dersize, params);
         if (ret >= 0) params->params_nr = DSA_PUBLIC_PARAMS;
         break;
-      case GNUTLS_PK_ECC:
+      case GNUTLS_PK_EC:
         ret = _gnutls_x509_read_ecc_pubkey(der, dersize, params);
         if (ret >= 0) params->params_nr = ECC_PUBLIC_PARAMS;
         break;
@@ -273,7 +273,7 @@ int _gnutls_x509_read_pubkey_params (gnutls_pk_algorithm_t algo, opaque * der, i
         return 0;
       case GNUTLS_PK_DSA:
         return _gnutls_x509_read_dsa_params(der, dersize, params);
-      case GNUTLS_PK_ECC:
+      case GNUTLS_PK_EC:
         return _gnutls_x509_read_ecc_params(der, dersize, params);
       default:
         return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);

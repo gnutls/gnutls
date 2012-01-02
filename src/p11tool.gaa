@@ -40,7 +40,7 @@ option (delete) STR "URL" { $action = ACTION_PKCS11_DELETE_URL; $pkcs11_url = $1
 #int key_type;
 option (generate-rsa) STR "URL" { $action = ACTION_PKCS11_GENERATE; $key_type = GNUTLS_PK_RSA; $pkcs11_url = $1; } "Generates an RSA private key on the specified token."
 option (generate-dsa) STR "URL" { $action = ACTION_PKCS11_GENERATE; $key_type = GNUTLS_PK_DSA; $pkcs11_url = $1; } "Generates a DSA private key on the specified token."
-option (generate-ecc) STR "URL" { $action = ACTION_PKCS11_GENERATE; $key_type = GNUTLS_PK_ECC; $pkcs11_url = $1; } "Generates an ECDSA private key on the specified token."
+option (generate-ecc) STR "URL" { $action = ACTION_PKCS11_GENERATE; $key_type = GNUTLS_PK_EC; $pkcs11_url = $1; } "Generates an ECDSA private key on the specified token."
 
 option (label) STR "label" { $pkcs11_label = $1; } "Sets a label for the write operation."
 #int pkcs11_trusted;

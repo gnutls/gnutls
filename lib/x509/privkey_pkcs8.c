@@ -140,7 +140,7 @@ _encode_privkey (gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
   switch (pkey->pk_algorithm)
     {
     case GNUTLS_PK_RSA:
-    case GNUTLS_PK_ECC:
+    case GNUTLS_PK_EC:
       ret =
         gnutls_x509_privkey_export (pkey, GNUTLS_X509_FMT_DER, NULL, &size);
       if (ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
@@ -1132,7 +1132,7 @@ decode_private_key_info (const gnutls_datum_t * der,
     result = _decode_pkcs8_rsa_key (pkcs8_asn, pkey);
   else if (pkey->pk_algorithm == GNUTLS_PK_DSA)
     result = _decode_pkcs8_dsa_key (pkcs8_asn, pkey);
-  else if (pkey->pk_algorithm == GNUTLS_PK_ECC)
+  else if (pkey->pk_algorithm == GNUTLS_PK_EC)
     result = _decode_pkcs8_ecc_key (pkcs8_asn, pkey);
   else return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
 

@@ -500,7 +500,7 @@ gnutls_pkcs11_privkey_generate (const char* url,
         a[a_val].value_len = sizeof (_bits);
         a_val++;
         break;
-      case GNUTLS_PK_ECC:
+      case GNUTLS_PK_EC:
         p[p_val].type = CKA_SIGN;
         p[p_val].value = (void*)&tval;
         p[p_val].value_len = sizeof (tval);

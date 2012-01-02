@@ -142,7 +142,7 @@ _gnutls_x509_write_pubkey_params (gnutls_pk_algorithm_t algo,
         memcpy(der->data, ASN1_NULL, ASN1_NULL_SIZE);
         der->size = ASN1_NULL_SIZE;
         return 0;
-      case GNUTLS_PK_ECC:
+      case GNUTLS_PK_EC:
         return _gnutls_x509_write_ecc_params(params, der);
       default:
         return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
@@ -160,7 +160,7 @@ _gnutls_x509_write_pubkey (gnutls_pk_algorithm_t algo,
         return _gnutls_x509_write_dsa_pubkey(params, der);
       case GNUTLS_PK_RSA:
         return _gnutls_x509_write_rsa_pubkey(params, der);
-      case GNUTLS_PK_ECC:
+      case GNUTLS_PK_EC:
         return _gnutls_x509_write_ecc_pubkey(params, der);
       default:
         return gnutls_assert_val(GNUTLS_E_UNIMPLEMENTED_FEATURE);
@@ -780,7 +780,7 @@ int _gnutls_asn1_encode_privkey (gnutls_pk_algorithm_t pk, ASN1_TYPE * c2, gnutl
         return _gnutls_asn1_encode_rsa(c2, params);
       case GNUTLS_PK_DSA:
         return _gnutls_asn1_encode_dsa(c2, params);
-      case GNUTLS_PK_ECC:
+      case GNUTLS_PK_EC:
         return _gnutls_asn1_encode_ecc(c2, params);
       default:
         return GNUTLS_E_UNIMPLEMENTED_FEATURE;

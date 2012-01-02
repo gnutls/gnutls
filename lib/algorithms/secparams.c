@@ -82,7 +82,7 @@ gnutls_sec_param_to_pk_bits (gnutls_pk_algorithm_t algo,
       );
       return ret;
     }
-  else if (algo == GNUTLS_PK_ECC)
+  else if (algo == GNUTLS_PK_EC)
     {
       GNUTLS_SEC_PARAM_LOOP (if (p->sec_param == param)
                              {
@@ -166,7 +166,7 @@ gnutls_pk_bits_to_sec_param (gnutls_pk_algorithm_t algo, unsigned int bits)
   if (bits == 0)
     return GNUTLS_SEC_PARAM_UNKNOWN;
 
-  if (algo == GNUTLS_PK_ECC)
+  if (algo == GNUTLS_PK_EC)
     {
       GNUTLS_SEC_PARAM_LOOP (if (p->ecc_bits > bits)
                          {

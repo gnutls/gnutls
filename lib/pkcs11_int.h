@@ -100,7 +100,7 @@ static inline int pk_to_mech(gnutls_pk_algorithm_t pk)
 {
   if (pk == GNUTLS_PK_DSA)
     return CKM_DSA;
-  else if (pk == GNUTLS_PK_ECC)
+  else if (pk == GNUTLS_PK_EC)
     return CKM_ECDSA;
   else 
     return CKM_RSA_PKCS;
@@ -113,7 +113,7 @@ static inline gnutls_pk_algorithm_t mech_to_pk(ck_key_type_t m)
   else if (m == CKK_DSA)
     return GNUTLS_PK_DSA;
   else  if (m == CKK_ECDSA)
-    return GNUTLS_PK_ECC;
+    return GNUTLS_PK_EC;
   else return GNUTLS_PK_UNKNOWN;
 }
 
@@ -121,7 +121,7 @@ static inline int pk_to_genmech(gnutls_pk_algorithm_t pk)
 {
   if (pk == GNUTLS_PK_DSA)
     return CKM_DSA_KEY_PAIR_GEN;
-  else if (pk == GNUTLS_PK_ECC)
+  else if (pk == GNUTLS_PK_EC)
     return CKM_ECDSA_KEY_PAIR_GEN;
   else 
     return CKM_RSA_PKCS_KEY_PAIR_GEN;

@@ -59,7 +59,7 @@ doit (void)
 
     for (i = 0; i < MAX_TRIES; i++)
       {
-          for (algorithm = GNUTLS_PK_RSA; algorithm <= GNUTLS_PK_ECC;
+          for (algorithm = GNUTLS_PK_RSA; algorithm <= GNUTLS_PK_EC;
                algorithm++)
             {
                 if (algorithm == GNUTLS_PK_DH)

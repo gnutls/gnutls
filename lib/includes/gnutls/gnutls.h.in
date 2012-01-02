@@ -562,13 +562,14 @@ extern "C"
     GNUTLS_CRT_PRINT_UNSIGNED_FULL = 2
   } gnutls_certificate_print_formats_t;
 
+#define GNUTLS_PK_ECC GNUTLS_PK_EC
 /**
  * gnutls_pk_algorithm_t:
  * @GNUTLS_PK_UNKNOWN: Unknown public-key algorithm.
  * @GNUTLS_PK_RSA: RSA public-key algorithm.
  * @GNUTLS_PK_DSA: DSA public-key algorithm.
  * @GNUTLS_PK_DH: Diffie-Hellman algorithm. Used to generate parameters.
- * @GNUTLS_PK_ECC: Elliptic curve algorithm. Used to generate parameters.
+ * @GNUTLS_PK_EC: Elliptic curve algorithm. Used to generate parameters.
  *
  * Enumeration of different public-key algorithms.
  */
@@ -578,7 +579,7 @@ extern "C"
     GNUTLS_PK_RSA = 1,
     GNUTLS_PK_DSA = 2,
     GNUTLS_PK_DH = 3,
-    GNUTLS_PK_ECC = 4,
+    GNUTLS_PK_EC = 4,
   } gnutls_pk_algorithm_t;
 
   const char *gnutls_pk_algorithm_get_name (gnutls_pk_algorithm_t algorithm);

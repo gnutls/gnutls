@@ -136,7 +136,7 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_pcert_st* cert,
         }
       break;
     case GNUTLS_PK_DSA:
-    case GNUTLS_PK_ECC:
+    case GNUTLS_PK_EC:
       _gnutls_hash_deinit (&td_sha, concat);
 
       if (!IS_SHA(hash_algo))
@@ -314,7 +314,7 @@ verify_tls_hash (gnutls_protocol_t ver, gnutls_pcert_st* cert,
 
       break;
     case GNUTLS_PK_DSA:
-    case GNUTLS_PK_ECC:
+    case GNUTLS_PK_EC:
 
       vdata.data = &hash_concat->data[sha1pos];
       vdata.size = hash_concat->size - sha1pos;
@@ -705,7 +705,7 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
       dconcat.size = 36;
       break;
     case GNUTLS_PK_DSA:
-    case GNUTLS_PK_ECC:
+    case GNUTLS_PK_EC:
 
       dconcat.data = &concat[16];
       dconcat.size = 20;
@@ -779,7 +779,7 @@ pk_prepare_hash (gnutls_pk_algorithm_t pk,
       _gnutls_free_datum (&old_digest);
       break;
     case GNUTLS_PK_DSA:
-    case GNUTLS_PK_ECC:
+    case GNUTLS_PK_EC:
       break;
     default:
       gnutls_assert ();

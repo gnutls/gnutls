@@ -127,7 +127,7 @@ static int _wrap_nettle_pk_derive(gnutls_pk_algorithm_t algo, gnutls_datum_t * o
 
   switch (algo)
     {
-    case GNUTLS_PK_ECC:
+    case GNUTLS_PK_EC:
       {
         ecc_key ecc_pub, ecc_priv;
         int curve = priv->flags;
@@ -373,7 +373,7 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
 
   switch (algo)
     {
-    case GNUTLS_PK_ECC: /* we do ECDSA */
+    case GNUTLS_PK_EC: /* we do ECDSA */
       {
         ecc_key priv;
         struct dsa_signature sig;
@@ -555,7 +555,7 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
 
   switch (algo)
     {
-    case GNUTLS_PK_ECC: /* ECDSA */
+    case GNUTLS_PK_EC: /* ECDSA */
       {
         ecc_key pub;
         struct dsa_signature sig;
@@ -784,7 +784,7 @@ rsa_fail:
 
         break;
       }
-    case GNUTLS_PK_ECC:
+    case GNUTLS_PK_EC:
       {
         ecc_key key;
         ecc_set_type tls_ecc_set;
@@ -953,7 +953,7 @@ dsa_cleanup:
       }
 
       break;
-    case GNUTLS_PK_ECC:
+    case GNUTLS_PK_EC:
       {
         int curve = params->flags;
         ecc_key ecc_priv;

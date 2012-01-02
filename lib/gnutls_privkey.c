@@ -157,7 +157,7 @@ privkey_to_pubkey (gnutls_pk_algorithm_t pk,
         }
 
       break;
-    case GNUTLS_PK_ECC:
+    case GNUTLS_PK_EC:
       pub->params[0] = _gnutls_mpi_copy (priv->params[0]);
       pub->params[1] = _gnutls_mpi_copy (priv->params[1]);
       pub->params[2] = _gnutls_mpi_copy (priv->params[2]);

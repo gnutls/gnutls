@@ -1217,7 +1217,7 @@ print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
             }
             break;
 
-          case GNUTLS_PK_ECC:
+          case GNUTLS_PK_EC:
             {
               gnutls_datum_t x, y;
               gnutls_ecc_curve_t curve;

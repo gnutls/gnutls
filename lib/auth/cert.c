@@ -1458,7 +1458,7 @@ _gnutls_check_supported_sign_algo (CertificateSigType algo)
     case DSA_SIGN:
       return GNUTLS_PK_DSA;
     case ECDSA_SIGN:
-      return GNUTLS_PK_ECC;
+      return GNUTLS_PK_EC;
     }
 
   return -1;
