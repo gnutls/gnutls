@@ -53,6 +53,9 @@
 // #define PARAMS_1024 
 
 #ifdef PARAMS_1024
+
+static const int rsa_bits = 1024, ec_bits = 192;
+
 const char *pkcs3 = 
   "-----BEGIN DH PARAMETERS-----\n"
   "MIIBCwKBgQCsIrA9BK23OUVIwrC4c65YJ2t8bqoGpJpuISjO07lAbWHWa47Kf9/t\n"
@@ -97,6 +100,9 @@ static unsigned char server_key_pem[] =
   "-----END RSA PRIVATE KEY-----\n";
 
 #else
+
+static const int rsa_bits = 1840, ec_bits = 192;
+
 /* DH of 1840 bits that is pretty close equivalent to 192 bits of ECDH.
  */
 const char *pkcs3 =
@@ -423,7 +429,7 @@ void benchmark_tls(int debug_level)
     test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, 8 * 1024);
     test_ciphersuite(PRIO_CAMELLIA_CBC_SHA1, 15 * 1024);
 
-    printf("\nTesting key exchanges:\n");
+    printf("\nTesting key exchanges (RSA/DH bits: %d, EC bits: %d):\n", rsa_bits, ec_bits);
     test_ciphersuite_kx(PRIO_DH);
     test_ciphersuite_kx(PRIO_ECDH);
     test_ciphersuite_kx(PRIO_ECDHE_ECDSA);
