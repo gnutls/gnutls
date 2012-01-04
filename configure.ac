@@ -433,6 +433,8 @@ AC_CHECK_FUNCS([alarm atexit dup2 epoll_create kqueue memchr memset munmap \
 
 PKG_CHECK_MODULES(LIBIDN, libidn >= 0.0.0, [libidn=yes], [libidn=no])
 
+else
+libidn=no
 fi
 
 AM_CONDITIONAL(ENABLE_CRYWRAP, test "x$libidn" != "xno")
