@@ -34,4 +34,4 @@ endif
 
 noinst_LTLIBRARIES = libgnutls_extras.la
 
-libgnutls_extras_la_SOURCES = randomart.c
+libgnutls_extras_la_SOURCES = randomart.c randomart.h
