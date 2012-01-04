@@ -934,7 +934,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 		GAA_FILL(GAATMP_generate_ecc.arg1, gaa_getstr, GAATMP_generate_ecc.size1);
 		gaa_index++;
 #line 43 "p11tool.gaa"
-{ gaaval->action = ACTION_PKCS11_GENERATE; gaaval->key_type = GNUTLS_PK_ECC; gaaval->pkcs11_url = GAATMP_generate_ecc.arg1; ;};
+{ gaaval->action = ACTION_PKCS11_GENERATE; gaaval->key_type = GNUTLS_PK_EC; gaaval->pkcs11_url = GAATMP_generate_ecc.arg1; ;};
 
 		return GAA_OK;
 		break;
