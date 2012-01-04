@@ -1,12 +1,12 @@
 
-GNUTLS_FILE:=gnutls-3.0.9.tar.xz
-GNUTLS_DIR:=gnutls-3.0.9
+GNUTLS_FILE:=gnutls-3.0.10.tar.xz
+GNUTLS_DIR:=gnutls-3.0.10
 
 GMP_FILE:=gmp-5.0.2.tar.bz2
 GMP_DIR:=gmp-5.0.2
 
-P11_KIT_FILE:=p11-kit-0.9.tar.gz
-P11_KIT_DIR:=p11-kit-0.9
+P11_KIT_FILE:=p11-kit-0.10.tar.gz
+P11_KIT_DIR:=p11-kit-0.10
 
 NETTLE_FILE:=nettle-2.4.tar.gz
 NETTLE_DIR:=nettle-2.4
@@ -16,15 +16,15 @@ BIN_DIR:=$(CROSS_DIR)/bin
 LIB_DIR:=$(CROSS_DIR)/lib
 HEADERS_DIR:=$(LIB_DIR)/include
 
-all: update-gpg-keys gnutls-win32
+all: update-gpg-keys gnutls-w32
 
 update-gpg-keys:
 	gpg --recv-keys 96865171 B565716F D92765AF A8F4C2FD DB899F46
 
-$(GNUTLS_DIR)-win32.zip: $(LIB_DIR) $(BIN_DIR) $(GNUTLS_DIR)/.installed
+$(GNUTLS_DIR)-w32.zip: $(LIB_DIR) $(BIN_DIR) $(GNUTLS_DIR)/.installed
 	cd $(CROSS_DIR) && zip -r $(PWD)/$@ *
 
-gnutls-win32: $(GNUTLS_DIR)-win32.zip
+gnutls-w32: $(GNUTLS_DIR)-w32.zip
 
 nettle: $(NETTLE_DIR)/.installed
 
