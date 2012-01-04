@@ -11,7 +11,6 @@ gnutls.toc
 missfont.log
 extra-api.tex
 gnutls-api.tex
-cover.tex
 error_codes.tex
 cha-tls-app.tex
 cha-support.tex
