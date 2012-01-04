@@ -1,7 +1,337 @@
+2012-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/extras/Makefile.am: added missing file
+
+2012-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, configure.ac, m4/hooks.m4: bumped version
+
+2012-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/certtool-gaa.c, src/certtool-gaa.h, src/p11tool-gaa.c: Updated
+	auto-generated files
+
+2012-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/latex/.gitignore, doc/latex/cover.tex: added missing file
+
+2012-01-03  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/benchmark-tls.c: print the RSA and DH bits as well as EC bits
+	for comparison.
+
+2012-01-03  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/benchmark-tls.c: use 1840 bit DH and RSA to compare with 192
+	bits of ECDH
+
+2012-01-02  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/algorithms/publickey.c, lib/algorithms/secparams.c,
+	lib/algorithms/sign.c, lib/auth/cert.c, lib/auth/ecdh_common.c,
+	lib/gnutls_privkey.c, lib/gnutls_pubkey.c, lib/gnutls_sig.c,
+	lib/includes/gnutls/gnutls.h.in, lib/nettle/pk.c, lib/pkcs11_int.h,
+	lib/pkcs11_privkey.c, lib/pkcs11_write.c, lib/x509/key_decode.c,
+	lib/x509/key_encode.c, lib/x509/output.c, lib/x509/privkey.c,
+	lib/x509/privkey_pkcs8.c, lib/x509/verify.c, src/certtool.c,
+	src/p11tool.gaa, tests/slow/keygen.c: GNUTLS_PK_ECC -> GNUTLS_PK_EC
+
+2011-12-31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/openpgp/gnutls_openpgp.c: CDK_EOF error code now returns
+	GNUTLS_E_PARSING_ERROR
+
+2011-12-31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/opencdk/armor.c, lib/opencdk/opencdk.h: removed
+	cdk_armor_filter_use()
+
+2011-12-31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/certtool.c: correctly report 0 keys on a keyring
+
+2011-12-31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/opencdk/kbnode.c, lib/opencdk/opencdk.h,
+	lib/openpgp/gnutls_openpgp.c, lib/openpgp/pgp.c,
+	lib/openpgp/privkey.c: more opencdk simplifications
+
+2011-12-31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/openpgp-certs/testselfsigs: specify key type (raw) to
+	certtool
+
+2011-12-31  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/opencdk/Makefile.am, lib/opencdk/armor.c,
+	lib/opencdk/keydb.c, lib/opencdk/main.c, lib/opencdk/opencdk.h,
+	lib/openpgp/extras.c, lib/openpgp/gnutls_openpgp.c: Removed unneeded
+	opencdk functionality.
+
+2011-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* cross.mk: verify signatures on download
+
+2011-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_global.c, lib/gnutls_mem.c: _gnutls_is_secure_memory is
+	no more.
+
+2011-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, src/cli.c: gnutls-cli can now read input from win32.
+
+2011-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/openpgp/pgp.c, lib/openpgp/privkey.c: Avoid using base64
+	armor auto-detection which causes decoding errors in win32.  For
+	some reason reading from the stream modifies the stream and this
+	work-around avoids that issue.
+
+2011-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/pgps2kgnu.c: enable debugging in pgps2kgnu
+
+2011-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/Makefile.am, tests/openpgp-auth2.c: do not use valgrind in
+	windows
+
+2011-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* cross.mk: gmp is compiled with --enable-fat.
+
+2011-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/Makefile.am: link libutils with libgnu.
+
+2011-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitignore: more files to ignore
+
+2011-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/manpages/Makefile.am: Added missing function names.
+
+2011-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* cross.mk: Added a preliminary win32 compilation makefile.
+
+2011-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/Makefile.am: win32 fixes
+
+2011-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* configure.ac: do not build crywrap on win32
+
+2011-12-30  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* extra/includes/gnutls/openssl.h: undefine possible system macros.
+
+2011-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/examples/ex-serv-dtls.c: updated DTLS example
+
+2011-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-cert-auth.texi, doc/cha-cert-auth2.texi,
+	doc/cha-programs.texi: more updates
+
+2011-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-ciphersuites.texi, doc/cha-copying.texi,
+	doc/cha-gtls-app.texi, doc/cha-gtls-examples.texi,
+	doc/cha-internals.texi, doc/cha-library.texi,
+	doc/cha-shared-key.texi, doc/gnutls.texi: Small improvements in
+	documentation.
+
+2011-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/x509/privkey.c: corrected bug in DSA private key
+	parsing.
+
+2011-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/certtool.gaa: Added --rsa option which is a no-op for now.
+
+2011-12-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/extras/randomart.c, lib/extras/randomart.h, lib/gnutls_ui.c,
+	lib/openpgp/output.c, lib/x509/output.c,
+	tests/pathlen/ca-no-pathlen.pem, tests/pathlen/no-ca-or-pathlen.pem: 
+	Allow the insertion of characters to align the randomart.
+
+2011-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/certtool.c: Print the fingerprint of PGP keys and not only the
+	key ID.
+
+2011-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/pathlen/ca-no-pathlen.pem,
+	tests/pathlen/no-ca-or-pathlen.pem: Add random art to keys.
+
+2011-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* tests/mini-deflate.c: Skip deflate test if libz is not available.
+
+2011-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/openpgp/output.c, lib/x509/output.c, src/certtool.c: updated
+	random art's messages.
+
+2011-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/certtool.c: Print the pgp key's randomart as well.
+
+2011-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/openpgp/output.c, lib/x509/output.c: Print the randomart on
+	the key ID and not the fingerprint.
+
+2011-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_errors.c: Updated GNUTLS_E_NO_CERTIFICATE_FOUND
+	description.
+
+2011-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitignore: more files to ignore
+
+2011-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/extras/randomart.c, lib/extras/randomart.h, lib/gnutls_ui.c,
+	lib/openpgp/output.c, lib/x509/output.c, src/certtool.c: print
+	randomart for private keys as well.
+
+2011-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/extras/randomart.c, lib/system.c, lib/system.h,
+	lib/x509/output.c: gnutls_atfork was no longer in use.
+
+2011-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, configure.ac, lib/Makefile.am, lib/extras/Makefile.am,
+	lib/extras/randomart.c, lib/extras/randomart.h, lib/gnutls_ui.c,
+	lib/includes/gnutls/gnutls.h.in, lib/libgnutls.map,
+	lib/openpgp/output.c, lib/x509/output.c: Added function
+	gnutls_random_art() to convert fingerprints to images (currently
+	ascii-art).
+
+2011-12-28  Patrick Pelletier <code@funwithsoftware.org>
+
+	* doc/cha-gtls-app.texi, doc/cha-gtls-examples.texi,
+	doc/cha-internals.texi, lib/algorithms/ciphers.c,
+	lib/algorithms/protocols.c, lib/algorithms/secparams.c,
+	lib/gnutls_cert.c, lib/gnutls_cipher.c, lib/gnutls_db.c,
+	lib/gnutls_global.c, lib/gnutls_handshake.c, lib/gnutls_priority.c,
+	lib/gnutls_state.c, lib/gnutls_ui.c, lib/nettle/rnd.c: minor doc and
+	comment fixes Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2011-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/Makefile.am, doc/cha-gtls-app.texi,
+	doc/cha-gtls-examples.texi, doc/cha-intro-tls.texi,
+	doc/examples/Makefile.am, doc/examples/ex-client-anon.c,
+	doc/examples/ex-client-dtls.c, doc/examples/ex-client-psk.c,
+	doc/examples/ex-client-resume.c, doc/examples/ex-client-srp.c,
+	doc/examples/ex-client-udp.c, doc/examples/ex-client-x509.c,
+	doc/examples/ex-client1.c, doc/examples/ex-rfc2818.c,
+	doc/examples/ex-serv-anon.c, doc/examples/ex-serv-srp.c,
+	doc/examples/ex-serv-x509.c, doc/examples/ex-serv1.c: updated
+	examples and added new "handling alerts" section.
+
+2011-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-gtls-examples.texi, doc/examples/udp.c: updated and
+	included in the documentation the udp code.
+
+2011-12-28  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, src/cli.c, src/serv.c: Set don't fragment bit in Linux as
+	well as in BSD variants.
+
+2011-12-27  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitignore, doc/examples/ex-serv-dtls.c, doc/examples/ex-serv1.c: 
+	updated server examples
+
+2011-12-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-cert-auth.texi, doc/cha-cert-auth2.texi,
+	doc/cha-gtls-app.texi, doc/cha-programs.texi,
+	doc/cha-shared-key.texi: smallexample is no longer used. It is
+	intended only for typesetting with smaller pages and had no relation
+	to our usage.
+
+2011-12-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/serv.c: prepend UDP to server application name when in UDP
+	mode.
+
+2011-12-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-gtls-app.texi, doc/cha-gtls-examples.texi,
+	doc/examples/Makefile.am, doc/examples/ex-serv-dtls.c,
+	doc/examples/ex-serv1.c: Added DTLS server example.
+
+2011-12-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/udp-serv.c: corrected a leak
+
+2011-12-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* doc/cha-gtls-app.texi: Added SECP192R1 curve.
+
+2011-12-26  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/includes/gnutls/abstract.h, lib/includes/gnutls/pkcs11.h: 
+	pkcs11.h and abstract.h use extern C idiom for C++.
+
+2011-12-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/algorithms/ciphersuites.c: Added ciphersuites:
+	GNUTLS_PSK_WITH_AES_256_GCM_SHA384 and
+	GNUTLS_DHE_PSK_WITH_AES_256_GCM_SHA384.
+
+2011-12-19  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/algorithms/ciphersuites.c: Corrected ciphersuite
+	GNUTLS_ECDHE_PSK_AES_256_CBC_SHA384
+
+2011-12-18  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/serv.c: Only use configured interfaces. Patch by Pino Toscano.
+
+2011-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/algorithms/protocols.c: better comments.
+
+2011-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_int.h, lib/gnutls_record.c, lib/gnutls_state.c: 
+	gnutls_protocol_get_version() and _gnutls_set_current_version() are
+	now inline functions
+
+2011-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/algorithms/ciphersuites.c: documented
+	_gnutls_supported_ciphersuites()
+
+2011-12-17  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/algorithms/ciphersuites.c: renamed the _SHA ciphersuites to
+	_SHA1.
+
+2011-12-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/nettle/mpi.c: correctly set the odd bits.
+
 2011-12-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
-	* ChangeLog, Makefile.am: make dist forces regeneration of ChangeLog
-	and manpages.
+	* ChangeLog, Makefile.am, cfg.mk: make dist forces regeneration of
+	ChangeLog and manpages.
 
 2011-12-13  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
