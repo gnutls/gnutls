@@ -150,12 +150,13 @@ _gnutls_sign_algorithm_parse_data (gnutls_session_t session,
        _gnutls_debug_log ("EXT[SIGA]: rcvd signature algo (%d.%d) %s\n", aid.hash_algorithm, 
          aid.sign_algorithm, gnutls_sign_get_name(sig));
 
-      hash = _gnutls_sign_get_hash_algorithm(sig);
-      if (hash != GNUTLS_DIG_SHA1 && hash != GNUTLS_DIG_SHA256)
-        continue;
 
       if (sig != GNUTLS_SIGN_UNKNOWN)
         {
+          hash = _gnutls_sign_get_hash_algorithm(sig);
+          if (hash != GNUTLS_DIG_SHA1 && hash != GNUTLS_DIG_SHA256)
+            continue;
+
           priv->sign_algorithms[priv->sign_algorithms_size++] = sig;
           if (priv->sign_algorithms_size == MAX_SIGNATURE_ALGORITHMS)
             break;
