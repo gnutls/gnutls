@@ -5,6 +5,9 @@ See the end for copying conditions.
 
 Version 2.12.15 (unreleased)
 
+** libgnutls: Disable signature algorithms that are not supported
+for client certificate verification.
+
 ** libgnutls: Optimized DH generation process (ported from 3.0.x)
 
 ** API and ABI modifications:
