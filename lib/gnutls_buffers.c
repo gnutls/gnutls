@@ -510,6 +510,10 @@ _gnutls_io_write_buffered (gnutls_session_t session,
 {
   mbuffer_head_st *const send_buffer = &session->internals.record_send_buffer;
 
+  /* to know where the procedure was interrupted.
+   */
+  session->internals.direction = 1;
+
   _mbuffer_enqueue (send_buffer, bufel);
 
   _gnutls_write_log
