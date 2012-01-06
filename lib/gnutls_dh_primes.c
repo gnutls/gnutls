@@ -155,6 +155,7 @@ gnutls_dh_params_cpy (gnutls_dh_params_t dst, gnutls_dh_params_t src)
 
   dst->params[0] = _gnutls_mpi_copy (src->params[0]);
   dst->params[1] = _gnutls_mpi_copy (src->params[1]);
+  dst->q_bits = src->q_bits;
 
   if (dst->params[0] == NULL || dst->params[1] == NULL)
     return GNUTLS_E_MEMORY_ERROR;
