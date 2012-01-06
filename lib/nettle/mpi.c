@@ -531,7 +531,6 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits, unsigned int *q
    * c = r^(2w)
    * if c!=1 c is the generator for the subgroup of order q-1
    * 
-   * (here we reuse q as r)
    */
   r_bytes = p_bytes;
 
