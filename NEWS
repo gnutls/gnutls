@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.0.11 (unreleased)
 
+** libgnutls: Corrected functionality of 
+gnutls_record_get_direction(). Reported by Philip Allison.
+
 ** libgnutls: Provide less timing information when decoding
 TLS/DTLS record packets. Patch by Nadhem Alfardan.
 
