@@ -1,3 +1,33 @@
+2012-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, configure.ac, m4/hooks.m4: bumped version
+
+2012-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/gnutls_buffers.c: Corrected functionality of
+	gnutls_record_get_direction(). Reported by Philip Allison.
+
+2012-01-06  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS, lib/gnutls_cipher.c: provide less timing information when
+	decoding packets. Patch by Nadhem Alfardan.
+
+2012-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* src/serv.c: use AI_ADDRCONFIG if available.
+
+2012-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* configure.ac: prevent building of crywrap in windows
+
+2012-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* cross.mk: updated
+
+2012-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* ChangeLog: updated
+
 2012-01-04  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* lib/extras/Makefile.am: added missing file

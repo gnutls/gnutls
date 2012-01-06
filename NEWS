@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.0.11 (unreleased)
+* Version 3.0.11 (released 2012-01-06)
 
 ** libgnutls: Corrected functionality of 
 gnutls_record_get_direction(). Reported by Philip Allison.
