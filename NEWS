@@ -2,6 +2,15 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.0.11 (unreleased)
+
+** libgnutls: Provide less timing information when decoding
+TLS/DTLS record packets. Patch by Nadhem Alfardan.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.0.10 (released 2012-01-04)
 
 ** gnutls-cli/serv: Set don't fragment bit in DTLS sessions

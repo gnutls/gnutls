@@ -560,7 +560,12 @@ ciphertext_to_compressed (gnutls_session_t session,
           }
 
       if (length < 0)
-        length = 0;
+        {
+          /* Setting a proper length to prevent timing differences in
+           * processing of records with invalid encryption.
+           */
+          length = ciphertext.size - tag_size;
+        }
 
       /* Pass the type, version, length and compressed through
        * MAC.
