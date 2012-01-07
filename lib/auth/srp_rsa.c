@@ -52,7 +52,7 @@ const mod_auth_st srp_rsa_auth_struct = {
   NULL,
   NULL,
 
-  _gnutls_proc_cert_server_certificate,
+  _gnutls_proc_certificate,
   NULL,                         /* certificate */
   proc_srp_cert_server_kx,
   _gnutls_proc_srp_client_kx,
@@ -69,7 +69,7 @@ const mod_auth_st srp_dss_auth_struct = {
   NULL,
   NULL,
 
-  _gnutls_proc_cert_server_certificate,
+  _gnutls_proc_certificate,
   NULL,                         /* certificate */
   proc_srp_cert_server_kx,
   _gnutls_proc_srp_client_kx,

@@ -58,8 +58,8 @@ const mod_auth_st rsa_export_auth_struct = {
   _gnutls_gen_cert_client_cert_vrfy,    /* gen client cert vrfy */
   _gnutls_gen_cert_server_cert_req,     /* server cert request */
 
-  _gnutls_proc_cert_server_certificate,
-  _gnutls_proc_cert_client_certificate,
+  _gnutls_proc_certificate,
+  _gnutls_proc_certificate,
   proc_rsa_export_server_kx,
   proc_rsa_export_client_kx,    /* proc client kx */
   _gnutls_proc_cert_client_cert_vrfy,   /* proc client cert vrfy */

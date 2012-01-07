@@ -1401,7 +1401,7 @@ cleanup:
 #endif
 
 int
-_gnutls_proc_cert_server_certificate (gnutls_session_t session,
+_gnutls_proc_certificate (gnutls_session_t session,
                                       opaque * data, size_t data_size)
 {
   int ret;

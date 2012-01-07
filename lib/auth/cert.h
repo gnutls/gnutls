@@ -128,7 +128,7 @@ int _gnutls_gen_cert_client_cert_vrfy (gnutls_session_t, gnutls_buffer_st *);
 int _gnutls_gen_cert_server_cert_req (gnutls_session_t, gnutls_buffer_st *);
 int _gnutls_proc_cert_cert_req (gnutls_session_t, opaque *, size_t);
 int _gnutls_proc_cert_client_cert_vrfy (gnutls_session_t, opaque *, size_t);
-int _gnutls_proc_cert_server_certificate (gnutls_session_t, opaque *, size_t);
+int _gnutls_proc_certificate (gnutls_session_t, opaque *, size_t);
 int _gnutls_get_selected_cert (gnutls_session_t session,
                                gnutls_pcert_st ** apr_cert_list,
                                int *apr_cert_list_length,
@@ -140,8 +140,6 @@ void _gnutls_selected_certs_deinit (gnutls_session_t session);
 void _gnutls_selected_certs_set (gnutls_session_t session,
                                  gnutls_pcert_st * certs, int ncerts,
                                  gnutls_privkey_t key, int need_free);
-
-#define _gnutls_proc_cert_client_certificate _gnutls_proc_cert_server_certificate
 
 gnutls_rsa_params_t _gnutls_certificate_get_rsa_params (gnutls_rsa_params_t
                                                         rsa_params,
