@@ -966,7 +966,7 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
       else if (strcmp (oid, "1.3.6.1.5.5.7.1.1") == 0)
         {
           addf (str, _("%s\t\tAuthority Information "
-		       "Access Information (%s):\n"), prefix,
+		       "Access (%s):\n"), prefix,
                 critical ? _("critical") : _("not critical"));
 
           if (type == TYPE_CRT)
