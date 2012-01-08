@@ -50,7 +50,7 @@ static ssize_t pull_func(gnutls_transport_ptr_t p, void * data, size_t size);
 
 #define MAX_BUFFER 255     /* Longest string to echo */
 
-int udp_server(const char* name, int port, int mtu)
+void udp_server(const char* name, int port, int mtu)
 {
     int sock, ret;
     struct sockaddr_in cli_addr;

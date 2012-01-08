@@ -81,7 +81,7 @@ char *dh_params_file;
 char *x509_crlfile = NULL;
 
 gnutls_datum_t session_ticket_key;
-static int tcp_server(const char* name, int port);
+static void tcp_server(const char* name, int port);
 
 /* end of globals */
 
@@ -1137,12 +1137,12 @@ main (int argc, char **argv)
 #endif
 
   if (info.udp)
-    return udp_server(name, info.port, info.mtu);
+    udp_server(name, info.port, info.mtu);
   else
-    return tcp_server(name, info.port);
+    tcp_server(name, info.port);
 }
 
-static int tcp_server(const char* name, int port)
+static void tcp_server(const char* name, int port)
 {
   int n, s;
   char topbuf[512];
@@ -1527,8 +1527,6 @@ static int tcp_server(const char* name, int port)
   if (nodb == 0)
     wrap_db_deinit ();
   gnutls_global_deinit ();
-
-  return 0;
 
 }
 
