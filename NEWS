@@ -11,7 +11,7 @@ and public keys as well.
 generation.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pubkey_encrypt_data: Added
 
 
 * Version 3.0.11 (released 2012-01-06)

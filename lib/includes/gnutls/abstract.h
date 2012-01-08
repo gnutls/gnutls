@@ -126,6 +126,11 @@ gnutls_pubkey_import_ecc_raw (gnutls_pubkey_t key,
                               const gnutls_datum_t * x,
                               const gnutls_datum_t * y);
 
+int
+gnutls_pubkey_encrypt_data (gnutls_pubkey_t key, unsigned int flags,
+                           const gnutls_datum_t * plaintext,
+                           gnutls_datum_t * ciphertext);
+
 int gnutls_x509_crt_set_pubkey (gnutls_x509_crt_t crt, gnutls_pubkey_t key);
 
 int gnutls_x509_crq_set_pubkey (gnutls_x509_crq_t crq, gnutls_pubkey_t key);

@@ -1373,13 +1373,13 @@ gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey,
 
 /**
  * gnutls_pubkey_verify_hash:
- * @key: Holds the certificate
+ * @key: Holds the public key
  * @flags: should be 0 for now
  * @hash: holds the hash digest to be verified
  * @signature: contains the signature
  *
  * This function will verify the given signed digest, using the
- * parameters from the certificate.
+ * parameters from the public key.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value (%GNUTLS_E_PK_SIG_VERIFY_FAILED in verification failure).
@@ -1404,6 +1404,37 @@ gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
       return pubkey_verify_hashed_data (key->pk_algorithm, hash, signature,
                        &key->params);
     }
+}
+
+/**
+ * gnutls_pubkey_encrypt_data:
+ * @key: Holds the public key
+ * @flags: should be 0 for now
+ * @plaintext: The data to be encrypted
+ * @ciphertext: contains the encrypted data
+ *
+ * This function will encrypt the given data, using the public
+ * key.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.0.0
+ **/
+int
+gnutls_pubkey_encrypt_data (gnutls_pubkey_t key, unsigned int flags,
+                           const gnutls_datum_t * plaintext,
+                           gnutls_datum_t * ciphertext)
+{
+  if (key == NULL || key->pk_algorithm != GNUTLS_PK_RSA)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  return _gnutls_pkcs1_rsa_encrypt (ciphertext, plaintext,
+                                    &key->params,
+                                    2);
 }
 
 /**
