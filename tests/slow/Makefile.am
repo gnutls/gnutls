@@ -18,8 +18,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
-AM_CPPFLAGS = \
-	-I$(top_srcdir)/lib/includes		\
+AM_CPPFLAGS = -I$(top_srcdir)/lib/includes		\
 	-I$(top_builddir)/lib/includes \
 	-I$(top_srcdir)/tests/
 
