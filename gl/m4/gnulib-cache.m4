@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2011 Free Software Foundation, Inc.
+# Copyright (C) 2002-2012 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lseek-tests --no-conditional-dependencies --libtool --macro-prefix=gl --no-vc-files accept alloca alphasort argp bind byteswap c-ctype close connect error extensions func getpass getsubopt gettext gettime havelib inet_ntop inet_pton lib-msvc-compat lib-symbol-versions listen maintainer-makefile manywarnings memmem-simple minmax netdb netinet_in pmccabe2html progname read-file recv recvfrom scandir select send sendto setsockopt shutdown snprintf socket sockets socklen stdint strcase strverscmp sys_socket sys_stat time_r timespec u64 unistd valgrind-tests vasprintf version-etc version-etc-fsf vfprintf-posix vprintf-posix vsnprintf warnings
+#   gnulib-tool --import --dir=. --local-dir=gl/override --lib=libgnu --source-base=gl --m4-base=gl/m4 --doc-base=doc --tests-base=gl/tests --aux-dir=build-aux --with-tests --avoid=alignof-tests --avoid=lseek-tests --no-conditional-dependencies --libtool --macro-prefix=gl --no-vc-files accept alloca alphasort argp bind byteswap c-ctype close connect error extensions freeaddrinfo func getaddrinfo getnameinfo getpass getsubopt gettext gettime havelib inet_ntop inet_pton lib-msvc-compat lib-symbol-versions listen maintainer-makefile manywarnings memmem-simple minmax netdb netinet_in pmccabe2html progname read-file recv recvfrom scandir select send sendto setsockopt shutdown snprintf socket sockets socklen stdint strcase strverscmp sys_socket sys_stat time_r timespec u64 unistd usleep valgrind-tests vasprintf version-etc version-etc-fsf vfprintf-posix vprintf-posix vsnprintf warnings
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([gl/override])
@@ -43,7 +43,10 @@ gl_MODULES([
   connect
   error
   extensions
+  freeaddrinfo
   func
+  getaddrinfo
+  getnameinfo
   getpass
   getsubopt
   gettext
@@ -84,6 +87,7 @@ gl_MODULES([
   timespec
   u64
   unistd
+  usleep
   valgrind-tests
   vasprintf
   version-etc

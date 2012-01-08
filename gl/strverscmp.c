@@ -1,5 +1,5 @@
 /* Compare strings while treating digits characters numerically.
-   Copyright (C) 1997, 2000, 2002, 2004, 2006, 2009-2011 Free Software
+   Copyright (C) 1997, 2000, 2002, 2004, 2006, 2009-2012 Free Software
    Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Jean-François Bignolles <bignolle@ecoledoc.ibp.fr>, 1997.
@@ -43,7 +43,7 @@
    - It's typically faster.
    POSIX says that only '0' through '9' are digits.  Prefer ISDIGIT to
    isdigit unless it's important to use the locale's definition
-   of `digit' even when the host does not conform to POSIX.  */
+   of "digit" even when the host does not conform to POSIX.  */
 #define ISDIGIT(c) ((unsigned int) (c) - '0' <= 9)
 
 #undef __strverscmp

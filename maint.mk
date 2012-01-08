@@ -2,7 +2,7 @@
 # This Makefile fragment tries to be general-purpose enough to be
 # used by many projects via the gnulib maintainer-makefile module.
 
-## Copyright (C) 2001-2011 Free Software Foundation, Inc.
+## Copyright (C) 2001-2012 Free Software Foundation, Inc.
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -126,7 +126,7 @@ export LC_ALL = C
 
 _cfg_mk := $(shell test -f $(srcdir)/cfg.mk && echo '$(srcdir)/cfg.mk')
 
-# Collect the names of rules starting with `sc_'.
+# Collect the names of rules starting with 'sc_'.
 syntax-check-rules := $(sort $(shell sed -n 's/^\(sc_[a-zA-Z0-9_-]*\):.*/\1/p' \
 			$(srcdir)/$(ME) $(_cfg_mk)))
 .PHONY: $(syntax-check-rules)
@@ -221,15 +221,6 @@ define _sc_say_and_exit
    { printf '%s\n' "$(ME): $$msg" 1>&2; exit 1; };
 endef
 
-# _sc_search_regexp used to be named _prohibit_regexp.  However,
-# upgrading to the new definition and leaving the old name undefined
-# would usually convert each custom rule using $(_prohibit_regexp)
-# (usually defined in cfg.mk) into a no-op.  This definition ensures
-# that people know right away if they're still using the old name.
-# FIXME: remove in 2012.
-_prohibit_regexp = \
-  $(error '*** you need to s/_prohibit_regexp/_sc_search_regexp/, and adapt')
-
 define _sc_search_regexp
    dummy=; : so we do not need a semicolon before each use;		\
 									\
@@ -303,7 +294,7 @@ sc_space_tab:
 	halt='found SPACE-TAB sequence; remove the SPACE'		\
 	  $(_sc_search_regexp)
 
-# Don't use *scanf or the old ato* functions in `real' code.
+# Don't use *scanf or the old ato* functions in "real" code.
 # They provide no error checking mechanism.
 # Instead, use strto* functions.
 sc_prohibit_atoi_atof:
@@ -335,15 +326,15 @@ sc_prohibit_magic_number_exit:
 	  $(_sc_search_regexp)
 
 # Using EXIT_SUCCESS as the first argument to error is misleading,
-# since when that parameter is 0, error does not exit.  Use `0' instead.
+# since when that parameter is 0, error does not exit.  Use '0' instead.
 sc_error_exit_success:
 	@prohibit='error *\(EXIT_SUCCESS,'				\
 	in_vc_files='\.[chly]$$'					\
 	halt='found error (EXIT_SUCCESS'				\
 	 $(_sc_search_regexp)
 
-# `FATAL:' should be fully upper-cased in error messages
-# `WARNING:' should be fully upper-cased, or fully lower-cased
+# "FATAL:" should be fully upper-cased in error messages
+# "WARNING:" should be fully upper-cased, or fully lower-cased
 sc_error_message_warn_fatal:
 	@grep -nEA2 '[^rp]error *\(' $$($(VC_LIST_EXCEPT))		\
 	    | grep -E '"Warning|"Fatal|"fatal' &&			\
@@ -1087,15 +1078,15 @@ sc_po_check:
 
 # Sometimes it is useful to change the PATH environment variable
 # in Makefiles.  When doing so, it's better not to use the Unix-centric
-# path separator of `:', but rather the automake-provided `$(PATH_SEPARATOR)'.
-msg = '$(ME): Do not use `:'\'' above; use $$(PATH_SEPARATOR) instead'
+# path separator of ':', but rather the automake-provided '$(PATH_SEPARATOR)'.
+msg = '$(ME): Do not use '\'':'\'' above; use $$(PATH_SEPARATOR) instead'
 sc_makefile_path_separator_check:
 	@prohibit='PATH[=].*:'						\
 	in_vc_files='akefile|\.mk$$'					\
 	halt=$(msg)							\
 	  $(_sc_search_regexp)
 
-# Check that `make alpha' will not fail at the end of the process,
+# Check that 'make alpha' will not fail at the end of the process,
 # i.e., when pkg-M.N.tar.xz already exists (either in "." or in ../release)
 # and is read-only.
 writable-files:
@@ -1156,6 +1147,16 @@ sc_cross_check_PATH_usage_in_tests:
 	    { echo "$(ME): the above files use path_prepend_ inconsistently" \
 		1>&2; exit 1; } || :;					\
 	fi
+
+# BRE regex of file contents to identify a test script.
+_test_script_regex ?= \<init\.sh\>
+
+# In tests, use "compare expected actual", not the reverse.
+sc_prohibit_reversed_compare_failure:
+	@prohibit='\<compare [^ ]+ ([^ ]*exp|/dev/null)'		\
+	containing='$(_test_script_regex)'				\
+	halt='reversed compare arguments'				\
+	  $(_sc_search_regexp)
 
 # #if HAVE_... will evaluate to false for any non numeric string.
 # That would be flagged by using -Wundef, however gnulib currently
@@ -1438,16 +1439,16 @@ sc_tight_scope: tight-scope.mk
 
 tight-scope.mk: $(ME)
 	@rm -f $@ $@-t
-	@perl -ne '/^# TS-start/.../^# TS-end/ and print' $(ME) > $@-t
+	@perl -ne '/^# TS-start/.../^# TS-end/ and print' $(srcdir)/$(ME) > $@-t
 	@chmod a=r $@-t && mv $@-t $@
 
 ifeq (a,b)
 # TS-start
 
 # Most functions should have static scope.
-# Any that don't must be marked with `extern', but `main'
-# and `usage' are exceptions: they're always extern, but
-# do not need to be marked.  Symbols matching `__.*' are
+# Any that don't must be marked with 'extern', but 'main'
+# and 'usage' are exceptions: they're always extern, but
+# do not need to be marked.  Symbols matching '__.*' are
 # reserved by the compiler, so are automatically excluded below.
 _gl_TS_unmarked_extern_functions ?= main usage
 _gl_TS_function_match ?= /^(?:$(_gl_TS_extern)) +.*?(\S+) *\(/
@@ -1457,9 +1458,9 @@ _gl_TS_function_match ?= /^(?:$(_gl_TS_extern)) +.*?(\S+) *\(/
 # export _gl_TS_extern = extern|XTERN
 _gl_TS_extern ?= extern
 
-# The second nm|grep checks for file-scope variables with `extern' scope.
+# The second nm|grep checks for file-scope variables with 'extern' scope.
 # Without gnulib's progname module, you might put program_name here.
-# Symbols matching `__.*' are reserved by the compiler,
+# Symbols matching '__.*' are reserved by the compiler,
 # so are automatically excluded below.
 _gl_TS_unmarked_extern_vars ?=
 

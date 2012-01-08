@@ -1,4 +1,4 @@
-/* Copyright (C) 1991, 1994, 1997-1998, 2000, 2003-2011 Free Software
+/* Copyright (C) 1991, 1994, 1997-1998, 2000, 2003-2012 Free Software
    Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with the GNU C
@@ -43,7 +43,7 @@ extern char **environ;
 #endif
 
 #if _LIBC
-/* This lock protects against simultaneous modifications of `environ'.  */
+/* This lock protects against simultaneous modifications of 'environ'.  */
 # include <bits/libc-lock.h>
 __libc_lock_define_initialized (static, envlock)
 # define LOCK   __libc_lock_lock (envlock)
@@ -91,7 +91,7 @@ _unsetenv (const char *name)
 
 
 /* Put STRING, which is of the form "NAME=VALUE", in the environment.
-   If STRING contains no `=', then remove STRING from the environment.  */
+   If STRING contains no '=', then remove STRING from the environment.  */
 int
 putenv (char *string)
 {

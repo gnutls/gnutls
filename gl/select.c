@@ -1,7 +1,7 @@
 /* Emulation for select(2)
    Contributed by Paolo Bonzini.
 
-   Copyright 2008-2011 Free Software Foundation, Inc.
+   Copyright 2008-2012 Free Software Foundation, Inc.
 
    This file is part of gnulib.
 
@@ -24,7 +24,7 @@
 #include <assert.h>
 
 #if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
-/* Native Win32.  */
+/* Native Windows.  */
 
 #include <sys/types.h>
 #include <errno.h>
@@ -78,6 +78,8 @@ typedef DWORD (WINAPI *PNtQueryInformationFile)
 #define PIPE_BUF        512
 #endif
 
+/* Optimized test whether a HANDLE refers to a console.
+   See <http://lists.gnu.org/archive/html/bug-gnulib/2009-08/msg00065.html>.  */
 #define IsConsoleHandle(h) (((long) (h) & 3) == 3)
 
 static BOOL
@@ -95,11 +97,14 @@ IsSocketHandle (HANDLE h)
   return ev.lNetworkEvents != 0xDEADBEEF;
 }
 
-/* Compute output fd_sets for libc descriptor FD (whose Win32 handle is H).  */
+/* Compute output fd_sets for libc descriptor FD (whose Windows handle is
+   H).  */
 
 static int
-win32_poll_handle (HANDLE h, int fd, struct bitset *rbits, struct bitset *wbits,
-                   struct bitset *xbits)
+windows_poll_handle (HANDLE h, int fd,
+		     struct bitset *rbits,
+		     struct bitset *wbits,
+                     struct bitset *xbits)
 {
   BOOL read, write, except;
   int i, ret;
@@ -140,11 +145,12 @@ win32_poll_handle (HANDLE h, int fd, struct bitset *rbits, struct bitset *wbits,
         {
           /* It was the write-end of the pipe.  Check if it is writable.
              If NtQueryInformationFile fails, optimistically assume the pipe is
-             writable.  This could happen on Win9x, where NtQueryInformationFile
-             is not available, or if we inherit a pipe that doesn't permit
-             FILE_READ_ATTRIBUTES access on the write end (I think this should
-             not happen since WinXP SP2; WINE seems fine too).  Otherwise,
-             ensure that enough space is available for atomic writes.  */
+             writable.  This could happen on Windows 9x, where
+             NtQueryInformationFile is not available, or if we inherit a pipe
+             that doesn't permit FILE_READ_ATTRIBUTES access on the write end
+             (I think this should not happen since Windows XP SP2; WINE seems
+             fine too).  Otherwise, ensure that enough space is available for
+             atomic writes.  */
           memset (&iosb, 0, sizeof (iosb));
           memset (&fpli, 0, sizeof (fpli));
 
@@ -369,7 +375,7 @@ rpl_select (int nfds, fd_set *rfds, fd_set *wfds, fd_set *xfds,
 
           /* Poll now.  If we get an event, do not wait below.  */
           if (wait_timeout != 0
-              && win32_poll_handle (h, i, &rbits, &wbits, &xbits))
+              && windows_poll_handle (h, i, &rbits, &wbits, &xbits))
             wait_timeout = 0;
         }
     }
@@ -446,7 +452,7 @@ rpl_select (int nfds, fd_set *rfds, fd_set *wfds, fd_set *xfds,
         {
           /* Not a socket.  */
           nhandles++;
-          win32_poll_handle (h, i, &rbits, &wbits, &xbits);
+          windows_poll_handle (h, i, &rbits, &wbits, &xbits);
           if (rbits.out[i / CHAR_BIT] & (1 << (i & (CHAR_BIT - 1))))
             {
               rc++;
@@ -468,7 +474,7 @@ rpl_select (int nfds, fd_set *rfds, fd_set *wfds, fd_set *xfds,
   return rc;
 }
 
-#else /* ! Native Win32.  */
+#else /* ! Native Windows.  */
 
 #include <sys/select.h>
 

@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2011 Free Software Foundation, Inc.
+# Copyright (C) 2002-2012 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -113,6 +113,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module func:
   # Code from module func-tests:
   # Code from module fwrite-tests:
+  # Code from module getaddrinfo:
+  # Code from module getaddrinfo-tests:
   # Code from module getcwd-lgpl:
   # Code from module getcwd-lgpl-tests:
   # Code from module getdelim:
@@ -134,6 +136,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module gettimeofday-tests:
   # Code from module gnumakefile:
   # Code from module havelib:
+  # Code from module hostent:
   # Code from module ignore-value:
   # Code from module ignore-value-tests:
   # Code from module include_next:
@@ -222,6 +225,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module send-tests:
   # Code from module sendto:
   # Code from module sendto-tests:
+  # Code from module servent:
   # Code from module setenv:
   # Code from module setenv-tests:
   # Code from module setsockopt:
@@ -303,6 +307,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module sys_uio-tests:
   # Code from module sysexits:
   # Code from module sysexits-tests:
+  # Code from module test-framework-sh:
+  # Code from module test-framework-sh-tests:
   # Code from module thread:
   # Code from module thread-tests:
   # Code from module threadlib:
@@ -318,6 +324,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module unsetenv:
   # Code from module unsetenv-tests:
   # Code from module useless-if-before-free:
+  # Code from module usleep:
+  # Code from module usleep-tests:
   # Code from module valgrind-tests:
   # Code from module vasnprintf:
   # Code from module vasnprintf-tests:
@@ -457,6 +465,14 @@ if test $HAVE_FTELLO = 0 || test $REPLACE_FTELLO = 1; then
 fi
 gl_STDIO_MODULE_INDICATOR([ftello])
 gl_FUNC
+gl_GETADDRINFO
+if test $HAVE_GETADDRINFO = 0; then
+  AC_LIBOBJ([getaddrinfo])
+fi
+if test $HAVE_DECL_GAI_STRERROR = 0 || test $REPLACE_GAI_STRERROR = 1; then
+  AC_LIBOBJ([gai_strerror])
+fi
+gl_NETDB_MODULE_INDICATOR([getaddrinfo])
 gl_FUNC_GETDELIM
 if test $HAVE_GETDELIM = 0 || test $REPLACE_GETDELIM = 1; then
   AC_LIBOBJ([getdelim])
@@ -474,14 +490,20 @@ if test $REPLACE_GETOPT = 1; then
   AC_LIBOBJ([getopt])
   AC_LIBOBJ([getopt1])
   gl_PREREQ_GETOPT
+  dnl Arrange for unistd.h to include getopt.h.
+  GNULIB_GL_UNISTD_H_GETOPT=1
 fi
+AC_SUBST([GNULIB_GL_UNISTD_H_GETOPT])
 gl_MODULE_INDICATOR_FOR_TESTS([getopt-gnu])
 gl_FUNC_GETOPT_POSIX
 if test $REPLACE_GETOPT = 1; then
   AC_LIBOBJ([getopt])
   AC_LIBOBJ([getopt1])
   gl_PREREQ_GETOPT
+  dnl Arrange for unistd.h to include getopt.h.
+  GNULIB_GL_UNISTD_H_GETOPT=1
 fi
+AC_SUBST([GNULIB_GL_UNISTD_H_GETOPT])
 gl_FUNC_GETPASS
 if test $HAVE_GETPASS = 0; then
   AC_LIBOBJ([getpass])
@@ -519,6 +541,7 @@ m4_if(m4_version_compare([2.61a.100],
         m4_defn([m4_PACKAGE_VERSION])), [1], [],
       [AC_CONFIG_LINKS([$GNUmakefile:$GNUmakefile], [],
         [GNUmakefile=$GNUmakefile])])
+gl_HOSTENT
 gl_FUNC_INET_NTOP
 if test $HAVE_INET_NTOP = 0 || test $REPLACE_INET_NTOP = 1; then
   AC_LIBOBJ([inet_ntop])
@@ -660,6 +683,7 @@ if test "$ac_cv_header_winsock2_h" = yes; then
   AC_LIBOBJ([sendto])
 fi
 gl_SYS_SOCKET_MODULE_INDICATOR([sendto])
+gl_SERVENT
 AC_REQUIRE([gl_HEADER_SYS_SOCKET])
 if test "$ac_cv_header_winsock2_h" = yes; then
   AC_LIBOBJ([setsockopt])
@@ -787,6 +811,11 @@ gl_TIME_MODULE_INDICATOR([time_r])
 gl_TIMESPEC
 AC_REQUIRE([AC_C_INLINE])
 gl_UNISTD_H
+gl_FUNC_USLEEP
+if test $HAVE_USLEEP = 0 || test $REPLACE_USLEEP = 1; then
+  AC_LIBOBJ([usleep])
+fi
+gl_UNISTD_MODULE_INDICATOR([usleep])
 gl_VALGRIND_TESTS
 gl_FUNC_VASNPRINTF
 gl_FUNC_VASPRINTF
@@ -1138,6 +1167,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/fstat.c
   lib/ftell.c
   lib/ftello.c
+  lib/gai_strerror.c
+  lib/getaddrinfo.c
   lib/getdelim.c
   lib/getline.c
   lib/getopt.c
@@ -1247,6 +1278,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/timespec.h
   lib/u64.h
   lib/unistd.in.h
+  lib/usleep.c
   lib/vasnprintf.c
   lib/vasnprintf.h
   lib/vasprintf.c
@@ -1296,6 +1328,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/ftello.m4
   m4/ftruncate.m4
   m4/func.m4
+  m4/getaddrinfo.m4
   m4/getcwd.m4
   m4/getdelim.m4
   m4/getline.m4
@@ -1309,6 +1342,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/glibc2.m4
   m4/glibc21.m4
   m4/gnulib-common.m4
+  m4/hostent.m4
   m4/iconv.m4
   m4/include_next.m4
   m4/inet_ntop.m4
@@ -1373,6 +1407,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/realloc.m4
   m4/scandir.m4
   m4/select.m4
+  m4/servent.m4
   m4/setenv.m4
   m4/signal_h.m4
   m4/signbit.m4
@@ -1420,6 +1455,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/uintmax_t.m4
   m4/ungetc.m4
   m4/unistd_h.m4
+  m4/usleep.m4
   m4/valgrind-tests.m4
   m4/vasnprintf.m4
   m4/vasprintf.m4
@@ -1492,6 +1528,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-ftruncate.sh
   tests/test-func.c
   tests/test-fwrite.c
+  tests/test-getaddrinfo.c
   tests/test-getcwd-lgpl.c
   tests/test-getdelim.c
   tests/test-getline.c
@@ -1503,6 +1540,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-ignore-value.c
   tests/test-inet_ntop.c
   tests/test-inet_pton.c
+  tests/test-init.sh
   tests/test-intprops.c
   tests/test-inttypes.c
   tests/test-ioctl.c
@@ -1585,6 +1623,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-u64.c
   tests/test-unistd.c
   tests/test-unsetenv.c
+  tests/test-usleep.c
   tests/test-vasnprintf.c
   tests/test-vasprintf.c
   tests/test-vc-list-files-cvs.sh

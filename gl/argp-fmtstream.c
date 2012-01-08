@@ -1,5 +1,5 @@
 /* Word-wrapping and line-truncating streams
-   Copyright (C) 1997-1999, 2001-2003, 2005, 2009-2011 Free Software
+   Copyright (C) 1997-1999, 2001-2003, 2005, 2009-2012 Free Software
    Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Miles Bader <miles@gnu.ai.mit.edu>.
@@ -17,7 +17,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-/* This package emulates glibc `line_wrap_stream' semantics for systems that
+/* This package emulates glibc 'line_wrap_stream' semantics for systems that
    don't have that.  */
 
 #ifdef HAVE_CONFIG_H

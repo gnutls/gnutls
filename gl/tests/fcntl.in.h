@@ -1,6 +1,6 @@
 /* Like <fcntl.h>, but with non-working flags defined to 0.
 
-   Copyright (C) 2006-2011 Free Software Foundation, Inc.
+   Copyright (C) 2006-2012 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -177,12 +177,12 @@ _GL_WARN_ON_USE (openat, "openat is not portable - "
 /* Fix up the O_* macros.  */
 
 #if !defined O_DIRECT && defined O_DIRECTIO
-/* Tru64 spells it `O_DIRECTIO'.  */
+/* Tru64 spells it 'O_DIRECTIO'.  */
 # define O_DIRECT O_DIRECTIO
 #endif
 
 #if !defined O_CLOEXEC && defined O_NOINHERIT
-/* Mingw spells it `O_NOINHERIT'.  */
+/* Mingw spells it 'O_NOINHERIT'.  */
 # define O_CLOEXEC O_NOINHERIT
 #endif
 

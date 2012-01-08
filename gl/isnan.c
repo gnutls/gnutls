@@ -1,5 +1,5 @@
 /* Test for NaN that does not need libm.
-   Copyright (C) 2007-2011 Free Software Foundation, Inc.
+   Copyright (C) 2007-2012 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 /* Specification.  */
 #ifdef USE_LONG_DOUBLE
 /* Specification found in math.h or isnanl-nolibm.h.  */
-extern int rpl_isnanl (long double x);
+extern int rpl_isnanl (long double x) _GL_ATTRIBUTE_CONST;
 #elif ! defined USE_FLOAT
 /* Specification found in math.h or isnand-nolibm.h.  */
 extern int rpl_isnand (double x);

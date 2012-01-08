@@ -1,6 +1,6 @@
 /* A GNU-like <stdlib.h>.
 
-   Copyright (C) 1995, 2001-2004, 2006-2011 Free Software Foundation, Inc.
+   Copyright (C) 1995, 2001-2004, 2006-2012 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -452,6 +452,32 @@ _GL_CXXALIASWARN (ptsname);
 # if HAVE_RAW_DECL_PTSNAME
 _GL_WARN_ON_USE (ptsname, "ptsname is not portable - "
                  "use gnulib module ptsname for portability");
+# endif
+#endif
+
+#if @GNULIB_PTSNAME_R@
+/* Set the pathname of the pseudo-terminal slave associated with
+   the master FD is open on and return 0, or set errno and return
+   non-zero on errors.  */
+# if @REPLACE_PTSNAME_R@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef ptsname_r
+#   define ptsname_r rpl_ptsname_r
+#  endif
+_GL_FUNCDECL_RPL (ptsname_r, int, (int fd, char *buf, size_t len));
+_GL_CXXALIAS_RPL (ptsname_r, int, (int fd, char *buf, size_t len));
+# else
+#  if !@HAVE_PTSNAME_R@
+_GL_FUNCDECL_SYS (ptsname_r, int, (int fd, char *buf, size_t len));
+#  endif
+_GL_CXXALIAS_SYS (ptsname_r, int, (int fd, char *buf, size_t len));
+# endif
+_GL_CXXALIASWARN (ptsname_r);
+#elif defined GNULIB_POSIXCHECK
+# undef ptsname_r
+# if HAVE_RAW_DECL_PTSNAME_R
+_GL_WARN_ON_USE (ptsname_r, "ptsname_r is not portable - "
+                 "use gnulib module ptsname_r for portability");
 # endif
 #endif
 

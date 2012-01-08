@@ -1,4 +1,4 @@
-/* Copyright (C) 1992, 1995-2002, 2005-2011 Free Software Foundation, Inc.
+/* Copyright (C) 1992, 1995-2002, 2005-2012 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@
 #endif
 
 #if _LIBC
-/* This lock protects against simultaneous modifications of `environ'.  */
+/* This lock protects against simultaneous modifications of 'environ'.  */
 # include <bits/libc-lock.h>
 __libc_lock_define_initialized (static, envlock)
 # define LOCK   __libc_lock_lock (envlock)

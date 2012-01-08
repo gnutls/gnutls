@@ -1,5 +1,5 @@
 /* Invalid parameter handler for MSVC runtime libraries.
-   Copyright (C) 2011 Free Software Foundation, Inc.
+   Copyright (C) 2011-2012 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ gl_msvc_invalid_parameter_handler (const wchar_t *expression,
 
 # else
 
-/* Get declarations of the Win32 API functions.  */
+/* Get declarations of the native Windows API functions.  */
 #  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
 

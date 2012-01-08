@@ -1,5 +1,5 @@
 /* Invalid parameter handler for MSVC runtime libraries.
-   Copyright (C) 2011 Free Software Foundation, Inc.
+   Copyright (C) 2011-2012 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -207,7 +207,7 @@ extern struct gl_msvc_inval_per_thread *gl_msvc_inval_current (void);
    or when SANE_LIBRARY_HANDLING is desired.  */
 
 /* The braces here avoid GCC warnings like
-   "warning: suggest explicit braces to avoid ambiguous `else'".  */
+   "warning: suggest explicit braces to avoid ambiguous 'else'".  */
 # define TRY_MSVC_INVAL \
     do                                                                         \
       {                                                                        \
