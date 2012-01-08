@@ -1199,16 +1199,18 @@ certificate_info (int pubkey, common_info_st * cinfo)
       if (info.outcert_format == GNUTLS_X509_FMT_PEM)
         print_certificate_info (crt[i], outfile, 1);
 
-      size = buffer_size;
-      ret = gnutls_x509_crt_export (crt[i], info.outcert_format, buffer,
-                                    &size);
-      if (ret < 0)
-        error (EXIT_FAILURE, 0, "export error: %s", gnutls_strerror (ret));
-
-      fwrite (buffer, 1, size, outfile);
-
       if (pubkey)
         pubkey_info (crt[i], cinfo);
+      else
+        {
+          size = buffer_size;
+          ret = gnutls_x509_crt_export (crt[i], info.outcert_format, buffer,
+                                        &size);
+          if (ret < 0)
+            error (EXIT_FAILURE, 0, "export error: %s", gnutls_strerror (ret));
+
+          fwrite (buffer, 1, size, outfile);
+        }
 
       gnutls_x509_crt_deinit (crt[i]);
     }
@@ -2946,6 +2948,22 @@ pubkey_info (gnutls_x509_crt_t crt, common_info_st * cinfo)
     {
       pubkey = load_pubkey (1, cinfo);
     }
+
+  if (info.outcert_format == GNUTLS_X509_FMT_DER)
+    {
+      size = buffer_size;
+      ret = gnutls_pubkey_export (pubkey, info.outcert_format, buffer, &size);
+      if (ret < 0)
+        error (EXIT_FAILURE, 0, "export error: %s", gnutls_strerror (ret));
+
+      fwrite (buffer, 1, size, outfile);
+
+      gnutls_pubkey_deinit (pubkey);
+      
+      return;
+    }
+    
+  /* PEM */
 
   fprintf (outfile, "Public Key Info:\n\n");
   ret = gnutls_pubkey_get_pk_algorithm (pubkey, &bits);

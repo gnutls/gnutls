@@ -5,7 +5,7 @@ See the end for copying conditions.
 * Version 3.0.12 (unreleased)
 
 ** certtool: --outder option now works for private
-keys as well.
+and public keys as well.
 
 ** libgnutls: Corrected memory leak in DH parameter
 generation.
