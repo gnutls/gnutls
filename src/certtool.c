@@ -275,7 +275,8 @@ print_private_key (gnutls_x509_privkey_t key)
   if (!key)
     return;
 
-  privkey_info_int(key);
+  if (info.outcert_format == GNUTLS_X509_FMT_PEM)
+    privkey_info_int(key);
 
   if (!info.pkcs8)
     {
@@ -1788,7 +1789,8 @@ privkey_info (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));
 
-  privkey_info_int (key);
+  if (info.outcert_format == GNUTLS_X509_FMT_PEM)
+    privkey_info_int (key);
 
   ret = gnutls_x509_privkey_verify_params (key);
   if (ret < 0)
@@ -1802,11 +1804,11 @@ privkey_info (void)
     }
 
   size = buffer_size;
-  ret = gnutls_x509_privkey_export (key, GNUTLS_X509_FMT_PEM, buffer, &size);
+  ret = gnutls_x509_privkey_export (key, info.outcert_format, buffer, &size);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "export error: %s", gnutls_strerror (ret));
 
-  fprintf (outfile, "\n%s\n", buffer);
+  fwrite (buffer, 1, size, outfile);
 
   gnutls_x509_privkey_deinit (key);
 }
