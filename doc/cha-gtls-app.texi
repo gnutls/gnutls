@@ -952,8 +952,15 @@ of Diffie-Hellman parameters we suggest against performing generation
 of them within an application. The @code{certtool} tool can be used to 
 generate or export known safe values that can be stored in code
 or in a configuration file to provide the ability to replace. We also
-recommend the usage of @funcref{gnutls_sec_param_to_pk_bits} (see @ref{Selecting cryptographic key sizes}) to determine
+recommend the usage of @funcref{gnutls_sec_param_to_pk_bits} 
+(see @ref{Selecting cryptographic key sizes}) to determine
 the bit size of the generated parameters.
+
+Note that the information stored in the generated PKCS #3 structure
+changed with GnuTLS 3.0.9. Since that version the @code{privateValueLength}
+member of the structure is set, allowing the server utilizing the
+parameters to use keys of the size of the security parameter. This
+provides better performance in key exchange.
 
 The ciphersuites that involve the RSA-EXPORT key exchange require
 additional parameters. Those ciphersuites are rarely used today
