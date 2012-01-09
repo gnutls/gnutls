@@ -699,12 +699,14 @@ included as a fallback only.  The ciphers are sorted by security
 margin.
 
 @item SECURE128 @tab
-Means all "secure" ciphersuites of security level 128-bit
-or more.
+Means all "secure" ciphersuites that offer a 
+security level 128-bit or more and a message authenticity
+security level of 80 bits or more.
 
 @item SECURE192 @tab
-Means all "secure" ciphersuites of security level 192-bit
-or more.
+Means all "secure" ciphersuites that offer a 
+security level 192-bit or more and a message authenticity
+security level of 128 bits or more.
 
 @item SECURE256 @tab
 Currently alias for SECURE192.
@@ -736,8 +738,16 @@ compression NULL; for certificate types X.509.
 In key exchange algorithms when in NORMAL or SECURE levels the
 perfect forward secrecy algorithms take precedence of the other
 protocols.  In all cases all the supported key exchange algorithms
- are enabled (except for the RSA-EXPORT which is only enabled in
-EXPORT level).
+are enabled@footnote{Except for the RSA-EXPORT which is only enabled in
+EXPORT level.}.
+
+Note that the SECURE levels distinguish between overall security level and
+message authenticity security level. That is because the message
+authenticity security level requires the adversary to break
+the algorithms at real-time during the protocol run, whilst 
+the overall security level refers to off-line adversaries 
+(e.g. adversaries breaking the ciphertext years after it was captured).
+
 The NONE keyword, if used, must followed by the algorithms to be enabled,
 and is used to provide the exact list of requested algorithms@footnote{To avoid collisions in order to specify a compression algorithm in
 this string you have to prefix it with "COMP-", protocol versions

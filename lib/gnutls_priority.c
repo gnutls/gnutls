@@ -370,7 +370,9 @@ static const int cipher_priority_secure128[] = {
   GNUTLS_CIPHER_AES_128_CBC,
   GNUTLS_CIPHER_CAMELLIA_128_CBC,
   GNUTLS_CIPHER_AES_128_GCM,
-  GNUTLS_CIPHER_3DES_CBC,
+  GNUTLS_CIPHER_AES_256_CBC,
+  GNUTLS_CIPHER_CAMELLIA_256_CBC,
+  GNUTLS_CIPHER_AES_256_GCM,
   0
 };
 
@@ -474,6 +476,7 @@ static const int mac_priority_suiteb192[] = {
 };
 
 static const int mac_priority_secure128[] = {
+  GNUTLS_MAC_SHA1,
   GNUTLS_MAC_SHA256,
   GNUTLS_MAC_SHA384,
   GNUTLS_MAC_AEAD,
