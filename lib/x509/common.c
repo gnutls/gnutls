@@ -171,8 +171,18 @@ _gnutls_x509_oid_data_choice (const char *oid)
   return 0;
 }
 
-const char *
-_gnutls_x509_oid2ldap_string (const char *oid)
+/**
+ * gnutls_x509_dn_oid_name:
+ * @oid: holds an Object Identifier in a null terminated string
+ *
+ * This function will return the name of a known DN OID. 
+ *
+ * Returns: A null terminated string or NULL otherwise.
+ *
+ * Since: 3.0.0
+ **/
+const char*
+gnutls_x509_dn_oid_name (const char *oid)
 {
   int i = 0;
 

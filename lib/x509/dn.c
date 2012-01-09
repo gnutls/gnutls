@@ -42,7 +42,7 @@ oid2ldap_string (const char *oid)
 {
   const char *ret;
 
-  ret = _gnutls_x509_oid2ldap_string (oid);
+  ret = gnutls_x509_dn_oid_name (oid);
   if (ret)
     return ret;
 

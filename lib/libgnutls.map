@@ -728,6 +728,7 @@ GNUTLS_3_0_0 {
 	gnutls_priority_get_cipher_suite_index;
 	gnutls_random_art;
 	gnutls_pubkey_encrypt_data;
+	gnutls_x509_dn_oid_name;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

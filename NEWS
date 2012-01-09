@@ -10,9 +10,12 @@ and public keys as well.
 ** libgnutls: Corrected memory leak in DH parameter
 generation.
 
+** libgnutls: Added gnutls_x509_dn_oid_name() to 
+return a descriptive name of a DN OID.
+
 ** API and ABI modifications:
 gnutls_pubkey_encrypt_data: Added
-
+gnutls_x509_dn_oid_name: Added
 
 * Version 3.0.11 (released 2012-01-06)
 
