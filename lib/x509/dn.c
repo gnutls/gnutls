@@ -50,7 +50,7 @@ oid2ldap_string (const char *oid)
   return oid;
 }
 
-/* Escapes a string following the rules from RFC2253.
+/* Escapes a string following the rules from RFC4514.
  */
 static char *
 str_escape (char *str, char *buffer, unsigned int buffer_size)
@@ -1030,7 +1030,7 @@ gnutls_x509_dn_deinit (gnutls_x509_dn_t dn)
  *
  * This function will return the name of the given RDN sequence.  The
  * name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in
- * RFC2253.
+ * RFC4514.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or
  * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@sizeof_buf is
@@ -1090,7 +1090,7 @@ gnutls_x509_rdn_get (const gnutls_datum_t * idn,
  *
  * This function will return the name of the given Object identifier,
  * of the RDN sequence.  The name will be encoded using the rules
- * from RFC2253.
+ * from RFC4514.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or
  * %GNUTLS_E_SHORT_MEMORY_BUFFER is returned and *@sizeof_buf is

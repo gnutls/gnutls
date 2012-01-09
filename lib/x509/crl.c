@@ -168,7 +168,7 @@ cleanup:
  *
  * This function will copy the name of the CRL issuer in the provided
  * buffer. The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
- * described in RFC2253. The output string will be ASCII or UTF-8
+ * described in RFC4514. The output string will be ASCII or UTF-8
  * encoded, depending on the certificate data.
  *
  * If buf is %NULL then only the size will be filled.
@@ -204,13 +204,13 @@ gnutls_x509_crl_get_issuer_dn (const gnutls_x509_crl_t crl, char *buf,
  *
  * This function will extract the part of the name of the CRL issuer
  * specified by the given OID. The output will be encoded as described
- * in RFC2253. The output string will be ASCII or UTF-8 encoded,
+ * in RFC4514. The output string will be ASCII or UTF-8 encoded,
  * depending on the certificate data.
  *
  * Some helper macros with popular OIDs can be found in gnutls/x509.h
  * If raw flag is (0), this function will only return known OIDs as
- * text. Other OIDs will be DER encoded, as described in RFC2253 -- in
- * hex format with a '\#' prefix.  You can check about known OIDs
+ * text. Other OIDs will be DER encoded, as described in RFC4514 -- in
+ * hex format with a '#' prefix.  You can check about known OIDs
  * using gnutls_x509_dn_oid_known().
  *
  * If buf is null then only the size will be filled.

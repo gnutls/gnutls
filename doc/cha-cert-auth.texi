@@ -35,6 +35,7 @@ acceptable.  The framework is illustrated on @ref{fig:x509}.
 
 @menu
 * X.509 certificate structure::
+* X.509 distinguished names::
 * Verifying X.509 certificate paths::
 * Verifying a certificate in the context of TLS session::
 @end menu
@@ -142,6 +143,34 @@ available functions for @acronym{X.509} certificate handling have
 their prototypes in @file{gnutls/x509.h}. An example program to
 demonstrate the @acronym{X.509} parsing capabilities can be found at
 @ref{ex:x509-info}.
+
+@node X.509 distinguished names
+@subsection X.509 distinguished names
+@cindex X.509 distinguished name
+
+The ``subject'' of an X.509 certificate is not described by
+a single name, but rather with a distinguished name. This in
+X.509 terminology is a list of strings each associated an object
+identifier. To make things simple GnuTLS provides @funcref{gnutls_x509_crt_get_dn}
+which follows the rules in @xcite{RFC4514} and returns a single
+string. Access to each string by individual object identifiers
+can be accessed using @funcref{gnutls_x509_crt_get_dn_by_oid}.
+
+@showfuncdesc{gnutls_x509_crt_get_dn}
+@showfuncdesc{gnutls_x509_crt_get_dn_by_oid}
+@showfuncdesc{gnutls_x509_crt_get_dn_oid}
+
+The more powerful @funcref{gnutls_x509_crt_get_subject} and 
+@funcref{gnutls_x509_dn_get_rdn_ava} provide efficient access
+to the contents of the distinguished name structure.
+
+@showfuncdesc{gnutls_x509_crt_get_subject}
+@showfuncdesc{gnutls_x509_dn_get_rdn_ava}
+
+Similar functions exist to access the distinguished name
+of the issuer of the certificate.
+
+@showfuncD{gnutls_x509_crt_get_issuer_dn,gnutls_x509_crt_get_issuer_dn_by_oid,gnutls_x509_crt_get_issuer_dn_oid,gnutls_x509_crt_get_issuer}
 
 @node Verifying X.509 certificate paths
 @subsection Verifying @acronym{X.509} certificate paths
