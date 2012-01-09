@@ -34,22 +34,6 @@
  * Name (you need a parser just to read a name in the X.509 protoocols!!!)
  */
 
-/* Converts the given OID to an ldap acceptable string or
- * a dotted OID.
- */
-static const char *
-oid2ldap_string (const char *oid)
-{
-  const char *ret;
-
-  ret = gnutls_x509_dn_oid_name (oid);
-  if (ret)
-    return ret;
-
-  /* else return the OID in dotted format */
-  return oid;
-}
-
 /* Escapes a string following the rules from RFC4514.
  */
 static char *
@@ -236,7 +220,7 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
                 }
             }
 
-          ldap_desc = oid2ldap_string (oid);
+          ldap_desc = gnutls_x509_dn_oid_name (oid, GNUTLS_X509_DN_OID_RETURN_OID);
           printable = _gnutls_x509_oid_data_printable (oid);
 
           /* leading #, hex encoded value and terminating NULL */

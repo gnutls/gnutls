@@ -295,7 +295,8 @@ extern "C"
 
   int gnutls_x509_dn_oid_known (const char *oid);
 
-  const char* gnutls_x509_dn_oid_name (const char *oid);
+#define GNUTLS_X509_DN_OID_RETURN_OID 1
+  const char* gnutls_x509_dn_oid_name (const char *oid, unsigned int flags);
 
   /* Read extensions by OID. */
   int gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert, int indx,
