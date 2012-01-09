@@ -267,6 +267,16 @@ specifying both options to @command{pkg-config}:
 gcc -o foo foo.c `pkg-config gnutls --cflags --libs`
 @end example
 
+When a program uses the GNU autoconf system, then the following
+line or similar can be used to detect the presence of GnuTLS.
+
+@example
+PKG_CHECK_MODULES([LIBGNUTLS], [gnutls >= 3.0.0])
+
+AC_SUBST([LIBGNUTLS_CFLAGS])
+AC_SUBST([LIBGNUTLS_LIBS])
+@end example
+
 @node Session initialization
 @section Session initialization
 

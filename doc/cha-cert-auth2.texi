@@ -858,8 +858,11 @@ signature verification operations with the underlying keys.
 
 @showfuncdesc{gnutls_pubkey_verify_data2}
 @showfuncdesc{gnutls_pubkey_verify_hash}
+@showfuncdesc{gnutls_pubkey_encrypt_data}
+
 @showfuncdesc{gnutls_privkey_sign_data}
 @showfuncdesc{gnutls_privkey_sign_hash}
+@showfuncdesc{gnutls_privkey_decrypt_data}
 
 Signing existing structures, such as certificates, CRLs,
 or certificate requests, as well as associating public
