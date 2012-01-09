@@ -258,9 +258,7 @@ cleanup:
  * "C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output string
  * will be ASCII or UTF-8 encoded, depending on the certificate data.
  *
- * If @buf is null then only the size will be filled. If the @raw_flag
- * is not specified the output is always null terminated, although the
- * @buf_size will not include the null character.
+ * If @buf is null then only the size will be filled. 
  *
  * Returns: GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
  * long enough, and in that case the @buf_size will be updated with
@@ -336,9 +334,7 @@ gnutls_x509_crt_get_issuer_dn_by_oid (gnutls_x509_crt_t cert,
  * This function will extract the OIDs of the name of the Certificate
  * issuer specified by the given index.
  *
- * If @oid is null then only the size will be filled. If the @raw_flag
- * is not specified the output is always null terminated, although the
- * @oid_size will not include the null character.
+ * If @oid is null then only the size will be filled. 
  *
  * Returns: GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
  *   long enough, and in that case the @oid_size will be updated
@@ -370,9 +366,7 @@ gnutls_x509_crt_get_issuer_dn_oid (gnutls_x509_crt_t cert,
  * described in RFC2253. The output string will be ASCII or UTF-8
  * encoded, depending on the certificate data.
  *
- * If @buf is null then only the size will be filled. If the @raw_flag
- * is not specified the output is always null terminated, although the
- * @buf_size will not include the null character.
+ * If @buf is null then only the size will be filled. 
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is not
  *   long enough, and in that case the @buf_size will be updated
@@ -447,9 +441,7 @@ gnutls_x509_crt_get_dn_by_oid (gnutls_x509_crt_t cert, const char *oid,
  * This function will extract the OIDs of the name of the Certificate
  * subject specified by the given index.
  *
- * If @oid is null then only the size will be filled. If the @raw_flag
- * is not specified the output is always null terminated, although the
- * @oid_size will not include the null character.
+ * If @oid is null then only the size will be filled. 
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
  *   not long enough, and in that case the @oid_size will be updated
@@ -1336,9 +1328,7 @@ gnutls_x509_crt_get_issuer_alt_name2 (gnutls_x509_crt_t cert,
  * gnutls_x509_crt_get_subject_alt_name() returned
  * %GNUTLS_SAN_OTHERNAME.
  *
- * If @oid is null then only the size will be filled. If the @raw_flag
- * is not specified the output is always null terminated, although the
- * @oid_size will not include the null character.
+ * If @oid is null then only the size will be filled. 
  *
  * Returns: the alternative subject name type on success, one of the
  * enumerated gnutls_x509_subject_alt_name_t.  For supported OIDs, it
@@ -1370,9 +1360,7 @@ gnutls_x509_crt_get_subject_alt_othername_oid (gnutls_x509_crt_t cert,
  * Alternative Name, contained in the given certificate, and return
  * the type as an enumerated element.
  *
- * If @oid is null then only the size will be filled. If the @raw_flag
- * is not specified the output is always null terminated, although the
- * @oid_size will not include the null character.
+ * If @oid is null then only the size will be filled. 
  *
  * This function is only useful if
  * gnutls_x509_crt_get_issuer_alt_name() returned
@@ -2719,9 +2707,7 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
  * Usage extension (2.5.29.37) See the GNUTLS_KP_* definitions for
  * human readable names.
  *
- * If @oid is null then only the size will be filled. If the @raw_flag
- * is not specified the output is always null terminated, although the
- * @oid_size will not include the null character.
+ * If @oid is null then only the size will be filled. 
  *
  * Returns: %GNUTLS_E_SHORT_MEMORY_BUFFER if the provided buffer is
  *   not long enough, and in that case the *oid_size will be updated
