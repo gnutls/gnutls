@@ -1,6 +1,6 @@
 
-GNUTLS_FILE:=gnutls-3.0.10.tar.xz
-GNUTLS_DIR:=gnutls-3.0.10
+GNUTLS_FILE:=gnutls-3.0.11.tar.xz
+GNUTLS_DIR:=gnutls-3.0.11
 
 GMP_FILE:=gmp-5.0.2.tar.bz2
 GMP_DIR:=gmp-5.0.2
@@ -22,7 +22,9 @@ update-gpg-keys:
 	gpg --recv-keys 96865171 B565716F D92765AF A8F4C2FD DB899F46
 
 $(GNUTLS_DIR)-w32.zip: $(LIB_DIR) $(BIN_DIR) $(GNUTLS_DIR)/.installed
+	-mv $(CROSS_DIR)/lib/include $(CROSS_DIR)/include
 	cd $(CROSS_DIR) && zip -r $(PWD)/$@ *
+	gpg --sign --detach $(GNUTLS_DIR)-w32.zip
 
 gnutls-w32: $(GNUTLS_DIR)-w32.zip
 
