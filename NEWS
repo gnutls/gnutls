@@ -7,8 +7,8 @@ See the end for copying conditions.
 ** certtool: --outder option now works for private
 and public keys as well.
 
-** libgnutls: Corrected memory leak in DH parameter
-generation.
+** libgnutls: Corrected memory leaks in DH parameter
+generation and ecc_projective_check_point().
 
 ** libgnutls: Added gnutls_x509_dn_oid_name() to 
 return a descriptive name of a DN OID.

@@ -42,15 +42,15 @@ int ecc_projective_check_point (ecc_point * P, mpz_t b, mpz_t modulus)
     if (P == NULL || b == NULL || modulus == NULL)
 	return -1;
 
-    if ((err = mp_init_multi (&t1, &t2, &t3, NULL)) != 0)
-      {
-	  return err;
-      }
-
     if (mpz_cmp_ui (P->z, 1) != 0)
       {
 	  gnutls_assert ();
 	  return -1;
+      }
+
+    if ((err = mp_init_multi (&t1, &t2, &t3, NULL)) != 0)
+      {
+	  return err;
       }
 
     /* t1 = Z * Z */
@@ -95,12 +95,16 @@ int ecc_projective_check_point (ecc_point * P, mpz_t b, mpz_t modulus)
 
     if (mpz_cmp_ui (t1, 0) != 0)
       {
-	  return -1;
+	  err = -1;
       }
     else
       {
-	  return 0;
+	  err = 0;
       }
+
+    mp_clear_multi(&t1, &t2, &t3, NULL);
+    
+    return err;
 }
 
 #endif
