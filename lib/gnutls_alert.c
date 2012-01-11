@@ -244,6 +244,7 @@ gnutls_error_to_alert (int err, int *level)
       break;
     case GNUTLS_E_UNEXPECTED_PACKET:
     case GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET:
+    case GNUTLS_E_PREMATURE_TERMINATION:
       ret = GNUTLS_A_UNEXPECTED_MESSAGE;
       _level = GNUTLS_AL_FATAL;
       break;
