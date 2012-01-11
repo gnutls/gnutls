@@ -822,8 +822,11 @@ gnutls_datum_t raw; /* raw headers */
     {
       if (gnutls_error_is_fatal (ret) == 0)
         return ret;
-
-      return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
+      
+      if (ret >= 0)
+        ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
+      
+      return gnutls_assert_val(ret);
     }
 
   ret = _mbuffer_linearize (&session->internals.record_recv_buffer);
