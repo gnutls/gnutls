@@ -441,6 +441,8 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
   session_id = &data[pos];
   ret = _gnutls_server_restore_session (session, session_id, session_id_len);
   pos += session_id_len;
+  
+  if (session_id_len > 0) session->internals.resumption_requested = 1;
 
   if (ret == 0)
     {                           /* resumed using default TLS resumption! */

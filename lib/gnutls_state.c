@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011
- * Free Software Foundation, Inc.
+ * Copyright (C) 2002-2012 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -1110,6 +1109,28 @@ gnutls_session_is_resumed (gnutls_session_t session)
     }
 
   return 0;
+}
+
+/**
+ * gnutls_session_resumption_requested:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * Check whether the client has asked for session resumption.
+ * This function is valid only on server side.
+ *
+ * Returns: non zero if session resumption was asked, or a zero if not.
+ **/
+int
+gnutls_session_resumption_requested(gnutls_session_t session)
+{
+  if (session->security_parameters.entity == GNUTLS_CLIENT)
+    {
+      return 0;
+    }
+  else
+    {
+      return session->internals.resumption_requested;
+    }
 }
 
 /*-

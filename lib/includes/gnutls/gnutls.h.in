@@ -1,5 +1,5 @@
 /* -*- c -*-
- * Copyright (C) 2000-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2000-2012 Free Software Foundation, Inc.
  *
  * Author: Nikos Mavrogiannopoulos
  *
@@ -959,6 +959,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 /* checks if this session is a resumed one 
  */
   int gnutls_session_is_resumed (gnutls_session_t session);
+  int gnutls_session_resumption_requested (gnutls_session_t session);
 
   typedef int (*gnutls_db_store_func) (void *, gnutls_datum_t key,
                                        gnutls_datum_t data);

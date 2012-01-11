@@ -683,7 +683,8 @@ typedef struct
   struct gnutls_priority_st priorities;
 
   /* resumed session */
-  unsigned int resumed:1;                /* RESUME_TRUE or FALSE - if we are resuming a session */
+  unsigned int resumed:1;  /* RESUME_TRUE or FALSE - if we are resuming a session */
+  unsigned int resumption_requested:1; /* non-zero if resumption was requested by client */
   security_parameters_st resumed_security_parameters;
 
   /* These buffers are used in the handshake

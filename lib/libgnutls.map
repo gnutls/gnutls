@@ -729,6 +729,7 @@ GNUTLS_3_0_0 {
 	gnutls_random_art;
 	gnutls_pubkey_encrypt_data;
 	gnutls_x509_dn_oid_name;
+	gnutls_session_resumption_requested;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {
