@@ -76,8 +76,7 @@ ecc_shared_secret (ecc_key * private_key, ecc_key * public_key,
       err = -1;
       goto done;
     }
-  memset (out, 0, x);
-  nettle_mpz_get_str_256(x, out + (x - nettle_mpz_sizeinbase_256_u (result->x)), result->x);
+  nettle_mpz_get_str_256(x, out, result->x);
 
   err = 0;
   *outlen = x;
