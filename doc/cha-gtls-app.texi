@@ -338,6 +338,10 @@ already.
 
 @showfuncD{gnutls_certificate_set_openpgp_key_mem,gnutls_certificate_set_openpgp_key,gnutls_certificate_set_openpgp_key_file,gnutls_certificate_set_key}
 
+If multiple certificates are used with the functions above each
+client's request will be served with the certificate that matches the
+requested name (see @ref{Server name indication}).
+
 As an alternative to loading from files or buffers, a callback may be used for the 
 server or the client to specify the certificate and the key at the handshake time.
 In that case a certificate should be selected according the peer's signature
@@ -346,44 +350,22 @@ algorithm preferences. To get those preferences use
 
 @showfuncB{gnutls_certificate_set_retrieve_function,gnutls_sign_algorithm_get_requested}
 
-Certificate verification is possible by loading the trusted
-authorities into the credentials structure by using
-the following functions, applicable to X.509 and OpenPGP certificates.
+The functions above do not handle the requested server name automatically.
+A server would need to check the name requested by the client
+using @funcref{gnutls_server_name_get}, and serve the appropriate
+certificate.
 
-@showfuncB{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_openpgp_keyring_file}
-
-Note however that the peer's certificate is not automatically
-verified, you should call @funcref{gnutls_certificate_verify_peers2},
-after a successful handshake or during if @funcref{gnutls_certificate_set_verify_function}
-has been used, to verify the certificate's signature.
-An alternative way, which reports a more detailed
-verification output, is to use @funcref{gnutls_certificate_get_peers} to
-obtain the raw certificate of the peer and verify it using the
-functions discussed in @ref{X.509 certificates}.
-
-@showfuncdesc{gnutls_certificate_verify_peers2}
-
-In a handshake, the negotiated cipher suite also depends on the
+In a handshake, the negotiated cipher suite depends on the
 certificate's parameters, so some key exchange methods might not be
-available with some certificates. @acronym{GnuTLS} will disable
+available with all certificates. @acronym{GnuTLS} will disable
 ciphersuites that are not compatible with the key, or the enabled
 authentication methods.  For example keys marked as sign-only, will
 not be able to access the plain RSA ciphersuites, that require
 decryption. It is not recommended to use RSA keys for both
 signing and encryption. If possible use a different key for the
-@code{DHE_RSA} which uses signing and @code{RSA} that requires decryption.
+@code{DHE-RSA} which uses signing and @code{RSA} that requires decryption.
 All the key exchange methods shown in @ref{tab:key-exchange} are
 available in certificate authentication.
-
-@showfuncdesc{gnutls_certificate_set_verify_function}
-
-Note that the DHE key exchange methods are generally
-slower@footnote{It depends on the group used.  Primes with
-lesser bits are always faster, but also easier to break.  See @ref{Selecting cryptographic key sizes}
-for the acceptable security levels.} than the elliptic curves counterpart
-(ECDHE). Moreover the plain Diffie-Hellman key exchange
-requires parameters to be generated and associated with a credentials
-structure by the server (see @ref{Parameter generation}). 
 
 
 @subsubheading Client certificate authentication
@@ -401,6 +383,31 @@ signed by server's acceptable signers.
 @showfuncdesc{gnutls_certificate_server_set_request}
 
 @showfuncdesc{gnutls_certificate_send_x509_rdn_sequence}
+
+
+@subsubheading Client or server certificate verification
+
+Certificate verification is possible by loading the trusted
+authorities into the credentials structure by using
+the following functions, applicable to X.509 and OpenPGP certificates.
+
+@showfuncB{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_openpgp_keyring_file}
+
+The peer's certificate is not automatically verified and one 
+should call @funcref{gnutls_certificate_verify_peers2}
+after a successful handshake to verify the certificate's signature.
+Alternative the verification can occur during the handshake
+by using @funcref{gnutls_certificate_set_verify_function}.
+
+In order to report a detailed verification output, an alternative
+way has to be used. For that, one should call @funcref{gnutls_certificate_get_peers} 
+to obtain the raw certificate of the peer and verify it using the
+functions discussed in @ref{X.509 certificates}.
+
+@showfuncdesc{gnutls_certificate_verify_peers2}
+
+@showfuncdesc{gnutls_certificate_set_verify_function}
+
 
 
 @node SRP credentials
@@ -804,7 +811,13 @@ CURVE-SECP192R1, CURVE-SECP224R1, CURVE-SECP256R1, CURVE-SECP384R1, CURVE-SECP52
 @caption{The supported algorithm keywords in priority strings.}
 @end float
 
-
+Note that the DHE key exchange methods are generally
+slower@footnote{It depends on the group used.  Primes with
+lesser bits are always faster, but also easier to break.  See @ref{Selecting cryptographic key sizes}
+for the acceptable security levels.} than their elliptic curves counterpart
+(ECDHE). Moreover the plain Diffie-Hellman key exchange
+requires parameters to be generated and associated with a credentials
+structure by the server (see @ref{Parameter generation}). 
 
 @float Table,tab:prio-special
 @multitable @columnfractions .45 .45
@@ -888,17 +901,19 @@ will allow V1 CAs in chains.
 @subsubheading Client side
 
 To reduce time and roundtrips spent in a handshake the client can   
-utilize session resumption. This requires the client to retrieve and store
-the session parameters. On new sessions to the same server the parameters must
-be re-associated with sessions using @funcref{gnutls_session_set_data}.
+request session resumption from a server that previously shared
+a session with. For that the client has to retrieve and store
+the session parameters. Before establishing a new session to the same 
+server the parameters must be re-associated with the GnuTLS session
+using @funcref{gnutls_session_set_data}.
 
 @showfuncC{gnutls_session_get_data,gnutls_session_get_id,gnutls_session_set_data}
 
-Keep in mind that sessions might be expired after some time, 
-and it may be normal for a server not to resume a session
-even it was requested.  That is to prevent temporal session keys
-from becoming long-term keys. Also note that as a client you must enable, using the
-priority functions, at least the algorithms used in the last session.
+Keep in mind that sessions will be expired after some time, depending
+on the server, and a server may choose not to resume a session
+even when requested to.  The expiration is to prevent temporal session keys
+from becoming long-term keys. Also note that as a client you must enable, 
+using the priority functions, at least the algorithms used in the last session.
 
 It is highly recommended for clients to enable the session ticket extension using
 @funcref{gnutls_session_ticket_enable_client} in order to allow resumption with 
@@ -906,14 +921,15 @@ servers that do not store any state.
 
 @showfuncA{gnutls_session_ticket_enable_client}
 
+@showfuncdesc{gnutls_session_is_resumed}
 
 @subsubheading Server side
 
-In order to support resumption a server might do it either by storing
+In order to support resumption a server can store
 the session security parameters in a local database or by using session
 tickets (see @ref{Session tickets}) to delegate storage to the client. Because
 session tickets might not be supported by all clients, servers
-might combine the two methods.
+could combine the two methods.
 
 A storing server needs to specify callback functions to store, retrieve and delete session data. These can be
 registered with the functions below. The stored sessions in the database can be checked using @funcref{gnutls_db_check_entry}
@@ -922,13 +938,14 @@ for expiration.
 @showfuncD{gnutls_db_set_retrieve_function,gnutls_db_set_store_function,gnutls_db_set_ptr,gnutls_db_set_remove_function}
 @showfuncA{gnutls_db_check_entry}
 
-A server utilizing tickets should use
-@funcref{gnutls_session_ticket_key_generate} to generate a ticket encryption key and
-call @funcref{gnutls_session_ticket_enable_server} to enable the extension.
+A server utilizing tickets should generate ticket encryption
+and authentication keys using @funcref{gnutls_session_ticket_key_generate}.
+Those keys should be associated with the GnuTLS session using
+@funcref{gnutls_session_ticket_enable_server}.
 
-@showfuncA{gnutls_session_ticket_enable_server}
+@showfuncdesc{gnutls_session_ticket_enable_server}
 @showfuncdesc{gnutls_session_ticket_key_generate}
-
+@showfuncdesc{gnutls_session_resumption_requested}
 
 @node Parameter generation
 @subsection Parameter generation
