@@ -7,6 +7,10 @@ See the end for copying conditions.
 ** certtool: --outder option now works for private
 and public keys as well.
 
+** libgnutls: Corrected an alignment issue in ECDH
+key generation which prevented some keys from being
+correctly aligned in rare circumstances.
+
 ** libgnutls: Corrected memory leaks in DH parameter
 generation and ecc_projective_check_point().
 
