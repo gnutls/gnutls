@@ -46,20 +46,16 @@ static int calc_ecdh_key( gnutls_session_t session, gnutls_datum_t * psk_key)
 gnutls_pk_params_st pub;
 int ret;
 
-  pub.params[0] = session->key->ecdh_params.params[0];
-  pub.params[1] = session->key->ecdh_params.params[1];
-  pub.params[2] = session->key->ecdh_params.params[2];
-  pub.params[3] = session->key->ecdh_params.params[3];
-  pub.params[4] = session->key->ecdh_params.params[4];
-  pub.params[5] = session->key->ecdh_params.params[5];
-  pub.params[6] = session->key->ecdh_x;
-  pub.params[7] = session->key->ecdh_y;
-  pub.params[8] = _gnutls_mpi_new(1);
-  if (pub.params[8] == NULL)
-    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
-  
-  _gnutls_mpi_set_ui(pub.params[8], 1);
-  
+  memset(&pub,0,sizeof(pub));
+  pub.params[ECC_PRIME] = session->key->ecdh_params.params[ECC_PRIME];
+  pub.params[ECC_ORDER] = session->key->ecdh_params.params[ECC_ORDER];
+  pub.params[ECC_A] = session->key->ecdh_params.params[ECC_A];
+  pub.params[ECC_B] = session->key->ecdh_params.params[ECC_B];
+  pub.params[ECC_GX] = session->key->ecdh_params.params[ECC_GX];
+  pub.params[ECC_GY] = session->key->ecdh_params.params[ECC_GY];
+  pub.params[ECC_X] = session->key->ecdh_x;
+  pub.params[ECC_Y] = session->key->ecdh_y;
+
   if (psk_key == NULL)
     ret = _gnutls_pk_derive(GNUTLS_PK_EC, &session->key->key, &session->key->ecdh_params, &pub);
   else
@@ -87,8 +83,6 @@ int ret;
   ret = 0;
 
 cleanup:
-  _gnutls_mpi_release(&pub.params[8]);
-  
   /* no longer needed */
   _gnutls_mpi_release (&session->key->ecdh_x);
   _gnutls_mpi_release (&session->key->ecdh_y);
