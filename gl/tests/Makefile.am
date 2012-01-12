@@ -1342,14 +1342,6 @@ EXTRA_DIST += test-unsetenv.c signature.h macros.h
 
 ## end   gnulib module unsetenv-tests
 
-## begin gnulib module usleep-tests
-
-TESTS += test-usleep
-check_PROGRAMS += test-usleep
-EXTRA_DIST += test-usleep.c signature.h macros.h
-
-## end   gnulib module usleep-tests
-
 ## begin gnulib module vasnprintf-tests
 
 TESTS += test-vasnprintf

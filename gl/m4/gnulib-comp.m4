@@ -324,8 +324,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module unsetenv:
   # Code from module unsetenv-tests:
   # Code from module useless-if-before-free:
-  # Code from module usleep:
-  # Code from module usleep-tests:
   # Code from module valgrind-tests:
   # Code from module vasnprintf:
   # Code from module vasnprintf-tests:
@@ -811,11 +809,6 @@ gl_TIME_MODULE_INDICATOR([time_r])
 gl_TIMESPEC
 AC_REQUIRE([AC_C_INLINE])
 gl_UNISTD_H
-gl_FUNC_USLEEP
-if test $HAVE_USLEEP = 0 || test $REPLACE_USLEEP = 1; then
-  AC_LIBOBJ([usleep])
-fi
-gl_UNISTD_MODULE_INDICATOR([usleep])
 gl_VALGRIND_TESTS
 gl_FUNC_VASNPRINTF
 gl_FUNC_VASPRINTF
@@ -1278,7 +1271,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/timespec.h
   lib/u64.h
   lib/unistd.in.h
-  lib/usleep.c
   lib/vasnprintf.c
   lib/vasnprintf.h
   lib/vasprintf.c
@@ -1455,7 +1447,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/uintmax_t.m4
   m4/ungetc.m4
   m4/unistd_h.m4
-  m4/usleep.m4
   m4/valgrind-tests.m4
   m4/vasnprintf.m4
   m4/vasprintf.m4
@@ -1623,7 +1614,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-u64.c
   tests/test-unistd.c
   tests/test-unsetenv.c
-  tests/test-usleep.c
   tests/test-vasnprintf.c
   tests/test-vasprintf.c
   tests/test-vc-list-files-cvs.sh

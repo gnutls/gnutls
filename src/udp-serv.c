@@ -104,7 +104,6 @@ void udp_server(const char* name, int port, int mtu)
 
                 /* discard peeked data*/
                 recvfrom(sock, buffer, sizeof(buffer), 0, (struct sockaddr*)&cli_addr, &cli_addr_size);
-                usleep(100);
                 continue;
               }
             printf ("Accepted connection from %s\n",
