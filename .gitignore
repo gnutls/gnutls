@@ -454,6 +454,7 @@ tests/*/out
 tests/Makefile
 tests/Makefile.in
 tests/anonself
+tests/rsa-encrypt-decrypt
 tests/certder
 tests/certificate_set_x509_crl
 tests/certuniqueid
