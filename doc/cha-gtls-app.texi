@@ -947,6 +947,9 @@ Those keys should be associated with the GnuTLS session using
 @showfuncdesc{gnutls_session_ticket_key_generate}
 @showfuncdesc{gnutls_session_resumption_requested}
 
+A server enabling both session tickets and a storage for session data
+would use session tickets when clients support it and the storage otherwise.
+
 @node Parameter generation
 @subsection Parameter generation
 @cindex parameter generation
