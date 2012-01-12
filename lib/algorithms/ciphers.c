@@ -249,7 +249,10 @@ static gnutls_cipher_algorithm_t supported_ciphers[MAX_ALGOS] = {0};
     {
       int i = 0;
 
-      GNUTLS_CIPHER_LOOP (supported_ciphers[i++]=p->id);
+      GNUTLS_CIPHER_LOOP (
+        if (_gnutls_cipher_exists(p->id))
+          supported_ciphers[i++]=p->id;
+      );
       supported_ciphers[i++]=0;
     }
 

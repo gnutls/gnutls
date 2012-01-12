@@ -41,6 +41,10 @@
     int (*auth) (void *ctx, const void *data, size_t datasize);
     void (*tag) (void *ctx, void *tag, size_t tagsize);
     void (*deinit) (void *ctx);
+    
+    /* Not needed for registered on run-time. Only included
+     * should define it. */
+    int (*exists) (gnutls_cipher_algorithm_t); /* true/false */
   } gnutls_crypto_cipher_st;
 
   typedef struct
@@ -52,6 +56,10 @@
     int (*output) (void *src_ctx, void *digest, size_t digestsize);
     void (*deinit) (void *ctx);
     int (*fast)(gnutls_mac_algorithm_t, const void *key, size_t keysize, const void *text, size_t textsize, void *digest);
+
+    /* Not needed for registered on run-time. Only included
+     * should define it. */
+    int (*exists) (gnutls_mac_algorithm_t);
   } gnutls_crypto_mac_st;
 
   typedef struct
@@ -63,6 +71,10 @@
     int (*output) (void *src_ctx, void *digest, size_t digestsize);
     void (*deinit) (void *ctx);
     int (*fast)(gnutls_digest_algorithm_t, const void *src, size_t srcsize, void *digest);
+
+    /* Not needed for registered on run-time. Only included
+     * should define it. */
+    int (*exists) (gnutls_digest_algorithm_t);
   } gnutls_crypto_digest_st;
 
   typedef struct gnutls_crypto_rnd

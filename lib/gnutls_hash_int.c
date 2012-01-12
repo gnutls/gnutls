@@ -57,6 +57,7 @@ digest_length (int algo)
     }
 }
 
+
 int
 _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
 {
@@ -205,6 +206,19 @@ _gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
 
   return 0;
 
+}
+
+/* Returns true(non-zero) or false(0) if the 
+ * provided hash exists
+ */
+int _gnutls_hmac_exists(gnutls_mac_algorithm_t algo)
+{
+  const gnutls_crypto_mac_st *cc = NULL;
+
+  cc = _gnutls_get_crypto_mac (algo);
+  if (cc != NULL) return 1;
+
+  return _gnutls_mac_ops.exists (algo);
 }
 
 int

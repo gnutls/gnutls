@@ -31,20 +31,21 @@ struct gnutls_hash_entry
   const char *oid;
   gnutls_mac_algorithm_t id;
   size_t key_size;              /* in case of mac */
+  unsigned placeholder; /* if set, then not a real MAC */
 };
 typedef struct gnutls_hash_entry gnutls_hash_entry;
 
 static const gnutls_hash_entry hash_algorithms[] = {
-  {"SHA1", HASH_OID_SHA1, GNUTLS_MAC_SHA1, 20},
-  {"MD5", HASH_OID_MD5, GNUTLS_MAC_MD5, 16},
-  {"SHA256", HASH_OID_SHA256, GNUTLS_MAC_SHA256, 32},
-  {"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384, 48},
-  {"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512, 64},
-  {"SHA224", HASH_OID_SHA224, GNUTLS_MAC_SHA224, 28},
-  {"AEAD", NULL, GNUTLS_MAC_AEAD, 0},
-  {"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0},     /* not used as MAC */
-  {"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160, 20},
-  {"MAC-NULL", NULL, GNUTLS_MAC_NULL, 0},
+  {"SHA1", HASH_OID_SHA1, GNUTLS_MAC_SHA1, 20, 0},
+  {"MD5", HASH_OID_MD5, GNUTLS_MAC_MD5, 16, 0},
+  {"SHA256", HASH_OID_SHA256, GNUTLS_MAC_SHA256, 32, 0},
+  {"SHA384", HASH_OID_SHA384, GNUTLS_MAC_SHA384, 48, 0},
+  {"SHA512", HASH_OID_SHA512, GNUTLS_MAC_SHA512, 64, 0},
+  {"SHA224", HASH_OID_SHA224, GNUTLS_MAC_SHA224, 28, 0},
+  {"AEAD", NULL, GNUTLS_MAC_AEAD, 0, 1},
+  {"MD2", HASH_OID_MD2, GNUTLS_MAC_MD2, 0, 0},     /* not used as MAC */
+  {"RIPEMD160", HASH_OID_RMD160, GNUTLS_MAC_RMD160, 20, 0},
+  {"MAC-NULL", NULL, GNUTLS_MAC_NULL, 0, 0},
   {0, 0, 0, 0}
 };
 
@@ -157,7 +158,10 @@ static gnutls_mac_algorithm_t supported_macs[MAX_ALGOS] = { 0 };
     {
       int i = 0;
 
-      GNUTLS_HASH_LOOP ( supported_macs[i++]=p->id);
+      GNUTLS_HASH_LOOP ( 
+        if (p->placeholder != 0 || _gnutls_hmac_exists(p->id))
+          supported_macs[i++]=p->id;
+      );
       supported_macs[i++]=0;
     }
 

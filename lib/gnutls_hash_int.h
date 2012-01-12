@@ -58,6 +58,7 @@ typedef struct
 } digest_hd_st;
 
 /* basic functions */
+int _gnutls_hmac_exists(gnutls_mac_algorithm_t algorithm);
 int _gnutls_hmac_init (digest_hd_st *, gnutls_mac_algorithm_t algorithm,
                        const void *key, int keylen);
 int _gnutls_hash_get_algo_len (gnutls_digest_algorithm_t algorithm);

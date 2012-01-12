@@ -101,6 +101,28 @@ static void _gcm_decrypt(void *_ctx, nettle_crypt_func f,
   return gcm_aes_decrypt(_ctx, length, dst, src);
 }
 
+static int wrap_nettle_cipher_exists(gnutls_cipher_algorithm_t algo)
+{
+  switch (algo)
+    {
+    case GNUTLS_CIPHER_AES_128_GCM:
+    case GNUTLS_CIPHER_AES_256_GCM:
+    case GNUTLS_CIPHER_CAMELLIA_128_CBC:
+    case GNUTLS_CIPHER_CAMELLIA_256_CBC:
+    case GNUTLS_CIPHER_AES_128_CBC:
+    case GNUTLS_CIPHER_AES_192_CBC:
+    case GNUTLS_CIPHER_AES_256_CBC:
+    case GNUTLS_CIPHER_3DES_CBC:
+    case GNUTLS_CIPHER_DES_CBC:
+    case GNUTLS_CIPHER_ARCFOUR_128:
+    case GNUTLS_CIPHER_ARCFOUR_40:
+    case GNUTLS_CIPHER_RC2_40_CBC:
+      return 1;
+    default:
+      return 0;
+    }
+}
+
 static int
 wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx, int enc)
 {
@@ -345,6 +367,7 @@ wrap_nettle_cipher_close (void *h)
 
 gnutls_crypto_cipher_st _gnutls_cipher_ops = {
   .init = wrap_nettle_cipher_init,
+  .exists = wrap_nettle_cipher_exists,
   .setiv = wrap_nettle_cipher_setiv,
   .setkey = wrap_nettle_cipher_setkey,
   .encrypt = wrap_nettle_cipher_encrypt,

@@ -160,6 +160,22 @@ static int wrap_nettle_hmac_fast(gnutls_mac_algorithm_t algo,
   return 0;
 }
 
+static int wrap_nettle_hmac_exists(gnutls_mac_algorithm_t algo)
+{
+  switch (algo)
+    {
+    case GNUTLS_MAC_MD5:
+    case GNUTLS_MAC_SHA1:
+    case GNUTLS_MAC_SHA224:
+    case GNUTLS_MAC_SHA256:
+    case GNUTLS_MAC_SHA384:
+    case GNUTLS_MAC_SHA512:
+      return 1;
+    default:
+      return 0;
+    }
+}
+
 static int
 wrap_nettle_hmac_init (gnutls_mac_algorithm_t algo, void **_ctx)
 {
@@ -277,6 +293,23 @@ static void
 wrap_nettle_hash_deinit (void *hd)
 {
   gnutls_free (hd);
+}
+
+static int wrap_nettle_hash_exists(gnutls_digest_algorithm_t algo)
+{
+  switch (algo)
+    {
+    case GNUTLS_DIG_MD5:
+    case GNUTLS_DIG_SHA1:
+    case GNUTLS_DIG_MD2:
+    case GNUTLS_DIG_SHA224:
+    case GNUTLS_DIG_SHA256:
+    case GNUTLS_DIG_SHA384:
+    case GNUTLS_DIG_SHA512:
+      return 1;
+    default:
+      return 0;
+    }
 }
 
 static int _ctx_init(gnutls_digest_algorithm_t algo, struct nettle_hash_ctx *ctx)
@@ -419,6 +452,7 @@ gnutls_crypto_mac_st _gnutls_mac_ops = {
   .output = wrap_nettle_hmac_output,
   .deinit = wrap_nettle_hmac_deinit,
   .fast = wrap_nettle_hmac_fast,
+  .exists = wrap_nettle_hmac_exists,
 };
 
 gnutls_crypto_digest_st _gnutls_digest_ops = {
@@ -429,4 +463,5 @@ gnutls_crypto_digest_st _gnutls_digest_ops = {
   .output = wrap_nettle_hash_output,
   .deinit = wrap_nettle_hash_deinit,
   .fast = wrap_nettle_hash_fast,
+  .exists = wrap_nettle_hash_exists,
 };

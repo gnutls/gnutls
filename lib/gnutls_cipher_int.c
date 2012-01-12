@@ -34,6 +34,21 @@
   goto cleanup; \
   }
 
+/* Returns true(non-zero) or false(0) if the 
+ * provided cipher exists
+ */
+int _gnutls_cipher_exists(gnutls_cipher_algorithm_t cipher)
+{
+  const gnutls_crypto_cipher_st *cc;
+  int ret;
+  
+  cc = _gnutls_get_crypto_cipher (cipher);
+  if (cc != NULL) return 1;
+  
+  ret = _gnutls_cipher_ops.exists(cipher);
+  return ret;
+}
+
 int
 _gnutls_cipher_init (cipher_hd_st * handle, gnutls_cipher_algorithm_t cipher,
                      const gnutls_datum_t * key, const gnutls_datum_t * iv, int enc)

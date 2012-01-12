@@ -100,6 +100,7 @@ _gnutls_cipher_deinit (cipher_hd_st * handle)
     }
 }
 
+int _gnutls_cipher_exists(gnutls_cipher_algorithm_t cipher);
 inline static unsigned int _gnutls_cipher_tag_len( cipher_hd_st * handle)
 {
   return handle->tag_size;
