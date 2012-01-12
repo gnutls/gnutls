@@ -151,10 +151,10 @@ $type_env = "(\\\$[A-Za-z0-9_]+)";
 		     $type_param, '" <tt><b>$1</b></tt>"' );
 $blankline_html = "<p>";
 
-%highlights_texinfo = ( $type_param, '" \@code{$1}"',
-			$type_constant, '"\@code{$1}"',
-			$type_func, '"\@code{$1}"',
-			$type_struct, '"\@code{$1}"',
+%highlights_texinfo = ( $type_param, '" \@code{$1} "',
+			$type_constant, '"\@code{$1} "',
+			$type_func, '"\@code{$1} "',
+			$type_struct, '"\@code{$1} "',
 			 );
 $blankline_texinfo = "";
 
