@@ -50,16 +50,17 @@ compar (const void *_n1, const void *_n2)
 
 static const char headers[] = "\\tablefirsthead{%\n"
 	"\\hline\n"
-	"\\multicolumn{1}{|c}{Error code} &\n"
+	"\\multicolumn{1}{|c}{Code} &\n"
+	"\\multicolumn{1}{c}{Name} &\n"
 	"\\multicolumn{1}{c|}{Description} \\\\\n"
 	"\\hline}\n"
 	"\\tablehead{%\n"
 	"\\hline\n"
-	"\\multicolumn{2}{|l|}{\\small\\sl continued from previous page}\\\\\n"
+	"\\multicolumn{3}{|l|}{\\small\\sl continued from previous page}\\\\\n"
 	"\\hline}\n"
 	"\\tabletail{%\n"
 	"\\hline\n"
-	"\\multicolumn{2}{|r|}{\\small\\sl continued on next page}\\\\\n"
+	"\\multicolumn{3}{|r|}{\\small\\sl continued on next page}\\\\\n"
 	"\\hline}\n"
 	"\\tablelasttail{\\hline}\n"
 	"\\bottomcaption{The error codes table}\n\n";
@@ -123,6 +124,8 @@ while( str[i] != 0 && j <buffer_size - 1) {
    if (str[i]=='_') {
       buffer[j++] = '\\';
       buffer[j++] = '_';
+      buffer[j++] = '\\';
+      buffer[j++] = '-';
    } else if (str[i]=='#') {
       buffer[j++] = '\\';
       buffer[j++] = '#';
@@ -149,7 +152,7 @@ error_name names_to_sort[MAX_CODES]; /* up to MAX_CODES names  */
 
 puts( headers);
 
-printf("\\begin{supertabular}{|p{.52\\linewidth}|p{.40\\linewidth}|}\n");
+printf("\\begin{supertabular}{|p{.05\\linewidth}|p{.40\\linewidth}|p{.45\\linewidth}|}\n");
 
 memset( names_to_sort, 0, sizeof(names_to_sort));
 j=0;
@@ -163,7 +166,7 @@ for (i=0;i>-MAX_CODES;i--)
    j++;
 }
 
-qsort( names_to_sort, j, sizeof(error_name), compar);
+//qsort( names_to_sort, j, sizeof(error_name), compar);
 
 for (i=0;i<j;i++)
 {
@@ -171,7 +174,7 @@ for (i=0;i<j;i++)
    desc = gnutls_strerror( names_to_sort[i].error_index);
    if (desc == NULL || _name == NULL) continue;
 
-   printf( "{\\scriptsize{%s}} & %s", escape_string(_name, buffer1, sizeof(buffer1)), escape_string(desc, buffer2, sizeof(buffer2)));
+   printf( "%d & {\\scriptsize{%s}} & %s", names_to_sort[i].error_index, escape_string(_name, buffer1, sizeof(buffer1)), escape_string(desc, buffer2, sizeof(buffer2)));
    printf( "\\\\\n");
 }
 

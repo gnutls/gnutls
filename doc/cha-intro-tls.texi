@@ -533,10 +533,8 @@ To resume a TLS session the server normally store session parameters.  This
 complicates deployment, and could be avoiding by delegating the storage
 to the client. Because session parameters are sensitive they are encrypted
 and authenticated with a key only known to the server and then sent to the
-client. The Session Ticket
-extension implements this idea, and it is documented in
-RFC 5077 @xcite{TLSTKT}.
-
+client. The Session Tickets in RFC 5077 @xcite{TLSTKT}, describe this 
+idea, which is implemented in GnuTLS.
 
 @node Safe renegotiation
 @subsection Safe renegotiation
