@@ -52,6 +52,7 @@ doc/errcodes
 doc/error_codes.texi
 doc/examples/Makefile
 doc/examples/Makefile.in
+doc/examples/print-ciphersuites
 doc/examples/ex-cert-select
 doc/examples/ex-cert-select-pkcs11
 doc/examples/ex-client-psk

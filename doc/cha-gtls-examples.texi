@@ -223,6 +223,7 @@ This example is a very simple echo server using Datagram TLS and
 @menu
 * Checking for an alert::
 * X.509 certificate parsing example::
+* Listing the ciphersuites in a priority string::
 @end menu
 
 @node Checking for an alert
@@ -242,3 +243,11 @@ listed below.  That program reads the peer's certificate, and prints
 information about it.
 
 @verbatiminclude examples/ex-x509-info.c
+
+@node Listing the ciphersuites in a priority string
+@subsection Listing the ciphersuites in a priority string
+
+This is a small program to list the enabled ciphersuites by a 
+priority string.
+
+@verbatiminclude examples/print-ciphersuites.c

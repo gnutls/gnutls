@@ -45,7 +45,7 @@ noinst_PROGRAMS = ex-client-resume ex-client-dtls
 noinst_PROGRAMS += ex-cert-select ex-client-x509
 
 if ENABLE_PKI
-noinst_PROGRAMS += ex-crq ex-serv-x509 ex-serv-dtls
+noinst_PROGRAMS += print-ciphersuites ex-crq ex-serv-x509 ex-serv-dtls
 endif
 
 if ENABLE_CXX
@@ -79,6 +79,6 @@ endif
 
 noinst_LTLIBRARIES = libexamples.la
 
-libexamples_la_SOURCES = examples.h ex-alert.c ex-pkcs12.c		\
+libexamples_la_SOURCES = examples.h ex-alert.c ex-pkcs12.c \
 	ex-session-info.c ex-x509-info.c ex-verify.c	\
 	tcp.c udp.c ex-pkcs11-list.c verify.c

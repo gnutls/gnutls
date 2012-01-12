@@ -682,6 +682,7 @@ Alerts messages may be sent to the peer using @funcref{gnutls_alert_send}.
 
 @node Priority Strings
 @section Priority strings
+@cindex Priority strings
 
 In order to specify cipher suite preferences on a TLS session
 there are priority functions that accept a string
@@ -770,7 +771,6 @@ appended with an algorithm will remove this algorithm.
 @item "+" 
 appended with an algorithm will add this algorithm.
 @end table
-
 
 @float Table,tab:prio-algorithms
 @multitable @columnfractions .20 .70
@@ -879,7 +879,9 @@ will allow V1 CAs in chains.
 @caption{Special priority string keywords.}
 @end float
 
-
+Finally the ciphersuites enabled by any priority string can be
+listed using the @code{gnutls-cli} application (see @ref{The gnutls-cli tool}), 
+or by using the priority functions as in @ref{Listing the ciphersuites in a priority string}.
 
 @node Advanced and other topics
 @section Advanced and other topics
