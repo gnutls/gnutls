@@ -1111,11 +1111,9 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   void gnutls_certificate_send_x509_rdn_sequence (gnutls_session_t session,
                                                   int status);
 
-  int gnutls_certificate_set_x509_simple_pkcs12_file
-    (gnutls_certificate_credentials_t res, const char *pkcs12file,
+  int gnutls_certificate_set_x509_simple_pkcs12_file (gnutls_certificate_credentials_t res, const char *pkcs12file,
      gnutls_x509_crt_fmt_t type, const char *password);
-  int gnutls_certificate_set_x509_simple_pkcs12_mem
-    (gnutls_certificate_credentials_t res, const gnutls_datum_t * p12blob,
+  int gnutls_certificate_set_x509_simple_pkcs12_mem (gnutls_certificate_credentials_t res, const gnutls_datum_t * p12blob,
      gnutls_x509_crt_fmt_t type, const char *password);
 
 /* New functions to allow setting already parsed X.509 stuff.
