@@ -124,7 +124,6 @@ web:
 	echo generating documentation for $(PACKAGE)
 	cd doc && $(SHELL) ../build-aux/gendocs.sh \
 		--html "--css-include=texinfo.css" \
-		--texi2html \
 		-o ../$(htmldir)/manual/ $(PACKAGE) "$(PACKAGE_NAME)"
 	cd doc && cp *.png ../$(htmldir)/manual/html_node/
 	#cd doc/doxygen && doxygen && cd ../.. && cp -v doc/doxygen/html/* $(htmldir)/devel/doxygen/ && cd doc/doxygen/latex && make refman.pdf && cd ../../../ && cp doc/doxygen/latex/refman.pdf $(htmldir)/devel/doxygen/$(PACKAGE).pdf
