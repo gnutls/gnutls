@@ -2129,8 +2129,8 @@ done:
  * be called more than once (in case multiple keys/certificates exist
  * for the server).
  *
- * MAC:ed PKCS#12 files are supported.  Encrypted PKCS#12 bags are
- * supported.  Encrypted PKCS#8 private keys are supported.  However,
+ * PKCS#12 files with a MAC, encrypted bags and PKCS #8
+ * private keys are supported. However,
  * only password based security, and the same password for all
  * operations, are supported.
  *
