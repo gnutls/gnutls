@@ -30,7 +30,7 @@ sub key_of_record {
 }
 
 if ($enum == 1) {
-  $/="\@end itemize";          # Records are separated by blank lines.
+  $/="\@end table";          # Records are separated by blank lines.
 } else {
   $/="\n\\end{function}";          # Records are separated by blank lines.
 }

@@ -377,7 +377,7 @@ sub output_enum_texinfo {
     my $type;
 
     print "\n\@c $name\n";
-    print "\@itemize\n";
+    print "\@table \@code\n";
 
     $check=0;
     foreach $parameter (@{$args{'parameterlist'}}) {
@@ -393,7 +393,7 @@ sub output_enum_texinfo {
 	chomp $out;
 	print $out . "\n";
     }
-    print "\@end itemize\n";
+    print "\@end table\n";
 }
 
 # output in html

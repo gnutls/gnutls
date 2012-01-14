@@ -50,9 +50,8 @@ static void main_texinfo (void)
     gnutls_mac_algorithm_t mac;
     gnutls_protocol_t version;
 
-    printf ("Available alert messages:\n");
-    
     printf ("@multitable @columnfractions .55 .10 .30\n@anchor{tab:alerts}\n");
+    printf ("@headitem Alert @tab ID @tab Description\n");
     for (i = 0; i<256;i++)
       {
         if (gnutls_alert_get_strname(i)==NULL) continue;
