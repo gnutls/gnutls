@@ -132,7 +132,10 @@ Documentation License''.
 @end macro
 
 @macro showenumdesc{ref,cap}
+@float Figure,\ref\
 @include enums/\ref\
+@caption{\cap\}
+@end float
 @end macro
 
 @contents

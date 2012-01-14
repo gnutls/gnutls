@@ -376,9 +376,8 @@ sub output_enum_texinfo {
     my $check;
     my $type;
 
-    print "\n\n\@float Table,$name\n";
-
-    print "\n\@itemize\n";
+    print "\n\@c $name\n";
+    print "\@itemize\n";
 
     $check=0;
     foreach $parameter (@{$args{'parameterlist'}}) {
@@ -395,7 +394,6 @@ sub output_enum_texinfo {
 	print $out . "\n";
     }
     print "\@end itemize\n";
-    print "\@end float\n";
 }
 
 # output in html
