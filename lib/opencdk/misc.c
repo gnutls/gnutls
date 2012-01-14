@@ -182,7 +182,7 @@ _cdk_tmpfile (void)
   /* Because the tmpfile() version of wine is not really useful,
      we implement our own version to avoid problems with 'make check'. */
   static const char *letters = "abcdefghijklmnopqrstuvwxyz";
-  char buf[512], rnd[24];
+  unsigned char buf[512], rnd[24];
   FILE *fp;
   int fd, i;
 

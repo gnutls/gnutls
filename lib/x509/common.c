@@ -109,7 +109,7 @@ static const struct oid2string _oid2str[] = {
 int
 _gnutls_x509_oid_data_printable (const char *oid)
 {
-  int i = 0;
+  unsigned int i = 0;
 
   do
     {
@@ -139,7 +139,7 @@ _gnutls_x509_oid_data_printable (const char *oid)
 int
 gnutls_x509_dn_oid_known (const char *oid)
 {
-  int i = 0;
+  unsigned int i = 0;
 
   do
     {
@@ -158,7 +158,7 @@ gnutls_x509_dn_oid_known (const char *oid)
 int
 _gnutls_x509_oid_data_choice (const char *oid)
 {
-  int i = 0;
+  unsigned int i = 0;
 
   do
     {
@@ -188,7 +188,7 @@ _gnutls_x509_oid_data_choice (const char *oid)
 const char*
 gnutls_x509_dn_oid_name (const char *oid, unsigned int flags)
 {
-  int i = 0;
+  unsigned int i = 0;
 
   do
     {
@@ -205,7 +205,7 @@ gnutls_x509_dn_oid_name (const char *oid, unsigned int flags)
 const char *
 _gnutls_x509_oid2asn_string (const char *oid)
 {
-  int i = 0;
+  unsigned int i = 0;
 
   do
     {
@@ -455,7 +455,7 @@ static time_t
 mktime_utc (const struct fake_tm *tm)
 {
   time_t result = 0;
-  int i;
+  unsigned int i;
 
 /* We do allow some ill-formed dates, but we don't do anything special
  * with them and our callers really shouldn't pass them to us.  Do
@@ -1437,15 +1437,16 @@ int
 _gnutls_x509_get_signature (ASN1_TYPE src, const char *src_name,
                             gnutls_datum_t * signature)
 {
-  int bits, result, len;
+  int result, len;
+  unsigned int bits;
 
   signature->data = NULL;
   signature->size = 0;
 
   /* Read the signature 
    */
-  bits = 0;
-  result = asn1_read_value (src, src_name, NULL, &bits);
+  len = 0;
+  result = asn1_read_value (src, src_name, NULL, &len);
 
   if (result != ASN1_MEM_ERROR)
     {
@@ -1454,6 +1455,7 @@ _gnutls_x509_get_signature (ASN1_TYPE src, const char *src_name,
       goto cleanup;
     }
 
+  bits = len;
   if (bits % 8 != 0)
     {
       gnutls_assert ();
@@ -1474,7 +1476,7 @@ _gnutls_x509_get_signature (ASN1_TYPE src, const char *src_name,
   /* read the bit string of the signature
    */
   bits = len;
-  result = asn1_read_value (src, src_name, signature->data, &bits);
+  result = asn1_read_value (src, src_name, signature->data, (int*)&bits);
 
   if (result != ASN1_SUCCESS)
     {

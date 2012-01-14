@@ -1898,7 +1898,7 @@ generate_key (schema_id schema,
               struct pbkdf2_params *kdf_params,
               struct pbe_enc_params *enc_params, gnutls_datum_t * key)
 {
-  opaque rnd[2];
+  unsigned char rnd[2];
   int ret;
 
   ret = _gnutls_rnd (GNUTLS_RND_RANDOM, rnd, 2);

@@ -889,7 +889,7 @@ P_hash (gnutls_mac_algorithm_t algorithm,
  */
 int
 _gnutls_PRF (gnutls_session_t session,
-             const opaque * secret, int secret_size, const char *label,
+             const opaque * secret, unsigned int secret_size, const char *label,
              int label_size, const opaque * seed, int seed_size,
              int total_bytes, void *ret)
 {

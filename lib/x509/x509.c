@@ -498,7 +498,8 @@ gnutls_x509_crt_get_signature (gnutls_x509_crt_t cert,
                                char *sig, size_t * sizeof_sig)
 {
   int result;
-  int bits, len;
+  unsigned int bits;
+  int len;
 
   if (cert == NULL)
     {
@@ -506,14 +507,15 @@ gnutls_x509_crt_get_signature (gnutls_x509_crt_t cert,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  bits = 0;
-  result = asn1_read_value (cert->cert, "signature", NULL, &bits);
+  len = 0;
+  result = asn1_read_value (cert->cert, "signature", NULL, &len);
   if (result != ASN1_MEM_ERROR)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
     }
 
+  bits = len;
   if (bits % 8 != 0)
     {
       gnutls_assert ();
@@ -524,7 +526,7 @@ gnutls_x509_crt_get_signature (gnutls_x509_crt_t cert,
 
   if (*sizeof_sig < (unsigned int) len)
     {
-      *sizeof_sig = bits / 8;
+      *sizeof_sig = len;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
 

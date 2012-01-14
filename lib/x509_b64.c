@@ -153,7 +153,8 @@ int
 _gnutls_fbase64_encode (const char *msg, const uint8_t * data,
                         int data_size, uint8_t ** result)
 {
-  int i, ret, tmp, j;
+  int ret, tmp;
+  unsigned int i, j;
   char tmpres[4];
   uint8_t *ptr;
   uint8_t top[80];

@@ -455,7 +455,7 @@ typedef struct
  */
 typedef struct
 {
-  int entity; /* GNUTLS_SERVER or GNUTLS_CLIENT */
+  unsigned int entity; /* GNUTLS_SERVER or GNUTLS_CLIENT */
   gnutls_kx_algorithm_t kx_algorithm;
 
   /* The epoch used to read and write */

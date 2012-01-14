@@ -801,7 +801,7 @@ server_find_pk_algos_in_ciphersuites (const opaque *
  */
 int
 _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
-                             int datalen)
+                             unsigned int datalen)
 {
   int i, j, ret, cipher_suites_size;
   size_t pk_algos_size;

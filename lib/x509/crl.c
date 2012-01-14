@@ -326,7 +326,7 @@ gnutls_x509_crl_get_signature (gnutls_x509_crl_t crl,
                                char *sig, size_t * sizeof_sig)
 {
   int result;
-  int bits;
+  unsigned int bits;
   int len;
 
   if (crl == NULL)
@@ -335,14 +335,16 @@ gnutls_x509_crl_get_signature (gnutls_x509_crl_t crl,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  bits = 0;
-  result = asn1_read_value (crl->crl, "signature", NULL, &bits);
+  len = 0;
+  result = asn1_read_value (crl->crl, "signature", NULL, &len);
+
   if (result != ASN1_MEM_ERROR)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
     }
 
+  bits = len;
   if (bits % 8 != 0)
     {
       gnutls_assert ();

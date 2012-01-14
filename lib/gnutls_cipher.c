@@ -200,7 +200,8 @@ calc_enc_length (gnutls_session_t session, int data_size,
                  unsigned block_algo, unsigned auth_cipher, uint16_t blocksize)
 {
   uint8_t rnd;
-  int length, ret;
+  unsigned int length;
+  int ret;
 
   *pad = 0;
 
@@ -256,7 +257,7 @@ calc_enc_length (gnutls_session_t session, int data_size,
  * and are not to be sent). Returns their size.
  */
 static inline int
-make_preamble (opaque * uint64_data, opaque type, int length,
+make_preamble (opaque * uint64_data, opaque type, unsigned int length,
                opaque ver, opaque * preamble)
 {
   opaque minor = _gnutls_version_get_minor (ver);

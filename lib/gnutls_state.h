@@ -76,7 +76,7 @@ int _gnutls_session_is_psk (gnutls_session_t session);
 int _gnutls_openpgp_send_fingerprint (gnutls_session_t session);
 
 int _gnutls_PRF (gnutls_session_t session,
-                 const opaque * secret, int secret_size,
+                 const opaque * secret, unsigned int secret_size,
                  const char *label, int label_size,
                  const opaque * seed, int seed_size,
                  int total_bytes, void *ret);

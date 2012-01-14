@@ -45,7 +45,7 @@
 /* This selects the best supported ciphersuite from the ones provided */
 static int
 _gnutls_handshake_select_v2_suite (gnutls_session_t session,
-                                   opaque * data, int datalen)
+                                   opaque * data, unsigned int datalen)
 {
   int i, j, ret;
   opaque *_data;
@@ -91,7 +91,7 @@ _gnutls_handshake_select_v2_suite (gnutls_session_t session,
  */
 int
 _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
-                              int datalen)
+                              unsigned int datalen)
 {
   uint16_t session_id_len = 0;
   int pos = 0;
