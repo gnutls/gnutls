@@ -8,6 +8,55 @@ using a browser today. @acronym{GnuTLS} supports both
 @acronym{X.509} certificates @xcite{PKIX} and @acronym{OpenPGP}
 certificates using a common API.
 
+The key exchange algorithms supported by certificate authentication are
+shown in @ref{tab:key-exchange}.
+
+@float Table,tab:key-exchange
+@multitable @columnfractions .2 .7
+
+@headitem Key exchange @tab Description
+
+@item RSA @tab
+The RSA algorithm is used to encrypt a key and send it to the peer.
+The certificate must allow the key to be used for encryption.
+
+@item RSA_EXPORT @tab
+The RSA algorithm is used to encrypt a key and send it to the peer.
+In the EXPORT algorithm, the server signs temporary RSA parameters of
+512 bits --- which are considered weak --- and sends them to the
+client.
+
+@item DHE_RSA @tab
+The RSA algorithm is used to sign ephemeral Diffie-Hellman parameters
+which are sent to the peer. The key in the certificate must allow the
+key to be used for signing. Note that key exchange algorithms which
+use ephemeral Diffie-Hellman parameters, offer perfect forward
+secrecy. That means that even if the private key used for signing is
+compromised, it cannot be used to reveal past session data.
+
+@item ECDHE_RSA @tab
+The RSA algorithm is used to sign ephemeral elliptic curve Diffie-Hellman 
+parameters which are sent to the peer. The key in the certificate must allow 
+the key to be used for signing. It also offers perfect forward
+secrecy. That means that even if the private key used for signing is
+compromised, it cannot be used to reveal past session data.
+
+@item DHE_DSS @tab
+The DSA algorithm is used to sign ephemeral Diffie-Hellman parameters
+which are sent to the peer. The certificate must contain DSA
+parameters to use this key exchange algorithm. DSA is the algorithm
+of the Digital Signature Standard (DSS).
+
+@item ECDHE_ECDSA @tab
+The Elliptic curve DSA algorithm is used to sign ephemeral elliptic
+curve Diffie-Hellman parameters which are sent to the peer. The 
+certificate must contain ECDSA parameters to use this key exchange 
+algorithm. 
+
+@end multitable
+@caption{Supported key exchange algorithms.}
+@end float
+
 @menu
 * X.509 certificates::
 * OpenPGP certificates::

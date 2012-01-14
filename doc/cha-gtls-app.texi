@@ -310,6 +310,53 @@ current session using @funcref{gnutls_credentials_set}.
 * Anonymous credentials::
 @end menu
 
+Each authentication method is associated with a key exchange method, and a credentials type. 
+The contents of the credentials is method-dependent, e.g. certificates
+for certificate authentication and should be initialized and associated
+with a session (see @funcref{gnutls_credentials_set}).  A mapping of the key exchange methods
+with the credential types is shown in @ref{tab:key-exchange-cred}.
+
+@float Table,tab:key-exchange-cred
+@multitable @columnfractions .25 .25 .2 .2
+
+@headitem Authentication method @tab Key exchange @tab Client credentials @tab Server credentials
+
+@item Certificate
+@tab @code{KX_RSA},
+@code{KX_DHE_RSA},
+@code{KX_DHE_DSS},
+@code{KX_ECDHE_RSA},
+@code{KX_ECDHE_ECDSA},
+@code{KX_RSA_EXPORT}
+@tab @code{CRD_CERTIFICATE}
+@tab @code{CRD_CERTIFICATE}
+
+@item Password and certificate
+@tab @code{KX_SRP_RSA}, @code{KX_SRP_DSS}
+@tab @code{CRD_SRP}
+@tab @code{CRD_CERTIFICATE}, @code{CRD_SRP}
+
+@item Password
+@tab @code{KX_SRP}
+@tab @code{CRD_SRP}
+@tab @code{CRD_SRP}
+
+@item Anonymous
+@tab @code{KX_ANON_DH},
+@code{KX_ANON_ECDH}
+@tab @code{CRD_ANON}
+@tab @code{CRD_ANON}
+
+@item Pre-shared key
+@tab @code{KX_PSK},
+@code{KX_DHE_PSK}, @code{KX_ECDHE_PSK}
+@tab @code{CRD_PSK}
+@tab @code{CRD_PSK}
+
+@end multitable
+@caption{Key exchange algorithms and the corresponding credential types.}
+@end float
+
 @node Certificate credentials
 @subsection Certificates
 @subsubheading Server certificate authentication
