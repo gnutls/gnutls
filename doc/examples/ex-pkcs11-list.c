@@ -1,3 +1,5 @@
+/* This example code is placed in the public domain. */
+
 #include <config.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/pkcs11.h>
