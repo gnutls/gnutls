@@ -88,6 +88,6 @@ dl {
   padding-left: 1em;
   border: solid #c2e0ff;
   background: #f0faff;
-  border-width: 1px 1px 1px 5px;
+  border-width: 5px 1px 1px 1px;
   margin: 1em auto;
 }

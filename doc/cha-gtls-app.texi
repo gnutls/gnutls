@@ -141,11 +141,11 @@ non-native thread usage is shown below.
 @example
 #include <gnutls.h>
 
-/* Other thread packages
- */
-
 int main()
 @{
+   /* When the system mutexes are not to be used 
+    * gnutls_global_set_mutex() must be called explicitly
+    */
    gnutls_global_set_mutex (mutex_init, mutex_deinit, 
                             mutex_lock, mutex_unlock);
    gnutls_global_init();
@@ -744,17 +744,17 @@ keyword, additional algorithm keywords and special keywords.
 @multitable @columnfractions .20 .70
 @headitem Keyword @tab Description
 @item PERFORMANCE @tab
-All the "secure" ciphersuites are enabled,
+All the known to be secure ciphersuites are enabled,
 limited to 128 bit ciphers and sorted by terms of speed
-performance.
+performance. The message authenticity security level is of 64 bits or more.
 
 @item NORMAL @tab
-Means all "secure" ciphersuites. The 256-bit ciphers are
-included as a fallback only.  The ciphers are sorted by security
-margin.
+Means all the known to be secure ciphersuites. The ciphers are sorted by security
+margin, although the 256-bit ciphers are included as a fallback only.
+The message authenticity security level is of 64 bits or more.
 
 @item SECURE128 @tab
-Means all "secure" ciphersuites that offer a 
+Means all known to be secure ciphersuites that offer a 
 security level 128-bit or more and a message authenticity
 security level of 80 bits or more.
 
