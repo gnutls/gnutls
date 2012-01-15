@@ -339,12 +339,19 @@ cryptographic operations as in @ref{fig:crypto-layers}.
 
 The TLS layer uses a cryptographic provider layer, that will in turn either 
 use the default crypto provider -- a software crypto library, or use an external
-crypto provider, if available.
+crypto provider, if available in the local system. The reason of handling
+the external cryptographic provider in GnuTLS and not delegating it to
+the cryptographic libraries, is that none of the supported cryptographic
+libraries support @code{/dev/crypto} or CPU-optimized cryptography in
+an efficient way.
 
 @subheading Cryptographic library layer
 The Cryptographic library layer, currently supports only
-libnettle. Other cryptographic libraries might be supported
-in the future.
+libnettle. Older versions of GnuTLS used to support libgcrypt,
+but it was switched with nettle mainly for performance reasons@footnote{See
+@url{http://lists.gnu.org/archive/html/gnutls-devel/2011-02/msg00079.html}.}
+and secondary because it is a simpler library to use.
+In the future other cryptographic libraries might be supported as well.
 
 @subheading External cryptography provider
 Systems that include a cryptographic co-processor, typically come with
