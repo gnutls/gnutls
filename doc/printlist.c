@@ -51,9 +51,9 @@ static void main_texinfo (void)
     gnutls_mac_algorithm_t mac;
     gnutls_protocol_t version;
 
-    printf ("Available cipher suites:\n");
-    
+    printf ("@heading Ciphersuites\n");
     printf ("@multitable @columnfractions .60 .20 .20\n");
+    printf("@headitem Ciphersuite name @tab TLS ID @tab Since\n");
     for (i = 0; (name = gnutls_cipher_suite_info
                  (i, id, &kx, &cipher, &mac, &version)); i++)
       {
@@ -69,95 +69,96 @@ static void main_texinfo (void)
   {
     const gnutls_certificate_type_t *p = gnutls_certificate_type_list ();
 
-    printf ("\n\nAvailable certificate types:\n@itemize\n");
+    printf ("\n\n@heading Certificate types\n");
+    printf ("@table @code\n");
     for (; *p; p++)
       {
         printf ("@item %s\n", gnutls_certificate_type_get_name (*p));
       }
-    printf ("@end itemize\n");
+    printf ("@end table\n");
   }
 
   {
     const gnutls_protocol_t *p = gnutls_protocol_list ();
 
-    printf ("\nAvailable protocols:\n@itemize\n");
+    printf ("\n@heading Protocols\n@table @code\n");
     for (; *p; p++)
       {
         printf ("@item %s\n", gnutls_protocol_get_name (*p));
       }
-    printf ("@end itemize\n");
+    printf ("@end table\n");
   }
 
   {
     const gnutls_cipher_algorithm_t *p = gnutls_cipher_list ();
 
-    printf ("\nAvailable ciphers:\n@itemize\n");
+    printf ("\n@heading Ciphers\n@table @code\n");
     for (; *p; p++)
       {
         printf ("@item %s\n", gnutls_cipher_get_name (*p));
       }
-    printf ("@end itemize\n");
+    printf ("@end table\n");
   }
 
   {
     const gnutls_mac_algorithm_t *p = gnutls_mac_list ();
 
-    printf ("\nAvailable MAC algorithms:\n@itemize\n");
+    printf ("\n@heading MAC algorithms\n@table @code\n");
     for (; *p; p++)
       {
         printf ("@item %s\n", gnutls_mac_get_name (*p));
       }
-    printf ("@end itemize\n");
+    printf ("@end table\n");
   }
 
   {
     const gnutls_kx_algorithm_t *p = gnutls_kx_list ();
 
-    printf ("\nAvailable key exchange methods:\n@itemize\n");
+    printf ("\n@heading Key exchange methods\n@table @code\n");
     for (; *p; p++)
       {
         printf ("@item %s\n", gnutls_kx_get_name (*p));
       }
-    printf ("@end itemize\n");
+    printf ("@end table\n");
   }
 
   {
     const gnutls_pk_algorithm_t *p = gnutls_pk_list ();
 
-    printf ("\nAvailable public key algorithms:\n@itemize\n");
+    printf ("\n@heading Public key algorithms\n@table @code\n");
     for (; *p; p++)
       {
         printf ("@item %s\n", gnutls_pk_get_name (*p));
       }
-    printf ("@end itemize\n");
+    printf ("@end table\n");
   }
 
   {
     const gnutls_sign_algorithm_t *p = gnutls_sign_list ();
 
-    printf ("\nAvailable public key signature algorithms:\n@itemize\n");
+    printf ("\n@heading Public key signature algorithms\n@table @code\n");
     for (; *p; p++)
       {
         printf ("@item %s\n", gnutls_sign_get_name (*p));
       }
-    printf ("@end itemize\n");
+    printf ("@end table\n");
   }
 
   {
     const gnutls_compression_method_t *p = gnutls_compression_list ();
 
-    printf ("\nAvailable compression methods:\n@itemize\n");
+    printf ("\n@heading Compression methods\n@table @code\n");
     for (; *p; p++)
       {
         printf ("@item %s\n", gnutls_compression_get_name (*p));
       }
-    printf ("@end itemize\n");
+    printf ("@end table\n");
   }
 }
 
 static const char headers[] = "\\tablefirsthead{%\n"
 	"\\hline\n"
-	"Ciphersuite name & TLS ID & since\\\\\n"
+	"Ciphersuite name & TLS ID & Since\\\\\n"
 	"\\hline}\n"
 	"\\tablehead{%\n"
 	"\\hline\n"
