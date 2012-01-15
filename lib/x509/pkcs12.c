@@ -210,7 +210,7 @@ gnutls_pkcs12_import (gnutls_pkcs12_t pkcs12,
    */
   if (format == GNUTLS_X509_FMT_PEM)
     {
-      opaque *out;
+      uint8_t *out;
 
       result = _gnutls_fbase64_decode (PEM_PKCS12, data->data, data->size,
                                        &out);
@@ -507,7 +507,7 @@ _pkcs12_decode_safe_contents (const gnutls_datum_t * content,
                     continue;
                   }
                 bag->element[i].friendly_name =
-                  ucs2_to_ascii (attr_val.data, attr_val.size);
+                  ucs2_to_ascii ((char*)attr_val.data, attr_val.size);
               }
             else
               {
@@ -863,12 +863,12 @@ cleanup:
 int
 gnutls_pkcs12_generate_mac (gnutls_pkcs12_t pkcs12, const char *pass)
 {
-  opaque salt[8], key[20];
+  uint8_t salt[8], key[20];
   int result;
   const int iter = 1;
   digest_hd_st td1;
   gnutls_datum_t tmp = { NULL, 0 };
-  opaque sha_mac[20];
+  uint8_t sha_mac[20];
 
   if (pkcs12 == NULL)
     {
@@ -996,7 +996,7 @@ cleanup:
 int
 gnutls_pkcs12_verify_mac (gnutls_pkcs12_t pkcs12, const char *pass)
 {
-  opaque key[20];
+  uint8_t key[20];
   int result;
   unsigned int iter;
   int len;
@@ -1004,8 +1004,8 @@ gnutls_pkcs12_verify_mac (gnutls_pkcs12_t pkcs12, const char *pass)
   gnutls_datum_t tmp = { NULL, 0 }, salt =
   {
   NULL, 0};
-  opaque sha_mac[20];
-  opaque sha_mac_orig[20];
+  uint8_t sha_mac[20];
+  uint8_t sha_mac_orig[20];
 
   if (pkcs12 == NULL)
     {
@@ -1153,7 +1153,7 @@ write_attributes (gnutls_pkcs12_bag_t bag, int elem,
 
   if (bag->element[elem].friendly_name != NULL)
     {
-      opaque *name;
+      uint8_t *name;
       int size, i;
       const char *p;
 

@@ -60,7 +60,8 @@ const char *_gnutls_digest_get_name (gnutls_digest_algorithm_t algorithm);
 
 /* Functions for cipher suites. */
 int _gnutls_supported_ciphersuites (gnutls_session_t session,
-                                    uint8_t* cipher_suites, int max_cipher_suite_size);
+                                    uint8_t* cipher_suites, 
+                                    unsigned int max_cipher_suite_size);
 const char *_gnutls_cipher_suite_get_name (const uint8_t suite[2]);
 gnutls_mac_algorithm_t _gnutls_cipher_suite_get_prf (const uint8_t suite[2]);
 gnutls_cipher_algorithm_t _gnutls_cipher_suite_get_cipher_algo (const

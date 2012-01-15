@@ -60,7 +60,7 @@ gnutls_pkcs11_copy_secret_key (const char *token_url, gnutls_datum_t * key,
   ck_key_type_t keytype = CKK_GENERIC_SECRET;
   ck_bool_t tval = 1;
   int a_val;
-  opaque id[16];
+  uint8_t id[16];
 
   ret = pkcs11_url_to_info (token_url, &info);
   if (ret < 0)

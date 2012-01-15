@@ -329,8 +329,8 @@ _gnutls_comp_deinit (comp_hd_st* handle, int d)
  */
 
 int
-_gnutls_compress (comp_hd_st *handle, const opaque * plain,
-                  size_t plain_size, opaque * compressed,
+_gnutls_compress (comp_hd_st *handle, const uint8_t * plain,
+                  size_t plain_size, uint8_t * compressed,
                   size_t max_comp_size)
 {
   int compressed_size = GNUTLS_E_COMPRESSION_FAILED;
@@ -383,8 +383,8 @@ _gnutls_compress (comp_hd_st *handle, const opaque * plain,
 
 
 int
-_gnutls_decompress (comp_hd_st *handle, opaque * compressed,
-                    size_t compressed_size, opaque * plain,
+_gnutls_decompress (comp_hd_st *handle, uint8_t * compressed,
+                    size_t compressed_size, uint8_t * plain,
                     size_t max_plain_size)
 {
   int plain_size = GNUTLS_E_DECOMPRESSION_FAILED;

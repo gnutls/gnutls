@@ -193,7 +193,7 @@ gnutls_session_set_data (gnutls_session_t session,
   int ret;
   gnutls_datum_t psession;
 
-  psession.data = (opaque *) session_data;
+  psession.data = (uint8_t *) session_data;
   psession.size = session_data_size;
 
   if (session_data == NULL || session_data_size == 0)

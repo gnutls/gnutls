@@ -799,12 +799,12 @@ _gnutls_cipher_suite_is_ok (const uint8_t suite[2])
  -*/
 int
 _gnutls_supported_ciphersuites (gnutls_session_t session,
-                                uint8_t *cipher_suites, int max_cipher_suite_size)
+                                uint8_t *cipher_suites, unsigned int max_cipher_suite_size)
 {
 
   unsigned int i, ret_count, j, z, k=0;
   const gnutls_cipher_suite_entry * ce;
-  int version = gnutls_protocol_get_version( session);
+  unsigned int version = gnutls_protocol_get_version( session);
 
   for (i = 0; i < session->internals.priorities.kx.algorithms; i++)
     for (j = 0; j < session->internals.priorities.cipher.algorithms; j++)
@@ -861,8 +861,9 @@ _gnutls_supported_ciphersuites (gnutls_session_t session,
 int
 gnutls_priority_get_cipher_suite_index (gnutls_priority_t pcache, unsigned int idx, unsigned int *sidx)
 {
-int mac_idx, cipher_idx, kx_idx, i;
-int total = pcache->mac.algorithms * pcache->cipher.algorithms * pcache->kx.algorithms;
+int mac_idx, cipher_idx, kx_idx;
+unsigned int i;
+unsigned int total = pcache->mac.algorithms * pcache->cipher.algorithms * pcache->kx.algorithms;
 
   if (idx >= total)
     return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;

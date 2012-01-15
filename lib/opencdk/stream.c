@@ -115,7 +115,7 @@ _cdk_stream_open_mode (const char *file, const char *mode,
 /**
  * cdk_stream_new_from_cbs:
  * @cbs: the callback context with all user callback functions
- * @opa: opaque handle which is passed to all callbacks.
+ * @opa: uint8_t handle which is passed to all callbacks.
  * @ret_s: the allocated stream
  * 
  * This function creates a stream which uses user callback
@@ -495,7 +495,7 @@ cdk_stream_close (cdk_stream_t s)
     {
       f2 = f->next;
       if (f->fnct)
-        f->fnct (f->opaque, STREAMCTL_FREE, NULL, NULL);
+        f->fnct (f->uint8_t, STREAMCTL_FREE, NULL, NULL);
       cdk_free (f);
       f = f2;
     }
@@ -632,30 +632,30 @@ filter_search (cdk_stream_t s, filter_fnct_t fnc)
 }
 
 static inline void
-set_opaque (struct stream_filter_s *f)
+set_uint8_t (struct stream_filter_s *f)
 {
   switch (f->type)
     {
     case fARMOR:
-      f->opaque = &f->u.afx;
+      f->uint8_t = &f->u.afx;
       break;
     case fCIPHER:
-      f->opaque = &f->u.cfx;
+      f->uint8_t = &f->u.cfx;
       break;
     case fLITERAL:
-      f->opaque = &f->u.pfx;
+      f->uint8_t = &f->u.pfx;
       break;
     case fCOMPRESS:
-      f->opaque = &f->u.zfx;
+      f->uint8_t = &f->u.zfx;
       break;
     case fHASH:
-      f->opaque = &f->u.mfx;
+      f->uint8_t = &f->u.mfx;
       break;
     case fTEXT:
-      f->opaque = &f->u.tfx;
+      f->uint8_t = &f->u.tfx;
       break;
     default:
-      f->opaque = NULL;
+      f->uint8_t = NULL;
     }
 
 }
@@ -679,7 +679,7 @@ filter_add (cdk_stream_t s, filter_fnct_t fnc, int type)
   f->tmp = NULL;
   f->type = type;
 
-  set_opaque (f);
+  set_uint8_t (f);
 
   return f;
 }
@@ -811,7 +811,7 @@ stream_filter_write (cdk_stream_t s)
           if (rc)
             break;
         }
-      rc = f->fnct (f->opaque, f->ctl, s->fp, f->tmp);
+      rc = f->fnct (f->uint8_t, f->ctl, s->fp, f->tmp);
       _gnutls_read_log ("filter [write]: type=%d rc=%d\n", f->type, rc);
       if (!rc)
         rc = stream_fp_replace (s, &f->tmp);
@@ -862,7 +862,7 @@ stream_filter_read (cdk_stream_t s)
           rc = CDK_File_Error;
           break;
         }
-      rc = f->fnct (f->opaque, f->ctl, s->fp, f->tmp);
+      rc = f->fnct (f->uint8_t, f->ctl, s->fp, f->tmp);
       _gnutls_read_log ("filter %s [read]: type=%d rc=%d\n",
                         s->fname ? s->fname : "[temp]", f->type, rc);
       if (rc)
@@ -901,7 +901,7 @@ stream_filter_read (cdk_stream_t s)
 
 
 void *
-_cdk_stream_get_opaque (cdk_stream_t s, int fid)
+_cdk_stream_get_uint8_t (cdk_stream_t s, int fid)
 {
   struct stream_filter_s *f;
 
@@ -911,7 +911,7 @@ _cdk_stream_get_opaque (cdk_stream_t s, int fid)
   for (f = s->filters; f; f = f->next)
     {
       if ((int) f->type == fid)
-        return f->opaque;
+        return f->uint8_t;
     }
   return NULL;
 }

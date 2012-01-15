@@ -33,7 +33,7 @@
 
 
 void
-_gnutls_write_datum16 (opaque * dest, gnutls_datum_t dat)
+_gnutls_write_datum16 (uint8_t * dest, gnutls_datum_t dat)
 {
   _gnutls_write_uint16 (dat.size, dest);
   if (dat.data != NULL)
@@ -41,7 +41,7 @@ _gnutls_write_datum16 (opaque * dest, gnutls_datum_t dat)
 }
 
 void
-_gnutls_write_datum24 (opaque * dest, gnutls_datum_t dat)
+_gnutls_write_datum24 (uint8_t * dest, gnutls_datum_t dat)
 {
   _gnutls_write_uint24 (dat.size, dest);
   if (dat.data != NULL)
@@ -49,7 +49,7 @@ _gnutls_write_datum24 (opaque * dest, gnutls_datum_t dat)
 }
 
 void
-_gnutls_write_datum32 (opaque * dest, gnutls_datum_t dat)
+_gnutls_write_datum32 (uint8_t * dest, gnutls_datum_t dat)
 {
   _gnutls_write_uint32 (dat.size, dest);
   if (dat.data != NULL)
@@ -57,7 +57,7 @@ _gnutls_write_datum32 (opaque * dest, gnutls_datum_t dat)
 }
 
 void
-_gnutls_write_datum8 (opaque * dest, gnutls_datum_t dat)
+_gnutls_write_datum8 (uint8_t * dest, gnutls_datum_t dat)
 {
   dest[0] = (uint8_t) dat.size;
   if (dat.data != NULL)

@@ -92,18 +92,18 @@ typedef struct
 
 
 /*-- armor.c -*/
-int _cdk_filter_armor (void *opaque, int ctl, FILE * in, FILE * out);
+int _cdk_filter_armor (void *uint8_t, int ctl, FILE * in, FILE * out);
 
 /*-- cipher.c --*/
-cdk_error_t _cdk_filter_hash (void *opaque, int ctl, FILE * in, FILE * out);
-cdk_error_t _cdk_filter_cipher (void *opaque, int ctl, FILE * in, FILE * out);
+cdk_error_t _cdk_filter_hash (void *uint8_t, int ctl, FILE * in, FILE * out);
+cdk_error_t _cdk_filter_cipher (void *uint8_t, int ctl, FILE * in, FILE * out);
 
 /*-- literal.c --*/
-int _cdk_filter_literal (void *opaque, int ctl, FILE * in, FILE * out);
-int _cdk_filter_text (void *opaque, int ctl, FILE * in, FILE * out);
+int _cdk_filter_literal (void *uint8_t, int ctl, FILE * in, FILE * out);
+int _cdk_filter_text (void *uint8_t, int ctl, FILE * in, FILE * out);
 
 /*-- compress.c --*/
-cdk_error_t _cdk_filter_compress (void *opaque, int ctl,
+cdk_error_t _cdk_filter_compress (void *uint8_t, int ctl,
                                   FILE * in, FILE * out);
 
 #endif /* CDK_FILTERS_H */

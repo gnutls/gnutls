@@ -51,7 +51,7 @@ static const char cert_pem[] =
   "jpfc/3X7sLUsMvumcDE01ls/cG5mIatmiyEU9qI3jbgUf82z23ON/acwJf875D3/\n"
   "U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
   "dc8Siq5JojruiMizAf0pA7in\n" "-----END CERTIFICATE-----\n";
-static const gnutls_datum_t cert_datum = { (char *) cert_pem,
+static const gnutls_datum_t cert_datum = { (unsigned char *) cert_pem,
   sizeof (cert_pem)
 };
 

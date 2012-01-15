@@ -36,13 +36,13 @@ _gnutls_gen_ecdh_common_client_kx_int (gnutls_session_t session,
 
 int
 _gnutls_proc_ecdh_common_client_kx (gnutls_session_t session,
-                                    opaque * data, size_t _data_size,
+                                    uint8_t * data, size_t _data_size,
                                     gnutls_ecc_curve_t curve,
                                     gnutls_datum_t *psk_key);
 
 int _gnutls_ecdh_common_print_server_kx (gnutls_session_t, gnutls_buffer_st* data,
                                          gnutls_ecc_curve_t curve);
-int _gnutls_proc_ecdh_common_server_kx (gnutls_session_t session, opaque * data,
+int _gnutls_proc_ecdh_common_server_kx (gnutls_session_t session, uint8_t * data,
                                       size_t _data_size);
 
 

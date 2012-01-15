@@ -94,7 +94,7 @@ cleanup:
 
 int
 _gnutls_proc_ecdh_common_client_kx (gnutls_session_t session,
-                                    opaque * data, size_t _data_size,
+                                    uint8_t * data, size_t _data_size,
                                     gnutls_ecc_curve_t curve,
                                     gnutls_datum_t *psk_key)
 {
@@ -166,7 +166,7 @@ _gnutls_gen_ecdh_common_client_kx_int (gnutls_session_t session,
 /* Returns the bytes parsed */
 int
 _gnutls_proc_ecdh_common_server_kx (gnutls_session_t session,
-                                  opaque * data, size_t _data_size)
+                                  uint8_t * data, size_t _data_size)
 {
   int i, ret, point_size;
   gnutls_ecc_curve_t curve;
@@ -206,7 +206,7 @@ _gnutls_proc_ecdh_common_server_kx (gnutls_session_t session,
 int _gnutls_ecdh_common_print_server_kx (gnutls_session_t session, gnutls_buffer_st* data,
                                          gnutls_ecc_curve_t curve)
 {
-  opaque p;
+  uint8_t p;
   int ret;
   gnutls_datum_t out;
 

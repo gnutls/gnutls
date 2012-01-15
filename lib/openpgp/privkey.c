@@ -87,7 +87,7 @@ _gnutls_openpgp_privkey_cpy (gnutls_openpgp_privkey_t dest, gnutls_openpgp_privk
 {
   int ret;
   size_t raw_size=0;
-  opaque *der;
+  uint8_t *der;
   gnutls_datum_t tmp;
 
   ret = gnutls_openpgp_privkey_export (src, GNUTLS_OPENPGP_FMT_RAW, NULL, 0, NULL, &raw_size);
@@ -730,8 +730,8 @@ _gnutls_openpgp_privkey_get_mpis (gnutls_openpgp_privkey_t pkey,
                                   uint32_t * keyid /*[2] */ ,
                                   gnutls_pk_params_st * params)
 {
-  int result, i;
-  int pk_algorithm;
+  int result;
+  unsigned int i, pk_algorithm;
   cdk_packet_t pkt;
 
   gnutls_pk_params_init(params);

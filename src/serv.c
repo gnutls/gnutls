@@ -250,7 +250,7 @@ static char pkcs3[] =
 static int
 static_dh_params (void)
 {
-  gnutls_datum_t params = { pkcs3, sizeof (pkcs3) };
+  gnutls_datum_t params = { (void*)pkcs3, sizeof (pkcs3) };
   int ret;
 
   if (gnutls_dh_params_init (&dh_params) < 0)

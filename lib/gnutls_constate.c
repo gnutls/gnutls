@@ -61,13 +61,13 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
 {
   /* FIXME: This function is too long
    */
-  opaque rnd[2 * GNUTLS_RANDOM_SIZE];
-  opaque rrnd[2 * GNUTLS_RANDOM_SIZE];
+  uint8_t rnd[2 * GNUTLS_RANDOM_SIZE];
+  uint8_t rrnd[2 * GNUTLS_RANDOM_SIZE];
   int pos, ret;
   int block_size;
   char buf[65];
   /* avoid using malloc */
-  opaque key_block[2 * MAX_HASH_SIZE + 2 * MAX_CIPHER_KEY_SIZE +
+  uint8_t key_block[2 * MAX_HASH_SIZE + 2 * MAX_CIPHER_KEY_SIZE +
                    2 * MAX_CIPHER_BLOCK_SIZE];
   record_state_st *client_write, *server_write;
 
@@ -137,9 +137,9 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
 
   if (key_size > 0)
     {
-      opaque key1[EXPORT_FINAL_KEY_SIZE];
-      opaque key2[EXPORT_FINAL_KEY_SIZE];
-      opaque *client_write_key, *server_write_key;
+      uint8_t key1[EXPORT_FINAL_KEY_SIZE];
+      uint8_t key2[EXPORT_FINAL_KEY_SIZE];
+      uint8_t *client_write_key, *server_write_key;
       int client_write_key_size, server_write_key_size;
 
       if (export_flag == 0)
@@ -254,7 +254,7 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
     }
   else if (IV_size > 0 && export_flag != 0)
     {
-      opaque iv_block[MAX_CIPHER_BLOCK_SIZE * 2];
+      uint8_t iv_block[MAX_CIPHER_BLOCK_SIZE * 2];
 
       if (session->security_parameters.version == GNUTLS_SSL3)
         {                       /* SSL 3 */
@@ -273,7 +273,7 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
         }
       else
         {                       /* TLS 1.0 */
-          ret = _gnutls_PRF (session, "", 0,
+          ret = _gnutls_PRF (session, (uint8_t*)"", 0,
                              ivblock, ivblock_length, rrnd,
                              2 * GNUTLS_RANDOM_SIZE, IV_size * 2, iv_block);
         }

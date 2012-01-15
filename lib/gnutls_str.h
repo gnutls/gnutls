@@ -33,8 +33,8 @@ void _gnutls_str_cat (char *dest, size_t dest_tot_size, const char *src);
 
 typedef struct
 {
-  opaque *allocd;               /* pointer to allocated data */
-  opaque *data;                 /* API: pointer to data to copy from */
+  uint8_t *allocd;               /* pointer to allocated data */
+  uint8_t *data;                 /* API: pointer to data to copy from */
   size_t max_length;
   size_t length;                /* API: current length */
 } gnutls_buffer_st;
@@ -93,15 +93,15 @@ int _gnutls_buffer_append_printf (gnutls_buffer_st * dest, const char *fmt,
   __attribute__ ((format (printf, 2, 3)));
 
 void _gnutls_buffer_hexprint (gnutls_buffer_st * str,
-			      const char *data, size_t len);
-void _gnutls_buffer_hexdump (gnutls_buffer_st * str, const char *data,
+			      const void *data, size_t len);
+void _gnutls_buffer_hexdump (gnutls_buffer_st * str, const void *data,
 			     size_t len, const char *spc);
 void _gnutls_buffer_asciiprint (gnutls_buffer_st * str,
 				const char *data, size_t len);
 
 char *_gnutls_bin2hex (const void *old, size_t oldlen, char *buffer,
                        size_t buffer_size, const char *separator);
-int _gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
+int _gnutls_hex2bin (const char * hex_data, size_t hex_size, uint8_t * bin_data,
                      size_t * bin_size);
 
 int _gnutls_hostname_compare (const char *certname, size_t certnamesize,

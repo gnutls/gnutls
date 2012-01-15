@@ -51,7 +51,7 @@ doit (void)
 {
   /* Server stuff. */
   gnutls_anon_server_credentials_t s_anoncred;
-  const gnutls_datum_t p3 = { (char *) pkcs3, strlen (pkcs3) };
+  const gnutls_datum_t p3 = { (unsigned char *) pkcs3, strlen (pkcs3) };
   static gnutls_dh_params_t dh_params;
   gnutls_session_t server;
   int sret, cret;

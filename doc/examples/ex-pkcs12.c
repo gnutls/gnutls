@@ -33,7 +33,7 @@ write_pkcs12 (const gnutls_datum_t * cert,
   /* A good idea might be to use gnutls_x509_privkey_get_key_id()
    * to obtain a unique ID.
    */
-  gnutls_datum_t key_id = { (char *) "\x00\x00\x07", 3 };
+  gnutls_datum_t key_id = { (void *) "\x00\x00\x07", 3 };
 
   gnutls_global_init ();
 

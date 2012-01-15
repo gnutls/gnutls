@@ -137,12 +137,12 @@ _gnutls_extension_list_check (gnutls_session_t session, uint16_t type)
 int
 _gnutls_parse_extensions (gnutls_session_t session,
                           gnutls_ext_parse_type_t parse_type,
-                          const opaque * data, int data_size)
+                          const uint8_t * data, int data_size)
 {
   int next, ret;
   int pos = 0;
   uint16_t type;
-  const opaque *sdata;
+  const uint8_t *sdata;
   gnutls_ext_recv_func ext_recv;
   uint16_t size;
 
@@ -381,7 +381,8 @@ _gnutls_ext_register (extension_entry_st * mod)
 int
 _gnutls_ext_pack (gnutls_session_t session, gnutls_buffer_st * packed)
 {
-  int i, ret;
+  unsigned int i;
+  int ret;
   extension_priv_data_t data;
   int cur_size;
   int size_offset;
@@ -597,7 +598,7 @@ _gnutls_ext_unset_resumed_session_data (gnutls_session_t session,
 void
 _gnutls_ext_free_session_data (gnutls_session_t session)
 {
-  int i;
+  unsigned int i;
 
   for (i = 0; i < extfunc_size; i++)
     {
@@ -619,7 +620,7 @@ void
 _gnutls_ext_set_session_data (gnutls_session_t session, uint16_t type,
                               extension_priv_data_t data)
 {
-  int i;
+  unsigned int i;
   gnutls_ext_deinit_data_func deinit;
 
   deinit = _gnutls_ext_func_deinit (type);

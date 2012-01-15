@@ -32,7 +32,7 @@ typedef int (*gnutls_ext_send_func) (gnutls_session_t session,
 
 int _gnutls_parse_extensions (gnutls_session_t session,
                               gnutls_ext_parse_type_t parse_type,
-                              const opaque * data, int data_size);
+                              const uint8_t * data, int data_size);
 int _gnutls_gen_extensions (gnutls_session_t session, gnutls_buffer_st * extdata,
                             gnutls_ext_parse_type_t);
 int _gnutls_ext_init (void);

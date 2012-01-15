@@ -716,8 +716,8 @@ static struct
   const char *name;
   const char **chain;
   const char **ca;
-  int verify_flags;
-  int expected_verify_result;
+  unsigned int verify_flags;
+  unsigned int expected_verify_result;
 } chains[] =
 {
   { "CVE-2008-4989", cve_2008_4989_chain, &cve_2008_4989_chain[2],
@@ -839,7 +839,7 @@ doit (void)
             error (EXIT_FAILURE, 0, "gnutls_x509_crt_init[%d,%d]: %s",
                    (int) i, (int) j, gnutls_strerror (ret));
 
-          tmp.data = (char *) chains[i].chain[j];
+          tmp.data = (unsigned char *) chains[i].chain[j];
           tmp.size = strlen (chains[i].chain[j]);
 
           ret = gnutls_x509_crt_import (certs[j], &tmp, GNUTLS_X509_FMT_PEM);
@@ -863,7 +863,7 @@ doit (void)
         error (EXIT_FAILURE, 0, "gnutls_x509_crt_init: %s",
                gnutls_strerror (ret));
 
-      tmp.data = (char *) *chains[i].ca;
+      tmp.data = (unsigned char *) *chains[i].ca;
       tmp.size = strlen (*chains[i].ca);
 
       ret = gnutls_x509_crt_import (ca, &tmp, GNUTLS_X509_FMT_PEM);

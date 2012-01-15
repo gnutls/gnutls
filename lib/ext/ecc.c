@@ -37,13 +37,13 @@
  */
 
 static int _gnutls_supported_ecc_recv_params (gnutls_session_t session,
-                                          const opaque * data,
+                                          const uint8_t * data,
                                           size_t data_size);
 static int _gnutls_supported_ecc_send_params (gnutls_session_t session,
                                           gnutls_buffer_st * extdata);
 
 static int _gnutls_supported_ecc_pf_recv_params (gnutls_session_t session,
-                                          const opaque * data,
+                                          const uint8_t * data,
                                           size_t data_size);
 static int _gnutls_supported_ecc_pf_send_params (gnutls_session_t session,
                                           gnutls_buffer_st * extdata);
@@ -82,12 +82,12 @@ extension_entry_st ext_mod_supported_ecc_pf = {
  */
 static int
 _gnutls_supported_ecc_recv_params (gnutls_session_t session,
-                               const opaque * data, size_t _data_size)
+                               const uint8_t * data, size_t _data_size)
 {
   int new_type = -1, ret, i;
   ssize_t data_size = _data_size;
   uint16_t len;
-  const opaque* p = data;
+  const uint8_t* p = data;
 
   if (session->security_parameters.entity == GNUTLS_CLIENT)
     {
@@ -198,7 +198,7 @@ _gnutls_supported_ecc_send_params (gnutls_session_t session, gnutls_buffer_st* e
  */
 static int
 _gnutls_supported_ecc_pf_recv_params (gnutls_session_t session,
-                               const opaque * data, size_t _data_size)
+                               const uint8_t * data, size_t _data_size)
 {
 int len, i;
 int uncompressed = 0;
@@ -236,7 +236,7 @@ int data_size = _data_size;
 static int
 _gnutls_supported_ecc_pf_send_params (gnutls_session_t session, gnutls_buffer_st* extdata)
 {
-  const opaque p[2] = {0x01, 0x00}; /* only support uncompressed point format */
+  const uint8_t p[2] = {0x01, 0x00}; /* only support uncompressed point format */
   
   if (session->security_parameters.entity == GNUTLS_SERVER && !_gnutls_session_is_ecc(session))
     return 0;
@@ -254,7 +254,7 @@ _gnutls_supported_ecc_pf_send_params (gnutls_session_t session, gnutls_buffer_st
  * session. A negative error value is returned otherwise.
  */
 int
-_gnutls_session_supports_ecc_curve (gnutls_session_t session, int ecc_type)
+_gnutls_session_supports_ecc_curve (gnutls_session_t session, unsigned int ecc_type)
 {
   unsigned i;
   

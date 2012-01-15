@@ -543,7 +543,7 @@ write_secret_key (cdk_stream_t out, cdk_pkt_seckey_t sk,
       size += calc_mpisize (sk->mpi, nskey);
     }
   else                          /* We do not know anything about the encrypted mpi's so we
-                                   treat the data as opaque. */
+                                   treat the data as uint8_t. */
     size += sk->enclen;
 
   pkttype = is_subkey ? CDK_PKT_SECRET_SUBKEY : CDK_PKT_SECRET_KEY;

@@ -42,7 +42,7 @@
    internal API is changed to use mbuffers. For now we don't avoid the
    extra alloc + memcpy. */
 static inline int
-send_handshake (gnutls_session_t session, opaque * data, size_t size,
+send_handshake (gnutls_session_t session, uint8_t * data, size_t size,
                 gnutls_handshake_description_t type)
 {
   mbuffer_st *bufel;
@@ -107,7 +107,7 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
 
   if (gnutls_protocol_get_version (session) == GNUTLS_SSL3)
     {
-      opaque rnd[2 * GNUTLS_RANDOM_SIZE + 1];
+      uint8_t rnd[2 * GNUTLS_RANDOM_SIZE + 1];
 
       memcpy (rnd, session->security_parameters.client_random,
               GNUTLS_RANDOM_SIZE);
@@ -124,7 +124,7 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
     }
   else
     {
-      opaque rnd[2 * GNUTLS_RANDOM_SIZE + 1];
+      uint8_t rnd[2 * GNUTLS_RANDOM_SIZE + 1];
 
       memcpy (rnd, session->security_parameters.client_random,
               GNUTLS_RANDOM_SIZE);

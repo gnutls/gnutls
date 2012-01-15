@@ -658,7 +658,7 @@ doit (void)
 
   if (debug)
     success ("Testing pem1...\n");
-  data.data = pem1;
+  data.data = (unsigned char*)pem1;
   data.size = strlen (pem1);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
@@ -671,7 +671,7 @@ doit (void)
 
   if (debug)
     success ("Testing pem2...\n");
-  data.data = pem2;
+  data.data = (unsigned char*)pem2;
   data.size = strlen (pem2);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
@@ -692,7 +692,7 @@ doit (void)
 
   if (debug)
     success ("Testing pem3...\n");
-  data.data = pem3;
+  data.data = (unsigned char*)pem3;
   data.size = strlen (pem3);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
@@ -713,7 +713,7 @@ doit (void)
 
   if (debug)
     success ("Testing pem4...\n");
-  data.data = pem4;
+  data.data = (unsigned char*)pem4;
   data.size = strlen (pem4);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
@@ -738,7 +738,7 @@ doit (void)
 
   if (debug)
     success ("Testing pem6...\n");
-  data.data = pem6;
+  data.data = (unsigned char*)pem6;
   data.size = strlen (pem6);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
@@ -755,7 +755,7 @@ doit (void)
 
   if (debug)
     success ("Testing pem7...\n");
-  data.data = pem7;
+  data.data = (unsigned char*)pem7;
   data.size = strlen (pem7);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
@@ -780,7 +780,7 @@ doit (void)
 
   if (debug)
     success ("Testing pem8...\n");
-  data.data = pem8;
+  data.data = (unsigned char*)pem8;
   data.size = strlen (pem8);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
@@ -805,7 +805,7 @@ doit (void)
 
   if (debug)
     success ("Testing pem9...\n");
-  data.data = pem9;
+  data.data = (unsigned char*)pem9;
   data.size = strlen (pem9);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
@@ -822,7 +822,7 @@ doit (void)
 
   if (debug)
     success ("Testing pem10...\n");
-  data.data = pem10;
+  data.data = (unsigned char*)pem10;
   data.size = strlen (pem10);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
@@ -835,7 +835,7 @@ doit (void)
 
   if (debug)
     success ("Testing pem_too_many...\n");
-  data.data = pem_too_many;
+  data.data = (unsigned char*)pem_too_many;
   data.size = strlen (pem_too_many);
 
   ret = gnutls_x509_crt_import (x509, &data, GNUTLS_X509_FMT_PEM);
@@ -849,7 +849,7 @@ doit (void)
 #ifdef ENABLE_OPENPGP
   if (debug)
     success ("Testing pem11...\n");
-  data.data = pem11;
+  data.data = (unsigned char*)pem11;
   data.size = strlen (pem11);
 
   ret = gnutls_openpgp_crt_import (pgp, &data, GNUTLS_OPENPGP_FMT_BASE64);

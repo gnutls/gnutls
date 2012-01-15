@@ -40,8 +40,8 @@
 #include <ext/ecc.h>
 
 static int gen_anon_ecdh_server_kx (gnutls_session_t, gnutls_buffer_st*);
-static int proc_anon_ecdh_client_kx (gnutls_session_t, opaque *, size_t);
-static int proc_anon_ecdh_server_kx (gnutls_session_t, opaque *, size_t);
+static int proc_anon_ecdh_client_kx (gnutls_session_t, uint8_t *, size_t);
+static int proc_anon_ecdh_server_kx (gnutls_session_t, uint8_t *, size_t);
 
 const mod_auth_st anon_ecdh_auth_struct = {
   "ANON ECDH",
@@ -93,7 +93,7 @@ gen_anon_ecdh_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 
 
 static int
-proc_anon_ecdh_client_kx (gnutls_session_t session, opaque * data,
+proc_anon_ecdh_client_kx (gnutls_session_t session, uint8_t * data,
                      size_t _data_size)
 {
   gnutls_anon_server_credentials_t cred;
@@ -111,7 +111,7 @@ proc_anon_ecdh_client_kx (gnutls_session_t session, opaque * data,
 }
 
 int
-proc_anon_ecdh_server_kx (gnutls_session_t session, opaque * data,
+proc_anon_ecdh_server_kx (gnutls_session_t session, uint8_t * data,
                      size_t _data_size)
 {
 

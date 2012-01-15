@@ -41,7 +41,7 @@
  */
 
 static int
-_gnutls_srp_gx (opaque * text, size_t textsize, opaque ** result,
+_gnutls_srp_gx (uint8_t * text, size_t textsize, uint8_t ** result,
                 bigint_t g, bigint_t prime)
 {
   bigint_t x, e;
@@ -170,7 +170,7 @@ bigint_t
 _gnutls_calc_srp_u (bigint_t A, bigint_t B, bigint_t n)
 {
   size_t b_size, a_size;
-  opaque *holder, hd[MAX_HASH_SIZE];
+  uint8_t *holder, hd[MAX_HASH_SIZE];
   size_t holder_size, hash_size, n_size;
   int ret;
   bigint_t res;
@@ -289,11 +289,11 @@ _gnutls_calc_srp_A (bigint_t * a, bigint_t g, bigint_t n)
  */
 static int
 _gnutls_calc_srp_sha (const char *username, const char *password,
-                      opaque * salt, int salt_size, size_t * size,
+                      uint8_t * salt, int salt_size, size_t * size,
                       void *digest)
 {
   digest_hd_st td;
-  opaque res[MAX_HASH_SIZE];
+  uint8_t res[MAX_HASH_SIZE];
   int ret;
 
   *size = 20;
@@ -324,7 +324,7 @@ _gnutls_calc_srp_sha (const char *username, const char *password,
 }
 
 int
-_gnutls_calc_srp_x (char *username, char *password, opaque * salt,
+_gnutls_calc_srp_x (char *username, char *password, uint8_t * salt,
                     size_t salt_size, size_t * size, void *digest)
 {
 
@@ -688,7 +688,7 @@ gnutls_srp_verifier (const char *username, const char *password,
   bigint_t _n, _g;
   int ret;
   size_t digest_size = 20, size;
-  opaque digest[20];
+  uint8_t digest[20];
 
   ret = _gnutls_calc_srp_sha (username, password, salt->data,
                               salt->size, &digest_size, digest);

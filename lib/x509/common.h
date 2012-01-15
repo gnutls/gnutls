@@ -69,13 +69,13 @@
 int _gnutls_x509_set_time (ASN1_TYPE c2, const char *where, time_t tim);
 
 int _gnutls_x509_decode_octet_string (const char *string_type,
-                                      const opaque * der, size_t der_size,
-                                      opaque * output, size_t * output_size);
+                                      const uint8_t * der, size_t der_size,
+                                      uint8_t * output, size_t * output_size);
 int _gnutls_x509_oid_data2string (const char *OID, void *value,
                                   int value_size, char *res,
                                   size_t * res_size);
-int _gnutls_x509_data2hex (const opaque * data, size_t data_size,
-                           opaque * out, size_t * sizeof_out);
+int _gnutls_x509_data2hex (const void * data, size_t data_size,
+                           void * out, size_t * sizeof_out);
 
 const char *_gnutls_x509_oid2asn_string (const char *oid);
 

@@ -42,13 +42,13 @@
 #include <random.h>
 
 static int compressed_to_ciphertext (gnutls_session_t session,
-                                   opaque * cipher_data, int cipher_size,
+                                   uint8_t * cipher_data, int cipher_size,
                                    gnutls_datum_t *compressed,
                                    content_type_t _type, 
                                    record_parameters_st * params);
 static int ciphertext_to_compressed (gnutls_session_t session,
                                    gnutls_datum_t *ciphertext, 
-                                   opaque * compress_data,
+                                   uint8_t * compress_data,
                                    int compress_size,
                                    uint8_t type,
                                    record_parameters_st * params, uint64* sequence);
@@ -78,9 +78,9 @@ is_read_comp_null (record_parameters_st * record_params)
  * If random pad != 0 then the random pad data will be appended.
  */
 int
-_gnutls_encrypt (gnutls_session_t session, const opaque * headers,
-                 size_t headers_size, const opaque * data,
-                 size_t data_size, opaque * ciphertext,
+_gnutls_encrypt (gnutls_session_t session, const uint8_t * headers,
+                 size_t headers_size, const uint8_t * data,
+                 size_t data_size, uint8_t * ciphertext,
                  size_t ciphertext_size, content_type_t type, 
                  record_parameters_st * params)
 {
@@ -90,7 +90,7 @@ _gnutls_encrypt (gnutls_session_t session, const opaque * headers,
 
   if (data_size == 0 || is_write_comp_null (params) == 0)
     {
-      comp.data = (opaque*)data;
+      comp.data = (uint8_t*)data;
       comp.size = data_size;
     }
   else
@@ -140,7 +140,7 @@ _gnutls_encrypt (gnutls_session_t session, const opaque * headers,
  * Returns the decrypted data length.
  */
 int
-_gnutls_decrypt (gnutls_session_t session, opaque * ciphertext,
+_gnutls_decrypt (gnutls_session_t session, uint8_t * ciphertext,
                  size_t ciphertext_size, uint8_t * data,
                  size_t max_data_size, content_type_t type,
                  record_parameters_st * params, uint64 *sequence)
@@ -166,7 +166,7 @@ _gnutls_decrypt (gnutls_session_t session, opaque * ciphertext,
     }
   else
     {
-      opaque* tmp_data;
+      uint8_t* tmp_data;
       
       tmp_data = gnutls_malloc(max_data_size);
       if (tmp_data == NULL)
@@ -257,12 +257,12 @@ calc_enc_length (gnutls_session_t session, int data_size,
  * and are not to be sent). Returns their size.
  */
 static inline int
-make_preamble (opaque * uint64_data, opaque type, unsigned int length,
-               opaque ver, opaque * preamble)
+make_preamble (uint8_t * uint64_data, uint8_t type, unsigned int length,
+               uint8_t ver, uint8_t * preamble)
 {
-  opaque minor = _gnutls_version_get_minor (ver);
-  opaque major = _gnutls_version_get_major (ver);
-  opaque *p = preamble;
+  uint8_t minor = _gnutls_version_get_minor (ver);
+  uint8_t major = _gnutls_version_get_major (ver);
+  uint8_t *p = preamble;
   uint16_t c_length;
 
   c_length = _gnutls_conv_uint16 (length);
@@ -290,7 +290,7 @@ make_preamble (opaque * uint64_data, opaque type, unsigned int length,
  */
 static int
 compressed_to_ciphertext (gnutls_session_t session,
-                               opaque * cipher_data, int cipher_size,
+                               uint8_t * cipher_data, int cipher_size,
                                gnutls_datum_t *compressed,
                                content_type_t type, 
                                record_parameters_st * params)
@@ -298,13 +298,13 @@ compressed_to_ciphertext (gnutls_session_t session,
   uint8_t * tag_ptr = NULL;
   uint8_t pad;
   int length, length_to_encrypt, ret;
-  opaque preamble[MAX_PREAMBLE_SIZE];
+  uint8_t preamble[MAX_PREAMBLE_SIZE];
   int preamble_size;
   int tag_size = _gnutls_auth_cipher_tag_len (&params->write.cipher_state);
   int blocksize = gnutls_cipher_get_block_size (params->cipher_algorithm);
   unsigned block_algo =
     _gnutls_cipher_is_block (params->cipher_algorithm);
-  opaque *data_ptr;
+  uint8_t *data_ptr;
   int ver = gnutls_protocol_get_version (session);
   int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
   int auth_cipher = _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
@@ -430,7 +430,7 @@ compressed_to_ciphertext (gnutls_session_t session,
 static int
 ciphertext_to_compressed (gnutls_session_t session,
                           gnutls_datum_t *ciphertext, 
-                          opaque * compress_data,
+                          uint8_t * compress_data,
                           int compress_size,
                           uint8_t type, record_parameters_st * params, 
                           uint64* sequence)
@@ -440,11 +440,11 @@ ciphertext_to_compressed (gnutls_session_t session,
   int length, length_to_decrypt;
   uint16_t blocksize;
   int ret, i, pad_failed = 0;
-  opaque preamble[MAX_PREAMBLE_SIZE];
-  int preamble_size;
-  int ver = gnutls_protocol_get_version (session);
-  int tag_size = _gnutls_auth_cipher_tag_len (&params->read.cipher_state);
-  int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
+  uint8_t preamble[MAX_PREAMBLE_SIZE];
+  unsigned int preamble_size;
+  unsigned int ver = gnutls_protocol_get_version (session);
+  unsigned int tag_size = _gnutls_auth_cipher_tag_len (&params->read.cipher_state);
+  unsigned int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
 
   blocksize = gnutls_cipher_get_block_size (params->cipher_algorithm);
 

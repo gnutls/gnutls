@@ -806,14 +806,14 @@ _gnutls_cal_PRF_A (gnutls_mac_algorithm_t algorithm,
  */
 static int
 P_hash (gnutls_mac_algorithm_t algorithm,
-                const opaque * secret, int secret_size,
-                const opaque * seed, int seed_size,
-                int total_bytes, opaque * ret)
+                const uint8_t * secret, int secret_size,
+                const uint8_t * seed, int seed_size,
+                int total_bytes, uint8_t * ret)
 {
 
   digest_hd_st td2;
   int i, times, how, blocksize, A_size;
-  opaque final[MAX_HASH_SIZE], Atmp[MAX_SEED_SIZE];
+  uint8_t final[MAX_HASH_SIZE], Atmp[MAX_SEED_SIZE];
   int output_bytes, result;
 
   if (seed_size > MAX_SEED_SIZE || total_bytes <= 0)
@@ -889,14 +889,14 @@ P_hash (gnutls_mac_algorithm_t algorithm,
  */
 int
 _gnutls_PRF (gnutls_session_t session,
-             const opaque * secret, unsigned int secret_size, const char *label,
-             int label_size, const opaque * seed, int seed_size,
+             const uint8_t * secret, unsigned int secret_size, const char *label,
+             int label_size, const uint8_t * seed, int seed_size,
              int total_bytes, void *ret)
 {
   int l_s, s_seed_size;
-  const opaque *s1, *s2;
-  opaque s_seed[MAX_SEED_SIZE];
-  opaque o1[MAX_PRF_BYTES], o2[MAX_PRF_BYTES];
+  const uint8_t *s1, *s2;
+  uint8_t s_seed[MAX_SEED_SIZE];
+  uint8_t o1[MAX_PRF_BYTES], o2[MAX_PRF_BYTES];
   int result;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
@@ -1009,7 +1009,7 @@ gnutls_prf_raw (gnutls_session_t session,
                      session->security_parameters.master_secret,
                      GNUTLS_MASTER_SIZE,
                      label,
-                     label_size, (opaque *) seed, seed_size, outsize, out);
+                     label_size, (uint8_t *) seed, seed_size, outsize, out);
 
   return ret;
 }
@@ -1051,7 +1051,7 @@ gnutls_prf (gnutls_session_t session,
             size_t extra_size, const char *extra, size_t outsize, char *out)
 {
   int ret;
-  opaque *seed;
+  uint8_t *seed;
   size_t seedsize = 2 * GNUTLS_RANDOM_SIZE + extra_size;
 
   seed = gnutls_malloc (seedsize);

@@ -82,7 +82,7 @@ _gnutls_session_pack (gnutls_session_t session,
 {
   int ret;
   gnutls_buffer_st sb;
-  opaque id;
+  uint8_t id;
 
   if (packed_session == NULL)
     {
@@ -173,7 +173,7 @@ _gnutls_session_unpack (gnutls_session_t session,
 {
   int ret;
   gnutls_buffer_st sb;
-  opaque id;
+  uint8_t id;
 
   _gnutls_buffer_init (&sb);
 

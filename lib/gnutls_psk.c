@@ -380,13 +380,13 @@ gnutls_psk_client_get_hint (gnutls_session_t session)
  *   long enough, or 0 on success.
  **/
 int
-gnutls_hex_decode (const gnutls_datum_t * hex_data, char *result,
+gnutls_hex_decode (const gnutls_datum_t * hex_data, void *result,
                    size_t * result_size)
 {
   int ret;
 
   ret =
-    _gnutls_hex2bin (hex_data->data, hex_data->size, (opaque *) result,
+    _gnutls_hex2bin ((char*)hex_data->data, hex_data->size, (uint8_t *) result,
                      result_size);
   if (ret < 0)
     return ret;

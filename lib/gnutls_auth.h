@@ -36,15 +36,15 @@ typedef struct mod_auth_st_int
   int (*gnutls_generate_server_certificate_request) (gnutls_session_t,
                                                      gnutls_buffer_st *);
 
-  int (*gnutls_process_server_certificate) (gnutls_session_t, opaque *,
+  int (*gnutls_process_server_certificate) (gnutls_session_t, uint8_t *,
                                             size_t);
-  int (*gnutls_process_client_certificate) (gnutls_session_t, opaque *,
+  int (*gnutls_process_client_certificate) (gnutls_session_t, uint8_t *,
                                             size_t);
-  int (*gnutls_process_server_kx) (gnutls_session_t, opaque *, size_t);
-  int (*gnutls_process_client_kx) (gnutls_session_t, opaque *, size_t);
-  int (*gnutls_process_client_cert_vrfy) (gnutls_session_t, opaque *, size_t);
+  int (*gnutls_process_server_kx) (gnutls_session_t, uint8_t *, size_t);
+  int (*gnutls_process_client_kx) (gnutls_session_t, uint8_t *, size_t);
+  int (*gnutls_process_client_cert_vrfy) (gnutls_session_t, uint8_t *, size_t);
   int (*gnutls_process_server_certificate_request) (gnutls_session_t,
-                                                    opaque *, size_t);
+                                                    uint8_t *, size_t);
 } mod_auth_st;
 
 const void *_gnutls_get_cred (gnutls_key_st key,

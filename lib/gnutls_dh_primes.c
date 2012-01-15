@@ -230,7 +230,7 @@ gnutls_dh_params_import_pkcs3 (gnutls_dh_params_t params,
 
   if (format == GNUTLS_X509_FMT_PEM)
     {
-      opaque *out;
+      uint8_t *out;
 
       result = _gnutls_fbase64_decode ("DH PARAMETERS",
                                        pkcs3_params->data,
@@ -350,8 +350,8 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
   ASN1_TYPE c2;
   int result, _params_data_size;
   size_t g_size, p_size;
-  opaque *p_data, *g_data;
-  opaque *all_data;
+  uint8_t *p_data, *g_data;
+  uint8_t *all_data;
 
   _gnutls_mpi_print_lz (params->params[1], NULL, &g_size);
   _gnutls_mpi_print_lz (params->params[0], NULL, &p_size);
@@ -442,8 +442,8 @@ gnutls_dh_params_export_pkcs3 (gnutls_dh_params_t params,
     }
   else
     {                           /* PEM */
-      opaque *tmp;
-      opaque *out;
+      uint8_t *tmp;
+      uint8_t *out;
       int len;
 
       len = 0;

@@ -196,7 +196,7 @@ _gnutls_x509_cert_verify_peers (gnutls_session_t session,
 static int
 _gnutls_check_key_cert_match (gnutls_certificate_credentials_t res)
 {
-  unsigned int pk = gnutls_pubkey_get_pk_algorithm(res->certs[res->ncerts-1].cert_list[0].pubkey, NULL);
+  int pk = gnutls_pubkey_get_pk_algorithm(res->certs[res->ncerts-1].cert_list[0].pubkey, NULL);
 
   if (gnutls_privkey_get_pk_algorithm (res->pkey[res->ncerts - 1], NULL) !=
       pk)
@@ -301,7 +301,7 @@ parse_der_cert_mem (gnutls_certificate_credentials_t res,
       goto cleanup;
     }
 
-  tmp.data = (opaque *) input_cert;
+  tmp.data = (uint8_t *) input_cert;
   tmp.size = input_cert_size;
 
   ret = gnutls_x509_crt_import (crt, &tmp, GNUTLS_X509_FMT_DER);
@@ -534,7 +534,7 @@ read_key_mem (gnutls_certificate_credentials_t res,
 
   if (key)
     {
-      tmp.data = (opaque *) key;
+      tmp.data = (uint8_t *) key;
       tmp.size = key_size;
 
       ret = _gnutls_x509_raw_privkey_to_privkey (&privkey, &tmp, type);
@@ -1338,7 +1338,7 @@ _gnutls_check_key_usage (const gnutls_pcert_st* cert, gnutls_kx_algorithm_t alg)
 
 static int
 parse_pem_ca_mem (gnutls_certificate_credentials_t res,
-                  const opaque * input_cert, int input_cert_size)
+                  const uint8_t * input_cert, int input_cert_size)
 {
   gnutls_x509_crt_t *x509_cert_list;
   unsigned int x509_ncerts;
@@ -1568,7 +1568,7 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t cred,
     }
 #endif
 
-  cas.data = read_binary_file (cafile, &size);
+  cas.data = (void*)read_binary_file (cafile, &size);
   if (cas.data == NULL)
     {
       gnutls_assert ();
@@ -1594,7 +1594,7 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t cred,
 
 static int
 parse_pem_crl_mem (gnutls_x509_trust_list_t tlist, 
-                   const opaque * input_crl, int input_crl_size)
+                   const char * input_crl, unsigned int input_crl_size)
 {
   gnutls_x509_crl_t *x509_crl_list;
   unsigned int x509_ncrls;
@@ -1629,7 +1629,7 @@ cleanup:
  */
 static int
 parse_der_crl_mem (gnutls_x509_trust_list_t tlist,
-                   const void *input_crl, int input_crl_size)
+                   const void *input_crl, unsigned int input_crl_size)
 {
   gnutls_x509_crl_t crl;
   gnutls_datum_t tmp;
@@ -1789,7 +1789,7 @@ gnutls_certificate_set_x509_crl_file (gnutls_certificate_credentials_t res,
 {
   int ret;
   size_t size;
-  char *data = read_binary_file (crlfile, &size);
+  char *data = (void*)read_binary_file (crlfile, &size);
 
   if (data == NULL)
     {
@@ -1827,8 +1827,8 @@ parse_pkcs12 (gnutls_certificate_credentials_t res,
   int ret;
   size_t cert_id_size = 0;
   size_t key_id_size = 0;
-  opaque cert_id[20];
-  opaque key_id[20];
+  uint8_t cert_id[20];
+  uint8_t key_id[20];
   int privkey_ok = 0;
 
   *cert = NULL;
@@ -2154,7 +2154,7 @@ int
   size_t size;
   int ret;
 
-  p12blob.data = read_binary_file (pkcs12file, &size);
+  p12blob.data = (void*)read_binary_file (pkcs12file, &size);
   p12blob.size = (unsigned int) size;
   if (p12blob.data == NULL)
     {

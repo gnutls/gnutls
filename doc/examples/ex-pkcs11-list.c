@@ -15,7 +15,8 @@ main (int argc, char** argv)
   gnutls_x509_crt_t xcrt;
   unsigned int obj_list_size = 0;
   gnutls_datum_t cinfo;
-  int i, ret;
+  int ret;
+  unsigned int i;
 
   obj_list_size = 0;
   ret = gnutls_pkcs11_obj_list_import_url (NULL, &obj_list_size, URL,

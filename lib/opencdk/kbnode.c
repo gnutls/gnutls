@@ -571,7 +571,7 @@ cdk_kbnode_write_to_mem (cdk_kbnode_t node, byte * buf, size_t * r_nbytes)
 /**
  * cdk_kbnode_hash:
  * @node: the key node
- * @hashctx: opaque pointer to the hash context
+ * @hashctx: uint8_t pointer to the hash context
  * @is_v4: OpenPGP signature (yes=1, no=0)
  * @pkttype: packet type to hash (if (0) use the packet type from the node)
  * @flags: flags which depend on the operation

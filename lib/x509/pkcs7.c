@@ -47,7 +47,7 @@ _decode_pkcs7_signed_data (ASN1_TYPE pkcs7, ASN1_TYPE * sdata,
 {
   char oid[MAX_OID_SIZE];
   ASN1_TYPE c2;
-  opaque *tmp = NULL;
+  uint8_t *tmp = NULL;
   int tmp_size, len, result;
 
   len = sizeof (oid) - 1;
@@ -218,7 +218,7 @@ gnutls_pkcs7_import (gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
    */
   if (format == GNUTLS_X509_FMT_PEM)
     {
-      opaque *out;
+      uint8_t *out;
 
       result = _gnutls_fbase64_decode (PEM_PKCS7, data->data, data->size,
                                        &out);

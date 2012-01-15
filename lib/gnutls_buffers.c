@@ -97,8 +97,8 @@ gnutls_record_check_pending (gnutls_session_t session)
 
 int
 _gnutls_record_buffer_get (content_type_t type,
-                           gnutls_session_t session, opaque * data,
-                           size_t length, opaque seq[8])
+                           gnutls_session_t session, uint8_t * data,
+                           size_t length, uint8_t seq[8])
 {
 gnutls_datum_t msg;
 mbuffer_st* bufel;
@@ -152,7 +152,7 @@ _gnutls_dgram_read (gnutls_session_t session, mbuffer_st **bufel,
 		    gnutls_pull_func pull_func)
 {
   ssize_t i, ret;
-  char *ptr;
+  uint8_t *ptr;
   size_t max_size = _gnutls_get_max_decrypted_data(session);
   size_t recv_size = MAX_RECV_SIZE(session);
   gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
@@ -226,7 +226,7 @@ _gnutls_stream_read (gnutls_session_t session, mbuffer_st **bufel,
   size_t left;
   ssize_t i = 0;
   size_t max_size = _gnutls_get_max_decrypted_data(session);
-  char *ptr;
+  uint8_t *ptr;
   gnutls_transport_ptr_t fd = session->internals.transport_recv_ptr;
 
   *bufel = _mbuffer_alloc (0, MAX(max_size, size));
@@ -314,10 +314,11 @@ _gnutls_read (gnutls_session_t session, mbuffer_st **bufel,
 
 static ssize_t
 _gnutls_writev_emu (gnutls_session_t session, gnutls_transport_ptr_t fd, const giovec_t * giovec,
-                    int giovec_cnt)
+                    unsigned int giovec_cnt)
 {
-  int ret = 0, j = 0;
+  unsigned int j = 0;
   size_t total = 0;
+  ssize_t ret = 0;
 
   for (j = 0; j < giovec_cnt; j++)
     {
@@ -328,7 +329,7 @@ _gnutls_writev_emu (gnutls_session_t session, gnutls_transport_ptr_t fd, const g
 
       total += ret;
 
-      if (ret != giovec[j].iov_len)
+      if ((size_t)ret != giovec[j].iov_len)
         break;
     }
 

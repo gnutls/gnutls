@@ -55,7 +55,7 @@ static int _decode_pkcs8_ecc_key (ASN1_TYPE pkcs8_asn, gnutls_x509_privkey_t pke
 
 struct pbkdf2_params
 {
-  opaque salt[32];
+  uint8_t salt[32];
   int salt_size;
   unsigned int iter_count;
   unsigned int key_size;
@@ -64,7 +64,7 @@ struct pbkdf2_params
 struct pbe_enc_params
 {
   gnutls_cipher_algorithm_t cipher;
-  opaque iv[MAX_CIPHER_BLOCK_SIZE];
+  uint8_t iv[MAX_CIPHER_BLOCK_SIZE];
   int iv_size;
 };
 
@@ -133,7 +133,7 @@ inline static int
 _encode_privkey (gnutls_x509_privkey_t pkey, gnutls_datum_t * raw)
 {
   size_t size = 0;
-  opaque *data = NULL;
+  uint8_t *data = NULL;
   int ret;
   ASN1_TYPE spk = ASN1_TYPE_EMPTY;
 
@@ -219,7 +219,7 @@ encode_to_private_key_info (gnutls_x509_privkey_t pkey,
                             gnutls_datum_t * der, ASN1_TYPE * pkey_info)
 {
   int result, len;
-  opaque null = 0;
+  uint8_t null = 0;
   const char *oid;
   gnutls_datum_t algo_params = { NULL, 0 };
   gnutls_datum_t algo_privkey = { NULL, 0 };
@@ -669,7 +669,7 @@ gnutls_x509_privkey_export_pkcs8 (gnutls_x509_privkey_t key,
  */
 static int
 read_pkcs_schema_params (schema_id * schema, const char *password,
-                         const opaque * data, int data_size,
+                         const uint8_t * data, int data_size,
                          struct pbkdf2_params *kdf_params,
                          struct pbe_enc_params *enc_params)
 {
@@ -705,7 +705,7 @@ read_pkcs_schema_params (schema_id * schema, const char *password,
           goto error;
         }
 
-      tmp.data = (opaque *) data;
+      tmp.data = (uint8_t *) data;
       tmp.size = data_size;
 
       result = read_pbkdf2_params (pbes2_asn, &tmp, kdf_params);
@@ -1078,7 +1078,7 @@ decode_private_key_info (const gnutls_datum_t * der,
                          gnutls_x509_privkey_t pkey)
 {
   int result, len;
-  opaque oid[64];
+  char oid[64];
   ASN1_TYPE pkcs8_asn = ASN1_TYPE_EMPTY;
 
 
@@ -1200,7 +1200,7 @@ gnutls_x509_privkey_import_pkcs8 (gnutls_x509_privkey_t key,
    */
   if (format == GNUTLS_X509_FMT_PEM)
     {
-      opaque *out;
+      uint8_t *out;
 
       /* Try the first header 
        */
@@ -1591,7 +1591,7 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
 {
   int result;
   int data_size;
-  opaque *data = NULL, *key = NULL;
+  uint8_t *data = NULL, *key = NULL;
   gnutls_datum_t dkey, d_iv;
   cipher_hd_st ch;
   int ch_init = 0;
@@ -1673,7 +1673,7 @@ decrypt_data (schema_id schema, ASN1_TYPE pkcs8_asn,
   dkey.data = key;
   dkey.size = key_size;
 
-  d_iv.data = (opaque *) enc_params->iv;
+  d_iv.data = (uint8_t *) enc_params->iv;
   d_iv.size = enc_params->iv_size;
   result = _gnutls_cipher_init (&ch, enc_params->cipher, &dkey, &d_iv, 0);
 
@@ -1723,7 +1723,7 @@ write_pbkdf2_params (ASN1_TYPE pbes2_asn,
 {
   int result;
   ASN1_TYPE pbkdf2_asn = ASN1_TYPE_EMPTY;
-  opaque tmp[64];
+  uint8_t tmp[64];
 
   /* Write the key derivation algorithm
    */
@@ -2129,11 +2129,11 @@ encrypt_data (const gnutls_datum_t * plain,
 {
   int result;
   int data_size;
-  opaque *data = NULL;
+  uint8_t *data = NULL;
   gnutls_datum_t d_iv;
   cipher_hd_st ch;
   int ch_init = 0;
-  opaque pad, pad_size;
+  uint8_t pad, pad_size;
 
   pad_size = gnutls_cipher_get_block_size (enc_params->cipher);
 
@@ -2161,7 +2161,7 @@ encrypt_data (const gnutls_datum_t * plain,
 
   data_size = plain->size + pad;
 
-  d_iv.data = (opaque *) enc_params->iv;
+  d_iv.data = (uint8_t *) enc_params->iv;
   d_iv.size = enc_params->iv_size;
   result = _gnutls_cipher_init (&ch, enc_params->cipher, key, &d_iv, 1);
 

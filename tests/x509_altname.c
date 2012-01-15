@@ -65,7 +65,7 @@ void
 doit (void)
 {
   int ret;
-  gnutls_datum_t derCert = { pem, sizeof (pem) };
+  gnutls_datum_t derCert = { (void*)pem, sizeof (pem) };
   gnutls_x509_crt_t cert;
   size_t data_len = MAX_DATA_SIZE;
   char data[MAX_DATA_SIZE];

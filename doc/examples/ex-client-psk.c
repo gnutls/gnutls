@@ -30,7 +30,7 @@ main (void)
   char buffer[MAX_BUF + 1];
   const char *err;
   gnutls_psk_client_credentials_t pskcred;
-  const gnutls_datum_t key = { (char *) "DEADBEEF", 8 };
+  const gnutls_datum_t key = { (void *) "DEADBEEF", 8 };
 
   gnutls_global_init ();
 

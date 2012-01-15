@@ -51,7 +51,7 @@ _gnutls_free_dh_info (dh_info_st * dh)
 
 int
 _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
-                                  opaque * data, size_t _data_size,
+                                  uint8_t * data, size_t _data_size,
                                   bigint_t g, bigint_t p,
                                   gnutls_datum_t* psk_key)
 {
@@ -201,7 +201,7 @@ error:
 /* Returns the bytes parsed */
 int
 _gnutls_proc_dh_common_server_kx (gnutls_session_t session,
-                                  opaque * data, size_t _data_size)
+                                  uint8_t * data, size_t _data_size)
 {
   uint16_t n_Y, n_g, n_p;
   size_t _n_Y, _n_g, _n_p;

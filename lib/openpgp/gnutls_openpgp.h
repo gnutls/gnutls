@@ -22,7 +22,7 @@ int gnutls_openpgp_count_key_names (const gnutls_datum_t * cert);
 
 int gnutls_openpgp_get_key (gnutls_datum_t * key,
                             gnutls_openpgp_keyring_t keyring,
-                            key_attr_t by, opaque * pattern);
+                            key_attr_t by, uint8_t * pattern);
 
 /* internal */
 int
@@ -32,7 +32,7 @@ int
 _gnutls_openpgp_request_key (gnutls_session_t,
                              gnutls_datum_t * ret,
                              const gnutls_certificate_credentials_t cred,
-                             opaque * key_fpr, int key_fpr_size);
+                             uint8_t * key_fpr, int key_fpr_size);
 
 int _gnutls_openpgp_verify_key (const gnutls_certificate_credentials_t,
                                 const gnutls_datum_t * cert_list,

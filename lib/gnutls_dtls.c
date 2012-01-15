@@ -42,7 +42,7 @@ static inline int
 transmit_message (gnutls_session_t session,
 		  mbuffer_st *bufel)
 {
-  opaque *data, *mtu_data;
+  uint8_t *data, *mtu_data;
   int ret = 0;
   unsigned int offset, frag_len, data_size;
   const unsigned int mtu = gnutls_dtls_get_data_mtu(session) - DTLS_HANDSHAKE_HEADER_SIZE;
@@ -519,7 +519,7 @@ int gnutls_dtls_cookie_send(gnutls_datum_t* key, void* client_data, size_t clien
   gnutls_dtls_prestate_st* prestate,
   gnutls_transport_ptr_t ptr, gnutls_push_func push_func)
 {
-opaque hvr[20+DTLS_HANDSHAKE_HEADER_SIZE+COOKIE_SIZE];
+uint8_t hvr[20+DTLS_HANDSHAKE_HEADER_SIZE+COOKIE_SIZE];
 int hvr_size = 0, ret;
 uint8_t digest[C_HASH_SIZE];
 
@@ -533,7 +533,7 @@ uint8_t digest[C_HASH_SIZE];
  *    uint16 epoch; - 2 bytes (0, 0)
  *    uint48 sequence_number; - 4 bytes (0,0,0,0)
  *    uint16 length; - 2 bytes (COOKIE_SIZE+1+2)+DTLS_HANDSHAKE_HEADER_SIZE
- *    opaque fragment[DTLSPlaintext.length];
+ *    uint8_t fragment[DTLSPlaintext.length];
  *  } DTLSPlaintext;
  *
  *
@@ -547,7 +547,7 @@ uint8_t digest[C_HASH_SIZE];
  *
  * struct {
  *   ProtocolVersion server_version;
- *   opaque cookie<0..32>;
+ *   uint8_t cookie<0..32>;
  * } HelloVerifyRequest;
  */ 
 
@@ -622,8 +622,8 @@ int gnutls_dtls_cookie_verify(gnutls_datum_t* key,
   void* _msg, size_t msg_size, gnutls_dtls_prestate_st* prestate)
 {
 gnutls_datum_t cookie;
-int sid_size;
-int pos, ret;
+int ret;
+unsigned int pos, sid_size;
 uint8_t * msg = _msg;
 uint8_t digest[C_HASH_SIZE];
 

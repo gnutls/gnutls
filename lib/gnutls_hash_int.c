@@ -29,7 +29,7 @@
 #include <gnutls_hash_int.h>
 #include <gnutls_errors.h>
 
-static int
+static size_t
 digest_length (int algo)
 {
   switch (algo)
@@ -119,7 +119,7 @@ _gnutls_hash_deinit (digest_hd_st * handle, void *digest)
 
 /* returns the output size of the given hash/mac algorithm
  */
-int
+size_t
 _gnutls_hash_get_algo_len (gnutls_digest_algorithm_t algorithm)
 {
   return digest_length (algorithm);
@@ -316,7 +316,7 @@ int
 _gnutls_mac_init_ssl3 (digest_hd_st * ret, gnutls_mac_algorithm_t algorithm,
                        void *key, int keylen)
 {
-  opaque ipad[48];
+  uint8_t ipad[48];
   int padsize, result;
 
   padsize = get_padsize (algorithm);
@@ -348,7 +348,7 @@ _gnutls_mac_init_ssl3 (digest_hd_st * ret, gnutls_mac_algorithm_t algorithm,
 void
 _gnutls_mac_reset_ssl3 (digest_hd_st * handle)
 {
-  opaque ipad[48];
+  uint8_t ipad[48];
   int padsize;
 
   padsize = get_padsize (handle->algorithm);
@@ -367,9 +367,9 @@ _gnutls_mac_reset_ssl3 (digest_hd_st * handle)
 int 
 _gnutls_mac_output_ssl3 (digest_hd_st * handle, void *digest)
 {
-  opaque ret[MAX_HASH_SIZE];
+  uint8_t ret[MAX_HASH_SIZE];
   digest_hd_st td;
-  opaque opad[48];
+  uint8_t opad[48];
   int padsize;
   int block, rc;
 
@@ -415,13 +415,13 @@ int ret = 0;
 
 int
 _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle,
-                                   void *digest, opaque * key,
+                                   void *digest, uint8_t * key,
                                    uint32_t key_size)
 {
-  opaque ret[MAX_HASH_SIZE];
+  uint8_t ret[MAX_HASH_SIZE];
   digest_hd_st td;
-  opaque opad[48];
-  opaque ipad[48];
+  uint8_t opad[48];
+  uint8_t ipad[48];
   int padsize;
   int block, rc;
 
@@ -466,11 +466,11 @@ cleanup:
 }
 
 static int
-ssl3_sha (int i, opaque * secret, int secret_len,
-          opaque * rnd, int rnd_len, void *digest)
+ssl3_sha (int i, uint8_t * secret, int secret_len,
+          uint8_t * rnd, int rnd_len, void *digest)
 {
   int j, ret;
-  opaque text1[26];
+  uint8_t text1[26];
 
   digest_hd_st td;
 
@@ -498,10 +498,10 @@ ssl3_sha (int i, opaque * secret, int secret_len,
 #define MD5_DIGEST_OUTPUT 16
 
 static int
-ssl3_md5 (int i, opaque * secret, int secret_len,
-          opaque * rnd, int rnd_len, void *digest)
+ssl3_md5 (int i, uint8_t * secret, int secret_len,
+          uint8_t * rnd, int rnd_len, void *digest)
 {
-  opaque tmp[MAX_HASH_SIZE];
+  uint8_t tmp[MAX_HASH_SIZE];
   digest_hd_st td;
   int ret;
 
@@ -531,9 +531,9 @@ ssl3_md5 (int i, opaque * secret, int secret_len,
 int
 _gnutls_ssl3_hash_md5 (const void *first, int first_len,
                        const void *second, int second_len,
-                       int ret_len, opaque * ret)
+                       int ret_len, uint8_t * ret)
 {
-  opaque digest[MAX_HASH_SIZE];
+  uint8_t digest[MAX_HASH_SIZE];
   digest_hd_st td;
   int block = MD5_DIGEST_OUTPUT;
   int rc;
@@ -565,10 +565,10 @@ _gnutls_ssl3_hash_md5 (const void *first, int first_len,
 int
 _gnutls_ssl3_generate_random (void *secret, int secret_len,
                               void *rnd, int rnd_len,
-                              int ret_bytes, opaque * ret)
+                              int ret_bytes, uint8_t * ret)
 {
   int i = 0, copy, output_bytes;
-  opaque digest[MAX_HASH_SIZE];
+  uint8_t digest[MAX_HASH_SIZE];
   int block = MD5_DIGEST_OUTPUT;
   int result, times;
 

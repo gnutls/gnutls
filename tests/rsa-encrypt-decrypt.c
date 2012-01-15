@@ -86,11 +86,11 @@ static char pem1_key[] =
   "-----END RSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t cert_dat[] = {
-  {pem1_cert, sizeof (pem1_cert)}
+  {(void*)pem1_cert, sizeof (pem1_cert)}
 };
 
 const gnutls_datum_t key_dat[] = {
-  {pem1_key, sizeof (pem1_key)}
+  {(void*)pem1_key, sizeof (pem1_key)}
 };
 
 void

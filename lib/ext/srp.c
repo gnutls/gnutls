@@ -38,7 +38,7 @@ static int _gnutls_srp_pack (extension_priv_data_t epriv,
                              gnutls_buffer_st * ps);
 static void _gnutls_srp_deinit_data (extension_priv_data_t epriv);
 static int _gnutls_srp_recv_params (gnutls_session_t state,
-                                    const opaque * data, size_t data_size);
+                                    const uint8_t * data, size_t data_size);
 static int _gnutls_srp_send_params (gnutls_session_t state, gnutls_buffer_st * extdata);
 
 extension_entry_st ext_mod_srp = {
@@ -55,7 +55,7 @@ extension_entry_st ext_mod_srp = {
 
 
 static int
-_gnutls_srp_recv_params (gnutls_session_t session, const opaque * data,
+_gnutls_srp_recv_params (gnutls_session_t session, const uint8_t * data,
                          size_t _data_size)
 {
   uint8_t len;
@@ -221,9 +221,8 @@ _gnutls_srp_unpack (gnutls_buffer_st * ps, extension_priv_data_t * _priv)
   srp_ext_st *priv;
   int ret;
   extension_priv_data_t epriv;
-  gnutls_datum_t username = { NULL, 0 }, password =
-  {
-  NULL, 0};
+  gnutls_datum_t username = { NULL, 0 };
+  gnutls_datum_t password = { NULL, 0 };
 
   priv = gnutls_calloc (1, sizeof (*priv));
   if (priv == NULL)
@@ -235,8 +234,8 @@ _gnutls_srp_unpack (gnutls_buffer_st * ps, extension_priv_data_t * _priv)
   BUFFER_POP_DATUM (ps, &username);
   BUFFER_POP_DATUM (ps, &password);
 
-  priv->username = username.data;
-  priv->password = password.data;
+  priv->username = (char*)username.data;
+  priv->password = (char*)password.data;
 
   epriv.ptr = priv;
   *_priv = epriv;

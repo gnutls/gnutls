@@ -74,7 +74,8 @@ do_write (int fd, void *buf, size_t nbytes)
 static int
 do_read (int fd, void *buf, size_t nbytes)
 {
-  int n, nread = 0;
+  int n;
+  size_t nread = 0;
 
   do
     {
@@ -84,7 +85,11 @@ do_read (int fd, void *buf, size_t nbytes)
         }
       while (n == -1 && errno == EINTR);
       if (n == -1)
-        return nread ? nread : -1;
+        {
+          if (nread > 0)
+            return nread;
+          else return -1;
+        }
       if (n == 0)
         return -1;
       nread += n;
@@ -188,16 +193,15 @@ _rndegd_connect_socket (void)
 int
 _rndegd_read (int *fd, void *_output, size_t _length)
 {
-  int n;
+  ssize_t n;
   uint8_t buffer[256 + 2];
   int nbytes;
   int do_restart = 0;
   unsigned char *output = _output;
-  size_t length = _length;
+  ssize_t length = (ssize_t)_length;
 
   if (!length)
     return 0;
-
 
 restart:
   if (*fd == -1 || do_restart)

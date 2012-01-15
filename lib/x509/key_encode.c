@@ -356,7 +356,7 @@ static int
 _gnutls_asn1_encode_rsa (ASN1_TYPE * c2, gnutls_pk_params_st * params)
 {
   int result;
-  opaque null = '\0';
+  uint8_t null = '\0';
   gnutls_pk_params_st pk_params;
   gnutls_datum_t m, e, d, p, q, u, exp1, exp2;
 
@@ -571,7 +571,7 @@ static int
 _gnutls_asn1_encode_ecc (ASN1_TYPE * c2, gnutls_pk_params_st * params)
 {
   int ret;
-  opaque one = '\x01';
+  uint8_t one = '\x01';
   gnutls_datum pubkey = { NULL, 0 };
   const char *oid;
   
@@ -657,9 +657,9 @@ _gnutls_asn1_encode_dsa (ASN1_TYPE * c2, gnutls_pk_params_st * params)
 {
   int result, i;
   size_t size[DSA_PRIVATE_PARAMS], total;
-  opaque *p_data, *q_data, *g_data, *x_data, *y_data;
-  opaque *all_data = NULL, *p;
-  opaque null = '\0';
+  uint8_t *p_data, *q_data, *g_data, *x_data, *y_data;
+  uint8_t *all_data = NULL, *p;
+  uint8_t null = '\0';
 
   /* Read all the sizes */
   total = 0;

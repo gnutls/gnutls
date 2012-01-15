@@ -48,7 +48,7 @@ static char client_pem[] =
   "jpfc/3X7sLUsMvumcDE01ls/cG5mIatmiyEU9qI3jbgUf82z23ON/acwJf875D3/\n"
   "U7jyOsBJ44SEQITbin2yUeJMIm1tievvdNXBDfW95AM507ShzP12sfiJkJfjjdhy\n"
   "dc8Siq5JojruiMizAf0pA7in\n" "-----END CERTIFICATE-----\n";
-const gnutls_datum_t client_dat = { client_pem, sizeof (client_pem) };
+const gnutls_datum_t client_dat = { (void*)client_pem, sizeof (client_pem) };
 
 static char ca_pem[] =
   "-----BEGIN CERTIFICATE-----\n"
@@ -63,7 +63,7 @@ static char ca_pem[] =
   "njuu7kHq5peUgYn8Jd9zNzExBOEp1VOipGsf6G66oQAhDFp2o8zkz7ZH71zR4HEW\n"
   "KoX6n5Emn6DvcEH/9pAhnGxNHJAoS7czTKv/JDZJhkqHxyrE1fuLsg5Qv25DTw7+\n"
   "PfqUpIhz5Bbm7J4=\n" "-----END CERTIFICATE-----\n";
-const gnutls_datum_t ca_dat = { ca_pem, sizeof (ca_pem) };
+const gnutls_datum_t ca_dat = { (void*)ca_pem, sizeof (ca_pem) };
 
 static void
 tls_log_func (int level, const char *str)
@@ -78,7 +78,7 @@ doit (void)
   gnutls_x509_crt_t client;
   gnutls_x509_crt_t ca;
   gnutls_pkcs12_bag_t bag;
-  char key_id_buf[20];
+  unsigned char key_id_buf[20];
   gnutls_datum_t key_id;
   int ret, indx;
   char outbuf[10240];

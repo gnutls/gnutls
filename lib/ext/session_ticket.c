@@ -42,7 +42,7 @@
 #define MAC_SIZE 32
 
 static int session_ticket_recv_params (gnutls_session_t session,
-                                       const opaque * data, size_t data_size);
+                                       const uint8_t * data, size_t data_size);
 static int session_ticket_send_params (gnutls_session_t session,
                                        gnutls_buffer_st* extdata);
 static int session_ticket_unpack (gnutls_buffer_st * ps,
@@ -72,26 +72,26 @@ typedef struct
 {
   int session_ticket_enable;
   int session_ticket_renew;
-  opaque session_ticket_IV[SESSION_TICKET_IV_SIZE];
+  uint8_t session_ticket_IV[SESSION_TICKET_IV_SIZE];
 
-  opaque *session_ticket;
+  uint8_t *session_ticket;
   int session_ticket_len;
 
-  opaque key[SESSION_KEY_SIZE];
+  uint8_t key[SESSION_KEY_SIZE];
 } session_ticket_ext_st;
 
 struct ticket
 {
-  opaque key_name[KEY_NAME_SIZE];
-  opaque IV[IV_SIZE];
-  opaque *encrypted_state;
+  uint8_t key_name[KEY_NAME_SIZE];
+  uint8_t IV[IV_SIZE];
+  uint8_t *encrypted_state;
   uint16_t encrypted_state_len;
-  opaque mac[MAC_SIZE];
+  uint8_t mac[MAC_SIZE];
 };
 
 static int
 digest_ticket (const gnutls_datum_t * key, struct ticket *ticket,
-               opaque * digest)
+               uint8_t * digest)
 {
   digest_hd_st digest_hd;
   uint16_t length16;
@@ -121,7 +121,7 @@ decrypt_ticket (gnutls_session_t session, session_ticket_ext_st * priv,
 {
   cipher_hd_st cipher_hd;
   gnutls_datum_t key, IV, mac_secret, state;
-  opaque final[MAC_SECRET_SIZE];
+  uint8_t final[MAC_SECRET_SIZE];
   time_t timestamp = gnutls_time (0);
   int ret;
 
@@ -261,7 +261,7 @@ encrypt_ticket (gnutls_session_t session, session_ticket_ext_st * priv,
 
 static int
 session_ticket_recv_params (gnutls_session_t session,
-                            const opaque * data, size_t _data_size)
+                            const uint8_t * data, size_t _data_size)
 {
   ssize_t data_size = _data_size;
   session_ticket_ext_st *priv = NULL;
@@ -283,7 +283,7 @@ session_ticket_recv_params (gnutls_session_t session,
   if (session->security_parameters.entity == GNUTLS_SERVER)
     {
       struct ticket ticket;
-      const opaque *encrypted_state;
+      const uint8_t *encrypted_state;
       int ret;
 
       /* The client requested a new session ticket. */

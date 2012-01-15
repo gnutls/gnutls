@@ -45,10 +45,11 @@
 /* This selects the best supported ciphersuite from the ones provided */
 static int
 _gnutls_handshake_select_v2_suite (gnutls_session_t session,
-                                   opaque * data, unsigned int datalen)
+                                   uint8_t * data, unsigned int datalen)
 {
-  int i, j, ret;
-  opaque *_data;
+  unsigned int i, j;
+  int ret;
+  uint8_t *_data;
   int _datalen;
 
   _gnutls_handshake_log ("HSK[%p]: Parsing a version 2.0 client hello.\n",
@@ -90,7 +91,7 @@ _gnutls_handshake_select_v2_suite (gnutls_session_t session,
  * However they set their version to 3.0 or 3.1.
  */
 int
-_gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
+_gnutls_read_client_hello_v2 (gnutls_session_t session, uint8_t * data,
                               unsigned int datalen)
 {
   uint16_t session_id_len = 0;
@@ -98,11 +99,11 @@ _gnutls_read_client_hello_v2 (gnutls_session_t session, opaque * data,
   int ret = 0;
   uint16_t sizeOfSuites;
   gnutls_protocol_t adv_version;
-  opaque rnd[GNUTLS_RANDOM_SIZE];
+  uint8_t rnd[GNUTLS_RANDOM_SIZE];
   int len = datalen;
   int err;
   uint16_t challenge;
-  opaque session_id[TLS_MAX_SESSION_ID_SIZE];
+  uint8_t session_id[TLS_MAX_SESSION_ID_SIZE];
 
   DECR_LEN (len, 2);
 

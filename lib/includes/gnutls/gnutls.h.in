@@ -1438,7 +1438,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 
   int gnutls_hex_encode (const gnutls_datum_t * data, char *result,
                          size_t * result_size);
-  int gnutls_hex_decode (const gnutls_datum_t * hex_data, char *result,
+  int gnutls_hex_decode (const gnutls_datum_t * hex_data, void *result,
                          size_t * result_size);
 
   void
@@ -1639,7 +1639,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                        gnutls_params_function * func);
 
   int gnutls_hex2bin (const char *hex_data, size_t hex_size,
-                      char *bin_data, size_t * bin_size);
+                      void *bin_data, size_t * bin_size);
 
   /* Gnutls error codes. The mapping to a TLS alert is also shown in
    * comments.

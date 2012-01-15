@@ -13,8 +13,6 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
-#define SA struct sockaddr
-
 /* tcp.c */
 int tcp_connect (void);
 void tcp_close (int sd);
@@ -39,7 +37,7 @@ tcp_connect (void)
   sa.sin_port = htons (atoi (PORT));
   inet_pton (AF_INET, SERVER, &sa.sin_addr);
 
-  err = connect (sd, (SA *) & sa, sizeof (sa));
+  err = connect (sd, (struct sockaddr *) & sa, sizeof (sa));
   if (err < 0)
     {
       fprintf (stderr, "Connect error\n");

@@ -40,7 +40,7 @@ extern FILE *infile;
 static void
 print_dh_info (gnutls_datum_t * p, gnutls_datum_t * g, unsigned int q_bits)
 {
-int i;
+unsigned int i;
 
   fprintf (outfile, "\nGenerator (%d bits): ", g->size*8);
 
@@ -90,7 +90,7 @@ void dh_info (common_info_st * ci)
       exit (1);
     }
 
-  params.data = fread_file (infile, &size);
+  params.data = (void*)fread_file (infile, &size);
   params.size = size;
 
   ret =

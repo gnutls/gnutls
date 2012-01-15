@@ -45,10 +45,10 @@
 
 static int gen_psk_server_kx (gnutls_session_t, gnutls_buffer_st*);
 static int gen_psk_client_kx (gnutls_session_t, gnutls_buffer_st*);
-static int proc_psk_client_kx (gnutls_session_t, opaque *, size_t);
-static int proc_psk_server_kx (gnutls_session_t, opaque *, size_t);
+static int proc_psk_client_kx (gnutls_session_t, uint8_t *, size_t);
+static int proc_psk_server_kx (gnutls_session_t, uint8_t *, size_t);
 static int gen_ecdhe_psk_server_kx (gnutls_session_t session, gnutls_buffer_st* data);
-static int proc_ecdhe_psk_client_kx (gnutls_session_t session, opaque * data,
+static int proc_ecdhe_psk_client_kx (gnutls_session_t session, uint8_t * data,
                                      size_t _data_size);
 
 const mod_auth_st dhe_psk_auth_struct = {
@@ -211,7 +211,7 @@ gen_ecdhe_psk_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 
 
 static int
-proc_psk_client_kx (gnutls_session_t session, opaque * data,
+proc_psk_client_kx (gnutls_session_t session, uint8_t * data,
                     size_t _data_size)
 {
   int ret;
@@ -290,7 +290,7 @@ proc_psk_client_kx (gnutls_session_t session, opaque * data,
 }
 
 static int
-proc_ecdhe_psk_client_kx (gnutls_session_t session, opaque * data,
+proc_ecdhe_psk_client_kx (gnutls_session_t session, uint8_t * data,
                     size_t _data_size)
 {
   int ret;
@@ -355,7 +355,7 @@ proc_ecdhe_psk_client_kx (gnutls_session_t session, opaque * data,
 }
 
 int
-proc_psk_server_kx (gnutls_session_t session, opaque * data,
+proc_psk_server_kx (gnutls_session_t session, uint8_t * data,
                     size_t _data_size)
 {
 

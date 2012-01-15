@@ -26,7 +26,7 @@
 
 typedef struct
 {
-  opaque name[MAX_SERVER_NAME_SIZE];
+  uint8_t name[MAX_SERVER_NAME_SIZE];
   unsigned name_length;
   gnutls_server_name_type_t type;
 } server_name_st;

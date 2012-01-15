@@ -90,7 +90,7 @@ void
 doit (void)
 {
   int ret;
-  gnutls_datum_t derCert = { pem, sizeof (pem) };
+  gnutls_datum_t derCert = { (unsigned char*)pem, sizeof (pem) };
   gnutls_x509_crt_t cert;
   gnutls_x509_dn_t xdn;
 

@@ -50,8 +50,8 @@ typedef struct
   cipher_setiv_func setiv;
   cipher_deinit_func deinit;
   
-  int tag_size;
-  int is_aead:1;
+  size_t tag_size;
+  unsigned int is_aead:1;
 } cipher_hd_st;
 
 int _gnutls_cipher_init (cipher_hd_st *, gnutls_cipher_algorithm_t cipher,
@@ -59,14 +59,14 @@ int _gnutls_cipher_init (cipher_hd_st *, gnutls_cipher_algorithm_t cipher,
                          const gnutls_datum_t * iv, int enc);
 
 inline static void _gnutls_cipher_setiv (const cipher_hd_st * handle, 
-    const void *iv, int ivlen)
+    const void *iv, size_t ivlen)
 {
   handle->setiv(handle->handle, iv, ivlen);
 }
 
 inline static int
 _gnutls_cipher_encrypt2 (const cipher_hd_st * handle, const void *text,
-                         int textlen, void *ciphertext, int ciphertextlen)
+                         size_t textlen, void *ciphertext, size_t ciphertextlen)
 {
   if (handle != NULL && handle->handle != NULL)
     {
@@ -79,7 +79,7 @@ _gnutls_cipher_encrypt2 (const cipher_hd_st * handle, const void *text,
 
 inline static int
 _gnutls_cipher_decrypt2 (const cipher_hd_st * handle, const void *ciphertext,
-                         int ciphertextlen, void *text, int textlen)
+                         size_t ciphertextlen, void *text, size_t textlen)
 {
   if (handle != NULL && handle->handle != NULL)
     {
@@ -101,7 +101,7 @@ _gnutls_cipher_deinit (cipher_hd_st * handle)
 }
 
 int _gnutls_cipher_exists(gnutls_cipher_algorithm_t cipher);
-inline static unsigned int _gnutls_cipher_tag_len( cipher_hd_st * handle)
+inline static size_t _gnutls_cipher_tag_len( cipher_hd_st * handle)
 {
   return handle->tag_size;
 }
@@ -112,7 +112,7 @@ inline static unsigned int _gnutls_cipher_is_aead( cipher_hd_st * handle)
 }
 
 /* returns the tag in AUTHENC ciphers */
-inline static void _gnutls_cipher_tag( const cipher_hd_st * handle, void* tag, int tag_size)
+inline static void _gnutls_cipher_tag( const cipher_hd_st * handle, void* tag, size_t tag_size)
 {
   if (handle != NULL && handle->handle != NULL)
     {
@@ -123,7 +123,7 @@ inline static void _gnutls_cipher_tag( const cipher_hd_st * handle, void* tag, i
 /* Add auth data for AUTHENC ciphers
  */
 inline static int _gnutls_cipher_auth (const cipher_hd_st * handle, const void *text,
-                             int textlen)
+                                       size_t textlen)
 {
   if (handle != NULL && handle->handle != NULL)
     {
@@ -145,7 +145,7 @@ typedef struct
   unsigned int is_mac:1;
   unsigned int ssl_hmac:1;
   unsigned int is_null:1;
-  int tag_size;
+  size_t tag_size;
 } auth_cipher_hd_st;
 
 int _gnutls_auth_cipher_init (auth_cipher_hd_st * handle, 
@@ -168,12 +168,12 @@ int _gnutls_auth_cipher_decrypt2 (auth_cipher_hd_st * handle,
 int _gnutls_auth_cipher_tag( auth_cipher_hd_st * handle, void* tag, int tag_size);
 
 inline static void _gnutls_auth_cipher_setiv (const auth_cipher_hd_st * handle, 
-    const void *iv, int ivlen)
+    const void *iv, size_t ivlen)
 {
   _gnutls_cipher_setiv(&handle->cipher, iv, ivlen);
 }
 
-inline static unsigned int _gnutls_auth_cipher_tag_len( auth_cipher_hd_st * handle)
+inline static size_t _gnutls_auth_cipher_tag_len( auth_cipher_hd_st * handle)
 {
   return handle->tag_size;
 }

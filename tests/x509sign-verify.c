@@ -128,15 +128,15 @@ static char pem2_key[] =
   "AoNBXjeBjgCGMei2m8E=\n" "-----END DSA PRIVATE KEY-----\n";
 
 const gnutls_datum_t cert_dat[] = {
-  {pem1_cert, sizeof (pem1_cert)}
+  {(void*)pem1_cert, sizeof (pem1_cert)}
   ,
-  {pem2_cert, sizeof (pem2_cert)}
+  {(void*)pem2_cert, sizeof (pem2_cert)}
 };
 
 const gnutls_datum_t key_dat[] = {
-  {pem1_key, sizeof (pem1_key)}
+  {(void*)pem1_key, sizeof (pem1_key)}
   ,
-  {pem2_key, sizeof (pem2_key)}
+  {(void*)pem2_key, sizeof (pem2_key)}
 };
 
 void

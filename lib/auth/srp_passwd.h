@@ -36,7 +36,7 @@ typedef struct
 int _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
                                 SRP_PWD_ENTRY **);
 void _gnutls_srp_entry_free (SRP_PWD_ENTRY * entry);
-int _gnutls_sbase64_decode (uint8_t * data, size_t data_size,
+int _gnutls_sbase64_decode (char * data, size_t data_size,
                             uint8_t ** result);
 
 #endif /* ENABLE_SRP */

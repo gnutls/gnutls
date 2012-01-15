@@ -213,7 +213,7 @@ static void test_ciphersuite(const char *cipher_prio, int size)
 {
     /* Server stuff. */
     gnutls_anon_server_credentials_t s_anoncred;
-    const gnutls_datum_t p3 = { (char *) pkcs3, strlen(pkcs3) };
+    const gnutls_datum_t p3 = { (void*) pkcs3, strlen(pkcs3) };
     static gnutls_dh_params_t dh_params;
     gnutls_session_t server;
     int sret, cret;
@@ -313,7 +313,7 @@ static void test_ciphersuite_kx(const char *cipher_prio)
 {
     /* Server stuff. */
     gnutls_anon_server_credentials_t s_anoncred;
-    const gnutls_datum_t p3 = { (char *) pkcs3, strlen(pkcs3) };
+    const gnutls_datum_t p3 = { (void*) pkcs3, strlen(pkcs3) };
     static gnutls_dh_params_t dh_params;
     gnutls_session_t server;
     int sret, cret;

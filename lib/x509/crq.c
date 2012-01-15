@@ -128,7 +128,7 @@ gnutls_x509_crq_import (gnutls_x509_crq_t crq,
    */
   if (format == GNUTLS_X509_FMT_PEM)
     {
-      opaque *out;
+      uint8_t *out;
 
       /* Try the first header */
       result = _gnutls_fbase64_decode (PEM_CRQ, data->data, data->size, &out);
@@ -740,7 +740,7 @@ gnutls_x509_crq_set_version (gnutls_x509_crq_t crq, unsigned int version)
 int
 gnutls_x509_crq_get_version (gnutls_x509_crq_t crq)
 {
-  opaque version[8];
+  uint8_t version[8];
   int len, result;
 
   if (crq == NULL)
@@ -1508,7 +1508,7 @@ gnutls_x509_crq_get_key_usage (gnutls_x509_crq_t crq,
 {
   int result;
   uint16_t _usage;
-  opaque buf[128];
+  uint8_t buf[128];
   size_t buf_size = sizeof (buf);
 
   if (crq == NULL)
@@ -1567,7 +1567,7 @@ gnutls_x509_crq_get_basic_constraints (gnutls_x509_crq_t crq,
 {
   int result;
   unsigned int tmp_ca;
-  opaque buf[256];
+  uint8_t buf[256];
   size_t buf_size = sizeof (buf);
 
   if (crq == NULL)

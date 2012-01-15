@@ -69,7 +69,7 @@ static const char *info =
 void
 doit (void)
 {
-  gnutls_datum_t der = { pem, sizeof (pem) };
+  gnutls_datum_t der = { (void*)pem, sizeof (pem) };
   gnutls_x509_crt_t cert;
   gnutls_datum_t out;
   int ret;
@@ -90,7 +90,8 @@ doit (void)
   if (ret < 0)
     fail ("x509_crt_print %d\n", ret);
 
-  if (out.size != strlen (info) || strcmp (out.data, info) != 0)
+  if (out.size != strlen (info) ||
+      strcmp ((char*)out.data, info) != 0)
     fail ("comparison fail (%d/%d)\nexpect: %s\n   got: %.*s\n",
           out.size, (int) strlen (info), info, out.size, out.data);
 

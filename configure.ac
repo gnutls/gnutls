@@ -275,12 +275,10 @@ if test "$gl_gcc_warnings" = yes; then
   done
 
   gl_WARN_ADD([-Wno-missing-field-initializers]) # We need this one
-  gl_WARN_ADD([-Wno-sign-compare])     # Too many warnings for now
   gl_WARN_ADD([-Wno-format-y2k])     # Too many warnings for now
   gl_WARN_ADD([-Wno-suggest-attribute=pure])     # Too many warnings for now
   gl_WARN_ADD([-Wno-suggest-attribute=const])     # Too many warnings for now
   gl_WARN_ADD([-Wno-suggest-attribute=noreturn])     # Too many warnings for now
-  gl_WARN_ADD([-Wno-pointer-sign])     # Too many warnings for now
   gl_WARN_ADD([-Wno-unused-value]) # warnings for things we don't want to get
   gl_WARN_ADD([-Wno-unused-result]) # warnings for things we don't want to get
   gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now

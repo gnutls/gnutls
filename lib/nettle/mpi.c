@@ -68,7 +68,7 @@ wrap_nettle_mpi_print (const bigint_t a, void *buffer, size_t * nbytes,
 
   if (format == GNUTLS_MPI_FORMAT_PGP)
     {
-      opaque *buf = buffer;
+      uint8_t *buf = buffer;
       unsigned int nbits = _gnutls_mpi_get_nbits (a);
       buf[0] = (nbits >> 8) & 0xff;
       buf[1] = (nbits) & 0xff;
@@ -121,7 +121,7 @@ wrap_nettle_mpi_scan (const void *buffer, size_t nbytes,
     }
   else if (format == GNUTLS_MPI_FORMAT_PGP)
     {
-      const opaque *buf = buffer;
+      const uint8_t *buf = buffer;
       size_t size;
 
       if (nbytes < 3)
@@ -417,7 +417,7 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits, unsigned int *q
 {
   mpz_t q, w, r;
   unsigned int p_bytes = nbits / 8;
-  opaque *buffer = NULL;
+  uint8_t *buffer = NULL;
   unsigned int q_bytes, w_bytes, r_bytes, w_bits;
   int ret;
 

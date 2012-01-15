@@ -159,7 +159,8 @@ void
 doit (void)
 {
   gnutls_certificate_credentials_t x509_cred;
-  int ret, i;
+  int ret;
+  unsigned int i;
   gnutls_x509_crt_t issuer;
   gnutls_x509_crt_t list[LIST_SIZE];
   char dn[128];

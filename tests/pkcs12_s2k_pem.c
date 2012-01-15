@@ -275,8 +275,8 @@ main (void)
       if (ret < 0)
         return 1;
 
-      tmp.data = (char *) keys[i].pkcs12key;
-      tmp.size = strlen (tmp.data);
+      tmp.data = (unsigned char *) keys[i].pkcs12key;
+      tmp.size = strlen ((char*)tmp.data);
 
       ret = gnutls_x509_privkey_import_pkcs8 (key, &tmp,
                                               GNUTLS_X509_FMT_PEM,

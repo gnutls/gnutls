@@ -150,7 +150,7 @@ cdk_error_t _cdk_sig_complete (cdk_pkt_signature_t sig, cdk_pkt_seckey_t sk,
 void _cdk_stream_set_compress_algo (cdk_stream_t s, int algo);
 cdk_error_t _cdk_stream_open_mode (const char *file, const char *mode,
                                    cdk_stream_t * ret_s);
-void *_cdk_stream_get_opaque (cdk_stream_t s, int fid);
+void *_cdk_stream_get_uint8_t (cdk_stream_t s, int fid);
 const char *_cdk_stream_get_fname (cdk_stream_t s);
 FILE *_cdk_stream_get_fp (cdk_stream_t s);
 int _cdk_stream_gets (cdk_stream_t s, char *buf, size_t count);

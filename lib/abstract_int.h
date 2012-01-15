@@ -28,6 +28,6 @@ int pubkey_verify_data (gnutls_pk_algorithm_t pk,
 
 
 gnutls_digest_algorithm_t _gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, 
-  const gnutls_pk_params_st* params, int* hash_len);
+  const gnutls_pk_params_st* params, unsigned int* hash_len);
 
 #endif

@@ -227,7 +227,7 @@ static int
 do_device_source_urandom (int init)
 {
   time_t now = gnutls_time (NULL);
-  int read_size = DEVICE_READ_SIZE;
+  unsigned int read_size = DEVICE_READ_SIZE;
 
   if (init)
     {
@@ -292,7 +292,7 @@ static int
 do_device_source_egd (int init)
 {
   time_t now = gnutls_time (NULL);
-  int read_size = DEVICE_READ_SIZE;
+  unsigned int read_size = DEVICE_READ_SIZE;
 
   if (init)
     {

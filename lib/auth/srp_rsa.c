@@ -40,7 +40,7 @@
 #include <gnutls_x509.h>
 
 static int gen_srp_cert_server_kx (gnutls_session_t, gnutls_buffer_st*);
-static int proc_srp_cert_server_kx (gnutls_session_t, opaque *, size_t);
+static int proc_srp_cert_server_kx (gnutls_session_t, uint8_t *, size_t);
 
 const mod_auth_st srp_rsa_auth_struct = {
   "SRP",
@@ -133,7 +133,7 @@ gen_srp_cert_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 }
 
 static int
-proc_srp_cert_server_kx (gnutls_session_t session, opaque * data,
+proc_srp_cert_server_kx (gnutls_session_t session, uint8_t * data,
                          size_t _data_size)
 {
   ssize_t ret;
@@ -142,7 +142,7 @@ proc_srp_cert_server_kx (gnutls_session_t session, opaque * data,
   ssize_t data_size;
   cert_auth_info_t info;
   gnutls_pcert_st peer_cert;
-  opaque *p;
+  uint8_t *p;
 
   ret = _gnutls_proc_srp_server_kx (session, data, _data_size);
   if (ret < 0)

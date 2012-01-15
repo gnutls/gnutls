@@ -28,7 +28,7 @@
 #include <ext/server_name.h>
 
 static int _gnutls_server_name_recv_params (gnutls_session_t session,
-                                            const opaque * data,
+                                            const uint8_t * data,
                                             size_t data_size);
 static int _gnutls_server_name_send_params (gnutls_session_t session,
                                             gnutls_buffer_st* extdata);
@@ -63,7 +63,7 @@ extension_entry_st ext_mod_server_name = {
  */
 static int
 _gnutls_server_name_recv_params (gnutls_session_t session,
-                                 const opaque * data, size_t _data_size)
+                                 const uint8_t * data, size_t _data_size)
 {
   int i;
   const unsigned char *p;
@@ -418,7 +418,8 @@ static int
 _gnutls_server_name_pack (extension_priv_data_t epriv, gnutls_buffer_st * ps)
 {
   server_name_ext_st *priv = epriv.ptr;
-  int i, ret;
+  unsigned int i;
+  int ret;
 
   BUFFER_APPEND_NUM (ps, priv->server_names_size);
   for (i = 0; i < priv->server_names_size; i++)
@@ -435,7 +436,8 @@ _gnutls_server_name_unpack (gnutls_buffer_st * ps,
                             extension_priv_data_t * _priv)
 {
   server_name_ext_st *priv;
-  int i, ret;
+  unsigned int i;
+  int ret;
   extension_priv_data_t epriv;
 
   priv = gnutls_calloc (1, sizeof (*priv));

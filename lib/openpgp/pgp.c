@@ -1073,7 +1073,7 @@ _gnutls_read_pgp_mpi (cdk_packet_t pkt, unsigned int priv, size_t idx,
                       bigint_t * m)
 {
   size_t buf_size = 512;
-  opaque *buf = gnutls_malloc (buf_size);
+  uint8_t *buf = gnutls_malloc (buf_size);
   int err;
   unsigned int max_pub_params = 0;
 

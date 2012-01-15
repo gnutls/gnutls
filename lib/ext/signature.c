@@ -34,7 +34,7 @@
 #include <abstract_int.h>
 
 static int _gnutls_signature_algorithm_recv_params (gnutls_session_t session,
-                                                    const opaque * data,
+                                                    const uint8_t * data,
                                                     size_t data_size);
 static int _gnutls_signature_algorithm_send_params (gnutls_session_t session,
                                                     gnutls_buffer_st * extdata);
@@ -67,11 +67,11 @@ typedef struct
  * by using the setup priorities.
  */
 int
-_gnutls_sign_algorithm_write_params (gnutls_session_t session, opaque * data,
+_gnutls_sign_algorithm_write_params (gnutls_session_t session, uint8_t * data,
                                      size_t max_data_size)
 {
-  opaque *p = data, *len_p;
-  int len, i, j;
+  uint8_t *p = data, *len_p;
+  unsigned int len, i, j;
   const sign_algorithm_st *aid;
 
   if (max_data_size < (session->internals.priorities.sign_algo.algorithms*2) + 2)
@@ -113,9 +113,9 @@ _gnutls_sign_algorithm_write_params (gnutls_session_t session, opaque * data,
  */
 int
 _gnutls_sign_algorithm_parse_data (gnutls_session_t session,
-                                   const opaque * data, size_t data_size)
+                                   const uint8_t * data, size_t data_size)
 {
-  int sig, i;
+  unsigned int sig, i;
   sig_ext_st *priv;
   extension_priv_data_t epriv;
 
@@ -164,7 +164,7 @@ _gnutls_sign_algorithm_parse_data (gnutls_session_t session,
 
 static int
 _gnutls_signature_algorithm_recv_params (gnutls_session_t session,
-                                         const opaque * data,
+                                         const uint8_t * data,
                                          size_t _data_size)
 {
   ssize_t data_size = _data_size;
@@ -250,7 +250,7 @@ _gnutls_session_get_sign_algo (gnutls_session_t session, gnutls_pcert_st* cert)
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
   sig_ext_st *priv;
   extension_priv_data_t epriv;
-  int cert_algo;
+  unsigned int cert_algo;
   
   cert_algo = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
 

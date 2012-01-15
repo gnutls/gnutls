@@ -98,7 +98,7 @@ print_key_id (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert, int idx)
 static void
 print_key_fingerprint (gnutls_buffer_st * str, gnutls_openpgp_crt_t cert)
 {
-  char fpr[128];
+  uint8_t fpr[128];
   size_t fpr_size = sizeof (fpr);
   int err;
   const char* name;
@@ -500,6 +500,7 @@ gnutls_openpgp_crt_print (gnutls_openpgp_crt_t cert,
                           gnutls_datum_t * out)
 {
   gnutls_buffer_st str;
+  int ret;
 
   _gnutls_buffer_init (&str);
 
@@ -514,8 +515,8 @@ gnutls_openpgp_crt_print (gnutls_openpgp_crt_t cert,
 
   _gnutls_buffer_append_data (&str, "\0", 1);
 
-  out->data = str.data;
-  out->size = strlen (str.data);
-
-  return 0;
+  ret = _gnutls_buffer_to_datum( &str, out);
+  if (out->size > 0) out->size--;
+ 
+  return ret;
 }

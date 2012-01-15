@@ -46,8 +46,8 @@ extern void success (const char *format, ...)
   __attribute__ ((format (printf, 1, 2)));
 
 extern void escapeprint (const char *str, size_t len);
-extern void hexprint (const char *str, size_t len);
-extern void binprint (const char *str, size_t len);
+extern void hexprint (const void *str, size_t len);
+extern void binprint (const void *str, size_t len);
 
 /* This must be implemented elsewhere. */
 extern void doit (void);

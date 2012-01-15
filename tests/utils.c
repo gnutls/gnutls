@@ -90,9 +90,10 @@ escapeprint (const char *str, size_t len)
 }
 
 void
-hexprint (const char *str, size_t len)
+hexprint (const void *_str, size_t len)
 {
   size_t i;
+  const char* str = _str;
 
   printf ("\t;; ");
   for (i = 0; i < len; i++)
@@ -107,9 +108,10 @@ hexprint (const char *str, size_t len)
 }
 
 void
-binprint (const char *str, size_t len)
+binprint (const void *_str, size_t len)
 {
   size_t i;
+  const char* str = _str;
 
   printf ("\t;; ");
   for (i = 0; i < len; i++)

@@ -84,7 +84,7 @@ struct cdk_ctx_s
     cdk_keydb_hd_t pub;
     unsigned int close_db:1;
   } db;
-  char *(*passphrase_cb) (void *opaque, const char *prompt);
+  char *(*passphrase_cb) (void *uint8_t, const char *prompt);
   void *passphrase_cb_value;
 };
 

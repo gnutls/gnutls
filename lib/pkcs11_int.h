@@ -245,9 +245,9 @@ pkcs11_init_pin (struct ck_function_list *module,
 ck_rv_t
 pkcs11_set_pin (struct ck_function_list *module,
                 ck_session_handle_t sess,
-                unsigned char *old_pin,
+                const char *old_pin,
                 unsigned long old_len,
-                unsigned char *new_pin,
+                const char *new_pin,
                 unsigned long new_len);
 
 const char *

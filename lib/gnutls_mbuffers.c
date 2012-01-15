@@ -293,7 +293,7 @@ _mbuffer_alloc (size_t payload_size, size_t maximum_size)
     }
 
   /* payload points after the mbuffer_st structure */
-  st->msg.data = (opaque *) st + sizeof (mbuffer_st);
+  st->msg.data = (uint8_t *) st + sizeof (mbuffer_st);
   st->msg.size = payload_size;
   st->maximum_size = maximum_size;
 

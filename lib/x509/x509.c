@@ -83,7 +83,7 @@ _gnutls_x509_crt_cpy (gnutls_x509_crt_t dest, gnutls_x509_crt_t src)
 {
   int ret;
   size_t der_size=0;
-  opaque *der;
+  uint8_t *der;
   gnutls_datum_t tmp;
 
   ret = gnutls_x509_crt_export (src, GNUTLS_X509_FMT_DER, NULL, &der_size);
@@ -178,7 +178,7 @@ gnutls_x509_crt_import (gnutls_x509_crt_t cert,
    */
   if (format == GNUTLS_X509_FMT_PEM)
     {
-      opaque *out;
+      uint8_t *out;
 
       /* Try the first header */
       result =
@@ -551,7 +551,7 @@ gnutls_x509_crt_get_signature (gnutls_x509_crt_t cert,
 int
 gnutls_x509_crt_get_version (gnutls_x509_crt_t cert)
 {
-  opaque version[8];
+  uint8_t version[8];
   int len, result;
 
   if (cert == NULL)
@@ -628,7 +628,7 @@ gnutls_x509_crt_get_expiration_time (gnutls_x509_crt_t cert)
  * This function will return the X.509 certificate's serial number.
  * This is obtained by the X509 Certificate serialNumber field. Serial
  * is not always a 32 or 64bit number. Some CAs use large serial
- * numbers, thus it may be wise to handle it as something opaque.
+ * numbers, thus it may be wise to handle it as something uint8_t.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -903,7 +903,7 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
   int len;
   char nptr[ASN1_MAX_NAME_SIZE];
   int result;
-  opaque choice_type[128];
+  char choice_type[128];
   gnutls_x509_subject_alt_name_t type;
 
   seq++;                        /* 0->1, 1->2 etc */
@@ -960,7 +960,7 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
 
       if (othername_oid)
         {
-          if (len > strlen (XMPP_OID) && strcmp (name, XMPP_OID) == 0)
+          if ((unsigned)len > strlen (XMPP_OID) && strcmp (name, XMPP_OID) == 0)
             type = GNUTLS_SAN_OTHERNAME_XMPP;
         }
       else
@@ -981,7 +981,7 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
               return _gnutls_asn2err (result);
             }
 
-          if (len > strlen (XMPP_OID) && strcmp (oid, XMPP_OID) == 0)
+          if ((unsigned)len > strlen (XMPP_OID) && strcmp (oid, XMPP_OID) == 0)
             {
               ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
               size_t orig_name_size = *name_size;
@@ -1013,7 +1013,7 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
                 }
               asn1_delete_structure (&c2);
 
-              if (len + 1 > orig_name_size)
+              if ((unsigned)len + 1 > orig_name_size)
                 {
                   gnutls_assert ();
                   *name_size = len + 1;
@@ -1065,7 +1065,7 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
       if (is_type_printable (type))
         {
 
-          if (len + 1 > orig_name_size)
+          if ((unsigned)len + 1 > orig_name_size)
             {
               gnutls_assert ();
               (*name_size)++;
@@ -1954,9 +1954,9 @@ get_dn (gnutls_x509_crt_t cert, const char *whom, gnutls_x509_dn_t * dn)
 /**
  * gnutls_x509_crt_get_subject:
  * @cert: should contain a #gnutls_x509_crt_t structure
- * @dn: output variable with pointer to opaque DN.
+ * @dn: output variable with pointer to uint8_t DN.
  *
- * Return the Certificate's Subject DN as an opaque data type.  You
+ * Return the Certificate's Subject DN as an uint8_t data type.  You
  * may use gnutls_x509_dn_get_rdn_ava() to decode the DN. 
  *
  * Note that @dn should be treated as constant. Because points 
@@ -1974,9 +1974,9 @@ gnutls_x509_crt_get_subject (gnutls_x509_crt_t cert, gnutls_x509_dn_t * dn)
 /**
  * gnutls_x509_crt_get_issuer:
  * @cert: should contain a #gnutls_x509_crt_t structure
- * @dn: output variable with pointer to opaque DN
+ * @dn: output variable with pointer to uint8_t DN
  *
- * Return the Certificate's Issuer DN as an opaque data type.  You may
+ * Return the Certificate's Issuer DN as an uint8_t data type.  You may
  * use gnutls_x509_dn_get_rdn_ava() to decode the DN.
  *
  * Note that @dn should be treated as constant. Because points 
@@ -1993,7 +1993,7 @@ gnutls_x509_crt_get_issuer (gnutls_x509_crt_t cert, gnutls_x509_dn_t * dn)
 
 /**
  * gnutls_x509_dn_get_rdn_ava:
- * @dn: input variable with opaque DN pointer
+ * @dn: input variable with uint8_t DN pointer
  * @irdn: index of RDN
  * @iava: index of AVA.
  * @ava: Pointer to structure which will hold output information.
@@ -2109,7 +2109,7 @@ gnutls_x509_crt_get_fingerprint (gnutls_x509_crt_t cert,
                                  gnutls_digest_algorithm_t algo,
                                  void *buf, size_t * buf_size)
 {
-  opaque *cert_buf;
+  uint8_t *cert_buf;
   int cert_buf_size;
   int result;
   gnutls_datum_t tmp;
@@ -2190,7 +2190,7 @@ _gnutls_get_key_id (gnutls_pk_algorithm_t pk, gnutls_pk_params_st * params,
   int ret = 0;
   gnutls_datum_t der = { NULL, 0 };
   const gnutls_digest_algorithm_t hash = GNUTLS_DIG_SHA1;
-  int digest_len = _gnutls_hash_get_algo_len(hash);
+  unsigned int digest_len = _gnutls_hash_get_algo_len(hash);
 
   if (output_data == NULL || *output_data_size < digest_len)
     {
@@ -2286,8 +2286,8 @@ _gnutls_x509_crt_check_revocation (gnutls_x509_crt_t cert,
                                   int crl_list_length,
                                   gnutls_verify_output_function func)
 {
-  opaque serial[128];
-  opaque cert_serial[128];
+  uint8_t serial[128];
+  uint8_t cert_serial[128];
   size_t serial_size, cert_serial_size;
   int ncerts, ret, i, j;
   gnutls_datum_t dn1, dn2;
@@ -3355,7 +3355,7 @@ _gnutls_parse_aia (ASN1_TYPE src,
 	    gnutls_assert ();
 	    return _gnutls_asn2err (result);
 	  }
-	if (len != strlen (oid) + 1 || memcmp (tmpoid, oid, len) != 0)
+	if ((unsigned)len != strlen (oid) + 1 || memcmp (tmpoid, oid, len) != 0)
 	  return GNUTLS_E_UNKNOWN_ALGORITHM;
       }
       /* fall through */
@@ -3479,7 +3479,7 @@ gnutls_x509_crt_get_authority_info_access (gnutls_x509_crt_t crt,
 					   unsigned int seq,
 					   int what,
 					   gnutls_datum_t * data,
-					   int *critical)
+					   unsigned int *critical)
 {
   int ret;
   gnutls_datum_t aia;

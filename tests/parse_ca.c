@@ -60,7 +60,7 @@ doit (void)
 {
   int rc;
   gnutls_certificate_credentials_t cred;
-  gnutls_datum_t ca = { castr, sizeof (castr) };
+  gnutls_datum_t ca = { (unsigned char*)castr, sizeof (castr) };
 
   gnutls_global_init ();
 

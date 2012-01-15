@@ -164,7 +164,7 @@ ASN1_TYPE _gnutls_privkey_decode_ecc_key (const gnutls_datum_t *
                                                 gnutls_x509_privkey_t pkey);
 
 int
-_gnutls_x509_read_ecc_params (opaque * der, int dersize, gnutls_pk_params_st * params);
+_gnutls_x509_read_ecc_params (uint8_t * der, int dersize, gnutls_pk_params_st * params);
 
 int _gnutls_asn1_encode_privkey (gnutls_pk_algorithm_t pk, ASN1_TYPE * c2, gnutls_pk_params_st * params);
 
@@ -191,10 +191,10 @@ int _gnutls_x509_crt_get_extension_oid (gnutls_x509_crt_t cert,
                                         int indx, void *ret,
                                         size_t * ret_size);
 int _gnutls_x509_ext_extract_keyUsage (uint16_t * keyUsage,
-                                       opaque * extnValue, int extnValueLen);
+                                       uint8_t * extnValue, int extnValueLen);
 int _gnutls_x509_ext_extract_basicConstraints (unsigned int *CA,
                                                int *pathLenConstraint,
-                                               opaque * extnValue,
+                                               uint8_t * extnValue,
                                                int extnValueLen);
 int _gnutls_x509_crt_set_extension (gnutls_x509_crt_t cert,
                                     const char *extension_id,
@@ -202,11 +202,11 @@ int _gnutls_x509_crt_set_extension (gnutls_x509_crt_t cert,
                                     unsigned int critical);
 
 int
-_gnutls_x509_ext_extract_number (opaque * number,
+_gnutls_x509_ext_extract_number (uint8_t * number,
                                  size_t * nr_size,
-                                 opaque * extnValue, int extnValueLen);
+                                 uint8_t * extnValue, int extnValueLen);
 int
-_gnutls_x509_ext_gen_number (const opaque * nuber, size_t nr_size,
+_gnutls_x509_ext_gen_number (const uint8_t * nuber, size_t nr_size,
                              gnutls_datum_t * der_ext);
 
 
@@ -231,7 +231,7 @@ int _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
                                             char **policyLanguage,
                                             char **policy,
                                             size_t * sizeof_policy,
-                                            opaque * extnValue,
+                                            uint8_t * extnValue,
                                             int extnValueLen);
 int _gnutls_x509_ext_gen_proxyCertInfo (int pathLenConstraint,
                                         const char *policyLanguage,
@@ -246,10 +246,10 @@ int _gnutls_x509_crq_get_mpis (gnutls_x509_crq_t cert,
 int _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
                                gnutls_pk_params_st * params);
 
-int _gnutls_x509_read_pubkey_params (gnutls_pk_algorithm_t, opaque * der, int dersize,
+int _gnutls_x509_read_pubkey_params (gnutls_pk_algorithm_t, uint8_t * der, int dersize,
                                   gnutls_pk_params_st * params);
 
-int _gnutls_x509_read_pubkey (gnutls_pk_algorithm_t, opaque * der, int dersize,
+int _gnutls_x509_read_pubkey (gnutls_pk_algorithm_t, uint8_t * der, int dersize,
                                   gnutls_pk_params_st * params);
 
 int _gnutls_x509_write_ecc_params (gnutls_pk_params_st * params,
@@ -267,7 +267,7 @@ int _gnutls_x509_write_pubkey (gnutls_pk_algorithm_t, gnutls_pk_params_st * para
 int _gnutls_x509_read_uint (ASN1_TYPE node, const char *value,
                             unsigned int *ret);
 
-int _gnutls_x509_read_der_int (opaque * der, int dersize, bigint_t * out);
+int _gnutls_x509_read_der_int (uint8_t * der, int dersize, bigint_t * out);
 
 int _gnutls_x509_read_int (ASN1_TYPE node, const char *value,
                            bigint_t * ret_mpi);
@@ -321,10 +321,10 @@ typedef struct gnutls_pkcs12_bag_int
 #define KEY_ID_OID "1.2.840.113549.1.9.21"
 
 int
-_gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
+_gnutls_pkcs12_string_to_key (unsigned int id, const uint8_t * salt,
                               unsigned int salt_size, unsigned int iter,
                               const char *pw, unsigned int req_keylen,
-                              opaque * keybuf);
+                              uint8_t * keybuf);
 
 int _gnutls_pkcs7_decrypt_data (const gnutls_datum_t * data,
                                 const char *password, gnutls_datum_t * dec);

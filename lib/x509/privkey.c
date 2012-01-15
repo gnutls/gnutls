@@ -89,7 +89,8 @@ gnutls_x509_privkey_deinit (gnutls_x509_privkey_t key)
 int
 gnutls_x509_privkey_cpy (gnutls_x509_privkey_t dst, gnutls_x509_privkey_t src)
 {
-  int i, ret;
+  unsigned int i;
+  int ret;
 
   if (!src || !dst)
     return GNUTLS_E_INVALID_REQUEST;
@@ -449,7 +450,7 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
    */
   if (format == GNUTLS_X509_FMT_PEM)
     {
-      opaque *out;
+      uint8_t *out;
 
       /* Try the first header */
       result =

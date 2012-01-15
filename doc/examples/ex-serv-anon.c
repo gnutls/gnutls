@@ -19,7 +19,6 @@
  */
 
 
-#define SA struct sockaddr
 #define SOCKET_ERR(err,s) if(err==-1) {perror(s);return(1);}
 #define MAX_BUF 1024
 #define PORT 5556               /* listen to 5556 port */
@@ -68,7 +67,7 @@ main (void)
   int sd, ret;
   struct sockaddr_in sa_serv;
   struct sockaddr_in sa_cli;
-  int client_len;
+  socklen_t client_len;
   char topbuf[512];
   gnutls_session_t session;
   char buffer[MAX_BUF + 1];
@@ -97,7 +96,7 @@ main (void)
   setsockopt (listen_sd, SOL_SOCKET, SO_REUSEADDR, (void *) &optval,
               sizeof (int));
 
-  err = bind (listen_sd, (SA *) & sa_serv, sizeof (sa_serv));
+  err = bind (listen_sd, (struct sockaddr *) & sa_serv, sizeof (sa_serv));
   SOCKET_ERR (err, "bind");
   err = listen (listen_sd, 1024);
   SOCKET_ERR (err, "listen");
@@ -109,7 +108,7 @@ main (void)
     {
       session = initialize_tls_session ();
 
-      sd = accept (listen_sd, (SA *) & sa_cli, &client_len);
+      sd = accept (listen_sd, (struct sockaddr *) & sa_cli, &client_len);
 
       printf ("- connection from %s, port %d\n",
               inet_ntop (AF_INET, &sa_cli.sin_addr, topbuf,

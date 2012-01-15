@@ -105,7 +105,7 @@ encode (char *result, const uint8_t * data, int left)
  */
 #define TOASCII(c) (c < 127 ? asciitable[c] : 0xff)
 inline static int
-decode (uint8_t * result, const opaque * data)
+decode (uint8_t * result, const uint8_t * data)
 {
   uint8_t a1, a2;
   int ret = 3;
@@ -151,14 +151,14 @@ decode (uint8_t * result, const opaque * data)
  */
 int
 _gnutls_fbase64_encode (const char *msg, const uint8_t * data,
-                        int data_size, uint8_t ** result)
+                        size_t data_size, uint8_t ** result)
 {
   int ret, tmp;
   unsigned int i, j;
   char tmpres[4];
   uint8_t *ptr;
-  uint8_t top[80];
-  uint8_t bottom[80];
+  char top[80];
+  char bottom[80];
   int pos, bytes, top_len, bottom_len;
 
   if (msg == NULL || strlen(msg) > 50)
@@ -270,7 +270,7 @@ int
 gnutls_pem_base64_encode (const char *msg, const gnutls_datum_t * data,
                           char *result, size_t * result_size)
 {
-  opaque *ret;
+  uint8_t *ret;
   int size;
 
   size = _gnutls_fbase64_encode (msg, data->data, data->size, &ret);
@@ -314,7 +314,7 @@ gnutls_pem_base64_encode_alloc (const char *msg,
                                 const gnutls_datum_t * data,
                                 gnutls_datum_t * result)
 {
-  opaque *ret;
+  uint8_t *ret;
   int size;
 
   if (result == NULL)
@@ -392,7 +392,7 @@ cpydata (const uint8_t * data, int data_size, uint8_t ** result)
  */
 #define ENDSTR "-----"
 int
-_gnutls_fbase64_decode (const char *header, const opaque * data,
+_gnutls_fbase64_decode (const char *header, const uint8_t * data,
                         size_t data_size, uint8_t ** result)
 {
   int ret;
@@ -505,7 +505,7 @@ gnutls_pem_base64_decode (const char *header,
                           const gnutls_datum_t * b64_data,
                           unsigned char *result, size_t * result_size)
 {
-  opaque *ret;
+  uint8_t *ret;
   int size;
 
   size =
@@ -551,7 +551,7 @@ gnutls_pem_base64_decode_alloc (const char *header,
                                 const gnutls_datum_t * b64_data,
                                 gnutls_datum_t * result)
 {
-  opaque *ret;
+  uint8_t *ret;
   int size;
 
   if (result == NULL)

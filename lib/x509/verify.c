@@ -52,7 +52,7 @@ check_if_same_cert (gnutls_x509_crt_t cert1, gnutls_x509_crt_t cert2)
   {
   NULL, 0};
   int result;
-  opaque serial1[128], serial2[128];
+  uint8_t serial1[128], serial2[128];
   size_t serial1_size, serial2_size;
 
   serial1_size = sizeof (serial1);
@@ -682,9 +682,9 @@ _gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
                                gnutls_pk_algorithm_t pk,
                                gnutls_pk_params_st * issuer_params)
 {
-  opaque digest[MAX_HASH_SIZE];
+  uint8_t digest[MAX_HASH_SIZE];
   gnutls_datum_t decrypted;
-  int digest_size;
+  unsigned int digest_size;
   int ret;
 
   switch (pk)

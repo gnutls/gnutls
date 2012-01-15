@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
@@ -53,7 +54,7 @@ main (void)
 {
   int rc;
   gnutls_certificate_credentials_t crt;
-  gnutls_datum_t crldatum = { crl, strlen (crl) };
+  gnutls_datum_t crldatum = { (uint8_t*)crl, strlen (crl) };
   gnutls_x509_crl_t crl;
 
   rc = gnutls_global_init ();

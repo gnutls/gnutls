@@ -369,7 +369,9 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
                       const gnutls_datum_t * vdata,
                       const gnutls_pk_params_st * pk_params)
 {
-  int ret, hash;
+  int ret;
+  unsigned int hash;
+  unsigned int hash_len;
 
   switch (algo)
     {
@@ -377,7 +379,6 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
       {
         ecc_key priv;
         struct dsa_signature sig;
-        int hash_len;
 
         _ecc_params_to_privkey(pk_params, &priv);
 
@@ -418,7 +419,6 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
         struct dsa_public_key pub;
         struct dsa_private_key priv;
         struct dsa_signature sig;
-        int hash_len;
 
         memset(&priv, 0, sizeof(priv));
         memset(&pub, 0, sizeof(pub));
@@ -550,7 +550,7 @@ _wrap_nettle_pk_verify (gnutls_pk_algorithm_t algo,
                         const gnutls_pk_params_st * pk_params)
 {
   int ret;
-  int hash_len;
+  unsigned int hash_len;
   bigint_t tmp[2] = { NULL, NULL };
 
   switch (algo)
@@ -670,8 +670,8 @@ wrap_nettle_pk_generate_params (gnutls_pk_algorithm_t algo,
                                 unsigned int level /*bits */ ,
                                 gnutls_pk_params_st * params)
 {
-  int ret, i;
-  int q_bits;
+  int ret;
+  unsigned int i, q_bits;
 
   memset(params, 0, sizeof(*params));
 

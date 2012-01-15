@@ -39,8 +39,8 @@
 #include <auth/dh_common.h>
 
 static int gen_anon_server_kx (gnutls_session_t, gnutls_buffer_st*);
-static int proc_anon_client_kx (gnutls_session_t, opaque *, size_t);
-static int proc_anon_server_kx (gnutls_session_t, opaque *, size_t);
+static int proc_anon_client_kx (gnutls_session_t, uint8_t *, size_t);
+static int proc_anon_server_kx (gnutls_session_t, uint8_t *, size_t);
 
 const mod_auth_st anon_auth_struct = {
   "ANON",
@@ -109,7 +109,7 @@ gen_anon_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 
 
 static int
-proc_anon_client_kx (gnutls_session_t session, opaque * data,
+proc_anon_client_kx (gnutls_session_t session, uint8_t * data,
                      size_t _data_size)
 {
   gnutls_anon_server_credentials_t cred;
@@ -145,7 +145,7 @@ proc_anon_client_kx (gnutls_session_t session, opaque * data,
 }
 
 int
-proc_anon_server_kx (gnutls_session_t session, opaque * data,
+proc_anon_server_kx (gnutls_session_t session, uint8_t * data,
                      size_t _data_size)
 {
 

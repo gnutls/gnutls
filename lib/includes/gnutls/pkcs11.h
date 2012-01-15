@@ -287,7 +287,7 @@ gnutls_pkcs11_token_init (const char *token_url,
                           const char *so_pin, const char *label);
 
 int
-gnutls_pkcs11_token_get_mechanism (const char *url, int idx,
+gnutls_pkcs11_token_get_mechanism (const char *url, unsigned int idx,
                                    unsigned long *mechanism);
 
 int gnutls_pkcs11_token_set_pin (const char *token_url,

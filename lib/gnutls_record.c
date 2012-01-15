@@ -269,7 +269,7 @@ session_is_valid (gnutls_session_t session)
  */
 inline static void
 copy_record_version (gnutls_session_t session,
-                     gnutls_handshake_description_t htype, opaque version[2])
+                     gnutls_handshake_description_t htype, uint8_t version[2])
 {
   gnutls_protocol_t lver;
 
@@ -488,7 +488,7 @@ check_recv_type (gnutls_session_t session, content_type_t recv_type)
  */
 static int
 check_buffers (gnutls_session_t session, content_type_t type,
-               opaque * data, int data_size, void* seq)
+               uint8_t * data, int data_size, void* seq)
 {
   if ((type == GNUTLS_APPLICATION_DATA ||
        type == GNUTLS_HANDSHAKE ||
@@ -516,7 +516,7 @@ check_buffers (gnutls_session_t session, content_type_t type,
  */
 inline static int
 record_check_version (gnutls_session_t session,
-                      gnutls_handshake_description_t htype, opaque version[2])
+                      gnutls_handshake_description_t htype, uint8_t version[2])
 {
   if (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO)
     {
@@ -973,7 +973,7 @@ begin:
   if (decrypted == NULL)
     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-  ciphertext = (opaque*)_mbuffer_get_udata_ptr(bufel) + record.header_size;
+  ciphertext = (uint8_t*)_mbuffer_get_udata_ptr(bufel) + record.header_size;
 
   /* decrypt the data we got. 
    */
@@ -1115,7 +1115,7 @@ recv_error:
 ssize_t
 _gnutls_recv_int (gnutls_session_t session, content_type_t type,
                   gnutls_handshake_description_t htype,
-                  opaque * data, size_t data_size, void* seq)
+                  uint8_t * data, size_t data_size, void* seq)
 {
   int ret;
 

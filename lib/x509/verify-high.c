@@ -53,7 +53,7 @@ struct node_st {
 };
 
 struct gnutls_x509_trust_list_st {
-  int size;
+  unsigned int size;
   struct node_st *node;
 };
 
@@ -111,7 +111,7 @@ void
 gnutls_x509_trust_list_deinit(gnutls_x509_trust_list_t list,
                               unsigned int all)
 {
-    int i, j;
+    unsigned int i, j;
 
     if (!list)
         return;
@@ -343,9 +343,10 @@ gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
  */
 static int shorten_clist(gnutls_x509_trust_list_t list,
                          gnutls_x509_crt_t * certificate_list,
-                         int clist_size)
+                         unsigned int clist_size)
 {
-    int i, ret;
+    int ret;
+    unsigned int j, i;
     uint32_t hash;
     gnutls_datum_t dn;
 
@@ -372,8 +373,6 @@ static int shorten_clist(gnutls_x509_trust_list_t list,
      * self-signed E but already removed above), and we trust B, remove
      * B, C and D. */
     for (i = 1; i < clist_size; i++) {
-        int j;
-
         ret = gnutls_x509_crt_get_raw_issuer_dn(certificate_list[i], &dn);
         if (ret < 0) {
             gnutls_assert();
@@ -421,7 +420,8 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
                                       unsigned int flags)
 {
     gnutls_datum_t dn;
-    int ret, i;
+    int ret;
+    unsigned int i;
     uint32_t hash;
 
     ret = gnutls_x509_crt_get_raw_issuer_dn(cert, &dn);
@@ -474,7 +474,8 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
                                   gnutls_verify_output_function func)
 {
     gnutls_datum_t dn;
-    int ret, i;
+    int ret;
+    unsigned int i;
     uint32_t hash;
 
     if (cert_list == NULL || cert_list_size < 1)
@@ -574,7 +575,8 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
                                         gnutls_verify_output_function func)
 {
     gnutls_datum_t dn;
-    int ret, i;
+    int ret;
+    unsigned int i;
     uint32_t hash;
 
     ret = gnutls_x509_crt_get_raw_issuer_dn(cert, &dn);
@@ -626,7 +628,8 @@ _gnutls_trustlist_inlist (gnutls_x509_trust_list_t list,
 			  gnutls_x509_crt_t cert)
 {
   gnutls_datum_t dn;
-  int ret, i;
+  int ret;
+  unsigned int i;
   uint32_t hash;
 
   ret = gnutls_x509_crt_get_raw_dn (cert, &dn);

@@ -125,7 +125,7 @@ static const char *pidfile = _CRYWRAP_PIDFILE; /**< File to log our PID
  */
 static gnutls_certificate_server_credentials cred;
 static gnutls_dh_params dh_params; /**< GNUTLS DH parameters. */
-static gnutls_datum dh_file = { _crywrap_prime_dh_1024, sizeof(_crywrap_prime_dh_1024) }; /**< Diffie Hellman parameters */
+static gnutls_datum dh_file = { (void*)_crywrap_prime_dh_1024, sizeof(_crywrap_prime_dh_1024) }; /**< Diffie Hellman parameters */
 
 /** Bugreport address.
  * Used by the argp suite.
@@ -203,7 +203,7 @@ load_file (const char *file)
   gnutls_datum_t loaded_file = { NULL, 0 };
   size_t length;
 
-  loaded_file.data = read_binary_file (file, &length);
+  loaded_file.data = (void*)read_binary_file (file, &length);
   if (loaded_file.data)
     loaded_file.size = (unsigned int) length;
 

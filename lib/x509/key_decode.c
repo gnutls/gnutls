@@ -30,15 +30,15 @@
 #include <gnutls_num.h>
 #include <gnutls_ecc.h>
 
-static int _gnutls_x509_read_rsa_pubkey (opaque * der, int dersize,
+static int _gnutls_x509_read_rsa_pubkey (uint8_t * der, int dersize,
                                   gnutls_pk_params_st* params);
-static int _gnutls_x509_read_dsa_pubkey (opaque * der, int dersize,
+static int _gnutls_x509_read_dsa_pubkey (uint8_t * der, int dersize,
                                   gnutls_pk_params_st * params);
-static int _gnutls_x509_read_ecc_pubkey (opaque * der, int dersize,
+static int _gnutls_x509_read_ecc_pubkey (uint8_t * der, int dersize,
                                   gnutls_pk_params_st * params);
 
 static int
-_gnutls_x509_read_dsa_params (opaque * der, int dersize, gnutls_pk_params_st * params);
+_gnutls_x509_read_dsa_params (uint8_t * der, int dersize, gnutls_pk_params_st * params);
 
 /*
  * some x509 certificate parsing functions that relate to MPI parameter
@@ -46,7 +46,7 @@ _gnutls_x509_read_dsa_params (opaque * der, int dersize, gnutls_pk_params_st * p
  * Returns 2 parameters (m,e). It does not set params_nr.
  */
 int
-_gnutls_x509_read_rsa_pubkey (opaque * der, int dersize, gnutls_pk_params_st * params)
+_gnutls_x509_read_rsa_pubkey (uint8_t * der, int dersize, gnutls_pk_params_st * params)
 {
   int result;
   ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -97,7 +97,7 @@ _gnutls_x509_read_rsa_pubkey (opaque * der, int dersize, gnutls_pk_params_st * p
  * Returns 2 parameters (m,e). It does not set params_nr.
  */
 int
-_gnutls_x509_read_ecc_pubkey (opaque * der, int dersize, gnutls_pk_params_st * params)
+_gnutls_x509_read_ecc_pubkey (uint8_t * der, int dersize, gnutls_pk_params_st * params)
 {
 /* Eventhough RFC5480 defines the public key to be an ECPoint (i.e. OCTET STRING),
  * it is actually copied in raw there. Why do they use ASN.1 anyway?
@@ -112,7 +112,7 @@ _gnutls_x509_read_ecc_pubkey (opaque * der, int dersize, gnutls_pk_params_st * p
  * params[0-2]. It does NOT set params_nr.
  */
 static int
-_gnutls_x509_read_dsa_params (opaque * der, int dersize, gnutls_pk_params_st * params)
+_gnutls_x509_read_dsa_params (uint8_t * der, int dersize, gnutls_pk_params_st * params)
 {
   int result;
   ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -178,7 +178,7 @@ _gnutls_x509_read_dsa_params (opaque * der, int dersize, gnutls_pk_params_st * p
  * params[0-4]. It does NOT set params_nr.
  */
 int
-_gnutls_x509_read_ecc_params (opaque * der, int dersize, gnutls_pk_params_st * params)
+_gnutls_x509_read_ecc_params (uint8_t * der, int dersize, gnutls_pk_params_st * params)
 {
   int ret;
   ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -238,7 +238,7 @@ cleanup:
 
 }
 
-int _gnutls_x509_read_pubkey (gnutls_pk_algorithm_t algo, opaque * der, int dersize,
+int _gnutls_x509_read_pubkey (gnutls_pk_algorithm_t algo, uint8_t * der, int dersize,
                                   gnutls_pk_params_st * params)
 {
 int ret;
@@ -264,7 +264,7 @@ int ret;
   return ret;
 }
 
-int _gnutls_x509_read_pubkey_params (gnutls_pk_algorithm_t algo, opaque * der, int dersize,
+int _gnutls_x509_read_pubkey_params (gnutls_pk_algorithm_t algo, uint8_t * der, int dersize,
                                   gnutls_pk_params_st * params)
 {
   switch(algo)
@@ -285,7 +285,7 @@ int _gnutls_x509_read_pubkey_params (gnutls_pk_algorithm_t algo, opaque * der, i
  * only sets params[3]
  */
 int
-_gnutls_x509_read_dsa_pubkey (opaque * der, int dersize, gnutls_pk_params_st * params)
+_gnutls_x509_read_dsa_pubkey (uint8_t * der, int dersize, gnutls_pk_params_st * params)
 {
   /* do not set a number */
   params->params_nr = 0;

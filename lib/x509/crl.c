@@ -120,7 +120,7 @@ gnutls_x509_crl_import (gnutls_x509_crl_t crl,
    */
   if (format == GNUTLS_X509_FMT_PEM)
     {
-      opaque *out;
+      uint8_t *out;
 
       result = _gnutls_fbase64_decode (PEM_CRL, data->data, data->size, &out);
 
@@ -353,7 +353,7 @@ gnutls_x509_crl_get_signature (gnutls_x509_crl_t crl,
 
   len = bits / 8;
 
-  if (*sizeof_sig < len)
+  if (*sizeof_sig < (unsigned)len)
     {
       *sizeof_sig = bits / 8;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
@@ -380,7 +380,7 @@ gnutls_x509_crl_get_signature (gnutls_x509_crl_t crl,
 int
 gnutls_x509_crl_get_version (gnutls_x509_crl_t crl)
 {
-  opaque version[8];
+  uint8_t version[8];
   int len, result;
 
   if (crl == NULL)
@@ -661,7 +661,7 @@ _gnutls_x509_crl_cpy (gnutls_x509_crl_t dest, gnutls_x509_crl_t src)
 {
   int ret;
   size_t der_size;
-  opaque *der;
+  uint8_t *der;
   gnutls_datum_t tmp;
 
   ret = gnutls_x509_crl_export (src, GNUTLS_X509_FMT_DER, NULL, &der_size);
@@ -922,7 +922,7 @@ gnutls_x509_crl_get_extension_oid (gnutls_x509_crl_t crl, int indx,
 int
 gnutls_x509_crl_get_extension_info (gnutls_x509_crl_t crl, int indx,
                                     void *oid, size_t * sizeof_oid,
-                                    int *critical)
+                                    unsigned int *critical)
 {
   int result;
   char str_critical[10];

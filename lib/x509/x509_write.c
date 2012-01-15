@@ -318,7 +318,7 @@ gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt,
       int result;
       char oid[MAX_OID_SIZE];
       size_t oid_size;
-      opaque *extensions;
+      uint8_t *extensions;
       size_t extensions_size;
       unsigned int critical;
       gnutls_datum_t ext;
@@ -678,7 +678,7 @@ finish:
  *   and negative error codes indicate that the pathLenConstraints field should
  *   not be present.
  * @policyLanguage: OID describing the language of @policy.
- * @policy: opaque byte array with policy language, can be %NULL
+ * @policy: uint8_t byte array with policy language, can be %NULL
  * @sizeof_policy: size of @policy.
  *
  * This function will set the proxyCertInfo extension.
@@ -864,7 +864,7 @@ gnutls_x509_crt_set_expiration_time (gnutls_x509_crt_t cert, time_t exp_time)
  * This function will set the X.509 certificate's serial number.
  * Serial is not always a 32 or 64bit number.  Some CAs use large
  * serial numbers, thus it may be wise to handle it as something
- * opaque.
+ * uint8_t.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.

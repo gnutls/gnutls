@@ -176,7 +176,7 @@ print_openpgp_info (gnutls_session_t session, const char *hostname,
 
   gnutls_openpgp_crt_t crt;
   const gnutls_datum_t *cert_list;
-  int cert_list_size = 0;
+  unsigned int cert_list_size = 0;
   int hostname_ok = 0;
   int ret;
 
@@ -505,7 +505,7 @@ print_info (gnutls_session_t session, const char *hostname, int insecure)
 
   if (verbose)
     {
-      char id[32];
+      unsigned char id[32];
       size_t id_size = sizeof (id);
       gnutls_session_get_id (session, id, &id_size);
       printf ("- Session ID: %s\n", raw_to_string (id, id_size));

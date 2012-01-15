@@ -40,8 +40,8 @@
 #include <auth/ecdh_common.h>
 
 static int gen_dhe_server_kx (gnutls_session_t, gnutls_buffer_st*);
-static int proc_dhe_server_kx (gnutls_session_t, opaque *, size_t);
-static int proc_dhe_client_kx (gnutls_session_t, opaque *, size_t);
+static int proc_dhe_server_kx (gnutls_session_t, uint8_t *, size_t);
+static int proc_dhe_client_kx (gnutls_session_t, uint8_t *, size_t);
 
 const mod_auth_st ecdhe_ecdsa_auth_struct = {
   "ECDHE_ECDSA",
@@ -249,11 +249,11 @@ cleanup:
 }
 
 static int
-proc_dhe_server_kx (gnutls_session_t session, opaque * data,
+proc_dhe_server_kx (gnutls_session_t session, uint8_t * data,
                     size_t _data_size)
 {
   int sigsize;
-  opaque *sigdata;
+  uint8_t *sigdata;
   gnutls_datum_t vparams, signature;
   int ret;
   cert_auth_info_t info = _gnutls_get_auth_info (session);
@@ -336,7 +336,7 @@ proc_dhe_server_kx (gnutls_session_t session, opaque * data,
 
 
 static int
-proc_dhe_client_kx (gnutls_session_t session, opaque * data,
+proc_dhe_client_kx (gnutls_session_t session, uint8_t * data,
                     size_t _data_size)
 {
   gnutls_certificate_credentials_t cred;

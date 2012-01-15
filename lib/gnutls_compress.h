@@ -44,11 +44,11 @@ typedef struct comp_hd_st
 int _gnutls_comp_init (comp_hd_st*, gnutls_compression_method_t, int d);
 void _gnutls_comp_deinit (comp_hd_st* handle, int d);
 
-int _gnutls_decompress (comp_hd_st* handle, opaque * compressed,
-                        size_t compressed_size, opaque * plain,
+int _gnutls_decompress (comp_hd_st* handle, uint8_t * compressed,
+                        size_t compressed_size, uint8_t * plain,
                         size_t max_plain_size);
-int _gnutls_compress (comp_hd_st*, const opaque * plain, size_t plain_size,
-                      opaque * compressed, size_t max_comp_size);
+int _gnutls_compress (comp_hd_st*, const uint8_t * plain, size_t plain_size,
+                      uint8_t * compressed, size_t max_comp_size);
 
 struct gnutls_compression_entry
 {

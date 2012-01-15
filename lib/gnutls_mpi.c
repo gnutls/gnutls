@@ -46,8 +46,8 @@ _gnutls_mpi_randomize (bigint_t r, unsigned int bits,
   int ret;
   int rem, i;
   bigint_t tmp;
-  char tmpbuf[512];
-  opaque *buf;
+  uint8_t tmpbuf[512];
+  uint8_t *buf;
   int buf_release = 0;
 
   if (size < sizeof (tmpbuf))
@@ -181,7 +181,7 @@ int
 _gnutls_mpi_dprint_lz (const bigint_t a, gnutls_datum_t * dest)
 {
   int ret;
-  opaque *buf = NULL;
+  uint8_t *buf = NULL;
   size_t bytes = 0;
 
   if (dest == NULL || a == NULL)
@@ -210,7 +210,7 @@ int
 _gnutls_mpi_dprint (const bigint_t a, gnutls_datum_t * dest)
 {
   int ret;
-  opaque *buf = NULL;
+  uint8_t *buf = NULL;
   size_t bytes = 0;
 
   if (dest == NULL || a == NULL)
@@ -242,7 +242,7 @@ int
 _gnutls_mpi_dprint_size (const bigint_t a, gnutls_datum_t * dest, size_t size)
 {
   int ret;
-  opaque *buf = NULL;
+  uint8_t *buf = NULL;
   size_t bytes = 0;
   unsigned int i;
 
@@ -286,7 +286,7 @@ int
 _gnutls_x509_read_int (ASN1_TYPE node, const char *value, bigint_t * ret_mpi)
 {
   int result;
-  opaque *tmpstr = NULL;
+  uint8_t *tmpstr = NULL;
   int tmpstr_size;
 
   tmpstr_size = 0;
@@ -330,7 +330,7 @@ int
 _gnutls_x509_write_int (ASN1_TYPE node, const char *value, bigint_t mpi,
                         int lz)
 {
-  opaque *tmpstr;
+  uint8_t *tmpstr;
   size_t s_len;
   int result;
 

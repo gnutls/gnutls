@@ -833,7 +833,7 @@ gnutls_pubkey_import (gnutls_pubkey_t key,
    */
   if (format == GNUTLS_X509_FMT_PEM)
     {
-      opaque *out;
+      uint8_t *out;
 
       /* Try the first header */
       result =
@@ -1473,8 +1473,8 @@ gnutls_pubkey_get_verify_algorithm (gnutls_pubkey_t key,
 int _gnutls_pubkey_compatible_with_sig(gnutls_pubkey_t pubkey, gnutls_protocol_t ver, 
   gnutls_sign_algorithm_t sign)
 {
-int hash_size;
-int hash_algo;
+unsigned int hash_size;
+unsigned int hash_algo;
 
   if (pubkey->pk_algorithm == GNUTLS_PK_DSA)
     {
@@ -1540,8 +1540,8 @@ _pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
 {
   gnutls_mac_algorithm_t hash = GNUTLS_MAC_UNKNOWN;
   int ret;
-  opaque digest[MAX_HASH_SIZE], md[MAX_HASH_SIZE], *cmp;
-  int digest_size;
+  uint8_t digest[MAX_HASH_SIZE], md[MAX_HASH_SIZE], *cmp;
+  unsigned int digest_size;
   digest_hd_st hd;
   gnutls_datum_t decrypted;
 
@@ -1616,8 +1616,8 @@ dsa_verify_hashed_data (const gnutls_datum_t * hash,
                 gnutls_pk_params_st* params)
 {
   gnutls_datum_t digest;
-  gnutls_digest_algorithm_t algo;
-  int hash_len;
+  unsigned int algo;
+  unsigned int hash_len;
 
   algo = _gnutls_dsa_q_to_hash (pk, params, &hash_len);
 
@@ -1645,7 +1645,7 @@ dsa_verify_data (gnutls_pk_algorithm_t pk,
                  gnutls_pk_params_st* params)
 {
   int ret;
-  opaque _digest[MAX_HASH_SIZE];
+  uint8_t _digest[MAX_HASH_SIZE];
   gnutls_datum_t digest;
   digest_hd_st hd;
 
@@ -1749,7 +1749,8 @@ pubkey_verify_data (gnutls_pk_algorithm_t pk,
 }
 
 gnutls_digest_algorithm_t
-_gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* params, int* hash_len)
+_gnutls_dsa_q_to_hash (gnutls_pk_algorithm_t algo, const gnutls_pk_params_st* params, 
+                       unsigned int* hash_len)
 {
   int bits = 0;
   

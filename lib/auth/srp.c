@@ -364,7 +364,7 @@ _gnutls_gen_srp_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
 
 /* just read A and put it to session */
 int
-_gnutls_proc_srp_client_kx (gnutls_session_t session, opaque * data,
+_gnutls_proc_srp_client_kx (gnutls_session_t session, uint8_t * data,
                             size_t _data_size)
 {
   size_t _n_A;
@@ -653,7 +653,7 @@ const gnutls_datum_t gnutls_srp_4096_group_prime = {
 /* Check if G and N are parameters from the SRP draft.
  */
 static int
-check_g_n (const opaque * g, size_t n_g, const opaque * n, size_t n_n)
+check_g_n (const uint8_t * g, size_t n_g, const uint8_t * n, size_t n_n)
 {
 
   if ((n_n == sizeof (srp_params_3072) &&
@@ -807,7 +807,7 @@ error:
 /* receive the key exchange message ( n, g, s, B) 
  */
 int
-_gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
+_gnutls_proc_srp_server_kx (gnutls_session_t session, uint8_t * data,
                             size_t _data_size)
 {
   uint8_t n_s;
@@ -818,7 +818,7 @@ _gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
   const uint8_t *data_s;
   const uint8_t *data_b;
   int i, ret;
-  opaque hd[SRP_MAX_HASH_SIZE];
+  uint8_t hd[SRP_MAX_HASH_SIZE];
   char *username, *password;
   ssize_t data_size = _data_size;
   gnutls_srp_client_credentials_t cred;
@@ -951,7 +951,7 @@ _gnutls_proc_srp_server_kx (gnutls_session_t session, opaque * data,
    * (or the equivalent using bcrypt)
    */
   if ((ret =
-       _gnutls_calc_srp_x (username, password, (opaque *) data_s, n_s,
+       _gnutls_calc_srp_x (username, password, (uint8_t *) data_s, n_s,
                            &_n_g, hd)) < 0)
     {
       gnutls_assert ();

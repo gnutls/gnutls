@@ -35,8 +35,8 @@ _gnutls_record_buffer_get_size (content_type_t type, gnutls_session_t session)
 }
 
 int _gnutls_record_buffer_get (content_type_t type,
-                               gnutls_session_t session, opaque * data,
-                               size_t length, opaque seq[8]);
+                               gnutls_session_t session, uint8_t * data,
+                               size_t length, uint8_t seq[8]);
 ssize_t _gnutls_io_read_buffered (gnutls_session_t, size_t n, content_type_t);
 int _gnutls_io_clear_peeked_data (gnutls_session_t session);
 

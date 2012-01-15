@@ -34,7 +34,7 @@
  */
 
 int
-_gnutls_x509_read_der_int (opaque * der, int dersize, bigint_t * out)
+_gnutls_x509_read_der_int (uint8_t * der, int dersize, bigint_t * out)
 {
   int result;
   ASN1_TYPE spk = ASN1_TYPE_EMPTY;
@@ -246,7 +246,7 @@ int
 _gnutls_x509_read_uint (ASN1_TYPE node, const char *value, unsigned int *ret)
 {
   int len, result;
-  opaque *tmpstr;
+  uint8_t *tmpstr;
 
   len = 0;
   result = asn1_read_value (node, value, NULL, &len);
@@ -297,7 +297,7 @@ _gnutls_x509_read_uint (ASN1_TYPE node, const char *value, unsigned int *ret)
 int
 _gnutls_x509_write_uint32 (ASN1_TYPE node, const char *value, uint32_t num)
 {
-  opaque tmpstr[4];
+  uint8_t tmpstr[4];
   int result;
 
   _gnutls_write_uint32 (num, tmpstr);

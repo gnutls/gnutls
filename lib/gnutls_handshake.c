@@ -64,7 +64,7 @@
 #define FALSE 0
 
 static int _gnutls_server_select_comp_method (gnutls_session_t session,
-                                              opaque * data, int datalen);
+                                              uint8_t * data, int datalen);
 static int
 _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
                                       uint8_t * cipher_suites,
@@ -88,17 +88,17 @@ _gnutls_handshake_hash_buffer_empty (gnutls_session_t session)
 static int
 _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
                                   gnutls_handshake_description_t recv_type,
-                                  opaque * header, uint16_t header_size,
-                                  opaque * dataptr, uint32_t datalen);
+                                  uint8_t * header, uint16_t header_size,
+                                  uint8_t * dataptr, uint32_t datalen);
 
 static int
 _gnutls_handshake_hash_add_sent (gnutls_session_t session,
                                  gnutls_handshake_description_t type,
-                                 opaque * dataptr, uint32_t datalen);
+                                 uint8_t * dataptr, uint32_t datalen);
 
 static int
 _gnutls_recv_hello_verify_request (gnutls_session_t session,
-				   opaque * data, int datalen);
+				   uint8_t * data, int datalen);
 
 
 /* Clears the handshake hash buffers and handles.
@@ -180,7 +180,7 @@ _gnutls_set_client_random (gnutls_session_t session, uint8_t * rnd)
 #define SSL3_SERVER_MSG "SRVR"
 #define SSL_MSG_LEN 4
 static int
-_gnutls_ssl3_finished (gnutls_session_t session, int type, opaque * ret, int sending)
+_gnutls_ssl3_finished (gnutls_session_t session, int type, uint8_t * ret, int sending)
 {
   digest_hd_st td_md5;
   digest_hd_st td_sha;
@@ -247,7 +247,7 @@ static int
 _gnutls_finished (gnutls_session_t session, int type, void *ret, int sending)
 {
   const int siz = TLS_MSG_LEN;
-  opaque concat[MAX_HASH_SIZE + 16 /*MD5 */ ];
+  uint8_t concat[MAX_HASH_SIZE + 16 /*MD5 */ ];
   size_t hash_len;
   const char *mesg;
   int rc, len;
@@ -297,7 +297,7 @@ _gnutls_finished (gnutls_session_t session, int type, void *ret, int sending)
  * and put it to dst.
  */
 int
-_gnutls_tls_create_random (opaque * dst)
+_gnutls_tls_create_random (uint8_t * dst)
 {
   uint32_t tim;
   int ret;
@@ -387,7 +387,7 @@ _gnutls_user_hello_func (gnutls_session_t session,
  * since SSL version 2.0 is not supported).
  */
 static int
-_gnutls_read_client_hello (gnutls_session_t session, opaque * data,
+_gnutls_read_client_hello (gnutls_session_t session, uint8_t * data,
                            int datalen)
 {
   uint8_t session_id_len;
@@ -396,7 +396,7 @@ _gnutls_read_client_hello (gnutls_session_t session, opaque * data,
   gnutls_protocol_t adv_version;
   int neg_version;
   int len = datalen;
-  opaque rnd[GNUTLS_RANDOM_SIZE], *suite_ptr, *comp_ptr, *session_id;
+  uint8_t rnd[GNUTLS_RANDOM_SIZE], *suite_ptr, *comp_ptr, *session_id;
 
   DECR_LEN (len, 2);
 
@@ -598,7 +598,7 @@ static int
 _gnutls_send_finished (gnutls_session_t session, int again)
 {
   mbuffer_st *bufel;
-  opaque *data;
+  uint8_t *data;
   int ret;
   size_t vdata_size = 0;
 
@@ -765,14 +765,14 @@ cleanup:
  * RSA algorithms, PK_DSA if DSS, and PK_ANY for both or PK_NONE for none.
  */
 static int
-server_find_pk_algos_in_ciphersuites (const opaque *
+server_find_pk_algos_in_ciphersuites (const uint8_t *
                                               data, unsigned int datalen,
                                               gnutls_pk_algorithm_t * algos,
                                               size_t* algos_size)
 {
   unsigned int j;
   gnutls_kx_algorithm_t kx;
-  int max = *algos_size;
+  unsigned int max = *algos_size;
 
   if (datalen % 2 != 0)
     {
@@ -800,10 +800,11 @@ server_find_pk_algos_in_ciphersuites (const opaque *
  * it adds the suite to the session and performs some checks.
  */
 int
-_gnutls_server_select_suite (gnutls_session_t session, opaque * data,
+_gnutls_server_select_suite (gnutls_session_t session, uint8_t * data,
                              unsigned int datalen)
 {
-  int i, j, ret, cipher_suites_size;
+  int ret;
+  unsigned int i, j, cipher_suites_size;
   size_t pk_algos_size;
   uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE];
   int retval, err;
@@ -815,7 +816,7 @@ _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
    */
   if (session->internals.priorities.sr != SR_DISABLED)
     {
-      int offset;
+      unsigned int offset;
 
       for (offset = 0; offset < datalen; offset += 2)
         {
@@ -976,7 +977,7 @@ finish:
  */
 static int
 _gnutls_server_select_comp_method (gnutls_session_t session,
-                                   opaque * data, int datalen)
+                                   uint8_t * data, int datalen)
 {
   int x, i, j;
   uint8_t comps[MAX_ALGOS];
@@ -1185,8 +1186,8 @@ _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
 static int
 _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
                                   gnutls_handshake_description_t recv_type,
-                                  opaque * header, uint16_t header_size,
-                                  opaque * dataptr, uint32_t datalen)
+                                  uint8_t * header, uint16_t header_size,
+                                  uint8_t * dataptr, uint32_t datalen)
 {
   int ret;
 
@@ -1219,7 +1220,7 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
 static int
 _gnutls_handshake_hash_add_sent (gnutls_session_t session,
                                  gnutls_handshake_description_t type,
-                                 opaque * dataptr, uint32_t datalen)
+                                 uint8_t * dataptr, uint32_t datalen)
 {
   int ret;
 
@@ -1359,7 +1360,7 @@ cleanup:
  * to the session;
  */
 static int
-_gnutls_client_set_ciphersuite (gnutls_session_t session, opaque suite[2])
+_gnutls_client_set_ciphersuite (gnutls_session_t session, uint8_t suite[2])
 {
   uint8_t z;
   uint8_t cipher_suites[MAX_CIPHERSUITE_SIZE];
@@ -1440,7 +1441,7 @@ _gnutls_client_set_ciphersuite (gnutls_session_t session, opaque suite[2])
 /* This function sets the given comp method to the session.
  */
 static int
-_gnutls_client_set_comp_method (gnutls_session_t session, opaque comp_method)
+_gnutls_client_set_comp_method (gnutls_session_t session, uint8_t comp_method)
 {
   int comp_methods_num;
   uint8_t compression_methods[MAX_ALGOS];
@@ -1485,9 +1486,9 @@ _gnutls_client_set_comp_method (gnutls_session_t session, opaque comp_method)
  */
 static int
 _gnutls_client_check_if_resuming (gnutls_session_t session,
-                                  opaque * session_id, int session_id_len)
+                                  uint8_t * session_id, int session_id_len)
 {
-  opaque buf[2 * TLS_MAX_SESSION_ID_SIZE + 1];
+  char buf[2 * TLS_MAX_SESSION_ID_SIZE + 1];
 
   _gnutls_handshake_log ("HSK[%p]: SessionID length: %d\n", session,
                          session_id_len);
@@ -1539,7 +1540,7 @@ _gnutls_client_check_if_resuming (gnutls_session_t session,
  */
 static int
 _gnutls_read_server_hello (gnutls_session_t session,
-                           opaque * data, int datalen)
+                           uint8_t * data, int datalen)
 {
   uint8_t session_id_len = 0;
   int pos = 0;
@@ -1741,10 +1742,10 @@ static int
 _gnutls_send_client_hello (gnutls_session_t session, int again)
 {
   mbuffer_st *bufel = NULL;
-  opaque *data = NULL;
+  uint8_t *data = NULL;
   int pos = 0, type;
   int datalen = 0, ret = 0;
-  opaque rnd[GNUTLS_RANDOM_SIZE];
+  uint8_t rnd[GNUTLS_RANDOM_SIZE];
   gnutls_protocol_t hver;
   gnutls_buffer_st extdata;
   int rehandshake = 0;
@@ -1948,13 +1949,13 @@ static int
 _gnutls_send_server_hello (gnutls_session_t session, int again)
 {
   mbuffer_st *bufel = NULL;
-  opaque *data = NULL;
+  uint8_t *data = NULL;
   gnutls_buffer_st extdata;
   int pos = 0;
   int datalen, ret = 0;
   uint8_t comp;
   uint8_t session_id_len = session->security_parameters.session_id_size;
-  opaque buf[2 * TLS_MAX_SESSION_ID_SIZE + 1];
+  char buf[2 * TLS_MAX_SESSION_ID_SIZE + 1];
 
   datalen = 0;
 
@@ -2047,7 +2048,7 @@ _gnutls_send_hello (gnutls_session_t session, int again)
  * and internals.compression_method.
  */
 int
-_gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
+_gnutls_recv_hello (gnutls_session_t session, uint8_t * data, int datalen)
 {
   int ret;
 
@@ -2083,7 +2084,7 @@ _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen)
 
 static int
 _gnutls_recv_hello_verify_request (gnutls_session_t session,
-				   opaque * data, int datalen)
+				   uint8_t * data, int datalen)
 {
   ssize_t len = datalen;
   size_t pos = 0;
@@ -2569,7 +2570,7 @@ _gnutls_handshake_client (gnutls_session_t session)
 static ssize_t
 send_change_cipher_spec (gnutls_session_t session, int again)
 {
-  opaque* data;
+  uint8_t* data;
   mbuffer_st * bufel;
   int ret;
   
@@ -2892,7 +2893,7 @@ _gnutls_handshake_common (gnutls_session_t session)
 }
 
 int
-_gnutls_generate_session_id (opaque * session_id, uint8_t * len)
+_gnutls_generate_session_id (uint8_t * session_id, uint8_t * len)
 {
   int ret;
 

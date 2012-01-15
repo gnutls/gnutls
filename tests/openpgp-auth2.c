@@ -168,7 +168,7 @@ doit ()
       ssize_t received;
       pid_t done;
       int status;
-      const gnutls_datum_t p3 = { (char *) pkcs3, strlen (pkcs3) };
+      const gnutls_datum_t p3 = { (void*) pkcs3, strlen (pkcs3) };
 
       if (debug)
         printf ("server process %i (child %i)\n", getpid (), child);

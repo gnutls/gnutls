@@ -37,9 +37,9 @@
 int _gnutls_gen_psk_server_kx (gnutls_session_t session, gnutls_buffer_st* data);
 int _gnutls_gen_psk_client_kx (gnutls_session_t, gnutls_buffer_st*);
 
-int _gnutls_proc_psk_client_kx (gnutls_session_t, opaque *, size_t);
+int _gnutls_proc_psk_client_kx (gnutls_session_t, uint8_t *, size_t);
 
-int _gnutls_proc_psk_server_kx (gnutls_session_t session, opaque * data,
+int _gnutls_proc_psk_server_kx (gnutls_session_t session, uint8_t * data,
                                 size_t _data_size);
 
 const mod_auth_st psk_auth_struct = {
@@ -130,7 +130,7 @@ int ret;
       if (ret)
         return gnutls_assert_val(ret);
       
-      username->data = user_p;
+      username->data = (uint8_t*)user_p;
       username->size = strlen(user_p);
       
       *free = 1;
@@ -147,7 +147,7 @@ int ret;
  * 
  * struct {
  *    select (KeyExchangeAlgorithm) {
- *       opaque psk_identity<0..2^16-1>;
+ *       uint8_t psk_identity<0..2^16-1>;
  *    } exchange_keys;
  * } ClientKeyExchange;
  *
@@ -200,7 +200,7 @@ cleanup:
 /* just read the username from the client key exchange.
  */
 int
-_gnutls_proc_psk_client_kx (gnutls_session_t session, opaque * data,
+_gnutls_proc_psk_client_kx (gnutls_session_t session, uint8_t * data,
                             size_t _data_size)
 {
   ssize_t data_size = _data_size;
@@ -273,7 +273,7 @@ error:
  *     select (KeyExchangeAlgorithm) {
  *         // other cases for rsa, diffie_hellman, etc.
  *         case psk:  // NEW
- *             opaque psk_identity_hint<0..2^16-1>;
+ *             uint8_t psk_identity_hint<0..2^16-1>;
  *     };
  * } ServerKeyExchange;
  *
@@ -300,7 +300,7 @@ _gnutls_gen_psk_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
       return GNUTLS_E_INT_RET_0;
     }
 
-  hint.data = cred->hint;
+  hint.data = (uint8_t*)cred->hint;
   hint.size = strlen (cred->hint);
 
   return _gnutls_buffer_append_data_prefix(data, 16, hint.data, hint.size);
@@ -310,7 +310,7 @@ _gnutls_gen_psk_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 /* just read the hint from the server key exchange.
  */
 int
-_gnutls_proc_psk_server_kx (gnutls_session_t session, opaque * data,
+_gnutls_proc_psk_server_kx (gnutls_session_t session, uint8_t * data,
                             size_t _data_size)
 {
   ssize_t data_size = _data_size;

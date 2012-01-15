@@ -42,7 +42,7 @@
 #include <abstract_int.h>
 
 int _gnutls_gen_rsa_client_kx (gnutls_session_t, gnutls_buffer_st*);
-static int proc_rsa_client_kx (gnutls_session_t, opaque *, size_t);
+static int proc_rsa_client_kx (gnutls_session_t, uint8_t *, size_t);
 
 const mod_auth_st rsa_auth_struct = {
   "RSA",
@@ -70,7 +70,7 @@ _gnutls_get_public_rsa_params (gnutls_session_t session,
   int ret;
   cert_auth_info_t info;
   gnutls_pcert_st peer_cert;
-  int i;
+  unsigned int i;
 
   /* normal non export case */
 
@@ -134,7 +134,7 @@ cleanup:
 }
 
 static int
-proc_rsa_client_kx (gnutls_session_t session, opaque * data,
+proc_rsa_client_kx (gnutls_session_t session, uint8_t * data,
                     size_t _data_size)
 {
   gnutls_datum_t plaintext;

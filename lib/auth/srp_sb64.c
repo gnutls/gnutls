@@ -147,11 +147,11 @@ encode (uint8_t * result, const uint8_t * rdata, int left)
  * The result_size is the return value
  */
 static int
-_gnutls_sbase64_encode (uint8_t * data, size_t data_size, uint8_t ** result)
+_gnutls_sbase64_encode (uint8_t * data, size_t data_size, char ** result)
 {
   unsigned i, j;
   int ret, tmp;
-  opaque tmpres[4];
+  uint8_t tmpres[4];
   int mod = data_size % 3;
 
   ret = mod;
@@ -248,7 +248,7 @@ decode (uint8_t * result, const uint8_t * data)
  * before calling it.
  */
 int
-_gnutls_sbase64_decode (uint8_t * data, size_t idata_size, uint8_t ** result)
+_gnutls_sbase64_decode (char * data, size_t idata_size, uint8_t ** result)
 {
   unsigned i, j;
   int ret, left;
@@ -291,7 +291,7 @@ _gnutls_sbase64_decode (uint8_t * data, size_t idata_size, uint8_t ** result)
   /* rest data */
   for (i = left, j = tmp; i < idata_size; i += 4)
     {
-      tmp = decode (tmpres, &data[i]);
+      tmp = decode (tmpres, (uint8_t*)&data[i]);
       if (tmp < 0)
         {
           gnutls_free ((*result));
@@ -328,23 +328,23 @@ int
 gnutls_srp_base64_encode (const gnutls_datum_t * data, char *result,
                           size_t * result_size)
 {
-  opaque *ret;
+  char *res;
   int size;
 
-  size = _gnutls_sbase64_encode (data->data, data->size, &ret);
+  size = _gnutls_sbase64_encode (data->data, data->size, &res);
   if (size < 0)
     return size;
 
   if (result == NULL || *result_size < (size_t) size)
     {
-      gnutls_free (ret);
+      gnutls_free (res);
       *result_size = size;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
   else
     {
-      memcpy (result, ret, size);
-      gnutls_free (ret);
+      memcpy (result, res, size);
+      gnutls_free (res);
       *result_size = size;
     }
 
@@ -372,21 +372,21 @@ int
 gnutls_srp_base64_encode_alloc (const gnutls_datum_t * data,
                                 gnutls_datum_t * result)
 {
-  opaque *ret;
+  char *res;
   int size;
 
-  size = _gnutls_sbase64_encode (data->data, data->size, &ret);
+  size = _gnutls_sbase64_encode (data->data, data->size, &res);
   if (size < 0)
     return size;
 
   if (result == NULL)
     {
-      gnutls_free (ret);
+      gnutls_free (res);
       return GNUTLS_E_INVALID_REQUEST;
     }
   else
     {
-      result->data = ret;
+      result->data = (uint8_t*)res;
       result->size = size;
     }
 
@@ -414,23 +414,23 @@ int
 gnutls_srp_base64_decode (const gnutls_datum_t * b64_data, char *result,
                           size_t * result_size)
 {
-  opaque *ret;
+  uint8_t *res;
   int size;
 
-  size = _gnutls_sbase64_decode (b64_data->data, b64_data->size, &ret);
+  size = _gnutls_sbase64_decode ((char*)b64_data->data, b64_data->size, &res);
   if (size < 0)
     return size;
 
   if (result == NULL || *result_size < (size_t) size)
     {
-      gnutls_free (ret);
+      gnutls_free (res);
       *result_size = size;
       return GNUTLS_E_SHORT_MEMORY_BUFFER;
     }
   else
     {
-      memcpy (result, ret, size);
-      gnutls_free (ret);
+      memcpy (result, res, size);
+      gnutls_free (res);
       *result_size = size;
     }
 
@@ -457,10 +457,10 @@ int
 gnutls_srp_base64_decode_alloc (const gnutls_datum_t * b64_data,
                                 gnutls_datum_t * result)
 {
-  opaque *ret;
+  uint8_t *ret;
   int size;
 
-  size = _gnutls_sbase64_decode (b64_data->data, b64_data->size, &ret);
+  size = _gnutls_sbase64_decode ((char*)b64_data->data, b64_data->size, &ret);
   if (size < 0)
     return size;
 

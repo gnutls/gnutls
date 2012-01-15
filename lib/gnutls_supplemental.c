@@ -49,7 +49,7 @@
 #include "gnutls_num.h"
 
 typedef int (*supp_recv_func) (gnutls_session_t session,
-                               const opaque * data, size_t data_size);
+                               const uint8_t * data, size_t data_size);
 typedef int (*supp_send_func) (gnutls_session_t session,
                                gnutls_buffer_st * buf);
 
@@ -159,7 +159,7 @@ int
 _gnutls_parse_supplemental (gnutls_session_t session,
                             const uint8_t * data, int datalen)
 {
-  const opaque *p = data;
+  const uint8_t *p = data;
   ssize_t dsize = datalen;
   size_t total_size;
 

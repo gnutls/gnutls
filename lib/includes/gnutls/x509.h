@@ -192,7 +192,7 @@ extern "C"
 						 unsigned int seq,
 						 int what,
 						 gnutls_datum_t * data,
-						 int *critical);
+						 unsigned int *critical);
 
 #define GNUTLS_CRL_REASON_UNUSED 128
 #define GNUTLS_CRL_REASON_KEY_COMPROMISE 64
@@ -508,7 +508,7 @@ extern "C"
 
   int gnutls_x509_crl_get_extension_info (gnutls_x509_crl_t crl, int indx,
                                           void *oid, size_t * sizeof_oid,
-                                          int *critical);
+                                          unsigned int *critical);
 
   int gnutls_x509_crl_get_extension_data (gnutls_x509_crl_t crl, int indx,
                                           void *data, size_t * sizeof_data);

@@ -1369,7 +1369,7 @@ static void
 print_keyid (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
   int err;
-  char buffer[32];
+  unsigned char buffer[32];
   size_t size = sizeof(buffer);
   const char* name;
   char* p;
@@ -1604,6 +1604,7 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
                        gnutls_datum_t * out)
 {
   gnutls_buffer_st str;
+  int ret;
 
   if (format == GNUTLS_CRT_PRINT_FULL
       || format == GNUTLS_CRT_PRINT_UNSIGNED_FULL)
@@ -1619,8 +1620,11 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
       print_other (&str, cert, format == GNUTLS_CRT_PRINT_UNSIGNED_FULL);
 
       _gnutls_buffer_append_data (&str, "\0", 1);
-      out->data = str.data;
-      out->size = strlen (str.data);
+
+      ret = _gnutls_buffer_to_datum( &str, out);
+      if (out->size > 0) out->size--;
+      
+      return ret;
     }
   else if (format == GNUTLS_CRT_PRINT_ONELINE)
     {
@@ -1629,16 +1633,17 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
       print_oneline (&str, cert);
 
       _gnutls_buffer_append_data (&str, "\0", 1);
-      out->data = str.data;
-      out->size = strlen (str.data);
+
+      ret = _gnutls_buffer_to_datum( &str, out);
+      if (out->size > 0) out->size--;
+      
+      return ret;
     }
   else
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
-
-  return 0;
 }
 
 #ifdef ENABLE_PKI
@@ -1857,7 +1862,7 @@ print_crl (gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
 
     for (j = 0; j < num; j++)
       {
-        char serial[128];
+        unsigned char serial[128];
         size_t serial_size = sizeof (serial);
         int err;
         time_t tim;
@@ -1960,6 +1965,7 @@ gnutls_x509_crl_print (gnutls_x509_crl_t crl,
                        gnutls_datum_t * out)
 {
   gnutls_buffer_st str;
+  int ret;
 
   _gnutls_buffer_init (&str);
 
@@ -1969,10 +1975,11 @@ gnutls_x509_crl_print (gnutls_x509_crl_t crl,
   print_crl (&str, crl, format == GNUTLS_CRT_PRINT_UNSIGNED_FULL);
 
   _gnutls_buffer_append_data (&str, "\0", 1);
-  out->data = str.data;
-  out->size = strlen (str.data);
-
-  return 0;
+  
+  ret = _gnutls_buffer_to_datum( &str, out);
+  if (out->size > 0) out->size--;
+ 
+  return ret;
 }
 
 static void
@@ -2220,7 +2227,7 @@ print_crq_other (gnutls_buffer_st * str, gnutls_x509_crq_t crq)
 {
   int err;
   size_t size = 0;
-  char *buffer = NULL;
+  unsigned char *buffer = NULL;
 
   err = gnutls_x509_crq_get_key_id (crq, 0, buffer, &size);
   if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
@@ -2274,6 +2281,7 @@ gnutls_x509_crq_print (gnutls_x509_crq_t crq,
                        gnutls_datum_t * out)
 {
   gnutls_buffer_st str;
+  int ret;
 
   _gnutls_buffer_init (&str);
 
@@ -2287,10 +2295,11 @@ gnutls_x509_crq_print (gnutls_x509_crq_t crq,
   print_crq_other (&str, crq);
 
   _gnutls_buffer_append_data (&str, "\0", 1);
-  out->data = str.data;
-  out->size = strlen (str.data);
 
-  return 0;
+  ret = _gnutls_buffer_to_datum( &str, out);
+  if (out->size > 0) out->size--;
+ 
+  return ret;
 }
 
 #endif /* ENABLE_PKI */

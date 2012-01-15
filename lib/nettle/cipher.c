@@ -217,7 +217,7 @@ static int
 wrap_nettle_cipher_setkey (void *_ctx, const void *key, size_t keysize)
 {
   struct nettle_cipher_ctx *ctx = _ctx;
-  opaque des_key[DES3_KEY_SIZE];
+  uint8_t des_key[DES3_KEY_SIZE];
 
   switch (ctx->algo)
     {

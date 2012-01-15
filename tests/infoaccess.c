@@ -69,7 +69,7 @@ static char cert_with_aia_data[] =
   "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t cert_with_aia = {
-  cert_with_aia_data, sizeof (cert_with_aia_data)
+  (void*)cert_with_aia_data, sizeof (cert_with_aia_data)
 };
 
 void
@@ -78,7 +78,7 @@ doit (void)
   gnutls_x509_crt_t crt;
   int ret;
   gnutls_datum_t data;
-  int critical;
+  unsigned int critical;
 
   ret = gnutls_global_init ();
   if (ret < 0)

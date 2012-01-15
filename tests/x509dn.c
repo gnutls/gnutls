@@ -30,11 +30,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-#if !defined(_WIN32)
-#include <netinet/in.h>
 #include <sys/socket.h>
-#include <sys/wait.h>
-#include <arpa/inet.h>
+#if !defined(_WIN32)
+# include <netinet/in.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
@@ -151,7 +151,7 @@ cert_callback (gnutls_session_t session,
             success ("client: got RDN 0.\n");
 
           if (val.value.size == strlen (EXPECT_RDN0)
-              && strncmp (val.value.data, EXPECT_RDN0, val.value.size) == 0)
+              && strncmp ((char*)val.value.data, EXPECT_RDN0, val.value.size) == 0)
             {
               if (debug)
                 success ("client: RND 0 correct.\n");
@@ -321,7 +321,7 @@ static gnutls_dh_params_t dh_params;
 static int
 generate_dh_params (void)
 {
-  const gnutls_datum_t p3 = { (char *) pkcs3, strlen (pkcs3) };
+  const gnutls_datum_t p3 = { (void *) pkcs3, strlen (pkcs3) };
   /* Generate Diffie-Hellman parameters - for use with DHE
    * kx algorithms. These should be discarded and regenerated
    * once a day, once a week or once a month. Depending on the
@@ -335,7 +335,7 @@ int err, listen_sd, i;
 int sd, ret;
 struct sockaddr_in sa_serv;
 struct sockaddr_in sa_cli;
-int client_len;
+socklen_t client_len;
 char topbuf[512];
 gnutls_session_t session;
 char buffer[MAX_BUF + 1];

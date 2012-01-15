@@ -47,7 +47,7 @@ _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
 {
   unsigned int i, pad;
   int ret;
-  opaque *edata, *ps;
+  uint8_t *edata, *ps;
   size_t k, psize;
   size_t mod_bits;
   gnutls_datum_t to_encrypt, encrypted;
@@ -447,7 +447,7 @@ _gnutls_decode_ber_rs (const gnutls_datum_t * sig_value, bigint_t * r,
 
 int _gnutls_pk_params_copy (gnutls_pk_params_st * dst, const gnutls_pk_params_st * src)
 {
-  int i, j;
+  unsigned int i, j;
   dst->params_nr = 0;
 
   if (src == NULL || src->params_nr == 0)

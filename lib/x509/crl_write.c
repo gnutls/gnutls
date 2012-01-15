@@ -283,7 +283,7 @@ gnutls_x509_crl_set_crt (gnutls_x509_crl_t crl, gnutls_x509_crt_t crt,
                          time_t revocation_time)
 {
   int ret;
-  opaque serial[128];
+  uint8_t serial[128];
   size_t serial_size;
 
   if (crl == NULL || crt == NULL)

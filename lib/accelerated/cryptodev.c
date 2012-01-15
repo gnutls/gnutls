@@ -48,8 +48,8 @@ struct cryptodev_ctx
 {
   struct session_op sess;
   struct crypt_op cryp;
-  opaque iv[EALG_MAX_BLOCK_LEN];
-  opaque key[CRYPTO_CIPHER_MAX_KEY_LEN];
+  uint8_t iv[EALG_MAX_BLOCK_LEN];
+  uint8_t key[CRYPTO_CIPHER_MAX_KEY_LEN];
   int cfd;
 };
 

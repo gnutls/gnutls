@@ -220,13 +220,13 @@ _gnutls_cert_get_issuer_dn (gnutls_pcert_st * cert, gnutls_datum_t * odn)
  */
 static int
 _find_x509_cert (const gnutls_certificate_credentials_t cred,
-                 opaque * _data, size_t _data_size,
+                 uint8_t * _data, size_t _data_size,
                  const gnutls_pk_algorithm_t * pk_algos,
                  int pk_algos_length, int *indx)
 {
   unsigned size;
   gnutls_datum_t odn = { NULL, 0 };
-  opaque *data = _data;
+  uint8_t *data = _data;
   ssize_t data_size = _data_size;
   unsigned i, j;
   int result, cert_pk;
@@ -331,7 +331,7 @@ _find_openpgp_cert (const gnutls_certificate_credentials_t cred,
  * certificate request packet.
  */
 static int
-get_issuers_num (gnutls_session_t session, opaque * data, ssize_t data_size)
+get_issuers_num (gnutls_session_t session, uint8_t * data, ssize_t data_size)
 {
   int issuers_dn_len = 0, result;
   unsigned size;
@@ -382,7 +382,7 @@ error:
 static int
 get_issuers (gnutls_session_t session,
              gnutls_datum_t * issuers_dn, int issuers_len,
-             opaque * data, size_t data_size)
+             uint8_t * data, size_t data_size)
 {
   int i;
   unsigned size;
@@ -679,13 +679,13 @@ cleanup:
  */
 static int
 _select_client_cert (gnutls_session_t session,
-                     opaque * _data, size_t _data_size,
+                     uint8_t * _data, size_t _data_size,
                      gnutls_pk_algorithm_t * pk_algos, int pk_algos_length)
 {
   int result;
   int indx = -1;
   gnutls_certificate_credentials_t cred;
-  opaque *data = _data;
+  uint8_t *data = _data;
   ssize_t data_size = _data_size;
   int issuers_dn_length;
   gnutls_datum_t *issuers_dn = NULL;
@@ -1062,10 +1062,10 @@ _gnutls_gen_cert_server_certificate (gnutls_session_t session,
 #define CLEAR_CERTS for(x=0;x<peer_certificate_list_size;x++) gnutls_pcert_deinit(&peer_certificate_list[x])
 static int
 _gnutls_proc_x509_server_certificate (gnutls_session_t session,
-                                      opaque * data, size_t data_size)
+                                      uint8_t * data, size_t data_size)
 {
   int size, len, ret;
-  opaque *p = data;
+  uint8_t *p = data;
   cert_auth_info_t info;
   gnutls_certificate_credentials_t cred;
   ssize_t dsize = data_size;
@@ -1203,10 +1203,10 @@ cleanup:
 #ifdef ENABLE_OPENPGP
 static int
 _gnutls_proc_openpgp_server_certificate (gnutls_session_t session,
-                                         opaque * data, size_t data_size)
+                                         uint8_t * data, size_t data_size)
 {
   int size, ret, len;
-  opaque *p = data;
+  uint8_t *p = data;
   cert_auth_info_t info;
   gnutls_certificate_credentials_t cred;
   ssize_t dsize = data_size;
@@ -1402,7 +1402,7 @@ cleanup:
 
 int
 _gnutls_proc_certificate (gnutls_session_t session,
-                                      opaque * data, size_t data_size)
+                                      uint8_t * data, size_t data_size)
 {
   int ret;
   gnutls_certificate_credentials_t cred;
@@ -1465,11 +1465,11 @@ _gnutls_check_supported_sign_algo (CertificateSigType algo)
 }
 
 int
-_gnutls_proc_cert_cert_req (gnutls_session_t session, opaque * data,
+_gnutls_proc_cert_cert_req (gnutls_session_t session, uint8_t * data,
                             size_t data_size)
 {
   int size, ret;
-  opaque *p;
+  uint8_t *p;
   gnutls_certificate_credentials_t cred;
   ssize_t dsize;
   int i;
@@ -1655,11 +1655,11 @@ cleanup:
 
 int
 _gnutls_proc_cert_client_cert_vrfy (gnutls_session_t session,
-                                    opaque * data, size_t data_size)
+                                    uint8_t * data, size_t data_size)
 {
   int size, ret;
   ssize_t dsize = data_size;
-  opaque *pdata = data;
+  uint8_t *pdata = data;
   gnutls_datum_t sig;
   cert_auth_info_t info = _gnutls_get_auth_info (session);
   gnutls_pcert_st peer_cert;
@@ -2140,7 +2140,7 @@ _gnutls_server_select_cert (gnutls_session_t session,
 
   /* Otherwise... */
   
-  get_server_name(session, server_name, sizeof(server_name));
+  get_server_name(session, (unsigned char*)server_name, sizeof(server_name));
 
   idx = -1;                     /* default is use no certificate */
 

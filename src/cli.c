@@ -123,7 +123,7 @@ load_file (const char *file)
   gnutls_datum_t loaded_file = { NULL, 0 };
   size_t length;
 
-  loaded_file.data = read_binary_file (file, &length);
+  loaded_file.data = (void*)read_binary_file (file, &length);
   if (loaded_file.data)
     loaded_file.size = (unsigned int) length;
 
@@ -171,7 +171,8 @@ static void
 load_keys (void)
 {
   unsigned int crt_num;
-  int ret, i;
+  int ret;
+  unsigned int i;
   gnutls_datum_t data = { NULL, 0 };
   gnutls_x509_crt_t crt_list[MAX_CRT];
 #ifdef ENABLE_PKCS11
@@ -1156,7 +1157,7 @@ static int
 psk_callback (gnutls_session_t session, char **username, gnutls_datum_t * key)
 {
   const char *hint = gnutls_psk_client_get_hint (session);
-  unsigned char *rawkey;
+  char *rawkey;
   char *passwd;
   int ret;
   size_t res_size;
@@ -1203,7 +1204,7 @@ psk_callback (gnutls_session_t session, char **username, gnutls_datum_t * key)
       return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
     }
 
-  tmp.data = passwd;
+  tmp.data = (void*)passwd;
   tmp.size = strlen (passwd);
 
   res_size = tmp.size / 2 + 1;
@@ -1220,7 +1221,7 @@ psk_callback (gnutls_session_t session, char **username, gnutls_datum_t * key)
       return ret;
     }
 
-  key->data = rawkey;
+  key->data = (void*)rawkey;
   key->size = res_size;
 
   if (info.debug)

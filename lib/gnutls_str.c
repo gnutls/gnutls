@@ -355,7 +355,7 @@ _gnutls_buffer_escape (gnutls_buffer_st * dest, int all,
 {
   int rv = -1;
   char t[5];
-  int pos = 0;
+  unsigned int pos = 0;
 
   while (pos < dest->length)
     {
@@ -390,7 +390,7 @@ int
 _gnutls_buffer_unescape (gnutls_buffer_st * dest)
 {
   int rv = -1;
-  int pos = 0;
+  unsigned int pos = 0;
 
   while (pos < dest->length)
     {
@@ -430,7 +430,7 @@ _gnutls_bin2hex (const void *_old, size_t oldlen,
                  char *buffer, size_t buffer_size, const char *separator)
 {
   unsigned int i, j;
-  const opaque *old = _old;
+  const uint8_t *old = _old;
   int step = 2;
   const char empty[] = "";
 
@@ -476,17 +476,17 @@ _gnutls_bin2hex (const void *_old, size_t oldlen,
  **/
 int
 gnutls_hex2bin (const char *hex_data,
-                size_t hex_size, char *bin_data, size_t * bin_size)
+                size_t hex_size, void *bin_data, size_t * bin_size)
 {
-  return _gnutls_hex2bin (hex_data, (int) hex_size, bin_data, bin_size);
+  return _gnutls_hex2bin (hex_data, hex_size, (void*)bin_data, bin_size);
 }
 
 int
-_gnutls_hex2bin (const opaque * hex_data, int hex_size, opaque * bin_data,
+_gnutls_hex2bin (const char * hex_data, size_t hex_size, uint8_t * bin_data,
                  size_t * bin_size)
 {
-  int i, j;
-  opaque hex2_data[3];
+  unsigned int i, j;
+  uint8_t hex2_data[3];
   unsigned long val;
 
   hex2_data[2] = 0;
@@ -578,7 +578,7 @@ _gnutls_hostname_compare (const char *certname,
 int
 _gnutls_buffer_append_prefix (gnutls_buffer_st * buf, int pfx_size, size_t data_size)
 {
-  opaque ss[4];
+  uint8_t ss[4];
 
   if (pfx_size == 32)
     {
@@ -732,24 +732,26 @@ _gnutls_buffer_pop_data_prefix (gnutls_buffer_st * buf, void *data,
 
 void
 _gnutls_buffer_hexprint (gnutls_buffer_st * str,
-			 const char *data, size_t len)
+			 const void *_data, size_t len)
 {
   size_t j;
+  const unsigned char* data = _data;
 
   if (len == 0)
     _gnutls_buffer_append_str (str, "00");
   else
     {
       for (j = 0; j < len; j++)
-        _gnutls_buffer_append_printf (str, "%.2x", (unsigned char) data[j]);
+        _gnutls_buffer_append_printf (str, "%.2x", (unsigned) data[j]);
     }
 }
 
 void
-_gnutls_buffer_hexdump (gnutls_buffer_st * str, const char *data, size_t len,
+_gnutls_buffer_hexdump (gnutls_buffer_st * str, const void *_data, size_t len,
 			const char *spc)
 {
   size_t j;
+  const unsigned char* data = _data;
 
   if (spc)
     _gnutls_buffer_append_str (str, spc);
@@ -757,14 +759,14 @@ _gnutls_buffer_hexdump (gnutls_buffer_st * str, const char *data, size_t len,
     {
       if (((j + 1) % 16) == 0)
         {
-          _gnutls_buffer_append_printf (str, "%.2x\n", (unsigned char) data[j]);
+          _gnutls_buffer_append_printf (str, "%.2x\n", (unsigned)data[j]);
           if (spc && j != (len - 1))
             _gnutls_buffer_append_str (str, spc);
         }
       else if (j == (len - 1))
-        _gnutls_buffer_append_printf (str, "%.2x", (unsigned char) data[j]);
+        _gnutls_buffer_append_printf (str, "%.2x", (unsigned)data[j]);
       else
-        _gnutls_buffer_append_printf (str, "%.2x:", (unsigned char) data[j]);
+        _gnutls_buffer_append_printf (str, "%.2x:", (unsigned)data[j]);
     }
   if ((j % 16) != 0)
     _gnutls_buffer_append_str (str, "\n");

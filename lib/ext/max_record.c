@@ -31,7 +31,7 @@
 #include <ext/max_record.h>
 
 static int _gnutls_max_record_recv_params (gnutls_session_t session,
-                                           const opaque * data,
+                                           const uint8_t * data,
                                            size_t data_size);
 static int _gnutls_max_record_send_params (gnutls_session_t session,
   gnutls_buffer_st* extdata);
@@ -72,7 +72,7 @@ extension_entry_st ext_mod_max_record_size = {
 
 static int
 _gnutls_max_record_recv_params (gnutls_session_t session,
-                                const opaque * data, size_t _data_size)
+                                const uint8_t * data, size_t _data_size)
 {
   ssize_t new_size;
   ssize_t data_size = _data_size;

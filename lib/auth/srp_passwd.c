@@ -49,7 +49,7 @@ pwd_put_values (SRP_PWD_ENTRY * entry, char *str)
 {
   char *p;
   int len, ret;
-  opaque *verifier;
+  uint8_t *verifier;
   size_t verifier_size;
   int indx;
 
@@ -139,7 +139,7 @@ pwd_put_values2 (SRP_PWD_ENTRY * entry, char *str)
 {
   char *p;
   int len;
-  opaque *tmp;
+  uint8_t *tmp;
   int ret;
 
   p = strrchr (str, ':');       /* we have g */

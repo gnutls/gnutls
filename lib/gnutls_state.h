@@ -76,9 +76,9 @@ int _gnutls_session_is_psk (gnutls_session_t session);
 int _gnutls_openpgp_send_fingerprint (gnutls_session_t session);
 
 int _gnutls_PRF (gnutls_session_t session,
-                 const opaque * secret, unsigned int secret_size,
+                 const uint8_t * secret, unsigned int secret_size,
                  const char *label, int label_size,
-                 const opaque * seed, int seed_size,
+                 const uint8_t * seed, int seed_size,
                  int total_bytes, void *ret);
 
 #define DEFAULT_CERT_TYPE GNUTLS_CRT_X509

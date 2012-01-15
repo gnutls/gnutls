@@ -46,7 +46,7 @@ struct gnutls_pkcs11_provider_s
   unsigned long nslots;
   ck_slot_id_t *slots;
   struct ck_info info;
-  int initialized;
+  unsigned int initialized;
 };
 
 struct flags_find_data_st
@@ -71,8 +71,8 @@ struct crt_find_data_st
 
 
 static struct gnutls_pkcs11_provider_s providers[MAX_PROVIDERS];
-static int active_providers = 0;
-static int initialized_registered = 0;
+static unsigned int active_providers = 0;
+static unsigned int initialized_registered = 0;
 
 static gnutls_pkcs11_pin_callback_t pin_func;
 static void *pin_data;
@@ -181,7 +181,7 @@ static int
 pkcs11_add_module (const char *name, struct ck_function_list *module)
 {
   struct ck_info info;
-  int i;
+  unsigned int i;
 
   if (active_providers >= MAX_PROVIDERS)
     {
@@ -323,7 +323,7 @@ pkcs11_get_info (struct p11_kit_uri *info,
 {
   struct ck_attribute *attr = NULL;
   struct ck_version *version = NULL;
-  const char *str = NULL;
+  const uint8_t *str = NULL;
   size_t str_max = 0;
   int terminate = 0;
   int hexify = 0;
@@ -389,7 +389,7 @@ pkcs11_get_info (struct p11_kit_uri *info,
     }
   else if (str != NULL)
     {
-      data = str;
+      data = (void*)str;
       length = p11_kit_space_strlen (str, str_max);
       terminate = 1;
     }
@@ -575,7 +575,7 @@ gnutls_pkcs11_init (unsigned int flags, const char *deprecated_config_file)
 void
 gnutls_pkcs11_deinit (void)
 {
-  int i;
+  unsigned int i;
 
   init--;
   if (init > 0)
@@ -845,7 +845,7 @@ int
 pkcs11_find_slot (struct ck_function_list ** module, ck_slot_id_t * slot,
                   struct p11_kit_uri *info, struct token_info *_tinfo)
 {
-  int x, z;
+  unsigned int x, z;
 
   for (x = 0; x < active_providers; x++)
     {
@@ -941,7 +941,8 @@ _pkcs11_traverse_tokens (find_func_t find_func, void *input,
                          struct p11_kit_uri *info, unsigned int flags)
 {
   ck_rv_t rv;
-  int found = 0, x, z, ret;
+  unsigned int found = 0, x, z;
+  int ret;
   ck_session_handle_t pks = 0;
   struct ck_function_list *module = NULL;
 
@@ -1116,8 +1117,8 @@ static int read_pkcs11_pubkey(struct ck_function_list *module,
                               ck_key_type_t key_type, gnutls_datum_t * pubkey)
 {
   struct ck_attribute a[4];
-  opaque tmp1[2048];
-  opaque tmp2[2048];
+  uint8_t tmp1[2048];
+  uint8_t tmp2[2048];
   int ret;
 
       switch (key_type)
@@ -1369,12 +1370,12 @@ find_obj_url (struct ck_function_list *module, ck_session_handle_t pks,
   struct ck_attribute a[4];
   struct ck_attribute *attr;
   ck_object_class_t class = -1;
-  ck_certificate_type_t type = -1;
+  ck_certificate_type_t type = (ck_certificate_type_t)-1;
   ck_rv_t rv;
   ck_object_handle_t obj;
   unsigned long count, a_vals;
   int found = 0, ret;
-  opaque *cert_data = NULL;
+  uint8_t *cert_data = NULL;
   char label_tmp[PKCS11_LABEL_SIZE];
 
   if (info == NULL)
@@ -1423,7 +1424,7 @@ find_obj_url (struct ck_function_list *module, ck_session_handle_t pks,
       a_vals++;
     }
 
-  if (type != -1)
+  if (type != (ck_certificate_type_t)-1)
     {
       a[a_vals].type = CKA_CERTIFICATE_TYPE;
       a[a_vals].value = &type;
@@ -1670,7 +1671,7 @@ gnutls_pkcs11_token_get_info (const char *url,
                               void *output, size_t * output_size)
 {
   struct p11_kit_uri *info = NULL;
-  const char *str;
+  const uint8_t *str;
   size_t str_max;
   size_t len;
   int ret;
@@ -2150,18 +2151,18 @@ find_objs (struct ck_function_list * module, ck_session_handle_t pks,
   struct crt_find_data_st *find_data = input;
   struct ck_attribute a[4];
   struct ck_attribute *attr;
-  ck_object_class_t class = -1;
-  ck_certificate_type_t type = -1;
+  ck_object_class_t class = (ck_object_class_t)-1;
+  ck_certificate_type_t type = (ck_certificate_type_t)-1;
   unsigned int trusted;
   ck_rv_t rv;
   ck_object_handle_t obj;
   unsigned long count;
-  opaque *cert_data;
+  uint8_t *cert_data;
   char certid_tmp[PKCS11_ID_SIZE];
   char label_tmp[PKCS11_LABEL_SIZE];
-  int ret, i;
+  int ret;
   struct pkey_list plist;       /* private key holder */
-  int tot_values = 0;
+  unsigned int i, tot_values = 0;
 
   if (info == NULL)
     {                           /* final call */
@@ -2268,14 +2269,14 @@ find_objs (struct ck_function_list * module, ck_session_handle_t pks,
     }
   else if (find_data->flags == GNUTLS_PKCS11_OBJ_ATTR_ALL)
     {
-      if (class != -1)
+      if (class != (ck_object_class_t)-1)
         {
           a[tot_values].type = CKA_CLASS;
           a[tot_values].value = &class;
           a[tot_values].value_len = sizeof class;
           tot_values++;
         }
-      if (type != -1)
+      if (type != (ck_certificate_type_t)-1)
         {
           a[tot_values].type = CKA_CERTIFICATE_TYPE;
           a[tot_values].value = &type;
@@ -2594,7 +2595,7 @@ gnutls_x509_crt_list_import_pkcs11 (gnutls_x509_crt_t * certs,
                                     gnutls_pkcs11_obj_t * const objs,
                                     unsigned int flags)
 {
-  int i, j;
+  unsigned int i, j;
   int ret;
 
   for (i = 0; i < cert_max; i++)
@@ -2711,7 +2712,7 @@ gnutls_pkcs11_token_get_flags (const char *url, unsigned int *flags)
  * Since: 2.12.0
  **/
 int
-gnutls_pkcs11_token_get_mechanism (const char *url, int idx,
+gnutls_pkcs11_token_get_mechanism (const char *url, unsigned int idx,
                                    unsigned long *mechanism)
 {
   int ret;
@@ -2969,12 +2970,12 @@ pkcs11_init_pin (struct ck_function_list *module,
 ck_rv_t
 pkcs11_set_pin (struct ck_function_list *module,
                 ck_session_handle_t sess,
-                unsigned char *old_pin,
+                const char *old_pin,
                 unsigned long old_len,
-                unsigned char *new_pin,
+                const char *new_pin,
                 unsigned long new_len)
 {
-	return (module)->C_SetPIN (sess, old_pin, old_len, new_pin, new_len);
+	return (module)->C_SetPIN (sess, (uint8_t*)old_pin, old_len, (uint8_t*)new_pin, new_len);
 }
 
 const char *

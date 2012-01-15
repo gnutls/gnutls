@@ -31,20 +31,20 @@ int _gnutls_send_handshake (gnutls_session_t session, mbuffer_st * bufel,
 int _gnutls_recv_hello_request (gnutls_session_t session, void *data,
                                 uint32_t data_size);
 int _gnutls_send_hello (gnutls_session_t session, int again);
-int _gnutls_recv_hello (gnutls_session_t session, opaque * data, int datalen);
+int _gnutls_recv_hello (gnutls_session_t session, uint8_t * data, int datalen);
 int _gnutls_recv_handshake (gnutls_session_t session, 
                         gnutls_handshake_description_t type,
                         optional_t optional, gnutls_buffer_st* buf);
-int _gnutls_generate_session_id (opaque * session_id, uint8_t * len);
+int _gnutls_generate_session_id (uint8_t * session_id, uint8_t * len);
 int _gnutls_handshake_common (gnutls_session_t session);
 int _gnutls_handshake_client (gnutls_session_t session);
 int _gnutls_handshake_server (gnutls_session_t session);
 void _gnutls_set_server_random (gnutls_session_t session, uint8_t * rnd);
 void _gnutls_set_client_random (gnutls_session_t session, uint8_t * rnd);
-int _gnutls_tls_create_random (opaque * dst);
+int _gnutls_tls_create_random (uint8_t * dst);
 
-int _gnutls_find_pk_algos_in_ciphersuites (opaque * data, int datalen);
-int _gnutls_server_select_suite (gnutls_session_t session, opaque * data,
+int _gnutls_find_pk_algos_in_ciphersuites (uint8_t * data, int datalen);
+int _gnutls_server_select_suite (gnutls_session_t session, uint8_t * data,
                                  unsigned int datalen);
 
 int _gnutls_negotiate_version (gnutls_session_t session,

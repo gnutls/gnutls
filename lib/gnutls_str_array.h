@@ -33,7 +33,7 @@
 typedef struct gnutls_str_array_st
 {
   char* str;
-  int len;
+  unsigned int len;
   struct gnutls_str_array_st* next;
 } *gnutls_str_array_t;
 
@@ -70,7 +70,7 @@ inline static int _gnutls_str_array_match (gnutls_str_array_t head, const char* 
 
 inline static void append(gnutls_str_array_t array, const char* str, int len)
 {
-  array->str = ((uint8_t*)array) + sizeof(struct gnutls_str_array_st);
+  array->str = ((char*)array) + sizeof(struct gnutls_str_array_st);
   memcpy(array->str, str, len);
   array->str[len] = 0;
   array->len = len;

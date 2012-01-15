@@ -69,7 +69,7 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_pcert_st* cert,
   gnutls_datum_t dconcat;
   int ret;
   digest_hd_st td_sha;
-  opaque concat[MAX_SIG_SIZE];
+  uint8_t concat[MAX_SIG_SIZE];
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
   gnutls_digest_algorithm_t hash_algo;
 
@@ -350,7 +350,7 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_pcert_st* cert,
   int ret;
   digest_hd_st td_md5;
   digest_hd_st td_sha;
-  opaque concat[MAX_SIG_SIZE];
+  uint8_t concat[MAX_SIG_SIZE];
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
   gnutls_digest_algorithm_t hash_algo;
 
@@ -443,7 +443,7 @@ _gnutls_handshake_verify_cert_vrfy12 (gnutls_session_t session,
                                       gnutls_sign_algorithm_t sign_algo)
 {
   int ret;
-  opaque concat[MAX_HASH_SIZE];
+  uint8_t concat[MAX_HASH_SIZE];
   gnutls_datum_t dconcat;
   gnutls_digest_algorithm_t hash_algo;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
@@ -486,7 +486,7 @@ _gnutls_handshake_verify_cert_vrfy (gnutls_session_t session,
                                     gnutls_sign_algorithm_t sign_algo)
 {
   int ret;
-  opaque concat[MAX_SIG_SIZE];
+  uint8_t concat[MAX_SIG_SIZE];
   digest_hd_st td_md5;
   digest_hd_st td_sha;
   gnutls_datum_t dconcat;
@@ -580,7 +580,7 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
 {
   gnutls_datum_t dconcat;
   int ret;
-  opaque concat[MAX_SIG_SIZE];
+  uint8_t concat[MAX_SIG_SIZE];
   gnutls_sign_algorithm_t sign_algo;
   gnutls_digest_algorithm_t hash_algo;
 
@@ -633,7 +633,7 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
 {
   gnutls_datum_t dconcat;
   int ret;
-  opaque concat[MAX_SIG_SIZE];
+  uint8_t concat[MAX_SIG_SIZE];
   digest_hd_st td_md5;
   digest_hd_st td_sha;
   gnutls_protocol_t ver = gnutls_protocol_get_version (session);
@@ -795,7 +795,7 @@ pk_prepare_hash (gnutls_pk_algorithm_t pk,
 int
 decode_ber_digest_info (const gnutls_datum_t * info,
                         gnutls_mac_algorithm_t * hash,
-                        opaque * digest, int *digest_size)
+                        uint8_t * digest, unsigned int *digest_size)
 {
   ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
   int result;
@@ -852,14 +852,18 @@ decode_ber_digest_info (const gnutls_datum_t * info,
       return GNUTLS_E_ASN1_GENERIC_ERROR;
     }
 
-  result = asn1_read_value (dinfo, "digest", digest, digest_size);
+  len = *digest_size;
+  result = asn1_read_value (dinfo, "digest", digest, &len);
+  
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
+      *digest_size = len;
       asn1_delete_structure (&dinfo);
       return _gnutls_asn2err (result);
     }
 
+  *digest_size = len;
   asn1_delete_structure (&dinfo);
 
   return 0;
@@ -876,7 +880,7 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
   ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
   int result;
   const char *algo;
-  opaque *tmp_output;
+  uint8_t *tmp_output;
   int tmp_output_size;
 
   algo = _gnutls_x509_mac_to_oid ((gnutls_mac_algorithm_t) hash);

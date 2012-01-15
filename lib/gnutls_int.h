@@ -210,10 +210,9 @@ typedef enum transport_t
 #define GNUTLS_POINTER_TO_INT(_) ((int) GNUTLS_POINTER_TO_INT_CAST (_))
 #define GNUTLS_INT_TO_POINTER(_) ((void*) GNUTLS_POINTER_TO_INT_CAST (_))
 
-typedef unsigned char opaque;
 typedef struct
 {
-  opaque pint[3];
+  uint8_t pint[3];
 } uint24;
 
 #include <gnutls_mpi.h>
@@ -285,7 +284,7 @@ typedef struct
   uint32_t start_offset;
   uint32_t end_offset;
   
-  opaque header[MAX_HANDSHAKE_HEADER_SIZE];
+  uint8_t header[MAX_HANDSHAKE_HEADER_SIZE];
   int header_size;
 
   gnutls_buffer_st data;
@@ -474,10 +473,10 @@ typedef struct
    */
   uint8_t cipher_suite[2];
   gnutls_compression_method_t compression_method;
-  opaque master_secret[GNUTLS_MASTER_SIZE];
-  opaque client_random[GNUTLS_RANDOM_SIZE];
-  opaque server_random[GNUTLS_RANDOM_SIZE];
-  opaque session_id[TLS_MAX_SESSION_ID_SIZE];
+  uint8_t master_secret[GNUTLS_MASTER_SIZE];
+  uint8_t client_random[GNUTLS_RANDOM_SIZE];
+  uint8_t server_random[GNUTLS_RANDOM_SIZE];
+  uint8_t session_id[TLS_MAX_SESSION_ID_SIZE];
   uint8_t session_id_size;
   time_t timestamp;
 
@@ -601,7 +600,7 @@ typedef struct
 typedef struct
 {
   /* HelloVerifyRequest DOS prevention cookie */
-  opaque  cookie[DTLS_MAX_COOKIE_SIZE];
+  uint8_t  cookie[DTLS_MAX_COOKIE_SIZE];
   uint8_t cookie_len;
 
   /* For DTLS handshake fragmentation and reassembly. */
@@ -779,7 +778,7 @@ typedef struct
 
   /* This holds the default version that our first
    * record packet will have. */
-  opaque default_record_version[2];
+  uint8_t default_record_version[2];
 
   void *user_ptr;
 
@@ -807,7 +806,7 @@ typedef struct
    * PMS secret. Can be used by clients to test whether the
    * server checks that version. (** only used in gnutls-cli-debug)
    */
-  opaque rsa_pms_version[2];
+  uint8_t rsa_pms_version[2];
 
   /* Here we cache the DH or RSA parameters got from the
    * credentials structure, or from a callback. That is to

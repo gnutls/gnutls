@@ -34,12 +34,11 @@
 static int
 _pkcs12_check_pass (const char *pass, size_t plen)
 {
-  const unsigned char *p = pass;
   unsigned int i;
 
   for (i = 0; i < plen; i++)
     {
-      if (isascii (p[i]))
+      if (isascii (pass[i]))
         continue;
       return GNUTLS_E_INVALID_PASSWORD;
     }
@@ -53,10 +52,10 @@ _pkcs12_check_pass (const char *pass, size_t plen)
  * 1 for encryption key
  */
 int
-_gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
+_gnutls_pkcs12_string_to_key (unsigned int id, const uint8_t * salt,
                               unsigned int salt_size, unsigned int iter,
                               const char *pw, unsigned int req_keylen,
-                              opaque * keybuf)
+                              uint8_t * keybuf)
 {
   int rc;
   unsigned int i, j;
@@ -64,10 +63,10 @@ _gnutls_pkcs12_string_to_key (unsigned int id, const opaque * salt,
   bigint_t num_b1 = NULL, num_ij = NULL;
   bigint_t mpi512 = NULL;
   unsigned int pwlen;
-  opaque hash[20], buf_b[64], buf_i[128], *p;
+  uint8_t hash[20], buf_b[64], buf_i[128], *p;
   size_t cur_keylen;
   size_t n, m;
-  const opaque buf_512[] =      /* 2^64 */
+  const uint8_t buf_512[] =      /* 2^64 */
   { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

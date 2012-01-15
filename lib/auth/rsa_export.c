@@ -44,8 +44,8 @@
 
 int _gnutls_gen_rsa_client_kx (gnutls_session_t, gnutls_buffer_st*);
 static int gen_rsa_export_server_kx (gnutls_session_t, gnutls_buffer_st*);
-static int proc_rsa_export_server_kx (gnutls_session_t, opaque *, size_t);
-static int proc_rsa_export_client_kx (gnutls_session_t session, opaque * data,
+static int proc_rsa_export_server_kx (gnutls_session_t, uint8_t *, size_t);
+static int proc_rsa_export_client_kx (gnutls_session_t session, uint8_t * data,
                                       size_t _data_size);
 
 const mod_auth_st rsa_export_auth_struct = {
@@ -119,7 +119,7 @@ _gnutls_get_private_rsa_params (gnutls_session_t session,
 }
 
 int
-proc_rsa_export_client_kx (gnutls_session_t session, opaque * data,
+proc_rsa_export_client_kx (gnutls_session_t session, uint8_t * data,
                            size_t _data_size)
 {
   gnutls_datum_t plaintext;
@@ -371,7 +371,7 @@ _gnutls_peers_cert_less_512 (gnutls_session_t session)
 
 static int
 proc_rsa_export_server_kx (gnutls_session_t session,
-                           opaque * data, size_t _data_size)
+                           uint8_t * data, size_t _data_size)
 {
   uint16_t n_m, n_e;
   size_t _n_m, _n_e;

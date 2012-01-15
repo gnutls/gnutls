@@ -59,7 +59,7 @@ static char badguy_nul_cn_data[] =
   "CQ==\n" "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t badguy_nul_cn = {
-  badguy_nul_cn_data, sizeof (badguy_nul_cn_data)
+  (void*)badguy_nul_cn_data, sizeof (badguy_nul_cn_data)
 };
 
 static char badguy_nul_san_data[] =
@@ -87,7 +87,7 @@ static char badguy_nul_san_data[] =
   "-----END CERTIFICATE-----\n";
 
 const gnutls_datum_t badguy_nul_san = {
-  badguy_nul_san_data, sizeof (badguy_nul_san_data)
+  (void*)badguy_nul_san_data, sizeof (badguy_nul_san_data)
 };
 
 void

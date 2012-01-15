@@ -78,7 +78,7 @@ _gnutls_x509_parse_dn (ASN1_TYPE asn1_struct,
   char tmpbuffer1[ASN1_MAX_NAME_SIZE];
   char tmpbuffer2[ASN1_MAX_NAME_SIZE];
   char tmpbuffer3[ASN1_MAX_NAME_SIZE];
-  opaque value[MAX_STRING_LEN], *value2 = NULL;
+  uint8_t value[MAX_STRING_LEN], *value2 = NULL;
   char *escaped = NULL;
   const char *ldap_desc;
   char oid[MAX_OID_SIZE];
@@ -331,7 +331,7 @@ _gnutls_x509_parse_dn_oid (ASN1_TYPE asn1_struct,
   char tmpbuffer1[ASN1_MAX_NAME_SIZE];
   char tmpbuffer2[ASN1_MAX_NAME_SIZE];
   char tmpbuffer3[ASN1_MAX_NAME_SIZE];
-  opaque value[256];
+  uint8_t value[256];
   char oid[MAX_OID_SIZE];
   int len, printable;
   int i = 0;
@@ -630,7 +630,7 @@ _gnutls_x509_encode_and_write_attribute (const char *given_oid,
                                          int sizeof_data, int multi)
 {
   const char *val_name;
-  const opaque *data = _data;
+  const uint8_t *data = _data;
   char tmp[128];
   ASN1_TYPE c2;
   int result;
@@ -993,7 +993,7 @@ gnutls_x509_dn_import (gnutls_x509_dn_t dn, const gnutls_datum_t * data)
 
 /**
  * gnutls_x509_dn_deinit:
- * @dn: a DN opaque object pointer.
+ * @dn: a DN uint8_t object pointer.
  *
  * This function deallocates the DN object as returned by
  * gnutls_x509_dn_import().
@@ -1201,7 +1201,7 @@ _gnutls_x509_compare_raw_dn (const gnutls_datum_t * dn1,
 
 /**
  * gnutls_x509_dn_export:
- * @dn: Holds the opaque DN object
+ * @dn: Holds the uint8_t DN object
  * @format: the format of output params. One of PEM or DER.
  * @output_data: will contain a DN PEM or DER encoded
  * @output_data_size: holds the size of output_data (and will be

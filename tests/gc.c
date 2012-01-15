@@ -36,7 +36,7 @@
 void
 doit (void)
 {
-  char digest[20];
+  unsigned char digest[20];
   int err;
 
   /* XXX: We need this to fix secure memory. */
@@ -82,7 +82,7 @@ doit (void)
         }
     }
 
-  err = _gnutls_pbkdf2_sha1 ("password", 8, "salt", 4, 4711, digest, 16);
+  err = _gnutls_pbkdf2_sha1 ("password", 8, (unsigned char*)"salt", 4, 4711, digest, 16);
   if (err < 0)
     fail ("_gnutls_pkcs5_pbkdf2_sha1() failed: %d\n", err);
   else

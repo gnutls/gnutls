@@ -37,7 +37,7 @@ tls_log_func (int level, const char *str)
   fprintf (stderr, "|<%d>| %s", level, str);
 }
 
-static const char *salt[3] = { "salt1", "ltsa22", "balt33" };
+static const unsigned char *salt[3] = { (void*)"salt1", (void*)"ltsa22", (void*)"balt33" };
 static const char *pw[3] = { "secret1", "verysecret2", "veryverysecret3" };
 
 static const char *values[] = {
@@ -71,47 +71,48 @@ static struct
 {
   int id;
   const char *password;
-  const char *salt;
+  const unsigned char *salt;
   size_t iter;
   size_t keylen;
   const char *key;
 } tv[] =
 {
   {
-  1, "smeg", "\x0A\x58\xCF\x64\x53\x0D\x82\x3F", 1, 24,
+  1, "smeg", (void*)"\x0A\x58\xCF\x64\x53\x0D\x82\x3F", 1, 24,
       "8aaae6297b6cb04642ab5b077851284eb7128f1a2a7fbca3"},
   {
-  2, "smeg", "\x0A\x58\xCF\x64\x53\x0D\x82\x3F", 1, 8, "79993dfe048d3b76"},
+  2, "smeg", (void*)"\x0A\x58\xCF\x64\x53\x0D\x82\x3F", 1, 8, "79993dfe048d3b76"},
   {
-  1, "smeg", "\x64\x2B\x99\xAB\x44\xFB\x4B\x1F", 1, 24,
+  1, "smeg", (void*)"\x64\x2B\x99\xAB\x44\xFB\x4B\x1F", 1, 24,
       "f3a95fec48d7711e985cfe67908c5ab79fa3d7c5caa5d966"},
   {
-  2, "smeg", "\x64\x2B\x99\xAB\x44\xFB\x4B\x1F", 1, 8, "c0a38d64a79bea1d"},
+  2, "smeg", (void*)"\x64\x2B\x99\xAB\x44\xFB\x4B\x1F", 1, 8, "c0a38d64a79bea1d"},
   {
-  3, "smeg", "\x3D\x83\xC0\xE4\x54\x6A\xC1\x40", 1, 20,
+  3, "smeg", (void*)"\x3D\x83\xC0\xE4\x54\x6A\xC1\x40", 1, 20,
       "8d967d88f6caa9d714800ab3d48051d63f73a312"},
   {
-  1, "queeg", "\x05\xDE\xC9\x59\xAC\xFF\x72\xF7", 1000, 24,
+  1, "queeg", (void*)"\x05\xDE\xC9\x59\xAC\xFF\x72\xF7", 1000, 24,
       "ed2034e36328830ff09df1e1a07dd357185dac0d4f9eb3d4"},
   {
-  2, "queeg", "\x05\xDE\xC9\x59\xAC\xFF\x72\xF7", 1000, 8,
+  2, "queeg", (void*)"\x05\xDE\xC9\x59\xAC\xFF\x72\xF7", 1000, 8,
       "11dedad7758d4860"},
   {
-  1, "queeg", "\x16\x82\xC0\xFC\x5B\x3F\x7E\xC5", 1000, 24,
+  1, "queeg", (void*)"\x16\x82\xC0\xFC\x5B\x3F\x7E\xC5", 1000, 24,
       "483dd6e919d7de2e8e648ba8f862f3fbfbdc2bcb2c02957f"},
   {
-  2, "queeg", "\x16\x82\xC0\xFC\x5B\x3F\x7E\xC5", 1000, 8,
+  2, "queeg", (void*)"\x16\x82\xC0\xFC\x5B\x3F\x7E\xC5", 1000, 8,
       "9d461d1b00355c50"},
   {
-  3, "queeg", "\x26\x32\x16\xFC\xC2\xFA\xB3\x1C", 1000, 20,
+  3, "queeg", (void*)"\x26\x32\x16\xFC\xC2\xFA\xB3\x1C", 1000, 20,
       "5ec4c7a80df652294c3925b6489a7ab857c83476"}
 };
 
 void
 doit (void)
 {
-  int rc, i, j, x;
-  char key[32];
+  int rc;
+  unsigned int i, j, x;
+  unsigned char key[32];
   char tmp[1024];
 
   gnutls_global_init ();
@@ -126,7 +127,7 @@ doit (void)
       for (j = 0; j < 3; j++)
         {
           rc =
-            _gnutls_pkcs12_string_to_key (i, salt[j], strlen (salt[j]),
+            _gnutls_pkcs12_string_to_key (i, salt[j], strlen ((char*)salt[j]),
                                           j + i + 15, pw[j], sizeof (key),
                                           key);
           if (rc < 0)

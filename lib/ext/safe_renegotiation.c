@@ -26,7 +26,7 @@
 
 
 static int _gnutls_sr_recv_params (gnutls_session_t state,
-                                   const opaque * data, size_t data_size);
+                                   const uint8_t * data, size_t data_size);
 static int _gnutls_sr_send_params (gnutls_session_t state, gnutls_buffer_st*);
 static void _gnutls_sr_deinit_data (extension_priv_data_t priv);
 
@@ -283,9 +283,9 @@ _gnutls_ext_sr_send_cs (gnutls_session_t session)
 
 static int
 _gnutls_sr_recv_params (gnutls_session_t session,
-                        const opaque * data, size_t _data_size)
+                        const uint8_t * data, size_t _data_size)
 {
-  int len = data[0];
+  unsigned int len = data[0];
   ssize_t data_size = _data_size;
   sr_ext_st *priv;
   extension_priv_data_t epriv;

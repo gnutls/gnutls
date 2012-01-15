@@ -55,8 +55,8 @@ gnutls_pkcs11_copy_x509_crt (const char *token_url,
   struct p11_kit_uri *info = NULL;
   ck_rv_t rv;
   size_t der_size, id_size;
-  opaque *der = NULL;
-  opaque id[20];
+  uint8_t *der = NULL;
+  uint8_t id[20];
   struct ck_attribute a[16];
   ck_object_class_t class = CKO_CERTIFICATE;
   ck_certificate_type_t type = CKC_X_509;
@@ -233,7 +233,7 @@ gnutls_pkcs11_copy_x509_privkey (const char *token_url,
   struct p11_kit_uri *info = NULL;
   ck_rv_t rv;
   size_t id_size;
-  opaque id[20];
+  uint8_t id[20];
   struct ck_attribute a[16];
   ck_object_class_t class = CKO_PRIVATE_KEY;
   ck_object_handle_t obj;
@@ -544,7 +544,7 @@ delete_obj_url (struct ck_function_list *module,
   struct ck_attribute a[4];
   struct ck_attribute *attr;
   ck_object_class_t class;
-  ck_certificate_type_t type = -1;
+  ck_certificate_type_t type = (ck_certificate_type_t)-1;
   ck_rv_t rv;
   ck_object_handle_t obj;
   unsigned long count, a_vals;
@@ -591,7 +591,7 @@ delete_obj_url (struct ck_function_list *module,
       a_vals++;
     }
 
-  if (type != -1)
+  if (type != (ck_certificate_type_t)-1)
     {
       a[a_vals].type = CKA_CERTIFICATE_TYPE;
       a[a_vals].value = &type;
@@ -737,8 +737,8 @@ gnutls_pkcs11_token_init (const char *token_url,
     memcpy (flabel, label, strlen (label));
 
   rv =
-    pkcs11_init_token (module, slot, (char *) so_pin, strlen (so_pin),
-                       flabel);
+    pkcs11_init_token (module, slot, (uint8_t*)so_pin, strlen (so_pin),
+                       (uint8_t*)flabel);
   if (rv != CKR_OK)
     {
       gnutls_assert ();
@@ -800,7 +800,7 @@ gnutls_pkcs11_token_set_pin (const char *token_url,
 
   if (oldpin == NULL)
     {
-      rv = pkcs11_init_pin (module, pks, (char *) newpin, strlen (newpin));
+      rv = pkcs11_init_pin (module, pks, (uint8_t *) newpin, strlen (newpin));
       if (rv != CKR_OK)
         {
           gnutls_assert ();
@@ -812,8 +812,8 @@ gnutls_pkcs11_token_set_pin (const char *token_url,
   else
     {
       rv = pkcs11_set_pin (module, pks,
-                           (char *) oldpin, strlen (oldpin),
-                           (char *) newpin, strlen (newpin));
+                           oldpin, strlen (oldpin),
+                           newpin, strlen (newpin));
       if (rv != CKR_OK)
         {
           gnutls_assert ();

@@ -73,10 +73,10 @@ _gnutls_key_fingerprint_randomart (uint8_t * dgst_raw, u_int dgst_raw_len,
   const char augmentation_string[] = " .o+=*BOX@%&#/^SE";
   char *retval, *p;
   uint8_t field[FLDSIZE_X][FLDSIZE_Y];
-  u_int i, b;
+  unsigned int i, b;
   int x, y;
   const size_t len = sizeof(augmentation_string) - 2;
-  int prefix_len = 0;
+  unsigned int prefix_len = 0;
   
   if (prefix)
     prefix_len = strlen(prefix);

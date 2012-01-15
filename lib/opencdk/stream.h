@@ -38,7 +38,7 @@ enum
 };
 
 /* Type definition for the filter function. */
-typedef cdk_error_t (*filter_fnct_t) (void *opaque, int ctl, FILE * in,
+typedef cdk_error_t (*filter_fnct_t) (void *uint8_t, int ctl, FILE * in,
                                       FILE * out);
 
 /* The stream filter context structure. */
@@ -46,7 +46,7 @@ struct stream_filter_s
 {
   struct stream_filter_s *next;
   filter_fnct_t fnct;
-  void *opaque;
+  void *uint8_t;
   FILE *tmp;
   union
   {

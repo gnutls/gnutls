@@ -183,7 +183,7 @@ cleanup:
 int
 gnutls_openpgp_get_key (gnutls_datum_t * key,
                         gnutls_openpgp_keyring_t keyring, key_attr_t by,
-                        opaque * pattern)
+                        uint8_t * pattern)
 {
   cdk_kbnode_t knode = NULL;
   unsigned long keyid[2];
@@ -453,7 +453,7 @@ gnutls_certificate_set_openpgp_key_file2 (gnutls_certificate_credentials_t
       return GNUTLS_E_FILE_ERROR;
     }
 
-  cert.data = read_binary_file (certfile, &size);
+  cert.data = (void*)read_binary_file (certfile, &size);
   cert.size = (unsigned int) size;
   if (cert.data == NULL)
     {
@@ -461,7 +461,7 @@ gnutls_certificate_set_openpgp_key_file2 (gnutls_certificate_credentials_t
       return GNUTLS_E_FILE_ERROR;
     }
 
-  key.data = read_binary_file (keyfile, &size);
+  key.data = (void*)read_binary_file (keyfile, &size);
   key.size = (unsigned int) size;
   if (key.data == NULL)
     {
@@ -550,7 +550,7 @@ gnutls_certificate_set_openpgp_keyring_file (gnutls_certificate_credentials_t c,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  ring.data = read_binary_file (file, &size);
+  ring.data = (void*)read_binary_file (file, &size);
   ring.size = (unsigned int) size;
   if (ring.data == NULL)
     {
@@ -584,7 +584,7 @@ gnutls_certificate_set_openpgp_keyring_file (gnutls_certificate_credentials_t c,
  **/
 int
 gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t
-                                            c, const opaque * data,
+                                            c, const uint8_t * data,
                                             size_t dlen,
                                             gnutls_openpgp_crt_fmt_t format)
 {
@@ -632,7 +632,7 @@ gnutls_certificate_set_openpgp_keyring_mem (gnutls_certificate_credentials_t
 int
 _gnutls_openpgp_request_key (gnutls_session_t session, gnutls_datum_t * ret,
                              const gnutls_certificate_credentials_t cred,
-                             opaque * key_fpr, int key_fpr_size)
+                             uint8_t * key_fpr, int key_fpr_size)
 {
   int rc = 0;
 

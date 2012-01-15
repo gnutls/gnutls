@@ -76,7 +76,7 @@ pwd_put_values (gnutls_datum_t * psk, char *str)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  ret = _gnutls_hex2bin ((opaque *) p, len, psk->data, &size);
+  ret = _gnutls_hex2bin (p, len, psk->data, &size);
   psk->size = (unsigned int) size;
   if (ret < 0)
     {

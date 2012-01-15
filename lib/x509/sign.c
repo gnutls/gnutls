@@ -48,7 +48,7 @@ _gnutls_x509_get_tbs (ASN1_TYPE cert, const char *tbs_name,
                       gnutls_datum_t * tbs)
 {
   int result;
-  opaque *buf;
+  uint8_t *buf;
   int buf_size;
 
   buf_size = 0;

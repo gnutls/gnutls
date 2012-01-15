@@ -615,7 +615,7 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
  */
 int
 _gnutls_x509_ext_extract_keyUsage (uint16_t * keyUsage,
-                                   opaque * extnValue, int extnValueLen)
+                                   uint8_t * extnValue, int extnValueLen)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int len, result;
@@ -661,7 +661,7 @@ _gnutls_x509_ext_extract_keyUsage (uint16_t * keyUsage,
 int
 _gnutls_x509_ext_extract_basicConstraints (unsigned int *CA,
                                            int *pathLenConstraint,
-                                           opaque * extnValue,
+                                           uint8_t * extnValue,
                                            int extnValueLen)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
@@ -778,9 +778,9 @@ _gnutls_x509_ext_gen_basicConstraints (int CA,
 /* extract an INTEGER from the DER encoded extension
  */
 int
-_gnutls_x509_ext_extract_number (opaque * number,
+_gnutls_x509_ext_extract_number (uint8_t * number,
                                  size_t * _nr_size,
-                                 opaque * extnValue, int extnValueLen)
+                                 uint8_t * extnValue, int extnValueLen)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int result;
@@ -823,7 +823,7 @@ _gnutls_x509_ext_extract_number (opaque * number,
 /* generate an INTEGER in a DER encoded extension
  */
 int
-_gnutls_x509_ext_gen_number (const opaque * number, size_t nr_size,
+_gnutls_x509_ext_gen_number (const uint8_t * number, size_t nr_size,
                              gnutls_datum_t * der_ext)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
@@ -1222,7 +1222,7 @@ _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
                                         char **policyLanguage,
                                         char **policy,
                                         size_t * sizeof_policy,
-                                        opaque * extnValue, int extnValueLen)
+                                        uint8_t * extnValue, int extnValueLen)
 {
   ASN1_TYPE ext = ASN1_TYPE_EMPTY;
   int result;
@@ -1266,7 +1266,7 @@ _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
     }
 
   if (policyLanguage)
-    *policyLanguage = gnutls_strdup (value.data);
+    *policyLanguage = gnutls_strdup ((char*)value.data);
 
   result = _gnutls_x509_read_value (ext, "proxyPolicy.policy", &value, 0);
   if (result == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
@@ -1285,7 +1285,7 @@ _gnutls_x509_ext_extract_proxyCertInfo (int *pathLenConstraint,
   else
     {
       if (policy)
-        *policy = value.data;
+        *policy = (char*)value.data;
       if (sizeof_policy)
         *sizeof_policy = value.size;
     }

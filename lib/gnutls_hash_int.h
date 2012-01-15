@@ -61,7 +61,7 @@ typedef struct
 int _gnutls_hmac_exists(gnutls_mac_algorithm_t algorithm);
 int _gnutls_hmac_init (digest_hd_st *, gnutls_mac_algorithm_t algorithm,
                        const void *key, int keylen);
-int _gnutls_hash_get_algo_len (gnutls_digest_algorithm_t algorithm);
+size_t _gnutls_hash_get_algo_len (gnutls_digest_algorithm_t algorithm);
 #define _gnutls_hmac_get_algo_len _gnutls_hash_get_algo_len
 int _gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
                        int keylen, const void *text, size_t textlen,
@@ -80,7 +80,7 @@ _gnutls_hmac (digest_hd_st * handle, const void *text, size_t textlen)
 inline static void
 _gnutls_hmac_output (digest_hd_st * handle, void *digest)
 {
-  int maclen;
+  size_t maclen;
 
   maclen = _gnutls_hmac_get_algo_len (handle->algorithm);
 
@@ -159,15 +159,15 @@ int _gnutls_mac_output_ssl3 (digest_hd_st * handle, void *digest);
 
 int _gnutls_ssl3_generate_random (void *secret, int secret_len,
                                   void *rnd, int random_len, int bytes,
-                                  opaque * ret);
+                                  uint8_t * ret);
 int _gnutls_ssl3_hash_md5 (const void *first, int first_len,
                            const void *second, int second_len,
-                           int ret_len, opaque * ret);
+                           int ret_len, uint8_t * ret);
 
 void _gnutls_mac_reset_ssl3 (digest_hd_st * handle);
 
 int _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle, void *digest,
-                                        opaque * key, uint32_t key_size);
+                                        uint8_t * key, uint32_t key_size);
 
 int _gnutls_hash_copy (digest_hd_st * dst_handle, digest_hd_st * src_handle);
 
