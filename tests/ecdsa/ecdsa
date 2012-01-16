@@ -82,7 +82,7 @@ fi
 rm -f verify new-user.pem new-ca-ecdsa.pem new-subca-ecdsa.pem template out
 rm -f key-subca-ecdsa.pem key-ca-ecdsa.pem key-ecdsa.pem
 
-$CERTTOOL -k <bad-key.pem | grep "validation failed" >/dev/null 2>&1
+$CERTTOOL -k < ${srcdir}/bad-key.pem | grep "validation failed" >/dev/null 2>&1
 if [ $? != 0 ];then
 	echo "certtool didn't detect a bad ECDSA key."
 	exit 1
