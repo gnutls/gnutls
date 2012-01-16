@@ -27,7 +27,7 @@
 /* size of sliding window, don't change this! */
 #define WINSIZE 4
 
-/**
+/*
    Perform a point multiplication 
    @param k    The scalar to multiply by
    @param G    The base point

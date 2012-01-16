@@ -1274,13 +1274,19 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                           const gnutls_datum_t * data, void *result,
                           size_t * result_size);
 
+  /**
+   * gnutls_random_art_t:
+   * @GNUTLS_RANDOM_ART_OPENSSH: OpenSSH-style random art.
+   *
+   * Enumeration of different random art types.
+   */
   typedef enum gnutls_random_art
   {
     GNUTLS_RANDOM_ART_OPENSSH=1,
   } gnutls_random_art_t;
 
   int gnutls_random_art (gnutls_random_art_t type, 
-                         const char* key_name, unsigned int key_size,
+                         const char* key_type, unsigned int key_size,
                          void * fpr, size_t fpr_size,
                          gnutls_datum_t* art);
 
