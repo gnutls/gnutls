@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-# Copyright (C) 2000-2011 Free Software Foundation, Inc.
+# Copyright (C) 2000-2012 Free Software Foundation, Inc.
 #
 # Author: Nikos Mavrogiannopoulos, Simon Josefsson
 #

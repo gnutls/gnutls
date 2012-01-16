@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-# Copyright (C) 2010 Free Software Foundation, Inc.
+# Copyright (C) 2010, 2012 Free Software Foundation, Inc.
 #
 # This file is part of GnuTLS.
 #

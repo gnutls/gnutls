@@ -1,5 +1,6 @@
 /* rndegd.c  -	interface to the EGD
- *	Copyright (C) 1999, 2000, 2002, 2003, 2010 Free Software Foundation, Inc.
+ *	Copyright (C) 1999-2000, 2002-2003, 2010, 2012 Free Software
+ *	Foundation, Inc.
  *
  * This file is part of Libgcrypt.
  *

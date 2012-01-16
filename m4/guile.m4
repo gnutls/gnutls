@@ -1,6 +1,7 @@
 ## Autoconf macros for working with Guile.
 ##
-##   Copyright (C) 1998, 2001, 2006, 2010 Free Software Foundation, Inc.
+##   Copyright (C) 1998, 2001, 2006, 2010, 2012 Free Software
+##   Foundation, Inc.
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public

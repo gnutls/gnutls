@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2002, 2003, 2004, 2005, 2008, 2010 Free Software
- * Foundation, Inc.
+ * Copyright (C) 2002-2005, 2008, 2010, 2012 Free Software Foundation,
+ * Inc.
  *
  * Author: Timo Schulz, Nikos Mavrogiannopoulos
  *

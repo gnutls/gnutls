@@ -1,6 +1,6 @@
 /* types.h - Some type definitions
- * Copyright (C) 2002, 2003, 2007, 2008, 2010, 2011 Free Software Foundation,
- * Inc.
+ * Copyright (C) 2002-2003, 2007-2008, 2010-2012 Free Software
+ * Foundation, Inc.
  *
  * Author: Timo Schulz
  *

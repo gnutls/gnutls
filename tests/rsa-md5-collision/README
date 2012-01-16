@@ -1,5 +1,5 @@
 rsa-md5-collision README -- Information about rsa-md5-collision self tests.
-Copyright (C) 2006-2011  Free Software Foundation, Inc.
+Copyright (C) 2006-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
 This directory contains colliding X.509 certificates for different

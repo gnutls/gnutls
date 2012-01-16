@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Free Software Foundation, Inc.
+ * Copyright (C) 2011-2012 Free Software Foundation, Inc.
  * Portions Copyright (C) 2001 Niels Moeller
  *
  * Author: Nikos Mavrogiannopoulos

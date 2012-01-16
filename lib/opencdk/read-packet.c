@@ -1,5 +1,5 @@
 /* read-packet.c - Read OpenPGP packets
- * Copyright (C) 2001, 2002, 2003, 2007, 2008, 2010 Free Software
+ * Copyright (C) 2001-2003, 2007-2008, 2010, 2012 Free Software
  * Foundation, Inc.
  *
  * Author: Timo Schulz
