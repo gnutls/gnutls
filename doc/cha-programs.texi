@@ -107,12 +107,12 @@ the handshake.
 @example
 $ ./gnutls-cli --priority SECURE192 -l
 Cipher suites for SECURE192
-TLS_ECDHE_ECDSA_AES_256_CBC_SHA384                	0xc0, 0x24	TLS1.2
-TLS_ECDHE_ECDSA_AES_256_GCM_SHA384                	0xc0, 0x2e	TLS1.2
-TLS_ECDHE_RSA_AES_256_GCM_SHA384                  	0xc0, 0x30	TLS1.2
-TLS_DHE_RSA_AES_256_CBC_SHA256                    	0x00, 0x6b	TLS1.2
-TLS_DHE_DSS_AES_256_CBC_SHA256                    	0x00, 0x6a	TLS1.2
-TLS_RSA_AES_256_CBC_SHA256                        	0x00, 0x3d	TLS1.2
+TLS_ECDHE_ECDSA_AES_256_CBC_SHA384                0xc0, 0x24	TLS1.2
+TLS_ECDHE_ECDSA_AES_256_GCM_SHA384                0xc0, 0x2e	TLS1.2
+TLS_ECDHE_RSA_AES_256_GCM_SHA384                  0xc0, 0x30	TLS1.2
+TLS_DHE_RSA_AES_256_CBC_SHA256                    0x00, 0x6b	TLS1.2
+TLS_DHE_DSS_AES_256_CBC_SHA256                    0x00, 0x6a	TLS1.2
+TLS_RSA_AES_256_CBC_SHA256                        0x00, 0x3d	TLS1.2
 @end example
 
 
