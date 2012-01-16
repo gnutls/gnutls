@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2011 Free Software Foundation, Inc.
+# Copyright (C) 2006-2012 Free Software Foundation, Inc.
 #
 # Author: Simon Josefsson
 #
@@ -40,7 +40,8 @@ local-checks-to-skip = sc_GPL_version sc_bindtextdomain			\
 	sc_require_config_h_first sc_texinfo_acronym sc_trailing_blank	\
 	sc_unmarked_diagnostics sc_useless_cpp_parens
 
-VC_LIST_ALWAYS_EXCLUDE_REGEX = ^maint.mk|(devel/perlasm/|build-aux/|gl/|src/cfg/|tests/suite/ecore/|doc/protocol/).*$$
+VC_LIST_ALWAYS_EXCLUDE_REGEX = ^maint.mk|m4/pkg|(devel/perlasm/|build-aux/|gl/|src/cfg/|tests/suite/ecore/|doc/protocol/).*$$
+update-copyright-env = UPDATE_COPYRIGHT_USE_INTERVALS=1
 
 # Explicit syntax-check exceptions.
 exclude_file_name_regexp--sc_cast_of_alloca_return_value = ^guile/modules/gnutls/build/priorities.scm|guile/src/core.c$$
