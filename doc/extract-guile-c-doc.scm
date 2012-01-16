@@ -1,6 +1,6 @@
 ;;; extract-c-doc.scm  --  Output Texinfo from "snarffed" C files.
 ;;;
-;;; Copyright 2006-2007, 2010, 2012 Free Software Foundation, Inc.
+;;; Copyright 2006-2012 Free Software Foundation, Inc.
 ;;;
 ;;;
 ;;; This program is free software; you can redistribute it and/or modify

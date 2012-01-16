@@ -29,8 +29,8 @@ SUBDIRS += reference
 endif
 
 info_TEXINFOS = gnutls.texi gnutls-guile.texi
-gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi lgpl-2.1.texi gpl-3.0.texi	\
-	cha-bib.texi cha-cert-auth.texi	cha-cert-auth2.texi	\
+gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
+	cha-bib.texi cha-cert-auth.texi	cha-cert-auth2.texi		\
 	cha-ciphersuites.texi cha-copying.texi cha-functions.texi	\
 	cha-gtls-app.texi cha-internals.texi cha-intro-tls.texi		\
 	cha-library.texi cha-preface.texi cha-programs.texi		\

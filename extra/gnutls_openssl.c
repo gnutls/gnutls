@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2004-2006, 2008, 2010, 2012 Free Software Foundation,
- * Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  * Copyright (c) 2002 Andrew McDonald <andrew@mcdonald.org.uk>
  *
  * This file is part of GnuTLS-EXTRA.
