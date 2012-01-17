@@ -233,9 +233,17 @@ _find_x509_cert (const gnutls_certificate_credentials_t cred,
 
   *indx = -1;
 
+  /* If peer doesn't send any issuers and we have a single certificate
+   * then send that one.
+   */
+  if (data_size == 0 && cred->ncerts == 1)
+    {
+      *indx = 0;
+      return 0;
+    }
+
   do
     {
-
       DECR_LENGTH_RET (data_size, 2, 0);
       size = _gnutls_read_uint16 (data);
       DECR_LENGTH_RET (data_size, size, 0);
@@ -281,7 +289,6 @@ _find_x509_cert (const gnutls_certificate_credentials_t cred,
 
       /* move to next record */
       data += size;
-
     }
   while (1);
 
@@ -752,9 +759,8 @@ _select_client_cert (gnutls_session_t session,
         result =
           _find_x509_cert (cred, _data, _data_size,
                            pk_algos, pk_algos_length, &indx);
-
 #ifdef ENABLE_OPENPGP
-      if (session->security_parameters.cert_type == GNUTLS_CRT_OPENPGP)
+      else if (session->security_parameters.cert_type == GNUTLS_CRT_OPENPGP)
         result = _find_openpgp_cert (cred, pk_algos, pk_algos_length, &indx);
 #endif
 
