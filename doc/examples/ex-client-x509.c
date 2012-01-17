@@ -40,6 +40,13 @@ int main (void)
    */
   gnutls_certificate_set_x509_trust_file (xcred, CAFILE, GNUTLS_X509_FMT_PEM);
   gnutls_certificate_set_verify_function (xcred, _verify_certificate_callback);
+  
+  /* If client holds a certificate it can be set using the following:
+   *
+     gnutls_certificate_set_x509_key_file (xcred, 
+                                           "cert.pem", "key.pem", 
+                                           GNUTLS_X509_FMT_PEM); 
+   */
 
   /* Initialize TLS session 
    */
