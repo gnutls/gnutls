@@ -52,41 +52,41 @@
 #include "sockets.h"
 
 #include "common.h"
-#include "cli-gaa.h"
+
+#include "gettext.h"
+#include "cli-args.h"
 
 #define MAX_BUF 4096
 
 /* global stuff here */
 int resume, starttls, insecure, rehandshake, udp, mtu;
 const char *hostname = NULL;
-char *service;
+const char *service = NULL;
 int record_max_size;
 int fingerprint;
 int crlf;
 int verbose = 0;
 extern int print_cert;
 
-char *srp_passwd = NULL;
-char *srp_username;
-char *pgp_keyfile;
-char *pgp_certfile;
-char *pgp_keyring;
-char *x509_keyfile;
-char *x509_certfile;
-char *x509_cafile;
-char *x509_crlfile = NULL;
+const char *srp_passwd = NULL;
+const char *srp_username = NULL;
+const char *pgp_keyfile = NULL;
+const char *pgp_certfile = NULL;
+const char *pgp_keyring = NULL;
+const char *x509_keyfile = NULL;
+const char *x509_certfile = NULL;
+const char *x509_cafile = NULL;
+const char *x509_crlfile = NULL;
 static int x509ctype;
 static int disable_extensions;
 
-char *psk_username = NULL;
+const char *psk_username = NULL;
 gnutls_datum_t psk_key = { NULL, 0 };
 
 static gnutls_srp_client_credentials_t srp_cred;
 static gnutls_psk_client_credentials_t psk_cred;
 static gnutls_anon_client_credentials_t anon_cred;
 static gnutls_certificate_credentials_t xcred;
-
-static gaainfo info;
 
 /* end of global stuff */
 
@@ -322,9 +322,9 @@ load_keys (void)
 
 
 #ifdef ENABLE_OPENPGP
-  if (info.pgp_subkey != NULL)
+  if (HAVE_OPT(PGPSUBKEY))
     {
-      get_keyid (keyid, info.pgp_subkey);
+      get_keyid (keyid, OPT_ARG(PGPSUBKEY));
     }
 
   if (pgp_certfile != NULL && pgp_keyfile != NULL)
@@ -341,7 +341,7 @@ load_keys (void)
       gnutls_openpgp_crt_init (&tmp_pgp_crt);
 
       ret =
-        gnutls_pcert_import_openpgp_raw (&pgp_crt, &data, GNUTLS_OPENPGP_FMT_BASE64, info.pgp_subkey!=NULL?keyid:NULL, 0);
+        gnutls_pcert_import_openpgp_raw (&pgp_crt, &data, GNUTLS_OPENPGP_FMT_BASE64, HAVE_OPT(PGPSUBKEY)?keyid:NULL, 0);
       if (ret < 0)
         {
           fprintf (stderr,
@@ -407,7 +407,7 @@ load_keys (void)
               exit (1);
             }
 
-          if (info.pgp_subkey != NULL)
+          if (HAVE_OPT(PGPSUBKEY))
             {
               ret =
                 gnutls_openpgp_privkey_set_preferred_key_id (tmp_pgp_key, keyid);
@@ -415,7 +415,7 @@ load_keys (void)
                 {
                   fprintf (stderr,
                       "*** Error setting preferred sub key id (%s): %s\n",
-                      info.pgp_subkey, gnutls_strerror (ret));
+                      OPT_ARG(PGPSUBKEY), gnutls_strerror (ret));
                   exit (1);
                 }
             }
@@ -547,8 +547,14 @@ init_tls_session (const char *hostname)
 {
   const char *err;
   int ret;
-
+  const char * priorities;
   gnutls_session_t session;
+  
+  if (HAVE_OPT(PRIORITY)) {
+    priorities = OPT_ARG(PRIORITY);
+  } else {
+    priorities = "NORMAL";
+  }
 
   if (udp)
     {
@@ -559,8 +565,7 @@ init_tls_session (const char *hostname)
   else
     gnutls_init (&session, GNUTLS_CLIENT);
 
-
-  if ((ret = gnutls_priority_set_direct (session, info.priorities, &err)) < 0)
+  if ((ret = gnutls_priority_set_direct (session, priorities, &err)) < 0)
     {
       if (ret == GNUTLS_E_INVALID_REQUEST) fprintf (stderr, "Syntax error at: %s\n", err);
       else 
@@ -610,14 +615,14 @@ init_tls_session (const char *hostname)
     }
 
 #ifdef ENABLE_SESSION_TICKET
-  if (disable_extensions == 0 && !info.noticket)
+  if (disable_extensions == 0 && !ENABLED_OPT(NOTICKET)t)
     gnutls_session_ticket_enable_client (session);
 #endif
 
   return session;
 }
 
-static void gaa_parser (int argc, char **argv);
+static void cmd_parser (int argc, char **argv);
 
 /* Returns zero if the error code was successfully handled.
  */
@@ -748,10 +753,10 @@ main (int argc, char **argv)
   ssize_t bytes;
 
   set_program_name (argv[0]);
-  gaa_parser (argc, argv);
+  cmd_parser (argc, argv);
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (info.debug);
+  gnutls_global_set_log_level (OPT_VALUE_DEBUG);
 
   if ((ret = gnutls_global_init ()) < 0)
     {
@@ -827,7 +832,7 @@ main (int argc, char **argv)
           gnutls_session_get_id (hd.session, session_id, &session_id_size);
 
           /* print some information */
-          print_info (hd.session, hostname, info.insecure);
+          print_info (hd.session, hostname, ENABLED_OPT(INSECURE));
 
           printf ("- Disconnecting\n");
           socket_bye (&hd);
@@ -1009,58 +1014,89 @@ after_handshake:
   return retval;
 }
 
-void
-gaa_parser (int argc, char **argv)
+static void
+cmd_parser (int argc, char **argv)
 {
-  if (gaa (argc, argv, &info) != -1)
+const char* rest = NULL;
+
+  int optct = optionProcess( &gnutls_cliOptions, argc, argv);
+  argc -= optct;
+  argv += optct;
+  
+  if (rest == NULL && argc > 0)
+    rest = argv[0];
+  
+  verbose = ENABLED_OPT( VERBOSE);
+  disable_extensions = ENABLED_OPT( DISABLE_EXTENSIONS);
+  print_cert = ENABLED_OPT( PRINT_CERT);
+  starttls = ENABLED_OPT(STARTTLS);
+  resume = ENABLED_OPT(RESUME);
+  rehandshake = ENABLED_OPT(REHANDSHAKE);
+  insecure = ENABLED_OPT(INSECURE);
+  udp = ENABLED_OPT(UDP);
+  mtu = OPT_VALUE_MTU;
+  
+  if (HAVE_OPT(PORT)) 
     {
-      fprintf (stderr,
-               "Error in the arguments. Use the --help or -h parameters to get more information.\n");
-      exit (1);
+      service = OPT_ARG(PORT);
+    }
+  else 
+    {
+      service = "443";
     }
 
-  verbose = info.verbose;
-  disable_extensions = info.disable_extensions;
-  print_cert = info.print_cert;
-  starttls = info.starttls;
-  resume = info.resume;
-  rehandshake = info.rehandshake;
-  insecure = info.insecure;
-  udp = info.udp;
-  mtu = info.mtu;
-  service = info.port;
-  record_max_size = info.record_size;
-  fingerprint = info.fingerprint;
+  record_max_size = OPT_VALUE_RECORDSIZE;
+  fingerprint = ENABLED_OPT(FINGERPRINT);
 
-  if (info.fmtder == 0)
-    x509ctype = GNUTLS_X509_FMT_PEM;
-  else
+  if (ENABLED_OPT(X509FMTDER))
     x509ctype = GNUTLS_X509_FMT_DER;
+  else
+    x509ctype = GNUTLS_X509_FMT_PEM;
 
-  srp_username = info.srp_username;
-  srp_passwd = info.srp_passwd;
-  x509_cafile = info.x509_cafile;
-  x509_crlfile = info.x509_crlfile;
-  x509_keyfile = info.x509_keyfile;
-  x509_certfile = info.x509_certfile;
-  pgp_keyfile = info.pgp_keyfile;
-  pgp_certfile = info.pgp_certfile;
+  if (HAVE_OPT(SRPUSERNAME))
+    srp_username = OPT_ARG(SRPUSERNAME);
+    
+  if (HAVE_OPT(SRPPASSWD))
+    srp_passwd = OPT_ARG(SRPPASSWD);
+  
+  if (HAVE_OPT(X509CAFILE))
+    x509_cafile = OPT_ARG(X509CAFILE);
+  
+  if (HAVE_OPT(X509CRLFILE))
+    x509_crlfile = OPT_ARG(X509CRLFILE);
+    
+  if (HAVE_OPT(X509KEYFILE))
+    x509_keyfile = OPT_ARG(X509KEYFILE);
+  
+  if (HAVE_OPT(X509CERTFILE))
+    x509_certfile = OPT_ARG(X509CERTFILE);
+  
+  if (HAVE_OPT(PGPKEYFILE))
+    pgp_keyfile = OPT_ARG(PGPKEYFILE);
+  
+  if (HAVE_OPT(PGPCERTFILE))
+    pgp_certfile = OPT_ARG(PGPCERTFILE);
 
-  psk_username = info.psk_username;
-  psk_key.data = (unsigned char *) info.psk_key;
-  if (info.psk_key != NULL)
-    psk_key.size = strlen (info.psk_key);
+  if (HAVE_OPT(PSKUSERNAME))
+    psk_username = OPT_ARG(PSKUSERNAME);
+
+  if (HAVE_OPT(PSKKEY))
+    {
+      psk_key.data = (unsigned char *) OPT_ARG(PSKKEY);
+      psk_key.size = strlen (OPT_ARG(PSKKEY));
+    }
   else
     psk_key.size = 0;
 
-  pgp_keyring = info.pgp_keyring;
+  if (HAVE_OPT(PGPKEYRING))
+    pgp_keyring = OPT_ARG(PGPKEYRING);
 
-  crlf = info.crlf;
+  crlf = ENABLED_OPT(CRLF);
 
-  if (info.rest_args == NULL)
+  if (rest == NULL)
     hostname = "localhost";
   else
-    hostname = info.rest_args;
+    hostname = rest;
 }
 
 void cli_version (void);
@@ -1125,7 +1161,7 @@ do_handshake (socket_st * socket)
   if (ret == 0)
     {
       /* print some information */
-      print_info (socket->session, socket->hostname, info.insecure);
+      print_info (socket->session, socket->hostname, ENABLED_OPT(INSECURE));
 
 
       socket->secure = 1;
@@ -1169,8 +1205,8 @@ psk_callback (gnutls_session_t session, char **username, gnutls_datum_t * key)
   else
     printf ("No PSK hint\n");
 
-  if (info.psk_username)
-    *username = gnutls_strdup (info.psk_username);
+  if (HAVE_OPT(PSKUSERNAME))
+    *username = gnutls_strdup (OPT_ARG(PSKUSERNAME));
   else
     {
       char *tmp = NULL;
@@ -1224,7 +1260,7 @@ psk_callback (gnutls_session_t session, char **username, gnutls_datum_t * key)
   key->data = (void*)rawkey;
   key->size = res_size;
 
-  if (info.debug)
+  if (HAVE_OPT(DEBUG))
     {
       char hexkey[41];
       res_size = sizeof (hexkey);

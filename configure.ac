@@ -123,8 +123,6 @@ AC_C_BIGENDIAN
 
 
 
-dnl Checks for functions
-
 dnl No fork on MinGW, disable some self-tests until we fix them.
 AC_CHECK_FUNCS(fork,,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
@@ -155,6 +153,9 @@ if test "$with_p11_kit" != "no"; then
 fi
 
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
+
+dnl Checks for programs in src/ 
+LIBOPTS_CHECK([libopts])
 
 dnl Check for libcfg+
 SAVED_LIBS=$LIBS
@@ -285,6 +286,7 @@ if test "$gl_gcc_warnings" = yes; then
   gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now
   gl_WARN_ADD([-Wno-stack-protector])  # Some functions cannot be protected
   gl_WARN_ADD([-Wno-int-to-pointer-cast])  # Some files cannot be compiled with that (gl_fd_to_handle)
+  gl_WARN_ADD([-Wno-redundant-decls])  # Some files cannot be compiled with that (gl_fd_to_handle)
   gl_WARN_ADD([-fdiagnostics-show-option])
 fi
 
@@ -485,6 +487,9 @@ AC_CONFIG_FILES([
   lib/x509/Makefile
   po/Makefile.in
   src/Makefile
+  src/cli-args.def
+  src/cli-debug-args.def
+  src/srptool-args.def
   src/cfg/Makefile
   src/cfg/platon/Makefile
   src/cfg/platon/str/Makefile

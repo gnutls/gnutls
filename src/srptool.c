@@ -24,7 +24,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <gnutls/gnutls.h>
-#include <srptool-gaa.h>
 #include <gnutls/crypto.h>      /* for random */
 
 #include <sys/types.h>
@@ -43,16 +42,19 @@
 #include <progname.h>
 #include <version-etc.h>
 
+#include <gettext.h>
+#include <srptool-args.h>
+
 /* This may need some rewrite. A lot of stuff which should be here
  * are in the library, which is not good.
  */
 
 int crypt_int (const char *username, const char *passwd, int salt,
-               char *tpasswd_conf, char *tpasswd, int uindex);
+               const char *tpasswd_conf, const char *tpasswd, int uindex);
 static int read_conf_values (gnutls_datum_t * g, gnutls_datum_t * n,
                              char *str);
 static int _verify_passwd_int (const char *username, const char *passwd,
-                               char *verifier, char *salt,
+                               char *verifier, const char *salt,
                                const gnutls_datum_t * g,
                                const gnutls_datum_t * n);
 
@@ -76,7 +78,7 @@ print_num (const char *msg, const gnutls_datum_t * num)
 }
 
 static int
-generate_create_conf (char *tpasswd_conf)
+generate_create_conf (const char *tpasswd_conf)
 {
   FILE *fd;
   char line[5 * 1024];
@@ -163,7 +165,7 @@ generate_create_conf (char *tpasswd_conf)
  */
 static int
 _verify_passwd_int (const char *username, const char *passwd,
-                    char *verifier, char *salt,
+                    char *verifier, const char *salt,
                     const gnutls_datum_t * g, const gnutls_datum_t * n)
 {
   char _salt[1024];
@@ -229,7 +231,7 @@ _verify_passwd_int (const char *username, const char *passwd,
 }
 
 static int
-filecopy (char *src, char *dst)
+filecopy (const char *src, const char *dst)
 {
   FILE *fd, *fd2;
   char line[5 * 1024];
@@ -269,7 +271,7 @@ filecopy (char *src, char *dst)
 
 /* accepts password file */
 static int
-find_strchr (char *username, char *file)
+find_strchr (const char *username, const char *file)
 {
   FILE *fd;
   char *pos;
@@ -309,8 +311,8 @@ find_strchr (char *username, char *file)
  * username/password pair.
  */
 static int
-verify_passwd (char *conffile, char *tpasswd, char *username,
-               const char *passwd)
+verify_passwd (const char *conffile, const char *tpasswd, 
+               const char *username, const char *passwd)
 {
   FILE *fd;
   char line[5 * 1024];
@@ -416,9 +418,11 @@ tls_log_func (int level, const char *str)
 
 int main (int argc, char **argv)
 {
-  gaainfo info;
   const char *passwd;
   int salt_size, ret;
+  int optct;
+  const char* fpasswd, *fpasswd_conf;
+  const char* username;
 #ifndef _WIN32
    struct passwd *pwd;
 #endif
@@ -433,26 +437,31 @@ int main (int argc, char **argv)
 
   umask (066);
 
-  if (gaa (argc, argv, &info) != -1)
-    {
-      fprintf (stderr, "Error in the arguments.\n");
-      return -1;
-    }
+  optct = optionProcess( &srptoolOptions, argc, argv);
+  argc -= optct;
+  argv += optct;
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (info.debug);
+  gnutls_global_set_log_level (OPT_VALUE_DEBUG);
 
-  if (info.create_conf != NULL)
+  if (HAVE_OPT(CREATE_CONF))
     {
-      return generate_create_conf (info.create_conf);
+      return generate_create_conf (OPT_ARG(CREATE_CONF));
     }
 
-  if (info.passwd == NULL)
-    info.passwd = (char *) KPASSWD;
-  if (info.passwd_conf == NULL)
-    info.passwd_conf = (char *) KPASSWD_CONF;
+  if (HAVE_OPT(PASSWD))
+    fpasswd = OPT_ARG(PASSWD);
+  else
+    fpasswd = (char *) KPASSWD;
 
-  if (info.username == NULL)
+  if (HAVE_OPT(PASSWD_CONF))
+    fpasswd_conf = OPT_ARG(PASSWD_CONF);
+  else
+    fpasswd_conf = (char *) KPASSWD_CONF;
+
+  if (HAVE_OPT(USERNAME))
+    username = OPT_ARG(USERNAME);
+  else
     {
 #ifndef _WIN32
       pwd = getpwuid (getuid ());
@@ -463,7 +472,7 @@ int main (int argc, char **argv)
           return -1;
         }
 
-      info.username = pwd->pw_name;
+      username = pwd->pw_name;
 #else
       fprintf (stderr, "Please specify a user\n");
       return -1;
@@ -480,15 +489,15 @@ int main (int argc, char **argv)
     }
 
 /* not ready yet */
-  if (info.verify != 0)
+  if (HAVE_OPT(VERIFY))
     {
-      return verify_passwd (info.passwd_conf, info.passwd,
-                            info.username, passwd);
+      return verify_passwd (fpasswd_conf, fpasswd,
+                            username, passwd);
     }
 
 
-  return crypt_int (info.username, passwd, salt_size,
-                    info.passwd_conf, info.passwd, info.index);
+  return crypt_int (username, passwd, salt_size,
+                    fpasswd_conf, fpasswd, VALUE_OPT_INDEX);
 
 }
 
@@ -548,7 +557,7 @@ _srp_crypt (const char *username, const char *passwd, int salt_size,
 
 int
 crypt_int (const char *username, const char *passwd, int salt_size,
-           char *tpasswd_conf, char *tpasswd, int uindex)
+           const char *tpasswd_conf, const char *tpasswd, int uindex)
 {
   FILE *fd;
   char *cr;

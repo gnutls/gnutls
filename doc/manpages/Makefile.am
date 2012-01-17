@@ -26,6 +26,15 @@ if ENABLE_SRP
 dist_man_MANS += srptool.1
 endif
 
+gnutls-cli.1: ../../src/cli-args.def
+	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+
+gnutls-cli-debug.1: ../../src/cli-debug-args.def
+	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+
+srptool.1: ../../src/srptool-args.def
+	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+
 APIMANS =
 APIMANS += gnutls_pubkey_init.3
 APIMANS += gnutls_pubkey_deinit.3

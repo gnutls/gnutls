@@ -30,7 +30,8 @@ AM_CPPFLAGS = \
 	-I$(builddir)/../lib/includes		\
 	-I$(srcdir)/../lib/includes		\
 	-I$(srcdir)/../extra/includes	\
-	-I$(srcdir)/cfg
+	-I$(srcdir)/cfg				\
+	$(LIBOPTS_CFLAGS)
 
 bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug
 if ENABLE_PKI
@@ -67,10 +68,10 @@ libcmd_serv_la_SOURCES = serv.gaa serv-gaa.h serv-gaa.c
 
 if ENABLE_SRP
 srptool_SOURCES = srptool.c
-srptool_LDADD = ../lib/libgnutls.la libcmd-srp.la ../gl/libgnu.la
+srptool_LDADD = ../lib/libgnutls.la libcmd-srp.la ../gl/libgnu.la $(LIBOPTS_LDADD)
 noinst_LTLIBRARIES += libcmd-srp.la
 libcmd_srp_la_CFLAGS =
-libcmd_srp_la_SOURCES = srptool.gaa srptool-gaa.h srptool-gaa.c
+libcmd_srp_la_SOURCES = srptool-args.def srptool-args.c srptool-args.h
 endif
 
 if ENABLE_OCSP
@@ -84,25 +85,25 @@ endif
 psktool_SOURCES = psk.c
 psktool_LDADD = ../lib/libgnutls.la libcmd-psk.la ../gl/libgnu.la
 noinst_LTLIBRARIES += libcmd-psk.la
-libcmd_psk_la_CFLAGS =
+libcmd_psk_la_CFLAGS = 
 libcmd_psk_la_SOURCES = psk.gaa psk-gaa.h psk-gaa.c
 
 BENCHMARK_SRCS = benchmark-cipher.c benchmark.c benchmark.h benchmark-tls.c
 
 gnutls_cli_SOURCES = cli.c common.h common.c $(PKCS11_SRCS) $(BENCHMARK_SRCS)
 gnutls_cli_LDADD = ../lib/libgnutls.la
-gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la
+gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la $(LIBOPTS_LDADD)
 gnutls_cli_LDADD += $(LTLIBGCRYPT) $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIB_CLOCK_GETTIME)
 noinst_LTLIBRARIES += libcmd-cli.la
-libcmd_cli_la_CFLAGS =
-libcmd_cli_la_SOURCES = cli.gaa cli-gaa.h cli-gaa.c
+libcmd_cli_la_CFLAGS = 
+libcmd_cli_la_SOURCES = cli-args.def cli-args.c cli-args.h
 
 gnutls_cli_debug_SOURCES = tls_test.c tests.h tests.c common.h common.c $(PKCS11_SRCS)
-gnutls_cli_debug_LDADD = ../lib/libgnutls.la libcmd-cli-debug.la
+gnutls_cli_debug_LDADD = ../lib/libgnutls.la libcmd-cli-debug.la $(LIBOPTS_LDADD)
 gnutls_cli_debug_LDADD += ../gl/libgnu.la $(LIBSOCKET) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-cli-debug.la
 libcmd_cli_debug_la_CFLAGS =
-libcmd_cli_debug_la_SOURCES = tls_test.gaa tls_test-gaa.h tls_test-gaa.c
+libcmd_cli_debug_la_SOURCES = cli-debug-args.def cli-debug-args.c cli-debug-args.h
 
 #certtool
 
@@ -157,8 +158,6 @@ endif # ENABLE_PKCS11
 
 psk-gaa.c: $(srcdir)/psk.gaa
 	-$(GAA) $< -o psk-gaa.c -i psk-gaa.h
-srptool-gaa.c: $(srcdir)/srptool.gaa
-	-$(GAA) $< -o srptool-gaa.c -i srptool-gaa.h
 ocsptool-gaa.c: $(srcdir)/ocsptool.gaa
 	-$(GAA) $< -o ocsptool-gaa.c -i ocsptool-gaa.h
 if ENABLE_PKCS11
@@ -167,9 +166,11 @@ p11tool-gaa.c: $(srcdir)/p11tool.gaa
 endif
 certtool-gaa.c: $(srcdir)/certtool.gaa
 	-$(GAA) $< -o certtool-gaa.c -i certtool-gaa.h
-cli-gaa.c: $(srcdir)/cli.gaa
-	-$(GAA) $< -o cli-gaa.c -i cli-gaa.h
-tls_test-gaa.c: $(srcdir)/tls_test.gaa
-	-$(GAA) $< -o tls_test-gaa.c -i tls_test-gaa.h
+cli-debug-args.c: $(srcdir)/cli-debug-args.def
+	-autogen $<
+cli-args.c: $(srcdir)/cli-args.def
+	-autogen $<
+srptool-args.c: $(srcdir)/srptool-args.def
+	-autogen $<
 serv-gaa.c: $(srcdir)/serv.gaa
 	-$(GAA) $< -o serv-gaa.c -i serv-gaa.h

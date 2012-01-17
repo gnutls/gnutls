@@ -1,0 +1,276 @@
+AutoGen Definitions options;
+prog-name     = gnutls-cli;
+prog-title    = "GnuTLS client";
+prog-desc     = "Simple client program to set up a TLS connection.";
+short-usage   = "Usage: gnutls-cli [options] hostname\ngnutls-cli --help for usage instructions.\n";
+prog-group    = "GnuTLS";
+detail        = "Simple client program to set up a TLS connection to some other computer. 
+It sets up a TLS connection and forwards data from the standard input to the secured socket and vice versa.";
+gnu-usage;
+no-misuse-usage;
+disable-save;
+reorder-args;
+argument;
+long-opts;
+config-header = 'config.h';
+export = '#include <gettext.h>';
+
+copyright = {
+    date  = "2000-2012";
+    owner = "Free Software Foundation";
+    author = "Nikos Mavrogiannopoulos and Simon Josefsson";
+    eaddr  = "bug-gnutls@gnu.org";
+    type  = gpl;
+};
+version = "@VERSION@";
+
+flag = {
+    name      = debug;
+    value     = d;
+    arg-type  = number;
+    arg-range = "0 -> 9999";
+    descrip   = "Enable debugging";
+    doc       = "";
+};
+
+flag = {
+    name      = resume;
+    value     = r;
+    descrip   = "Connect, establish a session. Connect again and resume this session";
+    doc       = "";
+};
+
+flag = {
+    name      = rehandshake;
+    value     = e;
+    descrip   = "Connect, establish a session and rehandshake immediately";
+    doc       = "";
+};
+
+flag = {
+    name      = noticket;
+    descrip   = "Don't accept session tickets";
+    doc      = "";
+};
+
+flag = {
+    name      = starttls;
+    value     = s;
+    descrip   = "Connect, establish a plain session and start TLS when EOF or a SIGALRM is received";
+    doc      = "";
+};
+
+flag = {
+    name      = udp;
+    value     = u;
+    descrip   = "Use DTLS (datagram TLS) over UDP";
+    doc      = "";
+};
+
+flag = {
+    name      = mtu;
+    arg-type  = number;
+    arg-range = "0->17000";
+    descrip   = "Set MTU for datagram TLS";
+    doc      = "";
+};
+
+flag = {
+    name      = crlf;
+    descrip   = "Send CR LF instead of LF";
+    doc      = "";
+};
+
+flag = {
+    name      = x509fmtder;
+    descrip   = "Use DER format for certificates to read from";
+    doc      = "";
+};
+
+flag = {
+    name      = fingerprint;
+    value     = f;
+    descrip   = "Send the openpgp fingerprint, instead of the key";
+    doc      = "";
+};
+
+flag = {
+    name      = disable-extensions;
+    descrip   = "Disable all the TLS extensions";
+    doc      = "";
+};
+
+flag = {
+    name      = print-cert;
+    descrip   = "Print peer's certificate in PEM format";
+    doc      = "";
+};
+
+flag = {
+    name      = recordsize;
+    arg-type  = number;
+    arg-range = "0->4096";
+    descrip   = "The maximum record size to advertize";
+    doc      = "";
+};
+
+flag = {
+    name      = verbose;
+    value     = V;
+    max       = NOLIMIT;
+    descrip   = "More verbose output";
+    doc      = "";
+};
+
+flag = {
+    name      = priority;
+    arg-type  = string;
+    descrip   = "Priorities string";
+    doc      = "TLS algorithms and protocols to enable. You can
+use predefined sets of ciphersuites such as PERFORMANCE,
+NORMAL, SECURE128, SECURE256.
+
+Check  the  GnuTLS  manual  on  section  ``Priority strings'' for more
+information on allowed keywords";
+};
+
+flag = {
+    name      = x509cafile;
+    arg-type  = file;
+    file-exists;
+    descrip   = "Certificate file or PKCS #11 URL to use";
+    doc      = "";
+};
+
+flag = {
+    name      = x509crlfile;
+    arg-type  = file;
+    file-exists;
+    descrip   = "CRL file to use";
+    doc      = "";
+};
+
+flag = {
+    name      = pgpkeyfile;
+    arg-type  = file;
+    file-exists;
+    descrip   = "PGP Key file to use";
+    doc      = "";
+};
+
+flag = {
+    name      = pgpkeyring;
+    arg-type  = file;
+    file-exists;
+    descrip   = "PGP Key ring file to use";
+    doc      = "";
+};
+
+flag = {
+    name      = pgpcertfile;
+    arg-type  = file;
+    file-exists;
+    descrip   = "PGP Public Key (certificate) file to use";
+    doc      = "";
+};
+
+flag = {
+    name      = x509keyfile;
+    arg-type  = file;
+    file-exists;
+    descrip   = "X.509 key file or PKCS #11 URL to use";
+    doc      = "";
+};
+
+flag = {
+    name      = x509certfile;
+    arg-type  = file;
+    file-exists;
+    descrip   = "X.509 Certificate file or PKCS #11 URL to use";
+    doc      = "";
+};
+
+flag = {
+    name      = pgpsubkey;
+    arg-type  = string;
+    descrip   = "PGP subkey to use (hex or auto)";
+    doc      = "";
+};
+
+flag = {
+    name      = srpusername;
+    arg-type  = string;
+    descrip   = "SRP username to use";
+    doc      = "";
+};
+
+flag = {
+    name      = srppasswd;
+    arg-type  = string;
+    descrip   = "SRP password to use";
+    doc      = "";
+};
+
+flag = {
+    name      = pskusername;
+    arg-type  = string;
+    descrip   = "PSK username to use";
+    doc      = "";
+};
+
+flag = {
+    name      = pskkey;
+    arg-type  = string;
+    descrip   = "PSK key (in hex) to use";
+    doc      = "";
+};
+
+flag = {
+    name      = port;
+    value     = p;
+    arg-type  = string;
+    descrip   = "The port to connect to";
+    doc      = "";
+};
+
+flag = {
+    name      = insecure;
+    descrip   = "Don't abort program if server certificate can't be validated";
+    doc      = "";
+};
+
+flag = {
+    name      = benchmark-ciphers;
+    descrip   = "Benchmark individual ciphers";
+    doc      = "";
+};
+
+flag = {
+    name      = benchmark-soft-ciphers;
+    descrip   = "Benchmark individual software ciphers (no hw acceleration)";
+    doc      = "";
+};
+
+flag = {
+    name      = benchmark-tls;
+    descrip   = "Benchmark ciphers and key exchange methods in TLS";
+    doc      = "";
+};
+
+flag = {
+    name      = list;
+    value     = l;
+    arg-type  = string;
+    descrip   = "Print a list of the supported algorithms and modes";
+    doc      = "Print a list of the supported algorithms and modes. If a priority string is given then only the enabled ciphersuites are shown.";
+};
+
+ 	
+
+doc-section = {
+  ds-type   = 'SEE ALSO'; // or anything else
+  ds-format = 'man';      // or texi or mdoc format
+  ds-text   = <<-_EOText_
+gnutls-cli-debug(1), gnutls-serv(1)
+_EOText_;
+};

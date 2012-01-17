@@ -421,6 +421,8 @@ po/quot.sed
 po/remove-potcdate.sed
 po/remove-potcdate.sin
 po/stamp-po
+src/cli-args.def
+src/srptool-args.def
 src/Makefile
 src/Makefile.in
 src/benchmark
@@ -549,8 +551,10 @@ doc/reference/*.bak
 doc/manpages/gnutls_*.3
 doc/examples/ex-ocsp-client
 doc/examples/ex-ocsp-verify
+doc/manpages/gnutls-cli.1
 doc/examples/ex-client-anon
 doc/examples/ex-client-dtls
 doc/examples/ex-client-x509
 doc/examples/ex-serv-x509
 tests/slow/cipher-test
+libopts/libopts.la

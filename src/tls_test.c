@@ -33,12 +33,14 @@
 #endif
 #include <tests.h>
 #include <common.h>
-#include <tls_test-gaa.h>
+#include <cli-debug-args.h>
 
 /* Gnulib portability files. */
 #include <progname.h>
 #include <version-etc.h>
 #include "sockets.h"
+
+static void cmd_parser (int argc, char **argv);
 
 #define ERR(err,s) if (err==-1) {perror(s);return(1);}
 #define MAX_BUF 4096
@@ -49,7 +51,7 @@ const char *hostname = NULL;
 int port;
 int record_max_size;
 int fingerprint;
-static int debug;
+static int debug = 0;
 
 gnutls_srp_client_credentials_t srp_cred;
 gnutls_anon_client_credentials_t anon_cred;
@@ -165,8 +167,6 @@ static const TLS_TEST tls_tests[] = {
 static int tt = 0;
 const char *ip;
 
-static void gaa_parser (int argc, char **argv);
-
 int
 main (int argc, char **argv)
 {
@@ -178,7 +178,7 @@ main (int argc, char **argv)
   struct addrinfo hints, *res, *ptr;
 
   set_program_name (argv[0]);
-  gaa_parser (argc, argv);
+  cmd_parser(argc, argv);
 
 #ifndef _WIN32
   signal (SIGPIPE, SIG_IGN);
@@ -317,26 +317,31 @@ main (int argc, char **argv)
   return 0;
 }
 
-static gaainfo info;
-void
-gaa_parser (int argc, char **argv)
+static void cmd_parser (int argc, char **argv)
 {
-  if (gaa (argc, argv, &info) != -1)
-    {
-      fprintf (stderr,
-               "Error in the arguments. Use the -h or --help parameters to get more info.\n");
-      exit (1);
-    }
+  const char* rest = NULL;
+  int optct = optionProcess( &gnutls_cli_debugOptions, argc, argv);
+  argc -= optct;
+  argv += optct;
+  
+  if (rest == NULL && argc > 0)
+    rest = argv[0];
 
-  port = info.pp;
-  if (info.rest_args == NULL)
+  if (HAVE_OPT(PORT))
+    port = OPT_VALUE_PORT;
+  else
+    port = 443;
+
+  if (rest == NULL)
     hostname = "localhost";
   else
-    hostname = info.rest_args;
+    hostname = rest;
 
-  debug = info.debug;
+  if (HAVE_OPT(DEBUG))
+    debug = OPT_VALUE_DEBUG;
 
-  verbose = info.more_info;
+  if (HAVE_OPT(VERBOSE))
+    verbose++;
 
 }
 

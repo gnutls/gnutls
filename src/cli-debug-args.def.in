@@ -1,0 +1,60 @@
+AutoGen Definitions options;
+prog-name     = gnutls-cli-debug;
+prog-title    = "GnuTLS debug client";
+prog-desc     = "Simple client program to check TLS server capabilities.";
+short-usage   = "Usage: gnutls-cli-debug [options] hostname\ngnutls-cli --help for usage instructions.\n";
+prog-group    = "GnuTLS";
+detail        = "TLS debug client. It sets up multiple TLS connections to 
+a server and queries its capabilities. Can be used to check for servers with
+special needs or bugs.";
+gnu-usage;
+no-misuse-usage;
+disable-save;
+reorder-args;
+argument;
+long-opts;
+config-header = 'config.h';
+export = '#include <gettext.h>';
+
+copyright = {
+    date  = "2000-2012";
+    owner = "Free Software Foundation";
+    author = "Nikos Mavrogiannopoulos and Simon Josefsson";
+    eaddr  = "bug-gnutls@gnu.org";
+    type  = gpl;
+};
+version = "@VERSION@";
+
+flag = {
+    name      = debug;
+    value     = d;
+    arg-type  = number;
+    arg-range = "0 -> 9999";
+    descrip   = "Enable debugging";
+    doc       = "";
+};
+
+flag = {
+    name      = verbose;
+    value     = V;
+    max       = NOLIMIT;
+    descrip   = "More verbose output";
+    doc      = "";
+};
+
+flag = {
+    name      = port;
+    value     = p;
+    arg-type  = number;
+    arg-range = "0 -> 65536";
+    descrip   = "The port to connect to";
+    doc      = "";
+};
+
+doc-section = {
+  ds-type   = 'SEE ALSO'; // or anything else
+  ds-format = 'man';      // or texi or mdoc format
+  ds-text   = <<-_EOText_
+gnutls-cli(1), gnutls-serv(1)
+_EOText_;
+};
