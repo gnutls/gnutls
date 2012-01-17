@@ -2344,6 +2344,11 @@ gnutls_handshake (gnutls_session_t session)
 {
   int ret;
   record_parameters_st *params;
+  
+  /* sanity check. Verify that there are priorities setup.
+   */
+  if (session->internals.priorities.protocol.algorithms == 0)
+    return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
 
   ret = _gnutls_epoch_get (session, session->security_parameters.epoch_next,
                            &params);
