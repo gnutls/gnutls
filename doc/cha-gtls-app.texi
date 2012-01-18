@@ -1235,17 +1235,17 @@ authentication.
 
 @headitem Security bits @tab RSA, DH and SRP parameter size @tab ECC key size @tab Security parameter @tab Description
 
-@item 64
-@tab 816
-@tab 128
-@tab @code{WEAK}
-@tab Very short term protection against small organizations
-
 @item 80
 @tab 1248
 @tab 160
 @tab @code{LOW}
 @tab Very short term protection against agencies
+
+@item 96
+@tab 1776
+@tab 192
+@tab @code{LEGACY}
+@tab Legacy standard level
 
 @item 112
 @tab 2432
