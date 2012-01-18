@@ -199,10 +199,10 @@ crypto-api.texi: $(top_srcdir)/lib/includes/gnutls/crypto.h
 # Generated texinfos.
 # for some reason it does not work when cross compiling
 if !WINDOWS
-gnutls_TEXINFOS += error_codes.texi algorithms.texi alerts.texi  enums.texi
+gnutls_TEXINFOS += error_codes.texi algorithms.texi alerts.texi enums.texi
 endif
 
-MAINTAINERCLEANFILES += error_codes.texi algorithms.texi enums.texi
+DISTCLEANFILES = error_codes.texi algorithms.texi alerts.texi enums.texi
 
 AM_CPPFLAGS = \
 	-I$(top_builddir)/lib/includes -I$(top_srcdir)/lib/includes \
@@ -220,15 +220,17 @@ alert_printlist_SOURCES = alert-printlist.c
 alert_printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 
 error_codes.texi: $(top_srcdir)/lib/gnutls_errors.c $(srcdir)/errcodes.c
-	make $(builddir)/errcodes
+	$(MAKE) $(builddir)/errcodes
 	$(builddir)/errcodes > $@-tmp
 	mv -f $@-tmp $@
 
-algorithms.texi: printlist
+algorithms.texi: $(top_srcdir)/lib/algorithms/ciphers.c $(srcdir)/printlist.c
+	$(MAKE) $(builddir)/printlist
 	$(builddir)/printlist > $@-tmp
 	mv -f $@-tmp $@
 
-alerts.texi: alert-printlist
+alerts.texi: $(top_srcdir)/lib/gnutls_alert.c $(srcdir)/alert-printlist.c
+	$(MAKE) $(builddir)/alert-printlist
 	$(builddir)/alert-printlist > $@-tmp
 	mv -f $@-tmp $@
 
@@ -239,8 +241,68 @@ enums.texi: $(srcdir)/../lib/includes/gnutls/*.h $(builddir)/../lib/includes/gnu
 		$(srcdir)/scripts/gdoc -texinfo $$i >> $@-tmp && \
 		echo "ok"; \
 	done
-	$(srcdir)/scripts/split-texi.pl enums enum < $@-tmp
 	mv -f $@-tmp $@
+
+ENUMS =
+ENUMS += enums/gnutls_alert_description_t
+ENUMS += enums/gnutls_alert_level_t
+ENUMS += enums/gnutls_certificate_import_flags
+ENUMS += enums/gnutls_certificate_print_formats_t
+ENUMS += enums/gnutls_certificate_request_t
+ENUMS += enums/gnutls_certificate_status_t
+ENUMS += enums/gnutls_certificate_type_t
+ENUMS += enums/gnutls_certificate_verify_flags
+ENUMS += enums/gnutls_channel_binding_t
+ENUMS += enums/gnutls_cipher_algorithm_t
+ENUMS += enums/gnutls_close_request_t
+ENUMS += enums/gnutls_compression_method_t
+ENUMS += enums/gnutls_credentials_type_t
+ENUMS += enums/gnutls_digest_algorithm_t
+ENUMS += enums/gnutls_ecc_curve_t
+ENUMS += enums/gnutls_handshake_description_t
+ENUMS += enums/gnutls_kx_algorithm_t
+ENUMS += enums/gnutls_mac_algorithm_t
+ENUMS += enums/gnutls_openpgp_crt_fmt_t
+ENUMS += enums/gnutls_openpgp_crt_status_t
+ENUMS += enums/gnutls_params_type_t
+ENUMS += enums/gnutls_pk_algorithm_t
+ENUMS += enums/gnutls_pkcs11_obj_attr_t
+ENUMS += enums/gnutls_pkcs11_obj_info_t
+ENUMS += enums/gnutls_pkcs11_obj_type_t
+ENUMS += enums/gnutls_pkcs11_token_info_t
+ENUMS += enums/gnutls_pkcs12_bag_type_t
+ENUMS += enums/gnutls_pkcs_encrypt_flags_t
+ENUMS += enums/gnutls_privkey_type_t
+ENUMS += enums/gnutls_protocol_t
+ENUMS += enums/gnutls_psk_key_flags
+ENUMS += enums/gnutls_rnd_level_t
+ENUMS += enums/gnutls_sec_param_t
+ENUMS += enums/gnutls_server_name_type_t
+ENUMS += enums/gnutls_sign_algorithm_t
+ENUMS += enums/gnutls_supplemental_data_format_type_t
+ENUMS += enums/gnutls_x509_crt_fmt_t
+ENUMS += enums/gnutls_x509_subject_alt_name_t
+
+gnutls_TEXINFOS += $(ENUMS)
+DISTCLEANFILES += $(ENUMS)
+
+$(ENUMS): enums.texi
+	$(MAKE) compare-makefile
+	-mkdir enums
+	$(srcdir)/scripts/split-texi.pl enums enum < enums.texi
+
+compare-makefile:
+	ENUMS=`grep '^@c ' enums.texi | sed 's/@c //g' | sort`; \
+	STR=""; \
+	for i in $$ENUMS; do \
+		STR="$$STR\nENUMS += enums/$$i"; \
+	done; \
+	grep -v -e '^ENUMS += ' $(srcdir)/Makefile.am | \
+		perl -p -e "s,^ENUMS =,ENUMS =$$STR," > tmp-$@; \
+	diff -u $(srcdir)/Makefile.am tmp-$@
+	rm -f tmp-$@
+
+.PHONY: compare-makefile
 
 # Guile texinfos.
 
@@ -275,7 +337,3 @@ core.c.texi:
 	echo "(Guile not available, documentation not generated.)" > $@
 
 endif !HAVE_GUILE
-
-clean-am:
-	rm -rf enums gnutls.info gnutls.html gnutls.pdf enums.texi
-
