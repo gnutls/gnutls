@@ -576,6 +576,13 @@ gnutls_priority_set (gnutls_session_t session, gnutls_priority_t priority)
                                  session->internals.priorities.protocol.
                                  priority[0]);
 
+  if (session->internals.priorities.protocol.algorithms == 0 ||
+      session->internals.priorities.cipher.algorithms == 0 ||
+      session->internals.priorities.mac.algorithms == 0 ||
+      session->internals.priorities.kx.algorithms == 0 ||
+      session->internals.priorities.compression.algorithms == 0)
+    return gnutls_assert_val(GNUTLS_E_NO_PRIORITIES_WERE_SET);
+
   return 0;
 }
 

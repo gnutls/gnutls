@@ -51,7 +51,7 @@ static const gnutls_error_entry error_algorithms[] = {
   ERROR_ENTRY (N_("Success."), GNUTLS_E_SUCCESS, 0),
   ERROR_ENTRY (N_("Could not negotiate a supported cipher suite."),
                GNUTLS_E_UNKNOWN_CIPHER_SUITE, 1),
-  ERROR_ENTRY (N_("No priorities were setup."),
+  ERROR_ENTRY (N_("No or insufficient priorities were set."),
                GNUTLS_E_NO_PRIORITIES_WERE_SET, 1),
   ERROR_ENTRY (N_("The cipher type is unsupported."),
                GNUTLS_E_UNKNOWN_CIPHER_TYPE, 1),

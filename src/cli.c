@@ -545,6 +545,7 @@ static gnutls_session_t
 init_tls_session (const char *hostname)
 {
   const char *err;
+  int ret;
 
   gnutls_session_t session;
 
@@ -558,9 +559,11 @@ init_tls_session (const char *hostname)
     gnutls_init (&session, GNUTLS_CLIENT);
 
 
-  if (gnutls_priority_set_direct (session, info.priorities, &err) < 0)
+  if ((ret = gnutls_priority_set_direct (session, info.priorities, &err)) < 0)
     {
-      fprintf (stderr, "Syntax error at: %s\n", err);
+      if (ret == GNUTLS_E_INVALID_REQUEST) fprintf (stderr, "Syntax error at: %s\n", err);
+      else 
+        fprintf(stderr, "Error in priorities: %s\n", gnutls_strerror(ret));
       exit (1);
     }
 

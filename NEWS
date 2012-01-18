@@ -7,6 +7,9 @@ See the end for copying conditions.
 ** certtool: --outder option now works for private
 and public keys as well.
 
+** libgnutls: Added error code GNUTLS_E_NO_PRIORITIES_WERE_SET
+to warn when no or insufficient priorities were set.
+
 ** libgnutls: Corrected an alignment issue in ECDH
 key generation which prevented some keys from being
 correctly aligned in rare circumstances.
