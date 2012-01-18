@@ -24,7 +24,7 @@ GUILE_LOAD_PATH="@abs_top_srcdir@/guile/modules:$GUILE_LOAD_PATH"
 GUILE_LOAD_PATH="@abs_top_builddir@/guile/modules:$GUILE_LOAD_PATH"
 export GUILE_LOAD_PATH
 
-GNUTLS_GUILE_EXTENSION_DIR="@abs_top_srcdir@/guile/src"
+GNUTLS_GUILE_EXTENSION_DIR="@abs_top_builddir@/guile/src"
 export GNUTLS_GUILE_EXTENSION_DIR
 
 exec @abs_top_builddir@/libtool --mode=execute		                    \
