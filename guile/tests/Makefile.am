@@ -31,6 +31,7 @@ endif
 
 TESTS_ENVIRONMENT =					\
   GUILE_AUTO_COMPILE=0					\
+  GUILE_WARN_DEPRECATED=detailed			\
   $(top_builddir)/guile/pre-inst-guile -L $(srcdir)
 
 
