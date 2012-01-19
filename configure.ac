@@ -490,6 +490,7 @@ AC_CONFIG_FILES([
   src/cli-args.def
   src/cli-debug-args.def
   src/srptool-args.def
+  src/psk-args.def
   src/cfg/Makefile
   src/cfg/platon/Makefile
   src/cfg/platon/str/Makefile

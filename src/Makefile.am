@@ -83,10 +83,10 @@ libcmd_ocsp_la_SOURCES = ocsptool.gaa ocsptool-gaa.h ocsptool-gaa.c
 endif
 
 psktool_SOURCES = psk.c
-psktool_LDADD = ../lib/libgnutls.la libcmd-psk.la ../gl/libgnu.la
+psktool_LDADD = ../lib/libgnutls.la libcmd-psk.la ../gl/libgnu.la $(LIBOPTS_LDADD)
 noinst_LTLIBRARIES += libcmd-psk.la
 libcmd_psk_la_CFLAGS = 
-libcmd_psk_la_SOURCES = psk.gaa psk-gaa.h psk-gaa.c
+libcmd_psk_la_SOURCES = psk-args.def psk-args.c psk-args.h
 
 BENCHMARK_SRCS = benchmark-cipher.c benchmark.c benchmark.h benchmark-tls.c
 
@@ -155,7 +155,6 @@ libcmd_p11tool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
 
 endif # ENABLE_PKCS11
 
-
 psk-gaa.c: $(srcdir)/psk.gaa
 	-$(GAA) $< -o psk-gaa.c -i psk-gaa.h
 ocsptool-gaa.c: $(srcdir)/ocsptool.gaa
@@ -166,6 +165,8 @@ p11tool-gaa.c: $(srcdir)/p11tool.gaa
 endif
 certtool-gaa.c: $(srcdir)/certtool.gaa
 	-$(GAA) $< -o certtool-gaa.c -i certtool-gaa.h
+psk-args.c: $(srcdir)/psk-args.def
+	-autogen $<
 cli-debug-args.c: $(srcdir)/cli-debug-args.def
 	-autogen $<
 cli-args.c: $(srcdir)/cli-args.def

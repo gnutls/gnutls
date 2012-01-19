@@ -41,7 +41,7 @@ main (int argc, char **argv)
 #include <string.h>
 #include <stdlib.h>
 #include <gnutls/gnutls.h>
-#include <psk-gaa.h>
+#include <psk-args.h>
 
 #include <gnutls/crypto.h>      /* for random */
 
@@ -60,21 +60,22 @@ main (int argc, char **argv)
 #include "getpass.h"
 
 static int write_key (const char *username, const char *key, int key_size,
-                      char *passwd_file);
+                      const char *passwd_file);
 
 #define KPASSWD "/etc/passwd.psk"
 #define MAX_KEY_SIZE 64
 int
 main (int argc, char **argv)
 {
-  gaainfo info;
   int ret;
 #ifndef _WIN32
   struct passwd *pwd;
 #endif
   unsigned char key[MAX_KEY_SIZE];
   char hex_key[MAX_KEY_SIZE * 2 + 1];
+  int optct, key_size;
   gnutls_datum_t dkey;
+  const char* passwd, *username;
   size_t hex_key_size = sizeof (hex_key);
 
   set_program_name (argv[0]);
@@ -87,16 +88,16 @@ main (int argc, char **argv)
 
   umask (066);
 
-  if (gaa (argc, argv, &info) != -1)
-    {
-      fprintf (stderr, "Error in the arguments.\n");
-      return -1;
-    }
+  optct = optionProcess( &psktoolOptions, argc, argv);
+  argc -= optct;
+  argv += optct;
 
-  if (info.passwd == NULL)
-    info.passwd = (char *) KPASSWD;
+  if (!HAVE_OPT(PASSWD))
+    passwd = (char *) KPASSWD;
+  else
+    passwd = OPT_ARG(PASSWD);
 
-  if (info.username == NULL)
+  if (!HAVE_OPT(USERNAME))
     {
 #ifndef _WIN32
       pwd = getpwuid (getuid ());
@@ -107,25 +108,29 @@ main (int argc, char **argv)
           return -1;
         }
 
-      info.username = pwd->pw_name;
+      username = pwd->pw_name;
 #else
       fprintf (stderr, "Please specify a user\n");
       return -1;
 #endif
     }
+  else
+    username = OPT_ARG(USERNAME);
 
-  if (info.key_size > MAX_KEY_SIZE)
+  if (HAVE_OPT(KEYSIZE) && OPT_VALUE_KEYSIZE > MAX_KEY_SIZE)
     {
       fprintf (stderr, "Key size is too long\n");
       exit (1);
     }
 
-  if (info.key_size < 1)
-    info.key_size = 16;
+  if (!HAVE_OPT(KEYSIZE) || OPT_VALUE_KEYSIZE < 1)
+    key_size = 16;
+  else
+    key_size = OPT_VALUE_KEYSIZE;
 
-  printf ("Generating a random key for user '%s'\n", info.username);
+  printf ("Generating a random key for user '%s'\n", username);
 
-  ret = gnutls_rnd (GNUTLS_RND_RANDOM, (char *) key, info.key_size);
+  ret = gnutls_rnd (GNUTLS_RND_RANDOM, (char *) key, key_size);
   if (ret < 0)
     {
       fprintf (stderr, "Not enough randomness\n");
@@ -133,7 +138,7 @@ main (int argc, char **argv)
     }
 
   dkey.data = key;
-  dkey.size = info.key_size;
+  dkey.size = key_size;
 
   ret = gnutls_hex_encode (&dkey, hex_key, &hex_key_size);
   if (ret < 0)
@@ -142,15 +147,15 @@ main (int argc, char **argv)
       exit (1);
     }
 
-  ret = write_key (info.username, hex_key, hex_key_size, info.passwd);
+  ret = write_key (username, hex_key, hex_key_size, passwd);
   if (ret == 0)
-    printf ("Key stored to %s\n", info.passwd);
+    printf ("Key stored to %s\n", passwd);
 
   return ret;
 }
 
 static int
-filecopy (char *src, char *dst)
+filecopy (const char *src, const char *dst)
 {
   FILE *fd, *fd2;
   char line[5 * 1024];
@@ -190,7 +195,7 @@ filecopy (char *src, char *dst)
 
 static int
 write_key (const char *username, const char *key, int key_size,
-           char *passwd_file)
+           const char *passwd_file)
 {
   FILE *fd;
   char line[5 * 1024];

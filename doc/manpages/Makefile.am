@@ -35,6 +35,9 @@ gnutls-cli-debug.1: ../../src/cli-debug-args.def
 srptool.1: ../../src/srptool-args.def
 	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
 
+psktool.1: ../../src/psk-args.def
+	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+
 APIMANS =
 APIMANS += gnutls_pubkey_init.3
 APIMANS += gnutls_pubkey_deinit.3
