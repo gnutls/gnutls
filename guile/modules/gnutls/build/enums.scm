@@ -458,10 +458,10 @@ unrecognized-name unknown-psk-identity)
 (define %error-enum
   (make-enum-type 'error "int"
                   '(
+;; FIXME: Automate this:
+;; grep '^#define GNUTLS_E_' ../../../../includes/gnutls/gnutls.h.in \
+;;  | sed -r -e 's/^#define GNUTLS_E_([^ ]+).*$/\1/' | tr A-Z_ a-z-
 success
-unknown-compression-algorithm
-unknown-cipher-type
-large-packet
 unsupported-version-packet
 unexpected-packet-length
 invalid-session
@@ -470,9 +470,6 @@ unexpected-packet
 warning-alert-received
 error-in-finished-packet
 unexpected-handshake-packet
-unknown-cipher-suite
-unwanted-algorithm
-mpi-scan-failed
 decryption-failed
 memory-error
 decompression-failed
@@ -485,10 +482,8 @@ insufficient-credentials
 insuficient-credentials
 insufficient-cred
 insuficient-cred
-invalid-request
 hash-failed
 base64-decoding-error
-mpi-print-failed
 rehandshake
 got-application-data
 record-limit-reached
@@ -513,6 +508,7 @@ dh-prime-unacceptable
 file-error
 too-many-empty-packets
 unknown-pk-algorithm
+too-many-handshake-packets
 no-temporary-rsa-params
 no-compression-algorithms
 no-cipher-suites
@@ -540,7 +536,6 @@ unsupported-certificate-type
 x509-unknown-san
 openpgp-fingerprint-unsupported
 x509-unsupported-attribute
-unknown-algorithm
 unknown-hash-algorithm
 unknown-pkcs-content-type
 unknown-pkcs-bag-type
@@ -550,6 +545,12 @@ constraint-error
 warning-ia-iphf-received
 warning-ia-fphf-received
 ia-verify-failed
+unknown-algorithm
+unsupported-signature-algorithm
+safe-renegotiation-failed
+unsafe-renegotiation-denied
+unknown-srp-username
+premature-termination
 base64-encoding-error
 incompatible-gcrypt-library
 incompatible-crypto-library
@@ -557,7 +558,46 @@ incompatible-libtasn1-library
 openpgp-keyring-error
 x509-unsupported-oid
 random-failed
-unimplemented-feature)
+base64-unexpected-header-error
+openpgp-subkey-error
+crypto-already-registered
+handshake-too-large
+cryptodev-ioctl-error
+cryptodev-device-error
+channel-binding-not-available
+bad-cookie
+openpgp-preferred-key-error
+incompat-dsa-key-with-tls-protocol
+pkcs11-error
+pkcs11-load-error
+parsing-error
+pkcs11-pin-error
+pkcs11-slot-error
+locking-error
+pkcs11-attribute-error
+pkcs11-device-error
+pkcs11-data-error
+pkcs11-unsupported-feature-error
+pkcs11-key-error
+pkcs11-pin-expired
+pkcs11-pin-locked
+pkcs11-session-error
+pkcs11-signature-error
+pkcs11-token-error
+pkcs11-user-error
+crypto-init-failed
+timedout
+user-error
+ecc-no-supported-curves
+ecc-unsupported-curve
+pkcs11-requested-object-not-availble
+certificate-list-unsorted
+illegal-parameter
+no-priorities-were-set
+unimplemented-feature
+application-error-max
+application-error-min
+)
                   "gnutls_strerror"
                   "GNUTLS_E_"))
 

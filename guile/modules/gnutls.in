@@ -258,10 +258,10 @@
            certificate-verify/allow-sign-rsa-md2
            certificate-verify/allow-sign-rsa-md5
 
+           ;; FIXME: Automate this:
+           ;; grep '^#define GNUTLS_E_' ../../lib/includes/gnutls/gnutls.h.in | \
+           ;;   sed -r -e 's|^#define GNUTLS_E_([^ ]+).*$|error/\1|' | tr A-Z_ a-z-
            error/success
-           error/unknown-compression-algorithm
-           error/unknown-cipher-type
-           error/large-packet
            error/unsupported-version-packet
            error/unexpected-packet-length
            error/invalid-session
@@ -270,9 +270,6 @@
            error/warning-alert-received
            error/error-in-finished-packet
            error/unexpected-handshake-packet
-           error/unknown-cipher-suite
-           error/unwanted-algorithm
-           error/mpi-scan-failed
            error/decryption-failed
            error/memory-error
            error/decompression-failed
@@ -287,7 +284,6 @@
            error/insuficient-cred
            error/hash-failed
            error/base64-decoding-error
-           error/mpi-print-failed
            error/rehandshake
            error/got-application-data
            error/record-limit-reached
@@ -312,8 +308,8 @@
            error/file-error
            error/too-many-empty-packets
            error/unknown-pk-algorithm
+           error/too-many-handshake-packets
            error/no-temporary-rsa-params
-           error/lzo-init-failed
            error/no-compression-algorithms
            error/no-cipher-suites
            error/openpgp-getkey-failed
@@ -340,7 +336,6 @@
            error/x509-unknown-san
            error/openpgp-fingerprint-unsupported
            error/x509-unsupported-attribute
-           error/unknown-algorithm
            error/unknown-hash-algorithm
            error/unknown-pkcs-content-type
            error/unknown-pkcs-bag-type
@@ -350,6 +345,12 @@
            error/warning-ia-iphf-received
            error/warning-ia-fphf-received
            error/ia-verify-failed
+           error/unknown-algorithm
+           error/unsupported-signature-algorithm
+           error/safe-renegotiation-failed
+           error/unsafe-renegotiation-denied
+           error/unknown-srp-username
+           error/premature-termination
            error/base64-encoding-error
            error/incompatible-gcrypt-library
            error/incompatible-crypto-library
@@ -357,7 +358,45 @@
            error/openpgp-keyring-error
            error/x509-unsupported-oid
            error/random-failed
+           error/base64-unexpected-header-error
+           error/openpgp-subkey-error
+           error/crypto-already-registered
+           error/handshake-too-large
+           error/cryptodev-ioctl-error
+           error/cryptodev-device-error
+           error/channel-binding-not-available
+           error/bad-cookie
+           error/openpgp-preferred-key-error
+           error/incompat-dsa-key-with-tls-protocol
+           error/pkcs11-error
+           error/pkcs11-load-error
+           error/parsing-error
+           error/pkcs11-pin-error
+           error/pkcs11-slot-error
+           error/locking-error
+           error/pkcs11-attribute-error
+           error/pkcs11-device-error
+           error/pkcs11-data-error
+           error/pkcs11-unsupported-feature-error
+           error/pkcs11-key-error
+           error/pkcs11-pin-expired
+           error/pkcs11-pin-locked
+           error/pkcs11-session-error
+           error/pkcs11-signature-error
+           error/pkcs11-token-error
+           error/pkcs11-user-error
+           error/crypto-init-failed
+           error/timedout
+           error/user-error
+           error/ecc-no-supported-curves
+           error/ecc-unsupported-curve
+           error/pkcs11-requested-object-not-availble
+           error/certificate-list-unsorted
+           error/illegal-parameter
+           error/no-priorities-were-set
            error/unimplemented-feature
+           error/application-error-max
+           error/application-error-min
 
            ;; OpenPGP keys (formerly in GnuTLS-extra)
            openpgp-certificate? openpgp-private-key?
