@@ -829,5 +829,6 @@ doit:
 			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
 		echo -n "."; \
 	done
+	@echo ""
 
 .PHONY: update-makefile doit
