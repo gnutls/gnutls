@@ -1,6 +1,6 @@
 /*
  * GnuTLS PKCS#11 support
- * Copyright (C) 2010,2011 Free Software Foundation
+ * Copyright (C) 2010-2012 Free Software Foundation, Inc.
  * 
  * Author: Nikos Mavrogiannopoulos
  *

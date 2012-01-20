@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009,2011 Free Software Foundation
+ * Copyright (C) 2009-2012 Free Software Foundation, Inc.
  *
  * Authors: Jonathan Bastien-Filiatrault
  *          Nikos Mavrogiannopoulos
