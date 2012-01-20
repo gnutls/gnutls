@@ -1429,7 +1429,7 @@ set_certificate_file (certificate_set_file_function_t set_file,
   c_format = scm_to_gnutls_x509_certificate_format (format, 3, FUNC_NAME);
 
   c_file_len = scm_c_string_length (file);
-  c_file = (char *) alloca (c_file_len + 1);
+  c_file = alloca (c_file_len + 1);
 
   (void) scm_to_locale_stringbuf (file, c_file, c_file_len + 1);
   c_file[c_file_len] = '\0';
@@ -1561,10 +1561,10 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_key_files_x,
   c_format = scm_to_gnutls_x509_certificate_format (format, 2, FUNC_NAME);
 
   c_cert_file_len = scm_c_string_length (cert_file);
-  c_cert_file = (char *) alloca (c_cert_file_len + 1);
+  c_cert_file = alloca (c_cert_file_len + 1);
 
   c_key_file_len = scm_c_string_length (key_file);
-  c_key_file = (char *) alloca (c_key_file_len + 1);
+  c_key_file = alloca (c_key_file_len + 1);
 
   (void) scm_to_locale_stringbuf (cert_file, c_cert_file,
                                   c_cert_file_len + 1);
@@ -1724,7 +1724,7 @@ SCM_DEFINE (scm_gnutls_set_certificate_credentials_x509_keys_x,
   SCM_VALIDATE_LIST_COPYLEN (2, certs, c_cert_count);
   c_key = scm_to_gnutls_x509_private_key (privkey, 3, FUNC_NAME);
 
-  c_certs = (gnutls_x509_crt_t *) alloca (c_cert_count * sizeof (*c_certs));
+  c_certs = alloca (c_cert_count * sizeof (*c_certs));
   for (i = 0; scm_is_pair (certs); certs = SCM_CDR (certs), i++)
     {
       c_certs[i] = scm_to_gnutls_x509_certificate (SCM_CAR (certs),
@@ -1878,8 +1878,8 @@ SCM_DEFINE (scm_gnutls_set_srp_server_credentials_files_x,
   c_password_file_len = scm_c_string_length (password_file);
   c_password_conf_file_len = scm_c_string_length (password_conf_file);
 
-  c_password_file = (char *) alloca (c_password_file_len + 1);
-  c_password_conf_file = (char *) alloca (c_password_conf_file_len + 1);
+  c_password_file = alloca (c_password_file_len + 1);
+  c_password_conf_file = alloca (c_password_conf_file_len + 1);
 
   (void) scm_to_locale_stringbuf (password_file, c_password_file,
                                   c_password_file_len + 1);
@@ -1936,8 +1936,8 @@ SCM_DEFINE (scm_gnutls_set_srp_client_credentials_x,
   c_username_len = scm_c_string_length (username);
   c_password_len = scm_c_string_length (password);
 
-  c_username = (char *) alloca (c_username_len + 1);
-  c_password = (char *) alloca (c_password_len + 1);
+  c_username = alloca (c_username_len + 1);
+  c_password = alloca (c_password_len + 1);
 
   (void) scm_to_locale_stringbuf (username, c_username, c_username_len + 1);
   c_username[c_username_len] = '\0';
@@ -1993,7 +1993,7 @@ SCM_DEFINE (scm_gnutls_srp_base64_encode, "srp-base64-encode",
   SCM_VALIDATE_STRING (1, str);
 
   c_str_len = scm_c_string_length (str);
-  c_str = (char *) alloca (c_str_len + 1);
+  c_str = alloca (c_str_len + 1);
   (void) scm_to_locale_stringbuf (str, c_str, c_str_len + 1);
   c_str[c_str_len] = '\0';
 
@@ -2056,14 +2056,14 @@ SCM_DEFINE (scm_gnutls_srp_base64_decode, "srp-base64-decode",
   SCM_VALIDATE_STRING (1, str);
 
   c_str_len = scm_c_string_length (str);
-  c_str = (char *) alloca (c_str_len + 1);
+  c_str = alloca (c_str_len + 1);
   (void) scm_to_locale_stringbuf (str, c_str, c_str_len + 1);
   c_str[c_str_len] = '\0';
 
   /* We assume that the decoded string is smaller than the encoded
      string.  */
   c_result_len = c_str_len;
-  c_result = (char *) alloca (c_result_len);
+  c_result = alloca (c_result_len);
 
   c_str_d.data = (unsigned char *) c_str;
   c_str_d.size = c_str_len;
@@ -2118,7 +2118,7 @@ SCM_DEFINE (scm_gnutls_set_psk_server_credentials_file_x,
   SCM_VALIDATE_STRING (2, file);
 
   c_file_len = scm_c_string_length (file);
-  c_file = (char *) alloca (c_file_len + 1);
+  c_file = alloca (c_file_len + 1);
 
   (void) scm_to_locale_stringbuf (file, c_file, c_file_len + 1);
   c_file[c_file_len] = '\0';
@@ -2172,7 +2172,7 @@ SCM_DEFINE (scm_gnutls_set_psk_client_credentials_x,
   c_key_format = scm_to_gnutls_psk_key_format (key_format, 4, FUNC_NAME);
 
   c_username_len = scm_c_string_length (username);
-  c_username = (char *) alloca (c_username_len + 1);
+  c_username = alloca (c_username_len + 1);
 
   (void) scm_to_locale_stringbuf (username, c_username, c_username_len + 1);
   c_username[c_username_len] = '\0';
@@ -2340,7 +2340,7 @@ SCM_DEFINE (scm_gnutls_pkcs8_import_x509_private_key,
   else
     {
       c_pass_len = scm_c_string_length (pass);
-      c_pass = (char *) alloca (c_pass_len + 1);
+      c_pass = alloca (c_pass_len + 1);
       (void) scm_to_locale_stringbuf (pass, c_pass, c_pass_len + 1);
       c_pass[c_pass_len] = '\0';
     }
@@ -2396,7 +2396,7 @@ SCM_DEFINE (scm_gnutls_pkcs8_import_x509_private_key,
   (void) get_the_dn (c_cert, NULL, &c_dn_len);			\
 								\
   /* Get the DN itself.  */					\
-  c_dn = (char *) alloca (c_dn_len);				\
+  c_dn = alloca (c_dn_len);					\
   err = get_the_dn (c_cert, c_dn, &c_dn_len);			\
 								\
   if (EXPECT_FALSE (err))					\
@@ -2529,7 +2529,7 @@ SCM_DEFINE (scm_gnutls_x509_certificate_matches_hostname_p,
   SCM_VALIDATE_STRING (2, hostname);
 
   c_hostname_len = scm_c_string_length (hostname);
-  c_hostname = (char *) alloca (c_hostname_len + 1);
+  c_hostname = alloca (c_hostname_len + 1);
 
   (void) scm_to_locale_stringbuf (hostname, c_hostname, c_hostname_len + 1);
   c_hostname[c_hostname_len] = '\0';
@@ -2870,7 +2870,7 @@ SCM_DEFINE (scm_gnutls_import_openpgp_private_key,
   else
     {
       c_pass_len = scm_c_string_length (pass);
-      c_pass = (char *) alloca (c_pass_len + 1);
+      c_pass = alloca (c_pass_len + 1);
       (void) scm_to_locale_stringbuf (pass, c_pass, c_pass_len + 1);
       c_pass[c_pass_len] = '\0';
     }

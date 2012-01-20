@@ -65,12 +65,11 @@
             (enum-type-c-type enum))
     (format port "  long int c_len, i;~%")
     (format port "  scm_c_issue_deprecation_warning \
-(\"`set-session-~a-priority!'is deprecated, \
+(\"`set-session-~a-priority!' is deprecated, \
 use `set-session-priorities!' instead\");~%" (enum-type-subsystem enum))
     (format port "  c_session = scm_to_gnutls_session (session, 1, FUNC_NAME);~%")
     (format port "  SCM_VALIDATE_LIST_COPYLEN (2, items, c_len);~%")
-    (format port "  c_items = (~a *) alloca (sizeof (* c_items) * c_len);~%"
-            (enum-type-c-type enum))
+    (format port "  c_items = alloca (sizeof (* c_items) * c_len);~%")
     (format port "  for (i = 0; i < c_len; i++, items = SCM_CDR (items))~%")
     (format port "    c_items[i] = ~a (SCM_CAR (items), 2, FUNC_NAME);~%"
             (enum-type-to-c-function enum))
