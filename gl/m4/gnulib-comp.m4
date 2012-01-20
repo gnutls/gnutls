@@ -113,6 +113,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module func:
   # Code from module func-tests:
   # Code from module fwrite-tests:
+  # Code from module gendocs:
   # Code from module getaddrinfo:
   # Code from module getaddrinfo-tests:
   # Code from module getcwd-lgpl:
@@ -1100,6 +1101,7 @@ AC_DEFUN([gltests_LIBSOURCES], [
 # gnulib-tool and may be removed by future gnulib-tool invocations.
 AC_DEFUN([gl_FILE_LIST], [
   build-aux/config.rpath
+  build-aux/gendocs.sh
   build-aux/pmccabe.css
   build-aux/pmccabe2html
   build-aux/snippet/_Noreturn.h
@@ -1108,6 +1110,7 @@ AC_DEFUN([gl_FILE_LIST], [
   build-aux/snippet/warn-on-use.h
   build-aux/useless-if-before-free
   build-aux/vc-list-files
+  doc/gendocs_template
   lib/accept.c
   lib/alloca.c
   lib/alloca.in.h

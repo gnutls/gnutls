@@ -2,9 +2,10 @@
 # gendocs.sh -- generate a GNU manual in many formats.  This script is
 #   mentioned in maintain.texi.  See the help message below for usage details.
 
-scriptversion=2010-11-27.07
+scriptversion=2011-04-08.14
 
-# Copyright 2003-2010 Free Software Foundation, Inc.
+# Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free Software
+# Foundation, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -304,10 +305,10 @@ if test -n "$docbook"; then
   docbook_xml_gz_size=`calcsize "$outdir/$PACKAGE-db.xml.gz"`
   mv $PACKAGE-db.xml "$outdir/"
 
+  split_html_db_dir=html_node_db
   cmd="${DOCBOOK2HTML} -o $split_html_db_dir \"${outdir}/$PACKAGE-db.xml\""
   echo "Generating docbook HTML... ($cmd)"
   eval "$cmd"
-  split_html_db_dir=html_node_db
   (
     cd ${split_html_db_dir} || exit 1
     tar -czf "$abs_outdir/${PACKAGE}.html_node_db.tar.gz" -- *.html
