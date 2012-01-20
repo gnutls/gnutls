@@ -68,6 +68,10 @@ ctests = mini-deflate simple gc set_pkcs12_cred certder certuniqueid	\
 	 mini-x509-rehandshake rng-fork mini-eagain-dtls	\
 	 x509cert x509cert-tl infoaccess rsa-encrypt-decrypt
 
+if ENABLE_OCSP
+ctests += ocsp
+endif
+
 if ENABLE_OPENSSL
 ctests +=  openssl
 openssl_LDADD = $(LDADD) ../extra/libgnutls-openssl.la

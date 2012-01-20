@@ -181,4 +181,16 @@ John Wiley \& Sons, Inc., 2001.
 M. Mathis, J. Heffner, "Packetization Layer Path MTU Discovery", March 2007,
 available from @url{http://www.ietf.org/rfc/rfc4821.txt}.
 
+@item @anchor{RFC2560}[RFC2560]
+M. Myers et al, "X.509 Internet Public Key Infrastructure Online
+Certificate Status Protocol - OCSP", June 1999, Available from
+@url{http://www.ietf.org/rfc/rfc2560.txt}.
+
+@item @anchor{RIVESTCRL}[RIVESTCRL]
+R. L. Rivest, "Can We Eliminate Certificate Revocation Lists?",
+Proceedings of Financial Cryptography '98; Springer Lecture Notes in
+Computer Science No. 1465 (Rafael Hirschfeld, ed.), February 1998),
+pages 178--183, available from
+@url{http://people.csail.mit.edu/rivest/Rivest-CanWeEliminateCertificateRevocationLists.pdf}.
+
 @end table

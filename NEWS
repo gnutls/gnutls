@@ -4,6 +4,20 @@ See the end for copying conditions.
 
 * Version 3.0.12 (unreleased)
 
+** libgnutls: Added OCSP support.
+There is a new header file gnutls/ocsp.h and a set of new functions
+under the gnutls_ocsp namespace.  Currently the functionality provided
+is to parse and extract information from OCSP requests/responses, to
+generate OCSP requests and to verify OCSP responses.  See the manual
+for more information.  Run ./configure with --disable-ocsp to build
+GnuTLS without OCSP support.
+
+This work was sponsored by Smoothwall <http://smoothwall.net/>.
+
+** ocsptool: Added new command line tool.
+The tool can parse OCSP request/responses, generate OCSP requests and
+verify OCSP responses.  See the manual for more information.
+
 ** certtool: --outder option now works for private
 and public keys as well.
 
@@ -24,6 +38,42 @@ return a descriptive name of a DN OID.
 gnutls_pubkey_encrypt_data: Added
 gnutls_x509_dn_oid_name: Added
 gnutls_session_resumption_requested: Added
+gnutls/ocsp.h: Added new header file.
+gnutls_ocsp_print_formats_t: Added new type.
+gnutls_ocsp_resp_status_t: Added new type.
+gnutls_ocsp_cert_status_t: Added new type.
+gnutls_x509_crl_reason_t: Added new type.
+gnutls_ocsp_req_add_cert: Added.
+gnutls_ocsp_req_add_cert_id: Added.
+gnutls_ocsp_req_deinit: Added.
+gnutls_ocsp_req_export: Added.
+gnutls_ocsp_req_get_cert_id: Added.
+gnutls_ocsp_req_get_extension: Added.
+gnutls_ocsp_req_get_nonce: Added.
+gnutls_ocsp_req_get_version: Added.
+gnutls_ocsp_req_import: Added.
+gnutls_ocsp_req_init: Added.
+gnutls_ocsp_req_print: Added.
+gnutls_ocsp_req_randomize_nonce: Added.
+gnutls_ocsp_req_set_extension: Added.
+gnutls_ocsp_req_set_nonce: Added.
+gnutls_ocsp_resp_deinit: Added.
+gnutls_ocsp_resp_export: Added.
+gnutls_ocsp_resp_get_certs: Added.
+gnutls_ocsp_resp_get_extension: Added.
+gnutls_ocsp_resp_get_nonce: Added.
+gnutls_ocsp_resp_get_produced: Added.
+gnutls_ocsp_resp_get_responder: Added.
+gnutls_ocsp_resp_get_response: Added.
+gnutls_ocsp_resp_get_signature: Added.
+gnutls_ocsp_resp_get_signature_algorithm: Added.
+gnutls_ocsp_resp_get_single: Added.
+gnutls_ocsp_resp_get_status: Added.
+gnutls_ocsp_resp_get_version: Added.
+gnutls_ocsp_resp_import: Added.
+gnutls_ocsp_resp_init: Added.
+gnutls_ocsp_resp_print: Added.
+gnutls_ocsp_resp_verify: Added.
 
 * Version 3.0.11 (released 2012-01-06)
 

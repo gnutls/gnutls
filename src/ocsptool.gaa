@@ -1,0 +1,76 @@
+#{
+
+/* C declarations */
+
+#include <config.h>
+#ifdef _WIN32
+# include <io.h>
+#endif
+
+#include "ocsptool-common.h"
+
+#}
+
+helpnode "Ocsptool help\nUsage : ocsptool [options]"
+
+#int action;
+
+option (e, verify-response) { $action = ACTION_VERIFY_RESP; } "Verify response."
+
+option (i, request-info) { $action = ACTION_REQ_INFO; } "Print information on a OCSP request."
+
+option (j, response-info) { $action = ACTION_RESP_INFO; } "Print information on a OCSP response."
+
+option (q, generate-request) { $action = ACTION_GEN_REQ; } "Generate a OCSP request."
+
+#int nononce;
+option (no-nonce) { $nononce = 1 } "don't add nonce to OCSP request."
+
+#char *issuer;
+option (load-issuer) STR "FILE" { $issuer = $1 } "read issuer certificate from FILE."
+
+#char *cert;
+option (load-cert) STR "FILE" { $cert = $1 } "read certificate to check from FILE."
+
+#char *trust;
+option (load-trust) STR "FILE" { $trust = $1 } "read OCSP trust anchors from FILE."
+
+#char *signer;
+option (load-signer) STR "FILE" { $signer = $1 } "read OCSP response signer from FILE."
+
+#int inder;
+option (inder) { $inder=1 } "Use DER format for input certificates."
+
+#char *req;
+option (Q, load-request) STR "FILE" { $req = $1 } "read DER encoded OCSP request from FILE."
+
+#char *resp;
+option (S, load-response) STR "FILE" { $resp = $1 } "read DER encoded OCSP response from FILE."
+
+#char *outfile;
+option (outfile) STR "FILE" { $outfile = $1 } "Output file."
+
+#char *infile;
+option (infile) STR "FILE" { $infile = $1 } "Input file."
+
+#int verbose;
+option (V, verbose) { $verbose = 1 } "More verbose output."
+
+#int debug;
+option (d, debug) INT "integer" { $debug = $1 } "Enable debugging"
+
+option (v, version) { ocsptool_version(); exit(0); } "prints the program's version number"
+option (h, help) { gaa_help(); exit(0); } "shows this help text"
+
+init { $action = ACTION_NONE;
+       $nononce = 0;
+       $inder = 0;
+       $issuer = NULL;
+       $cert = NULL;
+       $trust = NULL;
+       $req = NULL;
+       $resp = NULL;
+       $outfile = NULL;
+       $infile = NULL;
+       $verbose = 0;
+       $debug = 0; }

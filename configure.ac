@@ -529,4 +529,5 @@ AC_MSG_NOTICE([summary of build options:
   Crypto library:   $cryptolib
   PKCS#11 support:  $with_p11_kit
   crywrap app:      $libidn
+  OCSP support:     $ac_enable_ocsp
 ])

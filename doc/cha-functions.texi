@@ -6,6 +6,7 @@
 * Core TLS API::
 * Datagram TLS API::
 * X509 certificate API::
+* OCSP API::
 * OpenPGP API::
 * PKCS 12 API::
 * PKCS 11 API::
@@ -38,6 +39,15 @@ The following functions are to be used for @acronym{X.509} certificate handling.
 Their prototypes lie in @file{gnutls/x509.h}.
 
 @include x509-api.texi
+
+@node OCSP API
+@section @acronym{OCSP} API
+@cindex OCSP Functions
+
+The following functions are for @acronym{OCSP} certificate status
+checking.  Their prototypes lie in @file{gnutls/ocsp.h}.
+
+@include ocsp-api.texi
 
 @node OpenPGP API
 @section @acronym{OpenPGP} API

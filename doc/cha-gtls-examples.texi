@@ -11,6 +11,7 @@ no error checking.
 @menu
 * Client examples::
 * Server examples::
+* OCSP examples::
 * Miscellaneous examples::
 @end menu
 
@@ -208,6 +209,28 @@ This example server supports anonymous authentication, and could be
 used to serve the example client for anonymous authentication.
 
 @verbatiminclude examples/ex-serv-anon.c
+
+@node OCSP examples
+@section OCSP examples
+
+@menu
+* Generate OCSP request::
+* Verify OCSP response::
+@end menu
+
+@node Generate OCSP request
+@subsection Generate @acronym{OCSP} request
+
+A small tool to generate OCSP requests.
+
+@verbatiminclude examples/ex-ocsp-client.c
+
+@node Verify OCSP response
+@subsection Verify @acronym{OCSP} response
+
+A small tool to verify OCSP responses.
+
+@verbatiminclude examples/ex-ocsp-verify.c
 
 @node DTLS echo server with X.509 authentication
 @subsection DTLS echo server with @acronym{X.509} authentication

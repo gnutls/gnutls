@@ -88,13 +88,13 @@ MAINTAINERCLEANFILES =
 
 # Generated texinfos.
 
-gnutls_TEXINFOS += gnutls-api.texi \
-	x509-api.texi pgp-api.texi pkcs12-api.texi pkcs11-api.texi \
-	abstract-api.texi compat-api.texi dtls-api.texi crypto-api.texi
+gnutls_TEXINFOS += gnutls-api.texi x509-api.texi pgp-api.texi		\
+	pkcs12-api.texi pkcs11-api.texi abstract-api.texi		\
+	compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi
 
-MAINTAINERCLEANFILES += gnutls-api.texi \
-	x509-api.texi pgp-api.texi pkcs12-api.texi pkcs11-api.texi \
-	abstract-api.texi compat-api.texi dtls-api.texi crypto-api.texi
+MAINTAINERCLEANFILES += gnutls-api.texi x509-api.texi pgp-api.texi	\
+	pkcs12-api.texi pkcs11-api.texi abstract-api.texi		\
+	compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi
 
 gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
 	echo "" > $@-tmp
@@ -189,6 +189,17 @@ crypto-api.texi: $(top_srcdir)/lib/includes/gnutls/crypto.h
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/crypto.h|sort|uniq`; do \
 		echo -n "Creating documentation for $$i... " && \
+		$(srcdir)/scripts/gdoc -texinfo \
+			-function $$i \
+			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \
+		echo "ok"; \
+	done
+	mv -f $@-tmp $@
+
+ocsp-api.texi: $(top_srcdir)/lib/includes/gnutls/ocsp.h
+	echo "" > $@-tmp
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/ocsp.h|sort|uniq`; do \
+		echo -n "Creating documentation for file $$i... " && \
 		$(srcdir)/scripts/gdoc -texinfo \
 			-function $$i \
 			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c >> $@-tmp 2>/dev/null && \

@@ -57,3 +57,7 @@ libgnutls_x509_la_SOURCES =	\
 	x509_write.c		\
 	verify-high.c		\
 	verify-high.h
+
+if ENABLE_OCSP
+libgnutls_x509_la_SOURCES += ocsp.c ocsp_output.c
+endif

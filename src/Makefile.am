@@ -39,6 +39,9 @@ endif
 if ENABLE_SRP
 bin_PROGRAMS += srptool
 endif
+if ENABLE_OCSP
+bin_PROGRAMS += ocsptool
+endif
 
 if ENABLE_PKCS11
 bin_PROGRAMS += p11tool
@@ -68,6 +71,14 @@ srptool_LDADD = ../lib/libgnutls.la libcmd-srp.la ../gl/libgnu.la
 noinst_LTLIBRARIES += libcmd-srp.la
 libcmd_srp_la_CFLAGS =
 libcmd_srp_la_SOURCES = srptool.gaa srptool-gaa.h srptool-gaa.c
+endif
+
+if ENABLE_OCSP
+ocsptool_SOURCES = ocsptool.c ocsptool-common.h
+ocsptool_LDADD = ../lib/libgnutls.la libcmd-ocsp.la ../gl/libgnu.la
+noinst_LTLIBRARIES += libcmd-ocsp.la
+libcmd_ocsp_la_CFLAGS =
+libcmd_ocsp_la_SOURCES = ocsptool.gaa ocsptool-gaa.h ocsptool-gaa.c
 endif
 
 psktool_SOURCES = psk.c
@@ -148,6 +159,8 @@ psk-gaa.c: $(srcdir)/psk.gaa
 	-$(GAA) $< -o psk-gaa.c -i psk-gaa.h
 srptool-gaa.c: $(srcdir)/srptool.gaa
 	-$(GAA) $< -o srptool-gaa.c -i srptool-gaa.h
+ocsptool-gaa.c: $(srcdir)/ocsptool.gaa
+	-$(GAA) $< -o ocsptool-gaa.c -i ocsptool-gaa.h
 if ENABLE_PKCS11
 p11tool-gaa.c: $(srcdir)/p11tool.gaa
 	-$(GAA) $< -o p11tool-gaa.c -i p11tool-gaa.h

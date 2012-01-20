@@ -214,6 +214,21 @@ fi
     AC_DEFINE([ENABLE_CRYPTODEV], 1, [Enable cryptodev support])
   fi
 
+  AC_MSG_CHECKING([whether to disable OCSP support])
+  AC_ARG_ENABLE(ocsp,
+    AS_HELP_STRING([--disable-ocsp],
+                   [disable OCSP support]),
+    ac_enable_ocsp=no)
+  if test x$ac_enable_ocsp != xno; then
+   ac_enable_ocsp=yes
+   AC_MSG_RESULT(no)
+   AC_DEFINE([ENABLE_OCSP], 1, [enable OCSP support])
+  else
+   ac_full=0
+   AC_MSG_RESULT(yes)
+  fi
+  AM_CONDITIONAL(ENABLE_OCSP, test "$ac_enable_ocsp" != "no")
+
   # For storing integers in pointers without warnings
   # http://developer.gnome.org/doc/API/2.0/glib/glib-Type-Conversion-Macros.html#desc
   AC_CHECK_SIZEOF(void *)

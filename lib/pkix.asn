@@ -572,4 +572,113 @@ ProxyPolicy ::= SEQUENCE {
   policyLanguage   OBJECT IDENTIFIER,
   policy           OCTET STRING OPTIONAL }
 
+-- rfc2560
+
+OCSPRequest     ::=     SEQUENCE {
+    tbsRequest                  TBSRequest,
+    optionalSignature   [0]     EXPLICIT Signature OPTIONAL }
+
+TBSRequest      ::=     SEQUENCE {
+    version             [0] EXPLICIT Version DEFAULT v1,
+    requestorName       [1] EXPLICIT GeneralName OPTIONAL,
+    requestList             SEQUENCE OF Request,
+    requestExtensions   [2] EXPLICIT Extensions OPTIONAL }
+
+Signature       ::=     SEQUENCE {
+    signatureAlgorithm   AlgorithmIdentifier,
+    signature            BIT STRING,
+    certs                [0] EXPLICIT SEQUENCE OF Certificate OPTIONAL }
+
+-- comment out, already used above, fortunately with same values and names
+-- Version  ::=  INTEGER  {  v1(0) }
+
+Request ::=     SEQUENCE {
+    reqCert                    CertID,
+    singleRequestExtensions    [0] EXPLICIT Extensions OPTIONAL }
+
+CertID ::= SEQUENCE {
+    hashAlgorithm            AlgorithmIdentifier,
+    issuerNameHash     OCTET STRING, -- Hash of Issuer's DN
+    issuerKeyHash      OCTET STRING, -- Hash of Issuers public key
+    serialNumber       CertificateSerialNumber }
+
+OCSPResponse ::= SEQUENCE {
+   responseStatus         OCSPResponseStatus,
+   responseBytes          [0] EXPLICIT ResponseBytes OPTIONAL }
+
+OCSPResponseStatus ::= ENUMERATED {
+    successful            (0),      --Response has valid confirmations
+    malformedRequest      (1),      --Illegal confirmation request
+    internalError         (2),      --Internal error in issuer
+    tryLater              (3),      --Try again later
+                                    --(4) is not used
+    sigRequired           (5),      --Must sign the request
+    unauthorized          (6)       --Request unauthorized
+}
+
+ResponseBytes ::=       SEQUENCE {
+    responseType   OBJECT IDENTIFIER,
+    response       OCTET STRING }
+
+BasicOCSPResponse       ::= SEQUENCE {
+   tbsResponseData      ResponseData,
+   signatureAlgorithm   AlgorithmIdentifier,
+   signature            BIT STRING,
+   certs                [0] EXPLICIT SEQUENCE OF Certificate OPTIONAL }
+
+ResponseData ::= SEQUENCE {
+   version              [0] EXPLICIT Version DEFAULT v1,
+   responderID              ResponderID,
+   producedAt               GeneralizedTime,
+   responses                SEQUENCE OF SingleResponse,
+   responseExtensions   [1] EXPLICIT Extensions OPTIONAL }
+
+ResponderID ::= CHOICE {
+-- Changed to work with the libtasn1 parser.
+   byName   [1] EXPLICIT RDNSequence, --Name,
+   byKey    [2] KeyHash }
+
+KeyHash ::= OCTET STRING --SHA-1 hash of responder's public key
+                         --(excluding the tag and length fields)
+
+SingleResponse ::= SEQUENCE {
+   certID                       CertID,
+   certStatus                   CertStatus,
+   thisUpdate                   GeneralizedTime,
+   nextUpdate           [0]     EXPLICIT GeneralizedTime OPTIONAL,
+   singleExtensions     [1]     EXPLICIT Extensions OPTIONAL }
+
+CertStatus ::= CHOICE {
+    good                [0]     IMPLICIT NULL,
+    revoked             [1]     IMPLICIT RevokedInfo,
+    unknown             [2]     IMPLICIT UnknownInfo }
+
+RevokedInfo ::= SEQUENCE {
+    revocationTime              GeneralizedTime,
+    revocationReason    [0]     EXPLICIT CRLReason OPTIONAL }
+
+UnknownInfo ::= NULL -- this can be replaced with an enumeration
+
+ArchiveCutoff ::= GeneralizedTime
+
+AcceptableResponses ::= SEQUENCE OF OBJECT IDENTIFIER
+
+ServiceLocator ::= SEQUENCE {
+    issuer    Name,
+    locator   AuthorityInfoAccessSyntax }
+
+-- rfc5280
+
+CRLReason ::= ENUMERATED {
+     unspecified             (0),
+     keyCompromise           (1),
+     cACompromise            (2),
+     affiliationChanged      (3),
+     superseded              (4),
+     cessationOfOperation    (5),
+     certificateHold         (6),
+     removeFromCRL           (8),
+     privilegeWithdrawn      (9),
+     aACompromise           (10) }
+
 END

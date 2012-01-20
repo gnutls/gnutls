@@ -359,6 +359,38 @@ APIMANS += gnutls_certificate_set_params_function.3
 APIMANS += gnutls_anon_set_params_function.3
 APIMANS += gnutls_psk_set_params_function.3
 APIMANS += gnutls_hex2bin.3
+APIMANS += gnutls_ocsp_req_init.3
+APIMANS += gnutls_ocsp_req_deinit.3
+APIMANS += gnutls_ocsp_req_import.3
+APIMANS += gnutls_ocsp_req_export.3
+APIMANS += gnutls_ocsp_req_print.3
+APIMANS += gnutls_ocsp_req_get_version.3
+APIMANS += gnutls_ocsp_req_get_cert_id.3
+APIMANS += gnutls_ocsp_req_add_cert_id.3
+APIMANS += gnutls_ocsp_req_add_cert.3
+APIMANS += gnutls_ocsp_req_get_extension.3
+APIMANS += gnutls_ocsp_req_set_extension.3
+APIMANS += gnutls_ocsp_req_get_nonce.3
+APIMANS += gnutls_ocsp_req_set_nonce.3
+APIMANS += gnutls_ocsp_req_randomize_nonce.3
+APIMANS += gnutls_ocsp_resp_init.3
+APIMANS += gnutls_ocsp_resp_deinit.3
+APIMANS += gnutls_ocsp_resp_import.3
+APIMANS += gnutls_ocsp_resp_export.3
+APIMANS += gnutls_ocsp_resp_print.3
+APIMANS += gnutls_ocsp_resp_get_status.3
+APIMANS += gnutls_ocsp_resp_get_response.3
+APIMANS += gnutls_ocsp_resp_get_version.3
+APIMANS += gnutls_ocsp_resp_get_responder.3
+APIMANS += gnutls_ocsp_resp_get_produced.3
+APIMANS += gnutls_ocsp_resp_get_single.3
+APIMANS += gnutls_ocsp_resp_get_extension.3
+APIMANS += gnutls_ocsp_resp_get_nonce.3
+APIMANS += gnutls_ocsp_resp_get_signature_algorithm.3
+APIMANS += gnutls_ocsp_resp_get_signature.3
+APIMANS += gnutls_ocsp_resp_get_certs.3
+APIMANS += gnutls_ocsp_resp_verify_direct.3
+APIMANS += gnutls_ocsp_resp_verify.3
 APIMANS += gnutls_openpgp_crt_init.3
 APIMANS += gnutls_openpgp_crt_deinit.3
 APIMANS += gnutls_openpgp_crt_import.3
@@ -739,6 +771,20 @@ doit:
 			-bugsto $(PACKAGE_BUGREPORT) \
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/x509.h" \
+			-seeinfo $(PACKAGE) -verbatimcopying \
+			-copyright "2012 Free Software Foundation" \
+			-function $$i \
+			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
+		echo -n "."; \
+	done
+	@echo ""
+	@echo -n "Creating man pages for ocsp.h..." && \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/ocsp.h`; do \
+		$(top_srcdir)/doc/scripts/gdoc -man \
+			-module $(PACKAGE) -sourceversion $(VERSION) \
+			-bugsto $(PACKAGE_BUGREPORT) \
+			-pkg-name "$(PACKAGE_NAME)" \
+			-include "gnutls/ocsp.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
 			-copyright "2012 Free Software Foundation" \
 			-function $$i \

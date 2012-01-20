@@ -10,8 +10,10 @@ structures, etc., are discussed in this chapter.
 @menu
 * PKCS 10 certificate requests::
 * PKIX certificate revocation lists::
+* OCSP certificate status checking::
 * Managing encrypted keys::
 * The certtool application::
+* The ocsptool application::
 * Smart cards and HSMs::
 * Abstract key types::
 @end menu
@@ -115,6 +117,177 @@ Few extensions on the CRL structure are supported, including the
 CRL number extension and the authority key identifier.
 
 @showfuncB{gnutls_x509_crl_set_number,gnutls_x509_crl_set_authority_key_id}
+
+@node OCSP certificate status checking
+@section @acronym{OCSP} certificate status checking
+@cindex certificate status
+@cindex Online Certificate Status Protocol
+@cindex OCSP
+
+Certificates may be revoked before their expiration time has been
+reached.  There are several reasons for revoking certificates, but a
+typical situation is when the private key associated with a
+certificate has been compromised.  Traditionally, Certificate
+Revocation Lists (CRLs) have been used by application to implement
+revocation checking, however several disadvantages with CRLs have been
+identified, see for example @xcite{RIVESTCRL}.
+
+The Online Certificate Status Protocol (@acronym{OCSP}) is a widely
+implemented protocol to perform certificate (revocation) status
+checking.  @xcite{RFC2560}.  An application that wish to verify the
+identity of a peer will verify the certificate against a set of
+trusted certificates and then check whether the certificate is listed
+in a CRL and/or perform an OCSP check for the certificate.
+
+Before performing the OCSP query, the application will need to figure
+out the address of the OCSP server.  The OCSP server address can be
+provided by the local user in manual configuration.  The address can
+also be provided in the certificate that is being checked.  There is
+an extension field called the Authority Information Access (AIA) which
+has an access method called @code{id-ad-ocsp} that holds the location
+of the OCSP responder.  There is a function for extracting this
+information from a certificate.
+
+@showfuncA{gnutls_x509_crt_get_authority_info_access}
+
+There are several functions in GnuTLS for creating and manipulating
+OCSP requests and responses.  The general idea is that a client
+application create an OCSP request object, store some information
+about the certificate to check in the request, and then export the
+request in DER format.  The request will then need to be sent to the
+OCSP responder, which needs to be done by the application (GnuTLS does
+not send and receive OCSP packets).  Normally an OCSP response is
+received that the application will need to import into an OCSP
+response object.  The digital signature in the OCSP response needs to
+be verified against a set of trust anchors before the information in
+the response can be trusted.
+
+The ASN.1 structure of OCSP requests are briefly as follows.  It is
+useful to review the structures to get an understanding of which
+fields are modified by GnuTLS functions.
+
+@example
+OCSPRequest     ::=     SEQUENCE @{
+    tbsRequest                  TBSRequest,
+    optionalSignature   [0]     EXPLICIT Signature OPTIONAL @}
+
+TBSRequest      ::=     SEQUENCE @{
+    version             [0]     EXPLICIT Version DEFAULT v1,
+    requestorName       [1]     EXPLICIT GeneralName OPTIONAL,
+    requestList                 SEQUENCE OF Request,
+    requestExtensions   [2]     EXPLICIT Extensions OPTIONAL @}
+
+Request         ::=     SEQUENCE @{
+    reqCert                     CertID,
+    singleRequestExtensions     [0] EXPLICIT Extensions OPTIONAL @}
+
+CertID          ::=     SEQUENCE @{
+    hashAlgorithm       AlgorithmIdentifier,
+    issuerNameHash      OCTET STRING, -- Hash of Issuer's DN
+    issuerKeyHash       OCTET STRING, -- Hash of Issuers public key
+    serialNumber        CertificateSerialNumber @}
+@end example
+
+The basic functions to initialize, import, export and deallocate OCSP
+requests are the following.
+
+@showfuncE{gnutls_ocsp_req_init,gnutls_ocsp_req_deinit,gnutls_ocsp_req_import,gnutls_ocsp_req_export,gnutls_ocsp_req_print}
+
+There are two interfaces for setting the identity of a certificate in
+a OCSP request, the first being a low-level function when you have the
+issuer name hash, issuer key hash, and certificate serial number in
+binary form.  The second is usually more useful if you have the
+certificate (and its issuer) in a @code{gnutls_x509_crt_t} type.
+There is also a function to extract this information from an OCSP
+request.
+
+@showfuncC{gnutls_ocsp_req_add_cert_id,gnutls_ocsp_req_add_cert,gnutls_ocsp_req_get_cert_id}
+
+Each OCSP request may contain a number of extensions.  Extensions are
+identified by an Object Identifier (OID) and an opaque data buffer
+whose syntax and semantics is implied by the OID.
+
+@showfuncB{gnutls_ocsp_req_get_extension,gnutls_ocsp_req_set_extension}
+
+A common OCSP Request extension is the nonce extension (OID
+1.3.6.1.5.5.7.48.1.2), which is used to avoid replay attacks of
+earlier recorded OCSP responses.  The nonce extension carries a value
+that is intended to be sufficiently random and unique so that an
+attacker will not be able to give a stale response for the same nonce.
+
+@showfuncC{gnutls_ocsp_req_get_nonce,gnutls_ocsp_req_set_nonce,gnutls_ocsp_req_randomize_nonce}
+
+The OCSP response structures is a bit more complex than the request.
+The important ASN.1 structure is as follows.  In practice, all OCSP
+responses contain a Basic OCSP response sub-structure.
+
+@example
+OCSPResponse ::= SEQUENCE @{
+   responseStatus         OCSPResponseStatus,
+   responseBytes          [0] EXPLICIT ResponseBytes OPTIONAL @}
+
+OCSPResponseStatus ::= ENUMERATED @{
+    successful            (0),  --Response has valid confirmations
+    malformedRequest      (1),  --Illegal confirmation request
+    internalError         (2),  --Internal error in issuer
+    tryLater              (3),  --Try again later
+                                --(4) is not used
+    sigRequired           (5),  --Must sign the request
+    unauthorized          (6)   --Request unauthorized @}
+
+ResponseBytes ::=       SEQUENCE @{
+    responseType   OBJECT IDENTIFIER,
+    response       OCTET STRING @}
+
+id-pkix-ocsp-basic     OBJECT IDENTIFIER ::= @{ id-pkix-ocsp 1 @}
+
+BasicOCSPResponse       ::= SEQUENCE @{
+   tbsResponseData      ResponseData,
+   signatureAlgorithm   AlgorithmIdentifier,
+   signature            BIT STRING,
+   certs                [0] EXPLICIT SEQUENCE OF Certificate OPTIONAL @}
+
+ResponseData ::= SEQUENCE @{
+   version              [0] EXPLICIT Version DEFAULT v1,
+   responderID              ResponderID,
+   producedAt               GeneralizedTime,
+   responses                SEQUENCE OF SingleResponse,
+   responseExtensions   [1] EXPLICIT Extensions OPTIONAL @}
+
+ResponderID ::= CHOICE @{
+   byName               [1] Name,
+   byKey                [2] KeyHash @}
+
+KeyHash ::= OCTET STRING -- SHA-1 hash of responder's public key
+(excluding the tag and length fields)
+
+SingleResponse ::= SEQUENCE @{
+   certID                       CertID,
+   certStatus                   CertStatus,
+   thisUpdate                   GeneralizedTime,
+   nextUpdate         [0]       EXPLICIT GeneralizedTime OPTIONAL,
+   singleExtensions   [1]       EXPLICIT Extensions OPTIONAL @}
+
+CertStatus ::= CHOICE @{
+    good        [0]     IMPLICIT NULL,
+    revoked     [1]     IMPLICIT RevokedInfo,
+    unknown     [2]     IMPLICIT UnknownInfo @}
+
+RevokedInfo ::= SEQUENCE @{
+    revocationTime              GeneralizedTime,
+    revocationReason    [0]     EXPLICIT CRLReason OPTIONAL @}
+@end example
+
+We provide basic functions for initialization, importing, exporting
+and deallocating OCSP responses.  The Basic OCSP Response structure is
+automatically parsed when an OCSP Response is imported.
+
+@showfuncE{gnutls_ocsp_resp_init,gnutls_ocsp_resp_deinit,gnutls_ocsp_resp_import,gnutls_ocsp_resp_export,gnutls_ocsp_resp_print}
+
+The OCSP response needs to be verified against some set of trust
+anchors before it can be relied upon.
+
+@showfuncB{gnutls_ocsp_resp_verify,gnutls_ocsp_resp_verify_direct}
 
 @node Managing encrypted keys
 @section Managing encrypted keys
@@ -518,6 +691,195 @@ signing_key
 #ipsec_ike_key
 @end example
 
+
+@node The ocsptool application
+@section The ocsptool application
+@cindex ocsptool
+
+This is a program that can parse and print information about
+@acronym{OCSP} requests/responses, generate requests and verify
+responses.
+
+@example
+Ocsptool help
+Usage : ocsptool [options]
+     -e, --verify-response    Verify response.
+     -i, --request-info       Print information on a OCSP request.
+     -j, --response-info      Print information on a OCSP response.
+     -q, --generate-request   Generate a OCSP request.
+     --no-nonce               don't add nonce to OCSP request.
+     --load-issuer FILE       read issuer certificate from FILE.
+     --load-cert FILE         read certificate to check from FILE.
+     --load-trust FILE        read trust anchors from FILE.
+     --inder                  Use DER format for input certificates.
+     -Q, --load-request FILE
+                              read DER encoded OCSP request from
+                              FILE.
+     -S, --load-response FILE
+                              read DER encoded OCSP response from
+                              FILE.
+     --outfile FILE           Output file.
+     --infile FILE            Input file.
+     -V, --verbose            More verbose output.
+     -d, --debug integer      Enable debugging
+     -v, --version            prints the program's version number
+     -h, --help               shows this help text
+@end example
+
+@subheading Print information about an OCSP request
+
+To parse an OCSP request and print information about the content, the
+@code{-i} or @code{--request-info} parameter may be used as follows.
+The @code{-Q} parameter specify the name of the file containing the
+OCSP request, and it should contain the OCSP request in binary DER
+format.
+
+@smallexample
+$ ocsptool -i -Q ocsp-request.der
+@end smallexample
+
+The input file may also be sent to standard input like this:
+
+@smallexample
+$ cat ocsp-request.der | ocsptool --request-info
+@end smallexample
+
+@subheading Print information about an OCSP response
+
+Similar to parsing OCSP requests, OCSP responses can be parsed using
+the @code{-j} or @code{--response-info} as follows.
+
+@smallexample
+$ ocsptool -j -Q ocsp-response.der
+$ cat ocsp-response.der | ocsptool --response-info
+@end smallexample
+
+@subheading Generate an OCSP request
+
+The @code{-q} or @code{--generate-request} parameters are used to
+generate an OCSP request.  By default the OCSP request is written to
+standard output in binary DER format, but can be stored in a file
+using @code{--outfile}.  To generate an OCSP request the issuer of the
+certificate to check needs to be specified with @code{--load-issuer}
+and the certificate to check with @code{--load-cert}.  By default PEM
+format is used for these files, although @code{--inder} can be used to
+specify that the input files are in DER format.
+
+@smallexample
+$ ocsptool -q --load-issuer issuer.pem --load-cert client.pem --outfile ocsp-request.der
+@end smallexample
+
+When generating OCSP requests, the tool will add an OCSP extension
+containing a nonce.  This behaviour can be disabled by specifying
+@code{--no-nonce}.
+
+@subheading Verify signature in OCSP response
+
+To verify the signature in an OCSP response the @code{-e} or
+@code{--verify-response} parameter is used.  The tool will read an
+OCSP response in DER format from standard input, or from the file
+specified by @code{--load-response}.  The OCSP response is verified
+against a set of trust anchors, which are specified using
+@code{--load-trust}.  The trust anchors are concatenated certificates
+in PEM format.  The certificate that signed the OCSP response needs to
+be in the set of trust anchors, or the issuer of the signer
+certificate needs to be in the set of trust anchors and the OCSP
+Extended Key Usage bit has to be asserted in the signer certificate.
+
+@smallexample
+$ ocsptool -e --load-trust issuer.pem --load-response ocsp-response.der
+@end smallexample
+
+The tool will print status of verification.
+
+@subheading Verify signature in OCSP response against given certificate
+
+It is possible to override the normal trust logic if you know that a
+certain certificate is supposed to have signed the OCSP response, and
+you want to use it to check the signature.  This is achieved using
+@code{--load-signer} instead of @code{--load-trust}.  This will load
+one certificate and it will be used to verify the signature in the
+OCSP response.  It will not check the Extended Key Usage bit.
+
+@smallexample
+$ ocsptool -e --load-signer ocsp-signer.pem --load-response ocsp-response.der
+@end smallexample
+
+This approach is normally only relevant in two situations.  The first
+is when the OCSP response does not contain a copy of the signer
+certificate, so the @code{--load-trust} code would fail.  The second
+is if you want to avoid the indirect mode where the OCSP response
+signer certificate is signed by a trust anchor.
+
+@subheading Real-world example
+
+Here is an example of how to generate an OCSP request for a
+certificate and to verify the response.  For illustration we'll use
+the @code{blog.josefsson.org} host, which (as of writing) uses a
+certificate from CACert.  First we'll use @code{gnutls-cli} to get a
+copy of the server certificate chain.  The server is not required to
+send this information, but this particular one is configured to do so.
+
+@smallexample
+$ echo | gnutls-cli -p 443 blog.josefsson.org --print-cert > chain.pem
+@end smallexample
+
+Use a text editor on @code{chain.pem} to create three files for each
+separate certificates, called @code{cert.pem} for the first
+certificate for the domain itself, secondly @code{issuer.pem} for the
+intermediate certificate and @code{root.pem} for the final root
+certificate.
+
+The domain certificate normally contains a pointer to where the OCSP
+responder is located, in the Authority Information Access Information
+extension.  For example, from @code{certtool -i < cert.pem} there is
+this information:
+
+@smallexample
+		Authority Information Access Information (not critical):
+			Access Method: 1.3.6.1.5.5.7.48.1 (id-ad-ocsp)
+			Access Location URI: http://ocsp.CAcert.org/
+@end smallexample
+
+This means the CA support OCSP queries over HTTP.  We are now ready to
+create a OCSP request for the certificate.
+
+@smallexample
+$ ocsptool --generate-request --load-issuer issuer.pem  --load-cert cert.pem --outfile ocsp-request.der
+@end smallexample
+
+The request is sent base64 encoded via HTTP to the address indicated
+by the id-ad-ocsp extension, as follows.
+
+@smallexample
+$ wget -O ocsp-response.der http://ocsp.CAcert.org/$(base64 -w0 ocsp-request.der)
+@end smallexample
+
+The OCSP response is now in the file @code{ocsp-response.der} and you
+can view it using @code{ocsptool -j < ocsp-response.der}.  To verify
+the signature you need to load the issuer as the trust anchor.
+
+@smallexample
+$ ocsptool --verify-response --load-trust issuer.pem --load-response ocsp-response.der
+Verifying OCSP Response: Success.
+$
+@end smallexample
+
+This particular OCSP responder includes its signer certificate in the
+OCSP respnose, so you may extract it and use it together with
+@code{--load-signer} for verifying the signature directly against the
+certificate.
+
+@smallexample
+$ ocsptool -j < ocsp-response.der > signer.pem
+$ ocsptool --verify-response --load-signer signer.pem --load-response ocsp-response.der
+Verifying OCSP Response: Success.
+$
+@end smallexample
+
+You may experiment passing different certificates to
+@code{--load-trust} and @code{--load-signer} to find common error
+conditions for OCSP response verification failures.
 
 @node Smart cards and HSMs
 @section Smart cards and HSMs
