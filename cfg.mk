@@ -40,7 +40,7 @@ local-checks-to-skip = sc_GPL_version sc_bindtextdomain			\
 	sc_require_config_h_first sc_texinfo_acronym sc_trailing_blank	\
 	sc_unmarked_diagnostics sc_useless_cpp_parens
 
-VC_LIST_ALWAYS_EXCLUDE_REGEX = ^maint.mk|m4/pkg|doc/fdl-1.3.texi|(devel/perlasm/|build-aux/|gl/|src/cfg/|tests/suite/ecore/|doc/protocol/).*$$
+VC_LIST_ALWAYS_EXCLUDE_REGEX = ^maint.mk|m4/pkg|doc/fdl-1.3.texi|(devel/perlasm/|lib/accelerated/x86/|build-aux/|gl/|src/cfg/|tests/suite/ecore/|doc/protocol/).*$$
 update-copyright-env = UPDATE_COPYRIGHT_USE_INTERVALS=1
 
 # Explicit syntax-check exceptions.
