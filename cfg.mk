@@ -46,7 +46,7 @@ update-copyright-env = UPDATE_COPYRIGHT_USE_INTERVALS=1
 # Explicit syntax-check exceptions.
 exclude_file_name_regexp--sc_cast_of_alloca_return_value = ^guile/modules/gnutls/build/priorities.scm|guile/src/core.c$$
 exclude_file_name_regexp--sc_error_message_period = ^src/crywrap/crywrap.c$$
-exclude_file_name_regexp--sc_error_message_uppercase = ^doc/examples/ex-cxx.cpp|guile/src/core.c|src/certtool.c|src/crywrap/crywrap.c|tests/pkcs12_encode.c$$
+exclude_file_name_regexp--sc_error_message_uppercase = ^doc/examples/ex-cxx.cpp|guile/src/core.c|src/certtool.c|src/ocsptool.c|src/crywrap/crywrap.c|tests/pkcs12_encode.c$$
 exclude_file_name_regexp--sc_file_system = ^doc/doxygen/Doxyfile
 exclude_file_name_regexp--sc_prohibit_cvs_keyword = ^lib/nettle/.*$$
 exclude_file_name_regexp--sc_prohibit_undesirable_word_seq = ^tests/nist-pkits/gnutls-nist-tests.html$$
