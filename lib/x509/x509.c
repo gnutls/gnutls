@@ -2702,6 +2702,8 @@ gnutls_x509_crt_get_crl_dist_points (gnutls_x509_crt_t cert,
       *reason_flags = reasons[0] | (reasons[1] << 8);
     }
 
+  asn1_delete_structure (&c2);
+
   return type;
 }
 
