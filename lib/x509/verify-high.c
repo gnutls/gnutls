@@ -620,9 +620,10 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
     return 0;
 }
 
+/* return 0 if @cert is in @list, 1 if not, or < 0 on error. */
 int
-_gnutls_trustlist_inlist_p (gnutls_x509_trust_list_t list,
-			    gnutls_x509_crt_t cert)
+_gnutls_trustlist_inlist (gnutls_x509_trust_list_t list,
+			  gnutls_x509_crt_t cert)
 {
   gnutls_datum_t dn;
   int ret, i;
@@ -649,9 +650,9 @@ _gnutls_trustlist_inlist_p (gnutls_x509_trust_list_t list,
 	  return ret;
 	}
 
-      if (ret == 1)
-	return 1;
+      if (ret == 0)
+	return 0;
     }
 
-  return 0;
+  return 1;
 }

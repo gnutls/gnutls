@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2011-2012 Free Software Foundation, Inc.
  *
- * Author: Nikos Mavrogiannopoulos
+ * Author: Simon Josefsson
  *
  * This file is part of GnuTLS.
  *
@@ -20,5 +20,5 @@
  *
  */
 
-int _gnutls_trustlist_inlist_p (gnutls_x509_trust_list_t list,
-				gnutls_x509_crt_t cert);
+int _gnutls_trustlist_inlist (gnutls_x509_trust_list_t list,
+			      gnutls_x509_crt_t cert);
