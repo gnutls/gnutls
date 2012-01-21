@@ -3344,19 +3344,21 @@ _gnutls_parse_aia (ASN1_TYPE src,
       if (oid == NULL)
 	oid = GNUTLS_OID_AD_OCSP;
       {
-	char *tmpoid[20];
+	char tmpoid[20];
 	snprintf (nptr, sizeof (nptr), "?%u.accessMethod", seq);
 	len = sizeof (tmpoid);
 	result = asn1_read_value (src, nptr, tmpoid, &len);
+
 	if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND)
-	  return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+	  return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
 	if (result != ASN1_SUCCESS)
 	  {
 	    gnutls_assert ();
 	    return _gnutls_asn2err (result);
 	  }
 	if ((unsigned)len != strlen (oid) + 1 || memcmp (tmpoid, oid, len) != 0)
-	  return GNUTLS_E_UNKNOWN_ALGORITHM;
+	  return gnutls_assert_val(GNUTLS_E_UNKNOWN_ALGORITHM);
       }
       /* fall through */
 
@@ -3366,26 +3368,26 @@ _gnutls_parse_aia (ASN1_TYPE src,
 	break;
 
     default:
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
+      return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
     }
 
   len = 0;
   result = asn1_read_value (src, nptr, NULL, &len);
   if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND)
-    return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+    return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
   if (result != ASN1_MEM_ERROR)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
     }
+
   d.size = len;
+
   d.data = gnutls_malloc (d.size);
   if (d.data == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
   result = asn1_read_value (src, nptr, d.data, &len);
   if (result != ASN1_SUCCESS)
     {
@@ -3402,7 +3404,7 @@ _gnutls_parse_aia (ASN1_TYPE src,
   else
     gnutls_free (d.data);
 
-  return GNUTLS_E_SUCCESS;
+  return 0;
 }
 
 /**
@@ -3524,6 +3526,7 @@ gnutls_x509_crt_get_authority_info_access (gnutls_x509_crt_t crt,
     }
 
   ret = _gnutls_parse_aia (c2, seq, what, data);
+
   asn1_delete_structure (&c2);
   if (ret < 0)
     gnutls_assert ();
