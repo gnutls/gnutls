@@ -657,7 +657,6 @@ typedef enum
 /**
  * gnutls_sec_param_t:
  * @GNUTLS_SEC_PARAM_UNKNOWN: Cannot be known
- * @GNUTLS_SEC_PARAM_LOW: 80 or less bits of security
  * @GNUTLS_SEC_PARAM_LEGACY: 96 bits of security
  * @GNUTLS_SEC_PARAM_NORMAL: 112 bits of security
  * @GNUTLS_SEC_PARAM_HIGH: 128 bits of security

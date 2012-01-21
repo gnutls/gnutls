@@ -2,6 +2,19 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.0.13 (unreleased)
+
+** libgnutls: Added new security parameter GNUTLS_SEC_PARAM_LEGACY
+to account for security level of 96-bits.
+
+** libgnutls: In client side if server does not advertise any
+known CAs and only a single certificate is set in the credentials,
+sent that one.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.0.12 (released 2012-01-20)
 
 ** libgnutls: Added OCSP support.
