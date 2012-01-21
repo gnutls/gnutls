@@ -19,10 +19,10 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem
+EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem
 
-dist_check_SCRIPTS = pathlen
+dist_check_SCRIPTS = pathlen aki
 
-TESTS = pathlen
+TESTS = pathlen aki
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)

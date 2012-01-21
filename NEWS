@@ -11,8 +11,12 @@ to account for security level of 96-bits.
 known CAs and only a single certificate is set in the credentials,
 sent that one.
 
+** libgnutls: Added functions to parse authority key identifiers
+when stored as a 'general name' and serial combo.
+
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_crt_get_authority_key_an_serial: Added
+gnutls_x509_crl_get_authority_key_an_serial: Added
 
 
 * Version 3.0.12 (released 2012-01-20)

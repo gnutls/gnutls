@@ -81,6 +81,54 @@ ip_to_string (void *_ip, int ip_size, char *string, int string_size)
   return string;
 }
 
+static void add_altname(gnutls_buffer_st * str, const char* prefix, unsigned int alt_type, 
+                        char* name, size_t name_size)
+{
+char str_ip[64];
+char *p;
+
+      if ((alt_type == GNUTLS_SAN_DNSNAME
+           || alt_type == GNUTLS_SAN_RFC822NAME
+           || alt_type == GNUTLS_SAN_URI) && strlen (name) != name_size)
+        {
+          adds (str, _("warning: altname contains an embedded NUL, "
+                       "replacing with '!'\n"));
+          while (strlen (name) < name_size)
+            name[strlen (name)] = '!';
+        }
+
+      switch (alt_type)
+        {
+        case GNUTLS_SAN_DNSNAME:
+          addf (str, "%s\t\t\tDNSname: %.*s\n", prefix, (int) name_size, name);
+          break;
+
+        case GNUTLS_SAN_RFC822NAME:
+          addf (str, "%s\t\t\tRFC822name: %.*s\n", prefix, (int) name_size,
+                name);
+          break;
+
+        case GNUTLS_SAN_URI:
+          addf (str, "%s\t\t\tURI: %.*s\n", prefix, (int) name_size, name);
+          break;
+
+        case GNUTLS_SAN_IPADDRESS:
+          p = ip_to_string (name, name_size, str_ip, sizeof (str_ip));
+          if (p == NULL)
+            p = ERROR_STR;
+          addf (str, "%s\t\t\tIPAddress: %s\n", prefix, p);
+          break;
+
+        case GNUTLS_SAN_DN:
+          addf (str, "%s\t\t\tdirectoryName: %.*s\n", prefix,
+                (int) name_size, name);
+          break;
+        default:
+          addf (str, "error: unknown altname\n");
+          break;
+        }
+}
+
 static void
 print_proxy (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
@@ -228,6 +276,67 @@ typedef union
 } cert_type_t;
 
 static void
+print_aki_gn_serial (gnutls_buffer_st * str, int type, cert_type_t cert)
+{
+  char *buffer = NULL;
+  char serial[128];
+  size_t size = 0, serial_size = sizeof(serial);
+  unsigned int alt_type;
+  int err;
+
+  if (type == TYPE_CRT)
+    err =
+      gnutls_x509_crt_get_authority_key_gn_serial(cert.crt, 0, NULL, &size, 
+                                                  &alt_type, serial, &serial_size, NULL);
+  else if (type == TYPE_CRL)
+    err =
+      gnutls_x509_crl_get_authority_key_gn_serial(cert.crl, 0, NULL, &size, 
+                                                  &alt_type, serial, &serial_size, NULL);
+  else
+    {
+      gnutls_assert ();
+      return;
+    }
+  
+  if (err != GNUTLS_E_SHORT_MEMORY_BUFFER)
+    {
+      addf (str, "error: get_authority_key_gn_serial: %s\n", gnutls_strerror (err));
+      return;
+    }
+
+  buffer = gnutls_malloc (size);
+  if (!buffer)
+    {
+      addf (str, "error: malloc: %s\n",
+            gnutls_strerror (GNUTLS_E_MEMORY_ERROR));
+      return;
+    }
+
+  if (type == TYPE_CRT)
+    err =
+      gnutls_x509_crt_get_authority_key_gn_serial(cert.crt, 0, buffer, &size, 
+                                                  &alt_type, serial, &serial_size, NULL);
+  else
+    err =
+      gnutls_x509_crl_get_authority_key_gn_serial(cert.crl, 0, buffer, &size, 
+                                                  &alt_type, serial, &serial_size, NULL);
+
+  if (err < 0)
+    {
+      gnutls_free (buffer);
+      addf (str, "error: get_authority_key_gn_serial2: %s\n", gnutls_strerror (err));
+      return;
+    }
+
+  add_altname(str, "", alt_type, buffer, size);
+  adds (str, "\t\t\tserial: ");
+  _gnutls_buffer_hexprint (str, serial, serial_size);
+  adds (str, "\n");
+
+  gnutls_free (buffer);
+}
+
+static void
 print_aki (gnutls_buffer_st * str, int type, cert_type_t cert)
 {
   char *buffer = NULL;
@@ -243,6 +352,13 @@ print_aki (gnutls_buffer_st * str, int type, cert_type_t cert)
   else
     {
       gnutls_assert ();
+      return;
+    }
+  
+  if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+    {
+      /* Check if an alternative name is there */
+      print_aki_gn_serial(str, type, cert);
       return;
     }
 
@@ -519,12 +635,10 @@ print_basic (gnutls_buffer_st * str, const char *prefix, int type,
 
 
 static void
-print_altname (gnutls_buffer_st * str, const char *prefix, int altname_type,
+print_altname (gnutls_buffer_st * str, const char *prefix, unsigned int altname_type,
                cert_type_t cert)
 {
   unsigned int altname_idx;
-  char str_ip[64];
-  char *p;
 
   for (altname_idx = 0;; altname_idx++)
     {
@@ -584,45 +698,9 @@ print_altname (gnutls_buffer_st * str, const char *prefix, int altname_type,
           return;
         }
 
-      if ((err == GNUTLS_SAN_DNSNAME
-           || err == GNUTLS_SAN_RFC822NAME
-           || err == GNUTLS_SAN_URI) && strlen (buffer) != size)
+
+      if (err == GNUTLS_SAN_OTHERNAME)
         {
-          adds (str, _("warning: altname contains an embedded NUL, "
-                       "replacing with '!'\n"));
-          while (strlen (buffer) < size)
-            buffer[strlen (buffer)] = '!';
-        }
-
-      switch (err)
-        {
-        case GNUTLS_SAN_DNSNAME:
-          addf (str, "%s\t\t\tDNSname: %.*s\n", prefix, (int) size, buffer);
-          break;
-
-        case GNUTLS_SAN_RFC822NAME:
-          addf (str, "%s\t\t\tRFC822name: %.*s\n", prefix, (int) size,
-                buffer);
-          break;
-
-        case GNUTLS_SAN_URI:
-          addf (str, "%s\t\t\tURI: %.*s\n", prefix, (int) size, buffer);
-          break;
-
-        case GNUTLS_SAN_IPADDRESS:
-          p = ip_to_string (buffer, size, str_ip, sizeof (str_ip));
-          if (p == NULL)
-            p = ERROR_STR;
-          addf (str, "%s\t\t\tIPAddress: %s\n", prefix, p);
-          break;
-
-        case GNUTLS_SAN_DN:
-          addf (str, "%s\t\t\tdirectoryName: %.*s\n", prefix,
-                (int) size, buffer);
-          break;
-
-        case GNUTLS_SAN_OTHERNAME:
-          {
             char *oid = NULL;
             size_t oidsize;
 
@@ -699,12 +777,8 @@ print_altname (gnutls_buffer_st * str, const char *prefix, int altname_type,
               }
             gnutls_free (oid);
           }
-          break;
-
-        default:
-          addf (str, "error: unknown altname\n");
-          break;
-        }
+      else
+        add_altname(str, prefix, err, buffer, size);
 
       gnutls_free (buffer);
     }

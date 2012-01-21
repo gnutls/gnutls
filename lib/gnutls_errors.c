@@ -158,6 +158,8 @@ static const gnutls_error_entry error_algorithms[] = {
 
   ERROR_ENTRY (N_("Unsupported critical extension in X.509 certificate."),
                GNUTLS_E_X509_UNSUPPORTED_CRITICAL_EXTENSION, 1),
+  ERROR_ENTRY (N_("Unsupported extension in X.509 certificate."),
+               GNUTLS_E_X509_UNSUPPORTED_EXTENSION, 1),
   ERROR_ENTRY (N_("Key usage violation in certificate has been detected."),
                GNUTLS_E_KEY_USAGE_VIOLATION, 1),
   ERROR_ENTRY (N_("Resource temporarily unavailable, try again."),

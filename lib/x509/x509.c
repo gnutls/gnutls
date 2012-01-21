@@ -746,29 +746,14 @@ gnutls_x509_crt_get_subject_key_id (gnutls_x509_crt_t cert, void *ret,
   return 0;
 }
 
-/**
- * gnutls_x509_crt_get_authority_key_id:
- * @cert: should contain a #gnutls_x509_crt_t structure
- * @ret: The place where the identifier will be copied
- * @ret_size: Holds the size of the result field.
- * @critical: will be non (0) if the extension is marked as critical (may be null)
- *
- * This function will return the X.509v3 certificate authority's key
- * identifier.  This is obtained by the X.509 Authority Key
- * identifier extension field (2.5.29.35). Note that this function
- * only returns the keyIdentifier field of the extension.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
- **/
-int
-gnutls_x509_crt_get_authority_key_id (gnutls_x509_crt_t cert, void *ret,
-                                      size_t * ret_size,
-                                      unsigned int *critical)
+static int
+_get_authority_key_id (gnutls_x509_crt_t cert, ASN1_TYPE *c2,
+                       unsigned int *critical)
 {
-  int result, len;
+  int ret;
   gnutls_datum_t id;
-  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+  
+  *c2 = ASN1_TYPE_EMPTY;
 
   if (cert == NULL)
     {
@@ -776,17 +761,11 @@ gnutls_x509_crt_get_authority_key_id (gnutls_x509_crt_t cert, void *ret,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-
-  if (ret)
-    memset (ret, 0, *ret_size);
-  else
-    *ret_size = 0;
-
-  if ((result =
+  if ((ret =
        _gnutls_x509_crt_get_extension (cert, "2.5.29.35", 0, &id,
                                        critical)) < 0)
     {
-      return result;
+      return gnutls_assert_val(ret);
     }
 
   if (id.size == 0 || id.data == NULL)
@@ -795,35 +774,132 @@ gnutls_x509_crt_get_authority_key_id (gnutls_x509_crt_t cert, void *ret,
       return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
     }
 
-  result = asn1_create_element
-    (_gnutls_get_pkix (), "PKIX1.AuthorityKeyIdentifier", &c2);
-  if (result != ASN1_SUCCESS)
+  ret = asn1_create_element
+    (_gnutls_get_pkix (), "PKIX1.AuthorityKeyIdentifier", c2);
+  if (ret != ASN1_SUCCESS)
     {
       gnutls_assert ();
       _gnutls_free_datum (&id);
-      return _gnutls_asn2err (result);
+      return _gnutls_asn2err (ret);
     }
 
-  result = asn1_der_decoding (&c2, id.data, id.size, NULL);
+  ret = asn1_der_decoding (c2, id.data, id.size, NULL);
   _gnutls_free_datum (&id);
 
-  if (result != ASN1_SUCCESS)
+  if (ret != ASN1_SUCCESS)
     {
       gnutls_assert ();
-      asn1_delete_structure (&c2);
-      return _gnutls_asn2err (result);
+      asn1_delete_structure (c2);
+      return _gnutls_asn2err (ret);
     }
 
-  len = *ret_size;
-  result = asn1_read_value (c2, "keyIdentifier", ret, &len);
+  return 0;
+}
 
-  *ret_size = len;
+/**
+ * gnutls_x509_crt_get_authority_key_gn_serial:
+ * @cert: should contain a #gnutls_x509_crt_t structure
+ * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
+ * @alt: is the place where the alternative name will be copied to
+ * @alt_size: holds the size of alt.
+ * @alt_type: holds the type of the alternative name (one of gnutls_x509_subject_alt_name_t).
+ * @serial: buffer to store the serial number (may be null)
+ * @serial_size: Holds the size of the serial field (may be null)
+ * @critical: will be non (0) if the extension is marked as critical (may be null)
+ *
+ * This function will return the X.509 authority key
+ * identifier when stored as a general name (authorityCertIssuer) 
+ * and serial number.
+ *
+ * Because more than one general names might be stored
+ * @seq can be used as a counter to request them all until 
+ * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
+ *
+ * Returns: Returns 0 on success, or an error code.
+ **/
+int
+gnutls_x509_crt_get_authority_key_gn_serial (gnutls_x509_crt_t cert, unsigned int seq, void *alt,
+                            size_t * alt_size, unsigned int *alt_type, 
+                            void* serial, size_t *serial_size,
+                            unsigned int *critical)
+{
+int ret, result, len;
+ASN1_TYPE c2;
+
+  ret = _get_authority_key_id(cert, &c2, critical);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  ret =
+    _gnutls_parse_general_name (c2, "authorityCertIssuer", seq, alt, alt_size, alt_type,
+                                0);
+  if (ret < 0)
+    {
+      ret = gnutls_assert_val(ret);
+      goto fail;
+    }
+
+  if (serial)
+    {
+      len = *serial_size;
+      result = asn1_read_value (c2, "authorityCertSerialNumber", serial, &len);
+      
+      *serial_size = len;
+      
+      if (result < 0)
+        {
+          ret = _gnutls_asn2err(result);
+          goto fail;
+        }
+      
+    }
+   
+  ret = 0;
+
+fail:
+  asn1_delete_structure (&c2);
+  
+  return ret;
+}
+
+/**
+ * gnutls_x509_crt_get_authority_key_id:
+ * @cert: should contain a #gnutls_x509_crt_t structure
+ * @id: The place where the identifier will be copied
+ * @id_size: Holds the size of the id field.
+ * @critical: will be non (0) if the extension is marked as critical (may be null)
+ *
+ * This function will return the X.509v3 certificate authority's key
+ * identifier.  This is obtained by the X.509 Authority Key
+ * identifier extension field (2.5.29.35). Note that this function
+ * only returns the keyIdentifier field of the extension and
+ * %GNUTLS_E_X509_UNSUPPORTED_EXTENSION, if the extension contains
+ * the name and serial number of the certificate. In that case
+ * gnutls_x509_crt_get_authority_key_gn_serial() may be used.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_crt_get_authority_key_id (gnutls_x509_crt_t cert, void *id,
+                                      size_t * id_size,
+                                      unsigned int *critical)
+{
+  int ret, result, len;
+  ASN1_TYPE c2;
+
+  ret = _get_authority_key_id(cert, &c2, critical);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  len = *id_size;
+  result = asn1_read_value (c2, "keyIdentifier", id, &len);
+
+  *id_size = len;
   asn1_delete_structure (&c2);
 
   if (result == ASN1_VALUE_NOT_FOUND || result == ASN1_ELEMENT_NOT_FOUND)
-    {
-      return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
-    }
+    return gnutls_assert_val(GNUTLS_E_X509_UNSUPPORTED_EXTENSION);
 
   if (result != ASN1_SUCCESS)
     {
@@ -1083,14 +1159,13 @@ _gnutls_parse_general_name (ASN1_TYPE src, const char *src_name,
 
 static int
 get_alt_name (gnutls_x509_crt_t cert, const char *extension_id,
-              unsigned int seq, void *ret,
-              size_t * ret_size, unsigned int *ret_type,
+              unsigned int seq, void *alt,
+              size_t * alt_size, unsigned int *alt_type,
               unsigned int *critical, int othername_oid)
 {
   int result;
   gnutls_datum_t dnsname;
   ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
-  gnutls_x509_subject_alt_name_t type;
 
   if (cert == NULL)
     {
@@ -1098,10 +1173,10 @@ get_alt_name (gnutls_x509_crt_t cert, const char *extension_id,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  if (ret)
-    memset (ret, 0, *ret_size);
+  if (alt)
+    memset (alt, 0, *alt_size);
   else
-    *ret_size = 0;
+    *alt_size = 0;
 
   if ((result =
        _gnutls_x509_crt_get_extension (cert, extension_id, 0, &dnsname,
@@ -1146,7 +1221,7 @@ get_alt_name (gnutls_x509_crt_t cert, const char *extension_id,
     }
 
   result =
-    _gnutls_parse_general_name (c2, "", seq, ret, ret_size, ret_type,
+    _gnutls_parse_general_name (c2, "", seq, alt, alt_size, alt_type,
                                 othername_oid);
 
   asn1_delete_structure (&c2);
@@ -1157,17 +1232,15 @@ get_alt_name (gnutls_x509_crt_t cert, const char *extension_id,
       return result;
     }
 
-  type = result;
-
-  return type;
+  return result;
 }
 
 /**
  * gnutls_x509_crt_get_subject_alt_name:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
- * @ret: is the place where the alternative name will be copied to
- * @ret_size: holds the size of ret.
+ * @san: is the place where the alternative name will be copied to
+ * @san_size: holds the size of san.
  * @critical: will be non (0) if the extension is marked as critical (may be null)
  *
  * This function retrieves the Alternative Name (2.5.29.17), contained
@@ -1186,19 +1259,19 @@ get_alt_name (gnutls_x509_crt_t cert, const char *extension_id,
  *
  * Returns: the alternative subject name type on success, one of the
  *   enumerated #gnutls_x509_subject_alt_name_t.  It will return
- *   %GNUTLS_E_SHORT_MEMORY_BUFFER if @ret_size is not large enough to
- *   hold the value.  In that case @ret_size will be updated with the
+ *   %GNUTLS_E_SHORT_MEMORY_BUFFER if @san_size is not large enough to
+ *   hold the value.  In that case @san_size will be updated with the
  *   required size.  If the certificate does not have an Alternative
  *   name with the specified sequence number then
  *   %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
  **/
 int
 gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
-                                      unsigned int seq, void *ret,
-                                      size_t * ret_size,
+                                      unsigned int seq, void *san,
+                                      size_t * san_size,
                                       unsigned int *critical)
 {
-  return get_alt_name (cert, "2.5.29.17", seq, ret, ret_size, NULL, critical,
+  return get_alt_name (cert, "2.5.29.17", seq, san, san_size, NULL, critical,
                        0);
 }
 
@@ -1206,8 +1279,8 @@ gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
  * gnutls_x509_crt_get_issuer_alt_name:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
- * @ret: is the place where the alternative name will be copied to
- * @ret_size: holds the size of ret.
+ * @ian: is the place where the alternative name will be copied to
+ * @ian_size: holds the size of ian.
  * @critical: will be non (0) if the extension is marked as critical (may be null)
  *
  * This function retrieves the Issuer Alternative Name (2.5.29.18),
@@ -1227,8 +1300,8 @@ gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
  *
  * Returns: the alternative issuer name type on success, one of the
  *   enumerated #gnutls_x509_subject_alt_name_t.  It will return
- *   %GNUTLS_E_SHORT_MEMORY_BUFFER if @ret_size is not large enough
- *   to hold the value.  In that case @ret_size will be updated with
+ *   %GNUTLS_E_SHORT_MEMORY_BUFFER if @ian_size is not large enough
+ *   to hold the value.  In that case @ian_size will be updated with
  *   the required size.  If the certificate does not have an
  *   Alternative name with the specified sequence number then
  *   %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
@@ -1237,11 +1310,11 @@ gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_issuer_alt_name (gnutls_x509_crt_t cert,
-                                     unsigned int seq, void *ret,
-                                     size_t * ret_size,
+                                     unsigned int seq, void *ian,
+                                     size_t * ian_size,
                                      unsigned int *critical)
 {
-  return get_alt_name (cert, "2.5.29.18", seq, ret, ret_size, NULL, critical,
+  return get_alt_name (cert, "2.5.29.18", seq, ian, ian_size, NULL, critical,
                        0);
 }
 
@@ -1249,34 +1322,34 @@ gnutls_x509_crt_get_issuer_alt_name (gnutls_x509_crt_t cert,
  * gnutls_x509_crt_get_subject_alt_name2:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
- * @ret: is the place where the alternative name will be copied to
- * @ret_size: holds the size of ret.
- * @ret_type: holds the type of the alternative name (one of gnutls_x509_subject_alt_name_t).
+ * @san: is the place where the alternative name will be copied to
+ * @san_size: holds the size of ret.
+ * @san_type: holds the type of the alternative name (one of gnutls_x509_subject_alt_name_t).
  * @critical: will be non (0) if the extension is marked as critical (may be null)
  *
  * This function will return the alternative names, contained in the
  * given certificate. It is the same as
  * gnutls_x509_crt_get_subject_alt_name() except for the fact that it
- * will return the type of the alternative name in @ret_type even if
+ * will return the type of the alternative name in @san_type even if
  * the function fails for some reason (i.e.  the buffer provided is
  * not enough).
  *
  * Returns: the alternative subject name type on success, one of the
  *   enumerated #gnutls_x509_subject_alt_name_t.  It will return
- *   %GNUTLS_E_SHORT_MEMORY_BUFFER if @ret_size is not large enough
- *   to hold the value.  In that case @ret_size will be updated with
+ *   %GNUTLS_E_SHORT_MEMORY_BUFFER if @san_size is not large enough
+ *   to hold the value.  In that case @san_size will be updated with
  *   the required size.  If the certificate does not have an
  *   Alternative name with the specified sequence number then
  *   %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
  **/
 int
 gnutls_x509_crt_get_subject_alt_name2 (gnutls_x509_crt_t cert,
-                                       unsigned int seq, void *ret,
-                                       size_t * ret_size,
-                                       unsigned int *ret_type,
+                                       unsigned int seq, void *san,
+                                       size_t * san_size,
+                                       unsigned int *san_type,
                                        unsigned int *critical)
 {
-  return get_alt_name (cert, "2.5.29.17", seq, ret, ret_size, ret_type,
+  return get_alt_name (cert, "2.5.29.17", seq, san, san_size, san_type,
                        critical, 0);
 }
 
@@ -1284,22 +1357,22 @@ gnutls_x509_crt_get_subject_alt_name2 (gnutls_x509_crt_t cert,
  * gnutls_x509_crt_get_issuer_alt_name2:
  * @cert: should contain a #gnutls_x509_crt_t structure
  * @seq: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
- * @ret: is the place where the alternative name will be copied to
- * @ret_size: holds the size of ret.
- * @ret_type: holds the type of the alternative name (one of gnutls_x509_subject_alt_name_t).
+ * @ian: is the place where the alternative name will be copied to
+ * @ian_size: holds the size of ret.
+ * @ian_type: holds the type of the alternative name (one of gnutls_x509_subject_alt_name_t).
  * @critical: will be non (0) if the extension is marked as critical (may be null)
  *
  * This function will return the alternative names, contained in the
  * given certificate. It is the same as
  * gnutls_x509_crt_get_issuer_alt_name() except for the fact that it
- * will return the type of the alternative name in @ret_type even if
+ * will return the type of the alternative name in @ian_type even if
  * the function fails for some reason (i.e.  the buffer provided is
  * not enough).
  *
  * Returns: the alternative issuer name type on success, one of the
  *   enumerated #gnutls_x509_subject_alt_name_t.  It will return
- *   %GNUTLS_E_SHORT_MEMORY_BUFFER if @ret_size is not large enough
- *   to hold the value.  In that case @ret_size will be updated with
+ *   %GNUTLS_E_SHORT_MEMORY_BUFFER if @ian_size is not large enough
+ *   to hold the value.  In that case @ian_size will be updated with
  *   the required size.  If the certificate does not have an
  *   Alternative name with the specified sequence number then
  *   %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
@@ -1309,12 +1382,12 @@ gnutls_x509_crt_get_subject_alt_name2 (gnutls_x509_crt_t cert,
  **/
 int
 gnutls_x509_crt_get_issuer_alt_name2 (gnutls_x509_crt_t cert,
-                                      unsigned int seq, void *ret,
-                                      size_t * ret_size,
-                                      unsigned int *ret_type,
+                                      unsigned int seq, void *ian,
+                                      size_t * ian_size,
+                                      unsigned int *ian_type,
                                       unsigned int *critical)
 {
-  return get_alt_name (cert, "2.5.29.18", seq, ret, ret_size, ret_type,
+  return get_alt_name (cert, "2.5.29.18", seq, ian, ian_size, ian_type,
                        critical, 0);
 }
 
@@ -1342,8 +1415,8 @@ gnutls_x509_crt_get_issuer_alt_name2 (gnutls_x509_crt_t cert,
  * will return one of the virtual (GNUTLS_SAN_OTHERNAME_*) types,
  * e.g. %GNUTLS_SAN_OTHERNAME_XMPP, and %GNUTLS_SAN_OTHERNAME for
  * unknown OIDs.  It will return %GNUTLS_E_SHORT_MEMORY_BUFFER if
- * @ret_size is not large enough to hold the value.  In that case
- * @ret_size will be updated with the required size.  If the
+ * @ian_size is not large enough to hold the value.  In that case
+ * @ian_size will be updated with the required size.  If the
  * certificate does not have an Alternative name with the specified
  * sequence number and with the otherName type then
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
