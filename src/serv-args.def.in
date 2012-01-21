@@ -125,8 +125,7 @@ flag = {
 
 flag = {
     name      = x509cafile;
-    arg-type  = file;
-    file-exists = yes;
+    arg-type  = string;
     descrip   = "Certificate file or PKCS #11 URL to use";
     doc      = "";
 };
@@ -165,48 +164,42 @@ flag = {
 
 flag = {
     name      = x509keyfile;
-    arg-type  = file;
-    file-exists = yes;
+    arg-type  = string;
     descrip   = "X.509 key file or PKCS #11 URL to use";
     doc      = "";
 };
 
 flag = {
     name      = x509certfile;
-    arg-type  = file;
-    file-exists = yes;
+    arg-type  = string;
     descrip   = "X.509 Certificate file or PKCS #11 URL to use";
     doc      = "";
 };
 
 flag = {
     name      = x509dsakeyfile;
-    arg-type  = file;
-    file-exists = yes;
+    arg-type  = string;
     descrip   = "Alternative X.509 key file or PKCS #11 URL to use";
     doc      = "";
 };
 
 flag = {
     name      = x509dsacertfile;
-    arg-type  = file;
-    file-exists = yes;
+    arg-type  = string;
     descrip   = "Alternative X.509 Certificate file or PKCS #11 URL to use";
     doc      = "";
 };
 
 flag = {
     name      = x509ecckeyfile;
-    arg-type  = file;
-    file-exists = yes;
+    arg-type  = string;
     descrip   = "Alternative X.509 key file or PKCS #11 URL to use";
     doc      = "";
 };
 
 flag = {
     name      = x509ecccertfile;
-    arg-type  = file;
-    file-exists = yes;
+    arg-type  = string;
     descrip   = "Alternative X.509 Certificate file or PKCS #11 URL to use";
     doc      = "";
 };
