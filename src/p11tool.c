@@ -229,6 +229,15 @@ cmd_parser (int argc, char **argv)
       sec_param = OPT_ARG(SEC_PARAM);
     }
 
+  if (debug > 0)
+    {
+      fprintf(stderr, "Private: %s\n", ENABLED_OPT(PRIVATE)?"yes":"no");
+      fprintf(stderr, "Trusted: %s\n", ENABLED_OPT(TRUSTED)?"yes":"no");
+      fprintf(stderr, "Login: %s\n", ENABLED_OPT(LOGIN)?"yes":"no");
+      fprintf(stderr, "Detailed URLs: %s\n", ENABLED_OPT(DETAILED_URL)?"yes":"no");
+      fprintf(stderr, "\n");
+    }
+
   switch (action)
     {
     case ACTION_PKCS11_LIST:

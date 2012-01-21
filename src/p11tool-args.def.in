@@ -172,7 +172,7 @@ flag = {
     name      = detailed-url;
     descrip   = "Print detailed URLs";
     disabled;
-    enable    = "no";
+    disable   = "no";
     doc   = "";
 };
 
@@ -275,15 +275,15 @@ To view all tokens in your system use:
 $ p11tool --list-tokens
 @end example
 
+To view all objects in a token use:
+@example
+$ p11tool --login --list-all --url "pkcs11:TOKEN-URL"
+@end example
+
 To store a private key and a certificate in a token run:
 @example
 $ p11tool --login --write --url "pkcs11:URL" --load-privkey key.pem --label "Mykey"
 $ p11tool --login --write --url "pkcs11:URL" --load-certificate cert.pem --label "MyCert"
-@end example
-
-To view all objects in a token use:
-@example
-$ p11tool --login --list-all --url "pkcs11:TOKEN-URL"
 @end example
 _EOT_;
 };
