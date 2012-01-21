@@ -297,6 +297,8 @@ ENUMS += enums/gnutls_x509_subject_alt_name_t
 gnutls_TEXINFOS += $(ENUMS)
 DISTCLEANFILES += $(ENUMS)
 
+.NOTPARALLEL: $(ENUMS) enums.texi
+
 $(ENUMS): enums.texi
 	$(MAKE) compare-makefile
 	-mkdir enums
