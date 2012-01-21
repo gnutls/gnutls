@@ -60,11 +60,11 @@ gnutls_serv_SOURCES =				\
   certtool-common.h \
   $(PKCS11_SRCS)
 gnutls_serv_LDADD = ../lib/libgnutls.la
-gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la
+gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la $(LIBOPTS_LDADD)
 gnutls_serv_LDADD += $(LTLIBGCRYPT) $(LIBSOCKET) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-serv.la
 libcmd_serv_la_CFLAGS =
-libcmd_serv_la_SOURCES = serv.gaa serv-gaa.h serv-gaa.c
+libcmd_serv_la_SOURCES = serv-args.def serv-args.c serv-args.h
 
 if ENABLE_SRP
 srptool_SOURCES = srptool.c
@@ -171,7 +171,7 @@ cli-debug-args.c: $(srcdir)/cli-debug-args.def
 	-autogen $<
 cli-args.c: $(srcdir)/cli-args.def
 	-autogen $<
+serv-args.c: $(srcdir)/serv-args.def
+	-autogen $<
 srptool-args.c: $(srcdir)/srptool-args.def
 	-autogen $<
-serv-gaa.c: $(srcdir)/serv.gaa
-	-$(GAA) $< -o serv-gaa.c -i serv-gaa.h

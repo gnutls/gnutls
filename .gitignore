@@ -564,3 +564,4 @@ doc/examples/ex-client-x509
 doc/examples/ex-serv-x509
 tests/slow/cipher-test
 libopts/libopts.la
+src/serv-args.def

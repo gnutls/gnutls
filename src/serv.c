@@ -26,7 +26,7 @@
 #include <config.h>
 
 #include "common.h"
-#include "serv-gaa.h"
+#include "serv-args.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -56,7 +56,7 @@
 static int generate = 0;
 static int http = 0;
 static int x509ctype;
-static int debug;
+static int debug = 0;
 
 int verbose;
 static int nodb;
@@ -64,21 +64,21 @@ static int noticket;
 int require_cert;
 int disable_client_cert;
 
-char *psk_passwd;
-char *srp_passwd;
-char *srp_passwd_conf;
-char *pgp_keyring;
-char *pgp_keyfile;
-char *pgp_certfile;
-char *x509_keyfile;
-char *x509_certfile;
-char *x509_dsakeyfile;
-char *x509_dsacertfile;
-char *x509_ecckeyfile;
-char *x509_ecccertfile;
-char *x509_cafile;
-char *dh_params_file;
-char *x509_crlfile = NULL;
+const char *psk_passwd = NULL;
+const char *srp_passwd = NULL;
+const char *srp_passwd_conf = NULL;
+const char *pgp_keyring = NULL;
+const char *pgp_keyfile = NULL;
+const char *pgp_certfile = NULL;
+const char *x509_keyfile = NULL;
+const char *x509_certfile = NULL;
+const char *x509_dsakeyfile = NULL;
+const char *x509_dsacertfile = NULL;
+const char *x509_ecckeyfile = NULL;
+const char *x509_ecccertfile = NULL;
+const char *x509_cafile = NULL;
+const char *dh_params_file = NULL;
+const char *x509_crlfile = NULL;
 
 gnutls_datum_t session_ticket_key;
 static void tcp_server(const char* name, int port);
@@ -111,8 +111,6 @@ gnutls_psk_server_credentials_t psk_cred = NULL;
 gnutls_anon_server_credentials_t dh_cred = NULL;
 gnutls_certificate_credentials_t cert_cred = NULL;
 
-static gaainfo info;
-
 const int ssl_session_cache = 128;
 
 static void wrap_db_init (void);
@@ -120,6 +118,8 @@ static void wrap_db_deinit (void);
 static int wrap_db_store (void *dbf, gnutls_datum_t key, gnutls_datum_t data);
 static gnutls_datum_t wrap_db_fetch (void *dbf, gnutls_datum_t key);
 static int wrap_db_delete (void *dbf, gnutls_datum_t key);
+
+static void cmd_parser (int argc, char **argv);
 
 
 #define HTTP_STATE_REQUEST	1
@@ -331,6 +331,13 @@ gnutls_session_t initialize_session (int dtls)
 {
   gnutls_session_t session;
   const char *err;
+  const char * priorities;
+
+  if (HAVE_OPT(PRIORITY)) {
+    priorities = OPT_ARG(PRIORITY);
+  } else {
+    priorities = "NORMAL";
+  }
 
   if (dtls)
     gnutls_init (&session, GNUTLS_SERVER|GNUTLS_DATAGRAM);
@@ -353,7 +360,7 @@ gnutls_session_t initialize_session (int dtls)
     gnutls_session_ticket_enable_server (session, &session_ticket_key);
 #endif
 
-  if (gnutls_priority_set_direct (session, info.priorities, &err) < 0)
+  if (gnutls_priority_set_direct (session, priorities, &err) < 0)
     {
       fprintf (stderr, "Syntax error at: %s\n", err);
       exit (1);
@@ -898,15 +905,14 @@ tls_audit_log_func (gnutls_session_t session, const char *str)
   fprintf (stderr, "|<%p>| %s", session, str);
 }
 
-static void gaa_parser (int argc, char **argv);
-
 int
 main (int argc, char **argv)
 {
-  int ret;
+  int ret, mtu, port;
   char name[256];
 
   set_program_name (argv[0]);
+  cmd_parser(argc, argv);
 
 #ifndef _WIN32
   signal (SIGPIPE, SIG_IGN);
@@ -918,12 +924,12 @@ main (int argc, char **argv)
 
   sockets_init ();
 
-  gaa_parser (argc, argv);
+  optionProcess( &gnutls_servOptions, argc, argv);
 
   if (nodb == 0)
     wrap_db_init ();
 
-  if (info.udp != 0)
+  if (ENABLED_OPT(UDP))
     strcpy(name, "UDP ");
   else name[0] = 0;
 
@@ -1018,11 +1024,11 @@ main (int argc, char **argv)
         }
     }
 
-  if (pgp_certfile != NULL)
+  if (ENABLED_OPT(PGPCERTFILE))
     {
-      if (info.pgp_subkey != NULL)
+      if (ENABLED_OPT(PGPSUBKEY))
         ret = gnutls_certificate_set_openpgp_key_file2
-          (cert_cred, pgp_certfile, pgp_keyfile, info.pgp_subkey,
+          (cert_cred, pgp_certfile, pgp_keyfile, OPT_ARG(PGPSUBKEY),
            GNUTLS_OPENPGP_FMT_BASE64);
       else
         ret = gnutls_certificate_set_openpgp_key_file
@@ -1109,10 +1115,10 @@ main (int argc, char **argv)
           GERR (ret);
         }
 
-      if (info.psk_hint)
+      if (ENABLED_OPT(PSKHINT))
         {
           ret = gnutls_psk_set_server_credentials_hint (psk_cred,
-                                                        info.psk_hint);
+                                                        OPT_ARG(PSKHINT));
           if (ret)
             {
               fprintf (stderr, "Error setting PSK identity hint.\n");
@@ -1136,10 +1142,19 @@ main (int argc, char **argv)
     gnutls_session_ticket_key_generate (&session_ticket_key);
 #endif
 
-  if (info.udp)
-    udp_server(name, info.port, info.mtu);
+  if (ENABLED_OPT(MTU))
+    mtu = OPT_VALUE_MTU;
+  else mtu = 1300;
+
+  if (ENABLED_OPT(PORT))
+    port = OPT_VALUE_PORT;
   else
-    tcp_server(name, info.port);
+    port = 5556;
+
+  if (ENABLED_OPT(UDP))
+    udp_server(name, port, mtu);
+  else
+    tcp_server(name, port);
 }
 
 static void tcp_server(const char* name, int port)
@@ -1530,56 +1545,66 @@ static void tcp_server(const char* name, int port)
 
 }
 
-void
-gaa_parser (int argc, char **argv)
+static void cmd_parser (int argc, char **argv)
 {
-  if (gaa (argc, argv, &info) != -1)
-    {
-      fprintf (stderr,
-               "Error in the arguments. Use the --help or -h parameters to get more information.\n");
-      exit (1);
-    }
+  disable_client_cert = ENABLED_OPT(DISABLE_CLIENT_CERT);
+  require_cert = ENABLED_OPT(REQUIRE_CLIENT_CERT);
+  if (ENABLED_OPT(DEBUG))
+    debug = OPT_VALUE_DEBUG;
 
-  disable_client_cert = info.disable_client_cert;
-  require_cert = info.require_cert;
-  debug = info.debug;
-  verbose = info.quiet;
-  nodb = info.nodb;
-  noticket = info.noticket;
+  verbose = !ENABLED_OPT(QUIET);
+  nodb = ENABLED_OPT(NODB);
+  noticket = ENABLED_OPT(NOTICKET);
 
-  if (info.http == 0)
-    http = 0;
-  else
-    http = 1;
+  http = ENABLED_OPT(HTTP);
 
-  if (info.fmtder == 0)
-    x509ctype = GNUTLS_X509_FMT_PEM;
-  else
+  if (ENABLED_OPT(X509FMTDER))
     x509ctype = GNUTLS_X509_FMT_DER;
-
-  if (info.generate == 0)
-    generate = 0;
   else
-    generate = 1;
+    x509ctype = GNUTLS_X509_FMT_PEM;
 
-  dh_params_file = info.dh_params_file;
+  generate = ENABLED_OPT(GENERATE);
 
-  x509_certfile = info.x509_certfile;
-  x509_keyfile = info.x509_keyfile;
-  x509_dsacertfile = info.x509_dsacertfile;
-  x509_dsakeyfile = info.x509_dsakeyfile;
-  x509_ecccertfile = info.x509_ecccertfile;
-  x509_ecckeyfile = info.x509_ecckeyfile;
-  x509_cafile = info.x509_cafile;
-  x509_crlfile = info.x509_crlfile;
-  pgp_certfile = info.pgp_certfile;
-  pgp_keyfile = info.pgp_keyfile;
-  srp_passwd = info.srp_passwd;
-  srp_passwd_conf = info.srp_passwd_conf;
+  if (ENABLED_OPT(DHPARAMS))
+    dh_params_file = OPT_ARG(DHPARAMS);
 
-  psk_passwd = info.psk_passwd;
+  if (HAVE_OPT(X509KEYFILE))
+    x509_keyfile = OPT_ARG(X509KEYFILE);
+  if (HAVE_OPT(X509CERTFILE))
+    x509_certfile = OPT_ARG(X509CERTFILE);
 
-  pgp_keyring = info.pgp_keyring;
+  if (HAVE_OPT(X509DSAKEYFILE))
+    x509_dsakeyfile = OPT_ARG(X509DSAKEYFILE);
+  if (HAVE_OPT(X509DSACERTFILE))
+    x509_dsacertfile = OPT_ARG(X509DSACERTFILE);
+
+
+  if (HAVE_OPT(X509ECCKEYFILE))
+    x509_ecckeyfile = OPT_ARG(X509ECCKEYFILE);
+  if (HAVE_OPT(X509CERTFILE))
+    x509_ecccertfile = OPT_ARG(X509ECCCERTFILE);
+  
+  if (HAVE_OPT(X509CAFILE))
+    x509_cafile = OPT_ARG(X509CAFILE);
+  if (HAVE_OPT(X509CRLFILE))
+    x509_crlfile = OPT_ARG(X509CRLFILE);
+
+  if (HAVE_OPT(PGPKEYFILE))
+    pgp_keyfile = OPT_ARG(PGPKEYFILE);
+  if (HAVE_OPT(PGPCERTFILE))
+    pgp_certfile = OPT_ARG(PGPCERTFILE);
+
+  if (HAVE_OPT(PGPKEYRING))
+    pgp_keyring = OPT_ARG(PGPKEYRING);
+
+  if (HAVE_OPT(SRPPASSWD))
+    srp_passwd = OPT_ARG(SRPPASSWD);
+  if (HAVE_OPT(SRPPASSWDCONF))
+    srp_passwd_conf = OPT_ARG(SRPPASSWDCONF);
+
+  if (HAVE_OPT(PSKPASSWD))
+    psk_passwd = OPT_ARG(PSKPASSWD);
+
 }
 
 extern void serv_version (void);

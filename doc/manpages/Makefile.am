@@ -29,6 +29,9 @@ endif
 gnutls-cli.1: ../../src/cli-args.def
 	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
 
+gnutls-serv.1: ../../src/serv-args.def
+	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+
 gnutls-cli-debug.1: ../../src/cli-debug-args.def
 	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
 
