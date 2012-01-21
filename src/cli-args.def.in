@@ -137,7 +137,7 @@ information on allowed keywords";
 flag = {
     name      = x509cafile;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "Certificate file or PKCS #11 URL to use";
     doc      = "";
 };
@@ -145,7 +145,7 @@ flag = {
 flag = {
     name      = x509crlfile;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "CRL file to use";
     doc      = "";
 };
@@ -153,7 +153,7 @@ flag = {
 flag = {
     name      = pgpkeyfile;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "PGP Key file to use";
     doc      = "";
 };
@@ -161,7 +161,7 @@ flag = {
 flag = {
     name      = pgpkeyring;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "PGP Key ring file to use";
     doc      = "";
 };
@@ -169,7 +169,7 @@ flag = {
 flag = {
     name      = pgpcertfile;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "PGP Public Key (certificate) file to use";
     doc      = "";
 };
@@ -177,7 +177,7 @@ flag = {
 flag = {
     name      = x509keyfile;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "X.509 key file or PKCS #11 URL to use";
     doc      = "";
 };
@@ -185,7 +185,7 @@ flag = {
 flag = {
     name      = x509certfile;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "X.509 Certificate file or PKCS #11 URL to use";
     doc      = "";
 };

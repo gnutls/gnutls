@@ -58,7 +58,7 @@ static int http = 0;
 static int x509ctype;
 static int debug = 0;
 
-int verbose;
+int verbose = 1;
 static int nodb;
 static int noticket;
 int require_cert;
@@ -414,7 +414,7 @@ peer_print_info (gnutls_session_t session, int *ret_length,
   char *crtinfo = NULL;
   size_t ncrtinfo = 0;
 
-  if (verbose != 0)
+  if (verbose == 0)
     {
       http_buffer = malloc (len);
       if (http_buffer == NULL)
@@ -427,7 +427,6 @@ peer_print_info (gnutls_session_t session, int *ret_length,
       *ret_length =
         sizeof (DEFAULT_DATA) + sizeof (HTTP_BEGIN) + sizeof (HTTP_END) - 3;
       return http_buffer;
-
     }
 
   if (gnutls_certificate_type_get (session) == GNUTLS_CRT_X509)
@@ -924,8 +923,6 @@ main (int argc, char **argv)
 
   sockets_init ();
 
-  optionProcess( &gnutls_servOptions, argc, argv);
-
   if (nodb == 0)
     wrap_db_init ();
 
@@ -1260,7 +1257,7 @@ static void tcp_server(const char* name, int port)
                                           gl_fd_to_handle (accept_fd));
                 j->handshake_ok = 0;
 
-                if (verbose == 0)
+                if (verbose != 0)
                   {
                     tt = time (0);
                     ctt = ctime (&tt);
@@ -1306,10 +1303,10 @@ static void tcp_server(const char* name, int port)
                 else if (r == 0)
                   {
                     if (gnutls_session_is_resumed (j->tls_session) != 0
-                        && verbose == 0)
+                        && verbose != 0)
                       printf ("*** This is a resumed session\n");
 
-                    if (verbose == 0)
+                    if (verbose != 0)
                       {
                         printf ("\n* Successful handshake from %s\n",
                                 human_addr ((struct sockaddr *)
@@ -1429,9 +1426,9 @@ static void tcp_server(const char* name, int port)
                 else if (r == 0)
                   {
                     if (gnutls_session_is_resumed (j->tls_session) != 0
-                        && verbose == 0)
+                        && verbose != 0)
                       printf ("*** This is a resumed session\n");
-                    if (verbose == 0)
+                    if (verbose != 0)
                       {
                         printf ("- connection from %s\n",
                                 human_addr ((struct sockaddr *)
@@ -1547,16 +1544,22 @@ static void tcp_server(const char* name, int port)
 
 static void cmd_parser (int argc, char **argv)
 {
+  optionProcess( &gnutls_servOptions, argc, argv);
+
   disable_client_cert = ENABLED_OPT(DISABLE_CLIENT_CERT);
   require_cert = ENABLED_OPT(REQUIRE_CLIENT_CERT);
   if (ENABLED_OPT(DEBUG))
     debug = OPT_VALUE_DEBUG;
 
-  verbose = !ENABLED_OPT(QUIET);
+  if (ENABLED_OPT(QUIET))
+    verbose = 0;
+
   nodb = ENABLED_OPT(NODB);
   noticket = ENABLED_OPT(NOTICKET);
 
-  http = ENABLED_OPT(HTTP);
+  if (ENABLED_OPT(ECHO))
+    http = 0;
+  else http = 1;
 
   if (ENABLED_OPT(X509FMTDER))
     x509ctype = GNUTLS_X509_FMT_DER;
@@ -1568,41 +1571,41 @@ static void cmd_parser (int argc, char **argv)
   if (ENABLED_OPT(DHPARAMS))
     dh_params_file = OPT_ARG(DHPARAMS);
 
-  if (HAVE_OPT(X509KEYFILE))
+  if (ENABLED_OPT(X509KEYFILE))
     x509_keyfile = OPT_ARG(X509KEYFILE);
-  if (HAVE_OPT(X509CERTFILE))
+  if (ENABLED_OPT(X509CERTFILE))
     x509_certfile = OPT_ARG(X509CERTFILE);
 
-  if (HAVE_OPT(X509DSAKEYFILE))
+  if (ENABLED_OPT(X509DSAKEYFILE))
     x509_dsakeyfile = OPT_ARG(X509DSAKEYFILE);
-  if (HAVE_OPT(X509DSACERTFILE))
+  if (ENABLED_OPT(X509DSACERTFILE))
     x509_dsacertfile = OPT_ARG(X509DSACERTFILE);
 
 
-  if (HAVE_OPT(X509ECCKEYFILE))
+  if (ENABLED_OPT(X509ECCKEYFILE))
     x509_ecckeyfile = OPT_ARG(X509ECCKEYFILE);
-  if (HAVE_OPT(X509CERTFILE))
+  if (ENABLED_OPT(X509CERTFILE))
     x509_ecccertfile = OPT_ARG(X509ECCCERTFILE);
   
-  if (HAVE_OPT(X509CAFILE))
+  if (ENABLED_OPT(X509CAFILE))
     x509_cafile = OPT_ARG(X509CAFILE);
-  if (HAVE_OPT(X509CRLFILE))
+  if (ENABLED_OPT(X509CRLFILE))
     x509_crlfile = OPT_ARG(X509CRLFILE);
 
-  if (HAVE_OPT(PGPKEYFILE))
+  if (ENABLED_OPT(PGPKEYFILE))
     pgp_keyfile = OPT_ARG(PGPKEYFILE);
-  if (HAVE_OPT(PGPCERTFILE))
+  if (ENABLED_OPT(PGPCERTFILE))
     pgp_certfile = OPT_ARG(PGPCERTFILE);
 
-  if (HAVE_OPT(PGPKEYRING))
+  if (ENABLED_OPT(PGPKEYRING))
     pgp_keyring = OPT_ARG(PGPKEYRING);
 
-  if (HAVE_OPT(SRPPASSWD))
+  if (ENABLED_OPT(SRPPASSWD))
     srp_passwd = OPT_ARG(SRPPASSWD);
-  if (HAVE_OPT(SRPPASSWDCONF))
+  if (ENABLED_OPT(SRPPASSWDCONF))
     srp_passwd_conf = OPT_ARG(SRPPASSWDCONF);
 
-  if (HAVE_OPT(PSKPASSWD))
+  if (ENABLED_OPT(PSKPASSWD))
     psk_passwd = OPT_ARG(PSKPASSWD);
 
 }

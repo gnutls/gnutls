@@ -79,15 +79,14 @@ flag = {
 flag = {
     name      = passwd-conf;
     value     = v;
-    arg-type  = file;
-    file-exists;
+    arg-type  = string;
     descrip   = "specify a password conf file.";
     doc   = "Specify a filename or a PKCS #11 URL to read the CAs from.";
 };
 
 flag = {
     name      = create-conf;
-    arg-type  = file;
+    arg-type  = string;
     descrip   = "Generate a password configuration file.";
     doc   = "This generates a password configuration file (tpasswd.conf)
 containing the required for TLS parameters.";

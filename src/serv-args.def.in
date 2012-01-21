@@ -8,8 +8,6 @@ detail        = "Server program that listens to incoming TLS connections.";
 gnu-usage;
 no-misuse-usage;
 disable-save;
-reorder-args;
-argument;
 long-opts;
 config-header = 'config.h';
 export = '#include <gettext.h>';
@@ -120,7 +118,7 @@ information on allowed keywords";
 flag = {
     name      = dhparams;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "DH params file to use";
     doc      = "";
 };
@@ -128,7 +126,7 @@ flag = {
 flag = {
     name      = x509cafile;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "Certificate file or PKCS #11 URL to use";
     doc      = "";
 };
@@ -136,7 +134,7 @@ flag = {
 flag = {
     name      = x509crlfile;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "CRL file to use";
     doc      = "";
 };
@@ -144,7 +142,7 @@ flag = {
 flag = {
     name      = pgpkeyfile;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "PGP Key file to use";
     doc      = "";
 };
@@ -152,7 +150,7 @@ flag = {
 flag = {
     name      = pgpkeyring;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "PGP Key ring file to use";
     doc      = "";
 };
@@ -160,7 +158,7 @@ flag = {
 flag = {
     name      = pgpcertfile;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "PGP Public Key (certificate) file to use";
     doc      = "";
 };
@@ -168,7 +166,7 @@ flag = {
 flag = {
     name      = x509keyfile;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "X.509 key file or PKCS #11 URL to use";
     doc      = "";
 };
@@ -176,7 +174,7 @@ flag = {
 flag = {
     name      = x509certfile;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "X.509 Certificate file or PKCS #11 URL to use";
     doc      = "";
 };
@@ -184,7 +182,7 @@ flag = {
 flag = {
     name      = x509dsakeyfile;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "Alternative X.509 key file or PKCS #11 URL to use";
     doc      = "";
 };
@@ -192,7 +190,7 @@ flag = {
 flag = {
     name      = x509dsacertfile;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "Alternative X.509 Certificate file or PKCS #11 URL to use";
     doc      = "";
 };
@@ -200,7 +198,7 @@ flag = {
 flag = {
     name      = x509ecckeyfile;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "Alternative X.509 key file or PKCS #11 URL to use";
     doc      = "";
 };
@@ -208,7 +206,7 @@ flag = {
 flag = {
     name      = x509ecccertfile;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "Alternative X.509 Certificate file or PKCS #11 URL to use";
     doc      = "";
 };
@@ -223,7 +221,7 @@ flag = {
 flag = {
     name      = srppasswd;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "SRP password file to use";
     doc      = "";
 };
@@ -231,7 +229,7 @@ flag = {
 flag = {
     name      = srppasswdconf;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "SRP password configuration file to use";
     doc      = "";
 };
@@ -239,7 +237,7 @@ flag = {
 flag = {
     name      = pskpasswd;
     arg-type  = file;
-    file-exists;
+    file-exists = yes;
     descrip   = "PSK password file to use";
     doc      = "";
 };
