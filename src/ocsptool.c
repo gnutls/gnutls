@@ -62,9 +62,9 @@ request_info (void)
     error (EXIT_FAILURE, 0, "ocsp_req_init: %s", gnutls_strerror (ret));
 
   if (info.req)
-    dat.data = read_binary_file (info.req, &size);
+    dat.data = (void*)read_binary_file (info.req, &size);
   else
-    dat.data = fread_file (infile, &size);
+    dat.data = (void*)fread_file (infile, &size);
   if (dat.data == NULL)
     error (EXIT_FAILURE, errno, "reading request");
   dat.size = size;
@@ -97,9 +97,9 @@ response_info (void)
     error (EXIT_FAILURE, 0, "ocsp_resp_init: %s", gnutls_strerror (ret));
 
   if (info.resp)
-    dat.data = read_binary_file (info.resp, &size);
+    dat.data = (void*)read_binary_file (info.resp, &size);
   else
-    dat.data = fread_file (infile, &size);
+    dat.data = (void*)fread_file (infile, &size);
   if (dat.data == NULL)
     error (EXIT_FAILURE, errno, "reading response");
   dat.size = size;
@@ -134,7 +134,7 @@ load_issuer (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crt_init: %s", gnutls_strerror (ret));
 
-  dat.data = read_binary_file (info.issuer, &size);
+  dat.data = (void*)read_binary_file (info.issuer, &size);
   dat.size = size;
 
   if (!dat.data)
@@ -164,7 +164,7 @@ load_cert (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crt_init: %s", gnutls_strerror (ret));
 
-  dat.data = read_binary_file (info.cert, &size);
+  dat.data = (void*)read_binary_file (info.cert, &size);
   dat.size = size;
 
   if (!dat.data)
@@ -204,7 +204,7 @@ generate_request (void)
 
   if (!info.nononce)
     {
-      char noncebuf[23];
+      unsigned char noncebuf[23];
       gnutls_datum_t nonce = { noncebuf, sizeof (noncebuf) };
 
       ret = gnutls_rnd (GNUTLS_RND_RANDOM, nonce.data, nonce.size);
@@ -319,9 +319,9 @@ verify_response (void)
     error (EXIT_FAILURE, 0, "ocsp_resp_init: %s", gnutls_strerror (ret));
 
   if (info.resp)
-    dat.data = read_binary_file (info.resp, &size);
+    dat.data = (void*)read_binary_file (info.resp, &size);
   else
-    dat.data = fread_file (infile, &size);
+    dat.data = (void*)fread_file (infile, &size);
   if (dat.data == NULL)
     error (EXIT_FAILURE, errno, "reading response");
   dat.size = size;
@@ -335,7 +335,7 @@ verify_response (void)
     error (EXIT_FAILURE, 0, "cannot mix --load-trust and --load-signer");
   else if (info.signer == NULL)
     {
-      dat.data = read_binary_file (info.trust, &size);
+      dat.data = (void*)read_binary_file (info.trust, &size);
       if (dat.data == NULL)
 	error (EXIT_FAILURE, errno, "reading --load-trust: %s", info.trust);
       dat.size = size;
@@ -388,7 +388,7 @@ verify_response (void)
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "crt_init: %s", gnutls_strerror (ret));
 
-      dat.data = read_binary_file (info.signer, &size);
+      dat.data = (void*)read_binary_file (info.signer, &size);
       if (dat.data == NULL)
 	error (EXIT_FAILURE, errno, "reading --load-signer: %s", info.signer);
       dat.size = size;

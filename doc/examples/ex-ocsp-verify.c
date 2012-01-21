@@ -41,7 +41,7 @@ main (int argc, char *argv[])
   if (rc < 0)
     goto done;
 
-  tmp.data = read_binary_file (argv[1], &s);
+  tmp.data = (void*)read_binary_file (argv[1], &s);
   if (tmp.data == NULL)
     {
       printf ("cannot read OCSP response\n");
@@ -74,7 +74,7 @@ main (int argc, char *argv[])
   if (rc < 0)
     goto done;
 
-  tmp.data = read_binary_file (argv[2], &s);
+  tmp.data = (void*)read_binary_file (argv[2], &s);
   if (tmp.data == NULL)
     {
       printf ("cannot read OCSP response\n");

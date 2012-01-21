@@ -40,7 +40,7 @@ main (int argc, char *argv[])
   if (rc < 0)
     goto done;
 
-  certdata.data = read_binary_file (argv[1], &s);
+  certdata.data = (void*)read_binary_file (argv[1], &s);
   if (certdata.data == NULL)
     {
       printf ("cannot read certificate\n");
@@ -113,7 +113,7 @@ main (int argc, char *argv[])
   if (rc < 0)
     goto done;
 
-  issuerdata.data = read_binary_file (argv[2], &s);
+  issuerdata.data = (void*)read_binary_file (argv[2], &s);
   if (issuerdata.data == NULL)
     {
       printf ("cannot read issuer\n");

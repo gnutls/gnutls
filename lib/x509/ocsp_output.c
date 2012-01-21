@@ -137,11 +137,11 @@ print_req (gnutls_buffer_st * str, gnutls_ocsp_req_t req)
 		critical ? "critical" : "not critical");
 
 	  addf (str, _("\t\t\tASCII: "));
-	  _gnutls_buffer_asciiprint (str, data.data, data.size);
+	  _gnutls_buffer_asciiprint (str, (char*)data.data, data.size);
 	  addf (str, "\n");
 
 	  addf (str, _("\t\t\tHexdump: "));
-	  _gnutls_buffer_hexprint (str, data.data, data.size);
+	  _gnutls_buffer_hexprint (str, (char*)data.data, data.size);
 	  adds (str, "\n");
 	}
 
@@ -484,11 +484,11 @@ print_resp (gnutls_buffer_st * str, gnutls_ocsp_resp_t resp)
 		critical ? "critical" : "not critical");
 
 	  addf (str, _("\t\t\tASCII: "));
-	  _gnutls_buffer_asciiprint (str, data.data, data.size);
+	  _gnutls_buffer_asciiprint (str, (char*)data.data, data.size);
 	  addf (str, "\n");
 
 	  addf (str, _("\t\t\tHexdump: "));
-	  _gnutls_buffer_hexprint (str, data.data, data.size);
+	  _gnutls_buffer_hexprint (str, (char*)data.data, data.size);
 	  adds (str, "\n");
 	}
 

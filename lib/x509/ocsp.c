@@ -410,7 +410,7 @@ gnutls_ocsp_resp_export (gnutls_ocsp_resp_t resp, gnutls_datum_t * data)
 int
 gnutls_ocsp_req_get_version (gnutls_ocsp_req_t req)
 {
-  opaque version[8];
+  uint8_t version[8];
   int len, ret;
 
   if (req == NULL)
@@ -491,7 +491,7 @@ gnutls_ocsp_req_get_cert_id (gnutls_ocsp_req_t req,
       return ret;
     }
 
-  ret = _gnutls_x509_oid2digest_algorithm (sa.data);
+  ret = _gnutls_x509_oid2digest_algorithm ((char*)sa.data);
   _gnutls_free_datum (&sa);
   if (ret < 0)
     {
@@ -688,8 +688,8 @@ gnutls_ocsp_req_add_cert (gnutls_ocsp_req_t req,
 {
   int ret;
   gnutls_datum_t sn, tmp, inh, ikh;
-  char inh_buf[MAX_HASH_SIZE];
-  char ikh_buf[MAX_HASH_SIZE];
+  uint8_t inh_buf[MAX_HASH_SIZE];
+  uint8_t ikh_buf[MAX_HASH_SIZE];
   size_t inhlen = MAX_HASH_SIZE;
   size_t ikhlen = MAX_HASH_SIZE;
 
@@ -1013,7 +1013,7 @@ int
 gnutls_ocsp_req_randomize_nonce (gnutls_ocsp_req_t req)
 {
   int ret;
-  char rndbuf[23];
+  uint8_t rndbuf[23];
   gnutls_datum_t nonce = { rndbuf, sizeof (rndbuf) };
 
   if (req == NULL)
@@ -1052,7 +1052,7 @@ gnutls_ocsp_req_randomize_nonce (gnutls_ocsp_req_t req)
 int
 gnutls_ocsp_resp_get_status (gnutls_ocsp_resp_t resp)
 {
-  opaque str[1];
+  uint8_t str[1];
   int len, ret;
 
   if (resp == NULL)
@@ -1156,7 +1156,7 @@ gnutls_ocsp_resp_get_response (gnutls_ocsp_resp_t resp,
 int
 gnutls_ocsp_resp_get_version (gnutls_ocsp_resp_t resp)
 {
-  opaque version[8];
+  uint8_t version[8];
   int len, ret;
 
   if (resp == NULL)
@@ -1225,7 +1225,7 @@ gnutls_ocsp_resp_get_responder (gnutls_ocsp_resp_t resp,
 
   ret =  _gnutls_x509_parse_dn
     (resp->basicresp, "tbsResponseData.responderID.byName",
-     dn->data, &l);
+     (char*)dn->data, &l);
   if (ret != GNUTLS_E_SUCCESS)
     {
       gnutls_assert ();
@@ -1353,7 +1353,7 @@ gnutls_ocsp_resp_get_single (gnutls_ocsp_resp_t resp,
       return ret;
     }
 
-  ret = _gnutls_x509_oid2digest_algorithm (sa.data);
+  ret = _gnutls_x509_oid2digest_algorithm ((char*)sa.data);
   _gnutls_free_datum (&sa);
   if (ret < 0)
     {
@@ -1682,7 +1682,7 @@ gnutls_ocsp_resp_get_signature_algorithm (gnutls_ocsp_resp_t resp)
       return ret;
     }
 
-  ret = _gnutls_x509_oid2sign_algorithm (sa.data);
+  ret = _gnutls_x509_oid2sign_algorithm ((char*)sa.data);
 
   _gnutls_free_datum (&sa);
 
