@@ -218,8 +218,7 @@ typedef enum
   GNUTLS_CRD_CERTIFICATE = 1,
   GNUTLS_CRD_ANON,
   GNUTLS_CRD_SRP,
-  GNUTLS_CRD_PSK,
-  GNUTLS_CRD_IA
+  GNUTLS_CRD_PSK
 @} gnutls_credentials_type_t;
 @end example
 
@@ -231,7 +230,6 @@ credentials/certificate
 credentials/anonymous
 credentials/srp
 credentials/psk
-credentials/ia
 @end example
 
 Hopefully, most variable names can be deduced from this convention.
