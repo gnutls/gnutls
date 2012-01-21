@@ -355,7 +355,7 @@ print_aki (gnutls_buffer_st * str, int type, cert_type_t cert)
       return;
     }
   
-  if (err == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+  if (err == GNUTLS_E_X509_UNSUPPORTED_EXTENSION)
     {
       /* Check if an alternative name is there */
       print_aki_gn_serial(str, type, cert);
