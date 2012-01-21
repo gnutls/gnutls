@@ -421,12 +421,8 @@ po/quot.sed
 po/remove-potcdate.sed
 po/remove-potcdate.sin
 po/stamp-po
-src/cli-debug-args.c
 src/cli-debug-args.def
-src/cli-debug-args.h
-src/psk-args.c
 src/psk-args.def
-src/psk-args.h
 src/cli-args.def
 src/srptool-args.def
 src/Makefile
