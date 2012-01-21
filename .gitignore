@@ -565,3 +565,13 @@ doc/examples/ex-serv-x509
 tests/slow/cipher-test
 libopts/libopts.la
 src/serv-args.def
+src/cli-args.c
+src/cli-args.h
+src/cli-debug-args.c
+src/cli-debug-args.h
+src/psk-args.c
+src/psk-args.h
+src/serv-args.c
+src/serv-args.h
+src/srptool-args.c
+src/srptool-args.h
