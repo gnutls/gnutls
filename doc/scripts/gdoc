@@ -912,7 +912,7 @@ $doc_start = "^/\\*\\*\$";
 $doc_end = "\\*/";
 $doc_com = "\\s*\\*\\s*";
 $doc_func = $doc_com."(\\w+):?";
-$doc_sect = $doc_com."([".$doc_special."[:upper:]][\\w ]+):\\s*(.*)";
+$doc_sect = $doc_com."([".$doc_special."[:upper:]][\\w]+):\\s*(.*)";
 $doc_content = $doc_com."(.*)";
 
 %constants = ();
