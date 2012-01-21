@@ -575,3 +575,7 @@ src/serv-args.c
 src/serv-args.h
 src/srptool-args.c
 src/srptool-args.h
+doc/manpages/p11tool.1
+src/p11tool-args.h
+src/p11tool-args.c
+src/p11tool-args.def

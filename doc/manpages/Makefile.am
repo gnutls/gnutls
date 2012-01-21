@@ -38,6 +38,9 @@ gnutls-cli-debug.1: ../../src/cli-debug-args.def
 srptool.1: ../../src/srptool-args.def
 	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
 
+p11tool.1: ../../src/p11tool-args.def
+	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+
 psktool.1: ../../src/psk-args.def
 	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
 

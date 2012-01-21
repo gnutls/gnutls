@@ -14,9 +14,7 @@ short-usage   = "srptool [options]\nsrptool --help for usage instructions.\n";
 prog-group    = "GnuTLS";
 gnu-usage;
 no-misuse-usage;
-reorder-args;
 disable-save;
-argument;
 long-opts;
 config-header = 'config.h';
 export = '#include <gettext.h>';
@@ -24,7 +22,7 @@ export = '#include <gettext.h>';
 copyright = {
     date  = "2000-2012";
     owner = "Free Software Foundation";
-    author = "Nikos Mavrogiannopoulos and Simon Josefsson";
+    author = "Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.";
     eaddr  = "bug-gnutls@gnu.org";
     type  = gpl;
 };
@@ -114,7 +112,7 @@ This command will create @file{/etc/tpasswd} and will add user 'test' (you
 will also be prompted for a password). Verifiers are stored by default
 in the way libsrp expects.
 @example
-srptool --passwd /etc/tpasswd --passwd-conf /etc/tpasswd.conf -u test
+$ srptool --passwd /etc/tpasswd --passwd-conf /etc/tpasswd.conf -u test
 @end example
 
 

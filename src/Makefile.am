@@ -61,7 +61,7 @@ gnutls_serv_SOURCES =				\
   $(PKCS11_SRCS)
 gnutls_serv_LDADD = ../lib/libgnutls.la
 gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la $(LIBOPTS_LDADD)
-gnutls_serv_LDADD += $(LTLIBGCRYPT) $(LIBSOCKET) $(GETADDRINFO_LIB)
+gnutls_serv_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-serv.la
 libcmd_serv_la_CFLAGS =
 libcmd_serv_la_SOURCES = serv-args.def serv-args.c serv-args.h
@@ -93,7 +93,7 @@ BENCHMARK_SRCS = benchmark-cipher.c benchmark.c benchmark.h benchmark-tls.c
 gnutls_cli_SOURCES = cli.c common.h common.c $(PKCS11_SRCS) $(BENCHMARK_SRCS)
 gnutls_cli_LDADD = ../lib/libgnutls.la
 gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la $(LIBOPTS_LDADD)
-gnutls_cli_LDADD += $(LTLIBGCRYPT) $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIB_CLOCK_GETTIME)
+gnutls_cli_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIB_CLOCK_GETTIME)
 noinst_LTLIBRARIES += libcmd-cli.la
 libcmd_cli_la_CFLAGS = 
 libcmd_cli_la_SOURCES = cli-args.def cli-args.c cli-args.h
@@ -110,7 +110,6 @@ libcmd_cli_debug_la_SOURCES = cli-debug-args.def cli-debug-args.c cli-debug-args
 certtool_SOURCES = certtool.c dh.c certtool-common.c $(PKCS11_SRCS)
 certtool_LDADD = ../lib/libgnutls.la 
 certtool_LDADD += libcmd-certtool.la ../gl/libgnu.la
-certtool_LDADD += $(LTLIBGCRYPT)
 if HAVE_LIBCFG
 certtool_LDADD += -lcfg+
 else
@@ -134,10 +133,9 @@ libcmd_certtool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
 if ENABLE_PKCS11
 
 p11tool_gaa_CFLAGS =
-p11tool_SOURCES = p11tool.gaa p11tool.c pkcs11.c certtool-common.c p11tool.h $(PKCS11_SRCS)
-p11tool_LDADD = ../lib/libgnutls.la 
+p11tool_SOURCES = p11tool-args.def p11tool.c pkcs11.c certtool-common.c p11tool.h $(PKCS11_SRCS)
+p11tool_LDADD = ../lib/libgnutls.la $(LIBOPTS_LDADD)
 p11tool_LDADD += libcmd-p11tool.la ../gl/libgnu.la
-p11tool_LDADD += $(LTLIBGCRYPT)
 
 if HAVE_LIBCFG
 p11tool_LDADD += -lcfg+
@@ -147,7 +145,7 @@ endif
 
 noinst_LTLIBRARIES += libcmd-p11tool.la
 libcmd_p11tool_la_CFLAGS =
-libcmd_p11tool_la_SOURCES = p11tool-gaa.c p11tool.gaa p11tool-gaa.h	\
+libcmd_p11tool_la_SOURCES = p11tool-args.def p11tool-args.c p11tool-args.h \
 	certtool-cfg.h certtool-cfg.c
 libcmd_p11tool_la_LIBADD = ../gl/libgnu.la $(LTLIBREADLINE)
 libcmd_p11tool_la_LIBADD += ../lib/libgnutls.la
@@ -174,4 +172,6 @@ cli-args.c: $(srcdir)/cli-args.def
 serv-args.c: $(srcdir)/serv-args.def
 	-autogen $<
 srptool-args.c: $(srcdir)/srptool-args.def
+	-autogen $<
+p11tool-args.c: $(srcdir)/p11tool-args.def
 	-autogen $<

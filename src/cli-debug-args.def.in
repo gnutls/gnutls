@@ -19,7 +19,7 @@ export = '#include <gettext.h>';
 copyright = {
     date  = "2000-2012";
     owner = "Free Software Foundation";
-    author = "Nikos Mavrogiannopoulos and Simon Josefsson";
+    author = "Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.";
     eaddr  = "bug-gnutls@gnu.org";
     type  = gpl;
 };
