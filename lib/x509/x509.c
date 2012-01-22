@@ -816,6 +816,8 @@ _get_authority_key_id (gnutls_x509_crt_t cert, ASN1_TYPE *c2,
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
  *
  * Returns: Returns 0 on success, or an error code.
+ *
+ * Since: 3.0.0
  **/
 int
 gnutls_x509_crt_get_authority_key_gn_serial (gnutls_x509_crt_t cert, unsigned int seq, void *alt,
