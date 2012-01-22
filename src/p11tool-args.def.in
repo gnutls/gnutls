@@ -11,6 +11,7 @@ To use PKCS #11 tokens with gnutls the configuration file
 
 short-usage   = "p11tool [options] [url]\np11tool --help for usage instructions.\n";
 prog-group    = "GnuTLS";
+explain       = "";
 gnu-usage;
 reorder-args;
 no-xlate = opt;

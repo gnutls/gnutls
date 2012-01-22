@@ -6,6 +6,7 @@ detail    = "Program  that generates random keys for use with TLS-PSK. The
 keys are stored in hexadecimal format in a key file.";
 short-usage   = "psktool [options]\npsktool --help for usage instructions.\n";
 prog-group    = "GnuTLS";
+explain       = "";
 gnu-usage;
 no-xlate = opt;
 no-misuse-usage;

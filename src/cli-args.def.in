@@ -4,6 +4,7 @@ prog-title    = "GnuTLS client";
 prog-desc     = "Simple client program to set up a TLS connection.";
 short-usage   = "Usage: gnutls-cli [options] hostname\ngnutls-cli --help for usage instructions.\n";
 prog-group    = "GnuTLS";
+explain       = "";
 detail        = "Simple client program to set up a TLS connection to some other computer. 
 It sets up a TLS connection and forwards data from the standard input to the secured socket and vice versa.";
 gnu-usage;
@@ -266,8 +267,46 @@ flag = {
 
 doc-section = {
   ds-type   = 'SEE ALSO'; // or anything else
-  ds-format = 'man';      // or texi or mdoc format
-  ds-text   = <<-_EOText_
+  ds-format = 'texi';      // or texi or mdoc format
+  ds-text   = <<-_EOF_
 gnutls-cli-debug(1), gnutls-serv(1)
-_EOText_;
+_EOF_;
 };
+
+doc-section = {
+  ds-type = 'EXAMPLES';
+  ds-format = 'texi';
+  ds-text   = <<-_EOF_
+To connect to a server using PSK authentication, you need to enable the choice of PSK by using a cipher priority parameter such as in the example below. 
+@example
+$ ./gnutls-cli -p 5556 localhost --pskusername psk_identity \
+    --pskkey 88f3824b3e5659f52d00e959bacab954b6540344 \
+    --priority NORMAL:-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK
+Resolving 'localhost'...
+Connecting to '127.0.0.1:5556'...
+- PSK authentication.
+- Version: TLS1.1
+- Key Exchange: PSK
+- Cipher: AES-128-CBC
+- MAC: SHA1
+- Compression: NULL
+- Handshake was completed
+    
+- Simple Client Mode:
+@end example
+By keeping the --pskusername parameter and removing the --pskkey parameter, it will query only for the password during the handshake. 
+
+To list the ciphersuites in a priority string:
+@example
+$ ./gnutls-cli --priority SECURE192 -l
+Cipher suites for SECURE192
+TLS_ECDHE_ECDSA_AES_256_CBC_SHA384                0xc0, 0x24	TLS1.2
+TLS_ECDHE_ECDSA_AES_256_GCM_SHA384                0xc0, 0x2e	TLS1.2
+TLS_ECDHE_RSA_AES_256_GCM_SHA384                  0xc0, 0x30	TLS1.2
+TLS_DHE_RSA_AES_256_CBC_SHA256                    0x00, 0x6b	TLS1.2
+TLS_DHE_DSS_AES_256_CBC_SHA256                    0x00, 0x6a	TLS1.2
+TLS_RSA_AES_256_CBC_SHA256                        0x00, 0x3d	TLS1.2
+@end example
+_EOF_;
+};
+

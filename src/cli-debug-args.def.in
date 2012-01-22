@@ -4,6 +4,7 @@ prog-title    = "GnuTLS debug client";
 prog-desc     = "Simple client program to check TLS server capabilities.";
 short-usage   = "Usage: gnutls-cli-debug [options] hostname\ngnutls-cli --help for usage instructions.\n";
 prog-group    = "GnuTLS";
+explain       = "";
 detail        = "TLS debug client. It sets up multiple TLS connections to 
 a server and queries its capabilities. Can be used to check for servers with
 special needs or bugs.";
@@ -54,8 +55,9 @@ flag = {
 
 doc-section = {
   ds-type   = 'SEE ALSO'; // or anything else
-  ds-format = 'man';      // or texi or mdoc format
+  ds-format = 'texi';      // or texi or mdoc format
   ds-text   = <<-_EOText_
 gnutls-cli(1), gnutls-serv(1)
 _EOText_;
 };
+
