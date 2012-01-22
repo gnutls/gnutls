@@ -9,10 +9,12 @@ To use PKCS #11 tokens with gnutls the configuration file
 /etc/gnutls/pkcs11.conf has to exist and contain a number of lines of the form 'load=/usr/lib/opensc-pkcs11.so'.
 ";
 
-short-usage   = "p11tool [options]\np11tool --help for usage instructions.\n";
+short-usage   = "p11tool [options] [url]\np11tool --help for usage instructions.\n";
 prog-group    = "GnuTLS";
 gnu-usage;
+reorder-args;
 no-xlate = opt;
+argument = "[url]";
 no-misuse-usage;
 disable-save;
 long-opts;
@@ -45,98 +47,77 @@ flag = {
 
 flag = {
     name      = export;
-    flags-must= url;
     descrip   = "Export the object specified by the URL";
     doc = "";
 };
 
 flag = {
-    name      = url;
-    arg-type  = string;
-    arg-name  = "PKCS #11 URL";
-    descrip   = "Specify the PKCS #11 URL for the operation";
-    doc = "";
-};
-
-flag = {
     name      = list-mechanisms;
-    flags-must= url;
     descrip   = "List all available mechanisms in a token";
     doc = "";
 };
 
 flag = {
     name      = list-all;
-    flags-must= url;
     descrip   = "List all available objects in a token";
     doc = "";
 };
 
 flag = {
     name      = list-all-certs;
-    flags-must= url;
     descrip   = "List all available certificates in a token";
     doc = "";
 };
 
 flag = {
     name      = list-certs;
-    flags-must= url;
     descrip   = "List all certificates that are associated with a private key present in the token";
     doc = "";
 };
 
 flag = {
     name      = list-all-privkeys;
-    flags-must= url;
     descrip   = "List all available private keys in a token";
     doc = "";
 };
 
 flag = {
     name      = list-all-trusted;
-    flags-must= url;
     descrip   = "List all available certificates marked as trusted";
     doc = "";
 };
 
 flag = {
     name      = initialize;
-    flags-must= url;
     descrip   = "Initializes a PKCS #11 token";
     doc = "";
 };
 
 flag = {
     name      = write;
-    flags-must= url;
     descrip   = "Writes the loaded objects to a PKCS #11 token";
     doc = "It can be used to write private keys, certificates or secret keys to a token.";
 };
 
 flag = {
     name      = delete;
-    flags-must= url;
     descrip   = "Deletes the objects matching the PKCS #11 URL";
     doc = "";
 };
 
 flag = {
     name      = generate-rsa;
-    flags-must= url;
     descrip   = "Generates an RSA private-public key pair on the specified token";
     doc = "";
 };
 
 flag = {
     name      = generate-dsa;
-    flags-must= url;
     descrip   = "Generates an RSA private-public key pair on the specified token";
     doc = "";
 };
 flag = {
     name      = generate-ecc;
-    flags-must= url;
     descrip   = "Generates an RSA private-public key pair on the specified token";
     doc = "";
 };
@@ -280,13 +261,13 @@ $ p11tool --list-tokens
 
 To view all objects in a token use:
 @example
-$ p11tool --login --list-all --url "pkcs11:TOKEN-URL"
+$ p11tool --login --list-all "pkcs11:TOKEN-URL"
 @end example
 
 To store a private key and a certificate in a token run:
 @example
-$ p11tool --login --write --url "pkcs11:URL" --load-privkey key.pem --label "Mykey"
-$ p11tool --login --write --url "pkcs11:URL" --load-certificate cert.pem --label "MyCert"
+$ p11tool --login --write "pkcs11:URL" --load-privkey key.pem --label "Mykey"
+$ p11tool --login --write "pkcs11:URL" --load-certificate cert.pem --label "MyCert"
 @end example
 _EOT_;
 };

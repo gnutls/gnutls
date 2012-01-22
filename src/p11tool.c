@@ -78,12 +78,19 @@ cmd_parser (int argc, char **argv)
   common_info_st cinfo;
   unsigned int action = 1, pkcs11_type = -1, key_type = GNUTLS_PK_UNKNOWN;
   const char* url = NULL;
-  unsigned int detailed_url = 0;
+  unsigned int detailed_url = 0, optct;
   unsigned int login = 0, bits = 0;
   const char* label = NULL, *sec_param = NULL;
   
-  optionProcess( &p11toolOptions, argc, argv);
-  
+  optct = optionProcess( &p11toolOptions, argc, argv);
+  argc += optct;
+  argv += optct;
+ 
+  if (url == NULL && argc > 0)
+    url = argv[0];
+  else
+    url = "pkcs11:";
+ 
   if (HAVE_OPT(DEBUG))
     debug = OPT_VALUE_DEBUG;
 
@@ -208,11 +215,6 @@ cmd_parser (int argc, char **argv)
 
   if (ENABLED_OPT(LOGIN))
     login = 1;
-
-  if (HAVE_OPT(URL))
-    {
-      url = OPT_ARG(URL);
-    }
 
   if (HAVE_OPT(LABEL))
     {
