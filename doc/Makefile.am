@@ -297,12 +297,13 @@ ENUMS += enums/gnutls_x509_subject_alt_name_t
 gnutls_TEXINFOS += $(ENUMS)
 DISTCLEANFILES += $(ENUMS)
 
-.NOTPARALLEL: $(ENUMS) enums.texi
-
-$(ENUMS): enums.texi
+stamp_enums: enums.texi
 	$(MAKE) compare-makefile
 	-mkdir enums
 	$(srcdir)/scripts/split-texi.pl enums enum < enums.texi
+	echo $@ > $@
+
+$(ENUMS): stamp_enums
 
 compare-makefile:
 	ENUMS=`grep '^@c ' enums.texi | sed 's/@c //g' | sort`; \
