@@ -976,12 +976,12 @@ cmd_parser (int argc, char **argv)
   else
     infile = stdin;
 
-  if (HAVE_OPT(INDER))
+  if (HAVE_OPT(INDER) || HAVE_OPT(INRAW))
     incert_format = GNUTLS_X509_FMT_DER;
   else
     incert_format = GNUTLS_X509_FMT_PEM;
 
-  if (HAVE_OPT(OUTDER))
+  if (HAVE_OPT(OUTDER) || HAVE_OPT(OUTRAW))
     outcert_format = GNUTLS_X509_FMT_DER;
   else
     outcert_format = GNUTLS_X509_FMT_PEM;
