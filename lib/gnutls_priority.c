@@ -230,6 +230,7 @@ static const int supported_ecc_secure128[] = {
 
 static const int supported_ecc_suiteb128[] = {
   GNUTLS_ECC_CURVE_SECP256R1,
+  GNUTLS_ECC_CURVE_SECP384R1,
   0
 };
 
@@ -354,13 +355,12 @@ static const int *cipher_priority_normal = cipher_priority_normal_sw;
 
 static const int cipher_priority_suiteb128[] = {
   GNUTLS_CIPHER_AES_128_GCM,
-  GNUTLS_CIPHER_AES_128_CBC,
+  GNUTLS_CIPHER_AES_256_GCM,
   0
 };
 
 static const int cipher_priority_suiteb192[] = {
   GNUTLS_CIPHER_AES_256_GCM,
-  GNUTLS_CIPHER_AES_256_CBC,
   0
 };
 
@@ -425,6 +425,7 @@ static const int sign_priority_default[] = {
 
 static const int sign_priority_suiteb128[] = {
   GNUTLS_SIGN_ECDSA_SHA256,
+  GNUTLS_SIGN_ECDSA_SHA384,
   0
 };
 
@@ -462,14 +463,11 @@ static const int mac_priority_normal[] = {
 };
 
 static const int mac_priority_suiteb128[] = {
-  GNUTLS_MAC_SHA256,
-  GNUTLS_MAC_SHA384,
   GNUTLS_MAC_AEAD,
   0
 };
 
 static const int mac_priority_suiteb192[] = {
-  GNUTLS_MAC_SHA384,
   GNUTLS_MAC_AEAD,
   0
 };

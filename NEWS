@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.0.13 (unreleased)
 
+** libgnutls: SUITEB128 and SUITEB192 priority strings account
+for the RFC6460 requirements.
+
 ** libgnutls: Added new security parameter GNUTLS_SEC_PARAM_LEGACY
 to account for security level of 96-bits.
 
