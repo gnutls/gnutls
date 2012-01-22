@@ -79,6 +79,7 @@ const char *x509_cafile = NULL;
 const char *x509_crlfile = NULL;
 static int x509ctype;
 static int disable_extensions;
+static const char * priorities = NULL;
 
 const char *psk_username = NULL;
 gnutls_datum_t psk_key = { NULL, 0 };
@@ -547,15 +548,11 @@ init_tls_session (const char *hostname)
 {
   const char *err;
   int ret;
-  const char * priorities;
   gnutls_session_t session;
-  
-  if (HAVE_OPT(PRIORITY)) {
-    priorities = OPT_ARG(PRIORITY);
-  } else {
-    priorities = "NORMAL";
-  }
 
+  if (priorities == NULL)
+    priorities = "NORMAL";
+  
   if (udp)
     {
       gnutls_init (&session, GNUTLS_CLIENT|GNUTLS_DATAGRAM);
@@ -615,7 +612,7 @@ init_tls_session (const char *hostname)
     }
 
 #ifdef ENABLE_SESSION_TICKET
-  if (disable_extensions == 0 && !ENABLED_OPT(NOTICKET)t)
+  if (disable_extensions == 0 && !HAVE_OPT(NOTICKET)t)
     gnutls_session_ticket_enable_client (session);
 #endif
 
@@ -832,7 +829,7 @@ main (int argc, char **argv)
           gnutls_session_get_id (hd.session, session_id, &session_id_size);
 
           /* print some information */
-          print_info (hd.session, hostname, ENABLED_OPT(INSECURE));
+          print_info (hd.session, hostname, HAVE_OPT(INSECURE));
 
           printf ("- Disconnecting\n");
           socket_bye (&hd);
@@ -1025,15 +1022,26 @@ const char* rest = NULL;
   
   if (rest == NULL && argc > 0)
     rest = argv[0];
+
+  if (HAVE_OPT(PRIORITY)) 
+    {
+      priorities = OPT_ARG(PRIORITY);
+    } 
+  verbose = HAVE_OPT( VERBOSE);
   
-  verbose = ENABLED_OPT( VERBOSE);
-  disable_extensions = ENABLED_OPT( DISABLE_EXTENSIONS);
-  print_cert = ENABLED_OPT( PRINT_CERT);
-  starttls = ENABLED_OPT(STARTTLS);
-  resume = ENABLED_OPT(RESUME);
-  rehandshake = ENABLED_OPT(REHANDSHAKE);
-  insecure = ENABLED_OPT(INSECURE);
-  udp = ENABLED_OPT(UDP);
+  if (HAVE_OPT(LIST))
+    {
+      print_list(priorities, verbose);
+      exit(0);
+    }
+
+  disable_extensions = HAVE_OPT( DISABLE_EXTENSIONS);
+  print_cert = HAVE_OPT( PRINT_CERT);
+  starttls = HAVE_OPT(STARTTLS);
+  resume = HAVE_OPT(RESUME);
+  rehandshake = HAVE_OPT(REHANDSHAKE);
+  insecure = HAVE_OPT(INSECURE);
+  udp = HAVE_OPT(UDP);
   mtu = OPT_VALUE_MTU;
   
   if (HAVE_OPT(PORT)) 
@@ -1046,9 +1054,9 @@ const char* rest = NULL;
     }
 
   record_max_size = OPT_VALUE_RECORDSIZE;
-  fingerprint = ENABLED_OPT(FINGERPRINT);
+  fingerprint = HAVE_OPT(FINGERPRINT);
 
-  if (ENABLED_OPT(X509FMTDER))
+  if (HAVE_OPT(X509FMTDER))
     x509ctype = GNUTLS_X509_FMT_DER;
   else
     x509ctype = GNUTLS_X509_FMT_PEM;
@@ -1091,12 +1099,16 @@ const char* rest = NULL;
   if (HAVE_OPT(PGPKEYRING))
     pgp_keyring = OPT_ARG(PGPKEYRING);
 
-  crlf = ENABLED_OPT(CRLF);
+  crlf = HAVE_OPT(CRLF);
 
-  if (rest == NULL)
-    hostname = "localhost";
-  else
+  if (rest != NULL)
     hostname = rest;
+    
+  if (hostname == NULL)
+    {
+      fprintf(stderr, "No hostname specified\n");
+      exit(1);
+    }
 }
 
 void cli_version (void);
@@ -1161,7 +1173,7 @@ do_handshake (socket_st * socket)
   if (ret == 0)
     {
       /* print some information */
-      print_info (socket->session, socket->hostname, ENABLED_OPT(INSECURE));
+      print_info (socket->session, socket->hostname, HAVE_OPT(INSECURE));
 
 
       socket->secure = 1;

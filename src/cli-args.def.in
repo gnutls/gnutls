@@ -10,7 +10,8 @@ gnu-usage;
 no-misuse-usage;
 disable-save;
 reorder-args;
-argument;
+no-xlate = opt;
+argument = "[hostname]";
 long-opts;
 config-header = 'config.h';
 export = '#include <gettext.h>';
@@ -257,7 +258,6 @@ flag = {
 flag = {
     name      = list;
     value     = l;
-    arg-type  = string;
     descrip   = "Print a list of the supported algorithms and modes";
     doc      = "Print a list of the supported algorithms and modes. If a priority string is given then only the enabled ciphersuites are shown.";
 };

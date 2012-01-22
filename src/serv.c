@@ -79,6 +79,7 @@ const char *x509_ecccertfile = NULL;
 const char *x509_cafile = NULL;
 const char *dh_params_file = NULL;
 const char *x509_crlfile = NULL;
+const char * priorities = NULL;
 
 gnutls_datum_t session_ticket_key;
 static void tcp_server(const char* name, int port);
@@ -331,13 +332,9 @@ gnutls_session_t initialize_session (int dtls)
 {
   gnutls_session_t session;
   const char *err;
-  const char * priorities;
 
-  if (HAVE_OPT(PRIORITY)) {
-    priorities = OPT_ARG(PRIORITY);
-  } else {
+  if (priorities == NULL)
     priorities = "NORMAL";
-  }
 
   if (dtls)
     gnutls_init (&session, GNUTLS_SERVER|GNUTLS_DATAGRAM);
@@ -926,7 +923,7 @@ main (int argc, char **argv)
   if (nodb == 0)
     wrap_db_init ();
 
-  if (ENABLED_OPT(UDP))
+  if (HAVE_OPT(UDP))
     strcpy(name, "UDP ");
   else name[0] = 0;
 
@@ -1021,9 +1018,9 @@ main (int argc, char **argv)
         }
     }
 
-  if (ENABLED_OPT(PGPCERTFILE))
+  if (HAVE_OPT(PGPCERTFILE))
     {
-      if (ENABLED_OPT(PGPSUBKEY))
+      if (HAVE_OPT(PGPSUBKEY))
         ret = gnutls_certificate_set_openpgp_key_file2
           (cert_cred, pgp_certfile, pgp_keyfile, OPT_ARG(PGPSUBKEY),
            GNUTLS_OPENPGP_FMT_BASE64);
@@ -1112,7 +1109,7 @@ main (int argc, char **argv)
           GERR (ret);
         }
 
-      if (ENABLED_OPT(PSKHINT))
+      if (HAVE_OPT(PSKHINT))
         {
           ret = gnutls_psk_set_server_credentials_hint (psk_cred,
                                                         OPT_ARG(PSKHINT));
@@ -1139,16 +1136,16 @@ main (int argc, char **argv)
     gnutls_session_ticket_key_generate (&session_ticket_key);
 #endif
 
-  if (ENABLED_OPT(MTU))
+  if (HAVE_OPT(MTU))
     mtu = OPT_VALUE_MTU;
   else mtu = 1300;
 
-  if (ENABLED_OPT(PORT))
+  if (HAVE_OPT(PORT))
     port = OPT_VALUE_PORT;
   else
     port = 5556;
 
-  if (ENABLED_OPT(UDP))
+  if (HAVE_OPT(UDP))
     udp_server(name, port, mtu);
   else
     tcp_server(name, port);
@@ -1546,66 +1543,75 @@ static void cmd_parser (int argc, char **argv)
 {
   optionProcess( &gnutls_servOptions, argc, argv);
 
-  disable_client_cert = ENABLED_OPT(DISABLE_CLIENT_CERT);
-  require_cert = ENABLED_OPT(REQUIRE_CLIENT_CERT);
-  if (ENABLED_OPT(DEBUG))
+  disable_client_cert = HAVE_OPT(DISABLE_CLIENT_CERT);
+  require_cert = HAVE_OPT(REQUIRE_CLIENT_CERT);
+  if (HAVE_OPT(DEBUG))
     debug = OPT_VALUE_DEBUG;
 
-  if (ENABLED_OPT(QUIET))
+  if (HAVE_OPT(QUIET))
     verbose = 0;
 
-  nodb = ENABLED_OPT(NODB);
-  noticket = ENABLED_OPT(NOTICKET);
+  if (HAVE_OPT(PRIORITY)) 
+    priorities = OPT_ARG(PRIORITY);
+  
+  if (HAVE_OPT(LIST))
+    {
+      print_list(priorities, verbose);
+      exit(0);
+    }
 
-  if (ENABLED_OPT(ECHO))
+  nodb = HAVE_OPT(NODB);
+  noticket = HAVE_OPT(NOTICKET);
+
+  if (HAVE_OPT(ECHO))
     http = 0;
   else http = 1;
 
-  if (ENABLED_OPT(X509FMTDER))
+  if (HAVE_OPT(X509FMTDER))
     x509ctype = GNUTLS_X509_FMT_DER;
   else
     x509ctype = GNUTLS_X509_FMT_PEM;
 
-  generate = ENABLED_OPT(GENERATE);
+  generate = HAVE_OPT(GENERATE);
 
-  if (ENABLED_OPT(DHPARAMS))
+  if (HAVE_OPT(DHPARAMS))
     dh_params_file = OPT_ARG(DHPARAMS);
 
-  if (ENABLED_OPT(X509KEYFILE))
+  if (HAVE_OPT(X509KEYFILE))
     x509_keyfile = OPT_ARG(X509KEYFILE);
-  if (ENABLED_OPT(X509CERTFILE))
+  if (HAVE_OPT(X509CERTFILE))
     x509_certfile = OPT_ARG(X509CERTFILE);
 
-  if (ENABLED_OPT(X509DSAKEYFILE))
+  if (HAVE_OPT(X509DSAKEYFILE))
     x509_dsakeyfile = OPT_ARG(X509DSAKEYFILE);
-  if (ENABLED_OPT(X509DSACERTFILE))
+  if (HAVE_OPT(X509DSACERTFILE))
     x509_dsacertfile = OPT_ARG(X509DSACERTFILE);
 
 
-  if (ENABLED_OPT(X509ECCKEYFILE))
+  if (HAVE_OPT(X509ECCKEYFILE))
     x509_ecckeyfile = OPT_ARG(X509ECCKEYFILE);
-  if (ENABLED_OPT(X509CERTFILE))
+  if (HAVE_OPT(X509CERTFILE))
     x509_ecccertfile = OPT_ARG(X509ECCCERTFILE);
   
-  if (ENABLED_OPT(X509CAFILE))
+  if (HAVE_OPT(X509CAFILE))
     x509_cafile = OPT_ARG(X509CAFILE);
-  if (ENABLED_OPT(X509CRLFILE))
+  if (HAVE_OPT(X509CRLFILE))
     x509_crlfile = OPT_ARG(X509CRLFILE);
 
-  if (ENABLED_OPT(PGPKEYFILE))
+  if (HAVE_OPT(PGPKEYFILE))
     pgp_keyfile = OPT_ARG(PGPKEYFILE);
-  if (ENABLED_OPT(PGPCERTFILE))
+  if (HAVE_OPT(PGPCERTFILE))
     pgp_certfile = OPT_ARG(PGPCERTFILE);
 
-  if (ENABLED_OPT(PGPKEYRING))
+  if (HAVE_OPT(PGPKEYRING))
     pgp_keyring = OPT_ARG(PGPKEYRING);
 
-  if (ENABLED_OPT(SRPPASSWD))
+  if (HAVE_OPT(SRPPASSWD))
     srp_passwd = OPT_ARG(SRPPASSWD);
-  if (ENABLED_OPT(SRPPASSWDCONF))
+  if (HAVE_OPT(SRPPASSWDCONF))
     srp_passwd_conf = OPT_ARG(SRPPASSWDCONF);
 
-  if (ENABLED_OPT(PSKPASSWD))
+  if (HAVE_OPT(PSKPASSWD))
     psk_passwd = OPT_ARG(PSKPASSWD);
 
 }

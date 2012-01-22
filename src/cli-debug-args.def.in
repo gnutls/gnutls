@@ -8,6 +8,7 @@ detail        = "TLS debug client. It sets up multiple TLS connections to
 a server and queries its capabilities. Can be used to check for servers with
 special needs or bugs.";
 gnu-usage;
+no-xlate = opt;
 no-misuse-usage;
 disable-save;
 reorder-args;

@@ -12,6 +12,7 @@ configuration file to hold the group parameters (called tpasswd.conf).";
 
 short-usage   = "srptool [options]\nsrptool --help for usage instructions.\n";
 prog-group    = "GnuTLS";
+no-xlate = opt;
 gnu-usage;
 no-misuse-usage;
 disable-save;

@@ -12,6 +12,7 @@ To use PKCS #11 tokens with gnutls the configuration file
 short-usage   = "p11tool [options]\np11tool --help for usage instructions.\n";
 prog-group    = "GnuTLS";
 gnu-usage;
+no-xlate = opt;
 no-misuse-usage;
 disable-save;
 long-opts;
@@ -165,6 +166,8 @@ flag = {
 flag = {
     name      = login;
     descrip   = "Force login to token";
+    disabled;
+    disable   = "no";
     doc       = "";
 };
 

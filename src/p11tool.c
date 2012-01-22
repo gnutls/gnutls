@@ -84,7 +84,7 @@ cmd_parser (int argc, char **argv)
   
   optionProcess( &p11toolOptions, argc, argv);
   
-  if (ENABLED_OPT(DEBUG))
+  if (HAVE_OPT(DEBUG))
     debug = OPT_VALUE_DEBUG;
 
   gnutls_global_set_log_function (tls_log_func);
@@ -95,7 +95,7 @@ cmd_parser (int argc, char **argv)
   if ((ret = gnutls_global_init ()) < 0)
     error (EXIT_FAILURE, 0, "global_init: %s", gnutls_strerror (ret));
 
-  if (ENABLED_OPT(PROVIDER))
+  if (HAVE_OPT(PROVIDER))
     {
       ret = gnutls_pkcs11_init (GNUTLS_PKCS11_FLAG_MANUAL, NULL);
       if (ret < 0)
@@ -115,7 +115,7 @@ cmd_parser (int argc, char **argv)
         fprintf (stderr, "pkcs11_init: %s", gnutls_strerror (ret));
     }
 
-  if (ENABLED_OPT(OUTFILE))
+  if (HAVE_OPT(OUTFILE))
     {
       outfile = safe_open_rw (OPT_ARG(OUTFILE), 0);
       if (outfile == NULL)
@@ -126,74 +126,74 @@ cmd_parser (int argc, char **argv)
 
   memset (&cinfo, 0, sizeof (cinfo));
   
-  if (ENABLED_OPT(SECRET_KEY))
+  if (HAVE_OPT(SECRET_KEY))
     cinfo.secret_key = OPT_ARG(SECRET_KEY);
 
-  if (ENABLED_OPT(LOAD_PRIVKEY))
+  if (HAVE_OPT(LOAD_PRIVKEY))
     cinfo.privkey = OPT_ARG(LOAD_PRIVKEY);
 
-  if (ENABLED_OPT(PKCS8))
+  if (HAVE_OPT(PKCS8))
     cinfo.pkcs8 = 1;
 
-  if (ENABLED_OPT(INDER) || ENABLED_OPT(INRAW))
+  if (HAVE_OPT(INDER) || HAVE_OPT(INRAW))
     cinfo.incert_format = GNUTLS_X509_FMT_DER;
 
-  if (ENABLED_OPT(LOAD_CERTIFICATE))
+  if (HAVE_OPT(LOAD_CERTIFICATE))
     cinfo.cert = OPT_ARG(LOAD_CERTIFICATE);
 
-  if (ENABLED_OPT(LOAD_PUBKEY))
+  if (HAVE_OPT(LOAD_PUBKEY))
     cinfo.pubkey = OPT_ARG(LOAD_PUBKEY);
     
-  if (ENABLED_OPT(LIST_TOKENS))
+  if (HAVE_OPT(LIST_TOKENS))
     action = ACTION_PKCS11_TOKENS;
-  else if (ENABLED_OPT(LIST_MECHANISMS))
+  else if (HAVE_OPT(LIST_MECHANISMS))
     action = ACTION_PKCS11_MECHANISMS;
-  else if (ENABLED_OPT(LIST_ALL))
+  else if (HAVE_OPT(LIST_ALL))
     {
       pkcs11_type = PKCS11_TYPE_ALL;
       action = ACTION_PKCS11_LIST;
     }
-  else if (ENABLED_OPT(LIST_ALL_CERTS))
+  else if (HAVE_OPT(LIST_ALL_CERTS))
     {
       pkcs11_type = PKCS11_TYPE_CRT_ALL;
       action = ACTION_PKCS11_LIST;
     }
-  else if (ENABLED_OPT(LIST_CERTS))
+  else if (HAVE_OPT(LIST_CERTS))
     {
       pkcs11_type = PKCS11_TYPE_PK;
       action = ACTION_PKCS11_LIST;
     }
-  else if (ENABLED_OPT(LIST_ALL_PRIVKEYS))
+  else if (HAVE_OPT(LIST_ALL_PRIVKEYS))
     {
       pkcs11_type = PKCS11_TYPE_PRIVKEY;
       action = ACTION_PKCS11_LIST;
     }
-  else if (ENABLED_OPT(LIST_ALL_TRUSTED))
+  else if (HAVE_OPT(LIST_ALL_TRUSTED))
     {
       pkcs11_type = PKCS11_TYPE_TRUSTED;
       action = ACTION_PKCS11_LIST;
     }
-  else if (ENABLED_OPT(EXPORT))
+  else if (HAVE_OPT(EXPORT))
     {
       action = ACTION_PKCS11_EXPORT_URL;
     }
-  else if (ENABLED_OPT(WRITE))
+  else if (HAVE_OPT(WRITE))
     action = ACTION_PKCS11_WRITE_URL;
-  else if (ENABLED_OPT(INITIALIZE))
+  else if (HAVE_OPT(INITIALIZE))
     action = ACTION_PKCS11_TOKEN_INIT;
-  else if (ENABLED_OPT(DELETE))
+  else if (HAVE_OPT(DELETE))
     action = ACTION_PKCS11_DELETE_URL;
-  else if (ENABLED_OPT(GENERATE_ECC))
+  else if (HAVE_OPT(GENERATE_ECC))
     {
       key_type = GNUTLS_PK_EC;
       action = ACTION_PKCS11_GENERATE;
     }
-  else if (ENABLED_OPT(GENERATE_RSA))
+  else if (HAVE_OPT(GENERATE_RSA))
     {
       key_type = GNUTLS_PK_RSA;
       action = ACTION_PKCS11_GENERATE;
     }
-  else if (ENABLED_OPT(GENERATE_DSA))
+  else if (HAVE_OPT(GENERATE_DSA))
     {
       key_type = GNUTLS_PK_DSA;
       action = ACTION_PKCS11_GENERATE;
@@ -209,22 +209,22 @@ cmd_parser (int argc, char **argv)
   if (ENABLED_OPT(LOGIN))
     login = 1;
 
-  if (ENABLED_OPT(URL))
+  if (HAVE_OPT(URL))
     {
       url = OPT_ARG(URL);
     }
 
-  if (ENABLED_OPT(LABEL))
+  if (HAVE_OPT(LABEL))
     {
       label = OPT_ARG(LABEL);
     }
 
-  if (ENABLED_OPT(BITS))
+  if (HAVE_OPT(BITS))
     {
       bits = OPT_VALUE_BITS;
     }
 
-  if (ENABLED_OPT(SEC_PARAM))
+  if (HAVE_OPT(SEC_PARAM))
     {
       sec_param = OPT_ARG(SEC_PARAM);
     }

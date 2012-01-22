@@ -163,15 +163,15 @@ p11tool-gaa.c: $(srcdir)/p11tool.gaa
 endif
 certtool-gaa.c: $(srcdir)/certtool.gaa
 	-$(GAA) $< -o certtool-gaa.c -i certtool-gaa.h
-psk-args.c: $(srcdir)/psk-args.def
+psk-args.c psk-args.h: $(srcdir)/psk-args.def
 	-autogen $<
-cli-debug-args.c: $(srcdir)/cli-debug-args.def
+cli-debug-args.c cli-debug-args.h: $(srcdir)/cli-debug-args.def
 	-autogen $<
-cli-args.c: $(srcdir)/cli-args.def
+cli-args.c cli-args.h: $(srcdir)/cli-args.def
 	-autogen $<
-serv-args.c: $(srcdir)/serv-args.def
+serv-args.c serv-args.h: $(srcdir)/serv-args.def
 	-autogen $<
-srptool-args.c: $(srcdir)/srptool-args.def
+srptool-args.c srptool-args.h: $(srcdir)/srptool-args.def
 	-autogen $<
-p11tool-args.c: $(srcdir)/p11tool-args.def
+p11tool-args.c p11tool-args.h: $(srcdir)/p11tool-args.def
 	-autogen $<

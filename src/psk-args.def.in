@@ -7,6 +7,7 @@ keys are stored in hexadecimal format in a key file.";
 short-usage   = "psktool [options]\npsktool --help for usage instructions.\n";
 prog-group    = "GnuTLS";
 gnu-usage;
+no-xlate = opt;
 no-misuse-usage;
 disable-save;
 long-opts;

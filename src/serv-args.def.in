@@ -6,6 +6,7 @@ short-usage   = "Usage: gnutls-serv [options]\ngnutls-serv --help for usage inst
 prog-group    = "GnuTLS";
 detail        = "Server program that listens to incoming TLS connections.";
 gnu-usage;
+no-xlate = opt;
 no-misuse-usage;
 disable-save;
 long-opts;
@@ -253,7 +254,6 @@ flag = {
 flag = {
     name      = list;
     value     = l;
-    arg-type  = string;
     descrip   = "Print a list of the supported algorithms and modes";
     doc      = "Print a list of the supported algorithms and modes. If a priority string is given then only the enabled ciphersuites are shown.";
 };
