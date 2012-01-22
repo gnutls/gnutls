@@ -579,3 +579,8 @@ doc/manpages/p11tool.1
 src/p11tool-args.h
 src/p11tool-args.c
 src/p11tool-args.def
+src/certtool-args.c
+src/certtool-args.def
+src/certtool-args.h
+doc/manpages/certtool.1
+doc/stamp_enums
