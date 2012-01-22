@@ -25,12 +25,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <certtool-cfg.h>
-#include <cfg+.h>
 #include <gnutls/x509.h>
 #include <string.h>
 #include <limits.h>
 #include <inttypes.h>
 #include <time.h>
+#include <autoopts/options.h>
 
 /* for inet_pton */
 #include <sys/types.h>
@@ -47,6 +47,8 @@
 #include "certtool-common.h"
 
 extern int batch;
+
+#define MAX_ENTRIES 16
 
 typedef struct _cfg_ctx
 {
@@ -97,106 +99,165 @@ cfg_init (void)
   cfg.serial = -1;
 }
 
+#define READ_MULTI_LINE(name, s_name) \
+  val = optionGetValue(pov, name); \
+  if (val != NULL && val->valType == OPARG_TYPE_STRING) \
+  { \
+    if (s_name == NULL) { \
+      i = 0; \
+      s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
+      do { \
+        if (val && !strcmp(val->pzName, name)==0) \
+          continue; \
+        s_name[i] = strdup(val->v.strVal); \
+        i++; \
+          if (i>=MAX_ENTRIES) \
+            break; \
+      } while((val = optionNextValue(pov, val)) != NULL); \
+      s_name[i] = NULL; \
+    } \
+  }
+
+#define READ_MULTI_LINE_TOKENIZED(name, s_name) \
+  val = optionGetValue(pov, name); \
+  if (val != NULL && val->valType == OPARG_TYPE_STRING) \
+  { \
+    token_list_t* res; \
+    if (s_name == NULL) { \
+      i = 0; \
+      s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
+      do { \
+        if (val && !strcmp(val->pzName, name)==0) \
+          continue; \
+        res = ao_string_tokenize( val->v.strVal); \
+        if (res != NULL && res->tkn_ct > 1) \
+          { \
+            s_name[i] = strdup(res->tkn_list[0]); \
+            s_name[i+1] = strdup(res->tkn_list[1]); \
+          } \
+        i+=2; \
+        if (i>=MAX_ENTRIES) \
+          break; \
+      } while((val = optionNextValue(pov, val)) != NULL); \
+      s_name[i] = NULL; \
+    } \
+  }
+
+#define READ_BOOLEAN(name, s_name) \
+  val = optionGetValue(pov, name); \
+  if (val != NULL) \
+    { \
+      s_name = 1; \
+    }
+
+#define READ_NUMERIC(name, s_name) \
+  val = optionGetValue(pov, name); \
+  if (val != NULL) \
+    { \
+      if (val->valType == OPARG_TYPE_NUMERIC) \
+        s_name = val->v.longVal; \
+      else if (val->valType == OPARG_TYPE_STRING) \
+        s_name = atoi(val->v.strVal); \
+    }
+
 int
 template_parse (const char *template)
 {
-  /* libcfg+ parsing context */
-  CFG_CONTEXT con;
-
   /* Parsing return code */
-  register int ret;
+  int ret;
+  unsigned int i;
+  tOptionValue const * pov;
+  const tOptionValue* val;
 
+  pov = configFileLoad(template);
+  if (pov == NULL)
+    {
+      perror("configFileLoad");
+      fprintf(stderr, "Error loading template: %s\n", template);
+      exit(1);
+    }
+  
   /* Option variables */
+  val = optionGetValue(pov, "organization");
+  if (val != NULL && val->valType == OPARG_TYPE_STRING)
+    cfg.organization = strdup(val->v.strVal);
+  
+  val = optionGetValue(pov, "unit");
+  if (val != NULL && val->valType == OPARG_TYPE_STRING)
+    cfg.unit = strdup(val->v.strVal);
 
-  /* Option set */
-  struct cfg_option options[] = {
-    {NULL, '\0', "organization", CFG_STR, (void *) &cfg.organization,
-     0},
-    {NULL, '\0', "unit", CFG_STR, (void *) &cfg.unit, 0},
-    {NULL, '\0', "locality", CFG_STR, (void *) &cfg.locality, 0},
-    {NULL, '\0', "state", CFG_STR, (void *) &cfg.state, 0},
-    {NULL, '\0', "cn", CFG_STR, (void *) &cfg.cn, 0},
-    {NULL, '\0', "uid", CFG_STR, (void *) &cfg.uid, 0},
-    {NULL, '\0', "challenge_password", CFG_STR,
-     (void *) &cfg.challenge_password, 0},
-    {NULL, '\0', "password", CFG_STR, (void *) &cfg.password, 0},
-    {NULL, '\0', "pkcs9_email", CFG_STR, (void *) &cfg.pkcs9_email, 0},
-    {NULL, '\0', "country", CFG_STR, (void *) &cfg.country, 0},
-    {NULL, '\0', "dns_name", CFG_STR | CFG_MULTI_ARRAY,
-     (void *) &cfg.dns_name, 0},
-    {NULL, '\0', "ip_address", CFG_STR | CFG_MULTI_ARRAY,
-     (void *) &cfg.ip_addr, 0},
-    {NULL, '\0', "email", CFG_STR | CFG_MULTI_ARRAY, (void *) &cfg.email, 0},
+  val = optionGetValue(pov, "locality");
+  if (val != NULL && val->valType == OPARG_TYPE_STRING)
+    cfg.locality = strdup(val->v.strVal);
 
-    {NULL, '\0', "dn_oid", CFG_STR + CFG_MULTI_SEPARATED,
-     (void *) &cfg.dn_oid, 0},
-    {NULL, '\0', "key_purpose_oids", CFG_STR + CFG_MULTI_SEPARATED,
-     (void *) &cfg.key_purpose_oids, 0},
+  val = optionGetValue(pov, "state");
+  if (val != NULL && val->valType == OPARG_TYPE_STRING)
+    cfg.state = strdup(val->v.strVal);
 
-    {NULL, '\0', "crl_dist_points", CFG_STR,
-     (void *) &cfg.crl_dist_points, 0},
-    {NULL, '\0', "pkcs12_key_name", CFG_STR,
-     (void *) &cfg.pkcs12_key_name, 0},
+  val = optionGetValue(pov, "cn");
+  if (val != NULL && val->valType == OPARG_TYPE_STRING)
+    cfg.cn = strdup(val->v.strVal);
+  
+  val = optionGetValue(pov, "uid");
+  if (val != NULL && val->valType == OPARG_TYPE_STRING)
+    cfg.uid = strdup(val->v.strVal);
 
-    {NULL, '\0', "serial", CFG_INT, (void *) &cfg.serial, 0},
-    {NULL, '\0', "expiration_days", CFG_INT,
-     (void *) &cfg.expiration_days, 0},
+  val = optionGetValue(pov, "challenge_password");
+  if (val != NULL && val->valType == OPARG_TYPE_STRING)
+    cfg.challenge_password = strdup(val->v.strVal);
 
-    {NULL, '\0', "crl_next_update", CFG_INT,
-     (void *) &cfg.crl_next_update, 0},
+  val = optionGetValue(pov, "password");
+  if (val != NULL && val->valType == OPARG_TYPE_STRING)
+    cfg.password = strdup(val->v.strVal);
 
-    {NULL, '\0', "crl_number", CFG_INT,
-     (void *) &cfg.crl_number, 0},
+  val = optionGetValue(pov, "pkcs9_email");
+  if (val != NULL && val->valType == OPARG_TYPE_STRING)
+    cfg.pkcs9_email = strdup(val->v.strVal);
 
-    {NULL, '\0', "ca", CFG_BOOL, (void *) &cfg.ca, 0},
-    {NULL, '\0', "honor_crq_extensions", CFG_BOOL,
-     (void *) &cfg.crq_extensions, 0},
-    {NULL, '\0', "path_len", CFG_INT, (void *) &cfg.path_len, 0},
-    {NULL, '\0', "tls_www_client", CFG_BOOL,
-     (void *) &cfg.tls_www_client, 0},
-    {NULL, '\0', "tls_www_server", CFG_BOOL,
-     (void *) &cfg.tls_www_server, 0},
-    {NULL, '\0', "signing_key", CFG_BOOL, (void *) &cfg.signing_key,
-     0},
-    {NULL, '\0', "encryption_key", CFG_BOOL,
-     (void *) &cfg.encryption_key, 0},
-    {NULL, '\0', "cert_signing_key", CFG_BOOL,
-     (void *) &cfg.cert_sign_key, 0},
-    {NULL, '\0', "crl_signing_key", CFG_BOOL,
-     (void *) &cfg.crl_sign_key, 0},
-    {NULL, '\0', "code_signing_key", CFG_BOOL,
-     (void *) &cfg.code_sign_key, 0},
-    {NULL, '\0', "ocsp_signing_key", CFG_BOOL,
-     (void *) &cfg.ocsp_sign_key, 0},
-    {NULL, '\0', "time_stamping_key", CFG_BOOL,
-     (void *) &cfg.time_stamping_key, 0},
-    {NULL, '\0', "ipsec_ike_key", CFG_BOOL,
-     (void *) &cfg.ipsec_ike_key, 0},
-    {NULL, '\0', "proxy_policy_language", CFG_STR,
-     (void *) &cfg.proxy_policy_language, 0},
-    CFG_END_OF_LIST
-  };
+  val = optionGetValue(pov, "country");
+  if (val != NULL && val->valType == OPARG_TYPE_STRING)
+    cfg.country = strdup(val->v.strVal);
+  
+  READ_MULTI_LINE("dns_name", cfg.dns_name);
+  READ_MULTI_LINE("ip_address", cfg.ip_addr);
+  READ_MULTI_LINE("email", cfg.email);
+  
+  READ_MULTI_LINE_TOKENIZED("dn_oid", cfg.dn_oid);
+  READ_MULTI_LINE_TOKENIZED("key_purpose_oids", cfg.key_purpose_oids);
 
-  /* Creating context */
-  con = cfg_get_context (options);
-  if (con == NULL)
-    {
-      puts ("Not enough memory");
-      exit (1);
-    }
-
-  cfg_set_cfgfile_context (con, 0, -1, (char *) template);
-
-  /* Parsing command line */
-  ret = cfg_parse (con);
-
-  if (ret != CFG_OK)
-    {
-      printf ("error parsing command line: %s: ", template);
-      cfg_fprint_error (con, stdout);
-      putchar ('\n');
-      exit (ret < 0 ? -ret : ret);
-    }
+  val = optionGetValue(pov, "crl_dist_points");
+  if (val != NULL && val->valType == OPARG_TYPE_STRING)
+    cfg.crl_dist_points = strdup(val->v.strVal);
+  
+  val = optionGetValue(pov, "pkcs12_key_name");
+  if (val != NULL && val->valType == OPARG_TYPE_STRING)
+    cfg.pkcs12_key_name = strdup(val->v.strVal);
+  
+  
+  READ_NUMERIC("serial", cfg.serial);
+  READ_NUMERIC("expiration_days", cfg.expiration_days);
+  READ_NUMERIC("crl_next_update", cfg.crl_next_update);
+  READ_NUMERIC("crl_number", cfg.crl_number);
+  
+  val = optionGetValue(pov, "proxy_policy_language");
+  if (val != NULL && val->valType == OPARG_TYPE_STRING)
+    cfg.proxy_policy_language = strdup(val->v.strVal);
+  
+  READ_BOOLEAN("ca", cfg.ca);
+  READ_BOOLEAN("honor_crq_extensions", cfg.crq_extensions);
+  READ_BOOLEAN("path_len", cfg.path_len);
+  READ_BOOLEAN("tls_www_client", cfg.tls_www_client);
+  READ_BOOLEAN("tls_www_server", cfg.tls_www_server);
+  READ_BOOLEAN("signing_key", cfg.signing_key);
+  READ_BOOLEAN("encryption_key", cfg.encryption_key);
+  READ_BOOLEAN("cert_signing_key", cfg.cert_sign_key);
+  READ_BOOLEAN("crl_signing_key", cfg.crl_sign_key);
+  READ_BOOLEAN("code_signing_key", cfg.code_sign_key);
+  READ_BOOLEAN("ocsp_signing_key", cfg.ocsp_sign_key);
+  READ_BOOLEAN("time_stamping_key", cfg.time_stamping_key);
+  READ_BOOLEAN("ipsec_ike_key", cfg.ipsec_ike_key);
+  
+  optionUnloadNested(pov);
 
   return 0;
 }

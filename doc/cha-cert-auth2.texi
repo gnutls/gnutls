@@ -594,7 +594,8 @@ $ certtool --generate-certificate cert.pem --load-privkey key.pem  \
    --load-ca-certificate ca-cert.pem --load-ca-privkey ca-key.pem
 @end example
 
-An example certtool template file:
+An example certtool template file that can be used to generate a certificate
+request or a self signed certificate follows.
 
 @example
 # X.509 Certificate options
@@ -626,7 +627,8 @@ cn = "Cindy Lauper"
 # any OID here.
 # For example set the X.520 Title and the X.520 Pseudonym
 # by using OID and string pairs.
-#dn_oid = "2.5.4.12" "Dr." "2.5.4.65" "jackal"
+#dn_oid = 2.5.4.12 Dr. 
+#dn_oid = 2.5.4.65 jackal
 
 # This is deprecated and should not be used in new
 # certificates.
@@ -649,6 +651,12 @@ expiration_days = 700
 
 # An email in case of a person
 email = "none@@none.org"
+
+# Challenge password used in certificate requests
+challenge_passwd = 123456
+
+# key_purpose_oid = 1.2.3.4.5.6.7
+# key_purpose_oid = 1.2.3.4.5.6.7.9
 
 # An URL that has CRLs (certificate revocation lists)
 # available. Needed in CA certificates.
@@ -689,8 +697,30 @@ signing_key
 
 # Whether this key will be used for IPsec IKE operations.
 #ipsec_ike_key
-@end example
 
+# When generating a certificate from a certificate
+# request, then honor the extensions stored in the request
+# and store them in the real certificate.
+#honor_crq_extensions
+
+# Path length contraint. Sets the maximum number of
+# certificates that can be used to certify this certificate.
+# (i.e. the certificate chain length)
+#path_len = -1
+#path_len = 2
+
+# Options for proxy certificates
+# proxy_policy_language = 1.3.6.1.5.5.7.21.1
+
+# Options for generating a CRL
+
+# next CRL update will be in 43 days (wow)
+#crl_next_update = 43
+
+# this is the 5th CRL by this CA
+#crl_number = 5
+
+@end example
 
 @node The ocsptool application
 @section The ocsptool application

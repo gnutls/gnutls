@@ -17,10 +17,8 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-SUBDIRS = cfg 
-
 if ENABLE_CRYWRAP
-SUBDIRS += crywrap
+SUBDIRS = crywrap
 endif
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
@@ -30,7 +28,6 @@ AM_CPPFLAGS = \
 	-I$(builddir)/../lib/includes		\
 	-I$(srcdir)/../lib/includes		\
 	-I$(srcdir)/../extra/includes	\
-	-I$(srcdir)/cfg				\
 	$(LIBOPTS_CFLAGS)
 
 bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug
@@ -110,17 +107,7 @@ libcmd_cli_debug_la_SOURCES = cli-debug-args.def cli-debug-args.c cli-debug-args
 certtool_SOURCES = certtool.c dh.c certtool-common.c $(PKCS11_SRCS)
 certtool_LDADD = ../lib/libgnutls.la 
 certtool_LDADD += libcmd-certtool.la ../gl/libgnu.la
-if HAVE_LIBCFG
-certtool_LDADD += -lcfg+
-else
-noinst_LTLIBRARIES += libcfg.la
-libcfg_la_CFLAGS =
-libcfg_la_SOURCES = cfg/cfg+.c cfg/cfgfile.c cfg/cmdline.c cfg/parse.c	\
-	cfg/props.c cfg/shared.c cfg/platon/str/dynfgets.c		\
-	cfg/platon/str/strctype.c cfg/platon/str/strdyn.c		\
-	cfg/platon/str/strplus.c
-certtool_LDADD += libcfg.la
-endif
+
 noinst_LTLIBRARIES += libcmd-certtool.la
 libcmd_certtool_la_CFLAGS =
 libcmd_certtool_la_SOURCES = certtool-args.c certtool-args.def certtool-args.h	\
@@ -136,12 +123,6 @@ p11tool_gaa_CFLAGS =
 p11tool_SOURCES = p11tool-args.def p11tool.c pkcs11.c certtool-common.c p11tool.h $(PKCS11_SRCS)
 p11tool_LDADD = ../lib/libgnutls.la $(LIBOPTS_LDADD)
 p11tool_LDADD += libcmd-p11tool.la ../gl/libgnu.la
-
-if HAVE_LIBCFG
-p11tool_LDADD += -lcfg+
-else
-p11tool_LDADD += libcfg.la
-endif
 
 noinst_LTLIBRARIES += libcmd-p11tool.la
 libcmd_p11tool_la_CFLAGS =
