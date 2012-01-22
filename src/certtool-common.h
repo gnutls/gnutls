@@ -4,37 +4,6 @@
 #include <gnutls/x509.h>
 #include <stdio.h>
 
-enum
-{
-  ACTION_SELF_SIGNED,
-  ACTION_GENERATE_PRIVKEY,
-  ACTION_CERT_INFO,
-  ACTION_GENERATE_REQUEST,
-  ACTION_GENERATE_CERTIFICATE,
-  ACTION_VERIFY_CHAIN,
-  ACTION_PRIVKEY_INFO,
-  ACTION_UPDATE_CERTIFICATE,
-  ACTION_TO_PKCS12,
-  ACTION_PKCS12_INFO,
-  ACTION_GENERATE_DH,
-  ACTION_GET_DH,
-  ACTION_CRL_INFO,
-  ACTION_P7_INFO,
-  ACTION_GENERATE_CRL,
-  ACTION_VERIFY_CRL,
-  ACTION_SMIME_TO_P7,
-  ACTION_GENERATE_PROXY,
-  ACTION_GENERATE_PKCS8,
-  ACTION_PGP_INFO,
-  ACTION_PGP_PRIVKEY_INFO,
-  ACTION_RING_INFO,
-  ACTION_REQUEST,
-  ACTION_PUBKEY_INFO,
-  ACTION_CERT_PUBKEY,
-  ACTION_VERIFY,
-  ACTION_DH_INFO,
-};
-
 #define TYPE_CRT 1
 #define TYPE_CRQ 2
 
@@ -57,6 +26,10 @@ typedef struct common_info
   const char *ca_privkey;
   int bits;
   const char* sec_param;
+  const char* pkcs_cipher;
+  const char* password;
+  unsigned int crq_extensions;
+  unsigned int v1_cert;
 } common_info_st;
 
 gnutls_pubkey_t load_public_key_or_import(int mand, gnutls_privkey_t privkey, common_info_st * info);

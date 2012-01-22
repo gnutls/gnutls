@@ -1,0 +1,441 @@
+AutoGen Definitions options;
+prog-name     = certtool;
+prog-title    = "GnuTLS PKCS #11 tool";
+prog-desc     = "Manipulate certificates and private keys.";
+detail    = "Tool to parse and generate X.509 certificates, requests and private keys.";
+
+short-usage   = "certtool [options] [url]\ncerttool --help for usage instructions.\n";
+prog-group    = "GnuTLS";
+explain       = "";
+gnu-usage;
+no-xlate = opt;
+no-misuse-usage;
+disable-save;
+long-opts;
+config-header = 'config.h';
+export = '#include <gettext.h>';
+
+copyright = {
+    date  = "2000-2012";
+    owner = "Free Software Foundation";
+    author = "Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.";
+    eaddr  = "bug-gnutls@gnu.org";
+    type  = gpl;
+};
+version = "@VERSION@";
+
+flag = {
+    name      = debug;
+    value     = d;
+    arg-type  = number;
+    arg-range = "0 -> 9999";
+    descrip   = "Enable debugging.";
+    doc       = "Specifies the debug level.";
+};
+
+flag = {
+    name      = generate-self-signed;
+    value     = s;
+    descrip   = "Generate a self-signed certificate";
+    doc = "";
+};
+
+flag = {
+    name      = generate-certificate;
+    value     = c;
+    descrip   = "Generate a signed certificate";
+    doc = "";
+};
+
+flag = {
+    name      = generate-proxy;
+    descrip   = "Generates a proxy certificate";
+    doc = "";
+};
+
+flag = {
+    name      = generate-crl;
+    descrip   = "Generate a CRL";
+    doc = "";
+};
+
+flag = {
+    name      = update-certificate;
+    value     = u;
+    descrip   = "Update a signed certificate";
+    doc = "";
+};
+
+flag = {
+    name      = generate-privkey;
+    value     = p;
+    descrip   = "Generate a private key";
+    doc = "";
+};
+
+flag = {
+    name      = generate-request;
+    value     = q;
+    descrip   = "Generate a PKCS #10 certificate request";
+    doc = "";
+};
+
+flag = {
+    name      = verify-chain;
+    value     = e;
+    descrip   = "Verify a PEM encoded certificate chain. The last certificate in the chain must be a self signed one";
+    doc = "";
+};
+
+flag = {
+    name      = verify;
+    descrip   = "Verify a PEM encoded certificate chain using a trusted list.";
+    doc = "The trusted certificate list must be loaded with --load-ca-certificate.";
+    flags-must = load-ca-certificate;
+};
+
+flag = {
+    name      = verify-crl;
+    descrip   = "Verify a CRL using a trusted list.";
+    doc = "The trusted certificate list must be loaded with --load-ca-certificate.";
+    flags-must = load-ca-certificate;
+};
+
+flag = {
+    name      = generate-dh-params;
+    descrip   = "Generate PKCS #3 encoded Diffie-Hellman parameters.";
+    doc = "";
+};
+
+flag = {
+    name      = get-dh-params;
+    descrip   = "Get the included PKCS #3 encoded Diffie-Hellman parameters.";
+    doc = "Returns stored DH parameters in GnuTLS. Those parameters are used in the SRP protocol. The parameters returned by fresh generation
+are more efficient since GnuTLS 3.0.9.";
+};
+
+flag = {
+    name      = dh-info;
+    descrip   = "Print information PKCS #3 encoded Diffie-Hellman parameters";
+    doc = "";
+};
+
+flag = {
+    name      = load-privkey;
+    descrip   = "Loads a private key file";
+    arg-type  = string;
+    doc = "This can be either a file or a PKCS #11 URL";
+};
+
+flag = {
+    name      = load-pubkey;
+    descrip   = "Loads a public key file";
+    arg-type  = string;
+    doc = "This can be either a file or a PKCS #11 URL";
+};
+
+flag = {
+    name      = load-request;
+    descrip   = "Loads a certificate request file";
+    arg-type  = file;
+    file-exists = yes;
+    doc = "";
+};
+
+flag = {
+    name      = load-certificate;
+    descrip   = "Loads a certificate file";
+    arg-type  = string;
+    doc = "This can be either a file or a PKCS #11 URL";
+};
+
+flag = {
+    name      = load-ca-privkey;
+    descrip   = "Loads the certificate authority's private key file";
+    arg-type  = string;
+    doc = "This can be either a file or a PKCS #11 URL";
+};
+
+flag = {
+    name      = load-ca-certificate;
+    descrip   = "Loads the certificate authority's certificate file";
+    arg-type  = string;
+    doc = "This can be either a file or a PKCS #11 URL";
+};
+
+flag = {
+    name      = password;
+    arg-type  = string;
+    descrip   = "Password to use";
+    doc   = "";
+};
+
+flag = {
+    name      = certificate-info;
+    value     = i;
+    descrip   = "Print information on the given certificate";
+    doc       = "";
+};
+
+flag = {
+    name      = certificate-pubkey;
+    descrip   = "Print certificate's public key";
+    doc       = "";
+};
+
+flag = {
+    name      = pgp-certificate-info;
+    descrip   = "Print information on the given OpenPGP certificate";
+    doc       = "";
+};
+
+flag = {
+    name      = pgp-ring-info;
+    descrip   = "Print information on the given OpenPGP keyring structure";
+    doc       = "";
+};
+
+flag = {
+    name      = crl-info;
+    value     = l;
+    descrip   = "Print information on the given CRL structure";
+    doc       = "";
+};
+
+flag = {
+    name      = crq-info;
+    descrip   = "Print information on the given certificate request";
+    doc       = "";
+};
+
+
+flag = {
+    name      = no-crq-extensions;
+    descrip   = "Do not use extensions in certificate requests";
+    doc       = "";
+};
+
+flag = {
+    name      = p12-info;
+    descrip   = "Print information on a PKCS #12 structure";
+    doc       = "";
+};
+
+flag = {
+    name      = p7-info;
+    descrip   = "Print information on a PKCS #7 structure";
+    doc       = "";
+};
+
+flag = {
+    name      = smime-to-p7;
+    descrip   = "Convert S/MIME to PKCS #7 structure";
+    doc       = "";
+};
+
+flag = {
+    name      = key-info;
+    value     = k;
+    descrip   = "Print information on a private key";
+    doc = "";
+};
+
+flag = {
+    name      = pgp-key-info;
+    descrip   = "Print information on an OpenPGP private key";
+    doc = "";
+};
+
+flag = {
+    name      = pubkey-info;
+    descrip   = "Print information on a public key";
+    doc = "";
+};
+
+flag = {
+    name      = v1;
+    descrip   = "Generate an X.509 version 1 certificate (with no extensions)";
+    doc = "";
+};
+
+flag = {
+    name      = to-p12;
+    descrip   = "Generate a PKCS #12 structure";
+    doc = "";
+};
+
+flag = {
+    name      = to-p8;
+    descrip   = "Generate a PKCS #8 structure";
+    doc = "";
+};
+
+flag = {
+    name      = pkcs8;
+    value     = 8;
+    descrip   = "Use PKCS #8 format for private keys";
+    doc = "";
+};
+
+flag = {
+    name      = rsa;
+    descrip   = "Generate RSA key";
+    doc = "";
+};
+
+flag = {
+    name      = dsa;
+    descrip   = "Generate DSA key";
+    doc = "";
+};
+
+flag = {
+    name      = ecc;
+    descrip   = "Generate ECC (ECDSA) key";
+    doc = "";
+};
+
+flag = {
+    name      = hash;
+    arg-type  = string;
+    descrip   = "Hash algorithm to use for signing (MD5,SHA1,RMD160,SHA256,SHA384,SHA512).";
+    doc = "";
+};
+
+flag = {
+    name      = inder;
+    descrip   = "Use DER format for input certificates and private keys.";
+    disabled;
+    disable   = "no";
+    doc       = "";
+};
+
+flag = {
+    name      = inraw;
+    aliases   = inder;
+};
+
+flag = {
+    name      = outder;
+    descrip   = "Use DER format for output certificates and private keys";
+    disabled;
+    disable   = "no";
+    doc       = "";
+};
+
+flag = {
+    name      = outraw;
+    aliases   = outder;
+};
+
+flag = {
+    name      = bits;
+    arg-type  = number;
+    descrip   = "Specify the number of bits for key generate";
+    doc      = "";
+};
+
+flag = {
+    name      = sec-param;
+    arg-type  = string;
+    arg-name  = "Security parameter";
+    descrip   = "Specify the security level [low|legacy|normal|high|ultra].";
+    doc      = "This is alternative to the bits option.";
+};
+
+flag = {
+    name      = disable-quick-random;
+    descrip   = "No effect";
+    doc      = "";
+};
+
+flag = {
+    name      = outfile;
+    arg-type  = string;
+    descrip   = "Output file";
+    doc   = "";
+};
+
+flag = {
+    name      = infile;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Input file";
+    doc   = "";
+};
+
+flag = {
+    name      = template;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Template file to use for non-interactive operation";
+    doc   = "";
+};
+
+flag = {
+    name      = pkcs-cipher;
+    arg-type  = string;
+    arg-name  = "Cipher";
+    descrip   = "Cipher to use for PKCS #8 and #12 operations";
+    doc   = "Cipher may be one of 3des, 3des-pkcs12, aes-128, aes-192, aes-256, rc2-40, arcfour.";
+};
+
+doc-section = {
+  ds-type = 'SEE ALSO';
+  ds-format = 'man';
+  ds-text   = <<-_EOT_
+    p11tool (1)
+_EOT_;
+};
+
+doc-section = {
+  ds-type = 'EXAMPLES';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+To create a private key, run:
+@example
+$ certtool --generate-privkey --outfile key.pem
+@end example
+
+To create a certificate request (needed when the certificate is  issued  by
+another party), run:
+@example
+certtool --generate-request --load-privkey key.pem \
+   --outfile request.pem
+@end example
+
+To create a certificate request using a key stored in a PKCS #11 token, run:
+@example
+$ ./certtool --generate-request --load-privkey "pkcs11:..." \
+  --load-pubkey "pkcs11:..." --outfile request.pem
+@end example
+
+To generate a certificate using the previous request, use the command:
+@example
+$ certtool --generate-certificate --load-request request.pem \
+   --outfile cert.pem --load-ca-certificate ca-cert.pem \
+   --load-ca-privkey ca-key.pem
+@end example
+
+To generate a certificate using the private key only, use the command:
+@example
+$ certtool --generate-certificate --load-privkey key.pem \
+   --outfile cert.pem --load-ca-certificate ca-cert.pem \
+   --load-ca-privkey ca-key.pem
+@end example
+
+To view the certificate information, use:
+@example
+$ certtool --certificate-info --infile cert.pem
+@end example
+
+To generate a PKCS #12 structure using the previous key and certificate,
+use the command:
+@example
+$ certtool --load-certificate cert.pem --load-privkey key.pem \
+   --to-p12 --outder --outfile key.p12
+@end example
+
+_EOT_;
+};
+

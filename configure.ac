@@ -487,6 +487,7 @@ AC_CONFIG_FILES([
   lib/x509/Makefile
   po/Makefile.in
   src/Makefile
+  src/certtool-args.def
   src/cli-args.def
   src/serv-args.def
   src/cli-debug-args.def

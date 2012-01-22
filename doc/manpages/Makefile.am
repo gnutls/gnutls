@@ -26,6 +26,9 @@ if ENABLE_SRP
 dist_man_MANS += srptool.1
 endif
 
+certtool.1: ../../src/certtool-args.def
+	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+
 gnutls-cli.1: ../../src/cli-args.def
 	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
 

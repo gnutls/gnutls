@@ -123,9 +123,9 @@ certtool_LDADD += libcfg.la
 endif
 noinst_LTLIBRARIES += libcmd-certtool.la
 libcmd_certtool_la_CFLAGS =
-libcmd_certtool_la_SOURCES = certtool-gaa.c certtool.gaa certtool-gaa.h	\
+libcmd_certtool_la_SOURCES = certtool-args.c certtool-args.def certtool-args.h	\
 	certtool-cfg.h certtool-cfg.c
-libcmd_certtool_la_LIBADD = ../gl/libgnu.la $(LTLIBREADLINE)
+libcmd_certtool_la_LIBADD = ../gl/libgnu.la $(LTLIBREADLINE) $(LIBOPTS_LDADD)
 libcmd_certtool_la_LIBADD += ../lib/libgnutls.la 
 libcmd_certtool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
 
@@ -161,8 +161,6 @@ if ENABLE_PKCS11
 p11tool-gaa.c: $(srcdir)/p11tool.gaa
 	-$(GAA) $< -o p11tool-gaa.c -i p11tool-gaa.h
 endif
-certtool-gaa.c: $(srcdir)/certtool.gaa
-	-$(GAA) $< -o certtool-gaa.c -i certtool-gaa.h
 psk-args.c: $(srcdir)/psk-args.def
 	-autogen $<
 cli-debug-args.c: $(srcdir)/cli-debug-args.def
@@ -174,4 +172,6 @@ serv-args.c: $(srcdir)/serv-args.def
 srptool-args.c: $(srcdir)/srptool-args.def
 	-autogen $<
 p11tool-args.c: $(srcdir)/p11tool-args.def
+	-autogen $<
+certtool-args.c: $(srcdir)/certtool-args.def
 	-autogen $<

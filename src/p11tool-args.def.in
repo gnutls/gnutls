@@ -125,6 +125,7 @@ flag = {
 
 flag = {
     name      = label;
+    arg-type  = string;
     descrip   = "Sets a label for the write operation";
     doc       = "";
 };
