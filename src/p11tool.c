@@ -76,7 +76,7 @@ cmd_parser (int argc, char **argv)
 {
   int ret, debug = 0;
   common_info_st cinfo;
-  unsigned int action = 1, pkcs11_type = -1, key_type = GNUTLS_PK_UNKNOWN;
+  unsigned int pkcs11_type = -1, key_type = GNUTLS_PK_UNKNOWN;
   const char* url = NULL;
   unsigned int detailed_url = 0, optct;
   unsigned int login = 0, bits = 0;
@@ -150,66 +150,7 @@ cmd_parser (int argc, char **argv)
 
   if (HAVE_OPT(LOAD_PUBKEY))
     cinfo.pubkey = OPT_ARG(LOAD_PUBKEY);
-    
-  if (HAVE_OPT(LIST_TOKENS))
-    action = ACTION_PKCS11_TOKENS;
-  else if (HAVE_OPT(LIST_MECHANISMS))
-    action = ACTION_PKCS11_MECHANISMS;
-  else if (HAVE_OPT(LIST_ALL))
-    {
-      pkcs11_type = PKCS11_TYPE_ALL;
-      action = ACTION_PKCS11_LIST;
-    }
-  else if (HAVE_OPT(LIST_ALL_CERTS))
-    {
-      pkcs11_type = PKCS11_TYPE_CRT_ALL;
-      action = ACTION_PKCS11_LIST;
-    }
-  else if (HAVE_OPT(LIST_CERTS))
-    {
-      pkcs11_type = PKCS11_TYPE_PK;
-      action = ACTION_PKCS11_LIST;
-    }
-  else if (HAVE_OPT(LIST_ALL_PRIVKEYS))
-    {
-      pkcs11_type = PKCS11_TYPE_PRIVKEY;
-      action = ACTION_PKCS11_LIST;
-    }
-  else if (HAVE_OPT(LIST_ALL_TRUSTED))
-    {
-      pkcs11_type = PKCS11_TYPE_TRUSTED;
-      action = ACTION_PKCS11_LIST;
-    }
-  else if (HAVE_OPT(EXPORT))
-    {
-      action = ACTION_PKCS11_EXPORT_URL;
-    }
-  else if (HAVE_OPT(WRITE))
-    action = ACTION_PKCS11_WRITE_URL;
-  else if (HAVE_OPT(INITIALIZE))
-    action = ACTION_PKCS11_TOKEN_INIT;
-  else if (HAVE_OPT(DELETE))
-    action = ACTION_PKCS11_DELETE_URL;
-  else if (HAVE_OPT(GENERATE_ECC))
-    {
-      key_type = GNUTLS_PK_EC;
-      action = ACTION_PKCS11_GENERATE;
-    }
-  else if (HAVE_OPT(GENERATE_RSA))
-    {
-      key_type = GNUTLS_PK_RSA;
-      action = ACTION_PKCS11_GENERATE;
-    }
-  else if (HAVE_OPT(GENERATE_DSA))
-    {
-      key_type = GNUTLS_PK_DSA;
-      action = ACTION_PKCS11_GENERATE;
-    }
-  else 
-    {
-      USAGE(1);
-    }
-    
+
   if (ENABLED_OPT(DETAILED_URL))
     detailed_url = 1;
 
@@ -239,39 +180,81 @@ cmd_parser (int argc, char **argv)
       fprintf(stderr, "Detailed URLs: %s\n", ENABLED_OPT(DETAILED_URL)?"yes":"no");
       fprintf(stderr, "\n");
     }
-
-  switch (action)
+    
+  /* handle actions 
+   */
+  if (HAVE_OPT(LIST_TOKENS))
+    pkcs11_token_list (outfile, detailed_url, &cinfo);
+  else if (HAVE_OPT(LIST_MECHANISMS))
+    pkcs11_mechanism_list (outfile, url, login,
+                             &cinfo);
+  else if (HAVE_OPT(LIST_ALL))
     {
-    case ACTION_PKCS11_LIST:
+      pkcs11_type = PKCS11_TYPE_ALL;
       pkcs11_list (outfile, url, pkcs11_type,
                    login, detailed_url, &cinfo);
-      break;
-    case ACTION_PKCS11_TOKENS:
-      pkcs11_token_list (outfile, detailed_url, &cinfo);
-      break;
-    case ACTION_PKCS11_MECHANISMS:
-      pkcs11_mechanism_list (outfile, url, login,
-                             &cinfo);
-      break;
-    case ACTION_PKCS11_EXPORT_URL:
+    }
+  else if (HAVE_OPT(LIST_ALL_CERTS))
+    {
+      pkcs11_type = PKCS11_TYPE_CRT_ALL;
+      pkcs11_list (outfile, url, pkcs11_type,
+                   login, detailed_url, &cinfo);
+    }
+  else if (HAVE_OPT(LIST_CERTS))
+    {
+      pkcs11_type = PKCS11_TYPE_PK;
+      pkcs11_list (outfile, url, pkcs11_type,
+                   login, detailed_url, &cinfo);
+    }
+  else if (HAVE_OPT(LIST_ALL_PRIVKEYS))
+    {
+      pkcs11_type = PKCS11_TYPE_PRIVKEY;
+      pkcs11_list (outfile, url, pkcs11_type,
+                   login, detailed_url, &cinfo);
+    }
+  else if (HAVE_OPT(LIST_ALL_TRUSTED))
+    {
+      pkcs11_type = PKCS11_TYPE_TRUSTED;
+      pkcs11_list (outfile, url, pkcs11_type,
+                   login, detailed_url, &cinfo);
+    }
+  else if (HAVE_OPT(EXPORT))
+    {
       pkcs11_export (outfile, url, login, &cinfo);
-      break;
-    case ACTION_PKCS11_WRITE_URL:
-      pkcs11_write (outfile, url, label,
+    }
+  else if (HAVE_OPT(WRITE))
+    pkcs11_write (outfile, url, label,
                     ENABLED_OPT(TRUSTED), ENABLED_OPT(PRIVATE), login, &cinfo);
-      break;
-    case ACTION_PKCS11_TOKEN_INIT:
-      pkcs11_init (outfile, url, label, &cinfo);
-      break;
-    case ACTION_PKCS11_DELETE_URL:
-      pkcs11_delete (outfile, url, 0, login, &cinfo);
-      break;
-    case ACTION_PKCS11_GENERATE:
+  else if (HAVE_OPT(INITIALIZE))
+    pkcs11_init (outfile, url, label, &cinfo);
+  else if (HAVE_OPT(DELETE))
+    pkcs11_delete (outfile, url, 0, login, &cinfo);
+  else if (HAVE_OPT(GENERATE_ECC))
+    {
+      key_type = GNUTLS_PK_EC;
       pkcs11_generate (outfile, url, key_type, get_bits(key_type, bits, sec_param), 
                        label, ENABLED_OPT(PRIVATE), detailed_url, login, 
                        &cinfo);
-      break;
     }
+  else if (HAVE_OPT(GENERATE_RSA))
+    {
+      key_type = GNUTLS_PK_RSA;
+      pkcs11_generate (outfile, url, key_type, get_bits(key_type, bits, sec_param), 
+                       label, ENABLED_OPT(PRIVATE), detailed_url, login, 
+                       &cinfo);
+    }
+  else if (HAVE_OPT(GENERATE_DSA))
+    {
+      key_type = GNUTLS_PK_DSA;
+      pkcs11_generate (outfile, url, key_type, get_bits(key_type, bits, sec_param), 
+                       label, ENABLED_OPT(PRIVATE), detailed_url, login, 
+                       &cinfo);
+    }
+  else 
+    {
+      USAGE(1);
+    }
+    
   fclose (outfile);
 
 #ifdef ENABLE_PKCS11
