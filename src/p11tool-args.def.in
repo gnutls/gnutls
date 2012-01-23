@@ -219,14 +219,15 @@ flag = {
 
 flag = {
     name      = inder;
-    descrip   = "Use DER format for input certificates and private keys";
+    descrip   = "Use DER/RAW format for input certificates and private keys";
+    disabled;
+    disable   = "no";
     doc      = "";
 };
 
 flag = {
     name      = inraw;
-    descrip   = "Use RAW/DER format for input certificates and private keys";
-    doc      = "";
+    aliases   = inder;
 };
 
 flag = {
