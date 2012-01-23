@@ -982,6 +982,12 @@ are sharing a module. To avoid this problem GnuTLS uses @acronym{p11-kit}
 that provides a middleware to control access to resources over the
 multiple users.
 
+Moreover PKCS #11 modules must be reinitialized on the child processes
+after a @funcintref{fork}. @acronym{GnuTLS} provides @funcref{gnutls_pkcs11_reinit}
+to be called for this purpose.
+
+@showfuncdesc{gnutls_pkcs11_reinit}
+
 @node Reading objects
 @subsection Reading objects
 

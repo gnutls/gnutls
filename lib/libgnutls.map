@@ -762,6 +762,9 @@ GNUTLS_3_0_0 {
 	gnutls_pubkey_encrypt_data;
 	gnutls_x509_dn_oid_name;
 	gnutls_session_resumption_requested;
+	gnutls_pkcs11_reinit;
+	gnutls_x509_crt_get_authority_key_gn_serial;
+	gnutls_x509_crl_get_authority_key_gn_serial;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {
