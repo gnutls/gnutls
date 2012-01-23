@@ -734,9 +734,9 @@ Alerts messages may be sent to the peer using @funcref{gnutls_alert_send}.
 In order to specify cipher suite preferences on a TLS session
 there are priority functions that accept a string
 specifying the enabled for the handshake algorithms.
-That string may contain a high level keyword such as
-in @ref{tab:prio-keywords} or combination of a high level
-keyword, additional algorithm keywords and special keywords.
+That string may contain a single initial keyword such as
+in @ref{tab:prio-keywords} and may be followed by
+additional algorithm or special keywords.
 
 @showfuncB{gnutls_priority_set_direct,gnutls_priority_set}
 
@@ -784,10 +784,10 @@ compression methods. It should be followed by the
 algorithms to be enabled.
 
 @end multitable
-@caption{Supported priority string keywords.}
+@caption{Supported initial keywords.}
 @end float
 
-Unless the first keyword is "NONE" the defaults (in preference
+Unless the initial keyword is "NONE" the defaults (in preference
 order) are for TLS protocols TLS 1.2, TLS1.1, TLS1.0, SSL3.0; for
 compression NULL; for certificate types X.509.
 In key exchange algorithms when in NORMAL or SECURE levels the
@@ -803,15 +803,19 @@ the algorithms at real-time during the protocol run, whilst
 the overall security level refers to off-line adversaries 
 (e.g. adversaries breaking the ciphertext years after it was captured).
 
-The NONE keyword, if used, must followed by the algorithms to be enabled,
-and is used to provide the exact list of requested algorithms@footnote{To avoid collisions in order to specify a compression algorithm in
-this string you have to prefix it with "COMP-", protocol versions
-with "VERS-", signature algorithms with "SIGN-" and certificate types with "CTYPE-". All other
-algorithms don't need a prefix.}. The order with which every algorithm
-is specified is significant. Similar algorithms specified before others
-will take precedence. The individual algorithms are shown in @ref{tab:prio-algorithms}
-and special keywords are in @ref{tab:prio-special}.
-The prefixes for individual algorithms are:
+The NONE keyword, if used, must followed by keywords specifying 
+the algorithms and protocols to be enabled. The other initial keywords may be 
+followed by such keywords.
+The order with which every algorithm or protocol
+is specified is significant. Algorithms specified before others
+will take precedence. The supported algorithms and protocols
+are shown in @ref{tab:prio-algorithms}. 
+To avoid collisions in order to specify a compression algorithm in
+the priority string you have to prefix it with "COMP-", protocol versions
+with "VERS-", signature algorithms with "SIGN-" and certificate types with "CTYPE-". 
+All other algorithms don't need a prefix. Each specified keyword can
+be prefixed with any of the following characters.
+
 @table @asis
 @item '!' or '-' 
 appended with an algorithm will remove this algorithm.
@@ -865,6 +869,8 @@ for the acceptable security levels.} than their elliptic curves counterpart
 (ECDHE). Moreover the plain Diffie-Hellman key exchange
 requires parameters to be generated and associated with a credentials
 structure by the server (see @ref{Parameter generation}). 
+
+The available special keywords are shown in @ref{tab:prio-special}. 
 
 @float Table,tab:prio-special
 @multitable @columnfractions .45 .45
@@ -931,6 +937,21 @@ will allow V1 CAs in chains.
 Finally the ciphersuites enabled by any priority string can be
 listed using the @code{gnutls-cli} application (see @ref{The gnutls-cli tool}), 
 or by using the priority functions as in @ref{Listing the ciphersuites in a priority string}.
+
+Example priority strings are:
+@example
+The default priority:
+    "NORMAL"
+
+Specifying RSA with AES-128-CBC:
+    "NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+AES-128-CBC:+SIGN-ALL:+COMP-NULL"
+
+Specifying the defaults except ARCFOUR-128:
+    "NORMAL:-ARCFOUR-128"
+
+Enabling the 128-bit secure ciphers, while disabling SSL 3.0 and enabling compression:
+    "SECURE128:-VERS-SSL3.0:+COMP-DEFLATE"
+@end example
 
 @node Advanced and other topics
 @section Advanced and other topics
@@ -1146,8 +1167,12 @@ NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:%COMPAT
 @end verbatim
 This priority string will in addition to above, only enable SSL 3.0 and 
 TLS 1.0 as protocols. Note however that
-there are known attacks against those protocol versions and
-this mode trades security for compatibility.
+there are known attacks against those protocol versions, especially over
+the CBC-mode ciphersuites. To mitigate them another priority string
+that only allows the stream cipher ARCFOUR is below.
+@verbatim
+NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:-CIPHER-ALL:+ARCFOUR-128:%COMPAT
+@end verbatim
 
 @node Compatibility with the OpenSSL library
 @subsection Compatibility with the OpenSSL library
