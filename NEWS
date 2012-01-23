@@ -8,11 +8,15 @@ Version 2.12.17 (unreleased)
 ** libgnutls: Corrections in record packet parsing.
 Reported by Matthew Hall.
 
+** libgnutls: Added function to force explicit reinitialization
+of PKCS #11 modules. This is required on the child process after
+a fork.
+
 ** libgnutls: PKCS #11 objects that do not have ID
 no longer crash listing. Reported by Sven Geggus.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pkcs11_reinit: Added
 
 
 Version 2.12.16 (released 2011-01-06)

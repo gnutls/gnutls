@@ -570,6 +570,34 @@ gnutls_pkcs11_init (unsigned int flags, const char *deprecated_config_file)
 }
 
 /**
+ * gnutls_pkcs11_reinit:
+ *
+ * This function will reinitialize the PKCS 11 subsystem in gnutls. 
+ * This is required by PKCS 11 when an application uses fork(). The
+ * reinitialization function must be called on the child.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.0.0
+ **/
+int gnutls_pkcs11_reinit (void)
+{
+  int rv;
+
+  rv = p11_kit_initialize_registered ();
+  if (rv != CKR_OK)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("Cannot initialize registered module: %s\n",
+                         p11_kit_strerror (rv));
+      return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+  return 0;
+}
+
+/**
  * gnutls_pkcs11_deinit:
  *
  * This function will deinitialize the PKCS 11 subsystem in gnutls.

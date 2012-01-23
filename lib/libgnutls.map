@@ -693,6 +693,7 @@ GNUTLS_2_12
 	gnutls_certificate_get_issuer;
 	gnutls_x509_crq_verify;
 	gnutls_global_set_time_function;
+	gnutls_pkcs11_reinit;
 } GNUTLS_2_10;
 
 GNUTLS_PRIVATE {
