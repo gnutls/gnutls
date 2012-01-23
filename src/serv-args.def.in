@@ -3,6 +3,7 @@ prog-name     = gnutls-serv;
 prog-title    = "GnuTLS server";
 prog-desc     = "Simple server program to act as an HTTPS or TLS echo service.";
 short-usage   = "Usage: gnutls-serv [options]\ngnutls-serv --help for usage instructions.\n";
+help-value = "h";
 prog-group    = "GnuTLS";
 explain       = "";
 detail        = "Server program that listens to incoming TLS connections.";

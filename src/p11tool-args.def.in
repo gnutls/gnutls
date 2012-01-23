@@ -2,6 +2,7 @@ AutoGen Definitions options;
 prog-name     = p11tool;
 prog-title    = "GnuTLS PKCS #11 tool";
 prog-desc     = "Program to handle PKCS #11 smart cards and security modules.\n";
+help-value = "h";
 detail    = "Program that allows handling data from PKCS #11 smart cards
 and security modules. 
 

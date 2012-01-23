@@ -2,6 +2,7 @@ AutoGen Definitions options;
 prog-name     = srptool;
 prog-title    = "GnuTLS SRP tool";
 prog-desc     = "Simple program to create SRP parameters.\n";
+help-value = "h";
 explain       = "";
 detail    = "Simple program that emulates the programs in the Stanford SRP (Secure
 Remote Password) libraries using GnuTLS.  It is intended for use in  places

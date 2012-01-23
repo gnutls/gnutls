@@ -2,6 +2,7 @@ AutoGen Definitions options;
 prog-name     = gnutls-cli-debug;
 prog-title    = "GnuTLS debug client";
 prog-desc     = "Simple client program to check TLS server capabilities.";
+help-value = "h";
 short-usage   = "Usage: gnutls-cli-debug [options] hostname\ngnutls-cli --help for usage instructions.\n";
 prog-group    = "GnuTLS";
 explain       = "";

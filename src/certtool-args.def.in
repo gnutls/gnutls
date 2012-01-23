@@ -3,7 +3,7 @@ prog-name     = certtool;
 prog-title    = "GnuTLS PKCS #11 tool";
 prog-desc     = "Manipulate certificates and private keys.";
 detail    = "Tool to parse and generate X.509 certificates, requests and private keys.";
-
+help-value = "h";
 short-usage   = "certtool [options] [url]\ncerttool --help for usage instructions.\n";
 prog-group    = "GnuTLS";
 explain       = "";

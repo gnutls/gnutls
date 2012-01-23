@@ -2,6 +2,7 @@ AutoGen Definitions options;
 prog-name     = gnutls-cli;
 prog-title    = "GnuTLS client";
 prog-desc     = "Simple client program to set up a TLS connection.";
+help-value = "h";
 short-usage   = "Usage: gnutls-cli [options] hostname\ngnutls-cli --help for usage instructions.\n";
 prog-group    = "GnuTLS";
 explain       = "";
