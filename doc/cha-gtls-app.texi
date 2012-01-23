@@ -873,7 +873,9 @@ structure by the server (see @ref{Parameter generation}).
 @item %COMPAT @tab
 will enable compatibility mode. It might mean that violations
 of the protocols are allowed as long as maximum compatibility with
-problematic clients and servers is achieved.
+problematic clients and servers is achieved. More specifically this
+string would disable TLS record random padding and tolerate packets
+over the maximum allowed TLS record.
 
 @item %NO_EXTENSIONS @tab
 will prevent the sending of any TLS extensions in client side. Note
@@ -1130,15 +1132,20 @@ Because there is no way to achieve maximum interoperability with broken peers
 without sacrificing security, @acronym{GnuTLS} ignores such peers by default. 
 This might not be acceptable in cases where maximum compatibility
 is required. Thus we allow enabling compatibility with broken peers using
-priority strings (see @ref{Priority Strings}). An example priority string that
-is known to provide wide compatibility even with broken peers
-is shown below:
+priority strings (see @ref{Priority Strings}). A conservative priority
+string that would disable certain @acronym{TLS} protocol
+options that are known to cause compatibility problems, is shown below. 
+@verbatim
+NORMAL:%COMPAT
+@end verbatim
+
+For broken peers that do not tolerate TLS version numbers over TLS 1.0
+another priority string is:
 @verbatim
 NORMAL:-VERS-TLS-ALL:+VERS-TLS1.0:+VERS-SSL3.0:%COMPAT
 @end verbatim
-This priority string will only enable SSL 3.0 and TLS 1.0 as protocols and
-will disable, via the @code{%COMPAT} keyword, several @acronym{TLS} protocol
-options that are known to cause compatibility problems. Note however that
+This priority string will in addition to above, only enable SSL 3.0 and 
+TLS 1.0 as protocols. Note however that
 there are known attacks against those protocol versions and
 this mode trades security for compatibility.
 
