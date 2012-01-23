@@ -122,19 +122,26 @@ cfg_init (void)
   val = optionGetValue(pov, name); \
   if (val != NULL && val->valType == OPARG_TYPE_STRING) \
   { \
-    token_list_t* res; \
+    char str[512]; \
+    char * p; \
+    int j; \
     if (s_name == NULL) { \
       i = 0; \
       s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
       do { \
         if (val && !strcmp(val->pzName, name)==0) \
           continue; \
-        res = ao_string_tokenize( val->v.strVal); \
-        if (res != NULL && res->tkn_ct > 1) \
-          { \
-            s_name[i] = strdup(res->tkn_list[0]); \
-            s_name[i+1] = strdup(res->tkn_list[1]); \
-          } \
+        strncpy(str, val->v.strVal, sizeof(str)-1); \
+        str[sizeof(str)-1] = 0; \
+        if ((p=strchr(str, ' ')) == NULL && (p=strchr(str, '\t')) == NULL) { \
+          fprintf(stderr, "Error parsing %s\n", name); \
+          exit(1); \
+        } \
+        p[0] = 0; \
+        s_name[i] = strdup(str); \
+        j = 0; \
+        while(p[j]==' ' || p[j] == '\t') j++; \
+        s_name[i+1] = strdup(p+1); \
         i+=2; \
         if (i>=MAX_ENTRIES) \
           break; \
@@ -221,9 +228,9 @@ template_parse (const char *template)
   READ_MULTI_LINE("dns_name", cfg.dns_name);
   READ_MULTI_LINE("ip_address", cfg.ip_addr);
   READ_MULTI_LINE("email", cfg.email);
+  READ_MULTI_LINE("key_purpose_oid", cfg.key_purpose_oids);
   
   READ_MULTI_LINE_TOKENIZED("dn_oid", cfg.dn_oid);
-  READ_MULTI_LINE_TOKENIZED("key_purpose_oids", cfg.key_purpose_oids);
 
   val = optionGetValue(pov, "crl_dist_points");
   if (val != NULL && val->valType == OPARG_TYPE_STRING)
