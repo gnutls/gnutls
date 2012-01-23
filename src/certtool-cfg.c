@@ -124,7 +124,6 @@ cfg_init (void)
   { \
     char str[512]; \
     char * p; \
-    int j; \
     if (s_name == NULL) { \
       i = 0; \
       s_name = malloc(sizeof(char*)*MAX_ENTRIES); \
@@ -138,10 +137,14 @@ cfg_init (void)
           exit(1); \
         } \
         p[0] = 0; \
+        p++; \
         s_name[i] = strdup(str); \
-        j = 0; \
-        while(p[j]==' ' || p[j] == '\t') j++; \
-        s_name[i+1] = strdup(p+1); \
+        while(*p==' ' || *p == '\t') p++; \
+        if (p[0] == 0) { \
+          fprintf(stderr, "Error (2) parsing %s\n", name); \
+          exit(1); \
+        } \
+        s_name[i+1] = strdup(p); \
         i+=2; \
         if (i>=MAX_ENTRIES) \
           break; \
