@@ -3,8 +3,8 @@ prog-name     = psktool;
 prog-title    = "GnuTLS PSK tool";
 prog-desc     = "Program to create PSK parameters.\n";
 detail    = "Program  that generates random keys for use with TLS-PSK. The
-help-value = "h";
 keys are stored in hexadecimal format in a key file.";
+help-value = "h";
 short-usage   = "psktool [options]\npsktool --help for usage instructions.\n";
 prog-group    = "GnuTLS";
 explain       = "";
