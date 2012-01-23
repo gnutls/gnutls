@@ -37,11 +37,11 @@
 #include <read-file.h>
 
 #include <ocsptool-common.h>
-#include <ocsptool-gaa.h>
+#include <ocsptool-args.h>
 
-gaainfo info;
 FILE *outfile;
 FILE *infile;
+static unsigned int encoding;
 
 static void
 tls_log_func (int level, const char *str)
@@ -61,8 +61,8 @@ request_info (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "ocsp_req_init: %s", gnutls_strerror (ret));
 
-  if (info.req)
-    dat.data = (void*)read_binary_file (info.req, &size);
+  if (HAVE_OPT(LOAD_REQUEST))
+    dat.data = (void*)read_binary_file (OPT_ARG(LOAD_REQUEST), &size);
   else
     dat.data = (void*)fread_file (infile, &size);
   if (dat.data == NULL)
@@ -96,8 +96,8 @@ response_info (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "ocsp_resp_init: %s", gnutls_strerror (ret));
 
-  if (info.resp)
-    dat.data = (void*)read_binary_file (info.resp, &size);
+  if (HAVE_OPT(LOAD_RESPONSE))
+    dat.data = (void*)read_binary_file (OPT_ARG(LOAD_RESPONSE), &size);
   else
     dat.data = (void*)fread_file (infile, &size);
   if (dat.data == NULL)
@@ -127,24 +127,24 @@ load_issuer (void)
   gnutls_datum_t dat;
   size_t size;
 
-  if (info.issuer == NULL)
+  if (!HAVE_OPT(LOAD_ISSUER))
     error (EXIT_FAILURE, 0, "missing --load-issuer");
 
   ret = gnutls_x509_crt_init (&crt);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crt_init: %s", gnutls_strerror (ret));
 
-  dat.data = (void*)read_binary_file (info.issuer, &size);
+  dat.data = (void*)read_binary_file (OPT_ARG(LOAD_ISSUER), &size);
   dat.size = size;
 
   if (!dat.data)
-    error (EXIT_FAILURE, errno, "reading --load-issuer: %s", info.issuer);
+    error (EXIT_FAILURE, errno, "reading --load-issuer: %s", OPT_ARG(LOAD_ISSUER));
 
-  ret = gnutls_x509_crt_import (crt, &dat, info.inder);
+  ret = gnutls_x509_crt_import (crt, &dat, encoding);
   free (dat.data);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing --load-issuer: %s: %s",
-           info.issuer, gnutls_strerror (ret));
+           OPT_ARG(LOAD_ISSUER), gnutls_strerror (ret));
 
   return crt;
 }
@@ -157,24 +157,24 @@ load_cert (void)
   gnutls_datum_t dat;
   size_t size;
 
-  if (info.cert == NULL)
+  if (!HAVE_OPT(LOAD_CERT))
     error (EXIT_FAILURE, 0, "missing --load-cert");
 
   ret = gnutls_x509_crt_init (&crt);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "crt_init: %s", gnutls_strerror (ret));
 
-  dat.data = (void*)read_binary_file (info.cert, &size);
+  dat.data = (void*)read_binary_file (OPT_ARG(LOAD_CERT), &size);
   dat.size = size;
 
   if (!dat.data)
-    error (EXIT_FAILURE, errno, "reading --load-cert: %s", info.cert);
+    error (EXIT_FAILURE, errno, "reading --load-cert: %s", OPT_ARG(LOAD_CERT));
 
-  ret = gnutls_x509_crt_import (crt, &dat, info.inder);
+  ret = gnutls_x509_crt_import (crt, &dat, encoding);
   free (dat.data);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing --load-cert: %s: %s",
-           info.cert, gnutls_strerror (ret));
+           OPT_ARG(LOAD_CERT), gnutls_strerror (ret));
 
   return crt;
 }
@@ -202,7 +202,7 @@ generate_request (void)
   gnutls_x509_crt_deinit (cert);
   gnutls_x509_crt_deinit (issuer);
 
-  if (!info.nononce)
+  if (ENABLED_OPT(NONCE))
     {
       unsigned char noncebuf[23];
       gnutls_datum_t nonce = { noncebuf, sizeof (noncebuf) };
@@ -318,8 +318,8 @@ verify_response (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "ocsp_resp_init: %s", gnutls_strerror (ret));
 
-  if (info.resp)
-    dat.data = (void*)read_binary_file (info.resp, &size);
+  if (HAVE_OPT(LOAD_RESPONSE))
+    dat.data = (void*)read_binary_file (OPT_ARG(LOAD_RESPONSE), &size);
   else
     dat.data = (void*)fread_file (infile, &size);
   if (dat.data == NULL)
@@ -331,13 +331,11 @@ verify_response (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing response: %s", gnutls_strerror (ret));
 
-  if (info.trust && info.signer)
-    error (EXIT_FAILURE, 0, "cannot mix --load-trust and --load-signer");
-  else if (info.signer == NULL)
+  if (!HAVE_OPT(LOAD_SIGNER) && HAVE_OPT(LOAD_TRUST))
     {
-      dat.data = (void*)read_binary_file (info.trust, &size);
+      dat.data = (void*)read_binary_file (OPT_ARG(LOAD_TRUST), &size);
       if (dat.data == NULL)
-	error (EXIT_FAILURE, errno, "reading --load-trust: %s", info.trust);
+	error (EXIT_FAILURE, errno, "reading --load-trust: %s", OPT_ARG(LOAD_TRUST));
       dat.size = size;
 
       ret = gnutls_x509_trust_list_init (&list, 0);
@@ -351,7 +349,7 @@ verify_response (void)
 	error (EXIT_FAILURE, 0, "error parsing CAs: %s",
 	       gnutls_strerror (ret));
 
-      if (info.verbose)
+      if (HAVE_OPT(VERBOSE))
 	{
 	  unsigned int i;
 	  for (i = 0; i < x509_ncas; i++)
@@ -374,7 +372,7 @@ verify_response (void)
 	error (EXIT_FAILURE, 0, "gnutls_x509_trust_add_cas: %s",
 	       gnutls_strerror (ret));
 
-      if (info.verbose)
+      if (HAVE_OPT(VERBOSE))
 	fprintf (stdout, "Loaded %d trust anchors\n", x509_ncas);
 
       ret = gnutls_ocsp_resp_verify (resp, list, &verify, 0);
@@ -382,24 +380,24 @@ verify_response (void)
 	error (EXIT_FAILURE, 0, "gnutls_ocsp_resp_verify: %s",
 	       gnutls_strerror (ret));
     }
-  else if (info.trust == NULL)
+  else if (!HAVE_OPT(LOAD_TRUST) && HAVE_OPT(LOAD_SIGNER))
     {
       ret = gnutls_x509_crt_init (&signer);
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "crt_init: %s", gnutls_strerror (ret));
 
-      dat.data = (void*)read_binary_file (info.signer, &size);
+      dat.data = (void*)read_binary_file (OPT_ARG(LOAD_SIGNER), &size);
       if (dat.data == NULL)
-	error (EXIT_FAILURE, errno, "reading --load-signer: %s", info.signer);
+	error (EXIT_FAILURE, errno, "reading --load-signer: %s", OPT_ARG(LOAD_SIGNER));
       dat.size = size;
 
-      ret = gnutls_x509_crt_import (signer, &dat, info.inder);
+      ret = gnutls_x509_crt_import (signer, &dat, encoding);
       free (dat.data);
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "importing --load-signer: %s: %s",
-	       info.signer, gnutls_strerror (ret));
+	       OPT_ARG(LOAD_SIGNER), gnutls_strerror (ret));
 
-      if (info.verbose)
+      if (HAVE_OPT(VERBOSE))
 	{
 	  gnutls_datum_t out;
 
@@ -437,70 +435,47 @@ main (int argc, char **argv)
   if ((ret = gnutls_global_init ()) < 0)
     error (EXIT_FAILURE, 0, "global_init: %s", gnutls_strerror (ret));
 
-  if (gaa (argc, argv, &info) != -1)
-    {
-      fprintf (stderr, "Try `%s --help' for more information.\n",
-               program_name);
-      exit (EXIT_FAILURE);
-    }
+  optionProcess( &ocsptoolOptions, argc, argv);
 
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (info.debug);
+  gnutls_global_set_log_level (OPT_VALUE_DEBUG);
 
-  if (info.outfile)
+  if (HAVE_OPT(OUTFILE))
     {
-      outfile = fopen (info.outfile, "wb");
+      outfile = fopen (OPT_ARG(OUTFILE), "wb");
       if (outfile == NULL)
-        error (EXIT_FAILURE, errno, "%s", info.outfile);
+        error (EXIT_FAILURE, errno, "%s", OPT_ARG(OUTFILE));
     }
   else
     outfile = stdout;
 
-  if (info.infile)
+  if (HAVE_OPT(INFILE))
     {
-      infile = fopen (info.infile, "rb");
+      infile = fopen (OPT_ARG(INFILE), "rb");
       if (infile == NULL)
-        error (EXIT_FAILURE, errno, "%s", info.infile);
+        error (EXIT_FAILURE, errno, "%s", OPT_ARG(INFILE));
     }
   else
     infile = stdin;
 
-  if (info.inder)
-    info.inder = GNUTLS_X509_FMT_DER;
+  if (ENABLED_OPT(INDER))
+    encoding = GNUTLS_X509_FMT_DER;
   else
-    info.inder = GNUTLS_X509_FMT_PEM;
+    encoding = GNUTLS_X509_FMT_PEM;
 
-  switch (info.action)
+  if (HAVE_OPT(REQUEST_INFO))
+    request_info ();
+  else if (HAVE_OPT(RESPONSE_INFO))
+    response_info ();
+  else if (HAVE_OPT(GENERATE_REQUEST))
+    generate_request ();
+  else if (HAVE_OPT(VERIFY_RESPONSE))
+    verify_response ();
+  else 
     {
-    case ACTION_REQ_INFO:
-      request_info ();
-      break;
-
-    case ACTION_RESP_INFO:
-      response_info ();
-      break;
-
-    case ACTION_GEN_REQ:
-      generate_request ();
-      break;
-
-    case ACTION_VERIFY_RESP:
-      verify_response ();
-      break;
-
-    default:
-      gaa_help();
+      USAGE(1);
     }
 
   return 0;
 }
 
-void
-ocsptool_version (void)
-{
-  const char *p = PACKAGE_NAME;
-  if (strcmp (gnutls_check_version (NULL), PACKAGE_VERSION) != 0)
-    p = PACKAGE_STRING;
-  version_etc (stdout, "ocsptool", p, gnutls_check_version (NULL),
-               "Simon Josefsson", (char *) NULL);
-}

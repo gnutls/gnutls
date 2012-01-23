@@ -584,3 +584,7 @@ src/certtool-args.def
 src/certtool-args.h
 doc/manpages/certtool.1
 doc/stamp_enums
+src/ocsptool-args.c
+src/ocsptool-args.h
+src/ocsptool-args.def
+doc/manpages/ocsptool.1

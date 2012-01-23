@@ -73,10 +73,10 @@ endif
 
 if ENABLE_OCSP
 ocsptool_SOURCES = ocsptool.c ocsptool-common.h
-ocsptool_LDADD = ../lib/libgnutls.la libcmd-ocsp.la ../gl/libgnu.la
+ocsptool_LDADD = ../lib/libgnutls.la libcmd-ocsp.la ../gl/libgnu.la $(LIBOPTS_LDADD)
 noinst_LTLIBRARIES += libcmd-ocsp.la
 libcmd_ocsp_la_CFLAGS =
-libcmd_ocsp_la_SOURCES = ocsptool.gaa ocsptool-gaa.h ocsptool-gaa.c
+libcmd_ocsp_la_SOURCES = ocsptool-args.def ocsptool-args.h ocsptool-args.c
 endif
 
 psktool_SOURCES = psk.c
@@ -134,13 +134,11 @@ libcmd_p11tool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
 
 endif # ENABLE_PKCS11
 
-psk-gaa.c: $(srcdir)/psk.gaa
-	-$(GAA) $< -o psk-gaa.c -i psk-gaa.h
-ocsptool-gaa.c: $(srcdir)/ocsptool.gaa
-	-$(GAA) $< -o ocsptool-gaa.c -i ocsptool-gaa.h
+ocsptool-args.c: $(srcdir)/ocsptool-args.def
+	-autogen $<
 if ENABLE_PKCS11
-p11tool-gaa.c: $(srcdir)/p11tool.gaa
-	-$(GAA) $< -o p11tool-gaa.c -i p11tool-gaa.h
+p11tool-args.c: $(srcdir)/p11tool-args.def
+	-autogen $<
 endif
 psk-args.c: $(srcdir)/psk-args.def
 	-autogen $<
@@ -151,8 +149,6 @@ cli-args.c: $(srcdir)/cli-args.def
 serv-args.c: $(srcdir)/serv-args.def
 	-autogen $<
 srptool-args.c: $(srcdir)/srptool-args.def
-	-autogen $<
-p11tool-args.c: $(srcdir)/p11tool-args.def
 	-autogen $<
 certtool-args.c: $(srcdir)/certtool-args.def
 	-autogen $<

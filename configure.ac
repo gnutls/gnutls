@@ -488,6 +488,7 @@ AC_CONFIG_FILES([
   po/Makefile.in
   src/Makefile
   src/certtool-args.def
+  src/ocsptool-args.def
   src/cli-args.def
   src/serv-args.def
   src/cli-debug-args.def

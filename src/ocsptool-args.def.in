@@ -1,0 +1,164 @@
+AutoGen Definitions options;
+prog-name     = ocsptool;
+prog-title    = "GnuTLS OCSP tool";
+prog-desc     = "Program to handle OCSP request/responses.";
+help-value = "h";
+detail    = "Ocsptool can parse OCSP request/responses, generate OCSP requests and  verify OCSP responses.";
+
+short-usage   = "ocsptool [options]\nocsptool --help for usage instructions.\n";
+prog-group    = "GnuTLS";
+explain       = "";
+gnu-usage;
+no-xlate = opt;
+no-misuse-usage;
+disable-save;
+long-opts;
+config-header = 'config.h';
+export = '#include <gettext.h>';
+
+copyright = {
+    date  = "2012";
+    owner = "Free Software Foundation";
+    author = "Simon Josefsson and others; see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.";
+    eaddr  = "bug-gnutls@gnu.org";
+    type  = gpl;
+};
+version = "@VERSION@";
+
+flag = {
+    name      = debug;
+    value     = d;
+    arg-type  = number;
+    arg-default = 0;
+    arg-range = "0 -> 9999";
+    descrip   = "Enable debugging.";
+    doc       = "Specifies the debug level.";
+};
+
+flag = {
+    name      = verify-response;
+    value     = e;
+    descrip   = "Verify response";
+    doc = "";
+};
+
+flag = {
+    name      = request-info;
+    value     = i;
+    descrip   = "Print information on a OCSP request";
+    doc = "";
+};
+
+flag = {
+    name      = response-info;
+    value     = j;
+    descrip   = "Print information on a OCSP response";
+    doc = "";
+};
+
+flag = {
+    name      = generate-request;
+    value     = q;
+    descrip   = "Generate an OCSP request";
+    doc = "";
+};
+
+flag = {
+    name      = nonce;
+    disabled  = yes;
+    disable   = "no";
+    descrip   = "Don't add nonce to OCSP request";
+    doc = "";
+};
+
+flag = {
+    name      = load-issuer;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Read issuer certificate from file";
+    doc = "";
+};
+
+flag = {
+    name      = load-cert;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Read certificate to check from file";
+    doc = "";
+};
+
+flag = {
+    name      = load-trust;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Read OCSP trust anchors from file";
+    flags-cant = load-signer;
+    doc = "";
+};
+
+flag = {
+    name      = load-signer;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Read OCSP response signer from file";
+    flags-cant = load-trust;
+    doc = "";
+};
+
+flag = {
+    name      = inder;
+    disabled;
+    disable   = "no";
+    descrip   = "Use DER format for input certificates and private keys";
+    doc      = "";
+};
+
+flag = {
+    name      = load-request;
+    value     = Q;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Read DER encoded OCSP request from file";
+    doc      = "";
+};
+
+flag = {
+    name      = load-response;
+    value     = S;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Read DER encoded OCSP response from file";
+    doc      = "";
+};
+
+flag = {
+    name      = outfile;
+    arg-type  = string;
+    descrip   = "Output file";
+    doc      = "";
+};
+
+flag = {
+    name      = infile;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Input file";
+    doc   = "";
+};
+
+flag = {
+    name      = verbose;
+    value     = V;
+    max       = NOLIMIT;
+    descrip   = "More verbose output";
+    doc      = "";
+};
+
+doc-section = {
+  ds-type = 'SEE ALSO';
+  ds-format = 'man';
+  ds-text   = <<-_EOT_
+    certtool (1)
+_EOT_;
+};
+
