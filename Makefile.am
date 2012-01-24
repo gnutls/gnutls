@@ -21,19 +21,13 @@
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --disable-valgrind-tests
 
-SUBDIRS = gl lib extra po 
-
-if NEED_LIBOPTS
-SUBDIRS += libopts
-endif
-
-SUBDIRS += src doc tests
+SUBDIRS = gl lib extra po src doc tests
 
 if HAVE_GUILE
 SUBDIRS += guile
 endif
 
-ACLOCAL_AMFLAGS = -I m4 -I gl/m4
+ACLOCAL_AMFLAGS = -I m4 -I gl/m4 -I src/libopts/m4
 
 EXTRA_DIST = cfg.mk maint.mk .clcopying
 

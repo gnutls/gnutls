@@ -17,8 +17,12 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+SUBDIRS =
 if ENABLE_CRYWRAP
-SUBDIRS = crywrap
+SUBDIRS += crywrap
+endif
+if NEED_LIBOPTS
+SUBDIRS += $(LIBOPTS_DIR)
 endif
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
@@ -119,7 +123,6 @@ libcmd_certtool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
 # p11 tool
 if ENABLE_PKCS11
 
-p11tool_gaa_CFLAGS =
 p11tool_SOURCES = p11tool-args.def p11tool.c pkcs11.c certtool-common.c p11tool.h $(PKCS11_SRCS)
 p11tool_LDADD = ../lib/libgnutls.la $(LIBOPTS_LDADD)
 p11tool_LDADD += libcmd-p11tool.la ../gl/libgnu.la

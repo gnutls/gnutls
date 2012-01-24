@@ -148,7 +148,7 @@ fi
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 
 dnl Checks for programs in src/ 
-LIBOPTS_CHECK([libopts])
+LIBOPTS_CHECK([src/libopts])
 
 dnl Check for libcfg+
 SAVED_LIBS=$LIBS
@@ -291,16 +291,6 @@ dnl Programs for compilation or development
 AC_PROG_LN_S
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
-AC_PATH_PROG([GAA], [gaa])
-if test "x$GAA" = "x"; then
-   AC_MSG_WARN([[***
-*** GAA was not found.  It is only needed if you wish to modify
-*** the source code or command-line description files.  In this case,
-*** you may want to get it from http://gaa.sourceforge.net/ and
-*** read doc/README.gaa.
-***]])
-fi
-
 
 dnl Guile bindings.
 opt_guile_bindings=yes
@@ -481,20 +471,20 @@ AC_CONFIG_FILES([
   po/Makefile.in
   src/Makefile
   src/certtool-args.def
-  src/ocsptool-args.def
   src/cli-args.def
-  src/serv-args.def
   src/cli-debug-args.def
-  src/srptool-args.def
+  src/crywrap/Makefile
+  src/ocsptool-args.def
   src/p11tool-args.def
   src/psk-args.def
-  src/crywrap/Makefile
+  src/serv-args.def
+  src/srptool-args.def
   tests/Makefile
+  tests/cert-tests/Makefile
   tests/dsa/Makefile
   tests/ecdsa/Makefile
   tests/key-id/Makefile
   tests/openpgp-certs/Makefile
-  tests/cert-tests/Makefile
   tests/pkcs1-padding/Makefile
   tests/pkcs12-decode/Makefile
   tests/pkcs8-decode/Makefile
