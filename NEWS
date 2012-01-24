@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.0.13 (unreleased)
 
+** command line apps: Use gnu autogen (libopts) to parse command
+line arguments and template files.
+
 ** libgnutls: SUITEB128 and SUITEB192 priority strings account
 for the RFC6460 requirements.
 
