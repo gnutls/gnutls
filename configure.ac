@@ -45,16 +45,9 @@ AC_SUBST(MINOR_VERSION, `echo $PACKAGE_VERSION | sed 's/.*\.\(.*\)\..*/\1/g'`)
 AC_SUBST(PATCH_VERSION, `echo $PACKAGE_VERSION | sed 's/.*\..*\.\(.*\)/\1/g'`)
 AC_SUBST(NUMBER_VERSION, `printf "0x%02x%02x%02x" $MAJOR_VERSION $MINOR_VERSION $PATCH_VERSION`)
 
-
 dnl C and C++ capabilities
 AC_C_INLINE
 AC_HEADER_STDC
-AC_DEFINE([HAVE_STRINGS_H], 1, [Hard-code for src/cfg/.])
-AC_DEFINE([HAVE_FLOAT_H], 1, [Hard-code for src/cfg/.])
-AC_DEFINE([HAVE_LIMITS_H], 1, [Hard-code for src/cfg/.])
-AC_DEFINE([HAVE_MATH_H], 1, [Hard-code for src/cfg/.])
-AC_DEFINE([HAVE_CTYPE_H], 1, [Hard-code for src/cfg/.])
-AC_DEFINE([HAVE_ERRNO_H], 1, [Hard-code for src/cfg/.])
 
 # For the C++ code
 AC_ARG_ENABLE(cxx,
@@ -495,9 +488,6 @@ AC_CONFIG_FILES([
   src/srptool-args.def
   src/p11tool-args.def
   src/psk-args.def
-  src/cfg/Makefile
-  src/cfg/platon/Makefile
-  src/cfg/platon/str/Makefile
   src/crywrap/Makefile
   tests/Makefile
   tests/dsa/Makefile
