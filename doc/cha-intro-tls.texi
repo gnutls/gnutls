@@ -220,7 +220,7 @@ encrypted packet.
 Those weaknesses were solved in @acronym{TLS} 1.1 @xcite{RFC4346}
 which is implemented in @acronym{GnuTLS}. For this reason we suggest
 to always negotiate the highest supported TLS version with the 
-peer@foonote{If this is not possible then please consult @ref{Interoperability}.}.
+peer@footnote{If this is not possible then please consult @ref{Interoperability}.}.
 For a detailed discussion of the issues see the archives of the TLS 
 Working Group mailing list and @xcite{CBCATT}.
 
