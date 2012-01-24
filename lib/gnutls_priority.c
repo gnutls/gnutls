@@ -1128,3 +1128,108 @@ void _gnutls_priority_prefer_aes_gcm(void)
   cipher_priority_performance = cipher_priority_performance_hw_aes;
   cipher_priority_normal = cipher_priority_normal_hw_aes;
 }
+
+/**
+ * gnutls_priority_ecc_curve_list:
+ * @pcache: is a #gnutls_prioritity_t structure.
+ * @list: will point to an integer list
+ *
+ * Get a list of available elliptic curves in the priority
+ * structure. 
+ *
+ * Returns: the number of curves, or an error code.
+ * Since: 3.0.0
+ **/
+int
+gnutls_priority_ecc_curve_list (gnutls_priority_t pcache, const unsigned int** list)
+{
+  if (pcache->supported_ecc.algorithms == 0)
+    return 0;
+  
+  *list = pcache->supported_ecc.priority;
+  return pcache->supported_ecc.algorithms;
+}
+
+/**
+ * gnutls_priority_compression_list:
+ * @pcache: is a #gnutls_prioritity_t structure.
+ * @list: will point to an integer list
+ *
+ * Get a list of available compression method in the priority
+ * structure. 
+ *
+ * Returns: the number of methods, or an error code.
+ * Since: 3.0.0
+ **/
+int
+gnutls_priority_compression_list (gnutls_priority_t pcache, const unsigned int** list)
+{
+  if (pcache->compression.algorithms == 0)
+    return 0;
+  
+  *list = pcache->compression.priority;
+  return pcache->compression.algorithms;
+}
+
+/**
+ * gnutls_priority_protocol_list:
+ * @pcache: is a #gnutls_prioritity_t structure.
+ * @list: will point to an integer list
+ *
+ * Get a list of available TLS version numbers in the priority
+ * structure. 
+ *
+ * Returns: the number of protocols, or an error code.
+ * Since: 3.0.0
+ **/
+int
+gnutls_priority_protocol_list (gnutls_priority_t pcache, const unsigned int** list)
+{
+  if (pcache->protocol.algorithms == 0)
+    return 0;
+  
+  *list = pcache->protocol.priority;
+  return pcache->protocol.algorithms;
+}
+
+/**
+ * gnutls_priority_sign_list:
+ * @pcache: is a #gnutls_prioritity_t structure.
+ * @list: will point to an integer list
+ *
+ * Get a list of available signature algorithms in the priority
+ * structure. 
+ *
+ * Returns: the number of algorithms, or an error code.
+ * Since: 3.0.0
+ **/
+int
+gnutls_priority_sign_list (gnutls_priority_t pcache, const unsigned int** list)
+{
+  if (pcache->sign_algo.algorithms == 0)
+    return 0;
+  
+  *list = pcache->sign_algo.priority;
+  return pcache->sign_algo.algorithms;
+}
+
+/**
+ * gnutls_priority_certificate_type_list:
+ * @pcache: is a #gnutls_prioritity_t structure.
+ * @list: will point to an integer list
+ *
+ * Get a list of available certificate types in the priority
+ * structure. 
+ *
+ * Returns: the number of certificate types, or an error code.
+ * Since: 3.0.0
+ **/
+int
+gnutls_priority_certificate_type_list (gnutls_priority_t pcache, const unsigned int** list)
+{
+  if (pcache->cert_type.algorithms == 0)
+    return 0;
+  
+  *list = pcache->cert_type.priority;
+  return pcache->cert_type.algorithms;
+}

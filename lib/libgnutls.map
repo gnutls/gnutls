@@ -766,6 +766,11 @@ GNUTLS_3_0_0 {
 	gnutls_x509_crt_get_authority_key_gn_serial;
 	gnutls_x509_crl_get_authority_key_gn_serial;
 	gnutls_ecc_curve_list;
+	gnutls_priority_certificate_type_list;
+	gnutls_priority_sign_list;
+	gnutls_priority_protocol_list;
+	gnutls_priority_compression_list;
+	gnutls_priority_ecc_curve_list;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {
