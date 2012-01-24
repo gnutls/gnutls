@@ -923,11 +923,11 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                   const char *priorities,
                                   const char **err_pos);
 
-  int gnutls_priority_get_certificate_type_list (gnutls_priority_t pcache, const unsigned int** list);
-  int gnutls_priority_get_sign_list (gnutls_priority_t pcache, const unsigned int** list);
-  int gnutls_priority_get_protocol_list (gnutls_priority_t pcache, const unsigned int** list);
-  int gnutls_priority_get_compression_list (gnutls_priority_t pcache, const unsigned int** list);
-  int gnutls_priority_get_ecc_curve_list (gnutls_priority_t pcache, const unsigned int** list);
+  int gnutls_priority_certificate_type_list (gnutls_priority_t pcache, const unsigned int** list);
+  int gnutls_priority_sign_list (gnutls_priority_t pcache, const unsigned int** list);
+  int gnutls_priority_protocol_list (gnutls_priority_t pcache, const unsigned int** list);
+  int gnutls_priority_compression_list (gnutls_priority_t pcache, const unsigned int** list);
+  int gnutls_priority_ecc_curve_list (gnutls_priority_t pcache, const unsigned int** list);
 
   /* for compatibility
    */
