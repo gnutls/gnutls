@@ -505,14 +505,6 @@ print_info (gnutls_session_t session, const char *hostname, int insecure)
 
   if (verbose)
     {
-      unsigned char id[32];
-      size_t id_size = sizeof (id);
-      gnutls_session_get_id (session, id, &id_size);
-      printf ("- Session ID: %s\n", raw_to_string (id, id_size));
-    }
-
-  if (verbose)
-    {
       gnutls_datum_t cb;
       int rc;
 

@@ -828,9 +828,6 @@ main (int argc, char **argv)
           session_id = malloc (session_id_size);
           gnutls_session_get_id (hd.session, session_id, &session_id_size);
 
-          /* print some information */
-          print_info (hd.session, hostname, HAVE_OPT(INSECURE));
-
           printf ("- Disconnecting\n");
           socket_bye (&hd);
 
