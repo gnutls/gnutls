@@ -153,12 +153,16 @@ extern "C"
   int gnutls_x509_crt_set_authority_key_id (gnutls_x509_crt_t cert,
                                             const void *id, size_t id_size);
   int gnutls_x509_crt_get_authority_key_id (gnutls_x509_crt_t cert,
-                                            void *ret, size_t * ret_size,
+                                            void *id, size_t * id_size,
                                             unsigned int *critical);
-  int gnutls_x509_crt_get_authority_key_gn_serial (gnutls_x509_crt_t cert, unsigned int seq, 
-                            void *alt, size_t * alt_size, unsigned int *alt_type, 
-                            void* serial, size_t *serial_size,
-                            unsigned int *critical);
+  int gnutls_x509_crt_get_authority_key_gn_serial (gnutls_x509_crt_t cert,
+						   unsigned int seq,
+						   void *alt,
+						   size_t * alt_size,
+						   unsigned int *alt_type,
+						   void* serial,
+						   size_t *serial_size,
+						   unsigned int *critical);
 
   int gnutls_x509_crt_get_subject_key_id (gnutls_x509_crt_t cert,
                                           void *ret, size_t * ret_size,
@@ -247,13 +251,13 @@ extern "C"
                                       gnutls_datum_t * g, gnutls_datum_t * y);
 
   int gnutls_x509_crt_get_subject_alt_name (gnutls_x509_crt_t cert,
-                                            unsigned int seq, void *ret,
-                                            size_t * ret_size,
+                                            unsigned int seq, void *san,
+                                            size_t * san_size,
                                             unsigned int *critical);
   int gnutls_x509_crt_get_subject_alt_name2 (gnutls_x509_crt_t cert,
-                                             unsigned int seq, void *ret,
-                                             size_t * ret_size,
-                                             unsigned int *ret_type,
+                                             unsigned int seq, void *san,
+                                             size_t * san_size,
+                                             unsigned int *san_type,
                                              unsigned int *critical);
 
   int gnutls_x509_crt_get_subject_alt_othername_oid (gnutls_x509_crt_t cert,
@@ -262,13 +266,13 @@ extern "C"
                                                      size_t * oid_size);
 
   int gnutls_x509_crt_get_issuer_alt_name (gnutls_x509_crt_t cert,
-                                           unsigned int seq, void *ret,
-                                           size_t * ret_size,
+                                           unsigned int seq, void *ian,
+                                           size_t * ian_size,
                                            unsigned int *critical);
   int gnutls_x509_crt_get_issuer_alt_name2 (gnutls_x509_crt_t cert,
-                                            unsigned int seq, void *ret,
-                                            size_t * ret_size,
-                                            unsigned int *ret_type,
+                                            unsigned int seq, void *ian,
+                                            size_t * ian_size,
+                                            unsigned int *ian_type,
                                             unsigned int *critical);
 
   int gnutls_x509_crt_get_issuer_alt_othername_oid (gnutls_x509_crt_t cert,
@@ -500,13 +504,17 @@ extern "C"
   int gnutls_x509_crl_set_crt (gnutls_x509_crl_t crl,
                                gnutls_x509_crt_t crt, time_t revocation_time);
 
-  int gnutls_x509_crl_get_authority_key_id (gnutls_x509_crl_t crl, void *ret,
-                                            size_t * ret_size,
+  int gnutls_x509_crl_get_authority_key_id (gnutls_x509_crl_t crl, void *id,
+                                            size_t * id_size,
                                             unsigned int *critical);
-  int gnutls_x509_crl_get_authority_key_gn_serial (gnutls_x509_crl_t crl, unsigned int seq, void *alt,
-                            size_t * alt_size, unsigned int *alt_type, 
-                            void* serial, size_t *serial_size,
-                            unsigned int *critical);
+  int gnutls_x509_crl_get_authority_key_gn_serial (gnutls_x509_crl_t crl,
+						   unsigned int seq,
+						   void *alt,
+						   size_t * alt_size,
+						   unsigned int *alt_type,
+						   void* serial,
+						   size_t *serial_size,
+						   unsigned int *critical);
 
   int gnutls_x509_crl_get_number (gnutls_x509_crl_t crl, void *ret,
                                   size_t * ret_size, unsigned int *critical);

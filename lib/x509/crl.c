@@ -776,13 +776,17 @@ _get_authority_key_id (gnutls_x509_crl_t cert, ASN1_TYPE *c2,
  * Since: 3.0.0
  **/
 int
-gnutls_x509_crl_get_authority_key_gn_serial (gnutls_x509_crl_t crl, unsigned int seq, void *alt,
-                            size_t * alt_size, unsigned int *alt_type, 
-                            void* serial, size_t *serial_size,
-                            unsigned int *critical)
+gnutls_x509_crl_get_authority_key_gn_serial (gnutls_x509_crl_t crl,
+					     unsigned int seq,
+					     void *alt,
+					     size_t * alt_size,
+					     unsigned int *alt_type,
+					     void* serial,
+					     size_t *serial_size,
+					     unsigned int *critical)
 {
-int ret, result, len;
-ASN1_TYPE c2;
+  int ret, result, len;
+  ASN1_TYPE c2;
 
   ret = _get_authority_key_id(crl, &c2, critical);
   if (ret < 0)
