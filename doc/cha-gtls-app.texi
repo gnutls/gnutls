@@ -940,8 +940,8 @@ or by using the priority functions as in @ref{Listing the ciphersuites in a prio
 
 Example priority strings are:
 @example
-The default priority:
-    "NORMAL"
+The default priority without the HMAC-MD5:
+    "NORMAL:-MD5"
 
 Specifying RSA with AES-128-CBC:
     "NONE:+VERS-TLS-ALL:+MAC-ALL:+RSA:+AES-128-CBC:+SIGN-ALL:+COMP-NULL"
