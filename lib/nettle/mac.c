@@ -20,7 +20,7 @@
  *
  */
 
-/* This file provides is the backend hash/mac API for libgcrypt.
+/* This file provides the backend hash/mac API for nettle.
  */
 
 #include <gnutls_int.h>

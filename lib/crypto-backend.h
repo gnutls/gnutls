@@ -161,8 +161,8 @@
     int (*bigint_prime_check) (const bigint_t pp);
     int (*bigint_generate_group) (gnutls_group_st * gg, unsigned int bits);
 
-    /* reads an bigint from a buffer */
-    /* stores an bigint into the buffer.  returns
+    /* reads a bigint from a buffer */
+    /* stores a bigint into the buffer.  returns
      * GNUTLS_E_SHORT_MEMORY_BUFFER if buf_size is not sufficient to
      * store this integer, and updates the buf_size;
      */

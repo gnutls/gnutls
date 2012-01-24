@@ -399,7 +399,7 @@ and leave the rest of subsystem intact.
 @subsubheading Overriding the cryptographic library
 In some systems, that might contain a broad acceleration engine, it 
 might be desirable to override big parts of the cryptographic backend, 
-or even all of them. T following functions are provided for this reason.
+or even all of them. The following functions are provided for this reason.
 
 @itemize
 

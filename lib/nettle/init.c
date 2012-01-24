@@ -25,7 +25,7 @@
 #include <gnutls_num.h>
 #include <gnutls_mpi.h>
 
-/* Functions that refer to the initialization of the libgcrypt library.
+/* Functions that refer to the initialization of the nettle library.
  */
 
 int

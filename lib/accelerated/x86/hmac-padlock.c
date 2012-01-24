@@ -20,7 +20,8 @@
  *
  */
 
-/* This file provides is the backend hash/mac API for libgcrypt.
+/* This file provides the backend hash/mac implementation for
+ * VIA Padlock hardware acceleration.
  */
 
 #include <gnutls_int.h>

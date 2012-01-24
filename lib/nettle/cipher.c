@@ -35,7 +35,7 @@
 #include <nettle/cbc.h>
 #include <nettle/gcm.h>
 
-/* Functions that refer to the libgcrypt library.
+/* Functions that refer to the nettle library.
  */
 
 #define MAX_BLOCK_SIZE 32

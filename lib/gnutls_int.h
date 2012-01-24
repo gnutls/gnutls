@@ -383,7 +383,7 @@ struct gnutls_key_st
    */
   /* auth_info_t structures SHOULD NOT contain malloced 
    * elements. Check gnutls_session_pack.c, and gnutls_auth.c.
-   * Rememember that this should be calloced!
+   * Remember that this should be calloced!
    */
   void *auth_info;
   gnutls_credentials_type_t auth_info_type;
@@ -797,7 +797,7 @@ typedef struct
    */
   gnutls_openpgp_recv_key_func openpgp_recv_key_func;
 
-  /* If non zero the server will not advertize the CA's he
+  /* If non zero the server will not advertise the CA's he
    * trusts (do not send an RDN sequence).
    */
   int ignore_rdn_sequence;
@@ -880,7 +880,7 @@ struct gnutls_session_int
  */
 void _gnutls_free_auth_info (gnutls_session_t session);
 
-/* These two macros return the advertized TLS version of
+/* These two macros return the advertised TLS version of
  * the peer.
  */
 #define _gnutls_get_adv_version_major( session) \

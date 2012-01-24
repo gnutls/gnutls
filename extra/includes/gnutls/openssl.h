@@ -25,7 +25,7 @@
 
 /* This file contains prototypes about the OpenSSL compatibility layer
  * in GnuTLS.  GnuTLS is not a complete replacement of OPENSSL so this
- * compatibility layer only support limited OpenSSL functionality.
+ * compatibility layer only supports limited OpenSSL functionality.
  *
  * New programs should avoid using this compatibility layer, and use
  * the native GnuTLS API directly.
@@ -41,7 +41,7 @@ extern "C"
 
 #include <gnutls/gnutls.h>
 
-/* Extra definitions that do not longer exist in gnutls.
+/* Extra definitions that no longer exist in gnutls.
  */
 #define GNUTLS_X509_CN_SIZE 256
 #define GNUTLS_X509_C_SIZE 3
