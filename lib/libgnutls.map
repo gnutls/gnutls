@@ -765,6 +765,7 @@ GNUTLS_3_0_0 {
 	gnutls_pkcs11_reinit;
 	gnutls_x509_crt_get_authority_key_gn_serial;
 	gnutls_x509_crl_get_authority_key_gn_serial;
+	gnutls_ecc_curve_list;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

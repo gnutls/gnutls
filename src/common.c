@@ -703,6 +703,20 @@ print_list (const char* priorities, int verbose)
   }
 
   {
+    const gnutls_ecc_curve_t *p = gnutls_ecc_curve_list ();
+
+    printf ("Elliptic curves: ");
+    for (; *p; p++)
+      {
+        printf ("CURVE-%s", gnutls_ecc_curve_get_name (*p));
+        if (*(p + 1))
+          printf (", ");
+        else
+          printf ("\n");
+      }
+  }
+
+  {
     const gnutls_pk_algorithm_t *p = gnutls_pk_list ();
 
     printf ("Public Key Systems: ");

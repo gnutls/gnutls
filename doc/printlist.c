@@ -145,6 +145,18 @@ static void main_texinfo (void)
   }
 
   {
+    const gnutls_ecc_curve_t *p = gnutls_ecc_curve_list ();
+
+    printf ("\n@heading Elliptic curves\n@table @code\n");
+    for (; *p; p++)
+      {
+        printf ("@item %s\n", gnutls_ecc_curve_get_name (*p));
+      }
+    printf ("@end table\n");
+  }
+
+
+  {
     const gnutls_compression_method_t *p = gnutls_compression_list ();
 
     printf ("\n@heading Compression methods\n@table @code\n");

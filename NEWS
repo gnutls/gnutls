@@ -25,6 +25,7 @@ a fork.
 gnutls_x509_crt_get_authority_key_gn_serial: Added
 gnutls_x509_crl_get_authority_key_gn_serial: Added
 gnutls_pkcs11_reinit: Added
+gnutls_ecc_list: Added
 
 * Version 3.0.12 (released 2012-01-20)
 

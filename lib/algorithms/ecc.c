@@ -121,6 +121,34 @@ _gnutls_tls_id_to_ecc_curve (int num)
   return ret;
 }
 
+/**
+ * gnutls_ecc_curve_list:
+ *
+ * Get the list of supported elliptic curves.
+ *
+ * This function is not thread safe.
+ *
+ * Returns: Return a (0)-terminated list of #gnutls_ecc_curve_t
+ *   integers indicating the available curves.
+ **/
+const gnutls_ecc_curve_t *
+gnutls_ecc_curve_list (void)
+{
+static gnutls_ecc_curve_t supported_curves[MAX_ALGOS] = { 0 };
+
+  if (supported_curves[0] == 0)
+    {
+      int i = 0;
+
+      GNUTLS_ECC_CURVE_LOOP ( 
+        supported_curves[i++]=p->id;
+      );
+      supported_curves[i++]=0;
+    }
+
+  return supported_curves;
+}
+
 /* Maps numbers to TLS NamedCurve IDs (RFC4492).
  * Returns a negative number on error.
  */
