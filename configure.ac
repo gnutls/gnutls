@@ -150,27 +150,6 @@ AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 dnl Checks for programs in src/ 
 LIBOPTS_CHECK([src/libopts])
 
-dnl Check for libcfg+
-SAVED_LIBS=$LIBS
-AC_ARG_WITH(included-libcfg,
-	AS_HELP_STRING([--with-included-libcfg],
-		[use the included libcfg+ (certtool only)]),
-	libcfg_enabled=$withval, 
-	libcfg_enabled=no
-dnl We search for libcfg+ which is used by certtool
-dnl
-	AC_CHECK_LIB(cfg+, cfg_get_context,:,
-                     libcfg_enabled=yes
-                     AC_MSG_WARN([[
-*** 
-*** Libcfg+ was not found. Will use the included one.]])))
-
-AM_CONDITIONAL(HAVE_LIBCFG, test "$libcfg_enabled" = "no")
-LIBS=$SAVED_LIBS
-
-AC_MSG_CHECKING([whether to use the included libcfg])
-AC_MSG_RESULT($libcfg_enabled)
-
 AC_CHECK_TYPE(ssize_t,
   [
     DEFINE_SSIZE_T="#include <sys/types.h>"
