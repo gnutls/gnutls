@@ -770,14 +770,14 @@ update-makefile:
 
 doit:
 	@echo -n "Creating man pages for gnutls.h..." && \
-	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/gnutls.h`; do \
+	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/gnutls.h.in`; do \
 		$(top_srcdir)/doc/scripts/gdoc -man \
 			-module $(PACKAGE) -sourceversion $(VERSION) \
 			-bugsto $(PACKAGE_BUGREPORT) \
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/gnutls.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation" \
+			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
 		echo -n "."; \
@@ -791,7 +791,7 @@ doit:
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/compat.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation" \
+			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
 		echo -n "."; \
@@ -805,7 +805,7 @@ doit:
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/x509.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation" \
+			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
 		echo -n "."; \
@@ -819,7 +819,7 @@ doit:
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/ocsp.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation" \
+			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
 		echo -n "."; \
@@ -833,7 +833,7 @@ doit:
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/abstract.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation" \
+			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
 		echo -n "."; \
@@ -847,7 +847,7 @@ doit:
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/pkcs12.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation" \
+			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
 		echo -n "."; \
@@ -861,7 +861,7 @@ doit:
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/pkcs11.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation" \
+			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
 		echo -n "."; \
@@ -875,7 +875,7 @@ doit:
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/dtls.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation" \
+			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
 		echo -n "."; \
@@ -889,7 +889,7 @@ doit:
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/openpgp.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation" \
+			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
 		echo -n "."; \
@@ -903,7 +903,7 @@ doit:
 			-pkg-name "$(PACKAGE_NAME)" \
 			-include "gnutls/crypto.h" \
 			-seeinfo $(PACKAGE) -verbatimcopying \
-			-copyright "2012 Free Software Foundation" \
+			-copyright "2012 Free Software Foundation, Inc." \
 			-function $$i \
 			$(top_srcdir)/lib/*.c $(top_srcdir)/lib/*/*.c > $$i.3 2>/dev/null && \
 		echo -n "."; \
