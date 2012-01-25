@@ -20,7 +20,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
-	template-test.key template-test.pem    
+	template-test.key template-test.pem template-test.tmpl
 
 dist_check_SCRIPTS = pathlen aki template-test
 

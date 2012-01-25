@@ -295,7 +295,7 @@ ENUMS += enums/gnutls_x509_crt_fmt_t
 ENUMS += enums/gnutls_x509_subject_alt_name_t
 
 gnutls_TEXINFOS += $(ENUMS)
-DISTCLEANFILES += $(ENUMS)
+DISTCLEANFILES += $(ENUMS) stamp_enums
 
 stamp_enums: enums.texi
 	$(MAKE) compare-makefile
