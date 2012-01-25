@@ -100,6 +100,8 @@ doit (void)
       if(debug)
         success("success\n");
     }
+
+  gnutls_global_deinit ();
 }
 #else
 void

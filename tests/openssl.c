@@ -54,4 +54,6 @@ doit (void)
     }
   else if (debug)
     success ("MD5 OK\n");
+
+  gnutls_global_deinit ();
 }

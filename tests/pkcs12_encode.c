@@ -89,7 +89,6 @@ doit (void)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "gnutls_global_init %d", ret);
 
-  gnutls_global_init ();
   gnutls_global_set_log_function (tls_log_func);
   if (debug)
     gnutls_global_set_log_level (4711);
@@ -179,5 +178,4 @@ doit (void)
   gnutls_x509_crt_deinit (client);
   gnutls_x509_crt_deinit (ca);
   gnutls_global_deinit ();
-
 }

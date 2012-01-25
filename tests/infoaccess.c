@@ -231,6 +231,8 @@ doit (void)
     }
   gnutls_free (data.data);
 
+  gnutls_x509_crt_deinit (crt);
+
   gnutls_global_deinit ();
 
 }

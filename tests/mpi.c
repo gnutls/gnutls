@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2007-2012 Free Software Foundation, Inc.
  *
- * Author: Simon Josefsson
+ * Author: Nikos Mavrogiannopoulos, Simon Josefsson
  *
  * This file is part of GnuTLS.
  *
@@ -82,6 +82,8 @@ doit (void)
   _gnutls_mpi_release (&n2);
   _gnutls_mpi_release (&n3);
   _gnutls_mpi_release (&n4);
+
+  gnutls_global_deinit ();
 
   if (debug) success ("mpi ops ok\n");
 }

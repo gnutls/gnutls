@@ -266,6 +266,8 @@ doit ()
         }
 
     }
+
+  gnutls_global_deinit ();
 }
 #else
 void

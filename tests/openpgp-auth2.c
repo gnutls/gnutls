@@ -249,6 +249,8 @@ doit ()
       else
         fail ("child failed: %d\n", status);
     }
+
+  gnutls_global_deinit ();
 }
 #else
 void
