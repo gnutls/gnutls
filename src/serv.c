@@ -40,6 +40,7 @@
 #include <list.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <socket.h>
 
 /* Gnulib portability files. */
 #include "progname.h"
@@ -58,7 +59,7 @@ static int http = 0;
 static int x509ctype;
 static int debug = 0;
 
-int verbose = 1;
+unsigned int verbose = 1;
 static int nodb;
 static int noticket;
 int require_cert;
@@ -911,7 +912,6 @@ main (int argc, char **argv)
   cmd_parser(argc, argv);
 
 #ifndef _WIN32
-  signal (SIGPIPE, SIG_IGN);
   signal (SIGHUP, SIG_IGN);
   signal (SIGTERM, terminate);
   if (signal (SIGINT, terminate) == SIG_IGN)

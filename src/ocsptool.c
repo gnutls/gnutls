@@ -35,6 +35,7 @@
 #include <progname.h>
 #include <version-etc.h>
 #include <read-file.h>
+#include <socket.h>
 
 #include <ocsptool-common.h>
 #include <ocsptool-args.h>
@@ -42,6 +43,7 @@
 FILE *outfile;
 FILE *infile;
 static unsigned int encoding;
+unsigned int verbose = 0;
 
 static void
 tls_log_func (int level, const char *str)
@@ -85,16 +87,38 @@ request_info (void)
 }
 
 static void
-response_info (void)
+_response_info (const gnutls_datum_t* data)
 {
   gnutls_ocsp_resp_t resp;
   int ret;
-  gnutls_datum_t dat;
-  size_t size;
+  gnutls_datum buf;
 
   ret = gnutls_ocsp_resp_init (&resp);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "ocsp_resp_init: %s", gnutls_strerror (ret));
+
+  ret = gnutls_ocsp_resp_import (resp, data);
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "importing response: %s", gnutls_strerror (ret));
+
+  if (ENABLED_OPT(VERBOSE))
+    ret = gnutls_ocsp_resp_print (resp, GNUTLS_OCSP_PRINT_FULL, &buf);
+  else
+    ret = gnutls_ocsp_resp_print (resp, GNUTLS_OCSP_PRINT_COMPACT, &buf);
+  if (ret != 0)
+    error (EXIT_FAILURE, 0, "ocsp_resp_print: %s", gnutls_strerror (ret));
+
+  printf ("%.*s", buf.size, buf.data);
+  gnutls_free (buf.data);
+
+  gnutls_ocsp_resp_deinit (resp);
+}
+
+static void
+response_info (void)
+{
+  gnutls_datum_t dat;
+  size_t size;
 
   if (HAVE_OPT(LOAD_RESPONSE))
     dat.data = (void*)read_binary_file (OPT_ARG(LOAD_RESPONSE), &size);
@@ -104,19 +128,8 @@ response_info (void)
     error (EXIT_FAILURE, errno, "reading response");
   dat.size = size;
 
-  ret = gnutls_ocsp_resp_import (resp, &dat);
-  free (dat.data);
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "importing response: %s", gnutls_strerror (ret));
-
-  ret = gnutls_ocsp_resp_print (resp, GNUTLS_OCSP_PRINT_FULL, &dat);
-  if (ret != 0)
-    error (EXIT_FAILURE, 0, "ocsp_resp_print: %s", gnutls_strerror (ret));
-
-  printf ("%.*s", dat.size, dat.data);
+  _response_info(&dat);
   gnutls_free (dat.data);
-
-  gnutls_ocsp_resp_deinit (resp);
 }
 
 static gnutls_x509_crt_t
@@ -180,7 +193,7 @@ load_cert (void)
 }
 
 static void
-generate_request (void)
+_generate_request (gnutls_datum_t * rdata)
 {
   gnutls_ocsp_req_t req;
   int ret;
@@ -193,14 +206,14 @@ generate_request (void)
 
   issuer = load_issuer ();
   cert = load_cert ();
-
+  
   ret = gnutls_ocsp_req_add_cert (req, GNUTLS_DIG_SHA1,
-				  issuer, cert);
+  				      issuer, cert);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "ocsp_req_add_cert: %s", gnutls_strerror (ret));
-
-  gnutls_x509_crt_deinit (cert);
+    
   gnutls_x509_crt_deinit (issuer);
+  gnutls_x509_crt_deinit (cert);
 
   if (ENABLED_OPT(NONCE))
     {
@@ -221,12 +234,24 @@ generate_request (void)
   if (ret != 0)
     error (EXIT_FAILURE, 0, "ocsp_req_export: %s", gnutls_strerror (ret));
 
+  gnutls_ocsp_req_deinit (req);
+
+  memcpy(rdata, &dat, sizeof(*rdata));
+  return;
+}
+
+static void
+generate_request (void)
+{
+  gnutls_datum_t dat;
+  
+  _generate_request(&dat);
+
   fwrite (dat.data, 1, dat.size, outfile);
 
   gnutls_free (dat.data);
-
-  gnutls_ocsp_req_deinit (req);
 }
+
 
 static void
 print_verify_res (unsigned int output)
@@ -301,33 +326,24 @@ print_verify_res (unsigned int output)
     }
 }
 
-static void
-verify_response (void)
+static int
+_verify_response (gnutls_datum_t *data)
 {
   gnutls_ocsp_resp_t resp;
   int ret;
-  gnutls_datum_t dat;
   size_t size;
   gnutls_x509_crt_t *x509_ca_list = NULL;
   unsigned int x509_ncas = 0;
   gnutls_x509_trust_list_t list;
   gnutls_x509_crt_t signer;
   unsigned verify;
+  gnutls_datum_t dat;
 
   ret = gnutls_ocsp_resp_init (&resp);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "ocsp_resp_init: %s", gnutls_strerror (ret));
 
-  if (HAVE_OPT(LOAD_RESPONSE))
-    dat.data = (void*)read_binary_file (OPT_ARG(LOAD_RESPONSE), &size);
-  else
-    dat.data = (void*)fread_file (infile, &size);
-  if (dat.data == NULL)
-    error (EXIT_FAILURE, errno, "reading response");
-  dat.size = size;
-
-  ret = gnutls_ocsp_resp_import (resp, &dat);
-  free (dat.data);
+  ret = gnutls_ocsp_resp_import (resp, data);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing response: %s", gnutls_strerror (ret));
 
@@ -423,7 +439,181 @@ verify_response (void)
   printf (".\n");
 
   gnutls_ocsp_resp_deinit (resp);
+  
+  return verify;
 }
+
+static void
+verify_response (void)
+{
+  gnutls_datum_t dat;
+  size_t size;
+
+  if (HAVE_OPT(LOAD_RESPONSE))
+    dat.data = (void*)read_binary_file (OPT_ARG(LOAD_RESPONSE), &size);
+  else
+    dat.data = (void*)fread_file (infile, &size);
+  if (dat.data == NULL)
+    error (EXIT_FAILURE, errno, "reading response");
+  dat.size = size;
+  
+  _verify_response(&dat);
+}
+
+static size_t get_data(void *buffer, size_t size, size_t nmemb, void *userp)
+{
+gnutls_datum_t *ud = userp;
+  
+  size *= nmemb;
+
+  ud->data = realloc(ud->data, size+ud->size);
+  if (ud->data == NULL)
+    {
+      fprintf(stderr, "Not enough memory for the request\n");
+      exit(1);
+    }
+
+  memcpy(&ud->data[ud->size], buffer, size);
+  ud->size += size;
+  
+  return size;
+}
+
+/* returns the host part of a URL */
+static const char* host_from_url(const char* url, unsigned int* port)
+{
+static char hostname[512];
+char * p;
+
+  *port = 0;
+
+  if ((p=strstr(url, "http://")) != NULL)
+    {
+      snprintf(hostname, sizeof(hostname), "%s", p+7);
+      p = strchr(hostname, '/');
+      if (p != NULL) *p = 0;
+
+      p = strchr(hostname, ':');
+      if (p != NULL) {
+        *p = 0;
+        *port = atoi(p+1);
+      }
+      
+      return hostname;
+    }
+  else
+    {
+      return url;
+    }
+}
+
+#define MAX_BUF 4*1024
+#define HEADER_PATTERN "POST / HTTP/1.1\r\n" \
+  "Host: %s\r\n" \
+  "Accept: */*\r\n" \
+  "Content-Type: application/ocsp-request\r\n" \
+  "Content-Length: %u\r\n" \
+  "Connection: close\r\n\r\n"
+static char buffer[MAX_BUF + 1];
+
+static void ask_server(const char* _url)
+{
+gnutls_datum_t ud, resp_data;
+int ret, v;
+gnutls_datum_t req;
+char* url = (void*)_url;
+char headers[1024];
+char service[16];
+const char *hostname;
+unsigned int headers_size = 0, port;
+socket_st hd;
+
+  sockets_init ();
+
+  if (url == NULL)
+    {
+      /* try to read URL from issuer certificate */
+      gnutls_x509_crt_t issuer = load_issuer();
+      gnutls_datum_t data;
+      
+      ret = gnutls_x509_crt_get_authority_info_access(issuer, 0, 
+                                  GNUTLS_IA_OCSP_URI, &data, NULL);
+      if (ret < 0)
+        {
+          fprintf(stderr, "Cannot find URL from issuer: %s\n", gnutls_strerror(ret));
+          exit(1);  
+        }
+      
+      url = malloc(data.size+1);
+      memcpy(url, data.data, data.size);
+      url[data.size] = 0;
+      
+      gnutls_free(data.data);
+      
+      gnutls_x509_crt_deinit(issuer);
+    }
+    
+  hostname = host_from_url(url, &port);
+  if (port != 0)
+    snprintf(service, sizeof(service), "%u", port);
+  else strcpy(service, "80");
+  
+  fprintf(stderr, "Connecting to %s\n", hostname);
+
+  memset(&ud, 0, sizeof(ud));
+
+  _generate_request(&req);
+
+  snprintf(headers, sizeof(headers), HEADER_PATTERN, hostname, (unsigned int)req.size);
+  headers_size = strlen(headers);
+  
+  socket_open(&hd, hostname, service, 0);
+  socket_connect (&hd);
+  
+  socket_send(&hd, headers, headers_size);
+  socket_send(&hd, req.data, req.size);
+  
+  do {
+    ret = socket_recv(&hd, buffer, sizeof(buffer));
+    if (ret > 0) get_data(buffer, ret, 1, &ud);
+  } while(ret > 0);
+  
+  if (ret < 0 || ud.size == 0)
+    {
+      perror("recv");
+      exit(1);
+    }
+  
+  socket_bye(&hd);
+  
+  resp_data.data = memmem(ud.data, ud.size, "\r\n\r\n", 4);
+  if (resp_data.data == NULL)
+    {
+      fprintf(stderr, "Cannot interpret HTTP response\n");
+      exit(1);
+    }
+  
+  resp_data.data += 4;
+  resp_data.size = ud.size - (resp_data.data - ud.data);
+  
+  _response_info (&resp_data);
+
+  if (HAVE_OPT(LOAD_SIGNER))
+    {
+      fprintf(outfile, "\n");
+      v = _verify_response(&resp_data);
+    }
+  else
+    {
+      fprintf(stderr, "\nResponse could not be verified (use --load-signer).\n");
+      v = 0;
+    }
+    
+  if (HAVE_OPT(OUTFILE) && v == 0)
+    {
+      fwrite(resp_data.data, 1, resp_data.size, outfile);
+    }
+}  
 
 int
 main (int argc, char **argv)
@@ -471,6 +661,8 @@ main (int argc, char **argv)
     generate_request ();
   else if (HAVE_OPT(VERIFY_RESPONSE))
     verify_response ();
+  else if (HAVE_OPT(ASK))
+    ask_server(OPT_ARG(ASK));
   else 
     {
       USAGE(1);

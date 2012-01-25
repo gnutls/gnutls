@@ -34,6 +34,7 @@
 #include <tests.h>
 #include <common.h>
 #include <cli-debug-args.h>
+#include <socket.h>
 
 /* Gnulib portability files. */
 #include <progname.h>
@@ -59,8 +60,7 @@ gnutls_certificate_credentials_t xcred;
 
 /* end of global stuff */
 
-
-int verbose = 0;
+unsigned int verbose = 0;
 
 extern int tls1_ok;
 extern int tls1_1_ok;

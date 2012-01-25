@@ -39,12 +39,14 @@ extern "C"
   /**
    * gnutls_ocsp_print_formats_t:
    * @GNUTLS_OCSP_PRINT_FULL: Full information about OCSP request/response.
+   * @GNUTLS_OCSP_PRINT_COMPACT: More compact information about OCSP request/response.
    *
    * Enumeration of different OCSP printing variants.
    */
   typedef enum gnutls_ocsp_print_formats_t
     {
       GNUTLS_OCSP_PRINT_FULL = 0,
+      GNUTLS_OCSP_PRINT_COMPACT = 1,
     } gnutls_ocsp_print_formats_t;
 
   /**

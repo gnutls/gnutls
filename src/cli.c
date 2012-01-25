@@ -49,12 +49,14 @@
 #include <read-file.h>
 #include <getpass.h>
 #include <minmax.h>
+
 #include "sockets.h"
 
-#include "common.h"
+#include <common.h>
+#include <socket.h>
 
-#include "gettext.h"
-#include "cli-args.h"
+#include <gettext.h>
+#include <cli-args.h>
 
 #define MAX_BUF 4096
 
@@ -65,7 +67,7 @@ const char *service = NULL;
 int record_max_size;
 int fingerprint;
 int crlf;
-int verbose = 0;
+unsigned int verbose = 0;
 extern int print_cert;
 
 const char *srp_passwd = NULL;
@@ -92,24 +94,6 @@ static gnutls_certificate_credentials_t xcred;
 /* end of global stuff */
 
 /* prototypes */
-typedef struct
-{
-  int fd;
-  gnutls_session_t session;
-  int secure;
-  char *hostname;
-  char *ip;
-  char *service;
-  struct addrinfo *ptr;
-  struct addrinfo *addr_info;
-} socket_st;
-
-ssize_t socket_recv (const socket_st * socket, void *buffer, int buffer_size);
-ssize_t socket_send (const socket_st * socket, const void *buffer,
-                     int buffer_size);
-void socket_open (socket_st * hd, const char *hostname, const char *service);
-void socket_connect (const socket_st * hd);
-void socket_bye (socket_st * socket);
 
 static void check_rehandshake (socket_st * socket, int ret);
 static int do_handshake (socket_st * socket);
@@ -773,13 +757,9 @@ main (int argc, char **argv)
 
   sockets_init ();
 
-#ifndef _WIN32
-  signal (SIGPIPE, SIG_IGN);
-#endif
-
   init_global_tls_stuff ();
 
-  socket_open (&hd, hostname, service);
+  socket_open (&hd, hostname, service, udp);
   socket_connect (&hd);
 
   hd.session = init_tls_session (hostname);
@@ -833,7 +813,7 @@ main (int argc, char **argv)
 
           printf
             ("\n\n- Connecting again- trying to resume previous session\n");
-          socket_open (&hd, hostname, service);
+          socket_open (&hd, hostname, service, udp);
           socket_connect (&hd);
         }
       else
@@ -1384,168 +1364,4 @@ init_global_tls_stuff (void)
 
 }
 
-/* Functions to manipulate sockets
- */
-
-ssize_t
-socket_recv (const socket_st * socket, void *buffer, int buffer_size)
-{
-  int ret;
-
-  if (socket->secure)
-    do
-      {
-        ret = gnutls_record_recv (socket->session, buffer, buffer_size);
-      }
-    while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-  else
-    do
-      {
-        ret = recv (socket->fd, buffer, buffer_size, 0);
-      }
-    while (ret == -1 && errno == EINTR);
-
-  return ret;
-}
-
-ssize_t
-socket_send (const socket_st * socket, const void *buffer, int buffer_size)
-{
-  int ret;
-
-  if (socket->secure)
-    do
-      {
-        ret = gnutls_record_send (socket->session, buffer, buffer_size);
-      }
-    while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
-  else
-    do
-      {
-        ret = send (socket->fd, buffer, buffer_size, 0);
-      }
-    while (ret == -1 && errno == EINTR);
-
-  if (ret > 0 && ret != buffer_size && verbose)
-    fprintf (stderr,
-             "*** Only sent %d bytes instead of %d.\n", ret, buffer_size);
-
-  return ret;
-}
-
-void
-socket_bye (socket_st * socket)
-{
-  int ret;
-  if (socket->secure)
-    {
-      do
-        ret = gnutls_bye (socket->session, GNUTLS_SHUT_WR);
-      while (ret == GNUTLS_E_INTERRUPTED || ret == GNUTLS_E_AGAIN);
-      if (ret < 0)
-        fprintf (stderr, "*** gnutls_bye() error: %s\n",
-                 gnutls_strerror (ret));
-      gnutls_deinit (socket->session);
-      socket->session = NULL;
-    }
-
-  freeaddrinfo (socket->addr_info);
-  socket->addr_info = socket->ptr = NULL;
-
-  free (socket->ip);
-  free (socket->hostname);
-  free (socket->service);
-
-  shutdown (socket->fd, SHUT_RDWR);     /* no more receptions */
-  close (socket->fd);
-
-  socket->fd = -1;
-  socket->secure = 0;
-}
-
-void
-socket_connect (const socket_st * hd)
-{
-  int err;
-
-  printf ("Connecting to '%s:%s'...\n", hd->ip, hd->service);
-
-  err = connect (hd->fd, hd->ptr->ai_addr, hd->ptr->ai_addrlen);
-  if (err < 0)
-    {
-      fprintf (stderr, "Cannot connect to %s:%s: %s\n", hd->hostname,
-               hd->service, strerror (errno));
-      exit (1);
-    }
-}
-
-void
-socket_open (socket_st * hd, const char *hostname, const char *service)
-{
-  struct addrinfo hints, *res, *ptr;
-  int sd, err;
-  char buffer[MAX_BUF + 1];
-  char portname[16] = { 0 };
-
-  printf ("Resolving '%s'...\n", hostname);
-  /* get server name */
-  memset (&hints, 0, sizeof (hints));
-  hints.ai_socktype = udp ? SOCK_DGRAM : SOCK_STREAM;
-  if ((err = getaddrinfo (hostname, service, &hints, &res)))
-    {
-      fprintf (stderr, "Cannot resolve %s:%s: %s\n", hostname, service,
-               gai_strerror (err));
-      exit (1);
-    }
-
-  sd = -1;
-  for (ptr = res; ptr != NULL; ptr = ptr->ai_next)
-    {
-      sd = socket (ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
-      if (sd == -1)
-        continue;
-
-      if ((err = getnameinfo (ptr->ai_addr, ptr->ai_addrlen, buffer, MAX_BUF,
-                              portname, sizeof (portname),
-                              NI_NUMERICHOST | NI_NUMERICSERV)) != 0)
-        {
-          fprintf (stderr, "getnameinfo(): %s\n", gai_strerror (err));
-          freeaddrinfo (res);
-          exit (1);
-        }
-
-      break;
-    }
-
-  if (sd == -1)
-    {
-      fprintf (stderr, "socket(): %s\n", strerror (errno));
-      exit (1);
-    }
-
-  if (hints.ai_socktype == SOCK_DGRAM)
-    {
-#if defined(IP_DONTFRAG)
-      int yes = 1;
-      if (setsockopt (sd, IPPROTO_IP, IP_DONTFRAG,
-                      (const void *) &yes, sizeof (yes)) < 0)
-        perror ("setsockopt(IP_DF) failed");
-#elif defined(IP_MTU_DISCOVER)
-      int yes = IP_PMTUDISC_DO;
-      if (setsockopt(sd, IPPROTO_IP, IP_MTU_DISCOVER, 
-                     (const void*) &yes, sizeof (yes)) < 0)
-        perror ("setsockopt(IP_DF) failed");
-#endif
-    }
-
-  hd->secure = 0;
-  hd->fd = sd;
-  hd->hostname = strdup (hostname);
-  hd->ip = strdup (buffer);
-  hd->service = strdup (portname);
-  hd->ptr = ptr;
-  hd->addr_info = res;
-
-  return;
-}
 

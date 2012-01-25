@@ -50,11 +50,12 @@ endif
 
 noinst_LTLIBRARIES =
 
-gnutls_serv_SOURCES =				\
-  list.h serv.c					\
-  udp-serv.c udp-serv.h				\
-  common.h common.c				\
-  certtool-common.h \
+gnutls_serv_SOURCES =		\
+  list.h serv.c			\
+  udp-serv.c udp-serv.h		\
+  socket.c socket.h		\
+  common.h common.c		\
+  certtool-common.h 		\
   $(PKCS11_SRCS)
 gnutls_serv_LDADD = ../lib/libgnutls.la
 gnutls_serv_LDADD += libcmd-serv.la ../gl/libgnu.la $(LIBOPTS_LDADD)
@@ -72,7 +73,8 @@ libcmd_srp_la_SOURCES = srptool-args.def srptool-args.c srptool-args.h
 endif
 
 if ENABLE_OCSP
-ocsptool_SOURCES = ocsptool.c ocsptool-common.h
+ocsptool_SOURCES = ocsptool.c ocsptool-common.h \
+	socket.c socket.h
 ocsptool_LDADD = ../lib/libgnutls.la libcmd-ocsp.la ../gl/libgnu.la $(LIBOPTS_LDADD)
 noinst_LTLIBRARIES += libcmd-ocsp.la
 libcmd_ocsp_la_CFLAGS =
@@ -87,7 +89,9 @@ libcmd_psk_la_SOURCES = psk-args.def psk-args.c psk-args.h
 
 BENCHMARK_SRCS = benchmark-cipher.c benchmark.c benchmark.h benchmark-tls.c
 
-gnutls_cli_SOURCES = cli.c common.h common.c $(PKCS11_SRCS) $(BENCHMARK_SRCS)
+gnutls_cli_SOURCES = cli.c common.h common.c \
+	socket.c socket.h \
+	$(PKCS11_SRCS) $(BENCHMARK_SRCS)
 gnutls_cli_LDADD = ../lib/libgnutls.la
 gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la $(LIBOPTS_LDADD)
 gnutls_cli_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIB_CLOCK_GETTIME)
@@ -95,7 +99,9 @@ noinst_LTLIBRARIES += libcmd-cli.la
 libcmd_cli_la_CFLAGS = 
 libcmd_cli_la_SOURCES = cli-args.def cli-args.c cli-args.h
 
-gnutls_cli_debug_SOURCES = tls_test.c tests.h tests.c common.h common.c $(PKCS11_SRCS)
+gnutls_cli_debug_SOURCES = tls_test.c tests.h tests.c \
+		socket.c socket.h common.h common.c \
+		$(PKCS11_SRCS)
 gnutls_cli_debug_LDADD = ../lib/libgnutls.la libcmd-cli-debug.la $(LIBOPTS_LDADD)
 gnutls_cli_debug_LDADD += ../gl/libgnu.la $(LIBSOCKET) $(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-cli-debug.la

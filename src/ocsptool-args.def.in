@@ -36,6 +36,17 @@ flag = {
 };
 
 flag = {
+    name      = ask;
+    arg-type  = string;
+    arg-name  = "url";
+    arg-optional;
+    descrip   = "Ask server about the loaded certificate";
+    flags-must = load-cert;
+    flags-must = load-issuer;
+    doc = "Connects to the specified HTTP URL and queries an OCSP request.";
+};
+
+flag = {
     name      = verify-response;
     value     = e;
     descrip   = "Verify response";

@@ -202,7 +202,8 @@ gnutls_ocsp_req_print (gnutls_ocsp_req_t req,
 }
 
 static void
-print_resp (gnutls_buffer_st * str, gnutls_ocsp_resp_t resp)
+print_resp (gnutls_buffer_st * str, gnutls_ocsp_resp_t resp,
+            gnutls_ocsp_print_formats_t format)
 {
   int ret;
   unsigned indx;
@@ -497,7 +498,8 @@ print_resp (gnutls_buffer_st * str, gnutls_ocsp_resp_t resp)
     }
 
   /* Signature. */
-  {
+  if (format == GNUTLS_OCSP_PRINT_FULL) 
+    {
     gnutls_datum_t sig;
 
     ret = gnutls_ocsp_resp_get_signature_algorithm (resp);
@@ -527,10 +529,11 @@ print_resp (gnutls_buffer_st * str, gnutls_ocsp_resp_t resp)
 
 	gnutls_free (sig.data);
       }
-  }
+    }
 
   /* certs */
-  {
+  if (format == GNUTLS_OCSP_PRINT_FULL) 
+    {
     gnutls_x509_crt_t *certs;
     size_t ncerts, i;
     gnutls_datum_t out;
@@ -578,7 +581,7 @@ print_resp (gnutls_buffer_st * str, gnutls_ocsp_resp_t resp)
 	  }
 	gnutls_free (certs);
       }
-  }
+    }
 }
 
 /**
@@ -606,17 +609,11 @@ gnutls_ocsp_resp_print (gnutls_ocsp_resp_t resp,
   gnutls_buffer_st str;
   int rc;
 
-  if (format != GNUTLS_OCSP_PRINT_FULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
   _gnutls_buffer_init (&str);
 
   _gnutls_buffer_append_str (&str, _("OCSP Response Information:\n"));
 
-  print_resp (&str, resp);
+  print_resp (&str, resp, format);
 
   _gnutls_buffer_append_data (&str, "\0", 1);
 
