@@ -1,6 +1,5 @@
 /* misc.c
- * Copyright (C) 1998-2003, 2007-2010, 2012 Free Software Foundation,
- * Inc.
+ * Copyright (C) 1998-2012 Free Software Foundation, Inc.
  *
  * Author: Timo Schulz
  *
@@ -20,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *
  */
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif

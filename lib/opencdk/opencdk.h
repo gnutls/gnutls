@@ -1,6 +1,5 @@
 /* opencdk.h - Open Crypto Development Kit (OpenCDK)
- * Copyright (C) 2001-2003, 2006-2008, 2010-2012 Free Software
- * Foundation, Inc.
+ * Copyright (C) 2001-2012 Free Software Foundation, Inc.
  *
  * Author: Timo Schulz
  *
