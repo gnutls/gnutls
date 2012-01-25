@@ -133,21 +133,19 @@ libcmd_p11tool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
 
 endif # ENABLE_PKCS11
 
-ocsptool-args.c: $(srcdir)/ocsptool-args.def
-	-autogen $<
-if ENABLE_PKCS11
-p11tool-args.c: $(srcdir)/p11tool-args.def
-	-autogen $<
-endif
-psk-args.c: $(srcdir)/psk-args.def
-	-autogen $<
-cli-debug-args.c: $(srcdir)/cli-debug-args.def
-	-autogen $<
-cli-args.c: $(srcdir)/cli-args.def
-	-autogen $<
-serv-args.c: $(srcdir)/serv-args.def
-	-autogen $<
-srptool-args.c: $(srcdir)/srptool-args.def
-	-autogen $<
-certtool-args.c: $(srcdir)/certtool-args.def
-	-autogen $<
+ocsptool-args.c: $(srcdir)/ocsptool-args.def.in
+	-autogen $(srcdir)/ocsptool-args.def
+p11tool-args.c: $(srcdir)/p11tool-args.def.in
+	-autogen $(srcdir)/p11tool-args.def
+psk-args.c: $(srcdir)/psk-args.def.in
+	-autogen $(srcdir)/psk-args.def
+cli-debug-args.c: $(srcdir)/cli-debug-args.def.in
+	-autogen $(srcdir)/cli-debug-args.def
+cli-args.c: $(srcdir)/cli-args.def.in
+	-autogen $(srcdir)/cli-args.def
+serv-args.c: $(srcdir)/serv-args.def.in
+	-autogen $(srcdir)/serv-args.def
+srptool-args.c: $(srcdir)/srptool-args.def.in
+	-autogen $(srcdir)/srptool-args.def
+certtool-args.c: $(srcdir)/certtool-args.def.in
+	-autogen $(srcdir)/certtool-args.def
