@@ -264,7 +264,7 @@ flag = {
     doc      = "Print a list of the supported algorithms and modes. If a priority string is given then only the enabled ciphersuites are shown.";
 };
 
- 	
+
 
 doc-section = {
   ds-type   = 'SEE ALSO'; // or anything else

@@ -23,7 +23,7 @@ ADDFLAGS ?=
 CFGFLAGS ?= --enable-gtk-doc --enable-gtk-doc-pdf $(ADDFLAGS) $(WFLAGS)
 PACKAGE ?= gnutls
 
-INDENT_SOURCES = `find . -name \*.[ch] -o -name gnutls.h.in | grep -v -e ^./build-aux/ -e ^./lib/minitasn1/ -e ^./lib/build-aux/ -e ^./gl/ -e ^./src/cfg/ -e -gaa.[ch] -e asn1_tab.c -e ^./tests/suite/`
+INDENT_SOURCES = `find . -name \*.[ch] -o -name gnutls.h.in | grep -v -e ^./build-aux/ -e ^./lib/minitasn1/ -e ^./lib/build-aux/ -e ^./gl/ -e ^./src/libopts/ -e -gaa.[ch] -e asn1_tab.c -e ^./tests/suite/`
 
 ifeq ($(.DEFAULT_GOAL),abort-due-to-no-makefile)
 .DEFAULT_GOAL := bootstrap
@@ -38,9 +38,10 @@ local-checks-to-skip = sc_GPL_version sc_bindtextdomain			\
 	sc_prohibit_have_config_h sc_prohibit_magic_number_exit		\
 	sc_prohibit_strcmp sc_require_config_h				\
 	sc_require_config_h_first sc_texinfo_acronym sc_trailing_blank	\
-	sc_unmarked_diagnostics sc_useless_cpp_parens
+	sc_unmarked_diagnostics sc_useless_cpp_parens			\
+	sc_two_space_separator_in_usage
 
-VC_LIST_ALWAYS_EXCLUDE_REGEX = ^maint.mk|m4/pkg|doc/fdl-1.3.texi|(devel/perlasm/|lib/accelerated/x86/|build-aux/|gl/|src/cfg/|tests/suite/ecore/|doc/protocol/).*$$
+VC_LIST_ALWAYS_EXCLUDE_REGEX = ^maint.mk|gtk-doc.make|m4/pkg|doc/fdl-1.3.texi|(devel/perlasm/|lib/accelerated/x86/|build-aux/|gl/|src/libopts/|tests/suite/ecore/|doc/protocol/).*$$
 update-copyright-env = UPDATE_COPYRIGHT_USE_INTERVALS=1
 
 # Explicit syntax-check exceptions.
@@ -49,8 +50,7 @@ exclude_file_name_regexp--sc_error_message_uppercase = ^doc/examples/ex-cxx.cpp|
 exclude_file_name_regexp--sc_file_system = ^doc/doxygen/Doxyfile
 exclude_file_name_regexp--sc_prohibit_cvs_keyword = ^lib/nettle/.*$$
 exclude_file_name_regexp--sc_prohibit_undesirable_word_seq = ^tests/nist-pkits/gnutls-nist-tests.html$$
-exclude_file_name_regexp--sc_space_tab = ^gtk-doc.make|doc/.*.(pdf|png)|tests/nist-pkits/|tests/suite/x509paths/.*$$
-exclude_file_name_regexp--sc_two_space_separator_in_usage = ^doc/cha-programs.texi|doc/cha-cert-auth2.texi|tests/sha2/sha2|tests/sha2/sha2-dsa|tests/ecdsa/ecdsa
+exclude_file_name_regexp--sc_space_tab = ^doc/.*.(pdf|png)|tests/nist-pkits/|tests/suite/x509paths/.*$$
 
 autoreconf:
 	for f in $(PODIR)/*.po.in; do \
