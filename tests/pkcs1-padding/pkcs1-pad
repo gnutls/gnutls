@@ -27,7 +27,7 @@ CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 # Check for datefudge
 TSTAMP=`datefudge "2006-09-23" date -u +%s`
 if test "$TSTAMP" != "1158962400"; then
-    echo "Cannot fake timestamps, please install datefudge..."
+    echo "You need datefudge to run this test"
     exit 77
 fi
 
