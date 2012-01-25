@@ -165,7 +165,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module listen:
   # Code from module listen-tests:
   # Code from module lock:
-  # Code from module lock-tests:
   # Code from module lseek:
   # Code from module lstat:
   # Code from module lstat-tests:
@@ -310,8 +309,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module sysexits-tests:
   # Code from module test-framework-sh:
   # Code from module test-framework-sh-tests:
-  # Code from module thread:
-  # Code from module thread-tests:
   # Code from module threadlib:
   gl_THREADLIB_EARLY
   # Code from module time:
@@ -347,7 +344,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module wchar:
   # Code from module wchar-tests:
   # Code from module xsize:
-  # Code from module yield:
 ])
 
 # This macro should be invoked from ./configure.ac, in the section
@@ -996,7 +992,6 @@ gl_UNISTD_MODULE_INDICATOR([symlink])
 gl_SYS_IOCTL_H
 AC_PROG_MKDIR_P
 AC_CHECK_FUNCS_ONCE([shutdown])
-gl_THREAD
 gl_THREADLIB
 gl_FUNC_UNSETENV
 if test $HAVE_UNSETENV = 0 || test $REPLACE_UNSETENV = 1; then
@@ -1007,7 +1002,6 @@ gl_STDLIB_MODULE_INDICATOR([unsetenv])
 gl_VALGRIND_TESTS
 abs_aux_dir=`cd "$ac_aux_dir"; pwd`
 AC_SUBST([abs_aux_dir])
-gl_YIELD
   m4_popdef([gl_MODULE_INDICATOR_CONDITION])
   m4_ifval(gltests_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([gltests_LIBSOURCES_DIR])[ ||
@@ -1442,7 +1436,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/sys_types_h.m4
   m4/sys_uio_h.m4
   m4/sysexits.m4
-  m4/thread.m4
   m4/threadlib.m4
   m4/time_h.m4
   m4/time_r.m4
@@ -1464,7 +1457,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/wchar_t.m4
   m4/wint_t.m4
   m4/xsize.m4
-  m4/yield.m4
   tests/infinity.h
   tests/init.sh
   tests/macros.h
@@ -1545,7 +1537,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-isnanl-nolibm.c
   tests/test-isnanl.h
   tests/test-listen.c
-  tests/test-lock.c
   tests/test-lstat.c
   tests/test-lstat.h
   tests/test-malloc-gnu.c
@@ -1611,8 +1602,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-sys_uio.c
   tests/test-sys_wait.h
   tests/test-sysexits.c
-  tests/test-thread_create.c
-  tests/test-thread_self.c
   tests/test-time.c
   tests/test-u64.c
   tests/test-unistd.c
@@ -1641,10 +1630,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/getpagesize.c
   tests=lib/glthread/lock.c
   tests=lib/glthread/lock.h
-  tests=lib/glthread/thread.c
-  tests=lib/glthread/thread.h
   tests=lib/glthread/threadlib.c
-  tests=lib/glthread/yield.h
   tests=lib/ignore-value.h
   tests=lib/inttypes.in.h
   tests=lib/ioctl.c

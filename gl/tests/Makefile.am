@@ -621,15 +621,6 @@ libtests_a_SOURCES += glthread/lock.h glthread/lock.c
 
 ## end   gnulib module lock
 
-## begin gnulib module lock-tests
-
-TESTS += test-lock
-check_PROGRAMS += test-lock
-test_lock_LDADD = $(LDADD) @LIBMULTITHREAD@ @YIELD_LIB@
-EXTRA_DIST += test-lock.c
-
-## end   gnulib module lock-tests
-
 ## begin gnulib module lstat
 
 
@@ -1277,22 +1268,6 @@ EXTRA_DIST += test-init.sh
 
 ## end   gnulib module test-framework-sh-tests
 
-## begin gnulib module thread
-
-libtests_a_SOURCES += glthread/thread.h glthread/thread.c
-
-## end   gnulib module thread
-
-## begin gnulib module thread-tests
-
-TESTS += test-thread_self test-thread_create
-check_PROGRAMS += test-thread_self test-thread_create
-test_thread_self_LDADD = $(LDADD) @LIBTHREAD@
-test_thread_create_LDADD = $(LDADD) @LIBMULTITHREAD@
-EXTRA_DIST += test-thread_self.c test-thread_create.c macros.h
-
-## end   gnulib module thread-tests
-
 ## begin gnulib module threadlib
 
 libtests_a_SOURCES += glthread/threadlib.c
@@ -1419,12 +1394,6 @@ check_PROGRAMS += test-wchar
 EXTRA_DIST += test-wchar.c
 
 ## end   gnulib module wchar-tests
-
-## begin gnulib module yield
-
-libtests_a_SOURCES += glthread/yield.h
-
-## end   gnulib module yield
 
 # Clean up after Solaris cc.
 clean-local:
