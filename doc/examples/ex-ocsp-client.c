@@ -8,186 +8,321 @@
 #include <stdlib.h>
 #include <string.h>
 #include <gnutls/gnutls.h>
+#include <gnutls/crypto.h>
 #include <gnutls/ocsp.h>
-
+#ifndef NO_LIBCURL
+#include <curl/curl.h>
+#endif
 #include "read-file.h"
 
-/* This program will read a file (argv[1]) containing a certificate in
-   PEM format and print the "CA issuers" and "OCSP address" extensions
-   for the certificate.  If another file is given (argv[2]) it holds
-   the issuer certificate for the first certificate.  Then the tool
-   will generate an OCSP request for the certificate and write it to
-   the file "ocsp-req.der". */
+size_t get_data (void *buffer, size_t size, size_t nmemb,
+                        void *userp);
+static gnutls_x509_crt_t load_cert (const char *cert_file);
+static void _response_info (const gnutls_datum_t * data);
+static void
+_generate_request (gnutls_datum_t * rdata, const char *cert_file,
+                   const char *issuer_file);
+static int _verify_response (gnutls_datum_t * data,
+                             const char *signer_file);
+
+/* This program queries an OCSP server.
+   It expects three files. argv[1] containing the certificate to
+   be checked, argv[2] holding the issuer for this certificate,
+   and argv[3] holding a trusted certificate to verify OCSP's response.
+   argv[4] is optional and should hold the server host name.
+   
+   For simplicity the libcurl library is used.
+ */
 
 int
 main (int argc, char *argv[])
 {
-  int rc;
-  gnutls_x509_crt_t cert = NULL, issuer = NULL;
-  gnutls_datum_t certdata, issuerdata, tmp;
-  size_t s;
-  unsigned int seq;
-  gnutls_ocsp_req_t ocspreq = NULL;
-  FILE *fh;
+    gnutls_datum_t ud, tmp;
+    int ret;
+    gnutls_datum_t req;
+#ifndef NO_LIBCURL
+    CURL *handle;
+    struct curl_slist *headers = NULL;
+#endif
+    int v, seq;
+    const char *cert_file = argv[1];
+    const char *issuer_file = argv[2];
+    const char *signer_file = argv[3];
+    char *hostname = NULL;
 
-  rc = gnutls_global_init ();
-  if (rc < 0)
-    goto done;
+    gnutls_global_init ();
 
-  /* Read certificate and print AIA info. */
+    if (argc > 4)
+        hostname = argv[4];
 
-  rc = gnutls_x509_crt_init (&cert);
-  if (rc < 0)
-    goto done;
+    if (hostname == NULL)
+      {
+          gnutls_x509_crt_t cert = load_cert (cert_file);
 
-  certdata.data = (void*)read_binary_file (argv[1], &s);
-  if (certdata.data == NULL)
-    {
-      printf ("cannot read certificate\n");
-      goto done;
-    }
-  certdata.size = s;
+          for (seq = 0;; seq++)
+            {
+                ret = gnutls_x509_crt_get_authority_info_access (cert, seq,
+                                                                 GNUTLS_IA_OCSP_URI,
+                                                                 &tmp,
+                                                                 NULL);
+                if (ret == GNUTLS_E_UNKNOWN_ALGORITHM)
+                    continue;
+                if (ret == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+                  {
+                      fprintf (stderr,
+                               "No URI was found in the certificate.\n");
+                      exit (1);
+                  }
+                if (ret < 0)
+                  {
+                      fprintf (stderr, "error: %s\n",
+                               gnutls_strerror (ret));
+                      exit (1);
+                  }
 
-  rc = gnutls_x509_crt_import (cert, &certdata, GNUTLS_X509_FMT_PEM);
-  free (certdata.data);
-  if (rc < 0)
-    goto done;
+                printf ("CA issuers URI: %.*s\n", tmp.size, tmp.data);
 
-  rc = gnutls_x509_crt_print (cert, GNUTLS_CRT_PRINT_ONELINE, &tmp);
-  if (rc < 0)
-    goto done;
+                hostname = malloc (tmp.size + 1);
+                memcpy (hostname, tmp.data, tmp.size);
+                hostname[tmp.size] = 0;
 
-  printf ("cert: %.*s\n", tmp.size, tmp.data);
+                gnutls_free (tmp.data);
+                break;
+            }
 
-  gnutls_free (tmp.data); tmp.data = NULL;
+          gnutls_x509_crt_deinit (cert);
+      }
 
-  for (seq = 0; ; seq++)
-    {
-      rc = gnutls_x509_crt_get_authority_info_access (cert, seq,
-						      GNUTLS_IA_CAISSUERS_URI,
-						      &tmp, NULL);
-      if (rc == GNUTLS_E_UNKNOWN_ALGORITHM)
-	continue;
-      if (rc == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-	break;
-      if (rc < 0)
-	goto done;
+    /* Note that the OCSP servers hostname might be available
+     * using gnutls_x509_crt_get_authority_info_access() in the issuer's
+     * certificate */
 
-      printf ("CA issuers URI: %.*s\n", tmp.size, tmp.data);
-      gnutls_free (tmp.data);
-      break;
-    }
+    memset (&ud, 0, sizeof (ud));
+    fprintf (stderr, "Connecting to %s\n", hostname);
 
-  if (!tmp.data)
-    printf ("No CA issuers URI found\n");
+    _generate_request (&req, cert_file, issuer_file);
 
-  for (seq = 0; ; seq++)
-    {
-      rc = gnutls_x509_crt_get_authority_info_access (cert, seq,
-						      GNUTLS_IA_OCSP_URI,
-						      &tmp, NULL);
-      if (rc == GNUTLS_E_UNKNOWN_ALGORITHM)
-	continue;
-      if (rc == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-	break;
-      if (rc < 0)
-	goto done;
+#ifndef NO_LIBCURL
+    curl_global_init (CURL_GLOBAL_ALL);
 
-      printf ("OCSP URI: %.*s\n", tmp.size, tmp.data);
-      gnutls_free (tmp.data);
-      break;
-    }
+    handle = curl_easy_init ();
+    if (handle == NULL)
+        exit (1);
 
-  if (!tmp.data)
-    printf ("No OCSP URI URI found\n");
+    headers =
+        curl_slist_append (headers,
+                           "Content-Type: application/ocsp-request");
 
-  if (argc < 3)
-    {
-      printf ("Done...\n");
-      goto done;
-    }
+    curl_easy_setopt (handle, CURLOPT_HTTPHEADER, headers);
+    curl_easy_setopt (handle, CURLOPT_POSTFIELDS, (void *) req.data);
+    curl_easy_setopt (handle, CURLOPT_POSTFIELDSIZE, req.size);
+    curl_easy_setopt (handle, CURLOPT_URL, hostname);
+    curl_easy_setopt (handle, CURLOPT_WRITEFUNCTION, get_data);
+    curl_easy_setopt (handle, CURLOPT_WRITEDATA, &ud);
 
-  /* Read issuer cert and print brief info about it. */
+    ret = curl_easy_perform (handle);
+    if (ret != 0)
+      {
+          fprintf (stderr, "curl[%d] error %d\n", __LINE__, ret);
+          exit (1);
+      }
 
-  rc = gnutls_x509_crt_init (&issuer);
-  if (rc < 0)
-    goto done;
+    curl_easy_cleanup (handle);
+#endif
 
-  issuerdata.data = (void*)read_binary_file (argv[2], &s);
-  if (issuerdata.data == NULL)
-    {
-      printf ("cannot read issuer\n");
-      goto done;
-    }
-  issuerdata.size = s;
+    _response_info (&ud);
 
-  rc = gnutls_x509_crt_import (issuer, &issuerdata, GNUTLS_X509_FMT_PEM);
-  free (issuerdata.data);
-  if (rc < 0)
-    goto done;
+    v = _verify_response (&ud, signer_file);
 
-  rc = gnutls_x509_crt_print (issuer, GNUTLS_CRT_PRINT_ONELINE, &tmp);
-  if (rc < 0)
-    goto done;
+    gnutls_global_deinit ();
 
-  printf ("issuer: %.*s\n", tmp.size, tmp.data);
+    return v;
+}
 
-  gnutls_free (tmp.data);
+static void
+_response_info (const gnutls_datum_t * data)
+{
+    gnutls_ocsp_resp_t resp;
+    int ret;
+    gnutls_datum buf;
 
-  /* Generate OCSP request and write it. */
+    ret = gnutls_ocsp_resp_init (&resp);
+    if (ret < 0)
+        exit (1);
 
-  rc = gnutls_ocsp_req_init (&ocspreq);
-  if (rc < 0)
-    goto done;
+    ret = gnutls_ocsp_resp_import (resp, data);
+    if (ret < 0)
+        exit (1);
 
-  rc = gnutls_ocsp_req_add_cert (ocspreq, GNUTLS_DIG_SHA1, issuer, cert);
-  if (rc < 0)
-    goto done;
+    ret = gnutls_ocsp_resp_print (resp, GNUTLS_OCSP_PRINT_FULL, &buf);
+    if (ret != 0)
+        exit (1);
 
-  rc = gnutls_ocsp_req_print (ocspreq, GNUTLS_OCSP_PRINT_FULL, &tmp);
-  if (rc < 0)
-    goto done;
+    printf ("%.*s", buf.size, buf.data);
+    gnutls_free (buf.data);
 
-  printf ("ocsp request: %.*s\n", tmp.size, tmp.data);
+    gnutls_ocsp_resp_deinit (resp);
+}
 
-  gnutls_free (tmp.data);
+static gnutls_x509_crt_t
+load_cert (const char *cert_file)
+{
+    gnutls_x509_crt_t crt;
+    int ret;
+    gnutls_datum_t data;
+    size_t size;
 
-  fh = fopen ("ocsp-req.der", "w");
-  if (fh == NULL)
-    goto done;
+    ret = gnutls_x509_crt_init (&crt);
+    if (ret < 0)
+        exit (1);
 
-  rc = gnutls_ocsp_req_export (ocspreq, &tmp);
-  if (rc < 0)
-    goto done;
+    data.data = (void *) read_binary_file (cert_file, &size);
+    data.size = size;
 
-  s = fwrite (tmp.data, 1, tmp.size, fh);
+    if (!data.data)
+      {
+          fprintf (stderr, "Cannot open file: %s\n", cert_file);
+          exit (1);
+      }
 
-  gnutls_free (tmp.data);
+    ret = gnutls_x509_crt_import (crt, &data, GNUTLS_X509_FMT_PEM);
+    free (data.data);
+    if (ret < 0)
+      {
+          fprintf (stderr, "Cannot import certificate in %s: %s\n",
+                   cert_file, gnutls_strerror (ret));
+          exit (1);
+      }
 
-  if (s != tmp.size)
-    {
-      perror ("fwrite");
-      fclose (fh);
-      goto done;
-    }
+    return crt;
+}
 
-  rc = fclose (fh);
-  if (rc != 0)
-    {
-      perror ("fclose");
-      rc = 0;
-      goto done;
-    }
+static void
+_generate_request (gnutls_datum_t * rdata, const char *cert_file,
+                   const char *issuer_file)
+{
+    gnutls_ocsp_req_t req;
+    int ret;
+    gnutls_x509_crt_t issuer, cert;
+    unsigned char noncebuf[23];
+    gnutls_datum_t nonce = { noncebuf, sizeof (noncebuf) };
 
-  rc = 0;
+    ret = gnutls_ocsp_req_init (&req);
+    if (ret < 0)
+        exit (1);
 
- done:
-  if (rc != 0)
-    printf ("error (%d): %s\n", rc, gnutls_strerror (rc));
-  gnutls_ocsp_req_deinit (ocspreq);
-  gnutls_x509_crt_deinit (cert);
-  gnutls_x509_crt_deinit (issuer);
-  gnutls_global_deinit ();
+    issuer = load_cert (issuer_file);
+    cert = load_cert (cert_file);
 
-  return rc == 0 ? 0 : 1;
+    ret = gnutls_ocsp_req_add_cert (req, GNUTLS_DIG_SHA1, issuer, cert);
+    if (ret < 0)
+        exit (1);
+
+    gnutls_x509_crt_deinit (issuer);
+    gnutls_x509_crt_deinit (cert);
+
+    ret = gnutls_rnd (GNUTLS_RND_RANDOM, nonce.data, nonce.size);
+    if (ret < 0)
+        exit (1);
+
+    ret = gnutls_ocsp_req_set_nonce (req, 0, &nonce);
+    if (ret < 0)
+        exit (1);
+
+    ret = gnutls_ocsp_req_export (req, rdata);
+    if (ret != 0)
+        exit (1);
+
+    gnutls_ocsp_req_deinit (req);
+
+    return;
+}
+
+static int
+_verify_response (gnutls_datum_t * data, const char *signer_file)
+{
+    gnutls_ocsp_resp_t resp;
+    int ret;
+    size_t size;
+    gnutls_x509_crt_t signer;
+    unsigned verify;
+    gnutls_datum_t dat;
+
+    ret = gnutls_ocsp_resp_init (&resp);
+    if (ret < 0)
+        exit (1);
+
+    ret = gnutls_ocsp_resp_import (resp, data);
+    if (ret < 0)
+        exit (1);
+
+    ret = gnutls_x509_crt_init (&signer);
+    if (ret < 0)
+        exit (1);
+
+    dat.data = (void *) read_binary_file (signer_file, &size);
+    if (dat.data == NULL)
+        exit (1);
+
+    dat.size = size;
+
+    ret = gnutls_x509_crt_import (signer, &dat, GNUTLS_X509_FMT_PEM);
+    free (dat.data);
+    if (ret < 0)
+        exit (1);
+
+    ret = gnutls_ocsp_resp_verify_direct (resp, signer, &verify, 0);
+    if (ret < 0)
+        exit (1);
+
+    printf ("Verifying OCSP Response: ");
+    if (verify == 0)
+        printf ("Verification success!\n");
+    else
+        printf ("Verification error!\n");
+
+    if (verify & GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND)
+        printf ("Signer cert not found\n");
+
+    if (verify & GNUTLS_OCSP_VERIFY_SIGNER_KEYUSAGE_ERROR)
+        printf ("Signer cert keyusage error\n");
+
+    if (verify & GNUTLS_OCSP_VERIFY_UNTRUSTED_SIGNER)
+        printf ("Signer cert is not trusted\n");
+
+    if (verify & GNUTLS_OCSP_VERIFY_INSECURE_ALGORITHM)
+        printf ("Insecure algorithm\n");
+
+    if (verify & GNUTLS_OCSP_VERIFY_SIGNATURE_FAILURE)
+        printf ("Signature failure\n");
+
+    if (verify & GNUTLS_OCSP_VERIFY_CERT_NOT_ACTIVATED)
+        printf ("Signer cert not yet activated\n");
+
+    if (verify & GNUTLS_OCSP_VERIFY_CERT_EXPIRED)
+        printf ("Signer cert expired\n");
+
+    gnutls_ocsp_resp_deinit (resp);
+
+    return verify;
+}
+
+size_t
+get_data (void *buffer, size_t size, size_t nmemb, void *userp)
+{
+    gnutls_datum_t *ud = userp;
+
+    size *= nmemb;
+
+    ud->data = realloc (ud->data, size + ud->size);
+    if (ud->data == NULL)
+      {
+          fprintf (stderr, "Not enough memory for the request\n");
+          exit (1);
+      }
+
+    memcpy (&ud->data[ud->size], buffer, size);
+    ud->size += size;
+
+    return size;
 }

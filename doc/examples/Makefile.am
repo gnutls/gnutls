@@ -29,7 +29,7 @@ AM_CPPFLAGS = \
 # Gnulib warns and suggests use of fseeko instead of fseek, which is
 # used in ex-cert-select.c, but certificate files will not be > 4 GB,
 # so we just silence the warning instead of fixing the code here.
-AM_CPPFLAGS += -D_GL_NO_LARGE_FILES
+AM_CPPFLAGS += -D_GL_NO_LARGE_FILES -DNO_LIBCURL
 
 AM_LDFLAGS = -no-install
 LDADD = libexamples.la				\
@@ -76,11 +76,11 @@ if ENABLE_SRP
 noinst_PROGRAMS += ex-client-srp ex-serv-srp
 endif
 
-if ENABLE_OCSP
-noinst_PROGRAMS += ex-ocsp-client ex-ocsp-verify
-endif
-
 noinst_LTLIBRARIES = libexamples.la
+
+if ENABLE_OCSP
+noinst_PROGRAMS += ex-ocsp-client
+endif
 
 libexamples_la_SOURCES = examples.h ex-alert.c ex-pkcs12.c \
 	ex-session-info.c ex-x509-info.c ex-verify.c	\
