@@ -48,6 +48,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module argp-tests:
   # Code from module arpa_inet:
   # Code from module arpa_inet-tests:
+  # Code from module base64:
+  # Code from module base64-tests:
   # Code from module binary-io:
   # Code from module binary-io-tests:
   # Code from module bind:
@@ -382,6 +384,7 @@ m4_ifdef([AM_XGETTEXT_OPTION],
    AM_][XGETTEXT_OPTION([--flag=argp_failure:4:c-format])])
 gl_HEADER_ARPA_INET
 AC_PROG_MKDIR_P
+gl_FUNC_BASE64
 AC_REQUIRE([gl_HEADER_SYS_SOCKET])
 if test "$ac_cv_header_winsock2_h" = yes; then
   AC_LIBOBJ([bind])
@@ -1125,6 +1128,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/arpa_inet.in.h
   lib/asnprintf.c
   lib/asprintf.c
+  lib/base64.c
+  lib/base64.h
   lib/basename-lgpl.c
   lib/bind.c
   lib/byteswap.in.h
@@ -1286,6 +1291,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/alphasort.m4
   m4/argp.m4
   m4/arpa_inet_h.m4
+  m4/base64.m4
   m4/byteswap.m4
   m4/clock_time.m4
   m4/close.m4
@@ -1468,6 +1474,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-argp-2.sh
   tests/test-argp.c
   tests/test-arpa_inet.c
+  tests/test-base64.c
   tests/test-binary-io.c
   tests/test-binary-io.sh
   tests/test-bind.c

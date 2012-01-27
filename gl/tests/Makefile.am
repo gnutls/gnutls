@@ -93,6 +93,14 @@ EXTRA_DIST += test-arpa_inet.c
 
 ## end   gnulib module arpa_inet-tests
 
+## begin gnulib module base64-tests
+
+TESTS += test-base64
+check_PROGRAMS += test-base64
+EXTRA_DIST += test-base64.c macros.h
+
+## end   gnulib module base64-tests
+
 ## begin gnulib module binary-io
 
 libtests_a_SOURCES += binary-io.h
