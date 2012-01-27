@@ -38,12 +38,12 @@ flag = {
 flag = {
     name      = ask;
     arg-type  = string;
-    arg-name  = "url";
+    arg-name  = "server name|url";
     arg-optional;
-    descrip   = "Ask server about the loaded certificate";
+    descrip   = "Ask an OCSP/HTTP server on a certificate validity";
     flags-must = load-cert;
     flags-must = load-issuer;
-    doc = "Connects to the specified HTTP URL and queries an OCSP request.";
+    doc = "Connects to the specified HTTP OCSP server and queries on the validity of the loaded certificate.";
 };
 
 flag = {
