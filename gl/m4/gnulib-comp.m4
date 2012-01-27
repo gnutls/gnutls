@@ -289,6 +289,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module strndup:
   # Code from module strnlen:
   # Code from module strnlen-tests:
+  # Code from module strtok_r:
   # Code from module strverscmp:
   # Code from module strverscmp-tests:
   # Code from module symlink:
@@ -780,6 +781,12 @@ if test $HAVE_DECL_STRNLEN = 0 || test $REPLACE_STRNLEN = 1; then
   gl_PREREQ_STRNLEN
 fi
 gl_STRING_MODULE_INDICATOR([strnlen])
+gl_FUNC_STRTOK_R
+if test $HAVE_STRTOK_R = 0 || test $REPLACE_STRTOK_R = 1; then
+  AC_LIBOBJ([strtok_r])
+  gl_PREREQ_STRTOK_R
+fi
+gl_STRING_MODULE_INDICATOR([strtok_r])
 gl_FUNC_STRVERSCMP
 if test $HAVE_STRVERSCMP = 0; then
   AC_LIBOBJ([strverscmp])
@@ -1260,6 +1267,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/strncasecmp.c
   lib/strndup.c
   lib/strnlen.c
+  lib/strtok_r.c
   lib/strverscmp.c
   lib/sys_select.in.h
   lib/sys_socket.in.h
@@ -1432,6 +1440,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/strings_h.m4
   m4/strndup.m4
   m4/strnlen.m4
+  m4/strtok_r.m4
   m4/strverscmp.m4
   m4/symlink.m4
   m4/sys_ioctl_h.m4
