@@ -28,6 +28,9 @@
 #include <gnutls_datum.h>
 #include <x509_b64.h>
 
+/* FIXME: rewrite this to use GNULIB's base64 implementation.
+ */
+
 static const uint8_t b64table[] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
