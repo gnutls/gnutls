@@ -57,6 +57,7 @@
 
 #include <gettext.h>
 #include <cli-args.h>
+#include <ocsptool-common.h>
 
 #define MAX_BUF 4096
 
@@ -100,6 +101,7 @@ static gnutls_certificate_credentials_t xcred;
 static void check_rehandshake (socket_st * socket, int ret);
 static int do_handshake (socket_st * socket);
 static void init_global_tls_stuff (void);
+static int cert_verify_ocsp (gnutls_session_t session);
 
 /* Helper functions to load a certificate and key
  * files into memory.
@@ -460,6 +462,18 @@ cert_verify_callback (gnutls_session_t session)
       printf ("*** Verifying server certificate failed...\n");
       if (!insecure && !ssh)
         return -1;
+    }
+  else if (ENABLED_OPT(OCSP))
+    { /* off-line verification succeeded. Try OCSP */
+      rc = cert_verify_ocsp(session);
+      if (rc == 0)
+        {
+          printf ("*** Verifying (with OCSP) server certificate failed...\n");
+          if (!insecure && !ssh)
+            return -1;
+        }
+      else if (rc == -1)
+        printf("*** OCSP response ignored\n");
     }
 
   if (ssh) /* try ssh auth */
@@ -1229,7 +1243,7 @@ do_handshake (socket_st * socket)
   if (ret == 0)
     {
       /* print some information */
-      print_info (socket->session, socket->hostname, HAVE_OPT(INSECURE));
+      print_info (socket->session);
       socket->secure = 1;
     }
   else
@@ -1441,4 +1455,74 @@ init_global_tls_stuff (void)
 
 }
 
+/* Returns:
+ * 0: certificate is revoked
+ * 1: certificate is ok
+ * -1: dunno
+ */
+static int
+cert_verify_ocsp (gnutls_session_t session)
+{
+  gnutls_x509_crt_t crt, issuer;
+  const gnutls_datum_t *cert_list;
+  unsigned int cert_list_size = 0;
+  int deinit_issuer = 0;
+  gnutls_datum_t resp;
+  int ret;
 
+  cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
+  if (cert_list_size == 0)
+    {
+      fprintf (stderr, "No certificates found!\n");
+      return -1;
+    }
+
+  gnutls_x509_crt_init (&crt);
+  ret =
+      gnutls_x509_crt_import (crt, &cert_list[0],
+                              GNUTLS_X509_FMT_DER);
+  if (ret < 0)
+    {
+      fprintf (stderr, "Decoding error: %s\n",
+               gnutls_strerror (ret));
+      return -1;
+    }
+    
+  ret = gnutls_certificate_get_issuer(xcred, crt, &issuer, 0);
+  if (ret < 0 && cert_list_size > 1)
+    {
+      gnutls_x509_crt_init(&issuer);
+      ret = gnutls_x509_crt_import(issuer, &cert_list[1], GNUTLS_X509_FMT_DER);
+      if (ret < 0)
+        {
+          fprintf (stderr, "Decoding error: %s\n",
+                   gnutls_strerror (ret));
+           return -1;
+        }
+      deinit_issuer = 1;
+    }
+  else if (ret < 0)
+    {
+      fprintf(stderr, "Cannot find issuer\n");
+      ret = -1;
+      goto cleanup;
+    }
+    
+  ret = send_ocsp_request(NULL, crt, issuer, &resp, 1);
+  if (ret < 0)
+    {
+      fprintf(stderr, "Cannot contact OCSP server\n");
+      ret = -1;
+      goto cleanup;
+    }
+
+  /* verify and check the response for revoked cert */
+  ret = check_ocsp_response(xcred, &resp);
+
+cleanup:
+  if (deinit_issuer)
+    gnutls_x509_crt_deinit (issuer);
+  gnutls_x509_crt_deinit (crt);
+
+  return ret;
+}

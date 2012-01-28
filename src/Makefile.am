@@ -73,7 +73,7 @@ libcmd_srp_la_SOURCES = srptool-args.def srptool-args.c srptool-args.h
 endif
 
 if ENABLE_OCSP
-ocsptool_SOURCES = ocsptool.c ocsptool-common.h \
+ocsptool_SOURCES = ocsptool.c ocsptool-common.h ocsptool-common.c \
 	socket.c socket.h
 ocsptool_LDADD = ../lib/libgnutls.la libcmd-ocsp.la ../gl/libgnu.la $(LIBOPTS_LDADD)
 noinst_LTLIBRARIES += libcmd-ocsp.la
@@ -90,7 +90,7 @@ libcmd_psk_la_SOURCES = psk-args.def psk-args.c psk-args.h
 BENCHMARK_SRCS = benchmark-cipher.c benchmark.c benchmark.h benchmark-tls.c
 
 gnutls_cli_SOURCES = cli.c common.h common.c \
-	socket.c socket.h \
+	socket.c socket.h ocsptool-common.c \
 	$(PKCS11_SRCS) $(BENCHMARK_SRCS)
 gnutls_cli_LDADD = ../lib/libgnutls.la
 gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la $(LIBOPTS_LDADD)

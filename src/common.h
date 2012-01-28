@@ -49,7 +49,7 @@
 
 extern const char str_unknown[];
 
-int print_info (gnutls_session_t state, const char *hostname, int insecure);
+int print_info (gnutls_session_t state);
 void print_cert_info (gnutls_session_t, int flag);
 void print_list (const char* priorities, int verbose);
 int cert_verify (gnutls_session_t session, const char* hostname);

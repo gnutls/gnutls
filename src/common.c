@@ -409,7 +409,8 @@ print_openpgp_info (gnutls_session_t session, int flag)
 
 #endif
 
-/* returns false (0) if not verified, or true (1) otherwise */
+/* returns false (0) if not verified, or true (1) otherwise 
+ */
 int
 cert_verify (gnutls_session_t session, const char* hostname)
 {
@@ -581,13 +582,12 @@ print_ecdh_info (gnutls_session_t session, const char *str)
 }
 
 int
-print_info (gnutls_session_t session, const char *hostname, int insecure)
+print_info (gnutls_session_t session)
 {
     const char *tmp;
     gnutls_credentials_type_t cred;
     gnutls_kx_algorithm_t kx;
     unsigned char session_id[33];
-    int ret;
     size_t session_id_size = sizeof (session_id);
 
     /* print session ID */
@@ -656,13 +656,6 @@ print_info (gnutls_session_t session, const char *hostname, int insecure)
           }
 
           print_cert_info (session, verbose?GNUTLS_CRT_PRINT_FULL:GNUTLS_CRT_PRINT_COMPACT);
-
-          ret = cert_verify (session, hostname);
-          if (insecure == 0 && ret == 0)
-            {
-              fprintf(stderr, "Exiting because verification failed (use --insecure to force connection)\n");
-              exit(1);
-            }
 
           if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS)
               print_dh_info (session, "Ephemeral ");

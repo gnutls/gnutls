@@ -1309,7 +1309,8 @@ static void tcp_server(const char* name, int port)
                                 human_addr ((struct sockaddr *)
                                             &client_address, calen, topbuf,
                                             sizeof (topbuf)));
-                        print_info (j->tls_session, NULL, 1);
+                        print_info (j->tls_session);
+                        cert_verify(j->tls_session, NULL);
                       }
                     j->handshake_ok = 1;
                   }
@@ -1432,7 +1433,8 @@ static void tcp_server(const char* name, int port)
                                             &client_address, calen, topbuf,
                                             sizeof (topbuf)));
 
-                        print_info (j->tls_session, NULL, 1);
+                        print_info (j->tls_session);
+                        cert_verify(j->tls_session, NULL);
                       }
                     j->handshake_ok = 1;
                   }

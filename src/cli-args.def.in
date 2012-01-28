@@ -45,6 +45,14 @@ flag = {
 };
 
 flag = {
+    name      = ocsp;
+    descrip   = "Enable OCSP certificate verification";
+    disabled;
+    disable   = "no";
+    doc       = "This option will enable verification of the peer's certificate using ocsp";
+};
+
+flag = {
     name      = resume;
     value     = r;
     descrip   = "Connect, establish a session. Connect again and resume this session";

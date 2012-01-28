@@ -21,6 +21,8 @@
 #ifndef OCSPTOOL_COMMON_H
 #define OCSPTOOL_COMMON_H
 
+#include <gnutls/ocsp.h>
+
 enum
   {
     ACTION_NONE,
@@ -31,5 +33,17 @@ enum
   };
 
 extern void ocsptool_version (void);
+void
+_generate_request (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
+                   gnutls_datum_t * rdata, int nonce);
+int send_ocsp_request(const char* server,
+                       gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
+                       gnutls_datum_t * resp_data, int nonce);
+void
+print_ocsp_verify_res (unsigned int output);
+
+int
+check_ocsp_response (gnutls_certificate_credentials xcred, 
+                      gnutls_datum_t *data);
 
 #endif
