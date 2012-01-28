@@ -365,6 +365,7 @@ _verify_response (gnutls_datum_t *data)
 	error (EXIT_FAILURE, 0, "error parsing CAs: %s",
 	       gnutls_strerror (ret));
 
+#if 0
       if (HAVE_OPT(VERBOSE))
 	{
 	  unsigned int i;
@@ -382,6 +383,7 @@ _verify_response (gnutls_datum_t *data)
 	      gnutls_free (out.data);
 	    }
 	}
+#endif
 
       ret = gnutls_x509_trust_list_add_cas (list, x509_ca_list, x509_ncas, 0);
       if (ret < 0)
@@ -598,7 +600,7 @@ socket_st hd;
   
   _response_info (&resp_data);
 
-  if (HAVE_OPT(LOAD_SIGNER))
+  if (HAVE_OPT(LOAD_SIGNER) || HAVE_OPT(LOAD_TRUST))
     {
       fprintf(outfile, "\n");
       v = _verify_response(&resp_data);
