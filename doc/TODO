@@ -10,7 +10,7 @@ Current list:
   RSA but rather the combination of RSA-SHA256, RSA-SHA1 etc.
   That will allow the usage of more secure tokens that do not
   allow plain RSA.
-* Support PKCS#8 AES and DES-MD5 (tests/enc3pkcs8.pem) encrypted keys.
+* Support PKCS#8 DES-MD5 (tests/enc3pkcs8.pem) encrypted keys.
   (openssl seems to use DES-MD5 to encrypt keys by default)
 * Add support for generating empty CRLs
 * Document the format for the supported DN attributes.
