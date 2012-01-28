@@ -26,7 +26,7 @@
 
 #define CERT_FILE "cert.pem"
 #define KEY_FILE "key.pem"
-#define CAFILE "ca.pem"
+#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 
 extern int tcp_connect (void);
 extern void tcp_close (int sd);

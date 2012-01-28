@@ -20,7 +20,7 @@
 
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
-#define CAFILE "ca.pem"
+#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 
 /* This is a sample TLS-SRP echo server.
  */

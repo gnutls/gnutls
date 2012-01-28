@@ -87,6 +87,7 @@ acceptable.  The framework is illustrated on @ref{fig:x509}.
 * X.509 distinguished names::
 * Verifying X.509 certificate paths::
 * Verifying a certificate in the context of TLS session::
+* Verifying a certificate using SSH-style authentication::
 @end menu
 
 @node X.509 certificate structure
@@ -276,7 +277,20 @@ about the peer's identity. It is required to verify if the
 certificate's owner is the one you expect. For more information
 consult @xcite{RFC2818} and section @ref{ex:verify} for an example.
 
+@node Verifying a certificate using SSH-style authentication
+@subsection Verifying a certificate using SSH-style authentication
+@cindex verifying certificate paths
+@cindex SSH-style authentication
+@tindex gnutls_certificate_verify_flags
 
+It is possible to use an SSH-style authentication method in GnuTLS.
+That means that having seen and associated a public key with a host
+is enough to trust it on the subsequent connections.
+A hybrid system with X.509 and SSH authentication is 
+shown in @ref{Simple client example with SSH-style certificate verification}.
+
+@showfuncdesc{gnutls_verify_stored_pubkey}
+@showfuncdesc{gnutls_store_pubkey}
 
 @node OpenPGP certificates
 @section @acronym{OpenPGP} certificates

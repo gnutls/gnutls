@@ -68,14 +68,13 @@ raw_to_string (const unsigned char *raw, size_t raw_size)
 }
 
 static void
-print_x509_info (gnutls_session_t session, const char *hostname,
-                 int insecure)
+print_x509_info_compact (gnutls_session_t session, int flag)
 {
     gnutls_x509_crt_t crt;
     const gnutls_datum_t *cert_list;
-    unsigned int cert_list_size = 0, j;
-    int hostname_ok = 0;
+    unsigned int cert_list_size = 0;
     int ret;
+    gnutls_datum_t cinfo;
 
     cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
     if (cert_list_size == 0)
@@ -84,6 +83,47 @@ print_x509_info (gnutls_session_t session, const char *hostname,
           return;
       }
 
+    gnutls_x509_crt_init (&crt);
+    ret =
+          gnutls_x509_crt_import (crt, &cert_list[0],
+                                  GNUTLS_X509_FMT_DER);
+    if (ret < 0)
+      {
+        fprintf (stderr, "Decoding error: %s\n",
+                 gnutls_strerror (ret));
+        return;
+      }
+
+    ret =
+      gnutls_x509_crt_print (crt, flag, &cinfo);
+    if (ret == 0)
+      {
+        printf ("- X.509 cert: %s\n", cinfo.data);
+        gnutls_free (cinfo.data);
+      }
+
+    gnutls_x509_crt_deinit (crt);
+}
+
+static void
+print_x509_info (gnutls_session_t session, int flag)
+{
+    gnutls_x509_crt_t crt;
+    const gnutls_datum_t *cert_list;
+    unsigned int cert_list_size = 0, j;
+    int ret;
+    
+    if (flag == GNUTLS_CRT_PRINT_COMPACT)
+      return print_x509_info_compact(session, flag);
+
+    cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
+    if (cert_list_size == 0)
+      {
+          fprintf (stderr, "No certificates found!\n");
+          return;
+      }
+
+    printf (" - Certificate type: X.509\n");
     printf (" - Got a certificate list of %d certificates.\n",
             cert_list_size);
 
@@ -104,14 +144,8 @@ print_x509_info (gnutls_session_t session, const char *hostname,
 
           printf (" - Certificate[%d] info:\n  - ", j);
 
-          if (verbose)
-              ret =
-                  gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_FULL,
-                                         &cinfo);
-          else
-              ret =
-                  gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_ONELINE,
-                                         &cinfo);
+          ret =
+            gnutls_x509_crt_print (crt, flag, &cinfo);
           if (ret == 0)
             {
                 printf ("%s\n", cinfo.data);
@@ -153,46 +187,118 @@ print_x509_info (gnutls_session_t session, const char *hostname,
                 gnutls_free (p);
             }
 
-          if (j == 0 && hostname != NULL)
-            {
-                /* Check the hostname of the first certificate if it matches
-                 * the name of the host we connected to.
-                 */
-                if (gnutls_x509_crt_check_hostname (crt, hostname) == 0)
-                    hostname_ok = 1;
-                else
-                    hostname_ok = 2;
-            }
-
           gnutls_x509_crt_deinit (crt);
-      }
-
-    if (hostname_ok == 1)
-      {
-          printf
-              ("- The hostname in the certificate does NOT match '%s'\n",
-               hostname);
-          if (!insecure)
-              exit (1);
-      }
-    else if (hostname_ok == 2)
-      {
-          printf ("- The hostname in the certificate matches '%s'.\n",
-                  hostname);
       }
 }
 
+/* returns true or false, depending on whether the hostname
+ * matches to certificate */
+static int
+verify_x509_hostname (gnutls_session_t session, const char *hostname)
+{
+  gnutls_x509_crt_t crt;
+  const gnutls_datum_t *cert_list;
+  unsigned int cert_list_size = 0;
+  int ret;
+
+  cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
+  if (cert_list_size == 0)
+    {
+      fprintf (stderr, "No certificates found!\n");
+      return 0;
+    }
+
+  gnutls_x509_crt_init (&crt);
+  ret =
+      gnutls_x509_crt_import (crt, &cert_list[0],
+                              GNUTLS_X509_FMT_DER);
+  if (ret < 0)
+    {
+      fprintf (stderr, "Decoding error: %s\n",
+               gnutls_strerror (ret));
+      return 0;
+    }
+
+  /* Check the hostname of the first certificate if it matches
+   * the name of the host we connected to.
+   */
+  if (gnutls_x509_crt_check_hostname (crt, hostname) == 0)
+    {
+      printf
+             ("- The hostname in the certificate does NOT match '%s'\n",
+              hostname);
+      ret = 0;
+    }
+  else
+    {
+      printf ("- The hostname in the certificate matches '%s'.\n",
+              hostname);
+      ret = 1;
+    }
+
+  gnutls_x509_crt_deinit (crt);
+
+  return ret;
+}
+
 #ifdef ENABLE_OPENPGP
+/* returns true or false, depending on whether the hostname
+ * matches to certificate */
+static int
+verify_openpgp_hostname (gnutls_session_t session, const char *hostname)
+{
+  gnutls_openpgp_crt_t crt;
+  const gnutls_datum_t *cert_list;
+  unsigned int cert_list_size = 0;
+  int ret;
+
+  cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
+  if (cert_list_size == 0)
+    {
+      fprintf (stderr, "No certificates found!\n");
+      return 0;
+    }
+
+  gnutls_openpgp_crt_init (&crt);
+  ret =
+      gnutls_openpgp_crt_import (crt, &cert_list[0],
+                              GNUTLS_OPENPGP_FMT_RAW);
+  if (ret < 0)
+    {
+      fprintf (stderr, "Decoding error: %s\n",
+               gnutls_strerror (ret));
+      return 0;
+    }
+
+  /* Check the hostname of the first certificate if it matches
+   * the name of the host we connected to.
+   */
+  if (gnutls_openpgp_crt_check_hostname (crt, hostname) == 0)
+    {
+      printf
+             ("- The hostname in the certificate does NOT match '%s'\n",
+              hostname);
+      ret = 0;
+    }
+  else
+    {
+      printf ("- The hostname in the certificate matches '%s'.\n",
+              hostname);
+      ret = 1;
+    }
+
+  gnutls_openpgp_crt_deinit (crt);
+
+  return ret;
+}
 
 static void
-print_openpgp_info (gnutls_session_t session, const char *hostname,
-                    int insecure)
+print_openpgp_info_compact (gnutls_session_t session, int flag)
 {
 
     gnutls_openpgp_crt_t crt;
     const gnutls_datum_t *cert_list;
     unsigned int cert_list_size = 0;
-    int hostname_ok = 0;
     int ret;
 
     cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
@@ -211,14 +317,50 @@ print_openpgp_info (gnutls_session_t session, const char *hostname,
                 return;
             }
 
-          if (verbose)
-              ret =
-                  gnutls_openpgp_crt_print (crt, GNUTLS_CRT_PRINT_FULL,
-                                            &cinfo);
-          else
-              ret =
-                  gnutls_openpgp_crt_print (crt, GNUTLS_CRT_PRINT_ONELINE,
-                                            &cinfo);
+          ret =
+              gnutls_openpgp_crt_print (crt, flag, &cinfo);
+          if (ret == 0)
+            {
+                printf ("- OpenPGP cert: %s\n", cinfo.data);
+                gnutls_free (cinfo.data);
+            }
+
+          gnutls_openpgp_crt_deinit (crt);
+      }
+}
+
+static void
+print_openpgp_info (gnutls_session_t session, int flag)
+{
+
+    gnutls_openpgp_crt_t crt;
+    const gnutls_datum_t *cert_list;
+    unsigned int cert_list_size = 0;
+    int ret;
+
+    if (flag == GNUTLS_CRT_PRINT_COMPACT)
+      print_openpgp_info_compact(session, flag);
+    
+    printf (" - Certificate type: OpenPGP\n");
+
+    cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
+
+    if (cert_list_size > 0)
+      {
+          gnutls_datum_t cinfo;
+
+          gnutls_openpgp_crt_init (&crt);
+          ret = gnutls_openpgp_crt_import (crt, &cert_list[0],
+                                           GNUTLS_OPENPGP_FMT_RAW);
+          if (ret < 0)
+            {
+                fprintf (stderr, "Decoding error: %s\n",
+                         gnutls_strerror (ret));
+                return;
+            }
+
+          ret =
+              gnutls_openpgp_crt_print (crt, flag, &cinfo);
           if (ret == 0)
             {
                 printf (" - %s\n", cinfo.data);
@@ -261,59 +403,38 @@ print_openpgp_info (gnutls_session_t session, const char *hostname,
                 gnutls_free (p);
             }
 
-          if (hostname != NULL)
-            {
-                /* Check the hostname of the first certificate if it matches
-                 * the name of the host we connected to.
-                 */
-                if (gnutls_openpgp_crt_check_hostname (crt, hostname) == 0)
-                    hostname_ok = 1;
-                else
-                    hostname_ok = 2;
-            }
-
           gnutls_openpgp_crt_deinit (crt);
-      }
-
-    if (hostname_ok == 1)
-      {
-          printf
-              ("- The hostname in the certificate does NOT match '%s'\n",
-               hostname);
-          if (!insecure)
-              exit (1);
-      }
-    else if (hostname_ok == 2)
-      {
-          printf ("- The hostname in the certificate matches '%s'.\n",
-                  hostname);
       }
 }
 
 #endif
 
-static void
-print_cert_vrfy (gnutls_session_t session)
+/* returns false (0) if not verified, or true (1) otherwise */
+int
+cert_verify (gnutls_session_t session, const char* hostname)
 {
     int rc;
-    unsigned int status;
+    unsigned int status = 0;
+    int type;
 
     rc = gnutls_certificate_verify_peers2 (session, &status);
+    if (rc == GNUTLS_E_NO_CERTIFICATE_FOUND)
+      {
+          printf ("- Peer did not send any certificate.\n");
+          return 0;
+      }
+
     if (rc < 0)
       {
           printf ("- Could not verify certificate (err: %s)\n",
                   gnutls_strerror (rc));
-          return;
+          return 0;
       }
 
-    if (rc == GNUTLS_E_NO_CERTIFICATE_FOUND)
+    type = gnutls_certificate_type_get (session);
+    if (type == GNUTLS_CRT_X509)
       {
-          printf ("- Peer did not send any certificate.\n");
-          return;
-      }
 
-    if (gnutls_certificate_type_get (session) == GNUTLS_CRT_X509)
-      {
           if (status & GNUTLS_CERT_REVOKED)
               printf ("- Peer's certificate chain revoked\n");
           if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
@@ -333,8 +454,11 @@ print_cert_vrfy (gnutls_session_t session)
               printf ("- Peer's certificate is NOT trusted\n");
           else
               printf ("- Peer's certificate is trusted\n");
+
+          rc = verify_x509_hostname (session, hostname);
+          if (rc == 0) status |= GNUTLS_CERT_INVALID;
       }
-    else
+    else if (type == GNUTLS_CRT_OPENPGP)
       {
           if (status & GNUTLS_CERT_INVALID)
               printf ("- Peer's key is invalid\n");
@@ -342,7 +466,20 @@ print_cert_vrfy (gnutls_session_t session)
               printf ("- Peer's key is valid\n");
           if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
               printf ("- Could not find a signer of the peer's key\n");
+
+          rc = verify_openpgp_hostname (session, hostname);
+          if (rc == 0) status |= GNUTLS_CERT_INVALID;
       }
+    else
+      {
+        fprintf(stderr, "Unknown certificate type\n");
+        status |= GNUTLS_CERT_INVALID;
+      }
+
+    if (status)
+      return 0;
+
+    return 1;
 }
 
 static void
@@ -450,6 +587,7 @@ print_info (gnutls_session_t session, const char *hostname, int insecure)
     gnutls_credentials_type_t cred;
     gnutls_kx_algorithm_t kx;
     unsigned char session_id[33];
+    int ret;
     size_t session_id_size = sizeof (session_id);
 
     /* print session ID */
@@ -517,9 +655,14 @@ print_info (gnutls_session_t session, const char *hostname, int insecure)
                 }
           }
 
-          print_cert_info (session, hostname, insecure);
+          print_cert_info (session, verbose?GNUTLS_CRT_PRINT_FULL:GNUTLS_CRT_PRINT_COMPACT);
 
-          print_cert_vrfy (session);
+          ret = cert_verify (session, hostname);
+          if (insecure == 0 && ret == 0)
+            {
+              fprintf(stderr, "Exiting because verification failed (use --insecure to force connection)\n");
+              exit(1);
+            }
 
           if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS)
               print_dh_info (session, "Ephemeral ");
@@ -578,32 +721,25 @@ print_info (gnutls_session_t session, const char *hostname, int insecure)
 }
 
 void
-print_cert_info (gnutls_session_t session, const char *hostname,
-                 int insecure)
+print_cert_info (gnutls_session_t session, int flag)
 {
 
     if (gnutls_certificate_client_get_request_status (session) != 0)
         printf ("- Server has requested a certificate.\n");
 
-    printf ("- Certificate type: ");
     switch (gnutls_certificate_type_get (session))
       {
-      case GNUTLS_CRT_UNKNOWN:
-          printf ("Unknown\n");
-
-          if (!insecure)
-              exit (1);
-          break;
       case GNUTLS_CRT_X509:
-          printf ("X.509\n");
-          print_x509_info (session, hostname, insecure);
+          print_x509_info (session, flag);
           break;
 #ifdef ENABLE_OPENPGP
       case GNUTLS_CRT_OPENPGP:
-          printf ("OpenPGP\n");
-          print_openpgp_info (session, hostname, insecure);
+          print_openpgp_info (session, flag);
           break;
 #endif
+      default:
+          printf ("Unknown type\n");
+          break;
       }
 }
 

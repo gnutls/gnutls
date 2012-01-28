@@ -71,4 +71,6 @@ struct timespec ts;
 #endif
 }
 
+int _gnutls_find_config_path(char* path, size_t max_size);
+
 #endif /* SYSTEM_H */

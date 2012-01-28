@@ -18,7 +18,7 @@ extern void tcp_close (int sd);
 #define MAX_BUF 1024
 #define USERNAME "user"
 #define PASSWORD "pass"
-#define CAFILE "ca.pem"
+#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
 int

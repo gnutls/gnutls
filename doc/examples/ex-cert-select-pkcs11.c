@@ -26,7 +26,7 @@
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 #define MIN(x,y) (((x)<(y))?(x):(y))
 
-#define CAFILE "ca.pem"
+#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 
 /* The URLs of the objects can be obtained
  * using p11tool --list-all --login

@@ -50,9 +50,9 @@
 extern const char str_unknown[];
 
 int print_info (gnutls_session_t state, const char *hostname, int insecure);
-void print_cert_info (gnutls_session_t state, const char *hostname,
-                      int insecure);
+void print_cert_info (gnutls_session_t, int flag);
 void print_list (const char* priorities, int verbose);
+int cert_verify (gnutls_session_t session, const char* hostname);
 
 const char *raw_to_string (const unsigned char *raw, size_t raw_size);
 void pkcs11_common (void);

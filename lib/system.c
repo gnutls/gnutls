@@ -25,14 +25,20 @@
 #include <gnutls_errors.h>
 
 #include <errno.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #ifdef _WIN32
-#include <windows.h>
+# include <windows.h>
 
 #else
-#ifdef HAVE_PTHREAD_LOCKS
-#include <pthread.h>
-#endif
+# ifdef HAVE_PTHREAD_LOCKS
+#  include <pthread.h>
+# endif
+
+# if defined(HAVE_GETPWUID_R)
+#  include <pwd.h>
+# endif
 #endif
 
 /* We need to disable gnulib's replacement wrappers to get native
@@ -278,3 +284,65 @@ mutex_init_func gnutls_mutex_init = gnutls_system_mutex_init;
 mutex_deinit_func gnutls_mutex_deinit = gnutls_system_mutex_deinit;
 mutex_lock_func gnutls_mutex_lock = gnutls_system_mutex_lock;
 mutex_unlock_func gnutls_mutex_unlock = gnutls_system_mutex_unlock;
+
+#define CONFIG_PATH ".gnutls"
+
+/* Returns a path to store user-specific configuration
+ * data.
+ */
+int _gnutls_find_config_path(char* path, size_t max_size)
+{
+char tmp_home_dir[1024];
+const char *home_dir = getenv ("HOME");
+
+#ifdef _WIN32
+  if (home_dir == NULL || home_dir[0] == '\0')
+    {
+      const char *home_drive = getenv ("HOMEDRIVE");
+      const char *home_path = getenv ("HOMEPATH");
+
+      if (home_drive != NULL && home_path != NULL)
+        {
+          snprintf(tmp_home_dir, sizeof(tmp_home_dir), "%s%s", home_drive, home_path);
+        }
+      else
+        {
+          tmp_home_dir[0] = 0;
+        }
+      
+      home_dir = tmp_home_dir;
+    }
+#elsif defined(HAVE_GETPWUID_R)
+  if (home_dir == NULL || home_dir[0] == '\0')
+    {
+      struct passwd *pwd;
+      struct passwd _pwd;
+      char buf[1024];
+
+      getpwuid_r(getuid(), &_pwd, buf, sizeof(buf), &pwd);
+      if (pwd != NULL)
+        {
+          snprintf(tmp_home_dir, sizeof(tmp_home_dir), "%s", pwd->pw_dir);
+        }
+      else
+        {
+          tmp_home_dir[0] = 0;
+        }
+
+      home_dir = tmp_home_dir;
+    }
+#else
+  if (home_dir == NULL || home_dir[0] == '\0')
+    {
+      tmp_home_dir[0] = 0;
+      home_dir = tmp_home_dir;
+    }
+#endif
+
+  if (home_dir == NULL || home_dir[0] == 0)
+    path[0] = 0;
+  else
+    snprintf(path, max_size, "%s/"CONFIG_PATH, home_dir);
+      
+  return 0;
+}

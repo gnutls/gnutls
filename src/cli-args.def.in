@@ -37,6 +37,12 @@ flag = {
 };
 
 flag = {
+    name      = ssh;
+    descrip   = "Enable SSH-style authentication";
+    doc       = "This option will, in addition to certificate authentication, perform authentication based on stored public keys.";
+};
+
+flag = {
     name      = resume;
     value     = r;
     descrip   = "Connect, establish a session. Connect again and resume this session";
@@ -229,7 +235,7 @@ flag = {
     name      = port;
     value     = p;
     arg-type  = string;
-    descrip   = "The port to connect to";
+    descrip   = "The port or service to connect to";
     doc      = "";
 };
 

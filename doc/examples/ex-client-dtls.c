@@ -18,7 +18,7 @@
  */
 
 #define MAX_BUF 1024
-#define CAFILE "ca.pem"
+#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
 extern int udp_connect (void);

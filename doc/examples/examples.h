@@ -12,6 +12,9 @@ int print_info (gnutls_session_t session);
 
 void print_x509_certificate_info (gnutls_session_t session);
 
+int
+_ssh_verify_certificate_callback (gnutls_session_t session);
+
 void
 verify_certificate_chain (const char *hostname,
                           const gnutls_datum_t * cert_chain,

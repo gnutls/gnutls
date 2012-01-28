@@ -20,7 +20,7 @@
 
 #define KEYFILE "key.pem"
 #define CERTFILE "cert.pem"
-#define CAFILE "ca.pem"
+#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 #define CRLFILE "crl.pem"
 
 /* This is a sample DTLS echo server, using X.509 authentication.

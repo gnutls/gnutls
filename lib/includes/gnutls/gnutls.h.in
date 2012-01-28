@@ -526,6 +526,7 @@ extern "C"
  * @GNUTLS_CRT_UNKNOWN: Unknown certificate type.
  * @GNUTLS_CRT_X509: X.509 Certificate.
  * @GNUTLS_CRT_OPENPGP: OpenPGP certificate.
+ * @GNUTLS_CRT_RAW: Raw public key (SubjectPublicKey)
  *
  * Enumeration of different certificate types.
  */
@@ -533,7 +534,8 @@ extern "C"
   {
     GNUTLS_CRT_UNKNOWN = 0,
     GNUTLS_CRT_X509 = 1,
-    GNUTLS_CRT_OPENPGP = 2
+    GNUTLS_CRT_OPENPGP = 2,
+    GNUTLS_CRT_RAW = 3
   } gnutls_certificate_type_t;
 
 /**
@@ -552,6 +554,7 @@ extern "C"
 /**
  * gnutls_certificate_print_formats_t:
  * @GNUTLS_CRT_PRINT_FULL: Full information about certificate.
+ * @GNUTLS_CRT_PRINT_COMPACT: Information about certificate name in one line, plus identification of the public key.
  * @GNUTLS_CRT_PRINT_ONELINE: Information about certificate in one line.
  * @GNUTLS_CRT_PRINT_UNSIGNED_FULL: All info for an unsigned certificate.
  *
@@ -561,7 +564,8 @@ extern "C"
   {
     GNUTLS_CRT_PRINT_FULL = 0,
     GNUTLS_CRT_PRINT_ONELINE = 1,
-    GNUTLS_CRT_PRINT_UNSIGNED_FULL = 2
+    GNUTLS_CRT_PRINT_UNSIGNED_FULL = 2,
+    GNUTLS_CRT_PRINT_COMPACT = 3
   } gnutls_certificate_print_formats_t;
 
 #define GNUTLS_PK_ECC GNUTLS_PK_EC
@@ -1651,6 +1655,22 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 
   int gnutls_hex2bin (const char *hex_data, size_t hex_size,
                       void *bin_data, size_t * bin_size);
+
+  /* ssh style functions */
+  int gnutls_verify_stored_pubkey(const char* file, 
+                            const char* application,
+                            const char* host,
+                            const char* service,
+                            gnutls_certificate_type_t cert_type,
+                            const gnutls_datum_t * cert, unsigned int flags);
+
+  int gnutls_store_pubkey(const char* file, 
+                    const char* application,
+                    const char* host,
+                    const char* service,
+                    gnutls_certificate_type_t cert_type,
+                    const gnutls_datum_t * cert, unsigned int flags);
+
 
   /* Gnutls error codes. The mapping to a TLS alert is also shown in
    * comments.

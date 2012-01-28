@@ -506,6 +506,13 @@ gnutls_openpgp_crt_print (gnutls_openpgp_crt_t cert,
 
   if (format == GNUTLS_CRT_PRINT_ONELINE)
     print_oneline (&str, cert);
+  else if (format == GNUTLS_CRT_PRINT_COMPACT)
+    {
+      print_oneline (&str, cert);
+
+      _gnutls_buffer_append_data (&str, "\n", 1);
+      print_key_fingerprint (&str, cert);
+    }
   else
     {
       _gnutls_buffer_append_str (&str,

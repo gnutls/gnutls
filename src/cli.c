@@ -70,6 +70,8 @@ int crlf;
 unsigned int verbose = 0;
 extern int print_cert;
 
+#define DEFAULT_CA_FILE "/etc/ssl/certs/ca-certificates.crt"
+
 const char *srp_passwd = NULL;
 const char *srp_username = NULL;
 const char *pgp_keyfile = NULL;
@@ -423,21 +425,91 @@ load_keys (void)
 
 }
 
+#define IS_NEWLINE(x) ((x[0] == '\n') || (x[0] == '\r'))
+static int
+read_yesno (const char *input_str)
+{
+  char input[128];
+
+  fputs (input_str, stderr);
+  if (fgets (input, sizeof (input), stdin) == NULL)
+    return 0;
+
+  if (IS_NEWLINE(input))
+    return 0;
+
+  if (input[0] == 'y' || input[0] == 'Y')
+    return 1;
+
+  return 0;
+}
+
 static int
 cert_verify_callback (gnutls_session_t session)
 {
   int rc;
-  unsigned int status;
+  unsigned int status = 0;
+  int ssh = HAVE_OPT(SSH);
 
   if (!x509_cafile && !pgp_keyring)
     return 0;
 
-  rc = gnutls_certificate_verify_peers2 (session, &status);
-  if (rc != 0 || status != 0)
+  rc = cert_verify(session, hostname);
+  if (rc == 0)
     {
       printf ("*** Verifying server certificate failed...\n");
-      if (!insecure)
+      if (!insecure && !ssh)
         return -1;
+    }
+
+  if (ssh) /* try ssh auth */
+    {
+      unsigned int list_size;
+      const gnutls_datum_t * cert;
+      
+      cert = gnutls_certificate_get_peers(session, &list_size);
+      if (cert == NULL)
+        {
+          fprintf(stderr, "Cannot obtain peer's certificate!\n");
+          return -1;
+        }
+      
+      rc = gnutls_verify_stored_pubkey(NULL, NULL, hostname, service, GNUTLS_CRT_X509,
+                                       cert, 0);
+      if (rc == GNUTLS_E_NO_CERTIFICATE_FOUND)
+        {
+          print_cert_info(session, GNUTLS_CRT_PRINT_COMPACT);
+          fprintf(stderr, "Host %s has never been contacted before and is not in the trusted list.\n", hostname);
+          if (status == 0)
+            fprintf(stderr, "Its certificate is valid for %s.\n", hostname);
+
+          rc = read_yesno("Are you sure you want to trust it? (y/N): ");
+          if (rc == 0)
+            return -1;
+        }
+      else if (rc == GNUTLS_E_CERTIFICATE_KEY_MISMATCH)
+        {
+          print_cert_info(session, GNUTLS_CRT_PRINT_COMPACT);
+          fprintf(stderr, "Warning: host %s is known and it is associated with a different key.\n", hostname);
+          fprintf(stderr, "It might be that the server has multiple keys, or an attacker replaced the key to eavesdrop this connection .\n");
+          if (status == 0)
+            fprintf(stderr, "Its certificate is valid for %s.\n", hostname);
+
+          rc = read_yesno("Do you trust the received key? (y/N): ");
+          if (rc == 0)
+            return -1;
+        }
+      else if (rc < 0)
+        {
+          fprintf(stderr, "gnutls_verify_stored_pubkey: %s\n", gnutls_strerror(rc));
+          return -1;
+        }
+      
+      rc = gnutls_store_pubkey(NULL, NULL, hostname, service, GNUTLS_CRT_X509, cert, 0);
+      if (rc < 0)
+        {
+          fprintf(stderr, "Could not store key: %s\n", gnutls_strerror(rc));
+        }
     }
 
   return 0;
@@ -1018,6 +1090,7 @@ const char* rest = NULL;
   resume = HAVE_OPT(RESUME);
   rehandshake = HAVE_OPT(REHANDSHAKE);
   insecure = HAVE_OPT(INSECURE);
+
   udp = HAVE_OPT(UDP);
   mtu = OPT_VALUE_MTU;
   
@@ -1046,6 +1119,11 @@ const char* rest = NULL;
   
   if (HAVE_OPT(X509CAFILE))
     x509_cafile = OPT_ARG(X509CAFILE);
+  else
+    {
+      if (access(DEFAULT_CA_FILE, R_OK) == 0)
+        x509_cafile = DEFAULT_CA_FILE;
+    }
   
   if (HAVE_OPT(X509CRLFILE))
     x509_crlfile = OPT_ARG(X509CRLFILE);
@@ -1151,8 +1229,6 @@ do_handshake (socket_st * socket)
     {
       /* print some information */
       print_info (socket->session, socket->hostname, HAVE_OPT(INSECURE));
-
-
       socket->secure = 1;
     }
   else

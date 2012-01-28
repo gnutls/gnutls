@@ -25,6 +25,7 @@ implemented by another example.
 @menu
 * Simple client example with anonymous authentication::
 * Simple client example with X.509 certificate support::
+* Simple client example with SSH-style certificate verification::
 * Simple Datagram TLS client example::
 * Obtaining session information::
 * Using a callback to select the certificate to use::
@@ -47,6 +48,8 @@ is vulnerable to man-in-the-middle (active or redirection) attacks.
 However, the data are integrity protected and encrypted from
 passive eavesdroppers.
 
+Note that the server must support anonymous authentication as well.
+
 @verbatiminclude examples/ex-client-anon.c
 
 @node Simple client example with X.509 certificate support
@@ -61,6 +64,16 @@ functions for certificates, but does not support session
 resumption. 
 
 @verbatiminclude examples/ex-client-x509.c
+
+@node Simple client example with SSH-style certificate verification
+@subsection Simple client example with SSH-style certificate verification
+
+This is an alternative verification function that will use the
+X.509 certificate authorities for verification, but also assume an
+SSH-like authentication system. That is the user is prompted on unknown 
+public keys and known public keys are considered trusted.
+
+@verbatiminclude examples/ex-verify-ssh.c
 
 @node Simple Datagram TLS client example
 @subsection Simple datagram @acronym{TLS} client example

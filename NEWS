@@ -4,11 +4,17 @@ See the end for copying conditions.
 
 * Version 3.0.13 (unreleased)
 
+** gnutls-cli: If no --x509cafile is provided a default is
+assumed (/etc/ssl/certs/ca-certificates.crt).
+
 ** ocsptool: Added --ask parameter, to verify a certificate's
 status from an ocsp server.
 
 ** command line apps: Use gnu autogen (libopts) to parse command
 line arguments and template files.
+
+** libgnutls: Added new functions to easily allow the usage of
+an SSH-style authentication.
 
 ** libgnutls: SUITEB128 and SUITEB192 priority strings account
 for the RFC6460 requirements.
@@ -28,6 +34,8 @@ of PKCS #11 modules. This is required on the child process after
 a fork.
 
 ** API and ABI modifications:
+gnutls_verify_stored_pubkey: Added
+gnutls_store_pubkey: Added
 gnutls_x509_crt_get_authority_key_gn_serial: Added
 gnutls_x509_crl_get_authority_key_gn_serial: Added
 gnutls_pkcs11_reinit: Added

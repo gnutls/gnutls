@@ -1700,6 +1700,22 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
       
       return ret;
     }
+  else if (format == GNUTLS_CRT_PRINT_COMPACT)
+    {
+      _gnutls_buffer_init (&str);
+
+      print_oneline (&str, cert);
+
+      _gnutls_buffer_append_data (&str, "\n", 1);
+      print_keyid (&str, cert);
+
+      _gnutls_buffer_append_data (&str, "\0", 1);
+
+      ret = _gnutls_buffer_to_datum( &str, out);
+      if (out->size > 0) out->size--;
+      
+      return ret;
+    }
   else if (format == GNUTLS_CRT_PRINT_ONELINE)
     {
       _gnutls_buffer_init (&str);
