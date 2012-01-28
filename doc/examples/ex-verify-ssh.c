@@ -126,10 +126,11 @@ _ssh_verify_certificate_callback (gnutls_session_t session)
     }
   
   /* user trusts the key -> store it */
-  ret = gnutls_store_pubkey(NULL, NULL, hostname, "443", GNUTLS_CRT_X509, &cert_list[0], 0);
-  if (ret < 0)
+  if (ret != 0)
     {
-      fprintf(stderr, "gnutls_store_pubkey: %s\n", gnutls_strerror(ret));
+      ret = gnutls_store_pubkey(NULL, NULL, hostname, "443", GNUTLS_CRT_X509, &cert_list[0], 0);
+      if (ret < 0)
+        fprintf(stderr, "gnutls_store_pubkey: %s\n", gnutls_strerror(ret));
     }
 
   /* notify gnutls to continue handshake normally */

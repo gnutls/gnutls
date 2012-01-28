@@ -505,10 +505,11 @@ cert_verify_callback (gnutls_session_t session)
           return -1;
         }
       
-      rc = gnutls_store_pubkey(NULL, NULL, hostname, service, GNUTLS_CRT_X509, cert, 0);
-      if (rc < 0)
+      if (rc != 0)
         {
-          fprintf(stderr, "Could not store key: %s\n", gnutls_strerror(rc));
+          rc = gnutls_store_pubkey(NULL, NULL, hostname, service, GNUTLS_CRT_X509, cert, 0);
+          if (rc < 0)
+            fprintf(stderr, "Could not store key: %s\n", gnutls_strerror(rc));
         }
     }
 
