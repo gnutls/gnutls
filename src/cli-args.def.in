@@ -39,6 +39,8 @@ flag = {
 flag = {
     name      = ssh;
     descrip   = "Enable SSH-style authentication";
+    disabled;
+    disable   = "no";
     doc       = "This option will, in addition to certificate authentication, perform authentication based on stored public keys.";
 };
 

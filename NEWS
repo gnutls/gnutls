@@ -4,7 +4,10 @@ See the end for copying conditions.
 
 * Version 3.0.13 (unreleased)
 
-** gnutls-cli: If no --x509cafile is provided a default is
+** gnutls-cli: added the --ssh and if specified, gnutls-cli
+will use an ssh-style authentication method.
+
+** gnutls-cli: if no --x509cafile is provided a default is
 assumed (/etc/ssl/certs/ca-certificates.crt).
 
 ** ocsptool: Added --ask parameter, to verify a certificate's

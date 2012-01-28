@@ -449,7 +449,7 @@ cert_verify_callback (gnutls_session_t session)
 {
   int rc;
   unsigned int status = 0;
-  int ssh = HAVE_OPT(SSH);
+  int ssh = ENABLED_OPT(SSH);
 
   if (!x509_cafile && !pgp_keyring)
     return 0;
