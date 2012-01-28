@@ -773,6 +773,7 @@ GNUTLS_3_0_0 {
 	gnutls_priority_ecc_curve_list;
 	gnutls_verify_stored_pubkey;
 	gnutls_store_pubkey;
+	gnutls_ocsp_resp_verify_cred;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {
