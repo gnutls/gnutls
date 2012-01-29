@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.0.13 (unreleased)
 
+** gnutls-cli: added the --ocsp option which will verify
+the peer's certificate with OCSP.
+
 ** gnutls-cli: added the --ssh and if specified, gnutls-cli
 will use an ssh-style authentication method.
 

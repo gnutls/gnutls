@@ -297,41 +297,12 @@ This means the CA support OCSP queries over HTTP.  We are now ready to
 create a OCSP request for the certificate.
 
 @example
-$ ocsptool --generate-request --load-issuer issuer.pem  --load-cert cert.pem --outfile ocsp-request.der
+$ ocsptool --ask ocsp.CAcert.org --load-issuer issuer.pem  --load-cert cert.pem \
+           --outfile ocsp-request.der
 @end example
 
-The request is sent base64 encoded via HTTP to the address indicated
-by the id-ad-ocsp extension, as follows.
-
-@example
-$ wget -O ocsp-response.der http://ocsp.CAcert.org/$(base64 -w0 ocsp-request.der)
-@end example
-
-The OCSP response is now in the file @code{ocsp-response.der} and you
-can view it using @code{ocsptool -j < ocsp-response.der}.  To verify
-the signature you need to load the issuer as the trust anchor.
-
-@example
-$ ocsptool --verify-response --load-trust issuer.pem --load-response ocsp-response.der
-Verifying OCSP Response: Success.
-$
-@end example
-
-This particular OCSP responder includes its signer certificate in the
-OCSP respnose, so you may extract it and use it together with
-@code{--load-signer} for verifying the signature directly against the
-certificate.
-
-@example
-$ ocsptool -j < ocsp-response.der > signer.pem
-$ ocsptool --verify-response --load-signer signer.pem --load-response ocsp-response.der
-Verifying OCSP Response: Success.
-$
-@end example
-
-You may experiment passing different certificates to
-@code{--load-trust} and @code{--load-signer} to find common error
-conditions for OCSP response verification failures.
+The request is sent via HTTP to the OCSP server address specified. If the
+address is ommited ocsptool will use the address stored in the certificate.
 
 _EOF_;
 };
