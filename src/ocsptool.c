@@ -272,12 +272,6 @@ _verify_response (gnutls_datum_t *data)
       if (HAVE_OPT(VERBOSE))
 	fprintf (stdout, "Loaded %d trust anchors\n", x509_ncas);
 
-{
-FILE* f=fopen("resp.der", "w");
-fwrite(data->data, 1, data->size, f);
-fclose(f);
-}
-
       ret = gnutls_ocsp_resp_verify (resp, list, &verify, 0);
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "gnutls_ocsp_resp_verify: %s",
