@@ -27,28 +27,28 @@ dist_man_MANS += srptool.1
 endif
 
 certtool.1: ../../src/certtool-args.def
-	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
 
 ocsptool.1: ../../src/ocsptool-args.def
-	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
 
 gnutls-cli.1: ../../src/cli-args.def
-	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
 
 gnutls-serv.1: ../../src/serv-args.def
-	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
 
 gnutls-cli-debug.1: ../../src/cli-debug-args.def
-	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
 
 srptool.1: ../../src/srptool-args.def
-	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
 
 p11tool.1: ../../src/p11tool-args.def
-	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
 
 psktool.1: ../../src/psk-args.def
-	-autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
+	autogen -DMAN_SECTION=1 -Tagman-cmd.tpl $<
 
 APIMANS =
 APIMANS += gnutls_pubkey_init.3
