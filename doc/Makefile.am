@@ -29,42 +29,42 @@ SUBDIRS += reference
 endif
 
 invoke-gnutls-cli.texi: ../src/cli-args.def
-	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
-	mv ../src/$@ .
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	-mv -f ../src/$@ .
 
 invoke-gnutls-cli-debug.texi: ../src/cli-debug-args.def
-	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
-	mv ../src/$@ .
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	-mv -f ../src/$@ .
 
 invoke-gnutls-serv.texi: ../src/serv-args.def
-	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
-	mv ../src/$@ .
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	-mv -f ../src/$@ .
 
 invoke-certtool.texi: ../src/certtool-args.def
-	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
-	mv ../src/$@ .
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	-mv -f ../src/$@ .
 
 invoke-srptool.texi: ../src/srptool-args.def
-	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
-	mv ../src/$@ .
-	sed -i 's/@subsection/@subsubsection/' $@
-	sed -i 's/@section/@subsection/' $@
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	-mv -f ../src/$@ .
+	-sed -i 's/@subsection/@subsubsection/' $@
+	-sed -i 's/@section/@subsection/' $@
 
 invoke-ocsptool.texi: ../src/ocsptool-args.def
-	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
-	mv ../src/$@ .
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	-mv -f ../src/$@ .
 
 invoke-psktool.texi: ../src/psk-args.def
-	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
-	mv ../src/$@ .
-	sed -i 's/@subsection/@subsubsection/' $@
-	sed -i 's/@section/@subsection/' $@
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	-mv -f ../src/$@ .
+	-sed -i 's/@subsection/@subsubsection/' $@
+	-sed -i 's/@section/@subsection/' $@
 
 invoke-p11tool.texi: ../src/p11tool-args.def
-	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
-	mv ../src/$@ .
-	sed -i 's/@subsection/@subsubsection/' $@
-	sed -i 's/@section/@subsection/' $@
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	-mv -f ../src/$@ .
+	-sed -i 's/@subsection/@subsubsection/' $@
+	-sed -i 's/@section/@subsection/' $@
 
 info_TEXINFOS = gnutls.texi gnutls-guile.texi
 gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
