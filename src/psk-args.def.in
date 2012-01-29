@@ -81,8 +81,8 @@ psk_identity:88f3824b3e5659f52d00e959bacab954b6540344
 $
 @end example
 
-This command will create @file{/etc/passwd.psk} if it does not exist
-and will add user 'test' (you will also be prompted for a password). 
+This command will create @file{passwd.psk} if it does not exist
+and will add user 'psk_identity' (you will also be prompted for a password). 
 _EOT_;
 };
 
