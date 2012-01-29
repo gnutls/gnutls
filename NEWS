@@ -11,7 +11,7 @@ the peer's certificate with OCSP.
 will use an ssh-style authentication method.
 
 ** gnutls-cli: if no --x509cafile is provided a default is
-assumed (/etc/ssl/certs/ca-certificates.crt).
+assumed (/etc/ssl/certs/ca-certificates.crt), if it exists.
 
 ** ocsptool: Added --ask parameter, to verify a certificate's
 status from an ocsp server.
