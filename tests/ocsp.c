@@ -1276,21 +1276,6 @@ resp_verify (void)
       exit (1);
     }
 
-  /* check direct verify with issuer (should fail) */
-
-  ret = gnutls_ocsp_resp_verify_direct (resp, issuer, &verify, 0);
-  if (ret < 0)
-    {
-      fail ("gnutls_ocsp_resp_verify_direct (issuer) %d\n", ret);
-      exit (1);
-    }
-
-  if (verify != GNUTLS_OCSP_VERIFY_SIGNATURE_FAILURE)
-    {
-      fail ("gnutls_ocsp_resp_verify_direct2 %d\n", verify);
-      exit (1);
-    }
-
   /* check direct verify with cert (should fail) */
 
   ret = gnutls_ocsp_resp_verify_direct (resp, cert, &verify, 0);
@@ -1300,7 +1285,7 @@ resp_verify (void)
       exit (1);
     }
 
-  if (verify != GNUTLS_OCSP_VERIFY_SIGNATURE_FAILURE)
+  if (verify != GNUTLS_OCSP_VERIFY_UNTRUSTED_SIGNER)
     {
       fail ("gnutls_ocsp_resp_verify_direct3 %d\n", verify);
       exit (1);
