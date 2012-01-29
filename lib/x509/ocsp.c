@@ -1911,35 +1911,11 @@ find_signercert (gnutls_ocsp_resp_t resp)
   return signercert;
 }
 
-/**
- * gnutls_ocsp_resp_verify_direct:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
- * @signercert: certificate believed to have signed the response
- * @verify: output variable with verification status, an #gnutls_ocsp_cert_status_t
- * @flags: verification flags, 0 for now.
- *
- * Verify signature of the Basic OCSP Response against the public key
- * in the @signercert certificate.
- *
- * The output @verify variable will hold verification status codes
- * (e.g., %GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND,
- * %GNUTLS_OCSP_VERIFY_INSECURE_ALGORITHM) which are only valid if the
- * function returned %GNUTLS_E_SUCCESS.
- *
- * Note that the function returns %GNUTLS_E_SUCCESS even when
- * verification failed.  The caller must always inspect the @verify
- * variable to find out the verification status.
- *
- * The @flags variable should be 0 for now.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
- **/
-int
-gnutls_ocsp_resp_verify_direct (gnutls_ocsp_resp_t resp,
-				gnutls_x509_crt_t signercert,
-				unsigned int *verify,
-				unsigned int flags)
+static int
+_ocsp_resp_verify_direct (gnutls_ocsp_resp_t resp,
+		          gnutls_x509_crt_t signercert,
+			  unsigned int *verify,
+			  unsigned int flags)
 {
   gnutls_datum_t sig = { NULL };
   gnutls_datum_t data = { NULL };
@@ -1953,7 +1929,13 @@ gnutls_ocsp_resp_verify_direct (gnutls_ocsp_resp_t resp,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  sigalg = gnutls_ocsp_resp_get_signature_algorithm (resp);
+  rc = gnutls_ocsp_resp_get_signature_algorithm (resp);
+  if (rc < 0)
+    {
+      gnutls_assert ();
+      goto done;
+    }
+  sigalg = rc;
 
   rc = export (resp->basicresp, "tbsResponseData", &data);
   if (rc != GNUTLS_E_SUCCESS)
@@ -2003,6 +1985,142 @@ gnutls_ocsp_resp_verify_direct (gnutls_ocsp_resp_t resp,
   gnutls_free (data.data);
   gnutls_free (sig.data);
   gnutls_pubkey_deinit (pubkey);
+
+  return rc;
+}
+
+static inline unsigned int vstatus_to_ocsp_status(unsigned int status)
+{
+unsigned int ostatus;
+
+  if (status & GNUTLS_CERT_INSECURE_ALGORITHM)
+    ostatus = GNUTLS_OCSP_VERIFY_INSECURE_ALGORITHM;
+  else if (status & GNUTLS_CERT_NOT_ACTIVATED)
+    ostatus = GNUTLS_OCSP_VERIFY_CERT_NOT_ACTIVATED;
+  else if (status & GNUTLS_CERT_EXPIRED)
+    ostatus = GNUTLS_OCSP_VERIFY_CERT_EXPIRED;
+  else
+    ostatus = GNUTLS_OCSP_VERIFY_UNTRUSTED_SIGNER;
+
+  return ostatus;
+}
+
+static int check_ocsp_purpose(gnutls_x509_crt_t signercert)
+{
+char oidtmp[sizeof (GNUTLS_KP_OCSP_SIGNING)];
+size_t oidsize;
+int indx, rc;
+
+      for (indx = 0; ; indx++)
+	{
+	  oidsize = sizeof (oidtmp);
+	  rc = gnutls_x509_crt_get_key_purpose_oid (signercert, indx,
+						    oidtmp, &oidsize,
+						    NULL);
+	  if (rc == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
+	    {
+	      gnutls_assert();
+	      return rc;
+	    }
+	  else if (rc == GNUTLS_E_SHORT_MEMORY_BUFFER)
+	    {
+	      gnutls_assert ();
+	      continue;
+	    }
+	  else if (rc != GNUTLS_E_SUCCESS)
+	    {
+	      return gnutls_assert_val(rc);
+	    }
+
+	  if (memcmp (oidtmp, GNUTLS_KP_OCSP_SIGNING, oidsize) != 0)
+	    {
+	      gnutls_assert ();
+	      continue;
+	    }
+	  break;
+	}
+  
+  return 0;
+}
+
+/**
+ * gnutls_ocsp_resp_verify_direct:
+ * @resp: should contain a #gnutls_ocsp_resp_t structure
+ * @issuer: certificate believed to have signed the response
+ * @verify: output variable with verification status, an #gnutls_ocsp_cert_status_t
+ * @flags: verification flags, 0 for now.
+ *
+ * Verify signature of the Basic OCSP Response against the public key
+ * in the @issuer certificate.
+ *
+ * The output @verify variable will hold verification status codes
+ * (e.g., %GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND,
+ * %GNUTLS_OCSP_VERIFY_INSECURE_ALGORITHM) which are only valid if the
+ * function returned %GNUTLS_E_SUCCESS.
+ *
+ * Note that the function returns %GNUTLS_E_SUCCESS even when
+ * verification failed.  The caller must always inspect the @verify
+ * variable to find out the verification status.
+ *
+ * The @flags variable should be 0 for now.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_ocsp_resp_verify_direct (gnutls_ocsp_resp_t resp,
+				gnutls_x509_crt_t issuer,
+				unsigned int *verify,
+				unsigned int flags)
+{
+  gnutls_x509_crt_t signercert;
+  int rc;
+
+  if (resp == NULL || issuer == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  signercert = find_signercert (resp);
+  if (!signercert)
+    {
+      signercert = issuer;
+    }
+  else /* response contains a signer. Verify him */
+    {
+      unsigned int vtmp;
+
+      rc = gnutls_x509_crt_verify (signercert, &issuer, 1, 0, &vtmp);
+      if (rc != GNUTLS_E_SUCCESS)
+	{
+	  gnutls_assert ();
+	  goto done;
+	}
+
+      if (vtmp != 0)
+        {
+          *verify = vstatus_to_ocsp_status(vtmp);
+	  gnutls_assert ();
+	  rc = GNUTLS_E_SUCCESS;
+	  goto done;
+	}
+
+      rc = check_ocsp_purpose(signercert);
+      if (rc < 0)
+        {
+          gnutls_assert ();
+          *verify = GNUTLS_OCSP_VERIFY_SIGNER_KEYUSAGE_ERROR;
+          rc = GNUTLS_E_SUCCESS;
+          goto done;
+        }
+    }
+
+  rc = _ocsp_resp_verify_direct(resp, signercert, verify, flags);
+  
+ done:
+  if (signercert != issuer)
+    gnutls_x509_crt_deinit(signercert);
 
   return rc;
 }
@@ -2080,9 +2198,6 @@ gnutls_ocsp_resp_verify (gnutls_ocsp_resp_t resp,
       /* not in trustlist, need to verify signature and bits */
       gnutls_x509_crt_t issuer;
       unsigned vtmp;
-      char oidtmp[sizeof (GNUTLS_KP_OCSP_SIGNING)];
-      size_t oidsize;
-      int indx;
 
       gnutls_assert ();
 
@@ -2104,55 +2219,24 @@ gnutls_ocsp_resp_verify (gnutls_ocsp_resp_t resp,
 	}
 
       if (vtmp != 0)
-	{
+        {
+          *verify = vstatus_to_ocsp_status(vtmp);
 	  gnutls_assert ();
-	  if (vtmp & GNUTLS_CERT_INSECURE_ALGORITHM)
-	    *verify = GNUTLS_OCSP_VERIFY_INSECURE_ALGORITHM;
-	  else if (vtmp & GNUTLS_CERT_NOT_ACTIVATED)
-	    *verify = GNUTLS_OCSP_VERIFY_CERT_NOT_ACTIVATED;
-	  else if (vtmp & GNUTLS_CERT_EXPIRED)
-	    *verify = GNUTLS_OCSP_VERIFY_CERT_EXPIRED;
-	  else
-	    *verify = GNUTLS_OCSP_VERIFY_UNTRUSTED_SIGNER;
 	  rc = GNUTLS_E_SUCCESS;
 	  goto done;
 	}
 
-      for (indx = 0; ; indx++)
-	{
-	  oidsize = sizeof (oidtmp);
-	  rc = gnutls_x509_crt_get_key_purpose_oid (signercert, indx,
-						    oidtmp, &oidsize,
-						    NULL);
-	  if (rc == GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE)
-	    {
-	      gnutls_assert ();
-	      *verify = GNUTLS_OCSP_VERIFY_SIGNER_KEYUSAGE_ERROR;
-	      rc = GNUTLS_E_SUCCESS;
-	      goto done;
-	    }
-	  else if (rc == GNUTLS_E_SHORT_MEMORY_BUFFER)
-	    {
-	      gnutls_assert ();
-	      continue;
-	    }
-	  else if (rc != GNUTLS_E_SUCCESS)
-	    {
-	      gnutls_assert ();
-	      goto done;
-	    }
-
-	  if (memcmp (oidtmp, GNUTLS_KP_OCSP_SIGNING, oidsize) != 0)
-	    {
-	      gnutls_assert ();
-	      continue;
-	    }
-
-	  break;
-	}
+      rc = check_ocsp_purpose(signercert);
+      if (rc < 0)
+        {
+          gnutls_assert ();
+          *verify = GNUTLS_OCSP_VERIFY_SIGNER_KEYUSAGE_ERROR;
+          rc = GNUTLS_E_SUCCESS;
+          goto done;
+        }
     }
 
-  rc = gnutls_ocsp_resp_verify_direct (resp, signercert, verify, flags);
+  rc = _ocsp_resp_verify_direct (resp, signercert, verify, flags);
 
  done:
   gnutls_x509_crt_deinit (signercert);
