@@ -32,6 +32,7 @@
 #include "verify-high.h"
 
 #include <gnutls/ocsp.h>
+#include <auth/cert.h>
 
 typedef struct gnutls_ocsp_req_int
 {
@@ -1331,11 +1332,11 @@ gnutls_ocsp_resp_get_single (gnutls_ocsp_resp_t resp,
 			     gnutls_datum_t *issuer_name_hash,
 			     gnutls_datum_t *issuer_key_hash,
 			     gnutls_datum_t *serial_number,
-			     int *cert_status,
+			     unsigned int *cert_status,
 			     time_t *this_update,
 			     time_t *next_update,
 			     time_t *revocation_time,
-			     int *revocation_reason)
+			     unsigned int *revocation_reason)
 {
   gnutls_datum_t sa;
   char name[ASN1_MAX_NAME_SIZE];
@@ -2157,8 +2158,8 @@ gnutls_ocsp_resp_verify_direct (gnutls_ocsp_resp_t resp,
 int
 gnutls_ocsp_resp_verify (gnutls_ocsp_resp_t resp,
 			 gnutls_x509_trust_list_t trustlist,
-			 unsigned *verify,
-			 int flags)
+			 unsigned int *verify,
+			 unsigned int flags)
 {
   gnutls_x509_crt_t signercert = NULL;
   int rc;
