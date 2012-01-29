@@ -226,7 +226,7 @@ _verify_response (gnutls_datum_t *data)
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing response: %s", gnutls_strerror (ret));
 
-  if (!HAVE_OPT(LOAD_SIGNER) && HAVE_OPT(LOAD_TRUST))
+  if (HAVE_OPT(LOAD_TRUST))
     {
       dat.data = (void*)read_binary_file (OPT_ARG(LOAD_TRUST), &size);
       if (dat.data == NULL)
@@ -244,10 +244,10 @@ _verify_response (gnutls_datum_t *data)
 	error (EXIT_FAILURE, 0, "error parsing CAs: %s",
 	       gnutls_strerror (ret));
 
-#if 0
       if (HAVE_OPT(VERBOSE))
 	{
 	  unsigned int i;
+	  printf ("Trust anchors:\n");
 	  for (i = 0; i < x509_ncas; i++)
 	    {
 	      gnutls_datum_t out;
@@ -258,11 +258,11 @@ _verify_response (gnutls_datum_t *data)
 		error (EXIT_FAILURE, 0, "gnutls_x509_crt_print: %s",
 		       gnutls_strerror (ret));
 
-	      printf ("Trust anchor %d: %.*s\n", i, out.size, out.data);
+	      printf ("%d: %.*s\n", i, out.size, out.data);
 	      gnutls_free (out.data);
 	    }
+          printf("\n");
 	}
-#endif
 
       ret = gnutls_x509_trust_list_add_cas (list, x509_ca_list, x509_ncas, 0);
       if (ret < 0)
@@ -272,12 +272,18 @@ _verify_response (gnutls_datum_t *data)
       if (HAVE_OPT(VERBOSE))
 	fprintf (stdout, "Loaded %d trust anchors\n", x509_ncas);
 
+{
+FILE* f=fopen("resp.der", "w");
+fwrite(data->data, 1, data->size, f);
+fclose(f);
+}
+
       ret = gnutls_ocsp_resp_verify (resp, list, &verify, 0);
       if (ret < 0)
 	error (EXIT_FAILURE, 0, "gnutls_ocsp_resp_verify: %s",
 	       gnutls_strerror (ret));
     }
-  else if (!HAVE_OPT(LOAD_TRUST) && HAVE_OPT(LOAD_SIGNER))
+  else if (HAVE_OPT(LOAD_SIGNER))
     {
       ret = gnutls_x509_crt_init (&signer);
       if (ret < 0)
@@ -305,6 +311,7 @@ _verify_response (gnutls_datum_t *data)
 
 	  printf ("Signer: %.*s\n", out.size, out.data);
 	  gnutls_free (out.data);
+          printf("\n");
 	}
 
       ret = gnutls_ocsp_resp_verify_direct (resp, signer, &verify, 0);

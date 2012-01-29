@@ -307,13 +307,13 @@ print_ocsp_verify_res (unsigned int output)
  *  -1: dunno
  */
 int
-check_ocsp_response (gnutls_certificate_credentials xcred, 
-                      gnutls_datum_t *data)
+check_ocsp_response (gnutls_x509_crt_t issuer,
+                     gnutls_datum_t *data)
 {
   gnutls_ocsp_resp_t resp;
   int ret;
   unsigned int status, cert_status;
-  time_t rtime;
+  time_t rtime, ttime;
 
   ret = gnutls_ocsp_resp_init (&resp);
   if (ret < 0)
@@ -323,15 +323,18 @@ check_ocsp_response (gnutls_certificate_credentials xcred,
   if (ret < 0)
     error (EXIT_FAILURE, 0, "importing response: %s", gnutls_strerror (ret));
 
-  ret = gnutls_ocsp_resp_verify_cred (resp, xcred, &status, 0);
+  ret = gnutls_ocsp_resp_verify_direct( resp, issuer, &status, 0);
   if (ret < 0)
-    error (EXIT_FAILURE, 0, "gnutls_ocsp_resp_verify: %s",
-	       gnutls_strerror (ret));
+    error (EXIT_FAILURE, 0, "gnutls_ocsp_resp_verify_direct: %s",
+      gnutls_strerror (ret));
 
-  printf ("Verifying OCSP Response: ");
-  print_ocsp_verify_res (status);
-  printf (".\n");
-  
+  if (status != 0)
+    {
+      printf ("*** Verifying OCSP Response: ");
+      print_ocsp_verify_res (status);
+      printf (".\n");
+    }
+
   /* do not print revocation data if response was not verified */
   if (status != 0)
     {
@@ -340,17 +343,18 @@ check_ocsp_response (gnutls_certificate_credentials xcred,
     }
 
   ret = gnutls_ocsp_resp_get_single(resp, 0, NULL, NULL, NULL, NULL,
-        &cert_status, NULL, NULL, &rtime, NULL);
+        &cert_status, &ttime, NULL, &rtime, NULL);
   if (ret < 0)
     error (EXIT_FAILURE, 0, "reading response: %s", gnutls_strerror (ret));
   
   if (cert_status == GNUTLS_OCSP_CERT_REVOKED)
     {
-      printf("Certificate was revoked at %s\n", ctime(&rtime));
+      printf("*** Certificate was revoked at %s", ctime(&rtime));
       ret = 0;
       goto cleanup;
     }
   
+  printf("- OCSP server flags certificate not revoked as of %s", ctime(&ttime));
   ret = 1;
 cleanup:
   gnutls_ocsp_resp_deinit (resp);

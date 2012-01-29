@@ -1056,7 +1056,7 @@ test_certificate (gnutls_session_t session)
     return ret;
 
   printf ("\n");
-  print_cert_info (session, GNUTLS_CRT_PRINT_FULL);
+  print_cert_info (session, GNUTLS_CRT_PRINT_FULL, verbose);
 
   return TEST_SUCCEED;
 }

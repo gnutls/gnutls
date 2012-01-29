@@ -69,7 +69,7 @@ int record_max_size;
 int fingerprint;
 int crlf;
 unsigned int verbose = 0;
-extern int print_cert;
+int print_cert;
 
 #define DEFAULT_CA_FILE "/etc/ssl/certs/ca-certificates.crt"
 
@@ -492,7 +492,7 @@ cert_verify_callback (gnutls_session_t session)
                                        cert, 0);
       if (rc == GNUTLS_E_NO_CERTIFICATE_FOUND)
         {
-          print_cert_info(session, GNUTLS_CRT_PRINT_COMPACT);
+          print_cert_info(session, GNUTLS_CRT_PRINT_COMPACT, 0);
           fprintf(stderr, "Host %s has never been contacted before and is not in the trusted list.\n", hostname);
           if (status == 0)
             fprintf(stderr, "Its certificate is valid for %s.\n", hostname);
@@ -503,7 +503,7 @@ cert_verify_callback (gnutls_session_t session)
         }
       else if (rc == GNUTLS_E_CERTIFICATE_KEY_MISMATCH)
         {
-          print_cert_info(session, GNUTLS_CRT_PRINT_COMPACT);
+          print_cert_info(session, GNUTLS_CRT_PRINT_COMPACT, 0);
           fprintf(stderr, "Warning: host %s is known and it is associated with a different key.\n", hostname);
           fprintf(stderr, "It might be that the server has multiple keys, or an attacker replaced the key to eavesdrop this connection .\n");
           if (status == 0)
@@ -1092,6 +1092,10 @@ const char* rest = NULL;
       priorities = OPT_ARG(PRIORITY);
     } 
   verbose = HAVE_OPT( VERBOSE);
+  if (verbose)
+    print_cert = 1;
+  else
+    print_cert = HAVE_OPT( PRINT_CERT);
   
   if (HAVE_OPT(LIST))
     {
@@ -1100,7 +1104,6 @@ const char* rest = NULL;
     }
 
   disable_extensions = HAVE_OPT( DISABLE_EXTENSIONS);
-  print_cert = HAVE_OPT( PRINT_CERT);
   starttls = HAVE_OPT(STARTTLS);
   resume = HAVE_OPT(RESUME);
   rehandshake = HAVE_OPT(REHANDSHAKE);
@@ -1243,7 +1246,7 @@ do_handshake (socket_st * socket)
   if (ret == 0)
     {
       /* print some information */
-      print_info (socket->session);
+      print_info (socket->session, print_cert);
       socket->secure = 1;
     }
   else
@@ -1455,7 +1458,9 @@ init_global_tls_stuff (void)
 
 }
 
-/* Returns:
+/* OCSP check for the peer's certificate. Should be called 
+ * only after the certificate list verication is complete.
+ * Returns:
  * 0: certificate is revoked
  * 1: certificate is ok
  * -1: dunno
@@ -1517,7 +1522,7 @@ cert_verify_ocsp (gnutls_session_t session)
     }
 
   /* verify and check the response for revoked cert */
-  ret = check_ocsp_response(xcred, &resp);
+  ret = check_ocsp_response(issuer, &resp);
 
 cleanup:
   if (deinit_issuer)

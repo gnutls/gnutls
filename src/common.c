@@ -39,7 +39,6 @@
 
 #define SU(x) (x!=NULL?x:"Unknown")
 
-int print_cert;
 extern int verbose;
 
 const char str_unknown[] = "(unknown)";
@@ -106,14 +105,14 @@ print_x509_info_compact (gnutls_session_t session, int flag)
 }
 
 static void
-print_x509_info (gnutls_session_t session, int flag)
+print_x509_info (gnutls_session_t session, int flag, int print_cert)
 {
     gnutls_x509_crt_t crt;
     const gnutls_datum_t *cert_list;
     unsigned int cert_list_size = 0, j;
     int ret;
     
-    if (flag == GNUTLS_CRT_PRINT_COMPACT)
+    if (flag == GNUTLS_CRT_PRINT_COMPACT && print_cert == 0)
       return print_x509_info_compact(session, flag);
 
     cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
@@ -330,7 +329,7 @@ print_openpgp_info_compact (gnutls_session_t session, int flag)
 }
 
 static void
-print_openpgp_info (gnutls_session_t session, int flag)
+print_openpgp_info (gnutls_session_t session, int flag, int print_cert)
 {
 
     gnutls_openpgp_crt_t crt;
@@ -338,7 +337,7 @@ print_openpgp_info (gnutls_session_t session, int flag)
     unsigned int cert_list_size = 0;
     int ret;
 
-    if (flag == GNUTLS_CRT_PRINT_COMPACT)
+    if (flag == GNUTLS_CRT_PRINT_COMPACT && print_cert == 0)
       print_openpgp_info_compact(session, flag);
     
     printf (" - Certificate type: OpenPGP\n");
@@ -484,7 +483,7 @@ cert_verify (gnutls_session_t session, const char* hostname)
 }
 
 static void
-print_dh_info (gnutls_session_t session, const char *str)
+print_dh_info (gnutls_session_t session, const char *str, int print)
 {
     printf ("- %sDiffie-Hellman parameters\n", str);
     printf (" - Using prime: %d bits\n",
@@ -494,7 +493,7 @@ print_dh_info (gnutls_session_t session, const char *str)
     printf (" - Peer's public key: %d bits\n",
             gnutls_dh_get_peers_public_bits (session));
 
-    if (print_cert)
+    if (print)
       {
           int ret;
           gnutls_datum_t raw_gen = { NULL, 0 };
@@ -582,7 +581,7 @@ print_ecdh_info (gnutls_session_t session, const char *str)
 }
 
 int
-print_info (gnutls_session_t session)
+print_info (gnutls_session_t session, int print_cert)
 {
     const char *tmp;
     gnutls_credentials_type_t cred;
@@ -607,7 +606,7 @@ print_info (gnutls_session_t session)
           if (kx == GNUTLS_KX_ANON_ECDH)
               print_ecdh_info (session, "Anonymous ");
           else
-              print_dh_info (session, "Anonymous ");
+              print_dh_info (session, "Anonymous ", verbose);
           break;
 #endif
 #ifdef ENABLE_SRP
@@ -633,7 +632,7 @@ print_info (gnutls_session_t session)
               printf ("- PSK authentication. Connected as '%s'\n",
                       gnutls_psk_server_get_username (session));
           if (kx == GNUTLS_KX_DHE_PSK)
-              print_dh_info (session, "Ephemeral ");
+              print_dh_info (session, "Ephemeral ", verbose);
           if (kx == GNUTLS_KX_ECDHE_PSK)
               print_ecdh_info (session, "Ephemeral ");
           break;
@@ -655,10 +654,12 @@ print_info (gnutls_session_t session)
                 }
           }
 
-          print_cert_info (session, verbose?GNUTLS_CRT_PRINT_FULL:GNUTLS_CRT_PRINT_COMPACT);
+          print_cert_info (session, 
+                           verbose?GNUTLS_CRT_PRINT_FULL:GNUTLS_CRT_PRINT_COMPACT, 
+                           print_cert);
 
           if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS)
-              print_dh_info (session, "Ephemeral ");
+              print_dh_info (session, "Ephemeral ", verbose);
           else if (kx == GNUTLS_KX_ECDHE_RSA
                    || kx == GNUTLS_KX_ECDHE_ECDSA)
               print_ecdh_info (session, "Ephemeral ");
@@ -714,7 +715,7 @@ print_info (gnutls_session_t session)
 }
 
 void
-print_cert_info (gnutls_session_t session, int flag)
+print_cert_info (gnutls_session_t session, int flag, int print_cert)
 {
 
     if (gnutls_certificate_client_get_request_status (session) != 0)
@@ -723,11 +724,11 @@ print_cert_info (gnutls_session_t session, int flag)
     switch (gnutls_certificate_type_get (session))
       {
       case GNUTLS_CRT_X509:
-          print_x509_info (session, flag);
+          print_x509_info (session, flag, print_cert);
           break;
 #ifdef ENABLE_OPENPGP
       case GNUTLS_CRT_OPENPGP:
-          print_openpgp_info (session, flag);
+          print_openpgp_info (session, flag, print_cert);
           break;
 #endif
       default:

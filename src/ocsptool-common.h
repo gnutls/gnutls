@@ -43,7 +43,6 @@ void
 print_ocsp_verify_res (unsigned int output);
 
 int
-check_ocsp_response (gnutls_certificate_credentials xcred, 
-                      gnutls_datum_t *data);
+check_ocsp_response (gnutls_x509_crt_t issuer, gnutls_datum_t *data);
 
 #endif
