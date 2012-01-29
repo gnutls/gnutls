@@ -95,7 +95,7 @@ containing the required for TLS parameters.";
 
 doc-section = {
   ds-type = 'SEE ALSO';
-  ds-format = 'man';
+  ds-format = 'texi';
   ds-text   = <<-_EOT_
     gnutls-cli-debug (1), gnutls-serv (1), srptool (1), psktool (1), certtool (1)
 _EOT_;

@@ -2,7 +2,9 @@ AutoGen Definitions options;
 prog-name     = certtool;
 prog-title    = "GnuTLS PKCS #11 tool";
 prog-desc     = "Manipulate certificates and private keys.";
-detail    = "Tool to parse and generate X.509 certificates, requests and private keys.";
+detail    = "Tool to parse and generate X.509 certificates, requests and private keys.
+It can be used interactively or non interactively by
+specifying the template command line option.";
 help-value = "h";
 short-usage   = "certtool [options] [url]\ncerttool --help for usage instructions.\n";
 prog-group    = "GnuTLS";
@@ -382,7 +384,7 @@ flag = {
 
 doc-section = {
   ds-type = 'SEE ALSO';
-  ds-format = 'man';
+  ds-format = 'texi';
   ds-text   = <<-_EOT_
     p11tool (1)
 _EOT_;
@@ -392,11 +394,16 @@ doc-section = {
   ds-type = 'EXAMPLES';
   ds-format = 'texi';
   ds-text   = <<-_EOT_
-To create a private key, run:
+@subheading Generating private keys
+To create an RSA private key, run:
 @example
-$ certtool --generate-privkey --outfile key.pem
+$ certtool --generate-privkey --outfile key.pem --rsa
 @end example
 
+To create a DSA or elliptic curves (ECDSA) private key use the
+above command combined with 'dsa' or 'ecc' options.
+
+@subheading Generating certificate requests
 To create a certificate request (needed when the certificate is  issued  by
 another party), run:
 @example
@@ -404,12 +411,26 @@ certtool --generate-request --load-privkey key.pem \
    --outfile request.pem
 @end example
 
-To create a certificate request using a key stored in a PKCS #11 token, run:
+If the private key is stored in a smart card you can generate
+a request by specifying the private key object URL.
 @example
 $ ./certtool --generate-request --load-privkey "pkcs11:..." \
   --load-pubkey "pkcs11:..." --outfile request.pem
 @end example
 
+
+@subheading Generating a self-signed certificate
+To create a self signed certificate, use the command:
+@example
+$ certtool --generate-privkey --outfile ca-key.pem
+$ certtool --generate-self-signed --load-privkey ca-key.pem \
+   --outfile ca-cert.pem
+@end example
+
+Note that a self-signed certificate usually belongs to a certificate
+authority, that signs other certificates.
+
+@subheading Generating a certificate
 To generate a certificate using the previous request, use the command:
 @example
 $ certtool --generate-certificate --load-request request.pem \
@@ -424,16 +445,216 @@ $ certtool --generate-certificate --load-privkey key.pem \
    --load-ca-privkey ca-key.pem
 @end example
 
+@subheading Certificate information
 To view the certificate information, use:
 @example
 $ certtool --certificate-info --infile cert.pem
 @end example
 
+@subheading PKCS #12 structure generation
 To generate a PKCS #12 structure using the previous key and certificate,
 use the command:
 @example
 $ certtool --load-certificate cert.pem --load-privkey key.pem \
    --to-p12 --outder --outfile key.p12
+@end example
+
+Some tools (reportedly web browsers) have problems with that file
+because it does not contain the CA certificate for the certificate.
+To work around that problem in the tool, you can use the
+--load-ca-certificate parameter as follows:
+
+@example
+$ certtool --load-ca-certificate ca.pem \
+  --load-certificate cert.pem --load-privkey key.pem \
+  --to-p12 --outder --outfile key.p12
+@end example
+
+@subheading Diffie-Hellman parameter generation
+To generate parameters for Diffie-Hellman key exchange, use the command:
+@example
+$ certtool --generate-dh-params --outfile dh.pem --sec-param normal
+@end example
+
+@subheading Proxy certificate generation
+Proxy certificate can be used to delegate your credential to a
+temporary, typically short-lived, certificate.  To create one from the
+previously created certificate, first create a temporary key and then
+generate a proxy certificate for it, using the commands:
+
+@example
+$ certtool --generate-privkey > proxy-key.pem
+$ certtool --generate-proxy --load-ca-privkey key.pem \
+  --load-privkey proxy-key.pem --load-certificate cert.pem \
+  --outfile proxy-cert.pem
+@end example
+
+@subheading Certificate revocation list generation
+To create an empty Certificate Revocation List (CRL) do:
+
+@example
+$ certtool --generate-crl --load-ca-privkey x509-ca-key.pem \
+           --load-ca-certificate x509-ca.pem
+@end example
+
+To create a CRL that contains some revoked certificates, place the
+certificates in a file and use @code{--load-certificate} as follows:
+
+@example
+$ certtool --generate-crl --load-ca-privkey x509-ca-key.pem \
+  --load-ca-certificate x509-ca.pem --load-certificate revoked-certs.pem
+@end example
+
+To verify a Certificate Revocation List (CRL) do:
+
+@example
+$ certtool --verify-crl --load-ca-certificate x509-ca.pem < crl.pem
+@end example
+_EOT_;
+};
+
+
+doc-section = {
+  ds-type = 'FILES';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+@subheading Certtool's template file format
+A template file can be used to avoid the interactive questions of
+certtool. Initially create a file named 'cert.cfg' that contains the information
+about the certificate. The template can be used as below:
+
+@example
+$ certtool --generate-certificate cert.pem --load-privkey key.pem  \
+   --template cert.cfg \
+   --load-ca-certificate ca-cert.pem --load-ca-privkey ca-key.pem
+@end example
+
+An example certtool template file that can be used to generate a certificate
+request or a self signed certificate follows.
+
+@example
+# X.509 Certificate options
+#
+# DN options
+
+# The organization of the subject.
+organization = "Koko inc."
+
+# The organizational unit of the subject.
+unit = "sleeping dept."
+
+# The locality of the subject.
+# locality =
+
+# The state of the certificate owner.
+state = "Attiki"
+
+# The country of the subject. Two letter code.
+country = GR
+
+# The common name of the certificate owner.
+cn = "Cindy Lauper"
+
+# A user id of the certificate owner.
+#uid = "clauper"
+
+# If the supported DN OIDs are not adequate you can set
+# any OID here.
+# For example set the X.520 Title and the X.520 Pseudonym
+# by using OID and string pairs.
+#dn_oid = 2.5.4.12 Dr. 
+#dn_oid = 2.5.4.65 jackal
+
+# This is deprecated and should not be used in new
+# certificates.
+# pkcs9_email = "none@@none.org"
+
+# The serial number of the certificate
+serial = 007
+
+# In how many days, counting from today, this certificate will expire.
+expiration_days = 700
+
+# X.509 v3 extensions
+
+# A dnsname in case of a WWW server.
+#dns_name = "www.none.org"
+#dns_name = "www.morethanone.org"
+
+# An IP address in case of a server.
+#ip_address = "192.168.1.1"
+
+# An email in case of a person
+email = "none@@none.org"
+
+# Challenge password used in certificate requests
+challenge_passwd = 123456
+
+# key_purpose_oid = 1.2.3.4.5.6.7
+# key_purpose_oid = 1.2.3.4.5.6.7.9
+
+# An URL that has CRLs (certificate revocation lists)
+# available. Needed in CA certificates.
+#crl_dist_points = "http://www.getcrl.crl/getcrl/"
+
+# Whether this is a CA certificate or not
+#ca
+
+# Whether this certificate will be used for a TLS client
+#tls_www_client
+
+# Whether this certificate will be used for a TLS server
+#tls_www_server
+
+# Whether this certificate will be used to sign data (needed
+# in TLS DHE ciphersuites).
+signing_key
+
+# Whether this certificate will be used to encrypt data (needed
+# in TLS RSA ciphersuites). Note that it is preferred to use different
+# keys for encryption and signing.
+#encryption_key
+
+# Whether this key will be used to sign other certificates.
+#cert_signing_key
+
+# Whether this key will be used to sign CRLs.
+#crl_signing_key
+
+# Whether this key will be used to sign code.
+#code_signing_key
+
+# Whether this key will be used to sign OCSP data.
+#ocsp_signing_key
+
+# Whether this key will be used for time stamping.
+#time_stamping_key
+
+# Whether this key will be used for IPsec IKE operations.
+#ipsec_ike_key
+
+# When generating a certificate from a certificate
+# request, then honor the extensions stored in the request
+# and store them in the real certificate.
+#honor_crq_extensions
+
+# Path length contraint. Sets the maximum number of
+# certificates that can be used to certify this certificate.
+# (i.e. the certificate chain length)
+#path_len = -1
+#path_len = 2
+
+# Options for proxy certificates
+# proxy_policy_language = 1.3.6.1.5.5.7.21.1
+
+# Options for generating a CRL
+
+# next CRL update will be in 43 days (wow)
+#crl_next_update = 43
+
+# this is the 5th CRL by this CA
+#crl_number = 5
+
 @end example
 
 _EOT_;

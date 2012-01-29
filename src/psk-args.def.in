@@ -61,7 +61,7 @@ flag = {
 
 doc-section = {
   ds-type = 'SEE ALSO';
-  ds-format = 'man';
+  ds-format = 'texi';
   ds-text   = <<-_EOT_
     gnutls-cli-debug (1), gnutls-serv (1), srptool (1), certtool (1)
 _EOT_;
@@ -71,9 +71,14 @@ doc-section = {
   ds-type = 'EXAMPLES';
   ds-format = 'texi';
   ds-text   = <<-_EOT_
-To add a user 'test' in @file{passwd.psk} for use with GnuTLS run:
+To add a user 'psk_identity' in @file{passwd.psk} for use with GnuTLS run:
 @example
-$ psktool --passwd /etc/passwd.psk -u test
+$ ./psktool -u psk_identity -p passwd.psk
+Generating a random key for user 'psk_identity'
+Key stored to passwd.psk
+$ cat psks.txt
+psk_identity:88f3824b3e5659f52d00e959bacab954b6540344
+$
 @end example
 
 This command will create @file{/etc/passwd.psk} if it does not exist

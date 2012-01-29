@@ -935,7 +935,7 @@ will allow V1 CAs in chains.
 @end float
 
 Finally the ciphersuites enabled by any priority string can be
-listed using the @code{gnutls-cli} application (see @ref{The gnutls-cli tool}), 
+listed using the @code{gnutls-cli} application (see @ref{gnutls-cli Invocation}), 
 or by using the priority functions as in @ref{Listing the ciphersuites in a priority string}.
 
 Example priority strings are:

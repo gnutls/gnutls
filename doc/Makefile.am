@@ -28,6 +28,44 @@ if ENABLE_GTK_DOC
 SUBDIRS += reference
 endif
 
+invoke-gnutls-cli.texi: ../src/cli-args.def
+	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	mv ../src/$@ .
+
+invoke-gnutls-cli-debug.texi: ../src/cli-debug-args.def
+	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	mv ../src/$@ .
+
+invoke-gnutls-serv.texi: ../src/serv-args.def
+	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	mv ../src/$@ .
+
+invoke-certtool.texi: ../src/certtool-args.def
+	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	mv ../src/$@ .
+
+invoke-srptool.texi: ../src/srptool-args.def
+	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	mv ../src/$@ .
+	sed -i 's/@subsection/@subsubsection/' $@
+	sed -i 's/@section/@subsection/' $@
+
+invoke-ocsptool.texi: ../src/ocsptool-args.def
+	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	mv ../src/$@ .
+
+invoke-psktool.texi: ../src/psk-args.def
+	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	mv ../src/$@ .
+	sed -i 's/@subsection/@subsubsection/' $@
+	sed -i 's/@section/@subsection/' $@
+
+invoke-p11tool.texi: ../src/p11tool-args.def
+	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	mv ../src/$@ .
+	sed -i 's/@subsection/@subsubsection/' $@
+	sed -i 's/@section/@subsection/' $@
+
 info_TEXINFOS = gnutls.texi gnutls-guile.texi
 gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
 	cha-bib.texi cha-cert-auth.texi	cha-cert-auth2.texi		\
@@ -36,6 +74,10 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
 	cha-library.texi cha-preface.texi cha-programs.texi		\
 	sec-tls-app.texi cha-errors.texi cha-support.texi		\
 	cha-shared-key.texi cha-gtls-examples.texi
+
+gnutls_TEXINFOS += invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
+	invoke-gnutls-serv.texi invoke-certtool.texi invoke-srptool.texi \
+	invoke-ocsptool.texi invoke-psktool.texi invoke-p11tool.texi
 
 # Examples.
 gnutls_TEXINFOS += examples/ex-client-anon.c				\

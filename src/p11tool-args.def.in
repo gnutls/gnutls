@@ -248,7 +248,7 @@ flag = {
 
 doc-section = {
   ds-type = 'SEE ALSO';
-  ds-format = 'man';
+  ds-format = 'texi';
   ds-text   = <<-_EOT_
     certtool (1)
 _EOT_;
