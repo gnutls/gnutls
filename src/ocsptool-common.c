@@ -134,6 +134,7 @@ gnutls_datum_t *ud = userp;
   return size;
 }
 
+/* Returns 0 on ok, and -1 on error */
 int send_ocsp_request(const char* server,
                        gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer,
                        gnutls_datum_t * resp_data, int nonce)
@@ -165,7 +166,7 @@ socket_st hd;
       if (ret < 0)
         {
           fprintf(stderr, "Cannot find URL from issuer: %s\n", gnutls_strerror(ret));
-          exit(1);  
+          return -1;
         }
       
       url = malloc(data.size+1);
@@ -203,7 +204,7 @@ socket_st hd;
   if (ret < 0 || ud.size == 0)
     {
       perror("recv");
-      exit(1);
+      return -1;
     }
   
   socket_bye(&hd);
@@ -212,14 +213,14 @@ socket_st hd;
   if (p == NULL)
     {
       fprintf(stderr, "Cannot interpret HTTP response\n");
-      exit(1);
+      return -1;
     }
   
   p += 4;
   resp_data->size = ud.size - (p - ud.data);
   resp_data->data = malloc(resp_data->size);
   if (resp_data->data == NULL)
-    exit(1);
+    return -1;
   
   memcpy(resp_data->data, p, resp_data->size);
 
