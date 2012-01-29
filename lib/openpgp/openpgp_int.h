@@ -29,7 +29,7 @@
 
 #ifdef ENABLE_OPENPGP
 
-#include <opencdk/opencdk.h>
+#include <opencdk.h>
 #include <gnutls/openpgp.h>
 
 #define KEYID_IMPORT(dst, src) { \

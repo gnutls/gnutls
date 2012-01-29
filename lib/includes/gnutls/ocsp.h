@@ -220,11 +220,11 @@ extern "C"
 				   gnutls_datum_t *issuer_name_hash,
 				   gnutls_datum_t *issuer_key_hash,
 				   gnutls_datum_t *serial_number,
-				   unsigned int *cert_status,
+				   int *cert_status,
 				   time_t *this_update,
 				   time_t *next_update,
 				   time_t *revocation_time,
-				   unsigned int *revocation_reason);
+				   int *revocation_reason);
   int gnutls_ocsp_resp_get_extension (gnutls_ocsp_resp_t resp,
 				      unsigned indx,
 				      gnutls_datum_t *oid,
@@ -243,15 +243,11 @@ extern "C"
   int gnutls_ocsp_resp_verify_direct (gnutls_ocsp_resp_t resp,
 				      gnutls_x509_crt_t signercert,
 				      unsigned *verify,
-				      unsigned int flags);
+				      int flags);
   int gnutls_ocsp_resp_verify (gnutls_ocsp_resp_t resp,
 			       gnutls_x509_trust_list_t trustlist,
 			       unsigned *verify,
-			       unsigned int flags);
-  int gnutls_ocsp_resp_verify_cred (gnutls_ocsp_resp_t resp,
-			 gnutls_certificate_credentials_t cred,
-			 unsigned *verify,
-			 unsigned int flags);
+			       int flags);
 
 #ifdef __cplusplus
 }

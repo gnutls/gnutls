@@ -321,11 +321,11 @@ print_resp (gnutls_buffer_st * str, gnutls_ocsp_resp_t resp,
     {
       gnutls_digest_algorithm_t digest;
       gnutls_datum_t in, ik, sn;
-      unsigned int cert_status;
+      int cert_status;
       time_t this_update;
       time_t next_update;
       time_t revocation_time;
-      unsigned int revocation_reason;
+      int revocation_reason;
 
       ret = gnutls_ocsp_resp_get_single (resp,
 					 indx,

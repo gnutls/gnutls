@@ -32,7 +32,6 @@
 #include "verify-high.h"
 
 #include <gnutls/ocsp.h>
-#include <auth/cert.h>
 
 typedef struct gnutls_ocsp_req_int
 {
@@ -1332,11 +1331,11 @@ gnutls_ocsp_resp_get_single (gnutls_ocsp_resp_t resp,
 			     gnutls_datum_t *issuer_name_hash,
 			     gnutls_datum_t *issuer_key_hash,
 			     gnutls_datum_t *serial_number,
-			     unsigned int *cert_status,
+			     int *cert_status,
 			     time_t *this_update,
 			     time_t *next_update,
 			     time_t *revocation_time,
-			     unsigned int *revocation_reason)
+			     int *revocation_reason)
 {
   gnutls_datum_t sa;
   char name[ASN1_MAX_NAME_SIZE];
@@ -2158,8 +2157,8 @@ gnutls_ocsp_resp_verify_direct (gnutls_ocsp_resp_t resp,
 int
 gnutls_ocsp_resp_verify (gnutls_ocsp_resp_t resp,
 			 gnutls_x509_trust_list_t trustlist,
-			 unsigned int *verify,
-			 unsigned int flags)
+			 unsigned *verify,
+			 int flags)
 {
   gnutls_x509_crt_t signercert = NULL;
   int rc;
@@ -2242,26 +2241,4 @@ gnutls_ocsp_resp_verify (gnutls_ocsp_resp_t resp,
   gnutls_x509_crt_deinit (signercert);
 
   return rc;
-}
-
-/**
- * gnutls_ocsp_resp_verify_cred:
- * @resp: should contain a #gnutls_ocsp_resp_t structure
- * @trustlist: the certificate credentials structure
- * @verify: output variable with verification status, an #gnutls_ocsp_cert_status_t
- * @flags: verification flags, 0 for now.
- *
- * This function is identical to gnutls_ocsp_resp_verify() but would
- * use the trusted anchors from the certificate credentials structure.
- *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
- **/
-int
-gnutls_ocsp_resp_verify_cred (gnutls_ocsp_resp_t resp,
-			 gnutls_certificate_credentials_t cred,
-			 unsigned int*verify,
-			 unsigned int flags)
-{
-  return gnutls_ocsp_resp_verify( resp, cred->tlist, verify, flags);
 }
