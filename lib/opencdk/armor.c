@@ -18,10 +18,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  *
- * ChangeLog for basic BASE64 code (base64_encode, base64_decode):
- * Original author: Eric S. Raymond (Fetchmail)
- * Heavily modified by Brendan Cully <brendan@kublai.com> (Mutt)
- * Modify the code for generic use by Timo Schulz <twoaday@freakmail.de>
  */
 
 #ifdef HAVE_CONFIG_H
@@ -30,6 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <base64.h>
 
 #include "opencdk.h"
 #include "main.h"
@@ -44,9 +41,6 @@
 #endif
 
 #define CRCINIT 0xB704CE
-
-#define BAD -1
-#define b64val(c) index64[(unsigned int)(c)]
 
 static u32 crc_table[] = {
   0x000000, 0x864CFB, 0x8AD50D, 0x0C99F6, 0x93E6E1, 0x15AA1A, 0x1933EC,
@@ -116,119 +110,6 @@ static const char *valid_headers[] = {
 static char b64chars[] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-static int index64[128] = {
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63,
-  52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1,
-  -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
-  15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1,
-  -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-  41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1
-};
-
-
-/* encode a raw binary buffer to a null-terminated base64 strings */
-static int
-base64_encode (char *out, const byte * in, size_t len, size_t olen)
-{
-  if (!out || !in)
-    {
-      gnutls_assert ();
-      return CDK_Inv_Value;
-    }
-
-  while (len >= 3 && olen > 10)
-    {
-      *out++ = b64chars[in[0] >> 2];
-      *out++ = b64chars[((in[0] << 4) & 0x30) | (in[1] >> 4)];
-      *out++ = b64chars[((in[1] << 2) & 0x3c) | (in[2] >> 6)];
-      *out++ = b64chars[in[2] & 0x3f];
-      olen -= 4;
-      len -= 3;
-      in += 3;
-    }
-
-  /* clean up remainder */
-  if (len > 0 && olen > 4)
-    {
-      byte fragment = 0;
-      *out++ = b64chars[in[0] >> 2];
-      fragment = (in[0] << 4) & 0x30;
-      if (len > 1)
-        fragment |= in[1] >> 4;
-      *out++ = b64chars[fragment];
-      *out++ = (len < 2) ? '=' : b64chars[(in[1] << 2) & 0x3c];
-      *out++ = '=';
-    }
-  *out = '\0';
-  return 0;
-}
-
-
-/* Convert '\0'-terminated base64 string to raw byte buffer.
-   Returns length of returned buffer, or -1 on error. */
-static int
-base64_decode (byte * out, const char *in)
-{
-  size_t len;
-  byte digit1, digit2, digit3, digit4;
-
-  if (!out || !in)
-    {
-      gnutls_assert ();
-      return -1;
-    }
-
-  len = 0;
-  do
-    {
-      digit1 = in[0];
-      if (digit1 > 127 || b64val (digit1) == BAD)
-        {
-          gnutls_assert ();
-          return -1;
-        }
-      digit2 = in[1];
-      if (digit2 > 127 || b64val (digit2) == BAD)
-        {
-          gnutls_assert ();
-          return -1;
-        }
-      digit3 = in[2];
-      if (digit3 > 127 || ((digit3 != '=') && (b64val (digit3) == BAD)))
-        {
-          gnutls_assert ();
-          return -1;
-        }
-      digit4 = in[3];
-      if (digit4 > 127 || ((digit4 != '=') && (b64val (digit4) == BAD)))
-        {
-          gnutls_assert ();
-          return -1;
-        }
-      in += 4;
-
-      /* digits are already sanity-checked */
-      *out++ = (b64val (digit1) << 2) | (b64val (digit2) >> 4);
-      len++;
-      if (digit3 != '=')
-        {
-          *out++ = ((b64val (digit2) << 4) & 0xf0) | (b64val (digit3) >> 2);
-          len++;
-          if (digit4 != '=')
-            {
-              *out++ = ((b64val (digit3) << 6) & 0xc0) | b64val (digit4);
-              len++;
-            }
-        }
-    }
-  while (*in && digit4 != '=');
-
-  return len;
-}
-
-
 /* Return the compression algorithm in @r_zipalgo.
    If the parameter is not set after execution,
    the stream is not compressed. */
@@ -238,6 +119,7 @@ compress_get_algo (cdk_stream_t inp, int *r_zipalgo)
   byte plain[512];
   char buf[128];
   int nread, pkttype;
+  size_t plain_size;
 
   *r_zipalgo = 0;
   cdk_stream_seek (inp, 0);
@@ -249,7 +131,8 @@ compress_get_algo (cdk_stream_t inp, int *r_zipalgo)
       if (nread == 1 && !cdk_stream_eof (inp)
           && (nread = _cdk_stream_gets (inp, buf, DIM (buf) - 1)) > 0)
         {
-          base64_decode (plain, buf);
+          plain_size = sizeof(plain);
+          base64_decode (buf, nread, plain, &plain_size);
           if (!(*plain & 0x80))
             break;
           pkttype = *plain & 0x40 ? (*plain & 0x3f) : ((*plain >> 2) & 0xf);
@@ -381,7 +264,7 @@ armor_encode (void *data, FILE * in, FILE * out)
           return CDK_File_Error;
         }
       afx->crc = update_crc (afx->crc, (byte *) raw, nread);
-      base64_encode (buf, (byte *) raw, nread, DIM (buf) - 1);
+      base64_encode ((byte *) raw, nread, buf, DIM (buf) - 1);
       fprintf (out, "%s%s", buf, lf);
     }
 
@@ -428,6 +311,7 @@ armor_decode (void *data, FILE * in, FILE * out)
   int i, pgp_data = 0;
   cdk_error_t rc = 0;
   int len;
+  size_t raw_size, crcbuf_size;
 
   if (!afx)
     {
@@ -497,24 +381,32 @@ armor_decode (void *data, FILE * in, FILE * out)
         
       len = strlen(buf);
 
-      if (buf[len - 1] == '\n')
-        buf[len - 1] = '\0';
-      if (buf[len - 1] == '\r')
-        buf[len - 1] = '\0';
+      if (len > 0 && buf[len - 1] == '\n')
+        {
+          len--;
+          buf[len] = '\0';
+        }
+      if (len > 0 && buf[len - 1] == '\r')
+        {
+          len--;
+          buf[len] = '\0';
+        }
       if (buf[0] == '=' && strlen (s) == 5)
         {                       /* CRC */
           memset (crcbuf, 0, sizeof (crcbuf));
-          base64_decode (crcbuf, buf + 1);
+          crcbuf_size = sizeof(crcbuf);
+          base64_decode (buf + 1, len-1, crcbuf, &crcbuf_size);
           crc2 = (crcbuf[0] << 16) | (crcbuf[1] << 8) | crcbuf[2];
           break;                /* stop here */
         }
       else
         {
-          nread = base64_decode (raw, buf);
-          if (nread == -1 || nread == 0)
+          raw_size = sizeof(raw);
+          nread = base64_decode (buf, len, raw, &raw_size);
+          if (nread == 0)
             break;
-          afx->crc = update_crc (afx->crc, raw, nread);
-          fwrite (raw, 1, nread, out);
+          afx->crc = update_crc (afx->crc, raw, raw_size);
+          fwrite (raw, 1, raw_size, out);
         }
     }
 
@@ -524,9 +416,15 @@ armor_decode (void *data, FILE * in, FILE * out)
     {
       int len = strlen(buf);
       if (buf[len - 1] == '\n')
-        buf[len - 1] = '\0';
+        {
+          len--;
+          buf[len] = '\0';
+        }
       if (buf[len - 1] == '\r')
-        buf[len - 1] = '\0';
+        {
+          len--;
+          buf[len] = '\0';
+        }
       rc = CDK_General_Error;
       afx->idx2 = search_header (buf, armor_end);
       if (afx->idx2 >= 0)
@@ -656,7 +554,7 @@ cdk_armor_encode_buffer (const byte * inbuf, size_t inlen,
           len = rest;
         }
       rest -= len;
-      base64_encode (tempout, tempbuf, len, DIM (tempout) - 1);
+      base64_encode (tempbuf, len, tempout, DIM (tempout) - 1);
       memcpy (outbuf + pos, tempout, strlen (tempout));
       pos += strlen (tempout);
       memcpy (outbuf + pos, le, strlen (le));
