@@ -487,9 +487,9 @@ calc_s2ksize (cdk_pkt_seckey_t sk)
     case CDK_S2K_ITERSALTED:
       nbytes = 11;
       break;
-	case CDK_S2K_GNU_EXT:
-	  nbytes = 2;
-	  break;
+    case CDK_S2K_GNU_EXT:
+       nbytes = 2;
+       break;
     }
   nbytes += sk->protect.ivlen;
   nbytes++;                     /* single cipher byte */
