@@ -35,7 +35,7 @@
 #include "main.h"
 #include "filters.h"
 
-#ifdef __MINGW32__
+#ifdef _WIN32
 #define LF "\r\n"
 #define ALTLF "\n"
 #else
