@@ -20,10 +20,11 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 EXTRA_DIST = ca-no-pathlen.pem no-ca-or-pathlen.pem aki-cert.pem \
-	template-test.key template-test.pem template-test.tmpl
+	template-test.key template-test.pem template-test.tmpl \
+	funny-spacing.pem
 
-dist_check_SCRIPTS = pathlen aki template-test
+dist_check_SCRIPTS = pathlen aki template-test pem-decoding
 
-TESTS = pathlen aki template-test
+TESTS = pathlen aki template-test pem-decoding
 
 TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT)
