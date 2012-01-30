@@ -443,14 +443,6 @@ search_header (const char *buf, const char **array)
   return -1;
 }
 
-
-const char *
-_cdk_armor_get_lineend (void)
-{
-  return LF;
-}
-
-
 static cdk_error_t
 armor_decode (void *data, FILE * in, FILE * out)
 {
@@ -644,7 +636,7 @@ cdk_armor_encode_buffer (const byte * inbuf, size_t inlen,
 
   head = armor_begin[type];
   tail = armor_end[type];
-  le = _cdk_armor_get_lineend ();
+  le = LF;
   pos = strlen (head) + 10 + 2 + 2 + strlen (tail) + 10 + 2 + 5 + 2 + 1;
   /* The output data is 4/3 times larger, plus a line end for each line. */
   pos += (4 * inlen / 3) + 2 * (4 * inlen / 3 / 64) + 1;

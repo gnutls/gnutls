@@ -75,9 +75,6 @@ cdk_error_t map_gnutls_error (int err);
 #define KEY_CAN_SIGN(a)    ((_cdk_pk_algo_usage ((a))) & CDK_KEY_USG_SIGN)
 #define KEY_CAN_AUTH(a)    ((_cdk_pk_algo_usage ((a))) & CDK_KEY_USG_AUTH)
 
-/*-- armor.c --*/
-const char *_cdk_armor_get_lineend (void);
-
 /*-- main.c --*/
 char *_cdk_passphrase_get (cdk_ctx_t hd, const char *prompt);
 
