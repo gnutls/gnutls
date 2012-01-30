@@ -45,6 +45,7 @@ AC_SUBST(MINOR_VERSION, `echo $PACKAGE_VERSION | sed 's/.*\.\(.*\)\..*/\1/g'`)
 AC_SUBST(PATCH_VERSION, `echo $PACKAGE_VERSION | sed 's/.*\..*\.\(.*\)/\1/g'`)
 AC_SUBST(NUMBER_VERSION, `printf "0x%02x%02x%02x" $MAJOR_VERSION $MINOR_VERSION $PATCH_VERSION`)
 
+touch suppressions.valgrind
 dnl C and C++ capabilities
 AC_C_INLINE
 AC_HEADER_STDC
@@ -404,7 +405,7 @@ libidn=no
 fi
 
 AM_CONDITIONAL(ENABLE_CRYWRAP, test "x$libidn" != "xno")
-
+rm -f suppressions.valgrind
 dnl end of crywrap requirements
 
 AC_CONFIG_FILES([guile/pre-inst-guile], [chmod +x guile/pre-inst-guile])
