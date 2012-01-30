@@ -47,8 +47,8 @@ invoke-certtool.texi: ../src/certtool-args.def
 invoke-srptool.texi: ../src/srptool-args.def
 	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
 	mv ../src/$@ .
-	sed -i 's/@subsection/@subsubsection/' $@
-	sed -i 's/@section/@subsection/' $@
+	sed -i 's/@subsection/@subsubsection/g' $@
+	sed -i 's/@section/@subsection/g' $@
 
 invoke-ocsptool.texi: ../src/ocsptool-args.def
 	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
@@ -57,14 +57,14 @@ invoke-ocsptool.texi: ../src/ocsptool-args.def
 invoke-psktool.texi: ../src/psk-args.def
 	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
 	mv ../src/$@ .
-	sed -i 's/@subsection/@subsubsection/' $@
-	sed -i 's/@section/@subsection/' $@
+	sed -i 's/@subsection/@subsubsection/g' $@
+	sed -i 's/@section/@subsection/g' $@
 
 invoke-p11tool.texi: ../src/p11tool-args.def
 	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
 	mv ../src/$@ .
-	sed -i 's/@subsection/@subsubsection/' $@
-	sed -i 's/@section/@subsection/' $@
+	sed -i 's/@subsection/@subsubsection/g' $@
+	sed -i 's/@section/@subsection/g' $@
 
 info_TEXINFOS = gnutls.texi gnutls-guile.texi
 gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
