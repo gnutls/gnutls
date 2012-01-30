@@ -25,7 +25,6 @@ SERV="${SERV:-../../src/gnutls-serv} -q"
 CLI="${CLI:-../../src/gnutls-cli}"
 PORT="${PORT:-5557}"
 DEBUG=""
-unset RETCODE
 
 if test "${WINDIR}" != "";then
   exit 77
@@ -78,10 +77,10 @@ wait_server $PID
 echo | $CLI $DEBUG --priority NORMAL:+CTYPE-OPENPGP -p $PORT 127.0.0.1 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null || \
   fail $PID "Connection to signed PGP certificate should have succeeded! (error code $?)" $?
 
-$CLI $DEBUG --priority NORMAL:+CTYPE-OPENPGP -p $PORT 127.0.0.2 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null && \
+$CLI $DEBUG --priority NORMAL:+CTYPE-OPENPGP -p $PORT 127.0.0.2 --pgpkeyring $srcdir/ca-public.gpg </dev/null >/dev/null 2>&1 && \
   fail $PID "Connection to unrecognized IP address should have failed!"
 
 kill $PID
 wait
 
-exit ${RETCODE:-0}
+exit 0
