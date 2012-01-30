@@ -492,7 +492,7 @@ cert_verify_callback (gnutls_session_t session)
                                        cert, 0);
       if (rc == GNUTLS_E_NO_CERTIFICATE_FOUND)
         {
-          print_cert_info(session, GNUTLS_CRT_PRINT_COMPACT, 0);
+          print_cert_info_compact(session);
           fprintf(stderr, "Host %s has never been contacted before and is not in the trusted list.\n", hostname);
           if (status == 0)
             fprintf(stderr, "Its certificate is valid for %s.\n", hostname);
@@ -503,7 +503,7 @@ cert_verify_callback (gnutls_session_t session)
         }
       else if (rc == GNUTLS_E_CERTIFICATE_KEY_MISMATCH)
         {
-          print_cert_info(session, GNUTLS_CRT_PRINT_COMPACT, 0);
+          print_cert_info_compact(session);
           fprintf(stderr, "Warning: host %s is known and it is associated with a different key.\n", hostname);
           fprintf(stderr, "It might be that the server has multiple keys, or an attacker replaced the key to eavesdrop this connection .\n");
           if (status == 0)

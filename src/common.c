@@ -67,7 +67,7 @@ raw_to_string (const unsigned char *raw, size_t raw_size)
 }
 
 static void
-print_x509_info_compact (gnutls_session_t session, int flag)
+print_x509_info_compact (gnutls_session_t session)
 {
     gnutls_x509_crt_t crt;
     const gnutls_datum_t *cert_list;
@@ -94,7 +94,7 @@ print_x509_info_compact (gnutls_session_t session, int flag)
       }
 
     ret =
-      gnutls_x509_crt_print (crt, flag, &cinfo);
+      gnutls_x509_crt_print (crt, GNUTLS_CRT_PRINT_COMPACT, &cinfo);
     if (ret == 0)
       {
         printf ("- X.509 cert: %s\n", cinfo.data);
@@ -112,9 +112,6 @@ print_x509_info (gnutls_session_t session, int flag, int print_cert)
     unsigned int cert_list_size = 0, j;
     int ret;
     
-    if (flag == GNUTLS_CRT_PRINT_COMPACT && print_cert == 0)
-      return print_x509_info_compact(session, flag);
-
     cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
     if (cert_list_size == 0)
       {
@@ -122,8 +119,8 @@ print_x509_info (gnutls_session_t session, int flag, int print_cert)
           return;
       }
 
-    printf (" - Certificate type: X.509\n");
-    printf (" - Got a certificate list of %d certificates.\n",
+    printf ("- Certificate type: X.509\n");
+    printf ("- Got a certificate list of %d certificates.\n",
             cert_list_size);
 
     for (j = 0; j < cert_list_size; j++)
@@ -141,7 +138,7 @@ print_x509_info (gnutls_session_t session, int flag, int print_cert)
                 return;
             }
 
-          printf (" - Certificate[%d] info:\n  - ", j);
+          printf ("- Certificate[%d] info:\n - ", j);
 
           ret =
             gnutls_x509_crt_print (crt, flag, &cinfo);
@@ -292,7 +289,7 @@ verify_openpgp_hostname (gnutls_session_t session, const char *hostname)
 }
 
 static void
-print_openpgp_info_compact (gnutls_session_t session, int flag)
+print_openpgp_info_compact (gnutls_session_t session)
 {
 
     gnutls_openpgp_crt_t crt;
@@ -317,7 +314,7 @@ print_openpgp_info_compact (gnutls_session_t session, int flag)
             }
 
           ret =
-              gnutls_openpgp_crt_print (crt, flag, &cinfo);
+              gnutls_openpgp_crt_print (crt, GNUTLS_CRT_PRINT_COMPACT, &cinfo);
           if (ret == 0)
             {
                 printf ("- OpenPGP cert: %s\n", cinfo.data);
@@ -337,10 +334,7 @@ print_openpgp_info (gnutls_session_t session, int flag, int print_cert)
     unsigned int cert_list_size = 0;
     int ret;
 
-    if (flag == GNUTLS_CRT_PRINT_COMPACT && print_cert == 0)
-      print_openpgp_info_compact(session, flag);
-    
-    printf (" - Certificate type: OpenPGP\n");
+    printf ("- Certificate type: OpenPGP\n");
 
     cert_list = gnutls_certificate_get_peers (session, &cert_list_size);
 
@@ -362,7 +356,7 @@ print_openpgp_info (gnutls_session_t session, int flag, int print_cert)
               gnutls_openpgp_crt_print (crt, flag, &cinfo);
           if (ret == 0)
             {
-                printf (" - %s\n", cinfo.data);
+                printf ("- %s\n", cinfo.data);
                 gnutls_free (cinfo.data);
             }
 
@@ -729,6 +723,29 @@ print_cert_info (gnutls_session_t session, int flag, int print_cert)
 #ifdef ENABLE_OPENPGP
       case GNUTLS_CRT_OPENPGP:
           print_openpgp_info (session, flag, print_cert);
+          break;
+#endif
+      default:
+          printf ("Unknown type\n");
+          break;
+      }
+}
+
+void
+print_cert_info_compact (gnutls_session_t session)
+{
+
+    if (gnutls_certificate_client_get_request_status (session) != 0)
+        printf ("- Server has requested a certificate.\n");
+
+    switch (gnutls_certificate_type_get (session))
+      {
+      case GNUTLS_CRT_X509:
+          print_x509_info_compact (session);
+          break;
+#ifdef ENABLE_OPENPGP
+      case GNUTLS_CRT_OPENPGP:
+          print_openpgp_info_compact (session);
           break;
 #endif
       default:
