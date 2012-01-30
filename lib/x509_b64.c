@@ -27,122 +27,12 @@
 #include "gnutls_errors.h"
 #include <gnutls_datum.h>
 #include <x509_b64.h>
+#include <base64.h>
 
-/* FIXME: rewrite this to use GNULIB's base64 implementation.
- */
-
-static const uint8_t b64table[] =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-static const uint8_t asciitable[128] = {
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0x3e, 0xff, 0xff, 0xff, 0x3f,
-  0x34, 0x35, 0x36, 0x37, 0x38, 0x39,
-  0x3a, 0x3b, 0x3c, 0x3d, 0xff, 0xff,
-  0xff, 0xf1, 0xff, 0xff, 0xff, 0x00,   /* 0xf1 for '=' */
-  0x01, 0x02, 0x03, 0x04, 0x05, 0x06,
-  0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
-  0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12,
-  0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
-  0x19, 0xff, 0xff, 0xff, 0xff, 0xff,
-  0xff, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e,
-  0x1f, 0x20, 0x21, 0x22, 0x23, 0x24,
-  0x25, 0x26, 0x27, 0x28, 0x29, 0x2a,
-  0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30,
-  0x31, 0x32, 0x33, 0xff, 0xff, 0xff,
-  0xff, 0xff
-};
-
-inline static int
-encode (char *result, const uint8_t * data, int left)
-{
-
-  int data_len;
-
-  if (left > 3)
-    data_len = 3;
-  else
-    data_len = left;
-
-  switch (data_len)
-    {
-    case 3:
-      result[0] = b64table[(data[0] >> 2)];
-      result[1] =
-        b64table[(((((data[0] & 0x03) & 0xff) << 4) & 0xff) |
-                  (data[1] >> 4))];
-      result[2] =
-        b64table[((((data[1] & 0x0f) << 2) & 0xff) | (data[2] >> 6))];
-      result[3] = b64table[(((data[2] << 2) & 0xff) >> 2)];
-      break;
-    case 2:
-      result[0] = b64table[(data[0] >> 2)];
-      result[1] =
-        b64table[(((((data[0] & 0x03) & 0xff) << 4) & 0xff) |
-                  (data[1] >> 4))];
-      result[2] = b64table[(((data[1] << 4) & 0xff) >> 2)];
-      result[3] = '=';
-      break;
-    case 1:
-      result[0] = b64table[(data[0] >> 2)];
-      result[1] = b64table[(((((data[0] & 0x03) & 0xff) << 4) & 0xff))];
-      result[2] = '=';
-      result[3] = '=';
-      break;
-    default:
-      return -1;
-    }
-
-  return 4;
-
-}
-
-/* data must be 4 bytes
- * result should be 3 bytes
- */
-#define TOASCII(c) (c < 127 ? asciitable[c] : 0xff)
-inline static int
-decode (uint8_t * result, const uint8_t * data)
-{
-  uint8_t a1, a2;
-  int ret = 3;
-
-  a1 = TOASCII (data[0]);
-  a2 = TOASCII (data[1]);
-  if (a1 == 0xff || a2 == 0xff)
-    return -1;
-  result[0] = ((a1 << 2) & 0xff) | ((a2 >> 4) & 0xff);
-
-  a1 = a2;
-  a2 = TOASCII (data[2]);
-  if (a2 == 0xff)
-    return -1;
-  result[1] = ((a1 << 4) & 0xff) | ((a2 >> 2) & 0xff);
-
-  a1 = a2;
-  a2 = TOASCII (data[3]);
-  if (a2 == 0xff)
-    return -1;
-  result[2] = ((a1 << 6) & 0xff) | (a2 & 0xff);
-
-  if (data[2] == '=')
-    ret--;
-
-  if (data[3] == '=')
-    ret--;
-  return ret;
-}
-
-#define INCR(what, size) \
+#define INCR(what, size, max_len) \
 	do { \
 	what+=size; \
-	if (what > ret) { \
+	if (what > max_len) { \
 		gnutls_assert(); \
 		gnutls_free( (*result)); *result = NULL; \
 		return GNUTLS_E_INTERNAL_ERROR; \
@@ -156,13 +46,14 @@ int
 _gnutls_fbase64_encode (const char *msg, const uint8_t * data,
                         size_t data_size, uint8_t ** result)
 {
-  int ret, tmp;
-  unsigned int i, j;
-  char tmpres[4];
+  int tmp;
+  unsigned int i;
+  char tmpres[66];
   uint8_t *ptr;
   char top[80];
   char bottom[80];
-  int pos, bytes, top_len, bottom_len;
+  size_t size, max, bytes;
+  int pos, top_len, bottom_len;
 
   if (msg == NULL || strlen(msg) > 50)
     {
@@ -172,18 +63,18 @@ _gnutls_fbase64_encode (const char *msg, const uint8_t * data,
 
   _gnutls_str_cpy (top, sizeof(top), "-----BEGIN ");
   _gnutls_str_cat (top, sizeof(top), msg);
-  _gnutls_str_cat (top, sizeof(top), "-----");
+  _gnutls_str_cat (top, sizeof(top), "-----\n");
 
-  _gnutls_str_cpy (bottom, sizeof(bottom), "\n-----END ");
+  _gnutls_str_cpy (bottom, sizeof(bottom), "-----END ");
   _gnutls_str_cat (bottom, sizeof(bottom), msg);
   _gnutls_str_cat (bottom, sizeof(bottom), "-----\n");
 
   top_len = strlen (top);
   bottom_len = strlen (bottom);
 
-  ret = B64FSIZE (top_len+bottom_len, data_size);
+  max = B64FSIZE (top_len+bottom_len, data_size);
 
-  (*result) = gnutls_calloc (1, ret + 1);
+  (*result) = gnutls_calloc (1, max + 1);
   if ((*result) == NULL)
     {
       gnutls_assert ();
@@ -191,65 +82,37 @@ _gnutls_fbase64_encode (const char *msg, const uint8_t * data,
     }
 
   bytes = pos = 0;
-  INCR (bytes, top_len);
+  INCR (bytes, top_len, max);
   pos = top_len;
 
   memcpy (*result, top, top_len);
 
-  for (i = j = 0; i < data_size; i += 3, j += 4)
+  for (i = 0; i < data_size; i += 48)
     {
+      if (data_size - i < 48)
+        tmp = data_size - i;
+      else
+        tmp = 48;
 
-      tmp = encode (tmpres, &data[i], data_size - i);
-      if (tmp == -1)
-        {
-          gnutls_assert ();
-          gnutls_free ((*result));
-          *result = NULL;
-          return GNUTLS_E_BASE64_ENCODING_ERROR;
-        }
+      base64_encode ((void*)&data[i], tmp, tmpres, sizeof(tmpres));
+      size = strlen(tmpres);
 
-      INCR (bytes, 4);
-      ptr = &(*result)[j + pos];
+      INCR (bytes, size+1, max);
+      ptr = &(*result)[pos];
 
-      if ((j) % 64 == 0)
-        {
-          INCR (bytes, 1);
-          pos++;
-          *ptr++ = '\n';
-        }
-      *ptr++ = tmpres[0];
+      memcpy(ptr, tmpres, size);
+      ptr += size;
+      *ptr++ = '\n';
 
-      if ((j + 1) % 64 == 0)
-        {
-          INCR (bytes, 1);
-          pos++;
-          *ptr++ = '\n';
-        }
-      *ptr++ = tmpres[1];
-
-      if ((j + 2) % 64 == 0)
-        {
-          INCR (bytes, 1);
-          pos++;
-          *ptr++ = '\n';
-        }
-      *ptr++ = tmpres[2];
-
-      if ((j + 3) % 64 == 0)
-        {
-          INCR (bytes, 1);
-          pos++;
-          *ptr++ = '\n';
-        }
-      *ptr++ = tmpres[3];
+      pos += size + 1;
     }
 
-  INCR (bytes, bottom_len);
+  INCR (bytes, bottom_len, max);
 
   memcpy (&(*result)[bytes - bottom_len], bottom, bottom_len);
   (*result)[bytes] = 0;
 
-  return ret + 1;
+  return max + 1;
 }
 
 /**
@@ -340,29 +203,36 @@ static int
 _gnutls_base64_decode (const uint8_t * data, size_t data_size,
                        uint8_t ** result)
 {
-  unsigned int i, j;
-  int ret, tmp, est;
-  uint8_t tmpres[3];
+  unsigned int i;
+  int pos, tmp, est;
+  uint8_t tmpres[48];
+  size_t tmpres_size, decode_size;
 
   est = ((data_size * 3) / 4) + 1;
   (*result) = gnutls_malloc (est);
   if ((*result) == NULL)
     return GNUTLS_E_MEMORY_ERROR;
 
-  ret = 0;
-  for (i = j = 0; i < data_size; i += 4, j += 3)
+  pos = 0;
+  for (i = 0; i < data_size; i += 64)
     {
-      tmp = decode (tmpres, &data[i]);
-      if (tmp < 0)
+      if (data_size - i < 64)
+        decode_size = data_size - i;
+      else
+        decode_size = 64;
+    
+      tmpres_size = sizeof(tmpres);
+      tmp = base64_decode ((void*)&data[i], decode_size, (void*)tmpres, &tmpres_size);
+      if (tmp == 0)
         {
           gnutls_free (*result);
           *result = NULL;
           return tmp;
         }
-      memcpy (&(*result)[j], tmpres, tmp);
-      ret += tmp;
+      memcpy (&(*result)[pos], tmpres, tmpres_size);
+      pos += tmpres_size;
     }
-  return ret;
+  return pos;
 }
 
 /* copies data to result but removes newlines and <CR>
