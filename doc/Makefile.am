@@ -29,41 +29,41 @@ SUBDIRS += reference
 endif
 
 invoke-gnutls-cli.texi: ../src/cli-args.def
-	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	mv ../src/$@ .
 
 invoke-gnutls-cli-debug.texi: ../src/cli-debug-args.def
-	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	mv ../src/$@ .
 
 invoke-gnutls-serv.texi: ../src/serv-args.def
-	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	mv ../src/$@ .
 
 invoke-certtool.texi: ../src/certtool-args.def
-	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	mv ../src/$@ .
 
 invoke-srptool.texi: ../src/srptool-args.def
-	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
-	mv ../src/$@ .
-	sed -i 's/@subsection/@subsubsection/g' $@
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	mv ../src/$@ . && \
+	sed -i 's/@subsection/@subsubsection/g' $@ && \
 	sed -i 's/@section/@subsection/g' $@
 
 invoke-ocsptool.texi: ../src/ocsptool-args.def
-	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	mv ../src/$@ .
 
 invoke-psktool.texi: ../src/psk-args.def
-	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
-	mv ../src/$@ .
-	sed -i 's/@subsection/@subsubsection/g' $@
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	mv ../src/$@ . && \
+	sed -i 's/@subsection/@subsubsection/g' $@ && \
 	sed -i 's/@section/@subsection/g' $@
 
 invoke-p11tool.texi: ../src/p11tool-args.def
-	cd ../src/ && autogen -Tagtexi-cmd.tpl $<
-	mv ../src/$@ .
-	sed -i 's/@subsection/@subsubsection/g' $@
+	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	mv ../src/$@ . && \
+	sed -i 's/@subsection/@subsubsection/g' $@ && \
 	sed -i 's/@section/@subsection/g' $@
 
 info_TEXINFOS = gnutls.texi gnutls-guile.texi
