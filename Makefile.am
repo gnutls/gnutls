@@ -40,4 +40,5 @@ EXTRA_DIST = cfg.mk maint.mk .clcopying
 dist-hook: 
 	rm -f ChangeLog
 	make ChangeLog
-	make -C doc/manpages doit
+	cp -f ChangeLog $(distdir)/
+	sed 's/\@VERSION\@/$(VERSION)/g' -i $(distdir)/src/*.def

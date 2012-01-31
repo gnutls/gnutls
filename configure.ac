@@ -449,15 +449,7 @@ AC_CONFIG_FILES([
   lib/x509/Makefile
   po/Makefile.in
   src/Makefile
-  src/certtool-args.def
-  src/cli-args.def
-  src/cli-debug-args.def
   src/crywrap/Makefile
-  src/ocsptool-args.def
-  src/p11tool-args.def
-  src/psk-args.def
-  src/serv-args.def
-  src/srptool-args.def
   tests/Makefile
   tests/cert-tests/Makefile
   tests/dsa/Makefile
