@@ -170,10 +170,9 @@ static int _gnutls_init = 0;
 /**
  * gnutls_global_init:
  *
- * This function initializes the global data to defaults.  Every
- * gnutls application has a global data which holds common parameters
- * shared by gnutls session structures.  You should call
- * gnutls_global_deinit() when gnutls usage is no longer needed
+ * This function initializes the global data to defaults.  
+ * In order to free resources you may call gnutls_global_deinit() 
+ * when gnutls usage is no longer needed.
  *
  * Note that this function will also initialize the underlying crypto
  * backend, if it has not been initialized before.  
