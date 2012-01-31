@@ -465,7 +465,9 @@ gnutls_pubkey_get_openpgp_key_id (gnutls_pubkey_t key, unsigned int flags,
  * @output_data_size: holds the size of output_data (and will be
  *   replaced by the actual size of parameters)
  *
- * This function will export the certificate to DER or PEM format.
+ * This function will export the public key to DER or PEM format.
+ * The contents of the exported data is the SubjectPublicKeyInfo
+ * X.509 structure.
  *
  * If the buffer provided is not long enough to hold the output, then
  * *output_data_size is updated and %GNUTLS_E_SHORT_MEMORY_BUFFER will
@@ -801,10 +803,11 @@ int gnutls_pubkey_get_pk_ecc_x962 (gnutls_pubkey_t key, gnutls_datum_t* paramete
  * @data: The DER or PEM encoded certificate. 
  * @format: One of DER or PEM 
  * 
- * This function will convert the given DER or PEM encoded Public key 
- * to the native gnutls_pubkey_t format.The output will be stored 
- * in @key. 
- * If the Certificate is PEM encoded it should have a header of "PUBLIC KEY". 
+ * This function will import the provided public key in
+ * a SubjectPublicKeyInfo X.509 structure to a native
+ * %gnutls_pubkey_t structure. The output will be stored 
+ * in @key. If the public key is PEM encoded it should have a header 
+ * of "PUBLIC KEY". 
  * 
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  * negative error value.
