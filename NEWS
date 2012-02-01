@@ -45,7 +45,7 @@ gnutls_store_pubkey: Added
 gnutls_x509_crt_get_authority_key_gn_serial: Added
 gnutls_x509_crl_get_authority_key_gn_serial: Added
 gnutls_pkcs11_reinit: Added
-gnutls_ecc_list: Added
+gnutls_ecc_curve_list: Added
 gnutls_priority_certificate_type_list: Added
 gnutls_priority_sign_list: Added
 gnutls_priority_protocol_list: Added
