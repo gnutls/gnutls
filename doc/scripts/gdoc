@@ -700,11 +700,14 @@ sub output_man {
     if ($args{'bugsto'}) {
 	print ".SH \"REPORTING BUGS\"\n";
 	print "Report bugs to <". $args{'bugsto'} . ">.\n";
+        print ".br\n";
+	print "General guidelines for reporting bugs: http://www.gnu.org/gethelp/\n";
+        print ".br\n";
 	if ($args{'pkgname'}) {
 	    print $args{'pkgname'} . " home page: " .
 		"http://www.gnu.org/software/" . $args{'module'} . "/\n";
 	}
-	print "General help using GNU software: http://www.gnu.org/gethelp/\n";
+	print "\n";
     }
 
     if ($args{'copyright'}) {
@@ -731,6 +734,10 @@ sub output_man {
 	print ".B info " . $args{'seeinfo'} . "\n";
 	print ".PP\n";
 	print "should give you access to the complete manual.\n";
+	print "As an alternative you may obtain the manual from:\n";
+	print ".IP\n";
+	print ".B http://www.gnu.org/software/" . $args{'module'} . "/manual/\n";
+	print ".PP\n";
     }
 }
 
