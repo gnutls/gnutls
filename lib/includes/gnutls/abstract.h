@@ -278,8 +278,8 @@ void gnutls_pcert_deinit (gnutls_pcert_st* pcert);
                                                     gnutls_privkey_t *privkey);
 
 
-void gnutls_certificate_set_retrieve_function2
-  (gnutls_certificate_credentials_t cred,
+void gnutls_certificate_set_retrieve_function2 (
+   gnutls_certificate_credentials_t cred,
    gnutls_certificate_retrieve_function2 * func);
 
 int
