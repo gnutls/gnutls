@@ -612,8 +612,11 @@ typedef struct
   unsigned int flight_init:1;
   /* whether this is the last flight in the protocol  */
   unsigned int last_flight:1;
-  unsigned int retrans_timeout;
-  unsigned int total_timeout;
+  
+  /* the retransmission timeout in milliseconds */
+  unsigned int retrans_timeout_ms;
+  /* the connection timeout in milliseconds */
+  unsigned int total_timeout_ms;
 
   unsigned int hsk_hello_verify_requests;
   
@@ -622,12 +625,14 @@ typedef struct
 
   /* non blocking stuff variables */
   unsigned int blocking:1;
-  /* starting time of current handshake */
+  /* starting time of current handshake - seconds since epoch */
   time_t handshake_start_time;
   /* time in seconds of the last handshake call */
   time_t handshake_last_call;
-  /* The actual retrans_timeout for the next message (e.g. doubled or so) */
-  unsigned int actual_retrans_timeout;
+
+  /* The actual retrans_timeout for the next message (e.g. doubled or so) 
+   */
+  unsigned int actual_retrans_timeout_ms;
 
   /* timers to handle async handshake after gnutls_handshake()
    * has terminated. Required to handle retransmissions.

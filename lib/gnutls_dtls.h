@@ -50,7 +50,7 @@ inline static void _dtls_async_timer_init(gnutls_session_t session)
   if (_dtls_is_async(session))
     {
       _gnutls_dtls_log ("DTLS[%p]: Initializing timer for handshake state.\n", session);
-      session->internals.dtls.async_term = time(0) + MAX_DTLS_TIMEOUT/1000;
+      session->internals.dtls.async_term = gnutls_time(0) + MAX_DTLS_TIMEOUT/1000;
     }
   else
     session->internals.dtls.async_term = 0;

@@ -154,8 +154,8 @@ time_t now = gnutls_time (0);
 }
 
 #define UPDATE_TIMER \
-      session->internals.dtls.actual_retrans_timeout *= 2; \
-      session->internals.dtls.actual_retrans_timeout %= MAX_DTLS_TIMEOUT
+      session->internals.dtls.actual_retrans_timeout_ms *= 2; \
+      session->internals.dtls.actual_retrans_timeout_ms %= MAX_DTLS_TIMEOUT
 
 /* This function transmits the flight that has been previously
  * buffered.
@@ -192,7 +192,8 @@ int ret;
             {
               /* if no retransmission is required yet just return 
                */
-              if (now-session->internals.dtls.handshake_start_time < session->internals.dtls.actual_retrans_timeout)
+              if (now-session->internals.dtls.handshake_start_time < 
+                  session->internals.dtls.actual_retrans_timeout_ms/1000)
                 {
                   session->internals.dtls.handshake_last_call = now;
                   goto nb_timeout;
@@ -211,7 +212,7 @@ int ret;
 
   do 
     {
-      if (now-session->internals.dtls.handshake_start_time >= session->internals.dtls.total_timeout/1000) 
+      if (now-session->internals.dtls.handshake_start_time >= session->internals.dtls.total_timeout_ms/1000) 
         {
           ret = gnutls_assert_val(GNUTLS_E_TIMEDOUT);
           goto cleanup;
@@ -230,7 +231,7 @@ int ret;
         {
           session->internals.dtls.flight_init = 1;
           session->internals.dtls.handshake_last_call = now;
-          session->internals.dtls.actual_retrans_timeout = session->internals.dtls.retrans_timeout;
+          session->internals.dtls.actual_retrans_timeout_ms = session->internals.dtls.retrans_timeout_ms;
 
           if (last_type == GNUTLS_HANDSHAKE_FINISHED && _dtls_is_async(session))
             {
@@ -262,7 +263,7 @@ int ret;
       else /* all other messages -> implicit ack (receive of next flight) */
         {
           if (session->internals.dtls.blocking != 0)
-            ret = _gnutls_io_check_recv(session, session->internals.dtls.actual_retrans_timeout);
+            ret = _gnutls_io_check_recv(session, session->internals.dtls.actual_retrans_timeout_ms);
           else
             {
               ret = _gnutls_io_check_recv(session, 0);
@@ -423,8 +424,8 @@ int i, offset = 0;
 void gnutls_dtls_set_timeouts (gnutls_session_t session, unsigned int retrans_timeout,
   unsigned int total_timeout)
 {
-  session->internals.dtls.retrans_timeout = retrans_timeout;
-  session->internals.dtls.total_timeout  = total_timeout;
+  session->internals.dtls.retrans_timeout_ms = retrans_timeout;
+  session->internals.dtls.total_timeout_ms  = total_timeout;
 }
 
 /**

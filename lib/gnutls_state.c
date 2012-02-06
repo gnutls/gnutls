@@ -263,7 +263,7 @@ _gnutls_handshake_internal_state_init (gnutls_session_t session)
   
   session->internals.dtls.hsk_read_seq = 0;
   session->internals.dtls.hsk_write_seq = 0;
-  session->internals.dtls.handshake_start_time = time(0);
+  session->internals.dtls.handshake_start_time = gnutls_time(0);
 }
 
 void
@@ -383,8 +383,8 @@ gnutls_init (gnutls_session_t * session, unsigned int flags)
       (*session)->internals.dtls.mtu = DTLS_DEFAULT_MTU;
       (*session)->internals.transport = GNUTLS_DGRAM;
 
-      (*session)->internals.dtls.retrans_timeout = 1000;
-      (*session)->internals.dtls.total_timeout = 60000;
+      (*session)->internals.dtls.retrans_timeout_ms = 1000;
+      (*session)->internals.dtls.total_timeout_ms = 60000;
 
       (*session)->internals.dtls.record_sw_size = 0;
     }

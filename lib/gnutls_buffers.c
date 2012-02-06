@@ -960,7 +960,8 @@ handshake_buffer_st* recv_buf = session->internals.handshake_recv_buffer;
     }
 
 timeout:
-  if (time(0)-session->internals.dtls.handshake_start_time > session->internals.dtls.total_timeout/1000) 
+  if (gnutls_time(0) - session->internals.dtls.handshake_start_time >
+      session->internals.dtls.total_timeout_ms/1000) 
     return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
   else
     {

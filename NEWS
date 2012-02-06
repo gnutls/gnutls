@@ -19,6 +19,9 @@ status from an ocsp server.
 ** command line apps: Use gnu autogen (libopts) to parse command
 line arguments and template files.
 
+** libgnutls: Corrected DTLS retransmission timeouts. 
+Report and patch by Sean Buckheister.
+
 ** libgnutls: Added new functions to easily allow the usage of
 an SSH-style authentication.
 
