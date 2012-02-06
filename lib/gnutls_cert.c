@@ -432,7 +432,8 @@ void gnutls_certificate_set_retrieve_function
  *
  * The callback's function prototype is:
  * int (*callback)(gnutls_session_t, const gnutls_datum_t* req_ca_dn, int nreqs,
- * const gnutls_pk_algorithm_t* pk_algos, int pk_algos_length, gnutls_pcert_st* st);
+ * const gnutls_pk_algorithm_t* pk_algos, int pk_algos_length, gnutls_pcert_st** pcert,
+ * unsigned int *pcert_length, gnutls_privkey_t * pkey);
  *
  * @req_ca_cert is only used in X.509 certificates.
  * Contains a list with the CA names that the server considers trusted.
@@ -443,7 +444,11 @@ void gnutls_certificate_set_retrieve_function
  * @pk_algos contains a list with server's acceptable signature algorithms.
  * The certificate returned should support the server's given algorithms.
  *
- * @st should contain the certificates and private keys.
+ * @pcert should contain a single certificate and public or a list of them.
+ *
+ * @pcert_length is the size of the previous list.
+ *
+ * @pkey is the private key.
  *
  * If the callback function is provided then gnutls will call it, in the
  * handshake, after the certificate request message has been received.
