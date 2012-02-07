@@ -841,7 +841,7 @@ typedef struct
   uint16_t srp_prime_bits;
 
   /* A handshake process has been completed */
-  int initial_negotiation_completed:1;
+  unsigned int initial_negotiation_completed:1;
 
   struct
   {
