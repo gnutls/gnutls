@@ -585,7 +585,7 @@ record_add_to_buffers (gnutls_session_t session,
           if (bufel->msg.size < 2)
             {
               ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
-              goto cleanup;
+              goto unexpected_packet;
             }
 
           _gnutls_record_log
@@ -619,7 +619,6 @@ record_add_to_buffers (gnutls_session_t session,
                   session_invalidate (session);
                   ret = gnutls_assert_val(GNUTLS_E_FATAL_ALERT_RECEIVED);
                 }
-
               goto cleanup;
             }
           break;
@@ -635,17 +634,9 @@ record_add_to_buffers (gnutls_session_t session,
           if (session->internals.initial_negotiation_completed == 0)
             {
               ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
-              goto cleanup;
+              goto unexpected_packet;
             }
 
-          /* even if data is unexpected put it into the buffer */
-          if ((ret =
-               _gnutls_record_buffer_put (session, recv->type, seq,
-                                          bufel)) < 0)
-            {
-              gnutls_assert ();
-              goto cleanup;
-            }
 
           /* the got_application data is only returned
            * if expecting client hello (for rehandshake
@@ -654,11 +645,21 @@ record_add_to_buffers (gnutls_session_t session,
           if (type == GNUTLS_ALERT || (htype == GNUTLS_HANDSHAKE_CLIENT_HELLO
                                        && type == GNUTLS_HANDSHAKE))
             {
+              /* even if data is unexpected put it into the buffer */
+              if ((ret =
+                   _gnutls_record_buffer_put (session, recv->type, seq,
+                                              bufel)) < 0)
+                {
+                  gnutls_assert ();
+                  goto cleanup;
+                }
+
               return gnutls_assert_val(GNUTLS_E_GOT_APPLICATION_DATA);
             }
           else
             {
-              return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+              ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+              goto unexpected_packet;
             }
 
           break;
@@ -666,12 +667,15 @@ record_add_to_buffers (gnutls_session_t session,
           /* In DTLS we might receive a handshake replay from the peer to indicate
            * the our last TLS handshake messages were not received.
            */
-          if (_dtls_is_async(session) && _dtls_async_timer_active(session))
+          if (IS_DTLS(session))
             {
-              ret = _dtls_retransmit(session);
-              goto cleanup;
+              if (_dtls_is_async(session) && _dtls_async_timer_active(session))
+                {
+                  ret = _dtls_retransmit(session);
+                  goto cleanup;
+                }
             }
-          
+
           /* This is legal if HELLO_REQUEST is received - and we are a client.
            * If we are a server, a client may initiate a renegotiation at any time.
            */
@@ -695,7 +699,7 @@ record_add_to_buffers (gnutls_session_t session,
 
           /* So we accept it */
           ret = _gnutls_recv_hello_request (session, bufel->msg.data, bufel->msg.size);
-          goto cleanup;
+          goto unexpected_packet;
 
           break;
         default:
@@ -705,12 +709,16 @@ record_add_to_buffers (gnutls_session_t session,
              session, recv->type, type);
 
           gnutls_assert ();
-          ret = GNUTLS_E_INTERNAL_ERROR;
-          goto cleanup;
+          ret = GNUTLS_E_UNEXPECTED_PACKET;
+          goto unexpected_packet;
         }
     }
 
   return 0;
+
+unexpected_packet:
+  if (IS_DTLS(session) && ret != GNUTLS_E_REHANDSHAKE)
+    ret = GNUTLS_E_AGAIN; /* skip the packet */
 
 cleanup:
   _mbuffer_xfree(&bufel);
