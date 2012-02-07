@@ -39,11 +39,12 @@ libx86_la_SOURCES = sha-padlock.c hmac-padlock.c aes-x86.c aes-padlock.c aes-gcm
 
 if ASM_X86_64
 AM_CFLAGS += -DASM_X86_64 -DASM_X86
+libx86_la_SOURCES += aes-gcm-x86.c
 
 if WINDOWS
 libx86_la_SOURCES += asm-coff/appro-aes-x86-64-coff.s asm-coff/padlock-x86-64-coff.s asm-coff/cpuid-x86-64-coff.s asm-coff/appro-aes-gcm-x86-64-coff.s
 else
-libx86_la_SOURCES += asm/appro-aes-x86-64.s asm/appro-aes-gcm-x86-64.s aes-gcm-x86.c asm/padlock-x86-64.s asm/cpuid-x86-64.s
+libx86_la_SOURCES += asm/appro-aes-x86-64.s asm/appro-aes-gcm-x86-64.s asm/padlock-x86-64.s asm/cpuid-x86-64.s
 endif
 
 else
