@@ -191,7 +191,7 @@ main (void)
         {
           ret = gnutls_handshake (session);
         }
-      while (gnutls_error_is_fatal (ret) == 0);
+      while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
 
       if (ret < 0)
         {
