@@ -37,10 +37,12 @@
 
 
 /* This function fragments and transmits a previously buffered
- * outgoing message. */
+ * outgoing message. It accepts mtu_data which is a buffer to
+ * be reused (should be set to NULL initially).
+ */
 static inline int
 transmit_message (gnutls_session_t session,
-		  mbuffer_st *bufel)
+		  mbuffer_st *bufel, uint8_t **buf)
 {
   uint8_t *data, *mtu_data;
   int ret = 0;
@@ -60,9 +62,11 @@ transmit_message (gnutls_session_t session,
         _mbuffer_get_uhead_size(bufel), 0);
     }
 
-  mtu_data = gnutls_malloc(mtu + DTLS_HANDSHAKE_HEADER_SIZE);
-  if (mtu_data == NULL)
+  *buf = gnutls_realloc_fast(*buf, mtu + DTLS_HANDSHAKE_HEADER_SIZE);
+  if (*buf == NULL)
     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+  mtu_data = *buf;
 
   data = _mbuffer_get_udata_ptr( bufel);
   data_size = _mbuffer_get_udata_size(bufel);
@@ -110,8 +114,6 @@ transmit_message (gnutls_session_t session,
           break;
         }
    }
-
-  gnutls_free (mtu_data);
 
   return ret;
 }
@@ -167,6 +169,7 @@ int
 _dtls_transmit (gnutls_session_t session)
 {
 int ret;
+uint8_t* buf = NULL;
 
   /* PREPARING -> SENDING state transition */
   mbuffer_head_st *const send_buffer =
@@ -221,8 +224,20 @@ int ret;
       for (cur = send_buffer->head;
            cur != NULL; cur = cur->next)
         {
-          transmit_message (session, cur);
+          ret = transmit_message (session, cur, &buf);
+          if (ret < 0)
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
+
           last_type = cur->htype;
+        }
+
+      if (buf != NULL)
+        {
+          gnutls_free(buf);
+          buf = NULL;
         }
 
       if (session->internals.dtls.flight_init == 0)
@@ -285,6 +300,8 @@ int ret;
   ret = 0;
 
 cleanup:
+  if (buf != NULL)
+    gnutls_free(buf);
   _gnutls_dtls_log ("DTLS[%p]: End of flight transmission.\n", session);
 
   session->internals.dtls.flight_init = 0;
