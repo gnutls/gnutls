@@ -276,17 +276,17 @@ sc_avoid_if_before_free:
 	    exit 1; } || :
 
 sc_cast_of_argument_to_free:
-	@prohibit='\<free *\( *\(' halt='don'\''t cast free argument'	\
+	@prohibit='\<free *\( *\(' halt="don't cast free argument"	\
 	  $(_sc_search_regexp)
 
 sc_cast_of_x_alloc_return_value:
 	@prohibit='\*\) *x(m|c|re)alloc\>'				\
-	halt='don'\''t cast x*alloc return value'			\
+	halt="don't cast x*alloc return value"				\
 	  $(_sc_search_regexp)
 
 sc_cast_of_alloca_return_value:
 	@prohibit='\*\) *alloca\>'					\
-	halt='don'\''t cast alloca return value'			\
+	halt="don't cast alloca return value"				\
 	  $(_sc_search_regexp)
 
 sc_space_tab:
@@ -516,7 +516,7 @@ sc_prohibit_argmatch_without_use:
 
 sc_prohibit_canonicalize_without_use:
 	@h='canonicalize.h' \
-	re='CAN_(EXISTING|ALL_BUT_LAST|MISSING)|canonicalize_(mode_t|filename_mode)' \
+	re='CAN_(EXISTING|ALL_BUT_LAST|MISSING)|canonicalize_(mode_t|filename_mode|file_name)' \
 	  $(_sc_header_without_use)
 
 sc_prohibit_root_dev_ino_without_use:
@@ -1015,8 +1015,8 @@ update-NEWS-hash: NEWS
 # setting this to ' && !/PRAGMA_SYSTEM_HEADER/'.
 _makefile_at_at_check_exceptions ?=
 sc_makefile_at_at_check:
-	@perl -ne '/\@[A-Z_0-9]+\@/'					\
-          -e ' && !/([A-Z_0-9]+)\s+=.*\@\1\@$$/'			\
+	@perl -ne '/\@\w+\@/'						\
+          -e ' && !/(\w+)\s+=.*\@\1\@$$/'				\
           -e ''$(_makefile_at_at_check_exceptions)			\
 	  -e 'and (print "$$ARGV:$$.: $$_"), $$m=1; END {exit !$$m}'	\
 	    $$($(VC_LIST_EXCEPT) | grep -E '(^|/)(Makefile\.am|[^/]+\.mk)$$') \
@@ -1079,7 +1079,7 @@ sc_po_check:
 # Sometimes it is useful to change the PATH environment variable
 # in Makefiles.  When doing so, it's better not to use the Unix-centric
 # path separator of ':', but rather the automake-provided '$(PATH_SEPARATOR)'.
-msg = '$(ME): Do not use '\'':'\'' above; use $$(PATH_SEPARATOR) instead'
+msg = '$(ME): Do not use ":" above; use $$(PATH_SEPARATOR) instead'
 sc_makefile_path_separator_check:
 	@prohibit='PATH[=].*:'						\
 	in_vc_files='akefile|\.mk$$'					\
