@@ -2670,12 +2670,24 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
   int ret = 0;
   uint8_t ch;
 
+
   switch (STATE)
     {
     case STATE0:
     case STATE30:
-      ret = _gnutls_recv_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1, &ch, 1, NULL);
       STATE = STATE30;
+
+      /* This is the last flight and peer cannot be sure
+       * we have received it unless we notify him. So we
+       * wait for a message and retransmit if needed. */
+      if (IS_DTLS(session) && !_dtls_is_async(session))
+        {
+          ret = _dtls_wait_and_retransmit(session);
+          if (ret < 0)
+            return gnutls_assert_val(ret);
+        }
+
+      ret = _gnutls_recv_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1, &ch, 1, NULL);
       if (ret <= 0)
         {
           ERR ("recv ChangeCipherSpec", ret);
@@ -2700,10 +2712,18 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
           gnutls_assert ();
           return ret;
         }
-
+        
     case STATE31:
-      ret = _gnutls_recv_finished (session);
       STATE = STATE31;
+
+       if (IS_DTLS(session) && !_dtls_is_async(session))
+         {
+           ret = _dtls_wait_and_retransmit(session);
+           if (ret < 0)
+             return gnutls_assert_val(ret);
+         }
+
+      ret = _gnutls_recv_finished (session);
       if (ret < 0)
         {
           ERR ("recv finished", ret);

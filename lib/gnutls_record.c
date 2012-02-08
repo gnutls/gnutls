@@ -724,7 +724,10 @@ record_add_to_buffers (gnutls_session_t session,
 
 unexpected_packet:
   if (IS_DTLS(session) && ret != GNUTLS_E_REHANDSHAKE)
-    ret = GNUTLS_E_AGAIN; /* skip the packet */
+    {
+      _mbuffer_xfree(&bufel);
+      RETURN_DTLS_EAGAIN_OR_TIMEOUT(session);
+    }
 
 cleanup:
   _mbuffer_xfree(&bufel);

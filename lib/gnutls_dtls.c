@@ -216,7 +216,7 @@ int ret;
           goto cleanup;
         }
 
-      _gnutls_dtls_log ("DTLS[%p]: %sstart of flight transmission.\n", session,  (session->internals.dtls.flight_init == 0)?"":"re-");
+      _gnutls_dtls_log ("DTLS[%p]: %sStart of flight transmission.\n", session,  (session->internals.dtls.flight_init == 0)?"":"re-");
 
       for (cur = send_buffer->head;
            cur != NULL; cur = cur->next)
@@ -233,9 +233,9 @@ int ret;
 
           if (last_type == GNUTLS_HANDSHAKE_FINISHED)
             {
-              /* we cannot do anything here. We just return 0 and
-               * if a retransmission occurs because peer didn't receive it
-               * we rely on the record layer calling this function again.
+              /* On the last flight we cannot ensure retransmission
+               * from here. _dtls_wait_and_retransmit() is being called
+               * by handshake.
                */
               session->internals.dtls.last_flight = 1;
             }
@@ -248,11 +248,12 @@ int ret;
         return gnutls_assert_val(ret);
 
       /* last message in handshake -> no ack */
-      if (session->internals.dtls.last_flight != 0 && _dtls_is_async(session))
+      if (session->internals.dtls.last_flight != 0)
         {
-          /* we cannot do anything here. We just return 0 and
+          /* we don't wait here. We just return 0 and
            * if a retransmission occurs because peer didn't receive it
-           * we rely on the record layer calling this function again.
+           * we rely on the record or handshake
+           * layer calling this function again.
            */
           return 0;
         }
@@ -296,6 +297,33 @@ cleanup:
 nb_timeout:
   RETURN_DTLS_EAGAIN_OR_TIMEOUT(session);
 }
+
+/* Waits for the last flight or retransmits
+ * the previous on timeout. Returns 0 on success.
+ */
+int _dtls_wait_and_retransmit(gnutls_session_t session)
+{
+int ret;
+
+  if (session->internals.dtls.blocking != 0)
+    ret = _gnutls_io_check_recv(session, session->internals.dtls.actual_retrans_timeout_ms);
+  else
+    ret = _gnutls_io_check_recv(session, 0);
+
+  UPDATE_TIMER;
+      
+  if (ret == GNUTLS_E_TIMEDOUT)
+    {
+      ret = _dtls_retransmit(session);
+      if (ret == 0)
+        {
+          RETURN_DTLS_EAGAIN_OR_TIMEOUT(session);
+        }
+    }
+
+  return 0;
+}
+
 
 #define window_table session->internals.dtls.record_sw
 #define window_size session->internals.dtls.record_sw_size
