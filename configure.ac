@@ -118,7 +118,7 @@ AC_C_BIGENDIAN
 
 
 dnl No fork on MinGW, disable some self-tests until we fix them.
-AC_CHECK_FUNCS([fork getrusage getpwuid_r],,)
+AC_CHECK_FUNCS([fork getrusage getpwuid_r daemon],,)
 AM_CONDITIONAL(HAVE_FORK, test "$ac_cv_func_fork" != "no")
 AC_LIB_HAVE_LINKFLAGS(pthread,, [#include <pthread.h>], [pthread_mutex_lock (0);])
 
@@ -376,6 +376,8 @@ dnl Crywrap dependencies
 *** Checking dependencies for crywrap...
 ])
 
+crywrap=no
+
 if test "$have_win" != "yes"; then
 
 AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/select.h sys/types.h sys/wait.h])
@@ -400,11 +402,13 @@ AC_CHECK_FUNCS([alarm atexit dup2 epoll_create kqueue memchr memset munmap \
 
 PKG_CHECK_MODULES(LIBIDN, libidn >= 0.0.0, [libidn=yes], [libidn=no])
 
-else
-libidn=no
+ if test "x$libidn" != "xno" && test "$ac_cv_func_daemon" != "no";then
+  crywrap=yes
+ fi
+
 fi
 
-AM_CONDITIONAL(ENABLE_CRYWRAP, test "x$libidn" != "xno")
+AM_CONDITIONAL(ENABLE_CRYWRAP, test "x$crywrap" != "xno")
 rm -f suppressions.valgrind
 dnl end of crywrap requirements
 
