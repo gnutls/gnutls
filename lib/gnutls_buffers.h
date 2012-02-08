@@ -29,7 +29,7 @@ _gnutls_record_buffer_put (gnutls_session_t session,
   content_type_t type, uint64* seq, mbuffer_st* bufel);
 
 inline static int
-_gnutls_record_buffer_get_size (content_type_t type, gnutls_session_t session)
+_gnutls_record_buffer_get_size (gnutls_session_t session)
 {
   return session->internals.record_buffer.byte_length;
 }

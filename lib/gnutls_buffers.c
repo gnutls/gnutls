@@ -93,7 +93,7 @@ _gnutls_record_buffer_put (gnutls_session_t session,
 size_t
 gnutls_record_check_pending (gnutls_session_t session)
 {
-  return _gnutls_record_buffer_get_size (GNUTLS_APPLICATION_DATA, session);
+  return _gnutls_record_buffer_get_size (session) + session->internals.record_recv_buffer.byte_length;
 }
 
 int

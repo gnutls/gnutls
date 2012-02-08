@@ -493,7 +493,7 @@ check_buffers (gnutls_session_t session, content_type_t type,
   if ((type == GNUTLS_APPLICATION_DATA ||
        type == GNUTLS_HANDSHAKE ||
        type == GNUTLS_CHANGE_CIPHER_SPEC)
-      && _gnutls_record_buffer_get_size (type, session) > 0)
+      && _gnutls_record_buffer_get_size (session) > 0)
     {
       int ret;
       ret = _gnutls_record_buffer_get (type, session, data, data_size, seq);
@@ -906,7 +906,7 @@ gnutls_datum_t raw; /* raw headers */
  */
 ssize_t
 _gnutls_recv_in_buffers (gnutls_session_t session, content_type_t type,
-                  gnutls_handshake_description_t htype)
+                         gnutls_handshake_description_t htype)
 {
   uint64 *packet_sequence;
   uint8_t *ciphertext;
