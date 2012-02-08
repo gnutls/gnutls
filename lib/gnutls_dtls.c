@@ -294,7 +294,7 @@ cleanup:
   return ret;
 
 nb_timeout:
-    return GNUTLS_E_AGAIN;
+  RETURN_DTLS_EAGAIN_OR_TIMEOUT(session);
 }
 
 #define window_table session->internals.dtls.record_sw

@@ -33,6 +33,17 @@ int _dtls_record_check(gnutls_session_t session, uint64 * _seq);
 
 #define MAX_DTLS_TIMEOUT 60000
 
+#define RETURN_DTLS_EAGAIN_OR_TIMEOUT(session) \
+  if (gnutls_time(0) - session->internals.dtls.handshake_start_time > \
+      session->internals.dtls.total_timeout_ms/1000) \
+    return gnutls_assert_val(GNUTLS_E_TIMEDOUT); \
+  else \
+    { \
+      if (session->internals.dtls.blocking != 0) \
+        millisleep(50); \
+      return gnutls_assert_val(GNUTLS_E_AGAIN); \
+    }
+
 /* returns true or false depending on whether we need to
  * handle asynchronously handshake data.
  */

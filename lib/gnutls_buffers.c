@@ -960,16 +960,7 @@ handshake_buffer_st* recv_buf = session->internals.handshake_recv_buffer;
     }
 
 timeout:
-  if (gnutls_time(0) - session->internals.dtls.handshake_start_time >
-      session->internals.dtls.total_timeout_ms/1000) 
-    return gnutls_assert_val(GNUTLS_E_TIMEDOUT);
-  else
-    {
-      if (session->internals.dtls.blocking != 0)
-        millisleep(50);
-        
-      return gnutls_assert_val(GNUTLS_E_AGAIN);
-    }
+  RETURN_DTLS_EAGAIN_OR_TIMEOUT(session);
 }
 
 /* This is a receive function for the gnutls handshake 
