@@ -35,10 +35,12 @@
 #define RANDOMIZE
 #include "eagain-common.h"
 
+const char* side = "";
+
 static void
 tls_log_func (int level, const char *str)
 {
-  fprintf (stderr, "|<%d>| %s", level, str);
+  fprintf (stderr, "%s|<%d>| %s", side, level, str);
 }
 
 static int handshake = 0;

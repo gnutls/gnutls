@@ -1,5 +1,6 @@
 #define min(x,y) ((x)<(y)?(x):(y))
-//#define EAGAIN_DEBUG
+
+extern const char* side;
 
 #define HANDSHAKE_EXPECT(c, s, clierr, serverr) \
   sret = cret = GNUTLS_E_AGAIN; \
@@ -7,10 +8,12 @@
     { \
       if (cret == GNUTLS_E_AGAIN) \
         { \
+          side = "client"; \
           cret = gnutls_handshake (c); \
         } \
       if (sret == GNUTLS_E_AGAIN) \
         { \
+          side = "server"; \
           sret = gnutls_handshake (s); \
         } \
     } \
@@ -29,6 +32,7 @@
 #define TRANSFER(c, s, msg, msglen, buf, buflen) \
   do \
     { \
+      side = "client"; \
       ret = gnutls_record_send (c, msg, msglen); \
     } \
   while(ret == GNUTLS_E_AGAIN); \
@@ -39,6 +43,7 @@
     { \
       do \
         { \
+          side = "server"; \
           ret = gnutls_record_recv (s, buf, buflen); \
         } \
       while(ret == GNUTLS_E_AGAIN); \
@@ -54,12 +59,14 @@
         } \
       do \
         { \
+          side = "server"; \
           ns = gnutls_record_send (server, msg, msglen); \
         } \
       while (ns == GNUTLS_E_AGAIN); \
       if (ns < 0) fail ("server send error: %s\n", gnutls_strerror (ret)); \
       do \
         { \
+          side = "client"; \
           ret = gnutls_record_recv (client, buf, buflen); \
         } \
       while(ret == GNUTLS_E_AGAIN); \
@@ -82,6 +89,7 @@
           /* echo back */ \
           do \
             { \
+              side = "client"; \
               ns = gnutls_record_send (client, buf, msglen); \
             } \
           while (ns == GNUTLS_E_AGAIN); \
@@ -212,7 +220,7 @@ int ret;
     ret = 0; /* timeout */
 
 #ifdef EAGAIN_DEBUG
-  fprintf(stderr, "eagain: server_pull_timeout: %d\n", ret);
+  fprintf(stderr, "eagain: server_pull_timeout: %d (avail: cli %d, serv %d)\n", ret, (int)to_client_len, (int)to_server_len);
 #endif
 
   return ret;
@@ -228,7 +236,7 @@ int ret;
     ret = 0;
 
 #ifdef EAGAIN_DEBUG
-  fprintf(stderr, "eagain: client_pull_timeout: %d\n", ret);
+  fprintf(stderr, "eagain: client_pull_timeout: %d (avail: cli %d, serv %d)\n", ret, (int)to_client_len, (int)to_server_len);
 #endif
 
   return ret;
