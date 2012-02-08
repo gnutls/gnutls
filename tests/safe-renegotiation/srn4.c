@@ -39,10 +39,12 @@
 #include "../eagain-common.h"
 #include "../utils.h"
 
+const char* side = "";
+
 static void
 tls_log_func (int level, const char *str)
 {
-  fprintf (stderr, "|<%d>| %s", level, str);
+  fprintf (stderr, "%s|<%d>| %s", side, level, str);
 }
 
 static unsigned char server_cert_pem[] =
