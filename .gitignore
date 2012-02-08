@@ -584,3 +584,4 @@ tests/x509self
 tests/x509sign-verify
 tests/x509signself
 gl/tests/test-base64
+tests/mini-loss2
