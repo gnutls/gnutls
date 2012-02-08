@@ -179,6 +179,7 @@ int ret;
    * non blocking way, check if it is time to retransmit or just
    * return.
    */
+
   if (session->internals.dtls.flight_init != 0 && session->internals.dtls.blocking == 0)
     {
       /* just in case previous run was interrupted */
@@ -205,10 +206,7 @@ int ret;
               goto cleanup;
             }
         }
-      else
-        return ret;
     }
-
 
   do 
     {
@@ -233,7 +231,7 @@ int ret;
           session->internals.dtls.handshake_last_call = now;
           session->internals.dtls.actual_retrans_timeout_ms = session->internals.dtls.retrans_timeout_ms;
 
-          if (last_type == GNUTLS_HANDSHAKE_FINISHED && _dtls_is_async(session))
+          if (last_type == GNUTLS_HANDSHAKE_FINISHED)
             {
               /* we cannot do anything here. We just return 0 and
                * if a retransmission occurs because peer didn't receive it
@@ -243,8 +241,6 @@ int ret;
             }
           else
             session->internals.dtls.last_flight = 0;
-
-
         }
 
       ret = _gnutls_io_write_flush (session);
@@ -252,7 +248,7 @@ int ret;
         return gnutls_assert_val(ret);
 
       /* last message in handshake -> no ack */
-      if (session->internals.dtls.last_flight != 0)
+      if (session->internals.dtls.last_flight != 0 && _dtls_is_async(session))
         {
           /* we cannot do anything here. We just return 0 and
            * if a retransmission occurs because peer didn't receive it
@@ -321,12 +317,13 @@ static void rot_window(gnutls_session_t session, int places)
 int _dtls_record_check(gnutls_session_t session, uint64 * _seq)
 {
 uint64_t seq = 0, diff;
-int i, offset = 0;
+unsigned int i, offset = 0;
 
-  for (i=0;i<8;i++) 
+  seq |= _seq->i[0] & 0xff;
+  for (i=1;i<8;i++) 
     {
-      seq |= _seq->i[i];
       seq <<= 8;
+      seq |= _seq->i[i] & 0xff;
     }
 
   if (window_size == 0)
@@ -341,9 +338,10 @@ int i, offset = 0;
       return -1;
     }
 
-  if (window_size == DTLS_RECORD_WINDOW_SIZE) {
-    rot_window(session, MOVE_SIZE);
-  }
+  if (window_size == DTLS_RECORD_WINDOW_SIZE) 
+    {
+      rot_window(session, MOVE_SIZE);
+    }
 
   if (seq < window_table[window_size-1])
     {
@@ -352,19 +350,34 @@ int i, offset = 0;
 
       if (diff >= window_size) 
         {
+          /* Probably an epoch change. Check if we can fit it */
+          if (window_table[0] == 0)
+            {
+              window_table[0] = seq;
+              return 0;
+            }
+          
+          for (i=0;i<window_size-1;i++)
+            {
+              if (seq == window_table[i])
+                return -1;
+              if (seq == window_table[i] + 1)
+                {
+                  if (seq == window_table[i+1])
+                    return -1;
+                  window_table[i+1] = seq;
+                  return 0;
+                }
+            }
           return -1;
         }
 
       offset = window_size-1-diff;
 
       if (window_table[offset] == seq)
-        {
-          return -1;
-        }
+        return -1;
       else
-        {
-          window_table[offset] = seq;
-        }
+        window_table[offset] = seq;
     }
   else /* seq >= last */
     {

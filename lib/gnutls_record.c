@@ -669,6 +669,12 @@ record_add_to_buffers (gnutls_session_t session,
            */
           if (IS_DTLS(session))
             {
+              if (type == GNUTLS_CHANGE_CIPHER_SPEC)
+                {
+                  ret = gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+                  goto unexpected_packet;
+                }
+                
               if (_dtls_is_async(session) && _dtls_async_timer_active(session))
                 {
                   ret = _dtls_retransmit(session);
@@ -996,6 +1002,8 @@ begin:
   if (ret < 0)
     {
       gnutls_assert();
+      _gnutls_audit_log(session, "Discarded message[%u] due to invalid decryption\n", 
+            (unsigned int)_gnutls_uint64touint32 (packet_sequence));
       goto sanity_check_error;
     }
 
@@ -1008,8 +1016,8 @@ begin:
       ret = _dtls_record_check(session, packet_sequence);
       if (ret < 0)
         {
-          _gnutls_audit_log(session, "Discarded duplicate message[%u]\n",
-            (unsigned int) _gnutls_uint64touint32 (packet_sequence));
+          _gnutls_audit_log(session, "Discarded duplicate message[%u]: %s\n",
+            (unsigned int) _gnutls_uint64touint32 (packet_sequence), _gnutls_packet2str (record.type));
           goto sanity_check_error;
         }
     }
@@ -1077,8 +1085,6 @@ sanity_check_error:
   if (IS_DTLS(session))
     {
       session->internals.dtls.packets_dropped++;
-      _gnutls_audit_log(session, "Discarded message[%u] due to invalid decryption\n", 
-            (unsigned int)_gnutls_uint64touint32 (packet_sequence));
       ret = gnutls_assert_val(GNUTLS_E_AGAIN);
       goto cleanup;
     }

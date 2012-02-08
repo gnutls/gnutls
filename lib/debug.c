@@ -49,7 +49,7 @@ _gnutls_packet2str (content_type_t packet)
   switch (packet)
     {
     case GNUTLS_CHANGE_CIPHER_SPEC:
-      return "Change Cipher Spec";
+      return "ChangeCipherSpec";
     case GNUTLS_ALERT:
       return "Alert";
     case GNUTLS_HANDSHAKE:

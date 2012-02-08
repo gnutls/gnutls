@@ -51,6 +51,7 @@
 #include <gnutls_constate.h> /* gnutls_epoch_get */
 #include <errno.h>
 #include <system.h>
+#include "debug.h"
 
 #ifndef EAGAIN
 #define EAGAIN EWOULDBLOCK
@@ -600,7 +601,6 @@ _gnutls_io_write_flush (gnutls_session_t session)
   return sent;
 }
 
-#include "debug.h"
 /* Checks whether there are received data within
  * a timeframe.
  *
