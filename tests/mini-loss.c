@@ -41,7 +41,8 @@
 #include "utils.h"
 
 /* This program simulates packet loss in DTLS datagrams using
- * the blocking functions
+ * the blocking functions. Idea taken from test app of
+ * Sean Buckheister.
  */
 
 static void print_type(const unsigned char* buf, int size)
