@@ -82,7 +82,7 @@ main (void)
   gnutls_record_send (session, MSG, strlen (MSG));
 
   ret = gnutls_record_recv (session, buffer, MAX_BUF);
-  if (gnutls_error_is_fatal (ret) == 1 || ret == 0)
+  if (gnutls_error_is_fatal (ret) != 0 || ret == 0)
     {
       if (ret == 0)
         {
