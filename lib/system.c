@@ -111,12 +111,6 @@ system_read (gnutls_transport_ptr_t ptr, void *data, size_t data_size)
   return recv (GNUTLS_POINTER_TO_INT (ptr), data, data_size, 0);
 }
 
-ssize_t
-system_read_peek (gnutls_transport_ptr_t ptr, void *data, size_t data_size)
-{
-  return recv (GNUTLS_POINTER_TO_INT (ptr), data, data_size, MSG_PEEK);
-}
-
 /* Wait for data to be received within a timeout period in milliseconds.
  * If data_size > 0 it will return the specified amount of data in
  * peek mode.
