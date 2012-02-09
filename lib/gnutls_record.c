@@ -678,7 +678,11 @@ record_add_to_buffers (gnutls_session_t session,
               if (_dtls_is_async(session) && _dtls_async_timer_active(session))
                 {
                   ret = _dtls_retransmit(session);
-                  if (ret == 0) ret = GNUTLS_E_AGAIN;
+                  if (ret == 0) 
+                    {
+                      ret = gnutls_assert_val(GNUTLS_E_AGAIN);
+                      goto unexpected_packet;
+                    }
                   goto cleanup;
                 }
             }
