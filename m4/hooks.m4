@@ -39,9 +39,9 @@ AC_DEFUN([LIBGNUTLS_HOOKS],
   # Interfaces changed/added/removed:   CURRENT++       REVISION=0
   # Interfaces added:                             AGE++
   # Interfaces removed:                           AGE=0
-  AC_SUBST(LT_CURRENT, 33)
-  AC_SUBST(LT_REVISION, 1)
-  AC_SUBST(LT_AGE, 5)
+  AC_SUBST(LT_CURRENT, 34)
+  AC_SUBST(LT_REVISION, 0)
+  AC_SUBST(LT_AGE, 6)
 
   AC_SUBST(LT_SSL_CURRENT, 27)
   AC_SUBST(LT_SSL_REVISION, 1)
@@ -173,20 +173,6 @@ fi
    AC_MSG_RESULT(yes)
   fi
   AM_CONDITIONAL(ENABLE_ANON, test "$ac_enable_anon" != "no")
-  
-  AC_MSG_CHECKING([whether to disable extra PKI stuff])
-  AC_ARG_ENABLE(extra-pki,
-    AS_HELP_STRING([--disable-extra-pki],
-                   [only enable the basic PKI stuff]),
-    enable_pki=$enableval, enable_pki=yes)
-  if test "$enable_pki" != "yes"; then
-   ac_full=0
-   AC_MSG_RESULT(yes)
-  else
-   AC_MSG_RESULT(no)
-   AC_DEFINE([ENABLE_PKI], 1, [whether to include all the PKCS/PKI stuff])
-  fi
-  AM_CONDITIONAL(ENABLE_PKI, test "$enable_pki" = "yes")
   
   ac_enable_openpgp=yes
   AC_MSG_CHECKING([whether to disable OpenPGP Certificate authentication support])

@@ -484,13 +484,34 @@ AC_MSG_NOTICE([summary of build options:
   Warning flags:    errors: ${WERROR_CFLAGS} warnings: ${WARN_CFLAGS}
   Library types:    Shared=${enable_shared}, Static=${enable_static}
   Valgrind:         $opt_valgrind_tests ${VALGRIND}
+])
+
+AC_MSG_NOTICE([Optional features:
+(note that included applications might not compile properly
+if features are disabled)
+
+  OCSP support:     $ac_enable_ocsp
+  OpenPGP support:  $ac_enable_openpgp
+  SRP support:      $ac_enable_srp
+  PSK support:      $ac_enable_psk
+  Anon auth support:$ac_enable_anon
+])
+
+AC_MSG_NOTICE([Optional applications:
+
+  crywrap app:      $libidn
+])
+
+AC_MSG_NOTICE([Libraries:
+
   Guile wrappers:   $opt_guile_bindings
   C++ library:      $use_cxx
   OpenSSL compat:   $enable_openssl
+])
+
+AC_MSG_NOTICE([Hardware acceleration/support:
+
   /dev/crypto:      $enable_cryptodev
   Hardware accel:   $hw_accel
-  Crypto library:   $cryptolib
   PKCS#11 support:  $with_p11_kit
-  crywrap app:      $libidn
-  OCSP support:     $ac_enable_ocsp
 ])
