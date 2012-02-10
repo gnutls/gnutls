@@ -31,8 +31,8 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #ifndef _WIN32
-# include <unistd.h>
 # include <signal.h>
 #endif
 #include <socket.h>

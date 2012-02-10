@@ -31,9 +31,6 @@ AM_CPPFLAGS = \
 	$(LIBOPTS_CFLAGS)
 
 bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug
-if ENABLE_PKI
-bin_PROGRAMS += certtool
-endif
 if ENABLE_SRP
 bin_PROGRAMS += srptool
 endif

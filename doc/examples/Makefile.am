@@ -43,10 +43,6 @@ CXX_LDADD = $(LDADD) \
 noinst_PROGRAMS = ex-client-resume ex-client-dtls
 noinst_PROGRAMS += ex-cert-select ex-client-x509
 
-if ENABLE_PKI
-noinst_PROGRAMS += print-ciphersuites ex-crq ex-serv-x509 ex-serv-dtls
-endif
-
 if ENABLE_CXX
 ex_cxx_SOURCES = ex-cxx.cpp
 ex_cxx_LDADD = $(CXX_LDADD)
@@ -67,9 +63,7 @@ endif
 
 if ENABLE_PSK
 noinst_PROGRAMS += ex-client-psk
-if ENABLE_PKI
 noinst_PROGRAMS += ex-serv-psk
-endif
 endif
 
 if ENABLE_SRP
