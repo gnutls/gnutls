@@ -70,7 +70,8 @@ static const trust_storage_st default_storage =
  *
  * The @tdb variable if non-null specifies a custom back-end for
  * the storage and retrieval of entries. If it is NULL then the
- * default file back-end will be used.
+ * default file back-end will be used. In POSIX-like systems the
+ * file back-end uses the $HOME/.gnutls/known_hosts file.
  *
  * Note that if the custom storage back-end is provided the
  * retrieval function should return %GNUTLS_E_CERTIFICATE_KEY_MISMATCH
