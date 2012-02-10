@@ -563,6 +563,7 @@ read_key_mem (gnutls_certificate_credentials_t res,
   return 0;
 }
 
+#ifdef ENABLE_PKCS11
 /* Reads a private key from a token.
  */
 static int
@@ -770,6 +771,7 @@ cleanup:
   gnutls_free (ccert);
   return ret;
 }
+#endif
 
 /* Reads a certificate file
  */
