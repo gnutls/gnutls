@@ -471,7 +471,9 @@ optionParseShell(tOptions* pOpts)
         printf("\nenv | grep '^%s_'\n", pOpts->pzPROGNAME);
 
     fflush(stdout);
+#ifdef HAVE_FCHMOD
     fchmod(STDOUT_FILENO, 0755);
+#endif
     fclose(stdout);
     if (ferror(stdout)) {
         fputs(zOutputFail, stderr);

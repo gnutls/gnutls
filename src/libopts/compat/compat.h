@@ -82,7 +82,9 @@
 #  include <sys/procset.h>
 #endif
 #include <sys/stat.h>
-#include <sys/wait.h>
+#ifdef HAVE_SYS_WAIT_H
+# include <sys/wait.h>
+#endif
 
 #if defined( HAVE_SOLARIS_SYSINFO )
 #  include <sys/systeminfo.h>

@@ -59,7 +59,7 @@ contiguous_quote(char ** pps, char * pq, int * lnct_p);
  * err:  @code{NULL} is returned if the string is mal-formed.
 =*/
 unsigned int
-ao_string_cook_escape_char( char const* pzIn, char* pRes, u_int nl )
+ao_string_cook_escape_char( char const* pzIn, char* pRes, unsigned nl )
 {
     unsigned int  res = 1;
 
@@ -282,7 +282,7 @@ ao_string_cook(char * pzScan, int * lnct_p)
              *  THEN we do the full escape character processing
              */
             else if (q != '\'') {
-                int ct = ao_string_cook_escape_char( pzS, pzD-1, (u_int)'\n' );
+                int ct = ao_string_cook_escape_char( pzS, pzD-1, (unsigned)'\n' );
                 if (ct == 0)
                     return NULL;
 

@@ -96,7 +96,7 @@ load_text_file(tmap_info_t * mapinfo)
             if (rdct <= 0) {
                 mapinfo->txt_errno = errno;
                 fprintf(stderr, zFSErrReadFile,
-                        errno, strerror(errno), pzFile);
+                        errno, strerror(errno), "mapped file");
                 free(mapinfo->txt_data);
                 return;
             }
