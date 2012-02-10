@@ -1,6 +1,6 @@
 
-GNUTLS_FILE:=gnutls-3.0.11.tar.xz
-GNUTLS_DIR:=gnutls-3.0.11
+GNUTLS_FILE:=gnutls-3.0.13.tar.xz
+GNUTLS_DIR:=gnutls-3.0.13
 
 GMP_FILE:=gmp-5.0.2.tar.bz2
 GMP_DIR:=gmp-5.0.2
@@ -39,7 +39,7 @@ $(LIB_DIR):
 	mkdir -p $(LIB_DIR)
 	mkdir -p $(HEADERS_DIR)
 
-CONFIG_FLAGS := --host=i686-w64-mingw32 --enable-shared --disable-static --bindir=$(BIN_DIR) --libdir=$(LIB_DIR) --includedir=$(HEADERS_DIR)
+CONFIG_FLAGS := --prefix=$(CROSS_DIR) --host=i686-w64-mingw32 --enable-shared --disable-static --bindir=$(BIN_DIR) --libdir=$(LIB_DIR) --includedir=$(HEADERS_DIR)
 
 $(P11_KIT_DIR)/.configured:
 	test -f $(P11_KIT_FILE) || wget http://p11-glue.freedesktop.org/releases/$(P11_KIT_FILE)
@@ -103,7 +103,7 @@ $(GNUTLS_DIR)/.configured: $(NETTLE_DIR)/.installed $(P11_KIT_DIR)/.installed
 		P11_KIT_CFLAGS="-I$(HEADERS_DIR)" \
 		P11_KIT_LIBS="$(LIB_DIR)/libp11-kit.la" \
 		LDFLAGS="-L$(LIB_DIR)" CFLAGS="-I$(HEADERS_DIR)" CXXFLAGS="-I$(HEADERS_DIR)" \
-		./configure $(CONFIG_FLAGS) --with-libnettle-prefix=$(LIB_DIR) \
+		./configure $(CONFIG_FLAGS) --enable-local-libopts --with-libnettle-prefix=$(LIB_DIR) \
 		--disable-openssl-compatibility && cd ..
 	touch $@
 
