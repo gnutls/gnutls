@@ -85,8 +85,8 @@ flag = {
 flag = {
     name      = verify-chain;
     value     = e;
-    descrip   = "Verify a PEM encoded certificate chain. The last certificate in the chain must be a self signed one";
-    doc = "";
+    descrip   = "Verify a PEM encoded certificate chain.";
+    doc = "The last certificate in the chain must be a self signed one.";
 };
 
 flag = {
@@ -300,8 +300,8 @@ flag = {
 flag = {
     name      = hash;
     arg-type  = string;
-    descrip   = "Hash algorithm to use for signing (MD5,SHA1,RMD160,SHA256,SHA384,SHA512).";
-    doc = "";
+    descrip   = "Hash algorithm to use for signing.";
+    doc = "Available hash functions are SHA1, RMD160, SHA256, SHA384, SHA512.";
 };
 
 flag = {

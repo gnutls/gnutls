@@ -73,7 +73,7 @@ flag = {
 
 flag = {
     name      = list-certs;
-    descrip   = "List all certificates that are associated with a private key present in the token";
+    descrip   = "List all certificates that have an associated private key";
     doc = "";
 };
 

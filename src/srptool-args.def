@@ -67,7 +67,7 @@ flag = {
     name      = salt;
     value     = s;
     arg-type  = number;
-    descrip   = "specify salt size for crypt algorithm.";
+    descrip   = "specify salt size.";
     doc = "";
 };
 
