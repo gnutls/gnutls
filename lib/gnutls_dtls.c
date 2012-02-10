@@ -196,7 +196,7 @@ unsigned int timeout;
       if (ret < 0)
         {
           gnutls_assert();
-          goto fail;
+          goto cleanup;
         }
 
       if (session->internals.dtls.last_flight == 0 || !_dtls_is_async(session))
@@ -211,15 +211,18 @@ unsigned int timeout;
                   session->internals.dtls.actual_retrans_timeout_ms)
                 {
                   session->internals.dtls.handshake_last_call = now;
+                  gnutls_assert();
                   goto nb_timeout;
                 }
             }
           else /* received ack */
             {
               ret = 0;
-              goto fail;
+              goto end_flight;
             }
         }
+      else /* last flight of an async party. Return immediately. */
+        return ret;
     }
 
   do 
@@ -227,7 +230,7 @@ unsigned int timeout;
       if (1000*(now-session->internals.dtls.handshake_start_time) >= session->internals.dtls.total_timeout_ms) 
         {
           ret = gnutls_assert_val(GNUTLS_E_TIMEDOUT);
-          goto fail;
+          goto end_flight;
         }
 
       _gnutls_dtls_log ("DTLS[%p]: %sStart of flight transmission.\n", session,  (session->internals.dtls.flight_init == 0)?"":"re-");
@@ -239,7 +242,7 @@ unsigned int timeout;
           if (ret < 0)
             {
               gnutls_assert();
-              goto fail;
+              goto end_flight;
             }
 
           last_type = cur->htype;
@@ -307,12 +310,12 @@ unsigned int timeout;
   if (ret < 0)
     {
       ret = gnutls_assert_val(ret);
-      goto fail;
+      goto end_flight;
     }
 
   ret = 0;
 
-fail:
+end_flight:
   _gnutls_dtls_log ("DTLS[%p]: End of flight transmission.\n", session);
 
   session->internals.dtls.flight_init = 0;
