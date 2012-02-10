@@ -20,4 +20,3 @@ void socket_connect (const socket_st * hd);
 void socket_bye (socket_st * socket);
 
 void sockets_init (void);
-int service_to_port (const char *service);

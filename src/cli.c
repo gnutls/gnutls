@@ -35,6 +35,7 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <fcntl.h>
+#include <netdb.h>
 
 #include <gnutls/gnutls.h>
 #include <gnutls/abstract.h>
@@ -446,15 +447,41 @@ read_yesno (const char *input_str)
   return 0;
 }
 
+/* converts a textual service or port to
+ * a service.
+ */
+static const char* port_to_service(const char* sport)
+{
+unsigned int port;
+struct servent * sr;
+  
+  port = atoi(sport);
+  if (port == 0) return sport;
+
+  port = htons(port);
+
+  sr = getservbyport(port, udp?"udp":"tcp");
+  if (sr == NULL)
+    {
+      fprintf(stderr, "Warning: getservbyport() failed. Using port number as service.\n");
+      return sport;
+    }
+
+  return sr->s_name;
+}
+
 static int
 cert_verify_callback (gnutls_session_t session)
 {
   int rc;
   unsigned int status = 0;
   int ssh = ENABLED_OPT(SSH);
+  const char* txt_service;
 
   if (!x509_cafile && !pgp_keyring)
     return 0;
+    
+  txt_service = port_to_service(service);
 
   rc = cert_verify(session, hostname);
   if (rc == 0)
@@ -488,12 +515,12 @@ cert_verify_callback (gnutls_session_t session)
           return -1;
         }
       
-      rc = gnutls_verify_stored_pubkey(NULL, hostname, service, GNUTLS_CRT_X509,
+      rc = gnutls_verify_stored_pubkey(NULL, hostname, txt_service, GNUTLS_CRT_X509,
                                        cert, 0);
       if (rc == GNUTLS_E_NO_CERTIFICATE_FOUND)
         {
           print_cert_info_compact(session);
-          fprintf(stderr, "Host %s has never been contacted before.\n", hostname);
+          fprintf(stderr, "Host %s (%s) has never been contacted before.\n", hostname, txt_service);
           if (status == 0)
             fprintf(stderr, "Its certificate is valid for %s.\n", hostname);
 
@@ -521,7 +548,8 @@ cert_verify_callback (gnutls_session_t session)
       
       if (rc != 0)
         {
-          rc = gnutls_store_pubkey(NULL, hostname, service, GNUTLS_CRT_X509, cert, 0, 0);
+          rc = gnutls_store_pubkey(NULL, hostname, txt_service, GNUTLS_CRT_X509, 
+                                   cert, 0, 0);
           if (rc < 0)
             fprintf(stderr, "Could not store key: %s\n", gnutls_strerror(rc));
         }
