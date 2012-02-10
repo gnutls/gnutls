@@ -12,7 +12,8 @@
 #include "examples.h"
 
 /* A very basic TLS client, with X.509 authentication and server certificate
- * verification.
+ * verification. Note that error checking for missing files etc. is missing
+ * for simplicity.
  */
 
 #define MAX_BUF 1024
@@ -79,7 +80,11 @@ int main (void)
 
   /* Perform the TLS handshake
    */
-  ret = gnutls_handshake (session);
+  do
+    {
+      ret = gnutls_handshake (session);
+    }
+  while (ret < 0 && gnutls_error_is_fatal (ret) == 0);
 
   if (ret < 0)
     {
