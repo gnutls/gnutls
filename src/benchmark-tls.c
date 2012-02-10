@@ -40,6 +40,8 @@
 #include "../tests/eagain-common.h"
 #include "benchmark.h"
 
+const char* side = "";
+
 #define PRIO_DH "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+DHE-RSA"
 #define PRIO_ECDH "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-RSA:+CURVE-SECP192R1"
 #define PRIO_ECDHE_ECDSA "NONE:+VERS-TLS1.0:+AES-128-CBC:+SHA1:+SIGN-ALL:+COMP-NULL:+ECDHE-ECDSA:+CURVE-SECP192R1"
@@ -206,7 +208,7 @@ char buffer[64 * 1024];
 
 static void tls_log_func(int level, const char *str)
 {
-    fprintf(stderr, "|<%d>| %s", level, str);
+    fprintf(stderr, "%s|<%d>| %s", side, level, str);
 }
 
 static void test_ciphersuite(const char *cipher_prio, int size)
