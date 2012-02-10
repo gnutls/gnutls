@@ -17,8 +17,14 @@
 # along with this file; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+SUBDIRS =
+
 if ENABLE_CRYWRAP
-SUBDIRS = crywrap
+SUBDIRS += crywrap
+endif
+
+if NEED_LIBOPTS
+SUBDIRS += libopts
 endif
 
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
