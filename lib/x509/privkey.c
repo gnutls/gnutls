@@ -544,14 +544,12 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
 
 failover:
   /* Try PKCS #8 */
-#ifdef ENABLE_PKI
   if (result == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
     {
       _gnutls_debug_log ("Falling back to PKCS #8 key decoding\n");
       result = gnutls_x509_privkey_import_pkcs8 (key, data, format,
                                                  NULL, GNUTLS_PKCS_PLAIN);
     }
-#endif
 
   if (need_free)
     _gnutls_free_datum (&_data);
@@ -1430,7 +1428,6 @@ gnutls_x509_privkey_get_key_id (gnutls_x509_privkey_t key,
 }
 
 
-#ifdef ENABLE_PKI
 /*-
  * _gnutls_x509_privkey_sign_hash2:
  * @signer: Holds the signer's key
@@ -1647,4 +1644,3 @@ gnutls_x509_privkey_fix (gnutls_x509_privkey_t key)
   return 0;
 }
 
-#endif

@@ -2350,8 +2350,6 @@ gnutls_x509_crt_get_key_id (gnutls_x509_crt_t crt, unsigned int flags,
 }
 
 
-#ifdef ENABLE_PKI
-
 /* This is exactly as gnutls_x509_crt_check_revocation() except that
  * it calls func.
  */
@@ -3036,7 +3034,6 @@ cleanup:
 
 }
 
-#endif
 /**
  * gnutls_x509_crt_list_import2:
  * @certs: The structures to store the parsed certificate. Must not be initialized.

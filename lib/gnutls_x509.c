@@ -563,8 +563,6 @@ read_key_mem (gnutls_certificate_credentials_t res,
   return 0;
 }
 
-#ifdef ENABLE_PKCS11
-
 /* Reads a private key from a token.
  */
 static int
@@ -772,8 +770,6 @@ cleanup:
   gnutls_free (ccert);
   return ret;
 }
-
-#endif /* ENABLE_PKCS11 */
 
 /* Reads a certificate file
  */
@@ -1590,8 +1586,6 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t cred,
   return ret;
 }
 
-#ifdef ENABLE_PKI
-
 static int
 parse_pem_crl_mem (gnutls_x509_trust_list_t tlist, 
                    const char * input_crl, unsigned int input_crl_size)
@@ -2294,5 +2288,3 @@ gnutls_certificate_free_crls (gnutls_certificate_credentials_t sc)
   /* do nothing for now */
   return;
 }
-
-#endif

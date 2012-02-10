@@ -20,8 +20,6 @@
 
 #include <config.h>
 
-#ifdef ENABLE_PKI
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -241,4 +239,3 @@ generate_prime (int how, common_info_st * info)
   return 0;
 }
 
-#endif

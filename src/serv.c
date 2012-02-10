@@ -988,7 +988,6 @@ main (int argc, char **argv)
           printf ("Processed %d CA certificate(s).\n", ret);
         }
     }
-#ifdef ENABLE_PKI
   if (x509_crlfile != NULL)
     {
       if ((ret = gnutls_certificate_set_x509_crl_file
@@ -1003,7 +1002,6 @@ main (int argc, char **argv)
           printf ("Processed %d CRL(s).\n", ret);
         }
     }
-#endif
 
 #ifdef ENABLE_OPENPGP
   if (pgp_keyring != NULL)

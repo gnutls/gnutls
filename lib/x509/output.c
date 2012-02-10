@@ -437,8 +437,6 @@ print_key_usage (gnutls_buffer_st * str, const char *prefix, int type,
     addf (str, _("%s\t\t\tKey decipher only.\n"), prefix);
 }
 
-#ifdef ENABLE_PKI
-
 static void
 print_crldist (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
@@ -599,8 +597,6 @@ print_key_purpose (gnutls_buffer_st * str, const char *prefix, int type,
       gnutls_free (buffer);
     }
 }
-
-#endif
 
 static void
 print_basic (gnutls_buffer_st * str, const char *prefix, int type,
@@ -967,10 +963,7 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
           addf (str, _("%s\t\tKey Purpose (%s):\n"), prefix,
                 critical ? _("critical") : _("not critical"));
 
-#ifdef ENABLE_PKI
           print_key_purpose (str, prefix, type, cert);
-#endif
-
           keypurpose_idx++;
         }
       else if (strcmp (oid, "2.5.29.17") == 0)
@@ -1014,11 +1007,8 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
           addf (str, _("%s\t\tCRL Distribution points (%s):\n"), prefix,
                 critical ? _("critical") : _("not critical"));
 
-#ifdef ENABLE_PKI
           if (type == TYPE_CRT)
             print_crldist (str, cert.crt);
-#endif
-
           crldist_idx++;
         }
       else if (strcmp (oid, "1.3.6.1.5.5.7.1.14") == 0)
@@ -1252,7 +1242,6 @@ print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
         addf (str, _("\tCertificate Security Level: %s (%d bits)\n"),
               gnutls_sec_param_get_name (gnutls_pk_bits_to_sec_param
                                          (err, bits)), bits);
-#ifdef ENABLE_PKI
         err = gnutls_pubkey_init(&pubkey);
         if (err < 0)
          {
@@ -1347,7 +1336,6 @@ print_cert (gnutls_buffer_st * str, gnutls_x509_crt_t cert, int notsigned)
           }
         
         gnutls_pubkey_deinit(pubkey);
-#endif
       }
   }
 
@@ -1735,8 +1723,6 @@ gnutls_x509_crt_print (gnutls_x509_crt_t cert,
       return GNUTLS_E_INVALID_REQUEST;
     }
 }
-
-#ifdef ENABLE_PKI
 
 static void
 print_crl (gnutls_buffer_st * str, gnutls_x509_crl_t crl, int notsigned)
@@ -2392,4 +2378,3 @@ gnutls_x509_crq_print (gnutls_x509_crq_t crq,
   return ret;
 }
 
-#endif /* ENABLE_PKI */

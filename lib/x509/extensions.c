@@ -514,7 +514,6 @@ _gnutls_x509_crl_set_extension (gnutls_x509_crl_t crl,
                         ext_data, critical);
 }
 
-#ifdef ENABLE_PKI
 int
 _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
                                 const char *ext_id,
@@ -607,8 +606,6 @@ _gnutls_x509_crq_set_extension (gnutls_x509_crq_t crq,
 
   return 0;
 }
-
-#endif
 
 /* Here we only extract the KeyUsage field, from the DER encoded
  * extension.

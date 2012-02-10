@@ -21,8 +21,6 @@
 
 #include <gnutls_int.h>
 
-#ifdef ENABLE_PKI
-
 #include <gnutls_mpi.h>
 #include <gnutls_errors.h>
 #include <x509_int.h>
@@ -196,4 +194,3 @@ cleanup:
   return rc;
 }
 
-#endif /* ENABLE_PKI */

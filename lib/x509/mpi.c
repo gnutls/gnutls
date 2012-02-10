@@ -160,8 +160,6 @@ _gnutls_x509_crt_get_mpis (gnutls_x509_crt_t cert,
                                "tbsCertificate.subjectPublicKeyInfo", params);
 }
 
-#ifdef ENABLE_PKI
-
 /* Extracts DSA and RSA parameters from a certificate.
  */
 int
@@ -174,9 +172,6 @@ _gnutls_x509_crq_get_mpis (gnutls_x509_crq_t cert,
                                "certificationRequestInfo.subjectPKInfo",
                                params);
 }
-
-#endif
-
 
 /*
  * This function writes and encodes the parameters for DSS or RSA keys.

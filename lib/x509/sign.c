@@ -26,8 +26,6 @@
 
 #include <gnutls_int.h>
 
-#ifdef ENABLE_PKI
-
 #include <gnutls_errors.h>
 #include <libtasn1.h>
 #include <gnutls_global.h>
@@ -172,4 +170,3 @@ _gnutls_x509_pkix_sign (ASN1_TYPE src, const char *src_name,
   return 0;
 }
 
-#endif

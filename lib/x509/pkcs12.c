@@ -26,8 +26,6 @@
 #include <gnutls_int.h>
 #include <libtasn1.h>
 
-#ifdef ENABLE_PKI
-
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
@@ -1330,5 +1328,3 @@ cleanup:
 
 }
 
-
-#endif /* ENABLE_PKI */

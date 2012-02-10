@@ -872,7 +872,6 @@ int i, ret;
 
   /* Check for revoked certificates in the chain. 
    */
-#ifdef ENABLE_PKI
   for (i = 0; i < cert_list_length; i++)
     {
       ret = gnutls_x509_crt_check_revocation (cert_list[i],
@@ -883,7 +882,6 @@ int i, ret;
           *verify |= GNUTLS_CERT_INVALID;
         }
     }
-#endif
 
   return 0;
 }
@@ -916,10 +914,6 @@ gnutls_x509_crt_verify (gnutls_x509_crt_t cert,
                                      flags, NULL);
   return 0;
 }
-
-
-
-#ifdef ENABLE_PKI
 
 /**
  * gnutls_x509_crl_check_issuer:
@@ -1146,4 +1140,3 @@ cleanup:
   return result;
 }
 
-#endif

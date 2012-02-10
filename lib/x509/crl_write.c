@@ -25,8 +25,6 @@
 
 #include <gnutls_int.h>
 
-#ifdef ENABLE_PKI
-
 #include <gnutls_datum.h>
 #include <gnutls_global.h>
 #include <gnutls_errors.h>
@@ -508,4 +506,3 @@ gnutls_x509_crl_privkey_sign (gnutls_x509_crl_t crl, gnutls_x509_crt_t issuer,
   return 0;
 }
 
-#endif /* ENABLE_PKI */

@@ -1409,7 +1409,6 @@ init_global_tls_stuff (void)
           printf ("Processed %d CA certificate(s).\n", ret);
         }
     }
-#ifdef ENABLE_PKI
   if (x509_crlfile != NULL)
     {
       ret = gnutls_certificate_set_x509_crl_file (xcred, x509_crlfile,
@@ -1423,7 +1422,6 @@ init_global_tls_stuff (void)
           printf ("Processed %d CRL(s).\n", ret);
         }
     }
-#endif
 
   load_keys ();
 
