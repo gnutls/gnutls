@@ -481,8 +481,6 @@ cert_verify_callback (gnutls_session_t session)
   if (!x509_cafile && !pgp_keyring)
     return 0;
     
-  txt_service = port_to_service(service);
-
   rc = cert_verify(session, hostname);
   if (rc == 0)
     {
@@ -514,6 +512,8 @@ cert_verify_callback (gnutls_session_t session)
           fprintf(stderr, "Cannot obtain peer's certificate!\n");
           return -1;
         }
+
+      txt_service = port_to_service(service);
       
       rc = gnutls_verify_stored_pubkey(NULL, NULL, hostname, txt_service, 
                                        GNUTLS_CRT_X509, cert, 0);
