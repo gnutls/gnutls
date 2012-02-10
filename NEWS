@@ -26,7 +26,7 @@ the last flight.
 Report and patch by Sean Buckheister.
 
 ** libgnutls: Added new functions to easily allow the usage of
-an SSH-style authentication.
+a trust on first use (SSH-style) authentication.
 
 ** libgnutls: SUITEB128 and SUITEB192 priority strings account
 for the RFC6460 requirements.
