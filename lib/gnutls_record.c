@@ -865,9 +865,9 @@ gnutls_datum_t raw; /* raw headers */
     {
       if (_gnutls_epoch_is_valid(session, record->epoch) == 0)
         {
-          _gnutls_audit_log(session, "Discarded message[%u] with invalid epoch 0x%.2x%.2x.\n",
-            (unsigned int)_gnutls_uint64touint32 (&record->sequence), (int)record->sequence.i[0], 
-            (int)record->sequence.i[1]);
+          _gnutls_audit_log(session, "Discarded message[%u] with invalid epoch %u.\n",
+            (unsigned int)_gnutls_uint64touint32 (&record->sequence), 
+            (unsigned int)record->sequence.i[0]*256+(unsigned int)record->sequence.i[1]);
           gnutls_assert();
           /* doesn't matter, just a fatal error */
           return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
@@ -1028,12 +1028,19 @@ begin:
             (unsigned int) _gnutls_uint64touint32 (packet_sequence), _gnutls_packet2str (record.type));
           goto sanity_check_error;
         }
+      _gnutls_record_log
+        ("REC[%p]: Decrypted Packet[%u.%u] %s(%d) with length: %d\n", session,
+        (unsigned int)record.sequence.i[0]*256 +(unsigned int)record.sequence.i[1],
+        (unsigned int) _gnutls_uint64touint32 (packet_sequence),
+        _gnutls_packet2str (record.type), record.type, (int)_mbuffer_get_udata_size(decrypted));
     }
-
-  _gnutls_record_log
-    ("REC[%p]: Decrypted Packet[%d] %s(%d) with length: %d\n", session,
-     (int) _gnutls_uint64touint32 (packet_sequence),
-     _gnutls_packet2str (record.type), record.type, (int)_mbuffer_get_udata_size(decrypted));
+  else
+    {
+      _gnutls_record_log
+        ("REC[%p]: Decrypted Packet[%u] %s(%d) with length: %d\n", session,
+        (unsigned int) _gnutls_uint64touint32 (packet_sequence),
+        _gnutls_packet2str (record.type), record.type, (int)_mbuffer_get_udata_size(decrypted));
+    }
 
   /* increase sequence number 
    */

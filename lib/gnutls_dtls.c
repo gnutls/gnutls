@@ -157,9 +157,13 @@ int ret;
 
 }
 
-#define UPDATE_TIMER \
+#define UPDATE_TIMER { \
       session->internals.dtls.actual_retrans_timeout_ms *= 2; \
-      session->internals.dtls.actual_retrans_timeout_ms %= MAX_DTLS_TIMEOUT
+      session->internals.dtls.actual_retrans_timeout_ms %= MAX_DTLS_TIMEOUT; \
+    }
+
+#define RESET_TIMER \
+      session->internals.dtls.actual_retrans_timeout_ms = session->internals.dtls.retrans_timeout_ms
 
 /* This function transmits the flight that has been previously
  * buffered.
@@ -172,6 +176,7 @@ _dtls_transmit (gnutls_session_t session)
 {
 int ret;
 uint8_t* buf = NULL;
+unsigned int timeout;
 
   /* PREPARING -> SENDING state transition */
   mbuffer_head_st *const send_buffer =
@@ -184,13 +189,17 @@ uint8_t* buf = NULL;
    * non blocking way, check if it is time to retransmit or just
    * return.
    */
-
   if (session->internals.dtls.flight_init != 0 && session->internals.dtls.blocking == 0)
     {
       /* just in case previous run was interrupted */
       ret = _gnutls_io_write_flush (session);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
 
-      if (session->internals.dtls.last_flight == 0)
+      if (session->internals.dtls.last_flight == 0 || !_dtls_is_async(session))
         {
           /* check for ACK */
           ret = _gnutls_io_check_recv(session, 0);
@@ -198,8 +207,8 @@ uint8_t* buf = NULL;
             {
               /* if no retransmission is required yet just return 
                */
-              if (now-session->internals.dtls.handshake_start_time < 
-                  session->internals.dtls.actual_retrans_timeout_ms/1000)
+              if (1000*(now-session->internals.dtls.handshake_start_time) < 
+                  session->internals.dtls.actual_retrans_timeout_ms)
                 {
                   session->internals.dtls.handshake_last_call = now;
                   goto nb_timeout;
@@ -215,55 +224,49 @@ uint8_t* buf = NULL;
 
   do 
     {
-      if (now-session->internals.dtls.handshake_start_time >= session->internals.dtls.total_timeout_ms/1000) 
+      if (1000*(now-session->internals.dtls.handshake_start_time) >= session->internals.dtls.total_timeout_ms) 
         {
           ret = gnutls_assert_val(GNUTLS_E_TIMEDOUT);
           goto cleanup;
         }
-        
-      if ((session->internals.dtls.flight_init == 0) ||
-          (now - session->internals.dtls.last_retransmit > RETRANSMIT_WINDOW))
+
+      _gnutls_dtls_log ("DTLS[%p]: %sStart of flight transmission.\n", session,  (session->internals.dtls.flight_init == 0)?"":"re-");
+
+      for (cur = send_buffer->head;
+           cur != NULL; cur = cur->next)
         {
-          session->internals.dtls.last_retransmit = now;
-
-          _gnutls_dtls_log ("DTLS[%p]: %sStart of flight transmission.\n", session,  (session->internals.dtls.flight_init == 0)?"":"re-");
-
-          for (cur = send_buffer->head;
-               cur != NULL; cur = cur->next)
+          ret = transmit_message (session, cur, &buf);
+          if (ret < 0)
             {
-              ret = transmit_message (session, cur, &buf);
-              if (ret < 0)
-                {
-                  gnutls_assert();
-                  goto cleanup;
-                }
-
-              last_type = cur->htype;
+              gnutls_assert();
+              goto cleanup;
             }
 
-          if (buf != NULL)
+          last_type = cur->htype;
+        }
+
+      if (session->internals.dtls.flight_init == 0)
+        {
+          session->internals.dtls.flight_init = 1;
+          session->internals.dtls.handshake_last_call = now;
+          RESET_TIMER;
+          timeout = session->internals.dtls.actual_retrans_timeout_ms;
+
+          if (last_type == GNUTLS_HANDSHAKE_FINISHED)
             {
-              gnutls_free(buf);
-              buf = NULL;
+              /* On the last flight we cannot ensure retransmission
+               * from here. _dtls_wait_and_retransmit() is being called
+               * by handshake.
+               */
+              session->internals.dtls.last_flight = 1;
             }
-
-          if (session->internals.dtls.flight_init == 0)
-            {
-              session->internals.dtls.flight_init = 1;
-              session->internals.dtls.handshake_last_call = now;
-              session->internals.dtls.actual_retrans_timeout_ms = session->internals.dtls.retrans_timeout_ms;
-
-              if (last_type == GNUTLS_HANDSHAKE_FINISHED)
-                {
-                  /* On the last flight we cannot ensure retransmission
-                   * from here. _dtls_wait_and_retransmit() is being called
-                   * by handshake.
-                   */
-                  session->internals.dtls.last_flight = 1;
-                }
-              else
-                session->internals.dtls.last_flight = 0;
-           }
+          else
+            session->internals.dtls.last_flight = 0;
+        }
+      else
+        {
+          timeout = session->internals.dtls.actual_retrans_timeout_ms;
+          UPDATE_TIMER;
         }
 
       ret = _gnutls_io_write_flush (session);
@@ -283,19 +286,17 @@ uint8_t* buf = NULL;
       else /* all other messages -> implicit ack (receive of next flight) */
         {
           if (session->internals.dtls.blocking != 0)
-            ret = _gnutls_io_check_recv(session, session->internals.dtls.actual_retrans_timeout_ms);
+            ret = _gnutls_io_check_recv(session, timeout);
           else
             {
               ret = _gnutls_io_check_recv(session, 0);
               if (ret == GNUTLS_E_TIMEDOUT)
                 {
-                  UPDATE_TIMER;
                   goto nb_timeout;
                 }
             }
         }
 
-      UPDATE_TIMER;
       now = gnutls_time (0);
     } while(ret == GNUTLS_E_TIMEDOUT);
 
@@ -320,6 +321,9 @@ cleanup:
   return ret;
 
 nb_timeout:
+  if (buf != NULL)
+    gnutls_free(buf);
+
   RETURN_DTLS_EAGAIN_OR_TIMEOUT(session);
 }
 
@@ -335,8 +339,6 @@ int ret;
   else
     ret = _gnutls_io_check_recv(session, 0);
 
-  UPDATE_TIMER;
-      
   if (ret == GNUTLS_E_TIMEDOUT)
     {
       ret = _dtls_retransmit(session);
@@ -344,6 +346,8 @@ int ret;
         {
           RETURN_DTLS_EAGAIN_OR_TIMEOUT(session);
         }
+      else
+        return gnutls_assert_val(ret);
     }
 
   return 0;
@@ -404,28 +408,19 @@ unsigned int i, offset = 0;
       if (diff >= window_size) 
         {
           /* Probably an epoch change. Check if we can fit it */
-          if (window_table[0] == 0)
+          if (window_table[0] == 0 || window_table[0]+1 == seq)
             {
               window_table[0] = seq;
               return 0;
             }
           
-          for (i=0;i<window_size-1;i++)
-            {
-              if (seq == window_table[i])
-                return -1;
-              if (seq == window_table[i] + 1)
-                {
-                  if (seq == window_table[i+1])
-                    return -1;
-                  window_table[i+1] = seq;
-                  return 0;
-                }
-            }
-          return -1;
-        }
+          if ((window_size-2)/2 < 2)
+            return -1;
 
-      offset = window_size-1-diff;
+          offset = 1 + seq % ((window_size-2)/2);
+        }
+      else
+        offset = window_size-1-diff;
 
       if (window_table[offset] == seq)
         return -1;
