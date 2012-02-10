@@ -45,6 +45,8 @@ when stored as a 'general name' and serial combo.
 of PKCS #11 modules. This is required on the child process after
 a fork (if PKCS #11 functionality is desirable).
 
+** libgnutls: Depend on p11-kit 0.11.
+
 ** API and ABI modifications:
 gnutls_verify_stored_pubkey: Added
 gnutls_store_pubkey: Added
