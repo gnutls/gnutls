@@ -306,7 +306,7 @@ const char *home_dir = getenv ("HOME");
       
       home_dir = tmp_home_dir;
     }
-#elsif defined(HAVE_GETPWUID_R)
+#elif defined(HAVE_GETPWUID_R)
   if (home_dir == NULL || home_dir[0] == '\0')
     {
       struct passwd *pwd;
