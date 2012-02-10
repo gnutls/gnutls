@@ -53,6 +53,7 @@ static const char headers[] = "\\tablefirsthead{%\n"
 	"\\multicolumn{1}{c}{Name} &\n"
 	"\\multicolumn{1}{c|}{Description} \\\\\n"
 	"\\hline}\n"
+#if 0
 	"\\tablehead{%\n"
 	"\\hline\n"
 	"\\multicolumn{3}{|l|}{\\small\\sl continued from previous page}\\\\\n"
@@ -61,6 +62,7 @@ static const char headers[] = "\\tablefirsthead{%\n"
 	"\\hline\n"
 	"\\multicolumn{3}{|r|}{\\small\\sl continued on next page}\\\\\n"
 	"\\hline}\n"
+#endif
 	"\\tablelasttail{\\hline}\n"
 	"\\bottomcaption{The error codes table}\n\n";
 

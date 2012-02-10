@@ -172,6 +172,7 @@ static const char headers[] = "\\tablefirsthead{%\n"
 	"\\hline\n"
 	"Ciphersuite name & TLS ID & Since\\\\\n"
 	"\\hline}\n"
+#if 0
 	"\\tablehead{%\n"
 	"\\hline\n"
 	"\\multicolumn{3}{|l|}{\\small\\sl continued from previous page}\\\\\n"
@@ -180,6 +181,7 @@ static const char headers[] = "\\tablefirsthead{%\n"
 	"\\hline\n"
 	"\\multicolumn{3}{|r|}{\\small\\sl continued on next page}\\\\\n"
 	"\\hline}\n"
+#endif
 	"\\tablelasttail{\\hline}\n"
 	"\\bottomcaption{The ciphersuites table}\n\n";
 

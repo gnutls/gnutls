@@ -68,6 +68,7 @@ static const char headers[] = "\\tablefirsthead{%\n"
 	"\\hline\n"
 	"Alert & ID & Description\\\\\n"
 	"\\hline}\n"
+#if 0
 	"\\tablehead{%\n"
 	"\\hline\n"
 	"\\multicolumn{3}{|l|}{\\small\\sl continued from previous page}\\\\\n"
@@ -76,6 +77,7 @@ static const char headers[] = "\\tablefirsthead{%\n"
 	"\\hline\n"
 	"\\multicolumn{3}{|r|}{\\small\\sl continued on next page}\\\\\n"
 	"\\hline}\n"
+#endif
 	"\\tablelasttail{\\hline}\n"
 	"\\bottomcaption{The TLS alert table}\n\n";
 
