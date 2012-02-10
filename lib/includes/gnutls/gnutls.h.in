@@ -1658,18 +1658,18 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 
   /* ssh style functions */
   int gnutls_verify_stored_pubkey(const char* file, 
-                            const char* application,
                             const char* host,
                             const char* service,
                             gnutls_certificate_type_t cert_type,
                             const gnutls_datum_t * cert, unsigned int flags);
 
   int gnutls_store_pubkey(const char* file, 
-                    const char* application,
                     const char* host,
                     const char* service,
                     gnutls_certificate_type_t cert_type,
-                    const gnutls_datum_t * cert, unsigned int flags);
+                    const gnutls_datum_t * cert, 
+                    time_t expiration,
+                    unsigned int flags);
 
 
   /* Gnutls error codes. The mapping to a TLS alert is also shown in

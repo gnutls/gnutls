@@ -70,8 +70,9 @@ resumption.
 
 This is an alternative verification function that will use the
 X.509 certificate authorities for verification, but also assume an
-SSH-like authentication system. That is the user is prompted on unknown 
-public keys and known public keys are considered trusted.
+trust on first use (SSH-like) authentication system. That is the user is 
+prompted on unknown public keys and known public keys are considered 
+trusted.
 
 @verbatiminclude examples/ex-verify-ssh.c
 

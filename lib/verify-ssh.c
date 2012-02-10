@@ -38,7 +38,7 @@
 static int raw_pubkey_to_base64(gnutls_datum_t* pubkey);
 static int x509_crt_to_raw_pubkey(const gnutls_datum_t * cert, gnutls_datum_t *rpubkey);
 static int pgp_crt_to_raw_pubkey(const gnutls_datum_t * cert, gnutls_datum_t *rpubkey);
-static int find_stored_pubkey(const char* file, const char* application,
+static int find_stored_pubkey(const char* file, 
                               const char* host, const char* service, 
                               const gnutls_datum_t* skey);
 static int find_config_file(char* file, size_t max_size);
@@ -47,7 +47,6 @@ static int find_config_file(char* file, size_t max_size);
 /**
  * gnutls_verify_stored_pubkey:
  * @file: A file specifying the stored keys (use NULL for the default)
- * @application: non-NULL with an application name if this key is application-specific
  * @host: The peer's name
  * @service: non-NULL if this key is specific to a service (e.g. http)
  * @cert_type: The type of the certificate
@@ -68,7 +67,6 @@ static int find_config_file(char* file, size_t max_size);
  **/
 int
 gnutls_verify_stored_pubkey(const char* file, 
-                            const char* application,
                             const char* host,
                             const char* service,
                             gnutls_certificate_type_t cert_type,
@@ -107,7 +105,7 @@ char local_file[MAX_FILENAME];
       goto cleanup;
     }
 
-  ret = find_stored_pubkey(file, application, host, service, &pubkey);
+  ret = find_stored_pubkey(file, host, service, &pubkey);
   if (ret < 0)
     return gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_FOUND);
   
@@ -117,15 +115,16 @@ cleanup:
   return ret;
 }
 
-static int parse_line(char* line, const char* application,
-                      size_t application_len,
+static int parse_line(char* line, 
                       const char* host, size_t host_len,
                       const char* service, size_t service_len,
+                      time_t now,
                       const gnutls_datum_t *skey)
 {
 char* p, *kp;
 char* savep = NULL;
 size_t kp_len;
+time_t expiration;
 
   /* read version */
   p = strtok_r(line, "|", &savep);
@@ -133,14 +132,6 @@ size_t kp_len;
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
   if (strncmp(p, "g0", 2) != 0)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-
-  /* read application */
-  p = strtok_r(NULL, "|", &savep);
-  if (p == NULL)
-    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-    
-  if (p[0] != '*' && strcmp(p, application)!=0)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
   /* read host */
@@ -159,7 +150,16 @@ size_t kp_len;
   if (p[0] != '*' && strcmp(p, service) != 0)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
-  /* read service */
+  /* read expiration */
+  p = strtok_r(NULL, "|", &savep);
+  if (p == NULL)
+    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+    
+  expiration = (time_t)atol(p);
+  if (expiration > 0 && now > expiration)
+    return gnutls_assert_val(GNUTLS_E_EXPIRED);
+
+  /* read key */
   kp = strtok_r(NULL, "|", &savep);
   if (kp == NULL)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
@@ -180,7 +180,7 @@ size_t kp_len;
 
 /* Returns the base64 key if found 
  */
-static int find_stored_pubkey(const char* file, const char* application,
+static int find_stored_pubkey(const char* file, 
                              const char* host, const char* service, 
                              const gnutls_datum_t* skey)
 {
@@ -188,11 +188,11 @@ FILE* fd;
 char* line = NULL;
 size_t line_size = 0;
 int ret, l2, mismatch = 0;
-size_t application_len = 0, host_len = 0, service_len = 0;
+size_t host_len = 0, service_len = 0;
+time_t now = gnutls_time(0);
 
   if (host != NULL) host_len = strlen(host);
   if (service != NULL) service_len = strlen(service);
-  if (application != NULL) application_len = strlen(application);
 
   fd = fopen(file, "rb");
   if (fd == NULL)
@@ -203,8 +203,7 @@ size_t application_len = 0, host_len = 0, service_len = 0;
       l2 = getline(&line, &line_size, fd);
       if (l2 > 0)
         {
-          ret = parse_line(line, application, application_len,
-                          host, host_len, service, service_len, skey);
+          ret = parse_line(line, host, host_len, service, service_len, now, skey);
           if (ret == 0) /* found */
             {
               goto cleanup;
@@ -380,15 +379,16 @@ cleanup:
 /**
  * gnutls_store_pubkey:
  * @file: A file specifying the stored keys (use NULL for the default)
- * @application: non-NULL with an application name if this key is application-specific
  * @host: The peer's name
  * @service: non-NULL if this key is specific to a service (e.g. http)
  * @cert_type: The type of the certificate
  * @cert: The data of the certificate
+ * @expiration: The expiration time (use 0 to disable expiration)
  * @flags: should be 0.
  *
  * This function will store to verify the provided certificate to 
- * the list of stored public keys. 
+ * the list of stored public keys. The key will be considered valid until 
+ * the provided expiration time.
  *
  * Note that this function is not thread safe.
  *
@@ -399,11 +399,12 @@ cleanup:
  **/
 int
 gnutls_store_pubkey(const char* file, 
-                    const char* application,
                     const char* host,
                     const char* service,
                     gnutls_certificate_type_t cert_type,
-                    const gnutls_datum_t * cert, unsigned int flags)
+                    const gnutls_datum_t * cert, 
+                    time_t expiration,
+                    unsigned int flags)
 {
 FILE* fd = NULL;
 gnutls_datum_t pubkey = { NULL, 0 };
@@ -454,11 +455,11 @@ char local_file[MAX_FILENAME];
       goto cleanup;
     }
 
-  if (application == NULL) application = "*";
   if (service == NULL) service = "*";
   if (host == NULL) host = "*";
 
-  fprintf(fd, "|g0|%s|%s|%s|%.*s\n", application, host, service, pubkey.size, pubkey.data);
+  fprintf(fd, "|g0|%s|%s|%lu|%.*s\n", host, service, (unsigned long)expiration, 
+    pubkey.size, pubkey.data);
 
   ret = 0;
 
