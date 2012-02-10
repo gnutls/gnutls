@@ -7,7 +7,7 @@ See the end for copying conditions.
 ** gnutls-cli: added the --ocsp option which will verify
 the peer's certificate with OCSP.
 
-** gnutls-cli: added the --ssh and if specified, gnutls-cli
+** gnutls-cli: added the --tofu and if specified, gnutls-cli
 will use an ssh-style authentication method.
 
 ** gnutls-cli: if no --x509cafile is provided a default is

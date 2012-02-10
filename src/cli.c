@@ -475,7 +475,7 @@ cert_verify_callback (gnutls_session_t session)
 {
   int rc;
   unsigned int status = 0;
-  int ssh = ENABLED_OPT(SSH);
+  int ssh = ENABLED_OPT(TOFU);
   const char* txt_service;
 
   if (!x509_cafile && !pgp_keyring)
@@ -515,8 +515,8 @@ cert_verify_callback (gnutls_session_t session)
           return -1;
         }
       
-      rc = gnutls_verify_stored_pubkey(NULL, hostname, txt_service, GNUTLS_CRT_X509,
-                                       cert, 0);
+      rc = gnutls_verify_stored_pubkey(NULL, NULL, hostname, txt_service, 
+                                       GNUTLS_CRT_X509, cert, 0);
       if (rc == GNUTLS_E_NO_CERTIFICATE_FOUND)
         {
           print_cert_info_compact(session);
@@ -548,8 +548,8 @@ cert_verify_callback (gnutls_session_t session)
       
       if (rc != 0)
         {
-          rc = gnutls_store_pubkey(NULL, hostname, txt_service, GNUTLS_CRT_X509, 
-                                   cert, 0, 0);
+          rc = gnutls_store_pubkey(NULL, NULL, hostname, txt_service, 
+                                   GNUTLS_CRT_X509, cert, 0, 0);
           if (rc < 0)
             fprintf(stderr, "Could not store key: %s\n", gnutls_strerror(rc));
         }

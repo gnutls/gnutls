@@ -41,12 +41,23 @@ static int pgp_crt_to_raw_pubkey(const gnutls_datum_t * cert, gnutls_datum_t *rp
 static int find_stored_pubkey(const char* file, 
                               const char* host, const char* service, 
                               const gnutls_datum_t* skey);
+static 
+int store_pubkey(const char* db_name, const char* host,
+                 const char* service, time_t expiration, const gnutls_datum_t* pubkey);
+
 static int find_config_file(char* file, size_t max_size);
 #define MAX_FILENAME 512
 
+static const trust_storage_st default_storage =
+{
+  store_pubkey,
+  find_stored_pubkey
+};
+
 /**
  * gnutls_verify_stored_pubkey:
- * @file: A file specifying the stored keys (use NULL for the default)
+ * @db_name: A file specifying the stored keys (use NULL for the default)
+ * @tdb: A database structure or NULL to use the default
  * @host: The peer's name
  * @service: non-NULL if this key is specific to a service (e.g. http)
  * @cert_type: The type of the certificate
@@ -57,6 +68,17 @@ static int find_config_file(char* file, size_t max_size);
  * a list of stored public keys.  The @service field if non-NULL should
  * be a port number.
  *
+ * The @tdb variable if non-null specifies a custom back-end for
+ * the storage and retrieval of entries. If it is NULL then the
+ * default file back-end will be used.
+ *
+ * Note that if the custom storage back-end is provided the
+ * retrieval function should return %GNUTLS_E_CERTIFICATE_KEY_MISMATCH
+ * if the host/service pair is found but key doesn't match,
+ * %GNUTLS_E_NO_CERTIFICATE_FOUND if no such host/service with
+ * the given key is found, and 0 if it was found. The storage
+ * function should return 0 on success.
+ *
  * Returns: If no associated public key is found
  * then %GNUTLS_E_NO_CERTIFICATE_FOUND will be returned. If a key
  * is found but does not match %GNUTLS_E_CERTIFICATE_KEY_MISMATCH
@@ -66,7 +88,8 @@ static int find_config_file(char* file, size_t max_size);
  * Since: 3.0.0
  **/
 int
-gnutls_verify_stored_pubkey(const char* file, 
+gnutls_verify_stored_pubkey(const char* db_name, 
+                            const trust_storage_st *tdb,
                             const char* host,
                             const char* service,
                             gnutls_certificate_type_t cert_type,
@@ -79,13 +102,16 @@ char local_file[MAX_FILENAME];
   if (cert_type != GNUTLS_CRT_X509 && cert_type != GNUTLS_CRT_OPENPGP)
     return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
 
-  if (file == NULL)
+  if (db_name == NULL && tdb == NULL)
     {
       ret = find_config_file(local_file, sizeof(local_file));
       if (ret < 0)
         return gnutls_assert_val(ret);
-      file = local_file;
+      db_name = local_file;
     }
+
+  if (tdb == NULL)
+    tdb = &default_storage;
 
   if (cert_type == GNUTLS_CRT_X509)
     ret = x509_crt_to_raw_pubkey(cert, &pubkey);
@@ -105,10 +131,9 @@ char local_file[MAX_FILENAME];
       goto cleanup;
     }
 
-  ret = find_stored_pubkey(file, host, service, &pubkey);
+  ret = tdb->retrieve(db_name, host, service, &pubkey);
   if (ret < 0)
     return gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_FOUND);
-  
 
 cleanup:
   gnutls_free(pubkey.data);
@@ -376,9 +401,32 @@ cleanup:
   return ret;
 }
 
+static 
+int store_pubkey(const char* db_name, const char* host,
+                 const char* service, time_t expiration, 
+                 const gnutls_datum_t* pubkey)
+{
+FILE* fd;
+
+  fd = fopen(db_name, "ab+");
+  if (fd == NULL)
+    return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
+
+  if (service == NULL) service = "*";
+  if (host == NULL) host = "*";
+
+  fprintf(fd, "|g0|%s|%s|%lu|%.*s\n", host, service, (unsigned long)expiration, 
+    pubkey->size, pubkey->data);
+  
+  fclose(fd);
+  
+  return 0;
+}
+
 /**
  * gnutls_store_pubkey:
- * @file: A file specifying the stored keys (use NULL for the default)
+ * @db_name: A file specifying the stored keys (use NULL for the default)
+ * @tdb: A database structure or NULL to use the default
  * @host: The peer's name
  * @service: non-NULL if this key is specific to a service (e.g. http)
  * @cert_type: The type of the certificate
@@ -390,7 +438,11 @@ cleanup:
  * the list of stored public keys. The key will be considered valid until 
  * the provided expiration time.
  *
- * Note that this function is not thread safe.
+ * The @tdb variable if non-null specifies a custom back-end for
+ * the storage and retrieval of entries. If it is NULL then the
+ * default file back-end will be used.
+ *
+ * Note that this function is not thread safe with the default backend.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -398,7 +450,8 @@ cleanup:
  * Since: 3.0.0
  **/
 int
-gnutls_store_pubkey(const char* file, 
+gnutls_store_pubkey(const char* db_name, 
+                    const trust_storage_st* tdb,
                     const char* host,
                     const char* service,
                     gnutls_certificate_type_t cert_type,
@@ -414,7 +467,7 @@ char local_file[MAX_FILENAME];
   if (cert_type != GNUTLS_CRT_X509 && cert_type != GNUTLS_CRT_OPENPGP)
     return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
   
-  if (file == NULL)
+  if (db_name == NULL && tdb == NULL)
     {
       ret = _gnutls_find_config_path(local_file, sizeof(local_file));
       if (ret < 0)
@@ -426,8 +479,11 @@ char local_file[MAX_FILENAME];
       ret = find_config_file(local_file, sizeof(local_file));
       if (ret < 0)
         return gnutls_assert_val(ret);
-      file = local_file;
+      db_name = local_file;
     }
+
+  if (tdb == NULL)
+    tdb = &default_storage;
     
   if (cert_type == GNUTLS_CRT_X509)
     ret = x509_crt_to_raw_pubkey(cert, &pubkey);
@@ -446,20 +502,9 @@ char local_file[MAX_FILENAME];
       goto cleanup;
     }
 
-  _gnutls_debug_log("Configuration file: %s\n", file);
+  _gnutls_debug_log("Configuration file: %s\n", db_name);
 
-  fd = fopen(file, "ab+");
-  if (fd == NULL)
-    {
-      ret = gnutls_assert_val(GNUTLS_E_FILE_ERROR);
-      goto cleanup;
-    }
-
-  if (service == NULL) service = "*";
-  if (host == NULL) host = "*";
-
-  fprintf(fd, "|g0|%s|%s|%lu|%.*s\n", host, service, (unsigned long)expiration, 
-    pubkey.size, pubkey.data);
+  tdb->store(db_name, host, service, expiration, &pubkey);
 
   ret = 0;
 

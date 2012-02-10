@@ -37,11 +37,11 @@ flag = {
 };
 
 flag = {
-    name      = ssh;
-    descrip   = "Enable SSH-style authentication";
+    name      = tofu;
+    descrip   = "Enable trust on first use (SSH-style) authentication";
     disabled;
     disable   = "no";
-    doc       = "This option will, in addition to certificate authentication, perform authentication based on stored public keys.";
+    doc       = "This option will, in addition to certificate authentication, perform authentication based on previously seen public keys.";
 };
 
 flag = {

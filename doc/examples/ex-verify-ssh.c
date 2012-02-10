@@ -93,7 +93,7 @@ _ssh_verify_certificate_callback (gnutls_session_t session)
   gnutls_x509_crt_deinit (cert);
   
   /* service may be obtained alternatively using getservbyport() */
-  ret = gnutls_verify_stored_pubkey(NULL, hostname, "https", 
+  ret = gnutls_verify_stored_pubkey(NULL, NULL, hostname, "https", 
                                     GNUTLS_CRT_X509, &cert_list[0], 0);
   if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
     {
@@ -129,7 +129,8 @@ _ssh_verify_certificate_callback (gnutls_session_t session)
   /* user trusts the key -> store it */
   if (ret != 0)
     {
-      ret = gnutls_store_pubkey(NULL, hostname, "https", GNUTLS_CRT_X509, &cert_list[0], 
+      ret = gnutls_store_pubkey(NULL, NULL, hostname, "https", 
+                                GNUTLS_CRT_X509, &cert_list[0], 
                                 0, 0);
       if (ret < 0)
         fprintf(stderr, "gnutls_store_pubkey: %s\n", gnutls_strerror(ret));
