@@ -68,12 +68,12 @@ static const trust_storage_st default_storage =
  * a list of stored public keys.  The @service field if non-NULL should
  * be a port number.
  *
- * The @tdb variable if non-null specifies a custom back-end for
+ * The @tdb variable if non-null specifies a custom backend for
  * the storage and retrieval of entries. If it is NULL then the
- * default file back-end will be used. In POSIX-like systems the
- * file back-end uses the $HOME/.gnutls/known_hosts file.
+ * default file backend will be used. In POSIX-like systems the
+ * file backend uses the $HOME/.gnutls/known_hosts file.
  *
- * Note that if the custom storage back-end is provided the
+ * Note that if the custom storage backend is provided the
  * retrieval function should return %GNUTLS_E_CERTIFICATE_KEY_MISMATCH
  * if the host/service pair is found but key doesn't match,
  * %GNUTLS_E_NO_CERTIFICATE_FOUND if no such host/service with
@@ -439,9 +439,9 @@ FILE* fd;
  * the list of stored public keys. The key will be considered valid until 
  * the provided expiration time.
  *
- * The @tdb variable if non-null specifies a custom back-end for
+ * The @tdb variable if non-null specifies a custom backend for
  * the storage and retrieval of entries. If it is NULL then the
- * default file back-end will be used.
+ * default file backend will be used.
  *
  * Note that this function is not thread safe with the default backend.
  *

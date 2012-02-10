@@ -1677,7 +1677,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
     gnutls_trust_db_store_func store;
     gnutls_trust_db_retr_func retrieve;
   } trust_storage_st;
-  
+
   int gnutls_verify_stored_pubkey(const char* db_name, 
                             const trust_storage_st * tdb,
                             const char* host,

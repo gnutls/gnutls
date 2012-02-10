@@ -293,6 +293,28 @@ shown in @ref{Simple client example with SSH-style certificate verification}.
 @showfuncdesc{gnutls_verify_stored_pubkey}
 @showfuncdesc{gnutls_store_pubkey}
 
+The storage and verification functions may be used with the default
+text file based backend, or another backend may be specified. Such
+backend should contain a storage and a retrieval function. The format
+of those functions is shown below.
+@example
+  typedef int (*gnutls_trust_db_store_func) (const char* db_name, 
+                                             const char* host,
+                                             const char* service,
+                                             time_t expiration,
+                                             const gnutls_datum_t* pubkey);
+  
+  typedef int (*gnutls_trust_db_retr_func) (const char* db_name, 
+                                            const char* host,
+                                            const char* service,
+                                            const gnutls_datum_t *pubkey);
+  
+  typedef struct {
+    gnutls_trust_db_store_func store;
+    gnutls_trust_db_retr_func retrieve;
+  } trust_storage_st;
+@end example
+
 @node OpenPGP certificates
 @section @acronym{OpenPGP} certificates
 @cindex OpenPGP certificates
