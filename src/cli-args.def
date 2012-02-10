@@ -55,7 +55,7 @@ flag = {
 flag = {
     name      = resume;
     value     = r;
-    descrip   = "Connect, establish a session. Connect again and resume this session";
+    descrip   = "Connect, establish a session, reconnect and resume";
     doc       = "";
 };
 
@@ -75,8 +75,8 @@ flag = {
 flag = {
     name      = starttls;
     value     = s;
-    descrip   = "Connect, establish a plain session and start TLS when EOF or a SIGALRM is received";
-    doc      = "";
+    descrip   = "Connect, establish a plain session and start TLS.";
+    doc       = "The TLS session will be initiated when EOF or a SIGALRM is received.";
 };
 
 flag = {
