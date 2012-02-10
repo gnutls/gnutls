@@ -30,7 +30,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../extra/includes	\
 	$(LIBOPTS_CFLAGS)
 
-bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug
+bin_PROGRAMS = gnutls-serv gnutls-cli psktool gnutls-cli-debug certtool
 if ENABLE_SRP
 bin_PROGRAMS += srptool
 endif

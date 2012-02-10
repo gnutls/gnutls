@@ -132,6 +132,7 @@ fi
     AC_MSG_WARN([C99 macros not supported. This may affect compiling.])
   ])
 
+  ac_enable_srp=yes
   AC_MSG_CHECKING([whether to disable SRP authentication support])
   AC_ARG_ENABLE(srp-authentication,
     AS_HELP_STRING([--disable-srp-authentication],
@@ -146,6 +147,7 @@ fi
   fi
   AM_CONDITIONAL(ENABLE_SRP, test "$ac_enable_srp" != "no")
   
+  ac_enable_psk=yes
   AC_MSG_CHECKING([whether to disable PSK authentication support])
   AC_ARG_ENABLE(psk-authentication,
     AS_HELP_STRING([--disable-psk-authentication],
@@ -160,6 +162,7 @@ fi
   fi
   AM_CONDITIONAL(ENABLE_PSK, test "$ac_enable_psk" != "no")
   
+  ac_enable_anon=yes
   AC_MSG_CHECKING([whether to disable anonymous authentication support])
   AC_ARG_ENABLE(anon-authentication,
     AS_HELP_STRING([--disable-anon-authentication],
