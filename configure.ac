@@ -502,7 +502,7 @@ AC_MSG_NOTICE([Optional applications:
   crywrap app:      $libidn
 ])
 
-AC_MSG_NOTICE([Libraries:
+AC_MSG_NOTICE([Optional libraries:
 
   Guile wrappers:   $opt_guile_bindings
   C++ library:      $use_cxx
