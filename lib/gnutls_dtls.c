@@ -62,7 +62,7 @@ transmit_message (gnutls_session_t session,
         _mbuffer_get_uhead_size(bufel), 0);
     }
 
-  *buf = gnutls_realloc_fast(*buf, mtu + DTLS_HANDSHAKE_HEADER_SIZE);
+  if (*buf == NULL) *buf = gnutls_malloc(mtu + DTLS_HANDSHAKE_HEADER_SIZE);
   if (*buf == NULL)
     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
@@ -196,7 +196,7 @@ unsigned int timeout;
       if (ret < 0)
         {
           gnutls_assert();
-          goto cleanup;
+          goto fail;
         }
 
       if (session->internals.dtls.last_flight == 0 || !_dtls_is_async(session))
@@ -217,7 +217,7 @@ unsigned int timeout;
           else /* received ack */
             {
               ret = 0;
-              goto cleanup;
+              goto fail;
             }
         }
     }
@@ -227,7 +227,7 @@ unsigned int timeout;
       if (1000*(now-session->internals.dtls.handshake_start_time) >= session->internals.dtls.total_timeout_ms) 
         {
           ret = gnutls_assert_val(GNUTLS_E_TIMEDOUT);
-          goto cleanup;
+          goto fail;
         }
 
       _gnutls_dtls_log ("DTLS[%p]: %sStart of flight transmission.\n", session,  (session->internals.dtls.flight_init == 0)?"":"re-");
@@ -239,7 +239,7 @@ unsigned int timeout;
           if (ret < 0)
             {
               gnutls_assert();
-              goto cleanup;
+              goto fail;
             }
 
           last_type = cur->htype;
@@ -271,7 +271,10 @@ unsigned int timeout;
 
       ret = _gnutls_io_write_flush (session);
       if (ret < 0)
-        return gnutls_assert_val(ret);
+        {
+          ret = gnutls_assert_val(ret);
+          goto cleanup;
+        }
 
       /* last message in handshake -> no ack */
       if (session->internals.dtls.last_flight != 0)
@@ -281,7 +284,8 @@ unsigned int timeout;
            * we rely on the record or handshake
            * layer calling this function again.
            */
-          return 0;
+          ret = 0;
+          goto cleanup;
         }
       else /* all other messages -> implicit ack (receive of next flight) */
         {
@@ -303,19 +307,21 @@ unsigned int timeout;
   if (ret < 0)
     {
       ret = gnutls_assert_val(ret);
-      goto cleanup;
+      goto fail;
     }
 
   ret = 0;
 
-cleanup:
-  if (buf != NULL)
-    gnutls_free(buf);
+fail:
   _gnutls_dtls_log ("DTLS[%p]: End of flight transmission.\n", session);
 
   session->internals.dtls.flight_init = 0;
   drop_usage_count(session, send_buffer);
   _mbuffer_head_clear(send_buffer);
+
+cleanup:
+  if (buf != NULL)
+    gnutls_free(buf);
 
   /* SENDING -> WAITING state transition */
   return ret;
