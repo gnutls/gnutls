@@ -510,6 +510,7 @@ sub output_tex {
 	$out =~ s/\%([a-zA-Z\_]+)/{\\bf $1}/g;
 	$out =~ s/\@([a-zA-Z\_]+)/{\\bf $1}/g;
 	$out =~ s/_/\\_/g;
+        $out =~ s/\$/\\\$/g;
 	$out =~ s/#/\\#/g;
 	$out =~ s/\n\n/\n/g;
 	$out =~ s/\\:/:/g;

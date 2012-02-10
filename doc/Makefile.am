@@ -30,41 +30,41 @@ endif
 
 invoke-gnutls-cli.texi: ../src/cli-args.def
 	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
-	mv ../src/$@ .
+	mv -f ../src/$@ ../doc
 
 invoke-gnutls-cli-debug.texi: ../src/cli-debug-args.def
 	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
-	mv ../src/$@ .
+	mv -f ../src/$@ ../doc
 
 invoke-gnutls-serv.texi: ../src/serv-args.def
 	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
-	mv ../src/$@ .
+	mv -f ../src/$@ ../doc
 
 invoke-certtool.texi: ../src/certtool-args.def
 	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
-	mv ../src/$@ .
+	mv -f ../src/$@ ../doc
 
 invoke-srptool.texi: ../src/srptool-args.def
 	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
-	mv ../src/$@ . && \
 	sed -i 's/@subsection/@subsubsection/g' $@ && \
-	sed -i 's/@section/@subsection/g' $@
+	sed -i 's/@section/@subsection/g' $@ && \
+	mv -f ../src/$@ ../doc
 
 invoke-ocsptool.texi: ../src/ocsptool-args.def
 	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
-	mv ../src/$@ .
+	mv -f ../src/$@ ../doc
 
 invoke-psktool.texi: ../src/psk-args.def
 	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
-	mv ../src/$@ . && \
 	sed -i 's/@subsection/@subsubsection/g' $@ && \
-	sed -i 's/@section/@subsection/g' $@
+	sed -i 's/@section/@subsection/g' $@ && \
+	mv -f ../src/$@ ../doc
 
 invoke-p11tool.texi: ../src/p11tool-args.def
 	-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
-	mv ../src/$@ . && \
 	sed -i 's/@subsection/@subsubsection/g' $@ && \
-	sed -i 's/@section/@subsection/g' $@
+	sed -i 's/@section/@subsection/g' $@ && \
+	mv -f ../src/$@ ../doc
 
 info_TEXINFOS = gnutls.texi gnutls-guile.texi
 gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\

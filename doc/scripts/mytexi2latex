@@ -118,6 +118,7 @@ while ($line = <FILE>) {
                         $mode = pop(@stack);
                 }
                 $line =~ s/\@item (.+)/\\item $1/g;
+                $line =~ s/\@item/\\item/g;
 		$prev_mode = $mode;
         } elsif ($mode == ENUMERATE) {
                 if ($line =~ s/\@end itemize/\\end{enumerate}/g) {
@@ -127,6 +128,7 @@ while ($line = <FILE>) {
                         $mode = pop(@stack);
                 }
                 $line =~ s/\@item(.*)/\\item $1/g;
+                $line =~ s/\@item/\\item/g;
 		$prev_mode = $mode;
         } elsif ($mode == FLOAT) {
                 if ($line =~ s/\@end float/\\label\{$label\}\n\\end{figure}/g) {
@@ -271,6 +273,11 @@ multitable:
                         push(@stack, NORMAL);
 			next;
                 }
+                if ($line =~ s/\@ignore//g) {
+                        $mode = SKIP;
+                        push(@stack, NORMAL);
+			next;
+                }
                 if ($line =~ s/\@ifnottex//g) {
                         $mode = SKIP;
                         push(@stack, NORMAL);
@@ -314,7 +321,7 @@ multitable:
                         push(@stack, NORMAL);
                         $mode = MULTITABLE;
                 }
-                if ($line =~ s/\@example/\\begin{example}/g) {
+                if ($line =~ s/\@example$/\\begin{example}/g) {
                         push(@stack, NORMAL);
                         $mode = EXAMPLE;
                 }
@@ -342,6 +349,7 @@ multitable:
 		$line =~ s/\@image\{($match+)\,($match+)\}/\\includegraphics\[width\=$2\]\{\.\.\/$1\}/g;
 		$line =~ s/\@samp\{($spacematch+)\}/$1/g;
 		$line =~ s/\@strong\{/\{\\bf /g;
+		$line =~ s/\@exampleindent.*//g;
 		$line =~ s/\@c (.*)/\% $1/g;
 		$line =~ s/\@math\{($mathmatch+)\}/\$$1\$/g;
 		$line =~ s/\@acronym\{($spacematch+)\}/\\acronym{$1}/g;
@@ -354,12 +362,13 @@ multitable:
 			$line =~ s/(\\input)\{($underscorematch+)\}/$punescape->($1,$2)/ge;
 		}
 		$line =~ s/\@cindex (.+)/\\index{$1}/g;
+		$line =~ s/\@pindex (.+)/\\index{$1}/g;
 		$line =~ s/\@url\{($underscorematch+)\}/\\url{$1}/g;
 		#$line =~ s/\@euro/\\euro/g;
 		$line =~ s/\s*\@euro\{\}/\~\\textgreek\{\\euro\}/g;
 		$line =~ s/\@page/\\newpage/g;
 		$line =~ s/\@file\{($spacematch+)\}/\\file{$1}/g;
-		$line =~ s/\@code\{($codematch+)\}/\\code{$1}/g;
+		$line =~ s/\@code\{/\\code{/g;
 		$line =~ s/\@option\{($codematch+)\}/\\command{$1}/g;
 		$line =~ s/\@command\{($codematch+)\}/\\command{$1}/g;
 		$line =~ s/\@ref\{/\\myref\{/g;
@@ -380,6 +389,7 @@ multitable:
 		#when a myref{} contains underscores remove them
 		$line =~ s/(\\myref)\{($underscorematch+)\}/$punescape->($1,$2)/ge;
 	}
+	$line =~ s/\@\@/\@/g;
 
         print $line;
 }
