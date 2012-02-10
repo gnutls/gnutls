@@ -309,10 +309,10 @@ of those functions is shown below.
                                             const char* service,
                                             const gnutls_datum_t *pubkey);
   
-  typedef struct {
+  typedef struct @{
     gnutls_trust_db_store_func store;
     gnutls_trust_db_retr_func retrieve;
-  } trust_storage_st;
+  @} trust_storage_st;
 @end example
 
 @node OpenPGP certificates
