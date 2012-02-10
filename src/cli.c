@@ -488,12 +488,12 @@ cert_verify_callback (gnutls_session_t session)
           return -1;
         }
       
-      rc = gnutls_verify_stored_pubkey(NULL, NULL, hostname, service, GNUTLS_CRT_X509,
+      rc = gnutls_verify_stored_pubkey(NULL, hostname, service, GNUTLS_CRT_X509,
                                        cert, 0);
       if (rc == GNUTLS_E_NO_CERTIFICATE_FOUND)
         {
           print_cert_info_compact(session);
-          fprintf(stderr, "Host %s has never been contacted before and is not in the trusted list.\n", hostname);
+          fprintf(stderr, "Host %s has never been contacted before.\n", hostname);
           if (status == 0)
             fprintf(stderr, "Its certificate is valid for %s.\n", hostname);
 
@@ -521,7 +521,7 @@ cert_verify_callback (gnutls_session_t session)
       
       if (rc != 0)
         {
-          rc = gnutls_store_pubkey(NULL, NULL, hostname, service, GNUTLS_CRT_X509, cert, 0);
+          rc = gnutls_store_pubkey(NULL, hostname, service, GNUTLS_CRT_X509, cert, 0, 0);
           if (rc < 0)
             fprintf(stderr, "Could not store key: %s\n", gnutls_strerror(rc));
         }
