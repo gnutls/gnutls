@@ -3,11 +3,11 @@
  *
  * Map a text file, ensuring the text always has an ending NUL byte.
  *
- * Time-stamp:      "2011-06-25 11:42:22 bkorb"
+ * Time-stamp:      "2012-01-29 09:40:21 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
- *  AutoOpts is Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoOpts is Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  *  AutoOpts is available under any one of two licenses.  The license
  *  in use must be one of these two and the choice is under the control
@@ -76,9 +76,11 @@
  *
  * @param mapinfo a structure holding everything we need to know
  *        about the mapping.
+ *
+ * @param pzFile name of the file, for error reporting.
  */
 static void
-load_text_file(tmap_info_t * mapinfo)
+load_text_file(tmap_info_t * mapinfo, char const * pzFile)
 {
 #if ! defined(HAVE_MMAP)
     mapinfo->txt_data = AGALOC(mapinfo->txt_size+1, "file text");
@@ -96,7 +98,7 @@ load_text_file(tmap_info_t * mapinfo)
             if (rdct <= 0) {
                 mapinfo->txt_errno = errno;
                 fprintf(stderr, zFSErrReadFile,
-                        errno, strerror(errno), "mapped file");
+                        errno, strerror(errno), pzFile);
                 free(mapinfo->txt_data);
                 return;
             }
@@ -113,6 +115,8 @@ load_text_file(tmap_info_t * mapinfo)
 #else /* HAVE mmap */
     size_t const pgsz = GETPAGESIZE();
     void * map_addr   = NULL;
+
+    (void)pzFile;
 
     mapinfo->txt_full_size = (mapinfo->txt_size + pgsz) & ~(pgsz - 1);
     if (mapinfo->txt_full_size == (mapinfo->txt_size + pgsz)) {
@@ -297,7 +301,7 @@ text_mmap(char const * pzFile, int prot, int flags, tmap_info_t * mi)
     if (mi->txt_errno != 0)
         return MAP_FAILED_PTR;
 
-    load_text_file(mi);
+    load_text_file(mi, pzFile);
 
     if (mi->txt_errno == 0)
         return mi->txt_data;

@@ -3,12 +3,12 @@
 /**
  * \file compat.h --- fake the preprocessor into handlng portability
  *
- *  Time-stamp:      "2010-07-16 15:11:57 bkorb"
+ *  Time-stamp:      "2012-02-10 17:00:09 bkorb"
  *
  *  compat.h is free software.
  *  This file is part of AutoGen.
  *
- *  AutoGen Copyright (c) 1992-2011 by Bruce Korb - all rights reserved
+ *  AutoGen Copyright (c) 1992-2012 by Bruce Korb - all rights reserved
  *
  *  AutoGen is free software: you can redistribute it and/or modify it
  *  under the terms of the GNU General Public License as published by the
@@ -83,7 +83,7 @@
 #endif
 #include <sys/stat.h>
 #ifdef HAVE_SYS_WAIT_H
-# include <sys/wait.h>
+#  include <sys/wait.h>
 #endif
 
 #if defined( HAVE_SOLARIS_SYSINFO )
