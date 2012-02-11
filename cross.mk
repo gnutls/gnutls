@@ -14,7 +14,7 @@ NETTLE_DIR:=nettle-2.4
 CROSS_DIR:=$(PWD)/win32
 BIN_DIR:=$(CROSS_DIR)/bin
 LIB_DIR:=$(CROSS_DIR)/lib
-HEADERS_DIR:=$(LIB_DIR)/include
+HEADERS_DIR:=$(CROSS_DIR)/include
 
 all: update-gpg-keys gnutls-w32
 
@@ -22,7 +22,7 @@ update-gpg-keys:
 	gpg --recv-keys 96865171 B565716F D92765AF A8F4C2FD DB899F46
 
 $(GNUTLS_DIR)-w32.zip: $(LIB_DIR) $(BIN_DIR) $(GNUTLS_DIR)/.installed
-	-mv $(CROSS_DIR)/lib/include $(CROSS_DIR)/include
+	rm -rf $(CROSS_DIR)/etc $(CROSS_DIR)/share
 	cd $(CROSS_DIR) && zip -r $(PWD)/$@ *
 	gpg --sign --detach $(GNUTLS_DIR)-w32.zip
 
@@ -37,9 +37,8 @@ $(BIN_DIR):
 
 $(LIB_DIR):
 	mkdir -p $(LIB_DIR)
-	mkdir -p $(HEADERS_DIR)
 
-CONFIG_FLAGS := --prefix=$(CROSS_DIR) --host=i686-w64-mingw32 --enable-shared --disable-static --bindir=$(BIN_DIR) --libdir=$(LIB_DIR) --includedir=$(HEADERS_DIR)
+CONFIG_FLAGS := --prefix=$(CROSS_DIR) --host=i686-w64-mingw32 --enable-shared --disable-static --bindir=$(BIN_DIR) --libdir=$(LIB_DIR)
 
 $(P11_KIT_DIR)/.configured:
 	test -f $(P11_KIT_FILE) || wget http://p11-glue.freedesktop.org/releases/$(P11_KIT_FILE)
@@ -54,7 +53,7 @@ $(P11_KIT_DIR)/.installed: $(P11_KIT_DIR)/.configured
 	make -C $(P11_KIT_DIR) install -i
 	-rm -rf $(HEADERS_DIR)/p11-kit
 	-mv $(HEADERS_DIR)/p11-kit-1/p11-kit $(HEADERS_DIR)
-	-rmdir $(HEADERS_DIR)/p11-kit-1
+	-rm -rf $(HEADERS_DIR)/p11-kit-1
 	rm -f $(BIN_DIR)/p11-kit.exe
 	touch $@
 
