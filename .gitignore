@@ -586,3 +586,4 @@ tests/x509signself
 gl/tests/test-base64
 tests/mini-loss2
 src/libopts/libopts.la
+tests/mini-loss-time
