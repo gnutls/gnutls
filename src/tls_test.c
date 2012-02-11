@@ -91,9 +91,13 @@ static const TLS_TEST tls_tests[] = {
   {"fallback from TLS 1.1 to", test_tls1_1_fallback, "TLS 1.0", "failed",
    "SSL 3.0"},
   {"for TLS 1.2 support", test_tls1_2, "yes", "no", "dunno"},
-  /* this test will disable TLS 1.0 if the server is
+  /* The following tests will disable TLS 1.x if the server is
    * buggy */
-  {"whether we need to disable TLS 1.0", test_tls_disable, "no", "yes",
+  {"whether we need to disable TLS 1.2", test_tls_disable2, "no", "yes",
+   "dunno"},
+  {"whether we need to disable TLS 1.1", test_tls_disable1, "no", "yes",
+   "dunno"},
+  {"whether we need to disable TLS 1.0", test_tls_disable0, "no", "yes",
    "dunno"},
   {"for Safe renegotiation support", test_safe_renegotiation, "yes", "no",
    "dunno"},
@@ -277,6 +281,7 @@ main (int argc, char **argv)
       do
         {
           printf ("Checking %s...", tls_tests[i].test_name);
+          fflush(stdout);
 
           ret = tls_tests[i].func (state);
 

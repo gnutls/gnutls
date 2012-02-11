@@ -103,7 +103,7 @@ do_handshake (gnutls_session_t session)
   return TEST_SUCCEED;
 }
 
-char protocol_str[] = "+VERS-TLS1.0:+VERS-SSL3.0";
+char protocol_str[] = "+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0";
 char protocol_all_str[] = "+VERS-TLS1.2:+VERS-TLS1.1:+VERS-TLS1.0:+VERS-SSL3.0";
 char prio_str[512] = "";
 
@@ -782,7 +782,7 @@ test_tls1_1_fallback (gnutls_session_t session)
  * but the previous SSL 3.0 test succeeded then disable TLS 1.0.
  */
 test_code_t
-test_tls_disable (gnutls_session_t session)
+test_tls_disable0 (gnutls_session_t session)
 {
   int ret;
   if (tls1_ok != 0)
@@ -807,6 +807,84 @@ test_tls_disable (gnutls_session_t session)
   return ret;
 
 }
+
+test_code_t
+test_tls_disable1 (gnutls_session_t session)
+{
+  int ret;
+
+  if (tls1_1_ok != 0)
+    return TEST_IGNORE;
+
+  sprintf (prio_str,
+           INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
+           ":" ALL_KX ":%s", protocol_str, rest);
+  _gnutls_priority_set_direct (session, prio_str);
+
+  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+  ret = do_handshake (session);
+  if (ret == TEST_FAILED)
+    {
+      protocol_str[0] = 0;
+      /* disable TLS 1.1 */
+      if (tls1_ok != 0)
+        {
+          strcat (protocol_str, "+VERS-TLS1.0");
+        }
+      if (ssl3_ok != 0)
+        {
+          if (protocol_str[0] != 0)
+            strcat (protocol_str, ":+VERS-SSL3.0");
+          else
+            strcat (protocol_str, "+VERS-SSL3.0");
+        }
+    }
+  return ret;
+}
+
+test_code_t
+test_tls_disable2 (gnutls_session_t session)
+{
+  int ret;
+
+  if (tls1_2_ok != 0)
+    return TEST_IGNORE;
+
+  sprintf (prio_str,
+           INIT_STR ALL_CIPHERS ":" ALL_COMP ":" ALL_CERTTYPES ":%s:" ALL_MACS
+           ":" ALL_KX ":%s", protocol_str, rest);
+  _gnutls_priority_set_direct (session, prio_str);
+
+  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, xcred);
+
+  ret = do_handshake (session);
+  if (ret == TEST_FAILED)
+    {
+      /* disable TLS 1.2 */
+      protocol_str[0] = 0;
+      if (tls1_1_ok != 0)
+        {
+          strcat (protocol_str, "+VERS-TLS1.1");
+        }
+      if (tls1_ok != 0)
+        {
+          if (protocol_str[0] != 0)
+            strcat (protocol_str, ":+VERS-TLS1.0");
+          else
+            strcat (protocol_str, "+VERS-TLS1.0");
+        }
+      if (ssl3_ok != 0)
+        {
+          if (protocol_str[0] != 0)
+            strcat (protocol_str, ":+VERS-SSL3.0");
+          else
+            strcat (protocol_str, "+VERS-SSL3.0");
+        }
+    }
+  return ret;
+}
+
 
 test_code_t
 test_rsa_pms (gnutls_session_t session)
