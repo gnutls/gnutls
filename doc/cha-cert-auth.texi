@@ -286,8 +286,13 @@ consult @xcite{RFC2818} and section @ref{ex:verify} for an example.
 
 It is possible to use a trust on first use (similar to SSH) authentication 
 method in GnuTLS. That means that having seen and associated a public key 
-with a host is enough to trust it on the subsequent connections.
-A hybrid system with X.509 and SSH authentication is 
+with a host is enough to trust it on the subsequent connections. Such
+a system in combination with the normal CA verification, and OCSP verification,
+can help to provide multiple factor verification, where a single point of
+failure is not enough to compromise the system. For example a server compromise
+may be detected using OCSP, and a CA compromise can be detected using
+the trust on first use method.
+Such a hybrid system with X.509 and SSH authentication is 
 shown in @ref{Simple client example with SSH-style certificate verification}.
 
 @showfuncdesc{gnutls_verify_stored_pubkey}
