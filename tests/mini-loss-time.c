@@ -27,13 +27,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#if defined(_WIN32)
+
+int main()
+{
+  exit(77);
+}
+
+#else
+
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
-#if !defined(_WIN32)
 #include <sys/wait.h>
 #include <arpa/inet.h>
-#endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
@@ -294,3 +302,5 @@ time_t tstart, tstop;
   if (!(tstop < 70 && tstop > 55))
     fail("Time difference: %u\n", (unsigned)tstop);
 }
+
+#endif /* _WIN32 */

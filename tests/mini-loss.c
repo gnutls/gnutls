@@ -26,14 +26,22 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#if defined(_WIN32)
+
+int main()
+{
+  exit(77);
+}
+
+#else
+
 #include <string.h>
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
-#if !defined(_WIN32)
 #include <sys/wait.h>
 #include <arpa/inet.h>
-#endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/dtls.h>
@@ -393,3 +401,5 @@ doit (void)
   start(4, -1);
   start(5, -1);
 }
+
+#endif /* _WIN32 */
