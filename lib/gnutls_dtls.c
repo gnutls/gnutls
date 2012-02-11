@@ -34,7 +34,7 @@
 #include <gnutls_constate.h>
 #include <gnutls_state.h>
 #include <gnutls/dtls.h>
-
+#include <timespec.h>
 
 /* This function fragments and transmits a previously buffered
  * outgoing message. It accepts mtu_data which is a buffer to
@@ -183,7 +183,9 @@ unsigned int timeout;
     &session->internals.handshake_send_buffer;
   mbuffer_st *cur;
   gnutls_handshake_description_t last_type = 0;
-  time_t now = gnutls_time (0);
+  struct timespec now;
+  
+  gettime(&now);
 
   /* If we have already sent a flight and we are operating in a 
    * non blocking way, check if it is time to retransmit or just
@@ -207,10 +209,8 @@ unsigned int timeout;
             {
               /* if no retransmission is required yet just return 
                */
-              if (1000*(now-session->internals.dtls.handshake_start_time) < 
-                  session->internals.dtls.actual_retrans_timeout_ms)
+              if (timespec_sub_ms(&now, &session->internals.dtls.handshake_start_time) < session->internals.dtls.actual_retrans_timeout_ms)
                 {
-                  session->internals.dtls.handshake_last_call = now;
                   gnutls_assert();
                   goto nb_timeout;
                 }
@@ -227,7 +227,7 @@ unsigned int timeout;
 
   do 
     {
-      if (1000*(now-session->internals.dtls.handshake_start_time) >= session->internals.dtls.total_timeout_ms) 
+      if (timespec_sub_ms(&now, &session->internals.dtls.handshake_start_time) >= session->internals.dtls.total_timeout_ms) 
         {
           ret = gnutls_assert_val(GNUTLS_E_TIMEDOUT);
           goto end_flight;
@@ -251,7 +251,6 @@ unsigned int timeout;
       if (session->internals.dtls.flight_init == 0)
         {
           session->internals.dtls.flight_init = 1;
-          session->internals.dtls.handshake_last_call = now;
           RESET_TIMER;
           timeout = session->internals.dtls.actual_retrans_timeout_ms;
 
@@ -304,7 +303,7 @@ unsigned int timeout;
             }
         }
 
-      now = gnutls_time (0);
+      gettime(&now);
     } while(ret == GNUTLS_E_TIMEDOUT);
 
   if (ret < 0)

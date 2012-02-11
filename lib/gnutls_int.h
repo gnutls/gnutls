@@ -625,10 +625,8 @@ typedef struct
 
   /* non blocking stuff variables */
   unsigned int blocking:1;
-  /* starting time of current handshake - seconds since epoch */
-  time_t handshake_start_time;
-  /* time in seconds of the last handshake call */
-  time_t handshake_last_call;
+  /* starting time of current handshake */
+  struct timespec handshake_start_time;
 
   /* The actual retrans_timeout for the next message (e.g. doubled or so) 
    */

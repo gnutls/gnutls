@@ -23,9 +23,11 @@
 #ifndef DTLS_H
 # define DTLS_H
 
+#include <config.h>
 #include "gnutls_int.h"
 #include "gnutls_buffers.h"
 #include "gnutls_mbuffers.h"
+#include <timespec.h>
 
 int _dtls_transmit(gnutls_session_t session);
 int _dtls_retransmit(gnutls_session_t session);
@@ -33,9 +35,18 @@ int _dtls_record_check(gnutls_session_t session, uint64 * _seq);
 
 #define MAX_DTLS_TIMEOUT 60000
 
+/* returns a-b in ms */
+inline static unsigned int timespec_sub_ms(struct timespec *a, struct timespec *b)
+{
+  return (a->tv_sec * 1000 + a->tv_nsec / (1000 * 1000) -
+          (b->tv_sec * 1000 + b->tv_nsec / (1000 * 1000)));
+}
+
 #define RETURN_DTLS_EAGAIN_OR_TIMEOUT(session) { \
-  if (gnutls_time(0) - session->internals.dtls.handshake_start_time > \
-      session->internals.dtls.total_timeout_ms/1000) \
+  struct timespec now; \
+  gettime(&now); \
+   \
+  if (timespec_sub_ms(&now, &session->internals.dtls.handshake_start_time) > session->internals.dtls.total_timeout_ms) \
     return gnutls_assert_val(GNUTLS_E_TIMEDOUT); \
   else \
     { \
