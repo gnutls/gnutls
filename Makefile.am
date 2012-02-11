@@ -40,11 +40,9 @@ dist-hook:
 	sed 's/\@VERSION\@/$(VERSION)/g' -i $(distdir)/src/*.def
 	cd $(distdir)/src/ && for i in *.def;do \
 		autogen $$i; \
-		autogen -Tagtexi-cmd.tpl $$i; \
 		cp $$i $$i.tmp; \
 		sed -i 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $$i.tmp; \
 		autogen -Tagman-cmd.tpl $$i.tmp; \
 		rm -f $$i.tmp; \
 		mv -f *.1 ../doc/manpages/; \
-		mv -f *.texi ../doc/; \
 	done
