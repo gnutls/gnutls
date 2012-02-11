@@ -46,5 +46,5 @@ dist-hook:
 		autogen -Tagman-cmd.tpl $$i.tmp; \
 		rm -f $$i.tmp; \
 		mv -f *.1 ../doc/manpages/; \
-		mv -f *.texi ../doc/manpages; \
+		mv -f *.texi ../doc/; \
 	done
