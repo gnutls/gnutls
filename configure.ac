@@ -148,6 +148,7 @@ fi
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 
 dnl Checks for programs in src/ 
+NEED_LIBOPTS_DIR=true
 LIBOPTS_CHECK([src/libopts])
 
 AC_CHECK_TYPE(ssize_t,
