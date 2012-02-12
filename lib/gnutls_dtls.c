@@ -183,6 +183,7 @@ unsigned int timeout;
     &session->internals.handshake_send_buffer;
   mbuffer_st *cur;
   gnutls_handshake_description_t last_type = 0;
+  unsigned int diff;
   struct timespec now;
   
   gettime(&now);
@@ -227,8 +228,10 @@ unsigned int timeout;
 
   do 
     {
-      if (timespec_sub_ms(&now, &session->internals.dtls.handshake_start_time) >= session->internals.dtls.total_timeout_ms) 
+      diff = timespec_sub_ms(&now, &session->internals.dtls.handshake_start_time);
+      if (diff >= session->internals.dtls.total_timeout_ms) 
         {
+          _gnutls_dtls_log("Session timeout: %u ms\n", diff);
           ret = gnutls_assert_val(GNUTLS_E_TIMEDOUT);
           goto end_flight;
         }
@@ -349,6 +352,7 @@ int ret;
 
   if (ret == GNUTLS_E_TIMEDOUT)
     {
+      UPDATE_TIMER;
       ret = _dtls_retransmit(session);
       if (ret == 0)
         {
@@ -358,6 +362,7 @@ int ret;
         return gnutls_assert_val(ret);
     }
 
+  RESET_TIMER;
   return 0;
 }
 

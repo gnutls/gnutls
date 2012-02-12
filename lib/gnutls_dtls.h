@@ -44,10 +44,15 @@ inline static unsigned int timespec_sub_ms(struct timespec *a, struct timespec *
 
 #define RETURN_DTLS_EAGAIN_OR_TIMEOUT(session) { \
   struct timespec now; \
+  unsigned int diff; \
   gettime(&now); \
    \
-  if (timespec_sub_ms(&now, &session->internals.dtls.handshake_start_time) > session->internals.dtls.total_timeout_ms) \
-    return gnutls_assert_val(GNUTLS_E_TIMEDOUT); \
+  diff = timespec_sub_ms(&now, &session->internals.dtls.handshake_start_time); \
+  if (diff > session->internals.dtls.total_timeout_ms) \
+    { \
+      _gnutls_dtls_log("Session timeout: %u ms\n", diff); \
+      return gnutls_assert_val(GNUTLS_E_TIMEDOUT); \
+    } \
   else \
     { \
       if (session->internals.dtls.blocking != 0) \
