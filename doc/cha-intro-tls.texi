@@ -91,8 +91,6 @@ The record protocol initially starts with NULL parameters, which means
 no encryption, and no MAC is used. Encryption and authentication begin
 just after the handshake protocol has finished.
 
-@showfuncC{gnutls_record_send,gnutls_record_recv,gnutls_record_recv_seq}
-
 @menu
 * Encryption algorithms used in the record layer::
 * Compression algorithms used in the record layer::
@@ -120,28 +118,28 @@ The supported in @acronym{GnuTLS} ciphers and MAC algorithms are shown in @ref{t
 @float Table,tab:ciphers
 @multitable @columnfractions .20 .70
 @headitem Algorithm @tab Description
-@item 3DES_CBC @tab
+@item 3DES_@-CBC @tab
 This is the DES block cipher algorithm used with triple
 encryption (EDE). Has 64 bits block size and is used in CBC mode.
 
-@item ARCFOUR_128 @tab
+@item ARCFOUR_@-128 @tab
 ARCFOUR_128 is a compatible algorithm with RSA's RC4 algorithm, which is considered to be a trade
 secret. It is a fast cipher but considered weak today.
 
-@item ARCFOUR_40 @tab
+@item ARCFOUR_@-40 @tab
 This is the ARCFOUR cipher fed with a 40 bit key,
 which is considered weak.
 
-@item AES_CBC @tab
+@item AES_@-CBC @tab
 AES or RIJNDAEL is the block cipher algorithm that replaces the old
 DES algorithm.  Has 128 bits block size and is used in CBC mode.
 
-@item AES_GCM @tab
+@item AES_@-GCM @tab
 This is the AES algorithm in the authenticated encryption GCM mode.
 This mode combines message authentication and encryption and can
 be extremely fast on CPUs that support hardware acceleration.
 
-@item CAMELLIA_CBC @tab
+@item CAMELLIA_@-CBC @tab
 This is an 128-bit block cipher developed by Mitsubishi and NTT. It
 is one of the approved ciphers of the European NESSIE and Japanese
 CRYPTREC projects.
@@ -154,19 +152,18 @@ CRYPTREC projects.
 @float Table,tab:macs
 @multitable @columnfractions .20 .70
 @headitem Algorithm @tab Description
-@item MAC_MD5 @tab
-This is a cryptographic hash algorithm designed by Ron Rivest. Outputs
-128 bits of data.
+@item MAC_@-MD5 @tab
+This is an HMAC based on MD5 a cryptographic hash algorithm designed 
+by Ron Rivest. Outputs 128 bits of data.
 
-@item MAC_SHA1 @tab
-A cryptographic hash algorithm designed by NSA. Outputs 160
-bits of data.
+@item MAC_@-SHA1 @tab
+An HMAC based on the SHA1 cryptographic hash algorithm 
+designed by NSA. Outputs 160 bits of data.
 
-@item MAC_SHA256 @tab
-A cryptographic hash algorithm designed by NSA. Outputs 256
-bits of data.
+@item MAC_@-SHA256 @tab
+An HMAC based on SHA256. Outputs 256 bits of data.
 
-@item MAC_AEAD @tab
+@item MAC_@-AEAD @tab
 This indicates that an authenticated encryption algorithm, such as
 GCM, is in use.
 
@@ -189,8 +186,7 @@ tunnels, and in cases where network usage has to be minimized. It
 should be noted however that compression increases latency.
 
 The record layer compression in @acronym{GnuTLS} is implemented based
-on @xcite{RFC3749}. The supported algorithms are shown in
-@ref{gnutls_compression_method_t}.
+on @xcite{RFC3749}. The supported algorithms are shown below.
 
 @showenumdesc{gnutls_compression_method_t,Supported compression algorithms}
 
