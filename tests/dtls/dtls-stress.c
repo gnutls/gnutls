@@ -43,7 +43,7 @@ int nonblock;
 
 int run_id;
 
-const char* role_to_name(enum role role)
+static const char* role_to_name(enum role role)
 {
 	if (role == SERVER) {
 		return "server";
@@ -52,21 +52,21 @@ const char* role_to_name(enum role role)
 	}
 }
 
-void logfn(int level, const char* s)
+static void logfn(int level, const char* s)
 {
 	if (debug) {
 		fprintf(stdout, "%i %s|<%i> %s", run_id, role_to_name(role), level, s);
 	}
 }
 
-void auditfn(gnutls_session_t session, const char* s)
+static void auditfn(gnutls_session_t session, const char* s)
 {
 	if (debug) {
 		fprintf(stdout, "%i %s| %s", run_id, role_to_name(role), s);
 	}
 }
 
-void drop(const char* packet)
+static void drop(const char* packet)
 {
 	if (debug) {
 		fprintf(stdout, "%i %s| dropping %s\n", run_id, role_to_name(role), packet);
@@ -102,8 +102,10 @@ typedef void (*filter_fn)(gnutls_transport_ptr_t, const unsigned char*, size_t);
 filter_fn filter_chain[32];
 int filter_current_idx;
 
-void filter_clear_state()
+static void filter_clear_state(void)
 {
+int i;
+
 	memset(&state_packet_ServerHello, 0, sizeof(state_packet_ServerHello));
 	memset(&state_packet_ServerKeyExchange, 0, sizeof(state_packet_ServerKeyExchange));
 	memset(&state_packet_ServerHelloDone, 0, sizeof(state_packet_ServerHelloDone));
@@ -112,7 +114,7 @@ void filter_clear_state()
 	memset(&state_packet_ServerChangeCipherSpec, 0, sizeof(state_packet_ServerChangeCipherSpec));
 	memset(&state_packet_ServerFinished, 0, sizeof(state_packet_ServerFinished));
 
-	for (int i = 0; i < 3; i++) {
+	for (i = 0; i < 3; i++) {
 		if (state_permute_ServerHello.packets[i].data) {
 			free(state_permute_ServerHello.packets[i].data);
 		}
@@ -129,7 +131,7 @@ void filter_clear_state()
 	memset(&state_permute_ClientFinished, 0, sizeof(state_permute_ClientFinished));
 }
 
-void filter_run_next(gnutls_transport_ptr_t fd,
+static void filter_run_next(gnutls_transport_ptr_t fd,
 		const unsigned char* buffer, size_t len)
 {
 	filter_fn fn = filter_chain[filter_current_idx];
@@ -143,12 +145,12 @@ void filter_run_next(gnutls_transport_ptr_t fd,
 
 
 
-int match_ServerHello(const unsigned char* buffer, size_t len)
+static int match_ServerHello(const unsigned char* buffer, size_t len)
 {
 	return role == SERVER && len >= 13 + 1 && buffer[0] == 22 && buffer[13] == 2;
 }
 
-void filter_packet_ServerHello(gnutls_transport_ptr_t fd,
+static void filter_packet_ServerHello(gnutls_transport_ptr_t fd,
 		const unsigned char* buffer, size_t len)
 {
 	if (match_ServerHello(buffer, len) && state_packet_ServerHello.count++ < 3) {
@@ -158,12 +160,12 @@ void filter_packet_ServerHello(gnutls_transport_ptr_t fd,
 	}
 }
 
-int match_ServerKeyExchange(const unsigned char* buffer, size_t len)
+static int match_ServerKeyExchange(const unsigned char* buffer, size_t len)
 {
 	return role == SERVER && len >= 13 + 1 && buffer[0] == 22 && buffer[13] == 12;
 }
 
-void filter_packet_ServerKeyExchange(gnutls_transport_ptr_t fd,
+static void filter_packet_ServerKeyExchange(gnutls_transport_ptr_t fd,
 		const unsigned char* buffer, size_t len)
 {
 	if (match_ServerKeyExchange(buffer, len) && state_packet_ServerKeyExchange.count++ < 3) {
@@ -173,11 +175,12 @@ void filter_packet_ServerKeyExchange(gnutls_transport_ptr_t fd,
 	}
 }
 
-int match_ServerHelloDone(const unsigned char* buffer, size_t len)
+static int match_ServerHelloDone(const unsigned char* buffer, size_t len)
 {
 	return role == SERVER && len >= 13 + 1 && buffer[0] == 22 && buffer[13] == 14;
 }
 
+static 
 void filter_packet_ServerHelloDone(gnutls_transport_ptr_t fd,
 		const unsigned char* buffer, size_t len)
 {
@@ -188,11 +191,13 @@ void filter_packet_ServerHelloDone(gnutls_transport_ptr_t fd,
 	}
 }
 
+static
 int match_ClientKeyExchange(const unsigned char* buffer, size_t len)
 {
 	return role == CLIENT && len >= 13 + 1 && buffer[0] == 22 && buffer[13] == 16;
 }
 
+static
 void filter_packet_ClientKeyExchange(gnutls_transport_ptr_t fd,
 		const unsigned char* buffer, size_t len)
 {
@@ -203,11 +208,13 @@ void filter_packet_ClientKeyExchange(gnutls_transport_ptr_t fd,
 	}
 }
 
+static
 int match_ClientChangeCipherSpec(const unsigned char* buffer, size_t len)
 {
 	return role == CLIENT && len >= 13 && buffer[0] == 20;
 }
 
+static
 void filter_packet_ClientChangeCipherSpec(gnutls_transport_ptr_t fd,
 		const unsigned char* buffer, size_t len)
 {
@@ -218,11 +225,13 @@ void filter_packet_ClientChangeCipherSpec(gnutls_transport_ptr_t fd,
 	}
 }
 
+static
 int match_ClientFinished(const unsigned char* buffer, size_t len)
 {
 	return role == CLIENT && len >= 13 && buffer[0] == 22 && buffer[4] == 1;
 }
 
+static
 void filter_packet_ClientFinished(gnutls_transport_ptr_t fd,
 		const unsigned char* buffer, size_t len)
 {
@@ -233,11 +242,13 @@ void filter_packet_ClientFinished(gnutls_transport_ptr_t fd,
 	}
 }
 
+static
 int match_ServerChangeCipherSpec(const unsigned char* buffer, size_t len)
 {
 	return role == SERVER && len >= 13 && buffer[0] == 20;
 }
 
+static
 void filter_packet_ServerChangeCipherSpec(gnutls_transport_ptr_t fd,
 		const unsigned char* buffer, size_t len)
 {
@@ -248,11 +259,13 @@ void filter_packet_ServerChangeCipherSpec(gnutls_transport_ptr_t fd,
 	}
 }
 
+static
 int match_ServerFinished(const unsigned char* buffer, size_t len)
 {
 	return role == SERVER && len >= 13 && buffer[0] == 22 && buffer[4] == 1;
 }
 
+static
 void filter_packet_ServerFinished(gnutls_transport_ptr_t fd,
 		const unsigned char* buffer, size_t len)
 {
@@ -263,8 +276,7 @@ void filter_packet_ServerFinished(gnutls_transport_ptr_t fd,
 	}
 }
 
-
-
+static
 void filter_permutete_state_free_buffer(filter_permute_state_t* state)
 {
 	int i;
@@ -276,6 +288,7 @@ void filter_permutete_state_free_buffer(filter_permute_state_t* state)
 	}
 }
 
+static
 void filter_permute_state_run(filter_permute_state_t* state, int packetCount,
 		gnutls_transport_ptr_t fd, const unsigned char* buffer, size_t len)
 {
@@ -297,6 +310,7 @@ void filter_permute_state_run(filter_permute_state_t* state, int packetCount,
 	}
 }
 
+static
 void filter_permute_ServerHello(gnutls_transport_ptr_t fd,
 		const unsigned char* buffer, size_t len)
 {
@@ -309,6 +323,7 @@ void filter_permute_ServerHello(gnutls_transport_ptr_t fd,
 	}
 }
 
+static
 void filter_permute_ServerFinished(gnutls_transport_ptr_t fd,
 		const unsigned char* buffer, size_t len)
 {
@@ -320,6 +335,7 @@ void filter_permute_ServerFinished(gnutls_transport_ptr_t fd,
 	}
 }
 
+static
 void filter_permute_ClientFinished(gnutls_transport_ptr_t fd,
 		const unsigned char* buffer, size_t len)
 {
@@ -333,8 +349,7 @@ void filter_permute_ClientFinished(gnutls_transport_ptr_t fd,
 }
 
 
-
-
+static
 ssize_t writefn(gnutls_transport_ptr_t fd, const void* buffer, size_t len)
 {
 	filter_current_idx = 0;
@@ -342,6 +357,7 @@ ssize_t writefn(gnutls_transport_ptr_t fd, const void* buffer, size_t len)
 	return len;
 }
 
+static
 void await(int fd)
 {
 	if (nonblock) {
@@ -353,6 +369,7 @@ void await(int fd)
 
 
 
+static
 gnutls_session_t session(int sock, int server)
 {
 	gnutls_session_t r;
@@ -360,7 +377,7 @@ gnutls_session_t session(int sock, int server)
 	gnutls_init(&r, GNUTLS_DATAGRAM | (server ? GNUTLS_SERVER : GNUTLS_CLIENT)
 			| GNUTLS_NONBLOCK * nonblock);
 	gnutls_priority_set_direct(r, "NORMAL:+ANON-ECDH", 0);
-	gnutls_transport_set_ptr(r, (gnutls_transport_ptr_t) (long long int) sock);
+	gnutls_transport_set_ptr(r, (gnutls_transport_ptr_t) sock);
 
 	if (server) {
 		gnutls_anon_server_credentials_t cred;
@@ -380,6 +397,7 @@ gnutls_session_t session(int sock, int server)
 	return r;
 }
 
+static
 int log_error(int code)
 {
 	if (code < 0 && code != GNUTLS_E_AGAIN) {
@@ -396,28 +414,32 @@ int log_error(int code)
 
 timer_t killtimer_tid;
 
-void reset_killtimer()
+static
+void reset_killtimer(void)
 {
+struct itimerspec tout = { { 0, 0 }, { 120, 0 } };
+
 	if (nonblock) {
 		return;
 	}
-	struct itimerspec tout = { { 0, 0 }, { 120, 0 } };
 	timer_settime(killtimer_tid, 0, &tout, 0);
 }
 
-void setup_killtimer()
+static
+void setup_killtimer(void)
 {
 	struct sigevent sig;
+	struct itimerspec tout = { { 0, 0 }, { 240, 0 } };
 
 	memset(&sig, 0, sizeof(sig));
 	sig.sigev_notify = SIGEV_SIGNAL;
 	sig.sigev_signo = 15;
 	timer_create(CLOCK_MONOTONIC, &sig, &killtimer_tid);
 
-	struct itimerspec tout = { { 0, 0 }, { 240, 0 } };
 	timer_settime(killtimer_tid, 0, &tout, 0);
 }
 
+static
 void log_error_with_time(int err, time_t started)
 {
 	if (err < 0) {
@@ -433,11 +455,15 @@ void log_error_with_time(int err, time_t started)
 	}
 }
 
+static
 void client(int sock)
 {
 	gnutls_session_t s = session(sock, 0);
 	int err = 0;
 	time_t started = time(0);
+	const char* line = "foobar!";
+	char buffer[8192];
+	int len;
 
 	setup_killtimer();
 
@@ -449,15 +475,12 @@ void client(int sock)
 	log_error_with_time(err, started);
 	
 	started = time(0);
-	const char* line = "foobar!";
 	do {
 		err = gnutls_record_send(s, line, strlen(line));
 		reset_killtimer();
 	} while (err < 0 && !gnutls_error_is_fatal(err));
 	log_error_with_time(err, started);
 	
-	char buffer[8192];
-	int len;
 	do {
 		await(sock);
 		len = gnutls_record_recv(s, buffer, sizeof(buffer));
@@ -470,6 +493,7 @@ void client(int sock)
 	}
 }
 
+static
 void server(int sock)
 { 
 	gnutls_session_t s = session(sock, 1);
@@ -502,6 +526,8 @@ void server(int sock)
 	}
 }
 
+#if 0
+static
 void udp_sockpair(int* socks)
 {
 	struct sockaddr_in6 sa = { AF_INET6, htons(30000), 0, in6addr_loopback, 0 };
@@ -516,8 +542,10 @@ void udp_sockpair(int* socks)
 	connect(socks[1], (struct sockaddr*) &sa, sizeof(sa));
 	connect(socks[0], (struct sockaddr*) &sb, sizeof(sb));
 }
+#endif
 
-int run_test()
+static
+int run_test(void)
 {
 	int fds[2];
 	int pid1, pid2;
@@ -584,9 +612,11 @@ static const char* filter_names[8]
 		"SChangeCipherSpec",
 		"SFinished" };
 
+static
 int run_one_test(int dropMode, int serverFinishedPermute, int serverHelloPermute, int clientFinishedPermute)
 {
 	int fnIdx = 0;
+	int filterIdx, res;
 	run_id = ((dropMode * 2 + serverFinishedPermute) * 6 + serverHelloPermute) * 6 + clientFinishedPermute;
 
 	filter_clear_state();
@@ -601,7 +631,7 @@ int run_one_test(int dropMode, int serverFinishedPermute, int serverHelloPermute
 	state_permute_ClientFinished.order = permutations3[clientFinishedPermute];
 
 	if (dropMode) {
-		for (int filterIdx = 0; filterIdx < 8; filterIdx++) {
+		for (filterIdx = 0; filterIdx < 8; filterIdx++) {
 			if (dropMode & (1 << filterIdx)) {
 				filter_chain[fnIdx++] = filters[filterIdx];
 			}
@@ -609,7 +639,7 @@ int run_one_test(int dropMode, int serverFinishedPermute, int serverHelloPermute
 	}
 	filter_chain[fnIdx++] = NULL;
 
-	int res = run_test();
+	res = run_test();
 
 	switch (res) {
 		case 0:
@@ -627,7 +657,7 @@ int run_one_test(int dropMode, int serverFinishedPermute, int serverHelloPermute
 	fprintf(stdout, "SFinished(%s), ", permutations2names[serverFinishedPermute]);
 	fprintf(stdout, "CFinished(%s) :- ", permutations3names[clientFinishedPermute]);
 	if (dropMode) {
-		for (int filterIdx = 0; filterIdx < 8; filterIdx++) {
+		for (filterIdx = 0; filterIdx < 8; filterIdx++) {
 			if (dropMode & (1 << filterIdx)) {
 				if (dropMode & ((1 << filterIdx) - 1)) {
 					fprintf(stdout, ", ");
@@ -645,14 +675,16 @@ int run_one_test(int dropMode, int serverFinishedPermute, int serverHelloPermute
 	}
 }
 
+static
 void run_tests(int childcount)
 {
 	int children = 0;
+	int dropMode, serverFinishedPermute, serverHelloPermute, clientFinishedPermute;
 
-	for (int dropMode = 0; dropMode != 1 << 8; dropMode++)
-	for (int serverFinishedPermute = 0; serverFinishedPermute < 2; serverFinishedPermute++)
-	for (int serverHelloPermute = 0; serverHelloPermute < 6; serverHelloPermute++)
-	for (int clientFinishedPermute = 0; clientFinishedPermute < 6; clientFinishedPermute++) {
+	for (dropMode = 0; dropMode != 1 << 8; dropMode++)
+	for (serverFinishedPermute = 0; serverFinishedPermute < 2; serverFinishedPermute++)
+	for (serverHelloPermute = 0; serverHelloPermute < 6; serverHelloPermute++)
+	for (clientFinishedPermute = 0; clientFinishedPermute < 6; clientFinishedPermute++) {
 		if (!fork()) {
 			exit(run_one_test(dropMode, serverFinishedPermute, serverHelloPermute, clientFinishedPermute));
 		} else {
@@ -674,6 +706,8 @@ void run_tests(int childcount)
 
 int main(int argc, const char* argv[])
 {
+int arg;
+
 	setlinebuf(stdout);
 	gnutls_global_init();
 	gnutls_global_set_log_function(logfn);
@@ -690,7 +724,7 @@ int main(int argc, const char* argv[])
 		int serverHelloPermute = 0;
 		int clientFinishedPermute = 0;
 
-		for (int arg = 1; arg < argc; arg++) {
+		for (arg = 1; arg < argc; arg++) {
 			if (strcmp("-shello", argv[arg]) == 0) {
 				arg++;
 				if (arg >= argc) {

@@ -26,8 +26,10 @@ if test "${WINDIR}" != "";then
   exit 77
 fi
 
-./dtls-stress -shello 021 -sfinished 01 -cfinished 012 SKeyExchange CKeyExchange CFinished
-./dtls-stress -shello 012 -sfinished 10 -cfinished 210 SHello SKeyExchange SHelloDone
-./dtls-stress -shello 012 -sfinished 01 -cfinished 021 SHello SKeyExchange SHelloDone
+./dtls-stress -shello 021 -sfinished 01 -cfinished 012 SKeyExchange CKeyExchange CFinished >/dev/null 2>&1
+./dtls-stress -shello 012 -sfinished 10 -cfinished 210 SHello SKeyExchange SHelloDone  >/dev/null 2>&1
+./dtls-stress -shello 012 -sfinished 01 -cfinished 021 SHello SKeyExchange SHelloDone  >/dev/null 2>&1
+./dtls-stress -shello 021 -sfinished 01 -cfinished 201 SHello SHelloDone CChangeCipherSpec SChangeCipherSpec SFinished  >/dev/null 2>&1
+./dtls-stress -shello 102 -sfinished 01 -cfinished 120 SHello SHelloDone CKeyExchange CFinished SChangeCipherSpec SFinished  >/dev/null 2>&1
 
 exit 0
