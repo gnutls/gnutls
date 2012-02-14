@@ -31,5 +31,6 @@ fi
 ./dtls-stress -shello 012 -sfinished 01 -cfinished 021 SHello SKeyExchange SHelloDone  >/dev/null 2>&1
 ./dtls-stress -shello 021 -sfinished 01 -cfinished 201 SHello SHelloDone CChangeCipherSpec SChangeCipherSpec SFinished  >/dev/null 2>&1
 ./dtls-stress -shello 102 -sfinished 01 -cfinished 120 SHello SHelloDone CKeyExchange CFinished SChangeCipherSpec SFinished  >/dev/null 2>&1
+./dtls-stress -shello 210 -sfinished 01 -cfinished 201 CChangeCipherSpec SChangeCipherSpec SFinished >/dev/null 2>&1
 
 exit 0
