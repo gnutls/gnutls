@@ -124,6 +124,9 @@ typedef struct
 #define GNUTLS_MASTER_SIZE 48
 #define GNUTLS_RANDOM_SIZE 32
 
+/* DTLS */
+#define DTLS_RECORD_WINDOW_SIZE 64
+
 /* TLS Extensions */
 /* we can receive up to MAX_EXT_TYPES extensions.
  */
@@ -527,6 +530,10 @@ struct record_parameters_st
   gnutls_mac_algorithm_t mac_algorithm;
   gnutls_compression_method_t compression_algorithm;
 
+  /* for DTLS */
+  uint64_t record_sw[DTLS_RECORD_WINDOW_SIZE];
+  unsigned int record_sw_size;
+
   record_state_st read;
   record_state_st write;
   
@@ -593,8 +600,6 @@ typedef struct
   int free_rsa_params;
 } internal_params_st;
 
-#define DTLS_RECORD_WINDOW_SIZE 64
-
 /* DTLS session state
  */
 typedef struct
@@ -621,9 +626,6 @@ typedef struct
 
   unsigned int hsk_hello_verify_requests;
   
-  uint64_t record_sw[DTLS_RECORD_WINDOW_SIZE];
-  unsigned int record_sw_size;
-
   /* non blocking stuff variables */
   unsigned int blocking:1;
   /* starting time of current handshake */

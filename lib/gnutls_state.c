@@ -386,8 +386,6 @@ gnutls_init (gnutls_session_t * session, unsigned int flags)
 
       (*session)->internals.dtls.retrans_timeout_ms = 1000;
       (*session)->internals.dtls.total_timeout_ms = 60000;
-
-      (*session)->internals.dtls.record_sw_size = 0;
     }
   else
     (*session)->internals.transport = GNUTLS_STREAM;

@@ -31,7 +31,7 @@
 
 int _dtls_transmit(gnutls_session_t session);
 int _dtls_retransmit(gnutls_session_t session);
-int _dtls_record_check(gnutls_session_t session, uint64 * _seq);
+int _dtls_record_check(struct record_parameters_st *rp, uint64 * _seq);
 
 #define MAX_DTLS_TIMEOUT 60000
 

@@ -1021,7 +1021,7 @@ begin:
    */
   if (IS_DTLS(session)) 
     {
-      ret = _dtls_record_check(session, packet_sequence);
+      ret = _dtls_record_check(record_params, packet_sequence);
       if (ret < 0)
         {
           _gnutls_audit_log(session, "Discarded duplicate message[%u]: %s\n",

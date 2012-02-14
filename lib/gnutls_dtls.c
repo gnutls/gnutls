@@ -420,14 +420,14 @@ int ret;
 }
 
 
-#define window_table session->internals.dtls.record_sw
-#define window_size session->internals.dtls.record_sw_size
+#define window_table rp->record_sw
+#define window_size rp->record_sw_size
 
 /* FIXME: could we modify that code to avoid using
  * uint64_t?
  */
 
-static void rot_window(gnutls_session_t session, int places)
+static void rot_window(struct record_parameters_st * rp, int places)
 {
   window_size -= places;
   memmove(window_table, &window_table[places], window_size*sizeof(window_table[0]));
@@ -437,13 +437,12 @@ static void rot_window(gnutls_session_t session, int places)
 /* Checks if a sequence number is not replayed. If replayed
  * returns a negative error code, otherwise zero.
  */
-int _dtls_record_check(gnutls_session_t session, uint64 * _seq)
+int _dtls_record_check(struct record_parameters_st *rp, uint64 * _seq)
 {
 uint64_t seq = 0, diff;
 unsigned int i, offset = 0;
 
-  seq |= _seq->i[0] & 0xff;
-  for (i=1;i<8;i++) 
+  for (i=2;i<8;i++)
     {
       seq <<= 8;
       seq |= _seq->i[i] & 0xff;
@@ -463,7 +462,7 @@ unsigned int i, offset = 0;
 
   if (window_size == DTLS_RECORD_WINDOW_SIZE) 
     {
-      rot_window(session, MOVE_SIZE);
+      rot_window(rp, MOVE_SIZE);
     }
 
   if (seq < window_table[window_size-1])
@@ -472,21 +471,9 @@ unsigned int i, offset = 0;
       diff = window_table[window_size-1] - seq;
 
       if (diff >= window_size) 
-        {
-          /* Probably an epoch change. Check if we can fit it */
-          if (window_table[0] == 0 || window_table[0]+1 == seq)
-            {
-              window_table[0] = seq;
-              return 0;
-            }
-          
-          if ((window_size-2)/2 < 2)
-            return -1;
+        return -1;
 
-          offset = 1 + seq % ((window_size-2)/2);
-        }
-      else
-        offset = window_size-1-diff;
+      offset = window_size-1-diff;
 
       if (window_table[offset] == seq)
         return -1;
@@ -517,7 +504,7 @@ unsigned int i, offset = 0;
             }
           else
             {
-              rot_window(session, diff);
+              rot_window(rp, diff);
               offset = diff + window_size-1;
               window_table[offset] = seq;
               window_size = offset + 1;            
