@@ -27,7 +27,7 @@ CERTTOOL=${CERTTOOL:-../../src/certtool$EXEEXT}
 
 PARAMS="--generate-certificate --load-privkey $srcdir/key-user.pem --load-ca-privkey $srcdir/key-ca.pem --template tmpl"
 
-echo "#empty" > tmpl
+echo "serial = 0" > tmpl
 
 #$CERTTOOL $PARAMS --load-ca-certificate $srcdir/ca-gnutls-keyid.pem \
 #    --outfile user-gnutls-keyid.pem 2> /dev/null
