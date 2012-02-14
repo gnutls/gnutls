@@ -35,12 +35,18 @@
 #include <gnutls/abstract.h>
 #include <system.h>
 
-static int raw_pubkey_to_base64(gnutls_datum_t* pubkey);
+static int raw_pubkey_to_base64(const gnutls_datum_t* raw, gnutls_datum_t * b64);
 static int x509_crt_to_raw_pubkey(const gnutls_datum_t * cert, gnutls_datum_t *rpubkey);
 static int pgp_crt_to_raw_pubkey(const gnutls_datum_t * cert, gnutls_datum_t *rpubkey);
 static int find_stored_pubkey(const char* file, 
                               const char* host, const char* service, 
                               const gnutls_datum_t* skey);
+
+static 
+int store_commitment(const char* db_name, const char* host,
+                 const char* service, time_t expiration, 
+                 gnutls_digest_algorithm_t hash_algo,
+                 const char* hash);
 static 
 int store_pubkey(const char* db_name, const char* host,
                  const char* service, time_t expiration, const gnutls_datum_t* pubkey);
@@ -51,6 +57,7 @@ static int find_config_file(char* file, size_t max_size);
 static const trust_storage_st default_storage =
 {
   store_pubkey,
+  store_commitment,
   find_stored_pubkey
 };
 
@@ -125,13 +132,6 @@ char local_file[MAX_FILENAME];
       goto cleanup;
     }
   
-  ret = raw_pubkey_to_base64(&pubkey);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
-
   ret = tdb->retrieve(db_name, host, service, &pubkey);
   if (ret < 0)
     return gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_FOUND);
@@ -141,11 +141,93 @@ cleanup:
   return ret;
 }
 
-static int parse_line(char* line, 
+static int parse_commitment_line(char* line, 
                       const char* host, size_t host_len,
                       const char* service, size_t service_len,
                       time_t now,
                       const gnutls_datum_t *skey)
+{
+char* p, *kp;
+char* savep = NULL;
+size_t kp_len, phash_size;
+time_t expiration;
+int ret;
+gnutls_digest_algorithm_t hash_algo;
+uint8_t phash[MAX_HASH_SIZE];
+uint8_t hphash[MAX_HASH_SIZE*2+1];
+
+  /* read host */
+  p = strtok_r(line, "|", &savep);
+  if (p == NULL)
+    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+    
+  if (p[0] != '*' && strcmp(p, host) != 0)
+    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+
+  /* read service */
+  p = strtok_r(NULL, "|", &savep);
+  if (p == NULL)
+    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+    
+  if (p[0] != '*' && strcmp(p, service) != 0)
+    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+
+  /* read expiration */
+  p = strtok_r(NULL, "|", &savep);
+  if (p == NULL)
+    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+    
+  expiration = (time_t)atol(p);
+  if (expiration > 0 && now > expiration)
+    return gnutls_assert_val(GNUTLS_E_EXPIRED);
+
+  /* read hash algorithm */
+  p = strtok_r(NULL, "|", &savep);
+  if (p == NULL)
+    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+
+  hash_algo = (time_t)atol(p);
+  if (_gnutls_digest_get_name(hash_algo) == NULL)
+    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+
+  /* read hash */
+  kp = strtok_r(NULL, "|", &savep);
+  if (kp == NULL)
+    return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
+  
+  p = strpbrk(kp, "\n \r\t|");
+  if (p != NULL) *p = 0;
+
+  /* hash and hex encode */
+  ret = _gnutls_hash_fast (hash_algo, skey->data, skey->size, phash);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+    
+  phash_size = _gnutls_hash_get_algo_len(hash_algo);
+
+  p = _gnutls_bin2hex (phash, phash_size,(void*) hphash,
+                         sizeof(hphash), NULL);
+  if (p == NULL)
+    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+
+  kp_len = strlen(kp);
+  if (kp_len != phash_size*2)
+    return gnutls_assert_val(GNUTLS_E_CERTIFICATE_KEY_MISMATCH);
+
+  if (memcmp(kp, hphash, kp_len) != 0)
+    return gnutls_assert_val(GNUTLS_E_CERTIFICATE_KEY_MISMATCH);
+
+  /* key found and matches */
+  return 0;
+}
+
+
+static int parse_line(char* line, 
+                      const char* host, size_t host_len,
+                      const char* service, size_t service_len,
+                      time_t now,
+                      const gnutls_datum_t *rawkey,
+                      const gnutls_datum_t *b64key)
 {
 char* p, *kp;
 char* savep = NULL;
@@ -157,6 +239,9 @@ time_t expiration;
   if (p == NULL)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
+  if (strncmp(p, "c0", 2) == 0)
+    return parse_commitment_line(p+3, host, host_len, service, service_len, now, rawkey);
+
   if (strncmp(p, "g0", 2) != 0)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
@@ -164,7 +249,7 @@ time_t expiration;
   p = strtok_r(NULL, "|", &savep);
   if (p == NULL)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
-    
+
   if (p[0] != '*' && strcmp(p, host) != 0)
     return gnutls_assert_val(GNUTLS_E_PARSING_ERROR);
 
@@ -194,10 +279,10 @@ time_t expiration;
   if (p != NULL) *p = 0;
 
   kp_len = strlen(kp);
-  if (kp_len != skey->size)
+  if (kp_len != b64key->size)
     return gnutls_assert_val(GNUTLS_E_CERTIFICATE_KEY_MISMATCH);
     
-  if (memcmp(kp, skey->data, skey->size) != 0)
+  if (memcmp(kp, b64key->data, b64key->size) != 0)
     return gnutls_assert_val(GNUTLS_E_CERTIFICATE_KEY_MISMATCH);
   
   /* key found and matches */
@@ -208,7 +293,7 @@ time_t expiration;
  */
 static int find_stored_pubkey(const char* file, 
                              const char* host, const char* service, 
-                             const gnutls_datum_t* skey)
+                             const gnutls_datum_t* pubkey)
 {
 FILE* fd;
 char* line = NULL;
@@ -216,20 +301,28 @@ size_t line_size = 0;
 int ret, l2, mismatch = 0;
 size_t host_len = 0, service_len = 0;
 time_t now = gnutls_time(0);
+gnutls_datum_t b64key = { NULL, 0 };
+
+  ret = raw_pubkey_to_base64(pubkey, &b64key);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   if (host != NULL) host_len = strlen(host);
   if (service != NULL) service_len = strlen(service);
 
   fd = fopen(file, "rb");
   if (fd == NULL)
-    return gnutls_assert_val(GNUTLS_E_FILE_ERROR);
+    {
+      ret = gnutls_assert_val(GNUTLS_E_FILE_ERROR);
+      goto cleanup;
+    }
   
   do 
     {
       l2 = getline(&line, &line_size, fd);
       if (l2 > 0)
         {
-          ret = parse_line(line, host, host_len, service, service_len, now, skey);
+          ret = parse_line(line, host, host_len, service, service_len, now, pubkey, &b64key);
           if (ret == 0) /* found */
             {
               goto cleanup;
@@ -247,24 +340,25 @@ time_t now = gnutls_time(0);
   
 cleanup:
   free(line);
-  fclose(fd);
+  if (fd != NULL)
+    fclose(fd);
+  gnutls_free(b64key.data);
   
   return ret;
 }
 
-static int raw_pubkey_to_base64(gnutls_datum_t* pubkey)
+static int raw_pubkey_to_base64(const gnutls_datum_t* raw, gnutls_datum_t * b64)
 {
   int ret;
   char* out;
   
-  ret = base64_encode_alloc((void*)pubkey->data, pubkey->size, &out);
+  ret = base64_encode_alloc((void*)raw->data, raw->size, &out);
   if (ret == 0)
     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
   
-  gnutls_free(pubkey->data);
-  pubkey->data = (void*)out;
-  pubkey->size = ret;
-  
+  b64->data = (void*)out;
+  b64->size = ret;
+
   return 0;
 }
 
@@ -407,6 +501,43 @@ int store_pubkey(const char* db_name, const char* host,
                  const char* service, time_t expiration, 
                  const gnutls_datum_t* pubkey)
 {
+FILE* fd = NULL;
+gnutls_datum_t b64key;
+int ret;
+
+  ret = raw_pubkey_to_base64(pubkey, &b64key);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  fd = fopen(db_name, "ab+");
+  if (fd == NULL)
+    {
+      ret = gnutls_assert_val(GNUTLS_E_FILE_ERROR);
+      goto cleanup;
+    }
+
+  if (service == NULL) service = "*";
+  if (host == NULL) host = "*";
+
+  fprintf(fd, "|g0|%s|%s|%lu|%.*s\n", host, service, (unsigned long)expiration, 
+    pubkey->size, pubkey->data);
+
+  ret = 0;
+
+cleanup:
+  if (fd != NULL)
+    fclose(fd);
+  gnutls_free(b64key.data);
+  
+  return ret;
+}
+
+static 
+int store_commitment(const char* db_name, const char* host,
+                 const char* service, time_t expiration, 
+                 gnutls_digest_algorithm_t hash_algo,
+                 const char* hash)
+{
 FILE* fd;
 
   fd = fopen(db_name, "ab+");
@@ -416,8 +547,8 @@ FILE* fd;
   if (service == NULL) service = "*";
   if (host == NULL) host = "*";
 
-  fprintf(fd, "|g0|%s|%s|%lu|%.*s\n", host, service, (unsigned long)expiration, 
-    pubkey->size, pubkey->data);
+  fprintf(fd, "|c0|%s|%s|%lu|%u|%s\n", host, service, (unsigned long)expiration, 
+          (unsigned)hash_algo, hash);
   
   fclose(fd);
   
@@ -435,7 +566,7 @@ FILE* fd;
  * @expiration: The expiration time (use 0 to disable expiration)
  * @flags: should be 0.
  *
- * This function will store to verify the provided certificate to 
+ * This function will store the provided certificate to 
  * the list of stored public keys. The key will be considered valid until 
  * the provided expiration time.
  *
@@ -495,13 +626,6 @@ char local_file[MAX_FILENAME];
       gnutls_assert();
       goto cleanup;
     }
-  
-  ret = raw_pubkey_to_base64(&pubkey);
-  if (ret < 0)
-    {
-      gnutls_assert();
-      goto cleanup;
-    }
 
   _gnutls_debug_log("Configuration file: %s\n", db_name);
 
@@ -511,6 +635,78 @@ char local_file[MAX_FILENAME];
 
 cleanup:
   gnutls_free(pubkey.data);
+  if (fd != NULL) fclose(fd);
+  
+  return ret;
+}
+
+/**
+ * gnutls_store_commitment:
+ * @db_name: A file specifying the stored keys (use NULL for the default)
+ * @tdb: A database structure or NULL to use the default
+ * @host: The peer's name
+ * @service: non-NULL if this key is specific to a service (e.g. http)
+ * @hash_algo: The hash algorithm type
+ * @hash: The hex-encoded hash
+ * @expiration: The expiration time (use 0 to disable expiration)
+ * @flags: should be 0.
+ *
+ * This function will store the provided hash commitment to 
+ * the list of stored public keys. The key with the given
+ * hash will be considered valid until the provided expiration time.
+ *
+ * The @tdb variable if non-null specifies a custom backend for
+ * the storage and retrieval of entries. If it is NULL then the
+ * default file backend will be used.
+ *
+ * Note that this function is not thread safe with the default backend.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.0.0
+ **/
+int
+gnutls_store_commitment(const char* db_name, 
+                    const trust_storage_st* tdb,
+                    const char* host,
+                    const char* service,
+                    gnutls_digest_algorithm_t hash_algo,
+                    const char* hash,
+                    time_t expiration,
+                    unsigned int flags)
+{
+FILE* fd = NULL;
+int ret;
+char local_file[MAX_FILENAME];
+
+  if (hash_algo == GNUTLS_DIG_MD5 || hash_algo == GNUTLS_DIG_MD2)
+    return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
+  
+  if (db_name == NULL && tdb == NULL)
+    {
+      ret = _gnutls_find_config_path(local_file, sizeof(local_file));
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+      
+      _gnutls_debug_log("Configuration path: %s\n", local_file);
+      mkdir(local_file, 0700);
+      
+      ret = find_config_file(local_file, sizeof(local_file));
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+      db_name = local_file;
+    }
+
+  if (tdb == NULL)
+    tdb = &default_storage;
+    
+  _gnutls_debug_log("Configuration file: %s\n", db_name);
+
+  tdb->cstore(db_name, host, service, expiration, hash_algo, hash);
+
+  ret = 0;
+
   if (fd != NULL) fclose(fd);
   
   return ret;

@@ -17,6 +17,10 @@ Peter Gutmann, "Everything you never wanted to know about PKI but were
 forced to find out", Available from
 @url{http://www.cs.auckland.ac.nz/~pgut001/}.
 
+@item @anchor{KEYPIN}[KEYPIN]
+Chris Evans and Chris Palmer, "Public Key Pinning Extension for HTTP", 
+Available from @url{http://tools.ietf.org/html/draft-ietf-websec-key-pinning-01}.
+
 @item @anchor{NISTSP80057}[NISTSP80057]
 NIST Special Publication 800-57, "Recommendation for Key Management -
 Part 1: General (Revised)", March 2007, available from

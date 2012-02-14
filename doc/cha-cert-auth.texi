@@ -297,6 +297,11 @@ shown in @ref{Simple client example with SSH-style certificate verification}.
 
 @showfuncdesc{gnutls_verify_stored_pubkey}
 @showfuncdesc{gnutls_store_pubkey}
+@showfuncdesc{gnutls_store_commitment}
+
+The @funcref{gnutls_store_commitment} may be used to implement a
+key-pinning architecture as in @xcite{KEYPIN}.
+http://tools.ietf.org/html/draft-ietf-websec-key-pinning-01
 
 The storage and verification functions may be used with the default
 text file based backend, or another backend may be specified. Such
@@ -308,16 +313,25 @@ of those functions is shown below.
                                              const char* service,
                                              time_t expiration,
                                              const gnutls_datum_t* pubkey);
-  
+  typedef int (*gnutls_trust_db_store_commitment_func) (const char* db_name,
+                                             const char* host,
+                                             const char* service,
+                                             time_t expiration,
+                                             gnutls_digest_algorithm_t halgo,
+                                             const char* hash);  
+
   typedef int (*gnutls_trust_db_retr_func) (const char* db_name, 
                                             const char* host,
                                             const char* service,
                                             const gnutls_datum_t *pubkey);
   
-  typedef struct @{
-    gnutls_trust_db_store_func store;
-    gnutls_trust_db_retr_func retrieve;
-  @} trust_storage_st;
+  typedef struct 
+    @{
+       gnutls_trust_db_store_func store;
+       gnutls_trust_db_store_commitment_func cstore;
+       gnutls_trust_db_retr_func retrieve;
+    @} 
+  trust_storage_st;
 @end example
 
 @node OpenPGP certificates
