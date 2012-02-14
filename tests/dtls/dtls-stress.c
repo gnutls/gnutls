@@ -141,6 +141,7 @@ static void filter_run_next(gnutls_transport_ptr_t fd,
 	} else {
 		send((long int) fd, buffer, len, 0);
 	}
+	filter_current_idx--;
 }
 
 
@@ -743,6 +744,8 @@ int arg;
 				}
 			} else if (strcmp("-d", argv[arg]) == 0) {
 				debug++;
+			} else if (strcmp("-nb", argv[arg]) == 0) {
+				nonblock = 1;
 			} else if (strcmp("-sfinished", argv[arg]) == 0) {
 				arg++;
 				if (arg >= argc) {
