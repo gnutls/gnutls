@@ -409,3 +409,11 @@ core.c.texi:
 	echo "(Guile not available, documentation not generated.)" > $@
 
 endif !HAVE_GUILE
+
+gnutls.xml: epub.texi
+	makeinfo --docbook $<
+	sed -i 's/\&\#8226;//g' $@
+
+gnutls.epub: gnutls.xml
+	dbtoepub $<
+	epub-fix --delete-unmanifested gnutls.epub

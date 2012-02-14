@@ -587,3 +587,6 @@ gl/tests/test-base64
 tests/mini-loss2
 src/libopts/libopts.la
 tests/mini-loss-time
+tests/dtls/dtls-stress
+doc/gnutls.epub
+doc/gnutls.xml
