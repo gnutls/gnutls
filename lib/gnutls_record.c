@@ -731,7 +731,7 @@ unexpected_packet:
   if (IS_DTLS(session) && ret != GNUTLS_E_REHANDSHAKE)
     {
       _mbuffer_xfree(&bufel);
-      RETURN_DTLS_EAGAIN_OR_TIMEOUT(session);
+      RETURN_DTLS_EAGAIN_OR_TIMEOUT(session, ret);
     }
 
 cleanup:

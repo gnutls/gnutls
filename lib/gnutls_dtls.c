@@ -388,7 +388,7 @@ nb_timeout:
   if (buf != NULL)
     gnutls_free(buf);
 
-  RETURN_DTLS_EAGAIN_OR_TIMEOUT(session);
+  RETURN_DTLS_EAGAIN_OR_TIMEOUT(session, ret);
 }
 
 /* Waits for the last flight or retransmits
@@ -409,7 +409,7 @@ int ret;
       ret = _dtls_retransmit(session);
       if (ret == 0)
         {
-          RETURN_DTLS_EAGAIN_OR_TIMEOUT(session);
+          RETURN_DTLS_EAGAIN_OR_TIMEOUT(session, 0);
         }
       else
         return gnutls_assert_val(ret);

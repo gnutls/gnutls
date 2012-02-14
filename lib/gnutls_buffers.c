@@ -961,7 +961,7 @@ handshake_buffer_st* recv_buf = session->internals.handshake_recv_buffer;
     }
 
 timeout:
-  RETURN_DTLS_EAGAIN_OR_TIMEOUT(session);
+  RETURN_DTLS_EAGAIN_OR_TIMEOUT(session, 0);
 }
 
 /* This is a receive function for the gnutls handshake 

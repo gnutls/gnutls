@@ -42,7 +42,7 @@ inline static unsigned int timespec_sub_ms(struct timespec *a, struct timespec *
           (b->tv_sec * 1000 + b->tv_nsec / (1000 * 1000)));
 }
 
-#define RETURN_DTLS_EAGAIN_OR_TIMEOUT(session) { \
+#define RETURN_DTLS_EAGAIN_OR_TIMEOUT(session, r) { \
   struct timespec now; \
   unsigned int diff; \
   gettime(&now); \
@@ -55,9 +55,12 @@ inline static unsigned int timespec_sub_ms(struct timespec *a, struct timespec *
     } \
   else \
     { \
+      int rr; \
+      if (r != GNUTLS_E_INTERRUPTED) rr = GNUTLS_E_AGAIN; \
+      else rr = r; \
       if (session->internals.dtls.blocking != 0) \
         millisleep(50); \
-      return gnutls_assert_val(GNUTLS_E_AGAIN); \
+      return gnutls_assert_val(rr); \
     } \
   }
 
