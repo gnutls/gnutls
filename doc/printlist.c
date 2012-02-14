@@ -25,9 +25,12 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
+#include "common.h"
 
 static void main_texinfo (void);
 static void main_latex(void);
+
+char buffer[1024];
 
 int
 main (int argc, char *argv[])
@@ -58,7 +61,7 @@ static void main_texinfo (void)
                  (i, id, &kx, &cipher, &mac, &version)); i++)
       {
         printf ("@item %s\n@tab 0x%02X 0x%02X\n@tab %s\n",
-                name,
+                escape_texi_string(name, buffer, sizeof(buffer)),
                 (unsigned char) id[0], (unsigned char) id[1],
                 gnutls_protocol_get_name (version));
       }
@@ -185,28 +188,6 @@ static const char headers[] = "\\tablefirsthead{%\n"
 	"\\tablelasttail{\\hline}\n"
 	"\\bottomcaption{The ciphersuites table}\n\n";
 
-static char* escape_string( const char* str)
-{
-static char buffer[500];
-int i = 0, j = 0;
-
-
-while( str[i] != 0 && j < sizeof(buffer) - 1) {
-   if (str[i]=='_') {
-      buffer[j++] = '\\';
-      buffer[j++] = '_';
-   } else {
-      buffer[j++] = str[i];
-   }
-   i++;
-};
-
-buffer[j] = 0;
-
-return buffer;
-
-}
-
 static void main_latex(void)
 {
 int i, j;
@@ -230,7 +211,7 @@ printf("\\begin{supertabular}{|p{.64\\linewidth}|p{.12\\linewidth}|p{.09\\linewi
                  (i, id, &kx, &cipher, &mac, &version)); i++)
       {
         printf ("{\\small{%s}} & \\code{0x%02X 0x%02X} & %s",
-                escape_string(name),
+                escape_string(name, buffer, sizeof(buffer)),
                 (unsigned char) id[0], (unsigned char) id[1],
                 gnutls_protocol_get_name (version));
         printf( "\\\\\n");

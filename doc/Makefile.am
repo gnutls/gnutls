@@ -306,13 +306,13 @@ AM_CPPFLAGS = \
 
 EXTRA_PROGRAMS = errcodes printlist alert-printlist
 
-errcodes_SOURCES = errcodes.c
+errcodes_SOURCES = errcodes.c common.c common.h
 errcodes_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 
-printlist_SOURCES = printlist.c
+printlist_SOURCES = printlist.c common.c common.h
 printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 
-alert_printlist_SOURCES = alert-printlist.c
+alert_printlist_SOURCES = alert-printlist.c common.c common.h
 alert_printlist_LDADD = ../lib/libgnutls.la ../gl/libgnu.la
 
 error_codes.texi: $(top_srcdir)/lib/gnutls_errors.c $(srcdir)/errcodes.c

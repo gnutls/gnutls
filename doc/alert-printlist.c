@@ -25,9 +25,12 @@
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include <gnutls/openpgp.h>
+#include "common.h"
 
 static void main_texinfo (void);
 static void main_latex(void);
+
+char buffer[1024];
 
 int
 main (int argc, char *argv[])
@@ -56,7 +59,7 @@ static void main_texinfo (void)
       {
         if (gnutls_alert_get_strname(i)==NULL) continue;
         printf ("@item %s\n@tab %d\n@tab %s\n",
-                gnutls_alert_get_strname(i),
+                escape_texi_string(gnutls_alert_get_strname(i), buffer, sizeof(buffer)),
                 (unsigned int) i, gnutls_alert_get_name (i));
       }
     printf ("@end multitable\n");
@@ -81,28 +84,6 @@ static const char headers[] = "\\tablefirsthead{%\n"
 	"\\tablelasttail{\\hline}\n"
 	"\\bottomcaption{The TLS alert table}\n\n";
 
-static char* escape_string( const char* str)
-{
-static char buffer[500];
-int i = 0, j = 0;
-
-
-while( str[i] != 0 && j < sizeof(buffer) - 1) {
-   if (str[i]=='_') {
-      buffer[j++] = '\\';
-      buffer[j++] = '_';
-   } else {
-      buffer[j++] = str[i];
-   }
-   i++;
-};
-
-buffer[j] = 0;
-
-return buffer;
-
-}
-
 static void main_latex(void)
 {
 int i, j;
@@ -125,7 +106,7 @@ printf("\\begin{supertabular}{|p{.50\\linewidth}|p{.07\\linewidth}|p{.34\\linewi
       {
         if (gnutls_alert_get_strname(i)==NULL) continue;
         printf ("{\\small{%s}} & \\code{%d} & %s",
-                escape_string(gnutls_alert_get_strname(i)),
+                escape_string(gnutls_alert_get_strname(i), buffer, sizeof(buffer)),
                 (unsigned int) i, gnutls_alert_get_name (i));
         printf( "\\\\\n");
       }
