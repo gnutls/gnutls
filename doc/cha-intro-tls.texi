@@ -270,7 +270,7 @@ application protocol solely (e.g. @code{GNUTLS_@-A_@-USER_@-CANCELLED}).  An
 alert signal includes a level indication which may be either fatal or
 warning. Fatal alerts always terminate the current connection, and
 prevent future re-negotiations using the current session ID. All alert
-messages are summarized in @ref{tab:alerts}.
+messages are summarized in the table below.
 
 The alert messages are protected by the record protocol, thus the
 information that is included does not leak. You must take extreme care
