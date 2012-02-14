@@ -627,7 +627,7 @@ record_add_to_buffers (gnutls_session_t session,
           if (!(IS_DTLS(session)))
             return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
             
-          _gnutls_record_buffer_put (session, type, seq, bufel);
+          _gnutls_record_buffer_put (session, recv->type, seq, bufel);
 
           break;
         case GNUTLS_APPLICATION_DATA:
