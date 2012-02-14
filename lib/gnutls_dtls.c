@@ -134,7 +134,8 @@ static int drop_usage_count(gnutls_session_t session, mbuffer_head_st *const sen
   return 0;
 }
 
-#define RETRANSMIT_WINDOW 2
+/* in ms */
+#define RETRANSMIT_WINDOW 600
 
 /* This function is to be called from record layer once
  * a handshake replay is detected. It will make sure
@@ -143,18 +144,33 @@ static int drop_usage_count(gnutls_session_t session, mbuffer_head_st *const sen
  */
 int _dtls_retransmit(gnutls_session_t session)
 {
-time_t now = gnutls_time (0);
+  return _dtls_transmit(session);
+}
+
+/* Checks whether the received packet contains a handshake
+ * packet with sequence higher that the previously received.
+ * It must be called only when an actual packet has been
+ * received.
+ *
+ * Returns: 0 if expected, negative value otherwise.
+ */
+static int is_next_hpacket_expected(gnutls_session_t session)
+{
 int ret;
 
-  if (now - session->internals.dtls.last_retransmit > RETRANSMIT_WINDOW)
-    {
-      ret = _dtls_transmit(session);
-      session->internals.dtls.last_retransmit = now;
-      return ret;
-    }
-  else
-    return 0;
+  /* htype is arbitrary */
+  ret = _gnutls_recv_in_buffers(session, GNUTLS_HANDSHAKE, GNUTLS_HANDSHAKE_FINISHED);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+  
+  ret = _gnutls_parse_record_buffered_msgs(session);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
+  if (session->internals.handshake_recv_buffer_size > 0)
+    return 0;
+  else
+    return gnutls_assert_val(GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET);
 }
 
 #define UPDATE_TIMER { \
@@ -216,10 +232,23 @@ unsigned int timeout;
                   goto nb_timeout;
                 }
             }
-          else /* received ack */
+          else /* received something */
             {
-              ret = 0;
-              goto end_flight;
+              if (ret == 0)
+                {
+                  ret = is_next_hpacket_expected(session);
+                  if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED)
+                    goto nb_timeout;
+                  if (ret < 0 && ret != GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET)
+                    {
+                      gnutls_assert();
+                      goto cleanup;
+                    }
+                  if (ret == 0) goto end_flight;
+                  /* if ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET retransmit */
+                }
+              else
+                goto nb_timeout;
             }
         }
       else /* last flight of an async party. Return immediately. */
@@ -236,19 +265,23 @@ unsigned int timeout;
           goto end_flight;
         }
 
-      _gnutls_dtls_log ("DTLS[%p]: %sStart of flight transmission.\n", session,  (session->internals.dtls.flight_init == 0)?"":"re-");
-
-      for (cur = send_buffer->head;
-           cur != NULL; cur = cur->next)
+      diff = timespec_sub_ms(&now, &session->internals.dtls.last_retransmit);
+      if (session->internals.dtls.flight_init == 0 || diff >= RETRANSMIT_WINDOW)
         {
-          ret = transmit_message (session, cur, &buf);
-          if (ret < 0)
+          _gnutls_dtls_log ("DTLS[%p]: %sStart of flight transmission.\n", session,  (session->internals.dtls.flight_init == 0)?"":"re-");
+          for (cur = send_buffer->head;
+               cur != NULL; cur = cur->next)
             {
-              gnutls_assert();
-              goto end_flight;
-            }
+              ret = transmit_message (session, cur, &buf);
+              if (ret < 0)
+                {
+                  gnutls_assert();
+                  goto end_flight;
+                }
 
-          last_type = cur->htype;
+              last_type = cur->htype;
+            }
+          gettime(&session->internals.dtls.last_retransmit);
         }
 
       if (session->internals.dtls.flight_init == 0)
@@ -304,8 +337,28 @@ unsigned int timeout;
                   goto nb_timeout;
                 }
             }
+          
+          if (ret == 0)
+            {
+              ret = is_next_hpacket_expected(session);
+              if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED)
+                goto nb_timeout;
+
+              if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET)
+                {
+                  ret = GNUTLS_E_TIMEDOUT;
+                  goto keep_up;
+                }
+              if (ret < 0)
+                {
+                  gnutls_assert();
+                  goto cleanup;
+                }
+              goto end_flight;
+            }
         }
 
+keep_up:
       gettime(&now);
     } while(ret == GNUTLS_E_TIMEDOUT);
 

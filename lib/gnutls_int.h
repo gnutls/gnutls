@@ -605,6 +605,7 @@ typedef struct
 
   /* For DTLS handshake fragmentation and reassembly. */
   uint16_t hsk_write_seq;
+  /* the sequence number of the expected packet */
   unsigned int hsk_read_seq;
   uint16_t mtu;
 
@@ -638,7 +639,7 @@ typedef struct
   time_t async_term;
   
   /* last retransmission triggered by record layer */
-  time_t last_retransmit;
+  struct timespec last_retransmit;
   unsigned int packets_dropped;
 } dtls_st;
 

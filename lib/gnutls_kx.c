@@ -448,7 +448,7 @@ _gnutls_recv_server_kx_message (gnutls_session_t session)
 {
   gnutls_buffer_st buf;
   int ret = 0;
-  optional_t optflag = MANDATORY_PACKET;
+  unsigned int optflag = 0;
 
   if (session->internals.auth_struct->gnutls_process_server_kx != NULL)
     {
@@ -464,7 +464,7 @@ _gnutls_recv_server_kx_message (gnutls_session_t session)
 
       /* Server key exchange packet is optional for PSK. */
       if (_gnutls_session_is_psk (session))
-        optflag = OPTIONAL_PACKET;
+        optflag = 1;
 
       ret =
         _gnutls_recv_handshake (session, 
@@ -505,7 +505,7 @@ _gnutls_recv_server_certificate_request (gnutls_session_t session)
       ret =
         _gnutls_recv_handshake (session, 
                                 GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST,
-                                OPTIONAL_PACKET, &buf);
+                                1, &buf);
       if (ret < 0)
         return ret;
 
@@ -541,7 +541,7 @@ _gnutls_recv_client_kx_message (gnutls_session_t session)
       ret =
         _gnutls_recv_handshake (session, 
                                 GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE,
-                                MANDATORY_PACKET, &buf);
+                                0, &buf);
       if (ret < 0)
         return ret;
 
@@ -578,9 +578,9 @@ _gnutls_recv_client_certificate (gnutls_session_t session)
     }
 
   if (session->internals.send_cert_req == GNUTLS_CERT_REQUIRE)
-    optional = MANDATORY_PACKET;
+    optional = 0;
   else
-    optional = OPTIONAL_PACKET;
+    optional = 1;
 
   ret =
     _gnutls_recv_handshake (session, GNUTLS_HANDSHAKE_CERTIFICATE_PKT, 
@@ -592,7 +592,7 @@ _gnutls_recv_client_certificate (gnutls_session_t session)
        * a warning alert instead of an empty certificate to indicate
        * no certificate.
        */
-      if (optional == OPTIONAL_PACKET &&
+      if (optional != 0 &&
           ret == GNUTLS_E_WARNING_ALERT_RECEIVED &&
           gnutls_protocol_get_version (session) == GNUTLS_SSL3 &&
           gnutls_alert_get (session) == GNUTLS_A_SSL3_NO_CERTIFICATE)
@@ -609,7 +609,7 @@ _gnutls_recv_client_certificate (gnutls_session_t session)
        */
       if ((ret == GNUTLS_E_WARNING_ALERT_RECEIVED
            || ret == GNUTLS_E_FATAL_ALERT_RECEIVED)
-          && optional == MANDATORY_PACKET)
+          && optional == 0)
         {
           gnutls_assert ();
           return GNUTLS_E_NO_CERTIFICATE_FOUND;
@@ -618,7 +618,7 @@ _gnutls_recv_client_certificate (gnutls_session_t session)
       return ret;
     }
 
-  if (ret == 0 && buf.length == 0 && optional == OPTIONAL_PACKET)
+  if (ret == 0 && buf.length == 0 && optional != 0)
     {
       /* Client has not sent the certificate message.
        * well I'm not sure we should accept this
@@ -641,7 +641,7 @@ _gnutls_recv_client_certificate (gnutls_session_t session)
 
   /* ok we should expect a certificate verify message now 
    */
-  if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND && optional == OPTIONAL_PACKET)
+  if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND && optional != 0)
     ret = 0;
   else
     session->key->certificate_requested = 1;
@@ -664,7 +664,7 @@ _gnutls_recv_server_certificate (gnutls_session_t session)
       ret =
         _gnutls_recv_handshake (session, 
                                 GNUTLS_HANDSHAKE_CERTIFICATE_PKT,
-                                MANDATORY_PACKET, &buf);
+                                0, &buf);
       if (ret < 0)
         {
           gnutls_assert ();
@@ -709,7 +709,7 @@ _gnutls_recv_client_certificate_verify_message (gnutls_session_t session)
   ret =
     _gnutls_recv_handshake (session, 
                             GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY,
-                            OPTIONAL_PACKET, &buf);
+                            1, &buf);
   if (ret < 0)
     return ret;
 

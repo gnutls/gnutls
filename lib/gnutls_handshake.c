@@ -678,7 +678,7 @@ _gnutls_recv_finished (gnutls_session_t session)
 
   ret =
     _gnutls_recv_handshake (session, GNUTLS_HANDSHAKE_FINISHED, 
-      MANDATORY_PACKET, &buf);
+                            0, &buf);
   if (ret < 0)
     {
       ERR ("recv finished int", ret);
@@ -1251,24 +1251,20 @@ _gnutls_handshake_hash_add_sent (gnutls_session_t session,
 int
 _gnutls_recv_handshake (gnutls_session_t session, 
                         gnutls_handshake_description_t type,
-                        optional_t optional, gnutls_buffer_st* buf)
+                        unsigned int optional, gnutls_buffer_st* buf)
 {
   int ret;
   handshake_buffer_st hsk;
 
   ret =
-    _gnutls_handshake_io_recv_int (session, type, &hsk);
+    _gnutls_handshake_io_recv_int (session, type, &hsk, optional);
   if (ret < 0)
     {
-      if (optional == OPTIONAL_PACKET && ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET)
+      if (optional != 0 && ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET)
         {
           if (buf) _gnutls_buffer_init(buf);
           return 0;
         }
-
-       if (ret == GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET)
-        _gnutls_audit_log(session, "Received unexpected handshake message '%s' (%d). Expected '%s' (%d)\n",
-         _gnutls_handshake2str(hsk.htype), (int)hsk.htype, _gnutls_handshake2str(type), (int)type);
 
       return gnutls_assert_val_fatal(ret);
     }
@@ -2292,7 +2288,7 @@ _gnutls_recv_supplemental (gnutls_session_t session)
   _gnutls_debug_log ("EXT[%p]: Expecting supplemental data\n", session);
 
   ret = _gnutls_recv_handshake (session, GNUTLS_HANDSHAKE_SUPPLEMENTAL,
-                                OPTIONAL_PACKET, &buf);
+                                1, &buf);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -2464,7 +2460,7 @@ _gnutls_handshake_client (gnutls_session_t session)
           ret =
             _gnutls_recv_handshake (session, 
                   GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST,
-                  OPTIONAL_PACKET, NULL);
+                  1, NULL);
           STATE = STATE11;
           IMED_RET ("recv hello verify", ret, 1);
 
@@ -2479,7 +2475,7 @@ _gnutls_handshake_client (gnutls_session_t session)
       ret =
         _gnutls_recv_handshake (session,
                                 GNUTLS_HANDSHAKE_SERVER_HELLO,
-                                MANDATORY_PACKET, NULL);
+                                0, NULL);
       STATE = STATE2;
       IMED_RET ("recv hello", ret, 1);
 
@@ -2520,7 +2516,7 @@ _gnutls_handshake_client (gnutls_session_t session)
         ret =
           _gnutls_recv_handshake (session,
                                   GNUTLS_HANDSHAKE_SERVER_HELLO_DONE,
-                                  MANDATORY_PACKET, NULL);
+                                  0, NULL);
       STATE = STATE6;
       IMED_RET ("recv server hello done", ret, 1);
     case STATE71:
@@ -2757,7 +2753,7 @@ _gnutls_handshake_server (gnutls_session_t session)
       ret =
         _gnutls_recv_handshake (session,
                                 GNUTLS_HANDSHAKE_CLIENT_HELLO,
-                                MANDATORY_PACKET, NULL);
+                                0, NULL);
       STATE = STATE1;
       IMED_RET ("recv hello", ret, 1);
 

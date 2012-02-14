@@ -691,7 +691,7 @@ _gnutls_recv_new_session_ticket (gnutls_session_t session)
 
   ret = _gnutls_recv_handshake (session, 
                                 GNUTLS_HANDSHAKE_NEW_SESSION_TICKET,
-                                MANDATORY_PACKET, &buf);
+                                0, &buf);
   if (ret < 0)
     return gnutls_assert_val_fatal(ret);
 

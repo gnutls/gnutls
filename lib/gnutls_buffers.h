@@ -50,7 +50,7 @@ int _gnutls_handshake_io_cache_int (gnutls_session_t,
 ssize_t
 _gnutls_handshake_io_recv_int (gnutls_session_t session,
                                gnutls_handshake_description_t htype,
-                               handshake_buffer_st * hsk);
+                               handshake_buffer_st * hsk, unsigned int optional);
 
 ssize_t _gnutls_io_write_flush (gnutls_session_t session);
 int
@@ -87,6 +87,9 @@ int i;
     }
   session->internals.handshake_recv_buffer_size = 0;
 }
+
+int
+_gnutls_parse_record_buffered_msgs (gnutls_session_t session);
 
 ssize_t
 _gnutls_recv_in_buffers (gnutls_session_t session, content_type_t type,
