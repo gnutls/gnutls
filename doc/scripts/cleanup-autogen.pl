@@ -23,6 +23,7 @@ eval '(exit $?0)' && eval 'exec perl -wS "$0" ${1+"$@"}'
 my $line;
 my $init = 0;
 my $menu = 0;
+my $i = 0;
 
 while ($line = <>) {
   if ($line =~ /\@node/) {
@@ -50,4 +51,11 @@ while ($line = <>) {
   }
 
   print $line;
+  $i++;
 }
+
+if ($i < 2) {
+  exit 1;
+}
+
+exit 0;
