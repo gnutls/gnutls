@@ -115,7 +115,14 @@ mbuffer_st* bufel;
     return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
 
   if (type != bufel->type)
-    return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+    {
+      if (IS_DTLS(session))
+        _gnutls_audit_log(session, "Discarded unexpected %s (%d) packet (expecting: %s (%d))\n",
+                    _gnutls_packet2str(bufel->type), (int)bufel->type,
+                    _gnutls_packet2str(type), (int)type);
+      _mbuffer_head_remove_bytes(&session->internals.record_buffer, msg.size);
+      return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET);
+    }
 
   if (msg.size <= length)
     length = msg.size;

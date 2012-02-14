@@ -499,6 +499,13 @@ check_buffers (gnutls_session_t session, content_type_t type,
       ret = _gnutls_record_buffer_get (type, session, data, data_size, seq);
       if (ret < 0)
         {
+          if (IS_DTLS(session))
+            {
+              if (ret == GNUTLS_E_UNEXPECTED_PACKET)
+                {
+                  ret = GNUTLS_E_AGAIN;
+                }
+            }
           gnutls_assert ();
           return ret;
         }
