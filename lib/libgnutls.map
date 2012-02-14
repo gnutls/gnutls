@@ -772,6 +772,7 @@ GNUTLS_3_0_0 {
 	gnutls_priority_compression_list;
 	gnutls_priority_ecc_curve_list;
 	gnutls_verify_stored_pubkey;
+	gnutls_store_commitment;
 	gnutls_store_pubkey;
 } GNUTLS_2_12;
 

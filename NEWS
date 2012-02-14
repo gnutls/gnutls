@@ -50,6 +50,7 @@ a fork (if PKCS #11 functionality is desirable).
 ** API and ABI modifications:
 gnutls_verify_stored_pubkey: Added
 gnutls_store_pubkey: Added
+gnutls_store_commitment: Added
 gnutls_x509_crt_get_authority_key_gn_serial: Added
 gnutls_x509_crl_get_authority_key_gn_serial: Added
 gnutls_pkcs11_reinit: Added
