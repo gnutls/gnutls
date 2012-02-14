@@ -30,41 +30,57 @@ endif
 
 invoke-gnutls-cli.texi: ../src/cli-args.def
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
-	mv -f ../src/$@ ../doc
+	rm -f ../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@ && \
+	rm -f ../src/$@
 
 invoke-gnutls-cli-debug.texi: ../src/cli-debug-args.def
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
-	mv -f ../src/$@ ../doc
+	rm -f ../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@ && \
+	rm -f ../src/$@
 
 invoke-gnutls-serv.texi: ../src/serv-args.def
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
-	mv -f ../src/$@ ../doc
+	rm -f ../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@ && \
+	rm -f ../src/$@
 
 invoke-certtool.texi: ../src/certtool-args.def
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
-	mv -f ../src/$@ ../doc
-
-invoke-srptool.texi: ../src/srptool-args.def
-	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
-	sed -i 's/@subsection/@subsubsection/g' $@ && \
-	sed -i 's/@section/@subsection/g' $@ && \
-	mv -f ../src/$@ ../doc
+	rm -f ../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@ && \
+	rm -f ../src/$@
 
 invoke-ocsptool.texi: ../src/ocsptool-args.def
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
-	mv -f ../src/$@ ../doc
+	rm -f ../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@ && \
+	rm -f ../src/$@
+
+invoke-srptool.texi: ../src/srptool-args.def
+	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
+	rm -f ../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@ && \
+	rm -f ../src/$@ && \
+	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
+	sed -i 's/@section/@subsection/g' ../doc/$@
 
 invoke-psktool.texi: ../src/psk-args.def
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
-	sed -i 's/@subsection/@subsubsection/g' $@ && \
-	sed -i 's/@section/@subsection/g' $@ && \
-	mv -f ../src/$@ ../doc
+	rm -f ../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@ && \
+	rm -f ../src/$@ && \
+	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
+	sed -i 's/@section/@subsection/g' ../doc/$@
 
 invoke-p11tool.texi: ../src/p11tool-args.def
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
-	sed -i 's/@subsection/@subsubsection/g' $@ && \
-	sed -i 's/@section/@subsection/g' $@ && \
-	mv -f ../src/$@ ../doc
+	rm -f ../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@ && \
+	rm -f ../src/$@ && \
+	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
+	sed -i 's/@section/@subsection/g' ../doc/$@
 
 info_TEXINFOS = gnutls.texi gnutls-guile.texi
 gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\

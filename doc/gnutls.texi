@@ -49,7 +49,7 @@ Documentation License''.
 @subtitle Transport Layer Security Library for the GNU system
 @subtitle for version @value{VERSION}, @value{UPDATED}
 @sp 7
-@image{gnutls-logo,6cm,6cm}
+@center @image{gnutls-logo,6cm,6cm}
 @author Nikos Mavrogiannopoulos
 @author Simon Josefsson (@email{bug-gnutls@@gnu.org})
 @page
@@ -160,13 +160,13 @@ Documentation License''.
 * Internal architecture of GnuTLS::
 * Support::
 * Error codes::
-* API reference::
 * Supported ciphersuites::
+* API reference::
 * Copying Information::
-* Concept Index::
-* Function and Data Index::
-@c * @mybibnode{}::
 * Bibliography::
+* Function and Data Index::
+* Concept Index::
+@c * @mybibnode{}::
 @end menu
 
 @include cha-preface.texi
@@ -195,9 +195,9 @@ Documentation License''.
 
 @include cha-errors.texi
 
-@include cha-functions.texi
-
 @include cha-ciphersuites.texi
+
+@include cha-functions.texi
 
 @include cha-copying.texi
 
