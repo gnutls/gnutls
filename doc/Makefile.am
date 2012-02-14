@@ -28,56 +28,83 @@ if ENABLE_GTK_DOC
 SUBDIRS += reference
 endif
 
-invoke-gnutls-cli.texi: ../src/cli-args.def
+SRC_DEF_CLI = 
+SRC_DEF_CLI_DEBUG = 
+SRC_DEF_SERV = 
+SRC_DEF_CERTTOOL = 
+SRC_DEF_OCSPTOOL = 
+SRC_DEF_SRPTOOL = 
+SRC_DEF_PSKTOOL = 
+SRC_DEF_P11TOOL = 
+if WANT_TEST_SUITE
+SRC_DEF_CLI += ../src/cli-args.def
+SRC_DEF_CLI_DEBUG += ../src/cli-debug-args.def
+SRC_DEF_SERV += ../src/serv-args.def
+SRC_DEF_CERTTOOL += ../src/certtool-args.def
+SRC_DEF_OCSPTOOL += ../src/ocsptool-args.def
+SRC_DEF_SRPTOOL += ../src/srptool-args.def
+SRC_DEF_PSKTOOL += ../src/psk-args.def
+SRC_DEF_P11TOOL += ../src/p11tool-args.def
+endif
+
+invoke-gnutls-cli.texi: $(SRC_DEF_CLI)
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
-	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
+	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@
 
-invoke-gnutls-cli-debug.texi: ../src/cli-debug-args.def
+invoke-gnutls-cli-debug.texi: $(SRC_DEF_CLI_DEBUG)
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
-	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
+	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@
 
-invoke-gnutls-serv.texi: ../src/serv-args.def
+invoke-gnutls-serv.texi: $(SRC_DEF_SERV)
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
-	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
+	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@
 
-invoke-certtool.texi: ../src/certtool-args.def
+invoke-certtool.texi: $(SRC_DEF_CERTTOOL)
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
-	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
+	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@
 
-invoke-ocsptool.texi: ../src/ocsptool-args.def
+invoke-ocsptool.texi: $(SRC_DEF_OCSPTOOL)
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
-	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
+	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@
 
-invoke-srptool.texi: ../src/srptool-args.def
+invoke-srptool.texi: $(SRC_DEF_SRPTOOL)
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
-	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
+	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@ && \
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
 	sed -i 's/@section/@subsection/g' ../doc/$@
 
-invoke-psktool.texi: ../src/psk-args.def
+invoke-psktool.texi: $(SRC_DEF_PSKTOOL)
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
-	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
+	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@ && \
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
 	sed -i 's/@section/@subsection/g' ../doc/$@
 
-invoke-p11tool.texi: ../src/p11tool-args.def
+invoke-p11tool.texi: $(SRC_DEF_P11TOOL)
 	@-cd ../src/ && autogen -Tagtexi-cmd.tpl $< && \
 	rm -f ../doc/$@ && \
-	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@ && \
+	../doc/scripts/cleanup-autogen.pl <../src/$@ >../doc/$@.tmp && \
+	mv -f ../doc/$@.tmp ../doc/$@ && \
 	rm -f ../src/$@ && \
 	sed -i 's/@subheading/@subsubheading/g' ../doc/$@ && \
 	sed -i 's/@section/@subsection/g' ../doc/$@
