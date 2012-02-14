@@ -21,7 +21,7 @@
 
 SUBDIRS = . rsa-md5-collision pkcs1-padding pkcs8-decode pkcs12-decode	\
 	userid cert-tests key-id sha2 safe-renegotiation dsa scripts ecdsa \
-	slow
+	slow dtls
 
 if ENABLE_OPENPGP
 SUBDIRS += openpgp-certs
