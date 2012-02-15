@@ -226,7 +226,7 @@ unsigned int timeout;
             {
               /* if no retransmission is required yet just return 
                */
-              if (timespec_sub_ms(&now, &session->internals.dtls.handshake_start_time) < session->internals.dtls.actual_retrans_timeout_ms)
+              if (timespec_sub_ms(&now, &session->internals.dtls.last_retransmit) < session->internals.dtls.actual_retrans_timeout_ms)
                 {
                   gnutls_assert();
                   goto nb_timeout;
@@ -251,8 +251,6 @@ unsigned int timeout;
                 goto nb_timeout;
             }
         }
-      else /* last flight of an async party. Return immediately. */
-        return ret;
     }
 
   do 
