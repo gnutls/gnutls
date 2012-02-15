@@ -286,28 +286,31 @@ consult @xcite{RFC2818} and section @ref{ex:verify} for an example.
 @tindex gnutls_certificate_verify_flags
 
 It is possible to use a trust on first use (similar to SSH) authentication 
-method in GnuTLS. That means that having seen and associated a public key 
-with a host is enough to trust it on the subsequent connections. Such
-a system in combination with the normal CA verification, and OCSP verification,
+method in GnuTLS. That is the concept used by the SSH programs, where the 
+public key of the peer is not verified, or verified in an out-of-bound way,
+but subsequent connections to the same peer require the public key to 
+remain the same.  Such a system in combination with the typical CA 
+verification of a certificate, and OCSP revocation checks,
 can help to provide multiple factor verification, where a single point of
 failure is not enough to compromise the system. For example a server compromise
 may be detected using OCSP, and a CA compromise can be detected using
 the trust on first use method.
-Such a hybrid system with X.509 and SSH authentication is 
+Such a hybrid system with X.509 and trust on first use authentication is 
 shown in @ref{Simple client example with SSH-style certificate verification}.
 
 @showfuncdesc{gnutls_verify_stored_pubkey}
 @showfuncdesc{gnutls_store_pubkey}
+
+In addition to the above the @funcref{gnutls_store_commitment} can be 
+used to implement a key-pinning architecture as in @xcite{KEYPIN}. 
+This provides a way for web server to commit on a public key that is
+not yet active.
+
 @showfuncdesc{gnutls_store_commitment}
 
-The @funcref{gnutls_store_commitment} may be used to implement a
-key-pinning architecture as in @xcite{KEYPIN}.
-http://tools.ietf.org/html/draft-ietf-websec-key-pinning-01
-
 The storage and verification functions may be used with the default
-text file based backend, or another backend may be specified. Such
-backend should contain a storage and a retrieval function. The format
-of those functions is shown below.
+text file based back-end, or another back-end may be specified. That
+should contain storage and retrieval functions as shown below.
 @example
   typedef int (*gnutls_trust_db_store_func) (const char* db_name, 
                                              const char* host,
