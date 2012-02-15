@@ -74,7 +74,7 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_rsa_export.c gnutls_helper.c gnutls_supplemental.c	\
 	random.c crypto-api.c gnutls_privkey.c gnutls_pcert.c		\
 	gnutls_pubkey.c locks.c hash.c gnutls_dtls.c system_override.c	\
-	crypto-backend.c verify-ssh.c
+	crypto-backend.c verify-tofu.c
 
 if ENABLE_PKCS11
 COBJECTS += pkcs11.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c

@@ -282,6 +282,7 @@ consult @xcite{RFC2818} and section @ref{ex:verify} for an example.
 @cindex verifying certificate paths
 @cindex SSH-style authentication
 @cindex Trust on first use
+@cindex Key pinning
 @tindex gnutls_certificate_verify_flags
 
 It is possible to use a trust on first use (similar to SSH) authentication 
@@ -318,7 +319,7 @@ of those functions is shown below.
                                              const char* service,
                                              time_t expiration,
                                              gnutls_digest_algorithm_t halgo,
-                                             const char* hash);  
+                                             const gnutls_datum_t* hash);
 
   typedef int (*gnutls_trust_db_retr_func) (const char* db_name, 
                                             const char* host,

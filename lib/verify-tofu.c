@@ -46,7 +46,7 @@ static
 int store_commitment(const char* db_name, const char* host,
                  const char* service, time_t expiration, 
                  gnutls_digest_algorithm_t hash_algo,
-                 const char* hash);
+                 const gnutls_datum_t* hash);
 static 
 int store_pubkey(const char* db_name, const char* host,
                  const char* service, time_t expiration, const gnutls_datum_t* pubkey);
@@ -536,9 +536,10 @@ static
 int store_commitment(const char* db_name, const char* host,
                  const char* service, time_t expiration, 
                  gnutls_digest_algorithm_t hash_algo,
-                 const char* hash)
+                 const gnutls_datum_t* hash)
 {
 FILE* fd;
+char buffer[MAX_HASH_SIZE*2+1];
 
   fd = fopen(db_name, "ab+");
   if (fd == NULL)
@@ -548,7 +549,7 @@ FILE* fd;
   if (host == NULL) host = "*";
 
   fprintf(fd, "|c0|%s|%s|%lu|%u|%s\n", host, service, (unsigned long)expiration, 
-          (unsigned)hash_algo, hash);
+          (unsigned)hash_algo, _gnutls_bin2hex(hash->data, hash->size, buffer, sizeof(buffer), NULL));
   
   fclose(fd);
   
@@ -647,7 +648,7 @@ cleanup:
  * @host: The peer's name
  * @service: non-NULL if this key is specific to a service (e.g. http)
  * @hash_algo: The hash algorithm type
- * @hash: The hex-encoded hash
+ * @hash: The raw hash
  * @expiration: The expiration time (use 0 to disable expiration)
  * @flags: should be 0.
  *
@@ -672,7 +673,7 @@ gnutls_store_commitment(const char* db_name,
                     const char* host,
                     const char* service,
                     gnutls_digest_algorithm_t hash_algo,
-                    const char* hash,
+                    const gnutls_datum_t* hash,
                     time_t expiration,
                     unsigned int flags)
 {
@@ -682,7 +683,10 @@ char local_file[MAX_FILENAME];
 
   if (hash_algo == GNUTLS_DIG_MD5 || hash_algo == GNUTLS_DIG_MD2)
     return gnutls_assert_val(GNUTLS_E_ILLEGAL_PARAMETER);
-  
+    
+  if (_gnutls_hash_get_algo_len(hash_algo) != hash->size)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
   if (db_name == NULL && tdb == NULL)
     {
       ret = _gnutls_find_config_path(local_file, sizeof(local_file));

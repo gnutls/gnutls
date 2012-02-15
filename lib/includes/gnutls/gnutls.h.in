@@ -1671,7 +1671,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                              const char* service,
                                              time_t expiration,
                                              gnutls_digest_algorithm_t hash_algo,
-                                             const char* hash);
+                                             const gnutls_datum_t* hash);
   
   /* searches for the provided host/service pair that match the
    * provided public key in the database. */
@@ -1698,7 +1698,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                     const char* host,
                     const char* service,
                     gnutls_digest_algorithm_t hash_algo,
-                    const char* hash,
+                    const gnutls_datum_t* hash,
                     time_t expiration,
                     unsigned int flags);
 
