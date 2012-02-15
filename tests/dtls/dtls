@@ -32,5 +32,6 @@ fi
 ./dtls-stress -shello 021 -sfinished 01 -cfinished 201 SHello SHelloDone CChangeCipherSpec SChangeCipherSpec SFinished
 ./dtls-stress -shello 102 -sfinished 01 -cfinished 120 SHello SHelloDone CKeyExchange CFinished SChangeCipherSpec SFinished
 ./dtls-stress -shello 210 -sfinished 01 -cfinished 201 CChangeCipherSpec SChangeCipherSpec SFinished
+./dtls-stress -shello 021 -sfinished 10 -cfinished 210 SHello SHelloDone SChangeCipherSpec CChangeCipherSpec CFinished
 
 exit 0
