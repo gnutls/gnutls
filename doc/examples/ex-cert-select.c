@@ -59,6 +59,8 @@ load_file (const char *file)
       || !(ptr = malloc ((size_t) filelen))
       || fread (ptr, 1, (size_t) filelen, f) < (size_t) filelen)
     {
+      if (f)
+        fclose (f);
       return loaded_file;
     }
 
