@@ -34,6 +34,7 @@
 #include <base64.h>
 #include <gnutls/abstract.h>
 #include <system.h>
+#include <locks.h>
 
 static int raw_pubkey_to_base64(const gnutls_datum_t* raw, gnutls_datum_t * b64);
 static int x509_crt_to_raw_pubkey(const gnutls_datum_t * cert, gnutls_datum_t *rpubkey);
@@ -53,6 +54,8 @@ int store_pubkey(const char* db_name, const char* host,
 
 static int find_config_file(char* file, size_t max_size);
 #define MAX_FILENAME 512
+
+void *_gnutls_file_mutex;
 
 static const trust_storage_st default_storage =
 {
@@ -502,12 +505,19 @@ int store_pubkey(const char* db_name, const char* host,
                  const gnutls_datum_t* pubkey)
 {
 FILE* fd = NULL;
-gnutls_datum_t b64key;
+gnutls_datum_t b64key = { NULL, 0 };
 int ret;
+
+  ret = gnutls_mutex_lock(&_gnutls_file_mutex);
+  if (ret != 0)
+    return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 
   ret = raw_pubkey_to_base64(pubkey, &b64key);
   if (ret < 0)
-    return gnutls_assert_val(ret);
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
 
   fd = fopen(db_name, "ab+");
   if (fd == NULL)
@@ -527,6 +537,8 @@ int ret;
 cleanup:
   if (fd != NULL)
     fclose(fd);
+
+  gnutls_mutex_unlock(&_gnutls_file_mutex);
   gnutls_free(b64key.data);
   
   return ret;
@@ -574,8 +586,6 @@ char buffer[MAX_HASH_SIZE*2+1];
  * The @tdb variable if non-null specifies a custom backend for
  * the storage and retrieval of entries. If it is NULL then the
  * default file backend will be used.
- *
- * Note that this function is not thread safe with the default backend.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
