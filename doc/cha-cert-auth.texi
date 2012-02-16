@@ -312,30 +312,22 @@ The storage and verification functions may be used with the default
 text file based back-end, or another back-end may be specified. That
 should contain storage and retrieval functions as shown below.
 @example
-  typedef int (*gnutls_trust_db_store_func) (const char* db_name, 
-                                             const char* host,
-                                             const char* service,
-                                             time_t expiration,
-                                             const gnutls_datum_t* pubkey);
-  typedef int (*gnutls_trust_db_store_commitment_func) (const char* db_name,
+  typedef int (*gnutls_tdb_store_func) (const char* db_name, 
+                                        const char* host,
+                                        const char* service,
+                                        time_t expiration,
+                                        const gnutls_datum_t* pubkey);
+  typedef int (*gnutls_tdb_store_commitment_func) (const char* db_name,
                                              const char* host,
                                              const char* service,
                                              time_t expiration,
                                              gnutls_digest_algorithm_t halgo,
                                              const gnutls_datum_t* hash);
 
-  typedef int (*gnutls_trust_db_retr_func) (const char* db_name, 
-                                            const char* host,
-                                            const char* service,
-                                            const gnutls_datum_t *pubkey);
-  
-  typedef struct 
-    @{
-       gnutls_trust_db_store_func store;
-       gnutls_trust_db_store_commitment_func cstore;
-       gnutls_trust_db_retr_func retrieve;
-    @} 
-  trust_storage_st;
+  typedef int (*gnutls_tdb_retr_func) (const char* db_name, 
+                                       const char* host,
+                                       const char* service,
+                                       const gnutls_datum_t *pubkey);
 @end example
 
 @node OpenPGP certificates

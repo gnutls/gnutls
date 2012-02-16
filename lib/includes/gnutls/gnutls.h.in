@@ -1660,13 +1660,13 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 
   /* stores the provided information to a database
    */
-  typedef int (*gnutls_trust_db_store_func) (const char* db_name, 
+  typedef int (*gnutls_tdb_store_func) (const char* db_name, 
                                              const char* host,
                                              const char* service,
                                              time_t expiration,
                                              const gnutls_datum_t* pubkey);
 
-  typedef int (*gnutls_trust_db_store_commitment_func) (const char* db_name, 
+  typedef int (*gnutls_tdb_store_commitment_func) (const char* db_name, 
                                              const char* host,
                                              const char* service,
                                              time_t expiration,
@@ -1675,26 +1675,21 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   
   /* searches for the provided host/service pair that match the
    * provided public key in the database. */
-  typedef int (*gnutls_trust_db_retr_func) (const char* db_name, 
+  typedef int (*gnutls_tdb_retr_func) (const char* db_name, 
                                             const char* host,
                                             const char* service,
                                             const gnutls_datum_t *pubkey);
   
-  typedef struct {
-    gnutls_trust_db_store_func store;
-    gnutls_trust_db_store_commitment_func cstore;
-    gnutls_trust_db_retr_func retrieve;
-  } trust_storage_st;
 
   int gnutls_verify_stored_pubkey(const char* db_name, 
-                            const trust_storage_st * tdb,
+                            gnutls_tdb_retr_func retrieve,
                             const char* host,
                             const char* service,
                             gnutls_certificate_type_t cert_type,
                             const gnutls_datum_t * cert, unsigned int flags);
 
   int gnutls_store_commitment(const char* db_name,
-                    const trust_storage_st * tdb,
+                    gnutls_tdb_store_commitment_func ctore,
                     const char* host,
                     const char* service,
                     gnutls_digest_algorithm_t hash_algo,
@@ -1703,7 +1698,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                     unsigned int flags);
 
   int gnutls_store_pubkey(const char* db_name,
-                    const trust_storage_st * tdb,
+                    gnutls_tdb_store_func store,
                     const char* host,
                     const char* service,
                     gnutls_certificate_type_t cert_type,

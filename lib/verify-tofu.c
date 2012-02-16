@@ -39,7 +39,7 @@
 static int raw_pubkey_to_base64(const gnutls_datum_t* raw, gnutls_datum_t * b64);
 static int x509_crt_to_raw_pubkey(const gnutls_datum_t * cert, gnutls_datum_t *rpubkey);
 static int pgp_crt_to_raw_pubkey(const gnutls_datum_t * cert, gnutls_datum_t *rpubkey);
-static int find_stored_pubkey(const char* file, 
+static int retrieve_pubkey(const char* file, 
                               const char* host, const char* service, 
                               const gnutls_datum_t* skey);
 
@@ -57,17 +57,10 @@ static int find_config_file(char* file, size_t max_size);
 
 void *_gnutls_file_mutex;
 
-static const trust_storage_st default_storage =
-{
-  store_pubkey,
-  store_commitment,
-  find_stored_pubkey
-};
-
 /**
  * gnutls_verify_stored_pubkey:
  * @db_name: A file specifying the stored keys (use NULL for the default)
- * @tdb: A database structure or NULL to use the default
+ * @retrieve: A retrieval function or NULL to use the default
  * @host: The peer's name
  * @service: non-NULL if this key is specific to a service (e.g. http)
  * @cert_type: The type of the certificate
@@ -78,8 +71,8 @@ static const trust_storage_st default_storage =
  * a list of stored public keys.  The @service field if non-NULL should
  * be a port number.
  *
- * The @tdb variable if non-null specifies a custom backend for
- * the storage and retrieval of entries. If it is NULL then the
+ * The @retrieve variable if non-null specifies a custom backend for
+ * the retrieval of entries. If it is NULL then the
  * default file backend will be used. In POSIX-like systems the
  * file backend uses the $HOME/.gnutls/known_hosts file.
  *
@@ -100,7 +93,7 @@ static const trust_storage_st default_storage =
  **/
 int
 gnutls_verify_stored_pubkey(const char* db_name, 
-                            const trust_storage_st *tdb,
+                            gnutls_tdb_retr_func retrieve,
                             const char* host,
                             const char* service,
                             gnutls_certificate_type_t cert_type,
@@ -113,7 +106,7 @@ char local_file[MAX_FILENAME];
   if (cert_type != GNUTLS_CRT_X509 && cert_type != GNUTLS_CRT_OPENPGP)
     return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
 
-  if (db_name == NULL && tdb == NULL)
+  if (db_name == NULL && retrieve == NULL)
     {
       ret = find_config_file(local_file, sizeof(local_file));
       if (ret < 0)
@@ -121,8 +114,8 @@ char local_file[MAX_FILENAME];
       db_name = local_file;
     }
 
-  if (tdb == NULL)
-    tdb = &default_storage;
+  if (retrieve == NULL)
+    retrieve = retrieve_pubkey;
 
   if (cert_type == GNUTLS_CRT_X509)
     ret = x509_crt_to_raw_pubkey(cert, &pubkey);
@@ -135,7 +128,7 @@ char local_file[MAX_FILENAME];
       goto cleanup;
     }
   
-  ret = tdb->retrieve(db_name, host, service, &pubkey);
+  ret = retrieve(db_name, host, service, &pubkey);
   if (ret < 0)
     return gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_FOUND);
 
@@ -294,7 +287,7 @@ time_t expiration;
 
 /* Returns the base64 key if found 
  */
-static int find_stored_pubkey(const char* file, 
+static int retrieve_pubkey(const char* file, 
                              const char* host, const char* service, 
                              const gnutls_datum_t* pubkey)
 {
@@ -571,7 +564,7 @@ char buffer[MAX_HASH_SIZE*2+1];
 /**
  * gnutls_store_pubkey:
  * @db_name: A file specifying the stored keys (use NULL for the default)
- * @tdb: A database structure or NULL to use the default
+ * @store: A storage function or NULL to use the default
  * @host: The peer's name
  * @service: non-NULL if this key is specific to a service (e.g. http)
  * @cert_type: The type of the certificate
@@ -583,8 +576,8 @@ char buffer[MAX_HASH_SIZE*2+1];
  * the list of stored public keys. The key will be considered valid until 
  * the provided expiration time.
  *
- * The @tdb variable if non-null specifies a custom backend for
- * the storage and retrieval of entries. If it is NULL then the
+ * The @store variable if non-null specifies a custom backend for
+ * the storage of entries. If it is NULL then the
  * default file backend will be used.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -594,7 +587,7 @@ char buffer[MAX_HASH_SIZE*2+1];
  **/
 int
 gnutls_store_pubkey(const char* db_name, 
-                    const trust_storage_st* tdb,
+                    gnutls_tdb_store_func store,
                     const char* host,
                     const char* service,
                     gnutls_certificate_type_t cert_type,
@@ -610,7 +603,7 @@ char local_file[MAX_FILENAME];
   if (cert_type != GNUTLS_CRT_X509 && cert_type != GNUTLS_CRT_OPENPGP)
     return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
   
-  if (db_name == NULL && tdb == NULL)
+  if (db_name == NULL && store == NULL)
     {
       ret = _gnutls_find_config_path(local_file, sizeof(local_file));
       if (ret < 0)
@@ -625,8 +618,8 @@ char local_file[MAX_FILENAME];
       db_name = local_file;
     }
 
-  if (tdb == NULL)
-    tdb = &default_storage;
+  if (store == NULL)
+    store = store_pubkey;
     
   if (cert_type == GNUTLS_CRT_X509)
     ret = x509_crt_to_raw_pubkey(cert, &pubkey);
@@ -640,7 +633,7 @@ char local_file[MAX_FILENAME];
 
   _gnutls_debug_log("Configuration file: %s\n", db_name);
 
-  tdb->store(db_name, host, service, expiration, &pubkey);
+  store(db_name, host, service, expiration, &pubkey);
 
   ret = 0;
 
@@ -654,7 +647,7 @@ cleanup:
 /**
  * gnutls_store_commitment:
  * @db_name: A file specifying the stored keys (use NULL for the default)
- * @tdb: A database structure or NULL to use the default
+ * @cstore: A storage function or NULL to use the default
  * @host: The peer's name
  * @service: non-NULL if this key is specific to a service (e.g. http)
  * @hash_algo: The hash algorithm type
@@ -666,8 +659,8 @@ cleanup:
  * the list of stored public keys. The key with the given
  * hash will be considered valid until the provided expiration time.
  *
- * The @tdb variable if non-null specifies a custom backend for
- * the storage and retrieval of entries. If it is NULL then the
+ * The @store variable if non-null specifies a custom backend for
+ * the storage of entries. If it is NULL then the
  * default file backend will be used.
  *
  * Note that this function is not thread safe with the default backend.
@@ -679,7 +672,7 @@ cleanup:
  **/
 int
 gnutls_store_commitment(const char* db_name, 
-                    const trust_storage_st* tdb,
+                    gnutls_tdb_store_commitment_func cstore,
                     const char* host,
                     const char* service,
                     gnutls_digest_algorithm_t hash_algo,
@@ -697,7 +690,7 @@ char local_file[MAX_FILENAME];
   if (_gnutls_hash_get_algo_len(hash_algo) != hash->size)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-  if (db_name == NULL && tdb == NULL)
+  if (db_name == NULL && cstore == NULL)
     {
       ret = _gnutls_find_config_path(local_file, sizeof(local_file));
       if (ret < 0)
@@ -712,12 +705,12 @@ char local_file[MAX_FILENAME];
       db_name = local_file;
     }
 
-  if (tdb == NULL)
-    tdb = &default_storage;
+  if (cstore == NULL)
+    cstore = store_commitment;
     
   _gnutls_debug_log("Configuration file: %s\n", db_name);
 
-  tdb->cstore(db_name, host, service, expiration, hash_algo, hash);
+  cstore(db_name, host, service, expiration, hash_algo, hash);
 
   ret = 0;
 
