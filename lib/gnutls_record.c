@@ -697,7 +697,8 @@ record_add_to_buffers (gnutls_session_t session,
           /* This is legal if HELLO_REQUEST is received - and we are a client.
            * If we are a server, a client may initiate a renegotiation at any time.
            */
-          if (session->security_parameters.entity == GNUTLS_SERVER)
+          if (session->security_parameters.entity == GNUTLS_SERVER &&
+              bufel->htype == GNUTLS_HANDSHAKE_CLIENT_HELLO)
             {
               gnutls_assert ();
               ret =
@@ -715,7 +716,8 @@ record_add_to_buffers (gnutls_session_t session,
            * since this message will never make it up here.
            */
 
-          /* So we accept it */
+          /* So we accept it, if it is a Hello. If not, this will
+           * fail and trigger flight retransmissions after some time. */
           ret = _gnutls_recv_hello_request (session, bufel->msg.data, bufel->msg.size);
           goto unexpected_packet;
 
