@@ -20,7 +20,7 @@ export = '#include <gettext.h>';
 copyright = {
     date  = "2012";
     owner = "Free Software Foundation";
-    author = "Simon Josefsson and others; see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.";
+    author = "Simon Josefsson, Nikos Mavrogiannopoulos and others; see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.";
     eaddr  = "bug-gnutls@gnu.org";
     type  = gpl;
 };
@@ -298,7 +298,7 @@ create a OCSP request for the certificate.
 
 @example
 $ ocsptool --ask ocsp.CAcert.org --load-issuer issuer.pem  --load-cert cert.pem \
-           --outfile ocsp-request.der
+           --outfile ocsp-response.der
 @end example
 
 The request is sent via HTTP to the OCSP server address specified. If the
