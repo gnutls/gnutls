@@ -650,7 +650,7 @@ of DTLS messages and prevent messages from being silently discarded by the
 transport layer. The ``correct'' maximum transfer unit can be obtained through
 a path MTU discovery mechanism @xcite{RFC4821}.
 
-@showfuncD{gnutls_dtls_set_mtu,gnutls_dtls_get_mtu,gnutls_dtls_get_data_mtu}
+@showfuncC{gnutls_dtls_set_mtu,gnutls_dtls_get_mtu,gnutls_dtls_get_data_mtu}
 
 
 @node TLS handshake
