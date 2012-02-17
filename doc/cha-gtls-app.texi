@@ -579,9 +579,14 @@ In the case of DTLS it is also desirable to override the generic
 transport functions with functions that emulate the operation
 of @code{recvfrom} and @code{sendto}. In addition
 @acronym{DTLS} requires timers during the receive of a handshake
-message. This requires the @funcref{gnutls_transport_set_pull_timeout_function} function to be used.
+message, set using the @funcref{gnutls_transport_set_pull_timeout_function} 
+function. To check the retransmission timers the function
+@funcref{gnutls_dtls_get_timeout} is provided, which returns the time
+remaining until the next retransmission, or better the time until 
+@funcref{gnutls_handshake} should be called again.
 
 @showfuncdesc{gnutls_transport_set_pull_timeout_function}
+@showfuncdesc{gnutls_dtls_get_timeout}
 
 @menu
 * Asynchronous operation::
@@ -645,7 +650,7 @@ of DTLS messages and prevent messages from being silently discarded by the
 transport layer. The ``correct'' maximum transfer unit can be obtained through
 a path MTU discovery mechanism @xcite{RFC4821}.
 
-@showfuncC{gnutls_dtls_set_mtu,gnutls_dtls_get_mtu,gnutls_dtls_get_data_mtu}
+@showfuncD{gnutls_dtls_set_mtu,gnutls_dtls_get_mtu,gnutls_dtls_get_data_mtu}
 
 
 @node TLS handshake

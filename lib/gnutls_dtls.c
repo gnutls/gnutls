@@ -596,6 +596,34 @@ unsigned int gnutls_dtls_get_mtu (gnutls_session_t session)
   return session->internals.dtls.mtu;
 }
 
+/**
+ * gnutls_dtls_get_timeout:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function will return the milliseconds remaining
+ * for a retransmission of the previously sent handshake
+ * message. This function is useful when DTLS is used in
+ * non-blocking mode, to estimate when to call gnutls_handshake()
+ * if no packets have been received.
+ *
+ * Returns: the remaining time in milliseconds.
+ *
+ * Since: 3.0.0
+ **/
+unsigned int gnutls_dtls_get_timeout (gnutls_session_t session)
+{
+struct timespec now;
+unsigned int diff;
+
+  gettime(&now);
+  
+  diff = timespec_sub_ms(&now, &session->internals.dtls.last_retransmit);
+  if (diff >= session->internals.dtls.actual_retrans_timeout_ms)
+    return 0;
+  else
+    return session->internals.dtls.actual_retrans_timeout_ms - diff;
+}
+
 #define COOKIE_SIZE 16
 #define COOKIE_MAC_SIZE 16
 

@@ -774,6 +774,7 @@ GNUTLS_3_0_0 {
 	gnutls_verify_stored_pubkey;
 	gnutls_store_commitment;
 	gnutls_store_pubkey;
+	gnutls_dtls_get_timeout;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

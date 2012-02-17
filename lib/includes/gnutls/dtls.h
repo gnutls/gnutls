@@ -43,7 +43,9 @@ void gnutls_dtls_set_timeouts (gnutls_session_t session,
 unsigned int gnutls_dtls_get_mtu (gnutls_session_t session);
 unsigned int gnutls_dtls_get_data_mtu (gnutls_session_t session);
 
-  void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu);
+void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu);
+
+unsigned int gnutls_dtls_get_timeout (gnutls_session_t session);
 
 /**
  * gnutls_dtls_prestate_st:
