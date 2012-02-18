@@ -1308,7 +1308,8 @@ static void tcp_server(const char* name, int port)
                                             &client_address, calen, topbuf,
                                             sizeof (topbuf)));
                         print_info (j->tls_session, verbose);
-                        cert_verify(j->tls_session, NULL);
+                        if (gnutls_auth_get_type (j->tls_session) == GNUTLS_CRD_CERTIFICATE)
+                          cert_verify(j->tls_session, NULL);
                       }
                     j->handshake_ok = 1;
                   }
@@ -1432,7 +1433,8 @@ static void tcp_server(const char* name, int port)
                                             sizeof (topbuf)));
 
                         print_info (j->tls_session, verbose);
-                        cert_verify(j->tls_session, NULL);
+                        if (gnutls_auth_get_type (j->tls_session) == GNUTLS_CRD_CERTIFICATE)
+                          cert_verify(j->tls_session, NULL);
                       }
                     j->handshake_ok = 1;
                   }
