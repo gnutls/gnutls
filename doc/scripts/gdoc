@@ -148,7 +148,7 @@ $type_env = "(\\\$[A-Za-z0-9_]+)";
 %highlights_html = ( $type_constant, '"<i>$1</i>"',
 		     $type_func, '"<b>$1</b>"',
 		     $type_struct, '"<i>$1</i>"',
-		     $type_param, '" <tt><b>$1</b></tt>"' );
+		     $type_param, '" <tt><b>$1</b></tt> "' );
 $blankline_html = "<p>";
 
 %highlights_texinfo = ( $type_param, '" \@code{$1} "',
@@ -158,7 +158,7 @@ $blankline_html = "<p>";
 			 );
 $blankline_texinfo = "";
 
-%highlights_tex = ( $type_param, '" {\\\bf $1}"',
+%highlights_tex = ( $type_param, '" {\\\bf $1} "',
 		$type_constant, '"{\\\it $1}"',
 		$type_func, '"{\\\bf $1}"',
 		$type_struct, '"{\\\it $1}"',
@@ -170,21 +170,21 @@ $blankline_tex = "\\\\";
 		     $type_func, '"<function>$1</function>"',
 		     $type_struct, '"<structname>$1</structname>"',
 		     $type_env, '"<envar>$1</envar>"',
-		     $type_param, '" <parameter>$1</parameter>"' );
+		     $type_param, '" <parameter>$1</parameter> "' );
 $blankline_sgml = "</para><para>\n";
 
 # these are pretty rough
 %highlights_man = ( $type_constant, '"\\\fB$1\\\fP"',
 		    $type_func, '"\\\fB$1\\\fP"',
 		    $type_struct, '"\\\fB$1\\\fP"',
-		    $type_param, '" \\\fI$1\\\fP"' );
+		    $type_param, '" \\\fI$1\\\fP "' );
 $blankline_man = "";
 
 # text-mode
 %highlights_text = ( $type_constant, '"$1"',
 		     $type_func, '"$1"',
 		     $type_struct, '"$1"',
-		     $type_param, '"$1"' );
+		     $type_param, '"$1 "' );
 $blankline_text = "";
 my $lineprefix = "";
 
