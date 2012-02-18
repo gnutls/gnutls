@@ -609,7 +609,7 @@ record_add_to_buffers (gnutls_session_t session,
               /* If we have been expecting for an alert do 
                */
               session->internals.read_eof = 1;
-              ret = GNUTLS_E_INT_RET_0;        /* EOF */
+              ret = GNUTLS_E_SESSION_EOF;
               goto cleanup;
             }
           else
@@ -1087,13 +1087,7 @@ begin:
   /* bufel is now either deinitialized or buffered somewhere else */
 
   if (ret < 0)
-    {
-      if (ret == GNUTLS_E_INT_RET_0)
-        {
-          return 0;
-        }
-      return gnutls_assert_val(ret);
-    }
+    return gnutls_assert_val(ret);
 
   return ret;
 
@@ -1185,7 +1179,7 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
     return ret;
 
   ret = _gnutls_recv_in_buffers(session, type, htype);
-  if (ret < 0)
+  if (ret < 0 && ret != GNUTLS_E_SESSION_EOF)
     return gnutls_assert_val(ret);
 
   return check_buffers (session, type, data, data_size, seq);

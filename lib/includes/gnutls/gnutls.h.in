@@ -1888,6 +1888,7 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
 #define GNUTLS_E_ILLEGAL_PARAMETER -325
 #define GNUTLS_E_NO_PRIORITIES_WERE_SET -326
 #define GNUTLS_E_X509_UNSUPPORTED_EXTENSION -327
+#define GNUTLS_E_SESSION_EOF -328
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 

@@ -281,7 +281,8 @@ static const gnutls_error_entry error_algorithms[] = {
 
   ERROR_ENTRY (N_("Error interfacing with /dev/crypto"),
                GNUTLS_E_CRYPTODEV_IOCTL_ERROR, 1),
-
+  ERROR_ENTRY (N_("Peer has terminated the connection"),
+               GNUTLS_E_SESSION_EOF, 1),
   ERROR_ENTRY (N_("Channel binding data not available"),
                GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE, 1),
 
