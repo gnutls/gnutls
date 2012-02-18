@@ -403,7 +403,6 @@ int ret;
 
   if (ret == GNUTLS_E_TIMEDOUT)
     {
-      UPDATE_TIMER;
       ret = _dtls_retransmit(session);
       if (ret == 0)
         {
