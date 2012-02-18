@@ -49,9 +49,8 @@ int main()
 
 #include "utils.h"
 
-/* This program simulates packet loss in DTLS datagrams using
- * the blocking functions. Idea taken from test app of
- * Sean Buckheister.
+/* This program tests whether a DTLS handshake would timeout
+ * in a minute.
  */
 
 static void print_type(const unsigned char* buf, int size)
