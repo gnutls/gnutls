@@ -1117,7 +1117,7 @@ cleanup:
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_certificate_set_key (gnutls_certificate_credentials_t res,

@@ -1138,7 +1138,7 @@ void _gnutls_priority_prefer_aes_gcm(void)
  * structure. 
  *
  * Returns: the number of curves, or an error code.
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_priority_ecc_curve_list (gnutls_priority_t pcache, const unsigned int** list)
@@ -1159,7 +1159,7 @@ gnutls_priority_ecc_curve_list (gnutls_priority_t pcache, const unsigned int** l
  * structure. 
  *
  * Returns: the number of methods, or an error code.
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_priority_compression_list (gnutls_priority_t pcache, const unsigned int** list)
@@ -1180,7 +1180,7 @@ gnutls_priority_compression_list (gnutls_priority_t pcache, const unsigned int**
  * structure. 
  *
  * Returns: the number of protocols, or an error code.
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_priority_protocol_list (gnutls_priority_t pcache, const unsigned int** list)
@@ -1201,7 +1201,7 @@ gnutls_priority_protocol_list (gnutls_priority_t pcache, const unsigned int** li
  * structure. 
  *
  * Returns: the number of algorithms, or an error code.
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_priority_sign_list (gnutls_priority_t pcache, const unsigned int** list)
@@ -1222,7 +1222,7 @@ gnutls_priority_sign_list (gnutls_priority_t pcache, const unsigned int** list)
  * structure. 
  *
  * Returns: the number of certificate types, or an error code.
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_priority_certificate_type_list (gnutls_priority_t pcache, const unsigned int** list)

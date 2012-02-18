@@ -104,7 +104,7 @@ gnutls_alert_get_name (gnutls_alert_description_t alert)
  *
  * Returns: string corresponding to #gnutls_alert_description_t value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 const char *
 gnutls_alert_get_strname (gnutls_alert_description_t alert)

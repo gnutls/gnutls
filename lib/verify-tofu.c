@@ -102,7 +102,7 @@ struct gnutls_tdb_int default_tdb = {
  * is returned. On success, %GNUTLS_E_SUCCESS (0) is returned, 
  * or a negative error value on other errors.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_verify_stored_pubkey(const char* db_name, 
@@ -596,7 +596,7 @@ char buffer[MAX_HASH_SIZE*2+1];
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_store_pubkey(const char* db_name, 
@@ -681,7 +681,7 @@ cleanup:
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_store_commitment(const char* db_name, 

@@ -771,7 +771,7 @@ _get_authority_key_id (gnutls_x509_crl_t cert, ASN1_TYPE *c2,
  *
  * Returns: Returns 0 on success, or an error code.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_x509_crl_get_authority_key_gn_serial (gnutls_x509_crl_t crl,
@@ -1124,7 +1124,7 @@ gnutls_x509_crl_get_extension_data (gnutls_x509_crl_t crl, int indx,
  *
  * Returns: the number of certificates read or a negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_x509_crl_list_import2 (gnutls_x509_crl_t ** crls,
@@ -1182,7 +1182,7 @@ int ret;
  *
  * Returns: the number of certificates read or a negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_x509_crl_list_import (gnutls_x509_crl_t * crls,

@@ -81,7 +81,7 @@ gnutls_global_set_log_function (gnutls_log_func log_func)
  * @gnutls_audit_log_func is of the form,
  * void (*gnutls_audit_log_func)( gnutls_session_t, int level, const char*);
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 void
 gnutls_global_set_audit_log_function (gnutls_audit_log_func log_func)

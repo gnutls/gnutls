@@ -420,7 +420,7 @@ gnutls_pubkey_import_openpgp (gnutls_pubkey_t key,
  * Returns: In case of failure a negative error code will be
  *   returned, and 0 on success.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_pubkey_get_openpgp_key_id (gnutls_pubkey_t key, unsigned int flags,
@@ -719,7 +719,7 @@ gnutls_pubkey_get_pk_dsa_raw (gnutls_pubkey_t key,
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_pubkey_get_pk_ecc_raw (gnutls_pubkey_t key, gnutls_ecc_curve_t *curve,
@@ -773,7 +773,7 @@ gnutls_pubkey_get_pk_ecc_raw (gnutls_pubkey_t key, gnutls_ecc_curve_t *curve,
  *
  * Returns: %GNUTLS_E_SUCCESS on success, otherwise a negative error code.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int gnutls_pubkey_get_pk_ecc_x962 (gnutls_pubkey_t key, gnutls_datum_t* parameters,
                                    gnutls_datum_t * ecpoint)
@@ -1118,7 +1118,7 @@ gnutls_pubkey_import_rsa_raw (gnutls_pubkey_t key,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_pubkey_import_ecc_raw (gnutls_pubkey_t key,
@@ -1176,7 +1176,7 @@ cleanup:
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_pubkey_import_ecc_x962 (gnutls_pubkey_t key,
@@ -1346,7 +1346,7 @@ gnutls_pubkey_verify_data (gnutls_pubkey_t pubkey, unsigned int flags,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value (%GNUTLS_E_PK_SIG_VERIFY_FAILED in verification failure).
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey, 
@@ -1422,7 +1422,7 @@ gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_pubkey_encrypt_data (gnutls_pubkey_t key, unsigned int flags,

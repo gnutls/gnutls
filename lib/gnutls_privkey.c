@@ -385,7 +385,7 @@ int ret;
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_privkey_import_ext (gnutls_privkey_t pkey,

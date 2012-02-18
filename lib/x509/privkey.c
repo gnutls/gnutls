@@ -834,7 +834,7 @@ cleanup:
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_x509_privkey_import_ecc_raw (gnutls_x509_privkey_t key,
@@ -1001,7 +1001,7 @@ gnutls_x509_privkey_sec_param (gnutls_x509_privkey_t key)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int gnutls_x509_privkey_export_ecc_raw (gnutls_x509_privkey_t key, 
                                         gnutls_ecc_curve_t *curve,  

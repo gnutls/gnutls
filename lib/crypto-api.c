@@ -86,7 +86,7 @@ int ret;
  *
  * Returns: Zero or a negative error code on error.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_cipher_tag (gnutls_cipher_hd_t handle, void *tag, size_t tag_size)
@@ -114,7 +114,7 @@ api_cipher_hd_st * h = handle;
  *
  * Returns: Zero or a negative error code on error.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_cipher_add_auth (gnutls_cipher_hd_t handle, const void *text, size_t text_size)
@@ -138,7 +138,7 @@ api_cipher_hd_st * h = handle;
  * This function will set the IV to be used for the next
  * encryption block.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 void
 gnutls_cipher_set_iv (gnutls_cipher_hd_t handle, void *iv, size_t ivlen)
@@ -522,7 +522,7 @@ gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, or an
  * error code.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_key_generate (gnutls_datum_t * key, unsigned int key_size)

@@ -70,7 +70,7 @@ struct gnutls_x509_trust_list_st {
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_x509_trust_list_init(gnutls_x509_trust_list_t * list,
@@ -105,7 +105,7 @@ gnutls_x509_trust_list_init(gnutls_x509_trust_list_t * list,
  *
  * This function will deinitialize a trust list.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 void
 gnutls_x509_trust_list_deinit(gnutls_x509_trust_list_t list,
@@ -148,7 +148,7 @@ gnutls_x509_trust_list_deinit(gnutls_x509_trust_list_t list,
  *
  * Returns: The number of added elements is returned.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
@@ -211,7 +211,7 @@ gnutls_x509_trust_list_add_cas(gnutls_x509_trust_list_t list,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
@@ -273,7 +273,7 @@ gnutls_x509_trust_list_add_named_crt(gnutls_x509_trust_list_t list,
  *
  * Returns: The number of added elements is returned.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_x509_trust_list_add_crls(gnutls_x509_trust_list_t list,
@@ -412,7 +412,7 @@ static int shorten_clist(gnutls_x509_trust_list_t list,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
                                       gnutls_x509_crt_t cert,
@@ -463,7 +463,7 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
@@ -563,7 +563,7 @@ gnutls_x509_trust_list_verify_crt(gnutls_x509_trust_list_t list,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,

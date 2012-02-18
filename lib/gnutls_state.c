@@ -1410,7 +1410,7 @@ int total = 0, ret, iv_size;
  * Returns: the currently used curve, a #gnutls_ecc_curve_t
  *   type.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session)
 {

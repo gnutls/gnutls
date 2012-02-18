@@ -817,7 +817,7 @@ _get_authority_key_id (gnutls_x509_crt_t cert, ASN1_TYPE *c2,
  *
  * Returns: Returns 0 on success, or an error code.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_x509_crt_get_authority_key_gn_serial (gnutls_x509_crt_t cert, unsigned int seq, void *alt,
@@ -3051,7 +3051,7 @@ cleanup:
  *
  * Returns: the number of certificates read or a negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_x509_crt_list_import2 (gnutls_x509_crt_t ** certs,
@@ -3546,7 +3546,7 @@ _gnutls_parse_aia (ASN1_TYPE src,
  * not match (e.g., when using %GNUTLS_IA_OCSP_URI), otherwise a
  * negative error code.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_x509_crt_get_authority_info_access (gnutls_x509_crt_t crt,

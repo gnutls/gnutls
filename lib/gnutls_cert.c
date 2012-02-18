@@ -108,7 +108,7 @@ gnutls_certificate_free_cas (gnutls_certificate_credentials_t sc)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int
 gnutls_certificate_get_issuer (gnutls_certificate_credentials_t sc,
@@ -413,7 +413,7 @@ void gnutls_certificate_server_set_retrieve_function
  * number of certificates should be set to zero. The value (-1)
  * indicates error and the handshake will be terminated.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 void gnutls_certificate_set_retrieve_function
   (gnutls_certificate_credentials_t cred,
@@ -460,7 +460,7 @@ void gnutls_certificate_set_retrieve_function
  * number of certificates should be set to zero. The value (-1)
  * indicates error and the handshake will be terminated.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 void gnutls_certificate_set_retrieve_function2
   (gnutls_certificate_credentials_t cred,

@@ -183,7 +183,7 @@ _gnutls_x509_oid_data_choice (const char *oid)
  *
  * Returns: A null terminated string or NULL otherwise.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 const char*
 gnutls_x509_dn_oid_name (const char *oid, unsigned int flags)

@@ -575,7 +575,7 @@ gnutls_pkcs11_init (unsigned int flags, const char *deprecated_config_file)
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.0.0
+ * Since: 3.0
  **/
 int gnutls_pkcs11_reinit (void)
 {
