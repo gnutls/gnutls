@@ -142,7 +142,7 @@ char local_file[MAX_FILENAME];
     }
   
   ret = tdb->verify(db_name, host, service, &pubkey);
-  if (ret < 0)
+  if (ret < 0 && ret != GNUTLS_E_CERTIFICATE_KEY_MISMATCH)
     ret = gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_FOUND);
 
 cleanup:
