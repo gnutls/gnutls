@@ -90,7 +90,7 @@ void
 doit (void)
 {
   int ret;
-  gnutls_datum_t derCert = { (unsigned char*)pem, sizeof (pem) };
+  gnutls_datum_t pem_cert = { (unsigned char*)pem, sizeof (pem) };
   gnutls_x509_crt_t cert;
   gnutls_x509_dn_t xdn;
 
@@ -102,7 +102,7 @@ doit (void)
   if (ret < 0)
     fail ("crt_init %d\n", ret);
 
-  ret = gnutls_x509_crt_import (cert, &derCert, GNUTLS_X509_FMT_PEM);
+  ret = gnutls_x509_crt_import (cert, &pem_cert, GNUTLS_X509_FMT_PEM);
   if (ret < 0)
     fail ("crt_import %d\n", ret);
 
