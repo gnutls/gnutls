@@ -393,7 +393,10 @@ gnutls_session_t session(int sock, int server)
 	gnutls_transport_set_push_function(r, writefn);
 
 	gnutls_dtls_set_mtu(r, 1400);
-	gnutls_dtls_set_timeouts(r, 1000, 60000);
+	
+	/* The cases tested here might exceed the normal DTLS
+	 * timers */
+	gnutls_dtls_set_timeouts(r, 1000, 120000);
 
 	return r;
 }
