@@ -165,6 +165,11 @@ void doit(void)
       fail("verification succeed when shouldn't!\n");
       goto fail;
     }
+  if (ret != GNUTLS_E_CERTIFICATE_KEY_MISMATCH)
+    {
+      fail("Wrong error code returned: %s!\n", gnutls_strerror(ret));
+      goto fail;
+    }
   
   if (debug)
     success("Public key verification: passed\n");
