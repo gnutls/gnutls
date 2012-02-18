@@ -134,9 +134,6 @@ static int drop_usage_count(gnutls_session_t session, mbuffer_head_st *const sen
   return 0;
 }
 
-/* in ms */
-#define RETRANSMIT_WINDOW 600
-
 /* This function is to be called from record layer once
  * a handshake replay is detected. It will make sure
  * it transmits only once per few seconds. Otherwise
@@ -180,6 +177,8 @@ int ret;
 
 #define RESET_TIMER \
       session->internals.dtls.actual_retrans_timeout_ms = session->internals.dtls.retrans_timeout_ms
+
+#define TIMER_WINDOW session->internals.dtls.actual_retrans_timeout_ms
 
 /* This function transmits the flight that has been previously
  * buffered.
@@ -226,7 +225,7 @@ unsigned int timeout;
             {
               /* if no retransmission is required yet just return 
                */
-              if (timespec_sub_ms(&now, &session->internals.dtls.last_retransmit) < session->internals.dtls.actual_retrans_timeout_ms)
+              if (timespec_sub_ms(&now, &session->internals.dtls.last_retransmit) < TIMER_WINDOW)
                 {
                   gnutls_assert();
                   goto nb_timeout;
@@ -255,6 +254,8 @@ unsigned int timeout;
 
   do 
     {
+      timeout = TIMER_WINDOW;
+
       diff = timespec_sub_ms(&now, &session->internals.dtls.handshake_start_time);
       if (diff >= session->internals.dtls.total_timeout_ms) 
         {
@@ -264,7 +265,7 @@ unsigned int timeout;
         }
 
       diff = timespec_sub_ms(&now, &session->internals.dtls.last_retransmit);
-      if (session->internals.dtls.flight_init == 0 || diff >= RETRANSMIT_WINDOW)
+      if (session->internals.dtls.flight_init == 0 || diff >= TIMER_WINDOW)
         {
           _gnutls_dtls_log ("DTLS[%p]: %sStart of flight transmission.\n", session,  (session->internals.dtls.flight_init == 0)?"":"re-");
           for (cur = send_buffer->head;
@@ -280,29 +281,28 @@ unsigned int timeout;
               last_type = cur->htype;
             }
           gettime(&session->internals.dtls.last_retransmit);
-        }
 
-      if (session->internals.dtls.flight_init == 0)
-        {
-          session->internals.dtls.flight_init = 1;
-          RESET_TIMER;
-          timeout = session->internals.dtls.actual_retrans_timeout_ms;
-
-          if (last_type == GNUTLS_HANDSHAKE_FINISHED)
+          if (session->internals.dtls.flight_init == 0)
             {
+              session->internals.dtls.flight_init = 1;
+              RESET_TIMER;
+              timeout = TIMER_WINDOW;
+
+              if (last_type == GNUTLS_HANDSHAKE_FINISHED)
+                {
               /* On the last flight we cannot ensure retransmission
                * from here. _dtls_wait_and_retransmit() is being called
                * by handshake.
                */
-              session->internals.dtls.last_flight = 1;
+                  session->internals.dtls.last_flight = 1;
+                }
+              else
+                session->internals.dtls.last_flight = 0;
             }
           else
-            session->internals.dtls.last_flight = 0;
-        }
-      else
-        {
-          timeout = session->internals.dtls.actual_retrans_timeout_ms;
-          UPDATE_TIMER;
+            {
+              UPDATE_TIMER;
+            }
         }
 
       ret = _gnutls_io_write_flush (session);
@@ -397,7 +397,7 @@ int _dtls_wait_and_retransmit(gnutls_session_t session)
 int ret;
 
   if (session->internals.dtls.blocking != 0)
-    ret = _gnutls_io_check_recv(session, session->internals.dtls.actual_retrans_timeout_ms);
+    ret = _gnutls_io_check_recv(session, TIMER_WINDOW);
   else
     ret = _gnutls_io_check_recv(session, 0);
 
@@ -618,10 +618,10 @@ unsigned int diff;
   gettime(&now);
   
   diff = timespec_sub_ms(&now, &session->internals.dtls.last_retransmit);
-  if (diff >= session->internals.dtls.actual_retrans_timeout_ms)
+  if (diff >= TIMER_WINDOW)
     return 0;
   else
-    return session->internals.dtls.actual_retrans_timeout_ms - diff;
+    return TIMER_WINDOW - diff;
 }
 
 #define COOKIE_SIZE 16
