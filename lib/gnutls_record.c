@@ -1078,11 +1078,14 @@ begin:
   if (record.v2)
     decrypted->htype = GNUTLS_HANDSHAKE_CLIENT_HELLO_V2;
   else
-    decrypted->htype = -1;
+    {
+      uint8_t * p = _mbuffer_get_udata_ptr(decrypted);
+      decrypted->htype = p[0];
+    }
 
   ret =
     record_add_to_buffers (session, &record, type, htype, 
-      packet_sequence, decrypted);
+                           packet_sequence, decrypted);
 
   /* bufel is now either deinitialized or buffered somewhere else */
 
