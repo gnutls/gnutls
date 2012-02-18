@@ -67,7 +67,7 @@ ctests = mini-deflate simple gc set_pkcs12_cred certder certuniqueid	\
 	 nul-in-x509-names x509_altname pkcs12_encode mini-x509		\
 	 mini-x509-rehandshake rng-fork mini-eagain-dtls mini-loss	\
 	 x509cert x509cert-tl infoaccess rsa-encrypt-decrypt \
-	 mini-loss-time
+	 mini-loss-time mini-tdb
 
 if ENABLE_OCSP
 ctests += ocsp

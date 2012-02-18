@@ -775,6 +775,11 @@ GNUTLS_3_0_0 {
 	gnutls_store_commitment;
 	gnutls_store_pubkey;
 	gnutls_dtls_get_timeout;
+	gnutls_tdb_init;
+	gnutls_tdb_set_store_func;
+	gnutls_tdb_set_store_commitment_func;
+	gnutls_tdb_set_verify_func;
+	gnutls_tdb_deinit;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

@@ -590,3 +590,4 @@ tests/mini-loss-time
 tests/dtls/dtls-stress
 doc/gnutls.epub
 doc/gnutls.xml
+tests/mini-tdb

@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2008-2012 Free Software Foundation, Inc.
  *
- * Author: Simon Josefsson
+ * Author: Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *

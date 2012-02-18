@@ -36,10 +36,16 @@
 #include <system.h>
 #include <locks.h>
 
+struct gnutls_tdb_int {
+  gnutls_tdb_store_func store;
+  gnutls_tdb_store_commitment_func cstore;
+  gnutls_tdb_verify_func verify;
+};
+
 static int raw_pubkey_to_base64(const gnutls_datum_t* raw, gnutls_datum_t * b64);
 static int x509_crt_to_raw_pubkey(const gnutls_datum_t * cert, gnutls_datum_t *rpubkey);
 static int pgp_crt_to_raw_pubkey(const gnutls_datum_t * cert, gnutls_datum_t *rpubkey);
-static int retrieve_pubkey(const char* file, 
+static int verify_pubkey(const char* file, 
                               const char* host, const char* service, 
                               const gnutls_datum_t* skey);
 
@@ -57,10 +63,17 @@ static int find_config_file(char* file, size_t max_size);
 
 void *_gnutls_file_mutex;
 
+struct gnutls_tdb_int default_tdb = {
+  store_pubkey,
+  store_commitment,
+  verify_pubkey
+};
+
+
 /**
  * gnutls_verify_stored_pubkey:
  * @db_name: A file specifying the stored keys (use NULL for the default)
- * @retrieve: A retrieval function or NULL to use the default
+ * @tdb: A storage structure or NULL to use the default
  * @host: The peer's name
  * @service: non-NULL if this key is specific to a service (e.g. http)
  * @cert_type: The type of the certificate
@@ -93,7 +106,7 @@ void *_gnutls_file_mutex;
  **/
 int
 gnutls_verify_stored_pubkey(const char* db_name, 
-                            gnutls_tdb_retr_func retrieve,
+                            gnutls_tdb_t tdb,
                             const char* host,
                             const char* service,
                             gnutls_certificate_type_t cert_type,
@@ -106,7 +119,7 @@ char local_file[MAX_FILENAME];
   if (cert_type != GNUTLS_CRT_X509 && cert_type != GNUTLS_CRT_OPENPGP)
     return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
 
-  if (db_name == NULL && retrieve == NULL)
+  if (db_name == NULL && tdb == NULL)
     {
       ret = find_config_file(local_file, sizeof(local_file));
       if (ret < 0)
@@ -114,8 +127,8 @@ char local_file[MAX_FILENAME];
       db_name = local_file;
     }
 
-  if (retrieve == NULL)
-    retrieve = retrieve_pubkey;
+  if (tdb == NULL)
+    tdb = &default_tdb;
 
   if (cert_type == GNUTLS_CRT_X509)
     ret = x509_crt_to_raw_pubkey(cert, &pubkey);
@@ -128,7 +141,7 @@ char local_file[MAX_FILENAME];
       goto cleanup;
     }
   
-  ret = retrieve(db_name, host, service, &pubkey);
+  ret = tdb->verify(db_name, host, service, &pubkey);
   if (ret < 0)
     return gnutls_assert_val(GNUTLS_E_NO_CERTIFICATE_FOUND);
 
@@ -287,7 +300,7 @@ time_t expiration;
 
 /* Returns the base64 key if found 
  */
-static int retrieve_pubkey(const char* file, 
+static int verify_pubkey(const char* file, 
                              const char* host, const char* service, 
                              const gnutls_datum_t* pubkey)
 {
@@ -523,7 +536,7 @@ int ret;
   if (host == NULL) host = "*";
 
   fprintf(fd, "|g0|%s|%s|%lu|%.*s\n", host, service, (unsigned long)expiration, 
-    pubkey->size, pubkey->data);
+    b64key.size, b64key.data);
 
   ret = 0;
 
@@ -564,7 +577,7 @@ char buffer[MAX_HASH_SIZE*2+1];
 /**
  * gnutls_store_pubkey:
  * @db_name: A file specifying the stored keys (use NULL for the default)
- * @store: A storage function or NULL to use the default
+ * @tdb: A storage structure or NULL to use the default
  * @host: The peer's name
  * @service: non-NULL if this key is specific to a service (e.g. http)
  * @cert_type: The type of the certificate
@@ -587,7 +600,7 @@ char buffer[MAX_HASH_SIZE*2+1];
  **/
 int
 gnutls_store_pubkey(const char* db_name, 
-                    gnutls_tdb_store_func store,
+                    gnutls_tdb_t tdb,
                     const char* host,
                     const char* service,
                     gnutls_certificate_type_t cert_type,
@@ -603,7 +616,7 @@ char local_file[MAX_FILENAME];
   if (cert_type != GNUTLS_CRT_X509 && cert_type != GNUTLS_CRT_OPENPGP)
     return gnutls_assert_val(GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE);
   
-  if (db_name == NULL && store == NULL)
+  if (db_name == NULL && tdb == NULL)
     {
       ret = _gnutls_find_config_path(local_file, sizeof(local_file));
       if (ret < 0)
@@ -618,8 +631,8 @@ char local_file[MAX_FILENAME];
       db_name = local_file;
     }
 
-  if (store == NULL)
-    store = store_pubkey;
+  if (tdb == NULL)
+    tdb = &default_tdb;
     
   if (cert_type == GNUTLS_CRT_X509)
     ret = x509_crt_to_raw_pubkey(cert, &pubkey);
@@ -633,7 +646,7 @@ char local_file[MAX_FILENAME];
 
   _gnutls_debug_log("Configuration file: %s\n", db_name);
 
-  store(db_name, host, service, expiration, &pubkey);
+  tdb->store(db_name, host, service, expiration, &pubkey);
 
   ret = 0;
 
@@ -647,7 +660,7 @@ cleanup:
 /**
  * gnutls_store_commitment:
  * @db_name: A file specifying the stored keys (use NULL for the default)
- * @cstore: A storage function or NULL to use the default
+ * @tdb: A storage structure or NULL to use the default
  * @host: The peer's name
  * @service: non-NULL if this key is specific to a service (e.g. http)
  * @hash_algo: The hash algorithm type
@@ -672,7 +685,7 @@ cleanup:
  **/
 int
 gnutls_store_commitment(const char* db_name, 
-                    gnutls_tdb_store_commitment_func cstore,
+                    gnutls_tdb_t tdb,
                     const char* host,
                     const char* service,
                     gnutls_digest_algorithm_t hash_algo,
@@ -690,7 +703,7 @@ char local_file[MAX_FILENAME];
   if (_gnutls_hash_get_algo_len(hash_algo) != hash->size)
     return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 
-  if (db_name == NULL && cstore == NULL)
+  if (db_name == NULL && tdb == NULL)
     {
       ret = _gnutls_find_config_path(local_file, sizeof(local_file));
       if (ret < 0)
@@ -705,12 +718,12 @@ char local_file[MAX_FILENAME];
       db_name = local_file;
     }
 
-  if (cstore == NULL)
-    cstore = store_commitment;
+  if (tdb == NULL)
+    tdb = &default_tdb;
     
   _gnutls_debug_log("Configuration file: %s\n", db_name);
 
-  cstore(db_name, host, service, expiration, hash_algo, hash);
+  tdb->cstore(db_name, host, service, expiration, hash_algo, hash);
 
   ret = 0;
 
@@ -737,3 +750,89 @@ int ret;
       
   return 0;
 }
+
+/**
+ * gnutls_tdb_init:
+ * @tdb: The structure to be initialized
+ *
+ * This function will initialize a public key trust storage structure.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int gnutls_tdb_init(gnutls_tdb_t* tdb)
+{
+  *tdb = gnutls_calloc (1, sizeof (struct gnutls_tdb_int));
+
+  if (!*tdb)
+    return GNUTLS_E_MEMORY_ERROR;
+    
+  return 0;
+}
+
+/**
+ * gnutls_set_store_func:
+ * @tdb: The trust storage
+ * @store: The storage function
+ *
+ * This function will associate a storage function with the
+ * trust storage structure. The function is of the following form.
+ *
+ * gnutls_tdb_store_func(const char* db_name, const char* host,
+ *                       const char* service, time_t expiration,
+ *                       const gnutls_datum_t* pubkey);
+ *
+ **/
+void gnutls_tdb_set_store_func(gnutls_tdb_t tdb, gnutls_tdb_store_func store)
+{
+  tdb->store = store;
+}
+
+/**
+ * gnutls_set_store_commitment_func:
+ * @tdb: The trust storage
+ * @cstore: The commitment storage function
+ *
+ * This function will associate a commitment (hash) storage function with the
+ * trust storage structure. The function is of the following form.
+ *
+ * gnutls_tdb_store_commitment_func(const char* db_name, const char* host,
+ *                       const char* service, time_t expiration,
+ *                       gnutls_digest_algorithm_t, const gnutls_datum_t* hash);
+ *
+ **/
+void gnutls_tdb_set_store_commitment_func(gnutls_tdb_t tdb,
+                                     gnutls_tdb_store_commitment_func cstore)
+{
+  tdb->cstore = cstore;
+}
+
+/**
+ * gnutls_set_verify_func:
+ * @tdb: The trust storage
+ * @verify: The verification function
+ *
+ * This function will associate a retrieval function with the
+ * trust storage structure. The function is of the following form.
+ *
+ * gnutls_tdb_verify_func(const char* db_name, const char* host,
+ *                      const char* service, const gnutls_datum_t* pubkey);
+ *
+ **/
+void gnutls_tdb_set_verify_func(gnutls_tdb_t tdb, gnutls_tdb_verify_func verify)
+{
+  tdb->verify = verify;
+}
+
+/**
+ * gnutls_tdb_deinit:
+ * @tdb: The structure to be deinitialized
+ *
+ * This function will deinitialize a public key trust storage structure.
+ **/
+void gnutls_tdb_deinit(gnutls_tdb_t tdb)
+{
+  gnutls_free(tdb);
+}
+
+
