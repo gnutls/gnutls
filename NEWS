@@ -2,6 +2,17 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.0.14 (unreleased)
+
+** command line apps: Included libopts doesn't get installed
+by default.
+
+** libgnutls: cryptodev code corrected.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.0.13 (released 2012-02-18)
 
 ** gnutls-cli: added the --ocsp option which will verify
