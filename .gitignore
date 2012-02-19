@@ -95,10 +95,7 @@ doc/gnutls.dvi
 doc/gnutls.fn
 doc/gnutls.fns
 doc/gnutls.html
-doc/gnutls.info
-doc/gnutls.info-1
-doc/gnutls.info-2
-doc/gnutls.info-3
+doc/gnutls.info*
 doc/gnutls.ky
 doc/gnutls.log
 doc/gnutls.pdf
