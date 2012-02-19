@@ -267,6 +267,7 @@ static void start (int server_packet, int client_packet)
     {
       /* parent */
       server (fd[0], server_packet);
+      kill(child, SIGTERM);
     }
   else 
     {
