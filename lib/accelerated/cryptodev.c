@@ -64,7 +64,7 @@ static const int gnutls_cipher_map[] = {
 };
 
 static int
-cryptodev_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx)
+cryptodev_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc)
 {
   struct cryptodev_ctx *ctx;
   int cipher = gnutls_cipher_map[algorithm];
@@ -172,8 +172,9 @@ static int
 register_crypto (int cfd)
 {
   struct session_op sess;
-  char fake_key[CRYPTO_CIPHER_MAX_KEY_LEN];
-  int i = 0, ret;
+  uint8_t fake_key[CRYPTO_CIPHER_MAX_KEY_LEN];
+  unsigned int i;
+  int ret;
 
   memset (&sess, 0, sizeof (sess));
 
@@ -365,13 +366,13 @@ cryptodev_mac_fast (gnutls_mac_algorithm_t algo,
                         const void *key, size_t key_size, const void *text,
                         size_t text_size, void *digest)
 {
-int mac = gnutls_mac_map[algorithm];
+int mac = gnutls_mac_map[algo];
 struct session_op sess; 
 struct crypt_op cryp;
 
   sess.mac = mac;
-  sess.mackey = key;
-  sess.mackeylen = keysize;
+  sess.mackey = (void*)key;
+  sess.mackeylen = key_size;
 
   if (ioctl (cryptodev_fd, CIOCGSESSION, &sess))
     {
@@ -401,7 +402,7 @@ static const gnutls_crypto_mac_st mac_struct = {
   .setkey = cryptodev_mac_setkey,
   .hash = cryptodev_mac_hash,
   .output = cryptodev_mac_output,
-  .deinit = cryptodev_mac_deinit
+  .deinit = cryptodev_mac_deinit,
   .fast = cryptodev_mac_fast
 };
 
@@ -409,8 +410,9 @@ static int
 register_mac (int cfd)
 {
   struct session_op sess;
-  char fake_key[CRYPTO_CIPHER_MAX_KEY_LEN];
-  int i = 0, ret;
+  uint8_t fake_key[CRYPTO_CIPHER_MAX_KEY_LEN];
+  unsigned int i;
+  int ret;
 
   memset (&sess, 0, sizeof (sess));
   for (i = 0; i < sizeof (gnutls_mac_map) / sizeof (gnutls_mac_map[0]); i++)
