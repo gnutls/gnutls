@@ -1172,6 +1172,7 @@ _gnutls_proc_x509_server_certificate (gnutls_session_t session,
       if (ret < 0)
         {
           gnutls_assert ();
+          peer_certificate_list_size = j;
           goto cleanup;
         }
 

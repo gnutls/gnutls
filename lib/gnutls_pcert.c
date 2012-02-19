@@ -89,6 +89,7 @@ size_t sz;
   if (ret < 0)
     {
       gnutls_pubkey_deinit(pcert->pubkey);
+      pcert->pubkey = NULL;
       ret = gnutls_assert_val(ret);
       goto cleanup;
     }
@@ -96,7 +97,7 @@ size_t sz;
   return 0;
 
 cleanup:
-  gnutls_free(pcert->cert.data);
+  _gnutls_free_datum(&pcert->cert);
 
   return ret;
 }
@@ -281,6 +282,7 @@ size_t sz;
   if (ret < 0)
     {
       gnutls_pubkey_deinit(pcert->pubkey);
+      pcert->pubkey = NULL;
       ret = gnutls_assert_val(ret);
       goto cleanup;
     }
@@ -288,7 +290,7 @@ size_t sz;
   return 0;
 
 cleanup:
-  gnutls_free(pcert->cert.data);
+  _gnutls_free_datum(&pcert->cert);
 
   return ret;
 }
@@ -373,8 +375,7 @@ gnutls_pcert_deinit (gnutls_pcert_st *pcert)
 {
   gnutls_pubkey_deinit(pcert->pubkey);
   pcert->pubkey = NULL;
-  gnutls_free(pcert->cert.data);
-  pcert->cert.data = NULL;
+  _gnutls_free_datum(&pcert->cert);
 }
 
 /* Converts the first certificate for the cert_auth_info structure
