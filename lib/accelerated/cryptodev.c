@@ -360,6 +360,40 @@ cryptodev_mac_output (void *_ctx, void *digest, size_t digestsize)
   return 0;
 }
 
+static int
+cryptodev_mac_fast (gnutls_mac_algorithm_t algo,
+                        const void *key, size_t key_size, const void *text,
+                        size_t text_size, void *digest)
+{
+int mac = gnutls_mac_map[algorithm];
+struct session_op sess; 
+struct crypt_op cryp;
+
+  sess.mac = mac;
+  sess.mackey = key;
+  sess.mackeylen = keysize;
+
+  if (ioctl (cryptodev_fd, CIOCGSESSION, &sess))
+    {
+      gnutls_assert ();
+      return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
+    }
+  cryp.ses = sess.ses;
+  cryp.len = text_size;
+  cryp.src = (void *) text;
+  cryp.dst = NULL;
+  cryp.mac = digest;
+  cryp.op = COP_ENCRYPT;
+
+  if (ioctl (cryptodev_fd, CIOCCRYPT, &cryp))
+    {
+      gnutls_assert ();
+      return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
+    }
+  
+  return 0;
+}
+
 #define cryptodev_mac_deinit cryptodev_deinit
 
 static const gnutls_crypto_mac_st mac_struct = {
@@ -368,6 +402,7 @@ static const gnutls_crypto_mac_st mac_struct = {
   .hash = cryptodev_mac_hash,
   .output = cryptodev_mac_output,
   .deinit = cryptodev_mac_deinit
+  .fast = cryptodev_mac_fast
 };
 
 static int
