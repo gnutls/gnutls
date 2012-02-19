@@ -37,7 +37,7 @@ dist-hook:
 	rm -f ChangeLog
 	make ChangeLog
 	cp -f ChangeLog $(distdir)/
-	sed 's/\@VERSION\@/$(VERSION)/g' -i $(distdir)/src/*.def
+	sed 's/\@VERSION\@/$(VERSION)/g' -i $(distdir)/src/args-std.def
 	cd $(distdir)/src/ && for i in *.def;do \
 		autogen $$i; \
 		cp $$i $$i.tmp; \

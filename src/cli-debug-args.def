@@ -2,9 +2,8 @@ AutoGen Definitions options;
 prog-name     = gnutls-cli-debug;
 prog-title    = "GnuTLS debug client";
 prog-desc     = "Simple client program to check TLS server capabilities.";
-help-value = "h";
-short-usage   = "Usage: gnutls-cli-debug [options] hostname\ngnutls-cli --help for usage instructions.\n";
-prog-group    = "GnuTLS";
+short-usage   = "Usage: gnutls-cli-debug [options] hostname\n"
+                "gnutls-cli --help for usage instructions.\n";
 explain       = "";
 detail        = "TLS debug client. It sets up multiple TLS connections to 
 a server and queries its capabilities. It was created to assist in debugging 
@@ -12,41 +11,11 @@ GnuTLS, but it might be useful to extract a TLS server's capabilities.
 It connects to a TLS server, performs tests and print the server's 
 capabilities. If called with the `-v' parameter more checks will be performed.
 Can be used to check for servers with special needs or bugs.";
-gnu-usage;
-no-xlate = opt;
-no-misuse-usage;
-disable-save;
 reorder-args;
 argument;
-long-opts;
-config-header = 'config.h';
-export = '#include <gettext.h>';
 
-copyright = {
-    date  = "2000-2012";
-    owner = "Free Software Foundation";
-    author = "Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.";
-    eaddr  = "bug-gnutls@gnu.org";
-    type  = gpl;
-};
-version = "@VERSION@";
-
-flag = {
-    name      = debug;
-    value     = d;
-    arg-type  = number;
-    arg-range = "0 -> 9999";
-    descrip   = "Enable debugging";
-    doc       = "";
-};
-
-flag = {
-    name      = verbose;
-    value     = V;
-    max       = NOLIMIT;
-    descrip   = "More verbose output";
-    doc      = "";
-};
+#define  VERBOSE_OPT 1
+#include args-std.def
 
 flag = {
     name      = port;

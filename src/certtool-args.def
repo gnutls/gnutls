@@ -5,35 +5,12 @@ prog-desc     = "Manipulate certificates and private keys.";
 detail    = "Tool to parse and generate X.509 certificates, requests and private keys.
 It can be used interactively or non interactively by
 specifying the template command line option.";
-help-value = "h";
 short-usage   = "certtool [options] [url]\ncerttool --help for usage instructions.\n";
-prog-group    = "GnuTLS";
 explain       = "";
-gnu-usage;
-no-xlate = opt;
-no-misuse-usage;
-disable-save;
-long-opts;
-config-header = 'config.h';
-export = '#include <gettext.h>';
 
-copyright = {
-    date  = "2000-2012";
-    owner = "Free Software Foundation";
-    author = "Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.";
-    eaddr  = "bug-gnutls@gnu.org";
-    type  = gpl;
-};
-version = "@VERSION@";
-
-flag = {
-    name      = debug;
-    value     = d;
-    arg-type  = number;
-    arg-range = "0 -> 9999";
-    descrip   = "Enable debugging.";
-    doc       = "Specifies the debug level.";
-};
+#define  INFILE_OPT    1
+#define  OUTFILE_OPT   1
+#include args-std.def
 
 flag = {
     name      = generate-self-signed;
@@ -349,21 +326,6 @@ flag = {
     name      = disable-quick-random;
     descrip   = "No effect";
     doc      = "";
-};
-
-flag = {
-    name      = outfile;
-    arg-type  = string;
-    descrip   = "Output file";
-    doc   = "";
-};
-
-flag = {
-    name      = infile;
-    arg-type  = file;
-    file-exists = yes;
-    descrip   = "Input file";
-    doc   = "";
 };
 
 flag = {

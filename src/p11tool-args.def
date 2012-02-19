@@ -2,7 +2,6 @@ AutoGen Definitions options;
 prog-name     = p11tool;
 prog-title    = "GnuTLS PKCS #11 tool";
 prog-desc     = "Program to handle PKCS #11 smart cards and security modules.\n";
-help-value = "h";
 detail    = "Program that allows handling data from PKCS #11 smart cards
 and security modules. 
 
@@ -11,35 +10,12 @@ To use PKCS #11 tokens with gnutls the configuration file
 ";
 
 short-usage   = "p11tool [options] [url]\np11tool --help for usage instructions.\n";
-prog-group    = "GnuTLS";
 explain       = "";
-gnu-usage;
 reorder-args;
-no-xlate = opt;
 argument = "[url]";
-no-misuse-usage;
-disable-save;
-long-opts;
-config-header = 'config.h';
-export = '#include <gettext.h>';
 
-copyright = {
-    date  = "2000-2012";
-    owner = "Free Software Foundation";
-    author = "Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.";
-    eaddr  = "bug-gnutls@gnu.org";
-    type  = gpl;
-};
-version = "@VERSION@";
-
-flag = {
-    name      = debug;
-    value     = d;
-    arg-type  = number;
-    arg-range = "0 -> 9999";
-    descrip   = "Enable debugging.";
-    doc       = "Specifies the debug level.";
-};
+#define  OUTFILE_OPT   1
+#include args-std.def
 
 flag = {
     name      = list-tokens;
@@ -236,13 +212,6 @@ flag = {
     file-exists = yes;
     descrip   = "Specify the PKCS #11 provider library";
     doc      = "This will override the default options in /etc/gnutls/pkcs11.conf";
-};
-
-flag = {
-    name      = outfile;
-    arg-type  = string;
-    descrip   = "Output file";
-    doc      = "";
 };
 
 

@@ -3,35 +3,10 @@ prog-name     = gnutls-serv;
 prog-title    = "GnuTLS server";
 prog-desc     = "Simple server program to act as an HTTPS or TLS echo service.";
 short-usage   = "Usage: gnutls-serv [options]\ngnutls-serv --help for usage instructions.\n";
-help-value = "h";
-prog-group    = "GnuTLS";
 explain       = "";
 detail        = "Server program that listens to incoming TLS connections.";
-gnu-usage;
-no-xlate = opt;
-no-misuse-usage;
-disable-save;
-long-opts;
-config-header = 'config.h';
-export = '#include <gettext.h>';
 
-copyright = {
-    date  = "2000-2012";
-    owner = "Free Software Foundation";
-    author = "Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.";
-    eaddr  = "bug-gnutls@gnu.org";
-    type  = gpl;
-};
-version = "@VERSION@";
-
-flag = {
-    name      = debug;
-    value     = d;
-    arg-type  = number;
-    arg-range = "0 -> 9999";
-    descrip   = "Enable debugging";
-    doc       = "";
-};
+#include args-std.def
 
 flag = {
     name      = noticket;

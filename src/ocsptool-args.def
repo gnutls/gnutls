@@ -2,39 +2,16 @@ AutoGen Definitions options;
 prog-name     = ocsptool;
 prog-title    = "GnuTLS OCSP tool";
 prog-desc     = "Program to handle OCSP request/responses.";
-help-value = "h";
 detail    = "Ocsptool is a program that can parse and print information about
 OCSP requests/responses, generate requests and verify responses.
 ";
 short-usage   = "ocsptool [options]\nocsptool --help for usage instructions.\n";
-prog-group    = "GnuTLS";
 explain       = "";
-gnu-usage;
-no-xlate = opt;
-no-misuse-usage;
-disable-save;
-long-opts;
-config-header = 'config.h';
-export = '#include <gettext.h>';
 
-copyright = {
-    date  = "2012";
-    owner = "Free Software Foundation";
-    author = "Simon Josefsson, Nikos Mavrogiannopoulos and others; see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.";
-    eaddr  = "bug-gnutls@gnu.org";
-    type  = gpl;
-};
-version = "@VERSION@";
-
-flag = {
-    name      = debug;
-    value     = d;
-    arg-type  = number;
-    arg-default = 0;
-    arg-range = "0 -> 9999";
-    descrip   = "Enable debugging.";
-    doc       = "Specifies the debug level.";
-};
+#define  INFILE_OPT   1
+#define  OUTFILE_OPT  1
+#define  VERBOSE_OPT  1
+#include args-std.def
 
 flag = {
     name      = ask;
@@ -140,29 +117,6 @@ flag = {
     arg-type  = file;
     file-exists = yes;
     descrip   = "Read DER encoded OCSP response from file";
-    doc      = "";
-};
-
-flag = {
-    name      = outfile;
-    arg-type  = string;
-    descrip   = "Output file";
-    doc      = "";
-};
-
-flag = {
-    name      = infile;
-    arg-type  = file;
-    file-exists = yes;
-    descrip   = "Input file";
-    doc   = "";
-};
-
-flag = {
-    name      = verbose;
-    value     = V;
-    max       = NOLIMIT;
-    descrip   = "More verbose output";
     doc      = "";
 };
 

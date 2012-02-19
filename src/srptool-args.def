@@ -2,7 +2,6 @@ AutoGen Definitions options;
 prog-name     = srptool;
 prog-title    = "GnuTLS SRP tool";
 prog-desc     = "Simple program to create SRP parameters.\n";
-help-value = "h";
 explain       = "";
 detail    = "Simple program that emulates the programs in the Stanford SRP (Secure
 Remote Password) libraries using GnuTLS.  It is intended for use in  places
@@ -13,32 +12,8 @@ file that holds the users and the verifiers associated with  them  and  the
 configuration file to hold the group parameters (called tpasswd.conf).";
 
 short-usage   = "srptool [options]\nsrptool --help for usage instructions.\n";
-prog-group    = "GnuTLS";
-no-xlate = opt;
-gnu-usage;
-no-misuse-usage;
-disable-save;
-long-opts;
-config-header = 'config.h';
-export = '#include <gettext.h>';
 
-copyright = {
-    date  = "2000-2012";
-    owner = "Free Software Foundation";
-    author = "Nikos Mavrogiannopoulos, Simon Josefsson and others; see /usr/share/doc/gnutls-bin/AUTHORS for a complete list.";
-    eaddr  = "bug-gnutls@gnu.org";
-    type  = gpl;
-};
-version = "@VERSION@";
-
-flag = {
-    name      = debug;
-    value     = d;
-    arg-type  = number;
-    arg-range = "0 -> 9999";
-    descrip   = "Enable debugging.";
-    doc       = "Specifies the debug level.";
-};
+#include args-std.def
 
 flag = {
     name      = index;
