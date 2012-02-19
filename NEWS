@@ -7,6 +7,9 @@ See the end for copying conditions.
 ** command line apps: Included libopts doesn't get installed
 by default.
 
+** libgnutls: Eliminate double free on wrongly formatted
+certificate list. Reported by Remi Gacogne.
+
 ** libgnutls: cryptodev code corrected.
 
 ** API and ABI modifications:
