@@ -1,8 +1,8 @@
 #!/bin/sh
 
-# Copyright (C) 2006-2008, 2010, 2012 Free Software Foundation, Inc.
+# Copyright (C) 2012 Free Software Foundation, Inc.
 #
-# Author: Simon Josefsson
+# Author: Nikos Mavrogiannopoulos
 #
 # This file is part of GnuTLS.
 #
@@ -34,5 +34,8 @@ fi
 ./dtls-stress -nb -shello 210 -sfinished 01 -cfinished 201 CChangeCipherSpec SChangeCipherSpec SFinished
 ./dtls-stress -nb -shello 021 -sfinished 10 -cfinished 210 SHello SHelloDone SChangeCipherSpec CChangeCipherSpec CFinished
 ./dtls-stress -shello 210 -sfinished 10 -cfinished 210 SHello SKeyExchange SHelloDone CKeyExchange CChangeCipherSpec CFinished SChangeCipherSpec SFinished
+
+./dtls-stress -nb -full -shello 42130 -sfinished 10 -cfinished 43210 SHello SKeyExchange SHelloDone CKeyExchange CChangeCipherSpec CFinished SChangeCipherSpec SCertificate SFinished
+./dtls-stress -nb -full -shello 12430 -sfinished 01 -cfinished 01324 SHello SKeyExchange SHelloDone CKeyExchange CChangeCipherSpec CFinished SCertificate SFinished
 
 exit 0
