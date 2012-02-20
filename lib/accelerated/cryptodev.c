@@ -49,6 +49,7 @@ struct cryptodev_ctx
   struct session_op sess;
   struct crypt_op cryp;
   uint8_t iv[EALG_MAX_BLOCK_LEN];
+  unsigned int hash_reset;
   int cfd;
 };
 
@@ -349,7 +350,14 @@ cryptodev_mac_hash (void *_ctx, const void *text, size_t textsize)
   ctx->cryp.src = (void *) text;
   ctx->cryp.dst = NULL;
   ctx->cryp.op = COP_ENCRYPT;
-  ctx->cryp.flags = COP_FLAG_UPDATE;
+  
+  if (ctx->hash_reset == 0)
+    ctx->cryp.flags = COP_FLAG_UPDATE;
+  else
+    {
+      ctx->cryp.flags = 0;
+      ctx->hash_reset = 0;
+    }
   if (ioctl (ctx->cfd, CIOCCRYPT, &ctx->cryp))
     {
       gnutls_assert ();
@@ -374,6 +382,14 @@ cryptodev_mac_output (void *_ctx, void *digest, size_t digestsize)
     }
 
   return 0;
+}
+
+static void
+cryptodev_mac_reset (void *_ctx)
+{
+  struct cryptodev_ctx *ctx = _ctx;
+
+  ctx->hash_reset = 1;
 }
 
 static int
@@ -422,6 +438,7 @@ static const gnutls_crypto_mac_st mac_struct = {
   .hash = cryptodev_mac_hash,
   .output = cryptodev_mac_output,
   .deinit = cryptodev_mac_deinit,
+  .reset = cryptodev_mac_reset,
   .fast = cryptodev_mac_fast
 };
 
@@ -466,6 +483,7 @@ cryptodev_digest_init (gnutls_digest_algorithm_t algorithm, void **_ctx)
 
 #define cryptodev_digest_hash cryptodev_mac_hash
 #define cryptodev_digest_output cryptodev_mac_output
+#define cryptodev_digest_reset cryptodev_mac_reset
 
 static int
 cryptodev_digest_fast (gnutls_digest_algorithm_t algo,
@@ -509,6 +527,7 @@ static const gnutls_crypto_digest_st digest_struct = {
   .hash = cryptodev_digest_hash,
   .output = cryptodev_digest_output,
   .deinit = cryptodev_digest_deinit,
+  .reset = cryptodev_digest_reset,
   .fast = cryptodev_digest_fast
 };
 
