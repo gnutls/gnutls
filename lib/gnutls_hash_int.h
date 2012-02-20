@@ -37,7 +37,6 @@ extern int crypto_digest_prio;
 extern gnutls_crypto_digest_st _gnutls_digest_ops;
 
 typedef int (*hash_func) (void *handle, const void *text, size_t size);
-typedef int (*copy_func) (void **dst_ctx, void *src_ctx);
 typedef void (*reset_func) (void *ctx);
 typedef int (*output_func) (void *src_ctx, void *digest, size_t digestsize);
 typedef void (*deinit_func) (void *handle);
@@ -49,7 +48,6 @@ typedef struct
   int keysize;
 
   hash_func hash;
-  copy_func copy;
   reset_func reset;
   output_func output;
   deinit_func deinit;
@@ -168,8 +166,6 @@ void _gnutls_mac_reset_ssl3 (digest_hd_st * handle);
 
 int _gnutls_mac_deinit_ssl3_handshake (digest_hd_st * handle, void *digest,
                                         uint8_t * key, uint32_t key_size);
-
-int _gnutls_hash_copy (digest_hd_st * dst_handle, digest_hd_st * src_handle);
 
 inline static int IS_SHA(gnutls_digest_algorithm_t algo)
 {

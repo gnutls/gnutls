@@ -299,28 +299,6 @@ wrap_padlock_hash_init (gnutls_digest_algorithm_t algo, void **_ctx)
 }
 
 static int
-wrap_padlock_hash_copy (void **bhd, void *ahd)
-{
-  struct padlock_hash_ctx *ctx = ahd;
-  struct padlock_hash_ctx *dst_ctx;
-  int ret;
-
-  ret = wrap_padlock_hash_init (ctx->algo, bhd);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  dst_ctx = *bhd;
-
-  memcpy (&dst_ctx->ctx, &ctx->ctx, sizeof (ctx->ctx));
-
-  return 0;
-}
-
-
-static int
 wrap_padlock_hash_output (void *src_ctx, void *digest, size_t digestsize)
 {
   struct padlock_hash_ctx *ctx;
@@ -406,7 +384,6 @@ const gnutls_crypto_digest_st sha_padlock_nano_struct = {
   .init = wrap_padlock_hash_init,
   .hash = wrap_padlock_hash_update,
   .reset = wrap_padlock_hash_reset,
-  .copy = wrap_padlock_hash_copy,
   .output = wrap_padlock_hash_output,
   .deinit = wrap_padlock_hash_deinit,
   .fast = wrap_padlock_hash_fast,

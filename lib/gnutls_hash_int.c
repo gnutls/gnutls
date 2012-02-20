@@ -77,7 +77,6 @@ _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
         }
 
       dig->hash = cc->hash;
-      dig->copy = cc->copy;
       dig->reset = cc->reset;
       dig->output = cc->output;
       dig->deinit = cc->deinit;
@@ -93,7 +92,6 @@ _gnutls_hash_init (digest_hd_st * dig, gnutls_digest_algorithm_t algorithm)
     }
 
   dig->hash = _gnutls_digest_ops.hash;
-  dig->copy = _gnutls_digest_ops.copy;
   dig->reset = _gnutls_digest_ops.reset;
   dig->output = _gnutls_digest_ops.output;
   dig->deinit = _gnutls_digest_ops.deinit;
@@ -123,23 +121,6 @@ _gnutls_hash_get_algo_len (gnutls_digest_algorithm_t algorithm)
 {
   return digest_length (algorithm);
 }
-
-int
-_gnutls_hash_copy (digest_hd_st * dst, digest_hd_st * src)
-{
-
-  memset (dst, 0, sizeof (*dst));
-  dst->algorithm = src->algorithm;
-
-  dst->hash = src->hash;
-  dst->copy = src->copy;
-  dst->output = src->output;
-  dst->deinit = src->deinit;
-
-  return src->copy (&dst->handle, src->handle);
-}
-
-
 
 int
 _gnutls_hash_fast (gnutls_digest_algorithm_t algorithm,

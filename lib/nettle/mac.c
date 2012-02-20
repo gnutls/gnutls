@@ -268,27 +268,6 @@ wrap_nettle_hash_update (void *_ctx, const void *text, size_t textsize)
   return GNUTLS_E_SUCCESS;
 }
 
-static int
-wrap_nettle_hash_copy (void **bhd, void *ahd)
-{
-  struct nettle_hash_ctx *ctx = ahd;
-  struct nettle_hash_ctx *dst_ctx;
-  int ret;
-
-  ret = wrap_nettle_hash_init (ctx->algo, bhd);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  dst_ctx = *bhd;
-
-  memcpy (&dst_ctx->ctx, &ctx->ctx, sizeof (ctx->ctx));
-
-  return 0;
-}
-
 static void
 wrap_nettle_hash_deinit (void *hd)
 {
@@ -459,7 +438,6 @@ gnutls_crypto_digest_st _gnutls_digest_ops = {
   .init = wrap_nettle_hash_init,
   .hash = wrap_nettle_hash_update,
   .reset = wrap_nettle_hash_reset,
-  .copy = wrap_nettle_hash_copy,
   .output = wrap_nettle_hash_output,
   .deinit = wrap_nettle_hash_deinit,
   .fast = wrap_nettle_hash_fast,

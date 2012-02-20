@@ -67,7 +67,6 @@
     int (*init) (gnutls_digest_algorithm_t, void **ctx);
     void (*reset) (void *ctx);
     int (*hash) (void *ctx, const void *src, size_t srcsize);
-    int (*copy) (void **dst_ctx, void *src_ctx);
     int (*output) (void *src_ctx, void *digest, size_t digestsize);
     void (*deinit) (void *ctx);
     int (*fast)(gnutls_digest_algorithm_t, const void *src, size_t srcsize, void *digest);
