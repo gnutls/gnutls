@@ -153,7 +153,7 @@ cryptodev_deinit (void *_ctx)
 {
   struct cryptodev_ctx *ctx = _ctx;
 
-  ioctl (ctx->cfd, CIOCFSESSION, &ctx->sess);
+  ioctl (ctx->cfd, CIOCFSESSION, &ctx->sess.ses);
   gnutls_free (ctx);
 }
 
@@ -173,6 +173,9 @@ register_crypto (int cfd)
   uint8_t fake_key[CRYPTO_CIPHER_MAX_KEY_LEN];
   unsigned int i;
   int ret;
+#ifdef CIOCGSESSINFO
+  struct session_info_op siop;
+#endif
 
   memset (&sess, 0, sizeof (sess));
 
@@ -192,7 +195,19 @@ register_crypto (int cfd)
           continue;
         }
 
-      ioctl (cfd, CIOCFSESSION, &sess);
+#ifdef CIOCGSESSINFO
+      siop.ses = sess.ses; /* do not register ciphers that are not hw accelerated */
+      if (ioctl(cfd, CIOCGSESSINFO, &siop) == 0) 
+        {
+          if (!(siop.flags & SIOP_FLAG_KERNEL_DRIVER_ONLY))
+            {
+              ioctl (cfd, CIOCFSESSION, &sess.ses);
+              continue;
+            }
+        }
+#endif
+
+      ioctl (cfd, CIOCFSESSION, &sess.ses);
 
       _gnutls_debug_log ("/dev/crypto: registering: %s\n",
                          gnutls_cipher_get_name (i));
@@ -392,7 +407,7 @@ struct crypt_op cryp;
       gnutls_assert ();
       return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
     }
-  ioctl (cryptodev_fd, CIOCFSESSION, &sess);
+  ioctl (cryptodev_fd, CIOCFSESSION, &sess.ses);
   
   return 0;
 }
@@ -480,7 +495,7 @@ struct crypt_op cryp;
       gnutls_assert ();
       return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
     }
-  ioctl (cryptodev_fd, CIOCFSESSION, &sess);
+  ioctl (cryptodev_fd, CIOCFSESSION, &sess.ses);
   
   return 0;
 }
@@ -502,6 +517,9 @@ register_mac_digest (int cfd)
   uint8_t fake_key[CRYPTO_CIPHER_MAX_KEY_LEN];
   unsigned int i;
   int ret;
+#ifdef CIOCGSESSINFO
+  struct session_info_op siop;
+#endif
 
   memset (&sess, 0, sizeof (sess));
   for (i = 0; i < sizeof (gnutls_mac_map) / sizeof (gnutls_mac_map[0]); i++)
@@ -518,10 +536,22 @@ register_mac_digest (int cfd)
           continue;
         }
 
-      ioctl (cfd, CIOCFSESSION, &sess);
-
+#ifdef CIOCGSESSINFO
+      siop.ses = sess.ses; /* do not register ciphers that are not hw accelerated */
+      if (ioctl(cfd, CIOCGSESSINFO, &siop) == 0) 
+        {
+          if (!(siop.flags & SIOP_FLAG_KERNEL_DRIVER_ONLY))
+            {
+              ioctl (cfd, CIOCFSESSION, &sess.ses);
+              continue;
+            }
+        }
+#endif
       _gnutls_debug_log ("/dev/crypto: registering: HMAC-%s\n",
                          gnutls_mac_get_name (i));
+
+      ioctl (cfd, CIOCFSESSION, &sess.ses);
+
       ret = gnutls_crypto_single_mac_register (i, 90, &mac_struct);
       if (ret < 0)
         {
@@ -544,7 +574,19 @@ register_mac_digest (int cfd)
           continue;
         }
 
-      ioctl (cfd, CIOCFSESSION, &sess);
+#ifdef CIOCGSESSINFO
+      siop.ses = sess.ses;
+      if (ioctl(cfd, CIOCGSESSINFO, &siop) == 0) 
+        {
+          if (!(siop.flags & SIOP_FLAG_KERNEL_DRIVER_ONLY))
+            {
+              ioctl (cfd, CIOCFSESSION, &sess.ses);
+              continue;
+            }
+        }
+#endif
+
+      ioctl (cfd, CIOCFSESSION, &sess.ses);
 
       _gnutls_debug_log ("/dev/crypto: registering: %s\n",
                          gnutls_mac_get_name (i));
