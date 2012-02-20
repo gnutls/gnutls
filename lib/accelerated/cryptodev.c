@@ -327,6 +327,7 @@ static int
 cryptodev_mac_hash (void *_ctx, const void *text, size_t textsize)
 {
   struct cryptodev_ctx *ctx = _ctx;
+
   ctx->cryp.len = textsize;
   ctx->cryp.src = (void *) text;
   ctx->cryp.dst = NULL;
@@ -433,8 +434,15 @@ cryptodev_digest_init (gnutls_digest_algorithm_t algorithm, void **_ctx)
   ctx = *_ctx;
 
   ctx->cfd = cryptodev_fd;
-
   ctx->sess.mac = dig;
+
+  if (ioctl (ctx->cfd, CIOCGSESSION, &ctx->sess))
+    {
+      gnutls_assert ();
+      gnutls_free(ctx);
+      return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
+    }
+  ctx->cryp.ses = ctx->sess.ses;
 
   return 0;
 }
@@ -512,7 +520,7 @@ register_mac_digest (int cfd)
 
       ioctl (cfd, CIOCFSESSION, &sess);
 
-      _gnutls_debug_log ("/dev/crypto: registering: %s\n",
+      _gnutls_debug_log ("/dev/crypto: registering: HMAC-%s\n",
                          gnutls_mac_get_name (i));
       ret = gnutls_crypto_single_mac_register (i, 90, &mac_struct);
       if (ret < 0)
@@ -546,7 +554,6 @@ register_mac_digest (int cfd)
           gnutls_assert ();
           return ret;
         }
-
     }
 
   return 0;
@@ -559,7 +566,7 @@ register_mac_digest (int cfd)
   return 0;
 }
 
-#endif /* defined(CIOCSESSIONCLONE) && defined(COP_FLAG_UPDATE) */
+#endif /* defined(COP_FLAG_UPDATE) */
 
 #else /* ENABLE_CRYPTODEV */
 int
