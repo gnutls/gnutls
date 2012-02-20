@@ -52,6 +52,7 @@
 #include <minmax.h>
 
 #include "sockets.h"
+#include "benchmark.h"
 
 #include <common.h>
 #include <socket.h>
@@ -1114,6 +1115,24 @@ const char* rest = NULL;
   
   if (rest == NULL && argc > 0)
     rest = argv[0];
+    
+  if (HAVE_OPT(BENCHMARK_CIPHERS))
+    {
+      benchmark_cipher(1, OPT_VALUE_DEBUG); 
+      exit(0);
+    }
+
+  if (HAVE_OPT(BENCHMARK_SOFT_CIPHERS))
+    {
+      benchmark_cipher(0, OPT_VALUE_DEBUG); 
+      exit(0);
+    }
+
+  if (HAVE_OPT(BENCHMARK_TLS))
+    {
+      benchmark_tls(OPT_VALUE_DEBUG); 
+      exit(0);
+    }
 
   if (HAVE_OPT(PRIORITY)) 
     {
