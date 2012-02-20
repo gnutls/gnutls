@@ -34,8 +34,6 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-#define datum_append(x, y, z) _gnutls_datum_append_m (x, y, z, gnutls_realloc)
-
 /* Map an OpenCDK error type to a GnuTLS error type. */
 int
 _gnutls_map_cdk_rc (int rc)
@@ -236,7 +234,7 @@ gnutls_openpgp_get_key (gnutls_datum_t * key,
      to call the function twice. */
   rc = cdk_kbnode_write_to_mem_alloc (knode, &buf, &len);
   if (!rc)
-    datum_append (key, buf, len);
+    _gnutls_datum_append (key, buf, len);
   gnutls_free (buf);
 
 leave:

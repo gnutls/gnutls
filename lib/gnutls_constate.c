@@ -121,13 +121,13 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
   if (hash_size > 0)
     {
 
-      if (_gnutls_sset_datum
+      if (_gnutls_set_datum
           (&client_write->mac_secret, &key_block[pos], hash_size) < 0)
         return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
       pos += hash_size;
 
-      if (_gnutls_sset_datum
+      if (_gnutls_set_datum
           (&server_write->mac_secret, &key_block[pos], hash_size) < 0)
         return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
@@ -211,7 +211,7 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
           pos += key_size;
         }
 
-      if (_gnutls_sset_datum
+      if (_gnutls_set_datum
           (&client_write->key, client_write_key, client_write_key_size) < 0)
         return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
@@ -221,7 +221,7 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
                                          client_write_key_size, buf,
                                          sizeof (buf), NULL));
 
-      if (_gnutls_sset_datum
+      if (_gnutls_set_datum
           (&server_write->key, server_write_key, server_write_key_size) < 0)
         return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
@@ -238,13 +238,13 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
    */
   if (IV_size > 0 && export_flag == 0)
     {
-      if (_gnutls_sset_datum
+      if (_gnutls_set_datum
           (&client_write->IV, &key_block[pos], IV_size) < 0)
         return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
       pos += IV_size;
 
-      if (_gnutls_sset_datum
+      if (_gnutls_set_datum
           (&server_write->IV, &key_block[pos], IV_size) < 0)
         return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
@@ -280,10 +280,10 @@ _gnutls_set_keys (gnutls_session_t session, record_parameters_st * params,
       if (ret < 0)
         return gnutls_assert_val (ret);
 
-      if (_gnutls_sset_datum (&client_write->IV, iv_block, IV_size) < 0)
+      if (_gnutls_set_datum (&client_write->IV, iv_block, IV_size) < 0)
         return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
 
-      if (_gnutls_sset_datum
+      if (_gnutls_set_datum
           (&server_write->IV, &iv_block[IV_size], IV_size) < 0)
         return gnutls_assert_val (GNUTLS_E_MEMORY_ERROR);
     }
