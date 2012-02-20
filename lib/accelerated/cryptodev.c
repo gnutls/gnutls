@@ -175,6 +175,8 @@ register_crypto (int cfd)
   int ret;
 #ifdef CIOCGSESSINFO
   struct session_info_op siop;
+
+  memset(&siop, 0, sizeof(siop));
 #endif
 
   memset (&sess, 0, sizeof (sess));
@@ -519,6 +521,8 @@ register_mac_digest (int cfd)
   int ret;
 #ifdef CIOCGSESSINFO
   struct session_info_op siop;
+
+  memset(&siop, 0, sizeof(siop));
 #endif
 
   memset (&sess, 0, sizeof (sess));
