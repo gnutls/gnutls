@@ -118,6 +118,7 @@ cryptodev_encrypt (void *_ctx, const void *plain, size_t plainsize,
                    void *encr, size_t encrsize)
 {
   struct cryptodev_ctx *ctx = _ctx;
+
   ctx->cryp.len = plainsize;
   ctx->cryp.src = (void *) plain;
   ctx->cryp.dst = encr;
@@ -400,6 +401,7 @@ cryptodev_mac_fast (gnutls_mac_algorithm_t algo,
 int mac = gnutls_mac_map[algo];
 struct session_op sess; 
 struct crypt_op cryp;
+int ret;
 
   memset(&sess, 0, sizeof(sess));
   memset(&cryp, 0, sizeof(cryp));
@@ -420,12 +422,14 @@ struct crypt_op cryp;
   cryp.mac = digest;
   cryp.op = COP_ENCRYPT;
 
-  if (ioctl (cryptodev_fd, CIOCCRYPT, &cryp))
+  ret = ioctl (cryptodev_fd, CIOCCRYPT, &cryp);
+  ioctl (cryptodev_fd, CIOCFSESSION, &sess.ses);
+
+  if (ret)
     {
       gnutls_assert ();
       return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
     }
-  ioctl (cryptodev_fd, CIOCFSESSION, &sess.ses);
   
   return 0;
 }
@@ -493,6 +497,7 @@ cryptodev_digest_fast (gnutls_digest_algorithm_t algo,
 int dig = gnutls_digest_map[algo];
 struct session_op sess; 
 struct crypt_op cryp;
+int ret;
 
   memset(&sess, 0, sizeof(sess));
   memset(&cryp, 0, sizeof(cryp));
@@ -510,12 +515,14 @@ struct crypt_op cryp;
   cryp.mac = digest;
   cryp.op = COP_ENCRYPT;
 
-  if (ioctl (cryptodev_fd, CIOCCRYPT, &cryp))
+  ret = ioctl (cryptodev_fd, CIOCCRYPT, &cryp);
+  ioctl (cryptodev_fd, CIOCFSESSION, &sess.ses);
+  
+  if (ret)
     {
       gnutls_assert ();
       return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
     }
-  ioctl (cryptodev_fd, CIOCFSESSION, &sess.ses);
   
   return 0;
 }
