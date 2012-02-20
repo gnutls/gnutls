@@ -409,7 +409,9 @@ compressed_to_ciphertext (gnutls_session_t session,
     }
 
   /* add the authenticate data */
-  _gnutls_auth_cipher_add_auth(&params->write.cipher_state, preamble, preamble_size);
+  ret = _gnutls_auth_cipher_add_auth(&params->write.cipher_state, preamble, preamble_size);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   /* Actual encryption (inplace).
    */
@@ -493,7 +495,9 @@ ciphertext_to_compressed (gnutls_session_t session,
         make_preamble (UINT64DATA(*sequence), type,
                        length, ver, preamble);
 
-      _gnutls_auth_cipher_add_auth (&params->read.cipher_state, preamble, preamble_size);
+      ret = _gnutls_auth_cipher_add_auth (&params->read.cipher_state, preamble, preamble_size);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
 
       if ((ret =
            _gnutls_auth_cipher_decrypt (&params->read.cipher_state,
@@ -573,8 +577,13 @@ ciphertext_to_compressed (gnutls_session_t session,
       preamble_size =
         make_preamble (UINT64DATA(*sequence), type,
                        length, ver, preamble);
-      _gnutls_auth_cipher_add_auth (&params->read.cipher_state, preamble, preamble_size);
-      _gnutls_auth_cipher_add_auth (&params->read.cipher_state, ciphertext->data, length);
+      ret = _gnutls_auth_cipher_add_auth (&params->read.cipher_state, preamble, preamble_size);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+
+      ret = _gnutls_auth_cipher_add_auth (&params->read.cipher_state, ciphertext->data, length);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
 
       break;
     default:
