@@ -27,6 +27,8 @@ if NEED_LIBOPTS
 SUBDIRS += libopts
 endif
 
+EXTRA_DIST = args-std.def
+
 AM_CFLAGS = $(WARN_CFLAGS) $(WERROR_CFLAGS)
 AM_CPPFLAGS = \
 	-I$(srcdir)/../gl			\

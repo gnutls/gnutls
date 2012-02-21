@@ -39,6 +39,7 @@ dist-hook:
 	cp -f ChangeLog $(distdir)/
 	sed 's/\@VERSION\@/$(VERSION)/g' -i $(distdir)/src/args-std.def
 	cd $(distdir)/src/ && for i in *.def;do \
+		if test x"$$i" = x"args-std.def";then  continue; fi; \
 		autogen $$i; \
 		cp $$i $$i.tmp; \
 		sed -i 's/@subheading \(.*\)/@*\n@var{\1}\n@*/' $$i.tmp; \
