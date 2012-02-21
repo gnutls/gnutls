@@ -493,7 +493,18 @@ test_hash (void)
           /* import key */
           if (hash_vectors[i].key != NULL)
             {
+#if 0
+                ret = gnutls_hmac_fast(hash_vectors[i].algorithm, hash_vectors[i].key, hash_vectors[i].key_size,
+                      hash_vectors[i].plaintext, hash_vectors[i].plaintext_size, data);
+                if (ret < 0)
+                  {
+                      fprintf (stderr, "Error: %s:%d\n", __func__,
+                               __LINE__);
+                      return 1;
+                  }
+#else
                 gnutls_hmac_hd_t hd;
+
                 ret = gnutls_hmac_init( &hd, hash_vectors[i].algorithm, hash_vectors[i].key, hash_vectors[i].key_size);
                 if (ret < 0)
                   {
@@ -520,6 +531,7 @@ test_hash (void)
 
                 gnutls_hmac_output(hd, data);
                 gnutls_hmac_deinit(hd, NULL);
+#endif
 
                 data_size =
                     gnutls_hmac_get_len (hash_vectors[i].algorithm);
