@@ -46,6 +46,14 @@
 /* A very basic TLS client, with PSK authentication.
  */
 
+const char* side = "";
+
+static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "%s|<%d>| %s", side, level, str);
+}
+
 #define MAX_BUF 1024
 #define MSG "Hello TLS"
 
@@ -60,6 +68,11 @@ client (void)
   const gnutls_datum_t key = { (void *) "DEADBEEF", 8 };
 
   gnutls_global_init ();
+  gnutls_global_set_log_function (tls_log_func);
+  if (debug)
+    gnutls_global_set_log_level (4711);
+    
+  side = "client";
 
   gnutls_psk_allocate_client_credentials (&pskcred);
   gnutls_psk_set_client_credentials (pskcred, "test", &key,
@@ -237,6 +250,11 @@ server (void)
   /* this must be called once in the program
    */
   gnutls_global_init ();
+  gnutls_global_set_log_function (tls_log_func);
+  if (debug)
+    gnutls_global_set_log_level (4711);
+    
+  side = "server";
 
   gnutls_psk_allocate_server_credentials (&server_pskcred);
   gnutls_psk_set_server_credentials_function (server_pskcred, pskfunc);

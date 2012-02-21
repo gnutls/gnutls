@@ -32,6 +32,12 @@
 #include "../lib/x509/pbkdf2-sha1.h"
 #include "../lib/debug.h"
 
+static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "|<%d>| %s", level, str);
+}
+
 void
 doit (void)
 {
@@ -40,6 +46,9 @@ doit (void)
 
   /* XXX: We need this to fix secure memory. */
   gnutls_global_init ();
+  gnutls_global_set_log_function (tls_log_func);
+  if (debug)
+    gnutls_global_set_log_level (4711);
 
   err =
     _gnutls_hmac_fast (GNUTLS_MAC_MD5, "keykeykey", 9, "abcdefgh", 8, digest);
