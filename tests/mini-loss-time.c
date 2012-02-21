@@ -162,6 +162,9 @@ client (int fd, int packet)
       ret = gnutls_handshake (session);
     }
   while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+  
+  gnutls_deinit(session);
+  gnutls_global_deinit();
 
   if (ret < 0)
     {
@@ -231,10 +234,12 @@ int ret;
       ret = gnutls_handshake (session);
     }
   while (ret < 0 && gnutls_error_is_fatal(ret) == 0);
+
+  gnutls_deinit (session);
+  gnutls_global_deinit();
+
   if (ret < 0)
     {
-      close (fd);
-      gnutls_deinit (session);
       return;
     }
 }
@@ -266,12 +271,16 @@ static void start (int server_packet, int client_packet)
   if (child)
     {
       /* parent */
+      close(fd[1]);
       server (fd[0], server_packet);
+      close(fd[0]);
       kill(child, SIGTERM);
     }
   else 
     {
+      close(fd[0]);
       client (fd[1], client_packet);
+      close(fd[1]);
       exit(0);
     }
 }
