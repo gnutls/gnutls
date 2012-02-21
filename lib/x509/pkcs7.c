@@ -1026,4 +1026,3 @@ cleanup:
     asn1_delete_structure (&c2);
   return result;
 }
- 
