@@ -112,29 +112,29 @@ system_read (gnutls_transport_ptr_t ptr, void *data, size_t data_size)
 }
 
 /* Wait for data to be received within a timeout period in milliseconds.
- * If data_size > 0 it will return the specified amount of data in
- * peek mode.
+ * To catch a termination it will also try to receive 0 bytes from the
+ * socket if select reports to proceed.
  *
- * Returns -1 on error, 0 on timeout.
+ * Returns -1 on error, 0 on timeout, positive value if data are available for reading.
  */
 int system_recv_timeout(gnutls_transport_ptr_t ptr, unsigned int ms)
 {
 fd_set rfds;
 struct timeval tv;
 int ret, ret2;
+int fd = GNUTLS_POINTER_TO_INT(ptr);
 
   FD_ZERO(&rfds);
-  FD_SET(GNUTLS_POINTER_TO_INT(ptr), &rfds);
+  FD_SET(fd, &rfds);
   
   tv.tv_sec = 0;
   tv.tv_usec = ms * 1000;
   
-  ret = select(GNUTLS_POINTER_TO_INT(ptr)+1, &rfds, NULL, NULL, &tv);
+  ret = select(fd+1, &rfds, NULL, NULL, &tv);
   if (ret <= 0)
     return ret;
 
-  
-  ret2 = recv(GNUTLS_POINTER_TO_INT(ptr), NULL, 0, MSG_PEEK);
+  ret2 = recv(fd, NULL, 0, MSG_PEEK);
   if (ret2 == -1)
     return ret2;
       
