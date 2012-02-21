@@ -618,14 +618,22 @@ int
 _gnutls_io_check_recv (gnutls_session_t session, unsigned int ms)
 {
   gnutls_transport_ptr_t fd = session->internals.transport_send_ptr;
-  int ret = 0;
+  int ret = 0, err;
   
   if (session->internals.pull_timeout_func == system_recv_timeout && 
     session->internals.pull_func != system_read)
     return gnutls_assert_val(GNUTLS_E_PULL_ERROR);
 
+  reset_errno (session);
+
   ret = session->internals.pull_timeout_func(fd, ms);
-  if (ret == -1)
+
+  err = get_errno (session);
+  if (ret == -1 && err == EINTR)
+    return GNUTLS_E_INTERRUPTED;
+  else if (ret == -1 && err == EAGAIN)
+    return GNUTLS_E_AGAIN;
+  else if (ret == -1)
     return gnutls_assert_val(GNUTLS_E_PULL_ERROR);
   
   if (ret > 0)
