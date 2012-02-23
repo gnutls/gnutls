@@ -23,6 +23,11 @@
 /* Functions that are record layer specific, are included in this file.
  */
 
+/* allocate this many bytes more when encrypting or decrypting, to
+ * compensate for broken backends such as cryptodev.
+ */
+#define CIPHER_SLACK_SIZE 32
+
 #include "gnutls_int.h"
 #include "gnutls_errors.h"
 #include "debug.h"
@@ -398,10 +403,9 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
     }
   else
     {
-
       /* now proceed to packet encryption
        */
-      cipher_size = send_data_size + MAX_RECORD_OVERHEAD;
+      cipher_size = send_data_size + MAX_RECORD_OVERHEAD + CIPHER_SLACK_SIZE;
       bufel = _mbuffer_alloc (cipher_size, cipher_size);
       if (bufel == NULL)
         return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
@@ -1000,7 +1004,8 @@ begin:
   /* We allocate the maximum possible to allow few compressed bytes to expand to a
    * full record.
    */
-  decrypted = _mbuffer_alloc(MAX_RECORD_RECV_SIZE(session), MAX_RECORD_RECV_SIZE(session));
+  decrypted = _mbuffer_alloc(MAX_RECORD_RECV_SIZE(session), 
+                             MAX_RECORD_RECV_SIZE(session));
   if (decrypted == NULL)
     return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 

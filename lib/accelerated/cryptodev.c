@@ -23,7 +23,6 @@
 #include <gnutls_errors.h>
 #include <gnutls_int.h>
 #include <gnutls/crypto.h>
-#include <accelerated/cryptodev.h>
 #include <gnutls_errors.h>
 
 #ifdef ENABLE_CRYPTODEV
@@ -31,16 +30,9 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <crypto/cryptodev.h>
+#include <accelerated/cryptodev.h>
 
-#ifndef CRYPTO_CIPHER_MAX_KEY_LEN
-#define CRYPTO_CIPHER_MAX_KEY_LEN 64
-#endif
-
-#ifndef EALG_MAX_BLOCK_LEN
-#define EALG_MAX_BLOCK_LEN 16
-#endif
-
-static int cryptodev_fd = -1;
+int _gnutls_cryptodev_fd = -1;
 
 static int register_mac_digest (int cfd);
 
@@ -77,7 +69,7 @@ cryptodev_cipher_init (gnutls_cipher_algorithm_t algorithm, void **_ctx, int enc
 
   ctx = *_ctx;
 
-  ctx->cfd = cryptodev_fd;
+  ctx->cfd = _gnutls_cryptodev_fd;
   ctx->sess.cipher = cipher;
   ctx->cryp.iv = ctx->iv;
 
@@ -146,7 +138,6 @@ cryptodev_decrypt (void *_ctx, const void *encr, size_t encrsize,
       return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
     }
   return 0;
-
 }
 
 static void
@@ -223,7 +214,7 @@ register_crypto (int cfd)
 
     }
 
-  return 0;
+  return _cryptodev_register_gcm_crypto(cfd);
 }
 
 int
@@ -232,8 +223,8 @@ _gnutls_cryptodev_init (void)
   int ret;
 
   /* Open the crypto device */
-  cryptodev_fd = open ("/dev/crypto", O_RDWR, 0);
-  if (cryptodev_fd < 0)
+  _gnutls_cryptodev_fd = open ("/dev/crypto", O_RDWR, 0);
+  if (_gnutls_cryptodev_fd < 0)
     {
       gnutls_assert ();
       return GNUTLS_E_CRYPTODEV_DEVICE_ERROR;
@@ -243,7 +234,7 @@ _gnutls_cryptodev_init (void)
   {
     int cfd = -1;
     /* Clone file descriptor */
-    if (ioctl (cryptodev_fd, CRIOGET, &cfd))
+    if (ioctl (_gnutls_cryptodev_fd, CRIOGET, &cfd))
       {
         gnutls_assert ();
         return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
@@ -256,18 +247,18 @@ _gnutls_cryptodev_init (void)
         return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
       }
 
-    close (cryptodev_fd);
-    cryptodev_fd = cfd;
+    close (_gnutls_cryptodev_fd);
+    _gnutls_cryptodev_fd = cfd;
   }
 #endif
 
-  ret = register_crypto (cryptodev_fd);
+  ret = register_crypto (_gnutls_cryptodev_fd);
   if (ret < 0)
     gnutls_assert ();
 
   if (ret >= 0)
     {
-      ret = register_mac_digest (cryptodev_fd);
+      ret = register_mac_digest (_gnutls_cryptodev_fd);
       if (ret < 0)
         gnutls_assert ();
     }
@@ -275,7 +266,7 @@ _gnutls_cryptodev_init (void)
   if (ret < 0)
     {
       gnutls_assert ();
-      close (cryptodev_fd);
+      close (_gnutls_cryptodev_fd);
     }
 
   return ret;
@@ -284,7 +275,7 @@ _gnutls_cryptodev_init (void)
 void
 _gnutls_cryptodev_deinit (void)
 {
-  if (cryptodev_fd != -1) close (cryptodev_fd);
+  if (_gnutls_cryptodev_fd != -1) close (_gnutls_cryptodev_fd);
 }
 
 /* MAC and digest stuff */
@@ -316,7 +307,7 @@ cryptodev_mac_init (gnutls_mac_algorithm_t algorithm, void **_ctx)
 
   ctx = *_ctx;
 
-  ctx->cfd = cryptodev_fd;
+  ctx->cfd = _gnutls_cryptodev_fd;
 
   ctx->sess.mac = mac;
 
@@ -403,7 +394,7 @@ struct cryptodev_ctx ctx;
 int ret;
 
   memset(&ctx, 0, sizeof(ctx));
-  ctx.cfd = cryptodev_fd;
+  ctx.cfd = _gnutls_cryptodev_fd;
   ctx.sess.mac = gnutls_mac_map[algo];
 
   ctx.sess.mackeylen = key_size;
@@ -422,7 +413,7 @@ int ret;
   
   ret = ioctl (ctx.cfd, CIOCCRYPT, &ctx.cryp);
 
-  ioctl (cryptodev_fd, CIOCFSESSION, &ctx.sess.ses);
+  ioctl (_gnutls_cryptodev_fd, CIOCFSESSION, &ctx.sess.ses);
   if (ret != 0)
     return gnutls_assert_val(GNUTLS_E_CRYPTODEV_IOCTL_ERROR);
   
@@ -466,7 +457,7 @@ cryptodev_digest_init (gnutls_digest_algorithm_t algorithm, void **_ctx)
 
   ctx = *_ctx;
 
-  ctx->cfd = cryptodev_fd;
+  ctx->cfd = _gnutls_cryptodev_fd;
   ctx->sess.mac = dig;
 
   if (ioctl (ctx->cfd, CIOCGSESSION, &ctx->sess))
@@ -493,7 +484,7 @@ struct cryptodev_ctx ctx;
 int ret;
 
   memset(&ctx, 0, sizeof(ctx));
-  ctx.cfd = cryptodev_fd;
+  ctx.cfd = _gnutls_cryptodev_fd;
   ctx.sess.mac = gnutls_digest_map[algo];
 
   if (ioctl (ctx.cfd, CIOCGSESSION, &ctx.sess))
@@ -509,7 +500,7 @@ int ret;
   
   ret = ioctl (ctx.cfd, CIOCCRYPT, &ctx.cryp);
   
-  ioctl (cryptodev_fd, CIOCFSESSION, &ctx.sess.ses);
+  ioctl (_gnutls_cryptodev_fd, CIOCFSESSION, &ctx.sess.ses);
   if (ret != 0)
     return gnutls_assert_val(GNUTLS_E_CRYPTODEV_IOCTL_ERROR);
   

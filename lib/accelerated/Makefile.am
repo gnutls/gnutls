@@ -35,7 +35,7 @@ endif
 noinst_LTLIBRARIES = libaccelerated.la
 
 EXTRA_DIST = accelerated.h cryptodev.h
-libaccelerated_la_SOURCES = accelerated.c cryptodev.c
+libaccelerated_la_SOURCES = accelerated.c cryptodev.c cryptodev-gcm.c
 libaccelerated_la_LIBADD =
 
 if ASM_X86

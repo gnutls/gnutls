@@ -183,9 +183,6 @@ inline static unsigned int _gnutls_auth_cipher_is_aead( auth_cipher_hd_st * hand
   return _gnutls_cipher_is_aead(&handle->cipher);
 }
 
-#define _gnutls_auth_cipher_encrypt_tag(x,y,z,t,s,a) _gnutls_auth_cipher_encrypt2_tag(x,y,z,y,z,t,s,a)
-#define _gnutls_auth_cipher_decrypt(x,y,z) _gnutls_auth_cipher_decrypt2(x,y,z,y,z)
-
 void _gnutls_auth_cipher_deinit (auth_cipher_hd_st * handle);
 
 

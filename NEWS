@@ -10,7 +10,8 @@ by default.
 ** libgnutls: Eliminate double free on wrongly formatted
 certificate list. Reported by Remi Gacogne.
 
-** libgnutls: cryptodev code corrected.
+** libgnutls: cryptodev code corrected, updated to account
+for hashes and GCM mode.
 
 ** libgnutls: Eliminated memory leak in PCKS #11 initialization.
 Report and fix by Sam Varshavchik.

@@ -416,8 +416,10 @@ compressed_to_ciphertext (gnutls_session_t session,
   /* Actual encryption (inplace).
    */
   ret =
-    _gnutls_auth_cipher_encrypt_tag (&params->write.cipher_state,
-      cipher_data, length_to_encrypt, tag_ptr, tag_size, compressed->size);
+    _gnutls_auth_cipher_encrypt2_tag (&params->write.cipher_state,
+        cipher_data, length_to_encrypt, 
+        cipher_data, cipher_size,
+        tag_ptr, tag_size, compressed->size);
   if (ret < 0)
     return gnutls_assert_val(ret);
 
@@ -500,8 +502,9 @@ ciphertext_to_compressed (gnutls_session_t session,
         return gnutls_assert_val(ret);
 
       if ((ret =
-           _gnutls_auth_cipher_decrypt (&params->read.cipher_state,
-             ciphertext->data, length_to_decrypt)) < 0)
+           _gnutls_auth_cipher_decrypt2 (&params->read.cipher_state,
+             ciphertext->data, length_to_decrypt,
+             ciphertext->data, ciphertext->size)) < 0)
         return gnutls_assert_val(ret);
 
       break;

@@ -30,6 +30,7 @@ struct aes_gcm_vectors_st
 };
 
 struct aes_gcm_vectors_st aes_gcm_vectors[] = {
+#if 0
     {
      .key = (void*)
      "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
@@ -41,6 +42,7 @@ struct aes_gcm_vectors_st aes_gcm_vectors[] = {
      .iv = (void*)"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
      .tag = (void*)
      "\x58\xe2\xfc\xce\xfa\x7e\x30\x61\x36\x7f\x1d\x57\xa4\xe7\x45\x5a"},
+#endif
     {
      .key = (void*)
      "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
@@ -148,7 +150,7 @@ test_aes (void)
             }
 
           ret = gnutls_cipher_encrypt2 (hd, aes_vectors[i].plaintext, 16,
-                                        tmp, 16);
+                                        tmp, sizeof(tmp));
           if (ret < 0)
             {
                 fprintf (stderr, "%d: AES test %d failed\n", __LINE__, i);
@@ -200,7 +202,7 @@ test_aes (void)
             }
 
           ret = gnutls_cipher_decrypt2 (hd, aes_vectors[i].ciphertext, 16,
-                                        tmp, 16);
+                                        tmp, sizeof(tmp));
           if (ret < 0)
             {
                 fprintf (stderr, "%d: AES test %d failed\n", __LINE__, i);
@@ -273,12 +275,11 @@ test_aes (void)
                                             aes_gcm_vectors[i].plaintext,
                                             aes_gcm_vectors[i].
                                             plaintext_size, tmp,
-                                            aes_gcm_vectors[i].
-                                            plaintext_size);
+                                            sizeof(tmp));
                 if (ret < 0)
                   {
-                      fprintf (stderr, "%d: AES-GCM test %d failed\n",
-                               __LINE__, i);
+                      fprintf (stderr, "%d: AES-GCM test %d failed: %s\n",
+                               __LINE__, i, gnutls_strerror(ret));
                       return 1;
                   }
             }
