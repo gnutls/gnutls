@@ -487,7 +487,7 @@ static int
 initialize_automatic_p11_kit (void)
 {
   struct ck_function_list **modules;
-  const char *name;
+  char *name;
   ck_rv_t rv;
   int i, ret;
 
@@ -512,6 +512,7 @@ initialize_automatic_p11_kit (void)
           gnutls_assert ();
           _gnutls_debug_log ("Cannot add registered module: %s\n", name);
         }
+      free(name);
     }
 
   free (modules);

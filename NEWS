@@ -12,6 +12,9 @@ certificate list. Reported by Remi Gacogne.
 
 ** libgnutls: cryptodev code corrected.
 
+** libgnutls: Eliminated memory leak in PCKS #11 initialization.
+Report and fix by Sam Varshavchik.
+
 ** API and ABI modifications:
 No changes since last version.
 
