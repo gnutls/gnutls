@@ -24,13 +24,21 @@
 #include <gnutls_int.h>
 #include <gnutls/crypto.h>
 #include <gnutls_errors.h>
+#include <accelerated/cryptodev.h>
 
 #ifdef ENABLE_CRYPTODEV
 
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <crypto/cryptodev.h>
-#include <accelerated/cryptodev.h>
+
+#ifndef CRYPTO_CIPHER_MAX_KEY_LEN
+#define CRYPTO_CIPHER_MAX_KEY_LEN 64
+#endif
+
+#ifndef EALG_MAX_BLOCK_LEN
+#define EALG_MAX_BLOCK_LEN 16
+#endif
 
 int _gnutls_cryptodev_fd = -1;
 
@@ -621,13 +629,13 @@ register_mac_digest (int cfd)
 
 #else /* ENABLE_CRYPTODEV */
 int
-_gnutls_cryptodev_init ()
+_gnutls_cryptodev_init (void)
 {
   return 0;
 }
 
 void
-_gnutls_cryptodev_deinit ()
+_gnutls_cryptodev_deinit (void)
 {
   return;
 }
