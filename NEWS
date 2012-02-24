@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.0.14 (unreleased)
+* Version 3.0.14 (released 2012-02-24)
 
 ** command line apps: Included libopts doesn't get installed
 by default.
