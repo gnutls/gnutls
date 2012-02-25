@@ -26,10 +26,11 @@ my $menu = 0;
 my $i = 0;
 
 while ($line = <>) {
-  if ($line =~ /\@node/) {
+  if ($line =~ /\@node (.*)/) {
     if ($init == 0) {
       $init = 1;
     } else {
+      print "\@anchor\{$1\}\n";
       next;
     }
   }
