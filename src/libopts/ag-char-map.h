@@ -1,5 +1,5 @@
 /*
- *   Character mapping generated 02/10/12 19:53:35
+ *   Character mapping generated 02/25/12 13:14:41
  *
  *  This file contains the character classifications
  *  used by AutoGen and AutoOpts for identifying tokens.
@@ -26,6 +26,7 @@
 #ifdef HAVE_CONFIG_H
 # if defined(HAVE_INTTYPES_H)
 #   include <inttypes.h>
+
 # elif defined(HAVE_STDINT_H)
 #   include <stdint.h>
 
@@ -99,6 +100,7 @@
 // set-separator   "|+"          +end-list-entry
 //
 #endif /* 0 -- mapping spec. source */
+
 
 typedef uint32_t ag_char_map_mask_t;
 
@@ -218,7 +220,6 @@ static ag_char_map_mask_t const ag_char_map_table[128] = {
   /* x */ 0x002801, /* y */ 0x002801, /* z */ 0x002801, /* { */ 0x00A000,
   /* | */ 0x40A800, /* } */ 0x00A000, /* ~ */ 0x00A800, /*x7F*/ 0x000000
 };
-
 static inline int
 is_ag_char_map_char(char ch, ag_char_map_mask_t mask)
 {
@@ -239,5 +240,4 @@ brk_ag_char_map_chars(char * p, ag_char_map_mask_t mask)
     while ((*p != '\0') && (! is_ag_char_map_char(*p, mask)))  p++;
     return p;
 }
-
 #endif /* AG_CHAR_MAP_H_GUARD */

@@ -2,7 +2,7 @@
 /**
  * \file numeric.c
  *
- *  Time-stamp:      "2012-01-29 19:10:40 bkorb"
+ *  Time-stamp:      "2012-02-25 12:54:32 bkorb"
  *
  *  This file is part of AutoOpts, a companion to AutoGen.
  *  AutoOpts is free software.
@@ -54,7 +54,7 @@ optionShowRange(tOptions * pOpts, tOptDesc * pOD, void * rng_table, int rng_ct)
         pz_indent = ONE_TAB_STR;
 
         fprintf(option_usage_fp, zRangeErr, pOpts->pzProgName,
-                pOD->pz_Name, pOD->optArg.argString);
+                pOD->pz_Name, pOD->optArg.argInt);
         pz_indent = "";
     }
 

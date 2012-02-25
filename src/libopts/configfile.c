@@ -1,7 +1,7 @@
 /**
  * \file configfile.c
  *
- *  Time-stamp:      "2012-01-29 15:57:40 bkorb"
+ *  Time-stamp:      "2012-02-25 12:54:32 bkorb"
  *
  *  configuration/rc/ini file handling.
  *
@@ -1369,7 +1369,7 @@ validate_struct(tOptions * pOpts, char const * pzProgram)
           || (pOpts->structVersion < OPTIONS_MINIMUM_VERSION )
        )  )  {
         static char const aover[] =
-            __STR(AO_CURRENT)":"__STR(AO_REVISION)":"__STR(AO_AGE)"\n";
+            STR(AO_CURRENT)":"STR(AO_REVISION)":"STR(AO_AGE)"\n";
 
         fprintf(stderr, zAO_Err, pzProgram, NUM_TO_VER(pOpts->structVersion));
         if (pOpts->structVersion > OPTIONS_STRUCT_VERSION )

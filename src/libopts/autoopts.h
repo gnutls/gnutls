@@ -2,7 +2,7 @@
 /*
  *  \file autoopts.h
  *
- *  Time-stamp:      "2012-02-10 19:04:40 bkorb"
+ *  Time-stamp:      "2012-02-12 09:04:40 bkorb"
  *
  *  This file defines all the global structures and special values
  *  used in the automated option processing library.

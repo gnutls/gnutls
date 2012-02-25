@@ -1,7 +1,7 @@
 /**
  * \file cook.c
  *
- *  Time-stamp:      "2012-02-10 17:00:47 bkorb"
+ *  Time-stamp:      "2012-02-12 09:00:47 bkorb"
  *
  *  This file contains the routines that deal with processing quoted strings
  *  into an internal format.
@@ -59,7 +59,7 @@ contiguous_quote(char ** pps, char * pq, int * lnct_p);
  * err:  @code{NULL} is returned if the string is mal-formed.
 =*/
 unsigned int
-ao_string_cook_escape_char( char const* pzIn, char* pRes, uint_t nl )
+ao_string_cook_escape_char(char const* pzIn, char* pRes, uint_t nl)
 {
     unsigned int  res = 1;
 
