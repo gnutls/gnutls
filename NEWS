@@ -7,6 +7,9 @@ See the end for copying conditions.
 ** command line apps: Link with local libopts if the installed
 is an old one.
 
+** libgnutls: Corrected issue with select() that affected
+FreeBSD. This prevented establishing DTLS sessions.
+
 ** API and ABI modifications:
 No changes since last version.
 
