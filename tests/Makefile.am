@@ -105,7 +105,7 @@ TESTS_ENVIRONMENT =						\
 	EXEEXT=$(EXEEXT)					\
 	srcdir="$(srcdir)"
 
-if !WINDOWS
+if WANT_TEST_SUITE
 TESTS_ENVIRONMENT +=						\
 	$(VALGRIND)
 endif
