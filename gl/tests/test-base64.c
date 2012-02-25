@@ -153,7 +153,7 @@ main (void)
 
   {
     struct base64_decode_context ctx;
-    const char *newlineb64 = "YWJjZG\nVmZ2hp\r\n\tamtsbW5vcA==";
+    const char *newlineb64 = "YWJjZG\nVmZ2hp\namtsbW5vcA==";
 
     base64_decode_ctx_init (&ctx);
 
@@ -168,7 +168,7 @@ main (void)
     struct base64_decode_context ctx;
     base64_decode_ctx_init (&ctx);
 
-    ok = base64_decode_alloc_ctx (&ctx, "YW\n JjZGVmZ2hp", 14, &p, &len);
+    ok = base64_decode_alloc_ctx (&ctx, "YW\nJjZGVmZ2hp", 13, &p, &len);
     ASSERT (ok);
     ASSERT (len == 9);
     ASSERT (memcmp (p, "abcdefghi", len) == 0);

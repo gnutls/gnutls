@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
 
 /* Written by Simon Josefsson.  Partially adapted from GNU MailUtils
  * (mailbox/filter_trans.c, as of 2004-11-28).  Improved by review
@@ -308,24 +307,6 @@ base64_decode_ctx_init (struct base64_decode_context *ctx)
   ctx->i = 0;
 }
 
-inline static int is_nl(char c)
-{
-  if (c == ' ' || c == '\t' || c == '\n' || c == '\r')
-    return 1;
-  return 0;
-}
-
-inline static int search_for_nl(char const *t, size_t t_size)
-{
-int i;
-
-  for (i=0;i<t_size;i++)
-    if (t[i] == ' ' || t[i] == '\t' || t[i] == '\n' || t[i] == '\r')
-      return 1;
-  
-  return 0;
-}
-
 /* If CTX->i is 0 or 4, there are four or more bytes in [*IN..IN_END), and
    none of those four is a newline, then return *IN.  Otherwise, copy up to
    4 - CTX->i non-newline bytes from that range into CTX->buf, starting at
@@ -344,7 +325,7 @@ get_4 (struct base64_decode_context *ctx,
   if (ctx->i == 0)
     {
       char const *t = *in;
-      if (4 <= in_end - *in && search_for_nl(t, 4) == 0)
+      if (4 <= in_end - *in && memchr (t, '\n', 4) == NULL)
         {
           /* This is the common case: no newline.  */
           *in += 4;
@@ -359,7 +340,7 @@ get_4 (struct base64_decode_context *ctx,
     while (p < in_end)
       {
         char c = *p++;
-        if (!is_nl(c))
+        if (c != '\n')
           {
             ctx->buf[ctx->i++] = c;
             if (ctx->i == 4)
@@ -512,7 +493,7 @@ base64_decode_ctx (struct base64_decode_context *ctx,
 
       /* Handle the common case of 72-byte wrapped lines.
          This also handles any other multiple-of-4-byte wrapping.  */
-      if (inlen && is_nl(*in) && ignore_newlines)
+      if (inlen && *in == '\n' && ignore_newlines)
         {
           ++in;
           --inlen;

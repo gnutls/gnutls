@@ -317,6 +317,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module time:
   # Code from module time-tests:
   # Code from module time_r:
+  # Code from module timer-time:
   # Code from module timespec:
   # Code from module u64:
   # Code from module u64-tests:
@@ -813,6 +814,7 @@ if test $HAVE_LOCALTIME_R = 0 || test $REPLACE_LOCALTIME_R = 1; then
   gl_PREREQ_TIME_R
 fi
 gl_TIME_MODULE_INDICATOR([time_r])
+gl_TIMER_TIME
 gl_TIMESPEC
 AC_REQUIRE([AC_C_INLINE])
 gl_UNISTD_H
@@ -1454,6 +1456,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/threadlib.m4
   m4/time_h.m4
   m4/time_r.m4
+  m4/timer_time.m4
   m4/timespec.m4
   m4/uintmax_t.m4
   m4/ungetc.m4

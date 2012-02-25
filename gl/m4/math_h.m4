@@ -1,4 +1,4 @@
-# math_h.m4 serial 56
+# math_h.m4 serial 60
 dnl Copyright (C) 2007-2012 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
@@ -41,8 +41,9 @@ AC_DEFUN([gl_MATH_H],
   gl_WARN_ON_USE_PREPARE([[#include <math.h>]],
     [acosf acosl asinf asinl atanf atanl
      ceilf ceill copysign copysignf copysignl cosf cosl coshf
-     expf expl fabsf floorf floorl fma fmaf fmal fmodf frexpf frexpl
-     ldexpf ldexpl logb logf logl log10f modff powf
+     expf expl fabsf fabsl floorf floorl fma fmaf fmal fmodf fmodl frexpf frexpl
+     ldexpf ldexpl logb logf logl log10f modff modfl powf
+     remainder
      rint rintf rintl round roundf roundl sinf sinl sinhf sqrtf sqrtl
      tanf tanl tanhf trunc truncf truncl])
 ])
@@ -77,6 +78,7 @@ AC_DEFUN([gl_MATH_H_DEFAULTS],
   GNULIB_EXPF=0;      AC_SUBST([GNULIB_EXPF])
   GNULIB_EXPL=0;      AC_SUBST([GNULIB_EXPL])
   GNULIB_FABSF=0;     AC_SUBST([GNULIB_FABSF])
+  GNULIB_FABSL=0;     AC_SUBST([GNULIB_FABSL])
   GNULIB_FLOOR=0;     AC_SUBST([GNULIB_FLOOR])
   GNULIB_FLOORF=0;    AC_SUBST([GNULIB_FLOORF])
   GNULIB_FLOORL=0;    AC_SUBST([GNULIB_FLOORL])
@@ -84,6 +86,7 @@ AC_DEFUN([gl_MATH_H_DEFAULTS],
   GNULIB_FMAF=0;      AC_SUBST([GNULIB_FMAF])
   GNULIB_FMAL=0;      AC_SUBST([GNULIB_FMAL])
   GNULIB_FMODF=0;     AC_SUBST([GNULIB_FMODF])
+  GNULIB_FMODL=0;     AC_SUBST([GNULIB_FMODL])
   GNULIB_FREXPF=0;    AC_SUBST([GNULIB_FREXPF])
   GNULIB_FREXP=0;     AC_SUBST([GNULIB_FREXP])
   GNULIB_FREXPL=0;    AC_SUBST([GNULIB_FREXPL])
@@ -100,7 +103,9 @@ AC_DEFUN([gl_MATH_H_DEFAULTS],
   GNULIB_LOGL=0;      AC_SUBST([GNULIB_LOGL])
   GNULIB_LOG10F=0;    AC_SUBST([GNULIB_LOG10F])
   GNULIB_MODFF=0;     AC_SUBST([GNULIB_MODFF])
+  GNULIB_MODFL=0;     AC_SUBST([GNULIB_MODFL])
   GNULIB_POWF=0;      AC_SUBST([GNULIB_POWF])
+  GNULIB_REMAINDER=0; AC_SUBST([GNULIB_REMAINDER])
   GNULIB_RINT=0;      AC_SUBST([GNULIB_RINT])
   GNULIB_RINTF=0;     AC_SUBST([GNULIB_RINTF])
   GNULIB_RINTL=0;     AC_SUBST([GNULIB_RINTL])
@@ -136,10 +141,12 @@ AC_DEFUN([gl_MATH_H_DEFAULTS],
   HAVE_EXPF=1;                 AC_SUBST([HAVE_EXPF])
   HAVE_EXPL=1;                 AC_SUBST([HAVE_EXPL])
   HAVE_FABSF=1;                AC_SUBST([HAVE_FABSF])
+  HAVE_FABSL=1;                AC_SUBST([HAVE_FABSL])
   HAVE_FMA=1;                  AC_SUBST([HAVE_FMA])
   HAVE_FMAF=1;                 AC_SUBST([HAVE_FMAF])
   HAVE_FMAL=1;                 AC_SUBST([HAVE_FMAL])
   HAVE_FMODF=1;                AC_SUBST([HAVE_FMODF])
+  HAVE_FMODL=1;                AC_SUBST([HAVE_FMODL])
   HAVE_FREXPF=1;               AC_SUBST([HAVE_FREXPF])
   HAVE_ISNANF=1;               AC_SUBST([HAVE_ISNANF])
   HAVE_ISNAND=1;               AC_SUBST([HAVE_ISNAND])
@@ -149,7 +156,9 @@ AC_DEFUN([gl_MATH_H_DEFAULTS],
   HAVE_LOGL=1;                 AC_SUBST([HAVE_LOGL])
   HAVE_LOG10F=1;               AC_SUBST([HAVE_LOG10F])
   HAVE_MODFF=1;                AC_SUBST([HAVE_MODFF])
+  HAVE_MODFL=1;                AC_SUBST([HAVE_MODFL])
   HAVE_POWF=1;                 AC_SUBST([HAVE_POWF])
+  HAVE_REMAINDER=1;            AC_SUBST([HAVE_REMAINDER])
   HAVE_RINT=1;                 AC_SUBST([HAVE_RINT])
   HAVE_RINTF=1;                AC_SUBST([HAVE_RINTF])
   HAVE_RINTL=1;                AC_SUBST([HAVE_RINTL])
@@ -174,6 +183,7 @@ AC_DEFUN([gl_MATH_H_DEFAULTS],
   HAVE_DECL_LDEXPL=1;          AC_SUBST([HAVE_DECL_LDEXPL])
   HAVE_DECL_LOGB=1;            AC_SUBST([HAVE_DECL_LOGB])
   HAVE_DECL_LOGL=1;            AC_SUBST([HAVE_DECL_LOGL])
+  HAVE_DECL_REMAINDER=1;       AC_SUBST([HAVE_DECL_REMAINDER])
   HAVE_DECL_ROUND=1;           AC_SUBST([HAVE_DECL_ROUND])
   HAVE_DECL_ROUNDF=1;          AC_SUBST([HAVE_DECL_ROUNDF])
   HAVE_DECL_ROUNDL=1;          AC_SUBST([HAVE_DECL_ROUNDL])
@@ -186,12 +196,14 @@ AC_DEFUN([gl_MATH_H_DEFAULTS],
   REPLACE_CEIL=0;              AC_SUBST([REPLACE_CEIL])
   REPLACE_CEILF=0;             AC_SUBST([REPLACE_CEILF])
   REPLACE_CEILL=0;             AC_SUBST([REPLACE_CEILL])
+  REPLACE_FABSL=0;             AC_SUBST([REPLACE_FABSL])
   REPLACE_FLOOR=0;             AC_SUBST([REPLACE_FLOOR])
   REPLACE_FLOORF=0;            AC_SUBST([REPLACE_FLOORF])
   REPLACE_FLOORL=0;            AC_SUBST([REPLACE_FLOORL])
   REPLACE_FMA=0;               AC_SUBST([REPLACE_FMA])
   REPLACE_FMAF=0;              AC_SUBST([REPLACE_FMAF])
   REPLACE_FMAL=0;              AC_SUBST([REPLACE_FMAL])
+  REPLACE_FMODL=0;             AC_SUBST([REPLACE_FMODL])
   REPLACE_FREXPF=0;            AC_SUBST([REPLACE_FREXPF])
   REPLACE_FREXP=0;             AC_SUBST([REPLACE_FREXP])
   REPLACE_FREXPL=0;            AC_SUBST([REPLACE_FREXPL])
