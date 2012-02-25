@@ -148,8 +148,8 @@ fi
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 
 dnl Checks for programs in src/ 
-PKG_CHECK_MODULES([autoopts], autoopts >= 36.2.11,, [enable_local_libopts=yes])
 
+enable_local_libopts=yes
 NEED_LIBOPTS_DIR=true
 LIBOPTS_CHECK([src/libopts])
 
@@ -504,7 +504,6 @@ if features are disabled)
 AC_MSG_NOTICE([Optional applications:
 
   crywrap app:      $libidn
-  local libopts:    $enable_local_libopts
 ])
 
 AC_MSG_NOTICE([Optional libraries:
