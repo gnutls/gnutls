@@ -954,7 +954,8 @@ Specifying RSA with AES-128-CBC:
 Specifying the defaults except ARCFOUR-128:
     "NORMAL:-ARCFOUR-128"
 
-Enabling the 128-bit secure ciphers, while disabling SSL 3.0 and enabling compression:
+Enabling the 128-bit secure ciphers, while disabling SSL 3.0 and 
+enabling compression:
     "SECURE128:-VERS-SSL3.0:+COMP-DEFLATE"
 @end example
 

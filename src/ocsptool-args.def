@@ -172,7 +172,8 @@ format is used for these files, although @code{--inder} can be used to
 specify that the input files are in DER format.
 
 @example
-$ ocsptool -q --load-issuer issuer.pem --load-cert client.pem --outfile ocsp-request.der
+$ ocsptool -q --load-issuer issuer.pem --load-cert client.pem \
+           --outfile ocsp-request.der
 @end example
 
 When generating OCSP requests, the tool will add an OCSP extension
@@ -193,7 +194,8 @@ certificate needs to be in the set of trust anchors and the OCSP
 Extended Key Usage bit has to be asserted in the signer certificate.
 
 @example
-$ ocsptool -e --load-trust issuer.pem --load-response ocsp-response.der
+$ ocsptool -e --load-trust issuer.pem \
+           --load-response ocsp-response.der
 @end example
 
 The tool will print status of verification.
@@ -208,7 +210,8 @@ one certificate and it will be used to verify the signature in the
 OCSP response.  It will not check the Extended Key Usage bit.
 
 @example
-$ ocsptool -e --load-signer ocsp-signer.pem --load-response ocsp-response.der
+$ ocsptool -e --load-signer ocsp-signer.pem \
+           --load-response ocsp-response.der
 @end example
 
 This approach is normally only relevant in two situations.  The first
@@ -251,8 +254,8 @@ This means the CA support OCSP queries over HTTP.  We are now ready to
 create a OCSP request for the certificate.
 
 @example
-$ ocsptool --ask ocsp.CAcert.org --load-issuer issuer.pem  --load-cert cert.pem \
-           --outfile ocsp-response.der
+$ ocsptool --ask ocsp.CAcert.org --load-issuer issuer.pem \
+           --load-cert cert.pem --outfile ocsp-response.der
 @end example
 
 The request is sent via HTTP to the OCSP server address specified. If the

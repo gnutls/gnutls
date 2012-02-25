@@ -85,19 +85,19 @@ flag = {
 
 flag = {
     name      = generate-rsa;
-    descrip   = "Generates an RSA private-public key pair on the specified token";
-    doc = "";
+    descrip   = "Generate an RSA private-public key pair";
+    doc = "Generates an RSA private-public key pair on the specified token.";
 };
 
 flag = {
     name      = generate-dsa;
-    descrip   = "Generates an RSA private-public key pair on the specified token";
-    doc = "";
+    descrip   = "Generate an RSA private-public key pair";
+    doc = "Generates an RSA private-public key pair on the specified token.";
 };
 flag = {
     name      = generate-ecc;
-    descrip   = "Generates an RSA private-public key pair on the specified token";
-    doc = "";
+    descrip   = "Generate an RSA private-public key pair";
+    doc = "Generates an RSA private-public key pair on the specified token.";
 };
 
 flag = {
@@ -188,17 +188,17 @@ flag = {
     name      = sec-param;
     arg-type  = string;
     arg-name  = "Security parameter";
-    descrip   = "Specify the security level [low|legacy|normal|high|ultra].";
-    doc      = "This is alternative to the bits option.";
+    descrip   = "Specify the security level";
+    doc      = "This is alternative to the bits option. Available options are [low|legacy|normal|high|ultra].";
 };
 
 
 flag = {
     name      = inder;
-    descrip   = "Use DER/RAW format for input certificates and private keys";
+    descrip   = "Use DER/RAW format for input";
     disabled;
     disable   = "no";
-    doc      = "";
+    doc      = "Use DER/RAW format for input certificates and private keys.";
 };
 
 flag = {
@@ -239,8 +239,10 @@ $ p11tool --login --list-all "pkcs11:TOKEN-URL"
 
 To store a private key and a certificate in a token run:
 @example
-$ p11tool --login --write "pkcs11:URL" --load-privkey key.pem --label "Mykey"
-$ p11tool --login --write "pkcs11:URL" --load-certificate cert.pem --label "MyCert"
+$ p11tool --login --write "pkcs11:URL" --load-privkey key.pem \
+          --label "Mykey"
+$ p11tool --login --write "pkcs11:URL" --load-certificate cert.pem \
+          --label "MyCert"
 @end example
 _EOT_;
 };
