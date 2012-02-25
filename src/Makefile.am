@@ -80,7 +80,8 @@ endif
 if ENABLE_OCSP
 ocsptool_SOURCES = ocsptool.c ocsptool-common.h ocsptool-common.c \
 	socket.c socket.h
-ocsptool_LDADD = ../lib/libgnutls.la libcmd-ocsp.la ../gl/libgnu.la $(LIBOPTS_LDADD)
+ocsptool_LDADD = ../lib/libgnutls.la libcmd-ocsp.la ../gl/libgnu.la $(LIBOPTS_LDADD) \
+	$(GETADDRINFO_LIB)
 noinst_LTLIBRARIES += libcmd-ocsp.la
 libcmd_ocsp_la_CFLAGS =
 libcmd_ocsp_la_SOURCES = ocsptool-args.def ocsptool-args.h ocsptool-args.c
@@ -99,7 +100,8 @@ gnutls_cli_SOURCES = cli.c common.h common.c \
 	$(PKCS11_SRCS) $(BENCHMARK_SRCS)
 gnutls_cli_LDADD = ../lib/libgnutls.la
 gnutls_cli_LDADD += libcmd-cli.la ../gl/libgnu.la $(LIBOPTS_LDADD)
-gnutls_cli_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIB_CLOCK_GETTIME)
+gnutls_cli_LDADD += $(LIBSOCKET) $(GETADDRINFO_LIB) $(LIB_CLOCK_GETTIME) \
+	 $(SERVENT_LIB)
 noinst_LTLIBRARIES += libcmd-cli.la
 libcmd_cli_la_CFLAGS = 
 libcmd_cli_la_SOURCES = cli-args.def cli-args.c cli-args.h

@@ -116,7 +116,7 @@ libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	auth/libgnutls_auth.la algorithms/libgnutls_alg.la \
 	extras/libgnutls_extras.la \
 	$(LTLIBZ)  $(LTLIBINTL) $(LIBSOCKET) $(LTLIBDL) \
-	$(LTLIBPTHREAD) $(P11_KIT_LIBS)
+	$(LTLIBPTHREAD) $(P11_KIT_LIBS) $(LIB_SELECT)
 
 if ENABLE_OPENPGP
 libgnutls_la_LIBADD += openpgp/libgnutls_openpgp.la
