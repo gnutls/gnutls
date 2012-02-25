@@ -79,7 +79,7 @@
  * 8    error parsing command line
  */
 
-
+#include <config.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/openpgp.h>
 #include <gnutls/dtls.h>
@@ -94,7 +94,7 @@
 #include <errno.h>
 #include <poll.h>
 #include <time.h>
-#include <wait.h>
+#include <sys/wait.h>
 
 // {{{ types
 
