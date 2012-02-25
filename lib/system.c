@@ -130,6 +130,12 @@ int fd = GNUTLS_POINTER_TO_INT(ptr);
   tv.tv_sec = 0;
   tv.tv_usec = ms * 1000;
   
+  while(tv.tv_usec >= 1000000)
+    {
+      tv.tv_usec -= 1000000;
+      tv.tv_sec++;
+    }
+  
   ret = select(fd+1, &rfds, NULL, NULL, &tv);
   if (ret <= 0)
     return ret;
