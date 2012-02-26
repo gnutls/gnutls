@@ -14,10 +14,10 @@ argument = "[hostname]";
 
 flag = {
     name      = tofu;
-    descrip   = "Enable trust on first use (SSH-style) authentication";
+    descrip   = "Enable trust on first use authentication";
     disabled;
     disable   = "no";
-    doc       = "This option will, in addition to certificate authentication, perform authentication based on previously seen public keys.";
+    doc       = "This option will, in addition to certificate authentication, perform authentication based on previously seen public keys, a model similar to SSH authentication.";
 };
 
 flag = {
@@ -31,15 +31,15 @@ flag = {
 flag = {
     name      = resume;
     value     = r;
-    descrip   = "Connect, establish a session, reconnect and resume";
-    doc       = "";
+    descrip   = "Establish a session and resume";
+    doc       = "Connect, establish a session, reconnect and resume.";
 };
 
 flag = {
     name      = rehandshake;
     value     = e;
-    descrip   = "Connect, establish a session and rehandshake immediately";
-    doc       = "";
+    descrip   = "Establish a session and rehandshake";
+    doc       = "Connect, establish a session and rehandshake immediately.";
 };
 
 flag = {
