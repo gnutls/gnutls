@@ -34,6 +34,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
+#include <common.h>
 #include "udp-serv.h"
 #include "list.h"
 
@@ -147,6 +148,18 @@ void udp_server(const char* name, int port, int mtu)
               ret = gnutls_record_recv_seq(session, buffer, MAX_BUFFER, sequence);
             } while(ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
 
+            if (ret == GNUTLS_E_REHANDSHAKE)
+              {
+                fprintf (stderr, "*** Received hello message\n");
+                do
+                  {
+                    ret = gnutls_handshake (session);
+                  }
+                while (ret == GNUTLS_E_INTERRUPTED ||
+                       ret == GNUTLS_E_AGAIN);
+                
+                if (ret == 0) continue;
+              }
             if (ret < 0)
               {
                 fprintf(stderr, "Error in recv(): %s\n", gnutls_strerror(ret));
@@ -157,16 +170,20 @@ void udp_server(const char* name, int port, int mtu)
                 printf("EOF\n\n");
                 break;
               }
+              
             buffer[ret] = 0;
             printf("received[%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x]: %s\n", sequence[0], sequence[1], sequence[2],
-              sequence[3], sequence[4], sequence[5], sequence[6], sequence[7], buffer);
+                   sequence[3], sequence[4], sequence[5], sequence[6], sequence[7], buffer);
 
-            /* reply back */
-            ret = gnutls_record_send(session, buffer, ret);
-            if (ret < 0)
+            if (check_command(session, buffer) == 0)
               {
-                fprintf(stderr, "Error in send(): %s\n", gnutls_strerror(ret));
-                break;
+                /* reply back */
+                ret = gnutls_record_send(session, buffer, ret);
+                if (ret < 0)
+                  {
+                    fprintf(stderr, "Error in send(): %s\n", gnutls_strerror(ret));
+                    break;
+                  }
               }
           }
       }

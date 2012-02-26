@@ -58,3 +58,4 @@ int cert_verify (gnutls_session_t session, const char* hostname);
 
 const char *raw_to_string (const unsigned char *raw, size_t raw_size);
 void pkcs11_common (void);
+int check_command(gnutls_session_t session, const char* str);

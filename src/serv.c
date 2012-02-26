@@ -839,15 +839,8 @@ get_response (gnutls_session_t session, char *request,
     {
       strip (request);
       fprintf (stderr, "received: %s\n", request);
-      if (request[0] == request[1] && request[0] == '*')
+      if (check_command(session, *response))
         {
-          if (strncmp
-              (request, "**REHANDSHAKE**",
-               sizeof ("**REHANDSHAKE**") - 1) == 0)
-            {
-              fprintf (stderr, "*** Sending rehandshake request\n");
-              gnutls_rehandshake (session);
-            }
           *response = NULL;
           *response_length = 0;
           return;
