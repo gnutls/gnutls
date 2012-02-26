@@ -65,9 +65,9 @@ ctests = mini-deflate simple gc set_pkcs12_cred certder certuniqueid	\
 	 crq_key_id x509sign-verify cve-2009-1415 cve-2009-1416		\
 	 crq_apis init_roundtrip pkcs12_s2k_pem dn2 mini-eagain		\
 	 nul-in-x509-names x509_altname pkcs12_encode mini-x509		\
-	 mini-x509-rehandshake rng-fork mini-eagain-dtls \
+	 mini-rehandshake rng-fork mini-eagain-dtls resume-dtls \
 	 x509cert x509cert-tl infoaccess rsa-encrypt-decrypt \
-	 mini-loss-time mini-tdb
+	 mini-loss-time mini-tdb mini-dtls-rehandshake
 
 if ENABLE_OCSP
 ctests += ocsp

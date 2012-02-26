@@ -32,7 +32,7 @@
 #include "utils.h"
 #include "eagain-common.h"
 
-const char* side;
+const char* side = "";
 
 static void
 tls_log_func (int level, const char *str)

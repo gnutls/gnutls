@@ -520,7 +520,8 @@ tests/mini-deflate
 tests/mini-eagain
 tests/mini-eagain-dtls
 tests/mini-x509
-tests/mini-x509-rehandshake
+tests/mini-dtls-rehandshake
+tests/mini-rehandshake
 tests/moredn
 tests/mpi
 tests/netconf-psk
@@ -588,3 +589,4 @@ tests/dtls/dtls-stress
 doc/gnutls.epub
 doc/gnutls.xml
 tests/mini-tdb
+tests/resume-dtls
