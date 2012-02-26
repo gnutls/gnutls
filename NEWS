@@ -6,6 +6,8 @@ See the end for copying conditions.
 
 ** command line apps: Always link with local libopts.
 
+** libgnutls: Cryptodev updates and fixes.
+
 ** libgnutls: Corrected issue with select() that affected
 FreeBSD. This prevented establishing DTLS sessions.
 

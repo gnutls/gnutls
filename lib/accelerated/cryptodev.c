@@ -49,6 +49,8 @@ struct cryptodev_ctx
   struct session_op sess;
   struct crypt_op cryp;
   uint8_t iv[EALG_MAX_BLOCK_LEN];
+  int reset;
+
   int cfd;
 };
 
@@ -113,38 +115,43 @@ cryptodev_setiv (void *_ctx, const void *iv, size_t iv_size)
 }
 
 static int
-cryptodev_encrypt (void *_ctx, const void *plain, size_t plainsize,
-                   void *encr, size_t encrsize)
+cryptodev_encrypt (void *_ctx, const void *src, size_t src_size,
+                   void *dst, size_t dst_size)
 {
   struct cryptodev_ctx *ctx = _ctx;
-  ctx->cryp.len = plainsize;
-  ctx->cryp.src = (void *) plain;
-  ctx->cryp.dst = encr;
+  ctx->cryp.len = src_size;
+  ctx->cryp.src = (void *) src;
+  ctx->cryp.dst = dst;
   ctx->cryp.op = COP_ENCRYPT;
+  ctx->cryp.flags = COP_FLAG_WRITE_IV;
 
   if (ioctl (ctx->cfd, CIOCCRYPT, &ctx->cryp))
     {
       gnutls_assert ();
       return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
     }
+
   return 0;
 }
 
 static int
-cryptodev_decrypt (void *_ctx, const void *encr, size_t encrsize,
-                   void *plain, size_t plainsize)
+cryptodev_decrypt (void *_ctx, const void *src, size_t src_size,
+                   void *dst, size_t dst_size)
 {
   struct cryptodev_ctx *ctx = _ctx;
 
-  ctx->cryp.len = encrsize;
-  ctx->cryp.src = (void *) encr;
-  ctx->cryp.dst = plain;
+  ctx->cryp.len = src_size;
+  ctx->cryp.src = (void *) src;
+  ctx->cryp.dst = dst;
   ctx->cryp.op = COP_DECRYPT;
+  ctx->cryp.flags = COP_FLAG_WRITE_IV;
+
   if (ioctl (ctx->cfd, CIOCCRYPT, &ctx->cryp))
     {
       gnutls_assert ();
       return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
     }
+
   return 0;
 }
 
@@ -354,6 +361,11 @@ cryptodev_mac_hash (void *_ctx, const void *text, size_t textsize)
   ctx->cryp.dst = NULL;
   ctx->cryp.op = COP_ENCRYPT;
   ctx->cryp.flags = COP_FLAG_UPDATE;
+  if (ctx->reset)
+    {
+      ctx->cryp.flags |= COP_FLAG_RESET;
+      ctx->reset = 0;
+    }
   
   if (ioctl (ctx->cfd, CIOCCRYPT, &ctx->cryp))
     {
@@ -388,13 +400,7 @@ cryptodev_mac_reset (void *_ctx)
 {
   struct cryptodev_ctx *ctx = _ctx;
 
-  ctx->cryp.len = 0;
-  ctx->cryp.src = NULL;
-  ctx->cryp.dst = NULL;
-  ctx->cryp.op = COP_ENCRYPT;
-  ctx->cryp.flags = COP_FLAG_RESET;
-  
-  ioctl (ctx->cfd, CIOCCRYPT, &ctx->cryp);
+  ctx->reset = 1;
 }
 
 static int
