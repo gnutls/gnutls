@@ -141,10 +141,6 @@ client (int fd, int server_init)
 
   if (!server_init)
     {
-      do {
-        ret = gnutls_record_send (session, MSG, strlen (MSG));
-      } while (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED);
-
       if (debug) success("Initiating client rehandshake\n");
       do 
         {
