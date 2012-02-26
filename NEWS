@@ -10,6 +10,9 @@ is an old one.
 ** libgnutls: Corrected issue with select() that affected
 FreeBSD. This prevented establishing DTLS sessions.
 
+** libgnutls: Corrected rehandshake and resumption
+operations in DTLS. Reported by Sean Buckheister.
+
 ** API and ABI modifications:
 No changes since last version.
 
