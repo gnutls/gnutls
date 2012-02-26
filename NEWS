@@ -4,7 +4,8 @@ See the end for copying conditions.
 
 * Version 3.0.15 (unreleased)
 
-** command line apps: Always link with local libopts.
+** command line apps: Link with local libopts if the 
+installed is an old one.
 
 ** libgnutls: Cryptodev updates and fixes.
 
