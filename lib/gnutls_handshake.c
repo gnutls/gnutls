@@ -436,10 +436,20 @@ _gnutls_read_client_hello (gnutls_session_t session, uint8_t * data,
       return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
     }
   DECR_LEN (len, session_id_len);
-
   session_id = &data[pos];
-  ret = _gnutls_server_restore_session (session, session_id, session_id_len);
   pos += session_id_len;
+
+  if (IS_DTLS(session))
+   {
+     int cookie_size;
+
+     DECR_LEN (len, 1);
+     cookie_size = data[pos++];
+     DECR_LEN (len, cookie_size);
+     pos+=cookie_size;
+   }
+
+  ret = _gnutls_server_restore_session (session, session_id, session_id_len);
   
   if (session_id_len > 0) session->internals.resumption_requested = 1;
 
@@ -485,16 +495,6 @@ _gnutls_read_client_hello (gnutls_session_t session, uint8_t * data,
 
       session->internals.resumed = RESUME_FALSE;
     }
-
-  if (IS_DTLS(session))
-   {
-     int cookie_size;
-
-     DECR_LEN (len, 1);
-     cookie_size = data[pos++];
-     DECR_LEN (len, cookie_size);
-     pos+=cookie_size;
-   }
 
   /* Remember ciphersuites for later
    */
