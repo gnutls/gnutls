@@ -101,7 +101,7 @@ inline static void _dtls_async_timer_delete(gnutls_session_t session)
 {
   if (session->internals.dtls.async_term != 0)
     {
-      _gnutls_dtls_log ("DTLS[%p]: Deinitializing handshake state.\n", session);
+      _gnutls_dtls_log ("DTLS[%p]: Deinitializing previous handshake state.\n", session);
       session->internals.dtls.async_term = 0; /* turn off "timer" */
 
       _dtls_reset_hsk_state(session);
