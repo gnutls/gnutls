@@ -4,8 +4,7 @@ See the end for copying conditions.
 
 * Version 3.0.15 (unreleased)
 
-** command line apps: Link with local libopts if the installed
-is an old one.
+** command line apps: Always link with local libopts.
 
 ** libgnutls: Corrected issue with select() that affected
 FreeBSD. This prevented establishing DTLS sessions.
