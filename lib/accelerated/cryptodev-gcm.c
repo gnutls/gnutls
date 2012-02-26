@@ -299,14 +299,6 @@ _cryptodev_register_gcm_crypto (int cfd)
   return 0;
 }
 
-#else /* CIOCAUTHCRYPT */
-
-int
-_cryptodev_register_gcm_crypto (int cfd)
-{
-  return 0;
-}
-
 #endif /* CIOCAUTHCRYPT */
 
 #endif /* ENABLE_CRYPTODEV */

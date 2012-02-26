@@ -222,7 +222,11 @@ register_crypto (int cfd)
 
     }
 
+#ifdef CIOCAUTHCRYPT
   return _cryptodev_register_gcm_crypto(cfd);
+#else
+  return 0;
+#endif
 }
 
 int
