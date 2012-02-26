@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.0.15 (unreleased)
 
+** test suite: Only run under valgrind in the development
+system (the full git repository)
+
 ** command line apps: Link with local libopts if the 
 installed is an old one.
 
