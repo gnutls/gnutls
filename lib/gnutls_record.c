@@ -458,12 +458,14 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
 
   session->internals.record_send_buffer_user_size = 0;
 
-  _gnutls_record_log ("REC[%p]: Sent Packet[%d] %s(%d) with length: %d\n",
+  _gnutls_record_log ("REC[%p]: Sent Packet[%d] %s(%d) in epoch %d and length: %d\n",
                       session,
                       (unsigned int)
                       _gnutls_uint64touint32
                       (&record_state->sequence_number),
-                      _gnutls_packet2str (type), type, (int) cipher_size);
+                      _gnutls_packet2str (type), type, 
+                      (int) record_params->epoch,
+                      (int) cipher_size);
 
   return retval;
 }
@@ -831,10 +833,10 @@ record_read_headers (gnutls_session_t session,
           record->epoch = 0;
         }
 
-      _gnutls_record_log ("REC[%p]: SSL %d.%d %s packet received. Length: %d\n",
+      _gnutls_record_log ("REC[%p]: SSL %d.%d %s packet received. Epoch %d, length: %d\n",
                           session, (int)record->version[0], (int)record->version[1], 
                           _gnutls_packet2str (record->type),
-                          record->length);
+                          (int)record->epoch, record->length);
 
     }
 

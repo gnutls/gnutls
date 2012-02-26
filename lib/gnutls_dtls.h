@@ -24,14 +24,16 @@
 # define DTLS_H
 
 #include <config.h>
-#include "gnutls_int.h"
-#include "gnutls_buffers.h"
-#include "gnutls_mbuffers.h"
+#include <gnutls_int.h>
+#include <gnutls_buffers.h>
+#include <gnutls_mbuffers.h>
+#include <gnutls_constate.h>
 #include <timespec.h>
 
 int _dtls_transmit(gnutls_session_t session);
 int _dtls_retransmit(gnutls_session_t session);
 int _dtls_record_check(struct record_parameters_st *rp, uint64 * _seq);
+void _dtls_reset_hsk_state(gnutls_session_t session);
 
 #define MAX_DTLS_TIMEOUT 60000
 
@@ -87,7 +89,12 @@ inline static void _dtls_async_timer_init(gnutls_session_t session)
       session->internals.dtls.async_term = gnutls_time(0) + MAX_DTLS_TIMEOUT/1000;
     }
   else
-    session->internals.dtls.async_term = 0;
+    {
+      _dtls_reset_hsk_state(session);
+      _gnutls_handshake_io_buffer_clear (session);
+      _gnutls_epoch_gc(session);
+      session->internals.dtls.async_term = 0;
+    }
 }
 
 inline static void _dtls_async_timer_delete(gnutls_session_t session)
@@ -95,8 +102,11 @@ inline static void _dtls_async_timer_delete(gnutls_session_t session)
   if (session->internals.dtls.async_term != 0)
     {
       _gnutls_dtls_log ("DTLS[%p]: Deinitializing handshake state.\n", session);
-      _gnutls_handshake_io_buffer_clear (session);
       session->internals.dtls.async_term = 0; /* turn off "timer" */
+
+      _dtls_reset_hsk_state(session);
+      _gnutls_handshake_io_buffer_clear (session);
+      _gnutls_epoch_gc(session);
     }
 }
 

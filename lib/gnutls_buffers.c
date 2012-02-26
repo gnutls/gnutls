@@ -722,7 +722,6 @@ _gnutls_handshake_io_cache_int (gnutls_session_t session,
     &session->internals.handshake_send_buffer;
 
   bufel->epoch = (uint16_t)_gnutls_epoch_refcount_inc(session, EPOCH_WRITE_CURRENT);
-
   bufel->htype = htype;
   if (bufel->htype == GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC)
     bufel->type = GNUTLS_CHANGE_CIPHER_SPEC;

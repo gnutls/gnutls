@@ -170,6 +170,14 @@ int ret;
     return gnutls_assert_val(GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET);
 }
 
+void _dtls_reset_hsk_state(gnutls_session_t session)
+{
+  session->internals.dtls.flight_init = 0;
+  drop_usage_count(session, &session->internals.handshake_send_buffer);
+  _mbuffer_head_clear(&session->internals.handshake_send_buffer);
+}
+
+
 #define UPDATE_TIMER { \
       session->internals.dtls.actual_retrans_timeout_ms *= 2; \
       session->internals.dtls.actual_retrans_timeout_ms %= MAX_DTLS_TIMEOUT; \
@@ -370,10 +378,7 @@ keep_up:
 
 end_flight:
   _gnutls_dtls_log ("DTLS[%p]: End of flight transmission.\n", session);
-
-  session->internals.dtls.flight_init = 0;
-  drop_usage_count(session, send_buffer);
-  _mbuffer_head_clear(send_buffer);
+  _dtls_reset_hsk_state(session);
 
 cleanup:
   if (buf != NULL)

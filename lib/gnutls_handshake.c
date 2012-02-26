@@ -2945,7 +2945,11 @@ _gnutls_recv_hello_request (gnutls_session_t session, void *data,
     }
   type = ((uint8_t *) data)[0];
   if (type == GNUTLS_HANDSHAKE_HELLO_REQUEST)
-    return GNUTLS_E_REHANDSHAKE;
+    {
+      if (IS_DTLS(session))
+        session->internals.dtls.hsk_read_seq++;
+      return GNUTLS_E_REHANDSHAKE;
+    }
   else
     {
       gnutls_assert ();
