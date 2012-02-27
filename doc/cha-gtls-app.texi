@@ -1082,9 +1082,10 @@ an alternative interface is available using a callback function.
 @cindex keying material exporters
 @cindex exporting keying material
 
-The TLS PRF can be used by other protocols to derive data.  The API to
-use is @funcref{gnutls_prf}.  The function needs to be provided with the
-label in the parameter @code{label}, and the extra data to mix in the
+The TLS PRF can be used by other protocols to derive keys based on
+the TLS master secret.  The API to use is @funcref{gnutls_prf}.  The 
+function needs to be provided with the label in the parameter 
+@code{label}, and the extra data to mix in the
 @code{extra} parameter.  Depending on whether you want to mix in the
 client or server random data first, you can set the
 @code{server_random_first} parameter.
@@ -1100,7 +1101,7 @@ rc = gnutls_prf (session, strlen (MYLABEL), MYLABEL, 0,
                  strlen (MYCONTEXT), MYCONTEXT, 32, out);
 @end example
 
-If you don't want to mix in the client/server random, there is a more
+If you don't want to mix in the client/server random, there is a 
 low-level TLS PRF interface called @funcref{gnutls_prf_raw}.
 
 @node Channel Bindings
