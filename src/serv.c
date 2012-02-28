@@ -839,7 +839,7 @@ get_response (gnutls_session_t session, char *request,
     {
       strip (request);
       fprintf (stderr, "received: %s\n", request);
-      if (check_command(session, *response))
+      if (check_command(session, request))
         {
           *response = NULL;
           *response_length = 0;
