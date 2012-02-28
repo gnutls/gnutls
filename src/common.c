@@ -218,18 +218,21 @@ verify_x509_hostname (gnutls_session_t session, const char *hostname)
   /* Check the hostname of the first certificate if it matches
    * the name of the host we connected to.
    */
-  if (gnutls_x509_crt_check_hostname (crt, hostname) == 0)
+  if (hostname != NULL)
     {
-      printf
+      if (gnutls_x509_crt_check_hostname (crt, hostname) == 0)
+        {
+          printf
              ("- The hostname in the certificate does NOT match '%s'\n",
               hostname);
-      ret = 0;
-    }
-  else
-    {
-      printf ("- The hostname in the certificate matches '%s'.\n",
-              hostname);
-      ret = 1;
+          ret = 0;
+        }
+      else
+        {
+          printf ("- The hostname in the certificate matches '%s'.\n",
+                  hostname);
+          ret = 1;
+        }
     }
 
   gnutls_x509_crt_deinit (crt);
