@@ -354,7 +354,7 @@ compressed_to_ciphertext (gnutls_session_t session,
           ret = _gnutls_rnd (GNUTLS_RND_NONCE, data_ptr, blocksize);
           if (ret < 0)
             return gnutls_assert_val(ret);
-
+ 
           _gnutls_auth_cipher_setiv(&params->write.cipher_state, data_ptr, blocksize);
 
           data_ptr += blocksize;
@@ -509,7 +509,7 @@ ciphertext_to_compressed (gnutls_session_t session,
 
       break;
     case CIPHER_BLOCK:
-      if (ciphertext->size < MAX(blocksize, tag_size) || (ciphertext->size % blocksize != 0))
+      if (ciphertext->size < blocksize || (ciphertext->size % blocksize != 0))
         return gnutls_assert_val(GNUTLS_E_UNEXPECTED_PACKET_LENGTH);
 
       /* ignore the IV in TLS 1.1+
@@ -521,13 +521,10 @@ ciphertext_to_compressed (gnutls_session_t session,
 
           ciphertext->size -= blocksize;
           ciphertext->data += blocksize;
-
-          if (ciphertext->size == 0)
-            {
-              gnutls_assert ();
-              return GNUTLS_E_DECRYPTION_FAILED;
-            }
         }
+
+      if (ciphertext->size < tag_size)
+        return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 
       /* we don't use the auth_cipher interface here, since
        * TLS with block ciphers is impossible to be used under such
@@ -540,6 +537,7 @@ ciphertext_to_compressed (gnutls_session_t session,
         return gnutls_assert_val(ret);
 
       pad = ciphertext->data[ciphertext->size - 1] + 1;   /* pad */
+
 
       if ((int) pad > (int) ciphertext->size - tag_size)
         {
