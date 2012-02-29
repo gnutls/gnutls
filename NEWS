@@ -10,6 +10,9 @@ system (the full git repository)
 ** command line apps: Link with local libopts if the 
 installed is an old one.
 
+** libgnutls: Corrections in record packet parsing.
+Reported by Matthew Hall.
+
 ** libgnutls: Cryptodev updates and fixes.
 
 ** libgnutls: Corrected issue with select() that affected
