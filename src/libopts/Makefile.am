@@ -10,11 +10,11 @@ libopts_la_CPPFLAGS     = -I$(top_srcdir)
 libopts_la_LDFLAGS      = -version-info  36:3:11
 EXTRA_DIST              = \
     ag-char-map.h           alias.c                 ao-strs.c  \
-    ao-strs.h               autoopts/options.h      autoopts/project.h  \
+    ao-strs.h               autoopts/project.h      autoopts/options.h  \
     autoopts/usage-txt.h    autoopts.c              autoopts.h  \
-    boolean.c               check.c                 compat/strchr.c  \
-    compat/pathfind.c       compat/strdup.c         compat/windows-config.h  \
-    compat/snprintf.c       compat/compat.h         configfile.c  \
+    boolean.c               check.c                 compat/pathfind.c  \
+    compat/strchr.c         compat/windows-config.h compat/snprintf.c  \
+    compat/compat.h         compat/strdup.c         configfile.c  \
     cook.c                  COPYING.gplv3           COPYING.lgplv3  \
     COPYING.mbsd            enum.c                  env.c  \
     file.c                  find.c                  genshell.c  \

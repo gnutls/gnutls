@@ -164,9 +164,7 @@ optionParseShell(tOptions * pOpts)
         printf(SHOW_PROG_ENV, pOpts->pzPROGNAME);
 
     fflush(stdout);
-#ifdef HAVE_FCHMOD
     fchmod(STDOUT_FILENO, 0755);
-#endif
     fclose(stdout);
     if (ferror(stdout)) {
         fputs(zOutputFail, stderr);

@@ -1,5 +1,5 @@
 /*
- *   Character mapping generated 02/25/12 13:14:41
+ *   Character mapping generated 02/26/12 11:08:40
  *
  *  This file contains the character classifications
  *  used by AutoGen and AutoOpts for identifying tokens.
@@ -30,37 +30,16 @@
 # elif defined(HAVE_STDINT_H)
 #   include <stdint.h>
 
-# else
-#   ifndef HAVE_UINT8_T
-        typedef unsigned char   uint8_t;
-#   endif
-#   ifndef HAVE_UINT16_T
-        typedef unsigned short  uint16_t;
-#   endif
-
-#   ifndef HAVE_UINT32_T
-#     if SIZEOF_INT == 4
-        typedef unsigned int    uint32_t;
-#     elif SIZEOF_LONG == 4
-        typedef unsigned long   uint32_t;
-#     endif
-#   endif
-
-#   ifndef HAVE_UINT64_T
-#     if SIZEOF_LONG == 8
-        typedef unsigned long       uint64_t;
-#     elif SIZEOF_LONG_LONG == 8
-        typedef unsigned long long  uint64_t;
-#     endif
+# elif !defined(HAVE_UINT32_T)
+#   if SIZEOF_INT == 4
+      typedef unsigned int    uint32_t;
+#   elif SIZEOF_LONG == 4
+      typedef unsigned long   uint32_t;
 #   endif
 # endif /* HAVE_*INT*_H header */
 
 #else /* not HAVE_CONFIG_H -- */
-# ifdef __sun
-#   include <inttypes.h>
-# else
-#   include <stdint.h>
-# endif
+# include <inttypes.h>
 #endif /* HAVE_CONFIG_H */
 
 #if 0 /* mapping specification source (from autogen.map) */
