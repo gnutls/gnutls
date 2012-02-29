@@ -245,6 +245,7 @@ end:
   gnutls_deinit (session);
 
   gnutls_anon_free_client_credentials (anoncred);
+  gnutls_certificate_free_credentials (x509_cred);
 
   gnutls_global_deinit ();
 }
@@ -353,6 +354,7 @@ gnutls_session_t session;
   gnutls_deinit (session);
 
   gnutls_anon_free_server_credentials (anoncred);
+  gnutls_certificate_free_credentials (x509_cred);
 
   gnutls_global_deinit ();
 
