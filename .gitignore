@@ -590,3 +590,4 @@ doc/gnutls.epub
 doc/gnutls.xml
 tests/mini-tdb
 tests/resume-dtls
+tests/mini-record
