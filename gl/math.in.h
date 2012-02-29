@@ -615,17 +615,46 @@ _GL_WARN_ON_USE (fmal, "fmal is unportable - "
 
 
 #if @GNULIB_FMODF@
-# if !@HAVE_FMODF@
-#  undef fmodf
+# if @REPLACE_FMODF@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef fmodf
+#   define fmodf rpl_fmodf
+#  endif
+_GL_FUNCDECL_RPL (fmodf, float, (float x, float y));
+_GL_CXXALIAS_RPL (fmodf, float, (float x, float y));
+# else
+#  if !@HAVE_FMODF@
+#   undef fmodf
 _GL_FUNCDECL_SYS (fmodf, float, (float x, float y));
-# endif
+#  endif
 _GL_CXXALIAS_SYS (fmodf, float, (float x, float y));
+# endif
 _GL_CXXALIASWARN (fmodf);
 #elif defined GNULIB_POSIXCHECK
 # undef fmodf
 # if HAVE_RAW_DECL_FMODF
 _GL_WARN_ON_USE (fmodf, "fmodf is unportable - "
                  "use gnulib module fmodf for portability");
+# endif
+#endif
+
+#if @GNULIB_FMOD@
+# if @REPLACE_FMOD@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef fmod
+#   define fmod rpl_fmod
+#  endif
+_GL_FUNCDECL_RPL (fmod, double, (double x, double y));
+_GL_CXXALIAS_RPL (fmod, double, (double x, double y));
+# else
+_GL_CXXALIAS_SYS (fmod, double, (double x, double y));
+# endif
+_GL_CXXALIASWARN (fmod);
+#elif defined GNULIB_POSIXCHECK
+# undef fmod
+# if HAVE_RAW_DECL_FMOD
+_GL_WARN_ON_USE (fmod, "fmod has portability problems - "
+                 "use gnulib module fmod for portability");
 # endif
 #endif
 
@@ -849,13 +878,37 @@ _GL_WARN_ON_USE (log10f, "log10f is unportable - "
 # endif
 #endif
 
+#if @GNULIB_LOG10L@
+# if !@HAVE_LOG10L@ || !@HAVE_DECL_LOG10L@
+#  undef log10l
+_GL_FUNCDECL_SYS (log10l, long double, (long double x));
+# endif
+_GL_CXXALIAS_SYS (log10l, long double, (long double x));
+_GL_CXXALIASWARN (log10l);
+#elif defined GNULIB_POSIXCHECK
+# undef log10l
+# if HAVE_RAW_DECL_LOG10L
+_GL_WARN_ON_USE (log10l, "log10l is unportable - "
+                 "use gnulib module log10l for portability");
+# endif
+#endif
+
 
 #if @GNULIB_MODFF@
-# if !@HAVE_MODFF@
-#  undef modff
+# if @REPLACE_MODFF@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef modff
+#   define modff rpl_modff
+#  endif
+_GL_FUNCDECL_RPL (modff, float, (float x, float *iptr) _GL_ARG_NONNULL ((2)));
+_GL_CXXALIAS_RPL (modff, float, (float x, float *iptr));
+# else
+#  if !@HAVE_MODFF@
+#   undef modff
 _GL_FUNCDECL_SYS (modff, float, (float x, float *iptr) _GL_ARG_NONNULL ((2)));
-# endif
+#  endif
 _GL_CXXALIAS_SYS (modff, float, (float x, float *iptr));
+# endif
 _GL_CXXALIASWARN (modff);
 #elif defined GNULIB_POSIXCHECK
 # undef modff
@@ -865,13 +918,43 @@ _GL_WARN_ON_USE (modff, "modff is unportable - "
 # endif
 #endif
 
+#if @GNULIB_MODF@
+# if @REPLACE_MODF@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef modf
+#   define modf rpl_modf
+#  endif
+_GL_FUNCDECL_RPL (modf, double, (double x, double *iptr) _GL_ARG_NONNULL ((2)));
+_GL_CXXALIAS_RPL (modf, double, (double x, double *iptr));
+# else
+_GL_CXXALIAS_SYS (modf, double, (double x, double *iptr));
+# endif
+_GL_CXXALIASWARN (modf);
+#elif defined GNULIB_POSIXCHECK
+# undef modf
+# if HAVE_RAW_DECL_MODF
+_GL_WARN_ON_USE (modf, "modf has portability problems - "
+                 "use gnulib module modf for portability");
+# endif
+#endif
+
 #if @GNULIB_MODFL@
-# if !@HAVE_MODFL@
-#  undef modfl
+# if @REPLACE_MODFL@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef modfl
+#   define modfl rpl_modfl
+#  endif
+_GL_FUNCDECL_RPL (modfl, long double, (long double x, long double *iptr)
+                                      _GL_ARG_NONNULL ((2)));
+_GL_CXXALIAS_RPL (modfl, long double, (long double x, long double *iptr));
+# else
+#  if !@HAVE_MODFL@
+#   undef modfl
 _GL_FUNCDECL_SYS (modfl, long double, (long double x, long double *iptr)
                                       _GL_ARG_NONNULL ((2)));
-# endif
+#  endif
 _GL_CXXALIAS_SYS (modfl, long double, (long double x, long double *iptr));
+# endif
 _GL_CXXALIASWARN (modfl);
 #elif defined GNULIB_POSIXCHECK
 # undef modfl
@@ -898,17 +981,72 @@ _GL_WARN_ON_USE (powf, "powf is unportable - "
 #endif
 
 
-#if @GNULIB_REMAINDER@
-# if !@HAVE_REMAINDER@ || !@HAVE_DECL_REMAINDER@
-_GL_FUNCDECL_SYS (remainder, double, (double x, double y));
+#if @GNULIB_REMAINDERF@
+# if @REPLACE_REMAINDERF@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef remainderf
+#   define remainderf rpl_remainderf
+#  endif
+_GL_FUNCDECL_RPL (remainderf, float, (float x, float y));
+_GL_CXXALIAS_RPL (remainderf, float, (float x, float y));
+# else
+#  if !@HAVE_REMAINDERF@
+_GL_FUNCDECL_SYS (remainderf, float, (float x, float y));
+#  endif
+_GL_CXXALIAS_SYS (remainderf, float, (float x, float y));
 # endif
+_GL_CXXALIASWARN (remainderf);
+#elif defined GNULIB_POSIXCHECK
+# undef remainderf
+# if HAVE_RAW_DECL_REMAINDERF
+_GL_WARN_ON_USE (remainderf, "remainderf is unportable - "
+                 "use gnulib module remainderf for portability");
+# endif
+#endif
+
+#if @GNULIB_REMAINDER@
+# if @REPLACE_REMAINDER@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef remainder
+#   define remainder rpl_remainder
+#  endif
+_GL_FUNCDECL_RPL (remainder, double, (double x, double y));
+_GL_CXXALIAS_RPL (remainder, double, (double x, double y));
+# else
+#  if !@HAVE_REMAINDER@ || !@HAVE_DECL_REMAINDER@
+_GL_FUNCDECL_SYS (remainder, double, (double x, double y));
+#  endif
 _GL_CXXALIAS_SYS (remainder, double, (double x, double y));
+# endif
 _GL_CXXALIASWARN (remainder);
 #elif defined GNULIB_POSIXCHECK
 # undef remainder
 # if HAVE_RAW_DECL_REMAINDER
 _GL_WARN_ON_USE (remainder, "remainder is unportable - "
                  "use gnulib module remainder for portability");
+# endif
+#endif
+
+#if @GNULIB_REMAINDERL@
+# if @REPLACE_REMAINDERL@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef remainderl
+#   define remainderl rpl_remainderl
+#  endif
+_GL_FUNCDECL_RPL (remainderl, long double, (long double x, long double y));
+_GL_CXXALIAS_RPL (remainderl, long double, (long double x, long double y));
+# else
+#  if !@HAVE_REMAINDERL@
+_GL_FUNCDECL_SYS (remainderl, long double, (long double x, long double y));
+#  endif
+_GL_CXXALIAS_SYS (remainderl, long double, (long double x, long double y));
+# endif
+_GL_CXXALIASWARN (remainderl);
+#elif defined GNULIB_POSIXCHECK
+# undef remainderl
+# if HAVE_RAW_DECL_REMAINDERL
+_GL_WARN_ON_USE (remainderl, "remainderl is unportable - "
+                 "use gnulib module remainderl for portability");
 # endif
 #endif
 
