@@ -264,7 +264,6 @@ _mbuffer_head_remove_bytes (mbuffer_head_st * buf, size_t bytes)
           left = 0;
         }
     }
-
   return ret;
 }
 

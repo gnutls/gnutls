@@ -439,7 +439,7 @@ _gnutls_io_read_buffered (gnutls_session_t session, size_t total,
       return ret;
     }
 
-  /* READ DATA - but leave RCVLOWAT bytes in the kernel buffer.
+  /* READ DATA
    */
   if (readsize > 0)
     {

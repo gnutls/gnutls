@@ -1031,7 +1031,7 @@ begin:
   if (ret >= 0) _mbuffer_set_udata_size(decrypted, ret);
 
   _mbuffer_head_remove_bytes (&session->internals.record_recv_buffer,
-                         record.header_size + record.length);
+                              record.header_size + record.length);
   if (ret < 0)
     {
       gnutls_assert();
