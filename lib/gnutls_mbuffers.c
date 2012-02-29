@@ -356,8 +356,8 @@ _mbuffer_linearize (mbuffer_head_st * buf)
   for (cur = _mbuffer_head_get_first (buf, &msg);
        msg.data != NULL; cur = _mbuffer_head_get_next (cur, &msg))
     {
-      memcpy (&bufel->msg.data[pos], msg.data, cur->msg.size);
-      pos += cur->msg.size;
+      memcpy (&bufel->msg.data[pos], msg.data, msg.size);
+      pos += msg.size;
     }
 
   _mbuffer_head_clear (buf);
