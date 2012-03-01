@@ -511,14 +511,13 @@ _gnutls_ciphertext2compressed (gnutls_session_t session,
         {
           ciphertext.size -= blocksize;
           ciphertext.data += blocksize;
-
-          if (ciphertext.size == 0)
-            {
-              gnutls_assert ();
-              return GNUTLS_E_DECRYPTION_FAILED;
-            }
         }
 
+      if (ciphertext.size < hash_size)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_DECRYPTION_FAILED;
+        }
       pad = ciphertext.data[ciphertext.size - 1] + 1;   /* pad */
 
       if ((int) pad > (int) ciphertext.size - hash_size)

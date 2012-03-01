@@ -3,6 +3,15 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010, 2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+Version 2.12.17 (unreleased)
+
+** libgnutls: Corrections in record packet parsing.
+Reported by Matthew Hall.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 Version 2.12.16 (released 2011-01-06)
 
 ** libgnutls: Corrected functionality of
