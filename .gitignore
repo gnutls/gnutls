@@ -591,3 +591,4 @@ doc/gnutls.xml
 tests/mini-tdb
 tests/resume-dtls
 tests/mini-record
+tests/srp/mini-srp

@@ -461,6 +461,7 @@ AC_CONFIG_FILES([
   tests/cert-tests/Makefile
   tests/dsa/Makefile
   tests/dtls/Makefile
+  tests/srp/Makefile
   tests/ecdsa/Makefile
   tests/key-id/Makefile
   tests/openpgp-certs/Makefile
