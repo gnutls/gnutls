@@ -111,7 +111,9 @@ _gnutls_srp_send_params (gnutls_session_t session, opaque * data,
 {
   unsigned len;
   extension_priv_data_t epriv;
-  srp_ext_st *priv;
+  srp_ext_st *priv = NULL;
+  char *username = NULL, *password = NULL;
+  int ret;
 
   if (_gnutls_kx_priority (session, GNUTLS_KX_SRP) < 0 &&
       _gnutls_kx_priority (session, GNUTLS_KX_SRP_DSS) < 0 &&
@@ -131,6 +133,13 @@ _gnutls_srp_send_params (gnutls_session_t session, opaque * data,
       if (cred == NULL)
         return 0;
 
+      priv = gnutls_malloc (sizeof (*priv));
+      if (priv == NULL)
+        {
+          gnutls_assert ();
+          return GNUTLS_E_MEMORY_ERROR;
+        }
+
       if (cred->username != NULL)
         {                       /* send username */
           len = MIN (strlen (cred->username), 255);
@@ -141,6 +150,23 @@ _gnutls_srp_send_params (gnutls_session_t session, opaque * data,
               return GNUTLS_E_SHORT_MEMORY_BUFFER;
             }
 
+          priv->username = strdup(cred->username);
+          if (priv->username == NULL)
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
+
+          priv->password = strdup(cred->password);
+          if (priv->password == NULL)
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
+
+          epriv.ptr = priv;
+          _gnutls_ext_set_session_data (session, GNUTLS_EXTENSION_SRP, epriv);
+
           data[0] = (uint8_t) len;
           memcpy (&data[1], cred->username, len);
           return len + 1;
@@ -149,7 +175,6 @@ _gnutls_srp_send_params (gnutls_session_t session, opaque * data,
         {
           /* Try the callback
            */
-          char *username = NULL, *password = NULL;
 
           if (cred->get_function (session, &username, &password) < 0
               || username == NULL || password == NULL)
@@ -162,17 +187,9 @@ _gnutls_srp_send_params (gnutls_session_t session, opaque * data,
 
           if (data_size < len + 1)
             {
-              gnutls_free (username);
-              gnutls_free (password);
               gnutls_assert ();
-              return GNUTLS_E_SHORT_MEMORY_BUFFER;
-            }
-
-          priv = gnutls_malloc (sizeof (*priv));
-          if (priv == NULL)
-            {
-              gnutls_assert ();
-              return GNUTLS_E_MEMORY_ERROR;
+              ret = GNUTLS_E_SHORT_MEMORY_BUFFER;
+              goto cleanup;
             }
 
           priv->username = username;
@@ -187,6 +204,13 @@ _gnutls_srp_send_params (gnutls_session_t session, opaque * data,
         }
     }
   return 0;
+
+cleanup:
+  gnutls_free(username);
+  gnutls_free(password);
+  gnutls_free(priv);
+  
+  return ret;
 }
 
 static void
