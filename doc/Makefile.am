@@ -181,6 +181,13 @@ MAINTAINERCLEANFILES += gnutls-api.texi x509-api.texi pgp-api.texi	\
 	pkcs12-api.texi pkcs11-api.texi abstract-api.texi		\
 	compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi
 
+HEADER_FILES = $(top_srcdir)/lib/includes/gnutls/gnutls.h.in \
+	$(top_srcdir)/lib/includes/gnutls/x509.h $(top_srcdir)/lib/includes/gnutls/openpgp.h \
+	$(top_srcdir)/lib/includes/gnutls/pkcs12.h $(top_srcdir)/lib/includes/gnutls/pkcs11.h \
+	$(top_srcdir)/lib/includes/gnutls/abstract.h $(top_srcdir)/lib/includes/gnutls/compat.h \
+	$(top_srcdir)/lib/includes/gnutls/dtls.h $(top_srcdir)/lib/includes/gnutls/crypto.h \
+	$(top_srcdir)/lib/includes/gnutls/ocsp.h
+
 gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/gnutls.h.in|sort|uniq`; do \
@@ -330,7 +337,7 @@ alerts.texi: $(top_srcdir)/lib/gnutls_alert.c $(srcdir)/alert-printlist.c
 	$(builddir)/alert-printlist > $@-tmp
 	mv -f $@-tmp $@
 
-enums.texi: $(srcdir)/../lib/includes/gnutls/*.h $(builddir)/../lib/includes/gnutls/*.h
+enums.texi: $(HEADER_FILES)
 	echo "" > $@-tmp
 	for i in $^; do \
 		echo -n "Creating documentation for $$i... " && \
