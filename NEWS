@@ -22,6 +22,9 @@ Reported by Andreas Metzler.
 ** libgnutls: Corrected rehandshake and resumption
 operations in DTLS. Reported by Sean Buckheister.
 
+** libgnutls: PKCS #11 objects that do not have ID
+no longer crash listing. Reported by Sven Geggus.
+
 ** API and ABI modifications:
 No changes since last version.
 
