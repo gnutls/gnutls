@@ -502,11 +502,13 @@ _gnutls_mpi_log (const char *prefix, bigint_t a)
   char *hexbuf;
   int res;
 
+  if (_gnutls_log_level < 2) return;
+
   res = _gnutls_mpi_print (a, NULL, &binlen);
-  if (res != 0)
+  if (res < 0 && res != GNUTLS_E_SHORT_MEMORY_BUFFER)
     {
       gnutls_assert ();
-      _gnutls_hard_log ("MPI: can't print value (%d/%d)\n", res,
+      _gnutls_hard_log ("MPI: %s can't print value (%d/%d)\n", prefix, res,
                         (int) binlen);
       return;
     }
@@ -514,7 +516,7 @@ _gnutls_mpi_log (const char *prefix, bigint_t a)
   if (binlen > 1024 * 1024)
     {
       gnutls_assert ();
-      _gnutls_hard_log ("MPI: too large mpi (%d)\n", (int) binlen);
+      _gnutls_hard_log ("MPI: %s too large mpi (%d)\n", prefix, (int) binlen);
       return;
     }
 
@@ -522,7 +524,7 @@ _gnutls_mpi_log (const char *prefix, bigint_t a)
   if (!binbuf)
     {
       gnutls_assert ();
-      _gnutls_hard_log ("MPI: out of memory (%d)\n", (int) binlen);
+      _gnutls_hard_log ("MPI: %s out of memory (%d)\n", prefix, (int) binlen);
       return;
     }
 
@@ -530,7 +532,7 @@ _gnutls_mpi_log (const char *prefix, bigint_t a)
   if (res != 0)
     {
       gnutls_assert ();
-      _gnutls_hard_log ("MPI: can't print value (%d/%d)\n", res,
+      _gnutls_hard_log ("MPI: %s can't print value (%d/%d)\n", prefix, res,
                         (int) binlen);
       gnutls_free (binbuf);
       return;
@@ -542,7 +544,7 @@ _gnutls_mpi_log (const char *prefix, bigint_t a)
   if (!hexbuf)
     {
       gnutls_assert ();
-      _gnutls_hard_log ("MPI: out of memory (hex %d)\n", (int) hexlen);
+      _gnutls_hard_log ("MPI: %s out of memory (hex %d)\n", prefix, (int) hexlen);
       gnutls_free (binbuf);
       return;
     }

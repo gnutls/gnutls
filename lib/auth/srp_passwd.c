@@ -206,6 +206,7 @@ pwd_read_conf (const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
   char line[2 * 1024];
   unsigned i, len;
   char indexstr[10];
+  int ret;
 
   snprintf (indexstr, sizeof(indexstr), "%u", (unsigned int)idx);
 
@@ -228,14 +229,22 @@ pwd_read_conf (const char *pconf_file, SRP_PWD_ENTRY * entry, int idx)
       if (strncmp (indexstr, line, MAX (i, len)) == 0)
         {
           if ((idx = pwd_put_values2 (entry, line)) >= 0)
-            return 0;
+            {
+              ret = 0;
+              goto cleanup;
+            }
           else
             {
-              return GNUTLS_E_SRP_PWD_ERROR;
+              ret = GNUTLS_E_SRP_PWD_ERROR;
+              goto cleanup;
             }
         }
     }
-  return GNUTLS_E_SRP_PWD_ERROR;
+  ret = GNUTLS_E_SRP_PWD_ERROR;
+  
+cleanup:
+  fclose(fd);
+  return ret;
 
 }
 
@@ -244,12 +253,12 @@ _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
                             SRP_PWD_ENTRY ** _entry)
 {
   gnutls_srp_server_credentials_t cred;
-  FILE *fd;
+  FILE *fd = NULL;
   char line[2 * 1024];
   unsigned i, len;
   int ret;
   int idx, last_idx;
-  SRP_PWD_ENTRY *entry;
+  SRP_PWD_ENTRY *entry = NULL;
 
   *_entry = gnutls_calloc (1, sizeof (SRP_PWD_ENTRY));
   if (*_entry == NULL)
@@ -264,8 +273,8 @@ _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
   if (cred == NULL)
     {
       gnutls_assert ();
-      _gnutls_srp_entry_free (entry);
-      return GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+      ret = GNUTLS_E_INSUFFICIENT_CREDENTIALS;
+      goto cleanup;
     }
 
   /* if the callback which sends the parameters is
@@ -284,8 +293,7 @@ _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
               if (ret < 0)
                 {
                   gnutls_assert ();
-                  _gnutls_srp_entry_free (entry);
-                  return ret;
+                  goto cleanup;
                 }
               return 0;
             }
@@ -299,8 +307,8 @@ _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
       if (ret < 0)
         {
           gnutls_assert ();
-          _gnutls_srp_entry_free (entry);
-          return GNUTLS_E_SRP_PWD_ERROR;
+          ret = GNUTLS_E_SRP_PWD_ERROR;
+          goto cleanup;
         }
 
       return 0;
@@ -312,7 +320,8 @@ _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
   if (cred->password_file == NULL)
     {
       gnutls_assert ();
-      return GNUTLS_E_SRP_PWD_ERROR;
+      ret = GNUTLS_E_SRP_PWD_ERROR;
+      goto cleanup;
     }
 
   /* Open the selected password file.
@@ -321,8 +330,8 @@ _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
   if (fd == NULL)
     {
       gnutls_assert ();
-      _gnutls_srp_entry_free (entry);
-      return GNUTLS_E_SRP_PWD_ERROR;
+      ret = GNUTLS_E_SRP_PWD_ERROR;
+      goto cleanup;
     }
 
   last_idx = 1;                 /* a default value */
@@ -348,20 +357,20 @@ _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
               last_idx = idx;
               if (pwd_read_conf (cred->password_conf_file, entry, idx) == 0)
                 {
-                  return 0;
+                  goto found;
                 }
               else
                 {
                   gnutls_assert ();
-                  _gnutls_srp_entry_free (entry);
-                  return GNUTLS_E_SRP_PWD_ERROR;
+                  ret = GNUTLS_E_SRP_PWD_ERROR;
+                  goto cleanup;
                 }
             }
           else
             {
               gnutls_assert ();
-              _gnutls_srp_entry_free (entry);
-              return GNUTLS_E_SRP_PWD_ERROR;
+              ret = GNUTLS_E_SRP_PWD_ERROR;
+              goto cleanup;
             }
         }
     }
@@ -375,17 +384,21 @@ _gnutls_srp_pwd_read_entry (gnutls_session_t state, char *username,
       if (ret < 0)
         {
           gnutls_assert ();
-          _gnutls_srp_entry_free (entry);
-          return ret;
+          goto cleanup;
         }
 
-      return 0;
+      goto found;
     }
 
+cleanup:
   gnutls_assert ();
+  if (fd) fclose(fd);
   _gnutls_srp_entry_free (entry);
   return GNUTLS_E_SRP_PWD_ERROR;
 
+found:
+  if (fd) fclose(fd);
+  return 0;
 }
 
 /* Randomizes the given password entry. It actually sets the verifier

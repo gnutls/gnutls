@@ -108,7 +108,7 @@ _gnutls_srp_send_params (gnutls_session_t session,
   unsigned len;
   int ret;
   extension_priv_data_t epriv;
-  srp_ext_st *priv;
+  srp_ext_st *priv = NULL;
   char *username = NULL, *password = NULL;
 
   if (_gnutls_kx_priority (session, GNUTLS_KX_SRP) < 0 &&
@@ -129,13 +129,37 @@ _gnutls_srp_send_params (gnutls_session_t session,
       if (cred == NULL)
         return 0;
 
+      priv = gnutls_malloc (sizeof (*priv));
+      if (priv == NULL)
+        return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
       if (cred->username != NULL)
         {                       /* send username */
           len = MIN (strlen (cred->username), 255);
 
           ret = _gnutls_buffer_append_data_prefix(extdata, 8, cred->username, len);
           if (ret < 0)
-            return gnutls_assert_val(ret);
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
+
+          priv->username = strdup(cred->username);
+          if (priv->username == NULL)
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
+
+          priv->password = strdup(cred->password);
+          if (priv->password == NULL)
+            {
+              gnutls_assert();
+              goto cleanup;
+            }
+
+          epriv.ptr = priv;
+          _gnutls_ext_set_session_data (session, GNUTLS_EXTENSION_SRP, epriv);
 
           return len + 1;
         }
@@ -153,19 +177,8 @@ _gnutls_srp_send_params (gnutls_session_t session,
 
           len = MIN (strlen (username), 255);
 
-          priv = gnutls_malloc (sizeof (*priv));
-          if (priv == NULL)
-            {
-              gnutls_assert ();
-              ret = GNUTLS_E_MEMORY_ERROR;
-              goto cleanup;
-            }
-
           priv->username = username;
           priv->password = password;
-
-          epriv.ptr = priv;
-          _gnutls_ext_set_session_data (session, GNUTLS_EXTENSION_SRP, epriv);
 
           ret = _gnutls_buffer_append_data_prefix(extdata, 8, username, len);
           if (ret < 0)
@@ -173,6 +186,9 @@ _gnutls_srp_send_params (gnutls_session_t session,
               ret = gnutls_assert_val(ret);
               goto cleanup;
             }
+
+          epriv.ptr = priv;
+          _gnutls_ext_set_session_data (session, GNUTLS_EXTENSION_SRP, epriv);
 
           return len + 1;
         }
@@ -182,6 +198,7 @@ _gnutls_srp_send_params (gnutls_session_t session,
 cleanup:
   gnutls_free (username);
   gnutls_free (password);
+  gnutls_free (priv);
   
   return ret;
 }
