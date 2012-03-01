@@ -1,5 +1,5 @@
 /* Byte-wise substring search, using the Two-Way algorithm.
-   Copyright (C) 2008-2011 Free Software Foundation, Inc.
+   Copyright (C) 2008-2012 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Eric Blake <ebb9@byu.net>, 2008.
 
@@ -14,8 +14,7 @@
    GNU Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License along
-   with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   with this program; if not, see <http://www.gnu.org/licenses/>.  */
 
 /* Before including this file, you need to include <config.h> and
    <string.h>, and define:

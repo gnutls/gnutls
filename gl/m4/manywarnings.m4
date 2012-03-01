@@ -1,5 +1,5 @@
-# manywarnings.m4 serial 1
-dnl Copyright (C) 2008-2011 Free Software Foundation, Inc.
+# manywarnings.m4 serial 3
+dnl Copyright (C) 2008-2012 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -30,9 +30,9 @@ AC_DEFUN([gl_MANYWARN_COMPLEMENT],
 
 # gl_MANYWARN_ALL_GCC(VARIABLE)
 # -----------------------------
-# Add all documented GCC (currently as per version 4.4) warning
-# parameters to variable VARIABLE.  Note that you need to test them
-# using gl_WARN_ADD if you want to make sure your gcc understands it.
+# Add all documented GCC warning parameters to variable VARIABLE.
+# Note that you need to test them using gl_WARN_ADD if you want to
+# make sure your gcc understands it.
 AC_DEFUN([gl_MANYWARN_ALL_GCC],
 [
   dnl First, check if -Wno-missing-field-initializers is needed.
@@ -145,6 +145,32 @@ AC_DEFUN([gl_MANYWARN_ALL_GCC],
     -Wcoverage-mismatch \
     -Wmultichar \
     -Wunused-macros \
+    ; do
+    gl_manywarn_set="$gl_manywarn_set $gl_manywarn_item"
+  done
+  # More warnings from gcc 4.6.2 --help=warnings.
+  for gl_manywarn_item in \
+    -Wabi \
+    -Wcpp \
+    -Wdeprecated \
+    -Wdeprecated-declarations \
+    -Wdiv-by-zero \
+    -Wdouble-promotion \
+    -Wendif-labels \
+    -Wextra \
+    -Wformat-contains-nul \
+    -Wformat-extra-args \
+    -Wformat-zero-length \
+    -Wformat=2 \
+    -Wmultichar \
+    -Wnormalized=nfc \
+    -Woverflow \
+    -Wpointer-to-int-cast \
+    -Wpragmas \
+    -Wsuggest-attribute=const \
+    -Wsuggest-attribute=noreturn \
+    -Wsuggest-attribute=pure \
+    -Wtrampolines \
     ; do
     gl_manywarn_set="$gl_manywarn_set $gl_manywarn_item"
   done

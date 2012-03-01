@@ -1,4 +1,4 @@
-/* Copyright (C) 2011 Free Software Foundation, Inc.
+/* Copyright (C) 2011-2012 Free Software Foundation, Inc.
    This file is part of gnulib.
 
    This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@ typedef int dummy;
    (perhaps because the absolute name was longer than PATH_MAX, or
    because of missing read/search permissions on parent directories)
    or SIZE was too small.  If successful, returns BUF.  If BUF is
-   NULL, an array is allocated with `malloc'; the array is SIZE bytes
+   NULL, an array is allocated with 'malloc'; the array is SIZE bytes
    long, unless SIZE == 0, in which case it is as big as
    necessary.  */
 

@@ -1,5 +1,5 @@
-# intl.m4 serial 17b
-dnl Copyright (C) 1995-2011 Free Software Foundation, Inc.
+# intl.m4 serial 17c
+dnl Copyright (C) 1995-2012 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -296,5 +296,5 @@ AC_DEFUN([gt_CHECK_DECL],
     gt_value=0
   fi
   AC_DEFINE_UNQUOTED([HAVE_DECL_]translit($1, [a-z], [A-Z]), [$gt_value],
-    [Define to 1 if you have the declaration of `$1', and to 0 if you don't.])
+    [Define to 1 if you have the declaration of '$1', and to 0 if you don't.])
 ])

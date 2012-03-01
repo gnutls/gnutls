@@ -1,6 +1,6 @@
 ## DO NOT EDIT! GENERATED AUTOMATICALLY!
 ## Process this file with automake to produce Makefile.in.
-# Copyright (C) 2002-2011 Free Software Foundation, Inc.
+# Copyright (C) 2002-2012 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -295,7 +295,7 @@ BUILT_SOURCES += inttypes.h
 
 # We need the following in order to create <inttypes.h> when the system
 # doesn't have one that works with the given compiler.
-inttypes.h: inttypes.in.h $(top_builddir)/config.status $(WARN_ON_USE_H) $(ARG_NONNULL_H)
+inttypes.h: inttypes.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(WARN_ON_USE_H) $(ARG_NONNULL_H)
 	$(AM_V_GEN)rm -f $@-t $@ && \
 	{ echo '/* DO NOT EDIT! GENERATED AUTOMATICALLY! */'; \
 	  sed -e 's/@''HAVE_INTTYPES_H''@/$(HAVE_INTTYPES_H)/g' \
@@ -316,10 +316,12 @@ inttypes.h: inttypes.in.h $(top_builddir)/config.status $(WARN_ON_USE_H) $(ARG_N
 	      -e 's/@''HAVE_DECL_IMAXDIV''@/$(HAVE_DECL_IMAXDIV)/g' \
 	      -e 's/@''HAVE_DECL_STRTOIMAX''@/$(HAVE_DECL_STRTOIMAX)/g' \
 	      -e 's/@''HAVE_DECL_STRTOUMAX''@/$(HAVE_DECL_STRTOUMAX)/g' \
+	      -e 's/@''REPLACE_STRTOIMAX''@/$(REPLACE_STRTOIMAX)/g' \
 	      -e 's/@''INT32_MAX_LT_INTMAX_MAX''@/$(INT32_MAX_LT_INTMAX_MAX)/g' \
 	      -e 's/@''INT64_MAX_EQ_LONG_MAX''@/$(INT64_MAX_EQ_LONG_MAX)/g' \
 	      -e 's/@''UINT32_MAX_LT_UINTMAX_MAX''@/$(UINT32_MAX_LT_UINTMAX_MAX)/g' \
 	      -e 's/@''UINT64_MAX_EQ_ULONG_MAX''@/$(UINT64_MAX_EQ_ULONG_MAX)/g' \
+	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
 	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
 	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
 	      < $(srcdir)/inttypes.in.h; \
@@ -462,6 +464,14 @@ EXTRA_DIST += test-sockets.c
 
 ## end   gnulib module sockets-tests
 
+## begin gnulib module stdalign-tests
+
+TESTS += test-stdalign
+check_PROGRAMS += test-stdalign
+EXTRA_DIST += test-stdalign.c macros.h
+
+## end   gnulib module stdalign-tests
+
 ## begin gnulib module stdbool-tests
 
 TESTS += test-stdbool
@@ -558,6 +568,14 @@ EXTRA_DIST += test-sys_uio.c
 
 ## end   gnulib module sys_uio-tests
 
+## begin gnulib module test-framework-sh-tests
+
+TESTS += test-init.sh
+EXTRA_DIST += init.sh
+EXTRA_DIST += test-init.sh
+
+## end   gnulib module test-framework-sh-tests
+
 ## begin gnulib module time-tests
 
 TESTS += test-time
@@ -597,7 +615,7 @@ EXTRA_DIST += test-vasprintf.c signature.h macros.h
 TESTS_ENVIRONMENT += MAKE='$(MAKE)'
 TESTS += test-verify test-verify.sh
 check_PROGRAMS += test-verify
-EXTRA_DIST += test-verify.c test-verify.sh init.sh
+EXTRA_DIST += test-verify.c test-verify.sh
 
 ## end   gnulib module verify-tests
 

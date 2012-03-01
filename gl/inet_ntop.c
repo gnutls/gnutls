@@ -1,6 +1,6 @@
 /* inet_ntop.c -- convert IPv4 and IPv6 addresses from binary to text form
 
-   Copyright (C) 2005-2006, 2008-2011 Free Software Foundation, Inc.
+   Copyright (C) 2005-2006, 2008-2012 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
 
 /*
  * Copyright (c) 1996-1999 by Internet Software Consortium.
@@ -37,6 +36,16 @@
 
 /* Specification.  */
 #include <arpa/inet.h>
+
+/* Use this to suppress gcc's "...may be used before initialized" warnings.
+   Beware: The Code argument must not contain commas.  */
+#ifndef IF_LINT
+# ifdef lint
+#  define IF_LINT(Code) Code
+# else
+#  define IF_LINT(Code) /* empty */
+# endif
+#endif
 
 #if HAVE_DECL_INET_NTOP
 
@@ -74,7 +83,7 @@ static const char *inet_ntop6 (const unsigned char *src, char *dst, socklen_t si
  * inet_ntop(af, src, dst, size)
  *      convert a network format address to presentation format.
  * return:
- *      pointer to presentation format address (`dst'), or NULL (see errno).
+ *      pointer to presentation format address ('dst'), or NULL (see errno).
  * author:
  *      Paul Vixie, 1996.
  */
@@ -105,7 +114,7 @@ inet_ntop (int af, const void *restrict src,
  * inet_ntop4(src, dst, size)
  *      format an IPv4 address
  * return:
- *      `dst' (as a const)
+ *      'dst' (as a const)
  * notes:
  *      (1) uses no statics
  *      (2) takes a u_char* not an in_addr as input
@@ -167,6 +176,8 @@ inet_ntop6 (const unsigned char *src, char *dst, socklen_t size)
     words[i / 2] = (src[i] << 8) | src[i + 1];
   best.base = -1;
   cur.base = -1;
+  IF_LINT(best.len = 0);
+  IF_LINT(cur.len = 0);
   for (i = 0; i < (NS_IN6ADDRSZ / NS_INT16SZ); i++)
     {
       if (words[i] == 0)

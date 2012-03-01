@@ -1,6 +1,6 @@
 #!/bin/sh
 # Test suite for update-copyright.
-# Copyright (C) 2009-2011 Free Software Foundation, Inc.
+# Copyright (C) 2009-2012 Free Software Foundation, Inc.
 # This file is part of the GNUlib Library.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -103,7 +103,7 @@ Copyright (C) 1990-2005, 2007-2009 Acme, Inc.
 EOF
 
 UPDATE_COPYRIGHT_YEAR=2009 \
-  update-copyright $TMP.* 1> $TMP-stdout 2> $TMP-stderr
+  update-copyright $TMP.? 1> $TMP-stdout 2> $TMP-stderr
 compare /dev/null $TMP-stdout || exit 1
 compare - $TMP-stderr <<EOF || exit 1
 $TMP.4: warning: copyright statement not found
@@ -145,7 +145,7 @@ Copyright (C) 1990-2005, 2007-2009 Acme, Inc.
 EOF
 
 UPDATE_COPYRIGHT_YEAR=2010 UPDATE_COPYRIGHT_USE_INTERVALS=1 \
-  update-copyright $TMP.* 1> $TMP-stdout 2> $TMP-stderr
+  update-copyright $TMP.? 1> $TMP-stdout 2> $TMP-stderr
 compare /dev/null $TMP-stdout || exit 1
 compare - $TMP-stderr <<EOF || exit 1
 $TMP.4: warning: copyright statement not found
@@ -183,7 +183,7 @@ Copyright (C) 1990-2005, 2007-2009 Acme, Inc.
 EOF
 
 UPDATE_COPYRIGHT_YEAR=2010 UPDATE_COPYRIGHT_FORCE=1 \
-  update-copyright $TMP.* 1> $TMP-stdout 2> $TMP-stderr
+  update-copyright $TMP.? 1> $TMP-stdout 2> $TMP-stderr
 compare /dev/null $TMP-stdout || exit 1
 compare - $TMP-stderr <<EOF || exit 1
 $TMP.4: warning: copyright statement not found
@@ -423,6 +423,13 @@ compare /dev/null $TMP-stderr || exit 1
 compare - $TMP <<EOF || exit 1
 		# Copyright (C) 1987-1988, 1991-2011 Free Software
 		# Foundation, Inc.
+EOF
+UPDATE_COPYRIGHT_YEAR=2011 UPDATE_COPYRIGHT_USE_INTERVALS=2 \
+  UPDATE_COPYRIGHT_FORCE=1 update-copyright $TMP 1> $TMP-stdout 2> $TMP-stderr
+compare /dev/null $TMP-stdout || exit 1
+compare /dev/null $TMP-stderr || exit 1
+compare - $TMP <<EOF || exit 1
+		# Copyright (C) 1987-2011 Free Software Foundation, Inc.
 EOF
 rm $TMP*
 

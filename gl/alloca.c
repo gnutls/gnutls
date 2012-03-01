@@ -475,4 +475,4 @@ i00afunc (long address)
 #  endif /* CRAY */
 
 # endif /* no alloca */
-#endif /* not GCC version 3 */
+#endif /* not GCC 2 */

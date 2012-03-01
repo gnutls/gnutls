@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2011 Free Software Foundation, Inc.
+# Copyright (C) 2002-2012 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,8 +41,6 @@ AC_DEFUN([gl_EARLY],
   AC_REQUIRE([AM_PROG_CC_C_O])
   # Code from module accept:
   # Code from module accept-tests:
-  # Code from module alignof:
-  # Code from module alignof-tests:
   # Code from module alloca:
   # Code from module alloca-opt:
   # Code from module alloca-opt-tests:
@@ -199,6 +197,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module ssize_t:
   # Code from module stat:
   # Code from module stat-tests:
+  # Code from module stdalign:
+  # Code from module stdalign-tests:
   # Code from module stdarg:
   dnl Some compilers (e.g., AIX 5.3 cc) need to be in c99 mode
   dnl for the builtin va_copy to work.  With Autoconf 2.60 or later,
@@ -238,6 +238,8 @@ AC_DEFUN([gl_EARLY],
   # Code from module sys_types-tests:
   # Code from module sys_uio:
   # Code from module sys_uio-tests:
+  # Code from module test-framework-sh:
+  # Code from module test-framework-sh-tests:
   # Code from module thread:
   # Code from module thread-tests:
   # Code from module threadlib:
@@ -513,6 +515,7 @@ gl_SOCKETLIB
 gl_SOCKETS
 gl_TYPE_SOCKLEN_T
 gt_TYPE_SSIZE_T
+gl_STDALIGN_H
 gl_STDARG_H
 AM_STDBOOL_H
 gl_STDDEF_H
@@ -804,7 +807,6 @@ AC_DEFUN([gl_FILE_LIST], [
   doc/gpl-3.0.texi
   doc/lgpl-2.1.texi
   lib/accept.c
-  lib/alignof.h
   lib/alloca.c
   lib/alloca.in.h
   lib/arpa_inet.in.h
@@ -878,6 +880,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/socket.c
   lib/sockets.c
   lib/sockets.h
+  lib/stdalign.in.h
   lib/stdarg.in.h
   lib/stdbool.in.h
   lib/stddef.in.h
@@ -917,6 +920,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/dup2.m4
   m4/errno_h.m4
   m4/error.m4
+  m4/exponentd.m4
   m4/extensions.m4
   m4/fcntl-o.m4
   m4/fcntl_h.m4
@@ -986,6 +990,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/sockpfaf.m4
   m4/ssize_t.m4
   m4/stat.m4
+  m4/stdalign.m4
   m4/stdarg.m4
   m4/stdbool.m4
   m4/stddef_h.m4
@@ -1024,7 +1029,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/macros.h
   tests/signature.h
   tests/test-accept.c
-  tests/test-alignof.c
   tests/test-alloca-opt.c
   tests/test-arpa_inet.c
   tests/test-binary-io.c
@@ -1073,6 +1077,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-ignore-value.c
   tests/test-inet_ntop.c
   tests/test-inet_pton.c
+  tests/test-init.sh
   tests/test-intprops.c
   tests/test-inttypes.c
   tests/test-ioctl.c
@@ -1108,6 +1113,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-sockets.c
   tests/test-stat.c
   tests/test-stat.h
+  tests/test-stdalign.c
   tests/test-stdbool.c
   tests/test-stddef.c
   tests/test-stdint.c

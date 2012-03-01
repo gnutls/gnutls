@@ -1,5 +1,5 @@
 /* An fseeko() function that, together with fflush(), is POSIX compliant.
-   Copyright (C) 2007-2011 Free Software Foundation, Inc.
+   Copyright (C) 2007-2012 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License along
-   with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   with this program; if not, see <http://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -89,6 +88,9 @@ fseeko (FILE *fp, off_t offset, int whence)
       && fp->__get_limit == fp->__bufp
       && fp->__put_limit == fp->__bufp
       && !fp->__pushed_back)
+#elif defined EPLAN9                /* Plan9 */
+  if (fp->rp == fp->buf
+      && fp->wp == fp->buf)
 #else
   #error "Please port gnulib fseeko.c to your platform! Look at the code in fpurge.c, then report this to bug-gnulib."
 #endif

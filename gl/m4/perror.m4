@@ -1,5 +1,5 @@
-# perror.m4 serial 3
-dnl Copyright (C) 2008-2011 Free Software Foundation, Inc.
+# perror.m4 serial 6
+dnl Copyright (C) 2008-2012 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -27,6 +27,8 @@ AC_DEFUN([gl_FUNC_PERROR],
            [AC_LANG_PROGRAM(
               [[#include <errno.h>
                 #include <stdio.h>
+                #include <stdlib.h>
+                #include <string.h>
               ]],
               [[char *str = strerror (-1);
                 if (!getenv("CONFTEST_OUTPUT")) return 0;
@@ -34,9 +36,10 @@ AC_DEFUN([gl_FUNC_PERROR],
                 puts (str);
                 errno = -1;
                 perror ("");
+                return 0;
               ]])],
-           [CONFTEST_OUTPUT=1 ./conftest$EXEEXT >conftest.txt1 2>conftest.txt2
-            if cmp conftest.txt1 conftest.txt2 >/dev/null; then
+           [if CONFTEST_OUTPUT=1 ./conftest$EXEEXT >conftest.txt1 2>conftest.txt2 \
+               && cmp conftest.txt1 conftest.txt2 >/dev/null; then
               gl_cv_func_perror_works=yes
             else
               gl_cv_func_perror_works=no
@@ -44,12 +47,17 @@ AC_DEFUN([gl_FUNC_PERROR],
             rm -rf conftest.txt1 conftest.txt2],
            [gl_cv_func_perror_works=no],
            [dnl Guess no when cross-compiling.
-            gl_cv_func_perror_works="guessing no"])])
-       if test "$gl_cv_func_perror_works" != yes; then
-         REPLACE_PERROR=1
-       fi ;;
-    *) dnl The system's perror() probably inherits the bugs in the
-       dnl system's strerror_r(). Replace it.
-      REPLACE_PERROR=1 ;;
+            gl_cv_func_perror_works="guessing no"
+           ])
+        ])
+      if test "$gl_cv_func_perror_works" != yes; then
+        REPLACE_PERROR=1
+      fi
+      ;;
+    *)
+      dnl The system's perror() probably inherits the bugs in the
+      dnl system's strerror_r(). Replace it.
+      REPLACE_PERROR=1
+      ;;
   esac
 ])

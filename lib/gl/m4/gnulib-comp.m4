@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2011 Free Software Foundation, Inc.
+# Copyright (C) 2002-2012 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,7 +38,6 @@ AC_DEFUN([lgl_EARLY],
   m4_pattern_allow([^gl_LIBOBJS$])dnl a variable
   m4_pattern_allow([^gl_LTLIBOBJS$])dnl a variable
   AC_REQUIRE([gl_PROG_AR_RANLIB])
-  # Code from module alignof:
   # Code from module alloca-opt:
   # Code from module alloca-opt-tests:
   # Code from module binary-io:
@@ -119,6 +118,8 @@ AC_DEFUN([lgl_EARLY],
   # Code from module sockets-tests:
   # Code from module socklen:
   # Code from module ssize_t:
+  # Code from module stdalign:
+  # Code from module stdalign-tests:
   # Code from module stdbool:
   # Code from module stdbool-tests:
   # Code from module stddef:
@@ -144,6 +145,8 @@ AC_DEFUN([lgl_EARLY],
   # Code from module sys_types-tests:
   # Code from module sys_uio:
   # Code from module sys_uio-tests:
+  # Code from module test-framework-sh:
+  # Code from module test-framework-sh-tests:
   # Code from module time:
   # Code from module time-tests:
   # Code from module time_r:
@@ -265,6 +268,7 @@ gl_SOCKETLIB
 gl_SOCKETS
 gl_TYPE_SOCKLEN_T
 gt_TYPE_SSIZE_T
+gl_STDALIGN_H
 AM_STDBOOL_H
 gl_STDDEF_H
 gl_STDINT_H
@@ -481,7 +485,6 @@ AC_DEFUN([lgl_FILE_LIST], [
   build-aux/snippet/arg-nonnull.h
   build-aux/snippet/c++defs.h
   build-aux/snippet/warn-on-use.h
-  lib/alignof.h
   lib/alloca.in.h
   lib/asnprintf.c
   lib/asprintf.c
@@ -523,6 +526,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   lib/snprintf.c
   lib/sockets.c
   lib/sockets.h
+  lib/stdalign.in.h
   lib/stdbool.in.h
   lib/stddef.in.h
   lib/stdint.in.h
@@ -555,6 +559,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/byteswap.m4
   m4/codeset.m4
   m4/errno_h.m4
+  m4/exponentd.m4
   m4/extensions.m4
   m4/fcntl-o.m4
   m4/fcntl_h.m4
@@ -617,6 +622,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   m4/socklen.m4
   m4/sockpfaf.m4
   m4/ssize_t.m4
+  m4/stdalign.m4
   m4/stdbool.m4
   m4/stddef_h.m4
   m4/stdint.m4
@@ -684,6 +690,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-ftello4.sh
   tests/test-func.c
   tests/test-fwrite.c
+  tests/test-init.sh
   tests/test-intprops.c
   tests/test-inttypes.c
   tests/test-memchr.c
@@ -691,6 +698,7 @@ AC_DEFUN([lgl_FILE_LIST], [
   tests/test-read-file.c
   tests/test-snprintf.c
   tests/test-sockets.c
+  tests/test-stdalign.c
   tests/test-stdbool.c
   tests/test-stddef.c
   tests/test-stdint.c

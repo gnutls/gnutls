@@ -1,5 +1,5 @@
 /* Test setsockopt() function.
-   Copyright (C) 2011 Free Software Foundation, Inc.
+   Copyright (C) 2011-2012 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ SIGNATURE_CHECK (setsockopt, int, (int, int, int, const void *, socklen_t));
 int
 main (void)
 {
-  gl_sockets_startup (SOCKETS_1_1);
+  (void) gl_sockets_startup (SOCKETS_1_1);
 
   /* Test behaviour for invalid file descriptors.  */
   {

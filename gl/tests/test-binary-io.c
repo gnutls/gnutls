@@ -1,5 +1,5 @@
 /* Test of binary mode I/O.
-   Copyright (C) 2005, 2007-2011 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2007-2012 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -46,19 +46,10 @@ main ()
       exit (1);
     ASSERT (statbuf.st_size == 6);
   }
-  unlink ("t-bin-out2.tmp");
 
   /* Test the SET_BINARY macro.  */
   SET_BINARY (1);
   fputs ("Hello\n", stdout);
-  fclose (stdout);
-  fclose (stderr);
-  {
-    struct stat statbuf;
-    if (stat ("t-bin-out1.tmp", &statbuf) < 0)
-      exit (1);
-    ASSERT (statbuf.st_size == 6);
-  }
 
   return 0;
 }

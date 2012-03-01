@@ -1,5 +1,5 @@
 /* Test of <sys/select.h> substitute.
-   Copyright (C) 2007-2011 Free Software Foundation, Inc.
+   Copyright (C) 2007-2012 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -38,7 +38,10 @@ SIGNATURE_CHECK (FD_ZERO, void, (fd_set *));
 #endif
 
 /* Check that the 'struct timeval' type is defined.  */
-struct timeval t1;
+struct timeval a;
+
+/* Check that &a.tv_sec is a 'time_t *', ignoring signedness issues.  */
+typedef int verify_tv_sec_type[sizeof (a.tv_sec) == sizeof (time_t) ? 1 : -1];
 
 /* Check that sigset_t is defined.  */
 sigset_t t2;

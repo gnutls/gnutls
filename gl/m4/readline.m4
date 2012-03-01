@@ -1,5 +1,5 @@
-# readline.m4 serial 9
-dnl Copyright (C) 2005-2006, 2009-2011 Free Software Foundation, Inc.
+# readline.m4 serial 10
+dnl Copyright (C) 2005-2006, 2009-2012 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -29,7 +29,7 @@ AC_DEFUN([gl_FUNC_READLINE],
     am_save_LIBS="$LIBS"
     dnl On some systems, -lreadline doesn't link without an additional
     dnl -lncurses or -ltermcap.
-    dnl Try -lncurses before -ltermcap, because libtermcap is unsecure
+    dnl Try -lncurses before -ltermcap, because libtermcap is insecure
     dnl by design and obsolete since 1994. Try -lcurses last, because
     dnl libcurses is unusable on some old Unices.
     for extra_lib in "" ncurses termcap curses; do
@@ -72,7 +72,7 @@ AC_DEFUN([gl_FUNC_READLINE],
   AC_SUBST([LIBREADLINE])
   AC_SUBST([LTLIBREADLINE])
 
-  AC_CHECK_HEADERS([readline/readline.h])
+  AC_CHECK_HEADERS([readline/readline.h readline/history.h])
 ])
 
 # Prerequisites of lib/readline.c.

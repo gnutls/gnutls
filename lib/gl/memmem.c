@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-1994, 1996-1998, 2000, 2004, 2007-2011 Free Software
+/* Copyright (C) 1991-1994, 1996-1998, 2000, 2004, 2007-2012 Free Software
    Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -13,8 +13,7 @@
    GNU Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License along
-   with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   with this program; if not, see <http://www.gnu.org/licenses/>.  */
 
 /* This particular implementation was written by Eric Blake, 2008.  */
 

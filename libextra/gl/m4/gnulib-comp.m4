@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2011 Free Software Foundation, Inc.
+# Copyright (C) 2002-2012 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ AC_DEFUN([xgl_EARLY],
   # Code from module lib-msvc-compat:
   # Code from module lib-symbol-versions:
   # Code from module memxor:
+  # Code from module stdalign:
 ])
 
 # This macro should be invoked from ./configure.ac, in the section
@@ -66,6 +67,7 @@ gl_MD5
 gl_LD_OUTPUT_DEF
 gl_LD_VERSION_SCRIPT
 gl_MEMXOR
+gl_STDALIGN_H
   # End of code from modules
   m4_ifval(xgl_LIBSOURCES_LIST, [
     m4_syscmd([test ! -d ]m4_defn([xgl_LIBSOURCES_DIR])[ ||
@@ -209,6 +211,7 @@ AC_DEFUN([xgl_FILE_LIST], [
   lib/md5.h
   lib/memxor.c
   lib/memxor.h
+  lib/stdalign.in.h
   m4/00gnulib.m4
   m4/extensions.m4
   m4/gnulib-common.m4
@@ -219,4 +222,5 @@ AC_DEFUN([xgl_FILE_LIST], [
   m4/lib-prefix.m4
   m4/md5.m4
   m4/memxor.m4
+  m4/stdalign.m4
 ])
