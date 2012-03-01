@@ -244,8 +244,6 @@ _gnutls_gen_srp_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
 
   _gnutls_mpi_log ("SRP B: ", B);
 
-  _gnutls_srp_entry_free (pwd_entry);
-
   ret = data->length;
 
 cleanup:

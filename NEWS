@@ -10,6 +10,9 @@ system (the full git repository)
 ** command line apps: Link with local libopts if the 
 installed is an old one.
 
+** libgnutls: Eliminate double free during SRP
+authentication. Reported by Peter Penzov.
+
 ** libgnutls: Corrections in record packet parsing.
 Reported by Matthew Hall.
 
