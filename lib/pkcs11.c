@@ -396,6 +396,12 @@ pkcs11_get_info (struct p11_kit_uri *info,
                          (int)version->minor);
       terminate = 1;
     }
+  else
+    {
+      *output_size = 0;
+      if (output) ((uint8_t*)output)[0] = 0;
+      return 0;
+    }
 
   if (hexify)
     {
