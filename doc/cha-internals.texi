@@ -321,6 +321,101 @@ When writing GTK-DOC style documentation for your new APIs, don't
 forget to add @code{Since:} tags to indicate the GnuTLS version the
 API was introduced in.
 
+@subheading Adding a new Supplemental Data Handshake Message
+
+TLS handshake extensions allow to send so called supplemental data
+handshake messages. This short section explains how to implement a
+supplemental data handshake message for a given TLS extension.
+
+First of all, modify your extension @code{foobar} in the way, the that
+flags
+@code{session->security_parameters.do_send_supplemental}
+and
+@code{session->security_parameters.do_recv_supplemental}
+are set:
+
+@example
+int
+_gnutls_foobar_recv_params (gnutls_session_t session, const opaque * data,
+                                 size_t _data_size)
+@{
+   ...
+   session->security_parameters.do_recv_supplemental=1;
+   ...
+@}
+
+int
+_gnutls_foobar_send_params (gnutls_session_t session, gnutls_buffer_st *extdata)
+@{
+   ...
+   session->security_parameters.do_send_supplemental=1;
+   ...
+@}
+@end example
+
+Furthermore add the functions @funcintref{_foobar_supp_recv_params}
+and @funcintref{_foobar_supp_send_params} to @code{_foobar.h} and
+@code{_foobar.c}. The following example code shows how to send a
+``Hello World'' string in the supplemental data handshake message:
+
+@example
+int 
+_foobar_supp_recv_params(gnutls_session_t session,const opaque *data,size_t _data_size)
+@{
+   uint8_t len = (int) _data_size;
+   unsigned char *msg;
+
+   msg = (unsigned char *)malloc(len*sizeof(unsigned char));
+   memcpy(msg,data,len);
+   msg[len]='\0';
+
+   return len;
+@}
+
+int 
+_foobar_supp_send_params(gnutls_session_t session,gnutls_buffer_st *buf)
+@{
+   unsigned char *msg = "hello world";
+   int len = strlen(msg);
+
+   _gnutls_buffer_append_data_prefix(buf,8,msg,(uint8_t) len);
+
+   return len;
+@}
+@end example
+
+Afterwards, add the new supplemental data handshake message to
+@code{lib/gnutls_supplemental.c} by adding a new entry to the
+@code{_gnutls_supplemental[]} structure:
+
+@example
+gnutls_supplemental_entry _gnutls_supplemental[] = 
+@{
+  @{"foobar",
+   GNUTLS_SUPPLEMENTAL_FOOBAR_DATA,
+   _foobar_supp_recv_params,
+   _foobar_supp_send_params@},
+  @{0, 0, 0, 0@}
+@};
+@end example
+
+You have to include your @code{foobar.h} header file as well:
+
+@example
+#include "foobar.h"
+@end example
+
+Lastly, add the new supplemental data type to
+@code{lib/includes/gnutls/gnutls.h}:
+
+@example
+typedef enum
+@{
+    GNUTLS_SUPPLEMENTAL_USER_MAPPING_DATA = 0,
+    GNUTLS_SUPPLEMENTAL_FOOBAR_DATA = 1
+@} gnutls_supplemental_data_format_type_t;
+@end example
+
 @node Cryptographic Backend
 @section Cryptographic Backend
 Today most new processors, either for embedded or desktop systems
