@@ -37,19 +37,14 @@ void _dtls_reset_hsk_state(gnutls_session_t session);
 
 #define MAX_DTLS_TIMEOUT 60000
 
-/* returns a-b in ms */
-inline static unsigned int timespec_sub_ms(struct timespec *a, struct timespec *b)
-{
-  return (a->tv_sec * 1000 + a->tv_nsec / (1000 * 1000) -
-          (b->tv_sec * 1000 + b->tv_nsec / (1000 * 1000)));
-}
+unsigned int _dtls_timespec_sub_ms (struct timespec *a, struct timespec *b);
 
 #define RETURN_DTLS_EAGAIN_OR_TIMEOUT(session, r) { \
   struct timespec now; \
   unsigned int diff; \
   gettime(&now); \
    \
-  diff = timespec_sub_ms(&now, &session->internals.dtls.handshake_start_time); \
+  diff = _dtls_timespec_sub_ms(&now, &session->internals.dtls.handshake_start_time); \
   if (diff > session->internals.dtls.total_timeout_ms) \
     { \
       _gnutls_dtls_log("Session timeout: %u ms\n", diff); \
@@ -97,18 +92,7 @@ inline static void _dtls_async_timer_init(gnutls_session_t session)
     }
 }
 
-inline static void _dtls_async_timer_delete(gnutls_session_t session)
-{
-  if (session->internals.dtls.async_term != 0)
-    {
-      _gnutls_dtls_log ("DTLS[%p]: Deinitializing previous handshake state.\n", session);
-      session->internals.dtls.async_term = 0; /* turn off "timer" */
-
-      _dtls_reset_hsk_state(session);
-      _gnutls_handshake_io_buffer_clear (session);
-      _gnutls_epoch_gc(session);
-    }
-}
+void _dtls_async_timer_delete(gnutls_session_t session);
 
 /* Checks whether it is time to terminate the timer
  */
