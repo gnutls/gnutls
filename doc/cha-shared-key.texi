@@ -41,10 +41,16 @@ harm to the system security if they were revealed.  The @acronym{SRP}
 needs instead of the plain password something called a verifier, which
 is calculated using the user's password, and if stolen cannot be used
 to impersonate the user. 
-The Stanford @acronym{SRP} libraries, include a PAM module that synchronizes
-the system's users passwords with the @acronym{SRP} password
-files. That way @acronym{SRP} authentication could be used for all users
-of a system.
+@c The Stanford @acronym{SRP} libraries, include a PAM module that synchronizes
+@c the system's users passwords with the @acronym{SRP} password
+@c files. That way @acronym{SRP} authentication could be used for all users
+@c of a system.
+
+Typical conventions in SRP are a password file, called @file{tpasswd} that 
+holds the SRP verifiers (encoded passwords) and another file, @file{tpasswd.conf},
+which holds the allowed SRP parameters.  The included in GnuTLS helper 
+follow those conventions. The srptool program, discussed in the next section
+is a tool to manipulate the SRP parameters.
 
 The implementation in @acronym{GnuTLS} is based on @xcite{TLSSRP}. The
 supported key exchange methods are shown below.
@@ -64,10 +70,6 @@ authenticated using a certificate with RSA parameters.
 
 @end table
 
-Helper functions are included in @acronym{GnuTLS}, used to generate and
-maintain @acronym{SRP} verifiers and password files.  A program to
-manipulate the required parameters for @acronym{SRP} authentication is
-also included.  See @ref{srptool Invocation}, for more information.
 
 @showfuncdesc{gnutls_srp_verifier}
 
