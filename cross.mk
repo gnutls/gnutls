@@ -1,6 +1,6 @@
 
-GNUTLS_FILE:=gnutls-3.0.14.tar.xz
-GNUTLS_DIR:=gnutls-3.0.14
+GNUTLS_FILE:=gnutls-3.0.15.tar.xz
+GNUTLS_DIR:=gnutls-3.0.15
 
 GMP_FILE:=gmp-5.0.2.tar.bz2
 GMP_DIR:=gmp-5.0.2
