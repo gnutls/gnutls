@@ -2,6 +2,14 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.0.16 (unreleased)
+
+** Corrected SRP-RSA ciphersuites when used under TLS 1.2.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.0.15 (released 2012-03-02)
 
 ** test suite: Only run under valgrind in the development
