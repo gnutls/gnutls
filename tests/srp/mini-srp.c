@@ -49,7 +49,7 @@ int main()
 
 static void terminate(void);
 
-/* This program tests the rehandshake in DTLS
+/* This program tests the SRP and SRP-RSA ciphersuites.
  */
 
 static void
@@ -64,16 +64,55 @@ client_log_func (int level, const char *str)
   fprintf (stderr, "client|<%d>| %s", level, str);
 }
 
-/* A very basic TLS client, with anonymous authentication.
- */
+static unsigned char server_cert_pem[] =
+  "-----BEGIN CERTIFICATE-----\n"
+  "MIICVjCCAcGgAwIBAgIERiYdMTALBgkqhkiG9w0BAQUwGTEXMBUGA1UEAxMOR251\n"
+  "VExTIHRlc3QgQ0EwHhcNMDcwNDE4MTMyOTIxWhcNMDgwNDE3MTMyOTIxWjA3MRsw\n"
+  "GQYDVQQKExJHbnVUTFMgdGVzdCBzZXJ2ZXIxGDAWBgNVBAMTD3Rlc3QuZ251dGxz\n"
+  "Lm9yZzCBnDALBgkqhkiG9w0BAQEDgYwAMIGIAoGA17pcr6MM8C6pJ1aqU46o63+B\n"
+  "dUxrmL5K6rce+EvDasTaDQC46kwTHzYWk95y78akXrJutsoKiFV1kJbtple8DDt2\n"
+  "DZcevensf9Op7PuFZKBroEjOd35znDET/z3IrqVgbtm2jFqab7a+n2q9p/CgMyf1\n"
+  "tx2S5Zacc1LWn9bIjrECAwEAAaOBkzCBkDAMBgNVHRMBAf8EAjAAMBoGA1UdEQQT\n"
+  "MBGCD3Rlc3QuZ251dGxzLm9yZzATBgNVHSUEDDAKBggrBgEFBQcDATAPBgNVHQ8B\n"
+  "Af8EBQMDB6AAMB0GA1UdDgQWBBTrx0Vu5fglyoyNgw106YbU3VW0dTAfBgNVHSME\n"
+  "GDAWgBTpPBz7rZJu5gakViyi4cBTJ8jylTALBgkqhkiG9w0BAQUDgYEAaFEPTt+7\n"
+  "bzvBuOf7+QmeQcn29kT6Bsyh1RHJXf8KTk5QRfwp6ogbp94JQWcNQ/S7YDFHglD1\n"
+  "AwUNBRXwd3riUsMnsxgeSDxYBfJYbDLeohNBsqaPDJb7XailWbMQKfAbFQ8cnOxg\n"
+  "rOKLUQRWJ0K3HyXRMhbqjdLIaQiCvQLuizo=\n" "-----END CERTIFICATE-----\n";
+
+const gnutls_datum_t server_cert = { server_cert_pem,
+  sizeof (server_cert_pem)
+};
+
+static unsigned char server_key_pem[] =
+  "-----BEGIN RSA PRIVATE KEY-----\n"
+  "MIICXAIBAAKBgQDXulyvowzwLqknVqpTjqjrf4F1TGuYvkrqtx74S8NqxNoNALjq\n"
+  "TBMfNhaT3nLvxqResm62ygqIVXWQlu2mV7wMO3YNlx696ex/06ns+4VkoGugSM53\n"
+  "fnOcMRP/PciupWBu2baMWppvtr6far2n8KAzJ/W3HZLllpxzUtaf1siOsQIDAQAB\n"
+  "AoGAYAFyKkAYC/PYF8e7+X+tsVCHXppp8AoP8TEZuUqOZz/AArVlle/ROrypg5kl\n"
+  "8YunrvUdzH9R/KZ7saNZlAPLjZyFG9beL/am6Ai7q7Ma5HMqjGU8kTEGwD7K+lbG\n"
+  "iomokKMOl+kkbY/2sI5Czmbm+/PqLXOjtVc5RAsdbgvtmvkCQQDdV5QuU8jap8Hs\n"
+  "Eodv/tLJ2z4+SKCV2k/7FXSKWe0vlrq0cl2qZfoTUYRnKRBcWxc9o92DxK44wgPi\n"
+  "oMQS+O7fAkEA+YG+K9e60sj1K4NYbMPAbYILbZxORDecvP8lcphvwkOVUqbmxOGh\n"
+  "XRmTZUuhBrJhJKKf6u7gf3KWlPl6ShKEbwJASC118cF6nurTjuLf7YKARDjNTEws\n"
+  "qZEeQbdWYINAmCMj0RH2P0mvybrsXSOD5UoDAyO7aWuqkHGcCLv6FGG+qwJAOVqq\n"
+  "tXdUucl6GjOKKw5geIvRRrQMhb/m5scb+5iw8A4LEEHPgGiBaF5NtJZLALgWfo5n\n"
+  "hmC8+G8F0F78znQtPwJBANexu+Tg5KfOnzSILJMo3oXiXhf5PqXIDmbN0BKyCKAQ\n"
+  "LfkcEcUbVfmDaHpvzwY9VEaoMOKVLitETXdNSxVpvWM=\n"
+  "-----END RSA PRIVATE KEY-----\n";
+
+const gnutls_datum_t server_key = { server_key_pem,
+  sizeof (server_key_pem)
+};
 
 
 static void
-client (int fd)
+client (int fd, const char* prio)
 {
   int ret;
   gnutls_session_t session;
   gnutls_srp_client_credentials_t srp_cred;
+  gnutls_certificate_credentials_t x509_cred;
   /* Need to enable anonymous KX specifically. */
 
   gnutls_global_init ();
@@ -85,6 +124,8 @@ client (int fd)
     }
 
   gnutls_srp_allocate_client_credentials (&srp_cred);
+  gnutls_certificate_allocate_credentials (&x509_cred);
+
   gnutls_srp_set_client_credentials (srp_cred, "test", "test");
 
   /* Initialize TLS session
@@ -92,11 +133,12 @@ client (int fd)
   gnutls_init (&session, GNUTLS_CLIENT);
 
   /* Use default priorities */
-  gnutls_priority_set_direct (session, "NORMAL:+SRP", NULL);
+  gnutls_priority_set_direct (session, prio, NULL);
 
   /* put the anonymous credentials to the current session
    */
   gnutls_credentials_set (session, GNUTLS_CRD_SRP, srp_cred);
+  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, x509_cred);
 
   gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) fd);
 
@@ -132,6 +174,7 @@ client (int fd)
   gnutls_deinit (session);
 
   gnutls_srp_free_client_credentials (srp_cred);
+  gnutls_certificate_free_credentials (x509_cred);
 
   gnutls_global_deinit ();
 }
@@ -139,10 +182,11 @@ client (int fd)
 
 /* These are global */
 gnutls_srp_server_credentials_t s_srp_cred;
+gnutls_certificate_credentials_t s_x509_cred;
 pid_t child;
 
 static gnutls_session_t
-initialize_tls_session (void)
+initialize_tls_session (const char* prio)
 {
   gnutls_session_t session;
 
@@ -151,9 +195,10 @@ initialize_tls_session (void)
   /* avoid calling all the priority functions, since the defaults
    * are adequate.
    */
-  gnutls_priority_set_direct (session, "NORMAL:+SRP", NULL);
+  gnutls_priority_set_direct (session, prio, NULL);
 
   gnutls_credentials_set (session, GNUTLS_CRD_SRP, s_srp_cred);
+  gnutls_credentials_set (session, GNUTLS_CRD_CERTIFICATE, s_x509_cred);
 
   return session;
 }
@@ -168,7 +213,7 @@ int status;
 }
 
 static void
-server (int fd)
+server (int fd, const char* prio)
 {
 int ret;
 gnutls_session_t session;
@@ -187,7 +232,12 @@ gnutls_session_t session;
   gnutls_srp_set_server_credentials_file (s_srp_cred, "tpasswd",
                                           "tpasswd.conf");
 
-  session = initialize_tls_session ();
+  gnutls_certificate_allocate_credentials (&s_x509_cred);
+  gnutls_certificate_set_x509_key_mem (s_x509_cred,
+                                       &server_cert, &server_key,
+                                       GNUTLS_X509_FMT_PEM);
+
+  session = initialize_tls_session (prio);
 
   gnutls_transport_set_ptr (session, (gnutls_transport_ptr_t) fd);
 
@@ -219,6 +269,7 @@ gnutls_session_t session;
   gnutls_deinit (session);
 
   gnutls_srp_free_server_credentials (s_srp_cred);
+  gnutls_certificate_free_credentials (s_x509_cred);
 
   gnutls_global_deinit ();
 
@@ -226,7 +277,7 @@ gnutls_session_t session;
     success ("server: finished\n");
 }
 
-static void start (void)
+static void start (const char* prio)
 {
   int fd[2];
   int ret;
@@ -250,14 +301,14 @@ static void start (void)
     {
       int status;
       /* parent */
-      server (fd[0]);
+      server (fd[0], prio);
       wait (&status);
       if (WEXITSTATUS(status) != 0)
         fail("Child died with status %d\n", WEXITSTATUS(status));
     }
   else 
     {
-      client (fd[1]);
+      client (fd[1], prio);
       exit(0);
     }
 }
@@ -265,7 +316,8 @@ static void start (void)
 void
 doit (void)
 {
-  start();
+  start("NORMAL:-KX-ALL:+SRP");
+  start("NORMAL:-KX-ALL:+SRP-RSA");
 }
 
 #endif /* _WIN32 */
