@@ -38,6 +38,7 @@
 #include <gnutls_sig.h>
 #include <auth/srp.h>
 #include <gnutls_x509.h>
+#include <algorithms.h>
 
 static int gen_srp_cert_server_kx (gnutls_session_t, gnutls_buffer_st*);
 static int proc_srp_cert_server_kx (gnutls_session_t, uint8_t *, size_t);
@@ -86,6 +87,7 @@ gen_srp_cert_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
   gnutls_privkey_t apr_pkey;
   int apr_cert_list_length;
   gnutls_sign_algorithm_t sign_algo;
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
   ret = _gnutls_gen_srp_server_kx (session, data);
 
@@ -121,15 +123,49 @@ gen_srp_cert_server_kx (gnutls_session_t session, gnutls_buffer_st* data)
       return ret;
     }
 
+  if (_gnutls_version_has_selectable_sighash (ver))
+    {
+      const sign_algorithm_st *aid;
+      uint8_t p[2];
+
+      if (sign_algo == GNUTLS_SIGN_UNKNOWN)
+        {
+          ret = GNUTLS_E_UNKNOWN_ALGORITHM;
+          goto cleanup;
+        }
+
+      aid = _gnutls_sign_to_tls_aid (sign_algo);
+      if (aid == NULL)
+        {
+          gnutls_assert();
+          ret = GNUTLS_E_UNKNOWN_ALGORITHM;
+          goto cleanup;
+        }
+      
+      p[0] = aid->hash_algorithm;
+      p[1] = aid->sign_algorithm;
+      
+      ret = _gnutls_buffer_append_data(data, p, 2);
+      if (ret < 0)
+        {
+          gnutls_assert();
+          goto cleanup;
+        }
+    }
+
   ret = _gnutls_buffer_append_data_prefix( data, 16, signature.data, signature.size);
 
-  _gnutls_free_datum (&signature);
-
   if (ret < 0)
-    return gnutls_assert_val(ret);
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
 
-  return data->length;
+  ret = data->length;
 
+cleanup:
+  _gnutls_free_datum (&signature);
+  return ret;
 }
 
 static int
@@ -143,6 +179,8 @@ proc_srp_cert_server_kx (gnutls_session_t session, uint8_t * data,
   cert_auth_info_t info;
   gnutls_pcert_st peer_cert;
   uint8_t *p;
+  gnutls_sign_algorithm_t sign_algo = GNUTLS_SIGN_UNKNOWN;
+  gnutls_protocol_t ver = gnutls_protocol_get_version (session);
 
   ret = _gnutls_proc_srp_server_kx (session, data, _data_size);
   if (ret < 0)
@@ -164,6 +202,22 @@ proc_srp_cert_server_kx (gnutls_session_t session, uint8_t * data,
   vparams.data = data;
 
   p = &data[vparams.size];
+  if (_gnutls_version_has_selectable_sighash (ver))
+    {
+      sign_algorithm_st aid;
+
+      DECR_LEN (data_size, 1);
+      aid.hash_algorithm = *p++;
+      DECR_LEN (data_size, 1);
+      aid.sign_algorithm = *p++;
+      sign_algo = _gnutls_tls_aid_to_sign (&aid);
+      if (sign_algo == GNUTLS_SIGN_UNKNOWN)
+        {
+          _gnutls_debug_log("unknown signature %d.%d\n", aid.sign_algorithm, aid.hash_algorithm);
+          gnutls_assert ();
+          return GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM;
+        }
+    }
 
   DECR_LEN (data_size, 2);
   sigsize = _gnutls_read_uint16 (p);
@@ -185,7 +239,7 @@ proc_srp_cert_server_kx (gnutls_session_t session, uint8_t * data,
 
   ret =
     _gnutls_handshake_verify_data (session, &peer_cert, &vparams, &signature,
-                                   GNUTLS_SIGN_UNKNOWN);
+                                   sign_algo);
 
   gnutls_pcert_deinit (&peer_cert);
   if (ret < 0)
