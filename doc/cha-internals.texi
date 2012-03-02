@@ -329,9 +329,9 @@ supplemental data handshake message for a given TLS extension.
 
 First of all, modify your extension @code{foobar} in the way, the that
 flags
-@code{session->security_parameters.do_send_supplemental}
+@code{session->security_parameters.@-do_send_supplemental}
 and
-@code{session->security_parameters.do_recv_supplemental}
+@code{session->security_parameters.@-do_recv_supplemental}
 are set:
 
 @example
