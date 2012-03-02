@@ -241,12 +241,12 @@ extern "C"
 				  size_t *ncerts);
 
   int gnutls_ocsp_resp_verify_direct (gnutls_ocsp_resp_t resp,
-				      gnutls_x509_crt_t signercert,
-				      unsigned int*verify,
+				      gnutls_x509_crt_t issuer,
+				      unsigned int *verify,
 				      unsigned int flags);
   int gnutls_ocsp_resp_verify (gnutls_ocsp_resp_t resp,
 			       gnutls_x509_trust_list_t trustlist,
-			       unsigned int*verify,
+			       unsigned int *verify,
 			       unsigned int flags);
 
 #ifdef __cplusplus

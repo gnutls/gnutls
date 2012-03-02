@@ -105,7 +105,7 @@ struct gnutls_tdb_int default_tdb = {
  * Since: 3.0
  **/
 int
-gnutls_verify_stored_pubkey(const char* db_name, 
+gnutls_verify_stored_pubkey(const char* db_name,
                             gnutls_tdb_t tdb,
                             const char* host,
                             const char* service,
@@ -599,12 +599,12 @@ char buffer[MAX_HASH_SIZE*2+1];
  * Since: 3.0
  **/
 int
-gnutls_store_pubkey(const char* db_name, 
+gnutls_store_pubkey(const char* db_name,
                     gnutls_tdb_t tdb,
                     const char* host,
                     const char* service,
                     gnutls_certificate_type_t cert_type,
-                    const gnutls_datum_t * cert, 
+                    const gnutls_datum_t * cert,
                     time_t expiration,
                     unsigned int flags)
 {
@@ -684,7 +684,7 @@ cleanup:
  * Since: 3.0
  **/
 int
-gnutls_store_commitment(const char* db_name, 
+gnutls_store_commitment(const char* db_name,
                     gnutls_tdb_t tdb,
                     const char* host,
                     const char* service,
