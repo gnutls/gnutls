@@ -62,7 +62,7 @@
   <index role="2.12.0" id="api-index-2-12-0">
     <title>Index of new symbols in 2.12.0</title>
   </index>
-  <index role="3.0.0" id="api-index-3-0-0">
-    <title>Index of new symbols in 3.0.0</title>
+  <index role="3.0" id="api-index-3-0">
+    <title>Index of new symbols in 3.0.x</title>
   </index>
 </book>
