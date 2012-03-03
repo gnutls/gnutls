@@ -596,13 +596,18 @@ remaining until the next retransmission, or better the time until
 @node Asynchronous operation
 @subsection Asynchronous operation
 @acronym{GnuTLS} can be used with asynchronous socket or event-driven programming.
-During a TLS protocol session @acronym{GnuTLS} does not block for anything except
-calculations. The only blocking operations are due to the transport layer (sockets) functions.
-Those, however, in an asynchronous scenario are typically set to
-non-blocking mode, which forces them to return @code{EAGAIN} error code instead of blocking. 
-In that case @acronym{GnuTLS} functions
-will return the @code{GNUTLS_E_AGAIN} error code and can be resumed the
-same way as a system call would. The only exception is @funcref{gnutls_record_send},
+The approach is similar to using Berkeley sockets under such an environment.
+The blocking, due to network interaction, calls such as
+@funcref{gnutls_handshake}, @funcref{gnutls_record_recv},
+can be set to non-blocking by setting the underlying sockets to non-blocking.
+If other push and pull functions are setup, then they should behave the same
+way as @funcintref{recv} and @funcintref{send} when used in a non-blocking
+way, i.e., set errno to @code{EAGAIN}. Since, during a TLS protocol session 
+@acronym{GnuTLS} does not block except for network interaction, the non blocking
+@code{EAGAIN} errno will be propagated and @acronym{GnuTLS} functions 
+will return the @code{GNUTLS_E_AGAIN} error code. Such calls can be resumed the 
+same way as a system call would. 
+The only exception is @funcref{gnutls_record_send},
 which if interrupted subsequent calls need not to include the data to be
 sent (can be called with NULL argument).
 
@@ -612,13 +617,13 @@ and notifies on them being ready for reading or writing data. Note however
 that this system call cannot notify on data present in @acronym{GnuTLS}
 read buffers, it is only applicable to the kernel sockets API. Thus if
 you are using it for reading from a @acronym{GnuTLS} session, make sure
-the session is read completely. That can be achieved by checking there 
+that any cached data are read completely. That can be achieved by checking there 
 are no data waiting to be read (using @funcref{gnutls_record_check_pending}), 
 either before the @funcintref{select} system call, or after a call to
 @funcref{gnutls_record_recv}. @acronym{GnuTLS} does not keep a write buffer,
-thus when writing @funcintref{select} need only to be consulted.
+thus when writing no additional actions are required.
 
-In the DTLS, however, @acronym{GnuTLS} might block due to timers
+In the DTLS, however, @acronym{GnuTLS} may block due to retransmission timers
 required by the protocol. To prevent those timers from blocking a DTLS handshake,
 the @funcref{gnutls_init} should be called with the
 @code{GNUTLS_NONBLOCK} flag (see @ref{Session initialization}).
