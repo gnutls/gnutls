@@ -223,7 +223,11 @@ generate_private_key_int (common_info_st * cinfo)
 static int
 cipher_to_flags (const char *cipher)
 {
-  if (strcasecmp (cipher, "3des") == 0)
+  if (cipher == NULL)
+    {
+      return GNUTLS_PKCS_USE_PBES2_AES_128;
+    }
+  else if (strcasecmp (cipher, "3des") == 0)
     {
       return GNUTLS_PKCS_USE_PBES2_3DES;
     }
