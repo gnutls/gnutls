@@ -522,6 +522,10 @@ cn = "Cindy Lauper"
 # A user id of the certificate owner.
 #uid = "clauper"
 
+# Set domain components
+#dc = "name"
+#dc = "domain"
+
 # If the supported DN OIDs are not adequate you can set
 # any OID here.
 # For example set the X.520 Title and the X.520 Pseudonym

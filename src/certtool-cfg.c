@@ -61,6 +61,7 @@ typedef struct _cfg_ctx
   char *challenge_password;
   char *pkcs9_email;
   char *country;
+  char **dc;
   char **dns_name;
   char **ip_addr;
   char **email;
@@ -228,6 +229,7 @@ template_parse (const char *template)
   if (val != NULL && val->valType == OPARG_TYPE_STRING)
     cfg.country = strdup(val->v.strVal);
   
+  READ_MULTI_LINE("dc", cfg.dc);
   READ_MULTI_LINE("dns_name", cfg.dns_name);
   READ_MULTI_LINE("ip_address", cfg.ip_addr);
   READ_MULTI_LINE("email", cfg.email);
@@ -982,7 +984,6 @@ get_ip_addr_set (int type, void *crt)
     }
 }
 
-
 void
 get_email_set (int type, void *crt)
 {
@@ -1037,6 +1038,57 @@ get_email_set (int type, void *crt)
   if (ret < 0)
     {
       fprintf (stderr, "set_subject_alt_name: %s\n", gnutls_strerror (ret));
+      exit (1);
+    }
+}
+
+
+void
+get_dc_set (int type, void *crt)
+{
+  int ret = 0, i;
+
+  if (batch)
+    {
+      if (!cfg.dc)
+        return;
+
+      for (i = 0; cfg.dc[i] != NULL; i++)
+        {
+          if (type == TYPE_CRT)
+            ret =  gnutls_x509_crt_set_dn_by_oid (crt, GNUTLS_OID_LDAP_DC,
+                                       0, cfg.dc[i], strlen (cfg.dc[i]));
+          else
+            ret =  gnutls_x509_crq_set_dn_by_oid (crt, GNUTLS_OID_LDAP_DC,
+                                       0, cfg.dc[i], strlen (cfg.dc[i]));
+
+          if (ret < 0)
+            break;
+        }
+    }
+  else
+    {
+      const char *p;
+
+      do 
+        {
+          p = read_str ("Enter the subject's domain component (DC): ");
+          if (!p)
+            return;
+
+          if (type == TYPE_CRT)
+            ret =  gnutls_x509_crt_set_dn_by_oid (crt, GNUTLS_OID_LDAP_DC,
+                                       0, p, strlen (p));
+          else
+            ret =  gnutls_x509_crq_set_dn_by_oid (crt, GNUTLS_OID_LDAP_DC,
+                                       0, p, strlen (p));
+        }
+      while(p != NULL);
+    }
+
+  if (ret < 0)
+    {
+      fprintf (stderr, "set_dn_by_oid: %s\n", gnutls_strerror (ret));
       exit (1);
     }
 }

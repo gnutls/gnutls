@@ -4,10 +4,12 @@ See the end for copying conditions.
 
 * Version 3.0.16 (unreleased)
 
-** Corrected SRP-RSA ciphersuites when used under TLS 1.2.
+** libgnutls: Corrected SRP-RSA ciphersuites when used under TLS 1.2.
 
-** Small fixes in p11tool handling of the --private command 
+** p11tool: Small fixes in handling of the --private command 
 line option.
+
+** certtool: The template option allows for setting the DC option.
 
 ** API and ABI modifications:
 No changes since last version.

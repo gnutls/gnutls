@@ -69,6 +69,7 @@ void get_ip_addr_set (int type, void *crt);
 void get_dns_name_set (int type, void *crt);
 void get_email_set (int type, void *crt);
 int get_ipsec_ike_status (void);
+void get_dc_set (int type, void *crt);
 
 void get_cn_crq_set (gnutls_x509_crq_t crq);
 void get_uid_crq_set (gnutls_x509_crq_t crq);

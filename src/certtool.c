@@ -369,6 +369,7 @@ generate_certificate (gnutls_privkey_t * ret_key,
           get_locality_crt_set (crt);
           get_state_crt_set (crt);
           get_cn_crt_set (crt);
+          get_dc_set (TYPE_CRT, crt);
           get_uid_crt_set (crt);
           get_oid_crt_set (crt);
           get_key_purpose_set (crt);
@@ -1856,6 +1857,7 @@ generate_request (common_info_st * cinfo)
   get_locality_crq_set (crq);
   get_state_crq_set (crq);
   get_cn_crq_set (crq);
+  get_dc_set (TYPE_CRQ, crq);
   get_uid_crq_set (crq);
   get_oid_crq_set (crq);
 
