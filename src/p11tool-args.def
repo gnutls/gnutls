@@ -242,8 +242,10 @@ To store a private key and a certificate in a token run:
 $ p11tool --login --write "pkcs11:URL" --load-privkey key.pem \
           --label "Mykey"
 $ p11tool --login --write "pkcs11:URL" --load-certificate cert.pem \
-          --label "MyCert"
+          --label "Mykey"
 @end example
+Note that some tokens require the same label to be used for the certificate
+and its corresponding private key.
 _EOT_;
 };
 
