@@ -6,6 +6,9 @@ See the end for copying conditions.
 
 ** Corrected SRP-RSA ciphersuites when used under TLS 1.2.
 
+** Small fixes in p11tool handling of the --private command 
+line option.
+
 ** API and ABI modifications:
 No changes since last version.
 

@@ -176,7 +176,7 @@ cmd_parser (int argc, char **argv)
 
   if (debug > 0)
     {
-      fprintf(stderr, "Private: %s\n", ENABLED_OPT(PRIVATE)?"yes":"no");
+      if (HAVE_OPT(PRIVATE)) fprintf(stderr, "Private: %s\n", ENABLED_OPT(PRIVATE)?"yes":"no");
       fprintf(stderr, "Trusted: %s\n", ENABLED_OPT(TRUSTED)?"yes":"no");
       fprintf(stderr, "Login: %s\n", ENABLED_OPT(LOGIN)?"yes":"no");
       fprintf(stderr, "Detailed URLs: %s\n", ENABLED_OPT(DETAILED_URL)?"yes":"no");
@@ -225,8 +225,15 @@ cmd_parser (int argc, char **argv)
       pkcs11_export (outfile, url, login, &cinfo);
     }
   else if (HAVE_OPT(WRITE))
-    pkcs11_write (outfile, url, label,
-                    ENABLED_OPT(TRUSTED), ENABLED_OPT(PRIVATE), login, &cinfo);
+    {
+      int priv;
+
+      if (HAVE_OPT(PRIVATE))
+        priv = ENABLED_OPT(PRIVATE);
+      else priv = -1;
+      pkcs11_write (outfile, url, label,
+                    ENABLED_OPT(TRUSTED), priv, login, &cinfo);
+    }
   else if (HAVE_OPT(INITIALIZE))
     pkcs11_init (outfile, url, label, &cinfo);
   else if (HAVE_OPT(DELETE))
