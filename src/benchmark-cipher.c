@@ -94,7 +94,7 @@ cipher_mac_bench (int algo, int mac_algo, int size)
   do
     {
       gnutls_hmac(mac_ctx, data, step);
-      gnutls_cipher_encrypt (ctx, data, step);
+      gnutls_cipher_encrypt2 (ctx, data, step, data, step+64);
       st.size += step;
     }
   while (benchmark_must_finish == 0);
@@ -158,7 +158,7 @@ cipher_bench (int algo, int size, int aead)
 
   do
     {
-      gnutls_cipher_encrypt (ctx, data, step);
+      gnutls_cipher_encrypt2 (ctx, data, step, data, step+64);
       st.size += step;
     }
   while (benchmark_must_finish == 0);
