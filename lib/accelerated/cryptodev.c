@@ -312,98 +312,6 @@ static const int gnutls_mac_map[] = {
 };
 
 static int
-cryptodev_mac_init (gnutls_mac_algorithm_t algorithm, void **_ctx)
-{
-  struct cryptodev_ctx *ctx;
-  int mac = gnutls_mac_map[algorithm];
-
-  *_ctx = gnutls_calloc (1, sizeof (struct cryptodev_ctx));
-  if (*_ctx == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  ctx = *_ctx;
-
-  ctx->cfd = _gnutls_cryptodev_fd;
-
-  ctx->sess.mac = mac;
-
-  return 0;
-}
-
-static int
-cryptodev_mac_setkey (void *_ctx, const void *key, size_t keysize)
-{
-  struct cryptodev_ctx *ctx = _ctx;
-
-  ctx->sess.mackeylen = keysize;
-  ctx->sess.mackey = (void*)key;
-
-  if (ioctl (ctx->cfd, CIOCGSESSION, &ctx->sess))
-    {
-      gnutls_assert ();
-      return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
-    }
-  ctx->cryp.ses = ctx->sess.ses;
-
-  return 0;
-}
-
-static int
-cryptodev_mac_hash (void *_ctx, const void *text, size_t textsize)
-{
-  struct cryptodev_ctx *ctx = _ctx;
-
-  ctx->cryp.len = textsize;
-  ctx->cryp.src = (void *) text;
-  ctx->cryp.dst = NULL;
-  ctx->cryp.op = COP_ENCRYPT;
-  ctx->cryp.flags = COP_FLAG_UPDATE;
-  if (ctx->reset)
-    {
-      ctx->cryp.flags |= COP_FLAG_RESET;
-      ctx->reset = 0;
-    }
-  
-  if (ioctl (ctx->cfd, CIOCCRYPT, &ctx->cryp))
-    {
-      gnutls_assert ();
-      return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
-    }
-  return 0;
-}
-
-static int
-cryptodev_mac_output (void *_ctx, void *digest, size_t digestsize)
-{
-  struct cryptodev_ctx *ctx = _ctx;
-
-  ctx->cryp.len = 0;
-  ctx->cryp.src = NULL;
-  ctx->cryp.mac = digest;
-  ctx->cryp.op = COP_ENCRYPT;
-  ctx->cryp.flags = COP_FLAG_FINAL;
-
-  if (ioctl (ctx->cfd, CIOCCRYPT, &ctx->cryp))
-    {
-      gnutls_assert ();
-      return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
-    }
-
-  return 0;
-}
-
-static void
-cryptodev_mac_reset (void *_ctx)
-{
-  struct cryptodev_ctx *ctx = _ctx;
-
-  ctx->reset = 1;
-}
-
-static int
 cryptodev_mac_fast (gnutls_mac_algorithm_t algo,
                     const void *key, size_t key_size, const void *text,
                     size_t text_size, void *digest)
@@ -441,12 +349,12 @@ int ret;
 #define cryptodev_mac_deinit cryptodev_deinit
 
 static const gnutls_crypto_mac_st mac_struct = {
-  .init = cryptodev_mac_init,
-  .setkey = cryptodev_mac_setkey,
-  .hash = cryptodev_mac_hash,
-  .output = cryptodev_mac_output,
-  .deinit = cryptodev_mac_deinit,
-  .reset = cryptodev_mac_reset,
+  .init = NULL,
+  .setkey = NULL,
+  .hash = NULL,
+  .output = NULL,
+  .deinit = NULL,
+  .reset = NULL,
   .fast = cryptodev_mac_fast
 };
 
@@ -459,39 +367,6 @@ static const int gnutls_digest_map[] = {
   [GNUTLS_DIG_SHA384] = CRYPTO_SHA2_384,
   [GNUTLS_DIG_SHA512] = CRYPTO_SHA2_512,
 };
-
-static int
-cryptodev_digest_init (gnutls_digest_algorithm_t algorithm, void **_ctx)
-{
-  struct cryptodev_ctx *ctx;
-  int dig = gnutls_digest_map[algorithm];
-
-  *_ctx = gnutls_calloc (1, sizeof (struct cryptodev_ctx));
-  if (*_ctx == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  ctx = *_ctx;
-
-  ctx->cfd = _gnutls_cryptodev_fd;
-  ctx->sess.mac = dig;
-
-  if (ioctl (ctx->cfd, CIOCGSESSION, &ctx->sess))
-    {
-      gnutls_assert ();
-      gnutls_free(ctx);
-      return GNUTLS_E_CRYPTODEV_IOCTL_ERROR;
-    }
-  ctx->cryp.ses = ctx->sess.ses;
-
-  return 0;
-}
-
-#define cryptodev_digest_hash cryptodev_mac_hash
-#define cryptodev_digest_output cryptodev_mac_output
-#define cryptodev_digest_reset cryptodev_mac_reset
 
 static int
 cryptodev_digest_fast (gnutls_digest_algorithm_t algo,
@@ -525,14 +400,12 @@ int ret;
   return 0;
 }
 
-#define cryptodev_digest_deinit cryptodev_deinit
-
 static const gnutls_crypto_digest_st digest_struct = {
-  .init = cryptodev_digest_init,
-  .hash = cryptodev_digest_hash,
-  .output = cryptodev_digest_output,
-  .deinit = cryptodev_digest_deinit,
-  .reset = cryptodev_digest_reset,
+  .init = NULL,
+  .hash = NULL,
+  .output = NULL,
+  .deinit = NULL,
+  .reset = NULL,
   .fast = cryptodev_digest_fast
 };
 
