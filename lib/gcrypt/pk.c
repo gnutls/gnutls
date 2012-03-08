@@ -627,7 +627,6 @@ _rsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
 
   int ret, i;
   gcry_sexp_t parms, key, list;
-  bigint_t tmp;
 
   if (*resarr_len < RSA_PRIVATE_PARAMS)
     {
@@ -732,14 +731,6 @@ _rsa_generate_params (bigint_t * resarr, int *resarr_len, int bits)
   /* generate e1 and e2 */
 
   *resarr_len = 6;
-
-  tmp = _gnutls_mpi_alloc_like (resarr[0]);
-  if (tmp == NULL)
-    {
-      gnutls_assert ();
-      ret = GNUTLS_E_MEMORY_ERROR;
-      goto cleanup;
-    }
 
   ret = _gnutls_calc_rsa_exp (resarr, 2 + *resarr_len);
   if (ret < 0)

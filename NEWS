@@ -7,6 +7,9 @@ Version 2.12.18 (unreleased)
 
 ** Corrected SRP-RSA ciphersuites when used under TLS 1.2.
 
+** Fixed leaks in key generation. Reported by Sam Varshavchik,
+patch by Tomas Mraz.
+
 ** API and ABI modifications:
 
 No changes since last version.

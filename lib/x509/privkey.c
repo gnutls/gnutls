@@ -1462,16 +1462,17 @@ gnutls_x509_privkey_generate (gnutls_x509_privkey_t key,
     {
     case GNUTLS_PK_DSA:
       ret = _gnutls_dsa_generate_params (key->params, &params_len, bits);
-      if (params_len != DSA_PRIVATE_PARAMS)
-        {
-          gnutls_assert ();
-          ret = GNUTLS_E_INTERNAL_ERROR;
-        }
-
       if (ret < 0)
         {
           gnutls_assert ();
           return ret;
+        }
+
+      if (params_len != DSA_PRIVATE_PARAMS)
+        {
+          gnutls_assert ();
+          ret = GNUTLS_E_INTERNAL_ERROR;
+          goto cleanup;
         }
 
       ret = _gnutls_asn1_encode_dsa (&key->key, key->params);
@@ -1486,15 +1487,17 @@ gnutls_x509_privkey_generate (gnutls_x509_privkey_t key,
       break;
     case GNUTLS_PK_RSA:
       ret = _gnutls_rsa_generate_params (key->params, &params_len, bits);
-      if (params_len != RSA_PRIVATE_PARAMS)
-        {
-          gnutls_assert ();
-          ret = GNUTLS_E_INTERNAL_ERROR;
-        }
       if (ret < 0)
         {
           gnutls_assert ();
           return ret;
+        }
+
+      if (params_len != RSA_PRIVATE_PARAMS)
+        {
+          gnutls_assert ();
+          ret = GNUTLS_E_INTERNAL_ERROR;
+          goto cleanup;
         }
 
       ret = _gnutls_asn1_encode_rsa (&key->key, key->params);

@@ -547,6 +547,7 @@ _generate_params (int algo, bigint_t * resarr, unsigned int *resarr_len,
     }
   else
     {
+      gnutls_pk_params_release(&params);
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
