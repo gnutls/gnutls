@@ -261,14 +261,14 @@ extern "C"
 		      int *ret_len, unsigned char *str,
 		      int str_size, int *bit_len);
 
-  extern ASN1_API int
+  extern ASN1_API long
     asn1_get_length_der (const unsigned char *der, int der_len, int *len);
 
-  extern ASN1_API int
+  extern ASN1_API long
     asn1_get_length_ber (const unsigned char *ber, int ber_len, int *len);
 
   extern ASN1_API void
-    asn1_length_der (unsigned int len, unsigned char *ans, int *ans_len);
+    asn1_length_der (unsigned long len, unsigned char *ans, int *ans_len);
 
   /* Other utility functions. */
 
