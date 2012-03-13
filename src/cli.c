@@ -36,6 +36,7 @@
 #include <stdint.h>
 #include <fcntl.h>
 #include <netdb.h>
+#include <ctype.h>
 
 #include <gnutls/gnutls.h>
 #include <gnutls/abstract.h>
@@ -674,9 +675,9 @@ init_tls_session (const char *hostname)
    */
   if (disable_extensions == 0)
     {
-      gnutls_handshake_set_private_extensions (session, 1);
-      gnutls_server_name_set (session, GNUTLS_NAME_DNS, hostname,
-                              strlen (hostname));
+      if (!isdigit(hostname[0]) && strchr(hostname, ':') == 0)
+        gnutls_server_name_set (session, GNUTLS_NAME_DNS, hostname,
+                                strlen (hostname));
     }
 
   gnutls_dh_set_prime_bits (session, 512);
