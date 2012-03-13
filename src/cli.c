@@ -210,7 +210,7 @@ load_keys (void)
           crt_num = MAX_CRT;
           ret =
             gnutls_x509_crt_list_import (crt_list, &crt_num, &data,
-                                         GNUTLS_X509_FMT_PEM,
+                                         x509ctype,
                                          GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED);
           if (ret < 0)
             {
@@ -289,7 +289,7 @@ load_keys (void)
           gnutls_x509_privkey_init (&tmp_key);
 
           ret =
-            gnutls_x509_privkey_import (tmp_key, &data, GNUTLS_X509_FMT_PEM);
+            gnutls_x509_privkey_import (tmp_key, &data, x509ctype);
           if (ret < 0)
             {
               fprintf (stderr, "*** Error loading key file: %s\n",
