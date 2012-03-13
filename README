@@ -23,7 +23,7 @@ A typical command sequence for building the library is shown below.
 A complete list of options available for configure can be found
 by running './configure --help'.
 
-    cd gnutls-2.10.3
+    cd gnutls-<version>
     ./configure --prefix=/usr
     make
     sudo make install
@@ -40,7 +40,7 @@ p11-kit can be found at <http://p11-glue.freedesktop.org/p11-kit.html>.
 To configure libnettle for installation and use by GnuTLS, a typical
 command sequence would be:
 
-    cd nettle-2.2
+    cd nettle-<version>
     ./configure --prefix=/usr --disable-openssl --enable-shared
     make
     sudo make install
