@@ -111,8 +111,8 @@ int ret, tot;
     return ret;
   
   tot = ret + *len;
-  
-  if (tot < 0 || tot > der_len)
+
+  if (tot < ret || tot > der_len)
     return -3;
 
   return ret;
