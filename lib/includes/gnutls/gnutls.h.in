@@ -431,11 +431,11 @@ extern "C"
  * @GNUTLS_CERT_SIGNER_NOT_FOUND: The certificate's issuer is not known. 
  *   This is the case if the issue is not included in the trusted certificate list.
  *   not found.
- * @GNUTLS_CERT_SIGNER_NOT_CA: The certiﬁcate’s signer was not a CA. This
- *   may happen if this was a version 1 certiﬁcate, which is common with 
- *   some CAs, or a version 3 certiﬁcate without the basic constrains extension.
- * @GNUTLS_CERT_INSECURE_ALGORITHM:  The certiﬁcate was signed using an in-
- *   secure algorithm such as MD2 or MD5. These algorithms have been broken and
+ * @GNUTLS_CERT_SIGNER_NOT_CA: The certificate’s signer was not a CA. This
+ *   may happen if this was a version 1 certificate, which is common with 
+ *   some CAs, or a version 3 certificate without the basic constrains extension.
+ * @GNUTLS_CERT_INSECURE_ALGORITHM:  The certificate was signed using an insecure
+ *   algorithm such as MD2 or MD5. These algorithms have been broken and
  *   should not be trusted.
  * @GNUTLS_CERT_NOT_ACTIVATED: The certificate is not yet activated.
  * @GNUTLS_CERT_EXPIRED: The certificate has expired.

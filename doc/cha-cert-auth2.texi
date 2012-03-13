@@ -129,24 +129,24 @@ reached.  There are several reasons for revoking certificates, but a
 typical situation is when the private key associated with a
 certificate has been compromised.  Traditionally, Certificate
 Revocation Lists (CRLs) have been used by application to implement
-revocation checking, however several disadvantages with CRLs have been
-identified, see for example @xcite{RIVESTCRL}.
+revocation checking, however, several problems with CRLs have been
+identified @xcite{RIVESTCRL}.
 
-The Online Certificate Status Protocol (@acronym{OCSP}) is a widely
-implemented protocol to perform certificate (revocation) status
-checking.  @xcite{RFC2560}.  An application that wish to verify the
+The Online Certificate Status Protocol, or @acronym{OCSP} @xcite{RFC2560}, 
+is a widely implemented protocol to perform certificate revocation status
+checking.  An application that wish to verify the
 identity of a peer will verify the certificate against a set of
 trusted certificates and then check whether the certificate is listed
 in a CRL and/or perform an OCSP check for the certificate.
 
 Before performing the OCSP query, the application will need to figure
 out the address of the OCSP server.  The OCSP server address can be
-provided by the local user in manual configuration.  The address can
-also be provided in the certificate that is being checked.  There is
+provided by the local user in manual configuration or may be stored
+in the certificate that is being checked.  The latter is due to
 an extension field called the Authority Information Access (AIA) which
-has an access method called @code{id-ad-ocsp} that holds the location
-of the OCSP responder.  There is a function for extracting this
-information from a certificate.
+may hold the location of the OCSP responder in 
+the access method called @code{id-ad-ocsp}. The following function
+extracts this information from a certificate.
 
 @showfuncA{gnutls_x509_crt_get_authority_info_access}
 
@@ -365,10 +365,12 @@ of their usage is also shown.
 In this section we present the smart-card and hardware security module (HSM) support 
 in @acronym{GnuTLS} using @acronym{PKCS} #11 @xcite{PKCS11}. Hardware security
 modules and smart cards provide a way to store private keys and perform
-operations on them without exposing them. This allows decoupling cryptographic
-keys from the applications that use them providing an additional security layer.
+operations on them without exposing them. This decouples cryptographic
+keys from the applications that use them and provide an additional 
+security layer against cryptographic key extraction.
 Since this can also be achieved in software components such as in Gnome keyring,
-we will use the term security module to describe such an isolation interface.
+we will use the term security module to describe any cryptographic key 
+separation subsystem.
 
 @acronym{PKCS} #11 is plugin API allowing applications to access cryptographic
 operations on a security module, as well as to objects residing on it. PKCS
@@ -520,7 +522,7 @@ session, as shown in @ref{ex:pkcs11-client}. In addition
 the following functions can be used to load PKCS #11 key and
 certificates by specifying a PKCS #11 URL instead of a filename.
 
-@showfuncC{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_key_file,gnutls_certificate_set_x509_simple_pkcs12_file}
+@showfuncB{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_key_file}
 
 @include invoke-p11tool.texi
 
