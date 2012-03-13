@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2002-2012 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -44,7 +44,7 @@ extern "C"
 {
 #endif
 
-#define ASN1_VERSION "2.10"
+#define ASN1_VERSION "2.12"
 
   typedef int asn1_retCode;	/* type returned by libtasn1 functions */
 
@@ -261,14 +261,14 @@ extern "C"
 		      int *ret_len, unsigned char *str,
 		      int str_size, int *bit_len);
 
-  extern ASN1_API signed long
+  extern ASN1_API int
     asn1_get_length_der (const unsigned char *der, int der_len, int *len);
 
-  extern ASN1_API signed long
+  extern ASN1_API int
     asn1_get_length_ber (const unsigned char *ber, int ber_len, int *len);
 
   extern ASN1_API void
-    asn1_length_der (unsigned long int len, unsigned char *ans, int *ans_len);
+    asn1_length_der (unsigned int len, unsigned char *ans, int *ans_len);
 
   /* Other utility functions. */
 

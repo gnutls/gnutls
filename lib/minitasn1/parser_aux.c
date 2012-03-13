@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2000-2001, 2004, 2006-2012 Free Software Foundation,
- * Inc.
+ * Copyright (C) 2000-2012 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -719,7 +718,7 @@ _asn1_expand_object_id (ASN1_TYPE node)
 		    {
 		      _asn1_str_cpy (name2, sizeof (name2), name_root);
 		      _asn1_str_cat (name2, sizeof (name2), ".");
-		      _asn1_str_cat (name2, sizeof (name2), p2->value);
+		      _asn1_str_cat (name2, sizeof (name2), (char *) p2->value);
 		      p3 = asn1_find_node (node, name2);
 		      if (!p3 || (type_field (p3->type) != TYPE_OBJECT_ID) ||
 			  !(p3->type & CONST_ASSIGN))
@@ -734,7 +733,7 @@ _asn1_expand_object_id (ASN1_TYPE node)
 			    {
 			      p5 = _asn1_add_node_only (TYPE_CONSTANT);
 			      _asn1_set_name (p5, p4->name);
-			      tlen = strlen (p4->value);
+			      tlen = _asn1_strlen (p4->value);
 			      if (tlen > 0)
 				_asn1_set_value (p5, p4->value, tlen + 1);
 			      if (p2 == p)
@@ -805,7 +804,7 @@ _asn1_expand_object_id (ASN1_TYPE node)
 		{
 		  _asn1_str_cpy (name2, sizeof (name2), name_root);
 		  _asn1_str_cat (name2, sizeof (name2), ".");
-		  _asn1_str_cat (name2, sizeof (name2), p2->value);
+		  _asn1_str_cat (name2, sizeof (name2), (char *) p2->value);
 		  p3 = asn1_find_node (node, name2);
 		  if (!p3 || (type_field (p3->type) != TYPE_OBJECT_ID) ||
 		      !(p3->type & CONST_ASSIGN))
@@ -818,7 +817,8 @@ _asn1_expand_object_id (ASN1_TYPE node)
 			{
 			  if (name2[0])
 			    _asn1_str_cat (name2, sizeof (name2), ".");
-			  _asn1_str_cat (name2, sizeof (name2), p4->value);
+			  _asn1_str_cat (name2, sizeof (name2),
+					 (char *) p4->value);
 			}
 		      p4 = p4->right;
 		    }
@@ -960,11 +960,11 @@ _asn1_check_identifier (ASN1_TYPE node)
 	{
 	  _asn1_str_cpy (name2, sizeof (name2), node->name);
 	  _asn1_str_cat (name2, sizeof (name2), ".");
-	  _asn1_str_cat (name2, sizeof (name2), p->value);
+	  _asn1_str_cat (name2, sizeof (name2), (char *) p->value);
 	  p2 = asn1_find_node (node, name2);
 	  if (p2 == NULL)
 	    {
-	      strcpy (_asn1_identifierMissing, p->value);
+	      _asn1_strcpy (_asn1_identifierMissing, p->value);
 	      return ASN1_IDENTIFIER_NOT_FOUND;
 	    }
 	}
@@ -976,8 +976,8 @@ _asn1_check_identifier (ASN1_TYPE node)
 	    {
 	      _asn1_str_cpy (name2, sizeof (name2), node->name);
 	      _asn1_str_cat (name2, sizeof (name2), ".");
-	      _asn1_str_cat (name2, sizeof (name2), p2->value);
-	      strcpy (_asn1_identifierMissing, p2->value);
+	      _asn1_str_cat (name2, sizeof (name2), (char *) p2->value);
+	      _asn1_strcpy (_asn1_identifierMissing, p2->value);
 	      p2 = asn1_find_node (node, name2);
 	      if (!p2 || (type_field (p2->type) != TYPE_OBJECT_ID) ||
 		  !(p2->type & CONST_ASSIGN))
@@ -996,8 +996,8 @@ _asn1_check_identifier (ASN1_TYPE node)
 		{
 		  _asn1_str_cpy (name2, sizeof (name2), node->name);
 		  _asn1_str_cat (name2, sizeof (name2), ".");
-		  _asn1_str_cat (name2, sizeof (name2), p2->value);
-		  strcpy (_asn1_identifierMissing, p2->value);
+		  _asn1_str_cat (name2, sizeof (name2), (char *) p2->value);
+		  _asn1_strcpy (_asn1_identifierMissing, p2->value);
 		  p2 = asn1_find_node (node, name2);
 		  if (!p2 || (type_field (p2->type) != TYPE_OBJECT_ID) ||
 		      !(p2->type & CONST_ASSIGN))

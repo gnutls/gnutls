@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2000-2004, 2006, 2008-2012 Free Software Foundation,
- * Inc.
+ * Copyright (C) 2000-2012 Free Software Foundation, Inc.
  *
  * This file is part of LIBTASN1.
  *
@@ -26,7 +25,7 @@
 
 asn1_retCode _asn1_append_sequence_set (ASN1_TYPE node);
 
-asn1_retCode _asn1_convert_integer (const char *value,
+asn1_retCode _asn1_convert_integer (const unsigned char *value,
 				    unsigned char *value_out,
 				    int value_out_size, int *len);
 

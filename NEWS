@@ -4,6 +4,8 @@ See the end for copying conditions.
 
 * Version 3.0.16 (unreleased)
 
+** minitasn1: Upgraded to libtasn1 version 2.12.
+
 ** libgnutls: Corrected SRP-RSA ciphersuites when used under TLS 1.2.
 
 ** p11tool: Small fixes in handling of the --private command 
