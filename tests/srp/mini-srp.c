@@ -313,11 +313,38 @@ static void start (const char* prio)
     }
 }
 
+const char* tpasswd_file = "test:CsrY0PxYlYCAa8UuWUrcjpqBvG6ImlAdGwEUh3tN2DSDBbMWTvnUl7A8Hw7l0zFHwyLH5rh0llrmu/v.Df2FjDEGy0s0rYR5ARE2XlXPl66xhevHj5vitD0Qvq/J0x1v0zMWJSgq/Ah2MoOrw9aBEsQUgf9MddiHQKjE3Vetoq3:3h3cfS0WrBgPUsldDASSK0:1\n"
+  "test2:1J14yVX4iBa97cySs2/SduwnSbHxiz7WieE761psJQDxkc5flpumEwXbAgK5PrSZ0aZ6q7zyrAN1apJR1QQPAdyScJ6Jw4zjDP7AnezUVGbUNMJXhsI0NPwSc0c/415XfrnM1139yjWCr1qkcYMoN4bALppMMLB8glJkxy7t.3cmH9MkRRAjXXdUgAvHw2ZFLmB/8TlZDhnDS78xCSgLQs.oubZEEIgOWl7BT2.aW76fW3yKWdVrrHQDYPtR4hKx:11rUG9wSMLHe2Cu2p7dmFY:2\n"
+  "test3:LVJZDDuElMHuRt5/fcx64AhJ4erhFvbIhv/XCtD0tJI3OC6yEBzthZ1FSqblri9qtsvboPApbFHwP9WEluGtCOuzOON4LS8sSeQDBO.PaqjTnsmXKPYMKa.SuLXFuRTtdiFRwX2ZRy3GIWoCvxJtPDWCEYGBWfnjjGEYmQWvo534JVtVDyMaFItYlMTOtBSgsg488oJ5hIAU6jVyIQZGPVv8OHsPCpEt2UlTixzI9nAgQ0WL5ShKaAq0dksF/AY7UMKm0oHbtZeqAx6YcBzLbBhNvcEqYzH95ONpr.cUh91iRhVzdVscsFweSCtWsQrVT4zmSRwdsljeFQPqFbdeK:iWkELSVg3JxmyEq.XbjAW:3\n";
+
+const char* tpasswd_conf_file = "1:Ewl2hcjiutMd3Fu2lgFnUXWSc67TVyy2vwYCKoS9MLsrdJVT9RgWTCuEqWJrfB6uE3LsE9GkOlaZabS7M29sj5TnzUqOLJMjiwEzArfiLr9WbMRANlF68N5AVLcPWvNx6Zjl3m5Scp0BzJBz9TkgfhzKJZ.WtP3Mv/67I/0wmRZ:2\n"
+  "2:dUyyhxav9tgnyIg65wHxkzkb7VIPh4o0lkwfOKiPp4rVJrzLRYVBtb76gKlaO7ef5LYGEw3G.4E0jbMxcYBetDy2YdpiP/3GWJInoBbvYHIRO9uBuxgsFKTKWu7RnR7yTau/IrFTdQ4LY/q.AvoCzMxV0PKvD9Odso/LFIItn8PbTov3VMn/ZEH2SqhtpBUkWtmcIkEflhX/YY/fkBKfBbe27/zUaKUUZEUYZ2H2nlCL60.JIPeZJSzsu/xHDVcx:2\n"
+  "3:2iQzj1CagQc/5ctbuJYLWlhtAsPHc7xWVyCPAKFRLWKADpASkqe9djWPFWTNTdeJtL8nAhImCn3Sr/IAdQ1FrGw0WvQUstPx3FO9KNcXOwisOQ1VlL.gheAHYfbYyBaxXL.NcJx9TUwgWDT0hRzFzqSrdGGTN3FgSTA1v4QnHtEygNj3eZ.u0MThqWUaDiP87nqha7XnT66bkTCkQ8.7T8L4KZjIImrNrUftedTTBi.WCi.zlrBxDuOM0da0JbUkQlXqvp0yvJAPpC11nxmmZOAbQOywZGmu9nhZNuwTlxjfIro0FOdthaDTuZRL9VL7MRPUDo/DQEyW.d4H.UIlzp:2\n";
+
 void
 doit (void)
 {
+FILE * fd;
+
+  fd = fopen("tpasswd.conf", "w");
+  if (fd == NULL)
+    exit(1);
+  
+  fwrite(tpasswd_conf_file, 1, strlen(tpasswd_conf_file), fd);
+  fclose(fd);
+
+  fd = fopen("tpasswd", "w");
+  if (fd == NULL)
+    exit(1);
+  
+  fwrite(tpasswd_file, 1, strlen(tpasswd_file), fd);
+  fclose(fd);
+
   start("NORMAL:-KX-ALL:+SRP");
   start("NORMAL:-KX-ALL:+SRP-RSA");
+  
+  remove("tpasswd");
+  remove("tpasswd.conf");
 }
 
 #endif /* _WIN32 */
