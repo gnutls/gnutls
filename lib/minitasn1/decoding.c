@@ -45,8 +45,20 @@ _asn1_error_description_tag_error (ASN1_TYPE node, char *ErrorDescription)
 
 }
 
-static int
-_asn1_get_length_der (const unsigned char *der, int der_len, int *len)
+/**
+ * asn1_get_length_der:
+ * @der: DER data to decode.
+ * @der_len: Length of DER data to decode.
+ * @len: Output variable containing the length of the DER length field.
+ *
+ * Extract a length field from DER data.
+ *
+ * Returns: Return the decoded length value, or -1 on indefinite
+ *   length, or -2 when the value was too big to fit in a int, or -4
+ *   when the decoded length value plus @len would exceed @der_len.
+ **/
+signed long
+asn1_get_length_der (const unsigned char *der, int der_len, int *len)
 {
   int ans;
   int k, punt;
@@ -71,7 +83,7 @@ _asn1_get_length_der (const unsigned char *der, int der_len, int *len)
 	  ans = 0;
 	  while (punt <= k && punt < der_len)
 	    {
-	      unsigned long last = ans;
+	      int last = ans;
 
 	      ans = ans * 256 + der[punt++];
 	      if (ans < last)
@@ -81,59 +93,15 @@ _asn1_get_length_der (const unsigned char *der, int der_len, int *len)
 	}
       else
 	{			/* indefinite length method */
-	  ans = -1;
+	  *len = punt;
+	  return -1;
 	}
 
       *len = punt;
+      if (ans + *len < ans || ans + *len > der_len)
+	return -4;
       return ans;
     }
-}
-
-/*-
- * asn1_get_length_der_checked:
- * @der: DER data to decode.
- * @der_len: Length of DER data to decode.
- * @len: Output variable containing the length of the DER length field.
- *
- * Extract a length field from DER data.
- *
- * Returns: Return the decoded length value, or -1 on indefinite
- *   length, -2 when the value was too big or -3 when the value
- *   and the size of length exceed the @der_len.
- -*/
-static int
-asn1_get_length_der_checked (const unsigned char *der, int der_len, int *len)
-{
-int ret, tot;
-
-  ret = _asn1_get_length_der(der, der_len, len);
-  if (ret < 0)
-    return ret;
-  
-  tot = ret + *len;
-
-  if (tot < ret || tot > der_len)
-    return -3;
-
-  return ret;
-}
-
-/**
- * asn1_get_length_der:
- * @der: DER data to decode.
- * @der_len: Length of DER data to decode.
- * @len: Output variable containing the length of the DER length field.
- *
- * Extract a length field from DER data.
- *
- * Returns: Return the decoded length value, or -1 on indefinite
- *   length, -2 when the value was too big or -3 when the value
- *   and the size of length exceed the @der_len.
- **/
-long
-asn1_get_length_der (const unsigned char *der, int der_len, int *len)
-{
-  return asn1_get_length_der_checked(der, der_len, len);
 }
 
 /**
@@ -193,24 +161,6 @@ asn1_get_tag_der (const unsigned char *der, int der_len,
   return ASN1_SUCCESS;
 }
 
-static int
-_asn1_get_length_ber (const unsigned char *ber, int ber_len, int *len)
-{
-  int ret;
-  long err;
-
-  ret = _asn1_get_length_der (ber, ber_len, len);
-  if (ret == -1)
-    {				/* indefinite length method */
-      ret = ber_len;
-      err = _asn1_get_indefinite_length_string (ber + 1, &ret);
-      if (err != ASN1_SUCCESS)
-	return -3;
-    }
-
-  return ret;
-}
-
 /**
  * asn1_get_length_ber:
  * @ber: BER data to decode.
@@ -226,10 +176,22 @@ _asn1_get_length_ber (const unsigned char *ber, int ber_len, int *len)
  *
  * Since: 2.0
  **/
-long
+signed long
 asn1_get_length_ber (const unsigned char *ber, int ber_len, int *len)
 {
-  return _asn1_get_length_ber(ber, ber_len, len);
+  int ret;
+  long err;
+
+  ret = asn1_get_length_der (ber, ber_len, len);
+  if (ret == -1)
+    {				/* indefinite length method */
+      ret = ber_len;
+      err = _asn1_get_indefinite_length_string (ber + 1, &ret);
+      if (err != ASN1_SUCCESS)
+	return -3;
+    }
+
+  return ret;
 }
 
 /**
@@ -434,7 +396,7 @@ _asn1_extract_tag_der (ASN1_TYPE node, const unsigned char *der, int der_len,
 		  counter += len2;
 
 		  len3 =
-		    _asn1_get_length_ber (der + counter, der_len - counter,
+		    asn1_get_length_ber (der + counter, der_len - counter,
 					 &len2);
 		  if (len3 < 0)
 		    return ASN1_DER_ERROR;
