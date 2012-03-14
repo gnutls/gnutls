@@ -11,7 +11,8 @@ See the end for copying conditions.
 ** p11tool: Small fixes in handling of the --private command 
 line option.
 
-** certtool: The template option allows for setting the DC option.
+** certtool: The template option allows for setting the domain
+component (DC) option of the distinguished name.
 
 ** API and ABI modifications:
 No changes since last version.
