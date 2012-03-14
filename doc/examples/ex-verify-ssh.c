@@ -97,9 +97,9 @@ _ssh_verify_certificate_callback (gnutls_session_t session)
                                     GNUTLS_CRT_X509, &cert_list[0], 0);
   if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND)
     {
-      fprintf(stderr, "Host %s is not known.", hostname);
+      printf("Host %s is not known.", hostname);
       if (status == 0)
-        fprintf(stderr, "Its certificate is valid for %s.\n", hostname);
+        printf("Its certificate is valid for %s.\n", hostname);
       
       /* the certificate must be printed and user must be asked on
        * whether it is trustworthy. --see gnutls_x509_crt_print() */
@@ -109,10 +109,10 @@ _ssh_verify_certificate_callback (gnutls_session_t session)
     }
   else if (ret == GNUTLS_E_CERTIFICATE_KEY_MISMATCH)
     {
-      fprintf(stderr, "Warning: host %s is known but has another key associated.", hostname);
-      fprintf(stderr, "It might be that the server has multiple keys, or you are under attack\n");
+      printf("Warning: host %s is known but has another key associated.", hostname);
+      printf("It might be that the server has multiple keys, or you are under attack\n");
       if (status == 0)
-        fprintf(stderr, "Its certificate is valid for %s.\n", hostname);
+        printf("Its certificate is valid for %s.\n", hostname);
       
       /* the certificate must be printed and user must be asked on
        * whether it is trustworthy. --see gnutls_x509_crt_print() */
@@ -122,7 +122,7 @@ _ssh_verify_certificate_callback (gnutls_session_t session)
     }
   else if (ret < 0)
     {
-      fprintf(stderr, "gnutls_verify_stored_pubkey: %s\n", gnutls_strerror(ret));
+      printf("gnutls_verify_stored_pubkey: %s\n", gnutls_strerror(ret));
       return ret;
     }
   
@@ -133,7 +133,7 @@ _ssh_verify_certificate_callback (gnutls_session_t session)
                                 GNUTLS_CRT_X509, &cert_list[0], 
                                 0, 0);
       if (ret < 0)
-        fprintf(stderr, "gnutls_store_pubkey: %s\n", gnutls_strerror(ret));
+        printf("gnutls_store_pubkey: %s\n", gnutls_strerror(ret));
     }
 
   /* notify gnutls to continue handshake normally */
