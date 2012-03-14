@@ -320,7 +320,7 @@ flag = {
     name      = sec-param;
     arg-type  = string;
     arg-name  = "Security parameter";
-    descrip   = "Specify the security level [low| legacy| normal| high| ultra].";
+    descrip   = "Specify the security level [low, legacy, normal, high, ultra].";
     doc      = "This is alternative to the bits option.";
 };
 

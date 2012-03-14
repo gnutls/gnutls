@@ -189,7 +189,7 @@ flag = {
     arg-type  = string;
     arg-name  = "Security parameter";
     descrip   = "Specify the security level";
-    doc      = "This is alternative to the bits option. Available options are [low|legacy|normal|high|ultra].";
+    doc      = "This is alternative to the bits option. Available options are [low, legacy, normal, high, ultra].";
 };
 
 
