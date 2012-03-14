@@ -865,7 +865,7 @@ gnutls_datum_t raw; /* raw headers */
   if ((ret =
        _gnutls_io_read_buffered (session, record->header_size, -1)) != record->header_size)
     {
-      if (gnutls_error_is_fatal (ret) == 0)
+      if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
         return ret;
       
       if (ret >= 0)
