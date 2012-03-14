@@ -60,15 +60,13 @@ and zlib, may be required.
 DOCUMENTATION
 -------------
 See the documentation in doc/ and online at
-http://www.gnu.org/software/gnutls/manual/html_node/index.htm.
+http://www.gnu.org/software/gnutls/manual.
 
 
 EXAMPLES
 --------
 See the examples in doc/examples/ and online at 'How To Use GnuTLS in
-Applications' at http://www.gnu.org/software/gnutls/manual/html_node/How-
-to-use-GnuTLS-in-applications.html#How-to-use-GnuTLS-in-applications.
-The examples include client, server, and multi-threaded examples.
+Applications' at http://www.gnu.org/software/gnutls/manual.
 
 
 SECURITY ADVISORIES
@@ -118,8 +116,7 @@ tool being used, a stack trace if available ('bt full' if under gdb or
 valgrind output), and perhaps a network trace.  Vague queries or piecemeal 
 messages are difficult to act upon and don't help the development effort.
 
-Additional information can be found at the project's manual at:
-http://www.gnu.org/software/gnutls/documentation.html.
+Additional information can be found at the project's manual.
 
 
 PATCHES
