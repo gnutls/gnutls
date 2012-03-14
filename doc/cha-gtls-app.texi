@@ -139,7 +139,7 @@ is not the case, the use of the operating system defaults is recommended. An exa
 non-native thread usage is shown below.
 
 @example
-#include <gnutls.h>
+#include <gnutls/gnutls.h>
 
 int main()
 @{
