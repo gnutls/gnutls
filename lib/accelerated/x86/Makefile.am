@@ -38,22 +38,34 @@ noinst_LTLIBRARIES = libx86.la
 libx86_la_SOURCES = sha-padlock.c hmac-padlock.c aes-x86.c aes-padlock.c aes-gcm-padlock.c aes-padlock.h aes-x86.h x86.h sha-padlock.h
 
 if ASM_X86_64
-AM_CFLAGS += -DASM_X86_64 -DASM_X86
-libx86_la_SOURCES += aes-gcm-x86.c
+ AM_CFLAGS += -DASM_X86_64 -DASM_X86
+ libx86_la_SOURCES += aes-gcm-x86.c
 
-if WINDOWS
-libx86_la_SOURCES += asm-coff/appro-aes-x86-64-coff.s asm-coff/padlock-x86-64-coff.s asm-coff/cpuid-x86-64-coff.s asm-coff/appro-aes-gcm-x86-64-coff.s
-else
-libx86_la_SOURCES += asm/appro-aes-x86-64.s asm/appro-aes-gcm-x86-64.s asm/padlock-x86-64.s asm/cpuid-x86-64.s
-endif
+ if WINDOWS
+  libx86_la_SOURCES += asm-coff/appro-aes-x86-64-coff.s asm-coff/padlock-x86-64-coff.s asm-coff/cpuid-x86-64-coff.s asm-coff/appro-aes-gcm-x86-64-coff.s
+ endif
+
+ if MACOSX
+  libx86_la_SOURCES += asm-macosx/appro-aes-x86-64-macosx.s asm-macosx/padlock-x86-64-macosx.s asm-macosx/cpuid-x86-64-macosx.s asm-macosx/appro-aes-gcm-x86-64-macosx.s
+ endif
+
+ if ELF
+  libx86_la_SOURCES += asm/appro-aes-x86-64.s asm/appro-aes-gcm-x86-64.s asm/padlock-x86-64.s asm/cpuid-x86-64.s
+ endif
 
 else
-AM_CFLAGS += -DASM_X86_32 -DASM_X86
+ AM_CFLAGS += -DASM_X86_32 -DASM_X86
 
-if WINDOWS
-libx86_la_SOURCES += asm-coff/appro-aes-x86-coff.s asm-coff/padlock-x86-coff.s asm-coff/cpuid-x86-coff.s
-else
-libx86_la_SOURCES += asm/appro-aes-x86.s asm/padlock-x86.s asm/cpuid-x86.s
-endif
+ if WINDOWS
+  libx86_la_SOURCES += asm-coff/appro-aes-x86-coff.s asm-coff/padlock-x86-coff.s asm-coff/cpuid-x86-coff.s
+ endif
+
+ if MACOSX
+  libx86_la_SOURCES += asm-macosx/appro-aes-x86-macosx.s asm-macosx/padlock-x86-macosx.s asm-macosx/cpuid-x86-macosx.s
+ endif
+
+ if ELF
+  libx86_la_SOURCES += asm/appro-aes-x86.s asm/padlock-x86.s asm/cpuid-x86.s
+ endif
 
 endif

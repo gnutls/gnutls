@@ -67,11 +67,15 @@ case "$host" in
   *mingw32* | *mingw64*)
     have_win=yes
   ;;
+  *darwin*)
+    have_macosx=yes
+  ;;
   *)
   ;;
 esac
 
 AM_CONDITIONAL(WINDOWS, test "$have_win" = yes)
+AM_CONDITIONAL(MACOSX, test "$have_macosx" = yes)
 
 dnl Hardware Acceleration
 AC_ARG_ENABLE(hardware-acceleration,

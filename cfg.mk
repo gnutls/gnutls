@@ -157,20 +157,28 @@ upload-web:
 		cvs commit -m "Update." manual/ reference/ \
 			doxygen/ devel/ cyclo/
 
-ASM_SOURCES:= lib/accelerated/x86/asm-coff/cpuid-x86-64-coff.s \
+ASM_SOURCES:= \
 	lib/accelerated/x86/asm/cpuid-x86-64.s \
-	lib/accelerated/x86/asm-coff/cpuid-x86-coff.s \
 	lib/accelerated/x86/asm/cpuid-x86.s \
 	lib/accelerated/x86/asm/appro-aes-gcm-x86-64.s \
 	lib/accelerated/x86/asm/appro-aes-x86-64.s \
 	lib/accelerated/x86/asm/appro-aes-x86.s \
 	lib/accelerated/x86/asm/padlock-x86-64.s \
 	lib/accelerated/x86/asm/padlock-x86.s \
+	lib/accelerated/x86/asm-coff/cpuid-x86-coff.s \
+	lib/accelerated/x86/asm-coff/cpuid-x86-64-coff.s \
 	lib/accelerated/x86/asm-coff/appro-aes-gcm-x86-64-coff.s \
 	lib/accelerated/x86/asm-coff/appro-aes-x86-64-coff.s \
 	lib/accelerated/x86/asm-coff/appro-aes-x86-coff.s \
 	lib/accelerated/x86/asm-coff/padlock-x86-64-coff.s \
-	lib/accelerated/x86/asm-coff/padlock-x86-coff.s
+	lib/accelerated/x86/asm-coff/padlock-x86-coff.s \
+	lib/accelerated/x86/asm-macosx/cpuid-x86-64-macosx.s \
+	lib/accelerated/x86/asm-macosx/cpuid-x86-macosx.s \
+	lib/accelerated/x86/asm-macosx/appro-aes-gcm-x86-64-macosx.s \
+	lib/accelerated/x86/asm-macosx/appro-aes-x86-64-macosx.s \
+	lib/accelerated/x86/asm-macosx/appro-aes-x86-macosx.s \
+	lib/accelerated/x86/asm-macosx/padlock-x86-64-macosx.s \
+	lib/accelerated/x86/asm-macosx/padlock-x86-macosx.s
 
 asm-sources: $(ASM_SOURCES)
 
@@ -247,3 +255,31 @@ lib/accelerated/x86/asm-coff/cpuid-x86-64-coff.s: devel/perlasm/cpuid-x86_64.pl
 lib/accelerated/x86/asm-coff/cpuid-x86-coff.s: devel/perlasm/cpuid-x86.pl
 	cat devel/perlasm/license-gnutls.txt > $@
 	perl $< coff >> $@
+
+lib/accelerated/x86/asm-macosx/appro-aes-gcm-x86-64-macosx.s: devel/perlasm/ghash-x86_64.pl
+	cat devel/perlasm/license.txt > $@
+	perl $< macosx >> $@
+
+lib/accelerated/x86/asm-macosx/appro-aes-x86-64-macosx.s: devel/perlasm/aesni-x86_64.pl
+	cat devel/perlasm/license.txt > $@
+	perl $< macosx >> $@
+
+lib/accelerated/x86/asm-macosx/appro-aes-x86-macosx.s: devel/perlasm/aesni-x86.pl
+	cat devel/perlasm/license.txt > $@
+	perl $< macosx >> $@
+
+lib/accelerated/x86/asm-macosx/padlock-x86-64-macosx.s: devel/perlasm/e_padlock-x86_64.pl
+	cat devel/perlasm/license.txt > $@
+	perl $< macosx >> $@
+
+lib/accelerated/x86/asm-macosx/padlock-x86-macosx.s: devel/perlasm/e_padlock-x86.pl
+	cat devel/perlasm/license.txt > $@
+	perl $< macosx >> $@
+
+lib/accelerated/x86/asm-macosx/cpuid-x86-64-macosx.s: devel/perlasm/cpuid-x86_64.pl
+	cat devel/perlasm/license-gnutls.txt > $@
+	perl $< macosx >> $@
+
+lib/accelerated/x86/asm-macosx/cpuid-x86-macosx.s: devel/perlasm/cpuid-x86.pl
+	cat devel/perlasm/license-gnutls.txt > $@
+	perl $< macosx >> $@
