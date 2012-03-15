@@ -71,11 +71,13 @@ case "$host" in
     have_macosx=yes
   ;;
   *)
+    have_elf=yes
   ;;
 esac
 
 AM_CONDITIONAL(WINDOWS, test "$have_win" = yes)
 AM_CONDITIONAL(MACOSX, test "$have_macosx" = yes)
+AM_CONDITIONAL(ELF, test "$have_elf" = yes)
 
 dnl Hardware Acceleration
 AC_ARG_ENABLE(hardware-acceleration,
