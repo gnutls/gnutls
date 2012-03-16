@@ -18,6 +18,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+# *** This file is auto-generated ***
+#
 .text	
 .globl	gnutls_cpuid
 .def	gnutls_cpuid;	.scl 2;	.type 32;	.endef

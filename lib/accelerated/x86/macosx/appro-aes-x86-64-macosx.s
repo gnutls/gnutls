@@ -1,4 +1,4 @@
-# Copyright (c) 2011, Andy Polyakov by <appro@openssl.org>
+# Copyright (c) 2011-2012, Andy Polyakov <appro@openssl.org>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,9 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+#
+# *** This file is auto-generated ***
+#
 .text	
 .globl	_aesni_encrypt
 
