@@ -88,6 +88,8 @@ typedef struct _cfg_ctx
   int crl_number;
   int crq_extensions;
   char *proxy_policy_language;
+  char **ocsp_uris;
+  char **ca_issuers_uris;
 } cfg_ctx;
 
 cfg_ctx cfg;
@@ -254,6 +256,9 @@ template_parse (const char *template)
   val = optionGetValue(pov, "proxy_policy_language");
   if (val != NULL && val->valType == OPARG_TYPE_STRING)
     cfg.proxy_policy_language = strdup(val->v.strVal);
+
+  READ_MULTI_LINE("ocsp_uri", cfg.ocsp_uris);
+  READ_MULTI_LINE("ca_issuers_uri", cfg.ca_issuers_uris);
   
   READ_BOOLEAN("ca", cfg.ca);
   READ_BOOLEAN("honor_crq_extensions", cfg.crq_extensions);
@@ -704,7 +709,60 @@ get_key_purpose_set (gnutls_x509_crt_t crt)
             }
         }
     }
+}
 
+void
+get_ocsp_issuer_set (gnutls_x509_crt_t crt)
+{
+  int ret, i;
+  gnutls_datum_t uri;
+
+  if (batch)
+    {
+      if (!cfg.ocsp_uris)
+        return;
+      for (i = 0; cfg.ocsp_uris[i] != NULL; i++)
+        {
+          uri.data = cfg.ocsp_uris[i];
+          uri.size = strlen(cfg.ocsp_uris[i]);
+          ret =
+            gnutls_x509_crt_set_authority_info_access (crt, GNUTLS_IA_OCSP_URI,
+                                                       &uri);
+          if (ret < 0)
+            {
+              fprintf (stderr, "set OCSP URI (%s): %s\n",
+                       cfg.ocsp_uris[i], gnutls_strerror (ret));
+              exit (1);
+            }
+        }
+    }
+}
+
+void
+get_ca_issuers_set (gnutls_x509_crt_t crt)
+{
+  int ret, i;
+  gnutls_datum_t uri;
+
+  if (batch)
+    {
+      if (!cfg.ca_issuers_uris)
+        return;
+      for (i = 0; cfg.ca_issuers_uris[i] != NULL; i++)
+        {
+          uri.data = cfg.ca_issuers_uris[i];
+          uri.size = strlen(cfg.ca_issuers_uris[i]);
+          ret =
+            gnutls_x509_crt_set_authority_info_access (crt, GNUTLS_IA_CAISSUERS_URI,
+                                                       &uri);
+          if (ret < 0)
+            {
+              fprintf (stderr, "set CA ISSUERS URI (%s): %s\n",
+                       cfg.ca_issuers_uris[i], gnutls_strerror (ret));
+              exit (1);
+            }
+        }
+    }
 }
 
 

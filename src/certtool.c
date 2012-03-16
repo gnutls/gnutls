@@ -584,6 +584,8 @@ generate_certificate (gnutls_privkey_t * ret_key,
                        gnutls_strerror (result));
             }
         }
+      get_ocsp_issuer_set(crt);
+      get_ca_issuers_set(crt);
 
       if (usage != 0)
         {

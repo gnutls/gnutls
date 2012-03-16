@@ -14,10 +14,11 @@ See the end for copying conditions.
 line option.
 
 ** certtool: The template option allows for setting the domain
-component (DC) option of the distinguished name.
+component (DC) option of the distinguished name, and the ocsp_uri
+as well as the ca_issuers_uri options.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_x509_crt_set_authority_info_access: Added
 
 
 * Version 3.0.15 (released 2012-03-02)

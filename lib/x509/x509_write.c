@@ -1337,3 +1337,138 @@ gnutls_x509_crt_privkey_sign (gnutls_x509_crt_t crt, gnutls_x509_crt_t issuer,
 
   return 0;
 }
+
+static const char* what_to_oid(int what)
+{
+  switch(what)
+    {
+      case GNUTLS_IA_OCSP_URI:
+        return GNUTLS_OID_AD_OCSP;
+      case GNUTLS_IA_CAISSUERS_URI:
+        return GNUTLS_OID_AD_CAISSUERS;
+      default:
+        return NULL;
+    }
+}
+
+/**
+ * gnutls_x509_crt_set_authority_info_access:
+ * @crt: Holds the certificate
+ * @what: what data to get, a #gnutls_info_access_what_t type.
+ * @data: output data to be freed with gnutls_free().
+ *
+ * This function sets the Authority Information Access (AIA)
+ * extension, see RFC 5280 section 4.2.2.1 for more information.  
+ *
+ * The type of data stored in @data is specified via @what which
+ * should be #gnutls_info_access_what_t values.
+ *
+ * If @what is %GNUTLS_IA_OCSP_URI, @data will hold the OCSP URI.
+ * If @what is %GNUTLS_IA_CAISSUERS_URI, @data will hold the caIssuers
+ * URI.  
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.0
+ **/
+int
+gnutls_x509_crt_set_authority_info_access (gnutls_x509_crt_t crt,
+					   int what,
+					   gnutls_datum_t * data)
+{
+  int ret, result;
+  gnutls_datum_t aia = { NULL, 0 };
+  gnutls_datum_t der_data = { NULL, 0 };
+  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+  const char* oid;
+  unsigned int c;
+
+  if (crt == NULL)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+  
+  oid = what_to_oid(what);
+  if (oid == NULL)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  ret = asn1_create_element (_gnutls_get_pkix (),
+			     "PKIX1.AuthorityInfoAccessSyntax", &c2);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (ret);
+    }
+
+  ret = _gnutls_x509_crt_get_extension (crt, GNUTLS_OID_AIA, 0, &aia,
+			                &c);
+  if (ret >= 0) /* decode it */
+    {
+      ret = asn1_der_decoding (&c2, aia.data, aia.size, NULL);
+      if (ret != ASN1_SUCCESS)
+        {
+          gnutls_assert ();
+          ret = _gnutls_asn2err (ret);
+          goto cleanup;
+        }
+    }
+
+  /* generate the extension.
+   */
+  /* 1. create a new element.
+   */
+  result = asn1_write_value (c2, "", "NEW", 1);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      ret = _gnutls_asn2err (result);
+      goto cleanup;
+    }
+
+  /* 2. Add the OID.
+   */
+  result = asn1_write_value (c2, "?LAST.accessMethod", oid, 1);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      ret = _gnutls_asn2err (result);
+      goto cleanup;
+    }
+
+  /* accessLocation is a choice */
+  result = asn1_write_value (c2, "?LAST.accessLocation", "uniformResourceIdentifier", 1);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      ret = _gnutls_asn2err (result);
+      goto cleanup;
+    }
+
+  result = asn1_write_value (c2, "?LAST.accessLocation.uniformResourceIdentifier", data->data, data->size);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      ret = _gnutls_asn2err (result);
+      goto cleanup;
+    }
+
+  ret = _gnutls_x509_der_encode (c2, "", &der_data, 0);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  ret = _gnutls_x509_crt_set_extension (crt, GNUTLS_OID_AIA,
+                                        &der_data, 0);
+  if (ret < 0)
+    gnutls_assert ();
+
+  crt->use_extensions = 1;
+
+cleanup:
+  _gnutls_free_datum (&der_data);
+  _gnutls_free_datum(&aia);
+  asn1_delete_structure (&c2);
+  
+  return ret;
+}

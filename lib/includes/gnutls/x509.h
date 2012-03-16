@@ -295,6 +295,9 @@ extern "C"
                                      unsigned int *critical);
   int gnutls_x509_crt_set_key_usage (gnutls_x509_crt_t crt,
                                      unsigned int usage);
+  int gnutls_x509_crt_set_authority_info_access (gnutls_x509_crt_t crt,
+  					         int what,
+					         gnutls_datum_t * data);
 
   int gnutls_x509_crt_get_proxy (gnutls_x509_crt_t cert,
                                  unsigned int *critical,
