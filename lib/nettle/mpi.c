@@ -422,9 +422,6 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
   unsigned int q_bytes, w_bytes, r_bytes, w_bits;
   int ret;
 
-  mpz_init (*prime);
-  mpz_init (*generator);
-
   /* security level enforcement. 
    * Values for q are selected according to ECRYPT II recommendations.
    */
@@ -455,8 +452,6 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits)
       return GNUTLS_E_MEMORY_ERROR;
     }
 
-  mpz_init2 (*prime, nbits);
-  mpz_init (*generator);
   mpz_init (q);
   mpz_init (w);
 
