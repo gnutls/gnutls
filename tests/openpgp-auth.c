@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Free Software Foundation
+ * Copyright (C) 2010-2012 Free Software Foundation, Inc.
  * Author: Ludovic Courtès
  *
  * This file is part of GNUTLS.
@@ -67,19 +67,19 @@ doit ()
 
   srcdir = getenv ("srcdir") ? getenv ("srcdir") : ".";
 
-  for (i = 0; i < 3; i++)
+  for (i = 0; i < 4; i++)
     {
 
-      if (i == 0)
+      if (i <= 1)
         key_id = NULL;          /* try using the master key */
-      else if (i == 1)
-        key_id = "auto";        /* test auto */
       else if (i == 2)
+        key_id = "auto";        /* test auto */
+      else if (i == 3)
         key_id = "f30fd423c143e7ba";
 
       if (debug)
         {
-          gnutls_global_set_log_level (10);
+          gnutls_global_set_log_level (5);
           gnutls_global_set_log_function (log_message);
         }
 
@@ -115,7 +115,12 @@ doit ()
           if (err != 0)
             fail ("client session %d\n", err);
 
-          gnutls_priority_set_direct (session,
+          if (i==0) /* we use the primary key which is RSA. Test the RSA ciphersuite */
+            gnutls_priority_set_direct (session,
+                                      "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+RSA:+CTYPE-OPENPGP",
+                                      NULL);
+          else
+            gnutls_priority_set_direct (session,
                                       "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+DHE-DSS:+DHE-RSA:+CTYPE-OPENPGP",
                                       NULL);
           gnutls_transport_set_ptr (session,
@@ -158,6 +163,9 @@ doit ()
 
           if (debug)
             printf ("client done\n");
+          
+          gnutls_deinit(session);
+          gnutls_certificate_free_credentials (cred);
         }
       else
         {
@@ -169,7 +177,7 @@ doit ()
           ssize_t received;
           pid_t done;
           int status;
-          const gnutls_datum_t p3 = { (char *) pkcs3, strlen (pkcs3) };
+          const gnutls_datum_t p3 = { (void *) pkcs3, strlen (pkcs3) };
 
           if (debug)
             printf ("server process %i (child %i)\n", getpid (), child);
@@ -179,7 +187,7 @@ doit ()
             fail ("server session %d\n", err);
 
           gnutls_priority_set_direct (session,
-                                      "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+DHE-DSS:+DHE-RSA:+CTYPE-OPENPGP",
+                                      "NONE:+VERS-TLS1.0:+CIPHER-ALL:+MAC-ALL:+SIGN-ALL:+COMP-ALL:+DHE-DSS:+DHE-RSA:+RSA:+CTYPE-OPENPGP",
                                       NULL);
           gnutls_transport_set_ptr (session,
                                     (gnutls_transport_ptr_t) (intptr_t)
@@ -235,6 +243,10 @@ doit ()
           if (debug)
             printf ("server done\n");
 
+          gnutls_deinit(session);
+          gnutls_certificate_free_credentials (cred);
+          gnutls_dh_params_deinit (dh_params);
+
           done = wait (&status);
           if (done < 0)
             fail ("wait %s\n", strerror (errno));
@@ -254,6 +266,8 @@ doit ()
         }
 
     }
+
+  gnutls_global_deinit ();
 }
 #else
 void

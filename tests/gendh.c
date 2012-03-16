@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Free Software Foundation, Inc.
+ * Copyright (C) 2010, 2012 Free Software Foundation, Inc.
  *
  * Author: Simon Josefsson
  *
@@ -43,6 +43,10 @@ doit (void)
 
   if (gnutls_dh_params_generate2 (dh_params, 1024) < 0)
     fail ("Error in prime generation\n");
+    
+  gnutls_dh_params_deinit(dh_params);
+  
+  gnutls_global_deinit();
 
-  success ("generated DH params OK\n");
+  if (debug) success ("generated DH params OK\n");
 }
