@@ -2,9 +2,9 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.0.16 (unreleased)
+* Version 3.0.16 (released 2012-03-16)
 
-** minitasn1: Upgraded to libtasn1 version 2.12.
+** minitasn1: Upgraded to libtasn1 version 2.12 (pre-release).
 
 ** libgnutls: Corrected SRP-RSA ciphersuites when used under TLS 1.2.
 
