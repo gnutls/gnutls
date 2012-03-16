@@ -559,3 +559,4 @@ lib/gl/tests/test-sys_types
 lib/gl/tests/test-sys_uio
 tests/rng-fork
 tests/x509cert
+lib/gl/stdalign.h
