@@ -153,7 +153,7 @@ fi
 
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 
-dnl Checks for programs in src/ 
+enable_local_libopts=no
 PKG_CHECK_MODULES([autoopts], autoopts >= 36.2.11,, [enable_local_libopts=yes])
 
 NEED_LIBOPTS_DIR=true
