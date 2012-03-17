@@ -23,7 +23,7 @@ eval '(exit $?0)' && eval 'exec perl -wS "$0" ${1+"$@"}'
 $dir = shift;
 $param2 = shift;
 
-if ($param2 ne '') {
+if (defined $param2 && $param2 ne '') {
   $enum = 1;
 } else {
   $enum = 0;
@@ -36,21 +36,29 @@ sub key_of_record {
   my @lines = split /\n/, $record;
 
   my ($i) = 1;
-  my ($key) = $lines[$i]; 
+  my ($key) = '';
+  $key = $lines[$i] if (defined $lines[$i]);
 
   if ($enum == 1) {
     while( !($key =~ m/\@c\s(.*)\n/) && ($i < 5)) { $i=$i+1; $key = $lines[$i]; }
   } else {
-    while( !($key =~ m/^\\functionTitle\{(.*)\}/) && ($i < 5)) { $i=$i+1; $key = $lines[$i]; }
+    while( !($key =~ m/\@subheading\s(.*)/) && ($i < 5)) { 
+      $i=$i+1; 
+      if (defined $lines[$i]) {
+        $key = $lines[$i]; 
+      } else {
+        $key = '';
+      }
+    }
   }
 
   return $key;
 }
 
 if ($enum == 1) {
-  $/="\@end table";          # Records are separated by blank lines.
+  $/="\@end table";
 } else {
-  $/="\n\\end{function}";          # Records are separated by blank lines.
+  $/="\@end deftypefun";
 }
 @records = <>;  # Read in whole file, one record per array element.
 
@@ -68,7 +76,7 @@ foreach (@records) {
     $key =~ m/\@c\s(.*)\n/;
     $key = $1;
   } else {
-    $key =~ m/\\functionTitle\{(.*)\}/;
+    $key =~ m/\@subheading\s(.*)\n/;
     $key = $1;
   }
 

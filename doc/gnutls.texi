@@ -75,60 +75,58 @@ Documentation License''.
 @end macro
 
 @macro showfuncA{ref}
-@itemize
+@table @code
 @item @ref{\ref\}
-@end itemize
+@end table
 @end macro
 
 @macro showfuncB{ref1,ref2}
-@itemize
+@table @code
 @item @ref{\ref1\}
 @item @ref{\ref2\}
-@end itemize
+@end table
 @end macro
 
 @macro showfuncC{ref1,ref2,ref3}
-@itemize
+@table @code
 @item @ref{\ref1\}
 @item @ref{\ref2\}
 @item @ref{\ref3\}
-@end itemize
+@end table
 @end macro
 
 @macro showfuncD{ref1,ref2,ref3,ref4}
-@itemize
+@table @code
 @item @ref{\ref1\}
 @item @ref{\ref2\}
 @item @ref{\ref3\}
 @item @ref{\ref4\}
-@end itemize
+@end table
 @end macro
 
 @macro showfuncE{ref1,ref2,ref3,ref4,ref5}
-@itemize
+@table @code
 @item @ref{\ref1\}
 @item @ref{\ref2\}
 @item @ref{\ref3\}
 @item @ref{\ref4\}
 @item @ref{\ref5\}
-@end itemize
+@end table
 @end macro
 
 @macro showfuncF{ref1,ref2,ref3,ref4,ref5,ref6}
-@itemize
+@table @code
 @item @ref{\ref1\}
 @item @ref{\ref2\}
 @item @ref{\ref3\}
 @item @ref{\ref4\}
 @item @ref{\ref5\}
 @item @ref{\ref6\}
-@end itemize
+@end table
 @end macro
 
 @macro showfuncdesc{ref}
-@itemize
-@item @ref{\ref\}
-@end itemize
+@include functions/\ref\
 @end macro
 
 @macro showenumdesc{ref,cap}
