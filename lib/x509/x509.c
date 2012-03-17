@@ -2585,7 +2585,7 @@ gnutls_x509_crt_get_preferred_hash_algorithm (gnutls_x509_crt_t crt,
  * Deprecated. Please use gnutls_pubkey_verify_data().
  *
  * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
- * is returned, and a positive code on success.
+ * is returned, and zero or positive code on success.
  **/
 int
 gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
@@ -2623,7 +2623,7 @@ gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
  * Deprecated. Please use gnutls_pubkey_verify_data().
  *
  * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
- * is returned, and a positive code on success.
+ * is returned, and zero or positive code on success.
  **/
 int
 gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,

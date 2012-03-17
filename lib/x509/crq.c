@@ -2422,9 +2422,8 @@ gnutls_x509_crq_privkey_sign (gnutls_x509_crq_t crq, gnutls_privkey_t key,
  * This function will verify self signature in the certificate
  * request and return its status.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned,
- * %GNUTLS_E_PK_SIG_VERIFY_FAILED if verification failed, otherwise a
- * negative error value.
+ * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
+ * is returned, and zero or positive code on success.
  *
  * Since 2.12.0
  **/
