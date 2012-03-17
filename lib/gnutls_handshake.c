@@ -1383,7 +1383,8 @@ _gnutls_client_set_ciphersuite (gnutls_session_t session, uint8_t suite[2])
   if (z != 0)
     {
       gnutls_assert ();
-      _gnutls_debug_log("unsupported cipher suite %.2X.%.2X\n", (unsigned int)suite[0], (unsigned int)suite[1]);
+      _gnutls_handshake_log("HSK[%p]: unsupported cipher suite %.2X.%.2X\n", session,
+                        (unsigned int)suite[0], (unsigned int)suite[1]);
       return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
     }
 
