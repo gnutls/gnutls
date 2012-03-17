@@ -1383,6 +1383,7 @@ _gnutls_client_set_ciphersuite (gnutls_session_t session, uint8_t suite[2])
   if (z != 0)
     {
       gnutls_assert ();
+      _gnutls_debug_log("unsupported cipher suite %.2X.%.2X\n", (unsigned int)suite[0], (unsigned int)suite[1]);
       return GNUTLS_E_UNKNOWN_CIPHER_SUITE;
     }
 
@@ -3183,9 +3184,10 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
       if (delete == 0)
         {
 
-          _gnutls_handshake_log ("HSK[%p]: Keeping ciphersuite: %s\n",
+          _gnutls_handshake_log ("HSK[%p]: Keeping ciphersuite: %s (%.2X.%.2X)\n",
                                  session,
-                                 _gnutls_cipher_suite_get_name (&cipher_suites[i]));
+                                 _gnutls_cipher_suite_get_name (&cipher_suites[i]),
+                                 cipher_suites[i], cipher_suites[i+1]);
 
           if (i != new_suites_size)
             memmove( &cipher_suites[new_suites_size], &cipher_suites[i], 2);
