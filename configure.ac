@@ -21,7 +21,7 @@ dnl Process this file with autoconf to produce a configure script.
 # USA
 
 AC_PREREQ(2.61)
-AC_INIT([GnuTLS], [3.0.16], [bug-gnutls@gnu.org])
+AC_INIT([GnuTLS], [3.0.17], [bug-gnutls@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -153,8 +153,8 @@ fi
 
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 
-enable_local_libopts=no
-PKG_CHECK_MODULES([autoopts], autoopts >= 36.2.11,, [enable_local_libopts=yes])
+enable_local_libopts=yes
+dnl PKG_CHECK_MODULES([autoopts], autoopts >= 36.2.11,, [enable_local_libopts=yes])
 
 NEED_LIBOPTS_DIR=true
 LIBOPTS_CHECK([src/libopts])
