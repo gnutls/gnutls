@@ -417,7 +417,7 @@ generate_certificate (gnutls_privkey_t * ret_key,
 
   result =
     gnutls_x509_crt_set_expiration_time (crt,
-                                         time (NULL) + days * 24 * 60 * 60);
+                                         time (NULL) + ((time_t) days) * 24 * 60 * 60);
   if (result < 0)
     error (EXIT_FAILURE, 0, "set_expiration: %s", gnutls_strerror (result));
 
@@ -933,7 +933,7 @@ update_signed_certificate (common_info_st * cinfo)
   days = get_days ();
 
   result =
-    gnutls_x509_crt_set_expiration_time (crt, tim + days * 24 * 60 * 60);
+    gnutls_x509_crt_set_expiration_time (crt, tim + ((time_t) days) * 24 * 60 * 60);
   if (result < 0)
     error (EXIT_FAILURE, 0, "set_expiration: %s", gnutls_strerror (result));
 
