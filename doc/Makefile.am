@@ -116,7 +116,7 @@ gnutls_TEXINFOS = gnutls.texi fdl-1.3.texi				\
 	cha-gtls-app.texi cha-internals.texi cha-intro-tls.texi		\
 	cha-library.texi cha-preface.texi cha-programs.texi		\
 	sec-tls-app.texi cha-errors.texi cha-support.texi		\
-	cha-shared-key.texi cha-gtls-examples.texi
+	cha-shared-key.texi cha-gtls-examples.texi cha-upgrade.texi
 
 gnutls_TEXINFOS += invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
 	invoke-gnutls-serv.texi invoke-certtool.texi invoke-srptool.texi \

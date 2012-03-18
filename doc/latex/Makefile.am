@@ -4,12 +4,15 @@ TEX_OBJECTS = gnutls.tex macros.tex macros-epub.tex fdl.tex cover.tex gnutls.bib
 GEN_TEX_OBJECTS = cha-preface.tex cha-library.tex cha-intro-tls.tex cha-cert-auth2.tex \
   cha-cert-auth.tex cha-gtls-app.tex sec-tls-app.tex cha-programs.tex cha-support.tex \
   cha-functions.tex error_codes.tex cha-ciphersuites.tex algorithms.tex cha-shared-key.tex \
-  cha-errors.tex alerts.tex cha-internals.tex cha-gtls-examples.tex \
+  cha-errors.tex alerts.tex cha-internals.tex cha-gtls-examples.tex cha-upgrade.tex \
   invoke-certtool.tex invoke-gnutls-cli.tex invoke-gnutls-serv.tex \
   invoke-srptool.tex invoke-psktool.tex invoke-gnutls-cli-debug.tex \
   invoke-p11tool.tex invoke-ocsptool.tex
 
 invoke-certtool.tex: ../invoke-certtool.texi
+	../scripts/mytexi2latex $< > $@
+
+cha-upgrade.tex: ../cha-upgrade.texi
 	../scripts/mytexi2latex $< > $@
 
 invoke-gnutls-cli.tex: ../invoke-gnutls-cli.texi

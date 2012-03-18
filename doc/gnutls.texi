@@ -156,6 +156,7 @@ Documentation License''.
 * GnuTLS application examples::
 * Other included programs::
 * Internal architecture of GnuTLS::
+* Upgrading from previous versions::
 * Support::
 * Error codes::
 * Supported ciphersuites::
@@ -188,6 +189,8 @@ Documentation License''.
 @include cha-internals.texi
 
 @c appendices
+
+@include cha-upgrade.texi
 
 @include cha-support.texi
 

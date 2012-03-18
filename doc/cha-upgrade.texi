@@ -1,0 +1,32 @@
+@node Upgrading from previous versions
+@appendix Upgrading from previous versions
+@cindex upgrading
+
+The GnuTLS library typically maintains binary and source code compatibility
+across versions. The releases that have the major version increased
+break binary compatibility but source compatibility is provided.
+This section lists exceptional cases where changes to existing code are
+required due to library changes.
+
+@heading Upgrading to 2.12.x from previous versions
+
+GnuTLS 2.12.x is binary compatible with previous versions but changes the
+semantics of @funcintref{gnutls_transport_set_lowat}, which might cause breakage
+in applications that relied on its default value be 1. Two fixes
+are proposed:
+@itemize
+@item  Quick fix. Explicitly call @code{gnutls_transport_set_lowat (session, 1);}
+after @funcref{gnutls_init}.
+@item Long term fix. Because later versions of gnutls abolish the functionality 
+of using the system call @funcintref{select} to check for gnutls pending data, the 
+function @funcref{gnutls_record_check_pending} has to be used to achieve the same 
+functionality as described in @ref{Asynchronous operation}.
+@end itemize
+
+@heading Upgrading to 3.0.x from previous versions
+
+GnuTLS 3.0.x is source compatible with previous versions but discarded the function
+@funcintref{gnutls_transport_set_lowat}.
+The function @funcref{gnutls_record_check_pending} has to be used to achieve 
+the same functionality as described in @ref{Asynchronous operation}.
+
