@@ -86,7 +86,7 @@ if test "$cryptolib" = "nettle";then
     if test "$ac_cv_libnettle" != yes; then
       AC_MSG_ERROR([[
   *** 
-  *** Libnettle 2.4 was not found. 
+  *** Libnettle 2.4 was not found. You must compile nettle with gmp support.
   ]])
     fi
 else
