@@ -244,6 +244,7 @@ multitable:
 
 		$line =~ s/\@subsubheading (.+)/\\subsubsection\*{$1}/g;
 		$line =~ s/\@subheading (.+)/\\subsection\*{$1}/g;
+		$line =~ s/\@heading (.+)/\\section\*{$1}/g;
 
                 if ($line =~ s/\@section (.+)/\\section{$1}/g) {
 			if ($label ne '') {
