@@ -84,6 +84,9 @@ libtasn1 in other programs), you can get it from
 A few @code{configure} options may be relevant, summarized below.
 They disable or enable particular features,
 to create a smaller library with only the required features.
+Note however, that although a smaller library is generated, the
+included programs are not guarranteed to compile if some of these
+options are given.
 
 @verbatim
 --disable-srp-authentication
