@@ -416,7 +416,7 @@ gnutls_x509_crl_get_this_update (gnutls_x509_crl_t crl)
       return (time_t) - 1;
     }
 
-  return _gnutls_x509_get_time (crl->crl, "tbsCertList.thisUpdate");
+  return _gnutls_x509_get_time (crl->crl, "tbsCertList.thisUpdate", 0);
 }
 
 /**
@@ -438,7 +438,7 @@ gnutls_x509_crl_get_next_update (gnutls_x509_crl_t crl)
       return (time_t) - 1;
     }
 
-  return _gnutls_x509_get_time (crl->crl, "tbsCertList.nextUpdate");
+  return _gnutls_x509_get_time (crl->crl, "tbsCertList.nextUpdate", 0);
 }
 
 /**
@@ -524,7 +524,7 @@ gnutls_x509_crl_get_crt_serial (gnutls_x509_crl_t crl, int indx,
 
   if (t)
     {
-      *t = _gnutls_x509_get_time (crl->crl, date_name);
+      *t = _gnutls_x509_get_time (crl->crl, date_name, 0);
     }
 
   return 0;

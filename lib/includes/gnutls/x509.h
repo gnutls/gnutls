@@ -123,6 +123,9 @@ extern "C"
   int gnutls_x509_crt_export (gnutls_x509_crt_t cert,
                               gnutls_x509_crt_fmt_t format,
                               void *output_data, size_t * output_data_size);
+  int gnutls_x509_crt_get_private_key_usage_period (gnutls_x509_crt_t cert, time_t* activation, time_t* expiration, 
+                                     unsigned int *critical);
+
   int gnutls_x509_crt_get_issuer_dn (gnutls_x509_crt_t cert, char *buf,
                                      size_t * buf_size);
   int gnutls_x509_crt_get_issuer_dn_oid (gnutls_x509_crt_t cert, int indx,
@@ -151,6 +154,9 @@ extern "C"
                                   unsigned char *output_data,
                                   size_t * output_data_size);
 
+  int gnutls_x509_crt_set_private_key_usage_period (gnutls_x509_crt_t crt,
+                                                    time_t activation,
+                                                    time_t expiration);
   int gnutls_x509_crt_set_authority_key_id (gnutls_x509_crt_t cert,
                                             const void *id, size_t id_size);
   int gnutls_x509_crt_get_authority_key_id (gnutls_x509_crt_t cert,
@@ -810,6 +816,9 @@ extern "C"
                               const gnutls_datum_t * data,
                               gnutls_x509_crt_fmt_t format);
 
+  int gnutls_x509_crq_get_private_key_usage_period (gnutls_x509_crq_t cert, time_t* activation, time_t* expiration, 
+                                     unsigned int *critical);
+
   int gnutls_x509_crq_get_dn (gnutls_x509_crq_t crq, char *buf,
                               size_t * sizeof_buf);
   int gnutls_x509_crq_get_dn_oid (gnutls_x509_crq_t crq, int indx,
@@ -850,6 +859,9 @@ extern "C"
   int gnutls_x509_crt_set_crq_extensions (gnutls_x509_crt_t crt,
                                           gnutls_x509_crq_t crq);
 
+  int gnutls_x509_crq_set_private_key_usage_period (gnutls_x509_crq_t crq,
+                                              time_t activation,
+                                              time_t expiration);
   int gnutls_x509_crq_set_key_rsa_raw (gnutls_x509_crq_t crq,
                                        const gnutls_datum_t * m,
                                        const gnutls_datum_t * e);

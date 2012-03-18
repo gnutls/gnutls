@@ -594,7 +594,7 @@ gnutls_x509_crt_get_activation_time (gnutls_x509_crt_t cert)
     }
 
   return _gnutls_x509_get_time (cert->cert,
-                                "tbsCertificate.validity.notBefore");
+                                "tbsCertificate.validity.notBefore", 0);
 }
 
 /**
@@ -616,8 +616,80 @@ gnutls_x509_crt_get_expiration_time (gnutls_x509_crt_t cert)
     }
 
   return _gnutls_x509_get_time (cert->cert,
-                                "tbsCertificate.validity.notAfter");
+                                "tbsCertificate.validity.notAfter", 0);
 }
+
+/**
+ * gnutls_x509_crt_get_private_key_usage_period:
+ * @cert: should contain a #gnutls_x509_crt_t structure
+ * @activation: The activation time
+ * @expiration: The expiration time
+ * @critical: the extension status
+ *
+ * This function will return the expiration and activation
+ * times of the private key of the certificate. It relies on
+ * the PKIX extension 2.5.29.16 being present.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ * if the extension is not present, otherwise a negative error value.
+ **/
+int
+gnutls_x509_crt_get_private_key_usage_period (gnutls_x509_crt_t cert, time_t* activation, time_t* expiration, 
+                                     unsigned int *critical)
+{
+  int result, ret;
+  gnutls_datum_t der = {NULL, 0};
+  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+  if (cert == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  ret =
+       _gnutls_x509_crt_get_extension (cert, "2.5.29.16", 0, &der,
+                                       critical);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  if (der.size == 0 || der.data == NULL)
+    return gnutls_assert_val(GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE);
+
+  result = asn1_create_element
+    (_gnutls_get_pkix (), "PKIX1.PrivateKeyUsagePeriod", &c2);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      ret = _gnutls_asn2err (result);
+      goto cleanup;
+    }
+
+  result = asn1_der_decoding (&c2, der.data, der.size, NULL);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      ret = _gnutls_asn2err (result);
+      goto cleanup;
+    }
+
+  if (activation)
+    *activation = _gnutls_x509_get_time (c2,
+                                         "notBefore", 1);
+
+  if (expiration)
+    *expiration = _gnutls_x509_get_time (c2,
+                                         "notAfter", 1);
+
+  ret = 0;
+  
+cleanup:
+  _gnutls_free_datum(&der);
+  asn1_delete_structure (&c2);
+
+  return ret;
+}
+
 
 /**
  * gnutls_x509_crt_get_serial:
@@ -670,8 +742,8 @@ gnutls_x509_crt_get_serial (gnutls_x509_crt_t cert, void *result,
  * identifier.  This is obtained by the X.509 Subject Key identifier
  * extension field (2.5.29.14).
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ * if the extension is not present, otherwise a negative error value.
  **/
 int
 gnutls_x509_crt_get_subject_key_id (gnutls_x509_crt_t cert, void *ret,
@@ -815,7 +887,8 @@ _get_authority_key_id (gnutls_x509_crt_t cert, ASN1_TYPE *c2,
  * @seq can be used as a counter to request them all until 
  * %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE is returned.
  *
- * Returns: Returns 0 on success, or an error code.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ * if the extension is not present, otherwise a negative error value.
  *
  * Since: 3.0
  **/
@@ -879,8 +952,8 @@ fail:
  * the name and serial number of the certificate. In that case
  * gnutls_x509_crt_get_authority_key_gn_serial() may be used.
  *
- * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
- *   negative error value.
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ * if the extension is not present, otherwise a negative error value.
  **/
 int
 gnutls_x509_crt_get_authority_key_id (gnutls_x509_crt_t cert, void *id,

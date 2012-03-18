@@ -66,7 +66,7 @@
 #define ASN1_NULL "\x05\x00"
 #define ASN1_NULL_SIZE 2
 
-int _gnutls_x509_set_time (ASN1_TYPE c2, const char *where, time_t tim);
+int _gnutls_x509_set_time (ASN1_TYPE c2, const char *where, time_t tim, int general);
 
 int _gnutls_x509_decode_octet_string (const char *string_type,
                                       const uint8_t * der, size_t der_size,
@@ -82,7 +82,7 @@ const char *_gnutls_x509_oid2asn_string (const char *oid);
 int _gnutls_x509_oid_data_choice (const char *OID);
 int _gnutls_x509_oid_data_printable (const char *OID);
 
-time_t _gnutls_x509_get_time (ASN1_TYPE c2, const char *when);
+time_t _gnutls_x509_get_time (ASN1_TYPE c2, const char *when, int general);
 
 gnutls_x509_subject_alt_name_t _gnutls_x509_san_find_type (char *str_type);
 

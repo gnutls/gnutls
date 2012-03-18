@@ -7,9 +7,14 @@ See the end for copying conditions.
 ** certtool: Avoid a Y2K38 bug when generating certificates.
 Patch by Robert Millan.
 
-** API and ABI modifications:
-No changes since last version.
+** libgnutls: Time in generated certificates is stored
+as GeneralizedTime instead of UTCTime (which only stores
+2 digits of a year).
 
+** API and ABI modifications:
+gnutls_x509_crt_set_private_key_usage_period: Added
+gnutls_x509_crt_get_private_key_usage_period: Added
+gnutls_x509_crq_set_private_key_usage_period: Added
 
 * Version 3.0.17 (released 2012-03-17)
 

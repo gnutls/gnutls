@@ -438,6 +438,47 @@ print_key_usage (gnutls_buffer_st * str, const char *prefix, int type,
 }
 
 static void
+print_private_key_usage_period (gnutls_buffer_st * str, const char *prefix, int type,
+                                cert_type_t cert)
+{
+  time_t activation, expiration;
+  int err;
+  char s[42];
+  struct tm t;
+  size_t max;
+
+  if (type == TYPE_CRT)
+    err = gnutls_x509_crt_get_private_key_usage_period (cert.crt, &activation, &expiration, NULL);
+  else if (type == TYPE_CRQ)
+    err = gnutls_x509_crq_get_private_key_usage_period (cert.crq, &activation, &expiration, NULL);
+  else
+    return;
+
+  if (err < 0)
+    {
+      addf (str, "error: get_private_key_usage_period: %s\n", gnutls_strerror (err));
+      return;
+    }
+
+  max = sizeof (s);
+
+  if (gmtime_r (&activation, &t) == NULL)
+    addf (str, "error: gmtime_r (%ld)\n", (unsigned long) activation);
+  else if (strftime (s, max, "%a %b %d %H:%M:%S UTC %Y", &t) == 0)
+    addf (str, "error: strftime (%ld)\n", (unsigned long) activation);
+  else
+    addf (str, _("\t\t\tNot Before: %s\n"), s);
+
+  if (gmtime_r (&expiration, &t) == NULL)
+    addf (str, "error: gmtime_r (%ld)\n", (unsigned long) expiration);
+  else if (strftime (s, max, "%a %b %d %H:%M:%S UTC %Y", &t) == 0)
+    addf (str, "error: strftime (%ld)\n", (unsigned long) expiration);
+  else
+    addf (str, _("\t\t\tNot After: %s\n"), s);
+
+}
+
+static void
 print_crldist (gnutls_buffer_st * str, gnutls_x509_crt_t cert)
 {
   char *buffer = NULL;
@@ -854,7 +895,7 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
   int keypurpose_idx = 0;
   int ski_idx = 0;
   int aki_idx = 0;
-  int crldist_idx = 0;
+  int crldist_idx = 0, pkey_usage_period_idx = 0;
 
   for (i = 0;; i++)
     {
@@ -951,6 +992,21 @@ print_extensions (gnutls_buffer_st * str, const char *prefix, int type,
           print_key_usage (str, prefix, type, cert);
 
           keyusage_idx++;
+        }
+      else if (strcmp (oid, "2.5.29.16") == 0)
+        {
+          if (pkey_usage_period_idx)
+            {
+              addf (str, "error: more than one private key usage period extension\n");
+              continue;
+            }
+
+          addf (str, _("%s\t\tPrivate Key Usage Period (%s):\n"), prefix,
+                critical ? _("critical") : _("not critical"));
+
+          print_private_key_usage_period (str, prefix, type, cert);
+
+          pkey_usage_period_idx++;
         }
       else if (strcmp (oid, "2.5.29.37") == 0)
         {

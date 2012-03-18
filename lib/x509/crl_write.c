@@ -174,7 +174,7 @@ gnutls_x509_crl_set_this_update (gnutls_x509_crl_t crl, time_t act_time)
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  return _gnutls_x509_set_time (crl->crl, "tbsCertList.thisUpdate", act_time);
+  return _gnutls_x509_set_time (crl->crl, "tbsCertList.thisUpdate", act_time, 0);
 }
 
 /**
@@ -195,7 +195,7 @@ gnutls_x509_crl_set_next_update (gnutls_x509_crl_t crl, time_t exp_time)
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
     }
-  return _gnutls_x509_set_time (crl->crl, "tbsCertList.nextUpdate", exp_time);
+  return _gnutls_x509_set_time (crl->crl, "tbsCertList.nextUpdate", exp_time, 0);
 }
 
 /**
@@ -244,7 +244,7 @@ gnutls_x509_crl_set_crt_serial (gnutls_x509_crl_t crl,
   ret =
     _gnutls_x509_set_time (crl->crl,
                            "tbsCertList.revokedCertificates.?LAST.revocationDate",
-                           revocation_time);
+                           revocation_time, 0);
   if (ret < 0)
     {
       gnutls_assert ();

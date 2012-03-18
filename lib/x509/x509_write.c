@@ -728,6 +728,78 @@ gnutls_x509_crt_set_proxy (gnutls_x509_crt_t crt,
 }
 
 /**
+ * gnutls_x509_crt_set_private_key_usage_period:
+ * @crt: a certificate of type #gnutls_x509_crt_t
+ * @activation: The activation time
+ * @expiration: The expiration time
+ *
+ * This function will set the private key usage period extension (2.5.29.16).
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_crt_set_private_key_usage_period (gnutls_x509_crt_t crt,
+                                              time_t activation,
+                                              time_t expiration)
+{
+  int result;
+  gnutls_datum_t der_data;
+  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+  if (crt == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  result =
+    asn1_create_element (_gnutls_get_pkix (), "PKIX1.PrivateKeyUsagePeriod", &c2);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  result = _gnutls_x509_set_time (c2,
+                                  "notBefore",
+                                   activation, 1);
+  if (result < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  result = _gnutls_x509_set_time (c2,
+                                  "notAfter",
+                                  expiration, 1);
+  if (result < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  result = _gnutls_x509_der_encode (c2, "", &der_data, 0);
+  if (result < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  result = _gnutls_x509_crt_set_extension (crt, "2.5.29.16",
+                                           &der_data, 0);
+
+  _gnutls_free_datum(&der_data);
+
+  crt->use_extensions = 1;
+
+cleanup:
+  asn1_delete_structure (&c2);
+
+  return result;
+}
+
+/**
  * gnutls_x509_crt_sign2:
  * @crt: a certificate of type #gnutls_x509_crt_t
  * @issuer: is the certificate of the certificate issuer
@@ -828,7 +900,7 @@ gnutls_x509_crt_set_activation_time (gnutls_x509_crt_t cert, time_t act_time)
 
   return _gnutls_x509_set_time (cert->cert,
                                 "tbsCertificate.validity.notBefore",
-                                act_time);
+                                act_time, 0);
 }
 
 /**
@@ -850,7 +922,7 @@ gnutls_x509_crt_set_expiration_time (gnutls_x509_crt_t cert, time_t exp_time)
       return GNUTLS_E_INVALID_REQUEST;
     }
   return _gnutls_x509_set_time (cert->cert,
-                                "tbsCertificate.validity.notAfter", exp_time);
+                                "tbsCertificate.validity.notAfter", exp_time, 0);
 }
 
 /**

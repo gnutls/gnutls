@@ -15,6 +15,10 @@ id-pkix  OBJECT IDENTIFIER  ::=
 
 -- authority key identifier OID and syntax
 
+PrivateKeyUsagePeriod ::= SEQUENCE {
+     notBefore       [0]     GeneralizedTime OPTIONAL,
+     notAfter        [1]     GeneralizedTime OPTIONAL }
+
 AuthorityKeyIdentifier ::= SEQUENCE {
       keyIdentifier             [0] KeyIdentifier            OPTIONAL,
       authorityCertIssuer       [1] GeneralNames             OPTIONAL,

@@ -165,6 +165,71 @@ cleanup:
   return result;
 }
 
+/**
+ * gnutls_x509_crq_get_private_key_usage_period:
+ * @cert: should contain a #gnutls_x509_crq_t structure
+ * @activation: The activation time
+ * @expiration: The expiration time
+ * @critical: the extension status
+ *
+ * This function will return the expiration and activation
+ * times of the private key of the certificate.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, %GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE
+ * if the extension is not present, otherwise a negative error value.
+ **/
+int
+gnutls_x509_crq_get_private_key_usage_period (gnutls_x509_crq_t crq, time_t* activation, time_t* expiration, 
+                                     unsigned int *critical)
+{
+  int result, ret;
+  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+  uint8_t buf[128];
+  size_t buf_size = sizeof (buf);
+
+  if (crq == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  ret = gnutls_x509_crq_get_extension_by_oid (crq, "2.5.29.16", 0,
+                                              buf, &buf_size, critical);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  result = asn1_create_element
+    (_gnutls_get_pkix (), "PKIX1.PrivateKeyUsagePeriod", &c2);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      ret = _gnutls_asn2err (result);
+      goto cleanup;
+    }
+
+  result = asn1_der_decoding (&c2, buf, buf_size, NULL);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      ret = _gnutls_asn2err (result);
+      goto cleanup;
+    }
+
+  if (activation)
+    *activation = _gnutls_x509_get_time (c2,
+                                         "notBefore", 1);
+
+  if (expiration)
+    *expiration = _gnutls_x509_get_time (c2,
+                                         "notAfter", 1);
+
+  ret = 0;
+  
+cleanup:
+  asn1_delete_structure (&c2);
+
+  return ret;
+}
 
 
 /**
@@ -2489,3 +2554,72 @@ cleanup:
   return ret;
 }
 
+/**
+ * gnutls_x509_crq_set_private_key_usage_period:
+ * @crq: a certificate of type #gnutls_x509_crq_t
+ * @activation: The activation time
+ * @expiration: The expiration time
+ *
+ * This function will set the private key usage period extension (2.5.29.16).
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_crq_set_private_key_usage_period (gnutls_x509_crq_t crq,
+                                              time_t activation,
+                                              time_t expiration)
+{
+  int result;
+  gnutls_datum_t der_data;
+  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+  if (crq == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  result =
+    asn1_create_element (_gnutls_get_pkix (), "PKIX1.PrivateKeyUsagePeriod", &c2);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  result = _gnutls_x509_set_time (c2,
+                                  "notBefore",
+                                   activation, 1);
+  if (result < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  result = _gnutls_x509_set_time (c2,
+                                  "notAfter",
+                                  expiration, 1);
+  if (result < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  result = _gnutls_x509_der_encode (c2, "", &der_data, 0);
+  if (result < 0)
+    {
+      gnutls_assert();
+      goto cleanup;
+    }
+
+  result = _gnutls_x509_crq_set_extension (crq, "2.5.29.16",
+                                           &der_data, 0);
+
+  _gnutls_free_datum(&der_data);
+
+cleanup:
+  asn1_delete_structure (&c2);
+
+  return result;
+}

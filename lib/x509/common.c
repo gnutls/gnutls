@@ -486,11 +486,10 @@ mktime_utc (const struct fake_tm *tm)
  * and year is given. Returns a time_t date.
  */
 static time_t
-_gnutls_x509_time2gtime (const char *ttime, int year)
+time2gtime (const char *ttime, int year)
 {
   char xx[4];
   struct fake_tm etime;
-  time_t ret;
 
   if (strlen (ttime) < 8)
     {
@@ -544,9 +543,7 @@ _gnutls_x509_time2gtime (const char *ttime, int year)
   else
     etime.tm_sec = 0;
 
-  ret = mktime_utc (&etime);
-
-  return ret;
+  return mktime_utc (&etime);
 }
 
 
@@ -557,7 +554,7 @@ _gnutls_x509_time2gtime (const char *ttime, int year)
  * (seconds are optional)
  */
 static time_t
-_gnutls_x509_utcTime2gtime (const char *ttime)
+utcTime2gtime (const char *ttime)
 {
   char xx[3];
   int year;
@@ -579,35 +576,7 @@ _gnutls_x509_utcTime2gtime (const char *ttime)
   else
     year += 2000;
 
-  return _gnutls_x509_time2gtime (ttime, year);
-}
-
-/* returns a time value that contains the given time.
- * The given time is expressed as:
- * YEAR(2)|MONTH(2)|DAY(2)|HOUR(2)|MIN(2)|SEC(2)
- */
-static int
-_gnutls_x509_gtime2utcTime (time_t gtime, char *str_time, size_t str_time_size)
-{
-  size_t ret;
-  struct tm _tm;
-
-  if (!gmtime_r (&gtime, &_tm))
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  ret = strftime (str_time, str_time_size, "%y%m%d%H%M%SZ", &_tm);
-  if (!ret)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_SHORT_MEMORY_BUFFER;
-    }
-
-
-  return 0;
-
+  return time2gtime (ttime, year);
 }
 
 /* returns a time_t value that contains the given time.
@@ -641,60 +610,89 @@ _gnutls_x509_generalTime2gtime (const char *ttime)
   year = atoi (xx);
   ttime += 4;
 
-  return _gnutls_x509_time2gtime (ttime, year);
-
+  return time2gtime (ttime, year);
 }
+
+static int
+gtime2generalTime (time_t gtime, char *str_time, size_t str_time_size)
+{
+  size_t ret;
+  struct tm _tm;
+
+  if (!gmtime_r (&gtime, &_tm))
+    {
+      gnutls_assert ();
+      return GNUTLS_E_INTERNAL_ERROR;
+    }
+
+  ret = strftime (str_time, str_time_size, "%Y%m%d%H%M%SZ", &_tm);
+  if (!ret)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_SHORT_MEMORY_BUFFER;
+    }
+
+
+  return 0;
+}
+
 
 /* Extracts the time in time_t from the ASN1_TYPE given. When should
  * be something like "tbsCertList.thisUpdate".
  */
 #define MAX_TIME 64
 time_t
-_gnutls_x509_get_time (ASN1_TYPE c2, const char *when)
+_gnutls_x509_get_time (ASN1_TYPE c2, const char *when, int nochoice)
 {
   char ttime[MAX_TIME];
   char name[128];
   time_t c_time = (time_t) - 1;
   int len, result;
 
-  _gnutls_str_cpy (name, sizeof (name), when);
-
   len = sizeof (ttime) - 1;
-  if ((result = asn1_read_value (c2, name, ttime, &len)) < 0)
-    {
-      gnutls_assert ();
-      return (time_t) (-1);
-    }
-
-  /* CHOICE */
-  if (strcmp (ttime, "generalTime") == 0)
-    {
-
-      _gnutls_str_cat (name, sizeof (name), ".generalTime");
-      len = sizeof (ttime) - 1;
-      result = asn1_read_value (c2, name, ttime, &len);
-      if (result == ASN1_SUCCESS)
-        c_time = _gnutls_x509_generalTime2gtime (ttime);
-    }
-  else
-    {                           /* UTCTIME */
-
-      _gnutls_str_cat (name, sizeof (name), ".utcTime");
-      len = sizeof (ttime) - 1;
-      result = asn1_read_value (c2, name, ttime, &len);
-      if (result == ASN1_SUCCESS)
-        c_time = _gnutls_x509_utcTime2gtime (ttime);
-    }
-
-  /* We cannot handle dates after 2031 in 32 bit machines.
-   * a time_t of 64bits has to be used.
-   */
-
+  result = asn1_read_value (c2, when, ttime, &len);
   if (result != ASN1_SUCCESS)
     {
       gnutls_assert ();
       return (time_t) (-1);
     }
+
+  if (nochoice != 0)
+    {
+      c_time = _gnutls_x509_generalTime2gtime (ttime);
+    }
+  else
+    {
+      _gnutls_str_cpy (name, sizeof (name), when);
+
+      /* CHOICE */
+      if (strcmp (ttime, "generalTime") == 0)
+        {
+          _gnutls_str_cat (name, sizeof (name), ".generalTime");
+          len = sizeof (ttime) - 1;
+          result = asn1_read_value (c2, name, ttime, &len);
+          if (result == ASN1_SUCCESS)
+            c_time = _gnutls_x509_generalTime2gtime (ttime);
+        }
+      else
+        {                           /* UTCTIME */
+          _gnutls_str_cat (name, sizeof (name), ".utcTime");
+          len = sizeof (ttime) - 1;
+          result = asn1_read_value (c2, name, ttime, &len);
+          if (result == ASN1_SUCCESS)
+            c_time = utcTime2gtime (ttime);
+        }
+
+      /* We cannot handle dates after 2031 in 32 bit machines.
+       * a time_t of 64bits has to be used.
+       */
+      if (result != ASN1_SUCCESS)
+        {
+          gnutls_assert ();
+          return (time_t) (-1);
+        }
+    }
+
   return c_time;
 }
 
@@ -702,28 +700,42 @@ _gnutls_x509_get_time (ASN1_TYPE c2, const char *when)
  * be something like "tbsCertList.thisUpdate".
  */
 int
-_gnutls_x509_set_time (ASN1_TYPE c2, const char *where, time_t tim)
+_gnutls_x509_set_time (ASN1_TYPE c2, const char *where, time_t tim, int nochoice)
 {
   char str_time[MAX_TIME];
   char name[128];
   int result, len;
 
+  if (nochoice != 0)
+    {
+      result = gtime2generalTime( tim, str_time, sizeof(str_time));
+      if (result < 0)
+        return gnutls_assert_val(result);
+      
+      len = strlen (str_time);
+      result = asn1_write_value(c2, where, str_time, len);
+      if (result != ASN1_SUCCESS)
+        return gnutls_assert_val(_gnutls_asn2err (result));
+        
+      return 0;
+    }
+
   _gnutls_str_cpy (name, sizeof (name), where);
 
-  if ((result = asn1_write_value (c2, name, "utcTime", 1)) < 0)
+  if ((result = asn1_write_value (c2, name, "generalTime", 1)) < 0)
     {
       gnutls_assert ();
       return _gnutls_asn2err (result);
     }
 
-  result = _gnutls_x509_gtime2utcTime (tim, str_time, sizeof (str_time));
+  result = gtime2generalTime (tim, str_time, sizeof (str_time));
   if (result < 0)
     {
       gnutls_assert ();
       return result;
     }
 
-  _gnutls_str_cat (name, sizeof (name), ".utcTime");
+  _gnutls_str_cat (name, sizeof (name), ".generalTime");
 
   len = strlen (str_time);
   result = asn1_write_value (c2, name, str_time, len);
@@ -985,7 +997,7 @@ cleanup:
 }
 
 /* DER Encodes the src ASN1_TYPE and stores it to
- * the given datum. If str is non null then the data are encoded as
+ * the given datum. If str is non zero then the data are encoded as
  * an OCTET STRING.
  */
 int
