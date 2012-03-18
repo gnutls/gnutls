@@ -15,6 +15,7 @@ as GeneralizedTime instead of UTCTime (which only stores
 gnutls_x509_crt_set_private_key_usage_period: Added
 gnutls_x509_crt_get_private_key_usage_period: Added
 gnutls_x509_crq_set_private_key_usage_period: Added
+gnutls_x509_crq_get_private_key_usage_period: Added
 
 * Version 3.0.17 (released 2012-03-17)
 
