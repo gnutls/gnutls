@@ -5,7 +5,7 @@ CRYPTOGAMS licenses depending on where you obtain it. For further
 details see http://www.openssl.org/~appro/cryptogams/.
 ====================================================================
 
-Copyright (c) 2006, CRYPTOGAMS by <appro@openssl.org>
+Copyright (c) 2006-2012, CRYPTOGAMS by <appro@openssl.org>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

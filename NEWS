@@ -7,6 +7,8 @@ See the end for copying conditions.
 ** certtool: Avoid a Y2K38 bug when generating certificates.
 Patch by Robert Millan.
 
+** libgnutls: Updated assembler files.
+
 ** libgnutls: Time in generated certificates is stored
 as GeneralizedTime instead of UTCTime (which only stores
 2 digits of a year).
