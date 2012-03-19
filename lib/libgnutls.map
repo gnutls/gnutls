@@ -785,6 +785,7 @@ GNUTLS_3_0_0 {
 	gnutls_x509_crq_get_private_key_usage_period;
 	gnutls_x509_crt_set_private_key_usage_period;
 	gnutls_x509_crq_set_private_key_usage_period;
+	gnutls_session_get_random;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

@@ -25,8 +25,24 @@ functionality as described in @ref{Asynchronous operation}.
 
 @heading Upgrading to 3.0.x from previous versions
 
-GnuTLS 3.0.x is source compatible with previous versions but discarded the function
-@funcintref{gnutls_transport_set_lowat}.
-The function @funcref{gnutls_record_check_pending} has to be used to achieve 
-the same functionality as described in @ref{Asynchronous operation}.
+GnuTLS 3.0.x is source compatible with previous versions but discarded the functions
+@funcintref{gnutls_transport_set_lowat}, @funcintref{gnutls_session_get_client_random},
+@funcintref{gnutls_session_get_server_random}, @funcintref{gnutls_session_get_master_secret}.
+
+@multitable @columnfractions .30 .60
+@headitem Old function @tab Replacement
+
+@item @funcintref{gnutls_transport_set_lowat} @tab
+To replace its functionality the function @funcref{gnutls_record_check_pending} has to be used,
+as described in @ref{Asynchronous operation}
+
+@item @funcintref{gnutls_session_get_server_random},
+@funcintref{gnutls_session_get_client_random} 
+@tab 
+They are replaced by the safer function @ref{gnutls_session_get_random}
+
+@item @funcintref{gnutls_session_get_master_secret} 
+@tab Replaced by the keying material exporters discussed in @ref{Keying Material Exporters}
+
+@end multitable
 

@@ -960,6 +960,8 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                size_t * session_data_size);
   int gnutls_session_get_data2 (gnutls_session_t session,
                                 gnutls_datum_t * data);
+  void gnutls_session_get_random (gnutls_session_t session, gnutls_datum_t* client, 
+                                  gnutls_datum_t* server);
 
 /* returns the session ID */
 #define GNUTLS_MAX_SESSION_ID 32

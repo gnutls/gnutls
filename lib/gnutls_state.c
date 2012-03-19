@@ -1431,3 +1431,34 @@ gnutls_protocol_get_version (gnutls_session_t session)
 {
   return _gnutls_protocol_get_version(session);
 }
+
+/**
+ * gnutls_session_get_random:
+ * @session: is a #gnutls_session_t structure.
+ * @client: the client part of the random
+ * @server: the server part of the random
+ *
+ * This functions returns pointers to the client and server
+ * random fields used in the TLS handshake. The pointers are
+ * not to be modified or deallocated.
+ *
+ * If a client random value has not yet been established, the output
+ * will be garbage.
+ *
+ * Since: 3.0
+ **/
+void
+gnutls_session_get_random (gnutls_session_t session, gnutls_datum_t* client, gnutls_datum_t* server)
+{
+  if (client)
+    {
+      client->data = session->security_parameters.client_random;
+      client->size = sizeof(session->security_parameters.client_random);
+    }
+
+  if (server)
+    {
+      server->data = session->security_parameters.server_random;
+      server->size = sizeof(session->security_parameters.server_random);
+    }
+}

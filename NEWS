@@ -16,6 +16,8 @@ gnutls_x509_crt_set_private_key_usage_period: Added
 gnutls_x509_crt_get_private_key_usage_period: Added
 gnutls_x509_crq_set_private_key_usage_period: Added
 gnutls_x509_crq_get_private_key_usage_period: Added
+gnutls_session_get_random: Added
+
 
 * Version 3.0.17 (released 2012-03-17)
 
