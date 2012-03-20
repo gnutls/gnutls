@@ -282,7 +282,7 @@ register_padlock_crypto (void)
 #ifdef HAVE_LIBNETTLE
   phe = check_phe ();
 
-  if (check_phe_partial () && phe)
+  if (phe && check_phe_partial ())
     {
       _gnutls_debug_log ("Padlock SHA1 and SHA256 (partial) accelerator was detected\n");
       if (check_phe_sha512 ())

@@ -7,6 +7,9 @@ See the end for copying conditions.
 ** certtool: Avoid a Y2K38 bug when generating certificates.
 Patch by Robert Millan.
 
+** libgnutls: Corrected VIA padlock detection for old 
+VIA processors.
+
 ** libgnutls: Updated assembler files.
 
 ** libgnutls: Time in generated certificates is stored
