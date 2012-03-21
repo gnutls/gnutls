@@ -312,7 +312,7 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
 
 #ifdef _ISOC99_SOURCE
 /* we provide older functions for compatibility as inline functions that
- * depend on gnutls_session_get_random(). */
+ * depend on gnutls_session_get_random. */
  
 static inline const void *gnutls_session_get_server_random (gnutls_session_t session) _GNUTLS_GCC_ATTR_DEPRECATED
 {
