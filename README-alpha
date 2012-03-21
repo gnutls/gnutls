@@ -46,9 +46,12 @@ To download the version controlled sources:
 $ git clone git://git.savannah.gnu.org/gnutls.git
 $ cd gnutls
 
-The next step is to run autoreconf, ./configure, etc:
+The next step is to run autoreconf (etc) and then ./configure:
 
 $ make bootstrap
+
+When built this way, some developer defaults will be enabled.  See
+cfg.mk for details.
 
 Then build the project normally:
 
