@@ -594,3 +594,5 @@ tests/mini-record
 tests/srp/mini-srp
 doc/stamp_functions
 doc/latex/cha-upgrade.tex
+doc/functions/
+gl/glthread/.dirstamp
