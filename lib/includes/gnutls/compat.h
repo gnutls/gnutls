@@ -317,14 +317,14 @@ gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
 static inline const void *gnutls_session_get_server_random (gnutls_session_t session) _GNUTLS_GCC_ATTR_DEPRECATED
 {
   gnutls_datum_t rnd;
-  gnutls_session_get_random(session, NULL, &rnd);
+  gnutls_session_get_random(session, NULL, &rnd);/*doc-skip*/
   return rnd.data;
 }
 
 static inline const void *gnutls_session_get_client_random (gnutls_session_t session) _GNUTLS_GCC_ATTR_DEPRECATED
 {
   gnutls_datum_t rnd;
-  gnutls_session_get_random(session, &rnd, NULL);
+  gnutls_session_get_random(session, &rnd, NULL);/*doc-skip*/
   return rnd.data;
 }
 #endif

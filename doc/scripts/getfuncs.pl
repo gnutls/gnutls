@@ -27,8 +27,9 @@ my $func;
 
 while ($line=<STDIN>) {
 
-  if ($line !~ m/typedef/ && $line !~ m/Copyright/) {
+  if ($line !~ m/typedef/ && $line !~ m/Copyright/ && $line !~ m/doc-skip/) {
     $func = '';
+    
     if ($line =~ m/^\s*\w+[\s\*]+([A-Za-z0-9_]+)\s*\([^\)]+/) {
         $func = $1;
     }
