@@ -298,8 +298,8 @@ EXTRA_DIST += test-fread.c signature.h macros.h
 
 TESTS += test-frexp-nolibm
 check_PROGRAMS += test-frexp-nolibm
-test_frexp_nolibm_SOURCES = test-frexp.c
-EXTRA_DIST += test-frexp.c minus-zero.h infinity.h nan.h signature.h macros.h
+test_frexp_nolibm_SOURCES = test-frexp.c randomd.c
+EXTRA_DIST += test-frexp.c test-frexp.h minus-zero.h infinity.h nan.h signature.h macros.h randomd.c
 
 ## end   gnulib module frexp-nolibm-tests
 
@@ -307,8 +307,8 @@ EXTRA_DIST += test-frexp.c minus-zero.h infinity.h nan.h signature.h macros.h
 
 TESTS += test-frexpl-nolibm
 check_PROGRAMS += test-frexpl-nolibm
-test_frexpl_nolibm_SOURCES = test-frexpl.c
-EXTRA_DIST += test-frexpl.c minus-zero.h infinity.h nan.h signature.h macros.h
+test_frexpl_nolibm_SOURCES = test-frexpl.c randoml.c
+EXTRA_DIST += test-frexpl.c test-frexp.h minus-zero.h infinity.h nan.h signature.h macros.h randoml.c
 
 ## end   gnulib module frexpl-nolibm-tests
 
@@ -675,7 +675,7 @@ EXTRA_DIST += test-malloca.c
 
 TESTS += test-math
 check_PROGRAMS += test-math
-EXTRA_DIST += test-math.c
+EXTRA_DIST += test-math.c macros.h
 
 ## end   gnulib module math-tests
 
@@ -1275,14 +1275,6 @@ EXTRA_DIST += init.sh
 EXTRA_DIST += test-init.sh
 
 ## end   gnulib module test-framework-sh-tests
-
-## begin gnulib module threadlib
-
-libtests_a_SOURCES += glthread/threadlib.c
-
-EXTRA_DIST += $(top_srcdir)/build-aux/config.rpath
-
-## end   gnulib module threadlib
 
 ## begin gnulib module time-tests
 

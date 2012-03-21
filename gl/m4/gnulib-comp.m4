@@ -38,6 +38,7 @@ AC_DEFUN([gl_EARLY],
   m4_pattern_allow([^gl_LIBOBJS$])dnl a variable
   m4_pattern_allow([^gl_LTLIBOBJS$])dnl a variable
   AC_REQUIRE([gl_PROG_AR_RANLIB])
+  AC_REQUIRE([AM_PROG_CC_C_O])
   # Code from module accept:
   # Code from module accept-tests:
   # Code from module alloca:
@@ -807,6 +808,7 @@ AC_PROG_MKDIR_P
 gl_HEADER_SYS_UIO
 AC_PROG_MKDIR_P
 gl_SYSEXITS
+gl_THREADLIB
 gl_HEADER_TIME_H
 gl_TIME_R
 if test $HAVE_LOCALTIME_R = 0 || test $REPLACE_LOCALTIME_R = 1; then
@@ -1004,7 +1006,6 @@ gl_UNISTD_MODULE_INDICATOR([symlink])
 gl_SYS_IOCTL_H
 AC_PROG_MKDIR_P
 AC_CHECK_FUNCS_ONCE([shutdown])
-gl_THREADLIB
 gl_FUNC_UNSETENV
 if test $HAVE_UNSETENV = 0 || test $REPLACE_UNSETENV = 1; then
   AC_LIBOBJ([unsetenv])
@@ -1186,6 +1187,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/gettext.h
   lib/gettime.c
   lib/gettimeofday.c
+  lib/glthread/threadlib.c
   lib/inet_ntop.c
   lib/inet_pton.c
   lib/intprops.h
@@ -1480,6 +1482,8 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/macros.h
   tests/minus-zero.h
   tests/nan.h
+  tests/randomd.c
+  tests/randoml.c
   tests/signature.h
   tests/test-accept.c
   tests/test-alloca-opt.c
@@ -1506,6 +1510,7 @@ AC_DEFUN([gl_FILE_LIST], [
   tests/test-fputc.c
   tests/test-fread.c
   tests/test-frexp.c
+  tests/test-frexp.h
   tests/test-frexpl.c
   tests/test-fseek.c
   tests/test-fseek.sh
@@ -1649,7 +1654,6 @@ AC_DEFUN([gl_FILE_LIST], [
   tests=lib/getpagesize.c
   tests=lib/glthread/lock.c
   tests=lib/glthread/lock.h
-  tests=lib/glthread/threadlib.c
   tests=lib/ignore-value.h
   tests=lib/inttypes.in.h
   tests=lib/ioctl.c
