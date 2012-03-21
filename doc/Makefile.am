@@ -122,6 +122,8 @@ gnutls_TEXINFOS += invoke-gnutls-cli.texi invoke-gnutls-cli-debug.texi \
 	invoke-gnutls-serv.texi invoke-certtool.texi invoke-srptool.texi \
 	invoke-ocsptool.texi invoke-psktool.texi invoke-p11tool.texi
 
+gnutls_TEXINFOS += stamp_functions
+
 # Examples.
 gnutls_TEXINFOS += examples/ex-client-anon.c				\
 	examples/ex-session-info.c examples/ex-verify.c			\
