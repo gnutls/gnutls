@@ -7,6 +7,8 @@ See the end for copying conditions.
 ** certtool: Avoid a Y2K38 bug when generating certificates.
 Patch by Robert Millan.
 
+** libgnutls: Fixes for W64 API. Patch by B. Scott Michel.
+
 ** libgnutls: Corrected VIA padlock detection for old 
 VIA processors. Reported by Kris Karas.
 

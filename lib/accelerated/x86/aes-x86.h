@@ -7,7 +7,7 @@ void register_x86_crypto (void);
 void register_padlock_crypto(void);
 
 #define ALIGN16(x) \
-        ((void *)(((unsigned long)(x)+0x0f)&~(0x0f)))
+        ((void *)(((ptrdiff_t)(x)+(ptrdiff_t)0x0f)&~((ptrdiff_t)0x0f)))
 
 #define AES_KEY_ALIGN_SIZE 4
 #define AES_MAXNR 14
