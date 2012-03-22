@@ -140,6 +140,9 @@ extern tOptions genshelloptOptions;
 
 #if defined(ENABLE_NLS)
 # ifndef _
+#   if defined(HAVE_GETTEXT)
+#     include <libintl.h>
+#   endif
 #   include <stdio.h>
 static inline char* aoGetsText(char const* pz) {
     if (pz == NULL) return NULL;
