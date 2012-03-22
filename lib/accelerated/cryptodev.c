@@ -427,8 +427,8 @@ register_mac_digest (int cfd)
         continue;
 
       sess.mac = gnutls_mac_map[i];
-      sess.keylen = 8;
-      sess.key = fake_key;
+      sess.mackeylen = 8;
+      sess.mackey = fake_key;
 
       if (ioctl (cfd, CIOCGSESSION, &sess))
         {
