@@ -224,17 +224,13 @@ fi
   AC_CHECK_SIZEOF(long long)
   AC_CHECK_SIZEOF(long)
   AC_CHECK_SIZEOF(int)
-  case $ac_cv_sizeof_void_p in
-    $ac_cv_sizeof_long_long)
-      AC_DEFINE([GNUTLS_POINTER_TO_INT_CAST], [(long long)],
-                [Additional cast to bring void* to a type castable to int.])
-      ;;
-    $ac_cv_sizeof_long)
+  if test x$ac_cv_sizeof_void_p = x$ac_cv_sizeof_long;then
       AC_DEFINE([GNUTLS_POINTER_TO_INT_CAST], [(long)],
                 [Additional cast to bring void* to a type castable to int.])
-      ;;
-    *)
+  elif test x$ac_cv_sizeof_void_p = x$ac_cv_sizeof_long_long;then
+      AC_DEFINE([GNUTLS_POINTER_TO_INT_CAST], [(long long)],
+                [Additional cast to bring void* to a type castable to int.])
+   else
       AC_DEFINE([GNUTLS_POINTER_TO_INT_CAST], [])
-      ;;
-  esac
+   fi
 ])
