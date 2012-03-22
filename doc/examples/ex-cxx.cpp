@@ -51,7 +51,7 @@ int main(void)
         /* connect to the peer
          */
         sd = tcp_connect();
-        session.set_transport_ptr((gnutls_transport_ptr_t) sd);
+        session.set_transport_ptr((gnutls_transport_ptr_t) (ptrdiff_t)sd);
 
         /* Perform the TLS handshake
          */
