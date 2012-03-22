@@ -8,7 +8,7 @@ See the end for copying conditions.
 Patch by Robert Millan.
 
 ** libgnutls: Corrected VIA padlock detection for old 
-VIA processors.
+VIA processors. Reported by Kris Karas.
 
 ** libgnutls: Updated assembler files.
 
