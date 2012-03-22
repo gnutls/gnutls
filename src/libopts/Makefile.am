@@ -6,7 +6,7 @@ else
 noinst_LTLIBRARIES      = libopts.la
 endif
 libopts_la_SOURCES      = libopts.c
-libopts_la_CPPFLAGS     = -I$(top_srcdir)
+libopts_la_CPPFLAGS     = -I$(top_srcdir) -I$(top_srcdir)/gl
 libopts_la_LDFLAGS      = -version-info  36:3:11
 EXTRA_DIST              = \
     ag-char-map.h           alias.c                 ao-strs.c  \
