@@ -2,11 +2,11 @@
 GNUTLS_FILE:=gnutls-3.0.17.tar.xz
 GNUTLS_DIR:=gnutls-3.0.17
 
-GMP_FILE:=gmp-5.0.2.tar.bz2
-GMP_DIR:=gmp-5.0.2
+GMP_FILE:=gmp-5.0.4.tar.bz2
+GMP_DIR:=gmp-5.0.4
 
-P11_KIT_FILE:=p11-kit-0.11.tar.gz
-P11_KIT_DIR:=p11-kit-0.11
+P11_KIT_FILE:=p11-kit-0.12.tar.gz
+P11_KIT_DIR:=p11-kit-0.12
 
 NETTLE_FILE:=nettle-2.4.tar.gz
 NETTLE_DIR:=nettle-2.4
