@@ -120,7 +120,7 @@ literal_decode (void *data, FILE * in, FILE * out)
   while (!feof (in))
     {
       _cdk_log_debug ("literal_decode: part on %d size %lu\n",
-                      (int) pfx->blkmode.on, pfx->blkmode.size);
+                      (int) pfx->blkmode.on, (unsigned long)pfx->blkmode.size);
       if (pfx->blkmode.on)
         bufsize = pfx->blkmode.size;
       else

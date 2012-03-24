@@ -117,7 +117,7 @@ keydb_idx_build (const char *file)
       rc = cdk_pkt_read (inp, pkt);
       if (rc)
         {
-          _cdk_log_debug ("index build failed packet off=%lu\n", pos);
+          _cdk_log_debug ("index build failed packet off=%lu\n", (unsigned long)pos);
           /* FIXME: The index is incomplete */
           break;
         }
