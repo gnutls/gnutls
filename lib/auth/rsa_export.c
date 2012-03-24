@@ -50,8 +50,8 @@ static int proc_rsa_export_client_kx (gnutls_session_t session, uint8_t * data,
 
 const mod_auth_st rsa_export_auth_struct = {
   "RSA EXPORT",
-  _gnutls_gen_cert_server_certificate,
-  _gnutls_gen_cert_client_certificate,
+  _gnutls_gen_cert_server_crt,
+  _gnutls_gen_cert_client_crt,
   gen_rsa_export_server_kx,
   _gnutls_gen_rsa_client_kx,
   _gnutls_gen_cert_client_cert_vrfy,    /* gen client cert vrfy */

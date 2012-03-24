@@ -46,8 +46,8 @@ static int proc_rsa_client_kx (gnutls_session_t, uint8_t *, size_t);
 
 const mod_auth_st rsa_auth_struct = {
   "RSA",
-  _gnutls_gen_cert_server_certificate,
-  _gnutls_gen_cert_client_certificate,
+  _gnutls_gen_cert_server_crt,
+  _gnutls_gen_cert_client_crt,
   NULL,                         /* gen server kx */
   _gnutls_gen_rsa_client_kx,
   _gnutls_gen_cert_client_cert_vrfy,    /* gen client cert vrfy */
