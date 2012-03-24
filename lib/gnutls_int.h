@@ -396,7 +396,7 @@ struct gnutls_key_st
 
   auth_cred_st *cred;           /* used to specify keys/certificates etc */
 
-  int certificate_requested;
+  int crt_requested;
   /* some ciphersuites use this
    * to provide client authentication.
    * 1 if client auth was requested

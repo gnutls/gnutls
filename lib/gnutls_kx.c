@@ -204,13 +204,13 @@ cleanup:
  * client.
  */
 int
-_gnutls_send_server_certificate_request (gnutls_session_t session, int again)
+_gnutls_send_server_crt_request (gnutls_session_t session, int again)
 {
   gnutls_buffer_st data;
   int ret = 0;
 
   if (session->internals.
-      auth_struct->gnutls_generate_server_certificate_request == NULL)
+      auth_struct->gnutls_generate_server_crt_request == NULL)
     return 0;
 
   if (session->internals.send_cert_req <= 0)
@@ -222,7 +222,7 @@ _gnutls_send_server_certificate_request (gnutls_session_t session, int again)
     {
       ret =
         session->internals.
-        auth_struct->gnutls_generate_server_certificate_request (session,
+        auth_struct->gnutls_generate_server_crt_request (session,
                                                                  &data);
 
       if (ret < 0)
@@ -299,15 +299,15 @@ _gnutls_send_client_certificate_verify (gnutls_session_t session, int again)
 
   /* if certificate verify is not needed just exit 
    */
-  if (session->key->certificate_requested == 0)
+  if (session->key->crt_requested == 0)
     return 0;
 
 
-  if (session->internals.auth_struct->gnutls_generate_client_cert_vrfy ==
+  if (session->internals.auth_struct->gnutls_generate_client_crt_vrfy ==
       NULL)
     {
       gnutls_assert ();
-      return 0;                 /* this algorithm does not support cli_cert_vrfy 
+      return 0;                 /* this algorithm does not support cli_crt_vrfy 
                                  */
     }
 
@@ -317,7 +317,7 @@ _gnutls_send_client_certificate_verify (gnutls_session_t session, int again)
     {
       ret =
         session->internals.
-        auth_struct->gnutls_generate_client_cert_vrfy (session, &data);
+        auth_struct->gnutls_generate_client_crt_vrfy (session, &data);
       if (ret < 0)
         {
           gnutls_assert();
@@ -350,7 +350,7 @@ _gnutls_send_client_certificate (gnutls_session_t session, int again)
   int ret = 0;
 
 
-  if (session->key->certificate_requested == 0)
+  if (session->key->crt_requested == 0)
     return 0;
 
   if (session->internals.auth_struct->gnutls_generate_client_certificate ==
@@ -493,13 +493,13 @@ _gnutls_recv_server_kx_message (gnutls_session_t session)
 }
 
 int
-_gnutls_recv_server_certificate_request (gnutls_session_t session)
+_gnutls_recv_server_crt_request (gnutls_session_t session)
 {
   gnutls_buffer_st buf;
   int ret = 0;
 
   if (session->internals.
-      auth_struct->gnutls_process_server_certificate_request != NULL)
+      auth_struct->gnutls_process_server_crt_request != NULL)
     {
 
       ret =
@@ -517,7 +517,7 @@ _gnutls_recv_server_certificate_request (gnutls_session_t session)
 
       ret =
         session->internals.
-        auth_struct->gnutls_process_server_certificate_request (session, buf.data,
+        auth_struct->gnutls_process_server_crt_request (session, buf.data,
                                                                 buf.length);
       _gnutls_buffer_clear (&buf);
       if (ret < 0)
@@ -644,7 +644,7 @@ _gnutls_recv_client_certificate (gnutls_session_t session)
   if (ret == GNUTLS_E_NO_CERTIFICATE_FOUND && optional != 0)
     ret = 0;
   else
-    session->key->certificate_requested = 1;
+    session->key->crt_requested = 1;
 
 cleanup:
   _gnutls_buffer_clear(&buf);
@@ -697,11 +697,11 @@ _gnutls_recv_client_certificate_verify_message (gnutls_session_t session)
   int ret = 0;
 
 
-  if (session->internals.auth_struct->gnutls_process_client_cert_vrfy == NULL)
+  if (session->internals.auth_struct->gnutls_process_client_crt_vrfy == NULL)
     return 0;
 
   if (session->internals.send_cert_req == 0 ||
-      session->key->certificate_requested == 0)
+      session->key->crt_requested == 0)
     {
       return 0;
     }
@@ -724,7 +724,7 @@ _gnutls_recv_client_certificate_verify_message (gnutls_session_t session)
 
   ret =
     session->internals.
-    auth_struct->gnutls_process_client_cert_vrfy (session, buf.data,
+    auth_struct->gnutls_process_client_crt_vrfy (session, buf.data,
                                                   buf.length);
 
 cleanup:

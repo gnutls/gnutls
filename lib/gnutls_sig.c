@@ -434,10 +434,10 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_pcert_st* cert,
 /* Client certificate verify calculations
  */
 
-/* this is _gnutls_handshake_verify_cert_vrfy for TLS 1.2
+/* this is _gnutls_handshake_verify_crt_vrfy for TLS 1.2
  */
 static int
-_gnutls_handshake_verify_cert_vrfy12 (gnutls_session_t session,
+_gnutls_handshake_verify_crt_vrfy12 (gnutls_session_t session,
                                       gnutls_pcert_st*  cert,
                                       gnutls_datum_t * signature,
                                       gnutls_sign_algorithm_t sign_algo)
@@ -480,7 +480,7 @@ _gnutls_handshake_verify_cert_vrfy12 (gnutls_session_t session,
  * verify message). 
  */
 int
-_gnutls_handshake_verify_cert_vrfy (gnutls_session_t session,
+_gnutls_handshake_verify_crt_vrfy (gnutls_session_t session,
                                     gnutls_pcert_st *cert,
                                     gnutls_datum_t * signature,
                                     gnutls_sign_algorithm_t sign_algo)
@@ -497,7 +497,7 @@ _gnutls_handshake_verify_cert_vrfy (gnutls_session_t session,
 
 
   if (_gnutls_version_has_selectable_sighash(ver))
-    return _gnutls_handshake_verify_cert_vrfy12 (session, cert, signature,
+    return _gnutls_handshake_verify_crt_vrfy12 (session, cert, signature,
                                                  sign_algo);
 
   ret =
@@ -571,10 +571,10 @@ _gnutls_handshake_verify_cert_vrfy (gnutls_session_t session,
 
 }
 
-/* the same as _gnutls_handshake_sign_cert_vrfy except that it is made for TLS 1.2
+/* the same as _gnutls_handshake_sign_crt_vrfy except that it is made for TLS 1.2
  */
 static int
-_gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
+_gnutls_handshake_sign_crt_vrfy12 (gnutls_session_t session,
                                     gnutls_pcert_st* cert, gnutls_privkey_t pkey,
                                     gnutls_datum_t * signature)
 {
@@ -627,7 +627,7 @@ _gnutls_handshake_sign_cert_vrfy12 (gnutls_session_t session,
  * For TLS1.2 returns the signature algorithm used on success, or a negative error code;
  */
 int
-_gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
+_gnutls_handshake_sign_crt_vrfy (gnutls_session_t session,
                                   gnutls_pcert_st* cert, gnutls_privkey_t pkey,
                                   gnutls_datum_t * signature)
 {
@@ -640,7 +640,7 @@ _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
   gnutls_pk_algorithm_t pk = gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL);
 
   if (_gnutls_version_has_selectable_sighash(ver))
-    return _gnutls_handshake_sign_cert_vrfy12 (session, cert, pkey,
+    return _gnutls_handshake_sign_crt_vrfy12 (session, cert, pkey,
                                                  signature);
 
   ret =

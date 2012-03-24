@@ -1572,7 +1572,7 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, uint8_t * data,
   /* We should reply with a certificate message, 
    * even if we have no certificate to send.
    */
-  session->key->certificate_requested = 1;
+  session->key->crt_requested = 1;
 
   return 0;
 }

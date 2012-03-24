@@ -25,7 +25,7 @@
 
 #include <gnutls/abstract.h>
 
-int _gnutls_handshake_sign_cert_vrfy (gnutls_session_t session,
+int _gnutls_handshake_sign_crt_vrfy (gnutls_session_t session,
                                       gnutls_pcert_st* cert,
                                       gnutls_privkey_t pkey,
                                       gnutls_datum_t * signature);
@@ -37,7 +37,7 @@ int _gnutls_handshake_sign_data (gnutls_session_t session,
                                  gnutls_datum_t * signature,
                                  gnutls_sign_algorithm_t * algo);
 
-int _gnutls_handshake_verify_cert_vrfy (gnutls_session_t session,
+int _gnutls_handshake_verify_crt_vrfy (gnutls_session_t session,
                                         gnutls_pcert_st* cert,
                                         gnutls_datum_t * signature,
                                         gnutls_sign_algorithm_t);

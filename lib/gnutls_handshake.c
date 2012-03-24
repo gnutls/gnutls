@@ -2510,7 +2510,7 @@ _gnutls_handshake_client (gnutls_session_t session)
        */
 
       if (session->internals.resumed == RESUME_FALSE)   /* if we are not resuming */
-        ret = _gnutls_recv_server_certificate_request (session);
+        ret = _gnutls_recv_server_crt_request (session);
       STATE = STATE5;
       IMED_RET ("recv server certificate request message", ret, 1);
 
@@ -2794,7 +2794,7 @@ _gnutls_handshake_server (gnutls_session_t session)
       /* Send certificate request - if requested to */
       if (session->internals.resumed == RESUME_FALSE)
         ret =
-          _gnutls_send_server_certificate_request (session, AGAIN (STATE5));
+          _gnutls_send_server_crt_request (session, AGAIN (STATE5));
       STATE = STATE5;
       IMED_RET ("send server cert request", ret, 0);
 
