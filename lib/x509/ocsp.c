@@ -1771,7 +1771,7 @@ gnutls_ocsp_resp_get_certs (gnutls_ocsp_resp_t resp,
     {
       char name[ASN1_MAX_NAME_SIZE];
 
-      snprintf (name, sizeof (name), "certs.?%lu", ctr + 1);
+      snprintf (name, sizeof (name), "certs.?%u", (unsigned int)(ctr + 1));
       ret = _gnutls_x509_der_encode (resp->basicresp, name, &c, 0);
       if (ret == GNUTLS_E_ASN1_ELEMENT_NOT_FOUND)
 	break;
