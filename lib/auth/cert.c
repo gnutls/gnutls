@@ -791,9 +791,8 @@ cleanup:
 
 }
 
-/* Generate client certificate
+/* Generate certificate message
  */
-
 static int
 _gnutls_gen_x509_crt (gnutls_session_t session, gnutls_buffer_st * data)
 {
@@ -1408,7 +1407,7 @@ cleanup:
 #endif
 
 int
-_gnutls_proc_certificate (gnutls_session_t session,
+_gnutls_proc_crt (gnutls_session_t session,
                                       uint8_t * data, size_t data_size)
 {
   int ret;
@@ -1579,7 +1578,7 @@ _gnutls_proc_cert_cert_req (gnutls_session_t session, uint8_t * data,
 }
 
 int
-_gnutls_gen_cert_client_cert_vrfy (gnutls_session_t session,
+_gnutls_gen_cert_client_crt_vrfy (gnutls_session_t session,
                                    gnutls_buffer_st * data)
 {
   int ret;
@@ -1603,7 +1602,7 @@ _gnutls_gen_cert_client_cert_vrfy (gnutls_session_t session,
   if (apr_cert_list_length > 0)
     {
       if ((ret =
-           _gnutls_handshake_sign_cert_vrfy (session,
+           _gnutls_handshake_sign_crt_vrfy (session,
                                              &apr_cert_list[0],
                                              apr_pkey, &signature)) < 0)
         {
@@ -1661,7 +1660,7 @@ cleanup:
 }
 
 int
-_gnutls_proc_cert_client_cert_vrfy (gnutls_session_t session,
+_gnutls_proc_cert_client_crt_vrfy (gnutls_session_t session,
                                     uint8_t * data, size_t data_size)
 {
   int size, ret;
@@ -1724,7 +1723,7 @@ _gnutls_proc_cert_client_cert_vrfy (gnutls_session_t session,
     }
 
   if ((ret =
-       _gnutls_handshake_verify_cert_vrfy (session, &peer_cert, &sig,
+       _gnutls_handshake_verify_crt_vrfy (session, &peer_cert, &sig,
                                            sign_algo)) < 0)
     {
       gnutls_assert ();

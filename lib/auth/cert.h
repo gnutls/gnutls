@@ -124,11 +124,11 @@ void _gnutls_free_rsa_info (rsa_info_st * rsa);
 /* AUTH X509 functions */
 int _gnutls_gen_cert_server_crt (gnutls_session_t, gnutls_buffer_st *);
 int _gnutls_gen_cert_client_crt (gnutls_session_t, gnutls_buffer_st *);
-int _gnutls_gen_cert_client_cert_vrfy (gnutls_session_t, gnutls_buffer_st *);
+int _gnutls_gen_cert_client_crt_vrfy (gnutls_session_t, gnutls_buffer_st *);
 int _gnutls_gen_cert_server_cert_req (gnutls_session_t, gnutls_buffer_st *);
 int _gnutls_proc_cert_cert_req (gnutls_session_t, uint8_t *, size_t);
-int _gnutls_proc_cert_client_cert_vrfy (gnutls_session_t, uint8_t *, size_t);
-int _gnutls_proc_certificate (gnutls_session_t, uint8_t *, size_t);
+int _gnutls_proc_cert_client_crt_vrfy (gnutls_session_t, uint8_t *, size_t);
+int _gnutls_proc_crt (gnutls_session_t, uint8_t *, size_t);
 int _gnutls_get_selected_cert (gnutls_session_t session,
                                gnutls_pcert_st ** apr_cert_list,
                                int *apr_cert_list_length,
