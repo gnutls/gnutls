@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
- * Author: Simon Josefsson
+ * Author: Nikos Mavrogiannopoulos
  *
  * This file is part of GnuTLS.
  *
@@ -38,6 +38,15 @@
 #endif
 #include <unistd.h>
 #include <gnutls/gnutls.h>
+
+#if defined(_WIN32)
+
+int main()
+{
+  exit(77);
+}
+
+#else
 
 #include "tcp.c"
 
@@ -665,3 +674,5 @@ wrap_db_delete (void *dbf, gnutls_datum_t key)
   return -1;
 
 }
+
+#endif /* WIN32 */

@@ -253,6 +253,8 @@ doit ()
   gnutls_global_deinit ();
 }
 #else
+#include <stdlib.h>
+
 void
 doit ()
 {

@@ -33,6 +33,16 @@
 
 #include "utils.h"
 
+static time_t mytime (time_t * t)
+{
+  time_t then = 1332548220;
+
+  if (t)
+    *t = then;
+
+  return then;
+}
+
 /* sample request */
 
 static void
@@ -1449,8 +1459,10 @@ doit (void)
       exit (1);
     }
 
+  gnutls_global_set_time_function (mytime);
   gnutls_global_set_log_function (tls_log_func);
-  gnutls_global_set_log_level (0);
+  if (debug)
+    gnutls_global_set_log_level (99);
 
   ocsp_invalid_calls ();
   req_parse ();
