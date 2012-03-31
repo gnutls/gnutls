@@ -357,7 +357,7 @@ enums.texi: $(HEADER_FILES)
 	done
 	mv -f $@-tmp $@
 
-gnutls_TEXINFOS += $(ENUMS)
+gnutls_TEXINFOS += $(ENUMS) $(FUNCS)
 DISTCLEANFILES += $(ENUMS) stamp_enums stamp_functions
 
 stamp_enums: enums.texi
