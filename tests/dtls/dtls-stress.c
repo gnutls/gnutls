@@ -96,6 +96,8 @@
 #include <time.h>
 #include <sys/wait.h>
 
+#if _POSIX_TIMERS && (_POSIX_TIMERS - 200112L) >= 0
+
 // {{{ types
 
 typedef struct {
@@ -1141,3 +1143,12 @@ int main(int argc, const char* argv[])
 }
 
 // vim: foldmethod=marker
+
+#else /* NO POSIX TIMERS */
+
+int main(int argc, const char* argv[])
+{
+  exit(77);
+}
+
+#endif
