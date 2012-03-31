@@ -329,8 +329,9 @@ static void start (const char* prio)
 
 static void ch_handler(int sig)
 {
-int status;
-  wait(&status);
+int status = 0;
+
+  waitpid(-1, &status, 0);
   if (WEXITSTATUS(status) != 0 ||
       (WIFSIGNALED(status) && WTERMSIG(status) == SIGSEGV))
     {
