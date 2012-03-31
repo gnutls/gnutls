@@ -383,7 +383,7 @@ static void start (int server_initiated)
     {
       int status;
       /* parent */
-      close(fd[1]);
+
       server (fd[0], server_initiated);
       wait (&status);
       if (WEXITSTATUS(status) != 0)
