@@ -7,6 +7,9 @@ See the end for copying conditions.
 ** certtool: Avoid a Y2K38 bug when generating certificates.
 Patch by Robert Millan.
 
+** libgnutls: Make sure that GNUTLS_E_PREMATURE_TERMINATION
+is returned on premature termination (and added unit test).
+
 ** libgnutls: Fixes for W64 API. Patch by B. Scott Michel.
 
 ** libgnutls: Corrected VIA padlock detection for old 

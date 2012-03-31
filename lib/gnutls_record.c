@@ -868,9 +868,11 @@ gnutls_datum_t raw; /* raw headers */
       if (ret < 0 && gnutls_error_is_fatal (ret) == 0)
         return ret;
       
-      if (ret >= 0)
+      if (ret > 0)
         ret = GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
-      
+      else if (ret == 0)
+        ret = GNUTLS_E_PREMATURE_TERMINATION;
+
       return gnutls_assert_val(ret);
     }
 
@@ -1151,7 +1153,7 @@ recv_error:
   session_unresumable (session);
 
   if (ret == 0)
-    return GNUTLS_E_PREMATURE_TERMINATION;
+    return GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
   else
     return ret;
 }

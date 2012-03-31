@@ -385,11 +385,13 @@ static void start (const char* prio)
   if (child)
     {
       /* parent */
+      close(fd[1]);
       server (fd[0], prio);
       kill(child, SIGTERM);
     }
   else 
     {
+      close(fd[0]);
       client (fd[1], prio);
       exit(0);
     }

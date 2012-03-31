@@ -596,3 +596,4 @@ doc/stamp_functions
 doc/latex/cha-upgrade.tex
 doc/functions/
 gl/glthread/.dirstamp
+tests/mini-termination
