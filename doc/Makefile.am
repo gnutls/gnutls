@@ -728,7 +728,6 @@ FUNCS += functions/gnutls_certificate_set_x509_simple_pkcs12_mem
 FUNCS += functions/gnutls_certificate_set_x509_key
 FUNCS += functions/gnutls_certificate_set_x509_trust
 FUNCS += functions/gnutls_certificate_set_x509_crl
-FUNCS += functions/gnutls_certificate_get_openpgp_keyring
 FUNCS += functions/gnutls_global_init
 FUNCS += functions/gnutls_global_deinit
 FUNCS += functions/gnutls_global_set_mutex
