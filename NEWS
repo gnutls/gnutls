@@ -21,6 +21,8 @@ VIA processors. Reported by Kris Karas.
 as GeneralizedTime instead of UTCTime (which only stores
 2 digits of a year).
 
+** minitasn1: Upgraded to libtasn1 version 2.13 (pre-release).
+
 ** API and ABI modifications:
 gnutls_x509_crt_set_private_key_usage_period: Added
 gnutls_x509_crt_get_private_key_usage_period: Added
