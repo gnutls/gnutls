@@ -179,18 +179,20 @@ _gnutls_x509_mac_to_oid (gnutls_mac_algorithm_t algorithm)
   return ret;
 }
 
-gnutls_mac_algorithm_t
-_gnutls_x509_oid2mac_algorithm (const char *oid)
+gnutls_digest_algorithm_t
+_gnutls_x509_oid_to_digest (const char *oid)
 {
-  gnutls_mac_algorithm_t ret = 0;
+  gnutls_digest_algorithm_t ret = 0;
 
   GNUTLS_HASH_LOOP (if (p->oid && strcmp (oid, p->oid) == 0)
                     {
-                    ret = p->id; break;}
+                    ret = (gnutls_digest_algorithm_t)p->id; 
+                    break;
+                    }
   );
 
   if (ret == 0)
-    return GNUTLS_MAC_UNKNOWN;
+    return GNUTLS_DIG_UNKNOWN;
   return ret;
 }
 
@@ -200,16 +202,10 @@ _gnutls_x509_digest_to_oid (gnutls_digest_algorithm_t algorithm)
   return _gnutls_x509_mac_to_oid ((gnutls_mac_algorithm_t) algorithm);
 }
 
-gnutls_digest_algorithm_t
-_gnutls_x509_oid2digest_algorithm (const char *oid)
-{
-  return (gnutls_digest_algorithm_t) _gnutls_x509_oid2mac_algorithm (oid);
-}
-
 const char *
 _gnutls_digest_get_name (gnutls_digest_algorithm_t algorithm)
 {
-  return gnutls_mac_get_name ((gnutls_digest_algorithm_t) algorithm);
+  return gnutls_mac_get_name ((gnutls_mac_algorithm_t) algorithm);
 }
 
 int

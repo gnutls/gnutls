@@ -626,7 +626,7 @@ cdk_subpkt_new (size_t size)
   s = cdk_calloc (1, sizeof *s + size + 2);
   if (!s)
     return NULL;
-  s->d = (char *) s + sizeof (*s);
+  s->d = (byte*)s + sizeof (*s);
 
   return s;
 }

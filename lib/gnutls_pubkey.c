@@ -1465,8 +1465,7 @@ gnutls_pubkey_get_verify_algorithm (gnutls_pubkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  return _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *)
-                                        hash, signature,
+  return _gnutls_x509_verify_algorithm (hash, signature,
                                         key->pk_algorithm,
                                         &key->params);
 
@@ -1541,7 +1540,7 @@ _pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
                        const gnutls_datum_t * signature, 
                        gnutls_pk_params_st * params)
 {
-  gnutls_mac_algorithm_t hash = GNUTLS_MAC_UNKNOWN;
+  gnutls_digest_algorithm_t hash = GNUTLS_DIG_UNKNOWN;
   int ret;
   uint8_t digest[MAX_HASH_SIZE], md[MAX_HASH_SIZE], *cmp;
   unsigned int digest_size;

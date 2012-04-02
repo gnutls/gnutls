@@ -2582,7 +2582,7 @@ gnutls_x509_crt_get_verify_algorithm (gnutls_x509_crt_t crt,
       return ret;
     }
 
-  ret = _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) hash,
+  ret = _gnutls_x509_verify_algorithm (hash,
                                        signature,
                                        gnutls_x509_crt_get_pk_algorithm (crt,
                                                                          NULL),

@@ -288,7 +288,7 @@ api_cipher_hd_st * h = handle;
  **/
 int
 gnutls_hmac_init (gnutls_hmac_hd_t * dig,
-                  gnutls_digest_algorithm_t algorithm,
+                  gnutls_mac_algorithm_t algorithm,
                   const void *key, size_t keylen)
 {
   *dig = gnutls_malloc (sizeof (digest_hd_st));

@@ -43,7 +43,7 @@ typedef void (*deinit_func) (void *handle);
 
 typedef struct
 {
-  gnutls_mac_algorithm_t algorithm;
+  gnutls_digest_algorithm_t algorithm;
   const void *key;
   int keysize;
 
@@ -60,7 +60,7 @@ int _gnutls_hmac_exists(gnutls_mac_algorithm_t algorithm);
 int _gnutls_hmac_init (digest_hd_st *, gnutls_mac_algorithm_t algorithm,
                        const void *key, int keylen);
 size_t _gnutls_hash_get_algo_len (gnutls_digest_algorithm_t algorithm);
-#define _gnutls_hmac_get_algo_len _gnutls_hash_get_algo_len
+#define _gnutls_hmac_get_algo_len(x) _gnutls_hash_get_algo_len((gnutls_digest_algorithm_t)x)
 int _gnutls_hmac_fast (gnutls_mac_algorithm_t algorithm, const void *key,
                        int keylen, const void *text, size_t textlen,
                        void *digest);

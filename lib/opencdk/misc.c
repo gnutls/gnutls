@@ -116,7 +116,7 @@ _cdk_memistr (const char *buf, size_t buflen, const char *sub)
     {
       if (c_toupper (*t) == c_toupper (*s))
         {
-          for (buf = t++, buflen = n--, s++;
+          for (buf = (char*)t++, buflen = n--, s++;
                n && c_toupper (*t) == c_toupper ((byte) * s); t++, s++, n--)
             ;
           if (!*s)

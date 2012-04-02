@@ -181,7 +181,7 @@ gnutls_kx_get_name (gnutls_kx_algorithm_t algorithm)
 gnutls_kx_algorithm_t
 gnutls_kx_get_id (const char *name)
 {
-  gnutls_cipher_algorithm_t ret = GNUTLS_KX_UNKNOWN;
+  gnutls_kx_algorithm_t ret = GNUTLS_KX_UNKNOWN;
 
   GNUTLS_KX_LOOP (
     if (strcasecmp (p->name, name) == 0) 

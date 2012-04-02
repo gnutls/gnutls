@@ -502,7 +502,7 @@ _gnutls_pk_get_hash_algorithm (gnutls_pk_algorithm_t pk,
         *mand = 0;
     }
 
-  return _gnutls_x509_verify_algorithm ((gnutls_mac_algorithm_t *) dig,
+  return _gnutls_x509_verify_algorithm (dig,
                                         NULL, pk, params);
 
 }

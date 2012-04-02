@@ -50,11 +50,10 @@ int _gnutls_version_has_explicit_iv (gnutls_protocol_t version);
 
 /* Functions for MACs. */
 int _gnutls_mac_is_ok (gnutls_mac_algorithm_t algorithm);
-gnutls_mac_algorithm_t _gnutls_x509_oid2mac_algorithm (const char *oid);
+gnutls_digest_algorithm_t _gnutls_x509_oid_to_digest (const char *oid);
 const char *_gnutls_x509_mac_to_oid (gnutls_mac_algorithm_t mac);
 
 /* Functions for digests. */
-gnutls_digest_algorithm_t _gnutls_x509_oid2digest_algorithm (const char *oid);
 const char *_gnutls_x509_digest_to_oid (gnutls_digest_algorithm_t algorithm);
 const char *_gnutls_digest_get_name (gnutls_digest_algorithm_t algorithm);
 

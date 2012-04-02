@@ -166,7 +166,7 @@ int ret;
           goto cleanup;
         }
 
-      handle->tag_size = _gnutls_hash_get_algo_len(mac);
+      handle->tag_size = _gnutls_hmac_get_algo_len(mac);
     }
   else if (_gnutls_cipher_is_aead(&handle->cipher))
     handle->tag_size = _gnutls_cipher_tag_len(&handle->cipher);

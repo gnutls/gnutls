@@ -304,7 +304,7 @@ wrap_padlock_hmac_fast (gnutls_mac_algorithm_t algo,
 
           if (key_size > SHA1_DATA_SIZE)
             {
-                wrap_padlock_hash_fast (algo, key, key_size, hkey);
+                wrap_padlock_hash_fast ((gnutls_digest_algorithm_t)algo, key, key_size, hkey);
                 key = hkey;
                 key_size = digest_size;
             }
@@ -318,7 +318,7 @@ wrap_padlock_hmac_fast (gnutls_mac_algorithm_t algo,
 
           memcpy (&pad[SHA1_DATA_SIZE], text, text_size);
 
-          wrap_padlock_hash_fast (algo, pad, text_size + SHA1_DATA_SIZE,
+          wrap_padlock_hash_fast ((gnutls_digest_algorithm_t)algo, pad, text_size + SHA1_DATA_SIZE,
                                   &pad2[SHA1_DATA_SIZE]);
 
           gnutls_free (pad);
@@ -326,7 +326,7 @@ wrap_padlock_hmac_fast (gnutls_mac_algorithm_t algo,
           memset (pad2, OPAD, SHA1_DATA_SIZE);
           memxor (pad2, key, key_size);
 
-          wrap_padlock_hash_fast (algo, pad2, digest_size + SHA1_DATA_SIZE,
+          wrap_padlock_hash_fast ((gnutls_digest_algorithm_t)algo, pad2, digest_size + SHA1_DATA_SIZE,
                                   digest);
 
       }

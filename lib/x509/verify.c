@@ -677,7 +677,7 @@ _gnutls_x509_verify_certificate (const gnutls_x509_crt_t * certificate_list,
  * the given parameters.
  */
 int
-_gnutls_x509_verify_algorithm (gnutls_mac_algorithm_t * hash,
+_gnutls_x509_verify_algorithm (gnutls_digest_algorithm_t * hash,
                                const gnutls_datum_t * signature,
                                gnutls_pk_algorithm_t pk,
                                gnutls_pk_params_st * issuer_params)

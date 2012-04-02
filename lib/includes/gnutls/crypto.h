@@ -58,7 +58,7 @@ extern "C"
   typedef struct hmac_hd_st *gnutls_hmac_hd_t;
 
   int gnutls_hmac_init (gnutls_hmac_hd_t * dig,
-                        gnutls_digest_algorithm_t algorithm, const void *key,
+                        gnutls_mac_algorithm_t algorithm, const void *key,
                         size_t keylen);
   int gnutls_hmac (gnutls_hmac_hd_t handle, const void *text, size_t textlen);
   void gnutls_hmac_output (gnutls_hmac_hd_t handle, void *digest);

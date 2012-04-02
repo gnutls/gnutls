@@ -596,7 +596,7 @@ _gnutls_handshake_sign_crt_vrfy12 (gnutls_session_t session,
 
   _gnutls_debug_log ("sign handshake cert vrfy: picked %s with %s\n",
                     gnutls_sign_algorithm_get_name (sign_algo),
-                    gnutls_mac_get_name (hash_algo));
+                    gnutls_mac_get_name ((gnutls_mac_algorithm_t)hash_algo));
 
   ret = _gnutls_hash_fast (hash_algo, session->internals.handshake_hash_buffer.data, 
                            session->internals.handshake_hash_buffer.length,
@@ -794,7 +794,7 @@ pk_prepare_hash (gnutls_pk_algorithm_t pk,
  */
 int
 decode_ber_digest_info (const gnutls_datum_t * info,
-                        gnutls_mac_algorithm_t * hash,
+                        gnutls_digest_algorithm_t * hash,
                         uint8_t * digest, unsigned int *digest_size)
 {
   ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
@@ -827,7 +827,7 @@ decode_ber_digest_info (const gnutls_datum_t * info,
       return _gnutls_asn2err (result);
     }
 
-  *hash = _gnutls_x509_oid2mac_algorithm (str);
+  *hash = _gnutls_x509_oid_to_digest (str);
 
   if (*hash == GNUTLS_MAC_UNKNOWN)
     {

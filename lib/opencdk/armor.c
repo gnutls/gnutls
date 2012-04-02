@@ -132,7 +132,7 @@ compress_get_algo (cdk_stream_t inp, int *r_zipalgo)
           && (nread = _cdk_stream_gets (inp, buf, DIM (buf) - 1)) > 0)
         {
           plain_size = sizeof(plain);
-          base64_decode (buf, nread, plain, &plain_size);
+          base64_decode (buf, nread, (char*)plain, &plain_size);
           if (!(*plain & 0x80))
             break;
           pkttype = *plain & 0x40 ? (*plain & 0x3f) : ((*plain >> 2) & 0xf);
@@ -264,7 +264,7 @@ armor_encode (void *data, FILE * in, FILE * out)
           return CDK_File_Error;
         }
       afx->crc = update_crc (afx->crc, (byte *) raw, nread);
-      base64_encode ((byte *) raw, nread, buf, DIM (buf) - 1);
+      base64_encode (raw, nread, buf, DIM (buf) - 1);
       fprintf (out, "%s%s", buf, lf);
     }
 
@@ -395,14 +395,14 @@ armor_decode (void *data, FILE * in, FILE * out)
         {                       /* CRC */
           memset (crcbuf, 0, sizeof (crcbuf));
           crcbuf_size = sizeof(crcbuf);
-          base64_decode (buf + 1, len-1, crcbuf, &crcbuf_size);
+          base64_decode (buf + 1, len-1, (char*)crcbuf, &crcbuf_size);
           crc2 = (crcbuf[0] << 16) | (crcbuf[1] << 8) | crcbuf[2];
           break;                /* stop here */
         }
       else
         {
           raw_size = sizeof(raw);
-          nread = base64_decode (buf, len, raw, &raw_size);
+          nread = base64_decode (buf, len, (char*)raw, &raw_size);
           if (nread == 0)
             break;
           afx->crc = update_crc (afx->crc, raw, raw_size);
@@ -490,7 +490,7 @@ cdk_armor_encode_buffer (const byte * inbuf, size_t inlen,
                          size_t * nwritten, int type)
 {
   const char *head, *tail, *le;
-  byte tempbuf[48];
+  char tempbuf[48];
   char tempout[128];
   size_t pos, off, len, rest;
 

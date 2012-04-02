@@ -429,7 +429,7 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
   IV_size = _gnutls_cipher_get_iv_size (cipher_algo);
   key_size = gnutls_cipher_get_key_size (cipher_algo);
   export_flag = _gnutls_cipher_get_export_flag (cipher_algo);
-  hash_size = _gnutls_hash_get_algo_len (mac_algo);
+  hash_size = _gnutls_hmac_get_algo_len (mac_algo);
 
   ret = _gnutls_set_keys
     (session, params, hash_size, IV_size, key_size, export_flag);

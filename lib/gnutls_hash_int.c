@@ -208,7 +208,7 @@ _gnutls_hmac_init (digest_hd_st * dig, gnutls_mac_algorithm_t algorithm,
   int result;
   const gnutls_crypto_mac_st *cc = NULL;
 
-  dig->algorithm = algorithm;
+  dig->algorithm = (gnutls_digest_algorithm_t)algorithm;
   dig->key = key;
   dig->keysize = keylen;
 
@@ -276,13 +276,13 @@ _gnutls_hmac_deinit (digest_hd_st * handle, void *digest)
 }
 
 inline static int
-get_padsize (gnutls_mac_algorithm_t algorithm)
+get_padsize (gnutls_digest_algorithm_t algorithm)
 {
   switch (algorithm)
     {
-    case GNUTLS_MAC_MD5:
+    case GNUTLS_DIG_MD5:
       return 48;
-    case GNUTLS_MAC_SHA1:
+    case GNUTLS_DIG_SHA1:
       return 40;
     default:
       return 0;
@@ -299,7 +299,7 @@ _gnutls_mac_init_ssl3 (digest_hd_st * ret, gnutls_mac_algorithm_t algorithm,
   uint8_t ipad[48];
   int padsize, result;
 
-  padsize = get_padsize (algorithm);
+  padsize = get_padsize ((gnutls_digest_algorithm_t)algorithm);
   if (padsize == 0)
     {
       gnutls_assert ();
@@ -308,7 +308,7 @@ _gnutls_mac_init_ssl3 (digest_hd_st * ret, gnutls_mac_algorithm_t algorithm,
 
   memset (ipad, 0x36, padsize);
 
-  result = _gnutls_hash_init (ret, algorithm);
+  result = _gnutls_hash_init (ret, (gnutls_digest_algorithm_t)algorithm);
   if (result < 0)
     {
       gnutls_assert ();
