@@ -296,7 +296,7 @@ static void start (const char* prio)
   int fd[2];
   int ret;
   
-  ret = socketpair(AF_LOCAL, SOCK_STREAM, 0, fd);
+  ret = socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
   if (ret < 0)
     {
       perror("socketpair");

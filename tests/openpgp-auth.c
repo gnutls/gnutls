@@ -83,7 +83,7 @@ doit ()
           gnutls_global_set_log_function (log_message);
         }
 
-      err = socketpair (PF_UNIX, SOCK_STREAM, 0, sockets);
+      err = socketpair (AF_UNIX, SOCK_STREAM, 0, sockets);
       if (err != 0)
         fail ("socketpair %s\n", strerror (errno));
 
