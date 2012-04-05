@@ -51,10 +51,10 @@ raw_to_string (const unsigned char *raw, size_t raw_size)
     static char buf[1024];
     size_t i;
     if (raw_size == 0)
-        return NULL;
+        return "(empty)";
 
     if (raw_size * 3 + 1 >= sizeof (buf))
-        return NULL;
+        return "(too large)";
 
     for (i = 0; i < raw_size; i++)
       {
