@@ -23,24 +23,30 @@
 
 srcdir=${srcdir:-.}
 CERTTOOL=${CERTTOOL:-../../src/certtool}
+DEBUG=""
+
+if test "x$1" != "x";then
+  DEBUG="1"
+fi
 
 ret=0
 for p12 in 'client.p12 foobar' noclient.p12 unclient.p12 pkcs12_2certs.p12; do
     set -- $p12
     file=$1
     passwd=$2
-    $CERTTOOL --p12-info --inder --password "$passwd" \
-		--infile $srcdir/$file > out 2>&1
+    if test "x$DEBUG" != "x";then
+      $CERTTOOL -d 99 --p12-info --inder --password "$passwd" \
+		--infile $srcdir/$file
+    else
+      $CERTTOOL --p12-info --inder --password "$passwd" \
+		--infile $srcdir/$file >/dev/null 2>&1
+    fi
     rc=$?
     if test $rc != 0; then
-	cat out
 	echo "NEON PKCS12 FATAL $p12"
 	ret=1
-    else
-	echo "NEON PKCS12 OK $p12"
     fi
 done
-rm -f out
 
-echo "NEON PKCS12 DONE (rc $ret)"
+#echo "NEON PKCS12 DONE (rc $ret)"
 exit $ret
