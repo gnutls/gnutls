@@ -25,9 +25,8 @@ functionality as described in @ref{Asynchronous operation}.
 
 @heading Upgrading to 3.0.x from previous versions
 
-GnuTLS 3.0.x is source compatible with previous versions but discarded the functions
-@funcintref{gnutls_transport_set_lowat}, @funcintref{gnutls_session_get_client_random},
-@funcintref{gnutls_session_get_server_random}, @funcintref{gnutls_session_get_master_secret}.
+GnuTLS 3.0.x is source compatible with previous versions except for the functions
+listed below.
 
 @multitable @columnfractions .30 .60
 @headitem Old function @tab Replacement
@@ -43,6 +42,33 @@ They are replaced by the safer function @ref{gnutls_session_get_random}
 
 @item @funcintref{gnutls_session_get_master_secret} 
 @tab Replaced by the keying material exporters discussed in @ref{Keying Material Exporters}
+
+@item @funcintref{gnutls_transport_set_global_errno}
+@tab Replaced by using the system's errno fascility or @funcref{gnutls_transport_set_errno}.
+
+@item @funcintref{gnutls_x509_privkey_verify_data}
+@tab Replaced by @funcref{gnutls_pubkey_verify_data}.
+
+@item @funcintref{gnutls_certificate_verify_peers}
+@tab Replaced by @funcref{gnutls_certificate_verify_peers2}.
+
+@item @funcintref{gnutls_psk_netconf_derive_key}
+@tab Removed. The key derivation function was never standardized.
+
+@item @funcintref{gnutls_session_set_finished_function}
+@tab Removed.
+
+@item @funcintref{gnutls_ext_register}
+@tab Removed. Extension registration API is now internal to allow easier changes in the API.
+
+@item @funcintref{gnutls_certificate_get_x509_crls}, @funcintref{gnutls_certificate_get_x509_cas}
+@tab Removed to allow updating the internal structures. Replaced by @funcref{gnutls_certificate_get_issuer}.
+
+@item @funcintref{gnutls_certificate_get_openpgp_keyring}
+@tab Removed.
+
+@item @funcintref{gnutls_ia_*}
+@tab Removed. The inner application extensions were completely removed (they failed to be standardized).
 
 @end multitable
 
