@@ -829,7 +829,7 @@ decode_ber_digest_info (const gnutls_datum_t * info,
 
   *hash = _gnutls_x509_oid_to_digest (str);
 
-  if (*hash == GNUTLS_MAC_UNKNOWN)
+  if (*hash == GNUTLS_DIG_UNKNOWN)
     {
 
       _gnutls_debug_log ("verify.c: HASH OID: %s\n", str);
