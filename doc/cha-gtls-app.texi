@@ -692,10 +692,14 @@ fatal for the protocol or can be ignored.
 
 @showfuncdesc{gnutls_error_is_fatal}
 
-In DTLS it is advisable to use the extended receive
-function shown below, because it allows the extraction
-of the sequence number. This is required in DTLS because
-messages may arrive out of order.
+Although, in the TLS protocol the receive function can be called
+at any time, when DTLS is used the GnuTLS receive functions must be
+called once a message is available for reading, even if no data are
+expected. This is because in DTLS various (internal) actions
+may be required due to retransmission timers. Moreover,
+an extended receive function is shown below, which allows the extraction
+of the message's sequence number. Due to the unreliable nature of the
+protocol, this field allows distinguishing out-of-order messages.
 
 @showfuncdesc{gnutls_record_recv_seq}
 

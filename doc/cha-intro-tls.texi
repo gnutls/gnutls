@@ -79,9 +79,7 @@ the handshake process is finished, when there is need to receive
 or send data. In @acronym{DTLS} however, due to re-transmission
 timers used in the handshake out-of-order handshake data might
 be received for some time (maximum 60 seconds) after the handshake
-process is finished. For this reason programs using @acronym{DTLS}
-should call the receive functions for every packet received by 
-the peer, even if no data were expected. 
+process is finished. 
 
 The functions to access the record protocol are limited to send
 and receive functions, which might, given 
