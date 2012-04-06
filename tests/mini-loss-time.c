@@ -274,6 +274,7 @@ static void start (int server_packet, int client_packet)
       close(fd[1]);
       server (fd[0], server_packet);
       close(fd[0]);
+      kill(child, SIGTERM);
     }
   else 
     {
