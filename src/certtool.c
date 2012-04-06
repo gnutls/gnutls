@@ -2602,7 +2602,8 @@ print_bag_data (gnutls_pkcs12_bag_t bag)
       result = gnutls_pkcs12_bag_get_key_id (bag, i, &id);
       if (result < 0)
         error (EXIT_FAILURE, 0, "get_key_id: %s", gnutls_strerror (type));
-      fprintf (outfile, "\tKey ID: %s\n", raw_to_string (id.data, id.size));
+      if (id.size > 0)
+        fprintf (outfile, "\tKey ID: %s\n", raw_to_string (id.data, id.size));
 
       result = gnutls_pkcs12_bag_get_data (bag, i, &cdata);
       if (result < 0)
