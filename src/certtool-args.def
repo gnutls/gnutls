@@ -288,7 +288,9 @@ flag = {
     descrip   = "Use DER format for input certificates and private keys.";
     disabled;
     disable   = "no";
-    doc       = "";
+    doc       = "The input files will be assumed to be in DER or RAW format. 
+Unlike options that in PEM input would allow multiple input data (e.g. multiple 
+certificates), when reading in DER format a single data structure is read.";
 };
 
 flag = {
@@ -301,7 +303,7 @@ flag = {
     descrip   = "Use DER format for output certificates and private keys";
     disabled;
     disable   = "no";
-    doc       = "";
+    doc       = "The output will be in DER or RAW format.";
 };
 
 flag = {
