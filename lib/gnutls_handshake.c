@@ -2681,7 +2681,8 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
        * we have received it unless we notify him. So we
        * wait for a message and retransmit if needed. */
       if (IS_DTLS(session) && !_dtls_is_async(session) && 
-          gnutls_record_check_pending (session) == 0)
+          (gnutls_record_check_pending (session) +
+          gnutls_record_check_unprocessed (session)) == 0)
         {
           ret = _dtls_wait_and_retransmit(session);
           if (ret < 0)
@@ -2718,7 +2719,8 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
       STATE = STATE31;
 
        if (IS_DTLS(session) && !_dtls_is_async(session) && 
-           gnutls_record_check_pending( session) == 0)
+           (gnutls_record_check_pending( session) +
+           gnutls_record_check_unprocessed (session)) == 0)
          {
            ret = _dtls_wait_and_retransmit(session);
            if (ret < 0)

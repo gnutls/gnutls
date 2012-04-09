@@ -4,12 +4,17 @@ See the end for copying conditions.
 
 * Version 3.0.19 (unreleased)
 
+** libgnutls: gnutls_record_check_pending() no longer
+returns unprocessed data, and thus ensure the non-blocking
+of the next call to gnutls_record_recv(). To compensate
+for unprocessed data, the gnutls_record_check_unprocessed() 
+was added.
+
 ** tests: Disabled floating point test, and corrections
 in pkcs12 decoding tests.
 
 ** API and ABI modifications:
-No changes since last version.
-
+gnutls_record_check_unprocessed: Added
 
 * Version 3.0.18 (released 2012-04-02)
 
