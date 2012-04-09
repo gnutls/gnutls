@@ -654,7 +654,7 @@ typedef union
 
 typedef struct
 {
-  /* holds all the data received by the record layer */
+  /* holds all the parsed data received by the record layer */
   mbuffer_head_st record_buffer; 
 
   int handshake_hash_buffer_prev_len;           /* keeps the length of handshake_hash_buffer, excluding
@@ -702,7 +702,7 @@ typedef struct
   /* this buffer holds a record packet -mostly used for
    * non blocking IO.
    */
-  mbuffer_head_st record_recv_buffer;   /* buffer holding the record that is currently 
+  mbuffer_head_st record_recv_buffer;   /* buffer holding the unparsed record that is currently 
                                          * being received */
   mbuffer_head_st record_send_buffer;   /* holds cached data
                                          * for the gnutls_io_write_buffered()
