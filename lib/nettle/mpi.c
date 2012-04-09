@@ -427,7 +427,7 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits, unsigned int *q
   q_bytes = _gnutls_pk_bits_to_subgroup_bits (nbits);
   q_bytes /= 8;
 
-  if (q_bytes == 0 || q_bytes <= p_bytes)
+  if (q_bytes == 0 || q_bytes >= p_bytes)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
