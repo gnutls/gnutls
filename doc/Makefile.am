@@ -190,15 +190,6 @@ HEADER_FILES = $(top_srcdir)/lib/includes/gnutls/gnutls.h.in \
 	$(top_srcdir)/lib/includes/gnutls/dtls.h $(top_srcdir)/lib/includes/gnutls/crypto.h \
 	$(top_srcdir)/lib/includes/gnutls/ocsp.h
 
-stamp_functions: gnutls-api.texi x509-api.texi pgp-api.texi pkcs12-api.texi pkcs11-api.texi abstract-api.texi compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi
-	$(MAKE) compare-makefile
-	for i in $^; do \
-		$(srcdir)/scripts/split-texi.pl functions < $$i; \
-	done
-	sed -i 's/\@anchor{.*//g' functions/*
-	sed -i 's/\@subheading.*//g' functions/*
-	echo $@ > $@
-
 gnutls-api.texi: $(top_srcdir)/lib/includes/gnutls/gnutls.h.in
 	echo "" > $@-tmp
 	for i in `$(top_srcdir)/doc/scripts/getfuncs.pl <$(top_srcdir)/lib/includes/gnutls/gnutls.h.in|sort|uniq`; do \
@@ -359,6 +350,16 @@ enums.texi: $(HEADER_FILES)
 
 gnutls_TEXINFOS += $(ENUMS) $(FUNCS)
 DISTCLEANFILES += $(ENUMS) stamp_enums stamp_functions
+
+stamp_functions: gnutls-api.texi x509-api.texi pgp-api.texi pkcs12-api.texi pkcs11-api.texi abstract-api.texi compat-api.texi dtls-api.texi crypto-api.texi ocsp-api.texi
+	-mkdir functions
+	for i in $^; do \
+		$(srcdir)/scripts/split-texi.pl functions < $$i; \
+	done
+	sed -i 's/\@anchor{.*//g' functions/*
+	sed -i 's/\@subheading.*//g' functions/*
+	echo $@ > $@
+	$(MAKE) compare-makefile
 
 stamp_enums: enums.texi
 	-mkdir enums
