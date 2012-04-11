@@ -1490,7 +1490,7 @@ unsigned int hash_algo;
         }
       else if (sign != GNUTLS_SIGN_UNKNOWN)
         {
-          if (_gnutls_hash_get_algo_len(_gnutls_sign_get_hash_algorithm(sign)) != hash_size)
+          if (_gnutls_hash_get_algo_len(_gnutls_sign_get_hash_algorithm(sign)) < hash_size)
             return GNUTLS_E_UNWANTED_ALGORITHM;
         }
         
@@ -1501,7 +1501,7 @@ unsigned int hash_algo;
         {
           hash_algo = _gnutls_dsa_q_to_hash (pubkey->pk_algorithm, &pubkey->params, &hash_size);
 
-          if (_gnutls_hash_get_algo_len(_gnutls_sign_get_hash_algorithm(sign)) != hash_size)
+          if (_gnutls_hash_get_algo_len(_gnutls_sign_get_hash_algorithm(sign)) < hash_size)
             return GNUTLS_E_UNWANTED_ALGORITHM;
         }
         

@@ -10,6 +10,11 @@ of the next call to gnutls_record_recv(). To compensate
 for unprocessed data, the gnutls_record_check_unprocessed() 
 was added.
 
+** libgnutls: in ECDSA and DSA TLS 1.2 authentication be less
+strict in hash selection, and allow a stronger hash to
+be used than the appropriate, to improve interoperability
+with openssl.
+
 ** tests: Disabled floating point test, and corrections
 in pkcs12 decoding tests.
 
