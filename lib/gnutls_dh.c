@@ -63,39 +63,57 @@ gnutls_calc_dh_secret (bigint_t * ret_x, bigint_t g, bigint_t prime,
       return NULL;
     }
 
-  x = _gnutls_mpi_randomize (NULL, x_size, GNUTLS_RND_RANDOM);
+  x = _gnutls_mpi_new(x_size);
   if (x == NULL)
     {
       gnutls_assert ();
-      return NULL;
+      goto fail;
     }
 
   e = _gnutls_mpi_alloc_like (prime);
   if (e == NULL)
     {
       gnutls_assert ();
-      if (ret_x)
-        *ret_x = NULL;
-
-      _gnutls_mpi_release (&x);
-      return NULL;
+      goto fail;
     }
 
-  _gnutls_mpi_powm (e, g, x, prime);
+  do
+    {
+      if (_gnutls_mpi_randomize (x, x_size, GNUTLS_RND_RANDOM) == NULL)
+        {
+          gnutls_assert();
+          goto fail;
+        }
+
+      _gnutls_mpi_powm (e, g, x, prime);
+    }
+  while(_gnutls_mpi_cmp_ui(e, 1) == 0);
 
   if (ret_x)
     *ret_x = x;
   else
     _gnutls_mpi_release (&x);
   return e;
+
+fail:
+  if (x) _gnutls_mpi_release (&x);
+  return NULL;
+
 }
 
-
+/* returns f^x mod prime 
+ */
 bigint_t
 gnutls_calc_dh_key (bigint_t f, bigint_t x, bigint_t prime)
 {
   bigint_t k;
   int bits;
+  
+  if (_gnutls_mpi_cmp_ui(f, 1) == 0)
+    {
+      gnutls_assert();
+      return NULL;
+    }
 
   bits = _gnutls_mpi_get_nbits (prime);
   if (bits <= 0 || bits > MAX_BITS)
@@ -107,6 +125,7 @@ gnutls_calc_dh_key (bigint_t f, bigint_t x, bigint_t prime)
   k = _gnutls_mpi_alloc_like (prime);
   if (k == NULL)
     return NULL;
+
   _gnutls_mpi_powm (k, f, x, prime);
   return k;
 }
