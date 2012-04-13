@@ -58,7 +58,6 @@
 #include <common.h>
 #include <socket.h>
 
-#include <gettext.h>
 #include <cli-args.h>
 #include <ocsptool-common.h>
 
