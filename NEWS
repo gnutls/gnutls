@@ -17,7 +17,8 @@ with openssl.
 in pkcs12 decoding tests.
 
 ** API and ABI modifications:
-gnutls_record_check_unprocessed: Added
+No changes since last version.
+
 
 * Version 3.0.18 (released 2012-04-02)
 
