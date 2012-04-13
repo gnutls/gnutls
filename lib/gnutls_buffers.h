@@ -34,6 +34,22 @@ _gnutls_record_buffer_get_size (gnutls_session_t session)
   return session->internals.record_buffer.byte_length;
 }
 
+/*-
+ * record_check_unprocessed:
+ * @session: is a #gnutls_session_t structure.
+ *
+ * This function checks if there are unprocessed data
+ * in the gnutls record buffers. Those data might not
+ * be complete records.
+ *
+ * Returns: Returns the size of the data or zero.
+ -*/
+inline static size_t
+record_check_unprocessed (gnutls_session_t session)
+{
+  return session->internals.record_recv_buffer.byte_length;
+}
+
 int _gnutls_record_buffer_get (content_type_t type,
                                gnutls_session_t session, uint8_t * data,
                                size_t length, uint8_t seq[8]);

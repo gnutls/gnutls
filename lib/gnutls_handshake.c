@@ -2682,7 +2682,7 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
        * wait for a message and retransmit if needed. */
       if (IS_DTLS(session) && !_dtls_is_async(session) && 
           (gnutls_record_check_pending (session) +
-          gnutls_record_check_unprocessed (session)) == 0)
+          record_check_unprocessed (session)) == 0)
         {
           ret = _dtls_wait_and_retransmit(session);
           if (ret < 0)
@@ -2720,7 +2720,7 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
 
        if (IS_DTLS(session) && !_dtls_is_async(session) && 
            (gnutls_record_check_pending( session) +
-           gnutls_record_check_unprocessed (session)) == 0)
+           record_check_unprocessed (session)) == 0)
          {
            ret = _dtls_wait_and_retransmit(session);
            if (ret < 0)
