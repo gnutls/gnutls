@@ -447,23 +447,20 @@ wrap_nettle_rnd (void *_ctx, int level, void *data, size_t datasize)
 
   RND_LOCK;
 
-  if (level != GNUTLS_RND_NONCE)
+  ret = do_trivia_source (0);
+  if (ret < 0)
     {
-      ret = do_trivia_source (0);
-      if (ret < 0)
-        {
-          RND_UNLOCK;
-          gnutls_assert ();
-          return ret;
-        }
+      RND_UNLOCK;
+      gnutls_assert ();
+      return ret;
+    }
 
-      ret = do_device_source (0);
-      if (ret < 0)
-        {
-          RND_UNLOCK;
-          gnutls_assert ();
-          return ret;
-        }
+  ret = do_device_source (0);
+  if (ret < 0)
+    {
+      RND_UNLOCK;
+      gnutls_assert ();
+      return ret;
     }
 
   yarrow256_random (&yctx, datasize, data);
