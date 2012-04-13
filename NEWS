@@ -6,9 +6,7 @@ See the end for copying conditions.
 
 ** libgnutls: gnutls_record_check_pending() no longer
 returns unprocessed data, and thus ensure the non-blocking
-of the next call to gnutls_record_recv(). To compensate
-for unprocessed data, the gnutls_record_check_unprocessed() 
-was added.
+of the next call to gnutls_record_recv(). 
 
 ** libgnutls: in ECDSA and DSA TLS 1.2 authentication be less
 strict in hash selection, and allow a stronger hash to

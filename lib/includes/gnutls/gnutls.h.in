@@ -857,7 +857,6 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
   ssize_t gnutls_record_set_max_size (gnutls_session_t session, size_t size);
 
   size_t gnutls_record_check_pending (gnutls_session_t session);
-  size_t gnutls_record_check_unprocessed (gnutls_session_t session);
 
   int gnutls_prf (gnutls_session_t session,
                   size_t label_size, const char *label,
