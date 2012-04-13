@@ -42,7 +42,6 @@
 #include <progname.h>
 #include <version-etc.h>
 
-#include <gettext.h>
 #include <srptool-args.h>
 
 /* This may need some rewrite. A lot of stuff which should be here
