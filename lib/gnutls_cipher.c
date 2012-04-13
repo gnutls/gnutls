@@ -194,58 +194,52 @@ leave:
 
 
 inline static int
-calc_enc_length (gnutls_session_t session, int data_size,
-                 int hash_size, uint8_t * pad, int random_pad,
-                 unsigned block_algo, unsigned auth_cipher, uint16_t blocksize)
+calc_enc_length_block (gnutls_session_t session, int data_size,
+                 int hash_size, uint8_t * pad, 
+                 unsigned auth_cipher, uint16_t blocksize)
 {
-  uint8_t rnd;
+  uint8_t rnd = *pad;
   unsigned int length;
-  int ret;
 
   *pad = 0;
 
-  switch (block_algo)
+  /* make rnd a multiple of blocksize */
+  if (session->security_parameters.version == GNUTLS_SSL3)
     {
-    case CIPHER_STREAM:
-      length = data_size + hash_size;
-      if (auth_cipher)
-        length += AEAD_EXPLICIT_DATA_SIZE;
-
-      break;
-    case CIPHER_BLOCK:
-      ret = _gnutls_rnd (GNUTLS_RND_NONCE, &rnd, 1);
-      if (ret < 0)
-        return gnutls_assert_val(ret);
-
-      /* make rnd a multiple of blocksize */
-      if (session->security_parameters.version == GNUTLS_SSL3 ||
-          random_pad == 0)
-        {
-          rnd = 0;
-        }
-      else
-        {
-          rnd = (rnd / blocksize) * blocksize;
-          /* added to avoid the case of pad calculated 0
-           * seen below for pad calculation.
-           */
-          if (rnd > blocksize)
-            rnd -= blocksize;
-        }
-
-      length = data_size + hash_size;
-
-      *pad = (uint8_t) (blocksize - (length % blocksize)) + rnd;
-
-      length += *pad;
-      if (_gnutls_version_has_explicit_iv
-          (session->security_parameters.version))
-        length += blocksize;    /* for the IV */
-
-      break;
-    default:
-      return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+      rnd = 0;
     }
+  
+  if (rnd > 0)
+    {
+      rnd = (rnd / blocksize) * blocksize;
+      /* added to avoid the case of pad calculated 0
+       * seen below for pad calculation.
+       */
+      if (rnd > blocksize)
+        rnd -= blocksize;
+    }
+
+  length = data_size + hash_size;
+
+  *pad = (uint8_t) (blocksize - (length % blocksize)) + rnd;
+
+  length += *pad;
+  if (_gnutls_version_has_explicit_iv
+      (session->security_parameters.version))
+    length += blocksize;    /* for the IV */
+
+  return length;
+}
+
+inline static int
+calc_enc_length_stream (gnutls_session_t session, int data_size,
+                 int hash_size, unsigned auth_cipher)
+{
+  unsigned int length;
+
+  length = data_size + hash_size;
+  if (auth_cipher)
+    length += AEAD_EXPLICIT_DATA_SIZE;
 
   return length;
 }
@@ -295,7 +289,7 @@ compressed_to_ciphertext (gnutls_session_t session,
                                record_parameters_st * params)
 {
   uint8_t * tag_ptr = NULL;
-  uint8_t pad;
+  uint8_t pad = 0;
   int length, length_to_encrypt, ret;
   uint8_t preamble[MAX_PREAMBLE_SIZE];
   int preamble_size;
@@ -307,15 +301,9 @@ compressed_to_ciphertext (gnutls_session_t session,
   int ver = gnutls_protocol_get_version (session);
   int explicit_iv = _gnutls_version_has_explicit_iv (session->security_parameters.version);
   int auth_cipher = _gnutls_auth_cipher_is_aead(&params->write.cipher_state);
-  int random_pad;
-  
-  /* We don't use long padding if requested or if we are in DTLS.
-   */
-  if (session->internals.priorities.no_padding == 0 && (!IS_DTLS(session)))
-    random_pad = 1;
-  else
-    random_pad = 0;
-  
+  uint8_t nonce[MAX_CIPHER_BLOCK_SIZE+1];
+
+
   _gnutls_hard_log("ENC[%p]: cipher: %s, MAC: %s, Epoch: %u\n",
     session, gnutls_cipher_get_name(params->cipher_algorithm), gnutls_mac_get_name(params->mac_algorithm),
     (unsigned int)params->epoch);
@@ -327,9 +315,28 @@ compressed_to_ciphertext (gnutls_session_t session,
 
   /* Calculate the encrypted length (padding etc.)
    */
-  length_to_encrypt = length =
-    calc_enc_length (session, compressed->size, tag_size, &pad,
-                     random_pad, block_algo, auth_cipher, blocksize);
+  if (block_algo == CIPHER_BLOCK)
+    {
+      /* Call _gnutls_rnd() once. Get data used for the IV + 1 for 
+       * the random padding.
+       */
+      ret = _gnutls_rnd (GNUTLS_RND_NONCE, nonce, blocksize+1);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+
+      /* We don't use long padding if requested or if we are in DTLS.
+       */
+      if (session->internals.priorities.no_padding == 0 && !IS_DTLS(session))
+        pad = nonce[blocksize];
+
+      length_to_encrypt = length =
+        calc_enc_length_block (session, compressed->size, tag_size, &pad,
+                               auth_cipher, blocksize);
+    }
+  else
+    length_to_encrypt = length =
+      calc_enc_length_stream (session, compressed->size, tag_size,
+                             auth_cipher);
   if (length < 0)
     {
       return gnutls_assert_val(length);
@@ -346,15 +353,11 @@ compressed_to_ciphertext (gnutls_session_t session,
 
   if (explicit_iv)
     {
-
       if (block_algo == CIPHER_BLOCK)
         {
           /* copy the random IV.
            */
-          ret = _gnutls_rnd (GNUTLS_RND_NONCE, data_ptr, blocksize);
-          if (ret < 0)
-            return gnutls_assert_val(ret);
- 
+          memcpy(data_ptr, nonce, blocksize);
           _gnutls_auth_cipher_setiv(&params->write.cipher_state, data_ptr, blocksize);
 
           data_ptr += blocksize;
@@ -363,8 +366,6 @@ compressed_to_ciphertext (gnutls_session_t session,
         }
       else if (auth_cipher)
         {
-          uint8_t nonce[blocksize];
-
           /* Values in AEAD are pretty fixed in TLS 1.2 for 128-bit block
            */
           if (params->write.IV.data == NULL || params->write.IV.size != AEAD_IMPLICIT_DATA_SIZE)
