@@ -5,7 +5,8 @@ See the end for copying conditions.
 * Version 3.0.19 (unreleased)
 
 ** libgnutls: When decoding a PKCS #11 URL the pin-source field
-is assumed to be a file that stores the pin.
+is assumed to be a file that stores the pin. Based on patch
+by David Smith.
 
 ** libgnutls: gnutls_record_check_pending() no longer
 returns unprocessed data, and thus ensure the non-blocking

@@ -1948,7 +1948,7 @@ retrieve_pin_for_callback (struct ck_token_info *token_info, int attempts,
   *pin = p11_kit_pin_new_for_string (pin_value);
   
   if (*pin == NULL)
-    return gnutls_assert_val(GNUTLS_E_INTERNAL_ERROR);
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
   return 0;
 }
@@ -1958,29 +1958,32 @@ retrieve_pin (struct p11_kit_uri *info, struct ck_token_info *token_info,
               int attempts, ck_user_type_t user_type, struct p11_kit_pin **pin)
 {
   const char *pinfile;
+  int ret = GNUTLS_E_PKCS11_PIN_ERROR;
 
   *pin = NULL;
 
   /* Check if a pinfile is specified, and use that if possible */
   pinfile = p11_kit_uri_get_pinfile (info);
-  if (pinfile != NULL && attempts == 0)
+  if (pinfile != NULL)
     {
       _gnutls_debug_log("pk11: Using pinfile to retrieve PIN\n");
-      return retrieve_pin_for_pinfile (pinfile, token_info, attempts, user_type, pin);
+      ret = retrieve_pin_for_pinfile (pinfile, token_info, attempts, user_type, pin);
     }
 
   /* The global gnutls pin callback */
-  else if (pin_func)
-    return retrieve_pin_for_callback (token_info, attempts, user_type, pin);
+  if (pin_func && ret < 0)
+    ret = retrieve_pin_for_callback (token_info, attempts, user_type, pin);
 
   /* Otherwise, PIN entry is necessary for login, so fail if there's
    * no callback. */
-  else
+  
+  if (ret < 0)
     {
       gnutls_assert ();
-      _gnutls_debug_log ("pk11: No pin callback but login required.\n");
-      return GNUTLS_E_PKCS11_ERROR;
+      _gnutls_debug_log ("pk11: No suitable pin callback but login required.\n");
     }
+    
+  return ret;
 }
 
 int
