@@ -557,6 +557,9 @@ gnutls_pkcs11_init (unsigned int flags, const char *deprecated_config_file)
     }
   init++;
 
+  p11_kit_pin_register_callback (P11_KIT_PIN_FALLBACK, p11_kit_pin_file_callback,
+                                 NULL, NULL);
+
   if (flags == GNUTLS_PKCS11_FLAG_AUTO)
     {
       if (deprecated_config_file == NULL)
@@ -1911,7 +1914,7 @@ retrieve_pin (struct p11_kit_uri *info, struct ck_token_info *token_info,
 
   /* Check if a pinfile is specified, and use that if possible */
   pinfile = p11_kit_uri_get_pinfile (info);
-  if (pinfile != NULL)
+  if (pinfile != NULL && attempts == 0)
     {
       _gnutls_debug_log("pk11: Using pinfile to retrieve PIN\n");
       return retrieve_pin_for_pinfile (pinfile, token_info, attempts, user_type, pin);
