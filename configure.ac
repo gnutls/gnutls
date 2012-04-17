@@ -409,7 +409,14 @@ AC_CHECK_FUNCS([alarm atexit dup2 epoll_create kqueue memchr memset munmap \
 		putenv regcomp scandir select socket strcasecmp strchr \
 		strdup strerror strncasecmp strrchr strstr strtoul uname])
 
-PKG_CHECK_MODULES(LIBIDN, libidn >= 0.0.0, [libidn=yes], [libidn=no])
+AC_ARG_ENABLE(crywrap,
+	AS_HELP_STRING([--disable-crywrap], [unconditionally disable the crywrap TLS proxy service]))
+
+ libidn=no
+
+ if test "x$enable_crywrap" != "xno" ; then
+	PKG_CHECK_MODULES(LIBIDN, libidn >= 0.0.0, [libidn=yes], [libidn=no])
+ fi
 
  if test "x$libidn" != "xno" && test "$ac_cv_func_daemon" != "no";then
   crywrap=yes
