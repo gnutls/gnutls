@@ -8,9 +8,9 @@ want to build from version controlled sources.
 We require several tools to check out and build the software, including:
 
 - Make <http://www.gnu.org/software/make/>
-- Automake <http://www.gnu.org/software/automake/>
+- Automake <http://www.gnu.org/software/automake/> (use 1.11.3 or later)
 - Autoconf <http://www.gnu.org/software/autoconf/>
-- Autogen <http://www.gnu.org/software/autogen/> (use 5.15pre15 or better)
+- Autogen <http://www.gnu.org/software/autogen/> (use 5.15pre15 or later)
 - Libtool <http://www.gnu.org/software/libtool/>
 - Gettext <http://www.gnu.org/software/gettext/>
 - Texinfo <http://www.gnu.org/software/texinfo/>
@@ -36,17 +36,17 @@ system, and the instructions for installing them differ.  Here are
 some hints:
 
 gNewSense/Debian/Ubuntu:
-apt-get install git-core autoconf automake libtool gettext autopoint
+apt-get install git-core autoconf libtool gettext autopoint
 apt-get install texinfo texlive texlive-generic-recommended texlive-extra-utils
 apt-get install help2man gtk-doc-tools valgrind
 apt-get install guile-1.8-dev libtasn1-3-dev
 apt-get install datefudge libidn11-dev gawk
 
-You will usually need to install more recent versions of Nettle,
-P11-kit and Autogen, which you will need to build from sources.  If
-your system has the recent versions, you could do:
+You will sometimes need to install more recent versions of Automake,
+Nettle, P11-kit and Autogen, which you will need to build from
+sources.  If your system has the recent versions, you could do:
 
-sudo apt-get install autogen nettle-dev libp11-kit-dev
+apt-get install automake autogen nettle-dev libp11-kit-dev
 
 To download the version controlled sources:
 
