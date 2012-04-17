@@ -440,6 +440,7 @@ cleanup:
 
 static int pgp_crt_to_raw_pubkey(const gnutls_datum_t * cert, gnutls_datum_t *rpubkey)
 {
+#ifdef ENABLE_OPENPGP
 gnutls_openpgp_crt_t crt = NULL;
 gnutls_pubkey_t pubkey = NULL;
 size_t size;
@@ -503,6 +504,9 @@ cleanup:
   gnutls_pubkey_deinit(pubkey);
 
   return ret;
+#else
+  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+#endif
 }
 
 static 
