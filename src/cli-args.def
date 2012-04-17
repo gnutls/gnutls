@@ -56,6 +56,12 @@ flag = {
 };
 
 flag = {
+    name      = status-request-ocsp;
+    descrip   = "Request OCSP status request";
+    doc       = "The client will indicate to the server in a TLS extension that it wants a OCSP status request.";
+};
+
+flag = {
     name      = starttls;
     value     = s;
     descrip   = "Connect, establish a plain session and start TLS.";

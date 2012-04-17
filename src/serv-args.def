@@ -228,6 +228,14 @@ flag = {
 };
 
 flag = {
+    name      = status-response-ocsp;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "OCSP response to send to client";
+    doc      = "If the client requested an OCSP response, return data from this file to the client.";
+};
+
+flag = {
     name      = port;
     value     = p;
     arg-type  = number;

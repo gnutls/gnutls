@@ -38,6 +38,7 @@
 #include <ext/signature.h>
 #include <ext/safe_renegotiation.h>
 #include <ext/ecc.h>
+#include <ext/status_request.h>
 #include <gnutls_num.h>
 
 
@@ -311,10 +312,13 @@ _gnutls_ext_init (void)
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
 
-  ret = _gnutls_ext_register (&ext_mod_cert_type);
+  ret = _gnutls_ext_register (&ext_mod_status_request);
   if (ret != GNUTLS_E_SUCCESS)
     return ret;
 
+  ret = _gnutls_ext_register (&ext_mod_cert_type);
+  if (ret != GNUTLS_E_SUCCESS)
+    return ret;
 
   ret = _gnutls_ext_register (&ext_mod_server_name);
   if (ret != GNUTLS_E_SUCCESS)

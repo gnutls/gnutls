@@ -81,7 +81,8 @@ const char *x509_ecccertfile = NULL;
 const char *x509_cafile = NULL;
 const char *dh_params_file = NULL;
 const char *x509_crlfile = NULL;
-const char *priorities = NULL;
+const char * priorities = NULL;
+const char * status_response_ocsp = NULL;
 
 gnutls_datum_t session_ticket_key;
 static void tcp_server (const char *name, int port);
@@ -329,8 +330,15 @@ generate_rsa_params (void)
 
 LIST_DECLARE_INIT (listener_list, listener_item, listener_free);
 
-gnutls_session_t
-initialize_session (int dtls)
+static int
+ocsp_callback (gnutls_session_t session,
+	       void *ptr,
+	       gnutls_datum_t *ocsp_response)
+{
+  return GNUTLS_E_NO_CERTIFICATE_STATUS;
+}
+
+gnutls_session_t initialize_session (int dtls)
 {
   gnutls_session_t session;
   const char *err;
@@ -358,6 +366,19 @@ initialize_session (int dtls)
   if (noticket == 0)
     gnutls_session_ticket_enable_server (session, &session_ticket_key);
 #endif
+
+  /* OCSP status-request TLS extension */
+  if (status_response_ocsp)
+    {
+      if (gnutls_status_request_ocsp_server (session, ocsp_callback, NULL) < 0)
+	{
+	  fprintf (stderr, "Cannot set OCSP status request callback.\n");
+	  exit (1);
+	}
+    }
+
+  if (noticket == 0)
+    gnutls_session_ticket_enable_server (session, &session_ticket_key);
 
   if (gnutls_priority_set_direct (session, priorities, &err) < 0)
     {
@@ -1649,6 +1670,9 @@ cmd_parser (int argc, char **argv)
 
   if (HAVE_OPT (PSKPASSWD))
     psk_passwd = OPT_ARG (PSKPASSWD);
+
+  if (HAVE_OPT(STATUS_RESPONSE_OCSP))
+    status_response_ocsp = OPT_ARG(STATUS_RESPONSE_OCSP);
 
 }
 
