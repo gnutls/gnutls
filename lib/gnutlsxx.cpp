@@ -448,6 +448,11 @@ namespace gnutls
     gnutls_transport_set_push_function (s, push_func);
   }
 
+  void session::set_transport_vec_push_function (gnutls_vec_push_func vec_push_func)
+  {
+    gnutls_transport_set_vec_push_function (s, vec_push_func);
+  }
+
   void session::set_transport_pull_function (gnutls_pull_func pull_func)
   {
     gnutls_transport_set_pull_function (s, pull_func);

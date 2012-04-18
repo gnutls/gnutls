@@ -184,6 +184,7 @@ namespace gnutls
 
     void set_transport_lowat (size_t num);
     void set_transport_push_function (gnutls_push_func push_func);
+    void set_transport_vec_push_function (gnutls_vec_push_func vec_push_func);
     void set_transport_pull_function (gnutls_pull_func pull_func);
 
     void set_user_ptr (void *ptr);
