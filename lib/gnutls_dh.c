@@ -94,21 +94,46 @@ gnutls_calc_dh_secret (bigint_t * ret_x, bigint_t g, bigint_t prime)
 bigint_t
 gnutls_calc_dh_key (bigint_t f, bigint_t x, bigint_t prime)
 {
-  bigint_t k;
+  bigint_t k, ff, ret;
   int bits;
+  
+  ff = _gnutls_mpi_mod(f, prime);
+  _gnutls_mpi_add_ui(ff, ff, 1);
+
+  /* check if f==0,1,p-1. 
+   * or (ff=f+1) equivalently ff==1,2,p */
+  if ((_gnutls_mpi_cmp_ui(ff, 2) == 0) || (_gnutls_mpi_cmp_ui(ff, 1) == 0) ||
+      (_gnutls_mpi_cmp(ff,prime) == 0))
+    {
+      gnutls_assert();
+      ret = NULL;
+      goto cleanup;
+    }
 
   bits = _gnutls_mpi_get_nbits (prime);
   if (bits <= 0 || bits > MAX_BITS)
     {
       gnutls_assert ();
-      return NULL;
+      ret = NULL;
+      goto cleanup;
     }
 
   k = _gnutls_mpi_alloc_like (prime);
   if (k == NULL)
-    return NULL;
+    {
+      gnutls_assert();
+      ret = NULL;
+      goto cleanup;
+    }
+
   _gnutls_mpi_powm (k, f, x, prime);
-  return k;
+
+  ret = k;
+
+cleanup:
+  _gnutls_mpi_release (&ff);
+  
+  return ret;
 }
 
 /*-
