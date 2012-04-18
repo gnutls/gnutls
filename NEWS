@@ -8,6 +8,9 @@ See the end for copying conditions.
 is assumed to be a file that stores the pin. Based on patch
 by David Smith.
 
+** libgnutlsxx: Added session::set_transport_vec_push_function. Patch
+by Alexandre Bique.
+
 ** API and ABI modifications:
 No changes since last version.
 
