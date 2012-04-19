@@ -46,7 +46,7 @@
 /* returns the public value (X), and the secret (ret_x).
  */
 int
-gnutls_calc_dh_secret (bigint_t* ret_y, bigint_t * ret_x, bigint_t g, bigint_t 
+gnutls_calc_dh_secret (bigint_t* ret_y, bigint_t * ret_x, bigint_t g, bigint_t prime,
                        unsigned int q_bits)
 {
   bigint_t e=NULL, x = NULL;
