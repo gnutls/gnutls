@@ -45,28 +45,33 @@
 
 /* returns the public value (X), and the secret (ret_x).
  */
-bigint_t
-gnutls_calc_dh_secret (bigint_t * ret_x, bigint_t g, bigint_t prime, 
+int
+gnutls_calc_dh_secret (bigint_t* ret_y, bigint_t * ret_x, bigint_t g, bigint_t 
                        unsigned int q_bits)
 {
-  bigint_t e, x = NULL;
-  int x_size;
+  bigint_t e=NULL, x = NULL;
+  unsigned int x_size;
+  int ret;
   
   if (q_bits == 0)
-    x_size = _gnutls_mpi_get_nbits (prime) - 1;
+    {
+      x_size = _gnutls_mpi_get_nbits (prime);
+      if (x_size > 0) x_size--;
+    }
   else
     x_size = q_bits;
 
-  if (x_size > MAX_BITS || x_size <= 0)
+  if (x_size > MAX_BITS || x_size == 0)
     {
       gnutls_assert ();
-      return NULL;
+      return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
     }
 
   x = _gnutls_mpi_new(x_size);
   if (x == NULL)
     {
       gnutls_assert ();
+      ret = GNUTLS_E_MEMORY_ERROR;
       goto fail;
     }
 
@@ -74,6 +79,7 @@ gnutls_calc_dh_secret (bigint_t * ret_x, bigint_t g, bigint_t prime,
   if (e == NULL)
     {
       gnutls_assert ();
+      ret = GNUTLS_E_MEMORY_ERROR;
       goto fail;
     }
 
@@ -82,6 +88,7 @@ gnutls_calc_dh_secret (bigint_t * ret_x, bigint_t g, bigint_t prime,
       if (_gnutls_mpi_randomize (x, x_size, GNUTLS_RND_RANDOM) == NULL)
         {
           gnutls_assert();
+          ret = GNUTLS_E_INTERNAL_ERROR;
           goto fail;
         }
 
@@ -89,25 +96,26 @@ gnutls_calc_dh_secret (bigint_t * ret_x, bigint_t g, bigint_t prime,
     }
   while(_gnutls_mpi_cmp_ui(e, 1) == 0);
 
-  if (ret_x)
-    *ret_x = x;
-  else
-    _gnutls_mpi_release (&x);
-  return e;
+  *ret_x = x;
+  *ret_y = e;
+
+  return 0;
 
 fail:
   if (x) _gnutls_mpi_release (&x);
-  return NULL;
+  if (e) _gnutls_mpi_release (&e);
+  return ret;
 
 }
 
 /* returns f^x mod prime 
  */
-bigint_t
-gnutls_calc_dh_key (bigint_t f, bigint_t x, bigint_t prime)
+int
+gnutls_calc_dh_key (bigint_t *key, bigint_t f, bigint_t x, bigint_t prime)
 {
-  bigint_t k, ff, ret;
-  int bits;
+  bigint_t k, ff;
+  unsigned int bits;
+  int ret;
   
   ff = _gnutls_mpi_mod(f, prime);
   _gnutls_mpi_add_ui(ff, ff, 1);
@@ -118,15 +126,15 @@ gnutls_calc_dh_key (bigint_t f, bigint_t x, bigint_t prime)
       (_gnutls_mpi_cmp(ff,prime) == 0))
     {
       gnutls_assert();
-      ret = NULL;
+      ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
       goto cleanup;
     }
 
   bits = _gnutls_mpi_get_nbits (prime);
-  if (bits <= 0 || bits > MAX_BITS)
+  if (bits == 0 || bits > MAX_BITS)
     {
       gnutls_assert ();
-      ret = NULL;
+      ret = GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
       goto cleanup;
     }
 
@@ -134,14 +142,15 @@ gnutls_calc_dh_key (bigint_t f, bigint_t x, bigint_t prime)
   if (k == NULL)
     {
       gnutls_assert();
-      ret = NULL;
+      ret = GNUTLS_E_MEMORY_ERROR;
       goto cleanup;
     }
 
   _gnutls_mpi_powm (k, f, x, prime);
 
-  ret = k;
-
+  *key = k;
+  
+  ret = 0;
 cleanup:
   _gnutls_mpi_release (&ff);
   

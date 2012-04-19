@@ -74,14 +74,10 @@ _gnutls_proc_dh_common_client_kx (gnutls_session_t session,
 
   _gnutls_dh_set_peer_public (session, session->key->client_Y);
 
-  session->key->KEY =
-    gnutls_calc_dh_key (session->key->client_Y, session->key->dh_secret, p);
-
-  if (session->key->KEY == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
+  ret =
+    gnutls_calc_dh_key (&session->key->KEY, session->key->client_Y, session->key->dh_secret, p);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
   _gnutls_mpi_release (&session->key->client_Y);
   _gnutls_mpi_release (&session->key->dh_secret);
@@ -127,12 +123,11 @@ _gnutls_gen_dh_common_client_kx_int (gnutls_session_t session, gnutls_buffer_st*
   bigint_t x = NULL, X = NULL;
   int ret;
 
-  X = gnutls_calc_dh_secret (&x, session->key->client_g,
+  ret = gnutls_calc_dh_secret (&X, &x, session->key->client_g,
                              session->key->client_p, 0);
-  if (X == NULL || x == NULL)
+  if (ret < 0)
     {
       gnutls_assert ();
-      ret = GNUTLS_E_MEMORY_ERROR;
       goto error;
     }
 
@@ -146,13 +141,11 @@ _gnutls_gen_dh_common_client_kx_int (gnutls_session_t session, gnutls_buffer_st*
     }
 
   /* calculate the key after calculating the message */
-  session->key->KEY =
-    gnutls_calc_dh_key (session->key->client_Y, x, session->key->client_p);
-
-  if (session->key->KEY == NULL)
+  ret =
+    gnutls_calc_dh_key (&session->key->KEY, session->key->client_Y, x, session->key->client_p);
+  if (ret < 0)
     {
-      gnutls_assert ();
-      ret = GNUTLS_E_MEMORY_ERROR;
+      gnutls_assert();
       goto error;
     }
 
@@ -291,11 +284,11 @@ _gnutls_dh_common_print_server_kx (gnutls_session_t session,
   int ret;
 
   /* Y=g^x mod p */
-  Y = gnutls_calc_dh_secret (&x, g, p, q_bits);
-  if (Y == NULL || x == NULL)
+  ret = gnutls_calc_dh_secret (&Y, &x, g, p, q_bits);
+  if (ret < 0)
     {
       gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
+      return ret;
     }
 
   session->key->dh_secret = x;
