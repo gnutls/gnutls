@@ -103,7 +103,7 @@ check_b_mod_n (bigint_t b, bigint_t n)
 inline static int
 check_a_mod_n (bigint_t a, bigint_t n)
 {
-  int ret;
+  int ret, err = 0;
   bigint_t r;
 
   r = _gnutls_mpi_mod (a, n);
@@ -114,10 +114,18 @@ check_a_mod_n (bigint_t a, bigint_t n)
     }
 
   ret = _gnutls_mpi_cmp_ui (r, 0);
+  if (ret == 0) err = 1;
+
+  ret = _gnutls_mpi_cmp_ui (r, 1);
+  if (ret == 0) err = 1;
+
+  _gnutls_mpi_add_ui(r, r, 1);
+  ret = _gnutls_mpi_cmp (r, n);
+  if (ret == 0) err = 1;
 
   _gnutls_mpi_release (&r);
 
-  if (ret == 0)
+  if (err != 0)
     {
       gnutls_assert ();
       return GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER;
