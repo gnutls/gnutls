@@ -574,7 +574,7 @@ legitimate end of data or not.
 @item Weak message integrity for export ciphers.
 The cryptographic keys in @acronym{SSLv2} are used for both message
 authentication and encryption, so if weak encryption schemes are
-negotiated (say 40-bit keys) the message authentication code use the
+negotiated (say 40-bit keys) the message authentication code uses the
 same weak key, which isn't necessary.
 
 @end itemize

@@ -519,7 +519,7 @@ gen_group (mpz_t * prime, mpz_t * generator, unsigned int nbits, unsigned int *q
   _gnutls_debug_log ("Found prime q of %u bits. Looking for generator...\n",
                      *q_bits);
 
-  /* finally a prime! Let calculate generator
+  /* finally a prime! Let's calculate generator
    */
 
   /* c = r^((p-1)/q), r == random

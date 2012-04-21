@@ -48,7 +48,7 @@ const mod_auth_st ecdhe_ecdsa_auth_struct = {
   _gnutls_gen_cert_server_crt,
   _gnutls_gen_cert_client_crt,
   gen_dhe_server_kx,
-  _gnutls_gen_ecdh_common_client_kx,   /* This is the only different */
+  _gnutls_gen_ecdh_common_client_kx,   /* This is the only difference */
   _gnutls_gen_cert_client_crt_vrfy,
   _gnutls_gen_cert_server_cert_req,
 
@@ -65,7 +65,7 @@ const mod_auth_st ecdhe_rsa_auth_struct = {
   _gnutls_gen_cert_server_crt,
   _gnutls_gen_cert_client_crt,
   gen_dhe_server_kx,
-  _gnutls_gen_ecdh_common_client_kx,   /* This is the only different */
+  _gnutls_gen_ecdh_common_client_kx,   /* This is the only difference */
   _gnutls_gen_cert_client_crt_vrfy,
   _gnutls_gen_cert_server_cert_req,
 

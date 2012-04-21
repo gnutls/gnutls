@@ -675,7 +675,7 @@ check_g_n (const uint8_t * g, size_t n_g, const uint8_t * n, size_t n_n)
 }
 
 /* Check if N is a prime and G a generator of the
- * group. This is check only done if N is big enough.
+ * group. This check is only done if N is big enough.
  * Otherwise only the included parameters must be used.
  */
 static int

@@ -27,8 +27,8 @@
 
 #ifdef ENABLE_SRP
 
-/* this a modified base64 for srp !!! 
- * It seems that everybody makes an own base64 conversion.
+/* this is a modified base64 for srp !!!
+ * It seems that everybody makes their own base64 conversion.
  */
 static const uint8_t b64table[] =
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz./";

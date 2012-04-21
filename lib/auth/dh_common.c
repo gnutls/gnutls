@@ -22,7 +22,7 @@
 
 /* This file contains common stuff in Ephemeral Diffie-Hellman (DHE)
  * and Anonymous DH key exchange(DHA). These are used in the handshake
- * procedure of the certificate and anoymous authentication.
+ * procedure of the certificate and anonymous authentication.
  */
 
 #include "gnutls_int.h"

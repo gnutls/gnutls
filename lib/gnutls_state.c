@@ -980,17 +980,17 @@ _gnutls_PRF (gnutls_session_t session,
  * Apply the TLS Pseudo-Random-Function (PRF) on the master secret
  * and the provided data.
  *
- * The @label variable usually contain a string denoting the purpose
- * for the generated data.  The @seed usually contain data such as the
+ * The @label variable usually contains a string denoting the purpose
+ * for the generated data.  The @seed usually contains data such as the
  * client and server random, perhaps together with some additional
  * data that is added to guarantee uniqueness of the output for a
  * particular purpose.
  *
  * Because the output is not guaranteed to be unique for a particular
- * session unless @seed include the client random and server random
+ * session unless @seed includes the client random and server random
  * fields (the PRF would output the same data on another connection
  * resumed from the first one), it is not recommended to use this
- * function directly.  The gnutls_prf() function seed the PRF with the
+ * function directly.  The gnutls_prf() function seeds the PRF with the
  * client and server random fields directly, and is recommended if you
  * want to generate pseudo random data unique for each session.
  *
@@ -1027,14 +1027,14 @@ gnutls_prf_raw (gnutls_session_t session,
  * Apply the TLS Pseudo-Random-Function (PRF) on the master secret
  * and the provided data, seeded with the client and server random fields.
  *
- * The @label variable usually contain a string denoting the purpose
- * for the generated data.  The @server_random_first indicate whether
+ * The @label variable usually contains a string denoting the purpose
+ * for the generated data.  The @server_random_first indicates whether
  * the client random field or the server random field should be first
- * in the seed.  Non-0 indicate that the server random field is first,
+ * in the seed.  Non-0 indicates that the server random field is first,
  * 0 that the client random field is first.
  *
  * The @extra variable can be used to add more data to the seed, after
- * the random variables.  It can be used to tie make sure the
+ * the random variables.  It can be used to make sure the
  * generated output is strongly connected to some additional data
  * (e.g., a string used in user authentication).
  *
@@ -1218,7 +1218,7 @@ gnutls_session_get_ptr (gnutls_session_t session)
  * @ptr: is the user pointer
  *
  * This function will set (associate) the user given pointer @ptr to
- * the session structure.  This is pointer can be accessed with
+ * the session structure.  This pointer can be accessed with
  * gnutls_session_get_ptr().
  **/
 void
@@ -1438,7 +1438,7 @@ gnutls_protocol_get_version (gnutls_session_t session)
  * @client: the client part of the random
  * @server: the server part of the random
  *
- * This functions returns pointers to the client and server
+ * This function returns pointers to the client and server
  * random fields used in the TLS handshake. The pointers are
  * not to be modified or deallocated.
  *
