@@ -9,6 +9,9 @@ Version 2.12.19 (unreleased)
 is assumed to be a file that stores the pin. Based on patch
 by David Smith.
 
+** libgnutls: Added strict tests in Diffie-Hellman and
+SRP key exchange public keys.
+
 ** minitasn1: Upgraded to libtasn1 version 2.13 (pre-release).
 
 ** API and ABI modifications:
