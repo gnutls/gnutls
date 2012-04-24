@@ -14,7 +14,6 @@ We require several tools to check out and build the software, including:
 - Libtool <http://www.gnu.org/software/libtool/>
 - Gettext <http://www.gnu.org/software/gettext/>
 - Texinfo <http://www.gnu.org/software/texinfo/>
-- help2man <http://www.gnu.org/software/help2man/>
 - Tar <http://www.gnu.org/software/tar/>
 - Gzip <http://www.gnu.org/software/gzip/>
 - Texlive & epsf <http://www.tug.org/texlive/> (for PDF manual)
