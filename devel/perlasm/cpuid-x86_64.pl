@@ -27,7 +27,7 @@ $code=".text\n";
 
 $code.=<<___;
 .globl gnutls_cpuid
-.type gnutls_cpuid,\@abi-omnipotent
+.type gnutls_cpuid,\@function
 .align	16
 gnutls_cpuid:
 	pushq	%rbp

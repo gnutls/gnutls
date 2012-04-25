@@ -25,6 +25,17 @@
 .def	gnutls_cpuid;	.scl 2;	.type 32;	.endef
 .p2align	4
 gnutls_cpuid:
+	movq	%rdi,8(%rsp)
+	movq	%rsi,16(%rsp)
+	movq	%rsp,%rax
+.LSEH_begin_gnutls_cpuid:
+	movq	%rcx,%rdi
+	movq	%rdx,%rsi
+	movq	%r8,%rdx
+	movq	%r9,%rcx
+	movq	40(%rsp),%r8
+	movq	48(%rsp),%r9
+
 	pushq	%rbp
 	movq	%rsp,%rbp
 	pushq	%rbx
@@ -52,5 +63,7 @@ gnutls_cpuid:
 	movl	%ecx,(%rax)
 	popq	%rbx
 	leave
+	movq	8(%rsp),%rdi
+	movq	16(%rsp),%rsi
 	.byte	0xf3,0xc3
-
+.LSEH_end_gnutls_cpuid:
