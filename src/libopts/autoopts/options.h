@@ -1028,8 +1028,6 @@ extern unsigned int ao_string_cook_escape_char(char const*, char*, unsigned int)
 
 extern void genshelloptUsage(tOptions*, int);
 
-extern int optionAlias(tOptions*, tOptDesc*, unsigned int);
-
 extern void optionBooleanVal(tOptions*, tOptDesc*);
 
 extern uintptr_t optionEnumerationVal(tOptions*, tOptDesc*, char const * const *, unsigned int);
