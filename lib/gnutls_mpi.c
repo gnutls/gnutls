@@ -152,7 +152,7 @@ _gnutls_mpi_scan_nz (bigint_t * ret_mpi, const void *buffer, size_t nbytes)
 
   /* MPIs with 0 bits are illegal
    */
-  if (_gnutls_mpi_get_nbits (*ret_mpi) == 0)
+  if (_gnutls_mpi_cmp_ui (*ret_mpi, 0) == 0)
     {
       _gnutls_mpi_release (ret_mpi);
       return GNUTLS_E_MPI_SCAN_FAILED;
