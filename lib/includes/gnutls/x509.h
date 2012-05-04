@@ -699,7 +699,7 @@ int gnutls_pkcs7_delete_crl(gnutls_pkcs7_t pkcs7, int indx);
 /**
  * gnutls_certificate_verify_flags:
  * @GNUTLS_VERIFY_DISABLE_CA_SIGN: If set a signer does not have to be
- *   a certificate authority. This flag should normaly be disabled,
+ *   a certificate authority. This flag should normally be disabled,
  *   unless you know what this means.
  * @GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS: If set a signer in the trusted
  *   list is never checked for expiration or activation.

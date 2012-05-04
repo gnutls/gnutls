@@ -88,7 +88,7 @@ _gnutls_record_buffer_put(gnutls_session_t session,
  * This function checks if there are unread data
  * in the gnutls buffers. If the return value is
  * non-zero the next call to gnutls_record_recv()
- * is guarranteed not to block.
+ * is guaranteed not to block.
  *
  * Returns: Returns the size of the data or zero.
  **/

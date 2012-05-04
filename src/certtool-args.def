@@ -159,8 +159,8 @@ flag = {
 
 flag = {
     name      = cprint;
-    descrip   = "In certain operations it prints the information is C-friendly format";
-    doc   = "In certain operations it prints the information is C-friendly format, suitable for including into C programs.";
+    descrip   = "In certain operations it prints the information in C-friendly format";
+    doc   = "In certain operations it prints the information in C-friendly format, suitable for including into C programs.";
 };
 
 flag = {
