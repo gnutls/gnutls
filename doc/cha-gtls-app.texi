@@ -1267,7 +1267,7 @@ and SRP authentication.
 
 To reduce time and roundtrips spent in a handshake the client can   
 request session resumption from a server that previously shared
-a session with. For that the client has to retrieve and store
+a session with the client. For that the client has to retrieve and store
 the session parameters. Before establishing a new session to the same 
 server the parameters must be re-associated with the GnuTLS session
 using @funcref{gnutls_session_set_data}.

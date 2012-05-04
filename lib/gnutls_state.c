@@ -729,7 +729,7 @@ _gnutls_record_set_default_version(gnutls_session_t session,
  *
  * This function will enable or disable the use of private cipher
  * suites (the ones that start with 0xFF).  By default or if @allow
- * is 0 then these cipher suites will not be advertized nor used.
+ * is 0 then these cipher suites will not be advertised nor used.
  *
  * Currently GnuTLS does not include such cipher-suites or
  * compression algorithms.

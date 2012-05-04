@@ -262,7 +262,7 @@ record MAC', or both, on the GnuTLS server side.
 If compatibility with such devices is a concern, not sending length-hidden messages
 solves the problem by using minimal padding.
 
-If you implement an application that have a configuration file, we
+If you implement an application that has a configuration file, we
 recommend that you make it possible for users or administrators to
 specify a GnuTLS protocol priority string, which is used by your
 application via @funcref{gnutls_priority_set}.  To allow the best
@@ -454,8 +454,8 @@ client.
 @cindex session tickets
 @cindex tickets
 
-To resume a TLS session the server normally store session parameters.  This
-complicates deployment, and could be avoiding by delegating the storage
+To resume a TLS session, the server normally stores session parameters.  This
+complicates deployment, and can be avoided by delegating the storage
 to the client. Because session parameters are sensitive they are encrypted
 and authenticated with a key only known to the server and then sent to the
 client. The Session Tickets extension is described in RFC 5077 @xcite{TLSTKT}.
@@ -497,7 +497,7 @@ For example one server could forward all renegotiation traffic to an other
 server who will see this traffic as an initial negotiation attempt.
 
 This might be seen as a valid design decision, but it seems it was
-not widely known or understood, thus today some application protocols the TLS
+not widely known or understood, thus today some application protocols use the TLS
 renegotiation feature in a manner that enables a malicious server to insert
 content of his choice in the beginning of a TLS session.
 
