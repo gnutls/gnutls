@@ -479,9 +479,6 @@ cert_verify_callback (gnutls_session_t session)
   int ssh = ENABLED_OPT(TOFU);
   const char* txt_service;
 
-  if (!x509_cafile && !pgp_keyring)
-    return 0;
-    
   rc = cert_verify(session, hostname);
   if (rc == 0)
     {
@@ -1184,11 +1181,6 @@ const char* rest = NULL;
   
   if (HAVE_OPT(X509CAFILE))
     x509_cafile = OPT_ARG(X509CAFILE);
-  else
-    {
-      if (access(DEFAULT_CA_FILE, R_OK) == 0)
-        x509_cafile = DEFAULT_CA_FILE;
-    }
   
   if (HAVE_OPT(X509CRLFILE))
     x509_crlfile = OPT_ARG(X509CRLFILE);
@@ -1419,15 +1411,20 @@ init_global_tls_stuff (void)
     {
       ret = gnutls_certificate_set_x509_trust_file (xcred,
                                                     x509_cafile, x509ctype);
-      if (ret < 0)
-        {
-          fprintf (stderr, "Error setting the x509 trust file\n");
-        }
-      else
-        {
-          printf ("Processed %d CA certificate(s).\n", ret);
-        }
     }
+  else
+    {
+      ret = gnutls_certificate_set_x509_system_trust (xcred);
+    }
+  if (ret < 0)
+    {
+      fprintf (stderr, "Error setting the x509 trust file\n");
+    }
+  else
+    {
+      printf ("Processed %d CA certificate(s).\n", ret);
+    }
+
   if (x509_crlfile != NULL)
     {
       ret = gnutls_certificate_set_x509_crl_file (xcred, x509_crlfile,

@@ -1100,6 +1100,9 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                              unsigned int max_depth);
 
   int
+    gnutls_certificate_set_x509_system_trust (gnutls_certificate_credentials_t cred);
+
+  int
     gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t
                                             cred, const char *cafile,
                                             gnutls_x509_crt_fmt_t type);
