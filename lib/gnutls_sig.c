@@ -933,7 +933,7 @@ encode_ber_digest_info (gnutls_digest_algorithm_t hash,
   asn1_der_coding (dinfo, "", NULL, &tmp_output_size, NULL);
 
   tmp_output = gnutls_malloc (tmp_output_size);
-  if (output->data == NULL)
+  if (tmp_output == NULL)
     {
       gnutls_assert ();
       asn1_delete_structure (&dinfo);
