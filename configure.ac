@@ -285,6 +285,41 @@ AC_PROG_LN_S
 AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
 
+AC_ARG_WITH([default-trust-store-pkcs11],
+  [AS_HELP_STRING([--with-default-trust-store-pkcs11=URI],
+    [use the given pkcs11 uri as default trust store])])
+
+if test "x$with_default_trust_store_pkcs11" != x; then
+  if test "x$with_p11_kit" = xno; then
+    AC_MSG_ERROR([cannot use pkcs11 store without p11-kit])
+  fi
+  AC_DEFINE_UNQUOTED([DEFAULT_TRUST_STORE_PKCS11],
+    ["$with_default_trust_store_pkcs11"], [use the given pkcs11 uri as default trust store])
+fi
+
+AC_ARG_WITH([default-trust-store-file],
+  [AS_HELP_STRING([--with-default-trust-store-file=FILE],
+    [use the given file default trust store])])
+
+if test "x$with_default_trust_store_pkcs11" = x -a "x$with_default_trust_store_file" = x; then
+  # auto detect http://lists.gnu.org/archive/html/help-gnutls/2012-05/msg00004.html
+  for i in \
+    /etc/ssl/certs/ca-certificates.crt \
+    /etc/pki/tls/cert.pem \
+    /usr/local/share/certs/ca-root-nss.crt
+    do
+    if test -e $i; then
+      with_default_trust_store_file="$i"
+      break
+    fi
+  done
+fi
+
+if test "x$with_default_trust_store_file" != x; then
+  AC_DEFINE_UNQUOTED([DEFAULT_TRUST_STORE_FILE],
+    ["$with_default_trust_store_file"], [use the given file default trust store])
+fi
+
 dnl Guile bindings.
 opt_guile_bindings=yes
 AC_MSG_CHECKING([whether building Guile bindings])
@@ -518,6 +553,8 @@ if features are disabled)
   SRP support:      $ac_enable_srp
   PSK support:      $ac_enable_psk
   Anon auth support:$ac_enable_anon
+  Trust store pkcs: $with_default_trust_store_pkcs11
+  Trust store file: $with_default_trust_store_file
 ])
 
 AC_MSG_NOTICE([Optional applications:

@@ -1588,6 +1588,61 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t cred,
   return ret;
 }
 
+#ifdef DEFAULT_TRUST_STORE_FILE
+static int
+_gnutls_certificate_set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
+{
+  int ret;
+  gnutls_datum_t cas;
+  size_t size;
+
+  cas.data = (void*)read_binary_file (DEFAULT_TRUST_STORE_FILE, &size);
+  if (cas.data == NULL)
+    {
+      gnutls_assert ();
+      return GNUTLS_E_FILE_ERROR;
+    }
+
+  cas.size = size;
+
+  ret = gnutls_certificate_set_x509_trust_mem(cred, &cas, GNUTLS_X509_FMT_PEM);
+
+  free (cas.data);
+
+  if (ret < 0)
+    {
+      gnutls_assert ();
+    }
+
+  return ret;
+}
+#endif
+
+/**
+ * gnutls_certificate_set_x509_system_trust:
+ * @cred: is a #gnutls_certificate_credentials_t structure.
+ *
+ * This function adds the system's default trusted CAs in order to
+ * verify client or server certificates.
+ *
+ **/
+int
+gnutls_certificate_set_x509_system_trust (gnutls_certificate_credentials_t cred)
+{
+  int ret, r = 0;
+#if defined(ENABLE_PKCS11) && defined(DEFAULT_TRUST_STORE_PKCS11)
+  ret = read_cas_url (cred, DEFAULT_TRUST_STORE_PKCS11);
+  if (ret > 0)
+    r += ret;
+#endif
+#ifdef DEFAULT_TRUST_STORE_FILE
+  ret = _gnutls_certificate_set_x509_system_trust_file(cred);
+  if (ret > 0)
+    r += ret;
+#endif
+  return r;
+}
+
 static int
 parse_pem_crl_mem (gnutls_x509_trust_list_t tlist, 
                    const char * input_crl, unsigned int input_crl_size)

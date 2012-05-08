@@ -314,6 +314,7 @@ APIMANS += gnutls_certificate_free_crls.3
 APIMANS += gnutls_certificate_set_dh_params.3
 APIMANS += gnutls_certificate_set_verify_flags.3
 APIMANS += gnutls_certificate_set_verify_limits.3
+APIMANS += gnutls_certificate_set_x509_system_trust.3
 APIMANS += gnutls_certificate_set_x509_trust_file.3
 APIMANS += gnutls_certificate_set_x509_trust_mem.3
 APIMANS += gnutls_certificate_set_x509_crl_file.3

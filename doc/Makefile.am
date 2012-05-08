@@ -719,6 +719,7 @@ FUNCS += functions/gnutls_certificate_free_crls
 FUNCS += functions/gnutls_certificate_set_dh_params
 FUNCS += functions/gnutls_certificate_set_verify_flags
 FUNCS += functions/gnutls_certificate_set_verify_limits
+FUNCS += functions/gnutls_certificate_set_x509_system_trust
 FUNCS += functions/gnutls_certificate_set_x509_trust_file
 FUNCS += functions/gnutls_certificate_set_x509_trust_mem
 FUNCS += functions/gnutls_certificate_set_x509_crl_file
