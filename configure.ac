@@ -36,6 +36,9 @@ AC_MSG_RESULT([***
 
 dnl Checks for programs.
 AC_PROG_CC
+# automake 1.12 seems to require this, but automake 1.11 doesn't recognize it
+m4_pattern_allow([AM_PROG_AR])
+AM_PROG_AR
 AC_PROG_LN_S
 GTK_DOC_CHECK(1.1)
 AC_PATH_PROG([GAA], [gaa])

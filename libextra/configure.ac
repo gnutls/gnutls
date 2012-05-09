@@ -31,6 +31,9 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AM_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
+# automake 1.12 seems to require this, but automake 1.11 doesn't recognize it
+m4_pattern_allow([AM_PROG_AR])
+AM_PROG_AR
 xgl_EARLY
 
 AC_LIBTOOL_WIN32_DLL
