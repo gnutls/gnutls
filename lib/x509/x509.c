@@ -2693,7 +2693,7 @@ gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
  * This function will verify the given signed digest, using the
  * parameters from the certificate.
  *
- * Deprecated. Please use gnutls_pubkey_verify_data().
+ * Deprecated. Please use gnutls_pubkey_verify_data2() or gnutls_pubkey_verify_hash2().
  *
  * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
  * is returned, and zero or positive code on success.
@@ -2703,7 +2703,9 @@ gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,
                              const gnutls_datum_t * hash,
                              const gnutls_datum_t * signature)
 {
-  int result;
+  gnutls_pk_params_st params;
+  gnutls_digest_algorithm_t algo;
+  int ret;
 
   if (crt == NULL)
     {
@@ -2711,14 +2713,33 @@ gnutls_x509_crt_verify_hash (gnutls_x509_crt_t crt, unsigned int flags,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  result = _gnutls_x509_verify_hashed_data (hash, signature, crt);
-  if (result < 0)
+  ret = gnutls_x509_crt_get_verify_algorithm (crt, signature, &algo);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  /* Read the MPI parameters from the issuer's certificate.
+   */
+  ret =
+    _gnutls_x509_crt_get_mpis (crt, &params);
+  if (ret < 0)
     {
       gnutls_assert ();
-      return result;
+      return ret;
     }
 
-  return result;
+  ret =
+    pubkey_verify_hashed_data (gnutls_x509_crt_get_pk_algorithm (crt, NULL), algo,
+                               hash, signature, &params);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+    }
+
+  /* release all allocated MPIs
+   */
+  gnutls_pk_params_release(&params);
+
+  return ret;
 }
 
 /**

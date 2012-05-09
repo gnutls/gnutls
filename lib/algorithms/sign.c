@@ -178,12 +178,22 @@ _gnutls_x509_oid2sign_algorithm (const char *oid)
   return ret;
 }
 
+/**
+ * gnutls_pk_to_sign:
+ * @pk: is a public key algorithm
+ * @hash: a hash algorithm
+ *
+ * This function maps public key and hash algorithms combinations
+ * to signature algorithms.
+ *
+ * Returns: return a #gnutls_sign_algorithm_t value, or %GNUTLS_SIGN_UNKNOWN on error.
+ **/
 gnutls_sign_algorithm_t
-_gnutls_x509_pk_to_sign (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t mac)
+gnutls_pk_to_sign (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash)
 {
   gnutls_sign_algorithm_t ret = 0;
 
-  GNUTLS_SIGN_LOOP (if (pk == p->pk && mac == p->mac)
+  GNUTLS_SIGN_LOOP (if (pk == p->pk && hash == p->mac)
                     {
                     ret = p->id; break;}
   );
@@ -200,7 +210,7 @@ _gnutls_x509_sign_to_oid (gnutls_pk_algorithm_t pk,
   gnutls_sign_algorithm_t sign;
   const char *ret = NULL;
 
-  sign = _gnutls_x509_pk_to_sign (pk, mac);
+  sign = gnutls_pk_to_sign (pk, mac);
   if (sign == GNUTLS_SIGN_UNKNOWN)
     return NULL;
 

@@ -272,6 +272,7 @@ static int
 verify_tls_hash (gnutls_protocol_t ver, gnutls_pcert_st* cert,
                     const gnutls_datum_t * hash_concat,
                     gnutls_datum_t * signature, size_t sha1pos,
+                    gnutls_sign_algorithm_t sign_algo,
                     gnutls_pk_algorithm_t pk_algo)
 {
   int ret;
@@ -326,8 +327,8 @@ verify_tls_hash (gnutls_protocol_t ver, gnutls_pcert_st* cert,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  ret = gnutls_pubkey_verify_hash(cert->pubkey, flags, &vdata,
-    signature);
+  ret = gnutls_pubkey_verify_hash2(cert->pubkey, sign_algo, flags, 
+                                   &vdata, signature);
 
   if (ret < 0)
     return gnutls_assert_val(ret);
@@ -344,7 +345,7 @@ int
 _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_pcert_st* cert,
                                const gnutls_datum_t * params,
                                gnutls_datum_t * signature,
-                               gnutls_sign_algorithm_t algo)
+                               gnutls_sign_algorithm_t sign_algo)
 {
   gnutls_datum_t dconcat;
   int ret;
@@ -357,17 +358,17 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_pcert_st* cert,
   if (_gnutls_version_has_selectable_sighash (ver))
     {
       _gnutls_handshake_log ("HSK[%p]: verify handshake data: using %s\n",
-                    session, gnutls_sign_algorithm_get_name (algo));
+                    session, gnutls_sign_algorithm_get_name (sign_algo));
 
-      ret = _gnutls_pubkey_compatible_with_sig(cert->pubkey, ver, algo);
+      ret = _gnutls_pubkey_compatible_with_sig(cert->pubkey, ver, sign_algo);
       if (ret < 0)
         return gnutls_assert_val(ret);
 
-      ret = _gnutls_session_sign_algo_enabled (session, algo);
+      ret = _gnutls_session_sign_algo_enabled (session, sign_algo);
       if (ret < 0)
         return gnutls_assert_val(ret);
 
-      hash_algo = _gnutls_sign_get_hash_algorithm (algo);
+      hash_algo = _gnutls_sign_get_hash_algorithm (sign_algo);
     }
   else
     {
@@ -420,7 +421,8 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_pcert_st* cert,
   ret = verify_tls_hash (ver, cert, &dconcat, signature,
                             dconcat.size -
                             _gnutls_hash_get_algo_len (hash_algo),
-                            _gnutls_sign_get_pk_algorithm (algo));
+                            sign_algo,
+                            _gnutls_sign_get_pk_algorithm (sign_algo));
   if (ret < 0)
     {
       gnutls_assert ();
@@ -465,7 +467,7 @@ _gnutls_handshake_verify_crt_vrfy12 (gnutls_session_t session,
   dconcat.size = _gnutls_hash_get_algo_len (hash_algo);
 
   ret =
-    verify_tls_hash (ver, cert, &dconcat, signature, 0, pk);
+    verify_tls_hash (ver, cert, &dconcat, signature, 0, sign_algo, pk);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -560,6 +562,7 @@ _gnutls_handshake_verify_crt_vrfy (gnutls_session_t session,
 
   ret =
     verify_tls_hash (ver, cert, &dconcat, signature, 16,
+                        GNUTLS_SIGN_UNKNOWN,
                         gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL));
   if (ret < 0)
     {

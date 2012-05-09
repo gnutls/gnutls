@@ -2,6 +2,15 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+* Version 3.0.20 (unreleased)
+
+** libgnutls: Added gnutls_pubkey_verify_hash2()
+
+** API and ABI modifications:
+gnutls_pk_to_sign: Added
+gnutls_pubkey_verify_hash2: Added
+
+
 * Version 3.0.19 (released 2012-04-22)
 
 ** libgnutls: When decoding a PKCS #11 URL the pin-source field

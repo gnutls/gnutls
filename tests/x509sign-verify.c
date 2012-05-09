@@ -40,6 +40,12 @@
 
 #include "utils.h"
 
+static void
+tls_log_func (int level, const char *str)
+{
+  fprintf (stderr, "<%d> %s", level, str);
+}
+
 /* sha1 hash of "hello" string */
 const gnutls_datum_t hash_data = {
   (void *)
@@ -147,12 +153,17 @@ doit (void)
   gnutls_pubkey_t pubkey;
   gnutls_privkey_t privkey;
   gnutls_digest_algorithm_t hash_algo;
+  gnutls_sign_algorithm_t sign_algo;
   gnutls_datum_t signature;
   gnutls_datum_t signature2;
   int ret;
   size_t i;
 
   gnutls_global_init ();
+
+  gnutls_global_set_log_function (tls_log_func);
+  if (debug)
+    gnutls_global_set_log_level (6);
 
   for (i = 0; i < sizeof (key_dat) / sizeof (key_dat[0]); i++)
     {
@@ -210,7 +221,7 @@ doit (void)
 
       ret = gnutls_pubkey_verify_hash (pubkey, 0, &hash_data, &signature);
       if (ret < 0)
-        fail ("gnutls_x509_privkey_verify_hash\n");
+        fail ("gnutls_x509_pubkey_verify_hash\n");
 
       ret =
         gnutls_pubkey_get_verify_algorithm (pubkey, &signature2, &hash_algo);
@@ -219,12 +230,24 @@ doit (void)
 
       ret = gnutls_pubkey_verify_hash (pubkey, 0, &hash_data, &signature2);
       if (ret < 0)
-        fail ("gnutls_x509_privkey_verify_hash (hashed data)\n");
+        fail ("gnutls_x509_pubkey_verify_hash-1 (hashed data)\n");
 
       /* should fail */
       ret = gnutls_pubkey_verify_hash (pubkey, 0, &invalid_hash_data, &signature2);
       if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
-        fail ("gnutls_x509_privkey_verify_hash (hashed data)\n");
+        fail ("gnutls_x509_pubkey_verify_hash-2 (hashed data)\n");
+        
+      sign_algo = gnutls_pk_to_sign(gnutls_pubkey_get_pk_algorithm(pubkey, NULL),
+                                    GNUTLS_DIG_SHA1);
+
+      ret = gnutls_pubkey_verify_hash2 (pubkey, sign_algo, 0, &hash_data, &signature2);
+      if (ret < 0)
+        fail ("gnutls_x509_pubkey_verify_hash2-1 (hashed data)\n");
+
+      /* should fail */
+      ret = gnutls_pubkey_verify_hash2 (pubkey, sign_algo, 0, &invalid_hash_data, &signature2);
+      if (ret != GNUTLS_E_PK_SIG_VERIFY_FAILED)
+        fail ("gnutls_x509_pubkey_verify_hash2-2 (hashed data)\n");
 
 
       gnutls_free(signature.data);

@@ -1373,7 +1373,6 @@ gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey,
   return ret;
 }
 
-
 /**
  * gnutls_pubkey_verify_hash:
  * @key: Holds the public key
@@ -1382,7 +1381,8 @@ gnutls_pubkey_verify_data2 (gnutls_pubkey_t pubkey,
  * @signature: contains the signature
  *
  * This function will verify the given signed digest, using the
- * parameters from the public key.
+ * parameters from the public key. Use gnutls_pubkey_verify_hash2()
+ * instead of this function.
  *
  * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
  * is returned, and zero or positive code on success.
@@ -1394,6 +1394,41 @@ gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
                            const gnutls_datum_t * hash,
                            const gnutls_datum_t * signature)
 {
+gnutls_digest_algorithm_t algo;
+int ret;
+
+  ret = gnutls_pubkey_get_verify_algorithm (key, signature, &algo);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  return gnutls_pubkey_verify_hash2(key, gnutls_pk_to_sign(key->pk_algorithm, algo),
+                                    flags, hash, signature);
+}
+
+
+/**
+ * gnutls_pubkey_verify_hash:
+ * @key: Holds the public key
+ * @algo: The signature algorithm used
+ * @flags: should be 0 for now
+ * @hash: holds the hash digest to be verified
+ * @signature: contains the signature
+ *
+ * This function will verify the given signed digest, using the
+ * parameters from the public key.
+ *
+ * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
+ * is returned, and zero or positive code on success.
+ *
+ * Since: 3.0
+ **/
+int
+gnutls_pubkey_verify_hash2 (gnutls_pubkey_t key, 
+                            gnutls_sign_algorithm_t algo,
+                            unsigned int flags,
+                            const gnutls_datum_t * hash,
+                            const gnutls_datum_t * signature)
+{
   if (key == NULL)
     {
       gnutls_assert ();
@@ -1404,8 +1439,8 @@ gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
     return _gnutls_rsa_verify (hash, signature, &key->params, 1);
   else
     {
-      return pubkey_verify_hashed_data (key->pk_algorithm, hash, signature,
-                       &key->params);
+      return pubkey_verify_hashed_data (key->pk_algorithm, _gnutls_sign_get_hash_algorithm(algo),
+                                        hash, signature, &key->params);
     }
 }
 
@@ -1535,7 +1570,8 @@ _gnutls_pubkey_get_mpis (gnutls_pubkey_t key,
  * params[1] is public key
  */
 static int
-_pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
+_pkcs1_rsa_verify_sig (gnutls_digest_algorithm_t hash_algo,
+                       const gnutls_datum_t * text,
                        const gnutls_datum_t * prehash,
                        const gnutls_datum_t * signature, 
                        gnutls_pk_params_st * params)
@@ -1568,6 +1604,9 @@ _pkcs1_rsa_verify_sig (const gnutls_datum_t * text,
     }
 
   _gnutls_free_datum (&decrypted);
+
+  if (hash_algo != GNUTLS_DIG_UNKNOWN && hash_algo != hash)
+    return gnutls_assert_val(GNUTLS_E_PK_SIG_VERIFY_FAILED);
 
   if (digest_size != _gnutls_hash_get_algo_len (hash))
     {
@@ -1672,9 +1711,10 @@ dsa_verify_data (gnutls_pk_algorithm_t pk,
  */
 int
 pubkey_verify_hashed_data (gnutls_pk_algorithm_t pk,
-                   const gnutls_datum_t * hash,
-                   const gnutls_datum_t * signature,
-                   gnutls_pk_params_st * issuer_params)
+                           gnutls_digest_algorithm_t hash_algo,
+                           const gnutls_datum_t * hash,
+                           const gnutls_datum_t * signature,
+                           gnutls_pk_params_st * issuer_params)
 {
 
   switch (pk)
@@ -1682,7 +1722,7 @@ pubkey_verify_hashed_data (gnutls_pk_algorithm_t pk,
     case GNUTLS_PK_RSA:
 
       if (_pkcs1_rsa_verify_sig
-          (NULL, hash, signature, issuer_params) != 0)
+          (hash_algo, NULL, hash, signature, issuer_params) != 0)
         {
           gnutls_assert ();
           return GNUTLS_E_PK_SIG_VERIFY_FAILED;
@@ -1724,7 +1764,7 @@ pubkey_verify_data (gnutls_pk_algorithm_t pk,
     case GNUTLS_PK_RSA:
 
       if (_pkcs1_rsa_verify_sig
-          (data, NULL, signature, issuer_params) != 0)
+          (algo, data, NULL, signature, issuer_params) != 0)
         {
           gnutls_assert ();
           return GNUTLS_E_PK_SIG_VERIFY_FAILED;

@@ -786,6 +786,8 @@ GNUTLS_3_0_0 {
 	gnutls_x509_crt_set_private_key_usage_period;
 	gnutls_x509_crq_set_private_key_usage_period;
 	gnutls_session_get_random;
+	gnutls_pubkey_verify_hash2;
+	gnutls_pk_to_sign;
 } GNUTLS_2_12;
 
 GNUTLS_PRIVATE {

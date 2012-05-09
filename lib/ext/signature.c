@@ -264,7 +264,7 @@ _gnutls_session_get_sign_algo (gnutls_session_t session, gnutls_pcert_st* cert)
       || priv->sign_algorithms_size == 0)
     /* none set, allow SHA-1 only */
     {
-      return _gnutls_x509_pk_to_sign (cert_algo, GNUTLS_DIG_SHA1);
+      return gnutls_pk_to_sign (cert_algo, GNUTLS_DIG_SHA1);
     }
 
   for (i = 0; i < priv->sign_algorithms_size; i++)

@@ -788,39 +788,6 @@ _gnutls_x509_verify_data (gnutls_digest_algorithm_t algo,
   return ret;
 }
 
-int
-_gnutls_x509_verify_hashed_data (const gnutls_datum_t * hash,
-                                 const gnutls_datum_t * signature,
-                                 gnutls_x509_crt_t issuer)
-{
-  gnutls_pk_params_st issuer_params;
-  int ret;
-
-  /* Read the MPI parameters from the issuer's certificate.
-   */
-  ret =
-    _gnutls_x509_crt_get_mpis (issuer, &issuer_params);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  ret =
-    pubkey_verify_hashed_data (gnutls_x509_crt_get_pk_algorithm (issuer, NULL),
-                               hash, signature, &issuer_params);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-    }
-
-  /* release all allocated MPIs
-   */
-  gnutls_pk_params_release(&issuer_params);
-
-  return ret;
-}
-
 /**
  * gnutls_x509_crt_list_verify:
  * @cert_list: is the certificate list to be verified

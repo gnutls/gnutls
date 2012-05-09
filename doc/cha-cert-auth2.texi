@@ -615,7 +615,7 @@ The abstract key types can be used to access signing and
 signature verification operations with the underlying keys.
 
 @showfuncdesc{gnutls_pubkey_verify_data2}
-@showfuncdesc{gnutls_pubkey_verify_hash}
+@showfuncdesc{gnutls_pubkey_verify_hash2}
 @showfuncdesc{gnutls_pubkey_encrypt_data}
 
 @showfuncdesc{gnutls_privkey_sign_data}
