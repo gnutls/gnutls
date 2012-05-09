@@ -3117,7 +3117,7 @@ cleanup:
  *
  * This function will convert the given PEM encoded certificate list
  * to the native gnutls_x509_crt_t format. The output will be stored
- * in @certs.  They will be automatically initialized.
+ * in @certs which will be initialized.
  *
  * If the Certificate is PEM encoded it should have a header of "X509
  * CERTIFICATE", or "CERTIFICATE".

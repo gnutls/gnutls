@@ -2544,6 +2544,63 @@ gnutls_pkcs11_obj_list_import_url (gnutls_pkcs11_obj_t * p_list,
 }
 
 /**
+ * gnutls_pkcs11_obj_list_import_url2:
+ * @p_list: An uninitialized object list (may be NULL)
+ * @n_list: It will contain the size of the list.
+ * @url: A PKCS 11 url identifying a set of objects
+ * @attrs: Attributes of type #gnutls_pkcs11_obj_attr_t that can be used to limit output
+ * @flags: One of GNUTLS_PKCS11_OBJ_* flags
+ *
+ * This function will initialize and set values to an object list
+ * by using all objects identified by the PKCS 11 URL. The output
+ * is stored in @p_list, which will be initialized.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1
+ **/
+int
+gnutls_pkcs11_obj_list_import_url2 (gnutls_pkcs11_obj_t ** p_list,
+                                   unsigned int *n_list,
+                                   const char *url,
+                                   gnutls_pkcs11_obj_attr_t attrs,
+                                   unsigned int flags)
+{
+unsigned int init = 1024;
+int ret;
+
+  *p_list = gnutls_malloc(sizeof(gnutls_pkcs11_obj_t)*init);
+  if (*p_list == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  ret = gnutls_pkcs11_obj_list_import_url( *p_list, &init, url, attrs, flags);
+  if (ret == GNUTLS_E_SHORT_MEMORY_BUFFER)
+    {
+      *p_list = gnutls_realloc_fast(*p_list, sizeof(gnutls_pkcs11_obj_t)*init);
+      if (*p_list == NULL)
+        return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+      
+      ret = gnutls_pkcs11_obj_list_import_url( *p_list, &init, url, attrs, flags);
+    }
+
+  if (ret < 0)
+    {
+      gnutls_assert();
+      gnutls_free(*p_list);
+      *p_list = NULL;
+      return ret;
+    }
+
+  *n_list = init;
+  return 0;
+
+}
+
+/**
  * gnutls_x509_crt_import_pkcs11_url:
  * @crt: A certificate of type #gnutls_x509_crt_t
  * @url: A PKCS 11 url

@@ -314,6 +314,14 @@ int gnutls_pkcs11_obj_list_import_url (gnutls_pkcs11_obj_t * p_list,
                                        unsigned int flags
                                        /* GNUTLS_PKCS11_OBJ_FLAG_* */ );
 
+int
+gnutls_pkcs11_obj_list_import_url2 (gnutls_pkcs11_obj_t ** p_list,
+                                   unsigned int *n_list,
+                                   const char *url,
+                                   gnutls_pkcs11_obj_attr_t attrs,
+                                   unsigned int flags
+                                   /* GNUTLS_PKCS11_OBJ_FLAG_* */ );
+
 int gnutls_x509_crt_import_pkcs11 (gnutls_x509_crt_t crt,
                                    gnutls_pkcs11_obj_t pkcs11_crt);
 int gnutls_x509_crt_import_pkcs11_url (gnutls_x509_crt_t crt, const char *url,

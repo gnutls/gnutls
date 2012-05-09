@@ -1625,6 +1625,10 @@ _gnutls_certificate_set_x509_system_trust_file (gnutls_certificate_credentials_t
  * This function adds the system's default trusted CAs in order to
  * verify client or server certificates.
  *
+ * Returns: the number of certificates processed or a negative error code
+ * on error.
+ *
+ * Since: 3.1
  **/
 int
 gnutls_certificate_set_x509_system_trust (gnutls_certificate_credentials_t cred)

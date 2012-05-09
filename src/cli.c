@@ -73,8 +73,6 @@ int crlf;
 unsigned int verbose = 0;
 int print_cert;
 
-#define DEFAULT_CA_FILE "/etc/ssl/certs/ca-certificates.crt"
-
 const char *srp_passwd = NULL;
 const char *srp_username = NULL;
 const char *pgp_keyfile = NULL;

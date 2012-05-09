@@ -327,7 +327,6 @@ APIMANS += gnutls_certificate_set_x509_simple_pkcs12_mem.3
 APIMANS += gnutls_certificate_set_x509_key.3
 APIMANS += gnutls_certificate_set_x509_trust.3
 APIMANS += gnutls_certificate_set_x509_crl.3
-APIMANS += gnutls_certificate_get_openpgp_keyring.3
 APIMANS += gnutls_global_init.3
 APIMANS += gnutls_global_deinit.3
 APIMANS += gnutls_global_set_mutex.3
@@ -547,6 +546,7 @@ APIMANS += gnutls_pkcs11_token_get_url.3
 APIMANS += gnutls_pkcs11_token_get_info.3
 APIMANS += gnutls_pkcs11_token_get_flags.3
 APIMANS += gnutls_pkcs11_obj_list_import_url.3
+APIMANS += gnutls_pkcs11_obj_list_import_url2.3
 APIMANS += gnutls_x509_crt_import_pkcs11.3
 APIMANS += gnutls_x509_crt_import_pkcs11_url.3
 APIMANS += gnutls_pkcs11_obj_get_type.3
@@ -789,6 +789,9 @@ APIMANS += gnutls_x509_trust_list_add_named_crt.3
 APIMANS += gnutls_x509_trust_list_add_crls.3
 APIMANS += gnutls_x509_trust_list_verify_named_crt.3
 APIMANS += gnutls_x509_trust_list_verify_crt.3
+APIMANS += gnutls_x509_trust_list_add_trust_mem.3
+APIMANS += gnutls_x509_trust_list_add_trust_file.3
+APIMANS += gnutls_x509_trust_list_add_system_trust.3
 
 dist_man_MANS += $(APIMANS)
 

@@ -523,6 +523,7 @@ the following functions can be used to load PKCS #11 key and
 certificates by specifying a PKCS #11 URL instead of a filename.
 
 @showfuncB{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_key_file}
+@showfuncdesc{gnutls_certificate_set_x509_system_trust}
 
 @include invoke-p11tool.texi
 

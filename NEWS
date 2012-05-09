@@ -8,11 +8,18 @@ See the end for copying conditions.
 is assumed to be a file that stores the pin. Based on patch
 by David Smith.
 
+** libgnutls: introduce gnutls_certificate_set_x509_system_trust
+which imports the trusted root CA's from a compile time defined location. 
+
 ** libgnutlsxx: Added session::set_transport_vec_push_function. Patch
 by Alexandre Bique.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_certificate_set_x509_system_trust: Added
+gnutls_pkcs11_obj_list_import_url2: Added
+gnutls_x509_trust_list_add_system_trust: Added
+gnutls_x509_trust_list_add_trust_file: Added
+gnutls_x509_trust_list_add_trust_mem: Added
 
 
 * Version 3.0.19 (unreleased)
