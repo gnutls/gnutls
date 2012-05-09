@@ -1,6 +1,5 @@
-#include "autoopts/project.h"
 #define  AUTOOPTS_INTERNAL 1
-#include "compat/compat.h"
+#include "autoopts/project.h"
 #define  LOCAL static
 #include "ao-strs.h"
 #include "autoopts/options.h"
@@ -11,7 +10,6 @@
 #include "ao-strs.h"
 #include "ag-char-map.h"
 #include "autoopts.h"
-#include "parse-duration.h"
 #include "proto.h"
 #include "parse-duration.c"
 #include "ao-strs.c"

@@ -10,7 +10,7 @@ We require several tools to check out and build the software, including:
 - Make <http://www.gnu.org/software/make/>
 - Automake <http://www.gnu.org/software/automake/>
 - Autoconf <http://www.gnu.org/software/autoconf/>
-- Autogen <http://www.gnu.org/software/autogen/> (use 5.15pre15 or better)
+- Autogen <http://www.gnu.org/software/autogen/> (use 5.16 or better)
 - Libtool <http://www.gnu.org/software/libtool/>
 - Gettext <http://www.gnu.org/software/gettext/>
 - Texinfo <http://www.gnu.org/software/texinfo/>
