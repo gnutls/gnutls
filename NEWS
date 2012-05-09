@@ -25,6 +25,8 @@ gnutls_x509_trust_list_add_system_trust: Added
 gnutls_x509_trust_list_add_trust_file: Added
 gnutls_x509_trust_list_add_trust_mem: Added
 gnutls_pk_to_sign: Added
+gnutls_pubkey_verify_hash: Deprecated (use gnutls_pubkey_verify_hash2)
+gnutls_pubkey_verify_data: Deprecated (use gnutls_pubkey_verify_data2)
 
 
 * Version 3.0.19 (unreleased)

@@ -415,7 +415,8 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
         _rsa_params_to_privkey (pk_params, &priv);
         
         mpz_init(s);
-// XXX change with _tr
+
+/* XXX update when _tr is available */
         ret = rsa_pkcs1_sign(&priv, vdata->size, vdata->data, s);
         if (ret == 0)
           {
@@ -983,6 +984,59 @@ wrap_nettle_pk_fixup (gnutls_pk_algorithm_t algo,
   return 0;
 }
 
+static int
+extract_digest_info(const struct rsa_public_key *key,
+		 unsigned *length, uint8_t *digest_info,
+		 const mpz_t signature)
+{
+  unsigned i;
+  int ret;
+  mpz_t m;
+  uint8_t *em;
+
+  if (key->size == 0 || *length < key->size)
+    return 0;
+
+  em = gnutls_malloc(key->size);
+  if (em == NULL)
+    return 0;
+
+  mpz_init (m);
+
+  mpz_powm(m, signature, key->e, key->n);
+
+  nettle_mpz_get_str_256(key->size, em, m);
+  mpz_clear(m);
+  
+  if (em[0] != 0 || em[1] != 1)
+    {
+      ret = 0;
+      goto cleanup;
+    }
+  
+  for (i = 2; i < key->size; i++)
+    {
+      if (em[i] == 0 && i > 2)
+        break;
+      
+      if (em[i] != 0xff)
+        {
+          ret = 0;
+          goto cleanup;
+        }
+    }
+
+  i++;
+  memcpy(digest_info, &em[i], key->size-i);
+  *length = key->size-i;
+  
+  ret = 1;
+cleanup:
+  gnutls_free(em);
+
+  return ret;
+}
+
 static int wrap_nettle_hash_algorithm (gnutls_pk_algorithm_t pk, 
     const gnutls_datum_t * sig, gnutls_pk_params_st * issuer_params,
     gnutls_digest_algorithm_t* hash_algo)
@@ -1022,7 +1076,7 @@ static int wrap_nettle_hash_algorithm (gnutls_pk_algorithm_t pk,
       nettle_mpz_set_str_256_u(s, sig->size, sig->data);
       
       digest_size = sizeof (digest_info);
-      ret = rsa_pkcs1_sign_extract_digest_info( &pub, &digest_size, digest_info, s);
+      ret = extract_digest_info( &pub, &digest_size, digest_info, s);
       if (ret == 0)
         {
           ret = GNUTLS_E_PK_SIG_VERIFY_FAILED;
