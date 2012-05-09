@@ -15,11 +15,13 @@ which imports the trusted root CA's from a compile time defined location.
 by Alexandre Bique.
 
 ** API and ABI modifications:
+gnutls_pubkey_verify_hash2: Added
 gnutls_certificate_set_x509_system_trust: Added
 gnutls_pkcs11_obj_list_import_url2: Added
 gnutls_x509_trust_list_add_system_trust: Added
 gnutls_x509_trust_list_add_trust_file: Added
 gnutls_x509_trust_list_add_trust_mem: Added
+gnutls_pk_to_sign: Added
 
 
 * Version 3.0.19 (unreleased)

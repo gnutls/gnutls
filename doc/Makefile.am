@@ -622,6 +622,7 @@ FUNCS += functions/gnutls_kx_get_name
 FUNCS += functions/gnutls_certificate_type_get_name
 FUNCS += functions/gnutls_pk_get_name
 FUNCS += functions/gnutls_sign_get_name
+FUNCS += functions/gnutls_pk_to_sign
 FUNCS += functions/gnutls_mac_get_id
 FUNCS += functions/gnutls_compression_get_id
 FUNCS += functions/gnutls_cipher_get_id
