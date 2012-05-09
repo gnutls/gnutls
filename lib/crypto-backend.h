@@ -311,8 +311,15 @@
                  const gnutls_datum_t * data,
                  const gnutls_pk_params_st * priv);
     int (*verify) (gnutls_pk_algorithm_t, const gnutls_datum_t * data,
-                   const gnutls_datum_t * signature,
+                   const gnutls_datum_t * sig,
                    const gnutls_pk_params_st * pub);
+    /* given a signature and the public parameters,
+     * suggest a hash algorithm */
+    int (*hash_algorithm) (gnutls_pk_algorithm_t, 
+                   const gnutls_datum_t * sig,
+                   gnutls_pk_params_st * issuer_params,
+                   gnutls_digest_algorithm_t*);
+    /* sanity checks the public key parameters */
     int (*verify_params) (gnutls_pk_algorithm_t, 
                           const gnutls_pk_params_st * pub);
     int (*generate) (gnutls_pk_algorithm_t, unsigned int nbits,

@@ -121,10 +121,6 @@ void _cdk_kbnode_add (cdk_kbnode_t root, cdk_kbnode_t node);
 void _cdk_kbnode_clone (cdk_kbnode_t node);
 
 /*-- sesskey.c --*/
-cdk_error_t _cdk_digest_encode_pkcs1 (byte ** r_md, size_t * r_mdlen,
-                                      int pk_algo,
-                                      const byte * md,
-                                      int digest_algo, unsigned nbits);
 cdk_error_t _cdk_sk_unprotect_auto (cdk_ctx_t hd, cdk_pkt_seckey_t sk);
 
 /*-- keydb.c --*/

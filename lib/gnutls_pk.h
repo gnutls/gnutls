@@ -33,6 +33,7 @@ extern gnutls_crypto_pk_st _gnutls_pk_ops;
 #define _gnutls_pk_verify_params( algo, params) _gnutls_pk_ops.verify_params( algo, params)
 #define _gnutls_pk_derive( algo, out, pub, priv) _gnutls_pk_ops.derive( algo, out, pub, priv)
 #define _gnutls_pk_generate( algo, bits, priv) _gnutls_pk_ops.generate( algo, bits, priv)
+#define _gnutls_pk_hash_algorithm( pk, sig, params, hash) _gnutls_pk_ops.hash_algorithm(pk, sig, params, hash)
 
 inline static int
 _gnutls_pk_fixup (gnutls_pk_algorithm_t algo, gnutls_direction_t direction,
@@ -46,25 +47,22 @@ _gnutls_pk_fixup (gnutls_pk_algorithm_t algo, gnutls_direction_t direction,
 int _gnutls_pk_params_copy (gnutls_pk_params_st * dst, const gnutls_pk_params_st * src);
 
 /* The internal PK interface */
-int _gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
-                               const gnutls_datum_t * plaintext,
-                               gnutls_pk_params_st * params,
-                               unsigned btype);
-int _gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
-                               const gnutls_datum_t * ciphertext,
-                               gnutls_pk_params_st* params,
-                               unsigned btype);
-int _gnutls_rsa_verify (const gnutls_datum_t * vdata,
-                        const gnutls_datum_t * ciphertext, 
-                        gnutls_pk_params_st*,
-                        int btype);
-
 int
 _gnutls_encode_ber_rs (gnutls_datum_t * sig_value, bigint_t r, bigint_t s);
 
 int
 _gnutls_decode_ber_rs (const gnutls_datum_t * sig_value, bigint_t * r,
                        bigint_t * s);
+
+int
+encode_ber_digest_info (gnutls_digest_algorithm_t hash,
+                        const gnutls_datum_t * digest,
+                        gnutls_datum_t * output);
+
+int
+decode_ber_digest_info (const gnutls_datum_t * info,
+                        gnutls_digest_algorithm_t * hash,
+                        uint8_t * digest, unsigned int *digest_size);
 
 int _gnutls_pk_get_hash_algorithm (gnutls_pk_algorithm_t pk,
                                    gnutls_pk_params_st*,

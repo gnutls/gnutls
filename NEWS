@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.1.0 (unreleased)
 
+** libgnutls: Use the PKCS #1 1.5 encoding provided by nettle (2.5)
+for encryption and signatures.
+
 ** libgnutls: When decoding a PKCS #11 URL the pin-source field
 is assumed to be a file that stores the pin. Based on patch
 by David Smith.
@@ -39,7 +42,7 @@ with openssl.
 in pkcs12 decoding tests.
 
 ** API and ABI modifications:
-No changes since last version.
+gnutls_pubkey_verify_hash2: Added
 
 
 * Version 3.0.18 (released 2012-04-02)

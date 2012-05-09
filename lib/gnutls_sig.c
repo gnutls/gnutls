@@ -45,10 +45,6 @@ sign_tls_hash (gnutls_session_t session, gnutls_digest_algorithm_t hash_algo,
                   const gnutls_datum_t * hash_concat,
                   gnutls_datum_t * signature);
 
-static int
-encode_ber_digest_info (gnutls_digest_algorithm_t hash,
-                        const gnutls_datum_t * digest,
-                        gnutls_datum_t * output);
 
 /* While this is currently equal to the length of RSA/SHA512
  * signature, it should also be sufficient for DSS signature and any
@@ -163,41 +159,6 @@ _gnutls_handshake_sign_data (gnutls_session_t session, gnutls_pcert_st* cert,
 
 }
 
-
-/* This will create a PKCS1 or DSA signature, using the given parameters, and the
- * given data. The output will be allocated and be put in signature.
- */
-int
-_gnutls_soft_sign (gnutls_pk_algorithm_t algo, gnutls_pk_params_st * params,
-                   const gnutls_datum_t * data,
-                   gnutls_datum_t * signature)
-{
-  int ret;
-
-  switch (algo)
-    {
-    case GNUTLS_PK_RSA:
-      /* encrypt */
-      if ((ret = _gnutls_pkcs1_rsa_encrypt (signature, data, params, 1)) < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-
-      break;
-    default:
-      ret = _gnutls_pk_sign( algo, signature, data, params);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          return ret;
-        }
-      break;
-    }
-
-  return 0;
-}
-
 /* This will create a PKCS1 or DSA signature, as defined in the TLS protocol.
  * Cert is the certificate of the corresponding private key. It is only checked if
  * it supports signing.
@@ -270,9 +231,10 @@ es_cleanup:
 
 static int
 verify_tls_hash (gnutls_protocol_t ver, gnutls_pcert_st* cert,
-                    const gnutls_datum_t * hash_concat,
-                    gnutls_datum_t * signature, size_t sha1pos,
-                    gnutls_pk_algorithm_t pk_algo)
+                 const gnutls_datum_t * hash_concat,
+                 gnutls_datum_t * signature, size_t sha1pos,
+                 gnutls_sign_algorithm_t sign_algo,
+                 gnutls_pk_algorithm_t pk_algo)
 {
   int ret;
   gnutls_datum_t vdata;
@@ -309,12 +271,9 @@ verify_tls_hash (gnutls_protocol_t ver, gnutls_pcert_st* cert,
         flags = GNUTLS_PUBKEY_VERIFY_FLAG_TLS_RSA;
       else
         flags = 0;
-
-
       break;
     case GNUTLS_PK_DSA:
     case GNUTLS_PK_EC:
-
       vdata.data = &hash_concat->data[sha1pos];
       vdata.size = hash_concat->size - sha1pos;
 
@@ -326,8 +285,8 @@ verify_tls_hash (gnutls_protocol_t ver, gnutls_pcert_st* cert,
       return GNUTLS_E_INTERNAL_ERROR;
     }
 
-  ret = gnutls_pubkey_verify_hash(cert->pubkey, flags, &vdata,
-    signature);
+  ret = gnutls_pubkey_verify_hash2(cert->pubkey, sign_algo, flags, 
+                                   &vdata, signature);
 
   if (ret < 0)
     return gnutls_assert_val(ret);
@@ -344,7 +303,7 @@ int
 _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_pcert_st* cert,
                                const gnutls_datum_t * params,
                                gnutls_datum_t * signature,
-                               gnutls_sign_algorithm_t algo)
+                               gnutls_sign_algorithm_t sign_algo)
 {
   gnutls_datum_t dconcat;
   int ret;
@@ -357,17 +316,17 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_pcert_st* cert,
   if (_gnutls_version_has_selectable_sighash (ver))
     {
       _gnutls_handshake_log ("HSK[%p]: verify handshake data: using %s\n",
-                    session, gnutls_sign_algorithm_get_name (algo));
+                    session, gnutls_sign_algorithm_get_name (sign_algo));
 
-      ret = _gnutls_pubkey_compatible_with_sig(cert->pubkey, ver, algo);
+      ret = _gnutls_pubkey_compatible_with_sig(cert->pubkey, ver, sign_algo);
       if (ret < 0)
         return gnutls_assert_val(ret);
 
-      ret = _gnutls_session_sign_algo_enabled (session, algo);
+      ret = _gnutls_session_sign_algo_enabled (session, sign_algo);
       if (ret < 0)
         return gnutls_assert_val(ret);
 
-      hash_algo = _gnutls_sign_get_hash_algorithm (algo);
+      hash_algo = _gnutls_sign_get_hash_algorithm (sign_algo);
     }
   else
     {
@@ -420,7 +379,8 @@ _gnutls_handshake_verify_data (gnutls_session_t session, gnutls_pcert_st* cert,
   ret = verify_tls_hash (ver, cert, &dconcat, signature,
                             dconcat.size -
                             _gnutls_hash_get_algo_len (hash_algo),
-                            _gnutls_sign_get_pk_algorithm (algo));
+                            sign_algo,
+                            _gnutls_sign_get_pk_algorithm (sign_algo));
   if (ret < 0)
     {
       gnutls_assert ();
@@ -465,7 +425,7 @@ _gnutls_handshake_verify_crt_vrfy12 (gnutls_session_t session,
   dconcat.size = _gnutls_hash_get_algo_len (hash_algo);
 
   ret =
-    verify_tls_hash (ver, cert, &dconcat, signature, 0, pk);
+    verify_tls_hash (ver, cert, &dconcat, signature, 0, sign_algo, pk);
   if (ret < 0)
     {
       gnutls_assert ();
@@ -498,7 +458,7 @@ _gnutls_handshake_verify_crt_vrfy (gnutls_session_t session,
 
   if (_gnutls_version_has_selectable_sighash(ver))
     return _gnutls_handshake_verify_crt_vrfy12 (session, cert, signature,
-                                                 sign_algo);
+                                                sign_algo);
 
   ret =
     _gnutls_hash_init (&td_md5, GNUTLS_DIG_MD5);
@@ -560,7 +520,8 @@ _gnutls_handshake_verify_crt_vrfy (gnutls_session_t session,
 
   ret =
     verify_tls_hash (ver, cert, &dconcat, signature, 16,
-                        gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL));
+                     GNUTLS_SIGN_UNKNOWN,
+                     gnutls_pubkey_get_pk_algorithm(cert->pubkey, NULL));
   if (ret < 0)
     {
       gnutls_assert ();
@@ -788,170 +749,3 @@ pk_prepare_hash (gnutls_pk_algorithm_t pk,
   return 0;
 }
 
-/* Reads the digest information.
- * we use DER here, although we should use BER. It works fine
- * anyway.
- */
-int
-decode_ber_digest_info (const gnutls_datum_t * info,
-                        gnutls_digest_algorithm_t * hash,
-                        uint8_t * digest, unsigned int *digest_size)
-{
-  ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
-  int result;
-  char str[1024];
-  int len;
-
-  if ((result = asn1_create_element (_gnutls_get_gnutls_asn (),
-                                     "GNUTLS.DigestInfo",
-                                     &dinfo)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      return _gnutls_asn2err (result);
-    }
-
-  result = asn1_der_decoding (&dinfo, info->data, info->size, NULL);
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&dinfo);
-      return _gnutls_asn2err (result);
-    }
-
-  len = sizeof (str) - 1;
-  result = asn1_read_value (dinfo, "digestAlgorithm.algorithm", str, &len);
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&dinfo);
-      return _gnutls_asn2err (result);
-    }
-
-  *hash = _gnutls_x509_oid_to_digest (str);
-
-  if (*hash == GNUTLS_DIG_UNKNOWN)
-    {
-
-      _gnutls_debug_log ("verify.c: HASH OID: %s\n", str);
-
-      gnutls_assert ();
-      asn1_delete_structure (&dinfo);
-      return GNUTLS_E_UNKNOWN_ALGORITHM;
-    }
-
-  len = sizeof (str) - 1;
-  result = asn1_read_value (dinfo, "digestAlgorithm.parameters", str, &len);
-  /* To avoid permitting garbage in the parameters field, either the
-     parameters field is not present, or it contains 0x05 0x00. */
-  if (!(result == ASN1_ELEMENT_NOT_FOUND ||
-        (result == ASN1_SUCCESS && len == ASN1_NULL_SIZE &&
-         memcmp (str, ASN1_NULL, ASN1_NULL_SIZE) == 0)))
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&dinfo);
-      return GNUTLS_E_ASN1_GENERIC_ERROR;
-    }
-
-  len = *digest_size;
-  result = asn1_read_value (dinfo, "digest", digest, &len);
-  
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      *digest_size = len;
-      asn1_delete_structure (&dinfo);
-      return _gnutls_asn2err (result);
-    }
-
-  *digest_size = len;
-  asn1_delete_structure (&dinfo);
-
-  return 0;
-}
-
-/* Writes the digest information and the digest in a DER encoded
- * structure. The digest info is allocated and stored into the info structure.
- */
-static int
-encode_ber_digest_info (gnutls_digest_algorithm_t hash,
-                        const gnutls_datum_t * digest,
-                        gnutls_datum_t * output)
-{
-  ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
-  int result;
-  const char *algo;
-  uint8_t *tmp_output;
-  int tmp_output_size;
-
-  algo = _gnutls_x509_mac_to_oid ((gnutls_mac_algorithm_t) hash);
-  if (algo == NULL)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("Hash algorithm: %d has no OID\n", hash);
-      return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
-    }
-
-  if ((result = asn1_create_element (_gnutls_get_gnutls_asn (),
-                                     "GNUTLS.DigestInfo",
-                                     &dinfo)) != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      return _gnutls_asn2err (result);
-    }
-
-  result = asn1_write_value (dinfo, "digestAlgorithm.algorithm", algo, 1);
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&dinfo);
-      return _gnutls_asn2err (result);
-    }
-
-  /* Write an ASN.1 NULL in the parameters field.  This matches RFC
-     3279 and RFC 4055, although is arguable incorrect from a historic
-     perspective (see those documents for more information).
-     Regardless of what is correct, this appears to be what most
-     implementations do.  */
-  result = asn1_write_value (dinfo, "digestAlgorithm.parameters",
-                             ASN1_NULL, ASN1_NULL_SIZE);
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&dinfo);
-      return _gnutls_asn2err (result);
-    }
-
-  result = asn1_write_value (dinfo, "digest", digest->data, digest->size);
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&dinfo);
-      return _gnutls_asn2err (result);
-    }
-
-  tmp_output_size = 0;
-  asn1_der_coding (dinfo, "", NULL, &tmp_output_size, NULL);
-
-  tmp_output = gnutls_malloc (tmp_output_size);
-  if (output->data == NULL)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&dinfo);
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  result = asn1_der_coding (dinfo, "", tmp_output, &tmp_output_size, NULL);
-  if (result != ASN1_SUCCESS)
-    {
-      gnutls_assert ();
-      asn1_delete_structure (&dinfo);
-      return _gnutls_asn2err (result);
-    }
-
-  asn1_delete_structure (&dinfo);
-
-  output->size = tmp_output_size;
-  output->data = tmp_output;
-
-  return 0;
-}

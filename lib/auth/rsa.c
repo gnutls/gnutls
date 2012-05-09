@@ -298,8 +298,8 @@ _gnutls_gen_rsa_client_kx (gnutls_session_t session, gnutls_buffer_st* data)
     }
 
   ret =
-       _gnutls_pkcs1_rsa_encrypt (&sdata, &session->key->key,
-                                  &params, 2);
+       _gnutls_pk_encrypt (GNUTLS_PK_RSA, &sdata, &session->key->key,
+                                  &params);
 
   gnutls_pk_params_release(&params);
 

@@ -562,7 +562,7 @@ uint8_t keyid[GNUTLS_OPENPGP_KEYID_SIZE];
  * together with a hash functions.  Different hash functions may be
  * used for the RSA algorithm, but only the SHA family for the DSA keys.
  *
- * Use gnutls_pubkey_get_preferred_hash_algorithm() to determine
+ * You may use gnutls_pubkey_get_preferred_hash_algorithm() to determine
  * the hash algorithm.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -623,7 +623,7 @@ cleanup:
  * together with a hash functions.  Different hash functions may be
  * used for the RSA algorithm, but only SHA-XXX for the DSA keys.
  *
- * Use gnutls_pubkey_get_preferred_hash_algorithm() to determine
+ * You may use gnutls_pubkey_get_preferred_hash_algorithm() to determine
  * the hash algorithm.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -701,9 +701,8 @@ _gnutls_privkey_sign_hash (gnutls_privkey_t key,
                                                hash, signature);
 #endif
     case GNUTLS_PRIVKEY_X509:
-      return _gnutls_soft_sign (key->key.x509->pk_algorithm,
-                                &key->key.x509->params,
-                                hash, signature);
+      return _gnutls_pk_sign (key->key.x509->pk_algorithm,
+                              signature, hash, &key->key.x509->params);
     case GNUTLS_PRIVKEY_EXT:
       if (key->key.ext.sign_func == NULL)
         return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
@@ -735,23 +734,16 @@ gnutls_privkey_decrypt_data (gnutls_privkey_t key,
                              const gnutls_datum_t * ciphertext,
                              gnutls_datum_t * plaintext)
 {
-  if (key->pk_algorithm != GNUTLS_PK_RSA)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_INVALID_REQUEST;
-    }
-
   switch (key->type)
     {
 #ifdef ENABLE_OPENPGP
     case GNUTLS_PRIVKEY_OPENPGP:
       return _gnutls_openpgp_privkey_decrypt_data (key->key.openpgp, flags,
-                                                  ciphertext, plaintext);
+                                                   ciphertext, plaintext);
 #endif
     case GNUTLS_PRIVKEY_X509:
-      return _gnutls_pkcs1_rsa_decrypt (plaintext, ciphertext,
-                                        &key->key.x509->params,
-                                        2);
+      return _gnutls_pk_decrypt (key->pk_algorithm, plaintext, ciphertext,
+                                 &key->key.x509->params);
 #ifdef ENABLE_PKCS11
     case GNUTLS_PRIVKEY_PKCS11:
       return _gnutls_pkcs11_privkey_decrypt_data (key->key.pkcs11,

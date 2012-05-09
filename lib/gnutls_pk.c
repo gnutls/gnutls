@@ -36,318 +36,6 @@
 #include <x509/common.h>
 #include <random.h>
 
-/* Do PKCS-1 RSA encryption. 
- * params is modulus, public exp.
- */
-int
-_gnutls_pkcs1_rsa_encrypt (gnutls_datum_t * ciphertext,
-                           const gnutls_datum_t * plaintext,
-                           gnutls_pk_params_st * params, 
-                           unsigned btype)
-{
-  unsigned int i, pad;
-  int ret;
-  uint8_t *edata, *ps;
-  size_t k, psize;
-  size_t mod_bits;
-  gnutls_datum_t to_encrypt, encrypted;
-
-  mod_bits = _gnutls_mpi_get_nbits (params->params[0]);
-  k = mod_bits / 8;
-  if (mod_bits % 8 != 0)
-    k++;
-
-  if (plaintext->size > k - 11)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_PK_ENCRYPTION_FAILED;
-    }
-
-  edata = gnutls_malloc (k);
-  if (edata == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_MEMORY_ERROR;
-    }
-
-  /* EB = 00||BT||PS||00||D 
-   * (use block type 'btype')
-   */
-
-  edata[0] = 0;
-  edata[1] = btype;
-  psize = k - 3 - plaintext->size;
-
-  ps = &edata[2];
-  switch (btype)
-    {
-    case 2:
-      /* using public key */
-      if (params->params_nr < RSA_PUBLIC_PARAMS)
-        {
-          gnutls_assert ();
-          gnutls_free (edata);
-          return GNUTLS_E_INTERNAL_ERROR;
-        }
-
-      ret = _gnutls_rnd (GNUTLS_RND_RANDOM, ps, psize);
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          gnutls_free (edata);
-          return ret;
-        }
-      for (i = 0; i < psize; i++)
-        while (ps[i] == 0)
-          {
-            ret = _gnutls_rnd (GNUTLS_RND_RANDOM, &ps[i], 1);
-            if (ret < 0)
-              {
-                gnutls_assert ();
-                gnutls_free (edata);
-                return ret;
-              }
-          }
-      break;
-    case 1:
-      /* using private key */
-
-      if (params->params_nr < RSA_PRIVATE_PARAMS)
-        {
-          gnutls_assert ();
-          gnutls_free (edata);
-          return GNUTLS_E_INTERNAL_ERROR;
-        }
-
-      for (i = 0; i < psize; i++)
-        ps[i] = 0xff;
-      break;
-    default:
-      gnutls_assert ();
-      gnutls_free (edata);
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  ps[psize] = 0;
-  memcpy (&ps[psize + 1], plaintext->data, plaintext->size);
-
-  to_encrypt.data = edata;
-  to_encrypt.size = k;
-
-  if (btype == 2)               /* encrypt */
-    ret =
-      _gnutls_pk_encrypt (GNUTLS_PK_RSA, &encrypted, &to_encrypt, params);
-  else                          /* sign */
-    ret =
-      _gnutls_pk_sign (GNUTLS_PK_RSA, &encrypted, &to_encrypt, params);
-
-  gnutls_free (edata);
-
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  psize = encrypted.size;
-  if (psize < k)
-    {
-      /* padding psize */
-      pad = k - psize;
-      psize = k;
-    }
-  else if (psize == k)
-    {
-      /* pad = 0; 
-       * no need to do anything else
-       */
-      ciphertext->data = encrypted.data;
-      ciphertext->size = encrypted.size;
-      return 0;
-    }
-  else
-    {                           /* psize > k !!! */
-      /* This is an impossible situation */
-      gnutls_assert ();
-      _gnutls_free_datum (&encrypted);
-      return GNUTLS_E_INTERNAL_ERROR;
-    }
-
-  ciphertext->data = gnutls_malloc (psize);
-  if (ciphertext->data == NULL)
-    {
-      gnutls_assert ();
-      ret = GNUTLS_E_MEMORY_ERROR;
-      goto cleanup;
-    }
-
-  memcpy (&ciphertext->data[pad], encrypted.data, encrypted.size);
-  for (i = 0; i < pad; i++)
-    ciphertext->data[i] = 0;
-
-  ciphertext->size = k;
-
-  ret = 0;
-
-cleanup:
-  _gnutls_free_datum (&encrypted);
-
-  return ret;
-}
-
-
-/* Do PKCS-1 RSA decryption. 
- * params is modulus, public exp., private key
- * Can decrypt block type 1 and type 2 packets.
- */
-int
-_gnutls_pkcs1_rsa_decrypt (gnutls_datum_t * plaintext,
-                           const gnutls_datum_t * ciphertext,
-                           gnutls_pk_params_st* params,
-                           unsigned btype)
-{
-  unsigned int k, i;
-  int ret;
-  size_t esize, mod_bits;
-
-  mod_bits = _gnutls_mpi_get_nbits (params->params[0]);
-  k = mod_bits / 8;
-  if (mod_bits % 8 != 0)
-    k++;
-
-  esize = ciphertext->size;
-
-  if (esize != k)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_PK_DECRYPTION_FAILED;
-    }
-
-  /* we can use btype to see if the private key is
-   * available.
-   */
-  if (btype == 2)
-    {
-      ret =
-        _gnutls_pk_decrypt (GNUTLS_PK_RSA, plaintext, ciphertext, params);
-    }
-  else
-    {
-      ret =
-        _gnutls_pk_encrypt (GNUTLS_PK_RSA, plaintext, ciphertext, params);
-    }
-
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  /* EB = 00||BT||PS||00||D
-   * (use block type 'btype')
-   *
-   * From now on, return GNUTLS_E_DECRYPTION_FAILED on errors, to
-   * avoid attacks similar to the one described by Bleichenbacher in:
-   * "Chosen Ciphertext Attacks against Protocols Based on RSA
-   * Encryption Standard PKCS #1".
-   */
-  if (plaintext->data[0] != 0 || plaintext->data[1] != btype)
-    {
-      gnutls_assert ();
-      _gnutls_free_datum (plaintext);
-      return GNUTLS_E_DECRYPTION_FAILED;
-    }
-
-  ret = GNUTLS_E_DECRYPTION_FAILED;
-  switch (btype)
-    {
-    case 2:
-      for (i = 2; i < plaintext->size; i++)
-        {
-          if (plaintext->data[i] == 0)
-            {
-              ret = 0;
-              break;
-            }
-        }
-      break;
-    case 1:
-      for (i = 2; i < plaintext->size; i++)
-        {
-          if (plaintext->data[i] == 0 && i > 2)
-            {
-              ret = 0;
-              break;
-            }
-          if (plaintext->data[i] != 0xff)
-            {
-              _gnutls_handshake_log ("PKCS #1 padding error");
-              _gnutls_free_datum (plaintext);
-              /* PKCS #1 padding error.  Don't use
-                 GNUTLS_E_PKCS1_WRONG_PAD here.  */
-              break;
-            }
-        }
-      break;
-    default:
-      gnutls_assert ();
-      _gnutls_free_datum (plaintext);
-      break;
-    }
-
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      _gnutls_free_datum (plaintext);
-      return GNUTLS_E_DECRYPTION_FAILED;
-    }
-
-  i++;
-  memmove (plaintext->data, &plaintext->data[i], esize - i);
-  plaintext->size = esize - i;
-
-  return 0;
-}
-
-
-int
-_gnutls_rsa_verify (const gnutls_datum_t * vdata,
-                    const gnutls_datum_t * ciphertext, 
-                    gnutls_pk_params_st * params,
-                    int btype)
-{
-
-  gnutls_datum_t plain;
-  int ret;
-
-  /* decrypt signature */
-  if ((ret =
-       _gnutls_pkcs1_rsa_decrypt (&plain, ciphertext, params,
-                                  btype)) < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  if (plain.size != vdata->size)
-    {
-      gnutls_assert ();
-      _gnutls_free_datum (&plain);
-      return GNUTLS_E_PK_SIG_VERIFY_FAILED;
-    }
-
-  if (memcmp (plain.data, vdata->data, plain.size) != 0)
-    {
-      gnutls_assert ();
-      _gnutls_free_datum (&plain);
-      return GNUTLS_E_PK_SIG_VERIFY_FAILED;
-    }
-
-  _gnutls_free_datum (&plain);
-
-  return 0;                     /* ok */
-}
-
 /* encodes the Dss-Sig-Value structure
  */
 int
@@ -506,3 +194,172 @@ _gnutls_pk_get_hash_algorithm (gnutls_pk_algorithm_t pk,
                                         NULL, pk, params);
 
 }
+
+/* Writes the digest information and the digest in a DER encoded
+ * structure. The digest info is allocated and stored into the info structure.
+ */
+int
+encode_ber_digest_info (gnutls_digest_algorithm_t hash,
+                        const gnutls_datum_t * digest,
+                        gnutls_datum_t * output)
+{
+  ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
+  int result;
+  const char *algo;
+  uint8_t *tmp_output;
+  int tmp_output_size;
+
+  algo = _gnutls_x509_mac_to_oid ((gnutls_mac_algorithm_t) hash);
+  if (algo == NULL)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("Hash algorithm: %d has no OID\n", hash);
+      return GNUTLS_E_UNKNOWN_PK_ALGORITHM;
+    }
+
+  if ((result = asn1_create_element (_gnutls_get_gnutls_asn (),
+                                     "GNUTLS.DigestInfo",
+                                     &dinfo)) != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  result = asn1_write_value (dinfo, "digestAlgorithm.algorithm", algo, 1);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return _gnutls_asn2err (result);
+    }
+
+  /* Write an ASN.1 NULL in the parameters field.  This matches RFC
+     3279 and RFC 4055, although is arguable incorrect from a historic
+     perspective (see those documents for more information).
+     Regardless of what is correct, this appears to be what most
+     implementations do.  */
+  result = asn1_write_value (dinfo, "digestAlgorithm.parameters",
+                             ASN1_NULL, ASN1_NULL_SIZE);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return _gnutls_asn2err (result);
+    }
+
+  result = asn1_write_value (dinfo, "digest", digest->data, digest->size);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return _gnutls_asn2err (result);
+    }
+
+  tmp_output_size = 0;
+  asn1_der_coding (dinfo, "", NULL, &tmp_output_size, NULL);
+
+  tmp_output = gnutls_malloc (tmp_output_size);
+  if (tmp_output == NULL)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return GNUTLS_E_MEMORY_ERROR;
+    }
+
+  result = asn1_der_coding (dinfo, "", tmp_output, &tmp_output_size, NULL);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return _gnutls_asn2err (result);
+    }
+
+  asn1_delete_structure (&dinfo);
+
+  output->size = tmp_output_size;
+  output->data = tmp_output;
+
+  return 0;
+}
+
+/* Reads the digest information.
+ * we use DER here, although we should use BER. It works fine
+ * anyway.
+ */
+int
+decode_ber_digest_info (const gnutls_datum_t * info,
+                        gnutls_digest_algorithm_t * hash,
+                        uint8_t * digest, unsigned int *digest_size)
+{
+  ASN1_TYPE dinfo = ASN1_TYPE_EMPTY;
+  int result;
+  char str[1024];
+  int len;
+
+  if ((result = asn1_create_element (_gnutls_get_gnutls_asn (),
+                                     "GNUTLS.DigestInfo",
+                                     &dinfo)) != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      return _gnutls_asn2err (result);
+    }
+
+  result = asn1_der_decoding (&dinfo, info->data, info->size, NULL);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return _gnutls_asn2err (result);
+    }
+
+  len = sizeof (str) - 1;
+  result = asn1_read_value (dinfo, "digestAlgorithm.algorithm", str, &len);
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return _gnutls_asn2err (result);
+    }
+
+  *hash = _gnutls_x509_oid_to_digest (str);
+
+  if (*hash == GNUTLS_DIG_UNKNOWN)
+    {
+
+      _gnutls_debug_log ("verify.c: HASH OID: %s\n", str);
+
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return GNUTLS_E_UNKNOWN_ALGORITHM;
+    }
+
+  len = sizeof (str) - 1;
+  result = asn1_read_value (dinfo, "digestAlgorithm.parameters", str, &len);
+  /* To avoid permitting garbage in the parameters field, either the
+     parameters field is not present, or it contains 0x05 0x00. */
+  if (!(result == ASN1_ELEMENT_NOT_FOUND ||
+        (result == ASN1_SUCCESS && len == ASN1_NULL_SIZE &&
+         memcmp (str, ASN1_NULL, ASN1_NULL_SIZE) == 0)))
+    {
+      gnutls_assert ();
+      asn1_delete_structure (&dinfo);
+      return GNUTLS_E_ASN1_GENERIC_ERROR;
+    }
+
+  len = *digest_size;
+  result = asn1_read_value (dinfo, "digest", digest, &len);
+  
+  if (result != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      *digest_size = len;
+      asn1_delete_structure (&dinfo);
+      return _gnutls_asn2err (result);
+    }
+
+  *digest_size = len;
+  asn1_delete_structure (&dinfo);
+
+  return 0;
+}
+

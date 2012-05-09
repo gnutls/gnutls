@@ -159,7 +159,7 @@ proc_rsa_export_client_kx (gnutls_session_t session, uint8_t * data,
       return ret;
     }
 
-  ret = _gnutls_pkcs1_rsa_decrypt (&plaintext, &ciphertext, params, 2);     /* btype==2 */
+  ret = _gnutls_pk_decrypt (GNUTLS_PK_RSA, &plaintext, &ciphertext, params);
 
   if (ret < 0 || plaintext.size != GNUTLS_MASTER_SIZE)
     {

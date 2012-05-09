@@ -26,6 +26,7 @@
 #include <gnutls_int.h>
 #include <gnutls_datum.h>
 #include <gnutls_pk.h>
+#include <gnutls_sig.h>
 #include <x509/common.h>
 #include "opencdk.h"
 #include "main.h"
@@ -72,13 +73,12 @@ sig_to_datum (gnutls_datum_t * r_sig, cdk_pkt_signature_t sig)
 cdk_error_t
 cdk_pk_verify (cdk_pubkey_t pk, cdk_pkt_signature_t sig, const byte * md)
 {
-  gnutls_datum_t s_sig;
+  gnutls_datum_t s_sig = { NULL, 0}, di = {NULL, 0};
   byte *encmd = NULL;
   size_t enclen;
   cdk_error_t rc;
   int ret, algo;
   unsigned int i;
-  gnutls_datum_t data;
   gnutls_pk_params_st params;
 
   if (!pk || !sig || !md)
@@ -104,22 +104,25 @@ cdk_pk_verify (cdk_pubkey_t pk, cdk_pkt_signature_t sig, const byte * md)
       goto leave;
     }
 
-  rc = _cdk_digest_encode_pkcs1 (&encmd, &enclen, pk->pubkey_algo, md,
-                                 sig->digest_algo, cdk_pk_get_nbits (pk));
-  if (rc)
+  rc = _gnutls_set_datum (&di, md, _gnutls_hash_get_algo_len (sig->digest_algo));
+  if (rc < 0)
     {
-      gnutls_assert ();
+      rc = gnutls_assert_val(CDK_Out_Of_Core);
+      goto leave;
+    }  
+
+  rc = pk_prepare_hash (algo, sig->digest_algo, &di);
+  if (rc < 0)
+    {
+      rc = gnutls_assert_val(CDK_General_Error);
       goto leave;
     }
-
-  data.data = encmd;
-  data.size = enclen;
 
   params.params_nr = cdk_pk_get_npkey (pk->pubkey_algo);
   for (i = 0; i < params.params_nr; i++)
     params.params[i] = pk->mpi[i];
   params.flags = 0;
-  ret = _gnutls_pk_verify (algo, &data, &s_sig, &params);
+  ret = _gnutls_pk_verify (algo, &di, &s_sig, &params);
 
   if (ret < 0)
     {
@@ -132,6 +135,7 @@ cdk_pk_verify (cdk_pubkey_t pk, cdk_pkt_signature_t sig, const byte * md)
 
 leave:
   _gnutls_free_datum (&s_sig);
+  _gnutls_free_datum (&di);
   cdk_free (encmd);
   return rc;
 }

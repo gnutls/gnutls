@@ -48,11 +48,6 @@ int _gnutls_handshake_verify_data (gnutls_session_t session,
                                    gnutls_datum_t * signature,
                                    gnutls_sign_algorithm_t algo);
 
-int _gnutls_soft_sign (gnutls_pk_algorithm_t algo,
-                       gnutls_pk_params_st* params,
-                       const gnutls_datum_t * data,
-                       gnutls_datum_t * signature);
-
 int pk_prepare_hash (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash,
                      gnutls_datum_t * output);
 int pk_hash_data (gnutls_pk_algorithm_t pk, gnutls_digest_algorithm_t hash,
@@ -64,9 +59,5 @@ _gnutls_privkey_sign_hash (gnutls_privkey_t key,
                            const gnutls_datum_t * hash,
                            gnutls_datum_t * signature);
 
-int
-decode_ber_digest_info (const gnutls_datum_t * info,
-                        gnutls_digest_algorithm_t * hash,
-                        uint8_t * digest, unsigned int *digest_size);
 
 #endif

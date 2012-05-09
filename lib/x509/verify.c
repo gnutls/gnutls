@@ -682,70 +682,7 @@ _gnutls_x509_verify_algorithm (gnutls_digest_algorithm_t * hash,
                                gnutls_pk_algorithm_t pk,
                                gnutls_pk_params_st * issuer_params)
 {
-  uint8_t digest[MAX_HASH_SIZE];
-  gnutls_datum_t decrypted;
-  unsigned int digest_size;
-  int ret;
-
-  switch (pk)
-    {
-    case GNUTLS_PK_DSA:
-    case GNUTLS_PK_EC:
-
-      if (hash)
-        *hash = _gnutls_dsa_q_to_hash (pk, issuer_params, NULL);
-
-      ret = 0;
-      break;
-    case GNUTLS_PK_RSA:
-      if (signature == NULL)
-        {                       /* return a sensible algorithm */
-          if (hash)
-            *hash = GNUTLS_DIG_SHA256;
-          return 0;
-        }
-
-      ret =
-        _gnutls_pkcs1_rsa_decrypt (&decrypted, signature,
-                                   issuer_params, 1);
-
-
-      if (ret < 0)
-        {
-          gnutls_assert ();
-          goto cleanup;
-        }
-
-      digest_size = sizeof (digest);
-      if ((ret =
-           decode_ber_digest_info (&decrypted, hash, digest,
-                                   &digest_size)) != 0)
-        {
-          gnutls_assert ();
-          _gnutls_free_datum (&decrypted);
-          goto cleanup;
-        }
-
-      _gnutls_free_datum (&decrypted);
-      if (digest_size != _gnutls_hash_get_algo_len (*hash))
-        {
-          gnutls_assert ();
-          ret = GNUTLS_E_ASN1_GENERIC_ERROR;
-          goto cleanup;
-        }
-
-      ret = 0;
-      break;
-
-    default:
-      gnutls_assert ();
-      ret = GNUTLS_E_INTERNAL_ERROR;
-    }
-
-cleanup:
-
-  return ret;
-
+  return _gnutls_pk_hash_algorithm(pk, signature, issuer_params, hash);
 }
 
 /* verifies if the certificate is properly signed.
@@ -776,39 +713,6 @@ _gnutls_x509_verify_data (gnutls_digest_algorithm_t algo,
   ret =
     pubkey_verify_data (gnutls_x509_crt_get_pk_algorithm (issuer, NULL), algo,
                         data, signature, &issuer_params);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-    }
-
-  /* release all allocated MPIs
-   */
-  gnutls_pk_params_release(&issuer_params);
-
-  return ret;
-}
-
-int
-_gnutls_x509_verify_hashed_data (const gnutls_datum_t * hash,
-                                 const gnutls_datum_t * signature,
-                                 gnutls_x509_crt_t issuer)
-{
-  gnutls_pk_params_st issuer_params;
-  int ret;
-
-  /* Read the MPI parameters from the issuer's certificate.
-   */
-  ret =
-    _gnutls_x509_crt_get_mpis (issuer, &issuer_params);
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-
-  ret =
-    pubkey_verify_hashed_data (gnutls_x509_crt_get_pk_algorithm (issuer, NULL),
-                               hash, signature, &issuer_params);
   if (ret < 0)
     {
       gnutls_assert ();

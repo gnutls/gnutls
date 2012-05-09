@@ -141,6 +141,13 @@ gnutls_pubkey_verify_hash (gnutls_pubkey_t key, unsigned int flags,
                            const gnutls_datum_t * hash,
                            const gnutls_datum_t * signature);
 int
+gnutls_pubkey_verify_hash2 (gnutls_pubkey_t key, 
+                            gnutls_sign_algorithm_t algo,
+                            unsigned int flags,
+                            const gnutls_datum_t * hash,
+                            const gnutls_datum_t * signature);
+
+int
 gnutls_pubkey_get_verify_algorithm (gnutls_pubkey_t key,
                                     const gnutls_datum_t * signature,
                                     gnutls_digest_algorithm_t * hash);

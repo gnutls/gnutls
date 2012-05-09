@@ -1476,8 +1476,7 @@ _gnutls_x509_privkey_sign_hash2 (gnutls_x509_privkey_t signer,
       goto cleanup;
     }
 
-  ret = _gnutls_soft_sign (signer->pk_algorithm, &signer->params,
-                           &digest, signature);
+  ret = _gnutls_pk_sign (signer->pk_algorithm, signature, &digest, &signer->params);
 
   if (ret < 0)
     {
@@ -1521,8 +1520,8 @@ gnutls_x509_privkey_sign_hash (gnutls_x509_privkey_t key,
       return GNUTLS_E_INVALID_REQUEST;
     }
 
-  result = _gnutls_soft_sign (key->pk_algorithm, &key->params,
-                              hash, signature);
+  result = _gnutls_pk_sign (key->pk_algorithm, signature, hash, &key->params);
+
   if (result < 0)
     {
       gnutls_assert ();

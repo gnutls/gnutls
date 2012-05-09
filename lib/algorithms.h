@@ -106,8 +106,6 @@ enum encipher_type _gnutls_kx_encipher_type (gnutls_kx_algorithm_t algorithm);
 
 /* Functions for sign algorithms. */
 gnutls_sign_algorithm_t _gnutls_x509_oid2sign_algorithm (const char *oid);
-gnutls_sign_algorithm_t _gnutls_x509_pk_to_sign (gnutls_pk_algorithm_t pk,
-                                                 gnutls_digest_algorithm_t mac);
 gnutls_pk_algorithm_t _gnutls_x509_sign_to_pk (gnutls_sign_algorithm_t sign);
 const char *_gnutls_x509_sign_to_oid (gnutls_pk_algorithm_t,
                                       gnutls_digest_algorithm_t mac);
