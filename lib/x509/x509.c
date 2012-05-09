@@ -2693,7 +2693,7 @@ gnutls_x509_crt_verify_data (gnutls_x509_crt_t crt, unsigned int flags,
  * This function will verify the given signed digest, using the
  * parameters from the certificate.
  *
- * Deprecated. Please use gnutls_pubkey_verify_data().
+ * Deprecated. Please use gnutls_pubkey_verify_data2() or gnutls_pubkey_verify_hash2().
  *
  * Returns: In case of a verification failure %GNUTLS_E_PK_SIG_VERIFY_FAILED 
  * is returned, and zero or positive code on success.
