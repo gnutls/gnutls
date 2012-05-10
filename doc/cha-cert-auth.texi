@@ -253,12 +253,10 @@ This purpose is served by the functions @funcref{gnutls_x509_trust_list_add_name
 @cindex verifying certificate paths
 @tindex gnutls_certificate_verify_flags
 
-When operating in the context of a TLS session, if the trusted certificate
-authority list has been set via the
-@funcref{gnutls_certificate_set_x509_trust_file} and @funcref{gnutls_certificate_set_x509_crl_file},
-it is not required to setup a trusted list as above.
-The function @funcref{gnutls_certificate_verify_peers2} 
-may then be used to verify the peer's certificate chain.
+When operating in the context of a TLS session, the trusted certificate
+authority list may also be set using:
+@showfuncC{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_crl_file,gnutls_certificate_set_x509_system_trust}
+Then it is not required to setup a trusted list as above.
 
 There is also the possibility to pass some input to the verification
 functions in the form of flags. For @funcref{gnutls_x509_trust_list_verify_crt} the
