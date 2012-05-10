@@ -788,12 +788,8 @@ GNUTLS_3_0_0 {
 	gnutls_session_get_random;
 	gnutls_pubkey_verify_hash2;
 	gnutls_pk_to_sign;
-} GNUTLS_2_12;
-
-GNUTLS_3_0_1 {
-  global:
 	gnutls_certificate_set_x509_system_trust;
-} GNUTLS_3_0_0;
+} GNUTLS_2_12;
 
 GNUTLS_PRIVATE {
   global:

@@ -9,6 +9,7 @@ See the end for copying conditions.
 ** API and ABI modifications:
 gnutls_pk_to_sign: Added
 gnutls_pubkey_verify_hash2: Added
+gnutls_certificate_set_x509_system_trust: Added
 
 
 * Version 3.0.19 (released 2012-04-22)
