@@ -1037,6 +1037,11 @@ cleanup:
   return ret;
 }
 
+/* Given a signature and parameters, it should return
+ * the hash algorithm used in the signature. This is a kludge
+ * but until we deprecate gnutls_pubkey_get_verify_algorithm()
+ * we depend on it.
+ */
 static int wrap_nettle_hash_algorithm (gnutls_pk_algorithm_t pk, 
     const gnutls_datum_t * sig, gnutls_pk_params_st * issuer_params,
     gnutls_digest_algorithm_t* hash_algo)
