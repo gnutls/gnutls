@@ -6,6 +6,9 @@ See the end for copying conditions.
 
 ** libgnutls: Added gnutls_pubkey_verify_hash2()
 
+** certtool: Added support for the URI subject alternative
+name type in certtool.
+
 ** API and ABI modifications:
 gnutls_pk_to_sign: Added
 gnutls_pubkey_verify_hash2: Added

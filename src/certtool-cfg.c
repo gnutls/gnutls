@@ -63,6 +63,7 @@ typedef struct _cfg_ctx
   char *country;
   char **dc;
   char **dns_name;
+  char **uri;
   char **ip_addr;
   char **email;
   char **dn_oid;
@@ -233,6 +234,8 @@ template_parse (const char *template)
   
   READ_MULTI_LINE("dc", cfg.dc);
   READ_MULTI_LINE("dns_name", cfg.dns_name);
+  READ_MULTI_LINE("uri", cfg.uri);
+
   READ_MULTI_LINE("ip_address", cfg.ip_addr);
   READ_MULTI_LINE("email", cfg.email);
   READ_MULTI_LINE("key_purpose_oid", cfg.key_purpose_oids);
@@ -1207,6 +1210,64 @@ get_dns_name_set (int type, void *crt)
       exit (1);
     }
 }
+
+void
+get_uri_set (int type, void *crt)
+{
+  int ret = 0, i;
+
+  if (batch)
+    {
+      if (!cfg.uri)
+        return;
+
+      for (i = 0; cfg.uri[i] != NULL; i++)
+        {
+          if (type == TYPE_CRT)
+            ret =
+              gnutls_x509_crt_set_subject_alt_name (crt, GNUTLS_SAN_URI,
+                                                    cfg.uri[i],
+                                                    strlen (cfg.uri[i]),
+                                                    GNUTLS_FSAN_APPEND);
+          else
+            ret =
+              gnutls_x509_crq_set_subject_alt_name (crt, GNUTLS_SAN_URI,
+                                                    cfg.uri[i],
+                                                    strlen (cfg.uri[i]),
+                                                    GNUTLS_FSAN_APPEND);
+
+          if (ret < 0)
+            break;
+        }
+    }
+  else
+    {
+      const char *p;
+
+      do
+        {
+          p =
+            read_str ("Enter a URI of the subject of the certificate: ");
+          if (!p)
+            return;
+
+          if (type == TYPE_CRT)
+            ret = gnutls_x509_crt_set_subject_alt_name
+              (crt, GNUTLS_SAN_URI, p, strlen (p), GNUTLS_FSAN_APPEND);
+          else
+            ret = gnutls_x509_crq_set_subject_alt_name
+              (crt, GNUTLS_SAN_URI, p, strlen (p), GNUTLS_FSAN_APPEND);
+        }
+      while (p);
+    }
+
+  if (ret < 0)
+    {
+      fprintf (stderr, "set_subject_alt_name: %s\n", gnutls_strerror (ret));
+      exit (1);
+    }
+}
+
 
 
 int
