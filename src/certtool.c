@@ -484,11 +484,10 @@ generate_certificate (gnutls_privkey_t * ret_key,
 
       is_ike = get_ipsec_ike_status ();
       server = get_tls_server_status ();
-      if ((server != 0 && !proxy) || is_ike)
-        {
-          get_dns_name_set (TYPE_CRT, crt);
-          get_ip_addr_set (TYPE_CRT, crt);
-        }
+
+      get_dns_name_set (TYPE_CRT, crt);
+      get_uri_set (TYPE_CRT, crt);
+      get_ip_addr_set (TYPE_CRT, crt);
 
       if (server != 0)
         {
@@ -1864,6 +1863,7 @@ generate_request (common_info_st * cinfo)
   get_oid_crq_set (crq);
 
   get_dns_name_set (TYPE_CRQ, crq);
+  get_uri_set (TYPE_CRQ, crq);
   get_ip_addr_set (TYPE_CRQ, crq);
   get_email_set (TYPE_CRQ, crq);
 
