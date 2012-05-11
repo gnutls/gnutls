@@ -1628,7 +1628,7 @@ _gnutls_certificate_set_x509_system_trust_file (gnutls_certificate_credentials_t
  * Returns: the number of certificates processed or a negative error code
  * on error.
  *
- * Since: 3.1
+ * Since: 3.0
  **/
 int
 gnutls_certificate_set_x509_system_trust (gnutls_certificate_credentials_t cred)
