@@ -551,6 +551,9 @@ expiration_days = 700
 #dns_name = "www.none.org"
 #dns_name = "www.morethanone.org"
 
+# A subject alternative name URI
+#uri = "http://www.example.com"
+
 # An IP address in case of a server.
 #ip_address = "192.168.1.1"
 
