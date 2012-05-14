@@ -651,9 +651,7 @@ print_info (gnutls_session_t session, int print_cert)
                 }
           }
 
-          print_cert_info (session, 
-                           verbose?GNUTLS_CRT_PRINT_FULL:GNUTLS_CRT_PRINT_COMPACT, 
-                           print_cert);
+          print_cert_info (session, verbose, print_cert);
 
           if (kx == GNUTLS_KX_DHE_RSA || kx == GNUTLS_KX_DHE_DSS)
               print_dh_info (session, "Ephemeral ", verbose);
@@ -712,8 +710,12 @@ print_info (gnutls_session_t session, int print_cert)
 }
 
 void
-print_cert_info (gnutls_session_t session, int flag, int print_cert)
+print_cert_info (gnutls_session_t session, int verbose, int print_cert)
 {
+int flag;
+
+    if (verbose) flag = GNUTLS_CRT_PRINT_FULL;
+    else flag = GNUTLS_CRT_PRINT_COMPACT;
 
     if (gnutls_certificate_client_get_request_status (session) != 0)
         printf ("- Server has requested a certificate.\n");

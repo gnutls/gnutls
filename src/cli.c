@@ -1290,6 +1290,7 @@ do_handshake (socket_st * socket)
     }
   else
     {
+      print_cert_info (socket->session, verbose, print_cert);
       gnutls_alert_send_appropriate (socket->session, ret);
       shutdown (socket->fd, SHUT_RDWR);
     }
