@@ -84,6 +84,7 @@ main (void)
   gnutls_global_init ();
 
   gnutls_certificate_allocate_credentials (&x509_cred);
+  /* gnutls_certificate_set_x509_system_trust(xcred); */
   gnutls_certificate_set_x509_trust_file (x509_cred, CAFILE,
                                           GNUTLS_X509_FMT_PEM);
 

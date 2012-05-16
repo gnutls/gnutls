@@ -1590,7 +1590,7 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t cred,
 
 #ifdef DEFAULT_TRUST_STORE_FILE
 static int
-_gnutls_certificate_set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
+set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
 {
   int ret;
   gnutls_datum_t cas;
@@ -1625,6 +1625,9 @@ _gnutls_certificate_set_x509_system_trust_file (gnutls_certificate_credentials_t
  * This function adds the system's default trusted CAs in order to
  * verify client or server certificates.
  *
+ * In the case the system is currently unsupported %GNUTLS_E_UNIMPLEMENTED_FEATURE
+ * is returned.
+ *
  * Returns: the number of certificates processed or a negative error code
  * on error.
  *
@@ -1633,17 +1636,24 @@ _gnutls_certificate_set_x509_system_trust_file (gnutls_certificate_credentials_t
 int
 gnutls_certificate_set_x509_system_trust (gnutls_certificate_credentials_t cred)
 {
+#if !defined(DEFAULT_TRUST_STORE_PKCS11) && !defined(DEFAULT_TRUST_STORE_FILE)
+  int r = GNUTLS_E_UNIMPLEMENTED_FEATURE;
+#else
   int ret, r = 0;
+#endif
+
 #if defined(ENABLE_PKCS11) && defined(DEFAULT_TRUST_STORE_PKCS11)
   ret = read_cas_url (cred, DEFAULT_TRUST_STORE_PKCS11);
   if (ret > 0)
     r += ret;
 #endif
+
 #ifdef DEFAULT_TRUST_STORE_FILE
-  ret = _gnutls_certificate_set_x509_system_trust_file(cred);
+  ret = set_x509_system_trust_file(cred);
   if (ret > 0)
     r += ret;
 #endif
+
   return r;
 }
 

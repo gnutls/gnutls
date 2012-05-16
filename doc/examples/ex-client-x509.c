@@ -39,6 +39,7 @@ int main (void)
 
   /* sets the trusted cas file
    */
+  /* gnutls_certificate_set_x509_system_trust(xcred); */
   gnutls_certificate_set_x509_trust_file (xcred, CAFILE, GNUTLS_X509_FMT_PEM);
   gnutls_certificate_set_verify_function (xcred, _verify_certificate_callback);
   
