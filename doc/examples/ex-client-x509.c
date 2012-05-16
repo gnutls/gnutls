@@ -17,7 +17,7 @@
  */
 
 #define MAX_BUF 1024
-/* #define CAFILE "/etc/ssl/certs/ca-certificates.crt" */
+#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
 extern int tcp_connect (void);
@@ -37,12 +37,9 @@ int main (void)
   /* X509 stuff */
   gnutls_certificate_allocate_credentials (&xcred);
 
-  /* sets the trusted cas to be the system ones
+  /* sets the trusted cas file
    */
-  gnutls_certificate_set_x509_system_trust(xcred); 
-  /* gnutls_certificate_set_x509_trust_file (xcred, CAFILE, GNUTLS_X509_FMT_PEM); 
-   */
-
+  gnutls_certificate_set_x509_trust_file (xcred, CAFILE, GNUTLS_X509_FMT_PEM);
   gnutls_certificate_set_verify_function (xcred, _verify_certificate_callback);
   
   /* If client holds a certificate it can be set using the following:

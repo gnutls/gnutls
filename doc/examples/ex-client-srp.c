@@ -18,6 +18,7 @@ extern void tcp_close (int sd);
 #define MAX_BUF 1024
 #define USERNAME "user"
 #define PASSWORD "pass"
+#define CAFILE "/etc/ssl/certs/ca-certificates.crt"
 #define MSG "GET / HTTP/1.0\r\n\r\n"
 
 int
@@ -35,8 +36,8 @@ main (void)
   gnutls_srp_allocate_client_credentials (&srp_cred);
   gnutls_certificate_allocate_credentials (&cert_cred);
 
-  gnutls_certificate_set_x509_system_trust(cert_cred); 
-
+  gnutls_certificate_set_x509_trust_file (cert_cred, CAFILE,
+                                          GNUTLS_X509_FMT_PEM);
   gnutls_srp_set_client_credentials (srp_cred, USERNAME, PASSWORD);
 
   /* connects to server
