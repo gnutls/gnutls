@@ -84,12 +84,16 @@ int gnutls_random_art (gnutls_random_art_t type,
  * a server sends a prime with less bits than that
  * %GNUTLS_E_DH_PRIME_UNACCEPTABLE will be returned by the handshake.
  *
+ * Note that values lower than 512 bits may allow decryption of the
+ * exchanged data.
+ *
  * This function has no effect in server side.
  *
  **/
 void
 gnutls_dh_set_prime_bits (gnutls_session_t session, unsigned int bits)
 {
+  if (bits <= 512) _gnutls_audit_log(session, "Note that the security level of the Diffie-Hellman key exchange has been lowered to %u bits and this may allow decryption of the session data\n", bits);
   session->internals.dh_prime_bits = bits;
 }
 
