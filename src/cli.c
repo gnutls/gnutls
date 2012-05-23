@@ -674,7 +674,8 @@ init_tls_session (const char *hostname)
                                 strlen (hostname));
     }
 
-  gnutls_dh_set_prime_bits (session, 512);
+  if (HAVE_OPT(DH_BITS)) 
+    gnutls_dh_set_prime_bits( session, OPT_VALUE_DH_BITS);
 
   gnutls_credentials_set (session, GNUTLS_CRD_ANON, anon_cred);
   if (srp_cred)

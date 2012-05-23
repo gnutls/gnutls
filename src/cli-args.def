@@ -110,6 +110,13 @@ flag = {
 };
 
 flag = {
+    name      = dh-bits;
+    arg-type  = number;
+    descrip   = "The minimum number of bits allowed for DH";
+    doc      = "This option sets the minimum number of bits allowed for a Diffie-Hellman key exchange. You may want to lower the default value if the peer sends a weak prime and you get an connection error with unacceptable prime.";
+};
+
+flag = {
     name      = priority;
     arg-type  = string;
     descrip   = "Priorities string";
