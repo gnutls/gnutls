@@ -218,9 +218,12 @@ cleanup:
 static int
 is_issuer (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer_cert)
 {
-  gnutls_datum_t dn1 = { NULL, 0 }, dn2 =
-  {
-  NULL, 0};
+  gnutls_datum_t dn1 = { NULL, 0 }, 
+                 dn2 = { NULL, 0};
+  uint8_t id1[512];
+  uint8_t id2[512];
+  size_t id1_size;
+  size_t id2_size;
   int ret;
 
   ret = gnutls_x509_crt_get_raw_issuer_dn (cert, &dn1);
@@ -238,6 +241,34 @@ is_issuer (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer_cert)
     }
 
   ret = _gnutls_x509_compare_raw_dn (&dn1, &dn2);
+  
+  if (ret != 0)
+    {
+      /* check if the authority key identifier matches the subject key identifier
+       * of the isser */
+       id1_size = sizeof(id1);
+       
+       ret = gnutls_x509_crt_get_authority_key_id(cert, id1, &id1_size, NULL);
+       if (ret < 0)
+         {
+           ret = 1;
+           goto cleanup;
+         }
+
+       id2_size = sizeof(id2);
+       ret = gnutls_x509_crt_get_subject_key_id(issuer_cert, id2, &id2_size, NULL);
+       if (ret < 0)
+         {
+           ret = 1;
+           gnutls_assert();
+           goto cleanup;
+         }
+    
+       if (id1_size == id2_size && memcmp(id1, id2, id1_size) == 0)
+         ret = 1;
+       else
+         ret = 0;
+    }
 
 cleanup:
   _gnutls_free_datum (&dn1);
@@ -525,7 +556,8 @@ cleanup:
  * @issuer: is the certificate of a possible issuer
  *
  * This function will check if the given certificate was issued by the
- * given issuer.
+ * given issuer. It checks the DN fields and the authority
+ * key identifier and subject key identifier fields match.
  *
  * Returns: It will return true (1) if the given certificate is issued
  *   by the given issuer, and false (0) if not.  A negative error code is
