@@ -28,7 +28,6 @@
 #include <unistd.h>
 #ifndef _WIN32
 # include <netinet/in.h>
-# include <netinet/ip.h>
 #endif
 
 #include <signal.h>
