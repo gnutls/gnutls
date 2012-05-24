@@ -335,7 +335,8 @@ gnutls_certificate_server_set_request (gnutls_session_t session,
  * @st should contain the certificates and private keys.
  *
  * If the callback function is provided then gnutls will call it, in the
- * handshake, after the certificate request message has been received.
+ * handshake, if a certificate is requested by the server (and after the 
+ * certificate request message has been received).
  *
  * The callback function should set the certificate list to be sent,
  * and return 0 on success. If no certificate was selected then the
