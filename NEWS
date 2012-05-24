@@ -3,6 +3,14 @@ Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005,
               2006, 2007, 2008, 2009, 2010, 2011 Free Software Foundation, Inc.
 See the end for copying conditions.
 
+Version 2.12.20 (unreleased)
+
+** libgnutls: Check key identifiers when checking for an issuer.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 Version 2.12.19 (released 2012-05-05)
 
 ** libgnutls: When decoding a PKCS #11 URL the pin-source field
@@ -15,7 +23,6 @@ SRP key exchange public keys.
 ** minitasn1: Upgraded to libtasn1 version 2.13 (pre-release).
 
 ** API and ABI modifications:
-
 No changes since last version.
 
 
