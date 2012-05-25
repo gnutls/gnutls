@@ -1,6 +1,6 @@
-
-GNUTLS_FILE:=gnutls-3.0.18.tar.xz
-GNUTLS_DIR:=gnutls-3.0.18
+GNUTLS_VERSION:=3.0.19
+GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
+GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
 GMP_FILE:=gmp-5.0.4.tar.bz2
 GMP_DIR:=gmp-5.0.4
@@ -15,6 +15,7 @@ CROSS_DIR:=$(PWD)/win32
 BIN_DIR:=$(CROSS_DIR)/bin
 LIB_DIR:=$(CROSS_DIR)/lib
 HEADERS_DIR:=$(CROSS_DIR)/include
+DEVCPP_DIR:=$(PWD)/devcpp
 
 all: update-gpg-keys gnutls-w32
 
@@ -25,6 +26,14 @@ $(GNUTLS_DIR)-w32.zip: $(LIB_DIR) $(BIN_DIR) $(GNUTLS_DIR)/.installed
 	rm -rf $(CROSS_DIR)/etc $(CROSS_DIR)/share
 	cd $(CROSS_DIR) && zip -r $(PWD)/$@ *
 	gpg --sign --detach $(GNUTLS_DIR)-w32.zip
+
+gnutls-$(GNUTLS_VERSION)-1gn.DevPak: $(GNUTLS_DIR)-w32.zip
+	rm -rf $(DEVCPP_DIR)
+	mkdir -p $(DEVCPP_DIR)
+	cd $(DEVCPP_DIR) && unzip ../$(GNUTLS_DIR)-w32.zip && tar xf ../devcpp.tar && sed -i 's/@VERSION@/$(GNUTLS_VERSION)/g' gnutls.DevPackage
+	cd $(DEVCPP_DIR) && tar -cjf ../$@ .
+
+devpak: gnutls-$(GNUTLS_VERSION)-1gn.DevPak
 
 gnutls-w32: $(GNUTLS_DIR)-w32.zip
 
