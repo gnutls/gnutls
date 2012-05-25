@@ -159,9 +159,6 @@ _verify_certificate_callback (gnutls_session_t session)
       return GNUTLS_E_CERTIFICATE_ERROR;
     }
 
-  if (status & GNUTLS_CERT_INVALID)
-    printf ("The certificate is not trusted.\n");
-
   if (status & GNUTLS_CERT_SIGNER_NOT_FOUND)
     printf ("The certificate hasn't got a known issuer.\n");
 
@@ -173,6 +170,12 @@ _verify_certificate_callback (gnutls_session_t session)
 
   if (status & GNUTLS_CERT_NOT_ACTIVATED)
     printf ("The certificate is not yet activated\n");
+
+  if (status & GNUTLS_CERT_INVALID)
+    {
+      printf ("The certificate is not trusted.\n");
+      return GNUTLS_E_CERTIFICATE_ERROR;
+    }
 
   /* Up to here the process is the same for X.509 certificates and
    * OpenPGP keys. From now on X.509 certificates are assumed. This can
@@ -194,9 +197,6 @@ _verify_certificate_callback (gnutls_session_t session)
       return GNUTLS_E_CERTIFICATE_ERROR;
     }
 
-  /* This is not a real world example, since we only check the first 
-   * certificate in the given chain.
-   */
   if (gnutls_x509_crt_import (cert, &cert_list[0], GNUTLS_X509_FMT_DER) < 0)
     {
       printf ("error parsing certificate\n");
