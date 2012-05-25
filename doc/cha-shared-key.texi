@@ -132,7 +132,8 @@ with the peer. Moreover it is useful when complete anonymity is required.
 Unless in one of the above cases, do not use anonymous authentication.  
 
 The available key exchange algorithms for anonymous authentication are
-shown below.
+shown below, but note that few public servers support them. They typically
+have to be explicitly enabled.
 
 @table @code
 

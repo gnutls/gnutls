@@ -239,7 +239,8 @@ provided.
 The verification function will verify a given certificate chain against a list of certificate
 authorities and certificate revocation lists, and output
 a bit-wise OR of elements of the @code{gnutls_@-certificate_@-status_t} 
-enumeration shown in @ref{gnutls_certificate_status_t}. 
+enumeration shown in @ref{gnutls_certificate_status_t}. The @code{GNUTLS_@-CERT_@-INVALID} flag
+is always set on a verification error and more detailed flags will also be set when appropriate.
 
 @showenumdesc{gnutls_certificate_status_t,The @code{gnutls_@-certificate_@-status_t} enumeration.}
 
@@ -256,7 +257,11 @@ This purpose is served by the functions @funcref{gnutls_x509_trust_list_add_name
 When operating in the context of a TLS session, the trusted certificate
 authority list may also be set using:
 @showfuncC{gnutls_certificate_set_x509_trust_file,gnutls_certificate_set_x509_crl_file,gnutls_certificate_set_x509_system_trust}
+
 Then it is not required to setup a trusted list as above.
+The function @funcref{gnutls_certificate_verify_peers2} 
+may then be used to verify the peer's certificate chain. The flags
+are set similarly to the verification functions in the previous section.
 
 There is also the possibility to pass some input to the verification
 functions in the form of flags. For @funcref{gnutls_x509_trust_list_verify_crt} the

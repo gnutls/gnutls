@@ -22,6 +22,7 @@
 @menu
 * General idea::
 * Error handling::
+* Common types::
 * Debugging and auditing::
 * Thread safety::
 * Callback functions::
@@ -93,6 +94,32 @@ If any non fatal errors, that require an action, are to be returned by
 a function, these error codes will be documented in the function's
 reference.  See @ref{Error codes}, for a description of the available 
 error codes.
+
+@node Common types
+@subsection Common types
+
+Several functions in @acronym{GnuTLS} use @code{gnutls_datum_t} which is
+convenient way to combine a pointer to data and data's size. Its definition is
+shown below.
+@verbatim
+  typedef struct
+  {
+    unsigned char *data;
+    unsigned int size;
+  } gnutls_datum_t;
+@end verbatim
+
+Other functions that require data for scattered read use a structure similar
+to @code{struct iovec} typically used by @funcintref{readv}. It is shown
+below.
+@verbatim
+  typedef struct
+  {
+    void *iov_base;             /* Starting address */
+    size_t iov_len;             /* Number of bytes to transfer */
+  } giovec_t;
+@end verbatim
+
 
 @node Debugging and auditing
 @subsection Debugging and auditing
