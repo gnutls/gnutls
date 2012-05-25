@@ -1592,7 +1592,7 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t cred,
 static int
 set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
 {
-  int ret;
+  int ret, r;
   gnutls_datum_t cas;
   size_t size;
 
@@ -1612,9 +1612,33 @@ set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
   if (ret < 0)
     {
       gnutls_assert ();
+      return ret;
+    }
+  
+  r = ret;
+
+#ifdef DEFAULT_CRL_FILE
+  cas.data = (void*)read_binary_file (DEFAULT_CRL_FILE, &size);
+  if (cas.data == NULL)
+    {
+      gnutls_assert ();
+      return r;
     }
 
-  return ret;
+  cas.size = size;
+
+  ret = gnutls_certificate_set_x509_crl_mem(cred, &cas, GNUTLS_X509_FMT_PEM);
+
+  free (cas.data);
+
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      return ret;
+    }
+#endif
+
+  return r;
 }
 #endif
 

@@ -233,16 +233,21 @@ gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
                                         unsigned int tl_flags, unsigned int tl_vflags)
 {
   int ret, r = 0;
+  const char* crl_file = NULL;
+
+#ifdef DEFAULT_CRL_FILE
+  crl_file = DEFAULT_CRL_FILE;
+#endif
 
 #if defined(ENABLE_PKCS11) && defined(DEFAULT_TRUST_STORE_PKCS11)
-  ret = gnutls_x509_trust_list_add_trust_file(list, DEFAULT_TRUST_STORE_PKCS11, NULL, 
+  ret = gnutls_x509_trust_list_add_trust_file(list, DEFAULT_TRUST_STORE_PKCS11, crl_file, 
                                               GNUTLS_X509_FMT_DER, tl_flags, tl_vflags);
   if (ret > 0)
     r += ret;
 #endif
 
 #ifdef DEFAULT_TRUST_STORE_FILE
-  ret = gnutls_x509_trust_list_add_trust_file(list, DEFAULT_TRUST_STORE_FILE, NULL, 
+  ret = gnutls_x509_trust_list_add_trust_file(list, DEFAULT_TRUST_STORE_FILE, crl_file, 
                                               GNUTLS_X509_FMT_PEM, tl_flags, tl_vflags);
   if (ret > 0)
     r += ret;

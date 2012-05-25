@@ -296,6 +296,10 @@ AC_ARG_WITH([default-trust-store-file],
   [AS_HELP_STRING([--with-default-trust-store-file=FILE],
     [use the given file default trust store])])
 
+AC_ARG_WITH([default-crl-file],
+  [AS_HELP_STRING([--with-default-crl-file=FILE],
+    [use the given CRL file as default])])
+
 if test "x$with_default_trust_store_pkcs11" = x -a "x$with_default_trust_store_file" = x; then
   # auto detect http://lists.gnu.org/archive/html/help-gnutls/2012-05/msg00004.html
   for i in \
@@ -313,6 +317,11 @@ fi
 if test "x$with_default_trust_store_file" != x; then
   AC_DEFINE_UNQUOTED([DEFAULT_TRUST_STORE_FILE],
     ["$with_default_trust_store_file"], [use the given file default trust store])
+fi
+
+if test "x$with_default_crl_file" != x; then
+  AC_DEFINE_UNQUOTED([DEFAULT_CRL_FILE],
+    ["$with_default_crl_file"], [use the given CRL file])
 fi
 
 dnl Guile bindings.
@@ -548,8 +557,10 @@ if features are disabled)
   SRP support:      $ac_enable_srp
   PSK support:      $ac_enable_psk
   Anon auth support:$ac_enable_anon
+
   Trust store pkcs: $with_default_trust_store_pkcs11
   Trust store file: $with_default_trust_store_file
+  CRL file: $with_default_crl_file
 ])
 
 AC_MSG_NOTICE([Optional applications:
