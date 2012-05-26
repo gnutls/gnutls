@@ -23,9 +23,9 @@ clients, using @acronym{GnuTLS}. Note that some of the examples require function
 implemented by another example.
 
 @menu
-* Simple client example with anonymous authentication::
 * Simple client example with X.509 certificate support::
 * Simple client example with SSH-style certificate verification::
+* Simple client example with anonymous authentication::
 * Simple Datagram TLS client example::
 * Obtaining session information::
 * Using a callback to select the certificate to use::
@@ -37,20 +37,6 @@ implemented by another example.
 * Helper functions for TCP connections::
 * Helper functions for UDP connections::
 @end menu
-
-@node Simple client example with anonymous authentication
-@subsection Simple client example with anonymous authentication
-
-The simplest client using TLS is the one that doesn't do any
-authentication.  This means no external certificates or passwords are
-needed to set up the connection.  As could be expected, the connection
-is vulnerable to man-in-the-middle (active or redirection) attacks.
-However, the data are integrity protected and encrypted from
-passive eavesdroppers.
-
-Note that the server must support anonymous authentication as well.
-
-@verbatiminclude examples/ex-client-anon.c
 
 @node Simple client example with X.509 certificate support
 @subsection Simple client example with @acronym{X.509} certificate support
@@ -75,6 +61,22 @@ prompted on unknown public keys and known public keys are considered
 trusted.
 
 @verbatiminclude examples/ex-verify-ssh.c
+
+@node Simple client example with anonymous authentication
+@subsection Simple client example with anonymous authentication
+
+The simplest client using TLS is the one that doesn't do any
+authentication.  This means no external certificates or passwords are
+needed to set up the connection.  As could be expected, the connection
+is vulnerable to man-in-the-middle (active or redirection) attacks.
+However, the data are integrity protected and encrypted from
+passive eavesdroppers.
+
+Note that due to the vulnerable nature of this method very few public
+servers support it.
+
+@verbatiminclude examples/ex-client-anon.c
+
 
 @node Simple Datagram TLS client example
 @subsection Simple datagram @acronym{TLS} client example
