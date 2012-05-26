@@ -1588,7 +1588,57 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t cred,
   return ret;
 }
 
-#ifdef DEFAULT_TRUST_STORE_FILE
+#ifdef _WIN32
+static int
+set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
+{
+HCERTSTORE store = CertOpenSystemStore(0, "CA");
+const CERT_CONTEXT *cert;
+const CRL_CONTEXT *crl;
+gnutls_datum_t data;
+int ret = 0;
+unsigned int i;
+
+  for (i=0;i<2;i++)
+    {
+    
+      if (i==0) store = CertOpenSystemStore(0, "ROOT");
+      else store = CertOpenSystemStore(0, "CA");
+    
+      if (store == NULL) return GNUTLS_E_FILE_ERROR;
+
+      cert = CertEnumCertificatesInStore(store, NULL);
+      crl = CertEnumCRLsInStore(store, NULL);
+
+      while(cert != NULL) 
+        {
+          if (cert->dwCertEncodingType == X509_ASN_ENCODING)
+            {
+              data.data = cert->pbCertEncoded;
+              data.size = cert->cbCertEncoded;
+              if (gnutls_certificate_set_x509_trust_mem (cred, &data, GNUTLS_X509_FMT_DER) > 0)
+                ret++;
+            }
+          cert = CertEnumCertificatesInStore(store, cert);
+        }
+
+      while(crl != NULL) 
+        {
+          if (crl->dwCertEncodingType == X509_ASN_ENCODING)
+            {
+              data.data = crl->pbCrlEncoded;
+              data.size = crl->cbCrlEncoded;
+            
+              gnutls_certificate_set_x509_crl_mem(cred, &data, GNUTLS_X509_FMT_DER);
+            }
+          crl = CertEnumCRLsInStore(store, crl);
+        }
+      CertCloseStore(store, 0);
+    }
+
+  return ret;
+}
+#elif defined(DEFAULT_TRUST_STORE_FILE)
 static int
 set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
 {
@@ -1660,7 +1710,7 @@ set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
 int
 gnutls_certificate_set_x509_system_trust (gnutls_certificate_credentials_t cred)
 {
-#if !defined(DEFAULT_TRUST_STORE_PKCS11) && !defined(DEFAULT_TRUST_STORE_FILE)
+#if !defined(_WIN32) && !defined(DEFAULT_TRUST_STORE_PKCS11) && !defined(DEFAULT_TRUST_STORE_FILE)
   int r = GNUTLS_E_UNIMPLEMENTED_FEATURE;
 #else
   int ret, r = 0;
