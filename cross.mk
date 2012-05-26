@@ -1,4 +1,4 @@
-GNUTLS_VERSION:=3.0.19
+GNUTLS_VERSION:=3.0.20
 GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
 GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
@@ -23,14 +23,16 @@ update-gpg-keys:
 	gpg --recv-keys 96865171 B565716F D92765AF A8F4C2FD DB899F46
 
 $(GNUTLS_DIR)-w32.zip: $(LIB_DIR) $(BIN_DIR) $(GNUTLS_DIR)/.installed
-	rm -rf $(CROSS_DIR)/etc $(CROSS_DIR)/share
+	rm -rf $(CROSS_DIR)/etc $(CROSS_DIR)/share $(CROSS_DIR)/lib/include $(CROSS_DIR)/lib/pkgconfig
 	cd $(CROSS_DIR) && zip -r $(PWD)/$@ *
 	gpg --sign --detach $(GNUTLS_DIR)-w32.zip
 
 gnutls-$(GNUTLS_VERSION)-1gn.DevPak: $(GNUTLS_DIR)-w32.zip
 	rm -rf $(DEVCPP_DIR)
-	mkdir -p $(DEVCPP_DIR)
-	cd $(DEVCPP_DIR) && unzip ../$(GNUTLS_DIR)-w32.zip && tar xf ../devcpp.tar && sed -i 's/@VERSION@/$(GNUTLS_VERSION)/g' gnutls.DevPackage
+	mkdir -p $(DEVCPP_DIR)/gnutls
+	mkdir -p $(DEVCPP_DIR)/MinGW32
+	cd $(DEVCPP_DIR)/gnutls && unzip ../../$(GNUTLS_DIR)-w32.zip 
+	cd $(DEVCPP_DIR) && tar xf ../../devcpp.tar && sed -i 's/@VERSION@/$(GNUTLS_VERSION)/g' gnutls.DevPackage
 	cd $(DEVCPP_DIR) && tar -cjf ../$@ .
 
 devpak: gnutls-$(GNUTLS_VERSION)-1gn.DevPak
@@ -47,7 +49,7 @@ $(BIN_DIR):
 $(LIB_DIR):
 	mkdir -p $(LIB_DIR)
 
-CONFIG_FLAGS := --prefix=$(CROSS_DIR) --host=i686-w64-mingw32 --enable-shared --disable-static --bindir=$(BIN_DIR) --libdir=$(LIB_DIR)
+CONFIG_FLAGS := --prefix=$(CROSS_DIR) --host=i686-w64-mingw32 --enable-shared --disable-static --bindir=$(BIN_DIR) --libdir=$(LIB_DIR) --includedir=$(HEADERS_DIR)
 
 $(P11_KIT_DIR)/.configured:
 	test -f $(P11_KIT_FILE) || wget http://p11-glue.freedesktop.org/releases/$(P11_KIT_FILE)
@@ -71,12 +73,14 @@ $(GMP_DIR)/.configured:
 	test -f $(GMP_FILE).sig || wget ftp://ftp.gmplib.org/pub/$(GMP_DIR)/$(GMP_FILE).sig
 	gpg --verify $(GMP_FILE).sig
 	test -d $(GMP_DIR) || tar -xf $(GMP_FILE)
-	cd $(GMP_DIR) && ./configure $(CONFIG_FLAGS) --enable-fat --exec-prefix=$(LIB_DIR) --oldincludedir=$(HEADERS_DIR) && cd ..
+	cd $(GMP_DIR) && ./configure $(CONFIG_FLAGS) --enable-fat --exec-prefix=$(LIB_DIR)  --oldincludedir=$(HEADERS_DIR) && cd ..
 	touch $@
 
 $(GMP_DIR)/.installed: $(GMP_DIR)/.configured
 	make -C $(GMP_DIR) -j2
 	make -C $(GMP_DIR) install -i
+	mv $(LIB_DIR)/include/* $(HEADERS_DIR)/
+	rmdir $(LIB_DIR)/include/
 	touch $@
 
 $(NETTLE_DIR)/.configured: $(GMP_DIR)/.installed
