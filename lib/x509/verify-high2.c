@@ -40,8 +40,8 @@
 /**
  * gnutls_x509_trust_list_add_trust_mem:
  * @list: The structure of the list
- * @ca_file: A file containing a list of CAs (optional)
- * @crl_file: A file containing a list of CRLs (optional)
+ * @cas: A buffer containing a list of CAs (optional)
+ * @crls: A buffer containing a list of CRLs (optional)
  * @type: The format of the certificates
  * @tl_flags: GNUTLS_TL_*
  * @tl_vflags: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
@@ -215,43 +215,3 @@ gnutls_x509_trust_list_add_trust_file(gnutls_x509_trust_list_t list,
   return ret;
 }
 
-/**
- * gnutls_x509_trust_list_add_system_trust:
- * @list: The structure of the list
- * @tl_flags: GNUTLS_TL_*
- * @tl_vflags: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
- *
- * This function adds the system's default trusted certificate
- * authorities to the trusted list.
- *
- * Returns: The number of added elements is returned.
- *
- * Since: 3.1
- **/
-int
-gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
-                                        unsigned int tl_flags, unsigned int tl_vflags)
-{
-  int ret, r = 0;
-  const char* crl_file = NULL;
-
-#ifdef DEFAULT_CRL_FILE
-  crl_file = DEFAULT_CRL_FILE;
-#endif
-
-#if defined(ENABLE_PKCS11) && defined(DEFAULT_TRUST_STORE_PKCS11)
-  ret = gnutls_x509_trust_list_add_trust_file(list, DEFAULT_TRUST_STORE_PKCS11, crl_file, 
-                                              GNUTLS_X509_FMT_DER, tl_flags, tl_vflags);
-  if (ret > 0)
-    r += ret;
-#endif
-
-#ifdef DEFAULT_TRUST_STORE_FILE
-  ret = gnutls_x509_trust_list_add_trust_file(list, DEFAULT_TRUST_STORE_FILE, crl_file, 
-                                              GNUTLS_X509_FMT_PEM, tl_flags, tl_vflags);
-  if (ret > 0)
-    r += ret;
-#endif
-
-  return r;
-}

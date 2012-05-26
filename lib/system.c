@@ -30,6 +30,7 @@
 
 #ifdef _WIN32
 # include <windows.h>
+# include <Wincrypt.h>
 
 #else
 # ifdef HAVE_PTHREAD_LOCKS
@@ -345,4 +346,95 @@ const char *home_dir = getenv ("HOME");
     snprintf(path, max_size, "%s/"CONFIG_PATH, home_dir);
       
   return 0;
+}
+
+/**
+ * gnutls_x509_trust_list_add_system_trust:
+ * @list: The structure of the list
+ * @tl_flags: GNUTLS_TL_*
+ * @tl_vflags: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
+ *
+ * This function adds the system's default trusted certificate
+ * authorities to the trusted list. Note that on unsupported system
+ * this function returns %GNUTLS_E_UNIMPLEMENTED_FEATURE.
+ *
+ * Returns: The number of added elements or a negative error code on error.
+ *
+ * Since: 3.1
+ **/
+int
+gnutls_x509_trust_list_add_system_trust(gnutls_x509_trust_list_t list,
+                                        unsigned int tl_flags, unsigned int tl_vflags)
+{
+#if !defined(DEFAULT_TRUST_STORE_PKCS11) && !defined(DEFAULT_TRUST_STORE_FILE) && !defined(_WIN32)
+  return GNUTLS_E_UNIMPLEMENTED_FEATURE;
+#else
+  int ret, r = 0;
+  const char* crl_file = 
+# ifdef DEFAULT_CRL_FILE
+  DEFAULT_CRL_FILE;
+# else
+  NULL;
+# endif
+
+# ifdef _WIN32
+  unsigned int i;
+
+  for (i=0;i<2;i++)
+  {
+    HCERTSTORE store;
+    const CERT_CONTEXT *cert;
+    const CRL_CONTEXT *crl;
+    gnutls_datum_t data;
+    
+    if (i==0) store = CertOpenSystemStore(0, "ROOT");
+    else store = CertOpenSystemStore(0, "CA");
+
+    if (store == NULL) return GNUTLS_E_FILE_ERROR;
+
+    cert = CertEnumCertificatesInStore(store, NULL);
+    crl = CertEnumCRLsInStore(store, NULL);
+
+    while(cert != NULL) 
+      {
+        if (cert->dwCertEncodingType == X509_ASN_ENCODING)
+          {
+            data.data = cert->pbCertEncoded;
+            data.size = cert->cbCertEncoded;
+            if (gnutls_x509_trust_list_add_trust_mem(list, &data, NULL, GNUTLS_X509_FMT_DER, tl_flags, tl_vflags) > 0)
+              r++;
+          }
+        cert = CertEnumCertificatesInStore(store, cert);
+      }
+
+    while(crl != NULL) 
+      {
+        if (crl->dwCertEncodingType == X509_ASN_ENCODING)
+          {
+            data.data = crl->pbCrlEncoded;
+            data.size = crl->cbCrlEncoded;
+            gnutls_x509_trust_list_add_trust_mem(list, NULL, &data, GNUTLS_X509_FMT_DER, tl_flags, tl_vflags);
+          }
+        crl = CertEnumCRLsInStore(store, crl);
+      }
+    CertCloseStore(store, 0);
+  }
+# endif
+
+# if defined(ENABLE_PKCS11) && defined(DEFAULT_TRUST_STORE_PKCS11)
+  ret = gnutls_x509_trust_list_add_trust_file(list, DEFAULT_TRUST_STORE_PKCS11, crl_file, 
+                                              GNUTLS_X509_FMT_DER, tl_flags, tl_vflags);
+  if (ret > 0)
+    r += ret;
+# endif
+
+# ifdef DEFAULT_TRUST_STORE_FILE
+  ret = gnutls_x509_trust_list_add_trust_file(list, DEFAULT_TRUST_STORE_FILE, crl_file, 
+                                              GNUTLS_X509_FMT_PEM, tl_flags, tl_vflags);
+  if (ret > 0)
+    r += ret;
+# endif
+#endif
+
+  return r;
 }

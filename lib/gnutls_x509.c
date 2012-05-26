@@ -1588,60 +1588,6 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t cred,
   return ret;
 }
 
-#ifdef DEFAULT_TRUST_STORE_FILE
-static int
-set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
-{
-  int ret, r;
-  gnutls_datum_t cas;
-  size_t size;
-
-  cas.data = (void*)read_binary_file (DEFAULT_TRUST_STORE_FILE, &size);
-  if (cas.data == NULL)
-    {
-      gnutls_assert ();
-      return GNUTLS_E_FILE_ERROR;
-    }
-
-  cas.size = size;
-
-  ret = gnutls_certificate_set_x509_trust_mem(cred, &cas, GNUTLS_X509_FMT_PEM);
-
-  free (cas.data);
-
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-  
-  r = ret;
-
-#ifdef DEFAULT_CRL_FILE
-  cas.data = (void*)read_binary_file (DEFAULT_CRL_FILE, &size);
-  if (cas.data == NULL)
-    {
-      gnutls_assert ();
-      return r;
-    }
-
-  cas.size = size;
-
-  ret = gnutls_certificate_set_x509_crl_mem(cred, &cas, GNUTLS_X509_FMT_PEM);
-
-  free (cas.data);
-
-  if (ret < 0)
-    {
-      gnutls_assert ();
-      return ret;
-    }
-#endif
-
-  return r;
-}
-#endif
-
 /**
  * gnutls_certificate_set_x509_system_trust:
  * @cred: is a #gnutls_certificate_credentials_t structure.
@@ -1660,25 +1606,7 @@ set_x509_system_trust_file (gnutls_certificate_credentials_t cred)
 int
 gnutls_certificate_set_x509_system_trust (gnutls_certificate_credentials_t cred)
 {
-#if !defined(DEFAULT_TRUST_STORE_PKCS11) && !defined(DEFAULT_TRUST_STORE_FILE)
-  int r = GNUTLS_E_UNIMPLEMENTED_FEATURE;
-#else
-  int ret, r = 0;
-#endif
-
-#if defined(ENABLE_PKCS11) && defined(DEFAULT_TRUST_STORE_PKCS11)
-  ret = read_cas_url (cred, DEFAULT_TRUST_STORE_PKCS11);
-  if (ret > 0)
-    r += ret;
-#endif
-
-#ifdef DEFAULT_TRUST_STORE_FILE
-  ret = set_x509_system_trust_file(cred);
-  if (ret > 0)
-    r += ret;
-#endif
-
-  return r;
+  return gnutls_x509_trust_list_add_system_trust(cred->list, 0, 0);
 }
 
 static int
