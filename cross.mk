@@ -27,12 +27,11 @@ $(GNUTLS_DIR)-w32.zip: $(LIB_DIR) $(BIN_DIR) $(GNUTLS_DIR)/.installed
 	cd $(CROSS_DIR) && zip -r $(PWD)/$@ *
 	gpg --sign --detach $(GNUTLS_DIR)-w32.zip
 
-gnutls-$(GNUTLS_VERSION)-1gn.DevPak: $(GNUTLS_DIR)-w32.zip
+gnutls-$(GNUTLS_VERSION)-1gn.DevPak: $(GNUTLS_DIR)-w32.zip devcpp.tar
 	rm -rf $(DEVCPP_DIR)
-	mkdir -p $(DEVCPP_DIR)/gnutls
-	mkdir -p $(DEVCPP_DIR)/MinGW32
-	cd $(DEVCPP_DIR)/gnutls && unzip ../../$(GNUTLS_DIR)-w32.zip 
-	cd $(DEVCPP_DIR) && tar xf ../../devcpp.tar && sed -i 's/@VERSION@/$(GNUTLS_VERSION)/g' gnutls.DevPackage
+	mkdir -p $(DEVCPP_DIR)
+	cd $(DEVCPP_DIR) && unzip ../$(GNUTLS_DIR)-w32.zip 
+	cd $(DEVCPP_DIR) && tar xf ../devcpp.tar && sed -i 's/@VERSION@/$(GNUTLS_VERSION)/g' gnutls.DevPackage
 	cd $(DEVCPP_DIR) && tar -cjf ../$@ .
 
 devpak: gnutls-$(GNUTLS_VERSION)-1gn.DevPak

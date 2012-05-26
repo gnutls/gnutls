@@ -1,0 +1,10 @@
+*.tar.*
+*.zip
+*.sig
+*.DevPak
+gnutls-*
+nettle-*
+gmp-*
+p11-kit-*
+devcpp
+win32
