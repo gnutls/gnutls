@@ -4,10 +4,19 @@ See the end for copying conditions.
 
 * Version 3.0.20 (unreleased)
 
+** libgnutls: Check key identifiers when checking for an issuer.
+
 ** libgnutls: Added gnutls_pubkey_verify_hash2()
+
+** libgnutls: Added gnutls_certificate_set_x509_system_trust()
+that loads the trusted CA certificates from system locations
+(e.g. trusted storage in windows and CA bundle files in other systems).
 
 ** certtool: Added support for the URI subject alternative
 name type in certtool.
+
+** certtool: Increase to 128 the number of distinct options
+(e.g. dns_names) allowed.
 
 ** API and ABI modifications:
 gnutls_pk_to_sign: Added
