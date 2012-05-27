@@ -48,7 +48,7 @@
 
 extern int batch;
 
-#define MAX_ENTRIES 16
+#define MAX_ENTRIES 128
 
 typedef struct _cfg_ctx
 {
