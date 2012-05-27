@@ -1606,7 +1606,7 @@ gnutls_certificate_set_x509_trust_file (gnutls_certificate_credentials_t cred,
 int
 gnutls_certificate_set_x509_system_trust (gnutls_certificate_credentials_t cred)
 {
-  return gnutls_x509_trust_list_add_system_trust(cred->list, 0, 0);
+  return gnutls_x509_trust_list_add_system_trust(cred->tlist, 0, 0);
 }
 
 static int
