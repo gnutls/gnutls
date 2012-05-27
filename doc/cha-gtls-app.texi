@@ -650,10 +650,18 @@ either before the @funcintref{select} system call, or after a call to
 @funcref{gnutls_record_recv}. @acronym{GnuTLS} does not keep a write buffer,
 thus when writing no additional actions are required.
 
-In the DTLS, however, @acronym{GnuTLS} may block due to retransmission timers
-required by the protocol. To prevent those timers from blocking a DTLS handshake,
-the @funcref{gnutls_init} should be called with the
-@code{GNUTLS_NONBLOCK} flag (see @ref{Session initialization}).
+Although in the TLS protocol implementation each call to receive or send
+function implies to restoring the same function that was interrupted, in
+the DTLS protocol this requirement isn't true.
+There are cases where a retransmission is required, which are indicated by
+a received message and thus @funcref{gnutls_record_get_direction} must be called 
+to decide which operation to restore, i.e., send or receive.
+@showfuncdesc{gnutls_record_get_direction}
+
+Moreover, to prevent blocking from DTLS' retransmission timers to block a
+handshake, the @funcref{gnutls_init} function should be called with the
+@code{GNUTLS_NONBLOCK} flag set (see @ref{Session initialization}).
+
 
 @node DTLS sessions
 @subsection DTLS sessions
