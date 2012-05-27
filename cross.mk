@@ -1,6 +1,6 @@
-
-GNUTLS_FILE:=gnutls-3.0.18.tar.xz
-GNUTLS_DIR:=gnutls-3.0.18
+GNUTLS_VERSION:=3.0.20
+GNUTLS_FILE:=gnutls-$(GNUTLS_VERSION).tar.xz
+GNUTLS_DIR:=gnutls-$(GNUTLS_VERSION)
 
 GMP_FILE:=gmp-5.0.4.tar.bz2
 GMP_DIR:=gmp-5.0.4
@@ -15,6 +15,7 @@ CROSS_DIR:=$(PWD)/win32
 BIN_DIR:=$(CROSS_DIR)/bin
 LIB_DIR:=$(CROSS_DIR)/lib
 HEADERS_DIR:=$(CROSS_DIR)/include
+DEVCPP_DIR:=$(PWD)/devcpp
 
 all: update-gpg-keys gnutls-w32
 
@@ -22,9 +23,18 @@ update-gpg-keys:
 	gpg --recv-keys 96865171 B565716F D92765AF A8F4C2FD DB899F46
 
 $(GNUTLS_DIR)-w32.zip: $(LIB_DIR) $(BIN_DIR) $(GNUTLS_DIR)/.installed
-	rm -rf $(CROSS_DIR)/etc $(CROSS_DIR)/share
+	rm -rf $(CROSS_DIR)/etc $(CROSS_DIR)/share $(CROSS_DIR)/lib/include $(CROSS_DIR)/lib/pkgconfig
 	cd $(CROSS_DIR) && zip -r $(PWD)/$@ *
 	gpg --sign --detach $(GNUTLS_DIR)-w32.zip
+
+gnutls-$(GNUTLS_VERSION)-1gn.DevPak: $(GNUTLS_DIR)-w32.zip devcpp.tar
+	rm -rf $(DEVCPP_DIR)
+	mkdir -p $(DEVCPP_DIR)
+	cd $(DEVCPP_DIR) && unzip ../$(GNUTLS_DIR)-w32.zip 
+	cd $(DEVCPP_DIR) && tar xf ../devcpp.tar && sed -i 's/@VERSION@/$(GNUTLS_VERSION)/g' gnutls.DevPackage
+	cd $(DEVCPP_DIR) && tar -cjf ../$@ .
+
+devpak: gnutls-$(GNUTLS_VERSION)-1gn.DevPak
 
 gnutls-w32: $(GNUTLS_DIR)-w32.zip
 
@@ -38,7 +48,7 @@ $(BIN_DIR):
 $(LIB_DIR):
 	mkdir -p $(LIB_DIR)
 
-CONFIG_FLAGS := --prefix=$(CROSS_DIR) --host=i686-w64-mingw32 --enable-shared --disable-static --bindir=$(BIN_DIR) --libdir=$(LIB_DIR)
+CONFIG_FLAGS := --prefix=$(CROSS_DIR) --host=i686-w64-mingw32 --enable-shared --disable-static --bindir=$(BIN_DIR) --libdir=$(LIB_DIR) --includedir=$(HEADERS_DIR)
 
 $(P11_KIT_DIR)/.configured:
 	test -f $(P11_KIT_FILE) || wget http://p11-glue.freedesktop.org/releases/$(P11_KIT_FILE)
@@ -62,12 +72,14 @@ $(GMP_DIR)/.configured:
 	test -f $(GMP_FILE).sig || wget ftp://ftp.gmplib.org/pub/$(GMP_DIR)/$(GMP_FILE).sig
 	gpg --verify $(GMP_FILE).sig
 	test -d $(GMP_DIR) || tar -xf $(GMP_FILE)
-	cd $(GMP_DIR) && ./configure $(CONFIG_FLAGS) --enable-fat --exec-prefix=$(LIB_DIR) --oldincludedir=$(HEADERS_DIR) && cd ..
+	cd $(GMP_DIR) && ./configure $(CONFIG_FLAGS) --enable-fat --exec-prefix=$(LIB_DIR)  --oldincludedir=$(HEADERS_DIR) && cd ..
 	touch $@
 
 $(GMP_DIR)/.installed: $(GMP_DIR)/.configured
 	make -C $(GMP_DIR) -j2
 	make -C $(GMP_DIR) install -i
+	mv $(LIB_DIR)/include/* $(HEADERS_DIR)/
+	rmdir $(LIB_DIR)/include/
 	touch $@
 
 $(NETTLE_DIR)/.configured: $(GMP_DIR)/.installed
