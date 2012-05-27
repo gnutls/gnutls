@@ -827,20 +827,20 @@ unpack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
   BUFFER_POP_NUM (ps, session->internals.resumed_security_parameters.version);
 
   BUFFER_POP (ps,
-              &session->internals.resumed_security_parameters.master_secret,
+              session->internals.resumed_security_parameters.master_secret,
               GNUTLS_MASTER_SIZE);
 
   BUFFER_POP (ps,
-              &session->internals.resumed_security_parameters.client_random,
+              session->internals.resumed_security_parameters.client_random,
               GNUTLS_RANDOM_SIZE);
   BUFFER_POP (ps,
-              &session->internals.resumed_security_parameters.server_random,
+              session->internals.resumed_security_parameters.server_random,
               GNUTLS_RANDOM_SIZE);
   BUFFER_POP_NUM (ps,
                   session->internals.
                   resumed_security_parameters.session_id_size);
 
-  BUFFER_POP (ps, &session->internals.resumed_security_parameters.session_id,
+  BUFFER_POP (ps, session->internals.resumed_security_parameters.session_id,
               session->internals.resumed_security_parameters.session_id_size);
 
   BUFFER_POP_NUM (ps,
