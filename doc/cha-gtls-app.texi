@@ -89,11 +89,14 @@ This error code indicates that the server requests a re-handshake. The
 client may ignore this request, or may reply with an alert.  You can
 test if an error code is a fatal one by using the
 @funcref{gnutls_error_is_fatal}.
+All errors can be converted to a descriptive string using @funcref{gnutls_strerror}.
 
 If any non fatal errors, that require an action, are to be returned by
 a function, these error codes will be documented in the function's
-reference.  See @ref{Error codes}, for a description of the available 
-error codes.
+reference. For example the error codes @code{GNUTLS_@-E_@-WARNING_@-ALERT_@-RECEIVED} and @code{GNUTLS_@-E_@-FATAL_@-ALERT_@-RECEIVED}
+that may returned when receiving data, should be handled by notifying the
+user of the alert (as explained in @ref{Handling alerts}).
+See @ref{Error codes}, for a description of the available error codes.
 
 @node Common types
 @subsection Common types
@@ -763,17 +766,23 @@ During a TLS connection alert messages may be exchanged by the
 two peers. Those messages may be fatal, meaning the connection
 must be terminated afterwards, or warning when something needs
 to be reported to the peer, but without interrupting the session.
-The error codes @code{GNUTLS_E_WARNING_ALERT_RECEIVED}
-or @code{GNUTLS_E_FATAL_ALERT_RECEIVED} signal those alerts
+The error codes @code{GNUTLS_E_@-WARNING_@-ALERT_@-RECEIVED}
+or @code{GNUTLS_E_@-FATAL_@-ALERT_@-RECEIVED} signal those alerts
 when received, and may be returned by all GnuTLS functions that receive 
 data from the peer, being @funcref{gnutls_handshake} and @funcref{gnutls_record_recv}.
-Alerts messages may be sent to the peer using @funcref{gnutls_alert_send}.
+
+If those error codes are received the alert and its level should be logged
+or reported to the peer using the functions below.
 
 @showfuncdesc{gnutls_alert_get}
+@showfuncdesc{gnutls_alert_get_name}
+
+The peer may also be warned or notified of a fatal issue
+by using one of the functions below. All the available alerts
+are listed in @ref{The Alert Protocol}.
 
 @showfuncdesc{gnutls_alert_send}
-
-@showfuncB{gnutls_error_to_alert,gnutls_alert_get_name}
+@showfuncdesc{gnutls_error_to_alert}
 
 
 @node Priority Strings
