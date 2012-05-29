@@ -520,6 +520,7 @@ tests/mini-deflate
 tests/mini-eagain
 tests/mini-eagain-dtls
 tests/mini-x509
+tests/mini-x509-cas
 tests/mini-dtls-rehandshake
 tests/mini-rehandshake
 tests/moredn
