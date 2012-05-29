@@ -799,7 +799,7 @@ parse_handshake_header (gnutls_session_t session, mbuffer_st* bufel,
         {
           hsk->sequence = 0;
           hsk->start_offset = 0;
-          hsk->end_offset = hsk->length;
+          hsk->end_offset = MIN((_mbuffer_get_udata_size(bufel) - handshake_header_size), hsk->length);
         }
     }
   data_size = _mbuffer_get_udata_size(bufel) - handshake_header_size;

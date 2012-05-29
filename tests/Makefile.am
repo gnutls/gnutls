@@ -68,7 +68,7 @@ ctests = mini-deflate simple gc set_pkcs12_cred certder certuniqueid	\
 	 mini-rehandshake rng-fork mini-eagain-dtls resume-dtls \
 	 x509cert x509cert-tl infoaccess rsa-encrypt-decrypt \
 	 mini-loss-time mini-tdb mini-dtls-rehandshake mini-record \
-	 mini-termination
+	 mini-termination mini-x509-cas
 
 if ENABLE_OCSP
 ctests += ocsp
@@ -99,6 +99,7 @@ dist_check_SCRIPTS = rfc2253-escape-test
 TESTS = $(ctests) $(dist_check_SCRIPTS)
 
 TESTS_ENVIRONMENT =						\
+	CAFILE=$(srcdir)/certs/ca-certs.pem			\
 	PKCS12FILE=$(srcdir)/pkcs12-decode/client.p12		\
 	PKCS12PASSWORD=foobar					\
 	PKCS12FILE_2=$(srcdir)/pkcs12-decode/pkcs12_2certs.p12	\
