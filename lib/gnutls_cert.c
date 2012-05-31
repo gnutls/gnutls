@@ -776,7 +776,7 @@ gnutls_certificate_activation_time_peers (gnutls_session_t session)
     }
 }
 
-/**
+/*-
  * gnutls_sign_callback_set:
  * @session: is a gnutls session
  * @sign_func: function pointer to application's sign callback.
@@ -796,7 +796,7 @@ gnutls_certificate_activation_time_peers (gnutls_session_t session)
  * callback function.  See also gnutls_sign_callback_get().
  *
  * Deprecated: Use the PKCS 11 or #gnutls_privkey_t interfacess like gnutls_privkey_import_ext() instead.
- */
+ -*/
 void
 gnutls_sign_callback_set (gnutls_session_t session,
                           gnutls_sign_func sign_func, void *userdata)
@@ -805,7 +805,7 @@ gnutls_sign_callback_set (gnutls_session_t session,
   session->internals.sign_func_userdata = userdata;
 }
 
-/**
+/*-
  * gnutls_sign_callback_get:
  * @session: is a gnutls session
  * @userdata: if non-%NULL, will be set to abstract callback pointer.
@@ -816,7 +816,7 @@ gnutls_sign_callback_set (gnutls_session_t session,
  *   if not set, %NULL.
  *
  * Deprecated: Use the PKCS 11 interfaces instead.
- */
+ -*/
 gnutls_sign_func
 gnutls_sign_callback_get (gnutls_session_t session, void **userdata)
 {
