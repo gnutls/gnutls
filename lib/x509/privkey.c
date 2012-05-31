@@ -421,8 +421,9 @@ error:
  * native #gnutls_x509_privkey_t format. The output will be stored in
  * @key .
  *
- * If the key is PEM encoded it should have a header of "RSA PRIVATE
- * KEY", or "DSA PRIVATE KEY".
+ * If the key is PEM encoded it should have a header that contains "PRIVATE
+ * KEY". Note that this function falls back to PKCS #8 decoding without
+ * password, if the default format fails to import.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
