@@ -493,7 +493,7 @@ gnutls_dh_get_peers_public_bits (gnutls_session_t session)
  * list is being returned. Only the first certificate.
  *
  * Returns: a pointer to a #gnutls_datum_t containing our
- *   certificates, or %NULL in case of an error or if no certificate
+ *   certificate, or %NULL in case of an error or if no certificate
  *   was used.
  **/
 const gnutls_datum_t *
