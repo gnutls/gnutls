@@ -245,7 +245,7 @@ is_issuer (gnutls_x509_crt_t cert, gnutls_x509_crt_t issuer_cert)
   if (ret != 0)
     {
       /* check if the authority key identifier matches the subject key identifier
-       * of the isser */
+       * of the issuer */
        id1_size = sizeof(id1);
        
        ret = gnutls_x509_crt_get_authority_key_id(cert, id1, &id1_size, NULL);
