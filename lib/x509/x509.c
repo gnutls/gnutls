@@ -2059,7 +2059,7 @@ cleanup:
  * @start: will hold the starting point of the DN
  *
  * This function will return a pointer to the DER encoded DN structure
- * and the length.
+ * and the length. This points to allocated data that must be free'd using gnutls_free().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.or a negative error code on error.
@@ -2078,7 +2078,7 @@ gnutls_x509_crt_get_raw_issuer_dn (gnutls_x509_crt_t cert,
  * @start: will hold the starting point of the DN
  *
  * This function will return a pointer to the DER encoded DN structure and
- * the length.
+ * the length. This points to allocated data that must be free'd using gnutls_free().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value. or a negative error code on error.
