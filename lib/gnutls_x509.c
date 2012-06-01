@@ -1832,15 +1832,58 @@ gnutls_certificate_set_x509_crl_file (gnutls_certificate_credentials_t res,
 
 #include <gnutls/pkcs12.h>
 
-static int
-parse_pkcs12 (gnutls_certificate_credentials_t res,
-              gnutls_pkcs12_t p12,
-              const char *password,
-              gnutls_x509_privkey_t * key,
-              gnutls_x509_crt_t * cert,
-              gnutls_x509_crt_t ** extra_certs_ret,
-              unsigned int * extra_certs_ret_len,
-              gnutls_x509_crl_t * crl)
+/**
+ * gnutls_pkcs12_parse:
+ * @res: is a #gnutls_certificate_credentials_t structure.
+ * @p12: the PKCS#12 blob.
+ * @password: optional password used to decrypt PKCS#12 blob, bags and keys.
+ * @key: a structure to store the parsed private key.
+ * @cert: a structure to store the parsed certificate.
+ * @extra_certs_ret: optional pointer to receive an array of additional
+ *                   certificates found in the PKCS#12 blob.
+ * @extra_certs_ret_len: will be updated with the number of additional
+ *                       certs.
+ * @crl: a structure to store the parsed CRL.
+ *
+ * This function parses a PKCS#12 blob in @p12blob and extracts the
+ * private key, the corresponding certificate, and any additional
+ * certificates and a CRL.
+ *
+ * The @extra_certs_ret and @extra_certs_ret_len parameters are optional
+ * and both may be set to %NULL. If either is non-%NULL, then both must
+ * be.
+ * 
+ * MAC:ed PKCS#12 files are supported.  Encrypted PKCS#12 bags are
+ * supported.  Encrypted PKCS#8 private keys are supported.  However,
+ * only password based security, and the same password for all
+ * operations, are supported.
+ *
+ * The private keys may be RSA PKCS#1 or DSA private keys encoded in
+ * the OpenSSL way.
+ *
+ * PKCS#12 file may contain many keys and/or certificates, and there
+ * is no way to identify which key/certificate pair you want.  You
+ * should make sure the PKCS#12 file only contain one key/certificate
+ * pair and/or one CRL.
+ *
+ * It is believed that the limitations of this function is acceptable
+ * for most usage, and that any more flexibility would introduce
+ * complexity that would make it harder to use this functionality at
+ * all.
+ *
+ * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ *
+ * Since: 2.8.0
+ **/
+int
+gnutls_pkcs12_parse (gnutls_certificate_credentials_t res,
+                     gnutls_pkcs12_t p12,
+                     const char *password,
+                     gnutls_x509_privkey_t * key,
+                     gnutls_x509_crt_t * cert,
+                     gnutls_x509_crt_t ** extra_certs_ret,
+                     unsigned int * extra_certs_ret_len,
+                     gnutls_x509_crl_t * crl)
 {
   gnutls_pkcs12_bag_t bag = NULL;
   gnutls_x509_crt_t *extra_certs = NULL;
@@ -2302,7 +2345,7 @@ int
         }
     }
 
-  ret = parse_pkcs12 (res, p12, password, &key, &cert, NULL, NULL, &crl);
+  ret = gnutls_pkcs12_parse (res, p12, password, &key, &cert, NULL, NULL, &crl);
   gnutls_pkcs12_deinit (p12);
   if (ret < 0)
     {
