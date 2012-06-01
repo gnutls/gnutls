@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.0.20 (unreleased)
 
+** libgnutls: Corrected bug which prevented the parsing of
+handshake packets spanning multiple records.
+
 ** libgnutls: Check key identifiers when checking for an issuer.
 
 ** libgnutls: Added gnutls_pubkey_verify_hash2()
@@ -17,6 +20,9 @@ name type in certtool.
 
 ** certtool: Increase to 128 the number of distinct options
 (e.g. dns_names) allowed.
+
+** gnutls-cli: If --print-cert is given, print the certificate, 
+even on verification failure.
 
 ** API and ABI modifications:
 gnutls_pk_to_sign: Added
