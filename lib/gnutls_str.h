@@ -39,8 +39,13 @@ typedef struct
   size_t length;                /* API: current length */
 } gnutls_buffer_st;
 
+/* Initialize a buffer */
 void _gnutls_buffer_init (gnutls_buffer_st *);
+
+/* Free the data in a buffer */
 void _gnutls_buffer_clear (gnutls_buffer_st *);
+
+/* Set the buffer data to be of zero length */
 inline static void _gnutls_buffer_reset (gnutls_buffer_st * buf)
 {
   buf->data = buf->allocd;
