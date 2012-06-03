@@ -634,7 +634,6 @@ GNUTLS_2_12
 	gnutls_pubkey_import_pkcs11_url;
 	gnutls_pubkey_get_verify_algorithm;
 	gnutls_pubkey_verify_hash;
-	gnutls_pkcs11_obj_export;
 	gnutls_pubkey_import;
 	gnutls_x509_crt_set_pubkey;
 	gnutls_x509_crq_set_pubkey;
@@ -825,7 +824,6 @@ GNUTLS_PRIVATE {
     # Internal symbols needed by gnutls-cli-debug:
     _gnutls_rsa_pms_set_version;
     _gnutls_record_set_default_version;
-    _gnutls_record_set_default_version;
     # Internal symbols needed by tests/gc:
     _gnutls_hmac_fast;
     _gnutls_pbkdf2_sha1;
@@ -837,4 +835,6 @@ GNUTLS_PRIVATE {
     # Internal symbols needed by tests/pkcs12_s2k:
     _gnutls_pkcs12_string_to_key;
     _gnutls_bin2hex;
+  local:
+    *;
 };
