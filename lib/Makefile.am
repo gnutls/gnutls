@@ -170,9 +170,6 @@ libgnutlsxx_la_LDFLAGS = -no-undefined \
 
 libgnutlsxx_la_LIBADD = libgnutls.la
 
-if HAVE_LD_VERSION_SCRIPT
-libgnutlsxx_la_LDFLAGS += -Wl,--version-script=$(srcdir)/libgnutlsxx.map
-endif
 endif
 
 pkix_asn1_tab.c: pkix.asn
