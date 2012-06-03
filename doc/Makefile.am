@@ -974,6 +974,7 @@ FUNCS += functions/gnutls_pkcs12_generate_mac
 FUNCS += functions/gnutls_pkcs12_verify_mac
 FUNCS += functions/gnutls_pkcs12_bag_decrypt
 FUNCS += functions/gnutls_pkcs12_bag_encrypt
+FUNCS += functions/gnutls_pkcs12_simple_parse
 FUNCS += functions/gnutls_pkcs12_bag_get_type
 FUNCS += functions/gnutls_pkcs12_bag_get_data
 FUNCS += functions/gnutls_pkcs12_bag_set_data

@@ -571,6 +571,7 @@ APIMANS += gnutls_pkcs12_generate_mac.3
 APIMANS += gnutls_pkcs12_verify_mac.3
 APIMANS += gnutls_pkcs12_bag_decrypt.3
 APIMANS += gnutls_pkcs12_bag_encrypt.3
+APIMANS += gnutls_pkcs12_simple_parse.3
 APIMANS += gnutls_pkcs12_bag_get_type.3
 APIMANS += gnutls_pkcs12_bag_get_data.3
 APIMANS += gnutls_pkcs12_bag_set_data.3
