@@ -485,7 +485,7 @@ _gnutls_verify_certificate2 (gnutls_x509_crt_t cert,
   if (result == GNUTLS_E_PK_SIG_VERIFY_FAILED)
     {
       gnutls_assert ();
-      out |= GNUTLS_CERT_INVALID;
+      out |= GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNATURE_FAILURE;
       /* error. ignore it */
       if (output)
         *output |= out;
@@ -1044,7 +1044,7 @@ _gnutls_verify_crl2 (gnutls_x509_crl_t crl,
       gnutls_assert ();
       /* error. ignore it */
       if (output)
-        *output |= GNUTLS_CERT_INVALID;
+        *output |= GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNATURE_FAILURE;
       result = 0;
     }
   else if (result < 0)

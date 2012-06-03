@@ -590,7 +590,7 @@ gnutls_x509_trust_list_verify_named_crt(gnutls_x509_trust_list_t list,
 
     _gnutls_free_datum(&dn);
 
-    *verify = GNUTLS_CERT_INVALID;
+    *verify = GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNER_NOT_FOUND;
 
     for (i = 0; i < list->node[hash].named_cert_size; i++) {
         if (check_if_same_cert(cert, list->node[hash].named_certs[i].cert) == 0) {      /* check if name matches */
