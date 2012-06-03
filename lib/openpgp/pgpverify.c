@@ -106,8 +106,11 @@ gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
       rc = gnutls_openpgp_keyring_check_id (keyring, id, 0);
       /* If it exists in the keyring don't treat it as unknown. */
       if (rc == 0 && *verify & GNUTLS_CERT_SIGNER_NOT_FOUND)
-        *verify ^= GNUTLS_CERT_SIGNER_NOT_FOUND;
+        *verify &= ~GNUTLS_CERT_SIGNER_NOT_FOUND;
     }
+  
+  if (*verify != 0)
+    *verify |= GNUTLS_CERT_INVALID;
 
   return 0;
 }
