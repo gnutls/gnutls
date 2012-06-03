@@ -796,7 +796,7 @@ GNUTLS_3_1_0 {
 	gnutls_x509_trust_list_add_system_trust;
 	gnutls_x509_trust_list_add_trust_file;
 	gnutls_x509_trust_list_add_trust_mem;
-	gnutls_pkcs12_parse;
+	gnutls_pkcs12_simple_parse;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {
