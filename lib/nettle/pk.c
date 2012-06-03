@@ -264,7 +264,6 @@ _wrap_nettle_pk_decrypt (gnutls_pk_algorithm_t algo,
         unsigned length;
         bigint_t c;
 
-        memset(&priv, 0, sizeof(priv));
         _rsa_params_to_privkey (pk_params, &priv);
         _rsa_params_to_pubkey (pk_params, &pub);
 
@@ -409,15 +408,16 @@ _wrap_nettle_pk_sign (gnutls_pk_algorithm_t algo,
     case GNUTLS_PK_RSA:
       {
         struct rsa_private_key priv;
+        struct rsa_public_key pub;
         mpz_t s;
 
-        memset(&priv, 0, sizeof(priv));
         _rsa_params_to_privkey (pk_params, &priv);
+        _rsa_params_to_pubkey (pk_params, &pub);
         
         mpz_init(s);
 
-/* XXX update when _tr is available */
-        ret = rsa_pkcs1_sign(&priv, vdata->size, vdata->data, s);
+        ret = rsa_pkcs1_sign_tr(&pub, &priv, NULL, rnd_func,
+                                vdata->size, vdata->data, s);
         if (ret == 0)
           {
             gnutls_assert();
