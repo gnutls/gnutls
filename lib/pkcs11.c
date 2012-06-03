@@ -1816,7 +1816,7 @@ struct pkey_list
 
 
 static int
-retrieve_pin_for_pinfile (const char *pinfile, struct ck_token_info *token_info,
+retrieve_pin_from_source (const char *pinfile, struct ck_token_info *token_info,
                           int attempts, ck_user_type_t user_type, struct p11_kit_pin **pin)
 {
   unsigned int flags = 0;
@@ -1967,7 +1967,7 @@ retrieve_pin (struct p11_kit_uri *info, struct ck_token_info *token_info,
   if (pinfile != NULL)
     {
       _gnutls_debug_log("pk11: Using pinfile to retrieve PIN\n");
-      ret = retrieve_pin_for_pinfile (pinfile, token_info, attempts, user_type, pin);
+      ret = retrieve_pin_from_source (pinfile, token_info, attempts, user_type, pin);
     }
 
   /* The global gnutls pin callback */
