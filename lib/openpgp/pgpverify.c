@@ -43,10 +43,6 @@
  * or more of the #gnutls_certificate_status_t enumerated elements
  * bitwise or'd.
  *
- * %GNUTLS_CERT_INVALID: A signature on the key is invalid.
- *
- * %GNUTLS_CERT_REVOKED: The key has been revoked.
- *
  * Note that this function does not verify using any "web of trust".
  * You may use GnuPG for that purpose, or any other external PGP
  * application.
@@ -87,7 +83,7 @@ gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
   _gnutls_debug_log ("status: %x\n", status);
 
   if (status & CDK_KEY_INVALID)
-    *verify |= GNUTLS_CERT_INVALID;
+    *verify |= GNUTLS_CERT_SIGNATURE_FAILURE;
   if (status & CDK_KEY_REVOKED)
     *verify |= GNUTLS_CERT_REVOKED;
   if (status & CDK_KEY_NOSIGNER)
@@ -106,8 +102,11 @@ gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
       rc = gnutls_openpgp_keyring_check_id (keyring, id, 0);
       /* If it exists in the keyring don't treat it as unknown. */
       if (rc == 0 && *verify & GNUTLS_CERT_SIGNER_NOT_FOUND)
-        *verify ^= GNUTLS_CERT_SIGNER_NOT_FOUND;
+        *verify &= ~GNUTLS_CERT_SIGNER_NOT_FOUND;
     }
+
+  if (*verify != 0)
+    *verify |= GNUTLS_CERT_INVALID;
 
   return 0;
 }
@@ -123,8 +122,6 @@ gnutls_openpgp_crt_verify_ring (gnutls_openpgp_crt_t key,
  * output will be put in @verify and will be one or more of the
  * gnutls_certificate_status_t enumerated elements bitwise or'd.
  *
- * %GNUTLS_CERT_INVALID: The self signature on the key is invalid.
- *
  * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
  **/
 int
@@ -138,7 +135,7 @@ gnutls_openpgp_crt_verify_self (gnutls_openpgp_crt_t key,
 
   rc = cdk_pk_check_self_sig (key->knode, &status);
   if (rc || status != CDK_KEY_VALID)
-    *verify |= GNUTLS_CERT_INVALID;
+    *verify |= GNUTLS_CERT_INVALID | GNUTLS_CERT_SIGNATURE_FAILURE;
   else
     *verify = 0;
 
