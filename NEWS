@@ -27,11 +27,16 @@ to simplify parsing in most PKCS #12 use cases.
 the whole certificate chain (if any) to the credentials structure, instead
 of only the end-user certificate.
 
+** libgnutls: Key import functions such as gnutls_pkcs12_simple_parse()
+and gnutls_x509_privkey_import_pkcs8(), return GNUTLS_E_ENCRYPTED_STRUCTURE
+if the input structure is encrypted but no password was provided.
+
 ** libgnutlsxx: Added session::set_transport_vec_push_function. Patch
 by Alexandre Bique.
 
 ** API and ABI modifications:
 GNUTLS_CERT_SIGNATURE_FAILURE: Added
+GNUTLS_E_ENCRYPTED_STRUCTURE: Added
 gnutls_pubkey_verify_hash2: Added
 gnutls_pkcs12_simple_parse: Added
 gnutls_certificate_set_x509_system_trust: Added

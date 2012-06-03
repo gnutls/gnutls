@@ -1366,7 +1366,11 @@ cleanup:
  * complexity that would make it harder to use this functionality at
  * all.
  *
- * Returns: %GNUTLS_E_SUCCESS on success, or an error code.
+ * If the provided structure has encrypted fields but no password
+ * is provided then this function returns %GNUTLS_E_ENCRYPTED_STRUCTURE.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
  *
  * Since: 3.1
  **/
@@ -1426,6 +1430,12 @@ gnutls_pkcs12_simple_parse (gnutls_pkcs12_t p12,
 
       if (ret == GNUTLS_BAG_ENCRYPTED)
         {
+          if (password == NULL)
+            {
+              ret = gnutls_assert_val(GNUTLS_E_ENCRYPTED_STRUCTURE);
+              goto done;
+            }
+
           ret = gnutls_pkcs12_bag_decrypt (bag, password);
           if (ret < 0)
             {
@@ -1463,6 +1473,12 @@ gnutls_pkcs12_simple_parse (gnutls_pkcs12_t p12,
           switch (type)
             {
             case GNUTLS_BAG_PKCS8_ENCRYPTED_KEY:
+              if (password == NULL)
+                {
+                  ret = gnutls_assert_val(GNUTLS_E_ENCRYPTED_STRUCTURE);
+                  goto done;
+                }
+
             case GNUTLS_BAG_PKCS8_KEY:
               if (*key != NULL) /* too simple to continue */
                 {

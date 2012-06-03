@@ -1782,12 +1782,19 @@ privkey_info (common_info_st* cinfo)
   /* If we failed to import the certificate previously try PKCS #8 */
   if (cinfo->pkcs8 || ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
     {
-      if (cinfo->password)
-        pass = cinfo->password;
-      else
-        pass = get_pass ();
       ret = gnutls_x509_privkey_import_pkcs8 (key, &pem,
-                                              incert_format, pass, 0);
+                                              incert_format, NULL, GNUTLS_PKCS8_PLAIN);
+      if (ret == GNUTLS_E_ENCRYPTED_STRUCTURE)
+        {
+          fprintf(stderr, "Encrypted structure detected...\n");
+          if (cinfo->password)
+            pass = cinfo->password;
+          else
+            pass = get_pass ();
+
+          ret = gnutls_x509_privkey_import_pkcs8 (key, &pem,
+                                                  incert_format, pass, 0);
+        }
     }
   if (ret < 0)
     error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));
