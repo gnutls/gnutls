@@ -84,6 +84,7 @@ acceptable.  The framework is illustrated on @ref{fig:x509}.
 
 @menu
 * X.509 certificate structure::
+* Importing an X.509 certificate::
 * X.509 distinguished names::
 * Verifying X.509 certificate paths::
 * Verifying a certificate in the context of TLS session::
@@ -193,6 +194,23 @@ available functions for @acronym{X.509} certificate handling have
 their prototypes in @file{gnutls/x509.h}. An example program to
 demonstrate the @acronym{X.509} parsing capabilities can be found at
 @ref{ex:x509-info}.
+
+@node Importing an X.509 certificate
+@subsection Importing an X.509 certificate
+
+The certificate structure should be initialized using @funcref{gnutls_x509_crt_init}, and 
+a certificate structure can be imported using @funcref{gnutls_x509_crt_import}. 
+
+@showfuncC{gnutls_x509_crt_init,gnutls_x509_crt_import,gnutls_x509_crt_deinit}
+
+In several functions an array of certificates is required. To assist in initialization
+and import the following two functions are provided.
+
+@showfuncB{gnutls_x509_crt_list_import,gnutls_x509_crt_list_import2}
+
+In all cases after use a certificate must be deinitialized using @funcref{gnutls_x509_crt_deinit}.
+Note that although the functions above apply to @code{gnutls_x509_crt_t} structure, similar functions
+exist for the CRL structure @code{gnutls_x509_crl_t}.
 
 @node X.509 distinguished names
 @subsection X.509 distinguished names
