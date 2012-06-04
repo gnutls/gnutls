@@ -336,8 +336,12 @@ the holders of the actual data, which may be certificates, private
 keys or encrypted data.  A bag of type encrypted should be decrypted
 in order for its data to be accessed.
 
-The following functions are available to read a @acronym{PKCS} #12
-structure.
+To reduce the complexity in parsing the structures the simple 
+helper function @funcref{gnutls_pkcs12_simple_parse} is provided. For more
+advanced uses, manual parsing of the structure is required using the
+functions below.
+
+@showfuncdesc{gnutls_pkcs12_simple_parse}
 
 @showfuncC{gnutls_pkcs12_get_bag,gnutls_pkcs12_verify_mac,gnutls_pkcs12_bag_decrypt}
 
