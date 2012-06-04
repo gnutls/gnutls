@@ -439,7 +439,7 @@ get_confirmed_pass (bool empty_ok)
       do
         {
           if (pass)
-            printf ("Password missmatch, try again.\n");
+            fprintf (stderr, "Password missmatch, try again.\n");
 
           free (copy);
 
