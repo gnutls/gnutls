@@ -1006,11 +1006,9 @@ certificate_credentials_append_pkey (gnutls_certificate_credentials_t res,
  * This function sets a certificate/private key pair in the
  * gnutls_certificate_credentials_t structure.  This function may be
  * called more than once, in case multiple keys/certificates exist for
- * the server.  For clients that wants to send more than its own end
+ * the server.  For clients that wants to send more than their own end
  * entity certificate (e.g., also an intermediate CA cert) then put
  * the certificate chain in @cert_list.
- *
- * 
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  *
