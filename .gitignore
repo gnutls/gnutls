@@ -580,3 +580,4 @@ doc/latex/cha-upgrade.tex
 doc/functions/
 gl/glthread/.dirstamp
 tests/mini-termination
+tests/mini-x509-2
