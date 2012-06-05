@@ -430,7 +430,7 @@ extern "C"
  *   set only if CRLs are checked.
  * @GNUTLS_CERT_SIGNER_NOT_FOUND: The certificate's issuer is not known. 
  *   This is the case if the issuer is not included in the trusted certificate list.
- * @GNUTLS_CERT_SIGNER_NOT_CA: The certificate’s signer was not a CA. This
+ * @GNUTLS_CERT_SIGNER_NOT_CA: The certificate's signer was not a CA. This
  *   may happen if this was a version 1 certificate, which is common with 
  *   some CAs, or a version 3 certificate without the basic constrains extension.
  * @GNUTLS_CERT_INSECURE_ALGORITHM:  The certificate was signed using an insecure
