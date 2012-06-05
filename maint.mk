@@ -332,6 +332,14 @@ sc_prohibit_strcmp:
 	halt='$(ME): replace strcmp calls above with STREQ/STRNEQ'	\
 	  $(_sc_search_regexp)
 
+# Really.  You don't want to use this function.
+# It may fail to NUL-terminate the destination,
+# and always NUL-pads out to the specified length.
+sc_prohibit_strncpy:
+	@prohibit='\<strncpy *\('					\
+	halt='do not use strncpy, period'				\
+	  $(_sc_search_regexp)
+
 # Pass EXIT_*, not number, to usage, exit, and error (when exiting)
 # Convert all uses automatically, via these two commands:
 # git grep -l '\<exit *(1)' \
@@ -932,8 +940,15 @@ sc_prohibit_doubled_word:
 # A regular expression matching undesirable combinations of words like
 # "can not"; this matches them even when the two words appear on different
 # lines, but not when there is an intervening delimiter like "#" or "*".
+# Similarly undesirable, "See @xref{...}", since an @xref should start
+# a sentence.  Explicitly prohibit any prefix of "see" or "also".
+# Also prohibit a prefix matching "\w+ +".
+# @pxref gets the same see/also treatment and should be parenthesized;
+# presume it must *not* start a sentence.
+bad_xref_re_ ?= (?:[\w,:;] +|(?:see|also)\s+)\@xref\{
+bad_pxref_re_ ?= (?:[.!?]|(?:see|also))\s+\@pxref\{
 prohibit_undesirable_word_seq_RE_ ?=					\
-  /\bcan\s+not\b/gims
+  /(?:\bcan\s+not\b|$(bad_xref_re_)|$(bad_pxref_re_))/gims
 prohibit_undesirable_word_seq_ =					\
     -e 'while ($(prohibit_undesirable_word_seq_RE_))'			\
     $(perl_filename_lineno_text_)
@@ -1227,7 +1242,7 @@ bootstrap-tools ?= autoconf,automake,gnulib
 gpg_key_ID ?= \
   $$(git cat-file tag v$(VERSION) \
      | gpgv --status-fd 1 --keyring /dev/null - - 2>/dev/null \
-     | sed -n '/^\[GNUPG:\] ERRSIG /{s///;s/ .*//p;q}')
+     | awk '/^\[GNUPG:\] ERRSIG / {print $3; exit}')
 
 translation_project_ ?= coordinator@translationproject.org
 
@@ -1407,7 +1422,7 @@ refresh-po:
 	wget --no-verbose --directory-prefix $(PODIR) --no-directories --recursive --level 1 --accept .po --accept .po.1 $(POURL) && \
 	echo 'en@boldquot' > $(PODIR)/LINGUAS && \
 	echo 'en@quot' >> $(PODIR)/LINGUAS && \
-	ls $(PODIR)/*.po | sed 's/\.po//' | sed 's,$(PODIR)/,,' | sort >> $(PODIR)/LINGUAS
+	ls $(PODIR)/*.po | sed 's/\.po//;s,$(PODIR)/,,' | sort >> $(PODIR)/LINGUAS
 
  # Running indent once is not idempotent, but running it twice is.
 INDENT_SOURCES ?= $(C_SOURCES)
