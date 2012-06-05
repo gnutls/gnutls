@@ -111,7 +111,6 @@ static const gnutls_error_entry error_algorithms[] = {
                GNUTLS_E_MPI_PRINT_FAILED, 1),
   ERROR_ENTRY (N_("Decryption has failed."), GNUTLS_E_DECRYPTION_FAILED, 1),
   ERROR_ENTRY (N_("Encryption has failed."), GNUTLS_E_ENCRYPTION_FAILED, 1),
-  ERROR_ENTRY (N_("The provided structure is encrypted."), GNUTLS_E_ENCRYPTED_STRUCTURE, 1),
   ERROR_ENTRY (N_("Public key decryption has failed."),
                GNUTLS_E_PK_DECRYPTION_FAILED, 1),
   ERROR_ENTRY (N_("Public key encryption has failed."),

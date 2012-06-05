@@ -1186,7 +1186,7 @@ error:
  * the encryption status cannot be auto-detected.
  *
  * If the %GNUTLS_PKCS_PLAIN flag is specified and the supplied data
- * are encrypted then %GNUTLS_E_ENCRYPTED_STRUCTURE is returned.
+ * are encrypted then %GNUTLS_E_DECRYPTION_FAILED is returned.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1252,7 +1252,7 @@ gnutls_x509_privkey_import_pkcs8 (gnutls_x509_privkey_t key,
       if (result < 0)
         { /* check if it is encrypted */
           if (decode_pkcs8_key(&_data, "", key, 0) == 0)
-            result = GNUTLS_E_ENCRYPTED_STRUCTURE;
+            result = GNUTLS_E_DECRYPTION_FAILED;
         }
     }
   else
