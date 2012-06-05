@@ -598,3 +598,5 @@ doc/latex/cha-upgrade.tex
 doc/functions/
 gl/glthread/.dirstamp
 tests/mini-termination
+win32
+win64
