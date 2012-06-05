@@ -151,6 +151,7 @@ PDF_FILES = gnutls-client-server-use-case.pdf gnutls-crypto-layers.pdf \
 
 gnutls.pdf: $(SOURCE_GEN_FILES) $(TEX_OBJECTS) $(GEN_TEX_OBJECTS)
 	$(MAKE) -C .. errcodes printlist alert-printlist
+	sed -i 's/\@VERSION\@/$(VERSION)/g' $^
 #	for i in $(PDF_FILES);do cp ../$$i .;done
 	pdflatex gnutls.tex
 	bibtex gnutls
