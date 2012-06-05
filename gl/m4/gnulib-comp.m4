@@ -447,6 +447,7 @@ gl_STDIO_MODULE_INDICATOR([fseek])
 gl_FUNC_FSEEKO
 if test $HAVE_FSEEKO = 0 || test $REPLACE_FSEEKO = 1; then
   AC_LIBOBJ([fseeko])
+  gl_PREREQ_FSEEKO
 fi
 gl_STDIO_MODULE_INDICATOR([fseeko])
 gl_FUNC_FSTAT
@@ -463,6 +464,7 @@ gl_STDIO_MODULE_INDICATOR([ftell])
 gl_FUNC_FTELLO
 if test $HAVE_FTELLO = 0 || test $REPLACE_FTELLO = 1; then
   AC_LIBOBJ([ftello])
+  gl_PREREQ_FTELLO
 fi
 gl_STDIO_MODULE_INDICATOR([ftello])
 gl_FUNC
@@ -570,6 +572,7 @@ if test $gl_func_isnanl_no_libm != yes; then
   AC_LIBOBJ([isnanl])
   gl_PREREQ_ISNANL
 fi
+AC_REQUIRE([gl_LARGEFILE])
 gl_LD_OUTPUT_DEF
 gl_LD_VERSION_SCRIPT
 AC_REQUIRE([gl_HEADER_SYS_SOCKET])
@@ -834,7 +837,6 @@ gl_FUNC_VPRINTF_POSIX
 gl_STDIO_MODULE_INDICATOR([vprintf-posix])
 gl_FUNC_VSNPRINTF
 gl_STDIO_MODULE_INDICATOR([vsnprintf])
-AC_SUBST([WARN_CFLAGS])
 gl_WCHAR_H
 gl_XSIZE
   # End of code from modules
@@ -883,6 +885,7 @@ changequote([, ])dnl
   AC_SUBST([gltests_WITNESS])
   gl_module_indicator_condition=$gltests_WITNESS
   m4_pushdef([gl_MODULE_INDICATOR_CONDITION], [$gl_module_indicator_condition])
+AC_REQUIRE([AC_C_INLINE])
 gl_FUNC_DUP2
 if test $HAVE_DUP2 = 0 || test $REPLACE_DUP2 = 1; then
   AC_LIBOBJ([dup2])
@@ -903,7 +906,7 @@ gl_FUNC_UNGETC_WORKS
 gl_FUNC_UNGETC_WORKS
 gl_FUNC_UNGETC_WORKS
 gl_FUNC_FTRUNCATE
-if test $HAVE_FTRUNCATE = 0; then
+if test $HAVE_FTRUNCATE = 0 || test $REPLACE_FTRUNCATE = 1; then
   AC_LIBOBJ([ftruncate])
   gl_PREREQ_FTRUNCATE
 fi
@@ -1396,6 +1399,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/netinet_in_h.m4
   m4/nls.m4
   m4/nocrash.m4
+  m4/off_t.m4
   m4/open.m4
   m4/opendir.m4
   m4/pathmax.m4
