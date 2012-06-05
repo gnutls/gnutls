@@ -23,7 +23,6 @@
 #ifndef __GNUTLS_ABSTRACT_H
 #define __GNUTLS_ABSTRACT_H
 
-#include <stdarg.h>
 #include <gnutls/gnutls.h>
 #include <gnutls/x509.h>
 #include <gnutls/pkcs11.h>
