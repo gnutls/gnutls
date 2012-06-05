@@ -18,7 +18,7 @@ that loads the trusted CA certificates from system locations
 ** certtool: Added support for the URI subject alternative
 name type in certtool.
 
-** certtool: Increase to 128 the number of distinct options
+** certtool: Increase to 128 the maximum number of distinct options
 (e.g. dns_names) allowed.
 
 ** gnutls-cli: If --print-cert is given, print the certificate, 
