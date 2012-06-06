@@ -425,7 +425,7 @@ In that case a certificate should be selected according the peer's signature
 algorithm preferences. To get those preferences use
 @funcref{gnutls_sign_algorithm_get_requested}. Both functions are shown below.
 
-@showfuncC{gnutls_certificate_set_retrieve_function,gnutls_certificate_retrieve_function2,gnutls_sign_algorithm_get_requested}
+@showfuncC{gnutls_certificate_set_retrieve_function,gnutls_certificate_set_retrieve_function2,gnutls_sign_algorithm_get_requested}
 
 The functions above do not handle the requested server name automatically.
 A server would need to check the name requested by the client
