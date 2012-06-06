@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.1.0 (unreleased)
 
+** gnutls-cli: --benchmark-tls was split to --benchmark-tls-kx
+and --benchmark-tls-ciphers
+
 ** libgnutls: requires libnettle 2.5.
 
 ** libgnutls: Use the PKCS #1 1.5 encoding provided by nettle (2.5)

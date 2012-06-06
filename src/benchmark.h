@@ -28,7 +28,7 @@
 typedef void (*sighandler_t)(int);
 
 void benchmark_cipher (int init, int debug_level);
-void benchmark_tls (int debug_level);
+void benchmark_tls (int debug_level, int ciphers);
 
 struct benchmark_st
 {

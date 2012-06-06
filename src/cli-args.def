@@ -243,8 +243,14 @@ flag = {
 };
 
 flag = {
-    name      = benchmark-tls;
-    descrip   = "Benchmark ciphers and key exchange methods in TLS";
+    name      = benchmark-tls-kx;
+    descrip   = "Benchmark TLS key exchange methods";
+    doc      = "";
+};
+
+flag = {
+    name      = benchmark-tls-ciphers;
+    descrip   = "Benchmark TLS ciphers";
     doc      = "";
 };
 

@@ -1124,9 +1124,15 @@ const char* rest = NULL;
       exit(0);
     }
 
-  if (HAVE_OPT(BENCHMARK_TLS))
+  if (HAVE_OPT(BENCHMARK_TLS_CIPHERS))
     {
-      benchmark_tls(OPT_VALUE_DEBUG); 
+      benchmark_tls(OPT_VALUE_DEBUG, 1); 
+      exit(0);
+    }
+
+  if (HAVE_OPT(BENCHMARK_TLS_KX))
+    {
+      benchmark_tls(OPT_VALUE_DEBUG, 0); 
       exit(0);
     }
 
