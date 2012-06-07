@@ -139,6 +139,7 @@ print_x509_info (gnutls_session_t session, int flag, int print_cert)
             }
 
           printf ("- Certificate[%d] info:\n - ", j);
+          if (flag == GNUTLS_CRT_PRINT_COMPACT && j > 0) flag = GNUTLS_CRT_PRINT_ONELINE;
 
           ret =
             gnutls_x509_crt_print (crt, flag, &cinfo);
