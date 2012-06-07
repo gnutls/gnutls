@@ -42,8 +42,8 @@
 #include "x509/x509_int.h"
 #include <gnutls_str_array.h>
 #include "read-file.h"
-#if defined _WIN32 || defined __WIN32__
-#include <wincrypt.h>
+#ifdef _WIN32
+# include <wincrypt.h>
 #endif
 
 /*

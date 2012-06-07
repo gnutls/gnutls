@@ -965,7 +965,7 @@ after_handshake:
   fflush (stderr);
 
   /* do not buffer */
-#if !(defined _WIN32 || defined __WIN32__)
+#ifndef _WIN32
   setbuf (stdin, NULL);
 #endif
   setbuf (stdout, NULL);
