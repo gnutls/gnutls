@@ -1784,7 +1784,7 @@ privkey_info (common_info_st* cinfo)
     {
       ret = gnutls_x509_privkey_import_pkcs8 (key, &pem,
                                               incert_format, NULL, GNUTLS_PKCS8_PLAIN);
-      if (ret == GNUTLS_E_ENCRYPTED_STRUCTURE)
+      if (ret == GNUTLS_E_DECRYPTION_FAILED)
         {
           fprintf(stderr, "Encrypted structure detected...\n");
           if (cinfo->password)
