@@ -40,6 +40,7 @@
 #include <gnutls_num.h>
 #include <gnutls_extensions.h>
 #include <gnutls_constate.h>
+#include <algorithms.h>
 
 static int pack_certificate_auth_info (gnutls_session_t,
                                        gnutls_buffer_st * packed_session);
@@ -859,4 +860,73 @@ unpack_security_parameters (gnutls_session_t session, gnutls_buffer_st * ps)
 
 error:
   return ret;
+}
+
+/**
+ * gnutls_session_set_premaster:
+ * @session: is a #gnutls_session_t structure.
+ * @entity: GNUTLS_SERVER or GNUTLS_CLIENT
+ * @version: the TLS protocol version
+ * @kx: the key exchange method
+ * @cipher: the cipher
+ * @mac: the MAC algorithm
+ * @comp: the compression method
+ * @master: the master key to use
+ * @session_id: the session identifier
+ *
+ * This function sets the premaster secret in a session. This is
+ * a function intended for exceptional uses. Do not use this
+ * function unless you are implementing a legacy protocol.
+ * Use gnutls_session_set_data() instead.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ **/
+int
+gnutls_session_set_premaster (gnutls_session_t session, unsigned int entity,
+                              gnutls_protocol_t version, 
+                              gnutls_kx_algorithm_t kx, 
+                              gnutls_cipher_algorithm_t cipher,
+                              gnutls_mac_algorithm_t mac,
+                              gnutls_compression_method_t comp,
+                              const gnutls_datum_t* master,
+                              const gnutls_datum_t * session_id)
+{
+  int ret;
+
+  memset (&session->internals.resumed_security_parameters, 0,
+          sizeof (session->internals.resumed_security_parameters));
+  
+  session->internals.resumed_security_parameters.entity = entity;
+  session->internals.resumed_security_parameters.kx_algorithm = kx;
+  
+  ret = _gnutls_cipher_suite_get_id(kx, cipher, mac, session->internals.resumed_security_parameters.cipher_suite);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  session->internals.resumed_security_parameters.compression_method = comp;
+  session->internals.resumed_security_parameters.cert_type = GNUTLS_CRT_UNKNOWN;
+  session->internals.resumed_security_parameters.version = version;
+
+  if (master->size != GNUTLS_MASTER_SIZE)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  memcpy(session->internals.resumed_security_parameters.master_secret, master->data, master->size);
+
+  if (session_id->size > GNUTLS_MAX_SESSION_ID)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  session->internals.resumed_security_parameters.session_id_size = session_id->size;
+  memcpy(session->internals.resumed_security_parameters.session_id, session_id->data, session_id->size);
+
+  session->internals.resumed_security_parameters.max_record_send_size = 
+  session->internals.resumed_security_parameters.max_record_recv_size = DEFAULT_MAX_RECORD_SIZE;
+
+  session->internals.resumed_security_parameters.timestamp = time(0);
+
+  session->internals.resumed_security_parameters.ecc_curve = GNUTLS_ECC_CURVE_INVALID;
+
+  session->internals.premaster_set = 1;
+
+  return 0;
 }

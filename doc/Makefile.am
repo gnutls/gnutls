@@ -686,6 +686,7 @@ FUNCS += functions/gnutls_session_set_data
 FUNCS += functions/gnutls_session_get_data
 FUNCS += functions/gnutls_session_get_data2
 FUNCS += functions/gnutls_session_get_random
+FUNCS += functions/gnutls_session_set_premaster
 FUNCS += functions/gnutls_session_get_id
 FUNCS += functions/gnutls_session_channel_binding
 FUNCS += functions/gnutls_session_is_resumed

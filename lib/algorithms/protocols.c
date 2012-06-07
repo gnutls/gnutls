@@ -43,6 +43,7 @@ static const gnutls_version_entry sup_versions[] = {
   {"TLS1.0", GNUTLS_TLS1, 3, 1, GNUTLS_STREAM, 1},
   {"TLS1.1", GNUTLS_TLS1_1, 3, 2, GNUTLS_STREAM, 1},
   {"TLS1.2", GNUTLS_TLS1_2, 3, 3, GNUTLS_STREAM, 1},
+  {"DTLS0.9", GNUTLS_DTLS0_9, 1, 0, GNUTLS_DGRAM, 1}, /* Cisco AnyConnect (based on about OpenSSL 0.9.8e) */
   {"DTLS1.0", GNUTLS_DTLS1_0, 254, 255, GNUTLS_DGRAM, 1}, /* 1.1 over datagram */
   {0, 0, 0, 0, 0}
 };
@@ -242,6 +243,7 @@ _gnutls_version_has_selectable_prf (gnutls_protocol_t version)
 {
   switch (version)
     {
+    case GNUTLS_DTLS0_9:
     case GNUTLS_DTLS1_0:
     case GNUTLS_TLS1_1:
     case GNUTLS_TLS1_0:
@@ -259,6 +261,7 @@ _gnutls_version_has_selectable_sighash (gnutls_protocol_t version)
 {
   switch (version)
     {
+    case GNUTLS_DTLS0_9:
     case GNUTLS_DTLS1_0:
     case GNUTLS_TLS1_1:
     case GNUTLS_TLS1_0:

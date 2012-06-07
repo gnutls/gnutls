@@ -73,27 +73,34 @@ send_handshake (gnutls_session_t session, uint8_t * data, size_t size,
 
 #define MASTER_SECRET "master secret"
 #define MASTER_SECRET_SIZE (sizeof(MASTER_SECRET)-1)
-static int generate_normal_master (gnutls_session_t session, int);
+static int generate_normal_master (gnutls_session_t session, gnutls_datum_t*, int);
 
 int
 _gnutls_generate_master (gnutls_session_t session, int keep_premaster)
 {
   if (session->internals.resumed == RESUME_FALSE)
-    return generate_normal_master (session, keep_premaster);
+    return generate_normal_master (session, &session->key->key, keep_premaster);
+  else if (session->internals.premaster_set)  
+    {
+      gnutls_datum_t premaster;
+      premaster.size = sizeof(session->internals.resumed_security_parameters.master_secret);
+      premaster.data = session->internals.resumed_security_parameters.master_secret;
+      return generate_normal_master(session, &premaster, 1);
+    }
   return 0;
 }
 
 /* here we generate the TLS Master secret.
  */
-#define PREMASTER session->key->key
 static int
-generate_normal_master (gnutls_session_t session, int keep_premaster)
+generate_normal_master (gnutls_session_t session, gnutls_datum_t *premaster,
+			int keep_premaster)
 {
   int ret = 0;
   char buf[512];
 
-  _gnutls_hard_log ("INT: PREMASTER SECRET[%d]: %s\n", PREMASTER.size,
-                    _gnutls_bin2hex (PREMASTER.data, PREMASTER.size, buf,
+  _gnutls_hard_log ("INT: PREMASTER SECRET[%d]: %s\n", premaster->size,
+                    _gnutls_bin2hex (premaster->data, premaster->size, buf,
                                      sizeof (buf), NULL));
   _gnutls_hard_log ("INT: CLIENT RANDOM[%d]: %s\n", 32,
                     _gnutls_bin2hex (session->
@@ -114,7 +121,7 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
               session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
 
       ret =
-        _gnutls_ssl3_generate_random (PREMASTER.data, PREMASTER.size,
+        _gnutls_ssl3_generate_random (premaster->data, premaster->size,
                                       rnd, 2 * GNUTLS_RANDOM_SIZE,
                                       GNUTLS_MASTER_SIZE,
                                       session->
@@ -131,14 +138,14 @@ generate_normal_master (gnutls_session_t session, int keep_premaster)
               session->security_parameters.server_random, GNUTLS_RANDOM_SIZE);
 
       ret =
-        _gnutls_PRF (session, PREMASTER.data, PREMASTER.size,
+        _gnutls_PRF (session, premaster->data, premaster->size,
                      MASTER_SECRET, MASTER_SECRET_SIZE,
                      rnd, 2 * GNUTLS_RANDOM_SIZE, GNUTLS_MASTER_SIZE,
                      session->security_parameters.master_secret);
     }
 
   if (!keep_premaster)
-    _gnutls_free_datum (&PREMASTER);
+    _gnutls_free_datum (premaster);
 
   if (ret < 0)
     return ret;

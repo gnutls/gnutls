@@ -787,16 +787,17 @@ GNUTLS_3_0_0 {
 	gnutls_session_get_random;
 	gnutls_pubkey_verify_hash2;
 	gnutls_pk_to_sign;
+	gnutls_certificate_set_x509_system_trust;
 } GNUTLS_2_12;
 
 GNUTLS_3_1_0 {
   global:
-	gnutls_certificate_set_x509_system_trust;
 	gnutls_pkcs11_obj_list_import_url2;
 	gnutls_x509_trust_list_add_system_trust;
 	gnutls_x509_trust_list_add_trust_file;
 	gnutls_x509_trust_list_add_trust_mem;
 	gnutls_pkcs12_simple_parse;
+	gnutls_session_set_premaster;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

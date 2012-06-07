@@ -69,6 +69,11 @@ gnutls_kx_algorithm_t _gnutls_cipher_suite_get_kx_algo (const uint8_t suite[2]);
 gnutls_mac_algorithm_t _gnutls_cipher_suite_get_mac_algo (const
                                                           uint8_t suite[2]);
 
+int
+_gnutls_cipher_suite_get_id (gnutls_kx_algorithm_t kx_algorithm,
+                              gnutls_cipher_algorithm_t cipher_algorithm,
+                              gnutls_mac_algorithm_t mac_algorithm, uint8_t suite[2]);
+
 /* Functions for ciphers. */
 int _gnutls_cipher_is_block (gnutls_cipher_algorithm_t algorithm);
 int _gnutls_cipher_algo_is_aead (gnutls_cipher_algorithm_t algorithm);

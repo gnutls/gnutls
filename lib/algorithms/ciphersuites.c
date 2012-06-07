@@ -726,6 +726,35 @@ const gnutls_cipher_suite_entry * ce;
     return ce->name + sizeof ("GNUTLS_") - 1;
 }
 
+/*-
+ * _gnutls_cipher_suite_get_id:
+ * @kx_algorithm: is a Key exchange algorithm
+ * @cipher_algorithm: is a cipher algorithm
+ * @mac_algorithm: is a MAC algorithm
+ * @suite: The id to be returned
+ *
+ * It fills @suite with the ID of the ciphersuite of the provided parameters.
+ *
+ * Returns: 0 on success or a negative error code otherwise.
+ -*/
+int
+_gnutls_cipher_suite_get_id (gnutls_kx_algorithm_t kx_algorithm,
+                              gnutls_cipher_algorithm_t cipher_algorithm,
+                              gnutls_mac_algorithm_t mac_algorithm, uint8_t suite[2])
+{
+const gnutls_cipher_suite_entry * ce;
+
+  ce = cipher_suite_get (kx_algorithm, cipher_algorithm, mac_algorithm);
+  if (ce == NULL)
+    return GNUTLS_E_INVALID_REQUEST;
+  else
+    {
+      suite[0] = ce->id[0];
+      suite[1] = ce->id[1];
+    }
+  return 0;
+}
+
 /**
  * gnutls_cipher_suite_info:
  * @idx: index of cipher suite to get information about, starts on 0.

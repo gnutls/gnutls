@@ -505,6 +505,7 @@ extern "C"
  * @GNUTLS_TLS1_1: TLS version 1.1.
  * @GNUTLS_TLS1_2: TLS version 1.2.
  * @GNUTLS_DTLS1_0: DTLS version 1.0.
+ * @GNUTLS_DTLS0_9: DTLS version 0.9 (Cisco AnyConnect / OpenSSL 0.9.8e).
  * @GNUTLS_VERSION_MAX: Maps to the highest supported TLS version.
  * @GNUTLS_VERSION_UNKNOWN: Unknown SSL/TLS version.
  *
@@ -518,7 +519,8 @@ extern "C"
     GNUTLS_TLS1_1 = 3,
     GNUTLS_TLS1_2 = 4,
     GNUTLS_DTLS1_0 = 5,
-    GNUTLS_VERSION_MAX = GNUTLS_DTLS1_0,
+    GNUTLS_DTLS0_9 = 6,
+    GNUTLS_VERSION_MAX = GNUTLS_DTLS0_9,
     GNUTLS_VERSION_UNKNOWN = 0xff
   } gnutls_protocol_t;
 
@@ -968,6 +970,15 @@ gnutls_ecc_curve_t gnutls_ecc_curve_get(gnutls_session_t session);
                                 gnutls_datum_t * data);
   void gnutls_session_get_random (gnutls_session_t session, gnutls_datum_t* client, 
                                   gnutls_datum_t* server);
+
+  int gnutls_session_set_premaster (gnutls_session_t session, unsigned int entity,
+                           gnutls_protocol_t version, 
+                           gnutls_kx_algorithm_t kx, 
+                           gnutls_cipher_algorithm_t cipher,
+                           gnutls_mac_algorithm_t mac,
+                           gnutls_compression_method_t comp,
+                           const gnutls_datum_t* master,
+                           const gnutls_datum_t * session_id);
 
 /* returns the session ID */
 #define GNUTLS_MAX_SESSION_ID 32
