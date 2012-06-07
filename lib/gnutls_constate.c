@@ -466,7 +466,7 @@ _gnutls_epoch_set_keys (gnutls_session_t session, uint16_t epoch)
 	dst->timestamp = src->timestamp; \
 	dst->max_record_recv_size = src->max_record_recv_size; \
 	dst->max_record_send_size = src->max_record_send_size; \
-	dst->version = src->version
+	dst->version = src->version;
 
 static void
 _gnutls_set_resumed_parameters (gnutls_session_t session)

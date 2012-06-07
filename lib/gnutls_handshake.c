@@ -1191,7 +1191,8 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
 {
   int ret;
 
-  if (recv_type == GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST ||
+  if ((gnutls_protocol_get_version (session) != GNUTLS_DTLS0_9 &&
+       recv_type == GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST) ||
       recv_type == GNUTLS_HANDSHAKE_HELLO_REQUEST)
     return 0;
 
@@ -1199,11 +1200,13 @@ _gnutls_handshake_hash_add_recvd (gnutls_session_t session,
 
   session->internals.handshake_hash_buffer_prev_len = session->internals.handshake_hash_buffer.length;
 
-  ret = _gnutls_buffer_append_data(&session->internals.handshake_hash_buffer,
-    header, header_size);
-  if (ret < 0)
-    return gnutls_assert_val(ret);
-
+  if (gnutls_protocol_get_version (session) != GNUTLS_DTLS0_9)
+    {
+      ret = _gnutls_buffer_append_data(&session->internals.handshake_hash_buffer,
+        header, header_size);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+  }
   if (datalen > 0)
     {
       ret = _gnutls_buffer_append_data(&session->internals.handshake_hash_buffer,
@@ -1230,6 +1233,18 @@ _gnutls_handshake_hash_add_sent (gnutls_session_t session,
   if (type != GNUTLS_HANDSHAKE_HELLO_REQUEST)
     {
       CHECK_SIZE(datalen);
+
+      if (gnutls_protocol_get_version (session) == GNUTLS_DTLS0_9) 
+        {
+	  /* Old DTLS doesn't include the header in the MAC */
+	  if (datalen <= 12) 
+	    {
+	      gnutls_assert ();
+	      return GNUTLS_E_INVALID_REQUEST;
+	    }
+	  dataptr += 12;
+	  datalen -= 12;
+        }
 
       ret = _gnutls_buffer_append_data(&session->internals.handshake_hash_buffer,
                                        dataptr, datalen);
@@ -1402,7 +1417,8 @@ _gnutls_client_set_ciphersuite (gnutls_session_t session, uint8_t suite[2])
   /* check if the credentials (username, public key etc.) are ok.
    * Actually checks if they exist.
    */
-  if (_gnutls_get_kx_cred
+  if (!session->internals.premaster_set &&
+      _gnutls_get_kx_cred
       (session,
        _gnutls_cipher_suite_get_kx_algo
        (session->security_parameters.cipher_suite), &err) == NULL
@@ -1823,6 +1839,8 @@ _gnutls_send_client_hello (gnutls_session_t session, int again)
            */
           if (!IS_DTLS(session))
             _gnutls_record_set_default_version (session, 3, 0);
+          else if (gnutls_protocol_get_version (session) == GNUTLS_DTLS0_9)
+            _gnutls_record_set_default_version (session, 1, 0);
           else
             _gnutls_record_set_default_version (session, 254, 255);
         }
@@ -2580,12 +2598,20 @@ send_change_cipher_spec (gnutls_session_t session, int again)
       if (bufel == NULL)
         return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
 
-      _mbuffer_set_uhead_size(bufel, 1);
+      if (gnutls_protocol_get_version (session) == GNUTLS_DTLS0_9)
+        _mbuffer_set_uhead_size(bufel, 3);
+      else
+        _mbuffer_set_uhead_size(bufel, 1);
       _mbuffer_set_udata_size(bufel, 0);
 
       data = _mbuffer_get_uhead_ptr (bufel);
       
       data[0] = 1;
+      if (gnutls_protocol_get_version (session) == GNUTLS_DTLS0_9)
+        {
+          _gnutls_write_uint16 (session->internals.dtls.hsk_write_seq, &data[1]);
+          session->internals.dtls.hsk_write_seq++;
+        }
 
       ret = _gnutls_handshake_io_cache_int (session, GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC, bufel);
       if (ret < 0)
@@ -2669,7 +2695,7 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
 {
   int ret = 0;
   uint8_t ch;
-
+  unsigned int ccs_len = 1;
 
   switch (STATE)
     {
@@ -2689,13 +2715,19 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
             return gnutls_assert_val(ret);
         }
 
-      ret = _gnutls_recv_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1, &ch, 1, NULL);
+      if (gnutls_protocol_get_version (session) == GNUTLS_DTLS0_9)
+        ccs_len = 3;
+
+      ret = _gnutls_recv_int (session, GNUTLS_CHANGE_CIPHER_SPEC, -1, &ch, ccs_len, NULL);
       if (ret <= 0)
         {
           ERR ("recv ChangeCipherSpec", ret);
           gnutls_assert ();
           return (ret < 0) ? ret : GNUTLS_E_UNEXPECTED_PACKET_LENGTH;
         }
+
+      if (gnutls_protocol_get_version (session) == GNUTLS_DTLS0_9)
+        session->internals.dtls.hsk_read_seq++;
 
       /* Initialize the connection session (start encryption) - in case of server */
       if (init == TRUE)
@@ -2714,7 +2746,7 @@ _gnutls_recv_handshake_final (gnutls_session_t session, int init)
           gnutls_assert ();
           return ret;
         }
-        
+
     case STATE31:
       STATE = STATE31;
 
@@ -3149,7 +3181,8 @@ _gnutls_remove_unwanted_ciphersuites (gnutls_session_t session,
 
       /* if it is defined but had no credentials 
        */
-      if (_gnutls_get_kx_cred (session, kx, NULL) == NULL)
+      if (!session->internals.premaster_set &&
+          _gnutls_get_kx_cred (session, kx, NULL) == NULL)
         {
           delete = 1;
         }

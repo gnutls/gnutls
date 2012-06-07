@@ -863,6 +863,10 @@ typedef struct
 
   /* DTLS session state */
   dtls_st dtls;
+  
+  /* if set it means that the master key was set using
+   * gnutls_session_set_master() rather than being negotiated. */
+  unsigned int premaster_set:1;
 
   unsigned int cb_tls_unique_len;
   unsigned char cb_tls_unique[MAX_VERIFY_DATA_SIZE];
