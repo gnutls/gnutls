@@ -2851,16 +2851,6 @@ smime_to_pkcs7 (void)
   free (lineptr);
 }
 
-void
-certtool_version (void)
-{
-  const char *p = PACKAGE_NAME;
-  if (strcmp (gnutls_check_version (NULL), PACKAGE_VERSION) != 0)
-    p = PACKAGE_STRING;
-  version_etc (stdout, program_name, p, gnutls_check_version (NULL),
-               "Nikos Mavrogiannopoulos", "Simon Josefsson", (char *) NULL);
-}
-
 static void
 print_key_usage (FILE * outfile, unsigned int usage)
 {

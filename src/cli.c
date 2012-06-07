@@ -1228,19 +1228,6 @@ const char* rest = NULL;
     }
 }
 
-void cli_version (void);
-
-void
-cli_version (void)
-{
-  const char *p = PACKAGE_NAME;
-  if (strcmp (gnutls_check_version (NULL), PACKAGE_VERSION) != 0)
-    p = PACKAGE_STRING;
-  version_etc (stdout, program_name, p, gnutls_check_version (NULL),
-               "Nikos Mavrogiannopoulos", (char *) NULL);
-}
-
-
 static void
 check_rehandshake (socket_st * socket, int ret)
 {

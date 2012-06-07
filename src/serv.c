@@ -1611,18 +1611,6 @@ static void cmd_parser (int argc, char **argv)
 
 }
 
-extern void serv_version (void);
-
-void
-serv_version (void)
-{
-  const char *p = PACKAGE_NAME;
-  if (strcmp (gnutls_check_version (NULL), PACKAGE_VERSION) != 0)
-    p = PACKAGE_STRING;
-  version_etc (stdout, program_name, p, gnutls_check_version (NULL),
-               "Nikos Mavrogiannopoulos", (char *) NULL);
-}
-
 /* session resuming support */
 
 #define SESSION_ID_SIZE 32

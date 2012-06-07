@@ -350,14 +350,3 @@ static void cmd_parser (int argc, char **argv)
 
 }
 
-void tls_test_version (void);
-
-void
-tls_test_version (void)
-{
-  const char *p = PACKAGE_NAME;
-  if (strcmp (gnutls_check_version (NULL), PACKAGE_VERSION) != 0)
-    p = PACKAGE_STRING;
-  version_etc (stdout, "gnutls-cli-debug", p, gnutls_check_version (NULL),
-               "Nikos Mavrogiannopoulos", (char *) NULL);
-}

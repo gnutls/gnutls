@@ -284,14 +284,3 @@ write_key (const char *username, const char *key, int key_size,
 
 #endif /* ENABLE_PSK */
 
-void psktool_version (void);
-
-void
-psktool_version (void)
-{
-  const char *p = PACKAGE_NAME;
-  if (strcmp (gnutls_check_version (NULL), PACKAGE_VERSION) != 0)
-    p = PACKAGE_STRING;
-  version_etc (stdout, "psktool", p, gnutls_check_version (NULL),
-               "Nikos Mavrogiannopoulos", (char *) NULL);
-}
