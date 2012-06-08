@@ -46,6 +46,11 @@ pin_callback (void *user, int attempt, const char *token_url,
 {
   const char *password;
   int len;
+  
+  /* Note that a PIN callback may be called multiple times during a
+   * session. It is expected to cache and return the same PIN for
+   * the same token_url, unless flags is set to GNUTLS_PKCS11_PIN_WRONG.
+   */
 
   printf ("PIN required for token '%s' with URL '%s'\n", token_label,
           token_url);
