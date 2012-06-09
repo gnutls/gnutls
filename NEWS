@@ -10,7 +10,7 @@ and --benchmark-tls-ciphers
 ** libgnutls: Added support for an old version of the DTLS protocol
 used by openconnect vpn client for compatibility with Cisco's AnyConnect 
 SSL VPN. It is marked as GNUTLS_DTLS0_9. Do not use it for newer protocols
-as it has issues.
+as it has issues. Implemented by David Woodhouse.
 
 ** libgnutls: requires libnettle 2.5.
 
