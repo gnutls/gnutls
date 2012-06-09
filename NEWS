@@ -21,9 +21,6 @@ for encryption and signatures.
 is assumed to be a file that stores the pin. Based on patch
 by David Smith.
 
-** libgnutls: introduce gnutls_certificate_set_x509_system_trust
-which imports the trusted root CA's from a compile time defined location. 
-
 ** libgnutls: Added GNUTLS_CERT_SIGNATURE_FAILURE to differentiate between
 generic errors and signature verification errors in the verification
 functions.
