@@ -5,6 +5,8 @@ See the end for copying conditions.
 
 Version 2.12.20 (unreleased)
 
+** libgnutls: Fixed memory leak in PKCS #8 key import.
+
 ** libgnutls: Check key identifiers when checking for an issuer.
 
 ** API and ABI modifications:
