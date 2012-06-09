@@ -1385,7 +1385,7 @@ read_pbkdf2_params (ASN1_TYPE pbes2_asn,
   /* We don't read the PRF. We only use the default.
    */
 
-  return 0;
+  result = 0;
 
 error:
   asn1_delete_structure (&pbkdf2_asn);
@@ -1593,8 +1593,8 @@ read_pbe_enc_params (ASN1_TYPE pbes2_asn,
       goto error;
     }
   _gnutls_hard_log ("IV.size: %d\n", params->iv_size);
-
-  return 0;
+  
+  result = 0;
 
 error:
   asn1_delete_structure (&pbe_asn);
