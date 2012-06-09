@@ -57,14 +57,15 @@ extern "C"
   int gnutls_pkcs12_bag_decrypt (gnutls_pkcs12_bag_t bag, const char *pass);
   int gnutls_pkcs12_bag_encrypt (gnutls_pkcs12_bag_t bag, const char *pass,
                                  unsigned int flags);
-  int gnutls_pkcs12_simple_parse (
-                           gnutls_pkcs12_t p12,
-                           const char *password,
-                           gnutls_x509_privkey_t * key,
-                           gnutls_x509_crt_t * cert,
-                           gnutls_x509_crt_t ** extra_certs_ret,
-                           unsigned int * extra_certs_ret_len,
-                           gnutls_x509_crl_t * crl);
+  int gnutls_pkcs12_simple_parse (gnutls_pkcs12_t p12,
+                     const char *password,
+                     gnutls_x509_privkey_t * key,
+                     gnutls_x509_crt_t ** chain,
+                     unsigned int * chain_len,
+                     gnutls_x509_crt_t ** extra_certs,
+                     unsigned int * extra_certs_len,
+                     gnutls_x509_crl_t * crl,
+                     unsigned int flags);
 
 /**
  * gnutls_pkcs12_bag_type_t:

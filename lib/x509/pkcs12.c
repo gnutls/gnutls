@@ -1328,20 +1328,61 @@ cleanup:
 
 }
 
+/* Checks if the extra_certs contain certificates that may form a chain
+ * with the first certificate in chain (it is expected that chain_len==1)
+ * and appends those in the chain.
+ */
+static int make_chain(gnutls_x509_crt_t **chain, unsigned int *chain_len,
+                      gnutls_x509_crt_t **extra_certs, unsigned int *extra_certs_len)
+{
+unsigned int i;
+
+  if (*chain_len != 1)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+  
+  i = 0;
+  while(i<*extra_certs_len)
+    {
+      /* if it is an issuer but not a self-signed one */
+      if (gnutls_x509_crt_check_issuer((*chain)[*chain_len - 1], (*extra_certs)[i]) != 0 &&
+          gnutls_x509_crt_check_issuer((*extra_certs)[i], (*extra_certs)[i]) == 0)
+        {
+           *chain = gnutls_realloc (*chain, sizeof((*chain)[0]) *
+                                                     ++(*chain_len));
+           if (*chain == NULL)
+             {
+               gnutls_assert();
+               return GNUTLS_E_MEMORY_ERROR;
+             }
+           (*chain)[*chain_len - 1] = (*extra_certs)[i];
+           
+           (*extra_certs)[i] = (*extra_certs)[*extra_certs_len-1];
+           (*extra_certs_len)--;
+
+           i=0;
+           continue;
+        }
+      i++;
+    }
+  return 0;
+}
+
 /**
  * gnutls_pkcs12_simple_parse:
  * @p12: the PKCS#12 blob.
  * @password: optional password used to decrypt PKCS#12 blob, bags and keys.
  * @key: a structure to store the parsed private key.
- * @cert: a structure to store the parsed certificate.
- * @extra_certs_ret: optional pointer to receive an array of additional
+ * @chain: the corresponding to key certificate chain
+ * @chain_len: will be updated with the number of additional
+ * @extra_certs: optional pointer to receive an array of additional
  *                   certificates found in the PKCS#12 blob.
- * @extra_certs_ret_len: will be updated with the number of additional
+ * @extra_certs_len: will be updated with the number of additional
  *                       certs.
- * @crl: a structure to store the parsed CRL.
+ * @crl: an optional structure to store the parsed CRL.
+ * @flags: should be zero
  *
  * This function parses a PKCS#12 blob in @p12blob and extracts the
- * private key, the corresponding certificate, and any additional
+ * private key, the corresponding certificate chain, and any additional
  * certificates and a CRL.
  *
  * The @extra_certs_ret and @extra_certs_ret_len parameters are optional
@@ -1378,14 +1419,18 @@ int
 gnutls_pkcs12_simple_parse (gnutls_pkcs12_t p12,
                      const char *password,
                      gnutls_x509_privkey_t * key,
-                     gnutls_x509_crt_t * cert,
-                     gnutls_x509_crt_t ** extra_certs_ret,
-                     unsigned int * extra_certs_ret_len,
-                     gnutls_x509_crl_t * crl)
+                     gnutls_x509_crt_t ** chain,
+                     unsigned int * chain_len,
+                     gnutls_x509_crt_t ** extra_certs,
+                     unsigned int * extra_certs_len,
+                     gnutls_x509_crl_t * crl,
+                     unsigned int flags)
 {
   gnutls_pkcs12_bag_t bag = NULL;
-  gnutls_x509_crt_t *extra_certs = NULL;
-  unsigned int extra_certs_len = 0;
+  gnutls_x509_crt_t *_extra_certs = NULL;
+  unsigned int _extra_certs_len = 0;
+  gnutls_x509_crt_t *_chain = NULL;
+  unsigned int _chain_len = 0;
   int idx = 0;
   int ret;
   size_t cert_id_size = 0;
@@ -1394,9 +1439,10 @@ gnutls_pkcs12_simple_parse (gnutls_pkcs12_t p12,
   uint8_t key_id[20];
   int privkey_ok = 0;
 
-  *cert = NULL;
   *key = NULL;
-  *crl = NULL;
+  
+  if (crl)
+    *crl = NULL;
 
   /* find the first private key */
   for (;;)
@@ -1635,41 +1681,49 @@ gnutls_pkcs12_simple_parse (gnutls_pkcs12_t p12,
                 }
 
               if (memcmp (cert_id, key_id, cert_id_size) != 0)
-                {               /* they don't match - skip the certificate */
-                  if (extra_certs_ret)
+                { /* they don't match - skip the certificate */
+                  if (extra_certs)
                     {
-                      extra_certs = gnutls_realloc (extra_certs,
-                                                    sizeof(extra_certs[0]) *
-                                                    ++extra_certs_len);
-                      if (!extra_certs)
+                      _extra_certs = gnutls_realloc (_extra_certs,
+                                                     sizeof(_extra_certs[0]) *
+                                                     ++_extra_certs_len);
+                      if (!_extra_certs)
                         {
                           gnutls_assert ();
                           ret = GNUTLS_E_MEMORY_ERROR;
                           goto done;
                         }
-                      extra_certs[extra_certs_len - 1] = this_cert;
+                      _extra_certs[_extra_certs_len - 1] = this_cert;
                       this_cert = NULL;
                     }
                   else
                     {
                        gnutls_x509_crt_deinit (this_cert);
                     }
-                  break;
                 }
               else
                 {
-                   if (*cert != NULL)        /* no need to set it again */
-                     {
-                        gnutls_assert ();
-                        break;
-                     }
-                   *cert = this_cert;
-                   this_cert = NULL;
+                  if (_chain_len == 0)
+                    {
+                      _chain = gnutls_malloc (sizeof(_chain[0]) * (++_chain_len));
+                      if (!_chain)
+                        {
+                          gnutls_assert ();
+                          ret = GNUTLS_E_MEMORY_ERROR;
+                          goto done;
+                        }
+                      _chain[_chain_len - 1] = this_cert;
+                      this_cert = NULL;
+                    }
+                  else
+                    {
+                       gnutls_x509_crt_deinit (this_cert);
+                    }
                 }
               break;
 
             case GNUTLS_BAG_CRL:
-              if (*crl != NULL)
+              if (crl == NULL || *crl != NULL)
                 {
                   gnutls_assert ();
                   break;
@@ -1704,30 +1758,54 @@ gnutls_pkcs12_simple_parse (gnutls_pkcs12_t p12,
       gnutls_pkcs12_bag_deinit (bag);
     }
 
+  if (_chain_len != 1)
+    {
+      ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+      goto done;
+    }
+
+  ret = make_chain(&_chain, &_chain_len, &_extra_certs, &_extra_certs_len);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto done;
+    }
+
   ret = 0;
 
 done:
   if (bag)
     gnutls_pkcs12_bag_deinit (bag);
 
-  if (ret)
+  if (ret < 0)
     {
       if (*key)
         gnutls_x509_privkey_deinit(*key);
-      if (*cert)
-        gnutls_x509_crt_deinit(*cert);
-      if (extra_certs_len)
+      if (_extra_certs_len && _extra_certs != NULL)
         {
           unsigned int i;
-          for (i = 0; i < extra_certs_len; i++)
-            gnutls_x509_crt_deinit(extra_certs[i]);
-          gnutls_free(extra_certs);
+          for (i = 0; i < _extra_certs_len; i++)
+            gnutls_x509_crt_deinit(_extra_certs[i]);
+          gnutls_free(_extra_certs);
+        }
+      if (_chain_len && chain != NULL)
+        {
+          unsigned int i;
+          for (i = 0; i < _chain_len; i++)
+            gnutls_x509_crt_deinit(_chain[i]);
+          gnutls_free(_chain);
         }
     }
-  else if (extra_certs_ret)
+  else 
     {
-      *extra_certs_ret = extra_certs;
-      *extra_certs_ret_len = extra_certs_len;
+      if (extra_certs) 
+        {
+          *extra_certs = _extra_certs;
+          *extra_certs_len = _extra_certs_len;
+        }
+      
+      *chain = _chain;
+      *chain_len = _chain_len;
     }
 
   return ret;

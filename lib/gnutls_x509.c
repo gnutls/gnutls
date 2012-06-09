@@ -1888,8 +1888,6 @@ int
   return ret;
 }
 
-#define MAX_CERT_LIST 16
-
 /**
  * gnutls_certificate_set_x509_simple_pkcs12_mem:
  * @res: is a #gnutls_certificate_credentials_t structure.
@@ -1928,10 +1926,9 @@ int
 {
   gnutls_pkcs12_t p12;
   gnutls_x509_privkey_t key = NULL;
-  gnutls_x509_crt_t cert = NULL;
-  gnutls_x509_crt_t *extra_certs = NULL;
+  gnutls_x509_crt_t *chain = NULL;
   gnutls_x509_crl_t crl = NULL;
-  unsigned int extra_certs_size = 0, i;
+  unsigned int chain_size = 0, i;
   int ret;
 
   ret = gnutls_pkcs12_init (&p12);
@@ -1960,8 +1957,8 @@ int
         }
     }
 
-  ret = gnutls_pkcs12_simple_parse (p12, password, &key, &cert, 
-                             &extra_certs, &extra_certs_size, &crl);
+  ret = gnutls_pkcs12_simple_parse (p12, password, &key, &chain, &chain_size, 
+                             NULL, NULL, &crl, 0);
   gnutls_pkcs12_deinit (p12);
   if (ret < 0)
     {
@@ -1969,47 +1966,20 @@ int
       return ret;
     }
 
-  if (key && cert)
+  if (key && chain)
     {
-      gnutls_x509_crt_t chain[MAX_CERT_LIST];
-      unsigned int chain_size = 1, j;
-      unsigned int done = 0;
-      
-      j = 0;
-      chain[j] = cert;
-
-      if (extra_certs_size > 0 && extra_certs_size < MAX_CERT_LIST-1)
-        {
-          do 
-            {
-              for (i=0;i<extra_certs_size;i++)
-                {
-                  if (gnutls_x509_crt_check_issuer(chain[j], extra_certs[i]) != 0 &&
-                      gnutls_x509_crt_check_issuer(extra_certs[i], chain[j]) == 0)
-                    {
-                      if (gnutls_x509_crt_check_issuer(extra_certs[i], extra_certs[i]) != 0)
-                        { /* we found a self-signed one. We are done. */
-                          done = 1;
-                          break;
-                        }
-                      chain[++j] = extra_certs[i];
-                      chain_size++;
-                      break;
-                    }
-
-                  if (i==extra_certs_size - 1) 
-                    done = 1;
-                }
-            }
-          while(done == 0);
-        }
-
       ret = gnutls_certificate_set_x509_key (res, chain, chain_size, key);
       if (ret < 0)
         {
           gnutls_assert ();
           goto done;
         }
+    }
+  else
+    {
+      gnutls_assert();
+      ret = GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
+      goto done;
     }
 
   if (crl)
@@ -2025,14 +1995,12 @@ int
   ret = 0;
 
 done:
-  if (extra_certs)
+  if (chain)
     {
-      for (i=0;i<extra_certs_size;i++)
-        gnutls_x509_crt_deinit (extra_certs[i]);
-      gnutls_free(extra_certs);
+      for (i=0;i<chain_size;i++)
+        gnutls_x509_crt_deinit (chain[i]);
+      gnutls_free(chain);
     }
-  if (cert)
-    gnutls_x509_crt_deinit (cert);
   if (key)
     gnutls_x509_privkey_deinit (key);
   if (crl)
