@@ -581,3 +581,6 @@ doc/functions/
 gl/glthread/.dirstamp
 tests/mini-termination
 tests/mini-x509-2
+tests/pkcs12_simple
+win32
+win64
