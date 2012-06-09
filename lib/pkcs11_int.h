@@ -34,6 +34,13 @@
 #include <p11-kit/uri.h>
 typedef unsigned char ck_bool_t;
 
+struct pkcs11_session_info {
+  struct ck_function_list * module;
+  struct ck_token_info tinfo;
+  ck_session_handle_t pks;
+  unsigned int init;
+};
+
 struct token_info
 {
   struct ck_token_info tinfo;
@@ -58,8 +65,7 @@ struct gnutls_pkcs11_obj_st
  * function. Once everything is traversed it is called with NULL tinfo.
  * It should return 0 if found what it was looking for.
  */
-typedef int (*find_func_t) (struct ck_function_list *module,
-                            ck_session_handle_t pks,
+typedef int (*find_func_t) (struct pkcs11_session_info*,
                             struct token_info * tinfo, struct ck_info *,
                             void *input);
 
@@ -72,8 +78,8 @@ pkcs11_find_slot (struct ck_function_list ** module, ck_slot_id_t * slot,
 int pkcs11_get_info (struct p11_kit_uri *info,
                      gnutls_pkcs11_obj_info_t itype, void *output,
                      size_t * output_size);
-int pkcs11_login (struct ck_function_list * module, ck_session_handle_t pks,
-                  const struct token_info *tinfo, struct p11_kit_uri *info, int admin);
+int pkcs11_login (struct pkcs11_session_info * sinfo,
+              const struct token_info *tokinfo, struct p11_kit_uri *info, int so);
 
 int pkcs11_call_token_func (struct p11_kit_uri *info, const unsigned retry);
 
@@ -87,7 +93,7 @@ int pkcs11_info_to_url (struct p11_kit_uri *info,
 #define SESSION_WRITE (1<<0)
 #define SESSION_LOGIN (1<<1)
 #define SESSION_SO (1<<2)       /* security officer session */
-int pkcs11_open_session (struct ck_function_list **_module, ck_session_handle_t * _pks,
+int pkcs11_open_session (struct pkcs11_session_info* sinfo,
                          struct p11_kit_uri *info, unsigned int flags);
 int _pkcs11_traverse_tokens (find_func_t find_func, void *input,
                              struct p11_kit_uri *info, unsigned int flags);
@@ -98,10 +104,9 @@ int pkcs11_token_matches_info (struct p11_kit_uri *info,
                                struct ck_info *lib_info);
 
 /* flags are SESSION_* */
-int pkcs11_find_object (struct ck_function_list ** _module,
-                        ck_session_handle_t * _pks,
-                        ck_object_handle_t * _obj,
-                        struct p11_kit_uri *info, unsigned int flags);
+int pkcs11_find_object (struct pkcs11_session_info* sinfo,
+                    ck_object_handle_t * _obj,
+                    struct p11_kit_uri *info, unsigned int flags);
 
 unsigned int pkcs11_obj_flags_to_int (unsigned int flags);
 
@@ -192,12 +197,10 @@ pkcs11_find_objects (struct ck_function_list *module,
                        unsigned long *object_count);
 
 ck_rv_t
-pkcs11_find_objects_final (struct ck_function_list *module,
-                           ck_session_handle_t sess);
+pkcs11_find_objects_final (struct pkcs11_session_info*);
 
 ck_rv_t
-pkcs11_close_session (struct ck_function_list *module,
-                      ck_session_handle_t sess);
+pkcs11_close_session (struct pkcs11_session_info *);
 
 ck_rv_t
 pkcs11_get_attribute_value(struct ck_function_list *module,
