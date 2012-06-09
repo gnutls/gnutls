@@ -2456,10 +2456,13 @@ generate_pkcs12 (common_info_st * cinfo)
 
       indx = result;
 
-      result = gnutls_pkcs12_bag_set_friendly_name (bag, indx, name);
-      if (result < 0)
-        error (EXIT_FAILURE, 0, "bag_set_friendly_name: %s",
-               gnutls_strerror (result));
+      if (i==0) /* only the first certificate gets the friendly name */
+        {
+          result = gnutls_pkcs12_bag_set_friendly_name (bag, indx, name);
+          if (result < 0)
+            error (EXIT_FAILURE, 0, "bag_set_friendly_name: %s",
+                   gnutls_strerror (result));
+        }
 
       size = sizeof (_key_id);
       result = gnutls_x509_crt_get_key_id (crts[i], 0, _key_id, &size);
