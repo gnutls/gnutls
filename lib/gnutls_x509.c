@@ -1113,8 +1113,8 @@ cleanup:
  * entity certificate (e.g., also an intermediate CA cert) then put
  * the certificate chain in @pcert_list. The @pcert_list and @key will
  * become part of the credentials structure and must not
- * be deallocated. They will be automatically deallocated when
- * @res is deinitialized.
+ * be deallocated. They will be automatically deallocated when @res
+ * is deinitialized.
  *
  * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
  *
