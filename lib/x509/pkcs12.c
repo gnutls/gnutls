@@ -1333,7 +1333,8 @@ cleanup:
  * and appends those in the chain.
  */
 static int make_chain(gnutls_x509_crt_t **chain, unsigned int *chain_len,
-                      gnutls_x509_crt_t **extra_certs, unsigned int *extra_certs_len)
+                      gnutls_x509_crt_t **extra_certs, unsigned int *extra_certs_len,
+                      unsigned int flags)
 {
 unsigned int i;
 
@@ -1344,24 +1345,29 @@ unsigned int i;
   while(i<*extra_certs_len)
     {
       /* if it is an issuer but not a self-signed one */
-      if (gnutls_x509_crt_check_issuer((*chain)[*chain_len - 1], (*extra_certs)[i]) != 0 &&
-          gnutls_x509_crt_check_issuer((*extra_certs)[i], (*extra_certs)[i]) == 0)
+      if (gnutls_x509_crt_check_issuer((*chain)[*chain_len - 1], (*extra_certs)[i]) != 0)
         {
-           *chain = gnutls_realloc (*chain, sizeof((*chain)[0]) *
-                                                     ++(*chain_len));
-           if (*chain == NULL)
-             {
-               gnutls_assert();
-               return GNUTLS_E_MEMORY_ERROR;
-             }
-           (*chain)[*chain_len - 1] = (*extra_certs)[i];
-           
-           (*extra_certs)[i] = (*extra_certs)[*extra_certs_len-1];
-           (*extra_certs_len)--;
+          if (!(flags & GNUTLS_PKCS12_SP_INCLUDE_SELF_SIGNED) && 
+              gnutls_x509_crt_check_issuer((*extra_certs)[i], (*extra_certs)[i]) != 0)
+            goto skip;
 
-           i=0;
-           continue;
+          *chain = gnutls_realloc (*chain, sizeof((*chain)[0]) *
+                                                     ++(*chain_len));
+          if (*chain == NULL)
+            {
+              gnutls_assert();
+              return GNUTLS_E_MEMORY_ERROR;
+            }
+          (*chain)[*chain_len - 1] = (*extra_certs)[i];
+          
+          (*extra_certs)[i] = (*extra_certs)[*extra_certs_len-1];
+          (*extra_certs_len)--;
+
+          i=0;
+          continue;
         }
+
+skip:
       i++;
     }
   return 0;
@@ -1379,7 +1385,7 @@ unsigned int i;
  * @extra_certs_len: will be updated with the number of additional
  *                       certs.
  * @crl: an optional structure to store the parsed CRL.
- * @flags: should be zero
+ * @flags: should be zero or one of GNUTLS_PKCS12_SP_*
  *
  * This function parses a PKCS#12 blob in @p12blob and extracts the
  * private key, the corresponding certificate chain, and any additional
@@ -1394,9 +1400,6 @@ unsigned int i;
  * only password based security, and the same password for all
  * operations, are supported.
  *
- * The private keys may be RSA PKCS#1 or DSA private keys encoded in
- * the OpenSSL way.
- *
  * PKCS#12 file may contain many keys and/or certificates, and there
  * is no way to identify which key/certificate pair you want.  You
  * should make sure the PKCS#12 file only contain one key/certificate
@@ -1409,6 +1412,11 @@ unsigned int i;
  *
  * If the provided structure has encrypted fields but no password
  * is provided then this function returns %GNUTLS_E_DECRYPTION_FAILED.
+ *
+ * Note that normally the chain constructed does not include self signed
+ * certificates, to comply with TLS' requirements. If, however, the flag 
+ * %GNUTLS_PKCS12_SP_INCLUDE_SELF_SIGNED is specified then
+ * self signed certificates will be included in the chain.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -1765,7 +1773,7 @@ gnutls_pkcs12_simple_parse (gnutls_pkcs12_t p12,
       goto done;
     }
 
-  ret = make_chain(&_chain, &_chain_len, &_extra_certs, &_extra_certs_len);
+  ret = make_chain(&_chain, &_chain_len, &_extra_certs, &_extra_certs_len, flags);
   if (ret < 0)
     {
       gnutls_assert();

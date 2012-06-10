@@ -57,6 +57,8 @@ extern "C"
   int gnutls_pkcs12_bag_decrypt (gnutls_pkcs12_bag_t bag, const char *pass);
   int gnutls_pkcs12_bag_encrypt (gnutls_pkcs12_bag_t bag, const char *pass,
                                  unsigned int flags);
+
+#define GNUTLS_PKCS12_SP_INCLUDE_SELF_SIGNED 1
   int gnutls_pkcs12_simple_parse (gnutls_pkcs12_t p12,
                      const char *password,
                      gnutls_x509_privkey_t * key,
