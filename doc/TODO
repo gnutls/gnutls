@@ -3,18 +3,20 @@ anything), contact the developer's mailing list (gnutls-dev@lists.gnupg.org),
 in order to avoid having people working on the same thing. 
 
 Current list:
-* Add DTLS 1.2 support (RFC6347)
 * Added heartbeat support (http://tools.ietf.org/html/draft-ietf-tls-dtls-heartbeat-04)
-* Add certificate image support (see RFC3709, RFC6170)
-* Perform signature calculation in PKCS #11 using not plain
+* When importing a PKCS #11 certificate, check for its issuers to generate a
+  chain (e.g. use the DN to retrieve possible signers).
+- Add DTLS 1.2 support (RFC6347)
+- Add certificate image support (see RFC3709, RFC6170)
+- Perform signature calculation in PKCS #11 using not plain
   RSA but rather the combination of RSA-SHA256, RSA-SHA1 etc.
   That will allow the usage of more secure tokens that do not
   allow plain RSA.
-* Support PKCS#8 DES-MD5 (tests/enc3pkcs8.pem) encrypted keys.
+- Support PKCS#8 DES-MD5 (tests/enc3pkcs8.pem) encrypted keys.
   (openssl seems to use DES-MD5 to encrypt keys by default)
-* Add support for generating empty CRLs
-* Document the format for the supported DN attributes.
-* Audit the code
+- Add support for generating empty CRLs
+- Document the format for the supported DN attributes.
+- Audit the code
 - Implement TLS-PSK with PKCS #11.
 - Allow setting a PKCS #11 module to gnutls_x509_trust_list_t, to verify 
   against, similarly to NSS way.
