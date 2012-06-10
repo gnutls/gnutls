@@ -17,10 +17,6 @@ as it has issues. Implemented by David Woodhouse.
 ** libgnutls: Use the PKCS #1 1.5 encoding provided by nettle (2.5)
 for encryption and signatures.
 
-** libgnutls: When decoding a PKCS #11 URL the pin-source field
-is assumed to be a file that stores the pin. Based on patch
-by David Smith.
-
 ** libgnutls: Added GNUTLS_CERT_SIGNATURE_FAILURE to differentiate between
 generic errors and signature verification errors in the verification
 functions.
