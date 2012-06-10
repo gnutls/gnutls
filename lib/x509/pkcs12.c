@@ -1438,6 +1438,7 @@ gnutls_pkcs12_simple_parse (gnutls_pkcs12_t p12,
   uint8_t cert_id[20];
   uint8_t key_id[20];
   int privkey_ok = 0;
+  unsigned int i;
 
   *key = NULL;
   
@@ -1783,30 +1784,39 @@ done:
         gnutls_x509_privkey_deinit(*key);
       if (_extra_certs_len && _extra_certs != NULL)
         {
-          unsigned int i;
           for (i = 0; i < _extra_certs_len; i++)
             gnutls_x509_crt_deinit(_extra_certs[i]);
           gnutls_free(_extra_certs);
         }
       if (_chain_len && chain != NULL)
         {
-          unsigned int i;
           for (i = 0; i < _chain_len; i++)
             gnutls_x509_crt_deinit(_chain[i]);
           gnutls_free(_chain);
         }
+      
+      return ret;
     }
-  else 
+
+  if (extra_certs && _extra_certs_len > 0)
+    {
+      *extra_certs = _extra_certs;
+      *extra_certs_len = _extra_certs_len;
+    }
+  else
     {
       if (extra_certs) 
         {
-          *extra_certs = _extra_certs;
-          *extra_certs_len = _extra_certs_len;
+          *extra_certs = NULL;
+          *extra_certs_len = 0;
         }
-      
-      *chain = _chain;
-      *chain_len = _chain_len;
+      for (i = 0; i < _extra_certs_len; i++)
+        gnutls_x509_crt_deinit(_extra_certs[i]);
+      gnutls_free(_extra_certs);
     }
+      
+  *chain = _chain;
+  *chain_len = _chain_len;
 
   return ret;
 }
