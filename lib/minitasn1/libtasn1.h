@@ -44,7 +44,7 @@ extern "C"
 {
 #endif
 
-#define ASN1_VERSION "2.12"
+#define ASN1_VERSION "2.13"
 
   typedef int asn1_retCode;	/* type returned by libtasn1 functions */
 
@@ -261,10 +261,10 @@ extern "C"
 		      int *ret_len, unsigned char *str,
 		      int str_size, int *bit_len);
 
-  extern ASN1_API signed long
+  extern ASN1_API long
     asn1_get_length_der (const unsigned char *der, int der_len, int *len);
 
-  extern ASN1_API signed long
+  extern ASN1_API long
     asn1_get_length_ber (const unsigned char *ber, int ber_len, int *len);
 
   extern ASN1_API void

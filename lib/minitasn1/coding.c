@@ -256,7 +256,7 @@ _asn1_objectid_der (unsigned char *str, unsigned char *der, int *der_len)
   char *temp, *n_end, *n_start;
   unsigned char bit7;
   unsigned long val, val1 = 0;
-  int str_len = _asn1_strlen(str);
+  int str_len = _asn1_strlen (str);
 
   max_len = *der_len;
 
@@ -266,7 +266,7 @@ _asn1_objectid_der (unsigned char *str, unsigned char *der, int *der_len)
 
   memcpy (temp, str, str_len);
   temp[str_len] = '.';
-  temp[str_len+1] = 0;
+  temp[str_len + 1] = 0;
 
   counter = 0;
   n_start = temp;

@@ -36,6 +36,8 @@ password was provided.
 ** libgnutlsxx: Added session::set_transport_vec_push_function. Patch
 by Alexandre Bique.
 
+** minitasn1: Upgraded to libtasn1 version 2.13.
+
 ** API and ABI modifications:
 GNUTLS_CERT_SIGNATURE_FAILURE: Added
 gnutls_pubkey_verify_hash2: Added

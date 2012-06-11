@@ -23,7 +23,7 @@
 #define INT_H
 
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+#include <config.h>
 #endif
 
 #include <string.h>
@@ -33,7 +33,7 @@
 #include <stdint.h>
 
 #ifdef HAVE_SYS_TYPES_H
-# include <sys/types.h>
+#include <sys/types.h>
 #endif
 
 #include <libtasn1.h>
