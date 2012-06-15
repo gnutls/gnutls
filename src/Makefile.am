@@ -150,6 +150,9 @@ libcmd_p11tool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
 
 endif # ENABLE_PKCS11
 
+BUILT_SOURCES = ocsptool-args.c p11tool-args.c psk-args.c cli-debug-args.c \
+		cli-args.c serv-args.c srptool-args.c certtool-args.c
+
 ocsptool-args.c: $(srcdir)/args-std.def $(srcdir)/ocsptool-args.def
 	-autogen ocsptool-args.def
 p11tool-args.c: $(srcdir)/args-std.def $(srcdir)/p11tool-args.def
