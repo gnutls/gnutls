@@ -663,7 +663,7 @@ static void client(int sock)
 		len = process_error(gnutls_record_recv(session, buffer, sizeof(buffer)));
 	} while (len < 0);
 
-	if (len > 0 && strcmp(line, buffer) == 0) {
+	if (len > 0 && strncmp(line, buffer, len) == 0) {
 		exit(0);
 	} else {
 		exit(1);
