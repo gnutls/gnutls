@@ -1421,6 +1421,7 @@ find_obj_url (struct pkcs11_session_info *sinfo,
   int found = 0, ret;
   uint8_t *cert_data = NULL;
   char label_tmp[PKCS11_LABEL_SIZE];
+  char id_tmp[PKCS11_ID_SIZE];
 
   if (info == NULL)
     {                           /* we don't support multiple calls */
@@ -1437,8 +1438,22 @@ find_obj_url (struct pkcs11_session_info *sinfo,
       return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE;
     }
 
+  a_vals = 0;
   attr = p11_kit_uri_get_attribute (find_data->crt->info, CKA_ID);
-  if (attr == NULL)
+  if (attr)
+    {
+      memcpy (a + a_vals, attr, sizeof (struct ck_attribute));
+      a_vals++;
+    }
+
+  attr = p11_kit_uri_get_attribute (find_data->crt->info, CKA_LABEL);
+  if (attr)
+    {
+      memcpy (a + a_vals, attr, sizeof (struct ck_attribute));
+      a_vals++;
+    }
+
+  if (!a_vals)
     {
       gnutls_assert ();
       return GNUTLS_E_INVALID_REQUEST;
@@ -1454,9 +1469,6 @@ find_obj_url (struct pkcs11_session_info *sinfo,
     }
 
   /* Find objects with given class and type */
-  memcpy (a, attr, sizeof (struct ck_attribute));
-  a_vals = 1;
-
   attr = p11_kit_uri_get_attribute (find_data->crt->info, CKA_CLASS);
   if (attr)
     {
@@ -1494,16 +1506,15 @@ find_obj_url (struct pkcs11_session_info *sinfo,
       a[1].type = CKA_LABEL;
       a[1].value = label_tmp;
       a[1].value_len = sizeof (label_tmp);
+      a[2].type = CKA_ID;
+      a[2].value = id_tmp;
+      a[2].value_len = sizeof(id_tmp);
 
-      if (pkcs11_get_attribute_value (sinfo->module, sinfo->pks, obj, a, 2) == CKR_OK)
+      if (pkcs11_get_attribute_value (sinfo->module, sinfo->pks, obj, a, 3) == CKR_OK)
         {
-          gnutls_datum_t id;
+          gnutls_datum_t id = { a[2].value, a[2].value_len };
           gnutls_datum_t data = { a[0].value, a[0].value_len };
           gnutls_datum_t label = { a[1].value, a[1].value_len };
-
-          attr = p11_kit_uri_get_attribute (find_data->crt->info, CKA_ID);
-          id.data = attr->value;
-          id.size = attr->value_len;
 
           if (class == CKO_PUBLIC_KEY)
             {
