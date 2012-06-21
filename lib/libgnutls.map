@@ -798,6 +798,10 @@ GNUTLS_3_1_0 {
 	gnutls_x509_trust_list_add_trust_file;
 	gnutls_x509_trust_list_add_trust_mem;
 	gnutls_pkcs12_simple_parse;
+	gnutls_privkey_import_openpgp_raw;
+	gnutls_privkey_import_x509_raw;
+	gnutls_privkey_import_pkcs11_url;
+	gnutls_load_file;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

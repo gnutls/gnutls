@@ -174,6 +174,20 @@ int gnutls_privkey_import_x509 (gnutls_privkey_t pkey,
 int gnutls_privkey_import_openpgp (gnutls_privkey_t pkey,
                                    gnutls_openpgp_privkey_t key,
                                    unsigned int flags);
+
+int gnutls_privkey_import_openpgp_raw (gnutls_privkey_t pkey,
+                                    const gnutls_datum_t * data,
+                                    gnutls_openpgp_crt_fmt_t format,
+                                    const gnutls_openpgp_keyid_t keyid,
+                                    const char* password);
+
+int gnutls_privkey_import_x509_raw (gnutls_privkey_t pkey,
+                                    const gnutls_datum_t * data,
+                                    gnutls_x509_crt_fmt_t format,
+                                    const char* password);
+
+int gnutls_privkey_import_pkcs11_url (gnutls_privkey_t key, const char *url);
+
 int
 gnutls_privkey_import_ext (gnutls_privkey_t pkey,
                            gnutls_pk_algorithm_t pk,

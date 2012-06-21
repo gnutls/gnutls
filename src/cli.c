@@ -103,28 +103,6 @@ static int do_handshake (socket_st * socket);
 static void init_global_tls_stuff (void);
 static int cert_verify_ocsp (gnutls_session_t session);
 
-/* Helper functions to load a certificate and key
- * files into memory.
- */
-static gnutls_datum_t
-load_file (const char *file)
-{
-  gnutls_datum_t loaded_file = { NULL, 0 };
-  size_t length;
-
-  loaded_file.data = (void*)read_binary_file (file, &length);
-  if (loaded_file.data)
-    loaded_file.size = (unsigned int) length;
-
-  return loaded_file;
-}
-
-static void
-unload_file (gnutls_datum_t* data)
-{
-  free (data->data);
-}
-
 #define MAX_CRT 6
 static unsigned int x509_crt_size;
 static gnutls_pcert_st x509_crt[MAX_CRT];
@@ -167,7 +145,6 @@ load_keys (void)
 #ifdef ENABLE_PKCS11
   gnutls_pkcs11_privkey_t pkcs11_key;
 #endif
-  gnutls_x509_privkey_t tmp_key;
   unsigned char keyid[GNUTLS_OPENPGP_KEYID_SIZE];
 
   if (x509_certfile != NULL && x509_keyfile != NULL)
@@ -197,8 +174,8 @@ load_keys (void)
 #endif /* ENABLE_PKCS11 */
         {
 
-          data = load_file (x509_certfile);
-          if (data.data == NULL)
+          ret = gnutls_load_file (x509_certfile, &data);
+          if (ret < 0)
             {
               fprintf (stderr, "*** Error loading cert file.\n");
               exit (1);
@@ -241,7 +218,7 @@ load_keys (void)
           gnutls_x509_crt_deinit(crt_list[i]);
         }
 
-      unload_file (&data);
+      gnutls_free (data.data);
 
       ret = gnutls_privkey_init(&x509_key);
       if (ret < 0)
@@ -254,18 +231,8 @@ load_keys (void)
 #ifdef ENABLE_PKCS11
       if (strncmp (x509_keyfile, "pkcs11:", 7) == 0)
         {
-          gnutls_pkcs11_privkey_init (&pkcs11_key);
-
           ret =
-            gnutls_pkcs11_privkey_import_url (pkcs11_key, x509_keyfile, 0);
-          if (ret < 0)
-            {
-              fprintf (stderr, "*** Error loading url: %s\n",
-                       gnutls_strerror (ret));
-              exit (1);
-            }
-
-          ret = gnutls_privkey_import_pkcs11( x509_key, pkcs11_key, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+            gnutls_privkey_import_pkcs11_url (x509_key, x509_keyfile);
           if (ret < 0)
             {
               fprintf (stderr, "*** Error loading url: %s\n",
@@ -276,25 +243,14 @@ load_keys (void)
       else
 #endif /* ENABLE_PKCS11 */
         {
-          data = load_file (x509_keyfile);
-          if (data.data == NULL)
+          ret = gnutls_load_file (x509_keyfile, &data);
+          if (ret < 0)
             {
               fprintf (stderr, "*** Error loading key file.\n");
               exit (1);
             }
 
-          gnutls_x509_privkey_init (&tmp_key);
-
-          ret =
-            gnutls_x509_privkey_import (tmp_key, &data, x509ctype);
-          if (ret < 0)
-            {
-              fprintf (stderr, "*** Error loading key file: %s\n",
-                       gnutls_strerror (ret));
-              exit (1);
-            }
-
-          ret = gnutls_privkey_import_x509( x509_key, tmp_key, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+          ret = gnutls_privkey_import_x509_raw( x509_key, &data, x509ctype, NULL);
           if (ret < 0)
             {
               fprintf (stderr, "*** Error loading url: %s\n",
@@ -302,7 +258,7 @@ load_keys (void)
               exit (1);
             }
 
-          unload_file (&data);
+          gnutls_free(data.data);
         }
 
       fprintf (stdout, "Processed %d client X.509 certificates...\n",
@@ -320,8 +276,8 @@ load_keys (void)
     {
       gnutls_openpgp_crt_t tmp_pgp_crt;
 
-      data = load_file (pgp_certfile);
-      if (data.data == NULL)
+      ret = gnutls_load_file (pgp_certfile, &data);
+      if (ret < 0)
         {
           fprintf (stderr, "*** Error loading PGP cert file.\n");
           exit (1);
@@ -339,7 +295,7 @@ load_keys (void)
           exit (1);
         }
  
-      unload_file (&data);
+      gnutls_free (data.data);
 
       ret = gnutls_privkey_init(&pgp_key);
       if (ret < 0)
@@ -373,43 +329,17 @@ load_keys (void)
       else
 #endif /* ENABLE_PKCS11 */
         {
-          gnutls_openpgp_privkey_t tmp_pgp_key;
-
-          data = load_file (pgp_keyfile);
-          if (data.data == NULL)
-            {
-              fprintf (stderr, "*** Error loading PGP key file.\n");
-              exit (1);
-            }
-
-          gnutls_openpgp_privkey_init (&tmp_pgp_key);
-
-          ret =
-            gnutls_openpgp_privkey_import (tmp_pgp_key, &data,
-                                           GNUTLS_OPENPGP_FMT_BASE64, NULL,
-                                           0);
+          ret = gnutls_load_file (pgp_keyfile, &data);
           if (ret < 0)
             {
-              fprintf (stderr,
-                       "*** Error loading PGP key file: %s\n",
-                       gnutls_strerror (ret));
+              fprintf (stderr, "*** Error loading key file.\n");
               exit (1);
             }
 
           if (HAVE_OPT(PGPSUBKEY))
-            {
-              ret =
-                gnutls_openpgp_privkey_set_preferred_key_id (tmp_pgp_key, keyid);
-              if (ret < 0)
-                {
-                  fprintf (stderr,
-                      "*** Error setting preferred sub key id (%s): %s\n",
-                      OPT_ARG(PGPSUBKEY), gnutls_strerror (ret));
-                  exit (1);
-                }
-            }
-
-          ret = gnutls_privkey_import_openpgp( pgp_key, tmp_pgp_key, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
+            ret = gnutls_privkey_import_openpgp_raw( pgp_key, &data, x509ctype, keyid, NULL);
+          else
+            ret = gnutls_privkey_import_openpgp_raw( pgp_key, &data, x509ctype, NULL, NULL);
           if (ret < 0)
             {
               fprintf (stderr, "*** Error loading url: %s\n",
@@ -417,7 +347,7 @@ load_keys (void)
               exit (1);
             }
 
-          unload_file (&data);
+          gnutls_free(data.data);
         }
 
 
