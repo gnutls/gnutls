@@ -748,7 +748,7 @@ gnutls_anon_set_params_function (gnutls_anon_server_credentials_t res,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
  *   an error code is returned.
  *
- * Since 3.1
+ * Since 3.1.0
  **/
 int gnutls_load_file(const char* filename, gnutls_datum_t * data)
 {

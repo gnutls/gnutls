@@ -2574,7 +2574,7 @@ gnutls_pkcs11_obj_list_import_url (gnutls_pkcs11_obj_t * p_list,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.1
+ * Since: 3.1.0
  **/
 int
 gnutls_pkcs11_obj_list_import_url2 (gnutls_pkcs11_obj_t ** p_list,

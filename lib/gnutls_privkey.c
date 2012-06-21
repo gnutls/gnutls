@@ -774,7 +774,7 @@ gnutls_privkey_decrypt_data (gnutls_privkey_t key,
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.1
+ * Since: 3.1.0
  **/
 int gnutls_privkey_import_x509_raw (gnutls_privkey_t pkey,
                                     const gnutls_datum_t * data,
@@ -837,7 +837,7 @@ cleanup:
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.1
+ * Since: 3.1.0
  **/
 int gnutls_privkey_import_openpgp_raw (gnutls_privkey_t pkey,
                                     const gnutls_datum_t * data,
@@ -896,7 +896,7 @@ cleanup:
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
- * Since: 3.1
+ * Since: 3.1.0
  **/
 int
 gnutls_privkey_import_pkcs11_url (gnutls_privkey_t key, const char *url)
