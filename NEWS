@@ -11,6 +11,9 @@ used by openconnect vpn client for compatibility with Cisco's AnyConnect
 SSL VPN. It is marked as GNUTLS_DTLS0_9. Do not use it for newer protocols
 as it has issues.
 
+** libgnutls: Corrected bug that prevented resolving PKCS #11 URLs 
+if only the label is specified. Patch by David Woodhouse.
+
 ** API and ABI modifications:
 gnutls_session_set_premaster: Added
 
