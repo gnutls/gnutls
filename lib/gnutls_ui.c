@@ -34,6 +34,7 @@
 #include <gnutls_state.h>
 #include <gnutls_datum.h>
 #include <extras/randomart.h>
+#include <read-file.h>
 
 /**
  * gnutls_random_art:
@@ -734,4 +735,38 @@ gnutls_anon_set_params_function (gnutls_anon_server_credentials_t res,
                                  gnutls_params_function * func)
 {
   res->params_func = func;
+}
+
+/**
+ * gnutls_load_file:
+ * @filename: the name of the file to load
+ * @data: Where the file will be stored
+ *
+ * This function will load a file into a datum.
+ * The returned data are allocated using gnutls_malloc().
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
+ *   an error code is returned.
+ *
+ **/
+int gnutls_load_file(const char* filename, gnutls_datum_t * data)
+{
+size_t len;
+
+  data->data = (void*)read_binary_file(filename, &len);
+  if (data->data == NULL)
+    return GNUTLS_E_FILE_ERROR;
+  
+  if (malloc != gnutls_malloc)
+    {
+      void* tmp = gnutls_malloc(len);
+      
+      memcpy(tmp, data->data, len);
+      free(data->data);
+      data->data = tmp;
+    }
+  
+  data->size = len;
+  
+  return 0;
 }
