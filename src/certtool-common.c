@@ -346,6 +346,78 @@ load_x509_private_key (int mand, common_info_st * info)
   return key;
 }
 
+#define MAX_KEYS 256
+
+/* Loads a x509 private key list
+ */
+gnutls_x509_privkey_t *
+load_privkey_list (int mand, size_t * privkey_size, common_info_st * info)
+{
+  FILE *fd;
+  static gnutls_x509_privkey_t key[MAX_KEYS];
+  char *ptr;
+  int ret, i;
+  gnutls_datum_t dat;
+  size_t size;
+  int ptr_size;
+
+  *privkey_size = 0;
+  fprintf (stderr, "Loading private key list...\n");
+
+  if (info->privkey == NULL)
+    {
+      if (mand)
+        error (EXIT_FAILURE, 0, "missing --load-privkey");
+      else
+        return NULL;
+    }
+
+  fd = fopen (info->privkey, "r");
+  if (fd == NULL)
+    error (EXIT_FAILURE, errno, "%s", info->privkey);
+
+  size = fread (buffer, 1, sizeof (buffer) - 1, fd);
+  buffer[size] = 0;
+
+  fclose (fd);
+
+  ptr = (void*)buffer;
+  ptr_size = size;
+
+  for (i = 0; i < MAX_KEYS; i++)
+    {
+      ret = gnutls_x509_privkey_init (&key[i]);
+      if (ret < 0)
+        error (EXIT_FAILURE, 0, "privkey_init: %s", gnutls_strerror (ret));
+
+      dat.data = (void*)ptr;
+      dat.size = ptr_size;
+
+      ret = gnutls_x509_privkey_import (key[i], &dat, info->incert_format);
+      if (ret < 0 && *privkey_size > 0)
+        break;
+      if (ret < 0)
+        error (EXIT_FAILURE, 0, "privkey_import: %s", gnutls_strerror (ret));
+
+      ptr = strstr (ptr, "---END");
+      if (ptr == NULL)
+        break;
+      ptr++;
+
+      ptr_size = size;
+      ptr_size -=
+        (unsigned int) ((unsigned char *) ptr - (unsigned char *) buffer);
+
+      if (ptr_size < 0)
+        break;
+
+      (*privkey_size)++;
+    }
+  fprintf (stderr, "Loaded %d private keys.\n", (int) *privkey_size);
+
+  return key;
+}
+
 /* Loads the certificate
  * If mand is non zero then a certificate is mandatory. Otherwise
  * null will be returned if the certificate loading fails.

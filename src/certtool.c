@@ -2406,7 +2406,7 @@ generate_pkcs12 (common_info_st * cinfo)
 {
   gnutls_pkcs12_t pkcs12;
   gnutls_x509_crt_t *crts;
-  gnutls_x509_privkey_t key;
+  gnutls_x509_privkey_t *keys;
   int result;
   size_t size;
   gnutls_datum_t data;
@@ -2417,10 +2417,11 @@ generate_pkcs12 (common_info_st * cinfo)
   unsigned char _key_id[32];
   int indx;
   size_t ncrts;
+  size_t nkeys;
 
   fprintf (stderr, "Generating a PKCS #12 structure...\n");
 
-  key = load_x509_private_key (0, cinfo);
+  keys = load_privkey_list (0, &nkeys, cinfo);
   crts = load_cert_list (0, &ncrts, cinfo);
 
   name = get_pkcs12_key_name ();
@@ -2489,7 +2490,7 @@ generate_pkcs12 (common_info_st * cinfo)
         error (EXIT_FAILURE, 0, "set_bag: %s", gnutls_strerror (result));
     }
 
-  if (key)
+  for (i = 0; i < nkeys; i++)
     {
       gnutls_pkcs12_bag_t kbag;
 
@@ -2501,10 +2502,10 @@ generate_pkcs12 (common_info_st * cinfo)
 
       size = buffer_size;
       result =
-        gnutls_x509_privkey_export_pkcs8 (key, GNUTLS_X509_FMT_DER,
+        gnutls_x509_privkey_export_pkcs8 (keys[i], GNUTLS_X509_FMT_DER,
                                           pass, flags, buffer, &size);
       if (result < 0)
-        error (EXIT_FAILURE, 0, "key_export: %s", gnutls_strerror (result));
+        error (EXIT_FAILURE, 0, "key_export[%d]: %s", i, gnutls_strerror (result));
 
       data.data = buffer;
       data.size = size;
@@ -2522,9 +2523,9 @@ generate_pkcs12 (common_info_st * cinfo)
                gnutls_strerror (result));
 
       size = sizeof (_key_id);
-      result = gnutls_x509_privkey_get_key_id (key, 0, _key_id, &size);
+      result = gnutls_x509_privkey_get_key_id (keys[i], 0, _key_id, &size);
       if (result < 0)
-        error (EXIT_FAILURE, 0, "key_id: %s", gnutls_strerror (result));
+        error (EXIT_FAILURE, 0, "key_id[%d]: %s", i, gnutls_strerror (result));
 
       key_id.data = _key_id;
       key_id.size = size;
