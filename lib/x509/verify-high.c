@@ -460,6 +460,8 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
  * This function will try to verify the given certificate and return
  * its status.
  *
+ * Limitation: Pathlen constraints or key usage flags are not consulted.
+ *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
  *
