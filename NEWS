@@ -7,6 +7,9 @@ See the end for copying conditions.
 ** gnutls-cli: --benchmark-tls was split to --benchmark-tls-kx
 and --benchmark-tls-ciphers
 
+** certtool: generated PKCS #12 structures may hold more than one
+private key. Patch by Lucas Fisher.
+
 ** libgnutls: Added support for an old version of the DTLS protocol
 used by openconnect vpn client for compatibility with Cisco's AnyConnect 
 SSL VPN. It is marked as GNUTLS_DTLS0_9. Do not use it for newer protocols

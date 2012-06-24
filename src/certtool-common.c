@@ -353,12 +353,10 @@ load_x509_private_key (int mand, common_info_st * info)
 gnutls_x509_privkey_t *
 load_privkey_list (int mand, size_t * privkey_size, common_info_st * info)
 {
-  FILE *fd;
   static gnutls_x509_privkey_t key[MAX_KEYS];
   char *ptr;
   int ret, i;
-  gnutls_datum_t dat;
-  size_t size;
+  gnutls_datum_t dat, file_data;
   int ptr_size;
 
   *privkey_size = 0;
@@ -372,17 +370,12 @@ load_privkey_list (int mand, size_t * privkey_size, common_info_st * info)
         return NULL;
     }
 
-  fd = fopen (info->privkey, "r");
-  if (fd == NULL)
+  ret = gnutls_load_file(info->privkey, &file_data);
+  if (ret < 0)
     error (EXIT_FAILURE, errno, "%s", info->privkey);
 
-  size = fread (buffer, 1, sizeof (buffer) - 1, fd);
-  buffer[size] = 0;
-
-  fclose (fd);
-
-  ptr = (void*)buffer;
-  ptr_size = size;
+  ptr = (void*)file_data.data;
+  ptr_size = file_data.size;
 
   for (i = 0; i < MAX_KEYS; i++)
     {
@@ -404,7 +397,7 @@ load_privkey_list (int mand, size_t * privkey_size, common_info_st * info)
         break;
       ptr++;
 
-      ptr_size = size;
+      ptr_size = file_data.size;
       ptr_size -=
         (unsigned int) ((unsigned char *) ptr - (unsigned char *) buffer);
 
@@ -413,6 +406,8 @@ load_privkey_list (int mand, size_t * privkey_size, common_info_st * info)
 
       (*privkey_size)++;
     }
+  
+  gnutls_free(file_data.data);
   fprintf (stderr, "Loaded %d private keys.\n", (int) *privkey_size);
 
   return key;
