@@ -742,7 +742,8 @@ gnutls_anon_set_params_function (gnutls_anon_server_credentials_t res,
  * @filename: the name of the file to load
  * @data: Where the file will be stored
  *
- * This function will load a file into a datum.
+ * This function will load a file into a datum. The data are
+ * zero terminated but the terminating null is not included in length.
  * The returned data are allocated using gnutls_malloc().
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise
