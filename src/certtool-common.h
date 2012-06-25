@@ -72,6 +72,8 @@ gnutls_sec_param_t str_to_sec_param (const char *str);
 int generate_prime (int how, common_info_st * info);
 void dh_info (common_info_st * ci);
 
+gnutls_x509_privkey_t * load_privkey_list (int mand, size_t * privkey_size, common_info_st * info);
+
 FILE *safe_open_rw (const char *file, int privkey_op);
 
 extern unsigned char buffer[];

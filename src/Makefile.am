@@ -120,7 +120,7 @@ libcmd_cli_debug_la_SOURCES = cli-debug-args.def cli-debug-args.c cli-debug-args
 
 #certtool
 
-certtool_SOURCES = certtool.c dh.c certtool-common.c $(PKCS11_SRCS)
+certtool_SOURCES = certtool.c dh.c certtool-common.c certtool-extras.c $(PKCS11_SRCS)
 certtool_LDADD = ../lib/libgnutls.la 
 certtool_LDADD += libcmd-certtool.la ../gl/libgnu.la
 
@@ -136,7 +136,7 @@ libcmd_certtool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
 # p11 tool
 if ENABLE_PKCS11
 
-p11tool_SOURCES = p11tool-args.def p11tool.c pkcs11.c certtool-common.c p11tool.h $(PKCS11_SRCS)
+p11tool_SOURCES = p11tool-args.def p11tool.c pkcs11.c certtool-common.c certtool-extras.c p11tool.h $(PKCS11_SRCS)
 p11tool_LDADD = ../lib/libgnutls.la $(LIBOPTS_LDADD) $(LTLIBINTL)
 p11tool_LDADD += libcmd-p11tool.la ../gl/libgnu.la
 
