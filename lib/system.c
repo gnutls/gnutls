@@ -71,6 +71,9 @@ system_errno (gnutls_transport_ptr p)
     case WSAEINTR:
       ret = EINTR;
       break;
+    case WSAEMSGSIZE:
+      ret = EMSGSIZE;
+      break;
     default:
       ret = EIO;
       break;

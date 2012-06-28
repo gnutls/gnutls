@@ -186,22 +186,21 @@ _gnutls_dgram_read (gnutls_session_t session, mbuffer_st **bufel,
       _gnutls_read_log ("READ: %d returned from %p, errno=%d gerrno=%d\n",
 			(int) i, fd, errno, session->internals.errnum);
 
-      if (err == EAGAIN)
+      switch(err)
         {
-          ret = GNUTLS_E_AGAIN;
-          goto cleanup;
+          case EAGAIN:
+            ret = GNUTLS_E_AGAIN;
+            goto cleanup;
+          case EINTR:
+            ret = GNUTLS_E_INTERRUPTED;
+            goto cleanup;
+          case EMSGSIZE:
+            ret = GNUTLS_E_LARGE_PACKET;
+          default:
+            gnutls_assert ();
+            ret = GNUTLS_E_PULL_ERROR;
         }
-      else if (err == EINTR)
-        {
-          ret = GNUTLS_E_INTERRUPTED;
-          goto cleanup;
-        }
-      else
-        {
-          gnutls_assert ();
-          ret = GNUTLS_E_PULL_ERROR;
-          goto cleanup;
-        }
+      goto cleanup;
     }
   else
     {

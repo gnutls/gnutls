@@ -595,15 +595,17 @@ value instead of setting @code{errno} directly.
 
 @showfuncdesc{gnutls_transport_set_errno}
 
-@acronym{GnuTLS} currently only interprets the EINTR and EAGAIN errno
+@acronym{GnuTLS} currently only interprets the EINTR, EAGAIN and EMSGSIZE errno
 values and returns the corresponding @acronym{GnuTLS} error codes:
 @itemize
 @item @code{GNUTLS_E_INTERRUPTED} 
 @item @code{GNUTLS_E_AGAIN}
+@item @code{GNUTLS_E_LARGE_PACKET}
 @end itemize
 The EINTR and EAGAIN values are returned by interrupted system calls, 
 or when non blocking IO is used.  All @acronym{GnuTLS} functions can be 
-resumed (called again), if any of the above error codes is returned.  
+resumed (called again), if any of the above error codes is returned. The
+EMSGSIZE value is returned when attempting to send a large datagram.
 
 In the case of DTLS it is also desirable to override the generic 
 transport functions with functions that emulate the operation
