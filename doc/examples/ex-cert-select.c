@@ -38,42 +38,8 @@ cert_callback (gnutls_session_t session,
                int sign_algos_length, gnutls_pcert_st ** pcert,
                unsigned int *pcert_length, gnutls_privkey_t * pkey);
 
-gnutls_pcert_st crt;
+gnutls_pcert_st pcrt;
 gnutls_privkey_t key;
-
-/* Helper functions to load a certificate and key
- * files into memory.
- */
-static gnutls_datum_t
-load_file (const char *file)
-{
-  FILE *f;
-  gnutls_datum_t loaded_file = { NULL, 0 };
-  long filelen;
-  void *ptr;
-
-  if (!(f = fopen (file, "r"))
-      || fseek (f, 0, SEEK_END) != 0
-      || (filelen = ftell (f)) < 0
-      || fseek (f, 0, SEEK_SET) != 0
-      || !(ptr = malloc ((size_t) filelen))
-      || fread (ptr, 1, (size_t) filelen, f) < (size_t) filelen)
-    {
-      if (f)
-        fclose (f);
-      return loaded_file;
-    }
-
-  loaded_file.data = ptr;
-  loaded_file.size = (unsigned int) filelen;
-  return loaded_file;
-}
-
-static void
-unload_file (gnutls_datum_t data)
-{
-  free (data.data);
-}
 
 /* Load the certificate and the private key.
  */
@@ -82,16 +48,15 @@ load_keys (void)
 {
   int ret;
   gnutls_datum_t data;
-  gnutls_x509_privkey_t x509_key;
 
-  data = load_file (CERT_FILE);
-  if (data.data == NULL)
+  ret = gnutls_load_file (CERT_FILE, &data);
+  if (ret < 0)
     {
       fprintf (stderr, "*** Error loading certificate file.\n");
       exit (1);
     }
 
-  ret = gnutls_pcert_import_x509_raw (&crt, &data, GNUTLS_X509_FMT_PEM, 0);
+  ret = gnutls_pcert_import_x509_raw (&pcrt, &data, GNUTLS_X509_FMT_PEM, 0);
   if (ret < 0)
     {
       fprintf (stderr, "*** Error loading certificate file: %s\n",
@@ -99,38 +64,26 @@ load_keys (void)
       exit (1);
     }
 
-  unload_file (data);
+  gnutls_free(data.data);
 
-  data = load_file (KEY_FILE);
-  if (data.data == NULL)
+  ret = gnutls_load_file (KEY_FILE, &data);
+  if (ret < 0)
     {
       fprintf (stderr, "*** Error loading key file.\n");
       exit (1);
     }
 
-  gnutls_x509_privkey_init (&x509_key);
+  gnutls_privkey_init (&key);
 
-  ret = gnutls_x509_privkey_import (x509_key, &data, GNUTLS_X509_FMT_PEM);
+  ret = gnutls_privkey_import_x509_raw (key, &data, GNUTLS_X509_FMT_PEM, NULL);
   if (ret < 0)
     {
       fprintf (stderr, "*** Error loading key file: %s\n",
                gnutls_strerror (ret));
       exit (1);
     }
-
-  gnutls_privkey_init (&key);
-
-  ret =
-    gnutls_privkey_import_x509 (key, x509_key,
-                                GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);
-  if (ret < 0)
-    {
-      fprintf (stderr, "*** Error importing key: %s\n",
-               gnutls_strerror (ret));
-      exit (1);
-    }
-
-  unload_file (data);
+    
+  gnutls_free(data.data);
 }
 
 int
@@ -276,7 +229,7 @@ cert_callback (gnutls_session_t session,
   if (type == GNUTLS_CRT_X509)
     {
       *pcert_length = 1;
-      *pcert = &crt;
+      *pcert = &pcrt;
       *pkey = key;
     }
   else
