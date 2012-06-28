@@ -788,24 +788,11 @@ int gnutls_privkey_import_x509_raw (gnutls_privkey_t pkey,
   if (ret < 0)
     return gnutls_assert_val(ret);
 
-  if (password == NULL)
+  ret = gnutls_x509_privkey_import2(xpriv, data, format, password);
+  if (ret < 0)
     {
-      ret = gnutls_x509_privkey_import(xpriv, data, format);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto cleanup;
-        }
-    }
-  else
-    {
-      ret = gnutls_x509_privkey_import_pkcs8(xpriv, data, format, password, 0);
-      if (ret < 0)
-        {
-          gnutls_assert();
-          goto cleanup;
-        }
-    
+      gnutls_assert();
+      goto cleanup;
     }
 
   ret = gnutls_privkey_import_x509(pkey, xpriv, GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE);

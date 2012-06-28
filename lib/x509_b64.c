@@ -195,56 +195,16 @@ gnutls_pem_base64_encode_alloc (const char *msg,
   return 0;
 }
 
-
-/* decodes data and puts the result into result (locally allocated)
- * The result_size is the return value
- */
-static int
-_gnutls_base64_decode (const uint8_t * data, size_t data_size,
-                       uint8_t ** result)
-{
-  unsigned int i;
-  int pos, tmp, est;
-  uint8_t tmpres[48];
-  size_t tmpres_size, decode_size;
-
-  est = ((data_size * 3) / 4) + 1;
-  (*result) = gnutls_malloc (est);
-  if ((*result) == NULL)
-    return GNUTLS_E_MEMORY_ERROR;
-
-  pos = 0;
-  for (i = 0; i < data_size; i += 64)
-    {
-      if (data_size - i < 64)
-        decode_size = data_size - i;
-      else
-        decode_size = 64;
-    
-      tmpres_size = sizeof(tmpres);
-      tmp = base64_decode ((void*)&data[i], decode_size, (void*)tmpres, &tmpres_size);
-      if (tmp == 0)
-        {
-          gnutls_free (*result);
-          *result = NULL;
-          return tmp;
-        }
-      memcpy (&(*result)[pos], tmpres, tmpres_size);
-      pos += tmpres_size;
-    }
-  return pos;
-}
-
 /* copies data to result but removes newlines and <CR>
  * returns the size of the data copied.
  */
 inline static int
-cpydata (const uint8_t * data, int data_size, uint8_t ** result)
+cpydata (const uint8_t * data, int data_size, gnutls_datum_t *result)
 {
   int i, j;
 
-  (*result) = gnutls_malloc (data_size);
-  if (*result == NULL)
+  result->data = gnutls_malloc (data_size);
+  if (result->data == NULL)
     return GNUTLS_E_MEMORY_ERROR;
 
   for (j = i = 0; i < data_size; i++)
@@ -252,11 +212,73 @@ cpydata (const uint8_t * data, int data_size, uint8_t ** result)
       if (data[i] == '\n' || data[i] == '\r' || data[i] == ' '
           || data[i] == '\t')
         continue;
-      (*result)[j] = data[i];
+      else if (data[i] == '-') break;
+      result->data[j] = data[i];
       j++;
     }
+  
+  result->size = j;
+  result->data[j] = 0;
   return j;
 }
+
+/* decodes data and puts the result into result (locally allocated)
+ * The result_size is the return value
+ */
+int
+_gnutls_base64_decode (const uint8_t * data, size_t data_size,
+                       gnutls_datum_t * result)
+{
+  unsigned int i;
+  int pos, tmp, est, ret;
+  uint8_t tmpres[48];
+  size_t tmpres_size, decode_size;
+  gnutls_datum_t pdata;
+
+  ret = cpydata(data, data_size, &pdata);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+
+  est = ((data_size * 3) / 4) + 1;
+  
+  result->data = gnutls_malloc (est);
+  if (result->data == NULL)
+    return gnutls_assert_val(GNUTLS_E_MEMORY_ERROR);
+
+
+  pos = 0;
+  for (i = 0; i < pdata.size; i += 64)
+    {
+      if (pdata.size - i < 64)
+        decode_size = pdata.size - i;
+      else
+        decode_size = 64;
+    
+      tmpres_size = sizeof(tmpres);
+      tmp = base64_decode ((void*)&pdata.data[i], decode_size, (void*)tmpres, &tmpres_size);
+      if (tmp == 0)
+        {
+          gnutls_assert();
+          gnutls_free (result->data);
+          result->data = NULL;
+          ret = GNUTLS_E_PARSING_ERROR;
+          goto cleanup;
+        }
+      memcpy (&(result->data)[pos], tmpres, tmpres_size);
+      pos += tmpres_size;
+    }
+
+  result->size = pos;
+  ret = pos;
+
+cleanup:
+  gnutls_free (pdata.data);
+  return ret;
+}
+
 
 /* Searches the given string for ONE PEM encoded certificate, and
  * stores it in the result.
@@ -271,10 +293,9 @@ _gnutls_fbase64_decode (const char *header, const uint8_t * data,
   int ret;
   static const char top[] = "-----BEGIN ";
   static const char bottom[] = "-----END ";
-  uint8_t *rdata;
+  gnutls_datum_t res;
+  uint8_t *rdata, *kdata;
   int rdata_size;
-  uint8_t *kdata;
-  int kdata_size;
   char pem_header[128];
 
   _gnutls_str_cpy (pem_header, sizeof (pem_header), top);
@@ -331,28 +352,12 @@ _gnutls_fbase64_decode (const char *header, const uint8_t * data,
       return GNUTLS_E_BASE64_DECODING_ERROR;
     }
 
-  kdata_size = cpydata (rdata, rdata_size, &kdata);
-
-  if (kdata_size < 0)
+  if ((ret = _gnutls_base64_decode (rdata, rdata_size, &res)) < 0)
     {
-      gnutls_assert ();
-      return kdata_size;
-    }
-
-  if (kdata_size < 4)
-    {
-      gnutls_assert ();
-      gnutls_free (kdata);
-      return GNUTLS_E_BASE64_DECODING_ERROR;
-    }
-
-  if ((ret = _gnutls_base64_decode (kdata, kdata_size, result)) < 0)
-    {
-      gnutls_free (kdata);
       gnutls_assert ();
       return GNUTLS_E_BASE64_DECODING_ERROR;
     }
-  gnutls_free (kdata);
+  *result = res.data;
 
   return ret;
 }

@@ -1775,26 +1775,19 @@ privkey_info (common_info_st* cinfo)
   pem.data = buffer;
   pem.size = size;
 
-  ret = 0;
-  if (!cinfo->pkcs8)
-    ret = gnutls_x509_privkey_import (key, &pem, incert_format);
+  ret = gnutls_x509_privkey_import2 (key, &pem, incert_format, NULL);
 
   /* If we failed to import the certificate previously try PKCS #8 */
-  if (cinfo->pkcs8 || ret == GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR)
+  if (ret == GNUTLS_E_DECRYPTION_FAILED)
     {
-      ret = gnutls_x509_privkey_import_pkcs8 (key, &pem,
-                                              incert_format, NULL, GNUTLS_PKCS8_PLAIN);
-      if (ret == GNUTLS_E_DECRYPTION_FAILED)
-        {
           fprintf(stderr, "Encrypted structure detected...\n");
           if (cinfo->password)
             pass = cinfo->password;
           else
             pass = get_pass ();
 
-          ret = gnutls_x509_privkey_import_pkcs8 (key, &pem,
-                                                  incert_format, pass, 0);
-        }
+          ret = gnutls_x509_privkey_import2 (key, &pem,
+                                                  incert_format, pass);
     }
   if (ret < 0)
     error (EXIT_FAILURE, 0, "import error: %s", gnutls_strerror (ret));

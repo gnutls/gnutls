@@ -718,6 +718,15 @@ extern "C"
                                         gnutls_x509_crt_fmt_t format,
                                         const char *password,
                                         unsigned int flags);
+  int gnutls_x509_privkey_import_openssl (gnutls_x509_privkey_t key,
+                                          const gnutls_datum_t *data, gnutls_x509_crt_fmt_t format, 
+                                          const char* password);
+
+  int gnutls_x509_privkey_import2 (gnutls_x509_privkey_t key,
+                                   const gnutls_datum_t * data,
+                                   gnutls_x509_crt_fmt_t format,
+                                   const char* password);
+
   int gnutls_x509_privkey_import_rsa_raw (gnutls_x509_privkey_t key,
                                           const gnutls_datum_t * m,
                                           const gnutls_datum_t * e,

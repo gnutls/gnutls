@@ -802,6 +802,8 @@ GNUTLS_3_1_0 {
 	gnutls_privkey_import_x509_raw;
 	gnutls_privkey_import_pkcs11_url;
 	gnutls_load_file;
+	gnutls_x509_privkey_import_openssl;
+	gnutls_x509_privkey_import2;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

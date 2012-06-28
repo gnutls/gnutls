@@ -1,0 +1,306 @@
+/*
+ * Copyright (C) 2012 Free Software Foundation, Inc.
+ *
+ * Author: David Woodhouse
+ *
+ * This file is part of GnuTLS.
+ *
+ * The GnuTLS is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ *
+ */
+
+#include <gnutls_int.h>
+
+#include <gnutls_datum.h>
+#include <gnutls_global.h>
+#include <gnutls_errors.h>
+#include <gnutls_rsa_export.h>
+#include <common.h>
+#include <gnutls_x509.h>
+#include <x509_b64.h>
+#include "x509_int.h"
+#include <algorithms.h>
+#include <gnutls_num.h>
+#include <random.h>
+#include <pbkdf2-sha1.h>
+
+static int
+openssl_hash_password (const char *pass, gnutls_datum_t * key, gnutls_datum_t * salt)
+{
+  unsigned char md5[16];
+  gnutls_hash_hd_t hash;
+  unsigned int count = 0;
+  int err;
+
+  while (count < key->size)
+    {
+      err = gnutls_hash_init (&hash, GNUTLS_DIG_MD5);
+      if (err)
+        {
+          gnutls_assert ();
+          return err;
+        }
+      if (count)
+        {
+          err = gnutls_hash (hash, md5, sizeof (md5));
+          if (err)
+            {
+            hash_err:
+              gnutls_hash_deinit (hash, NULL);
+              gnutls_assert();
+              return err;
+            }
+        }
+      if (pass)
+        {
+          err = gnutls_hash (hash, pass, strlen (pass));
+          if (err)
+            goto hash_err;
+        }
+      err = gnutls_hash (hash, salt->data, salt->size);
+      if (err)
+        goto hash_err;
+
+      gnutls_hash_deinit (hash, md5);
+
+      if (key->size - count <= sizeof (md5))
+        {
+          memcpy (&key->data[count], md5, key->size - count);
+          break;
+        }
+
+      memcpy (&key->data[count], md5, sizeof (md5));
+      count += sizeof (md5);
+    }
+
+  return 0;
+}
+
+/**
+ * gnutls_x509_privkey_import_openssl:
+ * @key: The structure to store the parsed key
+ * @data: The DER or PEM encoded key.
+ * @format: Only PEM is supported
+ * @password: the password to decrypt the key (if it is encrypted).
+ *
+ * This function will convert the given PEM encrypted to 
+ * the native gnutls_x509_privkey_t format. The
+ * output will be stored in @key.  
+ *
+ * The @password should be in ASCII.
+ *
+ * If the Certificate is PEM encoded it should have a header of
+ * "PRIVATE KEY" and the "DEK-Info" header. 
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ **/
+int
+gnutls_x509_privkey_import_openssl (gnutls_x509_privkey_t key,
+                                    const gnutls_datum_t *data, gnutls_x509_crt_fmt_t format, const char* password)
+{
+  gnutls_cipher_hd_t handle;
+  gnutls_cipher_algorithm_t cipher;
+  gnutls_datum_t b64_data;
+  gnutls_datum_t salt, enc_key;
+  unsigned char *key_data;
+  const char *pem_header = (void*)data->data;
+  int ret, err;
+  unsigned int i, iv_size;
+
+  pem_header = memmem(pem_header, data->size, "DEK-Info: ", 10);
+  if (pem_header == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_PARSING_ERROR;
+    }
+  
+  pem_header += 10;
+
+  if (!strncmp (pem_header, "DES-EDE3-CBC,", 13))
+    {
+      pem_header += 13;
+      cipher = GNUTLS_CIPHER_3DES_CBC;
+    }
+  else if (!strncmp (pem_header, "AES-128-CBC,", 12))
+    {
+      pem_header += 12;
+      cipher = GNUTLS_CIPHER_AES_128_CBC;
+    }
+  else if (!strncmp (pem_header, "AES-256-CBC,", 12))
+    {
+      pem_header += 12;
+      cipher = GNUTLS_CIPHER_AES_256_CBC;
+    }
+  else
+    {
+      _gnutls_debug_log ("Unsupported PEM encryption type: %.10s\n", pem_header);
+      gnutls_assert();
+      return GNUTLS_E_INVALID_REQUEST;
+    }
+
+  iv_size = _gnutls_cipher_get_iv_size(cipher);
+  salt.size = iv_size;
+  salt.data = gnutls_malloc (salt.size);
+  if (!salt.data)
+    return GNUTLS_E_MEMORY_ERROR;
+    
+  for (i = 0; i < salt.size * 2; i++)
+    {
+      unsigned char x;
+      const char *c = &pem_header[i];
+
+      if (*c >= '0' && *c <= '9')
+        x = (*c) - '0';
+      else if (*c >= 'A' && *c <= 'F')
+        x = (*c) - 'A' + 10;
+      else
+        {
+          gnutls_assert();
+          /* Invalid salt in encrypted PEM file */
+          ret = GNUTLS_E_INVALID_REQUEST;
+          goto out_salt;
+        }
+      if (i & 1)
+        salt.data[i / 2] |= x;
+      else
+        salt.data[i / 2] = x << 4;
+    }
+
+  pem_header += salt.size * 2;
+  if (*pem_header != '\r' && *pem_header != '\n')
+    {
+      gnutls_assert();
+      ret = GNUTLS_E_INVALID_REQUEST;
+      goto out_salt;
+    }
+  while (*pem_header == '\n' || *pem_header == '\r')
+    pem_header++;
+
+  ret = _gnutls_base64_decode((const void*)pem_header, data->size, &b64_data);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto out_salt;
+    }
+
+  if (b64_data.size < 16)
+    {
+      /* Just to be sure our parsing is OK */
+      gnutls_assert();
+      ret = GNUTLS_E_PARSING_ERROR;
+      goto out_b64;
+    }
+
+  ret = GNUTLS_E_MEMORY_ERROR;
+  enc_key.size = gnutls_cipher_get_key_size (cipher);
+  enc_key.data = gnutls_malloc (enc_key.size);
+  if (!enc_key.data)
+    goto out_b64;
+
+  key_data = gnutls_malloc (b64_data.size);
+  if (!key_data)
+    goto out_enc_key;
+
+  while (1)
+    {
+      memcpy (key_data, b64_data.data, b64_data.size);
+
+      ret = openssl_hash_password (password, &enc_key, &salt);
+      if (ret)
+        goto out;
+
+      err = gnutls_cipher_init (&handle, cipher, &enc_key, &salt);
+      if (err)
+        {
+          gnutls_assert();
+          gnutls_cipher_deinit (handle);
+          ret = err;
+          goto out;
+        }
+
+      err = gnutls_cipher_decrypt (handle, key_data, b64_data.size);
+      gnutls_cipher_deinit (handle);
+      if (err)
+        {
+          gnutls_assert();
+          ret = -err;
+          goto out;
+        }
+
+      /* We have to strip any padding for GnuTLS to accept it.
+         So a bit more ASN.1 parsing for us.
+         FIXME: Consolidate with similar code in gnutls_tpm.c */
+      if (key_data[0] == 0x30)
+        {
+          gnutls_datum_t key_datum;
+          unsigned int blocksize = gnutls_cipher_get_block_size (cipher);
+          unsigned int keylen = key_data[1];
+          unsigned int ofs = 2;
+
+          if (keylen & 0x80)
+            {
+              int lenlen = keylen & 0x7f;
+              keylen = 0;
+
+              if (lenlen > 3)
+                goto fail;
+
+              while (lenlen)
+                {
+                  keylen <<= 8;
+                  keylen |= key_data[ofs++];
+                  lenlen--;
+                }
+            }
+          keylen += ofs;
+
+          /* If there appears to be more padding than required, fail */
+          if (b64_data.size - keylen >= blocksize)
+            goto fail;
+
+          /* If the padding bytes aren't all equal to the amount of padding, fail */
+          ofs = keylen;
+          while (ofs < b64_data.size)
+            {
+              if (key_data[ofs] != b64_data.size - keylen)
+                goto fail;
+              ofs++;
+            }
+
+          key_datum.data = key_data;
+          key_datum.size = keylen;
+          err =
+              gnutls_x509_privkey_import (key, &key_datum,
+                                          GNUTLS_X509_FMT_DER);
+          if (!err)
+            {
+              ret = 0;
+              goto out;
+            }
+        }
+    fail:
+      ret = GNUTLS_E_DECRYPTION_FAILED;
+      goto out;
+    }
+out:
+  gnutls_free (key_data);
+out_enc_key:
+  gnutls_free (enc_key.data);
+out_b64:
+  gnutls_free (b64_data.data);
+out_salt:
+  gnutls_free (salt.data);
+  return ret;
+}

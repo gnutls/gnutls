@@ -49,6 +49,7 @@ libgnutls_x509_la_SOURCES =	\
 	pkcs7.c			\
 	privkey.c		\
 	privkey_pkcs8.c		\
+	privkey_openssl.c	\
 	rfc2818_hostname.c	\
 	sign.c			\
 	verify.c		\
