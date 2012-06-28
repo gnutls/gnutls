@@ -14,6 +14,9 @@ as it has issues.
 ** libgnutls: Corrected bug that prevented resolving PKCS #11 URLs 
 if only the label is specified. Patch by David Woodhouse.
 
+** libgnutls: When EMSGSIZE errno is seen then GNUTLS_E_LARGE_PACKET
+is returned.
+
 ** API and ABI modifications:
 gnutls_session_set_premaster: Added
 

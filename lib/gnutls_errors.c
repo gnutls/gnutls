@@ -64,8 +64,6 @@ static const gnutls_error_entry error_algorithms[] = {
 
   ERROR_ENTRY (N_("An algorithm that is not enabled was negotiated."),
                GNUTLS_E_UNWANTED_ALGORITHM, 1),
-  ERROR_ENTRY (N_("A large TLS record packet was received."),
-               GNUTLS_E_LARGE_PACKET, 1),
   ERROR_ENTRY (N_("A record packet with illegal version was received."),
                GNUTLS_E_UNSUPPORTED_VERSION_PACKET, 1),
   ERROR_ENTRY (N_
@@ -164,6 +162,8 @@ static const gnutls_error_entry error_algorithms[] = {
                GNUTLS_E_KEY_USAGE_VIOLATION, 1),
   ERROR_ENTRY (N_("Resource temporarily unavailable, try again."),
                GNUTLS_E_AGAIN, 0),
+  ERROR_ENTRY (N_("The transmitted packet is too large (EMSGSIZE)."),
+               GNUTLS_E_LARGE_PACKET, 0),
   ERROR_ENTRY (N_("Function was interrupted."), GNUTLS_E_INTERRUPTED, 0),
   ERROR_ENTRY (N_("Rehandshake was requested by the peer."),
                GNUTLS_E_REHANDSHAKE, 0),

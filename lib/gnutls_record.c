@@ -1226,7 +1226,8 @@ _gnutls_recv_int (gnutls_session_t session, content_type_t type,
  * %GNUTLS_E_INTERRUPTED or %GNUTLS_E_AGAIN is returned, you must
  * call this function again, with the same parameters; alternatively
  * you could provide a %NULL pointer for data, and 0 for
- * size. cf. gnutls_record_get_direction().
+ * size. cf. gnutls_record_get_direction(). The errno value EMSGSIZE
+ * maps to %GNUTLS_E_LARGE_PACKET.
  *
  * Returns: The number of bytes sent, or a negative error code.  The
  *   number of bytes sent might be less than @data_size.  The maximum
