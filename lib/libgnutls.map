@@ -691,6 +691,7 @@ GNUTLS_3_0_0 {
 	gnutls_dtls_cookie_send;
 	gnutls_dtls_prestate_set;
 	gnutls_dtls_get_data_mtu;
+	gnutls_dtls_set_data_mtu;
 	gnutls_cipher_set_iv;
 	gnutls_pcert_deinit;
 	gnutls_pcert_import_x509;
