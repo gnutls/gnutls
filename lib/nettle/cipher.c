@@ -108,6 +108,7 @@ static int wrap_nettle_cipher_exists(gnutls_cipher_algorithm_t algo)
     case GNUTLS_CIPHER_AES_128_GCM:
     case GNUTLS_CIPHER_AES_256_GCM:
     case GNUTLS_CIPHER_CAMELLIA_128_CBC:
+    case GNUTLS_CIPHER_CAMELLIA_192_CBC:
     case GNUTLS_CIPHER_CAMELLIA_256_CBC:
     case GNUTLS_CIPHER_AES_128_CBC:
     case GNUTLS_CIPHER_AES_192_CBC:
@@ -151,6 +152,7 @@ wrap_nettle_cipher_init (gnutls_cipher_algorithm_t algo, void **_ctx, int enc)
       ctx->block_size = AES_BLOCK_SIZE;
       break;
     case GNUTLS_CIPHER_CAMELLIA_128_CBC:
+    case GNUTLS_CIPHER_CAMELLIA_192_CBC:
     case GNUTLS_CIPHER_CAMELLIA_256_CBC:
       ctx->encrypt = cbc_encrypt;
       ctx->decrypt = cbc_decrypt;
@@ -234,6 +236,7 @@ wrap_nettle_cipher_setkey (void *_ctx, const void *key, size_t keysize)
         aes_set_decrypt_key (ctx->ctx_ptr, keysize, key);
       break;
     case GNUTLS_CIPHER_CAMELLIA_128_CBC:
+    case GNUTLS_CIPHER_CAMELLIA_192_CBC:
     case GNUTLS_CIPHER_CAMELLIA_256_CBC:
       if (ctx->enc)
         camellia_set_encrypt_key (ctx->ctx_ptr, keysize, key);
