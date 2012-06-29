@@ -669,6 +669,46 @@ int overhead;
 }
 
 /**
+ * gnutls_dtls_set_data_mtu:
+ * @session: is a #gnutls_session_t structure.
+ * @mtu: The maximum unencrypted transfer unit of the session
+ *
+ * This function will set the maximum size of the *unencrypted* records
+ * which will be sent over a DTLS session. It is equivalent to calculating
+ * the DTLS packet overhead with the current encryption parameters, and
+ * calling gnutls_dtls_set_mtu() with that value. In particular, this means
+ * that you may need to call this function again after any negotiation or
+ * renegotiation, in order to ensure that the MTU is still sufficient to
+ * account for the new protocol overhead.
+ *
+ * Returns: %GNUTLS_E_SUCCESS (0) on success, or a negative error code.
+ *
+ * Since: 3.1
+ **/
+int gnutls_dtls_set_data_mtu (gnutls_session_t session, unsigned int mtu)
+{
+  int blocksize;
+  int overhead = _gnutls_record_overhead_rt(session, &blocksize);
+
+  /* You can't call this until the session is actually running */
+  if (overhead < 0)
+	  return GNUTLS_E_INVALID_SESSION;
+
+  /* Add the overhead inside the encrypted part */
+  mtu += overhead;
+
+  /* Round it up to the next multiple of blocksize */
+  mtu += blocksize - 1;
+  mtu -= mtu % blocksize;
+
+  /* Add the *unencrypted header size */
+  mtu += RECORD_HEADER_SIZE(session);
+
+  gnutls_dtls_set_mtu(session, mtu);
+  return GNUTLS_E_SUCCESS;
+}
+
+/**
  * gnutls_dtls_get_mtu:
  * @session: is a #gnutls_session_t structure.
  *
