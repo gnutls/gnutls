@@ -21,6 +21,7 @@ if only the label is specified. Patch by David Woodhouse.
 is returned.
 
 ** API and ABI modifications:
+gnutls_dtls_set_data_mtu: Added
 gnutls_session_set_premaster: Added
 
 
