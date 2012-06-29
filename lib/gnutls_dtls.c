@@ -613,10 +613,7 @@ int total = 0, ret, iv_size;
     {
       *blocksize = iv_size;
 
-      if (!IS_DTLS(session))
-        total += MAX_PAD_SIZE;
-      else
-        total += iv_size; /* iv_size == block_size */
+      total += iv_size; /* iv_size == block_size in DTLS */
 
       /* We always pad with at least one byte; never 0. */
       total++;
