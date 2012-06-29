@@ -581,6 +581,63 @@ void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu)
   session->internals.dtls.mtu  = mtu;
 }
 
+/* returns overhead imposed by the record layer (encryption/compression)
+ * etc. It does not include the record layer headers, since the caller
+ * needs to cope with rounding to multiples of blocksize, and the header
+ * is outside that.
+ *
+ * blocksize: will contain the block size when padding may be required or 1
+ *
+ * It may return a negative error code on error.
+ */
+static int _gnutls_record_overhead_rt(gnutls_session_t session, unsigned int *blocksize)
+{
+record_parameters_st *params;
+int total = 0, ret, iv_size;
+
+  if (session->internals.initial_negotiation_completed == 0)
+    return GNUTLS_E_INVALID_REQUEST;
+
+  ret = _gnutls_epoch_get (session, EPOCH_WRITE_CURRENT, &params);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+
+  /* requires padding */
+  iv_size = _gnutls_cipher_get_iv_size(params->cipher_algorithm);
+
+  if (_gnutls_cipher_is_block (params->cipher_algorithm) == CIPHER_BLOCK)
+    {
+      *blocksize = iv_size;
+
+      if (!IS_DTLS(session))
+        total += MAX_PAD_SIZE;
+      else
+        total += iv_size; /* iv_size == block_size */
+    }
+  else
+    {
+      *blocksize = 1;
+    }
+  
+  if (params->mac_algorithm == GNUTLS_MAC_AEAD)
+    total += _gnutls_cipher_get_tag_size(params->cipher_algorithm);
+  else
+    {
+      ret = _gnutls_hmac_get_algo_len(params->mac_algorithm);
+      if (ret < 0)
+        return gnutls_assert_val(ret);
+      total+=ret;
+    }
+
+  if (params->compression_algorithm != GNUTLS_COMP_NULL)
+    total += EXTRA_COMP_SIZE;
+  
+  /* We always pad with at least one byte; never 0. */
+  total++;
+
+  return total;
+}
+
 /**
  * gnutls_dtls_get_data_mtu:
  * @session: is a #gnutls_session_t structure.
@@ -595,13 +652,20 @@ void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu)
  **/
 unsigned int gnutls_dtls_get_data_mtu (gnutls_session_t session)
 {
-int ret;
+int mtu = session->internals.dtls.mtu;
+int blocksize = 0;
+int overhead;
+ 
+  mtu -= RECORD_HEADER_SIZE(session);
 
-  ret = _gnutls_record_overhead_rt(session);
-  if (ret >= 0)
-    return session->internals.dtls.mtu - ret;
-  else
-    return session->internals.dtls.mtu - RECORD_HEADER_SIZE(session);
+  overhead = _gnutls_record_overhead_rt(session, &blocksize);
+  if (overhead < 0)
+    return mtu;
+
+  if (blocksize)
+    mtu -= mtu % blocksize;
+
+  return mtu - overhead;
 }
 
 /**

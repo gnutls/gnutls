@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.0.21 (unreleased)
 
+** libgnutls: gnutls_dtls_get_data_mtu() is more precise. Based
+on patch by David Woodhouse.
+
 ** libgnutls: Fixed memory leak in PKCS #8 key import.
 
 ** libgnutls: Added support for an old version of the DTLS protocol
