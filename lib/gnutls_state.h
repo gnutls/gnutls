@@ -43,8 +43,6 @@ void
 _gnutls_record_set_default_version (gnutls_session_t session,
                                     unsigned char major, unsigned char minor);
 
-int _gnutls_record_overhead_rt(gnutls_session_t session);
-
 #include <gnutls_auth.h>
 
 #define CHECK_AUTH(auth, ret) if (gnutls_auth_get_type(session) != auth) { \
