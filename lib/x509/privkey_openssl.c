@@ -68,7 +68,7 @@ openssl_hash_password (const char *pass, gnutls_datum_t * key, gnutls_datum_t * 
           if (err)
             goto hash_err;
         }
-      err = gnutls_hash (hash, salt->data, salt->size);
+      err = gnutls_hash (hash, salt->data, 8);
       if (err)
         goto hash_err;
 
@@ -86,6 +86,19 @@ openssl_hash_password (const char *pass, gnutls_datum_t * key, gnutls_datum_t * 
 
   return 0;
 }
+
+static const struct pem_cipher {
+  const char *name;
+  gnutls_cipher_algorithm_t cipher;
+} pem_ciphers[] = {
+  { "DES-CBC", GNUTLS_CIPHER_DES_CBC },
+  { "DES-EDE3-CBC", GNUTLS_CIPHER_3DES_CBC },
+  { "AES-128-CBC", GNUTLS_CIPHER_AES_128_CBC },
+  { "AES-192-CBC", GNUTLS_CIPHER_AES_192_CBC },
+  { "AES-256-CBC", GNUTLS_CIPHER_AES_256_CBC },
+  { "CAMELLIA-128-CBC", GNUTLS_CIPHER_CAMELLIA_128_CBC },
+  { "CAMELLIA-256-CBC", GNUTLS_CIPHER_CAMELLIA_256_CBC },
+};
 
 /**
  * gnutls_x509_privkey_import_openssl:
@@ -111,13 +124,13 @@ gnutls_x509_privkey_import_openssl (gnutls_x509_privkey_t key,
                                     const gnutls_datum_t *data, gnutls_x509_crt_fmt_t format, const char* password)
 {
   gnutls_cipher_hd_t handle;
-  gnutls_cipher_algorithm_t cipher;
+  gnutls_cipher_algorithm_t cipher = GNUTLS_CIPHER_UNKNOWN;
   gnutls_datum_t b64_data;
   gnutls_datum_t salt, enc_key;
   unsigned char *key_data;
   const char *pem_header = (void*)data->data;
   int ret, err;
-  unsigned int i, iv_size;
+  unsigned int i, iv_size, l;
 
   pem_header = memmem(pem_header, data->size, "DEK-Info: ", 10);
   if (pem_header == NULL)
@@ -128,22 +141,19 @@ gnutls_x509_privkey_import_openssl (gnutls_x509_privkey_t key,
   
   pem_header += 10;
 
-  if (!strncmp (pem_header, "DES-EDE3-CBC,", 13))
+  for (i = 0; i < sizeof(pem_ciphers)/sizeof(pem_ciphers[0]); i++) 
     {
-      pem_header += 13;
-      cipher = GNUTLS_CIPHER_3DES_CBC;
+      l = strlen(pem_ciphers[i].name);
+      if (!strncmp(pem_header, pem_ciphers[i].name, l) &&
+          pem_header[l] == ',') 
+        {
+          pem_header += l + 1;
+          cipher = pem_ciphers[i].cipher;
+          break;
+        }
     }
-  else if (!strncmp (pem_header, "AES-128-CBC,", 12))
-    {
-      pem_header += 12;
-      cipher = GNUTLS_CIPHER_AES_128_CBC;
-    }
-  else if (!strncmp (pem_header, "AES-256-CBC,", 12))
-    {
-      pem_header += 12;
-      cipher = GNUTLS_CIPHER_AES_256_CBC;
-    }
-  else
+
+  if (cipher == GNUTLS_CIPHER_UNKNOWN)
     {
       _gnutls_debug_log ("Unsupported PEM encryption type: %.10s\n", pem_header);
       gnutls_assert();
