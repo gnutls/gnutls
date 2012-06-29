@@ -689,7 +689,7 @@ int overhead;
 int gnutls_dtls_set_data_mtu (gnutls_session_t session, unsigned int mtu)
 {
   unsigned int blocksize;
-  int overhead = _gnutls_record_overhead_rt(session, &blocksize);
+  int overhead = record_overhead_rt(session, &blocksize);
 
   /* You can't call this until the session is actually running */
   if (overhead < 0)
