@@ -35,6 +35,7 @@
 #include <gnutls_state.h>
 #include <gnutls/dtls.h>
 #include <timespec.h>
+#include <algorithms.h>
 
 /* returns a-b in ms */
 unsigned int
@@ -653,7 +654,7 @@ int total = 0, ret, iv_size;
 unsigned int gnutls_dtls_get_data_mtu (gnutls_session_t session)
 {
 int mtu = session->internals.dtls.mtu;
-int blocksize = 0;
+unsigned int blocksize = 1;
 int overhead;
  
   mtu -= RECORD_HEADER_SIZE(session);
@@ -687,7 +688,7 @@ int overhead;
  **/
 int gnutls_dtls_set_data_mtu (gnutls_session_t session, unsigned int mtu)
 {
-  int blocksize;
+  unsigned int blocksize;
   int overhead = _gnutls_record_overhead_rt(session, &blocksize);
 
   /* You can't call this until the session is actually running */
