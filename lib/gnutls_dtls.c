@@ -594,7 +594,7 @@ void gnutls_dtls_set_mtu (gnutls_session_t session, unsigned int mtu)
  *
  * It may return a negative error code on error.
  */
-static int _gnutls_record_overhead_rt(gnutls_session_t session, unsigned int *blocksize)
+static int record_overhead_rt(gnutls_session_t session, unsigned int *blocksize)
 {
 record_parameters_st *params;
 int total = 0, ret, iv_size;
@@ -662,7 +662,7 @@ int overhead;
  
   mtu -= RECORD_HEADER_SIZE(session);
 
-  overhead = _gnutls_record_overhead_rt(session, &blocksize);
+  overhead = record_overhead_rt(session, &blocksize);
   if (overhead < 0)
     return mtu;
 
