@@ -617,6 +617,9 @@ int total = 0, ret, iv_size;
         total += MAX_PAD_SIZE;
       else
         total += iv_size; /* iv_size == block_size */
+
+      /* We always pad with at least one byte; never 0. */
+      total++;
     }
   else
     {
@@ -635,9 +638,6 @@ int total = 0, ret, iv_size;
 
   if (params->compression_algorithm != GNUTLS_COMP_NULL)
     total += EXTRA_COMP_SIZE;
-  
-  /* We always pad with at least one byte; never 0. */
-  total++;
 
   return total;
 }
