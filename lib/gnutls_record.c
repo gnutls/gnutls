@@ -384,7 +384,14 @@ _gnutls_send_int (gnutls_session_t session, content_type_t type,
      _gnutls_packet2str (type), type, (int) data_size);
 
   if (data_size > MAX_RECORD_SEND_SIZE(session))
-    send_data_size = MAX_RECORD_SEND_SIZE(session);
+    {
+      if (IS_DTLS(session))
+        {
+          gnutls_assert ();
+          return GNUTLS_E_LARGE_PACKET;
+        }
+      send_data_size = MAX_RECORD_SEND_SIZE(session);
+    }
   else
     send_data_size = data_size;
 
