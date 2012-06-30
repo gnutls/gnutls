@@ -585,6 +585,7 @@ FUNCS += functions/gnutls_dtls_set_timeouts
 FUNCS += functions/gnutls_dtls_get_mtu
 FUNCS += functions/gnutls_dtls_get_data_mtu
 FUNCS += functions/gnutls_dtls_set_mtu
+FUNCS += functions/gnutls_dtls_set_data_mtu
 FUNCS += functions/gnutls_dtls_get_timeout
 FUNCS += functions/gnutls_dtls_cookie_send
 FUNCS += functions/gnutls_dtls_cookie_verify
