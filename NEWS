@@ -4,6 +4,9 @@ See the end for copying conditions.
 
 * Version 3.0.21 (unreleased)
 
+** libgnutls: In DTLS larger to mtu records result to 
+GNUTLS_E_LARGE_PACKET instead of being truncated.
+
 ** libgnutls: gnutls_dtls_get_data_mtu() is more precise. Based
 on patch by David Woodhouse.
 
