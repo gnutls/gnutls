@@ -608,7 +608,7 @@ gnutls_x509_privkey_import2 (gnutls_x509_privkey_t key,
           if (format == GNUTLS_X509_FMT_PEM)
             {
               int err;
-              err = gnutls_x509_privkey_import_openssl(key, data, format, password);
+              err = gnutls_x509_privkey_import_openssl(key, data, password);
               if (err < 0)
                 {
                   if (err == GNUTLS_E_DECRYPTION_FAILED) ret = err;

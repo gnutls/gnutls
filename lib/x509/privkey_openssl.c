@@ -105,7 +105,6 @@ static const struct pem_cipher {
  * gnutls_x509_privkey_import_openssl:
  * @key: The structure to store the parsed key
  * @data: The DER or PEM encoded key.
- * @format: Only PEM is supported
  * @password: the password to decrypt the key (if it is encrypted).
  *
  * This function will convert the given PEM encrypted to 
@@ -122,7 +121,7 @@ static const struct pem_cipher {
  **/
 int
 gnutls_x509_privkey_import_openssl (gnutls_x509_privkey_t key,
-                                    const gnutls_datum_t *data, gnutls_x509_crt_fmt_t format, const char* password)
+                                    const gnutls_datum_t *data, const char* password)
 {
   gnutls_cipher_hd_t handle;
   gnutls_cipher_algorithm_t cipher = GNUTLS_CIPHER_UNKNOWN;
