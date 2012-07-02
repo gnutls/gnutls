@@ -524,7 +524,12 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
           key->pk_algorithm = GNUTLS_PK_DSA;
           key->key = decode_dsa_key (&_data, key);
           if (key->key == NULL)
-            gnutls_assert ();
+            {
+              key->pk_algorithm = GNUTLS_PK_EC;
+              key->key = _gnutls_privkey_decode_ecc_key (&_data, key);
+              if (key->key == NULL)
+                gnutls_assert ();
+            }
         }
     }
 
