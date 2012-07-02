@@ -29,6 +29,46 @@ extern const char* side;
 #define HANDSHAKE(c, s) \
   HANDSHAKE_EXPECT(c,s,0,0)
 
+#define HANDSHAKE_DTLS_EXPECT(c, s, clierr, serverr) \
+  sret = cret = GNUTLS_E_LARGE_PACKET; \
+  do \
+    { \
+      if (cret == GNUTLS_E_LARGE_PACKET) \
+        { \
+          unsigned int mtu = gnutls_dtls_get_mtu(s); \
+          gnutls_dtls_set_mtu(s, mtu/2); \
+        } \
+      if (cret < 0 && gnutls_error_is_fatal(cret) == 0) \
+        { \
+          side = "client"; \
+          cret = gnutls_handshake (c); \
+        } \
+      if (sret == GNUTLS_E_LARGE_PACKET) \
+        { \
+          unsigned int mtu = gnutls_dtls_get_mtu(s); \
+          gnutls_dtls_set_mtu(s, mtu/2); \
+        } \
+      if (sret < 0 && gnutls_error_is_fatal(sret) == 0) \
+        { \
+          side = "server"; \
+          sret = gnutls_handshake (s); \
+        } \
+    } \
+  while (((gnutls_error_is_fatal(cret) == 0 && gnutls_error_is_fatal(sret) == 0)) && (cret < 0 || sret < 0)); \
+  if (cret != clierr || sret != serverr) \
+    { \
+      fprintf(stderr, "client: %s\n", gnutls_strerror(cret)); \
+      fprintf(stderr, "server: %s\n", gnutls_strerror(sret)); \
+      fail("Handshake failed\n"); \
+      exit(1); \
+    }
+
+#define HANDSHAKE_DTLS(c, s) \
+  HANDSHAKE_DTLS_EXPECT(c,s,0,0)
+
+#define HANDSHAKE(c, s) \
+  HANDSHAKE_EXPECT(c,s,0,0)
+
 #define TRANSFER(c, s, msg, msglen, buf, buflen) \
   do \
     { \
@@ -119,6 +159,7 @@ static size_t to_client_len = 0;
 #define RETURN_RND_EAGAIN(session)
 #endif
 
+#ifndef IGNORE_PUSH
 static ssize_t
 client_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
@@ -135,6 +176,8 @@ client_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 #endif
   return len;
 }
+
+#endif
 
 static ssize_t
 client_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
@@ -189,6 +232,7 @@ server_pull (gnutls_transport_ptr_t tr, void *data, size_t len)
   return len;
 }
 
+#ifndef IGNORE_PUSH
 static ssize_t
 server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 {
@@ -208,6 +252,8 @@ server_push (gnutls_transport_ptr_t tr, const void *data, size_t len)
 
   return len;
 }
+
+#endif
 
 /* inline is used to avoid a gcc warning if used in mini-eagain */
 inline static int server_pull_timeout_func(gnutls_transport_ptr_t ptr, unsigned int ms)

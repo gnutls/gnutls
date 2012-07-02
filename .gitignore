@@ -498,6 +498,7 @@ tests/key-id/Makefile.in
 tests/libutils.la
 tests/mini
 tests/mini-loss
+tests/mini-emsgsize-dtls
 tests/mini-deflate
 tests/mini-eagain
 tests/mini-eagain-dtls
