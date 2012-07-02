@@ -2,7 +2,7 @@ GnuTLS NEWS -- History of user-visible changes.                -*- outline -*-
 Copyright (C) 2000-2012 Free Software Foundation, Inc.
 See the end for copying conditions.
 
-* Version 3.0.21 (unreleased)
+* Version 3.0.21 (released 2012-07-02)
 
 ** libgnutls: fixed bug in gnutls_x509_privkey_import() 
 that prevented the loading of EC private keys when DER
