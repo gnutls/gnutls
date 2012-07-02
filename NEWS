@@ -4,6 +4,10 @@ See the end for copying conditions.
 
 * Version 3.0.21 (unreleased)
 
+** libgnutls: fixed bug in gnutls_x509_privkey_import() 
+that prevented the loading of EC private keys when DER
+encoded. Reported by David Woodhouse.
+
 ** libgnutls: In DTLS larger to mtu records result to 
 GNUTLS_E_LARGE_PACKET instead of being truncated.
 
