@@ -264,9 +264,8 @@ gnutls_x509_privkey_import_openssl (gnutls_x509_privkey_t key,
           goto out;
         }
 
-      /* We have to strip any padding for GnuTLS to accept it.
-         So a bit more ASN.1 parsing for us.
-         FIXME: Consolidate with similar code in gnutls_tpm.c */
+      /* We have to strip any padding to accept it.
+         So a bit more ASN.1 parsing for us.*/
       if (key_data[0] == 0x30)
         {
           gnutls_datum_t key_datum;
