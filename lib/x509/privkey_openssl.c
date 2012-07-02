@@ -130,16 +130,30 @@ gnutls_x509_privkey_import_openssl (gnutls_x509_privkey_t key,
   gnutls_datum_t salt, enc_key;
   unsigned char *key_data;
   const char *pem_header = (void*)data->data;
+  const char *pem_header_start = (void*)data->data;
+  ssize_t pem_header_size;
   int ret, err;
   unsigned int i, iv_size, l;
 
-  pem_header = memmem(pem_header, data->size, "DEK-Info: ", 10);
+  pem_header_size = data->size;
+
+  pem_header = memmem(pem_header, pem_header_size, "PRIVATE KEY---", 14);
+  if (pem_header == NULL)
+    {
+      gnutls_assert();
+      return GNUTLS_E_PARSING_ERROR;
+    }
+    
+  pem_header_size -= (ptrdiff_t)(pem_header-pem_header_start);
+
+  pem_header = memmem(pem_header, pem_header_size, "DEK-Info: ", 10);
   if (pem_header == NULL)
     {
       gnutls_assert();
       return GNUTLS_E_PARSING_ERROR;
     }
   
+  pem_header_size = data->size - (ptrdiff_t)(pem_header-pem_header_start) - 10;
   pem_header += 10;
 
   for (i = 0; i < sizeof(pem_ciphers)/sizeof(pem_ciphers[0]); i++) 
@@ -199,7 +213,7 @@ gnutls_x509_privkey_import_openssl (gnutls_x509_privkey_t key,
   while (*pem_header == '\n' || *pem_header == '\r')
     pem_header++;
 
-  ret = _gnutls_base64_decode((const void*)pem_header, data->size, &b64_data);
+  ret = _gnutls_base64_decode((const void*)pem_header, pem_header_size, &b64_data);
   if (ret < 0)
     {
       gnutls_assert();
