@@ -50,6 +50,9 @@ typedef int (*gnutls_privkey_decrypt_func) (gnutls_privkey_t key,
                                             const gnutls_datum_t * ciphertext,
                                             gnutls_datum_t * plaintext);
 
+typedef int (*gnutls_privkey_deinit_func) (gnutls_privkey_t key,
+                                           void *userdata);
+
 int gnutls_pubkey_init (gnutls_pubkey_t * key);
 void gnutls_pubkey_deinit (gnutls_pubkey_t key);
 int gnutls_pubkey_get_pk_algorithm (gnutls_pubkey_t key, unsigned int *bits);
@@ -194,6 +197,15 @@ gnutls_privkey_import_ext (gnutls_privkey_t pkey,
                            void* userdata,
                            gnutls_privkey_sign_func sign_func,
                            gnutls_privkey_decrypt_func decrypt_func,
+                           unsigned int flags);
+
+int
+gnutls_privkey_import_ext2 (gnutls_privkey_t pkey,
+                           gnutls_pk_algorithm_t pk,
+                           void* userdata,
+                           gnutls_privkey_sign_func sign_func,
+                           gnutls_privkey_decrypt_func decrypt_func,
+                           gnutls_privkey_deinit_func deinit_func,
                            unsigned int flags);
 
 int gnutls_privkey_sign_data (gnutls_privkey_t signer,

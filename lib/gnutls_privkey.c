@@ -50,6 +50,7 @@ struct gnutls_privkey_st
     struct {
       gnutls_privkey_sign_func sign_func;
       gnutls_privkey_decrypt_func decrypt_func;
+      gnutls_privkey_deinit_func deinit_func;
       void* userdata;
     } ext;
   } key;
@@ -305,6 +306,10 @@ gnutls_privkey_deinit (gnutls_privkey_t key)
       case GNUTLS_PRIVKEY_X509:
         gnutls_x509_privkey_deinit (key->key.x509);
         break;
+      case GNUTLS_PRIVKEY_EXT:
+        if (key->key.ext.deinit_func != NULL)
+          key->key.ext.deinit_func(key, key->key.ext.userdata);
+        break;
       default:
         break;
       }
@@ -409,6 +414,58 @@ int ret;
 
   pkey->key.ext.sign_func = sign_func;
   pkey->key.ext.decrypt_func = decrypt_func;
+  pkey->key.ext.deinit_func = NULL;
+  pkey->key.ext.userdata = userdata;
+  pkey->type = GNUTLS_PRIVKEY_EXT;
+  pkey->pk_algorithm = pk;
+  pkey->flags = flags;
+
+  return 0;
+}
+
+/**
+ * gnutls_privkey_import_ext2:
+ * @pkey: The private key
+ * @pk: The public key algorithm
+ * @userdata: private data to be provided to the callbacks
+ * @sign_func: callback for signature operations
+ * @decrypt_func: callback for decryption operations
+ * @deinit_func: a deinitialization function
+ * @flags: Flags for the import
+ *
+ * This function will associate the given callbacks with the
+ * #gnutls_privkey_t structure. At least one of the two callbacks
+ * must be non-null.
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1
+ **/
+int
+gnutls_privkey_import_ext2 (gnutls_privkey_t pkey,
+                           gnutls_pk_algorithm_t pk,
+                           void* userdata,
+                           gnutls_privkey_sign_func sign_func,
+                           gnutls_privkey_decrypt_func decrypt_func,
+                           gnutls_privkey_deinit_func deinit_func,
+                           unsigned int flags)
+{
+int ret;
+
+  ret = check_if_clean(pkey);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      return ret;
+    }
+  
+  if (sign_func == NULL && decrypt_func == NULL)
+    return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
+
+  pkey->key.ext.sign_func = sign_func;
+  pkey->key.ext.decrypt_func = decrypt_func;
+  pkey->key.ext.deinit_func = deinit_func;
   pkey->key.ext.userdata = userdata;
   pkey->type = GNUTLS_PRIVKEY_EXT;
   pkey->pk_algorithm = pk;

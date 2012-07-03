@@ -47,6 +47,7 @@ GNUTLS_CAMELLIA_192_CBC: Added
 gnutls_privkey_import_pkcs11_url: Added
 gnutls_privkey_import_openpgp_raw: Added
 gnutls_privkey_import_x509_raw: Added
+gnutls_privkey_import_ext2: Added
 gnutls_x509_privkey_import2: Added
 gnutls_x509_privkey_import_openssl: Added
 gnutls_load_file: Added
