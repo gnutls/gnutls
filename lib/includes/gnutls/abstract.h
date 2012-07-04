@@ -50,7 +50,7 @@ typedef int (*gnutls_privkey_decrypt_func) (gnutls_privkey_t key,
                                             const gnutls_datum_t * ciphertext,
                                             gnutls_datum_t * plaintext);
 
-typedef int (*gnutls_privkey_deinit_func) (gnutls_privkey_t key,
+typedef void (*gnutls_privkey_deinit_func) (gnutls_privkey_t key,
                                            void *userdata);
 
 int gnutls_pubkey_init (gnutls_pubkey_t * key);
@@ -188,6 +188,11 @@ int gnutls_privkey_import_x509_raw (gnutls_privkey_t pkey,
                                     const gnutls_datum_t * data,
                                     gnutls_x509_crt_fmt_t format,
                                     const char* password);
+
+int gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
+                                   const gnutls_datum_t * fdata,
+                                   gnutls_x509_crt_fmt_t format,
+                                   const char* password);
 
 int gnutls_privkey_import_pkcs11_url (gnutls_privkey_t key, const char *url);
 

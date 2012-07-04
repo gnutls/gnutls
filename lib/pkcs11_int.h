@@ -34,6 +34,9 @@
 #include <p11-kit/uri.h>
 typedef unsigned char ck_bool_t;
 
+extern gnutls_pkcs11_pin_callback_t _gnutls_pin_func;
+extern void *_gnutls_pin_data;
+
 struct pkcs11_session_info {
   struct ck_function_list * module;
   struct ck_token_info tinfo;
@@ -83,8 +86,8 @@ int pkcs11_login (struct pkcs11_session_info * sinfo,
 
 int pkcs11_call_token_func (struct p11_kit_uri *info, const unsigned retry);
 
-extern gnutls_pkcs11_token_callback_t token_func;
-extern void *token_data;
+extern gnutls_pkcs11_token_callback_t _gnutls_token_func;
+extern void *_gnutls_token_data;
 
 void pkcs11_rescan_slots (void);
 int pkcs11_info_to_url (struct p11_kit_uri *info,

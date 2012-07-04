@@ -76,6 +76,10 @@ COBJECTS = gnutls_record.c gnutls_compress.c debug.c gnutls_cipher.c	\
 	gnutls_pubkey.c locks.c hash.c gnutls_dtls.c system_override.c	\
 	crypto-backend.c verify-tofu.c
 
+if ENABLE_TROUSERS
+COBJECTS += tpm.c
+endif
+
 if ENABLE_PKCS11
 COBJECTS += pkcs11.c pkcs11_privkey.c pkcs11_write.c pkcs11_secret.c
 endif
@@ -120,7 +124,7 @@ libgnutls_la_LIBADD = ../gl/libgnu.la x509/libgnutls_x509.la \
 	auth/libgnutls_auth.la algorithms/libgnutls_alg.la \
 	extras/libgnutls_extras.la \
 	$(LTLIBZ)  $(LTLIBINTL) $(LIBSOCKET) $(LTLIBDL) \
-	$(LTLIBPTHREAD) $(P11_KIT_LIBS) $(LIB_SELECT)
+	$(LTLIBPTHREAD) $(P11_KIT_LIBS) $(LIB_SELECT) $(TSS_LIBS)
 
 if ENABLE_OPENPGP
 libgnutls_la_LIBADD += openpgp/libgnutls_openpgp.la

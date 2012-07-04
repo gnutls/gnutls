@@ -153,6 +153,33 @@ fi
 
 AM_CONDITIONAL(ENABLE_PKCS11, test "$with_p11_kit" != "no")
 
+AC_ARG_WITH(tpm,
+	AS_HELP_STRING([--without-tpm],
+		[Build without TPM (trousers) support]))
+if test "$with_tpm" != "no"; then
+    LIBS="$oldlibs -ltspi"
+    AC_MSG_CHECKING([for tss library])
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([
+		   #include <trousers/tss.h>
+		   #include <trousers/trousers.h>],[
+		   int err = Tspi_Context_Create((void *)0);
+		   Trspi_Error_String(err);])],
+		  [AC_MSG_RESULT(yes)
+		   AC_SUBST([TSS_LIBS], [-ltspi])
+		   AC_SUBST([TSS_CFLAGS], [])
+		   AC_DEFINE([HAVE_TROUSERS], 1, [Enable TPM])
+		   with_tpm=yes],
+		  [AC_MSG_RESULT(no)
+   	           AC_MSG_WARN([[
+*** 
+*** trousers was not found. TPM support will be disabled.
+*** ]])
+		  with_tpm=no])
+    LIBS="$oldlibs"
+fi
+
+AM_CONDITIONAL(ENABLE_TROUSERS, test "$with_tpm" != "no")
+
 enable_local_libopts=yes
 dnl PKG_CHECK_MODULES([autoopts], autoopts >= 36.2.11,, [enable_local_libopts=yes])
 
@@ -206,6 +233,7 @@ if test x$ac_zlib != xno; then
 fi
 AC_SUBST(GNUTLS_REQUIRES_PRIVATE)
 AC_SUBST(GNUTLS_ZLIB_LIBS_PRIVATE)
+
 
 
 gl_INIT
@@ -581,4 +609,5 @@ AC_MSG_NOTICE([Hardware acceleration/support:
   /dev/crypto:      $enable_cryptodev
   Hardware accel:   $hw_accel
   PKCS#11 support:  $with_p11_kit
+  TPM support:      $with_tpm
 ])

@@ -74,11 +74,11 @@ static struct gnutls_pkcs11_provider_s providers[MAX_PROVIDERS];
 static unsigned int active_providers = 0;
 static unsigned int initialized_registered = 0;
 
-static gnutls_pkcs11_pin_callback_t pin_func;
-static void *pin_data;
+gnutls_pkcs11_pin_callback_t _gnutls_pin_func;
+void *_gnutls_pin_data;
 
-gnutls_pkcs11_token_callback_t token_func;
-void *token_data;
+gnutls_pkcs11_token_callback_t _gnutls_token_func;
+void *_gnutls_token_data;
 
 int
 pkcs11_rv_to_err (ck_rv_t rv)
@@ -651,8 +651,8 @@ void
 gnutls_pkcs11_set_pin_function (gnutls_pkcs11_pin_callback_t fn,
                                 void *userdata)
 {
-  pin_func = fn;
-  pin_data = userdata;
+  _gnutls_pin_func = fn;
+  _gnutls_pin_data = userdata;
 }
 
 /**
@@ -669,8 +669,8 @@ void
 gnutls_pkcs11_set_token_function (gnutls_pkcs11_token_callback_t fn,
                                   void *userdata)
 {
-  token_func = fn;
-  token_data = userdata;
+  _gnutls_token_func = fn;
+  _gnutls_token_data = userdata;
 }
 
 int
@@ -1953,7 +1953,7 @@ retrieve_pin_for_callback (struct ck_token_info *token_info, int attempts,
   if (attempts > 0)
     flags |= GNUTLS_PKCS11_PIN_WRONG;
 
-  ret = pin_func (pin_data, attempts, (char*)token_str, label,
+  ret = _gnutls_pin_func (_gnutls_pin_data, attempts, (char*)token_str, label,
                   flags, pin_value, GNUTLS_PKCS11_MAX_PIN_LEN);
   free (token_str);
   free (label);
@@ -1987,7 +1987,7 @@ retrieve_pin (struct p11_kit_uri *info, struct ck_token_info *token_info,
     }
 
   /* The global gnutls pin callback */
-  if (pin_func && ret < 0)
+  if (_gnutls_pin_func && ret < 0)
     ret = retrieve_pin_for_callback (token_info, attempts, user_type, pin);
 
   /* Otherwise, PIN entry is necessary for login, so fail if there's
@@ -2102,7 +2102,7 @@ pkcs11_call_token_func (struct p11_kit_uri *info, const unsigned retry)
 
   tinfo = p11_kit_uri_get_token_info (info);
   label = p11_kit_space_strdup (tinfo->label, sizeof (tinfo->label));
-  ret = (token_func) (token_data, label, retry);
+  ret = (_gnutls_token_func) (_gnutls_token_data, label, retry);
   free (label);
 
   return ret;
