@@ -435,7 +435,8 @@ int ret;
  *
  * This function will associate the given callbacks with the
  * #gnutls_privkey_t structure. At least one of the two callbacks
- * must be non-null.
+ * must be non-null. If a deinitialization function is provided
+ * then flags is assumed to contain %GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -470,6 +471,10 @@ int ret;
   pkey->type = GNUTLS_PRIVKEY_EXT;
   pkey->pk_algorithm = pk;
   pkey->flags = flags;
+
+  /* Ensure gnutls_privkey_deinit() calls the deinit_func */
+  if (deinit_func)
+    pkey->flags |= GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE;
 
   return 0;
 }
