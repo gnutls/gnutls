@@ -3,7 +3,7 @@ prog-name     = tpmtool;
 prog-title    = "GnuTLS TPM tool";
 prog-desc     = "Program to handle TPM as a cryptographic device.\n";
 detail    = "Program that allows handling cryptographic data from the TPM chip.";
-short-usage   = "tpmtool [options] [url]\ntpmtool --help for usage instructions.\n";
+short-usage   = "tpmtool [options]\ntpmtool --help for usage instructions.\n";
 explain       = "";
 
 #define  OUTFILE_OPT   1
