@@ -451,7 +451,7 @@ gnutls_pkcs11_privkey_export_url (gnutls_pkcs11_privkey_t key,
  * @flags: should be zero
  *
  * This function will generate a private key in the specified
- * by the @url token. The pivate key will be generate within
+ * by the @url token. The private key will be generate within
  * the token and will not be exportable.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a

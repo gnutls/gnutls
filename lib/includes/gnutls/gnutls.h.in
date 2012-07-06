@@ -1915,7 +1915,7 @@ int gnutls_load_file(const char* filename, gnutls_datum_t * data);
 #define GNUTLS_E_SESSION_EOF -328
 
 #define GNUTLS_E_TPM_ERROR -329
-#define GNUTLS_E_TPM_PASSWORD_ERROR -330
+#define GNUTLS_E_TPM_KEY_PASSWORD_ERROR -330
 #define GNUTLS_E_TPM_SRK_PASSWORD_ERROR -331
 
 #define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250

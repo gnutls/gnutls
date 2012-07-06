@@ -807,6 +807,7 @@ GNUTLS_3_1_0 {
 	gnutls_x509_privkey_import2;
 	gnutls_privkey_import_ext2;
 	gnutls_privkey_import_tpm_raw;
+        gnutls_tpm_privkey_generate;
 } GNUTLS_3_0_0;
 
 GNUTLS_PRIVATE {

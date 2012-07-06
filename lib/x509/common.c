@@ -996,6 +996,42 @@ cleanup:
 
 }
 
+int _gnutls_x509_encode_octet_string(const void* input_data, size_t input_size,
+                                     gnutls_datum_t* output)
+{
+  int ret;
+  ASN1_TYPE c2 = ASN1_TYPE_EMPTY;
+
+  if ((ret = asn1_create_element
+       (_gnutls_get_pkix (), "PKIX1.pkcs-7-Data", &c2)) != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      ret = _gnutls_asn2err (ret);
+      goto cleanup;
+    }
+
+  ret = asn1_write_value (c2, "", input_data, input_size);
+  if (ret != ASN1_SUCCESS)
+    {
+      gnutls_assert ();
+      ret = _gnutls_asn2err (ret);
+      goto cleanup;
+    }
+
+  ret = _gnutls_x509_der_encode(c2, "", output, 0);
+  if (ret < 0)
+    {
+      gnutls_assert ();
+      goto cleanup;
+    }
+
+  ret = 0;
+
+cleanup:
+  asn1_delete_structure (&c2);
+  return ret;
+}
+
 /* DER Encodes the src ASN1_TYPE and stores it to
  * the given datum. If str is non zero then the data are encoded as
  * an OCTET STRING.

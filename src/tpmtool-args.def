@@ -1,0 +1,43 @@
+AutoGen Definitions options;
+prog-name     = tpmtool;
+prog-title    = "GnuTLS TPM tool";
+prog-desc     = "Program to handle TPM as a cryptographic device.\n";
+detail    = "Program that allows handling cryptographic data from the TPM chip.";
+short-usage   = "tpmtool [options] [url]\ntpmtool --help for usage instructions.\n";
+explain       = "";
+
+#define  OUTFILE_OPT   1
+#include args-std.def
+
+flag = {
+    name      = generate-rsa;
+    descrip   = "Generate an RSA private-public key pair";
+    doc = "Generates an RSA private-public key pair on the specified token.";
+};
+
+flag = {
+    name      = bits;
+    arg-type  = number;
+    descrip   = "Specify the number of bits for key generate";
+    doc      = "";
+};
+
+doc-section = {
+  ds-type = 'SEE ALSO';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+    p11tool (1), certtool (1)
+_EOT_;
+};
+
+doc-section = {
+  ds-type = 'EXAMPLES';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+To generate a public key use:
+@example
+$ tpmtool --generate-rsa --bits 1024
+@end example
+_EOT_;
+};
+

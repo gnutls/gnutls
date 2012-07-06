@@ -71,6 +71,9 @@ int _gnutls_x509_set_time (ASN1_TYPE c2, const char *where, time_t tim, int gene
 int _gnutls_x509_decode_octet_string (const char *string_type,
                                       const uint8_t * der, size_t der_size,
                                       uint8_t * output, size_t * output_size);
+int _gnutls_x509_encode_octet_string(const void* input_data, size_t input_size,
+                                     gnutls_datum_t* output);
+
 int _gnutls_x509_oid_data2string (const char *OID, void *value,
                                   int value_size, char *res,
                                   size_t * res_size);

@@ -46,6 +46,10 @@ if ENABLE_OCSP
 bin_PROGRAMS += ocsptool
 endif
 
+if ENABLE_TROUSERS
+bin_PROGRAMS += tpmtool
+endif
+
 if ENABLE_PKCS11
 bin_PROGRAMS += p11tool
 PKCS11_SRCS = p11common.c p11common.h
@@ -150,11 +154,29 @@ libcmd_p11tool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
 
 endif # ENABLE_PKCS11
 
+if ENABLE_TROUSERS
+
+tpmtool_SOURCES = tpmtool-args.def tpmtool.c certtool-common.c certtool-extras.c
+tpmtool_LDADD = ../lib/libgnutls.la $(LIBOPTS_LDADD) $(LTLIBINTL)
+tpmtool_LDADD += libcmd-tpmtool.la ../gl/libgnu.la
+
+noinst_LTLIBRARIES += libcmd-tpmtool.la
+libcmd_tpmtool_la_CFLAGS =
+libcmd_tpmtool_la_SOURCES = tpmtool-args.def tpmtool-args.c tpmtool-args.h \
+	certtool-cfg.h certtool-cfg.c
+libcmd_tpmtool_la_LIBADD = ../gl/libgnu.la $(LTLIBREADLINE)
+libcmd_tpmtool_la_LIBADD += ../lib/libgnutls.la
+libcmd_tpmtool_la_LIBADD += ../gl/libgnu.la $(INET_PTON_LIB)
+
+endif # ENABLE_TROUSERS
+
 BUILT_SOURCES = ocsptool-args.c p11tool-args.c psk-args.c cli-debug-args.c \
 		cli-args.c serv-args.c srptool-args.c certtool-args.c
 
 ocsptool-args.c: $(srcdir)/args-std.def $(srcdir)/ocsptool-args.def
 	-autogen ocsptool-args.def
+tpmtool-args.c: $(srcdir)/args-std.def $(srcdir)/tpmtool-args.def
+	-autogen tpmtool-args.def
 p11tool-args.c: $(srcdir)/args-std.def $(srcdir)/p11tool-args.def
 	-autogen p11tool-args.def
 psk-args.c: $(srcdir)/args-std.def $(srcdir)/psk-args.def
