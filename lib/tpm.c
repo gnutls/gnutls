@@ -33,6 +33,7 @@
 #include <gnutls_int.h>
 #include <gnutls_errors.h>
 #include <pkcs11_int.h>
+#include <x509/common.h>
 
 #include <trousers/tss.h>
 #include <trousers/trousers.h>
@@ -113,10 +114,15 @@ tpm_sign_fn (gnutls_privkey_t key, void *_s,
  * @pkey: The private key
  * @fdata: The TPM key to be imported
  * @format: The format of the private key
- * @password: A password (optional)
+ * @srk_password: A password for the key (optional)
+ * @tpm_password: A password for the TPM (optional)
  *
  * This function will import the given private key to the abstract
- * #gnutls_privkey_t structure. 
+ * #gnutls_privkey_t structure. If a password is needed to decrypt
+ * the provided key or the provided password is wrong, then 
+ * %GNUTLS_E_TPM_SRK_PASSWORD_ERROR is returned. If the TPM password
+ * is wrong or not provided then %GNUTLS_E_TPM_PASSWORD_ERROR
+ * is returned. 
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
  *   negative error value.
@@ -128,73 +134,40 @@ int
 gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
 			       const gnutls_datum_t * fdata,
 			       gnutls_x509_crt_fmt_t format,
-			       const char *password)
+			       const char *srk_password,
+			       const char *tpm_password)
 {
   static const TSS_UUID SRK_UUID = TSS_UUID_SRK;
-  char pin_value[GNUTLS_PKCS11_MAX_PIN_LEN];
   gnutls_datum_t asn1;
-  unsigned int tss_len;
-  unsigned int attempts = 0;
-  int ofs, err, ret;
+  size_t slen;
+  int err, ret;
   struct tpm_ctx_st *s;
   gnutls_datum_t tmp_sig;
   static const char nullpass[20];
 
-  err = gnutls_pem_base64_decode_alloc ("TSS KEY BLOB", fdata, &asn1);
-  if (err)
+  ret = gnutls_pem_base64_decode_alloc ("TSS KEY BLOB", fdata, &asn1);
+  if (ret)
     {
       gnutls_assert ();
       _gnutls_debug_log ("Error decoding TSS key blob: %s\n",
-			 gnutls_strerror (err));
-      return GNUTLS_E_INVALID_REQUEST;
+			 gnutls_strerror (ret));
+      return ret;
     }
 
-  /* FIXME: do proper decoding */
-
-  /* Ick. We have to parse the ASN1 OCTET_STRING for ourselves. */
-  if (asn1.size < 2 || asn1.data[0] != 0x04 /* OCTET_STRING */ )
+  slen = asn1.size;
+  ret = _gnutls_x509_decode_octet_string(NULL, asn1.data, asn1.size, asn1.data, &slen);
+  if (ret < 0)
     {
-      gnutls_assert ();
-      _gnutls_debug_log ("Error in TSS key blob\n");
-      ret = GNUTLS_E_PARSING_ERROR;
+      gnutls_assert();
       goto out_blob;
     }
+  asn1.size = slen;
 
   s = gnutls_malloc (sizeof (*s));
   if (s == NULL)
     {
       gnutls_assert ();
       ret = GNUTLS_E_MEMORY_ERROR;
-      goto out_ctx;
-    }
-
-  tss_len = asn1.data[1];
-  ofs = 2;
-  if (tss_len & 0x80)
-    {
-      unsigned int lenlen = tss_len & 0x7f;
-
-      if (asn1.size < 2 + lenlen || lenlen > 3)
-	{
-	  gnutls_assert ();
-	  _gnutls_debug_log ("Error in TSS key blob\n");
-	  ret = GNUTLS_E_PARSING_ERROR;
-	  goto out_blob;
-	}
-
-      tss_len = 0;
-      while (lenlen)
-	{
-	  tss_len <<= 8;
-	  tss_len |= asn1.data[ofs++];
-	  lenlen--;
-	}
-    }
-  if (tss_len + ofs != asn1.size)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("Error in TSS key blob\n");
-      ret = GNUTLS_E_PARSING_ERROR;
       goto out_blob;
     }
 
@@ -205,7 +178,7 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
       _gnutls_debug_log ("Failed to create TPM context: %s\n",
 			 Trspi_Error_String (err));
       ret = GNUTLS_E_TPM_ERROR;
-      goto out_blob;
+      goto out_ctx;
     }
   err = Tspi_Context_Connect (s->tpm_context, NULL);
   if (err)
@@ -214,7 +187,7 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
       _gnutls_debug_log ("Failed to connect TPM context: %s\n",
 			 Trspi_Error_String (err));
       ret = GNUTLS_E_TPM_ERROR;
-      goto out_context;
+      goto out_tspi_ctx;
     }
   err =
       Tspi_Context_LoadKeyByUUID (s->tpm_context, TSS_PS_TYPE_SYSTEM,
@@ -225,7 +198,7 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
       _gnutls_debug_log
 	  ("Failed to load TPM SRK key: %s\n", Trspi_Error_String (err));
       ret = GNUTLS_E_TPM_ERROR;
-      goto out_context;
+      goto out_tspi_ctx;
     }
   err = Tspi_GetPolicyObject (s->srk, TSS_POLICY_USAGE, &s->srk_policy);
   if (err)
@@ -238,10 +211,10 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
     }
 
   /* We don't seem to get the error here... */
-  if (password)
+  if (srk_password)
     err = Tspi_Policy_SetSecret (s->srk_policy,
 				 TSS_SECRET_MODE_PLAIN,
-				 strlen (password), (BYTE *) password);
+				 strlen (srk_password), (BYTE *) srk_password);
   else				/* Well-known NULL key */
     err = Tspi_Policy_SetSecret (s->srk_policy,
 				 TSS_SECRET_MODE_SHA1,
@@ -257,10 +230,10 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
 
   /* ... we get it here instead. */
   err = Tspi_Context_LoadKeyByBlob (s->tpm_context, s->srk,
-				    tss_len, asn1.data + ofs, &s->tpm_key);
+				    asn1.size, asn1.data, &s->tpm_key);
   if (err != 0)
     {
-      if (password)
+      if (srk_password)
 	{
 	  gnutls_assert ();
 	  _gnutls_debug_log
@@ -276,7 +249,7 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
 	}
       else
 	{
-	  ret = gnutls_assert_val (GNUTLS_E_PIN_ERROR);
+	  ret = gnutls_assert_val (GNUTLS_E_TPM_SRK_PASSWORD_ERROR);
 	  goto out_srkpol;
 	}
     }
@@ -321,25 +294,16 @@ retry_sign:
 	    }
 	}
 
-      ret =
-	  _gnutls_pin_func (_gnutls_pin_data, attempts++, "tpm:",
-			    "TPM key", 0, pin_value,
-			    GNUTLS_PKCS11_MAX_PIN_LEN);
-      if (ret < 0)
-	{
-	  ret = gnutls_assert_val (GNUTLS_E_PIN_ERROR);
-	  goto out_key_policy;
-	}
-
       err = Tspi_Policy_SetSecret (s->tpm_key_policy,
 				   TSS_SECRET_MODE_PLAIN,
-				   strlen (pin_value), (void *) pin_value);
+				   strlen (tpm_password), (void *) tpm_password);
 
       if (err)
 	{
 	  gnutls_assert ();
 	  _gnutls_debug_log ("Failed to set key PIN: %s\n",
 			     Trspi_Error_String (err));
+          ret = GNUTLS_E_TPM_PASSWORD_ERROR;
 	  goto out_key_policy;
 	}
       goto retry_sign;
@@ -364,7 +328,7 @@ out_srkpol:
 out_srk:
   Tspi_Context_CloseObject (s->tpm_context, s->srk);
   s->srk = 0;
-out_context:
+out_tspi_ctx:
   Tspi_Context_Close (s->tpm_context);
   s->tpm_context = 0;
 out_ctx:
