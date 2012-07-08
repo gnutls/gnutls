@@ -23,6 +23,14 @@ flag = {
 };
 
 flag = {
+    name      = sec-param;
+    arg-type  = string;
+    arg-name  = "Security parameter";
+    descrip   = "Specify the security level [low, legacy, normal, high, ultra].";
+    doc      = "This is alternative to the bits option.";
+};
+
+flag = {
     name      = bits;
     arg-type  = number;
     descrip   = "Specify the number of bits for key generate";
@@ -43,7 +51,7 @@ doc-section = {
   ds-text   = <<-_EOT_
 To generate a public key use:
 @example
-$ tpmtool --generate-rsa --bits 1024 --outfile tpmkey.pem
+$ tpmtool --generate-rsa --sec-param normal --outfile tpmkey.pem
 @end example
 
 To get the public key of a TPM key use:

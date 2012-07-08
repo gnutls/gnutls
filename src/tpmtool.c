@@ -80,6 +80,7 @@ cmd_parser (int argc, char **argv)
   unsigned int optct;
   unsigned int key_type = GNUTLS_PK_UNKNOWN;
   unsigned int bits = 0;
+  const char* sec_param = NULL;
   
   optct = optionProcess( &tpmtoolOptions, argc, argv);
   argc += optct;
@@ -114,14 +115,16 @@ cmd_parser (int argc, char **argv)
   else
     infile = stdin;
 
+  if (HAVE_OPT(SEC_PARAM))
+    sec_param = OPT_ARG(SEC_PARAM);
   if (HAVE_OPT(BITS))
     bits = OPT_VALUE_BITS;
-  else
-    bits = 2048;
+  
 
   if (HAVE_OPT(GENERATE_RSA))
     {
       key_type = GNUTLS_PK_RSA;
+      bits = get_bits (key_type, bits, sec_param);
       tpm_generate (outfile, key_type, bits);
     }
   else if (HAVE_OPT(PUBKEY))

@@ -563,8 +563,9 @@ out_blob:
  * form. Furthermore the wrapped key can be protected with
  * the provided @password.
  *
- * Note that bits in TPM is quantized value. Allowed values are 512,
- * 1024, 2048, 4096, 8192 and 16384.
+ * Note that bits in TPM is quantized value. If the input value
+ * is not one of the allowed values, then it will be quantized to
+ * one of 512, 1024, 2048, 4096, 8192 and 16384.
  *
  * Allowed flags are %GNUTLS_TPM_SIG_PKCS1V15 and %GNUTLS_TPM_SIG_PKCS1V15_SHA1.
  *
@@ -595,28 +596,18 @@ TSS_HPOLICY srk_policy, key_policy;
 unsigned int sig;
 gnutls_pubkey_t pub;
 
-  switch(bits) {
-    case 512:
+  if (bits <= 512)
       tpm_flags |= TSS_KEY_SIZE_512;
-      break;
-    case 1024:
+  else if (bits <= 1024)
       tpm_flags |= TSS_KEY_SIZE_1024;
-      break;
-    case 2048:
+  else if (bits <= 2048)
       tpm_flags |= TSS_KEY_SIZE_2048;
-      break;
-    case 4096:
+  else if (bits <= 4096)
       tpm_flags |= TSS_KEY_SIZE_4096;
-      break;
-    case 8192:
+  else if (bits <= 8192)
       tpm_flags |= TSS_KEY_SIZE_8192;
-      break;
-    case 16384:
+  else
       tpm_flags |= TSS_KEY_SIZE_16384;
-      break;
-    default:
-      return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
-  }
 
   tssret = Tspi_Context_Create(&ctx);
   if (tssret != 0)
