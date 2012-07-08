@@ -288,6 +288,8 @@ static const gnutls_error_entry error_algorithms[] = {
 
   ERROR_ENTRY (N_("TPM error."),
                GNUTLS_E_TPM_ERROR, 1),
+  ERROR_ENTRY (N_("Cannot initialize a session with the TPM."),
+               GNUTLS_E_TPM_SESSION_ERROR, 1),
   ERROR_ENTRY (N_("PKCS #11 error."),
                GNUTLS_E_PKCS11_ERROR, 1),
   ERROR_ENTRY (N_("PKCS #11 initialization error."),

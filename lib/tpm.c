@@ -40,27 +40,27 @@
 #include <trousers/tss.h>
 #include <trousers/trousers.h>
 
-/* Signing function for TPM privkeys, set with gnutls_privkey_import_ext() */
-
+/* Signing function for TPM privkeys, set with gnutls_privkey_import_ext2() */
 struct tpm_ctx_st
 {
-  TSS_HCONTEXT tpm_context;
+  TSS_HCONTEXT tpm_ctx;
   TSS_HKEY tpm_key;
   TSS_HPOLICY tpm_key_policy;
   TSS_HKEY srk;
   TSS_HPOLICY srk_policy;
 };
 
+static void tpm_close_session(struct tpm_ctx_st *s);
+
 static void
 tpm_deinit_fn (gnutls_privkey_t key, void *_s)
 {
   struct tpm_ctx_st *s = _s;
 
-  Tspi_Context_CloseObject (s->tpm_context, s->tpm_key_policy);
-  Tspi_Context_CloseObject (s->tpm_context, s->tpm_key);
-  Tspi_Context_CloseObject (s->tpm_context, s->srk_policy);
-  Tspi_Context_CloseObject (s->tpm_context, s->srk);
-  Tspi_Context_Close (s->tpm_context);
+  Tspi_Context_CloseObject (s->tpm_ctx, s->tpm_key_policy);
+  Tspi_Context_CloseObject (s->tpm_ctx, s->tpm_key);
+
+  tpm_close_session(s);
   gnutls_free (s);
 }
 
@@ -76,7 +76,7 @@ tpm_sign_fn (gnutls_privkey_t key, void *_s,
 		     data->size);
 
   err =
-      Tspi_Context_CreateObject (s->tpm_context,
+      Tspi_Context_CreateObject (s->tpm_ctx,
 				 TSS_OBJECT_TYPE_HASH, TSS_HASH_OTHER,
 				 &hash);
   if (err)
@@ -92,11 +92,11 @@ tpm_sign_fn (gnutls_privkey_t key, void *_s,
       gnutls_assert ();
       _gnutls_debug_log ("Failed to set value in TPM hash object: %s\n",
 			 Trspi_Error_String (err));
-      Tspi_Context_CloseObject (s->tpm_context, hash);
+      Tspi_Context_CloseObject (s->tpm_ctx, hash);
       return GNUTLS_E_PK_SIGN_FAILED;
     }
   err = Tspi_Hash_Sign (hash, s->tpm_key, &sig->size, &sig->data);
-  Tspi_Context_CloseObject (s->tpm_context, hash);
+  Tspi_Context_CloseObject (s->tpm_ctx, hash);
   if (err)
     {
       if (s->tpm_key_policy || err != TPM_E_AUTHFAIL)
@@ -112,6 +112,94 @@ tpm_sign_fn (gnutls_privkey_t key, void *_s,
 
 static const unsigned char nullpass[20];
 const TSS_UUID srk_uuid = TSS_UUID_SRK;
+
+
+static int tpm_open_session(struct tpm_ctx_st *s, const char* srk_password)
+{
+int err, ret;
+
+  err = Tspi_Context_Create (&s->tpm_ctx);
+  if (err)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("Failed to create TPM context: %s\n",
+			 Trspi_Error_String (err));
+      return GNUTLS_E_TPM_SESSION_ERROR;
+    }
+
+  err = Tspi_Context_Connect (s->tpm_ctx, NULL);
+  if (err)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("Failed to connect TPM context: %s\n",
+			 Trspi_Error_String (err));
+      ret = GNUTLS_E_TPM_SESSION_ERROR;
+      goto out_tspi_ctx;
+    }
+
+  err =
+      Tspi_Context_LoadKeyByUUID (s->tpm_ctx, TSS_PS_TYPE_SYSTEM,
+				  srk_uuid, &s->srk);
+  if (err)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log
+	  ("Failed to load TPM SRK key: %s\n", Trspi_Error_String (err));
+      ret = GNUTLS_E_TPM_SESSION_ERROR;
+      goto out_tspi_ctx;
+    }
+
+  err = Tspi_GetPolicyObject (s->srk, TSS_POLICY_USAGE, &s->srk_policy);
+  if (err)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("Failed to load TPM SRK policy object: %s\n",
+			 Trspi_Error_String (err));
+      ret = GNUTLS_E_TPM_SESSION_ERROR;
+      goto out_srk;
+    }
+
+  if (srk_password)
+    err = Tspi_Policy_SetSecret (s->srk_policy,
+				 TSS_SECRET_MODE_PLAIN,
+				 strlen (srk_password), (BYTE *) srk_password);
+  else				/* Well-known NULL key */
+    err = Tspi_Policy_SetSecret (s->srk_policy,
+				 TSS_SECRET_MODE_SHA1,
+				 sizeof (nullpass), (BYTE *) nullpass);
+  if (err)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("Failed to set TPM PIN: %s\n",
+			 Trspi_Error_String (err));
+      ret = GNUTLS_E_TPM_SESSION_ERROR;
+      goto out_srkpol;
+    }
+  
+  return 0;
+
+out_srkpol:
+  Tspi_Context_CloseObject (s->tpm_ctx, s->srk_policy);
+  s->srk_policy = 0;
+out_srk:
+  Tspi_Context_CloseObject (s->tpm_ctx, s->srk);
+  s->srk = 0;
+out_tspi_ctx:
+  Tspi_Context_Close (s->tpm_ctx);
+  s->tpm_ctx = 0;
+  return ret;
+
+}
+
+static void tpm_close_session(struct tpm_ctx_st *s)
+{
+  Tspi_Context_CloseObject (s->tpm_ctx, s->srk_policy);
+  s->srk_policy = 0;
+  Tspi_Context_CloseObject (s->tpm_ctx, s->srk);
+  s->srk = 0;
+  Tspi_Context_Close (s->tpm_ctx);
+  s->tpm_ctx = 0;
+}
 
 /**
  * gnutls_privkey_import_tpm_raw:
@@ -173,65 +261,15 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
       goto out_blob;
     }
 
-  err = Tspi_Context_Create (&s->tpm_context);
-  if (err)
+  ret = tpm_open_session(s, srk_password);
+  if (ret < 0)
     {
-      gnutls_assert ();
-      _gnutls_debug_log ("Failed to create TPM context: %s\n",
-			 Trspi_Error_String (err));
-      ret = GNUTLS_E_TPM_ERROR;
+      gnutls_assert();
       goto out_ctx;
-    }
-  err = Tspi_Context_Connect (s->tpm_context, NULL);
-  if (err)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("Failed to connect TPM context: %s\n",
-			 Trspi_Error_String (err));
-      ret = GNUTLS_E_TPM_ERROR;
-      goto out_tspi_ctx;
-    }
-  err =
-      Tspi_Context_LoadKeyByUUID (s->tpm_context, TSS_PS_TYPE_SYSTEM,
-				  srk_uuid, &s->srk);
-  if (err)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log
-	  ("Failed to load TPM SRK key: %s\n", Trspi_Error_String (err));
-      ret = GNUTLS_E_TPM_ERROR;
-      goto out_tspi_ctx;
-    }
-  err = Tspi_GetPolicyObject (s->srk, TSS_POLICY_USAGE, &s->srk_policy);
-  if (err)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("Failed to load TPM SRK policy object: %s\n",
-			 Trspi_Error_String (err));
-      ret = GNUTLS_E_TPM_ERROR;
-      goto out_srk;
-    }
-
-  /* We don't seem to get the error here... */
-  if (srk_password)
-    err = Tspi_Policy_SetSecret (s->srk_policy,
-				 TSS_SECRET_MODE_PLAIN,
-				 strlen (srk_password), (BYTE *) srk_password);
-  else				/* Well-known NULL key */
-    err = Tspi_Policy_SetSecret (s->srk_policy,
-				 TSS_SECRET_MODE_SHA1,
-				 sizeof (nullpass), (BYTE *) nullpass);
-  if (err)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("Failed to set TPM PIN: %s\n",
-			 Trspi_Error_String (err));
-      ret = GNUTLS_E_TPM_ERROR;
-      goto out_srkpol;
     }
 
   /* ... we get it here instead. */
-  err = Tspi_Context_LoadKeyByBlob (s->tpm_context, s->srk,
+  err = Tspi_Context_LoadKeyByBlob (s->tpm_ctx, s->srk,
 				    asn1.size, asn1.data, &s->tpm_key);
   if (err != 0)
     {
@@ -247,12 +285,12 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
 	{
 	  gnutls_assert ();
 	  ret = GNUTLS_E_TPM_ERROR;
-	  goto out_srkpol;
+	  goto out_session;
 	}
       else
 	{
 	  ret = gnutls_assert_val (GNUTLS_E_TPM_SRK_PASSWORD_ERROR);
-	  goto out_srkpol;
+	  goto out_session;
 	}
     }
 
@@ -262,7 +300,7 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
   if (ret < 0)
     {
       gnutls_assert ();
-      goto out_srkpol;
+      goto out_session;
     }
 
   ret =
@@ -271,7 +309,7 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
     {
       if (!s->tpm_key_policy)
 	{
-	  err = Tspi_Context_CreateObject (s->tpm_context,
+	  err = Tspi_Context_CreateObject (s->tpm_ctx,
 					   TSS_OBJECT_TYPE_POLICY,
 					   TSS_POLICY_USAGE,
 					   &s->tpm_key_policy);
@@ -318,20 +356,13 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
   gnutls_free (asn1.data);
   return 0;
 out_key_policy:
-  Tspi_Context_CloseObject (s->tpm_context, s->tpm_key_policy);
+  Tspi_Context_CloseObject (s->tpm_ctx, s->tpm_key_policy);
   s->tpm_key_policy = 0;
 out_key:
-  Tspi_Context_CloseObject (s->tpm_context, s->tpm_key);
+  Tspi_Context_CloseObject (s->tpm_ctx, s->tpm_key);
   s->tpm_key = 0;
-out_srkpol:
-  Tspi_Context_CloseObject (s->tpm_context, s->srk_policy);
-  s->srk_policy = 0;
-out_srk:
-  Tspi_Context_CloseObject (s->tpm_context, s->srk);
-  s->srk = 0;
-out_tspi_ctx:
-  Tspi_Context_Close (s->tpm_context);
-  s->tpm_context = 0;
+out_session:
+  tpm_close_session(s);
 out_ctx:
   gnutls_free (s);
 out_blob:
@@ -440,65 +471,15 @@ struct tpm_ctx_st s;
     }
   asn1.size = slen;
 
-  err = Tspi_Context_Create (&s.tpm_context);
-  if (err)
+  ret = tpm_open_session(&s, srk_password);
+  if (ret < 0)
     {
-      gnutls_assert ();
-      _gnutls_debug_log ("Failed to create TPM context: %s\n",
-			 Trspi_Error_String (err));
-      ret = GNUTLS_E_TPM_ERROR;
+      gnutls_assert();
       goto out_blob;
-    }
-  err = Tspi_Context_Connect (s.tpm_context, NULL);
-  if (err)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("Failed to connect TPM context: %s\n",
-			 Trspi_Error_String (err));
-      ret = GNUTLS_E_TPM_ERROR;
-      goto out_tspi_ctx;
-    }
-  err =
-      Tspi_Context_LoadKeyByUUID (s.tpm_context, TSS_PS_TYPE_SYSTEM,
-				  srk_uuid, &s.srk);
-  if (err)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log
-	  ("Failed to load TPM SRK key: %s\n", Trspi_Error_String (err));
-      ret = GNUTLS_E_TPM_ERROR;
-      goto out_tspi_ctx;
-    }
-  err = Tspi_GetPolicyObject (s.srk, TSS_POLICY_USAGE, &s.srk_policy);
-  if (err)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("Failed to load TPM SRK policy object: %s\n",
-			 Trspi_Error_String (err));
-      ret = GNUTLS_E_TPM_ERROR;
-      goto out_srk;
-    }
-
-  /* We don't seem to get the error here... */
-  if (srk_password)
-    err = Tspi_Policy_SetSecret (s.srk_policy,
-				 TSS_SECRET_MODE_PLAIN,
-				 strlen (srk_password), (BYTE *) srk_password);
-  else				/* Well-known NULL key */
-    err = Tspi_Policy_SetSecret (s.srk_policy,
-				 TSS_SECRET_MODE_SHA1,
-				 sizeof (nullpass), (BYTE *) nullpass);
-  if (err)
-    {
-      gnutls_assert ();
-      _gnutls_debug_log ("Failed to set TPM PIN: %s\n",
-			 Trspi_Error_String (err));
-      ret = GNUTLS_E_TPM_ERROR;
-      goto out_srkpol;
     }
 
   /* ... we get it here instead. */
-  err = Tspi_Context_LoadKeyByBlob (s.tpm_context, s.srk,
+  err = Tspi_Context_LoadKeyByBlob (s.tpm_ctx, s.srk,
 				    asn1.size, asn1.data, &s.tpm_key);
   if (err != 0)
     {
@@ -514,12 +495,12 @@ struct tpm_ctx_st s;
 	{
 	  gnutls_assert ();
 	  ret = GNUTLS_E_TPM_ERROR;
-	  goto out_srkpol;
+	  goto out_session;
 	}
       else
 	{
 	  ret = gnutls_assert_val (GNUTLS_E_TPM_SRK_PASSWORD_ERROR);
-	  goto out_srkpol;
+	  goto out_session;
 	}
     }
 
@@ -527,20 +508,12 @@ struct tpm_ctx_st s;
   if (ret < 0)
     {
       gnutls_assert();
-      goto out_srkpol;
+      goto out_session;
     }
 
-  gnutls_free (asn1.data);
-  return 0;
-out_srkpol:
-  Tspi_Context_CloseObject (s.tpm_context, s.srk_policy);
-  s.srk_policy = 0;
-out_srk:
-  Tspi_Context_CloseObject (s.tpm_context, s.srk);
-  s.srk = 0;
-out_tspi_ctx:
-  Tspi_Context_Close (s.tpm_context);
-  s.tpm_context = 0;
+  ret = 0;
+out_session:
+  tpm_close_session(&s);
 out_blob:
   gnutls_free (asn1.data);
   return ret;
@@ -583,18 +556,17 @@ gnutls_tpm_privkey_generate (gnutls_pk_algorithm_t pk, unsigned int bits,
                              gnutls_datum_t* pubkey,
                              unsigned int flags)
 {
-TSS_HCONTEXT ctx;
 TSS_FLAG tpm_flags = TSS_KEY_TYPE_LEGACY | TSS_KEY_VOLATILE;
 TSS_HKEY key_ctx; 
-TSS_HKEY srk_ctx;
 TSS_RESULT tssret;
 int ret;
 void* tdata;
 UINT32 tint;
 gnutls_datum_t tmpkey;
-TSS_HPOLICY srk_policy, key_policy;
+TSS_HPOLICY key_policy;
 unsigned int sig;
 gnutls_pubkey_t pub;
+struct tpm_ctx_st s;
 
   if (bits <= 512)
       tpm_flags |= TSS_KEY_SIZE_512;
@@ -609,22 +581,11 @@ gnutls_pubkey_t pub;
   else
       tpm_flags |= TSS_KEY_SIZE_16384;
 
-  tssret = Tspi_Context_Create(&ctx);
-  if (tssret != 0)
-    {
-      gnutls_assert();
-      return GNUTLS_E_TPM_ERROR;
-    }
-    
-  tssret = Tspi_Context_Connect(ctx, NULL);
-  if (tssret != 0)
-    {
-      gnutls_assert();
-      ret = GNUTLS_E_TPM_ERROR;
-      goto err_cc;
-    }
+  ret = tpm_open_session(&s, srk_password);
+  if (ret < 0)
+    return gnutls_assert_val(ret);
 
-  tssret = Tspi_Context_CreateObject(ctx, TSS_OBJECT_TYPE_RSAKEY, tpm_flags, &key_ctx);
+  tssret = Tspi_Context_CreateObject(s.tpm_ctx, TSS_OBJECT_TYPE_RSAKEY, tpm_flags, &key_ctx);
   if (tssret != 0)
     {
       gnutls_assert();
@@ -645,43 +606,7 @@ gnutls_pubkey_t pub;
       ret = GNUTLS_E_TPM_ERROR;
       goto err_sa;
     }
-  
-  tssret = Tspi_Context_LoadKeyByUUID(ctx, TSS_PS_TYPE_SYSTEM, srk_uuid,
-                                   &srk_ctx);
-  if (tssret != 0)
-    {
-      gnutls_assert();
-      ret = GNUTLS_E_TPM_ERROR;
-      goto err_sa;
-    }
 
-  /* set SRK key */
-  tssret = Tspi_GetPolicyObject(srk_ctx, TSS_POLICY_USAGE, &srk_policy);
-  if (tssret != 0)
-    {
-      gnutls_assert();
-      ret = GNUTLS_E_TPM_ERROR;
-      goto err_sa;
-    }
-
-  if (srk_password == NULL)
-    {
-      tssret = Tspi_Policy_SetSecret(srk_policy, TSS_SECRET_MODE_SHA1,
-                                     20, (void*)nullpass);
-    }
-  else
-    {
-      tssret = Tspi_Policy_SetSecret(srk_policy, TSS_SECRET_MODE_PLAIN,
-                                     strlen(srk_password), (void*)srk_password);
-    }
-  
-  if (tssret != 0)
-    {
-      gnutls_assert();
-      ret = GNUTLS_E_TPM_SRK_PASSWORD_ERROR;
-      goto err_sa;
-    }
-    
   /* set the key of the actual key */
   if (key_password)
     {
@@ -703,7 +628,7 @@ gnutls_pubkey_t pub;
         }
     }
 
-  tssret = Tspi_Key_CreateKey(key_ctx, srk_ctx, 0);
+  tssret = Tspi_Key_CreateKey(key_ctx, s.srk, 0);
   if (tssret != 0)
     {
       gnutls_assert();
@@ -796,8 +721,9 @@ cleanup:
   gnutls_free(tmpkey.data);
   tmpkey.data = NULL;
 err_sa:
-  Tspi_Context_CloseObject(ctx, key_ctx);
+  Tspi_Context_CloseObject(s.tpm_ctx, key_ctx);
 err_cc:
-  Tspi_Context_Close(ctx);
+  tpm_close_session(&s); 
   return ret;
 }
+
