@@ -68,6 +68,11 @@ int
 gnutls_pubkey_import_privkey (gnutls_pubkey_t key, gnutls_privkey_t pkey,
                               unsigned int usage, unsigned int flags);
 
+int
+gnutls_pubkey_import_tpm_raw (gnutls_pubkey_t pkey,
+			       const gnutls_datum_t * fdata,
+			       gnutls_x509_crt_fmt_t format,
+			       const char *srk_password);
 
 int gnutls_pubkey_get_preferred_hash_algorithm (gnutls_pubkey_t key,
                                                 gnutls_digest_algorithm_t *

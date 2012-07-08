@@ -74,7 +74,21 @@ void dh_info (common_info_st * ci);
 
 gnutls_x509_privkey_t * load_privkey_list (int mand, size_t * privkey_size, common_info_st * info);
 
+void _pubkey_info(FILE* outfile, gnutls_pubkey_t pubkey);
+void
+print_ecc_pkey (FILE* outfile, gnutls_ecc_curve_t curve, gnutls_datum_t* k, gnutls_datum_t * x, gnutls_datum_t * y);
+void
+print_rsa_pkey (FILE* outfile, gnutls_datum_t * m, gnutls_datum_t * e, gnutls_datum_t * d,
+                gnutls_datum_t * p, gnutls_datum_t * q, gnutls_datum_t * u,
+                gnutls_datum_t * exp1, gnutls_datum_t * exp2);
+void
+print_dsa_pkey (FILE* outfile, gnutls_datum_t * x, gnutls_datum_t * y, gnutls_datum_t * p,
+                gnutls_datum_t * q, gnutls_datum_t * g);
+
 FILE *safe_open_rw (const char *file, int privkey_op);
+
+const char *
+raw_to_string (const unsigned char *raw, size_t raw_size);
 
 extern unsigned char buffer[];
 extern const int buffer_size;

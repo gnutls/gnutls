@@ -75,8 +75,6 @@ static void print_certificate_info (gnutls_x509_crt_t crt, FILE * out,
                                     unsigned int all);
 static void verify_certificate (common_info_st * cinfo);
 
-static void print_hex_datum (gnutls_datum_t * dat);
-
 FILE *outfile;
 FILE *infile;
 static gnutls_digest_algorithm_t default_dig;
@@ -102,90 +100,6 @@ main (int argc, char **argv)
   cmd_parser (argc, argv);
 
   return 0;
-}
-
-static const char *
-raw_to_string (const unsigned char *raw, size_t raw_size)
-{
-  static char buf[1024];
-  size_t i;
-  if (raw_size == 0)
-    return NULL;
-
-  if (raw_size * 3 + 1 >= sizeof (buf))
-    return NULL;
-
-  for (i = 0; i < raw_size; i++)
-    {
-      sprintf (&(buf[i * 3]), "%02X%s", raw[i],
-               (i == raw_size - 1) ? "" : ":");
-    }
-  buf[sizeof (buf) - 1] = '\0';
-
-  return buf;
-}
-
-static void
-print_dsa_pkey (gnutls_datum_t * x, gnutls_datum_t * y, gnutls_datum_t * p,
-                gnutls_datum_t * q, gnutls_datum_t * g)
-{
-  if (x)
-    {
-      fprintf (outfile, "private key:");
-      print_hex_datum (x);
-    }
-  fprintf (outfile, "public key:");
-  print_hex_datum (y);
-  fprintf (outfile, "p:");
-  print_hex_datum (p);
-  fprintf (outfile, "q:");
-  print_hex_datum (q);
-  fprintf (outfile, "g:");
-  print_hex_datum (g);
-}
-
-static void
-print_ecc_pkey (gnutls_ecc_curve_t curve, gnutls_datum_t* k, gnutls_datum_t * x, gnutls_datum_t * y)
-{
-  fprintf (outfile, "curve:\t%s\n", gnutls_ecc_curve_get_name(curve));
-  if (k)
-    {
-      fprintf (outfile, "private key:");
-      print_hex_datum (k);
-    }
-  fprintf (outfile, "x:");
-  print_hex_datum (x);
-  fprintf (outfile, "y:");
-  print_hex_datum (y);
-}
-
-static void
-print_rsa_pkey (gnutls_datum_t * m, gnutls_datum_t * e, gnutls_datum_t * d,
-                gnutls_datum_t * p, gnutls_datum_t * q, gnutls_datum_t * u,
-                gnutls_datum_t * exp1, gnutls_datum_t * exp2)
-{
-  fprintf (outfile, "modulus:");
-  print_hex_datum (m);
-  fprintf (outfile, "public exponent:");
-  print_hex_datum (e);
-  if (d)
-    {
-      fprintf (outfile, "private exponent:");
-      print_hex_datum (d);
-      fprintf (outfile, "prime1:");
-      print_hex_datum (p);
-      fprintf (outfile, "prime2:");
-      print_hex_datum (q);
-      fprintf (outfile, "coefficient:");
-      print_hex_datum (u);
-      if (exp1 && exp2)
-        {
-          fprintf (outfile, "exp1:");
-          print_hex_datum (exp1);
-          fprintf (outfile, "exp2:");
-          print_hex_datum (exp2);
-        }
-    }
 }
 
 static gnutls_x509_privkey_t
@@ -1354,7 +1268,7 @@ pgp_privkey_info (void)
             fprintf (stderr, "Error in key RSA data export: %s\n",
                      gnutls_strerror (ret));
           else
-            print_rsa_pkey (&m, &e, &d, &p, &q, &u, NULL, NULL);
+            print_rsa_pkey (outfile, &m, &e, &d, &p, &q, &u, NULL, NULL);
 
           bits = m.size * 8;
         }
@@ -1373,7 +1287,7 @@ pgp_privkey_info (void)
             fprintf (stderr, "Error in key DSA data export: %s\n",
                      gnutls_strerror (ret));
           else
-            print_dsa_pkey (&x, &y, &p, &q, &g);
+            print_dsa_pkey (outfile, &x, &y, &p, &q, &g);
             
           bits = y.size * 8;
         }
@@ -1489,20 +1403,6 @@ pgp_ring_info (void)
 
 #endif
 
-static void
-print_hex_datum (gnutls_datum_t * dat)
-{
-  unsigned int j;
-#define SPACE "\t"
-  fprintf (outfile, "\n" SPACE);
-  for (j = 0; j < dat->size; j++)
-    {
-      fprintf (outfile, "%.2x:", (unsigned char) dat->data[j]);
-      if ((j + 1) % 15 == 0)
-        fprintf (outfile, "\n" SPACE);
-    }
-  fprintf (outfile, "\n");
-}
 
 
 static void
@@ -1680,7 +1580,7 @@ const char *cprint;
                  gnutls_strerror (ret));
       else
         {
-          print_rsa_pkey (&m, &e, &d, &p, &q, &u, &exp1, &exp2);
+          print_rsa_pkey (outfile, &m, &e, &d, &p, &q, &u, &exp1, &exp2);
           bits = m.size * 8;
 
           gnutls_free (m.data);
@@ -1703,7 +1603,7 @@ const char *cprint;
                  gnutls_strerror (ret));
       else
         {
-          print_dsa_pkey (&x, &y, &p, &q, &g);
+          print_dsa_pkey (outfile, &x, &y, &p, &q, &g);
           bits = y.size * 8;
 
           gnutls_free (x.data);
@@ -1724,7 +1624,7 @@ const char *cprint;
                  gnutls_strerror (ret));
       else
         {
-          print_ecc_pkey (curve, &k, &x, &y);
+          print_ecc_pkey (outfile, curve, &k, &x, &y);
           bits = gnutls_ecc_curve_get_size(curve) * 8;
 
           gnutls_free (x.data);
@@ -2848,63 +2748,13 @@ smime_to_pkcs7 (void)
   free (lineptr);
 }
 
-static void
-print_key_usage (FILE * outfile, unsigned int usage)
-{
-  if (usage & GNUTLS_KEY_DIGITAL_SIGNATURE)
-    {
-      fprintf (outfile, "\tDigital signature.\n");
-    }
-
-  if (usage & GNUTLS_KEY_NON_REPUDIATION)
-    {
-      fprintf (outfile, "\tNon repudiation.\n");
-    }
-
-  if (usage & GNUTLS_KEY_KEY_ENCIPHERMENT)
-    {
-      fprintf (outfile, "\tKey encipherment.\n");
-    }
-
-  if (usage & GNUTLS_KEY_DATA_ENCIPHERMENT)
-    {
-      fprintf (outfile, "\tData encipherment.\n");
-    }
-
-  if (usage & GNUTLS_KEY_KEY_AGREEMENT)
-    {
-      fprintf (outfile, "\tKey agreement.\n");
-    }
-
-  if (usage & GNUTLS_KEY_KEY_CERT_SIGN)
-    {
-      fprintf (outfile, "\tCertificate signing.\n");
-    }
-
-  if (usage & GNUTLS_KEY_NON_REPUDIATION)
-    {
-      fprintf (outfile, "\tCRL signing.\n");
-    }
-
-  if (usage & GNUTLS_KEY_ENCIPHER_ONLY)
-    {
-      fprintf (outfile, "\tKey encipher only.\n");
-    }
-
-  if (usage & GNUTLS_KEY_DECIPHER_ONLY)
-    {
-      fprintf (outfile, "\tKey decipher only.\n");
-    }
-}
 
 void
 pubkey_info (gnutls_x509_crt_t crt, common_info_st * cinfo)
 {
   gnutls_pubkey_t pubkey;
-  unsigned int bits, usage;
   int ret;
   size_t size;
-  const char *cprint;
 
   ret = gnutls_pubkey_init (&pubkey);
   if (ret < 0)
@@ -2947,94 +2797,6 @@ pubkey_info (gnutls_x509_crt_t crt, common_info_st * cinfo)
     
   /* PEM */
 
-  fprintf (outfile, "Public Key Info:\n\n");
-  ret = gnutls_pubkey_get_pk_algorithm (pubkey, &bits);
-  fprintf (outfile, "Public Key Algorithm: ");
-
-  cprint = gnutls_pk_algorithm_get_name (ret);
-  fprintf (outfile, "%s (%u bits)\n", cprint ? cprint : "Unknown", bits);
-
-
-  /* Print the raw public and private keys
-   */
-  if (ret == GNUTLS_PK_RSA)
-    {
-      gnutls_datum_t m, e;
-
-      ret = gnutls_pubkey_get_pk_rsa_raw (pubkey, &m, &e);
-      if (ret < 0)
-        fprintf (stderr, "Error in key RSA data export: %s\n",
-                 gnutls_strerror (ret));
-      else
-        {
-          print_rsa_pkey (&m, &e, NULL, NULL, NULL, NULL, NULL, NULL);
-          gnutls_free (m.data);
-          gnutls_free (e.data);
-        }
-    }
-  else if (ret == GNUTLS_PK_DSA)
-    {
-      gnutls_datum_t p, q, g, y;
-
-      ret = gnutls_pubkey_get_pk_dsa_raw (pubkey, &p, &q, &g, &y);
-      if (ret < 0)
-        fprintf (stderr, "Error in key DSA data export: %s\n",
-                 gnutls_strerror (ret));
-      else
-        {
-          print_dsa_pkey (NULL, &y, &p, &q, &g);
-          gnutls_free (y.data);
-          gnutls_free (p.data);
-          gnutls_free (q.data);
-          gnutls_free (g.data);
-        }
-    }
-  else if (ret == GNUTLS_PK_EC)
-    {
-      gnutls_datum_t x, y;
-      gnutls_ecc_curve_t curve;
-
-      ret = gnutls_pubkey_get_pk_ecc_raw (pubkey, &curve, &x, &y);
-      if (ret < 0)
-        fprintf (stderr, "Error in key ECC data export: %s\n",
-                 gnutls_strerror (ret));
-      else
-        {
-          print_ecc_pkey (curve, NULL, &y, &x);
-          gnutls_free (y.data);
-          gnutls_free (x.data);
-        }
-    }
-
-  ret = gnutls_pubkey_get_key_usage (pubkey, &usage);
-  if (ret < 0)
-    {
-      error (EXIT_FAILURE, 0, "pubkey_get_key_usage: %s",
-             gnutls_strerror (ret));
-    }
-
-  fprintf (outfile, "Public Key Usage:\n");
-  print_key_usage (outfile, usage);
-
-  fprintf (outfile, "\n");
-
-  size = buffer_size;
-  if ((ret = gnutls_pubkey_get_key_id (pubkey, 0, buffer, &size)) < 0)
-    {
-      fprintf (stderr, "Error in key id calculation: %s\n",
-               gnutls_strerror (ret));
-    }
-  else
-    {
-      fprintf (outfile, "Public Key ID: %s\n", raw_to_string (buffer, size));
-    }
-
-  size = buffer_size;
-  ret = gnutls_pubkey_export (pubkey, GNUTLS_X509_FMT_PEM, buffer, &size);
-  if (ret < 0)
-    error (EXIT_FAILURE, 0, "export error: %s", gnutls_strerror (ret));
-
-  fprintf (outfile, "\n%s\n", buffer);
-
+  _pubkey_info(outfile, pubkey);
   gnutls_pubkey_deinit (pubkey);
 }

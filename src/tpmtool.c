@@ -51,8 +51,10 @@
 
 static void cmd_parser (int argc, char **argv);
 static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits);
+static void tpm_pubkey(FILE* infile, FILE* outfile);
 
 static FILE *outfile;
+static FILE *infile;
 int batch = 0;
 
 static void
@@ -103,6 +105,15 @@ cmd_parser (int argc, char **argv)
   else
     outfile = stdout;
 
+  if (HAVE_OPT(INFILE))
+    {
+      infile = fopen (OPT_ARG(INFILE), "rb");
+      if (infile == NULL)
+        error (EXIT_FAILURE, errno, "%s", OPT_ARG(INFILE));
+    }
+  else
+    infile = stdin;
+
   if (HAVE_OPT(BITS))
     bits = OPT_VALUE_BITS;
   else
@@ -112,6 +123,10 @@ cmd_parser (int argc, char **argv)
     {
       key_type = GNUTLS_PK_RSA;
       tpm_generate (outfile, key_type, bits);
+    }
+  else if (HAVE_OPT(PUBKEY))
+    {
+      tpm_pubkey (infile, outfile);
     }
   else 
     {
@@ -150,4 +165,35 @@ static void tpm_generate(FILE* outfile, unsigned int key_type, unsigned int bits
   fwrite (pubkey.data, 1, pubkey.size, outfile);
   fputs ("\n", outfile);
   fwrite (privkey.data, 1, privkey.size, outfile);
+  fputs ("\n", outfile);
+}
+
+static void tpm_pubkey(FILE* infile, FILE* outfile)
+{
+  int ret;
+  char* srk_pass;
+  gnutls_datum_t data;
+  gnutls_pubkey_t pubkey;
+  size_t size;
+  
+  srk_pass = getpass ("Enter SRK password: ");
+  if (srk_pass != NULL)
+    srk_pass = strdup(srk_pass);
+
+  data.data = (void*)fread_file (infile, &size);
+  data.size = size;
+  
+  gnutls_pubkey_init(&pubkey);
+
+  ret = gnutls_pubkey_import_tpm_raw(pubkey, &data, GNUTLS_X509_FMT_PEM,
+                                     srk_pass);
+
+  free(srk_pass);
+
+  if (ret < 0)
+    error (EXIT_FAILURE, 0, "gnutls_pubkey_import_tpm_raw: %s", gnutls_strerror (ret));
+
+  _pubkey_info(outfile, pubkey);
+
+  gnutls_pubkey_deinit(pubkey);
 }

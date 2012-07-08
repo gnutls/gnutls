@@ -111,6 +111,7 @@ tpm_sign_fn (gnutls_privkey_t key, void *_s,
 }
 
 static const unsigned char nullpass[20];
+const TSS_UUID srk_uuid = TSS_UUID_SRK;
 
 /**
  * gnutls_privkey_import_tpm_raw:
@@ -140,7 +141,6 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
 			       const char *srk_password,
 			       const char *key_password)
 {
-  static const TSS_UUID SRK_UUID = TSS_UUID_SRK;
   gnutls_datum_t asn1;
   size_t slen;
   int err, ret;
@@ -193,7 +193,7 @@ gnutls_privkey_import_tpm_raw (gnutls_privkey_t pkey,
     }
   err =
       Tspi_Context_LoadKeyByUUID (s->tpm_context, TSS_PS_TYPE_SYSTEM,
-				  SRK_UUID, &s->srk);
+				  srk_uuid, &s->srk);
   if (err)
     {
       gnutls_assert ();
@@ -339,7 +339,213 @@ out_blob:
   return ret;
 }
 
-const TSS_UUID srk_uuid = TSS_UUID_SRK;
+/* reads the RSA public key from the given TSS key.
+ * If psize is non-null it contains the total size of the parameters
+ * in bytes */
+static int read_pubkey(gnutls_pubkey_t pub, TSS_HKEY key_ctx, size_t *psize)
+{
+void* tdata;
+UINT32 tint;
+TSS_RESULT tssret;
+gnutls_datum_t m, e;
+int ret;
+
+  /* read the public key */
+
+  tssret = Tspi_GetAttribData(key_ctx, TSS_TSPATTRIB_RSAKEY_INFO,
+                                TSS_TSPATTRIB_KEYINFO_RSA_MODULUS, &tint, (void*)&tdata);
+  if (tssret != 0)
+    {
+      gnutls_assert();
+      return GNUTLS_E_TPM_ERROR;
+    }
+    
+  m.data = tdata;
+  m.size = tint;
+
+  tssret = Tspi_GetAttribData(key_ctx, TSS_TSPATTRIB_RSAKEY_INFO,
+                                TSS_TSPATTRIB_KEYINFO_RSA_EXPONENT, &tint, (void*)&tdata);
+  if (tssret != 0)
+    {
+      gnutls_assert();
+      Tspi_Context_FreeMemory(key_ctx, m.data);
+      return GNUTLS_E_TPM_ERROR;
+    }
+    
+  e.data = tdata;
+  e.size = tint;
+    
+  ret = gnutls_pubkey_import_rsa_raw(pub, &m, &e);
+
+  Tspi_Context_FreeMemory(key_ctx, m.data);
+  Tspi_Context_FreeMemory(key_ctx, e.data);
+
+  if (ret < 0)
+    return gnutls_assert_val(ret);
+  
+  if (psize)
+    *psize = e.size + m.size;
+
+  return 0;
+}
+
+
+/**
+ * gnutls_pubkey_import_tpm_raw:
+ * @pkey: The public key
+ * @fdata: The TPM key to be imported
+ * @format: The format of the private key
+ * @srk_password: The password for the SRK key (optional)
+ * @key_password: A password for the key (optional)
+ *
+ * This function will import the public key from the provided
+ * TPM key structure. If a password is needed to decrypt
+ * the provided key or the provided password is wrong, then 
+ * %GNUTLS_E_TPM_SRK_PASSWORD_ERROR is returned. If the TPM password
+ * is wrong or not provided then %GNUTLS_E_TPM_KEY_PASSWORD_ERROR
+ * is returned. 
+ *
+ * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
+ *   negative error value.
+ *
+ * Since: 3.1.0
+ *
+ **/
+int
+gnutls_pubkey_import_tpm_raw (gnutls_pubkey_t pkey,
+			       const gnutls_datum_t * fdata,
+			       gnutls_x509_crt_fmt_t format,
+			       const char *srk_password)
+{
+gnutls_datum_t asn1;
+size_t slen;
+int err, ret;
+struct tpm_ctx_st s;
+
+  ret = gnutls_pem_base64_decode_alloc ("TSS KEY BLOB", fdata, &asn1);
+  if (ret)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("Error decoding TSS key blob: %s\n",
+			 gnutls_strerror (ret));
+      return ret;
+    }
+
+  slen = asn1.size;
+  ret = _gnutls_x509_decode_octet_string(NULL, asn1.data, asn1.size, asn1.data, &slen);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto out_blob;
+    }
+  asn1.size = slen;
+
+  err = Tspi_Context_Create (&s.tpm_context);
+  if (err)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("Failed to create TPM context: %s\n",
+			 Trspi_Error_String (err));
+      ret = GNUTLS_E_TPM_ERROR;
+      goto out_blob;
+    }
+  err = Tspi_Context_Connect (s.tpm_context, NULL);
+  if (err)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("Failed to connect TPM context: %s\n",
+			 Trspi_Error_String (err));
+      ret = GNUTLS_E_TPM_ERROR;
+      goto out_tspi_ctx;
+    }
+  err =
+      Tspi_Context_LoadKeyByUUID (s.tpm_context, TSS_PS_TYPE_SYSTEM,
+				  srk_uuid, &s.srk);
+  if (err)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log
+	  ("Failed to load TPM SRK key: %s\n", Trspi_Error_String (err));
+      ret = GNUTLS_E_TPM_ERROR;
+      goto out_tspi_ctx;
+    }
+  err = Tspi_GetPolicyObject (s.srk, TSS_POLICY_USAGE, &s.srk_policy);
+  if (err)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("Failed to load TPM SRK policy object: %s\n",
+			 Trspi_Error_String (err));
+      ret = GNUTLS_E_TPM_ERROR;
+      goto out_srk;
+    }
+
+  /* We don't seem to get the error here... */
+  if (srk_password)
+    err = Tspi_Policy_SetSecret (s.srk_policy,
+				 TSS_SECRET_MODE_PLAIN,
+				 strlen (srk_password), (BYTE *) srk_password);
+  else				/* Well-known NULL key */
+    err = Tspi_Policy_SetSecret (s.srk_policy,
+				 TSS_SECRET_MODE_SHA1,
+				 sizeof (nullpass), (BYTE *) nullpass);
+  if (err)
+    {
+      gnutls_assert ();
+      _gnutls_debug_log ("Failed to set TPM PIN: %s\n",
+			 Trspi_Error_String (err));
+      ret = GNUTLS_E_TPM_ERROR;
+      goto out_srkpol;
+    }
+
+  /* ... we get it here instead. */
+  err = Tspi_Context_LoadKeyByBlob (s.tpm_context, s.srk,
+				    asn1.size, asn1.data, &s.tpm_key);
+  if (err != 0)
+    {
+      if (srk_password)
+	{
+	  gnutls_assert ();
+	  _gnutls_debug_log
+	      ("Failed to load TPM key blob: %s\n",
+	       Trspi_Error_String (err));
+	}
+
+      if (err != TPM_E_AUTHFAIL)
+	{
+	  gnutls_assert ();
+	  ret = GNUTLS_E_TPM_ERROR;
+	  goto out_srkpol;
+	}
+      else
+	{
+	  ret = gnutls_assert_val (GNUTLS_E_TPM_SRK_PASSWORD_ERROR);
+	  goto out_srkpol;
+	}
+    }
+
+  ret = read_pubkey(pkey, s.tpm_key, NULL);
+  if (ret < 0)
+    {
+      gnutls_assert();
+      goto out_srkpol;
+    }
+
+  gnutls_free (asn1.data);
+  return 0;
+out_srkpol:
+  Tspi_Context_CloseObject (s.tpm_context, s.srk_policy);
+  s.srk_policy = 0;
+out_srk:
+  Tspi_Context_CloseObject (s.tpm_context, s.srk);
+  s.srk = 0;
+out_tspi_ctx:
+  Tspi_Context_Close (s.tpm_context);
+  s.tpm_context = 0;
+out_blob:
+  gnutls_free (asn1.data);
+  return ret;
+}
+
 
 /**
  * gnutls_tpm_privkey_generate:
@@ -549,8 +755,8 @@ gnutls_pubkey_t pub;
       tmpkey.data = NULL;
     }
 
+  /* read the public key */
   {
-    gnutls_datum_t m, e;
     size_t psize;
 
     ret = gnutls_pubkey_init(&pub);
@@ -559,40 +765,15 @@ gnutls_pubkey_t pub;
         gnutls_assert();
         goto privkey_cleanup;
       }
-    
-    tssret = Tspi_GetAttribData(key_ctx, TSS_TSPATTRIB_RSAKEY_INFO,
-                                TSS_TSPATTRIB_KEYINFO_RSA_MODULUS, &tint, (void*)&tdata);
-    if (tssret != 0)
-      {
-        gnutls_assert();
-        ret = GNUTLS_E_TPM_ERROR;
-        goto pubkey_cleanup;
-      }
-    
-    m.data = tdata;
-    m.size = tint;
 
-    tssret = Tspi_GetAttribData(key_ctx, TSS_TSPATTRIB_RSAKEY_INFO,
-                                TSS_TSPATTRIB_KEYINFO_RSA_EXPONENT, &tint, (void*)&tdata);
-    if (tssret != 0)
-      {
-        gnutls_assert();
-        Tspi_Context_FreeMemory(key_ctx, m.data);
-        ret = GNUTLS_E_TPM_ERROR;
-        goto pubkey_cleanup;
-      }
-    
-    e.data = tdata;
-    e.size = tint;
-    
-    ret = gnutls_pubkey_import_rsa_raw(pub, &m, &e);
+    ret = read_pubkey(pub, key_ctx, &psize);
     if (ret < 0)
       {
         gnutls_assert();
-        goto pubkey_cleanup;
+        goto privkey_cleanup;
       }
+    psize+=512;
     
-    psize = e.size+m.size+512;
     pubkey->data = gnutls_malloc(psize);
     if (pubkey->data == NULL)
       {

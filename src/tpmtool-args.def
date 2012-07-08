@@ -7,12 +7,19 @@ short-usage   = "tpmtool [options]\ntpmtool --help for usage instructions.\n";
 explain       = "";
 
 #define  OUTFILE_OPT   1
+#define  INFILE_OPT   1
 #include args-std.def
 
 flag = {
     name      = generate-rsa;
     descrip   = "Generate an RSA private-public key pair";
     doc = "Generates an RSA private-public key pair on the specified token.";
+};
+
+flag = {
+    name      = pubkey;
+    descrip   = "Prints the public key of the provided key";
+    doc = "";
 };
 
 flag = {
@@ -36,7 +43,12 @@ doc-section = {
   ds-text   = <<-_EOT_
 To generate a public key use:
 @example
-$ tpmtool --generate-rsa --bits 1024
+$ tpmtool --generate-rsa --bits 1024 --outfile tpmkey.pem
+@end example
+
+To get the public key of a TPM key use:
+@example
+$ tpmtool --pubkey --infile tpmkey.tpm --outfile pubkey.pem
 @end example
 _EOT_;
 };
