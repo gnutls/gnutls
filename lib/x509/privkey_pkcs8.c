@@ -1215,33 +1215,26 @@ gnutls_x509_privkey_import_pkcs8 (gnutls_x509_privkey_t key,
    */
   if (format == GNUTLS_X509_FMT_PEM)
     {
-      uint8_t *out;
-
       /* Try the first header 
        */
       result =
         _gnutls_fbase64_decode (PEM_UNENCRYPTED_PKCS8,
-                                data->data, data->size, &out);
+                                data->data, data->size, &_data);
 
       if (result < 0)
         {                       /* Try the encrypted header 
                                  */
           result =
-            _gnutls_fbase64_decode (PEM_PKCS8, data->data, data->size, &out);
+            _gnutls_fbase64_decode (PEM_PKCS8, data->data, data->size, &_data);
 
-          if (result <= 0)
+          if (result < 0)
             {
-              if (result == 0)
-                result = GNUTLS_E_INTERNAL_ERROR;
               gnutls_assert ();
               return result;
             }
         }
       else if (flags == 0)
         flags |= GNUTLS_PKCS_PLAIN;
-
-      _data.data = out;
-      _data.size = result;
 
       need_free = 1;
     }

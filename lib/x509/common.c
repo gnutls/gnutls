@@ -805,7 +805,7 @@ _gnutls_x509_export_int_named (ASN1_TYPE asn1_data, const char *name,
     }
   else
     {                           /* PEM */
-      uint8_t *out;
+      gnutls_datum_t out;
       gnutls_datum_t tmp;
 
       result = _gnutls_x509_der_encode (asn1_data, name, &tmp, 0);
@@ -825,31 +825,25 @@ _gnutls_x509_export_int_named (ASN1_TYPE asn1_data, const char *name,
           return result;
         }
 
-      if (result == 0)
-        {                       /* oooops */
-          gnutls_assert ();
-          return GNUTLS_E_INTERNAL_ERROR;
-        }
-
-      if ((size_t) result > *output_data_size)
+      if ((size_t) out.size > *output_data_size)
         {
           gnutls_assert ();
-          gnutls_free (out);
-          *output_data_size = (size_t)result;
+          gnutls_free (out.data);
+          *output_data_size = (size_t)out.size+1;
           return GNUTLS_E_SHORT_MEMORY_BUFFER;
         }
 
-      *output_data_size = (size_t)result;
+      *output_data_size = (size_t)out.size;
 
       if (output_data)
         {
-          memcpy (output_data, out, (size_t)result);
+          memcpy (output_data, out.data, (size_t)out.size);
 
           /* do not include the null character into output size.
            */
           *output_data_size = (size_t)result - 1;
         }
-      gnutls_free (out);
+      gnutls_free (out.data);
 
     }
 

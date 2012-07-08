@@ -215,21 +215,14 @@ gnutls_pkcs7_import (gnutls_pkcs7_t pkcs7, const gnutls_datum_t * data,
    */
   if (format == GNUTLS_X509_FMT_PEM)
     {
-      uint8_t *out;
-
       result = _gnutls_fbase64_decode (PEM_PKCS7, data->data, data->size,
-                                       &out);
+                                       &_data);
 
       if (result <= 0)
         {
-          if (result == 0)
-            result = GNUTLS_E_INTERNAL_ERROR;
           gnutls_assert ();
           return result;
         }
-
-      _data.data = out;
-      _data.size = result;
 
       need_free = 1;
     }

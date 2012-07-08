@@ -126,25 +126,18 @@ gnutls_x509_crq_import (gnutls_x509_crq_t crq,
    */
   if (format == GNUTLS_X509_FMT_PEM)
     {
-      uint8_t *out;
-
       /* Try the first header */
-      result = _gnutls_fbase64_decode (PEM_CRQ, data->data, data->size, &out);
+      result = _gnutls_fbase64_decode (PEM_CRQ, data->data, data->size, &_data);
 
-      if (result <= 0)          /* Go for the second header */
+      if (result < 0)          /* Go for the second header */
         result =
-          _gnutls_fbase64_decode (PEM_CRQ2, data->data, data->size, &out);
+          _gnutls_fbase64_decode (PEM_CRQ2, data->data, data->size, &_data);
 
-      if (result <= 0)
+      if (result < 0)
         {
-          if (result == 0)
-            result = GNUTLS_E_INTERNAL_ERROR;
           gnutls_assert ();
           return result;
         }
-
-      _data.data = out;
-      _data.size = result;
 
       need_free = 1;
     }

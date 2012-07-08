@@ -451,11 +451,9 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
    */
   if (format == GNUTLS_X509_FMT_PEM)
     {
-      uint8_t *out;
-
       /* Try the first header */
       result =
-        _gnutls_fbase64_decode (PEM_KEY_RSA, data->data, data->size, &out);
+        _gnutls_fbase64_decode (PEM_KEY_RSA, data->data, data->size, &_data);
 
       if (result >= 0)
         key->pk_algorithm = GNUTLS_PK_RSA;
@@ -465,7 +463,7 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
           /* try for the second header */
           result =
             _gnutls_fbase64_decode (PEM_KEY_DSA, data->data, data->size,
-                                    &out);
+                                    &_data);
 
           if (result >= 0)
             key->pk_algorithm = GNUTLS_PK_DSA;
@@ -475,7 +473,7 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
               /* try for the second header */
               result =
                 _gnutls_fbase64_decode (PEM_KEY_ECC, data->data, data->size,
-                                    &out);
+                                    &_data);
               if (result >= 0)
                 key->pk_algorithm = GNUTLS_PK_EC;
              }
@@ -486,9 +484,6 @@ gnutls_x509_privkey_import (gnutls_x509_privkey_t key,
           gnutls_assert ();
           goto failover;
         }
-
-      _data.data = out;
-      _data.size = result;
 
       need_free = 1;
     }

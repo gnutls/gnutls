@@ -357,6 +357,9 @@ const TSS_UUID srk_uuid = TSS_UUID_SRK;
  * form. Furthermore the wrapped key can be protected with
  * the provided @password.
  *
+ * Note that bits in TPM is quantized value. Allowed values are 512,
+ * 1024, 2048, 4096, 8192 and 16384.
+ *
  * Allowed flags are %GNUTLS_TPM_SIG_PKCS1V15 and %GNUTLS_TPM_SIG_PKCS1V15_SHA1.
  *
  * Returns: On success, %GNUTLS_E_SUCCESS (0) is returned, otherwise a
@@ -408,7 +411,7 @@ gnutls_pubkey_t pub;
     default:
       return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
   }
-  
+
   tssret = Tspi_Context_Create(&ctx);
   if (tssret != 0)
     {
@@ -532,13 +535,12 @@ gnutls_pubkey_t pub;
   
   if (format == GNUTLS_X509_FMT_PEM)
     {
-      ret = _gnutls_fbase64_encode ("TSS KEY BLOB", tmpkey.data, tmpkey.size, &privkey->data);
+      ret = _gnutls_fbase64_encode ("TSS KEY BLOB", tmpkey.data, tmpkey.size, privkey);
       if (ret < 0)
         {
           gnutls_assert();
           goto cleanup;
         }
-      privkey->size = ret;
     }
   else
     {

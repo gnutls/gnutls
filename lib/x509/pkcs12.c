@@ -207,21 +207,14 @@ gnutls_pkcs12_import (gnutls_pkcs12_t pkcs12,
    */
   if (format == GNUTLS_X509_FMT_PEM)
     {
-      uint8_t *out;
-
       result = _gnutls_fbase64_decode (PEM_PKCS12, data->data, data->size,
-                                       &out);
+                                       &_data);
 
-      if (result <= 0)
+      if (result < 0)
         {
-          if (result == 0)
-            result = GNUTLS_E_INTERNAL_ERROR;
           gnutls_assert ();
           return result;
         }
-
-      _data.data = out;
-      _data.size = result;
 
       need_free = 1;
     }
